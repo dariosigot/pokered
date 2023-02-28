@@ -108091,14 +108091,14 @@ SaveSAV: ;$770a
 	ld hl,Coord
 	ld de,NowSavingString
 	call $1955
-	ld c,$78
+	ld c,$1e;$78
 	call DelayFrames
 	ld hl,GameSavedText
 	call PrintText
 	ld a,$b6        ;sound for saved game
 	call PlaySoundWaitForCurrent
 	call WaitForSoundToFinish
-	ld c,$1e
+	ld c,$10;$1e
 	jp DelayFrames
 
 NowSavingString:
@@ -129693,11 +129693,18 @@ _OlderFileWillBeErasedText: ; 94643 (25:4643)
 	db "will be erased to", $55
 	db "save. Okay?", $57
 
+;_UnnamedText_73909: ; 94671 (25:4671)
+;	db $0, "When you change a", $4f
+;	db "#MON BOX, data", $55
+;	db "will be saved.", $51
+;	db "Is that okay?", $57
+; 0x94671 + 63 bytes
+
 _UnnamedText_73909: ; 94671 (25:4671)
-	db $0, "When you change a", $4f
-	db "#MON BOX, data", $55
-	db "will be saved.", $51
-	db "Is that okay?", $57
+	db $0, "Change #MON BOX", $4f
+	db "and save data?", $57
+
+SECTION "_UnnamedText_739d4",ROMX[$46b0],BANK[$25]
 
 _UnnamedText_739d4: ; 946b0 (25:46b0)
 	db $0, "Choose a", $4f
