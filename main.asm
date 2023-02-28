@@ -85,11 +85,11 @@ FarCopyData: ; 009d (0:009d)
 	push af
 	ld a,[$CEE9] ; get future bank #, switch
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call CopyData
 	pop af       ; okay, done, time to switch back
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 CopyData: ; 00b5 (0:00b5)
 ; copy bc bytes of data from hl to de
@@ -101,6 +101,18 @@ CopyData: ; 00b5 (0:00b5)
 	or b
 	jr nz,CopyData
 	ret
+
+SECTION "RoutineForRealGB",ROM0[$0F5] ; Denim
+
+RoutineForRealGB:
+    push af
+    cp a,0
+    jr nz,.NotZero
+    inc a
+.NotZero
+    ld [$2000],a
+    pop af
+    ret
 
 SECTION "romheader",ROM0[$100]
 nop
@@ -174,11 +186,11 @@ GetJoypadState: ; 019a (0:019a)
 	push af
 	ld a,$3
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call _GetJoypadState
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; see also MapHeaderBanks
@@ -1207,7 +1219,7 @@ HandleBlackOut: ; 0931 (0:0931)
 	res 5,[hl]
 	ld a,$01
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call Func_40b0
 	call Function62CE
 	call Func_2312
@@ -1238,7 +1250,7 @@ HandleFlyOrTeleportAway: ; 0965 (0:0965)
 	call DoFlyOrTeleportAwayGraphics
 	ld a,$01
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call Function62CE
 	jp Func_5d5f
 
@@ -1812,7 +1824,7 @@ LoadCurrentMapView: ; 0caa (0:0caa)
 	push af
 	ld a,[$d52b] ; tile data ROM bank
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a ; switch to ROM bank that contains tile data
+	call RoutineForRealGB ; switch to ROM bank that contains tile data
 	ld a,[$d35f] ; address of upper left corner of current map view
 	ld e,a
 	ld a,[$d360]
@@ -1894,7 +1906,7 @@ LoadCurrentMapView: ; 0caa (0:0caa)
 	jr nz,.rowLoop2
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a ; restore previous ROM bank
+	call RoutineForRealGB ; restore previous ROM bank
 	ret
 
 AdvancePlayerSprite: ; 0d27 (0:0d27)
@@ -2745,7 +2757,7 @@ LoadMapHeader: ; 107c (0:107c)
 	push af
 	ld a,$03
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ld hl,$404d
 	add hl,bc
 	add hl,bc
@@ -2755,7 +2767,7 @@ LoadMapHeader: ; 107c (0:107c)
 	ld [$d35c],a ; music 2
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; function to copy map connection data from ROM to WRAM
@@ -2830,7 +2842,7 @@ LoadMapData: ; 1241 (0:1241)
 .restoreRomBank
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; function to switch to the ROM bank that a map is stored in
@@ -2849,7 +2861,7 @@ SwitchToMapRomBank: ; 12bc (0:12bc)
 	call BankswitchBack
 	ld a,[$ffe8]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a ; switch to map ROM bank
+	call RoutineForRealGB ; switch to map ROM bank
 	pop bc
 	pop hl
 	ret
@@ -2914,7 +2926,7 @@ LoadDestinationWarpPosition: ; 1313 (0:1313)
 	push af
 	ld a,[$cf12]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ld a,b
 	add a
 	add a
@@ -2926,7 +2938,7 @@ LoadDestinationWarpPosition: ; 1313 (0:1313)
 	call CopyData
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; INPUT:
@@ -3051,7 +3063,7 @@ LoadFrontSpriteByMonIndex: ; 1389 (0:1389)
 	push af
 	ld a, $f
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	xor a
 	ld [$FF00+$e1], a
 	call asm_3f0d0
@@ -3059,7 +3071,7 @@ LoadFrontSpriteByMonIndex: ; 1389 (0:1389)
 	ld [W_SPRITEFLIPPED], a
 	pop af
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	ret
 ; 13d0 (0:13d0)
 
@@ -3256,12 +3268,12 @@ PrintStatusConditionNotFainted ; 14f6
 	push af
 	ld a,BANK(Unknown_747de)
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call Unknown_747de ; print status condition
 	pop bc
 	ld a,b
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; function to print pokemon level, leaving off the ":L" if the level is at least 100
@@ -3313,7 +3325,7 @@ GetMonHeader: ; 1537 (0:1537)
 	push af
 	ld a,BANK(BulbasaurBaseStats)
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	push bc
 	push de
 	push hl
@@ -3369,7 +3381,7 @@ GetMonHeader: ; 1537 (0:1537)
 	pop bc
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; copy party pokemon's name to $CD6D
@@ -3720,11 +3732,11 @@ FarCopyData2: ; 17f7 (0:17f7)
 	push af
 	ld a,[$ff8b]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call CopyData
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; does a far copy but the source is de and the destination is hl
@@ -3735,7 +3747,7 @@ FarCopyData3: ; 180d (0:180d)
 	push af
 	ld a,[$ff8b]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	push hl
 	push de
 	push de
@@ -3747,7 +3759,7 @@ FarCopyData3: ; 180d (0:180d)
 	pop hl
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; copies each source byte to the destination twice (next to each other)
@@ -3758,7 +3770,7 @@ FarCopyDataDouble: ; 182b (0:182b)
 	push af
 	ld a,[$ff8b]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 .loop
 	ld a,[hli]
 	ld [de],a
@@ -3771,7 +3783,7 @@ FarCopyDataDouble: ; 182b (0:182b)
 	jr nz,.loop
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; copy (c * 16) bytes from b:de to hl during V-blank
@@ -3785,7 +3797,7 @@ CopyVideoData: ; 1848 (0:1848)
 	ld [$ff8b],a
 	ld a,b
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ld a,e
 	ld [H_VBCOPYSRC],a
 	ld a,d
@@ -3803,7 +3815,7 @@ CopyVideoData: ; 1848 (0:1848)
 	call DelayFrame ; wait for V-blank handler to perform the copy
 	ld a,[$ff8b]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	pop af
 	ld [H_AUTOBGTRANSFERENABLED],a ; restore original auto-transfer enabled flag
 	ret
@@ -3828,7 +3840,7 @@ CopyVideoDataDouble: ; 1886 (0:1886)
 	ld [$ff8b],a
 	ld a,b
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ld a,e
 	ld [H_VBCOPYDOUBLESRC],a
 	ld a,d
@@ -3846,7 +3858,7 @@ CopyVideoDataDouble: ; 1886 (0:1886)
 	call DelayFrame ; wait for V-blank handler to perform the copy
 	ld a,[$ff8b]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	pop af
 	ld [H_AUTOBGTRANSFERENABLED],a ; restore original auto-transfer enabled flag
 	ret
@@ -4644,7 +4656,7 @@ TextCommand17: ; 1ca3 (0:1ca3)
 	ld d,a
 	ld a,[hli]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	push hl
 	ld l,e
 	ld h,d
@@ -4652,7 +4664,7 @@ TextCommand17: ; 1ca3 (0:1ca3)
 	pop hl
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	jp NextTextCommand
 
 TextCommandJumpTable: ; 1cc1 (0:1cc1)
@@ -5224,7 +5236,7 @@ InitGame: ; 1f54 (0:1f54)
 	call CleanLCD_OAM ; this is unnecessary since it was already cleared above
 	ld a,$01
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call WriteDMACodeToHRAM ; copy DMA code to HRAM
 	xor a
 	ld [$ffd7],a
@@ -5319,7 +5331,7 @@ VBlankHandler: ; 2024 (0:2024)
 	call $ff80 ; OAM DMA
 	ld a,$01
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call PrepareOAMData ; update OAM buffer with current sprite data
 	call GenRandom
 	ld a,[H_VBLANKOCCURRED]
@@ -5337,7 +5349,7 @@ VBlankHandler: ; 2024 (0:2024)
 	call Func_28cb
 	ld a,[$c0ef] ; music ROM bank
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	cp a,$02
 	jr nz,.checkIfBank08
 .bank02
@@ -5361,7 +5373,7 @@ VBlankHandler: ; 2024 (0:2024)
 	call z,ReadJoypadRegister
 	ld a,[$d122]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	pop hl
 	pop de
 	pop bc
@@ -5956,7 +5968,7 @@ PlaySound: ; 23b1 (0:23b1)
 	ld [$FF00+$b9], a
 	ld a, [$c0ef]
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	cp $2
 	jr nz, .checkForBank08
 .bank02
@@ -5976,7 +5988,7 @@ PlaySound: ; 23b1 (0:23b1)
 .asm_240b
 	ld a, [$FF00+$b9]
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	jr .asm_2425
 .asm_2414
 	ld a, b
@@ -6000,11 +6012,11 @@ UpdateSprites: ; 2429 (0:2429)
 	push af
 	ld a, $1
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	call _UpdateSprites
 	pop af
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	ret
 ; 2442 (0:2442)
 
@@ -6127,7 +6139,7 @@ UncompressSpriteData: ; 24fd (0:24fd)
 	push af
 	ld a, b
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	ld a, $a
 	ld [$0], a
 	xor a
@@ -6135,7 +6147,7 @@ UncompressSpriteData: ; 24fd (0:24fd)
 	call _UncompressSpriteData
 	pop af
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	ret
 
 ; initializes necessary data to load a sprite and runs UncompressSpriteDataLoop
@@ -6925,7 +6937,7 @@ CloseTextDisplay: ; 29e8 (0:29e8)
 	jr nz,.restoreSpriteFacingDirectionLoop
 	ld a,BANK(InitMapSprites)
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call InitMapSprites ; reload sprite tile pattern data (since it was partially overwritten by text tile patterns)
 	ld hl,$cfc4
 	res 0,[hl]
@@ -6935,7 +6947,7 @@ CloseTextDisplay: ; 29e8 (0:29e8)
 	call LoadCurrentMapView
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	jp UpdateSprites ; move sprites
 
 DisplayPokemartDialogue: ; 2a2e (0:2a2e)
@@ -6951,11 +6963,11 @@ DisplayPokemartDialogue: ; 2a2e (0:2a2e)
 	push af
 	ld a,$01
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call DisplayPokemartDialogue_
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	jp AfterDisplayingTextID
 
 PokemartGreetingText: ; 2a55 (0:2a55)
@@ -6988,11 +7000,11 @@ DisplayPokemonCenterDialogue: ; 2a72 (0:2a72)
 	push af
 	ld a,$01
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call DisplayPokemonCenterDialogue_
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	jp AfterDisplayingTextID
 
 DisplaySafariGameOverText: ; 2a90 (0:2a90)
@@ -7034,7 +7046,7 @@ RepelWoreOffText: ; 2ac8 (0:2ac8)
 DisplayStartMenu: ; 2acd (0:2acd)
 	ld a,$04
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a ; ROM bank 4
+	call RoutineForRealGB ; ROM bank 4
 	ld a,[$d700] ; walking/biking/surfing
 	ld [$d11a],a
 	ld a,$8f ; Start menu sound
@@ -7180,11 +7192,11 @@ RemoveItemFromInventory: ; 2bbb (0:2bbb)
 	push af
 	ld a,BANK(RemoveItemFromInventory_)
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call RemoveItemFromInventory_
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; function to add an item (in varying quantities) to the player's bag or PC box
@@ -7199,12 +7211,12 @@ AddItemToInventory: ; 2bcf (0:2bcf)
 	push af
 	ld a,BANK(AddItemToInventory_)
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call AddItemToInventory_
 	pop bc
 	ld a,b
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	pop bc
 	ret
 
@@ -7750,7 +7762,7 @@ GetMonName: ; 2f9e (0:2f9e)
 	push af
 	ld a,BANK(MonsterNames) ; 07
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ld a,[$d11e]
 	dec a
 	ld hl,MonsterNames ; 421E
@@ -7766,7 +7778,7 @@ GetMonName: ; 2f9e (0:2f9e)
 	pop de
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	pop hl
 	ret
 
@@ -7901,7 +7913,7 @@ ReloadMapData: ; 3071 (0:3071)
 	call EnableLCD
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; reloads tileset tile patterns
@@ -7915,7 +7927,7 @@ ReloadTilesetTilePatterns: ; 3090 (0:3090)
 	call EnableLCD
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; shows the town map and lets the player choose a destination to fly to
@@ -7959,12 +7971,12 @@ TossItem: ; 30c4 (0:30c4)
 	push af
 	ld a,BANK(TossItem_)
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call TossItem_
 	pop de
 	ld a,d
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; checks if an item is a key item
@@ -7994,12 +8006,12 @@ DisplayTextBoxID: ; 30e8 (0:30e8)
 	push af
 	ld a,BANK(DisplayTextBoxID_)
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call DisplayTextBoxID_
 	pop bc
 	ld a,b
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; known jump sources: 466 (0:466), 68a (0:68a)
@@ -8036,12 +8048,12 @@ Func_310e: ; 310e (0:310e)
 	push af
 	ld a, [$cc58]
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	ld a, [$cf10]
 	call CallFunctionInTable
 	pop af
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	ret
 .unknown_3140 ; 0x3140
 	dw Unknown_1a442
@@ -8417,7 +8429,7 @@ Func_3381: ; 3381 (0:3381)
 	push af
 	ld a, [W_PBSTOREDROMBANK]
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	push hl
 	ld b, BANK(SaveTrainerName)
 	ld hl, SaveTrainerName
@@ -8427,7 +8439,7 @@ Func_3381: ; 3381 (0:3381)
 	pop hl
 	pop af
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	ld b, BANK(Func_1a5e7)
 	ld hl, Func_1a5e7
 	call Bankswitch ; indirect jump to Func_1a5e7 (1a5e7 (6:65e7))
@@ -8863,14 +8875,14 @@ BankswitchHome: ; 35bc (0:35bc)
 	ld [$CF08],a
 	ld a,[$CF09]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 BankswitchBack: ; 35cd (0:35cd)
 ; returns from BankswitchHome
 	ld a,[$CF08]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 Bankswitch: ; 35d6 (0:35d6)
@@ -8880,7 +8892,7 @@ Bankswitch: ; 35d6 (0:35d6)
 	push af
 	ld a,b
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ld bc,.Return
 	push bc
 	jp [hl]
@@ -8888,7 +8900,7 @@ Bankswitch: ; 35d6 (0:35d6)
 	pop bc
 	ld a,b
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; displays yes/no choice
@@ -9193,7 +9205,7 @@ GetName: ; 376b (0:376b)
 	;2-7 = OTHER ENTRIES
 	ld a,[$d0b7]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ld a,[W_LISTTYPE]    ;VariousNames' entryID
 	dec a
 	add a
@@ -9241,7 +9253,7 @@ GetName: ; 376b (0:376b)
 	pop hl
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ; known jump sources: 2cdc (0:2cdc), 2ee0 (0:2ee0)
@@ -9255,7 +9267,7 @@ GetItemPrice: ; 37df (0:37df)
 	ld a, $f
 .asm_37ed
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	ld hl, $cf8f
 	ld a, [hli]
 	ld h, [hl]
@@ -9279,13 +9291,13 @@ GetItemPrice: ; 37df (0:37df)
 .asm_3812
 	ld a, $1e
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	call GetMachinePrice
 .asm_381c
 	ld de, H_DOWNARROWBLINKCNT1 ; $ff8b
 	pop af
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	ret
 
 ; copies a string from [de] to [$cf4b]
@@ -9436,11 +9448,11 @@ Divide: ; 38b9 (0:38b9)
 	push af
 	ld a,$0d
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call _Divide
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	pop bc
 	pop de
 	pop hl
@@ -9734,12 +9746,12 @@ AddEnemyMonToPlayerParty: ; 3a53 (0:3a53)
 	push af
 	ld a, BANK(_AddEnemyMonToPlayerParty)
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	call _AddEnemyMonToPlayerParty
 	pop bc
 	ld a, b
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	ret
 ; 0x3a68
 
@@ -9749,12 +9761,12 @@ Func_3a68: ; 3a68 (0:3a68)
 	push af
 	ld a, BANK(Func_f51e)
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	call Func_f51e
 	pop bc
 	ld a, b
 	ld [H_LOADEDROMBANK], a
-	ld [$2000], a
+	call RoutineForRealGB
 	ret
 
 ; skips a text entries, each of size $b (like trainer name, OT name, rival name, ...)
@@ -10546,14 +10558,14 @@ Predef: ; 3e6d (0:3e6d)
 	push af
 	ld a,BANK(GetPredefPointer)
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	call GetPredefPointer
 
 	; call the predef function
 	; ($D0B7 has the bank of the predef routine)
 	ld a,[$D0B7]
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ld de,.Return
 	push de
 	jp [hl]
@@ -10561,7 +10573,7 @@ Predef: ; 3e6d (0:3e6d)
 .Return
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ret
 
 ;loads hl from cc4f, de from cc51, and bc from cc53
@@ -10596,14 +10608,14 @@ Func_3eb5: ; 3eb5 (0:3eb5)
 	bit 0, a
 	jr z, .asm_3eea
 	ld a, $11
-	ld [$2000], a
+	call RoutineForRealGB
 	ld [H_LOADEDROMBANK], a
 	call Func_469a0
 	ld a, [$FF00+$ee]
 	and a
 	jr nz, .asm_3edd
 	ld a, [$cd3e]
-	ld [$2000], a
+	call RoutineForRealGB
 	ld [H_LOADEDROMBANK], a
 	ld de, $3eda
 	push de
@@ -10622,7 +10634,7 @@ Func_3eb5: ; 3eb5 (0:3eb5)
 .asm_3eec
 	ld [$FF00+$eb], a
 	pop af
-	ld [$2000], a
+	call RoutineForRealGB
 	ld [H_LOADEDROMBANK], a
 	ret
 
@@ -14695,7 +14707,7 @@ Func_609e: ; 609e (1:609e)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	ld [$4000], a
 	ld b, $b
 	ld hl, $a598
@@ -14707,13 +14719,13 @@ Func_609e: ; 609e (1:609e)
 	jr nz, .asm_60b0
 	xor a
 	ld [$0], a
-	ld [$6000], a
+	ds 3
 	and a
 	ret
 .asm_60c1
 	xor a
 	ld [$0], a
-	ld [$6000], a
+	ds 3
 	scf
 	ret
 
@@ -14832,7 +14844,7 @@ Function61BC: ; 61bc (1:61bc)
 	call PlaySound
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ld c,4
 	call DelayFrames
 	ld de,RedSprite ; $4180
@@ -14860,7 +14872,7 @@ Function61BC: ; 61bc (1:61bc)
 	call PlaySound ; stop music
 	pop af
 	ld [H_LOADEDROMBANK],a
-	ld [$2000],a
+	call RoutineForRealGB
 	ld c,$14
 	call DelayFrames
 	FuncCoord 6, 5 ; $c40a
@@ -103617,7 +103629,7 @@ LoadSAVCheckSum: ; 73623 (1c:7623)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	ld [$4000], a
 	ld hl, $a598 ; hero name located in SRAM
 	ld bc, $f8b ; but here checks the full SAV
@@ -103663,7 +103675,7 @@ LoadSAVCheckSum1: ; 73690 (1c:7690)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	ld [$4000], a
 	ld hl, $a598 ; hero name located in SRAM
 	ld bc, $f8b  ; but here checks the full SAV
@@ -103684,7 +103696,7 @@ LoadSAVCheckSum2: ; 736bd (1c:76bd)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	ld [$4000], a
 	ld hl, $a598 ; hero name located in SRAM
 	ld bc, $f8b  ; but here checks the full SAV
@@ -103711,7 +103723,7 @@ SAVBadCheckSum: ; 736f7 (1c:76f7)
 ; known jump sources: 7368d (1c:768d), 736ba (1c:76ba), 736f4 (1c:76f4)
 SAVGoodChecksum: ; 736f8 (1c:76f8)
 	ld a, $0
-	ld [$6000], a
+	ds 3
 	ld [$0], a
 	ret
 
@@ -103789,7 +103801,7 @@ SaveSAVtoSRAM0: ; 7378c (1c:778c)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	ld [$4000], a
 	ld hl, W_PLAYERNAME ; $d158
 	ld de, $a598
@@ -103814,7 +103826,7 @@ SaveSAVtoSRAM0: ; 7378c (1c:778c)
 	call SAVCheckSum
 	ld [$b523], a
 	xor a
-	ld [$6000], a
+	ds 3
 	ld [$0], a
 	ret
 
@@ -103824,7 +103836,7 @@ SaveSAVtoSRAM1: ; 737e2 (1c:77e2)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	ld [$4000], a
 	ld hl, W_NUMINBOX ; $da80
 	ld de, $b0c0
@@ -103835,7 +103847,7 @@ SaveSAVtoSRAM1: ; 737e2 (1c:77e2)
 	call SAVCheckSum
 	ld [$b523], a
 	xor a
-	ld [$6000], a
+	ds 3
 	ld [$0], a
 	ret
 
@@ -103844,7 +103856,7 @@ SaveSAVtoSRAM2: ; 7380f (1c:780f)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	ld [$4000], a
 	ld hl, W_NUMINPARTY ; $d163
 	ld de, $af2c
@@ -103859,7 +103871,7 @@ SaveSAVtoSRAM2: ; 7380f (1c:780f)
 	call SAVCheckSum
 	ld [$b523], a
 	xor a
-	ld [$6000], a
+	ds 3
 	ld [$0], a
 	ret
 
@@ -103986,7 +103998,7 @@ Func_7390e: ; 7390e (1c:790e)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	ld a, b
 	ld [$4000], a
 	ld bc, $462
@@ -104002,7 +104014,7 @@ Func_7390e: ; 7390e (1c:790e)
 	ld [$ba4c], a
 	call Func_73863
 	xor a
-	ld [$6000], a
+	ds 3
 	ld [$0], a
 	ret
 
@@ -104111,7 +104123,7 @@ Func_73a29: ; 73a29 (1c:7a29)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	ld a, $2
 	ld [$4000], a
 	call Func_73a4b
@@ -104119,7 +104131,7 @@ Func_73a29: ; 73a29 (1c:7a29)
 	ld [$4000], a
 	call Func_73a4b
 	xor a
-	ld [$6000], a
+	ds 3
 	ld [$0], a
 	ret
 
@@ -104159,7 +104171,7 @@ Func_73a84: ; 73a84 (1c:7a84)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	ld a, $2
 	ld [$4000], a
 	call Func_73ab8
@@ -104167,7 +104179,7 @@ Func_73a84: ; 73a84 (1c:7a84)
 	ld [$4000], a
 	call Func_73ab8
 	xor a
-	ld [$6000], a
+	ds 3
 	ld [$0], a
 	pop hl
 	ld a, [$d5a0]
@@ -104202,7 +104214,7 @@ SAVCheckRandomID: ;$7ad1
 	ld a,$0a
 	ld [$0000],a
 	ld a,$01
-	ld [$6000],a
+	ds 3
 	ld [$4000],a
 	ld a,[$a598]
 	and a
@@ -104225,7 +104237,7 @@ SAVCheckRandomID: ;$7ad1
 	cp h
 .next
 	ld a,$00
-	ld [$6000],a
+	ds 3
 	ld [$0000],a
 	ret
 
@@ -104266,12 +104278,12 @@ CopyToSRAM0: ; 73b51 (1c:7b51)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	xor a
 	ld [$4000], a
 	call CopyData
 	xor a
-	ld [$6000], a
+	ds 3
 	ld [$0], a
 	ret
 
@@ -104280,7 +104292,7 @@ Func_73b6a: ; 73b6a (1c:7b6a)
 	ld a, $a
 	ld [$0], a
 	ld a, $1
-	ld [$6000], a
+	ds 3
 	xor a
 	call PadSRAM_FF
 	ld a, $1
@@ -104290,7 +104302,7 @@ Func_73b6a: ; 73b6a (1c:7b6a)
 	ld a, $3
 	call PadSRAM_FF
 	xor a
-	ld [$6000], a
+	ds 3
 	ld [$0], a
 	ret
 
