@@ -42221,8 +42221,9 @@ Func_1da20: ; 1da20 (7:5a20)
 	scf
 	ret
 
-NameRaterTextPointers: ; 1da54 (7:5a54)
-	dw NameRaterText1
+NameRaterTextPointers_OLD: ; 1da54 (7:5a54)
+
+SECTION "NameRaterText1",ROMX[$5a56],BANK[$7]
 
 NameRaterText1: ; 1da56 (7:5a56)
 	db $8
@@ -42292,21 +42293,9 @@ UnnamedText_1dad1: ; 1dad1 (7:5ad1)
 	TX_FAR _UnnamedText_1dad1
 	db "@"
 
-NameRaterObject: ; 0x1dad6 (size=26)
-	db $a ; border tile
+NameRaterObject_OLD: ; 0x1dad6 (size=26)
 
-	db $2 ; warps
-	db $7, $2, $5, $ff
-	db $7, $3, $5, $ff
-
-	db $0 ; signs
-
-	db $1 ; people
-	db SPRITE_MR_MASTERBALL, $3 + 4, $5 + 4, $ff, $d2, $1 ; person
-
-	; warp-to
-	EVENT_DISP $4, $7, $2
-	EVENT_DISP $4, $7, $3
+SECTION "VermilionHouse1_h",ROMX[$5AF0],BANK[$7]
 
 VermilionHouse1_h: ; 0x1daf0 to 0x1dafc (12 bytes) (bank=7) (id=93)
 	db $08 ; tileset
@@ -44579,6 +44568,298 @@ Func_1ecaf: ; 1ecaf (7:6caf)
 OakLabEmailText: ; 1ecbd (7:6cbd)
 	TX_FAR _OakLabEmailText
 	db "@"
+
+NameRaterObject: ; ??? (size=26)
+	db $a ; border tile
+
+	db $2 ; warps
+	db $7, $2, $5, $ff
+	db $7, $3, $5, $ff
+
+	db $0 ; signs
+
+	db $2 ; people
+	db SPRITE_MR_MASTERBALL, $3 + 4, $5 + 4, $ff, $d2, $1 ; person
+	db SPRITE_GENTLEMAN, $3 + 4, $2 + 4, $ff, $d3, $2 ; person
+
+	; warp-to
+	EVENT_DISP $4, $7, $2
+	EVENT_DISP $4, $7, $3
+
+NameRaterTextPointers: ; ??? (7:????)
+	dw NameRaterText1
+	dw MoveDeleterText
+
+MoveDeleterText:
+    db $8
+    call SaveScreenTilesToBuffer2
+    ld hl,MoveDeleterIntroText ; Intro Text
+    call PrintText
+    call YesNoChoice ; yes/no textbox
+    ld a,[$CC26] ; yes/no answer (Y=0,N=1)
+    and a
+    ld hl,AnswerNoText ; answer NO text
+    jr nz,.PrintTextAndEndScript
+    ld a,[W_NUMINPARTY]
+    and a
+    ld hl,NoPartyText
+    jr z,.PrintTextAndEndScript
+    ld hl,WhichPkmnForgotText
+    call PrintText
+    xor a
+    ld [$cfcb],a  ; ?
+    ld [$d07d],a  ; Item Menu Id
+    ld [$cc35],a  ; ?
+    ld [$cc2b],a  ; Index of Choice Pkmn
+    call DisplayPartyMenu
+    jr .CheckIfPokemonChosen
+.PrintAndLoopParty
+    call PrintText
+.LoopPartyMenu
+    call LoadScreenTilesFromBuffer1 ; restore saved screen
+    xor a
+    ld [$cc35],a
+    ld [$d07d],a
+    call GoBackToPartyMenu
+.CheckIfPokemonChosen ; $70c9
+    jr nc,.ChosePokemon
+.ExitMenu
+    call GBPalWhiteOutWithDelay3
+    call Func_3dbe
+    call LoadGBPal
+    ld hl,AnswerNoText
+.PrintTextAndEndScript
+    call PrintText
+    jp TextScriptEnd
+.ChosePokemon
+    call SaveScreenTilesToBuffer1 ; save screen
+    ld a,[wWhichPokemon] ; $cf92 ; Index of Choice Pkmn
+    ld [$cc2b],a  ; Backup Index of Choice Pkmn
+    ld [wChoicePkmnMoveDeleter],a
+    call GoToFirstMove ; Hl point to first move
+    ld a,[hli]
+    and a
+    jr z,.FirstMoveZeroSkipChoice
+    call HasOnlyOneMove
+    jr nc,.ContinueChoiceMove
+    ld hl,OnlyOneMoveText
+    jr .PrintAndLoopParty ; Loop if Pkmn Know only 1 move (c > 2)
+.ContinueChoiceMove
+    ld hl,DeleteWhichTechniqueText
+    call PrintText
+    ld a,[wChoicePkmnMoveDeleter]
+    call ChoiceMove
+    jr nz,.LoopPartyMenu
+    ld a,[wCurrentMenuItem] ; $cc26
+.FirstMoveZeroSkipChoice
+    ld e,a ; e = index of move
+    ld a,[wChoicePkmnMoveDeleter]
+    ld d,a ; d = index of pkmn
+    call DeleteMove
+    call GetMoveNameNotZero
+    ld a,[wChoicePkmnMoveDeleter]
+    ld hl,W_PARTYMON1NAME ; $d2b5
+    call GetPartyMonName ; Insert Pkmn Name in $CD6D
+    ld hl,ForgetCompleteText
+    jr .PrintAndLoopParty
+
+; Hl point to first move
+; input a = pkmn Party index
+GoToFirstMove:
+    ld hl,W_PARTYMON1_MOVE1
+    ld bc,W_PARTYMON2DATA - W_PARTYMON1DATA ; $2c
+    jp AddNTimes
+
+HasOnlyOneMove:
+    ld bc,$0300 ; loop 3 moves and use counter c with blank move
+.LoopMoves
+    ld a,[hli]
+    and a
+    jr nz,.NotBlankMove
+    inc c
+.NotBlankMove
+    dec b
+    jr nz,.LoopMoves
+    ld a,2
+    cp c
+    ret
+
+; e = index of move,d = index of pkmn
+DeleteMove:
+    ld a,d
+    call GoToFirstMove ; Hl point to first move
+    push hl     ; zero in deleted Move
+    ld c,e     ; ...
+    ld b,0     ; ...
+    add hl,bc  ; ...
+    ld a,[hl]
+    ld [$D11E],a ; This is for GetMoveName Routine
+    ld [hl],$0 ; ...
+    pop hl      ; ...
+    ld bc,$0300 ; Loop 3 times and c counter
+.Loop3Moves ; Loop Move but not last
+    push bc ; Backup Counter
+    push hl ; Backup Actual Move Index
+    ld a,[hl]
+    and a
+    jr nz,.notDelete
+    push hl
+    inc b
+.LoopNextMove
+    dec b
+    jr z,.StopLoop
+    inc hl
+    ld a,[hl] ; Load Next Move
+    and a
+    jr z,.LoopNextMove
+.StopLoop
+    ld d,a
+    ld [hl],$0 ; Delete Copied Move
+    ld bc,W_PARTYMON1_MOVE1PP - W_PARTYMON1_MOVE1 ; $15
+    add hl,bc
+    ld a,[hl] ; Copied Move PP
+    ld [hl],$0 ; Delete Copied Move PP
+    ld e,a
+    pop hl
+    ld a,d
+    ld [hl],a ; Insert Copied Move in Actual Move
+    ld bc,W_PARTYMON1_MOVE1PP - W_PARTYMON1_MOVE1 ; $15
+    add hl,bc
+    ld a,e
+    ld [hl],a ; Insert Copied Move PP in Actual Move PP
+.notDelete
+    pop hl ; Restore Actual Move Index
+    pop bc ; Restore Counter
+    inc hl
+    inc c
+    dec b
+    jr nz,.Loop3Moves
+    ld [hl],$0 ; Delete Last Move
+    ret
+
+; Choice Move Move Selected Pokemon (a = party index)
+; output a = Flag Result,[wCurrentMenuItem] = Index of Choice
+ChoiceMove:
+    call GoToFirstMove ; Hl point to first move
+    ld de,$d0dc
+    ld bc,$4
+    call CopyData
+    ld hl,Func_39b87
+    ld b,BANK(Func_39b87)
+    call Bankswitch ; indirect jump to Func_39b87 (39b87 (e:5b87))
+    FuncCoord 4,7 ; $c430
+    ld hl,Coord
+    ld bc,$040e
+    call TextBoxBorder
+    FuncCoord 6,8 ; $c446
+    ld hl,Coord
+    ld de,$d0e1
+    ld a,[$FF00+$f6]
+    set 2,a
+    ld [$FF00+$f6],a
+    call PlaceString
+    ld a,[$FF00+$f6]
+    res 2,a
+    ld [$FF00+$f6],a
+    ld hl,wTopMenuItemY ; $cc24
+    ld a,$8
+    ld [hli],a
+    ld a,$5
+    ld [hli],a
+    xor a
+    ld [hli],a
+    inc hl
+    ld a,[$cd6c]
+    ld [hli],a
+    ld a,$3
+    ld [hli],a
+    ld [hl],$0
+    ld hl,$fff6
+    set 1,[hl]
+    call HandleMenuInput
+    ld hl,$fff6
+    res 1,[hl]
+    bit 1,a ; was the B button pressed?
+    ret
+
+GetMoveNameNotZero:
+    ld a,[$D11E]
+    and a
+    jr z,.Zero
+    call GetMoveName
+    ld de,$cd6d ; Backup Item Name in cc5b
+    jr .Done
+.Zero
+    ld de,theErrorText
+.Done
+    jp CopyStringToCF4B ; copies a string from [de] to [$CF4B]
+
+theErrorText:
+    db "the ERROR!@"
+
+MoveDeleterIntroText:
+    TX_FAR _MoveDeleterIntroText
+    db "@"
+
+_MoveDeleterIntroText:
+    db $0
+    db "I'm MOVEDELETER."  ,$4f
+    db "Would you like to" ,$55
+    db "delete one move"   ,$55
+    db "of your #MON?"     ,$57
+
+AnswerNoText:
+    TX_FAR _UnnamedText_5643b
+    db "@"
+
+NoPartyText:
+    TX_FAR _NoPartyText
+    db "@"
+
+_NoPartyText:
+    db $0
+    db "Your party is" ,$4f
+    db "Empty!"        ,$57
+
+WhichPkmnForgotText:
+    TX_FAR _WhichPkmnForgotText
+    db "@"
+
+_WhichPkmnForgotText:
+    db $0,"Which #MON" ,$4f
+    db "must forgot a"  ,$55
+    db "move?"          ,$58
+
+ForgetCompleteText:
+    TX_FAR _ForgetCompleteText
+    db $b,6,"@"
+
+_ForgetCompleteText:
+    db $0
+    db "@"
+    TX_RAM $cd6d
+    db 0
+    db " forgot" ,$4f
+    db "@"
+    TX_RAM $CF4B
+    db 0
+    db "!@@"
+
+DeleteWhichTechniqueText
+    TX_FAR _DeleteWhichTechniqueText
+    db "@"
+
+_DeleteWhichTechniqueText:
+    db $0,"Delete which",$4f
+    db "technique?",$57
+
+OnlyOneMoveText:
+    TX_FAR _OnlyOneMoveText
+    db "@"
+
+_OnlyOneMoveText:
+    db $0,"the #MON knows",$4f
+    db "only one move!",$58
 
 SECTION "bank8",ROMX,BANK[$8]
 

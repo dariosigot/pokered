@@ -1462,6 +1462,9 @@ wFlagBycicleFourX:         ; df35 ; bit 0
 wFlagPlaceTitleScreen ; df36 ; counter for title screen
     ds 1
 
+wChoicePkmnMoveDeleter ; df37
+    ds 1
+
 SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
 
 wFlagGameBoyColor:	; dfff ; Denim
