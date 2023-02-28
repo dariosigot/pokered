@@ -61027,14 +61027,16 @@ Func_3c04c: ; 3c04c (f:404c)
 	ld h, b
 	ld l, $40
 	call Func_3c110
-	inc b
-	inc b
-	ld h, $0
+    ;inc b
+    ;inc b
+    ;ld h,$0
+    call DoubleIncB ; Denim
 	ld l, $60
 	call Func_3c110
 	call Func_3c0ff
 	ld a, c
-	ld [$FF00+$ae], a
+    ;ld [$FF00+$ae],a
+    call DoubleDecC ; Denim
 	dec c
 	dec c
 	jr nz, .asm_3c0bb
@@ -61065,9 +61067,10 @@ Func_3c0ff: ; 3c0ff (f:40ff)
 	ld c, $15
 	ld de, $4
 .asm_3c108
-	dec [hl]
-	dec [hl]
-	add hl, de
+    call DoubleDecHL ; Denim
+    ;dec [hl]
+    ;dec [hl]
+    ;add hl,de
 	dec c
 	jr nz, .asm_3c108
 	pop bc
@@ -65591,7 +65594,7 @@ ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
 	ld [hl],a
 
 ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
-	ld hl,W_DAMAGE
+    call PrintDamageNearEnemyHpBar ; Denim    ; ld hl,W_DAMAGE
 	ld a,[hli]
 	ld b,a
 	ld a,[hl]
@@ -65643,7 +65646,7 @@ ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
 	ld a,$48
 	call Predef ; animate the HP bar shortening
 ApplyAttackToEnemyPokemonDone: ; 3e19d (f:619d)
-	jp Func_3cd5a ; redraw pokemon names and HP bars
+    jp RemoveDiplayedDamage ; Denim ; jp Func_3cd5a ; redraw pokemon names and HP bars
 
 ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
 	ld a,[W_ENEMYMOVEEFFECT]
@@ -65712,7 +65715,7 @@ ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
 	ld [hl],a
 
 ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
-	ld hl,W_DAMAGE
+    call PrintDamageNearEnemyHpBar + 5 ; (PrintDamageNearPlayerHpBar) ; Denim ; ld hl,W_DAMAGE
 	ld a,[hli]
 	ld b,a
 	ld a,[hl]
@@ -65763,7 +65766,7 @@ ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
 	ld a,$48
 	call Predef ; animate the HP bar shortening
 ApplyAttackToPlayerPokemonDone
-	jp Func_3cd5a ; redraw pokemon names and HP bars
+    jp RemoveDiplayedDamage + 5 ; (RemovePlayerDiplayedDamage) ; Denim ; jp Func_3cd5a ; redraw pokemon names and HP bars
 
 AttackSubstitute: ; 3e25e (f:625e)
 	ld hl,SubstituteTookDamageText
@@ -69516,6 +69519,55 @@ MultiplyD05B: ; xxxxx (f:xxxx) ; Denim
     ld [$d05b],a
     pop af
     ld [H_MULTIPLIER],a
+    ret
+
+PrintDamageNearEnemyHpBar: ; xxxxx (f:xxxx) ; Denim
+    FuncCoord 7,4
+    ld hl,Coord
+    jr .PrintBattleDamage
+.PrintDamageNearPlayerHpBar
+    FuncCoord 3,5
+    ld hl,Coord
+.PrintBattleDamage
+    ld de,W_DAMAGE
+    ld b,%00000010
+    ld c,5
+    call PrintNumber
+    ld hl,W_DAMAGE
+    ret
+
+RemoveDiplayedDamage: ; xxxxx (f:xxxx) ; Denim
+    FuncCoord 7,4
+    ld hl,Coord
+    jr .RemoveBattleDamage
+.RemovePlayerDiplayedDamage
+    FuncCoord 3,5
+    ld hl,Coord
+.RemoveBattleDamage:
+    ld bc,$0105
+    call ClearScreenArea
+    jp Func_3cd5a ; redraw pokemon names and HP bars
+
+DoubleIncB: ; Denim
+    inc b
+    inc b
+    inc b
+    inc b
+    ld h,$0
+    ret
+
+DoubleDecC: ; Denim
+    ld [$FF00+$ae],a
+    dec c
+    dec c
+    ret
+
+DoubleDecHL: ; Denim
+    dec [hl]
+    dec [hl]
+    dec [hl]
+    dec [hl]
+    add hl,de
     ret
 
 SECTION "bank10",ROMX,BANK[$10]
