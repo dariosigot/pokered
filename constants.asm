@@ -476,6 +476,10 @@ W_SPRITEOUTPUTPTRCACHED EQU $D0AF ; used to revert pointer for different bit off
 W_SPRITEDECODETABLE0PTR EQU $D0B1 ; pointer to differential decoding table (assuming initial value 0)
 W_SPRITEDECODETABLE1PTR EQU $D0B3 ; pointer to differential decoding table (assuming initial value 1)
 
+H_LCDC_STATUS			EQU $FF41
+H_LOADEDWRAMBANK		EQU $FF70
+H_LOADEDVRAMBANK        EQU $FF4F
+
 H_SPRITEWIDTH           EQU $FF8B ; in bytes
 H_SPRITEINTERLACECOUNTER EQU $FF8B
 H_SPRITEHEIGHT          EQU $FF8C ; in bytes

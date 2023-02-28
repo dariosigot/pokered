@@ -102,6 +102,38 @@ CopyData: ; 00b5 (0:00b5)
 	jr nz,CopyData
 	ret
 
+SECTION "gameboycolor",ROM0[$0BE] ; Denim ; gameboycolor
+
+CheckIfThisIsInAGBC:
+    ld [wFlagGameBoyColor],a
+    cp a,$11
+    jr nz,.NotGBC
+    ld a,BANK(InizializzaParametriGBC)
+    call RoutineForRealGB
+    call InizializzaParametriGBC
+    xor a
+    call RoutineForRealGB
+.NotGBC
+    jp Start + 7
+
+PostVBlankHandler:
+    push af
+    ld a,[wFlagGameBoyColor]
+    cp a,$11
+    jr nz,.NotGBC
+    ld a,BANK(FF47toColor)
+    call RoutineForRealGB
+    call FF47toColor
+.NotGBC
+    pop af
+    call RoutineForRealGB
+    ret
+
+GoodGBPalNormal: ; Denim
+    call Delay3
+    call GBPalNormal
+    jp Delay3
+
 SECTION "RoutineForRealGB",ROM0[$0F5] ; Denim
 
 RoutineForRealGB:
@@ -115,8 +147,7 @@ RoutineForRealGB:
     ret
 
 SECTION "romheader",ROM0[$100]
-nop
-jp Start
+    db $18,$BC ; jr CheckIfThisIsInAGBC
 
 SECTION "start",ROM0[$150]
 Start: ; 0150 (0:0150)
@@ -5221,7 +5252,7 @@ InitGame: ; 1f54 (0:1f54)
 	call DisableLCD ; why enable then disable?
 	ld sp,$dfff ; initialize stack pointer
 	ld hl,$c000 ; start of WRAM
-	ld bc,$2000 ; size of WRAM
+	ld bc,$2000-1 ; size of WRAM
 .zeroWramLoop
 	ld [hl],0
 	inc hl
@@ -5373,7 +5404,7 @@ VBlankHandler: ; 2024 (0:2024)
 	call z,ReadJoypadRegister
 	ld a,[$d122]
 	ld [H_LOADEDROMBANK],a
-	call RoutineForRealGB
+    call PostVBlankHandler ; Denim ; call RoutineForRealGB
 	pop hl
 	pop de
 	pop bc
@@ -10456,8 +10487,9 @@ GBPalWhiteOut: ; 3de5 (0:3de5)
 	xor a
 	ld [rBGP],a
 	ld [rOBP0],a
-	ld [rOBP1],a
-	ret
+	;ld [rOBP1],a
+	;ret
+    jp EndGBPalWhiteOutAndDelay1
 
 GoPAL_SET_CF1C: ; 3ded (0:3ded)
 	ld b,$ff
@@ -10735,6 +10767,10 @@ Func_3f0f: ; 3f0f (0:3f0f)
 	dw $7be8
 	dw $7c0d
 	dw $7c45
+
+EndGBPalWhiteOutAndDelay1: ; Denim
+    ld [rOBP1],a
+    jp DelayFrame
 
 SECTION "bank1",ROMX,BANK[$1]
 
@@ -11064,7 +11100,7 @@ ENDC
 	ld a, $98
 	call Func_4533
 	ld b, $6
-	call GoPAL_SET
+	call setExceptionPaletteGbcAndGoPAL_SET ; call GoPAL_SET ; Denim,Palette Menu Iniziale per GameboyColor
 	call GBPalNormal
 	ld a, $e4
 	ld [rOBP0], a ; $FF00+$48
@@ -11101,8 +11137,8 @@ INCBIN "baserom.gbc",$43db,$43ea - $43db
 	ld c, $24
 	call DelayFrames
 	ld a, $bd
-	call PlaySound
-	call PrintGameVersionOnTitleScreen
+    call PlaySoundAndResetCounter ; Denim ; call PlaySound
+;    call PrintGameVersionOnTitleScreen
 	ld a, $90
 	ld [$FF00+$b0], a
 	ld d, $90
@@ -11113,6 +11149,7 @@ INCBIN "baserom.gbc",$43db,$43ea - $43db
 	ld h, $0
 	ld l, $50
 	call Func_44cf
+    call ForceVRAM2WritingAndPrintGameVersionOnTitleScreen ; Denim ; Forzatura scrittura VRAM2 per il bug SGB/GBC della schermata iniziale
 	ld a, d
 	add $4
 	ld d, a
@@ -11755,9 +11792,10 @@ PrepareOAMData: ; 4b0f (1:4b0f)
 	ld a, [$FF00+$94]        ; load bit 7 (set to $80 if sprite is in grass and should be drawn behind it)
 	or [hl]
 .alwaysInForeground
-	inc hl
-	ld [de], a               ; write OAM sprite flags
-	inc e
+;    inc hl
+;    ld [de],a               ; write OAM sprite flags
+;    inc e
+    call SpriteAttributeHandler ; Denim ; routine per gameboycolor
 	bit 0, a                 ; test for OAMFLAG_ENDOFDATA
 	jr z, .spriteTilesLoop
 	ld a, e
@@ -18354,6 +18392,64 @@ Func_7c18: ; 7c18 (1:7c18)
 	ld [$cc3c], a
 	ret
 ; 0x7c49
+
+; Routine per Flaggare l'istante di chiamata della funzione GoPAL_SET durante il menu iniziale per gestire il bug di conversione
+; SGB/GBC durante lo sliding delle finestre
+setExceptionPaletteGbcAndGoPAL_SET:
+    ld a,2
+    ld [H_LOADEDWRAMBANK],a ; WRAM Bank 2
+    ld a,1
+    ld [wExceptionPaletteGbc],a
+    ld [H_LOADEDWRAMBANK],a ; WRAM Bank 1
+    jp GoPAL_SET
+
+; Forzatura riscrittura VRAM2 per il bug di conversione SGB/GBC della schermata iniziale
+ForceVRAM2WritingAndPrintGameVersionOnTitleScreen:
+    ld hl,wFlagPlaceTitleScreen
+    ld a,[hl]
+    cp a,3
+    jr z,.Write
+    cp a,7
+    jr z,.End
+    inc a
+    ld [wFlagPlaceTitleScreen],a
+    ret
+.End
+    ei
+    ret z
+.Write
+    di
+    inc a
+    ld [wFlagPlaceTitleScreen],a
+    push de
+    call PrintGameVersionOnTitleScreen
+    pop de
+    ret
+
+PlaySoundAndResetCounter ; Denim
+    push af
+    ld a,2
+    ld [H_LOADEDWRAMBANK],a ; WRAM Bank 2
+    ld a,1
+    ld [wForceVRAM2Writing],a
+    ld [H_LOADEDWRAMBANK],a ; WRAM Bank 1
+    xor a
+    ld [wFlagPlaceTitleScreen],a
+    pop af
+    jp PlaySound
+
+SpriteAttributeHandler: ; Denim
+    push af
+    and a,%11111000
+    bit 3,a
+    jr z,.Done
+    inc a
+.Done
+    inc hl
+    ld [de],a
+    inc e
+    pop af
+    ret
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -31038,7 +31134,7 @@ StartMenu_TrainerInfo: ; 13460 (4:7460)
 	call Predef ; draw badges
 	ld b,$0d
 	call GoPAL_SET
-	call GBPalNormal
+	call GoodGBPalNormal
 	call WaitForTextScrollButtonPress ; wait for button press
 	call GBPalWhiteOut
 	call LoadFontTilePatterns
@@ -99731,7 +99827,7 @@ Func_70433: ; 70433 (1c:4433)
 	ld [$c0ee], a
 	call PlaySound
 	ld d, $28
-	call Func_704f3
+	call FlashingBallHealPokecenter
 .asm_704a2
 	ld a, [$c026]
 	cp $e8
@@ -99752,17 +99848,17 @@ Unknown_704d7: ; 704d7 (1c:44d7)
 INCBIN "baserom.gbc",$704d7,$704f3 - $704d7
 
 ; known jump sources: 7049f (1c:449f), 708f3 (1c:48f3)
-Func_704f3: ; 704f3 (1c:44f3)
-	ld b, $8
-.asm_704f5
-	ld a, [rOBP1] ; $FF00+$49
-	xor d
-	ld [rOBP1], a ; $FF00+$49
-	ld c, $a
-	call DelayFrames
-	dec b
-	jr nz, .asm_704f5
-	ret
+FlashingBallHealPokecenter: ; 704f3 (1c:44f3) ; Denim,modificata interamente per funzionare sul GameBoyColor
+    ld b,$8
+.LoopFlash
+    push bc
+    call LoadAlternateBallPic ; Denim
+    ld c,$a - 1
+    call DelayFrames
+    pop bc
+    dec b
+    jr nz,.LoopFlash
+    ret
 
 ; known jump sources: 70454 (1c:4454), 7046e (1c:446e)
 Func_70503: ; 70503 (1c:4503)
@@ -100268,7 +100364,7 @@ Func_708ca: ; 708ca (1c:48ca)
 	ld b, BANK(Func_79793)
 	call Bankswitch ; indirect jump to Func_79793 (79793 (1e:5793))
 	ld d, $80
-	call Func_704f3
+	call FlashingBallHealPokecenter
 .asm_708f6
 	ld c, $a
 	call DelayFrames
@@ -101391,7 +101487,7 @@ Func_7109b: ; 7109b (1c:509b)
 	ld b, $2
 	call GoPAL_SET
 	call Delay3
-	call GBPalNormal
+	call GoodGBPalNormal
 	xor a
 	ld [W_SUBANIMTRANSFORM], a ; $d08b
 	inc a
@@ -102816,8 +102912,9 @@ Func_71fc2: ; 71fc2 (1c:5fc2)
 ; 71feb (1c:5feb)
 SendSGBPacket: ; 71feb (1c:5feb)
 ;check number of packets
-	ld a,[hl]
-	and a,$07
+;    ld a,[hl]
+;    and a,$07
+    call CheckIfGameBoyColorModeAndSetPalette ; Denim : gameboycolor
 	ret z
 ; store number of packets in B
 	ld b,a
@@ -102883,17 +102980,21 @@ SendSGBPacket: ; 71feb (1c:5feb)
 
 ; known jump sources: 1fd6 (0:1fd6)
 Func_7202b: ; 7202b (1c:602b)
-	xor a
-	ld [$cf1b], a
-	call Func_7209b
-	ret nc
-	ld a, $1
-	ld [$cf1b], a
-	ld a, [$cf1a]
-	and a
-	jr z, .asm_7203f
-	ret
-.asm_7203f
+    xor a
+    ld [wRunningOnSGB],a
+    call TryToSendSGBPackets_Plus ; call Func_7209b ; Denim ; gameboycolor
+    ret nc ; return if not supergameboy
+    ld a,$1
+    ld [wRunningOnSGB],a
+    ld a,[wFlagGameBoyColor] ; 3 ; Denim,se gameBoyColor NO BORDI
+    cp a,$11                 ; 2
+    ret z                    ; 1
+    nop                      ; 1
+;    ld a,[$cf1a]
+;    and a
+;    jr z,.asm_7203f
+;    ret
+;.asm_7203f
 	di
 	call Func_72075
 	ei
@@ -103125,11 +103226,33 @@ INCBIN "baserom.gbc",$721fa,$72222 - $721fa
 Unknown_72222: ; 72222 (1c:6222)
 INCBIN "baserom.gbc",$72222,$7228e - $72222
 
-Unknown_7228e: ; 7228e (1c:628e)
-INCBIN "baserom.gbc",$7228e,$722c1 - $7228e
+Unknown_7228e:
+BlkPacket_7228e: ; 7228e (1c:628e)
+;INCBIN "baserom.gbc",$7228e,$722c1 - $7228e
+    db $22
+    db $03
+    db $03,$0A ; $03,$00
+    db $00,$00,$13,$07
+    db $02,$05
+    db $00,$08,$13,$09
+    db $03,$00 ; $03,$0A
+    db $00,$0A,$13,$11
+    ;Unknown_Command:
+    db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$03,$00,$00,$13,$07,$00,$03,$00,$08,$13,$09,$01,$03,$00,$0A,$13,$11,$02,$00
+Unknown_722c1:
+BlkPacket_722c1: ; 722c1 (1c:62c1)
+;INCBIN "baserom.gbc",$722c1,$722f4 - $722c1
+    db $22
+    db $03
+    db $03,$05
+    db $00,$00,$1F,$03 ; Denim ; $00,$00,$13,$03
+    db $03,$00
+    db $00,$04,$1F,$0D ; ...   ; $00,$04,$13,$0D
+    db $03,$05
+    db $00,$0E,$1F,$11 ; ...   ; $00,$0E,$13,$11
+    ;Unknown_Command:
+    db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$03,$00,$00,$13,$03,$01,$03,$00,$04,$13,$0D,$00,$03,$00,$0E,$13,$11,$01,$00
 
-Unknown_722c1: ; 722c1 (1c:62c1)
-INCBIN "baserom.gbc",$722c1,$722f4 - $722c1
 
 Unknown_722f4: ; 722f4 (1c:62f4)
 INCBIN "baserom.gbc",$722f4,$72360 - $722f4
@@ -103158,8 +103281,9 @@ PalPacket_72468: ; 72468 (1c:6468)
 PalPacket_72478: ; 72478 (1c:6478)
 	db $51,$1A,$00,$1B,$00,$1C,$00,$1D,$00,$00,$00,$00,$00,$00,$00,$00
 
-PalPacket_72488: ; 72488 (1c:6488)
-	db $51,$0E,$00,$0D,$00,$10,$00,$14,$00,$00,$00,$00,$00,$00,$00,$00
+PalPacket_72488: ; 72488 (1c:6488) ; Denim ; MenuIniziale con scritta ROSSO o BLU
+    db $51,$10,$00,$0D,$00,$0E,$00,$14,$00,$00,$00,$00,$00,$00,$00,$00
+;    db $51,$0E,$00,$0D,$00,$10,$00,$14,$00,$00,$00,$00,$00,$00,$00,$00
 
 PalPacket_72498: ; 72498 (1c:6498)
 	db $51,$10,$00,$22,$00,$12,$00,$18,$00,$00,$00,$00,$00,$00,$00,$00
@@ -104314,6 +104438,252 @@ PadSRAM_FF: ; 73b8f (1c:7b8f)
 	ld a, $ff
 	jp FillMemory
 
+TryToSendSGBPackets_Plus: ; Denim ; gameboycolor
+    ld a,[wFlagGameBoyColor]
+    cp a,$11
+    jr z,.GameBoyColor
+    jp Func_7209b
+.GameBoyColor
+    scf ; setCarryFlag
+    ret
+
+; Denim : gameboycolor
+; se GameBoyColor e PAL_SET,copio i 4 colori del pacchetto in WRAM2
+; se GameBoyColor e ATTR_BLK,copio su VRAM2 gli ID delle Palette da utilizzare per ogni tiles
+CheckIfGameBoyColorModeAndSetPalette:
+    di
+    ld a,[wFlagGameBoyColor]
+    cp a,$11
+    ld a,[hl]
+    push af ; Backup First Byte Packet
+    jr nz,.Done
+    and a,%11111000 ; Apply Mask to SGB Packet Type
+    cp a,%01010000 ; PAL_SET : $A
+    jr z,.SetGBCPalette
+    cp a,%00100000 ; ATTR_BLK ; $4
+    jr z,.SetGBCAttrBlk
+    jr .Done
+
+.SetGBCPalette
+
+
+    push hl ; Backup
+    push de
+    push bc
+
+    ld a,2
+    ld [H_LOADEDWRAMBANK],a ; WRAM Bank 2
+
+    inc hl
+    ld b,4 ; Counter 4 Palette (2 Byte each)
+    xor a
+    ld [wLastrBGPUsed],a  ; Force to Update FF47 Interpretation
+    ld [wLastrOBP0Used],a
+    ld [wPointerToCurrentPaletteByteLSB],a ; Pointer to Current SGB Color in WRAM 2 (4LSB)
+.Loop4Palette
+    ld a,[hli] ; 1st Byte Current Color
+    ld e,a
+    ld a,[hli] ; 2nd Byte Current Color
+    ld d,a ; de = PALETTE ID
+
+    push hl ; Backup pointer to current Palette ID
+    ld h,d
+    ld l,e ; hl = PALETTE ID
+    ld de,SuperPalettes
+    add hl,hl ; hl = PALETTE ID * 2
+    add hl,hl ; hl = PALETTE ID * 4
+    add hl,hl ; hl = PALETTE ID * 8
+    add hl,de ; hl = pointer to current Palette Color
+
+    push bc ; Backup Offset
+
+    ld a,[$ff8b] ; Backup FF8B
+	push af
+    ld a,[wPointerToCurrentPaletteByteLSB]
+    ld d,$d0
+    ld e,a
+    ld bc,8
+    ld a,BANK(SuperPalettes)
+    call FarCopyData2 ; copy bc bytes of data from a:hl to de
+    ld a,e
+    ld [wPointerToCurrentPaletteByteLSB],a
+	pop af
+    ld [$ff8b],a ; Restore FF8B
+
+    pop bc ; Restore Offset
+    pop hl ; Restore pointer to current Palette ID
+
+    dec b ; Update Counter
+    jr nz,.Loop4Palette
+
+    ld a,$90
+    ld [$d08f],a
+
+    ld b,BANK(DebugStoreColour)
+    ld hl,DebugStoreColour
+    call Bankswitch
+
+    ld a,1
+    ld [H_LOADEDWRAMBANK],a ; WRAM Bank 1
+
+.Restore
+    pop bc ; Restore
+    pop de
+    pop hl
+    pop af ; Restore First Byte Packet
+    xor a ; set Number of packet to zero
+    jr .NoSentPacket
+
+.Done
+    pop af ; Restore First Byte Packet
+    and a,%00000111
+.NoSentPacket
+    ei
+    ret
+
+.SetGBCAttrBlk
+
+    push hl ; Backup
+    push de
+    push bc
+
+    ld d,h
+    ld e,l
+    inc de
+    ld a,[de] ; number of data sets
+    push af ; Backup Counter
+    scf ; set carry flag
+.Loop
+    ld hl,wBlkCurrentPaletteColor
+    inc de
+    inc de
+    ld a,[de] ; Color Palette Designation
+    call c,ResetPreVRAM2
+    and a,%00000011 ; Mask for Palette Number for inside of surrounded area
+    ld [hli],a
+    inc de
+    ld a,[de] ; Coordinate X1 (left)
+    ld [hli],a
+    inc de
+    ld a,[de] ; Coordinate Y1 (upper)
+    ld [hli],a
+    inc de
+    ld a,[de] ; Coordinate X2 (right)
+    ld [hli],a
+    inc de
+    ld a,[de] ; Coordinate Y2 (lower)
+    ld [hl],a
+
+    push de ; Backup Pointer to Packet
+
+    ld hl,wBlkCoordinateX1Left
+    ld a,[hli]
+    ld d,a
+    ld a,[hli]
+    ld e,a
+
+    ld hl,wPreLoadOfVRAM2
+    ld l,d
+    ld bc,$20
+    call AddNTimes ; hl : puntatore su VRAM2
+    push hl ; Backup puntatore su VRAM2
+
+    ld hl,wBlkCoordinateX2Right
+    ld a,[hli]
+    ld b,a
+    ld a,[hli]
+    ld d,a
+    ld a,[wBlkCurrentPaletteColor]
+    ld c,a
+    pop hl ; Restore puntatore su VRAM2
+
+    ; hl : puntatore su VRAM2
+    ; b  : colonna finale
+    ; d  : riga finale
+    ; c  : Palette
+    ; e  : riga iniziale
+    ld a,2
+    ld [H_LOADEDWRAMBANK],a ; WRAM Bank 2
+    inc d
+.PreLoop
+    push hl ; Backup puntatore su VRAM2
+    push de ; Backup Row Counter
+    jr .NextColumn
+.NextRow
+    pop hl ; Restore puntatore su VRAM2
+    push bc ; Backup Counter
+    ld bc,$20
+    add hl,bc
+    pop bc ; Restore Counter
+    jr .PreLoop
+.NextColumn
+    ld a,c
+    ld [hl],a
+    ld a,l
+    and a,%00011111 ; Mask per ottenere un massimo di $1F equivalente all'ultima colonna
+    cp b
+    inc hl
+    jr nz,.NextColumn
+    pop de ; Restore Row Counter
+    inc e
+    ld a,e
+    cp d
+    jr nz,.NextRow
+    pop hl ; Restore puntatore su VRAM2 (useless)
+    ld a,1
+    ld [wForceVRAM2Writing],a
+    ld [H_LOADEDWRAMBANK],a ; WRAM Bank 1
+
+    pop de ; Restore Pointer to Packet
+    pop af ; Restore Counter
+    dec a
+    push af ; Backup Counter
+    jr nz,.Loop
+    pop af ; Restore Counter (useless)
+
+    jr .Restore
+
+; Azzeramento intero Pre caricamento VRAM2 con Palette derivante dalla prima sequenza del pacchetto attr_blk
+ResetPreVRAM2:
+    push af
+    push hl
+    and a,%00110000
+    swap a
+    ld b,a
+;    di
+    ld a,2
+    ld [H_LOADEDWRAMBANK],a ; WRAM Bank 2
+    ld a,b
+    ld bc,1024
+    ld hl,wPreLoadOfVRAM2
+    call FillMemory
+    ld a,1
+    ld [H_LOADEDWRAMBANK],a ; WRAM Bank 1
+;    ei
+    pop hl
+    pop af
+    ret
+
+; Funzione per cambiare lo sprite utilizzato dalle ball durante la ricarica al centro pokemon
+LoadAlternateBallPic: ; Denim
+    ld hl,wFlagFlashingHealBallBit7
+    bit 7,[hl]
+    jr z,.Flash
+    jr .Restore
+.Flash
+    set 7,[hl]
+    ld de,PokeCenterFlashingHealBall ; $44b7
+    ld bc,(BANK(PokeCenterFlashingHealBall) << 8) + $03
+    jr .Done
+.Restore
+    res 7,[hl]
+    ld de,PokeCenterHealBall
+    ld bc,(BANK(PokeCenterHealBall) << 8) + $03
+.Done
+    ld hl,$87c0
+    jp CopyVideoData
+PokeCenterFlashingHealBall:
+    INCBIN "gfx/pokecenter_ball_2.2bpp"
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
@@ -129417,3 +129787,404 @@ MoveNames: ; b0000 (2c:4000)
 	db "SLASH@"
 	db "SUBSTITUTE@"
 	db "STRUGGLE@"
+
+
+SECTION "InizializzaParametriGBC",ROMX[$4400],BANK[$30]
+
+InizializzaParametriGBC:
+
+;    Imposta velocita' GBC a 1
+    ld a,1
+    ld [$FF00+$4D],a ; Speed Switch
+    stop
+    nop
+
+;    Svuota 6 banchi di WRAM
+    ld d,6
+    ld hl,$d000
+    ld bc,$1000
+.Loop
+    ld a,d
+    inc a
+    ld [$FF00+$70],a ; WRAM Bank
+    push bc
+    push hl
+    xor a
+    call FillMemory
+    pop hl
+    pop bc
+    dec d
+    jr nz,.Loop
+
+;    Svuota WRAM1
+    ld a,1
+    ld [$FF00+$70],a ; WRAM Bank
+    dec bc ; svuoto $999 byte per conservare il byte di scelta gameboy
+    xor a
+    call FillMemory
+
+;    Svuota WRAM0
+    ld hl,$c000
+    ld bc,$1000
+    call FillMemory
+
+;    Imposta tutte le palette a nero
+    ld a,2
+    ld de,0
+    ld hl,$ff68 ; BCPS/BGPI - CGB Mode Only - Background Palette Index
+.LoopBgSprite
+    push af
+    ld a,$80
+    ld b,8
+    add hl,de
+    ld [hli],a
+.LoopAll8LeftPalette
+    ld c,4
+.LoopAll4Color
+    xor a
+    call FF47BlackOrWhite
+    dec c
+    jr nz,.LoopAll4Color
+    dec b
+    jr nz,.LoopAll8LeftPalette
+    pop af
+    dec a
+    inc de
+    jr nz,.LoopBgSprite
+    ret
+
+SECTION "FF47toColor",ROMX[$4800],BANK[$30]
+
+FF47toColor:
+    push bc
+    push de
+    push hl
+    ld a,$02
+    ld [H_LOADEDWRAMBANK],a
+    ld a,[rBGP] ; $FF00+$47
+    ld b,a
+    ld a,[wLastrBGPUsed]
+    cp b
+    jr z,.rBGPNotChange
+    ld a,$80
+    ld b,$00
+    ld hl,$ff68 ; BCPS/BGPI - CGB Mode Only - Background Palette Index
+    ld [hli],a
+.LoopAll8LeftPalette ; counter b
+    ld c,$00
+.LoopAll4Color ; counter c
+    ld a,[rBGP] ; $FF00+$47
+    push bc ; Store counter
+    and a
+    jr nz,.notWhite
+    call FF47BlackOrWhite
+    jr .Done
+.notWhite
+    cp a,$ff
+    jr nz,.notBlack
+    call FF47BlackOrWhite
+    jr .Done
+.notBlack
+    xor a
+    cp c
+    ld a,[rBGP] ; $FF00+$47
+    call nz,func4894
+    call func48a2
+.Done
+    pop bc ; Restore counter
+    inc c
+    ld a,c
+    cp a,$04
+    jr nz,.LoopAll4Color
+    inc b
+    ld a,b
+    cp a,$04
+    jr nz,.LoopAll8LeftPalette
+    ld a,[rBGP] ; $FF00+$47
+    ld [wLastrBGPUsed],a
+.rBGPNotChange
+    ld a,[rOBP0] ; $FF00+$48
+    ld b,a
+    ld a,[wLastrOBP0Used]
+    cp b
+    jr z,.rOBP0NotChange
+    ld a,$80
+    ld b,0 ; ld b,$08
+    ld hl,$ff6a ; OCPS/OBPI - CGB Mode Only - Sprite Palette Index
+    ld [hli],a
+.LoopAll8RightPalette
+    ld c,$00
+.LoopAll4RightColor
+    ld a,[rOBP0] ; $FF00+$48
+    push bc
+    and a
+    jr nz,.notRightWhite
+    call FF47BlackOrWhite
+    jr .DoneRight
+.notRightWhite
+    cp a,$ff
+    jr nz,.notRightBlack
+    call FF47BlackOrWhite
+    jr .DoneRight
+.notRightBlack
+    xor a
+    cp c
+    ld a,[rOBP0] ; $FF00+$48
+    call nz,func4894
+    call func48a2
+.DoneRight
+    pop bc
+    inc c
+    ld a,c
+    cp a,$04
+    jr nz,.LoopAll4RightColor
+    inc b
+    ld a,b
+    cp a,$4
+    jr nz,.LoopAll8RightPalette
+    ld a,[rOBP0] ; $FF00+$48
+    ld [wLastrOBP0Used],a
+.rOBP0NotChange
+    call WriteVRAM2
+    xor a
+    ld [H_LOADEDWRAMBANK],a
+    pop hl
+    pop de
+    pop bc
+    ret
+
+func4894:
+.func4894
+    rrca ; rlca
+    rrca ; rlca
+    dec c
+    jr nz,.func4894
+    ret
+
+func48a2:
+    and a,%00000011
+    add a
+    ld d,a
+    ld a,b
+    add a
+    add a
+    add a
+    add d
+    ld d,$d0
+    ld e,a
+    ld a,[de]
+    push hl
+    ld hl,H_LCDC_STATUS
+.point48b9
+    bit 1,[hl]
+    jr nz,.point48b9
+    pop hl
+    ld [hl],a
+    inc e
+    ld a,[de]
+    push hl
+    ld hl,H_LCDC_STATUS
+.point48c5
+    bit 1,[hl]
+    jr nz,.point48c5
+    pop hl
+    ld [hl],a
+    ret
+
+FF47BlackOrWhite:
+    push hl
+    ld hl,H_LCDC_STATUS
+.WaitForBlack
+    bit 1,[hl]
+    jr nz,.WaitForBlack
+    pop hl
+    xor $FF
+    ld [hl],a
+    ld [hl],a
+    ret
+
+WriteVRAM2:
+    ld a,[wForceVRAM2Writing]
+    and a
+    ret z
+    xor a
+    ld [wForceVRAM2Writing],a
+    ld a,1
+    ld [H_LOADEDVRAMBANK],a ; VRAM Bank 1 ($FF4F)
+
+    ld bc,1024
+    ld hl,wPreLoadOfVRAM2
+
+    ld a,[wExceptionPaletteGbc]
+    and a
+    jr z,.NoException
+    xor a
+    ld [wExceptionPaletteGbc],a
+    push hl
+    ld h,b
+    ld l,c
+    ld de,-(32*10)
+    add hl,de
+    ld b,h
+    ld c,l
+    pop hl
+    ld de,+(32*10)
+    add hl,de
+
+.NoException
+    ld de,$9c00
+.Loop9C
+    ld a,[hli]
+    push hl
+    ld hl,H_LCDC_STATUS
+.WaitForWrite9C
+    bit 1,[hl]
+    jr nz,.WaitForWrite9C
+    ld [de],a
+    inc de
+    pop hl
+    dec bc
+    ld a,b
+    or c
+    jr nz,.Loop9C
+
+    ld bc,1024
+    ld hl,wPreLoadOfVRAM2
+    ld de,$9800
+.Loop98
+    ld a,[hli]
+    push hl
+    ld hl,H_LCDC_STATUS
+.WaitForWrite98
+    bit 1,[hl]
+    jr nz,.WaitForWrite98
+    ld [de],a
+    inc de
+    pop hl
+    dec bc
+    ld a,b
+    or c
+    jr nz,.Loop98
+
+    xor a
+    ld [H_LOADEDVRAMBANK],a ; VRAM Bank 0 ($FF4F)
+    ret
+
+SECTION "DebugStoreColour",ROMX[$4A00],BANK[$30]
+
+DebugStoreColour: ; 4c:4a8a (2015/09/29)
+    ld a,$90
+    ld [$d08f],a
+    ld hl,$d000
+    ld b,16
+.LoopColour
+    ld a,[hli]
+    ld e,a
+    ld a,[hli]
+    ld d,a
+    push hl
+    push de
+    ld a,[$d08f]
+    ld l,a
+    ld a,$d0
+    ld h,a
+    ld a,e
+    and a,%00011111 ; RED
+    call Conversion
+    pop de
+    push de
+    ld a,d
+    and a,%00000011
+    sla a
+    sla a
+    sla a
+    ld d,a
+    ld a,e
+    swap a
+    srl a
+    and a,%0000111
+    add a,d ; GREEN
+    call Conversion
+    pop de
+    push de
+    ld a,d
+    srl a
+    srl a
+    and a,%00011111 ; BLUE
+    call Conversion
+    ld a,l
+    ld [$d08f],a
+    pop de
+    pop hl
+    dec b
+    jr nz,.LoopColour
+
+    ld hl,$d090
+    ld b,16
+    ld e,0
+.Loop3ByteColour
+    ld a,[hli] ; red
+    ld d,a
+    ld a,[hli] ; green
+    ld c,a
+    and a,%00000111
+    swap a
+    sla a
+    add d ; 1st Byte
+    call StoreNewColour
+    ld a,c
+    sla a
+    swap a
+    and a,%00000011
+    ld c,a
+    ld a,[hli] ; blue
+    sla a
+    sla a
+    add c ; 2nd Byte
+    call StoreNewColour
+    dec b
+    jr nz,.Loop3ByteColour
+
+    ld hl,$d000
+    ld a,[hli]
+    ld b,a
+    ld a,[hld]
+    ld c,a
+    ld de,8
+    ld a,3
+.LoopCopyColor0
+    push af
+    add hl,de
+    ld a,b
+    ld [hli],a
+    ld a,c
+    ld [hld],a
+    pop af
+    dec a
+    jr nz,.LoopCopyColor0
+
+    ret
+
+StoreNewColour:
+    push hl
+    ld h,$d0
+    ld l,e
+    ld [hl],a
+    pop hl
+    inc e
+    ret
+
+TableConversion:
+    db 00,00,00,00,00,01,01,01,02,02,04,05,06,08,11,11,11,12,12,12,13,15,16,18,20,22,25,31,31,31,31,31
+Conversion:
+    push hl
+    ld hl,TableConversion - 1
+    inc a
+.LoopTable
+    inc hl
+    dec a
+    jr nz,.LoopTable
+    ld a,[hl]
+    pop hl
+    ld [hli],a
+    ret
