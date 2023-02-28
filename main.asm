@@ -4594,7 +4594,7 @@ TextCommand0B: ; 1c31 (0:1c31)
 	cp a,$16
 	jr z,.pokemonCry
 	ld a,[hl]
-	call PlaySound
+	call PlaySoundWaitForCurrent ; call PlaySound ; Denim : modifica per riprodurre i suoni anche con velocità massima dei testi
 	call WaitForSoundToFinish
 	pop hl
 	pop bc
@@ -9428,11 +9428,12 @@ PrintLetterDelay: ; 38d3 (0:38d3)
 	call GetJoypadState
 	ld a,[H_CURRENTPRESSEDBUTTONS]
 .checkAButton
-	bit 0,a ; is the A button pressed?
-	jr z,.checkBButton
-	jr .endWait
+	bit 0,a ; is the A button pressed? ; Denim : Hack per non rallentare il testo premendo A o B
+	jr nz,.done ; jr z,.checkBButton
+	;jr .endWait
 .checkBButton
 	bit 1,a ; is the B button pressed?
+	jr nz,.done ; Add 
 	jr z,.buttonsNotPressed
 .endWait
 	call DelayFrame
@@ -14070,11 +14071,11 @@ MainMenu: ; 5af2 (1:5af2)
 	call Func_62ce
 	jp Func_5d5f
 Func_5bff: ; 5bff (1:5bff)
-	ld a,1
-	ld [$D358],a
-	ld a,3
-	ld [$D355],a
-	ret
+    ld a,1
+    ld [$D358],a
+    ld a,%01000001; ld a,3 ; Denim,sostituite opzioni default
+    ld [W_OPTIONS],a
+    ret
 
 Func_5c0a: ; 5c0a (1:5c0a)
 	xor a
@@ -14632,12 +14633,17 @@ SetCursorPositionsFromOptions: ; 604c (1:604c)
 ; Format:
 ; 00: X coordinate of menu cursor
 ; 01: delay after printing a letter (in frames)
-TextSpeedOptionData: ; 6096 (1:6096)
-	db 14,5 ; Slow
-	db  7,3 ; Medium
-	db  1,1 ; Fast
-	db 7 ; default X coordinate (Medium)
-	db $ff ; terminator
+TextSpeedOptionData: ; 6096 (1:6096) ; Denim,aumentata velocità
+    ; db 14,5 ; Slow
+    ; db  7,3 ; Medium
+    ; db  1,1 ; Fast
+    ; db 7 ; default X coordinate (Medium)
+    ; db $ff ; terminator
+    db 14,2 ; Slow
+    db  7,1 ; Medium
+    db  1,0 ; Fast
+    db 7 ; default X coordinate (Medium)
+    db $ff ; terminator
 
 Func_609e: ; 609e (1:609e)
 	ld a, $a
