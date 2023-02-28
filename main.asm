@@ -65428,7 +65428,7 @@ CriticalHitTest: ; 3e023 (f:6023)
 	ld b, $ff                    ; cap at 255/256
 	jr .noFocusEnergyUsed
 .focusEnergyUsed
-	srl b
+    sla b ; Denim ; srl b
 .noFocusEnergyUsed
 	ld hl, HighCriticalMoves      ; table of high critical hit moves
 .Loop
@@ -66050,14 +66050,15 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
 	push hl
 	push bc
 	inc hl
-	ld a,[$d05b]
-	and a,$80
-	ld b,a
-	ld a,[hl] ; a = damage multiplier
-	ld [H_MULTIPLIER],a
-	add b
-	ld [$d05b],a
-	xor a
+    ld a,[$d05b]
+    ds 2 ; and a,$80
+    ld b,a
+    ld a,[hl] ; a = damage multiplier
+    ld [H_MULTIPLIER],a
+    ds 1 ; add b
+    ds 0 ; ld [$d05b],a
+    call MultiplyD05B ; Denim,corretto bug superefficace!
+    xor a
 	ld [H_MULTIPLICAND],a
 	ld hl,W_DAMAGE
 	ld a,[hli]
@@ -69491,6 +69492,31 @@ Func_3fbbc: ; 3fbbc (f:7bbc)
 	pop de
 	pop hl
 	ret
+
+MultiplyD05B: ; xxxxx (f:xxxx) ; Denim
+    push af
+    xor a
+    ld [H_MULTIPLICAND],a
+    ld a,b
+    and a,%01111111
+    ld [H_MULTIPLICAND + 1],a
+    ld a,b
+    and a,%10000000
+    push af
+    xor a
+    ld [H_MULTIPLICAND + 2],a
+    call Multiply
+    ld a,10
+    ld [H_DIVISOR],a
+    ld b,4
+    call Divide
+    ld a,[H_QUOTIENT + 2]
+    pop bc
+    add b
+    ld [$d05b],a
+    pop af
+    ld [H_MULTIPLIER],a
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
