@@ -61846,7 +61846,7 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
 	ld [wHPBarNewHP], a
 	ld [wHPBarNewHP+1], a
 .noOverkill
-	call UpdateCurMonHPBar
+	call WriteDamageAndUpdateCurMonHPBar ; call UpdateCurMonHPBar
 	pop hl
 	ret
 
@@ -65875,7 +65875,7 @@ ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
 	ld [hl],a
 
 ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
-    call PrintDamageNearHpBar ; Denim ; ld hl,W_DAMAGE
+    call PrintDamageNearHpBarAndLoadHlDamage ; Denim ; ld hl,W_DAMAGE
 	ld a,[hli]
 	ld b,a
 	ld a,[hl]
@@ -65996,7 +65996,7 @@ ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
 	ld [hl],a
 
 ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
-    call PrintDamageNearHpBar ; Denim ; ld hl,W_DAMAGE
+    call PrintDamageNearHpBarAndLoadHlDamage ; Denim ; ld hl,W_DAMAGE
 	ld a,[hli]
 	ld b,a
 	ld a,[hl]
@@ -69802,14 +69802,32 @@ MultiplyD05B: ; xxxxx (f:xxxx) ; Denim
     ld [H_MULTIPLIER],a
     ret
 
+PrintDamageNearHpBarAndLoadHlDamage: ; xxxxx (f:xxxx) ; Denim
+    call PrintDamageNearHpBar
+    ld hl,W_DAMAGE
+    ret
+
 PrintDamageNearHpBar: ; xxxxx (f:xxxx) ; Denim
-    call GetHlPointerToDamageTextArea
     ld de,W_DAMAGE
     ld b,%00000010
     ld c,5
-    call PrintNumber
-    ld hl,W_DAMAGE
-    ret
+	call GetHlPointerToDamageTextArea
+    jp PrintNumber
+
+WriteDamageAndUpdateCurMonHPBar: ; During Poison/Burn
+    ld hl,W_DAMAGE 
+	ld a,b
+	ld [hli],a
+	ld a,c
+	ld [hl],a
+	ld hl,wFlagReverseTurnBit1
+	set 1,[hl]
+    call PrintDamageNearHpBar
+    call UpdateCurMonHPBar
+    call RemoveDiplayedDamage
+	ld hl,wFlagReverseTurnBit1
+	res 1,[hl]
+	ret
 
 RemoveDiplayedDamageAndFunc_3cd5a: ; xxxxx (f:xxxx) ; Denim
     call RemoveDiplayedDamage
@@ -69827,12 +69845,20 @@ RemoveDiplayedDamage: ; xxxxx (f:xxxx) ; Denim
 GetHlPointerToDamageTextArea: ; xxxxx (f:xxxx) ; Denim
     FuncCoord 7,4 ; Player Turn
     ld hl,Coord
+	push hl
+	ld hl,wFlagReverseTurnBit1
+	bit 1,[hl]
+	pop hl
     ld a,[H_WHOSETURN]
+	jr z,.Done
+	inc a   ; Reverse a (0->1;1->0)
+	and a,1 ; ...
+.Done
 	and a
-	ret z
+	ret z ; Player Turn
     FuncCoord 4,4 ; Enemy Turn
     ld hl,Coord
-    ret
+    ret ; Enemy Turn
 
 DoubleIncB: ; Denim
     inc b

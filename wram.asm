@@ -1457,6 +1457,7 @@ wBlkCoordinateY2Lower: ; df34
 
 wFlagFlashingHealBallBit7: ; df35 ; bit 7
 wFlagBycicleFourX:         ; df35 ; bit 0
+wFlagReverseTurnBit1:      ; df35 ; bit 1
     ds 1
 
 wFlagPlaceTitleScreen ; df36 ; counter for title screen
