@@ -10603,7 +10603,7 @@ Func_3f0f: ; 3f0f (0:3f0f)
 PointerTable_3f22: ; 3f22 (0:3f22)
 	dw CardKeySuccessText                   ; id = 01
 	dw CardKeyFailText                      ; id = 02
-	dw Route15UpstairsLeftBinoculars        ; id = 03
+	dw ItemStoragePCInRedHouse              ; id = 03
 	dw RedBedroomSNESText                   ; id = 04
 	dw UnnamedText_1e960                    ; id = 05
 	dw UnnamedText_1e97e                    ; id = 06
@@ -10631,11 +10631,11 @@ PointerTable_3f22: ; 3f22 (0:3f22)
 	dw UnnamedText_624c6                    ; id = 1C
 	dw UnnamedText_624cb                    ; id = 1D
 	dw $6508
-	dw $6529
+	dw PokeCenterPCCode                     ; id = 1F
 	dw ViridianSchoolNotebook               ; id = 20
 	dw ViridianSchoolBlackboard             ; id = 21
 	dw UnnamedText_21865                    ; id = 22
-	dw $5878
+	dw BillPCCode                           ; id = 23
 	dw FoundHiddenItemText                  ; id = 24
 	dw HiddenItemBagFullText                ; id = 25
 	dw VermilionGymTrashText                ; id = 26
@@ -45650,6 +45650,7 @@ UnnamedText_21865: ; 21865 (8:5865)
 	TX_FAR _UnnamedText_21865
 	db "@"
 
+BillPC: ; 2186A (8:586A)
 	ld a, [$c109]
 	cp $4
 	ret nz
@@ -45657,7 +45658,8 @@ UnnamedText_21865: ; 21865 (8:5865)
 	ld a, $23
 	jp Func_3ef5
 
-INCBIN "baserom.gbc",$21878,$21879 - $21878
+BillPCCode: ; 21878 (8:5878)
+    db $fd ; Item Storage PC in DisplayTextID
 
 Func_21879: ; 21879 (8:5879)
 	ld c, CH0
@@ -77589,9 +77591,9 @@ OaksLabHiddenObjects: ; 46b7a (11:6b7a)
 	db $FF
 ViridianPokecenterHiddenObjects: ; 46b93 (11:6b93)
 	db $04,$00,$08 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 ViridianMartHiddenObjects: ; 46ba0 (11:6ba0)
 	db $FF
@@ -77623,15 +77625,15 @@ PewterMartHiddenObjects: ; 46bd5 (11:6bd5)
 	db $FF
 PewterPokecenterHiddenObjects: ; 46bd6 (11:6bd6)
 	db $04,$00,$08 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 CeruleanPokecenterHiddenObjects: ; 46be3 (11:6be3)
 	db $04,$00,$08 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 CeruleanGymHiddenObjects: ; 46bf0 (11:6bf0)
 	db $0b,$03,$04 ; XXX, y, x
@@ -77643,15 +77645,15 @@ CeruleanMartHiddenObjects: ; 46bfd (11:6bfd)
 	db $FF
 LavenderPokecenterHiddenObjects: ; 46bfe (11:6bfe)
 	db $04,$00,$08 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 VermilionPokecenterHiddenObjects: ; 46c0b (11:6c0b)
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $04,$00,$04 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $FF
 VermilionGymHiddenObjects: ; 46c18 (11:6c18)
 	db $0e,$03,$04 ; XXX, y, x
@@ -77693,13 +77695,13 @@ VermilionGymHiddenObjects: ; 46c18 (11:6c18)
 	db $FF
 CeladonMansion2HiddenObjects: ; 46c85 (11:6c85)
 	db $05,$00,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 CeladonPokecenterHiddenObjects: ; 46c8c (11:6c8c)
 	db $04,$00,$08 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 CeladonGymHiddenObjects: ; 46c99 (11:6c99)
 	db $0f,$03,$04 ; XXX, y, x
@@ -77807,15 +77809,15 @@ GameCornerHiddenObjects: ; 46ca6 (11:6ca6)
 	db $FF
 CeladonHotelHiddenObjects: ; 46dc7 (11:6dc7)
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $04,$00,$08 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $FF
 FuchsiaPokecenterHiddenObjects: ; 46dd4 (11:6dd4)
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $04,$00,$04 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $FF
 FuchsiaGymHiddenObjects: ; 46de1 (11:6de1)
 	db $0f,$03,$04 ; XXX, y, x
@@ -77841,9 +77843,9 @@ CinnabarGymHiddenObjects: ; 46dee (11:6dee)
 	db $FF
 CinnabarPokecenterHiddenObjects: ; 46e19 (11:6e19)
 	db $04,$00,$04 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 SaffronGymHiddenObjects: ; 46e26 (11:6e26)
 	db $0f,$09,$04 ; XXX, y, x
@@ -77851,15 +77853,15 @@ SaffronGymHiddenObjects: ; 46e26 (11:6e26)
 	db $FF
 MtMoonPokecenterHiddenObjects: ; 46e2d (11:6e2d)
 	db $04,$00,$08 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 RockTunnelPokecenterHiddenObjects: ; 46e3a (11:6e3a)
 	db $04,$00,$08 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 ViridianForestHiddenObjects: ; 46e47 (11:6e47)
 	db $12,$01,POTION
@@ -77921,9 +77923,9 @@ RocketHideout4HiddenObjects: ; 46eb7 (11:6eb7)
 	db $FF
 SaffronPokecenterHiddenObjects: ; 46ebe (11:6ebe)
 	db $04,$00,$04 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 PokemonTower5HiddenObjects: ; 46ecb (11:6ecb)
 	db $0c,$04,ELIXER
@@ -78029,21 +78031,21 @@ ViridianCityHiddenObjects: ; 46f8d (11:6f8d)
 	db $FF
 SafariZoneRestHouse2HiddenObjects: ; 46f94 (11:6f94)
 	db $04,$00,$08 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 SafariZoneRestHouse3HiddenObjects: ; 46fa1 (11:6fa1)
 	db $04,$00,$08 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 SafariZoneRestHouse4HiddenObjects: ; 46fae (11:6fae)
 	db $04,$00,$08 ; XXX, y, x
-	dbw $18,$645d
+	dbw BANK(Func_6245d),Func_6245d
 	db $03,$0d,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 UnusedB9HiddenObjects: ; 46fbb (11:6fbb)
 	db $02,$01,$04 ; XXX, y, x
@@ -78077,13 +78079,13 @@ FightingDojoHiddenObjects: ; 46fe8 (11:6fe8)
 	db $FF
 IndigoPlateauLobbyHiddenObjects: ; 47001 (11:7001)
 	db $07,$0f,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 CinnabarLab4HiddenObjects: ; 47008 (11:7008)
 	db $04,$00,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $04,$02,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 BikeShopHiddenObjects: ; 47015 (11:7015)
 	db $00,$01,$d0 ; XXX, y, x
@@ -78109,7 +78111,7 @@ Route12HiddenObjects: ; 47041 (11:7041)
 	db $FF
 SilphCo11FHiddenObjects: ; 47048 (11:7048)
 	db $0c,$0a,$04 ; XXX, y, x
-	dbw $18,$6516
+	dbw BANK(PokeCenterPC),PokeCenterPC
 	db $FF
 Route17HiddenObjects: ; 4704f (11:704f)
 	db $0e,$0f,RARE_CANDY
@@ -98747,8 +98749,10 @@ Func_5db86: ; 5db86 (17:5b86)
 	ld a, $3
 	jp Func_3ef5
 
-Route15UpstairsLeftBinoculars: ; 5db8e (17:5b8e)
-	db $fc
+ItemStoragePCInRedHouse: ; 5db8e (17:5b8e)
+	db $fc ; Item Storage PC in DisplayTextID
+
+Route15UpstairsLeftBinoculars: ; 5db8f (17:5b8f)
 	ld a, [$c109]
 	cp $4 ; i
 	ret nz
@@ -102953,6 +102957,7 @@ BookcaseText: ; 62511 (18:6511)
 	TX_FAR _BookcaseText
 	db "@"
 
+PokeCenterPC: ; 62516 (18:6516)
 	ld a, [$c109]
 	cp $4 ; check to see if player is facing up
 	ret nz
@@ -102962,7 +102967,8 @@ BookcaseText: ; 62511 (18:6511)
 	ld a, $1f
 	jp Func_3ef5
 
-INCBIN "baserom.gbc",$62529,$6252a - $62529
+PokeCenterPCCode: ; 62529 (18:6529)
+	db $f9 ; Pokemon Center PC in DisplayTextID
 
 SECTION "bank19",ROMX,BANK[$19]
 
