@@ -45336,7 +45336,7 @@ BillsPCDeposit:
 	call Func_3a68
 	xor a
 	ld [$cf95], a
-	call RemovePokemon
+	call RemovePokemonWithHack
 	call WaitForSoundToFinish
 	ld hl, wWhichTrade ; $cd3d
 	ld a, [$d5a0]
@@ -45659,7 +45659,7 @@ BillPC: ; 2186A (8:586A)
 	jp Func_3ef5
 
 BillPCCode: ; 21878 (8:5878)
-    db $fd ; Item Storage PC in DisplayTextID
+    db $fd ; Bill's PC in DisplayTextID
 
 Func_21879: ; 21879 (8:5879)
 	ld c, CH0
@@ -47420,6 +47420,12 @@ INCLUDE "music/sfx/sfx_08_46.asm"
 INCLUDE "music/defeatedtrainer.asm"
 INCLUDE "music/defeatedwildmon.asm"
 INCLUDE "music/defeatedgymleader.asm"
+
+RemovePokemonWithHack:
+    ld a,[W_CURMAP]
+	cp a,CELADON_HOTEL
+    jp nz,RemovePokemon
+    ret
 
 SECTION "bank9",ROMX,BANK[$9]
 
