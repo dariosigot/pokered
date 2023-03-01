@@ -77809,7 +77809,7 @@ GameCornerHiddenObjects: ; 46ca6 (11:6ca6)
 	db $FF
 CeladonHotelHiddenObjects: ; 46dc7 (11:6dc7)
 	db $03,$0d,$04 ; XXX, y, x
-	dbw BANK(PokeCenterPC),PokeCenterPC
+	dbw BANK(BillPC),BillPC
 	db $04,$00,$08 ; XXX, y, x
 	dbw BANK(Func_6245d),Func_6245d
 	db $FF
