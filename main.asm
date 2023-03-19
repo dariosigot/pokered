@@ -10699,6 +10699,27 @@ SpeedUpByke: ; Denim,Speed Walk and Byke
 .NotNormalByke
     jp AdvancePlayerSprite ; Speed 2X
 
+; INPUT hl = giusto indirizzo degli IV del pokemon interessato
+; $cff1 ; .Front
+; $d020 ; .Back
+; $cfb3 ; .OutOfBattle
+IsShiny:
+    push hl
+    push af
+    ld a,[hli] ; Controllo IV Atk/Def ; Controllo IV Atk,Shiny se IV Atk = 2,3,6,7,10,11,14 o 15
+    and %00101111 ; Shiny se bit 5 di a settato,gli altri bit dell'atk non contano,applico maschera
+    cp a,%00101010
+    jr nz,.End
+    ld a,[hl] ; Controllo IV Spd/Spc
+    cp a,%10101010
+    jr nz,.End
+	ld hl,wFlagShinyBit2
+	set 2,[hl]
+.End
+	pop af
+    pop hl
+	ret
+
 SECTION "bank1",ROMX,BANK[$1]
 
 SpriteFacingAndAnimationTable: ; 4000 (1:4000)
@@ -13785,7 +13806,7 @@ Func_5849:
 	ld [$cd3d], a
 	xor a
 	ld [$cf95], a
-	call RemovePokemon
+	call HackForBackupDVDuringTradeIn ; call RemovePokemon
 	ld a, [$cd3e]
 	ld c, a
 	ld [$cf92], a
@@ -18397,6 +18418,19 @@ SpriteAttributeHandler: ; Denim
     inc e
     pop af
     ret
+
+HackForBackupDVDuringTradeIn:
+	push af
+    ld a, [wWhichPokemon] ; $cf92
+    ld hl, W_PARTYMON1_IV ; $d18c
+	ld bc, 44 ; Pokemon Data Lenght
+	call AddNTimes
+	ld a,[hli]
+    ld [wDVForShinyAtkDef], a ; DV Atk/Def
+	ld a,[hl]
+	ld [wDVForShinySpdSpc], a ; DV Spd/Spc
+	pop af
+    jp RemovePokemon
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -58316,7 +58350,7 @@ asm_3ad2e: ; 3ad2e (e:6d2e)
 	ld [$cf91], a
 	pop hl
 
-Func_3ad71: ; 3ad71 (e:6d71)
+TryEvolution: ; 3ad71 (e:6d71)
 	ld a, [hli]
 	and a
 	jr z, asm_3ad2e
@@ -58496,7 +58530,7 @@ Func_3aed9: ; 3aed9 (e:6ed9)
 
 Func_3aeda: ; 3aeda (e:6eda)
 	inc hl
-	jp Func_3ad71
+	jp TryEvolution
 
 Func_3aede: ; 3aede (e:6ede)
 	pop de
@@ -72214,7 +72248,7 @@ Func_41245: ; 41245 (10:5245)
 	call CopyScreenTileBufferToVRAM
 	call ClearScreen
 	ld a, [wWhichTrade] ; $cd3d
-	call Func_415a4
+	call CheckShinyDuringTradeInSend ; call Func_415a4 ; Invio
 	ld a, $7e
 .asm_41273
 	push af
@@ -72333,7 +72367,7 @@ Func_41336: ; 41336 (10:5336)
 	ld a, $1
 	ld [H_AUTOBGTRANSFERENABLED], a ; $FF00+$ba
 	ld a, [$cd3e]
-	call Func_415a4
+	call CheckShinyDuringTradeInReceive ; call Func_415a4 ; Ricezione
 	ld a, $ad
 	call Func_41676
 	ld a, $1
@@ -73296,6 +73330,21 @@ OTString67E5: ; 427e5 (10:67e5)
 	db $4E
 	db "OT/",$4E
 	db $73,"№",$F2,"@"
+
+CheckShinyDuringTradeInSend:
+    push af
+	ld hl,wDVForShinyAtkDef
+	call IsShiny
+	xor a
+	ld [hli],a
+	ld [hl],a
+	pop af
+    jp Func_415a4 ; Invio
+
+CheckShinyDuringTradeInReceive:
+	ld hl,$cfb3 ; TradeIn Enemy's Pkmn
+	call IsShiny
+    jp Func_415a4 ; Ricezione
 
 SECTION "bank11",ROMX,BANK[$11]
 
@@ -103335,7 +103384,7 @@ GameFreakShootingStarOAMData: ; 70180 (1c:4180)
 FallingStar: ; 70190 (1c:4190)
 	INCBIN "gfx/falling_star.2bpp"
 
-Func_701a0: ; 701a0 (1c:41a0)
+HallOfFameDisplayPkmn: ; 701a0 (1c:41a0)
 	call Func_70423
 	call ClearScreen
 	ld c, $64
@@ -103390,7 +103439,7 @@ Func_701a0: ; 701a0 (1c:41a0)
 	call AddNTimes
 	ld a, [hl]
 	ld [$cd3f], a
-	call Func_70278
+	call HackForInsertDVInHallOfFameDataFirstStep ; call Func_70278
 	call Func_702e1
 	ld c, $50
 	call DelayFrames
@@ -103630,7 +103679,7 @@ Func_70404: ; 70404 (1c:4404)
 	ld d, h
 	ld hl, $cd6d
 	ld bc, $b
-	jp CopyData
+	jp HackForInsertDVInHallOfFameDataSecondStep ; jp CopyData
 
 Func_70423: ; 70423 (1c:4423)
 	ld a, $a
@@ -106836,11 +106885,11 @@ Func_71e06: ; 71e06 (1c:5e06)
 	call CopyData
 	ld a, [W_PLAYERBATTSTATUS3]
 	ld hl, W_PLAYERMONID
-	call DeterminePaletteID
+	call CheckShinyBackAndDeterminePaletteID
 	ld b, a
 	ld a, [W_ENEMYBATTSTATUS3]
 	ld hl, W_ENEMYMONID
-	call DeterminePaletteID
+	call CheckShinyFrontAndDeterminePaletteID
 	ld c, a
 	ld hl, $cf2e
 	ld a, [$cf1d]
@@ -106877,7 +106926,7 @@ Func_71e4f: ; 71e4f (1c:5e4f)
 	jr c, .pokemon
 	ld a, $1 ; not pokemon
 .pokemon
-	call DeterminePaletteIDOoutOfBattle
+	call CheckShinyAndDeterminePaletteIDOutOfBattle
 	push af
 	ld hl, $cf2e
 	ld a, [$cf25]
@@ -106895,7 +106944,7 @@ Func_71e7b: ; 71e7b (1c:5e7b)
 	ld de, $cf2e
 	ret
 
-Func_71e82: ; 71e82 (1c:5e82)
+PreLoadPokedexGraphics: ; 71e82 (1c:5e82)
 	ld hl, PalPacket_72468
 	ld de, $cf2d
 	ld bc, $10
@@ -106980,7 +107029,8 @@ GetMapPaletteID: ; 71ec7 (1c:5ec7)
 	xor a
 	jr .town
 
-Func_71f17: ; 71f17 (1c:5f17)
+; HallOfFame or LinkCable or Evolution
+PreLoadHallOfFameOrLinkCableOrEvolutionGraphics: ; 71f17 (1c:5f17)
 	push bc
 	ld hl, PalPacket_72428
 	ld de, $cf2d
@@ -107042,14 +107092,14 @@ PointerTable_71f73: ; 71f73 (1c:5f73)
 	dw Func_71e06
 	dw Func_71e48
 	dw Func_71e4f
-	dw Func_71e82
+	dw PreLoadPokedexGraphics
 	dw Func_71e9f
 	dw Func_71ea6
 	dw Func_71eb4
 	dw Func_71ead
 	dw GetMapPaletteID
 	dw Func_71e7b
-	dw Func_71f17
+	dw PreLoadHallOfFameOrLinkCableOrEvolutionGraphics
 	dw Func_71ebb
 	dw LoadTrainerCardBadgePalettes
 
@@ -107074,7 +107124,7 @@ DeterminePaletteIDOoutOfBattle: ; 71f9d (1c:5f9d)
 .idZero
 	ld e, a
 	ld d, $00
-	ld hl, MonsterPalettes   ; not just for Pokemon, Trainers use it too
+	call MonsterPalettesHack ; ld hl, MonsterPalettes   ; not just for Pokemon, Trainers use it too
 	add hl, de
 	ld a, [hl]
 	ret
@@ -108888,6 +108938,213 @@ LoadAlternateBallPic: ; Denim
 PokeCenterFlashingHealBall:
     INCBIN "gfx/pokecenter_ball_2.2bpp"
 
+MonsterPalettesHack:
+    ld hl,wFlagShinyBit2
+	bit 2,[hl]
+	res 2,[hl]
+    ld hl, MonsterPalettes
+	ret z
+	ld hl, MonsterPalettesShiny
+	ret
+
+CheckShinyFrontAndDeterminePaletteID:
+	push hl
+	ld hl,$cff1
+	jr DeterminePaletteIDCommon
+CheckShinyBackAndDeterminePaletteID:
+	push hl
+	ld hl,$d020
+DeterminePaletteIDCommon:
+	call IsShiny
+	pop hl
+    jp DeterminePaletteID
+
+CheckShinyAndDeterminePaletteIDOutOfBattle:
+	push hl
+	ld hl,$cfb3
+	call IsShiny
+	pop hl
+    jp DeterminePaletteIDOoutOfBattle
+
+HackForInsertDVInHallOfFameDataFirstStep:
+    ld a,[$cd3e] ; Pokemon Party Order
+    ld hl, W_PARTYMON1_IV ; $d18c
+	ld bc, 44 ; Pokemon Data Lenght
+	call AddNTimes
+	call IsShiny
+	ld a,[hli]
+    ld [wDVForShinyAtkDef], a ; DV Atk/Def
+	ld a,[hl]
+	ld [wDVForShinySpdSpc], a ; DV Spd/Spc
+    jp Func_70278
+
+HackForInsertDVInHallOfFameDataSecondStep:
+    call CopyData
+	ld h,d
+	ld l,e
+    ld a,[wDVForShinyAtkDef] ; DV Atk/Def
+	ld [hli],a
+	ld a,[wDVForShinySpdSpc] ; DV Spd/Spc
+	ld [hl],a
+	xor a
+	ld [hld],a
+	ld [hl],a
+	ret
+
+MonsterPalettesShiny:
+	db PAL_MEWMON    ; MISSINGNO
+	db PAL_YELLOWMON ; BULBASAUR
+	db PAL_YELLOWMON ; IVYSAUR
+	db PAL_YELLOWMON ; VENUSAUR
+	db PAL_YELLOWMON ; CHARMANDER
+	db PAL_YELLOWMON ; CHARMELEON
+	db PAL_PURPLEMON ; CHARIZARD
+	db PAL_PURPLEMON ; SQUIRTLE
+	db PAL_PURPLEMON ; WARTORTLE
+	db PAL_PURPLEMON ; BLASTOISE
+	db PAL_YELLOWMON ; CATERPIE
+	db PAL_REDMON    ; METAPOD
+	db PAL_PINKMON   ; BUTTERFREE
+	db PAL_GREENMON  ; WEEDLE
+	db PAL_GREENMON  ; KAKUNA
+	db PAL_GREENMON  ; BEEDRILL
+	db PAL_YELLOWMON ; PIDGEY
+	db PAL_YELLOWMON ; PIDGEOTTO
+	db PAL_YELLOWMON ; PIDGEOT
+	db PAL_GREENMON  ; RATTATA
+	db PAL_REDMON    ; RATICATE
+	db PAL_YELLOWMON ; SPEAROW
+	db PAL_YELLOWMON ; FEAROW
+	db PAL_GREENMON  ; EKANS
+	db PAL_YELLOWMON ; ARBOK
+	db PAL_REDMON    ; PIKACHU
+	db PAL_REDMON    ; RAICHU
+	db PAL_GREENMON  ; SANDSHREW
+	db PAL_REDMON    ; SANDSLASH
+	db PAL_PINKMON   ; NIDORAN_F
+	db PAL_PINKMON   ; NIDORINA
+	db PAL_GREENMON  ; NIDOQUEEN
+	db PAL_CYANMON   ; NIDORAN_M
+	db PAL_CYANMON   ; NIDORINO
+	db PAL_BLUEMON   ; NIDOKING
+	db PAL_GREENMON  ; CLEFAIRY
+	db PAL_GREENMON  ; CLEFABLE
+	db PAL_YELLOWMON ; VULPIX
+	db PAL_MEWMON    ; NINETALES
+	db PAL_GREENMON  ; JIGGLYPUFF
+	db PAL_GREENMON  ; WIGGLYTUFF
+	db PAL_GREENMON  ; ZUBAT
+	db PAL_GREENMON  ; GOLBAT
+	db PAL_YELLOWMON ; ODDISH
+	db PAL_GREENMON  ; GLOOM
+	db PAL_GREENMON  ; VILEPLUME
+	db PAL_YELLOWMON ; PARAS
+	db PAL_YELLOWMON ; PARASECT
+	db PAL_CYANMON   ; VENONAT
+	db PAL_CYANMON   ; VENOMOTH
+	db PAL_CYANMON   ; DIGLETT
+	db PAL_CYANMON   ; DUGTRIO
+	db PAL_MEWMON    ; MEOWTH
+	db PAL_MEWMON    ; PERSIAN
+	db PAL_CYANMON   ; PSYDUCK
+	db PAL_BLUEMON   ; GOLDUCK
+	db PAL_GREENMON  ; MANKEY
+	db PAL_GREENMON  ; PRIMEAPE
+	db PAL_YELLOWMON ; GROWLITHE
+	db PAL_YELLOWMON ; ARCANINE
+	db PAL_CYANMON   ; POLIWAG
+	db PAL_CYANMON   ; POLIWHIRL
+	db PAL_GREENMON  ; POLIWRATH
+	db PAL_GREYMON   ; ABRA
+	db PAL_GREYMON   ; KADABRA
+	db PAL_PINKMON   ; ALAKAZAM
+	db PAL_GREENMON  ; MACHOP
+	db PAL_GREENMON  ; MACHOKE
+	db PAL_GREENMON  ; MACHAMP
+	db PAL_YELLOWMON ; BELLSPROUT
+	db PAL_YELLOWMON ; WEEPINBELL
+	db PAL_YELLOWMON ; VICTREEBEL
+	db PAL_PURPLEMON ; TENTACOOL
+	db PAL_PURPLEMON ; TENTACRUEL
+	db PAL_YELLOWMON ; GEODUDE
+	db PAL_BROWNMON  ; GRAVELER
+	db PAL_BROWNMON  ; GOLEM
+	db PAL_CYANMON   ; PONYTA
+	db PAL_CYANMON   ; RAPIDASH
+	db PAL_MEWMON    ; SLOWPOKE
+	db PAL_PURPLEMON ; SLOWBRO
+	db PAL_YELLOWMON ; MAGNEMITE
+	db PAL_YELLOWMON ; MAGNETON
+	db PAL_PINKMON   ; FARFETCH_D
+	db PAL_GREENMON  ; DODUO
+	db PAL_GREENMON  ; DODRIO
+	db PAL_GREYMON   ; SEEL
+	db PAL_GREYMON   ; DEWGONG
+	db PAL_GREENMON  ; GRIMER
+	db PAL_GREENMON  ; MUK
+	db PAL_REDMON    ; SHELLDER
+	db PAL_CYANMON   ; CLOYSTER
+	db PAL_BLUEMON   ; GASTLY
+	db PAL_BLUEMON   ; HAUNTER
+	db PAL_BLUEMON   ; GENGAR
+	db PAL_GREENMON  ; ONIX
+	db PAL_PINKMON   ; DROWZEE
+	db PAL_PINKMON   ; HYPNO
+	db PAL_YELLOWMON ; KRABBY
+	db PAL_GREENMON  ; KINGLER
+	db PAL_CYANMON   ; VOLTORB
+	db PAL_CYANMON   ; ELECTRODE
+	db PAL_YELLOWMON ; EXEGGCUTE
+	db PAL_YELLOWMON ; EXEGGUTOR
+	db PAL_GREENMON  ; CUBONE
+	db PAL_GREENMON  ; MAROWAK
+	db PAL_GREENMON  ; HITMONLEE
+	db PAL_GREENMON  ; HITMONCHAN
+	db PAL_YELLOWMON ; LICKITUNG
+	db PAL_GREENMON  ; KOFFING
+	db PAL_GREENMON  ; WEEZING
+	db PAL_REDMON    ; RHYHORN
+	db PAL_YELLOWMON ; RHYDON
+	db PAL_GREENMON  ; CHANSEY
+	db PAL_GREENMON  ; TANGELA
+	db PAL_GREYMON   ; KANGASKHAN
+	db PAL_GREENMON  ; HORSEA
+	db PAL_PURPLEMON ; SEADRA
+	db PAL_YELLOWMON ; GOLDEEN
+	db PAL_YELLOWMON ; SEAKING
+	db PAL_GREENMON  ; STARYU
+	db PAL_CYANMON   ; STARMIE
+	db PAL_GREENMON  ; MR_MIME
+	db PAL_MEWMON    ; SCYTHER
+	db PAL_PINKMON   ; JYNX
+	db PAL_REDMON    ; ELECTABUZZ
+	db PAL_PINKMON   ; MAGMAR
+	db PAL_PURPLEMON ; PINSIR
+	db PAL_GREENMON  ; TAUROS
+	db PAL_YELLOWMON ; MAGIKARP
+	db PAL_REDMON    ; GYARADOS
+	db PAL_PURPLEMON ; LAPRAS
+	db PAL_CYANMON   ; DITTO
+	db PAL_YELLOWMON ; EEVEE
+	db PAL_PURPLEMON ; VAPOREON
+	db PAL_GREENMON  ; JOLTEON
+	db PAL_YELLOWMON ; FLAREON
+	db PAL_PURPLEMON ; PORYGON
+	db PAL_PURPLEMON ; OMANYTE
+	db PAL_PURPLEMON ; OMASTAR
+	db PAL_GREENMON  ; KABUTO
+	db PAL_GREENMON  ; KABUTOPS
+	db PAL_PINKMON   ; AERODACTYL
+	db PAL_BLUEMON   ; SNORLAX
+	db PAL_CYANMON   ; ARTICUNO
+	db PAL_BROWNMON  ; ZAPDOS
+	db PAL_PINKMON   ; MOLTRES
+	db PAL_PINKMON   ; DRATINI
+	db PAL_PINKMON   ; DRAGONAIR
+	db PAL_GREENMON  ; DRAGONITE
+	db PAL_GREENMON  ; MEWTWO
+	db PAL_CYANMON   ; MEW
+
 SECTION "bank1D",ROMX,BANK[$1D]
 
 CopycatsHouseF1Blocks: ; 74000 (1d:4000)
@@ -108908,9 +109165,9 @@ CeruleanHouse2Blocks: ; 7404c (1d:404c)
 	INCBIN "maps/ceruleanhouse2.blk"
 
 Func_7405c: ; 7405c (1d:405c)
-	ld b, BANK(Func_701a0)
-	ld hl, Func_701a0
-	call Bankswitch ; indirect jump to Func_701a0 (701a0 (1c:41a0))
+	ld b, BANK(HallOfFameDisplayPkmn)
+	ld hl, HallOfFameDisplayPkmn
+	call Bankswitch ; indirect jump to HallOfFameDisplayPkmn (701a0 (1c:41a0))
 	call ClearScreen
 	ld c, $64
 	call DelayFrames
@@ -113424,7 +113681,7 @@ Func_76610: ; 76610 (1d:6610)
 	ld [$CD3F], a
 	ld de, $CD6D
 	ld bc, $000B
-	call CopyData
+	call CheckShinyFromHallOfFameData ; call CopyData
 	ld b, $0B
 	ld c, 0
 	call GoPAL_SET
@@ -113695,6 +113952,10 @@ Func_76857: ; 76857 (1d:6857)
 .asm_76878
 	inc hl
 	jr .loop
+
+CheckShinyFromHallOfFameData:
+    call CopyData
+	jp IsShiny
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -120398,7 +120659,7 @@ Func_7bde9: ; 7bde9 (1e:7de9)
 	ld a, [$cee9]
 	ld [$cf1d], a
 	ld c, $0
-	call Func_7beb4
+	call CheckShinyDuringEvolution ; call Func_7beb4
 	ld a, [$ceea]
 	ld [$cf91], a
 	ld [$d0b5], a
@@ -120422,7 +120683,7 @@ Func_7bde9: ; 7bde9 (1e:7de9)
 	ld c, $50
 	call DelayFrames
 	ld c, $1
-	call Func_7beb4
+	call CheckShinyDuringEvolution ; call Func_7beb4
 	ld bc, $110
 .asm_7be63
 	push bc
@@ -120448,7 +120709,7 @@ Func_7bde9: ; 7bde9 (1e:7de9)
 	ld a, [$cf1d]
 	call PlayCry
 	ld c, $0
-	call Func_7beb4
+	call CheckShinyDuringEvolution ; call Func_7beb4
 	pop af
 	ld [$d0b5], a
 	pop af
@@ -120631,6 +120892,18 @@ TechnicalMachinePrices: ; 7bfa7 (1e:7fa7)
 	db $55, $52, $54, $52, $41
 	db $21, $12, $42, $25, $24
 	db $22, $52, $24, $34, $42
+
+CheckShinyDuringEvolution:
+	push af
+	push bc
+    ld a, [wWhichPokemon] ; $cf92
+    ld hl, W_PARTYMON1_IV ; $d18c
+	ld bc, 44 ; Pokemon Data Lenght
+	call AddNTimes
+	call IsShiny
+	pop bc
+	pop af
+    jp Func_7beb4
 
 SECTION "bank1F",ROMX,BANK[$1F]
 

@@ -1458,12 +1458,15 @@ wBlkCoordinateY2Lower: ; df34
 wFlagFlashingHealBallBit7: ; df35 ; bit 7
 wFlagBycicleFourX:         ; df35 ; bit 0
 wFlagReverseTurnBit1:      ; df35 ; bit 1
+wFlagShinyBit2             ; df35 ; bit 2
     ds 1
 
 wFlagPlaceTitleScreen ; df36 ; counter for title screen
+wDVForShinyAtkDef     ; df36
     ds 1
 
 wChoicePkmnMoveDeleter ; df37
+wDVForShinySpdSpc      ; df37
     ds 1
 
 SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
