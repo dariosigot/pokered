@@ -37,6 +37,13 @@ globals.asm
 .lvimrc
 
 extras/
+tools/
 
 *.map
 *.sym
+
+pic/bmon/*.pic
+pic/monback/*.pic
+pic/other/*.pic
+pic/trainer/*.pic
+
