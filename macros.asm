@@ -64,6 +64,14 @@ RGB: MACRO
 	dw (\3 << 10 | \2 << 5 | \1)
 	ENDM
 
+; standard palette with white and black
+PALETTE: MACRO
+	RGB 31,31,31
+    RGB \1,\2,\3
+    RGB \4,\5,\6
+    RGB 00,00,00
+	ENDM
+
 ; text macros
 TX_NUM: MACRO
 ; print a big-endian decimal number.

@@ -106878,45 +106878,54 @@ Func_71dff: ; 71dff (1c:5dff)
 	ld de, Unknown_721b5
 	ret
 
-Func_71e06: ; 71e06 (1c:5e06)
+GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
 	ld hl, PalPacket_72428
 	ld de, $cf2d
 	ld bc, $10
 	call CopyData
-	ld a, [W_PLAYERBATTSTATUS3]
+;    ld a, [W_PLAYERBATTSTATUS3]
 	ld hl, W_PLAYERMONID
-	call CheckShinyBackAndDeterminePaletteID
-	ld b, a
-	ld a, [W_ENEMYBATTSTATUS3]
-	ld hl, W_ENEMYMONID
-	call CheckShinyFrontAndDeterminePaletteID
-	ld c, a
-	ld hl, $cf2e
-	ld a, [$cf1d]
-	add $1f
-	ld [hli], a
-	inc hl
-	ld a, [$cf1e]
-	add $1f
-	ld [hli], a
-	inc hl
-	ld a, b
-	ld [hli], a
-	inc hl
-	ld a, c
-	ld [hl], a
-	ld hl, $cf2d
-	ld de, Unknown_721b5
-	ld a, $1
-	ld [$cf1c], a
-	ret
+	ld a,[hl]
+	call CheckShinyBackAndGetPAL
+    ld b,h
+    ld c,l
+;    ld a,[W_ENEMYBATTSTATUS3]
+    ld hl,W_ENEMYMONID
+	ld a,[hl]
+	call CheckShinyFrontAndGetPAL
+    ld d,h
+    ld e,l
+
+    ld hl,$cf2e
+
+    call HPBarPalette
+
+    ; backsprite palette
+    ld a,c
+    ld [hli],a
+    ld a,b
+    ld [hli],a
+
+    ; frontsprite palette
+    ld a,e
+    ld [hli],a
+    ld a,d
+    ld [hli],a
+
+    ld hl,$cf2d
+    ld de,Unknown_721b5
+    ld a,$1
+    ld [$cf1c],a
+    ret
+
+SECTION "Func_71e48",ROMX[$5e48],BANK[$1C] 
 
 Func_71e48: ; 71e48 (1c:5e48)
 	ld hl, PalPacket_72458
 	ld de, Unknown_7219e
 	ret
 
-Func_71e4f: ; 71e4f (1c:5e4f)
+GetPkmnStatPaletteID: ; 71e4f (1c:5e4f)
 	ld hl, PalPacket_72428
 	ld de, $cf2d
 	ld bc, $10
@@ -106926,16 +106935,16 @@ Func_71e4f: ; 71e4f (1c:5e4f)
 	jr c, .pokemon
 	ld a, $1 ; not pokemon
 .pokemon
-	call CheckShinyAndDeterminePaletteIDOutOfBattle
-	push af
+	call CheckShinyAndGetPAL
+    push hl ; ...
 	ld hl, $cf2e
 	ld a, [$cf25]
 	add $1f
 	ld [hli], a
 	inc hl
-	pop af
-	ld [hl], a
-	ld hl, $cf2d
+    pop de ; ...
+	ld [hl], e
+    call PaletteHackTwoBytes1 ; Denim ; ld hl,$cf2d
 	ld de, Unknown_721fa
 	ret
 
@@ -106950,9 +106959,9 @@ PreLoadPokedexGraphics: ; 71e82 (1c:5e82)
 	ld bc, $10
 	call CopyData
 	ld a, [$cf91]
-	call DeterminePaletteIDOoutOfBattle
-	ld hl, $cf30
-	ld [hl], a
+	call DeterminePaletteID
+    call PaletteHackTwoBytes2 ; Denim ; ld hl,$cf30
+    nop               ; ...   ; ld [hl],a
 	ld hl, $cf2d
 	ld de, Unknown_72222
 	ret
@@ -107039,13 +107048,14 @@ PreLoadHallOfFameOrLinkCableOrEvolutionGraphics: ; 71f17 (1c:5f17)
 	pop bc
 	ld a, c
 	and a
-	ld a, $1e
+	ld h,$0
+	ld l,PAL_BLACK ; Used during Evolution
 	jr nz, .asm_71f31
 	ld a, [$cf1d]
-	call DeterminePaletteIDOoutOfBattle
+	call DeterminePaletteID
 .asm_71f31
-	ld [$cf2e], a
-	ld hl, $cf2d
+    call PaletteHackTwoBytes3 ; Denim ; ld [$cf2e],a
+    ds 1                      ; ...   ; ld hl,$cf2d
 	ld de, Unknown_7219e
 	ret
 
@@ -107089,9 +107099,9 @@ LoadTrainerCardBadgePalettes: ; 71f3b (1c:5f3b)
 
 PointerTable_71f73: ; 71f73 (1c:5f73)
 	dw Func_71dff
-	dw Func_71e06
+	dw GetBattleScreenPaletteID
 	dw Func_71e48
-	dw Func_71e4f
+	dw GetPkmnStatPaletteID
 	dw PreLoadPokedexGraphics
 	dw Func_71e9f
 	dw Func_71ea6
@@ -107107,27 +107117,7 @@ PointerTable_71f73: ; 71f73 (1c:5f73)
 LoopCounts_71f8f: ; 71f8f (1c:5f8f)
 	db $06,$06,$06,$12,$06,$06,$06,$06
 
-DeterminePaletteID: ; 71f97 (1c:5f97)
-	bit 3, a                 ; bit 3 of battle status 3, set if current Pokemon is transformed
-	ld a, PAL_GREYMON        ; if yes, use Ditto's palette
-	ret nz
-	ld a, [hl]
-DeterminePaletteIDOoutOfBattle: ; 71f9d (1c:5f9d)
-	ld [$D11E], a
-	and a
-	jr z, .idZero
-	push bc
-	ld a, $3A
-	call Predef               ; turn Pokemon ID number into Pokedex number
-	pop bc
-	ld a, [$D11E]
-.idZero
-	ld e, a
-	ld d, $00
-	call MonsterPalettesHack ; ld hl, MonsterPalettes   ; not just for Pokemon, Trainers use it too
-	add hl, de
-	ld a, [hl]
-	ret
+SECTION "Func_71fb6",ROMX[$5fb6],BANK[$1C]
 
 Func_71fb6: ; 71fb6 (1c:5fb6)
 	ld hl, Unknown_722f4 ; $62f4
@@ -107365,7 +107355,7 @@ Func_7210b: ; 7210b (1c:610b)
 	jr .asm_72128
 .asm_72122
 	ld bc, $1000
-	call CopyData
+    call PaletteBankCopyData ; Denim ; call CopyData
 .asm_72128
 	ld hl, $9800
 	ld de, $c
@@ -107595,334 +107585,47 @@ PalPacket_725a8: ; 725a8 (1c:65a8)
 PalPacket_725b8: ; 725b8 (1c:65b8)
 	db $79,$10,$08,$00,$0B,$4C,$20,$08,$EA,$EA,$EA,$EA,$EA,$60,$EA,$EA
 
-MonsterPalettes: ; 725c8 (1c:65c8)
-	db PAL_MEWMON    ; MISSINGNO
-	db PAL_GREENMON  ; BULBASAUR
-	db PAL_GREENMON  ; IVYSAUR
-	db PAL_GREENMON  ; VENUSAUR
-	db PAL_REDMON    ; CHARMANDER
-	db PAL_REDMON    ; CHARMELEON
-	db PAL_REDMON    ; CHARIZARD
-	db PAL_CYANMON   ; SQUIRTLE
-	db PAL_CYANMON   ; WARTORTLE
-	db PAL_CYANMON   ; BLASTOISE
-	db PAL_GREENMON  ; CATERPIE
-	db PAL_GREENMON  ; METAPOD
-	db PAL_CYANMON   ; BUTTERFREE
-	db PAL_YELLOWMON ; WEEDLE
-	db PAL_YELLOWMON ; KAKUNA
-	db PAL_YELLOWMON ; BEEDRILL
-	db PAL_BROWNMON  ; PIDGEY
-	db PAL_BROWNMON  ; PIDGEOTTO
-	db PAL_BROWNMON  ; PIDGEOT
-	db PAL_GREYMON   ; RATTATA
-	db PAL_GREYMON   ; RATICATE
-	db PAL_BROWNMON  ; SPEAROW
-	db PAL_BROWNMON  ; FEAROW
-	db PAL_PURPLEMON ; EKANS
-	db PAL_PURPLEMON ; ARBOK
-	db PAL_YELLOWMON ; PIKACHU
-	db PAL_YELLOWMON ; RAICHU
-	db PAL_BROWNMON  ; SANDSHREW
-	db PAL_BROWNMON  ; SANDSLASH
-	db PAL_BLUEMON   ; NIDORAN_F
-	db PAL_BLUEMON   ; NIDORINA
-	db PAL_BLUEMON   ; NIDOQUEEN
-	db PAL_PURPLEMON ; NIDORAN_M
-	db PAL_PURPLEMON ; NIDORINO
-	db PAL_PURPLEMON ; NIDOKING
-	db PAL_PINKMON   ; CLEFAIRY
-	db PAL_PINKMON   ; CLEFABLE
-	db PAL_REDMON    ; VULPIX
-	db PAL_YELLOWMON ; NINETALES
-	db PAL_PINKMON   ; JIGGLYPUFF
-	db PAL_PINKMON   ; WIGGLYTUFF
-	db PAL_BLUEMON   ; ZUBAT
-	db PAL_BLUEMON   ; GOLBAT
-	db PAL_GREENMON  ; ODDISH
-	db PAL_REDMON    ; GLOOM
-	db PAL_REDMON    ; VILEPLUME
-	db PAL_REDMON    ; PARAS
-	db PAL_REDMON    ; PARASECT
-	db PAL_PURPLEMON ; VENONAT
-	db PAL_PURPLEMON ; VENOMOTH
-	db PAL_BROWNMON  ; DIGLETT
-	db PAL_BROWNMON  ; DUGTRIO
-	db PAL_YELLOWMON ; MEOWTH
-	db PAL_YELLOWMON ; PERSIAN
-	db PAL_YELLOWMON ; PSYDUCK
-	db PAL_CYANMON   ; GOLDUCK
-	db PAL_BROWNMON  ; MANKEY
-	db PAL_BROWNMON  ; PRIMEAPE
-	db PAL_BROWNMON  ; GROWLITHE
-	db PAL_REDMON    ; ARCANINE
-	db PAL_BLUEMON   ; POLIWAG
-	db PAL_BLUEMON   ; POLIWHIRL
-	db PAL_BLUEMON   ; POLIWRATH
-	db PAL_YELLOWMON ; ABRA
-	db PAL_YELLOWMON ; KADABRA
-	db PAL_YELLOWMON ; ALAKAZAM
-	db PAL_GREYMON   ; MACHOP
-	db PAL_GREYMON   ; MACHOKE
-	db PAL_GREYMON   ; MACHAMP
-	db PAL_GREENMON  ; BELLSPROUT
-	db PAL_GREENMON  ; WEEPINBELL
-	db PAL_GREENMON  ; VICTREEBEL
-	db PAL_CYANMON   ; TENTACOOL
-	db PAL_CYANMON   ; TENTACRUEL
-	db PAL_GREYMON   ; GEODUDE
-	db PAL_GREYMON   ; GRAVELER
-	db PAL_GREYMON   ; GOLEM
-	db PAL_REDMON    ; PONYTA
-	db PAL_REDMON    ; RAPIDASH
-	db PAL_PINKMON   ; SLOWPOKE
-	db PAL_PINKMON   ; SLOWBRO
-	db PAL_GREYMON   ; MAGNEMITE
-	db PAL_GREYMON   ; MAGNETON
-	db PAL_BROWNMON  ; FARFETCH_D
-	db PAL_BROWNMON  ; DODUO
-	db PAL_BROWNMON  ; DODRIO
-	db PAL_BLUEMON   ; SEEL
-	db PAL_BLUEMON   ; DEWGONG
-	db PAL_PURPLEMON ; GRIMER
-	db PAL_PURPLEMON ; MUK
-	db PAL_GREYMON   ; SHELLDER
-	db PAL_GREYMON   ; CLOYSTER
-	db PAL_PURPLEMON ; GASTLY
-	db PAL_PURPLEMON ; HAUNTER
-	db PAL_PURPLEMON ; GENGAR
-	db PAL_GREYMON   ; ONIX
-	db PAL_YELLOWMON ; DROWZEE
-	db PAL_YELLOWMON ; HYPNO
-	db PAL_REDMON    ; KRABBY
-	db PAL_REDMON    ; KINGLER
-	db PAL_YELLOWMON ; VOLTORB
-	db PAL_YELLOWMON ; ELECTRODE
-	db PAL_PINKMON   ; EXEGGCUTE
-	db PAL_GREENMON  ; EXEGGUTOR
-	db PAL_GREYMON   ; CUBONE
-	db PAL_GREYMON   ; MAROWAK
-	db PAL_BROWNMON  ; HITMONLEE
-	db PAL_BROWNMON  ; HITMONCHAN
-	db PAL_PINKMON   ; LICKITUNG
-	db PAL_PURPLEMON ; KOFFING
-	db PAL_PURPLEMON ; WEEZING
-	db PAL_GREYMON   ; RHYHORN
-	db PAL_GREYMON   ; RHYDON
-	db PAL_PINKMON   ; CHANSEY
-	db PAL_BLUEMON   ; TANGELA
-	db PAL_BROWNMON  ; KANGASKHAN
-	db PAL_CYANMON   ; HORSEA
-	db PAL_CYANMON   ; SEADRA
-	db PAL_REDMON    ; GOLDEEN
-	db PAL_REDMON    ; SEAKING
-	db PAL_REDMON    ; STARYU
-	db PAL_GREYMON   ; STARMIE
-	db PAL_PINKMON   ; MR_MIME
-	db PAL_GREENMON  ; SCYTHER
-	db PAL_MEWMON    ; JYNX
-	db PAL_YELLOWMON ; ELECTABUZZ
-	db PAL_REDMON    ; MAGMAR
-	db PAL_BROWNMON  ; PINSIR
-	db PAL_GREYMON   ; TAUROS
-	db PAL_REDMON    ; MAGIKARP
-	db PAL_BLUEMON   ; GYARADOS
-	db PAL_CYANMON   ; LAPRAS
-	db PAL_GREYMON   ; DITTO
-	db PAL_GREYMON   ; EEVEE
-	db PAL_CYANMON   ; VAPOREON
-	db PAL_YELLOWMON ; JOLTEON
-	db PAL_REDMON    ; FLAREON
-	db PAL_GREYMON   ; PORYGON
-	db PAL_BLUEMON   ; OMANYTE
-	db PAL_BLUEMON   ; OMASTAR
-	db PAL_BROWNMON  ; KABUTO
-	db PAL_BROWNMON  ; KABUTOPS
-	db PAL_GREYMON   ; AERODACTYL
-	db PAL_PINKMON   ; SNORLAX
-	db PAL_BLUEMON   ; ARTICUNO
-	db PAL_YELLOWMON ; ZAPDOS
-	db PAL_REDMON    ; MOLTRES
-	db PAL_GREYMON   ; DRATINI
-	db PAL_BLUEMON   ; DRAGONAIR
-	db PAL_BROWNMON  ; DRAGONITE
-	db PAL_MEWMON    ; MEWTWO
-	db PAL_MEWMON    ; MEW
+PaletteBankCopyData: ; Denim ; 5 BYTE
+    ld a,BANK(SuperPalettes)
+    jp FarCopyData
 
-; palettes for overworlds, title screen, monsters
-SuperPalettes: ; 72660 (1c:6660)
-	RGB 31,29,31 ; PAL_ROUTE
-	RGB 21,28,11
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_PALLET
-	RGB 25,28,27
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_VIRIDIAN
-	RGB 17,26,3
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_PEWTER
-	RGB 23,25,16
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_CERULEAN
-	RGB 17,20,30
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_LAVENDER
-	RGB 27,20,27
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_VERMILION
-	RGB 30,18,0
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_CELADON
-	RGB 16,30,22
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_FUCHSIA
-	RGB 31,15,22
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_CINNABAR
-	RGB 26,10,6
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_INDIGO
-	RGB 22,14,24
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_SAFFRON
-	RGB 27,27,3
-	RGB 20,26,31
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_TOWNMAP
-	RGB 20,26,31
-	RGB 17,23,10
-	RGB 3,2,2
-IF _RED
-	RGB 31,29,31 ; PAL_LOGO1
-	RGB 30,30,17
-	RGB 17,23,10
-	RGB 21,0,4
-ENDC
-IF _BLUE
-	RGB 31,29,31 ; PAL_LOGO1
-	RGB 30,30,17
-	RGB 21,0,4
-	RGB 14,19,29
-ENDC
-	RGB 31,29,31 ; XXX
-	RGB 30,30,17
-	RGB 18,18,24
-	RGB 7,7,16
-	RGB 31,29,31 ; PAL_LOGO2
-	RGB 24,20,30
-	RGB 11,20,30
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_MEWMON
-	RGB 30,22,17
-	RGB 16,14,19
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_BLUEMON
-	RGB 18,20,27
-	RGB 11,15,23
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_REDMON
-	RGB 31,20,10
-	RGB 26,10,6
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_CYANMON
-	RGB 21,25,29
-	RGB 14,19,25
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_PURPLEMON
-	RGB 27,22,24
-	RGB 21,15,23
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_BROWNMON
-	RGB 28,20,15
-	RGB 21,14,9
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_GREENMON
-	RGB 20,26,16
-	RGB 9,20,11
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_PINKMON
-	RGB 30,22,24
-	RGB 28,15,21
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_YELLOWMON
-	RGB 31,28,14
-	RGB 26,20,0
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_GREYMON
-	RGB 26,21,22
-	RGB 15,15,18
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_SLOTS1
-	RGB 26,21,22
-	RGB 27,20,6
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_SLOTS2
-	RGB 31,31,17
-IF _RED
-	RGB 25,17,21
-ENDC
-IF _BLUE
-	RGB 16,19,29
-ENDC
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_SLOTS3
-	RGB 22,31,16
-IF _RED
-	RGB 25,17,21
-ENDC
-IF _BLUE
-	RGB 16,19,29
-ENDC
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_SLOTS4
-IF _RED
-	RGB 16,19,29
-	RGB 25,17,21
-ENDC
-IF _BLUE
-	RGB 25,17,21
-	RGB 16,19,29
-ENDC
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_BLACK
-	RGB 7,7,7
-	RGB 2,3,3
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_GREENBAR
-	RGB 30,26,15
-	RGB 9,20,11
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_YELLOWBAR
-	RGB 30,26,15
-	RGB 26,20,0
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_REDBAR
-	RGB 30,26,15
-	RGB 26,10,6
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_BADGE
-	RGB 30,22,17
-	RGB 11,15,23
-	RGB 3,2,2
-	RGB 31,29,31 ; PAL_CAVE
-	RGB 21,14,9
-	RGB 18,24,22
-	RGB 3,2,2
-	RGB 31,29,31 ; XXX
-	RGB 31,28,14
-	RGB 24,20,10
-	RGB 3,2,2
+HPBarPalette: ; Denim ; 8 BYTE
+    ld a,[$cf1d] ; palette hp bar : player?
+    add PAL_GREENBAR
+    ld [hli],a
+    inc hl
+	ld a,[$cf1e] ; palette hp bar : opponent?
+    add PAL_GREENBAR
+    ld [hli],a
+    inc hl
+    ret
+
+PaletteHackTwoBytes1: ; Denim ; 6 BYTE
+    inc hl
+    ld [hl],d
+    ld hl,$cf2d
+    ret
+
+PaletteHackTwoBytes2: ; Denim ; 9 BYTE
+    ld d,h
+    ld e,l
+    ld hl,$cf30
+    ld [hl],e
+    inc hl
+    ld [hl],d
+    ret
+
+PaletteHackTwoBytes3: ; Denim ; 12 BYTE
+    ld d,h
+    ld e,l
+    ld hl,$cf2e
+    ld [hl],e
+    inc hl
+    ld [hl],d
+    ld hl,$cf2d
+    ret
+
+SECTION "BorderPalettes",ROMX[$6788],BANK[$1C]
 
 BorderPalettes: ; 72788 (1c:6788)
 IF _RED
@@ -108938,33 +108641,24 @@ LoadAlternateBallPic: ; Denim
 PokeCenterFlashingHealBall:
     INCBIN "gfx/pokecenter_ball_2.2bpp"
 
-MonsterPalettesHack:
-    ld hl,wFlagShinyBit2
-	bit 2,[hl]
-	res 2,[hl]
-    ld hl, MonsterPalettes
-	ret z
-	ld hl, MonsterPalettesShiny
-	ret
-
-CheckShinyFrontAndDeterminePaletteID:
+CheckShinyFrontAndGetPAL:
 	push hl
 	ld hl,$cff1
-	jr DeterminePaletteIDCommon
-CheckShinyBackAndDeterminePaletteID:
+	jr GetPalCommon
+
+CheckShinyBackAndGetPAL:
 	push hl
 	ld hl,$d020
-DeterminePaletteIDCommon:
+	jr GetPalCommon
+
+CheckShinyAndGetPAL:
+	push hl
+	ld hl,$cfb3
+
+GetPalCommon:
 	call IsShiny
 	pop hl
     jp DeterminePaletteID
-
-CheckShinyAndDeterminePaletteIDOutOfBattle:
-	push hl
-	ld hl,$cfb3
-	call IsShiny
-	pop hl
-    jp DeterminePaletteIDOoutOfBattle
 
 HackForInsertDVInHallOfFameDataFirstStep:
     ld a,[$cd3e] ; Pokemon Party Order
@@ -108986,164 +108680,87 @@ HackForInsertDVInHallOfFameDataSecondStep:
 	ld [hli],a
 	ld a,[wDVForShinySpdSpc] ; DV Spd/Spc
 	ld [hl],a
+	ld hl,wDVForShinyAtkDef
 	xor a
-	ld [hld],a
+	ld [hli],a
 	ld [hl],a
 	ret
 
-MonsterPalettesShiny:
-	db PAL_MEWMON    ; MISSINGNO
-	db PAL_YELLOWMON ; BULBASAUR
-	db PAL_YELLOWMON ; IVYSAUR
-	db PAL_YELLOWMON ; VENUSAUR
-	db PAL_YELLOWMON ; CHARMANDER
-	db PAL_YELLOWMON ; CHARMELEON
-	db PAL_PURPLEMON ; CHARIZARD
-	db PAL_PURPLEMON ; SQUIRTLE
-	db PAL_PURPLEMON ; WARTORTLE
-	db PAL_PURPLEMON ; BLASTOISE
-	db PAL_YELLOWMON ; CATERPIE
-	db PAL_REDMON    ; METAPOD
-	db PAL_PINKMON   ; BUTTERFREE
-	db PAL_GREENMON  ; WEEDLE
-	db PAL_GREENMON  ; KAKUNA
-	db PAL_GREENMON  ; BEEDRILL
-	db PAL_YELLOWMON ; PIDGEY
-	db PAL_YELLOWMON ; PIDGEOTTO
-	db PAL_YELLOWMON ; PIDGEOT
-	db PAL_GREENMON  ; RATTATA
-	db PAL_REDMON    ; RATICATE
-	db PAL_YELLOWMON ; SPEAROW
-	db PAL_YELLOWMON ; FEAROW
-	db PAL_GREENMON  ; EKANS
-	db PAL_YELLOWMON ; ARBOK
-	db PAL_REDMON    ; PIKACHU
-	db PAL_REDMON    ; RAICHU
-	db PAL_GREENMON  ; SANDSHREW
-	db PAL_REDMON    ; SANDSLASH
-	db PAL_PINKMON   ; NIDORAN_F
-	db PAL_PINKMON   ; NIDORINA
-	db PAL_GREENMON  ; NIDOQUEEN
-	db PAL_CYANMON   ; NIDORAN_M
-	db PAL_CYANMON   ; NIDORINO
-	db PAL_BLUEMON   ; NIDOKING
-	db PAL_GREENMON  ; CLEFAIRY
-	db PAL_GREENMON  ; CLEFABLE
-	db PAL_YELLOWMON ; VULPIX
-	db PAL_MEWMON    ; NINETALES
-	db PAL_GREENMON  ; JIGGLYPUFF
-	db PAL_GREENMON  ; WIGGLYTUFF
-	db PAL_GREENMON  ; ZUBAT
-	db PAL_GREENMON  ; GOLBAT
-	db PAL_YELLOWMON ; ODDISH
-	db PAL_GREENMON  ; GLOOM
-	db PAL_GREENMON  ; VILEPLUME
-	db PAL_YELLOWMON ; PARAS
-	db PAL_YELLOWMON ; PARASECT
-	db PAL_CYANMON   ; VENONAT
-	db PAL_CYANMON   ; VENOMOTH
-	db PAL_CYANMON   ; DIGLETT
-	db PAL_CYANMON   ; DUGTRIO
-	db PAL_MEWMON    ; MEOWTH
-	db PAL_MEWMON    ; PERSIAN
-	db PAL_CYANMON   ; PSYDUCK
-	db PAL_BLUEMON   ; GOLDUCK
-	db PAL_GREENMON  ; MANKEY
-	db PAL_GREENMON  ; PRIMEAPE
-	db PAL_YELLOWMON ; GROWLITHE
-	db PAL_YELLOWMON ; ARCANINE
-	db PAL_CYANMON   ; POLIWAG
-	db PAL_CYANMON   ; POLIWHIRL
-	db PAL_GREENMON  ; POLIWRATH
-	db PAL_GREYMON   ; ABRA
-	db PAL_GREYMON   ; KADABRA
-	db PAL_PINKMON   ; ALAKAZAM
-	db PAL_GREENMON  ; MACHOP
-	db PAL_GREENMON  ; MACHOKE
-	db PAL_GREENMON  ; MACHAMP
-	db PAL_YELLOWMON ; BELLSPROUT
-	db PAL_YELLOWMON ; WEEPINBELL
-	db PAL_YELLOWMON ; VICTREEBEL
-	db PAL_PURPLEMON ; TENTACOOL
-	db PAL_PURPLEMON ; TENTACRUEL
-	db PAL_YELLOWMON ; GEODUDE
-	db PAL_BROWNMON  ; GRAVELER
-	db PAL_BROWNMON  ; GOLEM
-	db PAL_CYANMON   ; PONYTA
-	db PAL_CYANMON   ; RAPIDASH
-	db PAL_MEWMON    ; SLOWPOKE
-	db PAL_PURPLEMON ; SLOWBRO
-	db PAL_YELLOWMON ; MAGNEMITE
-	db PAL_YELLOWMON ; MAGNETON
-	db PAL_PINKMON   ; FARFETCH_D
-	db PAL_GREENMON  ; DODUO
-	db PAL_GREENMON  ; DODRIO
-	db PAL_GREYMON   ; SEEL
-	db PAL_GREYMON   ; DEWGONG
-	db PAL_GREENMON  ; GRIMER
-	db PAL_GREENMON  ; MUK
-	db PAL_REDMON    ; SHELLDER
-	db PAL_CYANMON   ; CLOYSTER
-	db PAL_BLUEMON   ; GASTLY
-	db PAL_BLUEMON   ; HAUNTER
-	db PAL_BLUEMON   ; GENGAR
-	db PAL_GREENMON  ; ONIX
-	db PAL_PINKMON   ; DROWZEE
-	db PAL_PINKMON   ; HYPNO
-	db PAL_YELLOWMON ; KRABBY
-	db PAL_GREENMON  ; KINGLER
-	db PAL_CYANMON   ; VOLTORB
-	db PAL_CYANMON   ; ELECTRODE
-	db PAL_YELLOWMON ; EXEGGCUTE
-	db PAL_YELLOWMON ; EXEGGUTOR
-	db PAL_GREENMON  ; CUBONE
-	db PAL_GREENMON  ; MAROWAK
-	db PAL_GREENMON  ; HITMONLEE
-	db PAL_GREENMON  ; HITMONCHAN
-	db PAL_YELLOWMON ; LICKITUNG
-	db PAL_GREENMON  ; KOFFING
-	db PAL_GREENMON  ; WEEZING
-	db PAL_REDMON    ; RHYHORN
-	db PAL_YELLOWMON ; RHYDON
-	db PAL_GREENMON  ; CHANSEY
-	db PAL_GREENMON  ; TANGELA
-	db PAL_GREYMON   ; KANGASKHAN
-	db PAL_GREENMON  ; HORSEA
-	db PAL_PURPLEMON ; SEADRA
-	db PAL_YELLOWMON ; GOLDEEN
-	db PAL_YELLOWMON ; SEAKING
-	db PAL_GREENMON  ; STARYU
-	db PAL_CYANMON   ; STARMIE
-	db PAL_GREENMON  ; MR_MIME
-	db PAL_MEWMON    ; SCYTHER
-	db PAL_PINKMON   ; JYNX
-	db PAL_REDMON    ; ELECTABUZZ
-	db PAL_PINKMON   ; MAGMAR
-	db PAL_PURPLEMON ; PINSIR
-	db PAL_GREENMON  ; TAUROS
-	db PAL_YELLOWMON ; MAGIKARP
-	db PAL_REDMON    ; GYARADOS
-	db PAL_PURPLEMON ; LAPRAS
-	db PAL_CYANMON   ; DITTO
-	db PAL_YELLOWMON ; EEVEE
-	db PAL_PURPLEMON ; VAPOREON
-	db PAL_GREENMON  ; JOLTEON
-	db PAL_YELLOWMON ; FLAREON
-	db PAL_PURPLEMON ; PORYGON
-	db PAL_PURPLEMON ; OMANYTE
-	db PAL_PURPLEMON ; OMASTAR
-	db PAL_GREENMON  ; KABUTO
-	db PAL_GREENMON  ; KABUTOPS
-	db PAL_PINKMON   ; AERODACTYL
-	db PAL_BLUEMON   ; SNORLAX
-	db PAL_CYANMON   ; ARTICUNO
-	db PAL_BROWNMON  ; ZAPDOS
-	db PAL_PINKMON   ; MOLTRES
-	db PAL_PINKMON   ; DRATINI
-	db PAL_PINKMON   ; DRAGONAIR
-	db PAL_GREENMON  ; DRAGONITE
-	db PAL_GREENMON  ; MEWTWO
-	db PAL_CYANMON   ; MEW
+SAME_PALETTE EQU 19
+
+DeterminePaletteID: ; xxxxx (1c:7ba0) ; Denim
+    push bc
+	push de
+    ld [$D11E],a
+    ld a,$3A
+    call Predef ; turn Pokemon ID number into Pokedex number
+    ld a,[$D11E] ; Load Directly Dex ID
+    call CheckSamePalette
+	ld h,$0
+	ld l,a
+    ld bc,PAL_M
+	add hl,bc
+	push hl
+    ld hl,wFlagShinyBit2
+	bit 2,[hl]
+	res 2,[hl]
+	pop hl
+    jr z,.End
+	and a
+	jr z,.End ; 'M shiny doesn't exist
+	ld bc,151-SAME_PALETTE ; (from dex 1 to 151,SAME_PALETTE Share Same Palette)
+    add hl,bc
+.End
+    pop de
+    pop bc
+    ret
+
+CheckSamePalette:
+    ld b,a
+	ld hl,SamePalette
+	ld c,SAME_PALETTE
+	ld d,0
+.Loop
+    ld a,[hli]
+	ld [$D11E],a
+	ld a,$3A
+	push de
+	push hl
+    call Predef ; turn Pokemon ID number into Pokedex number
+    pop hl
+	pop de
+	ld a,[$D11E]
+	dec a
+	cp b
+	jr nc,.NotEqual
+	inc d
+.NotEqual
+	dec c
+	jr nz,.Loop
+	ld a,b
+	sub d
+    ret
+
+SamePalette:
+    db MAGNETON
+    db GOLBAT
+    db RHYDON
+    db GRAVELER
+    db DUGTRIO
+    db OMASTAR
+    db MAROWAK
+    db WARTORTLE
+    db KABUTOPS
+    db WEEZING
+    db ELECTRODE
+    db RAPIDASH
+    db KADABRA
+    db MUK
+    db KINGLER
+    db PIDGEOT
+    db CLEFABLE
+    db WIGGLYTUFF
+    db ARCANINE
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
@@ -120683,7 +120300,7 @@ Func_7bde9: ; 7bde9 (1e:7de9)
 	ld c, $50
 	call DelayFrames
 	ld c, $1
-	call CheckShinyDuringEvolution ; call Func_7beb4
+	call Func_7beb4
 	ld bc, $110
 .asm_7be63
 	push bc
@@ -136615,3 +136232,181 @@ Conversion:
     pop hl
     ld [hli],a
     ret
+
+SECTION "bank31",ROMX,BANK[$31]
+
+SuperPalettes:
+    RGB 31,29,31 ; PAL_ROUTE
+	RGB 21,28,11
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_PALLET
+	RGB 25,28,27
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_VIRIDIAN
+	RGB 17,26,3
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_PEWTER
+	RGB 23,25,16
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_CERULEAN
+	RGB 17,20,30
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_LAVENDER
+	RGB 27,20,27
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_VERMILION
+	RGB 30,18,0
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_CELADON
+	RGB 16,30,22
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_FUCHSIA
+	RGB 31,15,22
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_CINNABAR
+	RGB 26,10,6
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_INDIGO
+	RGB 22,14,24
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_SAFFRON
+	RGB 27,27,3
+	RGB 20,26,31
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_TOWNMAP
+	RGB 20,26,31
+	RGB 17,23,10
+	RGB 3,2,2
+IF _RED
+	RGB 31,29,31 ; PAL_LOGO1
+	RGB 30,30,17
+	RGB 17,23,10
+	RGB 21,0,4
+ENDC
+IF _BLUE
+	RGB 31,29,31 ; PAL_LOGO1
+	RGB 30,30,17
+	RGB 21,0,4
+	RGB 14,19,29
+ENDC
+	RGB 31,29,31 ; XXX
+	RGB 30,30,17
+	RGB 18,18,24
+	RGB 7,7,16
+	RGB 31,29,31 ; PAL_LOGO2
+	RGB 24,20,30
+	RGB 11,20,30
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_MEWMON
+	RGB 30,22,17
+	RGB 16,14,19
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_BLUEMON
+	RGB 18,20,27
+	RGB 11,15,23
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_REDMON
+	RGB 31,20,10
+	RGB 26,10,6
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_CYANMON
+	RGB 21,25,29
+	RGB 14,19,25
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_PURPLEMON
+	RGB 27,22,24
+	RGB 21,15,23
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_BROWNMON
+	RGB 28,20,15
+	RGB 21,14,9
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_GREENMON
+	RGB 20,26,16
+	RGB 9,20,11
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_PINKMON
+	RGB 30,22,24
+	RGB 28,15,21
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_YELLOWMON
+	RGB 31,28,14
+	RGB 26,20,0
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_GREYMON
+	RGB 26,21,22
+	RGB 15,15,18
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_SLOTS1
+	RGB 26,21,22
+	RGB 27,20,6
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_SLOTS2
+	RGB 31,31,17
+IF _RED
+	RGB 25,17,21
+ENDC
+IF _BLUE
+	RGB 16,19,29
+ENDC
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_SLOTS3
+	RGB 22,31,16
+IF _RED
+	RGB 25,17,21
+ENDC
+IF _BLUE
+	RGB 16,19,29
+ENDC
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_SLOTS4
+IF _RED
+	RGB 16,19,29
+	RGB 25,17,21
+ENDC
+IF _BLUE
+	RGB 25,17,21
+	RGB 16,19,29
+ENDC
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_BLACK
+	RGB 7,7,7
+	RGB 2,3,3
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_GREENBAR
+	RGB 30,26,15
+	RGB 9,20,11
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_YELLOWBAR
+	RGB 30,26,15
+	RGB 26,20,0
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_REDBAR
+	RGB 30,26,15
+	RGB 26,10,6
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_BADGE
+	RGB 30,22,17
+	RGB 11,15,23
+	RGB 3,2,2
+	RGB 31,29,31 ; PAL_CAVE
+	RGB 21,14,9
+	RGB 18,24,22
+	RGB 3,2,2
+	RGB 31,29,31 ; XXX
+	RGB 31,28,14
+	RGB 24,20,10
+	RGB 3,2,2
+
+    INCLUDE "constants/SuperPalettes.asm"

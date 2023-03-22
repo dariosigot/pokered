@@ -36,3 +36,4 @@ PAL_REDBAR    EQU $21
 PAL_BADGE     EQU $22
 PAL_CAVE      EQU $23
 ; XXX
+PAL_M        EQU $25
