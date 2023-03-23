@@ -39,11 +39,12 @@ globals.asm
 extras/
 tools/
 
-*.map
-*.sym
-
 pic/bmon/*.pic
 pic/monback/*.pic
 pic/other/*.pic
 pic/trainer/*.pic
 
+pic/bmon/*.2bpp
+pic/monback/*.2bpp
+pic/other/*.2bpp
+pic/trainer/*.2bpp

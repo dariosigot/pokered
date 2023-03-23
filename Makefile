@@ -1,17 +1,16 @@
 PYTHON := python
 .SUFFIXES: .asm .tx .o .gbc
-.PHONY: all clean red blue
+.PHONY: all clean denim
 .SECONDEXPANSION:
 
 
 TEXTQUEUE :=
 
-RED_OBJS  := pokered.o
-BLUE_OBJS := pokeblue.o
+DENIM_OBJS  := pokedenim.o
 
-OBJS := $(RED_OBJS) $(BLUE_OBJS)
+OBJS := $(DENIM_OBJS)
 
-ROMS := pokered.gbc pokeblue.gbc
+ROMS := pokedenim.gbc
 
 ### Build tools
 
@@ -30,23 +29,25 @@ $(shell $(foreach obj, $(OBJS), \
 ))
 
 all: $(ROMS)
-red:  pokered.gbc
-blue: pokeblue.gbc
+denim:  pokedenim.gbc
 
 redrle: extras/redtools/redrle.c
 	${CC} -o $@ $>
 
 clean:
-	rm -f $(ROMS)
-	rm -f $(OBJS)
-	rm -f globals.asm
-	@echo "removing *.tx" && find . -iname '*.tx' -exec rm {} +
-	rm -f redrle
+	make softclean
 	find pic \
 	     \( -iname '*.1bpp' \
 	        -o -iname '*.2bpp' \
 	        -o -iname '*.pic' \) \
 	     -delete
+
+softclean:
+	rm -f $(ROMS)
+	rm -f $(OBJS)
+	rm -f globals.asm
+	@echo "removing *.tx" && find . -iname '*.tx' -exec rm {} +
+	rm -f redrle
 
 tools:
 	make -C tools/
@@ -68,15 +69,9 @@ globals.tx: globals.asm
 $(OBJS): $$*.tx $$(patsubst %.asm, %.tx, $$($$*_DEPENDENCIES))
 	rgbasm -o $@ $*.tx
 
-pokered.gbc: globals.tx $(RED_OBJS)
-	rgblink -n $*.sym -m $*.map -o $@ $(RED_OBJS)
-	rgbfix -C -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON RED" $@
-#	cmp baserom.gbc $@
-
-pokeblue.gbc: globals.tx $(BLUE_OBJS)
-	rgblink -n $*.sym -m $*.map -o $@ $(BLUE_OBJS)
-	rgbfix -C -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON BLUE" $@
-#	cmp blue.gbc $@
+pokedenim.gbc: globals.tx $(DENIM_OBJS)
+	rgblink -n $*.sym -m $*.map -o $@ $(DENIM_OBJS)
+	rgbfix -C -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON DENIM" $@
 
 ### Catch-all graphics rules
 
