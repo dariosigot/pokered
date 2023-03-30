@@ -53,6 +53,11 @@ dn: MACRO
 	db (\1 << 4 | \2)
 	ENDM
 
+; macro for four semi nibbles
+dsn: MACRO
+    db (\1 << 6 | \2 << 4 | \3 << 2 | \4)
+    ENDM
+
 ; macro for putting a byte then a word
 dbw: MACRO
 	db \1

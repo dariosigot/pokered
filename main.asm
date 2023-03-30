@@ -1,22 +1,38 @@
 INCLUDE "constants.asm"
 
+SECTION "HackForGBC",ROM0[0]
+
+DelayAndPredef ; Denim
+    push af
+	push bc
+    call IfGBCDelay3
+	pop bc
+	pop af
+    jp Predef
+
+IfGBCDelay3:
+    ld a,[wFlagGameBoyColor]
+    cp a,$11
+    ret nz ; NotGBC
+    jp Delay3
+
 ; the rst vectors are unused
-SECTION "rst00",ROM0[0]
-	db $FF
-SECTION "rst08",ROM0[8]
-	db $FF
-SECTION "rst10",ROM0[$10]
-	db $FF
-SECTION "rst18",ROM0[$18]
-	db $FF
-SECTION "rst20",ROM0[$20]
-	db $FF
-SECTION "rst28",ROM0[$28]
-	db $FF
-SECTION "rst30",ROM0[$30]
-	db $FF
-SECTION "rst38",ROM0[$38]
-	db $FF
+;SECTION "rst00",ROM0[0]
+;	db $FF
+;SECTION "rst08",ROM0[8]
+;	db $FF
+;SECTION "rst10",ROM0[$10]
+;	db $FF
+;SECTION "rst18",ROM0[$18]
+;	db $FF
+;SECTION "rst20",ROM0[$20]
+;	db $FF
+;SECTION "rst28",ROM0[$28]
+;	db $FF
+;SECTION "rst30",ROM0[$30]
+;	db $FF
+;SECTION "rst38",ROM0[$38]
+;	db $FF
 
 ; interrupts
 SECTION "vblank",ROM0[$40]
@@ -114,7 +130,7 @@ CheckIfThisIsInAGBC:
     xor a
     call RoutineForRealGB
 .NotGBC
-    jp Start + 7
+    jp Start
 
 PostVBlankHandler:
     push af
@@ -129,11 +145,6 @@ PostVBlankHandler:
     call RoutineForRealGB
     ret
 
-GoodGBPalNormal: ; Denim
-    call Delay3
-    call GBPalNormal
-    jp Delay3
-
 SECTION "RoutineForRealGB",ROM0[$0F5] ; Denim
 
 RoutineForRealGB:
@@ -147,19 +158,15 @@ RoutineForRealGB:
     ret
 
 SECTION "romheader",ROM0[$100]
-    db $18,$BC ; jr CheckIfThisIsInAGBC
+    jp CheckIfThisIsInAGBC
 
 SECTION "start",ROM0[$150]
 Start: ; 0150 (0:0150)
-	cp $11 ; value that indicates Gameboy Color
-	jr z,.gbcDetected
 	xor a
-	jr .storeValue
-.gbcDetected
-	ld a,$00
-.storeValue
 	ld [$cf1a],a ; same value ($00) either way
 	jp InitGame
+
+SECTION "ReadJoypadRegister",ROM0[$015f]
 
 ; this function directly reads the joypad I/O register
 ; it reads many times in order to give the joypad a chance to stabilize
@@ -862,7 +869,7 @@ SpeedUp: ; 06a0 (0:06a0) ; Denim,20 BYTE a disposizione
     ld a,[$d700] ; if 0 -> walk,if 1 -> byke
     and a
     ld b,0;RUNN_SHOES
-    jp z,SpeedUpByke + 25; SpeedUpWalk
+    jp z,SpeedUpWalk
     dec a
     ret nz ; if 2 -> surf
 .Byke
@@ -8989,20 +8996,16 @@ LoadTextBoxTilePatterns: ; 36a0 (0:36a0)
 
 ; copies HP bar and status display tile patterns into VRAM
 LoadHpBarAndStatusTilePatterns: ; 36c0 (0:36c0)
-	ld a,[rLCDC]
-	bit 7,a ; is the LCD enabled?
-	jr nz,.lcdEnabled
-.lcdDisabled
-	ld hl,HpBarAndStatusGraphics
-	ld de,$9620
-	ld bc,$01e0
-	ld a,BANK(HpBarAndStatusGraphics)
-	jp FarCopyData2 ; if LCD is off, transfer all at once
-.lcdEnabled
-	ld de,HpBarAndStatusGraphics
-	ld hl,$9620
-	ld bc,(BANK(HpBarAndStatusGraphics) << 8 | $1e)
-	jp CopyVideoData ; if LCD is on, transfer during V-blank
+    ld de,HpBarAndStatusGraphics
+    ld hl,$9620
+    ld bc,(BANK(HpBarAndStatusGraphics) << 8 | $1e)
+    call GoodCopyVideoData
+    ld de,EXPBarGraphics
+    ld hl,$8c00
+    ld bc,(BANK(EXPBarGraphics) << 8 | $A)
+    jp GoodCopyVideoData
+
+SECTION "FillMemory",ROM0[$36e0]
 
 ;Fills memory range with the specified byte.
 ;input registers a = fill_byte, bc = length, hl = address
@@ -10371,10 +10374,11 @@ Delay3: ; 3dd7 (0:3dd7)
 
 ; resets BGP and OBP0 to their usual colors
 GBPalNormal: ; 3ddc (0:3ddc)
+	ld a,%11010000
+GBPalCommon:
+	ld [rOBP0],a
 	ld a,%11100100
 	ld [rBGP],a
-	ld a,%11010000
-	ld [rOBP0],a
 	ret
 
 ; makes all palette colors white
@@ -10382,9 +10386,8 @@ GBPalWhiteOut: ; 3de5 (0:3de5)
 	xor a
 	ld [rBGP],a
 	ld [rOBP0],a
-	;ld [rOBP1],a
-	;ret
-    jp EndGBPalWhiteOutAndDelay1
+	ld [rOBP1],a
+	ret
 
 GoPAL_SET_CF1C: ; 3ded (0:3ded)
 	ld b,$ff
@@ -10393,7 +10396,7 @@ GoPAL_SET: ; 3def (0:3def)
 	and a
 	ret z
 	ld a,$45
-	jp Predef
+	jp DelayAndPredef ; Denim ; jp Predef
 
 Func_3df9: ; 3df9 (0:3df9)
 	ld a, e
@@ -10653,10 +10656,6 @@ PointerTable_3f22: ; 3f22 (0:3f22)
 	dw UnnamedText_fbe8                     ; id = 40
 	dw UnnamedText_fc0d                     ; id = 41
 	dw UnnamedText_fc45                     ; id = 42
-
-EndGBPalWhiteOutAndDelay1: ; Denim
-    ld [rOBP1],a
-    jp DelayFrame
     
 SpeedUpByke: ; Denim,Speed Walk and Byke
     ld a,[W_CURMAP]
@@ -10665,15 +10664,16 @@ SpeedUpByke: ; Denim,Speed Walk and Byke
     ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
     and a,%01110000 ; bit mask for up,left,right buttons
     ld b,0;LIGHT_KIT
-    jr nz,.TrySpeedB
+    jr nz,TrySpeedB
 .normalByke
     call AdvancePlayerSprite ; Speed 2X
     ld hl,wFlagBycicleFourX
     set 0,[hl]
-    ld b,0;LIGHT_KIT
-.SpeedUpWalk
-.TrySpeedB
-    ds 4;call IsItemInBag
+;    ld b,0;LIGHT_KIT
+
+SpeedUpWalk:
+TrySpeedB:
+;    ds 4;call IsItemInBag
     ;ret z
     ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
     and a,%00000010 ; bit mask for B
@@ -10705,6 +10705,25 @@ IsShiny:
 	pop af
     pop hl
 	ret
+
+GoodCopyVideoData: ; Denim,ExpBar
+    ld a,[rLCDC]
+    bit 7,a ; is the LCD enabled?
+    jp nz,CopyVideoData ; if LCD is on,transfer during V-blank
+    ld a,b
+    push hl
+    push de
+    ld h,0
+    ld l,c
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    ld b,h
+    ld c,l
+    pop hl
+    pop de
+    jp FarCopyData2 ; if LCD is off,transfer all at once
 
 SECTION "bank1",ROMX,BANK[$1]
 
@@ -17227,10 +17246,10 @@ TextBoxTextAndCoordTable: ; 73b0 (1:73b0)
 	dw JapaneseSpeedOptionsText
 	db 2,7   ; text coordinates
 
-	db $0b ; text box ID
-	db 8,12,19,17  ; text box coordinates
+	db $0b ; text box ID ; Denim,spostati elementi grafici menu battaglia
+	db 0,12,19,17 ; db 8,12,19,17  ; text box coordinates
 	dw BattleMenuText
-	db 10,14 ; text coordinates
+	db 2,14 ; db 10,14 ; text coordinates
 
 	db $1b ; text box ID
 	db 0,12,19,17  ; text box coordinates
@@ -17291,9 +17310,10 @@ JapaneseMainMenuText: ; 7448 (1:7448)
 	db "つづきから",$4E
 	db "さいしょから@"
 
-BattleMenuText: ; 7455 (1:7455)
-	db "FIGHT ",$E1,$E2,$4E
-	db "ITEM  RUN@"
+BattleMenuText_Old: ; 7455 (1:7455) ; Denim,allargato menu battaglia
+;    db "FIGHT ",$E1,$E2,$4E
+;    db "ITEM  RUN@"
+    ds 19
 
 SafariZoneBattleMenuText: ; 7468 (1:7468)
 	db "BALL×       BAIT",$4E
@@ -17697,11 +17717,13 @@ FieldMoveNames: ; 778d (1:778d)
 	db "FLY@"
 	db "@"
 	db "SURF@"
-	db "STRENGTH@"
+	db "STR.TH@"
 	db "FLASH@"
 	db "DIG@"
-	db "TELEPORT@"
-	db "SOFTBOILED@"
+	db "TELEP.@"
+	db "SOFTB.@"
+
+SECTION "PokemonMenuEntries",ROMX[$77c2],BANK[$1]
 
 PokemonMenuEntries: ; 77c2 (1:77c2)
 	db "STATS",$4E
@@ -17771,11 +17793,11 @@ FieldMoveDisplayData: ; 7823 (1:7823)
 	db FLY, $02, $0C 
 	db $B4, $03, $0C ; unused field move
 	db SURF, $04, $0C 
-	db STRENGTH, $05, $0A 
+	db STRENGTH, $05, $0C
 	db FLASH, $06, $0C 
 	db DIG, $07, $0C 
-	db TELEPORT, $08, $0A 
-	db SOFTBOILED, $09, $08 
+	db TELEPORT, $08, $0C
+	db SOFTBOILED, $09, $0C
 	db $ff ; list terminator
 
 
@@ -18379,6 +18401,10 @@ HackForBackupDVDuringTradeIn:
 	ld [wDVForShinySpdSpc], a ; DV Spd/Spc
 	pop af
     jp RemovePokemon
+
+BattleMenuText: ; Denim,allargato menu battaglia
+    db "FIGHT       ",$E1,$E2,$4E
+    db "ITEM        RUN@"
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -32069,7 +32095,7 @@ Func_12924: ; 12924 (4:6924)
 	ld a, [$FF00+$f6]
 	bit 0, a
 	jr z, .asm_12937
-	ld bc, $9
+	ld bc, $9 + 1 ; Denim , spostato di 1 px a dx la scritta HP nel menù party
 	jr .asm_1293a
 .asm_12937
 	ld bc, $15
@@ -32129,9 +32155,9 @@ StatusScreen: ; 12953 (4:6953)
 	push af
 	xor a
 	ld [$ff00+$d7], a
-	FuncCoord 19,1
+	FuncCoord 19,3 ; Denim ; FuncCoord 19,1
 	ld hl, Coord
-	ld bc, $060a
+	ld bc,$040a ; Denim ; ld bc,$060a
 	call DrawLineBox ; Draws the box around name, HP and status
 	ld de, $fffa
 	add hl, de
@@ -32142,10 +32168,10 @@ StatusScreen: ; 12953 (4:6953)
 	ld hl, Coord
 	ld bc, $0806
 	call DrawLineBox ; Draws the box around types, ID No. and OT
-	FuncCoord 10,9
+	FuncCoord 10,10 ; Denim ; FuncCoord 10,9
 	ld hl, Coord
 	ld de, Type1Text
-	call PlaceString ; "TYPE1/"
+	call PlaceStringTypeIDOTShinyGender ; Denim ; call PlaceString ; "TYPE1/"
 	FuncCoord 11,3
 	ld hl, Coord
 	PREDEF DrawHPBarPredef ; predef $5f
@@ -32153,17 +32179,17 @@ StatusScreen: ; 12953 (4:6953)
 	call Func_3df9
 	ld b, $3
 	call GoPAL_SET ; SGB palette
-	FuncCoord 16,6
+	FuncCoord 11,9 ; Denim ; FuncCoord 16,6
 	ld hl, Coord
 	ld de, $cf9c
 	call PrintStatusCondition
 	jr nz, .StatusWritten ; 0x129fc $9
-	FuncCoord 16,6
+	FuncCoord 11,9 ; Denim ; FuncCoord 16,6
 	ld hl, Coord
 	ld de, OKText
 	call PlaceString ; "OK"
 .StatusWritten
-	FuncCoord 9,6
+	FuncCoord 10,8 ; Denim ; FuncCoord 9,6
 	ld hl, Coord
 	ld de, StatusText
 	call PlaceString ; "STATUS/"
@@ -32180,7 +32206,7 @@ StatusScreen: ; 12953 (4:6953)
 	ld de, $d11e
 	ld bc, $8103 ; Zero-padded, 3
 	call PrintNumber ; Pokémon no.
-	FuncCoord 11,10
+	FuncCoord 11,11 ; Denim ; FuncCoord 11,10
 	ld hl, Coord
 	ld a, $4b
 	call Predef ; Prints the type (?)
@@ -32195,10 +32221,10 @@ StatusScreen: ; 12953 (4:6953)
 	call .unk_12a7e
 	ld d, h
 	ld e, l
-	FuncCoord 12,16
+	FuncCoord 12,16 ; Denim ; FuncCoord 12,16
 	ld hl, Coord
 	call PlaceString ; OT
-	FuncCoord 12,14
+	FuncCoord 12,14 ; Denim ; FuncCoord 12,14
 	ld hl, Coord
 	ld de, $cfa4
 	ld bc, $8205 ; 5
@@ -32207,7 +32233,7 @@ StatusScreen: ; 12953 (4:6953)
 	call PrintStatsBox
 	call Delay3
 	call GBPalNormal
-	FuncCoord 1, 0 ; $c3a1
+	FuncCoord 0,0 ; Denim ; FuncCoord 1,0 ; $c3a1
 	ld hl, Coord
 	call LoadFlippedFrontSpriteByMonIndex ; draw Pokémon picture
 	ld a, [$cf91]
@@ -32243,11 +32269,13 @@ Unknown_12a9d: ; 12a9d (4:6a9d)
 	dw $DE06
 	dw $DA49
 
-Type1Text: ; 12aa5 (4:6aa5)
-	db "TYPE1/", $4e
+Type1Text: ; 12aa5 (4:6aa5) ; Denim
+;    db "TYPE1/",$4e
+    db "TYPE/@",$4e
 
-Type2Text: ; 12aac (4:6aac)
-	db "TYPE2/", $4e
+Type2Text: ; 12aac (4:6aac) ; Denim
+;    db "TYPE2/",$4e
+    ds 7
 
 IDNoText: ; 12ab3 (4:6ab3)
 	db $73, "№", "/", $4e
@@ -32351,13 +32379,14 @@ StatusScreen2: ; 12b57 (4:6b57)
 	ld hl, Func_39b87
 	ld b, BANK(Func_39b87)
 	call Bankswitch
-	FuncCoord 9,2
-	ld hl, Coord
-	ld bc, $050a
-	call ClearScreenArea ; Clear under name
-	FuncCoord 19, 3 ; $c3ef
-	ld hl, Coord
-	ld [hl], $78
+    FuncCoord 7,2 ; Denim ; FuncCoord 9,2 ; la cancellazione deve avvenire 2 tiles più a sx causa immagine spostata
+    ld hl,Coord
+    ld bc,$050c ; Denim ; ld bc,$050a ; la cencellazione deve ricoprire un area più grande
+    call ClearScreenArea ; Clear under name
+    call PlaceDoubleVerticalBorderAndNextCoord ; Denim
+    ; FuncCoord 19,3 ; $c3ef                  ; ..
+    ; ld hl,Coord                             ; ..
+    ld [hl],$78 ; bordo verticale 1 tile
 	FuncCoord 0,8
 	ld hl, Coord
 	ld b, $8
@@ -32636,7 +32665,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
 	call PrintStatusCondition
 	pop hl
 	push hl
-	ld bc,20 + 1 ; down 1 row and right 1 column
+	ld bc,20 + 1 - 1 ; Denim, Spostato a sinistra di 1 px la barra hp nel menù party ;ld bc,20 + 1 ; down 1 row and right 1 column
 	ld a,[$FFF6]
 	set 0,a
 	ld [$FFF6],a
@@ -32766,7 +32795,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
 	ld a,1
 	ld [H_AUTOBGTRANSFERENABLED],a
 	call Delay3
-	jp GBPalNormal
+    jp GbPalPartyComplete ; Denim ; Party Sprite con tutti e 4 i colori palette ; jp GBPalNormal
 .printItemUseMessage
 	and a,$0F
 	ld hl,PartyMenuItemUseMessagePointers
@@ -32862,7 +32891,7 @@ RareCandyText: ; 12ec0 (4:6ec0)
 	db $06
 	db "@"
 
-Func_12ec7: ; 12ec7 (4:6ec7)
+Func_12ec7: ; 12ec7 (4:6ec7) ; TODO : viene richiamata 6 volte GoPAL_SET durante la visualizzazione del menù party. LENTO!
 	ld hl, $cf1f
 	ld a, [$cf2d]
 	ld c, a
@@ -33431,7 +33460,7 @@ StartMenu_TrainerInfo: ; 13460 (4:7460)
 	call Predef ; draw badges
 	ld b,$0d
 	call GoPAL_SET
-	call GoodGBPalNormal
+	call GBPalNormal
 	call WaitForTextScrollButtonPress ; wait for button press
 	call GBPalWhiteOut
 	call LoadFontTilePatterns
@@ -34311,6 +34340,74 @@ GenRandom_: ; 13a8f (4:7a8f)
 	sbc b
 	ld [H_RAND2],a
 	ret
+
+PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
+    call PlaceString ; "TYPE/"
+    FuncCoord 10,13
+    ld hl,Coord
+    ld de,IDNoText
+    call PlaceString ; "ID/OT"
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	ld a,[$cf98] ; Pokemon ID
+    ld [$d11e],a
+	ld hl,GetGender_D11E
+	ld b,BANK(GetGender_D11E)
+	call Bankswitch
+	jr c,.Genderless
+    FuncCoord 17,2
+    ld hl,Coord
+	ld de,.MaleIcon
+	jr nz,.Male
+	ld de,.FemaleIcon
+.Male
+    call PlaceString
+.Genderless
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	ld a,[$cf98] ; Pokemon ID
+	and a
+	jr z,.noShiny
+	cp $FF
+	jr z,.noShiny
+    ld hl,$cfb3 ; .OutOfBattle
+    ld a,[hli] ; Controllo IV Atk/Def ; Controllo IV Atk,Shiny se IV Atk = 2,3,6,7,10,11,14 o 15
+    and %00101111 ; Shiny se bit 5 di a settato,gli altri bit dell'atk non contano,applico maschera
+    cp a,%00101010
+    ld a,[hl] ; Controllo IV Spd/Spc
+    jr nz,.noShiny
+    cp a,%10101010
+    jr nz,.noShiny
+	FuncCoord 6,7
+    ld hl,Coord
+	ld de,.ShinyStarIcon
+    call PlaceString
+.noShiny
+    ld a,[$cf9f] ; CatchRate / HeldItem
+    and a
+    ret
+.ShinyStarIcon
+    db $D1,$50
+.MaleIcon
+    db $EF,$50
+.FemaleIcon
+    db $F5,$50
+
+PlaceDoubleVerticalBorderAndNextCoord: ; xxxxx (4:xxxx) ; Denim
+    FuncCoord 19,1
+    ld hl,Coord
+    ld [hl],$78 ; bordo verticale 1 tile
+    FuncCoord 19,2
+    ld hl,Coord
+    ld [hl],$78 ; bordo verticale 1 tile
+    FuncCoord 19,3 ; $c3ef
+    ld hl,Coord
+    ret
+
+EXPBarGraphics: ; Denim,ExpBar
+    INCBIN "gfx/denim/exp_bar.2bpp"
+
+GbPalPartyComplete ; Denim
+    ld a,%11100100
+    jp GBPalCommon
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -47516,7 +47613,7 @@ Func_27d6b: ; 27d6b (9:7d6b)
 	cp b
 	pop hl
 	jr z, asm_27d8c
-	ld bc, $28
+    ld bc,$14 ; Denim ; ld bc,$28 ; Tipo2 a capo
 	add hl, bc
 
 Func_27d89: ; 27d89 (9:7d89)
@@ -60971,7 +61068,7 @@ Func_3bab1: ; 3bab1 (e:7ab1)
 	ld hl, wEnemyMonStatMods ; $cd2e
 	ld de, wPlayerMonStatMods ; $cd1a
 	call Func_3bb7d
-	ld hl, UnnamedText_3bb92 ; $7b92
+	call GoPalSetBattleAndLoadText ; Denim ; ld hl,UnnamedText_3bb92 ; $7b92
 	jp PrintText
 
 Func_3bb7d: ; 3bb7d (e:7b7d)
@@ -61039,6 +61136,12 @@ UnnamedText_3bbdc: ; 3bbdc (e:7bdc)
 BankswitchEtoF: ; 3bbe1 (e:7be1)
 	ld b, $f
 	jp Bankswitch
+
+GoPalSetBattleAndLoadText: ; Denim
+    ld b,1
+	call GoPAL_SET
+    ld hl,UnnamedText_3bb92 ; $7b92
+	ret
 
 SECTION "bankF",ROMX,BANK[$F]
 
@@ -62991,8 +63094,9 @@ Func_3cdec: ; 3cdec (f:4dec)
 Func_3ce7f: ; 3ce7f (f:4e7f)
 	xor a
 	ld [wListMenuID], a ; $cf94
-	FuncCoord 2, 2 ; $c3ca
-	ld hl, Coord
+    ;FuncCoord 2,2 ; $c3ca
+    ;ld hl,Coord
+    call DrawCatchGenderAndLoadCoord ; Denim
 	call DrawHPBar
 	ld a, $1
 	ld [H_AUTOBGTRANSFERENABLED], a ; $FF00+$ba
@@ -63094,11 +63198,11 @@ RegularBattleMenu: ; 3cf1a (f:4f1a)
 	cp $2
 	ld a, " "
 	jr z, .safaribattle
-	FuncCoord 15, 14 ; $c4c7
+	FuncCoord 13,14 ; $c4c7 ; FuncCoord 15,14 ; $c4c7 ; Denim
 	ld [Coord], a
-	FuncCoord 15, 16 ; $c4ef
+	FuncCoord 13,16 ; $c4ef ; FuncCoord 15,16 ; $c4ef ; ...
 	ld [Coord], a
-	ld b, $9
+	ld b,1 ; ld b,9                                   ; ...
 	jr .notsafari
 .safaribattle
 	FuncCoord 13, 14 ; $c4c5
@@ -63131,11 +63235,11 @@ RegularBattleMenu: ; 3cf1a (f:4f1a)
 	cp $2
 	ld a, " "
 	jr z, .safarirightcolumn
-	FuncCoord 9, 14 ; $c4c1
+	FuncCoord 1,14 ; FuncCoord 9,14 ; $c4c1 ; Denim ,Allineati comandi menu battaglia
 	ld [Coord], a
-	FuncCoord 9, 16 ; $c4e9
+	FuncCoord 1,16 ; FuncCoord 9,16 ; $c4e9 ; ...
 	ld [Coord], a
-	ld b, $f
+	ld b,13 ; ld b,15                       ; ...
 	jr .notsafarirightcolumn
 .safarirightcolumn
 	FuncCoord 1, 14 ; $c4b9
@@ -63499,23 +63603,22 @@ MoveSelectionMenu: ; 3d219 (f:5219)
 	ret z
 	ld hl, W_PLAYERMONMOVES
 	call .loadmoves
-	FuncCoord 4, 12 ; $c494
-	ld hl, Coord
-	ld b, $4
-	ld c, $e
+    FuncCoord 0,12 ; $c494
+    ld hl,Coord
+    ld b,$4
+    ld c,$e + 4
 	di
 	call TextBoxBorder
-	FuncCoord 4, 12 ; $c494
+    FuncCoord 0,12 ; $c494
 	ld hl, Coord
 	ld [hl], $7a
-	FuncCoord 10, 12 ; $c49a
+    FuncCoord 8,12 ; $c49a
 	ld hl, Coord
 	ld [hl], $7e
 	ei
-	FuncCoord 6, 13 ; $c4aa
-	ld hl, Coord
+    call WritePPAllMoves ; Denim
 	call .writemoves
-	ld b, $5
+    ld b,5-4
 	ld a, $c
 	jr .menuset
 .mimicmenu
@@ -63612,7 +63715,7 @@ Func_3d2fe: ; 3d2fe (f:52fe)
 	ld a, [$cc35]
 	and a
 	jr z, .select
-	FuncCoord 5, 13 ; $c4a9
+    FuncCoord 1,13 ; $c4a9
 	ld hl, Coord
 	dec a
 	ld bc, $14
@@ -63852,7 +63955,7 @@ Func_3d4b6: ; 3d4b6 (f:54b6)
 	FuncCoord 0, 8 ; $c440
 	ld hl, Coord
 	ld b, $3
-	ld c, $9
+    ld c,7
 	call TextBoxBorder
 	ld a, [W_PLAYERDISABLEDMOVE] ; $d06d
 	and a
@@ -63896,28 +63999,28 @@ Func_3d4b6: ; 3d4b6 (f:54b6)
 	ld a, [hl]
 	and $3f
 	ld [$cd6d], a
-	FuncCoord 1, 9 ; $c455
-	ld hl, Coord
-	ld de, TypeText ; $555f
-	call PlaceString
-	FuncCoord 7, 11 ; $c483
-	ld hl, Coord
-	ld [hl], "/"
-	FuncCoord 5, 9 ; $c459
-	ld hl, Coord
-	ld [hl], "/"
-	FuncCoord 5, 11 ; $c481
-	ld hl, Coord
-	ld de, $cd6d
-	ld bc, $102
-	call PrintNumber
-	FuncCoord 8, 11 ; $c484
-	ld hl, Coord
-	ld de, $d11e
-	ld bc, $102
-	call PrintNumber
-	call GetCurrentMove
-	FuncCoord 2, 10 ; $c46a
+	;FuncCoord 1, 9 ; $c455
+	;ld hl, Coord
+	;ld de, TypeText ; $555f
+	;call PlaceString
+	;FuncCoord 7, 11 ; $c483
+	;ld hl, Coord
+	;ld [hl], "/"
+	;FuncCoord 5, 9 ; $c459
+	;ld hl, Coord
+	;ld [hl], "/"
+	;FuncCoord 5, 11 ; $c481
+	;ld hl, Coord
+	;ld de, $cd6d
+	;ld bc, $102
+	;call PrintNumber
+	;FuncCoord 8, 11 ; $c484
+	;ld hl, Coord
+	;ld de, $d11e
+	;ld bc, $102
+	;call PrintNumber
+    call GetCurrentMoveDetails ; Denim ; call GetCurrentMove
+    FuncCoord 1,9
 	ld hl, Coord
 	ld a, $5d
 	call Predef ; indirect jump to Func_27d98 (27d98 (9:7d98))
@@ -63925,6 +64028,8 @@ Func_3d4b6: ; 3d4b6 (f:54b6)
 	ld a, $1
 	ld [H_AUTOBGTRANSFERENABLED], a ; $FF00+$ba
 	jp Delay3
+
+SECTION "DisabledText",ROMX[$5555],BANK[$F]
 
 DisabledText: ; 3d555 (f:5555)
 	db "disabled!@"
@@ -69770,6 +69875,143 @@ CheckSpecialHybridSprite: ; Denim
 	ld e,[hl] ; sprite pointer
 	xor a ; Reset Carry Flag
 	ret
+
+DrawCatchGenderAndLoadCoord ; Denim
+    push de
+    push bc
+    ld hl,_DrawCatchGender
+    ld b,BANK(_DrawCatchGender)
+    call Bankswitch
+    pop bc
+    pop de
+    FuncCoord 2,2 ; $c3ca
+    ld hl,Coord
+    ret
+
+GetCurrentMoveDetails: ; xxxxx (f:xxxx) ; Denim ; TODO
+    call GetCurrentMove ; per ottenere W_PLAYERMOVENUM e W_PLAYERMOVETYPE
+
+    ; Move_Accuracy
+    ld de,.AccrText
+    FuncCoord 1,11
+    ld hl,Coord
+    call PlaceString
+
+    ld hl,$FF95
+    xor a
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld a,[W_PLAYERMOVEACCURACY]
+    ld [hli],a
+    ld a,100
+    ld [hl],a
+    call Multiply
+    ld a,255
+    ld [$FF99],a
+    ld b,4
+    call Divide
+
+    ld de,$FF98
+    FuncCoord 5,11
+    ld hl,Coord
+    ld b,%00000001
+    ld c,3
+    call PrintNumber
+
+    ; Move_Power
+    ld de,.PwrText
+    FuncCoord 1,10
+    ld hl,Coord
+    call PlaceString
+    FuncCoord 5,10
+    ld hl,Coord
+    ld de,W_PLAYERMOVEPOWER
+    ld b,%00000001
+    ld c,3
+    call PrintNumber
+
+    ret
+
+.AccrText
+    db "ACR/@"
+.PwrText
+    db "PWR/@"
+
+WritePPAllMoves: ; Denim ; TODO,sistemare routine e posizioni
+    ld a,[wCurrentMenuItem]
+    push af
+
+    ld a,$4
+    ld [$cc49],a
+    ld d,4
+.Loop4Moves
+    push de
+    ld a,d
+    dec a
+    ld [wCurrentMenuItem],a
+    ld e,a
+
+    ld hl,W_PLAYERMONMOVES
+    ld b,0
+    ld c,a
+    add hl,bc
+    ld a,[hl]
+    and a
+    jr z,.SkipCurrentMove
+
+    ld a,e
+    push af ; Backup CurrentMenuItem
+    ;push af ; ..
+    ;push af ; ..
+
+    ;FuncCoord 16,13 ; $c459
+    ;ld hl,Coord
+    ;ld bc,20
+    ;call AddNTimes
+    ;ld [hl],"/"
+
+    ;ld hl,GetMaxPP
+    ;ld b,BANK(GetMaxPP)
+    ;call Bankswitch ; indirect jump to GetMaxPP (e677 (3:6677))
+
+    ld hl,W_PLAYERMONPP ; $d02d
+    ld b,0
+    ;pop af ; Restore CurrentMenuItem
+    ld c,a
+    add hl,bc
+    ld a,[hl]
+    and a,%00111111
+    ld [$cd6d],a
+
+    pop af ; Restore CurrentMenuItem
+    FuncCoord 14 + 3,13 ; FuncCoord 14,13
+    ld hl,Coord
+    ld bc,20
+    call AddNTimes
+    ld de,$cd6d
+    ld bc,$102
+    call PrintNumber
+
+    ;pop af ; Restore CurrentMenuItem
+    ;FuncCoord 17,13
+    ;ld hl,Coord
+    ;ld bc,20
+    ;call AddNTimes
+    ;ld de,$d11e
+    ;ld bc,$102
+    ;call PrintNumber
+
+.SkipCurrentMove
+    pop de
+    dec d
+    jr nz,.Loop4Moves
+
+    pop af
+    ld [wCurrentMenuItem],a
+    FuncCoord 2,13 ; $c4aa
+    ld hl,Coord
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -103418,7 +103660,9 @@ Func_702f0: ; 702f0 (1c:42f0)
 	jp PlayCry
 
 HoFMonInfoText: ; 70329 (1c:4329)
-	db "LEVEL/",$4e,"TYPE1/",$4e,"TYPE2/@"
+;    db "LEVEL/",$4e,"TYPE1/",$4e,"TYPE2/@" ; Denim
+    db "LEVEL/",$4e,"TYPE/@"
+    ds 8
 
 Func_7033e: ; 7033e (1c:433e)
 	ld de, Unknown_72ede ; $6ede
@@ -105392,7 +105636,7 @@ Func_7109b: ; 7109b (1c:509b)
 	ld b, $2
 	call GoPAL_SET
 	call Delay3
-	call GoodGBPalNormal
+	call GBPalNormal
 	xor a
 	ld [W_SUBANIMTRANSFORM], a ; $d08b
 	inc a
@@ -105962,8 +106206,8 @@ DataTable_71769: ; 71769 (1c:5769)
 	db $05,$10,$20
 
 Func_7176c: ; 7176c (1c:576c)
-	ld hl, MonOverworldSpritePointers ; $57c0
-	ld a, $1c
+    call LoadMonOverworldSpritePointersAndNewVRAMIcon ; Denim ;     ld hl,MonOverworldSpritePointers ; $57c0
+    ld a,$1c
 
 Func_71771: ; 71771 (1c:5771)
 	ld bc, $0
@@ -105995,9 +106239,9 @@ Func_71771: ; 71771 (1c:5771)
 	ret
 
 Func_71791: ; 71791 (1c:5791)
-	call DisableLCD
-	ld hl, MonOverworldSpritePointers ; $57c0
-	ld a, $1c
+    call DisableLCD
+    call LoadMonOverworldSpritePointersAndNewVRAMIcon ; Denim ; ld hl,MonOverworldSpritePointers ; $57c0
+    ld a,$1c
 	ld bc, $0
 .asm_7179c
 	push af
@@ -106215,7 +106459,7 @@ Func_718ac: ; 718ac (1c:58ac)
 	add a
 	ld c, a
 	ld b, $0
-	ld hl, MonOverworldSpritePointers
+    call LoadMonOverworldSpritePointersAndNewVRAMIcon ; Denim ; ld hl,MonOverworldSpritePointers ; $57c0
 	add hl, bc
 	add hl, bc
 	add hl, bc
@@ -106745,8 +106989,6 @@ GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
 
     ld hl,$cf2e
 
-    call HPBarPalette
-
     ; backsprite palette
     ld a,c
     ld [hli],a
@@ -106758,6 +107000,13 @@ GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
     ld [hli],a
     ld a,d
     ld [hli],a
+
+    call FirstHPBarPalette ; palette hp bar : player?
+
+    ; palette hp bar : opponent?
+    ld a,[$cf1e]
+    add PAL_GREENBAR
+    ld [hl],a
 
     ld hl,$cf2d
     ld de,Unknown_721b5
@@ -106773,7 +107022,7 @@ Func_71e48: ; 71e48 (1c:5e48)
 	ret
 
 GetPkmnStatPaletteID: ; 71e4f (1c:5e4f)
-	ld hl, PalPacket_72428
+	ld hl,PalPacketStatMenu ; Denim ; PalPacket_72428
 	ld de, $cf2d
 	ld bc, $10
 	call CopyData
@@ -106795,12 +107044,12 @@ GetPkmnStatPaletteID: ; 71e4f (1c:5e4f)
 	ld de, Unknown_721fa
 	ret
 
-Func_71e7b: ; 71e7b (1c:5e7b)
+GetPartyMenuPaletteID: ; 71e7b (1c:5e7b)
 	ld hl, PalPacket_72438
 	ld de, $cf2e
 	ret
 
-PreLoadPokedexGraphics: ; 71e82 (1c:5e82)
+GetPokedexPaletteID: ; 71e82 (1c:5e82)
 	ld hl, PalPacket_72468
 	ld de, $cf2d
 	ld bc, $10
@@ -106886,7 +107135,7 @@ GetMapPaletteID: ; 71ec7 (1c:5ec7)
 	jr .town
 
 ; HallOfFame or LinkCable or Evolution
-PreLoadHallOfFameOrLinkCableOrEvolutionGraphics: ; 71f17 (1c:5f17)
+GetHallOfFameLinkCableEvolutionPaletteID: ; 71f17 (1c:5f17)
 	push bc
 	ld hl, PalPacket_72428
 	ld de, $cf2d
@@ -106946,17 +107195,17 @@ LoadTrainerCardBadgePalettes: ; 71f3b (1c:5f3b)
 
 PointerTable_71f73: ; 71f73 (1c:5f73)
 	dw Func_71dff
-	dw GetBattleScreenPaletteID
+	dw GetBattleScreenPaletteID ; Palette Battle Screen
 	dw Func_71e48
-	dw GetPkmnStatPaletteID
-	dw PreLoadPokedexGraphics
+	dw GetPkmnStatPaletteID ; Palette Pokemon Stat
+	dw GetPokedexPaletteID ; Palette Pokedex
 	dw Func_71e9f
 	dw Func_71ea6
 	dw Func_71eb4
 	dw Func_71ead
 	dw GetMapPaletteID
-	dw Func_71e7b
-	dw PreLoadHallOfFameOrLinkCableOrEvolutionGraphics
+	dw GetPartyMenuPaletteID ; Palette Party Menu
+	dw GetHallOfFameLinkCableEvolutionPaletteID ; Palette HallOfFame or LinkCable or Evolution
 	dw Func_71ebb
 	dw LoadTrainerCardBadgePalettes
 
@@ -106969,7 +107218,7 @@ SECTION "Func_71fb6",ROMX[$5fb6],BANK[$1C]
 Func_71fb6: ; 71fb6 (1c:5fb6)
 	ld hl, Unknown_722f4 ; $62f4
 	ld de, $cf2e
-	ld bc, $30
+    ld bc,$30 + 6 ; Denim ; Aggiunti Byte al Pacchetto Unknown_722f4
 	jp CopyData
 
 Func_71fc2: ; 71fc2 (1c:5fc2)
@@ -107305,11 +107554,52 @@ Func_72188: ; 72188 (1c:6188)
 Unknown_7219e: ; 7219e (1c:619e)
 INCBIN "baserom.gbc",$7219e,$721b5 - $7219e
 
-Unknown_721b5: ; 721b5 (1c:61b5)
-INCBIN "baserom.gbc",$721b5,$721fa - $721b5
+Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP nella battaglia e altre migliorie ; TODO
+;INCBIN "baserom.gbc",$721b5,$721fa - $721b5
+    db $22 + 1
+    db $05 + 1
 
-Unknown_721fa: ; 721fa (1c:61fa)
-INCBIN "baserom.gbc",$721fa,$72222 - $721fa
+    ; main palette = backsprite player,bottombox using
+    db $07,$00 ; $07,$0A
+    db $00,$0C,$13,$11
+
+    ; opponent hp bar
+    db $03,$0F ; $03,$05
+    db $01,$00,$0A,$03
+
+    ; player hp bar
+    db $03,$0A ; $03,$00
+    db $09,$07,$12,$0B ; $0A,$07,$13,$0A
+
+    ; backsprite player
+    db $03,$00 ; $03,$0A
+    db $02,$06,$07,$0B ; $00,$04,$08,$0B
+
+    ; frontsprite opponent
+    db $03,$05 ; $03,$0F
+    db $0C,$00,$12,$06 ; db $0B,$00,$13,$06
+
+    ; Catch Flag opponent
+    db $02,$05 ; $03,$0F
+    db $01,$01,$01,$01
+
+;Unknown_Command:
+    ds 37 - 6
+    ;db $03,$00,$00,$13,$0B,$00,$03,$00,$0C,$13,$11,$02,$03,$01,$00,$0A,$03,$01,$03,$0A
+    ;db $08,$13,$0A,$00,$03,$00,$04,$08,$0B,$02,$03,$0B,$00,$13,$07,$03,$00
+
+Unknown_721fa: ; 721fa (1c:61fa) ; Denim,spostata palette del pokemon nel menu stat
+;INCBIN "baserom.gbc",$721fa,$72222 - $721fa
+    db $21
+	db $02
+	db $07,$05
+    db $00,$00,$06,$06
+    db $02,$0A
+	db $06,$07,$06,$07 ; ShinyStar
+	
+	db $00,$00
+    db $02,$00,$00,$11,$00,$03,$01,$00,$07,$06,$01,$03,$01,$07,$13,$11
+    db $00,$03,$08,$00,$13,$06,$00,$00
 
 Unknown_72222: ; 72222 (1c:6222)
 INCBIN "baserom.gbc",$72222,$7224f - $72222
@@ -107345,7 +107635,42 @@ BlkPacket_722c1: ; 722c1 (1c:62c1)
     db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$03,$00,$00,$13,$03,$01,$03,$00,$04,$13,$0D,$00,$03,$00,$0E,$13,$11,$01,$00
 
 Unknown_722f4: ; 722f4 (1c:62f4)
-INCBIN "baserom.gbc",$722f4,$72360 - $722f4
+;INCBIN "baserom.gbc",$722f4,$72360 - $722f4
+
+;BlkPacket_722f4: ; 722f4 (1c:62f4) ; Denim,spostata palette errata nel menu party
+    db $23 + 1
+    db $07 + 1
+
+    db $06,$10 ; MiniSprite
+    db $01,$00,$02,$0b ; db $01,$00,$02,$0c
+
+    db $02,$01 ; 1st Pkmn Hp Bar
+    db $04,$01,$0a,$01
+
+    db $02,$01 ; 2nd Pkmn Hp Bar
+    db $04,$03,$0a,$03
+
+    db $02,$01 ; 3rd Pkmn Hp Bar
+    db $04,$05,$0a,$05
+
+    db $02,$01 ; 4th Pkmn Hp Bar
+    db $04,$07,$0a,$07
+
+    db $02,$01 ; 5th Pkmn Hp Bar
+    db $04,$09,$0a,$09
+
+    db $02,$01 ; 6th Pkmn Hp Bar
+    db $04,$0b,$0a,$0b
+
+    db $02,$0F ; HeldItem
+    db $03,$01,$03,$0B
+
+    ds $40 - 6
+
+Unknown_Command:
+;    db $00,$00,$00,$00,$02,$00,$00,$11,$01,$03,$01,$00,$02,$0c,$00,$03,$01,$0d,$02,$11,$01,$03,$03,$00,$13,$11,$01,$03,$0c,$00,$12
+;    db $01,$00,$03,$0c,$02,$12,$03,$00,$03,$0c,$04,$12,$05,$00,$03,$0c,$06,$12,$07,$00,$03,$0c,$08,$12,$09,$00,$03
+;    db $0c,$0a,$12,$0b,$00,$00
 
 Unknown_72360: ; 72360 (1c:6360)
 INCBIN "baserom.gbc",$72360,$723dd - $72360
@@ -107436,15 +107761,11 @@ PaletteBankCopyData: ; Denim ; 5 BYTE
     ld a,BANK(SuperPalettes)
     jp FarCopyData
 
-HPBarPalette: ; Denim ; 8 BYTE
-    ld a,[$cf1d] ; palette hp bar : player?
+FirstHPBarPalette: ; Denim ; 8 BYTE
+    ld a,[$cf1d]
     add PAL_GREENBAR
     ld [hli],a
     inc hl
-	ld a,[$cf1e] ; palette hp bar : opponent?
-    add PAL_GREENBAR
-    ld [hli],a
-	inc hl
     ret
 
 PaletteHackTwoBytes1: ; Denim ; 6 BYTE
@@ -108490,6 +108811,11 @@ PokeCenterFlashingHealBall:
 
 CheckShinyFrontAndGetPAL:
 	push hl
+	ld hl,W_ENEMYBATTSTATUS3
+	bit 3,[hl] ; bit 3 of battle status 3,set if current Pokemon is transformed
+	jr z,.NoTransform
+	ld a,[$cfe5]
+.NoTransform
 	ld hl,$cff1
 	jr GetPalCommon
 
@@ -108608,6 +108934,19 @@ SamePalette:
     db CLEFABLE
     db WIGGLYTUFF
     db ARCANINE
+
+LoadMonOverworldSpritePointersAndNewVRAMIcon: ; xxxxx (1c:xxxx) ; Denim
+
+    ld de,HeldItemIcon
+    ld hl,$8d00
+    ld bc,(BANK(HeldItemIcon) << 8 | $2) ; Also Shiny Star
+    call GoodCopyVideoData
+
+	ld hl,MonOverworldSpritePointers ; $57c0
+	ret
+
+PalPacketStatMenu: ; Denim
+    db $51,$00,$00,$00,$00,PAL_SHINYSTAR,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
@@ -113479,7 +113818,7 @@ DrawFrameBlock: ; 78000 (1e:4000)
 	inc de
 	ld a,[hli]
 	ld [de],a ; store flags
-	inc de
+    nop ; Denim (CaptureBall) ; inc de
 	jp .nextTile
 .flipHorizontalAndVertical
 	ld a,[W_BASECOORDY]
@@ -113517,7 +113856,7 @@ DrawFrameBlock: ; 78000 (1e:4000)
 .storeFlags1
 	ld a,b
 	ld [de],a
-	inc de
+	nop ; Denim (CaptureBall) ; inc de
 	jp .nextTile
 .flipHorizontalTranslateDown
 	ld a,[W_BASECOORDY]
@@ -113548,9 +113887,9 @@ DrawFrameBlock: ; 78000 (1e:4000)
 	res 5,a
 .storeFlags2
 	ld [de],a
-	inc de
+	nop ; Denim (CaptureBall) ; inc de
 .nextTile
-	ld a,[W_FBTILECOUNTER]
+	call CheckCaptureAnimAndStoreFlag ; Denim (CaptureBall) ; ld a,[W_FBTILECOUNTER]
 	ld c,a
 	ld a,[W_NUMFBTILES]
 	cp c
@@ -113805,7 +114144,7 @@ MoveAnimation: ; 78d5e (1e:4d5e)
 	push bc
 	push af
 	call WaitForSoundToFinish
-	call Func_78e23
+	call MoveAnimationPalette
 	ld a,[W_ANIMATIONID]
 	and a
 	jr z,.AnimationFinished
@@ -113941,33 +114280,36 @@ Func_78e01: ; 78e01 (1e:4e01)
 	jr nz, Func_78e01
 	ret
 
-Func_78e23: ; 78e23 (1e:4e23)
-	ld a, [$cf1b]
-	and a
-	ld a, $e4
-	jr z, .asm_78e47
-	ld a, $f0
-	ld [$cc79], a
-	ld b, $e4
-	ld a, [W_ANIMATIONID] ; $d07c
-	cp $aa
-	jr c, .asm_78e3f
-	cp $ae
-	jr nc, .asm_78e3f
-	ld b, $f0
-.asm_78e3f
-	ld a, b
-	ld [rOBP0], a ; $FF00+$48
-	ld a, $6c
-	ld [rOBP1], a ; $FF00+$49
-	ret
-.asm_78e47
-	ld a, $e4
-	ld [$cc79], a
-	ld [rOBP0], a ; $FF00+$48
-	ld a, $6c
-	ld [rOBP1], a ; $FF00+$49
-	ret
+MoveAnimationPalette: ; 78e23 (1e:4e23) ; Denim
+    ld a,[wRunningOnSGB]
+    and a
+    jr z,.noSGB
+    ld a,%11110000
+    ld [$cc79],a
+    ld a,%11100100
+    ld [rOBP0],a ; $FF00+$48
+    ret
+.noSGB
+    ld a,%11100100
+    ld [$cc79],a
+    ld [rOBP0],a ; $FF00+$48
+    ret
+
+CheckCaptureAnimAndStoreFlag: ; Denim ; 13 BYTE
+    ld a,[W_ANIMATIONID]
+    cp SHAKE_ANIM
+    jr nz,.Done
+    ld a,[de]
+    inc a
+    ld [de],a ; store flags
+.Done
+    inc de
+    ld a,[W_FBTILECOUNTER]
+    ret
+
+    ds 9
+
+SECTION "PlaySubanimation",ROMX[$4e53],BANK[$1e] ; Denim
 
 PlaySubanimation: ; 78e53 (1e:4e53)
 	ld a,[wAnimSoundID]
@@ -135872,6 +136214,11 @@ MewPicFront:
 MewPicBack:
 	INCBIN "pic/monback/mewb.pic"
 
+HeldItemIcon: ; Denim,HeldItemIcon
+    INCBIN "gfx/denim/held_item.2bpp"
+ShinyStarIcon: ; Denim,ShinyStar
+    INCBIN "gfx/denim/ShinyStar.2bpp"
+
 SECTION "bank2F",ROMX,BANK[$2F]
 
 SECTION "InizializzaParametriGBC",ROMX[$4400],BANK[$30]
@@ -136317,3 +136664,234 @@ MewBaseStats: ; 425b (1:425b)
 	db %11111111
 
 	db BANK(MewPicFront)
+
+SECTION "bank33",ROMX,BANK[$33] ; Denim,GENDER
+
+_DrawCatchGender: ; Denim
+; catch
+    ld a,[W_ISINBATTLE] ; trainer battle, this is 2
+	dec a
+	dec a
+	jr z,.gender
+    ld a,[W_ENEMYMONID]
+    ld [$d11e],a
+    ld a,$3a
+    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
+    ld hl,wPokedexOwned
+    ld a,[$d11e]
+    dec a
+    ld c,a
+    ld b,2
+    ld a,$10
+    call Predef ; IsPokemonBitSet_bankF
+    ld a,c
+    and a
+    jr z,.gender
+    FuncCoord 1,1
+    ld hl,Coord
+    ld de,.PokeBallCatchFlagIcon
+    call PlaceString
+.gender
+    ld a,[W_ENEMYMONID]
+	call GetGender
+    jr c,.Genderless
+    FuncCoord 8,1 ; 1 px più a destra causa status (PSN/PAR/...) che sovrascriverebbe
+    ld hl,Coord
+	ld de,.MaleIcon
+	jr nz,.Male
+	ld de,.FemaleIcon
+.Male
+    call PlaceString
+.Genderless
+    ret
+.PokeBallCatchFlagIcon:
+    db $c9,$50
+.MaleIcon
+    db $EF,$50
+.FemaleIcon
+    db $F5,$50
+
+; $d11e = Pokemon ID
+GetGender_D11E:
+    ld hl,wFlagGenderFromStatsBit3
+	set 3,[hl]
+    ld a,[$d11e]
+GetGender:
+    and a
+	jr z,.Genderless
+	cp CHARIZARD_M
+	jr nz,.NoCharizardM
+	ld a,CHARIZARD
+.NoCharizardM
+	ld b,a
+    ld hl,Genderless
+    call IsInTable
+	jr nz,.Genderless
+	ld hl,OnlyMale
+	call IsInTable
+	jr nz,.Male
+	ld hl,OnlyFemale
+	call IsInTable
+	jr nz,.Female
+	ld a,b
+	ld [$d11e],a
+    ld a,$3a
+    call Predef ; IndexToPokedex
+	ld a,[$d11e]
+	dec a ; ApostropheM is not included
+	ld b,a
+    srl a
+    srl a
+    ld e,a
+    ld d,0
+    ld hl,GenderTable
+    add hl,de
+    ld a,b
+    and a,%00000011
+    ld b,[hl]
+.LoopCycle
+    and a
+	jr z,.EndCycle
+	srl b
+	srl b
+	dec a
+    jr .LoopCycle
+.EndCycle
+    ld a,b
+	and a,%00000011
+	ld hl,GenderConstant
+	ld e,a
+	ld d,0
+	add hl,de
+	ld a,[hl]
+	push af
+    call DetermineIVPointer
+	ld a,[hli]
+	and a,$F0
+	ld b,a
+	ld a,[hl]
+	and a,$F0
+	swap a
+	add b
+	ld b,a
+	pop af
+	cp b
+	jr c, .Male
+.Female
+    xor a
+    ret
+.Male
+    ld a, 1
+    and a
+    ret
+.Genderless
+    scf
+    ret
+
+DetermineIVPointer:
+    ld hl,wFlagGenderFromStatsBit3
+    bit 3,[hl]
+	res 3,[hl]
+    ld hl,$cff1 ; .Front
+    ret z
+    ld hl,$cfb3 ; .OutOfBattle
+    ret
+
+IsInTable:
+.Loop
+    ld a,[hli]
+	cp b
+	jr z,.Found
+	inc a ; Compare $FF
+	jr nz,.Loop
+    ret ; z notFound
+.Found
+    xor a
+	inc a
+    ret ; nz Found
+
+Genderless:
+    db ARTICUNO
+    db DITTO
+    db ELECTRODE
+    db MAGNEMITE
+    db MAGNETON
+    db MEW
+    db MEWTWO
+    db MOLTRES
+    db PORYGON
+    db STARMIE
+    db STARYU
+    db VOLTORB
+    db ZAPDOS
+	db $FF
+
+OnlyMale:
+    db HITMONCHAN
+    db HITMONLEE
+    db NIDOKING
+    db NIDORAN_M
+    db NIDORINO
+    db TAUROS
+    db $FF
+
+OnlyFemale:
+    db CHANSEY
+    db JYNX
+    db KANGASKHAN
+    db NIDOQUEEN
+    db NIDORAN_F
+    db NIDORINA
+    db $FF
+
+MALE_87 EQU 0
+MALE_75 EQU 1
+MALE_50 EQU 2
+MALE_25 EQU 3
+OTHGEND EQU MALE_87
+
+GenderConstant:
+    db 031 ; MALE_87
+	db 063 ; MALE_75
+	db 127 ; MALE_50
+	db 191 ; MALE_25
+
+GenderTable:
+    dsn MALE_87,MALE_87,MALE_87,MALE_87 ; BULBASAUR,IVYSAUR,VENUSAUR,CHARMANDER
+    dsn MALE_87,MALE_87,MALE_87,MALE_87 ; CHARMELEON,CHARIZARD,SQUIRTLE,WARTORTLE
+    dsn MALE_87,MALE_50,MALE_50,MALE_50 ; BLASTOISE,CATERPIE,METAPOD,BUTTERFREE
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; WEEDLE,KAKUNA,BEEDRILL,PIDGEY
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; PIDGEOTTO,PIDGEOT,RATTATA,RATICATE
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; SPEAROW,FEAROW,EKANS,ARBOK
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; PIKACHU,RAICHU,SANDSHREW,SANDSLASH
+    dsn OTHGEND,OTHGEND,OTHGEND,OTHGEND ; NIDORAN_F,NIDORINA,NIDOQUEEN,NIDORAN_M
+    dsn OTHGEND,OTHGEND,MALE_25,MALE_25 ; NIDORINO,NIDOKING,CLEFAIRY,CLEFABLE
+    dsn MALE_25,MALE_25,MALE_25,MALE_25 ; VULPIX,NINETALES,JIGGLYPUFF,WIGGLYTUFF
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; ZUBAT,GOLBAT,ODDISH,GLOOM
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; VILEPLUME,PARAS,PARASECT,VENONAT
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; VENOMOTH,DIGLETT,DUGTRIO,MEOWTH
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; PERSIAN,PSYDUCK,GOLDUCK,MANKEY
+    dsn MALE_50,MALE_75,MALE_75,MALE_50 ; PRIMEAPE,GROWLITHE,ARCANINE,POLIWAG
+    dsn MALE_50,MALE_50,MALE_75,MALE_75 ; POLIWHIRL,POLIWRATH,ABRA,KADABRA
+    dsn MALE_75,MALE_75,MALE_75,MALE_75 ; ALAKAZAM,MACHOP,MACHOKE,MACHAMP
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; BELLSPROUT,WEEPINBELL,VICTREEBEL,TENTACOOL
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; TENTACRUEL,GEODUDE,GRAVELER,GOLEM
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; PONYTA,RAPIDASH,SLOWPOKE,SLOWBRO
+    dsn OTHGEND,OTHGEND,MALE_50,MALE_50 ; MAGNEMITE,MAGNETON,FARFETCH_D,DODUO
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; DODRIO,SEEL,DEWGONG,GRIMER
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; MUK,SHELLDER,CLOYSTER,GASTLY
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; HAUNTER,GENGAR,ONIX,DROWZEE
+    dsn MALE_50,MALE_50,MALE_50,OTHGEND ; HYPNO,KRABBY,KINGLER,VOLTORB
+    dsn OTHGEND,MALE_50,MALE_50,MALE_50 ; ELECTRODE,EXEGGCUTE,EXEGGUTOR,CUBONE
+    dsn MALE_50,OTHGEND,OTHGEND,MALE_50 ; MAROWAK,HITMONLEE,HITMONCHAN,LICKITUNG
+    dsn MALE_50,MALE_50,MALE_50,MALE_50 ; KOFFING,WEEZING,RHYHORN,RHYDON
+    dsn OTHGEND,MALE_50,OTHGEND,MALE_50 ; CHANSEY,TANGELA,KANGASKHAN,HORSEA
+    dsn MALE_50,MALE_50,MALE_50,OTHGEND ; SEADRA,GOLDEEN,SEAKING,STARYU
+    dsn OTHGEND,MALE_50,MALE_50,OTHGEND ; STARMIE,MR_MIME,SCYTHER,JYNX
+    dsn MALE_75,MALE_75,MALE_50,OTHGEND ; ELECTABUZZ,MAGMAR,PINSIR,TAUROS
+    dsn MALE_50,MALE_50,MALE_50,OTHGEND ; MAGIKARP,GYARADOS,LAPRAS,DITTO
+    dsn MALE_87,MALE_87,MALE_87,MALE_87 ; EEVEE,VAPOREON,JOLTEON,FLAREON
+    dsn OTHGEND,MALE_87,MALE_87,MALE_87 ; PORYGON,OMANYTE,OMASTAR,KABUTO
+    dsn MALE_87,MALE_87,MALE_87,OTHGEND ; KABUTOPS,AERODACTYL,SNORLAX,ARTICUNO
+    dsn OTHGEND,OTHGEND,MALE_50,MALE_50 ; ZAPDOS,MOLTRES,DRATINI,DRAGONAIR
+    dsn MALE_50,OTHGEND,OTHGEND,OTHGEND ; DRAGONITE,MEWTWO,MEW,152
