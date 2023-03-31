@@ -1460,6 +1460,8 @@ wFlagBycicleFourX:         ; df35 ; bit 0
 wFlagReverseTurnBit1:      ; df35 ; bit 1
 wFlagShinyBit2             ; df35 ; bit 2
 wFlagGenderFromStatsBit3   ; df35 ; bit 3
+wFlagBackSpritePlayerBit4  ; df35 ; bit 4
+wFlagBackFrontSpriteBit56  ; df35 ; bit 5/6
     ds 1
 
 wFlagPlaceTitleScreen ; df36 ; counter for title screen

@@ -61257,7 +61257,7 @@ Func_3c04c: ; 3c04c (f:404c)
 	ld [H_AUTOBGTRANSFERENABLED], a ; $FF00+$ba
 	call Delay3
 	ld b, $1
-	call GoPAL_SET
+    call GoPAL_SET_PlusFlag ; Denim,funzione per flaggare questo istante di chiamata ; call GoPAL_SET
 	call ResetLCD_OAM
 	ld hl, Func_58d99
 	ld b, BANK(Func_58d99)
@@ -62986,7 +62986,7 @@ Func_3cd60: ; 3cd60 (f:4d60)
 	ld a, $1
 	ld [H_AUTOBGTRANSFERENABLED], a ; $FF00+$ba
 	ld hl, $cf1d
-	call Func_3ce90
+    call Func_3ce90_PlusFlag ; Denim,funzione per deflaggare questo istante di chiamata ; call Func_3ce90
 	ld hl, W_PLAYERMONCURHP ; $d015
 	ld a, [hli]
 	or [hl]
@@ -70012,6 +70012,21 @@ WritePPAllMoves: ; Denim ; TODO,sistemare routine e posizioni
     FuncCoord 2,13 ; $c4aa
     ld hl,Coord
     ret
+
+; Le seguenti 2 funzioni servono a gestire il flag per la corretta palette del backsprite del player
+GoPAL_SET_PlusFlag: ; xxxxx (f:xxxx) ; Denim,funzione per flaggare questo istante di chiamata
+    push hl
+    ld hl,wFlagBackSpritePlayerBit4
+    set 4,[hl]
+    pop hl
+    jp GoPAL_SET
+
+Func_3ce90_PlusFlag: ; xxxxx (f:xxxx) ; Denim,funzione per deflaggare questo istante di chiamata
+    push hl
+    ld hl,wFlagBackSpritePlayerBit4
+    res 4,[hl]
+    pop hl
+    jp Func_3ce90
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -103559,7 +103574,7 @@ HallOfFameDisplayPkmn: ; 701a0 (1c:41a0)
 	ld [wWhichTrade], a ; $cd3d
 	inc a
 	ld [$cd40], a
-	call Func_70278
+    call Func_70278_PlusFlag ; Denim,funzione per flaggare questo istante di chiamata ; call Func_70278
 	call Func_70377
 	call Func_70423
 	xor a
@@ -107571,20 +107586,16 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
     db $03,$0A ; $03,$00
     db $09,$07,$12,$0B ; $0A,$07,$13,$0A
 
-    ; backsprite player
-    db $03,$00 ; $03,$0A
-    db $02,$06,$07,$0B ; $00,$04,$08,$0B
-
     ; frontsprite opponent
     db $03,$05 ; $03,$0F
-    db $0C,$00,$12,$06 ; db $0B,$00,$13,$06
+    db $0B,$00,$13,$06
 
     ; Catch Flag opponent
     db $02,$05 ; $03,$0F
     db $01,$01,$01,$01
 
 ;Unknown_Command:
-    ds 37 - 6
+    ds 37
     ;db $03,$00,$00,$13,$0B,$00,$03,$00,$0C,$13,$11,$02,$03,$01,$00,$0A,$03,$01,$03,$0A
     ;db $08,$13,$0A,$00,$03,$00,$04,$08,$0B,$02,$03,$0B,$00,$13,$07,$03,$00
 
@@ -108811,6 +108822,8 @@ PokeCenterFlashingHealBall:
 
 CheckShinyFrontAndGetPAL:
 	push hl
+	ld hl,wFlagBackFrontSpriteBit56
+	set 6,[hl]
 	ld hl,W_ENEMYBATTSTATUS3
 	bit 3,[hl] ; bit 3 of battle status 3,set if current Pokemon is transformed
 	jr z,.NoTransform
@@ -108821,6 +108834,8 @@ CheckShinyFrontAndGetPAL:
 
 CheckShinyBackAndGetPAL:
 	push hl
+	ld hl,wFlagBackFrontSpriteBit56
+	set 5,[hl]
 	ld hl,$d020
 	jr GetPalCommon
 
@@ -108861,18 +108876,44 @@ HackForInsertDVInHallOfFameDataSecondStep:
 
 SAME_PALETTE EQU 19
 
-DeterminePaletteID: ; xxxxx (1c:7ba0) ; Denim
+DeterminePaletteID: ; xxxxx (1c:xxxx) ; Denim
     push bc
 	push de
     ld [$D11E],a
+    and a
+    jr z,.idZero
     ld a,$3A
     call Predef ; turn Pokemon ID number into Pokedex number
+    jr .Standard
+.idZero
+    ld hl,wFlagBackFrontSpriteBit56
+	bit 5,[hl]
+	res 5,[hl]
+	jr nz,.Back
+	bit 6,[hl]
+	res 6,[hl]
+	jr nz,.Standard ; TODO, .Front : Gestire i Colori TRAINERCLASS e M Front Sprite in Battle
+.ApostropheM
+    xor a ; 'M front Sprite out of battle
+    jr .AddPalMToA
+.Front ; TODO
+.Back
+    ld hl,wFlagBackSpritePlayerBit4 ; Pointer to Flag BackSpritePlayer (Bit4)
+    bit 4,[hl]
+    jr z,.Standard ; TODO, Gestire i Colori TRAINERCLASS
+	ld l,PAL_VARIOUS
+.PaletteSingleByteDone
+	ld h,0
+	jr .PreDone
+.Standard
     ld a,[$D11E] ; Load Directly Dex ID
     call CheckSamePalette
-	ld h,$0
+.AddPalMToA
+	ld h,0
 	ld l,a
-    ld bc,PAL_M
+    ld bc,PAL_MEWMON ; Palette 'M or Standard Trainer
 	add hl,bc
+.PreDone
 	push hl
     ld hl,wFlagShinyBit2
 	bit 2,[hl]
@@ -108947,6 +108988,20 @@ LoadMonOverworldSpritePointersAndNewVRAMIcon: ; xxxxx (1c:xxxx) ; Denim
 
 PalPacketStatMenu: ; Denim
     db $51,$00,$00,$00,$00,PAL_SHINYSTAR,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
+; La seguente funzione serve a gestire il flag per la corretta palette del backsprite del player durante la sala d'onore
+Func_70278_PlusFlag: ; xxxxx (1c:xxxx) ; Denim,funzione per flaggare questo istante di chiamata ; call Func_70278
+    push hl
+    ld hl,wFlagBackSpritePlayerBit4
+    set 4,[hl]
+    set 5,[hl] ; wFlagBackFrontSpriteBit56
+    pop hl
+    call Func_70278
+    push hl
+    ld hl,wFlagBackSpritePlayerBit4
+    res 4,[hl]
+    pop hl
+    ret
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
