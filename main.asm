@@ -17256,8 +17256,8 @@ TextBoxTextAndCoordTable: ; 73b0 (1:73b0)
 	dw SafariZoneBattleMenuText
 	db 2,14  ; text coordinates
 
-	db $0c ; text box ID
-	db 11,11,19,17 ; text box coordinates
+	db $0c ; text box ID ; Denim,spostati elementi grafici menu party durante battaglia
+	db 11,10,19,17 ; db 11,11,19,17 ; text box coordinates
 	dw SwitchStatsCancelText
 	db 13,12 ; text coordinates
 
@@ -17616,9 +17616,9 @@ Func_76e1: ; 76e1 (1:36e1)
 	ld a, [$cd41]
 	and a
 	jr nz, .asm_770f
-	FuncCoord 11, 11 ; $c487
+    FuncCoord 11,10   ; Denim, Spostato di 1 px in alto il bordo STATS/SWITCH ; FuncCoord 11, 11 ; $c487
 	ld hl, Coord
-	ld b, $5
+    ld b,6 ; ld b, $5 ; ...
 	ld c, $7
 	call TextBoxBorder
 	call UpdateSprites
@@ -27490,7 +27490,7 @@ ItemUseMedicine: ; dabb (3:5abb)
 	sbc b
 	ld [hl],a
 	ld [wHPBarNewHP+1],a
-	FuncCoord 4, 1 ; $c3b8
+    FuncCoord 4+7,1 ; Spostata HP Bar Durante Softboiled
 	ld hl,Coord
 	ld a,[$cf92]
 	ld bc,2 * 20
@@ -27622,7 +27622,7 @@ ItemUseMedicine: ; dabb (3:5abb)
 	xor a
 	ld [W_PLAYERMONSTATUS],a ; remove the status ailment in the in-battle pokemon data
 .calculateHPBarCoords
-	ld hl,$c390
+	ld hl,$c390+7 ; Spostate Coordinate Barra HP Durante Cura
 	ld bc,2 * 20
 	inc d
 .calculateHPBarCoordsLoop
@@ -31745,7 +31745,7 @@ UpdateHPBar_PrintHPNumber: ; faf5 (3:7af5)
 	ld a, [$FF00+$f6]
 	bit 0, a
 	jr z, .asm_fb15
-	ld de, $9
+    ld de,9-7-20 ; Denim ; Spostata l'indicazione HP durante la Cura/Danno nel meny party
 	jr .asm_fb18
 .asm_fb15
 	ld de, $15
@@ -32095,7 +32095,7 @@ Func_12924: ; 12924 (4:6924)
 	ld a, [$FF00+$f6]
 	bit 0, a
 	jr z, .asm_12937
-	ld bc, $9 + 1 ; Denim , spostato di 1 px a dx la scritta HP nel menù party
+	ld bc, $9 - 20 - 7 ; Denim , spostato scritta HP nel menù party alla riga precedente
 	jr .asm_1293a
 .asm_12937
 	ld bc, $15
@@ -32659,13 +32659,13 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
 	cp a,$05
 	jr z,.evolutionStoneMenu
 	push hl
-	ld bc,14 ; 14 columns to the right
+    ld bc,14+7 ; Denim, Spostato Stato a capo ; ld bc,14 ; 14 columns to the right
 	add hl,bc
 	ld de,$CF9C
 	call PrintStatusCondition
 	pop hl
 	push hl
-	ld bc,20 + 1 - 1 ; Denim, Spostato a sinistra di 1 px la barra hp nel menù party ;ld bc,20 + 1 ; down 1 row and right 1 column
+	ld bc,20+1+7 ; Denim, Spostata a destra la barra hp nel menù party ; ld bc,20 + 1 ; down 1 row and right 1 column
 	ld a,[$FFF6]
 	set 0,a
 	ld [$FFF6],a
@@ -32695,7 +32695,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
 	call PlaceString
 	pop hl
 .printLevel
-	ld bc,10 ; move 10 columns to the right
+	ld bc,10 + 15 ; Denim, Spostato Livello Riga a Capo ; ld bc,10 ; move 10 columns to the right
 	add hl,bc
 	call PrintLevel
 	pop hl
@@ -63439,9 +63439,9 @@ asm_3d0f0: ; 3d0f0 (f:50f0)
 	jp InitBattleMenu
 
 Func_3d105: ; 3d105 (f:5105)
-	FuncCoord 11, 11 ; $c487
+    FuncCoord 11,10 ; Denim, Aumentata altezza menù "switch" nel party, occorre cancellare 1 riga in più ; FuncCoord 11, 11 ; $c487
 	ld hl, Coord
-	ld bc, $81
+	ld bc, $81+20   ; ...
 	ld a, $7f
 	call FillMemory
 	xor a
@@ -107645,22 +107645,22 @@ Unknown_722f4: ; 722f4 (1c:62f4)
     db $01,$00,$02,$0b ; db $01,$00,$02,$0c
 
     db $02,$01 ; 1st Pkmn Hp Bar
-    db $04,$01,$0a,$01
+    db $0C,$01,$12,$01
 
     db $02,$01 ; 2nd Pkmn Hp Bar
-    db $04,$03,$0a,$03
+    db $0C,$03,$12,$03
 
     db $02,$01 ; 3rd Pkmn Hp Bar
-    db $04,$05,$0a,$05
+    db $0C,$05,$12,$05
 
     db $02,$01 ; 4th Pkmn Hp Bar
-    db $04,$07,$0a,$07
+    db $0C,$07,$12,$07
 
     db $02,$01 ; 5th Pkmn Hp Bar
-    db $04,$09,$0a,$09
+    db $0C,$09,$12,$09
 
     db $02,$01 ; 6th Pkmn Hp Bar
-    db $04,$0b,$0a,$0b
+    db $0C,$0b,$12,$0b
 
     db $02,$0F ; HeldItem
     db $03,$01,$03,$0B
