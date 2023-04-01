@@ -34134,7 +34134,7 @@ Func_1392c: ; 1392c (4:792c)
 	srl b
 	rr c
 	ld a, d
-	cp $a5
+	cp STRUGGLE
 	jr z, .asm_13953
 	srl b
 	rr c
@@ -34181,8 +34181,8 @@ Func_1392c: ; 1392c (4:792c)
 	xor a
 .asm_13990
 	ld [wListMenuID], a ; $cf94
-	ld a, $48
-	call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
+	ds 2; ld a, $48
+	call DisplayDamageAndUpdateHPBar ; call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
 	ld hl, UnnamedText_1399e ; $799e
 	jp PrintText
 UnnamedText_1399e: ; 1399e (4:799e)
@@ -34408,6 +34408,19 @@ EXPBarGraphics: ; Denim,ExpBar
 GbPalPartyComplete ; Denim
     ld a,%11100100
     jp GBPalCommon
+
+DisplayDamageAndUpdateHPBar: ; During Recoil
+    ld d,h
+	ld e,l
+    ld hl,W_DAMAGE 
+	xor a
+	ld [hli],a
+	ld a,c
+	ld [hl],a
+    ld b,BANK(_DisplayDamageAndUpdateHPBar)
+	ld hl,_DisplayDamageAndUpdateHPBar
+    call Bankswitch
+	ret
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -64032,7 +64045,8 @@ Func_3d4b6: ; 3d4b6 (f:54b6)
 SECTION "DisabledText",ROMX[$5555],BANK[$F]
 
 DisabledText: ; 3d555 (f:5555)
-	db "disabled!@"
+    db "Disable@" ; db "disabled!@"
+	ds 2
 
 TypeText: ; 3d55f (f:555f)
 	db "TYPE@"
@@ -65919,7 +65933,7 @@ ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
 	ld [hl],a
 
 ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
-    call PrintDamageNearHpBarAndLoadHlDamage ; Denim ; ld hl,W_DAMAGE
+    call PrintDamageNearPlayerHpBarAndLoadHlDamage ; Denim ; ld hl,W_DAMAGE
 	ld a,[hli]
 	ld b,a
 	ld a,[hl]
@@ -69728,12 +69742,16 @@ MultiplyD05B: ; xxxxx (f:xxxx) ; Denim
     ld [H_MULTIPLIER],a
     ret
 
-PrintDamageNearHpBarAndLoadHlDamage: ; xxxxx (f:xxxx) ; Denim
+PrintDamageNearPlayerHpBarAndLoadHlDamage:
+    ld hl,wFlagDamageToPlayerBit1
+	set 1,[hl]
+
+PrintDamageNearHpBarAndLoadHlDamage:
     call PrintDamageNearHpBar
     ld hl,W_DAMAGE
     ret
 
-PrintDamageNearHpBar: ; xxxxx (f:xxxx) ; Denim
+PrintDamageNearHpBar:
     ld de,W_DAMAGE
     ld b,%00000010
     ld c,5
@@ -69746,45 +69764,56 @@ WriteDamageAndUpdateCurMonHPBar: ; During Poison/Burn
 	ld [hli],a
 	ld a,c
 	ld [hl],a
-	ld hl,wFlagReverseTurnBit1
-	set 1,[hl]
+    call CheckIfPlayerTurnForPrintDamage
     call PrintDamageNearHpBar
     call UpdateCurMonHPBar
-    call RemoveDiplayedDamage
-	ld hl,wFlagReverseTurnBit1
-	res 1,[hl]
+    jp RemoveDiplayedDamage
+
+_DisplayDamageAndUpdateHPBar: ; During Recoil
+    push de
+    call CheckIfPlayerTurnForPrintDamage
+    call PrintDamageNearHpBar
+	pop hl
+	ld a, $48
+    call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
+	jp RemoveDiplayedDamage
+
+CheckIfPlayerTurnForPrintDamage:
+    ld a,[H_WHOSETURN] ; 0 on player’s turn, 1 on enemy’s turn
+    and a
+	ret nz
+    ld hl,wFlagDamageToPlayerBit1
+	set 1,[hl]
 	ret
 
-RemoveDiplayedDamageAndFunc_3cd5a: ; xxxxx (f:xxxx) ; Denim
+RemoveDiplayedDamageAndFunc_3cd5a:
     call RemoveDiplayedDamage
     jp Func_3cd5a ; redraw pokemon names and HP bars
 
-RemoveDiplayedDamageAndPrintText: ; xxxxx (f:xxxx) ; Denim
+RemoveDiplayedDamageAndPrintText:
     call PrintText
     jp RemoveDiplayedDamage
 
-RemoveDiplayedDamage: ; xxxxx (f:xxxx) ; Denim
+RemoveDiplayedDamage:
     call GetHlPointerToDamageTextArea
+	push hl
+    ld hl,wFlagDamageToPlayerBit1
+	res 1,[hl]
+	pop hl
     ld bc,$0105
     jp ClearScreenArea
 
-GetHlPointerToDamageTextArea: ; xxxxx (f:xxxx) ; Denim
-    FuncCoord 7,4 ; Player Turn
+GetHlPointerToDamageTextArea:
+    FuncCoord 7,4 ; Damage to Enemy
     ld hl,Coord
 	push hl
-	ld hl,wFlagReverseTurnBit1
+	ld hl,wFlagDamageToPlayerBit1
 	bit 1,[hl]
 	pop hl
-    ld a,[H_WHOSETURN]
-	jr z,.Done
-	inc a   ; Reverse a (0->1;1->0)
-	and a,1 ; ...
-.Done
-	and a
-	ret z ; Player Turn
-    FuncCoord 4,4 ; Enemy Turn
+	ret z ; Damage to Enemy
+    FuncCoord 4,5 ; Damage to Player
     ld hl,Coord
-    ret ; Enemy Turn
+    ret ; Damage to Player
 
 DoubleIncB: ; Denim
     inc b

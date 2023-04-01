@@ -1455,13 +1455,14 @@ wBlkCoordinateX2Right: ; df33
 wBlkCoordinateY2Lower: ; df34
 	ds 1
 
-wFlagFlashingHealBallBit7: ; df35 ; bit 7
 wFlagBycicleFourX:         ; df35 ; bit 0
-wFlagReverseTurnBit1:      ; df35 ; bit 1
+wFlagDamageToPlayerBit1    ; df35 ; bit 1
 wFlagShinyBit2             ; df35 ; bit 2
 wFlagGenderFromStatsBit3   ; df35 ; bit 3
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
-wFlagBackFrontSpriteBit56  ; df35 ; bit 5/6
+wFlagBackFrontSpriteBit56  ; df35 ; bit 5
+                           ; df35 ; bit 6
+wFlagFlashingHealBallBit7: ; df35 ; bit 7
     ds 1
 
 wFlagPlaceTitleScreen ; df36 ; counter for title screen
