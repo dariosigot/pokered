@@ -16665,7 +16665,7 @@ DisplayPokemonCenterDialogue_: ; 6fe6 (1:6fe6)
 	ld [$c0ee], a
 	call PlaySound
 	ld hl, PokemonFightingFitText
-	call PrintText
+	ds 3;call PrintText
 	ld a, $14
 	ld [$c112], a ; make the nurse bow
 	ld c, a
@@ -103856,7 +103856,7 @@ Func_70433: ; 70433 (1c:4433)
 	call Func_70503
 	ld a, $9e
 	call PlaySound
-	ld c, $1e
+    ld c,9
 	call DelayFrames
 	dec b
 	jr nz, .asm_7046e
@@ -134485,9 +134485,16 @@ _UnnamedText_6fe1: ; a284d (28:684d)
 	db $0, "HM techniques", $4f
 	db "can't be deleted!", $58
 
+;_PokemonCenterWelcomeText: ; a286d (28:686d)
+;	db $0, "Welcome to our", $4f
+;	db "#MON CENTER!", $51
+;	db "We heal your", $4f
+;	db "#MON back to", $55
+;	db "perfect health!", $58
+
 _PokemonCenterWelcomeText: ; a286d (28:686d)
 	db $0, "Welcome to our", $4f
-	db "#MON CENTER!", $51
+	db "#MON CENTER!", $57
 	db "We heal your", $4f
 	db "#MON back to", $55
 	db "perfect health!", $58
