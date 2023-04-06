@@ -58169,7 +58169,7 @@ Func_3a930: ; 3a930 (e:6930)
 	add hl, bc
 	ld a, [$cd40]
 	ld [hl], a
-	ld a, $8
+	ld a, $7 ; Diminuita larghezza barra sottostante Hp in battle
 .asm_3a93c
 	add hl, de
 	ld [hl], $76
@@ -64008,7 +64008,7 @@ Func_3d4b6: ; 3d4b6 (f:54b6)
 	FuncCoord 0, 8 ; $c440
 	ld hl, Coord
 	ld b, $3
-    ld c,7
+    ld c,8
 	call TextBoxBorder
 	ld a, [W_PLAYERDISABLEDMOVE] ; $d06d
 	and a
@@ -64085,8 +64085,8 @@ Func_3d4b6: ; 3d4b6 (f:54b6)
 SECTION "DisabledText",ROMX[$5555],BANK[$F]
 
 DisabledText: ; 3d555 (f:5555)
-    db "Disable@" ; db "disabled!@"
-	ds 2
+    db "Disabled@" ; db "disabled!@"
+	ds 1
 
 TypeText: ; 3d55f (f:555f)
 	db "TYPE@"
@@ -107661,7 +107661,7 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
 
     ; player hp bar
     db $03,$0A ; $03,$00
-    db $09,$07,$12,$0B ; $0A,$07,$13,$0A
+    db $0A,$07,$12,$0B ; $0A,$07,$13,$0A
 
     ; frontsprite opponent
     db $03,$05 ; $03,$0F
