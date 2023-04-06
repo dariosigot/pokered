@@ -32357,14 +32357,7 @@ PrintStatsBox: ; 12ae4 (4:6ae4)
 	ld bc, $0019 ; Number offset
 	jr .PrintStats ; 0x12af8 $10
 .DifferentBox
-	FuncCoord 9,2
-	ld hl, Coord
-	ld b, $8
-	ld c, $9
-	call TextBoxBorder
-	FuncCoord 11, 3 ; $c3e7
-	ld hl, Coord
-	ld bc, $0018
+	call DetermineCoordinateStatsBox
 .PrintStats
 	push bc
 	push hl
@@ -32389,6 +32382,8 @@ PrintStat
 	ld de, $0028
 	add hl, de
 	ret
+
+SECTION "StatsText",ROMX[$6b3a],BANK[$4]
 
 StatsText: ; 12b3a (4:6b3a)
 	db "ATTACK", $4e
@@ -34460,6 +34455,31 @@ HandleMenuInputPlusWrapping:
     ld a,1
     ld [wMenuWrappingEnabled],a ; $cc4a
     jp HandleMenuInput
+
+DetermineCoordinateStatsBox:
+    ld a,[W_ISINBATTLE] ; no battle, this is 0
+    and a
+	jr z,.OutOfBattleBattle
+.InBattle
+    FuncCoord 0,4
+	ld hl, Coord
+	ld b, $8
+	ld c, $8
+	call TextBoxBorder
+	FuncCoord 1,5
+	ld hl, Coord
+	ld bc, $0019
+	ret
+.OutOfBattleBattle
+	FuncCoord 9,2
+	ld hl, Coord
+	ld b, $8
+	ld c, $9
+	call TextBoxBorder
+	FuncCoord 11, 3 ; $c3e7
+	ld hl, Coord
+	ld bc, $0018
+	ret
 
 SECTION "bank5",ROMX,BANK[$5]
 
