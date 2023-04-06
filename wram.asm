@@ -228,7 +228,10 @@ wEnemyMonAccuracyMod: ; cd32
 wEnemyMonEvasionMod: ; cd33
 	ds 1
 
-	ds 9
+	ds 9-1
+
+wFieldMoves:
+    ds 1 ; + 4
 
 wWhichTrade: ; cd3d
 ; which entry from TradeMons to select
@@ -243,9 +246,15 @@ wTrainerFacingDirection: ; cd3f
 wTrainerScreenY: ; cd40
 	ds 1
 wTrainerScreenX: ; cd41
+wNumFieldMoves:  ; cd41
 	ds 1
 
-	ds 30
+wFieldMovesLeftmostXCoord:; cd42
+    ds 1
+wLastFieldMoveID:; cd43
+    ds 1
+
+	ds 30-2
 
 wFlags_0xcd60: ; cd60
 ; bit 0: is player engaged by trainer (to avoid being engaged by multiple trainers simultaniously)

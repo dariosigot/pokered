@@ -3204,7 +3204,7 @@ PartyMenuInit: ; 1420 (0:1420)
 
 HandlePartyMenuInput: ; 145a (0:145a)
 	ld a,1
-	ld [$cc4a],a
+	ld [wMenuWrappingEnabled],a ; $cc4a
 	ld a,$40
 	ld [$d09b],a
 	call HandleMenuInputPokemonSelection
@@ -17256,10 +17256,10 @@ TextBoxTextAndCoordTable: ; 73b0 (1:73b0)
 	dw SafariZoneBattleMenuText
 	db 2,14  ; text coordinates
 
-	db $0c ; text box ID ; Denim,spostati elementi grafici menu party durante battaglia
-	db 11,10,19,17 ; db 11,11,19,17 ; text box coordinates
+	db $0c ; text box ID ; Denim,spostati elementi grafici menu party durante battaglia ; Eliminato "CANCEL"
+	db 11,12,19,17 ; db 11,11,19,17 ; text box coordinates
 	dw SwitchStatsCancelText
-	db 13,12 ; text coordinates
+	db 13,14 ; text coordinates
 
 	db $0e ; text box ID
 	db 0,0,10,6    ; text box coordinates
@@ -17321,7 +17321,7 @@ SafariZoneBattleMenuText: ; 7468 (1:7468)
 
 SwitchStatsCancelText: ; 7489 (1:7489)
 	db "SWITCH",$4E
-	db "STATS",$4E
+	db "STATS","@" ; $4E ; Eliminato "CANCEL"
 	db "CANCEL@"
 
 JapaneseAhText: ; 749d (1:749d)
@@ -17605,39 +17605,40 @@ MenuStrings: ; 7671 (1:7671)
 
 Func_76e1: ; 76e1 (1:36e1)
 	xor a
-	ld hl, wWhichTrade ; $cd3d
+	ld hl, wFieldMoves ; $cd3d-1
 	ld [hli], a
 	ld [hli], a
-	ld [hli], a
-	ld [hli], a
-	ld [hli], a
-	ld [hl], $c
+	;ld [hli], a
+	;ld [hli], a
+	;ld [hli], a
+	call HackForAddAndResetFieldMovesSlot
+	ld [hl], $c ; Larghezza Fissa Menù Party Pokemon
 	call GetMonFieldMoves
-	ld a, [$cd41]
+	ld a, [wNumFieldMoves] ; [$cd41]
 	and a
 	jr nz, .asm_770f
-    FuncCoord 11,10   ; Denim, Spostato di 1 px in alto il bordo STATS/SWITCH ; FuncCoord 11, 11 ; $c487
+    FuncCoord 11,12   ; Denim, Spostato di 1 px in alto il bordo STATS/SWITCH, eliminato "CANCEL" ; FuncCoord 11, 11 ; $c487
 	ld hl, Coord
-    ld b,6 ; ld b, $5 ; ...
+    ld b,6-2 ; ld b, $5 ; ... ; Eliminato "CANCEL"
 	ld c, $7
 	call TextBoxBorder
 	call UpdateSprites
 	ld a, $c
 	ld [$FF00+$f7], a
-	FuncCoord 13, 12 ; $c49d
+	FuncCoord 13, 14 ; $c49d ; Eliminato "CANCEL" dal Menù Party
 	ld hl, Coord
 	ld de, PokemonMenuEntries ; $77c2
 	jp PlaceString
 .asm_770f
 	push af
-	FuncCoord 0, 11 ; $c47c
+	FuncCoord 0, 13 ; $c47c ; Eliminato "CANCEL" dal Menù Party
 	ld hl, Coord
-	ld a, [$cd42]
+	ld a, [wFieldMovesLeftmostXCoord] ; [$cd42]
 	dec a
 	ld e, a
 	ld d, $0
 	add hl, de
-	ld b, $5
+	ld b, $5-2 ; Eliminato "CANCEL" dal Menù Party
 	ld a, $12
 	sub e
 	ld c, a
@@ -17654,22 +17655,22 @@ Func_76e1: ; 76e1 (1:36e1)
 	inc b
 	call TextBoxBorder
 	call UpdateSprites
-	FuncCoord 0, 12 ; $c490
+	FuncCoord 0, 14 ; $c490 ; Eliminato "CANCEL"
 	ld hl, Coord
-	ld a, [$cd42]
+	ld a, [wFieldMovesLeftmostXCoord] ; [$cd42]
 	inc a
 	ld e, a
 	ld d, $0
 	add hl, de
 	ld de, $ffd8
-	ld a, [$cd41]
+	ld a, [wNumFieldMoves] ; [$cd41]
 .asm_7747
 	add hl, de
 	dec a
 	jr nz, .asm_7747
 	xor a
-	ld [$cd41], a
-	ld de, wWhichTrade ; $cd3d
+	ld [wNumFieldMoves], a ; [$cd41]
+	ld de, wFieldMoves ; $cd3d-1
 .asm_7752
 	push hl
 	ld hl, FieldMoveNames ; $778d
@@ -17700,11 +17701,11 @@ Func_76e1: ; 76e1 (1:36e1)
 	jr .asm_7752
 .asm_7776
 	pop hl
-	ld a, [$cd42]
+	ld a, [wFieldMovesLeftmostXCoord] ; [$cd42]
 	ld [$FF00+$f7], a
-	FuncCoord 0, 12 ; $c490
+	FuncCoord 0, 14 ; $c490 ; Eliminato "CANCEL" dal Menù Party
 	ld hl, Coord
-	ld a, [$cd42]
+	ld a, [wFieldMovesLeftmostXCoord] ; [$cd42]
 	inc a
 	ld e, a
 	ld d, $0
@@ -17727,79 +17728,76 @@ SECTION "PokemonMenuEntries",ROMX[$77c2],BANK[$1]
 
 PokemonMenuEntries: ; 77c2 (1:77c2)
 	db "STATS",$4E
-	db "SWITCH",$4E
+	db "SWITCH","@";$4E ; Eliminato "CANCEL"
 	db "CANCEL@"
 
-GetMonFieldMoves: ; 77d6 (1:77d6)
-	ld a, [wWhichPokemon] ; $cf92
-	ld hl, W_PARTYMON1_MOVE1 ; $d173
-	ld bc, $2c
-	call AddNTimes
-	ld d, h
-	ld e, l
-	ld c, $5
-	ld hl, wWhichTrade ; $cd3d
-.asm_77e9
-	push hl
-.asm_77ea
-	dec c
-	jr z, .asm_7821
-	ld a, [de] ; de is RAM address of move
-	and a
-	jr z, .asm_7821
-	ld b, a
-	inc de ; go to next move
-	ld hl, FieldMoveDisplayData ; $7823
-.asm_77f6
-	ld a, [hli]
-	cp $ff
-	jr z, .asm_77ea
-	cp b
-	jr z, .asm_7802
-	inc hl
-	inc hl
-	jr .asm_77f6
-.asm_7802
-	ld a, b
-	ld [$cd43], a
-	ld a, [hli]
-	ld b, [hl]
-	pop hl
-	ld [hli], a
-	ld a, [$cd41]
-	inc a
-	ld [$cd41], a
-	ld a, [$cd42]
-	cp b
-	jr c, .asm_781b
-	ld a, b
-	ld [$cd42], a
-.asm_781b
-	ld a, [$cd43]
-	ld b, a
-	jr .asm_77e9
-.asm_7821
-	pop hl
-	ret
+GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "FieldMoves"
+    ld a,[wWhichPokemon] ; $cf92
+    ld d,0
+    ld e,a
+    ld hl,W_PARTYMON1
+    add hl,de
+    ld a,[hl]
+    ld [$d11e],a
+    ld a,$3a
+    call Predef ; convert pokemon ID in [$D11E] to pokedex number
+    ld a,[$d11e]
+    ld e,a
+    ld hl,GetFieldMovesRulesByte
+    ld b,BANK(GetFieldMovesRulesByte)
+    call Bankswitch
+    ld c,8
+	ld b,0
+	ld hl,wFieldMoves ; $cd3d-1
+.Loop8BitRule
+    ld a,8+1
+	sub c ; a=a-c ; Move id
+	cp 3 ; (Set c if a<3)
+	jr c,.Continue
+	inc a ; inc a if move id >= 3 because there is a "unused field move"
+.Continue
+    srl e
+	jr nc,.TryToSearchInAttack
+.FieldMoveFound
+    inc b ; num of founded moves
+	ld [hli],a ; store field move id in wFieldMoves vector
+	ld a,b
+	cp 5 ; Max Possible Number of Field Moves
+	jr z,.End
+	jr .FieldMoveNotFound
+.TryToSearchInAttack
+    call SearchFieldMoveInAttack ; Insert Field Move Battle Id in wLastFieldMoveID
+    jr c,.FieldMoveFound
+.FieldMoveNotFound
+    dec c
+    jr nz,.Loop8BitRule
+.End
+    ld a,b
+	ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
+    ret
 
-; Format: [Move id], [list priority], [leftmost tile]
-; Move id = id of move
-; List priority = lower number means higher priority when field moves are displayed
-;                 these priorities must be unique
-; Leftmost tile = -1 + tile column in which the first letter of the move's name should be displayed
-;                 "SOFTBOILED" is $08 because it has 4 more letters than "SURF", for example, whose value is $0C
-FieldMoveDisplayData: ; 7823 (1:7823)
-	db CUT, $01, $0C
-	db FLY, $02, $0C 
-	db $B4, $03, $0C ; unused field move
-	db SURF, $04, $0C 
-	db STRENGTH, $05, $0C
-	db FLASH, $06, $0C 
-	db DIG, $07, $0C 
-	db TELEPORT, $08, $0C
-	db SOFTBOILED, $09, $0C
+FieldMoveDisplayData:
+	db CUT
+	db FLY
+	db $B4
+	db SURF
+	db STRENGTH
+	db FLASH
+	db DIG
+	db TELEPORT
+	db SOFTBOILED
 	db $ff ; list terminator
 
+HackForAddAndResetFieldMovesSlot:
+    ld [hli], a ; Standard
+    ld [hli], a ; Standard
+    ld [hli], a ; Standard
+	ld [hli], a ; New
+	ret
+
+; Some Bytes Free
+
+SECTION "Func_783f",ROMX[$783f],BANK[$1]
 
 Func_783f: ; 783f (1:783f)
 	ld hl, W_DAMAGE ; $d0d7
@@ -18405,6 +18403,41 @@ HackForBackupDVDuringTradeIn:
 BattleMenuText: ; Denim,allargato menu battaglia
     db "FIGHT       ",$E1,$E2,$4E
     db "ITEM        RUN@"
+
+SearchFieldMoveInAttack:
+    push hl
+    push bc
+	push af
+    ld hl,FieldMoveDisplayData
+    ld b,0
+    ld c,a
+    add hl,bc
+    dec hl
+    ld a,[hl]
+    ld c,a ; c = Current Field Move Hex ID
+	push bc
+    ld a,[wWhichPokemon] ; $cf92
+    ld hl,W_PARTYMON1_MOVE1 ; $d173
+    ld bc,$2c
+    call AddNTimes
+	pop bc
+    ld b,4
+.Loop4Moves
+    ld a,[hli] ; Get Field Move Hex Id
+    cp c
+    jr z,.Found
+    dec b
+    jr nz,.Loop4Moves
+	xor a ; Reset Carry Flag
+    jr .NotFound
+.Found
+    scf ; Set Carry Flag
+.NotFound
+    pop bc
+	ld a,b
+    pop bc
+    pop hl
+    ret
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -32973,9 +33006,9 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 	ld a,$04
 	ld [$d125],a
 	call DisplayTextBoxID ; display pokemon menu options
-	ld hl,$cd3d
-	ld bc,$020c ; max menu item ID, top menu item Y
-	ld e,5
+	ld hl,wFieldMoves ; $cd3d-1
+	ld bc,$010e ; ld bc,$020c ; max menu item ID, top menu item Y
+	ld e,5+1 ; Max Number of Field Moves + 1
 .adjustMenuVariablesLoop
 	dec e
 	jr z,.storeMenuVariables
@@ -33001,7 +33034,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 	ld [hli],a ; menu watched keys
 	xor a
 	ld [hl],a
-	call HandleMenuInput
+	call HandleMenuInputPlusWrapping
 	push af
 	call LoadScreenTilesFromBuffer1 ; restore saved screen
 	pop af
@@ -33011,9 +33044,10 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 	ld a,[wMaxMenuItem]
 	ld b,a
 	ld a,[wCurrentMenuItem] ; menu selection
-	cp b
-	jp z,.exitMenu ; if the player chose Cancel
-	dec b
+	; Eliminato "CANCEL"
+	ds 1 ; cp b
+	ds 3 ; jp z,.exitMenu ; if the player chose Cancel
+	ds 1 ; dec b
 	cp b
 	jr z,.choseSwitch
 	dec b
@@ -33021,7 +33055,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 	jp z,.choseStats
 	ld c,a
 	ld b,0
-	ld hl,$cd3d
+	ld hl,wFieldMoves ; $cd3d-1
 	add hl,bc
 	jp .choseOutOfBattleMove
 .choseSwitch
@@ -34421,6 +34455,11 @@ DisplayDamageAndUpdateHPBar: ; During Recoil
 	ld hl,_DisplayDamageAndUpdateHPBar
     call Bankswitch
 	ret
+
+HandleMenuInputPlusWrapping:
+    ld a,1
+    ld [wMenuWrappingEnabled],a ; $cc4a
+    jp HandleMenuInput
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -63452,9 +63491,9 @@ asm_3d0f0: ; 3d0f0 (f:50f0)
 	jp InitBattleMenu
 
 Func_3d105: ; 3d105 (f:5105)
-    FuncCoord 11,10 ; Denim, Aumentata altezza menù "switch" nel party, occorre cancellare 1 riga in più ; FuncCoord 11, 11 ; $c487
+    FuncCoord 0,12 ; Denim, occorre cancellare solo il Box, Eliminato "CANCEL" ; FuncCoord 11, 11 ; $c487
 	ld hl, Coord
-	ld bc, $81+20   ; ...
+	ld bc, 20*6 ; 6 righe
 	ld a, $7f
 	call FillMemory
 	xor a
@@ -63467,15 +63506,16 @@ Func_3d119: ; 3d119 (f:5119)
 	ld [$d125], a
 	call DisplayTextBoxID
 	ld hl, wTopMenuItemY ; $cc24
-	ld a, $c
+	ld a, $e ; Eliminato "CANCEL" da Party in Battle
 	ld [hli], a
-	ld [hli], a
-	xor a
-	ld [hli], a
+	call HackRemoveCancelFromBattle ; Eliminato "CANCEL" da Party in Battle
+	;ld [hli], a
+	;xor a
+	;ld [hli], a
 	inc hl
-	ld a, $2
+	ld a, $2-1 ; Eliminato "CANCEL" da Party in Battle
 	ld [hli], a
-	ld a, $3
+	ld a, $3 ; Eliminato "CANCEL" da Party in Battle
 	ld [hli], a
 	xor a
 	ld [hl], a
@@ -70056,6 +70096,14 @@ Func_3ce90_PlusFlag: ; xxxxx (f:xxxx) ; Denim,funzione per deflaggare questo ist
     res 4,[hl]
     pop hl
     jp Func_3ce90
+
+HackRemoveCancelFromBattle: ; Eliminato "CANCEL" da Party in Battle
+    dec a
+	dec a
+	ld [hli], a
+	xor a
+	ld [hli], a
+	ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -136716,6 +136764,19 @@ SECTION "bank31",ROMX,BANK[$31]
 
 SuperPalettes:
     INCLUDE "constants/SuperPalettes.asm"
+
+FieldMoves:
+    INCLUDE "constants/FieldMoves.asm"
+
+; INPUT e = Pokemon Pokedex ID (0 : 'M, 1: Bulbasaur, ...)
+; OUTPUT e = Regola da applicare
+GetFieldMovesRulesByte:
+    ld d,0
+    ld hl,FieldMoves
+    add hl,de
+    ld a,[hl]
+	ld e,a
+    ret
 
 SECTION "bank32",ROMX,BANK[$32]
 
