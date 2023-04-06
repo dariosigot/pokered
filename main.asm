@@ -58042,7 +58042,7 @@ DrawAllPokeballs: ; 0x3a849
 	jp SetupEnemyPartyPokeballs
 
 DrawEnemyPokeballs: ; 0x3a857
-	call LoadPartyPokeballGfx
+	call RedBallColorDuringEnemySwitch ; call LoadPartyPokeballGfx
 	jp SetupEnemyPartyPokeballs
 
 LoadPartyPokeballGfx: ; 3a85d (e:685d)
@@ -58138,9 +58138,10 @@ Func_3a8e1: ; 3a8e1 (e:68e1)
 	ld a, [W_BASECOORDX] ; $d081
 	ld [hli], a
 	ld a, [de]
-	ld [hli], a
-	xor a
-	ld [hli], a
+    ;ld [hli],a
+    ;xor a
+    ;ld [hli],a
+    call SetAttributeOamRedBall ; Red Ball
 	ld a, [W_BASECOORDX] ; $d081
 	ld b, a
 	ld a, [$cd3e]
@@ -61215,6 +61216,26 @@ GoPalSetBattleAndLoadText: ; Denim
     ld hl,UnnamedText_3bb92 ; $7b92
 	ret
 
+RedBallColorDuringEnemySwitch:
+    ld a,PAL_REDBALL - PAL_GREENBAR
+    ld [$CF1D + 1],a
+    ld b,1
+    call GoPAL_SET
+    call GbPalRedBallComplete
+	xor a
+	ld [$CF1D + 1],a
+    jp LoadPartyPokeballGfx
+
+GbPalRedBallComplete
+    ld a,%11100100
+    jp GBPalCommon
+
+SetAttributeOamRedBall:
+    ld [hli],a
+    ld a,3
+    ld [hli],a
+    ret
+
 SECTION "bankF",ROMX,BANK[$F]
 
 ; These are move effects (second value from the Moves table in bank $E).
@@ -61329,7 +61350,7 @@ Func_3c04c: ; 3c04c (f:404c)
 	ld [H_AUTOBGTRANSFERENABLED], a ; $FF00+$ba
 	call Delay3
 	ld b, $1
-    call GoPAL_SET_PlusFlag ; Denim,funzione per flaggare questo istante di chiamata ; call GoPAL_SET
+    call GoPAL_SET_PlusFlagAndRedBall ; Denim,funzione per flaggare questo istante di chiamata ; call GoPAL_SET
 	call ResetLCD_OAM
 	ld hl, Func_58d99
 	ld b, BANK(Func_58d99)
@@ -63087,7 +63108,7 @@ Func_3cdec: ; 3cdec (f:4dec)
 	ld [H_AUTOBGTRANSFERENABLED], a ; $FF00+$ba
 	ld hl, wTileMap
 	ld bc, $40c
-	call ClearScreenArea
+	call ClearScreenAreaAndGoPalSet ; Reset Battle Standard Palette after red ball
 	ld hl, Func_3a919
 	ld b, BANK(Func_3a919)
 	call Bankswitch ; indirect jump to Func_3a919 (3a919 (e:6919))
@@ -70103,12 +70124,22 @@ WritePPAllMoves: ; Denim ; TODO,sistemare routine e posizioni
     ret
 
 ; Le seguenti 2 funzioni servono a gestire il flag per la corretta palette del backsprite del player
-GoPAL_SET_PlusFlag: ; xxxxx (f:xxxx) ; Denim,funzione per flaggare questo istante di chiamata
+; aggiunta gestione red ball in battle
+GoPAL_SET_PlusFlagAndRedBall: ; xxxxx (f:xxxx) ; Denim,funzione per flaggare questo istante di chiamata
     push hl
     ld hl,wFlagBackSpritePlayerBit4
     set 4,[hl]
+    ld hl,$CF1D
+    ld a,PAL_REDBALL - PAL_GREENBAR
+    ld [hli],a
+    ld [hl],a
     pop hl
-    jp GoPAL_SET
+    call GoPAL_SET
+    ld hl,$CF1D
+    xor a
+    ld [hli],a
+    ld [hl],a
+    ret
 
 Func_3ce90_PlusFlag: ; xxxxx (f:xxxx) ; Denim,funzione per deflaggare questo istante di chiamata
     push hl
@@ -70124,6 +70155,11 @@ HackRemoveCancelFromBattle: ; Eliminato "CANCEL" da Party in Battle
 	xor a
 	ld [hli], a
 	ret
+
+ClearScreenAreaAndGoPalSet: ; Reset Battle Standard Palette after red ball
+    call ClearScreenArea
+    ld b,1
+    jp GoPAL_SET
 
 SECTION "bank10",ROMX,BANK[$10]
 
