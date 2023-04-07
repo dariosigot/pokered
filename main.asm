@@ -16,6 +16,18 @@ IfGBCDelay3:
     ret nz ; NotGBC
     jp Delay3
 
+CheckSelect:
+   bit 2,a ; was the select button pressed?
+   jr nz,.SelectPressed
+.End
+   ld hl,wFlags_0xcd60
+   jp $04d0 ; OverworldLoopLessDelay.noDirectionButtonsPressedContinue
+.SelectPressed
+   ld a,BICYCLE
+   ld [$cf91],a
+   call UseItem
+   jr .End
+
 ; the rst vectors are unused
 ;SECTION "rst00",ROM0[0]
 ;    db $FF
@@ -628,7 +640,8 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     jp nz,.newBattle
     jp OverworldLoop
 .noDirectionButtonsPressed
-    ld hl,wFlags_0xcd60
+    jp CheckSelect ; ld hl,wFlags_0xcd60
+.noDirectionButtonsPressedContinue:
     res 2,[hl]
     call UpdateSprites ; move sprites
     ld a,$01
