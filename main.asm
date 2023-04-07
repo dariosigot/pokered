@@ -107959,8 +107959,8 @@ INCBIN "baserom.gbc",$7219e,$721b5 - $7219e
 
 Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP nella battaglia e altre migliorie ; TODO
 ;INCBIN "baserom.gbc",$721b5,$721fa - $721b5
-    db $22 + 1
-    db $05 + 1
+    db $22
+    db $05
 
     ; main palette = backsprite player,bottombox using
     db $07,$00 ; $07,$0A
@@ -107991,8 +107991,8 @@ Unknown_721fa: ; 721fa (1c:61fa) ; Denim,spostata palette del pokemon nel menu s
 ;INCBIN "baserom.gbc",$721fa,$72222 - $721fa
     db $21
     db $02
-    db $07,$05
-    db $00,$00,$06,$06
+    db $07,%00010000 ; Bit 4-5 - Palette Number for outside of surrounded area
+    db $0C,$03,$12,$03
     db $02,$0A
     db $06,$07,$06,$07 ; ShinyStar
 
