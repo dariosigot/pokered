@@ -1446,6 +1446,17 @@ W_BOXMON2DATA: ; dab7
 
 ; dd2a
 
+; Denim, ExpBar
+wEXPBarPixelLength: ; dd2a
+    ds 1
+wEXPBarBaseEXP: ; dd2b
+    ds 3
+wEXPBarCurEXP: ; dd2e
+    ds 3
+wEXPBarNeededEXP: ; dd31
+    ds 3
+wEXPBarKeepFullFlag: ; dd34
+    ds 1
 
 SECTION "wBlkCurrentPaletteColor", WRAMX[$df30], BANK[1] ; Denim
 
