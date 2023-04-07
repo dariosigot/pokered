@@ -70160,6 +70160,9 @@ HackRemoveCancelFromBattle: ; Eliminato "CANCEL" da Party in Battle
 
 ClearScreenAreaAndGoPalSet: ; Reset Battle Standard Palette after red ball
     call ClearScreenArea
+    ld hl,wFlagBackSpritePlayerBit4 ; Force GoPal_SET only after red ball / player back sprite show
+    bit 4,[hl]
+    ret z
     ld b,1
     jp GoPAL_SET
 
