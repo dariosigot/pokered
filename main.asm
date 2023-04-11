@@ -70209,7 +70209,14 @@ CalcEXPBarPixelLength:
 
 .start
     ; get the base exp needed for the current level
-    ld a,[W_PLAYERMONID]
+	ld a,[W_PLAYERBATTSTATUS3]
+	ld hl,W_PLAYERMONID
+	bit 3,a
+	jr z,.skip
+	ld hl,W_PARTYMON1_NUM
+	call BattleMonPartyAttr
+.skip
+	ld a, [hl]
     ld [$d0b5],a
     call GetMonHeader
     ld a,[W_PLAYERMONLEVEL]
