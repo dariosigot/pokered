@@ -69841,7 +69841,8 @@ PrintDamageNearHpBar:
     call GetHlPointerToDamageTextArea
     jp PrintNumber
 
-WriteDamageAndUpdateCurMonHPBar: ; During Poison/Burn
+WriteDamageAndUpdateCurMonHPBar: ; During Poison/Burn/LeechSeed
+    push bc
     ld hl,W_DAMAGE
     ld a,b
     ld [hli],a
@@ -69850,7 +69851,9 @@ WriteDamageAndUpdateCurMonHPBar: ; During Poison/Burn
     call CheckIfPlayerTurnForPrintDamage
     call PrintDamageNearHpBar
     call UpdateCurMonHPBar
-    jp RemoveDiplayedDamage
+    call RemoveDiplayedDamage
+    pop bc
+    ret
 
 _DisplayDamageAndUpdateHPBar: ; During Recoil
     push de
