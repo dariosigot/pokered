@@ -63261,13 +63261,13 @@ InitBattleMenu: ; 3ceb3 (f:4eb3)
     ld bc,$b
     call CopyData
     ; the following simulates the keystrokes by drawing menus on screen
-    FuncCoord 9,14 ; $c4c1
+    FuncCoord 1,14 ; $c4c1
     ld hl,Coord
     ld [hl],"▶"
     ld c,$50
     call DelayFrames
     ld [hl],$7f
-    FuncCoord 9,16 ; $c4e9
+    FuncCoord 1,16 ; $c4e9
     ld hl,Coord
     ld [hl],"▶"
     ld c,$32
