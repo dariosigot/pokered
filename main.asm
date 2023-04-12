@@ -95518,7 +95518,7 @@ CoordsData_5a33e: ; 5a33e (16:633e)
     db $02,$06
     db $0B,$05
     db $0B,$06
-    db $10,$18
+    db $15,$05
     db $FF
 
 LanceScript2: ; 5a349 (16:6349)
@@ -95545,11 +95545,11 @@ Func_5a35b: ; 5a35b (16:635b)
     ret
 
 RLEList_5a379: ; 5a379 (16:6379)
-    db $40,$0C
+    db $40,$0A
+    db $FF
     db $20,$0C
     db $80,$07
     db $20,$06
-    db $FF
 
 LanceScript3: ; 5a382 (16:6382)
     ld a,[$cd38]
@@ -95602,7 +95602,7 @@ LanceObject: ; 0x5a3c5 (size=36)
     db $3 ; border tile
 
     db $3 ; warps
-    db $10,$18,$2,AGATHAS_ROOM
+    db $15,$05,$2,AGATHAS_ROOM
     db $0,$5,$0,CHAMPIONS_ROOM
     db $0,$6,$0,CHAMPIONS_ROOM
 
@@ -95612,7 +95612,7 @@ LanceObject: ; 0x5a3c5 (size=36)
     db SPRITE_LANCE,$1 + 4,$6 + 4,$ff,$d0,$41,LANCE + $C8,$1 ; trainer
 
     ; warp-to
-    EVENT_DISP $d,$10,$18 ; AGATHAS_ROOM
+    EVENT_DISP $d,$15,$05 ; AGATHAS_ROOM
     EVENT_DISP $d,$0,$5 ; CHAMPIONS_ROOM
     EVENT_DISP $d,$0,$6 ; CHAMPIONS_ROOM
 
