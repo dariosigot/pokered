@@ -34398,8 +34398,8 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld a,[$cf98] ; Pokemon ID
     ld [$d11e],a
-    ld hl,GetGender_D11E
-    ld b,BANK(GetGender_D11E)
+    ld hl,GetGender_D11E_StatsScreen
+    ld b,BANK(GetGender_D11E_StatsScreen)
     call Bankswitch
     jr c,.Genderless
     FuncCoord 17,2
@@ -104073,7 +104073,7 @@ Func_702f0: ; 702f0 (1c:42f0)
     FuncCoord 2,6 ; $c41a
     ld hl,Coord
     ld de,HoFMonInfoText ; $4329
-    call PlaceString
+    call PlaceStringAndGenderSymbol ; call PlaceString
     FuncCoord 1,4 ; $c3f1
     ld hl,Coord
     ld de,$cd6d
@@ -109420,6 +109420,28 @@ Func_70278_PlusFlag: ; xxxxx (1c:xxxx) ; Denim,funzione per flaggare questo ista
     pop hl
     ret
 
+PlaceStringAndGenderSymbol:
+    call PlaceString
+    ld a,[wWhichTrade]
+    ld [$d11e],a
+    ld b,BANK(GetGender_D11E_HallOfFame)
+    ld hl,GetGender_D11E_HallOfFame
+    call Bankswitch
+    jr c,.Genderless
+    FuncCoord 10,11
+    ld hl,Coord
+    ld de,.MaleIcon
+    jr nz,.Male
+    ld de,.FemaleIcon
+.Male
+    call PlaceString
+.Genderless
+    ret
+.MaleIcon
+    db $EF,$50
+.FemaleIcon
+    db $F5,$50
+
 SECTION "bank1D",ROMX,BANK[$1D]
 
 CopycatsHouseF1Blocks: ; 74000 (1d:4000)
@@ -113967,7 +113989,7 @@ Func_76610: ; 76610 (1d:6610)
     call GBPalNormal
     FuncCoord 0,13 ; $c4a4
     ld hl,Coord
-    ld b,2
+    ld b,3
     ld c,$12
     call TextBoxBorder
     FuncCoord 1,15 ; $c4cd
@@ -113981,7 +114003,7 @@ Func_76610: ; 76610 (1d:6610)
     call PrintNumber
     ld b,BANK(Func_702f0)
     ld hl,Func_702f0
-    jp Bankswitch
+    jp BankswitchAndRemoveIVFromCheckShinyArea ; jp Bankswitch
 
 HallOfFameNoText: ; 76670 (1d:6670)
     db "HALL OF FAME No   @"
@@ -114230,7 +114252,19 @@ Func_76857: ; 76857 (1d:6857)
 
 CheckShinyFromHallOfFameData:
     call CopyData
-    jp IsShiny
+    call IsShiny
+    ld a,[hli]
+    ld [wDVForShinyAtkDef],a
+    ld a,[hl]
+    ld [wDVForShinySpdSpc],a
+    ret
+
+BankswitchAndRemoveIVFromCheckShinyArea
+    call Bankswitch
+    xor a
+    ld [wDVForShinyAtkDef],a
+    ld [wDVForShinySpdSpc],a
+    ret
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -137227,9 +137261,14 @@ _DrawCatchGender: ; Denim
     db $F5,$50
 
 ; $d11e = Pokemon ID
-GetGender_D11E:
+GetGender_D11E_HallOfFame:
+    ld hl,wFlagGenderFromHallOFBit7
+    set 7,[hl]
+    jr GetGender_D11E
+GetGender_D11E_StatsScreen:
     ld hl,wFlagGenderFromStatsBit3
     set 3,[hl]
+GetGender_D11E:
     ld a,[$d11e]
 GetGender:
     and a
@@ -137307,9 +137346,14 @@ DetermineIVPointer:
     ld hl,wFlagGenderFromStatsBit3
     bit 3,[hl]
     res 3,[hl]
-    ld hl,$cff1 ; .Front
-    ret z
     ld hl,$cfb3 ; .OutOfBattle
+    ret nz
+    ld hl,wFlagGenderFromHallOFBit7
+    bit 7,[hl]
+    res 7,[hl]
+    ld hl,wDVForShinyAtkDef ; .HallOfFame
+    ret nz
+    ld hl,$cff1 ; .FrontSpriteInBattle
     ret
 
 IsInTable:

@@ -1482,7 +1482,8 @@ wFlagGenderFromStatsBit3   ; df35 ; bit 3
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
 wFlagBackFrontSpriteBit56  ; df35 ; bit 5
                            ; df35 ; bit 6
-wFlagFlashingHealBallBit7: ; df35 ; bit 7
+wFlagFlashingHealBallBit7  ; df35 ; bit 7
+wFlagGenderFromHallOFBit7  ; df35 ; bit 7
     ds 1
 
 wFlagPlaceTitleScreen ; df36 ; counter for title screen
