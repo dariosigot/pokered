@@ -17,16 +17,21 @@ IfGBCDelay3:
     jp Delay3
 
 CheckSelect:
-   bit 2,a ; was the select button pressed?
-   jr nz,.SelectPressed
+    bit 2,a ; was the select button pressed?
+    jr nz,.SelectPressed
 .End
-   ld hl,wFlags_0xcd60
-   jp $04d0 ; OverworldLoopLessDelay.noDirectionButtonsPressedContinue
+    jp $04eb ; OverworldLoopLessDelay.checkIfDownButtonIsPressed
 .SelectPressed
-   ld a,BICYCLE
-   ld [$cf91],a
-   call UseItem
-   jr .End
+    ld b,BANK(SelectInOverWorld)
+    ld hl,SelectInOverWorld
+    jp Bankswitch
+
+HackForCloseText:
+    ; close if $FF is the textID or sprite index
+    cp $ff
+    jp z,CloseTextDisplay
+    ld a,[$d4e1] ; number of sprites
+    jp ReturnInDisplayTextIDHack
 
 ; the rst vectors are unused
 ;SECTION "rst00",ROM0[0]
@@ -588,7 +593,7 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     jp .displayDialogue
 .startButtonNotPressed
     bit 0,a ; A button
-    jp z,.checkIfDownButtonIsPressed
+    jp z,CheckSelect ; jp z,.checkIfDownButtonIsPressed
 ; if A is pressed
     ld a,[$d730]
     bit 2,a
@@ -640,7 +645,7 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     jp nz,.newBattle
     jp OverworldLoop
 .noDirectionButtonsPressed
-    jp CheckSelect ; ld hl,wFlags_0xcd60
+    ld hl,wFlags_0xcd60
 .noDirectionButtonsPressedContinue:
     res 2,[hl]
     call UpdateSprites ; move sprites
@@ -6828,7 +6833,8 @@ DisplayTextID: ; 2920 (0:2920)
     jp z,DisplayPlayerBlackedOutText
     cp a,$d2 ; repel wore off
     jp z,DisplayRepelWoreOffText
-    ld a,[$d4e1] ; number of sprites
+    jp HackForCloseText ; ld a,[$d4e1] ; number of sprites
+ReturnInDisplayTextIDHack:
     ld e,a
     ld a,[$ff8c] ; sprite ID
     cp e
@@ -70222,14 +70228,14 @@ CalcEXPBarPixelLength:
 
 .start
     ; get the base exp needed for the current level
-	ld a,[W_PLAYERBATTSTATUS3]
-	ld hl,W_PLAYERMONID
-	bit 3,a
-	jr z,.skip
-	ld hl,W_PARTYMON1_NUM
-	call BattleMonPartyAttr
+    ld a,[W_PLAYERBATTSTATUS3]
+    ld hl,W_PLAYERMONID
+    bit 3,a
+    jr z,.skip
+    ld hl,W_PARTYMON1_NUM
+    call BattleMonPartyAttr
 .skip
-	ld a, [hl]
+    ld a, [hl]
     ld [$d0b5],a
     call GetMonHeader
     ld a,[W_PLAYERMONLEVEL]
@@ -137111,6 +137117,29 @@ GetFieldMovesRulesByte:
     ld a,[hl]
     ld e,a
     ret
+
+SelectInOverWorld:
+    ld b,BICYCLE
+    call IsItemInBag
+    jr z,.return
+    ; initialize a text box without drawing anything special
+    ld a,1
+    ld [$cf0c],a
+    ld b,BANK(DisplayTextIDInit)
+    ld hl,DisplayTextIDInit ; initialization
+    call Bankswitch
+    ld a,BICYCLE
+    ld [$cf91],a ; load item to be used
+    ld [$d11e],a ; load item so its name can be grabbed
+    call GetItemName ; get the item name into de register
+    call CopyStringToCF4B ; copy name from de to wcf4b so it shows up in text
+    call UseItem
+    ;use $ff value loaded into $FF8C to make DisplayTextID display nothing and close any text
+    ld a,$ff
+    ld [$FF8C],a
+    call DisplayTextID
+.return
+    jp OverworldLoop
 
 SECTION "bank32",ROMX,BANK[$32]
 
