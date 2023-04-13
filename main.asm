@@ -33,6 +33,10 @@ HackForCloseText:
     ld a,[$d4e1] ; number of sprites
     jp ReturnInDisplayTextIDHack
 
+GbPalComplete:
+    ld a,%11100100
+    jp GBPalCommon
+
 ; the rst vectors are unused
 ;SECTION "rst00",ROM0[0]
 ;    db $FF
@@ -15271,7 +15275,7 @@ AskForMonNickname: ; 64eb (1:64eb)
     push hl
     ld a,$2
     ld [$d07d],a
-    call Func_6596
+    call Func_6596AndStorePkmnId ; Denim ; call Func_6596
     ld a,[W_ISINBATTLE] ; $d057
     and a
     jr nz,.asm_653e
@@ -15362,7 +15366,7 @@ Func_6596: ; 6596 (1:6596)
     ld [W_SUBANIMTRANSFORM],a ; $d08b
 .asm_65ed
     call Func_676f
-    call GBPalNormal
+    call GbPalComplete ; Sprite During Rename Pokemon ; call GBPalNormal
 .asm_65f3
     ld a,[$ceea]
     and a
@@ -18457,6 +18461,18 @@ SearchFieldMoveInAttack:
     pop bc
     pop hl
     ret
+
+; Routine per memorizzare l'id del pokemon al quale si vuole applicare un nuovo nome per la corretta visualizzazione
+; dell'immagine MonOwSprite
+Func_6596AndStorePkmnId: ; Denim
+    push hl
+    ld hl,wRenamedPokemonIdFlag
+    set 0,[hl]
+    inc hl
+    ld a,[$d11e]
+    ld [hl],a ; wRenamedPokemonId
+    pop hl
+    jp Func_6596
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -32672,8 +32688,8 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     call GetPartyMonName
     pop hl
     call PlaceString ; print the pokemon's name
-    ld b,BANK(Func_71868)
-    ld hl,Func_71868
+    ld b,BANK(PlaceAppropriatePokemonIcon)
+    ld hl,PlaceAppropriatePokemonIcon
     call Bankswitch ; place the appropriate pokemon icon
     ld a,[$FF8C] ; loop counter
     ld [$CF92],a
@@ -32842,7 +32858,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     ld a,1
     ld [H_AUTOBGTRANSFERENABLED],a
     call Delay3
-    jp GbPalPartyComplete ; Denim ; Party Sprite con tutti e 4 i colori palette ; jp GBPalNormal
+    jp GbPalComplete ; Denim ; Party Sprite con tutti e 4 i colori palette ; jp GBPalNormal
 .printItemUseMessage
     and a,$0F
     ld hl,PartyMenuItemUseMessagePointers
@@ -34452,10 +34468,6 @@ PlaceDoubleVerticalBorderAndNextCoord: ; xxxxx (4:xxxx) ; Denim
 
 EXPBarGraphics: ; Denim,ExpBar
     INCBIN "gfx/denim/exp_bar.2bpp"
-
-GbPalPartyComplete ; Denim
-    ld a,%11100100
-    jp GBPalCommon
 
 DisplayDamageAndUpdateHPBar: ; During Recoil
     ld d,h
@@ -61240,14 +61252,10 @@ RedBallColorDuringEnemySwitch:
     ld [$CF1D + 1],a
     ld b,1
     call GoPAL_SET
-    call GbPalRedBallComplete
+    call GbPalComplete ; Red Ball
     xor a
     ld [$CF1D + 1],a
     jp LoadPartyPokeballGfx
-
-GbPalRedBallComplete
-    ld a,%11100100
-    jp GBPalCommon
 
 SetAttributeOamRedBall:
     ld [hli],a
@@ -106610,16 +106618,16 @@ asm_7170a: ; 7170a (1c:570a)
     ld bc,$10
     ld a,[wCurrentMenuItem] ; $cc26
     call AddNTimes
-    ld c,$40
-    ld a,[hl]
-    cp $4
-    jr z,.asm_71755
-    cp $8
-    jr nz,.asm_71759
+    ld c,$4 ; Denim ; $40
+    ds 1 ; ld a,[hl]
+    ds 2 ; cp $4
+    ds 2 ; jr z,.asm_71755
+    ds 2 ; cp $8
+    ds 2 ; jr nz,.asm_71759
 .asm_71755
-    dec hl
-    dec hl
-    ld c,$1
+    ds 1 ; dec hl
+    ds 1 ; dec hl
+    ds 2 ; ld c,$1
 .asm_71759
     ld b,$4
     ld de,$4
@@ -106638,8 +106646,8 @@ DataTable_71769: ; 71769 (1c:5769)
     db $05,$10,$20
 
 Func_7176c: ; 7176c (1c:576c)
-    call LoadMonOverworldSpritePointersAndNewVRAMIcon ; Denim ;     ld hl,MonOverworldSpritePointers ; $57c0
-    ld a,$1c
+    call CreateMonOvWorldSprInstructionAndNewVRAMIcon ; Denim ;     ld hl,MonOverworldSpritePointers ; $57c0
+    ds 2 ; ld a,$1c
 
 Func_71771: ; 71771 (1c:5771)
     ld bc,$0
@@ -106672,8 +106680,8 @@ Func_71771: ; 71771 (1c:5771)
 
 Func_71791: ; 71791 (1c:5791)
     call DisableLCD
-    call LoadMonOverworldSpritePointersAndNewVRAMIcon ; Denim ; ld hl,MonOverworldSpritePointers ; $57c0
-    ld a,$1c
+    call CreateMonOvWorldSprInstructionAndNewVRAMIcon ; Denim ; ld hl,MonOverworldSpritePointers ; $57c0
+    ds 2 ; ld a,$1c
     ld bc,$0
 .asm_7179c
     push af
@@ -106846,7 +106854,7 @@ MonOverworldSpritePointers: ; 717c0 (1c:57c0)
     db BANK(MonOverworldSprites)
     dw $8780
 
-Func_71868: ; 71868 (1c:5868)
+PlaceAppropriatePokemonIcon: ; 71868 (1c:5868)
     push hl
     push de
     push bc
@@ -106856,7 +106864,7 @@ Func_71868: ; 71868 (1c:5868)
     ld d,$0
     add hl,de
     ld a,[hl]
-    call Func_718e9
+    call IndexToMiniSpritePointer
     ld [$cd5b],a
     call Func_718c3
     pop bc
@@ -106868,13 +106876,13 @@ Func_71882: ; 71882 (1c:5882)
     xor a
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     ld a,[$cd5d]
-    call Func_718e9
+    call IndexToMiniSpritePointer
     ld [$cd5b],a
     jr Func_718c3
 
 Func_71890: ; 71890 (1c:5890)
     ld a,[$cf91]
-    call Func_718e9
+    call IndexToMiniSpritePointer
     push af
     ld hl,$8000
     call Func_718ac
@@ -106891,7 +106899,7 @@ Func_718ac: ; 718ac (1c:58ac)
     add a
     ld c,a
     ld b,$0
-    call LoadMonOverworldSpritePointersAndNewVRAMIcon ; Denim ; ld hl,MonOverworldSpritePointers ; $57c0
+    call CreateMonOvWorldSprInstructionAndNewVRAMIcon ; Denim ; ld hl,MonOverworldSpritePointers ; $57c0
     add hl,bc
     add hl,bc
     add hl,bc
@@ -106916,10 +106924,11 @@ Func_718c3: ; 718c3 (1c:58c3)
     add $10
     ld b,a
     pop af
-    cp $8
-    jr z,.asm_718da
-    call Func_712a6
-    jr .asm_718dd
+    ; Denim
+    ds 2 ; cp $8
+    ds 2 ; jr z,.asm_718da
+    ds 3 ; call Func_712a6
+    ds 2 ; jr .asm_718dd
 .asm_718da
     call Func_71281
 .asm_718dd
@@ -106928,105 +106937,22 @@ Func_718c3: ; 718c3 (1c:58c3)
     ld bc,$60
     jp CopyData
 
-Func_718e9: ; 718e9 (1c:58e9)
-    ld [$d11e],a
-    ld a,$3a
-    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
-    ld a,[$d11e]
-    ld c,a
-    dec a
-    srl a
-    ld hl,MonOverworldData ; $590d
-    ld e,a
-    ld d,$0
-    add hl,de
-    ld a,[hl]
-    bit 0,c
-    jr nz,.asm_71906
+IndexToMiniSpritePointer: ; 718e9 (1c:58e9)
+    ld b,0
+    ld hl,wArrayMiniSpriteLoaded
+.Loop
+    cp [hl]
+    jr z,.Find
+    inc hl
+    inc b
+    jr .Loop
+.Find
+    ld a,b
     swap a
-.asm_71906
-    and $f0
-    srl a
     srl a
     ret
 
-MonOverworldData: ; 7190d (1c:590d)
-    dn SPRITE_GRASS,SPRITE_GRASS            ;Bulbasaur/Ivysaur
-    dn SPRITE_GRASS,SPRITE_MON                ;Venusaur/Charmander
-    dn SPRITE_MON,SPRITE_MON                ;Charmeleon/Charizard
-    dn SPRITE_WATER,SPRITE_WATER            ;Squirtle/Wartortle
-    dn SPRITE_WATER,SPRITE_BUG                ;Blastoise/Caterpie
-    dn SPRITE_BUG,SPRITE_BUG                ;Metapod/Butterfree
-    dn SPRITE_BUG,SPRITE_BUG                ;Weedle/Kakuna
-    dn SPRITE_BUG,SPRITE_BIRD_M            ;Beedrill/Pidgey
-    dn SPRITE_BIRD_M,SPRITE_BIRD_M            ;Pidgeotto/Pidgeot
-    dn SPRITE_QUADRUPED,SPRITE_QUADRUPED    ;Rattata/Raticate
-    dn SPRITE_BIRD_M,SPRITE_BIRD_M            ;Spearow/Fearow
-    dn SPRITE_SNAKE,SPRITE_SNAKE            ;Ekans/Arbok
-    dn SPRITE_FAIRY,SPRITE_FAIRY            ;Pikachu/Raichu
-    dn SPRITE_MON,SPRITE_MON                ;Sandshrew/Sandslash
-    dn SPRITE_MON,SPRITE_MON                ;Nidoran?/Nidorina
-    dn SPRITE_MON,SPRITE_MON                ;Nidoqueen/Nidoran?
-    dn SPRITE_MON,SPRITE_MON                ;Nidorino/Nidoking
-    dn SPRITE_FAIRY,SPRITE_FAIRY            ;Clefairy/Clefable
-    dn SPRITE_QUADRUPED,SPRITE_QUADRUPED    ;Vulpix/Ninetales
-    dn SPRITE_FAIRY,SPRITE_FAIRY            ;Jigglypuff/Wigglytuff
-    dn SPRITE_MON,SPRITE_MON                ;Zubat/Golbat
-    dn SPRITE_GRASS,SPRITE_GRASS            ;Oddish/Gloom
-    dn SPRITE_GRASS,SPRITE_BUG                ;Vileplume/Paras
-    dn SPRITE_BUG,SPRITE_BUG                ;Parasect/Venonat
-    dn SPRITE_BUG,SPRITE_MON                ;Venomoth/Diglett
-    dn SPRITE_MON,SPRITE_MON                ;Dugtrio/Meowth
-    dn SPRITE_MON,SPRITE_MON                ;Persian/Psyduck
-    dn SPRITE_MON,SPRITE_MON                ;Golduck/Mankey
-    dn SPRITE_MON,SPRITE_QUADRUPED            ;Primeape/Growlithe
-    dn SPRITE_QUADRUPED,SPRITE_MON            ;Arcanine/Poliwag
-    dn SPRITE_MON,SPRITE_MON                ;Poliwhirl/Poliwrath
-    dn SPRITE_MON,SPRITE_MON                ;Abra/Kadabra
-    dn SPRITE_MON,SPRITE_MON                ;Alakazam/Machop
-    dn SPRITE_MON,SPRITE_MON                ;Machoke/Machamp
-    dn SPRITE_GRASS,SPRITE_GRASS            ;Bellsprout/Weepinbell
-    dn SPRITE_GRASS,SPRITE_WATER            ;Victreebel/Tentacool
-    dn SPRITE_WATER,SPRITE_MON                ;Tentacruel/Geodude
-    dn SPRITE_MON,SPRITE_MON                ;Graveler/Golem
-    dn SPRITE_QUADRUPED,SPRITE_QUADRUPED    ;Ponyta/Rapidash
-    dn SPRITE_QUADRUPED,SPRITE_MON            ;Slowpoke/Slowbro
-    dn SPRITE_BALL_M,SPRITE_BALL_M            ;Magnemite/Magneton
-    dn SPRITE_BIRD_M,SPRITE_BIRD_M            ;Farfetch'd/Doduo
-    dn SPRITE_BIRD_M,SPRITE_WATER            ;Dodrio/Seel
-    dn SPRITE_WATER,SPRITE_MON                ;Dewgong/Grimer
-    dn SPRITE_MON,SPRITE_HELIX                ;Muk/Shellder
-    dn SPRITE_HELIX,SPRITE_MON                ;Cloyster/Gastly
-    dn SPRITE_MON,SPRITE_MON                ;Haunter/Gengar
-    dn SPRITE_SNAKE,SPRITE_MON                ;Onix/Drowzee
-    dn SPRITE_MON,SPRITE_WATER                ;Hypno/Krabby
-    dn SPRITE_WATER,SPRITE_BALL_M            ;Kingler/Voltorb
-    dn SPRITE_BALL_M,SPRITE_GRASS            ;Electrode/Exeggcute
-    dn SPRITE_GRASS,SPRITE_MON                ;Exeggutor/Cubone
-    dn SPRITE_MON,SPRITE_MON                ;Marowak/Hitmonlee
-    dn SPRITE_MON,SPRITE_MON                ;Hitmonchan/Lickitung
-    dn SPRITE_MON,SPRITE_MON                ;Koffing/Weezing
-    dn SPRITE_QUADRUPED,SPRITE_MON            ;Rhyhorn/Rhydon
-    dn SPRITE_FAIRY,SPRITE_GRASS            ;Chansey/Tangela
-    dn SPRITE_MON,SPRITE_WATER                ;Kangaskhan/Horsea
-    dn SPRITE_WATER,SPRITE_WATER            ;Seadra/Goldeen
-    dn SPRITE_WATER,SPRITE_HELIX            ;Seaking/Staryu
-    dn SPRITE_HELIX,SPRITE_MON                ;Starmie/Mr.Mime
-    dn SPRITE_BUG,SPRITE_MON                ;Scyther/Jynx
-    dn SPRITE_MON,SPRITE_MON                ;Electabuzz/Magmar
-    dn SPRITE_BUG,SPRITE_QUADRUPED            ;Pinsir/Tauros
-    dn SPRITE_WATER,SPRITE_SNAKE            ;Magikarp/Gyarados
-    dn SPRITE_WATER,SPRITE_MON                ;Lapras/Ditto
-    dn SPRITE_QUADRUPED,SPRITE_QUADRUPED    ;Eevee/Vaporeon
-    dn SPRITE_QUADRUPED,SPRITE_QUADRUPED    ;Jolteon/Flareon
-    dn SPRITE_MON,SPRITE_HELIX                ;Porygon/Omanyte
-    dn SPRITE_HELIX,SPRITE_HELIX            ;Omastar/Kabuto
-    dn SPRITE_HELIX,SPRITE_BIRD_M            ;Kabutops/Aerodactyl
-    dn SPRITE_MON,SPRITE_BIRD_M            ;Snorlax/Articuno
-    dn SPRITE_BIRD_M,SPRITE_BIRD_M            ;Zapdos/Moltres
-    dn SPRITE_SNAKE,SPRITE_SNAKE            ;Dratini/Dragonair
-    dn SPRITE_SNAKE,SPRITE_MON                ;Dragonite/Mewtwo
-    dn SPRITE_MON,0                        ;Mew/Padding
+SECTION "MonOverworldSprites",ROMX[$5959],BANK[$1C]
 
 MonOverworldSprites: ; 71959 (1c:5959)
     INCBIN "gfx/mon_ow_sprites.2bpp"
@@ -109393,14 +109319,112 @@ SamePalette:
     db WIGGLYTUFF
     db ARCANINE
 
-LoadMonOverworldSpritePointersAndNewVRAMIcon: ; xxxxx (1c:xxxx) ; Denim
+CreateMonOvWorldSprInstructionAndNewVRAMIcon:
 
     ld de,HeldItemIcon
     ld hl,$8d00
     ld bc,(BANK(HeldItemIcon) << 8 | $2) ; Also Shiny Star
     call GoodCopyVideoData
 
-    ld hl,MonOverworldSpritePointers ; $57c0
+    ld hl,wRenamedPokemonIdFlag
+    bit 0,[hl]
+    jr z,.NoRename
+    res 0,[hl]
+    inc hl ; hl point to wRenamedPokemonId
+    ld a,1
+    jr .StartCreation
+.NoRename
+    ld hl,W_NUMINPARTY
+    ld a,[hli] ; numero di Pokemon nel party
+    and a
+    jr z,.EmptyParty
+
+.StartCreation
+    push af ; Backup numero di Pokemon nel party
+    ld d,a ; contatore in discesa
+    xor a
+    ld e,a ; contatore in salita
+.NextPartyPokemon
+    xor a
+    ld b,a
+    ld c,e
+    ld a,[hli] ; leggo id Pokemon n-esimo
+    push hl ; Backup location id Pokemon n-esimo
+    push af ; Backup Id Pokemon
+    ld hl,wArrayMiniSpriteLoaded
+    add hl,bc
+    ld [hl],a ; Memorizzo l'elenco dei pokemon Id cosi come verranno caricati in VRAM
+
+    ld a,e
+    ld hl,wLocationMonOvSprInstruction
+    ld bc,$06
+    call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
+    pop af ; Restore Id Pokemon
+    push hl ; Backup wLocationMonOvSprInstruction corretta
+
+    call IndexToMiniSpriteOrder
+    ld b,129 - 1 ; MAGIKARP in original pokedex
+    cp b
+    push af ; Backup flag C
+    jr c,.Before128 ; < MAGIKARP in original pokedex
+    sub b
+.Before128
+    ld hl,$4000 ; Entrambe le liste di immagini mini sprite iniziano a inizio BANK
+    ld bc,$80
+    call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
+    ld b,h
+    ld c,l
+
+    pop af ; Restore flag C
+    pop hl ; Restore wLocationMonOvSprInstruction corretta
+    ld a,c
+    ld [hli],a
+    ld a,b
+    ld [hli],a
+    ld a,$08
+    ld [hli],a
+    ld a,BANK(MonOverworldDataNew)
+    jr c,.Before128_2
+    inc a
+.Before128_2
+    ld [hli],a
+    push hl ; Backup wLocationMonOvSprInstruction
+    ld a,e
+    ld bc,$80
+    ld hl,$8000
+    call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
+    ld b,h
+    ld c,l
+    pop hl ; Restore wLocationMonOvSprInstruction
+    ld a,c
+    ld [hli],a
+    ld a,b
+    ld [hli],a
+
+    pop hl ; Restore location id Pokemon n-esimo
+    inc e
+    dec d
+    jr nz,.NextPartyPokemon
+    pop af ; Restore numero di Pokemon nel party
+    and a
+.EmptyParty
+    jr nz,.Done
+    inc a
+.Done
+    ld hl,wLocationMonOvSprInstruction
+    ret
+
+; Funzione che converte l'indice di un pokemon nel numero d'ordine del
+; mini sprite di MonOverworldDataNew
+; a = index
+IndexToMiniSpriteOrder:
+    ld [$d11e],a
+    ld a,$3a
+    push de
+    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
+    pop de
+    ld a,[$d11e]
+    dec a
     ret
 
 PalPacketStatMenu: ; Denim
@@ -137454,3 +137478,13 @@ GenderTable:
     dsn MALE_87,MALE_87,MALE_87,OTHGEND ; KABUTOPS,AERODACTYL,SNORLAX,ARTICUNO
     dsn OTHGEND,OTHGEND,MALE_50,MALE_50 ; ZAPDOS,MOLTRES,DRATINI,DRAGONAIR
     dsn MALE_50,OTHGEND,OTHGEND,OTHGEND ; DRAGONITE,MEWTWO,MEW,152
+
+SECTION "bank34",ROMX,BANK[$34] ; Denim
+
+MonOverworldDataNew:
+    INCBIN "gfx/denim/party_mon_sprites1.w32.2bpp"
+
+SECTION "bank35",ROMX,BANK[$35] ; Denim
+
+MonOverworldDataNew2:
+    INCBIN "gfx/denim/party_mon_sprites2.w32.2bpp"

@@ -1458,6 +1458,18 @@ wEXPBarNeededEXP: ; dd31
 wEXPBarKeepFullFlag: ; dd34
     ds 1
 
+SECTION "wLocationMonOvSprInstruction", WRAMX[$def0], BANK[1]
+
+wLocationMonOvSprInstruction: ; def0 ; Denim
+    ds 36
+wArrayMiniSpriteLoaded ; df14 ; Denim
+    ds 6
+wRenamedPokemonIdFlag ; df1a ; Denim
+                      ; bit 0 = Flag Tentativo Rinomina
+    ds 1
+wRenamedPokemonId ; df1b ; Denim
+    ds 1
+
 SECTION "wBlkCurrentPaletteColor", WRAMX[$df30], BANK[1] ; Denim
 
 wBlkCurrentPaletteColor: ; df30
