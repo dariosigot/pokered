@@ -1506,6 +1506,9 @@ wChoicePkmnMoveDeleter ; df37
 wDVForShinySpdSpc      ; df37
     ds 1
 
+wFlagAddPkmnToPartyBit0    ; df38 ; bit 0
+    ds 1
+
 SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
 
 wFlagGameBoyColor:    ; dfff ; Denim

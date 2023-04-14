@@ -37,6 +37,17 @@ GbPalComplete:
     ld a,%11100100
     jp GBPalCommon
 
+ResetTempIV:
+    push hl
+    push af
+    xor a
+    ld hl,wDVForShinyAtkDef
+    ld [hli],a ; DV Atk/Def
+    ld [hl],a  ; DV Spd/Spc
+    pop af
+    pop hl
+    ret
+
 ; the rst vectors are unused
 ;SECTION "rst00",ROM0[0]
 ;    db $FF
@@ -10477,8 +10488,8 @@ GivePokemon: ; 3e48 (0:3e48)
     ld [$d127],a
     xor a
     ld [$cc49],a
-    ld b,BANK(Func_4fda5)
-    ld hl,Func_4fda5
+    ld b,BANK(_GivePokemon)
+    ld hl,_GivePokemon
     jp Bankswitch
 
 GenRandom: ; 3e5c (0:3e5c)
@@ -15252,11 +15263,11 @@ AskForMonNickname: ; 64eb (1:64eb)
     ld hl,wTileMap
     ld b,$4
     ld c,$b
-    call z,ClearScreenArea ; only if in wild batle
+    call z,ClearScreenArea ; only if in wild battle
     ld a,[$cf91]
     ld [$d11e],a
     call GetMonName
-    ld hl,DoYouWantToNicknameText ; $6557
+    call InsertIVAndLoadTextCoord ; ld hl,DoYouWantToNicknameText ; $6557
     call PrintText
     FuncCoord 14,7 ; $c43a
     ld hl,Coord
@@ -15275,7 +15286,7 @@ AskForMonNickname: ; 64eb (1:64eb)
     push hl
     ld a,$2
     ld [$d07d],a
-    call Func_6596AndStorePkmnId ; Denim ; call Func_6596
+    call StoreCatchPkmnIdAndFlagBeforeRename
     ld a,[W_ISINBATTLE] ; $d057
     and a
     jr nz,.asm_653e
@@ -15305,7 +15316,7 @@ Func_655c: ; 655c (1:655c)
     ld [$cfcb],a
     ld a,$2
     ld [$d07d],a
-    call Func_6596
+    call InsertIVDuringNameRater
     call GBPalWhiteOutWithDelay3
     call Func_3dbe
     call LoadGBPal
@@ -15327,7 +15338,7 @@ Func_655c: ; 655c (1:655c)
     scf
     ret
 
-Func_6596: ; 6596 (1:6596)
+LoadRenameScreen: ; 6596 (1:6596)
     push hl
     ld hl,$d730
     set 6,[hl]
@@ -15728,8 +15739,8 @@ Func_68f8: ; 68f8 (1:68f8)
     ld hl,Coord
     call PlaceString
     ld hl,$1
-    add hl,bc
-    ld [hl],$c9
+    call PrintGenderInRenameScreen ; add hl,bc
+    ;ld [hl],$c9
     FuncCoord 1,3 ; $c3dd
     ld hl,Coord
     ld de,NicknameTextString ; $6953
@@ -15770,7 +15781,7 @@ Func_695d: ; 695d (1:695d)
     ld hl,W_PLAYERNAME ; $d158
     xor a
     ld [$d07d],a
-    call Func_6596
+    call LoadRenameScreen
     ld a,[$cf4b]
     cp $50
     jr z,.asm_697a
@@ -15803,7 +15814,7 @@ Func_69a4: ; 69a4 (1:69a4)
     ld hl,W_RIVALNAME ; $d34a
     ld a,$1
     ld [$d07d],a
-    call Func_6596
+    call LoadRenameScreen
     ld a,[$cf4b]
     cp $50
     jr z,.asm_69c1
@@ -18413,7 +18424,7 @@ SpriteAttributeHandler: ; Denim
 HackForBackupDVDuringTradeIn:
     push af
     ld a,[wWhichPokemon] ; $cf92
-    ld hl,W_PARTYMON1_IV ; $d18c
+    ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
     ld a,[hli]
@@ -18462,9 +18473,9 @@ SearchFieldMoveInAttack:
     pop hl
     ret
 
-; Routine per memorizzare l'id del pokemon al quale si vuole applicare un nuovo nome per la corretta visualizzazione
+; Routine per memorizzare l'id del pokemon appena catturato al quale si vuole applicare un nuovo nome per la corretta visualizzazione
 ; dell'immagine MonOwSprite
-Func_6596AndStorePkmnId: ; Denim
+StoreCatchPkmnIdAndFlagBeforeRename: ; Denim
     push hl
     ld hl,wRenamedPokemonIdFlag
     set 0,[hl]
@@ -18472,7 +18483,62 @@ Func_6596AndStorePkmnId: ; Denim
     ld a,[$d11e]
     ld [hl],a ; wRenamedPokemonId
     pop hl
-    jp Func_6596
+    jp LoadRenameScreen
+
+InsertIVDuringNameRater:
+    push hl
+    ld a,[wWhichPokemon] ; Pokemon Party Order
+    ld hl,W_PARTYMON1_IV
+    ld bc,44 ; Pokemon Data Lenght
+    call AddNTimes
+    ld a,[hli]
+    ld [wDVForShinyAtkDef],a ; DV Atk/Def
+    ld a,[hl]
+    ld [wDVForShinySpdSpc],a ; DV Spd/Spc
+    pop hl
+    call LoadRenameScreen
+    jp ResetTempIV
+
+PrintGenderInRenameScreen:
+    add hl,bc
+    push bc
+    push hl ; Backup Coord
+    ld b,BANK(GetGender_D11E_HallOfFameOrRenameScreen)
+    ld hl,GetGender_D11E_HallOfFameOrRenameScreen
+    call Bankswitch
+    ld a,$7F ; Blank
+    jr c,.End ; Genderless
+    ld a,$EF ; Male
+    jr nz,.End ; Male
+    ld a,$F5 ; Female
+.End
+    pop hl ; Restore Coord
+    ld [hl],a
+    pop bc
+    ret
+
+; Generate Random only if Out Of Battle And Pkmn Is Added ToParty
+InsertIVAndLoadTextCoord:
+    ld hl,wDVForShinyAtkDef
+    ld a,[W_ISINBATTLE] ; $d057
+    and a
+    jr nz,.copyEnemyMonDataDuringBattle
+    ld a,[wFlagAddPkmnToPartyBit0]
+    bit 0,a
+    jr z,.copyEnemyMonDataDuringBattle
+    call GenRandom
+    ld [hli],a
+    call GenRandom
+    ld [hl],a
+    jr .Done
+.copyEnemyMonDataDuringBattle
+    ld a,[W_ENEMYMONATKDEFIV]
+    ld [hli],a
+    ld a,[W_ENEMYMONSPDSPCIV]
+    ld [hl],a
+.Done
+    ld hl,DoYouWantToNicknameText ; $6557
+    ret
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -27010,8 +27076,8 @@ ItemUseBall: ; d687 (3:5687)
     ld [$cf91],a
     ld a,[$cff3]
     ld [$d127],a
-    ld hl,Func_3eb01
-    ld b,BANK(Func_3eb01)
+    ld hl,LoadEnemyMonData
+    ld b,BANK(LoadEnemyMonData)
     call Bankswitch
     pop af
     ld [$cf91],a
@@ -27070,7 +27136,7 @@ ItemUseBall: ; d687 (3:5687)
     jr .End
 .sendToBox    ;$5907
     call CleanLCD_OAM
-    call Func_e7a4
+    call SendNewMonToBox
     ld hl,ItemUseBallText07
     ld a,[$d7f1]
     bit 0,a        ;already met Bill?
@@ -29256,7 +29322,7 @@ KeyItemBitfield: ; e799 (3:6799)
     db %00111011
     db %00000000
 
-Func_e7a4: ; e7a4 (3:67a4)
+SendNewMonToBox: ; e7a4 (3:67a4)
     ld de,W_NUMINBOX ; $da80
     ld a,[de]
     inc a
@@ -29342,7 +29408,7 @@ Func_e7a4: ; e7a4 (3:67a4)
     ld a,$2
     ld [$d07d],a
     ld a,$4e
-    call Predef ; indirect jump to Func_64eb (64eb (1:64eb))
+    call Predef ; indirect jump to AskForMonNickname (64eb (1:64eb))
     ld a,[W_NUMINBOX] ; $da80
     dec a
     jr z,.asm_e867
@@ -29409,13 +29475,13 @@ Func_e7a4: ; e7a4 (3:67a4)
     inc de
     dec b
     jr nz,.asm_e89f
-    ld hl,$cff1
+    ld hl,W_ENEMYMONATKDEFIV
     ld a,[hli]
     ld [de],a
     inc de
     ld a,[hli]
     ld [de],a
-    ld hl,W_ENEMYMONPP ; $cffe
+    call ResetIvAndLoadHl ; ld hl,W_ENEMYMONPP ; $cffe
     ld b,$4
 .asm_e8b1
     ld a,[hli]
@@ -30527,7 +30593,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld a,$2
     ld [$d07d],a
     ld a,$4e
-    call Predef ; indirect jump to Func_64eb (64eb (1:64eb))
+    call SetFlagAndAskForMonNickname ; call Predef ; indirect jump to AskForMonNickname (64eb (1:64eb))
 .asm_f33f
     ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
     ld a,[$cc49]
@@ -30584,9 +30650,9 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld a,[W_ISINBATTLE] ; $d057
     and a
     jr nz,.copyEnemyMonData
-    call GenRandom     ; generate random IVs
+    ld a,[wDVForShinySpdSpc] ; call GenRandom     ; generate random IVs
     ld b,a
-    call GenRandom
+    ld a,[wDVForShinyAtkDef] ; call GenRandom
 .writeFreshMonData ; f3b3
     push bc
     ld bc,$1b
@@ -30702,7 +30768,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld a,[W_CURENEMYLVL] ; $d127
     ld [de],a
     inc de
-    ld a,[W_ISINBATTLE] ; $d057
+    call ResetIVAndCheckIsInBattle ; ld a,[W_ISINBATTLE] ; $d057
     dec a
     jr nz,.calcFreshStats
     ld hl,W_ENEMYMONMAXHP ; $cff4
@@ -32006,6 +32072,28 @@ TownMapText: ; fc12 (3:7c12)
 UnnamedText_fc45: ; fc45 (3:7c45)
     TX_FAR _UnnamedText_fc45
     db "@"
+
+ResetIVAndCheckIsInBattle:
+    call ResetTempIV
+    ld a,[W_ISINBATTLE] ; $d057
+    ret
+
+ResetIvAndLoadHl:
+    call ResetTempIV
+    ld hl,W_ENEMYMONPP ; $cffe
+    ret
+
+SetFlagAndAskForMonNickname:
+    push hl
+    ld hl,wFlagAddPkmnToPartyBit0
+    set 0,[hl]
+    pop hl
+    call Predef ; indirect jump to AskForMonNickname (64eb (1:64eb))
+    push hl
+    ld hl,wFlagAddPkmnToPartyBit0
+    res 0,[hl]
+    pop hl
+    ret
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -62600,7 +62688,7 @@ Func_3c92a: ; 3c92a (f:492a)
     ld a,[hl]
     ld [W_ENEMYMONID],a
     ld [$CF91],a
-    call Func_3eb01
+    call LoadEnemyMonData
     ld hl,$CFE6
     ld a,[hli]
     ld [$CCE3],a
@@ -67308,7 +67396,7 @@ GetCurrentMove: ; 3eabe (f:6abe)
     ld de,$cd6d
     jp CopyStringToCF4B
 
-Func_3eb01: ; 3eb01 (f:6b01)
+LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jp z,Func_3cc13
@@ -67990,7 +68078,7 @@ asm_3ef3d: ; 3ef3d (f:6f3d)
 Func_3ef8b: ; 3ef8b (f:6f8b)
     ld a,$1
     ld [W_ISINBATTLE],a ; $d057
-    call Func_3eb01
+    call LoadEnemyMonData
     call Func_3ec32
     ld a,[W_CUROPPONENT] ; $d059
     cp MAROWAK
@@ -83114,7 +83202,7 @@ TradeCenterMObject: ; 0x4fd87 (size=10)
 TradeCenterMBlocks: ; 4fd91 (13:7d91)
     INCBIN "maps/tradecenterm.blk"
 
-Func_4fda5: ; 4fda5 (13:7da5)
+_GivePokemon: ; 4fda5 (13:7da5)
     call EnableAutoTextBoxDrawing
     xor a
     ld [$ccd3],a
@@ -83128,13 +83216,13 @@ Func_4fda5: ; 4fda5 (13:7da5)
     ld [W_ENEMYBATTSTATUS3],a ; $d069
     ld a,[$cf91]
     ld [W_ENEMYMONID],a
-    ld hl,Func_3eb01
-    ld b,BANK(Func_3eb01)
-    call Bankswitch ; indirect jump to Func_3eb01 (3eb01 (f:6b01))
-    call Func_4fe11
-    ld hl,Func_e7a4
-    ld b,BANK(Func_e7a4)
-    call Bankswitch ; indirect jump to Func_e7a4 (e7a4 (3:67a4))
+    ld hl,LoadEnemyMonData
+    ld b,BANK(LoadEnemyMonData)
+    call Bankswitch ; indirect jump to LoadEnemyMonData (3eb01 (f:6b01))
+    call SetPokedexOwnedFlag
+    ld hl,SendNewMonToBox
+    ld b,BANK(SendNewMonToBox)
+    call Bankswitch ; indirect jump to SendNewMonToBox (e7a4 (3:67a4))
     ld hl,$cf4b
     ld a,[$d5a0]
     and $7f
@@ -83160,7 +83248,7 @@ Func_4fda5: ; 4fda5 (13:7da5)
     and a
     ret
 .asm_4fe01
-    call Func_4fe11
+    call SetPokedexOwnedFlag
     call AddPokemonToParty
     ld a,$1
     ld [$cc3c],a
@@ -83168,7 +83256,7 @@ Func_4fda5: ; 4fda5 (13:7da5)
     scf
     ret
 
-Func_4fe11: ; 4fe11 (13:7e11)
+SetPokedexOwnedFlag: ; 4fe11 (13:7e11)
     ld a,[$cf91]
     push af
     ld [$d11e],a
@@ -92217,9 +92305,9 @@ Func_58d99: ; 58d99 (16:4d99)
     ld a,b
     and a
     jr z,.asm_58df5
-    ld hl,Func_3eb01
-    ld b,BANK(Func_3eb01)
-    call Bankswitch ; indirect jump to Func_3eb01 (3eb01 (f:6b01))
+    ld hl,LoadEnemyMonData
+    ld b,BANK(LoadEnemyMonData)
+    call Bankswitch ; indirect jump to LoadEnemyMonData (3eb01 (f:6b01))
     jr .asm_58daa
 .asm_58df5
     ld hl,UnnamedText_58e45 ; $4e45
@@ -92235,9 +92323,9 @@ Func_58d99: ; 58d99 (16:4d99)
     call PrintText
     ld hl,UnnamedText_58e4f ; $4e4f
     call PrintText
-    ld hl,Func_3eb01
-    ld b,BANK(Func_3eb01)
-    call Bankswitch ; indirect jump to Func_3eb01 (3eb01 (f:6b01))
+    ld hl,LoadEnemyMonData
+    ld b,BANK(LoadEnemyMonData)
+    call Bankswitch ; indirect jump to LoadEnemyMonData (3eb01 (f:6b01))
     ld hl,Func_708ca
     ld b,BANK(Func_708ca)
     call Bankswitch ; indirect jump to Func_708ca (708ca (1c:48ca))
@@ -109193,7 +109281,7 @@ GetPalCommon:
 
 HackForInsertDVInHallOfFameDataFirstStep:
     ld a,[$cd3e] ; Pokemon Party Order
-    ld hl,W_PARTYMON1_IV ; $d18c
+    ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
     call IsShiny
@@ -109448,8 +109536,8 @@ PlaceStringAndGenderSymbol:
     call PlaceString
     ld a,[wWhichTrade]
     ld [$d11e],a
-    ld b,BANK(GetGender_D11E_HallOfFame)
-    ld hl,GetGender_D11E_HallOfFame
+    ld b,BANK(GetGender_D11E_HallOfFameOrRenameScreen)
+    ld hl,GetGender_D11E_HallOfFameOrRenameScreen
     call Bankswitch
     jr c,.Genderless
     FuncCoord 10,11
@@ -121233,7 +121321,7 @@ CheckShinyDuringEvolution:
     push af
     push bc
     ld a,[wWhichPokemon] ; $cf92
-    ld hl,W_PARTYMON1_IV ; $d18c
+    ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
     call IsShiny
@@ -137285,7 +137373,7 @@ _DrawCatchGender: ; Denim
     db $F5,$50
 
 ; $d11e = Pokemon ID
-GetGender_D11E_HallOfFame:
+GetGender_D11E_HallOfFameOrRenameScreen:
     ld hl,wFlagGenderFromHallOFBit7
     set 7,[hl]
     jr GetGender_D11E
