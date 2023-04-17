@@ -15368,9 +15368,9 @@ LoadRenameScreen: ; 6596 (1:6596)
     call GoPAL_SET
     call LoadHpBarAndStatusTilePatterns
     call Func_675b
-    ld b,BANK(Func_7176c)
-    ld hl,Func_7176c
-    call Bankswitch ; indirect jump to Func_7176c (7176c (1c:576c))
+    ld b,BANK(LoadMonPartySpriteGfx)
+    ld hl,LoadMonPartySpriteGfx
+    call Bankswitch ; indirect jump to LoadMonPartySpriteGfx (7176c (1c:576c))
     FuncCoord 0,4 ; $c3f0
     ld hl,Coord
     ld b,$9
@@ -15748,9 +15748,9 @@ Func_68f8: ; 68f8 (1:68f8)
     ld a,[$cf91]
     ld [$cd5d],a
     push af
-    ld b,BANK(Func_71882)
-    ld hl,Func_71882
-    call Bankswitch ; indirect jump to Func_71882 (71882 (1c:5882))
+    ld b,BANK(WriteMonPartySpriteOAMBySpecies)
+    ld hl,WriteMonPartySpriteOAMBySpecies
+    call Bankswitch ; indirect jump to WriteMonPartySpriteOAMBySpecies (71882 (1c:5882))
     pop af
     ld [$d11e],a
     call GetMonName
@@ -18493,11 +18493,11 @@ SearchFieldMoveInAttack:
 ; dell'immagine MonOwSprite
 StoreCatchPkmnIdAndFlagBeforeRename: ; Denim
     push hl
-    ld hl,wRenamedPokemonIdFlag
+    ld hl,wSpriteOAMBySpecies
     set 0,[hl]
     inc hl
     ld a,[$d11e]
-    ld [hl],a ; wRenamedPokemonId
+    ld [hl],a ; wSpriteOAMBySpeciesId
     pop hl
     jp LoadRenameScreen
 
@@ -72676,8 +72676,8 @@ PointerTable_4115f: ; 4115f (10:515f)
     dw Func_41298
     dw Func_412d2
     dw Func_41336
-    dw Func_41376
-    dw Func_413c6
+    dw Trade_AnimLeftToRight
+    dw Trade_AnimRightToLeft
     dw Func_41181
     dw Func_415c8
     dw Func_415fe
@@ -72754,12 +72754,12 @@ Func_411a1: ; 411a1 (10:51a1)
     ld [$d11e],a
     jp GetMonName
 
-Func_4120b: ; 4120b (10:520b)
+Trade_LoadMonPartySpriteGfx: ; 4120b (10:520b)
     ld a,$d0
     ld [rOBP1],a ; $FF00+$49
-    ld b,BANK(Func_7176c)
-    ld hl,Func_7176c
-    jp Bankswitch ; indirect jump to Func_7176c (7176c (1c:576c))
+    ld b,BANK(LoadMonPartySpriteGfx)
+    ld hl,LoadMonPartySpriteGfx
+    jp Bankswitch ; indirect jump to LoadMonPartySpriteGfx (7176c (1c:576c))
 
 Func_41217: ; 41217 (10:5217)
     ld hl,W_PLAYERNAME
@@ -72935,8 +72935,8 @@ Func_41336: ; 41336 (10:5336)
     call ClearScreenArea
     jp Func_4164c
 
-Func_41376: ; 41376 (10:5376)
-    call Func_41411
+Trade_AnimLeftToRight: ; 41376 (10:5376)
+    call StoreTradeLeftToRightPkmnIdAndInitGameboyTransferGfx ; call Trade_InitGameboyTransferGfx
     ld a,$1
     ld [$d08a],a
     ld a,$e4
@@ -72968,8 +72968,8 @@ Func_41376: ; 41376 (10:5376)
     call Func_41525
     jp CleanLCD_OAM
 
-Func_413c6: ; 413c6 (10:53c6)
-    call Func_41411
+Trade_AnimRightToLeft: ; 413c6 (10:53c6)
+    call StoreTradeRightToLeftPkmnIdAndInitGameboyTransferGfx ; call Trade_InitGameboyTransferGfx
     xor a
     ld [$d08a],a
     ld a,$64
@@ -72999,13 +72999,13 @@ Func_413c6: ; 413c6 (10:53c6)
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     jp CleanLCD_OAM
 
-Func_41411: ; 41411 (10:5411)
+Trade_InitGameboyTransferGfx: ; 41411 (10:5411)
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     call ClearScreen
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    call Func_4120b
+    call Trade_LoadMonPartySpriteGfx
     call DelayFrame
     ld a,$ab
     ld [rLCDC],a ; $FF00+$40
@@ -73147,7 +73147,7 @@ Func_414e8: ; 414e8 (10:54e8)
     ld c,$14
 .asm_414f9
     ld a,[hl]
-    xor $40
+    xor 4 ; xor $40
     ld [hl],a
     add hl,de
     dec c
@@ -73158,9 +73158,9 @@ Func_414e8: ; 414e8 (10:54e8)
     ret
 
 Func_41505: ; 41505 (10:5505)
-    ld b,BANK(Func_71882)
-    ld hl,Func_71882
-    call Bankswitch ; indirect jump to Func_71882 (71882 (1c:5882))
+    ld b,BANK(WriteMonPartySpriteOAMBySpecies)
+    ld hl,WriteMonPartySpriteOAMBySpecies
+    call Bankswitch ; indirect jump to WriteMonPartySpriteOAMBySpecies (71882 (1c:5882))
     call Func_41558
 
 Func_41510: ; 41510 (10:5510)
@@ -73897,6 +73897,26 @@ CheckShinyDuringTradeInReceive:
     ld hl,$cfb3 ; TradeIn Enemy's Pkmn
     call IsShiny
     jp Func_415a4 ; Ricezione
+
+StoreTradeLeftToRightPkmnIdAndInitGameboyTransferGfx:
+    push hl
+    ld hl,wSpriteOAMBySpecies
+    set 0,[hl]
+    inc hl
+    ld a,[$cd5e]
+    ld [hl],a ; wSpriteOAMBySpeciesId
+    pop hl
+    jp Trade_InitGameboyTransferGfx
+
+StoreTradeRightToLeftPkmnIdAndInitGameboyTransferGfx:
+    push hl
+    ld hl,wSpriteOAMBySpecies
+    set 0,[hl]
+    inc hl
+    ld a,[$cd5f]
+    ld [hl],a ; wSpriteOAMBySpeciesId
+    pop hl
+    jp Trade_InitGameboyTransferGfx
 
 SECTION "bank11",ROMX,BANK[$11]
 
@@ -106740,7 +106760,7 @@ asm_7170a: ; 7170a (1c:570a)
 DataTable_71769: ; 71769 (1c:5769)
     db $05,$10,$20
 
-Func_7176c: ; 7176c (1c:576c)
+LoadMonPartySpriteGfx: ; 7176c (1c:576c)
     call CreateMonOvWorldSprInstruction
     ds 2 ; ld a,$1c
 
@@ -106967,7 +106987,7 @@ PlaceAppropriatePokemonIcon: ; 71868 (1c:5868)
     pop hl
     ret
 
-Func_71882: ; 71882 (1c:5882)
+WriteMonPartySpriteOAMBySpecies: ; 71882 (1c:5882)
     xor a
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     ld a,[$cd5d]
@@ -106975,7 +106995,7 @@ Func_71882: ; 71882 (1c:5882)
     ld [$cd5b],a
     jr Func_718c3
 
-Func_71890: ; 71890 (1c:5890)
+UnusedPartyMonSpriteFunction: ; 71890 (1c:5890)
     ld a,[$cf91]
     call IndexToMiniSpritePointer
     push af
@@ -106987,7 +107007,7 @@ Func_71890: ; 71890 (1c:5890)
     call Func_718ac
     xor a
     ld [$cd5d],a
-    jr Func_71882
+    jr WriteMonPartySpriteOAMBySpecies
 
 Func_718ac: ; 718ac (1c:58ac)
     push hl
@@ -109417,11 +109437,11 @@ SamePalette:
     db ARCANINE
 
 CreateMonOvWorldSprInstruction:
-    ld hl,wRenamedPokemonIdFlag
+    ld hl,wSpriteOAMBySpecies
     bit 0,[hl]
     jr z,.NoRename
     res 0,[hl]
-    inc hl ; hl point to wRenamedPokemonId
+    inc hl ; hl point to wSpriteOAMBySpeciesId
     ld a,1
     jr .StartCreation
 .NoRename
@@ -109502,7 +109522,50 @@ CreateMonOvWorldSprInstruction:
     jr nz,.Done
     inc a
 .Done
+    call AddTradeBaloonRule
     ld hl,wLocationMonOvSprInstruction
+    ret
+
+AddTradeBaloonRule:
+    push af
+    ;dw MonOverworldSprites + $100
+    ;db $40 / $10 ; $40 bytes
+    ;db BANK(MonOverworldSprites)
+    ;dw $8380
+    ld hl,wLocationMonOvSprInstruction
+    ld bc,$06
+    call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
+    ld a,(MonOverworldSprites + $100) % $100
+    ld [hli],a
+    ld a,(MonOverworldSprites + $100) / $100
+    ld [hli],a
+    ld a,$40 / $10 ; $40 bytes
+    ld [hli],a
+    ld a,BANK(MonOverworldSprites)
+    ld [hli],a
+    ld a,$80
+    ld [hli],a
+    ld a,$83
+    ld [hli],a
+    ;dw MonOverworldSprites + $140
+    ;db $40 / $10 ; $40 bytes
+    ;db BANK(MonOverworldSprites)
+    ;dw $8780
+    ld a,(MonOverworldSprites + $140) % $100
+    ld [hli],a
+    ld a,(MonOverworldSprites + $140) / $100
+    ld [hli],a
+    ld a,$40 / $10 ; $40 bytes
+    ld [hli],a
+    ld a,BANK(MonOverworldSprites)
+    ld [hli],a
+    ld a,$c0
+    ld [hli],a
+    ld a,$83
+    ld [hl],a
+    pop af
+    inc a
+    inc a
     ret
 
 ; Funzione che converte l'indice di un pokemon nel numero d'ordine del

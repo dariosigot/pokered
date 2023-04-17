@@ -1459,13 +1459,13 @@ wEXPBarNeededEXP:
     ds 3
 wEXPBarKeepFullFlag:
     ds 1
-    ds 36-11
+    ds 36-11+(2*6)
 wArrayMiniSpriteLoaded ; df14 ; Denim
     ds 6
-wRenamedPokemonIdFlag ; df1a ; Denim
+wSpriteOAMBySpecies   ; df1a ; Denim
                       ; bit 0 = Flag Tentativo Rinomina
     ds 1
-wRenamedPokemonId ; df1b ; Denim
+wSpriteOAMBySpeciesId ; df1b ; Denim
     ds 1
 
 SECTION "wBlkCurrentPaletteColor", WRAMX[$df30], BANK[1] ; Denim
