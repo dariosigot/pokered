@@ -1446,22 +1446,20 @@ W_BOXMON2DATA: ; dab7
 
 ; dd2a
 
-; Denim, ExpBar
-wEXPBarPixelLength: ; dd2a
-    ds 1
-wEXPBarBaseEXP: ; dd2b
-    ds 3
-wEXPBarCurEXP: ; dd2e
-    ds 3
-wEXPBarNeededEXP: ; dd31
-    ds 3
-wEXPBarKeepFullFlag: ; dd34
-    ds 1
-
 SECTION "wLocationMonOvSprInstruction", WRAMX[$def0], BANK[1]
 
 wLocationMonOvSprInstruction: ; def0 ; Denim
-    ds 36
+wEXPBarPixelLength: ; def0 ; Denim, ExpBar
+    ds 1
+wEXPBarBaseEXP:
+    ds 3
+wEXPBarCurEXP:
+    ds 3
+wEXPBarNeededEXP:
+    ds 3
+wEXPBarKeepFullFlag:
+    ds 1
+    ds 36-11
 wArrayMiniSpriteLoaded ; df14 ; Denim
     ds 6
 wRenamedPokemonIdFlag ; df1a ; Denim
