@@ -9037,7 +9037,10 @@ LoadHpBarAndStatusTilePatterns: ; 36c0 (0:36c0)
     ld de,EXPBarGraphics
     ld hl,$8c00
     ld bc,(BANK(EXPBarGraphics) << 8 | $A)
-    jp GoodCopyVideoData
+    call GoodCopyVideoData
+    ld hl,LoadHeldItemAndShinyStarIcon
+    ld b,BANK(LoadHeldItemAndShinyStarIcon)
+    jp Bankswitch
 
 SECTION "FillMemory",ROM0[$36e0]
 
@@ -106734,7 +106737,7 @@ DataTable_71769: ; 71769 (1c:5769)
     db $05,$10,$20
 
 Func_7176c: ; 7176c (1c:576c)
-    call CreateMonOvWorldSprInstructionAndNewVRAMIcon ; Denim ;     ld hl,MonOverworldSpritePointers ; $57c0
+    call CreateMonOvWorldSprInstruction
     ds 2 ; ld a,$1c
 
 Func_71771: ; 71771 (1c:5771)
@@ -106768,7 +106771,7 @@ Func_71771: ; 71771 (1c:5771)
 
 Func_71791: ; 71791 (1c:5791)
     call DisableLCD
-    call CreateMonOvWorldSprInstructionAndNewVRAMIcon ; Denim ; ld hl,MonOverworldSpritePointers ; $57c0
+    call CreateMonOvWorldSprInstruction
     ds 2 ; ld a,$1c
     ld bc,$0
 .asm_7179c
@@ -106987,7 +106990,7 @@ Func_718ac: ; 718ac (1c:58ac)
     add a
     ld c,a
     ld b,$0
-    call CreateMonOvWorldSprInstructionAndNewVRAMIcon ; Denim ; ld hl,MonOverworldSpritePointers ; $57c0
+    call CreateMonOvWorldSprInstruction
     add hl,bc
     add hl,bc
     add hl,bc
@@ -109416,13 +109419,7 @@ SamePalette:
     db WIGGLYTUFF
     db ARCANINE
 
-CreateMonOvWorldSprInstructionAndNewVRAMIcon:
-
-    ld de,HeldItemIcon
-    ld hl,$8d00
-    ld bc,(BANK(HeldItemIcon) << 8 | $2) ; Also Shiny Star
-    call GoodCopyVideoData
-
+CreateMonOvWorldSprInstruction:
     ld hl,wRenamedPokemonIdFlag
     bit 0,[hl]
     jr z,.NoRename
@@ -137295,6 +137292,12 @@ SelectInOverWorld:
     call DisplayTextID
 .return
     jp OverworldLoop
+
+LoadHeldItemAndShinyStarIcon:
+    ld de,HeldItemIcon
+    ld hl,$8d00
+    ld bc,(BANK(HeldItemIcon) << 8 | $2) ; Also Shiny Star
+    jp GoodCopyVideoData
 
 SECTION "bank32",ROMX,BANK[$32]
 
