@@ -3584,6 +3584,14 @@ UncompressMonSprite: ; 1627 (0:1627) ; Denim,completamente ristrutturato
 .End
     jp UncompressSpriteData
 
+CheckCyclingRoad:
+    and a
+    ret z
+    ld a,[$d732]
+    bit 5,a
+    ld a,(Music_BikeRiding - $4000) / 3
+    ret
+
 ; ds X ; Denim ; some free Bytes
 
 SECTION "LoadMonFrontSprite",ROM0[$1665] ; Denim
@@ -5874,15 +5882,14 @@ Func_2312: ; 2312 (0:2312)
     ld d,c
 asm_2324: ; 2324 (0:2324)
     ld a,[$d700]
-    and a
-    jr z,.asm_2343
     cp $2
-    jr z,.asm_2332
-    ld a,(Music_BikeRiding - $4000) / 3
-    jr .asm_2334
-.asm_2332
+    jr z,.surfing
+    call CheckCyclingRoad
+    jr z,.walking
+    jr .Continue
+.surfing
     ld a,(Music_Surfing - $4000) / 3
-.asm_2334
+.Continue    
     ld b,a
     ld a,d
     and a
@@ -5892,7 +5899,7 @@ asm_2324: ; 2324 (0:2324)
 .asm_233e
     ld [$c0f0],a
     jr .asm_234c
-.asm_2343
+.walking
     ld a,[$d35b]
     ld b,a
     call Func_2385
@@ -27236,7 +27243,7 @@ ItemUseBicycle: ; d977 (3:5977)
     call ItemUseReloadOverworldData
     xor a
     ld [$d700],a ; change player state to walking
-    call Func_2307 ; play walking music
+    ds 3 ; call Func_2307 ; play walking music
     ld hl,GotOffBicycleText
     jr .printText
 .tryToGetOnBike
@@ -27248,7 +27255,7 @@ ItemUseBicycle: ; d977 (3:5977)
     inc a
     ld [$d700],a ; change player state to bicycling
     ld hl,GotOnBicycleText
-    call Func_2307 ; play bike riding music
+    ds 3 ; call Func_2307 ; play bike riding music
 .printText
     jp PrintText
 
@@ -137327,6 +137334,10 @@ SelectInOverWorld:
     ld b,BICYCLE
     call IsItemInBag
     jr z,.return
+    ld a,[$d732]
+    bit 5,a
+    jr nz,.return
+.Continue
     ; initialize a text box without drawing anything special
     ld a,1
     ld [$cf0c],a
