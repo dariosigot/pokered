@@ -69,8 +69,18 @@ ResetTempIV:
 ; interrupts
 SECTION "vblank",ROM0[$40]
     jp VBlankHandler
-SECTION "lcdc",ROM0[$48]
-    db $FF
+
+SetTempIV:
+    push af
+    ld a,[hli]
+    ld [wDVForShinyAtkDef],a
+    ld a,[hld]
+    ld [wDVForShinySpdSpc],a
+    pop af
+    ret
+
+;SECTION "lcdc",ROM0[$48]
+;    db $FF
 SECTION "timer",ROM0[$50]
     jp TimerHandler
 SECTION "serial",ROM0[$58]
@@ -10729,18 +10739,24 @@ TrySpeedB:
 IsShiny:
     push hl
     push af
-    ld a,[hli] ; Controllo IV Atk/Def ; Controllo IV Atk,Shiny se IV Atk = 2,3,6,7,10,11,14 o 15
-    and %00101111 ; Shiny se bit 5 di a settato,gli altri bit dell'atk non contano,applico maschera
-    cp a,%00101010
-    jr nz,.End
-    ld a,[hl] ; Controllo IV Spd/Spc
-    cp a,%10101010
+    call CheckShiny
     jr nz,.End
     ld hl,wFlagShinyBit2
     set 2,[hl]
 .End
     pop af
     pop hl
+    ret
+
+; INPUT hl = giusto indirizzo degli IV del pokemon interessato
+; OUTPUT z = set if Shiny
+CheckShiny:
+    ld a,[hli] ; Controllo IV Atk/Def ; Controllo IV Atk,Shiny se IV Atk = 2,3,6,7,10,11,14 o 15
+    and %00101111 ; Shiny se bit 5 di a settato,gli altri bit dell'atk non contano,applico maschera
+    cp a,%00101010
+    ret nz
+    ld a,[hld] ; Controllo IV Spd/Spc
+    cp a,%10101010
     ret
 
 GoodCopyVideoData: ; Denim,ExpBar
@@ -18430,10 +18446,7 @@ HackForBackupDVDuringTradeIn:
     ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
-    ld a,[hli]
-    ld [wDVForShinyAtkDef],a ; DV Atk/Def
-    ld a,[hl]
-    ld [wDVForShinySpdSpc],a ; DV Spd/Spc
+    call SetTempIV
     pop af
     jp RemovePokemon
 
@@ -18494,10 +18507,7 @@ InsertIVDuringNameRater:
     ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
-    ld a,[hli]
-    ld [wDVForShinyAtkDef],a ; DV Atk/Def
-    ld a,[hl]
-    ld [wDVForShinySpdSpc],a ; DV Spd/Spc
+    call SetTempIV
     pop hl
     call LoadRenameScreen
     jp ResetTempIV
@@ -18506,8 +18516,8 @@ PrintGenderInRenameScreen:
     add hl,bc
     push bc
     push hl ; Backup Coord
-    ld b,BANK(GetGender_D11E_HallOfFameOrRenameScreen)
-    ld hl,GetGender_D11E_HallOfFameOrRenameScreen
+    ld b,BANK(GetGender)
+    ld hl,GetGender
     call Bankswitch
     ld a,$7F ; Blank
     jr c,.End ; Genderless
@@ -18525,16 +18535,16 @@ InsertIVAndLoadTextCoord:
     ld hl,wDVForShinyAtkDef
     ld a,[W_ISINBATTLE] ; $d057
     and a
-    jr nz,.copyEnemyMonDataDuringBattle
+    jr nz,.copyEnemyMonData
     ld a,[wFlagAddPkmnToPartyBit0]
     bit 0,a
-    jr z,.copyEnemyMonDataDuringBattle
+    jr z,.copyEnemyMonData
     call GenRandom
     ld [hli],a
     call GenRandom
     ld [hl],a
     jr .Done
-.copyEnemyMonDataDuringBattle
+.copyEnemyMonData
     ld a,[W_ENEMYMONATKDEFIV]
     ld [hli],a
     ld a,[W_ENEMYMONSPDSPCIV]
@@ -30653,7 +30663,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld a,[W_ISINBATTLE] ; $d057
     and a
     jr nz,.copyEnemyMonData
-    ld a,[wDVForShinySpdSpc] ; call GenRandom     ; generate random IVs
+    ld a,[wDVForShinySpdSpc] ; call GenRandom
     ld b,a
     ld a,[wDVForShinyAtkDef] ; call GenRandom
 .writeFreshMonData ; f3b3
@@ -32077,14 +32087,12 @@ UnnamedText_fc45: ; fc45 (3:7c45)
     db "@"
 
 ResetIVAndCheckIsInBattle:
-    call ResetTempIV
     ld a,[W_ISINBATTLE] ; $d057
-    ret
+    jp ResetTempIV
 
 ResetIvAndLoadHl:
-    call ResetTempIV
     ld hl,W_ENEMYMONPP ; $cffe
-    ret
+    jp ResetTempIV
 
 SetFlagAndAskForMonNickname:
     push hl
@@ -34503,11 +34511,14 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     ld de,IDNoText
     call PlaceString ; "ID/OT"
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ld hl,$cfb3 ; .OutOfBattle
+    call SetTempIV
     ld a,[$cf98] ; Pokemon ID
     ld [$d11e],a
-    ld hl,GetGender_D11E_StatsScreen
-    ld b,BANK(GetGender_D11E_StatsScreen)
+    ld hl,GetGender
+    ld b,BANK(GetGender)
     call Bankswitch
+    call ResetTempIV
     jr c,.Genderless
     FuncCoord 17,2
     ld hl,Coord
@@ -34524,12 +34535,7 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     cp $FF
     jr z,.noShiny
     ld hl,$cfb3 ; .OutOfBattle
-    ld a,[hli] ; Controllo IV Atk/Def ; Controllo IV Atk,Shiny se IV Atk = 2,3,6,7,10,11,14 o 15
-    and %00101111 ; Shiny se bit 5 di a settato,gli altri bit dell'atk non contano,applico maschera
-    cp a,%00101010
-    ld a,[hl] ; Controllo IV Spd/Spc
-    jr nz,.noShiny
-    cp a,%10101010
+    call CheckShiny
     jr nz,.noShiny
     FuncCoord 6,7
     ld hl,Coord
@@ -73883,9 +73889,7 @@ CheckShinyDuringTradeInSend:
     push af
     ld hl,wDVForShinyAtkDef
     call IsShiny
-    xor a
-    ld [hli],a
-    ld [hl],a
+    call ResetTempIV
     pop af
     jp Func_415a4 ; Invio
 
@@ -109297,10 +109301,7 @@ HackForInsertDVInHallOfFameDataFirstStep:
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
     call IsShiny
-    ld a,[hli]
-    ld [wDVForShinyAtkDef],a ; DV Atk/Def
-    ld a,[hl]
-    ld [wDVForShinySpdSpc],a ; DV Spd/Spc
+    call SetTempIV
     jp Func_70278
 
 HackForInsertDVInHallOfFameDataSecondStep:
@@ -109311,11 +109312,7 @@ HackForInsertDVInHallOfFameDataSecondStep:
     ld [hli],a
     ld a,[wDVForShinySpdSpc] ; DV Spd/Spc
     ld [hl],a
-    ld hl,wDVForShinyAtkDef
-    xor a
-    ld [hli],a
-    ld [hl],a
-    ret
+    jp ResetTempIV
 
 SAME_PALETTE EQU 19
 
@@ -109542,8 +109539,8 @@ PlaceStringAndGenderSymbol:
     call PlaceString
     ld a,[wWhichTrade]
     ld [$d11e],a
-    ld b,BANK(GetGender_D11E_HallOfFameOrRenameScreen)
-    ld hl,GetGender_D11E_HallOfFameOrRenameScreen
+    ld b,BANK(GetGender)
+    ld hl,GetGender
     call Bankswitch
     jr c,.Genderless
     FuncCoord 10,11
@@ -114371,18 +114368,11 @@ Func_76857: ; 76857 (1d:6857)
 CheckShinyFromHallOfFameData:
     call CopyData
     call IsShiny
-    ld a,[hli]
-    ld [wDVForShinyAtkDef],a
-    ld a,[hl]
-    ld [wDVForShinySpdSpc],a
-    ret
+    jp SetTempIV
 
-BankswitchAndRemoveIVFromCheckShinyArea
+BankswitchAndRemoveIVFromCheckShinyArea:
     call Bankswitch
-    xor a
-    ld [wDVForShinyAtkDef],a
-    ld [wDVForShinySpdSpc],a
-    ret
+    jp ResetTempIV
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -137365,8 +137355,12 @@ _DrawCatchGender: ; Denim
     ld de,.PokeBallCatchFlagIcon
     call PlaceString
 .gender
+    ld hl,$cff1 ; .FrontSpriteInBattle
+    call SetTempIV
     ld a,[W_ENEMYMONID]
+    ld [$d11e],a
     call GetGender
+    call ResetTempIV
     jr c,.Genderless
     FuncCoord 8,1 ; 1 px più a destra causa status (PSN/PAR/...) che sovrascriverebbe
     ld hl,Coord
@@ -137384,17 +137378,12 @@ _DrawCatchGender: ; Denim
 .FemaleIcon
     db $F5,$50
 
+; INPUT :
 ; $d11e = Pokemon ID
-GetGender_D11E_HallOfFameOrRenameScreen:
-    ld hl,wFlagGenderFromHallOFBit7
-    set 7,[hl]
-    jr GetGender_D11E
-GetGender_D11E_StatsScreen:
-    ld hl,wFlagGenderFromStatsBit3
-    set 3,[hl]
-GetGender_D11E:
-    ld a,[$d11e]
+; wDVForShinyAtkDef = ATK/DEF
+; wDVForShinySpdSpc = SPD/SPC
 GetGender:
+    ld a,[$d11e]
     and a
     jr z,.Genderless
     cp CHARIZARD_M
@@ -137443,7 +137432,7 @@ GetGender:
     add hl,de
     ld a,[hl]
     push af
-    call DetermineIVPointer
+    ld hl,wDVForShinyAtkDef
     ld a,[hli]
     and a,$F0
     ld b,a
@@ -137464,20 +137453,6 @@ GetGender:
     ret
 .Genderless
     scf
-    ret
-
-DetermineIVPointer:
-    ld hl,wFlagGenderFromStatsBit3
-    bit 3,[hl]
-    res 3,[hl]
-    ld hl,$cfb3 ; .OutOfBattle
-    ret nz
-    ld hl,wFlagGenderFromHallOFBit7
-    bit 7,[hl]
-    res 7,[hl]
-    ld hl,wDVForShinyAtkDef ; .HallOfFame
-    ret nz
-    ld hl,$cff1 ; .FrontSpriteInBattle
     ret
 
 IsInTable:
