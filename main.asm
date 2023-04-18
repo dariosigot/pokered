@@ -137527,8 +137527,15 @@ _DrawCatchGender: ; Denim
     ld de,.PokeBallCatchFlagIcon
     call PlaceString
 .gender
-    ld hl,$cff1 ; .FrontSpriteInBattle
+    ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
+    call CheckShiny
     call SetTempIV
+    jr nz,.NoShiny
+    FuncCoord 1,1
+    ld hl,Coord
+    ld de,.ShinyStarIcon
+    call PlaceString
+.NoShiny
     ld a,[W_ENEMYMONID]
     ld [$d11e],a
     call GetGender
@@ -137549,6 +137556,8 @@ _DrawCatchGender: ; Denim
     db $EF,$50
 .FemaleIcon
     db $F5,$50
+.ShinyStarIcon
+    db $D1,$50
 
 ; INPUT :
 ; $d11e = Pokemon ID
