@@ -380,7 +380,7 @@ MapHeaderPointers: ; 01ae (0:01ae)
     dw SSAnne8_h
     dw SSAnne9_h
     dw SSAnne10_h
-    dw Lance_h ; unused
+    dw DratiniCave_h
     dw Lance_h ; unused
     dw Lance_h ; unused
     dw VictoryRoad1_h
@@ -10740,9 +10740,9 @@ TrySpeedB:
     jp AdvancePlayerSprite ; Speed 2X
 
 ; INPUT hl = giusto indirizzo degli IV del pokemon interessato
-; $cff1 ; .Front
-; $d020 ; .Back
-; $cfb3 ; .OutOfBattle
+; W_ENEMYMONATKDEFIV ; .Front
+; W_PLAYERMONIVS     ; .Back
+; $cfb3              ; .OutOfBattle
 IsShiny:
     push hl
     push af
@@ -20746,8 +20746,8 @@ MapSongBanks: ; c04d (3:404d)
     db BANK(Music_SSAnne) ; SSAnne9
     db (Music_SSAnne - $4000) / 3
     db BANK(Music_SSAnne) ; SSAnne10
-    db (Music_Dungeon2 - $4000) / 3
-    db BANK(Music_Dungeon2) ;unused
+    db (Music_SSAnne - $4000) / 3
+    db BANK(Music_SSAnne) ;DratiniCave
     db (Music_Dungeon2 - $4000) / 3
     db BANK(Music_Dungeon2) ;unused
     db (Music_SSAnne - $4000) / 3
@@ -21140,7 +21140,7 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(SSAnne8_h)
     db BANK(SSAnne9_h)
     db BANK(SSAnne10_h)
-    db $1D ;unused
+    db BANK(DratiniCave_h)
     db $1D ;unused
     db $1D ;unused
     db BANK(VictoryRoad1_h)
@@ -22196,7 +22196,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHS66
     dw MapHS67
     dw MapHS68
-    dw MapHSXX
+    dw MapHS69
     dw MapHSXX
     dw MapHSXX
     dw MapHS6C
@@ -22659,16 +22659,14 @@ MapHSA2: ; cd8d (3:4d8d)
     db SEAFOAM_ISLANDS_5,$01,Hide
     db SEAFOAM_ISLANDS_5,$02,Hide
     db SEAFOAM_ISLANDS_5,$03,Show
+MapHS69:
+    db DRATINI_CAVE,$01,Show
 
     db $FF,$01,Show
 
-Func_cd99: ; cd99 (3:4d99)
-    ld hl,$d728
-    set 0,[hl]
-    ld hl,UsedStrengthText ; $4daa
-    call PrintText
-    ld hl,UnnamedText_cdbb ; $4dbb
-    jp PrintText
+Func_cd99_Old:
+
+SECTION "UsedStrengthText",ROMX[$4daa],BANK[$3]
 
 UsedStrengthText: ; cdaa (3:4daa)
     TX_FAR _UsedStrengthText
@@ -32113,6 +32111,14 @@ SetFlagAndAskForMonNickname:
     pop hl
     ret
 
+Func_cd99: ; xxxx (3:xxxx) ; Spostato a Fine BANK
+    ld hl,$d728
+    set 0,[hl]
+    ld hl,UsedStrengthText ; $4daa
+    call PrintText
+    ld hl,UnnamedText_cdbb ; $4dbb
+    jp PrintText
+
 SECTION "bank4",ROMX,BANK[$4]
 
 OakAideSprite: ; 10000 (4:4000)
@@ -35587,10 +35593,10 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $c0 ; byte count
     db BANK(GuardSprite)
 
-    ; $32
-    dw GuardSprite
+    ; SPRITE_DRATINI
+    dw DratiniOverworld
     db $c0 ; byte count
-    db BANK(GuardSprite)
+    db BANK(DratiniOverworld)
 
     ; SPRITE_MOM
     dw MomSprite
@@ -67433,9 +67439,9 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     jr z,.asm_3eb33
     call GenRandomInBattle
     ld b,a
-    call GenRandomInBattle
+    call IsDratiniOrRandom ; call GenRandomInBattle
 .asm_3eb33
-    ld hl,$cff1
+    ld hl,W_ENEMYMONATKDEFIV
     ld [hli],a
     ld [hl],b
     ld de,W_ENEMYMONLEVEL ; $cff3
@@ -70484,6 +70490,14 @@ BattleMonPartyAttr:
     ld a,[wPlayerMonNumber]
     ld bc,W_PARTYMON2DATA - W_PARTYMON1DATA
     jp AddNTimes
+
+IsDratiniOrRandom:
+    ld a,[W_CURMAP]
+    cp DRATINI_CAVE
+    jp nz, GenRandomInBattle
+    ld b,$AA
+    ld a,$FA ; Rendere l'attacco casuale tra i valori Shiny Disponibili
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -81515,12 +81529,13 @@ Route12GateText1: ; 49509 (12:5509)
 Route12GateObject: ; 0x4950e (size=50)
     db $a ; border tile
 
-    db $5 ; warps
+    db $6 ; warps
     db $0,$4,$0,$ff
     db $0,$5,$1,$ff
     db $7,$4,$2,$ff
     db $7,$5,$2,$ff
     db $6,$8,$0,ROUTE_12_GATE_2F
+    db $4,$9,$0,DRATINI_CAVE
 
     db $0 ; signs
 
@@ -81533,9 +81548,11 @@ Route12GateObject: ; 0x4950e (size=50)
     EVENT_DISP $5,$7,$4
     EVENT_DISP $5,$7,$5
     EVENT_DISP $5,$6,$8 ; ROUTE_12_GATE_2F
+    EVENT_DISP $5,$4,$9 ; DRATINI_CAVE
 
-Route12GateBlocks: ; 49540 (12:5540)
-    INCBIN "maps/route12gate.blk"
+Route12GateBlocks_Bck:
+
+SECTION "Route12GateUpstairs_h",ROMX[$5554],BANK[$12]
 
 Route12GateUpstairs_h: ; 0x49554 to 0x49560 (12 bytes) (id=195)
     db $0c ; tileset
@@ -83052,6 +83069,9 @@ SafariZoneSecretHouseObject: ; 0x4a365 (size=26)
 
 SafariZoneSecretHouseBlocks: ; 4a37f (12:637f)
     INCBIN "maps/safarizonesecrethouse.blk"
+
+Route12GateBlocks: ; xxxxx (12:xxxx) ; Spostato a Fine Bank
+    INCBIN "maps/route12gate.blk"
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -106508,6 +106528,7 @@ InternalMapEntries: ; 71382 (1c:5382)
     IMAP $59,$C,$0,SeaCottageName
     IMAP $5F,$A,$9,VermilionCityName
     IMAP $69,$9,$A,SSAnneName
+    IMAP $70,$E,$7,Route12Name
     IMAP $6D,$0,$4,VictoryRoadName
     IMAP $77,$0,$2,PokemonLeagueName
     IMAP $78,$A,$5,UndergroundPathName
@@ -106658,8 +106679,9 @@ CeruleanCaveName: ; 716a4 (1c:56a4)
 PowerPlantName: ; 716b2 (1c:56b2)
     db "POWER PLANT@"
 
-MonNestIcon: ; 716be (1c:56be)
-    INCBIN "gfx/mon_nest_icon.1bpp"
+MonNestIcon_Bck:
+
+SECTION "Func_716c6",ROMX[$56c6],BANK[$1c]
 
 Func_716c6: ; 716c6 (1c:56c6)
     ld a,[W_SUBANIMTRANSFORM] ; $d08b
@@ -109303,14 +109325,14 @@ CheckShinyFrontAndGetPAL:
     jr z,.NoTransform
     ld a,[$cfe5]
 .NoTransform
-    ld hl,$cff1
+    ld hl,W_ENEMYMONATKDEFIV
     jr GetPalCommon
 
 CheckShinyBackAndGetPAL:
     push hl
     ld hl,wFlagBackFrontSpriteBit56
     set 5,[hl]
-    ld hl,$d020
+    ld hl,W_PLAYERMONIVS
     jr GetPalCommon
 
 CheckShinyAndGetPAL:
@@ -109626,6 +109648,9 @@ PlaceStringAndGenderSymbol:
     db $EF,$50
 .FemaleIcon
     db $F5,$50
+
+MonNestIcon: ; xxxxx (1c:xxxx) ; Spostato a Fine Bank
+    INCBIN "gfx/mon_nest_icon.1bpp"
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
@@ -137401,6 +137426,79 @@ MewBaseStats: ; 425b (1:425b)
     db %11111111
 
     db BANK(MewPicFront)
+
+DratiniOverworld:
+    INCBIN "gfx/denim/dratini.2bpp"
+
+DratiniCave_h:
+    db $0d ; tileset
+    db DRATINI_CAVE_HEIGHT,DRATINI_CAVE_WIDTH ; dimensions (y,x)
+    dw DratiniCaveBlocks,DratiniCaveTextPointers,DratiniCaveScript ; blocks,texts,scripts
+    db $00 ; connections
+    dw DratiniCaveObject ; objects
+
+DratiniCaveScript:
+    call EnableAutoTextBoxDrawing
+    ld hl,DratiniCaveTrainerHeaders
+    ld de,DratiniCaveScriptPointers
+    ld a,[W_DRATINICAVECURSCRIPT]
+    call ExecuteCurMapScriptInTable
+    ld [W_DRATINICAVECURSCRIPT],a
+    ret
+
+DratiniCaveScriptPointers:
+    dw CheckFightingMapTrainers
+    dw Func_324c
+    dw EndTrainerBattle
+
+DratiniCaveTextPointers:
+    dw DratiniCaveText1
+
+DratiniCaveTrainerHeaders:
+DratiniCaveTrainerHeader0:
+    db $1 ; flag's bit
+    db ($0 << 4) ; trainer's view range
+    dw wFlagDratiniCaveBit1 ; flag's byte
+    dw DratiniCaveDratiniText ; TextBeforeBattle
+    dw DratiniCaveDratiniText ; TextAfterBattle
+    dw DratiniCaveDratiniText ; TextEndBattle
+    dw DratiniCaveDratiniText ; TextEndBattle
+
+    db $ff
+
+DratiniCaveText1:
+    db $08 ; asm
+    ld hl,DratiniCaveTrainerHeader0
+    call TalkToTrainer
+    jp TextScriptEnd
+
+DratiniCaveDratiniText:
+    TX_FAR _DratiniCaveDratiniText
+    db $8
+    ld a,DRATINI
+    call PlayCry
+    call WaitForSoundToFinish
+    jp TextScriptEnd
+
+_DratiniCaveDratiniText:
+    db $0,"Truiuo!@@"
+
+DratiniCaveObject:
+    db $0c ; border tile
+
+    db $1 ; warps
+    db $0F,$1B,$5,ROUTE_12_GATE
+
+    db $0 ; signs
+
+    db $1 ; people
+    db SPRITE_DRATINI,$d + 4,$1a + 4,$ff,$d0,$41,DRATINI,12 ; trainer
+
+    ; warp-to
+    EVENT_DISP $f,$0F,$1B ; ROUTE_12_GATE
+
+DratiniCaveBlocks:
+    INCBIN "maps/dratinicave.blk"
 
 SECTION "bank33",ROMX,BANK[$33] ; Denim,GENDER
 

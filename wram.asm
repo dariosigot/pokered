@@ -1300,8 +1300,10 @@ W_SEAFOAMISLANDS5CURSCRIPT: ; d668
     ds 1
 W_ROUTE18GATECURSCRIPT: ; d669
     ds 1
+W_DRATINICAVECURSCRIPT: ; d66a
+    ds 1
 
-    ds 161
+    ds 161-1
 
 W_TOWNVISITEDFLAG: ; d70b
 ; 2 bytes bit array, 1 means visited
@@ -1503,6 +1505,7 @@ wDVForShinySpdSpc      ; df37
     ds 1
 
 wFlagAddPkmnToPartyBit0    ; df38 ; bit 0
+wFlagDratiniCaveBit1       ; df38 ; bit 1
     ds 1
 
 SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
