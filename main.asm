@@ -50442,7 +50442,7 @@ CharizardBaseStats: ; 3846a (e:446a)
     db %11001110
     db %11100011
     db %00001000
-    db %00100110
+    db %00101110
 
     db BANK(CharizardPicFront)
 
@@ -55733,7 +55733,7 @@ DragoniteBaseStats: ; 3940e (e:540e)
     db %11000001
     db %11100011
     db %00011000
-    db %00110010
+    db %00111010
 
     db BANK(DragonitePicFront)
 
@@ -59793,8 +59793,8 @@ Mon149_EvosMoves: ; 3b500 (e:7500)
 ;Learnset
     db 10,THUNDER_WAVE
     db 20,AGILITY
-    db 35,SLAM
-    db 45,DRAGON_RAGE
+    db 24,SLAM
+    db 43,DRAGON_RAGE
     db 60,HYPER_BEAM
     db 0
 
@@ -59987,26 +59987,26 @@ Mon167_EvosMoves: ; 3b5a6 (e:75a6)
 Mon147_EvosMoves: ; 3b5a8 (e:75a8)
 ;DRATINI
 ;Evolutions
-    db EV_LEVEL,30,DRAGONAIR
+    db EV_LEVEL,24,DRAGONAIR
     db 0
 ;Learnset
     db 10,THUNDER_WAVE
     db 20,AGILITY
-    db 30,SLAM
-    db 40,DRAGON_RAGE
-    db 50,HYPER_BEAM
+    db 24,SLAM
+    db 30,DRAGON_RAGE
+    db 40,HYPER_BEAM
     db 0
 Mon148_EvosMoves: ; 3b5b7 (e:75b7)
 ;DRAGONAIR
 ;Evolutions
-    db EV_LEVEL,55,DRAGONITE
+    db EV_LEVEL,43,DRAGONITE
     db 0
 ;Learnset
     db 10,THUNDER_WAVE
     db 20,AGILITY
-    db 35,SLAM
-    db 45,DRAGON_RAGE
-    db 55,HYPER_BEAM
+    db 24,SLAM
+    db 35,DRAGON_RAGE
+    db 43,HYPER_BEAM
     db 0
 Mon140_EvosMoves: ; 3b5c6 (e:75c6)
 ;KABUTO
@@ -60261,19 +60261,17 @@ Mon013_EvosMoves: ; 3b6e4 (e:76e4)
     db 0
 ;Learnset
     db 0
-Mon014_EvosMoves: ; 3b6e9 (e:76e9)
-;KAKUNA
-;Evolutions
-    db EV_LEVEL,10,BEEDRILL
-    db 0
-;Learnset
-    db 0
+
+Mon014_EvosMoves_Old:
+
+SECTION "Mon015_EvosMoves",ROMX[$76ee],BANK[$e]
+
 Mon015_EvosMoves: ; 3b6ee (e:76ee)
 ;BEEDRILL
 ;Evolutions
     db 0
 ;Learnset
-    db 12,FURY_ATTACK
+    db 10,FURY_ATTACK
     db 16,FOCUS_ENERGY
     db 20,TWINEEDLE
     db 25,RAGE
@@ -60365,19 +60363,17 @@ Mon010_EvosMoves: ; 3b742 (e:7742)
     db 0
 ;Learnset
     db 0
-Mon011_EvosMoves: ; 3b747 (e:7747)
-;METAPOD
-;Evolutions
-    db EV_LEVEL,10,BUTTERFREE
-    db 0
-;Learnset
-    db 0
+
+Mon011_EvosMoves_Old:
+
+SECTION "Mon012_EvosMoves",ROMX[$774c],BANK[$e]
+
 Mon012_EvosMoves: ; 3b74c (e:774c)
 ;BUTTERFREE
 ;Evolutions
     db 0
 ;Learnset
-    db 12,CONFUSION
+    db 10,CONFUSION
     db 15,POISONPOWDER
     db 16,STUN_SPORE
     db 17,SLEEP_POWDER
@@ -61372,6 +61368,24 @@ SetAttributeOamRedBall:
     ld a,3
     ld [hli],a
     ret
+
+Mon011_EvosMoves: ; xxxxx (e:xxxx) ; Spostato a Fine BANK
+;METAPOD
+;Evolutions
+    db EV_LEVEL,10,BUTTERFREE
+    db 0
+;Learnset
+    db 7,HARDEN
+    db 0
+
+Mon014_EvosMoves: ; 3b6e9 (e:76e9)
+;KAKUNA
+;Evolutions
+    db EV_LEVEL,10,BEEDRILL
+    db 0
+;Learnset
+    db 7,HARDEN
+    db 0
 
 SECTION "bankF",ROMX,BANK[$F]
 
