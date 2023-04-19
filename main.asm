@@ -33154,7 +33154,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     dw .softboiled
 .fly
     bit 2,a ; does the player have the Thunder Badge?
-    jp z,.newBadgeRequired
+    call CheckAirPower ; jp z,.newBadgeRequired
     call CheckIfInOutsideMap
     jr z,.canFly
     ld a,[$cf92]
@@ -33174,7 +33174,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jp StartMenu_Pokemon
 .cut
     bit 1,a ; does the player have the Cascade Badge?
-    jp z,.newBadgeRequired
+    call CheckNaturePower ; jp z,.newBadgeRequired
     ld a,$3c
     call Predef
     ld a,[$cd6a]
@@ -33183,7 +33183,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jp CloseTextDisplay
 .surf
     bit 4,a ; does the player have the Soul Badge?
-    jp z,.newBadgeRequired
+    call CheckWaterPower ; jp z,.newBadgeRequired
     ld b,BANK(Func_cdc0)
     ld hl,Func_cdc0
     call Bankswitch
@@ -33202,14 +33202,14 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jp .goBackToMap
 .strength
     bit 3,a ; does the player have the Rainbow Badge?
-    jp z,.newBadgeRequired
+    call CheckEarthPower ; jp z,.newBadgeRequired
     ld a,$5b
     call Predef
     call GBPalWhiteOutWithDelay3
     jp .goBackToMap
 .flash
     bit 0,a ; does the player have the Boulder Badge?
-    jp z,.newBadgeRequired
+    call CheckFirePower ; jp z,.newBadgeRequired
     xor a
     ld [$d35d],a
     ld hl,.flashLightsAreaText
@@ -34526,6 +34526,54 @@ DetermineCoordinateStatsBox:
     ld hl,Coord
     ld bc,$0018
     ret
+
+DontCheckElement:
+    pop af ; Delete Call Back Return
+    jp $72DF ; StartMenu_Pokemon.newBadgeRequired
+
+ElementEnd:
+    ret nz
+    pop af ; Delete Call Back Return
+    ld hl,.ElementMissedText
+    call PrintText
+    jp $70BF ; StartMenu_Pokedex.loop
+.ElementMissedText:
+    TX_FAR _ElementMissedText
+    db "@"
+
+_ElementMissedText: ; a4130 (29:4130)
+    db $0,"No! A new POWER",$4f
+    db "is required.",$58
+
+CheckNaturePower: ; CUT
+    jr z,DontCheckElement
+    ld hl,$d803
+    bit 0,[hl]
+    jr ElementEnd
+
+CheckAirPower: ; FLY
+    jr z,DontCheckElement
+    ld hl,$d7e0
+    bit 6,[hl]
+    jr ElementEnd
+
+CheckWaterPower: ; SURF
+    jr z,DontCheckElement
+    ld hl,$d857
+    bit 0,[hl]
+    jr ElementEnd
+
+CheckEarthPower: ; STRENGHT
+    jr z,DontCheckElement
+    ld hl,$d78e
+    bit 0,[hl]
+    jr ElementEnd
+
+CheckFirePower: ; FIRE
+    jr z,DontCheckElement
+    ld hl,$d7c2
+    bit 0,[hl]
+    jr ElementEnd
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -125256,7 +125304,7 @@ _SafariZoneNorthText6: ; 85689 (21:5689)
 
 _SafariZoneNorthText7: ; 856df (21:56df)
     db $0,"TRAINER TIPS",$51
-    db "Win a free HM for",$4f
+    db "Win a POWER for ",$4f
     db "finding the",$55
     db "SECRET HOUSE!",$57
 
@@ -125322,11 +125370,11 @@ _ReceivedHM03Text: ; 85943 (21:5943)
     db $0,"!@@"
 
 _HM03ExplanationText: ; 85957 (21:5957)
-    db $0,"HM03 is SURF!",$51
+    db $0,"This is SURF!",$51
     db "#MON will be",$4f
     db "able to ferry you",$55
     db "across water!",$51
-    db "And,this HM isn't",$4f
+    db "And,Power isn't  ",$4f
     db "disposable! You",$55
     db "can use it over",$55
     db "and over!",$51
@@ -126220,7 +126268,7 @@ TMNotebookText: ; 88bfd (22:4bfd)
     db "There are 50 TMs",$4f
     db "in all.",$51
     db "There are also 5",$4f
-    db "HMs that can be",$55
+    db "PWR that can be",$55
     db "used repeatedly.",$51
     db "SILPH CO.@@"
 
@@ -127278,7 +127326,7 @@ _Route2HouseText1: ; 8a7b8 (22:67b8)
     db "moves like CUT!",$57
 
 _UnnamedText_5d616: ; 8a7fc (22:67fc)
-    db $0,"The HM FLASH",$4f
+    db $0,"The New FLASH",$4f
     db "lights even the",$55
     db "darkest dungeons.",$57
 
@@ -127459,7 +127507,7 @@ _UnnamedText_56445: ; 8c041 (23:4041)
 _UnnamedText_5644a: ; 8c063 (23:4063)
     db $0,"I can't accept a",$4f
     db "#MON that",$55
-    db "knows an HM move.",$57
+    db "knows a PWR move.",$57
 
 _UnnamedText_5644f: ; 8c090 (23:4090)
     db $0,"Thank you! Here's",$4f
@@ -127838,16 +127886,7 @@ _Route16HouseText3: ; 8ce02 (23:4e02)
     db "I'll make it up",$55
     db "to you with this!",$58
 
-_ReceivedHM02Text: ; 8ce66 (23:4e66)
-    db $0,$52," received",$4f
-    db "HM02!@@"
-
-_HM02ExplanationText: ; 8ce79 (23:4e79)
-    db $0,"HM02 is FLY.",$4f
-    db "It will take you",$55
-    db "back to any town.",$51
-    db "Put it to good",$4f
-    db "use!",$57
+SECTION "_HM02NoRoomText",ROMX[$4ebe],BANK[$23]
 
 _HM02NoRoomText: ; 8cebe (23:4ebe)
     db $0,"You don't have any",$4f
@@ -128784,6 +128823,17 @@ _Route11BattleText9: ; 8ebee (23:6bee)
     db $0,"Watch out for",$4f
     db "live wires!",$57
 
+_ReceivedHM02Text: ; Moved to the End of the BANK
+    db $0,$52," received",$4f
+    db "AIR POWER!@@"
+
+_HM02ExplanationText: ; Moved to the End of the BANK
+    db $0,"AIR POWER is FLY.",$4f
+    db "It will take you",$55
+    db "back to any town.",$51
+    db "Put it to good",$4f
+    db "use!",$57
+
 SECTION "bank24",ROMX,BANK[$24]
 
 _Route11EndBattleText9: ; 90000 (24:4000)
@@ -129077,7 +129127,7 @@ _Route14EndBattleText1: ; 9083f (24:483f)
     db "good enough!",$58
 
 _Route14AfterBattleText1: ; 90851 (24:4851)
-    db $0,"You have some HMs",$4f
+    db $0,"You have some PWR",$4f
     db "right? #MON",$55
     db "can't ever forget",$55
     db "those moves.",$57
@@ -129099,7 +129149,7 @@ _Route14BattleText3: ; 908ea (24:48ea)
     db $0,"TMs are on sale",$4f
     db "in CELADON!",$55
     db "But,only a few",$55
-    db "people have HMs!",$57
+    db "people have PWR!",$57
 
 _Route14EndBattleText3: ; 90928 (24:4928)
     db $0,"Aww,",$4f
@@ -131006,7 +131056,7 @@ _UnnamedText_44201: ; 95858 (25:5858)
 _UnnamedText_44206: ; 95893 (25:5893)
     db $0,"You're on the",$4f
     db "right track! ",$55
-    db "Get a FLASH HM",$55
+    db "Get a POWER   ",$55
     db "from my AIDE!",$57
 
 _UnnamedText_4420b: ; 958cc (25:58cc)
@@ -133705,7 +133755,7 @@ _ReceivedHM04Text: ; 9e5a2 (27:65a2)
     db $0,"!@@"
 
 _HM04ExplanationText: ; 9e5b6 (27:65b6)
-    db $0,"WARDEN: HM04",$4f
+    db $0,"WARDEN: PWR ",$4f
     db "teaches STRENGTH!",$51
     db "It lets #MON",$4f
     db "move boulders",$55
@@ -133715,9 +133765,9 @@ _HM04ExplanationText: ; 9e5b6 (27:65b6)
     db "find SECRET HOUSE",$55
     db "in SAFARI ZONE?",$51
     db "If you do,you",$4f
-    db "win an HM!",$51
+    db "win a PWR!",$51
     db "I hear it's the",$4f
-    db "rare SURF HM.",$57
+    db "rare SURF PWR",$57
 
 _HM04NoRoomText: ; 9e67a (27:667a)
     db $0,"Your pack is",$4f
@@ -135026,7 +135076,7 @@ UnnamedText_a2833: ; a2833 (28:6833)
     db "And...",$58
 
 _UnnamedText_6fe1: ; a284d (28:684d)
-    db $0,"HM techniques",$4f
+    db $0,"POWER Moves  ",$4f
     db "can't be deleted!",$58
 
 ;_PokemonCenterWelcomeText: ; a286d (28:686d)
@@ -136255,7 +136305,7 @@ _BootedUpTMText: ; a6a1f (29:6a1f)
     db $0,"Booted up a TM!",$58
 
 _BootedUpHMText: ; a6a30 (29:6a30)
-    db $0,"Booted up an HM!",$58
+    db $0,"Booted up a PWR!",$58
 
 _TeachMachineMoveText: ; a6a42 (29:6a42)
     db $0,"It contained",$4f
@@ -137738,179 +137788,179 @@ ItemNames: ; 472b (1:472b)
     db "MAX ETHER@"    ; $51
     db "ELIXER@"       ; $52
     db "MAX ELIXER@"   ; $53
-	db "?@"            ; $54
-	db "?@"            ; $55
-	db "?@"            ; $56
-	db "?@"            ; $57
-	db "?@"            ; $58
-	db "?@"            ; $59
-	db "?@"            ; $5A
-	db "?@"            ; $5B
-	db "?@"            ; $5C
-	db "?@"            ; $5D
-	db "?@"            ; $5E
-	db "?@"            ; $5F
-	db "?@"            ; $60
-	db "?@"            ; $61
-	db "?@"            ; $62
-	db "?@"            ; $63
-	db "?@"            ; $64
-	db "?@"            ; $65
-	db "?@"            ; $66
-	db "?@"            ; $67
-	db "?@"            ; $68
-	db "?@"            ; $69
-	db "?@"            ; $6A
-	db "?@"            ; $6B
-	db "?@"            ; $6C
-	db "?@"            ; $6D
-	db "?@"            ; $6E
-	db "?@"            ; $6F
-	db "?@"            ; $70
-	db "?@"            ; $71
-	db "?@"            ; $72
-	db "?@"            ; $73
-	db "?@"            ; $74
-	db "?@"            ; $75
-	db "?@"            ; $76
-	db "?@"            ; $77
-	db "?@"            ; $78
-	db "?@"            ; $79
-	db "?@"            ; $7A
-	db "?@"            ; $7B
-	db "?@"            ; $7C
-	db "?@"            ; $7D
-	db "?@"            ; $7E
-	db "?@"            ; $7F
-	db "?@"            ; $80
-	db "?@"            ; $81
-	db "?@"            ; $82
-	db "?@"            ; $83
-	db "?@"            ; $84
-	db "?@"            ; $85
-	db "?@"            ; $86
-	db "?@"            ; $87
-	db "?@"            ; $88
-	db "?@"            ; $89
-	db "?@"            ; $8A
-	db "?@"            ; $8B
-	db "?@"            ; $8C
-	db "?@"            ; $8D
-	db "?@"            ; $8E
-	db "?@"            ; $8F
-	db "?@"            ; $90
-	db "?@"            ; $91
-	db "?@"            ; $92
-	db "?@"            ; $93
-	db "?@"            ; $94
-	db "?@"            ; $95
-	db "?@"            ; $96
-	db "?@"            ; $97
-	db "?@"            ; $98
-	db "?@"            ; $99
-	db "?@"            ; $9A
-	db "?@"            ; $9B
-	db "?@"            ; $9C
-	db "?@"            ; $9D
-	db "?@"            ; $9E
-	db "?@"            ; $9F
-	db "?@"            ; $A0
-	db "?@"            ; $A1
-	db "?@"            ; $A2
-	db "?@"            ; $A3
-	db "?@"            ; $A4
-	db "?@"            ; $A5
-	db "?@"            ; $A6
-	db "?@"            ; $A7
-	db "?@"            ; $A8
-	db "?@"            ; $A9
-	db "?@"            ; $AA
-	db "?@"            ; $AB
-	db "?@"            ; $AC
-	db "?@"            ; $AD
-	db "?@"            ; $AE
-	db "?@"            ; $AF
-	db "?@"            ; $B0
-	db "?@"            ; $B1
-	db "?@"            ; $B2
-	db "?@"            ; $B3
-	db "?@"            ; $B4
-	db "?@"            ; $B5
-	db "?@"            ; $B6
-	db "?@"            ; $B7
-	db "?@"            ; $B8
-	db "?@"            ; $B9
-	db "?@"            ; $BA
-	db "?@"            ; $BB
-	db "?@"            ; $BC
-	db "?@"            ; $BD
-	db "?@"            ; $BE
-	db "?@"            ; $BF
-	db "?@"            ; $C0
-	db "?@"            ; $C1
-	db "?@"            ; $C2
-	db "?@"            ; $C3
-	db "HM:CUT@"       ; $C4
-	db "HM:FLY@"       ; $C5
-	db "HM:SURF@"      ; $C6
-	db "HM:STRENGTH@"  ; $C7
-	db "HM:FLASH@"     ; $C8
-	db "TM:M. PUNCH@"  ; $C9
-	db "TM:RAZ. WIND@" ; $CA
-	db "TM:SW. DANCE@" ; $CB
-	db "TM:WHIRLWIND@" ; $CC
-	db "TM:MEGA KICK@" ; $CD
-	db "TM:TOXIC@"     ; $CE
-	db "TM:HORN DR.@"  ; $CF
-	db "TM:BODY SLAM@" ; $D0
-	db "TM:TAKE DOWN@" ; $D1
-	db "TM:DBL EDGE@"  ; $D2
-	db "TM:BUBBLEB.@"  ; $D3
-	db "TM:WATER GUN@" ; $D4
-	db "TM:ICE BEAM@"  ; $D5
-	db "TM:BLIZZARD@"  ; $D6
-	db "TM:HYPER B.@"  ; $D7
-	db "TM:PAY DAY@"   ; $D8
-	db "TM:SUBMISS.@"  ; $D9
-	db "TM:COUNTER@"   ; $DA
-	db "TM:SSM TOSS@"  ; $DB
-	db "TM:RAGE@"      ; $DC
-	db "TM:M. DRAIN@"  ; $DD
-	db "TM:SOLARBEAM@" ; $DE
-	db "TM:DRG RAGE@"  ; $DF
-	db "TM:THUNDERB.@" ; $E0
-	db "TM:THUNDER@"   ; $E1
-	db "TM:EARTHQ.@"   ; $E2
-	db "TM:FISSURE@"   ; $E3
-	db "TM:DIG@"       ; $E4
-	db "TM:PSYCHIC@"   ; $E5
-	db "TM:TELEPORT@"  ; $E6
-	db "TM:MIMIC@"     ; $E7
-	db "TM:DBL TEAM@"  ; $E8
-	db "TM:REFLECT@"   ; $E9
-	db "TM:BIDE@"      ; $EA
-	db "TM:METRONOME@" ; $EB
-	db "TM:SELFDSTR@"  ; $EC
-	db "TM:EGG BOMB@"  ; $ED
-	db "TM:FIRE BLST@" ; $EE
-	db "TM:SWIFT@"     ; $EF
-	db "TM:SKULL B.@"  ; $F0
-	db "TM:SOFTBOIL.@" ; $F1
-	db "TM:DREAM EAT@" ; $F2
-	db "TM:SKY ATK@"   ; $F3
-	db "TM:REST@"      ; $F4
-	db "TM:THNDR WV@"  ; $F5
-	db "TM:PSYWAVE@"   ; $F6
-	db "TM:EXPLOSION@" ; $F7
-	db "TM:RCK SLIDE@" ; $F8
-	db "TM:TRI ATK@"   ; $F9
-	db "TM:SUBSTIT.@"  ; $FA
-	db "TM:CUT@"       ; $FB
-	db "TM:FLY@"       ; $FC
-	db "TM:SURF@"      ; $FD
-	db "TM:STRENGTH@"  ; $FE
-	db "CANCEL@"       ; $FF
-	db "ITEM 00@"      ; $00
+    db "?@"            ; $54
+    db "?@"            ; $55
+    db "?@"            ; $56
+    db "?@"            ; $57
+    db "?@"            ; $58
+    db "?@"            ; $59
+    db "?@"            ; $5A
+    db "?@"            ; $5B
+    db "?@"            ; $5C
+    db "?@"            ; $5D
+    db "?@"            ; $5E
+    db "?@"            ; $5F
+    db "?@"            ; $60
+    db "?@"            ; $61
+    db "?@"            ; $62
+    db "?@"            ; $63
+    db "?@"            ; $64
+    db "?@"            ; $65
+    db "?@"            ; $66
+    db "?@"            ; $67
+    db "?@"            ; $68
+    db "?@"            ; $69
+    db "?@"            ; $6A
+    db "?@"            ; $6B
+    db "?@"            ; $6C
+    db "?@"            ; $6D
+    db "?@"            ; $6E
+    db "?@"            ; $6F
+    db "?@"            ; $70
+    db "?@"            ; $71
+    db "?@"            ; $72
+    db "?@"            ; $73
+    db "?@"            ; $74
+    db "?@"            ; $75
+    db "?@"            ; $76
+    db "?@"            ; $77
+    db "?@"            ; $78
+    db "?@"            ; $79
+    db "?@"            ; $7A
+    db "?@"            ; $7B
+    db "?@"            ; $7C
+    db "?@"            ; $7D
+    db "?@"            ; $7E
+    db "?@"            ; $7F
+    db "?@"            ; $80
+    db "?@"            ; $81
+    db "?@"            ; $82
+    db "?@"            ; $83
+    db "?@"            ; $84
+    db "?@"            ; $85
+    db "?@"            ; $86
+    db "?@"            ; $87
+    db "?@"            ; $88
+    db "?@"            ; $89
+    db "?@"            ; $8A
+    db "?@"            ; $8B
+    db "?@"            ; $8C
+    db "?@"            ; $8D
+    db "?@"            ; $8E
+    db "?@"            ; $8F
+    db "?@"            ; $90
+    db "?@"            ; $91
+    db "?@"            ; $92
+    db "?@"            ; $93
+    db "?@"            ; $94
+    db "?@"            ; $95
+    db "?@"            ; $96
+    db "?@"            ; $97
+    db "?@"            ; $98
+    db "?@"            ; $99
+    db "?@"            ; $9A
+    db "?@"            ; $9B
+    db "?@"            ; $9C
+    db "?@"            ; $9D
+    db "?@"            ; $9E
+    db "?@"            ; $9F
+    db "?@"            ; $A0
+    db "?@"            ; $A1
+    db "?@"            ; $A2
+    db "?@"            ; $A3
+    db "?@"            ; $A4
+    db "?@"            ; $A5
+    db "?@"            ; $A6
+    db "?@"            ; $A7
+    db "?@"            ; $A8
+    db "?@"            ; $A9
+    db "?@"            ; $AA
+    db "?@"            ; $AB
+    db "?@"            ; $AC
+    db "?@"            ; $AD
+    db "?@"            ; $AE
+    db "?@"            ; $AF
+    db "?@"            ; $B0
+    db "?@"            ; $B1
+    db "?@"            ; $B2
+    db "?@"            ; $B3
+    db "?@"            ; $B4
+    db "?@"            ; $B5
+    db "?@"            ; $B6
+    db "?@"            ; $B7
+    db "?@"            ; $B8
+    db "?@"            ; $B9
+    db "?@"            ; $BA
+    db "?@"            ; $BB
+    db "?@"            ; $BC
+    db "?@"            ; $BD
+    db "?@"            ; $BE
+    db "?@"            ; $BF
+    db "?@"            ; $C0
+    db "?@"            ; $C1
+    db "?@"            ; $C2
+    db "?@"            ; $C3
+    db "NATURE POWER@" ; $C4
+    db "AIR POWER@"    ; $C5
+    db "WATER POWER@"  ; $C6
+    db "EARTH POWER@"  ; $C7
+    db "FIRE POWER@"   ; $C8
+    db "TM:M. PUNCH@"  ; $C9
+    db "TM:RAZ. WIND@" ; $CA
+    db "TM:SW. DANCE@" ; $CB
+    db "TM:WHIRLWIND@" ; $CC
+    db "TM:MEGA KICK@" ; $CD
+    db "TM:TOXIC@"     ; $CE
+    db "TM:HORN DR.@"  ; $CF
+    db "TM:BODY SLAM@" ; $D0
+    db "TM:TAKE DOWN@" ; $D1
+    db "TM:DBL EDGE@"  ; $D2
+    db "TM:BUBBLEB.@"  ; $D3
+    db "TM:WATER GUN@" ; $D4
+    db "TM:ICE BEAM@"  ; $D5
+    db "TM:BLIZZARD@"  ; $D6
+    db "TM:HYPER B.@"  ; $D7
+    db "TM:PAY DAY@"   ; $D8
+    db "TM:SUBMISS.@"  ; $D9
+    db "TM:COUNTER@"   ; $DA
+    db "TM:SSM TOSS@"  ; $DB
+    db "TM:RAGE@"      ; $DC
+    db "TM:M. DRAIN@"  ; $DD
+    db "TM:SOLARBEAM@" ; $DE
+    db "TM:DRG RAGE@"  ; $DF
+    db "TM:THUNDERB.@" ; $E0
+    db "TM:THUNDER@"   ; $E1
+    db "TM:EARTHQ.@"   ; $E2
+    db "TM:FISSURE@"   ; $E3
+    db "TM:DIG@"       ; $E4
+    db "TM:PSYCHIC@"   ; $E5
+    db "TM:TELEPORT@"  ; $E6
+    db "TM:MIMIC@"     ; $E7
+    db "TM:DBL TEAM@"  ; $E8
+    db "TM:REFLECT@"   ; $E9
+    db "TM:BIDE@"      ; $EA
+    db "TM:METRONOME@" ; $EB
+    db "TM:SELFDSTR@"  ; $EC
+    db "TM:EGG BOMB@"  ; $ED
+    db "TM:FIRE BLST@" ; $EE
+    db "TM:SWIFT@"     ; $EF
+    db "TM:SKULL B.@"  ; $F0
+    db "TM:SOFTBOIL.@" ; $F1
+    db "TM:DREAM EAT@" ; $F2
+    db "TM:SKY ATK@"   ; $F3
+    db "TM:REST@"      ; $F4
+    db "TM:THNDR WV@"  ; $F5
+    db "TM:PSYWAVE@"   ; $F6
+    db "TM:EXPLOSION@" ; $F7
+    db "TM:RCK SLIDE@" ; $F8
+    db "TM:TRI ATK@"   ; $F9
+    db "TM:SUBSTIT.@"  ; $FA
+    db "TM:CUT@"       ; $FB
+    db "TM:FLY@"       ; $FC
+    db "TM:SURF@"      ; $FD
+    db "TM:STRENGTH@"  ; $FE
+    db "CANCEL@"       ; $FF
+    db "ITEM 00@"      ; $00
 
 SECTION "bank34",ROMX,BANK[$34] ; Denim
 
