@@ -7396,7 +7396,7 @@ DisplayListMenuIDLoop: ; 2c53 (0:2c53)
 .skipGettingQuantity
     ld a,[$cf91]
     ld [$d0b5],a
-    ld a,$01
+    ld a,BANK(ItemNames) ; Denim,spostata tabella ItemNames in un altro BANK
     ld [$d0b7],a
     call GetName
     jr .storeChosenEntry
@@ -7823,8 +7823,8 @@ GetItemName: ; 2fcf (0:2fcf)
     push hl
     push bc
     ld a,[$D11E]
-    cp HM_01 ; is this a TM/HM?
-    jr nc,.Machine
+    dw 0 ; cp HM_01 ; is this a TM/HM?
+    dw 0 ; jr nc,.Machine
 
     ld [$D0B5],a
     ld a,ITEM_NAME
@@ -9174,8 +9174,8 @@ GetName: ; 376b (0:376b)
 ; returns pointer to name in de
     ld a,[$d0b5]
     ld [$d11e],a
-    cp a,$C4        ;it's TM/HM
-    jp nc,GetMachineName
+    ds 2 ; cp a,$C4        ;it's TM/HM
+    ds 3; jp nc,GetMachineName
     ld a,[H_LOADEDROMBANK]
     push af
     push hl
@@ -11532,104 +11532,9 @@ ItemPrices: ; 4608 (1:4608)
     db $00,$00,$00
     db $00,$00,$00
 
-ItemNames: ; 472b (1:472b)
-    db "MASTER BALL@"
-    db "ULTRA BALL@"
-    db "GREAT BALL@"
-    db "POKé BALL@"
-    db "TOWN MAP@"
-    db "BICYCLE@"
-    db "?????@"
-    db "SAFARI BALL@"
-    db "POKéDEX@"
-    db "MOON STONE@"
-    db "ANTIDOTE@"
-    db "BURN HEAL@"
-    db "ICE HEAL@"
-    db "AWAKENING@"
-    db "PARLYZ HEAL@"
-    db "FULL RESTORE@"
-    db "MAX POTION@"
-    db "HYPER POTION@"
-    db "SUPER POTION@"
-    db "POTION@"
-    db "BOULDERBADGE@"
-    db "CASCADEBADGE@"
-    db "THUNDERBADGE@"
-    db "RAINBOWBADGE@"
-    db "SOULBADGE@"
-    db "MARSHBADGE@"
-    db "VOLCANOBADGE@"
-    db "EARTHBADGE@"
-    db "ESCAPE ROPE@"
-    db "REPEL@"
-    db "OLD AMBER@"
-    db "FIRE STONE@"
-    db "THUNDERSTONE@"
-    db "WATER STONE@"
-    db "HP UP@"
-    db "PROTEIN@"
-    db "IRON@"
-    db "CARBOS@"
-    db "CALCIUM@"
-    db "RARE CANDY@"
-    db "DOME FOSSIL@"
-    db "HELIX FOSSIL@"
-    db "SECRET KEY@"
-    db "?????@"
-    db "BIKE VOUCHER@"
-    db "X ACCURACY@"
-    db "LEAF STONE@"
-    db "CARD KEY@"
-    db "NUGGET@"
-    db "PP UP@"
-    db "POKé DOLL@"
-    db "FULL HEAL@"
-    db "REVIVE@"
-    db "MAX REVIVE@"
-    db "GUARD SPEC.@"
-    db "SUPER REPEL@"
-    db "MAX REPEL@"
-    db "DIRE HIT@"
-    db "COIN@"
-    db "FRESH WATER@"
-    db "SODA POP@"
-    db "LEMONADE@"
-    db "S.S.TICKET@"
-    db "GOLD TEETH@"
-    db "X ATTACK@"
-    db "X DEFEND@"
-    db "X SPEED@"
-    db "X SPECIAL@"
-    db "COIN CASE@"
-    db "OAK's PARCEL@"
-    db "ITEMFINDER@"
-    db "SILPH SCOPE@"
-    db "POKé FLUTE@"
-    db "LIFT KEY@"
-    db "EXP.ALL@"
-    db "OLD ROD@"
-    db "GOOD ROD@"
-    db "SUPER ROD@"
-    db "PP UP@"
-    db "ETHER@"
-    db "MAX ETHER@"
-    db "ELIXER@"
-    db "MAX ELIXER@"
-    db "B2F@"
-    db "B1F@"
-    db "1F@"
-    db "2F@"
-    db "3F@"
-    db "4F@"
-    db "5F@"
-    db "6F@"
-    db "7F@"
-    db "8F@"
-    db "9F@"
-    db "10F@"
-    db "11F@"
-    db "B4F@"
+ItemNames_Old: ; 472b (1:472b)
+
+SECTION "UnusedNames",ROMX[$4a92],BANK[$1]
 
 UnusedNames: ; 4a92 (1:4a92)
     db "かみなりバッヂ@"
@@ -137748,6 +137653,264 @@ GenderTable:
     dsn MALE_87,MALE_87,MALE_87,OTHGEND ; KABUTOPS,AERODACTYL,SNORLAX,ARTICUNO
     dsn OTHGEND,OTHGEND,MALE_50,MALE_50 ; ZAPDOS,MOLTRES,DRATINI,DRAGONAIR
     dsn MALE_50,OTHGEND,OTHGEND,OTHGEND ; DRAGONITE,MEWTWO,MEW,152
+
+ItemNames: ; 472b (1:472b)
+    db "MASTER BALL@"  ; $01
+    db "ULTRA BALL@"   ; $02
+    db "GREAT BALL@"   ; $03
+    db "POKé BALL@"    ; $04
+    db "TOWN MAP@"     ; $05
+    db "BICYCLE@"      ; $06
+    db "?@"            ; $07
+    db "SAFARI BALL@"  ; $08
+    db "POKéDEX@"      ; $09
+    db "MOON STONE@"   ; $0A
+    db "ANTIDOTE@"     ; $0B
+    db "BURN HEAL@"    ; $0C
+    db "ICE HEAL@"     ; $0D
+    db "AWAKENING@"    ; $0E
+    db "PARLYZ HEAL@"  ; $0F
+    db "FULL RESTORE@" ; $10
+    db "MAX POTION@"   ; $11
+    db "HYPER POTION@" ; $12
+    db "SUPER POTION@" ; $13
+    db "POTION@"       ; $14
+    db "BOULDERBADGE@" ; $15
+    db "CASCADEBADGE@" ; $16
+    db "THUNDERBADGE@" ; $17
+    db "RAINBOWBADGE@" ; $18
+    db "SOULBADGE@"    ; $19
+    db "MARSHBADGE@"   ; $1A
+    db "VOLCANOBADGE@" ; $1B
+    db "EARTHBADGE@"   ; $1C
+    db "ESCAPE ROPE@"  ; $1D
+    db "REPEL@"        ; $1E
+    db "OLD AMBER@"    ; $1F
+    db "FIRE STONE@"   ; $20
+    db "THUNDERSTONE@" ; $21
+    db "WATER STONE@"  ; $22
+    db "HP UP@"        ; $23
+    db "PROTEIN@"      ; $24
+    db "IRON@"         ; $25
+    db "CARBOS@"       ; $26
+    db "CALCIUM@"      ; $27
+    db "RARE CANDY@"   ; $28
+    db "DOME FOSSIL@"  ; $29
+    db "HELIX FOSSIL@" ; $2A
+    db "SECRET KEY@"   ; $2B
+    db "?@"            ; $2C
+    db "BIKE VOUCHER@" ; $2D
+    db "X ACCURACY@"   ; $2E
+    db "LEAF STONE@"   ; $2F
+    db "CARD KEY@"     ; $30
+    db "NUGGET@"       ; $31
+    db "PP UP@"        ; $32
+    db "POKé DOLL@"    ; $33
+    db "FULL HEAL@"    ; $34
+    db "REVIVE@"       ; $35
+    db "MAX REVIVE@"   ; $36
+    db "GUARD SPEC.@"  ; $37
+    db "SUPER REPEL@"  ; $38
+    db "MAX REPEL@"    ; $39
+    db "DIRE HIT@"     ; $3A
+    db "COIN@"         ; $3B
+    db "FRESH WATER@"  ; $3C
+    db "SODA POP@"     ; $3D
+    db "LEMONADE@"     ; $3E
+    db "S.S.TICKET@"   ; $3F
+    db "GOLD TEETH@"   ; $40
+    db "X ATTACK@"     ; $41
+    db "X DEFEND@"     ; $42
+    db "X SPEED@"      ; $43
+    db "X SPECIAL@"    ; $44
+    db "COIN CASE@"    ; $45
+    db "OAK's PARCEL@" ; $46
+    db "ITEMFINDER@"   ; $47
+    db "SILPH SCOPE@"  ; $48
+    db "POKé FLUTE@"   ; $49
+    db "LIFT KEY@"     ; $4A
+    db "EXP.ALL@"      ; $4B
+    db "OLD ROD@"      ; $4C
+    db "GOOD ROD@"     ; $4D
+    db "SUPER ROD@"    ; $4E
+    db "PP UP@"        ; $4F
+    db "ETHER@"        ; $50
+    db "MAX ETHER@"    ; $51
+    db "ELIXER@"       ; $52
+    db "MAX ELIXER@"   ; $53
+	db "?@"            ; $54
+	db "?@"            ; $55
+	db "?@"            ; $56
+	db "?@"            ; $57
+	db "?@"            ; $58
+	db "?@"            ; $59
+	db "?@"            ; $5A
+	db "?@"            ; $5B
+	db "?@"            ; $5C
+	db "?@"            ; $5D
+	db "?@"            ; $5E
+	db "?@"            ; $5F
+	db "?@"            ; $60
+	db "?@"            ; $61
+	db "?@"            ; $62
+	db "?@"            ; $63
+	db "?@"            ; $64
+	db "?@"            ; $65
+	db "?@"            ; $66
+	db "?@"            ; $67
+	db "?@"            ; $68
+	db "?@"            ; $69
+	db "?@"            ; $6A
+	db "?@"            ; $6B
+	db "?@"            ; $6C
+	db "?@"            ; $6D
+	db "?@"            ; $6E
+	db "?@"            ; $6F
+	db "?@"            ; $70
+	db "?@"            ; $71
+	db "?@"            ; $72
+	db "?@"            ; $73
+	db "?@"            ; $74
+	db "?@"            ; $75
+	db "?@"            ; $76
+	db "?@"            ; $77
+	db "?@"            ; $78
+	db "?@"            ; $79
+	db "?@"            ; $7A
+	db "?@"            ; $7B
+	db "?@"            ; $7C
+	db "?@"            ; $7D
+	db "?@"            ; $7E
+	db "?@"            ; $7F
+	db "?@"            ; $80
+	db "?@"            ; $81
+	db "?@"            ; $82
+	db "?@"            ; $83
+	db "?@"            ; $84
+	db "?@"            ; $85
+	db "?@"            ; $86
+	db "?@"            ; $87
+	db "?@"            ; $88
+	db "?@"            ; $89
+	db "?@"            ; $8A
+	db "?@"            ; $8B
+	db "?@"            ; $8C
+	db "?@"            ; $8D
+	db "?@"            ; $8E
+	db "?@"            ; $8F
+	db "?@"            ; $90
+	db "?@"            ; $91
+	db "?@"            ; $92
+	db "?@"            ; $93
+	db "?@"            ; $94
+	db "?@"            ; $95
+	db "?@"            ; $96
+	db "?@"            ; $97
+	db "?@"            ; $98
+	db "?@"            ; $99
+	db "?@"            ; $9A
+	db "?@"            ; $9B
+	db "?@"            ; $9C
+	db "?@"            ; $9D
+	db "?@"            ; $9E
+	db "?@"            ; $9F
+	db "?@"            ; $A0
+	db "?@"            ; $A1
+	db "?@"            ; $A2
+	db "?@"            ; $A3
+	db "?@"            ; $A4
+	db "?@"            ; $A5
+	db "?@"            ; $A6
+	db "?@"            ; $A7
+	db "?@"            ; $A8
+	db "?@"            ; $A9
+	db "?@"            ; $AA
+	db "?@"            ; $AB
+	db "?@"            ; $AC
+	db "?@"            ; $AD
+	db "?@"            ; $AE
+	db "?@"            ; $AF
+	db "?@"            ; $B0
+	db "?@"            ; $B1
+	db "?@"            ; $B2
+	db "?@"            ; $B3
+	db "?@"            ; $B4
+	db "?@"            ; $B5
+	db "?@"            ; $B6
+	db "?@"            ; $B7
+	db "?@"            ; $B8
+	db "?@"            ; $B9
+	db "?@"            ; $BA
+	db "?@"            ; $BB
+	db "?@"            ; $BC
+	db "?@"            ; $BD
+	db "?@"            ; $BE
+	db "?@"            ; $BF
+	db "?@"            ; $C0
+	db "?@"            ; $C1
+	db "?@"            ; $C2
+	db "?@"            ; $C3
+	db "HM:CUT@"       ; $C4
+	db "HM:FLY@"       ; $C5
+	db "HM:SURF@"      ; $C6
+	db "HM:STRENGTH@"  ; $C7
+	db "HM:FLASH@"     ; $C8
+	db "TM:M. PUNCH@"  ; $C9
+	db "TM:RAZ. WIND@" ; $CA
+	db "TM:SW. DANCE@" ; $CB
+	db "TM:WHIRLWIND@" ; $CC
+	db "TM:MEGA KICK@" ; $CD
+	db "TM:TOXIC@"     ; $CE
+	db "TM:HORN DR.@"  ; $CF
+	db "TM:BODY SLAM@" ; $D0
+	db "TM:TAKE DOWN@" ; $D1
+	db "TM:DBL EDGE@"  ; $D2
+	db "TM:BUBBLEB.@"  ; $D3
+	db "TM:WATER GUN@" ; $D4
+	db "TM:ICE BEAM@"  ; $D5
+	db "TM:BLIZZARD@"  ; $D6
+	db "TM:HYPER B.@"  ; $D7
+	db "TM:PAY DAY@"   ; $D8
+	db "TM:SUBMISS.@"  ; $D9
+	db "TM:COUNTER@"   ; $DA
+	db "TM:SSM TOSS@"  ; $DB
+	db "TM:RAGE@"      ; $DC
+	db "TM:M. DRAIN@"  ; $DD
+	db "TM:SOLARBEAM@" ; $DE
+	db "TM:DRG RAGE@"  ; $DF
+	db "TM:THUNDERB.@" ; $E0
+	db "TM:THUNDER@"   ; $E1
+	db "TM:EARTHQ.@"   ; $E2
+	db "TM:FISSURE@"   ; $E3
+	db "TM:DIG@"       ; $E4
+	db "TM:PSYCHIC@"   ; $E5
+	db "TM:TELEPORT@"  ; $E6
+	db "TM:MIMIC@"     ; $E7
+	db "TM:DBL TEAM@"  ; $E8
+	db "TM:REFLECT@"   ; $E9
+	db "TM:BIDE@"      ; $EA
+	db "TM:METRONOME@" ; $EB
+	db "TM:SELFDSTR@"  ; $EC
+	db "TM:EGG BOMB@"  ; $ED
+	db "TM:FIRE BLST@" ; $EE
+	db "TM:SWIFT@"     ; $EF
+	db "TM:SKULL B.@"  ; $F0
+	db "TM:SOFTBOIL.@" ; $F1
+	db "TM:DREAM EAT@" ; $F2
+	db "TM:SKY ATK@"   ; $F3
+	db "TM:REST@"      ; $F4
+	db "TM:THNDR WV@"  ; $F5
+	db "TM:PSYWAVE@"   ; $F6
+	db "TM:EXPLOSION@" ; $F7
+	db "TM:RCK SLIDE@" ; $F8
+	db "TM:TRI ATK@"   ; $F9
+	db "TM:SUBSTIT.@"  ; $FA
+	db "TM:CUT@"       ; $FB
+	db "TM:FLY@"       ; $FC
+	db "TM:SURF@"      ; $FD
+	db "TM:STRENGTH@"  ; $FE
+	db "CANCEL@"       ; $FF
+	db "ITEM 00@"      ; $00
 
 SECTION "bank34",ROMX,BANK[$34] ; Denim
 
