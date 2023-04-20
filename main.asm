@@ -29364,7 +29364,7 @@ SendNewMonToBox: ; e7a4 (3:67a4)
 .asm_e867
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld [W_ENEMYMONNUMBER],a ; $cfe8
-    ld hl,$cfe5
+    call ResetEnemyHPAndStatus ; ld hl,W_ENEMYMON_START
     ld de,W_BOXMON1DATA
     ld bc,$c
     call CopyData
@@ -32023,6 +32023,17 @@ Func_cd99: ; xxxx (3:xxxx) ; Spostato a Fine BANK
     call PrintText
     ld hl,UnnamedText_cdbb ; $4dbb
     jp PrintText
+
+ResetEnemyHPAndStatus:
+    xor a
+    ld [W_ENEMYMONSTATUS],a
+    ld hl,W_ENEMYMONMAXHP
+    ld a,[hli]
+    ld [W_ENEMYMONCURHP],a
+    ld a,[hl]
+    ld [W_ENEMYMONCURHP+1],a
+    ld hl,W_ENEMYMON_START
+    ret
 
 SECTION "bank4",ROMX,BANK[$4]
 

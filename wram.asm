@@ -372,6 +372,7 @@ W_ENEMYMONID: ; cfd8
 W_ENEMYMONNAME: ; cfda
     ds 11
 
+W_ENEMYMON_START ; cfe5
     ds 1
 
 W_ENEMYMONCURHP: ; cfe6
