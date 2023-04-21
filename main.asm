@@ -208,6 +208,11 @@ Start: ; 0150 (0:0150)
     ld [$cf1a],a ; same value ($00) either way
     jp InitGame
 
+GetSpecialListNameOrGetItemName: ; xxxx (0:xxxx) ; Denim
+    ld b,BANK(GetSpecialListNameOrGetItemName_)
+    ld hl,GetSpecialListNameOrGetItemName_
+    jp Bankswitch
+
 SECTION "ReadJoypadRegister",ROM0[$015f]
 
 ; this function directly reads the joypad I/O register
@@ -3592,7 +3597,14 @@ CheckCyclingRoad:
     ld a,(Music_BikeRiding - $4000) / 3
     ret
 
-; ds X ; Denim ; some free Bytes
+BackupHlAndGetSpecialListNameOrGetItemName:  ; xxxx (0:xxxx) ; Denim ; spazio ricavato dalla routine precedente
+    push hl
+    call GetSpecialListNameOrGetItemName
+    pop hl
+    ld de,$CD6D
+    ret
+
+; ds X ; Denim ; 4 free Bytes
 
 SECTION "LoadMonFrontSprite",ROM0[$1665] ; Denim
 
@@ -7645,7 +7657,7 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     cp a,$01
     jr z,.movesMenu
 .itemMenu
-    call GetItemName
+    call BackupHlAndGetSpecialListNameOrGetItemName ; Denim ; call GetItemName
     jr .placeNameString
 .pokemonPCMenu
     push hl
@@ -63515,7 +63527,7 @@ RegularBattleMenu: ; 3cf1a (f:4f1a)
     ld [$d120],a
     jp LoadScreenTilesFromBuffer1 ; restore saved screen and return??
 .safari1 ; safari first option??
-    ld a,$8
+    ld a,SAFARI_BALL
     ld [$cf91],a
     jr asm_3d05f
 
@@ -63533,7 +63545,7 @@ Func_3cfe8: ; 3cfe8 (f:4fe8)
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
     jr nz,asm_3d00e
-    ld a,$15
+    ld a,BAIT_ITEM
     ld [$cf91],a
     jr asm_3d05f
 asm_3d00e: ; 3d00e (f:500e)
@@ -63636,7 +63648,7 @@ Func_3d0ca: ; 3d0ca (f:50ca)
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
     jr nz,Func_3d0e0
-    ld a,$16
+    ld a,ROCK_ITEM
     ld [$cf91],a
     jp asm_3d05f
 
@@ -76384,19 +76396,27 @@ RocketHideoutElevatorScript_4573a: ; 4573a (11:573a)
     ret
 
 RocketHideoutElevatorScript_45741: ; 45741 (11:5741)
-    ld hl,Unknown_45754 ; $5754
+    ld hl,RocketHideoutElavatorFloors ; $5754
     call LoadItemList
-    ld hl,Unknown_45759 ; $5759
+    ld hl,RocketHideoutElevatorWarpMaps ; $5759
     ld de,$cc5b
     ld bc,$0006
     call CopyData
     ret
 
-Unknown_45754: ; 45754 (11:5754)
-INCBIN "baserom.gbc",$45754,$45759 - $45754
+RocketHideoutElavatorFloors: ; 45754 (11:5754)
+    db $03 ; num elements in list
+    ;db $55,$54,$61 ; "B1F","B2F","B4F"
+    db 1,2,3 ; Denim
+    db $FF ; terminator
 
-Unknown_45759: ; 45759 (11:5759)
-INCBIN "baserom.gbc",$45759,$4575f - $45759
+RocketHideoutElevatorWarpMaps: ; 45759 (11:5759)
+; first byte is warp number
+; second byte is map number
+; These specify where the player goes after getting out of the elevator.
+    db $04,ROCKET_HIDEOUT_1
+    db $04,ROCKET_HIDEOUT_2
+    db $02,ROCKET_HIDEOUT_4
 
 Func_4575f: ; 4575f (11:575f)
     call Delay3
@@ -76414,9 +76434,9 @@ RocketHideoutElevatorText1: ; 4576d (11:576d)
     call IsItemInBag
     jr z,.asm_8d8f0 ; 0x45773
     call RocketHideoutElevatorScript_45741
-    ld hl,Unknown_45759 ; $5759
+    ld hl,RocketHideoutElevatorWarpMaps ; $5759
     ld a,$61
-    call Predef
+    call FlagInstantAndPredefRocketHideout ; Denim ; call Predef
     jr .asm_46c43 ; 0x45780
 .asm_8d8f0 ; 0x45782
     ld hl,UnnamedText_4578b
@@ -76488,19 +76508,35 @@ SilphCoElevatorScript_457ea: ; 457ea (11:57ea)
     ret
 
 SilphCoElevatorScript_457f1: ; 457f1 (11:57f1)
-    ld hl,Unknown_45804 ; $5804
+    ld hl,SilphCoElavatorFloors ; $5804
     call LoadItemList
-    ld hl,Unknown_45811 ; $5811
+    ld hl,SilphCoElevatorWarpMaps ; $5811
     ld de,$cc5b
     ld bc,$16
     call CopyData
     ret
 
-Unknown_45804: ; 45804 (11:5804)
-INCBIN "baserom.gbc",$45804,$45811 - $45804
+SilphCoElavatorFloors: ; 45804 (11:5804)
+    db $0B ; num elements in list
+    ;db $56,$57,$58,$59,$5A,$5B,$5C,$5D,$5E,$5F,$60 ; "1F","2F","3F","4F",... ,"11F"
+    db 1,2,3,4,5,6,7,8,9,10,11
+    db $FF ; terminator
 
-Unknown_45811: ; 45811 (11:5811)
-INCBIN "baserom.gbc",$45811,$45827 - $45811
+SilphCoElevatorWarpMaps: ; 45811 (11:5811)
+; first byte is warp number
+; second byte is map number
+; These specify where the player goes after getting out of the elevator.
+    db $03,SILPH_CO_1F
+    db $02,SILPH_CO_2F
+    db $02,SILPH_CO_3F
+    db $02,SILPH_CO_4F
+    db $02,SILPH_CO_5F
+    db $02,SILPH_CO_6F
+    db $02,SILPH_CO_7F
+    db $02,SILPH_CO_8F
+    db $02,SILPH_CO_9F
+    db $02,SILPH_CO_10F
+    db $01,SILPH_CO_11F
 
 Func_45827: ; 45827 (11:5827)
     call Delay3
@@ -76515,9 +76551,9 @@ SilphCoElevatorTextPointers: ; 45833 (11:5833)
 SilphCoElevatorText1: ; 45835 (11:5835)
     db $08 ; asm
     call SilphCoElevatorScript_457f1
-    ld hl,Unknown_45811 ; $5811
+    ld hl,SilphCoElevatorWarpMaps ; $5811
     ld a,$61
-    call Predef
+    call FlagInstantAndPredefSilphCo ; Denim ; call Predef
     jp TextScriptEnd
 
 SilphCoElevatorObject: ; 0x45844 (size=23)
@@ -78793,6 +78829,26 @@ Route4HiddenObjects: ; 470a4 (11:70a4)
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
+FlagInstantAndPredefSilphCo: ; xxxxx (11:xxxx) ; Denim
+    push hl
+    ld hl,wFlagListMenuSpc
+    set 2,[hl]
+    pop hl
+    call Predef
+    ld hl,wFlagListMenuSpc
+    res 2,[hl]
+    ret
+
+FlagInstantAndPredefRocketHideout: ; xxxxx (11:xxxx) ; Denim
+    push hl
+    ld hl,wFlagListMenuSpc
+    set 3,[hl]
+    pop hl
+    call Predef
+    ld hl,wFlagListMenuSpc
+    res 3,[hl]
+    ret
+
 SECTION "bank12",ROMX,BANK[$12]
 
 Route7_h: ; 0x48000 to 0x48022 (34 bytes) (bank=12) (id=18)
@@ -79560,18 +79616,28 @@ CeladonMartElevatorScript_4862a: ; 4862a (12:462a)
     ret
 
 CeladonMartElevatorScript_48631: ; 48631 (12:4631)
-    ld hl,Unknown_48643 ; $4643
+    ld hl,CeladonMartElavatorFloors ; $4643
     call LoadItemList
-    ld hl,Unknown_4864a ; $464a
+    ld hl,CeldaonMartElevatorWarpMaps ; $464a
     ld de,$cc5b
     ld bc,$000a
     jp CopyData
 
-Unknown_48643: ; 48643 (12:4643)
-INCBIN "baserom.gbc",$48643,$4864a - $48643
+CeladonMartElavatorFloors: ; 48643 (12:4643)
+    db $05 ; num elements in list
+    ; db $56,$57,$58,$59,$5A ; "1F","2F","3F","4F,"5F"
+    db 1,2,3,4,5 ; Denim
+    db $FF ; terminator
 
-Unknown_4864a: ; 4864a (12:464a)
-INCBIN "baserom.gbc",$4864a,$48654 - $4864a
+CeldaonMartElevatorWarpMaps: ; 4864a (12:464a)
+; first byte is warp number
+; second byte is map number
+; These specify where the player goes after getting out of the elevator.
+    db $05,CELADON_MART_1
+    db $02,CELADON_MART_2
+    db $02,CELADON_MART_3
+    db $02,CELADON_MART_4
+    db $02,CELADON_MART_5
 
 Func_48654: ; 48654 (12:4654)
     ld b,BANK(Func_7bf15)
@@ -79584,9 +79650,9 @@ CeladonMartElevatorTextPointers: ; 4865c (12:465c)
 CeladonMartElevatorText1: ; 4865e (12:465e)
     db $08 ; asm
     call CeladonMartElevatorScript_48631
-    ld hl,Unknown_4864a ; $464a
+    ld hl,CeldaonMartElevatorWarpMaps ; $464a
     ld a,$61
-    call Predef
+    call FlagInstantAndPredefCeladonMart ; Denim ; call Predef
     jp TextScriptEnd
 
 CeladonMartElevatorObject: ; 0x4866d (size=23)
@@ -83059,6 +83125,16 @@ SafariZoneSecretHouseBlocks: ; 4a37f (12:637f)
 
 Route12GateBlocks: ; xxxxx (12:xxxx) ; Spostato a Fine Bank
     INCBIN "maps/route12gate.blk"
+
+FlagInstantAndPredefCeladonMart: ; xxxxx (12:xxxx) ; Denim
+    push hl
+    ld hl,wFlagListMenuSpc
+    set 1,[hl]
+    pop hl
+    call Predef
+    ld hl,wFlagListMenuSpc
+    res 1,[hl]
+    ret
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -87734,6 +87810,81 @@ Func_52a2f: ; 52a2f (14:6a2f)
 IndigoPlateauHQText: ; 52a3d (14:6a3d)
     TX_FAR _IndigoPlateauHQText
     db "@"
+
+GetSpecialListNameOrGetItemName_: ; xxxxx (14:6A4A) ; Denim
+    ld hl,wFlagListMenuSpc
+    bit 0,[hl]
+    jr nz,.BadgeName
+    bit 1,[hl]
+    jr nz,.CeladonMartElevator
+    bit 2,[hl]
+    jr nz,.SilphCoElevator
+    bit 3,[hl]
+    jr nz,.RocketHideoutElevator
+    jr .Item
+.BadgeName
+    ld hl,.BadgeNameText
+    jr .Common
+.CeladonMartElevator
+    ld hl,.CeladonMartElevatorText
+    jr .Common
+.SilphCoElevator
+    ld hl,.SilphCoElevatorText
+    jr .Common
+.RocketHideoutElevator
+    ld hl,.RocketHideoutElevatorText
+    ; jr .Common
+.Common
+    ld a,[$d11e] ; Badge ID
+    ld d,a
+.Loop
+    dec d
+    jr z,.End
+.nextChar
+    ld a,[hli]
+    cp "@"
+    jr nz,.nextChar
+    jr .Loop
+.End
+    ld bc,13
+    ld de,$CD6D
+    call CopyData ; copy bc bytes of data from hl to de
+    ld hl,W_LISTTYPE
+    ld [hl],4 ; FicticiousItemList
+    ret
+.Item
+    jp GetItemName
+.BadgeNameText
+    db "BOULDERBADGE@"
+    db "CASCADEBADGE@"
+    db "THUNDERBADGE@"
+    db "RAINBOWBADGE@"
+    db "SOULBADGE@"
+    db "MARSHBADGE@"
+    db "VOLCANOBADGE@"
+    db "EARTHBADGE@"
+.CeladonMartElevatorText
+    db "1F@"
+    db "2F@"
+    db "3F@"
+    db "4F@"
+    db "5F@"
+.SilphCoElevatorText
+    db "1F@"
+    db "2F@"
+    db "3F@"
+    db "4F@"
+    db "5F@"
+    db "6F@"
+    db "7F@"
+    db "8F@"
+    db "9F@"
+    db "10F@"
+    db "11F@"
+.RocketHideoutElevatorText
+    db "B1F@"
+    db "B2F@"
+    db "B4F@"
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -110940,7 +111091,7 @@ CeruleanHouse2Text1: ; 74e15 (1d:4e15)
 .asm_74e23
     ld hl,UnnamedText_74e7c
     call PrintText
-    ld hl,UnnamedText_74e6d
+    ld hl,BadgeIdList
     call LoadItemList
     ld hl,$cf7b
     ld a,l
@@ -110952,11 +111103,11 @@ CeruleanHouse2Text1: ; 74e15 (1d:4e15)
     ld [$cc35],a
     ld a,SPECIALLISTMENU
     ld [wListMenuID],a
-    call DisplayListMenuID
+    call FlagInstantAndDisplayListMenuID ; Denim ; call DisplayListMenuID
     jr c,.asm_74e60 ; 0x74e49 $15
     ld hl,Unknown_74e86
     ld a,[$cf91]
-    sub $15
+    sub 1 ; sub $15 ; Denim,ID badge spostati
     add a
     ld d,$0
     ld e,a
@@ -110973,7 +111124,16 @@ CeruleanHouse2Text1: ; 74e15 (1d:4e15)
     call PrintText
     jp TextScriptEnd
 
-UnnamedText_74e6d: ; 74e6d (1d:4e6d)
+BOULDERBADGE  EQU 0 + 1
+CASCADEBADGE  EQU 1 + 1
+THUNDERBADGE  EQU 2 + 1
+RAINBOWBADGE  EQU 3 + 1
+SOULBADGE     EQU 4 + 1
+MARSHBADGE    EQU 5 + 1
+VOLCANOBADGE  EQU 6 + 1
+EARTHBADGE    EQU 7 + 1
+
+BadgeIdList: ; 74e6d (1d:4e6d)
     db $8,BOULDERBADGE,CASCADEBADGE,THUNDERBADGE,RAINBOWBADGE,SOULBADGE,MARSHBADGE,VOLCANOBADGE,EARTHBADGE,$FF
 
 UnnamedText_74e77: ; 74e77 (1d:4e77)
@@ -114455,6 +114615,16 @@ CheckShinyFromHallOfFameData:
 BankswitchAndRemoveIVFromCheckShinyArea:
     call Bankswitch
     jp ResetTempIV
+
+FlagInstantAndDisplayListMenuID: ; xxxxx (1d:xxxx) ; Denim
+    ld hl,wFlagListMenuSpc
+    set 0,[hl]
+    call DisplayListMenuID
+    push af
+    ld hl,wFlagListMenuSpc
+    res 0,[hl]
+    pop af
+    ret
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -137745,14 +137915,14 @@ ItemNames: ; 472b (1:472b)
     db "HYPER POTION@" ; $12
     db "SUPER POTION@" ; $13
     db "POTION@"       ; $14
-    db "BOULDERBADGE@" ; $15
-    db "CASCADEBADGE@" ; $16
-    db "THUNDERBADGE@" ; $17
-    db "RAINBOWBADGE@" ; $18
-    db "SOULBADGE@"    ; $19
-    db "MARSHBADGE@"   ; $1A
-    db "VOLCANOBADGE@" ; $1B
-    db "EARTHBADGE@"   ; $1C
+    db "?@"            ; $15
+    db "?@"            ; $16
+    db "?@"            ; $17
+    db "?@"            ; $18
+    db "?@"            ; $19
+    db "?@"            ; $1A
+    db "?@"            ; $1B
+    db "?@"            ; $1C
     db "ESCAPE ROPE@"  ; $1D
     db "REPEL@"        ; $1E
     db "OLD AMBER@"    ; $1F

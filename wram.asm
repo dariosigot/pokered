@@ -1509,6 +1509,13 @@ wFlagAddPkmnToPartyBit0    ; df38 ; bit 0
 wFlagDratiniCaveBit1       ; df38 ; bit 1
     ds 1
 
+wFlagListMenuSpc: ; df39 ; Denim
+                  ; bit 0 = BadgeName
+                  ; bit 1 = Celadon Mart Elevator
+                  ; bit 2 = Silph Co Elevator
+                  ; bit 3 = Rocket Hideout Elevator
+    ds 1
+
 SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
 
 wFlagGameBoyColor:    ; dfff ; Denim
