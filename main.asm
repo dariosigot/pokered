@@ -124448,7 +124448,7 @@ _ReceivedTM36Text: ; 824ba (20:64ba)
     db $0,"!@@"
 
 _TM36ExplanationText: ; 824c9 (20:64c9)
-    db $0,"TM36 is",$4f
+    db $0,"This is",$4f
     db "SELFDESTRUCT!",$51
     db "It's powerful,but",$4f
     db "the #MON that",$55
@@ -127749,10 +127749,10 @@ _TM39PreReceiveText: ; 8c86b (23:486b)
 
 _ReceivedTM39Text: ; 8c8c6 (23:48c6)
     db $0,$52," received",$4f
-    db "TM39!@@"
+    db "a TM!@@"
 
 _TM39ExplanationText: ; 8c8d9 (23:48d9)
-    db $0,"TM39 is a move",$4f
+    db $0,"This is a move",$4f
     db "called SWIFT.",$51
     db "It's very accurate,",$4f
     db "so use it during",$55
@@ -131267,11 +131267,11 @@ _ViridianGymText12: ; 95fcc (25:5fcc)
 
 _ReceivedTM27Text: ; 96082 (25:6082)
     db $0,$52," received",$4f
-    db "TM27!@@"
+    db "a TM!@@"
 
 _TM27ExplanationText: ; 96095 (25:6095)
     db $0,$51
-    db "TM27 is FISSURE!",$4f
+    db "This is FISSURE!",$4f
     db "It will take out",$55
     db "#MON with just",$55
     db "one hit!",$51
@@ -131565,7 +131565,7 @@ _TM34PreReceiveText: ; 98092 (26:4092)
 
 _ReceivedTM34Text: ; 980ad (26:40ad)
     db $0,$52," received",$4f
-    db "TM34!@@"
+    db "a TM!@@"
 
 _TM34ExplanationText: ; 980c0 (26:40c0)
     db $0,$51
@@ -131579,7 +131579,7 @@ _TM34ExplanationText: ; 980c0 (26:40c0)
     db "a new technique,",$55
     db "pick the #MON",$55
     db "carefully!",$51
-    db "TM34 contains",$4f
+    db "This contains",$4f
     db "BIDE!",$51
     db "Your #MON will",$4f
     db "absorb damage in",$55
@@ -131798,7 +131798,7 @@ _UnnamedText_5c7be: ; 989c1 (26:49c1)
     db "#MON!",$57
 
 _UnnamedText_5c7c3: ; 98a7b (26:4a7b)
-    db $0,"TM11 teaches",$4f
+    db $0,"This teaches",$4f
     db "BUBBLEBEAM!",$51
     db "Use it on an",$4f
     db "aquatic #MON!",$57
@@ -132722,7 +132722,7 @@ _ReceivedTM24Text: ; 9c0e0 (27:40e0)
 
 _TM24ExplanationText: ; 9c0f5 (27:40f5)
     db $0,$51
-    db "TM24 contains",$4f
+    db "This contains",$4f
     db "THUNDERBOLT!",$51
     db "Teach it to an",$4f
     db "electric #MON!",$57
@@ -132926,7 +132926,7 @@ _ReceivedTM18Text: ; 9c85a (27:485a)
     db $0,"!@@"
 
 _TM18ExplanationText: ; 9c86e (27:486e)
-    db $0,"TM18 is COUNTER!",$4f
+    db $0,"This is COUNTER!",$4f
     db "Not like the one",$55
     db "I'm leaning on,",$55
     db "mind you!",$57
@@ -133070,11 +133070,11 @@ _UnnamedText_48515: ; 9cce6 (27:4ce6)
 
 _ReceivedTM49Text: ; 9cd1d (27:4d1d)
     db $0,$52," received",$4f
-    db "TM49!@@"
+    db "a TM!@@"
 
 _UnnamedText_48520: ; 9cd30 (27:4d30)
     db $0,$51
-    db "TM49 contains",$4f
+    db "This contains",$4f
     db "TRI ATTACK!@@"
 
 _UnnamedText_48526: ; 9cd4d (27:4d4d)
@@ -133288,7 +133288,7 @@ _ReceivedTM21Text: ; 9d50c (27:550c)
 
 _TM21ExplanationText: ; 9d520 (27:5520)
     db $0,$51
-    db "TM21 contains",$4f
+    db "This contains",$4f
     db "MEGA DRAIN.",$51
     db "Half the damage",$4f
     db "it inflicts is",$55
@@ -133922,7 +133922,7 @@ _ReceivedTM06Text: ; a00eb (28:40eb)
 
 _TM06ExplanationText: ; a00ff (28:40ff)
     db $0,$51
-    db "TM06 contains",$4f
+    db "This contains",$4f
     db "TOXIC!",$51
     db "It is a secret",$4f
     db "technique over",$55
@@ -134168,7 +134168,7 @@ _ReceivedTM38Text: ; a09a8 (28:49a8)
 
 _TM38ExplanationText: ; a09bc (28:49bc)
     db $0,$51
-    db "TM38 contains",$4f
+    db "This contains",$4f
     db "FIRE BLAST!",$51
     db "Teach it to fire-",$4f
     db "type #MON!",$51
@@ -134536,14 +134536,14 @@ _ReceivedTM31Text: ; a1675 (28:5675)
 
 _TM31ExplanationText1: ; a1689 (28:5689)
     db $0,$51
-    db "TM31 contains my",$4f
+    db "This contains my",$4f
     db "favorite,MIMIC!",$51
     db "Use it on a good",$4f
     db "#MON!@@"
 
 _TM31ExplanationText2: ; a16c5 (28:56c5)
     db $0,$52,": Hi!",$4f
-    db "Thanks for TM31!",$51
+    db "Thanks for TM!  ",$51
     db $52,": Pardon?",$51
     db $52,": Is it",$4f
     db "that fun to mimic",$55
@@ -134733,11 +134733,11 @@ _UnnamedText_5d173: ; a1d16 (28:5d16)
 
 ReceivedTM46Text: ; a1dcd (28:5dcd)
     db $0,$52," received",$4f
-    db "TM46!@@"
+    db "a TM!@@"
 
 _TM46ExplanationText: ; a1de0 (28:5de0)
     db $0,$51
-    db "TM46 is PSYWAVE!",$4f
+    db "This is PSYWAVE!",$4f
     db "It uses powerful",$55
     db "psychic waves to",$55
     db "inflict damage!",$57
@@ -134941,7 +134941,7 @@ _ReceivedTM29Text: ; a252a (28:652a)
     db $0,"!@@"
 
 _TM29ExplanationText: ; a253e (28:653e)
-    db $0,"TM29 is PSYCHIC!",$51
+    db $0,"This is PSYCHIC!",$51
     db "It can lower the",$4f
     db "target's SPECIAL",$55
     db "abilities.",$57
@@ -135308,10 +135308,10 @@ _UnnamedText_191ca: ; a45ea (29:45ea)
 
 _ReceivedTM42Text: ; a469a (29:469a)
     db $0,$52," received",$4f
-    db "TM42!@@"
+    db "a TM!@@"
 
 _TM42Explanation: ; a46ad (29:46ad)
-    db $0,"TM42 contains",$4f
+    db $0,"This contains",$4f
     db "DREAM EATER...",$55
     db "...Snore...",$57
 
@@ -135537,7 +135537,7 @@ _UnnamedText_196d9: ; a4f27 (29:4f27)
 
 _ReceivedTM28Text: ; a4f82 (29:4f82)
     db $0,$52," recovered",$4f
-    db "TM28!@@"
+    db "a TM!@@"
 
 _ReceivedTM28Text2: ; a4f96 (29:4f96)
     db $0,$51
@@ -135857,7 +135857,7 @@ _ReceivedTM41Text: ; a5b5a (29:5b5a)
     db $0,"!@@"
 
 _TM41ExplanationText: ; a5b6e (29:5b6e)
-    db $0,"TM41 teaches",$4f
+    db $0,"This teaches",$4f
     db "SOFTBOILED!",$51
     db "Only one #MON",$4f
     db "can use it!",$51
