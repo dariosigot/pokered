@@ -63594,13 +63594,13 @@ asm_3d00e: ; 3d00e (f:500e)
     ld [wListMenuID],a ; $cf94
     ld a,[$cc2c]
     ld [wCurrentMenuItem],a ; $cc26
-    call DisplayListMenuID
+    call SetBattleMenuPaletteAndDisplayListMenuID ; call DisplayListMenuID
     ld a,[wCurrentMenuItem] ; $cc26
     ld [$cc2c],a
     ld a,$0
     ld [$cc37],a
     ld [$cc35],a
-    jp c,InitBattleMenu
+    jp c,ResetBattleMenuPaletteAndInitBattleMenu ; jp c,InitBattleMenu
 asm_3d05f: ; 3d05f (f:505f)
     ld a,[$cf91]
     ld [$d11e],a
@@ -70510,6 +70510,16 @@ IsDratiniOrRandom:
     ld b,$AA
     ld a,$FA ; Rendere l'attacco casuale tra i valori Shiny Disponibili
     ret
+
+SetBattleMenuPaletteAndDisplayListMenuID:
+    ld b,0
+    call GoPAL_SET
+    jp DisplayListMenuID
+
+ResetBattleMenuPaletteAndInitBattleMenu:
+    call LoadScreenTilesFromBuffer1 ; restore saved screen
+    call GoPAL_SET_CF1C
+    jp InitBattleMenu
 
 SECTION "bank10",ROMX,BANK[$10]
 
