@@ -1507,6 +1507,7 @@ wDVForShinySpdSpc      ; df37
 
 wFlagAddPkmnToPartyBit0    ; df38 ; bit 0
 wFlagDratiniCaveBit1       ; df38 ; bit 1
+wFlagRenameAfterCatchBit2  ; df38 ; bit 2
     ds 1
 
 wFlagListMenuSpc: ; df39 ; Denim

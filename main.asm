@@ -18420,7 +18420,7 @@ StoreCatchPkmnIdAndFlagBeforeRename: ; Denim
     ld hl,wSpriteOAMBySpecies
     set 0,[hl]
     inc hl
-    ld a,[$d11e]
+    ld a,[$cf91]
     ld [hl],a ; wSpriteOAMBySpeciesId
     pop hl
     jp LoadRenameScreen
@@ -18455,6 +18455,7 @@ PrintGenderInRenameScreen:
     ret
 
 ; Generate Random only if Out Of Battle And Pkmn Is Added ToParty
+; During Battle clear Pokemon Stat and Change Palette to avoid Yes/No bad Palette Border
 InsertIVAndLoadTextCoord:
     ld hl,wDVForShinyAtkDef
     ld a,[W_ISINBATTLE] ; $d057
@@ -18473,6 +18474,18 @@ InsertIVAndLoadTextCoord:
     ld [hli],a
     ld a,[W_ENEMYMONSPDSPCIV]
     ld [hl],a
+    ; Remove Player Battle Stats Frame
+    FuncCoord 10,7
+    ld hl,Coord
+    ld bc,$050A
+    call ClearScreenArea
+    ; Change Battle Screen Palette to Player's Pkmn Color
+    ld hl,wFlagRenameAfterCatchBit2
+    set 2,[hl]
+    ld b,1
+    call GoPAL_SET
+    ; Backup Graphics
+    call SaveScreenTilesToBuffer1
 .Done
     ld hl,DoYouWantToNicknameText ; $6557
     ret
@@ -108192,7 +108205,15 @@ Func_72188: ; 72188 (1c:6188)
     ret
 
 Unknown_7219e: ; 7219e (1c:619e)
-INCBIN "baserom.gbc",$7219e,$721b5 - $7219e
+;INCBIN "baserom.gbc",$7219e,$721b5 - $7219e
+
+    db $21
+    db $01
+
+    db $03,$00
+    db $00,$00,$13,$11
+
+    db $00,$00,$00,$00,$00,$00,$00,$00,$03,$00,$00,$13,$11,$00,$00
 
 Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP nella battaglia e altre migliorie ; TODO
 ;INCBIN "baserom.gbc",$721b5,$721fa - $721b5
@@ -108406,11 +108427,23 @@ PaletteBankCopyData: ; Denim ; 5 BYTE
     ld a,BANK(SuperPalettes)
     jp FarCopyData
 
-FirstHPBarPalette: ; Denim ; 8 BYTE
+FirstHPBarPalette: ; Denim ; 28 BYTE
+    push hl
+    ld hl,wFlagRenameAfterCatchBit2
+    bit 2,[hl]
+    res 2,[hl]
+    pop hl
+    jr nz,.CopyPlayerPkmn
     ld a,[$cf1d]
     add PAL_GREENBAR
     ld [hli],a
     inc hl
+    ret
+.CopyPlayerPkmn
+    ld a,[$cf2e]
+    ld [hli],a
+    ld a,[$cf2e+1]
+    ld [hli],a
     ret
 
 PaletteHackTwoBytes1: ; Denim ; 6 BYTE
