@@ -108205,11 +108205,11 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
 
     ; opponent hp bar
     db $03,$0F ; $03,$05
-    db $01,$00,$0A,$03
+    db $00,$00,$0A,$03
 
     ; player hp bar
     db $03,$0A ; $03,$00
-    db $0A,$07,$12,$0B ; $0A,$07,$13,$0A
+    db $0A,$07,$13,$0B ; $0A,$07,$13,$0A
 
     ; frontsprite opponent
     db $03,$05 ; $03,$0F
