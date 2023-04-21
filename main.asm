@@ -39682,34 +39682,12 @@ Func_1a609: ; 1a609 (6:6609)
     and a
     ret
 
-DoorTileIDPointers: ; 1a62c (6:662c)
-    db $00
-    dw Tileset00DoorTileIDs
-    db $03
-    dw Tileset03DoorTileIDs
-    db $02
-    dw Tileset02DoorTileIDs
-    db $08
-    dw Tileset08DoorTileIDs
-    db $09
-    dw TilesetMuseumDoorTileIDs
-    db $0a
-    dw TilesetMuseumDoorTileIDs
-    db $0c
-    dw TilesetMuseumDoorTileIDs
-    db $0d
-    dw Tileset0DDoorTileIDs
-    db $12
-    dw Tileset12DoorTileIDs
-    db $13
-    dw Tileset13DoorTileIDs
-    db $14
-    dw Tileset14DoorTileIDs
-    db $16
-    dw Tileset16DoorTileIDs
-    db $17
-    dw Tileset17DoorTileIDs
-    db $ff
+DoorTileIDPointers_Old:
+
+Tileset10DoorTileIDs: ; Silph 11th floor
+    db $04,$15,$00
+
+SECTION "Tileset00DoorTileIDs",ROMX[$6654],BANK[$6]
 
 Tileset00DoorTileIDs: ; 1a654 (6:6654)
     db $1B,$58,$00
@@ -39830,6 +39808,37 @@ LedgeHoppingShadow: ; 1a708 (6:6708)
 LedgeHoppingShadowOAM: ; 1a710 (6:6710)
     db $FF,$10,$FF,$20
     db $FF,$40,$FF,$60
+
+DoorTileIDPointers: ; Move to Bank's End
+    db $00
+    dw Tileset00DoorTileIDs
+    db $03
+    dw Tileset03DoorTileIDs
+    db $02
+    dw Tileset02DoorTileIDs
+    db $08
+    dw Tileset08DoorTileIDs
+    db $09
+    dw TilesetMuseumDoorTileIDs
+    db $0a
+    dw TilesetMuseumDoorTileIDs
+    db $0c
+    dw TilesetMuseumDoorTileIDs
+    db $0d
+    dw Tileset0DDoorTileIDs
+    db $10
+    dw Tileset10DoorTileIDs ; Silph 11th floor
+    db $12
+    dw Tileset12DoorTileIDs
+    db $13
+    dw Tileset13DoorTileIDs
+    db $14
+    dw Tileset14DoorTileIDs
+    db $16
+    dw Tileset16DoorTileIDs
+    db $17
+    dw Tileset17DoorTileIDs
+    db $ff
 
 SECTION "bank7",ROMX,BANK[$7]
 
