@@ -115152,7 +115152,12 @@ MoveAnimationPalette: ; 78e23 (1e:4e23) ; Denim
     jr z,.noSGB
     ld a,%11110000
     ld [$cc79],a
+    ld a,[W_ANIMATIONID]
+    cp TOSS_ANIM
+    ld a,%11110000
+    jr nz,.Done
     ld a,%11100100
+.Done
     ld [rOBP0],a ; $FF00+$48
     ret
 .noSGB
@@ -115167,13 +115172,11 @@ CheckCaptureAnimAndStoreFlag: ; Denim ; 13 BYTE
     jr nz,.Done
     ld a,[de]
     inc a
-    ld [de],a ; store flags
+    ld [de],a ; Palette OBJ1 (Enemy Pkmn)
 .Done
     inc de
     ld a,[W_FBTILECOUNTER]
     ret
-
-    ds 9
 
 SECTION "PlaySubanimation",ROMX[$4e53],BANK[$1e] ; Denim
 
