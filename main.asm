@@ -7297,11 +7297,11 @@ DisplayListMenuID: ; 2be6 (0:2be6)
     ld a,[hl]
     ld [$d12a],a ; [$d12a] = number of list entries
     ld a,$0d ; list menu text box ID
-    ld [$d125],a
+    call HackItemInBattle ; ld [$d125],a ; $2c16
     call DisplayTextBoxID ; draw the menu text box
     call UpdateSprites ; move sprites
     FuncCoord 4,2 ; coordinates of upper left corner of menu text box
-    ld hl,Coord
+    call HackItemInBattle ; ld hl,Coord ; $2c1f
     ld de,$090e ; height and width of menu text box
     ld a,[wListMenuID]
     and a ; is it a PC pokemon list?
@@ -7317,7 +7317,7 @@ DisplayListMenuID: ; 2be6 (0:2be6)
 .setMenuVariables
     ld [wMaxMenuItem],a
     ld a,4
-    ld [wTopMenuItemY],a
+    call HackItemInBattle ; ld [wTopMenuItemY],a ; $2c41
     ld a,5
     ld [wTopMenuItemX],a
     ld a,%00000111 ; A button,B button,Select button
@@ -7338,7 +7338,7 @@ DisplayListMenuIDLoop: ; 2c53 (0:2c53)
 .oldManBattle
     ld a,"▶"
     FuncCoord 5,4
-    ld [Coord],a ; place menu cursor in front of first menu entry
+    call HackItemInBattle ; ld [Coord],a ; place menu cursor in front of first menu entry ; $2c68
     ld c,80
     call DelayFrames
     xor a
@@ -7612,7 +7612,7 @@ ExitListMenu: ; 2e3b (0:2e3b)
 
 PrintListMenuEntries: ; 2e5a (0:2e5a)
     FuncCoord 5,3 ; $c3e1
-    ld hl,Coord
+    call HackItemInBattle ; ld hl,Coord ; $2e5a
     ld b,$09
     ld c,$0e
     call ClearScreenArea
@@ -7638,7 +7638,7 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     inc d
 .noCarry
     FuncCoord 6,4 ; coordinates of first list entry name
-    ld hl,Coord
+    call HackItemInBattle ; ld hl,Coord ; $2e82
     ld b,4 ; print 4 names
 .loop
     ld a,b
@@ -10781,6 +10781,20 @@ GoodCopyVideoData: ; Denim,ExpBar
     pop hl
     pop de
     jp FarCopyData2 ; if LCD is off,transfer all at once
+
+HackItemInBattle:
+    pop hl  ; get Return Pointer to HL
+    push hl ; restore Return Pointer in Stack
+    push de
+    ld d,a
+    ld e,l
+    ld hl,_HackItemInBattle
+    ld b,BANK(_HackItemInBattle)
+    call Bankswitch
+    ld h,d
+    ld l,e
+    pop de
+    ret
 
 SECTION "bank1",ROMX,BANK[$1]
 
@@ -17162,20 +17176,11 @@ TextBoxFunctionTable: ; 7387 (1:7387)
     dbw $04,Func_76e1
     db $ff ; terminator
 
-; Format:
-; 00: text box ID
-; 01: column of upper left corner
-; 02: row of upper left corner
-; 03: column of lower right corner
-; 04: row of lower right corner
-TextBoxCoordTable: ; 7391 (1:7391)
-    db $01,0,12,19,17
-    db $03,0,0,19,14
-    db $07,0,0,11,6
-    db $0d,4,2,19,12
-    db $10,7,0,19,17
-    db $11,6,4,14,13
-    db $ff ; terminator
+TextBoxCoordTable_Old:
+
+; Some Free Bytes
+
+SECTION "TextBoxTextAndCoordTable",ROMX[$73b0],BANK[$1]
 
 ; Format:
 ; 00: text box ID
@@ -18474,6 +18479,23 @@ InsertIVAndLoadTextCoord:
 .Done
     ld hl,DoYouWantToNicknameText ; $6557
     ret
+
+; Format:
+; 00: text box ID
+; 01: column of upper left corner
+; 02: row of upper left corner
+; 03: column of lower right corner
+; 04: row of lower right corner
+TextBoxCoordTable: ; 7391 (1:7391)
+    db $01,0,12,19,17
+    db $03,0,0,19,14
+    db $07,0,0,11,6
+    db $0d,4,2,19,12 ; Item Menù
+    db $10,7,0,19,17
+    db $11,6,4,14,13
+    db $77,4,2+5,19,12+5 ; Item Menù during Battle
+
+    db $ff ; terminator
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -137696,6 +137718,87 @@ DratiniCaveObject:
 
 DratiniCaveBlocks:
     INCBIN "maps/dratinicave.blk"
+
+; INPUT
+; d = ex a
+; e = Low Bit Return Pointer
+_HackItemInBattle:
+    ld hl,.Table
+.Loop
+    ld a,[hli]
+    cp $ff
+    jr z,.End
+    cp e
+    jr z,.Found
+    inc hl
+    inc hl
+    jr .Loop
+.Found
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld a,[W_ISINBATTLE]
+    and a
+    jp [hl]
+.End
+    ret
+.Step1:
+    ld a,$0d ; list menu text box ID
+    jr z,.Step1Done
+    ld a,$77 ; list menu text box ID
+.Step1Done
+    ld [$d125],a ; $2c16
+    ret
+.Step2:
+    FuncCoord 4,2 ; coordinates of upper left corner of menu text box
+    ld de,Coord
+    ret z
+    FuncCoord 4,7 ; coordinates of upper left corner of menu text box
+    ld de,Coord ; $2c1f
+    ret
+.Step3
+    ld a,4
+    jr z,.Step3Done
+    ld a,9
+.Step3Done
+    ld [wTopMenuItemY],a ; $2c41
+    ret
+.Step4
+    ld a,d
+    FuncCoord 5,4
+    ld [Coord],a ; place menu cursor in front of first menu entry
+    ret z
+    FuncCoord 5,9
+    ld [Coord],a ; place menu cursor in front of first menu entry ; $2c68
+    ret
+.Step5
+    FuncCoord 5,3 ; $c3e1
+    ld de,Coord
+    ret z
+    FuncCoord 5,8 ; $c3e1
+    ld de,Coord ; $2e5a
+    ret
+.Step6
+    FuncCoord 6,4 ; coordinates of first list entry name
+    ld de,Coord
+    ret z
+    FuncCoord 6,9 ; coordinates of first list entry name
+    ld de,Coord ; $2e82
+    ret
+.Table
+    db $16 + 3
+    dw .Step1
+    db $1f + 3
+    dw .Step2
+    db $41 + 3
+    dw .Step3
+    db $68 + 3
+    dw .Step4
+    db $5a + 3
+    dw .Step5
+    db $82 + 3
+    dw .Step6
+    db $ff
 
 SECTION "bank33",ROMX,BANK[$33] ; Denim,GENDER
 
