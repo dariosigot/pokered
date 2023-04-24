@@ -1488,7 +1488,6 @@ wBlkCoordinateX2Right: ; df33
 wBlkCoordinateY2Lower: ; df34
     ds 1
 
-wFlagBycicleFourX:         ; df35 ; bit 0
 wFlagDamageToPlayerBit1    ; df35 ; bit 1
 wFlagShinyBit2             ; df35 ; bit 2
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
@@ -1507,7 +1506,7 @@ wDVForShinySpdSpc      ; df37
 
 wFlagAddPkmnToPartyBit0    ; df38 ; bit 0
 wFlagDratiniCaveBit1       ; df38 ; bit 1
-wFlagRenameAfterCatchBit2  ; df38 ; bit 2
+wFlagNoPlayerHpPalBit2     ; df38 ; bit 2
     ds 1
 
 wFlagListMenuSpc: ; df39 ; Denim
