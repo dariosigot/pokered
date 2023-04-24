@@ -26757,10 +26757,10 @@ ItemUseBall: ; d687 (3:5687)
     ld hl,W_NUMSAFARIBALLS
     dec [hl]
 .skipSafariZoneCode    ;$56b6
+    call LoadScreenTilesFromBuffer1    ;restore screenBuffer from Backup
     call GoPAL_SET_CF1C
     ld a,$43
     ld [$d11e],a
-    call LoadScreenTilesFromBuffer1    ;restore screenBuffer from Backup
     ld hl,ItemUseText00
     call PrintText
     ld hl,Func_3d83a
@@ -28882,8 +28882,8 @@ ItemUseNotYoursToUse: ; e586 (3:6586)
     jr ItemUseFailed
 
 ThrowBallAtTrainerMon: ; e58b (3:658b)
-    call GoPAL_SET_CF1C
     call LoadScreenTilesFromBuffer1 ; restore saved screen
+    call GoPAL_SET_CF1C
     call Delay3
     ld a,TOSS_ANIM
     ld [W_ANIMATIONID],a
@@ -70497,8 +70497,15 @@ IsDratiniOrRandom:
     ret
 
 SetBattleMenuPaletteAndDisplayListMenuID:
-    ld b,0
-    call GoPAL_SET
+    ; Remove Player Battle Stats Frame
+    FuncCoord 10,7
+    ld hl,Coord
+    ld bc,$050A
+    call ClearScreenArea
+    ; Change Battle Screen Palette to Player's Pkmn Color
+    ld hl,wFlagNoPlayerHpPalBit2
+    set 2,[hl]
+    call GoPAL_SET_CF1C
     jp DisplayListMenuID
 
 ResetBattleMenuPaletteAndInitBattleMenu:
