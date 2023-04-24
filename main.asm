@@ -806,16 +806,15 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
 .moveAhead2
     ld hl,wFlags_0xcd60
     res 2,[hl]
-    ; Denim
-    nop
     ld a,[$d736]
     bit 6,a ; jumping a ledge?
     jr nz,.SkipSpeedUp
-    call SpeedUp ; if not jumping a ledge
-    ld hl,wFlagBycicleFourX
-    res 0,[hl]
+    ld a,[$cc57] ; simulation
+    and a
+    jr nz,.SkipSpeedUp
+    call SpeedUp ; if not jumping a ledge or simulation
 .SkipSpeedUp
-    call AdvancePlayerSprite
+    call AdvancePlayerSprite ; Speed 1x
     ld a,[wWalkCounter] ; $cfc5
     and a
     jp nz,CheckMapConnections ; it seems like this check will never succeed (the other place where CheckMapConnections is run works)
@@ -916,16 +915,18 @@ NewBattle: ; 0683 (0:0683)
 SpeedUp: ; 06a0 (0:06a0) ; Denim,20 BYTE a disposizione
     ld a,[$d700] ; if 0 -> walk,if 1 -> byke
     and a
-    ld b,0;RUNN_SHOES
-    jp z,SpeedUpWalk
+    jr z,TrySpeedUpWithB ; if walk
     dec a
-    ret nz ; if 2 -> surf
-.Byke
-    ld a,[$cc57]    ; ??
-    and a            ; ..
-    ret nz            ; ..
-    jp SpeedUpByke
-    nop
+    jp z, SpeedUpByke
+    ret ; if 2 -> surf
+
+TrySpeedUpWithB:
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
+    and a,%00000010 ; bit mask for B
+    ret z
+    jp AdvancePlayerSprite ; Speed 2X
+
+SECTION "CheckWarpsNoCollision",ROM0[$06b4]
 
 ; check if the player has stepped onto a warp after having not collided
 CheckWarpsNoCollision: ; 06b4 (0:06b4)
@@ -10729,27 +10730,11 @@ SpeedUpByke: ; Denim,Speed Walk and Byke
     jr nz,.normalByke
     ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
     and a,%01110000 ; bit mask for up,left,right buttons
-    ld b,0;LIGHT_KIT
-    jr nz,TrySpeedB
+    jp nz,TrySpeedUpWithB
 .normalByke
     call AdvancePlayerSprite ; Speed 2X
-    ld hl,wFlagBycicleFourX
-    set 0,[hl]
-;    ld b,0;LIGHT_KIT
-
-SpeedUpWalk:
-TrySpeedB:
-;    ds 4;call IsItemInBag
-    ;ret z
-    ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
-    and a,%00000010 ; bit mask for B
-    ret z
-    ld hl,wFlagBycicleFourX
-    bit 0,[hl]
-    jr z,.NotNormalByke
-    call AdvancePlayerSprite ; Speed 2X (total 4X)
-.NotNormalByke
-    jp AdvancePlayerSprite ; Speed 2X
+    call TrySpeedUpWithB     ; Speed 3X
+    jp TrySpeedUpWithB       ; Speed 4X
 
 ; INPUT hl = giusto indirizzo degli IV del pokemon interessato
 ; W_ENEMYMONATKDEFIV ; .Front
@@ -18480,7 +18465,7 @@ InsertIVAndLoadTextCoord:
     ld bc,$050A
     call ClearScreenArea
     ; Change Battle Screen Palette to Player's Pkmn Color
-    ld hl,wFlagRenameAfterCatchBit2
+    ld hl,wFlagNoPlayerHpPalBit2
     set 2,[hl]
     ld b,1
     call GoPAL_SET
@@ -108429,7 +108414,7 @@ PaletteBankCopyData: ; Denim ; 5 BYTE
 
 FirstHPBarPalette: ; Denim ; 28 BYTE
     push hl
-    ld hl,wFlagRenameAfterCatchBit2
+    ld hl,wFlagNoPlayerHpPalBit2
     bit 2,[hl]
     res 2,[hl]
     pop hl
