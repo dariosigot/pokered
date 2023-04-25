@@ -28243,7 +28243,7 @@ ItemUseXStat: ; e104 (3:6104)
     ld a,XSTATITEM_ANIM ; X stat item animation ID
     ld [W_PLAYERMOVENUM],a
     call LoadScreenTilesFromBuffer1 ; restore saved screen
-    call Delay3
+    call GoPalSetAndDelay3Bank3 ; call Delay3
     xor a
     ld [H_WHOSETURN],a ; set turn to player's turn
     ld b,BANK(Func_3f428)
@@ -28316,7 +28316,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     ld a,[hl]
     and b ; remove Sleep status
     ld [hl],a
-    call LoadScreenTilesFromBuffer2 ; restore saved screen
+    call LoadScreenBufferAndGoPalSet ; call LoadScreenTilesFromBuffer2 ; restore saved screen
     ld a,[$cd3d]
     and a ; were any pokemon asleep before playing the flute?
     ld hl,PlayedFluteNoEffectText
@@ -32066,6 +32066,14 @@ ResetEnemyHPAndStatus:
     ld [W_ENEMYMONCURHP+1],a
     ld hl,W_ENEMYMON_START
     ret
+
+GoPalSetAndDelay3Bank3:
+    call GoPAL_SET_CF1C
+    jp Delay3
+
+LoadScreenBufferAndGoPalSet:
+    call LoadScreenTilesFromBuffer1 ; restore saved screen
+    jp GoPAL_SET_CF1C
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -63643,7 +63651,7 @@ asm_3d05f: ; 3d05f (f:505f)
     jr z,.asm_3d0b2
     call LoadScreenTilesFromBuffer1
     call Func_3cd5a ; redraw name and hp bar?
-    call Delay3
+    call GoPalSetAndDelay3BankF ; call Delay3
 .asm_3d0b2
     call GBPalNormal
     and a
@@ -70534,6 +70542,10 @@ ResetBattleMenuPaletteAndInitBattleMenu:
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     call GoPAL_SET_CF1C
     jp InitBattleMenu
+
+GoPalSetAndDelay3BankF:
+    call GoPAL_SET_CF1C
+    jp Delay3
 
 SECTION "bank10",ROMX,BANK[$10]
 
