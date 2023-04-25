@@ -59777,7 +59777,7 @@ Mon149_EvosMoves: ; 3b500 (e:7500)
     db 10,THUNDER_WAVE
     db 20,AGILITY
     db 24,SLAM
-    db 43,DRAGON_RAGE
+    db 45,DRAGON_RAGE
     db 60,HYPER_BEAM
     db 0
 
