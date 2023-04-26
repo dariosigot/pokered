@@ -16408,7 +16408,7 @@ Func_6e5b: ; 6e5b (1:6e5b)
     ld [$d11e],a
     call GetMoveName
     ld hl,UnnamedText_6fc8 ; $6fc8
-    call PrintText
+    call IsTryingToLearnFix ; call PrintText
     pop de
     pop hl
 .asm_6e8b
@@ -16451,7 +16451,7 @@ Func_6e5b: ; 6e5b (1:6e5b)
 
 Func_6eda: ; 6eda (1:6eda)
     ld hl,UnnamedText_6fb9 ; $6fb9
-    call PrintText
+    call IsTryingToLearnFix ; call PrintText
     FuncCoord 14,7 ; $c43a
     ld hl,Coord
     ld bc,$80f
@@ -16462,20 +16462,20 @@ Func_6eda: ; 6eda (1:6eda)
     and a
     jp nz,Func_6e5b
     ld hl,UnnamedText_6fbe ; $6fbe
-    call PrintText
+    call IsTryingToLearnFix_End ; call PrintText
     ld b,$0
     ret
 
 Func_6efe: ; 6efe (1:6efe)
     ld hl,UnnamedText_6fad ; $6fad
-    call PrintText
+    call IsTryingToLearnFix_End ; call PrintText
     ld b,$1
     ret
 
 Func_6f07: ; 6f07 (1:6f07)
     push hl
     ld hl,UnnamedText_6fc3 ; $6fc3
-    call PrintText
+    call IsTryingToLearnFix ; call PrintText
     FuncCoord 14,7 ; $c43a
     ld hl,Coord
     ld bc,$80f
@@ -18464,16 +18464,9 @@ InsertIVAndLoadTextCoord:
     ld [hli],a
     ld a,[W_ENEMYMONSPDSPCIV]
     ld [hl],a
-    ; Remove Player Battle Stats Frame
-    FuncCoord 10,7
-    ld hl,Coord
-    ld bc,$050A
-    call ClearScreenArea
-    ; Change Battle Screen Palette to Player's Pkmn Color
-    ld hl,wFlagNoPlayerHpPalBit2
-    set 2,[hl]
-    ld b,1
-    call GoPAL_SET
+    ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
+    ld hl,HidePlayerBattleHudAndStandarizePalette
+    call Bankswitch
     ; Backup Graphics
     call SaveScreenTilesToBuffer1
 .Done
@@ -18496,6 +18489,26 @@ TextBoxCoordTable: ; 7391 (1:7391)
     db $77,4,2+5,19,12+5 ; Item Menù during Battle
 
     db $ff ; terminator
+
+IsTryingToLearnFix:
+    push hl
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.End
+    ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
+    ld hl,HidePlayerBattleHudAndStandarizePalette
+    call Bankswitch
+.End
+    pop hl
+    jp PrintText
+
+IsTryingToLearnFix_End:
+    call PrintText
+    ld a,[W_ISINBATTLE]
+    and a
+    ret z
+    call LoadScreenTilesFromBuffer1
+    jp GoPAL_SET_CF1C
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -62452,7 +62465,7 @@ Func_3c79b: ; 3c79b (f:479b)
     ld bc,$a0e
     ld a,$14
     ld [$d125],a
-    call DisplayTextBoxID
+    call UseNextPkmnFixPalette ; call DisplayTextBoxID
     ld a,[$d12e]
     cp $2
     jr z,.asm_3c7c4
@@ -70526,7 +70539,11 @@ IsDratiniOrRandom:
     ld a,$FA ; Rendere l'attacco casuale tra i valori Shiny Disponibili
     ret
 
-SetBattleMenuPaletteAndDisplayListMenuID:
+HidePlayerBattleHudAndStandarizePalette:
+    push af
+    push bc
+    push de
+    push hl
     ; Remove Player Battle Stats Frame
     FuncCoord 10,7
     ld hl,Coord
@@ -70536,6 +70553,14 @@ SetBattleMenuPaletteAndDisplayListMenuID:
     ld hl,wFlagNoPlayerHpPalBit2
     set 2,[hl]
     call GoPAL_SET_CF1C
+    pop hl
+    pop de
+    pop bc
+    pop af
+    ret
+
+SetBattleMenuPaletteAndDisplayListMenuID:
+    call HidePlayerBattleHudAndStandarizePalette
     jp DisplayListMenuID
 
 ResetBattleMenuPaletteAndInitBattleMenu:
@@ -70546,6 +70571,10 @@ ResetBattleMenuPaletteAndInitBattleMenu:
 GoPalSetAndDelay3BankF:
     call GoPAL_SET_CF1C
     jp Delay3
+
+UseNextPkmnFixPalette:
+    call HidePlayerBattleHudAndStandarizePalette
+    jp DisplayTextBoxID
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -135277,7 +135306,8 @@ UnnamedText_a2749: ; a2749 (28:6749)
     db $0,"!@@"
 
 _UnnamedText_6fb4: ; a2750 (28:6750)
-    db $0,"Which move should",$4e,"be forgotten?",$57
+    db $0,"Which move should",$4e,"be replaced?",$57
+    ds 1
 
 _UnnamedText_6fb9: ; a2771 (28:6771)
     db $0,"Abandon learning",$4f
@@ -135299,21 +135329,14 @@ UnnamedText_a279e: ; a279e (28:679e)
 
 _UnnamedText_6fc3: ; a27a4 (28:67a4)
     TX_RAM $d036
-    db $0," is",$4f
-    db "trying to learn",$55
+    db $0," learned",$4f
     db "@"
 
 UnnamedText_a27bd: ; a27bd (28:67bd)
     TX_RAM $cf4b
     db $0,"!",$51
-    db "But,@"
-    TX_RAM $d036
-    db $0,$4f
-    db "can't learn more",$55
-    db "than 4 moves!",$51
-    db "Delete an older",$4f
-    db "move to make room",$55
-    db "for @"
+    db "Replace a move for",$4f
+    db "@"
 
 UnnamedText_a2813: ; a2813 (28:6813)
     TX_RAM $cf4b
@@ -135340,13 +135363,6 @@ UnnamedText_a2833: ; a2833 (28:6833)
 _UnnamedText_6fe1: ; a284d (28:684d)
     db $0,"POWER Moves  ",$4f
     db "can't be deleted!",$58
-
-;_PokemonCenterWelcomeText: ; a286d (28:686d)
-;    db $0,"Welcome to our",$4f
-;    db "#MON CENTER!",$51
-;    db "We heal your",$4f
-;    db "#MON back to",$55
-;    db "perfect health!",$58
 
 _PokemonCenterWelcomeText: ; a286d (28:686d)
     db $0,"Welcome to our",$4f
