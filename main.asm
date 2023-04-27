@@ -30587,8 +30587,8 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     push hl
     ld a,[$cc49]
     and $f
-    ld a,$98     ; set enemy trainer mon IVs to fixed average values
-    ld b,$88
+    call GenerateRandomEnemyTrainerIV ; ld a,$98     ; set enemy trainer mon IVs to fixed average values
+    ds 1                              ; ld b,$88
     jr nz,.writeFreshMonData
     ld a,[$cf91]
     ld [$d11e],a
@@ -32121,6 +32121,30 @@ PartyMenuHPAndStandarizePalette:
     pop de
     pop bc
     pop af
+    ret
+
+GenerateRandomEnemyTrainerIV:
+    ret z
+    push af
+    ld a,[W_CURMAP]
+    cp LANCES_ROOM
+    jr nz,.Random
+    ld a,[$FF00+$e4]
+    dec a
+    jr nz,.Random
+    ld c,$FA ; Lance's Gyarados
+    ld b,$AA
+    jr .End
+.Random
+    call GenRandom ; generate random IVs
+    or $88
+    ld b,a
+    call GenRandom
+    or $98
+    ld c,a
+.End
+    pop af
+    ld a,c
     ret
 
 SECTION "bank4",ROMX,BANK[$4]
@@ -67530,8 +67554,8 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     jr nz,.asm_3eb33
     ld a,[W_ISINBATTLE] ; $d057
     cp $2
-    ld a,$98
-    ld b,$88
+    call GetEnemyIV ; ld a,$98
+    ds 1            ; ld b,$88
     jr z,.asm_3eb33
     call GenRandomInBattle
     ld b,a
@@ -70631,6 +70655,17 @@ GoPalSetAndDelay3BankF:
 UseNextPkmnFixPalette:
     call HidePlayerBattleHudAndStandarizePalette
     jp DisplayTextBoxID
+
+GetEnemyIV:
+    push af
+    ld hl,W_ENEMYMON1MOVE3+$11
+	ld a,[wWhichPokemon]
+	ld bc,44
+	call AddNTimes
+    pop af
+	ld a,[hli]
+	ld b,[hl]
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
