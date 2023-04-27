@@ -16408,7 +16408,7 @@ Func_6e5b: ; 6e5b (1:6e5b)
     ld [$d11e],a
     call GetMoveName
     ld hl,UnnamedText_6fc8 ; $6fc8
-    call IsTryingToLearnFix ; call PrintText
+    call IsTryingToLearnPalFix ; call PrintText
     pop de
     pop hl
 .asm_6e8b
@@ -16451,7 +16451,7 @@ Func_6e5b: ; 6e5b (1:6e5b)
 
 Func_6eda: ; 6eda (1:6eda)
     ld hl,UnnamedText_6fb9 ; $6fb9
-    call IsTryingToLearnFix ; call PrintText
+    call IsTryingToLearnPalFix ; call PrintText
     FuncCoord 14,7 ; $c43a
     ld hl,Coord
     ld bc,$80f
@@ -16462,20 +16462,20 @@ Func_6eda: ; 6eda (1:6eda)
     and a
     jp nz,Func_6e5b
     ld hl,UnnamedText_6fbe ; $6fbe
-    call IsTryingToLearnFix_End ; call PrintText
+    call IsTryingToLearnPalFix_End ; call PrintText
     ld b,$0
     ret
 
 Func_6efe: ; 6efe (1:6efe)
     ld hl,UnnamedText_6fad ; $6fad
-    call IsTryingToLearnFix_End ; call PrintText
+    call IsTryingToLearnPalFix_End ; call PrintText
     ld b,$1
     ret
 
 Func_6f07: ; 6f07 (1:6f07)
     push hl
     ld hl,UnnamedText_6fc3 ; $6fc3
-    call IsTryingToLearnFix ; call PrintText
+    call IsTryingToLearnPalFix ; call PrintText
     FuncCoord 14,7 ; $c43a
     ld hl,Coord
     ld bc,$80f
@@ -18490,7 +18490,7 @@ TextBoxCoordTable: ; 7391 (1:7391)
 
     db $ff ; terminator
 
-IsTryingToLearnFix:
+IsTryingToLearnPalFix:
     push hl
     ld a,[W_ISINBATTLE]
     and a
@@ -18502,7 +18502,7 @@ IsTryingToLearnFix:
     pop hl
     jp PrintText
 
-IsTryingToLearnFix_End:
+IsTryingToLearnPalFix_End:
     call PrintText
     ld a,[W_ISINBATTLE]
     and a
@@ -27951,7 +27951,7 @@ ItemUseMedicine: ; dabb (3:5abb)
     ld [$d11e],a
     xor a
     ld [$cc49],a ; load from player's party
-    call LoadMonData
+    call PartyMenuHPAndStandarizePalette ; call LoadMonData
     ld d,$01
     ld hl,PrintStatsBox
     ld b,BANK(PrintStatsBox)
@@ -32088,6 +32088,41 @@ LoadScreenBufferAndGoPalSet:
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     jp GoPAL_SET_CF1C
 
+PartyMenuHPAndStandarizePalette:
+    call LoadMonData
+    push af
+    push bc
+    push de
+    push hl
+    ; Remove HP info from Party
+    FuncCoord 13,0
+    ld hl,Coord
+    ld bc,$0C07
+    call ClearScreenArea
+    FuncCoord 11,1
+    ld hl,Coord
+    ld d,6
+    ld bc,38
+.Loop6
+    ld a,$7f
+    ld [hli],a
+    ld [hli],a
+    add hl,bc
+    dec d
+    jr nz,.Loop6
+    ; Change HP Party Palette to Green
+    ld hl,wFlagNoHpPalBit2
+    set 2,[hl]
+    ld b,$a
+    call GoPAL_SET
+    ld c,6
+    call DelayFrames
+    pop hl
+    pop de
+    pop bc
+    pop af
+    ret
+
 SECTION "bank4",ROMX,BANK[$4]
 
 OakAideSprite: ; 10000 (4:4000)
@@ -32836,7 +32871,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     ld bc,20 + 9 ; down 1 row and right 9 columns
     push hl
     add hl,bc
-    call PlaceString
+    call FixTMPalette ; call PlaceString
     pop hl
 .printLevel
     ld bc,10 + 15 ; Denim,Spostato Livello Riga a Capo ; ld bc,10 ; move 10 columns to the right
@@ -34581,14 +34616,14 @@ DetermineCoordinateStatsBox:
     ld bc,$0019
     ret
 .OutOfBattleBattle
-    FuncCoord 9,2
+    FuncCoord 10,2
     ld hl,Coord
     ld b,$8
-    ld c,$9
+    ld c,$8
     call TextBoxBorder
     FuncCoord 11,3 ; $c3e7
     ld hl,Coord
-    ld bc,$0018
+    ld bc,$0019
     ret
 
 DontCheckElement:
@@ -34638,6 +34673,13 @@ CheckFirePower: ; FIRE
     ld hl,$d7c2
     bit 0,[hl]
     jr ElementEnd
+
+FixTMPalette:
+    push hl
+    ld hl,wFlagNoHpPalBit2
+    set 2,[hl]
+    pop hl
+    jp PlaceString
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -70550,7 +70592,7 @@ HidePlayerBattleHudAndStandarizePalette:
     ld bc,$050A
     call ClearScreenArea
     ; Change Battle Screen Palette to Player's Pkmn Color
-    ld hl,wFlagNoPlayerHpPalBit2
+    ld hl,wFlagNoHpPalBit2
     set 2,[hl]
     call GoPAL_SET_CF1C
     pop hl
@@ -107763,7 +107805,7 @@ GetPkmnStatPaletteID: ; 71e4f (1c:5e4f)
     ret
 
 GetPartyMenuPaletteID: ; 71e7b (1c:5e7b)
-    ld hl,PalPacket_72438
+    call GetPointerToPartyMenuPalPacket ; ld hl,PalPacket_72438
     ld de,$cf2e
     ret
 
@@ -108372,28 +108414,28 @@ Unknown_722f4: ; 722f4 (1c:62f4)
     db $23 + 1
     db $07 + 1
 
-    db $06,$10 ; MiniSprite
+    db $07,%00010000 ; MiniSprite
     db $01,$00,$02,$0b ; db $01,$00,$02,$0c
 
-    db $02,$01 ; 1st Pkmn Hp Bar
+    db $02,$05 ; 1st Pkmn Hp Bar
     db $0C,$01,$12,$01
 
-    db $02,$01 ; 2nd Pkmn Hp Bar
+    db $02,$05 ; 2nd Pkmn Hp Bar
     db $0C,$03,$12,$03
 
-    db $02,$01 ; 3rd Pkmn Hp Bar
+    db $02,$05 ; 3rd Pkmn Hp Bar
     db $0C,$05,$12,$05
 
-    db $02,$01 ; 4th Pkmn Hp Bar
+    db $02,$05 ; 4th Pkmn Hp Bar
     db $0C,$07,$12,$07
 
-    db $02,$01 ; 5th Pkmn Hp Bar
+    db $02,$05 ; 5th Pkmn Hp Bar
     db $0C,$09,$12,$09
 
-    db $02,$01 ; 6th Pkmn Hp Bar
+    db $02,$05 ; 6th Pkmn Hp Bar
     db $0C,$0b,$12,$0b
 
-    db $02,$0F ; HeldItem
+    db $02,$00 ; HeldItem
     db $03,$01,$03,$0B
 
     ds $40 - 6
@@ -108494,7 +108536,7 @@ PaletteBankCopyData: ; Denim ; 5 BYTE
 
 FirstHPBarPalette: ; Denim ; 28 BYTE
     push hl
-    ld hl,wFlagNoPlayerHpPalBit2
+    ld hl,wFlagNoHpPalBit2
     bit 2,[hl]
     res 2,[hl]
     pop hl
@@ -109887,6 +109929,18 @@ PlaceStringAndGenderSymbol:
 
 MonNestIcon: ; xxxxx (1c:xxxx) ; Spostato a Fine Bank
     INCBIN "gfx/mon_nest_icon.1bpp"
+
+PalPacketPartyMenuAllGreen:
+    db $51,$10,$00,$1F,$00,$1F,$00,$1F,$00,$00,$00,$00,$00,$00,$00,$00
+
+GetPointerToPartyMenuPalPacket:
+    ld hl,wFlagNoHpPalBit2
+    bit 2,[hl]
+    res 2,[hl]
+    ld hl,PalPacket_72438
+    ret z
+    ld hl,PalPacketPartyMenuAllGreen
+    ret
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
