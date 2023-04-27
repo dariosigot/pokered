@@ -57882,10 +57882,9 @@ KogaAI: ; 3a634 (e:6634)
     ret nc
     jp AIUseXAttack
 
-BlaineAI: ; 3a63a (e:663a)
-    cp $40
-    ret nc
-    jp AIUseSuperPotion
+BlaineAI_Old:
+
+SECTION "SabrinaAI",ROMX[$6640],BANK[$e]
 
 SabrinaAI: ; 3a640 (e:6640)
     cp $40
@@ -61454,6 +61453,14 @@ Mon014_EvosMoves: ; 3b6e9 (e:76e9)
 ;Learnset
     db 7,HARDEN
     db 0
+
+BlaineAI:
+    cp $40
+    ret nc
+    ld a,$A
+    call Func_3a7cf
+    ret nc
+    jp AIUseSuperPotion
 
 SECTION "bankF",ROMX,BANK[$F]
 
