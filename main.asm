@@ -50509,7 +50509,7 @@ CharizardBaseStats: ; 3846a (e:446a)
     db %01001111
     db %11001110
     db %11100011
-    db %00001000
+    db %00001100
     db %00101110
 
     db BANK(CharizardPicFront)
@@ -52175,7 +52175,7 @@ DugtrioBaseStats: ; 38956 (e:4956)
     db %11001110
     db %00000010
     db %10001000
-    db %00000010
+    db %00000110
 
     db BANK(DugtrioPicFront)
 
@@ -55800,7 +55800,7 @@ DragoniteBaseStats: ; 3940e (e:540e)
     db %11001000
     db %11000001
     db %11100011
-    db %00011000
+    db %00011100
     db %00111010
 
     db BANK(DragonitePicFront)
