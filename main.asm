@@ -52218,7 +52218,7 @@ VenonatBaseStats: ; 38902 (e:4902)
     db %11010000
     db %00000011
     db %00101000
-    db %00000010
+    db %01000010
 
     db BANK(VenonatPicFront)
 
@@ -52244,7 +52244,7 @@ VenomothBaseStats: ; 3891e (e:491e)
     db TACKLE
     db DISABLE
     db POISONPOWDER
-    db LEECH_LIFE
+    db CONFUSION
 
     db 0 ; growth rate
 
@@ -52255,7 +52255,7 @@ VenomothBaseStats: ; 3891e (e:491e)
     db %11110000
     db %01000011
     db %00101000
-    db %00000010
+    db %01000010
 
     db BANK(VenomothPicFront)
 
@@ -52292,7 +52292,7 @@ DiglettBaseStats: ; 3893a (e:493a)
     db %11001110
     db %00000010
     db %10001000
-    db %00000010
+    db %00000110
 
     db BANK(DiglettPicFront)
 
@@ -52539,8 +52539,8 @@ PrimeapeBaseStats: ; 389fe (e:49fe)
     ; attacks known at lvl 0
     db SCRATCH
     db LEER
+    db LOW_KICK
     db KARATE_CHOP
-    db FURY_SWIPES
 
     db 0 ; growth rate
 
@@ -52799,7 +52799,7 @@ KadabraBaseStats: ; 38ac2 (e:4ac2)
     db TELEPORT
     db CONFUSION
     db DISABLE
-    db 0
+    db KINESIS
 
     db 3 ; growth rate
 
@@ -52836,7 +52836,7 @@ AlakazamBaseStats: ; 38ade (e:4ade)
     db TELEPORT
     db CONFUSION
     db DISABLE
-    db 0
+    db KINESIS
 
     db 3 ; growth rate
 
@@ -54611,7 +54611,7 @@ ChanseyBaseStats: ; 3901e (e:501e)
     ; attacks known at lvl 0
     db POUND
     db DOUBLESLAP
-    db 0
+    db TAIL_WHIP
     db 0
 
     db 4 ; growth rate
@@ -54647,7 +54647,7 @@ TangelaBaseStats: ; 3903a (e:503a)
 
     ; attacks known at lvl 0
     db CONSTRICT
-    db BIND
+    db 0
     db 0
     db 0
 
@@ -55241,7 +55241,7 @@ GyaradosBaseStats: ; 391fa (e:51fa)
     db BITE
     db DRAGON_RAGE
     db LEER
-    db HYDRO_PUMP
+    db HYDRO_PUMP ; TODO
 
     db 5 ; growth rate
 
@@ -55350,7 +55350,7 @@ EeveeBaseStats: ; 3924e (e:524e)
 
     ; attacks known at lvl 0
     db TACKLE
-    db SAND_ATTACK
+    db TAIL_WHIP
     db 0
     db 0
 
@@ -59332,11 +59332,73 @@ Mon032_EvosMoves:
     db 0
 ;Learnset
     db 8,HORN_ATTACK
-    db 14,POISON_STING
-    db 21,FOCUS_ENERGY
-    db 29,FURY_ATTACK
-    db 36,HORN_DRILL
-    db 43,DOUBLE_KICK
+    db 12,DOUBLE_KICK
+    db 17,POISON_STING
+    db 23,FOCUS_ENERGY
+    db 30,FURY_ATTACK
+    db 38,HORN_DRILL
+    db 0
+
+Mon033_EvosMoves:
+;NIDORINO
+;Evolutions
+    db EV_ITEM,MOON_STONE,1,NIDOKING
+    db 0
+;Learnset
+    db 8,HORN_ATTACK
+    db 12,DOUBLE_KICK
+    db 19,POISON_STING
+    db 27,FOCUS_ENERGY
+    db 36,FURY_ATTACK
+    db 46,HORN_DRILL
+    db 0
+
+Mon034_EvosMoves:
+;NIDOKING
+;Evolutions
+    db 0
+;Learnset
+    db 8,HORN_ATTACK
+    db 12,DOUBLE_KICK
+    db 23,THRASH
+    db 0
+
+Mon029_EvosMoves:
+;NIDORAN_F
+;Evolutions
+    db EV_LEVEL,16,NIDORINA
+    db 0
+;Learnset
+    db 8,SCRATCH
+    db 12,DOUBLE_KICK
+    db 17,POISON_STING
+    db 23,TAIL_WHIP
+    db 30,BITE
+    db 38,FURY_SWIPES
+    db 0
+
+Mon030_EvosMoves:
+;NIDORINA
+;Evolutions
+    db EV_ITEM,MOON_STONE,1,NIDOQUEEN
+    db 0
+;Learnset
+    db 8,SCRATCH
+    db 12,DOUBLE_KICK
+    db 19,POISON_STING
+    db 27,TAIL_WHIP
+    db 36,BITE
+    db 46,FURY_SWIPES
+    db 0
+
+Mon031_EvosMoves:
+;NIDOQUEEN
+;Evolutions
+    db 0
+;Learnset
+    db 8,SCRATCH
+    db 12,DOUBLE_KICK
+    db 23,BODY_SLAM
     db 0
 
 Mon035_EvosMoves:
@@ -59377,16 +59439,6 @@ Mon100_EvosMoves:
     db 29,LIGHT_SCREEN
     db 36,SWIFT
     db 43,EXPLOSION
-    db 0
-
-Mon034_EvosMoves:
-;NIDOKING
-;Evolutions
-    db 0
-;Learnset
-    db 8,HORN_ATTACK
-    db 14,POISON_STING
-    db 23,THRASH
     db 0
 
 Mon080_EvosMoves:
@@ -59475,41 +59527,33 @@ Mon094_EvosMoves:
     db 38,DREAM_EATER
     db 0
 
-Mon029_EvosMoves:
-;NIDORAN_F
-;Evolutions
-    db EV_LEVEL,16,NIDORINA
-    db 0
-;Learnset
-    db 8,SCRATCH
-    db 14,POISON_STING
-    db 21,TAIL_WHIP
-    db 29,BITE
-    db 36,FURY_SWIPES
-    db 43,DOUBLE_KICK
-    db 0
-
-Mon031_EvosMoves:
-;NIDOQUEEN
-;Evolutions
-    db 0
-;Learnset
-    db 8,SCRATCH
-    db 14,POISON_STING
-    db 23,BODY_SLAM
-    db 0
-
 Mon104_EvosMoves:
 ;CUBONE
 ;Evolutions
     db EV_LEVEL,28,MAROWAK
     db 0
 ;Learnset
+    db 13,TAIL_WHIP
+    db 18,HEADBUTT
     db 25,LEER
     db 31,FOCUS_ENERGY
     db 38,THRASH
     db 43,BONEMERANG
     db 46,RAGE
+    db 0
+
+Mon105_EvosMoves:
+;MAROWAK
+;Evolutions
+    db 0
+;Learnset
+    db 13,TAIL_WHIP
+    db 18,HEADBUTT
+    db 25,LEER
+    db 33,FOCUS_ENERGY
+    db 41,THRASH
+    db 48,BONEMERANG
+    db 55,RAGE
     db 0
 
 Mon111_EvosMoves:
@@ -59619,6 +59663,7 @@ Mon123_EvosMoves:
     db 29,SLASH
     db 35,SWORDS_DANCE
     db 42,AGILITY
+    db 50,WING_ATTACK
     db 0
 
 Mon120_EvosMoves:
@@ -59654,6 +59699,7 @@ Mon127_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
+    db 21,BIND
     db 25,SEISMIC_TOSS
     db 30,GUILLOTINE
     db 36,FOCUS_ENERGY
@@ -59667,12 +59713,14 @@ Mon114_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    db 29,ABSORB
+    db 24,BIND
+    db 27,ABSORB
+    db 29,VINE_WHIP
     db 32,POISONPOWDER
     db 36,STUN_SPORE
     db 39,SLEEP_POWDER
     db 45,SLAM
-    db 49,GROWTH
+    db 48,GROWTH
     db 0
 
 Mon058_EvosMoves:
@@ -59939,11 +59987,28 @@ Mon056_EvosMoves:
     db EV_LEVEL,28,PRIMEAPE
     db 0
 ;Learnset
+    db 9,LOW_KICK
     db 15,KARATE_CHOP
     db 21,FURY_SWIPES
     db 27,FOCUS_ENERGY
     db 33,SEISMIC_TOSS
     db 39,THRASH
+    db 45,SCREECH
+    db 0
+
+Mon057_EvosMoves:
+;PRIMEAPE
+;Evolutions
+    db 0
+;Learnset
+    db 9,LOW_KICK
+    db 15,KARATE_CHOP
+    db 21,FURY_SWIPES
+    db 27,FOCUS_ENERGY
+    db 28,RAGE
+    db 37,SEISMIC_TOSS
+    db 45,THRASH
+    db 46,SCREECH
     db 0
 
 Mon086_EvosMoves:
@@ -60002,12 +60067,27 @@ Mon048_EvosMoves:
     db EV_LEVEL,31,VENOMOTH
     db 0
 ;Learnset
-    db 24,POISONPOWDER
+    db 11,SUPERSONIC
+    db 19,CONFUSION
+    db 22,POISONPOWDER
     db 27,LEECH_LIFE
     db 30,STUN_SPORE
     db 35,PSYBEAM
     db 38,SLEEP_POWDER
     db 43,PSYCHIC_M
+    db 0
+
+Mon049_EvosMoves:
+;VENOMOTH
+;Evolutions
+    db 0
+;Learnset
+    db 24,POISONPOWDER
+    db 27,LEECH_LIFE
+    db 30,STUN_SPORE
+    db 38,PSYBEAM
+    db 43,SLEEP_POWDER
+    db 48,PSYCHIC_M ; Level 48 because Koga's Team
     db 0
 
 Mon149_EvosMoves:
@@ -60152,11 +60232,15 @@ Mon025_EvosMoves:
     db EV_ITEM,THUNDER_STONE ,1,RAICHU
     db 0
 ;Learnset
-    db 9,THUNDER_WAVE
-    db 16,QUICK_ATTACK
-    db 26,SWIFT
+    db 6,TAIL_WHIP
+    db 8,THUNDER_WAVE
+    db 11,QUICK_ATTACK
+    db 15,DOUBLE_TEAM
+    db 20,SLAM
+    db 26,THUNDERBOLT
     db 33,AGILITY
-    db 43,THUNDER
+    db 41,THUNDER
+    db 50,LIGHT_SCREEN
     db 0
 
 Mon026_EvosMoves:
@@ -60318,10 +60402,12 @@ Mon133_EvosMoves:
     db EV_ITEM,WATER_STONE ,1,VAPOREON
     db 0
 ;Learnset
-    db 27,QUICK_ATTACK
-    db 31,TAIL_WHIP
-    db 37,BITE
-    db 45,TAKE_DOWN
+    db 8,SAND_ATTACK
+    db 16,GROWL
+    db 23,QUICK_ATTACK
+    db 30,BITE
+    db 36,FOCUS_ENERGY
+    db 42,TAKE_DOWN
     db 0
 
 Mon136_EvosMoves:
@@ -60329,14 +60415,14 @@ Mon136_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    db 27,QUICK_ATTACK
-    db 31,EMBER
-    db 37,TAIL_WHIP
-    db 40,BITE
-    db 42,LEER
-    db 44,FIRE_SPIN
-    db 48,RAGE
-    db 54,FLAMETHROWER
+    db 8,SAND_ATTACK
+    db 16,EMBER ; TODO
+    db 23,QUICK_ATTACK
+    db 30,BITE
+    db 36,FIRE_SPIN
+    db 42,SMOG
+    db 47,LEER
+    db 52,FLAMETHROWER
     db 0
 
 Mon135_EvosMoves:
@@ -60344,14 +60430,14 @@ Mon135_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    db 27,QUICK_ATTACK
-    db 31,THUNDERSHOCK
-    db 37,TAIL_WHIP
-    db 40,THUNDER_WAVE
-    db 42,DOUBLE_KICK
-    db 44,AGILITY
-    db 48,PIN_MISSILE
-    db 54,THUNDER
+    db 8,SAND_ATTACK
+    db 16,THUNDERSHOCK ; TODO
+    db 23,QUICK_ATTACK
+    db 30,DOUBLE_KICK
+    db 36,PIN_MISSILE
+    db 42,THUNDER_WAVE
+    db 47,AGILITY
+    db 52,THUNDER
     db 0
 
 Mon134_EvosMoves:
@@ -60359,15 +60445,16 @@ Mon134_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    db 27,QUICK_ATTACK
-    db 31,WATER_GUN
-    db 37,TAIL_WHIP
-    db 40,BITE
+    db 8,SAND_ATTACK
+    db 16,WATER_GUN ; TODO
+    db 23,QUICK_ATTACK
+    db 30,BITE
+    db 36,AURORA_BEAM
     db 42,ACID_ARMOR
-    db 44,HAZE
-    db 48,MIST
-    db 54,HYDRO_PUMP
+    db 47,HAZE
+    db 52,HYDRO_PUMP
     db 0
+;    db 48,MIST ; TODO
 
 Mon066_EvosMoves:
 ;MACHOP
@@ -60478,18 +60565,6 @@ Mon085_EvosMoves:
     db 51,AGILITY
     db 0
 
-Mon057_EvosMoves:
-;PRIMEAPE
-;Evolutions
-    db 0
-;Learnset
-    db 15,KARATE_CHOP
-    db 21,FURY_SWIPES
-    db 27,FOCUS_ENERGY
-    db 37,SEISMIC_TOSS
-    db 46,THRASH
-    db 0
-
 Mon051_EvosMoves:
 ;DUGTRIO
 ;Evolutions
@@ -60500,19 +60575,6 @@ Mon051_EvosMoves:
     db 24,SAND_ATTACK
     db 35,SLASH
     db 47,EARTHQUAKE
-    db 0
-
-Mon049_EvosMoves:
-;VENOMOTH
-;Evolutions
-    db 0
-;Learnset
-    db 24,POISONPOWDER
-    db 27,LEECH_LIFE
-    db 30,STUN_SPORE
-    db 38,PSYBEAM
-    db 43,SLEEP_POWDER
-    db 48,PSYCHIC_M ; Level 48 because Koga's Team
     db 0
 
 Mon087_EvosMoves:
@@ -60541,12 +60603,13 @@ Mon012_EvosMoves:
     db 0
 ;Learnset
     db 10,CONFUSION
-    db 15,POISONPOWDER
-    db 16,STUN_SPORE
-    db 17,SLEEP_POWDER
-    db 21,SUPERSONIC
-    db 26,WHIRLWIND
-    db 32,PSYBEAM
+    db 13,POISONPOWDER
+    db 14,STUN_SPORE
+    db 15,SLEEP_POWDER
+    db 18,SUPERSONIC
+    db 23,WHIRLWIND
+    db 28,GUST
+    db 31,PSYBEAM
     db 0
 
 Mon068_EvosMoves:
@@ -60694,18 +60757,6 @@ Mon053_EvosMoves:
     db 51,SLASH
     db 0
 
-Mon105_EvosMoves:
-;MAROWAK
-;Evolutions
-    db 0
-;Learnset
-    db 25,LEER
-    db 33,FOCUS_ENERGY
-    db 41,THRASH
-    db 48,BONEMERANG
-    db 55,RAGE
-    db 0
-
 Mon093_EvosMoves:
 ;HAUNTER
 ;Evolutions
@@ -60722,6 +60773,35 @@ Mon063_EvosMoves:
     db EV_LEVEL,16,KADABRA
     db 0
 ;Learnset
+    db 0
+
+Mon064_EvosMoves:
+;KADABRA
+;Evolutions
+    db EV_TRADE,1,ALAKAZAM
+    db 0
+;Learnset
+    db 16,CONFUSION
+    db 20,DISABLE
+    db 27,PSYBEAM
+    db 31,RECOVER
+    db 38,PSYCHIC_M
+    db 42,REFLECT ; Penultimate Move that is Replaced with Psywave in Sabrina's Team
+    db 45,KINESIS
+    db 0
+
+Mon065_EvosMoves:
+;ALAKAZAM
+;Evolutions
+    db 0
+;Learnset
+    db 16,CONFUSION
+    db 20,DISABLE
+    db 27,PSYBEAM
+    db 31,RECOVER
+    db 38,PSYCHIC_M
+    db 42,REFLECT
+    db 45,KINESIS
     db 0
 
 Mon017_EvosMoves:
@@ -60877,34 +60957,6 @@ Mon020_EvosMoves:
     db 14,HYPER_FANG
     db 27,FOCUS_ENERGY
     db 41,SUPER_FANG
-    db 0
-
-Mon033_EvosMoves:
-;NIDORINO
-;Evolutions
-    db EV_ITEM,MOON_STONE,1,NIDOKING
-    db 0
-;Learnset
-    db 8,HORN_ATTACK
-    db 14,POISON_STING
-    db 23,FOCUS_ENERGY
-    db 32,FURY_ATTACK
-    db 41,HORN_DRILL
-    db 50,DOUBLE_KICK
-    db 0
-
-Mon030_EvosMoves:
-;NIDORINA
-;Evolutions
-    db EV_ITEM,MOON_STONE,1,NIDOQUEEN
-    db 0
-;Learnset
-    db 8,SCRATCH
-    db 14,POISON_STING
-    db 23,TAIL_WHIP
-    db 32,BITE
-    db 41,FURY_SWIPES
-    db 50,DOUBLE_KICK
     db 0
 
 Mon074_EvosMoves:
@@ -61133,35 +61185,6 @@ Mon042_EvosMoves:
     db 32,WING_ATTACK
     db 43,HAZE ; Penultimate Move that is Replaced with Toxic in Koga's Team
     db 50,DOUBLE_TEAM
-    db 0
-
-Mon064_EvosMoves:
-;KADABRA
-;Evolutions
-    db EV_TRADE,1,ALAKAZAM
-    db 0
-;Learnset
-    db 16,CONFUSION
-    db 20,DISABLE
-    db 27,PSYBEAM
-    db 31,RECOVER
-    db 38,PSYCHIC_M
-    db 42,REFLECT ; Penultimate Move that is Replaced with Psywave in Sabrina's Team
-    db 45,KINESIS
-    db 0
-
-Mon065_EvosMoves:
-;ALAKAZAM
-;Evolutions
-    db 0
-;Learnset
-    db 16,CONFUSION
-    db 20,DISABLE
-    db 27,PSYBEAM
-    db 31,RECOVER
-    db 38,PSYCHIC_M
-    db 42,REFLECT
-    db 45,KINESIS
     db 0
 
 SECTION "Func_3ba97",ROMX[$7a97],BANK[$e]
