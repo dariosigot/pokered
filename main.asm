@@ -26913,6 +26913,8 @@ ItemUseTMHM: ; e479 (3:6479)
     and a
     jp nz,ItemUseNotTime
     ld a,[$cf91]
+    cp TM_01
+    jp c,ItemUseNotTime
     sub a,TM_01
     push af
     jr nc,.skipAdding
@@ -27011,21 +27013,7 @@ ItemUseTMHM: ; e479 (3:6479)
     ret c
     jp RemoveUsedItem
 
-BootedUpTMText: ; e54f (3:654f)
-    TX_FAR _BootedUpTMText
-    db "@"
-
-BootedUpHMText: ; e554 (3:6554)
-    TX_FAR _BootedUpHMText
-    db "@"
-
-TeachMachineMoveText: ; e559 (3:6559)
-    TX_FAR _TeachMachineMoveText
-    db "@"
-
-MonCannotLearnMachineMoveText: ; e55e (3:655e)
-    TX_FAR _MonCannotLearnMachineMoveText
-    db "@"
+SECTION "PrintItemUseTextAndRemoveItem",ROMX[$6563],BANK[$3]
 
 PrintItemUseTextAndRemoveItem: ; e563 (3:6563)
     ld hl,ItemUseText00
@@ -30413,6 +30401,22 @@ GetStatExpByLevel:
     ld [H_MULTIPLIER],a
     jp Multiply
 
+BootedUpTMText: ; e54f (3:654f)
+    TX_FAR _BootedUpTMText
+    db "@"
+
+BootedUpHMText: ; e554 (3:6554)
+    TX_FAR _BootedUpHMText
+    db "@"
+
+TeachMachineMoveText: ; e559 (3:6559)
+    TX_FAR _TeachMachineMoveText
+    db "@"
+
+MonCannotLearnMachineMoveText: ; e55e (3:655e)
+    TX_FAR _MonCannotLearnMachineMoveText
+    db "@"
+
 SECTION "bank4",ROMX,BANK[$4]
 
 OakAideSprite: ; 10000 (4:4000)
@@ -31805,7 +31809,7 @@ StartMenu_Item: ; 13302 (4:7302)
 .useItem
     ld [$d152],a
     ld a,[$cf91]
-    cp a,HM_01
+    cp a,TM_01
     jr nc,.useItem_partyMenu
     ld hl,UsableItems_CloseMenu
     ld de,1
@@ -32374,11 +32378,8 @@ TechnicalMachines: ; 13773 (4:7773)
     db ROCK_SLIDE
     db TRI_ATTACK
     db SUBSTITUTE
-    db BLADE
-    db SWOOP
-    db TSUNAMI
-    db STRIKE
-    db FLASH
+
+SECTION "Func_137aa",ROMX[$77aa],BANK[$4]
 
 Func_137aa: ; 137aa (4:77aa)
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -42308,7 +42309,8 @@ Route16HouseText1: ; 1e5ff (7:65ff)
     ld hl,Route16HouseText3
     call PrintText
     ld bc,(HM_02 << 8) | 1
-    call GiveItem
+    scf ; call GiveItem
+    ds 2
     jr nc,.BagFull
     ld hl,$d7e0
     set 6,[hl]
@@ -73534,7 +73536,8 @@ SafariZoneSecretHouseText1: ; 4a31c (12:631c)
     ld hl,UnnamedText_4a350
     call PrintText
     ld bc,(HM_03 << 8) | 1
-    call GiveItem
+    scf ; call GiveItem
+    ds 2
     jr nc,.BagFull
     ld hl,ReceivedHM03Text
     call PrintText
@@ -83344,7 +83347,7 @@ Func_59035 ; 0x59035
     ld a,[$ff00+$dc]
     ld b,a
     ld c,1
-    call GiveItem
+    call GiveItemNotPower ; call GiveItem
     jr nc,.BagFull
     ld hl,UnnamedText_590a5 ; $50a5
     call PrintText
@@ -86534,6 +86537,12 @@ RemoveGuardDrink: ; 5a59f (16:659f)
 GuardDrinksList: ; 5a5b7 (16:65b7)
     db FRESH_WATER,SODA_POP,LEMONADE,$00
 
+GiveItemNotPower:
+    cp HM_05
+    jp nz,GiveItem
+    scf
+    ret
+
 SECTION "bank17",ROMX,BANK[$17]
 
 SaffronMartBlocks: ; 5c000 (17:4000)
@@ -89357,7 +89366,7 @@ Route2GateText1: ; 5d5db (17:55db)
     jr nz,.asm_6592c ; 0x5d5e1
     ld a,$a
     ldh [$db],a
-    ld a,$c8
+    ld a,HM_05
     ldh [$dc],a
     ld [$d11e],a
     call GetItemName ; $2fcf
@@ -92798,7 +92807,8 @@ SSAnne7Text1: ; 618ad (18:58ad)
     ld hl,ReceivingHM01Text
     call PrintText
     ld bc,(HM_01 << 8) | 1
-    call GiveItem
+    scf ; call GiveItem
+    ds 2
     jr nc,.BagFull
     ld hl,ReceivedHM01Text
     call PrintText
@@ -101992,7 +102002,8 @@ FuchsiaHouse2Text1: ; 750c2 (1d:50c2)
     ld hl,WardenThankYouText
     call PrintText
     ld bc,(HM_04 << 8) | 1
-    call GiveItem
+    scf ; call GiveItem
+    ds 2
     jr nc,.BagFull
     ld hl,ReceivedHM04Text
     call PrintText
@@ -118015,7 +118026,7 @@ _Route2HouseText1: ; 8a7b8 (22:67b8)
     db "moves like CUT!",$57
 
 _UnnamedText_5d616: ; 8a7fc (22:67fc)
-    db $0,"The New FLASH",$4f
+    db $0,"The FIRE PWR ",$4f
     db "lights even the",$55
     db "darkest dungeons.",$57
 
