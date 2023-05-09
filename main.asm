@@ -48929,9 +48929,10 @@ AIMoveChoiceModification3: ; 39817 (e:5817)
     pop bc
     pop hl
     ld a,[$d11e]
-    cp $10
+    cp $0A ; Standard 1x
     jr z,.nextMove
     jr c,.notEffectiveMove
+    ;at this line, move is super effective
     dec [hl]       ; slighly encourage this move
     jr .nextMove
 .notEffectiveMove  ; discourages non-effective moves if better moves are available
@@ -56879,45 +56880,7 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
 .done
     ret
 
-; function to tell how effective the type of an enemy attack is on the player's current pokemon
-; this doesn't take into account the effects that dual types can have
-; (e.g. 4x weakness / resistance,weaknesses and resistances canceling)
-; the result is stored in [$D11E]
-; ($05 is not very effective,$10 is neutral,$14 is super effective)
-; as far is can tell,this is only used once in some AI code to help decide which move to use
-AIGetTypeEffectiveness: ; 3e449 (f:6449)
-    ld a,[W_ENEMYMOVETYPE]
-    ld d,a                 ; d = type of enemy move
-    ld hl,W_PLAYERMONTYPES
-    ld b,[hl]              ; b = type 1 of player's pokemon
-    inc hl
-    ld c,[hl]              ; c = type 2 of player's pokemon
-    ld a,$10
-    ld [$d11e],a           ; initialize [$D11E] to neutral effectiveness
-    ld hl,TypeEffects
-.loop
-    ld a,[hli]
-    cp a,$ff
-    ret z
-    cp d                   ; match the type of the move
-    jr nz,.nextTypePair1
-    ld a,[hli]
-    cp b                   ; match with type 1 of pokemon
-    jr z,.done
-    cp c                   ; or match with type 2 of pokemon
-    jr z,.done
-    jr .nextTypePair2
-.nextTypePair1
-    inc hl
-.nextTypePair2
-    inc hl
-    jr .loop
-.done
-    ld a,[hl]
-    ld [$d11e],a           ; store damage multiplier
-    ret
-
-TypeEffects: ; 3e474 (f:6474)
+TypeEffects:
 ; format: attacking type,defending type,damage multiplier
 ; the multiplier is a (decimal) fixed-point number:
 ;     20 is ×2.0
@@ -57006,6 +56969,8 @@ TypeEffects: ; 3e474 (f:6474)
     db ICE,DRAGON,20
     db DRAGON,DRAGON,20
     db $FF
+
+SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
 
 ; some tests that need to pass for a move to hit
 MoveHitTest: ; 3e56b (f:656b)
@@ -60932,6 +60897,69 @@ DebugMonOrEnemyPP:
 .Done
     pop af
     ret
+
+; function to tell how effective the type of an enemy attack is on the player's current pokemon
+; this doesn't take into account the effects that dual types can have
+; (e.g. 4x weakness / resistance,weaknesses and resistances canceling)
+; the result is stored in [$D11E]
+; ($05 is not very effective,$0A is neutral,$14 is super effective)
+; ($00 is immune, $02 is 4x uneffective, $28 is 4x super effective)
+; as far is can tell,this is only used once in some AI code to help decide which move to use
+AIGetTypeEffectiveness:
+    ld a,[W_ENEMYMOVENUM]        ; Thunder Wave must have to calculate effectiveness because ground
+    cp THUNDER_WAVE
+    jr z,.CalculateEffectiveness
+    ld a,[W_ENEMYMOVEPOWER]      ; if enemy move pwr is 0, don't calculate effectiveness
+    and a
+    ret z
+.CalculateEffectiveness
+    ld a,[W_ENEMYMOVETYPE]
+    ld d,a                       ; d = type of enemy move
+    ld hl,W_PLAYERMONTYPES
+    ld b,[hl]                    ; b = type 1 of player's pokemon
+    inc hl
+    ld c,[hl]                    ; c = type 2 of player's pokemon
+    ld a,$0A
+    ld [$d11e],a                 ; initialize [$D11E] to neutral effectiveness
+    ld hl,TypeEffects
+.loop
+    ld a,[hli]
+    cp a,$ff
+    ret z
+    cp d                         ; match the type of the move
+    jr nz,.nextTypePair1
+    ld a,[hli]
+    cp b                         ; match with type 1 of pokemon
+    jr z,.AImatchingPairFound
+    cp c                         ; or match with type 2 of pokemon
+    jr z,.AImatchingPairFound
+    jr .nextTypePair2
+; ──────────────────────────────────────────────────
+.AImatchingPairFound
+    ld a,[hl]                    ; get damage multiplier
+    cp $05                       ; is it halved?
+    jr nz,.AInothalf             ; jump down of not half
+    ld a,[$d11e]                 ; else get the effectiveness multiplier
+    srl a                        ; halve the multiplier
+    ld [$d11e],a                 ; store damage multiplier
+    jr .nextTypePair2            ; get next pair in list
+.AInothalf
+    cp $14                       ; is it double?
+    jr nz,.AImustbezero          ; if not double either,it must be zero so skip ahead
+    ld a,[$d11e]                 ; else get the effectiveness multiplier
+    sla a                        ; double the multiplier
+    ld [$d11e],a                 ; store damage multiplier
+    jr .nextTypePair2            ; get next pair in list
+.AImustbezero
+    xor a                        ; clear a to 00
+    ld [$d11e],a                 ; store damage multiplier
+    ret
+; ──────────────────────────────────────────────────
+.nextTypePair1
+    inc hl
+.nextTypePair2
+    inc hl
+    jr .loop
 
 SECTION "bank10",ROMX,BANK[$10]
 
