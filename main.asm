@@ -917,7 +917,7 @@ SpeedUp: ; 06a0 (0:06a0) ; Denim,20 BYTE a disposizione
     and a
     jr z,TrySpeedUpWithB ; if walk
     dec a
-    jp z, SpeedUpByke
+    jp z,SpeedUpByke
     ret ; if 2 -> surf
 
 TrySpeedUpWithB:
@@ -7932,8 +7932,8 @@ IsMoveHM: ; 3049 (0:3049)
     jp IsInArray
 
 HMMoves: ; 3052 (0:3052)
-    db CUT,FLY,SURF,STRENGTH,FLASH
     db $ff ; terminator
+    ds 5
 
 GetMoveName: ; 3058 (0:3058)
     push hl
@@ -17681,15 +17681,15 @@ Func_76e1: ; 76e1 (1:36e1)
     jp PlaceString
 
 FieldMoveNames: ; 778d (1:778d)
-    db "CUT@"
-    db "FLY@"
+    db "CUT@"    ; Move : BLADE
+    db "FLY@"    ; Move : SWOOP
     db "@"
-    db "SURF@"
-    db "STR.TH@"
-    db "FLASH@"
-    db "DIG@"
-    db "TELEP.@"
-    db "SOFTB.@"
+    db "FLOAT@"  ; Move : TSUNAMI (SURF)
+    db "STR.TH@" ; Move : STRIKE
+    db "LIGHT@"  ; Move : FLASH
+    db "DIG@"    ; Move : TRAPHOLE
+    db "TELEP.@" ; Move : TELEPORT
+    db "NURSE@"  ; Move : SOFTBOILED
 
 SECTION "PokemonMenuEntries",ROMX[$77c2],BANK[$1]
 
@@ -17724,7 +17724,7 @@ GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "
     inc a ; inc a if move id >= 3 because there is a "unused field move"
 .Continue
     srl e
-    jr nc,.TryToSearchInAttack
+    jr nc,.FieldMoveNotFound
 .FieldMoveFound
     inc b ; num of founded moves
     ld [hli],a ; store field move id in wFieldMoves vector
@@ -17732,9 +17732,6 @@ GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "
     cp 5 ; Max Possible Number of Field Moves
     jr z,.End
     jr .FieldMoveNotFound
-.TryToSearchInAttack
-    call SearchFieldMoveInAttack ; Insert Field Move Battle Id in wLastFieldMoveID
-    jr c,.FieldMoveFound
 .FieldMoveNotFound
     dec c
     jr nz,.Loop8BitRule
@@ -17742,18 +17739,6 @@ GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "
     ld a,b
     ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
     ret
-
-FieldMoveDisplayData:
-    db CUT
-    db FLY
-    db $B4
-    db SURF
-    db STRENGTH
-    db FLASH
-    db DIG
-    db TELEPORT
-    db SOFTBOILED
-    db $ff ; list terminator
 
 HackForAddAndResetFieldMovesSlot:
     ld [hli],a ; Standard
@@ -18367,41 +18352,6 @@ HackForBackupDVDuringTradeIn:
 BattleMenuText: ; Denim,allargato menu battaglia
     db "FIGHT       ",$E1,$E2,$4E
     db "ITEM        RUN@"
-
-SearchFieldMoveInAttack:
-    push hl
-    push bc
-    push af
-    ld hl,FieldMoveDisplayData
-    ld b,0
-    ld c,a
-    add hl,bc
-    dec hl
-    ld a,[hl]
-    ld c,a ; c = Current Field Move Hex ID
-    push bc
-    ld a,[wWhichPokemon] ; $cf92
-    ld hl,W_PARTYMON1_MOVE1 ; $d173
-    ld bc,$2c
-    call AddNTimes
-    pop bc
-    ld b,4
-.Loop4Moves
-    ld a,[hli] ; Get Field Move Hex Id
-    cp c
-    jr z,.Found
-    dec b
-    jr nz,.Loop4Moves
-    xor a ; Reset Carry Flag
-    jr .NotFound
-.Found
-    scf ; Set Carry Flag
-.NotFound
-    pop bc
-    ld a,b
-    pop bc
-    pop hl
-    ret
 
 ; Routine per memorizzare l'id del pokemon appena catturato al quale si vuole applicare un nuovo nome per la corretta visualizzazione
 ; dell'immagine MonOwSprite
@@ -24848,1820 +24798,6 @@ CaveMons: ; d5b1 (3:55b1)
     db $00
 
 ENDC
-IF _JAPAN && _BLUE
-NoMons: ; d0dd (3:50dd)
-    db $00
-
-    db $00
-
-Route1Mons: ; d0df (3:50df)
-    db $19
-    db 3,PIDGEY
-    db 3,RATTATA
-    db 3,RATTATA
-    db 2,RATTATA
-    db 2,PIDGEY
-    db 3,PIDGEY
-    db 3,PIDGEY
-    db 4,RATTATA
-    db 4,PIDGEY
-    db 5,PIDGEY
-
-    db $00
-
-Route2Mons: ; d0f5 (3:50f5)
-    db $19
-    db 3,RATTATA
-    db 3,PIDGEY
-    db 4,PIDGEY
-    db 4,RATTATA
-    db 5,PIDGEY
-    db 3,CATERPIE
-    db 2,RATTATA
-    db 5,RATTATA
-    db 4,CATERPIE
-    db 5,CATERPIE
-
-    db $00
-
-Route22Mons: ; d10b (3:510b)
-    db $19
-    db 3,RATTATA
-    db 3,NIDORAN_M
-    db 4,RATTATA
-    db 4,NIDORAN_M
-    db 2,RATTATA
-    db 2,NIDORAN_M
-    db 3,SPEAROW
-    db 5,SPEAROW
-    db 3,NIDORAN_F
-    db 4,NIDORAN_F
-
-    db $00
-
-ForestMons: ; d121 (3:5121)
-    db $08
-    db 4,CATERPIE
-    db 5,METAPOD
-    db 3,CATERPIE
-    db 5,CATERPIE
-    db 4,METAPOD
-    db 6,METAPOD
-    db 4,KAKUNA
-    db 3,WEEDLE
-    db 3,PIKACHU
-    db 5,PIKACHU
-
-    db $00
-
-Route3Mons: ; d137 (3:5137)
-    db $14
-    db 6,PIDGEY
-    db 5,SPEAROW
-    db 7,PIDGEY
-    db 6,SPEAROW
-    db 7,SPEAROW
-    db 8,PIDGEY
-    db 8,SPEAROW
-    db 3,JIGGLYPUFF
-    db 5,JIGGLYPUFF
-    db 7,JIGGLYPUFF
-
-    db $00
-
-MoonMons1: ; d14d (3:514d)
-    db $0A
-    db 8,ZUBAT
-    db 7,ZUBAT
-    db 9,ZUBAT
-    db 8,GEODUDE
-    db 6,ZUBAT
-    db 10,ZUBAT
-    db 10,GEODUDE
-    db 8,PARAS
-    db 11,ZUBAT
-    db 8,CLEFAIRY
-
-    db $00
-
-MoonMonsB1: ; d163 (3:5163)
-    db $0A
-    db 8,ZUBAT
-    db 7,ZUBAT
-    db 7,GEODUDE
-    db 8,GEODUDE
-    db 9,ZUBAT
-    db 10,PARAS
-    db 10,ZUBAT
-    db 11,ZUBAT
-    db 9,CLEFAIRY
-    db 9,GEODUDE
-
-    db $00
-
-MoonMonsB2: ; d179 (3:5179)
-    db $0A
-    db 9,ZUBAT
-    db 9,GEODUDE
-    db 10,ZUBAT
-    db 10,GEODUDE
-    db 11,ZUBAT
-    db 10,PARAS
-    db 12,PARAS
-    db 10,CLEFAIRY
-    db 12,ZUBAT
-    db 12,CLEFAIRY
-
-    db $00
-
-Route4Mons: ; d18f (3:518f)
-    db $14
-    db 10,RATTATA
-    db 10,SPEAROW
-    db 8,RATTATA
-    db 6,SANDSHREW
-    db 8,SPEAROW
-    db 10,SANDSHREW
-    db 12,RATTATA
-    db 12,SPEAROW
-    db 8,SANDSHREW
-    db 12,SANDSHREW
-
-    db $00
-
-Route24Mons: ; d1a5 (3:51a5)
-    db $19
-    db 7,CATERPIE
-    db 8,METAPOD
-    db 12,PIDGEY
-    db 12,ODDISH
-    db 13,ODDISH
-    db 10,ABRA
-    db 14,ODDISH
-    db 13,PIDGEY
-    db 8,ABRA
-    db 12,ABRA
-
-    db $00
-
-Route25Mons: ; d1bb (3:51bb)
-    db $0F
-    db 8,CATERPIE
-    db 9,METAPOD
-    db 13,PIDGEY
-    db 12,ODDISH
-    db 13,ODDISH
-    db 12,ABRA
-    db 14,ODDISH
-    db 10,ABRA
-    db 7,KAKUNA
-    db 8,WEEDLE
-
-    db $00
-
-Route9Mons: ; d1d1 (3:51d1)
-    db $0F
-    db 16,RATTATA
-    db 16,SPEAROW
-    db 14,RATTATA
-    db 11,SANDSHREW
-    db 13,SPEAROW
-    db 15,SANDSHREW
-    db 17,RATTATA
-    db 17,SPEAROW
-    db 13,SANDSHREW
-    db 17,SANDSHREW
-
-    db $00
-
-Route5Mons: ; d1e7 (3:51e7)
-    db $0F
-    db 13,ODDISH
-    db 13,PIDGEY
-    db 15,PIDGEY
-    db 10,MEOWTH
-    db 12,MEOWTH
-    db 15,ODDISH
-    db 16,ODDISH
-    db 16,PIDGEY
-    db 14,MEOWTH
-    db 16,MEOWTH
-
-    db $00
-
-Route6Mons: ; d1fd (3:51fd)
-    db $0F
-    db 13,ODDISH
-    db 13,PIDGEY
-    db 15,PIDGEY
-    db 10,MEOWTH
-    db 12,MEOWTH
-    db 15,ODDISH
-    db 16,ODDISH
-    db 16,PIDGEY
-    db 14,MEOWTH
-    db 16,MEOWTH
-
-    db $00
-
-Route11Mons: ; d213 (3:5213)
-    db $0F
-    db 14,SANDSHREW
-    db 15,SPEAROW
-    db 12,SANDSHREW
-    db 9,DROWZEE
-    db 13,SPEAROW
-    db 13,DROWZEE
-    db 15,SANDSHREW
-    db 17,SPEAROW
-    db 11,DROWZEE
-    db 15,DROWZEE
-
-    db $00
-
-TunnelMonsB1: ; d229 (3:5229)
-    db $0F
-    db 16,ZUBAT
-    db 17,ZUBAT
-    db 17,GEODUDE
-    db 15,MACHOP
-    db 16,GEODUDE
-    db 18,DITTO
-    db 15,ZUBAT
-    db 17,MACHOP
-    db 13,ONIX
-    db 15,ONIX
-
-    db $00
-
-TunnelMonsB2: ; d23f (3:523f)
-    db $0F
-    db 16,ZUBAT
-    db 17,ZUBAT
-    db 17,GEODUDE
-    db 15,MACHOP
-    db 16,GEODUDE
-    db 18,DITTO
-    db 17,MACHOP
-    db 17,ONIX
-    db 13,ONIX
-    db 18,GEODUDE
-
-    db $00
-
-Route10Mons: ; d255 (3:5255)
-    db $0F
-    db 16,VOLTORB
-    db 16,SPEAROW
-    db 14,VOLTORB
-    db 11,SANDSHREW
-    db 13,SPEAROW
-    db 15,SANDSHREW
-    db 17,VOLTORB
-    db 17,SPEAROW
-    db 13,SANDSHREW
-    db 17,SANDSHREW
-
-    db $00
-
-Route12Mons: ; d26b (3:526b)
-    db $0F
-    db 24,ODDISH
-    db 25,PIDGEY
-    db 23,PIDGEY
-    db 24,VENONAT
-    db 22,ODDISH
-    db 26,VENONAT
-    db 26,ODDISH
-    db 27,PIDGEY
-    db 28,GLOOM
-    db 30,GLOOM
-
-    db $00
-
-Route8Mons: ; d281 (3:5281)
-    db $0F
-    db 18,PIDGEY
-    db 18,MEOWTH
-    db 17,SANDSHREW
-    db 16,GROWLITHE
-    db 20,PIDGEY
-    db 20,MEOWTH
-    db 19,SANDSHREW
-    db 17,GROWLITHE
-    db 15,GROWLITHE
-    db 18,GROWLITHE
-
-    db $00
-
-Route7Mons: ; d297 (3:5297)
-    db $0F
-    db 19,PIDGEY
-    db 19,ODDISH
-    db 17,MEOWTH
-    db 22,ODDISH
-    db 22,PIDGEY
-    db 18,MEOWTH
-    db 18,GROWLITHE
-    db 20,GROWLITHE
-    db 19,MEOWTH
-    db 20,MEOWTH
-
-    db $00
-
-TowerMons1: ; d2ad (3:52ad)
-    db $00
-
-    db $00
-
-TowerMons2: ; d2af (3:52af)
-    db $00
-
-    db $00
-
-TowerMons3: ; d2b1 (3:52b1)
-    db $0A
-    db 20,GASTLY
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 19,GASTLY
-    db 18,GASTLY
-    db 24,GASTLY
-    db 20,CUBONE
-    db 22,CUBONE
-    db 25,HAUNTER
-
-    db $00
-
-TowerMons4: ; d2c7 (3:52c7)
-    db $0A
-    db 20,GASTLY
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 19,GASTLY
-    db 18,GASTLY
-    db 25,HAUNTER
-    db 20,CUBONE
-    db 22,CUBONE
-    db 24,GASTLY
-
-    db $00
-
-TowerMons5: ; d2dd (3:52dd)
-    db $0A
-    db 20,GASTLY
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 19,GASTLY
-    db 18,GASTLY
-    db 25,HAUNTER
-    db 20,CUBONE
-    db 22,CUBONE
-    db 24,GASTLY
-
-    db $00
-
-TowerMons6: ; d2f3 (3:52f3)
-    db $0F
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 24,GASTLY
-    db 20,GASTLY
-    db 19,GASTLY
-    db 26,HAUNTER
-    db 22,CUBONE
-    db 24,CUBONE
-    db 28,HAUNTER
-
-    db $00
-
-TowerMons7: ; d309 (3:5309)
-    db $0F
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 24,GASTLY
-    db 20,GASTLY
-    db 28,HAUNTER
-    db 22,CUBONE
-    db 24,CUBONE
-    db 28,HAUNTER
-    db 30,HAUNTER
-
-    db $00
-
-Route13Mons: ; d31f (3:531f)
-    db $14
-    db 24,ODDISH
-    db 25,PIDGEY
-    db 27,PIDGEY
-    db 24,VENONAT
-    db 22,ODDISH
-    db 26,VENONAT
-    db 26,ODDISH
-    db 25,DITTO
-    db 28,GLOOM
-    db 30,GLOOM
-
-    db $00
-
-Route14Mons: ; d335 (3:5335)
-    db $0F
-    db 24,ODDISH
-    db 26,PIDGEY
-    db 23,DITTO
-    db 24,VENONAT
-    db 22,ODDISH
-    db 26,VENONAT
-    db 26,ODDISH
-    db 30,GLOOM
-    db 28,PIDGEOTTO
-    db 30,PIDGEOTTO
-
-    db $00
-
-Route15Mons: ; d34b (3:534b)
-    db $0F
-    db 24,ODDISH
-    db 26,DITTO
-    db 23,PIDGEY
-    db 26,VENONAT
-    db 22,ODDISH
-    db 28,VENONAT
-    db 26,ODDISH
-    db 30,GLOOM
-    db 28,PIDGEOTTO
-    db 30,PIDGEOTTO
-
-    db $00
-
-Route16Mons: ; d361 (3:5361)
-    db $19
-    db 20,SPEAROW
-    db 22,SPEAROW
-    db 18,RATTATA
-    db 20,DODUO
-    db 20,RATTATA
-    db 18,DODUO
-    db 22,DODUO
-    db 22,RATTATA
-    db 23,RATICATE
-    db 25,RATICATE
-
-    db $00
-
-Route17Mons: ; d377 (3:5377)
-    db $19
-    db 20,SPEAROW
-    db 22,SPEAROW
-    db 25,RATICATE
-    db 24,DODUO
-    db 27,RATICATE
-    db 26,DODUO
-    db 28,DODUO
-    db 29,RATICATE
-    db 25,FEAROW
-    db 27,FEAROW
-
-    db $00
-
-Route18Mons: ; d38d (3:538d)
-    db $19
-    db 20,SPEAROW
-    db 22,SPEAROW
-    db 25,RATICATE
-    db 24,DODUO
-    db 25,FEAROW
-    db 26,DODUO
-    db 28,DODUO
-    db 29,RATICATE
-    db 27,FEAROW
-    db 29,FEAROW
-
-    db $00
-
-ZoneMonsCenter: ; d3a3 (3:53a3)
-    db $1E
-    db 22,NIDORAN_M
-    db 25,RHYHORN
-    db 22,VENONAT
-    db 24,EXEGGCUTE
-    db 31,NIDORINO
-    db 25,EXEGGCUTE
-    db 31,NIDORINA
-    db 30,PARASECT
-    db 23,SCYTHER
-    db 23,CHANSEY
-
-    db $00
-
-ZoneMons1: ; d3b9 (3:53b9)
-    db $1E
-    db 24,NIDORAN_M
-    db 26,DODUO
-    db 22,PARAS
-    db 25,EXEGGCUTE
-    db 33,NIDORINO
-    db 23,EXEGGCUTE
-    db 24,NIDORAN_F
-    db 25,PARASECT
-    db 25,LICKITUNG
-    db 28,SCYTHER
-
-    db $00
-
-ZoneMons2: ; d3cf (3:53cf)
-    db $1E
-    db 22,NIDORAN_M
-    db 26,RHYHORN
-    db 23,PARAS
-    db 25,EXEGGCUTE
-    db 30,NIDORINO
-    db 27,EXEGGCUTE
-    db 30,NIDORINA
-    db 32,VENOMOTH
-    db 26,CHANSEY
-    db 28,PINSIR
-
-    db $00
-
-ZoneMons3: ; d3e5 (3:53e5)
-    db $1E
-    db 25,NIDORAN_M
-    db 26,DODUO
-    db 23,VENONAT
-    db 24,EXEGGCUTE
-    db 33,NIDORINO
-    db 26,EXEGGCUTE
-    db 25,NIDORAN_F
-    db 31,VENOMOTH
-    db 26,PINSIR
-    db 28,LICKITUNG
-
-    db $00
-
-WaterMons: ; d3fb (3:53fb)
-    db $00
-
-    db $05
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 20,TENTACOOL
-    db 30,TENTACOOL
-    db 35,TENTACOOL
-    db 40,TENTACOOL
-
-WaterMons: ; d3fb (3:53fb)
-    db $00
-
-    db $05
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 20,TENTACOOL
-    db 30,TENTACOOL
-    db 35,TENTACOOL
-    db 40,TENTACOOL
-
-IslandMons1: ; d411 (3:5411)
-    db $0F
-    db 30,SEEL
-    db 30,HORSEA
-    db 30,STARYU
-    db 30,KRABBY
-    db 28,KRABBY
-    db 21,ZUBAT
-    db 29,GOLBAT
-    db 28,SLOWPOKE
-    db 28,STARYU
-    db 38,SLOWBRO
-
-    db $00
-
-IslandMonsB1: ; d427 (3:5427)
-    db $0A
-    db 30,SHELLDER
-    db 30,KRABBY
-    db 32,STARYU
-    db 32,KRABBY
-    db 28,HORSEA
-    db 30,SEEL
-    db 30,HORSEA
-    db 28,SEEL
-    db 38,DEWGONG
-    db 37,KINGLER
-
-    db $00
-
-IslandMonsB2: ; d43d (3:543d)
-    db $0A
-    db 30,SEEL
-    db 30,HORSEA
-    db 32,SEEL
-    db 32,HORSEA
-    db 28,KRABBY
-    db 30,SHELLDER
-    db 30,KRABBY
-    db 28,STARYU
-    db 30,GOLBAT
-    db 37,JYNX
-
-    db $00
-
-IslandMonsB3: ; d453 (3:5453)
-    db $0A
-    db 31,HORSEA
-    db 31,SEEL
-    db 33,HORSEA
-    db 33,SEEL
-    db 29,KRABBY
-    db 31,STARYU
-    db 31,KRABBY
-    db 29,STARYU
-    db 39,KINGLER
-    db 37,DEWGONG
-
-    db $00
-
-IslandMonsB4: ; d469 (3:5469)
-    db $0A
-    db 31,KRABBY
-    db 31,STARYU
-    db 33,KRABBY
-    db 33,STARYU
-    db 29,HORSEA
-    db 31,SEEL
-    db 31,HORSEA
-    db 29,SEEL
-    db 39,JYNX
-    db 32,GOLBAT
-
-    db $00
-
-MansionMons1: ; d47f (3:547f)
-    db $0A
-    db 32,GRIMER
-    db 30,GRIMER
-    db 34,PONYTA
-    db 30,PONYTA
-    db 34,GROWLITHE
-    db 32,PONYTA
-    db 30,KOFFING
-    db 28,PONYTA
-    db 37,MUK
-    db 39,WEEZING
-
-    db $00
-
-MansionMons2: ; d495 (3:5495)
-    db $0A
-    db 32,GROWLITHE
-    db 34,GRIMER
-    db 34,GRIMER
-    db 30,PONYTA
-    db 30,GRIMER
-    db 32,PONYTA
-    db 30,KOFFING
-    db 28,PONYTA
-    db 39,MUK
-    db 37,WEEZING
-
-    db $00
-
-MansionMons3: ; d4ab (3:54ab)
-    db $0A
-    db 31,GRIMER
-    db 33,GROWLITHE
-    db 35,GRIMER
-    db 32,PONYTA
-    db 34,PONYTA
-    db 40,MUK
-    db 34,KOFFING
-    db 38,MUK
-    db 36,PONYTA
-    db 42,WEEZING
-
-    db $00
-
-MansionMonsB1: ; d4c1 (3:54c1)
-    db $0A
-    db 33,GRIMER
-    db 31,GRIMER
-    db 35,GROWLITHE
-    db 32,PONYTA
-    db 31,GRIMER
-    db 40,MUK
-    db 34,PONYTA
-    db 35,KOFFING
-    db 38,MUK
-    db 42,WEEZING
-
-    db $00
-
-Route21Mons: ; d4d7 (3:54d7)
-    db $19
-    db 21,RATTATA
-    db 23,PIDGEY
-    db 30,RATICATE
-    db 23,RATTATA
-    db 21,PIDGEY
-    db 30,PIDGEOTTO
-    db 32,PIDGEOTTO
-    db 28,TANGELA
-    db 30,TANGELA
-    db 32,TANGELA
-
-    db $05
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 20,TENTACOOL
-    db 30,TENTACOOL
-    db 35,TENTACOOL
-    db 40,TENTACOOL
-
-DungeonMons1: ; d501 (3:5501)
-    db $0A
-    db 46,GOLBAT
-    db 46,HYPNO
-    db 46,MAGNETON
-    db 49,RAPIDASH
-    db 49,VENOMOTH
-    db 52,SANDSLASH
-    db 49,KADABRA
-    db 52,PARASECT
-    db 53,RAICHU
-    db 53,DITTO
-
-    db $00
-
-DungeonMons2: ; d517 (3:5517)
-    db $0F
-    db 51,DODRIO
-    db 51,VENOMOTH
-    db 51,KADABRA
-    db 52,RHYDON
-    db 52,RATICATE
-    db 52,ELECTRODE
-    db 56,CHANSEY
-    db 54,WIGGLYTUFF
-    db 55,DITTO
-    db 60,DITTO
-
-    db $00
-
-DungeonMonsB1: ; d52d (3:552d)
-    db $19
-    db 55,RHYDON
-    db 55,MAROWAK
-    db 55,ELECTRODE
-    db 64,CLEFAIRY
-    db 64,PARASECT
-    db 64,RAICHU
-    db 57,SANDSLASH
-    db 65,DITTO
-    db 63,DITTO
-    db 67,DITTO
-
-    db $00
-
-PowerPlantMons: ; d543 (3:5543)
-    db $0A
-    db 21,VOLTORB
-    db 21,MAGNEMITE
-    db 20,PIKACHU
-    db 24,PIKACHU
-    db 23,MAGNEMITE
-    db 23,VOLTORB
-    db 32,MAGNETON
-    db 35,MAGNETON
-    db 33,RAICHU
-    db 36,RAICHU
-
-    db $00
-
-Route23Mons: ; d559 (3:5559)
-    db $0A
-    db 26,SANDSHREW
-    db 33,DITTO
-    db 26,SPEAROW
-    db 38,FEAROW
-    db 38,DITTO
-    db 38,FEAROW
-    db 41,SANDSLASH
-    db 43,DITTO
-    db 41,FEAROW
-    db 43,FEAROW
-
-    db $00
-
-PlateauMons2: ; d56f (3:556f)
-    db $0A
-    db 22,MACHOP
-    db 24,GEODUDE
-    db 26,ZUBAT
-    db 36,ONIX
-    db 39,ONIX
-    db 42,ONIX
-    db 41,MACHOKE
-    db 40,GOLBAT
-    db 40,MAROWAK
-    db 43,GRAVELER
-
-    db $00
-
-PlateauMons3: ; d585 (3:5585)
-    db $0F
-    db 24,MACHOP
-    db 26,GEODUDE
-    db 22,ZUBAT
-    db 42,ONIX
-    db 40,VENOMOTH
-    db 45,ONIX
-    db 43,GRAVELER
-    db 41,GOLBAT
-    db 42,MACHOKE
-    db 45,MACHOKE
-
-    db $00
-
-PlateauMons1: ; d59b (3:559b)
-    db $0F
-    db 24,MACHOP
-    db 26,GEODUDE
-    db 22,ZUBAT
-    db 36,ONIX
-    db 39,ONIX
-    db 42,ONIX
-    db 41,GRAVELER
-    db 41,GOLBAT
-    db 42,MACHOKE
-    db 43,MAROWAK
-
-    db $00
-
-CaveMons: ; d5b1 (3:55b1)
-    db $14
-    db 18,DIGLETT
-    db 19,DIGLETT
-    db 17,DIGLETT
-    db 20,DIGLETT
-    db 16,DIGLETT
-    db 15,DIGLETT
-    db 21,DIGLETT
-    db 22,DIGLETT
-    db 29,DUGTRIO
-    db 31,DUGTRIO
-
-    db $00
-
-ENDC
-IF _YELLOW
-NoMons: ; d0dd (3:50dd)
-    db $00
-
-    db $00
-
-Route1Mons: ; d0df (3:50df)
-    db $19
-    db 3,PIDGEY
-    db 4,PIDGEY
-    db 2,RATTATA
-    db 3,RATTATA
-    db 2,PIDGEY
-    db 3,PIDGEY
-    db 5,PIDGEY
-    db 4,RATTATA
-    db 6,PIDGEY
-    db 7,PIDGEY
-
-    db $00
-
-Route2Mons: ; d0f5 (3:50f5)
-    db $19
-    db 3,RATTATA
-    db 3,PIDGEY
-    db 4,RATTATA
-    db 4,NIDORAN_M
-    db 4,NIDORAN_F
-    db 5,PIDGEY
-    db 6,NIDORAN_M
-    db 6,NIDORAN_F
-    db 7,PIDGEY
-    db 7,PIDGEY
-
-    db $00
-
-Route22Mons: ; d10b (3:510b)
-    db $19
-    db 2,NIDORAN_M
-    db 2,NIDORAN_F
-    db 3,MANKEY
-    db 3,RATTATA
-    db 4,NIDORAN_M
-    db 4,NIDORAN_F
-    db 5,MANKEY
-    db 2,SPEAROW
-    db 4,SPEAROW
-    db 6,SPEAROW
-
-    db $00
-
-ForestMons: ; d121 (3:5121)
-    db $19
-    db 3,CATERPIE
-    db 4,METAPOD
-    db 4,CATERPIE
-    db 5,CATERPIE
-    db 4,PIDGEY
-    db 6,PIDGEY
-    db 6,CATERPIE
-    db 6,METAPOD
-    db 8,PIDGEY
-    db 9,PIDGEOTTO
-
-    db $00
-
-Route3Mons: ; d137 (3:5137)
-    db $14
-    db 8,SPEAROW
-    db 9,SPEAROW
-    db 9,MANKEY
-    db 10,SPEAROW
-    db 8,SANDSHREW
-    db 10,RATTATA
-    db 10,SANDSHREW
-    db 12,RATTATA
-    db 11,SPEAROW
-    db 12,SPEAROW
-
-    db $00
-
-MoonMons1: ; d14d (3:514d)
-    db $0A
-    db 8,ZUBAT
-    db 9,ZUBAT
-    db 10,GEODUDE
-    db 6,ZUBAT
-    db 7,ZUBAT
-    db 10,ZUBAT
-    db 10,GEODUDE
-    db 11,ZUBAT
-    db 12,SANDSHREW
-    db 11,CLEFAIRY
-
-    db $00
-
-MoonMonsB1: ; d163 (3:5163)
-    db $0A
-    db 8,ZUBAT
-    db 9,ZUBAT
-    db 10,ZUBAT
-    db 10,GEODUDE
-    db 11,GEODUDE
-    db 11,ZUBAT
-    db 9,PARAS
-    db 11,PARAS
-    db 10,CLEFAIRY
-    db 12,CLEFAIRY
-
-    db $00
-
-MoonMonsB2: ; d179 (3:5179)
-    db $0A
-    db 10,ZUBAT
-    db 11,GEODUDE
-    db 13,PARAS
-    db 11,ZUBAT
-    db 11,ZUBAT
-    db 12,ZUBAT
-    db 13,ZUBAT
-    db 9,CLEFAIRY
-    db 11,CLEFAIRY
-    db 13,CLEFAIRY
-
-    db $00
-
-Route4Mons: ; d18f (3:518f)
-    db $14
-    db 8,SPEAROW
-    db 9,SPEAROW
-    db 9,MANKEY
-    db 10,SPEAROW
-    db 8,SANDSHREW
-    db 10,RATTATA
-    db 10,SANDSHREW
-    db 12,RATTATA
-    db 11,SPEAROW
-    db 12,SPEAROW
-
-    db $00
-
-Route24Mons: ; d1a5 (3:51a5)
-    db $19
-    db 12,ODDISH
-    db 12,BELLSPROUT
-    db 13,PIDGEY
-    db 14,ODDISH
-    db 14,BELLSPROUT
-    db 15,PIDGEY
-    db 13,VENONAT
-    db 16,VENONAT
-    db 17,PIDGEY
-    db 17,PIDGEOTTO
-
-    db $00
-
-Route25Mons: ; d1bb (3:51bb)
-    db $0F
-    db 12,ODDISH
-    db 12,BELLSPROUT
-    db 13,PIDGEY
-    db 14,ODDISH
-    db 14,BELLSPROUT
-    db 15,PIDGEY
-    db 13,VENONAT
-    db 16,VENONAT
-    db 17,PIDGEY
-    db 17,PIDGEOTTO
-
-    db $00
-
-Route9Mons: ; d1d1 (3:51d1)
-    db $0F
-    db 16,NIDORAN_M
-    db 16,NIDORAN_F
-    db 18,RATTATA
-    db 18,NIDORAN_M
-    db 18,NIDORAN_F
-    db 17,SPEAROW
-    db 18,NIDORINO
-    db 18,NIDORINA
-    db 20,RATICATE
-    db 19,FEAROW
-
-    db $00
-
-Route5Mons: ; d1e7 (3:51e7)
-    db $0F
-    db 15,PIDGEY
-    db 14,RATTATA
-    db 7,ABRA
-    db 16,PIDGEY
-    db 16,RATTATA
-    db 17,PIDGEY
-    db 17,PIDGEOTTO
-    db 3,JIGGLYPUFF
-    db 5,JIGGLYPUFF
-    db 7,JIGGLYPUFF
-
-    db $00
-
-Route6Mons: ; d1fd (3:51fd)
-    db $0F
-    db 15,PIDGEY
-    db 14,RATTATA
-    db 7,ABRA
-    db 16,PIDGEY
-    db 16,RATTATA
-    db 17,PIDGEY
-    db 17,PIDGEOTTO
-    db 3,JIGGLYPUFF
-    db 5,JIGGLYPUFF
-    db 7,JIGGLYPUFF
-
-    db $03
-    db 15,PSYDUCK
-    db 15,PSYDUCK
-    db 15,PSYDUCK
-    db 15,PSYDUCK
-    db 15,PSYDUCK
-    db 15,PSYDUCK
-    db 15,PSYDUCK
-    db 15,PSYDUCK
-    db 15,GOLDUCK
-    db 20,GOLDUCK
-
-Route11Mons: ; d213 (3:5213)
-    db $0F
-    db 16,PIDGEY
-    db 15,RATTATA
-    db 18,PIDGEY
-    db 15,DROWZEE
-    db 17,RATTATA
-    db 17,DROWZEE
-    db 18,PIDGEOTTO
-    db 20,PIDGEOTTO
-    db 19,DROWZEE
-    db 17,RATICATE
-
-    db $00
-
-TunnelMonsB1: ; d229 (3:5229)
-    db $0F
-    db 15,ZUBAT
-    db 16,GEODUDE
-    db 17,ZUBAT
-    db 19,ZUBAT
-    db 18,GEODUDE
-    db 20,GEODUDE
-    db 21,ZUBAT
-    db 17,MACHOP
-    db 19,MACHOP
-    db 21,MACHOP
-
-    db $00
-
-TunnelMonsB2: ; d23f (3:523f)
-    db $0F
-    db 20,ZUBAT
-    db 17,GEODUDE
-    db 18,MACHOP
-    db 21,ZUBAT
-    db 22,ZUBAT
-    db 21,GEODUDE
-    db 20,MACHOP
-    db 14,ONIX
-    db 18,ONIX
-    db 22,ONIX
-
-    db $00
-
-Route10Mons: ; d255 (3:5255)
-    db $0F
-    db 16,MAGNEMITE
-    db 18,RATTATA
-    db 18,MAGNEMITE
-    db 20,MAGNEMITE
-    db 17,NIDORAN_M
-    db 17,NIDORAN_F
-    db 22,MAGNEMITE
-    db 20,RATICATE
-    db 16,MACHOP
-    db 18,MACHOP
-
-    db $00
-
-Route12Mons: ; d26b (3:526b)
-    db $0F
-    db 25,ODDISH
-    db 25,BELLSPROUT
-    db 28,PIDGEY
-    db 28,PIDGEOTTO
-    db 27,ODDISH
-    db 27,BELLSPROUT
-    db 29,GLOOM
-    db 29,WEEPINBELL
-    db 26,FARFETCH_D
-    db 31,FARFETCH_D
-
-    db $03
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWBRO
-    db 20,SLOWBRO
-
-Route8Mons: ; d281 (3:5281)
-    db $0F
-    db 20,PIDGEY
-    db 22,PIDGEY
-    db 20,RATTATA
-    db 15,ABRA
-    db 19,ABRA
-    db 24,PIDGEOTTO
-    db 19,JIGGLYPUFF
-    db 24,JIGGLYPUFF
-    db 20,KADABRA
-    db 27,KADABRA
-
-    db $00
-
-Route7Mons: ; d297 (3:5297)
-    db $0F
-    db 20,PIDGEY
-    db 22,PIDGEY
-    db 20,RATTATA
-    db 15,ABRA
-    db 19,ABRA
-    db 24,PIDGEOTTO
-    db 26,ABRA
-    db 19,JIGGLYPUFF
-    db 24,JIGGLYPUFF
-    db 24,JIGGLYPUFF
-
-    db $00
-
-TowerMons1: ; d2ad (3:52ad)
-    db $00
-
-    db $00
-
-TowerMons2: ; d2af (3:52af)
-    db $00
-
-    db $00
-
-TowerMons3: ; d2b1 (3:52b1)
-    db $0A
-    db 20,GASTLY
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 24,GASTLY
-    db 19,GASTLY
-    db 18,GASTLY
-    db 25,GASTLY
-    db 20,HAUNTER
-    db 25,HAUNTER
-
-    db $00
-
-TowerMons4: ; d2c7 (3:52c7)
-    db $0A
-    db 20,GASTLY
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 24,GASTLY
-    db 19,GASTLY
-    db 18,GASTLY
-    db 25,GASTLY
-    db 20,HAUNTER
-    db 25,HAUNTER
-
-    db $00
-
-TowerMons5: ; d2dd (3:52dd)
-    db $0F
-    db 22,GASTLY
-    db 23,GASTLY
-    db 24,GASTLY
-    db 25,GASTLY
-    db 26,GASTLY
-    db 21,GASTLY
-    db 20,CUBONE
-    db 27,GASTLY
-    db 22,HAUNTER
-    db 27,HAUNTER
-
-    db $00
-
-TowerMons6: ; d2f3 (3:52f3)
-    db $0F
-    db 22,GASTLY
-    db 23,GASTLY
-    db 24,GASTLY
-    db 25,GASTLY
-    db 26,GASTLY
-    db 21,GASTLY
-    db 22,CUBONE
-    db 27,GASTLY
-    db 22,HAUNTER
-    db 27,HAUNTER
-
-    db $00
-
-TowerMons7: ; d309 (3:5309)
-    db $14
-    db 24,GASTLY
-    db 25,GASTLY
-    db 26,GASTLY
-    db 27,GASTLY
-    db 28,GASTLY
-    db 23,GASTLY
-    db 24,CUBONE
-    db 29,GASTLY
-    db 24,HAUNTER
-    db 29,HAUNTER
-
-    db $00
-
-Route13Mons: ; d31f (3:531f)
-    db $0F
-    db 25,ODDISH
-    db 25,BELLSPROUT
-    db 28,PIDGEOTTO
-    db 28,PIDGEY
-    db 27,ODDISH
-    db 27,BELLSPROUT
-    db 29,GLOOM
-    db 29,WEEPINBELL
-    db 26,FARFETCH_D
-    db 31,FARFETCH_D
-
-    db $03
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWPOKE
-    db 15,SLOWBRO
-    db 20,SLOWBRO
-
-Route14Mons: ; d335 (3:5335)
-    db $0F
-    db 26,ODDISH
-    db 26,BELLSPROUT
-    db 24,VENONAT
-    db 30,PIDGEOTTO
-    db 28,ODDISH
-    db 28,BELLSPROUT
-    db 30,GLOOM
-    db 30,WEEPINBELL
-    db 27,VENONAT
-    db 30,VENOMOTH
-
-    db $00
-
-Route15Mons: ; d34b (3:534b)
-    db $0F
-    db 26,ODDISH
-    db 26,BELLSPROUT
-    db 24,VENONAT
-    db 32,PIDGEOTTO
-    db 28,ODDISH
-    db 28,BELLSPROUT
-    db 30,GLOOM
-    db 30,WEEPINBELL
-    db 27,VENONAT
-    db 30,VENOMOTH
-
-    db $00
-
-Route16Mons: ; d361 (3:5361)
-    db $19
-    db 22,SPEAROW
-    db 22,DODUO
-    db 23,RATTATA
-    db 24,DODUO
-    db 24,RATTATA
-    db 26,DODUO
-    db 23,SPEAROW
-    db 24,FEAROW
-    db 25,RATICATE
-    db 26,RATICATE
-
-    db $00
-
-Route17Mons: ; d377 (3:5377)
-    db $19
-    db 26,DODUO
-    db 27,FEAROW
-    db 27,DODUO
-    db 28,DODUO
-    db 28,PONYTA
-    db 30,PONYTA
-    db 29,FEAROW
-    db 28,DODUO
-    db 32,PONYTA
-    db 29,DODRIO
-
-    db $00
-
-Route18Mons: ; d38d (3:538d)
-    db $19
-    db 22,SPEAROW
-    db 22,DODUO
-    db 23,RATTATA
-    db 24,DODUO
-    db 24,RATTATA
-    db 26,DODUO
-    db 23,SPEAROW
-    db 24,FEAROW
-    db 25,RATICATE
-    db 26,RATICATE
-
-    db $00
-
-ZoneMonsCenter: ; d3a3 (3:53a3)
-    db $1E
-    db 14,NIDORAN_M
-    db 36,NIDORAN_F
-    db 24,EXEGGCUTE
-    db 20,RHYHORN
-    db 23,NIDORINO
-    db 27,PARASECT
-    db 27,PARAS
-    db 32,PARASECT
-    db 22,TANGELA
-    db 7,CHANSEY
-
-    db $00
-
-ZoneMons1: ; d3b9 (3:53b9)
-    db $1E
-    db 21,NIDORAN_M
-    db 29,NIDORAN_F
-    db 22,EXEGGCUTE
-    db 21,TAUROS
-    db 32,NIDORINA
-    db 19,CUBONE
-    db 26,EXEGGCUTE
-    db 24,MAROWAK
-    db 21,CHANSEY
-    db 15,SCYTHER
-
-    db $00
-
-ZoneMons2: ; d3cf (3:53cf)
-    db $1E
-    db 36,NIDORAN_M
-    db 14,NIDORAN_F
-    db 20,EXEGGCUTE
-    db 25,RHYHORN
-    db 23,NIDORINA
-    db 28,KANGASKHAN
-    db 16,CUBONE
-    db 33,KANGASKHAN
-    db 25,SCYTHER
-    db 15,PINSIR
-
-    db $00
-
-ZoneMons3: ; d3e5 (3:53e5)
-    db $1E
-    db 29,NIDORAN_M
-    db 21,NIDORAN_F
-    db 22,EXEGGCUTE
-    db 21,TAUROS
-    db 32,NIDORINO
-    db 19,CUBONE
-    db 26,EXEGGCUTE
-    db 24,MAROWAK
-    db 25,PINSIR
-    db 27,TANGELA
-
-    db $00
-
-WaterMons: ; d3fb (3:53fb)
-    db $00
-
-    db $05
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 20,TENTACOOL
-    db 30,TENTACOOL
-    db 35,TENTACOOL
-    db 40,TENTACOOL
-
-WaterMons: ; d3fb (3:53fb)
-    db $00
-
-    db $05
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 20,TENTACOOL
-    db 30,TENTACOOL
-    db 35,TENTACOOL
-    db 40,TENTACOOL
-
-IslandMons1: ; d411 (3:5411)
-    db $0F
-    db 18,ZUBAT
-    db 25,KRABBY
-    db 27,KRABBY
-    db 27,ZUBAT
-    db 36,ZUBAT
-    db 28,SLOWPOKE
-    db 30,SLOWPOKE
-    db 9,ZUBAT
-    db 27,GOLBAT
-    db 36,GOLBAT
-
-    db $00
-
-IslandMonsB1: ; d427 (3:5427)
-    db $0A
-    db 27,ZUBAT
-    db 26,KRABBY
-    db 36,ZUBAT
-    db 28,KRABBY
-    db 27,GOLBAT
-    db 29,SLOWPOKE
-    db 18,ZUBAT
-    db 28,KINGLER
-    db 22,SEEL
-    db 26,SEEL
-
-    db $00
-
-IslandMonsB2: ; d43d (3:543d)
-    db $0A
-    db 27,ZUBAT
-    db 27,KRABBY
-    db 36,ZUBAT
-    db 27,GOLBAT
-    db 28,KINGLER
-    db 24,SEEL
-    db 29,KRABBY
-    db 36,GOLBAT
-    db 31,SLOWPOKE
-    db 31,SLOWBRO
-
-    db $00
-
-IslandMonsB3: ; d453 (3:5453)
-    db $0A
-    db 27,GOLBAT
-    db 36,ZUBAT
-    db 29,KRABBY
-    db 27,ZUBAT
-    db 30,KINGLER
-    db 26,SEEL
-    db 31,KRABBY
-    db 30,SEEL
-    db 28,DEWGONG
-    db 32,DEWGONG
-
-    db $05
-    db 25,TENTACOOL
-    db 30,TENTACOOL
-    db 20,TENTACOOL
-    db 30,STARYU
-    db 35,TENTACOOL
-    db 30,STARYU
-    db 40,TENTACOOL
-    db 30,STARYU
-    db 30,STARYU
-    db 30,STARYU
-
-IslandMonsB4: ; d469 (3:5469)
-    db $0A
-    db 36,GOLBAT
-    db 36,ZUBAT
-    db 30,KRABBY
-    db 32,KINGLER
-    db 28,SEEL
-    db 32,SEEL
-    db 27,GOLBAT
-    db 45,ZUBAT
-    db 30,DEWGONG
-    db 34,DEWGONG
-
-    db $05
-    db 25,TENTACOOL
-    db 30,TENTACOOL
-    db 20,TENTACOOL
-    db 30,STARYU
-    db 35,TENTACOOL
-    db 30,STARYU
-    db 40,TENTACOOL
-    db 30,STARYU
-    db 30,STARYU
-    db 30,STARYU
-
-MansionMons1: ; d47f (3:547f)
-    db $0A
-    db 34,RATTATA
-    db 34,RATICATE
-    db 23,GRIMER
-    db 26,GROWLITHE
-    db 37,RATTATA
-    db 37,RATICATE
-    db 30,GROWLITHE
-    db 26,GRIMER
-    db 34,GROWLITHE
-    db 38,GROWLITHE
-
-    db $00
-
-MansionMons2: ; d495 (3:5495)
-    db $0A
-    db 37,RATTATA
-    db 37,RATICATE
-    db 26,GRIMER
-    db 29,GRIMER
-    db 40,RATTATA
-    db 40,RATICATE
-    db 32,GRIMER
-    db 35,GRIMER
-    db 35,MUK
-    db 38,MUK
-
-    db $00
-
-MansionMons3: ; d4ab (3:54ab)
-    db $0A
-    db 40,RATTATA
-    db 40,RATICATE
-    db 32,GRIMER
-    db 35,GRIMER
-    db 43,RATTATA
-    db 43,RATICATE
-    db 38,GRIMER
-    db 38,GRIMER
-    db 38,MUK
-    db 41,MUK
-
-    db $00
-
-MansionMonsB1: ; d4c1 (3:54c1)
-    db $0A
-    db 35,GRIMER
-    db 38,GRIMER
-    db 37,RATICATE
-    db 40,RATICATE
-    db 41,MUK
-    db 43,RATICATE
-    db 24,DITTO
-    db 46,RATICATE
-    db 18,DITTO
-    db 12,DITTO
-
-    db $00
-
-Route21Mons: ; d4d7 (3:54d7)
-    db $19
-    db 15,PIDGEY
-    db 13,RATTATA
-    db 13,PIDGEY
-    db 11,PIDGEY
-    db 17,PIDGEY
-    db 15,RATTATA
-    db 15,RATICATE
-    db 17,PIDGEOTTO
-    db 19,PIDGEOTTO
-    db 15,PIDGEOTTO
-
-    db $05
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 20,TENTACOOL
-    db 30,TENTACOOL
-    db 35,TENTACOOL
-    db 40,TENTACOOL
-
-DungeonMons1: ; d501 (3:5501)
-    db $0A
-    db 50,GOLBAT
-    db 55,GOLBAT
-    db 45,GRAVELER
-    db 55,GLOOM
-    db 55,WEEPINBELL
-    db 52,SANDSLASH
-    db 54,VENOMOTH
-    db 54,PARASECT
-    db 55,DITTO
-    db 60,DITTO
-
-    db $00
-
-DungeonMons2: ; d517 (3:5517)
-    db $0F
-    db 52,GOLBAT
-    db 57,GOLBAT
-    db 50,GRAVELER
-    db 56,SANDSLASH
-    db 50,RHYHORN
-    db 60,DITTO
-    db 58,GLOOM
-    db 58,WEEPINBELL
-    db 60,RHYDON
-    db 58,RHYDON
-
-    db $00
-
-DungeonMonsB1: ; d52d (3:552d)
-    db $19
-    db 54,GOLBAT
-    db 59,GOLBAT
-    db 55,GRAVELER
-    db 52,RHYHORN
-    db 62,RHYDON
-    db 60,DITTO
-    db 56,CHANSEY
-    db 65,DITTO
-    db 55,LICKITUNG
-    db 50,LICKITUNG
-
-    db $00
-
-PowerPlantMons: ; d543 (3:5543)
-    db $0A
-    db 30,MAGNEMITE
-    db 35,MAGNEMITE
-    db 33,MAGNETON
-    db 33,VOLTORB
-    db 37,VOLTORB
-    db 33,GRIMER
-    db 37,GRIMER
-    db 38,MAGNETON
-    db 33,MUK
-    db 37,MUK
-
-    db $00
-
-Route23Mons: ; d559 (3:5559)
-    db $0A
-    db 41,NIDORINO
-    db 41,NIDORINA
-    db 36,MANKEY
-    db 44,NIDORINO
-    db 44,NIDORINA
-    db 40,FEAROW
-    db 41,MANKEY
-    db 45,FEAROW
-    db 41,PRIMEAPE
-    db 46,PRIMEAPE
-
-    db $00
-
-PlateauMons2: ; d56f (3:556f)
-    db $0A
-    db 31,GEODUDE
-    db 36,GEODUDE
-    db 41,GEODUDE
-    db 44,ZUBAT
-    db 39,GOLBAT
-    db 44,GRAVELER
-    db 45,ONIX
-    db 47,ONIX
-    db 39,MACHOKE
-    db 42,MACHOKE
-
-    db $00
-
-PlateauMons3: ; d585 (3:5585)
-    db $0F
-    db 36,GEODUDE
-    db 44,GOLBAT
-    db 41,GEODUDE
-    db 49,ONIX
-    db 46,GEODUDE
-    db 41,GRAVELER
-    db 42,MACHOKE
-    db 45,MACHOKE
-    db 47,GRAVELER
-    db 47,GRAVELER
-
-    db $00
-
-PlateauMons1: ; d59b (3:559b)
-    db $0F
-    db 26,GEODUDE
-    db 31,GEODUDE
-    db 36,GEODUDE
-    db 39,ZUBAT
-    db 44,ZUBAT
-    db 41,GEODUDE
-    db 43,ONIX
-    db 45,ONIX
-    db 41,GRAVELER
-    db 47,GRAVELER
-
-    db $00
-
-CaveMons: ; d5b1 (3:55b1)
-    db $14
-    db 18,DIGLETT
-    db 19,DIGLETT
-    db 17,DIGLETT
-    db 20,DIGLETT
-    db 16,DIGLETT
-    db 15,DIGLETT
-    db 21,DIGLETT
-    db 22,DIGLETT
-    db 29,DUGTRIO
-    db 31,DUGTRIO
-
-    db $00
-
-ENDC
 
 UseItem_: ; d5c7 (3:55c7)
     ld a,1
@@ -33063,7 +31199,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     ld l,a
     ld de,$CD6D
     ld a,BANK(EvosMovesPointerTable)
-    ld bc,13
+    ld bc,13 ; Eevee's Evolution Bytes
     call FarCopyData
     ld hl,$CD6D
     ld de,.notAbleToEvolveText
@@ -34215,7 +32351,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db THUNDER
     db EARTHQUAKE
     db FISSURE
-    db DIG
+    db TRAPHOLE
     db PSYCHIC_M
     db TELEPORT
     db MIMIC
@@ -34238,10 +32374,10 @@ TechnicalMachines: ; 13773 (4:7773)
     db ROCK_SLIDE
     db TRI_ATTACK
     db SUBSTITUTE
-    db CUT
-    db FLY
-    db SURF
-    db STRENGTH
+    db BLADE
+    db SWOOP
+    db TSUNAMI
+    db STRIKE
     db FLASH
 
 Func_137aa: ; 137aa (4:77aa)
@@ -34816,7 +32952,7 @@ CheckWaterPower: ; SURF
     bit 0,[hl]
     jr ElementEnd
 
-CheckEarthPower: ; STRENGHT
+CheckEarthPower: ; STRENGTH
     jr z,DontCheckElement
     ld hl,$d78e
     bit 0,[hl]
@@ -43117,7 +41253,7 @@ CeladonMansion5Text1: ; 1dd41 (7:5d41)
 
 CeladonMansion5Text2: ; 1dd46 (7:5d46)
     db $08 ; asm
-    ld bc,(EEVEE << 8) | 25
+    ld bc,(EEVEE << 8) | 15
     call GivePokemon
     jr nc,.asm_24365 ; 0x1dd4d
     ld a,$45
@@ -43262,7 +41398,7 @@ SaffronHouse2Text1: ; 1de41 (7:5e41)
     jr nz,.asm_9e72b ; 0x1de47
     ld hl,TM29PreReceiveText
     call PrintText
-    ld bc,(TM_29 << 8) | 1
+    ld bc,(TM_46 << 8) | 1
     call GiveItem
     jr nc,.BagFull
     ld hl,ReceivedTM29Text
@@ -44096,7 +42232,7 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,40 ; trainer
     db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,43 ; trainer
     db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,40 ; trainer
-    db SPRITE_BIRD,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,50 ; trainer
+    db SPRITE_BIRD,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,40 ; trainer
     db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
     db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,HP_UP ; item
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
@@ -45990,12 +44126,8 @@ Func_2171b: ; 2171b (8:571b)
     ret
 
 HMMoveArray: ; 21745 (8:5745)
-    db CUT
-    db FLY
-    db SURF
-    db STRENGTH
-    db FLASH
     db $ff
+    ds 5
 
 Func_2174b: ; 2174b (8:574b)
     FuncCoord 9,10 ; $c471
@@ -50278,5723 +48410,10 @@ GameCornerSomeonesKeysText: ; 37e83 (d:7e83)
 SECTION "bankE",ROMX,BANK[$E]
 
 Moves: ; 38000 (e:4000)
-; characteristics of each move
-; animation,effect,power,type,accuracy,PP
-    db POUND       ,NO_ADDITIONAL_EFFECT      ,$28,NORMAL,$FF,35
-    db KARATE_CHOP ,NO_ADDITIONAL_EFFECT      ,$32,NORMAL,$FF,25
-    db DOUBLESLAP  ,TWO_TO_FIVE_ATTACKS_EFFECT,$0F,NORMAL,$D8,10
-    db COMET_PUNCH ,TWO_TO_FIVE_ATTACKS_EFFECT,$12,NORMAL,$D8,15
-    db MEGA_PUNCH  ,NO_ADDITIONAL_EFFECT      ,$50,NORMAL,$D8,20
-    db PAY_DAY     ,PAY_DAY_EFFECT            ,$28,NORMAL,$FF,20
-    db FIRE_PUNCH  ,BURN_SIDE_EFFECT1         ,$4B,FIRE,$FF,15
-    db ICE_PUNCH   ,FREEZE_SIDE_EFFECT        ,$4B,ICE,$FF,15
-    db THUNDERPUNCH,PARALYZE_SIDE_EFFECT1     ,$4B,ELECTRIC,$FF,15
-    db SCRATCH     ,NO_ADDITIONAL_EFFECT      ,$28,NORMAL,$FF,35
-    db VICEGRIP    ,NO_ADDITIONAL_EFFECT      ,$37,NORMAL,$FF,30
-    db GUILLOTINE  ,OHKO_EFFECT               ,$01,NORMAL,$4C,5
-    db RAZOR_WIND  ,CHARGE_EFFECT             ,$50,NORMAL,$BF,10
-    db SWORDS_DANCE,ATTACK_UP2_EFFECT         ,$00,NORMAL,$FF,30
-    db CUT         ,NO_ADDITIONAL_EFFECT      ,$32,NORMAL,$F2,30
-    db GUST        ,NO_ADDITIONAL_EFFECT      ,$28,NORMAL,$FF,35
-    db WING_ATTACK ,NO_ADDITIONAL_EFFECT      ,$23,FLYING,$FF,35
-    db WHIRLWIND   ,SWITCH_AND_TELEPORT_EFFECT,$00,NORMAL,$D8,20
-    db FLY         ,FLY_EFFECT                ,$46,FLYING,$F2,15
-    db BIND        ,TRAPPING_EFFECT           ,$0F,NORMAL,$BF,20
-    db SLAM        ,NO_ADDITIONAL_EFFECT      ,$50,NORMAL,$BF,20
-    db VINE_WHIP   ,NO_ADDITIONAL_EFFECT      ,$23,GRASS,$FF,10
-    db STOMP       ,FLINCH_SIDE_EFFECT2       ,$41,NORMAL,$FF,20
-    db DOUBLE_KICK ,ATTACK_TWICE_EFFECT       ,$1E,FIGHTING,$FF,30
-    db MEGA_KICK   ,NO_ADDITIONAL_EFFECT      ,$78,NORMAL,$BF,5
-    db JUMP_KICK   ,JUMP_KICK_EFFECT          ,$46,FIGHTING,$F2,25
-    db ROLLING_KICK,FLINCH_SIDE_EFFECT2       ,$3C,FIGHTING,$D8,15
-    db SAND_ATTACK ,ACCURACY_DOWN1_EFFECT     ,$00,NORMAL,$FF,15
-    db HEADBUTT    ,FLINCH_SIDE_EFFECT2       ,$46,NORMAL,$FF,15
-    db HORN_ATTACK ,NO_ADDITIONAL_EFFECT      ,$41,NORMAL,$FF,25
-    db FURY_ATTACK ,TWO_TO_FIVE_ATTACKS_EFFECT,$0F,NORMAL,$D8,20
-    db HORN_DRILL  ,OHKO_EFFECT               ,$01,NORMAL,$4C,5
-    db TACKLE      ,NO_ADDITIONAL_EFFECT      ,$23,NORMAL,$F2,35
-    db BODY_SLAM   ,PARALYZE_SIDE_EFFECT2     ,$55,NORMAL,$FF,15
-    db WRAP        ,TRAPPING_EFFECT           ,$0F,NORMAL,$D8,20
-    db TAKE_DOWN   ,RECOIL_EFFECT             ,$5A,NORMAL,$D8,20
-    db THRASH      ,THRASH_PETAL_DANCE_EFFECT ,$5A,NORMAL,$FF,20
-    db DOUBLE_EDGE ,RECOIL_EFFECT             ,$64,NORMAL,$FF,15
-    db TAIL_WHIP   ,DEFENSE_DOWN1_EFFECT      ,$00,NORMAL,$FF,30
-    db POISON_STING,POISON_SIDE_EFFECT1       ,$0F,POISON,$FF,35
-    db TWINEEDLE   ,TWINEEDLE_EFFECT          ,$19,BUG,$FF,20
-    db PIN_MISSILE ,TWO_TO_FIVE_ATTACKS_EFFECT,$0E,BUG,$D8,20
-    db LEER        ,DEFENSE_DOWN1_EFFECT      ,$00,NORMAL,$FF,30
-    db BITE        ,FLINCH_SIDE_EFFECT1       ,$3C,NORMAL,$FF,25
-    db GROWL       ,ATTACK_DOWN1_EFFECT       ,$00,NORMAL,$FF,40
-    db ROAR        ,SWITCH_AND_TELEPORT_EFFECT,$00,NORMAL,$FF,20
-    db SING        ,SLEEP_EFFECT              ,$00,NORMAL,$8C,15
-    db SUPERSONIC  ,CONFUSION_EFFECT          ,$00,NORMAL,$8C,20
-    db SONICBOOM   ,SPECIAL_DAMAGE_EFFECT     ,$01,NORMAL,$E5,20
-    db DISABLE     ,DISABLE_EFFECT            ,$00,NORMAL,$8C,20
-    db ACID        ,DEFENSE_DOWN_SIDE_EFFECT  ,$28,POISON,$FF,30
-    db EMBER       ,BURN_SIDE_EFFECT1         ,$28,FIRE,$FF,25
-    db FLAMETHROWER,BURN_SIDE_EFFECT1         ,$5F,FIRE,$FF,15
-    db MIST        ,MIST_EFFECT               ,$00,ICE,$FF,30
-    db WATER_GUN   ,NO_ADDITIONAL_EFFECT      ,$28,WATER,$FF,25
-    db HYDRO_PUMP  ,NO_ADDITIONAL_EFFECT      ,$78,WATER,$CC,5
-    db SURF        ,NO_ADDITIONAL_EFFECT      ,$5F,WATER,$FF,15
-    db ICE_BEAM    ,FREEZE_SIDE_EFFECT        ,$5F,ICE,$FF,10
-    db BLIZZARD    ,FREEZE_SIDE_EFFECT        ,$78,ICE,$E5,5
-    db PSYBEAM     ,CONFUSION_SIDE_EFFECT     ,$41,PSYCHIC,$FF,20
-    db BUBBLEBEAM  ,SPEED_DOWN_SIDE_EFFECT    ,$41,WATER,$FF,20
-    db AURORA_BEAM ,ATTACK_DOWN_SIDE_EFFECT   ,$41,ICE,$FF,20
-    db HYPER_BEAM  ,HYPER_BEAM_EFFECT         ,$96,NORMAL,$E5,5
-    db PECK        ,NO_ADDITIONAL_EFFECT      ,$23,FLYING,$FF,35
-    db DRILL_PECK  ,NO_ADDITIONAL_EFFECT      ,$50,FLYING,$FF,20
-    db SUBMISSION  ,RECOIL_EFFECT             ,$50,FIGHTING,$CC,25
-    db LOW_KICK    ,FLINCH_SIDE_EFFECT2       ,$32,FIGHTING,$E5,20
-    db COUNTER     ,NO_ADDITIONAL_EFFECT      ,$01,FIGHTING,$FF,20
-    db SEISMIC_TOSS,SPECIAL_DAMAGE_EFFECT     ,$01,FIGHTING,$FF,20
-    db STRENGTH    ,NO_ADDITIONAL_EFFECT      ,$50,NORMAL,$FF,15
-    db ABSORB      ,DRAIN_HP_EFFECT           ,$14,GRASS,$FF,20
-    db MEGA_DRAIN  ,DRAIN_HP_EFFECT           ,$28,GRASS,$FF,10
-    db LEECH_SEED  ,LEECH_SEED_EFFECT         ,$00,GRASS,$E5,10
-    db GROWTH      ,SPECIAL_UP1_EFFECT        ,$00,NORMAL,$FF,40
-    db RAZOR_LEAF  ,NO_ADDITIONAL_EFFECT      ,$37,GRASS,$F2,25
-    db SOLARBEAM   ,CHARGE_EFFECT             ,$78,GRASS,$FF,10
-    db POISONPOWDER,POISON_EFFECT             ,$00,POISON,$BF,35
-    db STUN_SPORE  ,PARALYZE_EFFECT           ,$00,GRASS,$BF,30
-    db SLEEP_POWDER,SLEEP_EFFECT              ,$00,GRASS,$BF,15
-    db PETAL_DANCE ,THRASH_PETAL_DANCE_EFFECT ,$46,GRASS,$FF,20
-    db STRING_SHOT ,SPEED_DOWN1_EFFECT        ,$00,BUG,$F2,40
-    db DRAGON_RAGE ,SPECIAL_DAMAGE_EFFECT     ,$01,DRAGON,$FF,10
-    db FIRE_SPIN   ,TRAPPING_EFFECT           ,$0F,FIRE,$B2,15
-    db THUNDERSHOCK,PARALYZE_SIDE_EFFECT1     ,$28,ELECTRIC,$FF,30
-    db THUNDERBOLT ,PARALYZE_SIDE_EFFECT1     ,$5F,ELECTRIC,$FF,15
-    db THUNDER_WAVE,PARALYZE_EFFECT           ,$00,ELECTRIC,$FF,20
-    db THUNDER     ,PARALYZE_SIDE_EFFECT1     ,$78,ELECTRIC,$B2,10
-    db ROCK_THROW  ,NO_ADDITIONAL_EFFECT      ,$32,ROCK,$A5,15
-    db EARTHQUAKE  ,NO_ADDITIONAL_EFFECT      ,$64,GROUND,$FF,10
-    db FISSURE     ,OHKO_EFFECT               ,$01,GROUND,$4C,5
-    db DIG         ,CHARGE_EFFECT             ,$64,GROUND,$FF,10
-    db TOXIC       ,POISON_EFFECT             ,$00,POISON,$D8,10
-    db CONFUSION   ,CONFUSION_SIDE_EFFECT     ,$32,PSYCHIC,$FF,25
-    db PSYCHIC_M   ,SPECIAL_DOWN_SIDE_EFFECT  ,$5A,PSYCHIC,$FF,10
-    db HYPNOSIS    ,SLEEP_EFFECT              ,$00,PSYCHIC,$99,20
-    db MEDITATE    ,ATTACK_UP1_EFFECT         ,$00,PSYCHIC,$FF,40
-    db AGILITY     ,SPEED_UP2_EFFECT          ,$00,PSYCHIC,$FF,30
-    db QUICK_ATTACK,NO_ADDITIONAL_EFFECT      ,$28,NORMAL,$FF,30
-    db RAGE        ,RAGE_EFFECT               ,$14,NORMAL,$FF,20
-    db TELEPORT    ,SWITCH_AND_TELEPORT_EFFECT,$00,PSYCHIC,$FF,20
-    db NIGHT_SHADE ,SPECIAL_DAMAGE_EFFECT     ,$00,GHOST,$FF,15
-    db MIMIC       ,MIMIC_EFFECT              ,$00,NORMAL,$FF,10
-    db SCREECH     ,DEFENSE_DOWN2_EFFECT      ,$00,NORMAL,$D8,40
-    db DOUBLE_TEAM ,EVASION_UP1_EFFECT        ,$00,NORMAL,$FF,15
-    db RECOVER     ,HEAL_EFFECT               ,$00,NORMAL,$FF,20
-    db HARDEN      ,DEFENSE_UP1_EFFECT        ,$00,NORMAL,$FF,30
-    db MINIMIZE    ,EVASION_UP1_EFFECT        ,$00,NORMAL,$FF,20
-    db SMOKESCREEN ,ACCURACY_DOWN1_EFFECT     ,$00,NORMAL,$FF,20
-    db CONFUSE_RAY ,CONFUSION_EFFECT          ,$00,GHOST,$FF,10
-    db WITHDRAW    ,DEFENSE_UP1_EFFECT        ,$00,WATER,$FF,40
-    db DEFENSE_CURL,DEFENSE_UP1_EFFECT        ,$00,NORMAL,$FF,40
-    db BARRIER     ,DEFENSE_UP2_EFFECT        ,$00,PSYCHIC,$FF,30
-    db LIGHT_SCREEN,LIGHT_SCREEN_EFFECT       ,$00,PSYCHIC,$FF,30
-    db HAZE        ,HAZE_EFFECT               ,$00,ICE,$FF,30
-    db REFLECT     ,REFLECT_EFFECT            ,$00,PSYCHIC,$FF,20
-    db FOCUS_ENERGY,FOCUS_ENERGY_EFFECT       ,$00,NORMAL,$FF,30
-    db BIDE        ,BIDE_EFFECT               ,$00,NORMAL,$FF,10
-    db METRONOME   ,METRONOME_EFFECT          ,$00,NORMAL,$FF,10
-    db MIRROR_MOVE ,MIRROR_MOVE_EFFECT        ,$00,FLYING,$FF,20
-    db SELFDESTRUCT,EXPLODE_EFFECT            ,$82,NORMAL,$FF,5
-    db EGG_BOMB    ,NO_ADDITIONAL_EFFECT      ,$64,NORMAL,$BF,10
-    db LICK        ,PARALYZE_SIDE_EFFECT2     ,$14,GHOST,$FF,30
-    db SMOG        ,POISON_SIDE_EFFECT2       ,$14,POISON,$B2,20
-    db SLUDGE      ,POISON_SIDE_EFFECT2       ,$41,POISON,$FF,20
-    db BONE_CLUB   ,FLINCH_SIDE_EFFECT1       ,$41,GROUND,$D8,20
-    db FIRE_BLAST  ,BURN_SIDE_EFFECT2         ,$78,FIRE,$D8,5
-    db WATERFALL   ,NO_ADDITIONAL_EFFECT      ,$50,WATER,$FF,15
-    db CLAMP       ,TRAPPING_EFFECT           ,$23,WATER,$BF,10
-    db SWIFT       ,SWIFT_EFFECT              ,$3C,NORMAL,$FF,20
-    db SKULL_BASH  ,CHARGE_EFFECT             ,$64,NORMAL,$FF,15
-    db SPIKE_CANNON,TWO_TO_FIVE_ATTACKS_EFFECT,$14,NORMAL,$FF,15
-    db CONSTRICT   ,SPEED_DOWN_SIDE_EFFECT    ,$0A,NORMAL,$FF,35
-    db AMNESIA     ,SPECIAL_UP2_EFFECT        ,$00,PSYCHIC,$FF,20
-    db KINESIS     ,ACCURACY_DOWN1_EFFECT     ,$00,PSYCHIC,$CC,15
-    db SOFTBOILED  ,HEAL_EFFECT               ,$00,NORMAL,$FF,10
-    db HI_JUMP_KICK,JUMP_KICK_EFFECT          ,$55,FIGHTING,$E5,20
-    db GLARE       ,PARALYZE_EFFECT           ,$00,NORMAL,$BF,30
-    db DREAM_EATER ,DREAM_EATER_EFFECT        ,$64,PSYCHIC,$FF,15
-    db POISON_GAS  ,POISON_EFFECT             ,$00,POISON,$8C,40
-    db BARRAGE     ,TWO_TO_FIVE_ATTACKS_EFFECT,$0F,NORMAL,$D8,20
-    db LEECH_LIFE  ,DRAIN_HP_EFFECT           ,$14,BUG,$FF,15
-    db LOVELY_KISS ,SLEEP_EFFECT              ,$00,NORMAL,$BF,10
-    db SKY_ATTACK  ,CHARGE_EFFECT             ,$8C,FLYING,$E5,5
-    db TRANSFORM   ,TRANSFORM_EFFECT          ,$00,NORMAL,$FF,10
-    db BUBBLE      ,SPEED_DOWN_SIDE_EFFECT    ,$14,WATER,$FF,30
-    db DIZZY_PUNCH ,NO_ADDITIONAL_EFFECT      ,$46,NORMAL,$FF,10
-    db SPORE       ,SLEEP_EFFECT              ,$00,GRASS,$FF,15
-    db FLASH       ,ACCURACY_DOWN1_EFFECT     ,$00,NORMAL,$B2,20
-    db PSYWAVE     ,SPECIAL_DAMAGE_EFFECT     ,$01,PSYCHIC,$CC,15
-    db SPLASH      ,SPLASH_EFFECT             ,$00,NORMAL,$FF,40
-    db ACID_ARMOR  ,DEFENSE_UP2_EFFECT        ,$00,POISON,$FF,40
-    db CRABHAMMER  ,NO_ADDITIONAL_EFFECT      ,$5A,WATER,$D8,10
-    db EXPLOSION   ,EXPLODE_EFFECT            ,$AA,NORMAL,$FF,5
-    db FURY_SWIPES ,TWO_TO_FIVE_ATTACKS_EFFECT,$12,NORMAL,$CC,15
-    db BONEMERANG  ,ATTACK_TWICE_EFFECT       ,$32,GROUND,$E5,10
-    db REST        ,HEAL_EFFECT               ,$00,PSYCHIC,$FF,10
-    db ROCK_SLIDE  ,NO_ADDITIONAL_EFFECT      ,$4B,ROCK,$E5,10
-    db HYPER_FANG  ,FLINCH_SIDE_EFFECT1       ,$50,NORMAL,$E5,15
-    db SHARPEN     ,ATTACK_UP1_EFFECT         ,$00,NORMAL,$FF,30
-    db CONVERSION  ,CONVERSION_EFFECT         ,$00,NORMAL,$FF,30
-    db TRI_ATTACK  ,NO_ADDITIONAL_EFFECT      ,$50,NORMAL,$FF,10
-    db SUPER_FANG  ,SUPER_FANG_EFFECT         ,$01,NORMAL,$E5,10
-    db SLASH       ,NO_ADDITIONAL_EFFECT      ,$46,NORMAL,$FF,20
-    db SUBSTITUTE  ,SUBSTITUTE_EFFECT         ,$00,NORMAL,$FF,10
-    db STRUGGLE    ,RECOIL_EFFECT             ,$32,NORMAL,$FF,10
 
-BulbasaurBaseStats: ; 383de (e:43de)
-    db DEX_BULBASAUR ; pokedex id
-    db 45 ; base hp
-    db 49 ; base attack
-    db 49 ; base defense
-    db 45 ; base speed
-    db 65 ; base special
+INCLUDE "constants/moves.asm"
 
-    db GRASS ; species type 1
-    db POISON ; species type 2
-
-    db 45 ; catch rate
-    db 64 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw BulbasaurPicFront
-    dw BulbasaurPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db GROWL
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %00000011
-    db %00111000
-    db %11000000
-    db %00000011
-    db %00001000
-    db %00000110
-
-    db BANK(BulbasaurPicFront)
-
-IvysaurBaseStats: ; 383fa (e:43fa)
-    db DEX_IVYSAUR ; pokedex id
-    db 60 ; base hp
-    db 62 ; base attack
-    db 63 ; base defense
-    db 60 ; base speed
-    db 80 ; base special
-
-    db GRASS ; species type 1
-    db POISON ; species type 2
-
-    db 45 ; catch rate
-    db 141 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw IvysaurPicFront
-    dw IvysaurPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db GROWL
-    db LEECH_SEED
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %00000011
-    db %00111000
-    db %11000000
-    db %00000011
-    db %00001000
-    db %00000110
-
-    db BANK(IvysaurPicFront)
-
-VenusaurBaseStats: ; 38416 (e:4416)
-    db DEX_VENUSAUR ; pokedex id
-    db 80 ; base hp
-    db 82 ; base attack
-    db 83 ; base defense
-    db 80 ; base speed
-    db 100 ; base special
-
-    db GRASS ; species type 1
-    db POISON ; species type 2
-
-    db 45 ; catch rate
-    db 208 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw VenusaurPicFront
-    dw VenusaurPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db GROWL
-    db LEECH_SEED
-    db VINE_WHIP
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %01000011
-    db %00111000
-    db %11000000
-    db %00000011
-    db %00001000
-    db %00000110
-
-    db BANK(VenusaurPicFront)
-
-CharmanderBaseStats: ; 38432 (e:4432)
-    db DEX_CHARMANDER ; pokedex id
-    db 39 ; base hp
-    db 52 ; base attack
-    db 43 ; base defense
-    db 65 ; base speed
-    db 50 ; base special
-
-    db FIRE ; species type 1
-    db FIRE ; species type 2
-
-    db 45 ; catch rate
-    db 65 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw CharmanderPicFront
-    dw CharmanderPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db GROWL
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110101
-    db %00000011
-    db %01001111
-    db %11001000
-    db %11100011
-    db %00001000
-    db %00100110
-
-    db BANK(CharmanderPicFront)
-
-CharmeleonBaseStats: ; 3844e (e:444e)
-    db DEX_CHARMELEON ; pokedex id
-    db 58 ; base hp
-    db 64 ; base attack
-    db 58 ; base defense
-    db 80 ; base speed
-    db 65 ; base special
-
-    db FIRE ; species type 1
-    db FIRE ; species type 2
-
-    db 45 ; catch rate
-    db 142 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw CharmeleonPicFront
-    dw CharmeleonPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db GROWL
-    db EMBER
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110101
-    db %00000011
-    db %01001111
-    db %11001000
-    db %11100011
-    db %00001000
-    db %00100110
-
-    db BANK(CharmeleonPicFront)
-
-CharizardBaseStats: ; 3846a (e:446a)
-    db DEX_CHARIZARD ; pokedex id
-    db 78 ; base hp
-    db 84 ; base attack
-    db 78 ; base defense
-    db 100 ; base speed
-    db 85 ; base special
-
-    db FIRE ; species type 1
-    db FLYING ; species type 2
-
-    db 45 ; catch rate
-    db 209 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw CharizardPicFront
-    dw CharizardPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db GROWL
-    db EMBER
-    db LEER
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110101
-    db %01000011
-    db %01001111
-    db %11001110
-    db %11100011
-    db %00001100
-    db %00101110
-
-    db BANK(CharizardPicFront)
-
-SquirtleBaseStats: ; 38486 (e:4486)
-    db DEX_SQUIRTLE ; pokedex id
-    db 44 ; base hp
-    db 48 ; base attack
-    db 65 ; base defense
-    db 43 ; base speed
-    db 50 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 45 ; catch rate
-    db 66 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw SquirtlePicFront
-    dw SquirtlePicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00111111
-    db %00001111
-    db %11001000
-    db %10000011
-    db %00001000
-    db %00110010
-
-    db BANK(SquirtlePicFront)
-
-WartortleBaseStats: ; 384a2 (e:44a2)
-    db DEX_WARTORTLE ; pokedex id
-    db 59 ; base hp
-    db 63 ; base attack
-    db 80 ; base defense
-    db 58 ; base speed
-    db 65 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 45 ; catch rate
-    db 143 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw WartortlePicFront
-    dw WartortlePicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
-    db BUBBLE
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00111111
-    db %00001111
-    db %11001000
-    db %10000011
-    db %00001000
-    db %00110010
-
-    db BANK(WartortlePicFront)
-
-BlastoiseBaseStats: ; 384be (e:44be)
-    db DEX_BLASTOISE ; pokedex id
-    db 79 ; base hp
-    db 83 ; base attack
-    db 100 ; base defense
-    db 78 ; base speed
-    db 85 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 45 ; catch rate
-    db 210 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw BlastoisePicFront
-    dw BlastoisePicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
-    db BUBBLE
-    db WATER_GUN
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01111111
-    db %00001111
-    db %11001110
-    db %10000011
-    db %00001000
-    db %00110010
-
-    db BANK(BlastoisePicFront)
-
-CaterpieBaseStats: ; 384da (e:44da)
-    db DEX_CATERPIE ; pokedex id
-    db 45 ; base hp
-    db 30 ; base attack
-    db 35 ; base defense
-    db 45 ; base speed
-    db 20 ; base special
-
-    db BUG ; species type 1
-    db BUG ; species type 2
-
-    db 255 ; catch rate
-    db 53 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw CaterpiePicFront
-    dw CaterpiePicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db STRING_SHOT
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-
-    db BANK(CaterpiePicFront)
-
-MetapodBaseStats: ; 384f6 (e:44f6)
-    db DEX_METAPOD ; pokedex id
-    db 50 ; base hp
-    db 20 ; base attack
-    db 55 ; base defense
-    db 30 ; base speed
-    db 25 ; base special
-
-    db BUG ; species type 1
-    db BUG ; species type 2
-
-    db 120 ; catch rate
-    db 72 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw MetapodPicFront
-    dw MetapodPicBack
-
-    ; attacks known at lvl 0
-    db HARDEN
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-
-    db BANK(MetapodPicFront)
-
-ButterfreeBaseStats: ; 38512 (e:4512)
-    db DEX_BUTTERFREE ; pokedex id
-    db 60 ; base hp
-    db 45 ; base attack
-    db 50 ; base defense
-    db 70 ; base speed
-    db 80 ; base special
-
-    db BUG ; species type 1
-    db FLYING ; species type 2
-
-    db 45 ; catch rate
-    db 160 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw ButterfreePicFront
-    dw ButterfreePicBack
-
-    ; attacks known at lvl 0
-    db CONFUSION
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %01000011
-    db %00111000
-    db %11110000
-    db %01000011
-    db %00101000
-    db %00000010
-
-    db BANK(ButterfreePicFront)
-
-WeedleBaseStats: ; 3852e (e:452e)
-    db DEX_WEEDLE ; pokedex id
-    db 40 ; base hp
-    db 35 ; base attack
-    db 30 ; base defense
-    db 50 ; base speed
-    db 20 ; base special
-
-    db BUG ; species type 1
-    db POISON ; species type 2
-
-    db 255 ; catch rate
-    db 52 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw WeedlePicFront
-    dw WeedlePicBack
-
-    ; attacks known at lvl 0
-    db POISON_STING
-    db STRING_SHOT
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-
-    db BANK(WeedlePicFront)
-
-KakunaBaseStats: ; 3854a (e:454a)
-    db DEX_KAKUNA ; pokedex id
-    db 45 ; base hp
-    db 25 ; base attack
-    db 50 ; base defense
-    db 35 ; base speed
-    db 25 ; base special
-
-    db BUG ; species type 1
-    db POISON ; species type 2
-
-    db 120 ; catch rate
-    db 71 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw KakunaPicFront
-    dw KakunaPicBack
-
-    ; attacks known at lvl 0
-    db HARDEN
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-
-    db BANK(KakunaPicFront)
-
-BeedrillBaseStats: ; 38566 (e:4566)
-    db DEX_BEEDRILL ; pokedex id
-    db 65 ; base hp
-    db 80 ; base attack
-    db 40 ; base defense
-    db 75 ; base speed
-    db 45 ; base special
-
-    db BUG ; species type 1
-    db POISON ; species type 2
-
-    db 45 ; catch rate
-    db 159 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw BeedrillPicFront
-    dw BeedrillPicBack
-
-    ; attacks known at lvl 0
-    db FURY_ATTACK
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100100
-    db %01000011
-    db %00011000
-    db %11000000
-    db %11000011
-    db %00001000
-    db %00000110
-
-    db BANK(BeedrillPicFront)
-
-PidgeyBaseStats: ; 38582 (e:4582)
-    db DEX_PIDGEY ; pokedex id
-    db 40 ; base hp
-    db 45 ; base attack
-    db 40 ; base defense
-    db 56 ; base speed
-    db 35 ; base special
-
-    db NORMAL ; species type 1
-    db FLYING ; species type 2
-
-    db 255 ; catch rate
-    db 55 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw PidgeyPicFront
-    dw PidgeyPicBack
-
-    ; attacks known at lvl 0
-    db GUST
-    db 0
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %00000011
-    db %00001000
-    db %11000000
-    db %01000011
-    db %00001100
-    db %00001010
-
-    db BANK(PidgeyPicFront)
-
-PidgeottoBaseStats: ; 3859e (e:459e)
-    db DEX_PIDGEOTTO ; pokedex id
-    db 63 ; base hp
-    db 60 ; base attack
-    db 55 ; base defense
-    db 71 ; base speed
-    db 50 ; base special
-
-    db NORMAL ; species type 1
-    db FLYING ; species type 2
-
-    db 120 ; catch rate
-    db 113 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw PidgeottoPicFront
-    dw PidgeottoPicBack
-
-    ; attacks known at lvl 0
-    db GUST
-    db SAND_ATTACK
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %00000011
-    db %00001000
-    db %11000000
-    db %01000011
-    db %00001100
-    db %00001010
-
-    db BANK(PidgeottoPicFront)
-
-PidgeotBaseStats: ; 385ba (e:45ba)
-    db DEX_PIDGEOT ; pokedex id
-    db 83 ; base hp
-    db 80 ; base attack
-    db 75 ; base defense
-    db 91 ; base speed
-    db 70 ; base special
-
-    db NORMAL ; species type 1
-    db FLYING ; species type 2
-
-    db 45 ; catch rate
-    db 172 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw PidgeotPicFront
-    dw PidgeotPicBack
-
-    ; attacks known at lvl 0
-    db GUST
-    db SAND_ATTACK
-    db QUICK_ATTACK
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %01000011
-    db %00001000
-    db %11000000
-    db %01000011
-    db %00001100
-    db %00001010
-
-    db BANK(PidgeotPicFront)
-
-RattataBaseStats: ; 385d6 (e:45d6)
-    db DEX_RATTATA ; pokedex id
-    db 30 ; base hp
-    db 56 ; base attack
-    db 35 ; base defense
-    db 72 ; base speed
-    db 25 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 255 ; catch rate
-    db 57 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw RattataPicFront
-    dw RattataPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00101111
-    db %10001000
-    db %11001001
-    db %11000010
-    db %00001000
-    db %00000010
-
-    db BANK(RattataPicFront)
-
-RaticateBaseStats: ; 385f2 (e:45f2)
-    db DEX_RATICATE ; pokedex id
-    db 55 ; base hp
-    db 81 ; base attack
-    db 60 ; base defense
-    db 97 ; base speed
-    db 50 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 90 ; catch rate
-    db 116 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw RaticatePicFront
-    dw RaticatePicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
-    db QUICK_ATTACK
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %01111111
-    db %10001000
-    db %11001001
-    db %11000010
-    db %00001000
-    db %00000010
-
-    db BANK(RaticatePicFront)
-
-SpearowBaseStats: ; 3860e (e:460e)
-    db DEX_SPEAROW ; pokedex id
-    db 40 ; base hp
-    db 60 ; base attack
-    db 30 ; base defense
-    db 70 ; base speed
-    db 31 ; base special
-
-    db NORMAL ; species type 1
-    db FLYING ; species type 2
-
-    db 255 ; catch rate
-    db 58 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw SpearowPicFront
-    dw SpearowPicBack
-
-    ; attacks known at lvl 0
-    db PECK
-    db GROWL
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %00000011
-    db %00001000
-    db %11000000
-    db %01000010
-    db %00001100
-    db %00001010
-
-    db BANK(SpearowPicFront)
-
-FearowBaseStats: ; 3862a (e:462a)
-    db DEX_FEAROW ; pokedex id
-    db 65 ; base hp
-    db 90 ; base attack
-    db 65 ; base defense
-    db 100 ; base speed
-    db 61 ; base special
-
-    db NORMAL ; species type 1
-    db FLYING ; species type 2
-
-    db 90 ; catch rate
-    db 162 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw FearowPicFront
-    dw FearowPicBack
-
-    ; attacks known at lvl 0
-    db PECK
-    db GROWL
-    db LEER
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %01000011
-    db %00001000
-    db %11000000
-    db %01000010
-    db %00001100
-    db %00001010
-
-    db BANK(FearowPicFront)
-
-EkansBaseStats: ; 38646 (e:4646)
-    db DEX_EKANS ; pokedex id
-    db 35 ; base hp
-    db 60 ; base attack
-    db 44 ; base defense
-    db 55 ; base speed
-    db 40 ; base special
-
-    db POISON ; species type 1
-    db POISON ; species type 2
-
-    db 255 ; catch rate
-    db 62 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw EkansPicFront
-    dw EkansPicBack
-
-    ; attacks known at lvl 0
-    db WRAP
-    db LEER
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00000011
-    db %00011000
-    db %11001110
-    db %10000010
-    db %10001000
-    db %00100010
-
-    db BANK(EkansPicFront)
-
-ArbokBaseStats: ; 38662 (e:4662)
-    db DEX_ARBOK ; pokedex id
-    db 60 ; base hp
-    db 85 ; base attack
-    db 69 ; base defense
-    db 80 ; base speed
-    db 65 ; base special
-
-    db POISON ; species type 1
-    db POISON ; species type 2
-
-    db 90 ; catch rate
-    db 147 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw ArbokPicFront
-    dw ArbokPicBack
-
-    ; attacks known at lvl 0
-    db WRAP
-    db LEER
-    db POISON_STING
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %01000011
-    db %00011000
-    db %11001110
-    db %10000010
-    db %10001000
-    db %00100010
-
-    db BANK(ArbokPicFront)
-
-PikachuBaseStats: ; 3867e (e:467e)
-    db DEX_PIKACHU ; pokedex id
-    db 35 ; base hp
-    db 55 ; base attack
-    db 30 ; base defense
-    db 90 ; base speed
-    db 50 ; base special
-
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
-
-    db 190 ; catch rate
-    db 82 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw PikachuPicFront
-    dw PikachuPicBack
-
-    ; attacks known at lvl 0
-    db THUNDERSHOCK
-    db GROWL
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %10000011
-    db %10001101
-    db %11000001
-    db %11000011
-    db %00011000
-    db %01000010
-
-    db BANK(PikachuPicFront)
-
-RaichuBaseStats: ; 3869a (e:469a)
-    db DEX_RAICHU ; pokedex id
-    db 60 ; base hp
-    db 90 ; base attack
-    db 55 ; base defense
-    db 100 ; base speed
-    db 90 ; base special
-
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
-
-    db 75 ; catch rate
-    db 122 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw RaichuPicFront
-    dw RaichuPicBack
-
-    ; attacks known at lvl 0
-    db THUNDERSHOCK
-    db GROWL
-    db TAIL_WHIP ; Penultimate Move that is Replaced with Thunderbolt in Lt. Surge's Team
-    db THUNDER_WAVE
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %11000011
-    db %10001101
-    db %11000001
-    db %11000011
-    db %00011000
-    db %01000010
-
-    db BANK(RaichuPicFront)
-
-SandshrewBaseStats: ; 386b6 (e:46b6)
-    db DEX_SANDSHREW ; pokedex id
-    db 50 ; base hp
-    db 75 ; base attack
-    db 85 ; base defense
-    db 40 ; base speed
-    db 30 ; base special
-
-    db GROUND ; species type 1
-    db GROUND ; species type 2
-
-    db 255 ; catch rate
-    db 93 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw SandshrewPicFront
-    dw SandshrewPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %00000011
-    db %00001101
-    db %11001110
-    db %11000010
-    db %10001000
-    db %00100110
-
-    db BANK(SandshrewPicFront)
-
-SandslashBaseStats: ; 386d2 (e:46d2)
-    db DEX_SANDSLASH ; pokedex id
-    db 75 ; base hp
-    db 100 ; base attack
-    db 110 ; base defense
-    db 65 ; base speed
-    db 55 ; base special
-
-    db GROUND ; species type 1
-    db GROUND ; species type 2
-
-    db 90 ; catch rate
-    db 163 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw SandslashPicFront
-    dw SandslashPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db SAND_ATTACK
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %01000011
-    db %00001101
-    db %11001110
-    db %11000010
-    db %10001000
-    db %00100110
-
-    db BANK(SandslashPicFront)
-
-NidoranFBaseStats: ; 386ee (e:46ee)
-    db DEX_NIDORAN_F ; pokedex id
-    db 55 ; base hp
-    db 47 ; base attack
-    db 52 ; base defense
-    db 41 ; base speed
-    db 40 ; base special
-
-    db POISON ; species type 1
-    db POISON ; species type 2
-
-    db 235 ; catch rate
-    db 59 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw NidoranFPicFront
-    dw NidoranFPicBack
-
-    ; attacks known at lvl 0
-    db GROWL
-    db TACKLE
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00100011
-    db %10001000
-    db %11000001
-    db %10000011
-    db %00001000
-    db %00000010
-
-    db BANK(NidoranFPicFront)
-
-NidorinaBaseStats: ; 3870a (e:470a)
-    db DEX_NIDORINA ; pokedex id
-    db 70 ; base hp
-    db 62 ; base attack
-    db 67 ; base defense
-    db 56 ; base speed
-    db 55 ; base special
-
-    db POISON ; species type 1
-    db POISON ; species type 2
-
-    db 120 ; catch rate
-    db 117 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw NidorinaPicFront
-    dw NidorinaPicBack
-
-    ; attacks known at lvl 0
-    db GROWL
-    db TACKLE
-    db SCRATCH
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %00111111
-    db %10001000
-    db %11000001
-    db %10000011
-    db %00001000
-    db %00000010
-
-    db BANK(NidorinaPicFront)
-
-NidoqueenBaseStats: ; 38726 (e:4726)
-    db DEX_NIDOQUEEN ; pokedex id
-    db 90 ; base hp
-    db 82 ; base attack
-    db 87 ; base defense
-    db 76 ; base speed
-    db 75 ; base special
-
-    db POISON ; species type 1
-    db GROUND ; species type 2
-
-    db 45 ; catch rate
-    db 194 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw NidoqueenPicFront
-    dw NidoqueenPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db SCRATCH
-    db TAIL_WHIP
-    db BODY_SLAM
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %11110001
-    db %11111111
-    db %10001111
-    db %11000111
-    db %10100011
-    db %10001000
-    db %00110010
-
-    db BANK(NidoqueenPicFront)
-
-NidoranMBaseStats: ; 38742 (e:4742)
-    db DEX_NIDORAN_M ; pokedex id
-    db 46 ; base hp
-    db 57 ; base attack
-    db 40 ; base defense
-    db 50 ; base speed
-    db 40 ; base special
-
-    db POISON ; species type 1
-    db POISON ; species type 2
-
-    db 235 ; catch rate
-    db 60 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw NidoranMPicFront
-    dw NidoranMPicBack
-
-    ; attacks known at lvl 0
-    db LEER
-    db TACKLE
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %00100011
-    db %10001000
-    db %11000001
-    db %10000011
-    db %00001000
-    db %00000010
-
-    db BANK(NidoranMPicFront)
-
-NidorinoBaseStats: ; 3875e (e:475e)
-    db DEX_NIDORINO ; pokedex id
-    db 61 ; base hp
-    db 72 ; base attack
-    db 57 ; base defense
-    db 65 ; base speed
-    db 55 ; base special
-
-    db POISON ; species type 1
-    db POISON ; species type 2
-
-    db 120 ; catch rate
-    db 118 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw NidorinoPicFront
-    dw NidorinoPicBack
-
-    ; attacks known at lvl 0
-    db LEER
-    db TACKLE
-    db HORN_ATTACK
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %00111111
-    db %10001000
-    db %11000001
-    db %10000011
-    db %00001000
-    db %00000010
-
-    db BANK(NidorinoPicFront)
-
-NidokingBaseStats: ; 3877a (e:477a)
-    db DEX_NIDOKING ; pokedex id
-    db 81 ; base hp
-    db 92 ; base attack
-    db 77 ; base defense
-    db 85 ; base speed
-    db 75 ; base special
-
-    db POISON ; species type 1
-    db GROUND ; species type 2
-
-    db 45 ; catch rate
-    db 195 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw NidokingPicFront
-    dw NidokingPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db HORN_ATTACK
-    db POISON_STING
-    db THRASH
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %11110001
-    db %11111111
-    db %10001111
-    db %11000111
-    db %10100011
-    db %10001000
-    db %00110010
-
-    db BANK(NidokingPicFront)
-
-ClefairyBaseStats: ; 38796 (e:4796)
-    db DEX_CLEFAIRY ; pokedex id
-    db 70 ; base hp
-    db 45 ; base attack
-    db 48 ; base defense
-    db 35 ; base speed
-    db 60 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 150 ; catch rate
-    db 68 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw ClefairyPicFront
-    dw ClefairyPicBack
-
-    ; attacks known at lvl 0
-    db POUND
-    db GROWL
-    db 0
-    db 0
-
-    db 4 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00111111
-    db %10101111
-    db %11110001
-    db %10100111
-    db %00111000
-    db %01100011
-
-    db BANK(ClefairyPicFront)
-
-ClefableBaseStats: ; 387b2 (e:47b2)
-    db DEX_CLEFABLE ; pokedex id
-    db 95 ; base hp
-    db 70 ; base attack
-    db 73 ; base defense
-    db 60 ; base speed
-    db 85 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 25 ; catch rate
-    db 129 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw ClefablePicFront
-    dw ClefablePicBack
-
-    ; attacks known at lvl 0
-    db SING
-    db DOUBLESLAP
-    db MINIMIZE
-    db METRONOME
-
-    db 4 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01111111
-    db %10101111
-    db %11110001
-    db %10100111
-    db %00111000
-    db %01100011
-
-    db BANK(ClefablePicFront)
-
-VulpixBaseStats: ; 387ce (e:47ce)
-    db DEX_VULPIX ; pokedex id
-    db 38 ; base hp
-    db 41 ; base attack
-    db 40 ; base defense
-    db 65 ; base speed
-    db 65 ; base special
-
-    db FIRE ; species type 1
-    db FIRE ; species type 2
-
-    db 190 ; catch rate
-    db 63 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw VulpixPicFront
-    dw VulpixPicBack
-
-    ; attacks known at lvl 0
-    db EMBER
-    db TAIL_WHIP
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00000011
-    db %00001000
-    db %11001000
-    db %11100011
-    db %00001000
-    db %00000010
-
-    db BANK(VulpixPicFront)
-
-NinetalesBaseStats: ; 387ea (e:47ea)
-    db DEX_NINETALES ; pokedex id
-    db 73 ; base hp
-    db 76 ; base attack
-    db 75 ; base defense
-    db 100 ; base speed
-    db 100 ; base special
-
-    db FIRE ; species type 1
-    db FIRE ; species type 2
-
-    db 75 ; catch rate
-    db 178 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw NinetalesPicFront
-    dw NinetalesPicBack
-
-    ; attacks known at lvl 0
-    db EMBER
-    db TAIL_WHIP
-    db QUICK_ATTACK
-    db ROAR
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %01000011
-    db %00001000
-    db %11001000
-    db %11100011
-    db %00001000
-    db %00000010
-
-    db BANK(NinetalesPicFront)
-
-JigglypuffBaseStats: ; 38806 (e:4806)
-    db DEX_JIGGLYPUFF ; pokedex id
-    db 115 ; base hp
-    db 45 ; base attack
-    db 20 ; base defense
-    db 20 ; base speed
-    db 25 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 170 ; catch rate
-    db 76 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw JigglypuffPicFront
-    dw JigglypuffPicBack
-
-    ; attacks known at lvl 0
-    db SING
-    db 0
-    db 0
-    db 0
-
-    db 4 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00111111
-    db %10101111
-    db %11110001
-    db %10100011
-    db %00111000
-    db %01100011
-
-    db BANK(JigglypuffPicFront)
-
-WigglytuffBaseStats: ; 38822 (e:4822)
-    db DEX_WIGGLYTUFF ; pokedex id
-    db 140 ; base hp
-    db 70 ; base attack
-    db 45 ; base defense
-    db 45 ; base speed
-    db 50 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 50 ; catch rate
-    db 109 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw WigglytuffPicFront
-    dw WigglytuffPicBack
-
-    ; attacks known at lvl 0
-    db SING
-    db DISABLE
-    db DEFENSE_CURL
-    db DOUBLESLAP
-
-    db 4 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01111111
-    db %10101111
-    db %11110001
-    db %10100011
-    db %00111000
-    db %01100011
-
-    db BANK(WigglytuffPicFront)
-
-ZubatBaseStats: ; 3883e (e:483e)
-    db DEX_ZUBAT ; pokedex id
-    db 40 ; base hp
-    db 45 ; base attack
-    db 35 ; base defense
-    db 55 ; base speed
-    db 40 ; base special
-
-    db POISON ; species type 1
-    db FLYING ; species type 2
-
-    db 255 ; catch rate
-    db 54 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw ZubatPicFront
-    dw ZubatPicBack
-
-    ; attacks known at lvl 0
-    db LEECH_LIFE
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %00000011
-    db %00011000
-    db %11000000
-    db %01000010
-    db %00001000
-    db %00000010
-
-    db BANK(ZubatPicFront)
-
-GolbatBaseStats: ; 3885a (e:485a)
-    db DEX_GOLBAT ; pokedex id
-    db 75 ; base hp
-    db 80 ; base attack
-    db 70 ; base defense
-    db 90 ; base speed
-    db 75 ; base special
-
-    db POISON ; species type 1
-    db FLYING ; species type 2
-
-    db 90 ; catch rate
-    db 171 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw GolbatPicFront
-    dw GolbatPicBack
-
-    ; attacks known at lvl 0
-    db LEECH_LIFE
-    db SCREECH
-    db BITE
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %01000011
-    db %00011000
-    db %11000000
-    db %01000010
-    db %00001000
-    db %00000010
-
-    db BANK(GolbatPicFront)
-
-OddishBaseStats: ; 38876 (e:4876)
-    db DEX_ODDISH ; pokedex id
-    db 45 ; base hp
-    db 50 ; base attack
-    db 55 ; base defense
-    db 30 ; base speed
-    db 75 ; base special
-
-    db GRASS ; species type 1
-    db POISON ; species type 2
-
-    db 255 ; catch rate
-    db 78 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw OddishPicFront
-    dw OddishPicBack
-
-    ; attacks known at lvl 0
-    db ABSORB
-    db 0
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %00100100
-    db %00000011
-    db %00111000
-    db %11000000
-    db %00000011
-    db %00001000
-    db %00000110
-
-    db BANK(OddishPicFront)
-
-GloomBaseStats: ; 38892 (e:4892)
-    db DEX_GLOOM ; pokedex id
-    db 60 ; base hp
-    db 65 ; base attack
-    db 70 ; base defense
-    db 40 ; base speed
-    db 85 ; base special
-
-    db GRASS ; species type 1
-    db POISON ; species type 2
-
-    db 120 ; catch rate
-    db 132 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw GloomPicFront
-    dw GloomPicBack
-
-    ; attacks known at lvl 0
-    db ABSORB
-    db POISONPOWDER
-    db STUN_SPORE
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %00100100
-    db %00000011
-    db %00111000
-    db %11000000
-    db %00000011
-    db %00001000
-    db %00000110
-
-    db BANK(GloomPicFront)
-
-VileplumeBaseStats: ; 388ae (e:48ae)
-    db DEX_VILEPLUME ; pokedex id
-    db 75 ; base hp
-    db 80 ; base attack
-    db 85 ; base defense
-    db 50 ; base speed
-    db 100 ; base special
-
-    db GRASS ; species type 1
-    db POISON ; species type 2
-
-    db 45 ; catch rate
-    db 184 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw VileplumePicFront
-    dw VileplumePicBack
-
-    ; attacks known at lvl 0
-    db STUN_SPORE
-    db SLEEP_POWDER
-    db ACID
-    db PETAL_DANCE
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %01000011
-    db %00111000
-    db %11000000
-    db %00000011
-    db %00001000
-    db %00000110
-
-    db BANK(VileplumePicFront)
-
-ParasBaseStats: ; 388ca (e:48ca)
-    db DEX_PARAS ; pokedex id
-    db 35 ; base hp
-    db 70 ; base attack
-    db 55 ; base defense
-    db 25 ; base speed
-    db 55 ; base special
-
-    db BUG ; species type 1
-    db GRASS ; species type 2
-
-    db 190 ; catch rate
-    db 70 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw ParasPicFront
-    dw ParasPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %00000011
-    db %00111000
-    db %11001000
-    db %10000011
-    db %00001000
-    db %00000110
-
-    db BANK(ParasPicFront)
-
-ParasectBaseStats: ; 388e6 (e:48e6)
-    db DEX_PARASECT ; pokedex id
-    db 60 ; base hp
-    db 95 ; base attack
-    db 80 ; base defense
-    db 30 ; base speed
-    db 80 ; base special
-
-    db BUG ; species type 1
-    db GRASS ; species type 2
-
-    db 75 ; catch rate
-    db 128 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw ParasectPicFront
-    dw ParasectPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db STUN_SPORE
-    db LEECH_LIFE
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %01000011
-    db %00111000
-    db %11001000
-    db %10000011
-    db %00001000
-    db %00000110
-
-    db BANK(ParasectPicFront)
-
-VenonatBaseStats: ; 38902 (e:4902)
-    db DEX_VENONAT ; pokedex id
-    db 60 ; base hp
-    db 55 ; base attack
-    db 50 ; base defense
-    db 45 ; base speed
-    db 40 ; base special
-
-    db BUG ; species type 1
-    db POISON ; species type 2
-
-    db 190 ; catch rate
-    db 75 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw VenonatPicFront
-    dw VenonatPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db DISABLE
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %00000011
-    db %00111000
-    db %11010000
-    db %00000011
-    db %00101000
-    db %01000010
-
-    db BANK(VenonatPicFront)
-
-VenomothBaseStats: ; 3891e (e:491e)
-    db DEX_VENOMOTH ; pokedex id
-    db 70 ; base hp
-    db 65 ; base attack
-    db 60 ; base defense
-    db 90 ; base speed
-    db 90 ; base special
-
-    db BUG ; species type 1
-    db POISON ; species type 2
-
-    db 75 ; catch rate
-    db 138 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw VenomothPicFront
-    dw VenomothPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db DISABLE
-    db POISONPOWDER
-    db CONFUSION
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %01000011
-    db %00111000
-    db %11110000
-    db %01000011
-    db %00101000
-    db %01000010
-
-    db BANK(VenomothPicFront)
-
-DiglettBaseStats: ; 3893a (e:493a)
-    db DEX_DIGLETT ; pokedex id
-    db 10 ; base hp
-    db 55 ; base attack
-    db 25 ; base defense
-    db 95 ; base speed
-    db 45 ; base special
-
-    db GROUND ; species type 1
-    db GROUND ; species type 2
-
-    db 255 ; catch rate
-    db 81 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw DiglettPicFront
-    dw DiglettPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00000011
-    db %00001000
-    db %11001110
-    db %00000010
-    db %10001000
-    db %00000110
-
-    db BANK(DiglettPicFront)
-
-DugtrioBaseStats: ; 38956 (e:4956)
-    db DEX_DUGTRIO ; pokedex id
-    db 35 ; base hp
-    db 80 ; base attack
-    db 50 ; base defense
-    db 120 ; base speed
-    db 70 ; base special
-
-    db GROUND ; species type 1
-    db GROUND ; species type 2
-
-    db 50 ; catch rate
-    db 153 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw DugtrioPicFront
-    dw DugtrioPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db GROWL
-    db DIG
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %01000011
-    db %00001000
-    db %11001110
-    db %00000010
-    db %10001000
-    db %00000110
-
-    db BANK(DugtrioPicFront)
-
-MeowthBaseStats: ; 38972 (e:4972)
-    db DEX_MEOWTH ; pokedex id
-    db 40 ; base hp
-    db 45 ; base attack
-    db 35 ; base defense
-    db 90 ; base speed
-    db 40 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 255 ; catch rate
-    db 69 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw MeowthPicFront
-    dw MeowthPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db GROWL
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %10001111
-    db %10001000
-    db %11000001
-    db %11000010
-    db %00001000
-    db %00000010
-
-    db BANK(MeowthPicFront)
-
-PersianBaseStats: ; 3898e (e:498e)
-    db DEX_PERSIAN ; pokedex id
-    db 65 ; base hp
-    db 70 ; base attack
-    db 60 ; base defense
-    db 115 ; base speed
-    db 65 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 90 ; catch rate
-    db 148 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw PersianPicFront
-    dw PersianPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db GROWL
-    db BITE
-    db SCREECH
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %11001111
-    db %10001000
-    db %11000001
-    db %11000010
-    db %00001000
-    db %00000010
-
-    db BANK(PersianPicFront)
-
-PsyduckBaseStats: ; 389aa (e:49aa)
-    db DEX_PSYDUCK ; pokedex id
-    db 50 ; base hp
-    db 52 ; base attack
-    db 48 ; base defense
-    db 55 ; base speed
-    db 50 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 190 ; catch rate
-    db 80 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw PsyduckPicFront
-    dw PsyduckPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %10111111
-    db %00001111
-    db %11001000
-    db %11000010
-    db %00001000
-    db %00110010
-
-    db BANK(PsyduckPicFront)
-
-GolduckBaseStats: ; 389c6 (e:49c6)
-    db DEX_GOLDUCK ; pokedex id
-    db 80 ; base hp
-    db 82 ; base attack
-    db 78 ; base defense
-    db 85 ; base speed
-    db 80 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 75 ; catch rate
-    db 174 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw GolduckPicFront
-    dw GolduckPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db TAIL_WHIP
-    db DISABLE
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %11111111
-    db %00001111
-    db %11001000
-    db %11000010
-    db %00001000
-    db %00110010
-
-    db BANK(GolduckPicFront)
-
-MankeyBaseStats: ; 389e2 (e:49e2)
-    db DEX_MANKEY ; pokedex id
-    db 40 ; base hp
-    db 80 ; base attack
-    db 35 ; base defense
-    db 70 ; base speed
-    db 35 ; base special
-
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
-
-    db 190 ; catch rate
-    db 74 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw MankeyPicFront
-    dw MankeyPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db LEER
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %10000011
-    db %10001111
-    db %11001001
-    db %11000110
-    db %10001000
-    db %00100010
-
-    db BANK(MankeyPicFront)
-
-PrimeapeBaseStats: ; 389fe (e:49fe)
-    db DEX_PRIMEAPE ; pokedex id
-    db 65 ; base hp
-    db 105 ; base attack
-    db 60 ; base defense
-    db 95 ; base speed
-    db 60 ; base special
-
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
-
-    db 75 ; catch rate
-    db 149 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw PrimeapePicFront
-    dw PrimeapePicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db LEER
-    db LOW_KICK
-    db KARATE_CHOP
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %11000011
-    db %10001111
-    db %11001001
-    db %11000110
-    db %10001000
-    db %00100010
-
-    db BANK(PrimeapePicFront)
-
-GrowlitheBaseStats: ; 38a1a (e:4a1a)
-    db DEX_GROWLITHE ; pokedex id
-    db 55 ; base hp
-    db 70 ; base attack
-    db 45 ; base defense
-    db 60 ; base speed
-    db 50 ; base special
-
-    db FIRE ; species type 1
-    db FIRE ; species type 2
-
-    db 190 ; catch rate
-    db 91 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw GrowlithePicFront
-    dw GrowlithePicBack
-
-    ; attacks known at lvl 0
-    db BITE
-    db ROAR
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00000011
-    db %01001000
-    db %11001000
-    db %11100011
-    db %00001000
-    db %00000010
-
-    db BANK(GrowlithePicFront)
-
-ArcanineBaseStats: ; 38a36 (e:4a36)
-    db DEX_ARCANINE ; pokedex id
-    db 90 ; base hp
-    db 110 ; base attack
-    db 80 ; base defense
-    db 95 ; base speed
-    db 80 ; base special
-
-    db FIRE ; species type 1
-    db FIRE ; species type 2
-
-    db 75 ; catch rate
-    db 213 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw ArcaninePicFront
-    dw ArcaninePicBack
-
-    ; attacks known at lvl 0
-    db ROAR
-    db EMBER
-    db LEER
-    db TAKE_DOWN
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %01000011
-    db %01001000
-    db %11101000
-    db %11100011
-    db %00001000
-    db %00000010
-
-    db BANK(ArcaninePicFront)
-
-PoliwagBaseStats: ; 38a52 (e:4a52)
-    db DEX_POLIWAG ; pokedex id
-    db 40 ; base hp
-    db 50 ; base attack
-    db 40 ; base defense
-    db 90 ; base speed
-    db 40 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 255 ; catch rate
-    db 77 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw PoliwagPicFront
-    dw PoliwagPicBack
-
-    ; attacks known at lvl 0
-    db BUBBLE
-    db 0
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00111111
-    db %00001000
-    db %11010000
-    db %10000010
-    db %00101000
-    db %00010010
-
-    db BANK(PoliwagPicFront)
-
-PoliwhirlBaseStats: ; 38a6e (e:4a6e)
-    db DEX_POLIWHIRL ; pokedex id
-    db 65 ; base hp
-    db 65 ; base attack
-    db 65 ; base defense
-    db 90 ; base speed
-    db 50 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 120 ; catch rate
-    db 131 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw PoliwhirlPicFront
-    dw PoliwhirlPicBack
-
-    ; attacks known at lvl 0
-    db BUBBLE
-    db HYPNOSIS
-    db WATER_GUN
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00111111
-    db %00001111
-    db %11010110
-    db %10000110
-    db %00101000
-    db %00110010
-
-    db BANK(PoliwhirlPicFront)
-
-PoliwrathBaseStats: ; 38a8a (e:4a8a)
-    db DEX_POLIWRATH ; pokedex id
-    db 90 ; base hp
-    db 85 ; base attack
-    db 95 ; base defense
-    db 70 ; base speed
-    db 70 ; base special
-
-    db WATER ; species type 1
-    db FIGHTING ; species type 2
-
-    db 45 ; catch rate
-    db 185 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw PoliwrathPicFront
-    dw PoliwrathPicBack
-
-    ; attacks known at lvl 0
-    db HYPNOSIS
-    db WATER_GUN
-    db DOUBLESLAP
-    db BODY_SLAM
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01111111
-    db %00001111
-    db %11010110
-    db %10000110
-    db %00101000
-    db %00110010
-
-    db BANK(PoliwrathPicFront)
-
-AbraBaseStats: ; 38aa6 (e:4aa6)
-    db DEX_ABRA ; pokedex id
-    db 25 ; base hp
-    db 20 ; base attack
-    db 15 ; base defense
-    db 90 ; base speed
-    db 105 ; base special
-
-    db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 200 ; catch rate
-    db 73 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw AbraPicFront
-    dw AbraPicBack
-
-    ; attacks known at lvl 0
-    db TELEPORT
-    db 0
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00000011
-    db %00001111
-    db %11110000
-    db %10000111
-    db %00111000
-    db %01000011
-
-    db BANK(AbraPicFront)
-
-KadabraBaseStats: ; 38ac2 (e:4ac2)
-    db DEX_KADABRA ; pokedex id
-    db 40 ; base hp
-    db 35 ; base attack
-    db 30 ; base defense
-    db 105 ; base speed
-    db 120 ; base special
-
-    db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 100 ; catch rate
-    db 145 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw KadabraPicFront
-    dw KadabraPicBack
-
-    ; attacks known at lvl 0
-    db TELEPORT
-    db CONFUSION
-    db DISABLE
-    db KINESIS
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00000011
-    db %00001111
-    db %11111000
-    db %10000111
-    db %00111000
-    db %01000011
-
-    db BANK(KadabraPicFront)
-
-AlakazamBaseStats: ; 38ade (e:4ade)
-    db DEX_ALAKAZAM ; pokedex id
-    db 55 ; base hp
-    db 50 ; base attack
-    db 45 ; base defense
-    db 120 ; base speed
-    db 135 ; base special
-
-    db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 50 ; catch rate
-    db 186 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw AlakazamPicFront
-    dw AlakazamPicBack
-
-    ; attacks known at lvl 0
-    db TELEPORT
-    db CONFUSION
-    db DISABLE
-    db KINESIS
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01000011
-    db %00001111
-    db %11111000
-    db %10000111
-    db %00111000
-    db %01000011
-
-    db BANK(AlakazamPicFront)
-
-MachopBaseStats: ; 38afa (e:4afa)
-    db DEX_MACHOP ; pokedex id
-    db 70 ; base hp
-    db 80 ; base attack
-    db 50 ; base defense
-    db 35 ; base speed
-    db 35 ; base special
-
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
-
-    db 180 ; catch rate
-    db 88 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw MachopPicFront
-    dw MachopPicBack
-
-    ; attacks known at lvl 0
-    db KARATE_CHOP
-    db 0
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00000011
-    db %00001111
-    db %11001110
-    db %10100110
-    db %10001000
-    db %00100010
-
-    db BANK(MachopPicFront)
-
-MachokeBaseStats: ; 38b16 (e:4b16)
-    db DEX_MACHOKE ; pokedex id
-    db 80 ; base hp
-    db 100 ; base attack
-    db 70 ; base defense
-    db 45 ; base speed
-    db 50 ; base special
-
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
-
-    db 90 ; catch rate
-    db 146 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw MachokePicFront
-    dw MachokePicBack
-
-    ; attacks known at lvl 0
-    db KARATE_CHOP
-    db LOW_KICK
-    db LEER
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00000011
-    db %00001111
-    db %11001110
-    db %10100110
-    db %10001000
-    db %00100010
-
-    db BANK(MachokePicFront)
-
-MachampBaseStats: ; 38b32 (e:4b32)
-    db DEX_MACHAMP ; pokedex id
-    db 90 ; base hp
-    db 130 ; base attack
-    db 80 ; base defense
-    db 55 ; base speed
-    db 65 ; base special
-
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
-
-    db 45 ; catch rate
-    db 193 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw MachampPicFront
-    dw MachampPicBack
-
-    ; attacks known at lvl 0
-    db KARATE_CHOP
-    db LOW_KICK
-    db LEER
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01000011
-    db %00001111
-    db %11001110
-    db %10100110
-    db %10001000
-    db %00100010
-
-    db BANK(MachampPicFront)
-
-BellsproutBaseStats: ; 38b4e (e:4b4e)
-    db DEX_BELLSPROUT ; pokedex id
-    db 50 ; base hp
-    db 75 ; base attack
-    db 35 ; base defense
-    db 40 ; base speed
-    db 70 ; base special
-
-    db GRASS ; species type 1
-    db POISON ; species type 2
-
-    db 255 ; catch rate
-    db 84 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw BellsproutPicFront
-    dw BellsproutPicBack
-
-    ; attacks known at lvl 0
-    db VINE_WHIP
-    db GROWTH
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %00100100
-    db %00000011
-    db %00111000
-    db %11000000
-    db %00000011
-    db %00001000
-    db %00000110
-
-    db BANK(BellsproutPicFront)
-
-WeepinbellBaseStats: ; 38b6a (e:4b6a)
-    db DEX_WEEPINBELL ; pokedex id
-    db 65 ; base hp
-    db 90 ; base attack
-    db 50 ; base defense
-    db 55 ; base speed
-    db 85 ; base special
-
-    db GRASS ; species type 1
-    db POISON ; species type 2
-
-    db 120 ; catch rate
-    db 151 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw WeepinbellPicFront
-    dw WeepinbellPicBack
-
-    ; attacks known at lvl 0
-    db VINE_WHIP
-    db GROWTH
-    db WRAP
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %00100100
-    db %00000011
-    db %00111000
-    db %11000000
-    db %00000011
-    db %00001000
-    db %00000110
-
-    db BANK(WeepinbellPicFront)
-
-VictreebelBaseStats: ; 38b86 (e:4b86)
-    db DEX_VICTREEBEL ; pokedex id
-    db 80 ; base hp
-    db 105 ; base attack
-    db 65 ; base defense
-    db 70 ; base speed
-    db 100 ; base special
-
-    db GRASS ; species type 1
-    db POISON ; species type 2
-
-    db 45 ; catch rate
-    db 191 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw VictreebelPicFront
-    dw VictreebelPicBack
-
-    ; attacks known at lvl 0
-    db SLEEP_POWDER
-    db STUN_SPORE
-    db ACID
-    db RAZOR_LEAF
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %01000011
-    db %00111000
-    db %11000000
-    db %00000011
-    db %00001000
-    db %00000110
-
-    db BANK(VictreebelPicFront)
-
-TentacoolBaseStats: ; 38ba2 (e:4ba2)
-    db DEX_TENTACOOL ; pokedex id
-    db 40 ; base hp
-    db 40 ; base attack
-    db 35 ; base defense
-    db 70 ; base speed
-    db 100 ; base special
-
-    db WATER ; species type 1
-    db POISON ; species type 2
-
-    db 190 ; catch rate
-    db 105 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw TentacoolPicFront
-    dw TentacoolPicBack
-
-    ; attacks known at lvl 0
-    db ACID
-    db 0
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00100100
-    db %00111111
-    db %00011000
-    db %11000000
-    db %10000011
-    db %00001000
-    db %00010110
-
-    db BANK(TentacoolPicFront)
-
-TentacruelBaseStats: ; 38bbe (e:4bbe)
-    db DEX_TENTACRUEL ; pokedex id
-    db 80 ; base hp
-    db 70 ; base attack
-    db 65 ; base defense
-    db 100 ; base speed
-    db 120 ; base special
-
-    db WATER ; species type 1
-    db POISON ; species type 2
-
-    db 60 ; catch rate
-    db 205 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw TentacruelPicFront
-    dw TentacruelPicBack
-
-    ; attacks known at lvl 0
-    db ACID
-    db SUPERSONIC
-    db WRAP
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00100100
-    db %01111111
-    db %00011000
-    db %11000000
-    db %10000011
-    db %00001000
-    db %00010110
-
-    db BANK(TentacruelPicFront)
-
-GeodudeBaseStats: ; 38bda (e:4bda)
-    db DEX_GEODUDE ; pokedex id
-    db 40 ; base hp
-    db 80 ; base attack
-    db 100 ; base defense
-    db 20 ; base speed
-    db 30 ; base special
-
-    db ROCK ; species type 1
-    db GROUND ; species type 2
-
-    db 255 ; catch rate
-    db 86 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw GeodudePicFront
-    dw GeodudePicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db 0
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10100001
-    db %00000011
-    db %00001111
-    db %11001110
-    db %00101110
-    db %11001000
-    db %00100010
-
-    db BANK(GeodudePicFront)
-
-GravelerBaseStats: ; 38bf6 (e:4bf6)
-    db DEX_GRAVELER ; pokedex id
-    db 55 ; base hp
-    db 95 ; base attack
-    db 115 ; base defense
-    db 35 ; base speed
-    db 45 ; base special
-
-    db ROCK ; species type 1
-    db GROUND ; species type 2
-
-    db 120 ; catch rate
-    db 134 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw GravelerPicFront
-    dw GravelerPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db DEFENSE_CURL
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10100001
-    db %00000011
-    db %00001111
-    db %11001110
-    db %00101110
-    db %11001000
-    db %00100010
-
-    db BANK(GravelerPicFront)
-
-GolemBaseStats: ; 38c12 (e:4c12)
-    db DEX_GOLEM ; pokedex id
-    db 80 ; base hp
-    db 110 ; base attack
-    db 130 ; base defense
-    db 45 ; base speed
-    db 55 ; base special
-
-    db ROCK ; species type 1
-    db GROUND ; species type 2
-
-    db 45 ; catch rate
-    db 177 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw GolemPicFront
-    dw GolemPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db DEFENSE_CURL
-    db 0
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01000011
-    db %00001111
-    db %11001110
-    db %00101110
-    db %11001000
-    db %00100010
-
-    db BANK(GolemPicFront)
-
-PonytaBaseStats: ; 38c2e (e:4c2e)
-    db DEX_PONYTA ; pokedex id
-    db 50 ; base hp
-    db 85 ; base attack
-    db 55 ; base defense
-    db 90 ; base speed
-    db 65 ; base special
-
-    db FIRE ; species type 1
-    db FIRE ; species type 2
-
-    db 190 ; catch rate
-    db 152 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw PonytaPicFront
-    dw PonytaPicBack
-
-    ; attacks known at lvl 0
-    db EMBER
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %00000011
-    db %00001000
-    db %11000000
-    db %11100011
-    db %00001000
-    db %00000010
-
-    db BANK(PonytaPicFront)
-
-RapidashBaseStats: ; 38c4a (e:4c4a)
-    db DEX_RAPIDASH ; pokedex id
-    db 65 ; base hp
-    db 100 ; base attack
-    db 70 ; base defense
-    db 105 ; base speed
-    db 80 ; base special
-
-    db FIRE ; species type 1
-    db FIRE ; species type 2
-
-    db 60 ; catch rate
-    db 192 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw RapidashPicFront
-    dw RapidashPicBack
-
-    ; attacks known at lvl 0
-    db EMBER
-    db TAIL_WHIP
-    db STOMP
-    db GROWL
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %01000011
-    db %00001000
-    db %11000000
-    db %11100011
-    db %00001000
-    db %00000010
-
-    db BANK(RapidashPicFront)
-
-SlowpokeBaseStats: ; 38c66 (e:4c66)
-    db DEX_SLOWPOKE ; pokedex id
-    db 90 ; base hp
-    db 65 ; base attack
-    db 65 ; base defense
-    db 15 ; base speed
-    db 40 ; base special
-
-    db WATER ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 190 ; catch rate
-    db 99 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw SlowpokePicFront
-    dw SlowpokePicBack
-
-    ; attacks known at lvl 0
-    db CONFUSION
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %10111111
-    db %00001000
-    db %11111110
-    db %11100011
-    db %00111000
-    db %01110011
-
-    db BANK(SlowpokePicFront)
-
-SlowbroBaseStats: ; 38c82 (e:4c82)
-    db DEX_SLOWBRO ; pokedex id
-    db 95 ; base hp
-    db 75 ; base attack
-    db 110 ; base defense
-    db 30 ; base speed
-    db 80 ; base special
-
-    db WATER ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 75 ; catch rate
-    db 164 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw SlowbroPicFront
-    dw SlowbroPicBack
-
-    ; attacks known at lvl 0
-    db CONFUSION
-    db DISABLE
-    db HEADBUTT
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %11111111
-    db %00001111
-    db %11111110
-    db %11100011
-    db %00111000
-    db %01110011
-
-    db BANK(SlowbroPicFront)
-
-MagnemiteBaseStats: ; 38c9e (e:4c9e)
-    db DEX_MAGNEMITE ; pokedex id
-    db 25 ; base hp
-    db 35 ; base attack
-    db 70 ; base defense
-    db 45 ; base speed
-    db 95 ; base special
-
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
-
-    db 190 ; catch rate
-    db 89 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw MagnemitePicFront
-    dw MagnemitePicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %00000011
-    db %10001000
-    db %11100001
-    db %01000011
-    db %00011000
-    db %01000010
-
-    db BANK(MagnemitePicFront)
-
-MagnetonBaseStats: ; 38cba (e:4cba)
-    db DEX_MAGNETON ; pokedex id
-    db 50 ; base hp
-    db 60 ; base attack
-    db 95 ; base defense
-    db 70 ; base speed
-    db 120 ; base special
-
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
-
-    db 60 ; catch rate
-    db 161 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw MagnetonPicFront
-    dw MagnetonPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db SONICBOOM
-    db THUNDERSHOCK
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %01000011
-    db %10001000
-    db %11100001
-    db %01000011
-    db %00011000
-    db %01000010
-
-    db BANK(MagnetonPicFront)
-
-FarfetchdBaseStats: ; 38cd6 (e:4cd6)
-    db DEX_FARFETCH_D ; pokedex id
-    db 52 ; base hp
-    db 65 ; base attack
-    db 55 ; base defense
-    db 60 ; base speed
-    db 58 ; base special
-
-    db NORMAL ; species type 1
-    db FLYING ; species type 2
-
-    db 45 ; catch rate
-    db 94 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw FarfetchdPicFront
-    dw FarfetchdPicBack
-
-    ; attacks known at lvl 0
-    db PECK
-    db SAND_ATTACK
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10101110
-    db %00000011
-    db %00001000
-    db %11000000
-    db %11000011
-    db %00001000
-    db %00001110
-
-    db BANK(FarfetchdPicFront)
-
-DoduoBaseStats: ; 38cf2 (e:4cf2)
-    db DEX_DODUO ; pokedex id
-    db 35 ; base hp
-    db 85 ; base attack
-    db 45 ; base defense
-    db 75 ; base speed
-    db 35 ; base special
-
-    db NORMAL ; species type 1
-    db FLYING ; species type 2
-
-    db 190 ; catch rate
-    db 96 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw DoduoPicFront
-    dw DoduoPicBack
-
-    ; attacks known at lvl 0
-    db PECK
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10101000
-    db %00000011
-    db %00001000
-    db %11000000
-    db %10000011
-    db %00001100
-    db %00001011
-
-    db BANK(DoduoPicFront)
-
-DodrioBaseStats: ; 38d0e (e:4d0e)
-    db DEX_DODRIO ; pokedex id
-    db 60 ; base hp
-    db 110 ; base attack
-    db 70 ; base defense
-    db 100 ; base speed
-    db 60 ; base special
-
-    db NORMAL ; species type 1
-    db FLYING ; species type 2
-
-    db 45 ; catch rate
-    db 158 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw DodrioPicFront
-    dw DodrioPicBack
-
-    ; attacks known at lvl 0
-    db PECK
-    db GROWL
-    db FURY_ATTACK
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10101000
-    db %01000011
-    db %00001000
-    db %11000000
-    db %10000011
-    db %00001100
-    db %00001011
-
-    db BANK(DodrioPicFront)
-
-SeelBaseStats: ; 38d2a (e:4d2a)
-    db DEX_SEEL ; pokedex id
-    db 65 ; base hp
-    db 45 ; base attack
-    db 55 ; base defense
-    db 45 ; base speed
-    db 70 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 190 ; catch rate
-    db 100 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw SeelPicFront
-    dw SeelPicBack
-
-    ; attacks known at lvl 0
-    db HEADBUTT
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %10111111
-    db %00001000
-    db %11000000
-    db %10000010
-    db %00001000
-    db %00110010
-
-    db BANK(SeelPicFront)
-
-DewgongBaseStats: ; 38d46 (e:4d46)
-    db DEX_DEWGONG ; pokedex id
-    db 90 ; base hp
-    db 70 ; base attack
-    db 80 ; base defense
-    db 70 ; base speed
-    db 95 ; base special
-
-    db WATER ; species type 1
-    db ICE ; species type 2
-
-    db 75 ; catch rate
-    db 176 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw DewgongPicFront
-    dw DewgongPicBack
-
-    ; attacks known at lvl 0
-    db HEADBUTT
-    db GROWL
-    db AURORA_BEAM
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %11111111
-    db %00001000
-    db %11000000
-    db %10000010
-    db %00001000
-    db %00110010
-
-    db BANK(DewgongPicFront)
-
-GrimerBaseStats: ; 38d62 (e:4d62)
-    db DEX_GRIMER ; pokedex id
-    db 80 ; base hp
-    db 80 ; base attack
-    db 50 ; base defense
-    db 25 ; base speed
-    db 40 ; base special
-
-    db POISON ; species type 1
-    db POISON ; species type 2
-
-    db 190 ; catch rate
-    db 90 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw GrimerPicFront
-    dw GrimerPicBack
-
-    ; attacks known at lvl 0
-    db POUND
-    db DISABLE
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00000000
-    db %10011000
-    db %11000001
-    db %00101010
-    db %01001000
-    db %00000010
-
-    db BANK(GrimerPicFront)
-
-MukBaseStats: ; 38d7e (e:4d7e)
-    db DEX_MUK ; pokedex id
-    db 105 ; base hp
-    db 105 ; base attack
-    db 75 ; base defense
-    db 50 ; base speed
-    db 65 ; base special
-
-    db POISON ; species type 1
-    db POISON ; species type 2
-
-    db 75 ; catch rate
-    db 157 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw MukPicFront
-    dw MukPicBack
-
-    ; attacks known at lvl 0
-    db POUND
-    db DISABLE
-    db POISON_GAS
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %01000000
-    db %10011000
-    db %11000001
-    db %00101010
-    db %01001000
-    db %00000010
-
-    db BANK(MukPicFront)
-
-ShellderBaseStats: ; 38d9a (e:4d9a)
-    db DEX_SHELLDER ; pokedex id
-    db 30 ; base hp
-    db 65 ; base attack
-    db 100 ; base defense
-    db 40 ; base speed
-    db 45 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 190 ; catch rate
-    db 97 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw ShellderPicFront
-    dw ShellderPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db WITHDRAW
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %00111111
-    db %00001000
-    db %11100000
-    db %01001011
-    db %01001000
-    db %00010011
-
-    db BANK(ShellderPicFront)
-
-CloysterBaseStats: ; 38db6 (e:4db6)
-    db DEX_CLOYSTER ; pokedex id
-    db 50 ; base hp
-    db 95 ; base attack
-    db 180 ; base defense
-    db 70 ; base speed
-    db 85 ; base special
-
-    db WATER ; species type 1
-    db ICE ; species type 2
-
-    db 60 ; catch rate
-    db 203 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw CloysterPicFront
-    dw CloysterPicBack
-
-    ; attacks known at lvl 0
-    db WITHDRAW
-    db SUPERSONIC
-    db CLAMP
-    db AURORA_BEAM
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %01111111
-    db %00001000
-    db %11100000
-    db %01001011
-    db %01001000
-    db %00010011
-
-    db BANK(CloysterPicFront)
-
-GastlyBaseStats: ; 38dd2 (e:4dd2)
-    db DEX_GASTLY ; pokedex id
-    db 30 ; base hp
-    db 35 ; base attack
-    db 30 ; base defense
-    db 80 ; base speed
-    db 100 ; base special
-
-    db GHOST ; species type 1
-    db POISON ; species type 2
-
-    db 190 ; catch rate
-    db 95 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw GastlyPicFront
-    dw GastlyPicBack
-
-    ; attacks known at lvl 0
-    db LICK
-    db CONFUSE_RAY
-    db NIGHT_SHADE
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %00000000
-    db %10011000
-    db %11010001
-    db %00001010
-    db %01101010
-    db %00000010
-
-    db BANK(GastlyPicFront)
-
-HaunterBaseStats: ; 38dee (e:4dee)
-    db DEX_HAUNTER ; pokedex id
-    db 45 ; base hp
-    db 50 ; base attack
-    db 45 ; base defense
-    db 95 ; base speed
-    db 115 ; base special
-
-    db GHOST ; species type 1
-    db POISON ; species type 2
-
-    db 90 ; catch rate
-    db 126 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw HaunterPicFront
-    dw HaunterPicBack
-
-    ; attacks known at lvl 0
-    db LICK
-    db CONFUSE_RAY
-    db NIGHT_SHADE
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %00000000
-    db %10011000
-    db %11010001
-    db %00001010
-    db %01101010
-    db %00000010
-
-    db BANK(HaunterPicFront)
-
-GengarBaseStats: ; 38e0a (e:4e0a)
-    db DEX_GENGAR ; pokedex id
-    db 60 ; base hp
-    db 65 ; base attack
-    db 60 ; base defense
-    db 110 ; base speed
-    db 130 ; base special
-
-    db GHOST ; species type 1
-    db POISON ; species type 2
-
-    db 45 ; catch rate
-    db 190 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw GengarPicFront
-    dw GengarPicBack
-
-    ; attacks known at lvl 0
-    db LICK
-    db CONFUSE_RAY
-    db NIGHT_SHADE
-    db 0
-
-    db 3 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01000011
-    db %10011111
-    db %11010001
-    db %10001110
-    db %01101010
-    db %00100010
-
-    db BANK(GengarPicFront)
-
-OnixBaseStats: ; 38e26 (e:4e26)
-    db DEX_ONIX ; pokedex id
-    db 35 ; base hp
-    db 45 ; base attack
-    db 160 ; base defense
-    db 70 ; base speed
-    db 30 ; base special
-
-    db ROCK ; species type 1
-    db GROUND ; species type 2
-
-    db 45 ; catch rate
-    db 108 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw OnixPicFront
-    dw OnixPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db SCREECH
-    db 0 ; Penultimate Move that is Replaced with Bide in Brock's Team
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00000011
-    db %00001000
-    db %11001110
-    db %10001010
-    db %11001000
-    db %00100010
-
-    db BANK(OnixPicFront)
-
-DrowzeeBaseStats: ; 38e42 (e:4e42)
-    db DEX_DROWZEE ; pokedex id
-    db 60 ; base hp
-    db 48 ; base attack
-    db 45 ; base defense
-    db 42 ; base speed
-    db 90 ; base special
-
-    db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 190 ; catch rate
-    db 102 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw DrowzeePicFront
-    dw DrowzeePicBack
-
-    ; attacks known at lvl 0
-    db POUND
-    db HYPNOSIS
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00000011
-    db %00001111
-    db %11110000
-    db %10000111
-    db %00111010
-    db %01000011
-
-    db BANK(DrowzeePicFront)
-
-HypnoBaseStats: ; 38e5e (e:4e5e)
-    db DEX_HYPNO ; pokedex id
-    db 85 ; base hp
-    db 73 ; base attack
-    db 70 ; base defense
-    db 67 ; base speed
-    db 115 ; base special
-
-    db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 75 ; catch rate
-    db 165 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw HypnoPicFront
-    dw HypnoPicBack
-
-    ; attacks known at lvl 0
-    db POUND
-    db HYPNOSIS
-    db DISABLE
-    db CONFUSION
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01000011
-    db %00001111
-    db %11110000
-    db %10000111
-    db %00111010
-    db %01000011
-
-    db BANK(HypnoPicFront)
-
-KrabbyBaseStats: ; 38e7a (e:4e7a)
-    db DEX_KRABBY ; pokedex id
-    db 30 ; base hp
-    db 105 ; base attack
-    db 90 ; base defense
-    db 50 ; base speed
-    db 25 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 225 ; catch rate
-    db 115 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw KrabbyPicFront
-    dw KrabbyPicBack
-
-    ; attacks known at lvl 0
-    db BUBBLE
-    db LEER
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %00111111
-    db %00001000
-    db %11000000
-    db %00000010
-    db %00001000
-    db %00110110
-
-    db BANK(KrabbyPicFront)
-
-KinglerBaseStats: ; 38e96 (e:4e96)
-    db DEX_KINGLER ; pokedex id
-    db 55 ; base hp
-    db 130 ; base attack
-    db 115 ; base defense
-    db 75 ; base speed
-    db 50 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 60 ; catch rate
-    db 206 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw KinglerPicFront
-    dw KinglerPicBack
-
-    ; attacks known at lvl 0
-    db BUBBLE
-    db LEER
-    db VICEGRIP
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %01111111
-    db %00001000
-    db %11000000
-    db %00000010
-    db %00001000
-    db %00110110
-
-    db BANK(KinglerPicFront)
-
-VoltorbBaseStats: ; 38eb2 (e:4eb2)
-    db DEX_VOLTORB ; pokedex id
-    db 40 ; base hp
-    db 30 ; base attack
-    db 50 ; base defense
-    db 100 ; base speed
-    db 55 ; base special
-
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
-
-    db 190 ; catch rate
-    db 103 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw VoltorbPicFront
-    dw VoltorbPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db SCREECH
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %00000001
-    db %10001000
-    db %11100001
-    db %01001011
-    db %01011000
-    db %01000010
-
-    db BANK(VoltorbPicFront)
-
-ElectrodeBaseStats: ; 38ece (e:4ece)
-    db DEX_ELECTRODE ; pokedex id
-    db 60 ; base hp
-    db 50 ; base attack
-    db 70 ; base defense
-    db 140 ; base speed
-    db 80 ; base special
-
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
-
-    db 60 ; catch rate
-    db 150 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw ElectrodePicFront
-    dw ElectrodePicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db SCREECH
-    db SONICBOOM
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %01000001
-    db %10001000
-    db %11100001
-    db %11001011
-    db %01011000
-    db %01000010
-
-    db BANK(ElectrodePicFront)
-
-ExeggcuteBaseStats: ; 38eea (e:4eea)
-    db DEX_EXEGGCUTE ; pokedex id
-    db 60 ; base hp
-    db 40 ; base attack
-    db 80 ; base defense
-    db 40 ; base speed
-    db 60 ; base special
-
-    db GRASS ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 90 ; catch rate
-    db 98 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw ExeggcutePicFront
-    dw ExeggcutePicBack
-
-    ; attacks known at lvl 0
-    db BARRAGE
-    db HYPNOSIS
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %00000011
-    db %00001000
-    db %11110000
-    db %00011011
-    db %01101000
-    db %00000010
-
-    db BANK(ExeggcutePicFront)
-
-ExeggutorBaseStats: ; 38f06 (e:4f06)
-    db DEX_EXEGGUTOR ; pokedex id
-    db 95 ; base hp
-    db 95 ; base attack
-    db 85 ; base defense
-    db 55 ; base speed
-    db 125 ; base special
-
-    db GRASS ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 45 ; catch rate
-    db 212 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw ExeggutorPicFront
-    dw ExeggutorPicBack
-
-    ; attacks known at lvl 0
-    db BARRAGE
-    db HYPNOSIS
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %01000011
-    db %00111000
-    db %11110000
-    db %00011011
-    db %01101000
-    db %00100010
-
-    db BANK(ExeggutorPicFront)
-
-CuboneBaseStats: ; 38f22 (e:4f22)
-    db DEX_CUBONE ; pokedex id
-    db 50 ; base hp
-    db 50 ; base attack
-    db 95 ; base defense
-    db 35 ; base speed
-    db 40 ; base special
-
-    db GROUND ; species type 1
-    db GROUND ; species type 2
-
-    db 190 ; catch rate
-    db 87 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw CubonePicFront
-    dw CubonePicBack
-
-    ; attacks known at lvl 0
-    db BONE_CLUB
-    db GROWL
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00111111
-    db %00001111
-    db %11001110
-    db %10100010
-    db %00001000
-    db %00100010
-
-    db BANK(CubonePicFront)
-
-MarowakBaseStats: ; 38f3e (e:4f3e)
-    db DEX_MAROWAK ; pokedex id
-    db 60 ; base hp
-    db 80 ; base attack
-    db 110 ; base defense
-    db 45 ; base speed
-    db 50 ; base special
-
-    db GROUND ; species type 1
-    db GROUND ; species type 2
-
-    db 75 ; catch rate
-    db 124 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw MarowakPicFront
-    dw MarowakPicBack
-
-    ; attacks known at lvl 0
-    db BONE_CLUB
-    db GROWL
-    db LEER
-    db FOCUS_ENERGY
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01111111
-    db %00001111
-    db %11001110
-    db %10100010
-    db %00001000
-    db %00100010
-
-    db BANK(MarowakPicFront)
-
-HitmonleeBaseStats: ; 38f5a (e:4f5a)
-    db DEX_HITMONLEE ; pokedex id
-    db 50 ; base hp
-    db 120 ; base attack
-    db 53 ; base defense
-    db 87 ; base speed
-    db 35 ; base special
-
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
-
-    db 45 ; catch rate
-    db 139 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw HitmonleePicFront
-    dw HitmonleePicBack
-
-    ; attacks known at lvl 0
-    db DOUBLE_KICK
-    db MEDITATE
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00000011
-    db %00001111
-    db %11000000
-    db %11000110
-    db %00001000
-    db %00100010
-
-    db BANK(HitmonleePicFront)
-
-HitmonchanBaseStats: ; 38f76 (e:4f76)
-    db DEX_HITMONCHAN ; pokedex id
-    db 50 ; base hp
-    db 105 ; base attack
-    db 79 ; base defense
-    db 76 ; base speed
-    db 35 ; base special
-
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
-
-    db 45 ; catch rate
-    db 140 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw HitmonchanPicFront
-    dw HitmonchanPicBack
-
-    ; attacks known at lvl 0
-    db COMET_PUNCH
-    db AGILITY
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %00000011
-    db %00001111
-    db %11000000
-    db %11000110
-    db %00001000
-    db %00100010
-
-    db BANK(HitmonchanPicFront)
-
-LickitungBaseStats: ; 38f92 (e:4f92)
-    db DEX_LICKITUNG ; pokedex id
-    db 90 ; base hp
-    db 55 ; base attack
-    db 75 ; base defense
-    db 30 ; base speed
-    db 60 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 45 ; catch rate
-    db 127 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw LickitungPicFront
-    dw LickitungPicBack
-
-    ; attacks known at lvl 0
-    db WRAP
-    db SUPERSONIC
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110101
-    db %01111111
-    db %10001111
-    db %11000111
-    db %10100010
-    db %00001000
-    db %00110110
-
-    db BANK(LickitungPicFront)
-
-KoffingBaseStats: ; 38fae (e:4fae)
-    db DEX_KOFFING ; pokedex id
-    db 40 ; base hp
-    db 65 ; base attack
-    db 95 ; base defense
-    db 35 ; base speed
-    db 60 ; base special
-
-    db POISON ; species type 1
-    db POISON ; species type 2
-
-    db 190 ; catch rate
-    db 114 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw KoffingPicFront
-    dw KoffingPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db SMOG
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %00000000
-    db %10001000
-    db %11000001
-    db %00101010
-    db %01001000
-    db %00000010
-
-    db BANK(KoffingPicFront)
-
-WeezingBaseStats: ; 38fca (e:4fca)
-    db DEX_WEEZING ; pokedex id
-    db 65 ; base hp
-    db 90 ; base attack
-    db 120 ; base defense
-    db 60 ; base speed
-    db 85 ; base special
-
-    db POISON ; species type 1
-    db POISON ; species type 2
-
-    db 60 ; catch rate
-    db 173 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw WeezingPicFront
-    dw WeezingPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db SMOG
-    db SLUDGE
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %01000000
-    db %10001000
-    db %11000001
-    db %00101010
-    db %01001000
-    db %00000010
-
-    db BANK(WeezingPicFront)
-
-RhyhornBaseStats: ; 38fe6 (e:4fe6)
-    db DEX_RHYHORN ; pokedex id
-    db 80 ; base hp
-    db 85 ; base attack
-    db 95 ; base defense
-    db 25 ; base speed
-    db 30 ; base special
-
-    db GROUND ; species type 1
-    db ROCK ; species type 2
-
-    db 120 ; catch rate
-    db 135 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw RhyhornPicFront
-    dw RhyhornPicBack
-
-    ; attacks known at lvl 0
-    db HORN_ATTACK
-    db 0
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %00000011
-    db %10001000
-    db %11001111
-    db %10100010
-    db %10001000
-    db %00100010
-
-    db BANK(RhyhornPicFront)
-
-RhydonBaseStats: ; 39002 (e:5002)
-    db DEX_RHYDON ; pokedex id
-    db 105 ; base hp
-    db 130 ; base attack
-    db 120 ; base defense
-    db 40 ; base speed
-    db 45 ; base special
-
-    db GROUND ; species type 1
-    db ROCK ; species type 2
-
-    db 60 ; catch rate
-    db 204 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw RhydonPicFront
-    dw RhydonPicBack
-
-    ; attacks known at lvl 0
-    db HORN_ATTACK
-    db STOMP
-    db TAIL_WHIP
-    db FURY_ATTACK
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %11110001
-    db %11111111
-    db %10001111
-    db %11001111
-    db %10100010
-    db %10001000
-    db %00110010
-
-    db BANK(RhydonPicFront)
-
-ChanseyBaseStats: ; 3901e (e:501e)
-    db DEX_CHANSEY ; pokedex id
-    db 250 ; base hp
-    db 5 ; base attack
-    db 5 ; base defense
-    db 50 ; base speed
-    db 105 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 30 ; catch rate
-    db 255 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw ChanseyPicFront
-    dw ChanseyPicBack
-
-    ; attacks known at lvl 0
-    db POUND
-    db DOUBLESLAP
-    db TAIL_WHIP
-    db 0
-
-    db 4 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01111111
-    db %10101111
-    db %11110001
-    db %10110111
-    db %00111001
-    db %01100011
-
-    db BANK(ChanseyPicFront)
-
-TangelaBaseStats: ; 3903a (e:503a)
-    db DEX_TANGELA ; pokedex id
-    db 65 ; base hp
-    db 55 ; base attack
-    db 115 ; base defense
-    db 60 ; base speed
-    db 100 ; base special
-
-    db GRASS ; species type 1
-    db GRASS ; species type 2
-
-    db 45 ; catch rate
-    db 166 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw TangelaPicFront
-    dw TangelaPicBack
-
-    ; attacks known at lvl 0
-    db CONSTRICT
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %01000011
-    db %00111000
-    db %11000000
-    db %10000010
-    db %00001000
-    db %00000110
-
-    db BANK(TangelaPicFront)
-
-KangaskhanBaseStats: ; 39056 (e:5056)
-    db DEX_KANGASKHAN ; pokedex id
-    db 105 ; base hp
-    db 95 ; base attack
-    db 80 ; base defense
-    db 90 ; base speed
-    db 40 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 45 ; catch rate
-    db 175 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw KangaskhanPicFront
-    dw KangaskhanPicBack
-
-    ; attacks known at lvl 0
-    db COMET_PUNCH
-    db RAGE
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01111111
-    db %10001111
-    db %11000111
-    db %10100010
-    db %10001000
-    db %00110010
-
-    db BANK(KangaskhanPicFront)
-
-HorseaBaseStats: ; 39072 (e:5072)
-    db DEX_HORSEA ; pokedex id
-    db 30 ; base hp
-    db 40 ; base attack
-    db 70 ; base defense
-    db 60 ; base speed
-    db 70 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 225 ; catch rate
-    db 83 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw HorseaPicFront
-    dw HorseaPicBack
-
-    ; attacks known at lvl 0
-    db BUBBLE
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %00111111
-    db %00001000
-    db %11000000
-    db %11000010
-    db %00001000
-    db %00010010
-
-    db BANK(HorseaPicFront)
-
-SeadraBaseStats: ; 3908e (e:508e)
-    db DEX_SEADRA ; pokedex id
-    db 55 ; base hp
-    db 65 ; base attack
-    db 95 ; base defense
-    db 85 ; base speed
-    db 95 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 75 ; catch rate
-    db 155 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw SeadraPicFront
-    dw SeadraPicBack
-
-    ; attacks known at lvl 0
-    db BUBBLE
-    db SMOKESCREEN
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %01111111
-    db %00001000
-    db %11000000
-    db %11000010
-    db %00001000
-    db %00010010
-
-    db BANK(SeadraPicFront)
-
-GoldeenBaseStats: ; 390aa (e:50aa)
-    db DEX_GOLDEEN ; pokedex id
-    db 45 ; base hp
-    db 67 ; base attack
-    db 60 ; base defense
-    db 63 ; base speed
-    db 50 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 225 ; catch rate
-    db 111 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw GoldeenPicFront
-    dw GoldeenPicBack
-
-    ; attacks known at lvl 0
-    db PECK
-    db TAIL_WHIP
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %01100000
-    db %00111111
-    db %00001000
-    db %11000000
-    db %11000010
-    db %00001000
-    db %00010010
-
-    db BANK(GoldeenPicFront)
-
-SeakingBaseStats: ; 390c6 (e:50c6)
-    db DEX_SEAKING ; pokedex id
-    db 80 ; base hp
-    db 92 ; base attack
-    db 65 ; base defense
-    db 68 ; base speed
-    db 80 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 60 ; catch rate
-    db 170 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw SeakingPicFront
-    dw SeakingPicBack
-
-    ; attacks known at lvl 0
-    db PECK
-    db TAIL_WHIP
-    db SUPERSONIC
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %01100000
-    db %01111111
-    db %00001000
-    db %11000000
-    db %11000010
-    db %00001000
-    db %00010010
-
-    db BANK(SeakingPicFront)
-
-StaryuBaseStats: ; 390e2 (e:50e2)
-    db DEX_STARYU ; pokedex id
-    db 30 ; base hp
-    db 45 ; base attack
-    db 55 ; base defense
-    db 85 ; base speed
-    db 70 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 225 ; catch rate
-    db 106 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw StaryuPicFront
-    dw StaryuPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db 0
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %00111111
-    db %10001000
-    db %11110001
-    db %11000011
-    db %00111000
-    db %01010011
-
-    db BANK(StaryuPicFront)
-
-StarmieBaseStats: ; 390fe (e:50fe)
-    db DEX_STARMIE ; pokedex id
-    db 60 ; base hp
-    db 75 ; base attack
-    db 85 ; base defense
-    db 115 ; base speed
-    db 100 ; base special
-
-    db WATER ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 60 ; catch rate
-    db 207 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw StarmiePicFront
-    dw StarmiePicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db WATER_GUN
-    db HARDEN ; Penultimate Move that is Replaced with Bubblebeam in Misty's Team
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %01111111
-    db %10001000
-    db %11110001
-    db %11000011
-    db %00111000
-    db %01010011
-
-    db BANK(StarmiePicFront)
-
-MrMimeBaseStats: ; 3911a (e:511a)
-    db DEX_MR_MIME ; pokedex id
-    db 40 ; base hp
-    db 45 ; base attack
-    db 65 ; base defense
-    db 90 ; base speed
-    db 100 ; base special
-
-    db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 45 ; catch rate
-    db 136 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw MrMimePicFront
-    dw MrMimePicBack
-
-    ; attacks known at lvl 0
-    db CONFUSION
-    db BARRIER
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01000011
-    db %10101111
-    db %11110001
-    db %10000111
-    db %00111000
-    db %01000010
-
-    db BANK(MrMimePicFront)
-
-ScytherBaseStats: ; 39136 (e:5136)
-    db DEX_SCYTHER ; pokedex id
-    db 70 ; base hp
-    db 110 ; base attack
-    db 80 ; base defense
-    db 105 ; base speed
-    db 55 ; base special
-
-    db BUG ; species type 1
-    db FLYING ; species type 2
-
-    db 45 ; catch rate
-    db 187 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw ScytherPicFront
-    dw ScytherPicBack
-
-    ; attacks known at lvl 0
-    db QUICK_ATTACK
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100100
-    db %01000011
-    db %00001000
-    db %11000000
-    db %11000010
-    db %00001000
-    db %00000110
-
-    db BANK(ScytherPicFront)
-
-JynxBaseStats: ; 39152 (e:5152)
-    db DEX_JYNX ; pokedex id
-    db 65 ; base hp
-    db 50 ; base attack
-    db 35 ; base defense
-    db 95 ; base speed
-    db 95 ; base special
-
-    db ICE ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 45 ; catch rate
-    db 137 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw JynxPicFront
-    dw JynxPicBack
-
-    ; attacks known at lvl 0
-    db POUND
-    db LOVELY_KISS
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01111111
-    db %00001111
-    db %11110000
-    db %10000111
-    db %00101000
-    db %00000010
-
-    db BANK(JynxPicFront)
-
-ElectabuzzBaseStats: ; 3916e (e:516e)
-    db DEX_ELECTABUZZ ; pokedex id
-    db 65 ; base hp
-    db 83 ; base attack
-    db 57 ; base defense
-    db 105 ; base speed
-    db 85 ; base special
-
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
-
-    db 45 ; catch rate
-    db 156 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw ElectabuzzPicFront
-    dw ElectabuzzPicBack
-
-    ; attacks known at lvl 0
-    db QUICK_ATTACK
-    db LEER
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01000011
-    db %10001111
-    db %11110001
-    db %11000111
-    db %00111000
-    db %01100010
-
-    db BANK(ElectabuzzPicFront)
-
-MagmarBaseStats: ; 3918a (e:518a)
-    db DEX_MAGMAR ; pokedex id
-    db 65 ; base hp
-    db 95 ; base attack
-    db 57 ; base defense
-    db 93 ; base speed
-    db 85 ; base special
-
-    db FIRE ; species type 1
-    db FIRE ; species type 2
-
-    db 45 ; catch rate
-    db 167 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw MagmarPicFront
-    dw MagmarPicBack
-
-    ; attacks known at lvl 0
-    db EMBER
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %01000011
-    db %00001111
-    db %11110000
-    db %10100110
-    db %00101000
-    db %00100010
-
-    db BANK(MagmarPicFront)
-
-PinsirBaseStats: ; 391a6 (e:51a6)
-    db DEX_PINSIR ; pokedex id
-    db 65 ; base hp
-    db 125 ; base attack
-    db 100 ; base defense
-    db 85 ; base speed
-    db 55 ; base special
-
-    db BUG ; species type 1
-    db BUG ; species type 2
-
-    db 45 ; catch rate
-    db 200 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw PinsirPicFront
-    dw PinsirPicBack
-
-    ; attacks known at lvl 0
-    db VICEGRIP
-    db 0
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %10100100
-    db %01000011
-    db %00001101
-    db %11000000
-    db %00000010
-    db %00001000
-    db %00100110
-
-    db BANK(PinsirPicFront)
-
-TaurosBaseStats: ; 391c2 (e:51c2)
-    db DEX_TAUROS ; pokedex id
-    db 75 ; base hp
-    db 100 ; base attack
-    db 95 ; base defense
-    db 110 ; base speed
-    db 70 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 45 ; catch rate
-    db 211 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw TaurosPicFront
-    dw TaurosPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db 0
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %01110011
-    db %10001000
-    db %11000111
-    db %10100010
-    db %00001000
-    db %00100010
-
-    db BANK(TaurosPicFront)
-
-MagikarpBaseStats: ; 391de (e:51de)
-    db DEX_MAGIKARP ; pokedex id
-    db 20 ; base hp
-    db 10 ; base attack
-    db 55 ; base defense
-    db 80 ; base speed
-    db 20 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 255 ; catch rate
-    db 20 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw MagikarpPicFront
-    dw MagikarpPicBack
-
-    ; attacks known at lvl 0
-    db SPLASH
-    db 0
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-
-    db BANK(MagikarpPicFront)
-
-GyaradosBaseStats: ; 391fa (e:51fa)
-    db DEX_GYARADOS ; pokedex id
-    db 95 ; base hp
-    db 125 ; base attack
-    db 79 ; base defense
-    db 81 ; base speed
-    db 100 ; base special
-
-    db WATER ; species type 1
-    db FLYING ; species type 2
-
-    db 45 ; catch rate
-    db 214 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw GyaradosPicFront
-    dw GyaradosPicBack
-
-    ; attacks known at lvl 0
-    db BITE
-    db DRAGON_RAGE
-    db LEER
-    db HYDRO_PUMP ; TODO
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %01111111
-    db %11001000
-    db %11000001
-    db %10100011
-    db %00001000
-    db %00110010
-
-    db BANK(GyaradosPicFront)
-
-LaprasBaseStats: ; 39216 (e:5216)
-    db DEX_LAPRAS ; pokedex id
-    db 130 ; base hp
-    db 85 ; base attack
-    db 80 ; base defense
-    db 60 ; base speed
-    db 95 ; base special
-
-    db WATER ; species type 1
-    db ICE ; species type 2
-
-    db 45 ; catch rate
-    db 219 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw LaprasPicFront
-    dw LaprasPicBack
-
-    ; attacks known at lvl 0
-    db WATER_GUN
-    db GROWL
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %01111111
-    db %11101000
-    db %11010001
-    db %10000011
-    db %00101000
-    db %00110010
-
-    db BANK(LaprasPicFront)
-
-DittoBaseStats: ; 39232 (e:5232)
-    db DEX_DITTO ; pokedex id
-    db 48 ; base hp
-    db 48 ; base attack
-    db 48 ; base defense
-    db 48 ; base speed
-    db 48 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 35 ; catch rate
-    db 61 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw DittoPicFront
-    dw DittoPicBack
-
-    ; attacks known at lvl 0
-    db TRANSFORM
-    db 0
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-    db %00000000
-
-    db BANK(DittoPicFront)
-
-EeveeBaseStats: ; 3924e (e:524e)
-    db DEX_EEVEE ; pokedex id
-    db 55 ; base hp
-    db 55 ; base attack
-    db 50 ; base defense
-    db 55 ; base speed
-    db 65 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 45 ; catch rate
-    db 92 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw EeveePicFront
-    dw EeveePicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00000011
-    db %00001000
-    db %11000000
-    db %11000011
-    db %00001000
-    db %00000010
-
-    db BANK(EeveePicFront)
-
-VaporeonBaseStats: ; 3926a (e:526a)
-    db DEX_VAPOREON ; pokedex id
-    db 130 ; base hp
-    db 65 ; base attack
-    db 60 ; base defense
-    db 65 ; base speed
-    db 110 ; base special
-
-    db WATER ; species type 1
-    db WATER ; species type 2
-
-    db 45 ; catch rate
-    db 196 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw VaporeonPicFront
-    dw VaporeonPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db SAND_ATTACK
-    db QUICK_ATTACK
-    db WATER_GUN
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %01111111
-    db %00001000
-    db %11000000
-    db %11000011
-    db %00001000
-    db %00010010
-
-    db BANK(VaporeonPicFront)
-
-JolteonBaseStats: ; 39286 (e:5286)
-    db DEX_JOLTEON ; pokedex id
-    db 65 ; base hp
-    db 65 ; base attack
-    db 60 ; base defense
-    db 130 ; base speed
-    db 110 ; base special
-
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
-
-    db 45 ; catch rate
-    db 197 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw JolteonPicFront
-    dw JolteonPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db SAND_ATTACK
-    db QUICK_ATTACK
-    db THUNDERSHOCK
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %01000011
-    db %10001000
-    db %11000001
-    db %11000011
-    db %00011000
-    db %01000010
-
-    db BANK(JolteonPicFront)
-
-FlareonBaseStats: ; 392a2 (e:52a2)
-    db DEX_FLAREON ; pokedex id
-    db 65 ; base hp
-    db 130 ; base attack
-    db 60 ; base defense
-    db 65 ; base speed
-    db 110 ; base special
-
-    db FIRE ; species type 1
-    db FIRE ; species type 2
-
-    db 45 ; catch rate
-    db 198 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw FlareonPicFront
-    dw FlareonPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db SAND_ATTACK
-    db QUICK_ATTACK
-    db EMBER
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %01000011
-    db %00001000
-    db %11000000
-    db %11100011
-    db %00001000
-    db %00000010
-
-    db BANK(FlareonPicFront)
-
-PorygonBaseStats: ; 392be (e:52be)
-    db DEX_PORYGON ; pokedex id
-    db 65 ; base hp
-    db 60 ; base attack
-    db 70 ; base defense
-    db 40 ; base speed
-    db 75 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 45 ; catch rate
-    db 130 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw PorygonPicFront
-    dw PorygonPicBack
-
-    ; attacks known at lvl 0
-    db TACKLE
-    db SHARPEN
-    db CONVERSION
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %00100000
-    db %01110011
-    db %10001000
-    db %11110001
-    db %11000011
-    db %00111000
-    db %01000011
-
-    db BANK(PorygonPicFront)
-
-OmanyteBaseStats: ; 392da (e:52da)
-    db DEX_OMANYTE ; pokedex id
-    db 35 ; base hp
-    db 40 ; base attack
-    db 100 ; base defense
-    db 35 ; base speed
-    db 90 ; base special
-
-    db ROCK ; species type 1
-    db WATER ; species type 2
-
-    db 45 ; catch rate
-    db 120 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw OmanytePicFront
-    dw OmanytePicBack
-
-    ; attacks known at lvl 0
-    db WATER_GUN
-    db WITHDRAW
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00111111
-    db %00001000
-    db %11000000
-    db %00000011
-    db %00001000
-    db %00010010
-
-    db BANK(OmanytePicFront)
-
-OmastarBaseStats: ; 392f6 (e:52f6)
-    db DEX_OMASTAR ; pokedex id
-    db 70 ; base hp
-    db 60 ; base attack
-    db 125 ; base defense
-    db 55 ; base speed
-    db 115 ; base special
-
-    db ROCK ; species type 1
-    db WATER ; species type 2
-
-    db 45 ; catch rate
-    db 199 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw OmastarPicFront
-    dw OmastarPicBack
-
-    ; attacks known at lvl 0
-    db WATER_GUN
-    db WITHDRAW
-    db HORN_ATTACK
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %01111111
-    db %00001101
-    db %11000000
-    db %10000011
-    db %00001000
-    db %00010010
-
-    db BANK(OmastarPicFront)
-
-KabutoBaseStats: ; 39312 (e:5312)
-    db DEX_KABUTO ; pokedex id
-    db 30 ; base hp
-    db 80 ; base attack
-    db 90 ; base defense
-    db 55 ; base speed
-    db 45 ; base special
-
-    db ROCK ; species type 1
-    db WATER ; species type 2
-
-    db 45 ; catch rate
-    db 119 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw KabutoPicFront
-    dw KabutoPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db HARDEN
-    db 0
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00111111
-    db %00001000
-    db %11000000
-    db %00000011
-    db %00001000
-    db %00010010
-
-    db BANK(KabutoPicFront)
-
-KabutopsBaseStats: ; 3932e (e:532e)
-    db DEX_KABUTOPS ; pokedex id
-    db 60 ; base hp
-    db 115 ; base attack
-    db 105 ; base defense
-    db 80 ; base speed
-    db 70 ; base special
-
-    db ROCK ; species type 1
-    db WATER ; species type 2
-
-    db 45 ; catch rate
-    db 201 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw KabutopsPicFront
-    dw KabutopsPicBack
-
-    ; attacks known at lvl 0
-    db SCRATCH
-    db HARDEN
-    db ABSORB
-    db 0
-
-    db 0 ; growth rate
-
-    ; learnset
-    db %10110110
-    db %01111111
-    db %00001101
-    db %11000000
-    db %10000011
-    db %00001000
-    db %00010010
-
-    db BANK(KabutopsPicFront)
-
-AerodactylBaseStats: ; 3934a (e:534a)
-    db DEX_AERODACTYL ; pokedex id
-    db 80 ; base hp
-    db 105 ; base attack
-    db 65 ; base defense
-    db 130 ; base speed
-    db 60 ; base special
-
-    db ROCK ; species type 1
-    db FLYING ; species type 2
-
-    db 45 ; catch rate
-    db 202 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw AerodactylPicFront
-    dw AerodactylPicBack
-
-    ; attacks known at lvl 0
-    db WING_ATTACK
-    db AGILITY
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %01000011
-    db %01001000
-    db %11000000
-    db %01100011
-    db %00001100
-    db %00001010
-
-    db BANK(AerodactylPicFront)
-
-SnorlaxBaseStats: ; 39366 (e:5366)
-    db DEX_SNORLAX ; pokedex id
-    db 160 ; base hp
-    db 110 ; base attack
-    db 65 ; base defense
-    db 30 ; base speed
-    db 65 ; base special
-
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
-
-    db 25 ; catch rate
-    db 154 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw SnorlaxPicFront
-    dw SnorlaxPicBack
-
-    ; attacks known at lvl 0
-    db HEADBUTT
-    db AMNESIA
-    db REST
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %11111111
-    db %10101111
-    db %11010111
-    db %10101111
-    db %10101000
-    db %00110010
-
-    db BANK(SnorlaxPicFront)
-
-ArticunoBaseStats: ; 39382 (e:5382)
-    db DEX_ARTICUNO ; pokedex id
-    db 90 ; base hp
-    db 85 ; base attack
-    db 100 ; base defense
-    db 85 ; base speed
-    db 125 ; base special
-
-    db ICE ; species type 1
-    db FLYING ; species type 2
-
-    db 3 ; catch rate
-    db 215 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw ArticunoPicFront
-    dw ArticunoPicBack
-
-    ; attacks known at lvl 0
-    db PECK
-    db ICE_BEAM
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %01111111
-    db %00001000
-    db %11000000
-    db %01000011
-    db %00001100
-    db %00001010
-
-    db BANK(ArticunoPicFront)
-
-ZapdosBaseStats: ; 3939e (e:539e)
-    db DEX_ZAPDOS ; pokedex id
-    db 90 ; base hp
-    db 90 ; base attack
-    db 85 ; base defense
-    db 100 ; base speed
-    db 125 ; base special
-
-    db ELECTRIC ; species type 1
-    db FLYING ; species type 2
-
-    db 3 ; catch rate
-    db 216 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw ZapdosPicFront
-    dw ZapdosPicBack
-
-    ; attacks known at lvl 0
-    db THUNDERSHOCK
-    db DRILL_PECK
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %01000011
-    db %10001000
-    db %11000001
-    db %01000011
-    db %00011100
-    db %01001010
-
-    db BANK(ZapdosPicFront)
-
-MoltresBaseStats: ; 393ba (e:53ba)
-    db DEX_MOLTRES ; pokedex id
-    db 90 ; base hp
-    db 100 ; base attack
-    db 90 ; base defense
-    db 90 ; base speed
-    db 125 ; base special
-
-    db FIRE ; species type 1
-    db FLYING ; species type 2
-
-    db 3 ; catch rate
-    db 217 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw MoltresPicFront
-    dw MoltresPicBack
-
-    ; attacks known at lvl 0
-    db PECK
-    db FIRE_SPIN
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %00101010
-    db %01000011
-    db %00001000
-    db %11000000
-    db %01100011
-    db %00001100
-    db %00001010
-
-    db BANK(MoltresPicFront)
-
-DratiniBaseStats: ; 393d6 (e:53d6)
-    db DEX_DRATINI ; pokedex id
-    db 41 ; base hp
-    db 64 ; base attack
-    db 45 ; base defense
-    db 50 ; base speed
-    db 50 ; base special
-
-    db DRAGON ; species type 1
-    db DRAGON ; species type 2
-
-    db 45 ; catch rate
-    db 67 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw DratiniPicFront
-    dw DratiniPicBack
-
-    ; attacks known at lvl 0
-    db WRAP
-    db LEER
-    db 0
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %10100000
-    db %00111111
-    db %11001000
-    db %11000001
-    db %11100011
-    db %00011000
-    db %00010010
-
-    db BANK(DratiniPicFront)
-
-DragonairBaseStats: ; 393f2 (e:53f2)
-    db DEX_DRAGONAIR ; pokedex id
-    db 61 ; base hp
-    db 84 ; base attack
-    db 65 ; base defense
-    db 70 ; base speed
-    db 70 ; base special
-
-    db DRAGON ; species type 1
-    db DRAGON ; species type 2
-
-    db 45 ; catch rate
-    db 144 ; base exp yield
-    db $66 ; sprite dimensions
-
-    dw DragonairPicFront
-    dw DragonairPicBack
-
-    ; attacks known at lvl 0
-    db WRAP
-    db LEER
-    db THUNDER_WAVE
-    db 0
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %11100000
-    db %00111111
-    db %11001000
-    db %11000001
-    db %11100011
-    db %00011000
-    db %00010010
-
-    db BANK(DragonairPicFront)
-
-DragoniteBaseStats: ; 3940e (e:540e)
-    db DEX_DRAGONITE ; pokedex id
-    db 91 ; base hp
-    db 134 ; base attack
-    db 95 ; base defense
-    db 80 ; base speed
-    db 100 ; base special
-
-    db DRAGON ; species type 1
-    db FLYING ; species type 2
-
-    db 45 ; catch rate
-    db 218 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw DragonitePicFront
-    dw DragonitePicBack
-
-    ; attacks known at lvl 0
-    db WRAP
-    db LEER
-    db THUNDER_WAVE
-    db AGILITY
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %11100010
-    db %01111111
-    db %11001000
-    db %11000001
-    db %11100011
-    db %00011100
-    db %00111010
-
-    db BANK(DragonitePicFront)
-
-MewtwoBaseStats: ; 3942a (e:542a)
-    db DEX_MEWTWO ; pokedex id
-    db 106 ; base hp
-    db 110 ; base attack
-    db 90 ; base defense
-    db 130 ; base speed
-    db 154 ; base special
-
-    db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 3 ; catch rate
-    db 220 ; base exp yield
-    db $77 ; sprite dimensions
-
-    dw MewtwoPicFront
-    dw MewtwoPicBack
-
-    ; attacks known at lvl 0
-    db CONFUSION
-    db DISABLE
-    db SWIFT
-    db PSYCHIC_M
-
-    db 5 ; growth rate
-
-    ; learnset
-    db %10110001
-    db %11111111
-    db %10101111
-    db %11110001
-    db %10101111
-    db %00111000
-    db %01100011
-
-    db BANK(MewtwoPicFront)
+INCLUDE "constants/pokemon_header.asm"
 
 CryData: ; 39446 (e:5446)
     ;$BaseCry,$Pitch,$Length
@@ -56954,8 +49373,8 @@ ReadTrainer: ; 39c53 (e:5c53)
     ld [hl],a
 
 ; get the pointer to trainer data for this class
-    ld a,[W_CUROPPONENT]
-    sub $C9 ; convert value from pokemon to trainer
+    ld a,[W_TRAINERCLASS]
+    dec a
     add a,a
     ld hl,TrainerDataPointers
     ld c,a
@@ -56982,7 +49401,7 @@ ReadTrainer: ; 39c53 (e:5c53)
 ; if the first byte of trainer data is FF,
 ; - each pokemon has a specific level
 ;      (as opposed to the whole team being of the same level)
-; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move
+; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move (not applicable to the Yellow method)
 ; else the first byte is the level of every pokemon on the team
 .IterateTrainer
     ld a,[hli]
@@ -56992,7 +49411,7 @@ ReadTrainer: ; 39c53 (e:5c53)
 .LoopTrainerData
     ld a,[hli]
     and a ; have we reached the end of the trainer data?
-    jr z,.FinishUp
+    jr z,.AddAdditionalMoveData ; jr z,.FinishUp
     ld [$CF91],a ; write species somewhere (XXX why?)
     ld a,1
     ld [$CC49],a
@@ -57004,10 +49423,10 @@ ReadTrainer: ; 39c53 (e:5c53)
 ; if this code is being run:
 ; - each pokemon has a specific level
 ;      (as opposed to the whole team being of the same level)
-; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move
+; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move (not applicable to the Yellow method)
     ld a,[hli]
     and a ; have we reached the end of the trainer data?
-    jr z,.AddLoneMove
+    jr z,.AddAdditionalMoveData ; jr z,.AddLoneMove
     ld [W_CURENEMYLVL],a
     ld a,[hli]
     ld [$CF91],a
@@ -57017,69 +49436,53 @@ ReadTrainer: ; 39c53 (e:5c53)
     call AddPokemonToParty
     pop hl
     jr .SpecialTrainer
-.AddLoneMove
-; does the trainer have a single monster with a different move
-    ld a,[W_LONEATTACKNO] ; Brock is 01,Misty is 02,Erika is 04,etc
-    and a
-    jr z,.AddTeamMove
-    dec a
-    add a,a
-    ld c,a
-    ld b,0
-    ld hl,LoneMoves
-    add hl,bc
-    ld a,[hli]
-    ld d,[hl]
-    ld hl,W_ENEMYMON1MOVE3
-    ld bc,W_ENEMYMON2MOVE3 - W_ENEMYMON1MOVE3
-    call AddNTimes
-    ld [hl],d
-    jr .FinishUp
-.AddTeamMove
-; check if our trainer's team has special moves
-
-; get trainer class number
-    ld a,[$D059]
-    sub $C8
+.AddAdditionalMoveData
+; does the trainer have additional move data?
+    ld a,[W_TRAINERCLASS]
     ld b,a
-    ld hl,TeamMoves
-
-; iterate through entries in TeamMoves,checking each for our trainer class
-.IterateTeamMoves
+    ld a,[W_TRAINERNO]
+    ld c,a
+    ld hl,SpecialTrainerMoves
+.loopAdditionalMoveData
     ld a,[hli]
+    cp $ff
+    jr z,.FinishUp
     cp b
-    jr z,.GiveTeamMoves ; is there a match?
-    inc hl ; if not,go to the next entry
-    inc a
-    jr nz,.IterateTeamMoves
-
-    ; no matches found. is this trainer champion rival?
+    jr nz,.ContinueUntilZero
+    ld a,[hli]
+    cp c
+    jr nz,.ContinueUntilZero
+    ld d,h
+    ld e,l
+    ld b,0
+.writeAdditionalMoveDataLoop
     ld a,b
-    cp SONY3
-    jr z,.ChampionRival
-    jr .FinishUp ; nope
-.GiveTeamMoves
-    ld a,[hl]
-    ld [$D95E],a
-    jr .FinishUp
-.ChampionRival ; give moves to his team
-
-; pidgeot
-    ld a,SKY_ATTACK
-    ld [W_ENEMYMON1MOVE3],a
-
-; starter
-    ld a,[W_RIVALSTARTER]
-    cp BULBASAUR
-    ld b,MEGA_DRAIN
-    jr z,.GiveStarterMove
-    cp CHARMANDER
-    ld b,FIRE_BLAST
-    jr z,.GiveStarterMove
-    ld b,BLIZZARD ; must be squirtle
-.GiveStarterMove
+    srl a
+    srl a ; a = a DIV 4
+    ld hl,W_ENEMYMON1MOVE3-2 ; W_ENEMYMON1MOVE1
+    push bc
+    ld bc,44
+    call AddNTimes
+    pop bc
     ld a,b
-    ld [W_ENEMYMON6MOVE3],a
+    and %00000011 ; a = a MOD 4
+    ld c,a
+    push bc
+    ld b,0
+    add hl,bc
+    pop bc
+    ld a,[de]
+    inc de
+    and a
+    jp z,.FinishUp
+    ld [hl],a
+    inc b
+    jr .writeAdditionalMoveDataLoop
+.ContinueUntilZero
+    ld a,[hli]
+    and a
+    jr nz,.ContinueUntilZero
+    jr .loopAdditionalMoveData
 .FinishUp ; XXX this needs documenting
     xor a       ; clear D079-D07B
     ld de,$D079
@@ -57103,200 +49506,31 @@ ReadTrainer: ; 39c53 (e:5c53)
     jr nz,.LastLoop
     ret
 
-LoneMoves: ; 39d22 (e:5d22)
-; these are used for gym leaders.
-; this is not automatic! you have to write the number you want to W_LONEATTACKNO
-; first. e.g.,erika's script writes 4 to W_LONEATTACKNO to get mega drain,
-; the fourth entry in the list.
+BlaineAI:
+    cp $40
+    ret nc
+    ld a,$A
+    call Func_3a7cf
+    ret nc
+    jp AIUseSuperPotion
 
-; first byte:  pokemon in the trainer's party that gets the move
-; second byte: move
-; unterminated
-    db 1,BIDE
-    db 1,BUBBLEBEAM
-    db 0,THUNDERBOLT
-    db 2,MEGA_DRAIN
-    db 1,TOXIC
-    db 1,PSYWAVE
-    db 2,FIRE_BLAST
-    db 4,FISSURE
+GoPalSetBattleAndLoadText:
+    ld b,1
+    call GoPAL_SET
+    ld hl,UnnamedText_3bb92 ; $7b92
+    ret
 
-TeamMoves: ; 39d32 (e:5d32)
-; these are used for elite four.
-; this is automatic,based on trainer class.
-; don't be confused by LoneMoves above,the two data structures are
-    ; _completely_ unrelated.
+RedBallColorDuringEnemySwitch:
+    ld a,PAL_REDBALL - PAL_GREENBAR
+    ld [$CF1D + 1],a
+    ld b,1
+    call GoPAL_SET
+    call GbPalComplete ; Red Ball
+    xor a
+    ld [$CF1D + 1],a
+    jp LoadPartyPokeballGfx
 
-; first byte: trainer (all trainers in this class have this move)
-; second byte: move
-; ff-terminated
-    db LORELEI,BLIZZARD
-    db BRUNO,FISSURE
-    db AGATHA,TOXIC
-    db LANCE,BARRIER
-    db $FF
-
-if _YELLOW
-; different format from above.
-
-; entry ≔ trainerclass,trainerid,moveset+,0
-; moveset ≔ partymon,partymon'smove,moveid
-
-    db BUG_CATCHER,$f
-    db 2,2,TACKLE
-    db 2,3,STRING_SHOT
-    db 0
-
-    db YOUNGSTER,$e
-    db 1,4,FISSURE
-    db 0
-
-    db BROCK,$1
-    db 2,3,BIND
-    db 2,4,BIDE
-    db 0
-
-    db MISTY,$1
-    db 2,4,BUBBLEBEAM
-    db 0
-
-    db LT__SURGE,$1
-    db 1,1,THUNDERBOLT
-    db 1,2,MEGA_PUNCH
-    db 1,3,MEGA_KICK
-    db 1,4,GROWL
-    db 0
-
-    db ERIKA,$1
-    db 1,3,MEGA_DRAIN
-    db 2,1,RAZOR_LEAF
-    db 3,1,PETAL_DANCE
-    db 0
-
-    db KOGA,$1
-    db 1,1,TOXIC
-    db 1,2,TACKLE
-    db 2,1,TOXIC
-    db 2,3,SUPERSONIC
-    db 3,1,TOXIC
-    db 3,2,DOUBLE_EDGE
-    db 4,1,LEECH_LIFE
-    db 4,2,DOUBLE_TEAM
-    db 4,3,PSYCHIC_M
-    db 4,4,TOXIC
-    db 0
-
-    db BLAINE,$1
-    db 1,1,FLAMETHROWER
-    db 1,4,CONFUSE_RAY
-    db 3,1,FLAMETHROWER
-    db 3,2,FIRE_BLAST
-    db 3,3,REFLECT
-    db 0
-
-    db SABRINA,$1
-    db 1,1,FLASH
-    db 2,1,KINESIS
-    db 2,4,PSYWAVE
-    db 3,1,PSYWAVE
-    db 0
-
-    db GIOVANNI,$3
-    db 1,3,FISSURE
-    db 2,2,DOUBLE_TEAM
-    db 3,1,EARTHQUAKE
-    db 3,3,THUNDER
-    db 4,1,EARTHQUAKE
-    db 4,2,LEER
-    db 4,3,THUNDER
-    db 5,1,ROCK_SLIDE
-    db 5,4,EARTHQUAKE
-    db 0
-
-    db LORELEI,$1
-    db 1,1,BUBBLEBEAM
-    db 2,3,ICE_BEAM
-    db 3,1,PSYCHIC_M
-    db 3,2,SURF
-    db 4,3,LOVELY_KISS
-    db 5,3,BLIZZARD
-    db 0
-
-    db BRUNO,$1
-    db 1,1,ROCK_SLIDE
-    db 1,2,SCREECH
-    db 1,4,DIG
-    db 2,3,FIRE_PUNCH
-    db 2,4,DOUBLE_TEAM
-    db 3,1,DOUBLE_KICK
-    db 3,2,MEGA_KICK
-    db 3,4,DOUBLE_TEAM
-    db 4,1,ROCK_SLIDE
-    db 4,2,SCREECH
-    db 4,4,EARTHQUAKE
-    db 5,2,KARATE_CHOP
-    db 5,3,STRENGTH
-    db 0
-
-    db AGATHA,$1
-    db 1,2,SUBSTITUTE
-    db 1,3,LICK
-    db 1,4,MEGA_DRAIN
-    db 2,2,TOXIC
-    db 2,4,LEECH_LIFE
-    db 3,2,LICK
-    db 4,1,WRAP
-    db 5,2,PSYCHIC_M
-    db 0
-
-    db LANCE,$1
-    db 1,1,DRAGON_RAGE
-    db 2,1,THUNDER_WAVE
-    db 2,3,THUNDERBOLT
-    db 3,1,BUBBLEBEAM
-    db 3,2,WRAP
-    db 3,3,ICE_BEAM
-    db 4,1,WING_ATTACK
-    db 4,2,SWIFT
-    db 4,3,FLY
-    db 5,1,BLIZZARD
-    db 5,2,FIRE_BLAST
-    db 5,3,THUNDER
-    db 0
-
-    db SONY3,$1
-    db 1,3,EARTHQUAKE
-    db 2,4,KINESIS
-    db 3,4,LEECH_SEED
-    db 4,1,ICE_BEAM
-    db 5,1,CONFUSE_RAY
-    db 5,4,FIRE_SPIN
-    db 6,3,QUICK_ATTACK
-    db 0
-
-    db SONY3,$2
-    db 1,3,EARTHQUAKE
-    db 2,4,KINESIS
-    db 3,4,LEECH_SEED
-    db 4,1,THUNDERBOLT
-    db 5,1,ICE_BEAM
-    db 6,2,REFLECT
-    db 6,3,QUICK_ATTACK
-    db 0
-
-    db SONY3,$3
-    db 1,3,EARTHQUAKE
-    db 2,4,KINESIS
-    db 3,4,LEECH_SEED
-    db 4,1,CONFUSE_RAY
-    db 4,4,FIRE_SPIN
-    db 5,1,THUNDERBOLT
-    db 6,1,AURORA_BEAM
-    db 6,3,QUICK_ATTACK
-    db 0
-
-    db $ff
-endc
+SECTION "TrainerDataPointers",ROMX[$5d3b],BANK[$e]
 
 TrainerDataPointers: ; 39d3b (e:5d3b)
     dw YoungsterData,BugCatcherData,LassData,SailorData,JrTrainerMData
@@ -57330,22 +49564,13 @@ YoungsterData: ; 39d99 (e:5d99)
     db 21,NIDORAN_M,0
     db 21,EKANS,0
     db 19,SANDSHREW,ZUBAT,0
-    db 17,RATTATA,RATTATA,RATICATE,0
+    db 20,RATTATA,RATTATA,RATICATE,0
     db 18,NIDORAN_M,NIDORINO,0
     db 17,SPEAROW,RATTATA,RATTATA,SPEAROW,0
-if _YELLOW
-    db 24,SANDSHREW,0
-endc
 BugCatcherData: ; 39dce (e:5dce)
-if _YELLOW
-    db 7,CATERPIE,CATERPIE,0
-    db 6,METAPOD,CATERPIE,METAPOD,0
-    db 10,CATERPIE,0
-else
     db 6,WEEDLE,CATERPIE,0
     db 7,WEEDLE,KAKUNA,WEEDLE,0
     db 9,WEEDLE,0
-endc
     db 10,CATERPIE,WEEDLE,CATERPIE,0
     db 9,WEEDLE,KAKUNA,CATERPIE,METAPOD,0
     db 11,CATERPIE,METAPOD,0
@@ -57354,12 +49579,9 @@ endc
     db 14,CATERPIE,WEEDLE,0
     db 16,WEEDLE,CATERPIE,WEEDLE,0
     db 20,BUTTERFREE,0
-    db 18,METAPOD,CATERPIE,VENONAT,0
+    db 18,METAPOD,KAKUNA,VENONAT,0
     db 19,BEEDRILL,BEEDRILL,0
     db 20,CATERPIE,WEEDLE,VENONAT,0
-if _YELLOW
-    db 8,CATERPIE,METAPOD,0
-endc
 LassData: ; 39e0c (e:5e0c)
     db 9,PIDGEY,PIDGEY,0
     db 10,RATTATA,NIDORAN_M,0
@@ -57372,24 +49594,13 @@ LassData: ; 39e0c (e:5e0c)
     db 15,NIDORAN_M,NIDORAN_F,0
     db 13,ODDISH,PIDGEY,ODDISH,0
     db 18,PIDGEY,NIDORAN_F,0
-if _YELLOW
-    db 20,JIGGLYPUFF,0
-else
     db 18,RATTATA,PIKACHU,0
-endc
     db 23,NIDORAN_F,NIDORINA,0
     db 24,MEOWTH,MEOWTH,MEOWTH,0
-if _YELLOW
-    db 19,PIDGEY,RATTATA,NIDORAN_F,MEOWTH,NIDORAN_M,0
-else
     db 19,PIDGEY,RATTATA,NIDORAN_M,MEOWTH,PIKACHU,0
-endc
     db 22,CLEFAIRY,CLEFAIRY,0
     db 23,BELLSPROUT,WEEPINBELL,0
     db 23,ODDISH,GLOOM,0
-if _YELLOW
-    db 6,NIDORAN_F,NIDORAN_M,0
-endc
 SailorData: ; 39e58 (e:5e58)
     db 18,MACHOP,SHELLDER,0
     db 17,MACHOP,TENTACOOL,0
@@ -57398,53 +49609,30 @@ SailorData: ; 39e58 (e:5e58)
     db 18,TENTACOOL,STARYU,0
     db 17,HORSEA,HORSEA,HORSEA,0
     db 20,MACHOP,0
-if _YELLOW
-    db 24,MAGNEMITE,0
-else
     db 21,PIKACHU,PIKACHU,0
-endc
 JrTrainerMData: ; 39e78 (e:5e78)
-if _YELLOW
-    db 9,DIGLETT,SANDSHREW,0
-else
     db 11,DIGLETT,SANDSHREW,0
-endc
     db 14,RATTATA,EKANS,0
     db 18,MANKEY,0
     db 20,SQUIRTLE,0
-    db 16,SPEAROW,RATICATE,0
+    db 20,SPEAROW,RATICATE,0
     db 18,DIGLETT,DIGLETT,SANDSHREW,0
     db 21,GROWLITHE,CHARMANDER,0
     db 19,RATTATA,DIGLETT,EKANS,SANDSHREW,0
     db 29,NIDORAN_M,NIDORINO,0
-if _YELLOW
-    db 16,WEEPINBELL,0
-endc
 JrTrainerFData: ; 39e9d (e:5e9d)
     db 19,GOLDEEN,0
-if _YELLOW
-    db 16,ODDISH,BELLSPROUT,0
-else
     db 16,RATTATA,PIKACHU,0
-endc
     db 16,PIDGEY,PIDGEY,PIDGEY,0
     db 22,BULBASAUR,0
     db 18,ODDISH,BELLSPROUT,ODDISH,BELLSPROUT,0
     db 23,MEOWTH,0
-if _YELLOW
-    db 20,JIGGLYPUFF,CLEFAIRY,0
-else
     db 20,PIKACHU,CLEFAIRY,0
-endc
     db 21,PIDGEY,PIDGEOTTO,0
     db 21,JIGGLYPUFF,PIDGEY,MEOWTH,0
     db 22,ODDISH,BULBASAUR,0
     db 24,BULBASAUR,IVYSAUR,0
-if _YELLOW
-    db 24,PIDGEY,MEOWTH,RATTATA,PIDGEY,MEOWTH,0
-else
     db 24,PIDGEY,MEOWTH,RATTATA,PIKACHU,MEOWTH,0
-endc
     db 30,POLIWAG,POLIWAG,0
     db 27,PIDGEY,MEOWTH,PIDGEY,PIDGEOTTO,0
     db 28,GOLDEEN,POLIWAG,HORSEA,0
@@ -57453,17 +49641,10 @@ endc
     db 20,MEOWTH,ODDISH,PIDGEY,0
     db 19,PIDGEY,RATTATA,RATTATA,BELLSPROUT,0
     db 28,GLOOM,ODDISH,ODDISH,0
-if _YELLOW
-    db 29,PIDGEY,PIDGEOTTO,0
-else
     db 29,PIKACHU,RAICHU,0
-endc
     db 33,CLEFAIRY,0
     db 29,BELLSPROUT,ODDISH,TANGELA,0
     db 30,TENTACOOL,HORSEA,SEEL,0
-if _YELLOW
-    db 20,CUBONE,0
-endc
 PokemaniacData: ; 39f09 (e:5f09)
     db 30,RHYHORN,LICKITUNG,0
     db 20,CUBONE,SLOWPOKE,0
@@ -57476,9 +49657,9 @@ SuperNerdData: ; 39f26 (e:5f26)
     db 11,MAGNEMITE,VOLTORB,0
     db 12,GRIMER,VOLTORB,KOFFING,0
     db 20,VOLTORB,KOFFING,VOLTORB,MAGNEMITE,0
-    db 22,GRIMER,MUK,GRIMER,0
+    db 22,GRIMER,GRIMER,GRIMER,0
     db 26,KOFFING,0
-    db 22,KOFFING,MAGNEMITE,WEEZING,0
+    db 22,KOFFING,MAGNEMITE,KOFFING,0
     db 20,MAGNEMITE,MAGNEMITE,KOFFING,MAGNEMITE,0
     db 24,MAGNEMITE,VOLTORB,0
     db 36,VULPIX,VULPIX,NINETALES,0
@@ -57493,29 +49674,29 @@ HikerData: ; 39f5e (e:5f5e)
     db 21,GEODUDE,ONIX,0
     db 20,GEODUDE,MACHOP,GEODUDE,0
     db 21,GEODUDE,ONIX,0
-    db 19,ONIX,GRAVELER,0
-    db 21,GEODUDE,GEODUDE,GRAVELER,0
+    db 25,ONIX,GRAVELER,0
+    db 25,GEODUDE,GEODUDE,GRAVELER,0
     db 25,GEODUDE,0
     db 20,MACHOP,ONIX,0
     db 19,GEODUDE,MACHOP,GEODUDE,GEODUDE,0
     db 20,ONIX,ONIX,GEODUDE,0
-    db 21,GEODUDE,GRAVELER,0
+    db 25,GEODUDE,GRAVELER,0
 BikerData: ; 39f9c (e:5f9c)
     db 28,KOFFING,KOFFING,KOFFING,0
     db 29,KOFFING,GRIMER,0
-    db 25,KOFFING,KOFFING,WEEZING,KOFFING,GRIMER,0
-    db 28,KOFFING,GRIMER,WEEZING,0
+    db 25,KOFFING,KOFFING,KOFFING,KOFFING,GRIMER,0
+    db 28,KOFFING,GRIMER,KOFFING,0
     db 29,GRIMER,KOFFING,0
-    db 33,WEEZING,0
+    db 35,WEEZING,0
     db 26,GRIMER,GRIMER,GRIMER,GRIMER,0
-    db 28,WEEZING,KOFFING,WEEZING,0
-    db 33,MUK,0
+    db 35,KOFFING,KOFFING,WEEZING,0
+    db 38,MUK,0
     db 29,VOLTORB,VOLTORB,0
-    db 29,WEEZING,MUK,0
-    db 25,KOFFING,WEEZING,KOFFING,KOFFING,WEEZING,0
+    db 38,GRIMER,MUK,0
+    db 35,KOFFING,KOFFING,KOFFING,KOFFING,WEEZING,0
     db 26,KOFFING,KOFFING,GRIMER,KOFFING,0
     db 28,GRIMER,GRIMER,KOFFING,0
-    db 29,KOFFING,MUK,0
+    db 38,KOFFING,MUK,0
 BurglarData: ; 39fe4 (e:5fe4)
     db 29,GROWLITHE,VULPIX,0
     db 33,GROWLITHE,0
@@ -57529,7 +49710,8 @@ BurglarData: ; 39fe4 (e:5fe4)
 EngineerData: ; 3a007 (e:6007)
     db 21,VOLTORB,MAGNEMITE,0
     db 21,MAGNEMITE,0
-    db 18,MAGNEMITE,MAGNEMITE,MAGNETON,0
+    db 30,MAGNETON,0
+    ds 2
 Juggler1Data: ; 3a013 (e:6013)
 ; none
 FisherData: ; 3a013 (e:6013)
@@ -57539,7 +49721,7 @@ FisherData: ; 3a013 (e:6013)
     db 24,TENTACOOL,GOLDEEN,0
     db 27,GOLDEEN,0
     db 21,POLIWAG,SHELLDER,GOLDEEN,HORSEA,0
-    db 28,SEAKING,GOLDEEN,SEAKING,SEAKING,0
+    db 33,GOLDEEN,GOLDEEN,SEAKING,SEAKING,0
     db 31,SHELLDER,CLOYSTER,0
     db 27,MAGIKARP,MAGIKARP,MAGIKARP,MAGIKARP,MAGIKARP,MAGIKARP,0
     db 33,SEAKING,GOLDEEN,0
@@ -57550,12 +49732,12 @@ SwimmerData: ; 3a049 (e:6049)
     db 29,GOLDEEN,HORSEA,STARYU,0
     db 30,POLIWAG,POLIWHIRL,0
     db 27,HORSEA,TENTACOOL,TENTACOOL,GOLDEEN,0
-    db 29,GOLDEEN,SHELLDER,SEAKING,0
+    db 33,GOLDEEN,SHELLDER,SEAKING,0
     db 30,HORSEA,HORSEA,0
-    db 27,TENTACOOL,TENTACOOL,STARYU,HORSEA,TENTACRUEL,0
+    db 30,TENTACOOL,TENTACOOL,STARYU,HORSEA,TENTACRUEL,0
     db 31,SHELLDER,CLOYSTER,0
     db 35,STARYU,0
-    db 28,HORSEA,HORSEA,SEADRA,HORSEA,0
+    db 32,HORSEA,HORSEA,SEADRA,HORSEA,0
     db 33,SEADRA,TENTACRUEL,0
     db 37,STARMIE,0
     db 33,STARYU,WARTORTLE,0
@@ -57567,7 +49749,7 @@ CueBallData: ; 3a08d (e:608d)
     db 29,MANKEY,PRIMEAPE,0
     db 29,MACHOP,MACHOKE,0
     db 33,MACHOKE,0
-    db 26,MANKEY,MANKEY,MACHOKE,MACHOP,0
+    db 28,MANKEY,MANKEY,MACHOKE,MACHOP,0
     db 29,PRIMEAPE,MACHOKE,0
     db 31,TENTACOOL,TENTACOOL,TENTACRUEL,0
 GamblerData: ; 3a0b3 (e:60b3)
@@ -57575,41 +49757,33 @@ GamblerData: ; 3a0b3 (e:60b3)
     db 18,BELLSPROUT,ODDISH,0
     db 18,VOLTORB,MAGNEMITE,0
     db 18,GROWLITHE,VULPIX,0
-    db 22,POLIWAG,POLIWAG,POLIWHIRL,0
-    db 22,ONIX,GEODUDE,GRAVELER,0
+    db 25,POLIWAG,POLIWAG,POLIWHIRL,0
+    db 25,ONIX,GEODUDE,GRAVELER,0
     db 24,GROWLITHE,VULPIX,0
 BeautyData: ; 3a0d1 (e:60d1)
     db 21,ODDISH,BELLSPROUT,ODDISH,BELLSPROUT,0
     db 24,BELLSPROUT,BELLSPROUT,0
     db 26,EXEGGCUTE,0
-if _YELLOW
-    db 27,RATTATA,VULPIX,RATTATA,0
-else
     db 27,RATTATA,PIKACHU,RATTATA,0
-endc
     db 29,CLEFAIRY,MEOWTH,0
     db 35,SEAKING,0
     db 30,SHELLDER,SHELLDER,CLOYSTER,0
-    db 31,POLIWAG,SEAKING,0
+    db 33,POLIWAG,SEAKING,0
     db 29,PIDGEOTTO,WIGGLYTUFF,0
     db 29,BULBASAUR,IVYSAUR,0
     db 33,WEEPINBELL,BELLSPROUT,WEEPINBELL,0
-    db 27,POLIWAG,GOLDEEN,SEAKING,GOLDEEN,POLIWAG,0
-    db 30,GOLDEEN,SEAKING,0
+    db 33,POLIWAG,GOLDEEN,SEAKING,GOLDEEN,POLIWAG,0
+    db 33,GOLDEEN,SEAKING,0
     db 29,STARYU,STARYU,STARYU,0
-    db 30,SEADRA,HORSEA,SEADRA,0
+    db 32,SEADRA,HORSEA,SEADRA,0
 PsychicData: ; 3a115 (e:6115)
     db 31,KADABRA,SLOWPOKE,MR_MIME,KADABRA,0
     db 34,MR_MIME,KADABRA,0
-    db 33,SLOWPOKE,SLOWPOKE,SLOWBRO,0
+    db 37,SLOWPOKE,SLOWPOKE,SLOWBRO,0
     db 38,SLOWBRO,0
 RockerData: ; 3a127 (e:6127)
-if _YELLOW
-    db 20,VOLTORB,VOLTORB,VOLTORB,0
-else
     db 20,VOLTORB,MAGNEMITE,VOLTORB,0
-endc
-    db 29,VOLTORB,ELECTRODE,0
+    db 30,VOLTORB,ELECTRODE,0
 JugglerData: ; 3a130 (e:6130)
     db 29,KADABRA,MR_MIME,0
     db 41,DROWZEE,HYPNO,KADABRA,KADABRA,0
@@ -57633,12 +49807,12 @@ BirdKeeperData: ; 3a16b (e:616b)
     db 33,FARFETCH_D,0
     db 29,SPEAROW,FEAROW,0
     db 26,PIDGEOTTO,FARFETCH_D,DODUO,PIDGEY,0
-    db 28,DODRIO,DODUO,DODUO,0
+    db 31,DODRIO,DODUO,DODUO,0
     db 29,SPEAROW,FEAROW,0
     db 34,DODRIO,0
     db 26,SPEAROW,SPEAROW,FEAROW,SPEAROW,0
     db 30,FEAROW,FEAROW,PIDGEOTTO,0
-    db 39,PIDGEOTTO,PIDGEOTTO,PIDGEY,PIDGEOTTO,0
+    db 39,PIDGEOTTO,PIDGEOTTO,PIDGEY,PIDGEOT,0
     db 42,FARFETCH_D,FEAROW,0
     db 28,PIDGEY,DODUO,PIDGEOTTO,0
     db 26,PIDGEY,SPEAROW,PIDGEY,FEAROW,0
@@ -57655,21 +49829,15 @@ BlackbeltData: ; 3a1be (e:61be)
     db 38,MACHOKE,MACHOP,MACHOKE,0
     db 43,MACHOKE,MACHOP,MACHOKE,0
 Green1Data: ; 3a1e4 (e:61e4)
-if _YELLOW
-    db 5,EEVEE,0
-    db $FF,9,SPEAROW,8,EEVEE,0
-    db $FF,18,SPEAROW,15,SANDSHREW,15,RATTATA,17,EEVEE,0
-else
     db 5,SQUIRTLE,0
     db 5,BULBASAUR,0
     db 5,CHARMANDER,0
     db $FF,9,PIDGEY,8,SQUIRTLE,0
     db $FF,9,PIDGEY,8,BULBASAUR,0
     db $FF,9,PIDGEY,8,CHARMANDER,0
-    db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,17,SQUIRTLE,0
-    db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,17,BULBASAUR,0
-    db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,17,CHARMANDER,0
-endc
+    db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,15,SQUIRTLE,0
+    db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,15,BULBASAUR,0
+    db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,15,CHARMANDER,0
 ProfOakData: ; 3a21d (e:621d)
     db $FF,66,TAUROS,67,EXEGGUTOR,68,ARCANINE,69,BLASTOISE,70,GYARADOS,0
     db $FF,66,TAUROS,67,EXEGGUTOR,68,ARCANINE,69,VENUSAUR,70,GYARADOS,0
@@ -57678,42 +49846,36 @@ ChiefData: ; 3a241 (e:6241)
 ; none
 ScientistData: ; 3a241 (e:6241)
     db 34,KOFFING,VOLTORB,0
-    db 26,GRIMER,WEEZING,KOFFING,WEEZING,0
-    db 28,MAGNEMITE,VOLTORB,MAGNETON,0
-    db 29,ELECTRODE,WEEZING,0
+    db 35,GRIMER,GRIMER,KOFFING,WEEZING,0
+    db 30,MAGNEMITE,VOLTORB,MAGNETON,0
+    db 35,ELECTRODE,WEEZING,0
     db 33,ELECTRODE,0
-    db 26,MAGNETON,KOFFING,WEEZING,MAGNEMITE,0
+    db 35,MAGNETON,KOFFING,WEEZING,MAGNEMITE,0
     db 25,VOLTORB,KOFFING,MAGNETON,MAGNEMITE,KOFFING,0
-    db 29,ELECTRODE,MUK,0
-    db 29,GRIMER,ELECTRODE,0
-    db 28,VOLTORB,KOFFING,MAGNETON,0
+    db 38,ELECTRODE,MUK,0
+    db 30,GRIMER,ELECTRODE,0
+    db 30,VOLTORB,KOFFING,MAGNETON,0
     db 29,MAGNEMITE,KOFFING,0
     db 33,MAGNEMITE,MAGNETON,VOLTORB,0
     db 34,MAGNEMITE,ELECTRODE,0
 GiovanniData: ; 3a27e (e:627e)
-;if _YELLOW
-    db $FF,25,GEODUDE,24,RHYHORN,29,PERSIAN,0
-    db $FF,37,NIDORINO,35,PERSIAN,37,RHYHORN,41,NIDOQUEEN,0
-    db $FF,53,PERSIAN,53,NIDOQUEEN,55,NIDOKING,55,RHYDON,57,GOLEM,0
-;else
-;    db $FF,25,ONIX,24,RHYHORN,29,KANGASKHAN,0
-;    db $FF,37,NIDORINO,35,KANGASKHAN,37,RHYHORN,41,NIDOQUEEN,0
-;    db $FF,45,RHYHORN,42,DUGTRIO,44,NIDOQUEEN,45,NIDOKING,50,RHYDON,0
-;endc
+    db $FF,24,GEODUDE,32,RHYHORN,33,PERSIAN,0
+    db $FF,42,NIDORINO,43,PERSIAN,44,RHYDON,45,NIDOQUEEN,0
+    db $FF,53,PERSIAN,53,NIDOQUEEN,55,NIDOKING,56,RHYDON,60,GOLEM,0
 RocketData: ; 3a29c (e:629c)
     db 13,RATTATA,ZUBAT,0
     db 11,SANDSHREW,RATTATA,ZUBAT,0
     db 12,ZUBAT,EKANS,0
-    db 16,RATICATE,0
+    db 20,RATICATE,0
     db 17,MACHOP,DROWZEE,0
     db 15,EKANS,ZUBAT,0
     db 20,RATICATE,ZUBAT,0
     db 21,DROWZEE,MACHOP,0
     db 21,RATICATE,RATICATE,0
     db 20,GRIMER,KOFFING,KOFFING,0
-    db 19,RATTATA,RATICATE,RATICATE,RATTATA,0
+    db 20,RATTATA,RATICATE,RATICATE,RATTATA,0
     db 22,GRIMER,KOFFING,0
-    db 17,ZUBAT,KOFFING,GRIMER,ZUBAT,RATICATE,0
+    db 20,ZUBAT,KOFFING,GRIMER,ZUBAT,RATICATE,0
     db 20,RATTATA,RATICATE,DROWZEE,0
     db 21,MACHOP,MACHOP,0
     db 23,SANDSHREW,EKANS,SANDSLASH,0
@@ -57736,23 +49898,12 @@ RocketData: ; 3a29c (e:629c)
     db 29,CUBONE,CUBONE,0
     db 29,SANDSHREW,SANDSLASH,0
     db 26,RATICATE,ZUBAT,GOLBAT,RATTATA,0
-    db 28,WEEZING,GOLBAT,KOFFING,0
+    db 35,WEEZING,GOLBAT,KOFFING,0
     db 28,DROWZEE,GRIMER,MACHOP,0
     db 28,GOLBAT,DROWZEE,HYPNO,0
     db 33,MACHOKE,0
     db 25,RATTATA,RATTATA,ZUBAT,RATTATA,EKANS,0
     db 32,CUBONE,DROWZEE,MAROWAK,0
-if _YELLOW
-JessieJamesData:
-    db 14,EKANS,MEOWTH,KOFFING,0
-    db 25,KOFFING,MEOWTH,EKANS,0
-    db 27,MEOWTH,ARBOK,WEEZING,0
-    db 31,WEEZING,ARBOK,MEOWTH,0
-    db 16,KOFFING,0
-    db 27,KOFFING,0
-    db 29,WEEZING,0
-    db 33,WEEZING,0
-endc
 CooltrainerMData: ; 3a35a (e:635a)
     db 39,NIDORINO,NIDOKING,0
     db 43,EXEGGUTOR,CLOYSTER,ARCANINE,0
@@ -57776,96 +49927,46 @@ CooltrainerFData: ; 3a385 (e:6385)
 BrunoData: ; 3a3a9 (e:63a9)
     db $FF,53,ONIX,55,HITMONCHAN,55,HITMONLEE,56,ONIX,58,MACHAMP,0
 BrockData: ; 3a3b5 (e:63b5)
-if _YELLOW
-    db $FF,10,GEODUDE,12,ONIX,0
-else
     db $FF,12,GEODUDE,14,ONIX,0
-endc
 MistyData: ; 3a3bb (e:63bb)
     db $FF,18,STARYU,21,STARMIE,0
 LtSurgeData: ; 3a3c1 (e:63c1)
-;if _YELLOW
     db $FF,28,RAICHU,0
-;else
-;    db $FF,21,VOLTORB,18,PIKACHU,24,RAICHU,0
-;endc
     ds 4
 ErikaData: ; 3a3c9 (e:63c9)
-;if _YELLOW
-    db $FF,30,TANGELA,32,WEEPINBELL,38,GLOOM,0
-;else
-;    db $FF,29,VICTREEBEL,24,TANGELA,29,VILEPLUME,0
-;endc
+    db $FF,30,TANGELA,34,WEEPINBELL,38,GLOOM,0
 KogaData: ; 3a3d1 (e:63d1)
-;if _YELLOW
-;    db $FF,44,VENONAT,46,VENONAT,48,VENONAT,50,VENOMOTH,0
-;else
-;    db $FF,37,KOFFING,39,MUK,37,KOFFING,43,WEEZING,0
-;endc
     db $FF,48,VENOMOTH,52,GOLBAT,0
     ds 4
 BlaineData: ; 3a3db (e:63db)
-;if _YELLOW
-;    db $FF,48,NINETALES,50,RAPIDASH,54,ARCANINE,0
-;else
-;    db $FF,42,GROWLITHE,40,PONYTA,42,RAPIDASH,47,ARCANINE,0
-;endc
     db $FF,48,NINETALES,47,RHYDON,55,MAGMAR,0
     ds 2
 SabrinaData: ; 3a3e5 (e:63e5)
-;if _YELLOW
-;    db $FF,50,ABRA,50,KADABRA,50,ALAKAZAM,0
-;else
-;    db $FF,38,KADABRA,37,MR_MIME,38,VENOMOTH,43,ALAKAZAM,0
-;endc
     db $FF,48,HAUNTER,52,KADABRA,0
     ds 4
 GentlemanData: ; 3a3ef (e:63ef)
     db 18,GROWLITHE,GROWLITHE,0
     db 19,NIDORAN_M,NIDORAN_F,0
-if _YELLOW
-    db 22,VOLTORB,MAGNEMITE,0
-else
     db 23,PIKACHU,0
-endc
     db 48,PRIMEAPE,0
     db 17,GROWLITHE,PONYTA,0
 Green2Data: ; 3a401 (e:6401)
-if _YELLOW
-    db $FF,19,SPEAROW,16,RATTATA,18,SANDSHREW,20,EEVEE,0
-    db $FF,25,FEAROW,23,SHELLDER,22,VULPIX,20,SANDSHREW,25,EEVEE,0
-    db $FF,25,FEAROW,23,MAGNEMITE,22,SHELLDER,20,SANDSHREW,25,EEVEE,0
-    db $FF,25,FEAROW,23,VULPIX,22,MAGNEMITE,20,SANDSHREW,25,EEVEE,0
-    db $FF,38,SANDSLASH,35,NINETALES,37,CLOYSTER,35,KADABRA,40,JOLTEON,0
-    db $FF,38,SANDSLASH,35,CLOYSTER,37,MAGNETON,35,KADABRA,40,FLAREON,0
-    db $FF,38,SANDSLASH,35,MAGNETON,37,NINETALES,35,KADABRA,40,VAPOREON,0
-    db $FF,47,SANDSLASH,45,EXEGGCUTE,45,NINETALES,47,CLOYSTER,50,KADABRA,53,JOLTEON,0
-    db $FF,47,SANDSLASH,45,EXEGGCUTE,45,CLOYSTER,47,MAGNETON,50,KADABRA,53,FLAREON,0
-    db $FF,47,SANDSLASH,45,EXEGGCUTE,45,MAGNETON,47,NINETALES,50,KADABRA,53,VAPOREON,0
-else
-    db $FF,19,PIDGEOTTO,16,RATICATE,18,KADABRA,20,WARTORTLE,0
-    db $FF,19,PIDGEOTTO,16,RATICATE,18,KADABRA,20,IVYSAUR,0
-    db $FF,19,PIDGEOTTO,16,RATICATE,18,KADABRA,20,CHARMELEON,0
-    db $FF,25,PIDGEOTTO,23,GROWLITHE,22,EXEGGCUTE,20,KADABRA,25,WARTORTLE,0
-    db $FF,25,PIDGEOTTO,23,GYARADOS,22,GROWLITHE,20,KADABRA,25,IVYSAUR,0
-    db $FF,25,PIDGEOTTO,23,EXEGGCUTE,22,GYARADOS,20,KADABRA,25,CHARMELEON,0
-    db $FF,37,PIDGEOT,38,GROWLITHE,35,EXEGGCUTE,35,ALAKAZAM,40,BLASTOISE,0
-    db $FF,37,PIDGEOT,38,GYARADOS,35,GROWLITHE,35,ALAKAZAM,40,VENUSAUR,0
-    db $FF,37,PIDGEOT,38,EXEGGCUTE,35,GYARADOS,35,ALAKAZAM,40,CHARIZARD,0
-    db $FF,47,PIDGEOT,45,RHYHORN,45,GROWLITHE,47,EXEGGCUTE,50,ALAKAZAM,53,BLASTOISE,0
-    db $FF,47,PIDGEOT,45,RHYHORN,45,GYARADOS,47,GROWLITHE,50,ALAKAZAM,53,VENUSAUR,0
-    db $FF,47,PIDGEOT,45,RHYHORN,45,EXEGGCUTE,47,GYARADOS,50,ALAKAZAM,53,CHARIZARD,0
-endc
+    db $FF,19,PIDGEOTTO,20,RATICATE,18,KADABRA,20,WARTORTLE,0
+    db $FF,19,PIDGEOTTO,20,RATICATE,18,KADABRA,20,IVYSAUR,0
+    db $FF,19,PIDGEOTTO,20,RATICATE,18,KADABRA,20,CHARMELEON,0
+    db $FF,26,PIDGEOTTO,23,GROWLITHE,22,EXEGGCUTE,23,KADABRA,26,WARTORTLE,0
+    db $FF,26,PIDGEOTTO,23,GYARADOS,22,GROWLITHE,23,KADABRA,26,IVYSAUR,0
+    db $FF,26,PIDGEOTTO,23,EXEGGCUTE,22,GYARADOS,23,KADABRA,26,CHARMELEON,0
+    db $FF,37,PIDGEOT,38,ARCANINE,35,EXEGGUTOR,35,ALAKAZAM,40,BLASTOISE,0
+    db $FF,37,PIDGEOT,38,GYARADOS,35,ARCANINE,35,ALAKAZAM,40,VENUSAUR,0
+    db $FF,37,PIDGEOT,38,EXEGGUTOR,35,GYARADOS,35,ALAKAZAM,40,CHARIZARD,0
+    db $FF,47,PIDGEOT,45,RHYDON,45,ARCANINE,47,EXEGGUTOR,50,ALAKAZAM,53,BLASTOISE,0
+    db $FF,47,PIDGEOT,45,RHYDON,45,GYARADOS,47,ARCANINE,50,ALAKAZAM,53,VENUSAUR,0
+    db $FF,47,PIDGEOT,45,RHYDON,45,EXEGGUTOR,47,GYARADOS,50,ALAKAZAM,53,CHARIZARD,0
 Green3Data: ; 3a491 (e:6491)
-if _YELLOW
-    db $FF,61,SANDSLASH,59,ALAKAZAM,61,EXEGGUTOR,61,CLOYSTER,63,NINETALES,65,JOLTEON,0
-    db $FF,61,SANDSLASH,59,ALAKAZAM,61,EXEGGUTOR,61,MAGNETON,63,CLOYSTER,65,FLAREON,0
-    db $FF,61,SANDSLASH,59,ALAKAZAM,61,EXEGGUTOR,61,NINETALES,63,MAGNETON,65,VAPOREON,0
-else
     db $FF,61,PIDGEOT,59,ALAKAZAM,61,RHYDON,61,ARCANINE,63,EXEGGUTOR,65,BLASTOISE,0
     db $FF,61,PIDGEOT,59,ALAKAZAM,61,RHYDON,61,GYARADOS,63,ARCANINE,65,VENUSAUR,0
     db $FF,61,PIDGEOT,59,ALAKAZAM,61,RHYDON,61,EXEGGUTOR,63,GYARADOS,65,CHARIZARD,0
-endc
 LoreleiData: ; 3a4bb (e:64bb)
     db $FF,54,DEWGONG,53,CLOYSTER,54,SLOWBRO,56,JYNX,56,LAPRAS,0
 ChannelerData: ; 3a4c7 (e:64c7)
@@ -57875,18 +49976,18 @@ ChannelerData: ; 3a4c7 (e:64c7)
     db 24,GASTLY,0
     db 23,GASTLY,0
     db 24,GASTLY,0
-    db 24,HAUNTER,0
+    db 25,HAUNTER,0
     db 22,GASTLY,0
     db 24,GASTLY,0
     db 23,GASTLY,GASTLY,0
     db 24,GASTLY,0
     db 22,GASTLY,0
     db 24,GASTLY,0
-    db 23,HAUNTER,0
+    db 25,HAUNTER,0
     db 24,GASTLY,0
     db 22,GASTLY,0
     db 24,GASTLY,0
-    db 22,HAUNTER,0
+    db 25,HAUNTER,0
     db 22,GASTLY,GASTLY,GASTLY,0
     db 24,GASTLY,0
     db 24,GASTLY,0
@@ -58044,6 +50145,12 @@ KogaAI: ; 3a634 (e:6634)
     jp AIUseXAttack
 
 BlaineAI_Old:
+
+SetAttributeOamRedBall:
+    ld [hli],a
+    ld a,3
+    ld [hli],a
+    ret
 
 SECTION "SabrinaAI",ROMX[$6640],BANK[$e]
 
@@ -58593,17 +50700,73 @@ Func_3a948: ; 3a948 (e:6948)
     ld hl,$c318
     jp Func_3a8e1
 
-; four tiles: pokeball,black pokeball (status ailment),crossed out pokeball (faited) and pokeball slot (no mon)
-PokeballTileGraphics: ; 3a97e (e:697e)
-    INCBIN "gfx/pokeball.2bpp"
+LearnMoveFromLevelUp:
+    ld a,[$d11e]
+    ld [$cf91],a
+    cp a,MEW
+    jr z,.mew
+    dec a
+    ld bc,$0
+    ld hl,EvosMovesPointerTable
+    add a
+    rl b
+    ld c,a
+    add hl,bc
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+.skipEvolutionDataLoop
+    ld a,[hli]
+    and a
+    jr nz,.skipEvolutionDataLoop
+.learnSetLoop
+    ld a,[hli]
+    and a
+    jr z,.done
+    ld b,a
+    ld a,[W_CURENEMYLVL] ; $d127
+    cp b
+    ld a,[hli]
+    jr nz,.learnSetLoop
+.learnmove
+    ld d,a
+    ld a,[$cc49]
+    and a
+    jr nz,.next
+    ld hl,W_PARTYMON1_MOVE1 ; $d173
+    ld a,[wWhichPokemon] ; $cf92
+    ld bc,$2c
+    call AddNTimes
+.next
+    ld b,$4
+.checkCurrentMovesLoop
+    ld a,[hli]
+    cp d
+    jr z,.done
+    dec b
+    jr nz,.checkCurrentMovesLoop
+    ld a,d
+    ld [$d0e0],a
+    ld [$d11e],a
+    call GetMoveName
+    call CopyStringToCF4B
+    ld a,$1b
+    call Predef ; indirect jump to Func_6e43 (6e43 (1:6e43))
+.done
+    ld a,[$cf91]
+    ld [$d11e],a
+    ret
+.mew
+    call GenRandom
+    cp STRUGGLE ; C - Set for no borrow. (Set if A < n.)
+    jr c,.learnmove
+    jr .done
 
-; tiles for gameboy and link cable graphics used for trading sequence animation
-TradingAnimationGraphics: ; 3a9be (e:69be)
-    INCBIN "gfx/trade.2bpp"
+SpecialTrainerMoves:
 
-; 4 tiles for actual wire transfer animation (pokeball wandering inside wire)
-TradingAnimationGraphics2: ; 3acce (e:6cce)
-    INCBIN "gfx/trade2.2bpp"
+INCLUDE "constants/special_trainer.asm"
+
+SECTION "Func_3ad0e",ROMX[$6d0e],BANK[$e]
 
 Func_3ad0e: ; 3ad0e (e:6d0e)
     ld hl,$ccd3
@@ -58626,7 +50789,8 @@ Func_3ad1c: ; 3ad1c (e:6d1c)
     push de
     ld hl,W_NUMINPARTY ; $d163
     push hl
-asm_3ad2e: ; 3ad2e (e:6d2e)
+
+Evolution_PartyMonLoop: ; 3ad2e (e:6d2e)
     ld hl,wWhichPokemon ; $cf92
     inc [hl]
     pop hl
@@ -58643,7 +50807,7 @@ asm_3ad2e: ; 3ad2e (e:6d2e)
     call Func_3b057
     ld a,c
     and a
-    jp z,asm_3ad2e
+    jp z,Evolution_PartyMonLoop
     ld a,[$cee9]
     dec a
     ld b,$0
@@ -58668,19 +50832,19 @@ asm_3ad2e: ; 3ad2e (e:6d2e)
 TryEvolution: ; 3ad71 (e:6d71)
     ld a,[hli]
     and a
-    jr z,asm_3ad2e
+    jr z,Evolution_PartyMonLoop
     ld b,a
     cp $3
     jr z,.asm_3ad91
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $32
-    jr z,asm_3ad2e
+    jr z,Evolution_PartyMonLoop
     ld a,b
     cp $2
     jr z,.asm_3ada4
     ld a,[$ccd4]
     and a
-    jr nz,asm_3ad2e
+    jr nz,Evolution_PartyMonLoop
     ld a,b
     cp $1
     jr z,.asm_3adad
@@ -58692,7 +50856,7 @@ TryEvolution: ; 3ad71 (e:6d71)
     ld b,a
     ld a,[$cfb9]
     cp b
-    jp c,asm_3ad2e
+    jp c,Evolution_PartyMonLoop
     jr .asm_3adb6
 .asm_3ada4
     ld a,[hli]
@@ -58812,7 +50976,7 @@ TryEvolution: ; 3ad71 (e:6d71)
     ld [$d11e],a
     xor a
     ld [$cc49],a
-    call Func_3af5b
+    call CheckEvolutionMove ; call LearnMoveFromLevelUp
     pop hl
     ld a,$42
     call Predef ; indirect jump to SetPartyMonTypes (5db5e (17:5b5e))
@@ -58898,7 +51062,7 @@ Func_3af2e: ; 3af2e (e:6f2e)
     call ClearScreen
     pop hl
     call Func_3af52
-    jp asm_3ad2e
+    jp Evolution_PartyMonLoop
 
 UnnamedText_3af3e: ; 3af3e (e:6f3e)
     TX_FAR _UnnamedText_3af3e
@@ -58922,60 +51086,7 @@ Func_3af52: ; 3af52 (e:6f52)
     ret z
     jp ReloadTilesetTilePatterns
 
-Func_3af5b: ; 3af5b (e:6f5b)
-    ld hl,EvosMovesPointerTable
-    ld a,[$d11e]
-    ld [$cf91],a
-    dec a
-    ld bc,$0
-    ld hl,EvosMovesPointerTable
-    add a
-    rl b
-    ld c,a
-    add hl,bc
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-.asm_3af73
-    ld a,[hli]
-    and a
-    jr nz,.asm_3af73
-.asm_3af77
-    ld a,[hli]
-    and a
-    jr z,.asm_3afb1
-    ld b,a
-    ld a,[W_CURENEMYLVL] ; $d127
-    cp b
-    ld a,[hli]
-    jr nz,.asm_3af77
-    ld d,a
-    ld a,[$cc49]
-    and a
-    jr nz,.asm_3af96
-    ld hl,W_PARTYMON1_MOVE1 ; $d173
-    ld a,[wWhichPokemon] ; $cf92
-    ld bc,$2c
-    call AddNTimes
-.asm_3af96
-    ld b,$4
-.asm_3af98
-    ld a,[hli]
-    cp d
-    jr z,.asm_3afb1
-    dec b
-    jr nz,.asm_3af98
-    ld a,d
-    ld [$d0e0],a
-    ld [$d11e],a
-    call GetMoveName
-    call CopyStringToCF4B
-    ld a,$1b
-    call Predef ; indirect jump to Func_6e43 (6e43 (1:6e43))
-.asm_3afb1
-    ld a,[$cf91]
-    ld [$d11e],a
-    ret
+SECTION "WriteMonMoves",ROMX[$6fb8],BANK[$e]
 
 ; writes the moves a mon has at level [W_CURENEMYLVL] to [de]
 ; move slots are being filled up sequentially and shifted if all slots are full
@@ -59293,1921 +51404,128 @@ EvosMovesPointerTable: ; 3b05c (e:705c)
     dw Mon070_EvosMoves
     dw Mon071_EvosMoves
 
-MissingNo_EvosMoves: ; 3b1d8 (e:71d8)
-;MISSINGNO
-;Evolutions
-    db 0
-;Learnset
-    db 0
+Func_3b9ec: ; Moved Upper in the Bank
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    ld de,W_PLAYERMONCURHP ; $d015
+    ld hl,W_PLAYERMONMAXHP ; $d023
+    ld a,[W_PLAYERMOVENUM] ; $cfd2
+    jr z,.asm_3ba03
+    ld de,W_ENEMYMONCURHP ; $cfe6
+    ld hl,W_ENEMYMONMAXHP ; $cff4
+    ld a,[W_ENEMYMOVENUM] ; $cfcc
+.asm_3ba03
+    ld b,a
+    ld a,[de]
+    cp [hl]
+    inc de
+    inc hl
+    ld a,[de]
+    sbc [hl]
+    jp z,Func_3ba97
+    ld a,b
+    cp $9c
+    jr nz,.asm_3ba37
+    push hl
+    push de
+    push af
+    ld c,$32
+    call DelayFrames
+    ld hl,W_PLAYERMONSTATUS ; $d018
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr z,.asm_3ba25
+    ld hl,W_ENEMYMONSTATUS ; $cfe9
+.asm_3ba25
+    ld a,[hl]
+    and a
+    ld [hl],$2
+    ld hl,UnnamedText_3baa2 ; $7aa2
+    jr z,.asm_3ba31
+    ld hl,UnnamedText_3baa7 ; $7aa7
+.asm_3ba31
+    call PrintText
+    pop af
+    pop de
+    pop hl
+.asm_3ba37
+    ld a,[hld]
+    ld [wHPBarMaxHP],a
+    ld c,a
+    ld a,[hl]
+    ld [wHPBarMaxHP+1],a
+    ld b,a
+    jr z,.asm_3ba47
+    srl b
+    rr c
+.asm_3ba47
+    ld a,[de]
+    ld [wHPBarOldHP],a
+    add c
+    ld [de],a
+    ld [wHPBarNewHP],a
+    dec de
+    ld a,[de]
+    ld [wHPBarOldHP+1],a
+    adc b
+    ld [de],a
+    ld [wHPBarNewHP+1],a
+    inc hl
+    inc de
+    ld a,[de]
+    dec de
+    sub [hl]
+    dec hl
+    ld a,[de]
+    sbc [hl]
+    jr c,.asm_3ba6f
+    ld a,[hli]
+    ld [de],a
+    ld [wHPBarNewHP+1],a
+    inc de
+    ld a,[hl]
+    ld [de],a
+    ld [wHPBarNewHP],a
+.asm_3ba6f
+    ld hl,Func_3fba8 ; $7ba8
+    call BankswitchEtoF
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    FuncCoord 10,9 ; $c45e
+    ld hl,Coord
+    ld a,$1
+    jr z,.asm_3ba83
+    FuncCoord 2,2 ; $c3ca
+    ld hl,Coord
+    xor a
+.asm_3ba83
+    ld [wListMenuID],a ; $cf94
+    ld a,$48
+    call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
+    ld hl,Func_3cd5a ; $4d5a
+    call BankswitchEtoF
+    ld hl,UnnamedText_3baac ; $7aac
+    jp PrintText
 
-Mon112_EvosMoves:
-;RHYDON
-;Evolutions
-    db 0
-;Learnset
-    db 30,STOMP
-    db 35,TAIL_WHIP
-    db 40,FURY_ATTACK
-    db 48,HORN_DRILL
-    db 55,LEER
-    db 64,TAKE_DOWN
-    db 0
-
-Mon115_EvosMoves:
-;KANGASKHAN
-;Evolutions
-    db 0
-;Learnset
-    db 26,BITE
-    db 31,TAIL_WHIP
-    db 36,MEGA_PUNCH
-    db 41,LEER
-    db 46,DIZZY_PUNCH
-    db 0
-
-Mon032_EvosMoves:
-;NIDORAN_M
-;Evolutions
-    db EV_LEVEL,16,NIDORINO
-    db 0
-;Learnset
-    db 8,HORN_ATTACK
-    db 12,DOUBLE_KICK
-    db 17,POISON_STING
-    db 23,FOCUS_ENERGY
-    db 30,FURY_ATTACK
-    db 38,HORN_DRILL
-    db 0
-
-Mon033_EvosMoves:
-;NIDORINO
-;Evolutions
-    db EV_ITEM,MOON_STONE,1,NIDOKING
-    db 0
-;Learnset
-    db 8,HORN_ATTACK
-    db 12,DOUBLE_KICK
-    db 19,POISON_STING
-    db 27,FOCUS_ENERGY
-    db 36,FURY_ATTACK
-    db 46,HORN_DRILL
-    db 0
-
-Mon034_EvosMoves:
-;NIDOKING
-;Evolutions
-    db 0
-;Learnset
-    db 8,HORN_ATTACK
-    db 12,DOUBLE_KICK
-    db 23,THRASH
-    db 0
-
-Mon029_EvosMoves:
-;NIDORAN_F
-;Evolutions
-    db EV_LEVEL,16,NIDORINA
-    db 0
-;Learnset
-    db 8,SCRATCH
-    db 12,DOUBLE_KICK
-    db 17,POISON_STING
-    db 23,TAIL_WHIP
-    db 30,BITE
-    db 38,FURY_SWIPES
-    db 0
-
-Mon030_EvosMoves:
-;NIDORINA
-;Evolutions
-    db EV_ITEM,MOON_STONE,1,NIDOQUEEN
-    db 0
-;Learnset
-    db 8,SCRATCH
-    db 12,DOUBLE_KICK
-    db 19,POISON_STING
-    db 27,TAIL_WHIP
-    db 36,BITE
-    db 46,FURY_SWIPES
-    db 0
-
-Mon031_EvosMoves:
-;NIDOQUEEN
-;Evolutions
-    db 0
-;Learnset
-    db 8,SCRATCH
-    db 12,DOUBLE_KICK
-    db 23,BODY_SLAM
-    db 0
-
-Mon035_EvosMoves:
-;CLEFAIRY
-;Evolutions
-    db EV_ITEM,MOON_STONE,1,CLEFABLE
-    db 0
-;Learnset
-    db 13,SING
-    db 18,DOUBLESLAP
-    db 24,MINIMIZE
-    db 31,METRONOME
-    db 39,DEFENSE_CURL
-    db 48,LIGHT_SCREEN
-    db 0
-
-Mon021_EvosMoves:
-;SPEAROW
-;Evolutions
-    db EV_LEVEL,20,FEAROW
-    db 0
-;Learnset
-    db 9,LEER
-    db 15,FURY_ATTACK
-    db 22,MIRROR_MOVE
-    db 29,DRILL_PECK
-    db 36,AGILITY
-    db 0
-
-Mon100_EvosMoves:
-;VOLTORB
-;Evolutions
-    db EV_LEVEL,30,ELECTRODE
-    db 0
-;Learnset
-    db 17,SONICBOOM
-    db 22,SELFDESTRUCT
-    db 29,LIGHT_SCREEN
-    db 36,SWIFT
-    db 43,EXPLOSION
-    db 0
-
-Mon080_EvosMoves:
-;SLOWBRO
-;Evolutions
-    db 0
-;Learnset
-    db 18,DISABLE
-    db 22,HEADBUTT
-    db 27,GROWL
-    db 33,WATER_GUN
-    db 37,WITHDRAW
-    db 44,AMNESIA
-    db 55,PSYCHIC_M
-    db 0
-
-Mon002_EvosMoves:
-;IVYSAUR
-;Evolutions
-    db EV_LEVEL,32,VENUSAUR
-    db 0
-;Learnset
-    db 7,LEECH_SEED
-    db 13,VINE_WHIP
-    db 22,POISONPOWDER
-    db 30,RAZOR_LEAF
-    db 38,GROWTH
-    db 46,SLEEP_POWDER
-    db 54,SOLARBEAM
-    db 0
-
-Mon103_EvosMoves:
-;EXEGGUTOR
-;Evolutions
-    db 0
-;Learnset
-    db 28,STOMP
-    db 0
-
-Mon108_EvosMoves:
-;LICKITUNG
-;Evolutions
-    db 0
-;Learnset
-    db 7,STOMP
-    db 15,DISABLE
-    db 23,DEFENSE_CURL
-    db 31,SLAM
-    db 39,SCREECH
-    db 0
-
-Mon102_EvosMoves:
-;EXEGGCUTE
-;Evolutions
-    db EV_ITEM,LEAF_STONE ,1,EXEGGUTOR
-    db 0
-;Learnset
-    db 25,REFLECT
-    db 28,LEECH_SEED
-    db 32,STUN_SPORE
-    db 37,POISONPOWDER
-    db 42,SOLARBEAM
-    db 48,SLEEP_POWDER
-    db 0
-
-Mon088_EvosMoves:
-;GRIMER
-;Evolutions
-    db EV_LEVEL,38,MUK
-    db 0
-;Learnset
-    db 30,POISON_GAS
-    db 33,MINIMIZE
-    db 37,SLUDGE
-    db 42,HARDEN
-    db 48,SCREECH
-    db 55,ACID_ARMOR
-    db 0
-
-Mon094_EvosMoves:
-;GENGAR
-;Evolutions
-    db 0
-;Learnset
-    db 29,HYPNOSIS
-    db 38,DREAM_EATER
-    db 0
-
-Mon104_EvosMoves:
-;CUBONE
-;Evolutions
-    db EV_LEVEL,28,MAROWAK
-    db 0
-;Learnset
-    db 13,TAIL_WHIP
-    db 18,HEADBUTT
-    db 25,LEER
-    db 31,FOCUS_ENERGY
-    db 38,THRASH
-    db 43,BONEMERANG
-    db 46,RAGE
-    db 0
-
-Mon105_EvosMoves:
-;MAROWAK
-;Evolutions
-    db 0
-;Learnset
-    db 13,TAIL_WHIP
-    db 18,HEADBUTT
-    db 25,LEER
-    db 33,FOCUS_ENERGY
-    db 41,THRASH
-    db 48,BONEMERANG
-    db 55,RAGE
-    db 0
-
-Mon111_EvosMoves:
-;RHYHORN
-;Evolutions
-    db EV_LEVEL,42,RHYDON
-    db 0
-;Learnset
-    db 30,STOMP
-    db 35,TAIL_WHIP
-    db 40,FURY_ATTACK
-    db 45,HORN_DRILL
-    db 50,LEER
-    db 55,TAKE_DOWN
-    db 0
-
-Mon131_EvosMoves:
-;LAPRAS
-;Evolutions
-    db 0
-;Learnset
-    db 16,SING
-    db 20,MIST
-    db 25,BODY_SLAM
-    db 31,CONFUSE_RAY
-    db 38,ICE_BEAM
-    db 46,HYDRO_PUMP
-    db 0
-
-Mon059_EvosMoves:
-;ARCANINE
-;Evolutions
-    db 0
-;Learnset
-    db 0
-
-Mon151_EvosMoves:
-;MEW
-;Evolutions
-    db 0
-;Learnset
-    db 10,TRANSFORM
-    db 20,MEGA_PUNCH
-    db 30,METRONOME
-    db 40,PSYCHIC_M
-    db 0
-
-Mon130_EvosMoves:
-;GYARADOS
-;Evolutions
-    db 0
-;Learnset
-    db 20,BITE
-    db 25,DRAGON_RAGE
-    db 32,LEER
-    db 41,HYDRO_PUMP
-    db 52,HYPER_BEAM
-    db 0
-
-Mon090_EvosMoves:
-;SHELLDER
-;Evolutions
-    db EV_ITEM,WATER_STONE ,1,CLOYSTER
-    db 0
-;Learnset
-    db 18,SUPERSONIC
-    db 23,CLAMP
-    db 30,AURORA_BEAM
-    db 39,LEER
-    db 50,ICE_BEAM
-    db 0
-
-Mon072_EvosMoves:
-;TENTACOOL
-;Evolutions
-    db EV_LEVEL,30,TENTACRUEL
-    db 0
-;Learnset
-    db 7,SUPERSONIC
-    db 13,WRAP
-    db 18,POISON_STING
-    db 22,WATER_GUN
-    db 27,CONSTRICT
-    db 33,BARRIER
-    db 40,SCREECH
-    db 48,HYDRO_PUMP
-    db 0
-
-Mon092_EvosMoves:
-;GASTLY
-;Evolutions
-    db EV_LEVEL,25,HAUNTER
-    db 0
-;Learnset
-    db 27,HYPNOSIS
-    db 35,DREAM_EATER
-    db 0
-
-Mon123_EvosMoves:
-;SCYTHER
-;Evolutions
-    db 0
-;Learnset
-    db 17,LEER
-    db 20,FOCUS_ENERGY
-    db 24,DOUBLE_TEAM
-    db 29,SLASH
-    db 35,SWORDS_DANCE
-    db 42,AGILITY
-    db 50,WING_ATTACK
-    db 0
-
-Mon120_EvosMoves:
-;STARYU
-;Evolutions
-    db EV_ITEM,WATER_STONE ,1,STARMIE
-    db 0
-;Learnset
-    db 17,WATER_GUN
-    db 22,HARDEN
-    db 27,RECOVER
-    db 32,SWIFT
-    db 37,MINIMIZE
-    db 42,LIGHT_SCREEN
-    db 47,HYDRO_PUMP
-    db 0
-
-Mon009_EvosMoves:
-;BLASTOISE
-;Evolutions
-    db 0
-;Learnset
-    db 8,BUBBLE
-    db 15,WATER_GUN
-    db 24,BITE
-    db 31,WITHDRAW
-    db 42,SKULL_BASH
-    db 52,HYDRO_PUMP
-    db 0
-
-Mon127_EvosMoves:
-;PINSIR
-;Evolutions
-    db 0
-;Learnset
-    db 21,BIND
-    db 25,SEISMIC_TOSS
-    db 30,GUILLOTINE
-    db 36,FOCUS_ENERGY
-    db 43,HARDEN
-    db 49,SLASH
-    db 54,SWORDS_DANCE
-    db 0
-
-Mon114_EvosMoves:
-;TANGELA
-;Evolutions
-    db 0
-;Learnset
-    db 24,BIND
-    db 27,ABSORB
-    db 29,VINE_WHIP
-    db 32,POISONPOWDER
-    db 36,STUN_SPORE
-    db 39,SLEEP_POWDER
-    db 45,SLAM
-    db 48,GROWTH
-    db 0
-
-Mon058_EvosMoves:
-;GROWLITHE
-;Evolutions
-    db EV_ITEM,FIRE_STONE,1,ARCANINE
-    db 0
-;Learnset
-    db 18,EMBER
-    db 23,LEER
-    db 30,TAKE_DOWN
-    db 39,AGILITY
-    db 50,FLAMETHROWER
-    db 0
-
-Mon095_EvosMoves:
-;ONIX
-;Evolutions
-    db 0
-;Learnset
-    db 15,BIND
-    db 19,ROCK_THROW
-    db 25,RAGE
-    db 33,SLAM
-    db 43,HARDEN
-    db 0
-
-Mon022_EvosMoves:
-;FEAROW
-;Evolutions
-    db 0
-;Learnset
-    db 9,LEER
-    db 15,FURY_ATTACK
-    db 25,MIRROR_MOVE
-    db 34,DRILL_PECK
-    db 43,AGILITY
-    db 0
-
-Mon016_EvosMoves:
-;PIDGEY
-;Evolutions
-    db EV_LEVEL,18,PIDGEOTTO
-    db 0
-;Learnset
-    db 5,SAND_ATTACK
-    db 12,QUICK_ATTACK
-    db 19,WHIRLWIND
-    db 28,WING_ATTACK
-    db 36,AGILITY
-    db 44,MIRROR_MOVE
-    db 0
-
-Mon079_EvosMoves:
-;SLOWPOKE
-;Evolutions
-    db EV_LEVEL,37,SLOWBRO
-    db 0
-;Learnset
-    db 18,DISABLE
-    db 22,HEADBUTT
-    db 27,GROWL
-    db 33,WATER_GUN
-    db 40,AMNESIA
-    db 48,PSYCHIC_M
-    db 0
-
-Mon075_EvosMoves:
-;GRAVELER
-;Evolutions
-    db EV_TRADE,1,GOLEM
-    db 0
-;Learnset
-    db 11,DEFENSE_CURL
-    db 16,ROCK_THROW
-    db 21,SELFDESTRUCT
-    db 29,HARDEN
-    db 36,EARTHQUAKE
-    db 43,EXPLOSION
-    db 51,ROCK_SLIDE
-    db 0
-
-Mon076_EvosMoves:
-;GOLEM
-;Evolutions
-    db 0
-;Learnset
-    db 11,DEFENSE_CURL
-    db 16,ROCK_THROW
-    db 21,SELFDESTRUCT
-    db 29,HARDEN
-    db 36,EARTHQUAKE
-    db 43,EXPLOSION ; Penultimate Move that is Replaced with Fissure in Giovanni's Team
-    db 51,ROCK_SLIDE
-    db 0
-
-Mon113_EvosMoves:
-;CHANSEY
-;Evolutions
-    db 0
-;Learnset
-    db 24,SING
-    db 30,GROWL
-    db 38,MINIMIZE
-    db 44,DEFENSE_CURL
-    db 48,LIGHT_SCREEN
-    db 54,DOUBLE_EDGE
-    db 0
-
-Mon067_EvosMoves:
-;MACHOKE
-;Evolutions
-    db EV_TRADE,1,MACHAMP
-    db 0
-;Learnset
-    db 20,LOW_KICK
-    db 25,LEER
-    db 36,FOCUS_ENERGY
-    db 44,SEISMIC_TOSS
-    db 52,SUBMISSION
-    db 0
-
-Mon122_EvosMoves:
-;MR_MIME
-;Evolutions
-    db 0
-;Learnset
-    db 15,CONFUSION
-    db 23,LIGHT_SCREEN
-    db 31,DOUBLESLAP
-    db 39,MEDITATE
-    db 47,SUBSTITUTE
-    db 0
-
-Mon106_EvosMoves:
-;HITMONLEE
-;Evolutions
-    db 0
-;Learnset
-    db 33,ROLLING_KICK
-    db 38,JUMP_KICK
-    db 43,FOCUS_ENERGY
-    db 48,HI_JUMP_KICK
-    db 53,MEGA_KICK
-    db 0
-
-Mon107_EvosMoves:
-;HITMONCHAN
-;Evolutions
-    db 0
-;Learnset
-    db 33,FIRE_PUNCH
-    db 38,ICE_PUNCH
-    db 43,THUNDERPUNCH
-    db 48,MEGA_PUNCH
-    db 53,COUNTER
-    db 0
-
-Mon024_EvosMoves:
-;ARBOK
-;Evolutions
-    db 0
-;Learnset
-    db 10,POISON_STING
-    db 17,BITE
-    db 27,GLARE
-    db 36,SCREECH
-    db 47,ACID
-    db 0
-
-Mon047_EvosMoves:
-;PARASECT
-;Evolutions
-    db 0
-;Learnset
-    db 13,STUN_SPORE
-    db 20,LEECH_LIFE
-    db 30,SPORE
-    db 39,SLASH
-    db 48,GROWTH
-    db 0
-
-Mon054_EvosMoves:
-;PSYDUCK
-;Evolutions
-    db EV_LEVEL,33,GOLDUCK
-    db 0
-;Learnset
-    db 28,TAIL_WHIP
-    db 31,DISABLE
-    db 36,CONFUSION
-    db 43,FURY_SWIPES
-    db 52,HYDRO_PUMP
-    db 0
-
-Mon096_EvosMoves:
-;DROWZEE
-;Evolutions
-    db EV_LEVEL,26,HYPNO
-    db 0
-;Learnset
-    db 12,DISABLE
-    db 17,CONFUSION
-    db 24,HEADBUTT
-    db 29,POISON_GAS
-    db 32,PSYCHIC_M
-    db 37,MEDITATE
-    db 0
-
-Mon126_EvosMoves:
-;MAGMAR
-;Evolutions
-    db 0
-;Learnset
-    db 36,LEER
-    db 39,CONFUSE_RAY
-    db 43,FIRE_PUNCH
-    db 48,SMOKESCREEN
-    db 52,SMOG ; Penultimate Move that is Replaced with Fire Blast in Blaine's Team
-    db 55,FLAMETHROWER
-    db 0
-
-Mon125_EvosMoves:
-;ELECTABUZZ
-;Evolutions
-    db 0
-;Learnset
-    db 34,THUNDERSHOCK
-    db 37,SCREECH
-    db 42,THUNDERPUNCH
-    db 49,LIGHT_SCREEN
-    db 54,THUNDER
-    db 0
-
-Mon082_EvosMoves:
-;MAGNETON
-;Evolutions
-    db 0
-;Learnset
-    db 21,SONICBOOM
-    db 25,THUNDERSHOCK
-    db 29,SUPERSONIC
-    db 38,THUNDER_WAVE
-    db 46,SWIFT
-    db 54,SCREECH
-    db 0
-
-Mon109_EvosMoves:
-;KOFFING
-;Evolutions
-    db EV_LEVEL,35,WEEZING
-    db 0
-;Learnset
-    db 32,SLUDGE
-    db 37,SMOKESCREEN
-    db 40,SELFDESTRUCT
-    db 45,HAZE
-    db 48,EXPLOSION
-    db 0
-
-Mon056_EvosMoves:
-;MANKEY
-;Evolutions
-    db EV_LEVEL,28,PRIMEAPE
-    db 0
-;Learnset
-    db 9,LOW_KICK
-    db 15,KARATE_CHOP
-    db 21,FURY_SWIPES
-    db 27,FOCUS_ENERGY
-    db 33,SEISMIC_TOSS
-    db 39,THRASH
-    db 45,SCREECH
-    db 0
-
-Mon057_EvosMoves:
-;PRIMEAPE
-;Evolutions
-    db 0
-;Learnset
-    db 9,LOW_KICK
-    db 15,KARATE_CHOP
-    db 21,FURY_SWIPES
-    db 27,FOCUS_ENERGY
-    db 28,RAGE
-    db 37,SEISMIC_TOSS
-    db 45,THRASH
-    db 46,SCREECH
-    db 0
-
-Mon086_EvosMoves:
-;SEEL
-;Evolutions
-    db EV_LEVEL,34,DEWGONG
-    db 0
-;Learnset
-    db 30,GROWL
-    db 35,AURORA_BEAM
-    db 40,REST
-    db 45,TAKE_DOWN
-    db 50,ICE_BEAM
-    db 0
-
-Mon050_EvosMoves:
-;DIGLETT
-;Evolutions
-    db EV_LEVEL,26,DUGTRIO
-    db 0
-;Learnset
-    db 15,GROWL
-    db 19,DIG
-    db 24,SAND_ATTACK
-    db 31,SLASH
-    db 40,EARTHQUAKE
-    db 0
-
-Mon128_EvosMoves:
-;TAUROS
-;Evolutions
-    db 0
-;Learnset
-    db 21,STOMP
-    db 28,TAIL_WHIP
-    db 35,LEER
-    db 44,RAGE
-    db 51,TAKE_DOWN
-    db 0
-
-Mon083_EvosMoves:
-;FARFETCH_D
-;Evolutions
-    db 0
-;Learnset
-    db 7,LEER
-    db 15,FURY_ATTACK
-    db 23,SWORDS_DANCE
-    db 31,AGILITY
-    db 39,SLASH
-    db 0
-
-Mon048_EvosMoves:
-;VENONAT
-;Evolutions
-    db EV_LEVEL,31,VENOMOTH
-    db 0
-;Learnset
-    db 11,SUPERSONIC
-    db 19,CONFUSION
-    db 22,POISONPOWDER
-    db 27,LEECH_LIFE
-    db 30,STUN_SPORE
-    db 35,PSYBEAM
-    db 38,SLEEP_POWDER
-    db 43,PSYCHIC_M
-    db 0
-
-Mon049_EvosMoves:
-;VENOMOTH
-;Evolutions
-    db 0
-;Learnset
-    db 24,POISONPOWDER
-    db 27,LEECH_LIFE
-    db 30,STUN_SPORE
-    db 38,PSYBEAM
-    db 43,SLEEP_POWDER
-    db 48,PSYCHIC_M ; Level 48 because Koga's Team
-    db 0
-
-Mon149_EvosMoves:
-;DRAGONITE
-;Evolutions
-    db 0
-;Learnset
-    db 10,THUNDER_WAVE
-    db 20,AGILITY
-    db 24,SLAM
-    db 45,DRAGON_RAGE
-    db 60,HYPER_BEAM
-    db 0
-
-Mon084_EvosMoves:
-;DODUO
-;Evolutions
-    db EV_LEVEL,31,DODRIO
-    db 0
-;Learnset
-    db 20,GROWL
-    db 24,FURY_ATTACK
-    db 30,DRILL_PECK
-    db 36,RAGE
-    db 40,TRI_ATTACK
-    db 44,AGILITY
-    db 0
-
-Mon060_EvosMoves:
-;POLIWAG
-;Evolutions
-    db EV_LEVEL,25,POLIWHIRL
-    db 0
-;Learnset
-    db 16,HYPNOSIS
-    db 19,WATER_GUN
-    db 25,DOUBLESLAP
-    db 31,BODY_SLAM
-    db 38,AMNESIA
-    db 45,HYDRO_PUMP
-    db 0
-
-Mon124_EvosMoves:
-;JYNX
-;Evolutions
-    db 0
-;Learnset
-    db 18,LICK
-    db 23,DOUBLESLAP
-    db 31,ICE_PUNCH
-    db 39,BODY_SLAM
-    db 47,THRASH
-    db 58,BLIZZARD
-    db 0
-
-Mon146_EvosMoves:
-;MOLTRES
-;Evolutions
-    db 0
-;Learnset
-    db 51,LEER
-    db 55,AGILITY
-    db 60,SKY_ATTACK
-    db 0
-
-Mon144_EvosMoves:
-;ARTICUNO
-;Evolutions
-    db 0
-;Learnset
-    db 51,BLIZZARD
-    db 55,AGILITY
-    db 60,MIST
-    db 0
-
-Mon145_EvosMoves:
-;ZAPDOS
-;Evolutions
-    db 0
-;Learnset
-    db 51,THUNDER
-    db 55,AGILITY
-    db 60,LIGHT_SCREEN
-    db 0
-
-Mon132_EvosMoves:
-;DITTO
-;Evolutions
-    db 0
-;Learnset
-    db 0
-
-Mon052_EvosMoves:
-;MEOWTH
-;Evolutions
-    db EV_LEVEL,28,PERSIAN
-    db 0
-;Learnset
-    db 12,BITE
-    db 17,PAY_DAY
-    db 24,SCREECH
-    db 33,FURY_SWIPES
-    db 44,SLASH
-    db 0
-
-Mon098_EvosMoves:
-;KRABBY
-;Evolutions
-    db EV_LEVEL,28,KINGLER
-    db 0
-;Learnset
-    db 20,VICEGRIP
-    db 25,GUILLOTINE
-    db 30,STOMP
-    db 35,CRABHAMMER
-    db 40,HARDEN
-    db 0
-
-Mon037_EvosMoves:
-;VULPIX
-;Evolutions
-    db EV_ITEM,FIRE_STONE,1,NINETALES
-    db 0
-;Learnset
-    db 16,QUICK_ATTACK
-    db 21,ROAR
-    db 28,CONFUSE_RAY
-    db 35,FLAMETHROWER
-    db 42,FIRE_SPIN
-    db 0
-
-Mon038_EvosMoves:
-;NINETALES
-;Evolutions
-    db 0
-;Learnset
-    db 0
-
-Mon025_EvosMoves:
-;PIKACHU
-;Evolutions
-    db EV_ITEM,THUNDER_STONE ,1,RAICHU
-    db 0
-;Learnset
-    db 6,TAIL_WHIP
-    db 8,THUNDER_WAVE
-    db 11,QUICK_ATTACK
-    db 15,DOUBLE_TEAM
-    db 20,SLAM
-    db 26,THUNDERBOLT
-    db 33,AGILITY
-    db 41,THUNDER
-    db 50,LIGHT_SCREEN
-    db 0
-
-Mon026_EvosMoves:
-;RAICHU
-;Evolutions
-    db 0
-;Learnset
-    db 0
-
-Mon147_EvosMoves:
-;DRATINI
-;Evolutions
-    db EV_LEVEL,24,DRAGONAIR
-    db 0
-;Learnset
-    db 10,THUNDER_WAVE
-    db 20,AGILITY
-    db 24,SLAM
-    db 30,DRAGON_RAGE
-    db 40,HYPER_BEAM
-    db 0
-
-Mon148_EvosMoves:
-;DRAGONAIR
-;Evolutions
-    db EV_LEVEL,43,DRAGONITE
-    db 0
-;Learnset
-    db 10,THUNDER_WAVE
-    db 20,AGILITY
-    db 24,SLAM
-    db 35,DRAGON_RAGE
-    db 43,HYPER_BEAM
-    db 0
-
-Mon140_EvosMoves:
-;KABUTO
-;Evolutions
-    db EV_LEVEL,40,KABUTOPS
-    db 0
-;Learnset
-    db 34,ABSORB
-    db 39,SLASH
-    db 44,LEER
-    db 49,HYDRO_PUMP
-    db 0
-
-Mon141_EvosMoves:
-;KABUTOPS
-;Evolutions
-    db 0
-;Learnset
-    db 34,ABSORB
-    db 39,SLASH
-    db 46,LEER
-    db 53,HYDRO_PUMP
-    db 0
-
-Mon116_EvosMoves:
-;HORSEA
-;Evolutions
-    db EV_LEVEL,32,SEADRA
-    db 0
-;Learnset
-    db 19,SMOKESCREEN
-    db 24,LEER
-    db 30,WATER_GUN
-    db 37,AGILITY
-    db 45,HYDRO_PUMP
-    db 0
-
-Mon117_EvosMoves:
-;SEADRA
-;Evolutions
-    db 0
-;Learnset
-    db 19,SMOKESCREEN
-    db 24,LEER
-    db 30,WATER_GUN
-    db 41,AGILITY
-    db 52,HYDRO_PUMP
-    db 0
-
-Mon027_EvosMoves:
-;SANDSHREW
-;Evolutions
-    db EV_LEVEL,22,SANDSLASH
-    db 0
-;Learnset
-    db 10,SAND_ATTACK
-    db 17,SLASH
-    db 24,POISON_STING
-    db 31,SWIFT
-    db 38,FURY_SWIPES
-    db 0
-
-Mon028_EvosMoves:
-;SANDSLASH
-;Evolutions
-    db 0
-;Learnset
-    db 10,SAND_ATTACK
-    db 17,SLASH
-    db 27,POISON_STING
-    db 36,SWIFT
-    db 47,FURY_SWIPES
-    db 0
-
-Mon138_EvosMoves:
-;OMANYTE
-;Evolutions
-    db EV_LEVEL,40,OMASTAR
-    db 0
-;Learnset
-    db 34,HORN_ATTACK
-    db 39,LEER
-    db 46,SPIKE_CANNON
-    db 53,HYDRO_PUMP
-    db 0
-
-Mon139_EvosMoves:
-;OMASTAR
-;Evolutions
-    db 0
-;Learnset
-    db 34,HORN_ATTACK
-    db 39,LEER
-    db 44,SPIKE_CANNON
-    db 49,HYDRO_PUMP
-    db 0
-
-Mon039_EvosMoves:
-;JIGGLYPUFF
-;Evolutions
-    db EV_ITEM,MOON_STONE,1,WIGGLYTUFF
-    db 0
-;Learnset
-    db 9,POUND
-    db 14,DISABLE
-    db 19,DEFENSE_CURL
-    db 24,DOUBLESLAP
-    db 29,REST
-    db 34,BODY_SLAM
-    db 39,DOUBLE_EDGE
-    db 0
-
-Mon040_EvosMoves:
-;WIGGLYTUFF
-;Evolutions
-    db 0
-;Learnset
-    db 0
-
-Mon133_EvosMoves:
-;EEVEE
-;Evolutions
-    db EV_ITEM,FIRE_STONE,1,FLAREON
-    db EV_ITEM,THUNDER_STONE ,1,JOLTEON
-    db EV_ITEM,WATER_STONE ,1,VAPOREON
-    db 0
-;Learnset
-    db 8,SAND_ATTACK
-    db 16,GROWL
-    db 23,QUICK_ATTACK
-    db 30,BITE
-    db 36,FOCUS_ENERGY
-    db 42,TAKE_DOWN
-    db 0
-
-Mon136_EvosMoves:
-;FLAREON
-;Evolutions
-    db 0
-;Learnset
-    db 8,SAND_ATTACK
-    db 16,EMBER ; TODO
-    db 23,QUICK_ATTACK
-    db 30,BITE
-    db 36,FIRE_SPIN
-    db 42,SMOG
-    db 47,LEER
-    db 52,FLAMETHROWER
-    db 0
-
-Mon135_EvosMoves:
-;JOLTEON
-;Evolutions
-    db 0
-;Learnset
-    db 8,SAND_ATTACK
-    db 16,THUNDERSHOCK ; TODO
-    db 23,QUICK_ATTACK
-    db 30,DOUBLE_KICK
-    db 36,PIN_MISSILE
-    db 42,THUNDER_WAVE
-    db 47,AGILITY
-    db 52,THUNDER
-    db 0
-
-Mon134_EvosMoves:
-;VAPOREON
-;Evolutions
-    db 0
-;Learnset
-    db 8,SAND_ATTACK
-    db 16,WATER_GUN ; TODO
-    db 23,QUICK_ATTACK
-    db 30,BITE
-    db 36,AURORA_BEAM
-    db 42,ACID_ARMOR
-    db 47,HAZE
-    db 52,HYDRO_PUMP
-    db 0
-;    db 48,MIST ; TODO
-
-Mon066_EvosMoves:
-;MACHOP
-;Evolutions
-    db EV_LEVEL,28,MACHOKE
-    db 0
-;Learnset
-    db 20,LOW_KICK
-    db 25,LEER
-    db 32,FOCUS_ENERGY
-    db 39,SEISMIC_TOSS
-    db 46,SUBMISSION
-    db 0
-
-Mon041_EvosMoves:
-;ZUBAT
-;Evolutions
-    db EV_LEVEL,22,GOLBAT
-    db 0
-;Learnset
-    db 10,SUPERSONIC
-    db 15,BITE
-    db 21,CONFUSE_RAY
-    db 28,WING_ATTACK
-    db 36,HAZE
-    db 0
-
-Mon023_EvosMoves:
-;EKANS
-;Evolutions
-    db EV_LEVEL,22,ARBOK
-    db 0
-;Learnset
-    db 10,POISON_STING
-    db 17,BITE
-    db 24,GLARE
-    db 31,SCREECH
-    db 38,ACID
-    db 0
-
-Mon046_EvosMoves:
-;PARAS
-;Evolutions
-    db EV_LEVEL,24,PARASECT
-    db 0
-;Learnset
-    db 13,STUN_SPORE
-    db 20,LEECH_LIFE
-    db 27,SPORE
-    db 34,SLASH
-    db 41,GROWTH
-    db 0
-
-Mon061_EvosMoves:
-;POLIWHIRL
-;Evolutions
-    db EV_ITEM,WATER_STONE ,1,POLIWRATH
-    db 0
-;Learnset
-    db 16,HYPNOSIS
-    db 19,WATER_GUN
-    db 26,DOUBLESLAP
-    db 33,BODY_SLAM
-    db 41,AMNESIA
-    db 49,HYDRO_PUMP
-    db 0
-
-Mon062_EvosMoves:
-;POLIWRATH
-;Evolutions
-    db 0
-;Learnset
-    db 16,HYPNOSIS
-    db 19,WATER_GUN
-    db 0
-
-Mon013_EvosMoves:
-;WEEDLE
-;Evolutions
-    db EV_LEVEL,7,KAKUNA
-    db 0
-;Learnset
-    db 0
-
-Mon015_EvosMoves:
-;BEEDRILL
-;Evolutions
-    db 0
-;Learnset
-    db 10,FURY_ATTACK
-    db 16,FOCUS_ENERGY
-    db 20,TWINEEDLE
-    db 25,RAGE
-    db 30,PIN_MISSILE
-    db 35,AGILITY
-    db 0
-
-Mon085_EvosMoves:
-;DODRIO
-;Evolutions
-    db 0
-;Learnset
-    db 20,GROWL
-    db 24,FURY_ATTACK
-    db 30,DRILL_PECK
-    db 39,RAGE
-    db 45,TRI_ATTACK
-    db 51,AGILITY
-    db 0
-
-Mon051_EvosMoves:
-;DUGTRIO
-;Evolutions
-    db 0
-;Learnset
-    db 15,GROWL
-    db 19,DIG
-    db 24,SAND_ATTACK
-    db 35,SLASH
-    db 47,EARTHQUAKE
-    db 0
-
-Mon087_EvosMoves:
-;DEWGONG
-;Evolutions
-    db 0
-;Learnset
-    db 30,GROWL
-    db 35,AURORA_BEAM
-    db 44,REST
-    db 50,TAKE_DOWN
-    db 56,ICE_BEAM
-    db 0
-
-Mon010_EvosMoves:
-;CATERPIE
-;Evolutions
-    db EV_LEVEL,7,METAPOD
-    db 0
-;Learnset
-    db 0
-
-Mon012_EvosMoves:
-;BUTTERFREE
-;Evolutions
-    db 0
-;Learnset
-    db 10,CONFUSION
-    db 13,POISONPOWDER
-    db 14,STUN_SPORE
-    db 15,SLEEP_POWDER
-    db 18,SUPERSONIC
-    db 23,WHIRLWIND
-    db 28,GUST
-    db 31,PSYBEAM
-    db 0
-
-Mon068_EvosMoves:
-;MACHAMP
-;Evolutions
-    db 0
-;Learnset
-    db 20,LOW_KICK
-    db 25,LEER
-    db 36,FOCUS_ENERGY
-    db 44,SEISMIC_TOSS
-    db 52,SUBMISSION
-    db 0
-
-Mon055_EvosMoves:
-;GOLDUCK
-;Evolutions
-    db 0
-;Learnset
-    db 28,TAIL_WHIP
-    db 31,DISABLE
-    db 39,CONFUSION
-    db 48,FURY_SWIPES
-    db 59,HYDRO_PUMP
-    db 0
-
-Mon097_EvosMoves:
-;HYPNO
-;Evolutions
-    db 0
-;Learnset
-    db 12,DISABLE
-    db 17,CONFUSION
-    db 24,HEADBUTT
-    db 33,POISON_GAS
-    db 37,PSYCHIC_M
-    db 43,MEDITATE
-    db 0
-
-Mon150_EvosMoves:
-;MEWTWO
-;Evolutions
-    db 0
-;Learnset
-    db 63,BARRIER
-    db 66,PSYCHIC_M
-    db 70,RECOVER
-    db 75,MIST
-    db 81,AMNESIA
-    db 0
-
-Mon143_EvosMoves:
-;SNORLAX
-;Evolutions
-    db 0
-;Learnset
-    db 35,BODY_SLAM
-    db 41,HARDEN
-    db 48,DOUBLE_EDGE
-    db 56,HYPER_BEAM
-    db 0
-
-Mon129_EvosMoves:
-;MAGIKARP
-;Evolutions
-    db EV_LEVEL,20,GYARADOS
-    db 0
-;Learnset
-    db 15,TACKLE
-    db 0
-
-Mon089_EvosMoves:
-;MUK
-;Evolutions
-    db 0
-;Learnset
-    db 30,POISON_GAS
-    db 33,MINIMIZE
-    db 37,SLUDGE
-    db 45,HARDEN
-    db 53,SCREECH
-    db 60,ACID_ARMOR
-    db 0
-
-Mon099_EvosMoves:
-;KINGLER
-;Evolutions
-    db 0
-;Learnset
-    db 20,VICEGRIP
-    db 25,GUILLOTINE
-    db 34,STOMP
-    db 42,CRABHAMMER
-    db 49,HARDEN
-    db 0
-
-Mon091_EvosMoves:
-;CLOYSTER
-;Evolutions
-    db 0
-;Learnset
-    db 50,SPIKE_CANNON
-    db 0
-
-Mon101_EvosMoves:
-;ELECTRODE
-;Evolutions
-    db 0
-;Learnset
-    db 17,SONICBOOM
-    db 22,SELFDESTRUCT
-    db 29,LIGHT_SCREEN
-    db 40,SWIFT
-    db 50,EXPLOSION
-    db 0
-
-Mon036_EvosMoves:
-;CLEFABLE
-;Evolutions
-    db 0
-;Learnset
-    db 0
-
-Mon110_EvosMoves:
-;WEEZING
-;Evolutions
-    db 0
-;Learnset
-    db 32,SLUDGE
-    db 39,SMOKESCREEN
-    db 43,SELFDESTRUCT
-    db 49,HAZE
-    db 53,EXPLOSION
-    db 0
-
-Mon053_EvosMoves:
-;PERSIAN
-;Evolutions
-    db 0
-;Learnset
-    db 12,BITE
-    db 17,PAY_DAY
-    db 24,SCREECH
-    db 37,FURY_SWIPES
-    db 51,SLASH
-    db 0
-
-Mon093_EvosMoves:
-;HAUNTER
-;Evolutions
-    db EV_TRADE,1,GENGAR
-    db 0
-;Learnset
-    db 29,HYPNOSIS
-    db 38,DREAM_EATER
-    db 0
-
-Mon063_EvosMoves:
-;ABRA
-;Evolutions
-    db EV_LEVEL,16,KADABRA
-    db 0
-;Learnset
-    db 0
-
-Mon064_EvosMoves:
-;KADABRA
-;Evolutions
-    db EV_TRADE,1,ALAKAZAM
-    db 0
-;Learnset
-    db 16,CONFUSION
-    db 20,DISABLE
-    db 27,PSYBEAM
-    db 31,RECOVER
-    db 38,PSYCHIC_M
-    db 42,REFLECT ; Penultimate Move that is Replaced with Psywave in Sabrina's Team
-    db 45,KINESIS
-    db 0
-
-Mon065_EvosMoves:
-;ALAKAZAM
-;Evolutions
-    db 0
-;Learnset
-    db 16,CONFUSION
-    db 20,DISABLE
-    db 27,PSYBEAM
-    db 31,RECOVER
-    db 38,PSYCHIC_M
-    db 42,REFLECT
-    db 45,KINESIS
-    db 0
-
-Mon017_EvosMoves:
-;PIDGEOTTO
-;Evolutions
-    db EV_LEVEL,36,PIDGEOT
-    db 0
-;Learnset
-    db 5,SAND_ATTACK
-    db 12,QUICK_ATTACK
-    db 21,WHIRLWIND
-    db 31,WING_ATTACK
-    db 40,AGILITY
-    db 49,MIRROR_MOVE
-    db 0
-
-Mon018_EvosMoves:
-;PIDGEOT
-;Evolutions
-    db 0
-;Learnset
-    db 5,SAND_ATTACK
-    db 12,QUICK_ATTACK
-    db 21,WHIRLWIND
-    db 31,WING_ATTACK
-    db 44,AGILITY
-    db 54,MIRROR_MOVE
-    db 0
-
-Mon121_EvosMoves:
-;STARMIE
-;Evolutions
-    db 0
-;Learnset
-    db 0
-
-Mon001_EvosMoves:
-;BULBASAUR
-;Evolutions
-    db EV_LEVEL,16,IVYSAUR
-    db 0
-;Learnset
-    db 7,LEECH_SEED
-    db 13,VINE_WHIP
-    db 20,POISONPOWDER
-    db 27,RAZOR_LEAF
-    db 34,GROWTH
-    db 41,SLEEP_POWDER
-    db 48,SOLARBEAM
-    db 0
-
-Mon003_EvosMoves:
-;VENUSAUR
-;Evolutions
-    db 0
-;Learnset
-    db 7,LEECH_SEED
-    db 13,VINE_WHIP
-    db 22,POISONPOWDER
-    db 30,RAZOR_LEAF
-    db 43,GROWTH
-    db 55,SLEEP_POWDER
-    db 65,SOLARBEAM
-    db 0
-
-Mon073_EvosMoves:
-;TENTACRUEL
-;Evolutions
-    db 0
-;Learnset
-    db 7,SUPERSONIC
-    db 13,WRAP
-    db 18,POISON_STING
-    db 22,WATER_GUN
-    db 27,CONSTRICT
-    db 35,BARRIER
-    db 43,SCREECH
-    db 50,HYDRO_PUMP
-    db 0
-
-Mon118_EvosMoves:
-;GOLDEEN
-;Evolutions
-    db EV_LEVEL,33,SEAKING
-    db 0
-;Learnset
-    db 19,SUPERSONIC
-    db 24,HORN_ATTACK
-    db 30,FURY_ATTACK
-    db 37,WATERFALL
-    db 45,HORN_DRILL
-    db 54,AGILITY
-    db 0
-
-Mon119_EvosMoves:
-;SEAKING
-;Evolutions
-    db 0
-;Learnset
-    db 19,SUPERSONIC
-    db 24,HORN_ATTACK
-    db 30,FURY_ATTACK
-    db 39,WATERFALL
-    db 48,HORN_DRILL
-    db 54,AGILITY
-    db 0
-
-Mon077_EvosMoves:
-;PONYTA
-;Evolutions
-    db EV_LEVEL,40,RAPIDASH
-    db 0
-;Learnset
-    db 30,TAIL_WHIP
-    db 32,STOMP
-    db 35,GROWL
-    db 39,FIRE_SPIN
-    db 43,TAKE_DOWN
-    db 48,AGILITY
-    db 0
-
-Mon078_EvosMoves:
-;RAPIDASH
-;Evolutions
-    db 0
-;Learnset
-    db 30,TAIL_WHIP
-    db 32,STOMP
-    db 35,GROWL
-    db 39,FIRE_SPIN
-    db 47,TAKE_DOWN
-    db 55,AGILITY
-    db 0
-
-Mon019_EvosMoves:
-;RATTATA
-;Evolutions
-    db EV_LEVEL,20,RATICATE
-    db 0
-;Learnset
-    db 7,QUICK_ATTACK
-    db 14,HYPER_FANG
-    db 23,FOCUS_ENERGY
-    db 34,SUPER_FANG
-    db 0
-
-Mon020_EvosMoves:
-;RATICATE
-;Evolutions
-    db 0
-;Learnset
-    db 7,QUICK_ATTACK
-    db 14,HYPER_FANG
-    db 27,FOCUS_ENERGY
-    db 41,SUPER_FANG
-    db 0
-
-Mon074_EvosMoves:
-;GEODUDE
-;Evolutions
-    db EV_LEVEL,25,GRAVELER
-    db 0
-;Learnset
-    db 11,DEFENSE_CURL
-    db 16,ROCK_THROW
-    db 21,SELFDESTRUCT
-    db 26,HARDEN
-    db 31,EARTHQUAKE
-    db 36,EXPLOSION
-    db 0
-
-Mon137_EvosMoves:
-;PORYGON
-;Evolutions
-    db 0
-;Learnset
-    db 23,PSYBEAM
-    db 28,RECOVER
-    db 35,AGILITY
-    db 42,TRI_ATTACK
-    db 0
-
-Mon142_EvosMoves:
-;AERODACTYL
-;Evolutions
-    db 0
-;Learnset
-    db 33,SUPERSONIC
-    db 38,BITE
-    db 45,TAKE_DOWN
-    db 54,HYPER_BEAM
-    db 0
-
-Mon081_EvosMoves:
-;MAGNEMITE
-;Evolutions
-    db EV_LEVEL,30,MAGNETON
-    db 0
-;Learnset
-    db 21,SONICBOOM
-    db 25,THUNDERSHOCK
-    db 29,SUPERSONIC
-    db 35,THUNDER_WAVE
-    db 41,SWIFT
-    db 47,SCREECH
-    db 0
-
-Mon004_EvosMoves:
-;CHARMANDER
-;Evolutions
-    db EV_LEVEL,16,CHARMELEON
-    db 0
-;Learnset
-    db 9,EMBER
-    db 15,LEER
-    db 22,RAGE
-    db 30,SLASH
-    db 38,FLAMETHROWER
-    db 46,FIRE_SPIN
-    db 0
-
-Mon007_EvosMoves:
-;SQUIRTLE
-;Evolutions
-    db EV_LEVEL,16,WARTORTLE
-    db 0
-;Learnset
-    db 8,BUBBLE
-    db 15,WATER_GUN
-    db 22,BITE
-    db 28,WITHDRAW
-    db 35,SKULL_BASH
-    db 42,HYDRO_PUMP
-    db 0
-
-Mon005_EvosMoves:
-;CHARMELEON
-;Evolutions
-    db EV_LEVEL,36,CHARIZARD
-    db 0
-;Learnset
-    db 9,EMBER
-    db 15,LEER
-    db 24,RAGE
-    db 33,SLASH
-    db 42,FLAMETHROWER
-    db 56,FIRE_SPIN
-    db 0
-
-Mon008_EvosMoves:
-;WARTORTLE
-;Evolutions
-    db EV_LEVEL,36,BLASTOISE
-    db 0
-;Learnset
-    db 8,BUBBLE
-    db 15,WATER_GUN
-    db 24,BITE
-    db 31,WITHDRAW
-    db 39,SKULL_BASH
-    db 47,HYDRO_PUMP
-    db 0
-
-Mon006_EvosMoves:
-;CHARIZARD
-;Evolutions
-    db 0
-;Learnset
-    db 9,EMBER
-    db 15,LEER
-    db 24,RAGE
-    db 36,SLASH
-    db 46,FLAMETHROWER
-    db 55,FIRE_SPIN
-    db 0
-
-Mon043_EvosMoves:
-;ODDISH
-;Evolutions
-    db EV_LEVEL,21,GLOOM
-    db 0
-;Learnset
-    db 15,POISONPOWDER
-    db 17,STUN_SPORE
-    db 19,SLEEP_POWDER
-    db 24,ACID
-    db 33,PETAL_DANCE
-    db 46,SOLARBEAM
-    db 0
-
-Mon044_EvosMoves:
-;GLOOM
-;Evolutions
-    db EV_ITEM,LEAF_STONE ,1,VILEPLUME
-    db 0
-;Learnset
-    db 15,POISONPOWDER
-    db 17,STUN_SPORE
-    db 19,SLEEP_POWDER
-    db 28,ACID ; Penultimate Move that is Replaced with Megadrain in Erika's Team
-    db 38,PETAL_DANCE
-    db 52,SOLARBEAM
-    db 0
-
-Mon045_EvosMoves:
-;VILEPLUME
-;Evolutions
-    db 0
-;Learnset
-    db 15,POISONPOWDER
-    db 17,STUN_SPORE
-    db 19,SLEEP_POWDER
-    db 0
-
-Mon069_EvosMoves:
-;BELLSPROUT
-;Evolutions
-    db EV_LEVEL,21,WEEPINBELL
-    db 0
-;Learnset
-    db 13,WRAP
-    db 15,POISONPOWDER
-    db 18,SLEEP_POWDER
-    db 21,STUN_SPORE
-    db 26,ACID
-    db 33,RAZOR_LEAF
-    db 42,SLAM
-    db 0
-
-Mon070_EvosMoves:
-;WEEPINBELL
-;Evolutions
-    db EV_ITEM,LEAF_STONE ,1,VICTREEBEL
-    db 0
-;Learnset
-    db 13,WRAP
-    db 15,POISONPOWDER
-    db 18,SLEEP_POWDER
-    db 23,STUN_SPORE
-    db 29,ACID
-    db 38,RAZOR_LEAF
-    db 49,SLAM
-    db 0
-
-Mon071_EvosMoves:
-;VICTREEBEL
-;Evolutions
-    db 0
-;Learnset
-    db 13,WRAP
-    db 15,POISONPOWDER
-    db 18,SLEEP_POWDER
-    db 0
-
-Mon011_EvosMoves:
-;METAPOD
-;Evolutions
-    db EV_LEVEL,10,BUTTERFREE
-    db 0
-;Learnset
-    db 7,HARDEN
-    db 0
-
-Mon014_EvosMoves:
-;KAKUNA
-;Evolutions
-    db EV_LEVEL,10,BEEDRILL
-    db 0
-;Learnset
-    db 7,HARDEN
-    db 0
-
-Mon042_EvosMoves:
-;GOLBAT
-;Evolutions
-    db 0
-;Learnset
-    db 10,SUPERSONIC
-    db 15,BITE
-    db 21,CONFUSE_RAY
-    db 32,WING_ATTACK
-    db 43,HAZE ; Penultimate Move that is Replaced with Toxic in Koga's Team
-    db 50,DOUBLE_TEAM
-    db 0
-
-SECTION "Func_3ba97",ROMX[$7a97],BANK[$e]
-
-Func_3ba97: ; 3ba97 (e:7a97)
+Func_3ba97: ; Moved Upper in the Bank
     ld c,$32
     call DelayFrames
     ld hl,Func_3fb53
     jp BankswitchEtoF
 
-UnnamedText_3baa2: ; 3baa2 (e:7aa2)
+UnnamedText_3baa2: ; Moved Upper in the Bank
     TX_FAR _UnnamedText_3baa2
     db "@"
 
-UnnamedText_3baa7: ; 3baa7 (e:7aa7)
+UnnamedText_3baa7: ; Moved Upper in the Bank
     TX_FAR _UnnamedText_3baa7
     db "@"
 
-UnnamedText_3baac: ; 3baac (e:7aac)
+UnnamedText_3baac: ; Moved Upper in the Bank
     TX_FAR _UnnamedText_3baac
     db "@"
 
-Func_3bab1: ; 3bab1 (e:7ab1)
+Func_3bab1: ; Moved Upper in the Bank
     ld hl,W_PLAYERMONID
     ld de,$cfe5
     ld bc,W_ENEMYBATTSTATUS3 ; $d069
@@ -61326,7 +51644,7 @@ Func_3bab1: ; 3bab1 (e:7ab1)
     call GoPalSetBattleAndLoadText ; Denim ; ld hl,UnnamedText_3bb92 ; $7b92
     jp PrintText
 
-Func_3bb7d: ; 3bb7d (e:7b7d)
+Func_3bb7d: ; Moved Upper in the Bank
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.asm_3bb86
@@ -61380,150 +51698,27 @@ Func_3bb97: ; 3bb97 (e:7b97)
     ld hl,Func_3fb53 ; $7b53
     jp BankswitchEtoF
 
-UnnamedText_3bbd7: ; 3bbd7 (e:7bd7)
+UnnamedText_3bbd7: ; Moved Upper in the Bank
     TX_FAR _UnnamedText_3bbd7
     db "@"
 
-UnnamedText_3bbdc: ; 3bbdc (e:7bdc)
+UnnamedText_3bbdc: ; Moved Upper in the Bank
     TX_FAR _UnnamedText_3bbdc
     db "@"
 
-BankswitchEtoF: ; 3bbe1 (e:7be1)
+BankswitchEtoF: ; Moved Upper in the Bank
     ld b,$f
     jp Bankswitch
 
-Func_3b9ec: ; Moved to the End of The Bank
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    ld de,W_PLAYERMONCURHP ; $d015
-    ld hl,W_PLAYERMONMAXHP ; $d023
-    ld a,[W_PLAYERMOVENUM] ; $cfd2
-    jr z,.asm_3ba03
-    ld de,W_ENEMYMONCURHP ; $cfe6
-    ld hl,W_ENEMYMONMAXHP ; $cff4
-    ld a,[W_ENEMYMOVENUM] ; $cfcc
-.asm_3ba03
-    ld b,a
-    ld a,[de]
-    cp [hl]
-    inc de
-    inc hl
-    ld a,[de]
-    sbc [hl]
-    jp z,Func_3ba97
-    ld a,b
-    cp $9c
-    jr nz,.asm_3ba37
-    push hl
-    push de
-    push af
-    ld c,$32
-    call DelayFrames
-    ld hl,W_PLAYERMONSTATUS ; $d018
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.asm_3ba25
-    ld hl,W_ENEMYMONSTATUS ; $cfe9
-.asm_3ba25
-    ld a,[hl]
-    and a
-    ld [hl],$2
-    ld hl,UnnamedText_3baa2 ; $7aa2
-    jr z,.asm_3ba31
-    ld hl,UnnamedText_3baa7 ; $7aa7
-.asm_3ba31
-    call PrintText
-    pop af
-    pop de
-    pop hl
-.asm_3ba37
-    ld a,[hld]
-    ld [wHPBarMaxHP],a
-    ld c,a
-    ld a,[hl]
-    ld [wHPBarMaxHP+1],a
-    ld b,a
-    jr z,.asm_3ba47
-    srl b
-    rr c
-.asm_3ba47
-    ld a,[de]
-    ld [wHPBarOldHP],a
-    add c
-    ld [de],a
-    ld [wHPBarNewHP],a
-    dec de
-    ld a,[de]
-    ld [wHPBarOldHP+1],a
-    adc b
-    ld [de],a
-    ld [wHPBarNewHP+1],a
-    inc hl
-    inc de
-    ld a,[de]
-    dec de
-    sub [hl]
-    dec hl
-    ld a,[de]
-    sbc [hl]
-    jr c,.asm_3ba6f
-    ld a,[hli]
-    ld [de],a
-    ld [wHPBarNewHP+1],a
-    inc de
-    ld a,[hl]
-    ld [de],a
-    ld [wHPBarNewHP],a
-.asm_3ba6f
-    ld hl,Func_3fba8 ; $7ba8
-    call BankswitchEtoF
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    FuncCoord 10,9 ; $c45e
-    ld hl,Coord
-    ld a,$1
-    jr z,.asm_3ba83
-    FuncCoord 2,2 ; $c3ca
-    ld hl,Coord
-    xor a
-.asm_3ba83
-    ld [wListMenuID],a ; $cf94
-    ld a,$48
-    call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
-    ld hl,Func_3cd5a ; $4d5a
-    call BankswitchEtoF
-    ld hl,UnnamedText_3baac ; $7aac
-    jp PrintText
+; ─────────────────────────────────────────────────────────────
 
-GoPalSetBattleAndLoadText: ; Denim
-    ld b,1
-    call GoPAL_SET
-    ld hl,UnnamedText_3bb92 ; $7b92
-    ret
+CheckEvolutionMove:
+    ld hl,_CheckEvolutionMove
+    ld b,BANK(_CheckEvolutionMove)
+    call Bankswitch
+    jp LearnMoveFromLevelUp
 
-RedBallColorDuringEnemySwitch:
-    ld a,PAL_REDBALL - PAL_GREENBAR
-    ld [$CF1D + 1],a
-    ld b,1
-    call GoPAL_SET
-    call GbPalComplete ; Red Ball
-    xor a
-    ld [$CF1D + 1],a
-    jp LoadPartyPokeballGfx
-
-SetAttributeOamRedBall:
-    ld [hli],a
-    ld a,3
-    ld [hli],a
-    ret
-
-BlaineAI:
-    cp $40
-    ret nc
-    ld a,$A
-    call Func_3a7cf
-    ret nc
-    jp AIUseSuperPotion
+INCLUDE "constants/pokemon_learnset.asm"
 
 SECTION "bankF",ROMX,BANK[$F]
 
@@ -63986,7 +54181,7 @@ MoveSelectionMenu: ; 3d219 (f:5219)
 .regularmenu
     call Func_3d3f5
     ret z
-    ld hl,W_PLAYERMONMOVES
+    call DebugMonOrEnemyMoves ; ld hl,W_PLAYERMONMOVES
     call .loadmoves
     FuncCoord 0,12 ; $c494
     ld hl,Coord
@@ -70354,7 +60549,7 @@ WritePPAllMoves: ; Denim ; TODO,sistemare routine e posizioni
     ld [wCurrentMenuItem],a
     ld e,a
 
-    ld hl,W_PLAYERMONMOVES
+    call DebugMonOrEnemyMoves ; ld hl,W_PLAYERMONMOVES
     ld b,0
     ld c,a
     add hl,bc
@@ -70377,7 +60572,7 @@ WritePPAllMoves: ; Denim ; TODO,sistemare routine e posizioni
     ;ld b,BANK(GetMaxPP)
     ;call Bankswitch ; indirect jump to GetMaxPP (e677 (3:6677))
 
-    ld hl,W_PLAYERMONPP ; $d02d
+    call DebugMonOrEnemyPP ; ld hl,W_PLAYERMONPP ; $d02d
     ld b,0
     ;pop af ; Restore CurrentMenuItem
     ld c,a
@@ -70503,7 +60698,7 @@ CalcEXPBarPixelLength:
     ld hl,W_PARTYMON1_NUM
     call BattleMonPartyAttr
 .skip
-    ld a, [hl]
+    ld a,[hl]
     ld [$d0b5],a
     call GetMonHeader
     ld a,[W_PLAYERMONLEVEL]
@@ -70644,7 +60839,7 @@ BattleMonPartyAttr:
 IsDratiniOrRandom:
     ld a,[W_CURMAP]
     cp DRATINI_CAVE
-    jp nz, GenRandomInBattle
+    jp nz,GenRandomInBattle
     ld b,$AA
     ld a,$FA ; Rendere l'attacco casuale tra i valori Shiny Disponibili
     ret
@@ -70690,12 +60885,12 @@ GetEnemyIV:
     ret nz ; Not Trainer
     push af
     ld hl,W_ENEMYMON1MOVE3+$11
-	ld a,[wWhichPokemon]
-	ld bc,44
-	call AddNTimes
+    ld a,[wWhichPokemon]
+    ld bc,44
+    call AddNTimes
     pop af
-	ld a,[hli]
-	ld b,[hl]
+    ld a,[hli]
+    ld b,[hl]
     ret
 
 CalcStatsAndLoadEnemyMonHp:
@@ -70711,6 +60906,32 @@ CalcStatsAndLoadEnemyMonHp:
     ld b,$1
 .Done
     jp CalcStats
+
+DebugMonOrEnemyMoves:
+    push af
+    ld hl,W_PLAYERMONMOVES
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 3,a ; was the start button pressed?
+    jr z,.Done
+    bit 2,a ; was the select button pressed?
+    jr nz,.Done
+    ld hl,W_ENEMYMONMOVES
+.Done
+    pop af
+    ret
+
+DebugMonOrEnemyPP:
+    push af
+    ld hl,W_PLAYERMONPP ; $d02d
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 3,a ; was the start button pressed?
+    jr z,.Done
+    bit 2,a ; was the select button pressed?
+    jr nz,.Done
+    ld hl,W_ENEMYMONPP
+.Done
+    pop af
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -77269,7 +67490,7 @@ UnknownDungeon3Object: ; 0x45f36 (size=34)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_SLOWBRO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,70 ; trainer
+    db SPRITE_SLOWBRO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,45 ; trainer
     db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$82,ULTRA_BALL ; item
     db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
 
@@ -78123,7 +68344,7 @@ SeafoamIslands5Object: ; 0x468bc (size=62)
     db $3 ; people
     db SPRITE_BOULDER,$f + 4,$4 + 4,$ff,$ff,$1 ; person
     db SPRITE_BOULDER,$f + 4,$5 + 4,$ff,$ff,$2 ; person
-    db SPRITE_BIRD,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,50 ; trainer
+    db SPRITE_BIRD,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,40 ; trainer
 
     ; warp-to
     EVENT_DISP $f,$11,$14 ; SEAFOAM_ISLANDS_4
@@ -83715,7 +73936,8 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     db BANK(InitializePlayerData)
     dw InitializePlayerData
     dbw BANK(Func_c754),Func_c754
-    dbw BANK(Func_3af5b),Func_3af5b
+    db BANK(LearnMoveFromLevelUp)
+    dw LearnMoveFromLevelUp
     dbw BANK(Func_6e43),Func_6e43
     dbw BANK(Func_f8a5),Func_f8a5; 1C,used in Pokémon Tower
     dbw $03,Func_3eb5 ; for these two,the bank number is actually 0
@@ -86144,7 +76366,7 @@ VictoryRoad2Object: ; 0x51915 (size=154)
     db SPRITE_BLACK_HAIR_BOY_1,$8 + 4,$13 + 4,$ff,$d0,$43,TAMER + $C8,$5 ; trainer
     db SPRITE_BLACK_HAIR_BOY_2,$2 + 4,$4 + 4,$ff,$d0,$44,POKEMANIAC + $C8,$6 ; trainer
     db SPRITE_BLACK_HAIR_BOY_2,$3 + 4,$1a + 4,$ff,$d2,$45,JUGGLER + $C8,$5 ; trainer
-    db SPRITE_BIRD,$5 + 4,$b + 4,$ff,$d1,$46,MOLTRES,50 ; trainer
+    db SPRITE_BIRD,$5 + 4,$b + 4,$ff,$d1,$46,MOLTRES,40 ; trainer
     db SPRITE_BALL,$5 + 4,$1b + 4,$ff,$ff,$87,TM_17 ; item
     db SPRITE_BALL,$9 + 4,$12 + 4,$ff,$ff,$88,FULL_HEAL ; item
     db SPRITE_BALL,$b + 4,$9 + 4,$ff,$ff,$89,TM_05 ; item
@@ -86547,7 +76769,7 @@ SilphCo7Text1: ; 51d8e (14:5d8e)
 .asm_d7e17 ; 0x51da5
     ld hl,UnnamedText_51dd3
     call PrintText
-    ld bc,(LAPRAS << 8) | 15
+    ld bc,(LAPRAS << 8) | 10
     call GivePokemon
     jr nc,.asm_b3069 ; 0x51db1
     ld a,[$ccd3]
@@ -88717,7 +78939,7 @@ Func_5525f: ; 5525f (15:525f)
     ld a,[$d0b5]
     ld [$d11e],a
     ld a,$1a
-    call Predef ; indirect jump to Func_3af5b (3af5b (e:6f5b))
+    call Predef ; indirect jump to LearnMoveFromLevelUp (3af5b (e:6f5b))
     ld hl,$ccd3
     ld a,[wWhichPokemon] ; $cf92
     ld c,a
@@ -94145,7 +84367,7 @@ Route12Script0: ; 59619 (16:5619)
     call DisplayTextID
     ld a,$84
     ld [W_CUROPPONENT],a ; $d059
-    ld a,$1e
+    ld a,15 ; Snorlax
     ld [W_CURENEMYLVL],a ; $d127
     ld a,$1d
     ld [$cc4d],a
@@ -94737,7 +84959,7 @@ Route16Script0: ; 59959 (16:5959)
     call DisplayTextID
     ld a,$84
     ld [W_CUROPPONENT],a ; $d059
-    ld a,$1e
+    ld a,15 ; Snorlax
     ld [W_CURENEMYLVL],a ; $d127
     ld a,$21
     ld [$cc4d],a
@@ -98497,7 +88719,7 @@ Func_5d068: ; 5d068 (17:5068)
     call DisplayTextID
     ld hl,$d7b3
     set 1,[hl]
-    ld bc,(TM_46 << 8) | 1
+    ld bc,(TM_29 << 8) | 1
     call GiveItem
     jr nc,.BagFull
     ld a,$b
@@ -125809,11 +116031,11 @@ _ReceivedHM03Text: ; 85943 (21:5943)
     db $0,"!@@"
 
 _HM03ExplanationText: ; 85957 (21:5957)
-    db $0,"This is SURF!",$51
+    db $0,"This is FLOAT!",$51
     db "#MON will be",$4f
     db "able to ferry you",$55
     db "across water!",$51
-    db "And,Power isn't  ",$4f
+    db "And,Power isn't ",$4f
     db "disposable! You",$55
     db "can use it over",$55
     db "and over!",$51
@@ -132442,7 +122664,7 @@ _UnnamedText_74eaa: ; 9932a (26:532a)
     db "#MON increases",$55
     db "a little bit.",$51
     db "It also lets you",$4f
-    db "use SURF outside",$55
+    db "to FLOAT outside",$55
     db "of battle.",$58
 
 _UnnamedText_74eaf: ; 99388 (26:5388)
@@ -134206,7 +124428,7 @@ _HM04ExplanationText: ; 9e5b6 (27:65b6)
     db "If you do,you",$4f
     db "win a PWR!",$51
     db "I hear it's the",$4f
-    db "rare SURF PWR",$57
+    db "rare FLOAT PW",$57
 
 _HM04NoRoomText: ; 9e67a (27:667a)
     db $0,"Your pack is",$4f
@@ -134336,8 +124558,8 @@ _UnnamedText_75590: ; a0069 (28:4069)
     db "the DEFENSE of",$55
     db "your #MON",$55
     db "increases!",$51
-    db "It also lets you",$4f
-    db "SURF outside of",$55
+    db "It also lets   ",$4f
+    db "FLOAT outside of",$55
     db "battle!",$51
     db "Ah! Take this",$4f
     db "too!",$57
@@ -135165,10 +125387,12 @@ ReceivedTM46Text: ; a1dcd (28:5dcd)
 
 _TM46ExplanationText: ; a1de0 (28:5de0)
     db $0,$51
-    db "This is PSYWAVE!",$4f
-    db "It uses powerful",$55
-    db "psychic waves to",$55
-    db "inflict damage!",$57
+    db "This is PSYCHIC!",$51
+    db "It can lower the",$4f
+    db "target's SPECIAL",$55
+    db "abilities.",$57
+
+SECTION "_TM46NoRoomText",ROMX[$5e25],BANK[$28]
 
 _TM46NoRoomText: ; a1e25 (28:5e25)
     db $0,"Your pack is full",$4f
@@ -135369,10 +125593,12 @@ _ReceivedTM29Text: ; a252a (28:652a)
     db $0,"!@@"
 
 _TM29ExplanationText: ; a253e (28:653e)
-    db $0,"This is PSYCHIC!",$51
-    db "It can lower the",$4f
-    db "target's SPECIAL",$55
-    db "abilities.",$57
+    db $0,"This is PSYWAVE!",$51
+    db "It uses random",$4f
+    db "psychic waves to",$55
+    db "inflict damage!",$57
+
+SECTION "_TM29NoRoomText",ROMX[$657c],BANK[$28]
 
 _TM29NoRoomText: ; a257c (28:657c)
     db $0,"Where do you plan",$4f
@@ -135592,7 +125818,7 @@ _UnnamedText_cdff: ; a4088 (29:4088)
     db "Forget SURFing!",$58
 
 _FlashLightsAreaText: ; a40a9 (29:40a9)
-    db $0,"A blinding FLASH",$4f
+    db $0,"A blinding LIGHT",$4f
     db "lights the area!",$58
 
 _WarpToLastPokemonCenterText: ; a40cc (29:40cc)
@@ -136779,7 +127005,7 @@ _NoCyclingAllowedHereText: ; a6b34 (29:6b34)
     db $0,"No cycling",$4e,"allowed here.",$58
 
 _NoSurfingHereText: ; a6b4e (29:6b4e)
-    db $0,"No SURFing on",$4f
+    db $0,"No FLOAT on  ",$4f
     db "@"
     TX_RAM $cd6d
     db $0," here!",$58
@@ -136980,11 +127206,11 @@ MoveNames: ; b0000 (2c:4000)
     db "GUILLOTINE@"
     db "RAZOR WIND@"
     db "SWORDS DANCE@"
-    db "CUT@"
+    db "BLADE@" ; Old:CUT
     db "GUST@"
     db "WING ATTACK@"
     db "WHIRLWIND@"
-    db "FLY@"
+    db "SWOOP@" ; Old:FLY
     db "BIND@"
     db "SLAM@"
     db "VINE WHIP@"
@@ -137022,7 +127248,7 @@ MoveNames: ; b0000 (2c:4000)
     db "MIST@"
     db "WATER GUN@"
     db "HYDRO PUMP@"
-    db "SURF@"
+    db "TSUNAMI@" ; Old:SURF
     db "ICE BEAM@"
     db "BLIZZARD@"
     db "PSYBEAM@"
@@ -137035,7 +127261,7 @@ MoveNames: ; b0000 (2c:4000)
     db "LOW KICK@"
     db "COUNTER@"
     db "SEISMIC TOSS@"
-    db "STRENGTH@"
+    db "STRIKE@" ; Old:STRENTH
     db "ABSORB@"
     db "MEGA DRAIN@"
     db "LEECH SEED@"
@@ -137056,7 +127282,7 @@ MoveNames: ; b0000 (2c:4000)
     db "ROCK THROW@"
     db "EARTHQUAKE@"
     db "FISSURE@"
-    db "DIG@"
+    db "TRAPHOLE@" ; Old:DIG
     db "TOXIC@"
     db "CONFUSION@"
     db "PSYCHIC@"
@@ -137805,7 +128031,7 @@ MewBaseStats: ; 425b (1:425b)
 
     ; attacks known at lvl 0
     db POUND
-    db 0
+    db TRANSFORM
     db 0
     db 0
 
@@ -138072,9 +128298,8 @@ DebugEnemyStats:
     ld de,W_ENEMYMONMAXHP
     call .PrintStatBR
     ld de,W_ENEMYMONCURHP
-    call PrintNumber
-    ret
-.PrintIV:
+    jp PrintNumber
+.PrintIV
     push af
     srl a
     srl a
@@ -138526,12 +128751,219 @@ ItemNames: ; 472b (1:472b)
     db "TM:RCK SLIDE@" ; $F8
     db "TM:TRI ATK@"   ; $F9
     db "TM:SUBSTIT.@"  ; $FA
-    db "TM:CUT@"       ; $FB
-    db "TM:FLY@"       ; $FC
-    db "TM:SURF@"      ; $FD
-    db "TM:STRENGTH@"  ; $FE
+    db "TM:BLADE@"     ; $FB
+    db "TM:SWOOP@"     ; $FC
+    db "TM:TSUNAMI@"   ; $FD
+    db "TM:STRIKE@"    ; $FE
     db "CANCEL@"       ; $FF
     db "ITEM 00@"      ; $00
+
+_CheckEvolutionMove:
+    ld a,[$d11e] ; Read Original
+    ld [$cf91],a ; ...
+    ld a,$3a
+    call Predef ; indirect jump to IndexToPokedex
+    ld a,[$d11e]
+    dec a
+    ld hl,EvolutionMove
+    ld b,0
+    ld c,a
+    add hl,bc
+    ld a,[hl]
+    and a
+    jr z,.done
+    ld d,a
+    ld a,[$cc49]
+    and a
+    jr nz,.next
+    ld hl,W_PARTYMON1_MOVE1 ; $d173
+    ld a,[wWhichPokemon] ; $cf92
+    ld bc,$2c
+    call AddNTimes
+.next
+    ld b,$4
+.checkCurrentMovesLoop
+    ld a,[hli]
+    cp d
+    jr z,.done
+    dec b
+    jr nz,.checkCurrentMovesLoop
+    ld a,d
+    ld [$d0e0],a
+    ld [$d11e],a
+    call GetMoveName
+    call CopyStringToCF4B
+    ld a,$1b
+    call Predef ; indirect jump to Func_6e43 (6e43 (1:6e43)) ; LearnMove
+.done
+    ld a,[$cf91] ; Restore Original
+    ld [$d11e],a ; ...
+    ret
+
+EvolutionMove:
+   db 0                    ; BULBASAUR
+   db 0                    ; IVYSAUR
+   db GROWTH               ; VENUSAUR
+   db 0                    ; CHARMANDER
+   db 0                    ; CHARMELEON
+   db DRAGON_RAGE          ; CHARIZARD
+   db 0                    ; SQUIRTLE
+   db 0                    ; WARTORTLE
+   db SPIKE_CANNON         ; BLASTOISE
+   db 0                    ; CATERPIE
+   db HARDEN               ; METAPOD
+   db CONFUSION            ; BUTTERFREE
+   db 0                    ; WEEDLE
+   db HARDEN               ; KAKUNA
+   db TWINEEDLE            ; BEEDRILL
+   db 0                    ; PIDGEY
+   db 0                    ; PIDGEOTTO
+   db 0                    ; PIDGEOT
+   db 0                    ; RATTATA
+   db 0                    ; RATICATE
+   db 0                    ; SPEAROW
+   db SWOOP                ; FEAROW
+   db 0                    ; EKANS
+   db 0                    ; ARBOK
+   db 0                    ; PIKACHU
+   db THUNDERBOLT          ; RAICHU
+   db 0                    ; SANDSHREW
+   db 0                    ; SANDSLASH
+   db 0                    ; NIDORAN_F
+   db 0                    ; NIDORINA
+   db BODY_SLAM            ; NIDOQUEEN
+   db 0                    ; NIDORAN_M
+   db 0                    ; NIDORINO
+   db THRASH               ; NIDOKING
+   db 0                    ; CLEFAIRY
+   db 0                    ; CLEFABLE
+   db 0                    ; VULPIX
+   db 0                    ; NINETALES
+   db 0                    ; JIGGLYPUFF
+   db 0                    ; WIGGLYTUFF
+   db 0                    ; ZUBAT
+   db 0                    ; GOLBAT
+   db 0                    ; ODDISH
+   db 0                    ; GLOOM
+   db 0                    ; VILEPLUME
+   db 0                    ; PARAS
+   db 0                    ; PARASECT
+   db 0                    ; VENONAT
+   db PSYBEAM              ; VENOMOTH
+   db 0                    ; DIGLETT
+   db TRI_ATTACK           ; DUGTRIO
+   db 0                    ; MEOWTH
+   db HYPER_FANG           ; PERSIAN
+   db 0                    ; PSYDUCK
+   db WATER_GUN            ; GOLDUCK
+   db 0                    ; MANKEY
+   db RAGE                 ; PRIMEAPE
+   db 0                    ; GROWLITHE
+   db HYPER_FANG           ; ARCANINE
+   db 0                    ; POLIWAG
+   db MEGA_PUNCH           ; POLIWHIRL
+   db LOW_KICK             ; POLIWRATH
+   db 0                    ; ABRA
+   db KINESIS              ; KADABRA
+   db 0                    ; ALAKAZAM
+   db 0                    ; MACHOP
+   db 0                    ; MACHOKE
+   db 0                    ; MACHAMP
+   db 0                    ; BELLSPROUT
+   db 0                    ; WEEPINBELL
+   db 0                    ; VICTREEBEL
+   db 0                    ; TENTACOOL
+   db SLUDGE               ; TENTACRUEL
+   db 0                    ; GEODUDE
+   db BODY_SLAM            ; GRAVELER
+   db 0                    ; GOLEM
+   db 0                    ; PONYTA
+   db AGILITY              ; RAPIDASH
+   db 0                    ; SLOWPOKE
+   db MEGA_PUNCH           ; SLOWBRO
+   db 0                    ; MAGNEMITE
+   db TRI_ATTACK           ; MAGNETON
+   db 0                    ; FARFETCH_D
+   db 0                    ; DODUO
+   db TRI_ATTACK           ; DODRIO
+   db 0                    ; SEEL
+   db TSUNAMI              ; DEWGONG
+   db 0                    ; GRIMER
+   db 0                    ; MUK
+   db 0                    ; SHELLDER
+   db SPIKE_CANNON         ; CLOYSTER
+   db 0                    ; GASTLY
+   db 0                    ; HAUNTER
+   db 0                    ; GENGAR
+   db 0                    ; ONIX
+   db 0                    ; DROWZEE
+   db 0                    ; HYPNO
+   db 0                    ; KRABBY
+   db 0                    ; KINGLER
+   db 0                    ; VOLTORB
+   db THUNDERBOLT          ; ELECTRODE
+   db 0                    ; EXEGGCUTE
+   db STOMP                ; EXEGGUTOR
+   db 0                    ; CUBONE
+   db NIGHT_SHADE          ; MAROWAK
+   db 0                    ; HITMONLEE
+   db 0                    ; HITMONCHAN
+   db 0                    ; LICKITUNG
+   db 0                    ; KOFFING
+   db 0                    ; WEEZING
+   db 0                    ; RHYHORN
+   db 0                    ; RHYDON
+   db 0                    ; CHANSEY
+   db 0                    ; TANGELA
+   db 0                    ; KANGASKHAN
+   db 0                    ; HORSEA
+   db DRAGON_RAGE          ; SEADRA
+   db 0                    ; GOLDEEN
+   db 0                    ; SEAKING
+   db 0                    ; STARYU
+   db BUBBLEBEAM           ; STARMIE
+   db 0                    ; MR_MIME
+   db 0                    ; SCYTHER
+   db 0                    ; JYNX
+   db 0                    ; ELECTABUZZ
+   db 0                    ; MAGMAR
+   db 0                    ; PINSIR
+   db 0                    ; TAUROS
+   db 0                    ; MAGIKARP
+   db BITE                 ; GYARADOS
+   db 0                    ; LAPRAS
+   db 0                    ; DITTO
+   db 0                    ; EEVEE
+   db WATER_GUN            ; VAPOREON
+   db THUNDERSHOCK         ; JOLTEON
+   db EMBER                ; FLAREON
+   db 0                    ; PORYGON
+   db 0                    ; OMANYTE
+   db SPIKE_CANNON         ; OMASTAR
+   db 0                    ; KABUTO
+   db SLASH                ; KABUTOPS
+   db 0                    ; AERODACTYL
+   db 0                    ; SNORLAX
+   db 0                    ; ARTICUNO
+   db 0                    ; ZAPDOS
+   db 0                    ; MOLTRES
+   db 0                    ; DRATINI
+   db 0                    ; DRAGONAIR
+   db SWOOP                ; DRAGONITE
+   db 0                    ; MEWTWO
+   db 0                    ; MEW
+
+; four tiles: pokeball,black pokeball (status ailment),crossed out pokeball (faited) and pokeball slot (no mon)
+PokeballTileGraphics:
+    INCBIN "gfx/pokeball.2bpp"
+
+; tiles for gameboy and link cable graphics used for trading sequence animation
+TradingAnimationGraphics:
+    INCBIN "gfx/trade.2bpp"
+
+; 4 tiles for actual wire transfer animation (pokeball wandering inside wire)
+TradingAnimationGraphics2:
+    INCBIN "gfx/trade2.2bpp"
 
 SECTION "bank34",ROMX,BANK[$34] ; Denim
 
