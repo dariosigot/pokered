@@ -49451,40 +49451,38 @@ ReadTrainer: ; 39c53 (e:5c53)
     cp $ff
     jr z,.FinishUp
     cp b
-    jr nz,.ContinueUntilZero
+    jr nz,.NextSpecialTrainer1
     ld a,[hli]
     cp c
-    jr nz,.ContinueUntilZero
-    ld d,h
-    ld e,l
+    jr nz,.NextSpecialTrainer2
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
     ld b,0
 .writeAdditionalMoveDataLoop
+    ld a,[hl]
+    and a
+    jr z,.FinishUp
     ld a,b
-    srl a
-    srl a ; a = a DIV 4
-    ld hl,W_ENEMYMON1MOVE3-2 ; W_ENEMYMON1MOVE1
     push bc
+    push hl
+    ld hl,W_ENEMYMON1MOVE3-2 ; W_ENEMYMON1MOVE1
     ld bc,44
     call AddNTimes
-    pop bc
-    ld a,b
-    and %00000011 ; a = a MOD 4
-    ld c,a
-    push bc
+    ld d,h
+    ld e,l
+    pop hl
     ld b,0
-    add hl,bc
+    ld c,4
+    call CopyData ; copy bc bytes of data from hl to de
     pop bc
-    ld a,[de]
-    inc de
-    and a
-    jp z,.FinishUp
-    ld [hl],a
     inc b
     jr .writeAdditionalMoveDataLoop
-.ContinueUntilZero
-    ld a,[hli]
-    and a
-    jr nz,.ContinueUntilZero
+.NextSpecialTrainer1
+    inc hl
+.NextSpecialTrainer2
+    inc hl
+    inc hl
     jr .loopAdditionalMoveData
 .FinishUp ; XXX this needs documenting
     xor a       ; clear D079-D07B
@@ -50764,8 +50762,6 @@ LearnMoveFromLevelUp:
     cp STRUGGLE ; C - Set for no borrow. (Set if A < n.)
     jr c,.learnmove
     jr .done
-
-SpecialTrainerMoves:
 
 INCLUDE "constants/special_trainer.asm"
 

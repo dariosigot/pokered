@@ -1,7 +1,35 @@
-; entry ≔ trainerclass,trainerid,moveset+,0
-; moveset ≔ partymon,partymon'smove,moveid
+SpecialTrainer: MACRO
+    db \1,\2
+    dw \3
+    ENDM
 
-    db BROCK,$1
+SpecialTrainerMoves:
+    SpecialTrainer BROCK,$1,BrockMoves
+    SpecialTrainer MISTY,$1,MistyMove
+    SpecialTrainer LT__SURGE,$1,LtSurgeMove
+    SpecialTrainer ERIKA,$1,ErikaMove
+    SpecialTrainer KOGA,$1,KogaMove
+    SpecialTrainer BLAINE,$1,BlaineMove
+    SpecialTrainer SABRINA,$1,SabrinaMove
+    SpecialTrainer GIOVANNI,$1,Giovanni1Move
+    SpecialTrainer GIOVANNI,$2,Giovanni2Move
+    SpecialTrainer GIOVANNI,$3,Giovanni3Move
+    SpecialTrainer LORELEI,$1,LoreleiMove
+    SpecialTrainer BRUNO,$1,BrunoMove
+    SpecialTrainer AGATHA,$1,AgathaMove
+    SpecialTrainer LANCE,$1,LanceMove
+    SpecialTrainer SONY2,$7,Sony2Move7
+    SpecialTrainer SONY2,$8,Sony2Move8
+    SpecialTrainer SONY2,$9,Sony2Move9
+    SpecialTrainer SONY2,$a,Sony2MoveA
+    SpecialTrainer SONY2,$b,Sony2MoveB
+    SpecialTrainer SONY2,$c,Sony2MoveC
+    SpecialTrainer SONY3,$1,Sony3Move1
+    SpecialTrainer SONY3,$2,Sony3Move2
+    SpecialTrainer SONY3,$3,Sony3Move3
+    db $ff
+
+BrockMoves:
     ; Geodude (Level 12)
     db TACKLE
     db DEFENSE_CURL
@@ -14,7 +42,7 @@
     db STRIKE
     db 0
 
-    db MISTY,$1
+MistyMove:
     ; Staryu (Level 18)
     db BUBBLEBEAM
     db HARDEN
@@ -27,7 +55,7 @@
     db RECOVER
     db 0
 
-    db LT__SURGE,$1
+LtSurgeMove:
     ; Raichu (Level 28)
     db SUBMISSION
     db GROWL
@@ -35,7 +63,7 @@
     db THUNDER_WAVE
     db 0
 
-    db ERIKA,$1
+ErikaMove:
     ; Tangela (Level 30)
     db WRAP
     db MEGA_DRAIN
@@ -53,7 +81,7 @@
     db PETAL_DANCE
     db 0
 
-    db KOGA,$1
+KogaMove:
     ; Venomoth (Level 48)
     db SUPERSONIC
     db SLUDGE
@@ -66,7 +94,7 @@
     db DOUBLE_TEAM
     db 0
 
-    db BLAINE,$1
+BlaineMove:
     ; Ninetales (Level 48)
     db FIRE_BLAST
     db CONFUSE_RAY
@@ -84,7 +112,7 @@
     db PSYCHIC_M
     db 0
 
-    db SABRINA,$1
+SabrinaMove:
     ; Haunter (Level 48)
     db HYPNOSIS
     db AMNESIA
@@ -97,7 +125,7 @@
     db BARRIER
     db 0
 
-    db GIOVANNI,$1
+Giovanni1Move:
     ; Geodude (Level 25)
     db EXPLOSION
     db MEGA_PUNCH
@@ -115,7 +143,7 @@
     db SLASH
     db 0
 
-    db GIOVANNI,$2
+Giovanni2Move:
     ; Nidorino (Level 42)
     db DOUBLE_KICK
     db FOCUS_ENERGY
@@ -138,7 +166,7 @@
     db EARTHQUAKE
     db 0
 
-    db GIOVANNI,$3
+Giovanni3Move:
     ; Persian (Level 43)
     db HYPER_BEAM
     db REST
@@ -166,7 +194,7 @@
     db FISSURE
     db 0
 
-    db LORELEI,$1
+LoreleiMove:
     ; Dewgong (Level 54)
     db TSUNAMI
     db BODY_SLAM
@@ -194,7 +222,7 @@
     db BLIZZARD
     db 0
 
-    db BRUNO,$1
+BrunoMove:
     ; Onix (Level 53)
     db BODY_SLAM
     db DRAGON_RAGE
@@ -222,7 +250,7 @@
     db COUNTER
     db 0
 
-    db AGATHA,$1
+AgathaMove:
     ; Gengar (Level 56)
     db CONFUSE_RAY
     db SLUDGE
@@ -250,7 +278,7 @@
     db ACID_ARMOR
     db 0
 
-    db LANCE,$1
+LanceMove:
     ; Gyarados (Level 58)
     db HYPER_BEAM
     db HYDRO_PUMP
@@ -278,7 +306,7 @@
     db HYPER_BEAM
     db 0
 
-    db SONY2,$7
+Sony2Move7:
     ; Pidgeot (Level 37)
     db QUICK_ATTACK
     db WING_ATTACK
@@ -306,7 +334,7 @@
     db TSUNAMI
     db 0
 
-    db SONY2,$8
+Sony2Move8:
     ; Pidgeot (Level 37)
     db QUICK_ATTACK
     db WING_ATTACK
@@ -334,7 +362,7 @@
     db BODY_SLAM
     db 0
 
-    db SONY2,$9
+Sony2Move9:
     ; Pidgeot (Level 37)
     db QUICK_ATTACK
     db WING_ATTACK
@@ -362,7 +390,7 @@
     db SWOOP
     db 0
 
-    db SONY2,$a
+Sony2MoveA:
     ; Pidgeot (Level 47)
     db SWOOP
     db AGILITY
@@ -395,7 +423,7 @@
     db HYDRO_PUMP
     db 0
 
-    db SONY2,$b
+Sony2MoveB:
     ; Pidgeot (Level 47)
     db SWOOP
     db AGILITY
@@ -428,7 +456,7 @@
     db BODY_SLAM
     db 0
 
-    db SONY2,$c
+Sony2MoveC:
     ; Pidgeot (Level 47)
     db SWOOP
     db AGILITY
@@ -461,7 +489,7 @@
     db FLAMETHROWER
     db 0
 
-    db SONY3,$1
+Sony3Move1:
     ; Pidgeot (Level 61)
     db SWOOP
     db AGILITY
@@ -494,7 +522,7 @@
     db HYDRO_PUMP
     db 0
 
-    db SONY3,$2
+Sony3Move2:
     ; Pidgeot (Level 61)
     db SWOOP
     db AGILITY
@@ -527,7 +555,7 @@
     db BODY_SLAM
     db 0
 
-    db SONY3,$3
+Sony3Move3:
     ; Pidgeot (Level 61)
     db SWOOP
     db AGILITY
@@ -559,5 +587,3 @@
     db SWORDS_DANCE
     db FIRE_BLAST
     db 0
-
-    db $ff
