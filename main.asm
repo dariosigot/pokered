@@ -58388,7 +58388,7 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     ld hl,ReadTrainer
     ld b,BANK(ReadTrainer)
     call Bankswitch ; indirect jump to ReadTrainer (39c53 (e:5c53))
-    call DoBattleTransitionAndInitBatVar
+    call PlayBattleMusicAndDoBattleTransitionAndInitBatVar ; call DoBattleTransitionAndInitBatVar
     call _LoadTrainerPic
     xor a
     ld [W_ENEMYMONID],a
@@ -58409,7 +58409,7 @@ InitWildBattle: ; 3ef8b (f:6f8b)
     ld a,$1
     ld [W_ISINBATTLE],a ; $d057
     call LoadEnemyMonData
-    call DoBattleTransitionAndInitBatVar
+    call PlayBattleMusicAndDoBattleTransitionAndInitBatVar ; call DoBattleTransitionAndInitBatVar
     ld a,[W_CUROPPONENT] ; $d059
     cp MAROWAK
     jr z,.isGhost
@@ -60958,6 +60958,12 @@ AIGetTypeEffectiveness:
 .nextTypePair2
     inc hl
     jr .loop
+
+PlayBattleMusicAndDoBattleTransitionAndInitBatVar:
+   ld hl,PlayBattleMusic
+   ld b,BANK(PlayBattleMusic)
+   call Bankswitch ; indirect jump to PlayBattleMusic (90c6 (2:50c6))
+   jp DoBattleTransitionAndInitBatVar
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -77593,9 +77599,12 @@ InitBattleVariables: ; 525af (14:65af)
     ld a,$2
     ld [W_BATTLETYPE],a ; $d05a
 .asm_525f9
-    ld hl,PlayBattleMusic
-    ld b,BANK(PlayBattleMusic)
-    jp Bankswitch ; indirect jump to PlayBattleMusic (90c6 (2:50c6))
+    ret
+    ;ld hl,PlayBattleMusic
+    ;ld b,BANK(PlayBattleMusic)
+    ;jp Bankswitch ; indirect jump to PlayBattleMusic (90c6 (2:50c6))
+
+SECTION "Func_52601",ROMX[$6601],BANK[$14]
 
 Func_52601: ; 52601 (14:6601)
     ld hl,W_ENEMYMONSTATUS ; $cfe9
