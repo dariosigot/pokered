@@ -905,8 +905,8 @@ NewBattle: ; 0683 (0:0683)
     ld a,[$d72e]
     bit 4,a
     jr nz,.noBattle
-    ld b,BANK(Func_3ef12)
-    ld hl,Func_3ef12
+    ld b,BANK(InitBattle)
+    ld hl,InitBattle
     jp Bankswitch ; determines if a battle will occurr and runs the battle if so
 .noBattle
     and a
@@ -13236,7 +13236,7 @@ Func_5317: ; 5317 (1:5317)
     ld hl,W_OPTIONS ; $d355
     res 7,[hl]
     ld a,$2c
-    call Predef ; indirect jump to Func_3ef18 (3ef18 (f:6f18))
+    call Predef ; indirect jump to InitOpponent (3ef18 (f:6f18))
     ld a,$7
     call Predef ; indirect jump to HealParty (f6a5 (3:76a5))
     jp Func_577d
@@ -32474,7 +32474,7 @@ UnnamedText_1386b: ; 1386b (4:786b)
     TX_FAR _UnnamedText_1386b
     db "@"
 
-Func_13870: ; 13870 (4:7870)
+TryDoWildEncounter: ; 13870 (4:7870)
     ld a,[$cc57]
     and a
     ret nz
@@ -48676,9 +48676,9 @@ Func_396d3: ; 396d3 (e:56d3)
     ld [W_ENEMYMONID],a
     ld b,$1
     call GoPAL_SET
-    ld hl,Func_3f04b
-    ld b,BANK(Func_3f04b)
-    call Bankswitch ; indirect jump to Func_3f04b (3f04b (f:704b))
+    ld hl,_LoadTrainerPic
+    ld b,BANK(_LoadTrainerPic)
+    call Bankswitch ; indirect jump to _LoadTrainerPic (3f04b (f:704b))
     FuncCoord 19,0 ; $c3b3
     ld hl,Coord
     ld c,$0
@@ -57883,7 +57883,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     jr nz,.asm_3ec2d
     ret
 
-Func_3ec32: ; 3ec32 (f:6c32)
+DoBattleTransitionAndInitBatVar: ; 3ec32 (f:6c32)
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jr nz,.asm_3ec4d
@@ -58345,17 +58345,17 @@ PlayMoveAnimation: ; 3ef07 (f:6f07)
     call Delay3
     PREDEF_JUMP MoveAnimationPredef ; predef 8
 
-Func_3ef12: ; 3ef12 (f:6f12)
+InitBattle: ; 3ef12 (f:6f12)
     ld a,[W_CUROPPONENT] ; $d059
     and a
-    jr z,asm_3ef23
+    jr z,DetermineWildOpponent
 
-Func_3ef18: ; 3ef18 (f:6f18)
+InitOpponent: ; 3ef18 (f:6f18)
     ld a,[W_CUROPPONENT] ; $d059
     ld [$cf91],a
     ld [W_ENEMYMONID],a
-    jr asm_3ef3d
-asm_3ef23: ; 3ef23 (f:6f23)
+    jr InitBattleCommon
+DetermineWildOpponent: ; 3ef23 (f:6f23)
     ld a,[$d732]
     bit 1,a
     jr z,.asm_3ef2f
@@ -58366,30 +58366,30 @@ asm_3ef23: ; 3ef23 (f:6f23)
     ld a,[$d13c]
     and a
     ret nz
-    ld hl,Func_13870
-    ld b,BANK(Func_13870)
-    call Bankswitch ; indirect jump to Func_13870 (13870 (4:7870))
+    ld hl,TryDoWildEncounter
+    ld b,BANK(TryDoWildEncounter)
+    call Bankswitch ; indirect jump to TryDoWildEncounter (13870 (4:7870))
     ret nz
-asm_3ef3d: ; 3ef3d (f:6f3d)
+InitBattleCommon: ; 3ef3d (f:6f3d)
     ld a,[$d35d]
     push af
     ld hl,$d358
     ld a,[hl]
     push af
     res 1,[hl]
-    ld hl,Func_525af
-    ld b,BANK(Func_525af)
-    call Bankswitch ; indirect jump to Func_525af (525af (14:65af))
+    ld hl,InitBattleVariables
+    ld b,BANK(InitBattleVariables)
+    call Bankswitch ; indirect jump to InitBattleVariables (525af (14:65af))
     ld a,[W_ENEMYMONID]
     sub $c8
-    jp c,Func_3ef8b
+    jp c,InitWildBattle
     ld [W_TRAINERCLASS],a ; $d031
     call Func_3566
     ld hl,ReadTrainer
     ld b,BANK(ReadTrainer)
     call Bankswitch ; indirect jump to ReadTrainer (39c53 (e:5c53))
-    call Func_3ec32
-    call Func_3f04b
+    call DoBattleTransitionAndInitBatVar
+    call _LoadTrainerPic
     xor a
     ld [W_ENEMYMONID],a
     ld [$FF00+$e1],a
@@ -58405,11 +58405,11 @@ asm_3ef3d: ; 3ef3d (f:6f3d)
     ld [W_ISINBATTLE],a ; $d057
     jp Func_3efeb
 
-Func_3ef8b: ; 3ef8b (f:6f8b)
+InitWildBattle: ; 3ef8b (f:6f8b)
     ld a,$1
     ld [W_ISINBATTLE],a ; $d057
     call LoadEnemyMonData
-    call Func_3ec32
+    call DoBattleTransitionAndInitBatVar
     ld a,[W_CUROPPONENT] ; $d059
     cp MAROWAK
     jr z,.isGhost
@@ -58502,7 +58502,7 @@ Func_3efeb: ; 3efeb (f:6feb)
 TerminatorText_3f04a: ; 3f04a (f:704a)
     db "@"
 
-Func_3f04b: ; 3f04b (f:704b)
+_LoadTrainerPic: ; 3f04b (f:704b)
     ld a,[$d033]
     ld e,a
     ld a,[$d034]
@@ -73983,7 +73983,7 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     dw DisplayPokedexMenu_
     dbw BANK(Func_3ad1c),Func_3ad1c
     dbw BANK(SaveSAVtoSRAM0),SaveSAVtoSRAM0
-    dbw BANK(Func_3ef18),Func_3ef18
+    dbw BANK(InitOpponent),InitOpponent
     dbw BANK(Func_5a5f),Func_5a5f
     dbw BANK(DrawBadges),DrawBadges
     dbw BANK(Func_410f3),Func_410f3
@@ -77556,7 +77556,7 @@ Mansion4Object: ; 0x52498 (size=69)
 Mansion4Blocks: ; 524dd (14:64dd)
     INCBIN "maps/mansion4.blk"
 
-Func_525af: ; 525af (14:65af)
+InitBattleVariables: ; 525af (14:65af)
     ld a,[$FF00+$d7]
     ld [$d0d4],a
     xor a
