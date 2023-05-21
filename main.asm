@@ -7337,8 +7337,8 @@ DisplayListMenuIDLoop: ; 2c53 (0:2c53)
     jr z,.notOldManBattle
 .oldManBattle
     ld a,"▶"
-    FuncCoord 5,4
-    call HackItemInBattle ; ld [Coord],a ; place menu cursor in front of first menu entry ; $2c68
+    FuncCoord 5,9
+    ld [Coord],a ; place menu cursor in front of first menu entry
     ld c,80
     call DelayFrames
     xor a
@@ -10785,8 +10785,8 @@ GoodCopyVideoData: ; Denim,ExpBar
 HackItemInBattle:
     pop hl  ; get Return Pointer to HL
     push hl ; restore Return Pointer in Stack
+    push bc
     push de
-    ld d,a
     ld e,l
     ld hl,_HackItemInBattle
     ld b,BANK(_HackItemInBattle)
@@ -10794,6 +10794,7 @@ HackItemInBattle:
     ld h,d
     ld l,e
     pop de
+    pop bc
     ret
 
 SECTION "bank1",ROMX,BANK[$1]
@@ -127505,7 +127506,6 @@ DratiniCaveBlocks:
     INCBIN "maps/dratinicave.blk"
 
 ; INPUT
-; d = ex a
 ; e = Low Bit Return Pointer
 _HackItemInBattle:
     ld hl,.Table
@@ -127549,21 +127549,13 @@ _HackItemInBattle:
     ld [wTopMenuItemY],a ; $2c41
     ret
 .Step4
-    ld a,d
-    FuncCoord 5,4
-    ld [Coord],a ; place menu cursor in front of first menu entry
-    ret z
-    FuncCoord 5,9
-    ld [Coord],a ; place menu cursor in front of first menu entry ; $2c68
-    ret
-.Step5
     FuncCoord 5,3 ; $c3e1
     ld de,Coord
     ret z
     FuncCoord 5,8 ; $c3e1
     ld de,Coord ; $2e5a
     ret
-.Step6
+.Step5
     FuncCoord 6,4 ; coordinates of first list entry name
     ld de,Coord
     ret z
@@ -127577,12 +127569,10 @@ _HackItemInBattle:
     dw .Step2
     db $41 + 3
     dw .Step3
-    db $68 + 3
-    dw .Step4
     db $5a + 3
-    dw .Step5
+    dw .Step4
     db $82 + 3
-    dw .Step6
+    dw .Step5
     db $ff
 
 SECTION "bank33",ROMX,BANK[$33] ; Denim,GENDER
