@@ -8829,11 +8829,11 @@ Func_3566: ; 3566 (0:3566)
     ld a,[W_ISLINKBATTLE] ; $d12b
     and a
     jr nz,.asm_3594
-    ld a,$e
+    ld a,BANK(TrainerPicAndMoneyPointers)
     call BankswitchHome
     ld a,[W_TRAINERCLASS] ; $d031
     dec a
-    ld hl,$5914
+    ld hl,TrainerPicAndMoneyPointers
     ld bc,$5
     call AddNTimes
     ld de,$d033
@@ -48096,17 +48096,17 @@ TrainerClassMoveChoiceModifications: ; 3989b (e:589b)
     db 1,0    ; BIRD_KEEPER
     db 1,0    ; BLACKBELT
     db 1,0    ; SONY1
-    db 1,3,0  ; PROF_OAK
-    db 1,2,0  ; CHIEF
+    db 0      ; PROF_OAK
+    db 0      ; CHIEF
     db 1,2,0  ; SCIENTIST
     db 1,3,0  ; GIOVANNI
     db 1,0    ; ROCKET
     db 1,3,0  ; COOLTRAINER_M
     db 1,3,0  ; COOLTRAINER_F
     db 1,0    ; BRUNO
-    db 1,0    ; BROCK
-    db 1,3,0  ; MISTY
-    db 1,3,0  ; LT__SURGE
+    db 1,2,3,0  ; BROCK             ; TODO
+    db 1,2,3,0  ; MISTY
+    db 1,2,3,0  ; LT__SURGE
     db 1,3,0  ; ERIKA
     db 1,3,0  ; KOGA
     db 1,3,0  ; BLAINE
@@ -48119,8 +48119,12 @@ TrainerClassMoveChoiceModifications: ; 3989b (e:589b)
     db 1,0    ; AGATHA
     db 1,3,0  ; LANCE
 
+SECTION "TrainerPicAndMoneyPointers",ROMX[$5914],BANK[$e]
+
 ; trainer pic pointers and base money.
 ; money received after battle = base money × level of highest-level enemy mon
+TrainerPicAndMoneyPointers:
+
     dw YoungsterPic
     db 0,$15,0
 
