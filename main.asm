@@ -21998,7 +21998,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHSXX
     dw MapHSXX
     dw MapHSXX
-    dw MapHSXX
+    dw MapHS07
     dw MapHSXX
     dw MapHSXX
     dw MapHS0A
@@ -22561,6 +22561,9 @@ MapHSA2: ; cd8d (3:4d8d)
     db SEAFOAM_ISLANDS_5,$03,Show
 MapHS69:
     db DRATINI_CAVE,$01,Show
+    db DRATINI_CAVE,$02,Show
+MapHS07:
+    db FUCHSIA_CITY,$0b,Show
 
     db $FF,$01,Show
 
@@ -23064,1740 +23067,818 @@ WildDataPointers: ; ceeb (3:4eeb)
         ; followed by 20 bytes:
         ; level,species (ten times)
 
-IF _RED
+; Chance   51/256 51/256 39/256 25/256 25/256 25/256 13/256 13/256 11/256 3/256
+; Approx.  20%    20%    15%    10%    10%    10%    5%     5%     4%     1%
+
 NoMons: ; d0dd (3:50dd)
     db $00
-
     db $00
 
 Route1Mons: ; d0df (3:50df)
     db $19
-    db 3,PIDGEY
-    db 3,RATTATA
-    db 3,RATTATA
-    db 2,RATTATA
-    db 2,PIDGEY
-    db 3,PIDGEY
-    db 3,PIDGEY
-    db 4,RATTATA
-    db 4,PIDGEY
-    db 5,PIDGEY
-
+    db  3,PIDGEY  ; 20%
+    db  3,RATTATA ; 20%
+    db  4,RATTATA ; 15%
+    db  2,RATTATA ; 10%
+    db  2,PIDGEY  ; 10% ; Entry Level
+    db  3,PIDGEY  ; 10%
+    db  4,PIDGEY  ;  5%
+    db  1,RATTATA ;  5% ; Entry Level
+    db  2,MEOWTH  ;  4% ; Entry Level
+    db  5,PIDGEY  ;  1%
     db $00
 
 Route2Mons: ; d0f5 (3:50f5)
     db $19
-    db 3,RATTATA
-    db 3,PIDGEY
-    db 4,PIDGEY
-    db 4,RATTATA
-    db 5,PIDGEY
-    db 3,WEEDLE
-    db 2,RATTATA
-    db 5,RATTATA
-    db 4,WEEDLE
-    db 5,WEEDLE
-
+    db  3,RATTATA ; 20%
+    db  3,PIDGEY  ; 20%
+    db  4,PIDGEY  ; 15%
+    db  4,RATTATA ; 10%
+    db  3,MEOWTH  ; 10%
+    db  3,SPEAROW ; 10% ; Entry Level
+    db  4,MEOWTH  ;  5%
+    db  4,SPEAROW ;  5%
+    db  6,RATTATA ;  4%
+    db  7,PIDGEY  ;  1%
     db $00
 
 Route22Mons: ; d10b (3:510b)
     db $19
-    db 3,RATTATA
-    db 3,NIDORAN_M
-    db 4,RATTATA
-    db 4,NIDORAN_M
-    db 2,RATTATA
-    db 2,NIDORAN_M
-    db 3,SPEAROW
-    db 5,SPEAROW
-    db 3,NIDORAN_F
-    db 4,NIDORAN_F
-
+    db  3,NIDORAN_M ; 20% ; Entry Level
+    db  3,NIDORAN_F ; 20% ; Entry Level
+    db  4,SPEAROW   ; 15%
+    db  4,NIDORAN_M ; 10%
+    db  4,NIDORAN_F ; 10%
+    db  3,SPEAROW   ; 10%
+    db  2,MANKEY    ;  5% ; Entry Level
+    db  5,SPEAROW   ;  5%
+    db  3,MANKEY    ;  4%
+    db  4,MANKEY    ;  1%
     db $00
 
 ForestMons: ; d121 (3:5121)
     db $08
-    db 4,WEEDLE
-    db 5,KAKUNA
-    db 3,WEEDLE
-    db 5,WEEDLE
-    db 4,KAKUNA
-    db 6,KAKUNA
-    db 4,METAPOD
-    db 3,CATERPIE
-    db 3,PIKACHU
-    db 5,PIKACHU
-
+    db  3,WEEDLE   ; 20% ; Entry Level
+    db  3,CATERPIE ; 20% ; Entry Level
+    db  4,WEEDLE   ; 15%
+    db  7,KAKUNA   ; 10% ; Entry Level
+    db  7,METAPOD  ; 10% ; Entry Level
+    db  4,CATERPIE ; 10%
+    db  5,WEEDLE   ;  5%
+    db  4,VENONAT  ;  5%
+    db  6,VENONAT  ;  4% ; Entry Level
+    db  6,PINSIR   ;  1% ; Entry Level
     db $00
 
 Route3Mons: ; d137 (3:5137)
     db $14
-    db 6,PIDGEY
-    db 5,SPEAROW
-    db 7,PIDGEY
-    db 6,SPEAROW
-    db 7,SPEAROW
-    db 8,PIDGEY
-    db 8,SPEAROW
-    db 3,JIGGLYPUFF
-    db 5,JIGGLYPUFF
-    db 7,JIGGLYPUFF
-
+    db  6,MANKEY     ; 20%
+    db  5,SPEAROW    ; 20%
+    db  8,MANKEY     ; 15%
+    db  6,SPEAROW    ; 10%
+    db  5,SANDSHREW  ; 10% ; Entry Level
+    db  9,MANKEY     ; 10%
+    db  7,SANDSHREW  ;  5%
+    db  4,JIGGLYPUFF ;  5% ; Entry Level
+    db  8,JIGGLYPUFF ;  4%
+    db  7,PIKACHU    ;  1% ; Entry Level
     db $00
 
 MoonMons1: ; d14d (3:514d)
     db $0A
-    db 8,ZUBAT
-    db 7,ZUBAT
-    db 9,ZUBAT
-    db 8,GEODUDE
-    db 6,ZUBAT
-    db 10,ZUBAT
-    db 10,GEODUDE
-    db 8,PARAS
-    db 11,ZUBAT
-    db 8,CLEFAIRY
-
+    db  8,ZUBAT    ; 20%
+    db  7,ZUBAT    ; 20%
+    db  9,ZUBAT    ; 15%
+    db  8,GEODUDE  ; 10% ; Entry Level
+    db  6,ZUBAT    ; 10% ; Entry Level
+    db 10,ZUBAT    ; 10%
+    db 10,GEODUDE  ;  5%
+    db  8,PARAS    ;  5% ; Entry Level
+    db 11,ZUBAT    ;  4%
+    db  8,CLEFAIRY ;  1% ; Entry Level
     db $00
 
 MoonMonsB1: ; d163 (3:5163)
     db $0A
-    db 8,ZUBAT
-    db 7,ZUBAT
-    db 7,GEODUDE
-    db 8,GEODUDE
-    db 9,ZUBAT
-    db 10,PARAS
-    db 10,ZUBAT
-    db 11,ZUBAT
-    db 9,CLEFAIRY
-    db 9,GEODUDE
-
+    db  8,ZUBAT   ; 20%
+    db  7,ZUBAT   ; 20%
+    db  7,GEODUDE ; 15%
+    db  8,GEODUDE ; 10%
+    db  9,ZUBAT   ; 10%
+    db 10,PARAS   ; 10%
+    db  7,DIGLETT ;  5% ; Entry Level
+    db 12,ZUBAT   ;  5%
+    db  9,DIGLETT ;  4%
+    db 11,ONIX    ;  1% ; Entry Level
     db $00
 
 MoonMonsB2: ; d179 (3:5179)
     db $0A
-    db 9,ZUBAT
-    db 9,GEODUDE
-    db 10,ZUBAT
-    db 10,GEODUDE
-    db 11,ZUBAT
-    db 10,PARAS
-    db 12,PARAS
-    db 10,CLEFAIRY
-    db 12,ZUBAT
-    db 12,CLEFAIRY
-
+    db  9,ZUBAT    ; 20%
+    db  9,GEODUDE  ; 20%
+    db 10,ZUBAT    ; 15%
+    db 10,GEODUDE  ; 10%
+    db 11,ZUBAT    ; 10%
+    db 10,PARAS    ; 10%
+    db 13,PARAS    ;  5%
+    db 10,CLEFAIRY ;  5%
+    db 12,ZUBAT    ;  4%
+    db 12,CLEFAIRY ;  1%
     db $00
 
 Route4Mons: ; d18f (3:518f)
     db $14
-    db 10,RATTATA
-    db 10,SPEAROW
-    db 8,RATTATA
-    db 6,EKANS
-    db 8,SPEAROW
-    db 10,EKANS
-    db 12,RATTATA
-    db 12,SPEAROW
-    db 8,EKANS
-    db 12,EKANS
-
+    db 10,RATTATA   ; 20%
+    db 10,SPEAROW   ; 20%
+    db  8,RATTATA   ; 15%
+    db  6,EKANS     ; 10% ; Entry Level
+    db  8,SPEAROW   ; 10%
+    db  6,SANDSHREW ; 10%
+    db 10,SANDSHREW ;  5%
+    db 13,SPEAROW   ;  5%
+    db  8,EKANS     ;  4%
+    db 13,EKANS     ;  1%
     db $00
 
 Route24Mons: ; d1a5 (3:51a5)
     db $19
-    db 7,WEEDLE
-    db 8,KAKUNA
-    db 12,PIDGEY
-    db 12,ODDISH
-    db 13,ODDISH
-    db 10,ABRA
-    db 14,ODDISH
-    db 13,PIDGEY
-    db 8,ABRA
-    db 12,ABRA
-
+    db 13,PIDGEY     ; 20%
+    db  9,VENONAT    ; 20%
+    db 12,PIDGEY     ; 15%
+    db 11,ODDISH     ; 10% ; Entry Level
+    db 11,BELLSPROUT ; 10% ; Entry Level
+    db  8,ABRA       ; 10% ; Entry Level
+    db 14,ODDISH     ;  5%
+    db 14,BELLSPROUT ;  5%
+    db 12,VENONAT    ;  4%
+    db  9,ABRA       ;  1%
     db $00
 
 Route25Mons: ; d1bb (3:51bb)
     db $0F
-    db 8,WEEDLE
-    db 9,KAKUNA
-    db 13,PIDGEY
-    db 12,ODDISH
-    db 13,ODDISH
-    db 12,ABRA
-    db 14,ODDISH
-    db 10,ABRA
-    db 7,METAPOD
-    db 8,CATERPIE
-
-    db $00
-
-Route9Mons: ; d1d1 (3:51d1)
-    db $0F
-    db 16,RATTATA
-    db 16,SPEAROW
-    db 14,RATTATA
-    db 11,EKANS
-    db 13,SPEAROW
-    db 15,EKANS
-    db 17,RATTATA
-    db 17,SPEAROW
-    db 13,EKANS
-    db 17,EKANS
-
+    db 14,PIDGEY     ; 20%
+    db 16,PIDGEY     ; 20%
+    db 15,NIDORAN_M  ; 15%
+    db 13,NIDORAN_M  ; 10%
+    db 13,NIDORAN_F  ; 10%
+    db 14,NIDORAN_F  ; 10%
+    db 16,NIDORINO   ;  5% ; Entry Level
+    db 16,NIDORINA   ;  5% ; Entry Level
+    db 17,PIDGEY     ;  4%
+    db 18,PIDGEOTTO  ;  1% ; Entry Level
     db $00
 
 Route5Mons: ; d1e7 (3:51e7)
     db $0F
-    db 13,ODDISH
-    db 13,PIDGEY
-    db 15,PIDGEY
-    db 10,MANKEY
-    db 12,MANKEY
-    db 15,ODDISH
-    db 16,ODDISH
-    db 16,PIDGEY
-    db 14,MANKEY
-    db 16,MANKEY
-
+    db 13,ODDISH     ; 20%
+    db 13,BELLSPROUT ; 20%
+    db 15,MANKEY     ; 15%
+    db 12,MANKEY     ; 10%
+    db 16,ODDISH     ; 10%
+    db 16,BELLSPROUT ; 10%
+    db  9,FARFETCH_D ;  5% ; Entry Level
+    db 19,PIDGEOTTO  ;  5%
+    db 16,MANKEY     ;  4%
+    db 12,FARFETCH_D ;  1%
     db $00
 
 Route6Mons: ; d1fd (3:51fd)
     db $0F
-    db 13,ODDISH
-    db 13,PIDGEY
-    db 15,PIDGEY
-    db 10,MANKEY
-    db 12,MANKEY
-    db 15,ODDISH
-    db 16,ODDISH
-    db 16,PIDGEY
-    db 14,MANKEY
-    db 16,MANKEY
-
+    db 13,ODDISH     ; 20%
+    db 13,BELLSPROUT ; 20%
+    db 16,MEOWTH     ; 15%
+    db 12,MEOWTH     ; 10%
+    db 16,ODDISH     ; 10%
+    db 16,BELLSPROUT ; 10%
+    db 12,PSYDUCK    ;  5% ; Entry Level
+    db 19,PIDGEOTTO  ;  5%
+    db 16,MEOWTH     ;  4%
+    db 14,PSYDUCK    ;  1%
     db $00
 
 Route11Mons: ; d213 (3:5213)
     db $0F
-    db 14,EKANS
-    db 15,SPEAROW
-    db 12,EKANS
-    db 9,DROWZEE
-    db 13,SPEAROW
-    db 13,DROWZEE
-    db 15,EKANS
-    db 17,SPEAROW
-    db 11,DROWZEE
-    db 15,DROWZEE
-
+    db 12,RATTATA   ; 20%
+    db 13,SANDSHREW ; 20%
+    db 15,DIGLETT   ; 15%
+    db  9,DROWZEE   ; 10% ; Entry Level
+    db 16,DIGLETT   ; 10%
+    db 13,DROWZEE   ; 10%
+    db 15,RATTATA   ;  5%
+    db 16,SANDSHREW ;  5%
+    db 11,DROWZEE   ;  4%
+    db 15,DROWZEE   ;  1%
     db $00
 
-TunnelMonsB1: ; d229 (3:5229)
-    db $0F
-    db 16,ZUBAT
-    db 17,ZUBAT
-    db 17,GEODUDE
-    db 15,MACHOP
-    db 16,GEODUDE
-    db 18,ZUBAT
-    db 15,ZUBAT
-    db 17,MACHOP
-    db 13,ONIX
-    db 15,ONIX
-
+CaveMons: ; d5b1 (3:55b1)
+    db $14
+    db 18,DIGLETT   ; 20%
+    db 19,DIGLETT   ; 20%
+    db 17,DIGLETT   ; 15%
+    db 20,DIGLETT   ; 10%
+    db 16,DIGLETT   ; 10%
+    db 20,RATICATE  ; 10% ; Entry Level
+    db 21,DIGLETT   ;  5%
+    db 22,DIGLETT   ;  5%
+    db 22,SANDSLASH ;  4% ; Entry Level
+    db 31,DUGTRIO   ;  1% ; Entry Level
     db $00
 
-TunnelMonsB2: ; d23f (3:523f)
+Route9Mons: ; d1d1 (3:51d1)
     db $0F
-    db 16,ZUBAT
-    db 17,ZUBAT
-    db 17,GEODUDE
-    db 15,MACHOP
-    db 16,GEODUDE
-    db 18,ZUBAT
-    db 17,MACHOP
-    db 17,ONIX
-    db 13,ONIX
-    db 18,GEODUDE
-
+    db 16,RATTATA  ; 20%
+    db 16,SPEAROW  ; 20%
+    db 14,RATTATA  ; 15%
+    db 11,EKANS    ; 10%
+    db 13,SPEAROW  ; 10%
+    db 15,EKANS    ; 10%
+    db 20,RATICATE ;  5%
+    db 13,EKANS    ;  5%
+    db 20,FEAROW   ;  4% ; Entry Level
+    db 22,ARBOK    ;  1% ; Entry Level
     db $00
 
 Route10Mons: ; d255 (3:5255)
     db $0F
-    db 16,VOLTORB
-    db 16,SPEAROW
-    db 14,VOLTORB
-    db 11,EKANS
-    db 13,SPEAROW
-    db 15,EKANS
-    db 17,VOLTORB
-    db 17,SPEAROW
-    db 13,EKANS
-    db 17,EKANS
-
+    db 12,VOLTORB   ; 20% ; Entry Level
+    db 17,DIGLETT   ; 20%
+    db 13,VOLTORB   ; 15%
+    db 11,GRIMER    ; 10% ; Entry Level
+    db 16,DIGLETT   ; 10%
+    db 12,MAGNEMITE ; 10% ; Entry Level
+    db 13,KOFFING   ;  5% ; Entry Level
+    db 13,MAGNEMITE ;  5%
+    db 15,GRIMER    ;  4%
+    db 18,KOFFING   ;  1%
     db $00
 
-Route12Mons: ; d26b (3:526b)
+TunnelMonsB1: ; d229 (3:5229)
     db $0F
-    db 24,ODDISH
-    db 25,PIDGEY
-    db 23,PIDGEY
-    db 24,VENONAT
-    db 22,ODDISH
-    db 26,VENONAT
-    db 26,ODDISH
-    db 27,PIDGEY
-    db 28,GLOOM
-    db 30,GLOOM
+    db 16,ZUBAT   ; 20%
+    db 17,ZUBAT   ; 20%
+    db 17,GEODUDE ; 15%
+    db 15,MACHOP  ; 10% ; Entry Level
+    db 16,GEODUDE ; 10%
+    db 19,ZUBAT   ; 10%
+    db 15,ZUBAT   ;  5%
+    db 17,MACHOP  ;  5%
+    db 19,ONIX    ;  4%
+    db 22,GOLBAT  ;  1% ; Entry Level
+    db $00
 
+TunnelMonsB2: ; d23f (3:523f)
+    db $0F
+    db 17,ZUBAT    ; 20%
+    db 18,ZUBAT    ; 20%
+    db 19,GEODUDE  ; 15%
+    db 16,MACHOP   ; 10%
+    db 18,GEODUDE  ; 10%
+    db 20,ZUBAT    ; 10%
+    db 18,MACHOP   ;  5%
+    db 21,ONIX     ;  5%
+    db 22,GOLBAT   ;  4%
+    db 25,GRAVELER ;  1% ; Entry Level
     db $00
 
 Route8Mons: ; d281 (3:5281)
     db $0F
-    db 18,PIDGEY
-    db 18,MANKEY
-    db 17,EKANS
-    db 16,GROWLITHE
-    db 20,PIDGEY
-    db 20,MANKEY
-    db 19,EKANS
-    db 17,GROWLITHE
-    db 15,GROWLITHE
-    db 18,GROWLITHE
-
+    db 19,ODDISH     ; 20%
+    db 19,BELLSPROUT ; 20%
+    db 22,BUTTERFREE ; 15%
+    db 17,ODDISH     ; 10%
+    db 17,BELLSPROUT ; 10%
+    db 19,BEEDRILL   ; 10% ; Entry Level
+    db 21,GLOOM      ;  5% ; Entry Level
+    db 21,WEEPINBELL ;  5% ; Entry Level
+    db 17,BUTTERFREE ;  4% ; Entry Level
+    db 12,SCYTHER    ;  1% ; Entry Level
     db $00
 
 Route7Mons: ; d297 (3:5297)
     db $0F
-    db 19,PIDGEY
-    db 19,ODDISH
-    db 17,MANKEY
-    db 22,ODDISH
-    db 22,PIDGEY
-    db 18,MANKEY
-    db 18,GROWLITHE
-    db 20,GROWLITHE
-    db 19,MANKEY
-    db 20,MANKEY
-
-    db $00
-
-TowerMons1: ; d2ad (3:52ad)
-    db $00
-
-    db $00
-
-TowerMons2: ; d2af (3:52af)
-    db $00
-
-    db $00
-
-TowerMons3: ; d2b1 (3:52b1)
-    db $0A
-    db 20,GASTLY
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 19,GASTLY
-    db 18,GASTLY
-    db 24,GASTLY
-    db 20,CUBONE
-    db 22,CUBONE
-    db 25,HAUNTER
-
-    db $00
-
-TowerMons4: ; d2c7 (3:52c7)
-    db $0A
-    db 20,GASTLY
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 19,GASTLY
-    db 18,GASTLY
-    db 25,HAUNTER
-    db 20,CUBONE
-    db 22,CUBONE
-    db 24,GASTLY
-
-    db $00
-
-TowerMons5: ; d2dd (3:52dd)
-    db $0A
-    db 20,GASTLY
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 19,GASTLY
-    db 18,GASTLY
-    db 25,HAUNTER
-    db 20,CUBONE
-    db 22,CUBONE
-    db 24,GASTLY
-
-    db $00
-
-TowerMons6: ; d2f3 (3:52f3)
-    db $0F
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 24,GASTLY
-    db 20,GASTLY
-    db 19,GASTLY
-    db 26,HAUNTER
-    db 22,CUBONE
-    db 24,CUBONE
-    db 28,HAUNTER
-
-    db $00
-
-TowerMons7: ; d309 (3:5309)
-    db $0F
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 24,GASTLY
-    db 20,GASTLY
-    db 28,HAUNTER
-    db 22,CUBONE
-    db 24,CUBONE
-    db 28,HAUNTER
-    db 30,HAUNTER
-
-    db $00
-
-Route13Mons: ; d31f (3:531f)
-    db $14
-    db 24,ODDISH
-    db 25,PIDGEY
-    db 27,PIDGEY
-    db 24,VENONAT
-    db 22,ODDISH
-    db 26,VENONAT
-    db 26,ODDISH
-    db 25,DITTO
-    db 28,GLOOM
-    db 30,GLOOM
-
-    db $00
-
-Route14Mons: ; d335 (3:5335)
-    db $0F
-    db 24,ODDISH
-    db 26,PIDGEY
-    db 23,DITTO
-    db 24,VENONAT
-    db 22,ODDISH
-    db 26,VENONAT
-    db 26,ODDISH
-    db 30,GLOOM
-    db 28,PIDGEOTTO
-    db 30,PIDGEOTTO
-
-    db $00
-
-Route15Mons: ; d34b (3:534b)
-    db $0F
-    db 24,ODDISH
-    db 26,DITTO
-    db 23,PIDGEY
-    db 26,VENONAT
-    db 22,ODDISH
-    db 28,VENONAT
-    db 26,ODDISH
-    db 30,GLOOM
-    db 28,PIDGEOTTO
-    db 30,PIDGEOTTO
-
+    db 19,PIDGEOTTO ; 20%
+    db 17,MANKEY    ; 20%
+    db 24,PIDGEOTTO ; 15%
+    db 21,GROWLITHE ; 10%
+    db 21,VULPIX    ; 10%
+    db 20,MANKEY    ; 10%
+    db 17,GROWLITHE ;  5% ; Entry Level
+    db 17,VULPIX    ;  5% ; Entry Level
+    db 23,MANKEY    ;  4%
+    db 28,PRIMEAPE  ;  1% ; Entry Level
     db $00
 
 Route16Mons: ; d361 (3:5361)
     db $19
-    db 20,SPEAROW
-    db 22,SPEAROW
-    db 18,RATTATA
-    db 20,DODUO
-    db 20,RATTATA
-    db 18,DODUO
-    db 22,DODUO
-    db 22,RATTATA
-    db 23,RATICATE
-    db 25,RATICATE
+    db 20,SPEAROW   ; 20%
+    db 20,PIDGEY    ; 20%
+    db 24,PIDGEOTTO ; 15%
+    db 23,FEAROW    ; 10%
+    db 22,SPEAROW   ; 10%
+    db 18,PIDGEY    ; 10%
+    db 20,PIDGEOTTO ;  5%
+    db 20,FEAROW    ;  5%
+    db 25,PIDGEOTTO ;  4%
+    db 26,FEAROW    ;  1%
+    db $00
 
+TowerMons1: ; d2ad (3:52ad)
+    db $00     
+    db $00
+
+TowerMons2: ; d2af (3:52af)
+    db $00     
+    db $00
+
+TowerMons3: ; d2b1 (3:52b1)
+    db $0A
+    db 20,GASTLY  ; 20%
+    db 21,GASTLY  ; 20%
+    db 22,GASTLY  ; 15%
+    db 23,GASTLY  ; 10%
+    db 19,GASTLY  ; 10%
+    db 18,GASTLY  ; 10% ; Entry Level
+    db 24,GASTLY  ;  5%
+    db 12,CUBONE  ;  5% ; Entry Level
+    db 17,CUBONE  ;  4%
+    db 25,HAUNTER ;  1% ; Entry Level
+    db $00
+
+TowerMons4: ; d2c7 (3:52c7)
+    db $0A
+    db 20,GASTLY  ; 20%
+    db 21,GASTLY  ; 20%
+    db 22,GASTLY  ; 15%
+    db 23,GASTLY  ; 10%
+    db 19,GASTLY  ; 10%
+    db 18,GASTLY  ; 10%
+    db 25,HAUNTER ;  5%
+    db 13,CUBONE  ;  5%
+    db 18,CUBONE  ;  4%
+    db 24,GASTLY  ;  1%
+    db $00
+
+TowerMons5: ; d2dd (3:52dd)
+    db $0A
+    db 20,GASTLY  ; 20%
+    db 21,GASTLY  ; 20%
+    db 22,GASTLY  ; 15%
+    db 23,GASTLY  ; 10%
+    db 19,GASTLY  ; 10%
+    db 18,GASTLY  ; 10%
+    db 25,HAUNTER ;  5%
+    db 14,CUBONE  ;  5%
+    db 19,CUBONE  ;  4%
+    db 24,GASTLY  ;  1%
+    db $00
+
+TowerMons6: ; d2f3 (3:52f3)
+    db $0F
+    db 21,GASTLY  ; 20%
+    db 22,GASTLY  ; 20%
+    db 23,GASTLY  ; 15%
+    db 24,GASTLY  ; 10%
+    db 20,GASTLY  ; 10%
+    db 19,GASTLY  ; 10%
+    db 26,HAUNTER ;  5%
+    db 15,CUBONE  ;  5%
+    db 20,CUBONE  ;  4%
+    db 28,HAUNTER ;  1%
+    db $00
+
+TowerMons7: ; d309 (3:5309)
+    db $0F
+    db 21,GASTLY  ; 20%
+    db 22,GASTLY  ; 20%
+    db 23,GASTLY  ; 15%
+    db 24,GASTLY  ; 10%
+    db 20,GASTLY  ; 10%
+    db 28,HAUNTER ; 10%
+    db 16,CUBONE  ;  5%
+    db 21,CUBONE  ;  5%
+    db 26,HAUNTER ;  4%
+    db 28,MAROWAK ;  1% ; Entry Level
+    db $00
+
+Route12Mons: ; d31f (3:531f)
+    db $14
+    db 21,RATTATA   ; 20%
+    db 20,PIDGEY    ; 20%
+    db 22,PIDGEY    ; 15%
+    db 23,RATTATA   ; 10%
+    db 17,PIDGEOTTO ; 10%
+    db 23,PIDGEOTTO ; 10%
+    db 23,RATICATE  ;  5%
+    db 25,RATICATE  ;  5%
+    db 18,SLOWPOKE  ;  4% ; Entry Level
+    db 22,SLOWPOKE  ;  1%
+    db $00
+
+Route13Mons: ; d26b (3:526b)
+    db $0F
+    db 20,ODDISH     ; 20%
+    db 20,BELLSPROUT ; 20%
+    db 22,VENONAT    ; 15%
+    db 21,GLOOM      ; 10%
+    db 21,WEEPINBELL ; 10%
+    db 24,VENONAT    ; 10%
+    db 22,GLOOM      ;  5%
+    db 22,WEEPINBELL ;  5%
+    db 13,TANGELA    ;  4% ; Entry level
+    db 31,VENOMOTH   ;  1% ; Entry level
+    db $00
+
+Route14Mons: ; d335 (3:5335)
+    db $0F
+    db 22,NIDORINO  ; 20%
+    db 22,NIDORINA  ; 20%
+    db 17,EKANS     ; 15%
+    db 25,RATICATE  ; 10%
+    db 24,RATICATE  ; 10%
+    db 20,EKANS     ; 10%
+    db 26,NIDORINO  ;  5%
+    db 26,NIDORINA  ;  5%
+    db 28,ARBOK     ;  4%
+    db 31,ARBOK     ;  1%
+    db $00
+
+Route15Mons: ; d34b (3:534b)
+    db $0F
+    db 24,MEOWTH   ; 20%
+    db 26,DITTO    ; 20% ; Entry Level
+    db 23,DITTO    ; 15%
+    db 27,RATICATE ; 10%
+    db 22,MEOWTH   ; 10%
+    db 24,RATICATE ; 10%
+    db 26,MEOWTH   ;  5%
+    db 28,PERSIAN  ;  5% ; Entry Level
+    db 28,DITTO    ;  4%
+    db 31,PERSIAN  ;  1%
     db $00
 
 Route17Mons: ; d377 (3:5377)
     db $19
-    db 20,SPEAROW
-    db 22,SPEAROW
-    db 25,RATICATE
-    db 24,DODUO
-    db 27,RATICATE
-    db 26,DODUO
-    db 28,DODUO
-    db 29,RATICATE
-    db 25,FEAROW
-    db 27,FEAROW
-
+    db 19,KOFFING  ; 20%
+    db 19,GRIMER   ; 20%
+    db 26,RATICATE ; 15%
+    db 22,KOFFING  ; 10%
+    db 22,GRIMER   ; 10%
+    db 28,RATICATE ; 10%
+    db 25,KOFFING  ;  5%
+    db 25,GRIMER   ;  5%
+    db 35,WEEZING  ;  4% ; Entry Level
+    db 38,MUK      ;  1% ; Entry Level
     db $00
 
 Route18Mons: ; d38d (3:538d)
     db $19
-    db 20,SPEAROW
-    db 22,SPEAROW
-    db 25,RATICATE
-    db 24,DODUO
-    db 25,FEAROW
-    db 26,DODUO
-    db 28,DODUO
-    db 29,RATICATE
-    db 27,FEAROW
-    db 29,FEAROW
-
+    db 21,PIDGEY    ; 20%
+    db 22,PIDGEOTTO ; 20%
+    db 28,PIDGEOTTO ; 15%
+    db 22,SPEAROW   ; 10%
+    db 28,FEAROW    ; 10%
+    db 25,SPEAROW   ; 10%
+    db 27,PIDGEY    ;  5%
+    db 32,FEAROW    ;  5%
+    db 31,PIDGEOTTO ;  4%
+    db 36,PIDGEOT   ;  1% ; Entry Level
     db $00
 
 ZoneMonsCenter: ; d3a3 (3:53a3)
     db $1E
-    db 22,NIDORAN_M
-    db 25,RHYHORN
-    db 22,VENONAT
-    db 24,EXEGGCUTE
-    db 31,NIDORINO
-    db 25,EXEGGCUTE
-    db 31,NIDORINA
-    db 30,PARASECT
-    db 23,SCYTHER
-    db 23,CHANSEY
-
+    db 18,VENONAT    ; 20%
+    db 19,PARAS      ; 20%
+    db 20,VENONAT    ; 15%
+    db 21,PARAS      ; 10%
+    db 27,PARASECT   ; 10% ; Entry Level
+    db 27,BUTTERFREE ; 10%
+    db 27,BEEDRILL   ;  5%
+    db 32,VENOMOTH   ;  5%
+    db 23,SCYTHER    ;  4%
+    db 23,PINSIR     ;  1%
     db $00
 
-ZoneMons1: ; d3b9 (3:53b9)
+ZoneMons1: ; d3e5 (3:53e5)
     db $1E
-    db 24,NIDORAN_M
-    db 26,DODUO
-    db 22,PARAS
-    db 25,EXEGGCUTE
-    db 33,NIDORINO
-    db 23,EXEGGCUTE
-    db 24,NIDORAN_F
-    db 25,PARASECT
-    db 25,KANGASKHAN
-    db 28,SCYTHER
-
+    db 17,PONYTA  ; 20%
+    db 20,DODUO   ; 20%
+    db 13,PONYTA  ; 15% ; Entry Level
+    db 20,PONYTA  ; 10%
+    db 17,DODUO   ; 10% ; Entry Level
+    db 16,RHYHORN ; 10%
+    db 22,DODUO   ;  5%
+    db 12,RHYHORN ;  5% ; Entry Level
+    db 31,TAUROS  ;  4%
+    db  2,TAUROS  ;  1% ; Entry Level
     db $00
 
 ZoneMons2: ; d3cf (3:53cf)
     db $1E
-    db 22,NIDORAN_M
-    db 26,RHYHORN
-    db 23,PARAS
-    db 25,EXEGGCUTE
-    db 30,NIDORINO
-    db 27,EXEGGCUTE
-    db 30,NIDORINA
-    db 32,VENOMOTH
-    db 26,CHANSEY
-    db 28,TAUROS
-
+    db 24,NIDORINO   ; 20%
+    db 24,NIDORINA   ; 20%
+    db 16,RHYHORN    ; 15%
+    db 27,NIDORINO   ; 10%
+    db 27,NIDORINA   ; 10%
+    db 12,RHYHORN    ; 10%
+    db 31,NIDOKING   ;  5% ; Entry Level
+    db 31,NIDOQUEEN  ;  5% ; Entry Level
+    db 29,KANGASKHAN ;  4%
+    db  2,KANGASKHAN ;  1% ; Entry Level
     db $00
 
-ZoneMons3: ; d3e5 (3:53e5)
+ZoneMons3: ; d3b9 (3:53b9)
     db $1E
-    db 25,NIDORAN_M
-    db 26,DODUO
-    db 23,VENONAT
-    db 24,EXEGGCUTE
-    db 33,NIDORINO
-    db 26,EXEGGCUTE
-    db 25,NIDORAN_F
-    db 31,VENOMOTH
-    db 26,TAUROS
-    db 28,KANGASKHAN
-
+    db 24,TANGELA   ; 20%
+    db 15,EXEGGCUTE ; 20%
+    db 22,TANGELA   ; 15%
+    db 19,EXEGGCUTE ; 10%
+    db 11,EXEGGCUTE ; 10% ; Entry Level
+    db 18,TANGELA   ; 10%
+    db 12,EEVEE     ;  5% ; Entry Level
+    db 27,LICKITUNG ;  5%
+    db  2,LICKITUNG ;  4% ; Entry Level
+    db  7,CHANSEY   ;  1% ; Entry Level
     db $00
+
+; ─────────────────────────────────
 
 WaterMons: ; d3fb (3:53fb)
     db $00
 
     db $05
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 20,TENTACOOL
-    db 30,TENTACOOL
-    db 35,TENTACOOL
-    db 40,TENTACOOL
+    db 5,TENTACOOL  ; 20%
+    db 10,TENTACOOL ; 20%
+    db 15,TENTACOOL ; 15%
+    db 5,TENTACOOL  ; 10%
+    db 10,TENTACOOL ; 10%
+    db 15,TENTACOOL ; 10%
+    db 20,TENTACOOL ;  5%
+    db 30,TENTACOOL ;  5%
+    db 35,TENTACOOL ;  4%
+    db 40,TENTACOOL ;  1%
 
 IslandMons1: ; d411 (3:5411)
     db $0F
-    db 30,SEEL
-    db 30,SLOWPOKE
-    db 30,SHELLDER
-    db 30,HORSEA
-    db 28,HORSEA
-    db 21,ZUBAT
-    db 29,GOLBAT
-    db 28,PSYDUCK
-    db 28,SHELLDER
-    db 38,GOLDUCK
-
+    db 30,SEEL      ; 20%
+    db 30,SLOWPOKE  ; 20%
+    db 30,SHELLDER  ; 15%
+    db 30,HORSEA    ; 10%
+    db 28,HORSEA    ; 10%
+    db 21,ZUBAT     ; 10%
+    db 29,GOLBAT    ;  5%
+    db 28,PSYDUCK   ;  5%
+    db 28,SHELLDER  ;  4%
+    db 38,GOLDUCK   ;  1%
     db $00
 
 IslandMonsB1: ; d427 (3:5427)
     db $0A
-    db 30,STARYU
-    db 30,HORSEA
-    db 32,SHELLDER
-    db 32,HORSEA
-    db 28,SLOWPOKE
-    db 30,SEEL
-    db 30,SLOWPOKE
-    db 28,SEEL
-    db 38,DEWGONG
-    db 37,SEADRA
-
+    db 30,STARYU   ; 20%
+    db 30,HORSEA   ; 20%
+    db 32,SHELLDER ; 15%
+    db 32,HORSEA   ; 10%
+    db 28,SLOWPOKE ; 10%
+    db 30,SEEL     ; 10%
+    db 30,SLOWPOKE ;  5%
+    db 28,SEEL     ;  5%
+    db 38,DEWGONG  ;  4%
+    db 37,SEADRA   ;  1%
     db $00
 
 IslandMonsB2: ; d43d (3:543d)
     db $0A
-    db 30,SEEL
-    db 30,SLOWPOKE
-    db 32,SEEL
-    db 32,SLOWPOKE
-    db 28,HORSEA
-    db 30,STARYU
-    db 30,HORSEA
-    db 28,SHELLDER
-    db 30,GOLBAT
-    db 37,SLOWBRO
-
+    db 30,SEEL     ; 20%
+    db 30,SLOWPOKE ; 20%
+    db 32,SEEL     ; 15%
+    db 32,SLOWPOKE ; 10%
+    db 28,HORSEA   ; 10%
+    db 30,STARYU   ; 10%
+    db 30,HORSEA   ;  5%
+    db 28,SHELLDER ;  5%
+    db 30,GOLBAT   ;  4%
+    db 37,SLOWBRO  ;  1%
     db $00
 
 IslandMonsB3: ; d453 (3:5453)
     db $0A
-    db 31,SLOWPOKE
-    db 31,SEEL
-    db 33,SLOWPOKE
-    db 33,SEEL
-    db 29,HORSEA
-    db 31,SHELLDER
-    db 31,HORSEA
-    db 29,SHELLDER
-    db 39,SEADRA
-    db 37,DEWGONG
-
+    db 31,SLOWPOKE  ; 20%
+    db 31,SEEL      ; 20%
+    db 33,SLOWPOKE  ; 15%
+    db 33,SEEL      ; 10%
+    db 29,HORSEA    ; 10%
+    db 31,SHELLDER  ; 10%
+    db 31,HORSEA    ;  5%
+    db 29,SHELLDER  ;  5%
+    db 39,SEADRA    ;  4%
+    db 37,DEWGONG   ;  1%
     db $00
 
 IslandMonsB4: ; d469 (3:5469)
     db $0A
-    db 31,HORSEA
-    db 31,SHELLDER
-    db 33,HORSEA
-    db 33,SHELLDER
-    db 29,SLOWPOKE
-    db 31,SEEL
-    db 31,SLOWPOKE
-    db 29,SEEL
-    db 39,SLOWBRO
-    db 32,GOLBAT
-
+    db 31,HORSEA    ; 20%
+    db 31,SHELLDER  ; 20%
+    db 33,HORSEA    ; 15%
+    db 33,SHELLDER  ; 10%
+    db 29,SLOWPOKE  ; 10%
+    db 31,SEEL      ; 10%
+    db 31,SLOWPOKE  ;  5%
+    db 29,SEEL      ;  5%
+    db 39,SLOWBRO   ;  4%
+    db 32,GOLBAT    ;  1%
     db $00
 
 MansionMons1: ; d47f (3:547f)
     db $0A
-    db 32,KOFFING
-    db 30,KOFFING
-    db 34,PONYTA
-    db 30,PONYTA
-    db 34,GROWLITHE
-    db 32,PONYTA
-    db 30,GRIMER
-    db 28,PONYTA
-    db 37,WEEZING
-    db 39,MUK
-
+    db 32,KOFFING   ; 20%
+    db 30,KOFFING   ; 20%
+    db 34,PONYTA    ; 15%
+    db 30,PONYTA    ; 10%
+    db 34,GROWLITHE ; 10%
+    db 32,PONYTA    ; 10%
+    db 30,GRIMER    ;  5%
+    db 28,PONYTA    ;  5%
+    db 37,WEEZING   ;  4%
+    db 39,MUK       ;  1%
     db $00
 
 MansionMons2: ; d495 (3:5495)
     db $0A
-    db 32,GROWLITHE
-    db 34,KOFFING
-    db 34,KOFFING
-    db 30,PONYTA
-    db 30,KOFFING
-    db 32,PONYTA
-    db 30,GRIMER
-    db 28,PONYTA
-    db 39,WEEZING
-    db 37,MUK
-
+    db 32,GROWLITHE  ; 20%
+    db 34,KOFFING    ; 20%
+    db 34,KOFFING    ; 15%
+    db 30,PONYTA     ; 10%
+    db 30,KOFFING    ; 10%
+    db 32,PONYTA     ; 10%
+    db 30,GRIMER     ;  5%
+    db 28,PONYTA     ;  5%
+    db 39,WEEZING    ;  4%
+    db 37,MUK        ;  1%
     db $00
 
 MansionMons3: ; d4ab (3:54ab)
     db $0A
-    db 31,KOFFING
-    db 33,GROWLITHE
-    db 35,KOFFING
-    db 32,PONYTA
-    db 34,PONYTA
-    db 40,WEEZING
-    db 34,GRIMER
-    db 38,WEEZING
-    db 36,PONYTA
-    db 42,MUK
-
+    db 31,KOFFING   ; 20%
+    db 33,GROWLITHE ; 20%
+    db 35,KOFFING   ; 15%
+    db 32,PONYTA    ; 10%
+    db 34,PONYTA    ; 10%
+    db 40,WEEZING   ; 10%
+    db 34,GRIMER    ;  5%
+    db 38,WEEZING   ;  5%
+    db 36,PONYTA    ;  4%
+    db 42,MUK       ;  1%
     db $00
 
 MansionMonsB1: ; d4c1 (3:54c1)
     db $0A
-    db 33,KOFFING
-    db 31,KOFFING
-    db 35,GROWLITHE
-    db 32,PONYTA
-    db 31,KOFFING
-    db 40,WEEZING
-    db 34,PONYTA
-    db 35,GRIMER
-    db 42,WEEZING
-    db 42,MUK
-
+    db 33,KOFFING   ; 20%
+    db 31,KOFFING   ; 20%
+    db 35,GROWLITHE ; 15%
+    db 32,PONYTA    ; 10%
+    db 31,KOFFING   ; 10%
+    db 40,WEEZING   ; 10%
+    db 34,PONYTA    ;  5%
+    db 35,GRIMER    ;  5%
+    db 42,WEEZING   ;  4%
+    db 42,MUK       ;  1%
     db $00
 
 Route21Mons: ; d4d7 (3:54d7)
     db $19
-    db 21,RATTATA
-    db 23,PIDGEY
-    db 30,RATICATE
-    db 23,RATTATA
-    db 21,PIDGEY
-    db 30,PIDGEOTTO
-    db 32,PIDGEOTTO
-    db 28,TANGELA
-    db 30,TANGELA
-    db 32,TANGELA
+    db 21,RATTATA    ; 20%
+    db 23,PIDGEY     ; 20%
+    db 30,RATICATE   ; 15%
+    db 23,RATTATA    ; 10%
+    db 21,PIDGEY     ; 10%
+    db 30,PIDGEOTTO  ; 10%
+    db 32,PIDGEOTTO  ;  5%
+    db 28,TANGELA    ;  5%
+    db 30,TANGELA    ;  4%
+    db 32,TANGELA    ;  1%
 
     db $05
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 20,TENTACOOL
-    db 30,TENTACOOL
-    db 35,TENTACOOL
-    db 40,TENTACOOL
+    db 5,TENTACOOL   ; 20%
+    db 10,TENTACOOL  ; 20%
+    db 15,TENTACOOL  ; 15%
+    db 5,TENTACOOL   ; 10%
+    db 10,TENTACOOL  ; 10%
+    db 15,TENTACOOL  ; 10%
+    db 20,TENTACOOL  ;  5%
+    db 30,TENTACOOL  ;  5%
+    db 35,TENTACOOL  ;  4%
+    db 40,TENTACOOL  ;  1%
 
 DungeonMons1: ; d501 (3:5501)
     db $0A
-    db 46,GOLBAT
-    db 46,HYPNO
-    db 46,MAGNETON
-    db 49,DODRIO
-    db 49,VENOMOTH
-    db 52,ARBOK
-    db 49,KADABRA
-    db 52,PARASECT
-    db 53,RAICHU
-    db 53,DITTO
-
+    db 46,GOLBAT    ; 20%
+    db 46,HYPNO     ; 20%
+    db 46,MAGNETON  ; 15%
+    db 49,DODRIO    ; 10%
+    db 49,VENOMOTH  ; 10%
+    db 52,ARBOK     ; 10%
+    db 49,KADABRA   ;  5%
+    db 52,PARASECT  ;  5%
+    db 53,RAICHU    ;  4%
+    db 53,DITTO     ;  1%
     db $00
 
 DungeonMons2: ; d517 (3:5517)
     db $0F
-    db 51,DODRIO
-    db 51,VENOMOTH
-    db 51,KADABRA
-    db 52,RHYDON
-    db 52,MAROWAK
-    db 52,ELECTRODE
-    db 56,CHANSEY
-    db 54,WIGGLYTUFF
-    db 55,DITTO
-    db 60,DITTO
-
+    db 51,DODRIO     ; 20%
+    db 51,VENOMOTH   ; 20%
+    db 51,KADABRA    ; 15%
+    db 52,RHYDON     ; 10%
+    db 52,MAROWAK    ; 10%
+    db 52,ELECTRODE  ; 10%
+    db 56,CHANSEY    ;  5%
+    db 54,WIGGLYTUFF ;  5%
+    db 55,DITTO      ;  4%
+    db 60,DITTO      ;  1%
     db $00
 
 DungeonMonsB1: ; d52d (3:552d)
     db $19
-    db 55,RHYDON
-    db 55,MAROWAK
-    db 55,ELECTRODE
-    db 64,CHANSEY
-    db 64,PARASECT
-    db 64,RAICHU
-    db 57,ARBOK
-    db 65,DITTO
-    db 63,DITTO
-    db 67,DITTO
-
+    db 55,RHYDON    ; 20%
+    db 55,MAROWAK   ; 20%
+    db 55,ELECTRODE ; 15%
+    db 64,CHANSEY   ; 10%
+    db 64,PARASECT  ; 10%
+    db 64,RAICHU    ; 10%
+    db 57,ARBOK     ;  5%
+    db 65,DITTO     ;  5%
+    db 63,DITTO     ;  4%
+    db 67,DITTO     ;  1%
     db $00
 
 PowerPlantMons: ; d543 (3:5543)
     db $0A
-    db 21,VOLTORB
-    db 21,MAGNEMITE
-    db 20,PIKACHU
-    db 24,PIKACHU
-    db 23,MAGNEMITE
-    db 23,VOLTORB
-    db 32,MAGNETON
-    db 35,MAGNETON
-    db 33,ELECTABUZZ
-    db 36,ELECTABUZZ
-
+    db 21,VOLTORB    ; 20%
+    db 21,MAGNEMITE  ; 20%
+    db 20,PIKACHU    ; 15%
+    db 24,PIKACHU    ; 10%
+    db 23,MAGNEMITE  ; 10%
+    db 23,VOLTORB    ; 10%
+    db 32,MAGNETON   ;  5%
+    db 35,MAGNETON   ;  5%
+    db 33,ELECTABUZZ ;  4%
+    db 36,ELECTABUZZ ;  1%
     db $00
 
 Route23Mons: ; d559 (3:5559)
     db $0A
-    db 26,EKANS
-    db 33,DITTO
-    db 26,SPEAROW
-    db 38,FEAROW
-    db 38,DITTO
-    db 38,FEAROW
-    db 41,ARBOK
-    db 43,DITTO
-    db 41,FEAROW
-    db 43,FEAROW
-
+    db 26,EKANS    ; 20%
+    db 33,DITTO    ; 20%
+    db 26,SPEAROW  ; 15%
+    db 38,FEAROW   ; 10%
+    db 38,DITTO    ; 10%
+    db 38,FEAROW   ; 10%
+    db 41,ARBOK    ;  5%
+    db 43,DITTO    ;  5%
+    db 41,FEAROW   ;  4%
+    db 43,FEAROW   ;  1%
     db $00
 
 PlateauMons2: ; d56f (3:556f)
     db $0A
-    db 22,MACHOP
-    db 24,GEODUDE
-    db 26,ZUBAT
-    db 36,ONIX
-    db 39,ONIX
-    db 42,ONIX
-    db 41,MACHOKE
-    db 40,GOLBAT
-    db 40,MAROWAK
-    db 43,GRAVELER
-
+    db 22,MACHOP    ; 20%
+    db 24,GEODUDE   ; 20%
+    db 26,ZUBAT     ; 15%
+    db 36,ONIX      ; 10%
+    db 39,ONIX      ; 10%
+    db 42,ONIX      ; 10%
+    db 41,MACHOKE   ;  5%
+    db 40,GOLBAT    ;  5%
+    db 40,MAROWAK   ;  4%
+    db 43,GRAVELER  ;  1%
     db $00
 
 PlateauMons3: ; d585 (3:5585)
     db $0F
-    db 24,MACHOP
-    db 26,GEODUDE
-    db 22,ZUBAT
-    db 42,ONIX
-    db 40,VENOMOTH
-    db 45,ONIX
-    db 43,GRAVELER
-    db 41,GOLBAT
-    db 42,MACHOKE
-    db 45,MACHOKE
-
+    db 24,MACHOP    ; 20%
+    db 26,GEODUDE   ; 20%
+    db 22,ZUBAT     ; 15%
+    db 42,ONIX      ; 10%
+    db 40,VENOMOTH  ; 10%
+    db 45,ONIX      ; 10%
+    db 43,GRAVELER  ;  5%
+    db 41,GOLBAT    ;  5%
+    db 42,MACHOKE   ;  4%
+    db 45,MACHOKE   ;  1%
     db $00
 
 PlateauMons1: ; d59b (3:559b)
     db $0F
-    db 24,MACHOP
-    db 26,GEODUDE
-    db 22,ZUBAT
-    db 36,ONIX
-    db 39,ONIX
-    db 42,ONIX
-    db 41,GRAVELER
-    db 41,GOLBAT
-    db 42,MACHOKE
-    db 43,MAROWAK
-
+    db 24,MACHOP    ; 20%
+    db 26,GEODUDE   ; 20%
+    db 22,ZUBAT     ; 15%
+    db 36,ONIX      ; 10%
+    db 39,ONIX      ; 10%
+    db 42,ONIX      ; 10%
+    db 41,GRAVELER  ;  5%
+    db 41,GOLBAT    ;  5%
+    db 42,MACHOKE   ;  4%
+    db 43,MAROWAK   ;  1%
     db $00
-
-CaveMons: ; d5b1 (3:55b1)
-    db $14
-    db 18,DIGLETT
-    db 19,DIGLETT
-    db 17,DIGLETT
-    db 20,DIGLETT
-    db 16,DIGLETT
-    db 15,DIGLETT
-    db 21,DIGLETT
-    db 22,DIGLETT
-    db 29,DUGTRIO
-    db 31,DUGTRIO
-
-    db $00
-
-ENDC
-IF _GREEN || !_JAPAN && _BLUE
-NoMons: ; d0dd (3:50dd)
-    db $00
-
-    db $00
-
-Route1Mons: ; d0df (3:50df)
-    db $19
-    db 3,PIDGEY
-    db 3,RATTATA
-    db 3,RATTATA
-    db 2,RATTATA
-    db 2,PIDGEY
-    db 3,PIDGEY
-    db 3,PIDGEY
-    db 4,RATTATA
-    db 4,PIDGEY
-    db 5,PIDGEY
-
-    db $00
-
-Route2Mons: ; d0f5 (3:50f5)
-    db $19
-    db 3,RATTATA
-    db 3,PIDGEY
-    db 4,PIDGEY
-    db 4,RATTATA
-    db 5,PIDGEY
-    db 3,CATERPIE
-    db 2,RATTATA
-    db 5,RATTATA
-    db 4,CATERPIE
-    db 5,CATERPIE
-
-    db $00
-
-Route22Mons: ; d10b (3:510b)
-    db $19
-    db 3,RATTATA
-    db 3,NIDORAN_F
-    db 4,RATTATA
-    db 4,NIDORAN_F
-    db 2,RATTATA
-    db 2,NIDORAN_F
-    db 3,SPEAROW
-    db 5,SPEAROW
-    db 3,NIDORAN_M
-    db 4,NIDORAN_M
-
-    db $00
-
-ForestMons: ; d121 (3:5121)
-    db $08
-    db 4,CATERPIE
-    db 5,METAPOD
-    db 3,CATERPIE
-    db 5,CATERPIE
-    db 4,METAPOD
-    db 6,METAPOD
-    db 4,KAKUNA
-    db 3,WEEDLE
-    db 3,PIKACHU
-    db 5,PIKACHU
-
-    db $00
-
-Route3Mons: ; d137 (3:5137)
-    db $14
-    db 6,PIDGEY
-    db 5,SPEAROW
-    db 7,PIDGEY
-    db 6,SPEAROW
-    db 7,SPEAROW
-    db 8,PIDGEY
-    db 8,SPEAROW
-    db 3,JIGGLYPUFF
-    db 5,JIGGLYPUFF
-    db 7,JIGGLYPUFF
-
-    db $00
-
-MoonMons1: ; d14d (3:514d)
-    db $0A
-    db 8,ZUBAT
-    db 7,ZUBAT
-    db 9,ZUBAT
-    db 8,GEODUDE
-    db 6,ZUBAT
-    db 10,ZUBAT
-    db 10,GEODUDE
-    db 8,PARAS
-    db 11,ZUBAT
-    db 8,CLEFAIRY
-
-    db $00
-
-MoonMonsB1: ; d163 (3:5163)
-    db $0A
-    db 8,ZUBAT
-    db 7,ZUBAT
-    db 7,GEODUDE
-    db 8,GEODUDE
-    db 9,ZUBAT
-    db 10,PARAS
-    db 10,ZUBAT
-    db 11,ZUBAT
-    db 9,CLEFAIRY
-    db 9,GEODUDE
-
-    db $00
-
-MoonMonsB2: ; d179 (3:5179)
-    db $0A
-    db 9,ZUBAT
-    db 9,GEODUDE
-    db 10,ZUBAT
-    db 10,GEODUDE
-    db 11,ZUBAT
-    db 10,PARAS
-    db 12,PARAS
-    db 10,CLEFAIRY
-    db 12,ZUBAT
-    db 12,CLEFAIRY
-
-    db $00
-
-Route4Mons: ; d18f (3:518f)
-    db $14
-    db 10,RATTATA
-    db 10,SPEAROW
-    db 8,RATTATA
-    db 6,SANDSHREW
-    db 8,SPEAROW
-    db 10,SANDSHREW
-    db 12,RATTATA
-    db 12,SPEAROW
-    db 8,SANDSHREW
-    db 12,SANDSHREW
-
-    db $00
-
-Route24Mons: ; d1a5 (3:51a5)
-    db $19
-    db 7,CATERPIE
-    db 8,METAPOD
-    db 12,PIDGEY
-    db 12,BELLSPROUT
-    db 13,BELLSPROUT
-    db 10,ABRA
-    db 14,BELLSPROUT
-    db 13,PIDGEY
-    db 8,ABRA
-    db 12,ABRA
-
-    db $00
-
-Route25Mons: ; d1bb (3:51bb)
-    db $0F
-    db 8,CATERPIE
-    db 9,METAPOD
-    db 13,PIDGEY
-    db 12,BELLSPROUT
-    db 13,BELLSPROUT
-    db 12,ABRA
-    db 14,BELLSPROUT
-    db 10,ABRA
-    db 7,KAKUNA
-    db 8,WEEDLE
-
-    db $00
-
-Route9Mons: ; d1d1 (3:51d1)
-    db $0F
-    db 16,RATTATA
-    db 16,SPEAROW
-    db 14,RATTATA
-    db 11,SANDSHREW
-    db 13,SPEAROW
-    db 15,SANDSHREW
-    db 17,RATTATA
-    db 17,SPEAROW
-    db 13,SANDSHREW
-    db 17,SANDSHREW
-
-    db $00
-
-Route5Mons: ; d1e7 (3:51e7)
-    db $0F
-    db 13,BELLSPROUT
-    db 13,PIDGEY
-    db 15,PIDGEY
-    db 10,MEOWTH
-    db 12,MEOWTH
-    db 15,BELLSPROUT
-    db 16,BELLSPROUT
-    db 16,PIDGEY
-    db 14,MEOWTH
-    db 16,MEOWTH
-
-    db $00
-
-Route6Mons: ; d1fd (3:51fd)
-    db $0F
-    db 13,BELLSPROUT
-    db 13,PIDGEY
-    db 15,PIDGEY
-    db 10,MEOWTH
-    db 12,MEOWTH
-    db 15,BELLSPROUT
-    db 16,BELLSPROUT
-    db 16,PIDGEY
-    db 14,MEOWTH
-    db 16,MEOWTH
-
-    db $00
-
-Route11Mons: ; d213 (3:5213)
-    db $0F
-    db 14,SANDSHREW
-    db 15,SPEAROW
-    db 12,SANDSHREW
-    db 9,DROWZEE
-    db 13,SPEAROW
-    db 13,DROWZEE
-    db 15,SANDSHREW
-    db 17,SPEAROW
-    db 11,DROWZEE
-    db 15,DROWZEE
-
-    db $00
-
-TunnelMonsB1: ; d229 (3:5229)
-    db $0F
-    db 16,ZUBAT
-    db 17,ZUBAT
-    db 17,GEODUDE
-    db 15,MACHOP
-    db 16,GEODUDE
-    db 18,ZUBAT
-    db 15,ZUBAT
-    db 17,MACHOP
-    db 13,ONIX
-    db 15,ONIX
-
-    db $00
-
-TunnelMonsB2: ; d23f (3:523f)
-    db $0F
-    db 16,ZUBAT
-    db 17,ZUBAT
-    db 17,GEODUDE
-    db 15,MACHOP
-    db 16,GEODUDE
-    db 18,ZUBAT
-    db 17,MACHOP
-    db 17,ONIX
-    db 13,ONIX
-    db 18,GEODUDE
-
-    db $00
-
-Route10Mons: ; d255 (3:5255)
-    db $0F
-    db 16,VOLTORB
-    db 16,SPEAROW
-    db 14,VOLTORB
-    db 11,SANDSHREW
-    db 13,SPEAROW
-    db 15,SANDSHREW
-    db 17,VOLTORB
-    db 17,SPEAROW
-    db 13,SANDSHREW
-    db 17,SANDSHREW
-
-    db $00
-
-Route12Mons: ; d26b (3:526b)
-    db $0F
-    db 24,BELLSPROUT
-    db 25,PIDGEY
-    db 23,PIDGEY
-    db 24,VENONAT
-    db 22,BELLSPROUT
-    db 26,VENONAT
-    db 26,BELLSPROUT
-    db 27,PIDGEY
-    db 28,WEEPINBELL
-    db 30,WEEPINBELL
-
-    db $00
-
-Route8Mons: ; d281 (3:5281)
-    db $0F
-    db 18,PIDGEY
-    db 18,MEOWTH
-    db 17,SANDSHREW
-    db 16,VULPIX
-    db 20,PIDGEY
-    db 20,MEOWTH
-    db 19,SANDSHREW
-    db 17,VULPIX
-    db 15,VULPIX
-    db 18,VULPIX
-
-    db $00
-
-Route7Mons: ; d297 (3:5297)
-    db $0F
-    db 19,PIDGEY
-    db 19,BELLSPROUT
-    db 17,MEOWTH
-    db 22,BELLSPROUT
-    db 22,PIDGEY
-    db 18,MEOWTH
-    db 18,VULPIX
-    db 20,VULPIX
-    db 19,MEOWTH
-    db 20,MEOWTH
-
-    db $00
-
-TowerMons1: ; d2ad (3:52ad)
-    db $00
-
-    db $00
-
-TowerMons2: ; d2af (3:52af)
-    db $00
-
-    db $00
-
-TowerMons3: ; d2b1 (3:52b1)
-    db $0A
-    db 20,GASTLY
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 19,GASTLY
-    db 18,GASTLY
-    db 24,GASTLY
-    db 20,CUBONE
-    db 22,CUBONE
-    db 25,HAUNTER
-
-    db $00
-
-TowerMons4: ; d2c7 (3:52c7)
-    db $0A
-    db 20,GASTLY
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 19,GASTLY
-    db 18,GASTLY
-    db 25,HAUNTER
-    db 20,CUBONE
-    db 22,CUBONE
-    db 24,GASTLY
-
-    db $00
-
-TowerMons5: ; d2dd (3:52dd)
-    db $0A
-    db 20,GASTLY
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 19,GASTLY
-    db 18,GASTLY
-    db 25,HAUNTER
-    db 20,CUBONE
-    db 22,CUBONE
-    db 24,GASTLY
-
-    db $00
-
-TowerMons6: ; d2f3 (3:52f3)
-    db $0F
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 24,GASTLY
-    db 20,GASTLY
-    db 19,GASTLY
-    db 26,HAUNTER
-    db 22,CUBONE
-    db 24,CUBONE
-    db 28,HAUNTER
-
-    db $00
-
-TowerMons7: ; d309 (3:5309)
-    db $0F
-    db 21,GASTLY
-    db 22,GASTLY
-    db 23,GASTLY
-    db 24,GASTLY
-    db 20,GASTLY
-    db 28,HAUNTER
-    db 22,CUBONE
-    db 24,CUBONE
-    db 28,HAUNTER
-    db 30,HAUNTER
-
-    db $00
-
-Route13Mons: ; d31f (3:531f)
-    db $14
-    db 24,BELLSPROUT
-    db 25,PIDGEY
-    db 27,PIDGEY
-    db 24,VENONAT
-    db 22,BELLSPROUT
-    db 26,VENONAT
-    db 26,BELLSPROUT
-    db 25,DITTO
-    db 28,WEEPINBELL
-    db 30,WEEPINBELL
-
-    db $00
-
-Route14Mons: ; d335 (3:5335)
-    db $0F
-    db 24,BELLSPROUT
-    db 26,PIDGEY
-    db 23,DITTO
-    db 24,VENONAT
-    db 22,BELLSPROUT
-    db 26,VENONAT
-    db 26,BELLSPROUT
-    db 30,WEEPINBELL
-    db 28,PIDGEOTTO
-    db 30,PIDGEOTTO
-
-    db $00
-
-Route15Mons: ; d34b (3:534b)
-    db $0F
-    db 24,BELLSPROUT
-    db 26,DITTO
-    db 23,PIDGEY
-    db 26,VENONAT
-    db 22,BELLSPROUT
-    db 28,VENONAT
-    db 26,BELLSPROUT
-    db 30,WEEPINBELL
-    db 28,PIDGEOTTO
-    db 30,PIDGEOTTO
-
-    db $00
-
-Route16Mons: ; d361 (3:5361)
-    db $19
-    db 20,SPEAROW
-    db 22,SPEAROW
-    db 18,RATTATA
-    db 20,DODUO
-    db 20,RATTATA
-    db 18,DODUO
-    db 22,DODUO
-    db 22,RATTATA
-    db 23,RATICATE
-    db 25,RATICATE
-
-    db $00
-
-Route17Mons: ; d377 (3:5377)
-    db $19
-    db 20,SPEAROW
-    db 22,SPEAROW
-    db 25,RATICATE
-    db 24,DODUO
-    db 27,RATICATE
-    db 26,DODUO
-    db 28,DODUO
-    db 29,RATICATE
-    db 25,FEAROW
-    db 27,FEAROW
-
-    db $00
-
-Route18Mons: ; d38d (3:538d)
-    db $19
-    db 20,SPEAROW
-    db 22,SPEAROW
-    db 25,RATICATE
-    db 24,DODUO
-    db 25,FEAROW
-    db 26,DODUO
-    db 28,DODUO
-    db 29,RATICATE
-    db 27,FEAROW
-    db 29,FEAROW
-
-    db $00
-
-ZoneMonsCenter: ; d3a3 (3:53a3)
-    db $1E
-    db 22,NIDORAN_F
-    db 25,RHYHORN
-    db 22,VENONAT
-    db 24,EXEGGCUTE
-    db 31,NIDORINA
-    db 25,EXEGGCUTE
-    db 31,NIDORINO
-    db 30,PARASECT
-    db 23,PINSIR
-    db 23,CHANSEY
-
-    db $00
-
-ZoneMons1: ; d3b9 (3:53b9)
-    db $1E
-    db 24,NIDORAN_F
-    db 26,DODUO
-    db 22,PARAS
-    db 25,EXEGGCUTE
-    db 33,NIDORINA
-    db 23,EXEGGCUTE
-    db 24,NIDORAN_M
-    db 25,PARASECT
-    db 25,KANGASKHAN
-    db 28,PINSIR
-
-    db $00
-
-ZoneMons2: ; d3cf (3:53cf)
-    db $1E
-    db 22,NIDORAN_F
-    db 26,RHYHORN
-    db 23,PARAS
-    db 25,EXEGGCUTE
-    db 30,NIDORINA
-    db 27,EXEGGCUTE
-    db 30,NIDORINO
-    db 32,VENOMOTH
-    db 26,CHANSEY
-    db 28,TAUROS
-
-    db $00
-
-ZoneMons3: ; d3e5 (3:53e5)
-    db $1E
-    db 25,NIDORAN_F
-    db 26,DODUO
-    db 23,VENONAT
-    db 24,EXEGGCUTE
-    db 33,NIDORINA
-    db 26,EXEGGCUTE
-    db 25,NIDORAN_M
-    db 31,VENOMOTH
-    db 26,TAUROS
-    db 28,KANGASKHAN
-
-    db $00
-
-WaterMons: ; d3fb (3:53fb)
-    db $00
-
-    db $05
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 20,TENTACOOL
-    db 30,TENTACOOL
-    db 35,TENTACOOL
-    db 40,TENTACOOL
-
-IslandMons1: ; d411 (3:5411)
-    db $0F
-    db 30,SEEL
-    db 30,PSYDUCK
-    db 30,STARYU
-    db 30,KRABBY
-    db 28,KRABBY
-    db 21,ZUBAT
-    db 29,GOLBAT
-    db 28,SLOWPOKE
-    db 28,STARYU
-    db 38,SLOWBRO
-
-    db $00
-
-IslandMonsB1: ; d427 (3:5427)
-    db $0A
-    db 30,SHELLDER
-    db 30,KRABBY
-    db 32,STARYU
-    db 32,KRABBY
-    db 28,PSYDUCK
-    db 30,SEEL
-    db 30,PSYDUCK
-    db 28,SEEL
-    db 38,DEWGONG
-    db 37,KINGLER
-
-    db $00
-
-IslandMonsB2: ; d43d (3:543d)
-    db $0A
-    db 30,SEEL
-    db 30,PSYDUCK
-    db 32,SEEL
-    db 32,PSYDUCK
-    db 28,KRABBY
-    db 30,SHELLDER
-    db 30,KRABBY
-    db 28,STARYU
-    db 30,GOLBAT
-    db 37,GOLDUCK
-
-    db $00
-
-IslandMonsB3: ; d453 (3:5453)
-    db $0A
-    db 31,PSYDUCK
-    db 31,SEEL
-    db 33,PSYDUCK
-    db 33,SEEL
-    db 29,KRABBY
-    db 31,STARYU
-    db 31,KRABBY
-    db 29,STARYU
-    db 39,KINGLER
-    db 37,DEWGONG
-
-    db $00
-
-IslandMonsB4: ; d469 (3:5469)
-    db $0A
-    db 31,KRABBY
-    db 31,STARYU
-    db 33,KRABBY
-    db 33,STARYU
-    db 29,PSYDUCK
-    db 31,SEEL
-    db 31,PSYDUCK
-    db 29,SEEL
-    db 39,GOLDUCK
-    db 32,GOLBAT
-
-    db $00
-
-MansionMons1: ; d47f (3:547f)
-    db $0A
-    db 32,GRIMER
-    db 30,GRIMER
-    db 34,PONYTA
-    db 30,PONYTA
-    db 34,VULPIX
-    db 32,PONYTA
-    db 30,KOFFING
-    db 28,PONYTA
-    db 37,MUK
-    db 39,WEEZING
-
-    db $00
-
-MansionMons2: ; d495 (3:5495)
-    db $0A
-    db 32,VULPIX
-    db 34,GRIMER
-    db 34,GRIMER
-    db 30,PONYTA
-    db 30,GRIMER
-    db 32,PONYTA
-    db 30,KOFFING
-    db 28,PONYTA
-    db 39,MUK
-    db 37,WEEZING
-
-    db $00
-
-MansionMons3: ; d4ab (3:54ab)
-    db $0A
-    db 31,GRIMER
-    db 33,VULPIX
-    db 35,GRIMER
-    db 32,PONYTA
-    db 34,MAGMAR
-    db 40,MUK
-    db 34,KOFFING
-    db 38,MUK
-    db 36,PONYTA
-    db 42,WEEZING
-
-    db $00
-
-MansionMonsB1: ; d4c1 (3:54c1)
-    db $0A
-    db 33,GRIMER
-    db 31,GRIMER
-    db 35,VULPIX
-    db 32,PONYTA
-    db 31,GRIMER
-    db 40,MUK
-    db 34,PONYTA
-    db 35,KOFFING
-    db 38,MAGMAR
-    db 42,WEEZING
-
-    db $00
-
-Route21Mons: ; d4d7 (3:54d7)
-    db $19
-    db 21,RATTATA
-    db 23,PIDGEY
-    db 30,RATICATE
-    db 23,RATTATA
-    db 21,PIDGEY
-    db 30,PIDGEOTTO
-    db 32,PIDGEOTTO
-    db 28,TANGELA
-    db 30,TANGELA
-    db 32,TANGELA
-
-    db $05
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 5,TENTACOOL
-    db 10,TENTACOOL
-    db 15,TENTACOOL
-    db 20,TENTACOOL
-    db 30,TENTACOOL
-    db 35,TENTACOOL
-    db 40,TENTACOOL
-
-DungeonMons1: ; d501 (3:5501)
-    db $0A
-    db 46,GOLBAT
-    db 46,HYPNO
-    db 46,MAGNETON
-    db 49,DODRIO
-    db 49,VENOMOTH
-    db 52,SANDSLASH
-    db 49,KADABRA
-    db 52,PARASECT
-    db 53,RAICHU
-    db 53,DITTO
-
-    db $00
-
-DungeonMons2: ; d517 (3:5517)
-    db $0F
-    db 51,DODRIO
-    db 51,VENOMOTH
-    db 51,KADABRA
-    db 52,RHYDON
-    db 52,MAROWAK
-    db 52,ELECTRODE
-    db 56,CHANSEY
-    db 54,WIGGLYTUFF
-    db 55,DITTO
-    db 60,DITTO
-
-    db $00
-
-DungeonMonsB1: ; d52d (3:552d)
-    db $19
-    db 55,RHYDON
-    db 55,MAROWAK
-    db 55,ELECTRODE
-    db 64,CHANSEY
-    db 64,PARASECT
-    db 64,RAICHU
-    db 57,SANDSLASH
-    db 65,DITTO
-    db 63,DITTO
-    db 67,DITTO
-
-    db $00
-
-PowerPlantMons: ; d543 (3:5543)
-    db $0A
-    db 21,VOLTORB
-    db 21,MAGNEMITE
-    db 20,PIKACHU
-    db 24,PIKACHU
-    db 23,MAGNEMITE
-    db 23,VOLTORB
-    db 32,MAGNETON
-    db 35,MAGNETON
-    db 33,RAICHU
-    db 36,RAICHU
-
-    db $00
-
-Route23Mons: ; d559 (3:5559)
-    db $0A
-    db 26,SANDSHREW
-    db 33,DITTO
-    db 26,SPEAROW
-    db 38,FEAROW
-    db 38,DITTO
-    db 38,FEAROW
-    db 41,SANDSLASH
-    db 43,DITTO
-    db 41,FEAROW
-    db 43,FEAROW
-
-    db $00
-
-PlateauMons2: ; d56f (3:556f)
-    db $0A
-    db 22,MACHOP
-    db 24,GEODUDE
-    db 26,ZUBAT
-    db 36,ONIX
-    db 39,ONIX
-    db 42,ONIX
-    db 41,MACHOKE
-    db 40,GOLBAT
-    db 40,MAROWAK
-    db 43,GRAVELER
-
-    db $00
-
-PlateauMons3: ; d585 (3:5585)
-    db $0F
-    db 24,MACHOP
-    db 26,GEODUDE
-    db 22,ZUBAT
-    db 42,ONIX
-    db 40,VENOMOTH
-    db 45,ONIX
-    db 43,GRAVELER
-    db 41,GOLBAT
-    db 42,MACHOKE
-    db 45,MACHOKE
-
-    db $00
-
-PlateauMons1: ; d59b (3:559b)
-    db $0F
-    db 24,MACHOP
-    db 26,GEODUDE
-    db 22,ZUBAT
-    db 36,ONIX
-    db 39,ONIX
-    db 42,ONIX
-    db 41,GRAVELER
-    db 41,GOLBAT
-    db 42,MACHOKE
-    db 43,MAROWAK
-
-    db $00
-
-CaveMons: ; d5b1 (3:55b1)
-    db $14
-    db 18,DIGLETT
-    db 19,DIGLETT
-    db 17,DIGLETT
-    db 20,DIGLETT
-    db 16,DIGLETT
-    db 15,DIGLETT
-    db 21,DIGLETT
-    db 22,DIGLETT
-    db 29,DUGTRIO
-    db 31,DUGTRIO
-
-    db $00
-
-ENDC
 
 UseItem_: ; d5c7 (3:55c7)
     ld a,1
@@ -24860,7 +23941,7 @@ ItemUsePtrTable: ; d5e1 (3:55e1)
     dw UnusableItem      ; DOME_FOSSIL
     dw UnusableItem      ; HELIX_FOSSIL
     dw UnusableItem      ; SECRET_KEY
-    dw UnusableItem
+    dw ItemUseEvoStone   ; TRADE_STONE
     dw UnusableItem      ; BIKE_VOUCHER
     dw ItemUseXAccuracy  ; X_ACCURACY
     dw ItemUseEvoStone   ; LEAF_STONE
@@ -24892,9 +23973,9 @@ ItemUsePtrTable: ; d5e1 (3:55e1)
     dw ItemUsePokeflute  ; POKE_FLUTE
     dw UnusableItem      ; LIFT_KEY
     dw UnusableItem      ; EXP__ALL
-    dw OldRodCode        ; OLD_ROD
-    dw GoodRodCode       ; GOOD_ROD
-    dw SuperRodCode      ; SUPER_ROD
+    dw ItemUseOldRod     ; OLD_ROD
+    dw ItemUseGoodRod    ; GOOD_ROD
+    dw ItemUseSuperRod   ; SUPER_ROD
     dw ItemUsePPUp       ; PP_UP (real one)
     dw ItemUsePPRestore  ; ETHER
     dw ItemUsePPRestore  ; MAX_ETHER
@@ -25309,8 +24390,8 @@ ItemUseTownMap: ; d968 (3:5968)
     ld a,[W_ISINBATTLE]
     and a
     jp nz,ItemUseNotTime
-    ld b,BANK(Func_70e3e)
-    ld hl,Func_70e3e
+    ld b,BANK(DisplayTownMap)
+    ld hl,DisplayTownMap
     jp Bankswitch ; display Town Map
 
 ItemUseBicycle: ; d977 (3:5977)
@@ -26518,11 +25599,11 @@ WakeUpEntireParty: ; e1e5 (3:61e5)
 ; 00: Y
 ; 01: X
 Route12SnorlaxFluteCoords: ; e1fd (3:61fd)
-    db 62,9  ; one space West of Snorlax
-    db 61,10 ; one space North of Snorlax
-    db 63,10 ; one space South of Snorlax
-    db 62,11 ; one space East of Snorlax
+    db 62,8  ; one space West of Snorlax
+    db 62,10 ; one space East of Snorlax
     db $ff ; terminator
+
+SECTION "Route16SnorlaxFluteCoords",ROMX[$6206],BANK[$3]
 
 ; Format:
 ; 00: Y
@@ -26572,61 +25653,47 @@ CoinCaseNumCoinsText: ; e247 (3:6247)
     TX_FAR _CoinCaseNumCoinsText
     db "@"
 
-OldRodCode: ; e24c (3:624c)
+ItemUseOldRod:
     call FishingInit
     jp c,ItemUseNotTime
-    ld bc,(5 << 8) | MAGIKARP
+    ld hl,OldRodData
+    ld a,[W_CURMAP]
+    ld de,1 ; each fishing group is one byte wide
+    call IsInArray
+    jr c,.Magikarp
+    ld a,$2 ; $2 if no fishing groups found
+    jr RodResponse
+.Magikarp
+    ld bc,(1 << 8) | MAGIKARP ; Entry Level
     ld a,$1 ; set bite
-    jr RodResponse ; 0xe257 $34
-
-GoodRodCode: ; e259 (3:6259)
-    call FishingInit
-    jp c,ItemUseNotTime
-.RandomLoop
-    call GenRandom
-    srl a
-    jr c,.SetBite
-    and %11
-    cp 2
-    jr nc,.RandomLoop
-    ; choose which monster appears
-    ld hl,GoodRodMons
-    add a,a
-    ld c,a
-    ld b,0
-    add hl,bc
-    ld b,[hl]
-    inc hl
-    ld c,[hl]
-    and a
-.SetBite
-    ld a,0
-    rla
-    xor 1
     jr RodResponse
 
-GoodRodMons: ; e27f (3:627f)
-    db 10,GOLDEEN
-    db 10,POLIWAG
-
-SuperRodCode: ; e283 (3:6283)
+ItemUseGoodRod:
     call FishingInit
     jp c,ItemUseNotTime
-    call ReadSuperRodData ; 0xe8ea
-    ld a,e
-RodResponse: ; e28d (3:628d)
-    ld [$CD3D],a
+    ld de,GoodRodData
+    jr ItemUseRodCommon
 
+ItemUseSuperRod:
+    call FishingInit
+    jp c,ItemUseNotTime
+    ld de,SuperRodData
+
+ItemUseRodCommon:
+    call ReadRodData ; 0xe8ea
+    ld a,e
+
+RodResponse: ; e28d (3:628d)
+    ld [wWhichTrade],a
     dec a ; is there a bite?
     jr nz,.next
     ; if yes,store level and species data
     ld a,1
     ld [$D05F],a
     ld a,b ; level
-    ld [W_CURENEMYLVL],a
+    call GetBiteLevel ; ld [W_CURENEMYLVL],a
     ld a,c ; species
     ld [W_CUROPPONENT],a
-
 .next
     ld hl,$D700
     ld a,[hl] ; store the value in a
@@ -26640,6 +25707,8 @@ RodResponse: ; e28d (3:628d)
     pop af
     ld [hl],a
     ret
+
+SECTION "FishingInit",ROMX[$62b4],BANK[$3]
 
 ; checks if fishing is possible and if so,runs initialization code common to all rods
 ; unsets carry if fishing is possible,sets carry if not
@@ -27407,7 +26476,7 @@ KeyItemBitfield: ; e799 (3:6799)
     db %11110000
     db %01001111
     db %00000000
-    db %10011111
+    db %10010111
     db %00000000
     db %11000000
     db %11110000
@@ -27615,152 +26684,38 @@ WaterTilesets: ; e8e0 (3:68e0)
     db $00,$03,$05,$07,$0d,$0e,$11,$16,$17
     db $ff ; terminator
 
-ReadSuperRodData: ; e8ea (3:68ea)
-; return e = 2 if no fish on this map
-; return e = 1 if a bite,bc = level,species
-; return e = 0 if no bite
-    ld a,[W_CURMAP]
-    ld de,3 ; each fishing group is three bytes wide
-    ld hl,SuperRodData
-    call IsInArray
-    jr c,.ReadFishingGroup
-    ld e,$2 ; $2 if no fishing groups found
-    ret
-
-.ReadFishingGroup ; 0xe8f6
-; hl points to the fishing group entry in the index
-    inc hl ; skip map id
-
-    ; read fishing group address
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-
-    ld b,[hl] ; how many mons in group
-    inc hl ; point to data
-    ld e,$0 ; no bite yet
-
-.RandomLoop ; 0xe90c
-    call GenRandom
-    srl a
-    ret c ; 50% chance of no battle
-
-    and %11 ; 2-bit random number
-    cp b
-    jr nc,.RandomLoop ; if a is greater than the number of mons,regenerate
-
-    ; get the mon
-    add a
+ReadRodData:
+    ld b,BANK(_ReadRodData)
+    ld hl,_ReadRodData
+    call Bankswitch
+    ld a,[wFishingLevel]
+    ld b,a
+    ld a,[wFishingSpecies]
     ld c,a
-    ld b,$0
-    add hl,bc
-    ld b,[hl] ; level
-    inc hl
-    ld c,[hl] ; species
-    ld e,$1 ; $1 if there's a bite
     ret
 
-; super rod data
-; format: map,pointer to fishing group
-SuperRodData: ; e919 (3:6919)
-    dbw PALLET_TOWN,FishingGroup1
-    dbw VIRIDIAN_CITY,FishingGroup1
-    dbw CERULEAN_CITY,FishingGroup3
-    dbw VERMILION_CITY,FishingGroup4
-    dbw CELADON_CITY,FishingGroup5
-    dbw FUCHSIA_CITY,FishingGroup10
-    dbw CINNABAR_ISLAND,FishingGroup8
-    dbw ROUTE_4,FishingGroup3
-    dbw ROUTE_6,FishingGroup4
-    dbw ROUTE_10,FishingGroup5
-    dbw ROUTE_11,FishingGroup4
-    dbw ROUTE_12,FishingGroup7
-    dbw ROUTE_13,FishingGroup7
-    dbw ROUTE_17,FishingGroup7
-    dbw ROUTE_18,FishingGroup7
-    dbw ROUTE_19,FishingGroup8
-    dbw ROUTE_20,FishingGroup8
-    dbw ROUTE_21,FishingGroup8
-    dbw ROUTE_22,FishingGroup2
-    dbw ROUTE_23,FishingGroup9
-    dbw ROUTE_24,FishingGroup3
-    dbw ROUTE_25,FishingGroup3
-    dbw CERULEAN_GYM,FishingGroup3
-    dbw VERMILION_DOCK,FishingGroup4
-;XXX syntax errors on the rest?
-    dbw $A1,FishingGroup8 ; SEAFOAM_ISLANDS_4
-    dbw $A2,FishingGroup8 ; SEAFOAM_ISLANDS_5
-    dbw SAFARI_ZONE_EAST,FishingGroup6
-    dbw $DA,FishingGroup6 ; SAFARI_ZONE_NORTH
-    dbw SAFARI_ZONE_WEST,FishingGroup6
-    dbw $DC,FishingGroup6 ; SAFARI_ZONE_CENTER
-    dbw $E2,FishingGroup9 ; UNKNOWN_DUNGEON_2
-    dbw $E3,FishingGroup9 ; UNKNOWN_DUNGEON_3
-    dbw $E4,FishingGroup9 ; UNKNOWN_DUNGEON_1
+OldRodData:
+    db PALLET_TOWN
+    db CERULEAN_CITY
+    db VERMILION_CITY
+    db FUCHSIA_CITY
+    db ROUTE_10
+    db ROUTE_11
+    db ROUTE_12
+    db ROUTE_13
+    db ROUTE_17
+    db ROUTE_18
+    db ROUTE_19
+    db ROUTE_24
+    db ROUTE_25
+    db VERMILION_DOCK
+    db SAFARI_ZONE_EAST
+    db SAFARI_ZONE_NORTH
+    db SAFARI_ZONE_WEST
+    db SAFARI_ZONE_CENTER
     db $FF
 
-; fishing groups
-; number of monsters,followed by level/monster pairs
-FishingGroup1: ; e97d (3:697d)
-    db 2
-    db 15,TENTACOOL
-    db 15,POLIWAG
-
-FishingGroup2: ; e982 (3:6982)
-    db 2
-    db 15,GOLDEEN
-    db 15,POLIWAG
-
-FishingGroup3: ; e987 (3:6987)
-    db 3
-    db 15,PSYDUCK
-    db 15,GOLDEEN
-    db 15,KRABBY
-
-FishingGroup4: ; e98e (3:698e)
-    db 2
-    db 15,KRABBY
-    db 15,SHELLDER
-
-FishingGroup5: ; e993 (3:6993)
-    db 2
-    db 23,POLIWHIRL
-    db 15,SLOWPOKE
-
-FishingGroup6: ; e998 (3:6998)
-    db 4
-    db 15,DRATINI
-    db 15,KRABBY
-    db 15,PSYDUCK
-    db 15,SLOWPOKE
-
-FishingGroup7: ; e9a1 (3:69a1)
-    db 4
-    db 5,TENTACOOL
-    db 15,KRABBY
-    db 15,GOLDEEN
-    db 15,MAGIKARP
-
-FishingGroup8: ; e9aa (3:69aa)
-    db 4
-    db 15,STARYU
-    db 15,HORSEA
-    db 15,SHELLDER
-    db 15,GOLDEEN
-
-FishingGroup9: ; e9b3 (3:69b3)
-    db 4
-    db 23,SLOWBRO
-    db 23,SEAKING
-    db 23,KINGLER
-    db 23,SEADRA
-
-FishingGroup10: ; e9bc (3:69bc)
-    db 4
-    db 23,SEAKING
-    db 15,KRABBY
-    db 15,GOLDEEN
-    db 15,MAGIKARP
+SECTION "ItemUseReloadOverworldData",ROMX[$69c5],BANK[$3]
 
 ; reloads map view and processes sprite data
 ; for items that cause the overworld to be displayed
@@ -27768,52 +26723,46 @@ ItemUseReloadOverworldData: ; e9c5 (3:69c5)
     call LoadCurrentMapView
     jp UpdateSprites
 
-Func_e9cb: ; e9cb (3:69cb)
-    ld hl,WildDataPointers ; $4eeb
+; creates a list at wBuffer of maps where the mon in [wd11e] can be found.
+; this is used by the pokedex to display locations the mon can be found on the map.
+FindWildLocationsOfMon:
+    ld hl,WildDataPointers
     ld de,$cee9
     ld c,$0
-.asm_e9d3
+.loop
     inc hl
     ld a,[hld]
     inc a
-    jr z,.asm_e9ec
+    jr z,.done
     push hl
     ld a,[hli]
     ld h,[hl]
     ld l,a
     ld a,[hli]
     and a
-    call nz,Func_e9f0
+    call nz,CheckMapForMon ; land
+    jr c,.found
     ld a,[hli]
     and a
-    call nz,Func_e9f0
+    call nz,CheckMapForMon ; water
+    jr c,.found
+    ld hl,SuperRodData
+    call FindFishingLocationsOfMon ; fishing super rod
+    jr c,.found
+    ld hl,GoodRodData
+    call FindFishingLocationsOfMon ; fishing good rod
+.found
     pop hl
     inc hl
     inc hl
     inc c
-    jr .asm_e9d3
-.asm_e9ec
-    ld a,$ff
+    jr .loop
+.done
+    ld a,$ff ; list terminator
     ld [de],a
     ret
 
-Func_e9f0: ; e9f0 (3:69f0)
-    inc hl
-    ld b,$a
-.asm_e9f3
-    ld a,[$d11e]
-    cp [hl]
-    jr nz,.asm_e9fc
-    ld a,c
-    ld [de],a
-    inc de
-.asm_e9fc
-    inc hl
-    inc hl
-    dec b
-    jr nz,.asm_e9f3
-    dec hl
-    ret
+SECTION "DrawBadges",ROMX[$6a03],BANK[$3]
 
 DrawBadges: ; ea03 (3:6a03)
 ; Draw 4x2 gym leader faces,with the faces replaced by
@@ -30153,8 +29102,8 @@ TownMapText: ; fc12 (3:7c12)
     inc a
     ld [H_AUTOBGTRANSFERENABLED],a
     call LoadFontTilePatterns
-    ld b,BANK(Func_70e3e)
-    ld hl,Func_70e3e
+    ld b,BANK(DisplayTownMap)
+    ld hl,DisplayTownMap
     call Bankswitch
     ld hl,$d730
     res 6,[hl]
@@ -30416,6 +29365,94 @@ TeachMachineMoveText: ; e559 (3:6559)
 MonCannotLearnMachineMoveText: ; e55e (3:655e)
     TX_FAR _MonCannotLearnMachineMoveText
     db "@"
+
+GetBiteLevel:
+    push bc
+    push af
+    ld a,[$cf91] ; contains item_ID
+    ld b,(%111 << 4) | %1 ; add 0-8
+    cp OLD_ROD
+    jr z,.Done
+    ld b,(%1111 << 4) | %11 ; add 0-18
+    cp GOOD_ROD
+    jr z,.Done
+    ld b,(%11 << 4) | %1 ; add 0-4
+.Done
+    call GenRandom
+    and b
+    ld c,a
+    and $0F
+    ld b,a
+    ld a,c
+    swap a
+    and $0F
+    ld c,a
+    pop af
+    add b
+    add c
+    ld [W_CURENEMYLVL],a
+    pop bc
+    ret
+
+FindFishingLocationsOfMon:
+    push bc
+    push de
+    ld a,c
+    ld de,3
+    call IsInArray
+    pop de
+    pop bc
+    push bc
+    call c,CheckFishingForMon
+    pop bc
+    ret
+
+CheckMapForMon:
+    inc hl
+    ld b,10
+.loop
+    ld a,[$d11e]
+    cp [hl]
+    jr nz,.nextEntry
+    ld a,c
+    ld [de],a
+    inc de
+    scf
+    ret
+.nextEntry
+    inc hl
+    inc hl
+    dec b
+    jr nz,.loop
+    dec hl
+    and a ; Reset Carry Flag
+    ret
+
+CheckFishingForMon:
+    ; hl points to the fishing group entry in the index
+    inc hl ; skip map id
+    ld a,[hli] ; read fishing group address
+    ld h,[hl]
+    ld l,a
+    ld b,[hl] ; how many mons in group
+    inc hl
+    inc hl ; point to data
+.Loop
+    ld a,[$d11e]
+    cp [hl]
+    jr nz,.nextEntry
+    ld a,c
+    ld [de],a
+    inc de
+    scf
+    ret
+.nextEntry
+    inc hl
+    inc hl
+    dec b
+    jr nz,.Loop
+    and a ; Reset Carry Flag
+    ret
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -31893,6 +30930,7 @@ UsableItems_PartyMenu: ; 13434 (4:7434)
     db CARBOS
     db CALCIUM
     db RARE_CANDY
+    db TRADE_STONE
     db LEAF_STONE
     db FULL_HEAL
     db REVIVE
@@ -31911,15 +30949,7 @@ UsableItems_PartyMenu: ; 13434 (4:7434)
     db MAX_ELIXER
     db $ff
 
-; items which close the item menu when used
-UsableItems_CloseMenu: ; 13459 (4:7459)
-    db ESCAPE_ROPE
-    db ITEMFINDER
-    db POKE_FLUTE
-    db OLD_ROD
-    db GOOD_ROD
-    db SUPER_ROD
-    db $ff
+SECTION "StartMenu_TrainerInfo",ROMX[$7460],BANK[$4]
 
 StartMenu_TrainerInfo: ; 13460 (4:7460)
     call GBPalWhiteOut
@@ -32545,7 +31575,7 @@ TryDoWildEncounter: ; 13870 (4:7870)
     ld b,$0
     add hl,bc
     ld a,[hli]
-    ld [W_CURENEMYLVL],a ; $d127
+    call GetWildEnemyLevel ; ld [W_CURENEMYLVL],a ; $d127
     ld a,[hl]
     ld [$cf91],a
     ld [W_ENEMYMONID],a
@@ -32971,6 +32001,45 @@ FixTMPalette:
     set 2,[hl]
     pop hl
     jp PlaceString
+
+GetWildEnemyLevel:
+    push bc
+    push af
+    ld b,0
+    call GenRandom
+    ld c,a
+    and %00000111
+    jr z,.Add1 ; 1/8 = 12.50%
+    ld a,c
+    and %11111000
+    jr z,.Add2 ; (1-1/8)/32 = 2.73%
+    call GenRandom
+    and %01111111
+    jr z,.Add3 ; (1-((1-1/8)/32))/128 = 0.76%
+.Add0 ; 1-(1/8)-((1-1/8)/32)-((1-((1-1/8)/32))/128) = 84.01%
+.End
+    pop af
+    add b
+    ld [W_CURENEMYLVL],a ; $d127
+    pop bc
+    ret
+.Add3
+    inc b
+.Add2
+    inc b
+.Add1
+    inc b
+    jr .End
+
+; items which close the item menu when used
+UsableItems_CloseMenu:
+    db ESCAPE_ROPE
+    db ITEMFINDER
+    db POKE_FLUTE
+    db OLD_ROD
+    db GOOD_ROD
+    db SUPER_ROD
+    db $ff
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -34711,58 +33780,7 @@ FuchsiaCity_h: ; 0x18ba7 to 0x18bd4 (45 bytes) (bank=6) (id=7)
     EAST_MAP_CONNECTION ROUTE_15,ROUTE_15_WIDTH,4,0,ROUTE_15_HEIGHT,Route15Blocks,FUCHSIA_CITY_WIDTH
     dw FuchsiaCityObject ; objects
 
-FuchsiaCityObject: ; 0x18bd4 (size=178)
-    db $f ; border tile
-
-    db $9 ; warps
-    db $d,$5,$0,FUCHSIA_MART
-    db $1b,$b,$0,FUCHSIA_HOUSE_1
-    db $1b,$13,$0,FUCHSIA_POKECENTER
-    db $1b,$1b,$0,FUCHSIA_HOUSE_2
-    db $3,$12,$0,SAFARIZONEENTRANCE
-    db $1b,$5,$0,FUCHSIA_GYM
-    db $d,$16,$0,FUCHSIAMEETINGROOM
-    db $1b,$1f,$1,FUCHSIA_HOUSE_3
-    db $18,$1f,$0,FUCHSIA_HOUSE_3
-
-    db $e ; signs
-    db $17,$f,$b ; FuchsiaCityText11
-    db $f,$19,$c ; FuchsiaCityText12
-    db $5,$11,$d ; FuchsiaCityText13
-    db $d,$6,$e ; MartSignText
-    db $1b,$14,$f ; PokeCenterSignText
-    db $1d,$1b,$10 ; FuchsiaCityText16
-    db $f,$15,$11 ; FuchsiaCityText17
-    db $1d,$5,$12 ; FuchsiaCityText18
-    db $7,$21,$13 ; FuchsiaCityText19
-    db $7,$1b,$14 ; FuchsiaCityText20
-    db $7,$d,$15 ; FuchsiaCityText21
-    db $d,$1f,$16 ; FuchsiaCityText22
-    db $f,$d,$17 ; FuchsiaCityText23
-    db $7,$7,$18 ; FuchsiaCityText24
-
-    db $a ; people
-    db SPRITE_BUG_CATCHER,$c + 4,$a + 4,$fe,$2,$1 ; person
-    db SPRITE_GAMBLER,$11 + 4,$1c + 4,$fe,$2,$2 ; person
-    db SPRITE_FISHER2,$e + 4,$1e + 4,$ff,$d0,$3 ; person
-    db SPRITE_BUG_CATCHER,$8 + 4,$18 + 4,$ff,$d1,$4 ; person
-    db SPRITE_CLEFAIRY,$5 + 4,$1f + 4,$fe,$0,$5 ; person
-    db SPRITE_BALL,$6 + 4,$19 + 4,$ff,$ff,$6 ; person
-    db SPRITE_SLOWBRO,$6 + 4,$c + 4,$fe,$2,$7 ; person
-    db SPRITE_SLOWBRO,$c + 4,$1e + 4,$fe,$2,$8 ; person
-    db SPRITE_SEEL,$11 + 4,$8 + 4,$fe,$0,$9 ; person
-    db SPRITE_OMANYTE,$5 + 4,$6 + 4,$ff,$ff,$a ; person
-
-    ; warp-to
-    EVENT_DISP $14,$d,$5 ; FUCHSIA_MART
-    EVENT_DISP $14,$1b,$b ; FUCHSIA_HOUSE_1
-    EVENT_DISP $14,$1b,$13 ; FUCHSIA_POKECENTER
-    EVENT_DISP $14,$1b,$1b ; FUCHSIA_HOUSE_2
-    EVENT_DISP $14,$3,$12 ; SAFARIZONEENTRANCE
-    EVENT_DISP $14,$1b,$5 ; FUCHSIA_GYM
-    EVENT_DISP $14,$d,$16 ; FUCHSIAMEETINGROOM
-    EVENT_DISP $14,$1b,$1f ; FUCHSIA_HOUSE_3
-    EVENT_DISP $14,$18,$1f ; FUCHSIA_HOUSE_3
+SECTION "FuchsiaCityBlocks",ROMX[$4c86],BANK[$6]
 
 FuchsiaCityBlocks: ; 18c86 (6:4c86)
     INCBIN "maps/fuchsiacity.blk"
@@ -38226,6 +37244,59 @@ DoorTileIDPointers: ; Move to Bank's End
     dw Tileset17DoorTileIDs
     db $ff
 
+FuchsiaCityObject: ; 0x18bd4 (size=178)
+    db $f ; border tile
+
+    db $9 ; warps
+    db $d,$5,$0,FUCHSIA_MART
+    db $1b,$b,$0,FUCHSIA_HOUSE_1
+    db $1b,$13,$0,FUCHSIA_POKECENTER
+    db $1b,$1b,$0,FUCHSIA_HOUSE_2
+    db $3,$12,$0,SAFARIZONEENTRANCE
+    db $1b,$5,$0,FUCHSIA_GYM
+    db $d,$16,$0,FUCHSIAMEETINGROOM
+    db $1b,$1f,$1,FUCHSIA_HOUSE_3
+    db $18,$1f,$0,FUCHSIA_HOUSE_3
+
+    db $d ; signs
+    db $f,$19,$c ; FuchsiaCityText12
+    db $5,$11,$d ; FuchsiaCityText13
+    db $d,$6,$e ; MartSignText
+    db $1b,$14,$f ; PokeCenterSignText
+    db $1d,$1b,$10 ; FuchsiaCityText16
+    db $f,$15,$11 ; FuchsiaCityText17
+    db $1d,$5,$12 ; FuchsiaCityText18
+    db $7,$21,$13 ; FuchsiaCityText19
+    db $7,$1b,$14 ; FuchsiaCityText20
+    db $7,$d,$15 ; FuchsiaCityText21
+    db $d,$1f,$16 ; FuchsiaCityText22
+    db $f,$d,$17 ; FuchsiaCityText23
+    db $7,$7,$18 ; FuchsiaCityText24
+
+    db $b ; people
+    db SPRITE_BUG_CATCHER,$c + 4,$a + 4,$fe,$2,$1 ; person
+    db SPRITE_GAMBLER,$11 + 4,$1c + 4,$fe,$2,$2 ; person
+    db SPRITE_FISHER2,$e + 4,$1e + 4,$ff,$d0,$3 ; person
+    db SPRITE_BUG_CATCHER,$8 + 4,$18 + 4,$ff,$d1,$4 ; person
+    db SPRITE_CLEFAIRY,$5 + 4,$1f + 4,$fe,$0,$5 ; person
+    db SPRITE_BALL,$6 + 4,$19 + 4,$ff,$ff,$6 ; person
+    db SPRITE_SLOWBRO,$6 + 4,$c + 4,$fe,$2,$7 ; person
+    db SPRITE_SLOWBRO,$c + 4,$1e + 4,$fe,$2,$8 ; person
+    db SPRITE_SEEL,$11 + 4,$8 + 4,$fe,$0,$9 ; person
+    db SPRITE_OMANYTE,$5 + 4,$6 + 4,$ff,$ff,$a ; person
+    db SPRITE_GAMBLER,$1c + 4,$5 + 4,$ff,$d0,$b ; person
+
+    ; warp-to
+    EVENT_DISP $14,$d,$5 ; FUCHSIA_MART
+    EVENT_DISP $14,$1b,$b ; FUCHSIA_HOUSE_1
+    EVENT_DISP $14,$1b,$13 ; FUCHSIA_POKECENTER
+    EVENT_DISP $14,$1b,$1b ; FUCHSIA_HOUSE_2
+    EVENT_DISP $14,$3,$12 ; SAFARIZONEENTRANCE
+    EVENT_DISP $14,$1b,$5 ; FUCHSIA_GYM
+    EVENT_DISP $14,$d,$16 ; FUCHSIAMEETINGROOM
+    EVENT_DISP $14,$1b,$1f ; FUCHSIA_HOUSE_3
+    EVENT_DISP $14,$18,$1f ; FUCHSIA_HOUSE_3
+
 SECTION "bank7",ROMX,BANK[$7]
 
 CinnabarIsland_h: ; 0x1c000 to 0x1c022 (34 bytes) (bank=7) (id=8)
@@ -39534,7 +38605,7 @@ OaksLabText41: ; 1d0fd (7:50fd)
 OaksLabText29: ; 1d102 (7:5102)
 OaksLabText2: ; 1d102 (7:5102)
     db $8
-    ld a,$b1
+    ld a,SQUIRTLE ; Entry Level
     ld [$cd3d],a
     ld a,$3
     ld [$cd3e],a
@@ -39545,7 +38616,7 @@ OaksLabText2: ; 1d102 (7:5102)
 OaksLabText30: ; 1d113 (7:5113)
 OaksLabText3: ; 1d113 (7:5113)
     db $8
-    ld a,$99
+    ld a,BULBASAUR ; Entry Level
     ld [$cd3d],a
     ld a,$4
     ld [$cd3e],a
@@ -39556,7 +38627,7 @@ OaksLabText3: ; 1d113 (7:5113)
 OaksLabText31: ; 1d124 (7:5124)
 OaksLabText4: ; 1d124 (7:5124)
     db $8
-    ld a,$b0
+    ld a,CHARMANDER ; Entry Level
     ld [$cd3d],a
     ld a,$2
     ld [$cd3e],a
@@ -41254,7 +40325,7 @@ CeladonMansion5Text1: ; 1dd41 (7:5d41)
 
 CeladonMansion5Text2: ; 1dd46 (7:5d46)
     db $08 ; asm
-    ld bc,(EEVEE << 8) | 15
+    ld bc,(VOLTORB << 8) | 15
     call GivePokemon
     jr nc,.asm_24365 ; 0x1dd4d
     ld a,$45
@@ -49554,181 +48625,275 @@ TrainerDataPointers: ; 39d3b (e:5d3b)
     ; every next two bytes are a level and species
     ; null-terminated
 
-YoungsterData: ; 39d99 (e:5d99)
+YoungsterData:
+; Route 3
     db 11,RATTATA,EKANS,0
     db 14,SPEAROW,0
+; Mt. Moon 1F
     db 10,RATTATA,RATTATA,ZUBAT,0
+; Route 24
     db 14,RATTATA,EKANS,ZUBAT,0
+; Route 25
     db 15,RATTATA,SPEAROW,0
     db 17,SLOWPOKE,0
     db 14,EKANS,SANDSHREW,0
+; SS Anne 1F Rooms
     db 21,NIDORAN_M,0
+; Route 11
     db 21,EKANS,0
     db 19,SANDSHREW,ZUBAT,0
     db 20,RATTATA,RATTATA,RATICATE,0
     db 18,NIDORAN_M,NIDORINO,0
+; Unused
     db 17,SPEAROW,RATTATA,RATTATA,SPEAROW,0
-BugCatcherData: ; 39dce (e:5dce)
+
+BugCatcherData:
+; Viridian Forest
     db 6,WEEDLE,CATERPIE,0
     db 7,WEEDLE,KAKUNA,WEEDLE,0
     db 9,WEEDLE,0
+; Route 3
     db 10,CATERPIE,WEEDLE,CATERPIE,0
     db 9,WEEDLE,KAKUNA,CATERPIE,METAPOD,0
     db 11,CATERPIE,METAPOD,0
+; Mt. Moon 1F
     db 11,WEEDLE,KAKUNA,0
     db 10,CATERPIE,METAPOD,CATERPIE,0
+; Route 24
     db 14,CATERPIE,WEEDLE,0
+; Route 6
     db 16,WEEDLE,CATERPIE,WEEDLE,0
     db 20,BUTTERFREE,0
+; Unused
     db 18,METAPOD,KAKUNA,VENONAT,0
+; Route 9
     db 19,BEEDRILL,BEEDRILL,0
     db 20,CATERPIE,WEEDLE,VENONAT,0
-LassData: ; 39e0c (e:5e0c)
+
+LassData:
+; Route 3
     db 9,PIDGEY,PIDGEY,0
     db 10,RATTATA,NIDORAN_M,0
     db 14,JIGGLYPUFF,0
+; Route 4
     db 31,PARAS,PARAS,PARASECT,0
+; Mt. Moon 1F
     db 11,ODDISH,BELLSPROUT,0
     db 14,CLEFAIRY,0
+; Route 24
     db 16,PIDGEY,NIDORAN_F,0
     db 14,PIDGEY,NIDORAN_F,0
+; Route 25
     db 15,NIDORAN_M,NIDORAN_F,0
     db 13,ODDISH,PIDGEY,ODDISH,0
+; SS Anne 1F Rooms
     db 18,PIDGEY,NIDORAN_F,0
+; SS Anne 2F Rooms
     db 18,RATTATA,PIKACHU,0
+; Route 8
     db 23,NIDORAN_F,NIDORINA,0
     db 24,MEOWTH,MEOWTH,MEOWTH,0
     db 19,PIDGEY,RATTATA,NIDORAN_M,MEOWTH,PIKACHU,0
     db 22,CLEFAIRY,CLEFAIRY,0
+; Celadon Gym
     db 23,BELLSPROUT,WEEPINBELL,0
     db 23,ODDISH,GLOOM,0
-SailorData: ; 39e58 (e:5e58)
+
+SailorData:
+; SS Anne Stern
     db 18,MACHOP,SHELLDER,0
     db 17,MACHOP,TENTACOOL,0
+; SS Anne B1F Rooms
     db 21,SHELLDER,0
     db 17,HORSEA,SHELLDER,TENTACOOL,0
     db 18,TENTACOOL,STARYU,0
     db 17,HORSEA,HORSEA,HORSEA,0
     db 20,MACHOP,0
+; Vermilion Gym
     db 21,PIKACHU,PIKACHU,0
-JrTrainerMData: ; 39e78 (e:5e78)
+
+JrTrainerMData:
+; Pewter Gym
     db 11,DIGLETT,SANDSHREW,0
+; Route 24/Route 25
     db 14,RATTATA,EKANS,0
+; Route 24
     db 18,MANKEY,0
+; Route 6
     db 20,SQUIRTLE,0
     db 20,SPEAROW,RATICATE,0
+; Unused
     db 18,DIGLETT,DIGLETT,SANDSHREW,0
+; Route 9
     db 21,GROWLITHE,CHARMANDER,0
     db 19,RATTATA,DIGLETT,EKANS,SANDSHREW,0
+; Route 12
     db 29,NIDORAN_M,NIDORINO,0
-JrTrainerFData: ; 39e9d (e:5e9d)
+
+JrTrainerFData:
+; Cerulean Gym
     db 19,GOLDEEN,0
+; Route 6
     db 16,RATTATA,PIKACHU,0
     db 16,PIDGEY,PIDGEY,PIDGEY,0
+; Unused
     db 22,BULBASAUR,0
+; Route 9
     db 18,ODDISH,BELLSPROUT,ODDISH,BELLSPROUT,0
     db 23,MEOWTH,0
+; Route 10
     db 20,PIKACHU,CLEFAIRY,0
     db 21,PIDGEY,PIDGEOTTO,0
+; Rock Tunnel B1F
     db 21,JIGGLYPUFF,PIDGEY,MEOWTH,0
     db 22,ODDISH,BULBASAUR,0
+; Celadon Gym
     db 24,BULBASAUR,IVYSAUR,0
+; Route 13
     db 24,PIDGEY,MEOWTH,RATTATA,PIKACHU,MEOWTH,0
     db 30,POLIWAG,POLIWAG,0
     db 27,PIDGEY,MEOWTH,PIDGEY,PIDGEOTTO,0
     db 28,GOLDEEN,POLIWAG,HORSEA,0
+; Route 20
     db 31,GOLDEEN,SEAKING,0
+; Rock Tunnel 1F
     db 22,BELLSPROUT,CLEFAIRY,0
     db 20,MEOWTH,ODDISH,PIDGEY,0
     db 19,PIDGEY,RATTATA,RATTATA,BELLSPROUT,0
+; Route 15
     db 28,GLOOM,ODDISH,ODDISH,0
     db 29,PIKACHU,RAICHU,0
     db 33,CLEFAIRY,0
     db 29,BELLSPROUT,ODDISH,TANGELA,0
+; Route 20
     db 30,TENTACOOL,HORSEA,SEEL,0
-PokemaniacData: ; 39f09 (e:5f09)
+
+PokemaniacData:
+; Route 10
     db 30,RHYHORN,LICKITUNG,0
     db 20,CUBONE,SLOWPOKE,0
+; Rock Tunnel B1F
     db 20,SLOWPOKE,SLOWPOKE,SLOWPOKE,0
     db 22,CHARMANDER,CUBONE,0
     db 25,SLOWPOKE,0
+; Victory Road 2F
     db 40,CHARMELEON,LAPRAS,LICKITUNG,0
+; Rock Tunnel 1F
     db 23,CUBONE,SLOWPOKE,0
-SuperNerdData: ; 39f26 (e:5f26)
+
+SuperNerdData:
+; Mt. Moon 1F
     db 11,MAGNEMITE,VOLTORB,0
+; Mt. Moon B2F
     db 12,GRIMER,VOLTORB,KOFFING,0
+; Route 8
     db 20,VOLTORB,KOFFING,VOLTORB,MAGNEMITE,0
     db 22,GRIMER,GRIMER,GRIMER,0
     db 26,KOFFING,0
+; Unused
     db 22,KOFFING,MAGNEMITE,KOFFING,0
     db 20,MAGNEMITE,MAGNEMITE,KOFFING,MAGNEMITE,0
     db 24,MAGNEMITE,VOLTORB,0
+; Cinnabar Gym
     db 36,VULPIX,VULPIX,NINETALES,0
     db 34,PONYTA,CHARMANDER,VULPIX,GROWLITHE,0
     db 41,RAPIDASH,0
     db 37,GROWLITHE,VULPIX,0
-HikerData: ; 39f5e (e:5f5e)
+
+HikerData:
+; Mt. Moon 1F
     db 10,GEODUDE,GEODUDE,ONIX,0
+; Route 25
     db 15,MACHOP,GEODUDE,0
     db 13,GEODUDE,GEODUDE,MACHOP,GEODUDE,0
     db 17,ONIX,0
+; Route 9
     db 21,GEODUDE,ONIX,0
     db 20,GEODUDE,MACHOP,GEODUDE,0
+; Route 10
     db 21,GEODUDE,ONIX,0
     db 25,ONIX,GRAVELER,0
+; Rock Tunnel B1F
     db 25,GEODUDE,GEODUDE,GRAVELER,0
     db 25,GEODUDE,0
+; Route 9/Rock Tunnel B1F
     db 20,MACHOP,ONIX,0
+; Rock Tunnel 1F
     db 19,GEODUDE,MACHOP,GEODUDE,GEODUDE,0
     db 20,ONIX,ONIX,GEODUDE,0
     db 25,GEODUDE,GRAVELER,0
-BikerData: ; 39f9c (e:5f9c)
+
+BikerData:
+; Route 13
     db 28,KOFFING,KOFFING,KOFFING,0
+; Route 14
     db 29,KOFFING,GRIMER,0
+; Route 15
     db 25,KOFFING,KOFFING,KOFFING,KOFFING,GRIMER,0
     db 28,KOFFING,GRIMER,KOFFING,0
+; Route 16
     db 29,GRIMER,KOFFING,0
     db 35,WEEZING,0
     db 26,GRIMER,GRIMER,GRIMER,GRIMER,0
+; Route 17
     db 35,KOFFING,KOFFING,WEEZING,0
     db 38,MUK,0
     db 29,VOLTORB,VOLTORB,0
     db 38,GRIMER,MUK,0
     db 35,KOFFING,KOFFING,KOFFING,KOFFING,WEEZING,0
+; Route 14
     db 26,KOFFING,KOFFING,GRIMER,KOFFING,0
     db 28,GRIMER,GRIMER,KOFFING,0
     db 38,KOFFING,MUK,0
-BurglarData: ; 39fe4 (e:5fe4)
+
+BurglarData:
+; Unused
     db 29,GROWLITHE,VULPIX,0
     db 33,GROWLITHE,0
     db 28,VULPIX,CHARMANDER,PONYTA,0
+; Cinnabar Gym
     db 36,GROWLITHE,VULPIX,NINETALES,0
     db 41,PONYTA,0
     db 37,VULPIX,GROWLITHE,0
+; Mansion 2F
     db 34,CHARMANDER,CHARMELEON,0
+; Mansion 3F
     db 38,NINETALES,0
+; Mansion B1F
     db 34,GROWLITHE,PONYTA,0
+
 EngineerData: ; 3a007 (e:6007)
+; Unused
     db 21,VOLTORB,MAGNEMITE,0
+; Route 11
     db 21,MAGNEMITE,0
     db 30,MAGNETON,0
-    ds 2
-Juggler1Data: ; 3a013 (e:6013)
+
+Juggler1Data:
 ; none
+
 FisherData: ; 3a013 (e:6013)
+; SS Anne 2F Rooms
     db 17,GOLDEEN,TENTACOOL,GOLDEEN,0
+; SS Anne B1F Rooms
     db 17,TENTACOOL,STARYU,SHELLDER,0
+; Route 12
     db 22,GOLDEEN,POLIWAG,GOLDEEN,0
     db 24,TENTACOOL,GOLDEEN,0
     db 27,GOLDEEN,0
     db 21,POLIWAG,SHELLDER,GOLDEEN,HORSEA,0
+; Route 21
     db 33,GOLDEEN,GOLDEEN,SEAKING,SEAKING,0
     db 31,SHELLDER,CLOYSTER,0
     db 27,MAGIKARP,MAGIKARP,MAGIKARP,MAGIKARP,MAGIKARP,MAGIKARP,0
     db 33,SEAKING,GOLDEEN,0
+; Route 12
     db 24,MAGIKARP,MAGIKARP,0
-SwimmerData: ; 3a049 (e:6049)
+
+SwimmerData:
+; Cerulean Gym
     db 16,HORSEA,SHELLDER,0
+; Route 19
     db 30,TENTACOOL,SHELLDER,0
     db 29,GOLDEEN,HORSEA,STARYU,0
     db 30,POLIWAG,POLIWHIRL,0
@@ -49736,269 +48901,408 @@ SwimmerData: ; 3a049 (e:6049)
     db 33,GOLDEEN,SHELLDER,SEAKING,0
     db 30,HORSEA,HORSEA,0
     db 30,TENTACOOL,TENTACOOL,STARYU,HORSEA,TENTACRUEL,0
+; Route 20
     db 31,SHELLDER,CLOYSTER,0
     db 35,STARYU,0
     db 32,HORSEA,HORSEA,SEADRA,HORSEA,0
+; Route 21
     db 33,SEADRA,TENTACRUEL,0
     db 37,STARMIE,0
     db 33,STARYU,WARTORTLE,0
     db 32,POLIWHIRL,TENTACOOL,SEADRA,0
-CueBallData: ; 3a08d (e:608d)
+
+CueBallData:
+; Route 16
     db 28,MACHOP,MANKEY,MACHOP,0
     db 29,MANKEY,MACHOP,0
     db 33,MACHOP,0
+; Route 17
     db 29,MANKEY,PRIMEAPE,0
     db 29,MACHOP,MACHOKE,0
     db 33,MACHOKE,0
     db 28,MANKEY,MANKEY,MACHOKE,MACHOP,0
     db 29,PRIMEAPE,MACHOKE,0
+; Route 21
     db 31,TENTACOOL,TENTACOOL,TENTACRUEL,0
-GamblerData: ; 3a0b3 (e:60b3)
+
+GamblerData:
+; Route 11
     db 18,POLIWAG,HORSEA,0
     db 18,BELLSPROUT,ODDISH,0
     db 18,VOLTORB,MAGNEMITE,0
     db 18,GROWLITHE,VULPIX,0
+; Route 8
     db 25,POLIWAG,POLIWAG,POLIWHIRL,0
+; Unused
     db 25,ONIX,GEODUDE,GRAVELER,0
+; Route 8
     db 24,GROWLITHE,VULPIX,0
-BeautyData: ; 3a0d1 (e:60d1)
+
+BeautyData:
+; Celadon Gym
     db 21,ODDISH,BELLSPROUT,ODDISH,BELLSPROUT,0
     db 24,BELLSPROUT,BELLSPROUT,0
     db 26,EXEGGCUTE,0
+; Route 13
     db 27,RATTATA,PIKACHU,RATTATA,0
     db 29,CLEFAIRY,MEOWTH,0
+; Route 20
     db 35,SEAKING,0
     db 30,SHELLDER,SHELLDER,CLOYSTER,0
     db 33,POLIWAG,SEAKING,0
+; Route 15
     db 29,PIDGEOTTO,WIGGLYTUFF,0
     db 29,BULBASAUR,IVYSAUR,0
+; Unused
     db 33,WEEPINBELL,BELLSPROUT,WEEPINBELL,0
+; Route 19
     db 33,POLIWAG,GOLDEEN,SEAKING,GOLDEEN,POLIWAG,0
     db 33,GOLDEEN,SEAKING,0
     db 29,STARYU,STARYU,STARYU,0
+; Route 20
     db 32,SEADRA,HORSEA,SEADRA,0
-PsychicData: ; 3a115 (e:6115)
+
+PsychicData:
+; Saffron Gym
     db 31,KADABRA,SLOWPOKE,MR_MIME,KADABRA,0
     db 34,MR_MIME,KADABRA,0
     db 37,SLOWPOKE,SLOWPOKE,SLOWBRO,0
     db 38,SLOWBRO,0
-RockerData: ; 3a127 (e:6127)
+
+RockerData:
+; Vermilion Gym
     db 20,VOLTORB,MAGNEMITE,VOLTORB,0
+; Route 12
     db 30,VOLTORB,ELECTRODE,0
-JugglerData: ; 3a130 (e:6130)
+
+JugglerData:
+; Silph Co. 5F
     db 29,KADABRA,MR_MIME,0
+; Victory Road 2F
     db 41,DROWZEE,HYPNO,KADABRA,KADABRA,0
+; Fuchsia Gym
     db 31,DROWZEE,DROWZEE,KADABRA,DROWZEE,0
     db 34,DROWZEE,HYPNO,0
+; Victory Road 2F
     db 48,MR_MIME,0
+; Unused
     db 33,HYPNO,0
+; Fuchsia Gym
     db 38,HYPNO,0
     db 34,DROWZEE,KADABRA,0
-TamerData: ; 3a151 (e:6151)
+
+TamerData:
+; Fuchsia Gym
     db 34,SANDSLASH,ARBOK,0
     db 33,ARBOK,SANDSLASH,ARBOK,0
+; Viridian Gym
     db 43,RHYHORN,0
     db 39,ARBOK,TAUROS,0
+; Victory Road 2F
     db 44,PERSIAN,GOLDUCK,0
+; Unused
     db 42,RHYHORN,PRIMEAPE,ARBOK,TAUROS,0
-BirdKeeperData: ; 3a16b (e:616b)
+
+BirdKeeperData:
+; Route 13
     db 29,PIDGEY,PIDGEOTTO,0
     db 25,SPEAROW,PIDGEY,PIDGEY,SPEAROW,SPEAROW,0
     db 26,PIDGEY,PIDGEOTTO,SPEAROW,FEAROW,0
+; Route 14
     db 33,FARFETCH_D,0
     db 29,SPEAROW,FEAROW,0
+; Route 15
     db 26,PIDGEOTTO,FARFETCH_D,DODUO,PIDGEY,0
     db 31,DODRIO,DODUO,DODUO,0
+; Route 18
     db 29,SPEAROW,FEAROW,0
     db 34,DODRIO,0
     db 26,SPEAROW,SPEAROW,FEAROW,SPEAROW,0
+; Route 20
     db 30,FEAROW,FEAROW,PIDGEOTTO,0
+; Unused
     db 39,PIDGEOTTO,PIDGEOTTO,PIDGEY,PIDGEOT,0
     db 42,FARFETCH_D,FEAROW,0
+; Route 14
     db 28,PIDGEY,DODUO,PIDGEOTTO,0
     db 26,PIDGEY,SPEAROW,PIDGEY,FEAROW,0
     db 29,PIDGEOTTO,FEAROW,0
     db 28,SPEAROW,DODUO,FEAROW,0
-BlackbeltData: ; 3a1be (e:61be)
+
+BlackbeltData:
+; Fighting Dojo
     db 37,HITMONLEE,HITMONCHAN,0
     db 31,MANKEY,MANKEY,PRIMEAPE,0
     db 32,MACHOP,MACHOKE,0
     db 36,PRIMEAPE,0
     db 31,MACHOP,MANKEY,PRIMEAPE,0
+; Viridian Gym
     db 40,MACHOP,MACHOKE,0
     db 43,MACHOKE,0
     db 38,MACHOKE,MACHOP,MACHOKE,0
+; Victory Road 2F
     db 43,MACHOKE,MACHOP,MACHOKE,0
-Green1Data: ; 3a1e4 (e:61e4)
+
+Green1Data:
     db 5,SQUIRTLE,0
     db 5,BULBASAUR,0
     db 5,CHARMANDER,0
+; Route 22
     db $FF,9,PIDGEY,8,SQUIRTLE,0
     db $FF,9,PIDGEY,8,BULBASAUR,0
     db $FF,9,PIDGEY,8,CHARMANDER,0
+; Cerulean City
     db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,15,SQUIRTLE,0
     db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,15,BULBASAUR,0
     db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,15,CHARMANDER,0
-ProfOakData: ; 3a21d (e:621d)
+
+ProfOakData:
+; Unused
     db $FF,66,TAUROS,67,EXEGGUTOR,68,ARCANINE,69,BLASTOISE,70,GYARADOS,0
     db $FF,66,TAUROS,67,EXEGGUTOR,68,ARCANINE,69,VENUSAUR,70,GYARADOS,0
     db $FF,66,TAUROS,67,EXEGGUTOR,68,ARCANINE,69,CHARIZARD,70,GYARADOS,0
-ChiefData: ; 3a241 (e:6241)
+
+ChiefData:
 ; none
-ScientistData: ; 3a241 (e:6241)
+
+ScientistData:
+; Unused
     db 34,KOFFING,VOLTORB,0
+; Silph Co. 2F
     db 35,GRIMER,GRIMER,KOFFING,WEEZING,0
     db 30,MAGNEMITE,VOLTORB,MAGNETON,0
+; Silph Co. 3F/Mansion 1F
     db 35,ELECTRODE,WEEZING,0
+; Silph Co. 4F
     db 33,ELECTRODE,0
+; Silph Co. 5F
     db 35,MAGNETON,KOFFING,WEEZING,MAGNEMITE,0
+; Silph Co. 6F
     db 25,VOLTORB,KOFFING,MAGNETON,MAGNEMITE,KOFFING,0
+; Silph Co. 7F
     db 38,ELECTRODE,MUK,0
+; Silph Co. 8F
     db 30,GRIMER,ELECTRODE,0
+; Silph Co. 9F
     db 30,VOLTORB,KOFFING,MAGNETON,0
+; Silph Co. 10F
     db 29,MAGNEMITE,KOFFING,0
+; Mansion 3F
     db 33,MAGNEMITE,MAGNETON,VOLTORB,0
+; Mansion B1F
     db 34,MAGNEMITE,ELECTRODE,0
-GiovanniData: ; 3a27e (e:627e)
+
+GiovanniData:
+; Rocket Hideout B4F
     db $FF,24,GEODUDE,32,RHYHORN,33,PERSIAN,0
+; Silph Co. 11F
     db $FF,42,NIDORINO,43,PERSIAN,44,RHYDON,45,NIDOQUEEN,0
+; Viridian Gym
     db $FF,53,PERSIAN,53,NIDOQUEEN,55,NIDOKING,56,RHYDON,60,GOLEM,0
-RocketData: ; 3a29c (e:629c)
+
+RocketData:
+; Mt. Moon B2F
     db 13,RATTATA,ZUBAT,0
     db 11,SANDSHREW,RATTATA,ZUBAT,0
     db 12,ZUBAT,EKANS,0
     db 20,RATICATE,0
+; Cerulean City
     db 17,MACHOP,DROWZEE,0
+; Route 24
     db 15,EKANS,ZUBAT,0
+; Game Corner
     db 20,RATICATE,ZUBAT,0
+; Rocket Hideout B1F
     db 21,DROWZEE,MACHOP,0
     db 21,RATICATE,RATICATE,0
     db 20,GRIMER,KOFFING,KOFFING,0
     db 20,RATTATA,RATICATE,RATICATE,RATTATA,0
     db 22,GRIMER,KOFFING,0
+; Rocket Hideout B2F
     db 20,ZUBAT,KOFFING,GRIMER,ZUBAT,RATICATE,0
+; Rocket Hideout B3F
     db 20,RATTATA,RATICATE,DROWZEE,0
     db 21,MACHOP,MACHOP,0
+; Rocket Hideout B4F
     db 23,SANDSHREW,EKANS,SANDSLASH,0
     db 23,EKANS,SANDSHREW,ARBOK,0
     db 21,KOFFING,ZUBAT,0
+; Pokémon Tower 7F
     db 25,ZUBAT,ZUBAT,GOLBAT,0
     db 26,KOFFING,DROWZEE,0
     db 23,ZUBAT,RATTATA,RATICATE,ZUBAT,0
+; Unused
     db 26,DROWZEE,KOFFING,0
+; Silph Co. 2F
     db 29,CUBONE,ZUBAT,0
     db 25,GOLBAT,ZUBAT,ZUBAT,RATICATE,ZUBAT,0
+; Silph Co. 3F
     db 28,RATICATE,HYPNO,RATICATE,0
+; Silph Co. 4F
     db 29,MACHOP,DROWZEE,0
     db 28,EKANS,ZUBAT,CUBONE,0
+; Silph Co. 5F
     db 33,ARBOK,0
     db 33,HYPNO,0
+; Silph Co. 6F
     db 29,MACHOP,MACHOKE,0
     db 28,ZUBAT,ZUBAT,GOLBAT,0
+; Silph Co. 7F
     db 26,RATICATE,ARBOK,KOFFING,GOLBAT,0
     db 29,CUBONE,CUBONE,0
     db 29,SANDSHREW,SANDSLASH,0
+; Silph Co. 8F
     db 26,RATICATE,ZUBAT,GOLBAT,RATTATA,0
     db 35,WEEZING,GOLBAT,KOFFING,0
+; Silph Co. 9F
     db 28,DROWZEE,GRIMER,MACHOP,0
     db 28,GOLBAT,DROWZEE,HYPNO,0
+; Silph Co. 10F
     db 33,MACHOKE,0
+; Silph Co. 11F
     db 25,RATTATA,RATTATA,ZUBAT,RATTATA,EKANS,0
     db 32,CUBONE,DROWZEE,MAROWAK,0
-CooltrainerMData: ; 3a35a (e:635a)
+
+CooltrainerMData:
+; Viridian Gym
     db 39,NIDORINO,NIDOKING,0
+; Victory Road 3F
     db 43,EXEGGUTOR,CLOYSTER,ARCANINE,0
     db 43,KINGLER,TENTACRUEL,BLASTOISE,0
+; Unused
     db 45,KINGLER,STARMIE,0
+; Victory Road 1F
     db 42,IVYSAUR,WARTORTLE,CHARMELEON,CHARIZARD,0
+; Unused
     db 44,IVYSAUR,WARTORTLE,CHARMELEON,0
     db 49,NIDOKING,0
     db 44,KINGLER,CLOYSTER,0
+; Viridian Gym
     db 39,SANDSLASH,DUGTRIO,0
     db 43,RHYHORN,0
-CooltrainerFData: ; 3a385 (e:6385)
+
+CooltrainerFData:
+; Celadon Gym
     db 24,WEEPINBELL,GLOOM,IVYSAUR,0
+; Victory Road 3F
     db 43,BELLSPROUT,WEEPINBELL,VICTREEBEL,0
     db 43,PARASECT,DEWGONG,CHANSEY,0
+; Unused
     db 46,VILEPLUME,BUTTERFREE,0
+; Victory Road 1F
     db 44,PERSIAN,NINETALES,0
+; Unused
     db 45,IVYSAUR,VENUSAUR,0
     db 45,NIDORINA,NIDOQUEEN,0
     db 43,PERSIAN,NINETALES,RAICHU,0
-BrunoData: ; 3a3a9 (e:63a9)
+
+BrunoData:
     db $FF,53,ONIX,55,HITMONCHAN,55,HITMONLEE,56,ONIX,58,MACHAMP,0
-BrockData: ; 3a3b5 (e:63b5)
+
+BrockData:
     db $FF,12,GEODUDE,14,ONIX,0
-MistyData: ; 3a3bb (e:63bb)
+
+MistyData:
     db $FF,18,STARYU,21,STARMIE,0
-LtSurgeData: ; 3a3c1 (e:63c1)
+
+LtSurgeData:
     db $FF,28,RAICHU,0
-    ds 4
-ErikaData: ; 3a3c9 (e:63c9)
+
+ErikaData:
     db $FF,30,TANGELA,34,WEEPINBELL,38,GLOOM,0
-KogaData: ; 3a3d1 (e:63d1)
+
+KogaData:
     db $FF,48,VENOMOTH,52,GOLBAT,0
-    ds 4
-BlaineData: ; 3a3db (e:63db)
+
+BlaineData:
     db $FF,48,NINETALES,47,RHYDON,55,MAGMAR,0
-    ds 2
-SabrinaData: ; 3a3e5 (e:63e5)
+
+SabrinaData:
     db $FF,48,HAUNTER,52,KADABRA,0
-    ds 4
-GentlemanData: ; 3a3ef (e:63ef)
+
+GentlemanData:
+; SS Anne 1F Rooms
     db 18,GROWLITHE,GROWLITHE,0
     db 19,NIDORAN_M,NIDORAN_F,0
+; SS Anne 2F Rooms/Vermilion Gym
     db 23,PIKACHU,0
+; Unused
     db 48,PRIMEAPE,0
+; SS Anne 2F Rooms
     db 17,GROWLITHE,PONYTA,0
-Green2Data: ; 3a401 (e:6401)
+
+Green2Data:
+; SS Anne 2F
     db $FF,19,PIDGEOTTO,20,RATICATE,18,KADABRA,20,WARTORTLE,0
     db $FF,19,PIDGEOTTO,20,RATICATE,18,KADABRA,20,IVYSAUR,0
     db $FF,19,PIDGEOTTO,20,RATICATE,18,KADABRA,20,CHARMELEON,0
+; Pokémon Tower 2F
     db $FF,26,PIDGEOTTO,23,GROWLITHE,22,EXEGGCUTE,23,KADABRA,26,WARTORTLE,0
     db $FF,26,PIDGEOTTO,23,GYARADOS,22,GROWLITHE,23,KADABRA,26,IVYSAUR,0
     db $FF,26,PIDGEOTTO,23,EXEGGCUTE,22,GYARADOS,23,KADABRA,26,CHARMELEON,0
+; Silph Co. 7F
     db $FF,37,PIDGEOT,38,ARCANINE,35,EXEGGUTOR,35,ALAKAZAM,40,BLASTOISE,0
     db $FF,37,PIDGEOT,38,GYARADOS,35,ARCANINE,35,ALAKAZAM,40,VENUSAUR,0
     db $FF,37,PIDGEOT,38,EXEGGUTOR,35,GYARADOS,35,ALAKAZAM,40,CHARIZARD,0
+; Route 22
     db $FF,47,PIDGEOT,45,RHYDON,45,ARCANINE,47,EXEGGUTOR,50,ALAKAZAM,53,BLASTOISE,0
     db $FF,47,PIDGEOT,45,RHYDON,45,GYARADOS,47,ARCANINE,50,ALAKAZAM,53,VENUSAUR,0
     db $FF,47,PIDGEOT,45,RHYDON,45,EXEGGUTOR,47,GYARADOS,50,ALAKAZAM,53,CHARIZARD,0
-Green3Data: ; 3a491 (e:6491)
+
+Green3Data:
     db $FF,61,PIDGEOT,59,ALAKAZAM,61,RHYDON,61,ARCANINE,63,EXEGGUTOR,65,BLASTOISE,0
     db $FF,61,PIDGEOT,59,ALAKAZAM,61,RHYDON,61,GYARADOS,63,ARCANINE,65,VENUSAUR,0
     db $FF,61,PIDGEOT,59,ALAKAZAM,61,RHYDON,61,EXEGGUTOR,63,GYARADOS,65,CHARIZARD,0
-LoreleiData: ; 3a4bb (e:64bb)
+
+LoreleiData:
     db $FF,54,DEWGONG,53,CLOYSTER,54,SLOWBRO,56,JYNX,56,LAPRAS,0
-ChannelerData: ; 3a4c7 (e:64c7)
+
+ChannelerData:
+; Unused
     db 22,GASTLY,0
     db 24,GASTLY,0
     db 23,GASTLY,GASTLY,0
     db 24,GASTLY,0
+; Pokémon Tower 3F
     db 23,GASTLY,0
     db 24,GASTLY,0
+; Unused
     db 25,HAUNTER,0
+; Pokémon Tower 3F
     db 22,GASTLY,0
+; Pokémon Tower 4F
     db 24,GASTLY,0
     db 23,GASTLY,GASTLY,0
+; Unused
     db 24,GASTLY,0
+; Pokémon Tower 4F
+    db 22,GASTLY,0
+; Unused
+    db 24,GASTLY,0
+; Pokémon Tower 5F
+    db 25,HAUNTER,0
+; Unused
+    db 24,GASTLY,0
+; Pokémon Tower 5F
     db 22,GASTLY,0
     db 24,GASTLY,0
     db 25,HAUNTER,0
-    db 24,GASTLY,0
-    db 22,GASTLY,0
-    db 24,GASTLY,0
-    db 25,HAUNTER,0
+; Pokémon Tower 6F
     db 22,GASTLY,GASTLY,GASTLY,0
     db 24,GASTLY,0
     db 24,GASTLY,0
+; Saffron Gym
     db 34,GASTLY,HAUNTER,0
     db 38,HAUNTER,0
     db 33,GASTLY,GASTLY,HAUNTER,0
-AgathaData: ; 3a516 (e:6516)
+
+AgathaData:
     db $FF,56,GENGAR,56,GOLBAT,55,HAUNTER,58,ARBOK,60,GENGAR,0
-LanceData: ; 3a522 (e:6522)
+
+LanceData:
     db $FF,58,GYARADOS,56,DRAGONAIR,56,DRAGONAIR,60,AERODACTYL,62,DRAGONITE,0
+
+SECTION "TrainerAI",ROMX[$652e],BANK[$e]
 
 TrainerAI: ; 3a52e (e:652e)
 ;XXX called at 34964,3c342,3c398
@@ -57749,7 +57053,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     jr z,.asm_3eb33
     call GenRandomInBattle
     ld b,a
-    call IsDratiniOrRandom ; call GenRandomInBattle
+    call ForceShinyOrRandom ; call GenRandomInBattle
 .asm_3eb33
     ld hl,W_ENEMYMONATKDEFIV
     ld [hli],a
@@ -60799,12 +60103,27 @@ BattleMonPartyAttr:
     ld bc,W_PARTYMON2DATA - W_PARTYMON1DATA
     jp AddNTimes
 
-IsDratiniOrRandom:
+ForceShinyOrRandom:
     ld a,[W_CURMAP]
     cp DRATINI_CAVE
-    jp nz,GenRandomInBattle
+    jr z,.Shiny
+    cp SAFARI_ZONE_WEST
+    jr z,.Safari
+.Random
+    jp GenRandomInBattle
+.Safari
+    ld a,[W_CUROPPONENT]
+    cp MAGIKARP
+    jr nz,.Random
+    ld a,[W_CURENEMYLVL]
+    cp 26 ; Shiny If Level 26 in SAFARI_ZONE_WEST
+    jr nz,.Random
+.Shiny
+    call GenRandomInBattle
+    or %00100000
+    and $F0
+    add $A
     ld b,$AA
-    ld a,$FA ; Rendere l'attacco casuale tra i valori Shiny Disponibili
     ret
 
 HidePlayerBattleHudAndStandarizePalette:
@@ -60812,6 +60131,9 @@ HidePlayerBattleHudAndStandarizePalette:
     push bc
     push de
     push hl
+    ld a,[W_ISINBATTLE] ; $d057
+    and a
+    jr z,.Skip
     ; Remove Player Battle Stats Frame
     FuncCoord 10,7
     ld hl,Coord
@@ -60821,6 +60143,7 @@ HidePlayerBattleHudAndStandarizePalette:
     ld hl,wFlagNoHpPalBit2
     set 2,[hl]
     call GoPAL_SET_CF1C
+.Skip
     pop hl
     pop de
     pop bc
@@ -71761,7 +71084,7 @@ MtMoonPokecenterText4: ; 492ec (12:52ec)
     ld hl,UnnamedText_49366
     jr .asm_49356 ; 0x4931c
 .asm_faa09 ; 0x4931e
-    ld bc,(MAGIKARP << 8) | 5
+    ld bc,(MAGIKARP << 8) | 1
     call GivePokemon
     jr nc,.asm_49359 ; 0x49324
     xor a
@@ -76802,7 +76125,7 @@ SilphCo7Text1: ; 51d8e (14:5d8e)
 .asm_d7e17 ; 0x51da5
     ld hl,UnnamedText_51dd3
     call PrintText
-    ld bc,(LAPRAS << 8) | 10
+    ld bc,(PORYGON << 8) | 10 ; Entry Level
     call GivePokemon
     jr nc,.asm_b3069 ; 0x51db1
     ld a,[$ccd3]
@@ -81381,30 +80704,30 @@ FuchsiaHouse3TextPointers: ; 5617f (15:617f)
 FuchsiaHouse3Text1: ; 56181 (15:6181)
     db $08 ; asm
     ld a,[$d728]
-    bit 4,a
-    jr nz,asm_6084e ; 0x56187
-    ld hl,UnnamedText_561bd
+    bit 5,a
+    jr nz,asm_b4cad ; 0x5648a
+    ld hl,UnnamedText_564c0
     call PrintText
     call YesNoChoice
     ld a,[$cc26]
     and a
-    jr nz,asm_3ace4 ; 0x56196
-    ld bc,(GOOD_ROD << 8) | 1
+    jr nz,asm_a2d76 ; 0x56499
+    ld bc,(SUPER_ROD << 8) | 1
     call GiveItem
     jr nc,.BagFull
     ld hl,$d728
-    set 4,[hl]
-    ld hl,UnnamedText_561c2
-    jr asm_1b09c ; 0x561a8
+    set 5,[hl]
+    ld hl,UnnamedText_564c5
+    jr asm_df984 ; 0x564ab
 .BagFull
-    ld hl,UnnamedText_5621c
-    jr asm_1b09c ; 0x561ad
-asm_3ace4 ; 0x561af
-    ld hl,UnnamedText_56212
-    jr asm_1b09c ; 0x561b2
-asm_6084e ; 0x561b4
-    ld hl,UnnamedText_56217
-asm_1b09c ; 0x561b7
+    ld hl,UnnamedText_564d9
+    jr asm_df984 ; 0x564b0
+asm_a2d76 ; 0x564b2
+    ld hl,UnnamedText_564cf
+    jr asm_df984 ; 0x564b5
+asm_b4cad ; 0x564b7
+    ld hl,UnnamedText_564d4
+asm_df984 ; 0x564ba
     call PrintText
     jp TextScriptEnd
 
@@ -81762,30 +81085,30 @@ Route12HouseTextPointers: ; 56482 (15:6482)
 Route12HouseText1: ; 56484 (15:6484)
     db $08 ; asm
     ld a,[$d728]
-    bit 5,a
-    jr nz,asm_b4cad ; 0x5648a
-    ld hl,UnnamedText_564c0
+    bit 4,a
+    jr nz,asm_6084e ; 0x56187
+    ld hl,UnnamedText_561bd
     call PrintText
     call YesNoChoice
     ld a,[$cc26]
     and a
-    jr nz,asm_a2d76 ; 0x56499
-    ld bc,(SUPER_ROD << 8) | 1
+    jr nz,asm_3ace4 ; 0x56196
+    ld bc,(GOOD_ROD << 8) | 1
     call GiveItem
     jr nc,.BagFull
     ld hl,$d728
-    set 5,[hl]
-    ld hl,UnnamedText_564c5
-    jr asm_df984 ; 0x564ab
+    set 4,[hl]
+    ld hl,UnnamedText_561c2
+    jr asm_1b09c ; 0x561a8
 .BagFull
-    ld hl,UnnamedText_564d9
-    jr asm_df984 ; 0x564b0
-asm_a2d76 ; 0x564b2
-    ld hl,UnnamedText_564cf
-    jr asm_df984 ; 0x564b5
-asm_b4cad ; 0x564b7
-    ld hl,UnnamedText_564d4
-asm_df984 ; 0x564ba
+    ld hl,UnnamedText_5621c
+    jr asm_1b09c ; 0x561ad
+asm_3ace4 ; 0x561af
+    ld hl,UnnamedText_56212
+    jr asm_1b09c ; 0x561b2
+asm_6084e ; 0x561b4
+    ld hl,UnnamedText_56217
+asm_1b09c ; 0x561b7
     call PrintText
     jp TextScriptEnd
 
@@ -82776,7 +82099,7 @@ Route12Object: ; 0x5869a (size=118)
     db $3f,$b,$c ; Route12Text12
 
     db $a ; people
-    db SPRITE_SNORLAX,$3e + 4,$a + 4,$ff,$d0,$1 ; person
+    db SPRITE_SNORLAX,$3e + 4,$9 + 4,$ff,$d0,$1 ; person
     db SPRITE_FISHER2,$1f + 4,$e + 4,$ff,$d2,$42,FISHER + $C8,$3 ; trainer
     db SPRITE_FISHER2,$27 + 4,$5 + 4,$ff,$d1,$43,FISHER + $C8,$4 ; trainer
     db SPRITE_BLACK_HAIR_BOY_1,$5c + 4,$b + 4,$ff,$d2,$44,JR__TRAINER_M + $C8,$9 ; trainer
@@ -88607,7 +87930,7 @@ FightingDojoText6: ; 5cf06 (17:4f06)
     call PrintText
     jr .done
 .GetMon
-    ld a,HITMONLEE
+    ld a,HITMONLEE ; Entry Level
     call DisplayPokedex
     ld hl,WantHitmonleeText
     call PrintText
@@ -88617,7 +87940,7 @@ FightingDojoText6: ; 5cf06 (17:4f06)
     jr nz,.done
     ld a,[$cf91]
     ld b,a
-    ld c,30
+    ld c,10
     call GivePokemon
     jr nc,.done
 
@@ -88646,7 +87969,7 @@ FightingDojoText7: ; 5cf4e (17:4f4e)
     call PrintText
     jr .done
 .GetMon
-    ld a,HITMONCHAN
+    ld a,HITMONCHAN ; Entry Level
     call DisplayPokedex
     ld hl,WantHitmonchanText
     call PrintText
@@ -88656,7 +87979,7 @@ FightingDojoText7: ; 5cf4e (17:4f4e)
     jr nz,.done
     ld a,[$cf91]
     ld b,a
-    ld c,30
+    ld c,10
     call GivePokemon
     jr nc,.done
     ld hl,$d7b1
@@ -91759,7 +91082,7 @@ PokemonTower7Text4: ; 60e8a (18:4e8a)
     ld a,$17
     ld [$cc4d],a
     ld a,$11
-    call Predef
+    call PredefAndHideFuchsiaGuard ; call Predef
     ld a,$18
     ld [$cc4d],a
     ld a,$15
@@ -94313,6 +93636,13 @@ PokeCenterPC: ; 62516 (18:6516)
 PokeCenterPCCode: ; 62529 (18:6529)
     db $f9 ; Pokemon Center PC in DisplayTextID
 
+PredefAndHideFuchsiaGuard:
+    call Predef
+    ld a,$e5
+    ld [$cc4d],a
+    ld a,$11
+    jp Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
+
 SECTION "bank19",ROMX,BANK[$19]
 
 Tset00_GFX: ; 64000 (19:4000)
@@ -96459,7 +95789,7 @@ Unknown_70e20: ; 70e20 (1c:4e20)
 Unknown_70e2e: ; 70e2e (1c:4e2e)
     db $04,$00,$03,$00,$03,$00,$02,$00,$02,$00,$01,$00,$01,$00,$01,$FF
 
-Func_70e3e: ; 70e3e (1c:4e3e)
+DisplayTownMap: ; 70e3e (1c:4e3e)
     call Func_7109b
     ld hl,$cfcb
     ld a,[hl]
@@ -96487,9 +95817,8 @@ Func_70e3e: ; 70e3e (1c:4e3e)
     xor a
     ld [wWhichTrade],a ; $cd3d
     pop af
-    jr Func_70e92
-
-Func_70e7e: ; 70e7e (1c:4e7e)
+    jr .enterLoop
+.townMapLoop:
     ld hl,wTileMap
     ld bc,$114
     call ClearScreenArea
@@ -96499,8 +95828,7 @@ Func_70e7e: ; 70e7e (1c:4e7e)
     ld b,$0
     add hl,bc
     ld a,[hl]
-
-Func_70e92: ; 70e92 (1c:4e92)
+.enterLoop:
     ld de,$cee9
     call Func_712f1
     ld a,[de]
@@ -96526,19 +95854,19 @@ Func_70e92: ; 70e92 (1c:4e92)
     ld de,$c518
     ld bc,$10
     call CopyData
-.asm_70ec8
+.inputLoop
     call Func_716c6
     call GetJoypadStateLowSensitivity
     ld a,[$FF00+$b5]
     ld b,a
     and $c3
-    jr z,.asm_70ec8
+    jr z,.inputLoop
     ld a,$8c
     call PlaySound
     bit 6,b
-    jr nz,.asm_70ef2
+    jr nz,.pressedUp
     bit 7,b
-    jr nz,.asm_70f01
+    jr nz,.pressedDown
     xor a
     ld [$d09b],a
     ld [$FF00+$b7],a
@@ -96548,73 +95876,26 @@ Func_70e92: ; 70e92 (1c:4e92)
     pop af
     ld [hl],a
     ret
-.asm_70ef2
+.pressedUp
     ld a,[wWhichTrade] ; $cd3d
     inc a
-    cp $2f
-    jr nz,.asm_70efb
+    cp TownMapOrderEnd - TownMapOrder ; number of list items + 1
+    jr nz,.noOverflow
     xor a
-.asm_70efb
+.noOverflow
     ld [wWhichTrade],a ; $cd3d
-    jp Func_70e7e
-.asm_70f01
+    jp .townMapLoop
+.pressedDown
     ld a,[wWhichTrade] ; $cd3d
     dec a
-    cp $ff
-    jr nz,.asm_70f0b
-    ld a,$2e
-.asm_70f0b
+    cp -1
+    jr nz,.noUnderflow
+    ld a, TownMapOrderEnd - TownMapOrder - 1 ; number of list items
+.noUnderflow
     ld [wWhichTrade],a ; $cd3d
-    jp Func_70e7e
+    jp .townMapLoop
 
-TownMapOrder: ; 70f11 (1c:4f11)
-    db PALLET_TOWN
-    db ROUTE_1
-    db VIRIDIAN_CITY
-    db ROUTE_2
-    db VIRIDIAN_FOREST
-    db DIGLETTS_CAVE
-    db PEWTER_CITY
-    db ROUTE_3
-    db MT_MOON_1
-    db ROUTE_4
-    db CERULEAN_CITY
-    db ROUTE_24
-    db ROUTE_25
-    db BILLS_HOUSE
-    db ROUTE_5
-    db ROUTE_6
-    db VERMILION_CITY
-    db SS_ANNE_1
-    db ROUTE_9
-    db ROCK_TUNNEL_POKECENTER
-    db ROUTE_10
-    db LAVENDER_TOWN
-    db POKEMONTOWER_2
-    db ROUTE_8
-    db ROUTE_7
-    db CELADON_CITY
-    db SAFFRON_CITY
-    db ROUTE_11
-    db ROUTE_12
-    db ROUTE_13
-    db ROUTE_14
-    db ROUTE_15
-    db ROUTE_16
-    db ROUTE_17
-    db ROUTE_18
-    db FUCHSIA_CITY
-    db SAFARI_ZONE_EAST
-    db ROUTE_19
-    db SEAFOAM_ISLANDS_2
-    db ROUTE_20
-    db CINNABAR_ISLAND
-    db ROUTE_21
-    db ROUTE_22
-    db ROUTE_23
-    db VICTORY_ROAD_3
-    db INDIGO_PLATEAU
-    db POWER_PLANT
+SECTION "TownMapCursor",ROMX[$4f40],BANK[$1c]
 
 TownMapCursor: ; 70f40 (1c:4f40)
     INCBIN "gfx/town_map_cursor.1bpp"
@@ -96882,9 +96163,9 @@ Func_711c4: ; 711c4 (1c:51c4)
     jp CopyData
 
 Func_711ef: ; 711ef (1c:51ef)
-    ld b,BANK(Func_e9cb)
-    ld hl,Func_e9cb
-    call Bankswitch ; indirect jump to Func_e9cb (e9cb (3:69cb))
+    ld b,BANK(FindWildLocationsOfMon)
+    ld hl,FindWildLocationsOfMon
+    call Bankswitch ; indirect jump to FindWildLocationsOfMon (e9cb (3:69cb))
     call Func_712d9
     ld hl,wOAMBuffer
     ld de,$cee9
@@ -96892,8 +96173,8 @@ Func_711ef: ; 711ef (1c:51ef)
     ld a,[de]
     cp $ff
     jr z,.asm_7121d
-    and a
-    jr z,.asm_7121a
+    ds 1 ;and a            ; Include Also Pallet in Nest Pkmn
+    ds 2 ;jr z,.asm_7121a  ; ...
     push hl
     call Func_712f1
     pop hl
@@ -97103,13 +96384,13 @@ ExternalMapEntries: ; 71313 (1c:5313)
     EMAP $4,$3,Route3Name
     EMAP $8,$2,Route4Name
     EMAP $A,$3,Route5Name
-    EMAP $A,$8,Route6Name
+    EMAP $A,$7,Route6Name
     EMAP $8,$5,Route7Name
-    EMAP $D,$5,Route8Name
-    EMAP $D,$2,Route9Name
+    EMAP $C,$5,Route8Name
+    EMAP $C,$2,Route9Name
     EMAP $E,$4,Route10Name
     EMAP $C,$9,Route11Name
-    EMAP $E,$9,Route12Name
+    EMAP $E,$7,Route12Name
     EMAP $D,$B,Route13Name
     EMAP $B,$C,Route14Name
     EMAP $A,$D,Route15Name
@@ -97135,7 +96416,7 @@ InternalMapEntries: ; 71382 (1c:5382)
     IMAP $45,$5,$2,Route4Name
     IMAP $46,$A,$2,CeruleanCityName
     IMAP $49,$A,$4,Route5Name
-    IMAP $4C,$A,$6,Route6Name
+    IMAP $4C,$A,$7,Route6Name
     IMAP $4F,$9,$5,Route7Name
     IMAP $51,$B,$5,Route8Name
     IMAP $53,$E,$3,RockTunnelName
@@ -97145,7 +96426,7 @@ InternalMapEntries: ; 71382 (1c:5382)
     IMAP $59,$C,$0,SeaCottageName
     IMAP $5F,$A,$9,VermilionCityName
     IMAP $69,$9,$A,SSAnneName
-    IMAP $70,$E,$7,Route12Name
+    IMAP $6A,$E,$7,Route12Name
     IMAP $6D,$0,$4,VictoryRoadName
     IMAP $77,$0,$2,PokemonLeagueName
     IMAP $78,$A,$5,UndergroundPathName
@@ -97174,7 +96455,7 @@ InternalMapEntries: ; 71382 (1c:5382)
     IMAP $C3,$0,$4,VictoryRoadName
     IMAP $C4,$E,$7,Route12Name
     IMAP $C5,$A,$9,VermilionCityName
-    IMAP $C6,$3,$4,DiglettsCaveName
+    IMAP $C6,$B,$8,DiglettsCaveName
     IMAP $C7,$0,$4,VictoryRoadName
     IMAP $CF,$7,$5,RocketHQName
     IMAP $D6,$A,$5,SilphCoName
@@ -100300,6 +99581,59 @@ GetPointerToPartyMenuPalPacket:
     ret z
     ld hl,PalPacketPartyMenuAllGreen
     ret
+
+TownMapOrder:
+    db PALLET_TOWN
+    db ROUTE_1
+    db VIRIDIAN_CITY
+    db ROUTE_2
+    db VIRIDIAN_FOREST
+    db ROUTE_22
+    db PEWTER_CITY
+    db ROUTE_3
+    db MT_MOON_1
+    db ROUTE_4
+    db CERULEAN_CITY
+    db ROUTE_24
+    db ROUTE_25
+    db BILLS_HOUSE
+    db ROUTE_5
+    db ROUTE_6
+    db VERMILION_CITY
+    db SS_ANNE_1
+    db DIGLETTS_CAVE
+    db ROUTE_2
+    db ROUTE_11
+    db ROUTE_9
+    db ROCK_TUNNEL_POKECENTER
+    db ROUTE_10
+    db LAVENDER_TOWN
+    db ROUTE_8
+    db ROUTE_7
+    db CELADON_CITY
+    db ROUTE_16
+    db POKEMONTOWER_2
+    db SAFFRON_CITY
+    db ROUTE_12
+    db ROUTE_13
+    db ROUTE_14
+    db ROUTE_15
+    db ROUTE_16
+    db ROUTE_17
+    db ROUTE_18
+    db FUCHSIA_CITY
+    db SAFARI_ZONE_EAST
+    db POWER_PLANT
+    db ROUTE_19
+    db SEAFOAM_ISLANDS_2
+    db ROUTE_20
+    db CINNABAR_ISLAND
+    db ROUTE_21
+    db ROUTE_22
+    db ROUTE_23
+    db VICTORY_ROAD_3
+    db INDIGO_PLATEAU
+TownMapOrderEnd:
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
@@ -115476,18 +114810,19 @@ _UnnamedText_51dd3: ; 84430 (21:4430)
     db "for saving us.",$58
 
 _UnnamedText_51dd8: ; 8449e (21:449e)
-    db $0,"It's LAPRAS. It's",$4f
+    db $0,"It's PORYGON. It's",$4f
     db "very intelligent.",$51
-    db "We kept it in our",$4f
+    db "We create it in our",$4f
     db "lab,but it will",$55
     db "be much better",$55
     db "off with you!",$51
     db "I think you will",$4f
-    db "be a good trainer",$55
-    db "for LAPRAS!",$51
-    db "It's a good",$4f
-    db "swimmer. It'll",$55
-    db "give you a lift!",$57
+    db "be a good friend",$55
+    db "for PORYGON!",$51
+    db "It can also Hack",$4f
+    db "Computers!",$57
+
+SECTION "_UnnamedText_51ddd",ROMX[$455a],BANK[$21]
 
 _UnnamedText_51ddd: ; 8455a (21:455a)
     db $0,"TEAM ROCKET's",$4f
@@ -126652,10 +125987,7 @@ _FuchsiaCityText4: ; a5f6b (29:5f6b)
 _FuchsiaCityText5: ; a5f96 (29:5f96)
     db $0,"!",$57
 
-_FuchsiaCityText11: ; a5f99 (29:5f99)
-    db $0,"FUCHSIA CITY",$4f
-    db "Behold! It's",$55
-    db "Passion Pink!",$57
+ SECTION "_FuchsiaCityText13",ROMX[$5fc1],BANK[$29]
 
 _FuchsiaCityText13: ; a5fc1 (29:5fc1)
     db $0,"SAFARI GAME",$4f
@@ -127058,6 +126390,11 @@ _BoxFullCannotThrowBallText: ; a6b69 (29:6b69)
     db $0,"The #MON BOX",$4f
     db "is full! Can't",$55
     db "use that item!",$58
+
+_FuchsiaCityText11:
+    db $0,"To access it",$4f
+    db "is necessary",$55
+    db "to overcome Fear!",$57
 
 SECTION "bank2A",ROMX,BANK[$2A]
 
@@ -128118,6 +127455,7 @@ DratiniCaveScriptPointers:
 
 DratiniCaveTextPointers:
     dw DratiniCaveText1
+    dw Predef5CText
 
 DratiniCaveTrainerHeaders:
 DratiniCaveTrainerHeader0:
@@ -128156,8 +127494,9 @@ DratiniCaveObject:
 
     db $0 ; signs
 
-    db $1 ; people
-    db SPRITE_DRATINI,$d + 4,$1a + 4,$ff,$d0,$41,DRATINI,12 ; trainer
+    db $2 ; people
+    db SPRITE_DRATINI,$d + 4,$1a + 4,$ff,$d0,$41,DRATINI,12
+    db SPRITE_BALL,$a + 4,$1b + 4,$ff,$ff,$82,TRADE_STONE ; item
 
     ; warp-to
     EVENT_DISP $f,$0F,$1B ; ROUTE_12_GATE
@@ -128407,11 +127746,11 @@ GetGender:
     and a,%00000011
     ld b,[hl]
 .LoopCycle
-    and a
+    cp 3
     jr z,.EndCycle
     srl b
     srl b
-    dec a
+    inc a
     jr .LoopCycle
 .EndCycle
     ld a,b
@@ -128588,7 +127927,7 @@ ItemNames: ; 472b (1:472b)
     db "DOME FOSSIL@"  ; $29
     db "HELIX FOSSIL@" ; $2A
     db "SECRET KEY@"   ; $2B
-    db "?@"            ; $2C
+    db "TRADE STONE@"  ; $2C
     db "BIKE VOUCHER@" ; $2D
     db "X ACCURACY@"   ; $2E
     db "LEAF STONE@"   ; $2F
@@ -129008,6 +128347,508 @@ TradingAnimationGraphics:
 ; 4 tiles for actual wire transfer animation (pokeball wandering inside wire)
 TradingAnimationGraphics2:
     INCBIN "gfx/trade2.2bpp"
+
+_ReadRodData:
+; return e = 2 if no fish on this map
+; return e = 1 if a bite,bc = level,species
+; return e = 0 if no bite
+    ld h,d
+    ld l,e
+    ld a,[W_CURMAP]
+    ld de,3 ; each fishing group is three bytes wide
+    call IsInArray
+    jr c,.ReadFishingGroup
+    ld e,$2 ; $2 if no fishing groups found
+    ret
+.ReadFishingGroup ; 0xe8f6
+; hl points to the fishing group entry in the index
+    inc hl ; skip map id
+    ; read fishing group address
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld b,[hl] ; how many mons in group
+    inc hl ; point to data
+    ld e,$0 ; no bite yet
+.RandomLoop ; 0xe90c
+    call GenRandom
+    srl a
+    ret c ; 50% chance of no battle
+    and %11111 ; 5-bit random number
+    cp b
+    jr nc,.RandomLoop ; if a is greater than the number of mons,regenerate
+    ; get the mon
+    add a
+    ld c,a
+    ld b,$0
+    add hl,bc
+    ld a,[hli] ; level
+    ld [wFishingLevel],a
+    ld a,[hl] ; species
+    ld [wFishingSpecies],a
+    ld e,$1 ; $1 if there's a bite
+    ret
+
+GoodRodData:
+    dbdw PALLET_TOWN         , GoodRodGroupBeach
+    dbdw CERULEAN_CITY       , GoodRodGroupNorth
+    dbdw VERMILION_CITY      , GoodRodGroupCenter
+    dbdw FUCHSIA_CITY        , GoodRodGroupFishGuru
+    dbdw CINNABAR_ISLAND     , GoodRodGroupSouth
+    dbdw ROUTE_6             , GoodRodGroupPsyduck
+    dbdw ROUTE_10            , GoodRodGroupEst
+    dbdw ROUTE_11            , GoodRodGroupCenter
+    dbdw ROUTE_12            , GoodRodGroupEst
+    dbdw ROUTE_13            , GoodRodGroupEst
+    dbdw ROUTE_17            , GoodRodGroupCenter
+    dbdw ROUTE_18            , GoodRodGroupCenter
+    dbdw ROUTE_19            , GoodRodGroupBeach
+    dbdw ROUTE_20            , GoodRodGroupSouth
+    dbdw ROUTE_21            , GoodRodGroupSouth
+    dbdw ROUTE_24            , GoodRodGroupNorth
+    dbdw ROUTE_25            , GoodRodGroupNorth
+    dbdw VERMILION_DOCK      , GoodRodGroupCenter
+    dbdw SAFARI_ZONE_EAST    , GoodRodGroupSafari
+    dbdw SAFARI_ZONE_NORTH   , GoodRodGroupSafari
+    dbdw SAFARI_ZONE_WEST    , GoodRodGroupSafari
+    dbdw SAFARI_ZONE_CENTER  , GoodRodGroupSafari
+    db $FF
+
+SuperRodData:
+    dbdw PALLET_TOWN         , SuperRodGroupBeach
+    dbdw CERULEAN_CITY       , SuperRodGroupNorth
+    dbdw VERMILION_CITY      , SuperRodGroupCenter
+    dbdw FUCHSIA_CITY        , SuperRodGroupFishGuru
+    dbdw CINNABAR_ISLAND     , SuperRodGroupSouth
+    dbdw ROUTE_6             , SuperRodGroupPsyduck
+    dbdw ROUTE_10            , SuperRodGroupEst
+    dbdw ROUTE_11            , SuperRodGroupCenter
+    dbdw ROUTE_12            , SuperRodGroupEst
+    dbdw ROUTE_13            , SuperRodGroupEst
+    dbdw ROUTE_17            , SuperRodGroupCenter
+    dbdw ROUTE_18            , SuperRodGroupCenter
+    dbdw ROUTE_19            , SuperRodGroupBeach
+    dbdw ROUTE_20            , SuperRodGroupSouth
+    dbdw ROUTE_21            , SuperRodGroupSouth
+    dbdw ROUTE_23            , SuperRodGroupLake
+    dbdw ROUTE_24            , SuperRodGroupNorth
+    dbdw ROUTE_25            , SuperRodGroupNorth
+    dbdw VERMILION_DOCK      , SuperRodGroupCenter
+    dbdw SEAFOAM_ISLANDS_4   , SuperRodGroupSeaform
+    dbdw SEAFOAM_ISLANDS_5   , SuperRodGroupSeaform
+    dbdw SAFARI_ZONE_EAST    , SuperRodGroupSafari
+    dbdw SAFARI_ZONE_NORTH   , SuperRodGroupSafari
+    dbdw SAFARI_ZONE_WEST    , SuperRodGroupSafari
+    dbdw SAFARI_ZONE_CENTER  , SuperRodGroupSafari
+    dbdw UNKNOWN_DUNGEON_2   , SuperRodGroupUnknown
+    dbdw UNKNOWN_DUNGEON_3   , SuperRodGroupUnknown
+    dbdw UNKNOWN_DUNGEON_1   , SuperRodGroupUnknown
+    db $FF
+
+    ;────────────────
+    ;db  1,MAGIKARP
+    ;db  1,GOLDEEN
+    ;────────────────
+    ;db  1,TENTACOOL
+    ;db  1,POLIWAG
+    ;db  1,HORSEA
+    ;db  1,KRABBY
+    ;────────────────
+    ;db  1,SHELLDER
+    ;db  1,STARYU
+    ;db  1,PSYDUCK
+    ;db  1,SLOWPOKE
+    ;────────────────
+    ;db 25,POLIWHIRL
+    ;db 28,KINGLER
+    ;db 30,TENTACRUEL
+    ;db 32,SEADRA
+    ;────────────────
+    ;db 20,GYARADOS
+    ;db 33,SEAKING
+    ;────────────────
+    ;db  1,CLOYSTER
+    ;db  1,STARMIE
+    ;db 33,GOLDUCK
+    ;db 38,SLOWBRO
+    ;db  1,VAPOREON ???
+    ;────────────────
+    ;db  1,DRATINI
+    ;db  1,LAPRAS
+    ;db  1,SEEL
+    ;db  1,OMANYTE
+    ;db  1,KABUTO
+    ;────────────────
+    ;db 30,DRAGONAIR
+    ;db 55,DRAGONITE
+    ;db 34,DEWGONG
+    ;db 40,OMASTAR
+    ;db 40,KABUTOPS
+    ;────────────────
+
+GoodRodGroupBeach:
+    db 16
+    db  1,MAGIKARP
+    db  1,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  3,MAGIKARP
+    db  2,GOLDEEN ; Entry Level
+    db  2,GOLDEEN
+    db  2,GOLDEEN
+    db  3,GOLDEEN
+    db  2,KRABBY ; Entry Level
+    db  2,KRABBY
+    db  3,KRABBY
+    db  2,TENTACOOL ; Entry Level
+    db  3,TENTACOOL
+
+SuperRodGroupBeach:
+    db 32
+    db  1,MAGIKARP
+    db  5,MAGIKARP
+    db  9,MAGIKARP
+    db 13,MAGIKARP
+    db 13,MAGIKARP
+    db 17,MAGIKARP
+    db 21,MAGIKARP
+    db  5,GOLDEEN
+    db  9,GOLDEEN
+    db  9,GOLDEEN
+    db 13,GOLDEEN
+    db 13,GOLDEEN
+    db 17,GOLDEEN
+    db 21,GOLDEEN
+    db  5,KRABBY
+    db  9,KRABBY
+    db 13,KRABBY
+    db 13,KRABBY
+    db 17,KRABBY
+    db 21,KRABBY
+    db  5,TENTACOOL
+    db  9,TENTACOOL
+    db 13,TENTACOOL
+    db 17,TENTACOOL
+    db 21,TENTACOOL
+    db  9,SHELLDER ; Entry Level
+    db 13,SHELLDER
+    db 13,SHELLDER
+    db 17,SHELLDER
+    db 28,KINGLER ; Entry Level
+    db 30,TENTACRUEL ; Entry Level
+    db 33,SEAKING ; Entry Level
+
+GoodRodGroupNorth:
+    db 16
+    db  1,MAGIKARP
+    db  1,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  3,MAGIKARP
+    db  2,GOLDEEN
+    db  2,GOLDEEN
+    db  2,GOLDEEN
+    db  3,GOLDEEN
+    db  2,HORSEA ; Entry Level
+    db  2,HORSEA
+    db  3,HORSEA
+    db  2,TENTACOOL
+    db  3,TENTACOOL
+
+SuperRodGroupNorth:
+    db 32
+    db  1,MAGIKARP
+    db  5,MAGIKARP
+    db  9,MAGIKARP
+    db 13,MAGIKARP
+    db 13,MAGIKARP
+    db 17,MAGIKARP
+    db 21,MAGIKARP
+    db  5,GOLDEEN
+    db  9,GOLDEEN
+    db  9,GOLDEEN
+    db 13,GOLDEEN
+    db 13,GOLDEEN
+    db 17,GOLDEEN
+    db 21,GOLDEEN
+    db  5,HORSEA
+    db  9,HORSEA
+    db 13,HORSEA
+    db 13,HORSEA
+    db 17,HORSEA
+    db 21,HORSEA
+    db  5,TENTACOOL
+    db  9,TENTACOOL
+    db 13,TENTACOOL
+    db 17,TENTACOOL
+    db 21,TENTACOOL
+    db  9,STARYU ; Entry Level
+    db 13,STARYU
+    db 13,STARYU
+    db 17,STARYU
+    db 32,SEADRA ; Entry Level
+    db 30,TENTACRUEL
+    db 33,SEAKING
+
+GoodRodGroupCenter:
+    db 16
+    db  1,MAGIKARP
+    db  1,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  3,MAGIKARP
+    db  2,GOLDEEN
+    db  2,GOLDEEN
+    db  2,GOLDEEN
+    db  3,GOLDEEN
+    db  2,POLIWAG ; Entry Level
+    db  2,POLIWAG
+    db  3,POLIWAG
+    db  2,KRABBY
+    db  3,KRABBY
+
+SuperRodGroupCenter:
+    db 32
+    db  1,MAGIKARP
+    db  5,MAGIKARP
+    db  9,MAGIKARP
+    db 13,MAGIKARP
+    db 13,MAGIKARP
+    db 17,MAGIKARP
+    db 21,MAGIKARP
+    db  5,GOLDEEN
+    db  9,GOLDEEN
+    db  9,GOLDEEN
+    db 13,GOLDEEN
+    db 13,GOLDEEN
+    db 17,GOLDEEN
+    db 21,GOLDEEN
+    db  5,POLIWAG
+    db  9,POLIWAG
+    db 13,POLIWAG
+    db 13,POLIWAG
+    db 17,POLIWAG
+    db 21,POLIWAG
+    db  5,KRABBY
+    db  9,KRABBY
+    db 13,KRABBY
+    db 17,KRABBY
+    db 21,KRABBY
+    db  9,SHELLDER
+    db 13,SHELLDER
+    db 13,SHELLDER
+    db 17,SHELLDER
+    db 25,POLIWHIRL ; Entry Level
+    db 28,KINGLER
+    db 33,SEAKING
+
+GoodRodGroupEst:
+    db 16
+    db  1,MAGIKARP
+    db  1,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  2,MAGIKARP
+    db  3,MAGIKARP
+    db  2,GOLDEEN
+    db  2,GOLDEEN
+    db  2,GOLDEEN
+    db  3,GOLDEEN
+    db  2,TENTACOOL
+    db  2,TENTACOOL
+    db  3,TENTACOOL
+    db  2,HORSEA
+    db  3,HORSEA
+
+SuperRodGroupEst:
+    db 32
+    db  1,MAGIKARP
+    db  5,MAGIKARP
+    db  9,MAGIKARP
+    db 13,MAGIKARP
+    db 13,MAGIKARP
+    db 17,MAGIKARP
+    db 21,MAGIKARP
+    db  5,GOLDEEN
+    db  9,GOLDEEN
+    db  9,GOLDEEN
+    db 13,GOLDEEN
+    db 13,GOLDEEN
+    db 17,GOLDEEN
+    db 21,GOLDEEN
+    db  5,TENTACOOL
+    db  9,TENTACOOL
+    db 13,TENTACOOL
+    db 13,TENTACOOL
+    db 17,TENTACOOL
+    db 21,TENTACOOL
+    db  5,HORSEA
+    db  9,HORSEA
+    db 13,HORSEA
+    db 17,HORSEA
+    db 21,HORSEA
+    db  9,SHELLDER
+    db 13,SHELLDER
+    db 13,SHELLDER
+    db 17,SHELLDER
+    db 30,TENTACRUEL
+    db 32,SEADRA
+    db 33,SEAKING
+
+GoodRodGroupFishGuru:
+    db  2
+    db  1,MAGIKARP
+    db  2,GOLDEEN
+
+SuperRodGroupFishGuru:
+    db 16
+    db  1,MAGIKARP
+    db  5,MAGIKARP
+    db  9,MAGIKARP
+    db 13,MAGIKARP
+    db 13,MAGIKARP
+    db 17,MAGIKARP
+    db 21,MAGIKARP
+    db 25,MAGIKARP
+    db  2,GOLDEEN
+    db  6,GOLDEEN
+    db 10,GOLDEEN
+    db 14,GOLDEEN
+    db 14,GOLDEEN
+    db 18,GOLDEEN
+    db 22,GOLDEEN
+    db 26,GOLDEEN
+
+GoodRodGroupPsyduck:
+    db  2
+    db  2,PSYDUCK
+    db  2,POLIWAG
+
+SuperRodGroupPsyduck:
+    db 16
+    db  2,PSYDUCK
+    db  6,PSYDUCK
+    db 10,PSYDUCK
+    db 14,PSYDUCK
+    db 14,PSYDUCK
+    db 18,PSYDUCK
+    db 22,PSYDUCK
+    db 26,PSYDUCK
+    db  2,POLIWAG
+    db  6,POLIWAG
+    db 10,POLIWAG
+    db 14,POLIWAG
+    db 14,POLIWAG
+    db 18,POLIWAG
+    db 22,POLIWAG
+    db 26,POLIWAG
+
+GoodRodGroupSafari:
+    db  4
+    db  1,MAGIKARP
+    db  2,POLIWAG
+    db  2,GOLDEEN
+    db  2,SEEL ; Entry Level
+
+SuperRodGroupSafari:
+    db 32
+    db  6,MAGIKARP
+    db 10,MAGIKARP
+    db 14,MAGIKARP
+    db 18,MAGIKARP
+    db 22,MAGIKARP ; Shiny If Level 26 in SAFARI_ZONE_WEST
+    db  5,POLIWAG
+    db  9,POLIWAG
+    db 13,POLIWAG
+    db 17,POLIWAG
+    db 21,POLIWAG
+    db  5,GOLDEEN
+    db  9,GOLDEEN
+    db 13,GOLDEEN
+    db 17,GOLDEEN
+    db 21,GOLDEEN
+    db  8,SEEL
+    db 12,SEEL
+    db 16,SEEL
+    db 20,SEEL
+    db 24,SEEL
+    db  7,DRATINI ; Entry Level
+    db 11,DRATINI
+    db 15,DRATINI
+    db 13,OMANYTE ; Entry Level
+    db 13,KABUTO ; Entry Level
+    db  9,LAPRAS ; Entry Level ; TODO solo con FLOAT
+    db 20,GYARADOS ; Entry Level
+    db 24,GYARADOS
+    db 25,POLIWHIRL
+    db 29,POLIWHIRL
+    db 33,SEAKING
+    db 30,DRAGONAIR ; Entry Level
+
+GoodRodGroupSouth:
+    db 16
+    db  2,TENTACOOL
+    db  2,TENTACOOL
+    db  3,TENTACOOL
+    db  3,TENTACOOL
+    db  3,TENTACOOL
+    db  3,TENTACOOL
+    db  4,TENTACOOL
+    db  2,GOLDEEN
+    db  2,GOLDEEN
+    db  2,GOLDEEN
+    db  3,GOLDEEN
+    db  2,KRABBY
+    db  2,KRABBY
+    db  3,KRABBY
+    db  2,SEEL
+    db  3,SEEL
+
+SuperRodGroupSeaform:
+SuperRodGroupLake:
+SuperRodGroupUnknown:
+
+SuperRodGroupSouth:
+    db 32
+    db  7,TENTACOOL
+    db 11,TENTACOOL
+    db 15,TENTACOOL
+    db 19,TENTACOOL
+    db 23,TENTACOOL
+    db 27,TENTACOOL
+    db 31,TENTACOOL
+    db 19,GOLDEEN
+    db 23,GOLDEEN
+    db 27,GOLDEEN
+    db 31,GOLDEEN
+    db 11,KRABBY
+    db 15,KRABBY
+    db 19,KRABBY
+    db 23,KRABBY
+    db 27,KRABBY
+    db 31,KRABBY
+    db 15,SEEL
+    db 19,SEEL
+    db 23,SEEL
+    db 27,SEEL
+    db 31,SEEL
+    db 11,STARYU
+    db 15,STARYU
+    db 19,STARYU
+    db 23,STARYU
+    db 32,TENTACRUEL
+    db 36,TENTACRUEL
+    db 35,SEAKING
+    db 39,SEAKING
+    db 30,KINGLER
+    db 34,DEWGONG ; Entry Level
 
 SECTION "bank34",ROMX,BANK[$34] ; Denim
 

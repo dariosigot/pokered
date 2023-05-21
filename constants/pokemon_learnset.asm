@@ -998,6 +998,7 @@ Mon060_EvosMoves:
     ;   1,HYPNOSIS
     db 10,WATER_GUN
     db 14,DOUBLESLAP
+    db 19,AGILITY
     ;  25,POLIWHIRL
     db 26,BUBBLEBEAM
     db 30,HAZE
@@ -1058,6 +1059,7 @@ Mon064_EvosMoves:
 ;KADABRA
 ;Evolutions
     db EV_TRADE,1,ALAKAZAM
+    db EV_ITEM,TRADE_STONE,1,ALAKAZAM
     db 0
 ;Learnset
     ;  16,KINESIS
@@ -1105,6 +1107,7 @@ Mon067_EvosMoves:
 ;MACHOKE
 ;Evolutions
     db EV_TRADE,1,MACHAMP
+    db EV_ITEM,TRADE_STONE,1,MACHAMP
     db 0
 ;Learnset
     db 32,SEISMIC_TOSS
@@ -1237,6 +1240,7 @@ Mon075_EvosMoves:
 ;GRAVELER
 ;Evolutions
     db EV_TRADE,1,GOLEM
+    db EV_ITEM,TRADE_STONE,1,GOLEM
     db 0
 ;Learnset
     ;  25,BODY_SLAM 
@@ -1560,6 +1564,7 @@ Mon093_EvosMoves:
 ;HAUNTER
 ;Evolutions
     db EV_TRADE,1,GENGAR
+    db EV_ITEM,TRADE_STONE,1,GENGAR
     db 0
 ;Learnset
     db 28,POISON_GAS
@@ -2410,6 +2415,7 @@ Mon132_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
+    ;   1,TRANSFORM
     db 15,MINIMIZE
     db 20,CONVERSION
     db 35,MIMIC

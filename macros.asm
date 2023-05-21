@@ -64,6 +64,12 @@ dbw: MACRO
 	dw \2
 	ENDM
 
+; macro for putting a byte then a word (2nd method)
+dbdw: MACRO
+    db \1
+    dw \2
+    ENDM
+
 ; data format macros
 RGB: MACRO
 	dw (\3 << 10 | \2 << 5 | \1)

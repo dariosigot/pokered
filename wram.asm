@@ -1516,6 +1516,12 @@ wFlagListMenuSpc: ; df39 ; Denim
                   ; bit 3 = Rocket Hideout Elevator
     ds 1
 
+wFishingLevel: ; df40
+    ds 1
+
+wFishingSpecies: ; df40
+    ds 1
+
 SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
 
 wFlagGameBoyColor:    ; dfff ; Denim
