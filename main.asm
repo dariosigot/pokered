@@ -47525,7 +47525,7 @@ JrTrainerMData:
     db 18,MANKEY,0
 ; Route 6
     db 20,SQUIRTLE,0
-    db 20,SPEAROW,RATICATE,0
+    db 20,RATICATE,0
 ; Unused
     db 18,DIGLETT,DIGLETT,SANDSHREW,0
 ; Route 9
@@ -47909,7 +47909,7 @@ RocketData:
     db 13,RATTATA,ZUBAT,0
     db 11,SANDSHREW,RATTATA,ZUBAT,0
     db 12,ZUBAT,EKANS,0
-    db 20,RATICATE,0
+    db 18,RATTATA,0
 ; Cerulean City
     db 17,MACHOP,DROWZEE,0
 ; Route 24
