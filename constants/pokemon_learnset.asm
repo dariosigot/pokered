@@ -1584,11 +1584,11 @@ Mon094_EvosMoves:
 ;Learnset
     db 28,POISON_GAS
     db 35,DREAM_EATER
-    db 39,MEGA_DRAIN ; Agatha's Haunter (Level 55/56)
-    db 42,SLUDGE     ; ... ; Agatha's Gengar (Level 60)
-    db 44,HAZE       ; ... ; ...
-    db 51,TOXIC      ; ... ; ...
-    db 60,ACID_ARMOR       ; ...
+    db 39,MEGA_DRAIN
+    db 42,SLUDGE
+    db 44,HAZE
+    db 51,TOXIC
+    db 60,ACID_ARMOR
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────
