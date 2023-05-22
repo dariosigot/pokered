@@ -253,7 +253,8 @@ Mon016_EvosMoves:
     db 0
 ;Learnset
     ;   1,GUST
-    ;   1,SAND_ATTACK
+    ;   1,GROWL
+    db  5,SAND_ATTACK
     db 12,QUICK_ATTACK
     db 16,PECK
     ;  18,PIDGEOTTO
@@ -2295,9 +2296,9 @@ Mon127_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    ;   1,VICEGRIP
+    ;   1,BLADE
     ;   1,FOCUS_ENERGY
-    db  7,BLADE
+    db  7,VICEGRIP
     db 10,HARDEN
     db 13,FURY_ATTACK
     db 17,BIND

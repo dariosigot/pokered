@@ -573,7 +573,7 @@ PidgeyBaseStats: ; 38582 (e:4582)
 
     ; attacks known at lvl 0
     db GUST
-    db SAND_ATTACK
+    db GROWL
     db 0
     db 0
 
@@ -4679,7 +4679,7 @@ PinsirBaseStats: ; 391a6 (e:51a6)
     dw PinsirPicBack
 
     ; attacks known at lvl 0
-    db VICEGRIP
+    db BLADE
     db FOCUS_ENERGY
     db 0
     db 0
