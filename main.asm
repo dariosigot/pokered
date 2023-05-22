@@ -116144,7 +116144,7 @@ _DiglettsCaveRoute2Text1: ; 8a6a7 (22:66a7)
     db "TUNNEL,but it's",$55
     db "dark and scary.",$51
     db "If a #MON's",$4f
-    db "FLASH could light",$55
+    db "POWER could light",$55
     db "it up...",$57
 
 _ViridianForestexitText1: ; 8a6fd (22:66fd)
@@ -116176,7 +116176,7 @@ _UnnamedText_5d616: ; 8a7fc (22:67fc)
 
 _Route2GateText2: ; 8a82c (22:682c)
     db $0,"Once a #MON",$4f
-    db "learns FLASH,you",$55
+    db "can Light UP,you",$55
     db "can get through",$55
     db "ROCK TUNNEL.",$57
 
@@ -120441,7 +120441,7 @@ _UnnamedText_5c4c1: ; 98232 (26:4232)
     db "#MON become",$55
     db "more powerful!",$51
     db "The technique",$4f
-    db "FLASH can now be",$55
+    db "LIGHT can now be",$55
     db "used any time!",$58
 
 _PewterGymBattleText1: ; 982ae (26:42ae)
@@ -120813,7 +120813,7 @@ _UnnamedText_74e96: ; 99192 (26:5192)
     db "#MON increases",$55
     db "a little bit.",$51
     db "It also lets you",$4f
-    db "use FLASH any",$55
+    db "use LIGHT any",$55
     db "time you desire.",$58
 
 _UnnamedText_74e9b: ; 991f2 (26:51f2)
