@@ -38,8 +38,6 @@ YoungsterData:
     db 19,SANDSHREW,ZUBAT,0
     db 20,RATTATA,RATTATA,RATICATE,0
     db 18,NIDORAN_M,NIDORINO,0
-; Unused
-    db 17,SPEAROW,RATTATA,RATTATA,SPEAROW,0
 
 BugCatcherData:
 ; Viridian Forest
@@ -58,11 +56,9 @@ BugCatcherData:
 ; Route 6
     db 16,WEEDLE,CATERPIE,WEEDLE,0
     db 20,BUTTERFREE,0
-; Unused
-    db 18,METAPOD,KAKUNA,VENONAT,0
 ; Route 9
     db 19,BEEDRILL,BEEDRILL,0
-    db 20,CATERPIE,WEEDLE,VENONAT,0
+    db 18,METAPOD,KAKUNA,VENONAT,0
 
 LassData:
 ; Route 3
@@ -116,8 +112,6 @@ JrTrainerMData:
 ; Route 6
     db 20,SQUIRTLE,0
     db 20,RATICATE,0
-; Unused
-    db 18,DIGLETT,DIGLETT,SANDSHREW,0
 ; Route 9
     db 21,GROWLITHE,CHARMANDER,0
     db 19,RATTATA,DIGLETT,EKANS,SANDSHREW,0
@@ -130,8 +124,8 @@ JrTrainerFData:
 ; Route 6
     db 16,RATTATA,PIKACHU,0
     db 16,PIDGEY,PIDGEY,PIDGEY,0
-; Unused
-    db 22,BULBASAUR,0
+; Route 20
+    db 30,TENTACOOL,HORSEA,SEEL,0
 ; Route 9
     db 18,ODDISH,BELLSPROUT,ODDISH,BELLSPROUT,0
     db 23,MEOWTH,0
@@ -159,8 +153,6 @@ JrTrainerFData:
     db 29,PIKACHU,RAICHU,0
     db 33,CLEFAIRY,0
     db 29,BELLSPROUT,ODDISH,TANGELA,0
-; Route 20
-    db 30,TENTACOOL,HORSEA,SEEL,0
 
 PokemaniacData:
 ; Route 10
@@ -184,10 +176,6 @@ SuperNerdData:
     db 20,VOLTORB,KOFFING,VOLTORB,MAGNEMITE,0
     db 22,GRIMER,GRIMER,GRIMER,0
     db 26,KOFFING,0
-; Unused
-    db 22,KOFFING,MAGNEMITE,KOFFING,0
-    db 20,MAGNEMITE,MAGNEMITE,KOFFING,MAGNEMITE,0
-    db 24,MAGNEMITE,VOLTORB,0
 ; Cinnabar Gym
     db 36,VULPIX,VULPIX,NINETALES,0
     db 34,PONYTA,CHARMANDER,VULPIX,GROWLITHE,0
@@ -241,10 +229,6 @@ BikerData:
     db 38,KOFFING,MUK,0
 
 BurglarData:
-; Unused
-    db 29,GROWLITHE,VULPIX,0
-    db 33,GROWLITHE,0
-    db 28,VULPIX,CHARMANDER,PONYTA,0
 ; Cinnabar Gym
     db 36,GROWLITHE,VULPIX,NINETALES,0
     db 41,PONYTA,0
@@ -257,8 +241,6 @@ BurglarData:
     db 34,GROWLITHE,PONYTA,0
 
 EngineerData:
-; Unused
-    db 21,VOLTORB,MAGNEMITE,0
 ; Route 11
     db 21,MAGNEMITE,0
     db 19,DITTO,MAGNEMITE,0
@@ -327,8 +309,6 @@ GamblerData:
     db 18,GROWLITHE,VULPIX,0
 ; Route 8
     db 25,POLIWAG,POLIWAG,POLIWHIRL,0
-; Unused
-    db 25,ONIX,GEODUDE,GRAVELER,0
 ; Route 8
     db 24,GROWLITHE,VULPIX,0
 
@@ -347,8 +327,6 @@ BeautyData:
 ; Route 15
     db 29,PIDGEOTTO,WIGGLYTUFF,0
     db 29,BULBASAUR,IVYSAUR,0
-; Unused
-    db 33,WEEPINBELL,BELLSPROUT,WEEPINBELL,0
 ; Route 19
     db 33,POLIWAG,GOLDEEN,SEAKING,GOLDEEN,POLIWAG,0
     db 33,GOLDEEN,SEAKING,0
@@ -379,8 +357,6 @@ JugglerData:
     db 34,DROWZEE,HYPNO,0
 ; Victory Road 2F
     db 48,MR_MIME,0
-; Unused
-    db 33,HYPNO,0
 ; Fuchsia Gym
     db 38,HYPNO,0
     db 34,DROWZEE,KADABRA,0
@@ -390,12 +366,10 @@ TamerData:
     db 34,SANDSLASH,ARBOK,0
     db 33,ARBOK,SANDSLASH,ARBOK,0
 ; Viridian Gym
-    db 43,RHYHORN,0
+    db 40,RHYHORN,PRIMEAPE,0
     db 39,ARBOK,TAUROS,0
 ; Victory Road 2F
     db 44,PERSIAN,GOLDUCK,0
-; Unused
-    db 42,RHYHORN,PRIMEAPE,ARBOK,TAUROS,0
 
 BirdKeeperData:
 ; Route 13
@@ -414,9 +388,6 @@ BirdKeeperData:
     db 26,SPEAROW,SPEAROW,FEAROW,SPEAROW,0
 ; Route 20
     db 30,FEAROW,FEAROW,PIDGEOTTO,0
-; Unused
-    db 39,PIDGEOTTO,PIDGEOTTO,PIDGEY,PIDGEOT,0
-    db 42,FARFETCH_D,FEAROW,0
 ; Route 14
     db 28,PIDGEY,DODUO,PIDGEOTTO,0
     db 26,PIDGEY,SPEAROW,PIDGEY,FEAROW,0
@@ -451,21 +422,18 @@ Green1Data:
     db $FF,18,PIDGEOTTO,15,ABRA,17,RATTATA,15,CHARMANDER,0
 
 ProfOakData:
-; Unused
-    db $FF,66,TAUROS,67,EXEGGUTOR,68,ARCANINE,69,BLASTOISE,70,GYARADOS,0
-    db $FF,66,TAUROS,67,EXEGGUTOR,68,ARCANINE,69,VENUSAUR,70,GYARADOS,0
-    db $FF,66,TAUROS,67,EXEGGUTOR,68,ARCANINE,69,CHARIZARD,70,GYARADOS,0
+; none
 
 ChiefData:
 ; none
 
 ScientistData:
-; Unused
-    db 34,KOFFING,VOLTORB,0
+; Mansion 1F
+    db 35,ELECTRODE,WEEZING,0
 ; Silph Co. 2F
     db 35,GRIMER,GRIMER,KOFFING,WEEZING,0
     db 30,MAGNEMITE,VOLTORB,MAGNETON,0
-; Silph Co. 3F/Mansion 1F
+; Silph Co. 3F
     db 35,ELECTRODE,WEEZING,0
 ; Silph Co. 4F
     db 33,ELECTRODE,0
@@ -525,8 +493,8 @@ RocketData:
     db 25,ZUBAT,ZUBAT,GOLBAT,0
     db 26,KOFFING,DROWZEE,0
     db 23,ZUBAT,RATTATA,RATICATE,ZUBAT,0
-; Unused
-    db 26,DROWZEE,KOFFING,0
+; Silph Co. 10F
+    db 33,MACHOKE,0
 ; Silph Co. 2F
     db 29,CUBONE,ZUBAT,0
     db 25,GOLBAT,ZUBAT,ZUBAT,RATICATE,ZUBAT,0
@@ -551,8 +519,6 @@ RocketData:
 ; Silph Co. 9F
     db 28,DROWZEE,GRIMER,MACHOP,0
     db 28,GOLBAT,DROWZEE,HYPNO,0
-; Silph Co. 10F
-    db 33,MACHOKE,0
 ; Silph Co. 11F
     db 25,RATTATA,RATTATA,ZUBAT,RATTATA,EKANS,0
     db 32,CUBONE,DROWZEE,MAROWAK,0
@@ -563,14 +529,8 @@ CooltrainerMData:
 ; Victory Road 3F
     db 43,EXEGGUTOR,CLOYSTER,ARCANINE,0
     db 43,KINGLER,TENTACRUEL,BLASTOISE,0
-; Unused
-    db 45,KINGLER,STARMIE,0
 ; Victory Road 1F
     db 42,IVYSAUR,WARTORTLE,CHARMELEON,CHARIZARD,0
-; Unused
-    db 44,IVYSAUR,WARTORTLE,CHARMELEON,0
-    db 49,NIDOKING,0
-    db 44,KINGLER,CLOYSTER,0
 ; Viridian Gym
     db 39,SANDSLASH,DUGTRIO,0
     db 43,RHYHORN,0
@@ -581,14 +541,8 @@ CooltrainerFData:
 ; Victory Road 3F
     db 43,BELLSPROUT,WEEPINBELL,VICTREEBEL,0
     db 43,PARASECT,DEWGONG,CHANSEY,0
-; Unused
-    db 46,VILEPLUME,BUTTERFREE,0
 ; Victory Road 1F
     db 44,PERSIAN,NINETALES,0
-; Unused
-    db 45,IVYSAUR,VENUSAUR,0
-    db 45,NIDORINA,NIDOQUEEN,0
-    db 43,PERSIAN,NINETALES,RAICHU,0
 
 BrunoData:
     db $FF,53,ONIX,55,HITMONCHAN,55,HITMONLEE,56,ONIX,58,MACHAMP,0
@@ -618,10 +572,10 @@ GentlemanData:
 ; SS Anne 1F Rooms
     db 18,GROWLITHE,GROWLITHE,0
     db 19,NIDORAN_M,NIDORAN_F,0
-; SS Anne 2F Rooms/Vermilion Gym
+; SS Anne 2F Rooms
     db 23,PIKACHU,0
-; Unused
-    db 48,PRIMEAPE,0
+; Vermilion Gym
+    db 23,PIKACHU,0
 ; SS Anne 2F Rooms
     db 17,GROWLITHE,PONYTA,0
 
@@ -652,32 +606,16 @@ LoreleiData:
     db $FF,54,DEWGONG,53,CLOYSTER,54,SLOWBRO,56,JYNX,56,LAPRAS,0
 
 ChannelerData:
-; Unused
-    db 22,GASTLY,0
-    db 24,GASTLY,0
-    db 23,GASTLY,GASTLY,0
-    db 24,GASTLY,0
 ; Pokémon Tower 3F
     db 23,GASTLY,0
     db 24,GASTLY,0
-; Unused
-    db 25,HAUNTER,0
-; Pokémon Tower 3F
     db 22,GASTLY,0
 ; Pokémon Tower 4F
     db 24,GASTLY,0
     db 23,GASTLY,GASTLY,0
-; Unused
-    db 24,GASTLY,0
-; Pokémon Tower 4F
     db 22,GASTLY,0
-; Unused
-    db 24,GASTLY,0
 ; Pokémon Tower 5F
     db 25,HAUNTER,0
-; Unused
-    db 24,GASTLY,0
-; Pokémon Tower 5F
     db 22,GASTLY,0
     db 24,GASTLY,0
     db 25,HAUNTER,0

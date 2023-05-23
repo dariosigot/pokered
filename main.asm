@@ -62329,7 +62329,7 @@ Mansion1Object: ; 0x443a4 (size=90)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_OAK_AIDE,$11 + 4,$11 + 4,$ff,$d2,$41,SCIENTIST + $C8,$4 ; trainer
+    db SPRITE_OAK_AIDE,$11 + 4,$11 + 4,$ff,$d2,$41,SCIENTIST + $C8,$1 ; trainer
     db SPRITE_BALL,$3 + 4,$e + 4,$ff,$ff,$82,ESCAPE_ROPE ; item
     db SPRITE_BALL,$15 + 4,$12 + 4,$ff,$ff,$83,CARBOS ; item
 
@@ -71535,9 +71535,9 @@ Route20Object: ; 0x50113 (size=106)
 
     db $a ; people
     db SPRITE_SWIMMER,$8 + 4,$57 + 4,$ff,$d1,$41,SWIMMER + $C8,$9 ; trainer
-    db SPRITE_SWIMMER,$b + 4,$44 + 4,$ff,$d1,$42,BEAUTY + $C8,$f ; trainer
+    db SPRITE_SWIMMER,$b + 4,$44 + 4,$ff,$d1,$42,BEAUTY + $C8,$e ; trainer
     db SPRITE_SWIMMER,$a + 4,$2d + 4,$ff,$d0,$43,BEAUTY + $C8,$6 ; trainer
-    db SPRITE_SWIMMER,$e + 4,$37 + 4,$ff,$d3,$44,JR__TRAINER_F + $C8,$18 ; trainer
+    db SPRITE_SWIMMER,$e + 4,$37 + 4,$ff,$d3,$44,JR__TRAINER_F + $C8,$4 ; trainer
     db SPRITE_SWIMMER,$d + 4,$26 + 4,$ff,$d0,$45,SWIMMER + $C8,$a ; trainer
     db SPRITE_SWIMMER,$d + 4,$57 + 4,$ff,$d1,$46,SWIMMER + $C8,$b ; trainer
     db SPRITE_BLACK_HAIR_BOY_1,$9 + 4,$22 + 4,$ff,$d1,$47,BIRD_KEEPER + $C8,$b ; trainer
@@ -74633,7 +74633,7 @@ Mansion2Object: ; 0x520d1 (size=63)
     db $0 ; signs
 
     db $4 ; people
-    db SPRITE_BLACK_HAIR_BOY_2,$11 + 4,$3 + 4,$fe,$2,$41,BURGLAR + $C8,$7 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$11 + 4,$3 + 4,$fe,$2,$41,BURGLAR + $C8,$4 ; trainer
     db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
@@ -74817,7 +74817,7 @@ Mansion3Object: ; 0x522e6 (size=64)
     db $0 ; signs
 
     db $5 ; people
-    db SPRITE_BLACK_HAIR_BOY_2,$b + 4,$5 + 4,$fe,$2,$41,BURGLAR + $C8,$8 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$b + 4,$5 + 4,$fe,$2,$41,BURGLAR + $C8,$5 ; trainer
     db SPRITE_OAK_AIDE,$b + 4,$14 + 4,$ff,$d2,$42,SCIENTIST + $C8,$c ; trainer
     db SPRITE_BALL,$10 + 4,$1 + 4,$ff,$ff,$83,MAX_POTION ; item
     db SPRITE_BALL,$5 + 4,$19 + 4,$ff,$ff,$84,IRON ; item
@@ -74978,7 +74978,7 @@ Mansion4Object: ; 0x52498 (size=69)
     db $0 ; signs
 
     db $8 ; people
-    db SPRITE_BLACK_HAIR_BOY_2,$17 + 4,$10 + 4,$ff,$ff,$41,BURGLAR + $C8,$9 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$17 + 4,$10 + 4,$ff,$ff,$41,BURGLAR + $C8,$6 ; trainer
     db SPRITE_OAK_AIDE,$b + 4,$1b + 4,$ff,$d0,$42,SCIENTIST + $C8,$d ; trainer
     db SPRITE_BALL,$2 + 4,$a + 4,$ff,$ff,$83,RARE_CANDY ; item
     db SPRITE_BALL,$16 + 4,$1 + 4,$ff,$ff,$84,FULL_RESTORE ; item
@@ -75956,14 +75956,14 @@ Route9Object: ; 0x546a8 (size=86)
 
     db $a ; people
     db SPRITE_LASS,$a + 4,$d + 4,$ff,$d2,$41,JR__TRAINER_F + $C8,$5 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$18 + 4,$ff,$d2,$42,JR__TRAINER_M + $C8,$7 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$1f + 4,$ff,$d3,$43,JR__TRAINER_M + $C8,$8 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$18 + 4,$ff,$d2,$42,JR__TRAINER_M + $C8,$6 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$1f + 4,$ff,$d3,$43,JR__TRAINER_M + $C8,$7 ; trainer
     db SPRITE_LASS,$8 + 4,$30 + 4,$ff,$d3,$44,JR__TRAINER_F + $C8,$6 ; trainer
     db SPRITE_HIKER,$f + 4,$10 + 4,$ff,$d2,$45,HIKER + $C8,$b ; trainer
     db SPRITE_HIKER,$3 + 4,$2b + 4,$ff,$d2,$46,HIKER + $C8,$6 ; trainer
-    db SPRITE_BUG_CATCHER,$2 + 4,$16 + 4,$ff,$d0,$47,BUG_CATCHER + $C8,$d ; trainer
+    db SPRITE_BUG_CATCHER,$2 + 4,$16 + 4,$ff,$d0,$47,BUG_CATCHER + $C8,$c ; trainer
     db SPRITE_HIKER,$f + 4,$2d + 4,$ff,$d3,$48,HIKER + $C8,$5 ; trainer
-    db SPRITE_BUG_CATCHER,$8 + 4,$28 + 4,$ff,$d3,$49,BUG_CATCHER + $C8,$e ; trainer
+    db SPRITE_BUG_CATCHER,$8 + 4,$28 + 4,$ff,$d3,$49,BUG_CATCHER + $C8,$d ; trainer
     db SPRITE_BALL,$f + 4,$a + 4,$ff,$ff,$8a,TM_30 ; item
 
 Route9Blocks: ; 546fe (15:46fe)
@@ -76021,10 +76021,10 @@ Route14Object: ; 0x549bb (size=87)
     db $d,$11,$b ; Route14Text11
 
     db $a ; people
-    db SPRITE_BLACK_HAIR_BOY_1,$4 + 4,$4 + 4,$ff,$d0,$41,BIRD_KEEPER + $C8,$e ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$6 + 4,$f + 4,$ff,$d0,$42,BIRD_KEEPER + $C8,$f ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$b + 4,$c + 4,$ff,$d0,$43,BIRD_KEEPER + $C8,$10 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$f + 4,$e + 4,$ff,$d1,$44,BIRD_KEEPER + $C8,$11 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$4 + 4,$4 + 4,$ff,$d0,$41,BIRD_KEEPER + $C8,$c ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$6 + 4,$f + 4,$ff,$d0,$42,BIRD_KEEPER + $C8,$d ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$b + 4,$c + 4,$ff,$d0,$43,BIRD_KEEPER + $C8,$e ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$f + 4,$e + 4,$ff,$d1,$44,BIRD_KEEPER + $C8,$f ; trainer
     db SPRITE_BLACK_HAIR_BOY_1,$1f + 4,$f + 4,$ff,$d2,$45,BIRD_KEEPER + $C8,$4 ; trainer
     db SPRITE_BLACK_HAIR_BOY_1,$31 + 4,$6 + 4,$ff,$d1,$46,BIRD_KEEPER + $C8,$5 ; trainer
     db SPRITE_BIKER,$27 + 4,$5 + 4,$ff,$d0,$47,BIKER + $C8,$d ; trainer
@@ -76096,10 +76096,10 @@ Route19Object: ; 0x54e9a (size=87)
     db SPRITE_SWIMMER,$1b + 4,$4 + 4,$ff,$d3,$44,SWIMMER + $C8,$5 ; trainer
     db SPRITE_SWIMMER,$1f + 4,$10 + 4,$ff,$d1,$45,SWIMMER + $C8,$6 ; trainer
     db SPRITE_SWIMMER,$b + 4,$9 + 4,$ff,$d0,$46,SWIMMER + $C8,$7 ; trainer
-    db SPRITE_SWIMMER,$2b + 4,$8 + 4,$ff,$d2,$47,BEAUTY + $C8,$c ; trainer
-    db SPRITE_SWIMMER,$2b + 4,$b + 4,$ff,$d3,$48,BEAUTY + $C8,$d ; trainer
+    db SPRITE_SWIMMER,$2b + 4,$8 + 4,$ff,$d2,$47,BEAUTY + $C8,$b ; trainer
+    db SPRITE_SWIMMER,$2b + 4,$b + 4,$ff,$d3,$48,BEAUTY + $C8,$c ; trainer
     db SPRITE_SWIMMER,$2a + 4,$9 + 4,$ff,$d1,$49,SWIMMER + $C8,$8 ; trainer
-    db SPRITE_SWIMMER,$2c + 4,$a + 4,$ff,$d0,$4a,BEAUTY + $C8,$e ; trainer
+    db SPRITE_SWIMMER,$2c + 4,$a + 4,$ff,$d0,$4a,BEAUTY + $C8,$d ; trainer
 
 Route19Blocks: ; 54ef1 (15:4ef1)
     INCBIN "maps/route19.blk"
@@ -80085,7 +80085,7 @@ Route8Object: ; 0x5814f (size=119)
     db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$1a + 4,$ff,$d3,$45,SUPER_NERD + $C8,$5 ; trainer
     db SPRITE_LASS,$5 + 4,$1a + 4,$ff,$d2,$46,LASS + $C8,$e ; trainer
     db SPRITE_LASS,$6 + 4,$1a + 4,$ff,$d3,$47,LASS + $C8,$f ; trainer
-    db SPRITE_GAMBLER,$d + 4,$2e + 4,$ff,$d0,$48,GAMBLER + $C8,$7 ; trainer
+    db SPRITE_GAMBLER,$d + 4,$2e + 4,$ff,$d0,$48,GAMBLER + $C8,$6 ; trainer
     db SPRITE_LASS,$c + 4,$33 + 4,$ff,$d2,$49,LASS + $C8,$10 ; trainer
 
     ; warp-to
@@ -80165,12 +80165,12 @@ Route11Object: ; 0x584e0 (size=127)
     db SPRITE_GAMBLER,$e + 4,$a + 4,$ff,$d0,$41,GAMBLER + $C8,$1 ; trainer
     db SPRITE_GAMBLER,$9 + 4,$1a + 4,$ff,$d0,$42,GAMBLER + $C8,$2 ; trainer
     db SPRITE_BUG_CATCHER,$5 + 4,$d + 4,$ff,$d2,$43,YOUNGSTER + $C8,$9 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$b + 4,$24 + 4,$ff,$d0,$44,ENGINEER + $C8,$2 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$b + 4,$24 + 4,$ff,$d0,$44,ENGINEER + $C8,$1 ; trainer
     db SPRITE_BUG_CATCHER,$4 + 4,$16 + 4,$ff,$d1,$45,YOUNGSTER + $C8,$a ; trainer
     db SPRITE_GAMBLER,$7 + 4,$2d + 4,$ff,$d0,$46,GAMBLER + $C8,$3 ; trainer
     db SPRITE_GAMBLER,$3 + 4,$21 + 4,$ff,$d1,$47,GAMBLER + $C8,$4 ; trainer
     db SPRITE_BUG_CATCHER,$5 + 4,$2b + 4,$ff,$d3,$48,YOUNGSTER + $C8,$b ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$10 + 4,$2d + 4,$ff,$d2,$49,ENGINEER + $C8,$3 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$10 + 4,$2d + 4,$ff,$d2,$49,ENGINEER + $C8,$2 ; trainer
     db SPRITE_BUG_CATCHER,$c + 4,$16 + 4,$ff,$d1,$4a,YOUNGSTER + $C8,$c ; trainer
 
     ; warp-to
@@ -80210,7 +80210,7 @@ Route12Object: ; 0x5869a (size=118)
     db SPRITE_SNORLAX,$3e + 4,$9 + 4,$ff,$d0,$1 ; person
     db SPRITE_FISHER2,$1f + 4,$e + 4,$ff,$d2,$42,FISHER + $C8,$3 ; trainer
     db SPRITE_FISHER2,$27 + 4,$5 + 4,$ff,$d1,$43,FISHER + $C8,$4 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$5c + 4,$b + 4,$ff,$d2,$44,JR__TRAINER_M + $C8,$9 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$5c + 4,$b + 4,$ff,$d2,$44,JR__TRAINER_M + $C8,$8 ; trainer
     db SPRITE_BLACK_HAIR_BOY_2,$4c + 4,$e + 4,$ff,$d1,$45,ROCKER + $C8,$2 ; trainer
     db SPRITE_FISHER2,$28 + 4,$c + 4,$ff,$d2,$46,FISHER + $C8,$5 ; trainer
     db SPRITE_FISHER2,$34 + 4,$9 + 4,$ff,$d3,$47,FISHER + $C8,$6 ; trainer
@@ -83597,7 +83597,7 @@ SilphCo10Object: ; 0x5a1fb (size=95)
     db $0 ; signs
 
     db $6 ; people
-    db SPRITE_ROCKET,$9 + 4,$1 + 4,$ff,$d3,$41,ROCKET + $C8,$27 ; trainer
+    db SPRITE_ROCKET,$9 + 4,$1 + 4,$ff,$d3,$41,ROCKET + $C8,$16 ; trainer
     db SPRITE_OAK_AIDE,$2 + 4,$a + 4,$ff,$d2,$42,SCIENTIST + $C8,$b ; trainer
     db SPRITE_ERIKA,$f + 4,$9 + 4,$fe,$0,$3 ; person
     db SPRITE_BALL,$c + 4,$2 + 4,$ff,$ff,$84,TM_26 ; item
@@ -85621,7 +85621,7 @@ VermilionGymObject: ; 0x5cbfe (size=58)
 
     db $5 ; people
     db SPRITE_ROCKER,$1 + 4,$5 + 4,$ff,$d0,$41,LT__SURGE + $C8,$1 ; trainer
-    db SPRITE_GENTLEMAN,$6 + 4,$9 + 4,$ff,$d2,$42,GENTLEMAN + $C8,$3 ; trainer
+    db SPRITE_GENTLEMAN,$6 + 4,$9 + 4,$ff,$d2,$42,GENTLEMAN + $C8,$4 ; trainer
     db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$3 + 4,$ff,$d2,$43,ROCKER + $C8,$1 ; trainer
     db SPRITE_SAILOR,$a + 4,$0 + 4,$ff,$d3,$44,SAILOR + $C8,$8 ; trainer
     db SPRITE_GYM_HELPER,$e + 4,$4 + 4,$ff,$d0,$5 ; person
@@ -86548,11 +86548,11 @@ SaffronGymObject: ; 0x5d259 (size=330)
 
     db $9 ; people
     db SPRITE_GIRL,$8 + 4,$9 + 4,$ff,$d0,$41,SABRINA + $C8,$1 ; trainer
-    db SPRITE_MEDIUM,$1 + 4,$a + 4,$ff,$d0,$42,CHANNELER + $C8,$16 ; trainer
+    db SPRITE_MEDIUM,$1 + 4,$a + 4,$ff,$d0,$42,CHANNELER + $C8,$e ; trainer
     db SPRITE_BUG_CATCHER,$1 + 4,$11 + 4,$ff,$d0,$43,PSYCHIC_TR + $C8,$1 ; trainer
-    db SPRITE_MEDIUM,$7 + 4,$3 + 4,$ff,$d0,$44,CHANNELER + $C8,$17 ; trainer
+    db SPRITE_MEDIUM,$7 + 4,$3 + 4,$ff,$d0,$44,CHANNELER + $C8,$f ; trainer
     db SPRITE_BUG_CATCHER,$7 + 4,$11 + 4,$ff,$d0,$45,PSYCHIC_TR + $C8,$2 ; trainer
-    db SPRITE_MEDIUM,$d + 4,$3 + 4,$ff,$d0,$46,CHANNELER + $C8,$18 ; trainer
+    db SPRITE_MEDIUM,$d + 4,$3 + 4,$ff,$d0,$46,CHANNELER + $C8,$10 ; trainer
     db SPRITE_BUG_CATCHER,$d + 4,$11 + 4,$ff,$d0,$47,PSYCHIC_TR + $C8,$3 ; trainer
     db SPRITE_BUG_CATCHER,$1 + 4,$3 + 4,$ff,$d0,$48,PSYCHIC_TR + $C8,$4 ; trainer
     db SPRITE_GYM_HELPER,$f + 4,$a + 4,$ff,$d0,$9 ; person
@@ -87476,8 +87476,8 @@ VictoryRoad1Object: ; 0x5dab8 (size=76)
     db $0 ; signs
 
     db $7 ; people
-    db SPRITE_LASS,$5 + 4,$7 + 4,$ff,$d3,$41,COOLTRAINER_F + $C8,$5 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$2 + 4,$3 + 4,$ff,$d0,$42,COOLTRAINER_M + $C8,$5 ; trainer
+    db SPRITE_LASS,$5 + 4,$7 + 4,$ff,$d3,$41,COOLTRAINER_F + $C8,$4 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$2 + 4,$3 + 4,$ff,$d0,$42,COOLTRAINER_M + $C8,$4 ; trainer
     db SPRITE_BALL,$0 + 4,$b + 4,$ff,$ff,$83,TM_43 ; item
     db SPRITE_BALL,$2 + 4,$9 + 4,$ff,$ff,$84,RARE_CANDY ; item
     db SPRITE_BOULDER,$f + 4,$5 + 4,$ff,$10,$5 ; person
@@ -88340,9 +88340,9 @@ PokemonTower3Object: ; 0x6075d (size=51)
     db $0 ; signs
 
     db $4 ; people
-    db SPRITE_MEDIUM,$3 + 4,$c + 4,$ff,$d2,$41,CHANNELER + $C8,$5 ; trainer
-    db SPRITE_MEDIUM,$8 + 4,$9 + 4,$ff,$d0,$42,CHANNELER + $C8,$6 ; trainer
-    db SPRITE_MEDIUM,$d + 4,$a + 4,$ff,$d0,$43,CHANNELER + $C8,$8 ; trainer
+    db SPRITE_MEDIUM,$3 + 4,$c + 4,$ff,$d2,$41,CHANNELER + $C8,$1 ; trainer
+    db SPRITE_MEDIUM,$8 + 4,$9 + 4,$ff,$d0,$42,CHANNELER + $C8,$2 ; trainer
+    db SPRITE_MEDIUM,$d + 4,$a + 4,$ff,$d0,$43,CHANNELER + $C8,$3 ; trainer
     db SPRITE_BALL,$1 + 4,$c + 4,$ff,$ff,$84,ESCAPE_ROPE ; item
 
     ; warp-to
@@ -88475,9 +88475,9 @@ PokemonTower4Object: ; 0x6088b (size=65)
     db $0 ; signs
 
     db $6 ; people
-    db SPRITE_MEDIUM,$a + 4,$5 + 4,$ff,$d3,$41,CHANNELER + $C8,$9 ; trainer
-    db SPRITE_MEDIUM,$7 + 4,$f + 4,$ff,$d0,$42,CHANNELER + $C8,$a ; trainer
-    db SPRITE_MEDIUM,$c + 4,$e + 4,$ff,$d2,$43,CHANNELER + $C8,$c ; trainer
+    db SPRITE_MEDIUM,$a + 4,$5 + 4,$ff,$d3,$41,CHANNELER + $C8,$4 ; trainer
+    db SPRITE_MEDIUM,$7 + 4,$f + 4,$ff,$d0,$42,CHANNELER + $C8,$5 ; trainer
+    db SPRITE_MEDIUM,$c + 4,$e + 4,$ff,$d2,$43,CHANNELER + $C8,$6 ; trainer
     db SPRITE_BALL,$a + 4,$c + 4,$ff,$ff,$84,ELIXER ; item
     db SPRITE_BALL,$a + 4,$9 + 4,$ff,$ff,$85,AWAKENING ; item
     db SPRITE_BALL,$10 + 4,$c + 4,$ff,$ff,$86,HP_UP ; item
@@ -88689,10 +88689,10 @@ PokemonTower5Object: ; 0x60a48 (size=65)
 
     db $6 ; people
     db SPRITE_MEDIUM,$8 + 4,$c + 4,$ff,$ff,$1 ; person
-    db SPRITE_MEDIUM,$7 + 4,$11 + 4,$ff,$d2,$42,CHANNELER + $C8,$e ; trainer
-    db SPRITE_MEDIUM,$3 + 4,$e + 4,$ff,$d2,$43,CHANNELER + $C8,$10 ; trainer
-    db SPRITE_MEDIUM,$a + 4,$6 + 4,$ff,$d3,$44,CHANNELER + $C8,$11 ; trainer
-    db SPRITE_MEDIUM,$10 + 4,$9 + 4,$ff,$d3,$45,CHANNELER + $C8,$12 ; trainer
+    db SPRITE_MEDIUM,$7 + 4,$11 + 4,$ff,$d2,$42,CHANNELER + $C8,$a ; trainer
+    db SPRITE_MEDIUM,$3 + 4,$e + 4,$ff,$d2,$43,CHANNELER + $C8,$7 ; trainer
+    db SPRITE_MEDIUM,$a + 4,$6 + 4,$ff,$d3,$44,CHANNELER + $C8,$8 ; trainer
+    db SPRITE_MEDIUM,$10 + 4,$9 + 4,$ff,$d3,$45,CHANNELER + $C8,$9 ; trainer
     db SPRITE_BALL,$e + 4,$6 + 4,$ff,$ff,$86,NUGGET ; item
 
     ; warp-to
@@ -88935,9 +88935,9 @@ PokemonTower6Object: ; 0x60c5b (size=58)
     db $0 ; signs
 
     db $5 ; people
-    db SPRITE_MEDIUM,$a + 4,$c + 4,$ff,$d3,$41,CHANNELER + $C8,$13 ; trainer
-    db SPRITE_MEDIUM,$5 + 4,$9 + 4,$ff,$d0,$42,CHANNELER + $C8,$14 ; trainer
-    db SPRITE_MEDIUM,$5 + 4,$10 + 4,$ff,$d2,$43,CHANNELER + $C8,$15 ; trainer
+    db SPRITE_MEDIUM,$a + 4,$c + 4,$ff,$d3,$41,CHANNELER + $C8,$b ; trainer
+    db SPRITE_MEDIUM,$5 + 4,$9 + 4,$ff,$d0,$42,CHANNELER + $C8,$c ; trainer
+    db SPRITE_MEDIUM,$5 + 4,$10 + 4,$ff,$d2,$43,CHANNELER + $C8,$d ; trainer
     db SPRITE_BALL,$8 + 4,$6 + 4,$ff,$ff,$84,RARE_CANDY ; item
     db SPRITE_BALL,$e + 4,$e + 4,$ff,$ff,$85,X_ACCURACY ; item
 
@@ -91545,8 +91545,8 @@ SilphCo11Object: ; 0x62380 (size=72)
     db SPRITE_MR_MASTERBALL,$5 + 4,$7 + 4,$ff,$d0,$1 ; person
     db SPRITE_FOULARD_WOMAN,$5 + 4,$a + 4,$ff,$d0,$2 ; person
     db SPRITE_GIOVANNI,$9 + 4,$6 + 4,$ff,$d0,$43,GIOVANNI + $C8,$2 ; trainer
-    db SPRITE_ROCKET,$10 + 4,$3 + 4,$ff,$d1,$44,ROCKET + $C8,$29 ; trainer
-    db SPRITE_ROCKET,$9 + 4,$f + 4,$ff,$d1,$45,ROCKET + $C8,$28 ; trainer
+    db SPRITE_ROCKET,$10 + 4,$3 + 4,$ff,$d1,$44,ROCKET + $C8,$28 ; trainer
+    db SPRITE_ROCKET,$9 + 4,$f + 4,$ff,$d1,$45,ROCKET + $C8,$27 ; trainer
 
     ; warp-to
     EVENT_DISP $9,$0,$9 ; SILPH_CO_10F
@@ -98893,11 +98893,11 @@ ViridianGymObject: ; 0x74bde (size=105)
 
     db $b ; people
     db SPRITE_GIOVANNI,$1 + 4,$2 + 4,$ff,$d0,$41,GIOVANNI + $C8,$3 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$c + 4,$ff,$d0,$42,COOLTRAINER_M + $C8,$9 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$c + 4,$ff,$d0,$42,COOLTRAINER_M + $C8,$5 ; trainer
     db SPRITE_HIKER,$b + 4,$b + 4,$ff,$d1,$43,BLACKBELT + $C8,$6 ; trainer
     db SPRITE_ROCKER,$7 + 4,$a + 4,$ff,$d0,$44,TAMER + $C8,$3 ; trainer
     db SPRITE_HIKER,$7 + 4,$3 + 4,$ff,$d2,$45,BLACKBELT + $C8,$7 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$5 + 4,$d + 4,$ff,$d3,$46,COOLTRAINER_M + $C8,$a ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$5 + 4,$d + 4,$ff,$d3,$46,COOLTRAINER_M + $C8,$6 ; trainer
     db SPRITE_HIKER,$1 + 4,$a + 4,$ff,$d0,$47,BLACKBELT + $C8,$8 ; trainer
     db SPRITE_ROCKER,$10 + 4,$2 + 4,$ff,$d3,$48,TAMER + $C8,$4 ; trainer
     db SPRITE_BLACK_HAIR_BOY_1,$5 + 4,$6 + 4,$ff,$d0,$49,COOLTRAINER_M + $C8,$1 ; trainer
@@ -100230,9 +100230,9 @@ FuchsiaGymObject: ; 0x75658 (size=82)
 
     db $8 ; people
     db SPRITE_BLACKBELT,$a + 4,$4 + 4,$ff,$d0,$41,KOGA + $C8,$1 ; trainer
-    db SPRITE_ROCKER,$d + 4,$8 + 4,$ff,$d0,$42,JUGGLER + $C8,$7 ; trainer
+    db SPRITE_ROCKER,$d + 4,$8 + 4,$ff,$d0,$42,JUGGLER + $C8,$6 ; trainer
     db SPRITE_ROCKER,$8 + 4,$7 + 4,$ff,$d3,$43,JUGGLER + $C8,$3 ; trainer
-    db SPRITE_ROCKER,$c + 4,$1 + 4,$ff,$d0,$44,JUGGLER + $C8,$8 ; trainer
+    db SPRITE_ROCKER,$c + 4,$1 + 4,$ff,$d0,$44,JUGGLER + $C8,$7 ; trainer
     db SPRITE_ROCKER,$5 + 4,$3 + 4,$ff,$d1,$45,TAMER + $C8,$1 ; trainer
     db SPRITE_ROCKER,$2 + 4,$8 + 4,$ff,$d0,$46,TAMER + $C8,$2 ; trainer
     db SPRITE_ROCKER,$7 + 4,$2 + 4,$ff,$d2,$47,JUGGLER + $C8,$4 ; trainer
@@ -100792,13 +100792,13 @@ CinnabarGymObject: ; 0x75acc (size=90)
 
     db $9 ; people
     db SPRITE_FAT_BALD_GUY,$3 + 4,$3 + 4,$ff,$d0,$41,BLAINE + $C8,$1 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$2 + 4,$11 + 4,$ff,$d0,$42,SUPER_NERD + $C8,$9 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$11 + 4,$ff,$d0,$43,BURGLAR + $C8,$4 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$b + 4,$ff,$d0,$44,SUPER_NERD + $C8,$a ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$b + 4,$ff,$d0,$45,BURGLAR + $C8,$5 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$e + 4,$b + 4,$ff,$d0,$46,SUPER_NERD + $C8,$b ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$e + 4,$3 + 4,$ff,$d0,$47,BURGLAR + $C8,$6 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$3 + 4,$ff,$d0,$48,SUPER_NERD + $C8,$c ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$2 + 4,$11 + 4,$ff,$d0,$42,SUPER_NERD + $C8,$6 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$11 + 4,$ff,$d0,$43,BURGLAR + $C8,$1 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$b + 4,$ff,$d0,$44,SUPER_NERD + $C8,$7 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$b + 4,$ff,$d0,$45,BURGLAR + $C8,$2 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$e + 4,$b + 4,$ff,$d0,$46,SUPER_NERD + $C8,$8 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$e + 4,$3 + 4,$ff,$d0,$47,BURGLAR + $C8,$3 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$3 + 4,$ff,$d0,$48,SUPER_NERD + $C8,$9 ; trainer
     db SPRITE_GYM_HELPER,$d + 4,$10 + 4,$ff,$d0,$9 ; person
 
     ; warp-to
