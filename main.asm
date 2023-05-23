@@ -187,6 +187,11 @@ PostVBlankHandler:
     call RoutineForRealGB
     ret
 
+FakeGiveItem:
+    ld a,b
+    ld [$d11e],a
+    jp HackForGetItemName
+
 SECTION "RoutineForRealGB",ROM0[$0F5] ; Denim
 
 RoutineForRealGB:
@@ -10509,6 +10514,7 @@ GiveItem: ; 3e2e (0:3e2e)
     ld hl,wNumBagItems
     call AddItemToInventory
     ret nc
+HackForGetItemName:
     call GetItemName ; $2fcf
     call CopyStringToCF4B
     scf
@@ -11056,16 +11062,10 @@ ENDC
     db $41,$42,$43,$42,$44,$42,$45,$46,$47,$48,$49,$4A,$4B,$4C,$4D,$4E ; ©'95.'96.'98 GAME FREAK inc.
 
 .asm_438f
-    call SaveScreenTilesToBuffer2
+    call PrintDenimVersionAndSaveScreenTilesToBuffer2 ; call SaveScreenTilesToBuffer2
     call LoadScreenTilesFromBuffer2
     call EnableLCD
-IF _RED
-    ld a,DRATINI ; ld a,CHARMANDER ; which Pokemon to show first on the title screen
-ENDC
-IF _BLUE
-    ld a,SQUIRTLE ; which Pokemon to show first on the title screen
-ENDC
-
+    ld a,DRATINI ; which Pokemon to show first on the title screen
     ld [wWhichTrade],a ; $cd3d
     call Func_4524
     ld a,$9b
@@ -18460,6 +18460,21 @@ IsTryingToLearnPalFix_End:
     ret z
     call LoadScreenTilesFromBuffer1
     jp GoPAL_SET_CF1C
+
+PrintDenimVersionAndSaveScreenTilesToBuffer2:
+    FuncCoord 12,0
+    ld hl,Coord
+    ld de,.Version
+    ld b,8
+.Loop
+    ld a,[de]
+    ld [hli],a
+    inc de
+    dec b
+    jr nz,.Loop
+    jp SaveScreenTilesToBuffer2
+.Version
+    db "0.31.001"
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -40180,8 +40195,7 @@ Route16HouseText1: ; 1e5ff (7:65ff)
     ld hl,Route16HouseText3
     call PrintText
     ld bc,(HM_02 << 8) | 1
-    scf ; call GiveItem
-    ds 2
+    call FakeGiveItem
     jr nc,.BagFull
     ld hl,$d7e0
     set 6,[hl]
@@ -70969,8 +70983,7 @@ SafariZoneSecretHouseText1: ; 4a31c (12:631c)
     ld hl,UnnamedText_4a350
     call PrintText
     ld bc,(HM_03 << 8) | 1
-    scf ; call GiveItem
-    ds 2
+    call FakeGiveItem
     jr nc,.BagFull
     ld hl,ReceivedHM03Text
     call PrintText
@@ -83975,9 +83988,8 @@ GuardDrinksList: ; 5a5b7 (16:65b7)
 
 GiveItemNotPower:
     cp HM_05
-    jp nz,GiveItem
-    scf
-    ret
+    jp z,FakeGiveItem
+    jp GiveItem
 
 SECTION "bank17",ROMX,BANK[$17]
 
@@ -90243,8 +90255,7 @@ SSAnne7Text1: ; 618ad (18:58ad)
     ld hl,ReceivingHM01Text
     call PrintText
     ld bc,(HM_01 << 8) | 1
-    scf ; call GiveItem
-    ds 2
+    call FakeGiveItem
     jr nc,.BagFull
     ld hl,ReceivedHM01Text
     call PrintText
@@ -99449,8 +99460,7 @@ FuchsiaHouse2Text1: ; 750c2 (1d:50c2)
     ld hl,WardenThankYouText
     call PrintText
     ld bc,(HM_04 << 8) | 1
-    scf ; call GiveItem
-    ds 2
+    call FakeGiveItem
     jr nc,.BagFull
     ld hl,ReceivedHM04Text
     call PrintText
