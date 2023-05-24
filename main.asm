@@ -18474,7 +18474,7 @@ PrintDenimVersionAndSaveScreenTilesToBuffer2:
     jr nz,.Loop
     jp SaveScreenTilesToBuffer2
 .Version
-    db "0.31.001"
+    db "0.31.002"
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -95737,7 +95737,7 @@ SECTION "Func_71fb6",ROMX[$5fb6],BANK[$1C]
 Func_71fb6: ; 71fb6 (1c:5fb6)
     ld hl,Unknown_722f4 ; $62f4
     ld de,$cf2e
-    ld bc,$30 + 6 ; Denim ; Aggiunti Byte al Pacchetto Unknown_722f4
+    ld bc,$30
     jp CopyData
 
 Func_71fc2: ; 71fc2 (1c:5fc2)
@@ -96170,8 +96170,8 @@ Unknown_722f4: ; 722f4 (1c:62f4)
 ;INCBIN "baserom.gbc",$722f4,$72360 - $722f4
 
 ;BlkPacket_722f4: ; 722f4 (1c:62f4) ; Denim,spostata palette errata nel menu party
-    db $23 + 1
-    db $07 + 1
+    db $23
+    db $07
 
     db $07,%00010000 ; MiniSprite
     db $01,$00,$02,$0b ; db $01,$00,$02,$0c
@@ -96194,15 +96194,7 @@ Unknown_722f4: ; 722f4 (1c:62f4)
     db $02,$05 ; 6th Pkmn Hp Bar
     db $0C,$0b,$12,$0b
 
-    db $02,$00 ; HeldItem
-    db $03,$01,$03,$0B
-
-    ds $40 - 6
-
-Unknown_Command:
-;    db $00,$00,$00,$00,$02,$00,$00,$11,$01,$03,$01,$00,$02,$0c,$00,$03,$01,$0d,$02,$11,$01,$03,$03,$00,$13,$11,$01,$03,$0c,$00,$12
-;    db $01,$00,$03,$0c,$02,$12,$03,$00,$03,$0c,$04,$12,$05,$00,$03,$0c,$06,$12,$07,$00,$03,$0c,$08,$12,$09,$00,$03
-;    db $0c,$0a,$12,$0b,$00,$00
+SECTION "Unknown_72360",ROMX[$6360],BANK[$1c]
 
 Unknown_72360: ; 72360 (1c:6360)
 INCBIN "baserom.gbc",$72360,$723dd - $72360
