@@ -1401,17 +1401,17 @@ Mon084_EvosMoves:
 ;Learnset
     ;   1,PECK
     ;   1,GROWL
-    db 10,STOMP
-    db 13,FURY_ATTACK
-    db 18,QUICK_ATTACK
-    db 21,SCREECH
+    db 10,FURY_ATTACK
+    db 13,QUICK_ATTACK
+    db 18,SCREECH
+    db 21,STOMP
     db 25,RAGE
     db 30,DRILL_PECK
     ;  31,DODRIO
     db 37,AGILITY
     db 42,HAZE
-    db 46,DOUBLE_EDGE
-    db 50,DOUBLE_TEAM
+    db 46,DOUBLE_TEAM
+    db 53,DOUBLE_EDGE
     db 0
 
 Mon085_EvosMoves:
@@ -1422,8 +1422,8 @@ Mon085_EvosMoves:
     ;  31,TRI_ATTACK
     db 34,AGILITY
     db 42,HAZE
-    db 46,DOUBLE_EDGE
-    db 50,DOUBLE_TEAM
+    db 46,DOUBLE_TEAM
+    db 53,DOUBLE_EDGE
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -2417,9 +2417,8 @@ Mon132_EvosMoves:
     db 0
 ;Learnset
     ;   1,TRANSFORM
-    db 15,MINIMIZE
-    db 20,CONVERSION
-    db 35,MIMIC
+    db 30,CONVERSION
+    db 40,MIMIC
     db 50,MIRROR_MOVE
     db 0
 
