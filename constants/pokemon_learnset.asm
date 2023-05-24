@@ -1379,9 +1379,9 @@ Mon083_EvosMoves:
 ;Learnset
     ;   1,PECK
     ;   1,SAND_ATTACK
-    db  7,LEER
-    db  9,GUST
-    db 11,BLADE
+    db  7,BLADE
+    db  9,LEER
+    db 11,GUST
     db 15,FURY_ATTACK
     db 23,SWORDS_DANCE
     db 31,AGILITY

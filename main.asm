@@ -111496,7 +111496,7 @@ UnnamedText_80177: ; 80177 (20:4177)
     db $0,$4f
     db "kinds of #MON,",$55
     db "I'm supposed to",$55
-    db "give you an",$55
+    db "give you a ",$55
     db "@"
     TX_RAM $cc5b
     db $0,"!",$51
@@ -126874,13 +126874,13 @@ MoonMonsB2:
 Route4Mons:
     db $14
     db 10,RATTATA   ; 20%
-    db 10,SPEAROW   ; 20%
+    db 10,MANKEY    ; 20%
     db  8,RATTATA   ; 15%
     db  6,EKANS     ; 10% ; Entry Level
-    db  8,SPEAROW   ; 10%
+    db  8,MANKEY    ; 10%
     db  6,SANDSHREW ; 10%
     db 10,SANDSHREW ;  5%
-    db 13,SPEAROW   ;  5%
+    db 13,MANKEY    ;  5%
     db  8,EKANS     ;  4%
     db 13,EKANS     ;  1%
     db $00
@@ -126915,30 +126915,30 @@ Route25Mons:
 
 Route5Mons:
     db $0F
-    db 13,ODDISH     ; 20%
-    db 13,BELLSPROUT ; 20%
-    db 15,MANKEY     ; 15%
-    db 12,MANKEY     ; 10%
-    db 16,ODDISH     ; 10%
-    db 16,BELLSPROUT ; 10%
-    db  9,FARFETCH_D ;  5% ; Entry Level
+    db 13,MEOWTH     ; 20%
+    db 15,PIDGEY     ; 20%
+    db 13,PONYTA     ; 15%
+    db 11,PONYTA     ; 10% ; Entry Level
+    db 17,MEOWTH     ; 10%
+    db 17,PIDGEY     ; 10%
+    db 19,MEOWTH     ;  5%
     db 19,PIDGEOTTO  ;  5%
-    db 16,MANKEY     ;  4%
-    db 12,FARFETCH_D ;  1%
+    db 16,PONYTA     ;  4%
+    db 10,TAUROS     ;  1% ; Entry Level
     db $00
 
 Route6Mons:
     db $0F
-    db 13,ODDISH     ; 20%
-    db 13,BELLSPROUT ; 20%
-    db 16,MEOWTH     ; 15%
-    db 12,MEOWTH     ; 10%
-    db 16,ODDISH     ; 10%
-    db 16,BELLSPROUT ; 10%
-    db 12,PSYDUCK    ;  5% ; Entry Level
-    db 19,PIDGEOTTO  ;  5%
-    db 16,MEOWTH     ;  4%
-    db 14,PSYDUCK    ;  1%
+    db 12,ODDISH     ; 20%
+    db 12,BELLSPROUT ; 20%
+    db  9,FARFETCH_D ; 15% ; Entry Level
+    db 11,POLIWAG    ; 10%
+    db 15,ODDISH     ; 10%
+    db 15,BELLSPROUT ; 10%
+    db 11,PSYDUCK    ;  5% ; Entry Level
+    db 11,FARFETCH_D ;  5%
+    db 13,POLIWAG    ;  4%
+    db 13,PSYDUCK    ;  1%
     db $00
 
 Route11Mons:
@@ -126986,13 +126986,13 @@ Route9Mons:
 Route10Mons:
     db $0F
     db 12,VOLTORB   ; 20% ; Entry Level
-    db 17,DIGLETT   ; 20%
+    db 16,VOLTORB   ; 20%
     db 13,VOLTORB   ; 15%
     db 11,GRIMER    ; 10% ; Entry Level
-    db 16,DIGLETT   ; 10%
+    db 18,VOLTORB   ; 10%
     db 12,MAGNEMITE ; 10% ; Entry Level
     db 13,KOFFING   ;  5% ; Entry Level
-    db 13,MAGNEMITE ;  5%
+    db 15,MAGNEMITE ;  5%
     db 15,GRIMER    ;  4%
     db 18,KOFFING   ;  1%
     db $00
@@ -127247,14 +127247,14 @@ ZoneMons1:
     db $1E
     db 17,PONYTA  ; 20%
     db 20,DODUO   ; 20%
-    db 13,PONYTA  ; 15% ; Entry Level
+    db 16,PONYTA  ; 15%
     db 20,PONYTA  ; 10%
     db 17,DODUO   ; 10% ; Entry Level
     db 16,RHYHORN ; 10%
     db 22,DODUO   ;  5%
     db 12,RHYHORN ;  5% ; Entry Level
-    db 31,TAUROS  ;  4%
-    db  2,TAUROS  ;  1% ; Entry Level
+    db 20,RHYHORN ;  4%
+    db 31,TAUROS  ;  1%
     db $00
 
 ZoneMons2:
@@ -127279,9 +127279,9 @@ ZoneMons3:
     db 19,EXEGGCUTE ; 10%
     db 11,EXEGGCUTE ; 10% ; Entry Level
     db 18,TANGELA   ; 10%
-    db 12,EEVEE     ;  5% ; Entry Level
     db 27,LICKITUNG ;  5%
-    db  2,LICKITUNG ;  4% ; Entry Level
+    db 12,EEVEE     ;  5% ; Entry Level
+    db 15,EEVEE     ;  4%
     db  7,CHANSEY   ;  1% ; Entry Level
     db $00
 
