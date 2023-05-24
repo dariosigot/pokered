@@ -29475,8 +29475,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call GBPalWhiteOutWithDelay3
     jp .goBackToMap
 .teleport
-    call CheckIfInOutsideMap
-    jr z,.canTeleport
+    call CheckIfInCavernMap
+    jr nz,.canTeleport
     ld a,[$cf92]
     ld hl,W_PARTYMON1NAME
     call GetPartyMonName
@@ -30855,6 +30855,25 @@ UsableItems_CloseMenu:
     db GOOD_ROD
     db SUPER_ROD
     db $ff
+
+; If Cavern set z
+CheckIfInCavernMap:
+    ld a,[W_CURMAPTILESET]
+    ld b,a
+    ld hl,.EscapeRopeTilesets
+.loop
+    ld a,[hli]
+    cp a,$ff
+    jr z,.notInCavern
+    cp b
+    jr nz,.loop
+    ret ; Set Z
+.notInCavern
+    dec a ; Reset Z
+    ret
+.EscapeRopeTilesets
+    db $03,$0f,$11,$16,$10
+    db $ff ; terminator
 
 SECTION "bank5",ROMX,BANK[$5]
 
