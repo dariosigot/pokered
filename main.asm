@@ -29475,7 +29475,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call GBPalWhiteOutWithDelay3
     jp .goBackToMap
 .teleport
-    call CheckIfInCavernMap
+    call CheckIfTeleportNotAllowed
     jr nz,.canTeleport
     ld a,[$cf92]
     ld hl,W_PARTYMON1NAME
@@ -30856,20 +30856,29 @@ UsableItems_CloseMenu:
     db SUPER_ROD
     db $ff
 
-; If Cavern set z
-CheckIfInCavernMap:
+; If Not Allowed Set z
+CheckIfTeleportNotAllowed:
+    ld a,[W_CURMAP]
+    cp a,LORELEIS_ROOM
+    ret z ; Set z
+    cp a,BRUNOS_ROOM
+    ret z ; Set z
+    cp a,AGATHAS_ROOM
+    ret z ; Set z
+    cp a,LANCES_ROOM
+    ret z ; Set z
     ld a,[W_CURMAPTILESET]
     ld b,a
     ld hl,.EscapeRopeTilesets
 .loop
     ld a,[hli]
     cp a,$ff
-    jr z,.notInCavern
+    jr z,.Allowed
     cp b
     jr nz,.loop
-    ret ; Set Z
-.notInCavern
-    dec a ; Reset Z
+    ret ; Set z
+.Allowed
+    dec a ; Reset z
     ret
 .EscapeRopeTilesets
     db $03,$0f,$11,$16,$10
