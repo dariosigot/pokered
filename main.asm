@@ -30858,29 +30858,31 @@ UsableItems_CloseMenu:
 
 ; If Not Allowed Set z
 CheckIfTeleportNotAllowed:
-    ld a,[W_CURMAP]
-    cp a,LORELEIS_ROOM
-    ret z ; Set z
-    cp a,BRUNOS_ROOM
-    ret z ; Set z
-    cp a,AGATHAS_ROOM
-    ret z ; Set z
-    cp a,LANCES_ROOM
-    ret z ; Set z
     ld a,[W_CURMAPTILESET]
+    ld hl,.TilesetNotAllowed
+    call .CheckList
+    ld a,[W_CURMAP]
+    ld hl,.MapNotAllowed
+    call .CheckList
+    dec a ; Reset z ; Allowed
+    ret
+.CheckList
     ld b,a
-    ld hl,.EscapeRopeTilesets
-.loop
+.Loop
     ld a,[hli]
     cp a,$ff
-    jr z,.Allowed
+    ret z
     cp b
-    jr nz,.loop
-    ret ; Set z
-.Allowed
-    dec a ; Reset z
-    ret
-.EscapeRopeTilesets
+    jr nz,.Loop
+    pop hl ; Delete Return Pointer
+    ret ; Set z ; Not Allowed
+.MapNotAllowed
+    db BATTLE_CENTER,TRADE_CENTER
+    db LORELEIS_ROOM,BRUNOS_ROOM,AGATHAS_ROOM,LANCES_ROOM
+    db SS_ANNE_1,SS_ANNE_2,SS_ANNE_3,SS_ANNE_4,SS_ANNE_5,SS_ANNE_6,SS_ANNE_7,SS_ANNE_8,SS_ANNE_9,SS_ANNE_10,DRATINI_CAVE
+    db SAFARI_ZONE_REST_HOUSE_1,SAFARI_ZONE_REST_HOUSE_2,SAFARI_ZONE_REST_HOUSE_3,SAFARI_ZONE_REST_HOUSE_4,SAFARI_ZONE_SECRET_HOUSE
+    db $ff ; terminator
+.TilesetNotAllowed ; same as escape rope
     db $03,$0f,$11,$16,$10
     db $ff ; terminator
 
