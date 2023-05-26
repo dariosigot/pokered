@@ -34481,7 +34481,6 @@ FuchsiaCityText10: ; 19a72 (6:5a72)
     TX_FAR _FuchsiaCityText5
     db "@"
 
-FuchsiaCityText12: ; 19a77 (6:5a77)
 FuchsiaCityText11: ; 19a77 (6:5a77)
     TX_FAR _FuchsiaCityText11
     db "@"
@@ -36141,6 +36140,10 @@ FuchsiaCityObject: ; 0x18bd4 (size=178)
     EVENT_DISP $14,$d,$16 ; FUCHSIAMEETINGROOM
     EVENT_DISP $14,$1b,$1f ; FUCHSIA_HOUSE_3
     EVENT_DISP $14,$18,$1f ; FUCHSIA_HOUSE_3
+
+FuchsiaCityText12:
+    TX_FAR _FuchsiaCityText12
+    db "@"
 
 SECTION "bank7",ROMX,BANK[$7]
 
@@ -124535,6 +124538,11 @@ _FuchsiaCityText11:
     db $0,"To access it",$4f
     db "is necessary",$55
     db "to overcome Fear!",$57
+
+_FuchsiaCityText12:
+    db $0,"FUCHSIA CITY",$4f
+    db "Behold! It's",$55
+    db "Passion Pink!",$57
 
 SECTION "bank2A",ROMX,BANK[$2A]
 
