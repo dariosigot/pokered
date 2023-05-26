@@ -94031,7 +94031,7 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
 .pressedUp
     ld a,[wWhichTrade] ; $cd3d
     inc a
-    cp TownMapOrderEnd - TownMapOrder ; number of list items + 1
+    cp TownMapOrderEnd-TownMapOrder ; number of list items + 1
     jr nz,.noOverflow
     xor a
 .noOverflow
@@ -94042,7 +94042,7 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
     dec a
     cp -1
     jr nz,.noUnderflow
-    ld a, TownMapOrderEnd - TownMapOrder - 1 ; number of list items
+    ld a,TownMapOrderEnd-TownMapOrder-1 ; number of list items
 .noUnderflow
     ld [wWhichTrade],a ; $cd3d
     jp .townMapLoop
@@ -125506,20 +125506,43 @@ GetFieldMovesRulesByte:
     ret
 
 SelectInOverWorld:
+    ld a,$35
+    call Predef ; Update Next Tile
+    ;unsets carry if player is facing water or shore
+    ld b,BANK(IsNextTileShoreOrWater)
+    ld hl,IsNextTileShoreOrWater
+    call Bankswitch
+    jr c,.NoFishing
+    ld hl,TilePairCollisionsWater
+    call CheckForTilePairCollisions
+    jr c,.NoFishing
+    ;are rods in the bag?
+    ld b,SUPER_ROD
+    call .IsItemInBag
+    jr nz,.Continue
+    ld b,GOOD_ROD
+    call .IsItemInBag
+    jr nz,.Continue
+    ld b,OLD_ROD
+    call .IsItemInBag
+    jr nz,.Continue
+.NoFishing
     ld b,BICYCLE
-    call IsItemInBag
+    call .IsItemInBag
     jr z,.return
     ld a,[$d732]
     bit 5,a
     jr nz,.return
 .Continue
+    push bc
     ; initialize a text box without drawing anything special
     ld a,1
     ld [$cf0c],a
     ld b,BANK(DisplayTextIDInit)
     ld hl,DisplayTextIDInit ; initialization
     call Bankswitch
-    ld a,BICYCLE
+    pop bc
+    ld a,b
     ld [$cf91],a ; load item to be used
     ld [$d11e],a ; load item so its name can be grabbed
     call GetItemName ; get the item name into de register
@@ -125531,6 +125554,11 @@ SelectInOverWorld:
     call DisplayTextID
 .return
     jp OverworldLoop
+.IsItemInBag
+    push bc
+    call IsItemInBag
+    pop bc
+    ret
 
 LoadHeldItemAndShinyStarIcon:
     ld de,HeldItemIcon
