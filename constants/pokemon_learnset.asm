@@ -193,9 +193,9 @@ Mon012_EvosMoves:
     db 13,POISONPOWDER
     db 14,STUN_SPORE
     db 15,SLEEP_POWDER
-    db 18,SUPERSONIC
-    db 23,WHIRLWIND
-    db 28,GUST
+    db 18,GUST
+    db 23,SUPERSONIC
+    db 28,WHIRLWIND
     db 31,PSYBEAM
     db 40,RAZOR_WIND
     db 44,SPORE
