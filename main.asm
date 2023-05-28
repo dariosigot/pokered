@@ -12079,7 +12079,7 @@ PickupItem: ; 4de1 (1:4de1)
     ld a,[hl]        ; read Item type
     ld b,a
     ld c,1          ; quantity is 1
-    call GiveItem
+    call GetQtyAndGiveItem ; call GiveItem
     jr nc,.BagFull
     ld a,[$FF00+$db]
     ld [$cc4d],a
@@ -18475,6 +18475,39 @@ PrintDenimVersionAndSaveScreenTilesToBuffer2:
     jp SaveScreenTilesToBuffer2
 .Version
     db "0.31.101"
+
+GetQtyAndGiveItem:
+    push bc
+    ld hl,TmQtyTable
+    ld de,2
+    call IsInArray
+    pop bc
+    jr nc,.skip
+    inc hl
+    ld c,[hl]
+.skip
+    jp GiveItem
+
+TmQtyTable:
+    db TRADE_STONE,4
+    db TM_03,2 ; SWORDS_DANCE
+    db TM_04,3 ; WHIRLWIND
+    db TM_08,2 ; BODY_SLAM
+    db TM_10,3 ; DOUBLE_EDGE
+    db TM_12,4 ; WATER_GUN
+    db TM_14,2 ; BLIZZARD
+    db TM_16,3 ; PAY_DAY
+    db TM_19,3 ; SEISMIC_TOSS
+    db TM_20,3 ; RAGE
+    db TM_22,2 ; SOLARBEAM
+    db TM_25,2 ; THUNDER
+    db TM_26,2 ; EARTHQUAKE
+    db TM_30,3 ; TELEPORT
+    db TM_40,3 ; SKULL_BASH
+    db TM_43,2 ; SKY_ATTACK
+    db TM_44,3 ; REST
+    db TM_45,2 ; THUNDER_WAVE
+    db $ff
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -33164,7 +33197,7 @@ ViridianCityText6: ; 19196 (6:5196)
     jr nz,.asm_4e5a0 ; 0x1919c
     ld hl,UnnamedText_191ca
     call PrintText
-    ld bc,(TM_42 << 8) | 1
+    ld bc,(TM_42 << 8) | 2
     call GiveItem
     jr nc,.BagFull
     ld hl,ReceivedTM42Text
@@ -33872,7 +33905,7 @@ CeruleanCityText2: ; 1967c (6:567c)
 .asm_4ca20 ; 0x196ad
     ld hl,UnnamedText_196f3
     call PrintText
-    ld bc,$e401
+    ld bc,(TM_28 << 8) | 2
     call GiveItem
     jr c,.Success
     ld hl,TM28NoRoomText
@@ -39318,7 +39351,7 @@ SaffronHouse2Text1: ; 1de41 (7:5e41)
     jr nz,.asm_9e72b ; 0x1de47
     ld hl,TM29PreReceiveText
     call PrintText
-    ld bc,(TM_46 << 8) | 1
+    ld bc,(TM_46 << 8) | 3
     call GiveItem
     jr nc,.BagFull
     ld hl,ReceivedTM29Text
@@ -51809,7 +51842,7 @@ CheckandResetEnemyActedBit:
     bit 1,a ;check a for already-acted bit (sets or clears zero flag)
     res 1,a ; resets the already-acted bit (does not affect flags)
     ld [wUnusedC000], a
-    ret 
+    ret
 
 ;joenote - function for setting the AI's already-acted bit
 SetEnemyActedBit:
@@ -54190,7 +54223,7 @@ HandleEnemySwitchingOrUsingAnItemAndThenExecutePlayerMove:
     ld hl,TrainerAI
     ld b,BANK(TrainerAI)
     call Bankswitch
-    call c,SetEnemyActedBit ;if carry was set from TrainerAI, set the bit indicating the ai trainer switched or used an item  
+    call c,SetEnemyActedBit ;if carry was set from TrainerAI, set the bit indicating the ai trainer switched or used an item
     jp ExecutePlayerMove ; execute player move ;note: this function writes zero to H_WHOSETURN
 
 ResetBattleFlagAndLoadCurrentOpponent:
@@ -58225,13 +58258,13 @@ PlayBattleMusicAndDoBattleTransitionAndInitBatVar:
 ;move-choosing ai routines now check for the no-attack bit and kick out if found
 ;used so only ai switching checks can run
 NoAttackAICall:
-    push af	;preserve flags on stack
+    push af ;preserve flags on stack
     ld a,[W_ISINBATTLE]
     dec a
     jr z,.NoAttackAICall_exit ; exit if this is a wild encounter
     ;set the no-attack bit
     ld a,[wUnusedC000]
-    set 2,a 
+    set 2,a
     ld [wUnusedC000],a
     ;call ai routines
     ld b,BANK(AIEnemyTrainerChooseMoves)
@@ -58239,7 +58272,7 @@ NoAttackAICall:
     call Bankswitch
     ;joenote - reset the no-attack bit
     ld a,[wUnusedC000]
-    res 2,a 
+    res 2,a
     ld [wUnusedC000],a
 .NoAttackAICall_exit
     pop af ;get flags from stack
@@ -58252,7 +58285,7 @@ CheckTrappingMoveAndSetEnemyActedBitAndLoadHl:
     bit USING_TRAPPING_MOVE, a
     jr z,.preparewithdraw
     ld hl,W_ENEMYBATTSTATUS1
-    res USING_TRAPPING_MOVE,[hl] 
+    res USING_TRAPPING_MOVE,[hl]
     ld a,$FF
     ld [wEnemySelectedMove],a
     call SetEnemyActedBit
@@ -66875,7 +66908,7 @@ CeladonMart3Text1: ; 4824a (12:424a)
     jr nz,.asm_a5463 ; 0x48250
     ld hl,TM18PreReceiveText
     call PrintText
-    ld bc,(TM_18 << 8) | 1
+    ld bc,(TM_18 << 8) | 3
     call GiveItem
     jr nc,.BagFull
     ld hl,$d778
@@ -67144,7 +67177,7 @@ CeladonMartRoofScript_4840c: ; 4840c (12:440c)
     ld hl,UnnamedText_48515 ; $4515
     call PrintText
     call RemoveItemByIDBank12
-    ld bc,(TM_49 << 8) | 1
+    ld bc,(TM_49 << 8) | 3
     call GiveItem
     jr nc,.BagFull
     ld hl,ReceivedTM49Text ; $451b
@@ -67159,7 +67192,7 @@ CeladonMartRoofScript_4840c: ; 4840c (12:440c)
     ld hl,UnnamedText_48504 ; $4504
     call PrintText
     call RemoveItemByIDBank12
-    ld bc,(TM_48 << 8) | 1
+    ld bc,(TM_48 << 8) | 2
     call GiveItem
     jr nc,.BagFull
     ld hl,UnnamedText_4850a ; $450a
@@ -67174,7 +67207,7 @@ CeladonMartRoofScript_4840c: ; 4840c (12:440c)
     ld hl,UnnamedText_484f3 ; $44f3
     call PrintText
     call RemoveItemByIDBank12
-    ld bc,(TM_13 << 8) | 1
+    ld bc,(TM_13 << 8) | 2
     call GiveItem
     jr nc,.BagFull
     ld hl,UnnamedText_484f9 ; $44f9
@@ -67810,7 +67843,7 @@ Func_48963: ; 48963 (12:4963)
     call DisplayTextID
     ld hl,$d77c
     set 1,[hl]
-    ld bc,(TM_21 << 8) | 1
+    ld bc,(TM_21 << 8) | 3
     call GiveItem
     jr nc,.BagFull
     ld a,$a
@@ -69392,7 +69425,7 @@ Route12GateUpstairsText1: ; 49569 (12:5569)
     jr c,.asm_0ad3c ; 0x4956e
     ld hl,TM39PreReceiveText
     call PrintText
-    ld bc,(TM_39 << 8) | 1
+    ld bc,(TM_39 << 8) | 3
     call GiveItem
     jr nc,.BagFull
     ld hl,ReceivedTM39Text
@@ -84342,7 +84375,7 @@ Func_5c3df: ; 5c3df (17:43df)
     call DisplayTextID
     ld hl,$d755
     set 7,[hl]
-    ld bc,(TM_34 << 8) | 1
+    ld bc,(TM_34 << 8) | 3
     call GiveItem
     jr nc,.BagFull
     ld a,$5
@@ -84758,7 +84791,7 @@ Func_5c70d: ; 5c70d (17:470d)
     call DisplayTextID
     ld hl,$d75e
     set 7,[hl]
-    ld bc,(TM_11 << 8) | 1
+    ld bc,(TM_11 << 8) | 3
     call GiveItem
     jr nc,.BagFull
     ld a,$6
@@ -85271,7 +85304,7 @@ Func_5caaa: ; 5caaa (17:4aaa)
     call DisplayTextID
     ld hl,$d773
     set 7,[hl]
-    ld bc,(TM_24 << 8) | 1
+    ld bc,(TM_24 << 8) | 2
     call GiveItem
     jr nc,.BagFull
     ld a,$7
@@ -85529,7 +85562,7 @@ CopycatsHouseF2Text1: ; 5cc82 (17:4c82)
     jr z,.asm_62ecd ; 0x5cc9a
     ld hl,TM31PreReceiveText
     call PrintText
-    ld bc,(TM_31 << 8) | 1
+    ld bc,(TM_31 << 8) | 3
     call GiveItem
     jr nc,.BagFull
     ld hl,ReceivedTM31Text
@@ -86055,7 +86088,7 @@ Func_5d068: ; 5d068 (17:5068)
     call DisplayTextID
     ld hl,$d7b3
     set 1,[hl]
-    ld bc,(TM_29 << 8) | 1
+    ld bc,(TM_29 << 8) | 2
     call GiveItem
     jr nc,.BagFull
     ld a,$b
@@ -99788,7 +99821,7 @@ FuchsiaGymScript3_75497: ; 75497 (1d:5497)
     call DisplayTextID
     ld hl,$d792
     set 1,[hl]
-    ld bc,(TM_06 << 8) | 1
+    ld bc,(TM_06 << 8) | 2
     call GiveItem
     jr nc,.BagFull
     ld a,$a
@@ -100807,7 +100840,7 @@ Lab3Text1: ; 75c94 (1d:5c94)
     jr nz,.asm_e551a ; 0x75c9a
     ld hl,TM35PreReceiveText
     call PrintText
-    ld bc,(TM_35 << 8) | 1
+    ld bc,(TM_35 << 8) | 2
     call GiveItem
     jr nc,.BagFull
     ld hl,ReceivedTM35Text
@@ -126067,56 +126100,56 @@ ItemNames: ; 472b (1:472b)
     db "WATER POWER@"  ; $C6
     db "EARTH POWER@"  ; $C7
     db "FIRE POWER@"   ; $C8
-    db "TM:M. PUNCH@"  ; $C9
-    db "TM:RAZ. WIND@" ; $CA
-    db "TM:SW. DANCE@" ; $CB
-    db "TM:WHIRLWIND@" ; $CC
-    db "TM:MEGA KICK@" ; $CD
-    db "TM:TOXIC@"     ; $CE
-    db "TM:HORN DR.@"  ; $CF
-    db "TM:BODY SLAM@" ; $D0
-    db "TM:TAKE DOWN@" ; $D1
-    db "TM:DBL EDGE@"  ; $D2
-    db "TM:BUBBLEB.@"  ; $D3
-    db "TM:WATER GUN@" ; $D4
-    db "TM:ICE BEAM@"  ; $D5
-    db "TM:BLIZZARD@"  ; $D6
-    db "TM:HYPER B.@"  ; $D7
-    db "TM:PAY DAY@"   ; $D8
-    db "TM:SUBMISS.@"  ; $D9
-    db "TM:COUNTER@"   ; $DA
-    db "TM:SSM TOSS@"  ; $DB
-    db "TM:RAGE@"      ; $DC
-    db "TM:M. DRAIN@"  ; $DD
-    db "TM:SOLARBEAM@" ; $DE
-    db "TM:DRG RAGE@"  ; $DF
-    db "TM:THUNDERB.@" ; $E0
-    db "TM:THUNDER@"   ; $E1
-    db "TM:EARTHQ.@"   ; $E2
-    db "TM:FISSURE@"   ; $E3
-    db "TM:DIG@"       ; $E4
-    db "TM:PSYCHIC@"   ; $E5
-    db "TM:TELEPORT@"  ; $E6
-    db "TM:MIMIC@"     ; $E7
-    db "TM:DBL TEAM@"  ; $E8
-    db "TM:REFLECT@"   ; $E9
-    db "TM:BIDE@"      ; $EA
-    db "TM:METRONOME@" ; $EB
-    db "TM:SELFDSTR@"  ; $EC
-    db "TM:EGG BOMB@"  ; $ED
-    db "TM:FIRE BLST@" ; $EE
-    db "TM:SWIFT@"     ; $EF
-    db "TM:SKULL B.@"  ; $F0
-    db "TM:SOFTBOIL.@" ; $F1
-    db "TM:DREAM EAT@" ; $F2
-    db "TM:SKY ATK@"   ; $F3
-    db "TM:REST@"      ; $F4
-    db "TM:THNDR WV@"  ; $F5
-    db "TM:PSYWAVE@"   ; $F6
-    db "TM:EXPLOSION@" ; $F7
-    db "TM:RCK SLIDE@" ; $F8
-    db "TM:TRI ATK@"   ; $F9
-    db "TM:SUBSTIT.@"  ; $FA
+    db "TM:M. PUNCH@"  ; $C9 ; TM_01 ; Market
+    db "TM:RAZ. WIND@" ; $CA ; TM_02 ; Market
+    db "TM:SW. DANCE@" ; $CB ; TM_03
+    db "TM:WHIRLWIND@" ; $CC ; TM_04
+    db "TM:MEGA KICK@" ; $CD ; TM_05 ; Market
+    db "TM:TOXIC@"     ; $CE ; TM_06
+    db "TM:HORN DR.@"  ; $CF ; TM_07 ; Market
+    db "TM:BODY SLAM@" ; $D0 ; TM_08
+    db "TM:TAKE DOWN@" ; $D1 ; TM_09 ; Market
+    db "TM:DBL EDGE@"  ; $D2 ; TM_10
+    db "TM:BUBBLEB.@"  ; $D3 ; TM_11
+    db "TM:WATER GUN@" ; $D4 ; TM_12
+    db "TM:ICE BEAM@"  ; $D5 ; TM_13
+    db "TM:BLIZZARD@"  ; $D6 ; TM_14
+    db "TM:HYPER B.@"  ; $D7 ; TM_15
+    db "TM:PAY DAY@"   ; $D8 ; TM_16
+    db "TM:SUBMISS.@"  ; $D9 ; TM_17 ; Market
+    db "TM:COUNTER@"   ; $DA ; TM_18
+    db "TM:SSM TOSS@"  ; $DB ; TM_19
+    db "TM:RAGE@"      ; $DC ; TM_20
+    db "TM:M. DRAIN@"  ; $DD ; TM_21
+    db "TM:SOLARBEAM@" ; $DE ; TM_22
+    db "TM:DRG RAGE@"  ; $DF ; TM_23
+    db "TM:THUNDERB.@" ; $E0 ; TM_24
+    db "TM:THUNDER@"   ; $E1 ; TM_25
+    db "TM:EARTHQ.@"   ; $E2 ; TM_26
+    db "TM:FISSURE@"   ; $E3 ; TM_27
+    db "TM:DIG@"       ; $E4 ; TM_28
+    db "TM:PSYCHIC@"   ; $E5 ; TM_29
+    db "TM:TELEPORT@"  ; $E6 ; TM_30
+    db "TM:MIMIC@"     ; $E7 ; TM_31
+    db "TM:DBL TEAM@"  ; $E8 ; TM_32 ; Market
+    db "TM:REFLECT@"   ; $E9 ; TM_33 ; Market
+    db "TM:BIDE@"      ; $EA ; TM_34
+    db "TM:METRONOME@" ; $EB ; TM_35
+    db "TM:SELFDSTR@"  ; $EC ; TM_36
+    db "TM:EGG BOMB@"  ; $ED ; TM_37 ; Market
+    db "TM:FIRE BLST@" ; $EE ; TM_38
+    db "TM:SWIFT@"     ; $EF ; TM_39
+    db "TM:SKULL B.@"  ; $F0 ; TM_40
+    db "TM:SOFTBOIL.@" ; $F1 ; TM_41
+    db "TM:DREAM EAT@" ; $F2 ; TM_42
+    db "TM:SKY ATK@"   ; $F3 ; TM_43
+    db "TM:REST@"      ; $F4 ; TM_44
+    db "TM:THNDR WV@"  ; $F5 ; TM_45
+    db "TM:PSYWAVE@"   ; $F6 ; TM_46
+    db "TM:EXPLOSION@" ; $F7 ; TM_47
+    db "TM:RCK SLIDE@" ; $F8 ; TM_48
+    db "TM:TRI ATK@"   ; $F9 ; TM_49
+    db "TM:SUBSTIT.@"  ; $FA ; TM_50
     db "TM:BLADE@"     ; $FB
     db "TM:SWOOP@"     ; $FC
     db "TM:TSUNAMI@"   ; $FD
