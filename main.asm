@@ -2545,7 +2545,7 @@ RunMapScript: ; 101b (0:101b)
     ld l,a
     ld de,.return
     push de
-    jp [hl] ; jump to script
+    jp hl ; jump to script
 .return
     ret
 
@@ -4446,7 +4446,7 @@ NextTextCommand: ; 1b55 (0:1b55)
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    jp [hl]
+    jp hl
 
 ; draw box
 ; 04AAAABBCC
@@ -4584,7 +4584,7 @@ TextCommand08: ; 1bf9 (0:1bf9)
     pop hl
     ld de,NextTextCommand
     push de ; return address
-    jp [hl]
+    jp hl
 
 ; print decimal number (converted from binary number)
 ; 09AAAABB
@@ -8913,7 +8913,7 @@ Bankswitch: ; 35d6 (0:35d6)
     call RoutineForRealGB
     ld bc,.Return
     push bc
-    jp [hl]
+    jp hl
 .Return
     pop bc
     ld a,b
@@ -10393,7 +10393,7 @@ CallFunctionInTable: ; 3d97 (0:3d97)
     ld l,a
     ld de,.returnAddress
     push de
-    jp [hl]
+    jp hl
 .returnAddress
     pop bc
     pop de
@@ -10568,7 +10568,7 @@ Predef: ; 3e6d (0:3e6d)
     call RoutineForRealGB
     ld de,.Return
     push de
-    jp [hl]
+    jp hl
     ; after the predefined function finishes it returns here
 .Return
     pop af
@@ -10616,7 +10616,7 @@ Func_3eb5: ; 3eb5 (0:3eb5)
     ld [H_LOADEDROMBANK],a
     ld de,$3eda
     push de
-    jp [hl]
+    jp hl
     xor a
     jr .asm_3eec
 .asm_3edd
@@ -13262,7 +13262,7 @@ Func_551c:
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    jp [hl]
+    jp hl
 
 Func_5530
     call ClearScreen
@@ -15358,7 +15358,7 @@ LoadRenameScreen: ; 6596 (1:6596)
     ld h,[hl]
     ld l,a
     push de
-    jp [hl]
+    jp hl
 .asm_662d
     pop de
     ld hl,$cf4b
@@ -17067,7 +17067,7 @@ DisplayTextBoxID_: ; 72ea (1:72ea)
     ld l,a ; hl = address of function
     ld de,.done
     push de
-    jp [hl] ; jump to the function
+    jp hl ; jump to the function
 .coordTableMatch
     call GetTextBoxIDCoords
     call GetAddressOfScreenCoords
@@ -21368,7 +21368,7 @@ Func_c3ff: ; c3ff (3:43ff)
     ld c,a
     ld de,.asm_c41e ; $441e
     push de
-    jp [hl]
+    jp hl
 .asm_c41e
     pop bc
     pop de
@@ -22837,7 +22837,7 @@ UseItem_: ; d5c7 (3:55c7)
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    jp [hl]
+    jp hl
 
 ItemUsePtrTable: ; d5e1 (3:55e1)
     dw ItemUseBall       ; MASTER_BALL
@@ -29419,7 +29419,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld h,[hl]
     ld l,a
     ld a,[W_OBTAINEDBADGES] ; badges obtained
-    jp [hl]
+    jp hl
 .outOfBattleMovePointers
     dw .cut
     dw .fly
@@ -45602,7 +45602,7 @@ Func_37588: ; 37588 (d:7588)
     pop hl
     ld de,.asm_37638
     push de
-    jp [hl]
+    jp hl
 
 .asm_37638
     ld a,[$ff47]
@@ -47211,7 +47211,7 @@ TrainerAI:
     ld h,[hl]
     ld l,a
     call GenRandom
-    jp [hl]
+    jp hl
 
 TrainerAIPointers:
 ; one entry per trainer class
@@ -52027,7 +52027,7 @@ ExecutePlayerMove: ; 3d65e (f:565e)
     jp z,Func_3d80a
     call Func_3d854
     jr nz,.asm_3d68a
-    jp [hl]
+    jp hl
 .asm_3d68a
     call GetCurrentMove
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
@@ -54484,7 +54484,7 @@ ExecuteEnemyMove: ; 3e6bc (f:66bc)
     ld [$d05b],a
     call Func_3e88f
     jr nz,.asm_3e6f2
-    jp [hl]
+    jp hl
 .asm_3e6f2
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     bit 4,[hl]
@@ -55931,7 +55931,7 @@ JumpMoveEffect: ; 3f138 (f:7138)
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    jp [hl]       ;jump to special effect handler
+    jp hl       ;jump to special effect handler
 
 MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3f1fc
@@ -60469,7 +60469,7 @@ Func_41102: ; 41102 (10:5102)
     ld l,a
     ld de,.asm_41115 ; $5115
     push de
-    jp [hl]
+    jp hl
 .asm_4112d
     pop af
     ld [$FF00+$ae],a
@@ -93023,7 +93023,7 @@ Func_7096d: ; 7096d (1c:496d)
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    jp [hl]
+    jp hl
 
 PointerTable_709d2: ; 709d2 (1c:49d2)
     dw Func_70d24
@@ -95365,7 +95365,7 @@ Func_71ddf: ; 71ddf (1c:5ddf)
     ld l,a
     ld de,Func_72156
     push de
-    jp [hl]
+    jp hl
 
 Func_71dff: ; 71dff (1c:5dff)
     ld hl,PalPacket_72448
@@ -102683,7 +102683,7 @@ PlayAnimation: ; 780f1 (1e:40f1)
     ld h,a
     ld de,.nextAnimationCommand
     push de
-    jp [hl] ; jump to special effect function
+    jp hl ; jump to special effect function
 .playSubanimation
     ld c,a
     and a,%00111111
@@ -102925,7 +102925,7 @@ Func_78dbd: ; 78dbd (1e:4dbd)
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    jp [hl]
+    jp hl
 
 PointerTable_78dcf: ; 78dcf (1e:4dcf)
     dw Func_78ddb
@@ -103116,7 +103116,7 @@ DoSpecialEffectByAnimationId: ; 78ed7 (1e:4ed7)
     ld l,a
     ld de,.done
     push de
-    jp [hl]
+    jp hl
 .done
     pop bc
     pop de
@@ -103561,7 +103561,7 @@ CallWithTurnFlipped: ; 79155 (1e:5155)
     ld [H_WHOSETURN],a
     ld de,.returnAddress
     push de
-    jp [hl]
+    jp hl
 .returnAddress
     pop af
     ld [H_WHOSETURN],a
@@ -105458,7 +105458,7 @@ Func_79f54: ; 79f54 (1e:5f54)
     ld bc,$5f7e
     push bc
     ld c,$4
-    jp [hl]
+    jp hl
     ld a,[rOBP1] ; $FF00+$49
     xor $64
     ld [rOBP1],a ; $FF00+$49
@@ -125550,7 +125550,7 @@ _HackItemInBattle:
     ld l,a
     ld a,[W_ISINBATTLE]
     and a
-    jp [hl]
+    jp hl
 .End
     ret
 .Step1:
@@ -128203,7 +128203,7 @@ AIEnemyTrainerChooseMoves:
     ld l,a
     ld de,.nextMoveChoiceModification  ; set return address
     push de
-    jp [hl]       ; execute modification function
+    jp hl       ; execute modification function
 .loopFindMinimumEntries ; all entries will be decremented sequentially until one of them is zero
     ld hl,$cee9  ; temp move selection array
     ld de,W_ENEMYMONMOVES  ; enemy moves
