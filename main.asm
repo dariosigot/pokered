@@ -32120,8 +32120,8 @@ SubstituteEffectHandler: ; 17dad (5:7dad)
     call Bankswitch           ;jump to routine depending on animation setting
     ld hl,UnnamedText_17e1d  ;"it created a substitute"
     call PrintText
-    ld hl,Func_3cd5a
-    ld b,BANK(Func_3cd5a)
+    ld hl,DrawHUDsAndHPBars
+    ld b,BANK(DrawHUDsAndHPBars)
     jp Bankswitch
 .alreadyHasSubstitute
     ld hl,UnnamedText_17e22  ;"x has a substitute"
@@ -47104,14 +47104,6 @@ ReadTrainer: ; 39c53 (e:5c53)
     jr nz,.LastLoop
     ret
 
-BlaineAI:
-    cp $40
-    ret nc
-    ld a,$A
-    call Func_3a7cf
-    ret nc
-    jp AIUseSuperPotion
-
 GoPalSetBattleAndLoadText:
     ld b,1
     call GoPAL_SET
@@ -47132,9 +47124,16 @@ SECTION "TrainerDataPointers",ROMX[$5d3b],BANK[$e]
 
 INCLUDE "constants/TrainerData.asm"
 
-SECTION "TrainerAI",ROMX[$652e],BANK[$e]
+;joenote - added these functions to check if the ai switching bit is set
+;need to have 'a' accumulator and flag register freed up to use this function
+CheckandResetSwitchBit:
+    ld a,[wUnusedC000]
+    bit 0,a    ;check a for switch pkmn bit (sets or clears zero flag)
+    res 0,a ; resets the switch pkmn bit (does not affect flags)
+    ld [wUnusedC000],a
+    ret
 
-TrainerAI: ; 3a52e (e:652e)
+TrainerAI:
 ;XXX called at 34964,3c342,3c398
     and a
     ld a,[W_ISINBATTLE]
@@ -47143,6 +47142,20 @@ TrainerAI: ; 3a52e (e:652e)
     ld a,[W_ISLINKBATTLE]
     cp 4
     ret z
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - AI should not use actions if in a move that prevents such a thing
+    ld a,[W_ENEMYBATTSTATUS2]
+    and %01100000
+    ret nz
+    ld a,[W_ENEMYBATTSTATUS1]
+    and %01110011
+    ret nz
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - switch if the switch bit is set
+    call CheckandResetSwitchBit
+    jp nz,AISwitchIfEnoughMons    ;switch if bit was initially set
+    ;jp AISwitchIfEnoughMons    ;joedebug - use this to make trainer ai constantly switch
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld a,[W_TRAINERCLASS] ; what trainer class is this?
     dec a
     ld c,a
@@ -47167,7 +47180,7 @@ TrainerAI: ; 3a52e (e:652e)
     call GenRandom
     jp [hl]
 
-TrainerAIPointers: ; 3a55c (e:655c)
+TrainerAIPointers:
 ; one entry per trainer class
 ; first byte,number of times (per Pokémon) it can occur
 ; next two bytes,pointer to AI subroutine for trainer class
@@ -47219,67 +47232,166 @@ TrainerAIPointers: ; 3a55c (e:655c)
     dbw 2,AgathaAI ; agatha
     dbw 1,LanceAI ; lance
 
-JugglerAI: ; 3a5e9 (e:65e9)
-    cp $40
-    ret nc
-    jp Func_3a72a
+;joenote - reorganizing these AI routines to jump on carry instead of returning on not-carry
+;also adding recognition of a switch-pkmn bit
 
-BlackbeltAI: ; 3a5ef (e:65ef)
+JugglerAI:
+    cp $40
+    jp c,AISwitchIfEnoughMons
+    ret
+
+BlackbeltAI:
+    cp $20
+    jp c,AIUseXAttack
+    ret
+
+GiovanniAI:    ;joenote - uses dire hit now,but only if it's not active
     cp $20
     ret nc
-    jp AIUseXAttack
+    ld a,[W_ENEMYBATTSTATUS2]
+    and %00000100
+    ret z
+    jp AIUseDireHit
 
-GiovanniAI: ; 3a5f5 (e:65f5)
-    cp $40
+CooltrainerMAI:    ;joenote - changed item to x-special and guard spec
+    cp $20
     ret nc
+    cp $10
+    jr c,.xspec
+    ld a,[W_ENEMYBATTSTATUS2]
+    and %00000010
+    jr nz,.gspec
+.xspec
+    jp AIUseXSpecial
+.gspec
     jp AIUseGuardSpec
 
-CooltrainerMAI: ; 3a5fb (e:65fb)
-    cp $40
+CooltrainerFAI: ;joenote - uses x-special and x-accuracy now
+    cp $20
     ret nc
-    jp AIUseXAttack
+    cp $10
+    jr c,.xspec
+    ld a,[W_ENEMYBATTSTATUS2]
+    and %00000001
+    jr nz,.xaccy
+.xspec
+    jp AIUseXSpecial
+.xaccy
+    jp AIUseXAccuracy
 
-CooltrainerFAI: ; 3a601 (e:6601)
-    cp $40
-    ld a,$A
-    call Func_3a7cf
-    jp c,AIUseHyperPotion
-    ld a,5
-    call Func_3a7cf
-    ret nc
-    jp Func_3a72a
-
-BrockAI: ; 3a614 (e:6614)
+BrockAI:
 ; if his active monster has a status condition,use a full heal
     ld a,[W_ENEMYMONSTATUS]
     and a
-    ret z
-    jp AIUseFullHeal
+    jp nz,AIUseFullHeal
+    ret
 
-MistyAI: ; 3a61c (e:661c)
-    cp $40
-    ret nc
-    jp AIUseXDefend
+MistyAI:
+    cp $20
+    jp c,AIUseXDefend
+    ret
 
-LtSurgeAI: ; 3a622 (e:6622)
-    cp $40
-    ret nc
-    jp AIUseXSpeed
+LtSurgeAI:
+    cp $20
+    jp c,AIUseXSpeed
+    ret
 
-ErikaAI: ; 3a628 (e:6628)
+ErikaAI:
     cp $80
-    ret nc
+    jr nc,.erikareturn
     ld a,$A
-    call Func_3a7cf
-    ret nc
-    jp AIUseSuperPotion
+    call AICheckIfHPBelowFraction
+    jp c,AIUseSuperPotion
+.erikareturn
+    ret
 
-KogaAI: ; 3a634 (e:6634)
-    cp $40
-    ret nc
-    jp AIUseXAttack
+KogaAI:
+    cp $20
+    jp c,AIUseXAttack
+    ret
 
-BlaineAI_Old:
+BlaineAI:    ;blaine needs to check HP. this was an oversight
+    cp $20
+    jr nc,.blainereturn
+    ld a,$A
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
+.blainereturn
+    ret
+
+SabrinaAI:
+    cp $20
+    jr nc,.sabrinareturn
+    ld a,$A
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+.sabrinareturn
+    ret
+
+Sony2AI:
+    cp $20
+    jr nc,.rival2return
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUsePotion
+.rival2return
+    ret
+
+Sony3AI:
+    cp $40    ;joenote - doubled the chance of use
+    jr nc,.rival3return
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseFullRestore
+.rival3return
+    ret
+
+LoreleiAI:
+    cp $80
+    jr nc,.loreleireturn
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
+.loreleireturn
+    ret
+
+;joenote - changed to hyper potion like other e4 members
+BrunoAI:
+;    cp $40
+;    jp c,AIUseXDefend
+    cp $80
+    jr nc,.brunoreturn
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+.brunoreturn
+    ret
+
+AgathaAI:
+;    cp $14
+;    jp c,AISwitchIfEnoughMons
+    cp $80
+    jr nc,.agathareturn
+    ld a,5    ;joenote - upped to 5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
+.agathareturn
+    ret
+
+LanceAI:
+    cp $80
+    jr nc,.lancereturn
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+.lancereturn
+    ret
+
+GenericAI:
+    and a ; clear carry
+    ret
+
+; end of individual trainer AI routines
 
 SetAttributeOamRedBall:
     ld [hli],a
@@ -47287,68 +47399,7 @@ SetAttributeOamRedBall:
     ld [hli],a
     ret
 
-SECTION "SabrinaAI",ROMX[$6640],BANK[$e]
-
-SabrinaAI: ; 3a640 (e:6640)
-    cp $40
-    ret nc
-    ld a,$A
-    call Func_3a7cf
-    ret nc
-    jp AIUseHyperPotion
-
-Sony2AI: ; 3a64c (e:664c)
-    cp $20
-    ret nc
-    ld a,5
-    call Func_3a7cf
-    ret nc
-    jp AIUsePotion
-
-Sony3AI: ; 3a658 (e:6658)
-    cp $20
-    ret nc
-    ld a,5
-    call Func_3a7cf
-    ret nc
-    jp AIUseFullRestore
-
-LoreleiAI: ; 3a664 (e:6664)
-    cp $80
-    ret nc
-    ld a,5
-    call Func_3a7cf
-    ret nc
-    jp AIUseSuperPotion
-
-BrunoAI: ; 3a670 (e:6670)
-    cp $40
-    ret nc
-    jp AIUseXDefend
-
-AgathaAI: ; 3a676 (e:6676)
-    cp $14
-    jp c,Func_3a72a
-    cp $80
-    ret nc
-    ld a,4
-    call Func_3a7cf
-    ret nc
-    jp AIUseSuperPotion
-
-LanceAI: ; 3a687 (e:6687)
-    cp $80
-    ret nc
-    ld a,5
-    call Func_3a7cf
-    ret nc
-    jp AIUseHyperPotion
-
-GenericAI: ; 3a693 (e:6693)
-    and a ; clear carry
-    ret
-
-; end of individual trainer AI routines
+SECTION "DecrementAICount",ROMX[$6695],BANK[$e]
 
 DecrementAICount: ; 3a695 (e:6695)
     ld hl,wAICount
@@ -47453,7 +47504,7 @@ Func_3a718: ; 3a718 (e:6718)
     call Predef
     jp DecrementAICount
 
-Func_3a72a: ; 3a72a (e:672a)
+AISwitchIfEnoughMons: ; 3a72a (e:672a)
     ld a,[wEnemyPartyCount]
     ld c,a
     ld hl,W_ENEMYMON1HP
@@ -47478,11 +47529,11 @@ Func_3a72a: ; 3a72a (e:672a)
 
     ld a,d ; how many available monsters are there?
     cp 2 ; don't bother if only 1 or 2
-    jp nc,Func_3a74b
+    jp nc,SwitchEnemyMon
     and a
     ret
 
-Func_3a74b: ; 3a74b (e:674b)
+SwitchEnemyMon: ; 3a74b (e:674b)
 
 ; prepare to withdraw the active monster: copy hp,number,and status to roster
 
@@ -47557,30 +47608,35 @@ AIUseDireHit: ; 0x3a7c2 unused
     ld a,DIRE_HIT
     jp AIPrintItemUse
 
-Func_3a7cf: ; 3a7cf (e:67cf)
-    ld [H_DIVISOR],a
-    ld hl,$CFF4
-    ld a,[hli]
-    ld [H_DIVIDEND],a
-    ld a,[hl]
-    ld [H_DIVIDEND + 1],a
-    ld b,2
-    call Divide
-    ld a,[H_QUOTIENT + 3]
-    ld c,a
-    ld a,[H_QUOTIENT + 2]
-    ld b,a
-    ld hl,$CFE7
-    ld a,[hld]
+AICheckIfHPBelowFraction: ; 3a7cf (e:67cf)
+    push hl
+    push bc
+    push de
     ld e,a
-    ld a,[hl]
-    ld d,a
-    ld a,d
-    sub b
-    ret nz
-    ld a,e
-    sub c
+    ld b,BANK(_AICheckIfHPBelowFraction)
+    ld hl,_AICheckIfHPBelowFraction
+    call Bankswitch
+    pop de
+    pop bc
+    pop hl
     ret
+
+;joenote - takes move in d,returns its power in d and type in e
+ReadMoveForAIscoring:
+    dec d
+    ld a,d
+    ld hl,Moves
+    ld bc,6
+    call AddNTimes
+    inc hl
+    inc hl ;point to move power
+    ld a,[hli]
+    ld d,a    ;store power in d
+    ld a,[hl]
+    ld e,a ;store type in e
+    ret
+
+SECTION "AIUseXAttack",ROMX[$67f2],BANK[$e]
 
 AIUseXAttack: ; 3a7f2 (e:67f2)
     ld b,$A
@@ -48635,7 +48691,7 @@ Func_3b9ec: ; Moved Upper in the Bank
     ld [wListMenuID],a ; $cf94
     ld a,$48
     call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
-    ld hl,Func_3cd5a ; $4d5a
+    ld hl,DrawHUDsAndHPBars ; $4d5a
     call BankswitchEtoF
     ld hl,UnnamedText_3baac ; $7aac
     jp PrintText
@@ -49000,7 +49056,7 @@ Func_3c110: ; 3c110 (f:4110)
     jr z,.asm_3c118
     ret
 
-Func_3c11e: ; 3c11e (f:411e)
+StartBattle: ; 3c11e (f:411e)
     xor a
     ld [W_PLAYERMONSALIVEFLAGS],a
     ld [$ccf5],a
@@ -49154,7 +49210,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     ld hl,$cfe6
     ld a,[hli]
     or [hl]
-    jp z,Func_3c525
+    jp z,HandleEnemyMonFainted
     call SaveScreenTilesToBuffer1
     xor a
     ld [$d11d],a
@@ -49197,7 +49253,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     call MoveSelectionMenu
     push af
     call LoadScreenTilesFromBuffer1
-    call Func_3cd5a
+    call DrawHUDsAndHPBars
     pop af
     jr nz,MainInBattleLoop
 .asm_3c2a6
@@ -49227,8 +49283,8 @@ MainInBattleLoop: ; 3c233 (f:4233)
     jr nz,.asm_3c2dd ; 0x3c2d8 $3
     ld [wPlayerSelectedMove],a
 .asm_3c2dd
-    ld hl,Func_3a74b
-    ld b,BANK(Func_3a74b)
+    ld hl,SwitchEnemyMon
+    ld b,BANK(SwitchEnemyMon)
     call Bankswitch
 .noLinkBattle
     ld a,[wPlayerSelectedMove]
@@ -49281,59 +49337,69 @@ MainInBattleLoop: ; 3c233 (f:4233)
     ld b,BANK(TrainerAI)
     call Bankswitch
     jr c,.AIActionUsedEnemyFirst
-    call Func_3e6bc ; execute enemy move
+    call ExecuteEnemyMove ; execute enemy move
     ld a,[$d078]
-    and a
+    and a ; was Teleport, Road, or Whirlwind used to escape from battle?
     ret nz
     ld a,b
     and a
     jp z,HandlePlayerMonFainted
 .AIActionUsedEnemyFirst
     call HandlePoisonBurnLeechSeed
-    jp z,Func_3c525
-    call Func_3cd5a
-    call Func_3d65e ; execute player move
-    ld a,[$d078]
+    jp z,HandleEnemyMonFainted
+    call DrawHUDsAndHPBars
+    call ExecutePlayerMove ; execute player move
+    ld a,[$d078] ; was Teleport, Road, or Whirlwind used to escape from battle?
     and a
     ret nz
     ld a,b
     and a
-    jp z,Func_3c525
+    jp z,HandleEnemyMonFainted
     call HandlePoisonBurnLeechSeed
     jp z,HandlePlayerMonFainted
-    call Func_3cd5a
-    call Func_3c50f
+    call DrawHUDsAndHPBars
+    call CheckNumAttacksLeft
     jp MainInBattleLoop
 .playerMovesFirst
-    call Func_3d65e ; execute player move
+;#1 - handle enemy switching or using an item
+    call HandleEnemySwitchingOrUsingAnItemAndThenExecutePlayerMove ; call ExecutePlayerMove ; execute player move ;note: this function writes zero to H_WHOSETURN
+;#2 - handle player using a move
     ld a,[$d078]
-    and a
+    and a ; was Teleport, Road, or Whirlwind used to escape from battle?
     ret nz
     ld a,b
     and a
-    jp z,Func_3c525
+    push af
+    call z,CheckandResetEnemyActedBit ;reset enemy acted bit if enemy pkmn fainted
+    pop af
+    jp z,HandleEnemyMonFainted
     call HandlePoisonBurnLeechSeed
     jp z,HandlePlayerMonFainted
-    call Func_3cd5a
+    call DrawHUDsAndHPBars
+;#3 - handle enemy using move
     ld a,$1
     ld [H_WHOSETURN],a
-    ld hl,TrainerAI
-    ld b,BANK(TrainerAI)
-    call Bankswitch
-    jr c,.AIActionUsedPlayerFirst
-    call Func_3e6bc ; execute enemy move
+    ;ld hl,TrainerAI
+    ;ld b,BANK(TrainerAI)
+    ;call Bankswitch
+    call CheckandResetEnemyActedBit ;check to see if ai trainer already acted this turn
+    jr nz,.AIActionUsedPlayerFirst
+    ;else execute the enemy move
+    call ExecuteEnemyMove ; execute enemy move
     ld a,[$d078]
-    and a
+    and a ; was Teleport, Road, or Whirlwind used to escape from battle?
     ret nz
     ld a,b
     and a
     jp z,HandlePlayerMonFainted
 .AIActionUsedPlayerFirst
     call HandlePoisonBurnLeechSeed
-    jp z,Func_3c525
-    call Func_3cd5a
-    call Func_3c50f
+    jp z,HandleEnemyMonFainted
+    call DrawHUDsAndHPBars
+    call CheckNumAttacksLeft
     jp MainInBattleLoop
+
+SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
 
 HandlePoisonBurnLeechSeed: ; 3c3bd (f:43bd)
     ld hl,W_PLAYERMONCURHP ; $d015
@@ -49393,7 +49459,7 @@ HandlePoisonBurnLeechSeed: ; 3c3bd (f:43bd)
     ld a,[hli]
     or [hl]
     ret nz          ; test if fainted
-    call Func_3cd5a
+    call DrawHUDsAndHPBars
     ld c,$14
     call DelayFrames
     xor a
@@ -49550,7 +49616,7 @@ UpdateCurMonHPBar: ; 3c4f6 (f:44f6)
     pop bc
     ret
 
-Func_3c50f: ; 3c50f (f:450f)
+CheckNumAttacksLeft: ; 3c50f (f:450f)
     ld a,[$d06a]
     and a
     jr nz,.asm_3c51a
@@ -49564,7 +49630,7 @@ Func_3c50f: ; 3c50f (f:450f)
     res 5,[hl]
     ret
 
-Func_3c525: ; 3c525 (f:4525)
+HandleEnemyMonFainted: ; 3c525 (f:4525)
     xor a
     ld [$ccf0],a
     call FaintEnemyPokemon
@@ -50154,26 +50220,19 @@ Func_3c92a: ; 3c92a (f:492a)
     sub 4
     ld [$CF92],a
     jr .next3
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;AI trainer switching & sendout is handled in this block
 .next
-    ld b,$FF
-.next2
-    inc b
-    ld a,[$CFE8]
-    cp b
-    jr z,.next2
-    ld hl,$D8A4
-    ld a,b
-    ld [$CF92],a
-    push bc
-    ld bc,$2C
-    call AddNTimes
-    pop bc
-    inc hl
-    ld a,[hli]
-    ld c,a
-    ld a,[hl]
-    or c
-    jr z,.next2
+    ld b,BANK(AISelectWhichMonSendOut)
+    ld hl,AISelectWhichMonSendOut
+    call Bankswitch
+    push de
+    ld de,wWhichPokemon
+    ld b,BANK(SetAISwitched)
+    ld hl,SetAISwitched
+    call Bankswitch ;joenote - flag the pokemon being sent out
+    pop de
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .next3
     ld a,[$CF92]
     ld hl,$D8C5
@@ -50278,7 +50337,9 @@ Func_3c92a: ; 3c92a (f:492a)
     ld [W_PLAYERMONSALIVEFLAGS],a
     ld [$CCF5],a
     call SaveScreenTilesToBuffer1
-    jp Func_3d1ba
+    jp SwitchPlayerMon
+
+SECTION "TrainerAboutToUseText",ROMX[$4a79],BANK[$f]
 
 TrainerAboutToUseText: ; 3ca79 (f:4a79)
     TX_FAR _TrainerAboutToUseText
@@ -50647,7 +50708,7 @@ ReadPlayerMonCurHPAndStatus: ; 3cd43 (f:4d43)
     ld bc,$4               ; 2 bytes HP,1 byte unknown (unused?),1 byte status
     jp CopyData
 
-Func_3cd5a: ; 3cd5a (f:4d5a)
+DrawHUDsAndHPBars: ; 3cd5a (f:4d5a)
     call Func_3cd60
     jp Func_3cdec
 
@@ -50849,7 +50910,7 @@ InitBattleMenu: ; 3ceb3 (f:4eb3)
     ld a,[W_BATTLETYPE] ; $d05a
     and a
     jr nz,.nonstandardbattle
-    call Func_3cd5a ; redraw names and HP bars?
+    call DrawHUDsAndHPBars ; redraw names and HP bars?
     call Func_3ee94
     call SaveScreenTilesToBuffer1
 .nonstandardbattle
@@ -51034,7 +51095,7 @@ asm_3d00e: ; 3d00e (f:500e)
     ld a,[W_BATTLETYPE] ; $d05a
     and a
     jr nz,.asm_3d01a
-    call Func_3cd5a
+    call DrawHUDsAndHPBars
 .asm_3d01a
     ld a,[W_BATTLETYPE] ; $d05a
     dec a
@@ -51103,7 +51164,7 @@ asm_3d05f: ; 3d05f (f:505f)
     cp $2
     jr z,.asm_3d0b2
     call LoadScreenTilesFromBuffer1
-    call Func_3cd5a ; redraw name and hp bar?
+    call DrawHUDsAndHPBars ; redraw name and hp bar?
     call GoPalSetAndDelay3BankF ; call Delay3
 .asm_3d0b2
     call GBPalNormal
@@ -51237,10 +51298,10 @@ Func_3d119: ; 3d119 (f:5119)
     call GoPAL_SET_CF1C
     call GBPalNormal
 
-Func_3d1ba: ; 3d1ba (f:51ba)
-    ld hl,Func_58ed1
-    ld b,BANK(Func_58ed1)
-    call Bankswitch ; indirect jump to Func_58ed1 (58ed1 (16:4ed1))
+SwitchPlayerMon: ; 3d1ba (f:51ba) ;joedebug - this is where the player switches
+    call CheckTrappingMoveAndSetEnemyActedBitAndLoadHl ; ld hl,RetreatMon
+    ld b,BANK(RetreatMon)
+    call Bankswitch ; indirect jump to RetreatMon (58ed1 (16:4ed1))
     ld c,$32
     call DelayFrames
     call Func_3ccfa
@@ -51742,6 +51803,21 @@ Func_3d4b6: ; 3d4b6 (f:54b6)
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     jp Delay3
 
+;joenote - function for checking and reseting the AI's already-acted bit
+CheckandResetEnemyActedBit:
+    ld a,[wUnusedC000]
+    bit 1,a ;check a for already-acted bit (sets or clears zero flag)
+    res 1,a ; resets the already-acted bit (does not affect flags)
+    ld [wUnusedC000], a
+    ret 
+
+;joenote - function for setting the AI's already-acted bit
+SetEnemyActedBit:
+    ld a,[wUnusedC000]
+    set 1,a ; sets the already-acted bit
+    ld [wUnusedC000], a
+    ret
+
 SECTION "DisabledText",ROMX[$5555],BANK[$F]
 
 DisabledText: ; 3d555 (f:5555)
@@ -51782,6 +51858,9 @@ SelectEnemyMove: ; 3d564 (f:5564)
     ret nz
     ld a,[W_ENEMYMONSTATUS]
     and SLP | FRZ ; sleeping or frozen
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    call nz,NoAttackAICall ;joenote - get ai routines. flag register is preserved
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ret nz
     ld a,[W_ENEMYBATTSTATUS1]
     and $21      ; using fly/dig or thrash/petal dance
@@ -51790,6 +51869,9 @@ SelectEnemyMove: ; 3d564 (f:5564)
     bit 5,a    ; caught in player's multi-turn move (e.g. wrap)
     jr z,.notCaughtInWrap
 .unableToMove
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    call nz,NoAttackAICall ;joenote - get ai routines. flag register is preserved
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld a,$ff
     jr .done
 .notCaughtInWrap
@@ -51802,9 +51884,9 @@ SelectEnemyMove: ; 3d564 (f:5564)
     ld a,STRUGGLE ; struggle if the only move is disabled
     jr nz,.done
 .atLeastTwoMovesAvailable
-    ld a,[W_ISINBATTLE]
-    dec a
-    jr z,.chooseRandomMove ; wild encounter
+    ;ld a,[W_ISINBATTLE]
+    ;dec a
+    ;jr z,.chooseRandomMove ; wild encounter
     ld hl,AIEnemyTrainerChooseMoves
     ld b,BANK(AIEnemyTrainerChooseMoves)
     call Bankswitch
@@ -51893,7 +51975,7 @@ Func_3d605: ; 3d605 (f:5605)
     jr nz,.asm_3d654
     ret
 
-Func_3d65e: ; 3d65e (f:565e)
+ExecutePlayerMove: ; 3d65e (f:565e)
     xor a
     ld [H_WHOSETURN],a ; $FF00+$f3
     ld a,[wPlayerSelectedMove] ; $ccdc
@@ -53564,7 +53646,7 @@ ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
     ld a,$48
     call Predef ; animate the HP bar shortening
 ApplyAttackToEnemyPokemonDone: ; 3e19d (f:619d)
-    jp RemoveDiplayedDamageAndFunc_3cd5a ; Denim ; jp Func_3cd5a ; redraw pokemon names and HP bars
+    jp RemoveDiplayedDamageAndDrawHUDsAndHPBars ; Denim ; jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
 ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
     ld a,[W_ENEMYMOVEEFFECT]
@@ -53684,7 +53766,7 @@ ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
     ld a,$48
     call Predef ; animate the HP bar shortening
 ApplyAttackToPlayerPokemonDone
-    jp RemoveDiplayedDamageAndFunc_3cd5a ; Denim ; jp Func_3cd5a ; redraw pokemon names and HP bars
+    jp RemoveDiplayedDamageAndDrawHUDsAndHPBars ; Denim ; jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
 AttackSubstitute: ; 3e25e (f:625e)
     ld hl,SubstituteTookDamageText
@@ -53732,7 +53814,7 @@ AttackSubstitute: ; 3e25e (f:625e)
 .nullifyEffect
     xor a
     ld [hl],a ; zero the effect of the attacker's move
-    jp Func_3cd5a ; redraw pokemon names and HP bars
+    jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
 SubstituteTookDamageText: ; 3e2ac (f:62ac)
     TX_FAR _SubstituteTookDamageText
@@ -54102,6 +54184,22 @@ TypeEffects:
     db DRAGON,DRAGON,20
     db $FF
 
+HandleEnemySwitchingOrUsingAnItemAndThenExecutePlayerMove:
+    ld a,$1
+    ld [H_WHOSETURN],a
+    ld hl,TrainerAI
+    ld b,BANK(TrainerAI)
+    call Bankswitch
+    call c,SetEnemyActedBit ;if carry was set from TrainerAI, set the bit indicating the ai trainer switched or used an item  
+    jp ExecutePlayerMove ; execute player move ;note: this function writes zero to H_WHOSETURN
+
+ResetBattleFlagAndLoadCurrentOpponent:
+    xor a
+    ld [wUnusedC000],a;joenote - clear custom ai bits and battle flags at battle start
+    ld [wUnusedD366],a;joenote - clear ai switch tracker bits
+    ld a,[W_CUROPPONENT] ; $d059
+    ret
+
 SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
 
 ; some tests that need to pass for a move to hit
@@ -54328,7 +54426,7 @@ Func_3e687: ; 3e687 (f:6687)
     ld [hl],a
     ret
 
-Func_3e6bc: ; 3e6bc (f:66bc)
+ExecuteEnemyMove: ; 3e6bc (f:66bc)
     ld a,[wEnemySelectedMove] ; $ccdd
     inc a
     jp z,Func_3e88c
@@ -55480,7 +55578,7 @@ PlayMoveAnimation: ; 3ef07 (f:6f07)
     PREDEF_JUMP MoveAnimationPredef ; predef 8
 
 InitBattle: ; 3ef12 (f:6f12)
-    ld a,[W_CUROPPONENT] ; $d059
+    call ResetBattleFlagAndLoadCurrentOpponent ; ld a,[W_CUROPPONENT] ; $d059
     and a
     jr z,DetermineWildOpponent
 
@@ -55620,7 +55718,7 @@ Func_3efeb: ; 3efeb (f:6feb)
     ld a,[W_ISINBATTLE] ; $d057
     dec a
     call z,Func_3cdec
-    call Func_3c11e
+    call StartBattle
     ld hl,Func_137aa
     ld b,BANK(Func_137aa)
     call Bankswitch ; indirect jump to Func_137aa (137aa (4:77aa))
@@ -57451,9 +57549,9 @@ CheckIfPlayerTurnForPrintDamage:
     set 1,[hl]
     ret
 
-RemoveDiplayedDamageAndFunc_3cd5a:
+RemoveDiplayedDamageAndDrawHUDsAndHPBars:
     call RemoveDiplayedDamage
-    jp Func_3cd5a ; redraw pokemon names and HP bars
+    jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
 RemoveDiplayedDamageAndPrintText:
     call PrintText
@@ -58057,16 +58155,21 @@ DebugMonOrEnemyPP:
 ; ($00 is immune, $02 is 4x uneffective, $28 is 4x super effective)
 ; as far is can tell,this is only used once in some AI code to help decide which move to use
 AIGetTypeEffectiveness:
-    ld a,[W_ENEMYMOVENUM]        ; Thunder Wave must have to calculate effectiveness because ground
-    cp THUNDER_WAVE
-    jr z,.CalculateEffectiveness
-    ld a,[W_ENEMYMOVEPOWER]      ; if enemy move pwr is 0, don't calculate effectiveness
-    and a
-    ret z
-.CalculateEffectiveness
+;joenote - if type-effectiveness bit is set, then do W_PLAYERMOVETYPE and W_ENEMYMONTYPES
+;        -also changed neutral value from $10 to $0A since it makes more sense
+;        -and modifying this to take into account both types
+    ld a,[wUnusedC000]
+    bit 3,a
+    jr z,.EnemyMove
+    ld a,[W_PLAYERMOVETYPE]
+    ld d,a                       ; d = type of player move
+    ld hl,W_ENEMYMONTYPES
+    jr .common
+.EnemyMove
     ld a,[W_ENEMYMOVETYPE]
     ld d,a                       ; d = type of enemy move
     ld hl,W_PLAYERMONTYPES
+.common
     ld b,[hl]                    ; b = type 1 of player's pokemon
     inc hl
     ld c,[hl]                    ; c = type 2 of player's pokemon
@@ -58117,6 +58220,46 @@ PlayBattleMusicAndDoBattleTransitionAndInitBatVar:
    ld b,BANK(PlayBattleMusic)
    call Bankswitch ; indirect jump to PlayBattleMusic (90c6 (2:50c6))
    jp DoBattleTransitionAndInitBatVar
+
+;calls out to trainer ai routines with no-attack bit set
+;move-choosing ai routines now check for the no-attack bit and kick out if found
+;used so only ai switching checks can run
+NoAttackAICall:
+    push af	;preserve flags on stack
+    ld a,[W_ISINBATTLE]
+    dec a
+    jr z,.NoAttackAICall_exit ; exit if this is a wild encounter
+    ;set the no-attack bit
+    ld a,[wUnusedC000]
+    set 2,a 
+    ld [wUnusedC000],a
+    ;call ai routines
+    ld b,BANK(AIEnemyTrainerChooseMoves)
+    ld hl,AIEnemyTrainerChooseMoves
+    call Bankswitch
+    ;joenote - reset the no-attack bit
+    ld a,[wUnusedC000]
+    res 2,a 
+    ld [wUnusedC000],a
+.NoAttackAICall_exit
+    pop af ;get flags from stack
+    ret
+
+CheckTrappingMoveAndSetEnemyActedBitAndLoadHl:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - if enemy using trapping move, then end their move
+    ld a,[W_ENEMYBATTSTATUS1]
+    bit USING_TRAPPING_MOVE, a
+    jr z,.preparewithdraw
+    ld hl,W_ENEMYBATTSTATUS1
+    res USING_TRAPPING_MOVE,[hl] 
+    ld a,$FF
+    ld [wEnemySelectedMove],a
+    call SetEnemyActedBit
+.preparewithdraw
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ld hl,RetreatMon
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -80253,7 +80396,7 @@ UnnamedText_58ecc: ; 58ecc (16:4ecc)
     TX_FAR _UnnamedText_58ecc
     db "@"
 
-Func_58ed1: ; 58ed1 (16:4ed1)
+RetreatMon: ; 58ed1 (16:4ed1)
     ld hl,UnnamedText_58ed7 ; $4ed7
     jp PrintText
 
@@ -126809,11 +126952,11 @@ Route16Mons:
     db $00
 
 TowerMons1:
-    db $00     
+    db $00
     db $00
 
 TowerMons2:
-    db $00     
+    db $00
     db $00
 
 TowerMons3:
@@ -127912,63 +128055,77 @@ SECTION "bank37",ROMX,BANK[$37]
 ; move choice modification methods that are applied for each trainer class
 ; 0 is sentinel value
 TrainerClassMoveChoiceModifications:
-    db 0       ; YOUNGSTER
-    db 1,0     ; BUG CATCHER
-    db 1,0     ; LASS
-    db 1,3,0   ; SAILOR
-    db 1,0     ; JR__TRAINER_M
-    db 1,0     ; JR__TRAINER_F
-    db 1,2,3,0 ; POKEMANIAC
-    db 1,2,3,0 ; SUPER_NERD
-    db 1,0     ; HIKER
-    db 1,0     ; BIKER
-    db 1,3,0   ; BURGLAR
-    db 1,3,0   ; ENGINEER
-    db 0       ; JUGGLER_X
-    db 1,3,0   ; FISHER
-    db 1,3,0   ; SWIMMER
-    db 0       ; CUE_BALL
-    db 1,3,0   ; GAMBLER
-    db 1,3,0   ; BEAUTY
-    db 1,2,3,0 ; PSYCHIC_TR
-    db 1,3,0   ; ROCKER
-    db 1,2,3,0 ; JUGGLER
-    db 1,3,0   ; TAMER
-    db 1,0     ; BIRD_KEEPER
-    db 1,0     ; BLACKBELT
-    db 1,3,0   ; SONY1
-    db 0       ; PROF_OAK
-    db 0       ; CHIEF
-    db 1,2,3,0 ; SCIENTIST
-    db 1,3,0   ; GIOVANNI
-    db 1,0     ; ROCKET
-    db 1,3,0   ; COOLTRAINER_M
-    db 1,3,0   ; COOLTRAINER_F
-    db 1,3,0   ; BRUNO
-    db 1,3,0   ; BROCK
-    db 1,3,0   ; MISTY
-    db 1,3,0   ; LT__SURGE
-    db 1,3,0   ; ERIKA
-    db 1,3,0   ; KOGA
-    db 1,3,0   ; BLAINE
-    db 1,3,0   ; SABRINA
-    db 1,2,3,0 ; GENTLEMAN
-    db 1,3,0   ; SONY2
-    db 1,3,0   ; SONY3
-    db 1,2,3,0 ; LORELEI
-    db 1,0     ; CHANNELER
-    db 1,3,0   ; AGATHA
-    db 1,3,0   ; LANCE
+    db 0          ; YOUNGSTER
+    db 1,0        ; BUG CATCHER
+    db 0          ; LASS
+    db 1,4,0      ; SAILOR
+    db 1,4,0      ; JR_TRAINER_M
+    db 1,4,0      ; JR_TRAINER_F
+    db 1,2,3,4,0  ; POKEMANIAC
+    db 1,2,3,4,0  ; SUPER_NERD
+    db 1,4,0      ; HIKER
+    db 0          ; BIKER
+    db 1,4,0      ; BURGLAR
+    db 1,3,4,0    ; ENGINEER
+    db 0          ; JUGGLER_X
+    db 1,4,0      ; FISHER
+    db 1,4,0      ; SWIMMER
+    db 0          ; CUE_BALL
+    db 1,3,4,0    ; GAMBLER
+    db 1,3,4,0    ; BEAUTY
+    db 1,2,4,0    ; PSYCHIC_TR
+    db 1,4,0      ; ROCKER
+    db 1,3,0      ; JUGGLER
+    db 1,3,4,0    ; TAMER
+    db 1,4,0      ; BIRD_KEEPER
+    db 1,3,4,0    ; BLACKBELT
+    db 1,3,4,0    ; SONY1
+    db 0          ; PROF_OAK
+    db 0          ; CHIEF
+    db 1,3,4,0    ; SCIENTIST
+    db 1,3,4,0    ; GIOVANNI
+    db 1,4,0      ; ROCKET
+    db 1,3,4,0    ; COOLTRAINER_M
+    db 1,3,4,0    ; COOLTRAINER_F
+    db 1,3,4,0    ; BRUNO
+    db 1,3,4,0    ; BROCK
+    db 1,3,4,0    ; MISTY
+    db 1,2,3,0    ; LT_SURGE
+    db 1,3,4,0    ; ERIKA
+    db 1,2,3,4,0  ; KOGA
+    db 1,3,4,0    ; BLAINE
+    db 1,2,3,4,0  ; SABRINA
+    db 1,2,3,4,0  ; GENTLEMAN
+    db 1,3,4,0    ; SONY2
+    db 1,3,4,0    ; SONY3
+    db 1,2,3,4,0  ; LORELEI
+    db 1,2,3,4,0  ; CHANNELER
+    db 1,2,3,4,0  ; AGATHA
+    db 1,3,4,0    ; LANCE
 
 ; creates a set of moves that may be used and returns its address in hl
 ; unused slots are filled with 0,all used slots may be chosen with equal probability
 AIEnemyTrainerChooseMoves:
+    ld a,[W_ISINBATTLE]
+    dec a
+    jr nz,.notwildbattle
+    ret
+.notwildbattle
     ld a,$a
     ld hl,$cee9  ; init temporary move selection array. Only the moves with the lowest numbers are chosen in the end
     ld [hli],a   ; move 1
     ld [hli],a   ; move 2
     ld [hli],a   ; move 3
     ld [hl],a    ; move 4
+    ld a,[$ccd5]
+    and a
+    jr z,.FirstActiveEnemyPokemonTurn
+    ld a,[W_ENEMYMOVEPOWER] ;joenote - backup the power of the last moved used
+    jr .done
+.FirstActiveEnemyPokemonTurn
+    inc a ; a = 1
+.done
+    ld [wAILastMovePower],a
     ld a,[W_ENEMYDISABLEDMOVE] ; forbid disabled move (if any)
     swap a
     and $f
@@ -128069,155 +128226,9 @@ AIMoveChoiceModificationFunctionPointers:
     dw AIMoveChoiceModification1
     dw AIMoveChoiceModification2
     dw AIMoveChoiceModification3
-    dw AIMoveChoiceModification4 ; unused,does nothing
+    dw AIMoveChoiceModification4
 
-; discourages moves that cause no damage but only a status ailment if player's mon already has one
-AIMoveChoiceModification1:
-    ld a,[W_PLAYERMONSTATUS]
-    and a
-    ret z       ; return if no status ailment on player's mon
-    ld hl,$cee8  ; temp move selection array (-1 byte offest)
-    ld de,W_ENEMYMONMOVES  ; enemy moves
-    ld b,$5
-.nextMove
-    dec b
-    ret z         ; processed all 4 moves
-    inc hl
-    ld a,[de]
-    and a
-    ret z         ; no more moves in move set
-    inc de
-    call ReadMove
-    ld a,[W_ENEMYMOVEPOWER]
-    and a
-    jr nz,.nextMove
-    ld a,[W_ENEMYMOVEEFFECT]
-    push hl
-    push de
-    push bc
-    ld hl,StatusAilmentMoveEffects
-    ld de,$0001
-    call IsInArray
-    pop bc
-    pop de
-    pop hl
-    jr nc,.nextMove
-    ld a,[hl]
-    add $5       ; discourage move
-    ld [hl],a
-    jr .nextMove
-
-StatusAilmentMoveEffects ; 57e2
-    db $01 ; some sleep effect?
-    db SLEEP_EFFECT
-    db POISON_EFFECT
-    db PARALYZE_EFFECT
-    db $FF
-
-; slightly encourage moves with specific effects
-AIMoveChoiceModification2:
-    ld a,[$ccd5]
-    cp $1
-    ret nz
-    ld hl,$cee8  ; temp move selection array (-1 byte offest)
-    ld de,W_ENEMYMONMOVES  ; enemy moves
-    ld b,$5
-.nextMove
-    dec b
-    ret z         ; processed all 4 moves
-    inc hl
-    ld a,[de]
-    and a
-    ret z         ; no more moves in move set
-    inc de
-    call ReadMove
-    ld a,[W_ENEMYMOVEEFFECT]
-    cp ATTACK_UP1_EFFECT
-    jr c,.nextMove
-    cp BIDE_EFFECT
-    jr c,.preferMove
-    cp ATTACK_UP2_EFFECT
-    jr c,.nextMove
-    cp POISON_EFFECT
-    jr c,.preferMove
-    jr .nextMove
-.preferMove
-    dec [hl]       ; slighly encourage this move
-    jr .nextMove
-
-; encourages moves that are effective against the player's mon
-AIMoveChoiceModification3:
-    ld hl,$cee8  ; temp move selection array (-1 byte offest)
-    ld de,W_ENEMYMONMOVES  ; enemy moves
-    ld b,$5
-.nextMove
-    dec b
-    ret z         ; processed all 4 moves
-    inc hl
-    ld a,[de]
-    and a
-    ret z         ; no more moves in move set
-    inc de
-    call ReadMove
-    push hl
-    push bc
-    push de
-    ld hl,AIGetTypeEffectiveness
-    ld b,BANK(AIGetTypeEffectiveness)
-    call Bankswitch
-    pop de
-    pop bc
-    pop hl
-    ld a,[$d11e]
-    cp $0A ; Standard 1x
-    jr z,.nextMove
-    jr c,.notEffectiveMove
-    ;at this line, move is super effective
-    dec [hl]       ; slighly encourage this move
-    jr .nextMove
-.notEffectiveMove  ; discourages non-effective moves if better moves are available
-    push hl
-    push de
-    push bc
-    ld a,[W_ENEMYMOVETYPE]
-    ld d,a
-    ld hl,W_ENEMYMONMOVES  ; enemy moves
-    ld b,$5
-    ld c,$0
-.loopMoves
-    dec b
-    jr z,.done
-    ld a,[hli]
-    and a
-    jr z,.done
-    call ReadMove
-    ld a,[W_ENEMYMOVEEFFECT]
-    cp SUPER_FANG_EFFECT
-    jr z,.betterMoveFound      ; Super Fang is considered to be a better move
-    cp SPECIAL_DAMAGE_EFFECT
-    jr z,.betterMoveFound      ; any special damage moves are considered to be better moves
-    cp FLY_EFFECT
-    jr z,.betterMoveFound      ; Fly is considered to be a better move
-    ld a,[W_ENEMYMOVETYPE]
-    cp d
-    jr z,.loopMoves
-    ld a,[W_ENEMYMOVEPOWER]
-    and a
-    jr nz,.betterMoveFound      ; damaging moves of a different type are considered to be better moves
-    jr .loopMoves
-.betterMoveFound
-    ld c,a
-.done
-    ld a,c
-    pop bc
-    pop de
-    pop hl
-    and a
-    jr z,.nextMove
-    inc [hl]       ; slighly discourage this move
-    jr .nextMove
-AIMoveChoiceModification4:
-    ret
+INCLUDE "shin/Shin_AIMoveChoiceModification.asm"
 
 ReadMove:
     push hl
@@ -128227,8 +128238,13 @@ ReadMove:
     ld hl,Moves
     ld bc,6
     call AddNTimes
+    ld a,[wBuffer] ; Backup First Byte Because used By FarCopyData
+    push af
     ld de,$CFCC
-    call CopyData
+    ld a,BANK(Moves)
+    call FarCopyData
+    pop af
+    ld [wBuffer],a ; Restore First Byte Because used By FarCopyData
     pop bc
     pop de
     pop hl

@@ -2,6 +2,17 @@
 
 SECTION "WRAM Bank 0", WRAM0
 
+wUnusedC000:: ; c000
+;joenote - use this for battle ai bit settings and handling other battle flags
+;bit 0 - if set, ai should switch pokemon
+;bit 1 - if set, ai already acted by switching or using an item this turn
+;bit 2 - if set, ai can swith or use item but not use a move (only run ai routine 4)
+;bit 3 - used for AIGetTypeEffectiveness (0 = enemy move effectiveness | 1 = player move effectiveness)
+;bit 4 - if set, current move being handled is a static damaging move 
+;bit 5 - if set, current ai trainer has ai routine 4 assigned
+;bit 6 - if set, poison/burn damage algorithm is being called to handle leech seed
+;bit 7 - if set, force Counter to miss (for an opponent hurting itself or its jump kick missing)
+	ds 1
 
 SECTION "Sprite State Data", WRAM0[$c100]
 
@@ -150,7 +161,11 @@ SECTION "RLE", WRAM0[$ccd2]
 wRLEByteCount: ; ccd2
     ds 1
 
-    ds 4
+    ds 3
+
+;joenote - store the power of the enemy move used last turn for AI layer 3 use
+wAILastMovePower:: ;ccd6
+	ds 1
 
 ; current HP of player and enemy substitutes
 wPlayerSubstituteHP: ; ccd7
@@ -254,7 +269,17 @@ wFieldMovesLeftmostXCoord:; cd42
 wLastFieldMoveID:; cd43
     ds 1
 
-    ds 30-2
+SECTION "wAIPartyMonScores",WRAM0[$cd50]
+
+;joenote - block of data that holds a score for the switch desireability of each AI trainer mon
+;gets overwritten with zeroes at the end of battle 
+wAIPartyMonScores:: ;cd50
+	;8 bytes
+	;-->6 bytes for roster scores
+	;-->1 byte for storing the best score (wAIPartyMonScores + 6)
+	;-->1 byte for storing the zero-indexed position with the best score (wAIPartyMonScores + 7)
+
+SECTION "wFlags_0xcd60",WRAM0[$cd60]
 
 wFlags_0xcd60: ; cd60
 ; bit 0: is player engaged by trainer (to avoid being engaged by multiple trainers simultaniously)
@@ -1521,6 +1546,15 @@ wFishingLevel: ; df40
 
 wFishingSpecies: ; df40
     ds 1
+
+wUnusedD366:: ; df41 ;joenote - use this to track which ai pokemon have switched
+    ds 1
+;bit 1: 1st pkmn (position 0)
+;bit 2: 2nd pkmn (position 1)
+;bit 3: 3rd pkmn (position 2)
+;bit 4: 4th pkmn (position 3)
+;bit 5: 5th pkmn (position 4)
+;bit 6: 6th pkmn (position 5)
 
 SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
 

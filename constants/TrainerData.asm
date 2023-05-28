@@ -554,7 +554,7 @@ MistyData:
     db $FF,18,STARYU,21,STARMIE,0
 
 LtSurgeData:
-    db $FF,28,RAICHU,0
+    db $FF,29,RAICHU,0
 
 ErikaData:
     db $FF,30,TANGELA,34,WEEPINBELL,38,GLOOM,0

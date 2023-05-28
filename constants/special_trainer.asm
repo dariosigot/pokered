@@ -56,7 +56,7 @@ MistyMove:
     db 0
 
 LtSurgeMove:
-    ; Raichu (Level 28)
+    ; Raichu (Level 29)
     db SUBMISSION
     db GROWL
     db THUNDERBOLT
