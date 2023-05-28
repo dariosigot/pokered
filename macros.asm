@@ -354,3 +354,14 @@ WEST_MAP_CONNECTION: MACRO
 	db (\2 * 2) - 1 ; x alignment
 	dw $C6EE + (2 * \2) ; window (position of the upper left block after entring the map)
 ENDM
+
+tmlearn: MACRO
+    x = 0
+    REPT _NARG
+        IF \1 != 0
+        x = x | (1 << ((\1 - 1) % 8))
+    ENDC
+    SHIFT
+    ENDR
+    db x
+ENDM

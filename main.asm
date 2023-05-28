@@ -30206,56 +30206,56 @@ TMToMove: ; 13763 (4:7763)
     ret
 
 TechnicalMachines: ; 13773 (4:7773)
-    db MEGA_PUNCH
-    db RAZOR_WIND
-    db SWORDS_DANCE
-    db WHIRLWIND
-    db MEGA_KICK
-    db TOXIC
-    db HORN_DRILL
-    db BODY_SLAM
-    db TAKE_DOWN
-    db DOUBLE_EDGE
-    db BUBBLEBEAM
-    db WATER_GUN
-    db ICE_BEAM
-    db BLIZZARD
-    db HYPER_BEAM
-    db PAY_DAY
-    db SUBMISSION
-    db COUNTER
-    db SEISMIC_TOSS
-    db RAGE
-    db MEGA_DRAIN
-    db SOLARBEAM
-    db DRAGON_RAGE
-    db THUNDERBOLT
-    db THUNDER
-    db EARTHQUAKE
-    db FISSURE
-    db TRAPHOLE
-    db PSYCHIC_M
-    db TELEPORT
-    db MIMIC
-    db DOUBLE_TEAM
-    db REFLECT
-    db BIDE
-    db METRONOME
-    db SELFDESTRUCT
-    db EGG_BOMB
-    db FIRE_BLAST
-    db SWIFT
-    db SKULL_BASH
-    db SOFTBOILED
-    db DREAM_EATER
-    db SKY_ATTACK
-    db REST
-    db THUNDER_WAVE
-    db PSYWAVE
-    db EXPLOSION
-    db ROCK_SLIDE
-    db TRI_ATTACK
-    db SUBSTITUTE
+    db MEGA_PUNCH   ; TM_01
+    db RAZOR_WIND   ; TM_02
+    db SWORDS_DANCE ; TM_03
+    db WHIRLWIND    ; TM_04
+    db MEGA_KICK    ; TM_05
+    db TOXIC        ; TM_06
+    db HORN_DRILL   ; TM_07
+    db BODY_SLAM    ; TM_08
+    db TAKE_DOWN    ; TM_09
+    db DOUBLE_EDGE  ; TM_10
+    db BUBBLEBEAM   ; TM_11
+    db WATER_GUN    ; TM_12
+    db ICE_BEAM     ; TM_13
+    db BLIZZARD     ; TM_14
+    db HYPER_BEAM   ; TM_15
+    db PAY_DAY      ; TM_16
+    db SUBMISSION   ; TM_17
+    db COUNTER      ; TM_18
+    db SEISMIC_TOSS ; TM_19
+    db RAGE         ; TM_20
+    db MEGA_DRAIN   ; TM_21
+    db SOLARBEAM    ; TM_22
+    db DRAGON_RAGE  ; TM_23
+    db THUNDERBOLT  ; TM_24
+    db THUNDER      ; TM_25
+    db EARTHQUAKE   ; TM_26
+    db FISSURE      ; TM_27
+    db TRAPHOLE     ; TM_28
+    db PSYCHIC_M    ; TM_29
+    db TELEPORT     ; TM_30
+    db MIMIC        ; TM_31
+    db DOUBLE_TEAM  ; TM_32
+    db REFLECT      ; TM_33
+    db BIDE         ; TM_34
+    db METRONOME    ; TM_35
+    db SELFDESTRUCT ; TM_36
+    db EGG_BOMB     ; TM_37
+    db FIRE_BLAST   ; TM_38
+    db SWIFT        ; TM_39
+    db SKULL_BASH   ; TM_40
+    db SOFTBOILED   ; TM_41
+    db DREAM_EATER  ; TM_42
+    db SKY_ATTACK   ; TM_43
+    db REST         ; TM_44
+    db THUNDER_WAVE ; TM_45
+    db PSYWAVE      ; TM_46
+    db EXPLOSION    ; TM_47
+    db ROCK_SLIDE   ; TM_48
+    db TRI_ATTACK   ; TM_49
+    db SUBSTITUTE   ; TM_50
 
 SECTION "Func_137aa",ROMX[$77aa],BANK[$4]
 
@@ -125446,13 +125446,13 @@ MewBaseStats: ; 425b (1:425b)
     db 3 ; growth rate
 
     ; include learnset directly
-    db %11111111
-    db %11111111
-    db %11111111
-    db %11111111
-    db %11111111
-    db %11111111
-    db %11111111
+	tmlearn 1,2,3,4,5,6,7,8
+	tmlearn 9,10,11,12,13,14,15,16
+	tmlearn 17,18,19,20,21,22,23,24
+	tmlearn 25,26,27,28,29,30,31,32
+	tmlearn 33,34,35,36,37,38,39,40
+	tmlearn 41,42,43,44,45,46,47,48
+	tmlearn 49,50,51,52,53,54,55,56
 
     db BANK(MewPicFront)
 
