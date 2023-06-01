@@ -2557,7 +2557,7 @@ LoadWalkingPlayerSpriteGraphics: ; 104d (0:104d)
     jr LoadPlayerSpriteGraphicsCommon
 
 LoadSurfingPlayerSpriteGraphics: ; 1055 (0:1055)
-    ld de,SeelSprite
+    ld de,FloatSprite
     ld hl,$8000
     jr LoadPlayerSpriteGraphicsCommon
 
@@ -23428,7 +23428,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     dec a
     ld [wJoypadForbiddenButtonsMask],a
     call Func_2307 ; play walking music
-    jp LoadWalkingPlayerSpriteGraphics
+    jp ClearScreenAndLoadWalkingPlayerSpriteGraphics ; jp LoadWalkingPlayerSpriteGraphics
 ; uses a simulated button press to make the player move forward
 .makePlayerMoveForward
     ld a,[$d52a] ; direction the player is going
@@ -28307,6 +28307,11 @@ GetBiteLevel:
     pop bc
     ret
 
+ClearScreenAndLoadWalkingPlayerSpriteGraphics:
+    call GBPalWhiteOutWithDelay3
+    call ClearScreen
+    jp LoadWalkingPlayerSpriteGraphics
+
 SECTION "bank4",ROMX,BANK[$4]
 
 OakAideSprite: ; 10000 (4:4000)
@@ -30423,7 +30428,7 @@ TryDoWildEncounter: ; 13870 (4:7870)
 .asm_138d7
     ld c,[hl]
     ld hl,W_GRASSMONS ; $d888
-    FuncCoord 8,9 ; $c45c
+    FuncCoord 9,9 ; $c45c ; No Cinnabar Shore Bug
     ld a,[Coord]
     cp $14
     jr nz,.asm_138e5
@@ -31008,8 +31013,8 @@ BrunoSprite: ; 173c0 (5:73c0)
     INCBIN "gfx/sprites/bruno.2bpp" ; was $173c0
 LoreleiSprite: ; 17540 (5:7540)
     INCBIN "gfx/sprites/lorelei.2bpp" ; was $17540
-SeelSprite: ; 176c0 (5:76c0)
-    INCBIN "gfx/sprites/seel.2bpp" ; was $176c0
+FloatSprite: ; 176c0 (5:76c0)
+    INCBIN "gfx/denim/float.2bpp"
 
 ; Loads tile patterns for tiles used in the pokedex.
 LoadPokedexTilePatterns: ; 17840 (5:7840)
@@ -36186,6 +36191,9 @@ FuchsiaCityObject: ; 0x18bd4 (size=178)
 FuchsiaCityText12:
     TX_FAR _FuchsiaCityText12
     db "@"
+
+SeelSprite:
+    INCBIN "gfx/sprites/seel.2bpp"
 
 SECTION "bank7",ROMX,BANK[$7]
 
@@ -124263,11 +124271,7 @@ _ItemUseBallText06: ; a6835 (29:6835)
     TX_RAM W_ENEMYMONNAME
     db 0,"!@@"
 
-_SurfingGotOnText: ; a685e (29:685e)
-    db $0,$52," got on",$4f
-    db "@"
-    TX_RAM $cd6d
-    db $0,"!",$58
+SECTION "_SurfingNoPlaceToGetOffText",ROMX[$686f],BANK[$29]
 
 _SurfingNoPlaceToGetOffText: ; a686f (29:686f)
     db $0,"There's no place",$4f
@@ -124413,6 +124417,13 @@ _FuchsiaCityText12:
     db $0,"FUCHSIA CITY",$4f
     db "Behold! It's",$55
     db "Passion Pink!",$57
+
+_SurfingGotOnText:
+    db $0,$52," puts bag",$4f
+    db "on "
+    db "@"
+    TX_RAM $cd6d
+    db $0,"!",$58
 
 SECTION "bank2A",ROMX,BANK[$2A]
 
