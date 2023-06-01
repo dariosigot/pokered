@@ -82,15 +82,15 @@ ETHER         EQU $50
 MAX_ETHER     EQU $51
 ELIXER        EQU $52
 MAX_ELIXER    EQU $53
-HM_01         EQU $C4
-HM_02         EQU $C5
-HM_03         EQU $C6
-HM_04         EQU $C7
-HM_05         EQU $C8
+HM_01         EQU $C4 ; NATURE POWER
+HM_02         EQU $C5 ; AIR POWER
+HM_03         EQU $C6 ; WATER POWER
+HM_04         EQU $C7 ; EARTH POWER
+HM_05         EQU $C8 ; FIRE POWER
 TM_01         EQU $C9
 TM_02         EQU $CA
 TM_03         EQU $CB
-TM_04         EQU $CC
+;TM_04        EQU $CC ; TODO : Introvabile
 TM_05         EQU $CD
 TM_06         EQU $CE
 TM_07         EQU $CF
@@ -127,7 +127,8 @@ TM_37         EQU $ED
 TM_38         EQU $EE
 TM_39         EQU $EF
 TM_40         EQU $F0
-TM_41         EQU $F1
+;TM_41        EQU $F1 ; TODO : Softboiled Sostituito
+TM_55         EQU $F1
 TM_42         EQU $F2
 TM_43         EQU $F3
 TM_44         EQU $F4
@@ -137,3 +138,7 @@ TM_47         EQU $F7
 TM_48         EQU $F8
 TM_49         EQU $F9
 TM_50         EQU $FA
+TM_51         EQU $FB
+TM_52         EQU $FC
+TM_53         EQU $FD
+TM_54         EQU $FE

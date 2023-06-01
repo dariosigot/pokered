@@ -122,7 +122,7 @@ SabrinaMove:
     db RECOVER
     db PSYCHIC_M
     db THUNDER_WAVE
-    db BARRIER
+    db REFLECT
     db 0
 
 Giovanni1Move:
