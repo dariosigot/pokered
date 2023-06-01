@@ -1042,11 +1042,13 @@ WarpFound2: ; 073c (0:073c)
     ld [$d366],a
     ld a,[$ff8b] ; destination map number
     ld [W_CURMAP],a ; change current map to destination map
-    cp a,ROCK_TUNNEL_1
-    jr nz,.notRockTunnel
-    ld a,$06
-    ld [$d35d],a
-    call GBFadeIn1
+    push bc ; 1
+    push af ; 1
+    ld b,BANK(CheckDarkMap) ; 2
+    ld hl,CheckDarkMap ; 3
+    call Bankswitch ; 3
+    pop af ; 1
+    pop bc ; 1
 .notRockTunnel
     call PlayMapChangeSound
     jr .done
@@ -93110,33 +93112,7 @@ Func_70a19: ; 70a19 (1c:4a19)
     res 2,c
     ret
 
-; Func_70a19 checks if W_CURMAP is equal to one of these maps
-MapIDList_70a3f: ; 70a3f (1c:4a3f)
-    db VIRIDIAN_FOREST
-    db ROCK_TUNNEL_1
-    db SEAFOAM_ISLANDS_1
-    db ROCK_TUNNEL_2
-    db $FF
-
-; Func_70a19 checks if W_CURMAP is in between or equal to each pair of maps
-MapIDList_70a44: ; 70a44 (1c:4a44)
-    ; all MT_MOON maps
-    db MT_MOON_1
-    db MT_MOON_3
-
-    ; all SS_ANNE maps,VICTORY_ROAD_1,LANCES_ROOM,and HALL_OF_FAME
-    db SS_ANNE_1
-    db HALL_OF_FAME
-
-    ; all POKEMONTOWER maps and Lavender Town buildings
-    db LAVENDER_POKECENTER
-    db LAVENDER_HOUSE_2
-
-    ; all SILPH_CO,MANSION,SAFARI_ZONE,and UNKNOWN_DUNGEON maps,
-    ; except for SILPH_CO_1F
-    db SILPH_CO_2F
-    db UNKNOWN_DUNGEON_1
-    db $FF
+SECTION "Func_70a4d",ROMX[$4a4d],BANK[$1c]
 
 Func_70a4d: ; 70a4d (1c:4a4d)
     ld hl,$8ff0
@@ -97636,6 +97612,37 @@ TownMapOrder:
     db VICTORY_ROAD_3
     db INDIGO_PLATEAU
 TownMapOrderEnd:
+
+; Func_70a19 checks if W_CURMAP is equal to one of these maps
+MapIDList_70a3f: ; Moved in the BANK
+    db VIRIDIAN_FOREST
+    db ROCK_TUNNEL_1
+    db SEAFOAM_ISLANDS_1
+    db ROCK_TUNNEL_2
+    db VICTORY_ROAD_1
+    db VICTORY_ROAD_2
+    db VICTORY_ROAD_3
+    db $FF
+
+; Func_70a19 checks if W_CURMAP is in between or equal to each pair of maps
+MapIDList_70a44: ; Moved in the BANK
+    ; all MT_MOON maps
+    db MT_MOON_1
+    db MT_MOON_3
+    ; all SS_ANNE maps,VICTORY_ROAD_1,LANCES_ROOM,and HALL_OF_FAME
+    db SS_ANNE_1
+    db HALL_OF_FAME
+    ; all POKEMONTOWER maps and Lavender Town buildings
+    db LAVENDER_POKECENTER
+    db LAVENDER_HOUSE_2
+    ; all SILPH_CO,MANSION,SAFARI_ZONE,and UNKNOWN_DUNGEON maps,
+    ; except for SILPH_CO_1F
+    db SILPH_CO_2F
+    db UNKNOWN_DUNGEON_1
+    ; all SEAFOAM_ISLANDS maps
+    db SEAFOAM_ISLANDS_2
+    db SEAFOAM_ISLANDS_5
+    db $FF
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
@@ -126369,6 +126376,22 @@ TradingAnimationGraphics:
 ; 4 tiles for actual wire transfer animation (pokeball wandering inside wire)
 TradingAnimationGraphics2:
     INCBIN "gfx/trade2.2bpp"
+
+CheckDarkMap:
+    ld a,[W_CURMAP]
+    cp a,ROCK_TUNNEL_1
+    jr z,.Dark
+    cp a,VICTORY_ROAD_1
+    jr z,.Dark
+    cp a,VICTORY_ROAD_2
+    jr z,.Dark
+    cp a,SEAFOAM_ISLANDS_1
+    jr z,.Dark
+    ret
+.Dark
+    ld a,$06
+    ld [$d35d],a
+    jp GBFadeIn1
 
 SECTION "bank34",ROMX,BANK[$34] ; Denim
 
