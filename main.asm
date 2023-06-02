@@ -51973,7 +51973,7 @@ SelectEnemyMove: ; 3d564 (f:5564)
     ld [wEnemySelectedMove],a
     ret
 .asm_3d601
-    ld a,$a5
+    ld a,STRUGGLE
     jr .done
 
 Func_3d605: ; 3d605 (f:5605)
@@ -128131,7 +128131,7 @@ TrainerClassMoveChoiceModifications:
     db 0          ; YOUNGSTER
     db 1,0        ; BUG CATCHER
     db 0          ; LASS
-    db 1,4,0      ; SAILOR
+    db 1,3,0      ; SAILOR
     db 1,4,0      ; JR_TRAINER_M
     db 1,4,0      ; JR_TRAINER_F
     db 1,2,3,4,0  ; POKEMANIAC
@@ -128182,7 +128182,15 @@ AIEnemyTrainerChooseMoves:
     ld a,[W_ISINBATTLE]
     dec a
     jr nz,.notwildbattle
-    ret
+    ;wild battle confirmed at this point
+    ld hl,W_ENEMYMONMOVES ;restore this address which was clobbered by Bankswitch
+    ld a,[W_ENEMYMON_START]
+    cp MEWTWO
+    ret nz
+    ;load the Sailor class since it only uses AI routines 1 and 3
+    ld a,SAILOR
+    ld [W_TRAINERCLASS],a
+    ;should be fine to let AIEnemyTrainerChooseMoves run at this point
 .notwildbattle
     ld a,$a
     ld hl,$cee9  ; init temporary move selection array. Only the moves with the lowest numbers are chosen in the end
