@@ -10,6 +10,7 @@ SpecialTrainerMoves:
     SpecialTrainer ERIKA,$1,ErikaMove
     SpecialTrainer KOGA,$1,KogaMove
     SpecialTrainer BLAINE,$1,BlaineMove
+    SpecialTrainer BLACKBELT,$1,DojoLeader
     SpecialTrainer SABRINA,$1,SabrinaMove
     SpecialTrainer GIOVANNI,$1,Giovanni1Move
     SpecialTrainer GIOVANNI,$2,Giovanni2Move
@@ -112,6 +113,19 @@ BlaineMove:
     db PSYCHIC_M
     db 0
 
+DojoLeader:
+    ; Hitmonlee (Level 39)
+    db ROLLING_KICK
+    db JUMP_KICK
+    db HI_JUMP_KICK
+    db SUBMISSION
+    ; Himonchan (Level 39)
+    db FIRE_PUNCH
+    db ICE_PUNCH
+    db THUNDERPUNCH
+    db SUBMISSION
+    db 0
+
 SabrinaMove:
     ; Haunter (Level 48)
     db HYPNOSIS
@@ -126,17 +140,17 @@ SabrinaMove:
     db 0
 
 Giovanni1Move:
-    ; Geodude (Level 25)
+    ; Geodude (Level 24)
     db EXPLOSION
     db MEGA_PUNCH
     db ROCK_THROW
     db SELFDESTRUCT
-    ; Rhyhorn (Level 32)
+    ; Rhyhorn (Level 38)
     db STOMP
     db TAKE_DOWN
     db ROCK_THROW
     db BODY_SLAM
-    ; Persian (Level 33)
+    ; Persian (Level 40)
     db SCREECH
     db HYPER_FANG
     db REST
@@ -167,12 +181,12 @@ Giovanni2Move:
     db 0
 
 Giovanni3Move:
-    ; Persian (Level 43)
+    ; Persian (Level 53)
     db HYPER_BEAM
     db REST
     db SLASH
     db DOUBLE_TEAM
-    ; Nidoqueen (Level 53)
+    ; Nidoqueen (Level 55)
     db SLUDGE
     db EARTHQUAKE
     db BODY_SLAM

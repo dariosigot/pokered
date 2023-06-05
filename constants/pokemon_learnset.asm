@@ -1006,6 +1006,7 @@ Mon057_EvosMoves:
 ;Learnset
     ;  28,RAGE
     db 31,MEGA_PUNCH
+    db 34,TRAPHOLE
     db 37,SEISMIC_TOSS
     db 41,SUBMISSION
     db 45,THRASH
@@ -1187,6 +1188,7 @@ Mon067_EvosMoves:
     db 0
 ;Learnset
     ;  28,SEISMIC_TOSS
+    db 32,TRAPHOLE
     db 38,JUMP_KICK
     db 42,SUBMISSION
     db 46,COUNTER
@@ -1199,6 +1201,7 @@ Mon068_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
+    db 32,TRAPHOLE
     db 38,JUMP_KICK
     db 42,SUBMISSION
     db 46,COUNTER
