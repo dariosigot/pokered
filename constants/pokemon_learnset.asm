@@ -1358,10 +1358,10 @@ Mon077_EvosMoves:
 ;Learnset
     ;   1,TACKLE
     ;   1,GROWL
-    db  8,HORN_ATTACK
+    db  8,AGILITY
     db 10,QUICK_ATTACK
     db 12,EMBER
-    db 14,FURY_ATTACK
+    db 14,SLAM
     db 16,TAIL_WHIP
     db 18,DOUBLE_KICK
     db 21,STOMP
@@ -1370,7 +1370,6 @@ Mon077_EvosMoves:
     db 35,FLAMETHROWER
     db 38,DOUBLE_TEAM
     ;  40,RAPIDASH
-    db 43,AGILITY
     db 0
 
 Mon078_EvosMoves:
@@ -1378,7 +1377,8 @@ Mon078_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    ;  40,AGILITY
+    ;  40,HORN_ATTACK
+    db 41,FURY_ATTACK
     db 43,HORN_DRILL
     db 56,FIRE_BLAST
     db 60,BODY_SLAM

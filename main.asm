@@ -126455,7 +126455,7 @@ EvolutionMove:
    db BODY_SLAM            ; GRAVELER
    db 0                    ; GOLEM
    db 0                    ; PONYTA
-   db AGILITY              ; RAPIDASH
+   db HORN_ATTACK          ; RAPIDASH
    db 0                    ; SLOWPOKE
    db MEGA_PUNCH           ; SLOWBRO
    db 0                    ; MAGNEMITE
