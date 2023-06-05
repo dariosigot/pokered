@@ -121231,10 +121231,12 @@ _UnnamedText_484fe: ; 9cc1a (27:4c1a)
     db $0,$51
     db "@"
     TX_RAM $cf4b
-    db $0," contains",$4f
+    db $0," is",$4f
     db "ICE BEAM!",$51
     db "It can freeze the",$4f
     db "target sometimes!@@"
+
+SECTION "_UnnamedText_48504",ROMX[$4c5a],BANK[$27]
 
 _UnnamedText_48504: ; 9cc5a (27:4c5a)
     db $0,"Yay!",$51
@@ -121253,10 +121255,12 @@ _UnnamedText_4850f: ; 9cca5 (27:4ca5)
     db $0,$51
     db "@"
     TX_RAM $cf4b
-    db $0," contains",$4f
+    db $0," is",$4f
     db "ROCK SLIDE!",$51
     db "It can spook the",$4f
     db "target sometimes!@@"
+
+SECTION "_UnnamedText_48515",ROMX[$4ce6],BANK[$27]
 
 _UnnamedText_48515: ; 9cce6 (27:4ce6)
     db $0,"Yay!",$51
