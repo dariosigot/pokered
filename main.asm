@@ -37666,7 +37666,7 @@ OaksLabScript_1d22d: ; 1d22d (7:522d)
     ld [$ff00+$8b],a
     call Func_34fc
     ld [hl],$0
-    ld hl,OaksLabLastMonText ; $5243
+    call GetOakLastPkmn ; ld hl,OaksLabLastMonText ; $5243
     call PrintText
     jp TextScriptEnd
 
@@ -37690,7 +37690,7 @@ OaksLabText5: ; 1d248 (7:5248)
     bit 5,a
     jr z,.asm_b28b0 ; 0x1d264
 .asm_50e81 ; 0x1d266
-    ld hl,UnnamedText_1d31d
+    call CheckEnableLastPkmn ; ld hl,UnnamedText_1d31d
     call PrintText
     ld a,$1
     ld [$cc3c],a
@@ -41480,6 +41480,81 @@ OnlyOneMoveText:
 _OnlyOneMoveText:
     db $0,"the #MON knows",$4f
     db "only one move!",$58
+
+CheckEnableLastPkmn:
+    ld hl,wFlagEnableOakLastPkmnBit3
+    bit 3,[hl]
+    jr nz,.Ignore
+    push hl
+    ld hl,W_OBTAINEDBADGES
+    bit 2,[hl] ; THUNDERBADGE
+    pop hl
+    jr z,.Ignore
+    set 3,[hl]
+    pop hl ; Delete Return Pointer
+    ld hl,EnableLastPkmnText
+    call PrintText
+    jp TextScriptEnd
+.Ignore
+    ld hl,UnnamedText_1d31d
+    ret
+
+EnableLastPkmnText:
+    TX_FAR _EnableLastPkmnText
+    db "@"
+
+_EnableLastPkmnText:
+    db $0,"OAK: WOW! ",$51
+    db "Have you already",$4f
+    db "won three badges",$55
+    db "yet?",$51
+    db "Wonderfull!",$51
+    db "I knew that the",$4f
+    db "energy of a real",$55
+    db "trainer flows",$55
+    db "through you!",$51
+    db "Why don't you take",$4f
+    db "care of my last",$55
+    db "#MON?",$57
+
+GetOakLastPkmn:
+    ld hl,wFlagEnableOakLastPkmnBit3
+    bit 3,[hl]
+    jr z,.Ignore
+    push de
+    pop hl ; Delete Return Pointer
+    ld a,[W_PLAYERSTARTER]
+    cp CHARMANDER
+    jr z,.Charmander
+    cp SQUIRTLE
+    jr z,.Squirtle
+.Bulbasaur
+    ld b,SQUIRTLE
+    ld d,$2c
+    jr .Done
+.Charmander
+    ld b,BULBASAUR
+    ld d,$2d
+    jr .Done
+.Squirtle
+    ld b,CHARMANDER
+    ld d,$2b
+.Done
+    ld c,5
+    push de
+    call GivePokemon
+    pop de
+    jr nc,.PartyFull ; 0x1dd4d
+    ld a,d
+    ld [$cc4d],a
+    ld a,$11
+    call Predef ; Hide Last Pokeball
+.PartyFull
+    pop de
+    jp TextScriptEnd
+.Ignore
+    ld hl,OaksLabLastMonText ; $5243
+    ret
 
 SECTION "bank8",ROMX,BANK[$8]
 
@@ -127225,7 +127300,7 @@ ZoneMons2:
     db 31,NIDOKING   ;  5% ; Entry Level
     db 31,NIDOQUEEN  ;  5% ; Entry Level
     db 29,KANGASKHAN ;  4%
-    db  2,KANGASKHAN ;  1% ; Entry Level
+    db  7,KANGASKHAN ;  1% ; Entry Level
     db $00
 
 ZoneMons3:
