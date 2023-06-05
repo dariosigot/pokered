@@ -1719,9 +1719,9 @@ ParasectBaseStats: ; 388e6 (e:48e6)
     dw ParasectPicBack
 
     ; attacks known at lvl 0
-    db POISONPOWDER
     db LEECH_LIFE
     db VICEGRIP
+    db ABSORB
     db GROWTH
 
     db 0 ; growth rate

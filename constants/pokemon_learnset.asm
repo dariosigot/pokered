@@ -214,6 +214,7 @@ Mon012_EvosMoves:
     db 31,PSYBEAM
     db 40,RAZOR_WIND
     db 44,SPORE
+    db 48,MEGA_DRAIN
     db 55,PSYCHIC_M
     db 0
 
@@ -261,6 +262,7 @@ Mon015_EvosMoves:
     db 34,AGILITY
     db 37,SLAM
     db 40,RAZOR_WIND
+    db 44,SLUDGE
     db 55,SWORDS_DANCE
     db 0
 
