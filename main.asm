@@ -37666,8 +37666,10 @@ OaksLabScript_1d22d: ; 1d22d (7:522d)
     ld [$ff00+$8b],a
     call Func_34fc
     ld [hl],$0
+    push de
     call GetOakLastPkmn ; ld hl,OaksLabLastMonText ; $5243
-    call PrintText
+    pop de
+    ds 1 ; call PrintText
     jp TextScriptEnd
 
 OaksLabLastMonText: ; 1d243 (7:5243)
@@ -41487,9 +41489,12 @@ CheckEnableLastPkmn:
     jr nz,.Ignore
     push hl
     ld hl,W_OBTAINEDBADGES
-    bit 2,[hl] ; THUNDERBADGE
+    ld b,$1
+    call CountSetBits
+    ld a,[$d11e] ; Num of Badges
+    cp 3
     pop hl
-    jr z,.Ignore
+    jr c,.Ignore
     set 3,[hl]
     pop hl ; Delete Return Pointer
     ld hl,EnableLastPkmnText
@@ -41506,7 +41511,9 @@ EnableLastPkmnText:
 _EnableLastPkmnText:
     db $0,"OAK: WOW! ",$51
     db "Have you already",$4f
-    db "won three badges",$55
+    db "won @"
+    TX_NUM $d11e,1,3
+    db $0," badges",$55
     db "yet?",$51
     db "Wonderfull!",$51
     db "I knew that the",$4f
@@ -41521,40 +41528,39 @@ GetOakLastPkmn:
     ld hl,wFlagEnableOakLastPkmnBit3
     bit 3,[hl]
     jr z,.Ignore
-    push de
-    pop hl ; Delete Return Pointer
     ld a,[W_PLAYERSTARTER]
     cp CHARMANDER
     jr z,.Charmander
     cp SQUIRTLE
     jr z,.Squirtle
 .Bulbasaur
-    ld b,SQUIRTLE
+    ld a,SQUIRTLE
     ld d,$2c
     jr .Done
 .Charmander
-    ld b,BULBASAUR
+    ld a,BULBASAUR
     ld d,$2d
     jr .Done
 .Squirtle
-    ld b,CHARMANDER
+    ld a,CHARMANDER
     ld d,$2b
 .Done
-    ld c,5
     push de
+    push af
+    call DisplayPokedex
+    pop af
+    ld b,a
+    ld c,5
     call GivePokemon
     pop de
-    jr nc,.PartyFull ; 0x1dd4d
+    ret nc ; PartyFull
     ld a,d
     ld [$cc4d],a
     ld a,$11
-    call Predef ; Hide Last Pokeball
-.PartyFull
-    pop de
-    jp TextScriptEnd
+    jp Predef ; Hide Last Pokeball
 .Ignore
     ld hl,OaksLabLastMonText ; $5243
-    ret
+    jp PrintText
 
 SECTION "bank8",ROMX,BANK[$8]
 
@@ -85919,7 +85925,7 @@ FightingDojoText1: ; 5ce44 (17:4e44)
     ld [W_CURMAPSCRIPT],a
     jr .asm_9dba4 ; 0x5ce7b
 .continue1 ; 0x5ce7d
-    ld hl,UnnamedText_5ce9d
+    call CheckEnableOtherHitmon ; ld hl,UnnamedText_5ce9d
     call PrintText
     jr .asm_9dba4 ; 0x5ce83
 .continue2 ; 0x5ce85f
@@ -86022,8 +86028,10 @@ FightingDojoText6: ; 5cf06 (17:4f06)
     ld a,[$d7b1]
     and %11000000
     jr z,.GetMon
-    ld hl,OtherHitmonText
-    call PrintText
+    push de
+    call GetLastFighter ; ld hl,OtherHitmonText
+    pop de
+    ds 1 ; call PrintText
     jr .done
 .GetMon
     ld a,HITMONLEE ; Entry Level
@@ -86061,8 +86069,10 @@ FightingDojoText7: ; 5cf4e (17:4f4e)
     ld a,[$d7b1]
     and %11000000
     jr z,.GetMon
-    ld hl,OtherHitmonText
-    call PrintText
+    push de
+    call GetLastFighter ; ld hl,OtherHitmonText
+    pop de
+    ds 1 ; call PrintText
     jr .done
 .GetMon
     ld a,HITMONCHAN ; Entry Level
@@ -87920,6 +87930,71 @@ VermilionGymTrashFailText: ; 5df02 (17:5f02)
     call PlaySound
     call WaitForSoundToFinish
     jp TextScriptEnd
+
+CheckEnableOtherHitmon:
+    ld hl,wFlagEnableDojoLastPkmnBit4
+    bit 4,[hl]
+    jr nz,.Ignore
+    push hl
+    ld hl,W_OBTAINEDBADGES
+    bit 5,[hl] ; MARSHBADGE
+    pop hl
+    jr z,.Ignore
+    set 4,[hl]
+    pop hl ; Delete Return Pointer
+    ld hl,EnableLastDojoPkmnText
+    call PrintText
+    jp TextScriptEnd
+.Ignore
+    ld hl,UnnamedText_5ce9d
+    ret
+
+EnableLastDojoPkmnText:
+    TX_FAR _EnableLastDojoPkmnText
+    db "@"
+
+_EnableLastDojoPkmnText:
+    db $0,"Did you defeat",$4f
+    db "Sabrina the",$55
+    db "Witch? Ho Ho!",$51
+    db "I'm so happy that",$4f
+    db "I will also gift",$55
+    db "you the last",$55
+    db "Fighter!",$57
+
+GetLastFighter:
+    ld hl,wFlagEnableDojoLastPkmnBit4
+    bit 4,[hl]
+    jr z,.Ignore
+    ld hl,$d7b1
+    bit 6,[hl]
+    jr nz,.Hitmonlee
+    bit 7,[hl]
+    jr nz,.Hitmonchan
+.Ignore
+    ld hl,OtherHitmonText
+    jp PrintText
+.Hitmonchan
+    ld a,HITMONLEE
+    ld d,$4a
+    jr .Done
+.Hitmonlee
+    ld a,HITMONCHAN
+    ld d,$4b
+.Done
+    push de
+    push af
+    call DisplayPokedex
+    pop af
+    ld b,a
+    ld c,10
+    call GivePokemon
+    pop de
+    ret nc ; PartyFull
+    ld a,d
+    ld [$cc4d],a
+    ld a,$11
+    jp Predef ; Hide Last Pokeball
 
 SECTION "bank18",ROMX,BANK[$18]
 

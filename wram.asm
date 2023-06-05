@@ -1529,10 +1529,11 @@ wChoicePkmnMoveDeleter ; df37
 wDVForShinySpdSpc      ; df37
     ds 1
 
-wFlagAddPkmnToPartyBit0    ; df38 ; bit 0
-wFlagDratiniCaveBit1       ; df38 ; bit 1
-wFlagNoHpPalBit2           ; df38 ; bit 2
-wFlagEnableOakLastPkmnBit3 ; df38 ; bit 3
+wFlagAddPkmnToPartyBit0     ; df38 ; bit 0
+wFlagDratiniCaveBit1        ; df38 ; bit 1
+wFlagNoHpPalBit2            ; df38 ; bit 2
+wFlagEnableOakLastPkmnBit3  ; df38 ; bit 3
+wFlagEnableDojoLastPkmnBit4 ; df38 ; bit 4
     ds 1
 
 wFlagListMenuSpc: ; df39 ; Denim
