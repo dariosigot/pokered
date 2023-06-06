@@ -248,6 +248,7 @@ wEnemyMonEvasionMod: ; cd33
 wFieldMoves:
     ds 1 ; + 4
 
+wFlyLocationList: ; cd3d
 wWhichTrade: ; cd3d
 ; which entry from TradeMons to select
 ;    ds 1

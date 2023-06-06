@@ -94083,7 +94083,7 @@ Func_70f90: ; 70f90 (1c:4f90)
     ld hl,$8ed0
     ld bc,(BANK(TownMapUpArrow) << 8) + $01
     call CopyVideoDataDouble
-    call Func_71070
+    call BuildFlyLocationsList
     ld hl,$cfcb
     ld a,[hl]
     push af
@@ -94184,35 +94184,38 @@ Func_70fd6: ; 70fd6 (1c:4fd6)
     jr z,.asm_71058
     jp Func_70fd6
 .asm_71068
-    ld hl,$cd49
+    call CalcFlyingEndPointer ; ld hl,$cd49
     jr .asm_71058
 
 ToText: ; 7106d (1c:506d)
     db "To@"
 
-Func_71070: ; 71070 (1c:5070)
-    ld hl,wWhichTrade ; $cd3d
-    ld [hl],$ff
-    inc hl
-    ld a,[$d70b]
+BuildFlyLocationsList: ; 71070 (1c:5070)
+    ld bc,11 ; Num Flying City
+    ld hl,W_TOWNVISITEDFLAG
+    ld a,[hli]
     ld e,a
-    ld a,[$d70c]
+    ld a,[hl]
     ld d,a
-    ld bc,$b
-.asm_71081
+    ld a,$ff
+    ld hl,wFlyLocationList ; $cd3d
+    ld [hli],a ; Start of List
+    add hl,bc
+    ld [hl],a ; End of List
+.loop
     srl d
     rr e
     ld a,$fe
-    jr nc,.asm_7108a
+    jr nc,.notVisited
     ld a,b
-.asm_7108a
-    ld [hl],a
-    inc hl
+.notVisited
+    call InsertFlyingCitySorted
     inc b
     dec c
-    jr nz,.asm_71081
-    ld [hl],$ff
+    jr nz,.loop
     ret
+
+SECTION "TownMapUpArrow",ROMX[$5093],BANK[$1c]
 
 TownMapUpArrow: ; 71093 (1c:5093)
     INCBIN "gfx/up_arrow.1bpp"
@@ -97801,6 +97804,50 @@ MapIDList_70a44: ; Moved in the BANK
     db SEAFOAM_ISLANDS_2
     db SEAFOAM_ISLANDS_5
     db $FF
+
+CalcFlyingEndPointer:
+    ld hl,wFlyLocationList+1
+.Loop
+    ld a,[hli]
+    inc a
+    jr nz,.Loop
+    dec hl
+    ret
+
+; a = valore da inserire
+; b = id city
+InsertFlyingCitySorted:
+    push bc
+    push de
+    push af
+    ld hl,FlyingCitySortOrder
+    ld c,-1
+.Loop
+    inc c
+    ld a,[hli]
+    cp b
+    jr nz,.Loop
+    pop af
+    ld b,0
+    ld hl,wFlyLocationList+1
+    add hl,bc
+    ld [hl],a
+    pop de
+    pop bc
+    ret
+
+FlyingCitySortOrder:
+    db PALLET_TOWN
+    db VIRIDIAN_CITY
+    db PEWTER_CITY
+    db CERULEAN_CITY
+    db VERMILION_CITY
+    db LAVENDER_TOWN
+    db CELADON_CITY
+    db SAFFRON_CITY
+    db FUCHSIA_CITY
+    db CINNABAR_ISLAND
+    db INDIGO_PLATEAU
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
