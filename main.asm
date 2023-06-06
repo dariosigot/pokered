@@ -39226,7 +39226,7 @@ CeladonMansion5Text1: ; 1dd41 (7:5d41)
 CeladonMansion5Text2: ; 1dd46 (7:5d46)
     db $08 ; asm
     ld bc,(VOLTORB << 8) | 15
-    call GivePokemon
+    call GiveVoltorb ; call GivePokemon
     jr nc,.asm_24365 ; 0x1dd4d
     ld a,$45
     ld [$cc4d],a
@@ -41561,6 +41561,25 @@ GetOakLastPkmn:
 .Ignore
     ld hl,OaksLabLastMonText ; $5243
     jp PrintText
+
+GiveVoltorb:
+    push bc
+    ld hl,VoltorbText
+    call PrintText
+    pop bc
+    ld a,b
+    push bc
+    call DisplayPokedex
+    pop bc
+    jp GivePokemon
+
+VoltorbText:
+    TX_FAR _VoltorbText
+    db "@"
+
+_VoltorbText:
+    db $0,"Wow!",$4f
+    db "A Voltorb...",$58
 
 SECTION "bank8",ROMX,BANK[$8]
 
@@ -68408,20 +68427,20 @@ CeladonGameCornerText2: ; 48ca9 (12:4ca9)
     call Has9990Coins
     jr nc,.asm_31338 ; 0x48cc6
     xor a
-    ldh [$9f],a
-    ldh [$a1],a
-    ld a,$10
     ldh [$a0],a
+    ldh [$a1],a
+    ld a,$1
+    ldh [$9f],a
     call HasEnoughMoney
     jr nc,.asm_b6ef0 ; 0x48cd4
     ld hl,UnnamedText_48d31 ; $4d31
     jr .asm_e2afd ; 0x48cd9
 .asm_b6ef0 ; 0x48cdb
     xor a
-    ldh [$9f],a
-    ldh [$a1],a
-    ld a,$10
     ldh [$a0],a
+    ldh [$a1],a
+    ld a,$1
+    ldh [$9f],a
     ld hl,$ffa1
     ld de,$d349
     ld c,$3
@@ -68429,9 +68448,9 @@ CeladonGameCornerText2: ; 48ca9 (12:4ca9)
     call Predef
     xor a
     ldh [$9f],a
-    ldh [$a0],a
-    ld a,$50
     ldh [$a1],a
+    ld a,$5
+    ldh [$a0],a
     ld de,$d5a5
     ld hl,$ffa1
     ld c,$2
@@ -69189,7 +69208,7 @@ MtMoonPokecenterText4: ; 492ec (12:52ec)
     jr .asm_49356 ; 0x4931c
 .asm_faa09 ; 0x4931e
     ld bc,(MAGIKARP << 8) | 1
-    call GivePokemon
+    call GiveMagikarp ; call GivePokemon
     jr nc,.asm_49359 ; 0x49324
     xor a
     ld [wWhichTrade],a
@@ -71029,6 +71048,13 @@ FlagInstantAndPredefCeladonMart: ; xxxxx (12:xxxx) ; Denim
     ld hl,wFlagListMenuSpc
     res 1,[hl]
     ret
+
+GiveMagikarp:
+    ld a,b
+    push bc
+    call DisplayPokedex
+    pop bc
+    jp GivePokemon
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -74229,7 +74255,7 @@ SilphCo7Text1: ; 51d8e (14:5d8e)
     ld hl,UnnamedText_51dd3
     call PrintText
     ld bc,(PORYGON << 8) | 10 ; Entry Level
-    call GivePokemon
+    call GivePorygon ; call GivePokemon
     jr nc,.asm_b3069 ; 0x51db1
     ld a,[$ccd3]
     and a
@@ -75373,53 +75399,29 @@ NoThanksText: ; 5284f (14:684f)
     db "NO THANKS@"
 
 PrizeMenuMon1Entries: ; 52859 (14:6859)
-    db ABRA
-    db CLEFAIRY
-IF _RED
-    db NIDORINA
-ENDC
-IF _BLUE
-    db NIDORINO
-ENDC
+    db ONIX
+    db PIKACHU
+    db STARYU
     db "@"
 PrizeMenuMon1Cost: ; 5285d (14:685d)
-IF _RED
-    db $01,$80
-    db $05,$00
-ENDC
-IF _BLUE
-    db $01,$20
-    db $07,$50
-ENDC
-    db $12,$00
+    db $08,$00
+    db $10,$00
+    db $25,$00
     db "@"
 
 PrizeMenuMon2Entries: ; 52864 (14:6864)
-IF _RED
-    db DRATINI
-    db SCYTHER
-ENDC
-IF _BLUE
-    db PINSIR
-    db DRATINI
-ENDC
-    db PORYGON
+    db CHARMANDER
+    db SQUIRTLE
+    db BULBASAUR
     db "@"
 PrizeMenuMon2Cost: ; 52868 (14:6868)
-IF _RED
-    db $28,$00
-    db $55,$00
-    db $99,$99
-ENDC
-IF _BLUE
-    db $25,$00
-    db $46,$00
     db $65,$00
-ENDC
+    db $65,$00
+    db $65,$00
     db "@"
 
 PrizeMenuTMsEntries: ; 5286f (14:686f)
-    db TM_23
+    db RARE_CANDY
     db TM_15
     db TM_50
     db "@"
@@ -75487,7 +75489,7 @@ HandlePrizeChoice: ; 528c6 (14:68c6)
     call GetItemName
     jr .GivePrize
 .GetMonName ; 14:68E3
-    call GetMonName
+    call DisplayPokedexAndGetMonName ;  call GetMonName
 .GivePrize ; 14:68E6
     ld hl,SoYouWantPrizeTextPtr
     call PrintText
@@ -75585,24 +75587,12 @@ GetPrizeMonLevel: ; 52977 (14:6977)
     ret
 
 PrizeMonLevelDictionary: ; 5298a (14:698a)
-IF _RED
-    db ABRA,9
-    db CLEFAIRY,8
-    db NIDORINA,17
-
-    db DRATINI,18
-    db SCYTHER,25
-    db PORYGON,26
-ENDC
-IF _BLUE
-    db ABRA,6
-    db CLEFAIRY,12
-    db NIDORINO,17
-
-    db PINSIR,20
-    db DRATINI,24
-    db PORYGON,18
-ENDC
+    db ONIX,10
+    db PIKACHU,10
+    db STARYU,18
+    db CHARMANDER,12
+    db SQUIRTLE,12
+    db BULBASAUR,12
 
 Func_52996: ; 52996 (14:6996)
     call EnableAutoTextBoxDrawing
@@ -75783,6 +75773,24 @@ GetSpecialListNameOrGetItemName_: ; xxxxx (14:6A4A) ; Denim
     db "B1F@"
     db "B2F@"
     db "B4F@"
+
+DisplayPokedexAndGetMonName:
+    ld hl,$d11e
+    ld a,[hl]
+    push af
+    push hl
+    call DisplayPokedex
+    pop hl
+    pop af
+    ld [hl],a
+    jp GetMonName
+
+GivePorygon:
+    ld a,b
+    push bc
+    call DisplayPokedex
+    pop bc
+    jp GivePokemon
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -101216,8 +101224,8 @@ Lab4Text1: ; 75d6c (1d:5d6c)
     set 2,[hl]
     ld a,[W_FOSSILMON]
     ld b,a
-    ld c,$1e
-    call GivePokemon
+    ld c,30
+    call GiveFossil ; call GivePokemon
     jr nc,.asm_75d93 ; 0x75db9 $d8
     ld hl,$d7a3
     res 0,[hl]
@@ -102684,6 +102692,13 @@ FlagInstantAndDisplayListMenuID: ; xxxxx (1d:xxxx) ; Denim
     res 0,[hl]
     pop af
     ret
+
+GiveFossil:
+    ld a,b
+    push bc
+    call DisplayPokedex
+    pop bc
+    jp GivePokemon
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -113027,7 +113042,7 @@ _UnnamedText_51dd3: ; 84430 (21:4430)
 _UnnamedText_51dd8: ; 8449e (21:449e)
     db $0,"It's PORYGON. It's",$4f
     db "very intelligent.",$51
-    db "We create it in our",$4f
+    db "We create it in",$4f
     db "lab,but it will",$55
     db "be much better",$55
     db "off with you!",$51
@@ -121664,15 +121679,14 @@ _CeladonGameCornerText1: ; 9d8d5 (27:58d5)
 _UnnamedText_48d22: ; 9d91a (27:591a)
     db $0,"Welcome to ROCKET",$4f
     db "GAME CORNER!",$51
-    db "Do you need some",$4f
-    db "game coins?",$51
-    db "It's ¥1000 for 50",$4f
-    db "coins. Would you",$55
-    db "like some?",$57
+    db "It's ¥10000 for",$4f
+    db "500 coins. Ok?",$57
 
 _UnnamedText_48d27: ; 9d984 (27:5984)
     db $0,"Thanks! Here are",$4f
-    db "your 50 coins!",$57
+    db "your 500 coins!",$57
+
+SECTION "_UnnamedText_48d2c",ROMX[$59a5],BANK[$27]
 
 _UnnamedText_48d2c: ; 9d9a5 (27:59a5)
     db $0,"No? Please come",$4f
