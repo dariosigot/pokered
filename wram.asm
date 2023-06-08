@@ -1348,6 +1348,7 @@ W_FOSSILMON: ; d710
 ; mon that will result from the item
     ds 1
 
+wFossilSteps: ; d711
     ds 2
 
 W_ENEMYMONORTRAINERCLASS: ; d713

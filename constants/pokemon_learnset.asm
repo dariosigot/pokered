@@ -2511,17 +2511,17 @@ Mon131_EvosMoves:
     ;   1,WATER_GUN
     ;   1,GROWL
     db  7,BIDE
-    db  9,SING
-    db 11,CONFUSE_RAY
-    db 13,SKULL_BASH
-    db 16,AURORA_BEAM
-    db 18,TAKE_DOWN
-    db 20,MIST
-    db 25,BODY_SLAM
-    db 28,TSUNAMI
-    db 31,THUNDERSHOCK
-    db 35,HAZE
-    db 38,ICE_BEAM
+    db 11,SING
+    db 16,CONFUSE_RAY
+    db 19,SKULL_BASH
+    db 21,AURORA_BEAM
+    db 24,TAKE_DOWN
+    db 26,MIST
+    db 29,BODY_SLAM
+    db 32,TSUNAMI
+    db 35,THUNDERSHOCK
+    db 39,HAZE
+    db 42,ICE_BEAM
     db 46,HYDRO_PUMP
     db 50,SPIKE_CANNON
     db 54,BLIZZARD

@@ -839,12 +839,12 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     ld hl,$d72c
     res 0,[hl]
 .doneStepCounting
+    ld b,BANK(Func_1e997) ; Forced also in "not safari" because Count FossilSteps
+    ld hl,Func_1e997
+    call Bankswitch
     ld a,[$d790]
     bit 7,a ; in the safari zone?
     jr z,.notSafariZone
-    ld b,BANK(Func_1e997)
-    ld hl,Func_1e997
-    call Bankswitch
     ld a,[$da46]
     and a
     jp nz,WarpFound2
@@ -25651,7 +25651,6 @@ ReadRodData:
     ret
 
 OldRodData:
-    db PALLET_TOWN
     db CERULEAN_CITY
     db VERMILION_CITY
     db FUCHSIA_CITY
@@ -25661,7 +25660,6 @@ OldRodData:
     db ROUTE_13
     db ROUTE_17
     db ROUTE_18
-    db ROUTE_19
     db ROUTE_24
     db ROUTE_25
     db VERMILION_DOCK
@@ -36618,8 +36616,8 @@ CinnabarIslandScript: ; 1ca19 (7:4a19)
     set 5,[hl]
     ld hl,$d796
     res 0,[hl]
-    ld hl,$d7a3
-    res 1,[hl]
+    ds 3 ; ld hl,$d7a3
+    ds 2 ; res 1,[hl]
     ld hl,CinnabarIslandScriptPointers
     ld a,[W_CINNABARISLANDCURSCRIPT]
     jp CallFunctionInTable
@@ -40822,7 +40820,8 @@ Func_1e988: ; 1e988 (7:6988)
     jr asm_1e9ab
 
 Func_1e997: ; 1e997 (7:6997)
-    ld a,[wSafariSteps] ; $d70d
+    jp DecreaseFossilStep ; ld a,[wSafariSteps] ; $d70d
+ContinueSafariSteps:
     ld b,a
     ld a,[wSafariSteps + 1] ; $d70e
     ld c,a
@@ -41629,6 +41628,33 @@ VoltorbText:
 _VoltorbText:
     db $0,"Wow!",$4f
     db "A Voltorb...",$58
+
+DecreaseFossilStep:
+    ld hl,$d7a3
+    bit 1,[hl]
+    jr z,.Skip
+    ld a,[wFossilSteps]
+    ld b,a
+    ld a,[wFossilSteps+1]
+    ld c,a
+    or b
+    jr nz,.FossilStepNotZero
+    res 1,[hl] ; Fossil Live
+    ld a,$86
+    call PlaySound
+    jr .Skip
+.FossilStepNotZero
+    dec bc
+    ld a,b
+    ld [wFossilSteps],a ; $d70d
+    ld a,c
+    ld [wFossilSteps+1],a ; $d70e
+.Skip
+    ld a,[$d790]
+    bit 7,a ; in the safari zone?
+    ret z ; notSafariZone
+    ld a,[wSafariSteps] ; $d70d
+    jp ContinueSafariSteps
 
 SECTION "bank8",ROMX,BANK[$8]
 
@@ -82511,7 +82537,7 @@ Route16Script0: ; 59959 (16:5959)
     call DisplayTextID
     ld a,$84
     ld [W_CUROPPONENT],a ; $d059
-    ld a,15 ; Snorlax
+    ld a,22 ; Snorlax
     ld [W_CURENEMYLVL],a ; $d127
     ld a,$21
     ld [$cc4d],a
@@ -89514,10 +89540,10 @@ GiveFossilToCinnabarLab: ; 61006 (18:5006)
     ld b,AERODACTYL
     jr .fossilSelected
 .choseHelixFossil
-    ld b,OMANYTE
+    ld b,OMASTAR ; Entry Level
     jr .fossilSelected
 .choseDomeFossil
-    ld b,KABUTO
+    ld b,KABUTOPS ; Entry Level
 .fossilSelected
     ld [W_FOSSILITEM],a
     ld a,b
@@ -89538,7 +89564,7 @@ GiveFossilToCinnabarLab: ; 61006 (18:5006)
     call Bankswitch ; indirect jump to RemoveItemByID (17f37 (5:7f37))
     ld hl,UnnamedText_610b8
     call PrintText
-    ld hl,$d7a3
+    call ResetFossilSteps ; ld hl,$d7a3
     set 0,[hl]
     set 1,[hl]
     ret
@@ -91902,6 +91928,15 @@ PredefAndHideFuchsiaGuard:
     ld [$cc4d],a
     ld a,$11
     jp Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
+
+ResetFossilSteps:
+    ld hl,wFossilSteps
+    ld a,5000 / $100
+    ld [hli],a
+    ld a,5000 % $100
+    ld [hl],a
+    ld hl,$d7a3
+    ret
 
 SECTION "bank19",ROMX,BANK[$19]
 
@@ -94426,15 +94461,15 @@ Func_711ef: ; 711ef (1c:51ef)
     ld a,l
     and a
     jr nz,.asm_71236
-    FuncCoord 1,7 ; $c42d
-    ld hl,Coord
-    ld b,$2
-    ld c,$f
-    call TextBoxBorder
-    FuncCoord 2,9 ; $c456
-    ld hl,Coord
-    ld de,AreaUnknownText ; $524a
-    call PlaceString
+    ;FuncCoord 1,7 ; $c42d
+    ;ld hl,Coord
+    ;ld b,$2
+    ;ld c,$f
+    ;call TextBoxBorder
+    ;FuncCoord 2,9 ; $c456
+    ;ld hl,Coord
+    ;ld de,AreaUnknownText ; $524a
+    ;call PlaceString
     jr .asm_7123e
 .asm_71236
     ld a,[W_CURMAP] ; $d35e
@@ -94446,8 +94481,10 @@ Func_711ef: ; 711ef (1c:51ef)
     ld bc,$a0
     jp CopyData
 
-AreaUnknownText: ; 7124a (1c:524a)
-    db " AREA UNKNOWN@"
+;AreaUnknownText: ; 7124a (1c:524a)
+;    db " AREA UNKNOWN@"
+
+SECTION "Func_71258",ROMX[$5258],BANK[$1c]
 
 Func_71258: ; 71258 (1c:5258)
     push af
@@ -94657,7 +94694,7 @@ InternalMapEntries: ; 71382 (1c:5382)
     IMAP $57,$D,$9,Route11Name
     IMAP $58,$E,$7,Route12Name
     IMAP $59,$C,$0,SeaCottageName
-    IMAP $5F,$A,$9,VermilionCityName
+    IMAP $5E,$A,$9,VermilionCityName
     IMAP $69,$9,$A,SSAnneName
     IMAP $6A,$E,$7,Route12Name
     IMAP $6D,$0,$4,VictoryRoadName
@@ -101302,7 +101339,7 @@ Lab4Text1: ; 75d6c (1d:5d6c)
     set 2,[hl]
     ld a,[W_FOSSILMON]
     ld b,a
-    ld c,30
+    ld c,40
     call GiveFossil ; call GivePokemon
     jr nc,.asm_75d93 ; 0x75db9 $d8
     ld hl,$d7a3
@@ -126753,10 +126790,10 @@ LoadWildData:
     jp CopyData
 
 WildDataPointers:
-    dw NoMons        ; PALLET_TOWN
+    dw PalletMons    ; PALLET_TOWN
     dw NoMons        ; VIRIDIAN_CITY
     dw NoMons        ; PEWTER_CITY
-    dw NoMons        ; CERULEAN_CITY
+    dw CeruleanMons  ; CERULEAN_CITY
     dw NoMons        ; LAVENDER_TOWN
     dw VermilionMons ; VERMILION_CITY
     dw CeladonMons   ; CELADON_CITY
@@ -127021,60 +127058,19 @@ NoMons: ; d0dd (3:50dd)
     db $00
     db $00
 
-VermilionMons:
+PalletMons:
     db $00
-
     db $05
-    db 16,MAGIKARP  ; 20%
-    db 13,GOLDEEN   ; 20%
-    db 17,GOLDEEN   ; 15%
-    db 21,MAGIKARP  ; 10%
-    db 15,POLIWAG   ; 10%
-    db 21,GOLDEEN   ; 10%
-    db 18,POLIWAG   ;  5%
-    db 33,SEAKING   ;  5%
-    db 35,SEAKING   ;  4%
-    db 25,POLIWHIRL ;  1%
-
-DockMons:
-    db $01
-    db $FF,$FF ; 20%
-    db $FF,$FF ; 20%
-    db $FF,$FF ; 15%
-    db $FF,$FF ; 10%
-    db $FF,$FF ; 10%
-    db $FF,$FF ; 10%
-    db $FF,$FF ;  5%
-    db $FF,$FF ;  5%
-    db $FF,$FF ;  4%
-    db $FF,$FF ;  1%
-
-    db $05
-    db 16,MAGIKARP  ; 20%
-    db 13,GOLDEEN   ; 20%
-    db 17,GOLDEEN   ; 15%
-    db 21,MAGIKARP  ; 10%
-    db 15,POLIWAG   ; 10%
-    db 21,GOLDEEN   ; 10%
-    db 18,POLIWAG   ;  5%
-    db 33,SEAKING   ;  5%
-    db 35,SEAKING   ;  4%
-    db 25,POLIWHIRL ;  1%
-
-CeladonMons:
-    db $00
-
-    db $1E
-    db 13,GRIMER ; 20%
-    db 16,GRIMER ; 20%
-    db 22,GRIMER ; 15%
-    db 19,GRIMER ; 10%
-    db 28,GRIMER ; 10%
-    db 31,GRIMER ; 10%
-    db 25,GRIMER ;  5%
-    db 35,GRIMER ;  5%
-    db 38,MUK    ;  4%
-    db 40,MUK    ;  1%
+    db 18,KRABBY   ; 20%
+    db 24,KRABBY   ; 20%
+    db 21,KRABBY   ; 15%
+    db 15,SHELLDER ; 10%
+    db 17,SHELLDER ; 10%
+    db 27,KRABBY   ; 10%
+    db 33,KINGLER  ;  5%
+    db 33,KINGLER  ;  5%
+    db 35,KINGLER  ;  4%
+    db 31,CLOYSTER ;  1% ; Entry Level
 
 Route1Mons:
     db $19
@@ -127200,7 +127196,31 @@ Route4Mons:
     db 13,MANKEY    ;  5%
     db  8,EKANS     ;  4%
     db 13,EKANS     ;  1%
+    db $05
+    db 18,GOLDEEN   ; 20%
+    db 24,GOLDEEN   ; 20%
+    db 21,GOLDEEN   ; 15%
+    db 15,STARYU    ; 10%
+    db 17,STARYU    ; 10%
+    db 27,GOLDEEN   ; 10%
+    db 33,SEAKING   ;  5%
+    db 33,SEAKING   ;  5%
+    db 35,SEAKING   ;  4%
+    db 31,STARMIE   ;  1% ; Entry Level
+
+CeruleanMons:
     db $00
+    db $05
+    db 15,GOLDEEN   ; 20%
+    db 21,GOLDEEN   ; 20%
+    db 18,GOLDEEN   ; 15%
+    db 15,MAGIKARP  ; 10%
+    db 12,MAGIKARP  ; 10%
+    db 18,HORSEA    ; 10%
+    db 21,HORSEA    ;  5%
+    db 24,GOLDEEN   ;  5%
+    db 33,SEAKING   ;  4%
+    db 33,SEAKING   ;  1%
 
 Route24Mons:
     db $19
@@ -127214,7 +127234,17 @@ Route24Mons:
     db 14,BELLSPROUT ;  5%
     db 12,VENONAT    ;  4%
     db  9,ABRA       ;  1%
-    db $00
+    db $05
+    db 15,GOLDEEN   ; 20%
+    db 21,GOLDEEN   ; 20%
+    db 18,GOLDEEN   ; 15%
+    db 15,MAGIKARP  ; 10%
+    db 12,MAGIKARP  ; 10%
+    db 18,HORSEA    ; 10%
+    db 21,HORSEA    ;  5%
+    db 24,GOLDEEN   ;  5%
+    db 33,SEAKING   ;  4%
+    db 33,SEAKING   ;  1%
 
 Route25Mons:
     db $0F
@@ -127228,7 +127258,17 @@ Route25Mons:
     db 16,NIDORINA   ;  5% ; Entry Level
     db 17,PIDGEY     ;  4%
     db 18,PIDGEOTTO  ;  1% ; Entry Level
-    db $00
+    db $05
+    db 21,HORSEA   ; 20%
+    db 18,GOLDEEN  ; 20%
+    db 15,MAGIKARP ; 15%
+    db 18,HORSEA   ; 10%
+    db 18,GOLDEEN  ; 10%
+    db 12,MAGIKARP ; 10%
+    db 24,HORSEA   ;  5%
+    db 32,SEADRA   ;  5%
+    db 34,SEADRA   ;  4%
+    db 37,SEADRA   ;  1%
 
 Route5Mons:
     db $0F
@@ -127256,7 +127296,6 @@ Route6Mons:
     db 11,FARFETCH_D ;  5%
     db 13,POLIWAG    ;  4%
     db 13,PSYDUCK    ;  1%
-
     db $05
 	db 20,POLIWAG    ; 20%
 	db 19,FARFETCH_D ; 20%
@@ -127268,6 +127307,44 @@ Route6Mons:
 	db 23,FARFETCH_D ;  5%
 	db 32,POLIWRATH  ;  4% ; Entry Level
 	db 33,GOLDUCK    ;  1% ; Entry Level
+
+VermilionMons:
+    db $00
+    db $05
+    db 16,MAGIKARP  ; 20%
+    db 13,GOLDEEN   ; 20%
+    db 17,GOLDEEN   ; 15%
+    db 21,MAGIKARP  ; 10%
+    db 15,POLIWAG   ; 10%
+    db 21,GOLDEEN   ; 10%
+    db 18,POLIWAG   ;  5%
+    db 33,SEAKING   ;  5%
+    db 35,SEAKING   ;  4%
+    db 25,POLIWHIRL ;  1%
+
+DockMons:
+    db $01
+    db $FF,$FF ; 20%
+    db $FF,$FF ; 20%
+    db $FF,$FF ; 15%
+    db $FF,$FF ; 10%
+    db $FF,$FF ; 10%
+    db $FF,$FF ; 10%
+    db $FF,$FF ;  5%
+    db $FF,$FF ;  5%
+    db $FF,$FF ;  4%
+    db $FF,$FF ;  1%
+    db $05
+    db 16,MAGIKARP  ; 20%
+    db 13,GOLDEEN   ; 20%
+    db 17,GOLDEEN   ; 15%
+    db 21,MAGIKARP  ; 10%
+    db 15,POLIWAG   ; 10%
+    db 21,GOLDEEN   ; 10%
+    db 18,POLIWAG   ;  5%
+    db 33,SEAKING   ;  5%
+    db 35,SEAKING   ;  4%
+    db 25,POLIWHIRL ;  1%
 
 Route11Mons:
     db $0F
@@ -127281,7 +127358,6 @@ Route11Mons:
     db 16,SANDSHREW ;  5%
     db 11,DROWZEE   ;  4%
     db 15,DROWZEE   ;  1%
-
     db $05
     db 16,MAGIKARP  ; 20%
     db 13,GOLDEEN   ; 20%
@@ -127334,7 +127410,17 @@ Route10Mons:
     db 15,MAGNEMITE ;  5%
     db 15,GRIMER    ;  4%
     db 18,KOFFING   ;  1%
-    db $00
+    db $05
+    db 11,MAGIKARP   ; 20%
+    db 15,GRIMER     ; 20%
+    db 18,TENTACOOL  ; 15%
+    db 27,GRIMER     ; 10%
+    db 21,GRIMER     ; 10%
+    db 21,TENTACOOL  ; 10%
+    db 14,MAGIKARP   ;  5%
+    db 30,TENTACRUEL ;  5%
+    db 36,TENTACRUEL ;  4%
+    db 38,MUK        ;  1%
 
 TunnelMonsB1:
     db $0F
@@ -127391,6 +127477,20 @@ Route7Mons:
     db 23,MANKEY    ;  4%
     db 28,PRIMEAPE  ;  1% ; Entry Level
     db $00
+
+CeladonMons:
+    db $00
+    db $1E
+    db 13,GRIMER ; 20%
+    db 16,GRIMER ; 20%
+    db 22,GRIMER ; 15%
+    db 19,GRIMER ; 10%
+    db 28,GRIMER ; 10%
+    db 31,GRIMER ; 10%
+    db 25,GRIMER ;  5%
+    db 35,GRIMER ;  5%
+    db 38,MUK    ;  4% ; Entry Level
+    db 40,MUK    ;  1%
 
 Route16Mons:
     db $19
@@ -127488,7 +127588,17 @@ Route12Mons:
     db 25,RATICATE  ;  5%
     db 18,SLOWPOKE  ;  4% ; Entry Level
     db 22,SLOWPOKE  ;  1%
-    db $00
+    db $05
+    db 21,MAGIKARP   ; 20%
+    db 21,GOLDEEN    ; 20%
+    db 18,MAGIKARP   ; 15%
+    db 24,GOLDEEN    ; 10%
+    db 22,TENTACOOL  ; 10%
+    db 24,MAGIKARP   ; 10%
+    db 24,TENTACOOL  ;  5%
+    db 34,SEAKING    ;  5%
+    db 37,SEAKING    ;  4%
+    db 33,TENTACRUEL ;  1%
 
 Route13Mons:
     db $0F
@@ -127502,7 +127612,17 @@ Route13Mons:
     db 22,WEEPINBELL ;  5%
     db 13,TANGELA    ;  4% ; Entry level
     db 31,VENOMOTH   ;  1% ; Entry level
-    db $00
+    db $05
+    db 21,MAGIKARP   ; 20%
+    db 21,GOLDEEN    ; 20%
+    db 18,MAGIKARP   ; 15%
+    db 24,GOLDEEN    ; 10%
+    db 22,TENTACOOL  ; 10%
+    db 24,MAGIKARP   ; 10%
+    db 24,TENTACOOL  ;  5%
+    db 34,SEAKING    ;  5%
+    db 37,SEAKING    ;  4%
+    db 33,TENTACRUEL ;  1%
 
 Route14Mons:
     db $0F
@@ -127542,8 +127662,8 @@ Route17Mons:
     db 28,RATICATE ; 10%
     db 25,KOFFING  ;  5%
     db 25,GRIMER   ;  5%
-    db 35,WEEZING  ;  4% ; Entry Level
-    db 38,MUK      ;  1% ; Entry Level
+    db 31,RATICATE ;  4%
+    db 35,WEEZING  ;  1% ; Entry Level
     db $00
 
 Route18Mons:
@@ -127572,21 +127692,41 @@ ZoneMonsCenter:
     db 32,VENOMOTH   ;  5%
     db 23,SCYTHER    ;  4%
     db 23,PINSIR     ;  1%
-    db $00
+    db $0E
+    db 17,MAGIKARP  ; 20%
+    db 28,SEEL      ; 20%
+    db 15,DRATINI   ; 15%
+    db 20,MAGIKARP  ; 10%
+    db 25,SEEL      ; 10%
+    db 22,DRATINI   ; 10%
+    db 23,MAGIKARP  ;  5%
+    db 28,GYARADOS  ;  5%
+    db 32,GYARADOS  ;  4%
+    db 34,DRAGONAIR ;  1%
 
 ZoneMons1:
     db $1E
     db 17,PONYTA  ; 20%
     db 20,DODUO   ; 20%
-    db 16,PONYTA  ; 15%
+    db 16,RHYHORN ; 15%
     db 20,PONYTA  ; 10%
     db 17,DODUO   ; 10% ; Entry Level
-    db 16,RHYHORN ; 10%
+    db 12,RHYHORN ; 10% ; Entry Level
     db 22,DODUO   ;  5%
-    db 12,RHYHORN ;  5% ; Entry Level
-    db 20,RHYHORN ;  4%
+    db 26,TAUROS  ;  5%
+    db 28,TAUROS  ;  4%
     db 31,TAUROS  ;  1%
-    db $00
+    db $0E
+    db 17,MAGIKARP  ; 20%
+    db 28,SEEL      ; 20%
+    db 15,DRATINI   ; 15%
+    db 20,MAGIKARP  ; 10%
+    db 25,SEEL      ; 10%
+    db 22,DRATINI   ; 10%
+    db 23,MAGIKARP  ;  5%
+    db 28,GYARADOS  ;  5%
+    db 32,GYARADOS  ;  4%
+    db 15,LAPRAS    ;  1% ; Entry Level
 
 ZoneMons2:
     db $1E
@@ -127600,7 +127740,17 @@ ZoneMons2:
     db 31,NIDOQUEEN  ;  5% ; Entry Level
     db 29,KANGASKHAN ;  4%
     db  7,KANGASKHAN ;  1% ; Entry Level
-    db $00
+    db $0E
+    db 17,MAGIKARP  ; 20%
+    db 28,SEEL      ; 20%
+    db 15,DRATINI   ; 15%
+    db 20,MAGIKARP  ; 10%
+    db 25,SEEL      ; 10%
+    db 22,DRATINI   ; 10%
+    db 23,MAGIKARP  ;  5%
+    db 28,GYARADOS  ;  5%
+    db 32,GYARADOS  ;  4%
+    db 34,DRAGONAIR ;  1%
 
 ZoneMons3:
     db $1E
@@ -127609,29 +127759,53 @@ ZoneMons3:
     db 22,TANGELA   ; 15%
     db 19,EXEGGCUTE ; 10%
     db 11,EXEGGCUTE ; 10% ; Entry Level
-    db 18,TANGELA   ; 10%
-    db 27,LICKITUNG ;  5%
+    db 18,LICKITUNG ; 10%
+    db 14,LICKITUNG ;  5% ; Entry Level
     db 12,EEVEE     ;  5% ; Entry Level
     db 15,EEVEE     ;  4%
     db  7,CHANSEY   ;  1% ; Entry Level
-    db $00
-
-; ─────────────────────────────────
+    db $0E
+    db 17,MAGIKARP  ; 20%
+    db 28,SEEL      ; 20%
+    db 15,DRATINI   ; 15%
+    db 20,MAGIKARP  ; 10%
+    db 25,SEEL      ; 10%
+    db 22,DRATINI   ; 10%
+    db 23,MAGIKARP  ;  5% ; Shiny If Level 26 in SAFARI_ZONE_WEST
+    db 28,GYARADOS  ;  5%
+    db 32,GYARADOS  ;  4%
+    db 34,DRAGONAIR ;  1%
 
 WaterMons:
     db $00
-
     db $05
-    db 5,TENTACOOL  ; 20%
-    db 10,TENTACOOL ; 20%
-    db 15,TENTACOOL ; 15%
-    db 5,TENTACOOL  ; 10%
-    db 10,TENTACOOL ; 10%
-    db 15,TENTACOOL ; 10%
-    db 20,TENTACOOL ;  5%
-    db 30,TENTACOOL ;  5%
-    db 35,TENTACOOL ;  4%
-    db 40,TENTACOOL ;  1%
+    db 11,TENTACOOL  ; 20%
+    db 15,TENTACOOL  ; 20%
+    db 21,TENTACOOL  ; 15%
+    db 24,TENTACOOL  ; 10%
+    db 35,SEAKING    ; 10%
+    db 10,SEEL       ; 10%
+    db 20,SEEL       ;  5%
+    db 32,TENTACRUEL ;  5%
+    db 36,TENTACRUEL ;  4%
+    db 34,DEWGONG    ;  1% ; Entry Level
+
+; KRABBY
+; SHELLDER
+; STARYU
+
+; ZUBAT
+; GOLBAT
+
+; SLOWPOKE
+; SEEL
+
+; DEWGONG
+; SLOWBRO
+
+; OMANYTE
+; KABUTO
+; JYNX
 
 IslandMons1:
     db $0F
@@ -127702,6 +127876,8 @@ IslandMonsB4:
     db 39,SLOWBRO   ;  4%
     db 32,GOLBAT    ;  1%
     db $00
+
+; ─────────────────────────────────
 
 MansionMons1:
     db $0A
@@ -127944,7 +128120,7 @@ GoodRodData:
     dbdw FUCHSIA_CITY        , GoodRodGroupFishGuru
     dbdw CINNABAR_ISLAND     , GoodRodGroupSouth
     dbdw ROUTE_6             , GoodRodGroupPsyduck
-    dbdw ROUTE_10            , GoodRodGroupEst
+    dbdw ROUTE_10            , GoodRodGroupPowerPlant
     dbdw ROUTE_11            , GoodRodGroupCenter
     dbdw ROUTE_12            , GoodRodGroupEst
     dbdw ROUTE_13            , GoodRodGroupEst
@@ -127969,7 +128145,7 @@ SuperRodData:
     dbdw FUCHSIA_CITY        , SuperRodGroupFishGuru
     dbdw CINNABAR_ISLAND     , SuperRodGroupSouth
     dbdw ROUTE_6             , SuperRodGroupPsyduck
-    dbdw ROUTE_10            , SuperRodGroupEst
+    dbdw ROUTE_10            , SuperRodGroupPowerPlant
     dbdw ROUTE_11            , SuperRodGroupCenter
     dbdw ROUTE_12            , SuperRodGroupEst
     dbdw ROUTE_13            , SuperRodGroupEst
@@ -127978,19 +128154,19 @@ SuperRodData:
     dbdw ROUTE_19            , SuperRodGroupBeach
     dbdw ROUTE_20            , SuperRodGroupSouth
     dbdw ROUTE_21            , SuperRodGroupSouth
-    dbdw ROUTE_23            , SuperRodGroupLake
+    ;dbdw ROUTE_23            , SuperRodGroupLake
     dbdw ROUTE_24            , SuperRodGroupNorth
     dbdw ROUTE_25            , SuperRodGroupNorth
     dbdw VERMILION_DOCK      , SuperRodGroupCenter
-    dbdw SEAFOAM_ISLANDS_4   , SuperRodGroupSeaform
-    dbdw SEAFOAM_ISLANDS_5   , SuperRodGroupSeaform
+    ;dbdw SEAFOAM_ISLANDS_4   , SuperRodGroupSeaform
+    ;dbdw SEAFOAM_ISLANDS_5   , SuperRodGroupSeaform
     dbdw SAFARI_ZONE_EAST    , SuperRodGroupSafari
     dbdw SAFARI_ZONE_NORTH   , SuperRodGroupSafari
     dbdw SAFARI_ZONE_WEST    , SuperRodGroupSafari
     dbdw SAFARI_ZONE_CENTER  , SuperRodGroupSafari
-    dbdw UNKNOWN_DUNGEON_2   , SuperRodGroupUnknown
-    dbdw UNKNOWN_DUNGEON_3   , SuperRodGroupUnknown
-    dbdw UNKNOWN_DUNGEON_1   , SuperRodGroupUnknown
+    ;dbdw UNKNOWN_DUNGEON_2   , SuperRodGroupUnknown
+    ;dbdw UNKNOWN_DUNGEON_3   , SuperRodGroupUnknown
+    ;dbdw UNKNOWN_DUNGEON_1   , SuperRodGroupUnknown
     db $FF
 
     ;────────────────
@@ -128035,33 +128211,31 @@ SuperRodData:
     ;────────────────
 
 GoodRodGroupBeach:
-    db 16
-    db  1,MAGIKARP
-    db  1,MAGIKARP
-    db  2,MAGIKARP
-    db  2,MAGIKARP
-    db  2,MAGIKARP
-    db  2,MAGIKARP
-    db  3,MAGIKARP
-    db  2,GOLDEEN ; Entry Level
-    db  2,GOLDEEN
-    db  2,GOLDEEN
-    db  3,GOLDEEN
+    db  8
     db  2,KRABBY ; Entry Level
     db  2,KRABBY
+    db  2,KRABBY
     db  3,KRABBY
+    db  2,GOLDEEN ; Entry Level
+    db  3,GOLDEEN
     db  2,TENTACOOL ; Entry Level
     db  3,TENTACOOL
 
 SuperRodGroupBeach:
     db 32
-    db  1,MAGIKARP
-    db  5,MAGIKARP
-    db  9,MAGIKARP
-    db 13,MAGIKARP
-    db 13,MAGIKARP
-    db 17,MAGIKARP
-    db 21,MAGIKARP
+    db  2,KRABBY
+    db  5,KRABBY
+    db  9,KRABBY
+    db  9,KRABBY
+    db 13,KRABBY
+    db 13,KRABBY
+    db 13,KRABBY
+    db 17,KRABBY
+    db 17,KRABBY
+    db 21,KRABBY
+    db 21,KRABBY
+    db 24,KRABBY
+    db 27,KRABBY
     db  5,GOLDEEN
     db  9,GOLDEEN
     db  9,GOLDEEN
@@ -128069,12 +128243,6 @@ SuperRodGroupBeach:
     db 13,GOLDEEN
     db 17,GOLDEEN
     db 21,GOLDEEN
-    db  5,KRABBY
-    db  9,KRABBY
-    db 13,KRABBY
-    db 13,KRABBY
-    db 17,KRABBY
-    db 21,KRABBY
     db  5,TENTACOOL
     db  9,TENTACOOL
     db 13,TENTACOOL
@@ -128250,12 +128418,12 @@ SuperRodGroupEst:
     db 32,SEADRA
     db 33,SEAKING
 
-GoodRodGroupFishGuru:
+GoodRodGroupPowerPlant:
     db  2
     db  1,MAGIKARP
-    db  2,GOLDEEN
+    db  2,TENTACOOL
 
-SuperRodGroupFishGuru:
+SuperRodGroupPowerPlant:
     db 16
     db  1,MAGIKARP
     db  5,MAGIKARP
@@ -128265,14 +128433,30 @@ SuperRodGroupFishGuru:
     db 17,MAGIKARP
     db 21,MAGIKARP
     db 25,MAGIKARP
-    db  2,GOLDEEN
-    db  6,GOLDEEN
-    db 10,GOLDEEN
-    db 14,GOLDEEN
-    db 14,GOLDEEN
-    db 18,GOLDEEN
-    db 22,GOLDEEN
-    db 26,GOLDEEN
+    db  2,TENTACOOL
+    db  6,TENTACOOL
+    db 10,TENTACOOL
+    db 14,TENTACOOL
+    db 14,TENTACOOL
+    db 18,TENTACOOL
+    db 22,TENTACOOL
+    db 30,TENTACRUEL
+
+GoodRodGroupFishGuru:
+    db  2
+    db  1,MAGIKARP
+    db  2,MAGIKARP
+
+SuperRodGroupFishGuru:
+    db  8
+    db  1,MAGIKARP
+    db  5,MAGIKARP
+    db  9,MAGIKARP
+    db 13,MAGIKARP
+    db 13,MAGIKARP
+    db 17,MAGIKARP
+    db 21,MAGIKARP
+    db 25,MAGIKARP
 
 GoodRodGroupPsyduck:
     db  2
@@ -128302,26 +128486,26 @@ GoodRodGroupSafari:
     db  4
     db  1,MAGIKARP
     db  2,POLIWAG
-    db  2,GOLDEEN
+    db  3,POLIWAG
     db  2,SEEL ; Entry Level
 
 SuperRodGroupSafari:
     db 32
     db  6,MAGIKARP
     db 10,MAGIKARP
+    db 10,MAGIKARP
+    db 14,MAGIKARP
+    db 14,MAGIKARP
     db 14,MAGIKARP
     db 18,MAGIKARP
     db 22,MAGIKARP ; Shiny If Level 26 in SAFARI_ZONE_WEST
     db  5,POLIWAG
     db  9,POLIWAG
     db 13,POLIWAG
+    db 13,POLIWAG
     db 17,POLIWAG
     db 21,POLIWAG
-    db  5,GOLDEEN
-    db  9,GOLDEEN
-    db 13,GOLDEEN
-    db 17,GOLDEEN
-    db 21,GOLDEEN
+    db 24,POLIWAG
     db  8,SEEL
     db 12,SEEL
     db 16,SEEL
@@ -128332,12 +128516,12 @@ SuperRodGroupSafari:
     db 15,DRATINI
     db 13,OMANYTE ; Entry Level
     db 13,KABUTO ; Entry Level
-    db  9,LAPRAS ; Entry Level ; TODO solo con FLOAT
     db 20,GYARADOS ; Entry Level
     db 24,GYARADOS
     db 25,POLIWHIRL
+    db 28,POLIWHIRL
     db 29,POLIWHIRL
-    db 33,SEAKING
+    db 30,POLIWHIRL
     db 30,DRAGONAIR ; Entry Level
 
 GoodRodGroupSouth:
@@ -128358,10 +128542,6 @@ GoodRodGroupSouth:
     db  3,KRABBY
     db  2,SEEL
     db  3,SEEL
-
-SuperRodGroupSeaform:
-SuperRodGroupLake:
-SuperRodGroupUnknown:
 
 SuperRodGroupSouth:
     db 32
@@ -128396,7 +128576,11 @@ SuperRodGroupSouth:
     db 35,SEAKING
     db 39,SEAKING
     db 30,KINGLER
-    db 34,DEWGONG ; Entry Level
+    db 34,DEWGONG
+
+;SuperRodGroupSeaform:
+;SuperRodGroupLake:
+;SuperRodGroupUnknown:
 
 ; creates a list at wBuffer of maps where the mon in [wd11e] can be found.
 ; this is used by the pokedex to display locations the mon can be found on the map.
