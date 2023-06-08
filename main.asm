@@ -1406,7 +1406,8 @@ IsBikeRidingAllowed: ; 09c5 (0:09c5)
     ret
 
 BikeRidingTilesets: ; 09e2 (0:09e2)
-    db $00,$03,$0B,$0E,$11,$FF
+    db $00,$03,$0B,$11,$FF
+    ds 1
 
 ; load the tile pattern data of the current tileset into VRAM
 LoadTilesetTilePatternData: ; 09e8 (0:09e8)
@@ -12189,7 +12190,7 @@ UpdatePlayerSprite: ; 4e31 (1:4e31)
 .asm_4eb6
     ld a,[$FF00+$93]
     ld c,a
-    ld a,[W_GRASSTILE]
+    call DockException ; ld a,[W_GRASSTILE]
     cp c
     ld a,$0
     jr nz,.asm_4ec3
@@ -18514,6 +18515,14 @@ TmQtyTable:
     db TM_55,3 ; FLASH
     db $ff
 
+DockException:
+    ld a,[W_CURMAP]
+    cp VERMILION_DOCK
+    ld a,[W_GRASSTILE]
+    ret nz
+    dec a
+    ret
+
 SECTION "bank2",ROMX,BANK[$2]
 
 INCLUDE "music/headers/sfxheaders02.asm"
@@ -22008,7 +22017,7 @@ TilesetsHeadPtr: ; c7be (3:47be)
     TSETHEAD Tset0B_Block,Tset0B_GFX,Tset0B_Coll,$FF,$FF,$FF,$FF,0
     TSETHEAD Tset09_Block,Tset09_GFX,Tset09_Coll,$17,$32,$FF,$FF,0
     TSETHEAD Tset0D_Block,Tset0D_GFX,Tset0D_Coll,$FF,$FF,$FF,$FF,1
-    TSETHEAD Tset0E_Block,Tset0E_GFX,Tset0E_Coll,$FF,$FF,$FF,$FF,1
+    TSETHEAD Tset0E_Block,Tset0E_GFX,Tset0E_Coll,$FF,$FF,$FF,$2A,1
     TSETHEAD Tset0F_Block,Tset0F_GFX,Tset0F_Coll,$12,$FF,$FF,$FF,0
     TSETHEAD Tset10_Block,Tset10_GFX,Tset10_Coll,$FF,$FF,$FF,$FF,0
     TSETHEAD Tset11_Block,Tset11_GFX,Tset11_Coll,$FF,$FF,$FF,$FF,1
@@ -30376,91 +30385,92 @@ TryDoWildEncounter: ; 13870 (4:7870)
     ld hl,Func_c49d
     ld b,BANK(Func_c49d)
     call Bankswitch ; indirect jump to Func_c49d (c49d (3:449d))
-    jr nc,.asm_13888
-.asm_13884
+    jr nc,.notStandingOnDoorOrWarpTile
+.CantEncounter
     ld a,$1
     and a
     ret
-.asm_13888
+.notStandingOnDoorOrWarpTile
     ld hl,Func_128d8
     ld b,BANK(Func_128d8)
     call Bankswitch ; indirect jump to Func_128d8 (128d8 (4:68d8))
-    jr z,.asm_13884
+    jr z,.CantEncounter
     ld a,[$d0db]
     and a
-    jr z,.asm_1389e
+    jr z,.next
     dec a
-    jr z,.asm_13905
+    jr z,.lastRepelStep
     ld [$d0db],a
-.asm_1389e
+.next
     FuncCoord 9,9 ; $c45d
     ld hl,Coord
     ld c,[hl]
     ld a,[W_GRASSTILE]
     cp c
     ld a,[W_GRASSRATE] ; $d887
-    jr z,.asm_138c4
+    jr z,.CanEncounter
     ld a,$14
     cp c
     ld a,[W_WATERRATE] ; $d8a4
-    jr z,.asm_138c4
+    jr z,.CanEncounter
     ld a,[W_CURMAP] ; $d35e
     cp REDS_HOUSE_1F
-    jr c,.asm_13912
-    ld a,[W_CURMAPTILESET] ; $d367
+    jr c,.CantEncounter2
+    call HackDockTilesetLikeSafari ; ld a,[W_CURMAPTILESET] ; $d367
     cp $3 ; Viridian Forest/Safari Zone
-    jr z,.asm_13912
+    jr z,.CantEncounter2
     ld a,[W_GRASSRATE] ; $d887
-.asm_138c4
+.CanEncounter
     ld b,a
     ld a,[H_RAND1] ; $FF00+$d3
     cp b
-    jr nc,.asm_13912
+    jr nc,.CantEncounter2
     ld a,[H_RAND2] ; $FF00+$d4
     ld b,a
     ld hl,WildMonEncounterSlotChances ; $7918
-.asm_138d0
+.determineEncounterSlot
     ld a,[hli]
     cp b
-    jr nc,.asm_138d7
+    jr nc,.gotEncounterSlot
     inc hl
-    jr .asm_138d0
-.asm_138d7
+    jr .determineEncounterSlot
+.gotEncounterSlot
     ld c,[hl]
     ld hl,W_GRASSMONS ; $d888
     FuncCoord 9,9 ; $c45c ; No Cinnabar Shore Bug
     ld a,[Coord]
     cp $14
-    jr nz,.asm_138e5
+    jr nz,.gotWildEncounterType
     ld hl,W_WATERMONS ; $d8a5 (aliases: W_ENEMYMON1HP)
-.asm_138e5
+.gotWildEncounterType
     ld b,$0
     add hl,bc
     ld a,[hli]
     call GetWildEnemyLevel ; ld [W_CURENEMYLVL],a ; $d127
     ld a,[hl]
     ld [$cf91],a
-    ld [W_ENEMYMONID],a
-    ld a,[$d0db]
+    call GetEnemy ; ld [W_ENEMYMONID],a
+    jr nc,.CantEncounter2
+    ds 1 ; ld a,[$d0db] ; move in Previous Subroutine
     and a
-    jr z,.asm_13916
+    jr z,.willEncounter
     ld a,[W_PARTYMON1_LEVEL] ; $d18c
     ld b,a
     ld a,[W_CURENEMYLVL] ; $d127
     cp b
-    jr c,.asm_13912
-    jr .asm_13916
-.asm_13905
+    jr c,.CantEncounter2
+    jr .willEncounter
+.lastRepelStep
     ld [$d0db],a
     ld a,$d2
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call EnableAutoTextBoxDrawing
     call DisplayTextID
-.asm_13912
+.CantEncounter2
     ld a,$1
     and a
     ret
-.asm_13916
+.willEncounter
     xor a
     ret
 
@@ -30867,6 +30877,11 @@ FixTMPalette:
 GetWildEnemyLevel:
     push bc
     push af
+    inc a
+    jr nz,.NotNew
+    ld b,8
+    jr .End
+.NotNew
     ld b,0
     call GenRandom
     ld c,a
@@ -30932,6 +30947,40 @@ CheckIfTeleportNotAllowed:
 .TilesetNotAllowed ; same as escape rope
     db $03,$0f,$11,$16,$10
     db $ff ; terminator
+
+HackDockTilesetLikeSafari:
+    ld a,[W_CURMAP]
+    cp VERMILION_DOCK
+    ld a,[W_CURMAPTILESET] ; $d367
+    ret nz
+    ld a,$3 ; Viridian Forest/Safari Zone
+    ret
+
+GetEnemy:
+    cp $FF
+    jr nz,.NotMew
+    push hl
+    ld hl,$d728
+    bit 0,[hl]
+    pop hl
+    jr z,.NotEncounter
+    push hl
+    ld hl,wMewEventBit5
+    bit 5,[hl]
+    set 5,[hl]
+    pop hl
+    jr z,.MewFirstEncounter
+.NotEncounter
+    and a ; Reset Carry Flag ; NotEncounter
+    jr .End
+.MewFirstEncounter
+    ld a,MEW
+.NotMew
+    scf ; WillEncounter
+    ld [W_ENEMYMONID],a
+.End
+    ld a,[$d0db]
+    ret
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -91823,33 +91872,29 @@ PredefAndHideFuchsiaGuard:
 
 SECTION "bank19",ROMX,BANK[$19]
 
-Tset00_GFX: ; 64000 (19:4000)
+Tset00_GFX:
     INCBIN "gfx/tilesets/00.2bpp"
-Tset00_Block: ; 645e0 (19:45e0)
+Tset00_Block:
     INCBIN "gfx/blocksets/00.bst"
-Tset01_GFX: ; 64de0 (19:4de0)
+Tset01_GFX:
     INCBIN "gfx/tilesets/01.2bpp"
-Tset01_Block: ; 65270 (19:5270)
+Tset01_Block:
     INCBIN "gfx/blocksets/01.bst"
-Tset08_GFX: ; 653a0 (19:53a0)
+Tset08_GFX:
     INCBIN "gfx/tilesets/08.2bpp"
-Tset08_Block: ; 65980 (19:5980)
+Tset08_Block:
     INCBIN "gfx/blocksets/08.bst"
-Tset13_GFX: ; 65bb0 (19:5bb0)
+Tset13_GFX:
     INCBIN "gfx/tilesets/13.2bpp"
-Tset13_Block: ; 66190 (19:6190)
+Tset13_Block:
     INCBIN "gfx/blocksets/13.bst"
-Tset0E_GFX: ; 66610 (19:6610)
-    INCBIN "gfx/tilesets/0e.2bpp"
-Tset0E_Block: ; 66bf0 (19:6bf0)
-    INCBIN "gfx/blocksets/0e.bst"
-Tset10_GFX: ; 66d60 (19:6d60)
+Tset10_GFX:
     INCBIN "gfx/tilesets/10.2bpp"
-Tset10_Block: ; 67350 (19:7350)
+Tset10_Block:
     INCBIN "gfx/blocksets/10.bst"
-Tset17_GFX: ; 676f0 (19:76f0)
+Tset17_GFX:
     INCBIN "gfx/tilesets/17.2bpp"
-Tset17_Block: ; 67b50 (19:7b50)
+Tset17_Block:
     INCBIN "gfx/blocksets/17.bst"
 
 SECTION "bank1A",ROMX,BANK[$1A]
@@ -123427,7 +123472,7 @@ _UnnamedText_cdfa: ; a4069 (29:4069)
 
 _UnnamedText_cdff: ; a4088 (29:4088)
     db $0,"Cycling is fun!",$4f
-    db "Forget SURFing!",$58
+    db "Forget SWIM!   ",$58
 
 _FlashLightsAreaText: ; a40a9 (29:40a9)
     db $0,"A blinding LIGHT",$4f
@@ -126663,44 +126708,44 @@ LoadWildData:
     jp CopyData
 
 WildDataPointers:
-    dw NoMons      ; PALLET_TOWN
-    dw NoMons      ; VIRIDIAN_CITY
-    dw NoMons      ; PEWTER_CITY
-    dw NoMons      ; CERULEAN_CITY
-    dw NoMons      ; LAVENDER_TOWN
-    dw NoMons      ; VERMILION_CITY
-    dw NoMons      ; CELADON_CITY
-    dw NoMons      ; FUCHSIA_CITY
-    dw NoMons      ; CINNABAR_ISLAND
-    dw NoMons      ; INDIGO_PLATEAU
-    dw NoMons      ; SAFFRON_CITY
-    dw NoMons      ; unused
-    dw Route1Mons  ; ROUTE_1
-    dw Route2Mons  ; ROUTE_2
-    dw Route3Mons  ; ROUTE_3
-    dw Route4Mons  ; ROUTE_4
-    dw Route5Mons  ; ROUTE_5
-    dw Route6Mons  ; ROUTE_6
-    dw Route7Mons  ; ROUTE_7
-    dw Route8Mons  ; ROUTE_8
-    dw Route9Mons  ; ROUTE_9
-    dw Route10Mons ; ROUTE_10
-    dw Route11Mons ; ROUTE_11
-    dw Route12Mons ; ROUTE_12
-    dw Route13Mons ; ROUTE_13
-    dw Route14Mons ; ROUTE_14
-    dw Route15Mons ; ROUTE_15
-    dw Route16Mons ; ROUTE_16
-    dw Route17Mons ; ROUTE_17
-    dw Route18Mons ; ROUTE_18
-    dw WaterMons   ; ROUTE_19
-    dw WaterMons   ; ROUTE_20
-    dw Route21Mons ; ROUTE_21
-    dw Route22Mons ; ROUTE_22
-    dw Route23Mons ; ROUTE_23
-    dw Route24Mons ; ROUTE_24
-    dw Route25Mons ; ROUTE_25
-    dw NoMons      ; REDS_HOUSE_1F
+    dw NoMons        ; PALLET_TOWN
+    dw NoMons        ; VIRIDIAN_CITY
+    dw NoMons        ; PEWTER_CITY
+    dw NoMons        ; CERULEAN_CITY
+    dw NoMons        ; LAVENDER_TOWN
+    dw VermilionMons ; VERMILION_CITY
+    dw CeladonMons   ; CELADON_CITY
+    dw NoMons        ; FUCHSIA_CITY
+    dw NoMons        ; CINNABAR_ISLAND
+    dw NoMons        ; INDIGO_PLATEAU
+    dw NoMons        ; SAFFRON_CITY
+    dw NoMons        ; unused
+    dw Route1Mons    ; ROUTE_1
+    dw Route2Mons    ; ROUTE_2
+    dw Route3Mons    ; ROUTE_3
+    dw Route4Mons    ; ROUTE_4
+    dw Route5Mons    ; ROUTE_5
+    dw Route6Mons    ; ROUTE_6
+    dw Route7Mons    ; ROUTE_7
+    dw Route8Mons    ; ROUTE_8
+    dw Route9Mons    ; ROUTE_9
+    dw Route10Mons   ; ROUTE_10
+    dw Route11Mons   ; ROUTE_11
+    dw Route12Mons   ; ROUTE_12
+    dw Route13Mons   ; ROUTE_13
+    dw Route14Mons   ; ROUTE_14
+    dw Route15Mons   ; ROUTE_15
+    dw Route16Mons   ; ROUTE_16
+    dw Route17Mons   ; ROUTE_17
+    dw Route18Mons   ; ROUTE_18
+    dw WaterMons     ; ROUTE_19
+    dw WaterMons     ; ROUTE_20
+    dw Route21Mons   ; ROUTE_21
+    dw Route22Mons   ; ROUTE_22
+    dw Route23Mons   ; ROUTE_23
+    dw Route24Mons   ; ROUTE_24
+    dw Route25Mons   ; ROUTE_25
+    dw NoMons        ; REDS_HOUSE_1F
     dw NoMons
     dw NoMons
     dw NoMons
@@ -126757,7 +126802,7 @@ WildDataPointers:
     dw NoMons
     dw NoMons
     dw NoMons
-    dw NoMons
+    dw DockMons
     dw NoMons
     dw NoMons
     dw NoMons
@@ -126805,8 +126850,8 @@ WildDataPointers:
     dw NoMons
     dw NoMons
     dw NoMons
-    dw TowerMons1
-    dw TowerMons2
+    dw NoMons ; TowerMons1
+    dw NoMons ; TowerMons2
     dw TowerMons3
     dw TowerMons4
     dw TowerMons5
@@ -126930,6 +126975,61 @@ WildDataPointers:
 NoMons: ; d0dd (3:50dd)
     db $00
     db $00
+
+VermilionMons:
+    db $00
+
+    db $05
+    db 16,MAGIKARP  ; 20%
+    db 13,GOLDEEN   ; 20%
+    db 17,GOLDEEN   ; 15%
+    db 21,MAGIKARP  ; 10%
+    db 15,POLIWAG   ; 10%
+    db 21,GOLDEEN   ; 10%
+    db 18,POLIWAG   ;  5%
+    db 33,SEAKING   ;  5%
+    db 35,SEAKING   ;  4%
+    db 25,POLIWHIRL ;  1%
+
+DockMons:
+    db $40
+    db $FF,$FF ; 20%
+    db $FF,$FF ; 20%
+    db $FF,$FF ; 15%
+    db $FF,$FF ; 10%
+    db $FF,$FF ; 10%
+    db $FF,$FF ; 10%
+    db $FF,$FF ;  5%
+    db $FF,$FF ;  5%
+    db $FF,$FF ;  4%
+    db $FF,$FF ;  1%
+
+    db $05
+    db 16,MAGIKARP  ; 20%
+    db 13,GOLDEEN   ; 20%
+    db 17,GOLDEEN   ; 15%
+    db 21,MAGIKARP  ; 10%
+    db 15,POLIWAG   ; 10%
+    db 21,GOLDEEN   ; 10%
+    db 18,POLIWAG   ;  5%
+    db 33,SEAKING   ;  5%
+    db 35,SEAKING   ;  4%
+    db 25,POLIWHIRL ;  1%
+
+CeladonMons:
+    db $00
+
+    db $1E
+    db 13,GRIMER ; 20%
+    db 16,GRIMER ; 20%
+    db 22,GRIMER ; 15%
+    db 19,GRIMER ; 10%
+    db 28,GRIMER ; 10%
+    db 31,GRIMER ; 10%
+    db 25,GRIMER ;  5%
+    db 35,GRIMER ;  5%
+    db 38,MUK    ;  4%
+    db 40,MUK    ;  1%
 
 Route1Mons:
     db $19
@@ -127111,7 +127211,18 @@ Route6Mons:
     db 11,FARFETCH_D ;  5%
     db 13,POLIWAG    ;  4%
     db 13,PSYDUCK    ;  1%
-    db $00
+
+    db $05
+	db 20,POLIWAG    ; 20%
+	db 19,FARFETCH_D ; 20%
+	db 24,PSYDUCK    ; 15%
+	db 16,POLIWAG    ; 10%
+	db 27,PSYDUCK    ; 10%
+	db 25,POLIWHIRL  ; 10%
+	db 28,POLIWHIRL  ;  5%
+	db 23,FARFETCH_D ;  5%
+	db 32,POLIWRATH  ;  4% ; Entry Level
+	db 33,GOLDUCK    ;  1% ; Entry Level
 
 Route11Mons:
     db $0F
@@ -127125,7 +127236,18 @@ Route11Mons:
     db 16,SANDSHREW ;  5%
     db 11,DROWZEE   ;  4%
     db 15,DROWZEE   ;  1%
-    db $00
+
+    db $05
+    db 16,MAGIKARP  ; 20%
+    db 13,GOLDEEN   ; 20%
+    db 17,GOLDEEN   ; 15%
+    db 21,MAGIKARP  ; 10%
+    db 15,POLIWAG   ; 10%
+    db 21,GOLDEEN   ; 10%
+    db 18,POLIWAG   ;  5%
+    db 33,SEAKING   ;  5%
+    db 35,SEAKING   ;  4%
+    db 25,POLIWHIRL ;  1%
 
 CaveMons:
     db $14
@@ -127237,14 +127359,6 @@ Route16Mons:
     db 20,FEAROW    ;  5%
     db 25,PIDGEOTTO ;  4%
     db 26,FEAROW    ;  1%
-    db $00
-
-TowerMons1:
-    db $00
-    db $00
-
-TowerMons2:
-    db $00
     db $00
 
 TowerMons3:
@@ -128545,3 +128659,10 @@ ReadMove:
     pop de
     pop hl
     ret
+
+SECTION "Bank38",ROMX,BANK[$38]
+
+Tset0E_GFX:
+    INCBIN "gfx/tilesets/0e.2bpp"
+Tset0E_Block:
+    INCBIN "gfx/blocksets/0e.bst"

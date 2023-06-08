@@ -1535,6 +1535,7 @@ wFlagDratiniCaveBit1        ; df38 ; bit 1
 wFlagNoHpPalBit2            ; df38 ; bit 2
 wFlagEnableOakLastPkmnBit3  ; df38 ; bit 3
 wFlagEnableDojoLastPkmnBit4 ; df38 ; bit 4
+wMewEventBit5               ; df38 ; bit 5
     ds 1
 
 wFlagListMenuSpc: ; df39 ; Denim
