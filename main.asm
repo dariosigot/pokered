@@ -23197,18 +23197,18 @@ ItemUseBall: ; d687 (3:5687)
     ld a,[hl]
     push af        ;...and status ailments
     push hl
-    ld hl,$d069
+    ld hl,W_ENEMYBATTSTATUS3
     bit 3,[hl]
     jr z,.next15
-    ld a,$4c
-    ld [W_ENEMYMONID],a
+    ds 2 ; ld a,DITTO
+    ds 3 ; ld [W_ENEMYMONID],a
     jr .next16
 .next15    ;$5871
     set 3,[hl]
     ld hl,$cceb
-    ld a,[$cff1]
+    ld a,[W_ENEMYMONATKDEFIV]
     ld [hli],a
-    ld a,[$cff2]
+    ld a,[W_ENEMYMONSPDSPCIV]
     ld [hl],a
 .next16    ;$587e
     ld a,[$cf91]
@@ -48985,17 +48985,17 @@ Func_3b9ec: ; Moved Upper in the Bank
     ld hl,UnnamedText_3baac ; $7aac
     jp PrintText
 
-Func_3bab1: ; Moved Upper in the Bank
+TransformEffect_: ; Moved Upper in the Bank
     ld hl,W_PLAYERMONID
     ld de,$cfe5
-    ld bc,W_ENEMYBATTSTATUS3 ; $d069
+;    ld bc,W_ENEMYBATTSTATUS3 ; $d069
     ld a,[W_ENEMYBATTSTATUS1] ; $d067
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr nz,.asm_3bad1
     ld hl,$cfe5
     ld de,W_PLAYERMONID
-    ld bc,W_PLAYERBATTSTATUS3 ; $d064
+;    ld bc,W_PLAYERBATTSTATUS3 ; $d064
     ld [wPlayerMoveListIndex],a ; $cc2e
     ld a,[W_PLAYERBATTSTATUS1] ; $d062
 .asm_3bad1
@@ -49003,7 +49003,7 @@ Func_3bab1: ; Moved Upper in the Bank
     jp nz,Func_3bb8c
     push hl
     push de
-    push bc
+;    push bc
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -49028,10 +49028,10 @@ Func_3bab1: ; Moved Upper in the Bank
     ld b,BANK(Func_79771)
     pop af
     call nz,Bankswitch
-    pop bc
-    ld a,[bc]
-    set 3,a
-    ld [bc],a
+;    pop bc
+;    ld a,[bc]
+;    set 3,a
+;    ld [bc],a
     pop de
     pop hl
     push hl
@@ -49049,14 +49049,37 @@ Func_3bab1: ; Moved Upper in the Bank
     call CopyData
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_3bb32
+    push af
+    ld bc,W_PLAYERBATTSTATUS3
+    jr z,.SkipBackupDV
+    ld bc,W_ENEMYBATTSTATUS3
+    ld a,[bc]
+    bit 3,a ; Pokemon is Just Transformed
+    jr nz,.SkipBackupDV
     ld a,[de]
     ld [$cceb],a
     inc de
     ld a,[de]
     ld [$ccec],a
     dec de
-.asm_3bb32
+.SkipBackupDV
+    ld a,[bc]
+    set 3,a ; Set Transformed
+    ld [bc],a
+; ───────────────────────── Conflict with Disable Start
+    pop af	;get the saved turn result
+	jr nz, .undo_enemy_disable
+.undo_player_disable
+	xor a
+	ld [W_PLAYERDISABLEDMOVE], a
+	ld [$ccee], a
+	jr .undo_disable_end
+.undo_enemy_disable
+	xor a
+	ld [W_ENEMYDISABLEDMOVE], a
+	ld [$ccef], a
+.undo_disable_end
+; ───────────────────────── Conflict with Disable End
     ld a,[hli]
     ld [de],a
     inc de
@@ -51705,7 +51728,7 @@ Func_3d2fe: ; 3d2fe (f:52fe)
     bit 7,a
     jp nz,Func_3d3dd ; down
     bit 2,a
-    jp nz,Func_3d435 ; select
+    jp nz,SwapMovesInMenu ; select
     bit 1,a ; B,but was it reset above?
     push af
     xor a
@@ -51846,8 +51869,8 @@ UnnamedText_3d430: ; 3d430 (f:5430)
     TX_FAR _UnnamedText_3d430
     db "@"
 
-Func_3d435: ; 3d435 (f:5435)
-    ld a,[$cc35]
+SwapMovesInMenu: ; 3d435 (f:5435)
+    call CheckTransformed ; ld a,[$cc35]
     and a
     jr z,asm_3d4ad
     ld hl,W_PLAYERMONMOVES
@@ -52015,6 +52038,16 @@ SetEnemyActedBit:
     ld a,[wUnusedC000]
     set 1,a ; sets the already-acted bit
     ld [wUnusedC000], a
+    ret
+
+CheckTransformed:
+    ld a,[W_PLAYERBATTSTATUS3]
+    bit 3,a
+    jr z,.NotTransformed
+    pop af ; Delete Return pointer
+    jp MoveSelectionMenu
+.NotTransformed
+    ld a,[$cc35]
     ret
 
 SECTION "DisabledText",ROMX[$5555],BANK[$F]
@@ -56156,7 +56189,7 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3f428
      dw Func_3f428
      dw Func_3fb26
-     dw Func_3fb2e
+     dw TransformEffect
      dw Func_3f54c
      dw Func_3f54c
      dw Func_3f54c
@@ -57562,9 +57595,9 @@ Func_3fb26: ; 3fb26 (f:7b26)
     ld b,BANK(Func_3b9ec)
     jp Bankswitch
 
-Func_3fb2e: ; 3fb2e (f:7b2e)
-    ld hl,Func_3bab1
-    ld b,BANK(Func_3bab1)
+TransformEffect: ; 3fb2e (f:7b2e)
+    ld hl,TransformEffect_
+    ld b,BANK(TransformEffect_)
     jp Bankswitch
 
 Func_3fb36: ; 3fb36 (f:7b36)
@@ -99825,7 +99858,7 @@ SafariZoneEntranceScript4: ; 75287 (1d:5287)
 SafariZoneEntranceScript6: ; 75295 (1d:5295)
     call Func_752b4
     ret nz
-    call Delay3
+    call CheckSafariStatusAndDelay3 ; call Delay3
     ld a,[$cf0d]
     ld [W_SAFARIZONEENTRANCECURSCRIPT],a
     ret
@@ -102744,6 +102777,18 @@ GiveFossil:
     call DisplayPokedex
     pop bc
     jp GivePokemon
+
+CheckSafariStatusAndDelay3:
+    ld hl,$d790
+    bit 6,[hl] ; EVENT_SAFARI_GAME_OVER
+    jr nz,.End
+    bit 7,[hl] ; EVENT_IN_SAFARI_ZONE
+    jr z,.End
+    ;if the safari event is going on but not in game-over,then $cf0d needs to hold $05
+    ld a,5
+    ld [$cf0d],a
+.End
+    jp Delay3
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -126992,7 +127037,7 @@ VermilionMons:
     db 25,POLIWHIRL ;  1%
 
 DockMons:
-    db $40
+    db $01
     db $FF,$FF ; 20%
     db $FF,$FF ; 20%
     db $FF,$FF ; 15%
