@@ -1438,7 +1438,7 @@ Mon081_EvosMoves:
     db 21,THUNDERBOLT
     ;  30,MAGNETON
     db 33,CONVERSION
-    db 39,SWIFT
+    db 37,SWIFT
     db 41,SCREECH
     db 43,LIGHT_SCREEN
     db 45,THUNDER
@@ -1806,11 +1806,11 @@ Mon100_EvosMoves:
     db  6,FLASH
     db 10,SONICBOOM
     db 13,LIGHT_SCREEN
-    db 16,THUNDERSHOCK  ; Power Plant's Voltorb (Level 40)
-    db 21,SELFDESTRUCT  ; ... ; Power Plant's Electrode (Level 43)
+    db 16,THUNDERSHOCK  ; Power Plant's Voltorb (Level 37)
+    db 21,SELFDESTRUCT  ; ... ; Power Plant's Electrode (Level 40)
     ;  30,ELECTRODE
     db 33,SWIFT         ; ... ; ...
-    db 39,EXPLOSION     ; ... ; ...
+    db 37,EXPLOSION     ; ... ; ...
     db 41,THUNDERBOLT         ; ...
     db 43,CONVERSION
     db 45,THUNDER_WAVE

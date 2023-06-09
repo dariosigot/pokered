@@ -37549,7 +37549,7 @@ OaksLabText41: ; 1d0fd (7:50fd)
 OaksLabText29: ; 1d102 (7:5102)
 OaksLabText2: ; 1d102 (7:5102)
     db $8
-    ld a,SQUIRTLE ; Entry Level
+    ld a,SQUIRTLE
     ld [$cd3d],a
     ld a,$3
     ld [$cd3e],a
@@ -37560,7 +37560,7 @@ OaksLabText2: ; 1d102 (7:5102)
 OaksLabText30: ; 1d113 (7:5113)
 OaksLabText3: ; 1d113 (7:5113)
     db $8
-    ld a,BULBASAUR ; Entry Level
+    ld a,BULBASAUR
     ld [$cd3d],a
     ld a,$4
     ld [$cd3e],a
@@ -37571,7 +37571,7 @@ OaksLabText3: ; 1d113 (7:5113)
 OaksLabText31: ; 1d124 (7:5124)
 OaksLabText4: ; 1d124 (7:5124)
     db $8
-    ld a,CHARMANDER ; Entry Level
+    ld a,CHARMANDER
     ld [$cd3d],a
     ld a,$2
     ld [$cd3e],a
@@ -40242,14 +40242,14 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db $0 ; signs
 
     db $e ; people
-    db SPRITE_BALL,$14 + 4,$9 + 4,$ff,$ff,$41,VOLTORB,40 ; trainer
-    db SPRITE_BALL,$12 + 4,$20 + 4,$ff,$ff,$42,VOLTORB,40 ; trainer
-    db SPRITE_BALL,$19 + 4,$15 + 4,$ff,$ff,$43,VOLTORB,40 ; trainer
-    db SPRITE_BALL,$12 + 4,$19 + 4,$ff,$ff,$44,ELECTRODE,43 ; trainer
-    db SPRITE_BALL,$22 + 4,$17 + 4,$ff,$ff,$45,VOLTORB,40 ; trainer
-    db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,40 ; trainer
-    db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,43 ; trainer
-    db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,40 ; trainer
+    db SPRITE_BALL,$14 + 4,$9 + 4,$ff,$ff,$41,VOLTORB,37 ; trainer
+    db SPRITE_BALL,$12 + 4,$20 + 4,$ff,$ff,$42,VOLTORB,37 ; trainer
+    db SPRITE_BALL,$19 + 4,$15 + 4,$ff,$ff,$43,VOLTORB,37 ; trainer
+    db SPRITE_BALL,$12 + 4,$19 + 4,$ff,$ff,$44,ELECTRODE,40 ; trainer
+    db SPRITE_BALL,$22 + 4,$17 + 4,$ff,$ff,$45,VOLTORB,37 ; trainer
+    db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,37 ; trainer
+    db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,40 ; trainer
+    db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,37 ; trainer
     db SPRITE_BIRD,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,40 ; trainer
     db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
     db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,HP_UP ; item
@@ -127614,8 +127614,8 @@ Route12Mons:
     db 23,PIDGEOTTO ; 10%
     db 23,RATICATE  ;  5%
     db 25,RATICATE  ;  5%
-    db 18,SLOWPOKE  ;  4% ; Entry Level
-    db 22,SLOWPOKE  ;  1%
+    db 14,SLOWPOKE  ;  4% ; Entry Level
+    db 18,SLOWPOKE  ;  1%
     db $05
     db 21,MAGIKARP   ; 20%
     db 21,GOLDEEN    ; 20%
@@ -127730,7 +127730,7 @@ ZoneMonsCenter:
     db 23,MAGIKARP  ;  5%
     db 28,GYARADOS  ;  5%
     db 32,GYARADOS  ;  4%
-    db 34,DRAGONAIR ;  1%
+    db 30,DRAGONAIR ;  1%
 
 ZoneMons1:
     db $1E
@@ -127743,7 +127743,7 @@ ZoneMons1:
     db 22,DODUO   ;  5%
     db 26,TAUROS  ;  5%
     db 28,TAUROS  ;  4%
-    db 31,TAUROS  ;  1%
+    db 33,DODRIO  ;  1% ; Entry Level
     db $0E
     db 17,MAGIKARP  ; 20%
     db 28,SEEL      ; 20%
@@ -127778,7 +127778,7 @@ ZoneMons2:
     db 23,MAGIKARP  ;  5%
     db 28,GYARADOS  ;  5%
     db 32,GYARADOS  ;  4%
-    db 34,DRAGONAIR ;  1%
+    db 30,DRAGONAIR ;  1%
 
 ZoneMons3:
     db $1E
@@ -127802,9 +127802,7 @@ ZoneMons3:
     db 23,MAGIKARP  ;  5% ; Shiny If Level 26 in SAFARI_ZONE_WEST
     db 28,GYARADOS  ;  5%
     db 32,GYARADOS  ;  4%
-    db 34,DRAGONAIR ;  1%
-
-; ─────────────────────────────────
+    db 30,DRAGONAIR ;  1% ; Entry Level
 
 WaterMons:
     db $00
@@ -127814,348 +127812,224 @@ WaterMons:
     db 21,TENTACOOL  ; 15%
     db 24,TENTACOOL  ; 10%
     db 35,SEAKING    ; 10%
-    db 10,SEEL       ; 10%
-    db 20,SEEL       ;  5%
+    db 16,SEEL       ; 10%
+    db 37,SEAKING    ;  5%
     db 32,TENTACRUEL ;  5%
     db 36,TENTACRUEL ;  4%
-    db 34,DEWGONG    ;  1% ; Entry Level
-
-; ─────────────────────────────────
-
-; GRIMER
-; MUK
-
-; VOLTORB
-; ELECTRODE
-
-; MAGNEMITE
-; MAGNETON
-
-; PIKACHU
-; RAICHU
-
-; ELECTABUZZ
-
-; JOLTEON
-
-; ZAPDOS
+    db 40,TENTACRUEL ;  1%
 
 PowerPlantMons:
     db $0A
-    db 21,VOLTORB    ; 20%
-    db 21,MAGNEMITE  ; 20%
-    db 20,PIKACHU    ; 15%
-    db 24,PIKACHU    ; 10%
-    db 23,MAGNEMITE  ; 10%
-    db 23,VOLTORB    ; 10%
-    db 32,MAGNETON   ;  5%
-    db 35,MAGNETON   ;  5%
-    db 33,ELECTABUZZ ;  4%
-    db 36,ELECTABUZZ ;  1%
+    db 37,VOLTORB    ; 20%
+    db 37,VOLTORB    ; 20%
+    db 40,ELECTRODE  ; 15%
+    db  9,PIKACHU    ; 10%
+    db 21,MAGNEMITE  ; 10%
+    db 18,MAGNEMITE  ; 10%
+    db 30,MAGNETON   ;  5% ; Entry Level
+    db 20,RAICHU     ;  5% ; Entry Level
+    db  9,ELECTABUZZ ;  4% ; Entry Level
+    db 20,JOLTEON    ;  1% ; Entry Level
     db $00
-
-; ─────────────────────────────────
-
-; ZUBAT    ; (Only Earth)
-; GOLBAT   ; (Only Earth)
-
-; KRABBY   ; (Earth & Rod)
-; KINGLER  ; (Earth & Rod)
-
-; SLOWPOKE ; (Only Earth)
-; SLOWBRO  ; (Only Earth)
-
-; SEEL     ; (Earth & Water) ??? ha senso trovarlo col ROD???
-; DEWGONG  ; (Earth & Water)
-
-; SQUIRTLE
-; WARTORTLE
-; BLASTOISE
-
-; VAPOREON ; (Only Float)
-; JYNX     ; (Only Earth)
-; ARTICUNO ; (ONCE)
-
-; OMANYTE ; Rod
-; KABUTO  ; Rod
-
-; ─────────────
-
-; SHELLDER ; Rod
-; CLOYSTER ; Rod
-
-; STARYU   ; Rod
-; STARMIE  ; Rod
 
 IslandMons1:
     db $0F
-    db 30,SEEL      ; 20%
-    db 30,SLOWPOKE  ; 20%
-    db 30,SHELLDER  ; 15%
-    db 30,HORSEA    ; 10%
-    db 28,HORSEA    ; 10%
-    db 21,ZUBAT     ; 10%
-    db 29,GOLBAT    ;  5%
-    db 28,PSYDUCK   ;  5%
-    db 28,SHELLDER  ;  4%
-    db 38,GOLDUCK   ;  1%
+    db 25,GOLBAT   ; 20%
+    db 19,KRABBY   ; 20%
+    db 21,SEEL     ; 15%
+    db 28,GOLBAT   ; 10%
+    db 23,KRABBY   ; 10%
+    db 22,SLOWPOKE ; 10%
+    db 24,SEEL     ;  5%
+    db 25,SLOWPOKE ;  5%
+    db 28,KINGLER  ;  4%
+    db 34,DEWGONG  ;  1% ; Entry Level
     db $00
 
 IslandMonsB1:
     db $0A
-    db 30,STARYU   ; 20%
-    db 30,HORSEA   ; 20%
-    db 32,SHELLDER ; 15%
-    db 32,HORSEA   ; 10%
+    db 28,GOLBAT   ; 20%
+    db 25,SEEL     ; 20%
+    db 25,SLOWPOKE ; 15%
+    db 31,GOLBAT   ; 10%
+    db 28,SEEL     ; 10%
     db 28,SLOWPOKE ; 10%
-    db 30,SEEL     ; 10%
-    db 30,SLOWPOKE ;  5%
-    db 28,SEEL     ;  5%
-    db 38,DEWGONG  ;  4%
-    db 37,SEADRA   ;  1%
+    db 24,KRABBY   ;  5%
+    db 30,KINGLER  ;  5%
+    db 35,DEWGONG  ;  4%
+    db 38,SLOWBRO  ;  1% ; Entry Level
     db $00
 
 IslandMonsB2:
     db $0A
-    db 30,SEEL     ; 20%
-    db 30,SLOWPOKE ; 20%
-    db 32,SEEL     ; 15%
-    db 32,SLOWPOKE ; 10%
-    db 28,HORSEA   ; 10%
-    db 30,STARYU   ; 10%
-    db 30,HORSEA   ;  5%
-    db 28,SHELLDER ;  5%
-    db 30,GOLBAT   ;  4%
-    db 37,SLOWBRO  ;  1%
+    db 28,GOLBAT   ; 20%
+    db 28,SLOWPOKE ; 20%
+    db 31,GOLBAT   ; 15%
+    db 34,GOLBAT   ; 10%
+    db 31,SLOWPOKE ; 10%
+    db 30,KINGLER  ; 10%
+    db 36,DEWGONG  ;  5%
+    db 38,SLOWBRO  ;  5%
+    db 39,SLOWBRO  ;  4%
+    db 40,GOLBAT   ;  1%
     db $00
 
 IslandMonsB3:
     db $0A
-    db 31,SLOWPOKE  ; 20%
-    db 31,SEEL      ; 20%
-    db 33,SLOWPOKE  ; 15%
-    db 33,SEEL      ; 10%
-    db 29,HORSEA    ; 10%
-    db 31,SHELLDER  ; 10%
-    db 31,HORSEA    ;  5%
-    db 29,SHELLDER  ;  5%
-    db 39,SEADRA    ;  4%
-    db 37,DEWGONG   ;  1%
-    db $00
+    db 25,SEEL      ; 20%
+    db 24,KRABBY    ; 20%
+    db 28,SEEL      ; 15%
+    db 30,KINGLER   ; 10%
+    db 32,KINGLER   ; 10%
+    db 36,DEWGONG   ; 10%
+    db 37,DEWGONG   ;  5%
+    db  9,SQUIRTLE  ;  5%
+    db  9,JYNX      ;  4% ; Entry Level
+    db 20,VAPOREON  ;  1% ; Entry Level
+    db $04
+    db 27,SEEL      ; 20%
+    db 26,KRABBY    ; 20%
+    db 29,SEEL      ; 15%
+    db 24,KRABBY    ; 10%
+    db 13,SQUIRTLE  ; 10%
+    db 15,SQUIRTLE  ; 10%
+    db 16,WARTORTLE ;  5%
+    db 18,WARTORTLE ;  5%
+    db 21,WARTORTLE ;  4%
+    db 36,BLASTOISE ;  1% ; Entry Level
 
 IslandMonsB4:
     db $0A
-    db 31,HORSEA    ; 20%
-    db 31,SHELLDER  ; 20%
-    db 33,HORSEA    ; 15%
-    db 33,SHELLDER  ; 10%
-    db 29,SLOWPOKE  ; 10%
-    db 31,SEEL      ; 10%
-    db 31,SLOWPOKE  ;  5%
-    db 29,SEEL      ;  5%
-    db 39,SLOWBRO   ;  4%
-    db 32,GOLBAT    ;  1%
-    db $00
-
-; ─────────────────────────────────
-
-; KOFFING
-; WEEZING
-
-; PONYTA
-; RAPIDASH
-
-; GROWLITHE
-; ARCANINE
-
-; VULPIX
-; NINETALES
-
-; CHARMANDER
-; CHARMELEON
-; CHARIZARD
-
-; FLAREON
-; MAGMAR
-; MOLTRES !!!
+    db 26,KRABBY    ; 20%
+    db 28,SEEL      ; 20%
+    db 24,KRABBY    ; 15%
+    db 25,SEEL      ; 10%
+    db 32,KINGLER   ; 10%
+    db 34,KINGLER   ; 10%
+    db 37,DEWGONG   ;  5%
+    db 36,DEWGONG   ;  5%
+    db  5,SQUIRTLE  ;  4% ; Entry Level
+    db 11,SQUIRTLE  ;  1%
+    db $05
+    db 28,SEEL      ; 20%
+    db 29,KRABBY    ; 20%
+    db 30,SEEL      ; 15%
+    db 27,KRABBY    ; 10%
+    db 35,KINGLER   ; 10%
+    db 38,DEWGONG   ; 10%
+    db 12,SQUIRTLE  ;  5%
+    db 14,SQUIRTLE  ;  5%
+    db 16,WARTORTLE ;  4% ; Entry Level
+    db 30,LAPRAS    ;  1% ; Entry Level
 
 MansionMons1:
     db $0A
-    db 32,KOFFING   ; 20%
-    db 30,KOFFING   ; 20%
-    db 34,PONYTA    ; 15%
-    db 30,PONYTA    ; 10%
-    db 34,GROWLITHE ; 10%
-    db 32,PONYTA    ; 10%
-    db 30,GRIMER    ;  5%
-    db 28,PONYTA    ;  5%
-    db 37,WEEZING   ;  4%
-    db 39,MUK       ;  1%
+    db 29,PONYTA     ; 20%
+    db 25,KOFFING    ; 20%
+    db 32,PONYTA     ; 15%
+    db 28,KOFFING    ; 10%
+    db 24,GROWLITHE  ; 10%
+    db 24,VULPIX     ; 10%
+    db 27,GROWLITHE  ;  5%
+    db 27,VULPIX     ;  5%
+    db  5,CHARMANDER ;  4% ; Entry Level
+    db 40,RAPIDASH   ;  1%
     db $00
 
 MansionMons2:
     db $0A
-    db 32,GROWLITHE  ; 20%
-    db 34,KOFFING    ; 20%
-    db 34,KOFFING    ; 15%
-    db 30,PONYTA     ; 10%
-    db 30,KOFFING    ; 10%
-    db 32,PONYTA     ; 10%
-    db 30,GRIMER     ;  5%
-    db 28,PONYTA     ;  5%
-    db 39,WEEZING    ;  4%
-    db 37,MUK        ;  1%
+    db 25,KOFFING    ; 20%
+    db 25,PONYTA     ; 20%
+    db 28,KOFFING    ; 15%
+    db 29,PONYTA     ; 10%
+    db 11,CHARMANDER ; 10%
+    db 31,KOFFING    ; 10%
+    db  9,CHARMANDER ;  5%
+    db 38,WEEZING    ;  5%
+    db 16,CHARMELEON ;  4% ; Entry Level
+    db 40,WEEZING    ;  1%
     db $00
 
 MansionMons3:
     db $0A
-    db 31,KOFFING   ; 20%
-    db 33,GROWLITHE ; 20%
-    db 35,KOFFING   ; 15%
-    db 32,PONYTA    ; 10%
-    db 34,PONYTA    ; 10%
-    db 40,WEEZING   ; 10%
-    db 34,GRIMER    ;  5%
-    db 38,WEEZING   ;  5%
-    db 36,PONYTA    ;  4%
-    db 42,MUK       ;  1%
+    db 31,KOFFING    ; 20%
+    db 34,KOFFING    ; 20%
+    db 38,WEEZING    ; 15%
+    db 37,WEEZING    ; 10%
+    db 13,CHARMANDER ; 10%
+    db 15,CHARMANDER ; 10%
+    db 16,CHARMELEON ;  5%
+    db 18,CHARMELEON ;  5%
+    db 21,CHARMELEON ;  4%
+    db 36,CHARIZARD  ;  1% ; Entry Level
     db $00
 
 MansionMonsB1:
     db $0A
-    db 33,KOFFING   ; 20%
-    db 31,KOFFING   ; 20%
-    db 35,GROWLITHE ; 15%
-    db 32,PONYTA    ; 10%
-    db 31,KOFFING   ; 10%
-    db 40,WEEZING   ; 10%
-    db 34,PONYTA    ;  5%
-    db 35,GRIMER    ;  5%
-    db 42,WEEZING   ;  4%
-    db 42,MUK       ;  1%
+    db 26,GROWLITHE ; 20%
+    db 26,VULPIX    ; 20%
+    db 25,PONYTA    ; 15%
+    db 28,GROWLITHE ; 10%
+    db 28,VULPIX    ; 10%
+    db 29,PONYTA    ; 10%
+    db 32,ARCANINE  ;  5% ; Entry Level
+    db 32,NINETALES ;  5% ; Entry Level
+    db  9,MAGMAR    ;  4% ; Entry Level
+    db 20,FLAREON   ;  1% ; Entry Level
     db $00
 
 Route21Mons:
     db $19
-    db 21,RATTATA    ; 20%
-    db 23,PIDGEY     ; 20%
-    db 30,RATICATE   ; 15%
-    db 23,RATTATA    ; 10%
-    db 21,PIDGEY     ; 10%
-    db 30,PIDGEOTTO  ; 10%
-    db 32,PIDGEOTTO  ;  5%
-    db 28,TANGELA    ;  5%
-    db 30,TANGELA    ;  4%
-    db 32,TANGELA    ;  1%
-
+    db 25,GLOOM      ; 20%
+    db 25,WEEPINBELL ; 20%
+    db 30,VILEPLUME  ; 15% ; Entry Level
+    db 30,VICTREEBEL ; 10% ; Entry Level
+    db  5,BULBASAUR  ; 10% ; Entry Level
+    db 11,BULBASAUR  ; 10%
+    db 16,IVYSAUR    ;  5%
+    db 18,IVYSAUR    ;  5%
+    db 21,IVYSAUR    ;  4%
+    db 32,VENUSAUR   ;  1% ; Entry Level
     db $05
-    db 5,TENTACOOL   ; 20%
-    db 10,TENTACOOL  ; 20%
-    db 15,TENTACOOL  ; 15%
-    db 5,TENTACOOL   ; 10%
-    db 10,TENTACOOL  ; 10%
-    db 15,TENTACOOL  ; 10%
-    db 20,TENTACOOL  ;  5%
-    db 30,TENTACOOL  ;  5%
-    db 35,TENTACOOL  ;  4%
-    db 40,TENTACOOL  ;  1%
+    db 11,TENTACOOL  ; 20%
+    db 15,TENTACOOL  ; 20%
+    db 21,TENTACOOL  ; 15%
+    db 24,TENTACOOL  ; 10%
+    db 35,SEAKING    ; 10%
+    db 16,SEEL       ; 10%
+    db 37,SEAKING    ;  5%
+    db 32,TENTACRUEL ;  5%
+    db 36,TENTACRUEL ;  4%
+    db 40,TENTACRUEL ;  1%
 
-DungeonMons1:
-    db $0A
-    db 46,GOLBAT    ; 20%
-    db 46,HYPNO     ; 20%
-    db 46,MAGNETON  ; 15%
-    db 49,DODRIO    ; 10%
-    db 49,VENOMOTH  ; 10%
-    db 52,ARBOK     ; 10%
-    db 49,KADABRA   ;  5%
-    db 52,PARASECT  ;  5%
-    db 53,RAICHU    ;  4%
-    db 53,DITTO     ;  1%
-    db $00
-
-DungeonMons2:
-    db $0F
-    db 51,DODRIO     ; 20%
-    db 51,VENOMOTH   ; 20%
-    db 51,KADABRA    ; 15%
-    db 52,RHYDON     ; 10%
-    db 52,MAROWAK    ; 10%
-    db 52,ELECTRODE  ; 10%
-    db 56,CHANSEY    ;  5%
-    db 54,WIGGLYTUFF ;  5%
-    db 55,DITTO      ;  4%
-    db 60,DITTO      ;  1%
-    db $00
-
-DungeonMonsB1:
-    db $19
-    db 55,RHYDON    ; 20%
-    db 55,MAROWAK   ; 20%
-    db 55,ELECTRODE ; 15%
-    db 64,CHANSEY   ; 10%
-    db 64,PARASECT  ; 10%
-    db 64,RAICHU    ; 10%
-    db 57,ARBOK     ;  5%
-    db 65,DITTO     ;  5%
-    db 63,DITTO     ;  4%
-    db 67,DITTO     ;  1%
-    db $00
+; ─────────────────────────────────
 
 Route23Mons:
-    db $0A
-    db 26,EKANS    ; 20%
-    db 33,DITTO    ; 20%
-    db 26,SPEAROW  ; 15%
-    db 38,FEAROW   ; 10%
-    db 38,DITTO    ; 10%
-    db 38,FEAROW   ; 10%
-    db 41,ARBOK    ;  5%
-    db 43,DITTO    ;  5%
-    db 41,FEAROW   ;  4%
-    db 43,FEAROW   ;  1%
     db $00
-
-PlateauMons2:
-    db $0A
-    db 22,MACHOP    ; 20%
-    db 24,GEODUDE   ; 20%
-    db 26,ZUBAT     ; 15%
-    db 36,ONIX      ; 10%
-    db 39,ONIX      ; 10%
-    db 42,ONIX      ; 10%
-    db 41,MACHOKE   ;  5%
-    db 40,GOLBAT    ;  5%
-    db 40,MAROWAK   ;  4%
-    db 43,GRAVELER  ;  1%
-    db $00
-
-PlateauMons3:
-    db $0F
-    db 24,MACHOP    ; 20%
-    db 26,GEODUDE   ; 20%
-    db 22,ZUBAT     ; 15%
-    db 42,ONIX      ; 10%
-    db 40,VENOMOTH  ; 10%
-    db 45,ONIX      ; 10%
-    db 43,GRAVELER  ;  5%
-    db 41,GOLBAT    ;  5%
-    db 42,MACHOKE   ;  4%
-    db 45,MACHOKE   ;  1%
     db $00
 
 PlateauMons1:
-    db $0F
-    db 24,MACHOP    ; 20%
-    db 26,GEODUDE   ; 20%
-    db 22,ZUBAT     ; 15%
-    db 36,ONIX      ; 10%
-    db 39,ONIX      ; 10%
-    db 42,ONIX      ; 10%
-    db 41,GRAVELER  ;  5%
-    db 41,GOLBAT    ;  5%
-    db 42,MACHOKE   ;  4%
-    db 43,MAROWAK   ;  1%
+    db $00
+    db $00
+
+PlateauMons2:
+    db $00
+    db $00
+
+PlateauMons3:
+    db $00
+    db $00
+
+DungeonMons1:
+    db $00
+    db $00
+
+DungeonMons2:
+    db $00
+    db $00
+
+DungeonMonsB1:
+    db $00
     db $00
 
 _ReadRodData:
@@ -128204,7 +128078,6 @@ GoodRodData:
     dbdw CERULEAN_CITY       , GoodRodGroupNorth
     dbdw VERMILION_CITY      , GoodRodGroupCenter
     dbdw FUCHSIA_CITY        , GoodRodGroupFishGuru
-    dbdw CINNABAR_ISLAND     , GoodRodGroupSouth
     dbdw ROUTE_6             , GoodRodGroupPsyduck
     dbdw ROUTE_10            , GoodRodGroupPowerPlant
     dbdw ROUTE_11            , GoodRodGroupCenter
@@ -128213,8 +128086,6 @@ GoodRodData:
     dbdw ROUTE_17            , GoodRodGroupCenter
     dbdw ROUTE_18            , GoodRodGroupCenter
     dbdw ROUTE_19            , GoodRodGroupBeach
-    dbdw ROUTE_20            , GoodRodGroupSouth
-    dbdw ROUTE_21            , GoodRodGroupSouth
     dbdw ROUTE_24            , GoodRodGroupNorth
     dbdw ROUTE_25            , GoodRodGroupNorth
     dbdw VERMILION_DOCK      , GoodRodGroupCenter
@@ -128255,47 +128126,6 @@ SuperRodData:
     ;dbdw UNKNOWN_DUNGEON_1   , SuperRodGroupUnknown
     db $FF
 
-    ;────────────────
-    ;db  1,MAGIKARP
-    ;db  1,GOLDEEN
-    ;────────────────
-    ;db  1,TENTACOOL
-    ;db  1,POLIWAG
-    ;db  1,HORSEA
-    ;db  1,KRABBY
-    ;────────────────
-    ;db  1,SHELLDER
-    ;db  1,STARYU
-    ;db  1,PSYDUCK
-    ;db  1,SLOWPOKE
-    ;────────────────
-    ;db 25,POLIWHIRL
-    ;db 28,KINGLER
-    ;db 30,TENTACRUEL
-    ;db 32,SEADRA
-    ;────────────────
-    ;db 20,GYARADOS
-    ;db 33,SEAKING
-    ;────────────────
-    ;db  1,CLOYSTER
-    ;db  1,STARMIE
-    ;db 33,GOLDUCK
-    ;db 38,SLOWBRO
-    ;db  1,VAPOREON ???
-    ;────────────────
-    ;db  1,DRATINI
-    ;db  1,LAPRAS
-    ;db  1,SEEL
-    ;db  1,OMANYTE
-    ;db  1,KABUTO
-    ;────────────────
-    ;db 30,DRAGONAIR
-    ;db 55,DRAGONITE
-    ;db 34,DEWGONG
-    ;db 40,OMASTAR
-    ;db 40,KABUTOPS
-    ;────────────────
-
 GoodRodGroupBeach:
     db  8
     db  2,KRABBY ; Entry Level
@@ -128334,7 +128164,7 @@ SuperRodGroupBeach:
     db 13,TENTACOOL
     db 17,TENTACOOL
     db 21,TENTACOOL
-    db  9,SHELLDER ; Entry Level
+    db  9,SHELLDER
     db 13,SHELLDER
     db 13,SHELLDER
     db 17,SHELLDER
@@ -128388,7 +128218,7 @@ SuperRodGroupNorth:
     db 13,TENTACOOL
     db 17,TENTACOOL
     db 21,TENTACOOL
-    db  9,STARYU ; Entry Level
+    db  9,STARYU
     db 13,STARYU
     db 13,STARYU
     db 17,STARYU
@@ -128599,6 +128429,7 @@ SuperRodGroupSafari:
     db 24,SEEL
     db  7,DRATINI ; Entry Level
     db 11,DRATINI
+    db 11,DRATINI
     db 15,DRATINI
     db 13,OMANYTE ; Entry Level
     db 13,KABUTO ; Entry Level
@@ -128608,26 +128439,6 @@ SuperRodGroupSafari:
     db 28,POLIWHIRL
     db 29,POLIWHIRL
     db 30,POLIWHIRL
-    db 30,DRAGONAIR ; Entry Level
-
-GoodRodGroupSouth:
-    db 16
-    db  2,TENTACOOL
-    db  2,TENTACOOL
-    db  3,TENTACOOL
-    db  3,TENTACOOL
-    db  3,TENTACOOL
-    db  3,TENTACOOL
-    db  4,TENTACOOL
-    db  2,GOLDEEN
-    db  2,GOLDEEN
-    db  2,GOLDEEN
-    db  3,GOLDEEN
-    db  2,KRABBY
-    db  2,KRABBY
-    db  3,KRABBY
-    db  2,SEEL
-    db  3,SEEL
 
 SuperRodGroupSouth:
     db 32
@@ -128638,33 +128449,67 @@ SuperRodGroupSouth:
     db 23,TENTACOOL
     db 27,TENTACOOL
     db 31,TENTACOOL
-    db 19,GOLDEEN
-    db 23,GOLDEEN
-    db 27,GOLDEEN
-    db 31,GOLDEEN
     db 11,KRABBY
     db 15,KRABBY
     db 19,KRABBY
     db 23,KRABBY
     db 27,KRABBY
     db 31,KRABBY
-    db 15,SEEL
-    db 19,SEEL
-    db 23,SEEL
-    db 27,SEEL
-    db 31,SEEL
+    db 11,SHELLDER
+    db 15,SHELLDER
+    db 19,SHELLDER
+    db 23,SHELLDER
+    db 27,SHELLDER
     db 11,STARYU
     db 15,STARYU
     db 19,STARYU
     db 23,STARYU
+    db 27,STARYU
+    db 33,SEAKING
+    db 35,SEAKING
+    db 35,SEAKING
+    db 35,SEAKING
+    db 37,SEAKING
     db 32,TENTACRUEL
     db 36,TENTACRUEL
-    db 35,SEAKING
-    db 39,SEAKING
+    db 28,KINGLER
     db 30,KINGLER
-    db 34,DEWGONG
 
-;SuperRodGroupSeaform:
+SuperRodGroupSeaform:
+    db 32
+    db  3,KRABBY
+    db  8,KRABBY
+    db 11,KRABBY
+    db 15,KRABBY
+    db 19,KRABBY
+    db 23,KRABBY
+    db 27,KRABBY
+    db 31,KRABBY
+    db  3,SHELLDER ; Entry Level
+    db  8,SHELLDER
+    db 11,SHELLDER
+    db 15,SHELLDER
+    db 19,SHELLDER
+    db 23,SHELLDER
+    db 23,SHELLDER
+    db 27,SHELLDER
+    db  3,STARYU ; Entry Level
+    db  8,STARYU
+    db 11,STARYU
+    db 15,STARYU
+    db 19,STARYU
+    db 23,STARYU
+    db 23,STARYU
+    db 27,STARYU
+    db 30,KINGLER
+    db 32,KINGLER
+    db 34,KINGLER
+    db 36,KINGLER
+    db 31,STARMIE
+    db 31,CLOYSTER
+    db 21,OMANYTE
+    db 21,KABUTO
+
 ;SuperRodGroupLake:
 ;SuperRodGroupUnknown:
 
