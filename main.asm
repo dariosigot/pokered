@@ -22298,7 +22298,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHSXX
     dw MapHSXX
     dw MapHSXX
-    dw MapHSF4
+    dw MapHSXX
     dw MapHSXX
     dw MapHSXX
     dw MapHSXX
@@ -22445,7 +22445,7 @@ MapHS53: ; cbd1 (3:4bd1)
     db POWER_PLANT,$0D,Show
     db POWER_PLANT,$0E,Show
 MapHSC2: ; cbfb (3:4bfb)
-    db VICTORY_ROAD_2,$06,Show
+    db VICTORY_ROAD_2,$06,Hide ; Moltres in Victory Road
     db VICTORY_ROAD_2,$07,Show
     db VICTORY_ROAD_2,$08,Show
     db VICTORY_ROAD_2,$09,Show
@@ -22563,9 +22563,8 @@ MapHSEB: ; cd0f (3:4d0f)
     db SILPH_CO_11F,$03,Show
     db SILPH_CO_11F,$04,Show
     db SILPH_CO_11F,$05,Show
-MapHSF4: ; cd18 (3:4d18)
-    db $F4,$02,Show
-MapHSD6: ; cd1b (3:4d1b)
+MapHSD6: ; cd18 (3:4d18)
+    db MANSION_2,$05,Show ; New Moltres
     db MANSION_2,$02,Show
 MapHSD7: ; cd1e (3:4d1e)
     db MANSION_3,$03,Show
@@ -74655,7 +74654,7 @@ Func_52037: ; 52037 (14:6037)
     ret nz
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,$5
+    ld a,$6
     ld [H_SPRITEHEIGHT],a
     jp DisplayTextID
 
@@ -74669,19 +74668,10 @@ Mansion2TextPointers: ; 5204d (14:604d)
     dw Predef5CText
     dw Mansion2Text3
     dw Mansion2Text4
+    dw Mansion2TextMoltres
     dw Mansion2Text5
 
-Mansion2TrainerHeaders: ; 52057 (14:6057)
-Mansion2TrainerHeader0: ; 52057 (14:6057)
-    db $1 ; flag's bit
-    db ($0 << 4) ; trainer's view range
-    dw $d847 ; flag's byte
-    dw Mansion2BattleText1 ; 0x606e TextBeforeBattle
-    dw Mansion2AfterBattleText1 ; 0x6078 TextAfterBattle
-    dw Mansion2EndBattleText1 ; 0x6073 TextEndBattle
-    dw Mansion2EndBattleText1 ; 0x6073 TextEndBattle
-
-    db $ff
+SECTION "Mansion2Text1",ROMX[$6064],BANK[$14]
 
 Mansion2Text1: ; 52064 (14:6064)
     db $08 ; asm
@@ -74738,19 +74728,7 @@ Mansion2Text5: ; 52087 (14:6087)
 .asm_520bf
     jp TextScriptEnd
 
-UnnamedText_520c2: ; 520c2 (14:60c2)
-    TX_FAR _UnnamedText_520c2
-    db "@"
-
-UnnamedText_520c7: ; 520c7 (14:60c7)
-    TX_FAR _UnnamedText_520c7
-    db "@"
-
-UnnamedText_520cc: ; 520cc (14:60cc)
-    TX_FAR _UnnamedText_520cc
-    db "@"
-
-Mansion2Object: ; 0x520d1 (size=63)
+Mansion2Object: ; Move in the Bank
     db $1 ; border tile
 
     db $4 ; warps
@@ -74761,11 +74739,12 @@ Mansion2Object: ; 0x520d1 (size=63)
 
     db $0 ; signs
 
-    db $4 ; people
+    db $5 ; people
     db SPRITE_BLACK_HAIR_BOY_2,$11 + 4,$3 + 4,$fe,$2,$41,BURGLAR + $C8,$4 ; trainer
     db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
+    db SPRITE_BIRD,$c + 4,$1c + 4,$ff,$d1,$45,MOLTRES,40 ; trainer
 
     ; warp-to
     EVENT_DISP $f,$a,$5 ; MANSION_1
@@ -74775,6 +74754,8 @@ Mansion2Object: ; 0x520d1 (size=63)
 
 Mansion2Blocks: ; 52110 (14:6110)
     INCBIN "maps/mansion2.blk"
+
+SECTION "Mansion3_h",ROMX[$61e2],BANK[$14]
 
 Mansion3_h: ; 0x521e2 to 0x521ee (12 bytes) (id=215)
     db $16 ; tileset
@@ -75899,6 +75880,53 @@ GivePorygon:
     call DisplayPokedex
     pop bc
     jp GivePokemon
+
+UnnamedText_520cc: ; Moved in the Bank
+    TX_FAR _UnnamedText_520cc
+    db "@"
+
+UnnamedText_520c2: ; Moved in the Bank
+    TX_FAR _UnnamedText_520c2
+    db "@"
+
+UnnamedText_520c7: ; Moved in the Bank
+    TX_FAR _UnnamedText_520c7
+    db "@"
+
+Mansion2TrainerHeaders: ; Move in the Bank
+Mansion2TrainerHeader0: ; Move in the Bank
+    db $1 ; flag's bit
+    db ($0 << 4) ; trainer's view range
+    dw $d847 ; flag's byte
+    dw Mansion2BattleText1 ; 0x606e TextBeforeBattle
+    dw Mansion2AfterBattleText1 ; 0x6078 TextAfterBattle
+    dw Mansion2EndBattleText1 ; 0x6073 TextEndBattle
+    dw Mansion2EndBattleText1 ; 0x6073 TextEndBattle
+
+Mansion2TrainerHeader1: ; New Moltres
+    db $2 ; flag's bit
+    db ($0 << 4) ; trainer's view range
+    dw $d847 ; flag's byte
+    dw Mansion2BattleText2 ; TextBeforeBattle
+    dw Mansion2BattleText2 ; TextAfterBattle
+    dw Mansion2BattleText2 ; TextEndBattle
+    dw Mansion2BattleText2 ; TextEndBattle
+
+    db $ff
+
+Mansion2BattleText2:
+    TX_FAR _VictoryRoad2BattleText6 ; Gyaoo!
+    db $8
+    ld a,MOLTRES
+    call PlayCry
+    call WaitForSoundToFinish
+    jp TextScriptEnd
+
+Mansion2TextMoltres:
+    db $08 ; asm
+    ld hl,Mansion2TrainerHeader1
+    call TalkToTrainer
+    jp TextScriptEnd
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -127776,6 +127804,8 @@ ZoneMons3:
     db 32,GYARADOS  ;  4%
     db 34,DRAGONAIR ;  1%
 
+; ─────────────────────────────────
+
 WaterMons:
     db $00
     db $05
@@ -127790,22 +127820,72 @@ WaterMons:
     db 36,TENTACRUEL ;  4%
     db 34,DEWGONG    ;  1% ; Entry Level
 
-; KRABBY
-; SHELLDER
-; STARYU
+; ─────────────────────────────────
 
-; ZUBAT
-; GOLBAT
+; GRIMER
+; MUK
 
-; SLOWPOKE
-; SEEL
+; VOLTORB
+; ELECTRODE
 
-; DEWGONG
-; SLOWBRO
+; MAGNEMITE
+; MAGNETON
 
-; OMANYTE
-; KABUTO
-; JYNX
+; PIKACHU
+; RAICHU
+
+; ELECTABUZZ
+
+; JOLTEON
+
+; ZAPDOS
+
+PowerPlantMons:
+    db $0A
+    db 21,VOLTORB    ; 20%
+    db 21,MAGNEMITE  ; 20%
+    db 20,PIKACHU    ; 15%
+    db 24,PIKACHU    ; 10%
+    db 23,MAGNEMITE  ; 10%
+    db 23,VOLTORB    ; 10%
+    db 32,MAGNETON   ;  5%
+    db 35,MAGNETON   ;  5%
+    db 33,ELECTABUZZ ;  4%
+    db 36,ELECTABUZZ ;  1%
+    db $00
+
+; ─────────────────────────────────
+
+; ZUBAT    ; (Only Earth)
+; GOLBAT   ; (Only Earth)
+
+; KRABBY   ; (Earth & Rod)
+; KINGLER  ; (Earth & Rod)
+
+; SLOWPOKE ; (Only Earth)
+; SLOWBRO  ; (Only Earth)
+
+; SEEL     ; (Earth & Water) ??? ha senso trovarlo col ROD???
+; DEWGONG  ; (Earth & Water)
+
+; SQUIRTLE
+; WARTORTLE
+; BLASTOISE
+
+; VAPOREON ; (Only Float)
+; JYNX     ; (Only Earth)
+; ARTICUNO ; (ONCE)
+
+; OMANYTE ; Rod
+; KABUTO  ; Rod
+
+; ─────────────
+
+; SHELLDER ; Rod
+; CLOYSTER ; Rod
+
+; STARYU   ; Rod
+; STARMIE  ; Rod
 
 IslandMons1:
     db $0F
@@ -127878,6 +127958,26 @@ IslandMonsB4:
     db $00
 
 ; ─────────────────────────────────
+
+; KOFFING
+; WEEZING
+
+; PONYTA
+; RAPIDASH
+
+; GROWLITHE
+; ARCANINE
+
+; VULPIX
+; NINETALES
+
+; CHARMANDER
+; CHARMELEON
+; CHARIZARD
+
+; FLAREON
+; MAGMAR
+; MOLTRES !!!
 
 MansionMons1:
     db $0A
@@ -128000,20 +128100,6 @@ DungeonMonsB1:
     db 65,DITTO     ;  5%
     db 63,DITTO     ;  4%
     db 67,DITTO     ;  1%
-    db $00
-
-PowerPlantMons:
-    db $0A
-    db 21,VOLTORB    ; 20%
-    db 21,MAGNEMITE  ; 20%
-    db 20,PIKACHU    ; 15%
-    db 24,PIKACHU    ; 10%
-    db 23,MAGNEMITE  ; 10%
-    db 23,VOLTORB    ; 10%
-    db 32,MAGNETON   ;  5%
-    db 35,MAGNETON   ;  5%
-    db 33,ELECTABUZZ ;  4%
-    db 36,ELECTABUZZ ;  1%
     db $00
 
 Route23Mons:
