@@ -83,6 +83,7 @@ SPRITE_OLD_AMBER                 EQU $45
 SPRITE_LYING_OLD_MAN_UNUSED_1    EQU $46
 SPRITE_LYING_OLD_MAN_UNUSED_2    EQU $47
 SPRITE_LYING_OLD_MAN             EQU $48
+SPRITE_BASKET                    EQU $49
 
 ; different kinds of people events
 ITEM    EQU $80

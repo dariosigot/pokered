@@ -192,6 +192,9 @@ FakeGiveItem:
     ld [$d11e],a
     jp HackForGetItemName
 
+Tset0E_Coll: ; Move in the Bank 0
+    INCBIN "gfx/tilesets/0e.tilecoll"
+
 SECTION "RoutineForRealGB",ROM0[$0F5] ; Denim
 
 RoutineForRealGB:
@@ -3770,43 +3773,42 @@ InterlaceMergeSpriteBuffers: ; 16ea (0:16ea)
 
 Tset0B_Coll: ; 172f (0:172f)
     INCBIN "gfx/tilesets/0b.tilecoll"
-Tset00_Coll: ; 1735 (0:1735)
+Tset00_Coll:
     INCBIN "gfx/tilesets/00.tilecoll"
-Tset01_Coll: ; 1749 (0:1749)
+Tset01_Coll:
     INCBIN "gfx/tilesets/01.tilecoll"
-Tset02_Coll: ; 1753 (0:1753)
+Tset02_Coll:
     INCBIN "gfx/tilesets/02.tilecoll"
-Tset05_Coll: ; 1759 (0:1759)
+Tset05_Coll:
     INCBIN "gfx/tilesets/05.tilecoll"
-Tset03_Coll: ; 1765 (0:1765)
+Tset03_Coll:
     INCBIN "gfx/tilesets/03.tilecoll"
-Tset08_Coll: ; 1775 (0:1775)
+Tset08_Coll:
     INCBIN "gfx/tilesets/08.tilecoll"
-Tset09_Coll: ; 177f (0:177f)
+Tset09_Coll:
     INCBIN "gfx/tilesets/09.tilecoll"
-Tset0D_Coll: ; 178a (0:178a)
+Tset0D_Coll:
     INCBIN "gfx/tilesets/0d.tilecoll"
-Tset0E_Coll: ; 1795 (0:1795)
-    INCBIN "gfx/tilesets/0e.tilecoll"
-Tset0F_Coll: ; 179a (0:179a)
+Tset0F_Coll:
     INCBIN "gfx/tilesets/0f.tilecoll"
-Tset10_Coll: ; 17a2 (0:17a2)
+Tset10_Coll:
     INCBIN "gfx/tilesets/10.tilecoll"
-Tset11_Coll: ; 17ac (0:17ac)
+Tset11_Coll:
     INCBIN "gfx/tilesets/11.tilecoll"
-Tset12_Coll: ; 17b8 (0:17b8)
+Tset12_Coll:
     INCBIN "gfx/tilesets/12.tilecoll"
-Tset13_Coll: ; 17c0 (0:17c0)
+Tset13_Coll:
     INCBIN "gfx/tilesets/13.tilecoll"
-Tset14_Coll: ; 17ca (0:17ca)
+Tset14_Coll:
     INCBIN "gfx/tilesets/14.tilecoll"
-Tset15_Coll: ; 17d1 (0:17d1)
+Tset15_Coll:
     INCBIN "gfx/tilesets/15.tilecoll"
-Tset16_Coll: ; 17dd (0:17dd)
+Tset16_Coll:
     INCBIN "gfx/tilesets/16.tilecoll"
-Tset17_Coll: ; 17f0 (0:17f0)
+Tset17_Coll:
     INCBIN "gfx/tilesets/17.tilecoll"
-;Tile Collision ends 0x17f7
+
+SECTION "FarCopyData2",ROM0[$17f7] ; Denim
 
 ; does the same thing as FarCopyData at 009D
 ; only difference is that it uses [$ff8b] instead of [$cee9] for a temp value
@@ -22152,7 +22154,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHSXX
     dw MapHS60
     dw MapHSXX
-    dw MapHSXX
+    dw MapHS62
     dw MapHSXX
     dw MapHSXX
     dw MapHSXX
@@ -22626,6 +22628,9 @@ MapHS69:
     db DRATINI_CAVE,$02,Show
 MapHS07:
     db FUCHSIA_CITY,$0b,Show
+MapHS62:
+    db SS_ANNE_4,$01,Show
+    db SS_ANNE_4,$02,Hide
 
     db $FF,$01,Show
 
@@ -32065,7 +32070,12 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $40 ; byte count
     db BANK(LyingOldManSprite)
 
-Func_17c47: ; 17c47 (5:7c47)
+    ; SPRITE_BASKET
+    dw BasketSprite
+    db $40 ; byte count
+    db BANK(BasketSprite)
+
+Func_17c47: ; Move in the Bank
     ld a,[$cd50]
     ld c,a
     ld b,$0
@@ -32122,17 +32132,10 @@ Func_17c47: ; 17c47 (5:7c47)
     call DelayFrame
     jp UpdateSprites
 
-EmotionBubblesPointerTable: ; 17caf (5:7caf)
-    dw EmotionBubbles
-    dw EmotionBubbles + $40
-    dw EmotionBubbles + $80
-
-EmotionBubblesOAM: ; 17cb5 (5:7cb5)
-    db $F8,$00,$F9,$00
-    db $FA,$00,$FB,$00
-
 EmotionBubbles: ; 17cbd (5:7cbd)
     INCBIN "gfx/emotion_bubbles.2bpp"
+
+SECTION "Func_17d7d",ROMX[$7d7d],BANK[$5]
 
 Func_17d7d: ; 17d7d (5:7d7d)
     ld a,[wPlayerMonAccuracyMod] ; $cd1e
@@ -32388,6 +32391,15 @@ RemoveItemByID: ; 17f37 (5:7f37)
     ld [wWhichPokemon],a ; $cf92
     ld hl,wNumBagItems ; $d31d
     jp RemoveItemFromInventory
+
+EmotionBubblesPointerTable: ; Move in the BANK
+    dw EmotionBubbles
+    dw EmotionBubbles + $40
+    dw EmotionBubbles + $80
+
+EmotionBubblesOAM: ; Move in the BANK
+    db $F8,$00,$F9,$00
+    db $FA,$00,$FB,$00
 
 SECTION "bank6",ROMX,BANK[$6]
 
@@ -69602,13 +69614,12 @@ Route12GateText1: ; 49509 (12:5509)
 Route12GateObject: ; 0x4950e (size=50)
     db $a ; border tile
 
-    db $6 ; warps
+    db $5 ; warps
     db $0,$4,$0,$ff
     db $0,$5,$1,$ff
     db $7,$4,$2,$ff
     db $7,$5,$2,$ff
     db $6,$8,$0,ROUTE_12_GATE_2F
-    db $4,$9,$0,DRATINI_CAVE
 
     db $0 ; signs
 
@@ -69621,11 +69632,9 @@ Route12GateObject: ; 0x4950e (size=50)
     EVENT_DISP $5,$7,$4
     EVENT_DISP $5,$7,$5
     EVENT_DISP $5,$6,$8 ; ROUTE_12_GATE_2F
-    EVENT_DISP $5,$4,$9 ; DRATINI_CAVE
 
-Route12GateBlocks_Bck:
-
-SECTION "Route12GateUpstairs_h",ROMX[$5554],BANK[$12]
+Route12GateBlocks: ; 49540 (12:5540)
+    INCBIN "maps/route12gate.blk"
 
 Route12GateUpstairs_h: ; 0x49554 to 0x49560 (12 bytes) (id=195)
     db $0c ; tileset
@@ -71142,9 +71151,6 @@ SafariZoneSecretHouseObject: ; 0x4a365 (size=26)
 
 SafariZoneSecretHouseBlocks: ; 4a37f (12:637f)
     INCBIN "maps/safarizonesecrethouse.blk"
-
-Route12GateBlocks: ; xxxxx (12:xxxx) ; Spostato a Fine Bank
-    INCBIN "maps/route12gate.blk"
 
 FlagInstantAndPredefCeladonMart: ; xxxxx (12:xxxx) ; Denim
     push hl
@@ -90161,26 +90167,58 @@ SSAnne4_h: ; 0x61622 to 0x6162e (12 bytes) (id=98)
     db $00 ; connections
     dw SSAnne4Object ; objects
 
-SSAnne4Script: ; 6162e (18:562e)
-    jp EnableAutoTextBoxDrawing
+SSAnne4Script:
+    call EnableAutoTextBoxDrawing
+    ld hl,SSAnne4ScriptPointers
+    ld a,[W_SSANNE4CURSCRIPT]
+    jp CallFunctionInTable
 
-SSAnne4TextPointers: ; 61631 (18:5631)
-    db "@"
+SSAnne4ScriptPointers:
+    dw SSAnne4Script0
+    dw SSAnne4Script1
+    dw SSAnne4Script2
 
-SSAnne4Object: ; 0x61632 (size=52)
+SSAnne4Script0:
+    ld a,$e8     ; Hide Basket 2
+    ld [$cc4d],a ; ...
+    ld a,$11     ; ...
+    call Predef  ; ...
+    ld a,1
+    ld [W_SSANNE4CURSCRIPT],a
+    ret
+
+SSAnne4Script1:
+    ld a,[$c225] ; Check if sprite 2 is removed From display
+    cp $A0       ; ...
+    ret z ; Continue only if Basket 2 is not removed
+    ld a,$A0
+    ld [$c225],a ; Force remove sprite 2 from display
+    jp Delay3
+
+SSAnne4Script2:
+    ret
+
+SSAnne4TextPointers:
+    dw SSAnne4BasketText
+    dw SSAnne4BasketText
+
+SSAnne4Object:
     db $c ; border tile
 
-    db $6 ; warps
+    db $7 ; warps
     db $3,$17,$8,SS_ANNE_10
     db $3,$13,$6,SS_ANNE_10
     db $3,$f,$4,SS_ANNE_10
     db $3,$b,$2,SS_ANNE_10
     db $3,$7,$0,SS_ANNE_10
     db $5,$1b,$9,SS_ANNE_1
+    db $5,$3,$0,DRATINI_CAVE
 
     db $0 ; signs
 
-    db $0 ; people
+    db $2 ; people
+    db SPRITE_BASKET,$5 + 4,$3 + 4,$ff,$10,$1 ; person
+    db SPRITE_BASKET,$5 + 4,$2 + 4,$ff,$d0,$2 ; person
 
     ; warp-to
     EVENT_DISP $f,$3,$17 ; SS_ANNE_10
@@ -90189,9 +90227,13 @@ SSAnne4Object: ; 0x61632 (size=52)
     EVENT_DISP $f,$3,$b ; SS_ANNE_10
     EVENT_DISP $f,$3,$7 ; SS_ANNE_10
     EVENT_DISP $f,$5,$1b ; SS_ANNE_1
+    EVENT_DISP $f,$5,$3 ; DRATINI_CAVE
 
-SSAnne4Blocks: ; 61666 (18:5666)
-    INCBIN "maps/ssanne4.blk"
+SSAnne4BasketText:
+    TX_FAR _VermilionGymTrashText
+    db "@"
+
+SECTION "SSAnne5_h",ROMX[$56a2],BANK[$18]
 
 SSAnne5_h: ; 0x616a2 to 0x616ae (12 bytes) (id=99)
     db $0d ; tileset
@@ -91966,6 +92008,9 @@ ResetFossilSteps:
     ld hl,$d7a3
     ret
 
+SSAnne4Blocks: ; Move in the BANK
+    INCBIN "maps/ssanne4.blk"
+
 SECTION "bank19",ROMX,BANK[$19]
 
 Tset00_GFX:
@@ -92081,10 +92126,6 @@ Tset12_GFX: ; 6d8c0 (1b:58c0)
     INCBIN "gfx/tilesets/12.2bpp"
 Tset12_Block: ; 6dea0 (1b:5ea0)
     INCBIN "gfx/blocksets/12.bst"
-Tset0D_GFX: ; 6e390 (1b:6390)
-    INCBIN "gfx/tilesets/0d.2bpp"
-Tset0D_Block: ; 6e930 (1b:6930)
-    INCBIN "gfx/blocksets/0d.bst"
 Tset14_GFX: ; 6ed10 (1b:6d10)
     INCBIN "gfx/tilesets/14.2bpp"
 Tset14_Block: ; 6f2d0 (1b:72d0)
@@ -94723,8 +94764,7 @@ InternalMapEntries: ; 71382 (1c:5382)
     IMAP $58,$E,$7,Route12Name
     IMAP $59,$C,$0,SeaCottageName
     IMAP $5E,$A,$9,VermilionCityName
-    IMAP $69,$9,$A,SSAnneName
-    IMAP $6A,$E,$7,Route12Name
+    IMAP $6A,$9,$A,SSAnneName
     IMAP $6D,$0,$4,VictoryRoadName
     IMAP $77,$0,$2,PokemonLeagueName
     IMAP $78,$A,$5,UndergroundPathName
@@ -97947,13 +97987,13 @@ MapIDList_70a44: ; Moved in the BANK
     ; all POKEMONTOWER maps and Lavender Town buildings
     db LAVENDER_POKECENTER
     db LAVENDER_HOUSE_2
+    ; all SEAFOAM_ISLANDS maps
+    db SEAFOAM_ISLANDS_2
+    db SEAFOAM_ISLANDS_5
     ; all SILPH_CO,MANSION,SAFARI_ZONE,and UNKNOWN_DUNGEON maps,
     ; except for SILPH_CO_1F
     db SILPH_CO_2F
     db UNKNOWN_DUNGEON_1
-    ; all SEAFOAM_ISLANDS maps
-    db SEAFOAM_ISLANDS_2
-    db SEAFOAM_ISLANDS_5
     db $FF
 
 CalcFlyingEndPointer:
@@ -125862,6 +125902,20 @@ DratiniCave_h:
 
 DratiniCaveScript:
     call EnableAutoTextBoxDrawing
+    ld a,[W_SSANNE4CURSCRIPT]
+    cp 2
+    jr z,.Skip
+    ld a,$e7
+    ld [$cc4d],a
+    ld a,$11
+    call Predef ; Hide Basket 1
+    ld a,$e8
+    ld [$cc4d],a
+    ld a,$15
+    call Predef ; Show Basket 2
+    ld a,2
+    ld [W_SSANNE4CURSCRIPT],a
+.Skip
     ld hl,DratiniCaveTrainerHeaders
     ld de,DratiniCaveScriptPointers
     ld a,[W_DRATINICAVECURSCRIPT]
@@ -125911,7 +125965,7 @@ DratiniCaveObject:
     db $0c ; border tile
 
     db $1 ; warps
-    db $0F,$1B,$5,ROUTE_12_GATE
+    db $09,$19,$6,SS_ANNE_4
 
     db $0 ; signs
 
@@ -125920,7 +125974,7 @@ DratiniCaveObject:
     db SPRITE_BALL,$a + 4,$1b + 4,$ff,$ff,$82,TRADE_STONE ; item
 
     ; warp-to
-    EVENT_DISP $f,$0F,$1B ; ROUTE_12_GATE
+    EVENT_DISP $f,$09,$19 ; SS_ANNE_4
 
 DratiniCaveBlocks:
     INCBIN "maps/dratinicave.blk"
@@ -126767,6 +126821,8 @@ CheckDarkMap:
     cp a,VICTORY_ROAD_2
     jr z,.Dark
     cp a,SEAFOAM_ISLANDS_1
+    jr z,.Dark
+    cp a,UNKNOWN_DUNGEON_1
     jr z,.Dark
     ret
 .Dark
@@ -127886,7 +127942,7 @@ IslandMonsB3:
     db  9,SQUIRTLE  ;  5%
     db  9,JYNX      ;  4% ; Entry Level
     db 20,VAPOREON  ;  1% ; Entry Level
-    db $04
+    db $0A
     db 27,SEEL      ; 20%
     db 26,KRABBY    ; 20%
     db 29,SEEL      ; 15%
@@ -127910,7 +127966,7 @@ IslandMonsB4:
     db 36,DEWGONG   ;  5%
     db  5,SQUIRTLE  ;  4% ; Entry Level
     db 11,SQUIRTLE  ;  1%
-    db $05
+    db $0A
     db 28,SEEL      ; 20%
     db 29,KRABBY    ; 20%
     db 30,SEEL      ; 15%
@@ -128115,8 +128171,8 @@ SuperRodData:
     dbdw ROUTE_24            , SuperRodGroupNorth
     dbdw ROUTE_25            , SuperRodGroupNorth
     dbdw VERMILION_DOCK      , SuperRodGroupCenter
-    ;dbdw SEAFOAM_ISLANDS_4   , SuperRodGroupSeaform
-    ;dbdw SEAFOAM_ISLANDS_5   , SuperRodGroupSeaform
+    dbdw SEAFOAM_ISLANDS_4   , SuperRodGroupSeaform
+    dbdw SEAFOAM_ISLANDS_5   , SuperRodGroupSeaform
     dbdw SAFARI_ZONE_EAST    , SuperRodGroupSafari
     dbdw SAFARI_ZONE_NORTH   , SuperRodGroupSafari
     dbdw SAFARI_ZONE_WEST    , SuperRodGroupSafari
@@ -128822,7 +128878,14 @@ ReadMove:
 
 SECTION "Bank38",ROMX,BANK[$38]
 
+Tset0D_GFX:
+    INCBIN "gfx/tilesets/0d.2bpp"
+Tset0D_Block:
+    INCBIN "gfx/blocksets/0d.bst"
 Tset0E_GFX:
     INCBIN "gfx/tilesets/0e.2bpp"
 Tset0E_Block:
     INCBIN "gfx/blocksets/0e.bst"
+
+BasketSprite:
+    INCBIN "gfx/denim/basket.2bpp"

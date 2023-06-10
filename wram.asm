@@ -1329,8 +1329,10 @@ W_ROUTE18GATECURSCRIPT: ; d669
     ds 1
 W_DRATINICAVECURSCRIPT: ; d66a
     ds 1
+W_SSANNE4CURSCRIPT:
+    ds 1
 
-    ds 161-1
+    ds 161-2
 
 W_TOWNVISITEDFLAG: ; d70b
 ; 2 bytes bit array, 1 means visited
