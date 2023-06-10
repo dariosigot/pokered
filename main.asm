@@ -44226,8 +44226,13 @@ INCLUDE "music/defeatedgymleader.asm"
 RemovePokemonWithHack:
     ld a,[W_CURMAP]
     cp a,CELADON_HOTEL
-    jp nz,RemovePokemon
-    ret
+    jr nz,.RemovePokemon
+    ld a,PORYGON
+    ld hl,W_PARTYMON1
+    cp [hl]
+    ret z ; If Porygon is the first pkmn in Party Don't Remove = Duplicate
+.RemovePokemon
+    jp RemovePokemon
 
 SECTION "bank9",ROMX,BANK[$9]
 
