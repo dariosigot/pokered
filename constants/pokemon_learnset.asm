@@ -1401,7 +1401,8 @@ Mon079_EvosMoves:
     db 18,DISABLE
     db 22,HEADBUTT
     db 25,BIDE
-    db 31,REST
+    db 29,REST
+    db 33,PSYBEAM
     ;  37,SLOWBRO
     db 40,AMNESIA
     db 43,TSUNAMI
@@ -1726,10 +1727,10 @@ Mon096_EvosMoves:
 ;Learnset
     ;   1,POUND
     ;   1,DISABLE
+    db  6,TELEPORT
     db  9,HYPNOSIS
     db 16,DREAM_EATER
     db 17,CONFUSION
-    db 21,TELEPORT
     db 24,HEADBUTT
     ;  26,HYPNO
     db 28,MEDITATE
@@ -2941,13 +2942,12 @@ Mon150_EvosMoves:
     ;   1,CONFUSION
     ;   1,DISABLE
     db  7,REFLECT
-    db 10,PSYBEAM    ; Unknown Dungeon's Mewtwo (Level 45)
+    db 10,PSYCHIC_M  ; Unknown Dungeon's Mewtwo (Level 45)
     db 18,RECOVER    ; 
     db 25,SWIFT      ; 
     db 45,SUBSTITUTE ; 
     db 46,MIST
     db 48,BARRIER
-    db 51,PSYCHIC_M
     db 53,THUNDERBOLT
     db 55,ICE_BEAM
     db 57,AMNESIA

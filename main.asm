@@ -128726,6 +128726,14 @@ TrainerClassMoveChoiceModifications:
     db 1,2,3,4,0  ; AGATHA
     db 1,3,4,0    ; LANCE
 
+WildAI:
+    db ARTICUNO
+    db ZAPDOS
+    db MOLTRES
+    db MEWTWO
+    db MEW
+    db $FF
+
 ; creates a set of moves that may be used and returns its address in hl
 ; unused slots are filled with 0,all used slots may be chosen with equal probability
 AIEnemyTrainerChooseMoves:
@@ -128733,10 +128741,12 @@ AIEnemyTrainerChooseMoves:
     dec a
     jr nz,.notwildbattle
     ;wild battle confirmed at this point
-    ld hl,W_ENEMYMONMOVES ;restore this address which was clobbered by Bankswitch
     ld a,[W_ENEMYMON_START]
-    cp MEWTWO
-    ret nz
+    ld hl,WildAI
+    ld de,$0001
+    call IsInArray
+    ld hl,W_ENEMYMONMOVES ;restore this address which was clobbered by Bankswitch
+    ret nc
     ;load the Sailor class since it only uses AI routines 1 and 3
     ld a,SAILOR
     ld [W_TRAINERCLASS],a
