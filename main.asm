@@ -91999,7 +91999,7 @@ PokeCenterPCCode: ; 62529 (18:6529)
 
 PredefAndHideFuchsiaGuard:
     call Predef
-    ld a,$e5
+    ld a,$e6
     ld [$cc4d],a
     ld a,$11
     jp Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
