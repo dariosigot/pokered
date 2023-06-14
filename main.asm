@@ -71704,8 +71704,8 @@ Route23Object: ; 0x50361 (size=81)
     db $f ; border tile
 
     db $4 ; warps
-    db $8b,$7,$2,ROUTE_22_GATE
-    db $8b,$8,$3,ROUTE_22_GATE
+    db $8b,$8,$2,ROUTE_22_GATE
+    db $8b,$9,$3,ROUTE_22_GATE
     db $1f,$4,$0,VICTORY_ROAD_1
     db $1f,$e,$1,VICTORY_ROAD_2
 
@@ -71715,15 +71715,15 @@ Route23Object: ; 0x50361 (size=81)
     db $7 ; people
     db SPRITE_GUARD,$23 + 4,$4 + 4,$ff,$d0,$1 ; person
     db SPRITE_GUARD,$38 + 4,$a + 4,$ff,$d0,$2 ; person
-    db SPRITE_SWIMMER,$55 + 4,$8 + 4,$ff,$d0,$3 ; person
-    db SPRITE_SWIMMER,$60 + 4,$b + 4,$ff,$d0,$4 ; person
+    db SPRITE_GUARD,$55 + 4,$8 + 4,$ff,$d0,$3 ; person
+    db SPRITE_GUARD,$60 + 4,$b + 4,$ff,$d0,$4 ; person
     db SPRITE_GUARD,$69 + 4,$c + 4,$ff,$d0,$5 ; person
     db SPRITE_GUARD,$77 + 4,$8 + 4,$ff,$d0,$6 ; person
     db SPRITE_GUARD,$88 + 4,$8 + 4,$ff,$d0,$7 ; person
 
     ; warp-to
-    EVENT_DISP $a,$8b,$7 ; ROUTE_22_GATE
     EVENT_DISP $a,$8b,$8 ; ROUTE_22_GATE
+    EVENT_DISP $a,$8b,$9 ; ROUTE_22_GATE
     EVENT_DISP $a,$1f,$4 ; VICTORY_ROAD_1
     EVENT_DISP $a,$1f,$e ; VICTORY_ROAD_2
 
@@ -127944,7 +127944,7 @@ IslandMonsB3:
     db 32,KINGLER   ; 10%
     db 36,DEWGONG   ; 10%
     db 37,DEWGONG   ;  5%
-    db  9,SQUIRTLE  ;  5%
+    db  5,SQUIRTLE  ;  5% ; Entry Level
     db  9,JYNX      ;  4% ; Entry Level
     db 20,VAPOREON  ;  1% ; Entry Level
     db $0A
@@ -127952,8 +127952,8 @@ IslandMonsB3:
     db 26,KRABBY    ; 20%
     db 29,SEEL      ; 15%
     db 24,KRABBY    ; 10%
-    db 13,SQUIRTLE  ; 10%
-    db 15,SQUIRTLE  ; 10%
+    db  5,SQUIRTLE  ; 10%
+    db 11,SQUIRTLE  ; 10%
     db 16,WARTORTLE ;  5%
     db 18,WARTORTLE ;  5%
     db 21,WARTORTLE ;  4%
@@ -127969,8 +127969,8 @@ IslandMonsB4:
     db 34,KINGLER   ; 10%
     db 37,DEWGONG   ;  5%
     db 36,DEWGONG   ;  5%
-    db  5,SQUIRTLE  ;  4% ; Entry Level
-    db 11,SQUIRTLE  ;  1%
+    db 11,SQUIRTLE  ;  4%
+    db  5,SQUIRTLE  ;  1%
     db $0A
     db 28,SEEL      ; 20%
     db 29,KRABBY    ; 20%
@@ -127978,8 +127978,8 @@ IslandMonsB4:
     db 27,KRABBY    ; 10%
     db 35,KINGLER   ; 10%
     db 38,DEWGONG   ; 10%
-    db 12,SQUIRTLE  ;  5%
-    db 14,SQUIRTLE  ;  5%
+    db  5,SQUIRTLE  ;  5%
+    db 11,SQUIRTLE  ;  5%
     db 16,WARTORTLE ;  4% ; Entry Level
     db 30,LAPRAS    ;  1% ; Entry Level
 
@@ -128005,7 +128005,7 @@ MansionMons2:
     db 29,PONYTA     ; 10%
     db 11,CHARMANDER ; 10%
     db 31,KOFFING    ; 10%
-    db  9,CHARMANDER ;  5%
+    db  5,CHARMANDER ;  5%
     db 38,WEEZING    ;  5%
     db 16,CHARMELEON ;  4% ; Entry Level
     db 40,WEEZING    ;  1%
@@ -128017,8 +128017,8 @@ MansionMons3:
     db 34,KOFFING    ; 20%
     db 38,WEEZING    ; 15%
     db 37,WEEZING    ; 10%
-    db 13,CHARMANDER ; 10%
-    db 15,CHARMANDER ; 10%
+    db  5,CHARMANDER ; 10%
+    db 11,CHARMANDER ; 10%
     db 16,CHARMELEON ;  5%
     db 18,CHARMELEON ;  5%
     db 21,CHARMELEON ;  4%
@@ -128041,16 +128041,16 @@ MansionMonsB1:
 
 Route21Mons:
     db $19
-    db 25,GLOOM      ; 20%
-    db 25,WEEPINBELL ; 20%
-    db 30,VILEPLUME  ; 15% ; Entry Level
-    db 30,VICTREEBEL ; 10% ; Entry Level
-    db  5,BULBASAUR  ; 10% ; Entry Level
-    db 11,BULBASAUR  ; 10%
-    db 16,IVYSAUR    ;  5%
-    db 18,IVYSAUR    ;  5%
-    db 21,IVYSAUR    ;  4%
-    db 32,VENUSAUR   ;  1% ; Entry Level
+    db 22,ABRA       ; 20%
+    db 22,DROWZEE    ; 20%
+    db 25,KADABRA    ; 15% ; Entry Level
+    db 25,ABRA       ; 10% ; Entry Level
+    db 25,DROWZEE    ; 10% ; Entry Level
+    db 28,KADABRA    ; 10%
+    db 27,HYPNO      ;  5% ; Entry Level
+    db 15,MR_MIME    ;  5% ; Entry Level
+    db 32,HYPNO      ;  4%
+    db 18,MR_MIME    ;  1%
     db $05
     db 11,TENTACOOL  ; 20%
     db 15,TENTACOOL  ; 20%
@@ -128066,8 +128066,28 @@ Route21Mons:
 ; ─────────────────────────────────
 
 Route23Mons:
-    db $00
-    db $00
+    db $1C
+    db 25,GLOOM      ; 20%
+    db 25,WEEPINBELL ; 20%
+    db 35,VILEPLUME  ; 15% ; Entry Level
+    db 35,VICTREEBEL ; 10% ; Entry Level
+    db  5,BULBASAUR  ; 10% ; Entry Level
+    db 11,BULBASAUR  ; 10%
+    db 16,IVYSAUR    ;  5% ; Entry Level
+    db 18,IVYSAUR    ;  5%
+    db 21,IVYSAUR    ;  4%
+    db 32,VENUSAUR   ;  1% ; Entry Level
+    db $02
+    db 24,MAGIKARP   ; 20%
+    db 27,MAGIKARP   ; 20%
+    db 30,MAGIKARP   ; 15%
+    db 33,MAGIKARP   ; 10%
+    db 25,DRATINI    ; 10%
+    db 31,GYARADOS   ; 10%
+    db 30,DRAGONAIR  ;  5%
+    db 34,GYARADOS   ;  5%
+    db 45,DRAGONAIR  ;  4%
+    db 55,DRAGONITE  ;  1% ; Entry Level
 
 PlateauMons1:
     db $00
@@ -128172,7 +128192,7 @@ SuperRodData:
     dbdw ROUTE_19            , SuperRodGroupBeach
     dbdw ROUTE_20            , SuperRodGroupSouth
     dbdw ROUTE_21            , SuperRodGroupSouth
-    ;dbdw ROUTE_23            , SuperRodGroupLake
+    dbdw ROUTE_23            , SuperRodGroupLake
     dbdw ROUTE_24            , SuperRodGroupNorth
     dbdw ROUTE_25            , SuperRodGroupNorth
     dbdw VERMILION_DOCK      , SuperRodGroupCenter
@@ -128571,7 +128591,17 @@ SuperRodGroupSeaform:
     db 21,OMANYTE
     db 21,KABUTO
 
-;SuperRodGroupLake:
+SuperRodGroupLake:
+    db  8
+    db 24,MAGIKARP
+    db 24,MAGIKARP
+    db 27,MAGIKARP
+    db 27,MAGIKARP
+    db 30,MAGIKARP
+    db 30,MAGIKARP
+    db 33,MAGIKARP
+    db 31,GYARADOS
+
 ;SuperRodGroupUnknown:
 
 ; creates a list at wBuffer of maps where the mon in [wd11e] can be found.
