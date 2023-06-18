@@ -35497,7 +35497,7 @@ IndigoPlateauLobbyObject: ; 0x19c95 (size=58)
     db $3 ; warps
     db $b,$7,$0,$ff
     db $b,$8,$1,$ff
-    db $0,$8,$0,LORELEIS_ROOM
+    db $0,$8,$0,BRUNOS_ROOM
 
     db $0 ; signs
 
@@ -35511,7 +35511,7 @@ IndigoPlateauLobbyObject: ; 0x19c95 (size=58)
     ; warp-to
     EVENT_DISP $8,$b,$7
     EVENT_DISP $8,$b,$8
-    EVENT_DISP $8,$0,$8 ; LORELEIS_ROOM
+    EVENT_DISP $8,$0,$8 ; BRUNOS_ROOM
 
 IndigoPlateauLobbyBlocks: ; 19ccf (6:5ccf)
     INCBIN "maps/indigoplateaulobby.blk"
@@ -84524,7 +84524,7 @@ LanceObject: ; 0x5a3c5 (size=36)
     db $3 ; border tile
 
     db $3 ; warps
-    db $15,$05,$2,AGATHAS_ROOM
+    db $15,$05,$2,LORELEIS_ROOM
     db $0,$5,$0,CHAMPIONS_ROOM
     db $0,$6,$0,CHAMPIONS_ROOM
 
@@ -84534,7 +84534,7 @@ LanceObject: ; 0x5a3c5 (size=36)
     db SPRITE_LANCE,$1 + 4,$6 + 4,$ff,$d0,$41,LANCE + $C8,$1 ; trainer
 
     ; warp-to
-    EVENT_DISP $d,$15,$05 ; AGATHAS_ROOM
+    EVENT_DISP $d,$15,$05 ; LORELEIS_ROOM
     EVENT_DISP $d,$0,$5 ; CHAMPIONS_ROOM
     EVENT_DISP $d,$0,$6 ; CHAMPIONS_ROOM
 
@@ -102686,10 +102686,10 @@ LoreleiObject: ; 0x76280 (size=44)
     db $3 ; border tile
 
     db $4 ; warps
-    db $b,$4,$2,INDIGO_PLATEAU_LOBBY
-    db $b,$5,$2,INDIGO_PLATEAU_LOBBY
-    db $0,$4,$0,BRUNOS_ROOM
-    db $0,$5,$1,BRUNOS_ROOM
+    db $b,$4,$2,AGATHAS_ROOM
+    db $b,$5,$3,AGATHAS_ROOM
+    db $0,$4,$0,LANCES_ROOM
+    db $0,$5,$0,LANCES_ROOM
 
     db $0 ; signs
 
@@ -102697,10 +102697,10 @@ LoreleiObject: ; 0x76280 (size=44)
     db SPRITE_LORELEI,$2 + 4,$5 + 4,$ff,$d0,$41,LORELEI + $C8,$1 ; trainer
 
     ; warp-to
-    EVENT_DISP $5,$b,$4 ; INDIGO_PLATEAU_LOBBY
-    EVENT_DISP $5,$b,$5 ; INDIGO_PLATEAU_LOBBY
-    EVENT_DISP $5,$0,$4 ; BRUNOS_ROOM
-    EVENT_DISP $5,$0,$5 ; BRUNOS_ROOM
+    EVENT_DISP $5,$b,$4 ; AGATHAS_ROOM
+    EVENT_DISP $5,$b,$5 ; AGATHAS_ROOM
+    EVENT_DISP $5,$0,$4 ; LANCES_ROOM
+    EVENT_DISP $5,$0,$5 ; LANCES_ROOM
 
 LoreleiBlocks: ; 762ac (1d:62ac)
     INCBIN "maps/lorelei.blk"
@@ -102871,8 +102871,8 @@ BrunoObject: ; 0x763d7 (size=44)
     db $3 ; border tile
 
     db $4 ; warps
-    db $b,$4,$2,LORELEIS_ROOM
-    db $b,$5,$3,LORELEIS_ROOM
+    db $b,$4,$2,INDIGO_PLATEAU_LOBBY
+    db $b,$5,$2,INDIGO_PLATEAU_LOBBY
     db $0,$4,$0,AGATHAS_ROOM
     db $0,$5,$1,AGATHAS_ROOM
 
@@ -102882,8 +102882,8 @@ BrunoObject: ; 0x763d7 (size=44)
     db SPRITE_BRUNO,$2 + 4,$5 + 4,$ff,$d0,$41,BRUNO + $C8,$1 ; trainer
 
     ; warp-to
-    EVENT_DISP $5,$b,$4 ; LORELEIS_ROOM
-    EVENT_DISP $5,$b,$5 ; LORELEIS_ROOM
+    EVENT_DISP $5,$b,$4 ; INDIGO_PLATEAU_LOBBY
+    EVENT_DISP $5,$b,$5 ; INDIGO_PLATEAU_LOBBY
     EVENT_DISP $5,$0,$4 ; AGATHAS_ROOM
     EVENT_DISP $5,$0,$5 ; AGATHAS_ROOM
 
@@ -103061,8 +103061,8 @@ AgathaObject: ; 0x76534 (size=44)
     db $4 ; warps
     db $b,$4,$2,BRUNOS_ROOM
     db $b,$5,$3,BRUNOS_ROOM
-    db $0,$4,$0,LANCES_ROOM
-    db $0,$5,$0,LANCES_ROOM
+    db $0,$4,$0,LORELEIS_ROOM
+    db $0,$5,$1,LORELEIS_ROOM
 
     db $0 ; signs
 
@@ -103072,8 +103072,8 @@ AgathaObject: ; 0x76534 (size=44)
     ; warp-to
     EVENT_DISP $5,$b,$4 ; BRUNOS_ROOM
     EVENT_DISP $5,$b,$5 ; BRUNOS_ROOM
-    EVENT_DISP $5,$0,$4 ; LANCES_ROOM
-    EVENT_DISP $5,$0,$5 ; LANCES_ROOM
+    EVENT_DISP $5,$0,$4 ; LORELEIS_ROOM
+    EVENT_DISP $5,$0,$5 ; LORELEIS_ROOM
 
 AgathaBlocks: ; 76560 (1d:6560)
     INCBIN "maps/agatha.blk"
@@ -114708,9 +114708,7 @@ _UnnamedText_7612a: ; 86567 (21:6567)
     db "Come with me!",$57
 
 _LoreleiBeforeBattleText: ; 865ef (21:65ef)
-    db $0,"Welcome to",$4f
-    db "#MON LEAGUE!",$51
-    db "I am LORELEI of",$4f
+    db $0,"I am LORELEI of",$4f
     db "the ELITE FOUR!",$51
     db "No one can best",$4f
     db "me when it comes",$55
@@ -114741,7 +114739,9 @@ _UnnamedText_7627b: ; 86729 (21:6729)
     db "Don't run away!",$57
 
 _BrunoBeforeBattleText: ; 86749 (21:6749)
-    db $0,"I am BRUNO of",$4f
+    db $0,"Welcome to",$4f
+    db "#MON LEAGUE!",$51
+    db "I am BRUNO of",$4f
     db "the ELITE FOUR!",$51
     db "Through rigorous",$4f
     db "training,people",$55

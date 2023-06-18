@@ -221,9 +221,14 @@ LoreleiMove:
     db SPIKE_CANNON
     ; Slowbro (Level 54)
     db WITHDRAW
-    db TSUNAMI
+    db ICE_BEAM
     db AMNESIA
     db PSYCHIC_M
+    ; Blastoise (55)
+    db COUNTER
+    db HYDRO_PUMP
+    db EARTHQUAKE
+    db ICE_BEAM
     ; Jynx (Level 56)
     db ICE_BEAM
     db LOVELY_KISS
@@ -237,11 +242,11 @@ LoreleiMove:
     db 0
 
 BrunoMove:
-    ; Onix (Level 53)
-    db BODY_SLAM
-    db DRAGON_RAGE
+    ; Primeape (Level 53)
+    db SUBMISSION
+    db SCREECH
+    db SEISMIC_TOSS
     db ROCK_SLIDE
-    db EARTHQUAKE
     ; Hitmonchan (Level 55)
     db SUBMISSION
     db BODY_SLAM
@@ -252,11 +257,16 @@ BrunoMove:
     db MEDITATE
     db BODY_SLAM
     db SEISMIC_TOSS
-    ; Onix (Level 56)
+    ; Onix (Level 58)
     db BODY_SLAM
+    db DRAGON_RAGE
     db ROCK_SLIDE
     db EARTHQUAKE
-    db EXPLOSION
+    ; Pinsir (Level 57)
+    db SUBMISSION
+    db SLASH
+    db SWORDS_DANCE
+    db TWINEEDLE
     ; Machamp (Level 58)
     db LOW_KICK
     db EARTHQUAKE
@@ -265,26 +275,31 @@ BrunoMove:
     db 0
 
 AgathaMove:
-    ; Gengar (Level 56)
-    db CONFUSE_RAY
-    db SLUDGE
-    db NIGHT_SHADE
-    db TOXIC
-    ; Golbat (Level 56)
-    db SLUDGE
-    db CONFUSE_RAY
-    db SWOOP
-    db DOUBLE_TEAM
     ; Haunter (Level 55)
     db MEGA_DRAIN
     db AMNESIA
     db HYPNOSIS
     db DREAM_EATER
+    ; Golbat (Level 56)
+    db SLUDGE
+    db CONFUSE_RAY
+    db SWOOP
+    db DOUBLE_TEAM
     ; Arbok (Level 58)
     db TRAPHOLE
     db SUPER_FANG
     db SLUDGE
     db TOXIC
+    ; Venusaur (Level 55)
+    db RAZOR_LEAF
+    db SLEEP_POWDER
+    db SLUDGE
+    db TOXIC
+    ; Hypno (Level 58)
+    db HYPNOSIS
+    db POISON_GAS
+    db PSYCHIC_M
+    db NIGHT_SHADE
     ; Gengar (Level 60)
     db SLUDGE
     db PSYCHIC_M
@@ -308,6 +323,11 @@ LanceMove:
     db THUNDERBOLT
     db HYPER_BEAM
     db ICE_BEAM
+    ; Charizard (Level 55)
+    db SLASH
+    db FLAMETHROWER
+    db DRAGON_RAGE
+    db EARTHQUAKE
     ; Aerodactyl (Level 60)
     db FLAMETHROWER
     db EARTHQUAKE

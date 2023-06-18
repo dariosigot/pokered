@@ -1753,7 +1753,7 @@ Mon097_EvosMoves:
     db 42,LIGHT_SCREEN
     db 45,REST
     db 52,BARRIER
-    db 60,NIGHT_SHADE
+    db 58,NIGHT_SHADE
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────
