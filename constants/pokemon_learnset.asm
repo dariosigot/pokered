@@ -2942,12 +2942,12 @@ Mon150_EvosMoves:
     ;   1,CONFUSION
     ;   1,DISABLE
     db  7,REFLECT
-    db 10,PSYCHIC_M  ; Unknown Dungeon's Mewtwo (Level 45)
+    db 10,PSYCHIC_M  ; Unknown Dungeon's Mewtwo (Level 50)
     db 18,RECOVER    ; 
     db 25,SWIFT      ; 
     db 45,SUBSTITUTE ; 
-    db 46,MIST
-    db 48,BARRIER
+    db 51,MIST
+    db 52,BARRIER
     db 53,THUNDERBOLT
     db 55,ICE_BEAM
     db 57,AMNESIA
