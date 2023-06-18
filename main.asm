@@ -127105,9 +127105,9 @@ WildDataPointers:
     dw NoMons
     dw NoMons
     dw NoMons
-    dw DungeonMons2
-    dw DungeonMonsB1
-    dw DungeonMons1
+    dw NoMons ; DungeonMons2
+    dw NoMons ; DungeonMonsB1
+    dw NoMons ; DungeonMons1
     dw NoMons
     dw NoMons
     dw NoMons
@@ -128063,8 +128063,6 @@ Route21Mons:
     db 36,TENTACRUEL ;  4%
     db 40,TENTACRUEL ;  1%
 
-; ─────────────────────────────────
-
 Route23Mons:
     db $1C
     db 25,GLOOM      ; 20%
@@ -128090,27 +128088,45 @@ Route23Mons:
     db 55,DRAGONITE  ;  1% ; Entry Level
 
 PlateauMons1:
-    db $00
+    db $0F
+    db 31,GOLBAT   ; 20%
+    db 28,GEODUDE  ; 20%
+    db 34,GOLBAT   ; 15%
+    db 26,MACHOP   ; 10%
+    db 45,ONIX     ; 10%
+    db 47,ONIX     ; 10%
+    db 43,GRAVELER ;  5%
+    db 38,MACHOKE  ;  5% ; Entry Level
+    db 45,GRAVELER ;  4%
+    db 42,MACHOKE  ;  1%
     db $00
 
 PlateauMons2:
-    db $00
+    db $0A
+    db 34,GOLBAT    ; 20%
+    db 26,SANDSHREW ; 20%
+    db 37,GOLBAT    ; 15%
+    db 26,DIGLETT   ; 10%
+    db 46,ONIX      ; 10%
+    db 44,GRAVELER  ; 10%
+    db 40,MACHOKE   ;  5%
+    db 38,DUGTRIO   ;  5%
+    db 42,SANDSLASH ;  4%
+    db 45,DUGTRIO   ;  1%
     db $00
 
 PlateauMons3:
-    db $00
-    db $00
-
-DungeonMons1:
-    db $00
-    db $00
-
-DungeonMons2:
-    db $00
-    db $00
-
-DungeonMonsB1:
-    db $00
+    db $0F
+    db 37,GOLBAT   ; 20%
+    db 44,ONIX     ; 20%
+    db 40,GOLBAT   ; 15%
+    db 39,DUGTRIO  ; 10%
+    db 38,MACHOKE  ; 10%
+    db 47,ONIX     ; 10%
+    db 43,GRAVELER ;  5%
+    db 42,MACHOKE  ;  5%
+    db 45,GRAVELER ;  4%
+    db 56,ONIX     ;  1%
     db $00
 
 _ReadRodData:
