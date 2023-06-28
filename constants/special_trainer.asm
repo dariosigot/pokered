@@ -28,6 +28,10 @@ SpecialTrainerMoves:
     SpecialTrainer SONY3,$1,Sony3Move1
     SpecialTrainer SONY3,$2,Sony3Move2
     SpecialTrainer SONY3,$3,Sony3Move3
+    SpecialTrainer COOLTRAINER_F,$4,CooltrainerFMove4
+    SpecialTrainer COOLTRAINER_M,$4,CooltrainerMMove4
+    SpecialTrainer BLACKBELT,$9,BlackBeltMove9
+    SpecialTrainer JUGGLER,$2,JugglerMove2
     db $ff
 
 BrockMoves:
@@ -621,3 +625,131 @@ Sony3Move3:
     db SWORDS_DANCE
     db FIRE_BLAST
     db 0
+
+CooltrainerFMove4:
+    ; Persian (Level 41)
+    db DOUBLE_TEAM
+    db SLASH
+    db REST
+    db THUNDERBOLT
+    ; Ninetales (Level 43)
+    db TRAPHOLE
+    db CONFUSE_RAY
+    db FLAMETHROWER
+    db FIRE_SPIN
+    ; Seadra (Level 43)
+    db CONFUSION
+    db AGILITY
+    db TSUNAMI
+    db AURORA_BEAM
+    ; Butterfree (Level 44)
+    db SLEEP_POWDER
+    db LEECH_LIFE
+    db PSYCHIC_M
+    db SPORE
+    ; Electrode (Level 40)
+    db SWIFT
+    db LIGHT_SCREEN
+    db THUNDERBOLT
+    db EXPLOSION
+    ; Nidoqueen (Level 45)
+    db BODY_SLAM
+    db BLIZZARD
+    db SLUDGE
+    db EARTHQUAKE
+
+CooltrainerMMove4:
+    ; Magneton (Level 42)
+    db SWIFT
+    db CONVERSION
+    db THUNDER_WAVE
+    db THUNDER
+    ; Dugtrio (Level 41)
+    db SLASH
+    db TRAPHOLE
+    db ROCK_THROW
+    db FISSURE
+    ; Golduck (Level 43)
+    db SLASH
+    db TSUNAMI
+    db ICE_BEAM
+    db AMNESIA
+    ; Scyther (Level 42)
+    db SLASH
+    db SWORDS_DANCE
+    db SWOOP
+    db TWINEEDLE
+    ; Raticate (Level 44)
+    db DOUBLE_TEAM
+    db QUICK_ATTACK
+    db HYPER_FANG
+    db SUPER_FANG
+    ; Nidoking (Level 45)
+    db BODY_SLAM
+    db SLUDGE
+    db EARTHQUAKE
+    db THUNDERBOLT
+
+BlackBeltMove9:
+    ; Machoke (Level 43)
+    db LOW_KICK
+    db JUMP_KICK
+    db SEISMIC_TOSS
+    db BODY_SLAM
+    ; Golem (Level 45)
+    db ROCK_THROW
+    db BODY_SLAM
+    db EARTHQUAKE
+    db EXPLOSION
+    ; Parasect (Level 42)
+    db SLASH
+    db TWINEEDLE
+    db MEGA_DRAIN
+    db SPORE
+    ; Snorlax (Level 42)
+    db HYPER_BEAM
+    db AMNESIA
+    db TSUNAMI
+    db BODY_SLAM
+    ; Golbat (Level 44)
+    db SWOOP
+    db SLUDGE
+    db MEGA_DRAIN
+    db HYPER_FANG
+    ; Clefable (Level 43)
+    db SWIFT
+    db MINIMIZE
+    db BODY_SLAM
+    db METRONOME
+
+JugglerMove2:
+    ; Hypno (Level 43)
+    db SWIFT
+    db SWIFT
+    db SWIFT
+    db SWIFT
+    ; Tentacruel (Level 43)
+    db SWIFT
+    db SWIFT
+    db SWIFT
+    db SWIFT
+    ; Raichu (Level 42)
+    db SWIFT
+    db SWIFT
+    db SWIFT
+    db SWIFT
+    ; Dodrio (Level 44)
+    db SWIFT
+    db SWIFT
+    db SWIFT
+    db SWIFT
+    ; Rhyhorn (Level 41)
+    db SWIFT
+    db SWIFT
+    db SWIFT
+    db SWIFT
+    ; Muk (Level 45)
+    db SWIFT
+    db SWIFT
+    db SWIFT
+    db SWIFT

@@ -48163,26 +48163,6 @@ ReadTrainer: ; 39c53 (e:5c53)
     jr nz,.LastLoop
     ret
 
-GoPalSetBattleAndLoadText:
-    ld b,1
-    call GoPAL_SET
-    ld hl,UnnamedText_3bb92 ; $7b92
-    ret
-
-RedBallColorDuringEnemySwitch:
-    ld a,PAL_REDBALL - PAL_GREENBAR
-    ld [$CF1D + 1],a
-    ld b,1
-    call GoPAL_SET
-    call GbPalComplete ; Red Ball
-    xor a
-    ld [$CF1D + 1],a
-    jp LoadPartyPokeballGfx
-
-SECTION "TrainerDataPointers",ROMX[$5d3b],BANK[$e]
-
-INCLUDE "constants/TrainerData.asm"
-
 ;joenote - added these functions to check if the ai switching bit is set
 ;need to have 'a' accumulator and flag register freed up to use this function
 CheckandResetSwitchBit:
@@ -48291,172 +48271,7 @@ TrainerAIPointers:
     dbw 2,AgathaAI ; agatha
     dbw 1,LanceAI ; lance
 
-;joenote - reorganizing these AI routines to jump on carry instead of returning on not-carry
-;also adding recognition of a switch-pkmn bit
-
-JugglerAI:
-    cp $40
-    jp c,AISwitchIfEnoughMons
-    ret
-
-BlackbeltAI:
-    cp $20
-    jp c,AIUseXAttack
-    ret
-
-GiovanniAI:    ;joenote - uses dire hit now,but only if it's not active
-    cp $20
-    ret nc
-    ld a,[W_ENEMYBATTSTATUS2]
-    and %00000100
-    ret z
-    jp AIUseDireHit
-
-CooltrainerMAI:    ;joenote - changed item to x-special and guard spec
-    cp $20
-    ret nc
-    cp $10
-    jr c,.xspec
-    ld a,[W_ENEMYBATTSTATUS2]
-    and %00000010
-    jr nz,.gspec
-.xspec
-    jp AIUseXSpecial
-.gspec
-    jp AIUseGuardSpec
-
-CooltrainerFAI: ;joenote - uses x-special and x-accuracy now
-    cp $20
-    ret nc
-    cp $10
-    jr c,.xspec
-    ld a,[W_ENEMYBATTSTATUS2]
-    and %00000001
-    jr nz,.xaccy
-.xspec
-    jp AIUseXSpecial
-.xaccy
-    jp AIUseXAccuracy
-
-BrockAI:
-; if his active monster has a status condition,use a full heal
-    ld a,[W_ENEMYMONSTATUS]
-    and a
-    jp nz,AIUseFullHeal
-    ret
-
-MistyAI:
-    cp $20
-    jp c,AIUseXDefend
-    ret
-
-LtSurgeAI:
-    cp $20
-    jp c,AIUseXSpeed
-    ret
-
-ErikaAI:
-    cp $80
-    jr nc,.erikareturn
-    ld a,$A
-    call AICheckIfHPBelowFraction
-    jp c,AIUseSuperPotion
-.erikareturn
-    ret
-
-KogaAI:
-    cp $20
-    jp c,AIUseXAttack
-    ret
-
-BlaineAI:    ;blaine needs to check HP. this was an oversight
-    cp $20
-    jr nc,.blainereturn
-    ld a,$A
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
-.blainereturn
-    ret
-
-SabrinaAI:
-    cp $20
-    jr nc,.sabrinareturn
-    ld a,$A
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-.sabrinareturn
-    ret
-
-Sony2AI:
-    cp $20
-    jr nc,.rival2return
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUsePotion
-.rival2return
-    ret
-
-Sony3AI:
-    cp $40    ;joenote - doubled the chance of use
-    jr nc,.rival3return
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseFullRestore
-.rival3return
-    ret
-
-LoreleiAI:
-    cp $80
-    jr nc,.loreleireturn
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
-.loreleireturn
-    ret
-
-;joenote - changed to hyper potion like other e4 members
-BrunoAI:
-;    cp $40
-;    jp c,AIUseXDefend
-    cp $80
-    jr nc,.brunoreturn
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-.brunoreturn
-    ret
-
-AgathaAI:
-;    cp $14
-;    jp c,AISwitchIfEnoughMons
-    cp $80
-    jr nc,.agathareturn
-    ld a,5    ;joenote - upped to 5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
-.agathareturn
-    ret
-
-LanceAI:
-    cp $80
-    jr nc,.lancereturn
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-.lancereturn
-    ret
-
-GenericAI:
-    and a ; clear carry
-    ret
-
-; end of individual trainer AI routines
-
-SetAttributeOamRedBall:
-    ld [hli],a
-    ld a,3
-    ld [hli],a
-    ret
+INCLUDE "constants/TrainerData.asm"
 
 SECTION "DecrementAICount",ROMX[$6695],BANK[$e]
 
@@ -49394,6 +49209,28 @@ BankswitchEtoF: ; Moved in the Bank
     ld b,$f
     jp Bankswitch
 
+SetAttributeOamRedBall:
+    ld [hli],a
+    ld a,3
+    ld [hli],a
+    ret
+
+GoPalSetBattleAndLoadText:
+    ld b,1
+    call GoPAL_SET
+    ld hl,UnnamedText_3bb92 ; $7b92
+    ret
+
+RedBallColorDuringEnemySwitch:
+    ld a,PAL_REDBALL - PAL_GREENBAR
+    ld [$CF1D + 1],a
+    ld b,1
+    call GoPAL_SET
+    call GbPalComplete ; Red Ball
+    xor a
+    ld [$CF1D + 1],a
+    jp LoadPartyPokeballGfx
+
 SECTION "WriteMonMoves",ROMX[$6fb8],BANK[$e]
 
 ; writes the moves a mon has at level [W_CURENEMYLVL] to [de]
@@ -49749,6 +49586,169 @@ TransformEffect_: ; Moved Upper in the Bank
     call Func_3bb7d
     call GoPalSetBattleAndLoadText ; Denim ; ld hl,UnnamedText_3bb92 ; $7b92
     jp PrintText
+
+; ─────────────────────────────────────────────────────────────
+
+;joenote - reorganizing these AI routines to jump on carry instead of returning on not-carry
+;also adding recognition of a switch-pkmn bit
+
+JugglerAI:
+    cp $40
+    jp c,AISwitchIfEnoughMons
+    ret
+
+BlackbeltAI:
+    cp $20
+    jp c,AIUseXAttack
+    ret
+
+GiovanniAI:    ;joenote - uses dire hit now,but only if it's not active
+    cp $20
+    ret nc
+    ld a,[W_ENEMYBATTSTATUS2]
+    and %00000100
+    ret z
+    jp AIUseDireHit
+
+CooltrainerMAI:    ;joenote - changed item to x-special and guard spec
+    cp $20
+    ret nc
+    cp $10
+    jr c,.xspec
+    ld a,[W_ENEMYBATTSTATUS2]
+    and %00000010
+    jr nz,.gspec
+.xspec
+    jp AIUseXSpecial
+.gspec
+    jp AIUseGuardSpec
+
+CooltrainerFAI: ;joenote - uses x-special and x-accuracy now
+    cp $20
+    ret nc
+    cp $10
+    jr c,.xspec
+    ld a,[W_ENEMYBATTSTATUS2]
+    and %00000001
+    jr nz,.xaccy
+.xspec
+    jp AIUseXSpecial
+.xaccy
+    jp AIUseXAccuracy
+
+BrockAI:
+; if his active monster has a status condition,use a full heal
+    ld a,[W_ENEMYMONSTATUS]
+    and a
+    jp nz,AIUseFullHeal
+    ret
+
+MistyAI:
+    cp $20
+    jp c,AIUseXDefend
+    ret
+
+LtSurgeAI:
+    cp $20
+    jp c,AIUseXSpeed
+    ret
+
+ErikaAI:
+    cp $80
+    jr nc,.erikareturn
+    ld a,$A
+    call AICheckIfHPBelowFraction
+    jp c,AIUseSuperPotion
+.erikareturn
+    ret
+
+KogaAI:
+    cp $20
+    jp c,AIUseXAttack
+    ret
+
+BlaineAI:    ;blaine needs to check HP. this was an oversight
+    cp $20
+    jr nc,.blainereturn
+    ld a,$A
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
+.blainereturn
+    ret
+
+SabrinaAI:
+    cp $20
+    jr nc,.sabrinareturn
+    ld a,$A
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+.sabrinareturn
+    ret
+
+Sony2AI:
+    cp $20
+    jr nc,.rival2return
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUsePotion
+.rival2return
+    ret
+
+Sony3AI:
+    cp $40    ;joenote - doubled the chance of use
+    jr nc,.rival3return
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseFullRestore
+.rival3return
+    ret
+
+LoreleiAI:
+    cp $80
+    jr nc,.loreleireturn
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
+.loreleireturn
+    ret
+
+;joenote - changed to hyper potion like other e4 members
+BrunoAI:
+;    cp $40
+;    jp c,AIUseXDefend
+    cp $80
+    jr nc,.brunoreturn
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+.brunoreturn
+    ret
+
+AgathaAI:
+;    cp $14
+;    jp c,AISwitchIfEnoughMons
+    cp $80
+    jr nc,.agathareturn
+    ld a,5    ;joenote - upped to 5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
+.agathareturn
+    ret
+
+LanceAI:
+    cp $80
+    jr nc,.lancereturn
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+.lancereturn
+    ret
+
+GenericAI:
+    and a ; clear carry
+    ret
+
+; end of individual trainer AI routines
 
 ; ─────────────────────────────────────────────────────────────
 
