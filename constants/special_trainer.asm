@@ -28,10 +28,17 @@ SpecialTrainerMoves:
     SpecialTrainer SONY3,$1,Sony3Move1
     SpecialTrainer SONY3,$2,Sony3Move2
     SpecialTrainer SONY3,$3,Sony3Move3
+    SpecialTrainer COOLTRAINER_F,$2,CooltrainerFMove2
+    SpecialTrainer COOLTRAINER_F,$3,CooltrainerFMove3
     SpecialTrainer COOLTRAINER_F,$4,CooltrainerFMove4
+    SpecialTrainer COOLTRAINER_M,$2,CooltrainerMMove2
+    SpecialTrainer COOLTRAINER_M,$3,CooltrainerMMove3
     SpecialTrainer COOLTRAINER_M,$4,CooltrainerMMove4
     SpecialTrainer BLACKBELT,$9,BlackBeltMove9
     SpecialTrainer JUGGLER,$2,JugglerMove2
+    SpecialTrainer JUGGLER,$5,JugglerMove5
+    SpecialTrainer TAMER,$5,TamerMove5
+    SpecialTrainer POKEMANIAC,$6,PokemaniacMove6
     db $ff
 
 BrockMoves:
@@ -90,7 +97,7 @@ KogaMove:
     ; Venomoth (Level 48)
     db SUPERSONIC
     db SLUDGE
-    db SLEEP_POWDER
+    db SPORE
     db PSYCHIC_M
     ; Golbat (Level 52)
     db SWOOP
@@ -123,7 +130,7 @@ DojoLeader:
     db JUMP_KICK
     db HI_JUMP_KICK
     db SUBMISSION
-    ; Himonchan (Level 39)
+    ; Hitmonchan (Level 39)
     db FIRE_PUNCH
     db ICE_PUNCH
     db THUNDERPUNCH
@@ -626,6 +633,72 @@ Sony3Move3:
     db FIRE_BLAST
     db 0
 
+CooltrainerFMove2:
+    ; Victreebel (Level 44)
+    db RAZOR_LEAF
+    db SLUDGE
+    db SLEEP_POWDER
+    db WRAP
+    ; Wigglytuff (Level 43)
+    db BODY_SLAM
+    db REST
+    db SING
+    db HYPER_BEAM
+    ; Venomoth (Level 45)
+    db SLUDGE
+    db PIN_MISSILE
+    db SPORE
+    db PSYCHIC_M
+    ; Omastar (Level 44)
+    db AURORA_BEAM
+    db REST
+    db TSUNAMI
+    db EARTHQUAKE
+    ; Hitmonchan (Level 45)
+    db FIRE_PUNCH
+    db ICE_PUNCH
+    db THUNDERPUNCH
+    db SUBMISSION
+    ; Pinsir (Level 45)
+    db GUILLOTINE
+    db SLASH
+    db SWORDS_DANCE
+    db TWINEEDLE
+    db 0
+
+CooltrainerFMove3:
+    ; Vileplume (Level 44)
+    db RAZOR_LEAF
+    db SLUDGE
+    db SLEEP_POWDER
+    db STUN_SPORE
+    ; Dewgong (Level 43)
+    db BODY_SLAM
+    db REST
+    db TSUNAMI
+    db BLIZZARD
+    ; Beedrill (Level 45)
+    db TWINEEDLE
+    db SLUDGE
+    db SWORDS_DANCE
+    db AGILITY
+    ; Seaking (Level 41)
+    db AGILITY
+    db WATERFALL
+    db PSYBEAM
+    db HYPER_BEAM
+    ; Rapidash (Level 43)
+    db AGILITY
+    db BODY_SLAM
+    db FLAMETHROWER
+    db HORN_DRILL
+    ; Chansey (Level 46)
+    db REFLECT
+    db SOFTBOILED
+    db LOVELY_KISS
+    db SEISMIC_TOSS
+    db 0
+
 CooltrainerFMove4:
     ; Persian (Level 41)
     db DOUBLE_TEAM
@@ -657,6 +730,74 @@ CooltrainerFMove4:
     db BLIZZARD
     db SLUDGE
     db EARTHQUAKE
+    db 0
+
+CooltrainerMMove2:
+    ; Exeggutor (Level 44)
+    db STUN_SPORE
+    db SLEEP_POWDER
+    db PSYCHIC_M
+    db EXPLOSION
+    ; Cloyster (Level 44)
+    db CLAMP
+    db REST
+    db BLIZZARD
+    db EXPLOSION
+    ; Arcanine (Level 44)
+    db FIRE_SPIN
+    db FIRE_BLAST
+    db BODY_SLAM
+    db REST
+    ; Fearow (Level 41)
+    db DRILL_PECK
+    db AGILITY
+    db MIRROR_MOVE
+    db HYPER_BEAM
+    ; Clefable (Level 43)
+    db SWIFT
+    db MINIMIZE
+    db BODY_SLAM
+    db METRONOME
+    ; Weezing (Level 45)
+    db THUNDERBOLT
+    db SLUDGE
+    db PSYBEAM
+    db EXPLOSION
+    db 0
+
+
+CooltrainerMMove3:
+    ; Alakazam (Level 44)
+    db RECOVER
+    db PSYCHIC_M
+    db REFLECT
+    db THUNDER_WAVE
+    ; Tauros (Level 43)
+    db BODY_SLAM
+    db REST
+    db BLIZZARD
+    db EARTHQUAKE
+    ; Kingler (Level 45)
+    db CRABHAMMER
+    db SWORDS_DANCE
+    db HYPER_BEAM
+    db STOMP
+    ; Kabutops (Level 44)
+    db AURORA_BEAM
+    db REST
+    db TSUNAMI
+    db TRAPHOLE
+    ; Hitmonlee (Level 45)
+    db SEISMIC_TOSS
+    db COUNTER
+    db HI_JUMP_KICK
+    db SUBMISSION
+    ; Gyarados (Level 45)
+    db HYPER_FANG
+    db BODY_SLAM
+    db HYDRO_PUMP
+    db HYPER_BEAM
+    db 0
 
 CooltrainerMMove4:
     ; Magneton (Level 42)
@@ -689,6 +830,7 @@ CooltrainerMMove4:
     db SLUDGE
     db EARTHQUAKE
     db THUNDERBOLT
+    db 0
 
 BlackBeltMove9:
     ; Machoke (Level 43)
@@ -696,7 +838,7 @@ BlackBeltMove9:
     db JUMP_KICK
     db SEISMIC_TOSS
     db BODY_SLAM
-    ; Golem (Level 45)
+    ; Graveler (Level 45)
     db ROCK_THROW
     db BODY_SLAM
     db EARTHQUAKE
@@ -716,40 +858,141 @@ BlackBeltMove9:
     db SLUDGE
     db MEGA_DRAIN
     db HYPER_FANG
-    ; Clefable (Level 43)
-    db SWIFT
-    db MINIMIZE
+    ; Poliwrath (Level 43)
+    db TSUNAMI
     db BODY_SLAM
-    db METRONOME
+    db HYPNOSIS
+    db SUBMISSION
+    db 0
 
 JugglerMove2:
     ; Hypno (Level 43)
-    db SWIFT
-    db SWIFT
-    db SWIFT
-    db SWIFT
+    db THUNDER_WAVE
+    db REFLECT
+    db REST
+    db PSYCHIC_M
     ; Tentacruel (Level 43)
-    db SWIFT
-    db SWIFT
-    db SWIFT
-    db SWIFT
+    db REST
+    db ICE_BEAM
+    db TSUNAMI
+    db SLUDGE
     ; Raichu (Level 42)
-    db SWIFT
-    db SWIFT
-    db SWIFT
-    db SWIFT
+    db THUNDERBOLT
+    db THUNDER_WAVE
+    db THUNDER
+    db SUBMISSION
     ; Dodrio (Level 44)
-    db SWIFT
-    db SWIFT
-    db SWIFT
-    db SWIFT
+    db DRILL_PECK
+    db AGILITY
+    db HYPER_BEAM
+    db DOUBLE_TEAM
     ; Rhyhorn (Level 41)
-    db SWIFT
-    db SWIFT
-    db SWIFT
-    db SWIFT
+    db THUNDERBOLT
+    db SUBSTITUTE
+    db BODY_SLAM
+    db EARTHQUAKE
     ; Muk (Level 45)
-    db SWIFT
-    db SWIFT
-    db SWIFT
-    db SWIFT
+    db EXPLOSION
+    db SLUDGE
+    db THUNDERPUNCH
+    db TOXIC
+    db 0
+
+JugglerMove5:
+    ; Mr. Mime (Level 45)
+    db THUNDER_WAVE
+    db CONFUSE_RAY
+    db MIRROR_MOVE
+    db PSYCHIC_M
+    ; Starmie (Level 43)
+    db RECOVER
+    db PSYBEAM
+    db AURORA_BEAM
+    db THUNDERBOLT
+    ; Pidgeot (Level 44)
+    db REFLECT
+    db AGILITY
+    db SWOOP
+    db HYPER_BEAM
+    ; Marowak (Level 41)
+    db SWORDS_DANCE
+    db BLIZZARD
+    db ROCK_SLIDE
+    db BONEMERANG
+    ; Primeape (Level 42)
+    db LOW_KICK
+    db TRAPHOLE
+    db SEISMIC_TOSS
+    db SUBMISSION
+    ; Tangela (Level 43)
+    db LEECH_SEED
+    db SLEEP_POWDER
+    db WRAP
+    db SOLARBEAM
+    db 0
+
+TamerMove5:
+    ; Electabuzz (Level 41)
+    db AGILITY
+    db THUNDERBOLT
+    db BODY_SLAM
+    db THUNDER_WAVE
+    ; Jynx (Level 40)
+    db LOVELY_KISS
+    db PSYBEAM
+    db BODY_SLAM
+    db BLIZZARD
+    ; Magmar (Level 42)
+    db FIRE_SPIN
+    db FIRE_BLAST
+    db BODY_SLAM
+    db CONFUSE_RAY
+    ; Kangaskhan (Level 44)
+    db EARTHQUAKE
+    db BODY_SLAM
+    db SUBSTITUTE
+    db SLASH
+    ; Arbok (Level 45)
+    db EARTHQUAKE
+    db GLARE
+    db MEGA_DRAIN
+    db SLUDGE
+    ; Sandslash (Level 45)
+    db SLASH
+    db SWORDS_DANCE
+    db EARTHQUAKE
+    db TWINEEDLE
+    db 0
+
+PokemaniacMove6:
+    ; Porygon (Level 45)
+    db RECOVER
+    db THUNDER_WAVE
+    db REFLECT
+    db PSYCHIC_M
+    ; Lapras (Level 43)
+    db THUNDER
+    db REST
+    db BODY_SLAM
+    db ICE_BEAM
+    ; Slowbro (Level 45)
+    db WITHDRAW
+    db TSUNAMI
+    db AMNESIA
+    db PSYBEAM
+    ; Lickitung (Level 45)
+    db EARTHQUAKE
+    db BODY_SLAM
+    db TSUNAMI
+    db SWORDS_DANCE
+    ; Haunter (Level 42)
+    db HYPNOSIS
+    db AMNESIA
+    db PSYCHIC_M
+    db THUNDERBOLT
+    ; Farfetch'd (Level 44)
+    db TOXIC
+    db SWORDS_DANCE
+    db SLASH
+    db SWOOP
+    db 0

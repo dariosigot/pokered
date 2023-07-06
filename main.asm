@@ -48271,6 +48271,36 @@ TrainerAIPointers:
     dbw 2,AgathaAI ; agatha
     dbw 1,LanceAI ; lance
 
+Func_3af2e: ; Moved in the Bank
+    ld hl,UnnamedText_3af48 ; $6f48
+    call PrintText
+    call ClearScreen
+    pop hl
+    call Func_3af52
+    jp Evolution_PartyMonLoop
+
+UnnamedText_3af3e: ; Moved in the Bank
+    TX_FAR _UnnamedText_3af3e
+    db "@"
+
+UnnamedText_3af43: ; Moved in the Bank
+    TX_FAR _UnnamedText_3af43
+    db "@"
+
+UnnamedText_3af48: ; Moved in the Bank
+    TX_FAR _UnnamedText_3af48
+    db "@"
+
+UnnamedText_3af4d: ; Moved in the Bank
+    TX_FAR _UnnamedText_3af4d
+    db "@"
+
+Func_3af52: ; Moved in the Bank
+    ld a,[W_ISLINKBATTLE] ; $d12b
+    cp $32
+    ret z
+    jp ReloadTilesetTilePatterns
+
 INCLUDE "constants/TrainerData.asm"
 
 SECTION "DecrementAICount",ROMX[$6695],BANK[$e]
@@ -48869,11 +48899,7 @@ Func_3bb97: ; Moved in the Bank
     ld hl,Func_3fb53 ; $7b53
     jp BankswitchEtoF
 
-INCLUDE "constants/special_trainer.asm"
-
-SECTION "Func_3ad0e",ROMX[$6d0e],BANK[$e]
-
-Func_3ad0e: ; 3ad0e (e:6d0e)
+Func_3ad0e: ; Moved in the Bank
     ld hl,$ccd3
     xor a
     ld [hl],a
@@ -48882,7 +48908,7 @@ Func_3ad0e: ; 3ad0e (e:6d0e)
     ld b,$1
     call Func_3b057
 
-Func_3ad1c: ; 3ad1c (e:6d1c)
+Func_3ad1c: ; Moved in the Bank
     ld a,[$FF00+$d7]
     push af
     xor a
@@ -48895,7 +48921,7 @@ Func_3ad1c: ; 3ad1c (e:6d1c)
     ld hl,W_NUMINPARTY ; $d163
     push hl
 
-Evolution_PartyMonLoop: ; 3ad2e (e:6d2e)
+Evolution_PartyMonLoop: ; Moved in the Bank
     ld hl,wWhichPokemon ; $cf92
     inc [hl]
     pop hl
@@ -48934,7 +48960,7 @@ Evolution_PartyMonLoop: ; 3ad2e (e:6d2e)
     ld [$cf91],a
     pop hl
 
-TryEvolution: ; 3ad71 (e:6d71)
+TryEvolution: ; Moved in the Bank
     ld a,[hli]
     and a
     jr z,Evolution_PartyMonLoop
@@ -49109,87 +49135,12 @@ TryEvolution: ; 3ad71 (e:6d71)
     ld h,d
     jr Func_3aeda
 
-Func_3aed9: ; 3aed9 (e:6ed9)
+Func_3aed9: ; Moved in the Bank
     inc hl
 
-Func_3aeda: ; 3aeda (e:6eda)
+Func_3aeda: ; Moved in the Bank
     inc hl
     jp TryEvolution
-
-Func_3aede: ; 3aede (e:6ede)
-    pop de
-    pop bc
-    pop hl
-    pop af
-    ld [$FF00+$d7],a
-    ld a,[W_ISLINKBATTLE] ; $d12b
-    cp $32
-    ret z
-    ld a,[W_ISINBATTLE] ; $d057
-    and a
-    ret nz
-    ld a,[$d121]
-    and a
-    call nz,Func_2307
-    ret
-
-Func_3aef7: ; 3aef7 (e:6ef7)
-    ld a,[$d0b5]
-    push af
-    ld a,[$d0b8]
-    ld [$d0b5],a
-    call GetName
-    pop af
-    ld [$d0b5],a
-    ld hl,$cd6d
-    ld de,$cf4b
-.asm_3af0e
-    ld a,[de]
-    inc de
-    cp [hl]
-    inc hl
-    ret nz
-    cp $50
-    jr nz,.asm_3af0e
-    ld a,[wWhichPokemon] ; $cf92
-    ld bc,$b
-    ld hl,W_PARTYMON1NAME ; $d2b5
-    call AddNTimes
-    push hl
-    call GetName
-    ld hl,$cd6d
-    pop de
-    jp CopyData
-
-Func_3af2e: ; 3af2e (e:6f2e)
-    ld hl,UnnamedText_3af48 ; $6f48
-    call PrintText
-    call ClearScreen
-    pop hl
-    call Func_3af52
-    jp Evolution_PartyMonLoop
-
-UnnamedText_3af3e: ; 3af3e (e:6f3e)
-    TX_FAR _UnnamedText_3af3e
-    db "@"
-
-UnnamedText_3af43: ; 3af43 (e:6f43)
-    TX_FAR _UnnamedText_3af43
-    db "@"
-
-UnnamedText_3af48: ; 3af48 (e:6f48)
-    TX_FAR _UnnamedText_3af48
-    db "@"
-
-UnnamedText_3af4d: ; 3af4d (e:6f4d)
-    TX_FAR _UnnamedText_3af4d
-    db "@"
-
-Func_3af52: ; 3af52 (e:6f52)
-    ld a,[W_ISLINKBATTLE] ; $d12b
-    cp $32
-    ret z
-    jp ReloadTilesetTilePatterns
 
 CheckEvolutionMove:
     ld hl,_CheckEvolutionMove
@@ -49230,6 +49181,25 @@ RedBallColorDuringEnemySwitch:
     xor a
     ld [$CF1D + 1],a
     jp LoadPartyPokeballGfx
+
+Func_3aede: ; Moved in the Bank
+    pop de
+    pop bc
+    pop hl
+    pop af
+    ld [$FF00+$d7],a
+    ld a,[W_ISLINKBATTLE] ; $d12b
+    cp $32
+    ret z
+    ld a,[W_ISINBATTLE] ; $d057
+    and a
+    ret nz
+    ld a,[$d121]
+    and a
+    call nz,Func_2307
+    ret
+
+INCLUDE "constants/special_trainer.asm"
 
 SECTION "WriteMonMoves",ROMX[$6fb8],BANK[$e]
 
@@ -49751,6 +49721,34 @@ GenericAI:
 ; end of individual trainer AI routines
 
 ; ─────────────────────────────────────────────────────────────
+
+Func_3aef7: ; Moved in the Bank
+    ld a,[$d0b5]
+    push af
+    ld a,[$d0b8]
+    ld [$d0b5],a
+    call GetName
+    pop af
+    ld [$d0b5],a
+    ld hl,$cd6d
+    ld de,$cf4b
+.asm_3af0e
+    ld a,[de]
+    inc de
+    cp [hl]
+    inc hl
+    ret nz
+    cp $50
+    jr nz,.asm_3af0e
+    ld a,[wWhichPokemon] ; $cf92
+    ld bc,$b
+    ld hl,W_PARTYMON1NAME ; $d2b5
+    call AddNTimes
+    push hl
+    call GetName
+    ld hl,$cd6d
+    pop de
+    jp CopyData
 
 INCLUDE "constants/pokemon_learnset.asm"
 
