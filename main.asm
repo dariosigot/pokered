@@ -18479,7 +18479,7 @@ PrintDenimVersionAndSaveScreenTilesToBuffer2:
     jr nz,.Loop
     jp SaveScreenTilesToBuffer2
 .Version
-    db "0.52.000"
+    db "0.53.000"
 
 GetQtyAndGiveItem:
     push bc
