@@ -140,7 +140,7 @@ DojoLeader:
 SabrinaMove:
     ; Haunter (Level 48)
     db HYPNOSIS
-    db AMNESIA
+    db THUNDERPUNCH
     db PSYCHIC_M
     db DREAM_EATER
     ; Kadabra (Level 52)
@@ -288,7 +288,7 @@ BrunoMove:
 AgathaMove:
     ; Haunter (Level 55)
     db MEGA_DRAIN
-    db AMNESIA
+    db NIGHT_SHADE
     db HYPNOSIS
     db DREAM_EATER
     ; Golbat (Level 56)
@@ -767,7 +767,7 @@ CooltrainerMMove2:
 
 
 CooltrainerMMove3:
-    ; Alakazam (Level 44)
+    ; Kadabra (Level 44)
     db RECOVER
     db PSYCHIC_M
     db REFLECT
@@ -987,7 +987,7 @@ PokemaniacMove6:
     db SWORDS_DANCE
     ; Haunter (Level 42)
     db HYPNOSIS
-    db AMNESIA
+    db NIGHT_SHADE
     db PSYCHIC_M
     db THUNDERBOLT
     ; Farfetch'd (Level 44)

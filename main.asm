@@ -14071,7 +14071,7 @@ MainMenu: ; 5af2 (1:5af2)
 Func_5bff: ; 5bff (1:5bff)
     ld a,1
     ld [$D358],a
-    ld a,%01000001; ld a,3 ; Denim,sostituite opzioni default
+    ld a,%01000000; ld a,3 ; Denim,sostituite opzioni default
     ld [W_OPTIONS],a
     ret
 
@@ -14576,7 +14576,7 @@ SetOptionsFromCursorPositions: ; 601f (1:601f)
     set 6,d
     jr .storeOptions
 .battleStyleShift
-    res 6,d
+    set 6,d
 .storeOptions
     ld a,d
     ld [W_OPTIONS],a
@@ -23691,10 +23691,12 @@ ItemUseMedicine: ; dabb (3:5abb)
     ld a,[W_ISINBATTLE]
     and a
     jr z,.compareCurrentHPToMaxHP
-    push hl
-    push de
-    push bc
-    ld a,[$cf06]
+    ;push hl
+    ;push de
+    ;push bc
+    ;ld a,[$cf06]
+    call ItemUseNotTime
+    jp .done
     ld c,a
     ld hl,$ccf5
     ld b,$02
@@ -65692,7 +65694,7 @@ UnknownDungeon3Object: ; 0x45f36 (size=34)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_SLOWBRO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,50 ; trainer
+    db SPRITE_SLOWBRO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,65 ; trainer
     db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$82,ULTRA_BALL ; item
     db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
 

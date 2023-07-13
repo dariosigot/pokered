@@ -1152,7 +1152,7 @@ Mon065_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    ;  16,PSYBEAM
+    db 23,PSYBEAM
     db 27,FLASH
     db 31,RECOVER
     db 38,PSYCHIC_M
@@ -1331,6 +1331,7 @@ Mon075_EvosMoves:
     db 29,TRAPHOLE
     db 33,HARDEN
     db 36,EARTHQUAKE
+    db 39,FIRE_PUNCH
     db 43,EXPLOSION
     db 51,ROCK_SLIDE
     db 60,FISSURE
@@ -1671,10 +1672,11 @@ Mon093_EvosMoves:
     ;  25,SMOG
     db 31,POISON_GAS
     db 35,MEGA_DRAIN
-    db 38,AMNESIA
+    db 38,THUNDERPUNCH
     db 42,SLUDGE
     db 44,HAZE
     db 47,PSYCHIC_M
+    db 51,TOXIC
     db 60,ACID_ARMOR
     db 0
 
@@ -1685,6 +1687,7 @@ Mon094_EvosMoves:
 ;Learnset
     db 31,POISON_GAS
     db 35,MEGA_DRAIN
+    db 38,THUNDERPUNCH
     db 42,SLUDGE
     db 44,HAZE
     db 47,PSYCHIC_M
@@ -2942,17 +2945,20 @@ Mon150_EvosMoves:
     ;   1,CONFUSION
     ;   1,DISABLE
     db  7,REFLECT
-    db 10,PSYCHIC_M  ; Unknown Dungeon's Mewtwo (Level 50)
-    db 18,RECOVER    ; 
-    db 25,SWIFT      ; 
-    db 45,SUBSTITUTE ; 
-    db 51,MIST
-    db 52,BARRIER
-    db 53,THUNDERBOLT
-    db 55,ICE_BEAM
-    db 57,AMNESIA
-    db 59,EARTHQUAKE
-    db 60,HYPER_BEAM
+    db 11,PSYWAVE
+    db 16,PSYBEAM
+    db 20,LIGHT_SCREEN
+    db 25,PSYCHIC_M  ; Unknown Dungeon's Mewtwo (Level 65)
+    db 33,RECOVER    ; 
+    db 40,SWIFT      ; 
+    db 50,SUBSTITUTE ; 
+    db 66,MIST
+    db 67,BARRIER
+    db 68,THUNDERBOLT
+    db 70,ICE_BEAM
+    db 72,AMNESIA
+    db 74,EARTHQUAKE
+    db 75,HYPER_BEAM
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────

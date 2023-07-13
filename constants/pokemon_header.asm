@@ -2385,10 +2385,10 @@ AlakazamBaseStats: ; 38ade (e:4ade)
     dw AlakazamPicBack
 
     ; attacks known at lvl 0
+    db PSYWAVE
     db DISABLE
     db CONFUSION
     db KINESIS
-    db PSYBEAM
 
     db 3 ; growth rate
 
@@ -3458,9 +3458,9 @@ GengarBaseStats: ; 38e0a (e:4e0a)
     dw GengarPicBack
 
     ; attacks known at lvl 0
-    db LEECH_LIFE
     db NIGHT_SHADE
-    db CONFUSE_RAY
+    db HYPNOSIS
+    db DREAM_EATER
     db SMOG
 
     db 3 ; growth rate
