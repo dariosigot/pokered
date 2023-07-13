@@ -331,6 +331,11 @@ SECTION "wRunningOnSGB",WRAM0[$cf1b]
 wRunningOnSGB: ; cf1b
     ds 1
 
+SECTION "RNG WRAM",WRAM0[$cf26]
+wRNGState:: ds 4
+wRNGCumulativeDividerPlus:: ds 2
+wRNGCumulativeDividerMinus:: ds 1
+
 SECTION "wGymCityName",WRAM0[$cf5f]
 wGymCityName: ; cf5f
 wStringBuffer1: ; cf5f

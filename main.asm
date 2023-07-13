@@ -5321,7 +5321,7 @@ InitGame: ; 1f54 (0:1f54)
     ld a,$01
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
-    call WriteDMACodeToHRAM ; copy DMA code to HRAM
+    call WriteDMACodeToHRAMAndInitializeRNGState ; copy DMA code to HRAM and Initialize RNG State
     xor a
     ld [$ffd7],a
     ld [$ff41],a
@@ -5415,7 +5415,7 @@ VBlankHandler: ; 2024 (0:2024)
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call PrepareOAMData ; update OAM buffer with current sprite data
-    call GenRandom
+    call GenRandomAndAdvanceRNGState
     ld a,[H_VBLANKOCCURRED]
     and a
     jr z,.next
@@ -18538,6 +18538,30 @@ DockException:
     dec a
     ret
 
+WriteDMACodeToHRAMAndInitializeRNGState:
+    ld hl,wRNGState
+    ld a,[$ffb1]
+    ld [hli],a
+    ld a,[$ffd5]
+    ld [hli],a
+    ld a,$be
+    ld [hli],a
+    ld [hl],$ef
+    jp WriteDMACodeToHRAM
+
+GenRandomAndAdvanceRNGState:
+    call GenRandom
+    push hl
+    push de
+    push bc
+    ld b,BANK(AdvanceRNGState)
+    ld hl,AdvanceRNGState
+    call Bankswitch
+    pop bc
+    pop de
+    pop hl
+    ret
+
 SECTION "bank2",ROMX,BANK[$2]
 
 INCLUDE "music/headers/sfxheaders02.asm"
@@ -30715,20 +30739,6 @@ Func_13a58: ; 13a58 (4:7a58)
     ld bc,$d
     jp CopyData
 
-GenRandom_: ; 13a8f (4:7a8f)
-; generate a random 16-bit integer and store it at $FFD3,$FFD4
-    ld a,[rDIV]
-    ld b,a
-    ld a,[H_RAND1]
-    adc b
-    ld [H_RAND1],a
-    ld a,[rDIV]
-    ld b,a
-    ld a,[H_RAND2]
-    sbc b
-    ld [H_RAND2],a
-    ret
-
 PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     call PlaceString ; "TYPE/"
     FuncCoord 10,13
@@ -31002,10 +31012,8 @@ GetEnemy:
     ld a,[hl]
     ld d,a
     call GenRandom
-    srl a ; ...
-    srl a ; ...
-    srl a ; ...
-    srl a ; / 16
+    ld a,[H_RAND2]
+    and a,%00001111 ; 0-15
     add d
     ld [W_CURENEMYLVL],a
     pop af
@@ -129616,3 +129624,143 @@ Tset0E_Block:
 
 BasketSprite:
     INCBIN "gfx/denim/basket.2bpp"
+
+GenRandom_:
+    push hl
+    push bc
+    push de
+    call UpdateDividerCounters
+    ld hl,wRNGState
+    ld a,[hli]
+    ld b,a
+    ld a,[hli]
+    ld c,a
+    ld a,[hli]
+    ld d,a
+    ld e,[hl]
+    ld a,e
+    add a,a
+    xor b
+    ld b,a
+    ld a,d
+    rla
+    ld l,c
+    rl l
+    ld h,b
+    rl h
+    sbc a
+    and 1
+    xor c
+    ld c,a
+    ld a,h
+    xor d
+    ld d,a
+    ld a,l
+    xor e
+    ld e,a
+    ld h,b
+    ld l,c
+    push hl
+    ld h,d
+    ld a,e
+    rept 2
+        sla e
+        rl d
+        rl c
+        rl b
+    endr
+    xor e
+    ld e,a
+    ld a,h
+    xor d
+    ld d,a
+    pop hl
+    ld a,l
+    xor c
+    ld c,a
+    ld a,h
+    xor b
+    ld hl,wRNGState
+    ld [hli],a
+    ld a,c
+    ld [hli],a
+    ld a,d
+    ld [hli],a
+    ld [hl],e
+    ld a,[rDIV]
+    add a,[hl]
+    ld [H_RAND1],a
+    ld a,[hli]
+    inc hl
+    inc hl
+    sub [hl]
+    ld [H_RAND2],a
+    pop de
+    pop bc
+    pop hl
+    ret
+
+UpdateDividerCounters::
+    ld a,[rDIV]
+    ld hl,wRNGCumulativeDividerMinus
+    sbc [hl]
+    ld [hld],a
+    ld a,[rDIV]
+    adc [hl]
+    ld [hld],a
+    ret nc
+    inc [hl]
+    ret
+
+AdvanceRNGState::
+    ld hl,wRNGState
+    ld a,[hli]
+    ld b,a
+    ld a,[hli]
+    ld c,a
+    ld a,[hli]
+    ld d,a
+    ld a,[hli]
+    ld e,a
+    ld a,[hli]
+    ld l,[hl]
+    ld h,a
+    ld a,[rDIV]
+    rra
+    jr nc,.try_upper
+.try_lower
+    ld a,h
+    cp d
+    ld a,l
+    jr nz,.lower
+    cp e
+    jr nz,.lower
+.upper
+    xor c
+    ld c,a
+    ld a,h
+    xor b
+    jr .done
+.try_upper
+    ld a,h
+    cp b
+    ld a,l
+    jr nz,.upper
+    cp c
+    jr nz,.upper
+.lower
+    xor e
+    ld e,a
+    ld a,h
+    xor d
+    ld d,a
+    ld a,b
+.done
+    ld hl,wRNGState
+    ld [hli],a
+    ld a,c
+    ld [hli],a
+    ld a,d
+    ld [hli],a
+    ld [hl],e
+    ret
