@@ -18467,19 +18467,32 @@ IsTryingToLearnPalFix_End:
     jp GoPAL_SET_CF1C
 
 PrintDenimVersionAndSaveScreenTilesToBuffer2:
+    ld a,[wFlagGameBoyColor]
+    cp a,$11
+    jr nz,.done
+    ld de,.GBC
+    FuncCoord 0,0
+    ld hl,Coord
+    ld b,1
+    call .Loop
+.done
     FuncCoord 12,0
     ld hl,Coord
     ld de,.Version
     ld b,8
+    call .Loop
+    jp SaveScreenTilesToBuffer2
 .Loop
     ld a,[de]
     ld [hli],a
     inc de
     dec b
     jr nz,.Loop
-    jp SaveScreenTilesToBuffer2
+    ret
 .Version
     db "0.53.000"
+.GBC
+    db $41
 
 GetQtyAndGiveItem:
     push bc
