@@ -30488,7 +30488,7 @@ TryDoWildEncounter: ; 13870 (4:7870)
     add hl,bc
     ld a,[hli]
     call GetWildEnemyLevel ; ld [W_CURENEMYLVL],a ; $d127
-    ld a,[hl]
+    ld a,[hld] ; Decrese hl to read Exception ID in GetEnemy Routine
     ds 1 ; ld [$cf91],a ; moved in the Next Subroutine
     call GetEnemy ; ld [W_ENEMYMONID],a
     jr nc,.CantEncounter2
@@ -30979,20 +30979,19 @@ HackDockTilesetLikeSafari:
     ret
 
 GetEnemy:
-    cp MEW
-    jr z,.CheckMew
     cp $FF
-    jr z,.UnknownDungeon
-    cp $FE
-    jr z,.UnknownDungeon
-    jr .WillEncounter
+    jr nz,.WillEncounter
+.Exception
+    ld a,[hl] ; Table Level = Exception ID
+    cp $03
+    jr z,.CheckMew
 .UnknownDungeon
     push hl
     push de
     ld d,a
     call GenRandom
     ld e,a
-    inc d
+    dec d
     ld hl,UnknownDungeonLandPkmnList
     jr z,.Done
     ld hl,UnknownDungeonWaterPkmnList
@@ -128017,16 +128016,16 @@ VermilionMons:
 
 DockMons:
     db $01
-    db  7,MEW ; 20%
-    db  7,MEW ; 20%
-    db  7,MEW ; 15%
-    db  7,MEW ; 10%
-    db  7,MEW ; 10%
-    db  7,MEW ; 10%
-    db  7,MEW ;  5%
-    db  7,MEW ;  5%
-    db  7,MEW ;  4%
-    db  7,MEW ;  1%
+    db $03,$FF      ; 20%
+    db $03,$FF      ; 20%
+    db $03,$FF      ; 15%
+    db $03,$FF      ; 10%
+    db $03,$FF      ; 10%
+    db $03,$FF      ; 10%
+    db $03,$FF      ;  5%
+    db $03,$FF      ;  5%
+    db $03,$FF      ;  4%
+    db $03,$FF      ;  1%
     db $05
     db 16,MAGIKARP  ; 20%
     db 13,GOLDEEN   ; 20%
@@ -128735,75 +128734,75 @@ PlateauMons3:
 
 DungeonMons1:
     db $0A
-    db $FF,$FF ; 20%
-    db $FF,$FF ; 20%
-    db $FF,$FF ; 15%
-    db $FF,$FF ; 10%
-    db $FF,$FF ; 10%
-    db $FF,$FF ; 10%
-    db $FF,$FF ;  5%
-    db $FF,$FF ;  5%
-    db $FF,$FF ;  4%
-    db $FF,$FF ;  1%
+    db $01,$FF ; 20%
+    db $01,$FF ; 20%
+    db $01,$FF ; 15%
+    db $01,$FF ; 10%
+    db $01,$FF ; 10%
+    db $01,$FF ; 10%
+    db $01,$FF ;  5%
+    db $01,$FF ;  5%
+    db $01,$FF ;  4%
+    db $01,$FF ;  1%
     db $05
-    db $FF,$FE ; 20%
-    db $FF,$FE ; 20%
-    db $FF,$FE ; 15%
-    db $FF,$FE ; 10%
-    db $FF,$FE ; 10%
-    db $FF,$FE ; 10%
-    db $FF,$FE ;  5%
-    db $FF,$FE ;  5%
-    db $FF,$FE ;  4%
-    db $FF,$FE ;  1%
+    db $02,$FF ; 20%
+    db $02,$FF ; 20%
+    db $02,$FF ; 15%
+    db $02,$FF ; 10%
+    db $02,$FF ; 10%
+    db $02,$FF ; 10%
+    db $02,$FF ;  5%
+    db $02,$FF ;  5%
+    db $02,$FF ;  4%
+    db $02,$FF ;  1%
 
 DungeonMons2:
     db $0F
-    db $FF,$FF ; 20%
-    db $FF,$FF ; 20%
-    db $FF,$FF ; 15%
-    db $FF,$FF ; 10%
-    db $FF,$FF ; 10%
-    db $FF,$FF ; 10%
-    db $FF,$FF ;  5%
-    db $FF,$FF ;  5%
-    db $FF,$FF ;  4%
-    db $FF,$FF ;  1%
+    db $01,$FF ; 20%
+    db $01,$FF ; 20%
+    db $01,$FF ; 15%
+    db $01,$FF ; 10%
+    db $01,$FF ; 10%
+    db $01,$FF ; 10%
+    db $01,$FF ;  5%
+    db $01,$FF ;  5%
+    db $01,$FF ;  4%
+    db $01,$FF ;  1%
     db $05
-    db $FF,$FE ; 20%
-    db $FF,$FE ; 20%
-    db $FF,$FE ; 15%
-    db $FF,$FE ; 10%
-    db $FF,$FE ; 10%
-    db $FF,$FE ; 10%
-    db $FF,$FE ;  5%
-    db $FF,$FE ;  5%
-    db $FF,$FE ;  4%
-    db $FF,$FE ;  1%
+    db $02,$FF ; 20%
+    db $02,$FF ; 20%
+    db $02,$FF ; 15%
+    db $02,$FF ; 10%
+    db $02,$FF ; 10%
+    db $02,$FF ; 10%
+    db $02,$FF ;  5%
+    db $02,$FF ;  5%
+    db $02,$FF ;  4%
+    db $02,$FF ;  1%
 
 DungeonMonsB1:
     db $19
-    db $FF,$FF ; 20%
-    db $FF,$FF ; 20%
-    db $FF,$FF ; 15%
-    db $FF,$FF ; 10%
-    db $FF,$FF ; 10%
-    db $FF,$FF ; 10%
-    db $FF,$FF ;  5%
-    db $FF,$FF ;  5%
-    db $FF,$FF ;  4%
-    db $FF,$FF ;  1%
+    db $01,$FF ; 20%
+    db $01,$FF ; 20%
+    db $01,$FF ; 15%
+    db $01,$FF ; 10%
+    db $01,$FF ; 10%
+    db $01,$FF ; 10%
+    db $01,$FF ;  5%
+    db $01,$FF ;  5%
+    db $01,$FF ;  4%
+    db $01,$FF ;  1%
     db $05
-    db $FF,$FE ; 20%
-    db $FF,$FE ; 20%
-    db $FF,$FE ; 15%
-    db $FF,$FE ; 10%
-    db $FF,$FE ; 10%
-    db $FF,$FE ; 10%
-    db $FF,$FE ;  5%
-    db $FF,$FE ;  5%
-    db $FF,$FE ;  4%
-    db $FF,$FE ;  1%
+    db $02,$FF ; 20%
+    db $02,$FF ; 20%
+    db $02,$FF ; 15%
+    db $02,$FF ; 10%
+    db $02,$FF ; 10%
+    db $02,$FF ; 10%
+    db $02,$FF ;  5%
+    db $02,$FF ;  5%
+    db $02,$FF ;  4%
+    db $02,$FF ;  1%
 
 _ReadRodData:
 ; return e = 2 if no fish on this map
