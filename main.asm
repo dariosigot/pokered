@@ -53699,8 +53699,8 @@ Func_3dc88: ; 3dc88 (f:5c88)
     cp $4
     jp z,Obey
     call GetMaxLevel
-    ld b,a
-    ld c,a
+    ld b,d
+    ld c,d
     ld a,[W_PLAYERMONLEVEL] ; $d022
     ld d,a
     add b
@@ -53841,11 +53841,11 @@ Func_3ddb4: ; 3ddb4 (f:5db4)
 
 GetMaxLevel:
     ld a,[$d5a2] ; hall of fame
-    ld b,100
+    ld d,100
     and a
-    jr nz,.End
+    ret nz
     ld a,[W_OBTAINEDBADGES]
-    ld b,20
+    ld d,20
 .LoopBit
     and a
     jr z,.End
@@ -53853,13 +53853,12 @@ GetMaxLevel:
     jr nc,.NotFlagged
     ld c,5
 .LoopInc
-    inc b
+    inc d
     dec c
     jr nz,.LoopInc
 .NotFlagged
     jr .LoopBit
 .End
-    ld a,b
     ret
 
 EnemyMonFainted: ; 0x3c63e ; Moved in the Bank
@@ -76902,12 +76901,11 @@ GainExperience: ; 5524f (15:524f)
     ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
     xor a
     ld [wWhichPokemon],a ; $cf92
-
-Func_5525f: ; 5525f (15:525f)
+.partyMonLoop ; loop over each mon and add gained exp
     inc hl
     ld a,[hli]
     or [hl]
-    jp z,Func_55436
+    jp z,.nextMon
     push hl
     ld hl,W_PLAYERMONSALIVEFLAGS
     ld a,[wWhichPokemon] ; $cf92
@@ -76918,7 +76916,7 @@ Func_5525f: ; 5525f (15:525f)
     ld a,c
     and a
     pop hl
-    jp z,Func_55436
+    jp z,.nextMon
     ld de,$10
     add hl,de
     ld d,h
@@ -76946,15 +76944,18 @@ Func_5525f: ; 5525f (15:525f)
     ld [de],a
 .asm_5529a
     dec c
-    jr z,.asm_552a1
+    jr z,.statExpDone
     inc de
     inc de
     jr .asm_55285
-.asm_552a1
-    xor a
-    ld [H_NUMTOPRINT],a ; $FF00+$96 (aliases: H_MULTIPLICAND)
-    ld [$FF00+$97],a
-    ld a,[$d008]
+.statExpDone
+    call CheckReachLevelLimit
+    jp nc,.nextMon
+    ds 2
+    ;ds 1 ; xor a
+    ;ds 2 ; ld [H_NUMTOPRINT],a ; $FF00+$96 (aliases: H_MULTIPLICAND)
+    ;ds 2 ; ld [$FF00+$97],a
+    ;ds 3 ; ld a,[$d008]
     ld [$FF00+$98],a
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld [H_REMAINDER],a ; $FF00+$99 (aliases: H_DIVISOR,H_MULTIPLIER,H_POWEROFTEN)
@@ -76986,6 +76987,7 @@ Func_5525f: ; 5525f (15:525f)
     inc hl
     inc hl
     inc hl
+; add the gained exp to the party mon's exp
     ld b,[hl]
     ld a,[$FF00+$98]
     ld [$cf4c],a
@@ -77001,6 +77003,7 @@ Func_5525f: ; 5525f (15:525f)
     inc [hl]
     inc hl
 .asm_552f8
+; calculate exp for the mon at max level, and cap the exp at that value
     inc hl
     push hl
     ld a,[wWhichPokemon] ; $cf92
@@ -77010,11 +77013,12 @@ Func_5525f: ; 5525f (15:525f)
     add hl,bc
     ld a,[hl]
     ld [$d0b5],a
-    call GetMonHeader
-    ld d,$64
+    call GetMonHeaderAndMaxLevel ; call GetMonHeader
+    ds 2 ; ld d,100
     ld hl,CalcExperience
     ld b,BANK(CalcExperience)
     call Bankswitch ; indirect jump to CalcExperience (58f6a (16:4f6a))
+; compare max exp with current exp
     ld a,[H_NUMTOPRINT] ; $FF00+$96 (aliases: H_MULTIPLICAND)
     ld b,a
     ld a,[$FF00+$97]
@@ -77028,7 +77032,8 @@ Func_5525f: ; 5525f (15:525f)
     sbc c
     ld a,[hl]
     sbc b
-    jr c,.asm_5532e
+    jr c,.next2
+; the mon's exp is greater than the max exp, so overwrite it with the max exp
     ld a,b
     ld [hli],a
     ld a,c
@@ -77036,7 +77041,7 @@ Func_5525f: ; 5525f (15:525f)
     ld a,d
     ld [hld],a
     dec hl
-.asm_5532e
+.next2
     push hl
     ld a,[wWhichPokemon] ; $cf92
     ld hl,W_PARTYMON1NAME ; $d2b5
@@ -77056,7 +77061,7 @@ Func_5525f: ; 5525f (15:525f)
     pop hl
     ld a,[hl]
     cp d
-    jp z,Func_55436
+    jp z,.nextMon
     call KeepEXPBarFull ; Denim,ExpBar ; ld a,[W_CURENEMYLVL] ; $d127
     push af
     push hl
@@ -77168,8 +77173,7 @@ Func_5525f: ; 5525f (15:525f)
     pop hl
     pop af
     ld [W_CURENEMYLVL],a ; $d127
-
-Func_55436: ; 55436 (15:5436)
+.nextMon
     ld a,[W_NUMINPARTY] ; $d163
     ld b,a
     ld a,[wWhichPokemon] ; $cf92
@@ -77180,7 +77184,7 @@ Func_55436: ; 55436 (15:5436)
     ld bc,$2c
     ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
     call AddNTimes
-    jp Func_5525f
+    jp .partyMonLoop
 .asm_55450
     ld hl,W_PLAYERMONSALIVEFLAGS
     xor a
@@ -80800,6 +80804,53 @@ GetExperienceTextPointerAndPrintText:
 WithExpAllText:
     TX_FAR _WithExpAllText
     db "@"
+
+GetMonHeaderAndMaxLevel:
+    call GetMonHeader
+    ld hl,GetMaxLevel
+    ld b,BANK(GetMaxLevel)
+    jp Bankswitch
+
+CheckReachLevelLimit:
+    push de
+    ld hl,-10
+    add hl,de
+; calculate exp for the mon at max level
+    push hl
+    ld a,[wWhichPokemon] ; $cf92
+    ld c,a
+    ld b,0
+    ld hl,W_PARTYMON1 ; $d164
+    add hl,bc
+    ld a,[hl]
+    ld [$d0b5],a
+    call GetMonHeaderAndMaxLevel
+    ld hl,CalcExperience
+    ld b,BANK(CalcExperience)
+    call Bankswitch ; indirect jump to CalcExperience (58f6a (16:4f6a))
+; compare max exp with current exp
+    ld a,[H_NUMTOPRINT] ; $FF00+$96 (aliases: H_MULTIPLICAND)
+    ld b,a
+    ld a,[$FF00+$97]
+    ld c,a
+    ld a,[$FF00+$98]
+    ld d,a
+    pop hl
+    ld a,[hld]
+    sub d
+    ld a,[hld]
+    sbc c
+    ld a,[hl]
+    sbc b ; If Carry Flag = 0 -> the mon's exp is greater than the max exp
+    pop de
+    ret nc
+; Original Code
+    xor a ; Reset Carry Flag
+    ld [H_NUMTOPRINT],a ; $FF00+$96 (aliases: H_MULTIPLICAND)
+    ld [$FF00+$97],a
+    ld a,[$d008]
+    scf ; Set Carry Flag
+    ret
 
 SECTION "bank16",ROMX,BANK[$16]
 
