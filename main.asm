@@ -50605,51 +50605,45 @@ FaintEnemyPokemon ; 0x3c567
     call SaveScreenTilesToBuffer1
     xor a
     ld [$cf0b],a
-    ld b,EXP__ALL
-    call IsItemInBag
+    ;ld b,EXP__ALL
+    ;call IsItemInBag
+    ;jr z,.pre_no_exp_all
+    call CheckIfAllFought
+    jr nz,.exp_all
+.pre_no_exp_all
     push af
-    jr z,.no_exp_all
-    ld hl,$d002
-    ld b,$7
-.exp_all_loop
-    srl [hl]
-    inc hl
-    dec b
-    jr nz,.exp_all_loop
+    jr .no_exp_all
+.exp_all
+    push af
+    ld hl,ModulateExpForMonsThatFought
+    ld b,BANK(ModulateExpForMonsThatFought)
+    call Bankswitch
 .no_exp_all
     xor a
-    ld [$cc5b],a
-    ld hl,Func_5524f
-    ld b,BANK(Func_5524f)
-    call Bankswitch ; indirect jump to Func_5524f (5524f (15:524f))
+    call GainExperience_
     pop af
     ret z
+    ld hl,ModulateExpForMonsThatNotFought
+    ld b,BANK(ModulateExpForMonsThatNotFought)
+    call Bankswitch
     ld a,$1
-    ld [$cc5b],a
-    ld a,[W_NUMINPARTY] ; $d163
-    ld b,$0
-.asm_3c62c
-    scf
-    rl b
-    dec a
-    jr nz,.asm_3c62c
-    ld a,b
-    ld [W_PLAYERMONSALIVEFLAGS],a
-    ld hl,Func_5524f
-    ld b,BANK(Func_5524f)
-    jp Bankswitch ; indirect jump to Func_5524f (5524f (15:524f))
+    jp GainExperience_
 
-EnemyMonFainted: ; 0x3c63e
-    TX_FAR _EnemyMonFainted
-    db "@"
-
-Func_3c643: ; 3c643 (f:4643)
-    xor a
-    ld [$d083],a
-    ld [$c02a],a
-    inc a
-    ld [$ccf6],a
+CheckIfAllFought:
+    ld hl,DefineMonLiveFlag
+    ld b,BANK(DefineMonLiveFlag)
+    call Bankswitch               ; ► d = flag mon live
+    ld a,[W_PLAYERMONSALIVEFLAGS] ; ► a = flag has fought
+    cp d
     ret
+
+GainExperience_:
+    ld [$cc5b],a
+    ld hl,GainExperience
+    ld b,BANK(GainExperience)
+    jp Bankswitch ; indirect jump to GainExperience (5524f (15:524f))
+
+SECTION "Func_3c64f",ROMX[$464f],BANK[$f]
 
 Func_3c64f: ; 3c64f (f:464f)
     ld a,[wEnemyPartyCount] ; $d89c
@@ -53703,38 +53697,8 @@ Func_3dc88: ; 3dc88 (f:5c88)
     ld [$cced],a
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
-    jr nz,.asm_3dc97
-    ld a,$1
-    and a
-    ret
-.asm_3dc97
-    ld hl,W_PARTYMON1_OTID ; $d177
-    ld bc,$2c
-    ld a,[wPlayerMonNumber] ; $cc2f
-    call AddNTimes
-    ld a,[wPlayerID] ; $d359
-    cp [hl]
-    jr nz,.asm_3dcb1
-    inc hl
-    ld a,[wPlayerID + 1] ; $d35a
-    cp [hl]
-    jp z,Func_3ddb0
-.asm_3dcb1
-    ld hl,W_OBTAINEDBADGES ; $d356
-    bit 7,[hl]
-    ld a,$65
-    jr nz,.asm_3dcce
-    bit 5,[hl]
-    ld a,$46
-    jr nz,.asm_3dcce
-    bit 3,[hl]
-    ld a,$32
-    jr nz,.asm_3dcce
-    bit 1,[hl]
-    ld a,$1e
-    jr nz,.asm_3dcce
-    ld a,$a
-.asm_3dcce
+    jp z,Obey
+    call GetMaxLevel
     ld b,a
     ld c,a
     ld a,[W_PLAYERMONLEVEL] ; $d022
@@ -53746,14 +53710,14 @@ Func_3dc88: ; 3dc88 (f:5c88)
 .asm_3dcda
     ld a,c
     cp d
-    jp nc,Func_3ddb0
+    jp nc,Obey
 .asm_3dcdf
     call GenRandomInBattle
     swap a
     cp b
     jr nc,.asm_3dcdf
     cp c
-    jp c,Func_3ddb0
+    jp c,Obey
 .asm_3dceb
     call GenRandomInBattle
     cp b
@@ -53866,7 +53830,7 @@ Func_3dc88: ; 3dc88 (f:5c88)
     ld [wPlayerSelectedMove],a ; $ccdc
     call GetCurrentMove
 
-Func_3ddb0: ; 3ddb0 (f:5db0)
+Obey: ; 3ddb0 (f:5db0)
     ld a,$1
     and a
     ret
@@ -53874,6 +53838,43 @@ Func_3ddb0: ; 3ddb0 (f:5db0)
 Func_3ddb4: ; 3ddb4 (f:5db4)
     xor a
     ret
+
+GetMaxLevel:
+    ld a,[$d5a2] ; hall of fame
+    ld b,100
+    and a
+    jr nz,.End
+    ld a,[W_OBTAINEDBADGES]
+    ld b,20
+.LoopBit
+    and a
+    jr z,.End
+    srl a ; Shift right into Carry. MSB set to 0. C - Contains old bit 0 data.
+    jr nc,.NotFlagged
+    ld c,5
+.LoopInc
+    inc b
+    dec c
+    jr nz,.LoopInc
+.NotFlagged
+    jr .LoopBit
+.End
+    ld a,b
+    ret
+
+EnemyMonFainted: ; 0x3c63e ; Moved in the Bank
+    TX_FAR _EnemyMonFainted
+    db "@"
+
+Func_3c643: ; 3c643 (f:4643) ; Moved in the Bank
+    xor a
+    ld [$d083],a
+    ld [$c02a],a
+    inc a
+    ld [$ccf6],a
+    ret
+
+SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
 UnnamedText_3ddb6: ; 3ddb6 (f:5db6)
     TX_FAR _UnnamedText_3ddb6
@@ -76893,11 +76894,11 @@ DayCareMBlocks: ; 5522f (15:522f)
 FuchsiaHouse3Blocks: ; 5523f (15:523f)
     INCBIN "maps/fuchsiahouse3.blk"
 
-Func_5524f: ; 5524f (15:524f)
+GainExperience: ; 5524f (15:524f)
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     ret z
-    call Func_5546c
+    call DivideExpDataByNumMonsGainingExp
     ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
     xor a
     ld [wWhichPokemon],a ; $cf92
@@ -77040,8 +77041,8 @@ Func_5525f: ; 5525f (15:525f)
     ld a,[wWhichPokemon] ; $cf92
     ld hl,W_PARTYMON1NAME ; $d2b5
     call GetPartyMonName
-    ld hl,UnnamedText_554b2 ; $54b2
-    call PrintText
+    call GetExperienceTextPointerAndPrintText ; ld hl,UnnamedText_554b2 ; $54b2
+    ds 3 ; call PrintText
     xor a
     ld [$cc49],a
     call AnimateEXPBar ; Denim,ExpBar ; call LoadMonData
@@ -77197,38 +77198,7 @@ Func_55436: ; 55436 (15:5436)
     ld a,$10
     jp Predef ; indirect jump to HandleBitArray (f666 (3:7666))
 
-Func_5546c: ; 5546c (15:546c)
-    ld a,[W_PLAYERMONSALIVEFLAGS]
-    ld b,a
-    xor a
-    ld c,$8
-    ld d,$0
-.asm_55475
-    xor a
-    srl b
-    adc d
-    ld d,a
-    dec c
-    jr nz,.asm_55475
-    cp $2
-    ret c
-    ld [$d11e],a
-    ld hl,$d002
-    ld c,$7
-.asm_55488
-    xor a
-    ld [H_DIVIDEND],a ; $FF00+$95 (aliases: H_PRODUCT,H_PASTLEADINGZEROES,H_QUOTIENT)
-    ld a,[hl]
-    ld [H_NUMTOPRINT],a ; $FF00+$96 (aliases: H_MULTIPLICAND)
-    ld a,[$d11e]
-    ld [H_REMAINDER],a ; $FF00+$99 (aliases: H_DIVISOR,H_MULTIPLIER,H_POWEROFTEN)
-    ld b,$2
-    call Divide
-    ld a,[$FF00+$98]
-    ld [hli],a
-    dec c
-    jr nz,.asm_55488
-    ret
+SECTION "Func_5549f",ROMX[$549f],BANK[$15]
 
 Func_5549f: ; 5549f (15:549f)
     ld a,[$FF00+$97]
@@ -77247,10 +77217,10 @@ Func_5549f: ; 5549f (15:549f)
 UnnamedText_554b2: ; 554b2 (15:54b2)
     TX_FAR _UnnamedText_554b2
     db $08 ; asm
-    ld a,[$cc5b]
-    ld hl,UnnamedText_554cb
-    and a
-    ret nz
+    ;ld a,[$cc5b]
+    ;ld hl,UnnamedText_554cb
+    ;and a
+    ;ret nz
     ld hl,UnnamedText_554d8
     ld a,[$cf4d]
     and a
@@ -77258,11 +77228,13 @@ UnnamedText_554b2: ; 554b2 (15:54b2)
     ld hl,UnnamedText_554d4
     ret
 
-UnnamedText_554cb: ; 554cb (15:54cb)
-    TX_FAR _UnnamedText_554cb
-    db $08 ; asm
-    ld hl,UnnamedText_554d8
-    ret
+;UnnamedText_554cb: ; 554cb (15:54cb)
+;    TX_FAR _UnnamedText_554cb
+;    db $08 ; asm
+;    ld hl,UnnamedText_554d8
+;    ret
+
+SECTION "UnnamedText_554d4",ROMX[$54d4],BANK[$15]
 
 UnnamedText_554d4: ; 554d4 (15:54d4)
     TX_FAR _UnnamedText_554d4
@@ -80765,6 +80737,69 @@ IsCurrentMonBattleMon:
     ld a,[wWhichPokemon]
     cp b
     ret
+
+SetFirstExpAllMessage:
+    ld a,[$cc5b]
+    and a
+    ret z
+    ld a,[wFirstExpAllMessageBit6]
+    set 6,a
+    ld [wFirstExpAllMessageBit6],a
+    ret
+
+DivideExpDataByNumMonsGainingExp: ; Moved in the BANK
+    call SetFirstExpAllMessage
+    ld a,[W_PLAYERMONSALIVEFLAGS]
+    ld [wBackupFlagGainingExp],a ; make a backup of flagged mons gaining exp
+    ld b,a
+    xor a
+    ld c,$8
+    ld d,$0
+.asm_55475
+    xor a
+    srl b
+    adc d
+    ld d,a
+    dec c
+    jr nz,.asm_55475
+    cp $2
+    ret c
+    ld [$d11e],a
+    ld hl,$d002
+    ld c,$7
+.asm_55488
+    xor a
+    ld [H_DIVIDEND],a ; $FF00+$95 (aliases: H_PRODUCT,H_PASTLEADINGZEROES,H_QUOTIENT)
+    ld a,[hl]
+    ld [H_NUMTOPRINT],a ; $FF00+$96 (aliases: H_MULTIPLICAND)
+    ld a,[$d11e]
+    ld [H_REMAINDER],a ; $FF00+$99 (aliases: H_DIVISOR,H_MULTIPLIER,H_POWEROFTEN)
+    ld b,$2
+    call Divide
+    ld a,[$FF00+$98]
+    ld [hli],a
+    dec c
+    jr nz,.asm_55488
+    ret
+
+GetExperienceTextPointerAndPrintText:
+    ld a,[$cc5b]
+    and a
+    ld hl,UnnamedText_554b2 ; $54b2
+    jr z,.noexpall
+.exp_all
+    ld a,[wFirstExpAllMessageBit6]
+    bit 6,a
+    ret z ; NO exp.all text
+    res 6,a
+    ld [wFirstExpAllMessageBit6],a
+    ld hl,WithExpAllText
+.noexpall
+    jp PrintText
+
+WithExpAllText:
+    TX_FAR _WithExpAllText
+    db "@"
 
 SECTION "bank16",ROMX,BANK[$16]
 
@@ -115933,9 +115968,11 @@ _UnnamedText_554b2: ; 89bc2 (22:5bc2)
     db $0," gained",$4f
     db "@@"
 
-_UnnamedText_554cb: ; 89bd0 (22:5bd0)
-    db $0,"with EXP.ALL,",$55
-    db "@@"
+;_UnnamedText_554cb: ; 89bd0 (22:5bd0)
+;    db $0,"with EXP.ALL,",$55
+;    db "@@"
+
+SECTION "_UnnamedText_554d4",ROMX[$5be1],BANK[$22] 
 
 _UnnamedText_554d4: ; 89be1 (22:5be1)
     db $0,"a boosted",$55
@@ -116559,6 +116596,10 @@ UnnamedText_8acd6: ; 8acd6 (22:6cd6)
     db $0,$55
     db "needs some more",$55
     db "time with me.",$58
+
+_WithExpAllText
+    db $0,"Other #MON gain",$4F
+    db "some EXP. Points!",$58
 
 SECTION "bank23",ROMX,BANK[$23]
 
@@ -129610,6 +129651,129 @@ ReadMove:
     pop bc
     pop de
     pop hl
+    ret
+
+ModulateExpForMonsThatFought: ; 4/5 TOTAL (80%)
+    push bc
+    ld hl,$d002
+    ld c,$7
+.NextStat
+    xor a
+    ld [H_MULTIPLICAND],a
+    ld [H_MULTIPLICAND+1],a
+    ld a,[hl]
+    ld [H_MULTIPLICAND+2],a
+    ld a,4 ; Multiply 4
+    ld [H_MULTIPLIER],a
+    call Multiply
+    ld a,5 ; Divide 5
+    ld [H_DIVISOR],a
+    ld b,4 ; 4 bytes
+    call Divide
+    ld a,[$FF00+$98]
+    ld [hli],a
+    dec c
+    jr nz,.NextStat
+    pop bc
+    ret
+
+ModulateExpForMonsThatNotFought: ; 4/5 : 4 = 1/5 TOTAL (20%)
+    push bc
+    call UndoDivisionExp
+    ld hl,$d002
+    ld c,$7
+.NextStat
+    xor a
+    ld [H_DIVIDEND],a
+    ld a,[hl]
+    ld [H_DIVIDEND+1],a
+    ld a,4 ; Divide 4
+    ld [H_DIVISOR],a
+    ld b,2 ; 2 bytes
+    call Divide
+    ld a,[$FF00+$98]
+    ld [hli],a
+    dec c
+    jr nz,.NextStat
+    pop bc
+    jp DefineMonsThatNotFoughtFlag
+
+UndoDivisionExp:
+    ld hl,$d002
+    ld b,$7
+.exp_stat_loop
+    call GetNumOfFought
+    ld c,a              ; get number of participating pkmn into c
+    xor a               ; clear a to zero
+.exp_adder_loop
+    add [hl]            ; add the value of the current exp stat to 'a'
+    dec c               ; decrement participating pkmn
+    jr nz, .exp_adder_loop
+    ld [hl],a           ; stick the exp values, now multiplied by the number of participating pkmn, back into the stat address
+    inc hl              ; get next stat 
+    dec b
+    jr nz, .exp_stat_loop
+    ret
+
+GetNumOfFought:
+    push bc
+    push de
+    ld a,[wBackupFlagGainingExp]
+    ld b,a
+    xor a
+    ld c,$8
+    ld d,$0
+.Next
+    xor a
+    srl b
+    adc d
+    ld d,a
+    dec c
+    jr nz,.Next
+    pop de
+    pop bc
+    ret
+
+DefineMonsThatNotFoughtFlag:
+    call DefineMonLiveFlag ; ► d = flag mon live
+    call DefinePartyFlag   ; ► e = party
+    ld a,[wBackupFlagGainingExp]   ; ► a = flag has just gain experience
+    xor e ; If a mon has just gain experience xor turn into 0
+    and d ; If a mon is faintened turn into 0
+    ld [W_PLAYERMONSALIVEFLAGS],a
+    ret
+
+DefineMonLiveFlag:
+    ld a,8
+    ld d,0
+    ld e,a
+    ld hl,W_PARTYMON1_HP ; $d16c
+    ld bc,W_PARTYMON2DATA - W_PARTYMON1DATA - 1
+.partyMonsLoop8Byte
+    xor a
+    or [hl]
+    inc hl
+    or [hl] ; reset carry flag
+    jr z,.Fainted
+    scf ; set carry flag
+.Fainted
+    rr d
+    add hl,bc
+    dec e
+    jr nz,.partyMonsLoop8Byte
+    ld a,d
+    and %00111111 ; Reset fist 2 Byte because only 6 mons
+    ld d,a
+    ret
+
+DefinePartyFlag:
+    ld a,[W_NUMINPARTY] ; $d163
+    ld e,0
+.LoopParty1
+    scf
+    rl e
+    dec a
+    jr nz,.LoopParty1
     ret
 
 SECTION "Bank38",ROMX,BANK[$38]

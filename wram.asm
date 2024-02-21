@@ -823,7 +823,12 @@ W_PRIZE2: ; d13e
 W_PRIZE3: ; d13f
     ds 1
 
-    ds 24
+    ds 24 - 3
+
+wBackupFlagGainingExp: ; d155
+    ds 1
+
+    ds 2
 
 W_PLAYERNAME: ; d158
     ds 11
@@ -1544,6 +1549,7 @@ wFlagNoHpPalBit2            ; df38 ; bit 2
 wFlagEnableOakLastPkmnBit3  ; df38 ; bit 3
 wFlagEnableDojoLastPkmnBit4 ; df38 ; bit 4
 wMewEventBit5               ; df38 ; bit 5
+wFirstExpAllMessageBit6     ; df38 ; bit 6
     ds 1
 
 wFlagListMenuSpc: ; df39 ; Denim
