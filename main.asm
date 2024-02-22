@@ -22969,7 +22969,7 @@ ItemUsePtrTable: ; d5e1 (3:55e1)
     dw UnusableItem      ; SILPH_SCOPE
     dw ItemUsePokeflute  ; POKE_FLUTE
     dw UnusableItem      ; LIFT_KEY
-    dw UnusableItem      ; EXP__ALL
+    dw UnusableItem      ; FOCUS
     dw ItemUseOldRod     ; OLD_ROD
     dw ItemUseGoodRod    ; GOOD_ROD
     dw ItemUseSuperRod   ; SUPER_ROD
@@ -25479,7 +25479,7 @@ KeyItemBitfield: ; e799 (3:6799)
     db %00000000
     db %11000000
     db %11110000
-    db %00111011
+    db %00111111
     db %00000000
 
 SendNewMonToBox: ; e7a4 (3:67a4)
@@ -50605,29 +50605,35 @@ FaintEnemyPokemon ; 0x3c567
     call SaveScreenTilesToBuffer1
     xor a
     ld [$cf0b],a
-    ;ld b,EXP__ALL
-    ;call IsItemInBag
-    ;jr z,.pre_no_exp_all
-    call CheckIfAllFought
-    jr nz,.exp_all
-.pre_no_exp_all
-    push af
-    jr .no_exp_all
-.exp_all
-    push af
+    call IsFocusInBagOrAllFought
+    push af    
+    jr c,.focus
     ld hl,ModulateExpForMonsThatFought
     ld b,BANK(ModulateExpForMonsThatFought)
     call Bankswitch
-.no_exp_all
+.focus
     xor a
     call GainExperience_
     pop af
-    ret z
+    ret c ; end if focus
     ld hl,ModulateExpForMonsThatNotFought
     ld b,BANK(ModulateExpForMonsThatNotFought)
     call Bankswitch
     ld a,$1
     jp GainExperience_
+
+; Set Carry Flag if Focus in Bag or All Pkmn Fought
+IsFocusInBagOrAllFought:
+    ld b,FOCUS
+    call IsItemInBag ; set z if item isn't in player's bag
+    jr nz,.focus
+    call CheckIfAllFought ; set z if all Pkmn Fought
+    jr z,.focus
+    xor a ; Reset Carry Flag
+    ret
+.focus
+    scf ; Set Carry Flag
+    ret
 
 CheckIfAllFought:
     ld hl,DefineMonLiveFlag
@@ -70421,9 +70427,9 @@ Route15GateUpstairsText1: ; 49651 (12:5651)
     ld a,[$d7dd]
     bit 0,a
     jr nz,.asm_49683 ; 0x49657 $2a
-    ld a,$32
+    ld a,50
     ld [$ff00+$db],a
-    ld a,$4b
+    ld a,FOCUS
     ld [$ff00+$dc],a
     ld [$d11e],a
     call GetItemName
@@ -117043,19 +117049,34 @@ _Route15GateText1: ; 8cb73 (23:4b73)
     db "PROF.OAK's AIDE",$4f
     db "came by here.",$57
 
+;_UnnamedText_4968c: ; 8cbac (23:4bac)
+;    db $0,"EXP.ALL gives",$4f
+;    db "EXP points to all",$55
+;    db "the #MON with",$55
+;    db "you,even if they",$55
+;    db "don't fight.",$51
+;    db "It does,however,",$4f
+;    db "reduce the amount",$55
+;    db "of EXP for each",$55
+;    db "#MON.",$51
+;    db "If you don't need",$4f
+;    db "it,you should ",$55
+;    db "store it via PC.",$57
+
 _UnnamedText_4968c: ; 8cbac (23:4bac)
-    db $0,"EXP.ALL gives",$4f
-    db "EXP points to all",$55
-    db "the #MON with",$55
-    db "you,even if they",$55
-    db "don't fight.",$51
-    db "It does,however,",$4f
-    db "reduce the amount",$55
-    db "of EXP for each",$55
+    db $0,"FOCUS gives",$4f
+    db "EXP points only to",$55
+    db "#MON that",$55
+    db "has fought!",$51
+    db "It does,therefore,",$4f
+    db "raises the amount",$55
+    db "of EXP for those",$55
     db "#MON.",$51
     db "If you don't need",$4f
     db "it,you should ",$55
     db "store it via PC.",$57
+
+SECTION "_UnnamedText_49698",ROMX[$4c65],BANK[$23] 
 
 _UnnamedText_49698: ; 8cc65 (23:4c65)
     db $0,"Looked into the",$4f
@@ -120305,8 +120326,8 @@ _UnnamedText_4421a: ; 9596d (25:596d)
     db $0,"You finally got at",$4f
     db "least 50 species!",$55
     db "Be sure to get",$55
-    db "EXP.ALL from my",$55
-    db "AIDE!",$57
+    db "FOCUS from my",$55
+    db "AIDE!  ",$57
 
 _UnnamedText_4421f: ; 959b8 (25:59b8)
     db $0,"Ho! This is geting",$4f
@@ -127182,7 +127203,7 @@ ItemNames: ; 472b (1:472b)
     db "SILPH SCOPE@"  ; $48
     db "POKé FLUTE@"   ; $49
     db "LIFT KEY@"     ; $4A
-    db "EXP.ALL@"      ; $4B
+    db "FOCUS@"        ; $4B
     db "OLD ROD@"      ; $4C
     db "GOOD ROD@"     ; $4D
     db "SUPER ROD@"    ; $4E
