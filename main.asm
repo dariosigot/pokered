@@ -25768,7 +25768,7 @@ DrawBadges: ; ea03 (3:6a03)
 
 ; Draw two rows of badges.
     ld hl,$cd3d
-    ld a,$d8 ; [1]
+    ld a,$7f ; Blank (No Badge Number) ; ld a,$d8 ; [1]
     ld [hli],a
     ld [hl],$60 ; First name
 
@@ -25794,7 +25794,7 @@ DrawBadges: ; ea03 (3:6a03)
 ; Badge no.
     ld a,[$cd3d]
     ld [hli],a
-    inc a
+    nop ; inc a ; Blank (No Badge Number)
     ld [$cd3d],a
 
 ; Names aren't printed if the badge is owned.
@@ -28773,6 +28773,11 @@ PrintStat
     add hl,de
     ret
 
+GetMaxLevelBank4:
+    ld hl,GetMaxLevel
+    ld b,BANK(GetMaxLevel)
+    jp Bankswitch ; d = Max Level
+
 SECTION "StatsText",ROMX[$6b3a],BANK[$4]
 
 StatsText: ; 12b3a (4:6b3a)
@@ -29948,20 +29953,20 @@ DrawTrainerInfo: ; 1349a (4:749a)
     dec a
     ld [hli],a
     ld [hl],3
-    FuncCoord 1,10
-    ld hl,Coord
-    call TrainerInfo_DrawTextBox
-    FuncCoord 0,10
-    ld hl,Coord
-    ld a,$d7
-    call TrainerInfo_DrawVerticalLine
-    FuncCoord 19,10
-    ld hl,Coord
-    call TrainerInfo_DrawVerticalLine
-    FuncCoord 6,9
-    ld hl,Coord
-    ld de,TrainerInfo_BadgesText
-    call PlaceString
+    ;FuncCoord 1,10
+    ;ld hl,Coord
+    ;call TrainerInfo_DrawTextBox
+    ;FuncCoord 0,10
+    ;ld hl,Coord
+    ;ld a,$d7
+    ;call TrainerInfo_DrawVerticalLine
+    ;FuncCoord 19,10
+    ;ld hl,Coord
+    ;call TrainerInfo_DrawVerticalLine
+    ;FuncCoord 6,9
+    ;ld hl,Coord
+    ;ld de,TrainerInfo_BadgesText
+    ;call PlaceString
     FuncCoord 2,2
     ld hl,Coord
     ld de,TrainerInfo_NameMoneyTimeText
@@ -29984,6 +29989,24 @@ DrawTrainerInfo: ; 1349a (4:749a)
     inc hl
     ld de,$da43 ; minutes
     ld bc,$8102
+    call PrintNumber
+    ;##############################
+    ;Hall of FAME : TODO
+    ;FuncCoord 12,8
+    ;ld hl,Coord
+    ;ld de,$d5a2 ; hall of fame
+    ;ld c,3
+    ;ld b,%00000001
+    ;call PrintNumber
+    ;##############################
+    call GetMaxLevelBank4
+    ld a,d
+    ld de,wMaxLevel
+    ld [de],a
+    FuncCoord 12,8
+    ld hl,Coord
+    ld c,3
+    ld b,%00000001
     jp PrintNumber
 
 TrainerInfo_FarCopyData: ; 1357f (4:757f)
@@ -29993,14 +30016,18 @@ TrainerInfo_FarCopyData: ; 1357f (4:757f)
 TrainerInfo_NameMoneyTimeText: ; 13584 (4:7584)
     db "NAME/",$4E
     db "MONEY/",$4E
-    db "TIME/@"
+    db "TIME/",$4E
+    db "MAX LEVEL/",$4E
+    db "BADGES/@"
 
 ; $76 is a circle tile
-TrainerInfo_BadgesText: ; 13597 (4:7597)
-    db $76,"BADGES",$76,"@"
+;TrainerInfo_BadgesText: ; 13597 (4:7597)
+;    db $76,"BADGES",$76,"@"
+
+SECTION "TrainerInfo_DrawTextBox",ROMX[$75a0],BANK[$4]
 
 ; draws a text box on the trainer info screen
-; height is always 6
+; height is always 16
 ; INPUT:
 ; hl = destination address
 ; [$cd3d] = width + 1
@@ -30014,7 +30041,7 @@ TrainerInfo_DrawTextBox: ; 135a0 (4:75a0)
     ld a,[$cd3d] ; width of the text box plus one
     ld e,a
     ld d,0
-    ld c,6 ; height of the text box
+    ld c,16 ; height of the text box
 .loop
     ld [hl],$7c ; left edge tile ID
     add hl,de

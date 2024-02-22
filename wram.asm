@@ -1539,6 +1539,7 @@ wFlagPlaceTitleScreen ; df36 ; counter for title screen
 wDVForShinyAtkDef     ; df36
     ds 1
 
+wMaxLevel              ; df37
 wChoicePkmnMoveDeleter ; df37
 wDVForShinySpdSpc      ; df37
     ds 1
