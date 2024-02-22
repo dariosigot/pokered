@@ -59654,7 +59654,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     call GetMonHeader ; load pokemon picture location
     FuncCoord 1,1
     ld hl,Coord
-    call LoadFlippedFrontSpriteByMonIndex ; draw pokemon picture
+    call LoadMonSpritePokedexWithDebug ; call LoadFlippedFrontSpriteByMonIndex ; draw pokemon picture
     ld a,[$cf91]
     call PlayCry ; play pokemon cry
     pop hl
@@ -62575,6 +62575,24 @@ StoreTradeRightToLeftPkmnIdAndInitGameboyTransferGfx:
     ld [hl],a ; wSpriteOAMBySpeciesId
     pop hl
     jp Trade_InitGameboyTransferGfx
+
+LoadMonSpritePokedexWithDebug:
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 3,a ; was the start button pressed?
+    jp z,LoadFlippedFrontSpriteByMonIndex ; draw pokemon picture
+    push hl
+    call LoadMonBackSpritePokedex
+    pop hl
+    ld a,$1
+    jp Predef ; indirect jump to Func_3f0c6 (3f0c6 (f:70c6))
+
+LoadMonBackSpritePokedex:
+    ld hl,W_MONHBACKSPRITE - W_MONHEADER
+    call UncompressMonSprite
+    ld a,$66 ; BackSprite dimension
+    ld de,$9000
+    push de
+    jp HackBackSprite
 
 SECTION "bank11",ROMX,BANK[$11]
 
@@ -96487,7 +96505,7 @@ GetPokedexPaletteID: ; 71e82 (1c:5e82)
     ld bc,$10
     call CopyData
     ld a,[$cf91]
-    call DeterminePaletteID
+    call DeterminePaletteIDWithShinyDebug ; call DeterminePaletteID
     call PaletteHackTwoBytes2 ; Denim ; ld hl,$cf30
     nop               ; ...   ; ld [hl],a
     ld hl,$cf2d
@@ -98733,6 +98751,18 @@ FlyingCitySortOrder:
     db FUCHSIA_CITY
     db CINNABAR_ISLAND
     db INDIGO_PLATEAU
+
+DeterminePaletteIDWithShinyDebug:
+    push af
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 2,a ; was the select button pressed?
+    jr z,.Done
+    ld a,[wFlagShinyBit2]
+    set 2,a
+    ld [wFlagShinyBit2],a
+.Done
+    pop af
+    jp DeterminePaletteID
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
