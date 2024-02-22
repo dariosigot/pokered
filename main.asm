@@ -76969,11 +76969,10 @@ GainExperience: ; 5524f (15:524f)
 .statExpDone
     call CheckReachLevelLimit
     jp nc,.nextMon
-    ds 2
-    ;ds 1 ; xor a
-    ;ds 2 ; ld [H_NUMTOPRINT],a ; $FF00+$96 (aliases: H_MULTIPLICAND)
-    ;ds 2 ; ld [$FF00+$97],a
-    ;ds 3 ; ld a,[$d008]
+    ; xor a
+    ; ld [H_NUMTOPRINT],a ; $FF00+$96 (aliases: H_MULTIPLICAND)
+    ; ld [$FF00+$97],a
+    ; ld a,[$d008]
     ld [$FF00+$98],a
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld [H_REMAINDER],a ; $FF00+$99 (aliases: H_DIVISOR,H_MULTIPLIER,H_POWEROFTEN)
@@ -76984,27 +76983,29 @@ GainExperience: ; 5524f (15:524f)
     call Divide
     ld hl,$fff2
     add hl,de
-    ld b,[hl]
+    ;ld b,[hl]
     inc hl
-    ld a,[wPlayerID] ; $d359
-    cp b
-    jr nz,.asm_552d1
-    ld b,[hl]
-    ld a,[wPlayerID + 1] ; $d35a
-    cp b
+    ;ld a,[wPlayerID] ; $d359
+    ;cp b
+    ;jr nz,.tradedMon
+    ;ld b,[hl]
+    ;ld a,[wPlayerID + 1] ; $d35a
+    ;cp b
     ld a,$0
-    jr z,.asm_552d6
-.asm_552d1
-    call Func_5549f
-    ld a,$1
+    ;jr z,.asm_552d6
+.tradedMon
+    ;call BoostExp ; Denim : Delete boost exp if traded
+    ;ld a,$1
 .asm_552d6
     ld [$cf4d],a
     ld a,[W_ISINBATTLE] ; $d057
-    dec a
-    call nz,Func_5549f
+    dec a ; is it a trainer battle?
+    call nz,BoostExp ; if so, boost exp
     inc hl
     inc hl
     inc hl
+    call IsCurrentMonBattleMon ; Boost if Current Active Mon
+    call z,BoostExpALittle
 ; add the gained exp to the party mon's exp
     ld b,[hl]
     ld a,[$FF00+$98]
@@ -77065,7 +77066,7 @@ GainExperience: ; 5524f (15:524f)
     ld hl,W_PARTYMON1NAME ; $d2b5
     call GetPartyMonName
     call GetExperienceTextPointerAndPrintText ; ld hl,UnnamedText_554b2 ; $54b2
-    ds 3 ; call PrintText
+    ; call PrintText
     xor a
     ld [$cc49],a
     call AnimateEXPBar ; Denim,ExpBar ; call LoadMonData
@@ -77220,9 +77221,31 @@ GainExperience: ; 5524f (15:524f)
     ld a,$10
     jp Predef ; indirect jump to HandleBitArray (f666 (3:7666))
 
-SECTION "Func_5549f",ROMX[$549f],BANK[$15]
+; add 1/16 exp to exp
+BoostExpALittle:
+    ld a,[$FF00+$97]
+    ld b,a
+    ld a,[$FF00+$98]
+    ld c,a
+    srl b
+    rr c
+    srl b
+    rr c
+    srl b
+    rr c
+    srl b
+    rr c
+    add c
+    ld [$FF00+$98],a
+    ld a,[$FF00+$97]
+    adc b
+    ld [$FF00+$97],a
+    ret
 
-Func_5549f: ; 5549f (15:549f)
+SECTION "BoostExp",ROMX[$549f],BANK[$15]
+
+; multiplies exp by 1.5
+BoostExp: ; 5549f (15:549f)
     ld a,[$FF00+$97]
     ld b,a
     ld a,[$FF00+$98]
@@ -80764,6 +80787,13 @@ SetFirstExpAllMessage:
     ld a,[$cc5b]
     and a
     ret z
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 2,a ; was the select button pressed?
+    jr z,.NotSelect
+    xor a
+    ld [$cc5b],a ; If Select FORCE All Details
+    ret
+.NotSelect
     ld a,[wFirstExpAllMessageBit6]
     set 6,a
     ld [wFirstExpAllMessageBit6],a
