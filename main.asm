@@ -96487,7 +96487,7 @@ GetPokedexPaletteID: ; 71e82 (1c:5e82)
     ld bc,$10
     call CopyData
     ld a,[$cf91]
-    call DeterminePaletteID
+    call DeterminePaletteIDWithShinyDebug ; call DeterminePaletteID
     call PaletteHackTwoBytes2 ; Denim ; ld hl,$cf30
     nop               ; ...   ; ld [hl],a
     ld hl,$cf2d
@@ -98733,6 +98733,18 @@ FlyingCitySortOrder:
     db FUCHSIA_CITY
     db CINNABAR_ISLAND
     db INDIGO_PLATEAU
+
+DeterminePaletteIDWithShinyDebug:
+    push af
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 2,a ; was the select button pressed?
+    jr z,.Done
+    ld a,[wFlagShinyBit2]
+    set 2,a
+    ld [wFlagShinyBit2],a
+.Done
+    pop af
+    jp DeterminePaletteID
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
