@@ -59654,7 +59654,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     call GetMonHeader ; load pokemon picture location
     FuncCoord 1,1
     ld hl,Coord
-    call LoadFlippedFrontSpriteByMonIndex ; draw pokemon picture
+    call LoadMonSpritePokedexWithDebug ; call LoadFlippedFrontSpriteByMonIndex ; draw pokemon picture
     ld a,[$cf91]
     call PlayCry ; play pokemon cry
     pop hl
@@ -62575,6 +62575,24 @@ StoreTradeRightToLeftPkmnIdAndInitGameboyTransferGfx:
     ld [hl],a ; wSpriteOAMBySpeciesId
     pop hl
     jp Trade_InitGameboyTransferGfx
+
+LoadMonSpritePokedexWithDebug:
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 3,a ; was the start button pressed?
+    jp z,LoadFlippedFrontSpriteByMonIndex ; draw pokemon picture
+    push hl
+    call LoadMonBackSpritePokedex
+    pop hl
+    ld a,$1
+    jp Predef ; indirect jump to Func_3f0c6 (3f0c6 (f:70c6))
+
+LoadMonBackSpritePokedex:
+    ld hl,W_MONHBACKSPRITE - W_MONHEADER
+    call UncompressMonSprite
+    ld a,$66 ; BackSprite dimension
+    ld de,$9000
+    push de
+    jp HackBackSprite
 
 SECTION "bank11",ROMX,BANK[$11]
 
