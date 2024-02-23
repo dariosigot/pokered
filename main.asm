@@ -48906,10 +48906,8 @@ LearnMoveFromLevelUp:
     ld [$d11e],a
     ret
 .mew
-    call GenRandom
-    cp STRUGGLE ; C - Set for no borrow. (Set if A < n.)
-    jr c,.learnmove
-    jr .mew
+    call TryRandomForMew
+    jr .learnmove ; learn mew new move
 
 Func_3bb8c: ; Moved in the Bank
     ld hl,Func_3fb53 ; $7b53
@@ -49809,6 +49807,28 @@ GoPalSetAfterAIItemUser: ; to avoid bad color after enemy item use
     ld b,BANK(DrawEnemyHUDAndHPBar)
     ld hl,DrawEnemyHUDAndHPBar
     jp Bankswitch
+
+TryRandomForMew:
+    call GenRandom
+    cp STRUGGLE ; C - Set for no borrow. (Set if A < n.)
+    jr z,TryRandomForMew ; no id = 0
+    jr c,.TestMewJustKnow
+    jr TryRandomForMew
+.TestMewJustKnow
+    ld d,a
+    ld hl,W_PARTYMON1_MOVE1 ; $d173
+    ld a,[wWhichPokemon] ; $cf92
+    ld bc,$2c
+    call AddNTimes
+    ld b,4
+.checkCurrentMovesLoop2
+    ld a,[hli]
+    cp d
+    jr z,TryRandomForMew ; if mew just know the move
+    dec b
+    jr nz,.checkCurrentMovesLoop2
+    ld a,d
+    ret
 
 INCLUDE "constants/pokemon_learnset.asm"
 
