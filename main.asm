@@ -10475,7 +10475,7 @@ GoPAL_SET: ; 3def (0:3def)
     ld a,$45
     jp DelayAndPredef ; Denim ; jp Predef
 
-Func_3df9: ; 3df9 (0:3df9)
+GetHealthBarColor: ; 3df9 (0:3df9)
     ld a,e
     cp $1b
     ld d,$0
@@ -17838,9 +17838,9 @@ Func_7861: ; 7861 (1:7861)
     ld a,$48
     call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
     ld a,$0
-    call Predef ; indirect jump to Func_3cd60 (3cd60 (f:4d60))
+    call Predef ; indirect jump to DrawPlayerHUDAndHPBar (3cd60 (f:4d60))
     ld a,$49
-    call Predef ; indirect jump to Func_3cdec (3cdec (f:4dec))
+    call Predef ; indirect jump to DrawEnemyHUDAndHPBar (3cdec (f:4dec))
     ld hl,ReadPlayerMonCurHPAndStatus
     ld b,BANK(ReadPlayerMonCurHPAndStatus)
     call Bankswitch ; indirect jump to ReadPlayerMonCurHPAndStatus (3cd43 (f:4d43))
@@ -28595,7 +28595,7 @@ StatusScreen: ; 12953 (4:6953)
     ld hl,Coord
     PREDEF DrawHPBarPredef ; predef $5f
     ld hl,$cf25
-    call Func_3df9
+    call GetHealthBarColor
     ld b,$3
     call GoPAL_SET ; SGB palette
     FuncCoord 11,9 ; Denim ; FuncCoord 16,6
@@ -29316,7 +29316,7 @@ Func_12ec7: ; 12ec7 (4:6ec7) ; TODO : viene richiamata 6 volte GoPAL_SET durante
     ld c,a
     ld b,$0
     add hl,bc
-    call Func_3df9
+    call GetHealthBarColor
     ld b,$fc
     call GoPAL_SET
     ld hl,$cf2d
@@ -48450,7 +48450,7 @@ Func_3a718: ; 3a718 (e:6718)
     xor a
     ld [$CF94],a
     ld a,$48
-    call Predef
+    call GoPalSetAfterAIItemUser ; call Predef
     jp DecrementAICount
 
 AISwitchIfEnoughMons: ; 3a72a (e:672a)
@@ -49795,6 +49795,12 @@ Func_3aef7: ; Moved in the Bank
     pop de
     jp CopyData
 
+GoPalSetAfterAIItemUser: ; to avoid bad color after enemy item use
+    call Predef
+    ld b,BANK(DrawEnemyHUDAndHPBar)
+    ld hl,DrawEnemyHUDAndHPBar
+    jp Bankswitch
+
 INCLUDE "constants/pokemon_learnset.asm"
 
 SECTION "bankF",ROMX,BANK[$F]
@@ -50529,7 +50535,7 @@ HandleEnemyMonFainted: ; 3c525 (f:4525)
     ld hl,W_PLAYERMONCURHP ; $d015
     ld a,[hli]
     or [hl]
-    call nz,Func_3cd60
+    call nz,DrawPlayerHUDAndHPBar
     ld a,[W_ISINBATTLE] ; $d057
     dec a
     ret z
@@ -50694,7 +50700,7 @@ Func_3c64f: ; 3c64f (f:464f)
 Func_3c664: ; 3c664 (f:4664)
     ld hl,$cf1e
     ld e,$30
-    call Func_3ce90
+    call GetBattleHealthBarColor
     ld hl,DrawEnemyPokeballs
     ld b,BANK(DrawEnemyPokeballs)
     call Bankswitch ; indirect jump to Func_3a857 (3a857 (e:6857))
@@ -51217,7 +51223,7 @@ Func_3c92a: ; 3c92a (f:492a)
     call Predef
     ld a,[W_ENEMYMONID]
     call PlayCry
-    call Func_3cdec
+    call DrawEnemyHUDAndHPBar
     ld a,[$CC26]
     and a
     ret nz
@@ -51504,10 +51510,10 @@ Func_3cc91: ; 3cc91 (f:4c91)
     ld a,[hli]
     or [hl]
     jp z,Func_3cca4
-    call Func_3cdec
+    call DrawEnemyHUDAndHPBar
 
 Func_3cca4: ; 3cca4 (f:4ca4)
-    call Func_3cd60
+    call DrawPlayerHUDAndHPBar
     ld a,$4
     call Predef ; indirect jump to LoadMonBackSprite (3f103 (f:7103))
     xor a
@@ -51597,10 +51603,10 @@ ReadPlayerMonCurHPAndStatus: ; 3cd43 (f:4d43)
     jp CopyData
 
 DrawHUDsAndHPBars: ; 3cd5a (f:4d5a)
-    call Func_3cd60
-    jp Func_3cdec
+    call DrawPlayerHUDAndHPBar
+    jp DrawEnemyHUDAndHPBar
 
-Func_3cd60: ; 3cd60 (f:4d60)
+DrawPlayerHUDAndHPBar: ; 3cd60 (f:4d60)
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     FuncCoord 9,7 ; $c435
@@ -51647,7 +51653,7 @@ Func_3cd60: ; 3cd60 (f:4d60)
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld hl,$cf1d
-    call Func_3ce90_PlusFlag ; Denim,funzione per deflaggare questo istante di chiamata ; call Func_3ce90
+    call GetBattleHealthBarColor_PlusFlag ; Denim,funzione per deflaggare questo istante di chiamata ; call GetBattleHealthBarColor
     ld hl,W_PLAYERMONCURHP ; $d015
     ld a,[hli]
     or [hl]
@@ -51671,7 +51677,7 @@ Func_3cd60: ; 3cd60 (f:4d60)
     set 7,[hl]
     ret
 
-Func_3cdec: ; 3cdec (f:4dec)
+DrawEnemyHUDAndHPBar: ; 3cdec (f:4dec)
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld hl,wTileMap
@@ -51763,9 +51769,9 @@ Func_3ce7f: ; 3ce7f (f:4e7f)
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld hl,$cf1e
 
-Func_3ce90: ; 3ce90 (f:4e90)
+GetBattleHealthBarColor: ; 3ce90 (f:4e90)
     ld b,[hl]
-    call Func_3df9
+    call GetHealthBarColor
     ld a,[hl]
     cp b
     ret z
@@ -52982,7 +52988,7 @@ asm_3d71e
     ld a,[W_PLAYERMOVENUM]
     call PlayMoveAnimation
     call Func_3eed3
-    call Func_3cd60
+    call DrawPlayerHUDAndHPBar
     ld a,[W_PLAYERBATTSTATUS2]
     bit 4,a
     ld hl,Func_79771
@@ -53499,7 +53505,7 @@ Func_3daad: ; 3daad (f:5aad)
     inc a
     ld [H_WHOSETURN],a ; $FF00+$f3
     call PlayMoveAnimation
-    call Func_3cd60
+    call DrawPlayerHUDAndHPBar
     xor a
     ld [H_WHOSETURN],a ; $FF00+$f3
     jp ApplyDamageToPlayerPokemon
@@ -55463,7 +55469,7 @@ asm_3e7a4: ; 3e7a4 (f:67a4)
     ld a,[W_ENEMYMOVENUM] ; $cfcc
     call PlayMoveAnimation
     call Func_3eed3
-    call Func_3cdec
+    call DrawEnemyHUDAndHPBar
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
     bit 4,a
     ld hl,Func_79771
@@ -56635,7 +56641,7 @@ Func_3efeb: ; 3efeb (f:6feb)
     call CleanLCD_OAM
     ld a,[W_ISINBATTLE] ; $d057
     dec a
-    call z,Func_3cdec
+    call z,DrawEnemyHUDAndHPBar
     call StartBattle
     ld hl,Func_137aa
     ld b,BANK(Func_137aa)
@@ -58741,12 +58747,12 @@ GoPAL_SET_PlusFlagAndRedBall: ; xxxxx (f:xxxx) ; Denim,funzione per flaggare que
     ld [hl],a
     ret
 
-Func_3ce90_PlusFlag: ; xxxxx (f:xxxx) ; Denim,funzione per deflaggare questo istante di chiamata
+GetBattleHealthBarColor_PlusFlag: ; xxxxx (f:xxxx) ; Denim,funzione per deflaggare questo istante di chiamata
     push hl
     ld hl,wFlagBackSpritePlayerBit4
     res 4,[hl]
     pop hl
-    jp Func_3ce90
+    jp GetBattleHealthBarColor
 
 HackRemoveCancelFromBattle: ; Eliminato "CANCEL" da Party in Battle
     dec a
@@ -72169,7 +72175,7 @@ GetPredefPointer: ; 4fe49 (13:7e49)
 PredefPointers: ; 4fe79 (13:7e79)
 ; these are pointers to ASM routines.
 ; they appear to be used in overworld map scripts.
-    dbw BANK(Func_3cd60),Func_3cd60
+    dbw BANK(DrawPlayerHUDAndHPBar),DrawPlayerHUDAndHPBar
     dbw BANK(Func_3f0c6),Func_3f0c6
     dbw BANK(Func_3f073),Func_3f073
     dbw BANK(ScaleSpriteByTwo),ScaleSpriteByTwo
@@ -72257,7 +72263,7 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     db BANK(_AddPokemonToParty)
     dw _AddPokemonToParty
     dbw BANK(UpdateHPBar),UpdateHPBar
-    dbw BANK(Func_3cdec),Func_3cdec
+    dbw BANK(DrawEnemyHUDAndHPBar),DrawEnemyHUDAndHPBar
     dbw BANK(Func_70f60),Func_70f60
     dbw BANK(Func_27d6b),Func_27d6b
     dbw BANK(Func_17c47),Func_17c47; 4C player exclamation
@@ -77205,9 +77211,9 @@ GainExperience: ; 5524f (15:524f)
     ld hl,Func_3ee19
     ld b,BANK(Func_3ee19)
     call Bankswitch ; indirect jump to Func_3ee19 (3ee19 (f:6e19))
-    ld hl,Func_3cd60
-    ld b,BANK(Func_3cd60)
-    call Bankswitch ; indirect jump to Func_3cd60 (3cd60 (f:4d60))
+    ld hl,DrawPlayerHUDAndHPBar
+    ld b,BANK(DrawPlayerHUDAndHPBar)
+    call Bankswitch ; indirect jump to DrawPlayerHUDAndHPBar (3cd60 (f:4d60))
     ld hl,Func_3ee94
     ld b,BANK(Func_3ee94)
     call Bankswitch ; indirect jump to Func_3ee94 (3ee94 (f:6e94))
