@@ -77160,7 +77160,9 @@ GainExperience: ; 5524f (15:524f)
     ld hl,Func_58f43
     call Bankswitch ; indirect jump to Func_58f43 (58f43 (16:4f43))
     pop hl
-    ld a,[hl]
+    ld a,[hl] ; current level
+    ld [$cd46],a ; ($cd46 = wTempCoins1) joenote - fixing skip move-learn glitch: need to store the current level in wram
+    ;wTempCoins1 was chosen because it's used only for slot machine and gets defaulted to 1 during the mini-game
     cp d
     jp z,.nextMon
     call KeepEXPBarFull ; Denim,ExpBar ; ld a,[W_CURENEMYLVL] ; $d127
@@ -77264,7 +77266,7 @@ GainExperience: ; 5524f (15:524f)
     ld a,[$d0b5]
     ld [$d11e],a
     ld a,$1a
-    call Predef ; indirect jump to LearnMoveFromLevelUp (3af5b (e:6f5b))
+    call LevelByLevelFix ; call Predef ; indirect jump to LearnMoveFromLevelUp (3af5b (e:6f5b))
     ld hl,$ccd3
     ld a,[wWhichPokemon] ; $cf92
     ld c,a
@@ -80994,6 +80996,27 @@ CheckReachLevelLimit:
     ld [$FF00+$97],a
     ld a,[$d008]
     scf ; Set Carry Flag
+    ret
+
+LevelByLevelFix:
+    ;;;;;;;;;;;;;;;;;;;;
+    ;joenote - fixing skip move-learn glitch: here is where moves are learned from level-up, but it needs some changes
+    ld a,[W_CURENEMYLVL]    ; load the level to advance to into a. this starts out as the final level.
+    ld c,a    ; load the final level to grow to over to c
+    ld a,[$cd46]    ; load the current level into a ($cd46 = wTempCoins1)
+    ld b,a    ; load the current level over to b
+.inc_level    ; marker for looping back 
+    inc b    ;increment     the current level
+    ld a,b    ;put the current level in a
+    ld [W_CURENEMYLVL],a    ;and reset the level to advance to as merely 1 higher
+    push bc    ;save b & c on the stack as they hold the current a true final level
+    ld a,$1a
+    call Predef ; indirect jump to LearnMoveFromLevelUp (3af5b (e:6f5b))
+    pop bc    ;get the current and final level values back from the stack
+    ld a,b    ;load the current level into a
+    cp c    ;compare it with the final level
+    jr nz,.inc_level    ;loop back again if final level has not been reached
+    ;;;;;;;;;;;;;;;;;;;;
     ret
 
 SECTION "bank16",ROMX,BANK[$16]
