@@ -52324,7 +52324,7 @@ MoveSelectionMenu: ; 3d219 (f:5219)
     jr z,.selectedmoveknown
     ld a,$1
     jr nc,.selectedmoveknown
-    xor a ; Reset Menù Index ; ld a,[wPlayerMoveListIndex] ; $cc2e
+    ld a,[wPlayerMoveListIndex] ; $cc2e
     inc a
 .selectedmoveknown
     ld [hli],a ; wCurrentMenuItem
@@ -52383,7 +52383,7 @@ SelectMenuItem: ; 3d2fe (f:52fe)
     dec a
     ld bc,$14
     call AddNTimes
-    ld [hl],$ec
+    ld [hl],$ec ; "▷"
 .select
     ld hl,$fff6
     set 1,[hl]
@@ -52590,7 +52590,7 @@ SwapMovesInMenu: ; 3d435 (f:5435)
     call Func_3d493
     xor a
     ld [$cc35],a
-    jp MoveSelectionMenu
+    jp AlignIndexMenu ; jp MoveSelectionMenu
 
 Func_3d493: ; 3d493 (f:5493)
     push hl
@@ -52616,7 +52616,7 @@ Func_3d493: ; 3d493 (f:5493)
 asm_3d4ad: ; 3d4ad (f:54ad)
     ld a,[wCurrentMenuItem] ; $cc26
     ld [$cc35],a
-    jp MoveSelectionMenu
+    jp AlignIndexMenu ; jp MoveSelectionMenu
 
 PrintMenuItem: ; 3d4b6 (f:54b6)
     ld a,[wDebugEnemyMoveBit7]
@@ -52721,7 +52721,7 @@ CheckTransformed:
     bit 3,a
     jr z,.NotTransformed
     pop af ; Delete Return pointer
-    jp MoveSelectionMenu
+    jp SelectMenuItem
 .NotTransformed
     ld a,[$cc35]
     ret
@@ -53737,7 +53737,9 @@ Func_3dc88: ; 3dc88 (f:5c88)
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jp z,Obey
-    call GetMaxLevel
+    ld b,BANK(GetMaxLevel)
+    ld hl,GetMaxLevel
+    call Bankswitch
     ld b,d
     ld c,d
     ld a,[W_PLAYERMONLEVEL] ; $d022
@@ -53878,28 +53880,6 @@ Func_3ddb4: ; 3ddb4 (f:5db4)
     xor a
     ret
 
-GetMaxLevel:
-    ld a,[$d5a2] ; hall of fame
-    ld d,100
-    and a
-    ret nz
-    ld a,[W_OBTAINEDBADGES]
-    ld d,20
-.LoopBit
-    and a
-    jr z,.End
-    srl a ; Shift right into Carry. MSB set to 0. C - Contains old bit 0 data.
-    jr nc,.NotFlagged
-    ld c,5
-.LoopInc
-    inc d
-    dec c
-    jr nz,.LoopInc
-.NotFlagged
-    jr .LoopBit
-.End
-    ret
-
 EnemyMonFainted: ; 0x3c63e ; Moved in the Bank
     TX_FAR _EnemyMonFainted
     db "@"
@@ -53915,6 +53895,17 @@ Func_3c643: ; 3c643 (f:4643) ; Moved in the Bank
 MimicMenuPalFix:
     ld b,BANK(MimicMenuPalFix_)
     ld hl,MimicMenuPalFix_
+    jp Bankswitch
+
+AlignIndexMenu:
+    ld a,[wCurrentMenuItem] ; $cc26
+    dec a
+    ld [wPlayerMoveListIndex],a ; $cc2e
+    jp MoveSelectionMenu
+
+WaitButtonPressed:
+    ld b,BANK(WaitButtonPressed_)
+    ld hl,WaitButtonPressed_
     jp Bankswitch
 
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
@@ -55120,10 +55111,10 @@ ResetBattleFlagAndLoadCurrentOpponent:
     ret
 
 HandleMenuInputLockedDuringDebugEnemyMove:
-    call HandleMenuInput
     ld hl,wDebugEnemyMoveBit7
     bit 7,[hl]
-    ret z ; No Lock
+    jp z,HandleMenuInput ; No Lock
+    call WaitButtonPressed
     ld a,%0000010 ; Emulate B press to Close Debug Enemy Move Menù
     ret
 
@@ -129965,6 +129956,35 @@ MimicMenuPalFix_:
     ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
     ld hl,HidePlayerBattleHudAndStandarizePalette
     jp Bankswitch
+
+GetMaxLevel:
+    ld a,[$d5a2] ; hall of fame
+    ld d,100
+    and a
+    ret nz
+    ld a,[W_OBTAINEDBADGES]
+    ld d,20
+.LoopBit
+    and a
+    jr z,.End
+    srl a ; Shift right into Carry. MSB set to 0. C - Contains old bit 0 data.
+    jr nc,.NotFlagged
+    ld c,5
+.LoopInc
+    inc d
+    dec c
+    jr nz,.LoopInc
+.NotFlagged
+    jr .LoopBit
+.End
+    ret
+
+WaitButtonPressed_:
+    call GetJoypadStateLowSensitivity
+    ld a,[$ffb5]
+    and a ; was a key pressed?
+    jr z,WaitButtonPressed_
+    ret
 
 SECTION "Bank38",ROMX,BANK[$38]
 
