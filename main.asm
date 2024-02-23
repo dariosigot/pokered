@@ -80885,6 +80885,7 @@ DivideExpDataByNumMonsGainingExp: ; Moved in the BANK
     ld b,$2
     call Divide
     ld a,[$FF00+$98]
+    inc a ; Add 1 Point to Limit Approx Error
     ld [hli],a
     dec c
     jr nz,.asm_55488
@@ -129853,6 +129854,7 @@ ModulateExpForMonsThatFought: ; 4/5 TOTAL (80%)
     ld b,4 ; 4 bytes
     call Divide
     ld a,[$FF00+$98]
+    inc a ; Add 1 Point to Limit Approx Error
     ld [hli],a
     dec c
     jr nz,.NextStat
@@ -129874,6 +129876,7 @@ ModulateExpForMonsThatNotFought: ; 4/5 : 4 = 1/5 TOTAL (20%)
     ld b,2 ; 2 bytes
     call Divide
     ld a,[$FF00+$98]
+    inc a ; Add 1 Point to Limit Approx Error
     ld [hli],a
     dec c
     jr nz,.NextStat
