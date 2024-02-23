@@ -16489,7 +16489,7 @@ Func_6f07: ; 6f07 (1:6f07)
     ld bc,$80f
     ld a,$14
     ld [$d125],a
-    call DisplayTextBoxID
+    call NewMoveDetails ; call DisplayTextBoxID
     pop hl
     ld a,[wCurrentMenuItem] ; $cc26
     rra
@@ -18566,6 +18566,33 @@ CheckTransformedDuringLearnMove:
     bit 3,a ; is the mon transformed?
 	jp nz,PrintLearnedMove
     jp UpdateActiveMonMoves
+
+NewMoveDetails:
+    push af
+    push bc
+    push de
+    push hl
+    ld b,BANK(PrintNewLearnMoveDetail)
+    ld hl,PrintNewLearnMoveDetail
+    call Bankswitch
+    pop hl
+    pop de
+    pop bc
+    pop af
+    call DisplayTextBoxID
+    push af
+    push bc
+    push de
+    push hl
+    call LoadScreenTilesFromBuffer1
+    ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
+    ld hl,HidePlayerBattleHudAndStandarizePalette
+    call Bankswitch
+    pop hl
+    pop de
+    pop bc
+    pop af
+    ret
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -130055,6 +130082,44 @@ WaitButtonPressed_:
     ld a,[$ffb5]
     and a ; was a key pressed?
     jr z,WaitButtonPressed_
+    ret
+
+PrintNewLearnMoveDetail:
+    ld a,[W_ISINBATTLE]
+    and a
+    ret z ; not in battle
+
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    push af
+
+    xor a ; player turn
+    ld [H_WHOSETURN],a
+
+    ;xor a
+    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
+    FuncCoord 0,8 ; $c440
+    ld hl,Coord
+    ld b,$3
+    ld c,8
+    call TextBoxBorder
+    
+    ld a,[$d0e0] ; New Move Learned
+    ld [wPlayerSelectedMove],a ; $ccdc
+    
+    ld b,BANK(GetCurrentMoveDetails)
+    ld hl,GetCurrentMoveDetails
+    call Bankswitch
+
+    FuncCoord 1,9
+    ld hl,Coord
+    ld a,$5d
+    call Predef ; indirect jump to Func_27d98 (27d98 (9:7d98))
+    ld a,$1
+    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
+    call Delay3
+
+    pop af
+    ld [H_WHOSETURN],a ; $FF00+$f3
     ret
 
 SECTION "Bank38",ROMX,BANK[$38]
