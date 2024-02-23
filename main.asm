@@ -77067,7 +77067,7 @@ GainExperience: ; 5524f (15:524f)
     inc hl
     inc hl
     call IsCurrentMonBattleMon ; Boost if Current Active Mon
-    call z,BoostExpALittle
+    call z,BoostExpCurrentMon
 ; add the gained exp to the party mon's exp
     ld b,[hl]
     ld a,[$FF00+$98]
@@ -77283,6 +77283,19 @@ GainExperience: ; 5524f (15:524f)
     ld a,$10
     jp Predef ; indirect jump to HandleBitArray (f666 (3:7666))
 
+BoostExpCurrentMon:
+    call TryToBoostUnderLevelled
+    jp BoostExpALittle
+
+TryToBoostUnderLevelled:
+    ld a,[W_PLAYERMONLEVEL]
+	ld b,a
+	ld a,[W_ENEMYMONLEVEL]
+	cp b
+	ret z ; return if enemy lvl = player level
+	ret c ; return if enemy lvl < player level
+    jp BoostExp
+
 ; add 1/16 exp to exp
 BoostExpALittle:
     ld a,[$FF00+$97]
@@ -77297,14 +77310,7 @@ BoostExpALittle:
     rr c
     srl b
     rr c
-    add c
-    ld [$FF00+$98],a
-    ld a,[$FF00+$97]
-    adc b
-    ld [$FF00+$97],a
-    ret
-
-SECTION "BoostExp",ROMX[$549f],BANK[$15]
+    jr BoostCommon
 
 ; multiplies exp by 1.5
 BoostExp: ; 5549f (15:549f)
@@ -77314,12 +77320,19 @@ BoostExp: ; 5549f (15:549f)
     ld c,a
     srl b
     rr c
+BoostCommon:
     add c
     ld [$FF00+$98],a
     ld a,[$FF00+$97]
     adc b
     ld [$FF00+$97],a
+    ret nc ; no overflow
+    ld a,$FF
+    ld [$FF00+$97],a
+    ld [$FF00+$98],a
     ret
+
+SECTION "UnnamedText_554b2",ROMX[$54b2],BANK[$15]
 
 UnnamedText_554b2: ; 554b2 (15:54b2)
     TX_FAR _UnnamedText_554b2
