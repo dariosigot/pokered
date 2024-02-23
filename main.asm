@@ -18448,13 +18448,9 @@ TextBoxCoordTable: ; 7391 (1:7391)
 
 IsTryingToLearnPalFix:
     push hl
-    ld a,[W_ISINBATTLE]
-    and a
-    jr z,.End
     ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
     ld hl,HidePlayerBattleHudAndStandarizePalette
     call Bankswitch
-.End
     pop hl
     jp PrintText
 
@@ -52265,7 +52261,7 @@ MoveSelectionMenu: ; 3d219 (f:5219)
     ret
 
 .regularmenu
-    call Func_3d3f5
+    call AnyMoveToSelect
     ret z
     call DebugMonOrEnemyMoves ; ld hl,W_PLAYERMONMOVES
     call .loadmoves
@@ -52275,12 +52271,12 @@ MoveSelectionMenu: ; 3d219 (f:5219)
     ld c,$e + 4
     di
     call TextBoxBorder
-    FuncCoord 0,12 ; $c494
-    ld hl,Coord
-    ld [hl],$7a
-    FuncCoord 8,12 ; $c49a
-    ld hl,Coord
-    ld [hl],$7e
+    ;FuncCoord 0,12 ; $c494
+    ;ld hl,Coord
+    ;ld [hl],$7a
+    ;FuncCoord 8,12 ; $c49a
+    ;ld hl,Coord
+    ;ld [hl],$7e
     ei
     call WritePPAllMoves ; Denim
     call .writemoves
@@ -52288,6 +52284,7 @@ MoveSelectionMenu: ; 3d219 (f:5219)
     ld a,$c
     jr .menuset
 .mimicmenu
+    call MimicMenuPalFix
     ld hl,W_ENEMYMONMOVES
     call .loadmoves
     FuncCoord 0,7 ; $c42c
@@ -52327,7 +52324,7 @@ MoveSelectionMenu: ; 3d219 (f:5219)
     jr z,.selectedmoveknown
     ld a,$1
     jr nc,.selectedmoveknown
-    ld a,[wPlayerMoveListIndex] ; $cc2e
+    xor a ; Reset Menù Index ; ld a,[wPlayerMoveListIndex] ; $cc2e
     inc a
 .selectedmoveknown
     ld [hli],a ; wCurrentMenuItem
@@ -52362,7 +52359,7 @@ MoveSelectionMenu: ; 3d219 (f:5219)
 .movelistindex1
     ld [hl],a ; wLastMenuItem
 
-Func_3d2fe: ; 3d2fe (f:52fe)
+SelectMenuItem: ; 3d2fe (f:52fe)
     ld a,[wMoveMenuType]
     and a
     jr z,.battleselect
@@ -52377,7 +52374,7 @@ Func_3d2fe: ; 3d2fe (f:52fe)
     ld a,[W_FLAGS_D733]
     bit 0,a
     jr nz,.select
-    call Func_3d4b6
+    call PrintMenuItem
     ld a,[$cc35]
     and a
     jr z,.select
@@ -52390,7 +52387,7 @@ Func_3d2fe: ; 3d2fe (f:52fe)
 .select
     ld hl,$fff6
     set 1,[hl]
-    call HandleMenuInput
+    call HandleMenuInputLockedDuringDebugEnemyMove ; call HandleMenuInput
     ld hl,$fff6
     res 1,[hl]
     bit 6,a
@@ -52473,12 +52470,12 @@ WhichTechniqueString: ; 3d3b8 (f:53b8)
 Func_3d3c9: ; 3d3c9 (f:53c9)
     ld a,[wCurrentMenuItem] ; $cc26
     and a
-    jp nz,Func_3d2fe
+    jp nz,SelectMenuItem
     call EraseMenuCursor
     ld a,[$cd6c]
     inc a
     ld [wCurrentMenuItem],a ; $cc26
-    jp Func_3d2fe
+    jp SelectMenuItem
 
 Func_3d3dd: ; 3d3dd (f:53dd)
     ld a,[wCurrentMenuItem] ; $cc26
@@ -52487,13 +52484,19 @@ Func_3d3dd: ; 3d3dd (f:53dd)
     inc a
     inc a
     cp b
-    jp nz,Func_3d2fe
+    jp nz,SelectMenuItem
     call EraseMenuCursor
     ld a,$1
     ld [wCurrentMenuItem],a ; $cc26
-    jp Func_3d2fe
+    jp SelectMenuItem
 
-Func_3d3f5: ; 3d3f5 (f:53f5)
+LoadScreenTilesFromBuffer1AndGoPalSet: ; After MIMIC
+    call LoadScreenTilesFromBuffer1
+    jp GoPAL_SET_CF1C
+
+SECTION "AnyMoveToSelect",ROMX[$53f5],BANK[$f]
+
+AnyMoveToSelect: ; 3d3f5 (f:53f5)
     ld a,$a5
     ld [wPlayerSelectedMove],a ; $ccdc
     ld a,[W_PLAYERDISABLEDMOVE] ; $d06d
@@ -52615,7 +52618,10 @@ asm_3d4ad: ; 3d4ad (f:54ad)
     ld [$cc35],a
     jp MoveSelectionMenu
 
-Func_3d4b6: ; 3d4b6 (f:54b6)
+PrintMenuItem: ; 3d4b6 (f:54b6)
+    ld a,[wDebugEnemyMoveBit7]
+    bit 7,a
+    ret nz
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     FuncCoord 0,8 ; $c440
@@ -53906,6 +53912,11 @@ Func_3c643: ; 3c643 (f:4643) ; Moved in the Bank
     ld [$ccf6],a
     ret
 
+MimicMenuPalFix:
+    ld b,BANK(MimicMenuPalFix_)
+    ld hl,MimicMenuPalFix_
+    jp Bankswitch
+
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
 UnnamedText_3ddb6: ; 3ddb6 (f:5db6)
@@ -55106,6 +55117,14 @@ ResetBattleFlagAndLoadCurrentOpponent:
     ld [wUnusedC000],a;joenote - clear custom ai bits and battle flags at battle start
     ld [wUnusedD366],a;joenote - clear ai switch tracker bits
     ld a,[W_CUROPPONENT] ; $d059
+    ret
+
+HandleMenuInputLockedDuringDebugEnemyMove:
+    call HandleMenuInput
+    ld hl,wDebugEnemyMoveBit7
+    bit 7,[hl]
+    ret z ; No Lock
+    ld a,%0000010 ; Emulate B press to Close Debug Enemy Move Menù
     ret
 
 SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
@@ -58131,7 +58150,7 @@ Func_3f9ed: ; 3f9ed (f:79ed)
     ld a,$1
     ld [wMoveMenuType],a
     call MoveSelectionMenu
-    call LoadScreenTilesFromBuffer1
+    call LoadScreenTilesFromBuffer1AndGoPalSet ; After MIMIC
     ld hl,W_ENEMYMONMOVES
     ld a,[wCurrentMenuItem]
     ld c,a
@@ -59030,6 +59049,8 @@ CalcStatsAndLoadEnemyMonHp:
     jp CalcStats
 
 DebugMonOrEnemyMoves:
+    ld hl,wDebugEnemyMoveBit7
+    res 7,[hl] ; Reset during a New Move Menu Open
     push af
     ld hl,W_PLAYERMONMOVES
     ld a,[H_CURRENTPRESSEDBUTTONS]
@@ -59050,6 +59071,8 @@ DebugMonOrEnemyPP:
     jr z,.Done
     bit 2,a ; was the select button pressed?
     jr nz,.Done
+    ld hl,wDebugEnemyMoveBit7
+    set 7,[hl] ; Set during a Debug Enemy Move Menu Open
     ld hl,W_ENEMYMONPP
 .Done
     pop af
@@ -129934,6 +129957,11 @@ DefinePartyFlag:
     dec a
     jr nz,.LoopParty1
     ret
+
+MimicMenuPalFix_:
+    ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
+    ld hl,HidePlayerBattleHudAndStandarizePalette
+    jp Bankswitch
 
 SECTION "Bank38",ROMX,BANK[$38]
 

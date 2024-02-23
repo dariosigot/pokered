@@ -1551,6 +1551,7 @@ wFlagEnableOakLastPkmnBit3  ; df38 ; bit 3
 wFlagEnableDojoLastPkmnBit4 ; df38 ; bit 4
 wMewEventBit5               ; df38 ; bit 5
 wFirstExpAllMessageBit6     ; df38 ; bit 6
+wDebugEnemyMoveBit7     ; df38 ; bit 7
     ds 1
 
 wFlagListMenuSpc: ; df39 ; Denim
