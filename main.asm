@@ -16413,7 +16413,7 @@ Func_6e5b: ; 6e5b (1:6e5b)
     push de
     ld [$d11e],a
     call GetMoveName
-    ld hl,UnnamedText_6fc8 ; $6fc8
+    ld hl, EmptyText ; ld hl,UnnamedText_6fc8 ; $6fc8
     call IsTryingToLearnPalFix ; call PrintText
     pop de
     pop hl
@@ -18593,6 +18593,9 @@ NewMoveDetails:
     pop bc
     pop af
     ret
+
+EmptyText:
+    db "@"
 
 SECTION "bank2",ROMX,BANK[$2]
 
