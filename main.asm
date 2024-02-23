@@ -16437,12 +16437,14 @@ Func_6e5b: ; 6e5b (1:6e5b)
     ld [hl],a
     ld a,[W_ISINBATTLE] ; $d057
     and a
-    jp z,Func_6efe
+    jp z,PrintLearnedMove
     ld a,[wWhichPokemon] ; $cf92
     ld b,a
     ld a,[wPlayerMonNumber] ; $cc2f
     cp b
-    jp nz,Func_6efe
+    jp CheckTransformedDuringLearnMove ; Hack Jump ; jp nz,PrintLearnedMove
+
+UpdateActiveMonMoves: ; Hack Jump
     ld h,d
     ld l,e
     ld de,W_PLAYERMONMOVES
@@ -16453,7 +16455,7 @@ Func_6e5b: ; 6e5b (1:6e5b)
     ld de,W_PLAYERMONPP ; $d02d
     ld bc,$4
     call CopyData
-    jp Func_6efe
+    jp PrintLearnedMove
 
 Func_6eda: ; 6eda (1:6eda)
     ld hl,UnnamedText_6fb9 ; $6fb9
@@ -16472,7 +16474,7 @@ Func_6eda: ; 6eda (1:6eda)
     ld b,$0
     ret
 
-Func_6efe: ; 6efe (1:6efe)
+PrintLearnedMove: ; 6efe (1:6efe)
     ld hl,UnnamedText_6fad ; $6fad
     call IsTryingToLearnPalFix_End ; call PrintText
     ld b,$1
@@ -18557,6 +18559,13 @@ GenRandomAndAdvanceRNGState:
     pop de
     pop hl
     ret
+
+CheckTransformedDuringLearnMove:
+    jp nz,PrintLearnedMove
+    ld a,[W_PLAYERBATTSTATUS3]
+    bit 3,a ; is the mon transformed?
+	jp nz,PrintLearnedMove
+    jp UpdateActiveMonMoves
 
 SECTION "bank2",ROMX,BANK[$2]
 
