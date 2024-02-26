@@ -609,8 +609,8 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     bit 3,[hl]
     res 3,[hl]
     jp nz,WarpFound2
-    ld a,[$d732]
-    and a,$18
+    call HackFromBank0 ; $0433 ; BugFixLongRangeTrainer ; ld a,[$d732]
+    and a,$18          ; $0436
     jp nz,HandleFlyOrTeleportAway
     ld a,[W_CUROPPONENT]
     and a
@@ -9070,17 +9070,28 @@ LoadTextBoxTilePatterns: ; 36a0 (0:36a0)
 
 ; copies HP bar and status display tile patterns into VRAM
 LoadHpBarAndStatusTilePatterns: ; 36c0 (0:36c0)
-    ld de,HpBarAndStatusGraphics
-    ld hl,$9620
-    ld bc,(BANK(HpBarAndStatusGraphics) << 8 | $1e)
-    call GoodCopyVideoData
-    ld de,EXPBarGraphics
-    ld hl,$8c00
-    ld bc,(BANK(EXPBarGraphics) << 8 | $A)
-    call GoodCopyVideoData
-    ld hl,LoadHeldItemAndShinyStarIcon
-    ld b,BANK(LoadHeldItemAndShinyStarIcon)
+    ld b,BANK(LoadHpBarAndStatusTilePatterns_)
+    ld hl,LoadHpBarAndStatusTilePatterns_
     jp Bankswitch
+
+; Output -> a
+HackFromBank0:
+    push bc
+    push de
+    push hl
+    ld hl,sp+6
+    ld a,[hli]
+    ld d,a ; Input
+    ld a,[hl]
+    ld e,a ; Input
+    ld hl,_HackFromBank0
+    ld b,BANK(_HackFromBank0)
+    call Bankswitch
+    ld a,d ; Output
+    pop hl
+    pop de
+    pop bc
+    ret
 
 SECTION "FillMemory",ROM0[$36e0]
 
@@ -126775,12 +126786,6 @@ SelectInOverWorld:
     pop bc
     ret
 
-LoadHeldItemAndShinyStarIcon:
-    ld de,HeldItemIcon
-    ld hl,$8d00
-    ld bc,(BANK(HeldItemIcon) << 8 | $2) ; Also Shiny Star
-    jp GoodCopyVideoData
-
 SECTION "bank32",ROMX,BANK[$32]
 
 MewBaseStats: ; 425b (1:425b)
@@ -130124,6 +130129,62 @@ PrintNewLearnMoveDetail:
     pop af
     ld [H_WHOSETURN],a ; $FF00+$f3
     ret
+
+; copies HP bar and status display tile patterns into VRAM
+LoadHpBarAndStatusTilePatterns_:
+    ld de,HpBarAndStatusGraphics
+    ld hl,$9620
+    ld bc,(BANK(HpBarAndStatusGraphics) << 8 | $1e)
+    call GoodCopyVideoData
+    ld de,EXPBarGraphics
+    ld hl,$8c00
+    ld bc,(BANK(EXPBarGraphics) << 8 | $A)
+    call GoodCopyVideoData
+    ld de,HeldItemIcon
+    ld hl,$8d00
+    ld bc,(BANK(HeldItemIcon) << 8 | $2) ; Also Shiny Star
+    jp GoodCopyVideoData
+
+; INPUT
+; d = High Bit Return Pointer 
+; e = Low Bit Return Pointer
+_HackFromBank0:
+    ld hl,.Table
+.Loop
+    ld a,[hli]
+    cp $ff
+    jr z,.End
+    cp d
+    jr z,.Found1
+    inc hl
+.Next2
+    inc hl
+    inc hl
+    jr .Loop
+.Found1
+    ld a,[hli]
+    cp e
+    jr nz,.Next2
+.Found2
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    jp hl
+.End
+    ret
+.BugFixLongRangeTrainer:
+    ld hl,W_FLAGS_D733 ; check if trainer is wanting to battle
+    bit 3,[hl]
+    ld hl,$d732
+    jr z,.BugFixLongRangeTrainer_End
+    res 3,[hl] ; cancel fly/teleport warp
+.BugFixLongRangeTrainer_End
+    ld d,[hl] ; Output -> a
+    ret
+.Table
+    dw $0436
+    dw .BugFixLongRangeTrainer
+    db $ff
 
 SECTION "Bank38",ROMX,BANK[$38]
 
