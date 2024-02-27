@@ -23058,8 +23058,8 @@ ItemUseBall: ; d687 (3:5687)
     ld [$d11e],a
     ld hl,ItemUseText00
     call PrintText
-    ld hl,Func_3d83a
-    ld b,BANK(Func_3d83a)
+    ld hl,IsGhostBattle
+    ld b,BANK(IsGhostBattle)
     call Bankswitch
     ld b,$10
     jp z,.next12
@@ -51353,7 +51353,7 @@ UnnamedText_3cab4: ; 3cab4 (f:4ab4)
     db "@"
 
 Func_3cab9: ; 3cab9 (f:4ab9)
-    call Func_3d83a
+    call IsGhostBattle
     jp z,.asm_3cb5c
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
@@ -52234,7 +52234,7 @@ Func_3d119: ; 3d119 (f:5119)
     ld [$d0b5],a
     call GetMonHeader
     ld de,$9000
-    call LoadMonFrontSprite
+    call LoadMonFrontSpriteOrGhost ; call LoadMonFrontSprite
     jr .asm_3d187
 .asm_3d182
     ld b,$1e
@@ -53163,7 +53163,7 @@ Func_3d80a: ; 3d80a (f:580a)
 
 Func_3d811: ; 3d811 (f:5811)
 ; print the ghost battle messages
-    call Func_3d83a
+    call IsGhostBattle
     ret nz
     ld a,[H_WHOSETURN]
     and a
@@ -53189,7 +53189,7 @@ GetOutText: ; 3d835 (f:5835)
     TX_FAR _GetOutText
     db "@"
 
-Func_3d83a: ; 3d83a (f:583a)
+IsGhostBattle: ; 3d83a (f:583a)
     ld a,[W_ISINBATTLE]
     dec a
     ret nz
@@ -56639,40 +56639,13 @@ InitWildBattle: ; 3ef8b (f:6f8b)
     ld a,[W_CUROPPONENT] ; $d059
     cp MAROWAK
     jr z,.isGhost
-    call Func_3d83a
+    call IsGhostBattle
     jr nz,.isNoGhost
 .isGhost
-    ld hl,W_MONHSPRITEDIM
-    ld a,$66
-    ld [hli],a   ; write sprite dimensions
-    ld bc,GhostPic ; $66b5
-    ld a,c
-    ld [hli],a   ; write  front sprite pointer
-    ld [hl],b
-    ld hl,W_ENEMYMONNAME  ; set name to "GHOST"
-    ld a,"G"
-    ld [hli],a
-    ld a,"H"
-    ld [hli],a
-    ld a,"O"
-    ld [hli],a
-    ld a,"S"
-    ld [hli],a
-    ld a,"T"
-    ld [hli],a
-    ld [hl],"@"
-    ld a,[$cf91]
-    push af
-    ld a,MON_GHOST
-    ld [$cf91],a
-    ld de,$9000
-    call LoadMonFrontSprite ; load ghost sprite
-    pop af
-    ld [$cf91],a
+    call LoadGhostPic
     jr .spriteLoaded
 .isNoGhost
-    ld de,$9000
-    call LoadMonFrontSprite ; load mon sprite
+    call SetDEAndLoadMonFrontSprite ; load mon sprite
 .spriteLoaded
     xor a
     ld [W_TRAINERCLASS],a ; $d031
@@ -56724,6 +56697,40 @@ Func_3efeb: ; 3efeb (f:6feb)
     ld [$FF00+$d7],a
     scf
     ret
+
+LoadGhostPic:
+    ld hl,W_MONHSPRITEDIM
+    ld a,$66
+    ld [hli],a   ; write sprite dimensions
+    ld bc,GhostPic ; $66b5
+    ld a,c
+    ld [hli],a   ; write  front sprite pointer
+    ld [hl],b
+    ld hl,W_ENEMYMONNAME  ; set name to "GHOST"
+    ld a,"G"
+    ld [hli],a
+    ld a,"H"
+    ld [hli],a
+    ld a,"O"
+    ld [hli],a
+    ld a,"S"
+    ld [hli],a
+    ld a,"T"
+    ld [hli],a
+    ld [hl],"@"
+    ld hl,$cf91
+    ld a,[hl]
+    push af
+    push hl
+    ld a,MON_GHOST
+    ld [hl],a
+    call SetDEAndLoadMonFrontSprite ; load ghost sprite
+    pop hl
+    pop af
+    ld [hl],a
+    ret
+
+SECTION "TerminatorText_3f04a",ROMX[$704a],BANK[$f]
 
 TerminatorText_3f04a: ; 3f04a (f:704a)
     db "@"
@@ -59251,6 +59258,15 @@ SetExplodeFlagBecauseStatusAfterFainted:
     ld b,BANK(SetExplodeFlagBecauseStatusAfterFainted_)
     ld hl,SetExplodeFlagBecauseStatusAfterFainted_
     jp Bankswitch
+
+LoadMonFrontSpriteOrGhost:
+    call IsGhostBattle
+    jp nz,LoadMonFrontSprite
+    jp LoadGhostPic
+
+SetDEAndLoadMonFrontSprite:
+    ld de,$9000
+    jp LoadMonFrontSprite
 
 SECTION "bank10",ROMX,BANK[$10]
 
