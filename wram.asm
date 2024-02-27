@@ -1561,13 +1561,13 @@ wFlagListMenuSpc: ; df39 ; Denim
                   ; bit 3 = Rocket Hideout Elevator
     ds 1
 
-wFishingLevel: ; df40
+wFishingLevel: ; df3a
     ds 1
 
-wFishingSpecies: ; df40
+wFishingSpecies: ; df3b
     ds 1
 
-wUnusedD366:: ; df41 ;joenote - use this to track which ai pokemon have switched
+wUnusedD366:: ; df3c ;joenote - use this to track which ai pokemon have switched
     ds 1
 ;bit 1: 1st pkmn (position 0)
 ;bit 2: 2nd pkmn (position 1)
@@ -1575,6 +1575,9 @@ wUnusedD366:: ; df41 ;joenote - use this to track which ai pokemon have switched
 ;bit 4: 4th pkmn (position 3)
 ;bit 5: 5th pkmn (position 4)
 ;bit 6: 6th pkmn (position 5)
+
+wExplodeFlag: ; df3d
+    ds 1
 
 SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
 

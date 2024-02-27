@@ -875,8 +875,8 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     set 6,[hl]
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a ; clear joypad state
-    ld a,[W_CURMAP]
-    cp a,CINNABAR_GYM
+    call HackFromBank0 ; $064b ; RestoreFaintenedWith1HP ; ld a,[W_CURMAP]
+    cp a,CINNABAR_GYM  ; $064e
     jr nz,.notCinnabarGym
     ld hl,$d79b
     set 7,[hl]
@@ -56901,7 +56901,7 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
-     dw Func_3f2f1
+     dw ExplodeEffect
      dw Func_3f2e9
      dw $0000
      dw Func_3f428
@@ -57131,15 +57131,15 @@ Func_3f2e9: ; 3f2e9 (f:72e9)
     ld b,BANK(Func_783f)
     jp Bankswitch ; indirect jump to Func_783f (783f (1:783f))
 
-Func_3f2f1: ; 3f2f1 (f:72f1)
-    ld hl,W_PLAYERMONCURHP ; $d015
-    ld de,W_PLAYERBATTSTATUS2 ; $d063
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.asm_3f302
+ExplodeEffect: ; 3f2f1 (f:72f1)
     ld hl,W_ENEMYMONCURHP ; $cfe6
     ld de,W_ENEMYBATTSTATUS2 ; $d068
-.asm_3f302
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr nz,.enemy
+    call SetExplodeFlag ; ld hl,W_PLAYERMONCURHP ; $d015
+    ld de,W_PLAYERBATTSTATUS2 ; $d063
+.enemy
     xor a
     ld [hli],a
     ld [hli],a
@@ -59026,26 +59026,17 @@ BattleMonPartyAttr:
     jp AddNTimes
 
 ForceShinyOrRandom:
-    ld a,[W_CURMAP]
-    cp DRATINI_CAVE
-    jr z,.Shiny
-    cp SAFARI_ZONE_WEST
-    jr z,.Safari
-.Random
-    jp GenRandomInBattle
-.Safari
-    ld a,[W_CUROPPONENT]
-    cp MAGIKARP
-    jr nz,.Random
-    ld a,[W_CURENEMYLVL]
-    cp 26 ; Shiny If Level 26 in SAFARI_ZONE_WEST
-    jr nz,.Random
-.Shiny
+    ld e,b
+    ld b,BANK(ForceShinyOrRandom_)
+    ld hl,ForceShinyOrRandom_
+    call Bankswitch
+    ld a,d
+    ld b,e
+    ret
+
+GenRandomInBattleFromOtherBANK:
     call GenRandomInBattle
-    or %00100000
-    and $F0
-    add $A
-    ld b,$AA
+    ld d,a
     ret
 
 HidePlayerBattleHudAndStandarizePalette:
@@ -59257,6 +59248,13 @@ CheckTrappingMoveAndSetEnemyActedBitAndLoadHl:
 .preparewithdraw
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld hl,RetreatMon
+    ret
+
+SetExplodeFlag:
+    ld b,BANK(SetExplodeFlag_)
+    ld hl,SetExplodeFlag_
+    call Bankswitch
+    ld hl,W_PLAYERMONCURHP
     ret
 
 SECTION "bank10",ROMX,BANK[$10]
@@ -75893,10 +75891,12 @@ InitBattleVariables: ; 525af (14:65af)
     ld a,$2
     ld [W_BATTLETYPE],a ; $d05a
 .asm_525f9
-    ret
     ;ld hl,PlayBattleMusic
     ;ld b,BANK(PlayBattleMusic)
     ;jp Bankswitch ; indirect jump to PlayBattleMusic (90c6 (2:50c6))
+    ld b,BANK(InitExplodeFlag)
+    ld hl,InitExplodeFlag
+    jp Bankswitch
 
 SECTION "Func_52601",ROMX[$6601],BANK[$14]
 
@@ -81436,12 +81436,12 @@ Func_58d99: ; 58d99 (16:4d99)
     call PrintText
     jr asm_58e3a
 .asm_58dd8
-    ld b,$48
+    ld b,SILPH_SCOPE
     call IsItemInBag
     ld a,[W_ENEMYMONID]
-    ld [$cf91],a
-    cp $91
-    jr z,.asm_58e03
+    call CheckMarowak ; ld [$cf91],a
+    ds 2 ; cp MAROWAK
+    jr z,.isMarowak
     ld a,b
     and a
     jr z,.asm_58df5
@@ -81455,7 +81455,7 @@ Func_58d99: ; 58d99 (16:4d99)
     ld hl,UnnamedText_58e54 ; $4e54
     call PrintText
     jr asm_58e3a
-.asm_58e03
+.isMarowak
     ld a,b
     and a
     jr z,.asm_58df5
@@ -85022,6 +85022,15 @@ GiveItemNotPower:
     cp HM_05
     jp z,FakeGiveItem
     jp GiveItem
+
+CheckMarowak:
+    ld [$cf91],a
+    cp MAROWAK
+    ret nz
+    ld a,[W_CURMAP]
+    cp POKEMONTOWER_6
+    ld a,[$cf91]
+    ret
 
 SECTION "bank17",ROMX,BANK[$17]
 
@@ -130153,7 +130162,7 @@ _HackFromBank0:
 .Loop
     ld a,[hli]
     cp $ff
-    jr z,.End
+    ret z
     cp d
     jr z,.Found1
     inc hl
@@ -130170,21 +130179,129 @@ _HackFromBank0:
     ld h,[hl]
     ld l,a
     jp hl
-.End
-    ret
-.BugFixLongRangeTrainer:
+.Table
+    dw $0436
+    dw BugFixLongRangeTrainer
+    dw $064e
+    dw RestoreFaintenedWith1HP
+    db $ff
+
+BugFixLongRangeTrainer:
     ld hl,W_FLAGS_D733 ; check if trainer is wanting to battle
     bit 3,[hl]
     ld hl,$d732
-    jr z,.BugFixLongRangeTrainer_End
+    jr z,.End
     res 3,[hl] ; cancel fly/teleport warp
-.BugFixLongRangeTrainer_End
+.End
     ld d,[hl] ; Output -> a
     ret
-.Table
-    dw $0436
-    dw .BugFixLongRangeTrainer
-    db $ff
+
+RestoreFaintenedWith1HP:
+    ld hl,W_PARTYMON1_HP ; $d173
+    ld a,[W_NUMINPARTY]
+    ld e,a
+    ld a,[wExplodeFlag]
+    ld d,a
+.Loop
+    srl d
+    jr c,.Next
+    ld a,[hli]
+    ld b,a
+    ld a,[hld]
+    or b
+    jr nz,.Next
+    inc hl
+    inc [hl] ; 1 HP
+    dec hl ; Restore Pointer to PARTYMON_HP
+.Next
+    ld bc,$2c
+    add hl,bc
+    dec e
+    jr nz,.Loop
+    xor a
+    ld [wExplodeFlag],a
+    ld a,[W_CURMAP]
+    ld d,a
+    ret
+
+ForceShinyOrRandom_:
+    ld a,[W_CURMAP]
+    cp DRATINI_CAVE
+    jr z,.ShinyRandom
+    cp SAFARI_ZONE_WEST
+    jr z,.Safari
+    cp POKEMONTOWER_6
+    jr z,.Tower6
+.Random
+    call .GenRandomInBattle
+    jr .End
+.Tower6
+    ld a,[$cf91]
+    cp MAROWAK
+    jr nz,.Random
+    ld a,$70 ; Attack 7
+    jr .ShinyFilter
+.Safari
+    ld a,[W_CUROPPONENT]
+    cp MAGIKARP
+    jr nz,.Random
+    ld a,[W_CURENEMYLVL]
+    cp 26 ; Shiny If Level 26 in SAFARI_ZONE_WEST
+    jr nz,.Random
+.ShinyRandom
+    call .GenRandomInBattle
+.ShinyFilter
+    or %00100000
+    and $F0
+    add $A
+    ld e,$AA
+.End
+    ld d,a
+    ret
+.GenRandomInBattle
+    ld b,BANK(GenRandomInBattleFromOtherBANK)
+    ld hl,GenRandomInBattleFromOtherBANK
+    call Bankswitch
+    ld a,d
+    ret
+
+SetExplodeFlag_:
+    xor a ; Reset Carry Flag
+    ld a,[wWhichPokemon]
+    ld e,%00000001 ; 1 bit to rotate 
+.Loop
+    and a
+    jr z,.EndLoop
+    rl e
+    dec a
+    jr .Loop
+.EndLoop
+    ld a,[wExplodeFlag]
+    or e
+    ld [wExplodeFlag],a
+    ret
+
+InitExplodeFlag:
+    ld hl,W_PARTYMON1_HP ; $d173
+    ld a,[W_NUMINPARTY]
+    ld e,a
+    ld d,0
+.Loop
+    ld a,[hli]
+    ld b,a
+    ld a,[hld]
+    or b
+    jr nz,.Next
+    scf
+    rl d ; Set 1 to all Faintened (EXPLOSION)
+.Next
+    ld bc,$2c
+    add hl,bc
+    dec e
+    jr nz,.Loop
+    ld a,d
+    ld [wExplodeFlag],a
+    ret
 
 SECTION "Bank38",ROMX,BANK[$38]
 
