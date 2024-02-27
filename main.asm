@@ -42104,11 +42104,11 @@ ChoiceMove:
     ld hl,Func_39b87
     ld b,BANK(Func_39b87)
     call Bankswitch ; indirect jump to Func_39b87 (39b87 (e:5b87))
-    FuncCoord 4,7 ; $c430
+    FuncCoord 4,8 ; $c430
     ld hl,Coord
     ld bc,$040e
     call TextBoxBorder
-    FuncCoord 6,8 ; $c446
+    FuncCoord 6,9 ; $c446
     ld hl,Coord
     ld de,$d0e1
     ld a,[$FF00+$f6]
@@ -42119,7 +42119,7 @@ ChoiceMove:
     res 2,a
     ld [$FF00+$f6],a
     ld hl,wTopMenuItemY ; $cc24
-    ld a,$8
+    ld a,$9
     ld [hli],a
     ld a,$5
     ld [hli],a
