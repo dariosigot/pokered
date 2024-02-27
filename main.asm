@@ -50895,7 +50895,7 @@ Func_3c741: ; 3c741 (f:4741)
     ld hl,$cd05
     ld [hli],a
     ld [hl],a
-    ld [W_PLAYERMONSTATUS],a ; $d018
+    call SetExplodeFlagBecauseStatusAfterFainted ; ld [W_PLAYERMONSTATUS],a ; $d018
     call ReadPlayerMonCurHPAndStatus
     FuncCoord 9,7 ; $c435
     ld hl,Coord
@@ -59044,19 +59044,9 @@ HidePlayerBattleHudAndStandarizePalette:
     push bc
     push de
     push hl
-    ld a,[W_ISINBATTLE] ; $d057
-    and a
-    jr z,.Skip
-    ; Remove Player Battle Stats Frame
-    FuncCoord 10,7
-    ld hl,Coord
-    ld bc,$050A
-    call ClearScreenArea
-    ; Change Battle Screen Palette to Player's Pkmn Color
-    ld hl,wFlagNoHpPalBit2
-    set 2,[hl]
-    call GoPAL_SET_CF1C
-.Skip
+    ld b,BANK(HidePlayerBattleHudAndStandarizePalette_)
+    ld hl,HidePlayerBattleHudAndStandarizePalette_
+    call Bankswitch
     pop hl
     pop de
     pop bc
@@ -59256,6 +59246,11 @@ SetExplodeFlag:
     call Bankswitch
     ld hl,W_PLAYERMONCURHP
     ret
+
+SetExplodeFlagBecauseStatusAfterFainted:
+    ld b,BANK(SetExplodeFlagBecauseStatusAfterFainted_)
+    ld hl,SetExplodeFlagBecauseStatusAfterFainted_
+    jp Bankswitch
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -130281,9 +130276,17 @@ SetExplodeFlag_:
     ld [wExplodeFlag],a
     ret
 
+SetExplodeFlagBecauseStatusAfterFainted_:
+    ld a,[W_PLAYERMONSTATUS]
+    and PSN | BRN | FRZ | PAR
+    call nz,SetExplodeFlag_
+    xor a
+    ld [W_PLAYERMONSTATUS],a ; $d018
+    ret
+
 InitExplodeFlag:
     ld hl,W_PARTYMON1_HP ; $d173
-    ld a,[W_NUMINPARTY]
+    ld a,8;[W_NUMINPARTY]
     ld e,a
     ld d,0
 .Loop
@@ -130291,17 +130294,35 @@ InitExplodeFlag:
     ld b,a
     ld a,[hld]
     or b
-    jr nz,.Next
+    jr nz,.Zero
     scf
-    rl d ; Set 1 to all Faintened (EXPLOSION)
-.Next
+    jr .One
+.Zero
+    xor a ; Reset Carry Flag
+.One
+    rr d ; Set 1 to all Faintened (EXPLOSION)
     ld bc,$2c
     add hl,bc
     dec e
     jr nz,.Loop
     ld a,d
+    and %00111111 ; Only 6 Pkmn
     ld [wExplodeFlag],a
     ret
+
+HidePlayerBattleHudAndStandarizePalette_:
+    ld a,[W_ISINBATTLE] ; $d057
+    and a
+    ret z
+    ; Remove Player Battle Stats Frame
+    FuncCoord 10,7
+    ld hl,Coord
+    ld bc,$050A
+    call ClearScreenArea
+    ; Change Battle Screen Palette to Player's Pkmn Color
+    ld hl,wFlagNoHpPalBit2
+    set 2,[hl]
+    jp GoPAL_SET_CF1C
 
 SECTION "Bank38",ROMX,BANK[$38]
 
