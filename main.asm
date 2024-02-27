@@ -121213,7 +121213,7 @@ _UnnamedText_5c7c8: ; 98ab0 (26:4ab0)
 
 _ReceivedTM11Text: ; 98b7d (26:4b7d)
     db $0,$52," received",$4f
-    db "TM11!@@"
+    db "a TM!@@"
 
 _UnnamedText_5c7d3: ; 98b90 (26:4b90)
     db $0,"You better make",$4f
