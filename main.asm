@@ -51303,6 +51303,13 @@ Func_3c92a: ; 3c92a (f:492a)
     call SaveScreenTilesToBuffer1
     jp SwitchPlayerMon
 
+CheckGhostAndPrintLevel:
+    push hl
+    call IsGhostBattle
+    pop hl
+    call nz,PrintLevel
+    ret
+
 SECTION "TrainerAboutToUseText",ROMX[$4a79],BANK[$f]
 
 TrainerAboutToUseText: ; 3ca79 (f:4a79)
@@ -51771,7 +51778,7 @@ DrawEnemyHUDAndHPBar: ; 3cdec (f:4dec)
     jr nz,.asm_3ce23
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld [$cfb9],a
-    call PrintLevel
+    call CheckGhostAndPrintLevel ; call PrintLevel
 .asm_3ce23
     ld hl,W_ENEMYMONCURHP ; $cfe6
     ld a,[hli]
@@ -98488,6 +98495,11 @@ PokeCenterFlashingHealBall:
 
 CheckShinyFrontAndGetPAL:
     push hl
+    call .IsGhostBattle
+    jr nz,.NoGhost
+    ld a,GASTLY ; Ghost Color is Gastly Color
+    jr SkipShinyAndGetPAL
+.NoGhost
     ld hl,wFlagBackFrontSpriteBit56
     set 6,[hl]
     ld hl,W_ENEMYBATTSTATUS3
@@ -98497,6 +98509,26 @@ CheckShinyFrontAndGetPAL:
 .NoTransform
     ld hl,W_ENEMYMONATKDEFIV
     jr GetPalCommon
+.IsGhostBattle
+    push bc
+    push de
+    push af
+    ld hl,IsGhostBattle
+    ld b,BANK(IsGhostBattle)
+    call Bankswitch
+    jr z,.End
+    ; If No Standard Ghost Check Marowak Event
+    ld a,[W_ENEMYMONID]
+    cp MAROWAK
+    jr nz,.End
+    ld a,[W_CURMAP]
+    cp POKEMONTOWER_6
+.End
+    pop bc
+    ld a,b
+    pop de
+    pop bc
+    ret
 
 CheckShinyBackAndGetPAL:
     push hl
@@ -98511,6 +98543,7 @@ CheckShinyAndGetPAL:
 
 GetPalCommon:
     call IsShiny
+SkipShinyAndGetPAL:
     pop hl
     jp DeterminePaletteID
 
@@ -127002,6 +127035,10 @@ SECTION "bank33",ROMX,BANK[$33] ; Denim,GENDER
 
 _DrawCatchGender: ; Denim
 ; catch
+    ld hl,IsGhostBattle
+    ld b,BANK(IsGhostBattle)
+    call Bankswitch
+    jr z,.Ghost ; No Gender,Pokedex or Debug If Ghost Battle
     ld a,[W_ISINBATTLE] ; trainer battle,this is 2
     dec a
     dec a
@@ -127047,7 +127084,9 @@ _DrawCatchGender: ; Denim
     call PlaceString
 .Genderless
     call DebugEnemyStats
-    jp ResetTempIV
+    call ResetTempIV
+.Ghost
+    ret
 .PokeBallCatchFlagIcon:
     db $c9,$50
 .MaleIcon
@@ -130250,8 +130289,9 @@ ForceShinyOrRandom_:
     ld a,[$cf91]
     cp MAROWAK
     jr nz,.Random
-    ld a,$70 ; Attack 7
-    jr .ShinyFilter
+    call .GenRandomInBattle
+    and $7F ; Attack 7
+    jr .End
 .Safari
     ld a,[W_CUROPPONENT]
     cp MAGIKARP
@@ -130261,7 +130301,6 @@ ForceShinyOrRandom_:
     jr nz,.Random
 .ShinyRandom
     call .GenRandomInBattle
-.ShinyFilter
     or %00100000
     and $F0
     add $A
