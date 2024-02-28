@@ -30140,7 +30140,9 @@ StartMenu_SaveReset: ; 135e3 (4:75e3)
     ld a,$3f
     call Predef ; save the game
     call LoadScreenTilesFromBuffer2 ; restore saved screen
-    jp HoldTextDisplayOpen
+    ;jp HoldTextDisplayOpen
+    jp CloseStartMenu ;joenote - prevent menu from being held open with A button
+                      ;and instead only hold for a single button press
 
 StartMenu_Option: ; 135f6 (4:75f6)
     xor a
