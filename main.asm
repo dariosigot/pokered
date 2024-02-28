@@ -94164,7 +94164,7 @@ INCBIN "baserom.gbc",$708ba,$708ca - $708ba
 
 Func_708ca: ; 708ca (1c:48ca)
     ld a,$e4
-    ld [rOBP1],a ; $FF00+$49
+    call UpdateSpriteDuringMarowakEvent ; ld [rOBP1],a ; $FF00+$49
     call Func_7092a
     FuncCoord 12,0 ; $c3ac
     ld hl,Coord
@@ -94181,14 +94181,14 @@ Func_708ca: ; 708ca (1c:48ca)
     ld b,BANK(Func_79793)
     call Bankswitch ; indirect jump to Func_79793 (79793 (1e:5793))
     ld d,$80
-    call FlashingBallHealPokecenter
+    call FlashSprite8Times
 .asm_708f6
     ld c,$a
     call DelayFrames
-    ld a,[rOBP1] ; $FF00+$49
+    ld a,[rOBP0] ; ld a,[rOBP1] ; $FF00+$49
     sla a
     sla a
-    ld [rOBP1],a ; $FF00+$49
+    call UpdateSpriteDuringMarowakEvent ; ld [rOBP1],a ; $FF00+$49
     jr nz,.asm_708f6
     call CleanLCD_OAM
     call Func_7092a
@@ -94196,12 +94196,12 @@ Func_708ca: ; 708ca (1c:48ca)
 .asm_7090d
     ld c,$a
     call DelayFrames
-    ld a,[rOBP1] ; $FF00+$49
+    ld a,[rOBP0] ; ld a,[rOBP1] ; $FF00+$49
     srl b
     rra
     srl b
     rra
-    ld [rOBP1],a ; $FF00+$49
+    call UpdateSpriteDuringMarowakEvent ; ld [rOBP1],a ; $FF00+$49
     ld a,b
     and a
     jr nz,.asm_7090d
@@ -94235,7 +94235,7 @@ Func_7092a: ; 7092a (1c:492a)
     ld [hli],a
     ld a,d
     ld [hli],a
-    ld a,$10
+    ld a,$01 ; Ghost Palette 1 GBC ; ld a,$10
     ld [hli],a
     inc d
     dec c
@@ -99006,6 +99006,26 @@ DeterminePaletteIDWithShinyDebug:
 .Done
     pop af
     jp DeterminePaletteID
+
+UpdateSpriteDuringMarowakEvent:
+    ld [rOBP0],a ; $FF00+$49
+    push af
+    call IfGBCDelay3
+    pop af
+    ret
+
+; d = value to xor with palette
+FlashSprite8Times:
+    ld b, 8
+.loop
+    ld a,[rOBP0]
+    xor d
+    ld [rOBP0],a
+    ld c,10
+    call DelayFrames
+    dec b
+    jr nz,.loop
+    ret
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
