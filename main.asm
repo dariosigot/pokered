@@ -70653,10 +70653,11 @@ Route16GateMapScript0: ; 496d7 (12:56d7)
     ld a,$1
     ld [W_ROUTE16GATECURSCRIPT],a
     ret
-.asm_4970e
-    ld a,$2
-    ld [W_ROUTE16GATECURSCRIPT],a
-    ret
+.asm_4970e ;joenote - edited to prevent brute-forcing past the gate guard
+     ;ld a,$2
+     ;ld [W_ROUTE16GATECURSCRIPT],a
+     ;ret
+     jp Route16GateMapScript2
 
 CoordsData_49714: ; 49714 (12:5714)
     db $07,$04
@@ -70671,6 +70672,8 @@ Route16GateMapScript1: ; 4971d (12:571d)
     ret nz
     ld a,$f0
     ld [wJoypadForbiddenButtonsMask],a
+    ;joenote - prevent amazing man from happening here
+    call UpdateSprites
 
 Route16GateMapScript2: ; 49727 (12:5727)
     ld a,$1
