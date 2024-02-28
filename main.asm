@@ -51303,13 +51303,6 @@ Func_3c92a: ; 3c92a (f:492a)
     call SaveScreenTilesToBuffer1
     jp SwitchPlayerMon
 
-CheckGhostAndPrintLevel:
-    push hl
-    call IsGhostBattle
-    pop hl
-    call nz,PrintLevel
-    ret
-
 SECTION "TrainerAboutToUseText",ROMX[$4a79],BANK[$f]
 
 TrainerAboutToUseText: ; 3ca79 (f:4a79)
@@ -51778,7 +51771,7 @@ DrawEnemyHUDAndHPBar: ; 3cdec (f:4dec)
     jr nz,.asm_3ce23
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld [$cfb9],a
-    call CheckGhostAndPrintLevel ; call PrintLevel
+    call PrintLevel
 .asm_3ce23
     ld hl,W_ENEMYMONCURHP ; $cfe6
     ld a,[hli]
