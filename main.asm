@@ -50727,30 +50727,27 @@ FaintEnemyPokemon ; 0x3c567
 
 ; Set Carry Flag if Focus in Bag or All Pkmn Fought
 IsFocusInBagOrAllFought:
-    ld b,FOCUS
-    call IsItemInBag ; set z if item isn't in player's bag
-    jr nz,.focus
-    call CheckIfAllFought ; set z if all Pkmn Fought
-    jr z,.focus
-    xor a ; Reset Carry Flag
-    ret
-.focus
-    scf ; Set Carry Flag
-    ret
-
-CheckIfAllFought:
-    ld hl,DefineMonLiveFlag
-    ld b,BANK(DefineMonLiveFlag)
-    call Bankswitch               ; ► d = flag mon live
-    ld a,[W_PLAYERMONSALIVEFLAGS] ; ► a = flag has fought
-    cp d
-    ret
+    ld hl,IsFocusInBagOrAllFought_
+    ld b,BANK(IsFocusInBagOrAllFought_)
+    jp Bankswitch
 
 GainExperience_:
     ld [$cc5b],a
     ld hl,GainExperience
     ld b,BANK(GainExperience)
     jp Bankswitch ; indirect jump to GainExperience (5524f (15:524f))
+
+GetHealthBarColorWithGhostCheck:
+    ld a,l
+    cp $1e
+    jp nz,GetHealthBarColor ; don't check ghost if not front
+    ld a,e
+    ld [wBackupHealthBarWidth],a
+    ld d,h
+    ld e,l
+    ld hl,GetHealthBarColorWithGhostCheck_
+    ld b,BANK(GetHealthBarColorWithGhostCheck_)
+    jp Bankswitch
 
 SECTION "Func_3c64f",ROMX[$464f],BANK[$f]
 
@@ -51845,7 +51842,7 @@ Func_3ce7f: ; 3ce7f (f:4e7f)
 
 GetBattleHealthBarColor: ; 3ce90 (f:4e90)
     ld b,[hl]
-    call GetHealthBarColor
+    call GetHealthBarColorWithGhostCheck ; call GetHealthBarColor
     ld a,[hl]
     cp b
     ret z
@@ -98495,7 +98492,7 @@ PokeCenterFlashingHealBall:
 
 CheckShinyFrontAndGetPAL:
     push hl
-    call .IsGhostBattle
+    call IsGhostBattlePlus
     jr nz,.NoGhost
     ld a,GASTLY ; Ghost Color is Gastly Color
     jr SkipShinyAndGetPAL
@@ -98509,13 +98506,12 @@ CheckShinyFrontAndGetPAL:
 .NoTransform
     ld hl,W_ENEMYMONATKDEFIV
     jr GetPalCommon
-.IsGhostBattle
+
+IsGhostBattlePlus:
     push bc
     push de
     push af
-    ld hl,IsGhostBattle
-    ld b,BANK(IsGhostBattle)
-    call Bankswitch
+    call IsGhostBattle_Bank1C
     jr z,.End
     ; If No Standard Ghost Check Marowak Event
     ld a,[W_ENEMYMONID]
@@ -98528,6 +98524,23 @@ CheckShinyFrontAndGetPAL:
     ld a,b
     pop de
     pop bc
+    ret
+
+IsGhostBattle_Bank1C:
+    ld a,[W_ISINBATTLE]
+    dec a
+    ret nz
+    ld a,[W_CURMAP]
+    cp a,POKEMONTOWER_1
+    jr c,.next
+    cp a,LAVENDER_HOUSE_1
+    jr nc,.next
+    ld b,SILPH_SCOPE
+    call IsItemInBag ; $3493
+    ret z
+.next
+    ld a,1
+    and a
     ret
 
 CheckShinyBackAndGetPAL:
@@ -99026,6 +99039,18 @@ FlashSprite8Times:
     dec b
     jr nz,.loop
     ret
+
+GetHealthBarColorWithGhostCheck_:
+    call IsGhostBattlePlus
+    ld h,d
+    ld l,e
+    jr nz,.NoGhost
+    ld [hl],PAL_GASTLY - PAL_GREENBAR
+    ret
+.NoGhost
+    ld a,[wBackupHealthBarWidth]
+    ld e,a
+    jp GetHealthBarColor
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
@@ -130398,6 +130423,25 @@ HidePlayerBattleHudAndStandarizePalette_:
     ld hl,wFlagNoHpPalBit2
     set 2,[hl]
     jp GoPAL_SET_CF1C
+
+; Set Carry Flag if Focus in Bag or All Pkmn Fought
+IsFocusInBagOrAllFought_:
+    ld b,FOCUS
+    call IsItemInBag ; set z if item isn't in player's bag
+    jr nz,.focus
+    call CheckIfAllFought ; set z if all Pkmn Fought
+    jr z,.focus
+    xor a ; Reset Carry Flag
+    ret
+.focus
+    scf ; Set Carry Flag
+    ret
+
+CheckIfAllFought:
+    call DefineMonLiveFlag        ; ► d = flag mon live
+    ld a,[W_PLAYERMONSALIVEFLAGS] ; ► a = flag has fought
+    cp d
+    ret
 
 SECTION "Bank38",ROMX,BANK[$38]
 

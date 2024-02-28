@@ -1579,6 +1579,9 @@ wUnusedD366:: ; df3c ;joenote - use this to track which ai pokemon have switched
 wExplodeFlag: ; df3d
     ds 1
 
+wBackupHealthBarWidth: ; df3e
+    ds 1
+
 SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
 
 wFlagGameBoyColor:    ; dfff ; Denim
