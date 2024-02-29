@@ -24,7 +24,8 @@ CheckSelect:
 .SelectPressed
     ld b,BANK(SelectInOverWorld)
     ld hl,SelectInOverWorld
-    jp Bankswitch
+    call Bankswitch
+    jp OverworldLoop
 
 HackForCloseText:
     ; close if $FF is the textID or sprite index
@@ -126853,10 +126854,10 @@ SelectInOverWorld:
 .NoFishing
     ld b,BICYCLE
     call .IsItemInBag
-    jr z,.return
+    ret z
     ld a,[$d732]
     bit 5,a
-    jr nz,.return
+    ret nz
 .Continue
     push bc
     ; initialize a text box without drawing anything special
@@ -126876,8 +126877,7 @@ SelectInOverWorld:
     ld a,$ff
     ld [$FF8C],a
     call DisplayTextID
-.return
-    jp OverworldLoop
+    ret
 .IsItemInBag
     push bc
     call IsItemInBag
