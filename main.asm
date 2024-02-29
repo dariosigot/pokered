@@ -9776,7 +9776,7 @@ AddEnemyMonToPlayerParty: ; 3a53 (0:3a53)
     call RoutineForRealGB
     ret
 
-Func_3a68: ; 3a68 (0:3a68)
+MoveMon: ; 3a68 (0:3a68)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(Func_f51e)
@@ -42697,8 +42697,7 @@ BillsPC_: ; 0x214c2
     ld hl,SwitchOnText
     call PrintText
 
-Func_214e8: ; 214e8 (8:54e8)
-BillsPCMenu:
+BillsPCMenu: ; 214e8 (8:54e8)
     ld a,[$ccd3]
     ld [wCurrentMenuItem],a ; $cc26
     ld hl,$9780
@@ -42734,9 +42733,9 @@ BillsPCMenu:
     ld [wPlayerMonNumber],a ; $cc2f
     ld hl,WhatText
     call PrintText
-    FuncCoord 9,14 ; $c4c1
+    FuncCoord 9,13 ; $c4c1
     ld hl,Coord
-    ld b,$2
+    ld b,$3
     ld c,$9
     call TextBoxBorder
     ld a,[$d5a0]
@@ -42744,7 +42743,7 @@ BillsPCMenu:
     cp $9
     jr c,.asm_2154f
     sub $9
-    FuncCoord 17,16 ; $c4f1
+    FuncCoord 17,14 ; $c4f1
     ld hl,Coord
     ld [hl],$f7
     add $f6
@@ -42752,12 +42751,12 @@ BillsPCMenu:
 .asm_2154f
     add $f7
 .asm_21551
-    FuncCoord 18,16 ; $c4f2
+    FuncCoord 18,14 ; $c4f2
     ld [Coord],a
-    FuncCoord 10,16 ; $c4ea
+    FuncCoord 10,14 ; $c4ea
     ld hl,Coord
     ld de,BoxNoPCText ; $5713
-    call PlaceString
+    call PlaceStringAndBoxPkmnNumber ; call PlaceString
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     call Delay3
@@ -42768,13 +42767,13 @@ BillsPCMenu:
     ld a,[wCurrentMenuItem] ; $cc26
     ld [$ccd3],a
     and a
-    jp z,Func_21618 ; withdraw
+    jp z,BillsPCWithdraw ; withdraw
     cp $1
-    jp z,Func_215ac ; deposit
+    jp z,BillsPCDeposit ; deposit
     cp $2
-    jp z,Func_21673 ; release
+    jp z,BillsPCRelease ; release
     cp $3
-    jp z,Func_216b3 ; change box
+    jp z,BillsPCChangeBox ; change box
 
 Func_21588: ; 21588 (8:5588)
     ld a,[wFlags_0xcd60]
@@ -42794,33 +42793,32 @@ Func_21588: ; 21588 (8:5588)
     res 6,[hl]
     ret
 
-Func_215ac: ; 215ac (8:55ac)
-BillsPCDeposit:
+BillsPCDeposit: ; 215ac (8:55ac)
+    ld hl,W_NUMINPARTY ; $d163
+    call DisplayMonListMenu
+    jp c,BillsPCMenu
+    call DisplayDepositWithdrawMenu
+    jp nc,BillsPCMenu
     ld a,[W_NUMINPARTY] ; $d163
     dec a
-    jr nz,.asm_215bb
+    jr nz,.partyLargeEnough
     ld hl,CantDepositLastMonText
     call PrintText
     jp BillsPCMenu
-.asm_215bb
+.partyLargeEnough
     ld a,[W_NUMINBOX] ; $da80
     cp $14
-    jr nz,.asm_215cb
+    jr nz,.boxNotFull
     ld hl,BoxFullText ; $5802
     call PrintText
     jp BillsPCMenu
-.asm_215cb
-    ld hl,W_NUMINPARTY ; $d163
-    call Func_216be
-    jp c,BillsPCMenu
-    call Func_2174b
-    jp nc,BillsPCMenu
+.boxNotFull
     ld a,[$cf91]
     call GetCryData
     call PlaySoundWaitForCurrent
     ld a,$1
     ld [$cf95],a
-    call Func_3a68
+    call MoveMon
     xor a
     ld [$cf95],a
     call RemovePokemonWithHack
@@ -42844,26 +42842,26 @@ BillsPCDeposit:
     call PrintText
     jp BillsPCMenu
 
-Func_21618: ; 21618 (8:5618)
+BillsPCWithdraw: ; 21618 (8:5618)
     ld a,[W_NUMINBOX] ; $da80
     and a
-    jr nz,.asm_21627
+    jr nz,.boxNotEmpty
     ld hl,NoMonText ; $580c
     call PrintText
-    jp Func_214e8
-.asm_21627
+    jp BillsPCMenu
+.boxNotEmpty
+    ld hl,W_NUMINBOX ; $da80
+    call DisplayMonListMenu
+    jp c,BillsPCMenu
+    call DisplayDepositWithdrawMenu
+    jp nc,BillsPCMenu
     ld a,[W_NUMINPARTY] ; $d163
     cp $6
-    jr nz,.asm_21637
+    jr nz,.Continue
     ld hl,CantTakeMonText ; $5811
     call PrintText
-    jp Func_214e8
-.asm_21637
-    ld hl,W_NUMINBOX ; $da80
-    call Func_216be
-    jp c,Func_214e8
-    call Func_2174b
-    jp nc,Func_214e8
+    jp BillsPCMenu
+.Continue
     ld a,[wWhichPokemon] ; $cf92
     ld hl,$de06
     call GetPartyMonName
@@ -42872,26 +42870,26 @@ Func_21618: ; 21618 (8:5618)
     call PlaySoundWaitForCurrent
     xor a
     ld [$cf95],a
-    call Func_3a68
+    call MoveMon
     ld a,$1
     ld [$cf95],a
     call RemovePokemon
     call WaitForSoundToFinish
     ld hl,MonIsTakenOutText ; $5807
     call PrintText
-    jp Func_214e8
+    jp BillsPCMenu
 
-Func_21673: ; 21673 (8:5673)
+BillsPCRelease: ; 21673 (8:5673)
     ld a,[W_NUMINBOX] ; $da80
     and a
     jr nz,.asm_21682
     ld hl,NoMonText ; $580c
     call PrintText
-    jp Func_214e8
+    jp BillsPCMenu
 .asm_21682
     ld hl,W_NUMINBOX ; $da80
-    call Func_216be
-    jp c,Func_214e8
+    call DisplayMonListMenu
+    jp c,BillsPCMenu
     ld hl,OnceReleasedText ; $581b
     call PrintText
     call YesNoChoice
@@ -42906,15 +42904,15 @@ Func_21673: ; 21673 (8:5673)
     call PlayCry
     ld hl,MonWasReleasedText ; $5820
     call PrintText
-    jp Func_214e8
+    jp BillsPCMenu
 
-Func_216b3: ; 216b3 (8:56b3)
+BillsPCChangeBox: ; 216b3 (8:56b3)
     ld b,BANK(Func_738a1)
     ld hl,Func_738a1
     call Bankswitch ; indirect jump to Func_738a1 (738a1 (1c:78a1))
-    jp Func_214e8
+    jp BillsPCMenu
 
-Func_216be: ; 216be (8:56be)
+DisplayMonListMenu: ; 216be (8:56be)
     ld a,l
     ld [$cf8b],a
     ld a,h
@@ -42966,7 +42964,7 @@ HMMoveArray: ; 21745 (8:5745)
     db $ff
     ds 5
 
-Func_2174b: ; 2174b (8:574b)
+DisplayDepositWithdrawMenu: ; 2174b (8:574b)
     FuncCoord 9,10 ; $c471
     ld hl,Coord
     ld b,$6
@@ -44914,6 +44912,21 @@ RemovePokemonWithHack:
     ret z ; If Porygon is the first pkmn in Party Don't Remove = Duplicate
 .RemovePokemon
     jp RemovePokemon
+
+PlaceStringAndBoxPkmnNumber:
+    call PlaceString
+    FuncCoord 10,16
+    ld hl,Coord
+    ld de,BoxNoPkmnNumber
+    call PlaceString
+    FuncCoord 14,16
+    ld hl,Coord
+    ld de,W_NUMINBOX
+    ld bc,$102
+    jp PrintNumber
+
+BoxNoPkmnNumber:
+    db $E1,$E2,"    /20@"
 
 SECTION "bank9",ROMX,BANK[$9]
 
@@ -72506,9 +72519,9 @@ Route24Object: ; 0x506a4 (size=67)
     db SPRITE_BLACK_HAIR_BOY_1,$f + 4,$b + 4,$ff,$d2,$41,ROCKET + $C8,$6 ; trainer
     db SPRITE_BLACK_HAIR_BOY_1,$14 + 4,$5 + 4,$ff,$d1,$42,JR__TRAINER_M + $C8,$2 ; trainer
     db SPRITE_BLACK_HAIR_BOY_1,$13 + 4,$b + 4,$ff,$d2,$43,JR__TRAINER_M + $C8,$3 ; trainer
-    db SPRITE_LASS,$16 + 4,$a + 4,$ff,$d3,$44,LASS + $C8,$7 ; trainer
+    db SPRITE_LASS,$16 + 4,$b + 4,$ff,$d2,$44,LASS + $C8,$7 ; trainer
     db SPRITE_BUG_CATCHER,$19 + 4,$b + 4,$ff,$d2,$45,YOUNGSTER + $C8,$4 ; trainer
-    db SPRITE_LASS,$1c + 4,$a + 4,$ff,$d3,$46,LASS + $C8,$8 ; trainer
+    db SPRITE_LASS,$1c + 4,$b + 4,$ff,$d2,$46,LASS + $C8,$8 ; trainer
     db SPRITE_BUG_CATCHER,$1f + 4,$b + 4,$ff,$d2,$47,BUG_CATCHER + $C8,$9 ; trainer
     db SPRITE_BALL,$5 + 4,$a + 4,$ff,$ff,$88,TM_45 ; item
 
@@ -79861,7 +79874,7 @@ DayCareMText1: ; 56254 (15:6254)
     ld [$da48],a
     ld a,$3
     ld [$cf95],a
-    call Func_3a68
+    call MoveMon
     xor a
     ld [$cf95],a
     call RemovePokemon
@@ -79983,7 +79996,7 @@ Func_562e1: ; 562e1 (15:62e1)
     call PrintText
     ld a,$2
     ld [$cf95],a
-    call Func_3a68
+    call MoveMon
     ld a,[$da5f]
     ld [$cf91],a
     ld a,[W_NUMINPARTY]
