@@ -125782,12 +125782,7 @@ _ItemUseBallText05: ; a67cf (29:67cf)
     db 0," was",$55
     db "caught!@@"
 
-_ItemUseBallText07: ; a67ee (29:67ee)
-    db 1
-    dw $DE06
-    db 0," was",$4F
-    db "transferred to",$55
-    db "BILL's PC!",$58
+SECTION "_ItemUseBallText08",ROMX[$6810],BANK[$29] 
 
 _ItemUseBallText08: ; a6810 (29:6810)
     db 1
@@ -125955,6 +125950,15 @@ _SurfingGotOnText:
     db "@"
     TX_RAM $cd6d
     db $0,"!",$58
+
+_ItemUseBallText07:
+    db 1
+    dw $DE06
+    db 0," was",$4F
+    db "transferred to",$55
+    db "BILL's PC! ",$9E,"@" ; 9E = open braket
+    TX_NUM W_NUMINBOX,1,2
+    db 0,"/20",$9F,$58 ; 9F = closed braket
 
 SECTION "bank2A",ROMX,BANK[$2A]
 
