@@ -16060,19 +16060,20 @@ HandleItemListSwapping: ; 6b44 (1:6b44)
     cp b
     jr z,.swapSameItemType
 .swapDifferentItems
-    ld [$ff95],a ; [$ff95] = second item ID
-    ld a,[hld]
-    ld [$ff96],a ; [$ff96] = second item quantity
-    ld a,[de]
-    ld [hli],a ; put first item ID in second item slot
-    inc de
-    ld a,[de]
-    ld [hl],a ; put first item quantity in second item slot
-    ld a,[$ff96]
-    ld [de],a ; put second item quantity in first item slot
-    dec de
-    ld a,[$ff95]
-    ld [de],a ; put second item ID in first item slot
+    call SwapItemNew
+    ;ld [$ff95],a ; [$ff95] = second item ID
+    ;ld a,[hld]
+    ;ld [$ff96],a ; [$ff96] = second item quantity
+    ;ld a,[de]
+    ;ld [hli],a ; put first item ID in second item slot
+    ;inc de
+    ;ld a,[de]
+    ;ld [hl],a ; put first item quantity in second item slot
+    ;ld a,[$ff96]
+    ;ld [de],a ; put second item quantity in first item slot
+    ;dec de
+    ;ld a,[$ff95]
+    ;ld [de],a ; put second item ID in first item slot
     xor a
     ld [$cc35],a ; 0 means no item is currently being swapped
     pop de
@@ -16130,6 +16131,8 @@ HandleItemListSwapping: ; 6b44 (1:6b44)
     pop de
     pop hl
     jp DisplayListMenuIDLoop
+
+SECTION "DisplayPokemartDialogue_",ROMX[$6c20],BANK[$1]
 
 DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld a,[wListScrollOffset]
@@ -18608,6 +18611,77 @@ NewMoveDetails:
 
 EmptyText:
     db "@"
+
+SwapItemNew:
+    dec hl
+    ; hl = address of new entry
+    ; de = address of old entry
+    ld a,h
+    cp d ; C - Set for no borrow. (Set if A < n.)
+    jr c,.NewHigherThenOld
+    jr nz,.NewLowerThenOld
+.CheckLE ; run if h = d
+    ld a,l
+    cp e
+    jr c,.NewHigherThenOld
+.NewLowerThenOld ; l>e
+    ld a,l
+    sub e
+    srl a
+    ld b,a
+.NotZero
+    ld h,d
+    ld l,e
+.Loop1
+    ld a,[hli] ; d = item 1 ID  | hl = 1 ► 2
+    ld d,a     ; ...
+    ld a,[hli] ; e = item 1 QTY | hl = 2 ► 3
+    ld e,a     ; ...
+    ld c,[hl]  ; c = item 2 ID  | hl = 3
+    ld a,d     ; item 2 ID = d 
+    ld [hli],a ; ...            | hl = 3 ► 4
+    ld d,[hl]  ; d = item 2 QTY | hl = 4
+    ld a,e     ; item 2 Qty = e
+    ld [hld],a ; ...            | hl = 4 ► 3
+    dec hl     ; item 1 Qty = d | hl = 3 ► 2
+    ld a,d     ; ...
+    ld [hld],a ; ...            | hl = 2 ► 1
+    ld a,c     ; item 1 ID = c
+    ld [hli],a ; ...            | hl = 1 ► 2
+    inc hl     ; next item      | hl = 2 ► 3
+    dec b
+    jr nz,.Loop1
+    ret
+.NewHigherThenOld ; e>l
+    ld a,e
+    sub l
+    srl a
+    ld b,a ; b = Div(e-l,2) = Delta Offset Between the two items
+    ld h,d
+    ld l,e
+.Loop2
+    ld a,[hli] ; d = item 1 ID  | hl = 3 ► 4
+    ld d,a     ; ...
+    ld a,[hld] ; e = item 1 Qty | hl = 4 ► 3
+    ld e,a     ; ...
+    dec hl     ; c = item 2 Qty | hl = 3 ► 2
+    ld c,[hl]  ; ...            | hl = 2
+    ld a,e     ; item 2 Qty = e
+    ld [hld],a ; ...            | hl = 2 ► 1
+    ld e,[hl]  ; e = item 2 ID  | hl = 1
+    ld a,d     ; item 2 ID = d
+    ld [hli],a ; ...            | hl = 1 ► 2
+    inc hl     ; item 1 ID = e  | hl = 2 ► 3
+    ld a,e     ; ...
+    ld [hli],a ; ...            | hl = 3 ► 4
+    ld a,c     ; item 1 Qty = c
+    ld [hld],a ; ...            | hl = 4 ► 3
+    dec hl     ; prev item      | hl = 3 ► 2
+    dec hl     ; ...            | hl = 2 ► 1
+    dec b
+    jr nz,.Loop2
+    ret
+
 
 SECTION "bank2",ROMX,BANK[$2]
 
