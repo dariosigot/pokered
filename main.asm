@@ -3338,25 +3338,25 @@ DrawPartyMenuCommon: ; 14dc (0:14dc)
 ; INPUT:
 ; de = address of status condition
 ; hl = destination address
-PrintStatusCondition: ; 14e1 (0:14e1)
-    push de
-    dec de
-    dec de ; de = address of current HP
-    ld a,[de]
-    ld b,a
-    dec de
-    ld a,[de]
-    or b ; is the pokemon's HP zero?
-    pop de
-    jr nz,PrintStatusConditionNotFainted
+PrintStatusCondition: ; 14e1 (0:14e1) ; Don't Print "FNT"
+    ;push de
+    ;dec de
+    ;dec de ; de = address of current HP
+    ;ld a,[de]
+    ;ld b,a
+    ;dec de
+    ;ld a,[de]
+    ;or b ; is the pokemon's HP zero?
+    ;pop de
+    ;jr nz,PrintStatusConditionNotFainted
 ; if the pokemon's HP is 0,print "FNT"
-    ld a,"F"
-    ld [hli],a
-    ld a,"N"
-    ld [hli],a
-    ld [hl],"T"
-    and a
-    ret
+    ;ld a,"F"
+    ;ld [hli],a
+    ;ld a,"N"
+    ;ld [hli],a
+    ;ld [hl],"T"
+    ;and a
+    ;ret
 PrintStatusConditionNotFainted ; 14f6
     ld a,[H_LOADEDROMBANK]
     push af
@@ -3369,6 +3369,10 @@ PrintStatusConditionNotFainted ; 14f6
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ret
+
+; ds X ; Denim ; 4some free Bytes
+
+SECTION "PrintLevel",ROM0[$150b] ; Denim
 
 ; function to print pokemon level,leaving off the ":L" if the level is at least 100
 ; INPUT:
@@ -22014,8 +22018,9 @@ Func_c69c: ; c69c (3:469c)
     ld hl,W_PARTYMON1_STATUS ; $d16f
     ld de,W_PARTYMON1 ; $d164
 .asm_c6be
-    ld a,[hl]
-    and $8
+    ; ds 1 ; ld a,[hl]
+    ; ds 2 ; and $8
+    call PoisonedOnlyIfNotFaintened
     jr z,.asm_c6fd
     dec hl
     dec hl
@@ -22039,7 +22044,7 @@ Func_c69c: ; c69c (3:469c)
     push hl
     inc hl
     inc hl
-    ld [hl],a
+    nop ; ld [hl],a ; Not Remove Poison Status if Faintened in Overworld
     ld a,[de]
     ld [$d11e],a
     push de
@@ -22075,8 +22080,9 @@ Func_c69c: ; c69c (3:469c)
     ld d,a
     ld e,$0
 .asm_c717
-    ld a,[hl]
-    and $8
+    ; ds 1 ; ld a,[hl]
+    ; ds 2 ; and $8
+    call PoisonedOnlyIfNotFaintened
     or e
     ld e,a
     ld bc,$2c
@@ -23077,8 +23083,8 @@ ItemUsePtrTable: ; d5e1 (3:55e1)
     dw UnusableItem      ; ??? PP_UP
     dw ItemUsePokedoll   ; POKE_DOLL
     dw ItemUseMedicine   ; FULL_HEAL
-    dw ItemUseMedicine   ; REVIVE
-    dw ItemUseMedicine   ; MAX_REVIVE
+    dw UnusableItem      ; REVIVE     ; TODO
+    dw UnusableItem      ; MAX_REVIVE ; TODO
     dw ItemUseGuardSpec  ; GUARD_SPEC_
     dw ItemUseSuperRepel ; SUPER_REPL
     dw ItemUseMaxRepel   ; MAX_REPEL
@@ -23754,9 +23760,12 @@ ItemUseMedicine: ; dabb (3:5abb)
     jr nc,.healHP ; if it's a Full Restore or one of the potions
 ; fall through if it's one of the status-specifc healing items
 .cureStatusAilment
-    ld bc,4
-    add hl,bc ; hl now points to status
-    ld a,[$cf91]
+    ;ds 3 ; ld bc,4
+    ;ds 1 ; add hl,bc ; hl now points to status
+    ;ds 3 ; ld a,[$cf91]
+    call LoadPointerToStatusItemIDAndCheckFaintened
+    jp z,.healingItemNoEffect
+    nop
     ld bc,$f008
     cp a,ANTIDOTE
     jr z,.checkMonStatus
@@ -23811,47 +23820,47 @@ ItemUseMedicine: ; dabb (3:5abb)
     or b
     jr nz,.notFainted
 .fainted
-    ld a,[$cf91]
-    cp a,REVIVE
-    jr z,.updateInBattleFaintedData
-    cp a,MAX_REVIVE
-    jr z,.updateInBattleFaintedData
     jp .healingItemNoEffect
+    ds 3 ; ld a,[$cf91]
+    ds 2 ; cp a,REVIVE
+    ds 2 ; jr z,.updateInBattleFaintedData
+    ds 2 ; cp a,MAX_REVIVE
+    ds 2 ; jr z,.updateInBattleFaintedData
 .updateInBattleFaintedData
-    ld a,[W_ISINBATTLE]
-    and a
-    jr z,.compareCurrentHPToMaxHP
+    ds 3 ; ld a,[W_ISINBATTLE]
+    ds 1 ; and a
+    ds 2 ; jr z,.compareCurrentHPToMaxHP
     ;push hl
     ;push de
     ;push bc
     ;ld a,[$cf06]
-    call ItemUseNotTime
-    jp .done
-    ld c,a
-    ld hl,$ccf5
-    ld b,$02
-    ld a,$10
-    call Predef
-    ld a,c
-    and a
-    jr z,.next
-    ld a,[$cf06]
-    ld c,a
-    ld hl,W_PLAYERMONSALIVEFLAGS
-    ld b,$01
-    ld a,$10
-    call Predef
+    ds 3 ; call ItemUseNotTime
+    ds 3 ; jp .done
+    ds 1 ; ld c,a
+    ds 3 ; ld hl,$ccf5
+    ds 2 ; ld b,$02
+    ds 2 ; ld a,$10
+    ds 3 ; call Predef
+    ds 1 ; ld a,c
+    ds 1 ; and a
+    ds 2 ; jr z,.next
+    ds 3 ; ld a,[$cf06]
+    ds 1 ; ld c,a
+    ds 3 ; ld hl,W_PLAYERMONSALIVEFLAGS
+    ds 2 ; ld b,$01
+    ds 2 ; ld a,$10
+    ds 3 ; call Predef
 .next
-    pop bc
-    pop de
-    pop hl
-    jr .compareCurrentHPToMaxHP
+    ds 1 ; pop bc
+    ds 1 ; pop de
+    ds 1 ; pop hl
+    ds 2 ; jr .compareCurrentHPToMaxHP
 .notFainted
     ld a,[$cf91]
-    cp a,REVIVE
-    jp z,.healingItemNoEffect
-    cp a,MAX_REVIVE
-    jp z,.healingItemNoEffect
+    ds 2 ; cp a,REVIVE
+    ds 3 ; jp z,.healingItemNoEffect
+    ds 2 ; cp a,MAX_REVIVE
+    ds 3 ; jp z,.healingItemNoEffect
 .compareCurrentHPToMaxHP
     push hl
     push bc
@@ -24004,8 +24013,8 @@ ItemUseMedicine: ; dabb (3:5abb)
     ld hl,33
     add hl,de ; hl now points to max HP
     ld a,[$cf91]
-    cp a,REVIVE
-    jr z,.setCurrentHPToHalfMaxHP
+    ds 2 ; cp a,REVIVE
+    ds 2 ; jr z,.setCurrentHPToHalfMaxHP
     ld a,[hld]
     ld b,a
     ld a,[de]
@@ -28491,6 +28500,31 @@ ClearScreenAndLoadWalkingPlayerSpriteGraphics:
     call GBPalWhiteOutWithDelay3
     call ClearScreen
     jp LoadWalkingPlayerSpriteGraphics
+
+PoisonedOnlyIfNotFaintened:
+    ld a,[hl]
+    and $8
+    ret z ; Set z if NOT Poisoned
+.Poison
+    ; fall through
+
+CheckFaintenedFromStatusPointer:
+    dec hl
+    dec hl
+    ld a,[hld]
+    ld b,a
+    ld a,[hli]
+    inc hl
+    inc hl
+    or b ; Set z if Zero HP
+    ret
+
+LoadPointerToStatusItemIDAndCheckFaintened:
+    ld bc,4
+    add hl,bc ; hl now points to status
+    call CheckFaintenedFromStatusPointer
+    ld a,[$cf91]
+    ret
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -130478,10 +130512,10 @@ SetExplodeFlag_:
 
 SetExplodeFlagBecauseStatusAfterFainted_:
     ld a,[W_PLAYERMONSTATUS]
-    and PSN | BRN | FRZ | PAR
+    and PSN | BRN | FRZ | PAR | SLP
     call nz,SetExplodeFlag_
-    xor a
-    ld [W_PLAYERMONSTATUS],a ; $d018
+    ;xor a ; Don't Remove STATUS when faintened
+    ;ld [W_PLAYERMONSTATUS],a ; $d018
     ret
 
 InitExplodeFlag:
