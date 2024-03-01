@@ -7473,33 +7473,42 @@ DisplayListMenuIDLoop: ; 2c53 (0:2c53)
 
 DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
 ; text box dimensions/coordinates for just quantity
-    FuncCoord 15,9
-    ld hl,Coord
-    ld b,1 ; height
-    ld c,3 ; width
-    ld a,[wListMenuID]
-    cp a,PRICEDITEMLISTMENU
-    jr nz,.drawTextBox
+          ; FuncCoord 15,9
+    ;ds 3 ; ld hl,Coord
+    ;ds 2 ; ld b,1 ; height
+    ;ds 2 ; ld c,3 ; width
+    ;ds 3 ; ld a,[wListMenuID]
+    ;ds 2 ; cp a,PRICEDITEMLISTMENU
+    ;ds 2 ; jr nz,.drawTextBox
 ; text box dimensions/coordinates for quantity and price
-    FuncCoord 7,9
-    ld hl,Coord
-    ld b,1  ; height
-    ld c,11 ; width
-.drawTextBox
-    call TextBoxBorder
-    FuncCoord 16,10
-    ld hl,Coord
-    ld a,[wListMenuID]
-    cp a,PRICEDITEMLISTMENU
-    jr nz,.printInitialQuantity
-    FuncCoord 8,10
-    ld hl,Coord
-.printInitialQuantity
-    ld de,InitialQuantityText
-    call PlaceString
-    xor a
-    ld [$cf96],a ; initialize current quantity to 0
+          ; FuncCoord 7,9
+    ;ds 3 ; ld hl,Coord
+    ;ds 2 ; ld b,3  ; height
+    ;ds 2 ; ld c,11 ; width
+;.drawTextBox
+    ;ds 3 ; call TextBoxBorder
+          ; FuncCoord 16,10
+    ;ds 3 ; ld hl,Coord
+    ;ds 3 ; ld a,[wListMenuID]
+    ;ds 2 ; cp a,PRICEDITEMLISTMENU
+    ;ds 2 ; jr nz,.printInitialQuantity
+          ; FuncCoord 8,10
+    ;ds 3 ; ld hl,Coord
+;.printInitialQuantity
+    ;ds 3 ; ld de,InitialQuantityText
+    ;ds 3 ; call PlaceString
+    ;ds 1 ; xor a
+    ;ds 3 ; ld [$cf96],a ; initialize current quantity to 0
+
+    ld b,BANK(InitializeChooseQuantityMenu) ; 2 byte
+    ld hl,InitializeChooseQuantityMenu ; 3 byte
+    call Bankswitch ; 3 byte
+
     jp .incrementQuantity
+
+    ; free space in BANK0
+    ds 24+23-8
+
 .waitForKeyPressLoop
     call GetJoypadStateLowSensitivity
     ld a,[H_NEWLYPRESSEDBUTTONS] ; newly pressed buttons
@@ -130533,6 +130542,61 @@ CheckIfAllFought:
     ld a,[W_PLAYERMONSALIVEFLAGS] ; ► a = flag has fought
     cp d
     ret
+
+InitializeChooseQuantityMenu:
+; text box dimensions/coordinates for just quantity
+    FuncCoord 15,9
+    ld hl,Coord
+    ld b,1 ; height
+    ld c,3 ; width
+    ld a,[wListMenuID]
+    cp a,PRICEDITEMLISTMENU
+    jr nz,.drawTextBox
+; text box dimensions/coordinates for quantity and price
+    FuncCoord 7,9
+    ld hl,Coord
+    ld a,[$ff8e]
+    and a ; should the price be halved (for selling items)?
+    ld b,1  ; height
+    jr nz,.SellOnly1Row
+    ld b,3  ; height
+.SellOnly1Row
+    ld c,11 ; width
+.drawTextBox
+    call TextBoxBorder
+    FuncCoord 16,10
+    ld hl,Coord
+    ld a,[wListMenuID]
+    cp a,PRICEDITEMLISTMENU
+    jr nz,.printInitialQuantity
+    ld a,[$ff8e]
+    and a ; should the price be halved (for selling items)?
+    jr nz,.SkipShowBagInfo
+    FuncCoord 12,12
+    ld hl,Coord
+    ld de,.PackText
+    call PlaceString
+    ld a,[$cf91] ; selected item ID
+    ld b,a
+    call IsItemInBag
+    ld a,b
+    ld [wBackupItemCurrentQty],a
+    FuncCoord 17,12
+    ld hl,Coord
+    ld de,wBackupItemCurrentQty ; quantity
+    ld bc,$8102 ; print leading zeroes,1 byte,2 digits
+    call PrintNumber
+.SkipShowBagInfo
+    FuncCoord 8,10
+    ld hl,Coord
+.printInitialQuantity
+    ld de,InitialQuantityText
+    call PlaceString
+    xor a
+    ld [$cf96],a ; initialize current quantity to 0
+    ret
+.PackText
+    db "BAG ×@"
 
 SECTION "Bank38",ROMX,BANK[$38]
 

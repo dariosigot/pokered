@@ -1577,6 +1577,7 @@ wUnusedD366:: ; df3c ;joenote - use this to track which ai pokemon have switched
 ;bit 6: 6th pkmn (position 5)
 
 wExplodeFlag: ; df3d
+wBackupItemCurrentQty: ; df3d
     ds 1
 
 wBackupHealthBarWidth: ; df3e
