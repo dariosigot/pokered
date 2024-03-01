@@ -117404,8 +117404,8 @@ _Route15GateText1: ; 8cb73 (23:4b73)
 ;    db "store it via PC.",$57
 
 _UnnamedText_4968c: ; 8cbac (23:4bac)
-    db $0,"FOCUS gives",$4f
-    db "EXP points only to",$55
+    db $0,"FOCUS gives EXP",$4f
+    db "points only to",$55
     db "#MON that",$55
     db "has fought!",$51
     db "It does,therefore,",$4f
