@@ -5,7 +5,7 @@ FM_STRENGTH EQU %00001000 ; 5
 FM_LIGHT    EQU %00010000 ; 6
 FM_DIG      EQU %00100000 ; 7
 FM_TELEPORT EQU %01000000 ; 8
-FM_NURSE    EQU %10000000 ; 9
+FM_HEAL     EQU %10000000 ; 9
 
 db 0                                                 ; 0   - $00 - 'M
 db 0                                                 ; 1   - $01 - BULBASAUR
@@ -42,12 +42,12 @@ db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG                ; 31  - $1F - NIDOQUEEN
 db 0                                                 ; 32  - $20 - NIDORAN_M
 db FM_STRENGTH                                       ; 33  - $21 - NIDORINO
 db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG                ; 34  - $22 - NIDOKING
-db 0                                                 ; 35  - $23 - CLEFAIRY
-db 0                                                 ; 36  - $24 - CLEFABLE
+db FM_HEAL                                           ; 35  - $23 - CLEFAIRY
+db FM_HEAL                                           ; 36  - $24 - CLEFABLE
 db FM_LIGHT                                          ; 37  - $25 - VULPIX
 db FM_LIGHT+FM_DIG                                   ; 38  - $26 - NINETALES
-db 0                                                 ; 39  - $27 - JIGGLYPUFF
-db 0                                                 ; 40  - $28 - WIGGLYTUFF
+db FM_HEAL                                           ; 39  - $27 - JIGGLYPUFF
+db FM_HEAL                                           ; 40  - $28 - WIGGLYTUFF
 db 0                                                 ; 41  - $29 - ZUBAT
 db FM_CUT+FM_FLY                                     ; 42  - $2A - GOLBAT
 db 0                                                 ; 43  - $2B - ODDISH
@@ -115,12 +115,12 @@ db FM_DIG                                            ; 104 - $68 - CUBONE
 db FM_DIG+FM_STRENGTH                                ; 105 - $69 - MAROWAK
 db FM_FLOAT+FM_STRENGTH                              ; 106 - $6A - HITMONLEE
 db FM_FLOAT+FM_STRENGTH                              ; 107 - $6B - HITMONCHAN
-db FM_CUT+FM_FLOAT+FM_STRENGTH                       ; 108 - $6C - LICKITUNG
+db FM_CUT+FM_FLOAT+FM_HEAL                           ; 108 - $6C - LICKITUNG
 db 0                                                 ; 109 - $6D - KOFFING
 db 0                                                 ; 110 - $6E - WEEZING
 db FM_STRENGTH+FM_DIG                                ; 111 - $6F - RHYHORN
 db FM_FLOAT+FM_STRENGTH+FM_DIG                       ; 112 - $70 - RHYDON
-db FM_NURSE                                          ; 113 - $71 - CHANSEY
+db FM_HEAL                                           ; 113 - $71 - CHANSEY
 db FM_CUT                                            ; 114 - $72 - TANGELA
 db FM_FLOAT+FM_STRENGTH                              ; 115 - $73 - KANGASKHAN
 db 0                                                 ; 116 - $74 - HORSEA
@@ -144,7 +144,7 @@ db 0                                                 ; 133 - $85 - EEVEE
 db FM_FLOAT                                          ; 134 - $86 - VAPOREON
 db FM_LIGHT                                          ; 135 - $87 - JOLTEON
 db FM_LIGHT                                          ; 136 - $88 - FLAREON
-db FM_TELEPORT                                       ; 137 - $89 - PORYGON
+db FM_TELEPORT+FM_HEAL                               ; 137 - $89 - PORYGON
 db 0                                                 ; 138 - $8A - OMANYTE
 db FM_FLOAT+FM_DIG                                   ; 139 - $8B - OMASTAR
 db 0                                                 ; 140 - $8C - KABUTO
@@ -158,4 +158,4 @@ db 0                                                 ; 147 - $93 - DRATINI
 db FM_FLOAT+FM_DIG                                   ; 148 - $94 - DRAGONAIR
 db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_DIG         ; 149 - $95 - DRAGONITE
 db FM_STRENGTH+FM_TELEPORT                           ; 150 - $96 - MEWTWO
-db FM_TELEPORT+FM_NURSE                              ; 151 - $97 - MEW
+db FM_TELEPORT+FM_HEAL                               ; 151 - $97 - MEW

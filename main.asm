@@ -17712,7 +17712,7 @@ FieldMoveNames: ; 778d (1:778d)
     db "LIGHT@"  ; Move : FLASH
     db "DIG@"    ; Move : TRAPHOLE
     db "TELEP.@" ; Move : TELEPORT
-    db "NURSE@"  ; Move : SOFTBOILED
+    db "HEAL@"   ; Move : SOFTBOILED
 
 SECTION "PokemonMenuEntries",ROMX[$77c2],BANK[$1]
 
