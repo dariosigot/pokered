@@ -70,6 +70,12 @@ dbdw: MACRO
     dw \2
     ENDM
 
+bcd3: MACRO
+	dn ((\1) / 100000) % 10, ((\1) / 10000) % 10
+	dn ((\1) / 1000) % 10, ((\1) / 100) % 10
+	dn ((\1) / 10) % 10, (\1) % 10
+ENDM
+
 ; data format macros
 RGB: MACRO
 	dw (\3 << 10 | \2 << 5 | \1)

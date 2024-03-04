@@ -6116,12 +6116,12 @@ VermilionMartText1: ; 2461 (0:2461)
 
 ; Lavender
 LavenderMartText1: ; 246a (0:246a)
-    db $FE,9,GREAT_BALL,SUPER_POTION,REVIVE,ESCAPE_ROPE,SUPER_REPEL
-    db ANTIDOTE,BURN_HEAL,ICE_HEAL,PARLYZ_HEAL,$FF
+    db $FE,9,GREAT_BALL,SUPER_POTION,ETHER,ELIXER,ESCAPE_ROPE,SUPER_REPEL
+    db ANTIDOTE,BURN_HEAL,PARLYZ_HEAL,$FF
 
 ; Celadon Dept. Store 2F (1)
 CeladonMart2Text1: ; 2476 (0:2476)
-    db $FE,9,GREAT_BALL,SUPER_POTION,REVIVE,SUPER_REPEL,ANTIDOTE
+    db $FE,9,GREAT_BALL,SUPER_POTION,ETHER,SUPER_REPEL,ANTIDOTE
     db BURN_HEAL,ICE_HEAL,AWAKENING,PARLYZ_HEAL,$FF
 
 ; Celadon Dept. Store 2F (2)
@@ -6143,26 +6143,26 @@ CeladonMart5Text4: ; 24a0 (0:24a0)
 
 ; Fuchsia
 FuchsiaMartText1: ; 24a8 (0:24a8)
-    db $FE,6,ULTRA_BALL,GREAT_BALL,SUPER_POTION,REVIVE,FULL_HEAL
+    db $FE,6,ULTRA_BALL,GREAT_BALL,SUPER_POTION,ETHER,FULL_HEAL
     db SUPER_REPEL,$FF
 
 ; unused? 24b1
-    db $FE,5,GREAT_BALL,HYPER_POTION,SUPER_POTION,FULL_HEAL,REVIVE,$FF
+    db $FE,5,GREAT_BALL,HYPER_POTION,SUPER_POTION,FULL_HEAL,ETHER,$FF
 
 ; Cinnabar
 CinnabarMartText1: ; 24b9 (0:24b9)
     db $FE,7,ULTRA_BALL,GREAT_BALL,HYPER_POTION,MAX_REPEL,ESCAPE_ROPE
-    db FULL_HEAL,REVIVE,$FF
+    db FULL_HEAL,ETHER,$FF
 
 ; Saffron
 SaffronMartText1: ; 24c3 (0:24c3)
     db $FE,6,GREAT_BALL,HYPER_POTION,MAX_REPEL,ESCAPE_ROPE,FULL_HEAL
-    db REVIVE,$FF
+    db ETHER,$FF
 
 ; Indigo
 IndigoPlateauLobbyText4: ; 24cc (0:24cc)
     db $FE,7,ULTRA_BALL,GREAT_BALL,FULL_RESTORE,MAX_POTION,FULL_HEAL
-    db REVIVE,MAX_REPEL,$FF
+    db ETHER,MAX_REPEL,$FF
 
 TextScriptEndingChar: ; 24d6 (0:24d6)
     db "@"
@@ -11476,103 +11476,89 @@ LoadMonData_: ; 45b6 (1:45b6)
     jp CopyData
 
 ItemPrices: ; 4608 (1:4608)
-    db $00,$00,$00
-    db $00,$12,$00
-    db $00,$06,$00
-    db $00,$02,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$10,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$01,$00
-    db $00,$02,$50
-    db $00,$02,$50
-    db $00,$02,$00
-    db $00,$02,$00
-    db $00,$30,$00
-    db $00,$25,$00
-    db $00,$15,$00
-    db $00,$07,$00
-    db $00,$03,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$05,$50
-    db $00,$03,$50
-    db $00,$00,$00
-    db $00,$21,$00
-    db $00,$21,$00
-    db $00,$21,$00
-    db $00,$98,$00
-    db $00,$98,$00
-    db $00,$98,$00
-    db $00,$98,$00
-    db $00,$98,$00
-    db $00,$48,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$09,$50
-    db $00,$21,$00
-    db $00,$00,$00
-    db $01,$00,$00
-    db $00,$98,$00
-    db $00,$10,$00
-    db $00,$06,$00
-    db $00,$15,$00
-    db $00,$40,$00
-    db $00,$07,$00
-    db $00,$05,$00
-    db $00,$07,$00
-    db $00,$06,$50
-    db $00,$00,$10
-    db $00,$02,$00
-    db $00,$03,$00
-    db $00,$03,$50
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$05,$00
-    db $00,$05,$50
-    db $00,$03,$50
-    db $00,$03,$50
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
-    db $00,$00,$00
+    bcd3 200000 ; MASTER_BALL
+    bcd3   1200 ; ULTRA_BALL
+    bcd3    600 ; GREAT_BALL
+    bcd3    200 ; POKE_BALL
+    bcd3      0 ; TOWN_MAP
+    bcd3      0 ; BICYCLE
+    bcd3      0 ; SURFBOARD
+    bcd3   1000 ; SAFARI_BALL
+    bcd3      0 ; POKEDEX
+    bcd3  40000 ; MOON_STONE
+    bcd3    100 ; ANTIDOTE
+    bcd3    250 ; BURN_HEAL
+    bcd3    250 ; ICE_HEAL
+    bcd3    200 ; AWAKENING
+    bcd3    200 ; PARLYZ_HEAL
+    bcd3   3000 ; FULL_RESTORE
+    bcd3   2500 ; MAX_POTION
+    bcd3   1500 ; HYPER_POTION
+    bcd3    700 ; SUPER_POTION
+    bcd3    300 ; POTION
+    bcd3      0 ; BOULDERBADGE
+    bcd3      0 ; CASCADEBADGE
+    bcd3      0 ; THUNDERBADGE
+    bcd3      0 ; RAINBOWBADGE
+    bcd3      0 ; SOULBADGE
+    bcd3      0 ; MARSHBADGE
+    bcd3      0 ; VOLCANOBADGE
+    bcd3      0 ; EARTHBADGE
+    bcd3    550 ; ESCAPE_ROPE
+    bcd3    350 ; REPEL
+    bcd3      0 ; OLD_AMBER
+    bcd3   2100 ; FIRE_STONE
+    bcd3   2100 ; THUNDER_STONE
+    bcd3   2100 ; WATER_STONE
+    bcd3   9800 ; HP_UP
+    bcd3   9800 ; PROTEIN
+    bcd3   9800 ; IRON
+    bcd3   9800 ; CARBOS
+    bcd3   9800 ; CALCIUM
+    bcd3   4800 ; RARE_CANDY
+    bcd3      0 ; DOME_FOSSIL
+    bcd3      0 ; HELIX_FOSSIL
+    bcd3      0 ; SECRET_KEY
+    bcd3      0 ; XXX
+    bcd3      0 ; BIKE_VOUCHER
+    bcd3    950 ; X_ACCURACY
+    bcd3   2100 ; LEAF_STONE
+    bcd3      0 ; CARD_KEY
+    bcd3  10000 ; NUGGET
+    bcd3   9800 ; XXX PP_UP
+    bcd3   1000 ; POKE_DOLL
+    bcd3    600 ; FULL_HEAL
+    bcd3   1500 ; REVIVE
+    bcd3   4000 ; MAX_REVIVE
+    bcd3    700 ; GUARD_SPEC
+    bcd3    500 ; SUPER_REPEL
+    bcd3    700 ; MAX_REPEL
+    bcd3    650 ; DIRE_HIT
+    bcd3     10 ; COIN
+    bcd3    200 ; FRESH_WATER
+    bcd3    300 ; SODA_POP
+    bcd3    350 ; LEMONADE
+    bcd3      0 ; S_S_TICKET
+    bcd3      0 ; GOLD_TEETH
+    bcd3    500 ; X_ATTACK
+    bcd3    550 ; X_DEFEND
+    bcd3    350 ; X_SPEED
+    bcd3    350 ; X_SPECIAL
+    bcd3      0 ; COIN_CASE
+    bcd3      0 ; OAKS_PARCEL
+    bcd3      0 ; ITEMFINDER
+    bcd3      0 ; SILPH_SCOPE
+    bcd3      0 ; POKE_FLUTE
+    bcd3      0 ; LIFT_KEY
+    bcd3      0 ; EXP_ALL
+    bcd3      0 ; OLD_ROD
+    bcd3      0 ; GOOD_ROD
+    bcd3      0 ; SUPER_ROD
+    bcd3   9800 ; PP_UP
+    bcd3   3000 ; ETHER
+    bcd3   3000 ; MAX_ETHER
+    bcd3   5000 ; ELIXER
+    bcd3   5000 ; MAX_ELIXER
 
 ItemNames_Old: ; 472b (1:472b)
 
@@ -23083,8 +23069,8 @@ ItemUsePtrTable: ; d5e1 (3:55e1)
     dw UnusableItem      ; ??? PP_UP
     dw ItemUsePokedoll   ; POKE_DOLL
     dw ItemUseMedicine   ; FULL_HEAL
-    dw UnusableItem      ; REVIVE     ; TODO
-    dw UnusableItem      ; MAX_REVIVE ; TODO
+    dw ItemUseMedicine   ; REVIVE
+    dw ItemUseMedicine   ; MAX_REVIVE
     dw ItemUseGuardSpec  ; GUARD_SPEC_
     dw ItemUseSuperRepel ; SUPER_REPL
     dw ItemUseMaxRepel   ; MAX_REPEL
@@ -23727,16 +23713,27 @@ ItemUseMedicine: ; dabb (3:5abb)
     call DisplayPartyMenu
 .getPartyMonDataAddress
     jp c,.canceledItemUse
-    ld hl,W_PARTYMON1DATA
-    ld bc,44
-    ld a,[$cf92]
-    call AddNTimes
-    ld a,[$cf92]
-    ld [$cf06],a
-    ld d,a
-    ld a,[$cf91]
-    ld e,a
-    ld [$d0b5],a
+    ; ds 3 ; ld hl,W_PARTYMON1DATA
+    ; ds 3 ; ld bc,44
+    ; ds 3 ; ld a,[$cf92]
+    ; ds 3 ; call AddNTimes
+    ; ds 3 ; ld a,[$cf92]
+    ; ds 3 ; ld [$cf06],a
+    ; ds 1 ; ld d,a
+    ; ds 3 ; ld a,[$cf91]
+    ; ds 1 ; ld e,a
+    ; ds 3 ; ld [$d0b5],a
+    call CheckMedicineActive
+    jr z,.continue
+    pop af
+    ld [$cf91],a
+    pop af
+    ld [$cf92],a
+    ld hl,MustChoiceActiveText
+    call PrintText
+    jr ItemUseMedicine ; force another choice
+    ds 26 - 21
+.continue
     pop af
     ld [$cf91],a
     pop af
@@ -23820,22 +23817,21 @@ ItemUseMedicine: ; dabb (3:5abb)
     or b
     jr nz,.notFainted
 .fainted
+    ld a,[$cf91]
+    cp a,REVIVE
+    jr z,.updateInBattleFaintedData
+    cp a,MAX_REVIVE
+    jr z,.updateInBattleFaintedData
     jp .healingItemNoEffect
-    ds 3 ; ld a,[$cf91]
-    ds 2 ; cp a,REVIVE
-    ds 2 ; jr z,.updateInBattleFaintedData
-    ds 2 ; cp a,MAX_REVIVE
-    ds 2 ; jr z,.updateInBattleFaintedData
 .updateInBattleFaintedData
-    ds 3 ; ld a,[W_ISINBATTLE]
-    ds 1 ; and a
-    ds 2 ; jr z,.compareCurrentHPToMaxHP
-    ;push hl
-    ;push de
-    ;push bc
-    ;ld a,[$cf06]
-    ds 3 ; call ItemUseNotTime
-    ds 3 ; jp .done
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.compareCurrentHPToMaxHP
+    jp .healingItemNoEffect
+    ;ds 1 ; push hl
+    ;ds 1 ; push de
+    ;ds 1 ; push bc
+    ds 3 ; ld a,[$cf06]
     ds 1 ; ld c,a
     ds 3 ; ld hl,$ccf5
     ds 2 ; ld b,$02
@@ -23857,10 +23853,10 @@ ItemUseMedicine: ; dabb (3:5abb)
     ds 2 ; jr .compareCurrentHPToMaxHP
 .notFainted
     ld a,[$cf91]
-    ds 2 ; cp a,REVIVE
-    ds 3 ; jp z,.healingItemNoEffect
-    ds 2 ; cp a,MAX_REVIVE
-    ds 3 ; jp z,.healingItemNoEffect
+    cp a,REVIVE
+    jp z,.healingItemNoEffect
+    cp a,MAX_REVIVE
+    jp z,.healingItemNoEffect
 .compareCurrentHPToMaxHP
     push hl
     push bc
@@ -24013,8 +24009,8 @@ ItemUseMedicine: ; dabb (3:5abb)
     ld hl,33
     add hl,de ; hl now points to max HP
     ld a,[$cf91]
-    ds 2 ; cp a,REVIVE
-    ds 2 ; jr z,.setCurrentHPToHalfMaxHP
+    cp a,REVIVE
+    jr z,.setCurrentHPToHalfMaxHP
     ld a,[hld]
     ld b,a
     ld a,[de]
@@ -24034,11 +24030,11 @@ ItemUseMedicine: ; dabb (3:5abb)
     dec hl
     dec de
     ld a,[hli]
-    srl a
+    ld a,0 ; 1 HP ; srl a
     ld [de],a
     ld [wHPBarNewHP+1],a
     ld a,[hl]
-    rr a
+    ld a,1 ; 1 HP ;  rr a
     inc de
     ld [de],a
     ld [wHPBarNewHP],a
@@ -28526,6 +28522,33 @@ LoadPointerToStatusItemIDAndCheckFaintened:
     ld a,[$cf91]
     ret
 
+CheckMedicineActive:
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.continue ; continue if not in battle
+    ld a,[wPlayerMonNumber]
+    ld b,a
+    ld a,[$cf92]
+    cp b
+    jr z,.continue ; continue if active mon is choice in battle
+    ret nz
+.continue
+    ld hl,W_PARTYMON1DATA
+    ld bc,44
+    ld a,[$cf92]
+    call AddNTimes
+    ld a,[$cf92]
+    ld [$cf06],a
+    ld d,a
+    ld a,[$cf91]
+    ld e,a
+    ld [$d0b5],a
+    ret
+
+MustChoiceActiveText:
+    TX_FAR _MustChoiceActiveText
+    db "@"
+
 SECTION "bank4",ROMX,BANK[$4]
 
 OakAideSprite: ; 10000 (4:4000)
@@ -29367,7 +29390,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     cp a,$F0
     jr nc,.printItemUseMessage
     add a
-    ld hl,PartyMenuMessagePointers
+    call CheckIfInBattleItem ; ld hl,PartyMenuMessagePointers
     ld b,0
     ld c,a
     add hl,bc
@@ -31779,6 +31802,49 @@ UnknownDungeonPkmnMinLevel:
     db 55 ; DRAGONITE
     db 44 ; MEWTWO
     db 44 ; MEW
+
+CheckIfInBattleItem:
+    ld hl,PartyMenuMessagePointers
+    cp 2 ; If Original $D07D = 1 because doubled
+    ret nz
+    call .IsInBattle
+    jr nz,.ItemInBattle
+    call .IsUsingSoftboiled
+    jr nz,.Softboiled
+    ret
+.ItemInBattle
+    xor a
+.Softboiled ; a = 2
+    ld hl,PartyMenuMessagePointersNew
+    ret
+.IsInBattle
+    push bc
+    ld b,a ; Backup
+    ld a,[W_ISINBATTLE]
+    and a
+    ld a,b ; Restore
+    pop bc
+    ret
+.IsUsingSoftboiled
+    push bc
+    ld b,a ; Backup
+    ld a,[$d152]
+    and a ; using Softboiled?
+    ld a,b ; Restore
+    pop bc
+    ret
+
+PartyMenuMessagePointersNew:
+    dw PartyMenuItemUseInBattleText
+    dw PartyMenuSoftboiledUseText
+
+PartyMenuItemUseInBattleText:
+    TX_FAR _PartyMenuItemUseInBattleText
+    db "@"
+
+PartyMenuSoftboiledUseText:
+    TX_FAR _PartyMenuSoftboiledUseText
+    db "@"
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -117101,6 +117167,18 @@ _WithExpAllText
     db $0,"Other #MON gain",$4F
     db "some EXP. Points!",$58
 
+_PartyMenuItemUseInBattleText:
+    db $0,"Use item on",$4f
+    db "ACTIVE #MON!",$57
+
+_PartyMenuSoftboiledUseText:
+    db $0,"Heal which",$4f
+    db "#MON?",$57
+
+_MustChoiceActiveText:
+    db $0,"You must choice",$4F
+    db "ACTIVE #MON!",$58
+
 SECTION "bank23",ROMX,BANK[$23]
 
 _UnnamedText_56437: ; 8c000 (23:4000)
@@ -122522,7 +122600,7 @@ _CeladonMart2Text3: ; 9c76b (27:476b)
 _CeladonMart2Text4: ; 9c7b2 (27:47b2)
     db $0,"For long outings,",$4f
     db "you should buy",$55
-    db "REVIVE.",$57
+    db "ETHER. ",$57
 
 _CeladonMart2Text5: ; 9c7dc (27:47dc)
     db $0,"Top Grade Items",$4f
@@ -124531,7 +124609,7 @@ _SaffronMartText2: ; a23e3 (28:63e3)
     db "away!",$57
 
 _SaffronMartText3: ; a242a (28:642a)
-    db $0,"REVIVE is costly,",$4f
+    db $0,"REVIVE is rare,  ",$4f
     db "but it revives",$55
     db "fainted #MON!",$57
 
