@@ -24553,13 +24553,7 @@ CardKeyTable3: ; e0c4 (3:60c4)
     db SILPH_CO_11F,$09,$09,$15
     db $ff
 
-ItemUsePokedoll: ; e0cd (3:60cd)
-    ld a,[W_ISINBATTLE]
-    dec a
-    jp nz,ItemUseNotTime
-    ld a,$01
-    ld [$d078],a
-    jp PrintItemUseTextAndRemoveItem
+SECTION "ItemUseGuardSpec",ROMX[$60dc],BANK[$3]
 
 ItemUseGuardSpec: ; e0dc (3:60dc)
     ld a,[W_ISINBATTLE]
@@ -28548,6 +28542,19 @@ CheckMedicineActive:
 MustChoiceActiveText:
     TX_FAR _MustChoiceActiveText
     db "@"
+
+ItemUsePokedoll:
+    ld a,[W_ISINBATTLE]
+    dec a
+    jp nz,ItemUseNotTime
+    ld b,BANK(IsGhostBattlePlus)
+    ld hl,IsGhostBattlePlus
+    call Bankswitch
+    jp z,ItemUseNotTime
+.Continue
+    ld a,$01
+    ld [$d078],a
+    jp PrintItemUseTextAndRemoveItem
 
 SECTION "bank4",ROMX,BANK[$4]
 
