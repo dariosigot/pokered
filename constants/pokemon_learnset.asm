@@ -662,8 +662,8 @@ Mon038_EvosMoves:
     ;   1,TACKLE
     ;   1,TAIL_WHIP
     ;   1,BITE
-    db 14,EMBER
-    db 19,ROAR
+    db 14,ROAR
+    db 19,EMBER
     db 22,DOUBLE_KICK
     db 25,CONFUSE_RAY
     db 28,TRAPHOLE
@@ -1048,8 +1048,8 @@ Mon059_EvosMoves:
     ;   1,BITE
     ;   1,ROAR
     ;   1,HYPER_FANG
-    db 14,EMBER
-    db 19,LEER
+    db 14,LEER
+    db 19,EMBER
     db 22,DOUBLE_KICK
     db 25,TAKE_DOWN
     db 28,BODY_SLAM
