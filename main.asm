@@ -54577,81 +54577,19 @@ Func_3e016: ; 3e016 (f:6016)
 INCBIN "baserom.gbc",$3e01e,$3e023 - $3e01e
 
 ; determines if attack is a critical hit
-; azure heights claims "the fastest pokémon (who are,not coincidentally,
-; among the most popular) tend to CH about 20 to 25% of the time."
-CriticalHitTest: ; 3e023 (f:6023)
-    xor a
-    ld [$d05e],a
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    ld a,[$cfe5]
-    jr nz,.asm_3e032
-    ld a,[W_PLAYERMONID]
-.asm_3e032
-    ld [$d0b5],a
-    call GetMonHeader
-    ld a,[W_MONHBASESPEED]
-    ld b,a
-    srl b                        ; (effective (base speed/2))
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    ld hl,W_PLAYERMOVEPOWER ; $cfd4
-    ld de,W_PLAYERBATTSTATUS2 ; $d063
-    jr z,.calcCriticalHitProbability
-    ld hl,W_ENEMYMOVEPOWER ; $cfce
-    ld de,W_ENEMYBATTSTATUS2 ; $d068
-.calcCriticalHitProbability      ; 0x3e04f
-    ld a,[hld]                  ; read base power from RAM
-    and a
-    ret z                        ; do nothing if zero
-    dec hl
-    ld c,[hl]                   ; read move id
-    ld a,[de]
-    bit 2,a                     ; test for focus energy
-    jr nz,.focusEnergyUsed      ; bug: using focus energy causes a shift to the right instead of left,
-                                 ; resulting in 1/4 the usual crit chance
-    sla b                        ; (effective (base speed/2)*2)
-    jr nc,.noFocusEnergyUsed
-    ld b,$ff                    ; cap at 255/256
-    jr .noFocusEnergyUsed
-.focusEnergyUsed
-    sla b ; Denim ; srl b
-.noFocusEnergyUsed
-    ld hl,HighCriticalMoves      ; table of high critical hit moves
-.Loop
-    ld a,[hli]                  ; read move from move table
-    cp c                         ; does it match the move about to be used?
-    jr z,.HighCritical          ; if so,the move about to be used is a high critical hit ratio move
-    inc a                        ; move on to the next move,FF terminates loop
-    jr nz,.Loop                 ; check the next move in HighCriticalMoves
-    srl b                        ; /2 for regular move (effective (base speed / 2))
-    jr .SkipHighCritical         ; continue as a normal move
-.HighCritical
-    sla b                        ; *2 for high critical hit moves
-    jr nc,.noCarry
-    ld b,$ff                    ; cap at 255/256
-.noCarry
-    sla b                        ; *4 for high critical move (effective (base speed/2)*8))
-    jr nc,.SkipHighCritical
-    ld b,$ff
-.SkipHighCritical
-    call GenRandomInBattle       ; generates a random value,in "a"
-    rlc a
-    rlc a
-    rlc a
-    cp b                         ; check a against calculated crit rate
-    ret nc                       ; no critical hit if no borrow
-    ld a,$1
-    ld [$d05e],a                ; set critical hit flag
-    ret
+CriticalHitTest:
+    ld b,BANK(_CriticalHitTest) ; same as _CriticalHitTest_NoBug
+    ld hl,_CriticalHitTest
+    ld a,[W_ISLINKBATTLE]
+    cp $4
+    jr z,.RunWithBUG
+    ld hl,_CriticalHitTest_NoBug
+.RunWithBUG
+    jp Bankswitch
 
-; high critical hit moves
-HighCriticalMoves: ; 3e08e (f:608e)
-    db KARATE_CHOP
-    db RAZOR_LEAF
-    db CRABHAMMER
-    db SLASH
-    db $FF
+; Free Space
+
+SECTION "HandleCounterMove",ROMX[$6093],BANK[$f]
 
 ; function to determine if Counter hits and if so,how much damage it does
 HandleCounterMove: ; 3e093 (f:6093)
@@ -130862,4 +130800,166 @@ AdvanceRNGState::
     ld a,d
     ld [hli],a
     ld [hl],e
+    ret
+
+; determines if attack is a critical hit
+; azure heights claims "the fastest pokémon (who are,not coincidentally,
+; among the most popular) tend to CH about 20 to 25% of the time."
+_CriticalHitTest:
+    xor a
+    ld [$d05e],a
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    ld a,[$cfe5]
+    jr nz,.asm_3e032
+    ld a,[W_PLAYERMONID]
+.asm_3e032
+    ld [$d0b5],a
+    call GetMonHeader
+    ld a,[W_MONHBASESPEED]
+    ld b,a
+    srl b                        ; (effective (base speed/2))
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    ld hl,W_PLAYERMOVEPOWER ; $cfd4
+    ld de,W_PLAYERBATTSTATUS2 ; $d063
+    jr z,.calcCriticalHitProbability
+    ld hl,W_ENEMYMOVEPOWER ; $cfce
+    ld de,W_ENEMYBATTSTATUS2 ; $d068
+.calcCriticalHitProbability      ; 0x3e04f
+    ld a,[hld]                  ; read base power from RAM
+    and a
+    ret z                        ; do nothing if zero
+    dec hl
+    ld c,[hl]                   ; read move id
+    ld a,[de]
+    bit 2,a                     ; test for focus energy
+    jr nz,.focusEnergyUsed      ; bug: using focus energy causes a shift to the right instead of left,
+                                 ; resulting in 1/4 the usual crit chance
+    sla b                        ; (effective (base speed/2)*2)
+    jr nc,.noFocusEnergyUsed
+    ld b,$ff                    ; cap at 255/256
+    jr .noFocusEnergyUsed
+.focusEnergyUsed
+    srl b ; Restore Original
+.noFocusEnergyUsed
+    ld hl,HighCriticalMoves      ; table of high critical hit moves
+.Loop
+    ld a,[hli]                  ; read move from move table
+    cp c                         ; does it match the move about to be used?
+    jr z,.HighCritical          ; if so,the move about to be used is a high critical hit ratio move
+    inc a                        ; move on to the next move,FF terminates loop
+    jr nz,.Loop                 ; check the next move in HighCriticalMoves
+    srl b                        ; /2 for regular move (effective (base speed / 2))
+    jr .SkipHighCritical         ; continue as a normal move
+.HighCritical
+    sla b                        ; *2 for high critical hit moves
+    jr nc,.noCarry
+    ld b,$ff                    ; cap at 255/256
+.noCarry
+    sla b                        ; *4 for high critical move (effective (base speed/2)*8))
+    jr nc,.SkipHighCritical
+    ld b,$ff
+.SkipHighCritical
+    call GenRandomInBattle_CH       ; generates a random value,in "a"
+    rlc a
+    rlc a
+    rlc a
+    cp b                         ; check a against calculated crit rate
+    ret nc                       ; no critical hit if no borrow
+    ld a,$1
+    ld [$d05e],a                ; set critical hit flag
+    ret
+
+GenRandomInBattle_CH:
+    push bc
+    ld b,BANK(GenRandomInBattleFromOtherBANK)
+    ld hl,GenRandomInBattleFromOtherBANK
+    call Bankswitch
+    ld a,d
+    pop bc
+    ret
+
+; high critical hit moves
+HighCriticalMoves:
+    db KARATE_CHOP
+    db RAZOR_LEAF
+    db CRABHAMMER
+    db SLASH
+    db $FF
+
+_CriticalHitTest_NoBug:
+    xor a
+    ld [$d05e],a
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    ld a,[$cfe5]
+    jr nz,.handleEnemy
+    ld a,[W_PLAYERMONID]
+.handleEnemy
+    ld [$d0b5],a
+    call GetMonHeader
+    ld a,[W_MONHBASESPEED]
+    ld b,a
+    srl b                        ; /2 for regular move (effective (base speed / 2)) --> base crit rate
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    ld a,[W_PLAYERMOVEEFFECT]    ; joenote - begin storing player move effect
+    ld hl,W_PLAYERMOVEPOWER ; $cfd4
+    ld de,W_PLAYERBATTSTATUS2 ; $d063
+    jr z,.calcCriticalHitProbability
+    ld a,[W_ENEMYMOVEEFFECT]     ; joenote - begin storing enemy move effect
+    ld hl,W_ENEMYMOVEPOWER ; $cfce
+    ld de,W_ENEMYBATTSTATUS2 ; $d068
+.calcCriticalHitProbability      ; 0x3e04f
+;normal hit is (base speed) / 2
+;focus energy is 2*(base speed) for a 4x crit rate
+;high crit move is 4*(base speed) for a 8x crit rate
+;;;;;;;;;;;;
+;joenote - do not do a critical hit if a special damage move is being used (dragon rage, seismic toss, etc)
+    cp SPECIAL_DAMAGE_EFFECT
+    ret z
+;;;;;;;;;;;;
+    ld a,[hld]                   ; read base power from RAM
+    and a
+    ret z                        ; do nothing if zero
+    dec hl
+    ld c,[hl]                    ; read move id
+    ld a,[de]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    bit 2,a                      ; test for focus energy
+    jr z,.noFocusEnergyUsed      ;if getting pumped bit not set, then focus energy not used
+    ;else focus energy was used
+    sla b                        ;*2 for focus energy (effective +2x crit rate)
+    jr c,.capcritical
+    sla b                        ;*2 again for focus energy (effective +4x crit rate)
+    jr c,.capcritical
+.noFocusEnergyUsed
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ld hl,HighCriticalMoves      ; table of high critical hit moves
+.Loop
+    ld a,[hli]                   ; read move from move table
+    cp c                         ; does it match the move about to be used?
+    jr z,.HighCritical           ; if so, the move about to be used is a high critical hit ratio move
+    inc a                        ; move on to the next move, FF terminates loop
+    jr nz,.Loop                  ; check the next move in HighCriticalMoves
+    jr .finishcalc               ; continue as a normal move
+.HighCritical
+    sla b                        ; *2 for high critical hit moves (effective +2x crit rate)
+    jr c,.capcritical
+    sla b                        ; *2 again for high critical hit moves (effective +4x crit rate)
+    jr c,.capcritical
+    sla b                        ; *2 again for high critical hit moves (effective +8x crit rate)
+    jr nc,.finishcalc
+.capcritical
+    ld b,$ff                     ; cap at 255/256
+.finishcalc
+    call GenRandomInBattle_CH    ; generates a random value, in "a"
+    rlc a
+    rlc a
+    rlc a
+    cp b                         ; check a against calculated crit rate
+    ret nc                       ; no critical hit if no borrow
+    ld a,$1
+    ld [$d05e],a                 ; set critical hit flag
     ret
