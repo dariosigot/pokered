@@ -50374,7 +50374,7 @@ UnnamedText_3c22e: ; 3c22e (f:422e)
     db "@"
 
 MainInBattleLoop: ; 3c233 (f:4233)
-    call ReadPlayerMonCurHPAndStatus
+    call ResetLeechSeedFlagAndReadPlayerMonCurHPAndStatus ; call ReadPlayerMonCurHPAndStatus
     ld hl,W_PLAYERMONCURHP
     ld a,[hli]
     or [hl]
@@ -50617,7 +50617,7 @@ HandlePoisonBurnLeechSeed: ; 3c3bd (f:43bd)
     xor a
     ld [$cc5b],a
     ld a,$47
-    call PlayMoveAnimation ; play leech seed animation (from opposing mon)
+    call SetLeechSeedFlag ; call PlayMoveAnimation ; play leech seed animation (from opposing mon)
     pop af
     ld [H_WHOSETURN],a ; $FF00+$f3
     pop hl
@@ -50675,16 +50675,23 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
     jr nz,.nonZeroDamage
     inc c         ; damage is at least 1
 .nonZeroDamage
-    ld hl,W_PLAYERBATTSTATUS3 ; $d064
-    ld de,W_PLAYERTOXICCOUNTER ; $d06c
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.playersTurn
-    ld hl,W_ENEMYBATTSTATUS3 ; $d069
-    ld de,W_ENEMYTOXICCOUNTER ; $d071
-.playersTurn
-    bit 0,[hl]
+    ; ds 3 ; ld hl,W_PLAYERBATTSTATUS3 ; $d064
+    ; ds 3 ; ld de,W_PLAYERTOXICCOUNTER ; $d06c
+    ; ds 2 ; ld a,[H_WHOSETURN] ; $FF00+$f3
+    ; ds 1 ; and a
+    ; ds 2 ; jr z,.playersTurn
+    ; ds 3 ; ld hl,W_ENEMYBATTSTATUS3 ; $d069
+    ; ds 3 ; ld de,W_ENEMYTOXICCOUNTER ; $d071
+    ;.playersTurn
+    ; ds 2 ; bit 0,[hl]
+    ; ds 2 ; jr z,.noToxic
+    call InitPointerAndCheckToxic
     jr z,.noToxic
+    call CheckLeechSeedFlag
+    jr nz,.noToxic
+    jr .Toxic
+    ds 21 - 12
+.Toxic
     ld a,[de]    ; increment toxic counter
     inc a
     ld [de],a
@@ -54593,6 +54600,47 @@ CriticalHitTest:
     ld hl,_CriticalHitTest_NoBug
 .RunWithBUG
     jp Bankswitch
+
+ResetLeechSeedFlagAndReadPlayerMonCurHPAndStatus:
+    ;joenote - clear custom battle flags
+    ld a,[wUnusedC000]
+    res 7,a ;reset the bit that causes counter to miss
+    res 6,a ;reset the bit that specifies a leech seed effect
+    ld [wUnusedC000],a
+    jp ReadPlayerMonCurHPAndStatus
+
+SetLeechSeedFlag:
+    push af
+    ld a,[wUnusedC000]
+    set 6,a ; set the bit that indicates leech seed is being handled
+    ld [wUnusedC000],a
+    pop af
+    jp PlayMoveAnimation
+
+InitPointerAndCheckToxic:
+    ld hl,W_PLAYERBATTSTATUS3 ; $d064
+    ld de,W_PLAYERTOXICCOUNTER ; $d06c
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr z,.playersTurn
+    ld hl,W_ENEMYBATTSTATUS3 ; $d069
+    ld de,W_ENEMYTOXICCOUNTER ; $d071
+.playersTurn
+    bit 0,[hl]
+    ret
+
+CheckLeechSeedFlag:
+    ld a,[W_ISLINKBATTLE]
+    cp $4
+    ret z ; Return with BUG
+    ; joenote - If this bit is set, this function is being called for leech seed.
+    ; Do not do Toxic routines
+    ld a,[wUnusedC000]
+    bit 6,a ;check if this is for leech seed
+    res 6,a ;(reset the bit without affecting flags)
+    ld [wUnusedC000],a
+    ;if so, then do not increment the toxic counter or multiply the damage for toxic
+    ret
 
 ; Free Space
 
