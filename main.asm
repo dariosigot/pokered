@@ -126077,9 +126077,9 @@ _ItemUseBallText07:
     dw $DE06
     db 0," was",$4F
     db "transferred to",$55
-    db "BILL's PC! ",$9E,"@" ; 9E = open braket
+    db "BILL's PC! (@"
     TX_NUM W_NUMINBOX,1,2
-    db 0,"/20",$9F,$58 ; 9F = closed braket
+    db 0,"/20)",$58
 
 SECTION "bank2A",ROMX,BANK[$2A]
 
