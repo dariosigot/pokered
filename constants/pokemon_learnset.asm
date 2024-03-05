@@ -1718,12 +1718,13 @@ Mon095_EvosMoves:
     db 19,STRIKE
     db 23,TRAPHOLE
     db 26,HARDEN
+    db 29,RAGE
     db 31,BODY_SLAM
-    db 34,RAGE
-    db 38,ROCK_SLIDE
-    db 41,DRAGON_RAGE
-    db 44,EARTHQUAKE
-    db 56,EXPLOSION
+    db 36,EXPLOSION
+    db 39,ROCK_SLIDE
+    db 42,DRAGON_RAGE
+    db 46,EARTHQUAKE
+    db 60,HYPER_BEAM
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────

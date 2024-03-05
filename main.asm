@@ -2530,8 +2530,8 @@ RunMapScript: ; 101b (0:101b)
     push hl
     push de
     push bc
-    ld b,BANK(Func_f225)
-    ld hl,Func_f225
+    ld b,BANK(TryPushingBoulder)
+    ld hl,TryPushingBoulder
     call Bankswitch ; check if the player is pushing a boulder
     ld a,[wFlags_0xcd60]
     bit 1,a ; is the player pushing a boulder?
@@ -22606,7 +22606,7 @@ MapHS53: ; cbd1 (3:4bd1)
     db POWER_PLANT,$0D,Show
     db POWER_PLANT,$0E,Show
 MapHSC2: ; cbfb (3:4bfb)
-    db VICTORY_ROAD_2,$06,Hide ; Moltres in Victory Road
+    db VICTORY_ROAD_2,$06,Show ; Shiny Onix in Victory Road
     db VICTORY_ROAD_2,$07,Show
     db VICTORY_ROAD_2,$08,Show
     db VICTORY_ROAD_2,$09,Show
@@ -26570,7 +26570,7 @@ HandleBitArray2: ; f1e6 (3:71e6)
     ld c,a
     ret
 
-Func_f225: ; f225 (3:7225)
+TryPushingBoulder: ; f225 (3:7225)
     ld a,[$d728]
     bit 0,a
     ret z
@@ -32044,8 +32044,9 @@ LoadMapSpriteTilePatterns: ; 17871 (5:7871)
     ld a,b ; a = next VRAM tile pattern slot
     push af
     ld a,[hl] ; $C2XE (sprite picture ID)
-    ld b,a ; b = current sprite picture ID
-    cp a,SPRITE_BALL ; is it a 4-tile sprite?
+    ; ds 1 ; ld b,a ; b = current sprite picture ID
+    ; ds 2 ; cp a,SPRITE_BALL ; is it a 4-tile sprite?
+    call CheckSprite4Tile
     jr c,.notFourTileSprite
     pop af
     ld a,[$ff8e] ; 4-tile sprite counter
@@ -33269,6 +33270,19 @@ EmotionBubblesPointerTable: ; Move in the BANK
 EmotionBubblesOAM: ; Move in the BANK
     db $F8,$00,$F9,$00
     db $FA,$00,$FB,$00
+
+CheckSprite4Tile:
+    ld b,a ; b = current sprite picture ID
+    cp a,SPRITE_BALL ; is it a 4-tile sprite?
+    ; CP n | C - Set for no borrow. (Set if A < n.)
+    ret c
+    cp a,SPRITE_BASKET+1 ; TODO
+    jr c,.FourTileSprite
+    scf ; set carry flag
+    ret
+.FourTileSprite
+    xor a ; reset carry flag
+    ret
 
 SECTION "bank6",ROMX,BANK[$6]
 
@@ -74687,10 +74701,7 @@ Func_517e2: ; 517e2 (14:57e2)
     call Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
     ret
 
-VictoryRoad2ScriptPointers: ; 517eb (14:57eb)
-    dw VictoryRoad2Script0
-    dw Func_324c
-    dw EndTrainerBattle
+SECTION "VictoryRoad2Script0",ROMX[$57f1],BANK[$14]
 
 VictoryRoad2Script0: ; 517f1 (14:57f1)
     ld hl,CoordsData_51816 ; $5816
@@ -74724,7 +74735,7 @@ VictoryRoad2TextPointers: ; 5181b (14:581b)
     dw VictoryRoad2Text3
     dw VictoryRoad2Text4
     dw VictoryRoad2Text5
-    dw VictoryRoad2Text6
+    dw TalkToOnixText
     dw Predef5CText
     dw Predef5CText
     dw Predef5CText
@@ -74763,7 +74774,7 @@ VictoryRoad2TrainerHeader3: ; 5184d (14:584d)
 
 VictoryRoad2TrainerHeader4: ; 51859 (14:5859)
     db $4 ; flag's bit
-    db ($1 << 4) ; trainer's view range
+    db ($3 << 4) ; trainer's view range
     dw $d7ee ; flag's byte
     dw VictoryRoad2BattleText4 ; 0x58f7 TextBeforeBattle
     dw VictoryRoad2AfterBattleText4 ; 0x5901 TextAfterBattle
@@ -74779,16 +74790,15 @@ VictoryRoad2TrainerHeader5: ; 51865 (14:5865)
     dw VictoryRoad2EndBattleText5 ; 0x590b TextEndBattle
     dw VictoryRoad2EndBattleText5 ; 0x590b TextEndBattle
 
-VictoryRoad2TrainerHeader6: ; 51871 (14:5871)
-    db $6 ; flag's bit
-    db ($0 << 4) ; trainer's view range
-    dw $d7ee ; flag's byte
-    dw VictoryRoad2BattleText6 ; 0x58ba TextBeforeBattle
-    dw VictoryRoad2BattleText6 ; 0x58ba TextAfterBattle
-    dw VictoryRoad2BattleText6 ; 0x58ba TextEndBattle
-    dw VictoryRoad2BattleText6 ; 0x58ba TextEndBattle
-
     db $ff
+
+VictoryRoad2ScriptPointers: ; Moved in the Bank
+    dw VictoryRoad2Script0
+    dw Func_324c
+    dw EndTrainerBattle
+    dw VictoryRoad2Script3
+
+SECTION "VictoryRoad2Text1",ROMX[$587e],BANK[$14]
 
 VictoryRoad2Text1: ; 5187e (14:587e)
     db $08 ; asm
@@ -74820,19 +74830,20 @@ VictoryRoad2Text5: ; 518a6 (14:58a6)
     call TalkToTrainer
     jp TextScriptEnd
 
-VictoryRoad2Text6: ; 518b0 (14:58b0)
-    db $08 ; asm
-    ld hl,VictoryRoad2TrainerHeader6
-    call TalkToTrainer
+TalkToOnixText:
+    db $8
+    ld hl,CoordsOnix
+    call CheckBoulderCoords
+    jr nc,.SimpleBoulder
+    call BattleWithShinyOnix
+    jr .End
+.SimpleBoulder
+    ld hl,BoulderText
+    call PrintText
+.End
     jp TextScriptEnd
 
-VictoryRoad2BattleText6: ; 518ba (14:58ba)
-    TX_FAR _VictoryRoad2BattleText6 ; 0x8d06e
-    db $8
-    ld a,MOLTRES
-    call PlayCry
-    call WaitForSoundToFinish
-    jp TextScriptEnd
+SECTION "VictoryRoad2BattleText1",ROMX[$58ca],BANK[$14]
 
 VictoryRoad2BattleText1: ; 518ca (14:58ca)
     TX_FAR _VictoryRoad2BattleText1
@@ -74912,13 +74923,13 @@ VictoryRoad2Object: ; 0x51915 (size=154)
     db SPRITE_HIKER,$9 + 4,$c + 4,$ff,$d2,$41,BLACKBELT + $C8,$9 ; trainer
     db SPRITE_BLACK_HAIR_BOY_2,$d + 4,$15 + 4,$ff,$d2,$42,JUGGLER + $C8,$2 ; trainer
     db SPRITE_BLACK_HAIR_BOY_1,$8 + 4,$13 + 4,$ff,$d0,$43,TAMER + $C8,$5 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$2 + 4,$4 + 4,$ff,$d0,$44,POKEMANIAC + $C8,$6 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$1 + 4,$10 + 4,$ff,$d0,$44,POKEMANIAC + $C8,$6 ; trainer
     db SPRITE_BLACK_HAIR_BOY_2,$3 + 4,$1a + 4,$ff,$d2,$45,JUGGLER + $C8,$5 ; trainer
-    db SPRITE_BIRD,$5 + 4,$b + 4,$ff,$d1,$46,MOLTRES,40 ; trainer
+    db SPRITE_BOULDER,$2 + 4,$4 + 4,$ff,$10,$6;ONIX,62 ; trainer
     db SPRITE_BALL,$5 + 4,$1b + 4,$ff,$ff,$87,TM_17 ; item
     db SPRITE_BALL,$9 + 4,$12 + 4,$ff,$ff,$88,FULL_HEAL ; item
     db SPRITE_BALL,$b + 4,$9 + 4,$ff,$ff,$89,TM_05 ; item
-    db SPRITE_BALL,$0 + 4,$b + 4,$ff,$ff,$8a,GUARD_SPEC_ ; item
+    db SPRITE_BALL,$0 + 4,$f + 4,$ff,$ff,$8a,GUARD_SPEC_ ; item
     db SPRITE_BOULDER,$e + 4,$4 + 4,$ff,$10,$b ; person
     db SPRITE_BOULDER,$5 + 4,$5 + 4,$ff,$10,$c ; person
     db SPRITE_BOULDER,$10 + 4,$17 + 4,$ff,$10,$d ; person
@@ -74931,6 +74942,8 @@ VictoryRoad2Object: ; 0x51915 (size=154)
     EVENT_DISP $f,$e,$19 ; VICTORY_ROAD_3
     EVENT_DISP $f,$7,$1b ; VICTORY_ROAD_3
     EVENT_DISP $f,$1,$1 ; VICTORY_ROAD_3
+
+SECTION "VictoryRoad2Blocks",ROMX[$59af],BANK[$14]
 
 VictoryRoad2Blocks: ; 519af (14:59af)
     INCBIN "maps/victoryroad2.blk"
@@ -76873,7 +76886,7 @@ Mansion2TrainerHeader1: ; New Moltres
     db $ff
 
 Mansion2BattleText2:
-    TX_FAR _VictoryRoad2BattleText6 ; Gyaoo!
+    TX_FAR _Mansion2BattleText2 ; Gyaoo!
     db $8
     ld a,MOLTRES
     call PlayCry
@@ -76885,6 +76898,41 @@ Mansion2TextMoltres:
     ld hl,Mansion2TrainerHeader1
     call TalkToTrainer
     jp TextScriptEnd
+
+BattleWithShinyOnix:
+    ld hl,.OnixText
+    call PrintText
+    ld a,62
+    ld [W_CURENEMYLVL],a
+    ld a,ONIX
+    ld [W_CUROPPONENT],a
+    call PlayCry
+    call WaitForSoundToFinish
+    ld a,3
+    ld [W_VICTORYROAD2CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+.OnixText
+    TX_FAR _OnixText
+    db "@"
+
+VictoryRoad2Script3:
+    ld a,$5b
+    ld [$cc4d],a
+    ld a,$11
+    call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
+    xor a
+    ld [W_VICTORYROAD2CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+CoordsOnix:
+    db 0,11
+    db 1,11
+    db 2,11
+    db 2,12
+    db 2,13
+    db $FF
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -83082,7 +83130,7 @@ Route12Script0: ; 59619 (16:5619)
     ld a,$d
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
-    ld a,$84
+    ld a,SNORLAX
     ld [W_CUROPPONENT],a ; $d059
     ld a,15 ; Snorlax
     ld [W_CURENEMYLVL],a ; $d127
@@ -83674,7 +83722,7 @@ Route16Script0: ; 59959 (16:5959)
     ld a,$a
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
-    ld a,$84
+    ld a,SNORLAX
     ld [W_CUROPPONENT],a ; $d059
     ld a,22 ; Snorlax
     ld [W_CURENEMYLVL],a ; $d127
@@ -117637,8 +117685,8 @@ _UnnamedText_1e71a: ; 8d03e (23:503e)
     db "BOULDERBADGE!",$55
     db "Go right ahead!@@"
 
-_VictoryRoad2BattleText6: ; 8d06e (23:506e)
-    db $0,"Gyaoo!@@"
+_OnixText: ; 8d06e (23:506e)
+    db $0,"Hurou!@@"
 
 _VictoryRoad2BattleText1: ; 8d077 (23:5077)
     db $0,"VICTORY ROAD is",$4f
@@ -118533,6 +118581,9 @@ _HM02ExplanationText: ; Moved to the End of the BANK
     db "back to any town.",$51
     db "Put it to good",$4f
     db "use!",$57
+
+_Mansion2BattleText2:
+    db $0,"Gyaoo!@@"
 
 SECTION "bank24",ROMX,BANK[$24]
 
@@ -130525,6 +130576,9 @@ RestoreFaintenedWith1HP:
     ret
 
 ForceShinyOrRandom_:
+    ld a,[W_VICTORYROAD2CURSCRIPT]
+    cp 3 ; Shiny Onix
+    jr z,.Onix
     ld a,[W_CURMAP]
     cp DRATINI_CAVE
     jr z,.ShinyRandom
@@ -130535,6 +130589,10 @@ ForceShinyOrRandom_:
 .Random
     call .GenRandomInBattle
     jr .End
+.Onix
+    call .GenRandomInBattle
+    or $8F ; Attack > 7
+    jr .ShinyCommon
 .Tower6
     ld a,[$cf91]
     cp MAROWAK
@@ -130551,6 +130609,7 @@ ForceShinyOrRandom_:
     jr nz,.Random
 .ShinyRandom
     call .GenRandomInBattle
+.ShinyCommon
     or %00100000
     and $F0
     add $A
