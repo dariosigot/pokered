@@ -45,13 +45,13 @@ BrockMoves:
     ; Geodude (Level 12)
     db TACKLE
     db DEFENSE_CURL
-    db HEADBUTT
+    db DOUBLESLAP
     db BIDE
     ; Onix (Level 14)
     db SCREECH
     db BIDE
     db ROCK_THROW
-    db STRIKE
+    db SLAM
     db 0
 
 MistyMove:

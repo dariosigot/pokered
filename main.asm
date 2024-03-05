@@ -47831,7 +47831,7 @@ EvosMovesPointerTable: ; Moved in the Bank
     dw Mon111_EvosMoves
     dw Mon131_EvosMoves
     dw Mon059_EvosMoves
-    dw Mon151_EvosMoves
+    dw MissingNo_EvosMoves ; mew
     dw Mon130_EvosMoves
     dw Mon090_EvosMoves
     dw Mon072_EvosMoves
@@ -49500,6 +49500,12 @@ Func_3aede: ; Moved in the Bank
     call nz,Func_2307
     ret
 
+GoPalSetAfterAIItemUser: ; to avoid bad color after enemy item use
+    call Predef
+    ld b,BANK(DrawEnemyHUDAndHPBar)
+    ld hl,DrawEnemyHUDAndHPBar
+    jp Bankswitch
+
 INCLUDE "constants/special_trainer.asm"
 
 SECTION "WriteMonMoves",ROMX[$6fb8],BANK[$e]
@@ -50050,12 +50056,6 @@ Func_3aef7: ; Moved in the Bank
     ld hl,$cd6d
     pop de
     jp CopyData
-
-GoPalSetAfterAIItemUser: ; to avoid bad color after enemy item use
-    call Predef
-    ld b,BANK(DrawEnemyHUDAndHPBar)
-    ld hl,DrawEnemyHUDAndHPBar
-    jp Bankswitch
 
 TryRandomForMew:
     call GenRandom
@@ -127894,7 +127894,7 @@ EvolutionMove:
    db DRAGON_RAGE          ; CHARIZARD
    db 0                    ; SQUIRTLE
    db WITHDRAW             ; WARTORTLE
-   db SPIKE_CANNON         ; BLASTOISE
+   db TSUNAMI              ; BLASTOISE
    db 0                    ; CATERPIE
    db HARDEN               ; METAPOD
    db CONFUSION            ; BUTTERFREE
@@ -127952,16 +127952,16 @@ EvolutionMove:
    db KINESIS              ; KADABRA
    db PSYBEAM              ; ALAKAZAM
    db 0                    ; MACHOP
-   db SEISMIC_TOSS         ; MACHOKE
-   db 0                    ; MACHAMP
+   db ROLLING_KICK         ; MACHOKE
+   db JUMP_KICK            ; MACHAMP
    db 0                    ; BELLSPROUT
    db STUN_SPORE           ; WEEPINBELL
    db WRAP                 ; VICTREEBEL
    db 0                    ; TENTACOOL
    db SLUDGE               ; TENTACRUEL
    db 0                    ; GEODUDE
-   db BODY_SLAM            ; GRAVELER
-   db 0                    ; GOLEM
+   db STOMP                ; GRAVELER
+   db BODY_SLAM            ; GOLEM
    db 0                    ; PONYTA
    db HORN_ATTACK          ; RAPIDASH
    db 0                    ; SLOWPOKE
@@ -127978,8 +127978,8 @@ EvolutionMove:
    db 0                    ; SHELLDER
    db SPIKE_CANNON         ; CLOYSTER
    db 0                    ; GASTLY
-   db SMOG                 ; HAUNTER
-   db 0                    ; GENGAR
+   db PSYWAVE              ; HAUNTER
+   db POISON_GAS           ; GENGAR
    db 0                    ; ONIX
    db 0                    ; DROWZEE
    db PSYBEAM              ; HYPNO

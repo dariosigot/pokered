@@ -91,8 +91,8 @@ VenusaurBaseStats: ; 38416 (e:4416)
     dw VenusaurPicBack
 
     ; attacks known at lvl 0
-    db POISONPOWDER
     db RAZOR_LEAF
+    db SLAM
     db STUN_SPORE
     db GROWTH
 
@@ -202,8 +202,8 @@ CharizardBaseStats: ; 3846a (e:446a)
     dw CharizardPicBack
 
     ; attacks known at lvl 0
-    db RAGE
     db FIRE_PUNCH
+    db TRAPHOLE
     db SLASH
     db DRAGON_RAGE
 
@@ -313,10 +313,10 @@ BlastoiseBaseStats: ; 384be (e:44be)
     dw BlastoisePicBack
 
     ; attacks known at lvl 0
-    db BITE
-    db WITHDRAW
+    db SCREECH
+    db HEADBUTT
     db HAZE
-    db SPIKE_CANNON
+    db TSUNAMI
 
     db 3 ; growth rate
 
@@ -794,9 +794,9 @@ FearowBaseStats: ; 3862a (e:462a)
     dw FearowPicBack
 
     ; attacks known at lvl 0
-    db GROWL
-    db LEER
     db FURY_ATTACK
+    db WING_ATTACK
+    db WHIRLWIND
     db SWOOP
 
     db 0 ; growth rate
@@ -1127,9 +1127,9 @@ NidoqueenBaseStats: ; 38726 (e:4726)
     dw NidoqueenPicBack
 
     ; attacks known at lvl 0
-    db TAIL_WHIP
     db POISON_STING
     db FURY_SWIPES
+    db DOUBLE_KICK
     db BODY_SLAM
 
     db 3 ; growth rate
@@ -1238,9 +1238,9 @@ NidokingBaseStats: ; 3877a (e:477a)
     dw NidokingPicBack
 
     ; attacks known at lvl 0
-    db HORN_ATTACK
     db POISON_STING
     db FURY_ATTACK
+    db DOUBLE_KICK
     db THRASH
 
     db 3 ; growth rate
@@ -1277,7 +1277,7 @@ ClefairyBaseStats: ; 38796 (e:4796)
     ; attacks known at lvl 0
     db POUND
     db GROWL
-    db SWIFT
+    db 0
     db 0
 
     db 4 ; growth rate
@@ -1314,7 +1314,7 @@ ClefableBaseStats: ; 387b2 (e:47b2)
     ; attacks known at lvl 0
     db POUND
     db GROWL
-    db 0
+    db SWIFT
     db 0
 
     db 4 ; growth rate
@@ -1794,8 +1794,8 @@ VenomothBaseStats: ; 3891e (e:491e)
 
     ; attacks known at lvl 0
     db CONFUSION
-    db POISONPOWDER
-    db LEECH_LIFE
+    db STUN_SPORE
+    db SLEEP_POWDER
     db PSYBEAM
 
     db 0 ; growth rate
@@ -2015,9 +2015,9 @@ GolduckBaseStats: ; 389c6 (e:49c6)
     dw GolduckPicBack
 
     ; attacks known at lvl 0
-    db DISABLE
-    db CONFUSION
     db FURY_SWIPES
+    db SCREECH
+    db PSYBEAM
     db WATER_GUN
 
     db 0 ; growth rate
@@ -2239,8 +2239,8 @@ PoliwhirlBaseStats: ; 38a6e (e:4a6e)
     ; attacks known at lvl 0
     db WATER_GUN
     db DOUBLESLAP
+    db AGILITY
     db MEGA_PUNCH
-    db LOW_KICK
 
     db 3 ; growth rate
 
@@ -2274,10 +2274,10 @@ PoliwrathBaseStats: ; 38a8a (e:4a8a)
     dw PoliwrathPicBack
 
     ; attacks known at lvl 0
-    db HYPNOSIS
-    db WATER_GUN
     db DOUBLESLAP
+    db AGILITY
     db MEGA_PUNCH
+    db LOW_KICK
 
     db 3 ; growth rate
 
@@ -2385,10 +2385,10 @@ AlakazamBaseStats: ; 38ade (e:4ade)
     dw AlakazamPicBack
 
     ; attacks known at lvl 0
-    db PSYWAVE
     db DISABLE
     db CONFUSION
     db KINESIS
+    db PSYBEAM
 
     db 3 ; growth rate
 
@@ -2459,10 +2459,10 @@ MachokeBaseStats: ; 38b16 (e:4b16)
     dw MachokePicBack
 
     ; attacks known at lvl 0
-    db STRIKE
     db FOCUS_ENERGY
     db MEGA_PUNCH
     db SEISMIC_TOSS
+    db ROLLING_KICK
 
     db 3 ; growth rate
 
@@ -2496,10 +2496,10 @@ MachampBaseStats: ; 38b32 (e:4b32)
     dw MachampPicBack
 
     ; attacks known at lvl 0
-    db STRIKE
-    db FOCUS_ENERGY
     db MEGA_PUNCH
     db SEISMIC_TOSS
+    db ROLLING_KICK
+    db JUMP_KICK
 
     db 3 ; growth rate
 
@@ -2758,7 +2758,7 @@ GravelerBaseStats: ; 38bf6 (e:4bf6)
     db MEGA_PUNCH
     db ROCK_THROW
     db SELFDESTRUCT
-    db BODY_SLAM
+    db STOMP
 
     db 3 ; growth rate
 
@@ -2792,9 +2792,9 @@ GolemBaseStats: ; 38c12 (e:4c12)
     dw GolemPicBack
 
     ; attacks known at lvl 0
-    db MEGA_PUNCH
     db ROCK_THROW
     db SELFDESTRUCT
+    db STOMP
     db BODY_SLAM
 
     db 3 ; growth rate
@@ -2866,10 +2866,10 @@ RapidashBaseStats: ; 38c4a (e:4c4a)
     dw RapidashPicBack
 
     ; attacks known at lvl 0
-    db DOUBLE_KICK
-    db STOMP
-    db FIRE_SPIN
-    db AGILITY
+    db TAKE_DOWN
+    db FLAMETHROWER
+    db DOUBLE_TEAM
+    db HORN_ATTACK
 
     db 0 ; growth rate
 
@@ -2940,9 +2940,9 @@ SlowbroBaseStats: ; 38c82 (e:4c82)
     dw SlowbroPicBack
 
     ; attacks known at lvl 0
-    db HEADBUTT
     db BIDE
     db REST
+    db PSYBEAM
     db MEGA_PUNCH
 
     db 0 ; growth rate
@@ -3424,7 +3424,7 @@ HaunterBaseStats: ; 38dee (e:4dee)
     db NIGHT_SHADE
     db HYPNOSIS
     db DREAM_EATER
-    db SMOG
+    db PSYWAVE
 
     db 3 ; growth rate
 
@@ -3458,10 +3458,10 @@ GengarBaseStats: ; 38e0a (e:4e0a)
     dw GengarPicBack
 
     ; attacks known at lvl 0
-    db NIGHT_SHADE
     db HYPNOSIS
     db DREAM_EATER
-    db SMOG
+    db PSYWAVE
+    db POISON_GAS
 
     db 3 ; growth rate
 
@@ -3570,9 +3570,9 @@ HypnoBaseStats: ; 38e5e (e:4e5e)
 
     ; attacks known at lvl 0
     db CONFUSION
-    db TELEPORT
     db HEADBUTT
     db MEDITATE
+    db PSYBEAM
 
     db 0 ; growth rate
 

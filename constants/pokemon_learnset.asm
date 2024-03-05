@@ -161,8 +161,8 @@ Mon009_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    ;  36,SPIKE_CANNON
-    db 38,TSUNAMI
+    ;  36,TSUNAMI
+    db 38,SPIKE_CANNON
     db 40,STOMP
     db 42,SKULL_BASH
     db 46,BODY_SLAM
@@ -991,10 +991,10 @@ Mon056_EvosMoves:
     db 12,DOUBLE_TEAM 
     db 15,KARATE_CHOP
     db 18,FURY_SWIPES
-    db 21,STRIKE
+    db 21,MEGA_PUNCH
     db 25,FOCUS_ENERGY
     ;  28,PRIMEAPE
-    db 29,MEGA_PUNCH
+    db 29,STRIKE
     db 33,SEISMIC_TOSS
     db 39,THRASH
     db 45,SCREECH
@@ -1007,7 +1007,7 @@ Mon057_EvosMoves:
     db 0
 ;Learnset
     ;  28,RAGE
-    db 31,MEGA_PUNCH
+    db 31,STRIKE
     db 34,TRAPHOLE
     db 37,SEISMIC_TOSS
     db 41,SUBMISSION
@@ -1152,7 +1152,7 @@ Mon065_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    db 23,PSYBEAM
+    ;  16,PSYBEAM
     db 27,FLASH
     db 31,RECOVER
     db 38,PSYCHIC_M
@@ -1172,12 +1172,14 @@ Mon066_EvosMoves:
     ;   1,KARATE_CHOP
     ;   1,LEER
     db  9,LOW_KICK
-    db 13,STRIKE
-    db 20,FOCUS_ENERGY
-    db 23,MEGA_PUNCH
+    db 13,MEGA_PUNCH
+    db 17,FOCUS_ENERGY
+    db 20,STRIKE
+    db 25,SEISMIC_TOSS
     ;  28,MACHOKE
-    db 34,SEISMIC_TOSS
-    db 42,JUMP_KICK
+    db 30,ROLLING_KICK
+    db 35,JUMP_KICK
+    db 39,ROCK_THROW
     db 48,SUBMISSION
     db 56,MEGA_KICK
     db 0
@@ -1189,10 +1191,10 @@ Mon067_EvosMoves:
     db EV_ITEM,TRADE_STONE,1,MACHAMP
     db 0
 ;Learnset
-    ;  28,SEISMIC_TOSS
-    db 32,TRAPHOLE
-    db 38,JUMP_KICK
-    db 42,SUBMISSION
+    ;  28,ROLLING_KICK
+    db 32,JUMP_KICK
+    db 37,SUBMISSION
+    db 42,ROCK_SLIDE
     db 46,COUNTER
     db 51,MEGA_KICK
     db 60,EARTHQUAKE
@@ -1203,9 +1205,9 @@ Mon068_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    db 32,TRAPHOLE
-    db 38,JUMP_KICK
-    db 42,SUBMISSION
+    ;  28,JUMP_KICK
+    db 37,SUBMISSION
+    db 42,ROCK_SLIDE
     db 46,COUNTER
     db 51,MEGA_KICK
     db 60,EARTHQUAKE
@@ -1308,9 +1310,9 @@ Mon074_EvosMoves:
 ;Learnset
     ;   1,TACKLE
     ;   1,DEFENSE_CURL
-    db  6,HEADBUTT
-    db 13,MEGA_PUNCH
-    db 16,ROCK_THROW
+    db  6,DOUBLESLAP
+    db 13,ROCK_THROW
+    db 16,MEGA_PUNCH
     db 21,SELFDESTRUCT
     ;  25,GRAVELER
     db 26,TRAPHOLE
@@ -1327,7 +1329,7 @@ Mon075_EvosMoves:
     db EV_ITEM,TRADE_STONE,1,GOLEM
     db 0
 ;Learnset
-    ;  25,BODY_SLAM 
+    ;  25,STOMP
     db 29,TRAPHOLE
     db 33,HARDEN
     db 36,EARTHQUAKE
@@ -1342,6 +1344,7 @@ Mon076_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
+    ;  25,BODY_SLAM
     db 29,TRAPHOLE
     db 33,HARDEN
     db 36,EARTHQUAKE
@@ -1373,6 +1376,7 @@ Mon077_EvosMoves:
     db 35,FLAMETHROWER
     db 38,DOUBLE_TEAM
     ;  40,RAPIDASH
+    db 57,FIRE_BLAST
     db 0
 
 Mon078_EvosMoves:
@@ -1383,7 +1387,7 @@ Mon078_EvosMoves:
     ;  40,HORN_ATTACK
     db 41,FURY_ATTACK
     db 43,HORN_DRILL
-    db 56,FIRE_BLAST
+    db 55,FIRE_BLAST
     db 60,BODY_SLAM
     db 0
 
@@ -1651,15 +1655,15 @@ Mon092_EvosMoves:
     ;   1,CONFUSE_RAY
     db 10,LEECH_LIFE
     db 15,NIGHT_SHADE
-    db 23,HYPNOSIS
-    db 24,DREAM_EATER
+    db 23,HYPNOSIS     ; Saffron Gym Gastly (Level 35)
+    db 24,DREAM_EATER  ; ...
     ;  25,HAUNTER
-    db 26,SMOG
-    db 30,POISON_GAS
-    db 35,AMNESIA
-    db 39,MEGA_DRAIN
+    db 26,SMOG         ; ...
+    db 30,POISON_GAS   ; ...
+    db 36,MEGA_DRAIN
     db 44,HAZE
     db 47,PSYCHIC_M
+    db 60,AMNESIA
     db 0
 
 Mon093_EvosMoves:
@@ -1669,10 +1673,11 @@ Mon093_EvosMoves:
     db EV_ITEM,TRADE_STONE,1,GENGAR
     db 0
 ;Learnset
-    ;  25,SMOG
-    db 31,POISON_GAS
-    db 35,MEGA_DRAIN
-    db 38,THUNDERPUNCH
+    ;  25,PSYWAVE    ; Saffron Gym Haunter (Level 35)
+    db 28,POISON_GAS ;  ; Saffron Gym Haunter (Level 38)
+    db 31,CONFUSION  ;  ; ...
+    db 35,MEGA_DRAIN ;  ; ...
+    db 38,THUNDERPUNCH  ; ...
     db 42,SLUDGE
     db 44,HAZE
     db 47,PSYCHIC_M
@@ -1685,7 +1690,8 @@ Mon094_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    db 31,POISON_GAS
+    ;  25,POISON_GAS
+    db 31,CONFUSION
     db 35,MEGA_DRAIN
     db 38,THUNDERPUNCH
     db 42,SLUDGE
@@ -1707,16 +1713,16 @@ Mon095_EvosMoves:
     db  5,CONSTRICT
     db  8,BIDE
     db 12,ROCK_THROW
-    db 14,STRIKE
+    db 14,SLAM
     db 15,BIND
-    db 19,SLAM
-    db 23,HARDEN
-    db 26,RAGE
-    db 31,TRAPHOLE
-    db 37,BODY_SLAM
-    db 42,DRAGON_RAGE
-    db 45,ROCK_SLIDE
-    db 48,EARTHQUAKE
+    db 19,STRIKE
+    db 23,TRAPHOLE
+    db 26,HARDEN
+    db 31,BODY_SLAM
+    db 34,RAGE
+    db 38,ROCK_SLIDE
+    db 41,DRAGON_RAGE
+    db 44,EARTHQUAKE
     db 56,EXPLOSION
     db 0
 
@@ -1734,9 +1740,9 @@ Mon096_EvosMoves:
     db  9,HYPNOSIS
     db 16,DREAM_EATER
     db 17,CONFUSION
-    db 24,HEADBUTT
+    db 21,HEADBUTT
+    db 24,MEDITATE
     ;  26,HYPNO
-    db 28,MEDITATE
     db 31,POISON_GAS
     db 35,PSYBEAM
     db 38,LIGHT_SCREEN
@@ -1750,7 +1756,6 @@ Mon097_EvosMoves:
     db 0
 ;Learnset
     ;  26,PSYBEAM
-    db 27,MEDITATE
     db 32,POISON_GAS
     db 38,PSYCHIC_M
     db 42,LIGHT_SCREEN
@@ -2132,8 +2137,8 @@ Mon115_EvosMoves:
     db 21,SUBSTITUTE
     db 22,REST
     db 25,BITE
-    db 29,STRIKE
-    db 31,MEGA_PUNCH
+    db 29,MEGA_PUNCH
+    db 31,STRIKE
     db 35,STOMP
     db 39,DIZZY_PUNCH
     db 43,SLASH
@@ -2449,9 +2454,9 @@ Mon128_EvosMoves:
     db  9,HORN_ATTACK
     db 11,RAGE
     db 14,LEER
-    db 16,STRIKE
+    db 16,STOMP
     db 17,DOUBLE_KICK
-    db 21,STOMP
+    db 21,STRIKE
     db 25,REST
     db 28,DOUBLE_TEAM
     db 32,SLAM
@@ -2782,10 +2787,10 @@ Mon143_EvosMoves:
 ;Learnset
     ;   1,LICK         ; Snorlax (Level 15)
     ;   1,DEFENSE_CURL ;
-    db  8,REST         ;
-    db 13,BITE         ;
-    db 16,DISABLE
-    db 20,ROCK_THROW
+    db  8,REST         ; ; Snorlax (Level 22)
+    db 13,BITE         ; ;
+    db 16,DISABLE        ;
+    db 20,ROCK_THROW     ; 
     db 23,HEADBUTT
     db 25,STRIKE
     db 27,STOMP
@@ -2959,15 +2964,6 @@ Mon150_EvosMoves:
     db 72,AMNESIA
     db 74,EARTHQUAKE
     db 75,HYPER_BEAM
-    db 0
-
-; ──────────────────────────────────────────────────────────────────────
-
-Mon151_EvosMoves:
-;MEW
-;Evolutions
-    db 0
-;Learnset
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────

@@ -624,7 +624,7 @@ ChannelerData:
     db 24,GASTLY,0
     db 24,GASTLY,0
 ; Saffron Gym
-    db 34,GASTLY,HAUNTER,0
+    db 35,GASTLY,HAUNTER,0
     db 38,HAUNTER,0
     db 33,GASTLY,GASTLY,HAUNTER,0
 
