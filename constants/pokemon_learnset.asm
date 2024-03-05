@@ -2456,10 +2456,10 @@ Mon128_EvosMoves:
     db 14,LEER
     db 16,STOMP
     db 17,DOUBLE_KICK
-    db 21,STRIKE
+    db 21,SLAM
     db 25,REST
     db 28,DOUBLE_TEAM
-    db 32,SLAM
+    db 32,STRIKE
     db 36,TAKE_DOWN
     db 38,SKULL_BASH
     db 41,HORN_DRILL
@@ -2792,10 +2792,10 @@ Mon143_EvosMoves:
     db 16,DISABLE        ;
     db 20,ROCK_THROW     ; 
     db 23,HEADBUTT
-    db 25,STRIKE
-    db 27,STOMP
-    db 29,AMNESIA
-    db 32,SLAM
+    db 25,STOMP
+    db 27,SLAM
+    db 28,AMNESIA
+    db 32,STRIKE
     db 34,HARDEN
     db 37,BODY_SLAM
     db 40,TSUNAMI
