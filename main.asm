@@ -398,7 +398,7 @@ MapHeaderPointers: ; 01ae (0:01ae)
     dw Lance_h ; unused
     dw Lance_h ; unused
     dw VictoryRoad1_h
-    dw Lance_h ; unused
+    dw VictoryCenter_h
     dw Lance_h ; unused ;id=110
     dw Lance_h ; unused
     dw Lance_h ; unused
@@ -15147,6 +15147,8 @@ FlyWarpDataPtr: ; 6448 (1:6448)
     dw Map0fFlyWarp
     db $15,0
     dw Map15FlyWarp
+    db $22,0
+    dw Map22FlyWarp
 
 ; Original Format:
 ;   [Event Displacement][Y-block][X-block][Y-sub_block][X-sub_block]
@@ -15178,6 +15180,8 @@ Map0fFlyWarp: ; 64be (1:64be)
     FLYWARP_DATA 45,6,11
 Map15FlyWarp: ; 64c4 (1:64c4)
     FLYWARP_DATA 10,20,11
+Map22FlyWarp:
+    FLYWARP_DATA 10,48,12
 
 ; This function appears to never be used.
 ; It is likely a debugging feature to give the player Tsunekazu Ishihara's
@@ -15188,27 +15192,29 @@ Map15FlyWarp: ; 64c4 (1:64c4)
 ; while I was debugging the program."
 ; http://www.ign.com/articles/2000/02/09/abc-news-pokamon-chat-transcript
 
-SetIshiharaTeam: ; 64ca (1:64ca)
-    ld de,IshiharaTeam
-.loop
-    ld a,[de]
-    cp $ff
-    ret z
-    ld [$cf91],a
-    inc de
-    ld a,[de]
-    ld [W_CURENEMYLVL],a
-    inc de
-    call AddPokemonToParty
-    jr .loop
+;SetIshiharaTeam: ; 64ca (1:64ca)
+;    ld de,IshiharaTeam
+;.loop
+;    ld a,[de]
+;    cp $ff
+;    ret z
+;    ld [$cf91],a
+;    inc de
+;    ld a,[de]
+;    ld [W_CURENEMYLVL],a
+;    inc de
+;    call AddPokemonToParty
+;    jr .loop
+;
+;IshiharaTeam: ; 64df (1:64df)
+;    db EXEGGUTOR,90
+;    db MEW,20
+;    db JOLTEON,56
+;    db DUGTRIO,56
+;    db ARTICUNO,57
+;    db $FF
 
-IshiharaTeam: ; 64df (1:64df)
-    db EXEGGUTOR,90
-    db MEW,20
-    db JOLTEON,56
-    db DUGTRIO,56
-    db ARTICUNO,57
-    db $FF
+SECTION "Func_64ea",ROMX[$64ea],BANK[$1]
 
 Func_64ea: ; 64ea (1:64ea)
     ret
@@ -20876,8 +20882,8 @@ MapSongBanks: ; c04d (3:404d)
     db BANK(Music_SSAnne) ;unused
     db (Music_Dungeon3 - $4000) / 3
     db BANK(Music_Dungeon3) ; VictoryRoad1
-    db (Music_PokemonTower - $4000) / 3
-    db BANK(Music_PokemonTower) ;unused
+    db (Music_IndigoPlateau - $4000) / 3
+    db BANK(Music_IndigoPlateau) ;VictoryPokecenter
     db (Music_Dungeon1 - $4000) / 3
     db BANK(Music_Dungeon1) ;unused
     db (Music_SilphCo - $4000) / 3
@@ -21266,7 +21272,7 @@ MapHeaderBanks: ; c23d (3:423d)
     db $1D ;unused
     db $1D ;unused
     db BANK(VictoryRoad1_h)
-    db $1D ;unused
+    db BANK(VictoryCenter_h)
     db $1D ;unused
     db $1D ;unused
     db $1D ;unused
@@ -67100,7 +67106,7 @@ HiddenObjectMaps: ; 46a40 (11:6a40)
     db MANSION_3
     db ROUTE_23
     db VICTORY_ROAD_2
-    db $6F
+    db VICTORY_POKECENTER
     db BILLS_HOUSE
     db VIRIDIAN_CITY
     db SAFARI_ZONE_REST_HOUSE_2
@@ -67189,7 +67195,7 @@ HiddenObjectPointers: ; 46a96 (11:6a96)
     dw Mansion3HiddenObjects
     dw Route23HiddenObjects
     dw VictoryRoad2HiddenObjects
-    dw Unused6FHiddenObjects
+    dw VictoryPokecenterHiddenObjects
     dw BillsHouseHiddenObjects
     dw ViridianCityHiddenObjects
     dw SafariZoneRestHouse2HiddenObjects
@@ -67681,9 +67687,9 @@ VictoryRoad2HiddenObjects: ; 46f72 (11:6f72)
     db $07,$1a,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-Unused6FHiddenObjects: ; 46f7f (11:6f7f)
-    db $0b,$0e,MAX_ELIXER
-    dbw BANK(HiddenItems),HiddenItems
+VictoryPokecenterHiddenObjects: ; 46e3a (11:6e3a)
+    db $03,$0d,$04 ; XXX,y,x
+    dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 BillsHouseHiddenObjects: ; 46f86 (11:6f86)
     db $04,$01,$04 ; XXX,y,x
@@ -72133,6 +72139,47 @@ GiveMagikarp:
     pop bc
     jp GivePokemon
 
+VictoryCenter_h:
+    db $06 ; tileset
+    db VICTORY_POKECENTER_HEIGHT,VICTORY_POKECENTER_WIDTH ; dimensions (y,x)
+    dw VictoryPokecenterBlocks,VictoryPokecenterTextPointers,VictoryPokecenterScript ; blocks,texts,scripts
+    db $00 ; connections
+    dw VictoryPokecenterObject ; objects
+
+VictoryPokecenterScript:
+    call Func_22fa
+    jp EnableAutoTextBoxDrawing
+
+VictoryPokecenterTextPointers:
+    dw VictoryPokecenterText1
+    dw VictoryPokecenterText2
+
+VictoryPokecenterText1:
+    db $ff
+
+VictoryPokecenterText2:
+    db $f6
+
+VictoryPokecenterObject:
+    db $0 ; border tile
+
+    db $2 ; warps
+    db $7,$3,$4,$ff
+    db $7,$4,$4,$ff
+
+    db $0 ; signs
+
+    db $2 ; people
+    db SPRITE_NURSE,$1 + 4,$3 + 4,$ff,$d0,$1 ; person
+    db SPRITE_CABLE_CLUB_WOMAN,$2 + 4,$b + 4,$ff,$d0,$2 ; person
+
+    ; warp-to
+    EVENT_DISP $7,$7,$3
+    EVENT_DISP $7,$7,$4
+
+VictoryPokecenterBlocks: ; 480ab (12:40ab)
+    INCBIN "maps/victorypokecenter.blk"
+
 SECTION "bank13",ROMX,BANK[$13]
 
 YoungsterPic: ; 4c000 (13:4000)
@@ -72650,44 +72697,7 @@ Route20Object: ; 0x50113 (size=106)
 Route20Blocks: ; 5017d (14:417d)
     INCBIN "maps/route20.blk"
 
-Route23_h: ; 0x5033f to 0x50361 (34 bytes) (id=34)
-    db $17 ; tileset
-    db ROUTE_23_HEIGHT,ROUTE_23_WIDTH ; dimensions (y,x)
-    dw Route23Blocks,Route23TextPointers,Route23Script ; blocks,texts,scripts
-    db NORTH | SOUTH ; connections
-    NORTH_MAP_CONNECTION INDIGO_PLATEAU,INDIGO_PLATEAU_WIDTH,INDIGO_PLATEAU_HEIGHT,0,0,INDIGO_PLATEAU_WIDTH,IndigoPlateauBlocks
-    SOUTH_MAP_CONNECTION ROUTE_22,ROUTE_22_WIDTH,0,0,ROUTE_22_WIDTH - 7,Route22Blocks,ROUTE_23_WIDTH,ROUTE_23_HEIGHT
-    dw Route23Object ; objects
-
-Route23Object: ; 0x50361 (size=81)
-    db $f ; border tile
-
-    db $4 ; warps
-    db $8b,$8,$2,ROUTE_22_GATE
-    db $8b,$9,$3,ROUTE_22_GATE
-    db $1f,$4,$0,VICTORY_ROAD_1
-    db $1f,$e,$1,VICTORY_ROAD_2
-
-    db $1 ; signs
-    db $21,$3,$8 ; Route23Text8
-
-    db $7 ; people
-    db SPRITE_GUARD,$23 + 4,$4 + 4,$ff,$d0,$1 ; person
-    db SPRITE_GUARD,$38 + 4,$a + 4,$ff,$d0,$2 ; person
-    db SPRITE_GUARD,$55 + 4,$8 + 4,$ff,$d0,$3 ; person
-    db SPRITE_GUARD,$60 + 4,$b + 4,$ff,$d0,$4 ; person
-    db SPRITE_GUARD,$69 + 4,$c + 4,$ff,$d0,$5 ; person
-    db SPRITE_GUARD,$77 + 4,$8 + 4,$ff,$d0,$6 ; person
-    db SPRITE_GUARD,$88 + 4,$8 + 4,$ff,$d0,$7 ; person
-
-    ; warp-to
-    EVENT_DISP $a,$8b,$8 ; ROUTE_22_GATE
-    EVENT_DISP $a,$8b,$9 ; ROUTE_22_GATE
-    EVENT_DISP $a,$1f,$4 ; VICTORY_ROAD_1
-    EVENT_DISP $a,$1f,$e ; VICTORY_ROAD_2
-
-Route23Blocks: ; 503b2 (14:43b2)
-    INCBIN "maps/route23.blk"
+SECTION "Route24_h",ROMX[$4682],BANK[$14] 
 
 Route24_h: ; 0x50682 to 0x506a4 (34 bytes) (id=35)
     db $00 ; tileset
@@ -73815,12 +73825,12 @@ Route23Script0: ; 51219 (14:5219)
     dec c
     cp b
     jr nz,.asm_51224 ; 0x5122b $f7
-    cp $23
-    jr nz,.asm_51237 ; 0x5122f $6
-    ld a,[W_XCOORD]
-    cp $e
-    ret nc
-.asm_51237
+    ;cp $23
+    ;jr nz,.asm_51237 ; 0x5122f $6
+    ;ld a,[W_XCOORD]
+    ;cp $e
+    ;ret nc
+;.asm_51237
     ld a,e
     ld [$ff00+$8c],a
     ld a,c
@@ -73838,8 +73848,10 @@ Route23Script0: ; 51219 (14:5219)
     ld [H_CURRENTPRESSEDBUTTONS],a
     ret
 
+SECTION "YCoordsData_51255",ROMX[$5255],BANK[$14] 
+
 YCoordsData_51255: ; 51255 (14:5255)
-    db $23,$38,$55,$60,$69,$77,$88,$FF
+    db $35,$5F,$67,$6F,$77,$7F,$87,$FF
 
 Func_5125d: ; 5125d (14:525d)
     ld hl,BadgeTextPointers ; $5276
@@ -76933,6 +76945,47 @@ CoordsOnix:
     db 2,12
     db 2,13
     db $FF
+
+Route23_h: ; 0x5033f to 0x50361 (34 bytes) (id=34)
+    db $17 ; tileset
+    db ROUTE_23_HEIGHT,ROUTE_23_WIDTH ; dimensions (y,x)
+    dw Route23Blocks,Route23TextPointers,Route23Script ; blocks,texts,scripts
+    db NORTH | SOUTH ; connections
+    NORTH_MAP_CONNECTION INDIGO_PLATEAU,INDIGO_PLATEAU_WIDTH,INDIGO_PLATEAU_HEIGHT,0,0,INDIGO_PLATEAU_WIDTH,IndigoPlateauBlocks
+    SOUTH_MAP_CONNECTION ROUTE_22,ROUTE_22_WIDTH,0,0,ROUTE_22_WIDTH - 7,Route22Blocks,ROUTE_23_WIDTH,ROUTE_23_HEIGHT
+    dw Route23Object ; objects
+
+Route23Object: ; 0x50361 (size=81)
+    db $f ; border tile
+
+    db $5 ; warps
+    db $8b,$8,$2,ROUTE_22_GATE
+    db $8b,$9,$3,ROUTE_22_GATE
+    db $1f,$4,$0,VICTORY_ROAD_1
+    db $1f,$e,$1,VICTORY_ROAD_2
+    db $2f,$c,$0,VICTORY_POKECENTER
+
+    db $1 ; signs
+    db $21,$3,$8 ; Route23Text8
+
+    db $7 ; people
+    db SPRITE_GUARD,$35 + 4,$a + 4,$ff,$d0,$1 ; person
+    db SPRITE_GUARD,$5F + 4,$a + 4,$ff,$d0,$2 ; person
+    db SPRITE_GUARD,$67 + 4,$c + 4,$ff,$d0,$3 ; person
+    db SPRITE_GUARD,$6F + 4,$3 + 4,$ff,$d0,$4 ; person
+    db SPRITE_GUARD,$77 + 4,$8 + 4,$ff,$d0,$5 ; person
+    db SPRITE_GUARD,$7F + 4,$10 + 4,$ff,$d0,$6 ; person
+    db SPRITE_GUARD,$87 + 4,$8 + 4,$ff,$d0,$7 ; person
+
+    ; warp-to
+    EVENT_DISP $a,$8b,$8 ; ROUTE_22_GATE
+    EVENT_DISP $a,$8b,$9 ; ROUTE_22_GATE
+    EVENT_DISP $a,$1f,$4 ; VICTORY_ROAD_1
+    EVENT_DISP $a,$1f,$e ; VICTORY_ROAD_2
+    EVENT_DISP $a,$2f,$c ; VICTORY_POKECENTER
+
+Route23Blocks: ; 503b2 (14:43b2)
+    INCBIN "maps/route23.blk"
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -95927,7 +95980,7 @@ InternalMapEntries: ; 71382 (1c:5382)
     IMAP $59,$C,$0,SeaCottageName
     IMAP $5E,$A,$9,VermilionCityName
     IMAP $6A,$9,$A,SSAnneName
-    IMAP $6D,$0,$4,VictoryRoadName
+    IMAP $6E,$0,$4,VictoryRoadName
     IMAP $77,$0,$2,PokemonLeagueName
     IMAP $78,$A,$5,UndergroundPathName
     IMAP $79,$0,$2,PokemonLeagueName
