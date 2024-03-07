@@ -18508,7 +18508,7 @@ PrintDenimVersionAndSaveScreenTilesToBuffer2:
     jr nz,.Loop
     ret
 .Version
-    db "0.61.200"
+    db "0.61.210"
 .GBC
     db $41
 
