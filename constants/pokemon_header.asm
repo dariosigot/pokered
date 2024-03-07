@@ -94,7 +94,7 @@ VenusaurBaseStats: ; 38416 (e:4416)
     db RAZOR_LEAF
     db SLAM
     db STUN_SPORE
-    db GROWTH
+    db PETAL_DANCE
 
     db 3 ; growth rate
 
@@ -646,9 +646,9 @@ PidgeotBaseStats: ; 385ba (e:45ba)
     dw PidgeotPicBack
 
     ; attacks known at lvl 0
-    db WING_ATTACK
     db WHIRLWIND
     db SWOOP
+    db RAZOR_WIND
     db DOUBLE_TEAM
 
     db 3 ; growth rate
@@ -1130,7 +1130,7 @@ NidoqueenBaseStats: ; 38726 (e:4726)
     db POISON_STING
     db FURY_SWIPES
     db DOUBLE_KICK
-    db BODY_SLAM
+    db THRASH
 
     db 3 ; growth rate
 

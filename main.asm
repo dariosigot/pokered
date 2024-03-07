@@ -48022,6 +48022,45 @@ EvosMovesPointerTable: ; Moved in the Bank
     dw Mon070_EvosMoves
     dw Mon071_EvosMoves
 
+GoPalSetBattleAndLoadText:
+    ld b,1
+    call GoPAL_SET
+    ld hl,UnnamedText_3bb92 ; $7b92
+    ret
+
+RedBallColorDuringEnemySwitch:
+    ld a,PAL_REDBALL - PAL_GREENBAR
+    ld [$CF1D + 1],a
+    ld b,1
+    call GoPAL_SET
+    call GbPalComplete ; Red Ball
+    xor a
+    ld [$CF1D + 1],a
+    jp LoadPartyPokeballGfx
+
+Func_3aede: ; Moved in the Bank
+    pop de
+    pop bc
+    pop hl
+    pop af
+    ld [$FF00+$d7],a
+    ld a,[W_ISLINKBATTLE] ; $d12b
+    cp $32
+    ret z
+    ld a,[W_ISINBATTLE] ; $d057
+    and a
+    ret nz
+    ld a,[$d121]
+    and a
+    call nz,Func_2307
+    ret
+
+GoPalSetAfterAIItemUser: ; to avoid bad color after enemy item use
+    call Predef
+    ld b,BANK(DrawEnemyHUDAndHPBar)
+    ld hl,DrawEnemyHUDAndHPBar
+    jp Bankswitch
+
 SECTION "TrainerPicAndMoneyPointers",ROMX[$5914],BANK[$e]
 
 ; trainer pic pointers and base money.
@@ -49486,45 +49525,6 @@ SetAttributeOamRedBall:
     ld a,3
     ld [hli],a
     ret
-
-GoPalSetBattleAndLoadText:
-    ld b,1
-    call GoPAL_SET
-    ld hl,UnnamedText_3bb92 ; $7b92
-    ret
-
-RedBallColorDuringEnemySwitch:
-    ld a,PAL_REDBALL - PAL_GREENBAR
-    ld [$CF1D + 1],a
-    ld b,1
-    call GoPAL_SET
-    call GbPalComplete ; Red Ball
-    xor a
-    ld [$CF1D + 1],a
-    jp LoadPartyPokeballGfx
-
-Func_3aede: ; Moved in the Bank
-    pop de
-    pop bc
-    pop hl
-    pop af
-    ld [$FF00+$d7],a
-    ld a,[W_ISLINKBATTLE] ; $d12b
-    cp $32
-    ret z
-    ld a,[W_ISINBATTLE] ; $d057
-    and a
-    ret nz
-    ld a,[$d121]
-    and a
-    call nz,Func_2307
-    ret
-
-GoPalSetAfterAIItemUser: ; to avoid bad color after enemy item use
-    call Predef
-    ld b,BANK(DrawEnemyHUDAndHPBar)
-    ld hl,DrawEnemyHUDAndHPBar
-    jp Bankswitch
 
 INCLUDE "constants/special_trainer.asm"
 
@@ -99175,9 +99175,9 @@ TownMapOrder:
     db PALLET_TOWN
     db ROUTE_1
     db VIRIDIAN_CITY
+    db ROUTE_22
     db ROUTE_2
     db VIRIDIAN_FOREST
-    db ROUTE_22
     db PEWTER_CITY
     db ROUTE_3
     db MT_MOON_1
@@ -127992,7 +127992,7 @@ _CheckEvolutionMove:
 EvolutionMove:
    db 0                    ; BULBASAUR
    db POISONPOWDER         ; IVYSAUR
-   db GROWTH               ; VENUSAUR
+   db PETAL_DANCE          ; VENUSAUR
    db 0                    ; CHARMANDER
    db RAGE                 ; CHARMELEON
    db DRAGON_RAGE          ; CHARIZARD
@@ -128020,7 +128020,7 @@ EvolutionMove:
    db TRAPHOLE             ; SANDSLASH
    db 0                    ; NIDORAN_F
    db DOUBLE_KICK          ; NIDORINA
-   db BODY_SLAM            ; NIDOQUEEN
+   db THRASH               ; NIDOQUEEN
    db 0                    ; NIDORAN_M
    db DOUBLE_KICK          ; NIDORINO
    db THRASH               ; NIDOKING

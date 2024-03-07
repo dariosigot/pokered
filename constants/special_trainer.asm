@@ -338,7 +338,7 @@ LanceMove:
     db SLASH
     db FLAMETHROWER
     db DRAGON_RAGE
-    db EARTHQUAKE
+    db HYPER_BEAM
     ; Aerodactyl (Level 60)
     db FLAMETHROWER
     db EARTHQUAKE
@@ -372,6 +372,11 @@ Sony2Move7:
     db KINESIS
     db PSYBEAM
     db RECOVER
+    ; Rhyhorn (Level 38)
+    db BODY_SLAM
+    db ROCK_THROW
+    db TRAPHOLE
+    db THRASH
     ; Blastoise (Level 40)
     db WITHDRAW
     db SEISMIC_TOSS
@@ -385,11 +390,11 @@ Sony2Move8:
     db WING_ATTACK
     db SWOOP
     db RAZOR_WIND
-    ; Gyarados (Level 38)
-    db HYPER_FANG
-    db BUBBLEBEAM
-    db TSUNAMI
-    db DRAGON_RAGE
+    ; Cloyster (Level 38)
+    db SUPERSONIC
+    db CLAMP
+    db AURORA_BEAM
+    db MIST
     ; Arcanine (Level 35)
     db HYPER_FANG
     db DOUBLE_KICK
@@ -400,6 +405,11 @@ Sony2Move8:
     db KINESIS
     db PSYBEAM
     db RECOVER
+    ; Rhyhorn (Level 38)
+    db BODY_SLAM
+    db ROCK_THROW
+    db TRAPHOLE
+    db THRASH
     ; Venusaur (Level 40)
     db RAZOR_LEAF
     db STUN_SPORE
@@ -418,16 +428,21 @@ Sony2Move9:
     db SLEEP_POWDER
     db PSYBEAM
     db MEGA_DRAIN
-    ; Gyarados (Level 35)
-    db HYPER_FANG
-    db BUBBLEBEAM
-    db TSUNAMI
-    db DRAGON_RAGE
+    ; Cloyster (Level 35)
+    db SUPERSONIC
+    db CLAMP
+    db AURORA_BEAM
+    db MIST
     ; Alakazam (Level 35)
     db CONFUSION
     db KINESIS
     db PSYBEAM
     db RECOVER
+    ; Rhyhorn (Level 38)
+    db BODY_SLAM
+    db ROCK_THROW
+    db TRAPHOLE
+    db THRASH
     ; Charizard (Level 40)
     db FIRE_PUNCH
     db SLASH
@@ -479,11 +494,11 @@ Sony2MoveB:
     db EARTHQUAKE
     db SUBSTITUTE
     db BODY_SLAM
-    ; Gyarados (Level 45)
+    ; Cloyster (Level 45)
+    db CLAMP
+    db MIST
+    db SELFDESTRUCT
     db ICE_BEAM
-    db BODY_SLAM
-    db HYDRO_PUMP
-    db HYPER_BEAM
     ; Arcanine (Level 47)
     db HYPER_FANG
     db AGILITY
@@ -517,11 +532,11 @@ Sony2MoveC:
     db MEGA_DRAIN
     db PSYCHIC_M
     db EGG_BOMB
-    ; Gyarados (Level 47)
+    ; Cloyster (Level 47)
+    db CLAMP
+    db MIST
+    db SELFDESTRUCT
     db ICE_BEAM
-    db BODY_SLAM
-    db HYDRO_PUMP
-    db HYPER_BEAM
     ; Alakazam (Level 50)
     db RECOVER
     db PSYCHIC_M
@@ -536,7 +551,7 @@ Sony2MoveC:
 
 Sony3Move1:
     ; Pidgeot (Level 61)
-    db SWOOP
+    db DRILL_PECK
     db AGILITY
     db DOUBLE_EDGE
     db SKY_ATTACK
@@ -551,7 +566,7 @@ Sony3Move1:
     db SUBSTITUTE
     db BODY_SLAM
     ; Arcanine (Level 61)
-    db HYPER_FANG
+    db BODY_SLAM
     db AGILITY
     db FIRE_SPIN
     db FIRE_BLAST
@@ -569,7 +584,7 @@ Sony3Move1:
 
 Sony3Move2:
     ; Pidgeot (Level 61)
-    db SWOOP
+    db DRILL_PECK
     db AGILITY
     db DOUBLE_EDGE
     db SKY_ATTACK
@@ -583,13 +598,13 @@ Sony3Move2:
     db EARTHQUAKE
     db SUBSTITUTE
     db BODY_SLAM
-    ; Gyarados (Level 61)
+    ; Cloyster (Level 61)
+    db CLAMP
+    db REST
+    db EXPLOSION
     db BLIZZARD
-    db BODY_SLAM
-    db HYDRO_PUMP
-    db SUPER_FANG
     ; Arcanine (Level 63)
-    db HYPER_FANG
+    db BODY_SLAM
     db AGILITY
     db FIRE_SPIN
     db FIRE_BLAST
@@ -602,7 +617,7 @@ Sony3Move2:
 
 Sony3Move3:
     ; Pidgeot (Level 61)
-    db SWOOP
+    db DRILL_PECK
     db AGILITY
     db DOUBLE_EDGE
     db SKY_ATTACK
@@ -621,11 +636,11 @@ Sony3Move3:
     db MEGA_DRAIN
     db PSYCHIC_M
     db EXPLOSION
-    ; Gyarados (Level 63)
+    ; Cloyster (Level 63)
+    db CLAMP
+    db REST
+    db EXPLOSION
     db BLIZZARD
-    db BODY_SLAM
-    db HYDRO_PUMP
-    db SUPER_FANG
     ; Charizard (Level 65)
     db SLASH
     db EARTHQUAKE
