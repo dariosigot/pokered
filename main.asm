@@ -22623,9 +22623,9 @@ MapHS58: ; cc0d (3:4c0d)
     db BILLS_HOUSE,$02,Hide
     db BILLS_HOUSE,$03,Hide
 MapHS33: ; cc16 (3:4c16)
-    db VIRIDIAN_FOREST,$05,Show
-    db VIRIDIAN_FOREST,$06,Show
-    db VIRIDIAN_FOREST,$07,Show
+    db VIRIDIAN_FOREST,$08,Show
+    db VIRIDIAN_FOREST,$09,Show
+    db VIRIDIAN_FOREST,$0a,Show
 MapHS3B: ; cc1f (3:4c1f)
     db MT_MOON_1,$08,Show
     db MT_MOON_1,$09,Show
@@ -90888,16 +90888,14 @@ ViridianForestScript: ; 6110d (18:510d)
     ld [W_VIRIDIANFORESTCURSCRIPT],a
     ret
 
-ViridianForestScriptPointers: ; 61120 (18:5120)
-    dw CheckFightingMapTrainers
-    dw Func_324c
-    dw EndTrainerBattle
-
 ViridianForestTextPointers: ; 61126 (18:5126)
     dw ViridianForestText1
     dw ViridianForestText2
     dw ViridianForestText3
     dw ViridianForestText4
+    dw ViridianForestText15 ; New Trainer
+    dw ViridianForestText16 ; New Trainer
+    dw ViridianForestText17 ; New Trainer
     dw Predef5CText
     dw Predef5CText
     dw Predef5CText
@@ -90908,6 +90906,8 @@ ViridianForestTextPointers: ; 61126 (18:5126)
     dw ViridianForestText12
     dw ViridianForestText13
     dw ViridianForestText14
+
+SECTION "ViridianForestTrainerHeaders",ROMX[$5142],BANK[$18] 
 
 ViridianForestTrainerHeaders: ; 61142 (18:5142)
 ViridianForestTrainerHeader0: ; 61142 (18:5142)
@@ -90936,6 +90936,33 @@ ViridianForestTrainerHeader2: ; 6115a (18:515a)
     dw ViridianForestAfterBattleText3 ; 0x51b2 TextAfterBattle
     dw ViridianForestEndBattleText3 ; 0x51ad TextEndBattle
     dw ViridianForestEndBattleText3 ; 0x51ad TextEndBattle
+
+ViridianForestTrainerHeader3:
+    db $5 ; flag's bit
+    db ($4 << 4) ; trainer's view range
+    dw $d7f3 ; flag's byte
+    dw ViridianForestBattleText4
+    dw ViridianForestAfterBattleText4
+    dw ViridianForestEndBattleText4
+    dw ViridianForestEndBattleText4
+
+ViridianForestTrainerHeader4:
+    db $6 ; flag's bit
+    db ($4 << 4) ; trainer's view range
+    dw $d7f3 ; flag's byte
+    dw ViridianForestBattleText5
+    dw ViridianForestAfterBattleText5
+    dw ViridianForestEndBattleText5
+    dw ViridianForestEndBattleText5
+
+ViridianForestTrainerHeader5:
+    db $7 ; flag's bit
+    db ($4 << 4) ; trainer's view range
+    dw $d7f3 ; flag's byte
+    dw ViridianForestBattleText6
+    dw ViridianForestAfterBattleText6
+    dw ViridianForestEndBattleText6
+    dw ViridianForestEndBattleText6
 
     db $ff
 
@@ -90997,6 +91024,42 @@ ViridianForestAfterBattleText3: ; 611b2 (18:51b2)
     TX_FAR _ViridianFrstAfterBattleText3
     db "@"
 
+ViridianForestBattleText4:
+    TX_FAR _ViridianForestBattleText4
+    db "@"
+
+ViridianForestEndBattleText4:
+    TX_FAR _ViridianForestEndBattleText4
+    db "@"
+
+ViridianForestAfterBattleText4:
+    TX_FAR _ViridianFrstAfterBattleText4
+    db "@"
+
+ViridianForestBattleText5:
+    TX_FAR _ViridianForestBattleText5
+    db "@"
+
+ViridianForestEndBattleText5:
+    TX_FAR _ViridianForestEndBattleText5
+    db "@"
+
+ViridianForestAfterBattleText5:
+    TX_FAR _ViridianFrstAfterBattleText5
+    db "@"
+
+ViridianForestBattleText6:
+    TX_FAR _ViridianForestBattleText6
+    db "@"
+
+ViridianForestEndBattleText6:
+    TX_FAR _ViridianForestEndBattleText6
+    db "@"
+
+ViridianForestAfterBattleText6:
+    TX_FAR _ViridianFrstAfterBattleText6
+    db "@"
+
 ViridianForestText8: ; 611b7 (18:51b7)
     TX_FAR _ViridianForestText8
     db "@"
@@ -91025,42 +91088,7 @@ ViridianForestText14: ; 611d5 (18:51d5)
     TX_FAR _ViridianForestText14
     db "@"
 
-ViridianForestObject: ; 0x611da (size=127)
-    db $3 ; border tile
-
-    db $6 ; warps
-    db $0,$1,$2,VIRIDIAN_FOREST_EXIT
-    db $0,$2,$3,VIRIDIAN_FOREST_EXIT
-    db $2f,$f,$1,VIRIDIAN_FOREST_ENTRANCE
-    db $2f,$10,$1,VIRIDIAN_FOREST_ENTRANCE
-    db $2f,$11,$1,VIRIDIAN_FOREST_ENTRANCE
-    db $2f,$12,$1,VIRIDIAN_FOREST_ENTRANCE
-
-    db $6 ; signs
-    db $28,$18,$9 ; ViridianForestText9
-    db $20,$10,$a ; ViridianForestText10
-    db $11,$1a,$b ; ViridianForestText11
-    db $18,$4,$c ; ViridianForestText12
-    db $2d,$12,$d ; ViridianForestText13
-    db $1,$2,$e ; ViridianForestText14
-
-    db $8 ; people
-    db SPRITE_BUG_CATCHER,$2b + 4,$10 + 4,$ff,$ff,$1 ; person
-    db SPRITE_BUG_CATCHER,$21 + 4,$1e + 4,$ff,$d2,$42,BUG_CATCHER + $C8,$1 ; trainer
-    db SPRITE_BUG_CATCHER,$13 + 4,$1e + 4,$ff,$d2,$43,BUG_CATCHER + $C8,$2 ; trainer
-    db SPRITE_BUG_CATCHER,$12 + 4,$2 + 4,$ff,$d2,$44,BUG_CATCHER + $C8,$3 ; trainer
-    db SPRITE_BALL,$b + 4,$19 + 4,$ff,$ff,$85,ANTIDOTE ; item
-    db SPRITE_BALL,$1d + 4,$c + 4,$ff,$ff,$86,POTION ; item
-    db SPRITE_BALL,$1f + 4,$1 + 4,$ff,$ff,$87,POKE_BALL ; item
-    db SPRITE_BUG_CATCHER,$28 + 4,$1b + 4,$ff,$ff,$8 ; person
-
-    ; warp-to
-    EVENT_DISP $11,$0,$1 ; VIRIDIAN_FOREST_EXIT
-    EVENT_DISP $11,$0,$2 ; VIRIDIAN_FOREST_EXIT
-    EVENT_DISP $11,$2f,$f ; VIRIDIAN_FOREST_ENTRANCE
-    EVENT_DISP $11,$2f,$10 ; VIRIDIAN_FOREST_ENTRANCE
-    EVENT_DISP $11,$2f,$11 ; VIRIDIAN_FOREST_ENTRANCE
-    EVENT_DISP $11,$2f,$12 ; VIRIDIAN_FOREST_ENTRANCE
+SECTION "SSAnne1_h",ROMX[$4265],BANK[$18]
 
 SSAnne1_h: ; 0x61259 to 0x61265 (12 bytes) (id=95)
     db $0d ; tileset
@@ -93225,6 +93253,69 @@ ResetFossilSteps:
 
 SSAnne4Blocks: ; Move in the BANK
     INCBIN "maps/ssanne4.blk"
+
+ViridianForestObject: ; Moved in the Bank
+    db $3 ; border tile
+
+    db $6 ; warps
+    db $0,$1,$2,VIRIDIAN_FOREST_EXIT
+    db $0,$2,$3,VIRIDIAN_FOREST_EXIT
+    db $2f,$f,$1,VIRIDIAN_FOREST_ENTRANCE
+    db $2f,$10,$1,VIRIDIAN_FOREST_ENTRANCE
+    db $2f,$11,$1,VIRIDIAN_FOREST_ENTRANCE
+    db $2f,$12,$1,VIRIDIAN_FOREST_ENTRANCE
+
+    db $6 ; signs
+    db $28,$18,$9 ; ViridianForestText9
+    db $20,$10,$a ; ViridianForestText10
+    db $11,$1a,$b ; ViridianForestText11
+    db $18,$4,$c ; ViridianForestText12
+    db $2d,$12,$d ; ViridianForestText13
+    db $1,$2,$e ; ViridianForestText14
+
+    db $b ; people
+    db SPRITE_BUG_CATCHER,$2b + 4,$10 + 4,$ff,$ff,$1 ; person
+    db SPRITE_BUG_CATCHER,$21 + 4,$1e + 4,$ff,$d2,$42,BUG_CATCHER + $C8,$1 ; trainer
+    db SPRITE_BUG_CATCHER,$13 + 4,$1e + 4,$ff,$d2,$43,BUG_CATCHER + $C8,$2 ; trainer
+    db SPRITE_BUG_CATCHER,$12 + 4,$2 + 4,$ff,$d2,$44,BUG_CATCHER + $C8,$3 ; trainer
+    db SPRITE_BUG_CATCHER,$12 + 4,$d + 4,$ff,$d3,$45,BUG_CATCHER + $C8,$e ; trainer
+    db SPRITE_BUG_CATCHER,$3 + 4,$7 + 4,$ff,$d3,$46,BUG_CATCHER + $C8,$f ; trainer
+    db SPRITE_BUG_CATCHER,$18 + 4,$c + 4,$ff,$d2,$47,BUG_CATCHER + $C8,$10 ; trainer
+    db SPRITE_BALL,$b + 4,$19 + 4,$ff,$ff,$88,ANTIDOTE ; item
+    db SPRITE_BALL,$1d + 4,$c + 4,$ff,$ff,$89,POTION ; item
+    db SPRITE_BALL,$1f + 4,$1 + 4,$ff,$ff,$8a,POKE_BALL ; item
+    db SPRITE_BUG_CATCHER,$28 + 4,$1b + 4,$ff,$ff,$b ; person
+
+    ; warp-to
+    EVENT_DISP $11,$0,$1 ; VIRIDIAN_FOREST_EXIT
+    EVENT_DISP $11,$0,$2 ; VIRIDIAN_FOREST_EXIT
+    EVENT_DISP $11,$2f,$f ; VIRIDIAN_FOREST_ENTRANCE
+    EVENT_DISP $11,$2f,$10 ; VIRIDIAN_FOREST_ENTRANCE
+    EVENT_DISP $11,$2f,$11 ; VIRIDIAN_FOREST_ENTRANCE
+    EVENT_DISP $11,$2f,$12 ; VIRIDIAN_FOREST_ENTRANCE
+
+ViridianForestScriptPointers: ; Moved in the Bank
+    dw CheckFightingMapTrainers
+    dw Func_324c
+    dw EndTrainerBattle
+
+ViridianForestText15:
+    db $08 ; asm
+    ld hl,ViridianForestTrainerHeader3
+    call TalkToTrainer
+    jp TextScriptEnd
+
+ViridianForestText16:
+    db $08 ; asm
+    ld hl,ViridianForestTrainerHeader4
+    call TalkToTrainer
+    jp TextScriptEnd
+
+ViridianForestText17:
+    db $08 ; asm
+    ld hl,ViridianForestTrainerHeader5
+    call TalkToTrainer
+    jp TextScriptEnd
 
 SECTION "bank19",ROMX,BANK[$19]
 
@@ -114393,6 +114484,48 @@ _SilphCo5BattleText4: ; 82a81 (20:6a81)
     db $0,"Whaaat? There",$4f
     db "shouldn't be any",$55
     db "children here?",$57
+
+_ViridianForestBattleText4:
+    db $0,"Hi! I'm a",$4f
+    db "Trainer, Fight!",$57
+
+_ViridianForestEndBattleText4:
+    db $0,"I",$4f
+    db "Lost! Damn!",$58
+
+_ViridianFrstAfterBattleText4:
+    db $0,"My #MON",$4f
+    db "can TELEPORT",$55
+    db "to return to",$55
+    db "#MON CENTER!",$57
+
+_ViridianForestBattleText5:
+    db $0,"Hi! I'm a",$4f
+    db "Trainer, Fight!",$57
+
+_ViridianForestEndBattleText5:
+    db $0,"I",$4f
+    db "Lost! Damn!",$58
+
+_ViridianFrstAfterBattleText5:
+    db $0,"You must",$4f
+    db "train a lot",$55
+    db "every your",$55
+    db "#MON!",$57
+
+_ViridianForestBattleText6:
+    db $0,"Hi! I'm a",$4f
+    db "Trainer, Fight!",$57
+
+_ViridianForestEndBattleText6:
+    db $0,"I",$4f
+    db "Lost! Damn!",$58
+
+_ViridianFrstAfterBattleText6:
+    db $0,"CATERPIE Seems",$4f
+    db "so weak...",$51
+    db "I hope to ",$4f
+    db "Evolve it!",$57
 
 SECTION "bank21",ROMX,BANK[$21]
 

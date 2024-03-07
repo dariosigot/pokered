@@ -59,6 +59,10 @@ BugCatcherData:
 ; Route 9
     db 19,BEEDRILL,BEEDRILL,0
     db 18,METAPOD,KAKUNA,VENONAT,0
+; Viridian Forest
+    db 5,CATERPIE,VENONAT,0
+    db 7,METAPOD,CATERPIE,0
+    db 8,CATERPIE,0
 
 LassData:
 ; Route 3
