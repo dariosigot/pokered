@@ -6094,75 +6094,76 @@ UpdateSprites: ; 2429 (0:2429)
 
 ; Viridian
 ViridianMartText6: ; 2442 (0:2442)
-    db $FE,4,POKE_BALL,ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
+    db $FE,4,POKE_BALL
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
 
 ; Pewter
-PewterMartText1: ; 2449 (0:2449)
-    db $FE,7,POKE_BALL,POTION,ESCAPE_ROPE,ANTIDOTE,BURN_HEAL,AWAKENING
-    db PARLYZ_HEAL,$FF
+PewterMartText1:
+    db $FE,7,POKE_BALL
+    db POTION
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
+    db ESCAPE_ROPE,$FF
 
 ; Cerulean
-CeruleanMartText1: ; 2453 (0:2453)
-    db $FE,7,POKE_BALL,POTION,REPEL,ANTIDOTE,BURN_HEAL,AWAKENING
-    db PARLYZ_HEAL,$FF
-
-; Bike shop
-    db $FE,1,BICYCLE,$FF
+CeruleanMartText1:
+    db $FE,7,POKE_BALL
+    db POTION
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
+    db REPEL,$FF
 
 ; Vermilion
-VermilionMartText1: ; 2461 (0:2461)
-    db $FE,6,POKE_BALL,SUPER_POTION,ICE_HEAL,AWAKENING,PARLYZ_HEAL
+VermilionMartText1:
+    db $FE,8,POKE_BALL
+    db SUPER_POTION,POTION
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
     db REPEL,$FF
 
 ; Lavender
-LavenderMartText1: ; 246a (0:246a)
-    db $FE,9,GREAT_BALL,SUPER_POTION,ETHER,ELIXER,ESCAPE_ROPE,SUPER_REPEL
-    db ANTIDOTE,BURN_HEAL,PARLYZ_HEAL,$FF
+LavenderMartText1:
+    db $FE,10,GREAT_BALL
+    db SUPER_POTION
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
+    db SUPER_REPEL
+    db ETHER,ELIXER,$FF
 
 ; Celadon Dept. Store 2F (1)
-CeladonMart2Text1: ; 2476 (0:2476)
-    db $FE,9,GREAT_BALL,SUPER_POTION,ETHER,SUPER_REPEL,ANTIDOTE
-    db BURN_HEAL,ICE_HEAL,AWAKENING,PARLYZ_HEAL,$FF
-
-; Celadon Dept. Store 2F (2)
-CeladonMart2Text2: ; 2482 (0:2482)
-    db $FE,9,TM_32,TM_33,TM_02,TM_07,TM_37,TM_01,TM_05,TM_09,TM_17,$FF
-
-; Celadon Dept. Store 4F
-CeladonMart4Text1: ; 248e (0:248e)
-    db $FE,5,POKE_DOLL,FIRE_STONE,THUNDER_STONE,WATER_STONE,LEAF_STONE,$FF
-
-; Celadon Dept. Store 5F (1)
-CeladonMart5Text3: ; 2496 (0:2496)
-    db $FE,7,X_ACCURACY,GUARD_SPEC_,DIRE_HIT,X_ATTACK,X_DEFEND,X_SPEED
-    db X_SPECIAL,$FF
-
-; Celadon Dept. Store 5F (2)
-CeladonMart5Text4: ; 24a0 (0:24a0)
-    db $FE,5,HP_UP,PROTEIN,IRON,CARBOS,CALCIUM,$FF
-
-; Fuchsia
-FuchsiaMartText1: ; 24a8 (0:24a8)
-    db $FE,6,ULTRA_BALL,GREAT_BALL,SUPER_POTION,ETHER,FULL_HEAL
-    db SUPER_REPEL,$FF
-
-; unused? 24b1
-    db $FE,5,GREAT_BALL,HYPER_POTION,SUPER_POTION,FULL_HEAL,ETHER,$FF
-
-; Cinnabar
-CinnabarMartText1: ; 24b9 (0:24b9)
-    db $FE,7,ULTRA_BALL,GREAT_BALL,HYPER_POTION,MAX_REPEL,ESCAPE_ROPE
-    db FULL_HEAL,ETHER,$FF
+CeladonMart2Text1:
+    db $FE,13,GREAT_BALL,POKE_BALL
+    db REVIVE
+    db SUPER_POTION,POTION
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
+    db ESCAPE_ROPE,SUPER_REPEL,REPEL,$FF
 
 ; Saffron
-SaffronMartText1: ; 24c3 (0:24c3)
-    db $FE,6,GREAT_BALL,HYPER_POTION,MAX_REPEL,ESCAPE_ROPE,FULL_HEAL
-    db ETHER,$FF
+SaffronMartText1:
+    db $FE,5,GREAT_BALL
+    db HYPER_POTION
+    db FULL_HEAL
+    db MAX_REPEL,ESCAPE_ROPE,$FF
+
+; Fuchsia
+FuchsiaMartText1:
+    db $FE,5,ULTRA_BALL,GREAT_BALL
+    db SUPER_POTION
+    db FULL_HEAL
+    db SUPER_REPEL,$FF
+
+; Cinnabar
+CinnabarMartText1:
+    db $FE,6,ULTRA_BALL
+    db HYPER_POTION,SUPER_POTION
+    db FULL_HEAL
+    db MAX_REPEL,ESCAPE_ROPE,$FF
 
 ; Indigo
-IndigoPlateauLobbyText4: ; 24cc (0:24cc)
-    db $FE,7,ULTRA_BALL,GREAT_BALL,FULL_RESTORE,MAX_POTION,FULL_HEAL
-    db ETHER,MAX_REPEL,$FF
+IndigoPlateauLobbyText4:
+    db $FE,7,ULTRA_BALL
+    db REVIVE
+    db FULL_RESTORE,MAX_POTION,HYPER_POTION
+    db FULL_HEAL
+    db MAX_REPEL,$FF
+
+SECTION "TextScriptEndingChar",ROM0[$24d6]
 
 TextScriptEndingChar: ; 24d6 (0:24d6)
     db "@"
@@ -11515,7 +11516,7 @@ ItemPrices: ; 4608 (1:4608)
     bcd3   9800 ; IRON
     bcd3   9800 ; CARBOS
     bcd3   9800 ; CALCIUM
-    bcd3   4800 ; RARE_CANDY
+    bcd3   9800 ; RARE_CANDY
     bcd3      0 ; DOME_FOSSIL
     bcd3      0 ; HELIX_FOSSIL
     bcd3      0 ; SECRET_KEY
@@ -11528,8 +11529,8 @@ ItemPrices: ; 4608 (1:4608)
     bcd3   9800 ; XXX PP_UP
     bcd3   1000 ; POKE_DOLL
     bcd3    600 ; FULL_HEAL
-    bcd3   1500 ; REVIVE
-    bcd3   4000 ; MAX_REVIVE
+    bcd3  15000 ; REVIVE
+    bcd3  40000 ; MAX_REVIVE
     bcd3    700 ; GUARD_SPEC
     bcd3    500 ; SUPER_REPEL
     bcd3    700 ; MAX_REPEL
@@ -11556,9 +11557,9 @@ ItemPrices: ; 4608 (1:4608)
     bcd3      0 ; SUPER_ROD
     bcd3   9800 ; PP_UP
     bcd3   3000 ; ETHER
-    bcd3   3000 ; MAX_ETHER
+    bcd3  10000 ; MAX_ETHER
     bcd3   5000 ; ELIXER
-    bcd3   5000 ; MAX_ELIXER
+    bcd3  17000 ; MAX_ELIXER
 
 ItemNames_Old: ; 472b (1:472b)
 
@@ -72208,6 +72209,19 @@ VictoryPokecenterObject:
 VictoryPokecenterBlocks: ; 480ab (12:40ab)
     INCBIN "maps/victorypokecenter.blk"
 
+; Celadon Dept. Store 4F
+CeladonMart4Text1:
+    db $FE,5,POKE_DOLL,FIRE_STONE,THUNDER_STONE,WATER_STONE,LEAF_STONE,$FF
+
+; Celadon Dept. Store 5F (1)
+CeladonMart5Text3:
+    db $FE,7,X_ACCURACY,GUARD_SPEC_,DIRE_HIT,X_ATTACK,X_DEFEND,X_SPEED
+    db X_SPECIAL,$FF
+
+; Celadon Dept. Store 5F (2)
+CeladonMart5Text4:
+    db $FE,5,HP_UP,PROTEIN,IRON,CARBOS,CALCIUM,$FF
+
 SECTION "bank13",ROMX,BANK[$13]
 
 YoungsterPic: ; 4c000 (13:4000)
@@ -81393,6 +81407,25 @@ LevelByLevelFix:
     jr nz,.inc_level    ;loop back again if final level has not been reached
     ;;;;;;;;;;;;;;;;;;;;
     ret
+
+; Celadon Dept. Store 2F (2)
+CeladonMart2Text2:
+    db $FE,14
+    db TM_01 ; MEGA_PUNCH
+    db TM_02 ; RAZOR_WIND
+    db TM_04 ; WHIRLWIND
+    db TM_05 ; MEGA_KICK
+    db TM_07 ; HORN_DRILL
+    db TM_09 ; TAKE_DOWN
+    db TM_10 ; DOUBLE_EDGE
+    db TM_12 ; WATER_GUN
+    db TM_17 ; SUBMISSION
+    db TM_20 ; RAGE
+    db TM_30 ; TELEPORT
+    db TM_32 ; DOUBLE_TEAM
+    db TM_33 ; REFLECT
+    db TM_37 ; EGG_BOMB
+    db $FF
 
 SECTION "bank16",ROMX,BANK[$16]
 
@@ -122858,7 +122891,7 @@ _CeladonMart2Text3: ; 9c76b (27:476b)
 _CeladonMart2Text4: ; 9c7b2 (27:47b2)
     db $0,"For long outings,",$4f
     db "you should buy",$55
-    db "ETHER. ",$57
+    db "REVIVE.",$57
 
 _CeladonMart2Text5: ; 9c7dc (27:47dc)
     db $0,"Top Grade Items",$4f
@@ -124867,7 +124900,7 @@ _SaffronMartText2: ; a23e3 (28:63e3)
     db "away!",$57
 
 _SaffronMartText3: ; a242a (28:642a)
-    db $0,"REVIVE is rare,  ",$4f
+    db $0,"REVIVE is costly,",$4f
     db "but it revives",$55
     db "fainted #MON!",$57
 

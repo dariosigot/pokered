@@ -90,7 +90,7 @@ HM_05         EQU $C8 ; FIRE POWER
 TM_01         EQU $C9
 TM_02         EQU $CA
 TM_03         EQU $CB
-;TM_04        EQU $CC ; TODO : Introvabile
+TM_04         EQU $CC
 TM_05         EQU $CD
 TM_06         EQU $CE
 TM_07         EQU $CF
