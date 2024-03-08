@@ -14386,32 +14386,35 @@ SaveScreenInfoText: ; 5e6a (1:5e6a)
 DisplayOptionMenu: ; 5e8a (1:5e8a)
     FuncCoord 0,0
     ld hl,Coord
-    ld b,3
+    ld b,16
     ld c,18
     call TextBoxBorder
-    FuncCoord 0,5
-    ld hl,Coord
-    ld b,3
-    ld c,18
-    call TextBoxBorder
-    FuncCoord 0,10
-    ld hl,Coord
-    ld b,3
-    ld c,18
-    call TextBoxBorder
+    jr .continue
+    ds 18
+    ;FuncCoord 0,5
+    ;ld hl,Coord
+    ;ld b,3
+    ;ld c,18
+    ;call TextBoxBorder
+    ;FuncCoord 0,10
+    ;ld hl,Coord
+    ;ld b,3
+    ;ld c,18
+    ;call TextBoxBorder
+.continue
     FuncCoord 1,1
     ld hl,Coord
     ld de,TextSpeedOptionText
     call PlaceString
-    FuncCoord 1,6
+    FuncCoord 1,5
     ld hl,Coord
     ld de,BattleAnimationOptionText
     call PlaceString
-    FuncCoord 1,11
+    FuncCoord 1,9
     ld hl,Coord
     ld de,BattleStyleOptionText
     call PlaceString
-    FuncCoord 2,16
+    FuncCoord 3,16
     ld hl,Coord
     ld de,OptionMenuCancelText
     call PlaceString
@@ -14420,7 +14423,7 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     ld [wLastMenuItem],a
     inc a
     ld [$d358],a
-    ld [$cd40],a
+    call ShiftCancelRight ; ld [$cd40],a
     ld a,3 ; text speed cursor Y coordinate
     ld [wTopMenuItemY],a
     call SetCursorPositionsFromOptions
@@ -14461,9 +14464,9 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     jr nz,.downPressed
     bit 6,b ; Up pressed?
     jr nz,.upPressed
-    cp a,8 ; cursor in Battle Animation section?
+    cp a,7 ; cursor in Battle Animation section?
     jr z,.cursorInBattleAnimation
-    cp a,13 ; cursor in Battle Style section?
+    cp a,11 ; cursor in Battle Style section?
     jr z,.cursorInBattleStyle
     cp a,16 ; cursor on Cancel?
     jr z,.loop
@@ -14476,26 +14479,26 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     ld b,-13
     ld hl,$cd3d
     jr z,.updateMenuVariables
-    ld b,5
+    ld b,4
     cp a,3
     inc hl
     jr z,.updateMenuVariables
-    cp a,8
+    cp a,7
     inc hl
     jr z,.updateMenuVariables
-    ld b,3
+    ld b,5
     inc hl
     jr .updateMenuVariables
 .upPressed
-    cp a,8
-    ld b,-5
+    cp a,7
+    ld b,-4
     ld hl,$cd3d
     jr z,.updateMenuVariables
-    cp a,13
+    cp a,11
     inc hl
     jr z,.updateMenuVariables
     cp a,16
-    ld b,-3
+    ld b,-5
     inc hl
     jr z,.updateMenuVariables
     ld b,13
@@ -14509,21 +14512,21 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     jp .loop
 .cursorInBattleAnimation
     ld a,[$cd3e] ; battle animation cursor X coordinate
-    xor a,$0b ; toggle between 1 and 10
+    xor a,$08 ; toggle between 2 and 10
     ld [$cd3e],a
     jp .eraseOldMenuCursor
 .cursorInBattleStyle
     ld a,[$cd3f] ; battle style cursor X coordinate
-    xor a,$0b ; toggle between 1 and 10
+    xor a,$08 ; toggle between 2 and 10
     ld [$cd3f],a
     jp .eraseOldMenuCursor
 .pressedLeftInTextSpeed
     ld a,[$cd3d] ; text speed cursor X coordinate
-    cp a,1
+    cp a,2
     jr z,.updateTextSpeedXCoord
     cp a,7
     jr nz,.fromSlowToMedium
-    sub a,6
+    sub a,5
     jr .updateTextSpeedXCoord
 .fromSlowToMedium
     sub a,7
@@ -14537,22 +14540,26 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     add a,7
     jr .updateTextSpeedXCoord
 .fromFastToMedium
-    add a,6
+    add a,5
 .updateTextSpeedXCoord
     ld [$cd3d],a ; text speed cursor X coordinate
     jp .eraseOldMenuCursor
 
 TextSpeedOptionText: ; 5fc0 (1:5fc0)
     db "TEXT SPEED",$4E
-    db " FAST  MEDIUM SLOW@"
+    db "  FAST MEDIUM SLOW@"
 
 BattleAnimationOptionText: ; 5fde (1:5fde)
     db "BATTLE ANIMATION",$4E
-    db " ON       OFF@"
+    db "  ON      OFF@"
 
 BattleStyleOptionText: ; 5ffd (1:5ffd)
-    db "BATTLE STYLE",$4E
-    db " SHIFT    SET@"
+;   db "BATTLE STYLE",$4E
+;   db " SHIFT    SET@"
+    db "?",$4E
+    db "  0       1@"
+
+SECTION "OptionMenuCancelText",ROMX[$6018],BANK[$1] 
 
 OptionMenuCancelText: ; 6018 (1:6018)
     db "CANCEL@"
@@ -14571,7 +14578,7 @@ SetOptionsFromCursorPositions: ; 601f (1:601f)
 .textSpeedMatchFound
     ld a,[hl]
     ld d,a
-    ld a,[$cd3e] ; battle animation cursor X coordinate
+    call GetFirstBinaryOptionChoice ; ld a,[$cd3e] ; battle animation cursor X coordinate
     dec a
     jr z,.battleAnimationOn
 .battleAnimationOff
@@ -14580,14 +14587,14 @@ SetOptionsFromCursorPositions: ; 601f (1:601f)
 .battleAnimationOn
     res 7,d
 .checkBattleStyle
-    ld a,[$cd3f] ; battle style cursor X coordinate
+    call GetSecondBinaryOptionChoice ; ld a,[$cd3f] ; battle style cursor X coordinate
     dec a
     jr z,.battleStyleShift
 .battleStyleSet
-    set 6,d
+    set 5,d
     jr .storeOptions
 .battleStyleShift
-    set 6,d
+    res 5,d
 .storeOptions
     ld a,d
     ld [W_OPTIONS],a
@@ -14598,7 +14605,7 @@ SetCursorPositionsFromOptions: ; 604c (1:604c)
     ld hl,TextSpeedOptionData + 1
     ld a,[W_OPTIONS]
     ld c,a
-    and a,$3f
+    and a,%00000011 ; Speed text from 0 to 2
     push bc
     ld de,2
     call IsInArray
@@ -14610,33 +14617,34 @@ SetCursorPositionsFromOptions: ; 604c (1:604c)
     ld hl,Coord
     call .placeUnfilledRightArrow
     sla c
-    ld a,1 ; On
+    ld a,2 ; On
     jr nc,.storeBattleAnimationCursorX
     ld a,10 ; Off
 .storeBattleAnimationCursorX
     ld [$cd3e],a ; battle animation cursor X coordinate
-    FuncCoord 0,8
+    FuncCoord 0,7
     ld hl,Coord
     call .placeUnfilledRightArrow
-    sla c
-    ld a,1
+    call NewOption
     jr nc,.storeBattleStyleCursorX
     ld a,10
 .storeBattleStyleCursorX
     ld [$cd3f],a ; battle style cursor X coordinate
-    FuncCoord 0,13
+    FuncCoord 0,11
     ld hl,Coord
     call .placeUnfilledRightArrow
 ; cursor in front of Cancel
     FuncCoord 0,16
     ld hl,Coord
-    ld a,1
+    ld a,2
 .placeUnfilledRightArrow
     ld e,a
     ld d,0
     add hl,de
     ld [hl],$ec ; unfilled right arrow menu cursor
     ret
+
+    ds 1
 
 ; table that indicates how the 3 text speed options affect frame delays
 ; Format:
@@ -14650,7 +14658,7 @@ TextSpeedOptionData: ; 6096 (1:6096) ; Denim,aumentata velocità
     ; db $ff ; terminator
     db 14,2 ; Slow
     db  7,1 ; Medium
-    db  1,0 ; Fast
+    db  2,0 ; Fast
     db 7 ; default X coordinate (Medium)
     db $ff ; terminator
 
@@ -18687,6 +18695,26 @@ SwapItemNew:
     jr nz,.Loop2
     ret
 
+NewOption:
+    sla c
+    sla c
+    ld a,2
+    ret
+
+GetFirstBinaryOptionChoice:
+    ld a,[$cd3e] ; battle animation cursor X coordinate
+    dec a
+    ret
+
+GetSecondBinaryOptionChoice:
+    ld a,[$cd3f] ; battle style cursor X coordinate
+    dec a
+    ret
+
+ShiftCancelRight:
+    inc a
+    ld [$cd40],a
+    ret
 
 SECTION "bank2",ROMX,BANK[$2]
 
