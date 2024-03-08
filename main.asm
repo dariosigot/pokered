@@ -18534,7 +18534,6 @@ GetQtyAndGiveItem:
     jp GiveItem
 
 TmQtyTable:
-    db TRADE_STONE,4
     db TM_03,2 ; SWORDS_DANCE
     db TM_08,2 ; BODY_SLAM
     db TM_10,3 ; DOUBLE_EDGE
@@ -18542,7 +18541,6 @@ TmQtyTable:
     db TM_14,2 ; BLIZZARD
     db TM_16,3 ; PAY_DAY
     db TM_19,3 ; SEISMIC_TOSS
-    db TM_20,3 ; RAGE
     db TM_22,2 ; SOLARBEAM
     db TM_25,2 ; THUNDER
     db TM_26,2 ; EARTHQUAKE
@@ -22284,7 +22282,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHSXX
     dw MapHSXX
     dw MapHS21
-    dw MapHSXX
+    dw MapHS22
     dw MapHS23
     dw MapHS24
     dw MapHSXX
@@ -22825,20 +22823,15 @@ MapHS07:
 MapHS62:
     db SS_ANNE_4,$01,Show
     db SS_ANNE_4,$02,Hide
+MapHS22:
+    db ROUTE_23,$08,Show
 
     db $FF,$01,Show
 
 Func_cd99_Old:
+UsedStrengthText_Old:
 
-SECTION "UsedStrengthText",ROMX[$4daa],BANK[$3]
-
-UsedStrengthText: ; cdaa (3:4daa)
-    TX_FAR _UsedStrengthText
-    db $08 ; asm
-    ld a,[$cf91]
-    call PlayCry
-    call Delay3
-    jp TextScriptEnd
+SECTION "UnnamedText_cdbb",ROMX[$4dbb],BANK[$3]
 
 UnnamedText_cdbb: ; cdbb (3:4dbb)
     TX_FAR _UnnamedText_cdbb
@@ -28590,6 +28583,14 @@ ItemUsePokedoll:
     ld a,$01
     ld [$d078],a
     jp PrintItemUseTextAndRemoveItem
+
+UsedStrengthText: ; Moved in the Bank
+    TX_FAR _UsedStrengthText
+    db $08 ; asm
+    ld a,[$cf91]
+    call PlayCry
+    call Delay3
+    jp TextScriptEnd
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -63461,7 +63462,7 @@ Mansion1Object: ; 0x443a4 (size=90)
     db $3 ; people
     db SPRITE_OAK_AIDE,$11 + 4,$11 + 4,$ff,$d2,$41,SCIENTIST + $C8,$1 ; trainer
     db SPRITE_BALL,$3 + 4,$e + 4,$ff,$ff,$82,ESCAPE_ROPE ; item
-    db SPRITE_BALL,$15 + 4,$12 + 4,$ff,$ff,$83,CARBOS ; item
+    db SPRITE_BALL,$15 + 4,$12 + 4,$ff,$ff,$83,TRADE_STONE ; item
 
     ; warp-to
     EVENT_DISP $f,$1b,$4
@@ -67653,7 +67654,7 @@ SilphCo9FHiddenObjects: ; 46ef4 (11:6ef4)
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 CopycatsHouse2FHiddenObjects: ; 46efb (11:6efb)
-    db $01,$01,NUGGET
+    db $01,$01,TRADE_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 UnknownDungeon1HiddenObjects: ; 46f02 (11:6f02)
@@ -72060,7 +72061,7 @@ SafariZoneWestObject: ; 0x4a1dc (size=108)
     db $16,$18,$8 ; SafariZoneWestText8
 
     db $4 ; people
-    db SPRITE_BALL,$14 + 4,$8 + 4,$ff,$ff,$81,MAX_POTION ; item
+    db SPRITE_BALL,$14 + 4,$8 + 4,$ff,$ff,$81,TRADE_STONE ; item
     db SPRITE_BALL,$7 + 4,$9 + 4,$ff,$ff,$82,TM_32 ; item
     db SPRITE_BALL,$12 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
     db SPRITE_BALL,$7 + 4,$13 + 4,$ff,$ff,$84,GOLD_TEETH ; item
@@ -73963,15 +73964,7 @@ Route23Script2: ; 512f1 (14:52f1)
     ld [W_ROUTE23CURSCRIPT],a
     ret
 
-Route23TextPointers: ; 512f7 (14:52f7)
-    dw Route23Text1
-    dw Route23Text2
-    dw Route23Text3
-    dw Route23Text4
-    dw Route23Text5
-    dw Route23Text6
-    dw Route23Text7
-    dw Route23Text8
+SECTION "Route23Text1",ROMX[$5307],BANK[$14]
 
 Route23Text1: ; 51307 (14:5307)
     db $08 ; asm
@@ -76988,7 +76981,7 @@ CoordsOnix:
     db 2,13
     db $FF
 
-Route23_h: ; 0x5033f to 0x50361 (34 bytes) (id=34)
+Route23_h: ; Moved in the Bank
     db $17 ; tileset
     db ROUTE_23_HEIGHT,ROUTE_23_WIDTH ; dimensions (y,x)
     dw Route23Blocks,Route23TextPointers,Route23Script ; blocks,texts,scripts
@@ -76997,7 +76990,7 @@ Route23_h: ; 0x5033f to 0x50361 (34 bytes) (id=34)
     SOUTH_MAP_CONNECTION ROUTE_22,ROUTE_22_WIDTH,0,0,ROUTE_22_WIDTH - 7,Route22Blocks,ROUTE_23_WIDTH,ROUTE_23_HEIGHT
     dw Route23Object ; objects
 
-Route23Object: ; 0x50361 (size=81)
+Route23Object: ; Moved in the Bank
     db $f ; border tile
 
     db $5 ; warps
@@ -77008,9 +77001,9 @@ Route23Object: ; 0x50361 (size=81)
     db $2f,$c,$0,VICTORY_POKECENTER
 
     db $1 ; signs
-    db $21,$3,$8 ; Route23Text8
+    db $21,$3,$9 ; Route23Text8
 
-    db $7 ; people
+    db $8 ; people
     db SPRITE_GUARD,$35 + 4,$a + 4,$ff,$d0,$1 ; person
     db SPRITE_GUARD,$5F + 4,$a + 4,$ff,$d0,$2 ; person
     db SPRITE_GUARD,$67 + 4,$c + 4,$ff,$d0,$3 ; person
@@ -77018,6 +77011,7 @@ Route23Object: ; 0x50361 (size=81)
     db SPRITE_GUARD,$77 + 4,$8 + 4,$ff,$d0,$5 ; person
     db SPRITE_GUARD,$7F + 4,$10 + 4,$ff,$d0,$6 ; person
     db SPRITE_GUARD,$87 + 4,$8 + 4,$ff,$d0,$7 ; person
+    db SPRITE_BALL,$3D + 4,$4 + 4,$ff,$ff,$88,TRADE_STONE ; item
 
     ; warp-to
     EVENT_DISP $a,$8b,$8 ; ROUTE_22_GATE
@@ -77026,8 +77020,19 @@ Route23Object: ; 0x50361 (size=81)
     EVENT_DISP $a,$1f,$e ; VICTORY_ROAD_2
     EVENT_DISP $a,$2f,$c ; VICTORY_POKECENTER
 
-Route23Blocks: ; 503b2 (14:43b2)
+Route23Blocks: ; Moved in the Bank
     INCBIN "maps/route23.blk"
+
+Route23TextPointers: ; Moved in the Bank
+    dw Route23Text1
+    dw Route23Text2
+    dw Route23Text3
+    dw Route23Text4
+    dw Route23Text5
+    dw Route23Text6
+    dw Route23Text7
+    dw Predef5CText
+    dw Route23Text8
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -81671,7 +81676,7 @@ Route15Object: ; 0x5894e (size=126)
     db SPRITE_BIKER,$a + 4,$2e + 4,$ff,$d0,$48,BIKER + $C8,$4 ; trainer
     db SPRITE_LASS,$5 + 4,$25 + 4,$ff,$d3,$49,JR__TRAINER_F + $C8,$16 ; trainer
     db SPRITE_LASS,$d + 4,$12 + 4,$ff,$d1,$4a,JR__TRAINER_F + $C8,$17 ; trainer
-    db SPRITE_BALL,$5 + 4,$12 + 4,$ff,$ff,$8b,TM_20 ; item
+    db SPRITE_BALL,$5 + 4,$12 + 4,$ff,$ff,$8b,PP_UP ; item
 
     ; warp-to
     EVENT_DISP $1e,$8,$7 ; ROUTE_15_GATE_1F
