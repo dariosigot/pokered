@@ -26007,7 +26007,7 @@ DrawBadges: ; ea03 (3:6a03)
 GymLeaderFaceAndBadgeTileGraphics: ; ea9e (3:6a9e)
     INCBIN "gfx/badges.2bpp"
 
-Func_ee9e: ; ee9e (3:6e9e)
+ReplaceTileBlock: ; ee9e (3:6e9e)
     call Load16BitRegisters
     ld hl,$c6e8
     ld a,[W_CURMAPWIDTH] ; $d369
@@ -33723,7 +33723,7 @@ PalletTownScript: ; 18e5b (6:4e5b)
     ld hl,$D747
     set 6,[hl]
 .next
-    call EnableAutoTextBoxDrawing
+    call SetTempScriptFlag ; call EnableAutoTextBoxDrawing
     ld hl,PalletTownScriptPointers
     ld a,[W_PALLETTOWNCURSCRIPT]
     jp CallFunctionInTable
@@ -37173,6 +37173,11 @@ FuchsiaCityText12:
 
 SeelSprite:
     INCBIN "gfx/sprites/seel.2bpp"
+
+SetTempScriptFlag:
+    ld hl,$d126
+    set 6,[hl] ; Set Temp Script Flag to potentially Lock Cinnabar from Pallet
+    jp EnableAutoTextBoxDrawing
 
 SECTION "bank7",ROMX,BANK[$7]
 
@@ -41999,7 +42004,7 @@ Func_1eb0a: ; 1eb0a (7:6b0a)
     pop bc
     ld [$d09f],a
     ld a,$17
-    call Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     ld hl,$ffdb
     dec [hl]
     jr nz,.asm_1eb0e
@@ -63350,7 +63355,7 @@ Func_4430b: ; 4430b (11:430b)
     ld [$d09f],a
 asm_44310: ; 44310 (11:4310)
     ld a,$17
-    call Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     ret
 
 Func_44316: ; 44316 (11:4316)
@@ -63894,7 +63899,7 @@ VictoryRoad3Script_44996: ; 44996 (11:4996)
     ld [$d09f],a
     ld bc,$503
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 VictoryRoad3ScriptPointers: ; 449b1 (11:49b1)
     dw VictoryRoad3Script0
@@ -72584,7 +72589,7 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     dw AddMissableObject
     db BANK(AddMissableObject)
     dw AddMissableObject
-    dbw BANK(Func_ee9e),Func_ee9e
+    dbw BANK(ReplaceTileBlock),ReplaceTileBlock
     db BANK(InitializePlayerData)
     dw InitializePlayerData
     dbw BANK(Func_c754),Func_c754
@@ -74745,7 +74750,7 @@ Func_517c9: ; 517c9 (14:57c9)
 Func_517e2: ; 517e2 (14:57e2)
     ld [$d09f],a
     ld a,$17
-    call Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     ret
 
 SECTION "VictoryRoad2Script0",ROMX[$57f1],BANK[$14]
@@ -75076,7 +75081,7 @@ SilphCo7Script_51b77: ; 51b77 (14:5b77)
     ld [$d09f],a
     ld bc,$305
     ld a,$17
-    call Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_51b9e
     bit 5,a
@@ -75086,7 +75091,7 @@ SilphCo7Script_51b77: ; 51b77 (14:5b77)
     ld [$d09f],a
     ld bc,$20a
     ld a,$17
-    call Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_51bb1
     bit 6,a
@@ -75095,7 +75100,7 @@ SilphCo7Script_51b77: ; 51b77 (14:5b77)
     ld [$d09f],a
     ld bc,$60a
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 DataTable_51bc1: ; 51bc1 (14:5bc1)
     db $03,$05,$02,$0A,$06,$0A,$FF
@@ -75662,7 +75667,7 @@ Mansion2Script_51fee: ; 51fee (14:5fee)
 Func_5202f: ; 5202f (14:602f)
     ld [$d09f],a
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 Func_52037: ; 52037 (14:6037)
     ld a,[$c109]
@@ -76277,7 +76282,7 @@ Func_52673: ; 52673 (14:6673)
 .asm_526ca
     ld [$d09f],a
     ld a,$17
-    call Predef ; indirect jump to Func_ee9e
+    call Predef ; indirect jump to ReplaceTileBlock
     ld hl,$d126
     set 5,[hl]
     ld a,$ad
@@ -79650,6 +79655,7 @@ Route19Text11: ; 55ee6 (15:5ee6)
     db "@"
 
 Route21Script: ; 55eeb (15:5eeb)
+    call Route21ScriptBarrier
     call EnableAutoTextBoxDrawing
     ld hl,Route21TrainerHeaders
     ld de,Route21ScriptPointers
@@ -79658,10 +79664,7 @@ Route21Script: ; 55eeb (15:5eeb)
     ld [W_ROUTE21CURSCRIPT],a
     ret
 
-Route21ScriptPointers: ; 55efe (15:5efe)
-    dw CheckFightingMapTrainers
-    dw Func_324c
-    dw EndTrainerBattle
+SECTION "Route21TextPointers",ROMX[$5f04],BANK[$15]
 
 Route21TextPointers: ; 55f04 (15:5f04)
     dw Route21Text1
@@ -80549,7 +80552,7 @@ SilphCo8Script_5651a: ; 5651a (15:651a)
     ld [$d09f],a
     ld bc,$403
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 DataTable_5653e: ; 5653e (15:653e)
     db $04,$03,$FF
@@ -81430,6 +81433,55 @@ CeladonMart2Text2:
     db TM_32 ; DOUBLE_TEAM
     db TM_33 ; REFLECT
     db TM_37 ; EGG_BOMB
+    db $FF
+
+Route21ScriptPointers: ; Moved in the Bank
+    dw CheckFightingMapTrainers
+    dw Func_324c
+    dw EndTrainerBattle
+
+Route21ScriptBarrier:
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    ret z
+    call .CheckCinnabarVisited
+    ret nz ; Don't block if visited
+    ld hl,.BlockMap
+.Loop
+    ld a,[hli]
+    inc a
+    ret z
+    ld b,a ; b = Y
+    ld a,[hli]
+    ld c,a ; c = X
+    ld a,[hli]
+    push hl
+    call .ReplaceTileBlock
+    pop hl
+    jr .Loop
+.CheckCinnabarVisited
+    ld hl,W_TOWNVISITEDFLAG
+    ld c,CINNABAR_ISLAND ; bit n
+    ld b,2 ; read bit
+    ld a,$10
+    call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
+    ld a,c
+    and a
+    ret
+.ReplaceTileBlock
+    ld [$d09f],a
+    ld a,$17
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+    ret
+.BlockMap
+   ;db -1+YY,XX,ID
+    db -1+07,01,$6B
+    db -1+07,02,$6B
+    db -1+07,03,$6B
+    db -1+07,04,$6B
+    db -1+07,05,$6B
+    db -1+07,06,$6B
     db $FF
 
 SECTION "bank16",ROMX,BANK[$16]
@@ -84714,7 +84766,7 @@ SilphCo3Script_59f71: ; 59f71 (16:5f71)
     ld [$d09f],a
     ld bc,$404
     ld a,$17
-    call Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_59f98
     bit 1,a
@@ -84723,7 +84775,7 @@ SilphCo3Script_59f71: ; 59f71 (16:5f71)
     ld [$d09f],a
     ld bc,$408
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 DataTable_59fa8: ; 59fa8 (16:5fa8)
     db $04,$04,$04,$08,$FF
@@ -84898,7 +84950,7 @@ SilphCo10Script_5a14f: ; 5a14f (16:614f)
     ld [$d09f],a
     ld bc,$405
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 DataTable_5a173: ; 5a173 (16:6173)
     db $04,$05,$FF
@@ -85076,7 +85128,7 @@ Func_5a2de: ; 5a2de (16:62de)
 
 Func_5a2f0: ; 5a2f0 (16:62f0)
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 Func_5a2f5: ; 5a2f5 (16:62f5)
     xor a
@@ -86805,7 +86857,7 @@ VermilionGymScript_5ca6d: ; 5ca6d (17:4a6d)
     ld [$d09f],a
     ld bc,$202
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 VermilionGymScript_5ca8a: ; 5ca8a (17:4a8a)
     xor a
@@ -88527,7 +88579,7 @@ SilphCo9Script_5d7d1: ; 5d7d1 (17:57d1)
     ld [$d09f],a
     ld bc,$401
     ld a,$17
-    call Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_5d7f8
     bit 1,a
@@ -88537,7 +88589,7 @@ SilphCo9Script_5d7d1: ; 5d7d1 (17:57d1)
     ld [$d09f],a
     ld bc,$209
     ld a,$17
-    call Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_5d80b
     bit 2,a
@@ -88547,7 +88599,7 @@ SilphCo9Script_5d7d1: ; 5d7d1 (17:57d1)
     ld [$d09f],a
     ld bc,$509
     ld a,$17
-    call Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_5d81e
     bit 3,a
@@ -88556,7 +88608,7 @@ SilphCo9Script_5d7d1: ; 5d7d1 (17:57d1)
     ld [$d09f],a
     ld bc,$605
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 DataTable_5d82e: ; 5d82e (17:582e)
     db $04,$01,$02,$09,$05,$09,$06,$05,$FF
@@ -88805,7 +88857,7 @@ VictoryRoad1Script: ; 5da0a (17:5a0a)
     ld [$d09f],a
     ld bc,$604
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 VictoryRoad1ScriptPointers: ; 5da3a (17:5a3a)
     dw VictoryRoad1Script0
@@ -92742,7 +92794,7 @@ SilphCo11Script_62110: ; 62110 (18:6110)
     ld [$d09f],a
     ld bc,$603
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 DataTable_62134: ; 62134 (18:6134)
     db $06,$03,$FF
@@ -103430,7 +103482,7 @@ LoreleiScript_76191: ; 76191 (1d:6191)
     ld [$d09f],a
     ld bc,$2
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 Func_761b6: ; 761b6 (1d:61b6)
     xor a
@@ -103613,7 +103665,7 @@ Func_76302: ; 76302 (1d:6302)
     ld [$d09f],a
     ld bc,$2
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 Func_7630d: ; 7630d (1d:630d)
     xor a
@@ -103798,7 +103850,7 @@ Func_76459: ; 76459 (1d:6459)
     ld [$d09f],a
     ld bc,$2
     ld a,$17
-    jp Predef ; indirect jump to Func_ee9e (ee9e (3:6e9e))
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 Func_76464: ; 76464 (1d:6464)
     xor a
