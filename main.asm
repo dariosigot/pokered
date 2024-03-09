@@ -15926,18 +15926,20 @@ Func_6a6c: ; 6a6c (1:6a6c)
 .namestring ; 6aa3 (1:6aa3)
     db "NAME@"
 
-IF _RED
-DefaultNamesPlayer: ; 6aa8 (1:6aa8)
-    db "NEW NAME",$4E,"RED",$4E,"ASH",$4E,"JACK@"
-DefaultNamesRival: ; 6abe (1:6abe)
-    db "NEW NAME",$4E,"BLUE",$4E,"GARY",$4E,"JOHN@"
-ENDC
-IF _BLUE
-DefaultNamesPlayer: ; 6aa8 (1:6aa8)
-    db "NEW NAME",$4E,"BLUE",$4E,"GARY",$4E,"JOHN@"
-DefaultNamesRival: ; 6abe (1:6abe)
-    db "NEW NAME",$4E,"RED",$4E,"ASH",$4E,"JACK@"
-ENDC
+;IF _RED
+;DefaultNamesPlayer: ; 6aa8 (1:6aa8)
+;    db "NEW NAME",$4E,"RED",$4E,"ASH",$4E,"JACK@"
+;DefaultNamesRival: ; 6abe (1:6abe)
+;    db "NEW NAME",$4E,"BLUE",$4E,"GARY",$4E,"JOHN@"
+;ENDC
+;IF _BLUE
+;DefaultNamesPlayer: ; 6aa8 (1:6aa8)
+;    db "NEW NAME",$4E,"BLUE",$4E,"GARY",$4E,"JOHN@"
+;DefaultNamesRival: ; 6abe (1:6abe)
+;    db "NEW NAME",$4E,"RED",$4E,"ASH",$4E,"JACK@"
+;ENDC
+
+SECTION "Func_6ad6",ROMX[$6ad6],BANK[$1]
 
 Func_6ad6: ; 6ad6 (1:6ad6)
     ld b,a
@@ -15960,18 +15962,20 @@ Func_6ad6: ; 6ad6 (1:6ad6)
     ld de,$cd6d
     ld bc,$14
     jp CopyData
-IF _RED
-DefaultNamesPlayerList: ; 6af2 (1:6af2)
-    db "NEW NAME@RED@ASH@JACK@"
-DefaultNamesRivalList: ; 6b08 (1:6b08)
-    db "NEW NAME@BLUE@GARY@JOHN@"
-ENDC
-IF _BLUE
-DefaultNamesPlayerList: ; 6af2 (1:6af2)
-    db "NEW NAME@BLUE@GARY@JOHN@"
-DefaultNamesRivalList: ; 6b08 (1:6b08)
-    db "NEW NAME@RED@ASH@JACK@"
-ENDC
+;IF _RED
+;DefaultNamesPlayerList: ; 6af2 (1:6af2)
+;    db "NEW NAME@RED@ASH@JACK@"
+;DefaultNamesRivalList: ; 6b08 (1:6b08)
+;    db "NEW NAME@BLUE@GARY@JOHN@"
+;ENDC
+;IF _BLUE
+;DefaultNamesPlayerList: ; 6af2 (1:6af2)
+;    db "NEW NAME@BLUE@GARY@JOHN@"
+;DefaultNamesRivalList: ; 6b08 (1:6b08)
+;    db "NEW NAME@RED@ASH@JACK@"
+;ENDC
+
+SECTION "TextTerminator_6b20",ROMX[$6b20],BANK[$1]
 
 TextTerminator_6b20: ; 6b20 (1:6b20)
     db "@"
@@ -18714,6 +18718,16 @@ ShiftCancelRight:
     inc a
     ld [$cd40],a
     ret
+
+DefaultNamesPlayer:
+    db "NEW NAME",$4E,"RED",$4E,"DENIM",$4E,"ASH@"
+DefaultNamesRival:
+    db "NEW NAME",$4E,"BLUE",$4E,"JEANS",$4E,"GARY@"
+
+DefaultNamesPlayerList:
+    db "NEW NAME@RED@DENIM@ASH@"
+DefaultNamesRivalList:
+    db "NEW NAME@BLUE@JEANS@GARY@"
 
 SECTION "bank2",ROMX,BANK[$2]
 
