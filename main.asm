@@ -31244,6 +31244,8 @@ GetEnemy:
     ld a,[hl] ; Table Level = Exception ID
     cp $03
     jr z,.CheckMew
+    cp $04
+    jr z,.CheckPikachu
 .UnknownDungeon
     push hl
     push de
@@ -31279,7 +31281,36 @@ GetEnemy:
     pop af
     pop de
     pop hl
+.WillEncounter
+    ld [$cf91],a
+    ld [W_ENEMYMONID],a
+    scf ; WillEncounter
+    ret
+.NotEncounter
+    and a ; Reset Carry Flag ; NotEncounter
+    ret
+.CheckPikachu
+    ld a,[W_NUMINPARTY]
+    and a
+    jr z,.NotEncounter
+    call .OwnPikachu
+    jr nz,.NotEncounter
+    ld a,1
+    ld [W_CURENEMYLVL],a
+    ld a,PIKACHU
     jr .WillEncounter
+.OwnPikachu
+    push hl
+    push bc
+    ld hl,wPokedexOwned
+    ld bc,(2 << 8) + DEX_PIKACHU - 1 ; 2 = read bit
+    ld a,$10
+    call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
+    ld a,c
+    and a
+    pop bc
+    pop hl
+    ret
 .CheckMew
     push hl
     ld hl,$d728 ; Strength
@@ -31291,19 +31322,12 @@ GetEnemy:
     bit 5,[hl]
     set 5,[hl]
     pop hl
-    jr z,.MewFirstEncounter
-.NotEncounter
-    and a ; Reset Carry Flag ; NotEncounter
-    ret
+    jr nz,.NotEncounter
 .MewFirstEncounter
     ld a,7
     ld [W_CURENEMYLVL],a
     ld a,MEW
-.WillEncounter
-    ld [$cf91],a
-    ld [W_ENEMYMONID],a
-    scf ; WillEncounter
-    ret
+    jr .WillEncounter
 
 UnknownDungeonLandPkmnList:
     db BULBASAUR
@@ -128736,7 +128760,17 @@ NoMons: ; d0dd (3:50dd)
     db $00
 
 PalletMons:
-    db $00
+    db $19
+    db $04,$FF      ; 20%
+    db $04,$FF      ; 20%
+    db $04,$FF      ; 15%
+    db $04,$FF      ; 10%
+    db $04,$FF      ; 10%
+    db $04,$FF      ; 10%
+    db $04,$FF      ;  5%
+    db $04,$FF      ;  5%
+    db $04,$FF      ;  4%
+    db $04,$FF      ;  1%
     db $05
     db 18,KRABBY   ; 20%
     db 24,KRABBY   ; 20%
@@ -130890,12 +130924,24 @@ ForceShinyOrRandom_:
     jr z,.Safari
     cp POKEMONTOWER_6
     jr z,.Tower6
+    cp PALLET_TOWN
+    jr z,.PalletTown
 .Random
     call .GenRandomInBattle
     jr .End
+.PalletTown
+    ld a,[$cf91]
+    cp PIKACHU
+    jr nz,.Random
+    ld a,e
+    or $88 ; Speed > 7 ; Special > 7
+    ld e,a
+    call .GenRandomInBattle
+    or $88 ; Attack > 7 ; Defense > 7
+    jr .End
 .Onix
     call .GenRandomInBattle
-    or $8F ; Attack > 7
+    or $80 ; Attack > 7
     jr .ShinyCommon
 .Tower6
     ld a,[$cf91]
