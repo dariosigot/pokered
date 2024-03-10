@@ -74791,9 +74791,8 @@ Func_517e2: ; 517e2 (14:57e2)
     call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     ret
 
-SECTION "VictoryRoad2Script0",ROMX[$57f1],BANK[$14]
-
 VictoryRoad2Script0: ; 517f1 (14:57f1)
+    call CheckOnix
     ld hl,CoordsData_51816 ; $5816
     call CheckBoulderCoords
     jp nc,CheckFightingMapTrainers
@@ -74813,6 +74812,8 @@ VictoryRoad2Script0: ; 517f1 (14:57f1)
     ld hl,$d126
     set 5,[hl]
     ret
+
+SECTION "CoordsData_51816",ROMX[$5816],BANK[$14]
 
 CoordsData_51816: ; 51816 (14:5816)
     db $10,$01
@@ -74887,6 +74888,7 @@ VictoryRoad2ScriptPointers: ; Moved in the Bank
     dw Func_324c
     dw EndTrainerBattle
     dw VictoryRoad2Script3
+    dw VictoryRoad2Script4
 
 SECTION "VictoryRoad2Text1",ROMX[$587e],BANK[$14]
 
@@ -74922,9 +74924,9 @@ VictoryRoad2Text5: ; 518a6 (14:58a6)
 
 TalkToOnixText:
     db $8
-    ld hl,CoordsOnix
-    call CheckBoulderCoords
-    jr nc,.SimpleBoulder
+    ld hl,$d7ed ; bit 7 free because in route 23 there are only 7 check (0-6)
+    bit 7,[hl]  ; ...
+    jr z,.SimpleBoulder
     call BattleWithShinyOnix
     jr .End
 .SimpleBoulder
@@ -77012,6 +77014,36 @@ VictoryRoad2Script3:
     ld a,$11
     call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
     xor a
+    ld [W_VICTORYROAD2CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+VictoryRoad2Script4:
+    ld a,[wFlags_0xcd60] ; Wait untile end of the dust
+    bit 1,a              ; ...
+    ret nz               ; ...
+    ld a,ONIX
+    call PlayCry
+    xor a
+    ld [W_VICTORYROAD2CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+CheckOnix:
+    ld a,[$ff00+$8c]
+    cp $6 ; onix oam
+    ret nz
+    ld hl,CoordsOnix
+    call CheckBoulderCoords
+    ld hl,$d7ed ; bit 7 free because in route 23 there are only 7 check (0-6)
+    jr c,.InCoord
+    res 7,[hl]  ; ...
+    ret
+.InCoord
+    bit 7,[hl]  ; ...
+    set 7,[hl]  ; ...
+    ret nz
+    ld a,4
     ld [W_VICTORYROAD2CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
     ret
