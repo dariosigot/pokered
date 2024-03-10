@@ -51252,7 +51252,7 @@ Func_3c79b: ; 3c79b (f:479b)
     jr z,.asm_3c7ad
     ld hl,W_PARTYMON1_SPEED ; $d193
     ld de,W_ENEMYMONSPEED
-    jp Func_3cab9
+    jp TryRunningFromBattle
 
 UnnamedText_3c7d3: ; 3c7d3 (f:47d3)
     TX_FAR _UnnamedText_3c7d3
@@ -51657,21 +51657,27 @@ UnnamedText_3cab4: ; 3cab4 (f:4ab4)
     TX_FAR _UnnamedText_3cab4
     db "@"
 
-Func_3cab9: ; 3cab9 (f:4ab9)
+; try to run from battle (hl = player speed, de = enemy speed)
+; stores whether the attempt was successful in carry flag
+TryRunningFromBattle: ; 3cab9 (f:4ab9)
     call IsGhostBattle
-    jp z,.asm_3cb5c
+    jp z,.canEscape
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
-    jp z,.asm_3cb5c
+    jp z,.canEscape
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
-    jp z,.asm_3cb5c
+    jp z,.canEscape
     ld a,[W_ISINBATTLE] ; $d057
     dec a
-    jr nz,.asm_3cb4c
-    ld a,[$d120]
-    inc a
-    ld [$d120],a
+    jr nz,.trainerBattle
+    jr .skipNop
+    ; ds 3 ; ld a,[$d120]
+    ; ds 1 ; inc a
+    ; ds 3 ; ld [$d120],a
+.skipNop
+    call CheckNotEscapeWildPokemon
+    jr c,.cantEscape
     ld a,[hli]
     ld [$FF00+$97],a
     ld a,[hl]
@@ -51686,7 +51692,7 @@ Func_3cab9: ; 3cab9 (f:4ab9)
     ld hl,$ff8d
     ld c,$2
     call StringCmp
-    jr nc,.asm_3cb5c
+    jr nc,.canEscape
     xor a
     ld [H_NUMTOPRINT],a ; $FF00+$96 (aliases: H_MULTIPLICAND)
     ld a,$20
@@ -51704,13 +51710,13 @@ Func_3cab9: ; 3cab9 (f:4ab9)
     srl b
     rr a
     and a
-    jr z,.asm_3cb5c
+    jr z,.canEscape
     ld [H_REMAINDER],a ; $FF00+$99 (aliases: H_DIVISOR,H_MULTIPLIER,H_POWEROFTEN)
     ld b,$2
     call Divide
     ld a,[$FF00+$97]
     and a
-    jr nz,.asm_3cb5c
+    jr nz,.canEscape
     ld a,[$d120]
     ld c,a
 .asm_3cb2b
@@ -51720,19 +51726,20 @@ Func_3cab9: ; 3cab9 (f:4ab9)
     ld a,[$FF00+$98]
     add b
     ld [$FF00+$98],a
-    jr c,.asm_3cb5c
+    jr c,.canEscape
     jr .asm_3cb2b
 .asm_3cb39
     call GenRandomInBattle
     ld b,a
     ld a,[$FF00+$98]
     cp b
-    jr nc,.asm_3cb5c
+    jr nc,.canEscape
+.cantEscape
     ld a,$1
     ld [$cd6a],a
     ld hl,UnnamedText_3cb97 ; $4b97
     jr .asm_3cb4f
-.asm_3cb4c
+.trainerBattle
     ld hl,UnnamedText_3cb9c ; $4b9c
 .asm_3cb4f
     call PrintText
@@ -51741,7 +51748,7 @@ Func_3cab9: ; 3cab9 (f:4ab9)
     call SaveScreenTilesToBuffer1
     and a
     ret
-.asm_3cb5c
+.canEscape
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     ld a,$2
@@ -52604,7 +52611,7 @@ Func_3d1fa: ; 3d1fa (f:51fa)
     ld [wCurrentMenuItem],a ; $cc26
     ld hl,W_PLAYERMONSPEED
     ld de,W_ENEMYMONSPEED
-    call Func_3cab9
+    call TryRunningFromBattle
     ld a,$0
     ld [$d11f],a
     ret c
@@ -54733,6 +54740,14 @@ CheckLeechSeedFlag:
     res 6,a ;(reset the bit without affecting flags)
     ld [wUnusedC000],a
     ;if so, then do not increment the toxic counter or multiply the damage for toxic
+    ret
+
+CheckNotEscapeWildPokemon:
+    push hl
+    ld b,BANK(_CheckNotEscapeWildPokemon)
+    ld hl,_CheckNotEscapeWildPokemon
+    call Bankswitch
+    pop hl
     ret
 
 ; Free Space
@@ -76992,14 +77007,18 @@ Mansion2TextMoltres:
     jp TextScriptEnd
 
 BattleWithShinyOnix:
+    xor a
+    ld [W_GYMLEADERNO],a
     ld hl,.OnixText
     call PrintText
     ld a,62
     ld [W_CURENEMYLVL],a
     ld a,ONIX
     ld [W_CUROPPONENT],a
+    ld [wEngagedTrainerClass],a
     call PlayCry
     call WaitForSoundToFinish
+    call PlayTrainerMusic
     ld a,3
     ld [W_VICTORYROAD2CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -77009,10 +77028,14 @@ BattleWithShinyOnix:
     db "@"
 
 VictoryRoad2Script3:
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $ff ; if lose battle
+    jr z,.End
     ld a,$5b
     ld [$cc4d],a
     ld a,$11
     call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
+.End
     xor a
     ld [W_VICTORYROAD2CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -83368,27 +83391,18 @@ Route12Script0: ; 59619 (16:5619)
     bit 6,[hl]
     res 6,[hl]
     jp z,CheckFightingMapTrainers
+    ld a,SNORLAX
+    call PlayCry
+    call WaitForSoundToFinish
     ld a,$d
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
-    ld a,SNORLAX
-    ld [W_CUROPPONENT],a ; $d059
-    ld a,15 ; Snorlax
-    ld [W_CURENEMYLVL],a ; $d127
-    ld a,$1d
-    ld [$cc4d],a
-    ld a,$11
-    call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
-    ld a,$3
-    ld [W_ROUTE12CURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
     ret
 
 Route12Script3: ; 5964c (16:564c)
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
     jr z,Route12Script_59606
-    call UpdateSprites
     ld a,[$cf0b]
     cp $2
     jr z,.asm_59664
@@ -83396,6 +83410,11 @@ Route12Script3: ; 5964c (16:564c)
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
 .asm_59664
+    ld a,$1d
+    ld [$cc4d],a
+    ld a,$11
+    call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
+    call UpdateSprites
     ld hl,$d7d8
     set 7,[hl]
     call Delay3
@@ -83403,6 +83422,8 @@ Route12Script3: ; 5964c (16:564c)
     ld [W_ROUTE12CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
     ret
+
+SECTION "Route12TextPointers",ROMX[$5675],BANK[$16]
 
 Route12TextPointers: ; 59675 (16:5675)
     dw Route12Text1
@@ -83417,7 +83438,7 @@ Route12TextPointers: ; 59675 (16:5675)
     dw Predef5CText
     dw Route12Text11
     dw Route12Text12
-    dw Route12Text13
+    dw Route12Snorlax
     dw Route12Text14
 
 Route12TrainerHeaders: ; 59691 (16:5691)
@@ -83490,9 +83511,8 @@ Route12Text1: ; 596e6 (16:56e6)
     TX_FAR _Route12Text1
     db "@"
 
-Route12Text13: ; 596eb (16:56eb)
-UnnamedText_596eb: ; 596eb (16:56eb)
-    TX_FAR _UnnamedText_596eb
+Route12SnorlaxText: ; 596eb (16:56eb)
+    TX_FAR _Route12SnorlaxText
     db "@"
 
 Route12Text14: ; 596f0 (16:56f0)
@@ -83960,28 +83980,18 @@ Route16Script0: ; 59959 (16:5959)
     bit 0,[hl]
     res 0,[hl]
     jp z,CheckFightingMapTrainers
+    ld a,SNORLAX
+    call PlayCry
+    call WaitForSoundToFinish
     ld a,$a
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
-    ld a,SNORLAX
-    ld [W_CUROPPONENT],a ; $d059
-    ld a,22 ; Snorlax
-    ld [W_CURENEMYLVL],a ; $d127
-    ld a,$21
-    ld [$cc4d],a
-    ld a,$11
-    call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
-    call UpdateSprites
-    ld a,$3
-    ld [W_ROUTE16CURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
     ret
 
 Route16Script3: ; 5998f (16:598f)
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
     jp z,Func_59946
-    call UpdateSprites
     ld a,[$cf0b]
     cp $2
     jr z,.asm_599a8
@@ -83989,6 +83999,11 @@ Route16Script3: ; 5998f (16:598f)
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
 .asm_599a8
+    ld a,$21
+    ld [$cc4d],a
+    ld a,$11
+    call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
+    call UpdateSprites
     ld hl,$d7e0
     set 1,[hl]
     call Delay3
@@ -83996,6 +84011,8 @@ Route16Script3: ; 5998f (16:598f)
     ld [W_ROUTE16CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
     ret
+
+SECTION "Route16TextPointers",ROMX[$59b9],BANK[$16]
 
 Route16TextPointers: ; 599b9 (16:59b9)
     dw Route16Text1
@@ -84007,7 +84024,7 @@ Route16TextPointers: ; 599b9 (16:59b9)
     dw Route16Text7
     dw Route16Text8
     dw Route16Text9
-    dw Route16Text10
+    dw Route16Snorlax
     dw Route16Text11
 
 Route16TrainerHeaders: ; 599cf (16:59cf)
@@ -84179,8 +84196,8 @@ Route16Text7: ; 59aae (16:5aae)
     TX_FAR _Route16Text7
     db "@"
 
-Route16Text10: ; 59ab3 (16:5ab3)
-    TX_FAR _UnnamedText_59ab3
+Route16SnorlaxText: ; 59ab3 (16:5ab3)
+    TX_FAR _Route16SnorlaxText
     db "@"
 
 Route16Text11: ; 59ab8 (16:5ab8)
@@ -85525,6 +85542,44 @@ CheckMarowak:
     cp POKEMONTOWER_6
     ld a,[$cf91]
     ret
+
+Route12Snorlax:
+    db $8
+    ld hl,Route12SnorlaxText
+    call PrintText
+    ld a,1           ; Snorlax OAM ID
+    ld [$FF00+$8c],a ; ...
+    xor a
+    ld [W_GYMLEADERNO],a
+    ld a,15
+    ld [W_CURENEMYLVL],a ; $d127
+    ld a,SNORLAX
+    ld [W_CUROPPONENT],a ; $d059
+    ld [wEngagedTrainerClass],a
+    call PlayTrainerMusic
+    ld a,3
+    ld [W_ROUTE12CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    jp TextScriptEnd
+
+Route16Snorlax:
+    db $8
+    ld hl,Route16SnorlaxText
+    call PrintText
+    ld a,7           ; Snorlax OAM ID
+    ld [$FF00+$8c],a ; ...
+    xor a
+    ld [W_GYMLEADERNO],a
+    ld a,22
+    ld [W_CURENEMYLVL],a ; $d127
+    ld a,SNORLAX
+    ld [W_CUROPPONENT],a ; $d059
+    ld [wEngagedTrainerClass],a
+    call PlayTrainerMusic
+    ld a,3
+    ld [W_ROUTE16CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    jp TextScriptEnd
 
 SECTION "bank17",ROMX,BANK[$17]
 
@@ -118988,7 +119043,7 @@ _Route12Text1: ; 9009e (24:409e)
     db $0,"A sleeping #MON",$4f
     db "blocks the way!",$57
 
-_UnnamedText_596eb: ; 900bf (24:40bf)
+_Route12SnorlaxText: ; 900bf (24:40bf)
     db $0,"SNORLAX woke up!",$51
     db "It attacked in a",$4f
     db "grumpy rage!",$57
@@ -119603,7 +119658,7 @@ _Route16Text7: ; 91287 (24:5287)
     db $0,"A sleeping #MON",$4f
     db "blocks the way!",$57
 
-_UnnamedText_59ab3: ; 912a8 (24:52a8)
+_Route16SnorlaxText: ; 912a8 (24:52a8)
     db $0,"SNORLAX woke up!",$51
     db "It attacked in a",$4f
     db "grumpy rage!",$57
@@ -128896,7 +128951,7 @@ Route3Mons:
     db  7,SANDSHREW  ;  5%
     db  4,JIGGLYPUFF ;  5% ; Entry Level
     db  8,JIGGLYPUFF ;  4%
-    db  7,PIKACHU    ;  1% ; Entry Level
+    db  7,CLEFAIRY   ;  1% ; Entry Level
     db $00
 
 MoonMons1:
@@ -130513,9 +130568,12 @@ TrainerClassMoveChoiceModifications:
     db 1,3,4,0    ; LANCE
 
 WildAI:
+    db AERODACTYL
+    db SNORLAX
     db ARTICUNO
     db ZAPDOS
     db MOLTRES
+    db DRAGONITE
     db MEWTWO
     db MEW
     db $FF
@@ -130983,7 +131041,7 @@ ForceShinyOrRandom_:
     or $88 ; Speed > 7 ; Special > 7
     ld e,a
     call .GenRandomInBattle
-    or $88 ; Attack > 7 ; Defense > 7
+    or $98 ; Attack > 8 ; Defense > 7 ; HP > 7
     jr .End
 .Onix
     call .GenRandomInBattle
@@ -130994,7 +131052,7 @@ ForceShinyOrRandom_:
     cp MAROWAK
     jr nz,.Random
     call .GenRandomInBattle
-    and $7F ; Attack 7
+    and $7F ; Attack < 8
     jr .End
 .Safari
     ld a,[W_CUROPPONENT]
@@ -131157,6 +131215,43 @@ InitializeChooseQuantityMenu:
     ret
 .PackText
     db "BAG ×@"
+
+_CheckNotEscapeWildPokemon:
+    ld a,[W_ISINBATTLE] ; wild = 1
+    dec a
+    jr nz,.End
+    ld a,[W_ENEMYMONID]
+    ld b,a
+    ld hl,.NotEscapeWildPokemon
+.Loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NotInList
+    cp b
+    jr nz,.Loop
+.NotEscape
+    scf ; set carry flag
+    ret
+.NotInList
+    ld hl,W_ENEMYMONATKDEFIV
+    call CheckShiny
+    jr z,.NotEscape
+.End
+    ld a,[$d120]
+    inc a
+    ld [$d120],a
+    and a ; reset carry flag
+    ret
+.NotEscapeWildPokemon
+    db AERODACTYL
+    db SNORLAX
+    db ARTICUNO
+    db ZAPDOS
+    db MOLTRES
+    db DRAGONITE
+    db MEWTWO
+    db MEW
+    db $FF
 
 SECTION "Bank38",ROMX,BANK[$38]
 
