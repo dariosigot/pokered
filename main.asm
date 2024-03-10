@@ -22268,7 +22268,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHS03
     dw MapHSXX
     dw MapHSXX
-    dw MapHSXX
+    dw MapHS06
     dw MapHS07
     dw MapHSXX
     dw MapHSXX
@@ -22839,6 +22839,9 @@ MapHS62:
     db SS_ANNE_4,$02,Hide
 MapHS22:
     db ROUTE_23,$08,Show
+MapHS06:
+    db CELADON_CITY,$08,Show
+    db CELADON_CITY,$09,Show
 
     db $FF,$01,Show
 
@@ -92993,16 +92996,7 @@ Func_6216d: ; 6216d (18:616d)
     pop hl
     jr .asm_62184
 
-MissableObjectIDs_62194: ; 62194 (18:6194)
-    db $11,$12,$13,$14,$15,$16,$FF
-
-MissableObjectIDs_6219b: ; 6219b (18:619b)
-    db $0A,$0B,$0C,$0D,$0E,$0F,$10,$17
-    db $18,$8A,$8B,$8C,$8D,$8E,$8F,$91
-    db $92,$93,$97,$98,$99,$9A,$9E,$9F
-    db $A0,$A3,$A4,$A5,$A6,$AB,$AC,$AD
-    db $AE,$AF,$B0,$B1,$B2,$B7,$B8,$B9
-    db $FF
+SECTION "SilphCo11Script_621c4",ROMX[$61c4],BANK[$18]
 
 SilphCo11Script_621c4: ; 621c4 (18:61c4)
     xor a
@@ -93559,6 +93553,17 @@ ViridianForestText17:
     ld hl,ViridianForestTrainerHeader5
     call TalkToTrainer
     jp TextScriptEnd
+
+MissableObjectIDs_62194: ; Moved in the Bank
+    db $11,$12,$13,$14,$15,$16,$FF
+
+MissableObjectIDs_6219b: ; Moved in the Bank
+    db $0A,$0B,$0C,$0D,$0E,$0F,$10,$17
+    db $18,$8A,$8B,$8C,$8D,$8E,$8F,$91
+    db $92,$93,$97,$98,$99,$9A,$9E,$9F
+    db $A0,$A3,$A4,$A5,$A6,$AB,$AC,$AD
+    db $AE,$AF,$B0,$B1,$B2,$B7,$B8,$B9
+    db $EA,$EB,$FF
 
 SECTION "bank19",ROMX,BANK[$19]
 
