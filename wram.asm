@@ -1341,8 +1341,10 @@ W_DRATINICAVECURSCRIPT: ; d66a
     ds 1
 W_SSANNE4CURSCRIPT:
     ds 1
+W_DIGLETTSCAVECURSCRIPT:
+    ds 1
 
-    ds 161-2
+    ds 161-3
 
 W_TOWNVISITEDFLAG: ; d70b
 ; 2 bytes bit array, 1 means visited
@@ -1527,8 +1529,10 @@ wBlkCoordinateX2Right: ; df33
 wBlkCoordinateY2Lower: ; df34
     ds 1
 
+wDigCaveAerodactylTrigBit0 ; df35 ; bit 0
 wFlagDamageToPlayerBit1    ; df35 ; bit 1
 wFlagShinyBit2             ; df35 ; bit 2
+wDigCaveAerodactylBeatBit3 ; df35 ; bit 3
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
 wFlagBackFrontSpriteBit56  ; df35 ; bit 5
                            ; df35 ; bit 6
@@ -1542,6 +1546,7 @@ wDVForShinyAtkDef     ; df36
 wMaxLevel              ; df37
 wChoicePkmnMoveDeleter ; df37
 wDVForShinySpdSpc      ; df37
+wBackupDarkMap         ; df37
     ds 1
 
 wFlagAddPkmnToPartyBit0     ; df38 ; bit 0
@@ -1551,7 +1556,7 @@ wFlagEnableOakLastPkmnBit3  ; df38 ; bit 3
 wFlagEnableDojoLastPkmnBit4 ; df38 ; bit 4
 wMewEventBit5               ; df38 ; bit 5
 wFirstExpAllMessageBit6     ; df38 ; bit 6
-wDebugEnemyMoveBit7     ; df38 ; bit 7
+wDebugEnemyMoveBit7         ; df38 ; bit 7
     ds 1
 
 wFlagListMenuSpc: ; df39 ; Denim

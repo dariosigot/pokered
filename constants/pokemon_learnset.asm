@@ -2769,11 +2769,11 @@ Mon142_EvosMoves:
     ;   1,AGILITY
     db  8,WHIRLWIND
     db 11,SUPERSONIC
-    db 15,BITE
-    db 19,ROCK_THROW
-    db 23,SWOOP
-    db 27,DOUBLE_TEAM
-    db 30,TAKE_DOWN
+    db 14,BITE        ; Digletts Cave's Aerodactyl (Level 25)
+    db 17,ROCK_THROW  ; ...
+    db 21,SWOOP       ; ...
+    db 25,DOUBLE_TEAM ; ...
+    db 29,TAKE_DOWN
     db 33,HYPER_FANG
     db 37,BODY_SLAM
     db 40,DRAGON_RAGE

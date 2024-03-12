@@ -876,8 +876,8 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     set 6,[hl]
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a ; clear joypad state
-    call HackFromBank0 ; $064b ; RestoreFaintenedWith1HP ; ld a,[W_CURMAP]
-    cp a,CINNABAR_GYM  ; $064e
+    ld a,[W_CURMAP]
+    cp a,CINNABAR_GYM
     jr nz,.notCinnabarGym
     ld hl,$d79b
     set 7,[hl]
@@ -889,8 +889,8 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     jp z,.noFaintCheck
     ld hl,AnyPokemonAliveCheck
     ld b,BANK(AnyPokemonAliveCheck)
-    call Bankswitch ; check if all the player's pokemon fainted
-    ld a,d
+    call HackFromBank0 ; $0669 ; RestoreFaintenedWith1HP ; call Bankswitch ; check if all the player's pokemon fainted
+    nop                ; $066c ; ld a,d
     and a
     jr z,.allPokemonFainted
 .noFaintCheck
@@ -15032,7 +15032,7 @@ Func_62ff: ; 62ff (1:62ff)
     ld e,a
     jr .asm_6376
 .asm_6388
-    ld hl,DungeonWarpData ; $63d8
+    call CheckDiglettsCave ; ld hl,DungeonWarpData ; $63d8
     add hl,de
     jr .asm_63a4
 .asm_638e
@@ -15084,6 +15084,7 @@ DungeonWarpList: ; 63bf (1:63bf)
     db MANSION_1,$01
     db MANSION_1,$02
     db MANSION_2,$03
+    db DIGLETTS_CAVE,$01
     db $FF
 
 DungeonWarpData: ; 63d8 (1:63d8)
@@ -15099,6 +15100,7 @@ DungeonWarpData: ; 63d8 (1:63d8)
     FLYWARP_DATA MANSION_1_WIDTH,14,16
     FLYWARP_DATA MANSION_1_WIDTH,14,16
     FLYWARP_DATA MANSION_2_WIDTH,14,18
+    FLYWARP_DATA DIGLETTS_CAVE_WIDTH,11,31
 
 ;Format:
 ;    db Map_id
@@ -18728,6 +18730,16 @@ DefaultNamesPlayerList:
     db "NEW NAME@RED@DENIM@ASH@"
 DefaultNamesRivalList:
     db "NEW NAME@BLUE@JEANS@GARY@"
+
+CheckDiglettsCave:
+    ld a,[W_CURMAP]
+    cp DIGLETTS_CAVE
+    jr nz,.done
+    ld a,$06     ; Dark Map
+    ld [$d35d],a ; ...
+.done
+    ld hl,DungeonWarpData ; $63d8
+    ret
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -22459,7 +22471,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHSC2
     dw MapHSXX
     dw MapHSXX
-    dw MapHSXX
+    dw MapHSC5
     dw MapHSC6
     dw MapHSC7
     dw MapHSC8
@@ -22842,6 +22854,8 @@ MapHS22:
 MapHS06:
     db CELADON_CITY,$08,Show
     db CELADON_CITY,$09,Show
+MapHSC5: ; cc52 (3:4c52)
+    db DIGLETTS_CAVE,$01,Show
 
     db $FF,$01,Show
 
@@ -24446,7 +24460,7 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
     ld a,[W_ISINBATTLE]
     and a
     jr nz,.notUsable
-    ld a,[W_CURMAP]
+    call CheckDiglettsCaveHole ; ld a,[W_CURMAP]
     cp a,AGATHAS_ROOM
     jr z,.notUsable
     ld a,[W_CURMAPTILESET]
@@ -24682,7 +24696,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     ret
 .notRoute12
     cp a,ROUTE_16
-    jr nz,.noSnorlaxToWakeUp
+    jr nz,.notRoute16
     ld a,[$d7e0]
     bit 1,a ; has the player beaten Route 16 Snorlax yet?
     jr nz,.noSnorlaxToWakeUp
@@ -24694,6 +24708,24 @@ ItemUsePokeflute: ; e140 (3:6140)
     call PrintText
     ld hl,$d7e0
     set 0,[hl] ; trigger Snorlax fight (handled by map script)
+    ret
+.notRoute16
+    cp a,DIGLETTS_CAVE
+    jr nz,.noSnorlaxToWakeUp
+    ld a,[wDigCaveAerodactylBeatBit3]
+    bit 3,a ; has the player beaten Diglett's Cave Aerodactyl yet?
+    jr nz,.noSnorlaxToWakeUp
+; if the player hasn't beaten Diglett's Cave Aerodactyl
+    ld a,[$d35d]
+    and a ; if it's not dark
+    jr nz,.noSnorlaxToWakeUp
+    ld hl,DiglettsCaveAerodactylFluteCoords
+    call ArePlayerCoordsInArray
+    jr nc,.noSnorlaxToWakeUp
+    ld hl,PlayedFluteHadEffectText
+    call PrintText
+    ld hl,wDigCaveAerodactylTrigBit0
+    set 0,[hl] ; trigger Aerodactyl fight (handled by map script)
     ret
 .noSnorlaxToWakeUp
     ld hl,PlayedFluteNoEffectText
@@ -24742,49 +24774,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     ld hl,FluteWokeUpText
     jp PrintText
 
-; wakes up all party pokemon
-; INPUT:
-; hl must point to status of first pokemon in party (player's or enemy's)
-; b must equal ~SLP
-; [$cd3d] should be initialized to 0
-; OUTPUT:
-; [$cd3d]: set to 1 if any pokemon were asleep
-WakeUpEntireParty: ; e1e5 (3:61e5)
-    ld de,44
-    ld c,6
-.loop
-    ld a,[hl]
-    push af
-    and a,SLP ; is pokemon asleep?
-    jr z,.notAsleep
-    ld a,1
-    ld [$cd3d],a ; indicate that a pokemon had to be woken up
-.notAsleep
-    pop af
-    and b ; remove Sleep status
-    ld [hl],a
-    add hl,de
-    dec c
-    jr nz,.loop
-    ret
-
-; Format:
-; 00: Y
-; 01: X
-Route12SnorlaxFluteCoords: ; e1fd (3:61fd)
-    db 62,8  ; one space West of Snorlax
-    db 62,10 ; one space East of Snorlax
-    db $ff ; terminator
-
-SECTION "Route16SnorlaxFluteCoords",ROMX[$6206],BANK[$3]
-
-; Format:
-; 00: Y
-; 01: X
-Route16SnorlaxFluteCoords: ; e206 (3:6206)
-    db 10,27 ; one space East of Snorlax
-    db 10,25 ; one space West of Snorlax
-    db $ff ; terminator
+SECTION "PlayedFluteNoEffectText",ROMX[$620b],BANK[$3]
 
 PlayedFluteNoEffectText: ; e20b (3:620b)
     TX_FAR _PlayedFluteNoEffectText
@@ -28608,6 +28598,80 @@ UsedStrengthText: ; Moved in the Bank
     call PlayCry
     call Delay3
     jp TextScriptEnd
+
+; wakes up all party pokemon
+; INPUT:
+; hl must point to status of first pokemon in party (player's or enemy's)
+; b must equal ~SLP
+; [$cd3d] should be initialized to 0
+; OUTPUT:
+; [$cd3d]: set to 1 if any pokemon were asleep
+WakeUpEntireParty: ; Moved in the Bank
+    ld de,44
+    ld c,6
+.loop
+    ld a,[hl]
+    push af
+    and a,SLP ; is pokemon asleep?
+    jr z,.notAsleep
+    ld a,1
+    ld [$cd3d],a ; indicate that a pokemon had to be woken up
+.notAsleep
+    pop af
+    and b ; remove Sleep status
+    ld [hl],a
+    add hl,de
+    dec c
+    jr nz,.loop
+    ret
+
+; Format:
+; 00: Y
+; 01: X
+Route12SnorlaxFluteCoords: ; e1fd (3:61fd)
+    db 62,8  ; one space West of Snorlax
+    db 62,10 ; one space East of Snorlax
+    db $ff ; terminator
+
+; Format:
+; 00: Y
+; 01: X
+Route16SnorlaxFluteCoords: ; e206 (3:6206)
+    db 10,27 ; one space East of Snorlax
+    db 10,25 ; one space West of Snorlax
+    db $ff ; terminator
+
+; Format:
+; 00: Y
+; 01: X
+DiglettsCaveAerodactylFluteCoords:
+    db 4,33 ; one space East of Aerodactyl
+    db 4,31 ; one space West of Aerodactyl
+    db 5,32 ; one space Sud of Aerodactyl
+    db $ff ; terminator
+
+CheckDiglettsCaveHole:
+    ld a,[W_CURMAP]
+    cp DIGLETTS_CAVE
+    jr nz,.NotEvent
+    ld a,[$d152]
+    and a          ; using Dig?
+    jr z,.NotEvent ; if so,continue
+    ld hl,.coordsData
+    call ArePlayerCoordsInArray
+    jr nc,.NotEvent
+.Event
+    pop hl ; remove return pointer
+    ld a,1
+    ld [W_DIGLETTSCAVECURSCRIPT],a
+    ld [$cd6a],a ; item used
+    ret
+.NotEvent
+    ld a,[W_CURMAP]
+    ret
+.coordsData
+    db 18,13
+    db $FF
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -33022,6 +33086,11 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $40 ; byte count
     db BANK(BasketSprite)
 
+    ; SPRITE_DACTIL
+    dw AerodatylOverworld
+    db $40 ; byte count
+    db BANK(AerodatylOverworld)
+
 Func_17c47: ; Move in the Bank
     ld a,[$cd50]
     ld c,a
@@ -33353,7 +33422,7 @@ CheckSprite4Tile:
     cp a,SPRITE_BALL ; is it a 4-tile sprite?
     ; CP n | C - Set for no borrow. (Set if A < n.)
     ret c
-    cp a,SPRITE_BASKET+1 ; TODO
+    cp a,SPRITE_DACTIL+1 ; TODO
     jr c,.FourTileSprite
     scf ; set carry flag
     ret
@@ -75917,6 +75986,8 @@ Func_5225b: ; 5225b (14:625b)
     ld hl,$d732
     set 4,[hl]
     ret
+
+;???:
     ld a,[$c109]
     cp $4
     ret nz
@@ -92866,26 +92937,7 @@ DiglettsCave_h: ; 0x61f62 to 0x61f6e (12 bytes) (id=197)
     db $00 ; connections
     dw DiglettsCaveObject ; objects
 
-DiglettsCaveScript: ; 61f6e (18:5f6e)
-    jp EnableAutoTextBoxDrawing
-
-DiglettsCaveTextPointers: ; 61f71 (18:5f71)
-    db "@"
-
-DiglettsCaveObject: ; 0x61f72 (size=20)
-    db $19 ; border tile
-
-    db $2 ; warps
-    db $5,$5,$2,DIGLETTS_CAVE_EXIT
-    db $1f,$25,$2,DIGLETTS_CAVE_ENTRANCE
-
-    db $0 ; signs
-
-    db $0 ; people
-
-    ; warp-to
-    EVENT_DISP $14,$5,$5 ; DIGLETTS_CAVE_EXIT
-    EVENT_DISP $14,$1f,$25 ; DIGLETTS_CAVE_ENTRANCE
+SECTION "DiglettsCaveBlocks",ROMX[$5f86],BANK[$18]
 
 DiglettsCaveBlocks: ; 61f86 (18:5f86)
     INCBIN "maps/diglettscave.blk"
@@ -93564,6 +93616,152 @@ MissableObjectIDs_6219b: ; Moved in the Bank
     db $A0,$A3,$A4,$A5,$A6,$AB,$AC,$AD
     db $AE,$AF,$B0,$B1,$B2,$B7,$B8,$B9
     db $EA,$EB,$FF
+
+DiglettsCaveObject: ; 0x61f72 (size=20)
+    db $19 ; border tile
+
+    db $2 ; warps
+    db $5,$5,$2,DIGLETTS_CAVE_EXIT
+    db $1f,$25,$2,DIGLETTS_CAVE_ENTRANCE
+
+    db $0 ; signs
+
+    db $2 ; people
+    db SPRITE_DACTIL,$4 + 4,$20 + 4,$ff,$d0,$1 ; person
+    db SPRITE_HIKER,$1c + 4,$d + 4,$ff,$d0,$2 ; person
+
+    ; warp-to
+    EVENT_DISP $14,$5,$5 ; DIGLETTS_CAVE_EXIT
+    EVENT_DISP $14,$1f,$25 ; DIGLETTS_CAVE_ENTRANCE
+
+DiglettsCaveTextPointers:
+    dw DiglettsCave1
+    dw DiglettsCaveHiker
+    dw DiglettsCaveAerodactyl
+    dw DiglettsCaveAerodactylRunAway
+
+DiglettsCave1:
+    TX_FAR _DiglettsCave1
+    db "@"
+DiglettsCaveHiker:
+    TX_FAR _DiglettsCaveHiker
+    db "@"
+
+DiglettsCaveScript:
+    call EnableAutoTextBoxDrawing
+    ld hl,DiglettsCaveScriptPointers
+    ld a,[W_DIGLETTSCAVECURSCRIPT]
+    jp CallFunctionInTable
+
+DiglettsCaveScriptPointers:
+    dw DiglettsCaveScript0
+    dw DiglettsCaveHole
+    dw DiglettsCavePostAerodactyl
+
+DiglettsCaveScript0:
+    ld hl,$d126
+    bit 6,[hl] ; Trigger Check Warp Script 0
+    set 6,[hl] ; ...
+    jr nz,.CheckAerodatyl
+    ; Start Warp
+    ld a,1 ; Warp ID
+    ld [$d71e],a
+    ld hl,$d72d
+    set 4,[hl]
+    ld hl,$d732
+    set 4,[hl]
+    ld a,DIGLETTS_CAVE
+    ld [$d71d],a
+    ld a,$06     ; Dark Map
+    ld [$d35d],a ; ...
+    ret
+.CheckAerodatyl
+    ld hl,wDigCaveAerodactylBeatBit3 ; wDigCaveAerodactylTrigBit0
+    bit 3,[hl]
+    ret nz
+    bit 0,[hl]
+    res 0,[hl]
+    ret z
+    ld a,AERODACTYL
+    call PlayCry
+    call WaitForSoundToFinish
+    ld a,3 ; DiglettsCaveAerodactyl
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    jp DisplayTextID
+
+DiglettsCaveHole:
+    call .Delay
+    ld bc,$0906 ; X = 6 ; Y = 9
+    ld a,$78
+    ld [$d09f],a
+    ld a,$17
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+    call .Delay
+    ld hl,$d126 ; Trigger Check Warp Script 0
+    res 6,[hl]  ; ...
+    xor a
+    ld [W_DIGLETTSCAVECURSCRIPT],a
+    ret
+.Delay
+    ld c,60
+    jp DelayFrames
+
+DiglettsCaveAerodactyl:
+    db $8
+    ld hl,DiglettsCaveAerodactylText
+    call PrintText
+    ld a,1           ; Aerodactyl OAM ID
+    ld [$FF00+$8c],a ; ...
+    xor a
+    ld [W_GYMLEADERNO],a
+    ld a,25
+    ld [W_CURENEMYLVL],a ; $d127
+    ld a,AERODACTYL
+    ld [W_CUROPPONENT],a ; $d059
+    ld [wEngagedTrainerClass],a
+    call PlayTrainerMusic
+    ld a,2
+    ld [W_DIGLETTSCAVECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    jp TextScriptEnd
+
+DiglettsCaveAerodactylText:
+    TX_FAR _DiglettsCaveAerodactylText
+    db "@"
+
+DiglettsCavePostAerodactyl:
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $ff
+    jr z,DiglettsCaveResetDefaultScript
+    ld a,[$cf0b]
+    cp $2
+    jr z,.skip
+    ld a,4 ; DiglettsCaveAerodactylRunAway
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    call DisplayTextID
+.skip
+    ld a,$ec
+    ld [$cc4d],a
+    ld a,$11
+    call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
+    call UpdateSprites
+    ld hl,wDigCaveAerodactylBeatBit3
+    set 3,[hl]
+    call Delay3
+    ; fallthrough
+
+DiglettsCaveResetDefaultScript:
+    xor a
+    ld [W_DIGLETTSCAVECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+DiglettsCaveAerodactylRunAway:
+    TX_FAR _DiglettsCaveAerodactylRunAway
+    db "@"
+
+AerodatylOverworld:
+    INCBIN "gfx/denim/aerodactyl.2bpp"
 
 SECTION "bank19",ROMX,BANK[$19]
 
@@ -94333,7 +94531,7 @@ Func_70510: ; 70510 (1c:4510)
     ld [$c104],a
     call Delay3
     push hl
-    call GBFadeIn2
+    call IfNotDarkGBFadeIn2 ; call GBFadeIn2
     ld hl,W_FLAGS_D733
     bit 7,[hl]
     res 7,[hl]
@@ -94430,7 +94628,7 @@ _DoFlyOrTeleportAwayGraphics: ; 705ba (1c:45ba)
     ld c,$a
     call DelayFrames
 .asm_705e9
-    call GBFadeOut2
+    call IfNotDarkGBFadeOut2 ; call GBFadeOut2
     jp Func_70772
 .asm_705ef
     ld a,$4
@@ -94500,7 +94698,7 @@ Func_7067d: ; 7067d (1c:467d)
     ld a,$a0
     ld [$c308],a
     ld [$c30c],a
-    call GBFadeOut2
+    call IfNotDarkGBFadeOut2 ; call GBFadeOut2
     ld a,$1
     ld [$cfcb],a
     jp Func_70772
@@ -99588,6 +99786,9 @@ MapIDList_70a44: ; Moved in the BANK
     ; all SEAFOAM_ISLANDS maps
     db SEAFOAM_ISLANDS_2
     db SEAFOAM_ISLANDS_5
+    ; DIGLETTS_CAVE
+    db DIGLETTS_CAVE
+    db DIGLETTS_CAVE
     ; all SILPH_CO,MANSION,SAFARI_ZONE,and UNKNOWN_DUNGEON maps,
     ; except for SILPH_CO_1F
     db SILPH_CO_2F
@@ -99681,6 +99882,22 @@ GetHealthBarColorWithGhostCheck_:
     ld a,[wBackupHealthBarWidth]
     ld e,a
     jp GetHealthBarColor
+
+IfNotDarkGBFadeOut2:
+    ld a,[wBackupDarkMap] ; [$d35d]
+    and a
+    jp z,GBFadeOut2
+    ld hl,IncGradGBPalTable_01+5
+    ld b,2
+    jp GBFadeInCommon
+
+IfNotDarkGBFadeIn2:
+    ld a,[$d35d]
+    and a
+    jp z,GBFadeIn2
+    ld hl,IncGradGBPalTable_01
+    ld b,2
+    jp GBFadeOutCommon
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
@@ -120426,6 +120643,30 @@ _Route24BattleText1: ; 928e2 (24:68e2)
     db $0,"I saw your feat",$4f
     db "from the grass!",$57
 
+_DiglettsCave1:
+    db $0,"It looks like a",$4f
+    db "huge stone",$55
+    db "statue!",$57
+
+_DiglettsCaveHiker:
+    db $0,"It seems that",$4f
+    db "all DIGLETTs",$55
+    db "often DIG in the",$55
+    db "same corner of",$55
+    db "the tunnel!",$51
+    db "What strange",$4f
+    db "behavior!",$57
+
+_DiglettsCaveAerodactylText:
+    db $0,"Oops...",$51
+    db "It wasn't a statue!",$57
+
+_DiglettsCaveAerodactylRunAway:
+    db $0,"The gigantic",$4f
+    db "Aerodatyl flies",$55
+    db "through the hole.",$51
+    db "Good bye!",$57
+
 SECTION "bank25",ROMX,BANK[$25]
 
 _Route24EndBattleText1: ; 94000 (25:4000)
@@ -130980,21 +131221,26 @@ _HackFromBank0:
 .Table
     dw $0436
     dw BugFixLongRangeTrainer
-    dw $064e
+    dw $066c
     dw RestoreFaintenedWith1HP
     db $ff
 
 BugFixLongRangeTrainer:
+    call BackupDarkMapState
     ld hl,W_FLAGS_D733 ; check if trainer is wanting to battle
     bit 3,[hl]
     ld hl,$d732
     jr z,.End
     res 3,[hl] ; cancel fly/teleport warp
 .End
-    ld d,[hl] ; Output -> a
+    ld d,[hl] ; Output d -> a
     ret
 
 RestoreFaintenedWith1HP:
+    ld hl,AnyPokemonAliveCheck
+    ld b,BANK(AnyPokemonAliveCheck)
+    call Bankswitch ; check if all the player's pokemon fainted
+    push de ; output in d
     ld hl,W_PARTYMON1_HP ; $d173
     ld a,[W_NUMINPARTY]
     ld e,a
@@ -131018,8 +131264,12 @@ RestoreFaintenedWith1HP:
     jr nz,.Loop
     xor a
     ld [wExplodeFlag],a
-    ld a,[W_CURMAP]
-    ld d,a
+    pop de ; Output d -> a
+    ret
+
+BackupDarkMapState:
+    ld a,[$d35d]
+    ld [wBackupDarkMap],a
     ret
 
 ForceShinyOrRandom_:

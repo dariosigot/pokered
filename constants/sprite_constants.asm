@@ -84,6 +84,7 @@ SPRITE_LYING_OLD_MAN_UNUSED_1    EQU $46
 SPRITE_LYING_OLD_MAN_UNUSED_2    EQU $47
 SPRITE_LYING_OLD_MAN             EQU $48
 SPRITE_BASKET                    EQU $49
+SPRITE_DACTIL                    EQU $4A
 
 ; different kinds of people events
 ITEM    EQU $80
