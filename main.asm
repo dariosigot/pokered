@@ -28723,8 +28723,9 @@ BookMapDexSprite: ; 11240 (4:5240)
     INCBIN "gfx/sprites/book_map_dex.2bpp" ; was $11240
 ClipboardSprite: ; 11280 (4:5280)
     INCBIN "gfx/sprites/clipboard.2bpp" ; was $11280
-SnorlaxSprite: ; 112c0 (4:52c0)
-    INCBIN "gfx/sprites/snorlax.2bpp" ; was $112c0
+;SnorlaxSprite: ; 112c0 (4:52c0)
+;    INCBIN "gfx/sprites/snorlax.2bpp" ; was $112c0
+SECTION "OldAmberSprite",ROMX[$5300],BANK[$4]
 OldAmberSprite: ; 11300 (4:5300)
     INCBIN "gfx/sprites/old_amber.2bpp" ; was $11300
 LyingOldManSprite: ; 11340 (4:5340)
@@ -32966,10 +32967,10 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $c0 ; byte count
     db BANK(GuardSprite)
 
-    ; SPRITE_DRATINI
-    dw DratiniOverworld
+    ; SPRITE_NOT_DEFINED
+    dw 0
     db $c0 ; byte count
-    db BANK(DratiniOverworld)
+    db 0
 
     ; SPRITE_MOM
     dw MomSprite
@@ -33052,9 +33053,9 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db BANK(ClipboardSprite)
 
     ; SPRITE_SNORLAX
-    dw SnorlaxSprite
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_SNORLAX-1)%(DEX_MAGIKARP-1)))
     db $40 ; byte count
-    db BANK(SnorlaxSprite)
+    db BANK(MonOverworldDataNew2_emimonserrate)
 
     ; SPRITE_OLD_AMBER_COPY
     dw OldAmberSprite
@@ -33086,10 +33087,35 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $40 ; byte count
     db BANK(BasketSprite)
 
-    ; SPRITE_DACTIL
-    dw AerodatylOverworld
+    ; SPRITE_AERODACTYL
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_AERODACTYL-1)%(DEX_MAGIKARP-1)))
     db $40 ; byte count
-    db BANK(AerodatylOverworld)
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
+    ; SPRITE_ARTICUNO
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ARTICUNO-1)%(DEX_MAGIKARP-1)))
+    db $40 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
+    ; SPRITE_ZAPDOS
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ZAPDOS-1)%(DEX_MAGIKARP-1)))
+    db $40 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
+    ; SPRITE_MOLTRES
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MOLTRES-1)%(DEX_MAGIKARP-1)))
+    db $40 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
+    ; SPRITE_DRATINI
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_DRATINI-1)%(DEX_MAGIKARP-1)))
+    db $40 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
+    ; SPRITE_MEWTWO
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MEWTWO-1)%(DEX_MAGIKARP-1)))
+    db $40 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
 
 Func_17c47: ; Move in the Bank
     ld a,[$cd50]
@@ -33151,31 +33177,7 @@ Func_17c47: ; Move in the Bank
 EmotionBubbles: ; 17cbd (5:7cbd)
     INCBIN "gfx/emotion_bubbles.2bpp"
 
-SECTION "Func_17d7d",ROMX[$7d7d],BANK[$5]
-
-Func_17d7d: ; 17d7d (5:7d7d)
-    ld a,[wPlayerMonAccuracyMod] ; $cd1e
-    cp $86
-    jr z,.asm_17d8d
-    cp $92
-    ret nz
-    ld a,[wPlayerMonEvasionMod] ; $cd1f
-    cp $8f
-    ret nz
-.asm_17d8d
-    ld a,[W_NUMINPARTY] ; $d163
-    dec a
-    ld [wWhichPokemon],a ; $cf92
-    ld a,$1
-    ld [$ccd4],a
-    ld a,$32
-    ld [W_ISLINKBATTLE],a ; $d12b
-    ld hl,Func_3ad0e
-    ld b,BANK(Func_3ad0e)
-    call Bankswitch ; indirect jump to Func_3ad0e (3ad0e (e:6d0e))
-    xor a
-    ld [W_ISLINKBATTLE],a ; $d12b
-    jp Func_2307
+SECTION "SubstituteEffectHandler",ROMX[$7dad],BANK[$5]
 
 SubstituteEffectHandler: ; 17dad (5:7dad)
     ld c,50
@@ -33422,13 +33424,37 @@ CheckSprite4Tile:
     cp a,SPRITE_BALL ; is it a 4-tile sprite?
     ; CP n | C - Set for no borrow. (Set if A < n.)
     ret c
-    cp a,SPRITE_DACTIL+1 ; TODO
+    cp a,$FF;SPRITE_MEWTWO+1 ; TODO
     jr c,.FourTileSprite
     scf ; set carry flag
     ret
 .FourTileSprite
     xor a ; reset carry flag
     ret
+
+Func_17d7d: ; Moved in the Bank
+    ld a,[wPlayerMonAccuracyMod] ; $cd1e
+    cp $86
+    jr z,.asm_17d8d
+    cp $92
+    ret nz
+    ld a,[wPlayerMonEvasionMod] ; $cd1f
+    cp $8f
+    ret nz
+.asm_17d8d
+    ld a,[W_NUMINPARTY] ; $d163
+    dec a
+    ld [wWhichPokemon],a ; $cf92
+    ld a,$1
+    ld [$ccd4],a
+    ld a,$32
+    ld [W_ISLINKBATTLE],a ; $d12b
+    ld hl,Func_3ad0e
+    ld b,BANK(Func_3ad0e)
+    call Bankswitch ; indirect jump to Func_3ad0e (3ad0e (e:6d0e))
+    xor a
+    ld [W_ISLINKBATTLE],a ; $d12b
+    jp Func_2307
 
 SECTION "bank6",ROMX,BANK[$6]
 
@@ -41298,7 +41324,7 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,37 ; trainer
     db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,40 ; trainer
     db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,37 ; trainer
-    db SPRITE_BIRD,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,40 ; trainer
+    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,40 ; trainer
     db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
     db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,HP_UP ; item
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
@@ -66214,7 +66240,7 @@ UnknownDungeon3Object: ; 0x45f36 (size=34)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_SLOWBRO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,65 ; trainer
+    db SPRITE_MEWTWO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,65 ; trainer
     db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$82,ULTRA_BALL ; item
     db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
 
@@ -67068,7 +67094,7 @@ SeafoamIslands5Object: ; 0x468bc (size=62)
     db $3 ; people
     db SPRITE_BOULDER,$f + 4,$4 + 4,$ff,$ff,$1 ; person
     db SPRITE_BOULDER,$f + 4,$5 + 4,$ff,$ff,$2 ; person
-    db SPRITE_BIRD,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,40 ; trainer
+    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,40 ; trainer
 
     ; warp-to
     EVENT_DISP $f,$11,$14 ; SEAFOAM_ISLANDS_4
@@ -75892,7 +75918,7 @@ Mansion2Object: ; Move in the Bank
     db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
-    db SPRITE_BIRD,$c + 4,$1c + 4,$ff,$d1,$45,MOLTRES,40 ; trainer
+    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$45,MOLTRES,40 ; trainer
 
     ; warp-to
     EVENT_DISP $f,$a,$5 ; MANSION_1
@@ -93627,7 +93653,7 @@ DiglettsCaveObject: ; 0x61f72 (size=20)
     db $0 ; signs
 
     db $2 ; people
-    db SPRITE_DACTIL,$4 + 4,$20 + 4,$ff,$d0,$1 ; person
+    db SPRITE_AERODACTYL,$4 + 4,$20 + 4,$ff,$d0,$1 ; person
     db SPRITE_HIKER,$1c + 4,$d + 4,$ff,$d0,$2 ; person
 
     ; warp-to
@@ -93759,9 +93785,6 @@ DiglettsCaveResetDefaultScript:
 DiglettsCaveAerodactylRunAway:
     TX_FAR _DiglettsCaveAerodactylRunAway
     db "@"
-
-AerodatylOverworld:
-    INCBIN "gfx/denim/aerodactyl.2bpp"
 
 SECTION "bank19",ROMX,BANK[$19]
 
@@ -99571,6 +99594,13 @@ CreateMonOvWorldSprInstruction:
     jr c,.Before128_2
     inc a
 .Before128_2
+    push hl
+    ld hl,W_OPTIONS
+    bit 5,[hl]
+    pop hl
+    jr z,.skip
+    add BANK(MonOverworldDataNew_emimonserrate)-BANK(MonOverworldDataNew)
+.skip
     ld [hli],a
     push hl ; Backup wLocationMonOvSprInstruction
     ld a,e
@@ -127848,9 +127878,6 @@ MewBaseStats: ; 425b (1:425b)
 
     db BANK(MewPicFront)
 
-DratiniOverworld:
-    INCBIN "gfx/denim/dratini.2bpp"
-
 DratiniCave_h:
     db $0d ; tileset
     db DRATINI_CAVE_HEIGHT,DRATINI_CAVE_WIDTH ; dimensions (y,x)
@@ -131823,3 +131850,13 @@ _CriticalHitTest_NoBug:
     ld a,$1
     ld [$d05e],a                 ; set critical hit flag
     ret
+
+SECTION "Bank39",ROMX,BANK[$39]
+
+MonOverworldDataNew_emimonserrate:
+    INCBIN "gfx/denim/party_mon_sprites1_emimonserrate.w32.2bpp"
+
+SECTION "Bank3a",ROMX,BANK[$3A]
+
+MonOverworldDataNew2_emimonserrate:
+    INCBIN "gfx/denim/party_mon_sprites2_emimonserrate.w32.2bpp"

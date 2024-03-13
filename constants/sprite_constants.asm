@@ -60,7 +60,7 @@ SPRITE_SS_CAPTAIN                EQU $2e
 SPRITE_FISHER2                   EQU $2f
 SPRITE_BLACKBELT                 EQU $30
 SPRITE_GUARD                     EQU $31
-SPRITE_DRATINI                   EQU $32
+;SPRITE_NOT_DEFINED              EQU $32
 SPRITE_MOM                       EQU $33
 SPRITE_BALDING_GUY               EQU $34
 SPRITE_YOUNG_BOY                 EQU $35
@@ -84,7 +84,12 @@ SPRITE_LYING_OLD_MAN_UNUSED_1    EQU $46
 SPRITE_LYING_OLD_MAN_UNUSED_2    EQU $47
 SPRITE_LYING_OLD_MAN             EQU $48
 SPRITE_BASKET                    EQU $49
-SPRITE_DACTIL                    EQU $4A
+SPRITE_AERODACTYL                EQU $4A
+SPRITE_ARTICUNO                  EQU $4B
+SPRITE_ZAPDOS                    EQU $4C
+SPRITE_MOLTRES                   EQU $4D
+SPRITE_DRATINI                   EQU $4E
+SPRITE_MEWTWO                    EQU $4F
 
 ; different kinds of people events
 ITEM    EQU $80
