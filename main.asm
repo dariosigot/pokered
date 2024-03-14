@@ -7512,7 +7512,7 @@ DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
     jp .incrementQuantity
 
     ; free space in BANK0
-    ds 24+23-8
+    ds 24+23-8-16
 
 .waitForKeyPressLoop
     call GetJoypadStateLowSensitivity
@@ -7521,6 +7521,16 @@ DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
     jp nz,.buttonAPressed
     bit 1,a ; was the B button pressed?
     jp nz,.buttonBPressed
+    ld b,a
+    ld a,[$ff8e]
+    and a ; should the price be halved (for selling items)?
+    jr nz,.CheckUpDown
+    ld a,[$cf91] ; selected item ID
+    cp TM_01
+    jr c,.CheckUpDown
+    jr .waitForKeyPressLoop
+.CheckUpDown
+    ld a,b
     bit 6,a ; was Up pressed?
     jr nz,.incrementQuantity
     bit 7,a ; was Down pressed?
@@ -11526,7 +11536,7 @@ ItemPrices: ; 4608 (1:4608)
     bcd3   2100 ; LEAF_STONE
     bcd3      0 ; CARD_KEY
     bcd3  10000 ; NUGGET
-    bcd3   9800 ; XXX PP_UP
+    bcd3      0 ; TECH_MACHINE
     bcd3   1000 ; POKE_DOLL
     bcd3    600 ; FULL_HEAL
     bcd3  15000 ; REVIVE
@@ -18529,7 +18539,7 @@ PrintDenimVersionAndSaveScreenTilesToBuffer2:
 
 GetQtyAndGiveItem:
     push bc
-    ld hl,TmQtyTable
+    ld hl,ItemQtyTable
     ld de,2
     call IsInArray
     pop bc
@@ -18539,26 +18549,8 @@ GetQtyAndGiveItem:
 .skip
     jp GiveItem
 
-TmQtyTable:
-    db TM_03,2 ; SWORDS_DANCE
-    db TM_08,2 ; BODY_SLAM
-    db TM_10,3 ; DOUBLE_EDGE
-    db TM_12,4 ; WATER_GUN
-    db TM_14,2 ; BLIZZARD
-    db TM_16,3 ; PAY_DAY
-    db TM_19,3 ; SEISMIC_TOSS
-    db TM_22,2 ; SOLARBEAM
-    db TM_25,2 ; THUNDER
-    db TM_26,2 ; EARTHQUAKE
-    db TM_30,3 ; TELEPORT
-    db TM_40,3 ; SKULL_BASH
-    db TM_43,2 ; SKY_ATTACK
-    db TM_44,3 ; REST
-    db TM_45,2 ; THUNDER_WAVE
-    db TM_51,3 ; BLADE
-    db TM_52,3 ; SWOOP
-    db TM_54,3 ; STRIKE
-    db TM_55,3 ; FLASH
+ItemQtyTable:
+    db POTION,2
     db $ff
 
 DockException:
@@ -22912,13 +22904,13 @@ UnnamedText_cdff: ; cdff (3:4dff)
 ; [$CF96] = item quantity
 ; sets carry flag if successful,unsets carry flag if unsuccessful
 AddItemToInventory_: ; ce04 (3:4e04)
-    ld a,[$cf96] ; a = item quantity
+    call HackCheckTMToBag ; ld a,[$cf96] ; a = item quantity
     push af
     push bc
     push de
     push hl
     push hl
-    ld d,50 ; PC box can hold 50 items
+    ld d,40 ; PC box can hold 50 items
     ld a,wNumBagItems & $FF
     cp l
     jr nz,.checkIfInventoryFull
@@ -23125,7 +23117,7 @@ ItemUsePtrTable: ; d5e1 (3:55e1)
     dw ItemUseEvoStone   ; LEAF_STONE
     dw ItemUseCardKey    ; CARD_KEY
     dw UnusableItem      ; NUGGET
-    dw UnusableItem      ; ??? PP_UP
+    dw ItemUseTechMach  ; TECH_MACHINE
     dw ItemUsePokedoll   ; POKE_DOLL
     dw ItemUseMedicine   ; FULL_HEAL
     dw ItemUseMedicine   ; REVIVE
@@ -25149,9 +25141,6 @@ ItemUseTMHM: ; e479 (3:6479)
     jp c,ItemUseNotTime
     sub a,TM_01
     push af
-    jr nc,.skipAdding
-    add a,55 ; if item is an HM,add 55
-.skipAdding
     inc a
     ld [$d11e],a
     ld a,$44
@@ -25165,7 +25154,7 @@ ItemUseTMHM: ; e479 (3:6479)
     jr nc,.printBootedUpMachineText
     ld hl,BootedUpHMText
 .printBootedUpMachineText
-    call PrintText
+    ds 3 ; call PrintText
     ld hl,TeachMachineMoveText
     call PrintText
     FuncCoord 14,7
@@ -25240,10 +25229,15 @@ ItemUseTMHM: ; e479 (3:6479)
     ld a,b
     and a
     ret z
+    ld a,[$d152]
+    and a
     ld a,[$cf91]
+    jr nz,.TechMach ; if use TECH.MACHINE don't remove it
     call IsItemHM
     ret c
     jp RemoveUsedItem
+.TechMach
+    jp RemoveTMQty ; but remove inside TM
 
 SECTION "PrintItemUseTextAndRemoveItem",ROMX[$6563],BANK[$3]
 
@@ -25640,7 +25634,7 @@ KeyItemBitfield: ; e799 (3:6799)
     db %01001111
     db %00000000
     db %10010111
-    db %00000000
+    db %00000010
     db %11000000
     db %11110000
     db %00111111
@@ -25876,18 +25870,143 @@ OldRodData:
     db SAFARI_ZONE_CENTER
     db $FF
 
-SECTION "ItemUseReloadOverworldData",ROMX[$69c5],BANK[$3]
+ItemUseTechMach:
+    ld a,[$d152]
+    push af
+    ld a,[$cf91]
+    ld [$d152],a
+    push af
+    call GetTMChoiceItemID ; put item_ID in $cf91
+    call c,ItemUseTMHM
+    pop af
+    ld [$cf91],a
+    pop af
+    ld [$d152],a
+    ret
 
-; reloads map view and processes sprite data
-; for items that cause the overworld to be displayed
-ItemUseReloadOverworldData: ; e9c5 (3:69c5)
-    call LoadCurrentMapView
-    jp UpdateSprites
+GetTMChoiceItemID:
+    ld hl,wTM
+    ld b,((TM_54-TM_01+1) >> 2)+1
+.LoopSearchAtLeastOne
+    ld a,[hli]
+    and a
+    jr nz,.AtLeastOne
+    dec b
+    jr nz,.LoopSearchAtLeastOne
+    call PrintTMEmpty
+    jr .BPressed
+.AtLeastOne
+    call .PrintBasicLayoutTMChoice
+    ld a,TM_01-1
+.TryNext
+    inc a
+    cp TM_54+1
+    jr nz,.continue1
+    ld a,TM_01
+.continue1
+    call GetTMQty ; input a = TM ID | output c = Qty | z if Qty=0
+    jr z,.TryNext
+    jr .start
+.TryPrev
+    dec a
+    cp TM_01-1
+    jr nz,.continue2
+    ld a,TM_54
+.continue2
+    call GetTMQty ; input a = TM ID | output c = Qty | z if Qty=0
+    jr z,.TryPrev
+.start
+    ld [$cf91],a
+    call .ClearScreenArea
+    call .GetAndPlaceTMStats
+.getJoypadStateLoop
+    call GetJoypadStateLowSensitivity
+    ld a,[$ffb5]
+    and %00110011 ; ▼▲◄►StSeBA
+    jr z,.getJoypadStateLoop
+    bit 4,a ; pressed Right key?
+    jr z,.checkIfLeftPressed
+;Right
+    ld a,[$cf91]
+    jr .TryNext
+.checkIfLeftPressed
+    bit 5,a ; pressed Left key?
+    jr z,.checkIfAPressed
+;Left
+    ld a,[$cf91]
+    jr .TryPrev
+.checkIfAPressed
+    bit 0,a
+    jr z,.BPressed
+    scf ; APressed
+    ret
+.BPressed
+    ld a,2
+    ld [$cd6a],a ; item not used
+    xor a ; rcf
+    ret
 
-FindWildLocationsOfMon:
-    ld b,BANK(_FindWildLocationsOfMon)
-    ld hl,_FindWildLocationsOfMon
-    jp Bankswitch
+.PrintBasicLayoutTMChoice
+    ld hl,.ChoiceTMText
+    call PrintText
+    FuncCoord 4,10
+    ld hl,Coord
+    ld bc,$020e ; 2,14
+    call TextBoxBorder
+    FuncCoord 18,11
+    ld hl,Coord
+    ld de,.Arrows
+    jp PlaceString
+
+.ClearScreenArea
+    FuncCoord 5,11
+    ld hl,Coord
+    ld bc,$020d ; 2,13
+    jp ClearScreenArea
+
+.GetAndPlaceTMStats
+    FuncCoord 14,12
+    ld hl,Coord
+    ld de,.X
+    call PlaceString
+    ld a,[$cf91]
+    push af
+    ld b,a
+    call GetTMQty
+    ld a,c
+    ld de,$d11e
+    ld [de],a
+    FuncCoord 15,12
+    ld hl,Coord
+    ld bc,$0102 ; b=1 | c=2
+    call PrintNumber
+    pop af
+    sub TM_01
+    inc a
+    ld [$d11e],a
+    ld de,$d11e
+    FuncCoord 6,12
+    ld hl,Coord
+    ld bc,$8102 ; b=%10000001 Leading Zeroes | c=2
+    call PrintNumber
+    ld a,$44
+    call Predef ; get move ID from TM/HM ID
+    ld a,[$d11e]
+    ld [$d0e0],a
+    call GetMoveName
+    call CopyStringToCF4B ; copy name to $cf4b
+    ld de,$cf4b
+    FuncCoord 6,11
+    ld hl,Coord
+    jp PlaceString
+
+.ChoiceTMText:
+    TX_FAR _ChoiceTMText
+    db "@"
+.Arrows
+    db "▶@"
+.X
+    db "×@"
 
 SECTION "DrawBadges",ROMX[$6a03],BANK[$3]
 
@@ -28673,6 +28792,139 @@ CheckDiglettsCaveHole:
     db 18,13
     db $FF
 
+; reloads map view and processes sprite data
+; for items that cause the overworld to be displayed
+ItemUseReloadOverworldData: ; Moved in the Bank
+    call LoadCurrentMapView
+    jp UpdateSprites
+
+FindWildLocationsOfMon: ; Moved in the Bank
+    ld b,BANK(_FindWildLocationsOfMon)
+    ld hl,_FindWildLocationsOfMon
+    jp Bankswitch
+
+GetTMQty:
+    ; a = TM ID
+    push af
+    call FindRightByteAndNibbleID ; hl=pointerToRightByte | e=nibbleID
+    ld a,[hl]
+    ld b,a
+.LoopForRightNibble
+    ld a,e
+    and a
+    jr z,.RightNibbleDone
+    srl b ; shift right byte read
+    srl b ; ...
+    dec e
+    jr .LoopForRightNibble
+.RightNibbleDone
+    ld a,b
+    and %00000011 ; Mask
+.end
+    pop bc
+    ld c,a
+    ld a,b
+    ; a = TM ID
+    ; c = Qty
+    ret
+
+ResetTMQty:
+    ld a,[$cf91] ; TM ID
+    call FindRightByteAndNibbleID ; hl=pointerToRightByte | e=nibbleID
+    ld b,%00000011 ; Mask
+.LoopForMask
+    ld a,e
+    and a
+    jr z,.RightMask
+    sla b ; shift left mask
+    sla b ; ...
+    dec e
+    jr .LoopForMask
+.RightMask
+    ld a,[hl] ; Read Original
+    or b ; Apply Mask (Qty = 3)
+    ld [hl],a ; Overwrite
+    ret
+
+RemoveTMQty:
+    ; a = TM ID
+    call FindRightByteAndNibbleID ; hl=pointerToRightByte | e=nibbleID
+    ld a,[hl]
+    ld b,a
+    ld d,e ; Backup Nibble
+    ld c,%00000011 ; Mask
+.LoopForMaskAndRightNibble
+    ld a,e
+    and a
+    jr z,.RightMaskAndNibble
+    srl b ; shift right byte read
+    srl b ; ...
+    sla c ; shift left mask
+    sla c ; ...
+    dec e
+    jr .LoopForMaskAndRightNibble
+.RightMaskAndNibble
+    dec b ; Remove 1 Unit to TM Qty
+.LoopToRevertSlide
+    ld a,d
+    and a
+    jr z,.RevertSlideDone
+    sla b ; shift left byte read
+    sla b ; ...
+    dec d
+    jr .LoopToRevertSlide
+.RevertSlideDone
+    ld a,%11111111  ; Reverse Mask
+    sub c           ; ...
+    ld c,a          ; ...
+    ld a,[hl] ; Read Original
+    and c ; Apply Mask
+    add b ; Insert New TM Qty
+    ld [hl],a ; Overwrite
+    ret
+
+FindRightByteAndNibbleID:
+    sub TM_01 ; TM01 ID = 0
+    ld c,a
+    ld e,0
+    srl c
+    jr nc,.skipBit0
+    set 0,e
+.skipBit0
+    srl c
+    jr nc,.skipBit1
+    set 1,e
+.skipBit1
+    ld hl,wTM ; c=byte|e=nibbleID
+    ld b,0
+    add hl,bc
+    ret
+
+PrintTMEmpty:
+    ld hl,.TMEmpy
+    jp PrintText
+.TMEmpy:
+    TX_FAR _TMEmpy
+    db "@"
+
+HackCheckTMToBag:
+    ld a,[$cf91] ; a = item ID
+    cp TM_01
+    jr c,.Standard
+    ld a,wNumBagItems & $FF
+    cp l
+    jr nz,.Standard
+    ld a,wNumBagItems >> 8
+    cp h
+    jr nz,.Standard
+    call ResetTMQty
+    pop hl ; Hack Remove Return Pointer
+    scf
+    ret
+.Standard
+    ld a,[$cf96] ; a = item quantity
+    ret
+
 SECTION "bank4",ROMX,BANK[$4]
 
 OakAideSprite: ; 10000 (4:4000)
@@ -30027,6 +30279,8 @@ StartMenu_Item: ; 13302 (4:7302)
     ld a,[$cf91]
     cp a,BICYCLE
     jp z,.useOrTossItem
+    cp a,TECH_MACHINE
+    jp z,.useOrTossItem
 .notBicycle1
     ld a,$06 ; use/toss menu
     ld [$d125],a
@@ -30065,6 +30319,9 @@ StartMenu_Item: ; 13302 (4:7302)
     call PrintText
     jp ItemMenuLoop
 .notBicycle2
+    ld a,[$cf91]
+    cp TECH_MACHINE
+    jr z,.useItem_partyMenu
     ld a,[wCurrentMenuItem]
     and a
     jr nz,.tossItem
@@ -30132,47 +30389,6 @@ CannotUseItemsHereText: ; 1342a (4:742a)
 CannotGetOffHereText: ; 1342f (4:742f)
     TX_FAR _CannotGetOffHereText
     db "@"
-
-; items which bring up the party menu when used
-UsableItems_PartyMenu: ; 13434 (4:7434)
-    db MOON_STONE
-    db ANTIDOTE
-    db BURN_HEAL
-    db ICE_HEAL
-    db AWAKENING
-    db PARLYZ_HEAL
-    db FULL_RESTORE
-    db MAX_POTION
-    db HYPER_POTION
-    db SUPER_POTION
-    db POTION
-    db FIRE_STONE
-    db THUNDER_STONE
-    db WATER_STONE
-    db HP_UP
-    db PROTEIN
-    db IRON
-    db CARBOS
-    db CALCIUM
-    db RARE_CANDY
-    db TRADE_STONE
-    db LEAF_STONE
-    db FULL_HEAL
-    db REVIVE
-    db MAX_REVIVE
-    db FRESH_WATER
-    db SODA_POP
-    db LEMONADE
-    db X_ATTACK
-    db X_DEFEND
-    db X_SPEED
-    db X_SPECIAL
-    db PP_UP
-    db ETHER
-    db MAX_ETHER
-    db ELIXER
-    db MAX_ELIXER
-    db $ff
 
 SECTION "StartMenu_TrainerInfo",ROMX[$7460],BANK[$4]
 
@@ -31994,6 +32210,47 @@ PartyMenuItemUseInBattleText:
 PartyMenuSoftboiledUseText:
     TX_FAR _PartyMenuSoftboiledUseText
     db "@"
+
+; items which bring up the party menu when used
+UsableItems_PartyMenu: ; Moved in the Bank
+    db MOON_STONE
+    db ANTIDOTE
+    db BURN_HEAL
+    db ICE_HEAL
+    db AWAKENING
+    db PARLYZ_HEAL
+    db FULL_RESTORE
+    db MAX_POTION
+    db HYPER_POTION
+    db SUPER_POTION
+    db POTION
+    db FIRE_STONE
+    db THUNDER_STONE
+    db WATER_STONE
+    db HP_UP
+    db PROTEIN
+    db IRON
+    db CARBOS
+    db CALCIUM
+    db RARE_CANDY
+    db TRADE_STONE
+    db LEAF_STONE
+    db FULL_HEAL
+    db REVIVE
+    db MAX_REVIVE
+    db FRESH_WATER
+    db SODA_POP
+    db LEMONADE
+    db X_ATTACK
+    db X_DEFEND
+    db X_SPEED
+    db X_SPECIAL
+    db PP_UP
+    db ETHER
+    db MAX_ETHER
+    db ELIXER
+    db MAX_ELIXER
+    db $ff
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -86182,7 +86439,7 @@ Func_5c3df: ; 5c3df (17:43df)
     ld hl,$d755
     set 7,[hl]
     ld bc,(TM_34 << 8) | 3
-    call GiveItem
+    call GiveTechMachAndTM34 ; call GiveItem
     jr nc,.BagFull
     ld a,$5
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
@@ -89703,6 +89960,11 @@ GetLastFighter:
     ld [$cc4d],a
     ld a,$11
     jp Predef ; Hide Last Pokeball
+
+GiveTechMachAndTM34:
+    call GiveItem
+    ld bc,(TECH_MACHINE << 8) | 1
+    jp GiveItem
 
 SECTION "bank18",ROMX,BANK[$18]
 
@@ -122010,26 +122272,27 @@ _TM34PreReceiveText: ; 98092 (26:4092)
 
 _ReceivedTM34Text: ; 980ad (26:40ad)
     db $0,$52," received",$4f
-    db "a TM!@@"
+    db "TECH.MACHINE!@@"
 
 _TM34ExplanationText: ; 980c0 (26:40c0)
     db $0,$51
-    db "A TM contains a",$4f
-    db "technique that",$55
+    db "T.M. contains",$4f
+    db "techniques that",$55
     db "can be taught to",$55
     db "#MON!",$51
-    db "A TM is good only",$4f
-    db "once! So when you",$55
+    db "When you",$4f
     db "use one to teach",$55
     db "a new technique,",$55
     db "pick the #MON",$55
     db "carefully!",$51
-    db "This contains",$4f
-    db "BIDE!",$51
+    db "My Gift is",$4f
+    db "3x BIDE!",$51
     db "Your #MON will",$4f
     db "absorb damage in",$55
     db "battle then pay",$55
     db "it back double!",$57
+
+SECTION "_TM34NoRoomText",ROMX[$41ab],BANK[$26]
 
 _TM34NoRoomText: ; 981ab (26:41ab)
     db $0,"You don't have",$4f
@@ -125587,6 +125850,14 @@ _CableClubNPCText4: ; a29db (28:69db)
     db "your friend and",$55
     db "come again!",$57
 
+_ChoiceTMText:
+    db $0,"Which Technical",$4f
+    db "Machines Move?",$57
+
+_TMEmpy:
+    db $0,"Technical",$4f
+    db "Machines Empty!",$58
+
 SECTION "bank29",ROMX,BANK[$29]
 
 _CableClubNPCText5: ; a4000 (29:4000)
@@ -126749,14 +127020,16 @@ _BootedUpHMText: ; a6a30 (29:6a30)
     db $0,"Booted up a PWR!",$58
 
 _TeachMachineMoveText: ; a6a42 (29:6a42)
-    db $0,"It contained",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!",$51
-    db "Teach @"
+    ;db $0,"It contained",$4f
+    ;db "@"
+    ;TX_RAM $cf4b
+    ;db $0,"!",$51
+    db $0,"Teach @"
     TX_RAM $cf4b
     db $0,$4f
     db "to a #MON?",$57
+
+SECTION "_MonCannotLearnMachineMoveText",ROMX[$6a6e],BANK[$29]
 
 _MonCannotLearnMachineMoveText: ; a6a6e (29:6a6e)
     TX_RAM $cd6d
@@ -128388,7 +128661,7 @@ ItemNames: ; 472b (1:472b)
     db "LEAF STONE@"   ; $2F
     db "CARD KEY@"     ; $30
     db "NUGGET@"       ; $31
-    db "PP UP@"        ; $32
+    db "TECH.MACHINE@" ; $32
     db "POKé DOLL@"    ; $33
     db "FULL HEAL@"    ; $34
     db "REVIVE@"       ; $35
@@ -131459,6 +131732,9 @@ InitializeChooseQuantityMenu:
     and a ; should the price be halved (for selling items)?
     ld b,1  ; height
     jr nz,.SellOnly1Row
+    ld a,[$cf91] ; selected item ID
+    cp TM_01
+    jr nc,.SellOnly1Row
     ld b,3  ; height
 .SellOnly1Row
     ld c,11 ; width
@@ -131472,11 +131748,9 @@ InitializeChooseQuantityMenu:
     ld a,[$ff8e]
     and a ; should the price be halved (for selling items)?
     jr nz,.SkipShowBagInfo
-    FuncCoord 12,12
-    ld hl,Coord
-    ld de,.PackText
-    call PlaceString
     ld a,[$cf91] ; selected item ID
+    cp TM_01
+    jr nc,.SkipShowBagInfo
     ld b,a
     call IsItemInBag
     ld a,b
@@ -131486,14 +131760,27 @@ InitializeChooseQuantityMenu:
     ld de,wBackupItemCurrentQty ; quantity
     ld bc,$8102 ; print leading zeroes,1 byte,2 digits
     call PrintNumber
+    FuncCoord 12,12
+    ld hl,Coord
+    ld de,.PackText
+    call PlaceString
 .SkipShowBagInfo
     FuncCoord 8,10
     ld hl,Coord
 .printInitialQuantity
     ld de,InitialQuantityText
     call PlaceString
+    ld a,[$ff8e]
+    and a ; should the price be halved (for selling items)?
+    jr nz,.QtyStandard
+    ld a,[$cf91] ; selected item ID
+    cp TM_01
+    ld a,2 ; Initialize TM Qty to 2 (then increase)
+    jr nc,.QtyDone
+.QtyStandard
     xor a
-    ld [$cf96],a ; initialize current quantity to 0
+.QtyDone
+    ld [$cf96],a ; initialize current quantity to 0 (then increase)
     ret
 .PackText
     db "BAG ×@"
