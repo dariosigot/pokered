@@ -11526,7 +11526,7 @@ ItemPrices: ; 4608 (1:4608)
     bcd3   2100 ; LEAF_STONE
     bcd3      0 ; CARD_KEY
     bcd3  10000 ; NUGGET
-    bcd3   9800 ; XXX PP_UP
+    bcd3      0 ; TECH_MACHINE
     bcd3   1000 ; POKE_DOLL
     bcd3    600 ; FULL_HEAL
     bcd3  15000 ; REVIVE
@@ -23125,7 +23125,7 @@ ItemUsePtrTable: ; d5e1 (3:55e1)
     dw ItemUseEvoStone   ; LEAF_STONE
     dw ItemUseCardKey    ; CARD_KEY
     dw UnusableItem      ; NUGGET
-    dw UnusableItem      ; ??? PP_UP
+    dw ItemUseTechMach  ; TECH_MACHINE
     dw ItemUsePokedoll   ; POKE_DOLL
     dw ItemUseMedicine   ; FULL_HEAL
     dw ItemUseMedicine   ; REVIVE
@@ -25149,9 +25149,6 @@ ItemUseTMHM: ; e479 (3:6479)
     jp c,ItemUseNotTime
     sub a,TM_01
     push af
-    jr nc,.skipAdding
-    add a,55 ; if item is an HM,add 55
-.skipAdding
     inc a
     ld [$d11e],a
     ld a,$44
@@ -25240,6 +25237,9 @@ ItemUseTMHM: ; e479 (3:6479)
     ld a,b
     and a
     ret z
+    ld a,[$d152]
+    and a
+    ret nz ; if use TECH.MACHINE don't remove it
     ld a,[$cf91]
     call IsItemHM
     ret c
@@ -25640,7 +25640,7 @@ KeyItemBitfield: ; e799 (3:6799)
     db %01001111
     db %00000000
     db %10010111
-    db %00000000
+    db %00000010
     db %11000000
     db %11110000
     db %00111111
@@ -25875,6 +25875,104 @@ OldRodData:
     db SAFARI_ZONE_WEST
     db SAFARI_ZONE_CENTER
     db $FF
+
+ItemUseTechMach:
+    ld a,[$d152]
+    push af
+    ld a,[$cf91]
+    ld [$d152],a
+    push af
+    call GetTMChoiceItemID ; put item_ID in $cf91
+    call c,ItemUseTMHM
+    pop af
+    ld [$cf91],a
+    pop af
+    ld [$d152],a
+    ret
+
+GetTMChoiceItemID:
+    ld hl,ChoiceTMText
+    call PrintText
+    FuncCoord 0,10
+    ld hl,Coord
+    ld bc,$0112 ; 1,18
+    call TextBoxBorder
+    ld a,TM_01
+    ld [$cf91],a
+.start
+    FuncCoord 1,11
+    ld hl,Coord
+    ld bc,$0112 ; 1,18
+    call ClearScreenArea
+    call .GetAndPlaceName
+.getJoypadStateLoop
+    call GetJoypadStateLowSensitivity
+    ld a,[$ffb5]
+    and %00110011 ; ▼▲◄►StSeBA
+    jr z,.getJoypadStateLoop
+    bit 4,a ; pressed Right key?
+    jr z,.checkIfRightPressed
+;Right
+    ld hl,$cf91
+    ld a,[hl]
+    inc a
+    cp TM_54+1
+    jr c,.rightdone
+    ld a,TM_01
+.rightdone
+    ld [hl],a
+    jr .start
+.checkIfRightPressed
+    bit 5,a ; pressed Left key?
+    jr z,.checkIfAPressed
+;Left
+    ld hl,$cf91
+    ld a,[hl]
+    dec a
+    cp TM_01
+    jr nc,.leftdone
+    ld a,TM_54
+.leftdone
+    ld [hl],a
+    jr .start
+.checkIfAPressed
+    bit 0,a
+    jr z,.BPressed
+;A
+    scf
+    ret
+.BPressed
+;B
+    xor a ; rcf
+    ret
+.GetAndPlaceName
+    ld a,[$cf91]
+    sub TM_01
+    inc a
+    ld [$d11e],a
+    ld de,$d11e
+    FuncCoord 1,11
+    ld hl,Coord
+    ld bc,$0102 ; b=1 | c=2
+    call PrintNumber
+    ld a,$44
+    call Predef ; get move ID from TM/HM ID
+    ld a,[$d11e]
+    ld [$d0e0],a
+    call GetMoveName
+    call CopyStringToCF4B ; copy name to $cf4b
+    ld de,$cf4b
+    FuncCoord 4,11
+    ld hl,Coord
+    jp PlaceString
+
+ChoiceTMText:
+    TX_FAR _ChoiceTMText
+    db "@"
+
+_ChoiceTMText:
+    db $0,"Choice TM",$57
+
 
 SECTION "ItemUseReloadOverworldData",ROMX[$69c5],BANK[$3]
 
@@ -30157,6 +30255,7 @@ UsableItems_PartyMenu: ; 13434 (4:7434)
     db RARE_CANDY
     db TRADE_STONE
     db LEAF_STONE
+    db TECH_MACHINE
     db FULL_HEAL
     db REVIVE
     db MAX_REVIVE
@@ -128388,7 +128487,7 @@ ItemNames: ; 472b (1:472b)
     db "LEAF STONE@"   ; $2F
     db "CARD KEY@"     ; $30
     db "NUGGET@"       ; $31
-    db "PP UP@"        ; $32
+    db "TECH.MACHINE@" ; $32
     db "POKé DOLL@"    ; $33
     db "FULL HEAL@"    ; $34
     db "REVIVE@"       ; $35
