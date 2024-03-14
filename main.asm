@@ -14570,8 +14570,6 @@ BattleStyleOptionText: ; 5ffd (1:5ffd)
     db "?",$4E
     db "  0       1@"
 
-SECTION "OptionMenuCancelText",ROMX[$6018],BANK[$1] 
-
 OptionMenuCancelText: ; 6018 (1:6018)
     db "CANCEL@"
 
@@ -14607,9 +14605,12 @@ SetOptionsFromCursorPositions: ; 601f (1:601f)
 .battleStyleShift
     res 5,d
 .storeOptions
+    set 6,d ; Real Battle Style 
     ld a,d
     ld [W_OPTIONS],a
     ret
+
+SECTION "SetCursorPositionsFromOptions",ROMX[$604c],BANK[$1] 
 
 ; reads the options variable and places menu cursors in the correct positions within the options menu
 SetCursorPositionsFromOptions: ; 604c (1:604c)
