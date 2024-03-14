@@ -1104,8 +1104,11 @@ wNumBoxItems: ; d53a
     ds 1
 wBoxItems: ; d53b
 ; item, quantity
-    ds 50 * 2
+    ds 40 * 2
     ds 1 ; end
+
+wTM: ; d58c
+    ds 20
 
     ds 4
 
@@ -1504,12 +1507,12 @@ wEXPBarNeededEXP:
 wEXPBarKeepFullFlag:
     ds 1
     ds 36-11+(2*6)
-wArrayMiniSpriteLoaded ; df14 ; Denim
+wArrayMiniSpriteLoaded: ; df20 ; Denim
     ds 6
-wSpriteOAMBySpecies   ; df1a ; Denim
+wSpriteOAMBySpecies:   ; df26 ; Denim
                       ; bit 0 = Flag Tentativo Rinomina
     ds 1
-wSpriteOAMBySpeciesId ; df1b ; Denim
+wSpriteOAMBySpeciesId: ; df27 ; Denim
     ds 1
 
 SECTION "wBlkCurrentPaletteColor", WRAMX[$df30], BANK[1] ; Denim
