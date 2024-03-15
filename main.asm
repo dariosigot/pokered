@@ -3357,7 +3357,7 @@ PrintStatusCondition: ; 14e1 (0:14e1) ; Don't Print "FNT"
     ;ld [hl],"T"
     ;and a
     ;ret
-PrintStatusConditionNotFainted ; 14f6
+PrintStatusConditionNotFainted: ; 14f6
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(PrintStatusAilment)
@@ -31315,8 +31315,13 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     call Bankswitch
     call ResetTempIV
     jr c,.Genderless
+    ld a,[$cf9b] ; .OutOfBattleLevel
+    cp 10
     FuncCoord 17,2
     ld hl,Coord
+    jr nc,.GreaterThen9
+    dec hl
+.GreaterThen9
     ld de,.MaleIcon
     jr nz,.Male
     ld de,.FemaleIcon
@@ -52340,11 +52345,7 @@ ReadPlayerMonCurHPAndStatus: ; 3cd43 (f:4d43)
     ld bc,$4               ; 2 bytes HP,1 byte unknown (unused?),1 byte status
     jp CopyData
 
-DrawHUDsAndHPBars: ; 3cd5a (f:4d5a)
-    call DrawPlayerHUDAndHPBar
-    jp DrawEnemyHUDAndHPBar
-
-DrawPlayerHUDAndHPBar: ; 3cd60 (f:4d60)
+DrawPlayerHUDAndHPBar: ; Moved in the Bank
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     FuncCoord 9,7 ; $c435
@@ -52360,8 +52361,7 @@ DrawPlayerHUDAndHPBar: ; 3cd60 (f:4d60)
     ld de,W_PLAYERMONNAME
     FuncCoord 10,7 ; $c436
     ld hl,Coord
-    ; Denim,ExpBar
-;    call Func_3ce9c
+    ds 3 ; call CenterMonName
     call PlaceString
     call PrintEXPBar ; Denim,ExpBar
     ld hl,W_PLAYERMONID
@@ -52372,20 +52372,23 @@ DrawPlayerHUDAndHPBar: ; 3cd60 (f:4d60)
     ld de,$cfb9
     ld bc,$b
     call CopyData
-    FuncCoord 14,8 ; $c44e
+    FuncCoord 10,8
     ld hl,Coord
-    push hl
-    inc hl
+    ds 1 ; push hl
+    ds 1 ; inc hl
     ld de,$cf9c
     call PrintStatusConditionNotFainted
-    pop hl
-    jr nz,.asm_3cdae
+    ; ds 1 ; pop hl
+    ; ds 2 ; jr nz,.asm_3cdae
+    FuncCoord 14,8
+    ld hl,Coord
     call PrintLevel
-.asm_3cdae
+;.asm_3cdae
     ld a,[$cf98]
     ld [$cf91],a
-    FuncCoord 10,9 ; $c45e
-    ld hl,Coord
+    ;FuncCoord 10,9 ; $c45e
+    ;ld hl,Coord
+    call DrawCurrentMonGenderInBattle
     ld a,$5f
     call Predef ; indirect jump to Func_128ef (128ef (4:68ef))
     ld a,$1
@@ -52415,7 +52418,11 @@ DrawPlayerHUDAndHPBar: ; 3cd60 (f:4d60)
     set 7,[hl]
     ret
 
-DrawEnemyHUDAndHPBar: ; 3cdec (f:4dec)
+DrawHUDsAndHPBars: ; Moved in the Bank
+    call DrawPlayerHUDAndHPBar
+    ; ds 3 ; jp DrawEnemyHUDAndHPBar
+
+DrawEnemyHUDAndHPBar: ; Moved in the Bank
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld hl,wTileMap
@@ -52427,20 +52434,22 @@ DrawEnemyHUDAndHPBar: ; 3cdec (f:4dec)
     ld de,W_ENEMYMONNAME
     FuncCoord 1,0 ; $c3a1
     ld hl,Coord
-    call Func_3ce9c
+    ds 3 ; call CenterMonName
     call PlaceString
-    FuncCoord 4,1 ; $c3b8
+    FuncCoord 8,1
     ld hl,Coord
-    push hl
-    inc hl
+    ds 1 ; push hl
+    ds 1 ; inc hl
     ld de,W_ENEMYMONSTATUS ; $cfe9
     call PrintStatusConditionNotFainted
-    pop hl
-    jr nz,.asm_3ce23
+    ; ds 1 ; pop hl
+    ; ds 2 ; jr nz,.asm_3ce23
+    FuncCoord 3,1
+    ld hl,Coord
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld [$cfb9],a
     call PrintLevel
-.asm_3ce23
+;.asm_3ce23
     ld hl,W_ENEMYMONCURHP ; $cfe6
     ld a,[hli]
     ld [$FF00+$97],a
@@ -52507,6 +52516,8 @@ Func_3ce7f: ; 3ce7f (f:4e7f)
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld hl,$cf1e
 
+SECTION "GetBattleHealthBarColor",ROMX[$4e90],BANK[$f]
+
 GetBattleHealthBarColor: ; 3ce90 (f:4e90)
     ld b,[hl]
     call GetHealthBarColorWithGhostCheck ; call GetHealthBarColor
@@ -52516,24 +52527,29 @@ GetBattleHealthBarColor: ; 3ce90 (f:4e90)
     ld b,$1
     jp GoPAL_SET
 
-Func_3ce9c: ; 3ce9c (f:4e9c)
+; center's mon's name on the battle screen
+; if the name is 1 or 2 letters long, it is printed 2 spaces more to the right than usual
+; (i.e. for names longer than 4 letters)
+; if the name is 3 or 4 letters long, it is printed 1 space more to the right than usual
+; (i.e. for names longer than 4 letters)
+CenterMonName:
     push de
     inc hl
     inc hl
     ld b,$2
-.asm_3cea1
+.loop
     inc de
     ld a,[de]
-    cp $50
-    jr z,.asm_3ceb1
+    cp "@"
+    jr z,.done
     inc de
     ld a,[de]
-    cp $50
-    jr z,.asm_3ceb1
+    cp "@"
+    jr z,.done
     dec hl
     dec b
-    jr nz,.asm_3cea1
-.asm_3ceb1
+    jr nz,.loop
+.done
     pop de
     ret
 
@@ -55104,6 +55120,18 @@ CheckNotEscapeWildPokemon:
     ld hl,_CheckNotEscapeWildPokemon
     call Bankswitch
     pop hl
+    ret
+
+DrawCurrentMonGenderInBattle:
+    push de
+    push bc
+    ld hl,_DrawCurrentMonGenderInBattle
+    ld b,BANK(_DrawCurrentMonGenderInBattle)
+    call Bankswitch
+    pop bc
+    pop de
+    FuncCoord 10,9 ; $c45e
+    ld hl,Coord
     ret
 
 ; Free Space
@@ -128352,8 +128380,13 @@ _DrawCatchGender: ; Denim
     ld [$d11e],a
     call GetGender
     jr c,.Genderless
-    FuncCoord 8,1 ; 1 px più a destra causa status (PSN/PAR/...) che sovrascriverebbe
+    ld a,[W_ENEMYMONLEVEL]
+    cp 10
+    FuncCoord 6,1
     ld hl,Coord
+    jr nc,.GreaterThen9
+    dec hl
+.GreaterThen9
     ld de,.MaleIcon
     jr nz,.Male
     ld de,.FemaleIcon
@@ -128372,6 +128405,33 @@ _DrawCatchGender: ; Denim
     db $F5,$50
 .ShinyStarIcon
     db $D1,$50
+
+_DrawCurrentMonGenderInBattle:
+    ld hl,W_PLAYERMONIVS ; .BackSpriteInBattle
+    call SetTempIV
+    ld a,[W_PLAYERMONID]
+    ld [$d11e],a
+    call GetGender
+    jr c,.Genderless
+    ld a,[W_PLAYERMONLEVEL]
+    cp 10
+    FuncCoord 17,8
+    ld hl,Coord
+    jr nc,.GreaterThen9
+    dec hl
+.GreaterThen9
+    ld de,.MaleIcon
+    jr nz,.Male
+    ld de,.FemaleIcon
+.Male
+    call PlaceString
+.Genderless
+    call ResetTempIV
+    ret
+.MaleIcon
+    db $EF,$50
+.FemaleIcon
+    db $F5,$50
 
 DebugEnemyStats:
     ld a,[H_CURRENTPRESSEDBUTTONS]
