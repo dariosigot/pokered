@@ -31315,6 +31315,7 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     call Bankswitch
     call ResetTempIV
     jr c,.Genderless
+    push af
     ld a,[$cfb9] ; .OutOfBattleLevel
     cp 10
     FuncCoord 17,2
@@ -31322,6 +31323,7 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     jr nc,.GreaterThen9
     dec hl
 .GreaterThen9
+    pop af
     ld de,.MaleIcon
     jr nz,.Male
     ld de,.FemaleIcon
@@ -128380,6 +128382,7 @@ _DrawCatchGender: ; Denim
     ld [$d11e],a
     call GetGender
     jr c,.Genderless
+    push af
     ld a,[W_ENEMYMONLEVEL]
     cp 10
     FuncCoord 6,1
@@ -128387,6 +128390,7 @@ _DrawCatchGender: ; Denim
     jr nc,.GreaterThen9
     dec hl
 .GreaterThen9
+    pop af
     ld de,.MaleIcon
     jr nz,.Male
     ld de,.FemaleIcon
@@ -128413,6 +128417,7 @@ _DrawCurrentMonGenderInBattle:
     ld [$d11e],a
     call GetGender
     jr c,.Genderless
+    push af
     ld a,[W_PLAYERMONLEVEL]
     cp 10
     FuncCoord 17,8
@@ -128420,6 +128425,7 @@ _DrawCurrentMonGenderInBattle:
     jr nc,.GreaterThen9
     dec hl
 .GreaterThen9
+    pop af
     ld de,.MaleIcon
     jr nz,.Male
     ld de,.FemaleIcon
