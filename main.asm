@@ -31315,7 +31315,7 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     call Bankswitch
     call ResetTempIV
     jr c,.Genderless
-    ld a,[$cf9b] ; .OutOfBattleLevel
+    ld a,[$cfb9] ; .OutOfBattleLevel
     cp 10
     FuncCoord 17,2
     ld hl,Coord
