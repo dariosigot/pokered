@@ -29647,7 +29647,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     cp a,$05
     jr z,.evolutionStoneMenu
     push hl
-    ld bc,14+7 ; Denim,Spostato Stato a capo ; ld bc,14 ; 14 columns to the right
+    ld bc,14+6 ; Denim,Spostato Stato a capo ; ld bc,14 ; 14 columns to the right
     add hl,bc
     ld de,$CF9C
     call PrintStatusCondition
@@ -29683,9 +29683,9 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     call FixTMPalette ; call PlaceString
     pop hl
 .printLevel
-    ld bc,10 + 15 ; Denim,Spostato Livello Riga a Capo ; ld bc,10 ; move 10 columns to the right
+    ld bc,10 + 14 ; Denim,Spostato Livello Riga a Capo ; ld bc,10 ; move 10 columns to the right
     add hl,bc
-    call PrintLevel
+    call PrintLevelAndGender ; call PrintLevel
     pop hl
     pop de
     inc de
@@ -31306,14 +31306,7 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     ld de,IDNoText
     call PlaceString ; "ID/OT"
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ld hl,$cfb3 ; .OutOfBattle
-    call SetTempIV
-    ld a,[$cf98] ; Pokemon ID
-    ld [$d11e],a
-    ld hl,GetGender
-    ld b,BANK(GetGender)
-    call Bankswitch
-    call ResetTempIV
+    call GetGenderOutOfBattle
     jr c,.Genderless
     push af
     ld a,[$cfb9] ; .OutOfBattleLevel
@@ -31353,6 +31346,16 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     db $EF,$50
 .FemaleIcon
     db $F5,$50
+
+GetGenderOutOfBattle:
+    ld hl,$cfb3 ; .OutOfBattle
+    call SetTempIV
+    ld a,[$cf98] ; Pokemon ID
+    ld [$d11e],a
+    ld hl,GetGender
+    ld b,BANK(GetGender)
+    call Bankswitch
+    jp ResetTempIV
 
 PlaceDoubleVerticalBorderAndNextCoord: ; xxxxx (4:xxxx) ; Denim
     FuncCoord 19,1
@@ -32259,6 +32262,36 @@ UsableItems_PartyMenu: ; Moved in the Bank
     db ELIXER
     db MAX_ELIXER
     db $ff
+
+PrintLevelAndGender:
+    push hl
+    call PrintLevel
+    call GetGenderOutOfBattle
+    pop hl
+    push af
+    inc hl
+    inc hl
+    inc hl
+    pop af
+    jr c,.Genderless
+    push af
+    ld a,[$cfb9] ; .OutOfBattleLevel
+    cp 10
+    jr nc,.GreaterThen9
+    dec hl
+.GreaterThen9
+    pop af
+    ld de,.MaleIcon
+    jr nz,.Male
+    ld de,.FemaleIcon
+.Male
+    call PlaceString
+.Genderless
+    ret
+.MaleIcon
+    db $EF,$50
+.FemaleIcon
+    db $F5,$50
 
 SECTION "bank5",ROMX,BANK[$5]
 
