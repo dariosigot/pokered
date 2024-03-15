@@ -93844,12 +93844,12 @@ ViridianForestObject: ; Moved in the Bank
     db $2f,$12,$1,VIRIDIAN_FOREST_ENTRANCE
 
     db $6 ; signs
-    db $28,$18,$9 ; ViridianForestText9
-    db $20,$10,$a ; ViridianForestText10
-    db $11,$1a,$b ; ViridianForestText11
-    db $18,$4,$c ; ViridianForestText12
-    db $2d,$12,$d ; ViridianForestText13
-    db $1,$2,$e ; ViridianForestText14
+    db $28,$18,$c ; ViridianForestText9
+    db $20,$10,$d ; ViridianForestText10
+    db $11,$1a,$e ; ViridianForestText11
+    db $18,$4,$f ; ViridianForestText12
+    db $2d,$12,$10 ; ViridianForestText13
+    db $1,$2,$11 ; ViridianForestText14
 
     db $b ; people
     db SPRITE_BUG_CATCHER,$2b + 4,$10 + 4,$ff,$ff,$1 ; person
