@@ -37716,7 +37716,7 @@ DiglettsCaveRoute2Blocks: ; 0x1c20e size=16
 MonsterNames: ; 1c21e (7:421e)
     db "RHYDON@@@@"
     db "KANGASKHAN"
-    db "NIDORAN♂@@"
+    db "NIDORAN@@@"
     db "CLEFAIRY@@"
     db "SPEAROW@@@"
     db "VOLTORB@@@"
@@ -37728,7 +37728,7 @@ MonsterNames: ; 1c21e (7:421e)
     db "EXEGGCUTE@"
     db "GRIMER@@@@"
     db "GENGAR@@@@"
-    db "NIDORAN♀@@"
+    db "NIDORAN@@@"
     db "NIDOQUEEN@"
     db "CUBONE@@@@"
     db "RHYHORN@@@"
@@ -49995,6 +49995,46 @@ SetAttributeOamRedBall:
     ld [hli],a
     ret
 
+TryRandomForMew:
+    call GenRandom
+    cp STRUGGLE ; C - Set for no borrow. (Set if A < n.)
+    jr z,TryRandomForMew ; no id = 0
+    jr c,.TestMewJustKnow
+    jr TryRandomForMew
+.TestMewJustKnow
+    ld d,a
+    ld hl,W_PARTYMON1_MOVE1 ; $d173
+    ld a,[wWhichPokemon] ; $cf92
+    ld bc,$2c
+    call AddNTimes
+    ld b,4
+.checkCurrentMovesLoop2
+    ld a,[hli]
+    cp d
+    jr z,TryRandomForMew ; if mew just know the move
+    dec b
+    jr nz,.checkCurrentMovesLoop2
+    ld a,d
+    ret
+
+KogaAI:
+    cp $20
+    jp c,AIUseXAttack
+    ret
+
+LanceAI:
+    cp $80
+    jr nc,.lancereturn
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+.lancereturn
+    ret
+
+GenericAI:
+    and a ; clear carry
+    ret
+
 INCLUDE "constants/special_trainer.asm"
 
 SECTION "WriteMonMoves",ROMX[$6fb8],BANK[$e]
@@ -50428,10 +50468,7 @@ ErikaAI:
 .erikareturn
     ret
 
-KogaAI:
-    cp $20
-    jp c,AIUseXAttack
-    ret
+; KogaAI ; Moved in the Bank
 
 BlaineAI:    ;blaine needs to check HP. this was an oversight
     cp $20
@@ -50501,18 +50538,8 @@ AgathaAI:
 .agathareturn
     ret
 
-LanceAI:
-    cp $80
-    jr nc,.lancereturn
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-.lancereturn
-    ret
-
-GenericAI:
-    and a ; clear carry
-    ret
+; LanceAI   ; Moved in the Bank
+; GenericAI ; Moved in the Bank
 
 ; end of individual trainer AI routines
 
@@ -50545,28 +50572,6 @@ Func_3aef7: ; Moved in the Bank
     ld hl,$cd6d
     pop de
     jp CopyData
-
-TryRandomForMew:
-    call GenRandom
-    cp STRUGGLE ; C - Set for no borrow. (Set if A < n.)
-    jr z,TryRandomForMew ; no id = 0
-    jr c,.TestMewJustKnow
-    jr TryRandomForMew
-.TestMewJustKnow
-    ld d,a
-    ld hl,W_PARTYMON1_MOVE1 ; $d173
-    ld a,[wWhichPokemon] ; $cf92
-    ld bc,$2c
-    call AddNTimes
-    ld b,4
-.checkCurrentMovesLoop2
-    ld a,[hli]
-    cp d
-    jr z,TryRandomForMew ; if mew just know the move
-    dec b
-    jr nz,.checkCurrentMovesLoop2
-    ld a,d
-    ret
 
 INCLUDE "constants/pokemon_learnset.asm"
 
@@ -129060,7 +129065,7 @@ EvolutionMove:
    db 0                    ; PARAS
    db GROWTH               ; PARASECT
    db 0                    ; VENONAT
-   db PSYBEAM              ; VENOMOTH
+   db PIN_MISSILE          ; VENOMOTH
    db 0                    ; DIGLETT
    db TRI_ATTACK           ; DUGTRIO
    db 0                    ; MEOWTH
@@ -129597,7 +129602,7 @@ Route3Mons:
     db  7,SANDSHREW  ;  5%
     db  4,JIGGLYPUFF ;  5% ; Entry Level
     db  8,JIGGLYPUFF ;  4%
-    db  7,CLEFAIRY   ;  1% ; Entry Level
+    db  4,CLEFAIRY   ;  1% ; Entry Level
     db $00
 
 MoonMons1:
@@ -129630,16 +129635,16 @@ MoonMonsB1:
 
 MoonMonsB2:
     db $0A
-    db  9,ZUBAT    ; 20%
-    db  9,GEODUDE  ; 20%
-    db 10,ZUBAT    ; 15%
-    db 10,GEODUDE  ; 10%
-    db 11,ZUBAT    ; 10%
-    db 10,PARAS    ; 10%
-    db 13,PARAS    ;  5%
-    db 10,CLEFAIRY ;  5%
-    db 12,ZUBAT    ;  4%
-    db 12,CLEFAIRY ;  1%
+    db  9,ZUBAT      ; 20%
+    db  9,GEODUDE    ; 20%
+    db 10,ZUBAT      ; 15%
+    db 10,GEODUDE    ; 10%
+    db 11,ZUBAT      ; 10%
+    db 10,PARAS      ; 10%
+    db 13,PARAS      ;  5%
+    db 10,CLEFAIRY   ;  5%
+    db 12,ZUBAT      ;  4%
+    db 10,JIGGLYPUFF ;  1%
     db $00
 
 Route4Mons:
@@ -130413,8 +130418,8 @@ Route21Mons:
     db 22,ABRA       ; 20%
     db 22,DROWZEE    ; 20%
     db 25,KADABRA    ; 15% ; Entry Level
-    db 25,ABRA       ; 10% ; Entry Level
-    db 25,DROWZEE    ; 10% ; Entry Level
+    db 25,ABRA       ; 10%
+    db 25,DROWZEE    ; 10%
     db 28,KADABRA    ; 10%
     db 27,HYPNO      ;  5% ; Entry Level
     db 15,MR_MIME    ;  5% ; Entry Level

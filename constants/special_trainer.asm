@@ -454,7 +454,7 @@ Sony2MoveA:
     ; Pidgeot (Level 47)
     db SWOOP
     db AGILITY
-    db DOUBLE_EDGE
+    db MIRROR_MOVE
     db QUICK_ATTACK
     ; Rhydon (Level 45)
     db DOUBLE_KICK
@@ -487,7 +487,7 @@ Sony2MoveB:
     ; Pidgeot (Level 47)
     db SWOOP
     db AGILITY
-    db DOUBLE_EDGE
+    db MIRROR_MOVE
     db QUICK_ATTACK
     ; Rhydon (Level 45)
     db DOUBLE_KICK
@@ -520,7 +520,7 @@ Sony2MoveC:
     ; Pidgeot (Level 47)
     db SWOOP
     db AGILITY
-    db DOUBLE_EDGE
+    db MIRROR_MOVE
     db QUICK_ATTACK
     ; Rhydon (Level 45)
     db DOUBLE_KICK

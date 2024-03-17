@@ -310,9 +310,9 @@ Mon018_EvosMoves:
     db 0
 ;Learnset
     ;  36,DOUBLE_TEAM
-    db 44,AGILITY
-    db 47,DOUBLE_EDGE
-    db 50,MIRROR_MOVE
+    db 40,AGILITY
+    db 44,MIRROR_MOVE
+    db 50,DOUBLE_EDGE
     db 59,DRILL_PECK
     db 60,SKY_ATTACK
     db 0
@@ -327,13 +327,16 @@ Mon019_EvosMoves:
 ;Learnset
     ;   1,TACKLE
     ;   1,TAIL_WHIP
-    db  7,QUICK_ATTACK
-    db 11,BITE
+    db  4,SCRATCH
+    db  8,FURY_SWIPES
+    db 10,QUICK_ATTACK
+    db 13,BITE
     db 15,HYPER_FANG
     ;  20,RATICATE
     db 23,FOCUS_ENERGY
     db 29,DOUBLE_TEAM
-    db 34,SUPER_FANG
+    db 34,SLASH
+    db 40,SUPER_FANG
     db 0
 
 Mon020_EvosMoves:
@@ -348,6 +351,7 @@ Mon020_EvosMoves:
     db 42,SUPER_FANG
     db 47,BODY_SLAM
     db 51,DOUBLE_EDGE
+    db 56,EARTHQUAKE
     db 60,HYPER_BEAM
     db 0
 
@@ -359,9 +363,10 @@ Mon021_EvosMoves:
     db EV_LEVEL,20,FEAROW
     db 0
 ;Learnset
-    ;   1,PECK
+    ;   1,GUST
     ;   1,GROWL
-    db  9,LEER
+    db  5,LEER
+    db  9,PECK
     db 12,FURY_ATTACK
     db 16,WING_ATTACK
     db 19,WHIRLWIND
@@ -404,7 +409,7 @@ Mon023_EvosMoves:
     db 18,ACID
     db 21,HYPER_FANG
     ;  22,ARBOK
-    db 24,GLARE
+    db 26,GLARE
     db 29,SCREECH
     db 37,SLUDGE
     db 41,ABSORB
@@ -417,7 +422,7 @@ Mon024_EvosMoves:
     db 0
 ;Learnset
     ;  22,TRAPHOLE
-    db 27,GLARE
+    db 26,GLARE
     db 31,SCREECH
     db 36,SLUDGE
     db 41,MEGA_DRAIN
@@ -476,12 +481,14 @@ Mon027_EvosMoves:
     ;   1,SCRATCH
     ;   1,DEFENSE_CURL
     db  9,SAND_ATTACK
-    db 13,FURY_SWIPES
+    db 12,FURY_SWIPES
+    db 14,POISON_STING
     db 17,SLASH
     ;  22,SANDSLASH
     db 23,TRAPHOLE
-    db 26,POISON_STING
+    db 28,ROCK_THROW
     db 31,SWIFT
+    db 35,PIN_MISSILE
     db 43,EARTHQUAKE
     db 0
 
@@ -491,7 +498,7 @@ Mon028_EvosMoves:
     db 0
 ;Learnset
     ;  22,TRAPHOLE
-    db 26,POISON_STING
+    db 26,ROCK_THROW
     db 31,PIN_MISSILE
     db 36,SWIFT
     db 40,TWINEEDLE
@@ -725,6 +732,7 @@ Mon041_EvosMoves:
 ;Learnset
     ;   1,LEECH_LIFE
     ;   1,SUPERSONIC
+    db  7,POISON_STING
     db 11,BITE
     db 16,ACID
     db 21,HYPER_FANG
@@ -794,8 +802,9 @@ Mon045_EvosMoves:
     db 0
 ;Learnset
     ;  21,MEGA_DRAIN
-    db 38,PETAL_DANCE
-    db 44,SLUDGE
+    db 25,PETAL_DANCE
+    db 29,SLUDGE
+    db 44,SPORE
     db 52,SOLARBEAM
     db 60,SWORDS_DANCE
     db 0
@@ -811,11 +820,11 @@ Mon046_EvosMoves:
     ;   1,SCRATCH
     ;   1,STUN_SPORE
     db  9,LEECH_SEED
-    db 11,BLADE
+    db 11,LEECH_LIFE
     db 13,POISONPOWDER
-    db 17,LEECH_LIFE
+    db 17,ABSORB
     db 19,VICEGRIP
-    db 22,ABSORB
+    db 22,BLADE
     ;  24,PARASECT
     db 25,GROWTH
     db 28,SPORE
@@ -850,10 +859,11 @@ Mon048_EvosMoves:
 ;Learnset
     ;   1,TACKLE
     ;   1,DISABLE
-    db  8,SUPERSONIC
+    db  5,SUPERSONIC
+    db  8,PSYWAVE
     db 11,POISONPOWDER
+    db 13,CONFUSION
     db 15,LEECH_LIFE
-    db 19,CONFUSION
     db 23,STUN_SPORE
     db 28,SLEEP_POWDER
     ;  31,VENOMOTH
@@ -866,9 +876,9 @@ Mon049_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    ;  31,PSYBEAM
+    ;  31,PIN_MISSILE
     db 33,WHIRLWIND
-    db 35,PIN_MISSILE
+    db 35,PSYBEAM
     db 37,RAZOR_WIND
     db 39,SLUDGE
     db 41,SPORE
@@ -904,8 +914,8 @@ Mon051_EvosMoves:
 ;Learnset
     ;  26,TRI_ATTACK
     db 28,ROCK_THROW
-    db 35,SLASH
-    db 44,EARTHQUAKE
+    db 31,SLASH
+    db 40,EARTHQUAKE
     db 45,ROCK_SLIDE
     db 51,SWORDS_DANCE
     db 60,FISSURE
@@ -921,11 +931,14 @@ Mon052_EvosMoves:
 ;Learnset
     ;   1,SCRATCH
     ;   1,GROWL
-    db  7,QUICK_ATTACK
-    db 12,BITE
-    db 17,PAY_DAY
-    db 21,FURY_SWIPES
+    db  5,TAIL_WHIP
+    db  9,PAY_DAY
+    db 12,QUICK_ATTACK
+    db 15,BITE
+    db 18,FURY_SWIPES
+    db 21,SLAM
     db 24,SCREECH
+    db 26,GLARE
     ;  28,PERSIAN
     db 29,HYPER_FANG
     db 30,REST
@@ -940,6 +953,7 @@ Mon053_EvosMoves:
     ;  28,HYPER_FANG
     db 29,REST
     db 32,SLASH
+    db 36,TAKE_DOWN
     db 41,DOUBLE_TEAM
     db 47,BODY_SLAM
     db 51,DOUBLE_EDGE
@@ -956,10 +970,12 @@ Mon054_EvosMoves:
 ;Learnset
     ;   1,SCRATCH
     ;   1,TAIL_WHIP
-    db  9,PECK
-    db 13,DISABLE
-    db 17,CONFUSION
+    db  7,PSYWAVE
+    db 10,DISABLE
+    db 13,CONFUSION
+    db 17,PECK
     db 21,FURY_SWIPES
+    db 25,MEDITATE
     db 27,SCREECH
     db 31,PSYBEAM
     ;  33,GOLDUCK
@@ -992,7 +1008,7 @@ Mon056_EvosMoves:
     ;   1,SCRATCH
     ;   1,LEER
     db  9,LOW_KICK
-    db 12,DOUBLE_TEAM 
+    db 12,DOUBLE_TEAM
     db 15,KARATE_CHOP
     db 18,FURY_SWIPES
     db 21,MEGA_PUNCH
@@ -1074,6 +1090,7 @@ Mon060_EvosMoves:
 ;Learnset
     ;   1,BUBBLE
     ;   1,HYPNOSIS
+    db  7,TACKLE
     db 10,WATER_GUN
     db 14,DOUBLESLAP
     db 19,AGILITY
@@ -1110,7 +1127,8 @@ Mon062_EvosMoves:
     db 29,SEISMIC_TOSS
     db 32,BODY_SLAM
     db 34,TSUNAMI
-    db 37,HAZE
+    db 36,ICE_PUNCH
+    db 39,HAZE
     db 42,SUBMISSION
     db 51,HYDRO_PUMP
     db 60,EARTHQUAKE
@@ -1126,8 +1144,8 @@ Mon063_EvosMoves:
 ;Learnset
     ;   1,TELEPORT
     db  9,PSYWAVE
-    db 14,DISABLE
-    db 15,CONFUSION
+    db 12,CONFUSION
+    db 15,DISABLE
     ;  16,KADABRA
     db 25,PSYBEAM
     db 35,RECOVER
@@ -1258,8 +1276,9 @@ Mon071_EvosMoves:
     db 0
 ;Learnset
     ;  21,WRAP
-    db 38,RAZOR_LEAF
-    db 44,SLUDGE
+    db 25,RAZOR_LEAF
+    db 29,SLUDGE
+    db 44,SPORE
     db 52,SLAM
     db 60,SWORDS_DANCE
     db 0
@@ -1319,11 +1338,13 @@ Mon074_EvosMoves:
     db 16,MEGA_PUNCH
     db 21,SELFDESTRUCT
     ;  25,GRAVELER
-    db 26,TRAPHOLE
-    db 28,HARDEN
-    db 31,EARTHQUAKE
-    db 36,EXPLOSION
-    db 48,ROCK_SLIDE
+    db 28,TRAPHOLE
+    db 31,HARDEN
+    db 34,BODY_SLAM
+    db 35,FIRE_PUNCH
+    db 42,EARTHQUAKE
+    db 46,ROCK_SLIDE
+    db 53,EXPLOSION
     db 0
 
 Mon075_EvosMoves:
@@ -1334,13 +1355,13 @@ Mon075_EvosMoves:
     db 0
 ;Learnset
     ;  25,STOMP
-    db 28,BODY_SLAM
-    db 31,TRAPHOLE
+    db 28,TRAPHOLE
+    db 31,BODY_SLAM
     db 33,HARDEN
-    db 36,EARTHQUAKE
-    db 39,FIRE_PUNCH
-    db 43,EXPLOSION
-    db 51,ROCK_SLIDE
+    db 36,FIRE_PUNCH
+    db 40,EARTHQUAKE
+    db 44,ROCK_SLIDE
+    db 51,EXPLOSION
     db 60,FISSURE
     db 0
 
@@ -1350,12 +1371,12 @@ Mon076_EvosMoves:
     db 0
 ;Learnset
     ;  25,BODY_SLAM
-    db 31,TRAPHOLE
+    db 28,TRAPHOLE
     db 33,HARDEN
-    db 36,EARTHQUAKE
-    db 39,FIRE_PUNCH
-    db 43,EXPLOSION
-    db 51,ROCK_SLIDE
+    db 36,FIRE_PUNCH
+    db 40,EARTHQUAKE
+    db 44,ROCK_SLIDE
+    db 51,EXPLOSION
     db 60,FISSURE
     db 0
 
@@ -1406,7 +1427,8 @@ Mon079_EvosMoves:
 ;Learnset
     ;   1,TACKLE
     ;   1,GROWL
-    db 11,CONFUSION
+    db  7,PSYWAVE
+    db 12,CONFUSION
     db 15,WATER_GUN
     db 18,DISABLE
     db 22,HEADBUTT
@@ -1743,7 +1765,8 @@ Mon096_EvosMoves:
     ;   1,POUND
     ;   1,DISABLE
     db  6,TELEPORT
-    db  9,HYPNOSIS
+    db  9,PSYWAVE
+    db 13,HYPNOSIS
     db 16,DREAM_EATER
     db 17,CONFUSION
     db 21,HEADBUTT
@@ -1754,6 +1777,7 @@ Mon096_EvosMoves:
     db 38,LIGHT_SCREEN
     db 42,REST
     db 50,PSYCHIC_M
+    db 60,NIGHT_SHADE
     db 0
 
 Mon097_EvosMoves:
@@ -1856,9 +1880,11 @@ Mon102_EvosMoves:
 ;Learnset
     ;   1,BARRAGE
     ;   1,HYPNOSIS
-    db  7,REFLECT
-    db 13,LEECH_SEED
-    db 19,CONFUSION
+    db  7,PSYWAVE
+    db 10,REFLECT
+    db 13,CONFUSION
+    db 16,LEECH_SEED
+    db 20,TELEPORT
     db 25,STUN_SPORE
     db 28,POISONPOWDER
     db 31,SLEEP_POWDER
@@ -1877,10 +1903,12 @@ Mon103_EvosMoves:
     ;   1,BARRAGE
     ;   1,HYPNOSIS
     ;   1,STOMP
-    db 13,TELEPORT
-    db 19,CONFUSION
+    db  7,PSYWAVE
+    db 10,TELEPORT
+    db 13,CONFUSION
+    db 17,ABSORB
     db 22,EGG_BOMB
-    db 27,ABSORB
+    db 27,GROWTH
     db 32,PSYBEAM
     db 36,SELFDESTRUCT
     db 40,MEGA_DRAIN
@@ -2119,8 +2147,8 @@ Mon114_EvosMoves:
     db 27,STUN_SPORE
     db 29,MEGA_DRAIN
     db 32,SLAM
-    db 40,CONFUSION
-    db 47,SOLARBEAM
+    db 37,CONFUSION
+    db 42,SOLARBEAM
     db 51,SWORDS_DANCE
     db 60,AMNESIA
     db 0
@@ -2243,13 +2271,13 @@ Mon120_EvosMoves:
     ;   1,TACKLE
     ;   1,HARDEN
     db  6,WATER_GUN
-    db 15,MINIMIZE
-    db 19,CONVERSION
+    db 10,MINIMIZE
+    db 15,CONVERSION
     db 22,RECOVER
-    db 24,SONICBOOM
+    db 24,SUPERSONIC
     db 26,FLASH
     db 29,SWIFT
-    db 32,SUPERSONIC
+    db 32,SONICBOOM
     db 36,BUBBLEBEAM
     db 40,REFLECT
     db 43,CONFUSION
@@ -2267,12 +2295,12 @@ Mon121_EvosMoves:
     ;   1,TACKLE
     ;   1,HARDEN
     ;   1,BUBBLEBEAM
-    db 15,CONVERSION
-    db 19,RECOVER
-    db 22,SONICBOOM
+    db 10,CONVERSION
+    db 15,RECOVER
+    db 22,CONFUSION
     db 24,FLASH
     db 26,SWIFT
-    db 29,CONFUSION
+    db 29,SONICBOOM
     db 32,REFLECT
     db 36,AURORA_BEAM
     db 40,LIGHT_SCREEN
@@ -2292,8 +2320,9 @@ Mon122_EvosMoves:
 ;Learnset
     ;   1,POUND
     ;   1,BARRIER
-    db  6,CONFUSION
-    db 11,SUBSTITUTE
+    db  6,PSYWAVE
+    db 10,SUBSTITUTE
+    db 13,CONFUSION
     db 16,DOUBLESLAP
     db 20,MEDITATE
     db 23,LIGHT_SCREEN
@@ -2321,9 +2350,9 @@ Mon123_EvosMoves:
     db  7,AGILITY
     db 10,BLADE
     db 13,RAZOR_WIND
-    db 17,FOCUS_ENERGY
-    db 21,DOUBLE_TEAM
-    db 25,PIN_MISSILE
+    db 17,PIN_MISSILE
+    db 21,FOCUS_ENERGY
+    db 25,DOUBLE_TEAM
     db 28,SLASH
     db 31,WING_ATTACK
     db 33,SWORDS_DANCE
@@ -2434,9 +2463,9 @@ Mon127_EvosMoves:
     db  7,VICEGRIP
     db 10,HARDEN
     db 13,FURY_ATTACK
-    db 17,BIND
-    db 21,SEISMIC_TOSS
-    db 25,PIN_MISSILE
+    db 17,PIN_MISSILE
+    db 21,BIND
+    db 25,SEISMIC_TOSS
     db 28,STRIKE
     db 31,GUILLOTINE
     db 33,BARRIER
@@ -2457,10 +2486,10 @@ Mon128_EvosMoves:
 ;Learnset
     ;   1,TACKLE
     ;   1,TAIL_WHIP
-    db  9,HORN_ATTACK
-    db 11,RAGE
-    db 14,LEER
-    db 16,STOMP
+    db  7,HORN_ATTACK
+    db 10,LEER
+    db 13,BONE_CLUB
+    db 15,STOMP
     db 17,DOUBLE_KICK
     db 21,SLAM
     db 25,REST
@@ -2713,10 +2742,10 @@ Mon139_EvosMoves:
     ;  40,SPIKE_CANNON
     db 41,HORN_ATTACK
     db 43,TRAPHOLE
-    db 45,HORN_DRILL
+    db 45,ROCK_SLIDE
     db 49,HYDRO_PUMP
     db 52,BODY_SLAM
-    db 56,ROCK_SLIDE
+    db 56,HORN_DRILL
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -2752,10 +2781,10 @@ Mon141_EvosMoves:
     ;  40,SLASH
     db 41,GUILLOTINE
     db 43,TRAPHOLE
-    db 45,SWORDS_DANCE
+    db 45,ROCK_SLIDE
     db 49,HYDRO_PUMP
     db 52,BODY_SLAM
-    db 56,ROCK_SLIDE
+    db 56,SWORDS_DANCE
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────

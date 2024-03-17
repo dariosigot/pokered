@@ -731,7 +731,7 @@ RaticateBaseStats: ; 385f2 (e:45f2)
     tmlearn 6,8                    ; TOXIC|BODY_SLAM
     tmlearn 9,10,11,12,13,14,15    ; TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM
     tmlearn 20,24                  ; RAGE|THUNDERBOLT
-    tmlearn 25,28,31,32            ; THUNDER|TRAPHOLE|MIMIC|DOUBLE_TEAM
+    tmlearn 25,26,28,31,32         ; THUNDER|EARTHQUAKE|TRAPHOLE|MIMIC|DOUBLE_TEAM
     tmlearn 34,39,40               ; BIDE|SWIFT|SKULL_BASH
     tmlearn 44                     ; REST
     tmlearn 50                     ; SUBSTITUTE
@@ -1016,8 +1016,8 @@ SandslashBaseStats: ; 386d2 (e:46d2)
     dw SandslashPicBack
 
     ; attacks known at lvl 0
-    db SAND_ATTACK
     db FURY_SWIPES
+    db POISON_STING
     db SLASH
     db TRAPHOLE
 
@@ -1719,9 +1719,9 @@ ParasectBaseStats: ; 388e6 (e:48e6)
     dw ParasectPicBack
 
     ; attacks known at lvl 0
-    db LEECH_LIFE
-    db VICEGRIP
     db ABSORB
+    db VICEGRIP
+    db BLADE
     db GROWTH
 
     db 0 ; growth rate
@@ -1793,10 +1793,10 @@ VenomothBaseStats: ; 3891e (e:491e)
     dw VenomothPicBack
 
     ; attacks known at lvl 0
-    db CONFUSION
+    db LEECH_LIFE
     db STUN_SPORE
     db SLEEP_POWDER
-    db PSYBEAM
+    db PIN_MISSILE
 
     db 0 ; growth rate
 
@@ -1941,9 +1941,9 @@ PersianBaseStats: ; 3898e (e:498e)
     dw PersianPicBack
 
     ; attacks known at lvl 0
-    db PAY_DAY
-    db FURY_SWIPES
+    db SLAM
     db SCREECH
+    db GLARE
     db HYPER_FANG
 
     db 0 ; growth rate
@@ -2015,7 +2015,7 @@ GolduckBaseStats: ; 389c6 (e:49c6)
     dw GolduckPicBack
 
     ; attacks known at lvl 0
-    db FURY_SWIPES
+    db MEDITATE
     db SCREECH
     db PSYBEAM
     db WATER_GUN
@@ -2349,8 +2349,8 @@ KadabraBaseStats: ; 38ac2 (e:4ac2)
 
     ; attacks known at lvl 0
     db PSYWAVE
-    db DISABLE
     db CONFUSION
+    db DISABLE
     db KINESIS
 
     db 3 ; growth rate
@@ -2385,8 +2385,8 @@ AlakazamBaseStats: ; 38ade (e:4ade)
     dw AlakazamPicBack
 
     ; attacks known at lvl 0
-    db DISABLE
     db CONFUSION
+    db DISABLE
     db KINESIS
     db PSYBEAM
 

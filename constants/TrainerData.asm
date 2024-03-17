@@ -124,7 +124,7 @@ JrTrainerMData:
 
 JrTrainerFData:
 ; Cerulean Gym
-    db 19,GOLDEEN,0
+    db 18,GOLDEEN,0
 ; Route 6
     db 16,RATTATA,PIKACHU,0
     db 16,PIDGEY,PIDGEY,PIDGEY,0
