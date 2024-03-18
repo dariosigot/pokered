@@ -23710,8 +23710,8 @@ ItemUseEvoStone: ; da5b (3:5a5b)
     ld a,$8e
     call PlaySoundWaitForCurrent ; play sound
     call WaitForSoundToFinish ; wait for sound to end
-    ld hl,Func_3ad0e
-    ld b,BANK(Func_3ad0e)
+    ld hl,TryEvolvingMon
+    ld b,BANK(TryEvolvingMon)
     call Bankswitch ; try to evolve pokemon
     ld a,[$d121]
     and a
@@ -24366,8 +24366,8 @@ ItemUseMedicine: ; dabb (3:5abb)
     call Predef ; learn level up move,if any
     xor a
     ld [$ccd4],a
-    ld hl,Func_3ad0e
-    ld b,BANK(Func_3ad0e)
+    ld hl,TryEvolvingMon
+    ld b,BANK(TryEvolvingMon)
     call Bankswitch ; evolve pokemon,if appropriate
     ld a,$01
     ld [$cfcb],a
@@ -30929,7 +30929,7 @@ Func_137aa: ; 137aa (4:77aa)
     xor a
     ld [$ccd4],a
     ld a,$2a
-    call Predef ; indirect jump to Func_3ad1c (3ad1c (e:6d1c))
+    call Predef ; indirect jump to EvolutionAfterBattle (3ad1c (e:6d1c))
 .asm_13813
     xor a
     ld [$d083],a
@@ -33747,9 +33747,9 @@ Func_17d7d: ; Moved in the Bank
     ld [$ccd4],a
     ld a,$32
     ld [W_ISLINKBATTLE],a ; $d12b
-    ld hl,Func_3ad0e
-    ld b,BANK(Func_3ad0e)
-    call Bankswitch ; indirect jump to Func_3ad0e (3ad0e (e:6d0e))
+    ld hl,TryEvolvingMon
+    ld b,BANK(TryEvolvingMon)
+    call Bankswitch ; indirect jump to TryEvolvingMon (3ad0e (e:6d0e))
     xor a
     ld [W_ISLINKBATTLE],a ; $d12b
     jp Func_2307
@@ -49132,6 +49132,15 @@ Func_3af52: ; Moved in the Bank
     ret z
     jp ReloadTilesetTilePatterns
 
+BugfixEvolutionStoneInBattle:
+    ld a,[W_ISINBATTLE] ; no battle,this is 0
+    and a
+    ret nz ; ret if in battle
+.NoBattle
+    ld a,[$cf91]
+    cp b
+    ret
+
 INCLUDE "constants/TrainerData.asm"
 
 SECTION "DecrementAICount",ROMX[$6695],BANK[$e]
@@ -49728,7 +49737,7 @@ Func_3bb97: ; Moved in the Bank
     ld hl,Func_3fb53 ; $7b53
     jp BankswitchEtoF
 
-Func_3ad0e: ; Moved in the Bank
+TryEvolvingMon: ; Moved in the Bank
     ld hl,$ccd3
     xor a
     ld [hl],a
@@ -49737,7 +49746,7 @@ Func_3ad0e: ; Moved in the Bank
     ld b,$1
     call Func_3b057
 
-Func_3ad1c: ; Moved in the Bank
+EvolutionAfterBattle: ; Moved in the Bank
     ld a,[$FF00+$d7]
     push af
     xor a
@@ -49789,48 +49798,48 @@ Evolution_PartyMonLoop: ; Moved in the Bank
     ld [$cf91],a
     pop hl
 
-TryEvolution: ; Moved in the Bank
+TryEvolution: ; loop over evolution entries ; Moved in the Bank
     ld a,[hli]
     and a
     jr z,Evolution_PartyMonLoop
     ld b,a
-    cp $3
-    jr z,.asm_3ad91
+    cp EV_TRADE
+    jr z,.checkTradeEvo
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $32
     jr z,Evolution_PartyMonLoop
     ld a,b
-    cp $2
-    jr z,.asm_3ada4
+    cp EV_ITEM
+    jr z,.checkItemEvo
     ld a,[$ccd4]
     and a
     jr nz,Evolution_PartyMonLoop
     ld a,b
-    cp $1
-    jr z,.asm_3adad
-.asm_3ad91
+    cp EV_LEVEL
+    jr z,.checkLevel
+.checkTradeEvo
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $32
-    jp nz,Func_3aed9
+    jp nz,nextEvoEntry1
     ld a,[hli]
     ld b,a
     ld a,[$cfb9]
     cp b
     jp c,Evolution_PartyMonLoop
-    jr .asm_3adb6
-.asm_3ada4
+    jr .doEvolution
+.checkItemEvo
     ld a,[hli]
     ld b,a
-    ld a,[$cf91]
-    cp b
-    jp nz,Func_3aed9
-.asm_3adad
+    call BugfixEvolutionStoneInBattle ; ds 3 ; ld a,[$cf91]
+    nop ; ds 1 ; cp b
+    jp nz,nextEvoEntry1 ; if in battle next
+.checkLevel
     ld a,[hli]
     ld b,a
     ld a,[$cfb9]
     cp b
-    jp c,Func_3aeda
-.asm_3adb6
+    jp c,nextEvoEntry2
+.doEvolution
     ld [W_CURENEMYLVL],a ; $d127
     ld a,$1
     ld [$d121],a
@@ -49962,12 +49971,12 @@ TryEvolution: ; Moved in the Bank
     push hl
     ld l,e
     ld h,d
-    jr Func_3aeda
+    jr nextEvoEntry2
 
-Func_3aed9: ; Moved in the Bank
+nextEvoEntry1: ; Moved in the Bank
     inc hl
 
-Func_3aeda: ; Moved in the Bank
+nextEvoEntry2: ; Moved in the Bank
     inc hl
     jp TryEvolution
 
@@ -73088,7 +73097,7 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     dbw BANK(Func_3ed02),Func_3ed02
     db BANK(DisplayPokedexMenu_)
     dw DisplayPokedexMenu_
-    dbw BANK(Func_3ad1c),Func_3ad1c
+    dbw BANK(EvolutionAfterBattle),EvolutionAfterBattle
     dbw BANK(SaveSAVtoSRAM0),SaveSAVtoSRAM0
     dbw BANK(InitOpponent),InitOpponent
     dbw BANK(Func_5a5f),Func_5a5f
