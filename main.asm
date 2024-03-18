@@ -93994,7 +93994,7 @@ DiglettsCaveObject: ; 0x61f72 (size=20)
 
     db $2 ; people
     db SPRITE_AERODACTYL,$4 + 4,$20 + 4,$ff,$d0,$1 ; person
-    db SPRITE_HIKER,$1c + 4,$d + 4,$ff,$d0,$2 ; person
+    db SPRITE_HIKER,$1c + 4,$d + 4,$ff,$d1,$2 ; person
 
     ; warp-to
     EVENT_DISP $14,$5,$5 ; DIGLETTS_CAVE_EXIT
