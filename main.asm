@@ -3115,14 +3115,18 @@ LoadMonData: ; 1372 (0:1372)
     jp Bankswitch
 
 ; writes c to $d0dc+b
-Func_137a: ; 137a (0:137a)
-    ld hl,$d0dc
-    ld e,b
-    ld d,$0
-    add hl,de
-    ld a,c
-    ld [hl],a
-    ret
+;Func_137a: ; 137a (0:137a)
+;    ld hl,$d0dc
+;    ld e,b
+;    ld d,$0
+;    add hl,de
+;    ld a,c
+;    ld [hl],a
+;    ret
+
+; Some Free Bytes Bank 0
+
+SECTION "LoadFlippedFrontSpriteByMonIndex",ROM0[$1384]
 
 LoadFlippedFrontSpriteByMonIndex: ; 1384 (0:1384)
     ld a,$1
@@ -10244,51 +10248,50 @@ PrintNumber: ; 3c5f (0:3c5f)
     jr z,.tenThousandsPlace
     cp a,6
     jr z,.hundredThousandsPlace
+    cp a,7
+    jr z,.millionsPlace
+.tenMillionsPlace
+    ld a,10000000 >> 16
+    ld [H_POWEROFTEN],a
+    ld a,(10000000 >> 8) & $FF
+    ld [H_POWEROFTEN + 1],a
+    ld a,10000000 & $FF
+    call .ProcessStep
 .millionsPlace
     ld a,1000000 >> 16
     ld [H_POWEROFTEN],a
     ld a,(1000000 >> 8) & $FF
     ld [H_POWEROFTEN + 1],a
     ld a,1000000 & $FF
-    ld [H_POWEROFTEN + 2],a
-    call PrintNumber_PrintDigit
-    call PrintNumber_AdvancePointer
+    call .ProcessStep
 .hundredThousandsPlace
     ld a,100000 >> 16
     ld [H_POWEROFTEN],a
     ld a,(100000 >> 8) & $FF
     ld [H_POWEROFTEN + 1],a
     ld a,100000 & $FF
-    ld [H_POWEROFTEN + 2],a
-    call PrintNumber_PrintDigit
-    call PrintNumber_AdvancePointer
+    call .ProcessStep
 .tenThousandsPlace
     xor a
     ld [H_POWEROFTEN],a
     ld a,10000 >> 8
     ld [H_POWEROFTEN + 1],a
     ld a,10000 & $FF
-    ld [H_POWEROFTEN + 2],a
-    call PrintNumber_PrintDigit
-    call PrintNumber_AdvancePointer
+    call .ProcessStep
 .thousandsPlace
     xor a
     ld [H_POWEROFTEN],a
     ld a,1000 >> 8
     ld [H_POWEROFTEN + 1],a
     ld a,1000 & $FF
-    ld [H_POWEROFTEN + 2],a
-    call PrintNumber_PrintDigit
-    call PrintNumber_AdvancePointer
+    call .ProcessStep
 .hundredsPlace
     xor a
     ld [H_POWEROFTEN],a
     xor a
     ld [H_POWEROFTEN + 1],a
     ld a,100
-    ld [H_POWEROFTEN + 2],a
-    call PrintNumber_PrintDigit
-    call PrintNumber_AdvancePointer
+    call .ProcessStep
 .tensPlace
     ld c,00
     ld a,[H_NUMTOPRINT + 2]
@@ -10320,6 +10323,12 @@ PrintNumber: ; 3c5f (0:3c5f)
     dec de
     pop bc
     ret
+.ProcessStep
+    ld [H_POWEROFTEN + 2],a
+    call PrintNumber_PrintDigit
+    jp PrintNumber_AdvancePointer
+
+SECTION "PrintNumber_PrintDigit",ROM0[$3d25] 
 
 ; prints a decimal digit
 ; This works by repeatedely subtracting a power of ten until the number becomes negative.
@@ -29143,45 +29152,35 @@ StatusScreen: ; 12953 (4:6953)
     push af
     xor a
     ld [$ff00+$d7],a
-    FuncCoord 19,3 ; Denim ; FuncCoord 19,1
+    FuncCoord 18,2
     ld hl,Coord
-    ld bc,$040a ; Denim ; ld bc,$060a
+    ld bc,$0207
     call DrawLineBox ; Draws the box around name,HP and status
-    ld de,$fffa
-    add hl,de
+    FuncCoord 15,5
+    ld hl,Coord
     ld [hl],$f2 ; . after No ("." is a different one)
     dec hl
     ld [hl],"№"
-    FuncCoord 19,9
+    FuncCoord 9,7
     ld hl,Coord
-    ld bc,$0806
+    ld bc,$0a07
     call DrawLineBox ; Draws the box around types,ID No. and OT
-    FuncCoord 10,10 ; Denim ; FuncCoord 10,9
-    ld hl,Coord
-    ld de,Type1Text
-    call PlaceStringTypeIDOTShinyGender ; Denim ; call PlaceString ; "TYPE1/"
-    FuncCoord 11,3
+    ;FuncCoord 0,7
+    ;ld hl,Coord
+    ;ld de,Type1Text
+    ;call PlaceString ; "TYPE/"
+    FuncCoord 10,2
     ld hl,Coord
     PREDEF DrawHPBarPredef ; predef $5f
     ld hl,$cf25
     call GetHealthBarColor
     ld b,$3
     call GoPAL_SET ; SGB palette
-    FuncCoord 11,9 ; Denim ; FuncCoord 16,6
+    FuncCoord 10,1
     ld hl,Coord
     ld de,$cf9c
     call PrintStatusCondition
-    jr nz,.StatusWritten ; 0x129fc $9
-    FuncCoord 11,9 ; Denim ; FuncCoord 16,6
-    ld hl,Coord
-    ld de,OKText
-    call PlaceString ; "OK"
-.StatusWritten
-    FuncCoord 10,8 ; Denim ; FuncCoord 9,6
-    ld hl,Coord
-    ld de,StatusText
-    call PlaceString ; "STATUS/"
-    FuncCoord 14,2
+    FuncCoord 14,1
     ld hl,Coord
     call PrintLevel ; Pokémon level
     ld a,[$d0b8]
@@ -29189,39 +29188,44 @@ StatusScreen: ; 12953 (4:6953)
     ld [$d0b5],a
     ld a,$3a
     call Predef
-    FuncCoord 3,7
+    FuncCoord 16,5
     ld hl,Coord
     ld de,$d11e
     ld bc,$8103 ; Zero-padded,3
     call PrintNumber ; Pokémon no.
-    FuncCoord 11,11 ; Denim ; FuncCoord 11,10
+    FuncCoord 1,8
     ld hl,Coord
     ld a,$4b
     call Predef ; Prints the type (?)
     ld hl,Unknown_12a9d ; $6a9d
-    call .unk_12a7e
+    call unk_12a7e
     ld d,h
     ld e,l
-    FuncCoord 9,1
+    FuncCoord 10,0
     ld hl,Coord
     call PlaceString ; Pokémon name
     ld hl,Unknown_12a95 ; $6a95
-    call .unk_12a7e
+    call unk_12a7e
     ld d,h
     ld e,l
-    FuncCoord 12,16 ; Denim ; FuncCoord 12,16
+    FuncCoord 1,12
     ld hl,Coord
     call PlaceString ; OT
-    FuncCoord 12,14 ; Denim ; FuncCoord 12,14
+    FuncCoord 4,11
     ld hl,Coord
     ld de,$cfa4
     ld bc,$8205 ; 5
     call PrintNumber ; ID Number
+    FuncCoord 0,11
+    ld hl,Coord
+    ld de,IDNoText
+    call PlaceString ; "ID/OT"
     ld d,$0
-    call PrintStatsBox
+    call PlaceStatusScreenShinyGenderEtc ; call PrintStatsBox
+    call ExperienceSection
     call Delay3
     call GBPalNormal
-    FuncCoord 0,0 ; Denim ; FuncCoord 1,0 ; $c3a1
+    FuncCoord 0,0
     ld hl,Coord
     call LoadFlippedFrontSpriteByMonIndex ; draw Pokémon picture
     ld a,[$cf91]
@@ -29230,7 +29234,8 @@ StatusScreen: ; 12953 (4:6953)
     pop af
     ld [$ff00+$d7],a
     ret
-.unk_12a7e ; 0x12a7e ; I don't know what this does,iterates over pointers?
+
+unk_12a7e: ; 0x12a7e ; I don't know what this does,iterates over pointers?
     ld a,[$cc49]
     add a
     ld c,a
@@ -29245,40 +29250,90 @@ StatusScreen: ; 12953 (4:6953)
     ld a,[wWhichPokemon]
     jp SkipFixedLengthTextEntries
 
-Unknown_12a95: ; 12a95 (4:6a95)
+;Type1Text:
+;    db "Type",$d3,"@",$4e
+IDNoText:
+    db "OT",$d3,$4e,"@"
+
+ExperienceSection:
+    FuncCoord 0,14
+    ld hl,Coord
+    ld de,EXPPointsText
+    call PlaceString
+    ld de,$cfa6
+    FuncCoord 0,15
+    ld hl,Coord
+    ld bc,$0308
+    call PrintNumber ; exp
+    call .asm_12c86
+    ld hl,$cfa6
+    ld a,[hli]
+    ld b,a
+    ld a,[hli]
+    ld c,a
+    ld a,[hl]
+    or b
+    or c
+    and a
+    ret z ; skipExpLevelUp
+    FuncCoord 8,16
+    ld hl,Coord
+    ld de,LevelUpText
+    call PlaceString
+    ld de,$cfa6
+    FuncCoord 0,16
+    ld hl,Coord
+    ld bc,$0308
+    jp PrintNumber
+
+.asm_12c86 ; This does some magic with lvl/exp?
+    ld a,[$cfb9] ; Load level
+    cp $64
+    jr z,.asm_12ca7 ; 0x12c8b $1a ; If 100
+    inc a
+    ld d,a
+    ld hl,CalcExperience
+    ld b,BANK(CalcExperience)
+    call Bankswitch
+    ld hl,$cfa8
+    ld a,[$ff00+$98]
+    sub [hl]
+    ld [hld],a
+    ld a,[$ff00+$97]
+    sbc [hl]
+    ld [hld],a
+    ld a,[$ff00+$96]
+    sbc [hl]
+    ld [hld],a
+    ret
+.asm_12ca7
+    ld hl,$cfa6
+    xor a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+    ret
+
+EXPPointsText:
+    db "Exp Pt",$D3,"@"
+
+LevelUpText:
+    db $D4,"@"
+
+Unknown_12a95:
     dw W_PARTYMON1OT
     dw W_ENEMYMON1OT
     dw $DD2A
     dw $DA54
 
-Unknown_12a9d: ; 12a9d (4:6a9d)
+Unknown_12a9d:
     dw W_PARTYMON1NAME
     dw W_ENEMYMON1NAME
     dw $DE06
     dw $DA49
 
-Type1Text: ; 12aa5 (4:6aa5) ; Denim
-;    db "TYPE1/",$4e
-    db "TYPE/@",$4e
-
-Type2Text: ; 12aac (4:6aac) ; Denim
-;    db "TYPE2/",$4e
-    ds 7
-
-IDNoText: ; 12ab3 (4:6ab3)
-    db $73,"№","/",$4e
-
-OTText: ; 12ab7 (4:6ab7)
-    db "OT/",$4e,"@"
-
-StatusText: ; 12abc (4:6abc)
-    db "STATUS/@"
-
-OKText: ; 12ac4 (4:6ac4)
-    db "OK@"
-
 ; Draws a line starting from hl high b and wide c
-DrawLineBox ; 0x12ac7
+DrawLineBox:
     ld de,$0014 ; New line
 .PrintVerticalLine
     ld [hl],$78 ; │
@@ -29295,61 +29350,8 @@ DrawLineBox ; 0x12ac7
     ld [hl],$6f ; ← (halfarrow ending)
     ret
 
-PTile: ; 12adc (4:6adc) ; This is a single 1bpp "P" tile
+PTile: ; This is a single 1bpp "P" tile
     INCBIN "gfx/p_tile.1bpp"
-
-PrintStatsBox: ; 12ae4 (4:6ae4)
-    ld a,d
-    and a ; a is 0 from the status screen
-    jr nz,.DifferentBox ; 0x12ae6 $12
-    FuncCoord 0,8
-    ld hl,Coord
-    ld b,$8
-    ld c,$8
-    call TextBoxBorder ; Draws the box
-    FuncCoord 1,9 ; Start printing stats from here
-    ld hl,Coord
-    ld bc,$0019 ; Number offset
-    jr .PrintStats ; 0x12af8 $10
-.DifferentBox
-    call DetermineCoordinateStatsBox
-.PrintStats
-    push bc
-    push hl
-    ld de,StatsText
-    call PlaceString
-    pop hl
-    pop bc
-    add hl,bc
-    ld de,$cfbc
-    ld bc,$0203 ; three digits
-    call PrintStat
-    ld de,$cfbe
-    call PrintStat
-    ld de,$cfc0
-    call PrintStat
-    ld de,$cfc2
-    jp PrintNumber
-PrintStat
-    push hl
-    call PrintNumber
-    pop hl
-    ld de,$0028
-    add hl,de
-    ret
-
-GetMaxLevelBank4:
-    ld hl,GetMaxLevel
-    ld b,BANK(GetMaxLevel)
-    jp Bankswitch ; d = Max Level
-
-SECTION "StatsText",ROMX[$6b3a],BANK[$4]
-
-StatsText: ; 12b3a (4:6b3a)
-    db "ATTACK",$4e
-    db "DEFENSE",$4e
-    db "SPEED",$4e
-    db "SPECIAL@"
 
 StatusScreen2: ; 12b57 (4:6b57)
     ld a,[$ff00+$d7]
@@ -29360,59 +29362,44 @@ StatusScreen2: ; 12b57 (4:6b57)
     ld bc,$0005
     ld hl,$d0dc
     call FillMemory
-    ld hl,$cfa0
-    ld de,$d0dc
-    ld bc,$0004
-    call CopyData
-    ld hl,Func_39b87
-    ld b,BANK(Func_39b87)
+
+    call GBPalWhiteOutWithDelay3
+    call ClearScreen
+
+    ld b,BANK(LoadFontTilePatternsWithWall)
+    ld hl,LoadFontTilePatternsWithWall
     call Bankswitch
-    FuncCoord 7,2 ; Denim ; FuncCoord 9,2 ; la cancellazione deve avvenire 2 tiles più a sx causa immagine spostata
+
+    ld b,14
+    call GoPAL_SET
+
+    FuncCoord 19,1
     ld hl,Coord
-    ld bc,$050c ; Denim ; ld bc,$050a ; la cencellazione deve ricoprire un area più grande
-    call ClearScreenArea ; Clear under name
-    call PlaceDoubleVerticalBorderAndNextCoord ; Denim
-    ; FuncCoord 19,3 ; $c3ef                  ; ..
-    ; ld hl,Coord                             ; ..
-    ld [hl],$78 ; bordo verticale 1 tile
-    FuncCoord 0,8
+    ld bc,$1011
+    call DrawLineBox
+    ld hl,Unknown_12a9d ; $6a9d
+    call unk_12a7e
+    ld d,h
+    ld e,l
+    FuncCoord 1,0
     ld hl,Coord
-    ld b,$8
-    ld c,$12
-    call TextBoxBorder ; Draw move container
-    FuncCoord 2,9
-    ld hl,Coord
-    ld de,$d0e1
-    call PlaceString ; Print moves
-    ld a,[$cd6c]
-    inc a
-    ld c,a
-    ld a,$4
-    sub c
-    ld b,a ; Number of moves ?
-    FuncCoord 11,10
-    ld hl,Coord
-    ld de,$0028
-    ld a,$72
-    call Func_12ccb ; Print "PP"
-    ld a,b
-    and a
-    jr z,.InitPP ; 0x12bb3 $6
-    ld c,a
-    ld a,"-"
-    call Func_12ccb ; Fill the rest with --
-.InitPP ; 12bbb
+    call PlaceString ; Pokémon name
+    ld h,b
+    ld l,c
+    ld de,.MovesText
+    call PlaceString
     ld hl,$cfa0
-    FuncCoord 14,10
+    FuncCoord 5,4 ; Move PP
     ld de,Coord
     ld b,$0
 .PrintPP ; 12bc3
     ld a,[hli]
     and a
-    jr z,.PPDone ; 0x12bc5 $4a
     push bc
     push hl
+    call nz,.PlaceMoveNameTypeAcrPwr
     push de
+    jr z,.EmptyMove
     ld hl,wCurrentMenuItem
     ld a,[hl]
     push af
@@ -29444,8 +29431,9 @@ StatusScreen2: ; 12b57 (4:6b57)
     ld de,$d11e
     ld bc,$0102
     call PrintNumber
+.next
     pop hl
-    ld de,$0028
+    ld de,80
     add hl,de
     ld d,h
     ld e,l
@@ -29456,51 +29444,10 @@ StatusScreen2: ; 12b57 (4:6b57)
     cp $4
     jr nz,.PrintPP ; 0x12c0f $b2
 .PPDone
-    FuncCoord 9,3
-    ld hl,Coord
-    ld de,EXPPointsText
-    call PlaceString
-    ld a,[$cfb9] ; level
-    push af
-    cp $64
-    jr z,.Level100 ; 0x12c20 $4
-    inc a
-    ld [$cfb9],a ; Increase temporarily if not 100
-.Level100
-    FuncCoord 14,6
-    ld hl,Coord
-    ld [hl],$70 ; 1-tile "to"
-    inc hl
-    inc hl
-    call PrintLevel
-    pop af
-    ld [$cfb9],a
-    ld de,$cfa6
-    FuncCoord 12,4
-    ld hl,Coord
-    ld bc,$0307
-    call PrintNumber ; exp
-    call .asm_12c86
-    ld de,$cfa6
-    FuncCoord 7,6
-    ld hl,Coord
-    ld bc,$0307
-    call PrintNumber
-    FuncCoord 9,0
-    ld hl,Coord
-    call Func_12cc3
-    FuncCoord 9,1
-    ld hl,Coord
-    call Func_12cc3
-    ld a,[$d0b8]
-    ld [$d11e],a
-    call GetMonName
-    FuncCoord 9,1
-    ld hl,Coord
-    call PlaceString
     ld a,$1
     ld [$ff00+$ba],a
     call Delay3
+    call GBPalNormal
     call WaitForTextScrollButtonPress ; wait for button
     pop af
     ld [$ff00+$d7],a
@@ -29509,53 +29456,159 @@ StatusScreen2: ; 12b57 (4:6b57)
     ld a,$77
     ld [$ff00+$24],a
     call GBPalWhiteOut
+    call LoadFontTilePatterns
     jp ClearScreen
-.asm_12c86 ; This does some magic with lvl/exp?
-    ld a,[$cfb9] ; Load level
-    cp $64
-    jr z,.asm_12ca7 ; 0x12c8b $1a ; If 100
-    inc a
-    ld d,a
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
-    ld hl,$cfa8
-    ld a,[$ff00+$98]
-    sub [hl]
-    ld [hld],a
-    ld a,[$ff00+$97]
-    sbc [hl]
-    ld [hld],a
-    ld a,[$ff00+$96]
-    sbc [hl]
-    ld [hld],a
-    ret
-.asm_12ca7
-    ld hl,$cfa6
+.EmptyMove
+    ld h,d
+    ld l,e
+    ld bc,-44 ; Move Name
+    add hl,bc
+    ld bc,$0312
+    call FillBlankArea
+    jr .next
+
+.PlaceMoveNameTypeAcrPwr
+    push af
+    push bc
+    push de
+
+    ld h,d
+    ld l,e
+    ld bc,-44 ; Move Name
+    add hl,bc
+    ld d,h
+    ld e,l
+    
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+
+    ld [$d0b5],a
+    dec a
+    ld hl,Moves
+    ld bc,6
+    call AddNTimes
+    ld a,BANK(Moves)
+    ld de,W_PLAYERMOVENUM
+    call FarCopyData ; copy bc bytes of data from a:hl to de
+
+.Text1
+    ld de,.PwrText
+    pop hl
+    ld bc,20+11
+    add hl,bc
+    call PlaceString
+
+.Text2
+    ld de,.AccrText
+    pop hl
+    ld bc,40+11
+    add hl,bc
+    call PlaceString
+
+.Text3
+    ld de,.PPText
+    pop hl
+    ld bc,40+1
+    add hl,bc
+    call PlaceString
+
+.PlaceMoveName
+    ld a,$2c
+    ld [$d0b7],a
+    ld a,MOVE_NAME
+    ld [W_LISTTYPE],a
+    call GetName
+    ld de,$cd6d
+    pop hl
+    call PlaceString
+
+.PlaceMoveType
+    pop hl
+    ld bc,20+1
+    add hl,bc
+    ld a,$5d
+    call Predef ; indirect jump to PrintMoveType (27d98 (9:7d98))
+
+.PlaceMoveAcr
+    ; ─────── Move_Accuracy
+    ld hl,$FF95
     xor a
     ld [hli],a
     ld [hli],a
-    ld [hl],a
-    ret
-
-EXPPointsText: ; 12caf (4:6caf)
-    db "EXP POINTS",$4e
-
-LevelUpText: ; 12cba (4:6cba)
-    db "LEVEL UP@"
-
-Func_12cc3: ; 12cc3 (4:6cc3)
-    ld bc,$a
-    ld a,$7f
-    jp FillMemory
-
-Func_12ccb: ; 12ccb (4:6ccb)
     ld [hli],a
-    ld [hld],a
-    add hl,de
-    dec c
-    jr nz,Func_12ccb
+    ld a,[W_PLAYERMOVEACCURACY]
+    ld [hli],a
+    ld a,100
+    ld [hl],a
+    call Multiply
+    ld a,255
+    ld [$FF99],a
+    ld b,4
+    call Divide
+    ; ───────
+    ld de,$FF98
+    pop hl
+    ld bc,40+15
+    add hl,bc
+    ld bc,$0103
+    call PrintNumber
+
+.PlaceMovePwr
+    ld de,W_PLAYERMOVEPOWER
+    pop hl
+    ld bc,20+15
+    add hl,bc
+    ld bc,$0103
+    call PrintNumber
+
+.end
+    pop de
+    pop bc
+    pop af
     ret
+
+.MovesText
+    db "'s Moves@"
+.AccrText
+    db "ACR",$D3,"@"
+.PwrText
+    db "PWR",$D3,"@"
+.PPText
+    db "PP",$D3,"@"
+
+; fill an area of the screen with blank tile
+; INPUT:
+; hl = address of upper left corner of the area
+; b = height
+; c = width
+FillBlankArea:
+    ld a,$CA ; Blank Tile
+    ld de,20 ; screen width
+.loop
+    push hl
+    push bc
+.innerLoop
+    ld [hli],a
+    dec c
+    jr nz,.innerLoop
+    pop bc
+    pop hl
+    add hl,de
+    dec b
+    jr nz,.loop
+    ret
+    
+GetMaxLevelBank4:
+    ld hl,GetMaxLevel
+    ld b,BANK(GetMaxLevel)
+    jp Bankswitch ; d = Max Level
+
+SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
 
 ; [$D07D] = menu type / message ID
 ; if less than $F0,it is a menu type
@@ -30390,6 +30443,14 @@ CannotUseItemsHereText: ; 1342a (4:742a)
 CannotGetOffHereText: ; 1342f (4:742f)
     TX_FAR _CannotGetOffHereText
     db "@"
+
+DebugPlayerStats:
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 2,a ; was the select button pressed?
+    ret z
+    ld b,BANK(_DebugPlayerStats)
+    ld hl,_DebugPlayerStats
+    jp Bankswitch
 
 SECTION "StartMenu_TrainerInfo",ROMX[$7460],BANK[$4]
 
@@ -31299,19 +31360,22 @@ Func_13a58: ; 13a58 (4:7a58)
     ld bc,$d
     jp CopyData
 
-PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
-    call PlaceString ; "TYPE/"
-    FuncCoord 10,13
-    ld hl,Coord
-    ld de,IDNoText
-    call PlaceString ; "ID/OT"
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+PlaceStatusScreenShinyGenderEtc:
+    ld b,BANK(PrintEXPBar_StatusScreen)
+    ld hl,PrintEXPBar_StatusScreen
+    call Bankswitch
+    ld b,BANK(PrintStatsBox)
+    ld hl,PrintStatsBox
+    call Bankswitch
+    ld hl,$cfb3 ; .OutOfBattle
+    call SetTempIV
+    ; ────────────────────────────────── Gender
     call GetGenderOutOfBattle
     jr c,.Genderless
     push af
     ld a,[$cfb9] ; .OutOfBattleLevel
     cp 10
-    FuncCoord 17,2
+    FuncCoord 17,1
     ld hl,Coord
     jr nc,.GreaterThen9
     dec hl
@@ -31323,7 +31387,10 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
 .Male
     call PlaceString
 .Genderless
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; ────────────────────────────────── Debug DV/StatExp
+    call DebugPlayerStats
+    ; ──────────────────────────────────
+    call ResetTempIV
     ld a,[$cf98] ; Pokemon ID
     and a
     jr z,.noShiny
@@ -31332,13 +31399,11 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     ld hl,$cfb3 ; .OutOfBattle
     call CheckShiny
     jr nz,.noShiny
-    FuncCoord 6,7
+    FuncCoord 8,0
     ld hl,Coord
     ld de,.ShinyStarIcon
     call PlaceString
 .noShiny
-    ld a,[$cf9f] ; CatchRate / HeldItem
-    and a
     ret
 .ShinyStarIcon
     db $D1,$50
@@ -31348,25 +31413,11 @@ PlaceStringTypeIDOTShinyGender ; xxxxx (4:xxxx) ; Denim
     db $F5,$50
 
 GetGenderOutOfBattle:
-    ld hl,$cfb3 ; .OutOfBattle
-    call SetTempIV
     ld a,[$cf98] ; Pokemon ID
     ld [$d11e],a
     ld hl,GetGender
     ld b,BANK(GetGender)
-    call Bankswitch
-    jp ResetTempIV
-
-PlaceDoubleVerticalBorderAndNextCoord: ; xxxxx (4:xxxx) ; Denim
-    FuncCoord 19,1
-    ld hl,Coord
-    ld [hl],$78 ; bordo verticale 1 tile
-    FuncCoord 19,2
-    ld hl,Coord
-    ld [hl],$78 ; bordo verticale 1 tile
-    FuncCoord 19,3 ; $c3ef
-    ld hl,Coord
-    ret
+    jp Bankswitch
 
 EXPBarGraphics: ; Denim,ExpBar
     INCBIN "gfx/denim/exp_bar.2bpp"
@@ -31388,31 +31439,6 @@ HandleMenuInputPlusWrapping:
     ld a,1
     ld [wMenuWrappingEnabled],a ; $cc4a
     jp HandleMenuInput
-
-DetermineCoordinateStatsBox:
-    ld a,[W_ISINBATTLE] ; no battle,this is 0
-    and a
-    jr z,.OutOfBattleBattle
-.InBattle
-    FuncCoord 0,4
-    ld hl,Coord
-    ld b,$8
-    ld c,$8
-    call TextBoxBorder
-    FuncCoord 1,5
-    ld hl,Coord
-    ld bc,$0019
-    ret
-.OutOfBattleBattle
-    FuncCoord 10,2
-    ld hl,Coord
-    ld b,$8
-    ld c,$8
-    call TextBoxBorder
-    FuncCoord 11,3 ; $c3e7
-    ld hl,Coord
-    ld bc,$0019
-    ret
 
 DontCheckElement:
     pop af ; Delete Call Back Return
@@ -32266,7 +32292,10 @@ UsableItems_PartyMenu: ; Moved in the Bank
 PrintLevelAndGender:
     push hl
     call PrintLevel
+    ld hl,$cfb3 ; .OutOfBattle
+    call SetTempIV
     call GetGenderOutOfBattle
+    call ResetTempIV
     pop hl
     push af
     inc hl
@@ -45727,7 +45756,7 @@ asm_27d8c: ; 27d8c (9:7d8c)
     ld bc,$6
     jp FillMemory
 
-Func_27d98: ; 27d98 (9:7d98)
+PrintMoveType: ; 27d98 (9:7d98)
     call Load16BitRegisters
     push hl
     ld a,[W_PLAYERMOVETYPE] ; $cfd5
@@ -53504,7 +53533,7 @@ PrintMenuItem: ; 3d4b6 (f:54b6)
     FuncCoord 1,9
     ld hl,Coord
     ld a,$5d
-    call Predef ; indirect jump to Func_27d98 (27d98 (9:7d98))
+    call Predef ; indirect jump to PrintMoveType (27d98 (9:7d98))
 .asm_3d54e
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
@@ -59459,9 +59488,9 @@ GetCurrentMoveDetails: ; xxxxx (f:xxxx) ; Denim ; TODO
     ret
 
 .AccrText
-    db "ACR/@"
+    db "ACR",$D3,"@"
 .PwrText
-    db "PWR/@"
+    db "PWR",$D3,"@"
 
 WritePPAllMoves: ; Denim ; TODO,sistemare routine e posizioni
     ld a,[wCurrentMenuItem]
@@ -73154,7 +73183,7 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     dbw BANK(Func_c60b),Func_c60b
     dbw BANK(Func_cd99),Func_cd99
     dbw BANK(PickupItem),PickupItem
-    dbw BANK(Func_27d98),Func_27d98
+    dbw BANK(PrintMoveType),PrintMoveType
     dbw BANK(LoadMovePPs),LoadMovePPs
 DrawHPBarPredef: ; 4ff96 (13:7f96)
     dbw BANK(Func_128ef),Func_128ef ; 5F draw HP bar
@@ -89817,13 +89846,13 @@ ViridianSchoolBlackboardText2: ; 5dda7 (17:5da7)
     db "@"
 
 StatusAilmentText1: ; 5ddac (17:5dac)
-    db " SLP",$4e
-    db " PSN",$4e
-    db " PAR@"
+    db " Slp",$4e
+    db " Psn",$4e
+    db " Par@"
 
 StatusAilmentText2: ; 5ddbb (17:5dbb)
-    db " BRN",$4e
-    db " FRZ",$4e
+    db " Brn",$4e
+    db " Frz",$4e
     db " QUIT@@"
 
 ViridianBlackboardStatusPointers: ; 5ddcc (17:5ddc)
@@ -98063,6 +98092,7 @@ PointerTable_71f73: ; 71f73 (1c:5f73)
     dw GetHallOfFameLinkCableEvolutionPaletteID ; Palette HallOfFame or LinkCable or Evolution
     dw Func_71ebb
     dw LoadTrainerCardBadgePalettes
+    dw GetPkmnStat2PaletteID ; Palette Pokemon Stat2
 
 ; each byte is the number of loops to make in .asm_71f5b for each badge
 LoopCounts_71f8f: ; 71f8f (1c:5f8f)
@@ -98452,9 +98482,9 @@ Unknown_721fa: ; 721fa (1c:61fa) ; Denim,spostata palette del pokemon nel menu s
     db $21
     db $02
     db $07,%00010000 ; Bit 4-5 - Palette Number for outside of surrounded area
-    db $0C,$03,$12,$03
+    db $0B,$02,$11,$02
     db $02,$0A
-    db $06,$07,$06,$07 ; ShinyStar
+    db $08,$00,$08,$00 ; ShinyStar
 
     db $00,$00
     db $02,$00,$00,$11,$00,$03,$01,$00,$07,$06,$01,$03,$01,$07,$13,$11
@@ -98664,6 +98694,31 @@ PaletteHackTwoBytes3: ; Denim ; 12 BYTE
     ld [hl],d
     ld hl,$cf2d
     ret
+
+GetPkmnStat2PaletteID:
+    ld hl,PalPacketStat2Menu
+    ld de,Unknown_721fa_Stat2
+    ret
+
+PalPacketStat2Menu:
+    db $51
+    db PAL_NOWALL,$00
+    db PAL_ROUTE,$00
+    db PAL_STATS2,$00
+    db PAL_ROUTE,$00
+    ds 7
+
+Unknown_721fa_Stat2:
+    db $22
+    db $04
+    db $07,$0A
+    db $01,$02,$12,$04 ; 1st Move
+    db $03,$0A
+    db $01,$06,$12,$08 ; 2nd Move
+    db $03,$0A
+    db $01,$0A,$12,$0C ; 3rd Move
+    db $03,$0A
+    db $01,$0E,$12,$10 ; 4th Move
 
 SECTION "BorderPalettes",ROMX[$6788],BANK[$1C]
 
@@ -100784,37 +100839,37 @@ PrintStatusAilment: ; 747de (1d:47de)
     ret z
     ld a,"S"
     ld [hli],a
-    ld a,"L"
+    ld a,"l"
     ld [hli],a
-    ld [hl],"P"
+    ld [hl],"p"
     ret
 .psn
     ld a,"P"
     ld [hli],a
-    ld a,"S"
+    ld a,"s"
     ld [hli],a
-    ld [hl],"N"
+    ld [hl],"n"
     ret
 .brn
     ld a,"B"
     ld [hli],a
-    ld a,"R"
+    ld a,"r"
     ld [hli],a
-    ld [hl],"N"
+    ld [hl],"n"
     ret
 .frz
     ld a,"F"
     ld [hli],a
-    ld a,"R"
+    ld a,"r"
     ld [hli],a
-    ld [hl],"Z"
+    ld [hl],"z"
     ret
 .par
     ld a,"P"
     ld [hli],a
-    ld a,"A"
+    ld a,"a"
     ld [hli],a
-    ld [hl],"R"
+    ld [hl],"r"
     ret
 
 Func_7481f: ; 7481f (1d:481f)
@@ -127717,10 +127772,12 @@ MewPicFront:
 MewPicBack:
     INCBIN "pic/monback/mewb.pic"
 
-HeldItemIcon: ; Denim,HeldItemIcon
+OtherIcon:
     INCBIN "gfx/denim/held_item.2bpp"
-ShinyStarIcon: ; Denim,ShinyStar
     INCBIN "gfx/denim/ShinyStar.2bpp"
+    INCBIN "gfx/denim/plus.2bpp"
+    INCBIN "gfx/denim/doubledot.2bpp"
+    INCBIN "gfx/denim/arrowup.2bpp"
 
 SECTION "bank2F",ROMX,BANK[$2F]
 
@@ -128548,6 +128605,78 @@ DebugEnemyStats:
     ld de,17
     add hl,de
     ret
+
+_DebugPlayerStats:
+    ; Remove Stat Text
+    FuncCoord 11,7
+    ld hl,Coord
+    ld de,.DebugStatsText
+    call PlaceString
+    ; Print IV
+    FuncCoord 11,9
+    ld hl,Coord
+    ld a,[wDVForShinyAtkDef]
+    call .PrintIV
+    swap a
+    call .PrintIV
+    ld a,[wDVForShinySpdSpc]
+    call .PrintIV
+    swap a
+    call .PrintIV
+    ; Print exp point
+    ld bc,$0205 ; five digits
+    ; Print HP exp point
+    FuncCoord 14,7
+    ld hl,Coord
+    ld de,$cfa9
+    call .PrintStatBR
+    ; Print ATK/DEF exp point
+    FuncCoord 14,9
+    ld hl,Coord
+    ld de,$cfab
+    call .PrintStatBR
+    ld de,$cfad
+    call .PrintStatBR
+    ; Print SPD/SPC exp point
+    ld de,$cfaf
+    call .PrintStatBR
+    ld de,$cfb1
+    call .PrintStatBR
+    ret
+.PrintIV
+    push af
+    srl a
+    srl a
+    srl a
+    srl a
+    ld [$d11e],a
+    ld de,$d11e
+    ld c,2
+    ld b,%10000001
+    call PrintNumber
+    ld de,18+20
+    add hl,de
+    pop af
+    ret
+.PrintStatBR
+    push bc
+    push hl
+    push de
+    ld bc,$0105
+    call ClearScreenArea
+    pop de
+    pop hl
+    pop bc
+    call PrintNumber
+    ld de,15+20
+    add hl,de
+    ret
+.DebugStatsText
+    db "   ",$4e
+    db "   ",$4e
+    db "   ",$4e
+    db "   ",$4e
+    db "   @"
 
 ; INPUT :
 ; $d11e = Pokemon ID
@@ -131583,7 +131712,7 @@ PrintNewLearnMoveDetail:
     FuncCoord 1,9
     ld hl,Coord
     ld a,$5d
-    call Predef ; indirect jump to Func_27d98 (27d98 (9:7d98))
+    call Predef ; indirect jump to PrintMoveType (27d98 (9:7d98))
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     call Delay3
@@ -131602,9 +131731,9 @@ LoadHpBarAndStatusTilePatterns_:
     ld hl,$8c00
     ld bc,(BANK(EXPBarGraphics) << 8 | $A)
     call GoodCopyVideoData
-    ld de,HeldItemIcon
+    ld de,OtherIcon
     ld hl,$8d00
-    ld bc,(BANK(HeldItemIcon) << 8 | $2) ; Also Shiny Star
+    ld bc,(BANK(OtherIcon) << 8 | $5)
     jp GoodCopyVideoData
 
 ; INPUT
@@ -131936,6 +132065,221 @@ _CheckNotEscapeWildPokemon:
     db MEW
     db $FF
 
+PrintStatsBox:
+    ld a,d
+    and a ; a is 0 from the status screen
+    jr nz,.DifferentBox ; 0x12ae6 $12
+    FuncCoord 19,7
+    ld hl,Coord
+    ld bc,$0a07
+    call DrawLineBox2
+    FuncCoord 11,7 ; Start printing stats from here
+    ld hl,Coord
+    ld bc,$0019 ; Number offset
+    jr .PrintStats ; 0x12af8 $10
+.DifferentBox
+    call DetermineCoordinateStatsBox
+.PrintStats
+    push bc
+    push hl
+    ld de,StatsText
+    call PlaceString
+    pop hl
+    pop bc
+    add hl,bc
+    jp CalcStatNoStatExp
+
+StatsText:
+    db "Health",$4e
+    db "Attack",$4e
+    db "Defense",$4e
+    db "Speed",$4e
+    db "Special@"
+
+DetermineCoordinateStatsBox:
+    ld a,[W_ISINBATTLE] ; no battle,this is 0
+    and a
+    jr z,.OutOfBattleBattle
+.InBattle
+    FuncCoord 0,4
+    ld hl,Coord
+    ld b,$a
+    ld c,$8
+    call TextBoxBorder
+    FuncCoord 1,5
+    ld hl,Coord
+    ld bc,$0019
+    ret
+.OutOfBattleBattle
+    FuncCoord 10,2
+    ld hl,Coord
+    ld b,$a
+    ld c,$8
+    call TextBoxBorder
+    FuncCoord 11,3 ; $c3e7
+    ld hl,Coord
+    ld bc,$0019
+    ret
+
+CalcStatNoStatExp:
+    ld de,$cfba ; hp actual stat
+    ld a,[$cfb9] ; copy actual pokemon level to enemy mon level used in CalcStat
+    ld [$d127],a ; ...
+    ld b,0 ; NOT consider stat exp
+    ld c,0 ; Start with HP
+.statsLoop
+    inc c ; Start with Atk
+    push hl
+    ld hl,$cfa8 ; actual mon stat exp - 1
+    call CalcStat
+    pop hl
+    call .PrintSingleStat
+    ld a,c
+    cp $5
+    jr nz,.statsLoop
+    xor a
+    ld [wTempStatHI],a
+    ld [wTempStatLO],a
+    ret
+
+.PrintSingleStat
+    push bc
+    push de
+
+    ; [de] : actual stat
+    ; [H_MULTIPLICAND+1] : stat without stat exp
+    call .GetBaseAndActualStatIn_DEBC
+    ; de : actual stat
+    ; bc : stat without stat exp
+
+    ; Print Actual Stat
+    ;push bc
+    ;ld bc,-20
+    ;add hl,bc
+    ;ld a,e
+    ;ld [wTempStatLO],a
+    ;ld a,d
+    ;ld [wTempStatHI],a
+    ;ld bc,$0203 ; three digits
+    ;call .PrintStat
+    ;pop bc
+
+    ; de : actual stat
+    ; bc : stat without stat exp
+    call .GetDeltaStatIn_DE
+    ; de : delta
+    ; bc : stat without stat exp
+
+    ; if delta <=9 shift right
+    ld a,d
+    and a
+    jr nz,.done1
+    ld a,e
+    cp 10
+    jr nc,.done1 ; >=10
+    inc hl
+.done1
+
+    ; Print stat without stat exp
+    push bc
+    ld bc,-3;+20
+    add hl,bc
+    pop bc
+    ld a,c
+    ld [wTempStatLO],a
+    ld a,b
+    ld [wTempStatHI],a
+    ld bc,$0203 ; three digits
+    call .PrintStat
+
+    ; Print Delta
+    ld bc,+4
+    add hl,bc
+    ld a,e
+    ld [wTempStatLO],a
+    ld a,d
+    ld [wTempStatHI],a
+    ld bc,$6203 ; three digits ; print leading zeroes
+    call .PrintStat
+
+    dec hl
+    ld [hl],$D2 ; plus
+
+    ; if delta <=9 shift left
+    ld a,d
+    and a
+    jr nz,.done2
+    ld a,e
+    cp 10
+    jr nc,.done2 ; >=10
+    dec hl
+.done2
+
+    pop de
+    inc de
+    inc de
+    ld bc,40
+    add hl,bc
+    pop bc
+    ret
+
+.PrintStat
+    push hl
+    push de
+    ld de,wTempStatHI
+    call PrintNumber
+    pop de
+    pop hl
+    ret
+
+.GetBaseAndActualStatIn_DEBC
+    ; [de] : actual stat
+    ; [H_MULTIPLICAND+1] : stat without stat exp
+    ld a,[de]
+    ld b,a
+    inc de
+    ld a,[de]
+    ld e,a
+    ld d,b
+    ld a,[H_MULTIPLICAND+1]
+    ld b,a
+    ld a,[H_MULTIPLICAND+2]
+    ld c,a
+    ; de : actual stat
+    ; bc : stat without stat exp
+    ret
+
+.GetDeltaStatIn_DE
+    ; de : actual stat
+    ; bc : stat without stat exp
+    ld a,e
+    sub c
+    ld e,a
+    ld a,d
+    sbc b
+    ld d,a
+    ; de : delta
+    ; bc : stat without stat exp
+    ret
+
+; Draws a line starting from hl high b and wide c
+DrawLineBox2:
+    ld de,$0014 ; New line
+.PrintVerticalLine
+    ld [hl],$78 ; │
+    add hl,de
+    dec b
+    jr nz,.PrintVerticalLine ; 0x12ace $fa
+    ld [hl],$77 ; ┘
+    dec hl
+.PrintHorizLine
+    ld [hl],$76 ; ─
+    dec hl
+    dec c
+    jr nz,.PrintHorizLine ; 0x12ad7 $fa
+    ld [hl],$6f ; ← (halfarrow ending)
+    ret
+
 SECTION "Bank38",ROMX,BANK[$38]
 
 Tset0D_GFX:
@@ -132251,6 +132595,203 @@ _CriticalHitTest_NoBug:
     ld a,$1
     ld [$d05e],a                 ; set critical hit flag
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+PrintEXPBar_StatusScreen:
+    call CalcEXPBarPixelLength_StatusScreen
+    ld a,[H_QUOTIENT + 3] ; pixel length
+    ld [wEXPBarPixelLength],a
+    ld b,a
+    ld c,$08
+    ld d,$08
+    FuncCoord 17,4
+    ld hl,Coord
+.loop
+    ld a,b
+    sub c
+    jr nc,.skip
+    ld c,b
+    jr .loop
+.skip
+    ld b,a
+    ld a,$c0
+    add c
+.loop2
+    ld [hld],a
+    dec d
+    ret z
+    ld a,b
+    and a
+    jr nz,.loop
+    ld a,$c0
+    jr .loop2
+
+CalcEXPBarPixelLength_StatusScreen:
+
+    ; get the base exp needed for the current level
+    ld a,[$cfb9] ; Level
+    ld d,a
+    ld hl,CalcExperience
+    ld b,BANK(CalcExperience)
+    call Bankswitch
+    ld hl,H_MULTIPLICAND
+    ld de,wEXPBarBaseEXP
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hl]
+    ld [de],a
+
+    ; get the exp needed to gain a level
+    ld a,[$cfb9] ; Level
+    ld d,a
+    inc d
+    ld hl,CalcExperience
+    ld b,BANK(CalcExperience)
+    call Bankswitch
+
+    ; get the address of the active Pokemon's current experience
+    ld hl,$cfa6
+
+    ; current exp - base exp
+    ld b,h
+    ld c,l
+    ld hl,wEXPBarBaseEXP
+    ld de,wEXPBarCurEXP
+    call SubThreeByteNum_StatusScreen
+
+    ; exp needed - base exp
+    ld bc,H_MULTIPLICAND
+    ld hl,wEXPBarBaseEXP
+    ld de,wEXPBarNeededEXP
+    call SubThreeByteNum_StatusScreen
+
+    ; make the divisor an 8-bit number
+    ld hl,wEXPBarNeededEXP
+    ld de,wEXPBarCurEXP + 1
+    ld a,[hli]
+    and a
+    jr z,.twoBytes
+    ld a,[hli]
+    ld [hld],a
+    dec hl
+    ld a,[hli]
+    ld [hld],a
+    ld a,[de]
+    inc de
+    ld [de],a
+    dec de
+    dec de
+    ld a,[de]
+    inc de
+    ld [de],a
+    dec de
+    xor a
+    ld [hli],a
+    ld [de],a
+    inc de
+.twoBytes
+    ld a,[hl]
+    and a
+    jr z,.oneByte
+    srl a
+    ld [hli],a
+    ld a,[hl]
+    rr a
+    ld [hld],a
+    ld a,[de]
+    srl a
+    ld [de],a
+    inc de
+    ld a,[de]
+    rr a
+    ld [de],a
+    dec de
+    jr .twoBytes
+.oneByte
+
+    ; current exp * (8 tiles * 8 pixels)
+    ld hl,H_MULTIPLICAND
+    ld de,wEXPBarCurEXP
+    ld a,[de]
+    inc de
+    ld [hli],a
+    ld a,[de]
+    inc de
+    ld [hli],a
+    ld a,[de]
+    ld [hl],a
+    ld a,$40
+    ld [H_MULTIPLIER],a
+    call Multiply
+
+    ; product / needed exp = pixel length
+    ld a,[wEXPBarNeededEXP + 2]
+    ld [H_DIVISOR],a
+    ld b,$04
+    jp Divide
+
+; calculates the three byte number starting at [bc]
+; minus the three byte number starting at [hl]
+; and stores it into the three bytes starting at [de]
+; assumes that [hl] is smaller than [bc]
+SubThreeByteNum_StatusScreen:
+    call .subByte
+    call .subByte
+.subByte
+    ld a,[bc]
+    inc bc
+    sub [hl]
+    inc hl
+    ld [de],a
+    jr nc,.noCarry
+    dec de
+    ld a,[de]
+    dec a
+    ld [de],a
+    inc de
+.noCarry
+    inc de
+    ret
+
+FontGraphics1GrayWall2bpp:
+    INCBIN "gfx/denim/font1.2bpp"
+FontGraphics2GrayWall2bpp:
+    INCBIN "gfx/denim/font2.2bpp"
+Wall2bpp:
+    INCBIN "gfx/denim/wall.2bpp"
+Empty2bpp:
+    INCBIN "gfx/denim/empty.2bpp"
+OtherIcon_w:
+    INCBIN "gfx/denim/plus_w.2bpp"
+    INCBIN "gfx/denim/doubledot_w.2bpp"
+    INCBIN "gfx/denim/arrowup_w.2bpp"
+
+LoadFontTilePatternsWithWall:
+    ld de,FontGraphics1GrayWall2bpp
+    ld hl,$8800
+    ld bc,(BANK(FontGraphics1GrayWall2bpp) << 8 | $40)
+    call GoodCopyVideoData
+    ld de,FontGraphics2GrayWall2bpp
+    ld hl,$8E00
+    ld bc,(BANK(FontGraphics2GrayWall2bpp) << 8 | $20)
+    call GoodCopyVideoData
+    ld de,Wall2bpp
+    ld hl,$97F0
+    ld bc,(BANK(Wall2bpp) << 8 | $1)
+    call GoodCopyVideoData
+    ld de,OtherIcon_w
+    ld hl,$8D20
+    ld bc,(BANK(OtherIcon_w) << 8 | $3)
+    call GoodCopyVideoData
+    ld de,Empty2bpp
+    ld hl,$8CA0
+    ld bc,(BANK(Empty2bpp) << 8 | $1)
+    jp GoodCopyVideoData
 
 SECTION "Bank39",ROMX,BANK[$39]
 

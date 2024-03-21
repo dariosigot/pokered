@@ -1544,12 +1544,14 @@ wFlagFlashingHealBallBit7  ; df35 ; bit 7
 
 wFlagPlaceTitleScreen ; df36 ; counter for title screen
 wDVForShinyAtkDef     ; df36
+wTempStatHI           ; df36
     ds 1
 
 wMaxLevel              ; df37
 wChoicePkmnMoveDeleter ; df37
 wDVForShinySpdSpc      ; df37
 wBackupDarkMap         ; df37
+wTempStatLO            ; df37
     ds 1
 
 wFlagAddPkmnToPartyBit0     ; df38 ; bit 0
