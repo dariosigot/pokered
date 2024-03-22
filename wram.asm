@@ -1509,8 +1509,8 @@ wEXPBarKeepFullFlag:
     ds 36-11+(2*6)
 wArrayMiniSpriteLoaded: ; df20 ; Denim
     ds 6
-wSpriteOAMBySpecies:   ; df26 ; Denim
-                      ; bit 0 = Flag Tentativo Rinomina
+wSpriteOAMBySpecies:      ; df26 ; bit 0 = Flag Tentativo Rinomina
+wStatusScreenJustLoadBit1 ; fd26 ; bit 1 = Status Screen Picture Just Load
     ds 1
 wSpriteOAMBySpeciesId: ; df27 ; Denim
     ds 1

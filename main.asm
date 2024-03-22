@@ -3158,14 +3158,15 @@ LoadFrontSpriteByMonIndex: ; 1389 (0:1389)
     ld de,$9000
     call LoadMonFrontSprite
     pop hl
+HackLoadUncompressedPicToHLFromStatusScreen:
     ld a,[H_LOADEDROMBANK]
     push af
-    ld a,$f
+    ld a,BANK(CopyUncompressedPicToHL)
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     xor a
     ld [$FF00+$e1],a
-    call asm_3f0d0
+    call CopyUncompressedPicToHL
     xor a
     ld [W_SPRITEFLIPPED],a
     pop af
@@ -13014,12 +13015,15 @@ Func_5317: ; 5317 (1:5317)
     call Func_5ab3
     FuncCoord 4,10 ; $c46c
     ld hl,Coord
-    ld de,.pleaseWait ; $550f
+    ld de,pleaseWait ; $550f
     call PlaceString
     ld hl,W_NUMHITS ; $d074
     xor a
     ld [hli],a
     ld [hl],$50
+
+; This is called after completing a trade.
+CableClub_DoBattleOrTradeAgain:
     ld hl,$d152
     ld a,$fd
     ld b,$6
@@ -13283,7 +13287,7 @@ Func_5317: ; 5317 (1:5317)
     call PlayMusic
     jr Func_551c
 
-.pleaseWait: ; 550f (1:550f)
+pleaseWait: ; 550f (1:550f)
     db "PLEASE WAIT!@"
 
 Func_551c:
@@ -13618,9 +13622,9 @@ Func_57d6:
     ld a,[$cc26]
     ld [$cf92],a
     ld a,$36
-    call Predef
+    call Predef ; indirect jump to StatusScreen (12953 (4:6953))
     ld a,$37
-    call Predef
+    call Predef ; indirect jump to StatusScreen2 (12b57 (4:6b57))
     call GBPalNormal
     call Func_5ae6
     call Func_57f2
@@ -13643,9 +13647,10 @@ Func_57f2:
     call PlaceString
     ld hl,$c3b6
     ld de,$d164
-    call $5827
+    call .TradeCenter_PrintPartyListNames
     ld hl,$c456
     ld de,$d89d
+.TradeCenter_PrintPartyListNames
     ld c,$0
 .asm_5829
     ld a,[de]
@@ -13839,8 +13844,8 @@ Func_5849:
     ld a,$2f
     call Predef
 .asm_59de
-    ld hl,$6d0e
-    ld b,$e
+    ld hl,TryEvolvingMon
+    ld b,BANK(TryEvolvingMon)
     call Bankswitch
     call ClearScreen
     call Func_5ae6
@@ -13860,14 +13865,14 @@ Func_5849:
     call DelayFrames
     xor a
     ld [$cc38],a
-    jp $5345
+    jp CableClub_DoBattleOrTradeAgain
 
 Func_5a18:
     ld c,$64
     call DelayFrames
     xor a
     ld [$cc38],a
-    jp $551c
+    jp Func_551c
 
 SSAnne8AfterBattleText2: ; 5a24 (1:5a24)
     TX_FAR _SSAnne8AfterBattleText2
@@ -28985,53 +28990,50 @@ BookMapDexSprite: ; 11240 (4:5240)
     INCBIN "gfx/sprites/book_map_dex.2bpp" ; was $11240
 ClipboardSprite: ; 11280 (4:5280)
     INCBIN "gfx/sprites/clipboard.2bpp" ; was $11280
-;SnorlaxSprite: ; 112c0 (4:52c0)
-;    INCBIN "gfx/sprites/snorlax.2bpp" ; was $112c0
-SECTION "OldAmberSprite",ROMX[$5300],BANK[$4]
-OldAmberSprite: ; 11300 (4:5300)
-    INCBIN "gfx/sprites/old_amber.2bpp" ; was $11300
-LyingOldManSprite: ; 11340 (4:5340)
-    INCBIN "gfx/sprites/lying_old_man.2bpp" ; was $11340
+OldAmberSprite:
+    INCBIN "gfx/sprites/old_amber.2bpp"
+LyingOldManSprite:
+    INCBIN "gfx/sprites/lying_old_man.2bpp"
 
-PokemonLogoGraphics: ; 11380 (4:5380)
+PokemonLogoGraphics:
     INCBIN "gfx/pokemon_logo.2bpp"
-FontGraphics: ; 11a80 (4:5a80)
+FontGraphics:
     INCBIN "gfx/font.1bpp"
 
-ABTiles: ; 11e80 (4:5e80)
+ABTiles:
     INCBIN "gfx/AB.2bpp"
 
-HpBarAndStatusGraphics: ; 11ea0 (4:5ea0)
+HpBarAndStatusGraphics:
     INCBIN "gfx/hp_bar_and_status.2bpp"
 
-BattleHudTiles1: ; 12080 (4:6080)
+BattleHudTiles1:
     INCBIN "gfx/battle_hud1.1bpp"
 
-BattleHudTiles2: ; 12098 (4:6098)
+BattleHudTiles2:
     INCBIN "gfx/battle_hud2.1bpp"
 
-BattleHudTiles3: ; 120b0 (4:60b0)
+BattleHudTiles3:
     INCBIN "gfx/battle_hud3.1bpp"
 
-NintendoCopyrightLogoGraphics: ; 120c8 (4:60c8)
+NintendoCopyrightLogoGraphics:
     INCBIN "gfx/copyright.2bpp"
 
-GamefreakLogoGraphics: ; 121f8 (4:61f8)
+GamefreakLogoGraphics:
     INCBIN "gfx/gamefreak.2bpp"
 
-TextBoxGraphics: ; 12288 (4:6288)
+TextBoxGraphics:
     INCBIN "gfx/text_box.2bpp"
 
-PokedexTileGraphics: ; 12488 (4:6488)
+PokedexTileGraphics:
     INCBIN "gfx/pokedex.2bpp"
 
-WorldMapTileGraphics: ; 125a8 (4:65a8)
+WorldMapTileGraphics:
     INCBIN "gfx/town_map.2bpp"
 
-PlayerCharacterTitleGraphics: ; 126a8 (4:66a8)
+PlayerCharacterTitleGraphics:
     INCBIN "gfx/player_title.2bpp"
 
-Func_128d8: ; 128d8 (4:68d8)
+Func_128d8:
     ld a,[W_YCOORD] ; $d361
     ld b,a
     ld a,[W_CURMAPHEIGHT] ; $d368
@@ -29041,22 +29043,22 @@ Func_128d8: ; 128d8 (4:68d8)
     ld b,a
     ld a,[W_CURMAPWIDTH] ; $d369
 
-Func_128ea: ; 128ea (4:68ea)
+Func_128ea:
     add a
     cp b
     ret z
     inc b
     ret
 
-Func_128ef: ; 128ef (4:68ef)
+Func_128ef:
     call Load16BitRegisters
     ld a,$1
     jr asm_128fb
 
-Func_128f6: ; 128f6 (4:68f6)
+Func_128f6:
     call Load16BitRegisters
     ld a,$2
-asm_128fb: ; 128fb (4:68fb)
+asm_128fb:
     ld [wListMenuID],a ; $cf94
     push hl
     ld a,[$cf99]
@@ -29082,7 +29084,7 @@ asm_128fb: ; 128fb (4:68fb)
     ld d,a
     ld c,a
 
-Func_12924: ; 12924 (4:6924)
+Func_12924:
     pop hl
     push de
     push hl
@@ -29110,89 +29112,181 @@ Func_12924: ; 12924 (4:6924)
     pop de
     ret
 
+; Predef 0x38
+StatusScreen2:
+    ret
+
 ; Predef 0x37
-StatusScreen: ; 12953 (4:6953)
+StatusScreen:
+    ; prevent audio fade out
+    ld hl,$d72c
+    set 1,[hl]
+    ld a,$33
+    ld [$ff00+$24],a ; Reduce the volume
+    ; Clear Screen & Update Sprites
+    call GBPalWhiteOutWithDelay3
+    call UpdateSprites ; move sprites (?)
+    ; water/flower tile animation
+    ld a,[$ff00+$d7]
+    push af
+    xor a
+    ld [$ff00+$d7],a
+    ; Load Generic Tile
+    ld b,BANK(LoadStatusScreenGenricTile)
+    ld hl,LoadStatusScreenGenricTile
+    call Bankswitch
+    ; Load Custom Tile
+    ld b,BANK(LoadFontTilePatternsWithWall)
+    ld hl,LoadFontTilePatternsWithWall
+    call Bankswitch
+
+; STATUSSCREEN 1
+    jr .skipOnlyFirstTime
+.Status1
+    call GBPalWhiteOutWithDelay3
+.skipOnlyFirstTime
+    call ClearScreen
+    ; Recalculate stats
+    call .LoadMonData
+    call HandleStatusScreen1
+.getJoypadStateLoop1
+    call .GetJoy
+    and %11010011 ; ▼▲◄►StSeBA
+    jr z,.getJoypadStateLoop1
+    bit 1,a ; b pressed?
+    jr nz,.end
+    bit 7,a ; down pressed?
+    jr nz,.downFromStatus1
+    bit 6,a ; up pressed?
+    jr nz,.upFromStatus1
+    ; fall through (b/right)
+
+; STATUSSCREEN 2
+    jr .skipIfDirectlyFromStatus1
+    ; Recalculate stats
+.Status2
+    call .LoadMonData
+.skipIfDirectlyFromStatus1
+    call GBPalWhiteOutWithDelay3
+    call ClearScreen
+    call HandleStatusScreen2
+.getJoypadStateLoop2
+    call .GetJoy
+    and %11100011 ; ▼▲◄►StSeBA
+    jr z,.getJoypadStateLoop2
+    bit 5,a ; left pressed?
+    jr nz,.Status1
+    bit 7,a ; down pressed?
+    jr nz,.downFromStatus2
+    bit 6,a ; up pressed?
+    jr nz,.upFromStatus2
+
+    ; fall through (a/b)
+
+.end
+    ; Update Selected Pokemon Menù ID
+    ld a,[$cf92]
+    ld [$cc2b],a
+    call .ResetFlagStatusScreenJustLoad
+    ; water/flower tile animation
+    pop af
+    ld [$ff00+$d7],a
+    ; prevent audio fade out
+    ld hl,$d72c
+    res 1,[hl]
+    ld a,$77
+    ld [$ff00+$24],a
+    ; Restore Tile & END
+    call GBPalWhiteOut
+    call LoadFontTilePatterns
+    ld de,Empty2bpp
+    ld hl,$97F0
+    ld bc,(BANK(Empty2bpp) << 8 | $1)
+    jp GoodCopyVideoData
+.ResetFlagStatusScreenJustLoad
+    ld hl,wStatusScreenJustLoadBit1
+    res 1,[hl]
+    ret
+.downFromStatus1
+    ld a,[$cf92]
+    inc a
+.commonFromStatus1
+    cp 6
+    jr nc,.getJoypadStateLoop1 ; valid only between 0 and 5
+    ld [$cf92],a
+    call .ResetFlagStatusScreenJustLoad
+    jr .Status1
+.upFromStatus1
+    ld a,[$cf92]
+    dec a
+    jr .commonFromStatus1
+.downFromStatus2
+    ld a,[$cf92]
+    inc a
+.commonFromStatus2
+    cp 6
+    jr nc,.getJoypadStateLoop2 ; valid only between 0 and 5
+    ld [$cf92],a
+    call .ResetFlagStatusScreenJustLoad
+    jr .Status2
+.upFromStatus2
+    ld a,[$cf92]
+    dec a
+    jr .commonFromStatus2
+.GetJoy
+    call GetJoypadStateLowSensitivity
+    ld a,[$ffb5]
+    ret
+.LoadMonData
     call LoadMonData
+    ld hl,wStatusScreenJustLoadBit1
+    bit 1,[hl]
+    ret nz ; Don't Recalculate 
     ld a,[$cc49]
     cp $2 ; 2 means we're in a PC box
-    jr c,.DontRecalculate ; 0x1295b $14
+    ret c ;  Don't Recalculate
     ld a,[$cf9b]
     ld [$cfb9],a
     ld [$d127],a
     ld hl,$cfa8
     ld de,$cfba
     ld b,$1
-    call CalcStats ; Recalculate stats
-.DontRecalculate
-    ld hl,$d72c
-    set 1,[hl]
-    ld a,$33
-    ld [$ff00+$24],a ; Reduce the volume
-    call GBPalWhiteOutWithDelay3
-    call ClearScreen
-    call UpdateSprites ; move sprites (?)
-    call LoadHpBarAndStatusTilePatterns
-    ld de,BattleHudTiles1  ; $6080 ; source
-    ld hl,$96d0 ; dest
-    ld bc,(BANK(BattleHudTiles1) << 8) + $03 ; bank bytes/8
-    call CopyVideoDataDouble ; ·│ :L and halfarrow line end
-    ld de,BattleHudTiles2 ; $6098
-    ld hl,$9780
-    ld bc,(BANK(BattleHudTiles2) << 8) + $01
-    call CopyVideoDataDouble ; │
-    ld de,BattleHudTiles3 ; $60b0
-    ld hl,$9760
-    ld bc,(BANK(BattleHudTiles3) << 8) + $02
-    call CopyVideoDataDouble ; ─┘
-    ld de,PTile
-    ld hl,$9720
-    ld bc,(BANK(PTile) << 8 | $01)
-    call CopyVideoDataDouble ; P (for PP),inline
-    ld a,[$ff00+$d7]
-    push af
-    xor a
-    ld [$ff00+$d7],a
-    FuncCoord 18,2
+    jp CalcStats ; Recalculate stats
+
+HandleStatusScreen1:
+    FuncCoord 1,0
+    ld hl,Coord
+    ld bc,$0707
+    call FillBlankArea
+    ld a,$CA ; Blank Tile (ShinyStar)
+    FuncCoord 19,6
+    ld [Coord],a
+    FuncCoord 18,3
     ld hl,Coord
     ld bc,$0207
     call DrawLineBox ; Draws the box around name,HP and status
-    FuncCoord 15,5
-    ld hl,Coord
-    ld [hl],$f2 ; . after No ("." is a different one)
-    dec hl
-    ld [hl],"№"
     FuncCoord 9,7
     ld hl,Coord
     ld bc,$0a07
     call DrawLineBox ; Draws the box around types,ID No. and OT
-    ;FuncCoord 0,7
+    ;FuncCoord 18,0
     ;ld hl,Coord
-    ;ld de,Type1Text
-    ;call PlaceString ; "TYPE/"
-    FuncCoord 10,2
+    ;ld de,.Paging1
+    ;call PlaceString
+    FuncCoord 10,3
     ld hl,Coord
     PREDEF DrawHPBarPredef ; predef $5f
     ld hl,$cf25
     call GetHealthBarColor
     ld b,$3
     call GoPAL_SET ; SGB palette
-    FuncCoord 10,1
+    FuncCoord 10,2
     ld hl,Coord
     ld de,$cf9c
     call PrintStatusCondition
-    FuncCoord 14,1
+    FuncCoord 14,2
     ld hl,Coord
     call PrintLevel ; Pokémon level
-    ld a,[$d0b8]
-    ld [$d11e],a
-    ld [$d0b5],a
-    ld a,$3a
-    call Predef
-    FuncCoord 16,5
-    ld hl,Coord
-    ld de,$d11e
-    ld bc,$8103 ; Zero-padded,3
-    call PrintNumber ; Pokémon no.
     FuncCoord 1,8
     ld hl,Coord
     ld a,$4b
@@ -29201,7 +29295,7 @@ StatusScreen: ; 12953 (4:6953)
     call unk_12a7e
     ld d,h
     ld e,l
-    FuncCoord 10,0
+    FuncCoord 10,1
     ld hl,Coord
     call PlaceString ; Pokémon name
     ld hl,Unknown_12a95 ; $6a95
@@ -29223,17 +29317,23 @@ StatusScreen: ; 12953 (4:6953)
     ld d,$0
     call PlaceStatusScreenShinyGenderEtc ; call PrintStatsBox
     call ExperienceSection
+    ; End
     call Delay3
     call GBPalNormal
-    FuncCoord 0,0
+
+    ld a,1
+    ld [W_SPRITEFLIPPED],a
+    ld hl,wStatusScreenJustLoadBit1
+    bit 1,[hl] ; skipUncompressAndCry?
+    set 1,[hl]
+    FuncCoord 1,0
     ld hl,Coord
+    jp nz,HackLoadUncompressedPicToHLFromStatusScreen
     call LoadFlippedFrontSpriteByMonIndex ; draw Pokémon picture
     ld a,[$cf91]
-    call PlayCry ; play Pokémon cry
-    call WaitForTextScrollButtonPress ; wait for button
-    pop af
-    ld [$ff00+$d7],a
-    ret
+    jp PlayCry ; play Pokémon cry
+;.Paging1:
+;    db $d6,$ec,"@"
 
 unk_12a7e: ; 0x12a7e ; I don't know what this does,iterates over pointers?
     ld a,[$cc49]
@@ -29250,8 +29350,6 @@ unk_12a7e: ; 0x12a7e ; I don't know what this does,iterates over pointers?
     ld a,[wWhichPokemon]
     jp SkipFixedLengthTextEntries
 
-;Type1Text:
-;    db "Type",$d3,"@",$4e
 IDNoText:
     db "OT",$d3,$4e,"@"
 
@@ -29350,38 +29448,27 @@ DrawLineBox:
     ld [hl],$6f ; ← (halfarrow ending)
     ret
 
-PTile: ; This is a single 1bpp "P" tile
-    INCBIN "gfx/p_tile.1bpp"
-
-StatusScreen2: ; 12b57 (4:6b57)
-    ld a,[$ff00+$d7]
-    push af
+HandleStatusScreen2:
     xor a
-    ld [$ff00+$d7],a
-    ld [$ff00+$ba],a
-    ld bc,$0005
+    ld [$ff00+$ba],a ; AutoBGTransferEnabled
+    ld bc,$0005 ; Moves
     ld hl,$d0dc
     call FillMemory
-
-    call GBPalWhiteOutWithDelay3
-    call ClearScreen
-
-    ld b,BANK(LoadFontTilePatternsWithWall)
-    ld hl,LoadFontTilePatternsWithWall
-    call Bankswitch
-
-    ld b,14
+    ld b,14 ; GetPkmnStat2PaletteID
     call GoPAL_SET
-
-    FuncCoord 19,1
+    FuncCoord 19,2
     ld hl,Coord
-    ld bc,$1011
+    ld bc,$0f11
     call DrawLineBox
+    ;FuncCoord 18,0
+    ;ld hl,Coord
+    ;ld de,.Paging2
+    ;call PlaceString
     ld hl,Unknown_12a9d ; $6a9d
     call unk_12a7e
     ld d,h
     ld e,l
-    FuncCoord 1,0
+    FuncCoord 0,0
     ld hl,Coord
     call PlaceString ; Pokémon name
     ld h,b
@@ -29444,20 +29531,14 @@ StatusScreen2: ; 12b57 (4:6b57)
     cp $4
     jr nz,.PrintPP ; 0x12c0f $b2
 .PPDone
+    ; End
     ld a,$1
-    ld [$ff00+$ba],a
+    ld [$ff00+$ba],a ; AutoBGTransferEnabled
     call Delay3
-    call GBPalNormal
-    call WaitForTextScrollButtonPress ; wait for button
-    pop af
-    ld [$ff00+$d7],a
-    ld hl,$d72c
-    res 1,[hl]
-    ld a,$77
-    ld [$ff00+$24],a
-    call GBPalWhiteOut
-    call LoadFontTilePatterns
-    jp ClearScreen
+    jp GBPalNormal
+;.Paging2:
+;    db $d5,$ed,"@"
+
 .EmptyMove
     ld h,d
     ld l,e
@@ -29602,11 +29683,6 @@ FillBlankArea:
     dec b
     jr nz,.loop
     ret
-    
-GetMaxLevelBank4:
-    ld hl,GetMaxLevel
-    ld b,BANK(GetMaxLevel)
-    jp Bankswitch ; d = Max Level
 
 SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
 
@@ -30080,9 +30156,9 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     xor a
     ld [$cc49],a
     ld a,$36
-    call Predef
+    call Predef ; indirect jump to StatusScreen (12953 (4:6953))
     ld a,$37
-    call Predef
+    call Predef ; indirect jump to StatusScreen2 (12b57 (4:6b57))
     call ReloadMapData
     jp StartMenu_Pokemon
 .choseOutOfBattleMove
@@ -30451,6 +30527,11 @@ DebugPlayerStats:
     ld b,BANK(_DebugPlayerStats)
     ld hl,_DebugPlayerStats
     jp Bankswitch
+
+GetMaxLevelBank4:
+    ld hl,GetMaxLevel
+    ld b,BANK(GetMaxLevel)
+    jp Bankswitch ; d = Max Level
 
 SECTION "StartMenu_TrainerInfo",ROMX[$7460],BANK[$4]
 
@@ -31375,7 +31456,7 @@ PlaceStatusScreenShinyGenderEtc:
     push af
     ld a,[$cfb9] ; .OutOfBattleLevel
     cp 10
-    FuncCoord 17,1
+    FuncCoord 17,2
     ld hl,Coord
     jr nc,.GreaterThen9
     dec hl
@@ -31399,7 +31480,7 @@ PlaceStatusScreenShinyGenderEtc:
     ld hl,$cfb3 ; .OutOfBattle
     call CheckShiny
     jr nz,.noShiny
-    FuncCoord 8,0
+    FuncCoord 19,6
     ld hl,Coord
     ld de,.ShinyStarIcon
     call PlaceString
@@ -57559,7 +57640,7 @@ Func_3f073: ; 3f073 (f:7073)
     add hl,bc
     ld a,[H_DOWNARROWBLINKCNT1] ; $FF00+$8b
     add $31
-    jr asm_3f0d0
+    jr CopyUncompressedPicToHL
 
 Func_3f0c6: ; 3f0c6 (f:70c6)
     ld a,[$cc4f]
@@ -57567,7 +57648,7 @@ Func_3f0c6: ; 3f0c6 (f:70c6)
     ld a,[$cc50]
     ld l,a
     ld a,[$FF00+$e1]
-asm_3f0d0: ; 3f0d0 (f:70d0)
+CopyUncompressedPicToHL: ; 3f0d0 (f:70d0)
     ld bc,$707
     ld de,$14
     push af
@@ -64661,7 +64742,7 @@ Func_44be0: ; 44be0 (11:4be0)
     jr .asm_44c03
 .asm_44bf7
     ld a,$ad
-    call $23b1
+    call PlaySound
     ld hl,$d815
     bit 7,[hl]
 .asm_44c01
@@ -87888,7 +87969,7 @@ FightingDojoScript1: ; 5cd83 (17:4d83)
     ld [$ff8c],a
     ld a,$8
     ld [$ff8d],a
-    call $34a6
+    call Func_34a6
     ld a,$1
     ld [$ff8c],a
     call DisplayTextID
@@ -87907,7 +87988,7 @@ FightingDojoScript3: ; 5cdc6 (17:4dc6)
     ld [$ff8c],a
     ld a,$8
     ld [$ff8d],a
-    call $34a6
+    call Func_34a6
 
 .asm_5cde4
     ld a,$f0
@@ -97925,7 +98006,7 @@ GetPkmnStatPaletteID: ; 71e4f (1c:5e4f)
     pop de ; ...
     ld [hl],e
     call PaletteHackTwoBytes1 ; Denim ; ld hl,$cf2d
-    ld de,Unknown_721fa
+    ld de,ATTR_BLK_StatusScreen
     ret
 
 GetPartyMenuPaletteID: ; 71e7b (1c:5e7b)
@@ -98472,38 +98553,33 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
     db $02,$05 ; $03,$0F
     db $01,$01,$01,$01
 
-;Unknown_Command:
-    ds 37
-    ;db $03,$00,$00,$13,$0B,$00,$03,$00,$0C,$13,$11,$02,$03,$01,$00,$0A,$03,$01,$03,$0A
-    ;db $08,$13,$0A,$00,$03,$00,$04,$08,$0B,$02,$03,$0B,$00,$13,$07,$03,$00
+ATTR_BLK_StatusScreen:
+    db $22
+    db $04
+    db $07,%00110000   ; HP Bar & WallPaper
+    db $0B,$03,$11,$03 ; ...
+    db $03,%00000101   ; Mon Pic
+    db $01,$00,$07,$06 ; ...
+    db $03,%00001010   ; Stats Box
+    db $0B,$07,$12,$10 ; ...
+    db $02,%00000101   ; ShinyStar
+    db $13,$06,$13,$06 ; ...
+    ;db $03,%00000101   ; Paging
+    ;db $12,$00,$12,$00 ; ...
 
-Unknown_721fa: ; 721fa (1c:61fa) ; Denim,spostata palette del pokemon nel menu stat
-;INCBIN "baserom.gbc",$721fa,$72222 - $721fa
-    db $21
-    db $02
-    db $07,%00010000 ; Bit 4-5 - Palette Number for outside of surrounded area
-    db $0B,$02,$11,$02
-    db $02,$0A
-    db $08,$00,$08,$00 ; ShinyStar
-
-    db $00,$00
-    db $02,$00,$00,$11,$00,$03,$01,$00,$07,$06,$01,$03,$01,$07,$13,$11
-    db $00,$03,$08,$00,$13,$06,$00,$00
-
-Unknown_72222: ; 72222 (1c:6222)
-;INCBIN "baserom.gbc",$72222,$7224f - $72222
+Unknown_72222:
 
     db $21
     db $01
     db $07,%00010101
     db $01,$01,$08,$08
 
-    db$00,$00,$00,$00,$00,$00,$00,$00,$02,$00,$00,$11,$00,$01,$00,$01,$13,$00,$03,$01,$01,$08,$08,$01,$03,$01,$09,$08,$11,$00,$03,$09,$01,$13,$11,$00,$00
-
-Unknown_7224f: ; 7224f (1c:624f)
+Unknown_7224f:
 INCBIN "baserom.gbc",$7224f,$7228e - $7224f
 
 ;220503050000130B030A00041309020F00061307030004040F090300000C1311030000130B010300041309020300061307030304040F090003000C13110000
+
+SECTION "Unknown_7228e",ROMX[$628e],BANK[$1c]
 
 Unknown_7228e:
 BlkPacket_7228e: ; 7228e (1c:628e)
@@ -98696,22 +98772,14 @@ PaletteHackTwoBytes3: ; Denim ; 12 BYTE
     ret
 
 GetPkmnStat2PaletteID:
-    ld hl,PalPacketStat2Menu
-    ld de,Unknown_721fa_Stat2
+    call GetPkmnStatPaletteID
+    ld de,ATTR_BLK_StatusScreen2
     ret
 
-PalPacketStat2Menu:
-    db $51
-    db PAL_NOWALL,$00
-    db PAL_ROUTE,$00
-    db PAL_STATS2,$00
-    db PAL_ROUTE,$00
-    ds 7
-
-Unknown_721fa_Stat2:
+ATTR_BLK_StatusScreen2:
     db $22
     db $04
-    db $07,$0A
+    db $07,$FA
     db $01,$02,$12,$04 ; 1st Move
     db $03,$0A
     db $01,$06,$12,$08 ; 2nd Move
@@ -98719,6 +98787,8 @@ Unknown_721fa_Stat2:
     db $01,$0A,$12,$0C ; 3rd Move
     db $03,$0A
     db $01,$0E,$12,$10 ; 4th Move
+    ;db $03,%00000101
+    ;db $13,$00,$13,$00 ; Paging
 
 SECTION "BorderPalettes",ROMX[$6788],BANK[$1C]
 
@@ -98946,11 +99016,11 @@ SaveSAV: ;$770a
     FuncCoord 1,13
     ld hl,Coord
     ld bc,$0412
-    call $18c4      ;clear area 4x12 starting at 13,1
+    call ClearScreenArea      ;clear area 4x12 starting at 13,1
     FuncCoord 1,14
     ld hl,Coord
     ld de,NowSavingString
-    call $1955
+    call PlaceString
     ld c,$1e;$78
     call DelayFrames
     ld hl,GameSavedText
@@ -100080,7 +100150,12 @@ IndexToMiniSpriteOrder:
     ret
 
 PalPacketStatMenu: ; Denim
-    db $51,$00,$00,$00,$00,PAL_SHINYSTAR,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    db $51
+    db $00,$00
+    db $00,$00
+    db PAL_STATS2,$00
+    db PAL_NOWALL,$00
+    ds 7
 
 ; La seguente funzione serve a gestire il flag per la corretta palette del backsprite del player durante la sala d'onore
 Func_70278_PlusFlag: ; xxxxx (1c:xxxx) ; Denim,funzione per flaggare questo istante di chiamata ; call Func_70278
@@ -127778,6 +127853,7 @@ OtherIcon:
     INCBIN "gfx/denim/plus.2bpp"
     INCBIN "gfx/denim/doubledot.2bpp"
     INCBIN "gfx/denim/arrowup.2bpp"
+    INCBIN "gfx/denim/arrowleft.2bpp"
 
 SECTION "bank2F",ROMX,BANK[$2F]
 
@@ -131733,7 +131809,7 @@ LoadHpBarAndStatusTilePatterns_:
     call GoodCopyVideoData
     ld de,OtherIcon
     ld hl,$8d00
-    ld bc,(BANK(OtherIcon) << 8 | $5)
+    ld bc,(BANK(OtherIcon) << 8 | $7)
     jp GoodCopyVideoData
 
 ; INPUT
@@ -132605,7 +132681,7 @@ PrintEXPBar_StatusScreen:
     ld b,a
     ld c,$08
     ld d,$08
-    FuncCoord 17,4
+    FuncCoord 17,5
     ld hl,Coord
 .loop
     ld a,b
@@ -132770,6 +132846,28 @@ OtherIcon_w:
     INCBIN "gfx/denim/plus_w.2bpp"
     INCBIN "gfx/denim/doubledot_w.2bpp"
     INCBIN "gfx/denim/arrowup_w.2bpp"
+    INCBIN "gfx/denim/arrowleft_w.2bpp"
+PTile: ; This is a single 1bpp "P" tile
+    INCBIN "gfx/p_tile.1bpp"
+
+LoadStatusScreenGenricTile:
+    call LoadHpBarAndStatusTilePatterns
+    ld de,BattleHudTiles1  ; $6080 ; source
+    ld hl,$96d0 ; dest
+    ld bc,(BANK(BattleHudTiles1) << 8) + $03 ; bank bytes/8
+    call CopyVideoDataDouble ; ·│ :L and halfarrow line end
+    ld de,BattleHudTiles2 ; $6098
+    ld hl,$9780
+    ld bc,(BANK(BattleHudTiles2) << 8) + $01
+    call CopyVideoDataDouble ; │
+    ld de,BattleHudTiles3 ; $60b0
+    ld hl,$9760
+    ld bc,(BANK(BattleHudTiles3) << 8) + $02
+    call CopyVideoDataDouble ; ─┘
+    ld de,PTile
+    ld hl,$9720
+    ld bc,(BANK(PTile) << 8 | $01)
+    jp CopyVideoDataDouble ; P (for PP),inline
 
 LoadFontTilePatternsWithWall:
     ld de,FontGraphics1GrayWall2bpp
@@ -132786,7 +132884,7 @@ LoadFontTilePatternsWithWall:
     call GoodCopyVideoData
     ld de,OtherIcon_w
     ld hl,$8D20
-    ld bc,(BANK(OtherIcon_w) << 8 | $3)
+    ld bc,(BANK(OtherIcon_w) << 8 | $5)
     call GoodCopyVideoData
     ld de,Empty2bpp
     ld hl,$8CA0
