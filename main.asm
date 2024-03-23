@@ -22802,21 +22802,23 @@ MapHSD8: ; cd24 (3:4d24)
     db MANSION_4,$05,Show
     db MANSION_4,$06,Show
     db MANSION_4,$08,Show
-MapHSD9: ; cd33 (3:4d33)
-    db SAFARI_ZONE_EAST,$01,Show
-    db SAFARI_ZONE_EAST,$02,Show
-    db SAFARI_ZONE_EAST,$03,Show
-    db SAFARI_ZONE_EAST,$04,Show
-MapHSDA: ; cd3f (3:4d3f)
-    db SAFARI_ZONE_NORTH,$01,Show
-    db SAFARI_ZONE_NORTH,$02,Show
-MapHSDB: ; cd45 (3:4d45)
-    db SAFARI_ZONE_WEST,$01,Show
-    db SAFARI_ZONE_WEST,$02,Show
-    db SAFARI_ZONE_WEST,$03,Show
-    db SAFARI_ZONE_WEST,$04,Show
-MapHSDC: ; cd51 (3:4d51)
-    db SAFARI_ZONE_CENTER,$01,Show
+MapHS69:
+    db DRATINI_CAVE,$01,Show ; $E4 -> $C3
+    db DRATINI_CAVE,$02,Show ; $E5 -> $C4
+MapHS07:
+    db FUCHSIA_CITY,$0b,Show ; $E6 -> $C5
+MapHS62:
+    db SS_ANNE_4,$01,Show ; $E7 -> $C6
+    db SS_ANNE_4,$02,Hide ; $E8 -> $C7
+MapHS22:
+    db ROUTE_23,$08,Show ; $E9 -> $C8
+MapHS06:
+    db CELADON_CITY,$08,Show ; $EA -> $C9
+    db CELADON_CITY,$09,Show ; $EB -> $CA
+MapHSC5:
+    db DIGLETTS_CAVE,$01,Show ; $EC -> $CB
+; Unused
+    ds 2 ; ($CC|$CD)
 MapHSE2: ; cd54 (3:4d54)
     db UNKNOWN_DUNGEON_2,$01,Show
     db UNKNOWN_DUNGEON_2,$02,Show
@@ -22848,21 +22850,22 @@ MapHSA2: ; cd8d (3:4d8d)
     db SEAFOAM_ISLANDS_5,$01,Hide
     db SEAFOAM_ISLANDS_5,$02,Hide
     db SEAFOAM_ISLANDS_5,$03,Show
-MapHS69:
-    db DRATINI_CAVE,$01,Show
-    db DRATINI_CAVE,$02,Show
-MapHS07:
-    db FUCHSIA_CITY,$0b,Show
-MapHS62:
-    db SS_ANNE_4,$01,Show
-    db SS_ANNE_4,$02,Hide
-MapHS22:
-    db ROUTE_23,$08,Show
-MapHS06:
-    db CELADON_CITY,$08,Show
-    db CELADON_CITY,$09,Show
-MapHSC5: ; cc52 (3:4c52)
-    db DIGLETTS_CAVE,$01,Show
+MapHSD9:
+    db SAFARI_ZONE_EAST,$01,Show
+    db SAFARI_ZONE_EAST,$02,Show
+    db SAFARI_ZONE_EAST,$03,Show
+    db SAFARI_ZONE_EAST,$04,Show
+MapHSDA:
+    db SAFARI_ZONE_NORTH,$01,Show
+    db SAFARI_ZONE_NORTH,$02,Show
+    db SAFARI_ZONE_NORTH,$03,Show
+MapHSDB:
+    db SAFARI_ZONE_WEST,$01,Show
+    db SAFARI_ZONE_WEST,$02,Show
+    db SAFARI_ZONE_WEST,$03,Show
+    db SAFARI_ZONE_WEST,$04,Show ; $E8
+MapHSDC:
+    db SAFARI_ZONE_CENTER,$01,Show
 
     db $FF,$01,Show
 
@@ -28990,50 +28993,8 @@ BookMapDexSprite: ; 11240 (4:5240)
     INCBIN "gfx/sprites/book_map_dex.2bpp" ; was $11240
 ClipboardSprite: ; 11280 (4:5280)
     INCBIN "gfx/sprites/clipboard.2bpp" ; was $11280
-OldAmberSprite:
-    INCBIN "gfx/sprites/old_amber.2bpp"
-LyingOldManSprite:
-    INCBIN "gfx/sprites/lying_old_man.2bpp"
 
-PokemonLogoGraphics:
-    INCBIN "gfx/pokemon_logo.2bpp"
-FontGraphics:
-    INCBIN "gfx/font.1bpp"
-
-ABTiles:
-    INCBIN "gfx/AB.2bpp"
-
-HpBarAndStatusGraphics:
-    INCBIN "gfx/hp_bar_and_status.2bpp"
-
-BattleHudTiles1:
-    INCBIN "gfx/battle_hud1.1bpp"
-
-BattleHudTiles2:
-    INCBIN "gfx/battle_hud2.1bpp"
-
-BattleHudTiles3:
-    INCBIN "gfx/battle_hud3.1bpp"
-
-NintendoCopyrightLogoGraphics:
-    INCBIN "gfx/copyright.2bpp"
-
-GamefreakLogoGraphics:
-    INCBIN "gfx/gamefreak.2bpp"
-
-TextBoxGraphics:
-    INCBIN "gfx/text_box.2bpp"
-
-PokedexTileGraphics:
-    INCBIN "gfx/pokedex.2bpp"
-
-WorldMapTileGraphics:
-    INCBIN "gfx/town_map.2bpp"
-
-PlayerCharacterTitleGraphics:
-    INCBIN "gfx/player_title.2bpp"
-
-Func_128d8:
+Func_128d8: ; Moved in the Bank
     ld a,[W_YCOORD] ; $d361
     ld b,a
     ld a,[W_CURMAPHEIGHT] ; $d368
@@ -29043,22 +29004,91 @@ Func_128d8:
     ld b,a
     ld a,[W_CURMAPWIDTH] ; $d369
 
-Func_128ea:
+Func_128ea: ; Moved in the Bank
     add a
     cp b
     ret z
     inc b
     ret
 
-Func_128ef:
+; fill an area of the screen with blank tile
+; INPUT:
+; hl = address of upper left corner of the area
+; b = height
+; c = width
+FillBlankArea:
+    ld a,$CA ; Blank Tile
+    ld de,20 ; screen width
+.loop
+    push hl
+    push bc
+.innerLoop
+    ld [hli],a
+    dec c
+    jr nz,.innerLoop
+    pop bc
+    pop hl
+    add hl,de
+    dec b
+    jr nz,.loop
+    ret
+
+; Some Byte Free
+
+SECTION "OldAmberSprite",ROMX[$5300],BANK[$4]
+
+OldAmberSprite: ; 11300 (4:5300)
+    INCBIN "gfx/sprites/old_amber.2bpp" ; was $11300
+LyingOldManSprite: ; 11340 (4:5340)
+    INCBIN "gfx/sprites/lying_old_man.2bpp" ; was $11340
+
+PokemonLogoGraphics: ; 11380 (4:5380)
+    INCBIN "gfx/pokemon_logo.2bpp"
+FontGraphics: ; 11a80 (4:5a80)
+    INCBIN "gfx/font.1bpp"
+
+ABTiles: ; 11e80 (4:5e80)
+    INCBIN "gfx/AB.2bpp"
+
+HpBarAndStatusGraphics: ; 11ea0 (4:5ea0)
+    INCBIN "gfx/hp_bar_and_status.2bpp"
+
+BattleHudTiles1: ; 12080 (4:6080)
+    INCBIN "gfx/battle_hud1.1bpp"
+
+BattleHudTiles2: ; 12098 (4:6098)
+    INCBIN "gfx/battle_hud2.1bpp"
+
+BattleHudTiles3: ; 120b0 (4:60b0)
+    INCBIN "gfx/battle_hud3.1bpp"
+
+NintendoCopyrightLogoGraphics: ; 120c8 (4:60c8)
+    INCBIN "gfx/copyright.2bpp"
+
+GamefreakLogoGraphics: ; 121f8 (4:61f8)
+    INCBIN "gfx/gamefreak.2bpp"
+
+TextBoxGraphics: ; 12288 (4:6288)
+    INCBIN "gfx/text_box.2bpp"
+
+PokedexTileGraphics: ; 12488 (4:6488)
+    INCBIN "gfx/pokedex.2bpp"
+
+WorldMapTileGraphics: ; 125a8 (4:65a8)
+    INCBIN "gfx/town_map.2bpp"
+
+PlayerCharacterTitleGraphics: ; 126a8 (4:66a8)
+    INCBIN "gfx/player_title.2bpp"
+
+Func_128ef: ; 128ef (4:68ef)
     call Load16BitRegisters
     ld a,$1
     jr asm_128fb
 
-Func_128f6:
+Func_128f6: ; 128f6 (4:68f6)
     call Load16BitRegisters
     ld a,$2
-asm_128fb:
+asm_128fb: ; 128fb (4:68fb)
     ld [wListMenuID],a ; $cf94
     push hl
     ld a,[$cf99]
@@ -29084,7 +29114,7 @@ asm_128fb:
     ld d,a
     ld c,a
 
-Func_12924:
+Func_12924: ; 12924 (4:6924)
     pop hl
     push de
     push hl
@@ -29661,28 +29691,6 @@ HandleStatusScreen2:
     db "PWR",$D3,"@"
 .PPText
     db "PP",$D3,"@"
-
-; fill an area of the screen with blank tile
-; INPUT:
-; hl = address of upper left corner of the area
-; b = height
-; c = width
-FillBlankArea:
-    ld a,$CA ; Blank Tile
-    ld de,20 ; screen width
-.loop
-    push hl
-    push bc
-.innerLoop
-    ld [hli],a
-    dec c
-    jr nz,.innerLoop
-    pop bc
-    pop hl
-    add hl,de
-    dec b
-    jr nz,.loop
-    ret
 
 SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
 
@@ -31713,7 +31721,7 @@ GetEnemy:
     jr nz,.NotEncounter
     ld a,1
     ld [W_CURENEMYLVL],a
-    ld a,PIKACHU
+    ld a,PIKACHU ; Entry Level
     jr .WillEncounter
 .OwnPikachu
     push hl
@@ -31742,7 +31750,7 @@ GetEnemy:
 .MewFirstEncounter
     ld a,7
     ld [W_CURENEMYLVL],a
-    ld a,MEW
+    ld a,MEW ; Entry Level
     jr .WillEncounter
 
 UnknownDungeonLandPkmnList:
@@ -31827,13 +31835,13 @@ UnknownDungeonLandPkmnList:
     db NIDORINO
     db NIDOKING
     db CLEFAIRY
-    db CLEFABLE
+    db CLEFABLE ; Entry Level
     db VULPIX
     db VULPIX
     db NINETALES
     db JIGGLYPUFF
     db JIGGLYPUFF
-    db WIGGLYTUFF
+    db WIGGLYTUFF ; Entry Level
     db ZUBAT
     db ZUBAT
     db ZUBAT
@@ -31977,7 +31985,7 @@ UnknownDungeonLandPkmnList:
     db ELECTRODE
     db EXEGGCUTE
     db EXEGGCUTE
-    db EXEGGUTOR
+    db EXEGGUTOR ; Entry Level
     db CUBONE
     db CUBONE
     db MAROWAK
@@ -31987,7 +31995,7 @@ UnknownDungeonLandPkmnList:
     db WEEZING
     db RHYHORN
     db RHYHORN
-    db RHYDON
+    db RHYDON ; Entry Level
     db TANGELA
     db TANGELA
     db MR_MIME
@@ -33494,6 +33502,11 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     dw BasketSprite
     db $40 ; byte count
     db BANK(BasketSprite)
+
+    ; SPRITE_LAPRAS
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_LAPRAS-1)%(DEX_MAGIKARP-1)))
+    db $40 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
 
     ; SPRITE_AERODACTYL
     dw MonOverworldDataNew2_emimonserrate+($80*((DEX_AERODACTYL-1)%(DEX_MAGIKARP-1)))
@@ -41732,7 +41745,7 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,37 ; trainer
     db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,40 ; trainer
     db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,37 ; trainer
-    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,40 ; trainer
+    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,45 ; Entry Level (Over)
     db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
     db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,HP_UP ; item
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
@@ -49251,6 +49264,29 @@ BugfixEvolutionStoneInBattle:
     cp b
     ret
 
+;joenote - changed to hyper potion like other e4 members
+BrunoAI: ; Moved in the Bank
+;    cp $40
+;    jp c,AIUseXDefend
+    cp $80
+    jr nc,.brunoreturn
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+.brunoreturn
+    ret
+
+AgathaAI: ; Moved in the Bank
+;    cp $14
+;    jp c,AISwitchIfEnoughMons
+    cp $80
+    jr nc,.agathareturn
+    ld a,5    ;joenote - upped to 5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
+.agathareturn
+    ret
+
 INCLUDE "constants/TrainerData.asm"
 
 SECTION "DecrementAICount",ROMX[$6695],BANK[$e]
@@ -50634,29 +50670,8 @@ LoreleiAI:
 .loreleireturn
     ret
 
-;joenote - changed to hyper potion like other e4 members
-BrunoAI:
-;    cp $40
-;    jp c,AIUseXDefend
-    cp $80
-    jr nc,.brunoreturn
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-.brunoreturn
-    ret
-
-AgathaAI:
-;    cp $14
-;    jp c,AISwitchIfEnoughMons
-    cp $80
-    jr nc,.agathareturn
-    ld a,5    ;joenote - upped to 5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
-.agathareturn
-    ret
-
+; BrunoAI   ; Moved in the Bank
+; AgathaAI  ; Moved in the Bank
 ; LanceAI   ; Moved in the Bank
 ; GenericAI ; Moved in the Bank
 
@@ -52182,22 +52197,20 @@ UnnamedText_3cab4: ; 3cab4 (f:4ab4)
 TryRunningFromBattle: ; 3cab9 (f:4ab9)
     call IsGhostBattle
     jp z,.canEscape
-    ld a,[W_BATTLETYPE] ; $d05a
-    cp $2
-    jp z,.canEscape
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jp z,.canEscape
     ld a,[W_ISINBATTLE] ; $d057
     dec a
     jr nz,.trainerBattle
-    jr .skipNop
     ; ds 3 ; ld a,[$d120]
     ; ds 1 ; inc a
     ; ds 3 ; ld [$d120],a
-.skipNop
     call CheckNotEscapeWildPokemon
     jr c,.cantEscape
+    ld a,[W_BATTLETYPE] ; $d05a
+    cp $2
+    jp z,.canEscape
     ld a,[hli]
     ld [$FF00+$97],a
     ld a,[hl]
@@ -66274,39 +66287,38 @@ SafariZoneNorth_h: ; 0x4599f to 0x459ab (12 bytes) (bank=11) (id=218)
     db $00 ; connections
     dw SafariZoneNorthObject ; objects
 
-SafariZoneNorthScript: ; 459ab (11:59ab)
-    jp EnableAutoTextBoxDrawing
-
-SafariZoneNorthTextPointers: ; 459ae (11:59ae)
+SafariZoneNorthTextPointers:
     dw Predef5CText
     dw Predef5CText
+    dw SafariZoneNorthLapras
     dw SafariZoneNorthText3
     dw SafariZoneNorthText4
     dw SafariZoneNorthText5
     dw SafariZoneNorthText6
     dw SafariZoneNorthText7
+    dw SafariZoneLaprasRunAway
 
-SafariZoneNorthText3: ; 459bc (11:59bc)
+SafariZoneNorthText3:
     TX_FAR _SafariZoneNorthText3
     db "@"
 
-SafariZoneNorthText4: ; 459c1 (11:59c1)
+SafariZoneNorthText4:
     TX_FAR _SafariZoneNorthText4
     db "@"
 
-SafariZoneNorthText5: ; 459c6 (11:59c6)
+SafariZoneNorthText5:
     TX_FAR _SafariZoneNorthText5
     db "@"
 
-SafariZoneNorthText6: ; 459cb (11:59cb)
+SafariZoneNorthText6:
     TX_FAR _SafariZoneNorthText6
     db "@"
 
-SafariZoneNorthText7: ; 459d0 (11:59d0)
+SafariZoneNorthText7:
     TX_FAR _SafariZoneNorthText7
     db "@"
 
-SafariZoneNorthObject: ; 0x459d5 (size=105)
+SafariZoneNorthObject:
     db $0 ; border tile
 
     db $9 ; warps
@@ -66321,15 +66333,16 @@ SafariZoneNorthObject: ; 0x459d5 (size=105)
     db $3,$23,$0,SAFARI_ZONE_REST_HOUSE_4
 
     db $5 ; signs
-    db $4,$24,$3 ; SafariZoneNorthText3
-    db $19,$4,$4 ; SafariZoneNorthText4
-    db $1f,$d,$5 ; SafariZoneNorthText5
-    db $21,$13,$6 ; SafariZoneNorthText6
-    db $1c,$1a,$7 ; SafariZoneNorthText7
+    db $4,$24,$4 ; SafariZoneNorthText3
+    db $19,$4,$5 ; SafariZoneNorthText4
+    db $1f,$d,$6 ; SafariZoneNorthText5
+    db $21,$13,$7 ; SafariZoneNorthText6
+    db $1c,$1a,$8 ; SafariZoneNorthText7
 
-    db $2 ; people
+    db $3 ; people
     db SPRITE_BALL,$1 + 4,$19 + 4,$ff,$ff,$81,PROTEIN ; item
     db SPRITE_BALL,$7 + 4,$13 + 4,$ff,$ff,$82,TM_40 ; item
+    db SPRITE_LAPRAS,$f + 4,$19 + 4,$ff,$d0,$3 ; person ; Entry Level (Over)
 
     ; warp-to
     EVENT_DISP $14,$23,$2 ; SAFARI_ZONE_WEST
@@ -66342,8 +66355,10 @@ SafariZoneNorthObject: ; 0x459d5 (size=105)
     EVENT_DISP $14,$1f,$27 ; SAFARI_ZONE_EAST
     EVENT_DISP $14,$3,$23 ; SAFARI_ZONE_REST_HOUSE_4
 
-SafariZoneNorthBlocks: ; 45a3e (11:5a3e)
+SafariZoneNorthBlocks:
     INCBIN "maps/safarizonenorth.blk"
+
+SECTION "SafariZoneCenter_h",ROMX[$5bb2],BANK[$11]
 
 SafariZoneCenter_h: ; 0x45ba6 to 0x45bb2 (12 bytes) (bank=11) (id=220)
     db $03 ; tileset
@@ -66685,7 +66700,7 @@ UnknownDungeon3Object: ; 0x45f36 (size=34)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_MEWTWO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,65 ; trainer
+    db SPRITE_MEWTWO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,65 ; Entry Level (Over)
     db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$82,ULTRA_BALL ; item
     db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
 
@@ -67539,7 +67554,7 @@ SeafoamIslands5Object: ; 0x468bc (size=62)
     db $3 ; people
     db SPRITE_BOULDER,$f + 4,$4 + 4,$ff,$ff,$1 ; person
     db SPRITE_BOULDER,$f + 4,$5 + 4,$ff,$ff,$2 ; person
-    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,40 ; trainer
+    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,45 ; Entry Level (Over)
 
     ; warp-to
     EVENT_DISP $f,$11,$14 ; SEAFOAM_ISLANDS_4
@@ -68478,6 +68493,98 @@ FlagInstantAndPredefRocketHideout: ; xxxxx (11:xxxx) ; Denim
     ld hl,wFlagListMenuSpc
     res 3,[hl]
     ret
+
+; ──────────────────────
+; Safari NORD
+; ──────────────────────
+
+SafariZoneNorthScript: ; Moved in the Bank
+    call EnableAutoTextBoxDrawing
+    ld hl,SafariZoneNorthScriptPointers
+    ld a,[W_SAFARIZONENORTHCURSCRIPT]
+    jp CallFunctionInTable
+
+SafariZoneNorthScriptPointers:
+    dw SafariZoneNorthScript0
+    dw SafariZoneNorthPostLapras
+
+SafariZoneNorthScript0:
+    ret
+
+SafariZoneNorthLapras:
+    db $8
+    ld d,3 ; Lapras OAM ID
+    call SafariZoneLapras
+    ld a,1 ; SafariZoneNorthPostLapras
+    ld [W_SAFARIZONENORTHCURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    jp TextScriptEnd
+
+SafariZoneNorthPostLapras:
+    ld de,$E809 ; d = ID Missable Sprite | e = LaprasRunAway Text ID  ; SAFARITODO
+    call SafariZonePostLapras
+    xor a
+    ld [W_SAFARIZONENORTHCURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+; ──────────────────────
+; Lapras General
+; ──────────────────────
+
+; SAFARITODO : Sprite Lapras Colori Invertiti
+
+SafariZoneLapras: ; SAFARITODO : Lapras sempre maschio
+    push de
+    ld hl,SafariZoneLaprasText
+    call PrintText
+    ld a,LAPRAS
+    call PlayCry
+    call WaitForSoundToFinish
+    pop af           ; Lapras OAM ID
+    ld [$FF00+$8c],a ; ...
+    xor a
+    ld [W_GYMLEADERNO],a
+    ld a,30
+    ld [W_CURENEMYLVL],a
+    ld a,LAPRAS ; Entry Level (Over)
+    ld [W_CUROPPONENT],a ; $d059
+    ld [wEngagedTrainerClass],a
+    jp PlayTrainerMusic
+
+SafariZoneLaprasText:
+    TX_FAR _SafariZoneLaprasText
+    db "@"
+
+; d = ID Missable Sprite | e = LaprasRunAway Text ID
+SafariZonePostLapras:
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $ff
+    ret z
+    ld a,d
+    ld [$cc4d],a
+    ld a,$11
+    push de
+    call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
+    pop de
+    ld a,[$cf0b]
+    cp $2
+    jr z,.skip
+    ld a,e ; SafariZoneLaprasRunAway
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    call DisplayTextID
+.skip
+    call UpdateSprites
+
+    ; SAFARITODO - mostrare altri lapras solo se $cf0b <> 2
+
+    jp Delay3
+
+SafariZoneLaprasRunAway:
+    TX_FAR _SafariZoneLaprasRunAway
+    db "@"
+
+; ──────────────────────
 
 SECTION "bank12",ROMX,BANK[$12]
 
@@ -72665,7 +72772,7 @@ SafariZoneWestObject: ; 0x4a1dc (size=108)
     db SPRITE_BALL,$14 + 4,$8 + 4,$ff,$ff,$81,TRADE_STONE ; item
     db SPRITE_BALL,$7 + 4,$9 + 4,$ff,$ff,$82,TM_32 ; item
     db SPRITE_BALL,$12 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
-    db SPRITE_BALL,$7 + 4,$13 + 4,$ff,$ff,$84,GOLD_TEETH ; item
+    db SPRITE_BALL,$d + 4,$14 + 4,$ff,$ff,$84,GOLD_TEETH ; item
 
     ; warp-to
     EVENT_DISP $f,$0,$14 ; SAFARI_ZONE_NORTH
@@ -75980,7 +76087,7 @@ SilphCo7Text1: ; 51d8e (14:5d8e)
 .asm_d7e17 ; 0x51da5
     ld hl,UnnamedText_51dd3
     call PrintText
-    ld bc,(PORYGON << 8) | 10 ; Entry Level
+    ld bc,(PORYGON << 8) | 30 ; Entry Level (Over)
     call GivePorygon ; call GivePokemon
     jr nc,.asm_b3069 ; 0x51db1
     ld a,[$ccd3]
@@ -76363,7 +76470,7 @@ Mansion2Object: ; Move in the Bank
     db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
-    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$45,MOLTRES,40 ; trainer
+    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$45,MOLTRES,45 ; Entry Level (Over)
 
     ; warp-to
     EVENT_DISP $f,$a,$5 ; MANSION_1
@@ -86096,9 +86203,9 @@ Route12Snorlax:
     ld [$FF00+$8c],a ; ...
     xor a
     ld [W_GYMLEADERNO],a
-    ld a,15
+    ld a,25
     ld [W_CURENEMYLVL],a ; $d127
-    ld a,SNORLAX
+    ld a,SNORLAX ; Entry Level (Over)
     ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
     call PlayTrainerMusic
@@ -86115,7 +86222,7 @@ Route16Snorlax:
     ld [$FF00+$8c],a ; ...
     xor a
     ld [W_GYMLEADERNO],a
-    ld a,22
+    ld a,25
     ld [W_CURENEMYLVL],a ; $d127
     ld a,SNORLAX
     ld [W_CUROPPONENT],a ; $d059
@@ -88187,7 +88294,7 @@ FightingDojoText6: ; 5cf06 (17:4f06)
     ds 1 ; call PrintText
     jr .done
 .GetMon
-    ld a,HITMONLEE ; Entry Level
+    ld a,HITMONLEE ; Entry Level (Over)
     call DisplayPokedex
     ld hl,WantHitmonleeText
     call PrintText
@@ -88197,7 +88304,7 @@ FightingDojoText6: ; 5cf06 (17:4f06)
     jr nz,.done
     ld a,[$cf91]
     ld b,a
-    ld c,10
+    ld c,25
     call GivePokemon
     jr nc,.done
 
@@ -88228,7 +88335,7 @@ FightingDojoText7: ; 5cf4e (17:4f4e)
     ds 1 ; call PrintText
     jr .done
 .GetMon
-    ld a,HITMONCHAN ; Entry Level
+    ld a,HITMONCHAN ; Entry Level (Over)
     call DisplayPokedex
     ld hl,WantHitmonchanText
     call PrintText
@@ -88238,7 +88345,7 @@ FightingDojoText7: ; 5cf4e (17:4f4e)
     jr nz,.done
     ld a,[$cf91]
     ld b,a
-    ld c,10
+    ld c,25
     call GivePokemon
     jr nc,.done
     ld hl,$d7b1
@@ -92215,10 +92322,10 @@ SSAnne4ScriptPointers:
     dw SSAnne4Script2
 
 SSAnne4Script0:
-    ld a,$e8     ; Hide Basket 2
-    ld [$cc4d],a ; ...
-    ld a,$11     ; ...
-    call Predef  ; ...
+    ld a,$C7 ; old $e8 ; Hide Basket 2
+    ld [$cc4d],a       ; ...
+    ld a,$11           ; ...
+    call Predef        ; ...
     ld a,1
     ld [W_SSANNE4CURSCRIPT],a
     ret
@@ -94002,7 +94109,7 @@ PokeCenterPCCode: ; 62529 (18:6529)
 
 PredefAndHideFuchsiaGuard:
     call Predef
-    ld a,$e6
+    ld a,$C5 ; old $e6
     ld [$cc4d],a
     ld a,$11
     jp Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
@@ -94091,7 +94198,7 @@ MissableObjectIDs_6219b: ; Moved in the Bank
     db $92,$93,$97,$98,$99,$9A,$9E,$9F
     db $A0,$A3,$A4,$A5,$A6,$AB,$AC,$AD
     db $AE,$AF,$B0,$B1,$B2,$B7,$B8,$B9
-    db $EA,$EB,$FF
+    db $C9,$CA,$FF
 
 DiglettsCaveObject: ; 0x61f72 (size=20)
     db $19 ; border tile
@@ -94192,7 +94299,7 @@ DiglettsCaveAerodactyl:
     ld [W_GYMLEADERNO],a
     ld a,25
     ld [W_CURENEMYLVL],a ; $d127
-    ld a,AERODACTYL
+    ld a,AERODACTYL ; Entry Level (Over)
     ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
     call PlayTrainerMusic
@@ -94216,7 +94323,7 @@ DiglettsCavePostAerodactyl:
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
 .skip
-    ld a,$ec
+    ld a,$CB ; old $ec
     ld [$cc4d],a
     ld a,$11
     call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
@@ -121167,6 +121274,16 @@ _DiglettsCaveAerodactylRunAway:
     db "through the hole.",$51
     db "Good bye!",$57
 
+_SafariZoneLaprasText:
+    db $0,"Weeeeh!",$57
+
+_SafariZoneLaprasRunAway:
+    db $0,"Lapras has",$4f
+    db "disappeared into",$55
+    db "the lake.",$51
+    db "He won't have",$4f
+    db "gone far!",$57
+
 SECTION "bank25",ROMX,BANK[$25]
 
 _Route24EndBattleText1: ; 94000 (25:4000)
@@ -128342,7 +128459,7 @@ MewBaseStats: ; 425b (1:425b)
     db PSYCHIC ; species type 1
     db PSYCHIC ; species type 2
 
-    db 45 ; catch rate
+    db 3 ; catch rate
     db 64 ; base exp yield
     db $55 ; sprite dimensions
 
@@ -128350,10 +128467,10 @@ MewBaseStats: ; 425b (1:425b)
     dw MewPicBack
 
     ; attacks known at lvl 0
-    db POUND
     db TRANSFORM
-    db 0
-    db 0
+    db MIMIC
+    db MIRROR_MOVE
+    db METRONOME
 
     db 3 ; growth rate
 
@@ -128374,11 +128491,11 @@ DratiniCaveScript:
     ld a,[W_SSANNE4CURSCRIPT]
     cp 2
     jr z,.Skip
-    ld a,$e7
+    ld a,$C6 ; old $e7
     ld [$cc4d],a
     ld a,$11
     call Predef ; Hide Basket 1
-    ld a,$e8
+    ld a,$C7 ; old $e8
     ld [$cc4d],a
     ld a,$15
     call Predef ; Show Basket 2
@@ -129830,7 +129947,7 @@ MoonMons1:
     db 10,GEODUDE  ;  5%
     db  8,PARAS    ;  5% ; Entry Level
     db 11,ZUBAT    ;  4%
-    db  8,CLEFAIRY ;  1% ; Entry Level
+    db  8,CLEFAIRY ;  1%
     db $00
 
 MoonMonsB1:
@@ -130185,13 +130302,13 @@ Route16Mons:
 
 TowerMons3:
     db $0A
-    db 20,GASTLY  ; 20%
-    db 21,GASTLY  ; 20%
-    db 22,GASTLY  ; 15%
-    db 23,GASTLY  ; 10%
-    db 19,GASTLY  ; 10%
-    db 18,GASTLY  ; 10% ; Entry Level
-    db 24,GASTLY  ;  5%
+    db 18,GASTLY  ; 20%
+    db 19,GASTLY  ; 20%
+    db 20,GASTLY  ; 15%
+    db 21,GASTLY  ; 10%
+    db 17,GASTLY  ; 10%
+    db 16,GASTLY  ; 10% ; Entry Level
+    db 23,GASTLY  ;  5%
     db 12,CUBONE  ;  5% ; Entry Level
     db 17,CUBONE  ;  4%
     db 25,HAUNTER ;  1% ; Entry Level
@@ -130199,16 +130316,16 @@ TowerMons3:
 
 TowerMons4:
     db $0A
+    db 19,GASTLY  ; 20%
     db 20,GASTLY  ; 20%
-    db 21,GASTLY  ; 20%
-    db 22,GASTLY  ; 15%
-    db 23,GASTLY  ; 10%
-    db 19,GASTLY  ; 10%
+    db 21,GASTLY  ; 15%
+    db 22,GASTLY  ; 10%
     db 18,GASTLY  ; 10%
+    db 17,GASTLY  ; 10%
     db 25,HAUNTER ;  5%
     db 13,CUBONE  ;  5%
     db 18,CUBONE  ;  4%
-    db 24,GASTLY  ;  1%
+    db 23,GASTLY  ;  1%
     db $00
 
 TowerMons5:
@@ -130385,7 +130502,7 @@ ZoneMons1:
     db $1E
     db 17,PONYTA  ; 20%
     db 20,DODUO   ; 20%
-    db 16,RHYHORN ; 15%
+    db 19,RHYHORN ; 15%
     db 20,PONYTA  ; 10%
     db 17,DODUO   ; 10% ; Entry Level
     db 12,RHYHORN ; 10% ; Entry Level
@@ -130403,16 +130520,16 @@ ZoneMons1:
     db 23,MAGIKARP  ;  5%
     db 28,GYARADOS  ;  5%
     db 32,GYARADOS  ;  4%
-    db 15,LAPRAS    ;  1% ; Entry Level
+    db 30,DRAGONAIR ;  1%
 
 ZoneMons2:
     db $1E
     db 24,NIDORINO   ; 20%
     db 24,NIDORINA   ; 20%
-    db 16,RHYHORN    ; 15%
+    db 31,RHYHORN    ; 15%
     db 27,NIDORINO   ; 10%
     db 27,NIDORINA   ; 10%
-    db 12,RHYHORN    ; 10%
+    db 26,RHYHORN    ; 10%
     db 31,NIDOKING   ;  5% ; Entry Level
     db 31,NIDOQUEEN  ;  5% ; Entry Level
     db 29,KANGASKHAN ;  4%
@@ -130471,14 +130588,14 @@ PowerPlantMons:
     db $0A
     db 37,VOLTORB    ; 20%
     db 37,VOLTORB    ; 20%
-    db 40,ELECTRODE  ; 15%
+    db 40,ELECTRODE  ; 15% ; Entry Level
     db  9,PIKACHU    ; 10%
     db 21,MAGNEMITE  ; 10%
     db 18,MAGNEMITE  ; 10%
     db 30,MAGNETON   ;  5% ; Entry Level
-    db 20,RAICHU     ;  5% ; Entry Level
-    db  9,ELECTABUZZ ;  4% ; Entry Level
-    db 20,JOLTEON    ;  1% ; Entry Level
+    db 32,RAICHU     ;  5% ; Entry Level
+    db 22,ELECTABUZZ ;  4% ; Entry Level (Over)
+    db 32,JOLTEON    ;  1% ; Entry Level
     db $00
 
 IslandMons1:
@@ -130533,8 +130650,8 @@ IslandMonsB3:
     db 36,DEWGONG   ; 10%
     db 37,DEWGONG   ;  5%
     db  5,SQUIRTLE  ;  5% ; Entry Level
-    db  9,JYNX      ;  4% ; Entry Level
-    db 20,VAPOREON  ;  1% ; Entry Level
+    db 22,JYNX      ;  4% ; Entry Level (Over)
+    db 32,VAPOREON  ;  1% ; Entry Level
     db $0A
     db 27,SEEL      ; 20%
     db 26,KRABBY    ; 20%
@@ -130542,10 +130659,10 @@ IslandMonsB3:
     db 24,KRABBY    ; 10%
     db  5,SQUIRTLE  ; 10%
     db 11,SQUIRTLE  ; 10%
-    db 16,WARTORTLE ;  5%
-    db 18,WARTORTLE ;  5%
+    db 16,WARTORTLE ;  5% ; Entry Level
+    db 25,WARTORTLE ;  5%
     db 21,WARTORTLE ;  4%
-    db 36,BLASTOISE ;  1% ; Entry Level
+    db 40,BLASTOISE ;  1% ; Entry Level
 
 IslandMonsB4:
     db $0A
@@ -130568,8 +130685,8 @@ IslandMonsB4:
     db 38,DEWGONG   ; 10%
     db  5,SQUIRTLE  ;  5%
     db 11,SQUIRTLE  ;  5%
-    db 16,WARTORTLE ;  4% ; Entry Level
-    db 30,LAPRAS    ;  1% ; Entry Level
+    db 25,WARTORTLE ;  4%
+    db 38,LAPRAS    ;  1%
 
 MansionMons1:
     db $0A
@@ -130582,7 +130699,7 @@ MansionMons1:
     db 27,GROWLITHE  ;  5%
     db 27,VULPIX     ;  5%
     db  5,CHARMANDER ;  4% ; Entry Level
-    db 40,RAPIDASH   ;  1%
+    db 40,RAPIDASH   ;  1% ; Entry Level
     db $00
 
 MansionMons2:
@@ -130608,9 +130725,9 @@ MansionMons3:
     db  5,CHARMANDER ; 10%
     db 11,CHARMANDER ; 10%
     db 16,CHARMELEON ;  5%
-    db 18,CHARMELEON ;  5%
+    db 25,CHARMELEON ;  5%
     db 21,CHARMELEON ;  4%
-    db 36,CHARIZARD  ;  1% ; Entry Level
+    db 40,CHARIZARD  ;  1% ; Entry Level
     db $00
 
 MansionMonsB1:
@@ -130623,8 +130740,8 @@ MansionMonsB1:
     db 29,PONYTA    ; 10%
     db 32,ARCANINE  ;  5% ; Entry Level
     db 32,NINETALES ;  5% ; Entry Level
-    db  9,MAGMAR    ;  4% ; Entry Level
-    db 20,FLAREON   ;  1% ; Entry Level
+    db 22,MAGMAR    ;  4% ; Entry Level (Over)
+    db 32,FLAREON   ;  1% ; Entry Level
     db $00
 
 Route21Mons:
@@ -130633,12 +130750,12 @@ Route21Mons:
     db 22,DROWZEE    ; 20%
     db 25,KADABRA    ; 15% ; Entry Level
     db 25,ABRA       ; 10%
-    db 25,DROWZEE    ; 10%
+    db 21,DROWZEE    ; 10%
     db 28,KADABRA    ; 10%
     db 27,HYPNO      ;  5% ; Entry Level
-    db 15,MR_MIME    ;  5% ; Entry Level
+    db 25,MR_MIME    ;  5%
     db 32,HYPNO      ;  4%
-    db 18,MR_MIME    ;  1%
+    db 10,MR_MIME    ;  1% ; Entry Level
     db $05
     db 11,TENTACOOL  ; 20%
     db 15,TENTACOOL  ; 20%
@@ -130660,9 +130777,9 @@ Route23Mons:
     db  5,BULBASAUR  ; 10% ; Entry Level
     db 11,BULBASAUR  ; 10%
     db 16,IVYSAUR    ;  5% ; Entry Level
-    db 18,IVYSAUR    ;  5%
+    db 25,IVYSAUR    ;  5%
     db 21,IVYSAUR    ;  4%
-    db 32,VENUSAUR   ;  1% ; Entry Level
+    db 40,VENUSAUR   ;  1% ; Entry Level
     db $02
     db 24,MAGIKARP   ; 20%
     db 27,MAGIKARP   ; 20%
@@ -132108,7 +132225,10 @@ _CheckNotEscapeWildPokemon:
     ld a,[W_ISINBATTLE] ; wild = 1
     dec a
     jr nz,.End
+    ld a,[W_BATTLETYPE]
+    cp $2 ; is safari?
     ld a,[W_ENEMYMONID]
+    jr z,.Safari ; notSafariZone
     ld b,a
     ld hl,.NotEscapeWildPokemon
 .Loop
@@ -132121,21 +132241,79 @@ _CheckNotEscapeWildPokemon:
     scf ; set carry flag
     ret
 .NotInList
+.CheckShiny
     ld hl,W_ENEMYMONATKDEFIV
     call CheckShiny
     jr z,.NotEscape
 .End
+    ld a,[W_BATTLETYPE] ; $d05a
+    cp $2
+    jp z,.skip
     ld a,[$d120]
     inc a
     ld [$d120],a
+.skip
     and a ; reset carry flag
     ret
+.Safari
+    cp LAPRAS
+    jr z,.NotEscape
+    jr .CheckShiny
+
 .NotEscapeWildPokemon
+    db VENUSAUR
+    db CHARIZARD
+    db BLASTOISE
+    db BEEDRILL
+    db PIDGEOT
+    db RATICATE
+    db FEAROW
+    db ARBOK
+    db RAICHU
+    db SANDSLASH
+    db NIDOQUEEN
+    db NIDOKING
+    db NINETALES
+    db GOLBAT
+    db GLOOM
+    db VILEPLUME
+    db DIGLETT
+    db DUGTRIO
+    db PERSIAN
+    db GOLDUCK
+    db PRIMEAPE
+    db ARCANINE
+    db POLIWRATH
+    db WEEPINBELL
+    db VICTREEBEL
+    db TENTACRUEL
+    db RAPIDASH
+    db DODRIO
+    db MUK
+    db HAUNTER
+    db GENGAR
+    db ONIX
+    db VOLTORB
+    db ELECTRODE
+    db HITMONLEE
+    db HITMONCHAN
+    db WEEZING
+    db SCYTHER
+    db JYNX
+    db ELECTABUZZ
+    db MAGMAR
+    db PINSIR
+    db GYARADOS
+    db LAPRAS
+    db VAPOREON
+    db JOLTEON
+    db FLAREON
     db AERODACTYL
     db SNORLAX
     db ARTICUNO
     db ZAPDOS
     db MOLTRES
+    db DRAGONAIR
     db DRAGONITE
     db MEWTWO
     db MEW

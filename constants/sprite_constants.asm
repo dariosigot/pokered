@@ -84,12 +84,13 @@ SPRITE_LYING_OLD_MAN_UNUSED_1    EQU $46
 SPRITE_LYING_OLD_MAN_UNUSED_2    EQU $47
 SPRITE_LYING_OLD_MAN             EQU $48
 SPRITE_BASKET                    EQU $49
-SPRITE_AERODACTYL                EQU $4A
-SPRITE_ARTICUNO                  EQU $4B
-SPRITE_ZAPDOS                    EQU $4C
-SPRITE_MOLTRES                   EQU $4D
-SPRITE_DRATINI                   EQU $4E
-SPRITE_MEWTWO                    EQU $4F
+SPRITE_LAPRAS                    EQU $4A
+SPRITE_AERODACTYL                EQU $4B
+SPRITE_ARTICUNO                  EQU $4C
+SPRITE_ZAPDOS                    EQU $4D
+SPRITE_MOLTRES                   EQU $4E
+SPRITE_DRATINI                   EQU $4F
+SPRITE_MEWTWO                    EQU $50
 
 ; different kinds of people events
 ITEM    EQU $80

@@ -91,9 +91,9 @@ Mon005_EvosMoves:
 ;Learnset
     ;  16,RAGE
     db 21,SMOKESCREEN
-    db 25,FIRE_PUNCH
-    db 28,TRAPHOLE
-    db 33,SLASH
+    db 24,TRAPHOLE
+    db 27,FIRE_PUNCH
+    db 32,SLASH
     ;  36,CHARIZARD
     db 38,AGILITY
     db 42,FLAMETHROWER
@@ -1767,10 +1767,10 @@ Mon096_EvosMoves:
     db  6,TELEPORT
     db  9,PSYWAVE
     db 13,HYPNOSIS
-    db 16,DREAM_EATER
+    db 14,DREAM_EATER
     db 17,CONFUSION
     db 21,HEADBUTT
-    db 24,MEDITATE
+    db 26,MEDITATE
     ;  26,HYPNO
     db 31,POISON_GAS
     db 35,PSYBEAM
@@ -1929,8 +1929,8 @@ Mon104_EvosMoves:
     ;   1,GROWL
     db  5,TAIL_WHIP
     db  9,BONE_CLUB
-    db 13,HEADBUTT
-    db 17,LEER         ; Pkmn Tower's Marowak (Level 30)
+    db 13,LEER
+    db 17,HEADBUTT     ; Pkmn Tower's Marowak (Level 30)
     db 21,FOCUS_ENERGY ; ...
     db 25,BONEMERANG   ; ...
     ;  28,MAROWAK
@@ -1965,10 +1965,10 @@ Mon106_EvosMoves:
     ;   1,MEDITATE
     db  6,DOUBLE_KICK
     db  9,STRIKE
-    db 11,ROLLING_KICK
-    db 16,JUMP_KICK
-    db 21,FOCUS_ENERGY
-    db 23,DOUBLE_TEAM
+    db 11,ROLLING_KICK ; Dojo's Hitmonlee (Level 25)
+    db 16,JUMP_KICK    ; ...
+    db 21,FOCUS_ENERGY ; ...
+    db 23,DOUBLE_TEAM  ; ...
     db 26,MEGA_KICK
     db 27,HI_JUMP_KICK
     db 28,REST
@@ -1989,10 +1989,10 @@ Mon107_EvosMoves:
     ;   1,AGILITY
     db  6,COMET_PUNCH
     db  9,STRIKE
-    db 11,BIDE
-    db 16,MEGA_PUNCH
-    db 21,FOCUS_ENERGY
-    db 23,DOUBLE_TEAM
+    db 11,BIDE         ; Dojo's Hitmonchan (Level 25)
+    db 16,MEGA_PUNCH   ; ...
+    db 21,FOCUS_ENERGY ; ...
+    db 23,DOUBLE_TEAM  ; ...
     db 26,FIRE_PUNCH
     db 27,ICE_PUNCH
     db 28,THUNDERPUNCH
@@ -2558,10 +2558,10 @@ Mon131_EvosMoves:
     db 11,SING
     db 16,CONFUSE_RAY
     db 19,SKULL_BASH
-    db 21,AURORA_BEAM
-    db 24,TAKE_DOWN
-    db 26,MIST
-    db 29,BODY_SLAM
+    db 21,AURORA_BEAM ; Safari's Lapras (Level 30)
+    db 24,TAKE_DOWN   ; ...
+    db 26,MIST        ; ...
+    db 29,BODY_SLAM   ; ...
     db 32,TSUNAMI
     db 35,THUNDERSHOCK
     db 39,HAZE
@@ -2689,21 +2689,22 @@ Mon137_EvosMoves:
 ;Learnset
     ;   1,TACKLE
     ;   1,CONVERSION
-    db  8,AGILITY
-    db 10,TELEPORT
-    db 12,SONICBOOM
-    db 15,PSYBEAM
-    db 18,FLASH
-    db 20,SWIFT
-    db 22,RECOVER
-    db 24,LIGHT_SCREEN
-    db 27,SHARPEN
-    db 29,THUNDER_WAVE
-    db 30,BARRIER
-    db 33,HYPNOSIS
-    db 36,DREAM_EATER
-    db 39,TRI_ATTACK
-    db 42,REFLECT
+    db  6,AGILITY
+    db  9,PSYWAVE
+    db 12,TELEPORT
+    db 14,SONICBOOM
+    db 17,FLASH
+    db 20,SWIFT    ; Silph's Gift Porygon (Level 30)
+    db 23,SHARPEN  ; ...
+    db 25,RECOVER  ; ...
+    db 29,PSYBEAM  ; ...
+    db 31,LIGHT_SCREEN
+    db 33,THUNDER_WAVE
+    db 35,BARRIER
+    db 38,HYPNOSIS
+    db 39,DREAM_EATER
+    db 41,TRI_ATTACK
+    db 44,REFLECT
     db 51,AMNESIA
     db 55,THUNDERBOLT
     db 60,HYPER_BEAM
@@ -2820,14 +2821,14 @@ Mon143_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    ;   1,LICK         ; Snorlax (Level 15)
-    ;   1,DEFENSE_CURL ; ...
-    db  8,BITE         ; ...
-    db 11,REST         ; ... ; Snorlax (Level 22)
-    db 16,HEADBUTT           ; ...
-    db 19,ROCK_THROW         ; ...
-    db 21,STOMP              ; ...
-    db 24,BODY_SLAM
+    ;   1,LICK
+    ;   1,DEFENSE_CURL
+    db  8,BITE
+    db 11,STOMP
+    db 16,REST         ; Snorlax (Level 25)
+    db 19,ROCK_THROW   ; ...
+    db 21,HEADBUTT     ; ...
+    db 24,BODY_SLAM    ; ...
     db 27,AMNESIA
     db 30,DISABLE
     db 34,HARDEN
@@ -2849,17 +2850,17 @@ Mon144_EvosMoves:
     ;   1,MIST
     db  9,PECK
     db 15,WING_ATTACK
-    db 18,WATER_GUN
-    db 25,SWOOP
-    db 27,HAZE        ; Seaform Island's Articuno (Level 40)
-    db 29,AURORA_BEAM ; 
-    db 32,SWIFT       ; 
-    db 37,ICE_BEAM    ; 
-    db 41,REFLECT
-    db 43,TSUNAMI
-    db 46,BARRIER
-    db 50,BLIZZARD
-    db 55,AGILITY
+    db 19,WATER_GUN
+    db 24,SWOOP
+    db 29,REFLECT
+    db 32,HAZE        ; Seaform Island's Articuno (Level 45)
+    db 34,AURORA_BEAM ; 
+    db 37,SWIFT       ; 
+    db 42,ICE_BEAM    ; 
+    db 48,TSUNAMI
+    db 51,BARRIER
+    db 54,BLIZZARD
+    db 57,AGILITY
     db 60,SKY_ATTACK
     db 0
 
@@ -2874,17 +2875,17 @@ Mon145_EvosMoves:
     ;   1,FLASH
     db  9,PECK
     db 15,WING_ATTACK
-    db 18,THUNDERSHOCK
-    db 25,SWOOP
-    db 27,THUNDER_WAVE ; Power PLants's Zapdos (Level 40)
-    db 29,DRILL_PECK   ; 
-    db 32,SWIFT        ; 
-    db 37,THUNDERBOLT  ; 
-    db 41,LIGHT_SCREEN
-    db 43,PIN_MISSILE
-    db 46,REFLECT
-    db 50,THUNDER
-    db 55,AGILITY
+    db 19,THUNDERSHOCK
+    db 24,SWOOP
+    db 29,LIGHT_SCREEN
+    db 32,THUNDER_WAVE ; Power PLants's Zapdos (Level 45)
+    db 34,DRILL_PECK   ; 
+    db 37,SWIFT        ; 
+    db 42,THUNDERBOLT  ; 
+    db 48,PIN_MISSILE
+    db 51,REFLECT
+    db 54,THUNDER
+    db 57,AGILITY
     db 60,SKY_ATTACK
     db 0
 
@@ -2899,17 +2900,17 @@ Mon146_EvosMoves:
     ;   1,LEER
     db  9,PECK
     db 15,WING_ATTACK
-    db 18,EMBER
-    db 25,SWOOP
-    db 27,POISON_GAS   ; Victory Road's Moltres (Level 40)
-    db 29,FIRE_SPIN    ; ...
-    db 32,SWIFT        ; ...
-    db 37,FLAMETHROWER ; ...
-    db 41,BARRIER
-    db 43,DRILL_PECK
-    db 46,LIGHT_SCREEN
-    db 50,FIRE_BLAST
-    db 55,AGILITY
+    db 19,EMBER
+    db 24,SWOOP
+    db 29,BARRIER
+    db 32,POISON_GAS   ; Victory Road's Moltres (Level 45)
+    db 34,FIRE_SPIN    ; ...
+    db 37,SWIFT        ; ...
+    db 42,FLAMETHROWER ; ...
+    db 48,DRILL_PECK
+    db 51,LIGHT_SCREEN
+    db 54,FIRE_BLAST
+    db 57,AGILITY
     db 60,SKY_ATTACK
     db 0
 
