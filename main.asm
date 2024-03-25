@@ -16,11 +16,11 @@ IfGBCDelay3:
     ret nz ; NotGBC
     jp Delay3
 
-CheckSelect:
+CheckSelect: ; 18 Byte
     bit 2,a ; was the select button pressed?
     jr nz,.SelectPressed
 .End
-    jp $04eb ; OverworldLoopLessDelay.checkIfDownButtonIsPressed
+    jp $0459 ; OverworldLoopLessDelay.startButtonNotPressed
 .SelectPressed
     ld b,BANK(SelectInOverWorld)
     ld hl,SelectInOverWorld
@@ -625,14 +625,14 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     ld a,[H_NEWLYPRESSEDBUTTONS]
 .checkIfStartIsPressed
     bit 3,a ; start button
-    jr z,.startButtonNotPressed
+    jp z,CheckSelect ; jr z,.startButtonNotPressed
 ; if START is pressed
     xor a
     ld [$ff8c],a ; the $2920 ID for the start menu is 0
-    jp .displayDialogue
+    jr .displayDialogue
 .startButtonNotPressed
     bit 0,a ; A button
-    jp z,CheckSelect ; jp z,.checkIfDownButtonIsPressed
+    jp z,.checkIfDownButtonIsPressed
 ; if A is pressed
     ld a,[$d730]
     bit 2,a
@@ -22874,9 +22874,9 @@ MapHSDC:
 Func_cd99_Old:
 UsedStrengthText_Old:
 
-SECTION "Func_cdc0",ROMX[$4dc0],BANK[$3]
+SECTION "IsSurfingAllowed",ROMX[$4dc0],BANK[$3]
 
-Func_cdc0: ; cdc0 (3:4dc0)
+IsSurfingAllowed: ; cdc0 (3:4dc0)
     ld hl,$d728
     set 1,[hl]
     ld a,[$d732]
@@ -23612,15 +23612,9 @@ ItemUseBicycle: ; d977 (3:5977)
 
 ; used for Surf out-of-battle effect
 ItemUseSurfboard: ; d9b4 (3:59b4)
-    ld a,[$d700]
-    ld [$d11a],a
-    cp a,2 ; is the player already surfing?
+    ld hl,.HandleSurfboardCheck
+    call RunOnlyIfNotSelectInOverworld
     jr z,.tryToStopSurfing
-.tryToSurf
-    call IsNextTileShoreOrWater
-    jp c,SurfingAttemptFailed
-    ld hl,TilePairCollisionsWater
-    call CheckForTilePairCollisions
     jp c,SurfingAttemptFailed
 .surf
     call .makePlayerMoveForward
@@ -23629,8 +23623,8 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld a,2
     ld [$d700],a ; change player state to surfing
     call Func_2307 ; play surfing music
-    ld hl,SurfingGotOnText
-    jp PrintText
+    ld hl,.HandleSurfboardTextMessage
+    jp RunOnlyIfNotSelectInOverworld
 .tryToStopSurfing
     xor a
     ld [$ff8c],a
@@ -23657,7 +23651,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     jr nz,.passableTileLoop
 .cannotStopSurfing
     ld hl,SurfingNoPlaceToGetOffText
-    jp PrintText
+    jr .PrintText
 .stopSurfing
     call .makePlayerMoveForward
     ld hl,$d730
@@ -23689,18 +23683,23 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     inc a
     ld [$cd38],a ; index of current simulated button press
     ret
+.HandleSurfboardCheck
+    ld a,[$d700]
+    ld [$d11a],a
+    cp a,2 ; is the player already surfing?
+    ret z; jr z,.tryToStopSurfing
+.tryToSurf
+    call IsNextTileShoreOrWater
+    ret c ; jp c,SurfingAttemptFailed
+    ld hl,TilePairCollisionsWater
+    call CheckForTilePairCollisions
+    ret ; jp c,SurfingAttemptFailed
+.HandleSurfboardTextMessage
+    ld hl,SurfingGotOnText
+.PrintText
+    jp PrintText
 
-SurfingGotOnText: ; da4c (3:5a4c)
-    TX_FAR _SurfingGotOnText
-    db "@"
-
-SurfingNoPlaceToGetOffText: ; da51 (3:5a51)
-    TX_FAR _SurfingNoPlaceToGetOffText
-    db "@"
-
-ItemUsePokedex: ; da56 (3:5a56)
-    ld a,$29
-    jp Predef
+SECTION "ItemUsePokedex",ROMX[$5a5b],BANK[$3]
 
 ItemUseEvoStone: ; da5b (3:5a5b)
     ld a,[W_ISINBATTLE]
@@ -26271,37 +26270,50 @@ Func_ef4e: ; ef4e (3:6f4e)
     sub c
     ret
 
-Func_ef54: ; ef54 (3:6f54)
+UsedCut: ; ef54 (3:6f54)
     xor a
     ld [$cd6a],a
-    ld a,[W_CURMAPTILESET] ; $d367
-    and a
-    jr z,.asm_ef6b
-    cp $7
-    jr nz,.asm_ef77
-    ld a,[$cfc6]
-    cp $50
-    jr nz,.asm_ef77
-    jr asm_ef82
-.asm_ef6b
-    dec a
-    ld a,[$cfc6]
-    cp $3d
-    jr z,asm_ef82
-    cp $52
-    jr z,asm_ef82
-.asm_ef77
-    ld hl,UnnamedText_ef7d ; $6f7d
-    jp PrintText
-
-UnnamedText_ef7d: ; ef7d (3:6f7d)
-    TX_FAR _UnnamedText_ef7d
-    db "@"
-
-asm_ef82: ; ef82 (3:6f82)
-    ld [$cd4d],a
+    call CheckCutTile
+    jr nz,.nothingToCut
     ld a,$1
     ld [$cd6a],a
+    jr CanCut
+.nothingToCut
+    ld hl,NothingToCutText ; $6f7d
+    jp PrintText
+
+CanCut:
+    ld hl,.HandlePartyMenuToCut
+    call RunOnlyIfNotSelectInOverworld
+    ld a,[W_CURMAPTILESET]
+    cp 23 ; plateau
+    jr z,.plateau
+    ld a,$ff
+    ld [$cfcb],a
+    call Func_eff7
+    ld de,CutTreeBlockSwaps ; $7100
+    call Func_f09f
+    call Func_eedc
+    ld b,BANK(Func_79e96)
+    ld hl,Func_79e96
+    call Bankswitch ; indirect jump to Func_79e96 (79e96 (1e:5e96))
+    ld a,$1
+    ld [$cfcb],a
+    ld a,$ac
+    call PlaySound
+    ld a,$90
+    ld [$FF00+$b0],a
+    call UpdateSprites
+    jp Func_eedc
+.plateau
+    call WaitForSoundToFinish
+    ld a,$a5
+    call PlaySound
+    call WaitForSoundToFinish
+    ld hl,PlateauGrassText
+    jp PrintText
+
+.HandlePartyMenuToCut
     ld a,[wWhichPokemon] ; $cf92
     ld hl,W_PARTYMON1NAME ; $d2b5
     call GetPartyMonName
@@ -26324,29 +26336,9 @@ asm_ef82: ; ef82 (3:6f82)
     call LoadScreenTilesFromBuffer2
     ld hl,$d730
     res 6,[hl]
-    ld a,$ff
-    ld [$cfcb],a
-    call Func_eff7
-    ld de,CutTreeBlockSwaps ; $7100
-    call Func_f09f
-    call Func_eedc
-    ld b,BANK(Func_79e96)
-    ld hl,Func_79e96
-    call Bankswitch ; indirect jump to Func_79e96 (79e96 (1e:5e96))
-    ld a,$1
-    ld [$cfcb],a
-    ld a,$ac
-    call PlaySound
-    ld a,$90
-    ld [$FF00+$b0],a
-    call UpdateSprites
-    jp Func_eedc
+    ret
 
-UsedCutText: ; eff2 (3:6ff2)
-    TX_FAR _UsedCutText
-    db "@"
-
-Func_eff7: ; eff7 (3:6ff7)
+Func_eff7:
     xor a
     ld [$cd50],a
     ld a,$e4
@@ -26385,19 +26377,17 @@ Func_eff7: ; eff7 (3:6ff7)
     jr nz,.asm_f044
     ret
 
-Func_f04c: ; f04c (3:704c)
+Func_f04c:
     ld de,AnimationTileset2 + $60 ; $474e ; tile depicting a leaf
     ld bc,(BANK(AnimationTileset2) << 8) + $01
     jp CopyVideoData
-asm_f055: ; f055 (3:7055)
+asm_f055:
     call Func_f068
     ld a,$9
     ld de,UnknownOAM_f060 ; $7060
     jp WriteOAMBlock
 
-UnknownOAM_f060: ; f060 (3:7060)
-    db $FC,$10,$FD,$10
-    db $FE,$10,$FF,$10
+SECTION "Func_f068",ROMX[$7068],BANK[$3]
 
 Func_f068: ; f068 (3:7068)
     ld hl,$c104
@@ -27089,6 +27079,10 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
 .done
     scf
     ret
+
+ItemUsePokedex: ; Moved in the Bank
+    ld a,$29
+    jp Predef
 
 SECTION "LoadMovePPs",ROMX[$7473],BANK[$3]
 
@@ -28978,6 +28972,70 @@ StopAlarmAndLoadCaughtText:
     ld hl,ItemUseBallText05
     ret
 
+CheckCutTile: ;joenote - consolidate this into its own function
+    ld a,[W_CURMAPTILESET]
+    and a
+    jr z,.overworld
+    cp 7
+    jr z,.gym
+    cp 23 ;added plateau
+    jr z,.plateau
+    ret ;nz if not one of the listed tilesets
+.gym
+    ld a,[$cfc6]
+    cp $50 ; gym cut tree
+    jr z,.loadCutTile
+    ret ;nz if not a cuttable tile
+.plateau
+    ld a,[$cfc6]
+    cp $45 ; grass
+    jr z,.loadCutTile
+    ret ;nz if not a cuttable tile
+.overworld
+    ld a,[$cfc6]
+    cp $3d ; cut tree
+    jr z,.loadCutTile
+    cp $52 ; grass
+    jr z,.loadCutTile
+    ret ;nz if not a cuttable tile
+.loadCutTile
+    ld [$cd4d],a ; CutTile
+    ret ;z already set at this return
+
+RunOnlyIfNotSelectInOverworld:
+    ld a,[wSelectInOverworldOnBit6]
+    bit 6,a
+    jr nz,.End
+    jp hl
+.End
+    ld a,1
+    or a ; reset all flag
+    ret
+
+NothingToCutText:
+    TX_FAR _NothingToCutText
+    db "@"
+
+PlateauGrassText:
+    TX_FAR _PlateauGrassText
+    db "@"
+
+UsedCutText:
+    TX_FAR _UsedCutText
+    db "@"
+
+UnknownOAM_f060:
+    db $FC,$10,$FD,$10
+    db $FE,$10,$FF,$10
+
+SurfingGotOnText:
+    TX_FAR _SurfingGotOnText
+    db "@"
+
+SurfingNoPlaceToGetOffText:
+    TX_FAR _SurfingNoPlaceToGetOffText
+    db "@"
+
 SECTION "bank4",ROMX,BANK[$4]
 
 OakAideSprite: ; 10000 (4:4000)
@@ -30264,8 +30322,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .surf
     bit 4,a ; does the player have the Soul Badge?
     call CheckWaterPower ; jp z,.newBadgeRequired
-    ld b,BANK(Func_cdc0)
-    ld hl,Func_cdc0
+    ld b,BANK(IsSurfingAllowed)
+    ld hl,IsSurfingAllowed
     call Bankswitch
     ld hl,$d728
     bit 1,[hl]
@@ -73397,7 +73455,7 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     dw CheckEngagePlayer
     dbw BANK(IndexToPokedex),IndexToPokedex
     dbw BANK(Predef3B),Predef3B; 3B display pic?
-    dbw BANK(Func_ef54),Func_ef54
+    dbw BANK(UsedCut),UsedCut
     dbw BANK(ShowPokedexData),ShowPokedexData
     dbw BANK(WriteMonMoves),WriteMonMoves
     dbw BANK(SaveSAV),SaveSAV
@@ -127655,14 +127713,18 @@ _UnnamedText_71dda: ; a82c9 (2a:42c9)
     db $0," is",$4f
     db "doing great!",$57
 
-_UnnamedText_ef7d ; a82f8 (2a:42f8)
+_NothingToCutText:
     db $0,"There isn't",$4f
     db "anything to CUT!",$58
 
-_UsedCutText: ; a8315 (2a:4315)
+_UsedCutText:
     TX_RAM $cd6d
     db $0," hacked",$4f
     db "away with CUT!",$58
+
+_PlateauGrassText:
+    db $0,"The grass is",$4f
+    db "too thick to CUT!",$58
 
 SECTION "bank2B",ROMX,BANK[$2B]
 
@@ -128461,54 +128523,298 @@ GetFieldMovesRulesByte:
 SelectInOverWorld:
     ld a,$35
     call Predef ; Update Next Tile
-    ;unsets carry if player is facing water or shore
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 1,a ; B button
+    scf ; set carry flag (z not affected)
+    jr z,.NoFieldMove
+    call c,.TryCut
+    call c,.TryFloat
+    call c,.TryLight
+    call c,.TryStrength
+    ret
+.NoFieldMove
+    call c,.TryFishing
+    call c,.TryBike
+    ret
+
+.TryCut
+    ; ──────────────────────────────────── Cut
+    ld b,BANK(CheckCutTile)
+    ld hl,CheckCutTile
+    call Bankswitch
+    jr nz,.noCut
+    ld a,[W_CURMAPTILESET]
+    cp 23 ; plateau
+    jr z,.noCut
+    ld a,[W_OBTAINEDBADGES] ; badges obtained
+    bit 1,a ; does the player have the Cascade Badge?
+    jr z,.noCut
+    ld hl,$d803 ; NaturePower
+    bit 0,[hl]  ; ...
+    jr z,.noCut
+    ld b,$01 ; CUT
+    call SearchFieldMoveInParty
+    jr nc,.noCut
+.canCut
+    call .StartCustomSelectFunction
+    call .PlayCry
+    ld b,BANK(CanCut)
+    ld hl,CanCut
+    call Bankswitch
+    jp .EndCustomSelectFunction
+.noCut
+    scf ; set carry flag
+    ret
+
+.TryFloat
+    ; ──────────────────────────────────── Float
+    ld a,[$d700]
+    ld [$d11a],a
+    cp a,2 ; is the player surfing?
+    jp z,.noFloat
+    ld a,[$d732] ; Force to Ride Bike
+    bit 5,a      ; ...
+    jr nz,.noFloat
+    ld a,[W_OBTAINEDBADGES] ; badges obtained
+    bit 4,a ; does the player have the Soul Badge?
+    jr z,.noFloat
+    ld hl,$d857 ; WaterPower
+    bit 0,[hl]  ; ...
+    jr z,.noFloat
+    ld b,BANK(IsSurfingAllowed)
+    ld hl,IsSurfingAllowed
+    call Bankswitch
+    ld hl,$d728
+    bit 1,[hl]
+    res 1,[hl]
+    jp z,.noFloat
     ld b,BANK(IsNextTileShoreOrWater)
     ld hl,IsNextTileShoreOrWater
     call Bankswitch
-    jr c,.NoFishing
+    jp c,.noFloat
     ld hl,TilePairCollisionsWater
     call CheckForTilePairCollisions
-    jr c,.NoFishing
+    jp c,.noFloat
+    ld b,$04 ; FLOAT
+    call SearchFieldMoveInParty
+    jr nc,.noFloat
+.canFloat
+    call .StartCustomSelectFunction
+    call .PlayCry
+    ld a,SURFBOARD
+    ld [$cf91],a
+    ld [$d152],a
+    call UseItem
+    jp .EndCustomSelectFunction
+.noFloat
+    scf ; set carry flag
+    ret
+
+.TryLight
+    ; ──────────────────────────────────── Light
+    ld a,[$d35d]
+    and a 
+    jr z,.noLight
+    ld a,[W_OBTAINEDBADGES] ; badges obtained
+    bit 0,a ; does the player have the Boulder Badge?
+    jr z,.noLight
+    ld hl,$d7c2 ; FirePower
+    bit 0,[hl]  ; ...
+    jr z,.noLight
+    ld b,$06 ; LIGHT
+    call SearchFieldMoveInParty
+    jr nc,.noLight
+.canLight
+    call .StartCustomSelectFunction
+    call .PlayCry
+    xor a
+    ld [$d35d],a
+    jp .EndCustomSelectFunction
+.noLight
+    scf ; set carry flag
+    ret
+
+.TryStrength
+    ; ──────────────────────────────────── Strength
+    ld hl,$d728
+    bit 0,[hl]
+    jr nz,.noStrength
+    ld a,[$d700]
+    cp a,2 ; is the player surfing?
+    jp z,.noStrength
+    ld a,[W_OBTAINEDBADGES] ; badges obtained
+    bit 3,a ; does the player have the Rainbow Badge?
+    jr z,.noStrength
+    ld hl,$d78e ; EarthPower
+    bit 0,[hl]  ; ...
+    jr z,.noStrength
+    ld b,$05 ; STRENGTH
+    call SearchFieldMoveInParty
+    jr nc,.noStrength
+.canStrength
+    call .StartCustomSelectFunction
+    call .PlayCry
+    ld hl,$d728
+    set 0,[hl]
+    jp .EndCustomSelectFunction
+.noStrength
+    scf ; set carry flag
+    ret
+
+.TryFishing
+    ; ──────────────────────────────────── Fishing
+    ld a,[$d700]
+    cp a,2 ; is the player surfing?
+    jp z,.noFishing
+    ld b,BANK(IsNextTileShoreOrWater)
+    ld hl,IsNextTileShoreOrWater
+    call Bankswitch ; unsets carry if player is facing water or shore
+    jr c,.noFishing
+    ld hl,TilePairCollisionsWater
+    call CheckForTilePairCollisions
+    jr c,.noFishing
     ;are rods in the bag?
     ld b,SUPER_ROD
     call .IsItemInBag
-    jr nz,.Continue
+    jr nz,.Fishing
     ld b,GOOD_ROD
     call .IsItemInBag
-    jr nz,.Continue
+    jr nz,.Fishing
     ld b,OLD_ROD
     call .IsItemInBag
-    jr nz,.Continue
-.NoFishing
-    ld b,BICYCLE
-    call .IsItemInBag
-    ret z
-    ld a,[$d732]
-    bit 5,a
-    ret nz
-.Continue
-    push bc
-    ; initialize a text box without drawing anything special
-    ld a,1
-    ld [$cf0c],a
-    ld b,BANK(DisplayTextIDInit)
-    ld hl,DisplayTextIDInit ; initialization
-    call Bankswitch
-    pop bc
+    jr z,.noFishing
+.Fishing
+    call .StartCustomSelectFunction
     ld a,b
     ld [$cf91],a ; load item to be used
     ld [$d11e],a ; load item so its name can be grabbed
     call GetItemName ; get the item name into de register
     call CopyStringToCF4B ; copy name from de to wcf4b so it shows up in text
     call UseItem
-    ;use $ff value loaded into $FF8C to make DisplayTextID display nothing and close any text
-    ld a,$ff
-    ld [$FF8C],a
-    call DisplayTextID
+    jp .EndCustomSelectFunction
+.noFishing
+    scf ; set carry flag
     ret
+
+.TryBike
+    ; ──────────────────────────────────── Bike
+    ld b,BICYCLE
+    call .IsItemInBag
+    jr z,.noBike
+    ld a,[$d732] ; Force to Ride Bike
+    bit 5,a      ; ...
+    jr nz,.noBike
+    call IsBikeRidingAllowed
+    jp nc,.noBike
+    ld a,[$d700]
+    cp a,2 ; is the player surfing?
+    jp z,.noBike
+.BikeOrWalk
+    push af
+    call .StartCustomSelectFunction
+    call UpdateSprites
+    pop af
+    dec a ; is player already bicycling?
+    jr nz,.tryToGetOnBike
+.getOffBike
+    xor a
+    jr .doneBike
+.tryToGetOnBike
+    ld a,1
+.doneBike
+    ld [$d700],a ; change player state to bicycling
+    jp .EndCustomSelectFunction
+.noBike
+    scf ; set carry flag
+    ret
+
 .IsItemInBag
     push bc
     call IsItemInBag
+    pop bc
+    ret
+
+.StartCustomSelectFunction
+    push bc
+    ld hl,wSelectInOverworldOnBit6
+    set 6,[hl]
+    call .InitializeTextBox
+    pop bc
+    ret
+
+.EndCustomSelectFunction
+    call .DisplayNothing
+    ld hl,wSelectInOverworldOnBit6
+    res 6,[hl]
+    xor a ; reset carry flag
+    ret
+
+.PlayCry
+    ld a,[wWhichPokemon]
+    push af
+    ld hl,W_PARTYMON1NAME ; $d2b5
+    call GetPartyMonName
+    pop af
+    ld hl,W_PARTYMON1
+    ld b,0
+    ld c,a
+    add hl,bc
+    ld a,[hl]
+    call PlayCry
+    jp WaitForSoundToFinish
+
+.InitializeTextBox
+    ; initialize a text box without drawing anything special
+    ld a,1
+    ld [$cf0c],a
+    ld b,BANK(DisplayTextIDInit)
+    ld hl,DisplayTextIDInit ; initialization
+    jp Bankswitch
+
+.DisplayNothing
+    ;use $ff value loaded into $FF8C to make DisplayTextID display nothing and close any text
+    ld a,$ff
+    ld [$FF8C],a
+    jp DisplayTextID
+
+; INPUT  : b = Field Move
+; OUTPUT : carry flag -> set found | reset not found
+SearchFieldMoveInParty:
+    ld a,[W_NUMINPARTY]
+    ld d,a
+    ld c,0
+.LoopMon
+    ld a,c
+    ld [wWhichPokemon],a
+    call .GetMonFieldMoves
+    ld a,[wNumFieldMoves]
+    and a
+    jr z,.NextMon
+    ld e,a ; NumFieldMoves
+    ld hl,wFieldMoves
+.LoopFieldMove
+    ld a,[hli]
+    cp b ; Field Move
+    jr z,.found
+    dec e
+    jr nz,.LoopFieldMove
+.NextMon
+    inc c
+    dec d
+    jr nz,.LoopMon
+.notfound
+    xor a ; rcf
+    ret
+.found
+    scf
+    ret
+.GetMonFieldMoves
+    push bc
+    push de
+    ld b,BANK(GetMonFieldMoves)
+    ld hl,GetMonFieldMoves
+    call Bankswitch
+    pop de
     pop bc
     ret
 
