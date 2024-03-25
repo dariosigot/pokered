@@ -22855,28 +22855,26 @@ MapHSD9:
     db SAFARI_ZONE_EAST,$02,Show
     db SAFARI_ZONE_EAST,$03,Show
     db SAFARI_ZONE_EAST,$04,Show
+    db SAFARI_ZONE_EAST,$05,Hide ; $E6 (Lapras)
 MapHSDA:
     db SAFARI_ZONE_NORTH,$01,Show
     db SAFARI_ZONE_NORTH,$02,Show
-    db SAFARI_ZONE_NORTH,$03,Show
+    db SAFARI_ZONE_NORTH,$03,Show ; $E9 (Lapras)
 MapHSDB:
     db SAFARI_ZONE_WEST,$01,Show
     db SAFARI_ZONE_WEST,$02,Show
     db SAFARI_ZONE_WEST,$03,Show
-    db SAFARI_ZONE_WEST,$04,Show ; $E8
+    db SAFARI_ZONE_WEST,$04,Show
 MapHSDC:
     db SAFARI_ZONE_CENTER,$01,Show
+    db SAFARI_ZONE_CENTER,$02,Hide ; $EF (Lapras)
 
     db $FF,$01,Show
 
 Func_cd99_Old:
 UsedStrengthText_Old:
 
-SECTION "UnnamedText_cdbb",ROMX[$4dbb],BANK[$3]
-
-UnnamedText_cdbb: ; cdbb (3:4dbb)
-    TX_FAR _UnnamedText_cdbb
-    db "@"
+SECTION "Func_cdc0",ROMX[$4dc0],BANK[$3]
 
 Func_cdc0: ; cdc0 (3:4dc0)
     ld hl,$d728
@@ -23469,7 +23467,7 @@ ItemUseBall: ; d687 (3:5687)
     ld a,[W_BATTLETYPE]
     dec a
     jr z,.printText1
-    ld hl,ItemUseBallText05
+    call StopAlarmAndLoadCaughtText ; ld hl,ItemUseBallText05
     call PrintText
     ld a,$3a    ;convert order: Internal->Dex
     call Predef
@@ -23519,7 +23517,7 @@ ItemUseBall: ; d687 (3:5687)
     call PrintText
     jr .End
 .printText1    ;$591f
-    ld hl,ItemUseBallText05
+    call StopAlarmAndLoadCaughtText ; ld hl,ItemUseBallText05
 .printText0    ;$5922
     call PrintText
     call CleanLCD_OAM
@@ -24453,9 +24451,9 @@ BaitRockCommon: ; df7f (3:5f7f)
 .noCarry
     ld [hl],a
     ld a,$08
-    call Predef ; do animation
-    ld c,70
-    jp DelayFrames
+    jp RockDamageOrBaitHealth ; call Predef ; do animation
+    ds 2 ; ld c,70
+    ds 3 ; jp DelayFrames
 
 ThrewBaitText: ; dfa5 (3:5fa5)
     TX_FAR _ThrewBaitText
@@ -28941,6 +28939,43 @@ HackCheckTMToBag:
     ret
 .Standard
     ld a,[$cf96] ; a = item quantity
+    ret
+
+UnnamedText_cdbb: ; Moved in the Bank
+    TX_FAR _UnnamedText_cdbb
+    db "@"
+
+RockDamageOrBaitHealth:
+    call Predef
+    ld a,[W_ANIMATIONID]
+    cp ROCK_ANIM
+    jr z,.Rock
+.Bait
+    ld b,BANK(_BaitHealth)
+    ld hl,_BaitHealth
+    call Bankswitch
+    jr .end
+.Rock
+    ld a,1
+    ld [H_WHOSETURN],a ; force enemy turn
+    ld b,BANK(_RockDamage)
+    ld hl,_RockDamage
+    call Bankswitch
+    xor a
+    ld [H_WHOSETURN],a ; restore player turn
+.end
+    ld c,70
+    call DelayFrames
+    ld hl,.emptyText
+    call PrintText
+    jp SaveScreenTilesToBuffer1
+.emptyText
+    db "@"
+
+StopAlarmAndLoadCaughtText:
+    ld a,$ff     ; stop low health alarm
+    ld [$d083],a ; ...
+    ld hl,ItemUseBallText05
     ret
 
 SECTION "bank4",ROMX,BANK[$4]
@@ -51318,7 +51353,7 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
     call CheckLeechSeedFlag
     jr nz,.noToxic
     jr .Toxic
-    ds 21 - 12
+    ;ds 21 - 12
 .Toxic
     ld a,[de]    ; increment toxic counter
     inc a
@@ -51353,6 +51388,8 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
     call WriteDamageAndUpdateCurMonHPBar ; call UpdateCurMonHPBar
     pop hl
     ret
+
+SECTION "HandlePoisonBurnLeechSeed_IncreaseEnemyHP",ROMX[$44a3],BANK[$f]
 
 ; adds bc to enemy HP
 HandlePoisonBurnLeechSeed_IncreaseEnemyHP: ; 3c4a3 (f:44a3)
@@ -57554,36 +57591,24 @@ Func_3efeb: ; 3efeb (f:6feb)
     ret
 
 LoadGhostPic:
-    ld hl,W_MONHSPRITEDIM
-    ld a,$66
-    ld [hli],a   ; write sprite dimensions
-    ld bc,GhostPic ; $66b5
-    ld a,c
-    ld [hli],a   ; write  front sprite pointer
-    ld [hl],b
-    ld hl,W_ENEMYMONNAME  ; set name to "GHOST"
-    ld a,"G"
-    ld [hli],a
-    ld a,"H"
-    ld [hli],a
-    ld a,"O"
-    ld [hli],a
-    ld a,"S"
-    ld [hli],a
-    ld a,"T"
-    ld [hli],a
-    ld [hl],"@"
-    ld hl,$cf91
+    ld b,BANK(_LoadGhostPic)
+    ld hl,_LoadGhostPic
+    jp Bankswitch
+
+_RockDamage:
+    ld hl,W_ENEMYMONCURHP ; $cfe6
+    call HandlePoisonBurnLeechSeed_DecreaseOwnHP
+    jp DrawEnemyHUDAndHPBar
+
+_BaitHealth:
+    ld hl,W_DAMAGE
+    ld a,[hli]
+    ld b,a
     ld a,[hl]
-    push af
-    push hl
-    ld a,MON_GHOST
-    ld [hl],a
-    call SetDEAndLoadMonFrontSprite ; load ghost sprite
-    pop hl
-    pop af
-    ld [hl],a
-    ret
+    ld c,a
+    ld hl,W_ENEMYMONCURHP ; $cfe6
+    call HandlePoisonBurnLeechSeed_IncreaseEnemyHP
+    jp DrawEnemyHUDAndHPBar
 
 SECTION "TerminatorText_3f04a",ROMX[$704a],BANK[$f]
 
@@ -66221,21 +66246,9 @@ SilphCoElevatorBlocks: ; 4585b (11:585b)
 SafariZoneEast_h: ; 0x4585f to 0x4586b (12 bytes) (bank=11) (id=217)
     db $03 ; tileset
     db SAFARI_ZONE_EAST_HEIGHT,SAFARI_ZONE_EAST_WIDTH ; dimensions (y,x)
-    dw SafariZoneEastBlocks,SafariZoneEastTextPointers,SafariZoneEastScript ; blocks,texts,scripts
+    dw SafariZoneEastBlocks,SafariZoneEastTextPointers,SafariZoneScript ; blocks,texts,scripts
     db $00 ; connections
     dw SafariZoneEastObject ; objects
-
-SafariZoneEastScript: ; 4586b (11:586b)
-    jp EnableAutoTextBoxDrawing
-
-SafariZoneEastTextPointers: ; 4586e (11:586e)
-    dw Predef5CText
-    dw Predef5CText
-    dw Predef5CText
-    dw Predef5CText
-    dw SafariZoneEastText5
-    dw SafariZoneEastText6
-    dw SafariZoneEastText7
 
 SafariZoneEastText5: ; 4587c (11:587c)
     TX_FAR _SafariZoneEastText5
@@ -66260,15 +66273,16 @@ SafariZoneEastObject: ; 0x4588b (size=81)
     db $9,$19,$0,SAFARI_ZONE_REST_HOUSE_3
 
     db $3 ; signs
-    db $a,$1a,$5 ; SafariZoneEastText5
-    db $4,$6,$6 ; SafariZoneEastText6
-    db $17,$5,$7 ; SafariZoneEastText7
+    db $a,$1a,$6 ; SafariZoneEastText5
+    db $4,$6,$7 ; SafariZoneEastText6
+    db $17,$5,$8 ; SafariZoneEastText7
 
-    db $4 ; people
+    db $5 ; people
     db SPRITE_BALL,$a + 4,$15 + 4,$ff,$ff,$81,FULL_RESTORE ; item
     db SPRITE_BALL,$7 + 4,$3 + 4,$ff,$ff,$82,MAX_POTION ; item
     db SPRITE_BALL,$d + 4,$14 + 4,$ff,$ff,$83,CARBOS ; item
     db SPRITE_BALL,$c + 4,$f + 4,$ff,$ff,$84,TM_54 ; item ; STRIKE
+    db SPRITE_LAPRAS,$b + 4,$11 + 4,$ff,$d0,$5 ; person
 
     ; warp-to
     EVENT_DISP $f,$4,$0 ; SAFARI_ZONE_NORTH
@@ -66280,23 +66294,14 @@ SafariZoneEastObject: ; 0x4588b (size=81)
 SafariZoneEastBlocks: ; 458dc (11:58dc)
     INCBIN "maps/safarizoneeast.blk"
 
+SECTION "SafariZoneNorth_h",ROMX[$599f],BANK[$11]
+
 SafariZoneNorth_h: ; 0x4599f to 0x459ab (12 bytes) (bank=11) (id=218)
     db $03 ; tileset
     db SAFARI_ZONE_NORTH_HEIGHT,SAFARI_ZONE_NORTH_WIDTH ; dimensions (y,x)
-    dw SafariZoneNorthBlocks,SafariZoneNorthTextPointers,SafariZoneNorthScript ; blocks,texts,scripts
+    dw SafariZoneNorthBlocks,SafariZoneNorthTextPointers,SafariZoneScript ; blocks,texts,scripts
     db $00 ; connections
     dw SafariZoneNorthObject ; objects
-
-SafariZoneNorthTextPointers:
-    dw Predef5CText
-    dw Predef5CText
-    dw SafariZoneNorthLapras
-    dw SafariZoneNorthText3
-    dw SafariZoneNorthText4
-    dw SafariZoneNorthText5
-    dw SafariZoneNorthText6
-    dw SafariZoneNorthText7
-    dw SafariZoneLaprasRunAway
 
 SafariZoneNorthText3:
     TX_FAR _SafariZoneNorthText3
@@ -66358,22 +66363,14 @@ SafariZoneNorthObject:
 SafariZoneNorthBlocks:
     INCBIN "maps/safarizonenorth.blk"
 
-SECTION "SafariZoneCenter_h",ROMX[$5bb2],BANK[$11]
+SECTION "SafariZoneCenter_h",ROMX[$5ba6],BANK[$11]
 
 SafariZoneCenter_h: ; 0x45ba6 to 0x45bb2 (12 bytes) (bank=11) (id=220)
     db $03 ; tileset
     db SAFARI_ZONE_CENTER_HEIGHT,SAFARI_ZONE_CENTER_WIDTH ; dimensions (y,x)
-    dw SafariZoneCenterBlocks,SafariZoneCenterTextPointers,SafariZoneCenterScript ; blocks,texts,scripts
+    dw SafariZoneCenterBlocks,SafariZoneCenterTextPointers,SafariZoneScript ; blocks,texts,scripts
     db $00 ; connections
     dw SafariZoneCenterObject ; objects
-
-SafariZoneCenterScript: ; 45bb2 (11:5bb2)
-    jp EnableAutoTextBoxDrawing
-
-SafariZoneCenterTextPointers: ; 45bb5 (11:5bb5)
-    dw Predef5CText
-    dw SafariZoneCenterText2
-    dw SafariZoneCenterText3
 
 SafariZoneCenterText2: ; 45bbb (11:5bbb)
     TX_FAR _SafariZoneCenterText2
@@ -66398,11 +66395,12 @@ SafariZoneCenterObject: ; 0x45bc5 (size=89)
     db $13,$11,$0,SAFARI_ZONE_REST_HOUSE_1
 
     db $2 ; signs
-    db $14,$12,$2 ; SafariZoneCenterText2
-    db $16,$e,$3 ; SafariZoneCenterText3
+    db $14,$12,$3 ; SafariZoneCenterText2
+    db $16,$e,$4 ; SafariZoneCenterText3
 
-    db $1 ; people
+    db $2 ; people
     db SPRITE_BALL,$a + 4,$e + 4,$ff,$ff,$81,NUGGET ; item
+    db SPRITE_LAPRAS,$9 + 4,$9 + 4,$ff,$d0,$2 ; person
 
     ; warp-to
     EVENT_DISP $f,$19,$e ; SAFARIZONEENTRANCE
@@ -66417,6 +66415,8 @@ SafariZoneCenterObject: ; 0x45bc5 (size=89)
 
 SafariZoneCenterBlocks: ; 45c1e (11:5c1e)
     INCBIN "maps/safarizonecenter.blk"
+
+SECTION "SafariZoneRestHouse1_h",ROMX[$5ce1],BANK[$11]
 
 SafariZoneRestHouse1_h: ; 0x45ce1 to 0x45ced (12 bytes) (bank=11) (id=221)
     db $0c ; tileset
@@ -68495,54 +68495,73 @@ FlagInstantAndPredefRocketHideout: ; xxxxx (11:xxxx) ; Denim
     ret
 
 ; ──────────────────────
-; Safari NORD
+; Safari NORTH
 ; ──────────────────────
 
-SafariZoneNorthScript: ; Moved in the Bank
-    call EnableAutoTextBoxDrawing
-    ld hl,SafariZoneNorthScriptPointers
-    ld a,[W_SAFARIZONENORTHCURSCRIPT]
-    jp CallFunctionInTable
+SafariZoneNorthTextPointers: ; Moved in the Bank
+    dw Predef5CText
+    dw Predef5CText
+    dw SafariZoneLapras ; id=3
+    dw SafariZoneNorthText3
+    dw SafariZoneNorthText4
+    dw SafariZoneNorthText5
+    dw SafariZoneNorthText6
+    dw SafariZoneNorthText7
+    dw SafariZoneLaprasRunAway ; id=9
 
-SafariZoneNorthScriptPointers:
-    dw SafariZoneNorthScript0
-    dw SafariZoneNorthPostLapras
+; ──────────────────────
+; Safari EAST
+; ──────────────────────
 
-SafariZoneNorthScript0:
-    ret
+SafariZoneEastTextPointers: ; Moved in the Bank
+    dw Predef5CText
+    dw Predef5CText
+    dw Predef5CText
+    dw Predef5CText
+    dw SafariZoneLapras ; id=5
+    dw SafariZoneEastText5
+    dw SafariZoneEastText6
+    dw SafariZoneEastText7
+    dw SafariZoneLaprasRunAway ; id=9
 
-SafariZoneNorthLapras:
-    db $8
-    ld d,3 ; Lapras OAM ID
-    call SafariZoneLapras
-    ld a,1 ; SafariZoneNorthPostLapras
-    ld [W_SAFARIZONENORTHCURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
-    jp TextScriptEnd
+; ──────────────────────
+; Safari CENTER
+; ──────────────────────
 
-SafariZoneNorthPostLapras:
-    ld de,$E809 ; d = ID Missable Sprite | e = LaprasRunAway Text ID  ; SAFARITODO
-    call SafariZonePostLapras
-    xor a
-    ld [W_SAFARIZONENORTHCURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
-    ret
+SafariZoneCenterTextPointers: ; 45bb5 (11:5bb5)
+    dw Predef5CText
+    dw SafariZoneLapras ; id=2
+    dw SafariZoneCenterText2
+    dw SafariZoneCenterText3
+    dw SafariZoneLaprasRunAway ; id=5
 
 ; ──────────────────────
 ; Lapras General
 ; ──────────────────────
 
-; SAFARITODO : Sprite Lapras Colori Invertiti
+SafariZoneScript:
+    call EnableAutoTextBoxDrawing
+    ld hl,SafariZoneScriptPointers
+    ld a,[W_SAFARIZONECURSCRIPT]
+    jp CallFunctionInTable
 
-SafariZoneLapras: ; SAFARITODO : Lapras sempre maschio
-    push de
+SafariZoneScriptPointers:
+    dw SafariZoneScript0
+    dw SafariZonePostLapras
+
+SafariZoneScript0:
+    ret
+
+SafariZoneLapras:
+    db $8
     ld hl,SafariZoneLaprasText
     call PrintText
     ld a,LAPRAS
     call PlayCry
     call WaitForSoundToFinish
-    pop af           ; Lapras OAM ID
-    ld [$FF00+$8c],a ; ...
+    ld hl,.OAMIdList
+    call GetCurrentMapLaprasInfo
+    ld [$FF00+$8c],a ; OAM
     xor a
     ld [W_GYMLEADERNO],a
     ld a,30
@@ -68550,35 +68569,80 @@ SafariZoneLapras: ; SAFARITODO : Lapras sempre maschio
     ld a,LAPRAS ; Entry Level (Over)
     ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
-    jp PlayTrainerMusic
+    call PlayTrainerMusic
+    ld a,1 ; SafariZonePostLapras
+    ld [W_SAFARIZONECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    jp TextScriptEnd
+.OAMIdList
+    db SAFARI_ZONE_EAST,5
+    db SAFARI_ZONE_NORTH,3
+    db SAFARI_ZONE_CENTER,2
 
 SafariZoneLaprasText:
     TX_FAR _SafariZoneLaprasText
     db "@"
 
-; d = ID Missable Sprite | e = LaprasRunAway Text ID
 SafariZonePostLapras:
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
     ret z
-    ld a,d
+    ld hl,.MissableIdList
+    call GetCurrentMapLaprasInfo
     ld [$cc4d],a
     ld a,$11
-    push de
     call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
-    pop de
+    call UpdateSprites
+    call Delay3
     ld a,[$cf0b]
     cp $2
     jr z,.skip
-    ld a,e ; SafariZoneLaprasRunAway
+    ld hl,.RunAwayTextIdList
+    call GetCurrentMapLaprasInfo
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
+    ; Show Another Lapras
+    call GenRandom
+    srl a
+    ld hl,.ShowLapras1IdList
+    jr c,.done
+    ld hl,.ShowLapras2IdList
+.done
+    call GetCurrentMapLaprasInfo
+    ld [$cc4d],a
+    ld a,$15
+    call Predef ; indirect jump to AddMissableObject (f1c8 (3:71c8))
 .skip
-    call UpdateSprites
+    xor a
+    ld [W_SAFARIZONECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+.MissableIdList
+    db SAFARI_ZONE_EAST,$E6
+    db SAFARI_ZONE_NORTH,$E9
+    db SAFARI_ZONE_CENTER,$EF
+.RunAwayTextIdList
+    db SAFARI_ZONE_EAST,9
+    db SAFARI_ZONE_NORTH,9
+    db SAFARI_ZONE_CENTER,5
+.ShowLapras1IdList
+    db SAFARI_ZONE_EAST,$E9
+    db SAFARI_ZONE_NORTH,$E6
+    db SAFARI_ZONE_CENTER,$E6
+.ShowLapras2IdList
+    db SAFARI_ZONE_EAST,$EF
+    db SAFARI_ZONE_NORTH,$EF
+    db SAFARI_ZONE_CENTER,$E9
 
-    ; SAFARITODO - mostrare altri lapras solo se $cf0b <> 2
-
-    jp Delay3
+GetCurrentMapLaprasInfo:
+    ld a,[W_CURMAP]
+    ld b,a
+.Loop
+    ld a,[hli]
+    cp b
+    ld a,[hli]
+    ret z
+    jr .Loop
 
 SafariZoneLaprasRunAway:
     TX_FAR _SafariZoneLaprasRunAway
@@ -118236,13 +118300,14 @@ _UnnamedText_5d4d: ; 8a40d (22:640d)
 INCLUDE "text/oakspeech.asm"
 
 _DoYouWantToNicknameText: ; 0x8a605
-    db $0,"Do you want to",$4f
-    db "give a nickname",$55
+    db $0,"Give a nickname",$4f
     db "to @"
 
 UnnamedText_8a629: ; 8a629 (22:6629)
     TX_RAM $cd6d
     db $0,"?",$57
+
+SECTION "_UnnamedText_699f",ROMX[$662f],BANK[$22]
 
 _UnnamedText_699f: ; 8a62f (22:662f)
     db $0,"Right! So your",$4f
@@ -127243,19 +127308,20 @@ _ItemUseBallText04: ; a67b2 (29:67b2)
     db "close too!",$58
 
 _ItemUseBallText05: ; a67cf (29:67cf)
-    db 0,"All right!",$4F,"@",1
+    db 0,"Yeah! @",1
     dw W_ENEMYMONNAME
-    db 0," was",$55
-    db "caught!@@"
+    db 0,$4f,"was caught!@@"
 
 SECTION "_ItemUseBallText08",ROMX[$6810],BANK[$29] 
 
 _ItemUseBallText08: ; a6810 (29:6810)
     db 1
     dw $DE06
-    db 0," was",$4F
-    db "transferred to",$55
+    db 0," sent to",$4F
+    ;db "transferred to",$55
     db "someone's PC!",$58
+
+SECTION "_ItemUseBallText06",ROMX[$6835],BANK[$29]
 
 _ItemUseBallText06: ; a6835 (29:6835)
     db 0,"New #DEX data",$4F
@@ -127422,8 +127488,8 @@ _SurfingGotOnText:
 _ItemUseBallText07:
     db 1
     dw $DE06
-    db 0," was",$4F
-    db "transferred to",$55
+    db 0," sent to",$4F
+    ;db "transferred to",$55
     db "BILL's PC! (@"
     TX_NUM W_NUMINBOX,1,2
     db 0,"/20)",$58
@@ -132009,6 +132075,9 @@ BackupDarkMapState:
     ret
 
 ForceShinyOrRandom_:
+    ld a,[W_SAFARIZONECURSCRIPT]
+    cp 1 ; Safari's Lapras
+    jr z,.Lapras
     ld a,[W_VICTORYROAD2CURSCRIPT]
     cp 3 ; Shiny Onix
     jr z,.Onix
@@ -132033,6 +132102,10 @@ ForceShinyOrRandom_:
     ld e,a
     call .GenRandomInBattle
     or $98 ; Attack > 8 ; Defense > 7 ; HP > 7
+    jr .End
+.Lapras
+    call .GenRandomInBattle
+    or $81 ; Attack > 7 ; Defense ODD (NO Shiny)
     jr .End
 .Onix
     call .GenRandomInBattle
@@ -133068,6 +133141,43 @@ LoadFontTilePatternsWithWall:
     ld hl,$8CA0
     ld bc,(BANK(Empty2bpp) << 8 | $1)
     jp GoodCopyVideoData
+
+_LoadGhostPic:
+    ld hl,W_MONHSPRITEDIM
+    ld a,$66
+    ld [hli],a   ; write sprite dimensions
+    ld bc,GhostPic ; $66b5
+    ld a,c
+    ld [hli],a   ; write  front sprite pointer
+    ld [hl],b
+    ld hl,W_ENEMYMONNAME  ; set name to "GHOST"
+    ld a,"G"
+    ld [hli],a
+    ld a,"H"
+    ld [hli],a
+    ld a,"O"
+    ld [hli],a
+    ld a,"S"
+    ld [hli],a
+    ld a,"T"
+    ld [hli],a
+    ld [hl],"@"
+    ld hl,$cf91
+    ld a,[hl]
+    push af
+    push hl
+    ld a,MON_GHOST
+    ld [hl],a
+    call .SetDEAndLoadMonFrontSprite ; load ghost sprite
+    pop hl
+    pop af
+    ld [hl],a
+    ret
+.SetDEAndLoadMonFrontSprite
+    ld de,$9000
+    ld b,BANK(LoadMonFrontSprite)
+    ld hl,LoadMonFrontSprite
+    jp Bankswitch
 
 SECTION "Bank39",ROMX,BANK[$39]
 
