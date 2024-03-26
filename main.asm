@@ -1225,7 +1225,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     ld [$d360],a
 .loadNewMap ; load the connected map that was entered
     call LoadMapHeader
-    call Func_2312 ; music
+    call PlayDefaultMusicFadeOutCurrent ; music
     ld b,$09
     call GoPAL_SET
 ; Since the sprite set shouldn't change,this will just update VRAM slots at
@@ -1321,7 +1321,7 @@ HandleBlackOut: ; 0931 (0:0931)
     call RoutineForRealGB
     call Func_40b0
     call Func_62ce
-    call Func_2312
+    call PlayDefaultMusicFadeOutCurrent
     jp Func_5d5f
 
 StopMusic: ; 0951 (0:0951)
@@ -2517,7 +2517,7 @@ CollisionCheckOnWater: ; 0fb7 (0:0fb7)
     xor a
     ld [$d700],a
     call LoadPlayerSpriteGraphics
-    call Func_2307
+    call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic
     jr .noCollision
 .checkIfVermilionDockTileset
     ld a,[W_CURMAPTILESET] ; tileset
@@ -2938,7 +2938,7 @@ LoadMapData: ; 1241 (0:1241)
     bit 1,a
     jr nz,.restoreRomBank
     call Func_235f ; music related
-    call Func_2312 ; music related
+    call PlayDefaultMusicFadeOutCurrent ; music related
 .restoreRomBank
     pop af
     ld [H_LOADEDROMBANK],a
@@ -2987,7 +2987,7 @@ ForceBikeOrSurf: ; 12ed (0:12ed)
     ld b,5 ;graphics bank 5
     ld hl,LoadPlayerSpriteGraphics ;load player sprite graphics
     call Bankswitch ;loads bank 5 and then calls LoadPlayerSpriteGraphics
-    jp Func_2307 ;update map/player state?
+    jp PlayDefaultMusicFadeOutCurrent ; jp PlayDefaultMusic ;update map/player state?
 
 ; this is used to check if the player wants to interrupt the opening sequence at several points
 ; XXX is this used anywhere else?
@@ -3373,6 +3373,23 @@ PrintStatusConditionNotFainted: ; 14f6
     ld a,b
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
+    ret
+
+CheckSurfing:
+    ld b,a
+    jr nz,.notsurf
+    ld a,[W_CURMAP]
+    cp ROUTE_19
+    jr c,.notsurf
+    cp ROUTE_21+1
+    jr nc,.notsurf
+.surf
+    ld a,(Music_Surfing - $4000) / 3
+    scf
+    jr .end
+.notsurf
+    xor a ; rcf
+.end
     ret
 
 ; ds X ; Denim ; 4some free Bytes
@@ -5895,33 +5912,32 @@ Func_22fa: ; 22fa (0:22fa)
 TimerHandler: ; 2306 (0:2306)
     reti
 
-Func_2307: ; 2307 (0:2307)
+PlayDefaultMusic: ; 2307 (0:2307)
     call WaitForSoundToFinish
     xor a
     ld c,a
     ld d,a
     ld [$cfca],a
-    jr asm_2324
+    jr PlayDefaultMusicCommon
 
-Func_2312: ; 2312 (0:2312)
+PlayDefaultMusicFadeOutCurrent: ; 2312 (0:2312)
     ld c,$a
     ld d,$0
     ld a,[$d72e]
     bit 5,a
-    jr z,asm_2324
+    jr z,PlayDefaultMusicCommon
     xor a
     ld [$cfca],a
     ld c,$8
     ld d,c
-asm_2324: ; 2324 (0:2324)
+PlayDefaultMusicCommon: ; 2324 (0:2324)
     ld a,[$d700]
     cp $2
-    jr z,.surfing
+    call CheckSurfing
+    jr c,.Continue
+    ld a,b
     call CheckCyclingRoad
     jr z,.walking
-    jr .Continue
-.surfing
-    ld a,(Music_Surfing - $4000) / 3
 .Continue
     ld b,a
     ld a,d
@@ -23594,7 +23610,7 @@ ItemUseBicycle: ; d977 (3:5977)
     call ItemUseReloadOverworldData
     xor a
     ld [$d700],a ; change player state to walking
-    ds 3 ; call Func_2307 ; play walking music
+    ds 3 ; call PlayDefaultMusic ; play walking music
     ld hl,GotOffBicycleText
     jr .printText
 .tryToGetOnBike
@@ -23606,7 +23622,7 @@ ItemUseBicycle: ; d977 (3:5977)
     inc a
     ld [$d700],a ; change player state to bicycling
     ld hl,GotOnBicycleText
-    ds 3 ; call Func_2307 ; play bike riding music
+    ds 3 ; call PlayDefaultMusic ; play bike riding music
 .printText
     jp PrintText
 
@@ -23622,7 +23638,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     set 7,[hl]
     ld a,2
     ld [$d700],a ; change player state to surfing
-    call Func_2307 ; play surfing music
+    call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play surfing music
     ld hl,.HandleSurfboardTextMessage
     jp RunOnlyIfNotSelectInOverworld
 .tryToStopSurfing
@@ -23660,7 +23676,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld [$d700],a ; change player state to walking
     dec a
     ld [wJoypadForbiddenButtonsMask],a
-    call Func_2307 ; play walking music
+    call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play walking music
     jp ClearScreenAndLoadWalkingPlayerSpriteGraphics ; jp LoadWalkingPlayerSpriteGraphics
 ; uses a simulated button press to make the player move forward
 .makePlayerMoveForward
@@ -24808,7 +24824,7 @@ PlayedFluteHadEffectText: ; e215 (3:6215)
     ld a,[$c028]
     cp a,$b8
     jr z,.musicWaitLoop
-    call Func_2307 ; start playing normal music again
+    call PlayDefaultMusic ; start playing normal music again
 .done
     jp TextScriptEnd ; end text
 
@@ -33968,7 +33984,7 @@ Func_17d7d: ; Moved in the Bank
     call Bankswitch ; indirect jump to TryEvolvingMon (3ad0e (e:6d0e))
     xor a
     ld [W_ISLINKBATTLE],a ; $d12b
-    jp Func_2307
+    jp PlayDefaultMusic
 
 SECTION "bank6",ROMX,BANK[$6]
 
@@ -34986,7 +35002,7 @@ PewterCityScript1: ; 19280 (6:5280)
     ld a,$34
     ld [$ff00+$8d],a
     call Func_34b9
-    call Func_2307
+    call PlayDefaultMusic
     ld hl,wFlags_0xcd60
     set 4,[hl]
     ld a,$d
@@ -35052,7 +35068,7 @@ PewterCityScript4: ; 19305 (6:5305)
     ld a,$18
     ld [$ff00+$8d],a
     call Func_34b9
-    call Func_2307
+    call PlayDefaultMusic
     ld hl,wFlags_0xcd60
     set 4,[hl]
     ld a,$e
@@ -35469,7 +35485,7 @@ CeruleanCityScript3: ; 19610 (6:5610)
     call Predef
     xor a
     ld [wJoypadForbiddenButtonsMask],a
-    call Func_2307
+    call PlayDefaultMusic
     ld a,$0
     ld [W_CERULEANCITYCURSCRIPT],a
     ret
@@ -38469,7 +38485,7 @@ OaksLabScript4: ; 1cbd2 (7:4bd2)
     call UpdateSprites
     ld hl,W_FLAGS_D733
     res 1,[hl]
-    call Func_2307
+    call PlayDefaultMusic
 
     ld a,$5
     ld [W_OAKSLABCURSCRIPT],a
@@ -38808,7 +38824,7 @@ OaksLabScript14: ; 1ce6d (7:4e6d)
     call Predef
     xor a
     ld [wJoypadForbiddenButtonsMask],a
-    call Func_2307 ; reset to map music
+    call PlayDefaultMusic ; reset to map music
     ld a,$12
     ld [W_OAKSLABCURSCRIPT],a
     jr .done ; 0x1ce8a $23
@@ -38886,7 +38902,7 @@ OaksLabScript16: ; 1cf12 (7:4f12)
     bit 0,a
     ret nz
     call EnableAutoTextBoxDrawing
-    call Func_2307
+    call PlayDefaultMusic
     ld a,$fc
     ld [wJoypadForbiddenButtonsMask],a
     call OaksLabScript_1cefd
@@ -38967,7 +38983,7 @@ OaksLabScript17: ; 1cfd4 (7:4fd4)
     ld a,[$d730]
     bit 0,a
     ret nz
-    call Func_2307
+    call PlayDefaultMusic
     ld a,$2a
     ld [$cc4d],a
     ld a,$11
@@ -42718,7 +42734,7 @@ UnnamedText_1eb69: ; 1eb69 (7:6b69)
     ld a,$86
     call PlaySound
     call WaitForSoundToFinish
-    call Func_2307
+    call PlayDefaultMusic
     ld hl,$d7f2
     set 3,[hl]
     ret
@@ -48737,7 +48753,7 @@ Func_3aede: ; Moved in the Bank
     ret nz
     ld a,[$d121]
     and a
-    call nz,Func_2307
+    call nz,PlayDefaultMusic
     ret
 
 GoPalSetAfterAIItemUser: ; to avoid bad color after enemy item use
@@ -74424,7 +74440,7 @@ Route22Script3: ; 5102a (14:502a)
     ld [$cc4d],a
     ld a,$11
     call Predef
-    call Func_2307
+    call PlayDefaultMusic
     ld hl,$d7eb
     res 0,[hl]
     res 7,[hl]
@@ -74575,7 +74591,7 @@ Route22Script6: ; 51151 (14:5151)
     ld [$cc4d],a
     ld a,$11
     call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
-    call Func_2307
+    call PlayDefaultMusic
     ld hl,$d7eb
     res 1,[hl]
     res 7,[hl]
@@ -76134,7 +76150,7 @@ SilphCo7Script5: ; 51d25 (14:5d25)
     ld [$cc4d],a
     ld a,$11
     call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
-    call Func_2307
+    call PlayDefaultMusic
     xor a
     ld [wJoypadForbiddenButtonsMask],a
     jp Func_51c10
@@ -87129,7 +87145,7 @@ PewterPokecenterText3: ; 5c59b (17:459b)
     jr nz,.asm_5c5d1 ; 0x5c5f6 $d9
     ld c,$30
     call DelayFrames
-    call Func_2307
+    call PlayDefaultMusic
     jp TextScriptEnd
 
 PewterPokecenterText5: ; 5c603 (17:4603)
@@ -90578,7 +90594,7 @@ PokemonTower2Script2: ; 605bb (18:45bb)
     call Predef
     xor a
     ld [wJoypadForbiddenButtonsMask],a
-    call Func_2307
+    call PlayDefaultMusic
     ld a,$0
     ld [W_POKEMONTOWER2CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -92349,7 +92365,7 @@ SSAnne2Script3: ; 614be (18:54be)
     ld [$cc4d],a
     ld a,$11
     call Predef
-    call Func_2307
+    call PlayDefaultMusic
     ld a,$4
     ld [W_SSANNE2CURSCRIPT],a
     ret
@@ -92796,7 +92812,7 @@ SSAnne7RubText: ; 618ec (18:58ec)
     ld a,[$c026]
     cp $e8
     jr z,.asm_61910 ; 0x61915 $f9
-    call Func_2307
+    call PlayDefaultMusic
     ld hl,$d803
     set 1,[hl]
     ld hl,$d72d
@@ -95263,7 +95279,7 @@ Func_70510: ; 70510 (1c:4510)
     ld hl,$cd48
     call Func_70730
 .asm_70558
-    call Func_2307
+    call PlayDefaultMusic
 .asm_7055b
     jp Func_70772
 .asm_7055e
@@ -112365,7 +112381,7 @@ Func_7bf15: ; 7bf15 (1e:7f15)
     cp $b9
     jr z,.asm_7bf57
     call UpdateSprites
-    jp Func_2307
+    jp PlayDefaultMusic
 
 Func_7bf64: ; 7bf64 (1e:7f64)
     ld hl,$d527
@@ -112606,7 +112622,7 @@ Func_7d13b: ; 7d13b (1f:513b)
     ld a,[hli]
     ld c,[hl]
     call PlayMusic
-    jp Func_2307
+    jp PlayDefaultMusic
 
 PokedexRatingSfxPointers: ; 7d162 (1f:5162)
     db (SFX_1f_51 - $4000) / 3
