@@ -14430,19 +14430,10 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     ld b,16
     ld c,18
     call TextBoxBorder
-    jr .continue
-    ds 18
-    ;FuncCoord 0,5
-    ;ld hl,Coord
-    ;ld b,3
-    ;ld c,18
-    ;call TextBoxBorder
-    ;FuncCoord 0,10
-    ;ld hl,Coord
-    ;ld b,3
-    ;ld c,18
-    ;call TextBoxBorder
-.continue
+    FuncCoord 11,16
+    ld hl,Coord
+    ld de,.Version
+    call PlaceString
     FuncCoord 1,1
     ld hl,Coord
     ld de,TextSpeedOptionText
@@ -14495,6 +14486,8 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     ld a,$90
     call PlaySound ; play sound
     ret
+.Version
+    db "0.75.001@"
 .eraseOldMenuCursor
     ld [wTopMenuItemX],a
     call EraseMenuCursor
@@ -14586,25 +14579,23 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     ld [$cd3d],a ; text speed cursor X coordinate
     jp .eraseOldMenuCursor
 
-TextSpeedOptionText: ; 5fc0 (1:5fc0)
+TextSpeedOptionText:
     db "TEXT SPEED",$4E
     db "  FAST MEDIUM SLOW@"
 
-BattleAnimationOptionText: ; 5fde (1:5fde)
+BattleAnimationOptionText:
     db "BATTLE ANIMATION",$4E
     db "  ON      OFF@"
 
-BattleStyleOptionText: ; 5ffd (1:5ffd)
-;   db "BATTLE STYLE",$4E
-;   db " SHIFT    SET@"
+BattleStyleOptionText:
     db "?",$4E
     db "  0       1@"
 
-OptionMenuCancelText: ; 6018 (1:6018)
+OptionMenuCancelText:
     db "CANCEL@"
 
 ; sets the options variable according to the current placement of the menu cursors in the options menu
-SetOptionsFromCursorPositions: ; 601f (1:601f)
+SetOptionsFromCursorPositions:
     ld hl,TextSpeedOptionData
     ld a,[$cd3d] ; text speed cursor X coordinate
     ld c,a
@@ -14639,6 +14630,8 @@ SetOptionsFromCursorPositions: ; 601f (1:601f)
     ld a,d
     ld [W_OPTIONS],a
     ret
+
+; Free Space
 
 SECTION "SetCursorPositionsFromOptions",ROMX[$604c],BANK[$1] 
 
@@ -18564,7 +18557,7 @@ PrintDenimVersionAndSaveScreenTilesToBuffer2:
     jr nz,.Loop
     ret
 .Version
-    db "0.75.000"
+    db "0.75.001"
 .GBC
     db $41
 
