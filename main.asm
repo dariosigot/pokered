@@ -29350,8 +29350,8 @@ StatusScreen:
     ld a,[$cf92]
     inc a
 .commonFromStatus1
-    cp 6
-    jr nc,.getJoypadStateLoop1 ; valid only between 0 and 5
+    call CompareWithCurrentPartyBoxNum ; cp 6
+    jr nc,.getJoypadStateLoop1 ; valid only between 0 and [W_NUMINPARTY]/[W_NUMINBOX]
     ld [$cf92],a
     call .ResetFlagStatusScreenJustLoad
     jr .Status1
@@ -29363,8 +29363,8 @@ StatusScreen:
     ld a,[$cf92]
     inc a
 .commonFromStatus2
-    cp 6
-    jr nc,.getJoypadStateLoop2 ; valid only between 0 and 5
+    call CompareWithCurrentPartyBoxNum ; cp 6
+    jr nc,.getJoypadStateLoop2 ; valid only between 0 and [W_NUMINPARTY]/[W_NUMINBOX]
     ld [$cf92],a
     call .ResetFlagStatusScreenJustLoad
     jr .Status2
@@ -32519,6 +32519,21 @@ PrintLevelAndGender:
     db $EF,$50
 .FemaleIcon
     db $F5,$50
+
+CompareWithCurrentPartyBoxNum:
+    push af
+    ld a,[$cc49] ; (0=Party|2=Box)
+    and a
+    ld hl,W_NUMINPARTY
+    jr z,.party
+.box
+    ld hl,W_NUMINBOX
+.party
+    ld a,[hl]
+    ld b,a
+    pop af
+    cp b
+    ret
 
 SECTION "bank5",ROMX,BANK[$5]
 
