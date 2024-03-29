@@ -344,7 +344,15 @@ wGymLeaderName: ; cf70
 wStringBuffer2: ; cf70
     ds 16 + 1
 wStringBuffer3: ; cf81
-    ds 16 + 1
+    ds 10
+
+wListPointer: ; $cf8b
+    ds 1
+
+    ds 5
+
+wcf91: ; $cf91
+    ds 1
 
 wWhichPokemon: ; cf92
 ; which pokemon you selected
@@ -1497,6 +1505,7 @@ W_BOXMON2DATA: ; dab7
 
 SECTION "wLocationMonOvSprInstruction", WRAMX[$def0], BANK[1]
 
+wMoveRelearnerMoveList: ; def0
 wLocationMonOvSprInstruction: ; def0 ; Denim
 wEXPBarPixelLength: ; def0 ; Denim, ExpBar
     ds 1
@@ -1557,6 +1566,7 @@ wTempStatLO            ; df37
     ds 1
 
 wFlagAddPkmnToPartyBit0     ; df38 ; bit 0
+wFlagMoveRelearnEngagedBit0 ; df38 ; bit 0
 wFlagDratiniCaveBit1        ; df38 ; bit 1
 wFlagNoHpPalBit2            ; df38 ; bit 2
 wFlagEnableOakLastPkmnBit3  ; df38 ; bit 3
