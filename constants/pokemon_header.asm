@@ -168,7 +168,7 @@ CharmeleonBaseStats: ; 3844e (e:444e)
     db EMBER
     db LEER
     db FURY_SWIPES
-    db RAGE
+    db FOCUS_ENERGY
 
     db 3 ; growth rate
 
@@ -202,10 +202,10 @@ CharizardBaseStats: ; 3846a (e:446a)
     dw CharizardPicBack
 
     ; attacks known at lvl 0
-    db FIRE_PUNCH
     db TRAPHOLE
+    db FIRE_PUNCH
     db SLASH
-    db DRAGON_RAGE
+    db SWOOP
 
     db 3 ; growth rate
 
@@ -2092,7 +2092,7 @@ PrimeapeBaseStats: ; 389fe (e:49fe)
     db FURY_SWIPES
     db STRIKE
     db FOCUS_ENERGY
-    db RAGE
+    db JUMP_KICK
 
     db 0 ; growth rate
 
@@ -3126,7 +3126,7 @@ DodrioBaseStats: ; 38d0e (e:4d0e)
 
     ; attacks known at lvl 0
     db SCREECH
-    db RAGE
+    db SLAM
     db DRILL_PECK
     db TRI_ATTACK
 
@@ -4235,8 +4235,8 @@ KangaskhanBaseStats: ; 39056 (e:5056)
     dw KangaskhanPicBack
 
     ; attacks known at lvl 0
-    db COMET_PUNCH
-    db RAGE
+    db SCRATCH
+    db TAIL_WHIP
     db 0
     db 0
 

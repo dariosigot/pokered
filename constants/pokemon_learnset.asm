@@ -74,7 +74,7 @@ Mon004_EvosMoves:
     db 10,LEER
     db 13,FURY_SWIPES
     ;  16,CHARMELEON
-    db 19,RAGE
+    db 19,FOCUS_ENERGY
     db 22,SMOKESCREEN
     db 25,FIRE_PUNCH
     db 30,SLASH
@@ -89,7 +89,7 @@ Mon005_EvosMoves:
     db EV_LEVEL,36,CHARIZARD
     db 0
 ;Learnset
-    ;  16,RAGE
+    ;  16,FOCUS_ENERGY
     db 21,SMOKESCREEN
     db 24,TRAPHOLE
     db 27,FIRE_PUNCH
@@ -106,8 +106,8 @@ Mon006_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    ;  36,DRAGON_RAGE
-    db 39,SWOOP
+    ;  36,SWOOP
+    db 39,DRAGON_RAGE
     db 41,SEISMIC_TOSS
     db 44,FLAMETHROWER
     db 49,FIRE_SPIN
@@ -256,7 +256,7 @@ Mon015_EvosMoves:
     db 15,FOCUS_ENERGY
     db 18,FURY_ATTACK
     db 21,LEECH_LIFE
-    db 24,RAGE
+    db 24,ACID
     db 27,DOUBLE_TEAM
     db 30,PIN_MISSILE
     db 34,AGILITY
@@ -1026,7 +1026,7 @@ Mon057_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    ;  28,RAGE
+    ;  28,JUMP_KICK
     db 31,STRIKE
     db 34,TRAPHOLE
     db 37,SEISMIC_TOSS
@@ -1529,7 +1529,7 @@ Mon084_EvosMoves:
     db 13,QUICK_ATTACK
     db 18,SCREECH
     db 21,STOMP
-    db 25,RAGE
+    db 25,SLAM
     db 30,DRILL_PECK
     ;  31,DODRIO
     db 37,AGILITY
@@ -1745,7 +1745,7 @@ Mon095_EvosMoves:
     db 19,STRIKE
     db 23,TRAPHOLE
     db 26,HARDEN
-    db 29,RAGE
+    db 29,MEDITATE
     db 31,BODY_SLAM
     db 36,EXPLOSION
     db 39,ROCK_SLIDE
@@ -1934,7 +1934,7 @@ Mon104_EvosMoves:
     db 21,FOCUS_ENERGY ; ...
     db 25,BONEMERANG   ; ...
     ;  28,MAROWAK
-    db 29,RAGE
+    db 29,STRIKE
     db 32,TRAPHOLE
     db 37,THRASH
     db 40,EARTHQUAKE
@@ -1946,7 +1946,7 @@ Mon105_EvosMoves:
     db 0
 ;Learnset
     ;  28,NIGHT_SHADE  ; ...
-    db 32,RAGE
+    db 32,STRIKE
     db 37,TRAPHOLE
     db 42,THRASH
     db 46,EARTHQUAKE
@@ -2073,10 +2073,10 @@ Mon111_EvosMoves:
 ;Learnset
     ;   1,HORN_ATTACK
     ;   1,TAIL_WHIP
-    db  8,RAGE
+    db  8,HARDEN
     db 10,STOMP
-    db 13,STRIKE
-    db 16,FURY_ATTACK
+    db 13,FURY_ATTACK
+    db 16,STRIKE
     db 19,LEER
     db 23,TAKE_DOWN
     db 27,ROCK_THROW
@@ -2163,12 +2163,12 @@ Mon115_EvosMoves:
     ;   1,SCRATCH
     ;   1,TAIL_WHIP
     db  7,COMET_PUNCH
-    db  9,RAGE
+    db  9,SUBSTITUTE
     db 11,LEER
     db 14,FURY_SWIPES
     db 16,FOCUS_ENERGY
     db 19,LOW_KICK
-    db 21,SUBSTITUTE
+    db 21,BONE_CLUB
     db 22,REST
     db 25,BITE
     db 29,MEGA_PUNCH

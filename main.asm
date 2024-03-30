@@ -130317,8 +130317,8 @@ EvolutionMove:
    db POISONPOWDER         ; IVYSAUR
    db PETAL_DANCE          ; VENUSAUR
    db 0                    ; CHARMANDER
-   db RAGE                 ; CHARMELEON
-   db DRAGON_RAGE          ; CHARIZARD
+   db FOCUS_ENERGY         ; CHARMELEON
+   db SWOOP                ; CHARIZARD
    db 0                    ; SQUIRTLE
    db WITHDRAW             ; WARTORTLE
    db TSUNAMI              ; BLASTOISE
@@ -130369,7 +130369,7 @@ EvolutionMove:
    db 0                    ; PSYDUCK
    db WATER_GUN            ; GOLDUCK
    db 0                    ; MANKEY
-   db RAGE                 ; PRIMEAPE
+   db JUMP_KICK            ; PRIMEAPE
    db 0                    ; GROWLITHE
    db HYPER_FANG           ; ARCANINE
    db 0                    ; POLIWAG
