@@ -29430,9 +29430,9 @@ StatusScreen:
     ret
 .LoadMonData
     call LoadMonData
-    ld hl,wStatusScreenJustLoadBit1
-    bit 1,[hl]
-    ret nz ; Don't Recalculate 
+    ;ld hl,wStatusScreenJustLoadBit1
+    ;bit 1,[hl]
+    ;ret nz ; Don't Recalculate
     ld a,[$cc49]
     cp $2 ; 2 means we're in a PC box
     ret c ;  Don't Recalculate
