@@ -54229,6 +54229,10 @@ PrintMenuItem: ; 3d4b6 (f:54b6)
     ld a,[wCurrentMenuItem] ; $cc26
     cp b
     jr nz,.asm_3d4df
+    FuncCoord 0,8
+    ld hl,Coord
+    ld bc,$0308
+    call TextBoxBorder
     FuncCoord 1,10 ; $c469
     ld hl,Coord
     ld de,DisabledText ; $5555
