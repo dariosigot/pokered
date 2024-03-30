@@ -3865,7 +3865,7 @@ MarowakBaseStats: ; 38f3e (e:4f3e)
     dw MarowakPicBack
 
     ; attacks known at lvl 0
-    db LEER
+    db HEADBUTT
     db FOCUS_ENERGY
     db BONEMERANG
     db NIGHT_SHADE
