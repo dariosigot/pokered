@@ -130373,7 +130373,7 @@ EvolutionMove:
    db 0                    ; GROWLITHE
    db HYPER_FANG           ; ARCANINE
    db 0                    ; POLIWAG
-   db MEGA_PUNCH           ; POLIWHIRL
+   db SLAM                 ; POLIWHIRL
    db LOW_KICK             ; POLIWRATH
    db 0                    ; ABRA
    db KINESIS              ; KADABRA

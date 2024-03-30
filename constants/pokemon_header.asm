@@ -2240,7 +2240,7 @@ PoliwhirlBaseStats: ; 38a6e (e:4a6e)
     db WATER_GUN
     db DOUBLESLAP
     db AGILITY
-    db MEGA_PUNCH
+    db SLAM
 
     db 3 ; growth rate
 
@@ -2276,7 +2276,7 @@ PoliwrathBaseStats: ; 38a8a (e:4a8a)
     ; attacks known at lvl 0
     db DOUBLESLAP
     db AGILITY
-    db MEGA_PUNCH
+    db SLAM
     db LOW_KICK
 
     db 3 ; growth rate
