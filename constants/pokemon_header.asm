@@ -1720,8 +1720,8 @@ ParasectBaseStats: ; 388e6 (e:48e6)
 
     ; attacks known at lvl 0
     db ABSORB
-    db VICEGRIP
     db BLADE
+    db VICEGRIP
     db GROWTH
 
     db 0 ; growth rate
@@ -2460,7 +2460,7 @@ MachokeBaseStats: ; 38b16 (e:4b16)
 
     ; attacks known at lvl 0
     db FOCUS_ENERGY
-    db MEGA_PUNCH
+    db STRIKE
     db SEISMIC_TOSS
     db ROLLING_KICK
 
@@ -2755,8 +2755,8 @@ GravelerBaseStats: ; 38bf6 (e:4bf6)
     dw GravelerPicBack
 
     ; attacks known at lvl 0
-    db MEGA_PUNCH
     db ROCK_THROW
+    db MEGA_PUNCH
     db SELFDESTRUCT
     db STOMP
 
@@ -2792,7 +2792,7 @@ GolemBaseStats: ; 38c12 (e:4c12)
     dw GolemPicBack
 
     ; attacks known at lvl 0
-    db ROCK_THROW
+    db MEGA_PUNCH
     db SELFDESTRUCT
     db STOMP
     db BODY_SLAM

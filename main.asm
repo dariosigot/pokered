@@ -43271,10 +43271,28 @@ MoveRelearnerText:
     ld bc,wListPointer-wStringBuffer1
     call FarCopyData ; copy bc bytes of data from a:hl to de
 
+    ; Get Mon Move List from "PreEvolutionMove"
+    ld de,wMoveRelearnerMoveList+1 ; Backup Final List Pointer to $CD6D
+    ld hl,$CD6D                    ; ...
+    ld a,e                         ; ...
+    ld [hli],a                     ; ...
+    ld a,d                         ; ...
+    ld [hl],a                      ; ...
+    ld a,[$cf91]
+    ld d,a ; pokemon ID
+    ld e,0 ; initial counter = 0
+    ld b,BANK(GetPreEvolutionMove)
+    ld hl,GetPreEvolutionMove
+    call Bankswitch
+    ld b,e ; restore counter
+    ld hl,$CD6D
+    ld a,[hli]
+    ld d,[hl]
+    ld e,a ; de pointer to current Final List
+
     ; Get Mon Move List from Header Base Moves
-    ld de,wMoveRelearnerMoveList+1
     ld hl,W_MONHMOVES
-    ld bc,4 ; counter b = 0
+    ld c,4
 .LoopHeaderMoves
     ld a,[hli]
     and a
@@ -130317,157 +130335,380 @@ _CheckEvolutionMove:
     ret
 
 EvolutionMove:
-   db 0                    ; BULBASAUR
-   db POISONPOWDER         ; IVYSAUR
-   db PETAL_DANCE          ; VENUSAUR
-   db 0                    ; CHARMANDER
-   db FOCUS_ENERGY         ; CHARMELEON
-   db SWOOP                ; CHARIZARD
-   db 0                    ; SQUIRTLE
-   db WITHDRAW             ; WARTORTLE
-   db TSUNAMI              ; BLASTOISE
-   db 0                    ; CATERPIE
-   db HARDEN               ; METAPOD
-   db CONFUSION            ; BUTTERFREE
-   db 0                    ; WEEDLE
-   db HARDEN               ; KAKUNA
-   db TWINEEDLE            ; BEEDRILL
-   db 0                    ; PIDGEY
-   db WING_ATTACK          ; PIDGEOTTO
-   db DOUBLE_TEAM          ; PIDGEOT
-   db 0                    ; RATTATA
-   db TRAPHOLE             ; RATICATE
-   db 0                    ; SPEAROW
-   db SWOOP                ; FEAROW
-   db 0                    ; EKANS
-   db TRAPHOLE             ; ARBOK
-   db 0                    ; PIKACHU
-   db THUNDERBOLT          ; RAICHU
-   db 0                    ; SANDSHREW
-   db TRAPHOLE             ; SANDSLASH
-   db 0                    ; NIDORAN_F
-   db DOUBLE_KICK          ; NIDORINA
-   db THRASH               ; NIDOQUEEN
-   db 0                    ; NIDORAN_M
-   db DOUBLE_KICK          ; NIDORINO
-   db THRASH               ; NIDOKING
-   db 0                    ; CLEFAIRY
-   db SWIFT                ; CLEFABLE
-   db 0                    ; VULPIX
-   db BITE                 ; NINETALES
-   db 0                    ; JIGGLYPUFF
-   db SWIFT                ; WIGGLYTUFF
-   db 0                    ; ZUBAT
-   db WING_ATTACK          ; GOLBAT
-   db 0                    ; ODDISH
-   db SLEEP_POWDER         ; GLOOM
-   db MEGA_DRAIN           ; VILEPLUME
-   db 0                    ; PARAS
-   db GROWTH               ; PARASECT
-   db 0                    ; VENONAT
-   db PIN_MISSILE          ; VENOMOTH
-   db 0                    ; DIGLETT
-   db TRI_ATTACK           ; DUGTRIO
-   db 0                    ; MEOWTH
-   db HYPER_FANG           ; PERSIAN
-   db 0                    ; PSYDUCK
-   db WATER_GUN            ; GOLDUCK
-   db 0                    ; MANKEY
-   db JUMP_KICK            ; PRIMEAPE
-   db 0                    ; GROWLITHE
-   db HYPER_FANG           ; ARCANINE
-   db 0                    ; POLIWAG
-   db SLAM                 ; POLIWHIRL
-   db LOW_KICK             ; POLIWRATH
-   db 0                    ; ABRA
-   db KINESIS              ; KADABRA
-   db PSYBEAM              ; ALAKAZAM
-   db 0                    ; MACHOP
-   db ROLLING_KICK         ; MACHOKE
-   db JUMP_KICK            ; MACHAMP
-   db 0                    ; BELLSPROUT
-   db STUN_SPORE           ; WEEPINBELL
-   db WRAP                 ; VICTREEBEL
-   db 0                    ; TENTACOOL
-   db SLUDGE               ; TENTACRUEL
-   db 0                    ; GEODUDE
-   db STOMP                ; GRAVELER
-   db BODY_SLAM            ; GOLEM
-   db 0                    ; PONYTA
-   db HORN_ATTACK          ; RAPIDASH
-   db 0                    ; SLOWPOKE
-   db MEGA_PUNCH           ; SLOWBRO
-   db 0                    ; MAGNEMITE
-   db TRI_ATTACK           ; MAGNETON
-   db 0                    ; FARFETCH_D
-   db 0                    ; DODUO
-   db TRI_ATTACK           ; DODRIO
-   db 0                    ; SEEL
-   db TSUNAMI              ; DEWGONG
-   db 0                    ; GRIMER
-   db ACID_ARMOR           ; MUK
-   db 0                    ; SHELLDER
-   db SPIKE_CANNON         ; CLOYSTER
-   db 0                    ; GASTLY
-   db PSYWAVE              ; HAUNTER
-   db POISON_GAS           ; GENGAR
-   db 0                    ; ONIX
-   db 0                    ; DROWZEE
-   db PSYBEAM              ; HYPNO
-   db 0                    ; KRABBY
-   db CRABHAMMER           ; KINGLER
-   db 0                    ; VOLTORB
-   db THUNDERBOLT          ; ELECTRODE
-   db 0                    ; EXEGGCUTE
-   db STOMP                ; EXEGGUTOR
-   db 0                    ; CUBONE
-   db NIGHT_SHADE          ; MAROWAK
-   db 0                    ; HITMONLEE
-   db 0                    ; HITMONCHAN
-   db 0                    ; LICKITUNG
-   db 0                    ; KOFFING
-   db EXPLOSION            ; WEEZING
-   db 0                    ; RHYHORN
-   db ROCK_SLIDE           ; RHYDON
-   db 0                    ; CHANSEY
-   db 0                    ; TANGELA
-   db 0                    ; KANGASKHAN
-   db 0                    ; HORSEA
-   db DRAGON_RAGE          ; SEADRA
-   db 0                    ; GOLDEEN
-   db WATERFALL            ; SEAKING
-   db 0                    ; STARYU
-   db BUBBLEBEAM           ; STARMIE
-   db 0                    ; MR_MIME
-   db 0                    ; SCYTHER
-   db 0                    ; JYNX
-   db 0                    ; ELECTABUZZ
-   db 0                    ; MAGMAR
-   db 0                    ; PINSIR
-   db 0                    ; TAUROS
-   db 0                    ; MAGIKARP
-   db BITE                 ; GYARADOS
-   db 0                    ; LAPRAS
-   db 0                    ; DITTO
-   db 0                    ; EEVEE
-   db WATER_GUN            ; VAPOREON
-   db THUNDERSHOCK         ; JOLTEON
-   db EMBER                ; FLAREON
-   db 0                    ; PORYGON
-   db 0                    ; OMANYTE
-   db SPIKE_CANNON         ; OMASTAR
-   db 0                    ; KABUTO
-   db SLASH                ; KABUTOPS
-   db 0                    ; AERODACTYL
-   db 0                    ; SNORLAX
-   db 0                    ; ARTICUNO
-   db 0                    ; ZAPDOS
-   db 0                    ; MOLTRES
-   db 0                    ; DRATINI
-   db DRAGON_RAGE          ; DRAGONAIR
-   db SWOOP                ; DRAGONITE
-   db 0                    ; MEWTWO
-   db 0                    ; MEW
+    db 0                    ; BULBASAUR
+    db POISONPOWDER         ; IVYSAUR
+    db PETAL_DANCE          ; VENUSAUR
+    db 0                    ; CHARMANDER
+    db FOCUS_ENERGY         ; CHARMELEON
+    db SWOOP                ; CHARIZARD
+    db 0                    ; SQUIRTLE
+    db WITHDRAW             ; WARTORTLE
+    db TSUNAMI              ; BLASTOISE
+    db 0                    ; CATERPIE
+    db HARDEN               ; METAPOD
+    db CONFUSION            ; BUTTERFREE
+    db 0                    ; WEEDLE
+    db HARDEN               ; KAKUNA
+    db TWINEEDLE            ; BEEDRILL
+    db 0                    ; PIDGEY
+    db WING_ATTACK          ; PIDGEOTTO
+    db DOUBLE_TEAM          ; PIDGEOT
+    db 0                    ; RATTATA
+    db TRAPHOLE             ; RATICATE
+    db 0                    ; SPEAROW
+    db SWOOP                ; FEAROW
+    db 0                    ; EKANS
+    db TRAPHOLE             ; ARBOK
+    db 0                    ; PIKACHU
+    db THUNDERBOLT          ; RAICHU
+    db 0                    ; SANDSHREW
+    db TRAPHOLE             ; SANDSLASH
+    db 0                    ; NIDORAN_F
+    db DOUBLE_KICK          ; NIDORINA
+    db THRASH               ; NIDOQUEEN
+    db 0                    ; NIDORAN_M
+    db DOUBLE_KICK          ; NIDORINO
+    db THRASH               ; NIDOKING
+    db 0                    ; CLEFAIRY
+    db SWIFT                ; CLEFABLE
+    db 0                    ; VULPIX
+    db BITE                 ; NINETALES
+    db 0                    ; JIGGLYPUFF
+    db SWIFT                ; WIGGLYTUFF
+    db 0                    ; ZUBAT
+    db WING_ATTACK          ; GOLBAT
+    db 0                    ; ODDISH
+    db SLEEP_POWDER         ; GLOOM
+    db MEGA_DRAIN           ; VILEPLUME
+    db 0                    ; PARAS
+    db GROWTH               ; PARASECT
+    db 0                    ; VENONAT
+    db PIN_MISSILE          ; VENOMOTH
+    db 0                    ; DIGLETT
+    db TRI_ATTACK           ; DUGTRIO
+    db 0                    ; MEOWTH
+    db HYPER_FANG           ; PERSIAN
+    db 0                    ; PSYDUCK
+    db WATER_GUN            ; GOLDUCK
+    db 0                    ; MANKEY
+    db JUMP_KICK            ; PRIMEAPE
+    db 0                    ; GROWLITHE
+    db HYPER_FANG           ; ARCANINE
+    db 0                    ; POLIWAG
+    db SLAM                 ; POLIWHIRL
+    db LOW_KICK             ; POLIWRATH
+    db 0                    ; ABRA
+    db KINESIS              ; KADABRA
+    db PSYBEAM              ; ALAKAZAM
+    db 0                    ; MACHOP
+    db ROLLING_KICK         ; MACHOKE
+    db JUMP_KICK            ; MACHAMP
+    db 0                    ; BELLSPROUT
+    db STUN_SPORE           ; WEEPINBELL
+    db WRAP                 ; VICTREEBEL
+    db 0                    ; TENTACOOL
+    db SLUDGE               ; TENTACRUEL
+    db 0                    ; GEODUDE
+    db STOMP                ; GRAVELER
+    db BODY_SLAM            ; GOLEM
+    db 0                    ; PONYTA
+    db HORN_ATTACK          ; RAPIDASH
+    db 0                    ; SLOWPOKE
+    db MEGA_PUNCH           ; SLOWBRO
+    db 0                    ; MAGNEMITE
+    db TRI_ATTACK           ; MAGNETON
+    db 0                    ; FARFETCH_D
+    db 0                    ; DODUO
+    db TRI_ATTACK           ; DODRIO
+    db 0                    ; SEEL
+    db TSUNAMI              ; DEWGONG
+    db 0                    ; GRIMER
+    db ACID_ARMOR           ; MUK
+    db 0                    ; SHELLDER
+    db SPIKE_CANNON         ; CLOYSTER
+    db 0                    ; GASTLY
+    db PSYWAVE              ; HAUNTER
+    db POISON_GAS           ; GENGAR
+    db 0                    ; ONIX
+    db 0                    ; DROWZEE
+    db PSYBEAM              ; HYPNO
+    db 0                    ; KRABBY
+    db CRABHAMMER           ; KINGLER
+    db 0                    ; VOLTORB
+    db THUNDERBOLT          ; ELECTRODE
+    db 0                    ; EXEGGCUTE
+    db STOMP                ; EXEGGUTOR
+    db 0                    ; CUBONE
+    db NIGHT_SHADE          ; MAROWAK
+    db 0                    ; HITMONLEE
+    db 0                    ; HITMONCHAN
+    db 0                    ; LICKITUNG
+    db 0                    ; KOFFING
+    db EXPLOSION            ; WEEZING
+    db 0                    ; RHYHORN
+    db ROCK_SLIDE           ; RHYDON
+    db 0                    ; CHANSEY
+    db 0                    ; TANGELA
+    db 0                    ; KANGASKHAN
+    db 0                    ; HORSEA
+    db DRAGON_RAGE          ; SEADRA
+    db 0                    ; GOLDEEN
+    db WATERFALL            ; SEAKING
+    db 0                    ; STARYU
+    db BUBBLEBEAM           ; STARMIE
+    db 0                    ; MR_MIME
+    db 0                    ; SCYTHER
+    db 0                    ; JYNX
+    db 0                    ; ELECTABUZZ
+    db 0                    ; MAGMAR
+    db 0                    ; PINSIR
+    db 0                    ; TAUROS
+    db 0                    ; MAGIKARP
+    db BITE                 ; GYARADOS
+    db 0                    ; LAPRAS
+    db 0                    ; DITTO
+    db 0                    ; EEVEE
+    db WATER_GUN            ; VAPOREON
+    db THUNDERSHOCK         ; JOLTEON
+    db EMBER                ; FLAREON
+    db 0                    ; PORYGON
+    db 0                    ; OMANYTE
+    db SPIKE_CANNON         ; OMASTAR
+    db 0                    ; KABUTO
+    db SLASH                ; KABUTOPS
+    db 0                    ; AERODACTYL
+    db 0                    ; SNORLAX
+    db 0                    ; ARTICUNO
+    db 0                    ; ZAPDOS
+    db 0                    ; MOLTRES
+    db 0                    ; DRATINI
+    db DRAGON_RAGE          ; DRAGONAIR
+    db SWOOP                ; DRAGONITE
+    db 0                    ; MEWTWO
+    db 0                    ; MEW
+
+; INPUT : $CD6D = Pointer to Mon Move List
+;         d = pokemon ID
+;         e = initial counter = 0
+GetPreEvolutionMove:
+    ld hl,.Pointer
+.next
+    ld a,[hli]
+    cp $FF ; Check $FF
+    jr z,.end
+    cp d ; Check Search Mon ID
+    jr z,.found
+    inc hl
+    inc hl
+    jr .next
+.found
+    ld a,[hli]
+    ld b,a
+    ld h,[hl]
+    ld l,b ; hl point to current mon pre evolution moves
+    ld b,e ; counter to b
+    call .getPointerToMonMoveList_DE
+.LoopMoves
+    ld a,[hli]
+    cp $FF
+    jr z,.endLoopMoves
+    ld [de],a
+    inc de
+    inc b ; counter++
+    jr .LoopMoves
+.endLoopMoves
+    call .setPointerToMonMoveList_DE
+    ld e,b ; counter to e
+.end
+    ret
+.getPointerToMonMoveList_DE
+    push hl
+    ld hl,$CD6D
+    ld a,[hli]
+    ld e,a
+    ld d,[hl]
+    pop hl
+    ret
+.setPointerToMonMoveList_DE
+    ld hl,$CD6D
+    ld a,e
+    ld [hli],a
+    ld a,d
+    ld [hl],d
+    ret
+.Pointer
+    PreEvolution IVYSAUR
+    PreEvolution VENUSAUR
+    PreEvolution CHARMELEON
+    PreEvolution CHARIZARD
+    PreEvolution WARTORTLE
+    PreEvolution BLASTOISE
+    PreEvolution PIDGEOTTO
+    PreEvolution PIDGEOT
+    PreEvolution RATICATE
+    PreEvolution FEAROW
+    PreEvolution ARBOK
+    PreEvolution SANDSLASH
+    PreEvolution NIDORINA
+    PreEvolution NIDOQUEEN
+    PreEvolution NIDORINO
+    PreEvolution NIDOKING
+    PreEvolution GOLBAT
+    PreEvolution GLOOM
+    PreEvolution VILEPLUME
+    PreEvolution PARASECT
+    PreEvolution VENOMOTH
+    PreEvolution DUGTRIO
+    PreEvolution PERSIAN
+    PreEvolution GOLDUCK
+    PreEvolution PRIMEAPE
+    PreEvolution POLIWHIRL
+    PreEvolution POLIWRATH
+    PreEvolution KADABRA
+    PreEvolution ALAKAZAM
+    PreEvolution MACHOKE
+    PreEvolution MACHAMP
+    PreEvolution WEEPINBELL
+    PreEvolution VICTREEBEL
+    PreEvolution TENTACRUEL
+    PreEvolution GRAVELER
+    PreEvolution GOLEM
+    PreEvolution RAPIDASH
+    PreEvolution SLOWBRO
+    PreEvolution MAGNETON
+    PreEvolution DODRIO
+    PreEvolution DEWGONG
+    PreEvolution MUK
+    PreEvolution HAUNTER
+    PreEvolution GENGAR
+    PreEvolution HYPNO
+    PreEvolution KINGLER
+    PreEvolution ELECTRODE
+    PreEvolution MAROWAK
+    PreEvolution WEEZING
+    PreEvolution RHYDON
+    PreEvolution SEADRA
+    PreEvolution SEAKING
+    PreEvolution GYARADOS
+    PreEvolution OMASTAR
+    PreEvolution KABUTOPS
+    PreEvolution DRAGONAIR
+    PreEvolution DRAGONITE
+    db $FF
+.IVYSAUR
+    db TACKLE,GROWL,$FF
+.VENUSAUR
+    db TACKLE,GROWL,LEECH_SEED,CONSTRICT,VINE_WHIP,POISONPOWDER,DOUBLE_KICK,$FF
+.CHARMELEON
+    db SCRATCH,GROWL,$FF
+.CHARIZARD
+    db SCRATCH,GROWL,EMBER,LEER,FURY_SWIPES,FOCUS_ENERGY,SMOKESCREEN,$FF
+.WARTORTLE
+    db TACKLE,TAIL_WHIP,$FF
+.BLASTOISE
+    db TACKLE,TAIL_WHIP,BUBBLE,DOUBLESLAP,WATER_GUN,WITHDRAW,BITE,$FF
+.PIDGEOTTO
+    db GUST,GROWL,$FF
+.PIDGEOT
+    db GUST,GROWL,SAND_ATTACK,QUICK_ATTACK,PECK,WING_ATTACK,$FF
+.RATICATE
+    db TACKLE,TAIL_WHIP,SCRATCH,FURY_SWIPES,$FF
+.FEAROW
+    db GUST,GROWL,LEER,PECK,$FF
+.ARBOK
+    db WRAP,LEER,POISON_STING,LEECH_LIFE,$FF
+.SANDSLASH
+    db SCRATCH,DEFENSE_CURL,SAND_ATTACK,$FF
+.NIDORINA
+    db SCRATCH,GROWL,$FF
+.NIDOQUEEN
+    db SCRATCH,GROWL,TAIL_WHIP,$FF
+.NIDORINO
+    db TACKLE,LEER,$FF
+.NIDOKING
+    db TACKLE,LEER,HORN_ATTACK,$FF
+.GOLBAT
+    db LEECH_LIFE,SUPERSONIC,POISON_STING,$FF
+.GLOOM
+    db ABSORB,GROWTH,LEECH_SEED,$FF
+.VILEPLUME
+    db ABSORB,GROWTH,LEECH_SEED,ACID,$FF
+.PARASECT
+    db SCRATCH,STUN_SPORE,LEECH_SEED,LEECH_LIFE,POISONPOWDER,$FF
+.VENOMOTH
+    db TACKLE,DISABLE,SUPERSONIC,PSYWAVE,POISONPOWDER,CONFUSION,$FF
+.DUGTRIO
+    db SCRATCH,GROWL,AGILITY,$FF
+.PERSIAN
+    db SCRATCH,GROWL,TAIL_WHIP,PAY_DAY,QUICK_ATTACK,BITE,FURY_SWIPES,$FF
+.GOLDUCK
+    db SCRATCH,TAIL_WHIP,PSYWAVE,DISABLE,CONFUSION,PECK,FURY_SWIPES,$FF
+.PRIMEAPE
+    db SCRATCH,LEER,LOW_KICK,DOUBLE_TEAM,KARATE_CHOP,$FF
+.POLIWHIRL
+    db BUBBLE,HYPNOSIS,TACKLE,$FF
+.POLIWRATH
+    db BUBBLE,HYPNOSIS,TACKLE,WATER_GUN,$FF
+.KADABRA
+    db TELEPORT,$FF
+.ALAKAZAM
+    db TELEPORT,PSYWAVE,$FF
+.MACHOKE
+    db KARATE_CHOP,LEER,LOW_KICK,MEGA_PUNCH,$FF
+.MACHAMP
+    db KARATE_CHOP,LEER,LOW_KICK,MEGA_PUNCH,FOCUS_ENERGY,$FF
+.WEEPINBELL
+    db VINE_WHIP,GROWTH,LEECH_LIFE,$FF
+.VICTREEBEL
+    db VINE_WHIP,GROWTH,LEECH_LIFE,ACID,$FF
+.TENTACRUEL
+    db CONSTRICT,SUPERSONIC,ACID,LEECH_LIFE,WRAP,POISON_STING,$FF
+.GRAVELER
+    db TACKLE,DEFENSE_CURL,DOUBLESLAP,$FF
+.GOLEM
+    db TACKLE,DEFENSE_CURL,DOUBLESLAP,ROCK_THROW,$FF
+.RAPIDASH
+    db TACKLE,GROWL,AGILITY,QUICK_ATTACK,EMBER,STOMP,TAIL_WHIP,DOUBLE_KICK,SLAM,FIRE_SPIN,$FF
+.SLOWBRO
+    db TACKLE,GROWL,PSYWAVE,CONFUSION,WATER_GUN,DISABLE,HEADBUTT,$FF
+.MAGNETON
+    db TACKLE,FLASH,THUNDERSHOCK,SUPERSONIC,$FF
+.DODRIO
+    db PECK,GROWL,FURY_ATTACK,QUICK_ATTACK,STOMP,$FF
+.DEWGONG
+    db HEADBUTT,GROWL,LICK,DISABLE,WATER_GUN,TAKE_DOWN,AURORA_BEAM,$FF
+.MUK
+    db POUND,POISON_GAS,HARDEN,ACID,SCREECH,LICK,DISABLE,$FF
+.HAUNTER
+    db LICK,CONFUSE_RAY,LEECH_LIFE,$FF
+.GENGAR
+    db LICK,CONFUSE_RAY,LEECH_LIFE,NIGHT_SHADE,$FF
+.HYPNO
+    db POUND,DISABLE,TELEPORT,PSYWAVE,HYPNOSIS,DREAM_EATER,$FF
+.KINGLER
+    db BUBBLE,LEER,BLADE,VICEGRIP,CLAMP,$FF
+.ELECTRODE
+    db TACKLE,SCREECH,FLASH,SONICBOOM,$FF
+.MAROWAK
+    db TACKLE,GROWL,TAIL_WHIP,BONE_CLUB,LEER,$FF
+.WEEZING
+    db TACKLE,POISON_GAS,SMOG,ACID,SCREECH,HARDEN,SELFDESTRUCT,$FF
+.RHYDON
+    db HORN_ATTACK,TAIL_WHIP,HARDEN,STOMP,FURY_ATTACK,STRIKE,LEER,TAKE_DOWN,ROCK_THROW,BODY_SLAM,$FF
+.SEADRA
+    db BUBBLE,SMOKESCREEN,LEER,DISABLE,WATER_GUN,SMOG,$FF
+.SEAKING
+    db SPLASH,TAIL_WHIP,PECK,SUPERSONIC,BUBBLE,HORN_ATTACK,WATER_GUN,POISON_STING,AGILITY,$FF
+.GYARADOS
+    db SPLASH,$FF
+.OMASTAR
+    db CONSTRICT,WITHDRAW,WATER_GUN,BITE,LEER,SLAM,BUBBLEBEAM,AURORA_BEAM,REST,ROCK_THROW,$FF
+.KABUTOPS
+    db SCRATCH,HARDEN,ABSORB,BUBBLE,LEER,BLADE,WATER_GUN,AURORA_BEAM,LEECH_LIFE,ROCK_THROW,$FF
+.DRAGONAIR
+    db WRAP,LEER,SUPERSONIC,THUNDER_WAVE,BUBBLEBEAM,SLAM,THUNDERSHOCK,EMBER,$FF
+.DRAGONITE
+    db WRAP,LEER,SUPERSONIC,THUNDER_WAVE,BUBBLEBEAM,SLAM,THUNDERSHOCK,EMBER,AURORA_BEAM,AGILITY,MIST,DRAGON_RAGE,LIGHT_SCREEN,HAZE,ICE_BEAM,FLAMETHROWER,THUNDERBOLT,BODY_SLAM,$FF
 
 ; four tiles: pokeball,black pokeball (status ailment),crossed out pokeball (faited) and pokeball slot (no mon)
 PokeballTileGraphics:

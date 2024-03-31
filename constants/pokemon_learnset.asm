@@ -1527,8 +1527,8 @@ Mon084_EvosMoves:
     ;   1,GROWL
     db 10,FURY_ATTACK
     db 13,QUICK_ATTACK
-    db 18,SCREECH
-    db 21,STOMP ; (Dmg:65|Acr:255)
+    db 18,STOMP ; (Dmg:65|Acr:255)
+    db 21,SCREECH
     db 25,SLAM ; (Dmg:80|Acr:191)
     db 30,DRILL_PECK
     ;  31,DODRIO
