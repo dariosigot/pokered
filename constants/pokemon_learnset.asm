@@ -1930,9 +1930,9 @@ Mon104_EvosMoves:
     db  5,TAIL_WHIP
     db  9,BONE_CLUB
     db 13,LEER
-    db 17,HEADBUTT ; (Dmg:70|Acr:255) ; Pkmn Tower's Marowak (Level 30)
-    db 21,FOCUS_ENERGY                ; ...
-    db 25,BONEMERANG                  ; ...
+    db 17,HEADBUTT ; (Dmg:70|Acr:255)
+    db 21,FOCUS_ENERGY
+    db 25,BONEMERANG
     ;  28,MAROWAK
     db 29,STRIKE ; (Dmg:80|Acr:255)
     db 32,TRAPHOLE
@@ -1945,7 +1945,7 @@ Mon105_EvosMoves:
 ;Evolutions
     db 0
 ;Learnset
-    ;  28,NIGHT_SHADE                 ; ...
+    ;  28,NIGHT_SHADE
     db 32,STRIKE ; (Dmg:80|Acr:255)
     db 37,TRAPHOLE
     db 42,THRASH
@@ -1965,10 +1965,10 @@ Mon106_EvosMoves:
     ;   1,MEDITATE
     db  6,DOUBLE_KICK
     db  9,FOCUS_ENERGY
-    db 11,ROLLING_KICK              ; Dojo's Hitmonlee (Level 25)
-    db 16,JUMP_KICK                 ; ...
-    db 21,STRIKE ; (Dmg:80|Acr:255) ; ...
-    db 23,DOUBLE_TEAM               ; ...
+    db 11,ROLLING_KICK
+    db 16,JUMP_KICK
+    db 21,STRIKE ; (Dmg:80|Acr:255)
+    db 23,DOUBLE_TEAM
     db 26,MEGA_KICK
     db 27,HI_JUMP_KICK
     db 28,REST
@@ -1989,10 +1989,10 @@ Mon107_EvosMoves:
     ;   1,AGILITY
     db  6,COMET_PUNCH
     db  9,FOCUS_ENERGY
-    db 11,BIDE                          ; Dojo's Hitmonchan (Level 25)
-    db 16,MEGA_PUNCH ; (Dmg:80|Acr:216) ; ...
-    db 21,STRIKE ; (Dmg:80|Acr:255)     ; ...
-    db 23,DOUBLE_TEAM                   ; ...
+    db 11,BIDE
+    db 16,MEGA_PUNCH ; (Dmg:80|Acr:216)
+    db 21,STRIKE ; (Dmg:80|Acr:255)
+    db 23,DOUBLE_TEAM
     db 26,FIRE_PUNCH
     db 27,ICE_PUNCH
     db 28,THUNDERPUNCH
@@ -2558,10 +2558,10 @@ Mon131_EvosMoves:
     db 11,SING
     db 16,CONFUSE_RAY
     db 19,SKULL_BASH
-    db 21,AURORA_BEAM                    ; Safari's Lapras (Level 30)
-    db 24,TAKE_DOWN ; (Dmg:90|Acr:216)   ; ...
-    db 26,MIST                           ; ...
-    db 29,BODY_SLAM ; (Dmg:85|Acr:255)   ; ...
+    db 21,AURORA_BEAM
+    db 24,TAKE_DOWN ; (Dmg:90|Acr:216)
+    db 26,MIST
+    db 29,BODY_SLAM ; (Dmg:85|Acr:255)
     db 32,TSUNAMI
     db 35,THUNDERSHOCK
     db 39,HAZE
@@ -2694,10 +2694,10 @@ Mon137_EvosMoves:
     db 12,TELEPORT
     db 14,SONICBOOM
     db 17,FLASH
-    db 20,SWIFT    ; Silph's Gift Porygon (Level 30)
-    db 23,SHARPEN  ; ...
-    db 25,RECOVER  ; ...
-    db 29,PSYBEAM  ; ...
+    db 20,SWIFT
+    db 23,SHARPEN
+    db 25,RECOVER
+    db 29,PSYBEAM
     db 31,LIGHT_SCREEN
     db 33,THUNDER_WAVE
     db 35,BARRIER
@@ -2799,10 +2799,10 @@ Mon142_EvosMoves:
     ;   1,AGILITY
     db  8,WHIRLWIND
     db 11,SUPERSONIC
-    db 14,BITE ; (Dmg:60|Acr:255)       ; Digletts Cave's Aerodactyl (Level 25)
-    db 17,ROCK_THROW                    ; ...
-    db 21,SWOOP                         ; ...
-    db 25,DOUBLE_TEAM                   ; ...
+    db 14,BITE ; (Dmg:60|Acr:255)
+    db 17,ROCK_THROW
+    db 21,SWOOP
+    db 25,DOUBLE_TEAM
     db 29,TAKE_DOWN ; (Dmg:90|Acr:216)
     db 33,HYPER_FANG ; (Dmg:80|Acr:229)
     db 37,BODY_SLAM ; (Dmg:85|Acr:255)
@@ -2825,10 +2825,10 @@ Mon143_EvosMoves:
     ;   1,DEFENSE_CURL
     db  8,BITE ; (Dmg:60|Acr:255)
     db 11,STOMP ; (Dmg:65|Acr:255)
-    db 16,REST                         ; Snorlax (Level 25)
-    db 19,ROCK_THROW                   ; ...
-    db 21,HEADBUTT ; (Dmg:70|Acr:255)  ; ...
-    db 24,BODY_SLAM ; (Dmg:85|Acr:255) ; ...
+    db 16,REST
+    db 19,ROCK_THROW
+    db 21,HEADBUTT ; (Dmg:70|Acr:255)
+    db 24,BODY_SLAM ; (Dmg:85|Acr:255)
     db 27,AMNESIA
     db 30,DISABLE
     db 34,HARDEN
@@ -2849,19 +2849,20 @@ Mon144_EvosMoves:
     ;   1,GUST
     ;   1,MIST
     db  9,PECK
-    db 15,WING_ATTACK
-    db 19,WATER_GUN
-    db 24,SWOOP
-    db 29,REFLECT
-    db 32,HAZE        ; Seaform Island's Articuno (Level 45)
-    db 34,AURORA_BEAM ; ...
-    db 37,SWIFT       ; ...
-    db 42,ICE_BEAM    ; ...
-    db 48,TSUNAMI
-    db 51,BARRIER
-    db 54,BLIZZARD
-    db 57,AGILITY
-    db 60,SKY_ATTACK
+    db 13,WATER_GUN
+    db 18,WING_ATTACK
+    db 23,SWOOP
+    db 28,REFLECT
+    db 33,HAZE
+    db 38,AURORA_BEAM
+    db 43,SWIFT
+    db 48,ICE_BEAM
+    db 51,TSUNAMI
+    db 54,BARRIER
+    db 57,BLIZZARD
+    db 60,DRILL_PECK
+    db 62,AGILITY
+    db 65,SKY_ATTACK
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -2874,19 +2875,20 @@ Mon145_EvosMoves:
     ;   1,GUST
     ;   1,FLASH
     db  9,PECK
-    db 15,WING_ATTACK
-    db 19,THUNDERSHOCK
-    db 24,SWOOP
-    db 29,LIGHT_SCREEN
-    db 32,THUNDER_WAVE ; Power PLants's Zapdos (Level 45)
-    db 34,DRILL_PECK   ; ...
-    db 37,SWIFT        ; ...
-    db 42,THUNDERBOLT  ; ...
-    db 48,PIN_MISSILE
-    db 51,REFLECT
-    db 54,THUNDER
-    db 57,AGILITY
-    db 60,SKY_ATTACK
+    db 13,THUNDERSHOCK
+    db 18,WING_ATTACK
+    db 23,SWOOP
+    db 28,LIGHT_SCREEN
+    db 33,THUNDER_WAVE
+    db 38,DRILL_PECK
+    db 43,SWIFT
+    db 48,THUNDERBOLT
+    db 51,PIN_MISSILE
+    db 54,REFLECT
+    db 57,THUNDER
+    db 60,TWINEEDLE
+    db 62,AGILITY
+    db 65,SKY_ATTACK
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -2899,19 +2901,20 @@ Mon146_EvosMoves:
     ;   1,GUST
     ;   1,LEER
     db  9,PECK
-    db 15,WING_ATTACK
-    db 19,EMBER
-    db 24,SWOOP
-    db 29,BARRIER
-    db 32,POISON_GAS   ; Cinnabar Mansion's Moltres (Level 45)
-    db 34,FIRE_SPIN    ; ...
-    db 37,SWIFT        ; ...
-    db 42,FLAMETHROWER ; ...
-    db 48,DRILL_PECK
-    db 51,LIGHT_SCREEN
-    db 54,FIRE_BLAST
-    db 57,AGILITY
-    db 60,SKY_ATTACK
+    db 13,EMBER
+    db 18,WING_ATTACK
+    db 23,SWOOP
+    db 28,BARRIER
+    db 33,POISON_GAS
+    db 38,FIRE_SPIN
+    db 43,SWIFT
+    db 48,FLAMETHROWER
+    db 51,DRILL_PECK
+    db 54,LIGHT_SCREEN
+    db 57,FIRE_BLAST
+    db 60,SOLARBEAM
+    db 62,AGILITY
+    db 65,SKY_ATTACK
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -2922,10 +2925,10 @@ Mon147_EvosMoves:
     db EV_LEVEL,30,DRAGONAIR
     db 0
 ;Learnset
-    ;   1,WRAP         ; Dratini's Cave's Dratini (Level 12)
-    ;   1,LEER         ; ...
-    db  8,SUPERSONIC   ; ...
-    db 10,THUNDER_WAVE ; ...
+    ;   1,WRAP
+    ;   1,LEER
+    db  8,SUPERSONIC
+    db 10,THUNDER_WAVE
     db 13,BUBBLEBEAM
     db 17,SLAM ; (Dmg:80|Acr:191)
     db 20,THUNDERSHOCK
@@ -2987,17 +2990,17 @@ Mon150_EvosMoves:
     db 11,PSYWAVE
     db 16,PSYBEAM
     db 20,LIGHT_SCREEN
-    db 25,PSYCHIC_M  ; Unknown Dungeon's Mewtwo (Level 65)
-    db 33,RECOVER    ; 
-    db 40,SWIFT      ; 
-    db 50,SUBSTITUTE ; 
-    db 66,MIST
-    db 67,BARRIER
-    db 68,THUNDERBOLT
-    db 70,ICE_BEAM
-    db 72,AMNESIA
-    db 74,EARTHQUAKE
-    db 75,HYPER_BEAM
+    db 25,PSYCHIC_M
+    db 30,RECOVER
+    db 35,SWIFT
+    db 40,SUBSTITUTE
+    db 44,MIST
+    db 48,BARRIER
+    db 53,THUNDERBOLT
+    db 58,ICE_BEAM
+    db 63,AMNESIA
+    db 68,EARTHQUAKE
+    db 73,HYPER_BEAM
     db 0
 
 ; ──────────────────────────────────────────────────────────────────────

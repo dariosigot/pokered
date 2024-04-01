@@ -41932,7 +41932,7 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,37 ; trainer
     db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,40 ; trainer
     db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,37 ; trainer
-    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,45 ; Entry Level (Over)
+    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,50 ; Entry Level (Over)
     db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
     db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,HP_UP ; item
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
@@ -57573,7 +57573,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     xor a
     ld [$cee9],a
     ld a,$3e
-    call Predef ; indirect jump to WriteMonMoves (3afb8 (e:6fb8))
+    call WriteMonMovesPlus ; call Predef ; indirect jump to WriteMonMoves (3afb8 (e:6fb8))
 .asm_3ebca
     ld hl,W_ENEMYMONMOVES
     ld de,$cffd
@@ -60721,6 +60721,20 @@ LoadMonFrontSpriteOrGhost:
 SetDEAndLoadMonFrontSprite:
     ld de,$9000
     jp LoadMonFrontSprite
+
+WriteMonMovesPlus:
+    ld a,[W_ISINBATTLE]
+    dec a
+    jr z,.CheckSpecialWild
+.NormalWild
+    ld a,$3e
+    jp Predef ; indirect jump to WriteMonMoves (3afb8 (e:6fb8))
+.CheckSpecialWild
+    ld b,BANK(CheckSpecialWild_)
+    ld hl,CheckSpecialWild_
+    call Bankswitch
+    jr nc,.NormalWild
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -67274,7 +67288,7 @@ UnknownDungeon3Object: ; 0x45f36 (size=34)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_MEWTWO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,65 ; Entry Level (Over)
+    db SPRITE_MEWTWO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,70 ; Entry Level (Over)
     db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$82,ULTRA_BALL ; item
     db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
 
@@ -68128,7 +68142,7 @@ SeafoamIslands5Object: ; 0x468bc (size=62)
     db $3 ; people
     db SPRITE_BOULDER,$f + 4,$4 + 4,$ff,$ff,$1 ; person
     db SPRITE_BOULDER,$f + 4,$5 + 4,$ff,$ff,$2 ; person
-    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,45 ; Entry Level (Over)
+    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,50 ; Entry Level (Over)
 
     ; warp-to
     EVENT_DISP $f,$11,$14 ; SEAFOAM_ISLANDS_4
@@ -77108,7 +77122,7 @@ Mansion2Object: ; Move in the Bank
     db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
-    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$45,MOLTRES,45 ; Entry Level (Over)
+    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$45,MOLTRES,50 ; Entry Level (Over)
 
     ; warp-to
     EVENT_DISP $f,$a,$5 ; MANSION_1
@@ -78301,7 +78315,7 @@ BattleWithShinyOnix:
     ld [W_GYMLEADERNO],a
     ld hl,.OnixText
     call PrintText
-    ld a,62
+    ld a,60
     ld [W_CURENEMYLVL],a
     ld a,ONIX
     ld [W_CUROPPONENT],a
@@ -86841,7 +86855,7 @@ Route12Snorlax:
     ld [$FF00+$8c],a ; ...
     xor a
     ld [W_GYMLEADERNO],a
-    ld a,25
+    ld a,30
     ld [W_CURENEMYLVL],a ; $d127
     ld a,SNORLAX ; Entry Level (Over)
     ld [W_CUROPPONENT],a ; $d059
@@ -86860,7 +86874,7 @@ Route16Snorlax:
     ld [$FF00+$8c],a ; ...
     xor a
     ld [W_GYMLEADERNO],a
-    ld a,25
+    ld a,30
     ld [W_CURENEMYLVL],a ; $d127
     ld a,SNORLAX
     ld [W_CUROPPONENT],a ; $d059
@@ -88942,7 +88956,7 @@ FightingDojoText6: ; 5cf06 (17:4f06)
     jr nz,.done
     ld a,[$cf91]
     ld b,a
-    ld c,25
+    ld c,30
     call GivePokemon
     jr nc,.done
 
@@ -88983,7 +88997,7 @@ FightingDojoText7: ; 5cf4e (17:4f4e)
     jr nz,.done
     ld a,[$cf91]
     ld b,a
-    ld c,25
+    ld c,30
     call GivePokemon
     jr nc,.done
     ld hl,$d7b1
@@ -94935,7 +94949,7 @@ DiglettsCaveAerodactyl:
     ld [$FF00+$8c],a ; ...
     xor a
     ld [W_GYMLEADERNO],a
-    ld a,25
+    ld a,30
     ld [W_CURENEMYLVL],a ; $d127
     ld a,AERODACTYL ; Entry Level (Over)
     ld [W_CUROPPONENT],a ; $d059
@@ -132760,7 +132774,7 @@ TrainerClassMoveChoiceModifications:
     db 1,3,4,0    ; LANCE
 
 WildAI:
-    db AERODACTYL
+    ;db AERODACTYL
     db SNORLAX
     db ARTICUNO
     db ZAPDOS
@@ -133058,7 +133072,7 @@ GetMaxLevel:
     and a
     ret nz
     ld a,[W_OBTAINEDBADGES]
-    ld d,20
+    ld d,19
 .LoopBit
     and a
     jr z,.End
@@ -134358,6 +134372,122 @@ GetCurrentMoveDetails:
     db "ACR",$D3,"@"
 .PwrText
     db "PWR",$D3,"@"
+
+; ──────────────────────────────────────────────────────────────────────
+
+CheckSpecialWild_:
+    push de
+    ld hl,.SpecialWild
+    ld c,0
+.LoopMon
+    ld a,[$cf91]
+    ld b,a
+    ld a,[hli]
+    cp $FF
+    jr z,.NormalWild
+    cp b
+    jr z,.MonFound
+    inc hl
+    inc hl
+.next
+    inc c
+    jr .LoopMon
+.NormalWild
+    pop de
+    xor a ; rcf
+    ret
+.MonFound
+    ld a,[W_ENEMYMONLEVEL]
+    ld b,a
+    ld a,[hli] ; Table Level
+    inc b
+    cp b ; Enemy's Level +1
+    jr c,.LevelFound ; if Enemy's Level >= Table Level
+    inc hl
+    jr .next
+.LevelFound
+    ld a,[W_CURMAP]
+    ld b,a
+    ld a,[hli]
+    cp b
+    jr z,.MapFound
+    jr .next
+.MapFound
+    ld hl,.SpecialWildMoves
+    ld a,c
+    ld bc,4
+    call AddNTimes ; add bc to hl a times
+    ld b,4
+    pop de
+.Loop4Moves
+    ld a,[hli]
+    ld [de],a
+    inc de
+    dec b
+    jr nz,.Loop4Moves
+    scf
+    ret
+
+.SpecialWild
+    db MAROWAK,30,POKEMONTOWER_6 ; PokemonTower6_Marowak
+    db SNORLAX,30,ROUTE_12 ; Route12_Snorlax
+    db SNORLAX,30,ROUTE_16 ; Route16_Snorlax
+    db AERODACTYL,30,DIGLETTS_CAVE ; DiglettsCave_Aerodactyl
+    db ARTICUNO,50,SEAFOAM_ISLANDS_5 ; SeafoamIslands5_Articuno
+    db ZAPDOS,50,POWER_PLANT ; PowerPlant_Zapdos
+    db MOLTRES,50,MANSION_2 ; Mansion2_Moltres
+    db ONIX,60,VICTORY_ROAD_2 ; VictoryRoad2_ShinyOnix
+    db MEWTWO,70,UNKNOWN_DUNGEON_3 ; UnknownDungeon3_Mewtwo
+    db $FF
+
+.SpecialWildMoves
+; PokemonTower6_Marowak
+    db HEADBUTT
+    db FOCUS_ENERGY
+    db BONEMERANG
+    db NIGHT_SHADE
+; Route12_Snorlax
+    db REST
+    db DEFENSE_CURL
+    db AMNESIA
+    db BODY_SLAM
+; Route16_Snorlax
+    db REST
+    db LICK
+    db ROCK_THROW
+    db BODY_SLAM
+; DiglettsCave_Aerodactyl
+    db WHIRLWIND
+    db ROCK_THROW
+    db SWOOP
+    db DOUBLE_TEAM
+; SeafoamIslands5_Articuno
+    db HAZE
+    db AURORA_BEAM
+    db SWIFT
+    db ICE_BEAM
+; PowerPlant_Zapdos
+    db THUNDER_WAVE
+    db DRILL_PECK
+    db SWIFT
+    db THUNDERBOLT
+; Mansion2_Moltres
+    db POISON_GAS
+    db FIRE_SPIN
+    db SWIFT
+    db FLAMETHROWER
+; VictoryRoad2_ShinyOnix
+    db ROCK_SLIDE
+    db DRAGON_RAGE
+    db EARTHQUAKE
+    db HYPER_BEAM
+; UnknownDungeon3_Mewtwo
+    db PSYCHIC_M
+    db RECOVER
+    db SWIFT
+    db SUBSTITUTE
+
+; ──────────────────────────────────────────────────────────────────────
 
 SECTION "Bank39",ROMX,BANK[$39]
 
