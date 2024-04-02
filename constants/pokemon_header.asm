@@ -17,8 +17,8 @@ BulbasaurBaseStats: ; 383de (e:43de)
     dw BulbasaurPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -54,10 +54,10 @@ IvysaurBaseStats: ; 383fa (e:43fa)
     dw IvysaurPicBack
 
     ; attacks known at lvl 0
-    db LEECH_SEED
-    db CONSTRICT
-    db VINE_WHIP
-    db POISONPOWDER
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -91,10 +91,10 @@ VenusaurBaseStats: ; 38416 (e:4416)
     dw VenusaurPicBack
 
     ; attacks known at lvl 0
-    db RAZOR_LEAF
-    db SLAM
-    db STUN_SPORE
-    db PETAL_DANCE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -128,8 +128,8 @@ CharmanderBaseStats: ; 38432 (e:4432)
     dw CharmanderPicBack
 
     ; attacks known at lvl 0
-    db SCRATCH
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -165,10 +165,10 @@ CharmeleonBaseStats: ; 3844e (e:444e)
     dw CharmeleonPicBack
 
     ; attacks known at lvl 0
-    db EMBER
-    db LEER
-    db FURY_SWIPES
-    db FOCUS_ENERGY
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -202,10 +202,10 @@ CharizardBaseStats: ; 3846a (e:446a)
     dw CharizardPicBack
 
     ; attacks known at lvl 0
-    db TRAPHOLE
-    db FIRE_PUNCH
-    db SLASH
-    db SWOOP
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -239,8 +239,8 @@ SquirtleBaseStats: ; 38486 (e:4486)
     dw SquirtlePicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
+    db 0
+    db 0
     db 0
     db 0
 
@@ -276,10 +276,10 @@ WartortleBaseStats: ; 384a2 (e:44a2)
     dw WartortlePicBack
 
     ; attacks known at lvl 0
-    db BUBBLE
-    db DOUBLESLAP
-    db WATER_GUN
-    db WITHDRAW
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -313,10 +313,10 @@ BlastoiseBaseStats: ; 384be (e:44be)
     dw BlastoisePicBack
 
     ; attacks known at lvl 0
-    db SCREECH
-    db HEADBUTT
-    db HAZE
-    db TSUNAMI
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 

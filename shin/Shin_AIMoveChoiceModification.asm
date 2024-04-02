@@ -31,7 +31,15 @@ AIMoveChoiceModification1:
 ;joenote - do not use effects that end battle because this is a trainer battle and they do not work
     ld a,[W_ENEMYMOVEEFFECT]    ;load the move effect
     cp SWITCH_AND_TELEPORT_EFFECT    ;see if it is a battle-ending effect
+    jr nz,.notBattleEndingMove
+    ld a,[W_ISINBATTLE]
+    dec a
+    jr z,.wildBattleEndingMove ; is this a wold battle?
     jp z,.heavydiscourage    ;heavily discourage if so
+.wildBattleEndingMove
+    dec [hl]    ;else slightly encourage dream eater's use on a sleeping pkmn
+    jp .nextMove
+.notBattleEndingMove
 ;and dont try to use rage either
 ;    cp RAGE_EFFECT
 ;    jp z,.heavydiscourage

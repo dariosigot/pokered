@@ -41932,7 +41932,7 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,37 ; trainer
     db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,40 ; trainer
     db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,37 ; trainer
-    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,50 ; Entry Level (Over)
+    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,55 ; Entry Level (Over)
     db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
     db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,HP_UP ; item
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
@@ -43281,9 +43281,9 @@ MoveRelearnerText:
     ld a,[$cf91]
     ld d,a ; pokemon ID
     ld e,0 ; initial counter = 0
-    ld b,BANK(GetPreEvolutionMove)
-    ld hl,GetPreEvolutionMove
-    call Bankswitch
+    ; ld b,BANK(GetPreEvolutionMove) ; TODO Learnset
+    ; ld hl,GetPreEvolutionMove
+    ; call Bankswitch
     ld b,e ; restore counter
     ld hl,$CD6D
     ld a,[hli]
@@ -49103,196 +49103,196 @@ Func_3b057: ; Moved in the Bank
     jp Predef ; indirect jump to HandleBitArray (f666 (3:7666))
 
 EvosMovesPointerTable: ; Moved in the Bank
-    dw Mon112_EvosMoves
-    dw Mon115_EvosMoves
-    dw Mon032_EvosMoves
-    dw Mon035_EvosMoves
-    dw Mon021_EvosMoves
-    dw Mon100_EvosMoves
-    dw Mon034_EvosMoves
-    dw Mon080_EvosMoves
-    dw Mon002_EvosMoves
-    dw Mon103_EvosMoves
-    dw Mon108_EvosMoves
-    dw Mon102_EvosMoves
-    dw Mon088_EvosMoves
-    dw Mon094_EvosMoves
-    dw Mon029_EvosMoves
-    dw Mon031_EvosMoves
-    dw Mon104_EvosMoves
-    dw Mon111_EvosMoves
-    dw Mon131_EvosMoves
-    dw Mon059_EvosMoves
-    dw MissingNo_EvosMoves ; mew
-    dw Mon130_EvosMoves
-    dw Mon090_EvosMoves
-    dw Mon072_EvosMoves
-    dw Mon092_EvosMoves
-    dw Mon123_EvosMoves
-    dw Mon120_EvosMoves
-    dw Mon009_EvosMoves
-    dw Mon127_EvosMoves
-    dw Mon114_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon058_EvosMoves
-    dw Mon095_EvosMoves
-    dw Mon022_EvosMoves
-    dw Mon016_EvosMoves
-    dw Mon079_EvosMoves
-    dw Mon064_EvosMoves
-    dw Mon075_EvosMoves
-    dw Mon113_EvosMoves
-    dw Mon067_EvosMoves
-    dw Mon122_EvosMoves
-    dw Mon106_EvosMoves
-    dw Mon107_EvosMoves
-    dw Mon024_EvosMoves
-    dw Mon047_EvosMoves
-    dw Mon054_EvosMoves
-    dw Mon096_EvosMoves
-    dw Mon076_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon126_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon125_EvosMoves
-    dw Mon082_EvosMoves
-    dw Mon109_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon056_EvosMoves
-    dw Mon086_EvosMoves
-    dw Mon050_EvosMoves
-    dw Mon128_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon083_EvosMoves
-    dw Mon048_EvosMoves
-    dw Mon149_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon084_EvosMoves
-    dw Mon060_EvosMoves
-    dw Mon124_EvosMoves
-    dw Mon146_EvosMoves
-    dw Mon144_EvosMoves
-    dw Mon145_EvosMoves
-    dw Mon132_EvosMoves
-    dw Mon052_EvosMoves
-    dw Mon098_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon037_EvosMoves
-    dw Mon038_EvosMoves
-    dw Mon025_EvosMoves
-    dw Mon026_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon147_EvosMoves
-    dw Mon148_EvosMoves
-    dw Mon140_EvosMoves
-    dw Mon141_EvosMoves
-    dw Mon116_EvosMoves
-    dw Mon117_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon027_EvosMoves
-    dw Mon028_EvosMoves
-    dw Mon138_EvosMoves
-    dw Mon139_EvosMoves
-    dw Mon039_EvosMoves
-    dw Mon040_EvosMoves
-    dw Mon133_EvosMoves
-    dw Mon136_EvosMoves
-    dw Mon135_EvosMoves
-    dw Mon134_EvosMoves
-    dw Mon066_EvosMoves
-    dw Mon041_EvosMoves
-    dw Mon023_EvosMoves
-    dw Mon046_EvosMoves
-    dw Mon061_EvosMoves
-    dw Mon062_EvosMoves
-    dw Mon013_EvosMoves
-    dw Mon014_EvosMoves
-    dw Mon015_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon085_EvosMoves
-    dw Mon057_EvosMoves
-    dw Mon051_EvosMoves
-    dw Mon049_EvosMoves
-    dw Mon087_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon010_EvosMoves
-    dw Mon011_EvosMoves
-    dw Mon012_EvosMoves
-    dw Mon068_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon055_EvosMoves
-    dw Mon097_EvosMoves
-    dw Mon042_EvosMoves
-    dw Mon150_EvosMoves
-    dw Mon143_EvosMoves
-    dw Mon129_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon089_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon099_EvosMoves
-    dw Mon091_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon101_EvosMoves
-    dw Mon036_EvosMoves
-    dw Mon110_EvosMoves
-    dw Mon053_EvosMoves
-    dw Mon105_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon093_EvosMoves
-    dw Mon063_EvosMoves
-    dw Mon065_EvosMoves
-    dw Mon017_EvosMoves
-    dw Mon018_EvosMoves
-    dw Mon121_EvosMoves
-    dw Mon001_EvosMoves
-    dw Mon003_EvosMoves
-    dw Mon073_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon118_EvosMoves
-    dw Mon119_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon077_EvosMoves
-    dw Mon078_EvosMoves
-    dw Mon019_EvosMoves
-    dw Mon020_EvosMoves
-    dw Mon033_EvosMoves
-    dw Mon030_EvosMoves
-    dw Mon074_EvosMoves
-    dw Mon137_EvosMoves
-    dw Mon142_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon081_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon004_EvosMoves
-    dw Mon007_EvosMoves
-    dw Mon005_EvosMoves
-    dw Mon008_EvosMoves
-    dw Mon006_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon043_EvosMoves
-    dw Mon044_EvosMoves
-    dw Mon045_EvosMoves
-    dw Mon069_EvosMoves
-    dw Mon070_EvosMoves
-    dw Mon071_EvosMoves
+    ;dw Mon112_EvosMoves
+    ;dw Mon115_EvosMoves
+    ;dw Mon032_EvosMoves
+    ;dw Mon035_EvosMoves
+    ;dw Mon021_EvosMoves
+    ;dw Mon100_EvosMoves
+    ;dw Mon034_EvosMoves
+    ;dw Mon080_EvosMoves
+    ;dw Mon002_EvosMoves
+    ;dw Mon103_EvosMoves
+    ;dw Mon108_EvosMoves
+    ;dw Mon102_EvosMoves
+    ;dw Mon088_EvosMoves
+    ;dw Mon094_EvosMoves
+    ;dw Mon029_EvosMoves
+    ;dw Mon031_EvosMoves
+    ;dw Mon104_EvosMoves
+    ;dw Mon111_EvosMoves
+    ;dw Mon131_EvosMoves
+    ;dw Mon059_EvosMoves
+    ;dw MissingNo_EvosMoves ; mew
+    ;dw Mon130_EvosMoves
+    ;dw Mon090_EvosMoves
+    ;dw Mon072_EvosMoves
+    ;dw Mon092_EvosMoves
+    ;dw Mon123_EvosMoves
+    ;dw Mon120_EvosMoves
+    ;dw Mon009_EvosMoves
+    ;dw Mon127_EvosMoves
+    ;dw Mon114_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon058_EvosMoves
+    ;dw Mon095_EvosMoves
+    ;dw Mon022_EvosMoves
+    ;dw Mon016_EvosMoves
+    ;dw Mon079_EvosMoves
+    ;dw Mon064_EvosMoves
+    ;dw Mon075_EvosMoves
+    ;dw Mon113_EvosMoves
+    ;dw Mon067_EvosMoves
+    ;dw Mon122_EvosMoves
+    ;dw Mon106_EvosMoves
+    ;dw Mon107_EvosMoves
+    ;dw Mon024_EvosMoves
+    ;dw Mon047_EvosMoves
+    ;dw Mon054_EvosMoves
+    ;dw Mon096_EvosMoves
+    ;dw Mon076_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon126_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon125_EvosMoves
+    ;dw Mon082_EvosMoves
+    ;dw Mon109_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon056_EvosMoves
+    ;dw Mon086_EvosMoves
+    ;dw Mon050_EvosMoves
+    ;dw Mon128_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon083_EvosMoves
+    ;dw Mon048_EvosMoves
+    ;dw Mon149_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon084_EvosMoves
+    ;dw Mon060_EvosMoves
+    ;dw Mon124_EvosMoves
+    ;dw Mon146_EvosMoves
+    ;dw Mon144_EvosMoves
+    ;dw Mon145_EvosMoves
+    ;dw Mon132_EvosMoves
+    ;dw Mon052_EvosMoves
+    ;dw Mon098_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon037_EvosMoves
+    ;dw Mon038_EvosMoves
+    ;dw Mon025_EvosMoves
+    ;dw Mon026_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon147_EvosMoves
+    ;dw Mon148_EvosMoves
+    ;dw Mon140_EvosMoves
+    ;dw Mon141_EvosMoves
+    ;dw Mon116_EvosMoves
+    ;dw Mon117_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon027_EvosMoves
+    ;dw Mon028_EvosMoves
+    ;dw Mon138_EvosMoves
+    ;dw Mon139_EvosMoves
+    ;dw Mon039_EvosMoves
+    ;dw Mon040_EvosMoves
+    ;dw Mon133_EvosMoves
+    ;dw Mon136_EvosMoves
+    ;dw Mon135_EvosMoves
+    ;dw Mon134_EvosMoves
+    ;dw Mon066_EvosMoves
+    ;dw Mon041_EvosMoves
+    ;dw Mon023_EvosMoves
+    ;dw Mon046_EvosMoves
+    ;dw Mon061_EvosMoves
+    ;dw Mon062_EvosMoves
+    ;dw Mon013_EvosMoves
+    ;dw Mon014_EvosMoves
+    ;dw Mon015_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon085_EvosMoves
+    ;dw Mon057_EvosMoves
+    ;dw Mon051_EvosMoves
+    ;dw Mon049_EvosMoves
+    ;dw Mon087_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon010_EvosMoves
+    ;dw Mon011_EvosMoves
+    ;dw Mon012_EvosMoves
+    ;dw Mon068_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon055_EvosMoves
+    ;dw Mon097_EvosMoves
+    ;dw Mon042_EvosMoves
+    ;dw Mon150_EvosMoves
+    ;dw Mon143_EvosMoves
+    ;dw Mon129_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon089_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon099_EvosMoves
+    ;dw Mon091_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon101_EvosMoves
+    ;dw Mon036_EvosMoves
+    ;dw Mon110_EvosMoves
+    ;dw Mon053_EvosMoves
+    ;dw Mon105_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon093_EvosMoves
+    ;dw Mon063_EvosMoves
+    ;dw Mon065_EvosMoves
+    ;dw Mon017_EvosMoves
+    ;dw Mon018_EvosMoves
+    ;dw Mon121_EvosMoves
+    ;dw Mon001_EvosMoves
+    ;dw Mon003_EvosMoves
+    ;dw Mon073_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon118_EvosMoves
+    ;dw Mon119_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon077_EvosMoves
+    ;dw Mon078_EvosMoves
+    ;dw Mon019_EvosMoves
+    ;dw Mon020_EvosMoves
+    ;dw Mon033_EvosMoves
+    ;dw Mon030_EvosMoves
+    ;dw Mon074_EvosMoves
+    ;dw Mon137_EvosMoves
+    ;dw Mon142_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon081_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon004_EvosMoves
+    ;dw Mon007_EvosMoves
+    ;dw Mon005_EvosMoves
+    ;dw Mon008_EvosMoves
+    ;dw Mon006_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw MissingNo_EvosMoves
+    ;dw Mon043_EvosMoves
+    ;dw Mon044_EvosMoves
+    ;dw Mon045_EvosMoves
+    ;dw Mon069_EvosMoves
+    ;dw Mon070_EvosMoves
+    ;dw Mon071_EvosMoves
 
 GoPalSetBattleAndLoadText:
     ld b,1
@@ -49746,28 +49746,12 @@ ReadTrainer: ; 39c53 (e:5c53)
     cp c
     jr nz,.NextSpecialTrainer2
     ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    ld b,0
-.writeAdditionalMoveDataLoop
-    ld a,[hl]
-    and a
-    jr z,.FinishUp
-    ld a,b
-    push bc
-    push hl
-    ld hl,W_ENEMYMON1MOVE3-2 ; W_ENEMYMON1MOVE1
-    ld bc,44
-    call AddNTimes
-    ld d,h
-    ld e,l
-    pop hl
-    ld b,0
-    ld c,4
-    call CopyData ; copy bc bytes of data from hl to de
-    pop bc
-    inc b
-    jr .writeAdditionalMoveDataLoop
+    ld d,[hl]
+    ld e,a
+    ld b,BANK(LoadSpecialTrainerMoves)
+    ld hl,LoadSpecialTrainerMoves
+    call Bankswitch
+    jr .FinishUp
 .NextSpecialTrainer1
     inc hl
 .NextSpecialTrainer2
@@ -50852,32 +50836,146 @@ TryRandomForMew:
     ld a,d
     ret
 
-KogaAI:
-    cp $20
-    jp c,AIUseXAttack
+SpecialTrainer: MACRO
+    db \1,\2
+    dw \3
+    ENDM
+
+SpecialTrainerMoves:
+    SpecialTrainer BROCK,1,BrockMoves
+    SpecialTrainer MISTY,1,MistyMove
+    SpecialTrainer LT__SURGE,1,LtSurgeMove
+    SpecialTrainer ERIKA,1,ErikaMove
+    SpecialTrainer KOGA,1,KogaMove
+    SpecialTrainer BLAINE,1,BlaineMove
+    SpecialTrainer BLACKBELT,1,DojoLeader
+    SpecialTrainer SABRINA,1,SabrinaMove
+    SpecialTrainer GIOVANNI,1,Giovanni1Move
+    SpecialTrainer GIOVANNI,2,Giovanni2Move
+    SpecialTrainer GIOVANNI,3,Giovanni3Move
+    SpecialTrainer LORELEI,1,LoreleiMove
+    SpecialTrainer BRUNO,1,BrunoMove
+    SpecialTrainer AGATHA,1,AgathaMove
+    SpecialTrainer LANCE,1,LanceMove
+    SpecialTrainer SONY2,7,Sony2Move7
+    SpecialTrainer SONY2,8,Sony2Move8
+    SpecialTrainer SONY2,9,Sony2Move9
+    SpecialTrainer SONY2,10,Sony2MoveA
+    SpecialTrainer SONY2,11,Sony2MoveB
+    SpecialTrainer SONY2,12,Sony2MoveC
+    SpecialTrainer SONY3,1,Sony3Move1
+    SpecialTrainer SONY3,2,Sony3Move2
+    SpecialTrainer SONY3,3,Sony3Move3
+    SpecialTrainer COOLTRAINER_F,2,CooltrainerFMove2
+    SpecialTrainer COOLTRAINER_F,3,CooltrainerFMove3
+    SpecialTrainer COOLTRAINER_F,4,CooltrainerFMove4
+    SpecialTrainer COOLTRAINER_M,2,CooltrainerMMove2
+    SpecialTrainer COOLTRAINER_M,3,CooltrainerMMove3
+    SpecialTrainer COOLTRAINER_M,4,CooltrainerMMove4
+    SpecialTrainer BLACKBELT,9,BlackBeltMove9
+    SpecialTrainer JUGGLER,2,JugglerMove2
+    SpecialTrainer JUGGLER,5,JugglerMove5
+    SpecialTrainer TAMER,5,TamerMove5
+    SpecialTrainer POKEMANIAC,6,PokemaniacMove6
+    SpecialTrainer CHANNELER,14,ChannelerMove14
+    SpecialTrainer CHANNELER,15,ChannelerMove15
+    SpecialTrainer CHANNELER,16,ChannelerMove16
+    db $ff
+
+ShuffleMoves:
+    ld a,[$cee9] ; Check Day Care
+    and a
+    ret nz
+    push de
+    push hl
+    call .ShuffleMoves
+    pop hl
+    pop de
+    ld a,[$cee9]
+    ret
+.ShuffleMoves
+    ld h,d
+    ld l,e
+    ld b,0
+    push hl
+.loop
+    inc b
+    ld a,b
+    cp 10
+    pop hl
+    ret z
+.retry
+    call GenRandom
+    and %00000011 ; from 0 to 3
+    jr z,.retry
+    ld e,a ; from 1 to 3
+    ld d,0
+    push hl
+    add hl,de
+    ld a,[hl]
+    and a
+    jr z,.loop
+    pop de
+    push de
+    ld c,a
+    ld a,[de]
+    ld [hl],a
+    ld a,c
+    ld [de],a
+    jr .loop
     ret
 
-LanceAI:
-    cp $80
-    jr nc,.lancereturn
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-.lancereturn
+CheckAtLeastOneDamageMove:
+    push de
+    push hl
+    ; Check New Move
+    dec a ; New Move
+    ld hl,Moves+2 ; damage
+    ld bc,6
+    call AddNTimes
+    ld a,[hl]
+    and a
+    jr nz,.success
+    ; Check Day Care
+    ld a,[$cee9] ; Check Day Care
+    and a
+    jr nz,.success
+    ; Check First 3 Moves (the 4th must be replaced)
+    ld b,0
+.loop
+    inc b
+    ld a,b
+    cp 4
+    jr z,.fail
+    ld a,[de]
+    dec a
+    ld hl,Moves+2 ; damage
+    push bc
+    ld bc,6
+    call AddNTimes
+    pop bc
+    ld a,[hl]
+    and a
+    jr nz,.success
+    inc de
+    jr .loop
+.success
+    pop hl
+    pop de
+    call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
+    ld a,[$cee9]
+    scf
     ret
-
-GenericAI:
-    and a ; clear carry
+.fail
+    pop hl
+    pop de
+    xor a ; rcf
     ret
-
-INCLUDE "constants/special_trainer.asm"
-
-SECTION "WriteMonMoves",ROMX[$6fb8],BANK[$e]
 
 ; writes the moves a mon has at level [W_CURENEMYLVL] to [de]
 ; move slots are being filled up sequentially and shifted if all slots are full
-; [$cee9]: (?)
-WriteMonMoves: ; 3afb8 (e:6fb8)
+; [$cee9]: Day Care
+WriteMonMoves: ; Moved in the Bank
     call Load16BitRegisters
     push hl
     push de
@@ -50910,7 +51008,7 @@ WriteMonMoves: ; 3afb8 (e:6fb8)
     ld a,[W_CURENEMYLVL] ; $d127
     cp b
     jp c,.done       ; mon level < move level (assumption: learnset is sorted by level)
-    ld a,[$cee9]
+    call ShuffleMoves ; ld a,[$cee9]
     and a
     jr z,.skipMinLevelCheck
     ld a,[wWhichTrade] ; $cd3d (min move level)
@@ -50939,10 +51037,11 @@ WriteMonMoves: ; 3afb8 (e:6fb8)
     pop de                        ; no empty move slots found
     push de
     push hl
+    ld a,[hl] ; read new move
     ld h,d
     ld l,e
-    call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
-    ld a,[$cee9]
+    call CheckAtLeastOneDamageMove ; call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
+    jr nc,.HackNext ; ld a,[$cee9]
     and a
     jr z,.writeMoveToSlot
     push de
@@ -50975,6 +51074,7 @@ WriteMonMoves: ; 3afb8 (e:6fb8)
     ld a,[$ceee]
     pop hl
     ld [hl],a
+.HackNext
     pop hl
     jr .nextMove
 .done
@@ -51303,7 +51403,10 @@ ErikaAI:
 .erikareturn
     ret
 
-; KogaAI ; Moved in the Bank
+KogaAI:
+    cp $20
+    jp c,AIUseXAttack
+    ret
 
 BlaineAI:    ;blaine needs to check HP. this was an oversight
     cp $20
@@ -51352,8 +51455,19 @@ LoreleiAI:
 
 ; BrunoAI   ; Moved in the Bank
 ; AgathaAI  ; Moved in the Bank
-; LanceAI   ; Moved in the Bank
-; GenericAI ; Moved in the Bank
+
+LanceAI:
+    cp $80
+    jr nc,.lancereturn
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+.lancereturn
+    ret
+
+GenericAI:
+    and a ; clear carry
+    ret
 
 ; end of individual trainer AI routines
 
@@ -68142,7 +68256,7 @@ SeafoamIslands5Object: ; 0x468bc (size=62)
     db $3 ; people
     db SPRITE_BOULDER,$f + 4,$4 + 4,$ff,$ff,$1 ; person
     db SPRITE_BOULDER,$f + 4,$5 + 4,$ff,$ff,$2 ; person
-    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,50 ; Entry Level (Over)
+    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,55 ; Entry Level (Over)
 
     ; warp-to
     EVENT_DISP $f,$11,$14 ; SEAFOAM_ISLANDS_4
@@ -77122,7 +77236,7 @@ Mansion2Object: ; Move in the Bank
     db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
-    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$45,MOLTRES,50 ; Entry Level (Over)
+    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$45,MOLTRES,55 ; Entry Level (Over)
 
     ; warp-to
     EVENT_DISP $f,$a,$5 ; MANSION_1
@@ -132774,7 +132888,7 @@ TrainerClassMoveChoiceModifications:
     db 1,3,4,0    ; LANCE
 
 WildAI:
-    ;db AERODACTYL
+    db AERODACTYL
     db SNORLAX
     db ARTICUNO
     db ZAPDOS
@@ -133072,7 +133186,7 @@ GetMaxLevel:
     and a
     ret nz
     ld a,[W_OBTAINEDBADGES]
-    ld d,19
+    ld d,20
 .LoopBit
     and a
     jr z,.End
@@ -134433,9 +134547,11 @@ CheckSpecialWild_:
     db SNORLAX,30,ROUTE_12 ; Route12_Snorlax
     db SNORLAX,30,ROUTE_16 ; Route16_Snorlax
     db AERODACTYL,30,DIGLETTS_CAVE ; DiglettsCave_Aerodactyl
-    db ARTICUNO,50,SEAFOAM_ISLANDS_5 ; SeafoamIslands5_Articuno
-    db ZAPDOS,50,POWER_PLANT ; PowerPlant_Zapdos
-    db MOLTRES,50,MANSION_2 ; Mansion2_Moltres
+    db VOLTORB,37,POWER_PLANT ; PowerPlant_Voltorb
+    db ELECTRODE,40,POWER_PLANT ; PowerPlant_Electrode
+    db ARTICUNO,55,SEAFOAM_ISLANDS_5 ; SeafoamIslands5_Articuno
+    db ZAPDOS,55,POWER_PLANT ; PowerPlant_Zapdos
+    db MOLTRES,55,MANSION_2 ; Mansion2_Moltres
     db ONIX,60,VICTORY_ROAD_2 ; VictoryRoad2_ShinyOnix
     db MEWTWO,70,UNKNOWN_DUNGEON_3 ; UnknownDungeon3_Mewtwo
     db $FF
@@ -134461,6 +134577,16 @@ CheckSpecialWild_:
     db ROCK_THROW
     db SWOOP
     db DOUBLE_TEAM
+; PowerPlant_Voltorb
+    db THUNDERSHOCK
+    db SELFDESTRUCT
+    db SWIFT
+    db EXPLOSION
+; PowerPlant_Electrode
+    db SELFDESTRUCT
+    db SWIFT
+    db EXPLOSION
+    db THUNDERBOLT
 ; SeafoamIslands5_Articuno
     db HAZE
     db AURORA_BEAM
@@ -134486,6 +134612,35 @@ CheckSpecialWild_:
     db RECOVER
     db SWIFT
     db SUBSTITUTE
+
+; ──────────────────────────────────────────────────────────────────────
+
+LoadSpecialTrainerMoves:
+    ld h,d
+    ld l,e
+    ld b,0
+.writeAdditionalMoveDataLoop
+    ld a,[hl]
+    and a
+    jr z,.FinishUp
+    ld a,b
+    push bc
+    push hl
+    ld hl,W_ENEMYMON1MOVE3-2 ; W_ENEMYMON1MOVE1
+    ld bc,44
+    call AddNTimes
+    ld d,h
+    ld e,l
+    pop hl
+    ld bc,4
+    call CopyData ; copy bc bytes of data from hl to de
+    pop bc
+    inc b
+    jr .writeAdditionalMoveDataLoop
+.FinishUp
+    ret
+
+INCLUDE "constants/special_trainer.asm"
 
 ; ──────────────────────────────────────────────────────────────────────
 
