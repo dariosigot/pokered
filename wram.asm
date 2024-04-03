@@ -156,6 +156,10 @@ wTrainerHeaderFlagBit: ; cc55
 
 ; cc56
 
+SECTION "GenericBuffer", WRAM0[$cc5b]
+
+GenericBuffer:
+    ds 96
 
 SECTION "RLE", WRAM0[$ccd2]
 wRLEByteCount: ; ccd2
@@ -1505,8 +1509,21 @@ W_BOXMON2DATA: ; dab7
 
 SECTION "wLocationMonOvSprInstruction", WRAMX[$def0], BANK[1]
 
+UNION ; 54 Byte
+
 wMoveRelearnerMoveList: ; def0
+    ds 54
+
+NEXTU
+
 wLocationMonOvSprInstruction: ; def0 ; Denim
+    ds 6*6
+    ds 2*6
+wArrayMiniSpriteLoaded: ; df20 ; Denim
+    ds 6
+
+NEXTU
+
 wEXPBarPixelLength: ; def0 ; Denim, ExpBar
     ds 1
 wEXPBarBaseEXP:
@@ -1517,9 +1534,11 @@ wEXPBarNeededEXP:
     ds 3
 wEXPBarKeepFullFlag:
     ds 1
-    ds 36-11+(2*6)
-wArrayMiniSpriteLoaded: ; df20 ; Denim
-    ds 6
+
+ENDU
+
+SECTION "wSpriteOAMBySpecies",WRAMX[$df26],BANK[1]
+
 wSpriteOAMBySpecies:      ; df26 ; bit 0 = Flag Tentativo Rinomina
 wStatusScreenJustLoadBit1 ; fd26 ; bit 1 = Status Screen Picture Just Load
     ds 1
@@ -1558,6 +1577,7 @@ wDVForShinyAtkDef     ; df36
 wTempStatHI           ; df36
     ds 1
 
+wEvolutionMove         ; df37
 wMaxLevel              ; df37
 wChoicePkmnMoveDeleter ; df37
 wDVForShinySpdSpc      ; df37

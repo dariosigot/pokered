@@ -350,8 +350,8 @@ CaterpieBaseStats: ; 384da (e:44da)
     dw CaterpiePicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db STRING_SHOT
+    db 0
+    db 0
     db 0
     db 0
 
@@ -387,9 +387,9 @@ MetapodBaseStats: ; 384f6 (e:44f6)
     dw MetapodPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db STRING_SHOT
-    db HARDEN
+    db 0
+    db 0
+    db 0
     db 0
 
     db 0 ; growth rate
@@ -424,10 +424,10 @@ ButterfreeBaseStats: ; 38512 (e:4512)
     dw ButterfreePicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db STRING_SHOT
-    db HARDEN
-    db CONFUSION
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -461,8 +461,8 @@ WeedleBaseStats: ; 3852e (e:452e)
     dw WeedlePicBack
 
     ; attacks known at lvl 0
-    db POISON_STING
-    db STRING_SHOT
+    db 0
+    db 0
     db 0
     db 0
 
@@ -498,9 +498,9 @@ KakunaBaseStats: ; 3854a (e:454a)
     dw KakunaPicBack
 
     ; attacks known at lvl 0
-    db POISON_STING
-    db STRING_SHOT
-    db HARDEN
+    db 0
+    db 0
+    db 0
     db 0
 
     db 0 ; growth rate
@@ -535,10 +535,10 @@ BeedrillBaseStats: ; 38566 (e:4566)
     dw BeedrillPicBack
 
     ; attacks known at lvl 0
-    db POISON_STING
-    db STRING_SHOT
-    db HARDEN
-    db TWINEEDLE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -572,8 +572,8 @@ PidgeyBaseStats: ; 38582 (e:4582)
     dw PidgeyPicBack
 
     ; attacks known at lvl 0
-    db GUST
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -609,10 +609,10 @@ PidgeottoBaseStats: ; 3859e (e:459e)
     dw PidgeottoPicBack
 
     ; attacks known at lvl 0
-    db SAND_ATTACK
-    db QUICK_ATTACK
-    db PECK
-    db WING_ATTACK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -646,10 +646,10 @@ PidgeotBaseStats: ; 385ba (e:45ba)
     dw PidgeotPicBack
 
     ; attacks known at lvl 0
-    db WHIRLWIND
-    db SWOOP
-    db RAZOR_WIND
-    db DOUBLE_TEAM
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -683,8 +683,8 @@ RattataBaseStats: ; 385d6 (e:45d6)
     dw RattataPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
+    db 0
+    db 0
     db 0
     db 0
 
@@ -720,10 +720,10 @@ RaticateBaseStats: ; 385f2 (e:45f2)
     dw RaticatePicBack
 
     ; attacks known at lvl 0
-    db QUICK_ATTACK
-    db BITE
-    db HYPER_FANG
-    db TRAPHOLE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -757,8 +757,8 @@ SpearowBaseStats: ; 3860e (e:460e)
     dw SpearowPicBack
 
     ; attacks known at lvl 0
-    db PECK
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -794,10 +794,10 @@ FearowBaseStats: ; 3862a (e:462a)
     dw FearowPicBack
 
     ; attacks known at lvl 0
-    db FURY_ATTACK
-    db WING_ATTACK
-    db WHIRLWIND
-    db SWOOP
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -831,8 +831,8 @@ EkansBaseStats: ; 38646 (e:4646)
     dw EkansPicBack
 
     ; attacks known at lvl 0
-    db WRAP
-    db LEER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -868,10 +868,10 @@ ArbokBaseStats: ; 38662 (e:4662)
     dw ArbokPicBack
 
     ; attacks known at lvl 0
-    db BITE
-    db ACID
-    db HYPER_FANG
-    db TRAPHOLE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -905,8 +905,8 @@ PikachuBaseStats: ; 3867e (e:467e)
     dw PikachuPicBack
 
     ; attacks known at lvl 0
-    db THUNDERSHOCK
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -942,9 +942,9 @@ RaichuBaseStats: ; 3869a (e:469a)
     dw RaichuPicBack
 
     ; attacks known at lvl 0
-    db THUNDERSHOCK
-    db GROWL
-    db THUNDERBOLT
+    db 0
+    db 0
+    db 0
     db 0
 
     db 0 ; growth rate
@@ -979,8 +979,8 @@ SandshrewBaseStats: ; 386b6 (e:46b6)
     dw SandshrewPicBack
 
     ; attacks known at lvl 0
-    db SCRATCH
-    db DEFENSE_CURL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1016,10 +1016,10 @@ SandslashBaseStats: ; 386d2 (e:46d2)
     dw SandslashPicBack
 
     ; attacks known at lvl 0
-    db FURY_SWIPES
-    db POISON_STING
-    db SLASH
-    db TRAPHOLE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -1053,8 +1053,8 @@ NidoranFBaseStats: ; 386ee (e:46ee)
     dw NidoranFPicBack
 
     ; attacks known at lvl 0
-    db SCRATCH
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1090,10 +1090,10 @@ NidorinaBaseStats: ; 3870a (e:470a)
     dw NidorinaPicBack
 
     ; attacks known at lvl 0
-    db TAIL_WHIP
-    db POISON_STING
-    db FURY_SWIPES
-    db DOUBLE_KICK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -1127,10 +1127,10 @@ NidoqueenBaseStats: ; 38726 (e:4726)
     dw NidoqueenPicBack
 
     ; attacks known at lvl 0
-    db POISON_STING
-    db FURY_SWIPES
-    db DOUBLE_KICK
-    db THRASH
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -1164,8 +1164,8 @@ NidoranMBaseStats: ; 38742 (e:4742)
     dw NidoranMPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db LEER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1201,10 +1201,10 @@ NidorinoBaseStats: ; 3875e (e:475e)
     dw NidorinoPicBack
 
     ; attacks known at lvl 0
-    db HORN_ATTACK
-    db POISON_STING
-    db FURY_ATTACK
-    db DOUBLE_KICK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -1238,10 +1238,10 @@ NidokingBaseStats: ; 3877a (e:477a)
     dw NidokingPicBack
 
     ; attacks known at lvl 0
-    db POISON_STING
-    db FURY_ATTACK
-    db DOUBLE_KICK
-    db THRASH
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -1275,8 +1275,8 @@ ClefairyBaseStats: ; 38796 (e:4796)
     dw ClefairyPicBack
 
     ; attacks known at lvl 0
-    db POUND
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1312,9 +1312,9 @@ ClefableBaseStats: ; 387b2 (e:47b2)
     dw ClefablePicBack
 
     ; attacks known at lvl 0
-    db POUND
-    db GROWL
-    db SWIFT
+    db 0
+    db 0
+    db 0
     db 0
 
     db 4 ; growth rate
@@ -1349,8 +1349,8 @@ VulpixBaseStats: ; 387ce (e:47ce)
     dw VulpixPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1386,9 +1386,9 @@ NinetalesBaseStats: ; 387ea (e:47ea)
     dw NinetalesPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
-    db BITE
+    db 0
+    db 0
+    db 0
     db 0
 
     db 0 ; growth rate
@@ -1423,8 +1423,8 @@ JigglypuffBaseStats: ; 38806 (e:4806)
     dw JigglypuffPicBack
 
     ; attacks known at lvl 0
-    db POUND
-    db SING
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1460,9 +1460,9 @@ WigglytuffBaseStats: ; 38822 (e:4822)
     dw WigglytuffPicBack
 
     ; attacks known at lvl 0
-    db POUND
-    db SING
-    db SWIFT
+    db 0
+    db 0
+    db 0
     db 0
 
     db 4 ; growth rate
@@ -1497,8 +1497,8 @@ ZubatBaseStats: ; 3883e (e:483e)
     dw ZubatPicBack
 
     ; attacks known at lvl 0
-    db LEECH_LIFE
-    db SUPERSONIC
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1534,10 +1534,10 @@ GolbatBaseStats: ; 3885a (e:485a)
     dw GolbatPicBack
 
     ; attacks known at lvl 0
-    db BITE
-    db ACID
-    db HYPER_FANG
-    db WING_ATTACK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -1571,8 +1571,8 @@ OddishBaseStats: ; 38876 (e:4876)
     dw OddishPicBack
 
     ; attacks known at lvl 0
-    db ABSORB
-    db GROWTH
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1608,10 +1608,10 @@ GloomBaseStats: ; 38892 (e:4892)
     dw GloomPicBack
 
     ; attacks known at lvl 0
-    db ACID
-    db POISONPOWDER
-    db STUN_SPORE
-    db SLEEP_POWDER
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -1645,10 +1645,10 @@ VileplumeBaseStats: ; 388ae (e:48ae)
     dw VileplumePicBack
 
     ; attacks known at lvl 0
-    db POISONPOWDER
-    db STUN_SPORE
-    db SLEEP_POWDER
-    db MEGA_DRAIN
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -1682,8 +1682,8 @@ ParasBaseStats: ; 388ca (e:48ca)
     dw ParasPicBack
 
     ; attacks known at lvl 0
-    db SCRATCH
-    db STUN_SPORE
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1719,10 +1719,10 @@ ParasectBaseStats: ; 388e6 (e:48e6)
     dw ParasectPicBack
 
     ; attacks known at lvl 0
-    db ABSORB
-    db BLADE
-    db VICEGRIP
-    db GROWTH
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -1756,8 +1756,8 @@ VenonatBaseStats: ; 38902 (e:4902)
     dw VenonatPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db DISABLE
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1793,10 +1793,10 @@ VenomothBaseStats: ; 3891e (e:491e)
     dw VenomothPicBack
 
     ; attacks known at lvl 0
-    db LEECH_LIFE
-    db STUN_SPORE
-    db SLEEP_POWDER
-    db PIN_MISSILE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -1830,8 +1830,8 @@ DiglettBaseStats: ; 3893a (e:493a)
     dw DiglettPicBack
 
     ; attacks known at lvl 0
-    db SCRATCH
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1867,10 +1867,10 @@ DugtrioBaseStats: ; 38956 (e:4956)
     dw DugtrioPicBack
 
     ; attacks known at lvl 0
-    db FURY_SWIPES
-    db TRAPHOLE
-    db SAND_ATTACK
-    db TRI_ATTACK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -1904,8 +1904,8 @@ MeowthBaseStats: ; 38972 (e:4972)
     dw MeowthPicBack
 
     ; attacks known at lvl 0
-    db SCRATCH
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -1941,10 +1941,10 @@ PersianBaseStats: ; 3898e (e:498e)
     dw PersianPicBack
 
     ; attacks known at lvl 0
-    db SLAM
-    db SCREECH
-    db GLARE
-    db HYPER_FANG
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -1978,8 +1978,8 @@ PsyduckBaseStats: ; 389aa (e:49aa)
     dw PsyduckPicBack
 
     ; attacks known at lvl 0
-    db SCRATCH
-    db TAIL_WHIP
+    db 0
+    db 0
     db 0
     db 0
 
@@ -2015,10 +2015,10 @@ GolduckBaseStats: ; 389c6 (e:49c6)
     dw GolduckPicBack
 
     ; attacks known at lvl 0
-    db MEDITATE
-    db SCREECH
-    db PSYBEAM
-    db WATER_GUN
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -2052,8 +2052,8 @@ MankeyBaseStats: ; 389e2 (e:49e2)
     dw MankeyPicBack
 
     ; attacks known at lvl 0
-    db SCRATCH
-    db LEER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -2089,10 +2089,10 @@ PrimeapeBaseStats: ; 389fe (e:49fe)
     dw PrimeapePicBack
 
     ; attacks known at lvl 0
-    db FURY_SWIPES
-    db STRIKE
-    db FOCUS_ENERGY
-    db JUMP_KICK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -2126,8 +2126,8 @@ GrowlitheBaseStats: ; 38a1a (e:4a1a)
     dw GrowlithePicBack
 
     ; attacks known at lvl 0
-    db BITE
-    db ROAR
+    db 0
+    db 0
     db 0
     db 0
 
@@ -2163,9 +2163,9 @@ ArcanineBaseStats: ; 38a36 (e:4a36)
     dw ArcaninePicBack
 
     ; attacks known at lvl 0
-    db ROAR
-    db EMBER
-    db HYPER_FANG
+    db 0
+    db 0
+    db 0
     db 0
 
     db 5 ; growth rate
@@ -2200,8 +2200,8 @@ PoliwagBaseStats: ; 38a52 (e:4a52)
     dw PoliwagPicBack
 
     ; attacks known at lvl 0
-    db BUBBLE
-    db HYPNOSIS
+    db 0
+    db 0
     db 0
     db 0
 
@@ -2237,10 +2237,10 @@ PoliwhirlBaseStats: ; 38a6e (e:4a6e)
     dw PoliwhirlPicBack
 
     ; attacks known at lvl 0
-    db WATER_GUN
-    db DOUBLESLAP
-    db AGILITY
-    db SLAM
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -2274,10 +2274,10 @@ PoliwrathBaseStats: ; 38a8a (e:4a8a)
     dw PoliwrathPicBack
 
     ; attacks known at lvl 0
-    db DOUBLESLAP
-    db AGILITY
-    db SLAM
-    db LOW_KICK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -2311,7 +2311,7 @@ AbraBaseStats: ; 38aa6 (e:4aa6)
     dw AbraPicBack
 
     ; attacks known at lvl 0
-    db TELEPORT
+    db 0
     db 0
     db 0
     db 0
@@ -2348,10 +2348,10 @@ KadabraBaseStats: ; 38ac2 (e:4ac2)
     dw KadabraPicBack
 
     ; attacks known at lvl 0
-    db PSYWAVE
-    db CONFUSION
-    db DISABLE
-    db KINESIS
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -2385,10 +2385,10 @@ AlakazamBaseStats: ; 38ade (e:4ade)
     dw AlakazamPicBack
 
     ; attacks known at lvl 0
-    db CONFUSION
-    db DISABLE
-    db KINESIS
-    db PSYBEAM
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -2422,8 +2422,8 @@ MachopBaseStats: ; 38afa (e:4afa)
     dw MachopPicBack
 
     ; attacks known at lvl 0
-    db KARATE_CHOP
-    db LEER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -2459,10 +2459,10 @@ MachokeBaseStats: ; 38b16 (e:4b16)
     dw MachokePicBack
 
     ; attacks known at lvl 0
-    db FOCUS_ENERGY
-    db STRIKE
-    db SEISMIC_TOSS
-    db ROLLING_KICK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -2496,10 +2496,10 @@ MachampBaseStats: ; 38b32 (e:4b32)
     dw MachampPicBack
 
     ; attacks known at lvl 0
-    db MEGA_PUNCH
-    db SEISMIC_TOSS
-    db ROLLING_KICK
-    db JUMP_KICK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -2533,8 +2533,8 @@ BellsproutBaseStats: ; 38b4e (e:4b4e)
     dw BellsproutPicBack
 
     ; attacks known at lvl 0
-    db VINE_WHIP
-    db GROWTH
+    db 0
+    db 0
     db 0
     db 0
 
@@ -2570,10 +2570,10 @@ WeepinbellBaseStats: ; 38b6a (e:4b6a)
     dw WeepinbellPicBack
 
     ; attacks known at lvl 0
-    db ACID
-    db POISONPOWDER
-    db SLEEP_POWDER
-    db STUN_SPORE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -2607,10 +2607,10 @@ VictreebelBaseStats: ; 38b86 (e:4b86)
     dw VictreebelPicBack
 
     ; attacks known at lvl 0
-    db POISONPOWDER
-    db SLEEP_POWDER
-    db STUN_SPORE
-    db WRAP
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -2644,8 +2644,8 @@ TentacoolBaseStats: ; 38ba2 (e:4ba2)
     dw TentacoolPicBack
 
     ; attacks known at lvl 0
-    db CONSTRICT
-    db SUPERSONIC
+    db 0
+    db 0
     db 0
     db 0
 
@@ -2681,10 +2681,10 @@ TentacruelBaseStats: ; 38bbe (e:4bbe)
     dw TentacruelPicBack
 
     ; attacks known at lvl 0
-    db WATER_GUN
-    db ABSORB
-    db BUBBLEBEAM
-    db SLUDGE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 5 ; growth rate
 
@@ -2718,8 +2718,8 @@ GeodudeBaseStats: ; 38bda (e:4bda)
     dw GeodudePicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db DEFENSE_CURL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -2755,10 +2755,10 @@ GravelerBaseStats: ; 38bf6 (e:4bf6)
     dw GravelerPicBack
 
     ; attacks known at lvl 0
-    db ROCK_THROW
-    db MEGA_PUNCH
-    db SELFDESTRUCT
-    db STOMP
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -2792,10 +2792,10 @@ GolemBaseStats: ; 38c12 (e:4c12)
     dw GolemPicBack
 
     ; attacks known at lvl 0
-    db MEGA_PUNCH
-    db SELFDESTRUCT
-    db STOMP
-    db BODY_SLAM
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -2829,8 +2829,8 @@ PonytaBaseStats: ; 38c2e (e:4c2e)
     dw PonytaPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -2866,10 +2866,10 @@ RapidashBaseStats: ; 38c4a (e:4c4a)
     dw RapidashPicBack
 
     ; attacks known at lvl 0
-    db TAKE_DOWN
-    db FLAMETHROWER
-    db DOUBLE_TEAM
-    db HORN_ATTACK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -2903,8 +2903,8 @@ SlowpokeBaseStats: ; 38c66 (e:4c66)
     dw SlowpokePicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -2940,10 +2940,10 @@ SlowbroBaseStats: ; 38c82 (e:4c82)
     dw SlowbroPicBack
 
     ; attacks known at lvl 0
-    db BIDE
-    db REST
-    db PSYBEAM
-    db MEGA_PUNCH
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -2977,8 +2977,8 @@ MagnemiteBaseStats: ; 38c9e (e:4c9e)
     dw MagnemitePicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db FLASH
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3014,10 +3014,10 @@ MagnetonBaseStats: ; 38cba (e:4cba)
     dw MagnetonPicBack
 
     ; attacks known at lvl 0
-    db SONICBOOM
-    db THUNDER_WAVE
-    db THUNDERBOLT
-    db TRI_ATTACK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -3051,8 +3051,8 @@ FarfetchdBaseStats: ; 38cd6 (e:4cd6)
     dw FarfetchdPicBack
 
     ; attacks known at lvl 0
-    db BLADE
-    db LEER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3088,8 +3088,8 @@ DoduoBaseStats: ; 38cf2 (e:4cf2)
     dw DoduoPicBack
 
     ; attacks known at lvl 0
-    db PECK
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3125,10 +3125,10 @@ DodrioBaseStats: ; 38d0e (e:4d0e)
     dw DodrioPicBack
 
     ; attacks known at lvl 0
-    db SCREECH
-    db SLAM
-    db DRILL_PECK
-    db TRI_ATTACK
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -3162,8 +3162,8 @@ SeelBaseStats: ; 38d2a (e:4d2a)
     dw SeelPicBack
 
     ; attacks known at lvl 0
-    db HEADBUTT
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3199,10 +3199,10 @@ DewgongBaseStats: ; 38d46 (e:4d46)
     dw DewgongPicBack
 
     ; attacks known at lvl 0
-    db SKULL_BASH
-    db REST
-    db MIST
-    db TSUNAMI
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -3236,8 +3236,8 @@ GrimerBaseStats: ; 38d62 (e:4d62)
     dw GrimerPicBack
 
     ; attacks known at lvl 0
-    db POUND
-    db POISON_GAS
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3273,10 +3273,10 @@ MukBaseStats: ; 38d7e (e:4d7e)
     dw MukPicBack
 
     ; attacks known at lvl 0
-    db SLUDGE
-    db MINIMIZE
-    db HAZE
-    db ACID_ARMOR
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -3310,8 +3310,8 @@ ShellderBaseStats: ; 38d9a (e:4d9a)
     dw ShellderPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db WITHDRAW
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3347,9 +3347,9 @@ CloysterBaseStats: ; 38db6 (e:4db6)
     dw CloysterPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db WITHDRAW
-    db SPIKE_CANNON
+    db 0
+    db 0
+    db 0
     db 0
 
     db 5 ; growth rate
@@ -3384,8 +3384,8 @@ GastlyBaseStats: ; 38dd2 (e:4dd2)
     dw GastlyPicBack
 
     ; attacks known at lvl 0
-    db LICK
-    db CONFUSE_RAY
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3421,10 +3421,10 @@ HaunterBaseStats: ; 38dee (e:4dee)
     dw HaunterPicBack
 
     ; attacks known at lvl 0
-    db NIGHT_SHADE
-    db HYPNOSIS
-    db DREAM_EATER
-    db PSYWAVE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -3458,10 +3458,10 @@ GengarBaseStats: ; 38e0a (e:4e0a)
     dw GengarPicBack
 
     ; attacks known at lvl 0
-    db HYPNOSIS
-    db DREAM_EATER
-    db PSYWAVE
-    db POISON_GAS
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 3 ; growth rate
 
@@ -3495,8 +3495,8 @@ OnixBaseStats: ; 38e26 (e:4e26)
     dw OnixPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db SCREECH
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3532,8 +3532,8 @@ DrowzeeBaseStats: ; 38e42 (e:4e42)
     dw DrowzeePicBack
 
     ; attacks known at lvl 0
-    db POUND
-    db DISABLE
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3569,10 +3569,10 @@ HypnoBaseStats: ; 38e5e (e:4e5e)
     dw HypnoPicBack
 
     ; attacks known at lvl 0
-    db CONFUSION
-    db HEADBUTT
-    db MEDITATE
-    db PSYBEAM
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -3606,8 +3606,8 @@ KrabbyBaseStats: ; 38e7a (e:4e7a)
     dw KrabbyPicBack
 
     ; attacks known at lvl 0
-    db BUBBLE
-    db LEER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3643,10 +3643,10 @@ KinglerBaseStats: ; 38e96 (e:4e96)
     dw KinglerPicBack
 
     ; attacks known at lvl 0
-    db BUBBLEBEAM
-    db GUILLOTINE
-    db HARDEN
-    db CRABHAMMER
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -3680,8 +3680,8 @@ VoltorbBaseStats: ; 38eb2 (e:4eb2)
     dw VoltorbPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db SCREECH
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3717,10 +3717,10 @@ ElectrodeBaseStats: ; 38ece (e:4ece)
     dw ElectrodePicBack
 
     ; attacks known at lvl 0
-    db LIGHT_SCREEN
-    db THUNDERSHOCK
-    db SELFDESTRUCT
-    db THUNDERBOLT
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -3754,8 +3754,8 @@ ExeggcuteBaseStats: ; 38eea (e:4eea)
     dw ExeggcutePicBack
 
     ; attacks known at lvl 0
-    db BARRAGE
-    db HYPNOSIS
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3791,9 +3791,9 @@ ExeggutorBaseStats: ; 38f06 (e:4f06)
     dw ExeggutorPicBack
 
     ; attacks known at lvl 0
-    db BARRAGE
-    db HYPNOSIS
-    db STOMP
+    db 0
+    db 0
+    db 0
     db 0
 
     db 5 ; growth rate
@@ -3828,8 +3828,8 @@ CuboneBaseStats: ; 38f22 (e:4f22)
     dw CubonePicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3865,10 +3865,10 @@ MarowakBaseStats: ; 38f3e (e:4f3e)
     dw MarowakPicBack
 
     ; attacks known at lvl 0
-    db HEADBUTT
-    db FOCUS_ENERGY
-    db BONEMERANG
-    db NIGHT_SHADE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -3902,8 +3902,8 @@ HitmonleeBaseStats: ; 38f5a (e:4f5a)
     dw HitmonleePicBack
 
     ; attacks known at lvl 0
-    db LOW_KICK
-    db MEDITATE
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3939,8 +3939,8 @@ HitmonchanBaseStats: ; 38f76 (e:4f76)
     dw HitmonchanPicBack
 
     ; attacks known at lvl 0
-    db KARATE_CHOP
-    db AGILITY
+    db 0
+    db 0
     db 0
     db 0
 
@@ -3976,8 +3976,8 @@ LickitungBaseStats: ; 38f92 (e:4f92)
     dw LickitungPicBack
 
     ; attacks known at lvl 0
-    db WRAP
-    db SUPERSONIC
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4013,8 +4013,8 @@ KoffingBaseStats: ; 38fae (e:4fae)
     dw KoffingPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db POISON_GAS
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4050,10 +4050,10 @@ WeezingBaseStats: ; 38fca (e:4fca)
     dw WeezingPicBack
 
     ; attacks known at lvl 0
-    db SLUDGE
-    db SMOKESCREEN
-    db HAZE
-    db EXPLOSION
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -4087,8 +4087,8 @@ RhyhornBaseStats: ; 38fe6 (e:4fe6)
     dw RhyhornPicBack
 
     ; attacks known at lvl 0
-    db HORN_ATTACK
-    db TAIL_WHIP
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4124,10 +4124,10 @@ RhydonBaseStats: ; 39002 (e:5002)
     dw RhydonPicBack
 
     ; attacks known at lvl 0
-    db THRASH
-    db EARTHQUAKE
-    db HORN_DRILL
-    db ROCK_SLIDE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 5 ; growth rate
 
@@ -4161,8 +4161,8 @@ ChanseyBaseStats: ; 3901e (e:501e)
     dw ChanseyPicBack
 
     ; attacks known at lvl 0
-    db POUND
-    db TAIL_WHIP
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4198,8 +4198,8 @@ TangelaBaseStats: ; 3903a (e:503a)
     dw TangelaPicBack
 
     ; attacks known at lvl 0
-    db CONSTRICT
-    db SLEEP_POWDER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4235,8 +4235,8 @@ KangaskhanBaseStats: ; 39056 (e:5056)
     dw KangaskhanPicBack
 
     ; attacks known at lvl 0
-    db SCRATCH
-    db TAIL_WHIP
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4272,8 +4272,8 @@ HorseaBaseStats: ; 39072 (e:5072)
     dw HorseaPicBack
 
     ; attacks known at lvl 0
-    db BUBBLE
-    db SMOKESCREEN
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4309,10 +4309,10 @@ SeadraBaseStats: ; 3908e (e:508e)
     dw SeadraPicBack
 
     ; attacks known at lvl 0
-    db LEECH_LIFE
-    db BUBBLEBEAM
-    db AGILITY
-    db DRAGON_RAGE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -4346,8 +4346,8 @@ GoldeenBaseStats: ; 390aa (e:50aa)
     dw GoldeenPicBack
 
     ; attacks known at lvl 0
-    db SPLASH
-    db TAIL_WHIP
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4383,10 +4383,10 @@ SeakingBaseStats: ; 390c6 (e:50c6)
     dw SeakingPicBack
 
     ; attacks known at lvl 0
-    db AGILITY
-    db FURY_ATTACK
-    db BUBBLEBEAM
-    db WATERFALL
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -4420,8 +4420,8 @@ StaryuBaseStats: ; 390e2 (e:50e2)
     dw StaryuPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db HARDEN
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4457,9 +4457,9 @@ StarmieBaseStats: ; 390fe (e:50fe)
     dw StarmiePicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db HARDEN
-    db BUBBLEBEAM
+    db 0
+    db 0
+    db 0
     db 0
 
     db 5 ; growth rate
@@ -4494,8 +4494,8 @@ MrMimeBaseStats: ; 3911a (e:511a)
     dw MrMimePicBack
 
     ; attacks known at lvl 0
-    db POUND
-    db BARRIER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4531,8 +4531,8 @@ ScytherBaseStats: ; 39136 (e:5136)
     dw ScytherPicBack
 
     ; attacks known at lvl 0
-    db QUICK_ATTACK
-    db LEER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4568,8 +4568,8 @@ JynxBaseStats: ; 39152 (e:5152)
     dw JynxPicBack
 
     ; attacks known at lvl 0
-    db POUND
-    db LOVELY_KISS
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4605,8 +4605,8 @@ ElectabuzzBaseStats: ; 3916e (e:516e)
     dw ElectabuzzPicBack
 
     ; attacks known at lvl 0
-    db QUICK_ATTACK
-    db LEER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4642,8 +4642,8 @@ MagmarBaseStats: ; 3918a (e:518a)
     dw MagmarPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db LEER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4679,8 +4679,8 @@ PinsirBaseStats: ; 391a6 (e:51a6)
     dw PinsirPicBack
 
     ; attacks known at lvl 0
-    db BLADE
-    db FOCUS_ENERGY
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4716,8 +4716,8 @@ TaurosBaseStats: ; 391c2 (e:51c2)
     dw TaurosPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4753,7 +4753,7 @@ MagikarpBaseStats: ; 391de (e:51de)
     dw MagikarpPicBack
 
     ; attacks known at lvl 0
-    db SPLASH
+    db 0
     db 0
     db 0
     db 0
@@ -4790,10 +4790,10 @@ GyaradosBaseStats: ; 391fa (e:51fa)
     dw GyaradosPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
-    db BITE
-    db LEER
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 5 ; growth rate
 
@@ -4827,8 +4827,8 @@ LaprasBaseStats: ; 39216 (e:5216)
     dw LaprasPicBack
 
     ; attacks known at lvl 0
-    db WATER_GUN
-    db GROWL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4864,7 +4864,7 @@ DittoBaseStats: ; 39232 (e:5232)
     dw DittoPicBack
 
     ; attacks known at lvl 0
-    db TRANSFORM
+    db 0
     db 0
     db 0
     db 0
@@ -4901,8 +4901,8 @@ EeveeBaseStats: ; 3924e (e:524e)
     dw EeveePicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
+    db 0
+    db 0
     db 0
     db 0
 
@@ -4938,9 +4938,9 @@ VaporeonBaseStats: ; 3926a (e:526a)
     dw VaporeonPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
-    db WATER_GUN
+    db 0
+    db 0
+    db 0
     db 0
 
     db 0 ; growth rate
@@ -4975,9 +4975,9 @@ JolteonBaseStats: ; 39286 (e:5286)
     dw JolteonPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
-    db THUNDERSHOCK
+    db 0
+    db 0
+    db 0
     db 0
 
     db 0 ; growth rate
@@ -5012,9 +5012,9 @@ FlareonBaseStats: ; 392a2 (e:52a2)
     dw FlareonPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db TAIL_WHIP
-    db EMBER
+    db 0
+    db 0
+    db 0
     db 0
 
     db 0 ; growth rate
@@ -5049,8 +5049,8 @@ PorygonBaseStats: ; 392be (e:52be)
     dw PorygonPicBack
 
     ; attacks known at lvl 0
-    db TACKLE
-    db CONVERSION
+    db 0
+    db 0
     db 0
     db 0
 
@@ -5086,8 +5086,8 @@ OmanyteBaseStats: ; 392da (e:52da)
     dw OmanytePicBack
 
     ; attacks known at lvl 0
-    db CONSTRICT
-    db WITHDRAW
+    db 0
+    db 0
     db 0
     db 0
 
@@ -5123,10 +5123,10 @@ OmastarBaseStats: ; 392f6 (e:52f6)
     dw OmastarPicBack
 
     ; attacks known at lvl 0
-    db SUPERSONIC
-    db HAZE
-    db TSUNAMI
-    db SPIKE_CANNON
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -5160,8 +5160,8 @@ KabutoBaseStats: ; 39312 (e:5312)
     dw KabutoPicBack
 
     ; attacks known at lvl 0
-    db SCRATCH
-    db HARDEN
+    db 0
+    db 0
     db 0
     db 0
 
@@ -5197,10 +5197,10 @@ KabutopsBaseStats: ; 3932e (e:532e)
     dw KabutopsPicBack
 
     ; attacks known at lvl 0
-    db REST
-    db MEGA_DRAIN
-    db TSUNAMI
-    db SLASH
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 0 ; growth rate
 
@@ -5234,8 +5234,8 @@ AerodactylBaseStats: ; 3934a (e:534a)
     dw AerodactylPicBack
 
     ; attacks known at lvl 0
-    db WING_ATTACK
-    db AGILITY
+    db 0
+    db 0
     db 0
     db 0
 
@@ -5271,8 +5271,8 @@ SnorlaxBaseStats: ; 39366 (e:5366)
     dw SnorlaxPicBack
 
     ; attacks known at lvl 0
-    db LICK
-    db DEFENSE_CURL
+    db 0
+    db 0
     db 0
     db 0
 
@@ -5308,8 +5308,8 @@ ArticunoBaseStats: ; 39382 (e:5382)
     dw ArticunoPicBack
 
     ; attacks known at lvl 0
-    db GUST
-    db MIST
+    db 0
+    db 0
     db 0
     db 0
 
@@ -5345,8 +5345,8 @@ ZapdosBaseStats: ; 3939e (e:539e)
     dw ZapdosPicBack
 
     ; attacks known at lvl 0
-    db GUST
-    db FLASH
+    db 0
+    db 0
     db 0
     db 0
 
@@ -5382,8 +5382,8 @@ MoltresBaseStats: ; 393ba (e:53ba)
     dw MoltresPicBack
 
     ; attacks known at lvl 0
-    db GUST
-    db LEER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -5419,8 +5419,8 @@ DratiniBaseStats: ; 393d6 (e:53d6)
     dw DratiniPicBack
 
     ; attacks known at lvl 0
-    db WRAP
-    db LEER
+    db 0
+    db 0
     db 0
     db 0
 
@@ -5456,10 +5456,10 @@ DragonairBaseStats: ; 393f2 (e:53f2)
     dw DragonairPicBack
 
     ; attacks known at lvl 0
-    db AURORA_BEAM
-    db AGILITY
-    db MIST
-    db DRAGON_RAGE
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 5 ; growth rate
 
@@ -5493,10 +5493,10 @@ DragoniteBaseStats: ; 3940e (e:540e)
     dw DragonitePicBack
 
     ; attacks known at lvl 0
-    db TSUNAMI
-    db HYPER_BEAM
-    db WING_ATTACK
-    db SWOOP
+    db 0
+    db 0
+    db 0
+    db 0
 
     db 5 ; growth rate
 
@@ -5530,8 +5530,8 @@ MewtwoBaseStats: ; 3942a (e:542a)
     dw MewtwoPicBack
 
     ; attacks known at lvl 0
-    db CONFUSION
-    db DISABLE
+    db 0
+    db 0
     db 0
     db 0
 
@@ -5547,3 +5547,34 @@ MewtwoBaseStats: ; 3942a (e:542a)
     tmlearn 49,50,54               ; TRI_ATTACK|SUBSTITUTE|STRIKE
 
     db BANK(MewtwoPicFront)
+
+MewBaseStats: ; 425b (1:425b)
+    db DEX_MEW ; pokedex id
+    db 100 ; base hp
+    db 100 ; base attack
+    db 100 ; base defense
+    db 100 ; base speed
+    db 100 ; base special
+
+    db PSYCHIC ; species type 1
+    db PSYCHIC ; species type 2
+
+    db 3 ; catch rate
+    db 64 ; base exp yield
+    db $55 ; sprite dimensions
+
+    dw MewPicFront
+    dw MewPicBack
+
+    ; attacks known at lvl 0
+    db 0
+    db 0
+    db 0
+    db 0
+
+    db 3 ; growth rate
+
+    ; include learnset directly
+	db $ff,$ff,$ff,$ff,$ff,$ff,$ff
+
+    db BANK(MewPicFront)

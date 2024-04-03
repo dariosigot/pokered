@@ -3463,8 +3463,6 @@ GetMonHeader: ; 1537 (0:1537)
     ld b,$77 ; size of Aerodactyl fossil sprite
     cp a,FOSSIL_AERODACTYL ; Aerodactyl fossil
     jr z,.specialID
-    cp a,MEW
-    jr z,.mew
     ld a,$3a
     call Predef   ; convert pokemon ID in [$D11E] to pokedex number
     ld a,[$d11e]
@@ -3483,13 +3481,6 @@ GetMonHeader: ; 1537 (0:1537)
     ld [hl],e ; write front sprite pointer
     inc hl
     ld [hl],d
-    jr .done
-.mew
-    ld hl,MewBaseStats
-    ld de,W_MONHEADER
-    ld bc,28
-    ld a,BANK(MewBaseStats)
-    call FarCopyData
 .done
     ld a,[$d0b5]
     ld [$d0b8],a
@@ -3500,8 +3491,11 @@ GetMonHeader: ; 1537 (0:1537)
     pop bc
     pop af
     ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
+
+; Free Space
+
+SECTION "GetPartyMonName2",ROM0[$15b4]
 
 ; copy party pokemon's name to $CD6D
 GetPartyMonName2: ; 15b4 (0:15b4)
@@ -4917,7 +4911,7 @@ AutoBgMapTransfer: ; 1d57 (0:1d57)
     ld a,[H_AUTOBGTRANSFERENABLED]
     and a
     ret z
-    ld hl,[sp + 0]
+    ld hl,sp + 0
     ld a,h
     ld [H_SPTEMP],a
     ld a,l
@@ -5036,7 +5030,7 @@ VBlankCopyBgMap: ; 1de1 (0:1de1)
     ld a,[H_VBCOPYBGSRC] ; doubles as enabling byte
     and a
     ret z
-    ld hl,[sp + 0]
+    ld hl,sp + 0
     ld a,h
     ld [H_SPTEMP],a
     ld a,l
@@ -5065,7 +5059,7 @@ VBlankCopyDouble: ; 1e02 (0:1e02)
     ld a,[H_VBCOPYDOUBLESIZE]
     and a ; are there any bytes to copy?
     ret z
-    ld hl,[sp + 0]
+    ld hl,sp + 0
     ld a,h
     ld [H_SPTEMP],a
     ld a,l
@@ -5126,7 +5120,7 @@ VBlankCopyDouble: ; 1e02 (0:1e02)
     ld [H_VBCOPYDOUBLEDEST],a
     ld a,h
     ld [H_VBCOPYDOUBLEDEST + 1],a ; update destination address
-    ld hl,[sp + 0]
+    ld hl,sp + 0
     ld a,l
     ld [H_VBCOPYDOUBLESRC],a
     ld a,h
@@ -5145,7 +5139,7 @@ VBlankCopy: ; 1e5e (0:1e5e)
     ld a,[H_VBCOPYSIZE]
     and a ; are there any bytes to copy?
     ret z
-    ld hl,[sp + 0]
+    ld hl,sp + 0
     ld a,h
     ld [H_SPTEMP],a
     ld a,l
@@ -5210,7 +5204,7 @@ VBlankCopy: ; 1e5e (0:1e5e)
     ld [H_VBCOPYDEST],a
     ld a,h
     ld [H_VBCOPYDEST + 1],a
-    ld hl,[sp + 0]
+    ld hl,sp + 0
     ld a,l
     ld [H_VBCOPYSRC],a
     ld a,h
@@ -6976,8 +6970,8 @@ ReturnInDisplayTextIDHack:
     jp z,FuncTX_SlotMachine
     cp a,$f6   ; cable connection NPC in Pokemon Center
     jr nz,.notSpecialCase
-    ld hl,CableClubNPC
-    ld b,BANK(CableClubNPC)
+    ld hl,MoveRelearner ; CableClubNPC
+    ld b,BANK(MoveRelearner) ; BANK(CableClubNPC)
     call Bankswitch
     jr AfterDisplayingTextID
 .notSpecialCase
@@ -30023,7 +30017,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     ld h,[hl]
     ld l,a
     ld de,$CD6D
-    ld a,BANK(EvosMovesPointerTable)
+    ld a,BANK(MissingNo_EvosMoves)
     ld bc,13 ; Eevee's Evolution Bytes
     call FarCopyData
     ld hl,$CD6D
@@ -31900,7 +31894,7 @@ GetEnemy:
     pop hl
     jr nz,.NotEncounter
 .MewFirstEncounter
-    ld a,7
+    ld a,70
     ld [W_CURENEMYLVL],a
     ld a,MEW ; Entry Level
     jr .WillEncounter
@@ -43194,6 +43188,7 @@ RELEARN_MOVE_SCREEN_LENGHT EQU 7
 
 MoveRelearnerText:
     db $8
+MoveRelearner:
     call SaveScreenTilesToBuffer2
 
     ld hl,.MoveRelearnerIntroText ; Intro Text
@@ -43249,7 +43244,7 @@ MoveRelearnerText:
     ld [$cc49],a
     call LoadMonData
 
-    ; Get Copy of Level UP EvosMoves in wStringBuffer1
+    ; Get Copy of Level UP EvosMoves in GenericBuffer
     ld hl,EvosMovesPointerTable
     ld d,0
     ld a,[W_MONHEADER]
@@ -43267,45 +43262,49 @@ MoveRelearnerText:
     ld h,[hl]
     ld l,a ; hl pointer to Correct EvosMoves
     ld a,BANK(MissingNo_EvosMoves)
-    ld de,wStringBuffer1
-    ld bc,wListPointer-wStringBuffer1
+    ld de,GenericBuffer
+    ld bc,96
     call FarCopyData ; copy bc bytes of data from a:hl to de
 
     ; Get Mon Move List from "PreEvolutionMove"
-    ld de,wMoveRelearnerMoveList+1 ; Backup Final List Pointer to $CD6D
-    ld hl,$CD6D                    ; ...
-    ld a,e                         ; ...
-    ld [hli],a                     ; ...
-    ld a,d                         ; ...
-    ld [hl],a                      ; ...
-    ld a,[$cf91]
-    ld d,a ; pokemon ID
-    ld e,0 ; initial counter = 0
+    ; ld de,wMoveRelearnerMoveList+1 ; Backup Final List Pointer to $CD6D
+    ; ld hl,$CD6D                    ; ...
+    ; ld a,e                         ; ...
+    ; ld [hli],a                     ; ...
+    ; ld a,d                         ; ...
+    ; ld [hl],a                      ; ...
+    ; ld a,[$cf91]
+    ; ld d,a ; pokemon ID
+    ; ld e,0 ; initial counter = 0
     ; ld b,BANK(GetPreEvolutionMove) ; TODO Learnset
     ; ld hl,GetPreEvolutionMove
     ; call Bankswitch
-    ld b,e ; restore counter
-    ld hl,$CD6D
-    ld a,[hli]
-    ld d,[hl]
-    ld e,a ; de pointer to current Final List
+    ; ld b,e ; restore counter
+    ; ld hl,$CD6D
+    ; ld a,[hli]
+    ; ld d,[hl]
+    ; ld e,a ; de pointer to current Final List
+
+    ; TODO Learnset
+    ld de,wMoveRelearnerMoveList+1 ; Final List Pointer
+    ld b,0 ; initial counter = 0
 
     ; Get Mon Move List from Header Base Moves
-    ld hl,W_MONHMOVES
-    ld c,4
-.LoopHeaderMoves
-    ld a,[hli]
-    and a
-    jr z,.EndLoopHeaderMoves
-    ld [de],a
-    inc de
-    inc b
-    dec c
-    jr nz,.LoopHeaderMoves
-.EndLoopHeaderMoves
+    ;ld hl,W_MONHMOVES
+    ;ld c,4
+;.LoopHeaderMoves
+    ;ld a,[hli]
+    ;and a
+    ;jr z,.EndLoopHeaderMoves
+    ;ld [de],a
+    ;inc de
+    ;inc b
+    ;dec c
+    ;jr nz,.LoopHeaderMoves
+;.EndLoopHeaderMoves
 
-    ; Get Mon Move List from Level UP EvosMoves (wStringBuffer1)
-    ld hl,wStringBuffer1
+    ; Get Mon Move List from Level UP EvosMoves (GenericBuffer)
+    ld hl,GenericBuffer
 .skipEvolutionDataLoop
     ld a,[hli]
     and a
@@ -48750,7 +48749,7 @@ Moves: ; 38000 (e:4000)
 
 INCLUDE "constants/moves.asm"
 
-INCLUDE "constants/pokemon_header.asm"
+SECTION "CryData",ROMX[$5446],BANK[$e]
 
 CryData: ; 39446 (e:5446)
     ;$BaseCry,$Pitch,$Length
@@ -49103,196 +49102,196 @@ Func_3b057: ; Moved in the Bank
     jp Predef ; indirect jump to HandleBitArray (f666 (3:7666))
 
 EvosMovesPointerTable: ; Moved in the Bank
-    ;dw Mon112_EvosMoves
-    ;dw Mon115_EvosMoves
-    ;dw Mon032_EvosMoves
-    ;dw Mon035_EvosMoves
-    ;dw Mon021_EvosMoves
-    ;dw Mon100_EvosMoves
-    ;dw Mon034_EvosMoves
-    ;dw Mon080_EvosMoves
-    ;dw Mon002_EvosMoves
-    ;dw Mon103_EvosMoves
-    ;dw Mon108_EvosMoves
-    ;dw Mon102_EvosMoves
-    ;dw Mon088_EvosMoves
-    ;dw Mon094_EvosMoves
-    ;dw Mon029_EvosMoves
-    ;dw Mon031_EvosMoves
-    ;dw Mon104_EvosMoves
-    ;dw Mon111_EvosMoves
-    ;dw Mon131_EvosMoves
-    ;dw Mon059_EvosMoves
-    ;dw MissingNo_EvosMoves ; mew
-    ;dw Mon130_EvosMoves
-    ;dw Mon090_EvosMoves
-    ;dw Mon072_EvosMoves
-    ;dw Mon092_EvosMoves
-    ;dw Mon123_EvosMoves
-    ;dw Mon120_EvosMoves
-    ;dw Mon009_EvosMoves
-    ;dw Mon127_EvosMoves
-    ;dw Mon114_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon058_EvosMoves
-    ;dw Mon095_EvosMoves
-    ;dw Mon022_EvosMoves
-    ;dw Mon016_EvosMoves
-    ;dw Mon079_EvosMoves
-    ;dw Mon064_EvosMoves
-    ;dw Mon075_EvosMoves
-    ;dw Mon113_EvosMoves
-    ;dw Mon067_EvosMoves
-    ;dw Mon122_EvosMoves
-    ;dw Mon106_EvosMoves
-    ;dw Mon107_EvosMoves
-    ;dw Mon024_EvosMoves
-    ;dw Mon047_EvosMoves
-    ;dw Mon054_EvosMoves
-    ;dw Mon096_EvosMoves
-    ;dw Mon076_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon126_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon125_EvosMoves
-    ;dw Mon082_EvosMoves
-    ;dw Mon109_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon056_EvosMoves
-    ;dw Mon086_EvosMoves
-    ;dw Mon050_EvosMoves
-    ;dw Mon128_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon083_EvosMoves
-    ;dw Mon048_EvosMoves
-    ;dw Mon149_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon084_EvosMoves
-    ;dw Mon060_EvosMoves
-    ;dw Mon124_EvosMoves
-    ;dw Mon146_EvosMoves
-    ;dw Mon144_EvosMoves
-    ;dw Mon145_EvosMoves
-    ;dw Mon132_EvosMoves
-    ;dw Mon052_EvosMoves
-    ;dw Mon098_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon037_EvosMoves
-    ;dw Mon038_EvosMoves
-    ;dw Mon025_EvosMoves
-    ;dw Mon026_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon147_EvosMoves
-    ;dw Mon148_EvosMoves
-    ;dw Mon140_EvosMoves
-    ;dw Mon141_EvosMoves
-    ;dw Mon116_EvosMoves
-    ;dw Mon117_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon027_EvosMoves
-    ;dw Mon028_EvosMoves
-    ;dw Mon138_EvosMoves
-    ;dw Mon139_EvosMoves
-    ;dw Mon039_EvosMoves
-    ;dw Mon040_EvosMoves
-    ;dw Mon133_EvosMoves
-    ;dw Mon136_EvosMoves
-    ;dw Mon135_EvosMoves
-    ;dw Mon134_EvosMoves
-    ;dw Mon066_EvosMoves
-    ;dw Mon041_EvosMoves
-    ;dw Mon023_EvosMoves
-    ;dw Mon046_EvosMoves
-    ;dw Mon061_EvosMoves
-    ;dw Mon062_EvosMoves
-    ;dw Mon013_EvosMoves
-    ;dw Mon014_EvosMoves
-    ;dw Mon015_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon085_EvosMoves
-    ;dw Mon057_EvosMoves
-    ;dw Mon051_EvosMoves
-    ;dw Mon049_EvosMoves
-    ;dw Mon087_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon010_EvosMoves
-    ;dw Mon011_EvosMoves
-    ;dw Mon012_EvosMoves
-    ;dw Mon068_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon055_EvosMoves
-    ;dw Mon097_EvosMoves
-    ;dw Mon042_EvosMoves
-    ;dw Mon150_EvosMoves
-    ;dw Mon143_EvosMoves
-    ;dw Mon129_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon089_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon099_EvosMoves
-    ;dw Mon091_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon101_EvosMoves
-    ;dw Mon036_EvosMoves
-    ;dw Mon110_EvosMoves
-    ;dw Mon053_EvosMoves
-    ;dw Mon105_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon093_EvosMoves
-    ;dw Mon063_EvosMoves
-    ;dw Mon065_EvosMoves
-    ;dw Mon017_EvosMoves
-    ;dw Mon018_EvosMoves
-    ;dw Mon121_EvosMoves
-    ;dw Mon001_EvosMoves
-    ;dw Mon003_EvosMoves
-    ;dw Mon073_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon118_EvosMoves
-    ;dw Mon119_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon077_EvosMoves
-    ;dw Mon078_EvosMoves
-    ;dw Mon019_EvosMoves
-    ;dw Mon020_EvosMoves
-    ;dw Mon033_EvosMoves
-    ;dw Mon030_EvosMoves
-    ;dw Mon074_EvosMoves
-    ;dw Mon137_EvosMoves
-    ;dw Mon142_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon081_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon004_EvosMoves
-    ;dw Mon007_EvosMoves
-    ;dw Mon005_EvosMoves
-    ;dw Mon008_EvosMoves
-    ;dw Mon006_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw MissingNo_EvosMoves
-    ;dw Mon043_EvosMoves
-    ;dw Mon044_EvosMoves
-    ;dw Mon045_EvosMoves
-    ;dw Mon069_EvosMoves
-    ;dw Mon070_EvosMoves
-    ;dw Mon071_EvosMoves
+    dw Mon112_EvosMoves
+    dw Mon115_EvosMoves
+    dw Mon032_EvosMoves
+    dw Mon035_EvosMoves
+    dw Mon021_EvosMoves
+    dw Mon100_EvosMoves
+    dw Mon034_EvosMoves
+    dw Mon080_EvosMoves
+    dw Mon002_EvosMoves
+    dw Mon103_EvosMoves
+    dw Mon108_EvosMoves
+    dw Mon102_EvosMoves
+    dw Mon088_EvosMoves
+    dw Mon094_EvosMoves
+    dw Mon029_EvosMoves
+    dw Mon031_EvosMoves
+    dw Mon104_EvosMoves
+    dw Mon111_EvosMoves
+    dw Mon131_EvosMoves
+    dw Mon059_EvosMoves
+    dw Mon151_EvosMoves
+    dw Mon130_EvosMoves
+    dw Mon090_EvosMoves
+    dw Mon072_EvosMoves
+    dw Mon092_EvosMoves
+    dw Mon123_EvosMoves
+    dw Mon120_EvosMoves
+    dw Mon009_EvosMoves
+    dw Mon127_EvosMoves
+    dw Mon114_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon058_EvosMoves
+    dw Mon095_EvosMoves
+    dw Mon022_EvosMoves
+    dw Mon016_EvosMoves
+    dw Mon079_EvosMoves
+    dw Mon064_EvosMoves
+    dw Mon075_EvosMoves
+    dw Mon113_EvosMoves
+    dw Mon067_EvosMoves
+    dw Mon122_EvosMoves
+    dw Mon106_EvosMoves
+    dw Mon107_EvosMoves
+    dw Mon024_EvosMoves
+    dw Mon047_EvosMoves
+    dw Mon054_EvosMoves
+    dw Mon096_EvosMoves
+    dw Mon076_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon126_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon125_EvosMoves
+    dw Mon082_EvosMoves
+    dw Mon109_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon056_EvosMoves
+    dw Mon086_EvosMoves
+    dw Mon050_EvosMoves
+    dw Mon128_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon083_EvosMoves
+    dw Mon048_EvosMoves
+    dw Mon149_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon084_EvosMoves
+    dw Mon060_EvosMoves
+    dw Mon124_EvosMoves
+    dw Mon146_EvosMoves
+    dw Mon144_EvosMoves
+    dw Mon145_EvosMoves
+    dw Mon132_EvosMoves
+    dw Mon052_EvosMoves
+    dw Mon098_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon037_EvosMoves
+    dw Mon038_EvosMoves
+    dw Mon025_EvosMoves
+    dw Mon026_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon147_EvosMoves
+    dw Mon148_EvosMoves
+    dw Mon140_EvosMoves
+    dw Mon141_EvosMoves
+    dw Mon116_EvosMoves
+    dw Mon117_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon027_EvosMoves
+    dw Mon028_EvosMoves
+    dw Mon138_EvosMoves
+    dw Mon139_EvosMoves
+    dw Mon039_EvosMoves
+    dw Mon040_EvosMoves
+    dw Mon133_EvosMoves
+    dw Mon136_EvosMoves
+    dw Mon135_EvosMoves
+    dw Mon134_EvosMoves
+    dw Mon066_EvosMoves
+    dw Mon041_EvosMoves
+    dw Mon023_EvosMoves
+    dw Mon046_EvosMoves
+    dw Mon061_EvosMoves
+    dw Mon062_EvosMoves
+    dw Mon013_EvosMoves
+    dw Mon014_EvosMoves
+    dw Mon015_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon085_EvosMoves
+    dw Mon057_EvosMoves
+    dw Mon051_EvosMoves
+    dw Mon049_EvosMoves
+    dw Mon087_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon010_EvosMoves
+    dw Mon011_EvosMoves
+    dw Mon012_EvosMoves
+    dw Mon068_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon055_EvosMoves
+    dw Mon097_EvosMoves
+    dw Mon042_EvosMoves
+    dw Mon150_EvosMoves
+    dw Mon143_EvosMoves
+    dw Mon129_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon089_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon099_EvosMoves
+    dw Mon091_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon101_EvosMoves
+    dw Mon036_EvosMoves
+    dw Mon110_EvosMoves
+    dw Mon053_EvosMoves
+    dw Mon105_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon093_EvosMoves
+    dw Mon063_EvosMoves
+    dw Mon065_EvosMoves
+    dw Mon017_EvosMoves
+    dw Mon018_EvosMoves
+    dw Mon121_EvosMoves
+    dw Mon001_EvosMoves
+    dw Mon003_EvosMoves
+    dw Mon073_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon118_EvosMoves
+    dw Mon119_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon077_EvosMoves
+    dw Mon078_EvosMoves
+    dw Mon019_EvosMoves
+    dw Mon020_EvosMoves
+    dw Mon033_EvosMoves
+    dw Mon030_EvosMoves
+    dw Mon074_EvosMoves
+    dw Mon137_EvosMoves
+    dw Mon142_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon081_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon004_EvosMoves
+    dw Mon007_EvosMoves
+    dw Mon005_EvosMoves
+    dw Mon008_EvosMoves
+    dw Mon006_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon043_EvosMoves
+    dw Mon044_EvosMoves
+    dw Mon045_EvosMoves
+    dw Mon069_EvosMoves
+    dw Mon070_EvosMoves
+    dw Mon071_EvosMoves
 
 GoPalSetBattleAndLoadText:
     ld b,1
@@ -50446,6 +50445,9 @@ Func_3a948: ; 3a948 (e:6948)
     jp Func_3a8e1
 
 LearnMoveFromLevelUp:
+    xor a
+    ld [wEvolutionMove],a ; Initialize to ZERO
+LearnMoveFromLevelUp_AfterEvolutionMove:
     ld a,[$d11e]
     ld [$cf91],a
     cp a,MEW
@@ -50460,6 +50462,7 @@ LearnMoveFromLevelUp:
     ld a,[hli]
     ld h,[hl]
     ld l,a
+    call GetEvosMoves
 .skipEvolutionDataLoop
     ld a,[hli]
     and a
@@ -50475,19 +50478,24 @@ LearnMoveFromLevelUp:
     jr nz,.learnSetLoop
 .learnmove
     ld d,a
-    ld a,[$cc49]
-    and a
-    jr nz,.next
+    ld a,[wEvolutionMove] ; Is Different than Actual?
+    cp d
+    jr z,.learnSetLoop
+    push hl ; Backup Pointer to Corrent Learn Move's Level
+    ; Useless Code
+    ;ld a,[$cc49]
+    ;and a
+    ;jr nz,.next
     ld hl,W_PARTYMON1_MOVE1 ; $d173
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
     call AddNTimes
-.next
+;.next
     ld b,$4
 .checkCurrentMovesLoop
     ld a,[hli]
     cp d
-    jr z,.done
+    jr z,.LearnEndOrJustKnow
     dec b
     jr nz,.checkCurrentMovesLoop
     ld a,d
@@ -50497,13 +50505,16 @@ LearnMoveFromLevelUp:
     call CopyStringToCF4B
     ld a,$1b
     call Predef ; indirect jump to LearnMove (6e43 (1:6e43))
+.LearnEndOrJustKnow
+    pop hl ; Restore Pointer to Corrent Learn Move's Level
+    jr .learnSetLoop
 .done
     ld a,[$cf91]
     ld [$d11e],a
     ret
 .mew
     call TryRandomForMew
-    jr .learnmove ; learn mew new move
+    jr .done
 
 Func_3bb8c: ; Moved in the Bank
     ld hl,Func_3fb53 ; $7b53
@@ -50598,6 +50609,7 @@ Evolution_PartyMonLoop: ; Moved in the Bank
     ld a,[hli]
     ld h,[hl]
     ld l,a
+    call GetEvosMoves
     push hl
     ld a,[$cf91]
     push af
@@ -50712,7 +50724,8 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     ld bc,$1c
     call AddNTimes
     ld de,W_MONHEADER
-    call CopyData
+    ld a,BANK(BulbasaurBaseStats)
+    call FarCopyData
     ld a,[$d0b5]
     ld [$d0b8],a
     pop af
@@ -50781,7 +50794,7 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     push hl
     ld l,e
     ld h,d
-    jr nextEvoEntry2
+    jp Evolution_PartyMonLoop ; jr nextEvoEntry2
 
 nextEvoEntry1: ; Moved in the Bank
     inc hl
@@ -50794,7 +50807,7 @@ CheckEvolutionMove:
     ld hl,_CheckEvolutionMove
     ld b,BANK(_CheckEvolutionMove)
     call Bankswitch
-    jp LearnMoveFromLevelUp
+    jp LearnMoveFromLevelUp_AfterEvolutionMove
 
 UnnamedText_3bbd7: ; Moved in the Bank
     TX_FAR _UnnamedText_3bbd7
@@ -50834,7 +50847,12 @@ TryRandomForMew:
     dec b
     jr nz,.checkCurrentMovesLoop2
     ld a,d
-    ret
+    ld [$d0e0],a
+    ld [$d11e],a
+    call GetMoveName
+    call CopyStringToCF4B
+    ld a,$1b
+    jp Predef ; indirect jump to LearnMove (6e43 (1:6e43))
 
 SpecialTrainer: MACRO
     db \1,\2
@@ -50991,6 +51009,7 @@ WriteMonMoves: ; Moved in the Bank
     ld a,[hli]
     ld h,[hl]
     ld l,a
+    call GetEvosMoves
 .skipEvoEntriesLoop
     ld a,[hli]
     and a
@@ -51501,7 +51520,20 @@ Func_3aef7: ; Moved in the Bank
     pop de
     jp CopyData
 
-INCLUDE "constants/pokemon_learnset.asm"
+; Get Copy of Level UP EvosMoves in GenericBuffer
+GetEvosMoves:
+    push de
+    ld a,[$CEE9] ; Backup
+    push af
+    ld a,BANK(MissingNo_EvosMoves)
+    ld de,GenericBuffer
+    ld bc,96
+    call FarCopyData ; copy bc bytes of data from a:hl to de
+    pop af
+    ld [$CEE9],a ; Restore
+    ld hl,GenericBuffer
+    pop de
+    ret
 
 SECTION "bankF",ROMX,BANK[$F]
 
@@ -82913,6 +82945,9 @@ LevelByLevelFix:
     ld c,a    ; load the final level to grow to over to c
     ld a,[$cd46]    ; load the current level into a ($cd46 = wTempCoins1)
     ld b,a    ; load the current level over to b
+    ; Check Error
+    cp c
+    jr nc,.Error_FinalLevelNotGreaterThenPrevious
 .inc_level    ; marker for looping back 
     inc b    ;increment     the current level
     ld a,b    ;put the current level in a
@@ -82926,6 +82961,11 @@ LevelByLevelFix:
     jr nz,.inc_level    ;loop back again if final level has not been reached
     ;;;;;;;;;;;;;;;;;;;;
     ret
+.Error_FinalLevelNotGreaterThenPrevious
+    ld a,c
+    dec a
+    ld b,a ; Force current level to final-1
+    jr .inc_level
 
 ; Celadon Dept. Store 2F (2)
 CeladonMart2Text2:
@@ -129563,37 +129603,6 @@ SearchFieldMoveInParty:
 
 SECTION "bank32",ROMX,BANK[$32]
 
-MewBaseStats: ; 425b (1:425b)
-    db DEX_MEW ; pokedex id
-    db 100 ; base hp
-    db 100 ; base attack
-    db 100 ; base defense
-    db 100 ; base speed
-    db 100 ; base special
-
-    db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
-
-    db 3 ; catch rate
-    db 64 ; base exp yield
-    db $55 ; sprite dimensions
-
-    dw MewPicFront
-    dw MewPicBack
-
-    ; attacks known at lvl 0
-    db TRANSFORM
-    db MIMIC
-    db MIRROR_MOVE
-    db METRONOME
-
-    db 3 ; growth rate
-
-    ; include learnset directly
-	db $ff,$ff,$ff,$ff,$ff,$ff,$ff
-
-    db BANK(MewPicFront)
-
 DratiniCave_h:
     db $0d ; tileset
     db DRATINI_CAVE_HEIGHT,DRATINI_CAVE_WIDTH ; dimensions (y,x)
@@ -130435,14 +130444,15 @@ _CheckEvolutionMove:
     and a
     jr z,.done
     ld d,a
-    ld a,[$cc49]
-    and a
-    jr nz,.next
+    ; Useless Code
+    ;ld a,[$cc49]
+    ;and a
+    ;jr nz,.next
     ld hl,W_PARTYMON1_MOVE1 ; $d173
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
     call AddNTimes
-.next
+;.next
     ld b,$4
 .checkCurrentMovesLoop
     ld a,[hli]
@@ -130453,6 +130463,7 @@ _CheckEvolutionMove:
     ld a,d
     ld [$d0e0],a
     ld [$d11e],a
+    ld [wEvolutionMove],a
     call GetMoveName
     call CopyStringToCF4B
     ld a,$1b
@@ -130618,225 +130629,225 @@ EvolutionMove:
 ; INPUT : $CD6D = Pointer to Mon Move List
 ;         d = pokemon ID
 ;         e = initial counter = 0
-GetPreEvolutionMove:
-    ld hl,.Pointer
-.next
-    ld a,[hli]
-    cp $FF ; Check $FF
-    jr z,.end
-    cp d ; Check Search Mon ID
-    jr z,.found
-    inc hl
-    inc hl
-    jr .next
-.found
-    ld a,[hli]
-    ld b,a
-    ld h,[hl]
-    ld l,b ; hl point to current mon pre evolution moves
-    ld b,e ; counter to b
-    call .getPointerToMonMoveList_DE
-.LoopMoves
-    ld a,[hli]
-    cp $FF
-    jr z,.endLoopMoves
-    ld [de],a
-    inc de
-    inc b ; counter++
-    jr .LoopMoves
-.endLoopMoves
-    call .setPointerToMonMoveList_DE
-    ld e,b ; counter to e
-.end
-    ret
-.getPointerToMonMoveList_DE
-    push hl
-    ld hl,$CD6D
-    ld a,[hli]
-    ld e,a
-    ld d,[hl]
-    pop hl
-    ret
-.setPointerToMonMoveList_DE
-    ld hl,$CD6D
-    ld a,e
-    ld [hli],a
-    ld a,d
-    ld [hl],d
-    ret
-.Pointer
-    PreEvolution IVYSAUR
-    PreEvolution VENUSAUR
-    PreEvolution CHARMELEON
-    PreEvolution CHARIZARD
-    PreEvolution WARTORTLE
-    PreEvolution BLASTOISE
-    PreEvolution PIDGEOTTO
-    PreEvolution PIDGEOT
-    PreEvolution RATICATE
-    PreEvolution FEAROW
-    PreEvolution ARBOK
-    PreEvolution SANDSLASH
-    PreEvolution NIDORINA
-    PreEvolution NIDOQUEEN
-    PreEvolution NIDORINO
-    PreEvolution NIDOKING
-    PreEvolution GOLBAT
-    PreEvolution GLOOM
-    PreEvolution VILEPLUME
-    PreEvolution PARASECT
-    PreEvolution VENOMOTH
-    PreEvolution DUGTRIO
-    PreEvolution PERSIAN
-    PreEvolution GOLDUCK
-    PreEvolution PRIMEAPE
-    PreEvolution POLIWHIRL
-    PreEvolution POLIWRATH
-    PreEvolution KADABRA
-    PreEvolution ALAKAZAM
-    PreEvolution MACHOKE
-    PreEvolution MACHAMP
-    PreEvolution WEEPINBELL
-    PreEvolution VICTREEBEL
-    PreEvolution TENTACRUEL
-    PreEvolution GRAVELER
-    PreEvolution GOLEM
-    PreEvolution RAPIDASH
-    PreEvolution SLOWBRO
-    PreEvolution MAGNETON
-    PreEvolution DODRIO
-    PreEvolution DEWGONG
-    PreEvolution MUK
-    PreEvolution HAUNTER
-    PreEvolution GENGAR
-    PreEvolution HYPNO
-    PreEvolution KINGLER
-    PreEvolution ELECTRODE
-    PreEvolution MAROWAK
-    PreEvolution WEEZING
-    PreEvolution RHYDON
-    PreEvolution SEADRA
-    PreEvolution SEAKING
-    PreEvolution GYARADOS
-    PreEvolution OMASTAR
-    PreEvolution KABUTOPS
-    PreEvolution DRAGONAIR
-    PreEvolution DRAGONITE
-    db $FF
-.IVYSAUR
-    db TACKLE,GROWL,$FF
-.VENUSAUR
-    db TACKLE,GROWL,LEECH_SEED,CONSTRICT,VINE_WHIP,POISONPOWDER,DOUBLE_KICK,$FF
-.CHARMELEON
-    db SCRATCH,GROWL,$FF
-.CHARIZARD
-    db SCRATCH,GROWL,EMBER,LEER,FURY_SWIPES,FOCUS_ENERGY,SMOKESCREEN,$FF
-.WARTORTLE
-    db TACKLE,TAIL_WHIP,$FF
-.BLASTOISE
-    db TACKLE,TAIL_WHIP,BUBBLE,DOUBLESLAP,WATER_GUN,WITHDRAW,BITE,$FF
-.PIDGEOTTO
-    db GUST,GROWL,$FF
-.PIDGEOT
-    db GUST,GROWL,SAND_ATTACK,QUICK_ATTACK,PECK,WING_ATTACK,$FF
-.RATICATE
-    db TACKLE,TAIL_WHIP,SCRATCH,FURY_SWIPES,$FF
-.FEAROW
-    db GUST,GROWL,LEER,PECK,$FF
-.ARBOK
-    db WRAP,LEER,POISON_STING,LEECH_LIFE,$FF
-.SANDSLASH
-    db SCRATCH,DEFENSE_CURL,SAND_ATTACK,$FF
-.NIDORINA
-    db SCRATCH,GROWL,$FF
-.NIDOQUEEN
-    db SCRATCH,GROWL,TAIL_WHIP,$FF
-.NIDORINO
-    db TACKLE,LEER,$FF
-.NIDOKING
-    db TACKLE,LEER,HORN_ATTACK,$FF
-.GOLBAT
-    db LEECH_LIFE,SUPERSONIC,POISON_STING,$FF
-.GLOOM
-    db ABSORB,GROWTH,LEECH_SEED,$FF
-.VILEPLUME
-    db ABSORB,GROWTH,LEECH_SEED,ACID,$FF
-.PARASECT
-    db SCRATCH,STUN_SPORE,LEECH_SEED,LEECH_LIFE,POISONPOWDER,$FF
-.VENOMOTH
-    db TACKLE,DISABLE,SUPERSONIC,PSYWAVE,POISONPOWDER,CONFUSION,$FF
-.DUGTRIO
-    db SCRATCH,GROWL,AGILITY,$FF
-.PERSIAN
-    db SCRATCH,GROWL,TAIL_WHIP,PAY_DAY,QUICK_ATTACK,BITE,FURY_SWIPES,$FF
-.GOLDUCK
-    db SCRATCH,TAIL_WHIP,PSYWAVE,DISABLE,CONFUSION,PECK,FURY_SWIPES,$FF
-.PRIMEAPE
-    db SCRATCH,LEER,LOW_KICK,DOUBLE_TEAM,KARATE_CHOP,$FF
-.POLIWHIRL
-    db BUBBLE,HYPNOSIS,TACKLE,$FF
-.POLIWRATH
-    db BUBBLE,HYPNOSIS,TACKLE,WATER_GUN,$FF
-.KADABRA
-    db TELEPORT,$FF
-.ALAKAZAM
-    db TELEPORT,PSYWAVE,$FF
-.MACHOKE
-    db KARATE_CHOP,LEER,LOW_KICK,MEGA_PUNCH,$FF
-.MACHAMP
-    db KARATE_CHOP,LEER,LOW_KICK,MEGA_PUNCH,FOCUS_ENERGY,$FF
-.WEEPINBELL
-    db VINE_WHIP,GROWTH,LEECH_LIFE,$FF
-.VICTREEBEL
-    db VINE_WHIP,GROWTH,LEECH_LIFE,ACID,$FF
-.TENTACRUEL
-    db CONSTRICT,SUPERSONIC,ACID,LEECH_LIFE,WRAP,POISON_STING,$FF
-.GRAVELER
-    db TACKLE,DEFENSE_CURL,DOUBLESLAP,$FF
-.GOLEM
-    db TACKLE,DEFENSE_CURL,DOUBLESLAP,ROCK_THROW,$FF
-.RAPIDASH
-    db TACKLE,GROWL,AGILITY,QUICK_ATTACK,EMBER,STOMP,TAIL_WHIP,DOUBLE_KICK,SLAM,FIRE_SPIN,$FF
-.SLOWBRO
-    db TACKLE,GROWL,PSYWAVE,CONFUSION,WATER_GUN,DISABLE,HEADBUTT,$FF
-.MAGNETON
-    db TACKLE,FLASH,THUNDERSHOCK,SUPERSONIC,$FF
-.DODRIO
-    db PECK,GROWL,FURY_ATTACK,QUICK_ATTACK,STOMP,$FF
-.DEWGONG
-    db HEADBUTT,GROWL,LICK,DISABLE,WATER_GUN,TAKE_DOWN,AURORA_BEAM,$FF
-.MUK
-    db POUND,POISON_GAS,HARDEN,ACID,SCREECH,LICK,DISABLE,$FF
-.HAUNTER
-    db LICK,CONFUSE_RAY,LEECH_LIFE,$FF
-.GENGAR
-    db LICK,CONFUSE_RAY,LEECH_LIFE,NIGHT_SHADE,$FF
-.HYPNO
-    db POUND,DISABLE,TELEPORT,PSYWAVE,HYPNOSIS,DREAM_EATER,$FF
-.KINGLER
-    db BUBBLE,LEER,BLADE,VICEGRIP,CLAMP,$FF
-.ELECTRODE
-    db TACKLE,SCREECH,FLASH,SONICBOOM,$FF
-.MAROWAK
-    db TACKLE,GROWL,TAIL_WHIP,BONE_CLUB,LEER,$FF
-.WEEZING
-    db TACKLE,POISON_GAS,SMOG,ACID,SCREECH,HARDEN,SELFDESTRUCT,$FF
-.RHYDON
-    db HORN_ATTACK,TAIL_WHIP,HARDEN,STOMP,FURY_ATTACK,STRIKE,LEER,TAKE_DOWN,ROCK_THROW,BODY_SLAM,$FF
-.SEADRA
-    db BUBBLE,SMOKESCREEN,LEER,DISABLE,WATER_GUN,SMOG,$FF
-.SEAKING
-    db SPLASH,TAIL_WHIP,PECK,SUPERSONIC,BUBBLE,HORN_ATTACK,WATER_GUN,POISON_STING,AGILITY,$FF
-.GYARADOS
-    db SPLASH,$FF
-.OMASTAR
-    db CONSTRICT,WITHDRAW,WATER_GUN,BITE,LEER,SLAM,BUBBLEBEAM,AURORA_BEAM,REST,ROCK_THROW,$FF
-.KABUTOPS
-    db SCRATCH,HARDEN,ABSORB,BUBBLE,LEER,BLADE,WATER_GUN,AURORA_BEAM,LEECH_LIFE,ROCK_THROW,$FF
-.DRAGONAIR
-    db WRAP,LEER,SUPERSONIC,THUNDER_WAVE,BUBBLEBEAM,SLAM,THUNDERSHOCK,EMBER,$FF
-.DRAGONITE
-    db WRAP,LEER,SUPERSONIC,THUNDER_WAVE,BUBBLEBEAM,SLAM,THUNDERSHOCK,EMBER,AURORA_BEAM,AGILITY,MIST,DRAGON_RAGE,LIGHT_SCREEN,HAZE,ICE_BEAM,FLAMETHROWER,THUNDERBOLT,BODY_SLAM,$FF
+;GetPreEvolutionMove:
+;    ld hl,.Pointer
+;.next
+;    ld a,[hli]
+;    cp $FF ; Check $FF
+;    jr z,.end
+;    cp d ; Check Search Mon ID
+;    jr z,.found
+;    inc hl
+;    inc hl
+;    jr .next
+;.found
+;    ld a,[hli]
+;    ld b,a
+;    ld h,[hl]
+;    ld l,b ; hl point to current mon pre evolution moves
+;    ld b,e ; counter to b
+;    call .getPointerToMonMoveList_DE
+;.LoopMoves
+;    ld a,[hli]
+;    cp $FF
+;    jr z,.endLoopMoves
+;    ld [de],a
+;    inc de
+;    inc b ; counter++
+;    jr .LoopMoves
+;.endLoopMoves
+;    call .setPointerToMonMoveList_DE
+;    ld e,b ; counter to e
+;.end
+;    ret
+;.getPointerToMonMoveList_DE
+;    push hl
+;    ld hl,$CD6D
+;    ld a,[hli]
+;    ld e,a
+;    ld d,[hl]
+;    pop hl
+;    ret
+;.setPointerToMonMoveList_DE
+;    ld hl,$CD6D
+;    ld a,e
+;    ld [hli],a
+;    ld a,d
+;    ld [hl],d
+;    ret
+;.Pointer
+;    PreEvolution IVYSAUR
+;    PreEvolution VENUSAUR
+;    PreEvolution CHARMELEON
+;    PreEvolution CHARIZARD
+;    PreEvolution WARTORTLE
+;    PreEvolution BLASTOISE
+;    PreEvolution PIDGEOTTO
+;    PreEvolution PIDGEOT
+;    PreEvolution RATICATE
+;    PreEvolution FEAROW
+;    PreEvolution ARBOK
+;    PreEvolution SANDSLASH
+;    PreEvolution NIDORINA
+;    PreEvolution NIDOQUEEN
+;    PreEvolution NIDORINO
+;    PreEvolution NIDOKING
+;    PreEvolution GOLBAT
+;    PreEvolution GLOOM
+;    PreEvolution VILEPLUME
+;    PreEvolution PARASECT
+;    PreEvolution VENOMOTH
+;    PreEvolution DUGTRIO
+;    PreEvolution PERSIAN
+;    PreEvolution GOLDUCK
+;    PreEvolution PRIMEAPE
+;    PreEvolution POLIWHIRL
+;    PreEvolution POLIWRATH
+;    PreEvolution KADABRA
+;    PreEvolution ALAKAZAM
+;    PreEvolution MACHOKE
+;    PreEvolution MACHAMP
+;    PreEvolution WEEPINBELL
+;    PreEvolution VICTREEBEL
+;    PreEvolution TENTACRUEL
+;    PreEvolution GRAVELER
+;    PreEvolution GOLEM
+;    PreEvolution RAPIDASH
+;    PreEvolution SLOWBRO
+;    PreEvolution MAGNETON
+;    PreEvolution DODRIO
+;    PreEvolution DEWGONG
+;    PreEvolution MUK
+;    PreEvolution HAUNTER
+;    PreEvolution GENGAR
+;    PreEvolution HYPNO
+;    PreEvolution KINGLER
+;    PreEvolution ELECTRODE
+;    PreEvolution MAROWAK
+;    PreEvolution WEEZING
+;    PreEvolution RHYDON
+;    PreEvolution SEADRA
+;    PreEvolution SEAKING
+;    PreEvolution GYARADOS
+;    PreEvolution OMASTAR
+;    PreEvolution KABUTOPS
+;    PreEvolution DRAGONAIR
+;    PreEvolution DRAGONITE
+;    db $FF
+;.IVYSAUR
+;    db TACKLE,GROWL,$FF
+;.VENUSAUR
+;    db TACKLE,GROWL,LEECH_SEED,CONSTRICT,VINE_WHIP,POISONPOWDER,DOUBLE_KICK,$FF
+;.CHARMELEON
+;    db SCRATCH,GROWL,$FF
+;.CHARIZARD
+;    db SCRATCH,GROWL,EMBER,LEER,FURY_SWIPES,FOCUS_ENERGY,SMOKESCREEN,$FF
+;.WARTORTLE
+;    db TACKLE,TAIL_WHIP,$FF
+;.BLASTOISE
+;    db TACKLE,TAIL_WHIP,BUBBLE,DOUBLESLAP,WATER_GUN,WITHDRAW,BITE,$FF
+;.PIDGEOTTO
+;    db GUST,GROWL,$FF
+;.PIDGEOT
+;    db GUST,GROWL,SAND_ATTACK,QUICK_ATTACK,PECK,WING_ATTACK,$FF
+;.RATICATE
+;    db TACKLE,TAIL_WHIP,SCRATCH,FURY_SWIPES,$FF
+;.FEAROW
+;    db GUST,GROWL,LEER,PECK,$FF
+;.ARBOK
+;    db WRAP,LEER,POISON_STING,LEECH_LIFE,$FF
+;.SANDSLASH
+;    db SCRATCH,DEFENSE_CURL,SAND_ATTACK,$FF
+;.NIDORINA
+;    db SCRATCH,GROWL,$FF
+;.NIDOQUEEN
+;    db SCRATCH,GROWL,TAIL_WHIP,$FF
+;.NIDORINO
+;    db TACKLE,LEER,$FF
+;.NIDOKING
+;    db TACKLE,LEER,HORN_ATTACK,$FF
+;.GOLBAT
+;    db LEECH_LIFE,SUPERSONIC,POISON_STING,$FF
+;.GLOOM
+;    db ABSORB,GROWTH,LEECH_SEED,$FF
+;.VILEPLUME
+;    db ABSORB,GROWTH,LEECH_SEED,ACID,$FF
+;.PARASECT
+;    db SCRATCH,STUN_SPORE,LEECH_SEED,LEECH_LIFE,POISONPOWDER,$FF
+;.VENOMOTH
+;    db TACKLE,DISABLE,SUPERSONIC,PSYWAVE,POISONPOWDER,CONFUSION,$FF
+;.DUGTRIO
+;    db SCRATCH,GROWL,AGILITY,$FF
+;.PERSIAN
+;    db SCRATCH,GROWL,TAIL_WHIP,PAY_DAY,QUICK_ATTACK,BITE,FURY_SWIPES,$FF
+;.GOLDUCK
+;    db SCRATCH,TAIL_WHIP,PSYWAVE,DISABLE,CONFUSION,PECK,FURY_SWIPES,$FF
+;.PRIMEAPE
+;    db SCRATCH,LEER,LOW_KICK,DOUBLE_TEAM,KARATE_CHOP,$FF
+;.POLIWHIRL
+;    db BUBBLE,HYPNOSIS,TACKLE,$FF
+;.POLIWRATH
+;    db BUBBLE,HYPNOSIS,TACKLE,WATER_GUN,$FF
+;.KADABRA
+;    db TELEPORT,$FF
+;.ALAKAZAM
+;    db TELEPORT,PSYWAVE,$FF
+;.MACHOKE
+;    db KARATE_CHOP,LEER,LOW_KICK,MEGA_PUNCH,$FF
+;.MACHAMP
+;    db KARATE_CHOP,LEER,LOW_KICK,MEGA_PUNCH,FOCUS_ENERGY,$FF
+;.WEEPINBELL
+;    db VINE_WHIP,GROWTH,LEECH_LIFE,$FF
+;.VICTREEBEL
+;    db VINE_WHIP,GROWTH,LEECH_LIFE,ACID,$FF
+;.TENTACRUEL
+;    db CONSTRICT,SUPERSONIC,ACID,LEECH_LIFE,WRAP,POISON_STING,$FF
+;.GRAVELER
+;    db TACKLE,DEFENSE_CURL,DOUBLESLAP,$FF
+;.GOLEM
+;    db TACKLE,DEFENSE_CURL,DOUBLESLAP,ROCK_THROW,$FF
+;.RAPIDASH
+;    db TACKLE,GROWL,AGILITY,QUICK_ATTACK,EMBER,STOMP,TAIL_WHIP,DOUBLE_KICK,SLAM,FIRE_SPIN,$FF
+;.SLOWBRO
+;    db TACKLE,GROWL,PSYWAVE,CONFUSION,WATER_GUN,DISABLE,HEADBUTT,$FF
+;.MAGNETON
+;    db TACKLE,FLASH,THUNDERSHOCK,SUPERSONIC,$FF
+;.DODRIO
+;    db PECK,GROWL,FURY_ATTACK,QUICK_ATTACK,STOMP,$FF
+;.DEWGONG
+;    db HEADBUTT,GROWL,LICK,DISABLE,WATER_GUN,TAKE_DOWN,AURORA_BEAM,$FF
+;.MUK
+;    db POUND,POISON_GAS,HARDEN,ACID,SCREECH,LICK,DISABLE,$FF
+;.HAUNTER
+;    db LICK,CONFUSE_RAY,LEECH_LIFE,$FF
+;.GENGAR
+;    db LICK,CONFUSE_RAY,LEECH_LIFE,NIGHT_SHADE,$FF
+;.HYPNO
+;    db POUND,DISABLE,TELEPORT,PSYWAVE,HYPNOSIS,DREAM_EATER,$FF
+;.KINGLER
+;    db BUBBLE,LEER,BLADE,VICEGRIP,CLAMP,$FF
+;.ELECTRODE
+;    db TACKLE,SCREECH,FLASH,SONICBOOM,$FF
+;.MAROWAK
+;    db TACKLE,GROWL,TAIL_WHIP,BONE_CLUB,LEER,$FF
+;.WEEZING
+;    db TACKLE,POISON_GAS,SMOG,ACID,SCREECH,HARDEN,SELFDESTRUCT,$FF
+;.RHYDON
+;    db HORN_ATTACK,TAIL_WHIP,HARDEN,STOMP,FURY_ATTACK,STRIKE,LEER,TAKE_DOWN,ROCK_THROW,BODY_SLAM,$FF
+;.SEADRA
+;    db BUBBLE,SMOKESCREEN,LEER,DISABLE,WATER_GUN,SMOG,$FF
+;.SEAKING
+;    db SPLASH,TAIL_WHIP,PECK,SUPERSONIC,BUBBLE,HORN_ATTACK,WATER_GUN,POISON_STING,AGILITY,$FF
+;.GYARADOS
+;    db SPLASH,$FF
+;.OMASTAR
+;    db CONSTRICT,WITHDRAW,WATER_GUN,BITE,LEER,SLAM,BUBBLEBEAM,AURORA_BEAM,REST,ROCK_THROW,$FF
+;.KABUTOPS
+;    db SCRATCH,HARDEN,ABSORB,BUBBLE,LEER,BLADE,WATER_GUN,AURORA_BEAM,LEECH_LIFE,ROCK_THROW,$FF
+;.DRAGONAIR
+;    db WRAP,LEER,SUPERSONIC,THUNDER_WAVE,BUBBLEBEAM,SLAM,THUNDERSHOCK,EMBER,$FF
+;.DRAGONITE
+;    db WRAP,LEER,SUPERSONIC,THUNDER_WAVE,BUBBLEBEAM,SLAM,THUNDERSHOCK,EMBER,AURORA_BEAM,AGILITY,MIST,DRAGON_RAGE,LIGHT_SCREEN,HAZE,ICE_BEAM,FLAMETHROWER,THUNDERBOLT,BODY_SLAM,$FF
 
 ; four tiles: pokeball,black pokeball (status ailment),crossed out pokeball (faited) and pokeball slot (no mon)
 PokeballTileGraphics:
@@ -134554,6 +134565,7 @@ CheckSpecialWild_:
     db MOLTRES,55,MANSION_2 ; Mansion2_Moltres
     db ONIX,60,VICTORY_ROAD_2 ; VictoryRoad2_ShinyOnix
     db MEWTWO,70,UNKNOWN_DUNGEON_3 ; UnknownDungeon3_Mewtwo
+    db MEW,70,VERMILION_DOCK ; VermilionDock_Mew
     db $FF
 
 .SpecialWildMoves
@@ -134612,6 +134624,11 @@ CheckSpecialWild_:
     db RECOVER
     db SWIFT
     db SUBSTITUTE
+; VermilionDock_Mew
+    db SOFTBOILED
+    db MIMIC
+    db MIRROR_MOVE
+    db METRONOME
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -134653,3 +134670,12 @@ SECTION "Bank3a",ROMX,BANK[$3A]
 
 MonOverworldDataNew2_emimonserrate:
     INCBIN "gfx/denim/party_mon_sprites2_emimonserrate.w32.2bpp"
+
+; ──────────────────────────────────────────────────────────────────────
+
+SECTION "Bank3b",ROMX,BANK[$3B]
+
+INCLUDE "constants/pokemon_header.asm"
+INCLUDE "constants/pokemon_learnset.asm"
+
+; ──────────────────────────────────────────────────────────────────────
