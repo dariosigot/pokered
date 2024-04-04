@@ -16452,8 +16452,11 @@ LearnMove: ; 6e43 (1:6e43)
     ld de,$d036
     ld bc,$b
     call CopyData
-
-DontAbandonLearning: ; 6e5b (1:6e5b)
+    ; XX learned YY! ♫♪
+    ld hl,wFlagMoveRelearnEngagedBit0
+    bit 0,[hl]
+    ld hl,.LearnedTextPlusSound
+    call z,PrintText
     ld hl,W_PARTYMON1_MOVE1 ; $d173
     ld bc,$2c
     ld a,[wWhichPokemon] ; $cf92
@@ -16461,26 +16464,28 @@ DontAbandonLearning: ; 6e5b (1:6e5b)
     ld d,h
     ld e,l
     ld b,$4
-.asm_6e6b
+.FindEmptySlot
     ld a,[hl]
     and a
-    jr z,.asm_6e8b
+    jr z,.DoLearn
     inc hl
     dec b
-    jr nz,.asm_6e6b
+    jr nz,.FindEmptySlot
+    ; Return to First Move
+    ld bc,$fffc ; -4
+    add hl,bc
+.TryToLearnMove
     push de
-    call Func_6f07
+    call .LearnButJust4Moves
     pop de
-    jp c,Func_6eda
+    jr c,.AbandonLearningConfirm
     push hl
     push de
     ld [$d11e],a
     call GetMoveName
-    ld hl,EmptyText ; ld hl,UnnamedText_6fc8 ; $6fc8
-    call IsTryingToLearnPalFix ; call PrintText
     pop de
     pop hl
-.asm_6e8b
+.DoLearn
     ld a,[$d0e0]
     ld [hl],a
     ld bc,$15
@@ -16500,14 +16505,17 @@ DontAbandonLearning: ; 6e5b (1:6e5b)
     ld [hl],a
     ld a,[W_ISINBATTLE] ; $d057
     and a
-    jp z,PrintLearnedMove
+    jr z,.PrintLearnedMove
     ld a,[wWhichPokemon] ; $cf92
     ld b,a
     ld a,[wPlayerMonNumber] ; $cc2f
     cp b
-    jp CheckTransformedDuringLearnMove ; Hack Jump ; jp nz,PrintLearnedMove
-
-UpdateActiveMonMoves: ; Hack Jump
+    jp nz,.PrintLearnedMove
+    ; Check Transformed
+    ld a,[W_PLAYERBATTSTATUS3]
+    bit 3,a ; is the mon transformed?
+	jp nz,.PrintLearnedMove
+    ; Update Active Mon Moves
     ld h,d
     ld l,e
     ld de,W_PLAYERMONMOVES
@@ -16518,11 +16526,17 @@ UpdateActiveMonMoves: ; Hack Jump
     ld de,W_PLAYERMONPP ; $d02d
     ld bc,$4
     call CopyData
-    jp PrintLearnedMove
+    jr .PrintLearnedMove
 
-Func_6eda: ; 6eda (1:6eda)
-    call ChangeLearnToRelearnText1 ; ld hl,UnnamedText_6fb9 ; $6fb9
-    call IsTryingToLearnPalFix ; call PrintText
+.AbandonLearningConfirm
+    push hl
+    push de
+    ; Abandon learning YY?
+    ld hl,wFlagMoveRelearnEngagedBit0
+    bit 0,[hl]
+    jp nz,.SkipAbandonConfirm
+    ld hl,.AbandonLearningText
+    call .IsTryingToLearnPalFix_PrintText
     FuncCoord 14,7 ; $c43a
     ld hl,Coord
     ld bc,$80f
@@ -16531,35 +16545,40 @@ Func_6eda: ; 6eda (1:6eda)
     call DisplayTextBoxID
     ld a,[wCurrentMenuItem] ; $cc26
     and a
-    jp nz,DontAbandonLearning
-    ds 3 ; ld hl,UnnamedText_6fbe ; $6fbe
-    call IsTryingToLearnPalFix_End_WithoutPrint ; call PrintText
-SkipAbandonConfirm:
+    jr nz,.Retry
+    ; ld hl,UnnamedText_6fbe ; $6fbe
+.SkipAbandonConfirm
+    call .IsTryingToLearnPalFix_End
+    pop de
+    pop hl
     ld b,$0
     ret
+.Retry
+    pop de
+    pop hl
+    jp .TryToLearnMove
 
-PrintLearnedMove: ; 6efe (1:6efe)
-    call ChangeLearnToRelearnText2 ; ld hl,UnnamedText_6fad ; $6fad
-    call IsTryingToLearnPalFix_End ; call PrintText
+.PrintLearnedMove
+    call .IsTryingToLearnPalFix_End
+    ld hl,.ForgotAndLearnText
+    call PrintText
     ld b,$1
     ret
 
-Func_6f07: ; 6f07 (1:6f07)
+.LearnButJust4Moves
     push hl
-    call ChangeLearnToRelearnText3 ; ld hl,UnnamedText_6fc3 ; $6fc3
-    call IsTryingToLearnPalFix ; call PrintText
+    ld hl,.ReplaceAMoveForText ; Replace a move for YY?
+    call .IsTryingToLearnPalFix_PrintText
     FuncCoord 14,7 ; $c43a
     ld hl,Coord
     ld bc,$80f
     ld a,$14
     ld [$d125],a
     call NewMoveDetails ; call DisplayTextBoxID
-    pop hl
     ld a,[wCurrentMenuItem] ; $cc26
     rra
+    pop hl
     ret c
-    ld bc,$fffc
-    add hl,bc
     push hl
     ld de,$d0dc
     ld bc,$4
@@ -16567,10 +16586,7 @@ Func_6f07: ; 6f07 (1:6f07)
     ld hl,Func_39b87
     ld b,BANK(Func_39b87)
     call Bankswitch ; indirect jump to Func_39b87 (39b87 (e:5b87))
-    pop hl
-.asm_6f39
-    push hl
-    ld hl,UnnamedText_6fb4 ; $6fb4
+    ld hl,.WhichMoveShouldBeReplacedText ; $6fb4
     call PrintText
     FuncCoord 4,7 ; $c430
     ld hl,Coord
@@ -16610,72 +16626,55 @@ Func_6f07: ; 6f07 (1:6f07)
     pop af
     pop hl
     bit 1,a
-    jr nz,.asm_6fab
+    jr nz,.asm_6fab_B_Pressed
     push hl
     ld a,[wCurrentMenuItem] ; $cc26
     ld c,a
     ld b,$0
     add hl,bc
     ld a,[hl]
-    push af
-    push bc
-    call IsMoveHM
-    pop bc
-    pop de
-    ld a,d
-    jr c,.asm_6fa2
     pop hl
     add hl,bc
-    and a
+    and a ; rcf
     ret
-.asm_6fa2
-    ld hl,UnnamedText_6fe1 ; $6fe1
-    call PrintText
-    pop hl
-    jr .asm_6f39
-.asm_6fab
+.asm_6fab_B_Pressed
     scf
     ret
 
-UnnamedText_6fad: ; 6fb4 (1:6fb4)
-    TX_FAR UnnamedText_a273b
+.LearnedTextPlusSound
+    TX_FAR _LearnedText
     db $b,6,"@"
 
-UnnamedText_6fb4: ; 6fb4 (1:6fb4)
-    TX_FAR _UnnamedText_6fb4
+.WhichMoveShouldBeReplacedText
+    TX_FAR _WhichMoveShouldBeReplacedText
     db "@"
 
-UnnamedText_6fb9: ; 6fb9 (1:6fb9)
-    TX_FAR _UnnamedText_6fb9
+.AbandonLearningText
+    TX_FAR _AbandonLearningText
     db "@"
 
-UnnamedText_6fbe: ; 6fbe (1:6fbe)
-    TX_FAR _UnnamedText_6fbe
+.ReplaceAMoveForText
+    TX_FAR _ReplaceAMoveForText
     db "@"
 
-UnnamedText_6fc3: ; 6fc3 (1:6fc3)
-    TX_FAR _UnnamedText_6fc3
+.ForgotAndLearnText
+    TX_FAR _ForgotAndLearnText
     db "@"
 
-UnnamedText_6fc8: ; 6fc8 (1:6fc8)
-    TX_FAR _UnnamedText_6fc8 ; 0xa2819
-    db $a
-    db $8
-    ld a,$ae
-    call PlaySoundWaitForCurrent
-    ld hl,UnnamedText_6fd7 ; $6fd7
-    ret
+.IsTryingToLearnPalFix_PrintText
+    push hl
+    call IsTryingToLearnPalFix
+    pop hl
+    jp PrintText    
 
-UnnamedText_6fd7: ; 6fd7 (1:6fd7)
-    TX_FAR _UnnamedText_6fd7 ; 0xa2827
-    db $a ; 0x6fdb
-UnnamedText_6fdc: ; 6fdc (1:6fdc)
-    TX_FAR _UnnamedText_6fdc
-    db "@"
+.IsTryingToLearnPalFix_End
+    ld a,[W_ISINBATTLE]
+    and a
+    ret z
+    call LoadScreenTilesFromBuffer1
+    jp GoPAL_SET_CF1C
 
-UnnamedText_6fe1: ; 6fe1 (1:6fe1)
-    TX_FAR _UnnamedText_6fe1
-    db "@"
+SECTION "DisplayPokemonCenterDialogue_",ROMX[$6fe6],BANK[$1]
 
 DisplayPokemonCenterDialogue_: ; 6fe6 (1:6fe6)
     call SaveScreenTilesToBuffer1 ; save screen
@@ -18512,27 +18511,6 @@ TextBoxCoordTable: ; 7391 (1:7391)
 
     db $ff ; terminator
 
-IsTryingToLearnPalFix:
-    ld a,[W_ISINBATTLE]
-    and a
-    jr z,.end
-    push hl
-    ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
-    ld hl,HidePlayerBattleHudAndStandarizePalette
-    call Bankswitch
-    pop hl
-.end
-    jp PrintText
-
-IsTryingToLearnPalFix_End:
-    call PrintText
-IsTryingToLearnPalFix_End_WithoutPrint:
-    ld a,[W_ISINBATTLE]
-    and a
-    ret z
-    call LoadScreenTilesFromBuffer1
-    jp GoPAL_SET_CF1C
-
 PrintDenimVersionAndSaveScreenTilesToBuffer2:
     ld a,[wFlagGameBoyColor]
     cp a,$11
@@ -18609,22 +18587,14 @@ GenRandomAndAdvanceRNGState:
     pop hl
     ret
 
-CheckTransformedDuringLearnMove:
-    jp nz,PrintLearnedMove
-    ld a,[W_PLAYERBATTSTATUS3]
-    bit 3,a ; is the mon transformed?
-	jp nz,PrintLearnedMove
-    jp UpdateActiveMonMoves
-
 NewMoveDetails:
-    ld a,[W_ISINBATTLE]
-    and a
-    push af
-    call nz,.PrintNewLearnMoveDetail
+    call .PrintNewLearnMoveDetail
     call DisplayTextBoxID
-    pop af
-    ret z ; NotInBattle
-    jp LoadScreenTilesFromBuffer1
+    ld a,[wCurrentMenuItem] ; $cc26
+    rra
+    ret nc
+    call LoadScreenTilesFromBuffer1
+    jp IsTryingToLearnPalFix
 .PrintNewLearnMoveDetail
     ; Backup
     push bc
@@ -18639,8 +18609,14 @@ NewMoveDetails:
     ld b,BANK(GetCurrentMove)
     ld hl,GetCurrentMove
     call Bankswitch
-    FuncCoord 0,8
+    ;ld a,[W_ISINBATTLE]
+    ;and a
+    ;FuncCoord 0,9
+    ;ld de,Coord
+    ;jr nz,.InBattle
+    FuncCoord 4,9
     ld de,Coord
+;.InBattle
     ld b,BANK(GetCurrentMoveDetails)
     ld hl,GetCurrentMoveDetails
     call Bankswitch
@@ -18651,8 +18627,13 @@ NewMoveDetails:
     pop bc
     ret
 
-EmptyText:
-    db "@"
+IsTryingToLearnPalFix:
+    ld a,[W_ISINBATTLE]
+    and a
+    ret z
+    ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
+    ld hl,HidePlayerBattleHudAndStandarizePalette
+    jp Bankswitch
 
 SwapItemNew:
     dec hl
@@ -18764,37 +18745,6 @@ CheckDiglettsCave:
 .done
     ld hl,DungeonWarpData ; $63d8
     ret
-
-ChangeLearnToRelearnText1:
-    ld hl,wFlagMoveRelearnEngagedBit0
-    bit 0,[hl]
-    ld hl,UnnamedText_6fb9
-    ret z
-    pop af ; Remove Return Pointer
-    jp SkipAbandonConfirm
-
-ChangeLearnToRelearnText2:
-    ld hl,wFlagMoveRelearnEngagedBit0
-    bit 0,[hl]
-    ld hl,UnnamedText_6fad
-    ret z
-    ld hl,.UnnamedText_6fad_R
-    ret
-.UnnamedText_6fad_R
-    TX_FAR UnnamedText_a273b_R ; relearned
-    db $b,6,"@"
-
-
-ChangeLearnToRelearnText3:
-    ld hl,wFlagMoveRelearnEngagedBit0
-    bit 0,[hl]
-    ld hl,UnnamedText_6fc3
-    ret z
-    ld hl,.UnnamedText_6fc3_R
-    ret
-.UnnamedText_6fc3_R
-    TX_FAR _UnnamedText_6fc3_R ; relearned / Replace a move for
-    db "@"
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -23112,6 +23062,35 @@ RemoveItemFromInventory_: ; ce74 (3:4e74)
 .done
     ret
 
+ReadRodData:
+    ld b,BANK(_ReadRodData)
+    ld hl,_ReadRodData
+    call Bankswitch
+    ld a,[wFishingLevel]
+    ld b,a
+    ld a,[wFishingSpecies]
+    ld c,a
+    ret
+
+OldRodData:
+    db CERULEAN_CITY
+    db VERMILION_CITY
+    db FUCHSIA_CITY
+    db ROUTE_10
+    db ROUTE_11
+    db ROUTE_12
+    db ROUTE_13
+    db ROUTE_17
+    db ROUTE_18
+    db ROUTE_24
+    db ROUTE_25
+    db VERMILION_DOCK
+    db SAFARI_ZONE_EAST
+    db SAFARI_ZONE_NORTH
+    db SAFARI_ZONE_WEST
+    db SAFARI_ZONE_CENTER
+    db $FF
+
 SECTION "UseItem_",ROMX[$55c7],BANK[$3]
 
 UseItem_: ; d5c7 (3:55c7)
@@ -23181,7 +23160,7 @@ ItemUsePtrTable: ; d5e1 (3:55e1)
     dw ItemUseEvoStone   ; LEAF_STONE
     dw ItemUseCardKey    ; CARD_KEY
     dw UnusableItem      ; NUGGET
-    dw ItemUseTechMach  ; TECH_MACHINE
+    dw ItemUseTechMach   ; TECH_MACHINE
     dw ItemUsePokedoll   ; POKE_DOLL
     dw ItemUseMedicine   ; FULL_HEAL
     dw ItemUseMedicine   ; REVIVE
@@ -25213,26 +25192,26 @@ ItemUseTMHM: ; e479 (3:6479)
     call GetMoveName
     call CopyStringToCF4B ; copy name to $cf4b
     pop af
-    ld hl,BootedUpTMText
-    jr nc,.printBootedUpMachineText
-    ld hl,BootedUpHMText
-.printBootedUpMachineText
-    ds 3 ; call PrintText
-    ld hl,TeachMachineMoveText
-    call PrintText
-    FuncCoord 14,7
-    ld hl,Coord
-    ld bc,$080f
-    ld a,$14
-    ld [$d125],a
-    call DisplayTextBoxID ; yes/no menu
-    ld a,[wCurrentMenuItem]
-    and a
-    jr z,.useMachine
-    ld a,2
-    ld [$cd6a],a ; item not used
-    ret
-.useMachine
+    ;ld hl,BootedUpTMText
+    ;jr nc,.printBootedUpMachineText
+    ;ld hl,BootedUpHMText
+;.printBootedUpMachineText
+    ; call PrintText
+    ;ld hl,TeachMachineMoveText
+    ; call PrintText
+    ;FuncCoord 14,7
+    ;ld hl,Coord
+    ;ld bc,$080f
+    ;ld a,$14
+    ;ld [$d125],a
+    ;call DisplayTextBoxID ; yes/no menu
+    ;ld a,[wCurrentMenuItem]
+    ;and a
+    ;jr z,.useMachine
+    ;ld a,2
+    ;ld [$cd6a],a ; item not used
+    ;ret
+;.useMachine
     ld a,[$cf92]
     push af
     ld a,[$cf91]
@@ -25283,8 +25262,12 @@ ItemUseTMHM: ; e479 (3:6479)
     ld b,BANK(Func_2fe18)
     call Bankswitch ; check if the pokemon already knows the move
     jr c,.chooseMon
+    ld hl,wFlagMoveRelearnEngagedBit0
+    set 0,[hl]
     ld a,$1b
     call Predef ; teach move
+    ld hl,wFlagMoveRelearnEngagedBit0
+    res 0,[hl]
     pop af
     ld [$cf91],a
     pop af
@@ -25872,74 +25855,18 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     jr nz,.asm_e8b1
     ret
 
-; checks if the tile in front of the player is a shore or water tile
-; used for surfing and fishing
-; unsets carry if it is,sets carry if not
-IsNextTileShoreOrWater: ; e8b8 (3:68b8)
-    ld a,[W_CURMAPTILESET]
-    ld hl,WaterTilesets
-    ld de,1
-    call IsInArray
-    jr nc,.notShoreOrWater
-    ld a,[W_CURMAPTILESET]
-    cp a,$0e ; Vermilion Dock tileset
-    ld a,[$cfc6] ; tile in front of player
-    jr z,.skipShoreTiles ; if it's the Vermilion Dock tileset
-    cp a,$48 ; eastern shore tile in Safari Zone
-    jr z,.shoreOrWater
-    cp a,$32 ; usual eastern shore tile
-    jr z,.shoreOrWater
-.skipShoreTiles
-    cp a,$14 ; water tile
-    jr z,.shoreOrWater
-.notShoreOrWater
-    scf
-    ret
-.shoreOrWater
-    and a
-    ret
-
-; tilesets with water
-WaterTilesets: ; e8e0 (3:68e0)
-    db $00,$03,$05,$07,$0d,$0e,$11,$16,$17
-    db $ff ; terminator
-
-ReadRodData:
-    ld b,BANK(_ReadRodData)
-    ld hl,_ReadRodData
-    call Bankswitch
-    ld a,[wFishingLevel]
-    ld b,a
-    ld a,[wFishingSpecies]
-    ld c,a
-    ret
-
-OldRodData:
-    db CERULEAN_CITY
-    db VERMILION_CITY
-    db FUCHSIA_CITY
-    db ROUTE_10
-    db ROUTE_11
-    db ROUTE_12
-    db ROUTE_13
-    db ROUTE_17
-    db ROUTE_18
-    db ROUTE_24
-    db ROUTE_25
-    db VERMILION_DOCK
-    db SAFARI_ZONE_EAST
-    db SAFARI_ZONE_NORTH
-    db SAFARI_ZONE_WEST
-    db SAFARI_ZONE_CENTER
-    db $FF
-
 ItemUseTechMach:
     ld a,[$d152]
     push af
     ld a,[$cf91]
     ld [$d152],a
     push af
+    call LoadHpBarAndStatusTilePatterns
+    ld a,[wLastTechMachIdUsed] ; restore last choice
+    ld [$cf91],a
     call GetTMChoiceItemID ; put item_ID in $cf91
+    ld a,[$cf91]
+    ld [wLastTechMachIdUsed],a ; overwrite last choice
     call c,ItemUseTMHM
     pop af
     ld [$cf91],a
@@ -25948,6 +25875,17 @@ ItemUseTechMach:
     ret
 
 GetTMChoiceItemID:
+    cp TM_01 ; less then TM01?
+    jr c,.Init
+    cp TM_54+1 ; greater then TM54?
+    jr nc,.Init
+    call GetTMQty
+    jr z,.Init
+    push af
+    call .PrintBasicLayoutTMChoice
+    pop af
+    jr .start
+.Init
     ld hl,wTM
     ld b,((TM_54-TM_01+1) >> 2)+1
 .LoopSearchAtLeastOne
@@ -26016,15 +25954,15 @@ GetTMChoiceItemID:
     ld hl,Coord
     ld bc,$020e ; 2,14
     call TextBoxBorder
-    FuncCoord 18,11
+    FuncCoord 5,11
     ld hl,Coord
     ld de,.Arrows
     jp PlaceString
 
 .ClearScreenArea
-    FuncCoord 5,11
+    FuncCoord 6,11
     ld hl,Coord
-    ld bc,$020d ; 2,13
+    ld bc,$020c ; 2,12
     jp ClearScreenArea
 
 .GetAndPlaceTMStats
@@ -26067,7 +26005,7 @@ GetTMChoiceItemID:
     TX_FAR _ChoiceTMText
     db "@"
 .Arrows
-    db "▶@"
+    db $d6,"            ▶@"
 .X
     db "×@"
 
@@ -99703,6 +99641,48 @@ ATTR_BLK_StatusScreen2:
     ;db $03,%00000101
     ;db $13,$00,$13,$00 ; Paging
 
+; checks if the tile in front of the player is a shore or water tile
+; used for surfing and fishing
+; unsets carry if it is,sets carry if not
+IsNextTileShoreOrWater: ; Moved in the Bank
+    ld a,[W_CURMAPTILESET]
+    ld hl,WaterTilesets
+    ld de,1
+    call IsInArray
+    jr nc,.notShoreOrWater
+    ld a,[W_CURMAPTILESET]
+    cp a,$0e ; Vermilion Dock tileset
+    ld a,[$cfc6] ; tile in front of player
+    jr z,.skipShoreTiles ; if it's the Vermilion Dock tileset
+    cp a,$48 ; eastern shore tile in Safari Zone
+    jr z,.shoreOrWater
+    cp a,$32 ; usual eastern shore tile
+    jr z,.shoreOrWater
+.skipShoreTiles
+    cp a,$14 ; water tile
+    jr z,.shoreOrWater
+.notShoreOrWater
+    scf
+    ret
+.shoreOrWater
+    and a
+    ret
+
+; tilesets with water
+WaterTilesets: ; Moved in the Bank
+    db $00,$03,$05,$07,$0d,$0e,$11,$16,$17
+    db $ff ; terminator
+
+CreateMonOvWorldSprInstruction_End:
+    call AddTradeBaloonRule
+    ld hl,wSpriteOAMBySpecies
+    bit 0,[hl]
+    ret z ; NoRename
+    res 0,[hl]
+    inc hl ; wSpriteOAMBySpeciesId
+    ld [hl],0
+    ret
+
 SECTION "BorderPalettes",ROMX[$6788],BANK[$1C]
 
 BorderPalettes: ; 72788 (1c:6788)
@@ -100914,7 +100894,6 @@ CreateMonOvWorldSprInstruction:
     ld hl,wSpriteOAMBySpecies
     bit 0,[hl]
     jr z,.NoRename
-    res 0,[hl]
     inc hl ; hl point to wSpriteOAMBySpeciesId
     ld a,1
     jr .StartCreation
@@ -101003,7 +100982,7 @@ CreateMonOvWorldSprInstruction:
     jr nz,.Done
     inc a
 .Done
-    call AddTradeBaloonRule
+    call CreateMonOvWorldSprInstruction_End ; call AddTradeBaloonRule
     ld hl,wLocationMonOvSprInstruction
     ret
 
@@ -126863,73 +126842,80 @@ _PokemartAnythingElseText: ; a2719 (28:6719)
     db $0,"Is there anything",$4f
     db "else I can do?",$57
 
-UnnamedText_a273b: ; a273b (28:673b)
+_LearnedText: ; a273b (28:673b)
     TX_RAM $d036
     db $0," learned",$4f
     db "@"
-
-UnnamedText_a2749: ; a2749 (28:6749)
     TX_RAM $cf4b
     db $0,"!@@"
 
-_UnnamedText_6fb4: ; a2750 (28:6750)
+_WhichMoveShouldBeReplacedText: ; a2750 (28:6750)
     db $0,"Which move should",$4e,"be replaced?",$57
     ds 1
 
-_UnnamedText_6fb9: ; a2771 (28:6771)
-    db $0,"Abandon learning",$4f
-    db "@"
+_AbandonLearningText: ; a2771 (28:6771)
+    ;db $0,"Abandon learning",$4f
+    ;db "@"
+    ;TX_RAM $cf4b
+    ;db $0,"?",$57
+    db $0,"Are you sure?",$57
 
-UnnamedText_a2784: ; a2784 (28:6784)
+;SECTION "_UnnamedText_6fbe",ROMX[$678a],BANK[$28]
+
+;_UnnamedText_6fbe: ; a278a (28:678a)
+;    TX_RAM $d036
+;    db $0,$4f
+;    db "did not learn",$55
+;    db "@"
+;    TX_RAM $cf4b
+;    db $0,"!",$58
+
+_ReplaceAMoveForText: ; a27a4 (28:67a4)
+    ;TX_RAM $d036
+    ;db $0," learned",$4f
+    ;db "@"
+    ;TX_RAM $cf4b
+    ;db $0,"!",$51
+    ;db "Replace a move for",$4f
+    ;db "@"
+    ;TX_RAM $cf4b
+    ;db $0,"?",$57
+    db 0,"Replace a move for",$4f
+    db "@"
     TX_RAM $cf4b
     db $0,"?",$57
 
-_UnnamedText_6fbe: ; a278a (28:678a)
-    TX_RAM $d036
-    db $0,$4f
-    db "did not learn",$55
-    db "@"
+;SECTION "_UnnamedText_6fc8",ROMX[$6819],BANK[$28]
 
-UnnamedText_a279e: ; a279e (28:679e)
-    TX_RAM $cf4b
-    db $0,"!",$58
+;_UnnamedText_6fc8: ; a2819 (28:6819)
+;    db $0,"1,2 and...@@"
 
-_UnnamedText_6fc3: ; a27a4 (28:67a4)
-    TX_RAM $d036
-    db $0," learned",$4f
-    db "@"
+;_UnnamedText_6fd7: ; a2827 (28:6827)
+;    db $0," Poof!@@"
 
-UnnamedText_a27bd: ; a27bd (28:67bd)
-    TX_RAM $cf4b
-    db $0,"!",$51
-    db "Replace a move for",$4f
-    db "@"
+;_UnnamedText_6fdc: ; a2830 (28:6830)
+;    db $0,$51
+;    db "@"
+;    TX_RAM $d036
+;    db $0," forgot",$4f
+;    db "@"
+;    TX_RAM $cd6d
+;    db $0,"!",$51
+;    db "And...",$58
 
-UnnamedText_a2813: ; a2813 (28:6813)
-    TX_RAM $cf4b
-    db $0,"?",$57
+;_UnnamedText_6fe1: ; a284d (28:684d)
+;    db $0,"POWER Moves  ",$4f
+;    db "can't be deleted!",$58
 
-_UnnamedText_6fc8: ; a2819 (28:6819)
-    db $0,"1,2 and...@@"
-
-_UnnamedText_6fd7: ; a2827 (28:6827)
-    db $0," Poof!@@"
-
-_UnnamedText_6fdc: ; a2830 (28:6830)
-    db $0,$51
-    db "@"
-
-UnnamedText_a2833: ; a2833 (28:6833)
-    TX_RAM $d036
-    db $0," forgot",$4f
-    db "@"
+_ForgotAndLearnText:
+    db 0," ",$d5," @"
     TX_RAM $cd6d
-    db $0,"!",$51
-    db "And...",$58
+    db $0,$4f
+    db " ",$ed," @"
+    TX_RAM $cf4b
+    db $0,$58
 
-_UnnamedText_6fe1: ; a284d (28:684d)
-    db $0,"POWER Moves  ",$4f
-    db "can't be deleted!",$58
+SECTION "_PokemonCenterWelcomeText",ROMX[$686d],BANK[$28]
 
 _PokemonCenterWelcomeText: ; a286d (28:686d)
     db $0,"Welcome to our",$4f
@@ -126989,24 +126975,6 @@ _ChoiceTMText:
 _TMEmpy:
     db $0,"Technical",$4f
     db "Machines Empty!",$58
-
-UnnamedText_a273b_R: ; a273b (28:673b)
-    TX_RAM $d036
-    db $0," relearn",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
-
-_UnnamedText_6fc3_R:
-    TX_RAM $d036
-    db $0," relearn",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!",$51
-    db "Replace a move for",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"?",$57
 
 ; ───────────────────────────────
 ; Move Deleter
@@ -127086,8 +127054,6 @@ _MoveJustKnownText:
     db "@"
     TX_RAM $cf4b
     db $0,"!",$58
-
-
 
 SECTION "bank29",ROMX,BANK[$29]
 

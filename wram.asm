@@ -1543,6 +1543,7 @@ wSpriteOAMBySpecies:      ; df26 ; bit 0 = Flag Tentativo Rinomina
 wStatusScreenJustLoadBit1 ; fd26 ; bit 1 = Status Screen Picture Just Load
     ds 1
 wSpriteOAMBySpeciesId: ; df27 ; Denim
+wLastTechMachIdUsed: ; df27
     ds 1
 
 SECTION "wBlkCurrentPaletteColor", WRAMX[$df30], BANK[1] ; Denim
