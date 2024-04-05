@@ -16464,6 +16464,7 @@ LearnMove: ; 6e43 (1:6e43)
     ld d,h
     ld e,l
     ld b,$4
+    ld c,1 ; result
 .FindEmptySlot
     ld a,[hl]
     and a
@@ -16481,11 +16482,18 @@ LearnMove: ; 6e43 (1:6e43)
     jr c,.AbandonLearningConfirm
     push hl
     push de
-    ld [$d11e],a
-    call GetMoveName
+    call IsTryingToLearnPalFix_End
+    ld hl,wFlagMoveRelearnEngagedBit0
+    bit 0,[hl]
+    jr nz,.DoLearn2
+    ld hl,.ForgotAndLearnText
+    call PrintText
+.DoLearn2
     pop de
     pop hl
+    ld c,2 ; result
 .DoLearn
+    push bc
     ld a,[$d0e0]
     ld [hl],a
     ld bc,$15
@@ -16505,16 +16513,16 @@ LearnMove: ; 6e43 (1:6e43)
     ld [hl],a
     ld a,[W_ISINBATTLE] ; $d057
     and a
-    jr z,.PrintLearnedMove
+    jr z,.LearnedMoveComplete
     ld a,[wWhichPokemon] ; $cf92
     ld b,a
     ld a,[wPlayerMonNumber] ; $cc2f
     cp b
-    jp nz,.PrintLearnedMove
+    jp nz,.LearnedMoveComplete
     ; Check Transformed
     ld a,[W_PLAYERBATTSTATUS3]
     bit 3,a ; is the mon transformed?
-	jp nz,.PrintLearnedMove
+	jp nz,.LearnedMoveComplete
     ; Update Active Mon Moves
     ld h,d
     ld l,e
@@ -16526,7 +16534,7 @@ LearnMove: ; 6e43 (1:6e43)
     ld de,W_PLAYERMONPP ; $d02d
     ld bc,$4
     call CopyData
-    jr .PrintLearnedMove
+    jr .LearnedMoveComplete
 
 .AbandonLearningConfirm
     push hl
@@ -16536,7 +16544,7 @@ LearnMove: ; 6e43 (1:6e43)
     bit 0,[hl]
     jp nz,.SkipAbandonConfirm
     ld hl,.AbandonLearningText
-    call .IsTryingToLearnPalFix_PrintText
+    call IsTryingToLearnPalFix_PrintText
     FuncCoord 14,7 ; $c43a
     ld hl,Coord
     ld bc,$80f
@@ -16548,27 +16556,25 @@ LearnMove: ; 6e43 (1:6e43)
     jr nz,.Retry
     ; ld hl,UnnamedText_6fbe ; $6fbe
 .SkipAbandonConfirm
-    call .IsTryingToLearnPalFix_End
+    call IsTryingToLearnPalFix_End
     pop de
     pop hl
-    ld b,$0
+    ld b,$0 ; 0 = No Learn
     ret
 .Retry
     pop de
     pop hl
     jp .TryToLearnMove
-
-.PrintLearnedMove
-    call .IsTryingToLearnPalFix_End
-    ld hl,.ForgotAndLearnText
-    call PrintText
-    ld b,$1
+    
+.LearnedMoveComplete
+    pop bc
+    ld b,c ; 1 = Learn directly | 2 = Learn by replacing Move
     ret
 
 .LearnButJust4Moves
     push hl
     ld hl,.ReplaceAMoveForText ; Replace a move for YY?
-    call .IsTryingToLearnPalFix_PrintText
+    call IsTryingToLearnPalFix_PrintText
     FuncCoord 14,7 ; $c43a
     ld hl,Coord
     ld bc,$80f
@@ -16586,6 +16592,9 @@ LearnMove: ; 6e43 (1:6e43)
     ld hl,Func_39b87
     ld b,BANK(Func_39b87)
     call Bankswitch ; indirect jump to Func_39b87 (39b87 (e:5b87))
+    pop hl
+.ChoiceAnotherMoveToDelete
+    push hl
     ld hl,.WhichMoveShouldBeReplacedText ; $6fb4
     call PrintText
     FuncCoord 4,7 ; $c430
@@ -16616,6 +16625,8 @@ LearnMove: ; 6e43 (1:6e43)
     ld a,$3
     ld [hli],a
     ld [hl],$0
+    ld hl,wMenuWrappingEnabled
+    set 1,[hl]
     ld hl,$fff6
     set 1,[hl]
     call HandleMenuInput
@@ -16628,12 +16639,9 @@ LearnMove: ; 6e43 (1:6e43)
     bit 1,a
     jr nz,.asm_6fab_B_Pressed
     push hl
-    ld a,[wCurrentMenuItem] ; $cc26
-    ld c,a
-    ld b,$0
-    add hl,bc
-    ld a,[hl]
+    call CheckImportantMove
     pop hl
+    jr c,.ChoiceAnotherMoveToDelete
     add hl,bc
     and a ; rcf
     ret
@@ -16660,19 +16668,6 @@ LearnMove: ; 6e43 (1:6e43)
 .ForgotAndLearnText
     TX_FAR _ForgotAndLearnText
     db "@"
-
-.IsTryingToLearnPalFix_PrintText
-    push hl
-    call IsTryingToLearnPalFix
-    pop hl
-    jp PrintText    
-
-.IsTryingToLearnPalFix_End
-    ld a,[W_ISINBATTLE]
-    and a
-    ret z
-    call LoadScreenTilesFromBuffer1
-    jp GoPAL_SET_CF1C
 
 SECTION "DisplayPokemonCenterDialogue_",ROMX[$6fe6],BANK[$1]
 
@@ -18635,6 +18630,19 @@ IsTryingToLearnPalFix:
     ld hl,HidePlayerBattleHudAndStandarizePalette
     jp Bankswitch
 
+IsTryingToLearnPalFix_PrintText:
+    push hl
+    call IsTryingToLearnPalFix
+    pop hl
+    jp PrintText    
+
+IsTryingToLearnPalFix_End:
+    ld a,[W_ISINBATTLE]
+    and a
+    ret z
+    call LoadScreenTilesFromBuffer1
+    jp GoPAL_SET_CF1C
+
 SwapItemNew:
     dec hl
     ; hl = address of new entry
@@ -18745,6 +18753,69 @@ CheckDiglettsCave:
 .done
     ld hl,DungeonWarpData ; $63d8
     ret
+
+CheckImportantMove:
+
+    ; Get Move to Delete
+    ld a,[wCurrentMenuItem] ; $cc26
+    ld c,a
+    ld b,$0
+    add hl,bc
+    ld a,[hl]
+
+    push af ; Backup Move to Delete
+    push bc ; Backup Move Offset
+
+    ; Get Move Name and Potential Move List
+    push af
+    ld [$d11e],a
+    call GetMoveName
+    ld b,BANK(GetMonPotentialMoveList)
+    ld hl,GetMonPotentialMoveList
+    call Bankswitch
+    pop af
+
+    ; Search Move to Delete in Potential Move List
+    ld b,a
+    ld hl,wMoveRelearnerMoveList
+    ld a,[hli]
+    ld c,a
+.Loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFindThenImportant
+    cp b
+    jr z,.FindThenNotImportant
+    dec c
+    jr nz,.Loop
+.NotFindThenImportant
+
+    ld hl,.ImportantText
+    call IsTryingToLearnPalFix_PrintText
+
+    FuncCoord 14,7 ; $c43a
+    ld hl,Coord
+    ld bc,$80f
+    ld a,$14
+    ld [$d125],a
+    call DisplayTextBoxID
+    ld a,[wCurrentMenuItem] ; $cc26
+    and a
+    jr z,.ConfirmDelete
+
+    pop bc ; Restore Move Offset
+    pop af ; Backup Move to Delete
+    scf
+    ret
+.FindThenNotImportant
+.ConfirmDelete
+    pop bc ; Restore Move Offset
+    pop af ; Backup Move to Delete
+    and a ; rcf
+    ret
+.ImportantText
+    TX_FAR _ImportantText
+    db "@"
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -24277,7 +24348,7 @@ ItemUseMedicine: ; dabb (3:5abb)
     ld a,10
     ld b,a
     ld a,[hl] ; a = MSB of stat experience of the appropriate stat
-    cp a,100 ; is there already at least 25600 (256 * 100) stat experience?
+    cp a,247 ; is there already at least 63232 (256 * 253) stat experience?
     jr nc,.vitaminNoEffect ; if so,vitamins can't add any more
     add b ; add 2560 (256 * 10) stat experience
     jr nc,.noCarry3 ; a carry should be impossible here,so this will always jump
@@ -25265,16 +25336,26 @@ ItemUseTMHM: ; e479 (3:6479)
     ld hl,wFlagMoveRelearnEngagedBit0
     set 0,[hl]
     ld a,$1b
-    call Predef ; teach move
+    call Predef ; indirect jump to LearnMove (6e43 (1:6e43))
     ld hl,wFlagMoveRelearnEngagedBit0
     res 0,[hl]
     pop af
     ld [$cf91],a
     pop af
     ld [$cf92],a
-    ld a,b
+
+    ld a,b ; LearnMove result
     and a
     ret z
+
+    ; Print Learned or Replaced
+    cp 2
+    ld hl,.ForgotAndLearnText
+    jr z,.done
+    ld hl,.LearnText
+.done
+    call PrintText
+
     ld a,[$d152]
     and a
     ld a,[$cf91]
@@ -25284,6 +25365,12 @@ ItemUseTMHM: ; e479 (3:6479)
     jp RemoveUsedItem
 .TechMach
     jp RemoveTMQty ; but remove inside TM
+.LearnText
+    TX_FAR _LearnText
+    db "@"
+.ForgotAndLearnText
+    TX_FAR _ForgotAndLearnText
+    db "@"
 
 SECTION "PrintItemUseTextAndRemoveItem",ROMX[$6563],BANK[$3]
 
@@ -42861,10 +42948,10 @@ NameRaterObject: ; ??? (size=26)
 
     db $0 ; signs
 
-    db $3 ; people
+    db $2 ; people
     db SPRITE_MR_MASTERBALL,$3 + 4,$5 + 4,$ff,$d2,$1 ; person
     db SPRITE_GENTLEMAN,$3 + 4,$2 + 4,$ff,$d3,$2 ; person
-    db SPRITE_WHITE_PLAYER,$4 + 4,$5 + 4,$ff,$d2,$3 ; person
+    ;db SPRITE_WHITE_PLAYER,$4 + 4,$5 + 4,$ff,$d2,$3 ; person
 
     ; warp-to
     EVENT_DISP $4,$7,$2
@@ -42873,7 +42960,7 @@ NameRaterObject: ; ??? (size=26)
 NameRaterTextPointers: ; ??? (7:????)
     dw NameRaterText1
     dw MoveDeleterText
-    dw MoveRelearnerText
+    ;dw MoveRelearnerText
 
 ; ────────────────────────────────────────────────────────────
 ; Move Deleter
@@ -43086,8 +43173,16 @@ GetMoveNameNotZero:
 theErrorText:
     db "the ERROR!@"
 
+AnswerNoText:
+    TX_FAR _AnswerNoText
+    db "@"
+
 MoveDeleterIntroText:
     TX_FAR _MoveDeleterIntroText
+    db "@"
+
+NoPartyText:
+    TX_FAR _NoPartyText
     db "@"
 
 WhichPkmnForgotText:
@@ -43107,42 +43202,35 @@ OnlyOneMoveText:
     db "@"
 
 ; ────────────────────────────────────────────────────────────
-; Common Deleter & Relearner
-; ────────────────────────────────────────────────────────────
-
-AnswerNoText:
-    TX_FAR _AnswerNoText
-    db "@"
-
-NoPartyText:
-    TX_FAR _NoPartyText
-    db "@"
-
-; ────────────────────────────────────────────────────────────
 ; Move Relearner
 ; ────────────────────────────────────────────────────────────
 
 RELEARN_MOVE_SCREEN_LENGHT EQU 7
 
-MoveRelearnerText:
-    db $8
+;MoveRelearnerText:
+;    db $8
+
 MoveRelearner:
     call SaveScreenTilesToBuffer2
+
+    ld hl,wFlagMoveRelearnEngagedBit0
+    set 0,[hl]
 
     ld hl,.MoveRelearnerIntroText ; Intro Text
     call PrintText
     call YesNoChoice ; yes/no textbox
     ld a,[$CC26] ; yes/no answer (Y=0,N=1)
     and a
-    ld hl,AnswerNoText ; answer NO text
+    ld hl,.GoodbyeText
     jr nz,.PrintTextAndEndScript
 
     ld a,[W_NUMINPARTY]
     and a
-    ld hl,NoPartyText
+    ld hl,.NoPartyText
     jr z,.PrintTextAndEndScript
-    ld hl,.WhichPkmnRestoreText
-    call PrintText
+    ;ld hl,.WhichPkmnRestoreText
+    ;call PrintText
+.Start
     xor a
     ld [$cfcb],a  ; ?
     ld [$d07d],a  ; Item Menu Id
@@ -43164,15 +43252,198 @@ MoveRelearner:
 .CheckIfPokemonChosen ; $70c9
     jr nc,.ChosePokemon
 .ExitMenu
+    call .RestoreScreen
+    ld hl,.GoodbyeText
+.PrintTextAndEndScript
+    ld c,14
+    call DelayFrames
+    call PrintText
+    ld hl,wFlagMoveRelearnEngagedBit0
+    res 0,[hl]
+    jp TextScriptEnd
+.RestoreScreen
     call GBPalWhiteOutWithDelay3
     call Func_3dbe
-    call LoadGBPal
-    ld hl,AnswerNoText
-.PrintTextAndEndScript
-    call PrintText
-    jp TextScriptEnd
+    jp LoadGBPal
 .ChosePokemon
     call SaveScreenTilesToBuffer1 ; save screen
+
+    ; Get Mon Potential Move List in wMoveRelearnerMoveList
+    call GetMonPotentialMoveList
+
+    ; Check at least one move
+    and a
+    ld hl,.NoMoveToRelearnText
+    jp z,.PrintAndLoopParty ; No Move to Learn
+
+    ; Choice Move
+    ld hl,.RelearnWhichTechniqueText
+    call PrintText
+    ld hl,wMoveRelearnerMoveList
+    call ChoiceRelearnMove
+    push af
+    call LoadScreenTilesFromBuffer1 ; restore saved screen
+    pop af
+    jp nz,.LoopPartyMenu ; Choice another mon (B Pressed)
+
+    ; Get Mon Name
+    ld a,[wWhichPokemon] ; $cf92
+    ld hl,W_PARTYMON1NAME ; $d2b5
+    call GetPartyMonName
+    ld hl,$cd6d
+    ld de,$d036
+    ld bc,$b
+    call CopyData
+
+    ; Check Move Just Known
+    ld a,[$d11e]
+    call .CheckMoveJustKnown
+    ld hl,.MoveJustKnownText
+    jp z,.PrintAndLoopParty ; Move Just Known
+
+    ; Learn Move
+    ld a,$1b
+    call Predef ; indirect jump to LearnMove (6e43 (1:6e43))
+
+    ; Check Result
+    ld a,b
+    and a
+    jp z,.LoopPartyMenu
+
+    ; Backup Result
+    push af
+
+    ; Restore Screen
+    call .RestoreScreen
+    call UpdateSprites
+    ld hl,.NeedYourPokemonText
+    call PrintText
+
+    ; make the OAM turn left
+    ld c,14
+    call DelayFrames
+    xor a
+    ld [$ff8c],a
+    call IsSpriteInFrontOfPlayer
+    ld a,[$ff8c]
+    ld hl,wSpriteStateData1+2
+    ld bc,16
+    call AddNTimes
+    ld a,[hl]
+    add 8 ; facing left
+    ld [hl],a
+    call Delay3
+
+    ; Animate Ball & Sound (Force One Mon)
+    ld hl,W_NUMINPARTY
+    ld a,[hl]
+    push af
+    ld a,1
+    ld [hl],a
+    ld b,BANK(Func_70433)
+    ld hl,Func_70433
+    call Bankswitch ; do the healing machine animation
+    xor a
+    ld [wMusicHeaderPointer],a
+    ld a,[$c0f0]
+    ld [$c0ef],a
+    ld a,[$d35b]
+    ld [$cfca],a
+    ld [$c0ee],a
+    call PlaySound
+    pop af
+    ld [W_NUMINPARTY],a
+    ld c,14
+    call DelayFrames
+
+    ; Restore Result
+    pop af
+
+    ; Print Learned or Replaced
+    ld c,14
+    call DelayFrames
+    cp 2
+    ld hl,.ForgotAndLearnText
+    jr z,.done
+    ld hl,.LearnText
+.done
+    call PrintText
+
+    ; another learn?
+    ld c,14
+    call DelayFrames
+    ld hl,.AnotherLearnText ; Intro Text
+    call PrintText
+    call YesNoChoice ; yes/no textbox
+    ld a,[$CC26] ; yes/no answer (Y=0,N=1)
+    and a
+    ld hl,.GoodbyeText
+    jp nz,.PrintTextAndEndScript
+    
+    jp .Start
+
+.CheckMoveJustKnown
+    push hl
+    push de
+    ld e,a
+    ld hl,$cfa0 ; Loaded Move Mon Data
+    ld d,4
+.Loop
+    ld a,[hli]
+    and a
+    jr z,.MoveNotKnow
+    cp e
+    jr z,.MoveKnow ; z = Move Just Know
+    dec d
+    jr nz,.Loop
+.MoveNotKnow
+    ld a,e
+    and a ; nz = Move doesn't Know
+    jr .end
+.MoveKnow
+    ld a,e
+.end
+    pop de
+    pop hl
+    ret
+
+.MoveRelearnerIntroText:
+    TX_FAR _MoveRelearnerIntroText
+    db "@"
+.NoPartyText
+    TX_FAR _NoPartyText
+    db "@"
+.GoodbyeText
+    db $a ; wait a second
+    TX_FAR _GoodbyeText
+    db "@"
+;.WhichPkmnRestoreText
+;    TX_FAR _WhichPkmnRestoreText
+;    db "@"
+.NoMoveToRelearnText
+    TX_FAR _NoMoveToRelearnText
+    db "@"
+.RelearnWhichTechniqueText
+    TX_FAR _RelearnWhichTechniqueText
+    db "@"
+.MoveJustKnownText
+    TX_FAR _MoveJustKnownText
+    db "@"
+.NeedYourPokemonText:
+    TX_FAR _NeedYourPokemonText
+    db "@"
+.LearnText
+    TX_FAR _LearnText
+    db "@"
+.ForgotAndLearnText
+    TX_FAR _ForgotAndLearnText
+    db "@"
+.AnotherLearnText
+    db $a ; wait a second
+    TX_FAR _AnotherLearnText
+    db "@"
+
+GetMonPotentialMoveList:
 
     ; Load Mon Choice Data
     ld a,[wWhichPokemon] ; $cf92 ; Index of Choice Pkmn
@@ -43191,11 +43462,11 @@ MoveRelearner:
     rl d
     ld e,a
     add hl,de
-    ld de,$CD6D
+    ld de,GenericBuffer
     ld a,BANK(EvosMovesPointerTable)
     ld bc,2
     call FarCopyData
-    ld hl,$CD6D
+    ld hl,GenericBuffer
     ld a,[hli]
     ld h,[hl]
     ld l,a ; hl pointer to Correct EvosMoves
@@ -43227,20 +43498,6 @@ MoveRelearner:
     ld de,wMoveRelearnerMoveList+1 ; Final List Pointer
     ld b,0 ; initial counter = 0
 
-    ; Get Mon Move List from Header Base Moves
-    ;ld hl,W_MONHMOVES
-    ;ld c,4
-;.LoopHeaderMoves
-    ;ld a,[hli]
-    ;and a
-    ;jr z,.EndLoopHeaderMoves
-    ;ld [de],a
-    ;inc de
-    ;inc b
-    ;dec c
-    ;jr nz,.LoopHeaderMoves
-;.EndLoopHeaderMoves
-
     ; Get Mon Move List from Level UP EvosMoves (GenericBuffer)
     ld hl,GenericBuffer
 .skipEvolutionDataLoop
@@ -43267,121 +43524,7 @@ MoveRelearner:
     ld [de],a
     ld a,b
     ld [wMoveRelearnerMoveList],a ; Insert Counter
-
-    ; Check at least one move
-    and a
-    ld hl,.NoMoveToRelearnText
-    jp z,.PrintAndLoopParty ; No Move to Learn
-
-    ; Choice Move
-    ld hl,.RelearnWhichTechniqueText
-    call PrintText
-    ld hl,wMoveRelearnerMoveList
-    call ChoiceRelearnMove
-    push af
-    call LoadScreenTilesFromBuffer1 ; restore saved screen
-    pop af
-    jp nz,.LoopPartyMenu ; Choice another mon (B Pressed)
-
-    ; Remove HP Bar From Party
-    ;FuncCoord 13,0
-    ;ld hl,Coord
-    ;ld e,6
-;.Loop6
-    ;ld bc,$0207
-    ;push de
-    ;call ClearScreenArea
-    ;pop de
-    ;ld bc,-22
-    ;add hl,bc
-    ;ld a,$7f
-    ;ld [hli],a
-    ;ld [hli],a
-    ;ld bc,20
-    ;add hl,bc
-    ;dec e
-    ;jr nz,.Loop6
-
-    ; Change HP Party Palette to Green
-    ;ld hl,wFlagNoHpPalBit2
-    ;set 2,[hl]
-    ;ld b,$a
-    ;call GoPAL_SET ; Fail If Current MoveName is loaded
-    ;call Delay3
-
-    ; Get Mon Name
-    ld a,[wWhichPokemon] ; $cf92
-    ld hl,W_PARTYMON1NAME ; $d2b5
-    call GetPartyMonName
-    ld hl,$cd6d
-    ld de,$d036
-    ld bc,$b
-    call CopyData
-
-    ; Check Move Just Known
-    ld a,[$d11e]
-    call .CheckMoveJustKnown
-    ld hl,.MoveJustKnownText
-    jp z,.PrintAndLoopParty ; Move Just Known
-
-    ; Learn Move
-    ld hl,wFlagMoveRelearnEngagedBit0
-    set 0,[hl]
-    ld a,$1b
-    call Predef ; indirect jump to LearnMove (6e43 (1:6e43))
-    ld hl,wFlagMoveRelearnEngagedBit0
-    res 0,[hl]
-
-    ; Restore HP Party Palette
-    ;ld b,BANK(Func_71fb6)
-    ;ld hl,Func_71fb6
-    ;call Bankswitch
-    ;ld b,$a
-    ;call GoPAL_SET
-    ;call Delay3
-
-    jp .LoopPartyMenu
-
-.CheckMoveJustKnown
-    push hl
-    push de
-    ld e,a
-    ld hl,$cfa0 ; Loaded Move Mon Data
-    ld d,4
-.Loop
-    ld a,[hli]
-    and a
-    jr z,.MoveNotKnow
-    cp e
-    jr z,.MoveKnow ; z = Move Just Know
-    dec d
-    jr nz,.Loop
-.MoveNotKnow
-    ld a,e
-    and a ; nz = Move doesn't Know
-    jr .end
-.MoveKnow
-    ld a,e
-.end
-    pop de
-    pop hl
     ret
-
-.MoveRelearnerIntroText:
-    TX_FAR _MoveRelearnerIntroText
-    db "@"
-.WhichPkmnRestoreText
-    TX_FAR _WhichPkmnRestoreText
-    db "@"
-.NoMoveToRelearnText
-    TX_FAR _NoMoveToRelearnText
-    db "@"
-.RelearnWhichTechniqueText
-    TX_FAR _RelearnWhichTechniqueText
-    db "@"
-.MoveJustKnownText
-    TX_FAR _MoveJustKnownText
-    db "@"
 
 ; Choice Relearn Move Selected Pokemon (a = party index)
 ; output a = Flag Result,[wCurrentMenuItem] = Index of Choice
@@ -52081,7 +52224,7 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
     jr z,.noToxic
     call CheckLeechSeedFlag
     jr nz,.noToxic
-    jr .Toxic
+    ;jr .Toxic
     ;ds 21 - 12
 .Toxic
     ld a,[de]    ; increment toxic counter
@@ -55981,13 +56124,13 @@ INCBIN "baserom.gbc",$3e01e,$3e023 - $3e01e
 
 ; determines if attack is a critical hit
 CriticalHitTest:
-    ld b,BANK(_CriticalHitTest) ; same as _CriticalHitTest_NoBug
-    ld hl,_CriticalHitTest
-    ld a,[W_ISLINKBATTLE]
-    cp $4
-    jr z,.RunWithBUG
+    ld b,BANK(_CriticalHitTest_NoBug) ; same as _CriticalHitTest
+    ;ld hl,_CriticalHitTest
+    ;ld a,[W_ISLINKBATTLE]
+    ;cp $4
+    ;jr z,.RunWithBUG
     ld hl,_CriticalHitTest_NoBug
-.RunWithBUG
+;.RunWithBUG
     jp Bankswitch
 
 ResetLeechSeedFlagAndReadPlayerMonCurHPAndStatus:
@@ -56019,9 +56162,9 @@ InitPointerAndCheckToxic:
     ret
 
 CheckLeechSeedFlag:
-    ld a,[W_ISLINKBATTLE]
-    cp $4
-    ret z ; Return with BUG
+    ;ld a,[W_ISLINKBATTLE]
+    ;cp $4
+    ;ret z ; Return with BUG
     ; joenote - If this bit is set, this function is being called for leech seed.
     ; Do not do Toxic routines
     ld a,[wUnusedC000]
@@ -95759,8 +95902,13 @@ Func_70433: ; 70433 (1c:4433)
     push af
     ld a,$e0
     ld [rOBP1],a ; $FF00+$49
+    ld hl,wFlagMoveRelearnEngagedBit0
+    bit 0,[hl]
     ld hl,$c384
+    ld de,MoveRelearnerOAMData
+    jr nz,.moverelearner
     ld de,PokeCenterOAMData ; $44d7
+.moverelearner
     call Func_70503
     ld a,$4
     ld [wMusicHeaderPointer],a
@@ -95809,17 +95957,10 @@ Func_70433: ; 70433 (1c:4433)
     ld [hl],a
     jp UpdateSprites
 
-PokeCenterHealBall: ; 704b7 (1c:44b7)
+PokeCenterHealBall:
     INCBIN "gfx/pokecenter_ball.2bpp"
 
-PokeCenterOAMData: ; 704d7 (1c:44d7)
-    db $24,$34,$7C,$10 ; heal machine monitor
-    db $2B,$30,$7D,$10 ; pokeballs 1-6
-    db $2B,$38,$7D,$30
-    db $30,$30,$7D,$10
-    db $30,$38,$7D,$30
-    db $35,$30,$7D,$10
-    db $35,$38,$7D,$30
+SECTION "FlashingBallHealPokecenter",ROMX[$44f3],BANK[$1C]
 
 ; known jump sources: 7049f (1c:449f),708f3 (1c:48f3)
 FlashingBallHealPokecenter: ; 704f3 (1c:44f3) ; Denim,modificata interamente per funzionare sul GameBoyColor
@@ -99682,6 +99823,18 @@ CreateMonOvWorldSprInstruction_End:
     inc hl ; wSpriteOAMBySpeciesId
     ld [hl],0
     ret
+
+PokeCenterOAMData: ; Moved in the Bank
+    db $24,$34,$7C,$10 ; heal machine monitor
+    db $2B,$30,$7D,$10 ; pokeballs 1-6
+    db $2B,$38,$7D,$30
+    db $30,$30,$7D,$10
+    db $30,$38,$7D,$30
+    db $35,$30,$7D,$10
+    db $35,$38,$7D,$30
+
+MoveRelearnerOAMData:
+    db $3D,$3F,$7D,$10 ; pokeballs 1
 
 SECTION "BorderPalettes",ROMX[$6788],BANK[$1C]
 
@@ -123389,10 +123542,10 @@ _TM34ExplanationText: ; 980c0 (26:40c0)
     db $0,$51
     db "T.M. contains",$4f
     db "techniques that",$55
-    db "can be taught to",$55
+    db "can be added to",$55
     db "#MON!",$51
     db "When you",$4f
-    db "use one to teach",$55
+    db "use one to add",$55
     db "a new technique,",$55
     db "pick the #MON",$55
     db "carefully!",$51
@@ -126853,67 +127006,47 @@ _WhichMoveShouldBeReplacedText: ; a2750 (28:6750)
     db $0,"Which move should",$4e,"be replaced?",$57
     ds 1
 
-_AbandonLearningText: ; a2771 (28:6771)
-    ;db $0,"Abandon learning",$4f
-    ;db "@"
-    ;TX_RAM $cf4b
-    ;db $0,"?",$57
+_AbandonLearningText:
     db $0,"Are you sure?",$57
 
-;SECTION "_UnnamedText_6fbe",ROMX[$678a],BANK[$28]
-
-;_UnnamedText_6fbe: ; a278a (28:678a)
-;    TX_RAM $d036
-;    db $0,$4f
-;    db "did not learn",$55
-;    db "@"
-;    TX_RAM $cf4b
-;    db $0,"!",$58
-
-_ReplaceAMoveForText: ; a27a4 (28:67a4)
-    ;TX_RAM $d036
-    ;db $0," learned",$4f
-    ;db "@"
-    ;TX_RAM $cf4b
-    ;db $0,"!",$51
-    ;db "Replace a move for",$4f
-    ;db "@"
-    ;TX_RAM $cf4b
-    ;db $0,"?",$57
+_ReplaceAMoveForText:
     db 0,"Replace a move for",$4f
     db "@"
     TX_RAM $cf4b
     db $0,"?",$57
 
-;SECTION "_UnnamedText_6fc8",ROMX[$6819],BANK[$28]
+_ImportantText:
+    TX_RAM $cd6d
+    db $0," is a",$4f,"@"
+    TX_RAM $d036
+    db 0,"'s",$55
+    db "Exclusive Move!",$51
+    db "If replaced,",$4f,"@"
+    TX_RAM $d036
+    db 0," can't",$55
+    db "relearn it again!",$51
+    db "Permanently forget",$4f,"@"
+    TX_RAM $cd6d
+    db 0,"?",$57
 
-;_UnnamedText_6fc8: ; a2819 (28:6819)
-;    db $0,"1,2 and...@@"
-
-;_UnnamedText_6fd7: ; a2827 (28:6827)
-;    db $0," Poof!@@"
-
-;_UnnamedText_6fdc: ; a2830 (28:6830)
-;    db $0,$51
-;    db "@"
-;    TX_RAM $d036
-;    db $0," forgot",$4f
-;    db "@"
-;    TX_RAM $cd6d
-;    db $0,"!",$51
-;    db "And...",$58
-
-;_UnnamedText_6fe1: ; a284d (28:684d)
-;    db $0,"POWER Moves  ",$4f
-;    db "can't be deleted!",$58
+_LearnText:
+    db 0,"Ok! Added",$4f,"@"
+    TX_RAM $cf4b
+    db $0,$55,"in @"
+    TX_RAM $d036
+    db 0,"'s",$55
+    db "Moveset!",$58
 
 _ForgotAndLearnText:
-    db 0," ",$d5," @"
+    db 0,"Ok! Replaced",$4f,"@"
     TX_RAM $cd6d
-    db $0,$4f
-    db " ",$ed," @"
+    db $0,$55
+    db "with @"
     TX_RAM $cf4b
-    db $0,$58
+    db $0,$55,"in @"
+    TX_RAM $d036
+    db 0,"'s",$55
+    db "Moveset!",$58
 
 SECTION "_PokemonCenterWelcomeText",ROMX[$686d],BANK[$28]
 
@@ -126980,6 +127113,10 @@ _TMEmpy:
 ; Move Deleter
 ; ───────────────────────────────
 
+_AnswerNoText:
+    db $0,"Bye!",$4f
+    db "Come Again.",$57
+
 _MoveDeleterIntroText:
     db $0
     db "I'm MOVEDELETER."  ,$4f
@@ -127020,40 +127157,46 @@ _NoPartyText:
     db "Your party is" ,$4f
     db "Empty!"        ,$57
 
-_AnswerNoText:
-    db $0,"Bye!",$4f
-    db "Come Again.",$57
-
 ; ───────────────────────────────
 ; Move Relearner
 ; ───────────────────────────────
 
 _MoveRelearnerIntroText:
     db $0
-    db "I'm MOVERELEARNER.",$4f
-    db "Would you like to",$55
+    ;db "I'm MOVERELEARNER.",$4f
+    db "Would you like to",$4f
     db "restore one move",$55
     db "of your #MON?",$57
 
-_WhichPkmnRestoreText:
-    db $0,"Which #MON",$4f
-    db "must restore a",$55
-    db "move?",$58
+_GoodbyeText:
+    db $0,"We hope to see",$4f
+    db "you again!",$57
+
+;_WhichPkmnRestoreText:
+;    db $0,"Which #MON",$4f
+;    db "must restore a",$55
+;    db "move?",$58
 
 _NoMoveToRelearnText:
     db $0,"There aren't",$4f
-    db "Move to Relearn!",$58
+    db "Move to restore!",$58
 
 _RelearnWhichTechniqueText:
-    db $0,"Relearn which",$4f
+    db $0,"Restore which",$4f
     db "technique?",$57
 
 _MoveJustKnownText:
     TX_RAM $d036
-    db $0," knows",$4f
-    db "@"
+    db $0,$4f
+    db "already has",$55,"@"
     TX_RAM $cf4b
     db $0,"!",$58
+
+_AnotherLearnText:
+    db 0,"Restore another",$4f
+    db "move?",$57
+
+; ───────────────────────────────
 
 SECTION "bank29",ROMX,BANK[$29]
 
@@ -128217,29 +128360,21 @@ _BootedUpTMText: ; a6a1f (29:6a1f)
 _BootedUpHMText: ; a6a30 (29:6a30)
     db $0,"Booted up a PWR!",$58
 
-_TeachMachineMoveText: ; a6a42 (29:6a42)
-    ;db $0,"It contained",$4f
-    ;db "@"
-    ;TX_RAM $cf4b
-    ;db $0,"!",$51
+_TeachMachineMoveText:
     db $0,"Teach @"
     TX_RAM $cf4b
     db $0,$4f
     db "to a #MON?",$57
 
-SECTION "_MonCannotLearnMachineMoveText",ROMX[$6a6e],BANK[$29]
-
-_MonCannotLearnMachineMoveText: ; a6a6e (29:6a6e)
+_MonCannotLearnMachineMoveText:
     TX_RAM $cd6d
     db $0," is not",$4f
     db "compatible with",$55
     db "@"
     TX_RAM $cf4b
-    db $0,".",$51
-    db "It can't learn",$4f
-    db "@"
-    TX_RAM $cf4b
     db $0,".",$58
+
+SECTION "_ItemUseNotTimeText",ROMX[$6aa6],BANK[$29]
 
 _ItemUseNotTimeText: ; a6aa6 (29:6aa6)
     db $0,"OAK: ",$52,"!",$4f
@@ -128343,12 +128478,7 @@ _TooImportantToTossText: ; a8068 (2a:4068)
     db $0,"That's too impor-",$4f
     db "tant to toss!",$58
 
-_UnnamedText_2fe3b: ; a8088 (2a:4088)
-    TX_RAM $cd6d
-    db $0," knows",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!",$58
+SECTION "_UnnamedText_71d88",ROMX[$409a],BANK[$2a]
 
 _UnnamedText_71d88: ; a809a (2a:409a)
     db $0,"Okay,connect the",$4f
@@ -128474,6 +128604,13 @@ _UsedCutText:
 _PlateauGrassText:
     db $0,"The grass is",$4f
     db "too thick to CUT!",$58
+
+_UnnamedText_2fe3b:    
+    TX_RAM $cd6d
+    db $0,$4f
+    db "already has",$55,"@"
+    TX_RAM $cf4b
+    db $0,"!",$58
 
 SECTION "bank2B",ROMX,BANK[$2B]
 
@@ -130338,60 +130475,60 @@ ItemNames: ; 472b (1:472b)
     db "WATER POWER@"  ; $C6
     db "EARTH POWER@"  ; $C7
     db "FIRE POWER@"   ; $C8
-    db "TM:M. PUNCH@"  ; $C9 ; TM_01 ; Market
-    db "TM:RAZ. WIND@" ; $CA ; TM_02 ; Market
-    db "TM:SW. DANCE@" ; $CB ; TM_03
-    db "TM:WHIRLWIND@" ; $CC ; TM_04
-    db "TM:MEGA KICK@" ; $CD ; TM_05 ; Market
-    db "TM:TOXIC@"     ; $CE ; TM_06
-    db "TM:HORN DR.@"  ; $CF ; TM_07 ; Market
-    db "TM:BODY SLAM@" ; $D0 ; TM_08
-    db "TM:TAKE DOWN@" ; $D1 ; TM_09 ; Market
-    db "TM:DBL EDGE@"  ; $D2 ; TM_10
-    db "TM:BUBBLEB.@"  ; $D3 ; TM_11
-    db "TM:WATER GUN@" ; $D4 ; TM_12
-    db "TM:ICE BEAM@"  ; $D5 ; TM_13
-    db "TM:BLIZZARD@"  ; $D6 ; TM_14
-    db "TM:HYPER B.@"  ; $D7 ; TM_15
-    db "TM:PAY DAY@"   ; $D8 ; TM_16
-    db "TM:SUBMISS.@"  ; $D9 ; TM_17 ; Market
-    db "TM:COUNTER@"   ; $DA ; TM_18
-    db "TM:SSM TOSS@"  ; $DB ; TM_19
-    db "TM:RAGE@"      ; $DC ; TM_20
-    db "TM:M. DRAIN@"  ; $DD ; TM_21
-    db "TM:SOLARBEAM@" ; $DE ; TM_22
-    db "TM:DRG RAGE@"  ; $DF ; TM_23
-    db "TM:THUNDERB.@" ; $E0 ; TM_24
-    db "TM:THUNDER@"   ; $E1 ; TM_25
-    db "TM:EARTHQ.@"   ; $E2 ; TM_26
-    db "TM:FISSURE@"   ; $E3 ; TM_27
-    db "TM:DIG@"       ; $E4 ; TM_28
-    db "TM:PSYCHIC@"   ; $E5 ; TM_29
-    db "TM:TELEPORT@"  ; $E6 ; TM_30
-    db "TM:MIMIC@"     ; $E7 ; TM_31
-    db "TM:DBL TEAM@"  ; $E8 ; TM_32 ; Market
-    db "TM:REFLECT@"   ; $E9 ; TM_33 ; Market
-    db "TM:BIDE@"      ; $EA ; TM_34
-    db "TM:METRONOME@" ; $EB ; TM_35
-    db "TM:SELFDSTR@"  ; $EC ; TM_36
-    db "TM:EGG BOMB@"  ; $ED ; TM_37 ; Market
-    db "TM:FIRE BLST@" ; $EE ; TM_38
-    db "TM:SWIFT@"     ; $EF ; TM_39
-    db "TM:SKULL B.@"  ; $F0 ; TM_40
-    db "TM:FLASH@"     ; $F1 ; TM_55
-    db "TM:DREAM EAT@" ; $F2 ; TM_42
-    db "TM:SKY ATK@"   ; $F3 ; TM_43
-    db "TM:REST@"      ; $F4 ; TM_44
-    db "TM:THNDR WV@"  ; $F5 ; TM_45
-    db "TM:PSYWAVE@"   ; $F6 ; TM_46
-    db "TM:EXPLOSION@" ; $F7 ; TM_47
-    db "TM:RCK SLIDE@" ; $F8 ; TM_48
-    db "TM:TRI ATK@"   ; $F9 ; TM_49
-    db "TM:SUBSTIT.@"  ; $FA ; TM_50
-    db "TM:BLADE@"     ; $FB ; TM_51
-    db "TM:SWOOP@"     ; $FC ; TM_52
-    db "TM:TSUNAMI@"   ; $FD ; TM_53
-    db "TM:STRIKE@"    ; $FE ; TM_54
+    db "TM01:M.PNCH@"  ; $C9 ; TM_01 ; Market
+    db "TM02:RAZ.WND@" ; $CA ; TM_02 ; Market
+    db "TM03:SW.DNCE@" ; $CB ; TM_03
+    db "TM04:WHRLWND@" ; $CC ; TM_04
+    db "TM05:MEG.KCK@" ; $CD ; TM_05 ; Market
+    db "TM06:TOXIC@"   ; $CE ; TM_06
+    db "TM07:HRN DR.@" ; $CF ; TM_07 ; Market
+    db "TM08:BDY SLM@" ; $D0 ; TM_08
+    db "TM09:TAK.DWN@" ; $D1 ; TM_09 ; Market
+    db "TM10:DB.EDG@"  ; $D2 ; TM_10
+    db "TM11:BUB.B.@"  ; $D3 ; TM_11
+    db "TM12:WTR GUN@" ; $D4 ; TM_12
+    db "TM13:ICE BM.@" ; $D5 ; TM_13
+    db "TM14:BLZZARD@" ; $D6 ; TM_14
+    db "TM15:HYP.B.@"  ; $D7 ; TM_15
+    db "TM16:PAY DAY@" ; $D8 ; TM_16
+    db "TM17:SUBMIS.@" ; $D9 ; TM_17 ; Market
+    db "TM18:COUNTER@" ; $DA ; TM_18
+    db "TM19:SSM TOS@" ; $DB ; TM_19
+    db "TM20:RAGE@"    ; $DC ; TM_20
+    db "TM21:M.DRAIN@" ; $DD ; TM_21
+    db "TM22:SOLRBM.@" ; $DE ; TM_22
+    db "TM23:DRG RGE@" ; $DF ; TM_23
+    db "TM24:THUNDRB@" ; $E0 ; TM_24
+    db "TM25:THUNDER@" ; $E1 ; TM_25
+    db "TM26:EARTHQ.@" ; $E2 ; TM_26
+    db "TM27:FISSURE@" ; $E3 ; TM_27
+    db "TM28:DIG@"     ; $E4 ; TM_28
+    db "TM29:PSYCHIC@" ; $E5 ; TM_29
+    db "TM30:TELEPRT@" ; $E6 ; TM_30
+    db "TM31:MIMIC@"   ; $E7 ; TM_31
+    db "TM32:DB.TEAM@" ; $E8 ; TM_32 ; Market
+    db "TM33:REFLECT@" ; $E9 ; TM_33 ; Market
+    db "TM34:BIDE@"    ; $EA ; TM_34
+    db "TM35:METRONM@" ; $EB ; TM_35
+    db "TM36:SELFDST@" ; $EC ; TM_36
+    db "TM37:EGG BMB@" ; $ED ; TM_37 ; Market
+    db "TM38:FIR.BLS@" ; $EE ; TM_38
+    db "TM39:SWIFT@"   ; $EF ; TM_39
+    db "TM40:SKUL B.@" ; $F0 ; TM_40
+    db "TM55:FLASH@"   ; $F1 ; TM_55
+    db "TM42:DRM EAT@" ; $F2 ; TM_42
+    db "TM43:SKY ATK@" ; $F3 ; TM_43
+    db "TM44:REST@"    ; $F4 ; TM_44
+    db "TM45:THND WV@" ; $F5 ; TM_45
+    db "TM46:PSYWAVE@" ; $F6 ; TM_46
+    db "TM47:EXPLOS.@" ; $F7 ; TM_47
+    db "TM48:RCK SLD@" ; $F8 ; TM_48
+    db "TM49:TRI ATK@" ; $F9 ; TM_49
+    db "TM50:SUBSTIT@" ; $FA ; TM_50
+    db "TM51:BLADE@"   ; $FB ; TM_51
+    db "TM52:SWOOP@"   ; $FC ; TM_52
+    db "TM53:TSUNAMI@" ; $FD ; TM_53
+    db "TM54:STRIKE@"  ; $FE ; TM_54
     db "CANCEL@"       ; $FF
     db "ITEM 00@"      ; $00
 
@@ -133970,71 +134107,71 @@ AdvanceRNGState::
 ; determines if attack is a critical hit
 ; azure heights claims "the fastest pokémon (who are,not coincidentally,
 ; among the most popular) tend to CH about 20 to 25% of the time."
-_CriticalHitTest:
-    xor a
-    ld [$d05e],a
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    ld a,[$cfe5]
-    jr nz,.asm_3e032
-    ld a,[W_PLAYERMONID]
-.asm_3e032
-    ld [$d0b5],a
-    call GetMonHeader
-    ld a,[W_MONHBASESPEED]
-    ld b,a
-    srl b                        ; (effective (base speed/2))
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    ld hl,W_PLAYERMOVEPOWER ; $cfd4
-    ld de,W_PLAYERBATTSTATUS2 ; $d063
-    jr z,.calcCriticalHitProbability
-    ld hl,W_ENEMYMOVEPOWER ; $cfce
-    ld de,W_ENEMYBATTSTATUS2 ; $d068
-.calcCriticalHitProbability      ; 0x3e04f
-    ld a,[hld]                  ; read base power from RAM
-    and a
-    ret z                        ; do nothing if zero
-    dec hl
-    ld c,[hl]                   ; read move id
-    ld a,[de]
-    bit 2,a                     ; test for focus energy
-    jr nz,.focusEnergyUsed      ; bug: using focus energy causes a shift to the right instead of left,
-                                 ; resulting in 1/4 the usual crit chance
-    sla b                        ; (effective (base speed/2)*2)
-    jr nc,.noFocusEnergyUsed
-    ld b,$ff                    ; cap at 255/256
-    jr .noFocusEnergyUsed
-.focusEnergyUsed
-    srl b ; Restore Original
-.noFocusEnergyUsed
-    ld hl,HighCriticalMoves      ; table of high critical hit moves
-.Loop
-    ld a,[hli]                  ; read move from move table
-    cp c                         ; does it match the move about to be used?
-    jr z,.HighCritical          ; if so,the move about to be used is a high critical hit ratio move
-    inc a                        ; move on to the next move,FF terminates loop
-    jr nz,.Loop                 ; check the next move in HighCriticalMoves
-    srl b                        ; /2 for regular move (effective (base speed / 2))
-    jr .SkipHighCritical         ; continue as a normal move
-.HighCritical
-    sla b                        ; *2 for high critical hit moves
-    jr nc,.noCarry
-    ld b,$ff                    ; cap at 255/256
-.noCarry
-    sla b                        ; *4 for high critical move (effective (base speed/2)*8))
-    jr nc,.SkipHighCritical
-    ld b,$ff
-.SkipHighCritical
-    call GenRandomInBattle_CH       ; generates a random value,in "a"
-    rlc a
-    rlc a
-    rlc a
-    cp b                         ; check a against calculated crit rate
-    ret nc                       ; no critical hit if no borrow
-    ld a,$1
-    ld [$d05e],a                ; set critical hit flag
-    ret
+;_CriticalHitTest:
+;    xor a
+;    ld [$d05e],a
+;    ld a,[H_WHOSETURN] ; $FF00+$f3
+;    and a
+;    ld a,[$cfe5]
+;    jr nz,.asm_3e032
+;    ld a,[W_PLAYERMONID]
+;.asm_3e032
+;    ld [$d0b5],a
+;    call GetMonHeader
+;    ld a,[W_MONHBASESPEED]
+;    ld b,a
+;    srl b                        ; (effective (base speed/2))
+;    ld a,[H_WHOSETURN] ; $FF00+$f3
+;    and a
+;    ld hl,W_PLAYERMOVEPOWER ; $cfd4
+;    ld de,W_PLAYERBATTSTATUS2 ; $d063
+;    jr z,.calcCriticalHitProbability
+;    ld hl,W_ENEMYMOVEPOWER ; $cfce
+;    ld de,W_ENEMYBATTSTATUS2 ; $d068
+;.calcCriticalHitProbability      ; 0x3e04f
+;    ld a,[hld]                  ; read base power from RAM
+;    and a
+;    ret z                        ; do nothing if zero
+;    dec hl
+;    ld c,[hl]                   ; read move id
+;    ld a,[de]
+;    bit 2,a                     ; test for focus energy
+;    jr nz,.focusEnergyUsed      ; bug: using focus energy causes a shift to the right instead of left,
+;                                 ; resulting in 1/4 the usual crit chance
+;    sla b                        ; (effective (base speed/2)*2)
+;    jr nc,.noFocusEnergyUsed
+;    ld b,$ff                    ; cap at 255/256
+;    jr .noFocusEnergyUsed
+;.focusEnergyUsed
+;    srl b ; Restore Original
+;.noFocusEnergyUsed
+;    ld hl,HighCriticalMoves      ; table of high critical hit moves
+;.Loop
+;    ld a,[hli]                  ; read move from move table
+;    cp c                         ; does it match the move about to be used?
+;    jr z,.HighCritical          ; if so,the move about to be used is a high critical hit ratio move
+;    inc a                        ; move on to the next move,FF terminates loop
+;    jr nz,.Loop                 ; check the next move in HighCriticalMoves
+;    srl b                        ; /2 for regular move (effective (base speed / 2))
+;    jr .SkipHighCritical         ; continue as a normal move
+;.HighCritical
+;    sla b                        ; *2 for high critical hit moves
+;    jr nc,.noCarry
+;    ld b,$ff                    ; cap at 255/256
+;.noCarry
+;    sla b                        ; *4 for high critical move (effective (base speed/2)*8))
+;    jr nc,.SkipHighCritical
+;    ld b,$ff
+;.SkipHighCritical
+;    call GenRandomInBattle_CH       ; generates a random value,in "a"
+;    rlc a
+;    rlc a
+;    rlc a
+;    cp b                         ; check a against calculated crit rate
+;    ret nc                       ; no critical hit if no borrow
+;    ld a,$1
+;    ld [$d05e],a                ; set critical hit flag
+;    ret
 
 GenRandomInBattle_CH:
     push bc
