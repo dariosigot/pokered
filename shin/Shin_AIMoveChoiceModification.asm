@@ -34,10 +34,10 @@ AIMoveChoiceModification1:
     jr nz,.notBattleEndingMove
     ld a,[W_ISINBATTLE]
     dec a
-    jr z,.wildBattleEndingMove ; is this a wold battle?
-    jp z,.heavydiscourage    ;heavily discourage if so
+    jr z,.wildBattleEndingMove ; is this a wild battle?
+    jp .heavydiscourage    ;heavily discourage if so
 .wildBattleEndingMove
-    dec [hl]    ;else slightly encourage dream eater's use on a sleeping pkmn
+    dec [hl]    ; slightly encourage
     jp .nextMove
 .notBattleEndingMove
 ;and dont try to use rage either
