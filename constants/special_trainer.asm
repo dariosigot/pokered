@@ -1,46 +1,3 @@
-SpecialTrainer: MACRO
-    db \1,\2
-    dw \3
-    ENDM
-
-SpecialTrainerMoves:
-    SpecialTrainer BROCK,$1,BrockMoves
-    SpecialTrainer MISTY,$1,MistyMove
-    SpecialTrainer LT__SURGE,$1,LtSurgeMove
-    SpecialTrainer ERIKA,$1,ErikaMove
-    SpecialTrainer KOGA,$1,KogaMove
-    SpecialTrainer BLAINE,$1,BlaineMove
-    SpecialTrainer BLACKBELT,$1,DojoLeader
-    SpecialTrainer SABRINA,$1,SabrinaMove
-    SpecialTrainer GIOVANNI,$1,Giovanni1Move
-    SpecialTrainer GIOVANNI,$2,Giovanni2Move
-    SpecialTrainer GIOVANNI,$3,Giovanni3Move
-    SpecialTrainer LORELEI,$1,LoreleiMove
-    SpecialTrainer BRUNO,$1,BrunoMove
-    SpecialTrainer AGATHA,$1,AgathaMove
-    SpecialTrainer LANCE,$1,LanceMove
-    SpecialTrainer SONY2,$7,Sony2Move7
-    SpecialTrainer SONY2,$8,Sony2Move8
-    SpecialTrainer SONY2,$9,Sony2Move9
-    SpecialTrainer SONY2,$a,Sony2MoveA
-    SpecialTrainer SONY2,$b,Sony2MoveB
-    SpecialTrainer SONY2,$c,Sony2MoveC
-    SpecialTrainer SONY3,$1,Sony3Move1
-    SpecialTrainer SONY3,$2,Sony3Move2
-    SpecialTrainer SONY3,$3,Sony3Move3
-    SpecialTrainer COOLTRAINER_F,$2,CooltrainerFMove2
-    SpecialTrainer COOLTRAINER_F,$3,CooltrainerFMove3
-    SpecialTrainer COOLTRAINER_F,$4,CooltrainerFMove4
-    SpecialTrainer COOLTRAINER_M,$2,CooltrainerMMove2
-    SpecialTrainer COOLTRAINER_M,$3,CooltrainerMMove3
-    SpecialTrainer COOLTRAINER_M,$4,CooltrainerMMove4
-    SpecialTrainer BLACKBELT,$9,BlackBeltMove9
-    SpecialTrainer JUGGLER,$2,JugglerMove2
-    SpecialTrainer JUGGLER,$5,JugglerMove5
-    SpecialTrainer TAMER,$5,TamerMove5
-    SpecialTrainer POKEMANIAC,$6,PokemaniacMove6
-    db $ff
-
 BrockMoves:
     ; Geodude (Level 12)
     db TACKLE
@@ -1010,4 +967,43 @@ PokemaniacMove6:
     db SWORDS_DANCE
     db SLASH
     db SWOOP
+    db 0
+
+ChannelerMove14:
+    ; Gastly (Level 35)
+    db LEECH_LIFE
+    db LICK
+    db POISON_GAS
+    db SMOG
+    ; Haunter (Level 35)
+    db MEGA_DRAIN
+    db POISON_GAS
+    db CONFUSION
+    db NIGHT_SHADE
+    db 0
+
+ChannelerMove15:
+    ; Haunter (Level 38)
+    db HYPNOSIS
+    db DREAM_EATER
+    db THUNDERPUNCH
+    db CONFUSION
+    db 0
+
+ChannelerMove16:
+    ; Gastly (Level 33)
+    db HYPNOSIS
+    db DREAM_EATER
+    db CONFUSE_RAY
+    db SMOG
+    ; Gastly (Level 33)
+    db POISON_GAS
+    db NIGHT_SHADE
+    db LEECH_LIFE
+    db LICK
+    ; Haunter (Level 33)
+    db PSYWAVE
+    db HYPNOSIS
+    db NIGHT_SHADE
+    db CONFUSION
     db 0
