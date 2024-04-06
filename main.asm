@@ -13633,12 +13633,12 @@ Func_57d6:
     ld [$cf92],a
     ld a,$36
     call Predef ; indirect jump to StatusScreen (12953 (4:6953))
-    ld a,$37
-    call Predef ; indirect jump to StatusScreen2 (12b57 (4:6b57))
     call GBPalNormal
     call Func_5ae6
     call Func_57f2
     jp Func_57a2
+
+SECTION "Func_57f2",ROMX[$57f2],BANK[1]
 
 Func_57f2:
     ld hl,wTileMap
@@ -29505,6 +29505,7 @@ HandleStatusScreen1:
     call unk_12a7e
     ld d,h
     ld e,l
+    call CopyNameToCF4B
     FuncCoord 10,1
     ld hl,Coord
     call PlaceString ; Pokémon name
@@ -29664,6 +29665,7 @@ HandleStatusScreen2:
     ld d,h
     ld e,l
     FuncCoord 0,0
+    call CopyNameToCF4B
     ld hl,Coord
     call PlaceString ; Pokémon name
     ld h,b
@@ -30127,6 +30129,12 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     call PrintText
     jr .done
 
+CopyNameToCF4B:
+    push de
+    call CopyStringToCF4B ; copy name to $cf4b
+    pop de
+    ret
+
 SECTION "PartyMenuNormalText",ROMX[$6e7f],BANK[$4]
 
 PartyMenuNormalText: ; 12e7f (4:6e7f)
@@ -30336,8 +30344,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld [$cc49],a
     ld a,$36
     call Predef ; indirect jump to StatusScreen (12953 (4:6953))
-    ld a,$37
-    call Predef ; indirect jump to StatusScreen2 (12b57 (4:6b57))
+    ds 2 ; ld a,$37
+    ds 3 ; call Predef ; indirect jump to StatusScreen2 (12b57 (4:6b57))
     call ReloadMapData
     jp StartMenu_Pokemon
 .choseOutOfBattleMove
@@ -44527,28 +44535,28 @@ HMMoveArray: ; 21745 (8:5745)
     ds 5
 
 DisplayDepositWithdrawMenu: ; 2174b (8:574b)
-    FuncCoord 9,10 ; $c471
+    FuncCoord 4,2
     ld hl,Coord
-    ld b,$6
-    ld c,$9
-    call TextBoxBorder
+    ld b,9
+    ld c,14
+    call TextBoxBorderDepositWithdrawMenu ; call TextBoxBorder
     ld a,[$ccd3]
     and a
     ld de,DepositPCText ; $57cb
     jr nz,.asm_21761
     ld de,WithdrawPCText ; $57d3
 .asm_21761
-    FuncCoord 11,12 ; $c49b
+    FuncCoord 11,7
     ld hl,Coord
     call PlaceString
-    FuncCoord 11,14 ; $c4c3
+    FuncCoord 11,9
     ld hl,Coord
     ld de,StatsCancelPCText ; $57dc
     call PlaceString
     ld hl,wTopMenuItemY ; $cc24
-    ld a,$c
+    ld a,7
     ld [hli],a
-    ld a,$a
+    ld a,10
     ld [hli],a
     xor a
     ld [hli],a
@@ -44565,7 +44573,7 @@ DisplayDepositWithdrawMenu: ; 2174b (8:574b)
     ld [wPlayerMonNumber],a ; $cc2f
     ld [$cc2b],a
 .asm_2178f
-    call HandleMenuInput
+    call PrintTitleName_HandleMenuInput ; call HandleMenuInput
     bit 1,a
     jr nz,.asm_2179f
     ld a,[wCurrentMenuItem] ; $cc26
@@ -44590,13 +44598,14 @@ DisplayDepositWithdrawMenu: ; 2174b (8:574b)
     ld [$cc49],a
     ld a,$36
     call Predef ; indirect jump to StatusScreen (12953 (4:6953))
-    ld a,$37
-    call Predef ; indirect jump to StatusScreen2 (12b57 (4:6b57))
     call LoadScreenTilesFromBuffer1
+    call PrintTitleName
     call ReloadTilesetTilePatterns
     call GoPAL_SET_CF1C
     call LoadGBPal
     jr .asm_2178f
+
+SECTION "DepositPCText",ROMX[$57cb],BANK[8]
 
 DepositPCText: ; 217cb (8:57cb)
     db "DEPOSIT@"
@@ -46489,6 +46498,47 @@ PlaceStringAndBoxPkmnNumber:
 
 BoxNoPkmnNumber:
     db $E1,$E2,"    /20@"
+
+; ────────────────────────────────────────────
+; DisplayDepositWithdrawMenu EDIT
+; ────────────────────────────────────────────
+
+TextBoxBorderDepositWithdrawMenu
+    call TextBoxBorder
+    FuncCoord 9,6
+    ld hl,Coord
+    ld b,5
+    ld c,9
+    jp TextBoxBorder
+
+PrintTitleName_HandleMenuInput:
+    call PrintTitleName
+    jp HandleMenuInput
+
+PrintTitleName:
+    ; Clear Title Area
+    FuncCoord 5,3
+    ld bc,$030e ; 3,14
+    ld hl,Coord
+    call ClearScreenArea
+    ; Level
+    call LoadMonData
+    ld a,[$cc49]
+    cp $2 ; 2 means we're in a PC box
+    jr nz,.skip
+    ld a,[$cf9b] ; box level
+    ld [$cfb9],a ; real level
+.skip
+    FuncCoord 14,5
+    ld hl,Coord
+    call PrintLevel ; Pokémon level
+    ; Name
+    ld de,$cf4b
+    FuncCoord 6,4
+    ld hl,Coord
+    jp PlaceString
+
+; ────────────────────────────────────────────
 
 SECTION "bank9",ROMX,BANK[$9]
 
@@ -51039,7 +51089,8 @@ CheckAtLeastOneDamageMove:
     ld a,[$cee9] ; Check Day Care
     and a
     jr nz,.success
-    ; Check First 3 Moves (the 4th must be replaced)
+    ; Check Last 3 Moves (the 1st must be replaced)
+    inc de ; Point to 2nd Move
     ld b,0
 .loop
     inc b
@@ -53984,8 +54035,8 @@ Func_3d119: ; 3d119 (f:5119)
     call CleanLCD_OAM
     ld a,$36
     call Predef ; indirect jump to StatusScreen (12953 (4:6953))
-    ld a,$37
-    call Predef ; indirect jump to StatusScreen2 (12b57 (4:6b57))
+    ds 2 ; ld a,$37
+    ds 3 ; call Predef ; indirect jump to StatusScreen2 (12b57 (4:6b57))
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
     bit 4,a
     ld hl,AnimationSubstitute
