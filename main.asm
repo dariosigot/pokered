@@ -16622,14 +16622,14 @@ LearnMove: ; 6e43 (1:6e43)
     inc hl
     ld a,[$cd6c]
     ld [hli],a
-    ld a,$3
+    ld a,%11000011 ; ▼▲◄►StSeBA
     ld [hli],a
     ld [hl],$0
-    ld hl,wMenuWrappingEnabled
-    set 1,[hl]
     ld hl,$fff6
     set 1,[hl]
-    call HandleMenuInput
+    pop hl
+    push hl
+    call HandleMenuInput_PrintMoveDetailsBox ; call HandleMenuInput
     ld hl,$fff6
     res 1,[hl]
     push af
@@ -18596,25 +18596,16 @@ NewMoveDetails:
     push hl
     ld a,[H_WHOSETURN] ; $FF00+$f3
     push af
-    ; Print Type/Acr/Pwr
+
+    ; Print Move Details Box
     ld a,[$d0e0] ; New Move Learned
-    ld [wPlayerSelectedMove],a ; $ccdc
-    xor a ; player turn
-    ld [H_WHOSETURN],a
-    ld b,BANK(GetCurrentMove)
-    ld hl,GetCurrentMove
-    call Bankswitch
-    ;ld a,[W_ISINBATTLE]
-    ;and a
-    ;FuncCoord 0,9
-    ;ld de,Coord
-    ;jr nz,.InBattle
+    ld [wPlayerSelectedMove],a
     FuncCoord 4,9
     ld de,Coord
-;.InBattle
-    ld b,BANK(GetCurrentMoveDetails)
-    ld hl,GetCurrentMoveDetails
+    ld b,BANK(PrintMoveDetailsBox)
+    ld hl,PrintMoveDetailsBox
     call Bankswitch
+
     ; Restore
     pop af
     ld [H_WHOSETURN],a ; $FF00+$f3
@@ -18816,6 +18807,34 @@ CheckImportantMove:
 .ImportantText
     TX_FAR _ImportantText
     db "@"
+
+HandleMenuInput_PrintMoveDetailsBox:
+    push hl
+    ; Get Move to Delete
+    ld a,[wCurrentMenuItem] ; $cc26
+    ld c,a
+    ld b,$0
+    add hl,bc
+    ld a,[hl]
+
+    ; Print Move Details Box
+    ld [wPlayerSelectedMove],a
+    FuncCoord 10,13
+    ld de,Coord
+    ld b,BANK(PrintMoveDetailsBox)
+    ld hl,PrintMoveDetailsBox
+    call Bankswitch
+
+    ; Menu
+    ld hl,wMenuWrappingEnabled
+    set 1,[hl]
+    call HandleMenuInput
+    pop hl
+    ld b,a
+    and %11000000 ; ▼▲◄►StSeBA
+    ld a,b
+    ret z
+    jr HandleMenuInput_PrintMoveDetailsBox
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -26081,12 +26100,19 @@ GetTMChoiceItemID:
     call Predef ; get move ID from TM/HM ID
     ld a,[$d11e]
     ld [$d0e0],a
+    ld [wPlayerSelectedMove],a
     call GetMoveName
     call CopyStringToCF4B ; copy name to $cf4b
     ld de,$cf4b
     FuncCoord 6,11
     ld hl,Coord
-    jp PlaceString
+    call PlaceString
+    ; Print Move Details Box
+    FuncCoord 10,5
+    ld de,Coord
+    ld b,BANK(PrintMoveDetailsBox)
+    ld hl,PrintMoveDetailsBox
+    jp Bankswitch
 
 .ChoiceTMText:
     TX_FAR _ChoiceTMText
@@ -43361,15 +43387,13 @@ MoveRelearner:
     call PlaySound
     pop af
     ld [W_NUMINPARTY],a
-    ld c,14
+    ld c,28
     call DelayFrames
 
     ; Restore Result
     pop af
 
     ; Print Learned or Replaced
-    ld c,14
-    call DelayFrames
     cp 2
     ld hl,.ForgotAndLearnText
     jr z,.done
@@ -43629,18 +43653,21 @@ ChoiceRelearnMove:
     ; Set Move Relearned
     ld [$d0e0],a
 
-    ; Print Type/Acr/Pwr
+    ; Set Move for Name
+    ld [$d11e],a
+
+    ; Print Move Details Box
     ld [wPlayerSelectedMove],a
-    xor a
-    ld [H_WHOSETURN],a
-    ld b,BANK(GetCurrentMove)
-    ld hl,GetCurrentMove
-    call Bankswitch
     FuncCoord 4,9
     ld de,Coord
-    ld b,BANK(GetCurrentMoveDetails)
-    ld hl,GetCurrentMoveDetails
-    jp Bankswitch
+    ld b,BANK(PrintMoveDetailsBox)
+    ld hl,PrintMoveDetailsBox
+    call Bankswitch
+
+    ; Get Move Name
+    call GetMoveName
+    ld de,$cd6d
+    jp CopyStringToCF4B
 
 .PrintMovesAndArrows
 
@@ -54563,13 +54590,13 @@ PrintMenuItem: ; 3d4b6 (f:54b6)
     and $3f
     ld [$cd6d],a
 
-    ; Print Type/Acr/Pwr
-    call GetCurrentMove
+    ; Print Move Details Box
     FuncCoord 0,8
     ld de,Coord
-    ld b,BANK(GetCurrentMoveDetails)
-    ld hl,GetCurrentMoveDetails
+    ld b,BANK(PrintMoveDetailsBox)
+    ld hl,PrintMoveDetailsBox
     call Bankswitch
+
 .asm_3d54e
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
@@ -127054,8 +127081,9 @@ _LearnedText: ; a273b (28:673b)
     db $0,"!@@"
 
 _WhichMoveShouldBeReplacedText: ; a2750 (28:6750)
-    db $0,"Which move should",$4e,"be replaced?",$57
-    ds 1
+    ;db $0,"Which move should",$4e,"be replaced?",$57
+    db 0,"Which",$4f
+    db "Replace?",$57
 
 _AbandonLearningText:
     db $0,"Are you sure?",$57
@@ -134573,7 +134601,22 @@ _LoadGhostPic:
     ld hl,LoadMonFrontSprite
     jp Bankswitch
 
-GetCurrentMoveDetails:
+; Print a box with selected/current move details
+; input : [wPlayerSelectedMove] = Move ID
+;         [de] = Upper left Corner Coord
+PrintMoveDetailsBox:
+
+    ; Get Current Move
+    push de
+    ld a,[wPlayerSelectedMove]
+    dec a
+    ld hl,Moves ; $4000
+    ld bc,$6
+    call AddNTimes
+    ld a,BANK(Moves)
+    ld de,W_PLAYERMOVENUM
+    call FarCopyData
+    pop de
 
     ; Init Screen Location
     ld h,d
