@@ -131907,7 +131907,7 @@ Route12Mons:
     db 20,PIDGEY    ; 20%
     db 22,PIDGEY    ; 15%
     db 23,RATTATA   ; 10%
-    db 17,PIDGEOTTO ; 10%
+    db 25,PIDGEOTTO ; 10%
     db 23,PIDGEOTTO ; 10%
     db 23,RATICATE  ;  5%
     db 25,RATICATE  ;  5%
