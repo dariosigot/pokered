@@ -895,3 +895,15 @@ BRUNOS_ROOM_WIDTH  EQU $05
 ; Agatha_h map_id=247
 AGATHAS_ROOM_HEIGHT EQU $06
 AGATHAS_ROOM_WIDTH  EQU $05
+
+; ──────────────────────────────────────────────────────────────────────
+; NEW ADVENTURE
+; ──────────────────────────────────────────────────────────────────────
+
+; PortRoyal_h map_id=11
+PORT_ROYAL_HEIGHT EQU 09
+PORT_ROYAL_WIDTH  EQU 10
+
+; RouteD1_h map_id=69
+ROUTE_D1_HEIGHT EQU 09
+ROUTE_D1_WIDTH  EQU 20

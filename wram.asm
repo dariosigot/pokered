@@ -1365,7 +1365,11 @@ W_SAFARIZONECURSCRIPT:
 
 W_TOWNVISITEDFLAG: ; d70b
 ; 2 bytes bit array, 1 means visited
-    ds 2
+    ds 1
+
+W_TOWNVISITEDFLAG_PLUS_1: ; d70b
+wFlagNewAdventureBit7:    ; d70b ; bit7 = New Adventure
+    ds 1
 
 wSafariSteps: ; d70d
 ; starts at 502
