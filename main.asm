@@ -16241,7 +16241,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld [$cf8c],a
     xor a
     ld [$cf93],a
-    ld [wCurrentMenuItem],a
+    ds 3 ; ld [wCurrentMenuItem],a
     ld a,ITEMLISTMENU
     ld [wListMenuID],a
     call DisplayListMenuID
@@ -16317,7 +16317,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld a,h
     ld [$cf8c],a
     xor a
-    ld [wCurrentMenuItem],a
+    ds 3 ; ld [wCurrentMenuItem],a
     inc a
     ld [$cf93],a
     inc a ; a = 2 (PRICEDITEMLISTMENU)
