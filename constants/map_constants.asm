@@ -246,17 +246,10 @@ TRADE_CENTER EQU $F0
 LORELEIS_ROOM EQU $F5
 BRUNOS_ROOM EQU $F6
 AGATHAS_ROOM EQU $F7
-; unused EQU EQU $F8
-; unused EQU EQU $F9
-; unused EQU EQU $FA
-; unused EQU EQU $FB
-; unused EQU EQU $FC
-; unused EQU EQU $FD
-; unused EQU EQU $FE
-; unused EQU EQU $FF
 
 ; ───────────────────────────────────────
 ; New Adventure
 ; ───────────────────────────────────────
-PORT_ROYAL    EQU $00
-ROUTE_D1      EQU $0C
+PORT_ROYAL                 EQU $00
+ROUTE_D1                   EQU $0C
+TEST_MAP_1                 EQU $0D

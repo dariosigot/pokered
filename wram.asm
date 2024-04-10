@@ -1135,7 +1135,12 @@ wPlayerCoins: ; d5a4
 
 W_MISSABLEOBJECTFLAGS: ; d5a6
 ; bit array of missable objects. set = removed
-    ds 40
+    ds 32
+
+	ds 7
+
+; temp copy of SPRITESTATEDATA1_IMAGEINDEX (used for sprite facing/anim)
+wd5cd:: db
 
 W_MISSABLEOBJECTLIST: ; d5ce
 ; each entry consists of 2 bytes
@@ -1367,24 +1372,30 @@ W_DIGLETTSCAVECURSCRIPT: ; d66c
 W_SAFARIZONECURSCRIPT: ; d66d
     ds 1
 
-SECTION "wGameProgressFlagsEnd", WRAMX[$d6b8], BANK[1]
-
 wGameProgressFlagsEnd:
 
-	ds 56
+SECTION "W_MISSABLEOBJECTFLAGS_NEW", WRAMX[$d6b8], BANK[1]
+
+W_MISSABLEOBJECTFLAGS_NEW:
+    ds 32
+
+SECTION "HiddenItems", WRAMX[$d6f0], BANK[1]
 
 flag_array: MACRO
     ds ((\1) + 7) / 8
 ENDM
-
-wObtainedHiddenItemsFlags: flag_array 112
-
-wObtainedHiddenCoinsFlags: flag_array 16
+wObtainedHiddenItemsFlags: flag_array 112 ; d6f0
+wObtainedHiddenCoinsFlags: flag_array 16  ; d6fe
 
 ; $00 = walking
 ; $01 = biking
 ; $02 = surfing
-wWalkBikeSurfState:: db
+wWalkBikeSurfState:: db ; d700
+
+wObtainedHiddenItemsFlags_NEW: flag_array 48 ; d701
+wObtainedHiddenCoinsFlags_NEW: flag_array 8  ; d707
+
+wImportantByte:: db ; d708
 
 SECTION "W_TOWNVISITEDFLAG_NEW", WRAMX[$d709], BANK[1]
 

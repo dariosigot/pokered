@@ -300,7 +300,7 @@ MapHeaderPointers: ; 01ae (0:01ae)
     dw CinnabarIsland_h
     dw IndigoPlateau_h
     dw SaffronCity_h
-    dw PalletTown_h ; dummytown
+    dw EmptyMap_h
     dw Route1_h
     dw Route2_h
     dw Route3_h
@@ -358,16 +358,16 @@ MapHeaderPointers: ; 01ae (0:01ae)
     dw BikeShop_h
     dw CeruleanMart_h
     dw MtMoonPokecenter_h
-    dw PalletTown_h ; unused
+    dw EmptyMap_h ; unused
     dw Route5Gate_h
     dw UndergroundTunnelEntranceRoute5_h
     dw DayCareM_h
     dw Route6Gate_h
     dw UndergroundTunnelEntranceRoute6_h
-    dw PalletTown_h ; unused
+    dw EmptyMap_h ; unused
     dw Route7Gate_h
     dw UndergroundPathEntranceRoute7_h
-    dw PalletTown_h ; unused
+    dw EmptyMap_h ; unused
     dw Route8Gate_h
     dw UndergroundPathEntranceRoute8_h ;id=80
     dw RockTunnelPokecenter_h
@@ -395,18 +395,18 @@ MapHeaderPointers: ; 01ae (0:01ae)
     dw SSAnne9_h
     dw SSAnne10_h
     dw DratiniCave_h
-    dw PalletTown_h ; unused
-    dw PalletTown_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
     dw VictoryRoad1_h
     dw VictoryCenter_h
-    dw PalletTown_h ; unused ;id=110
-    dw PalletTown_h ; unused
-    dw PalletTown_h ; unused
+    dw EmptyMap_h ; unused ;id=110
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
     dw Lance_h
-    dw PalletTown_h ; unused
-    dw PalletTown_h ; unused
-    dw PalletTown_h ; unused
-    dw PalletTown_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
     dw HallofFameRoom_h
     dw UndergroundPathNS_h
     dw Gary_h ;id=120
@@ -462,7 +462,7 @@ MapHeaderPointers: ; 01ae (0:01ae)
     dw Lab4_h ;id=170
     dw CinnabarPokecenter_h
     dw CinnabarMart_h
-    dw PalletTown_h ; unused
+    dw EmptyMap_h ; unused
     dw IndigoPlateauLobby_h
     dw CopycatsHouseF1_h
     dw CopycatsHouseF2_h
@@ -493,9 +493,9 @@ MapHeaderPointers: ; 01ae (0:01ae)
     dw RocketHideout3_h
     dw RocketHideout4_h
     dw RocketHideoutElevator_h
-    dw PalletTown_h ; unused
-    dw PalletTown_h ; unused
-    dw PalletTown_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
     dw SilphCo2_h
     dw SilphCo3_h
     dw SilphCo4_h
@@ -520,20 +520,20 @@ MapHeaderPointers: ; 01ae (0:01ae)
     dw UnknownDungeon1_h
     dw NameRater_h
     dw CeruleanHouse2_h
-    dw PalletTown_h ; unused
+    dw EmptyMap_h ; unused
     dw RockTunnel2_h
     dw SilphCo9_h
     dw SilphCo10_h
     dw SilphCo11_h
     dw SilphCoElevator_h
-    dw PalletTown_h ; unused
-    dw PalletTown_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
     dw BattleCenterM_h
     dw TradeCenterM_h
-    dw PalletTown_h ; unused
-    dw PalletTown_h ; unused
-    dw PalletTown_h ; unused
-    dw PalletTown_h ; unused
+    dw TestMap1_h ; devmap1
+    dw RouteD1_h  ; devmap2
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
     dw Lorelei_h
     dw Bruno_h
     dw Agatha_h ;247
@@ -2855,10 +2855,10 @@ LoadMapHeader: ; 107c (0:107c)
     ld b,$00
     ld a,[H_LOADEDROMBANK]
     push af
-    ld a,BANK(MapSongBanks)
+    ld a,BANK(MapSongBanks) ; same as MapSongBanksNew
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
-    ld hl,MapSongBanks
+    call GetMapSongBanks ; ld hl,MapSongBanks
     add hl,bc
     add hl,bc
     ld a,[hli]
@@ -3124,7 +3124,7 @@ LoadMonData: ; 1372 (0:1372)
 ;    ld [hl],a
 ;    ret
 
-CheckNewAdvenureFlag:
+CheckNewAdventureFlag:
     push bc
     ld b,a
     ld a,[wFlagNewAdventureBit5]
@@ -3500,7 +3500,7 @@ GetMonHeader: ; 1537 (0:1537)
 
 GetTownVisitedFlag:
     ld hl,W_TOWNVISITEDFLAG
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld hl,W_TOWNVISITEDFLAG_NEW
     ret
@@ -6133,6 +6133,8 @@ MapHeaderPointersNew:
     dw SaffronCity_h    ; SAFFRON_CITY
     dw PalletTown_h     ; DUMMY_TOWN
     dw RouteD1_h        ; ROUTE_D1
+    dw TestMap1_h       ; TEST_MAP_1
+
 
 SECTION "TextScriptEndingChar",ROM0[$24d6]
 
@@ -7603,14 +7605,14 @@ SpacesBetweenQuantityAndPriceText: ; 2e34 (0:2e34)
 
 GetMapHeaderBanks:
     ld hl,MapHeaderBanks
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld hl,MapHeaderBanksNew
     ret
 
 GetMapHeaderPointers:
     ld hl,MapHeaderPointers
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld hl,MapHeaderPointersNew
     ret
@@ -18804,21 +18806,21 @@ DungeonWarpDataNew:
 
 GetFlyWarpDataPtr:
     ld hl,FlyWarpDataPtr
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld hl,FlyWarpDataPtrNew
     ret
 
 GetDungeonWarpList:
     ld hl,DungeonWarpList
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld hl,DungeonWarpListNew
     ret
 
 GetDungeonWarpData:
     ld hl,DungeonWarpData
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld hl,DungeonWarpDataNew
     ret
@@ -20801,502 +20803,254 @@ HandleJoypadResetButtons: ; c03c (3:403c)
     jp GetJoypadState
 
 MapSongBanks: ; c04d (3:404d)
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ;PALLET_TOWN
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; VIRIDIAN_CITY
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; PEWTER_CITY
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; CERULEAN_CITY
-    db (Music_Lavender - $4000) / 3
-    db BANK(Music_Lavender) ; LAVENDER_TOWN
-    db (Music_Vermilion - $4000) / 3
-    db BANK(Music_Vermilion) ; VERMILION_CITY
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; CELADON_CITY
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; FUCHSIA_CITY
-    db (Music_Cinnabar - $4000) / 3
-    db BANK(Music_Cinnabar) ; CINNABAR_ISLAND
-    db (Music_IndigoPlateau - $4000) / 3
-    db BANK(Music_IndigoPlateau) ; INDIGO_PLATEAU
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; SAFFRON_CITY
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; PORT_ROYAL
-    db (Music_Routes1 - $4000) / 3
-    db BANK(Music_Routes1) ; ROUTE_1
-    db (Music_Routes1 - $4000) / 3
-    db BANK(Music_Routes1) ; ROUTE_2
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_3
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_4
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_5
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_6
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_7
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_8
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_9
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_10
-    db (Music_Routes4 - $4000) / 3
-    db BANK(Music_Routes4) ; ROUTE_11
-    db (Music_Routes4 - $4000) / 3
-    db BANK(Music_Routes4) ; ROUTE_12
-    db (Music_Routes4 - $4000) / 3
-    db BANK(Music_Routes4) ; ROUTE_13
-    db (Music_Routes4 - $4000) / 3
-    db BANK(Music_Routes4) ; ROUTE_14
-    db (Music_Routes4 - $4000) / 3
-    db BANK(Music_Routes4) ; ROUTE_15
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_16
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_17
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_18
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_19
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_20
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_21
-    db (Music_Routes3 - $4000) / 3
-    db BANK(Music_Routes3) ; ROUTE_22
-    db (Music_IndigoPlateau - $4000) / 3
-    db BANK(Music_IndigoPlateau) ; ROUTE_23
-    db (Music_Routes2 - $4000) / 3
-    db BANK(Music_Routes2) ; ROUTE_24
-    db (Music_Routes2 - $4000) / 3
-    db BANK(Music_Routes2) ; ROUTE_25
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; RedsHouse1F
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; RedsHouse2F
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; BluesHouse
-    db (Music_OaksLab - $4000) / 3
-    db BANK(Music_OaksLab) ; OaksLab
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; ViridianPokecenter
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; ViridianMart
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; School
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; ViridianHouse
-    db (Music_Gym - $4000) / 3
-    db BANK(Music_Gym) ; ViridianGym
-    db (Music_Dungeon2 - $4000) / 3
-    db BANK(Music_Dungeon2) ; DiglettsCaveRoute2
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; ViridianForestexit
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route2House
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route2Gate
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; ViridianForestEntrance
-    db (Music_Dungeon2 - $4000) / 3
-    db BANK(Music_Dungeon2) ; ViridianForest
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; MuseumF1
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; MuseumF2
-    db (Music_Gym - $4000) / 3
-    db BANK(Music_Gym) ; PewterGym
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; PewterHouse1
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; PewterMart
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; PewterHouse2
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; PewterPokecenter
-    db (Music_Dungeon3 - $4000) / 3
-    db BANK(Music_Dungeon3) ; MtMoon1
-    db (Music_Dungeon3 - $4000) / 3
-    db BANK(Music_Dungeon3) ; MtMoon2
-    db (Music_Dungeon3 - $4000) / 3
-    db BANK(Music_Dungeon3) ; MtMoon3
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; CeruleanHouseTrashed
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; CeruleanHouse
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CeruleanPokecenter
-    db (Music_Gym - $4000) / 3
-    db BANK(Music_Gym) ; CeruleanGym
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; BikeShop
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CeruleanMart
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; MtMoonPokecenter
-    db (Music_Routes1 - $4000) / 3
-    db BANK(Music_Routes1) ; ROUTE_D1
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route5Gate
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; UndergroundTunnelEntranceRoute5
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; DayCareM
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route6Gate
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; UndergroundTunnelEntranceRoute6
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route7Gate
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; UndergroundPathEntranceRoute7
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route8Gate
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; UndergroundPathEntranceRoute8
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; RockTunnelPokecenter
-    db (Music_Dungeon3 - $4000) / 3
-    db BANK(Music_Dungeon3) ; RockTunnel1
-    db (Music_Dungeon1 - $4000) / 3
-    db BANK(Music_Dungeon1) ; PowerPlant
-    db (Music_Vermilion - $4000) / 3
-    db BANK(Music_Vermilion) ; Route11Gate
-    db (Music_Dungeon2 - $4000) / 3
-    db BANK(Music_Dungeon2) ; DiglettsCaveEntranceRoute11
-    db (Music_Vermilion - $4000) / 3
-    db BANK(Music_Vermilion) ; Route11GateUpstairs
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route12Gate
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; BillsHouse
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; VermilionPokecenter
-    db (Music_Vermilion - $4000) / 3
-    db BANK(Music_Vermilion) ; FanClub
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; VermilionMart
-    db (Music_Gym - $4000) / 3
-    db BANK(Music_Gym) ; VermilionGym
-    db (Music_Vermilion - $4000) / 3
-    db BANK(Music_Vermilion) ; VermilionHouse1
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ; VermilionDock
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ; SSAnne1
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ; SSAnne2
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ; SSAnne3
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ; SSAnne4
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ; SSAnne5
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ; SSAnne6
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ; SSAnne7
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ; SSAnne8
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ; SSAnne9
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ; SSAnne10
-    db (Music_SSAnne - $4000) / 3
-    db BANK(Music_SSAnne) ;DratiniCave
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_Dungeon3 - $4000) / 3
-    db BANK(Music_Dungeon3) ; VictoryRoad1
-    db (Music_IndigoPlateau - $4000) / 3
-    db BANK(Music_IndigoPlateau) ;VictoryPokecenter
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_IndigoPlateau - $4000) / 3
-    db BANK(Music_IndigoPlateau) ; Lance
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; HallofFameRoom
-    db (Music_Routes1 - $4000) / 3
-    db BANK(Music_Routes1) ; UndergroundPathNS
-    db (Music_IndigoPlateau - $4000) / 3
-    db BANK(Music_IndigoPlateau) ; Gary
-    db (Music_Routes1 - $4000) / 3
-    db BANK(Music_Routes1) ; UndergroundPathWE
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CeladonMart1
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CeladonMart2
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CeladonMart3
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CeladonMart4
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CeladonMartRoof
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CeladonMartElevator
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; CeladonMansion1
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; CeladonMansion2
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; CeladonMansion3
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; CeladonMansion4
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; CeladonMansion5
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CeladonPokecenter
-    db (Music_Gym - $4000) / 3
-    db BANK(Music_Gym) ; CeladonGym
-    db (Music_GameCorner - $4000) / 3
-    db BANK(Music_GameCorner) ; CeladonGameCorner
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CeladonMart5
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; CeladonPrizeRoom
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; CeladonDiner
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; CeladonHouse
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; CeladonHotel
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; LavenderPokecenter
-    db (Music_PokemonTower - $4000) / 3
-    db BANK(Music_PokemonTower) ; PokemonTower1
-    db (Music_PokemonTower - $4000) / 3
-    db BANK(Music_PokemonTower) ; PokemonTower2
-    db (Music_PokemonTower - $4000) / 3
-    db BANK(Music_PokemonTower) ; PokemonTower3
-    db (Music_PokemonTower - $4000) / 3
-    db BANK(Music_PokemonTower) ; PokemonTower4
-    db (Music_PokemonTower - $4000) / 3
-    db BANK(Music_PokemonTower) ; PokemonTower5
-    db (Music_PokemonTower - $4000) / 3
-    db BANK(Music_PokemonTower) ; PokemonTower6
-    db (Music_PokemonTower - $4000) / 3
-    db BANK(Music_PokemonTower) ; PokemonTower7
-    db (Music_Lavender - $4000) / 3
-    db BANK(Music_Lavender) ; LavenderHouse1
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; LavenderMart
-    db (Music_Lavender - $4000) / 3
-    db BANK(Music_Lavender) ; LavenderHouse2
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; FuchsiaMart
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; FuchsiaHouse1
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; FuchsiaPokecenter
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; FuchsiaHouse2
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; SafariZoneEntrance
-    db (Music_Gym - $4000) / 3
-    db BANK(Music_Gym) ; FuchsiaGym
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; FuchsiaMeetingRoom
-    db (Music_Dungeon2 - $4000) / 3
-    db BANK(Music_Dungeon2) ; SeafoamIslands2
-    db (Music_Dungeon2 - $4000) / 3
-    db BANK(Music_Dungeon2) ; SeafoamIslands3
-    db (Music_Dungeon2 - $4000) / 3
-    db BANK(Music_Dungeon2) ; SeafoamIslands4
-    db (Music_Dungeon2 - $4000) / 3
-    db BANK(Music_Dungeon2) ; SeafoamIslands5
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; VermilionHouse2
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; FuchsiaHouse3
-    db (Music_CinnabarMansion - $4000) / 3
-    db BANK(Music_CinnabarMansion) ; Mansion1
-    db (Music_Gym - $4000) / 3
-    db BANK(Music_Gym) ; CinnabarGym
-    db (Music_Cinnabar - $4000) / 3
-    db BANK(Music_Cinnabar) ; Lab1
-    db (Music_Cinnabar - $4000) / 3
-    db BANK(Music_Cinnabar) ; Lab2
-    db (Music_Cinnabar - $4000) / 3
-    db BANK(Music_Cinnabar) ; Lab3
-    db (Music_Cinnabar - $4000) / 3
-    db BANK(Music_Cinnabar) ; Lab4
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CinnabarPokecenter
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; CinnabarMart
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_IndigoPlateau - $4000) / 3
-    db BANK(Music_IndigoPlateau) ; IndigoPlateauLobby
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; CopycatsHouseF1
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; CopycatsHouseF2
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; FightingDojo
-    db (Music_Gym - $4000) / 3
-    db BANK(Music_Gym) ; SaffronGym
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; SaffronHouse1
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; SaffronMart
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCo1
-    db (Music_Pokecenter - $4000) / 3
-    db BANK(Music_Pokecenter) ; SaffronPokecenter
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; SaffronHouse2
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route15Gate
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route15GateUpstairs
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route16GateMap
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route16GateUpstairs
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; Route16House
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; Route12House
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route18Gate
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route18GateUpstairs
-    db (Music_Dungeon2 - $4000) / 3
-    db BANK(Music_Dungeon2) ; SeafoamIslands1
-    db (Music_Dungeon2 - $4000) / 3
-    db BANK(Music_Dungeon2) ; Route22Gate
-    db (Music_Dungeon3 - $4000) / 3
-    db BANK(Music_Dungeon3) ; VictoryRoad2
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; Route12GateUpstairs
-    db (Music_Vermilion - $4000) / 3
-    db BANK(Music_Vermilion) ; VermilionHouse3
-    db (Music_Dungeon2 - $4000) / 3
-    db BANK(Music_Dungeon2) ; DiglettsCave
-    db (Music_Dungeon3 - $4000) / 3
-    db BANK(Music_Dungeon3) ; VictoryRoad3
-    db (Music_Dungeon1 - $4000) / 3
-    db BANK(Music_Dungeon1) ; RocketHideout1
-    db (Music_Dungeon1 - $4000) / 3
-    db BANK(Music_Dungeon1) ; RocketHideout2
-    db (Music_Dungeon1 - $4000) / 3
-    db BANK(Music_Dungeon1) ; RocketHideout3
-    db (Music_Dungeon1 - $4000) / 3
-    db BANK(Music_Dungeon1) ; RocketHideout4
-    db (Music_Dungeon1 - $4000) / 3
-    db BANK(Music_Dungeon1) ; RocketHideoutElevator
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCo2
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCo3
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCo4
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCo5
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCo6
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCo7
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCo8
-    db (Music_CinnabarMansion - $4000) / 3
-    db BANK(Music_CinnabarMansion) ; Mansion2
-    db (Music_CinnabarMansion - $4000) / 3
-    db BANK(Music_CinnabarMansion) ; Mansion3
-    db (Music_CinnabarMansion - $4000) / 3
-    db BANK(Music_CinnabarMansion) ; Mansion4
-    db (Music_SafariZone - $4000) / 3
-    db BANK(Music_SafariZone) ; SafariZoneEast
-    db (Music_SafariZone - $4000) / 3
-    db BANK(Music_SafariZone) ; SafariZoneNorth
-    db (Music_SafariZone - $4000) / 3
-    db BANK(Music_SafariZone) ; SafariZoneWest
-    db (Music_SafariZone - $4000) / 3
-    db BANK(Music_SafariZone) ; SafariZoneCenter
-    db (Music_SafariZone - $4000) / 3
-    db BANK(Music_SafariZone) ; SafariZoneRestHouse1
-    db (Music_SafariZone - $4000) / 3
-    db BANK(Music_SafariZone) ; SafariZoneSecretHouse
-    db (Music_SafariZone - $4000) / 3
-    db BANK(Music_SafariZone) ; SafariZoneRestHouse2
-    db (Music_SafariZone - $4000) / 3
-    db BANK(Music_SafariZone) ; SafariZoneRestHouse3
-    db (Music_SafariZone - $4000) / 3
-    db BANK(Music_SafariZone) ; SafariZoneRestHouse4
-    db (Music_Dungeon1 - $4000) / 3
-    db BANK(Music_Dungeon1) ; UnknownDungeon2
-    db (Music_Dungeon1 - $4000) / 3
-    db BANK(Music_Dungeon1) ; UnknownDungeon3
-    db (Music_Dungeon1 - $4000) / 3
-    db BANK(Music_Dungeon1) ; UnknownDungeon1
-    db (Music_Cities2 - $4000) / 3
-    db BANK(Music_Cities2) ; NameRater
-    db (Music_Cities1 - $4000) / 3
-    db BANK(Music_Cities1) ; CeruleanHouse2
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_Dungeon3 - $4000) / 3
-    db BANK(Music_Dungeon3) ; RockTunnel2
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCo9
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCo10
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCo11
-    db (Music_SilphCo - $4000) / 3
-    db BANK(Music_SilphCo) ; SilphCoElevator
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; BattleCenterM
-    db (Music_Celadon - $4000) / 3
-    db BANK(Music_Celadon) ; TradeCenterM
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_PalletTown - $4000) / 3
-    db BANK(Music_PalletTown) ; unused
-    db (Music_Gym - $4000) / 3
-    db BANK(Music_Gym) ; Lorelei
-    db (Music_Dungeon1 - $4000) / 3
-    db BANK(Music_Dungeon1) ; Bruno
-    db (Music_PokemonTower - $4000) / 3
-    db BANK(Music_PokemonTower) ; Agatha
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; PALLET_TOWN
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; VIRIDIAN_CITY
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; PEWTER_CITY
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; CERULEAN_CITY
+    db (Music_Lavender        -$4000)/3 , BANK(Music_Lavender)        ; LAVENDER_TOWN
+    db (Music_Vermilion       -$4000)/3 , BANK(Music_Vermilion)       ; VERMILION_CITY
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; CELADON_CITY
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; FUCHSIA_CITY
+    db (Music_Cinnabar        -$4000)/3 , BANK(Music_Cinnabar)        ; CINNABAR_ISLAND
+    db (Music_IndigoPlateau   -$4000)/3 , BANK(Music_IndigoPlateau)   ; INDIGO_PLATEAU
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; SAFFRON_CITY
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_Routes1         -$4000)/3 , BANK(Music_Routes1)         ; ROUTE_1
+    db (Music_Routes1         -$4000)/3 , BANK(Music_Routes1)         ; ROUTE_2
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_3
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_4
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_5
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_6
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_7
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_8
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_9
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_10
+    db (Music_Routes4         -$4000)/3 , BANK(Music_Routes4)         ; ROUTE_11
+    db (Music_Routes4         -$4000)/3 , BANK(Music_Routes4)         ; ROUTE_12
+    db (Music_Routes4         -$4000)/3 , BANK(Music_Routes4)         ; ROUTE_13
+    db (Music_Routes4         -$4000)/3 , BANK(Music_Routes4)         ; ROUTE_14
+    db (Music_Routes4         -$4000)/3 , BANK(Music_Routes4)         ; ROUTE_15
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_16
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_17
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_18
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_19
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_20
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_21
+    db (Music_Routes3         -$4000)/3 , BANK(Music_Routes3)         ; ROUTE_22
+    db (Music_IndigoPlateau   -$4000)/3 , BANK(Music_IndigoPlateau)   ; ROUTE_23
+    db (Music_Routes2         -$4000)/3 , BANK(Music_Routes2)         ; ROUTE_24
+    db (Music_Routes2         -$4000)/3 , BANK(Music_Routes2)         ; ROUTE_25
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; RedsHouse1F
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; RedsHouse2F
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; BluesHouse
+    db (Music_OaksLab         -$4000)/3 , BANK(Music_OaksLab)         ; OaksLab
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; ViridianPokecenter
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; ViridianMart
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; School
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; ViridianHouse
+    db (Music_Gym             -$4000)/3 , BANK(Music_Gym)             ; ViridianGym
+    db (Music_Dungeon2        -$4000)/3 , BANK(Music_Dungeon2)        ; DiglettsCaveRoute2
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; ViridianForestexit
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route2House
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route2Gate
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; ViridianForestEntrance
+    db (Music_Dungeon2        -$4000)/3 , BANK(Music_Dungeon2)        ; ViridianForest
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; MuseumF1
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; MuseumF2
+    db (Music_Gym             -$4000)/3 , BANK(Music_Gym)             ; PewterGym
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; PewterHouse1
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; PewterMart
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; PewterHouse2
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; PewterPokecenter
+    db (Music_Dungeon3        -$4000)/3 , BANK(Music_Dungeon3)        ; MtMoon1
+    db (Music_Dungeon3        -$4000)/3 , BANK(Music_Dungeon3)        ; MtMoon2
+    db (Music_Dungeon3        -$4000)/3 , BANK(Music_Dungeon3)        ; MtMoon3
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; CeruleanHouseTrashed
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; CeruleanHouse
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CeruleanPokecenter
+    db (Music_Gym             -$4000)/3 , BANK(Music_Gym)             ; CeruleanGym
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; BikeShop
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CeruleanMart
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; MtMoonPokecenter
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route5Gate
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; UndergroundTunnelEntranceRoute5
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; DayCareM
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route6Gate
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; UndergroundTunnelEntranceRoute6
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route7Gate
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; UndergroundPathEntranceRoute7
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route8Gate
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; UndergroundPathEntranceRoute8
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; RockTunnelPokecenter
+    db (Music_Dungeon3        -$4000)/3 , BANK(Music_Dungeon3)        ; RockTunnel1
+    db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; PowerPlant
+    db (Music_Vermilion       -$4000)/3 , BANK(Music_Vermilion)       ; Route11Gate
+    db (Music_Dungeon2        -$4000)/3 , BANK(Music_Dungeon2)        ; DiglettsCaveEntranceRoute11
+    db (Music_Vermilion       -$4000)/3 , BANK(Music_Vermilion)       ; Route11GateUpstairs
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route12Gate
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; BillsHouse
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; VermilionPokecenter
+    db (Music_Vermilion       -$4000)/3 , BANK(Music_Vermilion)       ; FanClub
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; VermilionMart
+    db (Music_Gym             -$4000)/3 , BANK(Music_Gym)             ; VermilionGym
+    db (Music_Vermilion       -$4000)/3 , BANK(Music_Vermilion)       ; VermilionHouse1
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; VermilionDock
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; SSAnne1
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; SSAnne2
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; SSAnne3
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; SSAnne4
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; SSAnne5
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; SSAnne6
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; SSAnne7
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; SSAnne8
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; SSAnne9
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; SSAnne10
+    db (Music_SSAnne          -$4000)/3 , BANK(Music_SSAnne)          ; DratiniCave
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_Dungeon3        -$4000)/3 , BANK(Music_Dungeon3)        ; VictoryRoad1
+    db (Music_IndigoPlateau   -$4000)/3 , BANK(Music_IndigoPlateau)   ; VictoryPokecenter
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_IndigoPlateau   -$4000)/3 , BANK(Music_IndigoPlateau)   ; Lance
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; HallofFameRoom
+    db (Music_Routes1         -$4000)/3 , BANK(Music_Routes1)         ; UndergroundPathNS
+    db (Music_IndigoPlateau   -$4000)/3 , BANK(Music_IndigoPlateau)   ; Gary
+    db (Music_Routes1         -$4000)/3 , BANK(Music_Routes1)         ; UndergroundPathWE
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CeladonMart1
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CeladonMart2
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CeladonMart3
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CeladonMart4
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CeladonMartRoof
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CeladonMartElevator
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; CeladonMansion1
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; CeladonMansion2
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; CeladonMansion3
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; CeladonMansion4
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; CeladonMansion5
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CeladonPokecenter
+    db (Music_Gym             -$4000)/3 , BANK(Music_Gym)             ; CeladonGym
+    db (Music_GameCorner      -$4000)/3 , BANK(Music_GameCorner)      ; CeladonGameCorner
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CeladonMart5
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; CeladonPrizeRoom
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; CeladonDiner
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; CeladonHouse
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; CeladonHotel
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; LavenderPokecenter
+    db (Music_PokemonTower    -$4000)/3 , BANK(Music_PokemonTower)    ; PokemonTower1
+    db (Music_PokemonTower    -$4000)/3 , BANK(Music_PokemonTower)    ; PokemonTower2
+    db (Music_PokemonTower    -$4000)/3 , BANK(Music_PokemonTower)    ; PokemonTower3
+    db (Music_PokemonTower    -$4000)/3 , BANK(Music_PokemonTower)    ; PokemonTower4
+    db (Music_PokemonTower    -$4000)/3 , BANK(Music_PokemonTower)    ; PokemonTower5
+    db (Music_PokemonTower    -$4000)/3 , BANK(Music_PokemonTower)    ; PokemonTower6
+    db (Music_PokemonTower    -$4000)/3 , BANK(Music_PokemonTower)    ; PokemonTower7
+    db (Music_Lavender        -$4000)/3 , BANK(Music_Lavender)        ; LavenderHouse1
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; LavenderMart
+    db (Music_Lavender        -$4000)/3 , BANK(Music_Lavender)        ; LavenderHouse2
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; FuchsiaMart
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; FuchsiaHouse1
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; FuchsiaPokecenter
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; FuchsiaHouse2
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; SafariZoneEntrance
+    db (Music_Gym             -$4000)/3 , BANK(Music_Gym)             ; FuchsiaGym
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; FuchsiaMeetingRoom
+    db (Music_Dungeon2        -$4000)/3 , BANK(Music_Dungeon2)        ; SeafoamIslands2
+    db (Music_Dungeon2        -$4000)/3 , BANK(Music_Dungeon2)        ; SeafoamIslands3
+    db (Music_Dungeon2        -$4000)/3 , BANK(Music_Dungeon2)        ; SeafoamIslands4
+    db (Music_Dungeon2        -$4000)/3 , BANK(Music_Dungeon2)        ; SeafoamIslands5
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; VermilionHouse2
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; FuchsiaHouse3
+    db (Music_CinnabarMansion -$4000)/3 , BANK(Music_CinnabarMansion) ; Mansion1
+    db (Music_Gym             -$4000)/3 , BANK(Music_Gym)             ; CinnabarGym
+    db (Music_Cinnabar        -$4000)/3 , BANK(Music_Cinnabar)        ; Lab1
+    db (Music_Cinnabar        -$4000)/3 , BANK(Music_Cinnabar)        ; Lab2
+    db (Music_Cinnabar        -$4000)/3 , BANK(Music_Cinnabar)        ; Lab3
+    db (Music_Cinnabar        -$4000)/3 , BANK(Music_Cinnabar)        ; Lab4
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CinnabarPokecenter
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CinnabarMart
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_IndigoPlateau   -$4000)/3 , BANK(Music_IndigoPlateau)   ; IndigoPlateauLobby
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; CopycatsHouseF1
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; CopycatsHouseF2
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; FightingDojo
+    db (Music_Gym             -$4000)/3 , BANK(Music_Gym)             ; SaffronGym
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; SaffronHouse1
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; SaffronMart
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo1
+    db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; SaffronPokecenter
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; SaffronHouse2
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route15Gate
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route15GateUpstairs
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route16GateMap
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route16GateUpstairs
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; Route16House
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; Route12House
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route18Gate
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route18GateUpstairs
+    db (Music_Dungeon2        -$4000)/3 , BANK(Music_Dungeon2)        ; SeafoamIslands1
+    db (Music_Dungeon2        -$4000)/3 , BANK(Music_Dungeon2)        ; Route22Gate
+    db (Music_Dungeon3        -$4000)/3 , BANK(Music_Dungeon3)        ; VictoryRoad2
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route12GateUpstairs
+    db (Music_Vermilion       -$4000)/3 , BANK(Music_Vermilion)       ; VermilionHouse3
+    db (Music_Dungeon2        -$4000)/3 , BANK(Music_Dungeon2)        ; DiglettsCave
+    db (Music_Dungeon3        -$4000)/3 , BANK(Music_Dungeon3)        ; VictoryRoad3
+    db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; RocketHideout1
+    db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; RocketHideout2
+    db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; RocketHideout3
+    db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; RocketHideout4
+    db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; RocketHideoutElevator
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo2
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo3
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo4
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo5
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo6
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo7
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo8
+    db (Music_CinnabarMansion -$4000)/3 , BANK(Music_CinnabarMansion) ; Mansion2
+    db (Music_CinnabarMansion -$4000)/3 , BANK(Music_CinnabarMansion) ; Mansion3
+    db (Music_CinnabarMansion -$4000)/3 , BANK(Music_CinnabarMansion) ; Mansion4
+    db (Music_SafariZone      -$4000)/3 , BANK(Music_SafariZone)      ; SafariZoneEast
+    db (Music_SafariZone      -$4000)/3 , BANK(Music_SafariZone)      ; SafariZoneNorth
+    db (Music_SafariZone      -$4000)/3 , BANK(Music_SafariZone)      ; SafariZoneWest
+    db (Music_SafariZone      -$4000)/3 , BANK(Music_SafariZone)      ; SafariZoneCenter
+    db (Music_SafariZone      -$4000)/3 , BANK(Music_SafariZone)      ; SafariZoneRestHouse1
+    db (Music_SafariZone      -$4000)/3 , BANK(Music_SafariZone)      ; SafariZoneSecretHouse
+    db (Music_SafariZone      -$4000)/3 , BANK(Music_SafariZone)      ; SafariZoneRestHouse2
+    db (Music_SafariZone      -$4000)/3 , BANK(Music_SafariZone)      ; SafariZoneRestHouse3
+    db (Music_SafariZone      -$4000)/3 , BANK(Music_SafariZone)      ; SafariZoneRestHouse4
+    db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; UnknownDungeon2
+    db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; UnknownDungeon3
+    db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; UnknownDungeon1
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; NameRater
+    db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; CeruleanHouse2
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_Dungeon3        -$4000)/3 , BANK(Music_Dungeon3)        ; RockTunnel2
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo9
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo10
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo11
+    db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCoElevator
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; BattleCenterM
+    db (Music_Celadon         -$4000)/3 , BANK(Music_Celadon)         ; TradeCenterM
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_Gym             -$4000)/3 , BANK(Music_Gym)             ; Lorelei
+    db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; Bruno
+    db (Music_PokemonTower    -$4000)/3 , BANK(Music_PokemonTower)    ; Agatha
 
 ; see also MapHeaderPointers
 MapHeaderBanks: ; c23d (3:423d)
@@ -21311,7 +21065,7 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(CinnabarIsland_h) ; CINNABAR_ISLAND
     db BANK(IndigoPlateau_h) ; INDIGO_PLATEAU
     db BANK(SaffronCity_h) ; SAFFRON_CITY
-    db BANK(PalletTown_h) ; DUMMY_TOWN
+    db BANK(EmptyMap_h) ; unused
     db BANK(Route1_h) ; ROUTE_1
     db BANK(Route2_h) ; ROUTE_2
     db BANK(Route3_h) ; ROUTE_3
@@ -21369,16 +21123,16 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(BikeShop_h)
     db BANK(CeruleanMart_h)
     db BANK(MtMoonPokecenter_h)
-    db BANK(PalletTown_h) ; unused
+    db BANK(EmptyMap_h) ; unused
     db BANK(Route5Gate_h)
     db BANK(UndergroundTunnelEntranceRoute5_h)
     db BANK(DayCareM_h)
     db BANK(Route6Gate_h)
     db BANK(UndergroundTunnelEntranceRoute6_h)
-    db BANK(PalletTown_h) ; unused
+    db BANK(EmptyMap_h) ; unused
     db BANK(Route7Gate_h)
     db BANK(UndergroundPathEntranceRoute7_h)
-    db BANK(PalletTown_h) ; unused
+    db BANK(EmptyMap_h) ; unused
     db BANK(Route8Gate_h)
     db BANK(UndergroundPathEntranceRoute8_h)
     db BANK(RockTunnelPokecenter_h)
@@ -21406,18 +21160,18 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(SSAnne9_h)
     db BANK(SSAnne10_h)
     db BANK(DratiniCave_h)
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
+    db BANK(EmptyMap_h) ; unused
+    db BANK(EmptyMap_h) ; unused
     db BANK(VictoryRoad1_h)
     db BANK(VictoryCenter_h)
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
+    db BANK(EmptyMap_h) ; unused
+    db BANK(EmptyMap_h) ; unused
+    db BANK(EmptyMap_h) ; unused
     db BANK(Lance_h)
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
+    db BANK(EmptyMap_h) ; unused
+    db BANK(EmptyMap_h) ; unused
+    db BANK(EmptyMap_h) ; unused
+    db BANK(EmptyMap_h) ; unused
     db BANK(HallofFameRoom_h)
     db BANK(UndergroundPathNS_h)
     db BANK(Gary_h)
@@ -21473,7 +21227,7 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(Lab4_h)
     db BANK(CinnabarPokecenter_h)
     db BANK(CinnabarMart_h)
-    db BANK(PalletTown_h) ; unused
+    db BANK(EmptyMap_h) ; unused
     db BANK(IndigoPlateauLobby_h)
     db BANK(CopycatsHouseF1_h)
     db BANK(CopycatsHouseF2_h)
@@ -21504,9 +21258,9 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(RocketHideout3_h)
     db BANK(RocketHideout4_h)
     db BANK(RocketHideoutElevator_h)
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
+    db BANK(EmptyMap_h) ; unused
+    db BANK(EmptyMap_h) ; unused
+    db BANK(EmptyMap_h) ; unused
     db BANK(SilphCo2_h)
     db BANK(SilphCo3_h)
     db BANK(SilphCo4_h)
@@ -21531,20 +21285,20 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(UnknownDungeon1_h)
     db BANK(NameRater_h)
     db BANK(CeruleanHouse2_h)
-    db BANK(PalletTown_h) ; unused
+    db BANK(EmptyMap_h) ; unused
     db BANK(RockTunnel2_h)
     db BANK(SilphCo9_h)
     db BANK(SilphCo10_h)
     db BANK(SilphCo11_h)
     db BANK(SilphCoElevator_h)
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
+    db BANK(EmptyMap_h) ; unused
+    db BANK(EmptyMap_h) ; unused
     db BANK(BattleCenterM_h)
     db BANK(TradeCenterM_h)
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
-    db BANK(PalletTown_h) ; unused
+    db BANK(TestMap1_h) ; devmap1
+    db BANK(RouteD1_h)  ; devmap2
+    db BANK(EmptyMap_h) ; unused
+    db BANK(EmptyMap_h) ; unused
     db BANK(Lorelei_h)
     db BANK(Bruno_h)
     db BANK(Agatha_h)
@@ -23188,9 +22942,112 @@ MapHeaderBanksNew:
     db BANK(SaffronCity_h)    ; SAFFRON_CITY
     db BANK(PalletTown_h)     ; DUMMY_TOWN
     db BANK(RouteD1_h)        ; ROUTE_D1
+    db BANK(TestMap1_h)       ; TEST_MAP_1
+
+MapSongBanksNew:
+    db (Music_Lavender      -$4000)/3 , BANK(Music_Lavender)      ; PORT_ROYAL
+    db (Music_Cities1       -$4000)/3 , BANK(Music_Cities1)       ; VIRIDIAN_CITY
+    db (Music_Cities1       -$4000)/3 , BANK(Music_Cities1)       ; PEWTER_CITY
+    db (Music_Cities2       -$4000)/3 , BANK(Music_Cities2)       ; CERULEAN_CITY
+    db (Music_Lavender      -$4000)/3 , BANK(Music_Lavender)      ; LAVENDER_TOWN
+    db (Music_Vermilion     -$4000)/3 , BANK(Music_Vermilion)     ; VERMILION_CITY
+    db (Music_Celadon       -$4000)/3 , BANK(Music_Celadon)       ; CELADON_CITY
+    db (Music_Cities2       -$4000)/3 , BANK(Music_Cities2)       ; FUCHSIA_CITY
+    db (Music_Cinnabar      -$4000)/3 , BANK(Music_Cinnabar)      ; CINNABAR_ISLAND
+    db (Music_IndigoPlateau -$4000)/3 , BANK(Music_IndigoPlateau) ; INDIGO_PLATEAU
+    db (Music_Cities1       -$4000)/3 , BANK(Music_Cities1)       ; SAFFRON_CITY
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown)    ; unused
+    db (Music_PokemonTower  -$4000)/3 , BANK(Music_PokemonTower)  ; ROUTE_D1
+    db (Music_PokemonTower  -$4000)/3 , BANK(Music_PokemonTower)  ; TEST_MAP_1
+
+MapHSPointersNew:
+    dw MapHS_PortRoyal
+    dw MapHSXX
+    dw MapHSXX
+    dw MapHSXX
+    dw MapHSXX
+    dw MapHSXX
+    dw MapHSXX
+    dw MapHSXX
+    dw MapHSXX
+    dw MapHSXX
+    dw MapHSXX
+    dw MapHSXX
+    dw MapHSXX ; ROUTE_D1
+    dw MapHSXX ; TEST_MAP_1
+    dw $FFFF
+
+MapHS_PortRoyal:
+    db PORT_ROYAL,2,Show
+
+    db $FF,$01,Show
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $03)
+; ───────────────────────────────────────
+
+GetMapSongBanks:
+    ld hl,MapSongBanks
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,MapSongBanksNew
+    ret
+
+GetMapHSPointers:
+    ld hl,MapHSPointers
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,MapHSPointersNew
+    ret
+
+GetFirstMapHSPointer_DE:
+    ld de,MapHS00
+    call CheckNewAdventureFlag
+    ret z
+    ld de,MapHS_PortRoyal
+    ret
+
+GetMissableObjectFlag:
+    ld hl,W_MISSABLEOBJECTFLAGS
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,W_MISSABLEOBJECTFLAGS_NEW
+    ret
+
+InitializeMissableObjectsFlags_OldAndNew:
+    call InitializeMissableObjectsFlags
+    ; fall through
+
+InitializeMissableObjectsFlagsNew:
+    ld hl,W_MISSABLEOBJECTFLAGS_NEW
+    ld bc,32
+    xor a
+    call FillMemory ; clear missable objects flags
+    ld hl,MapHS_PortRoyal
+    xor a
+    ld [$d048],a
+.missableObjectsLoop
+    ld a,[hli]
+    cp $ff          ; end of list
+    ret z
+    push hl
+    inc hl
+    ld a,[hl]
+    cp Hide
+    jr nz,.asm_f19d
+    ld hl,W_MISSABLEOBJECTFLAGS_NEW
+    ld a,[$d048]
+    ld c,a
+    ld b,$1
+    call HandleBitArray2 ; set flag iff Item is hidden
+.asm_f19d
+    ld hl,$d048
+    inc [hl]
+    pop hl
+    inc hl
+    inc hl
+    jr .missableObjectsLoop
+
 ; ───────────────────────────────────────
 
 SECTION "UseItem_",ROMX[$55c7],BANK[$3]
@@ -24955,7 +24812,7 @@ CoinCaseNumCoinsText: ; e247 (3:6247)
 ItemUseOldRod:
     call FishingInit
     jp c,ItemUseNotTime
-    ld hl,OldRodData
+    call GetOldRodData ; ld hl,OldRodData
     ld a,[W_CURMAP]
     ld de,1 ; each fishing group is one byte wide
     call IsInArray
@@ -24970,13 +24827,13 @@ ItemUseOldRod:
 ItemUseGoodRod:
     call FishingInit
     jp c,ItemUseNotTime
-    ld de,GoodRodData
+    call GetGoodRodData_DE ; ld de,GoodRodData
     jr ItemUseRodCommon
 
 ItemUseSuperRod:
     call FishingInit
     jp c,ItemUseNotTime
-    ld de,SuperRodData
+    call GetSuperRodData_DE ; ld de,SuperRodData
 
 ItemUseRodCommon:
     call ReadRodData ; 0xe8ea
@@ -26643,7 +26500,7 @@ Func_f113: ; f113 (3:7113)
     ld a,$10
     call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
 .notInTown
-    ld hl,MapHSPointers
+    call GetMapHSPointers ; ld hl,MapHSPointers
     ld a,[W_CURMAP] ; $d35e
     ld b,$0
     ld c,a
@@ -26655,7 +26512,7 @@ Func_f113: ; f113 (3:7113)
 Func_f132: ; f132 (3:7132)
     ld l,a
     push hl
-    ld de,MapHS00             ; calculate difference between out pointer and the base pointer
+    call GetFirstMapHSPointer_DE ; ld de,MapHS00 ; calculate difference between out pointer and the base pointer
     ld a,l
     sub e
     jr nc,.asm_f13c
@@ -26747,7 +26604,7 @@ IsMissableObjectHidden: ; f1a6 (3:71a6)
     jr nz,.loop
     ld c,a
     ld b,$2
-    ld hl,W_MISSABLEOBJECTFLAGS
+    call GetMissableObjectFlag ; ld hl,W_MISSABLEOBJECTFLAGS
     call HandleBitArray2
     ld a,c
     and a
@@ -26761,7 +26618,7 @@ IsMissableObjectHidden: ; f1a6 (3:71a6)
 ; adds missable object (items,leg. pokemon,etc.) to the map
 ; [$cc4d]: index of the missable object to be added (global index)
 AddMissableObject: ; f1c8 (3:71c8)
-    ld hl,W_MISSABLEOBJECTFLAGS
+    call GetMissableObjectFlag ; ld hl,W_MISSABLEOBJECTFLAGS
     ld a,[$cc4d]
     ld c,a
     ld b,$0
@@ -26771,7 +26628,7 @@ AddMissableObject: ; f1c8 (3:71c8)
 ; removes missable object (items,leg. pokemon,etc.) from the map
 ; [$cc4d]: index of the missable object to be removed (global index)
 RemoveMissableObject: ; f1d7 (3:71d7)
-    ld hl,W_MISSABLEOBJECTFLAGS
+    call GetMissableObjectFlag ; ld hl,W_MISSABLEOBJECTFLAGS
     ld a,[$cc4d]
     ld c,a
     ld b,$1
@@ -27854,7 +27711,7 @@ InitializePlayerData: ; f850 (3:7850)
     ld hl,W_GAMEPROGRESSFLAGS ; $d5f0
     ld bc,wGameProgressFlagsEnd-W_GAMEPROGRESSFLAGS ; ld bc,$c8
     call FillMemory               ; clear all game progress flags
-    jp InitializeMissableObjectsFlags
+    jp InitializeMissableObjectsFlags_OldAndNew
 
 ; writes two bytes $00 $ff to hl
 InitializeEmptyList: ; f8a0 (3:78a0)
@@ -33021,7 +32878,7 @@ InitOutsideMapSprites: ; 1797b (5:797b)
     ld a,[W_CURMAP]
     cp a,REDS_HOUSE_1F ; is the map a city or a route (map ID less than $25)?
     ret nc ; if not,return
-    ld hl,MapSpriteSets
+    call GetMapSpriteSets ; ld hl,MapSpriteSets
     add l
     ld l,a
     jr nc,.noCarry
@@ -33216,7 +33073,7 @@ MapSpriteSets: ; 17a64 (5:7a64)
     db $01 ; CINNABAR_ISLAND
     db $06 ; INDIGO_PLATEAU
     db $07 ; SAFFRON_CITY
-    db $01 ; unused map ID
+    db $01 ; unused
     db $01 ; ROUTE_1
     db $f1 ; ROUTE_2
     db $02 ; ROUTE_3
@@ -34134,6 +33991,37 @@ Func_17d7d: ; Moved in the Bank
     xor a
     ld [W_ISLINKBATTLE],a ; $d12b
     jp PlayDefaultMusic
+
+; ───────────────────────────────────────
+; Handle New Adventure Data (BANK $05)
+; ───────────────────────────────────────
+
+MapSpriteSetsNew:
+    db $01 ; PORT_ROYAL
+    db $01 ; VIRIDIAN_CITY
+    db $02 ; PEWTER_CITY
+    db $02 ; CERULEAN_CITY
+    db $03 ; LAVENDER_TOWN
+    db $04 ; VERMILION_CITY
+    db $05 ; CELADON_CITY
+    db $0a ; FUCHSIA_CITY
+    db $01 ; CINNABAR_ISLAND
+    db $06 ; INDIGO_PLATEAU
+    db $07 ; SAFFRON_CITY
+    db $01 ; unused map ID
+    db $01 ; ROUTE_D1
+    db $01 ; TEST_MAP_1
+
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $05)
+; ───────────────────────────────────────
+
+GetMapSpriteSets:
+    ld hl,MapSpriteSets
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,MapSpriteSetsNew
+    ret
 
 SECTION "bank6",ROMX,BANK[$6]
 
@@ -68520,7 +68408,7 @@ Func_469a0: ; 469a0 (11:69a0)
     ld [hli],a
     ld [hl],a
     ld de,$0
-    ld hl,HiddenObjectMaps ; $6a40
+    call GetHiddenObjectMaps ; ld hl,HiddenObjectMaps ; $6a40
 .asm_469ae
     ld a,[hli]
     ld b,a
@@ -68533,7 +68421,7 @@ Func_469a0: ; 469a0 (11:69a0)
     inc de
     jr .asm_469ae
 .asm_469be
-    ld hl,HiddenObjectPointers ; $6a96
+    call GetHiddenObjectPointers ; ld hl,HiddenObjectPointers ; $6a96
     add hl,de
     ld a,[hli]
     ld h,[hl]
@@ -69579,7 +69467,42 @@ SafariZoneLaprasRunAway:
     TX_FAR _SafariZoneLaprasRunAway
     db "@"
 
-; ──────────────────────
+; ───────────────────────────────────────
+; Handle New Adventure Data (BANK $11)
+; ───────────────────────────────────────
+
+
+HiddenObjectMapsNew:
+    db ROUTE_D1
+    db $FF
+
+HiddenObjectPointersNew:
+    dw RouteD1HiddenObjects
+
+RouteD1HiddenObjects:
+    db 13,26,ULTRA_BALL
+    dbw BANK(HiddenItems),HiddenItems
+    db $FF
+
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $11)
+; ───────────────────────────────────────
+
+GetHiddenObjectMaps:
+    ld hl,HiddenObjectMaps
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,HiddenObjectMapsNew
+    ret
+
+GetHiddenObjectPointers:
+    ld hl,HiddenObjectPointers
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,HiddenObjectPointersNew
+    ret
+
+; ───────────────────────────────────────
 
 SECTION "bank12",ROMX,BANK[$12]
 
@@ -99969,6 +99892,7 @@ ExternalMapEntriesNew:
     EMAP $A,$5,SaffronCityName
     EMAP $2,$B,DummyTownName ; dummytown
     EMAP $9,$E,RouteD1Name
+    EMAP $9,$E,RouteD1Name ; TEST_MAP_1
 
 InternalMapEntriesNew:
     IMAP $FF,$7,$E,PortRoyalName
@@ -99987,34 +99911,34 @@ RouteD1Name:
 
 ChoiceCompressedMap:
     ld de,CompressedMap
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld de,CompressedMapNew
     ret
 
 GetExternalMapEntries:
     ld hl,ExternalMapEntries
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld hl,ExternalMapEntriesNew
     ret
 
 GetInternalMapEntries:
     ld hl,InternalMapEntries
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld hl,InternalMapEntriesNew
     ret
 
 ChoiceTownMapOrder:
     ld hl,TownMapOrder
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld hl,TownMapOrderNew
     ret
 
 CompareWithMaxNumberOfTownInCurrentWorld:
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     jr nz,.new
     cp TownMapOrderEnd-TownMapOrder ; number of list items + 1
     ret
@@ -100024,21 +99948,21 @@ CompareWithMaxNumberOfTownInCurrentWorld:
 
 LoadMaxNumberOfTownInCurrentWorld:
     ld a,TownMapOrderEnd-TownMapOrder-1 ; number of list items
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld a,TownMapOrderNewEnd-TownMapOrderNew-1 ; number of list items
     ret
 
 GetNumFlyingCity:
     ld bc,FlyingCitySortOrderEnd-FlyingCitySortOrder
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld bc,FlyingCitySortOrderNewEnd-FlyingCitySortOrderNew
     ret
 
 GetFlyingCitySortOrder:
     ld hl,FlyingCitySortOrder
-    call CheckNewAdvenureFlag
+    call CheckNewAdventureFlag
     ret z
     ld hl,FlyingCitySortOrderNew
     ret
@@ -102203,7 +102127,7 @@ PrintStatusAilment: ; 747de (1d:47de)
     ret
 
 Func_7481f: ; 7481f (1d:481f)
-    ld hl,HiddenItemCoords
+    call GetHiddenItemCoords ; ld hl,HiddenItemCoords
     ld b,$0
 .asm_74824
     ld de,$0003
@@ -102212,7 +102136,7 @@ Func_7481f: ; 7481f (1d:481f)
     ret nc
     push bc
     push hl
-    ld hl,$d6f0
+    call GetObtainedHiddenItemsFlags ; ld hl,wObtainedHiddenItemsFlags
     ld c,b
     ld b,$2
     ld a,$10
@@ -106234,10 +106158,10 @@ UnnamedText_76683: ; 76683 (1d:6683)
     db "@"
 
 HiddenItems: ; 76688 (1d:6688)
-    ld hl,HiddenItemCoords
+    call GetHiddenItemCoords ; ld hl,HiddenItemCoords
     call Func_76857
     ld [$cd41],a
-    ld hl,$d6f0
+    call GetObtainedHiddenItemsFlags ; ld hl,wObtainedHiddenItemsFlags
     ld a,[$cd41]
     ld c,a
     ld b,$2
@@ -106322,7 +106246,7 @@ FoundHiddenItemText: ; 7675b (1d:675b)
     ld c,1
     call GiveItem
     jr nc,.BagFull
-    ld hl,$d6f0
+    call GetObtainedHiddenItemsFlags ; ld hl,wObtainedHiddenItemsFlags
     ld a,[$cd41]
     ld c,a
     ld b,$1
@@ -106351,10 +106275,10 @@ HiddenCoins: ; 76799 (1d:6799)
     ld a,b
     and a
     ret z
-    ld hl,HiddenCoinCoords
+    call GetHiddenCoinCoords ; ld hl,HiddenCoinCoords
     call Func_76857
     ld [$cd41],a
-    ld hl,$d6fe
+    call GetObtainedHiddenCoinsFlags ; ld hl,wObtainedHiddenCoinsFlags
     ld a,[$cd41]
     ld c,a
     ld b,$2
@@ -106397,7 +106321,7 @@ HiddenCoins: ; 76799 (1d:6799)
     ld c,$2
     ld a,$b
     call Predef
-    ld hl,$d6fe
+    call GetObtainedHiddenCoinsFlags ; ld hl,wObtainedHiddenCoinsFlags
     ld a,[$cd41]
     ld c,a
     ld b,$1
@@ -106522,6 +106446,51 @@ CinnabarMartText1:
     db HYPER_POTION,SUPER_POTION
     db FULL_HEAL
     db MAX_REPEL,ESCAPE_ROPE,$FF
+
+; ───────────────────────────────────────
+; Handle New Adventure Data (BANK $1D)
+; ───────────────────────────────────────
+
+HiddenItemCoordsNew:
+    db ROUTE_D1,13,26
+    db $ff
+
+HiddenCoinCoordsNew:
+    db $ff
+
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $1C)
+; ───────────────────────────────────────
+
+GetHiddenItemCoords:
+    ld hl,HiddenItemCoords
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,HiddenItemCoordsNew
+    ret
+
+GetHiddenCoinCoords:
+    ld hl,HiddenCoinCoords
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,HiddenCoinCoordsNew
+    ret
+
+GetObtainedHiddenItemsFlags:
+    ld hl,wObtainedHiddenItemsFlags
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,wObtainedHiddenItemsFlags_NEW
+    ret
+
+GetObtainedHiddenCoinsFlags:
+    ld hl,wObtainedHiddenCoinsFlags
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,wObtainedHiddenCoinsFlags_NEW
+    ret
+
+; ───────────────────────────────────────
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -131193,7 +131162,7 @@ MonOverworldDataNew2:
 SECTION "Wild Pkmn",ROMX,BANK[$36]
 
 LoadWildData:
-    ld hl,WildDataPointers
+    call GetWildDataPointers ; ld hl,WildDataPointers
     ld a,[W_CURMAP]
     ; get wild data for current map
     ld c,a
@@ -132645,9 +132614,6 @@ SuperRodData:
     dbdw SAFARI_ZONE_NORTH   , SuperRodGroupSafari
     dbdw SAFARI_ZONE_WEST    , SuperRodGroupSafari
     dbdw SAFARI_ZONE_CENTER  , SuperRodGroupSafari
-    ;dbdw UNKNOWN_DUNGEON_2   , SuperRodGroupUnknown
-    ;dbdw UNKNOWN_DUNGEON_3   , SuperRodGroupUnknown
-    ;dbdw UNKNOWN_DUNGEON_1   , SuperRodGroupUnknown
     db $FF
 
 GoodRodGroupBeach:
@@ -133050,7 +133016,7 @@ SuperRodGroupLake:
 ; creates a list at wBuffer of maps where the mon in [wd11e] can be found.
 ; this is used by the pokedex to display locations the mon can be found on the map.
 _FindWildLocationsOfMon:
-    ld hl,WildDataPointers
+    call GetWildDataPointers ; ld hl,WildDataPointers
     ld de,$cee9
     ld c,$0
 .loop
@@ -133070,10 +133036,10 @@ _FindWildLocationsOfMon:
     and a
     call nz,CheckMapForMon ; water
     jr c,.found
-    ld hl,SuperRodData
+    call GetSuperRodData ; ld hl,SuperRodData
     call FindFishingLocationsOfMon ; fishing super rod
     jr c,.found
-    ld hl,GoodRodData
+    call GetGoodRodData ; ld hl,GoodRodData
     call FindFishingLocationsOfMon ; fishing good rod
 .found
     pop hl
@@ -133145,6 +133111,112 @@ CheckFishingForMon:
     jr nz,.Loop
     and a ; Reset Carry Flag
     ret
+
+; ───────────────────────────────────────
+; Handle New Adventure Data (BANK $36)
+; ───────────────────────────────────────
+
+WildDataPointersNew:
+    dw NoMons        ; PORT_ROYAL
+    dw NoMons        ; VIRIDIAN_CITY
+    dw NoMons        ; PEWTER_CITY
+    dw NoMons        ; CERULEAN_CITY
+    dw NoMons        ; LAVENDER_TOWN
+    dw NoMons        ; VERMILION_CITY
+    dw NoMons        ; CELADON_CITY
+    dw NoMons        ; FUCHSIA_CITY
+    dw NoMons        ; CINNABAR_ISLAND
+    dw NoMons        ; INDIGO_PLATEAU
+    dw NoMons        ; SAFFRON_CITY
+    dw NoMons
+    dw RouteD1Mons   ; ROUTE_D1
+    dw NoMons        ; TEST_MAP_1
+    dw $FFFF
+
+RouteD1Mons:
+    db $19
+    db  3,RATTATA  ; 20%
+    db  3,RATTATA  ; 20%
+    db  4,RATTATA  ; 15%
+    db  2,RATTATA  ; 10%
+    db  2,RATTATA  ; 10%
+    db  3,RATTATA  ; 10%
+    db  4,RATTATA  ;  5%
+    db  1,RATTATA  ;  5%
+    db  2,RATTATA  ;  4%
+    db  5,RATTATA  ;  1%
+    db $05
+    db  2,MAGIKARP ; 20%
+    db  2,MAGIKARP ; 20%
+    db  2,MAGIKARP ; 15%
+    db  2,MAGIKARP ; 10%
+    db  2,MAGIKARP ; 10%
+    db  2,MAGIKARP ; 10%
+    db  2,MAGIKARP ;  5%
+    db  2,MAGIKARP ;  5%
+    db  2,MAGIKARP ;  4%
+    db  2,MAGIKARP ;  1%
+
+
+GoodRodDataNew:
+    dbdw ROUTE_D1, GoodRodGroupBeach
+    db $FF
+
+SuperRodDataNew:
+    dbdw ROUTE_D1, SuperRodGroupBeach
+    db $FF
+
+OldRodDataNew:
+    db ROUTE_D1
+    db $FF
+
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $36)
+; ───────────────────────────────────────
+
+GetWildDataPointers:
+    ld hl,WildDataPointers
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,WildDataPointersNew
+    ret
+
+GetOldRodData:
+    ld hl,OldRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,OldRodDataNew
+    ret
+
+GetGoodRodData:
+    ld hl,GoodRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,GoodRodDataNew
+    ret
+
+GetGoodRodData_DE:
+    ld de,GoodRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld de,GoodRodDataNew
+    ret
+
+GetSuperRodData:
+    ld hl,SuperRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,SuperRodDataNew
+    ret
+
+GetSuperRodData_DE:
+    ld de,SuperRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld de,SuperRodDataNew
+    ret
+
+; ───────────────────────────────────────
 
 SECTION "bank37",ROMX,BANK[$37]
 
@@ -133622,6 +133694,8 @@ ForceShinyOrRandom_:
     ld a,[W_VICTORYROAD2CURSCRIPT]
     cp 3 ; Shiny Onix
     jr z,.Onix
+    call CheckNewAdventureFlag
+    jr nz,.NewAdventure
     ld a,[W_CURMAP]
     cp DRATINI_CAVE
     jr z,.ShinyRandom
@@ -133631,9 +133705,12 @@ ForceShinyOrRandom_:
     jr z,.Tower6
     cp PALLET_TOWN
     jr z,.PalletTown
+    ; fall through
 .Random
     call .GenRandomInBattle
     jr .End
+.NewAdventure
+    jr .Random
 .PalletTown
     ld a,[$cf91]
     cp PIKACHU
@@ -134998,6 +135075,29 @@ INCLUDE "constants/pokemon_learnset.asm"
 
 SECTION "Bank3c",ROMX,BANK[$3C]
 
+
+; ──────────────────────────────────────────────────────────────────────
+; EMPTY MAP
+; ──────────────────────────────────────────────────────────────────────
+
+EmptyMap_h:
+    db $00 ; tileset
+    db 1,2 ; dimensions
+    dw EmptyMapBlocks,EmptyMapTextPointers,EmptyMapScript
+    db 0 ; connections
+    dw EmptyMapObject
+EmptyMapObject:
+    db $f ; border tile
+    db $0 ; warps
+    db $0 ; signs
+    db $0 ; people
+EmptyMapBlocks:
+    db 2,3
+EmptyMapTextPointers:
+    dw 0
+EmptyMapScript:
+    ret
+
 ; ──────────────────────────────────────────────────────────────────────
 ; PORT ROYAL
 ; ──────────────────────────────────────────────────────────────────────
@@ -135014,13 +135114,17 @@ PortRoyalObject:
     db $f ; border tile
     db $0 ; warps
     db $0 ; signs
-    db $0 ; people
+
+    db $2 ; people
+    db SPRITE_GIRL,8 + 4,3 + 4,$fe,$00,$00+1 ; person
+    db SPRITE_BALL,9 + 4,3 + 4,$ff,$ff,$80+2,SURFBOARD ; item
 
 PortRoyalBlocks:
     INCBIN "maps/portroyal.blk"
 
-PortRoyalTextPointers: ; 4fd4c (13:7d4c)
+PortRoyalTextPointers:
     dw PortRoyalText1
+    dw Predef5CText
 
 PortRoyalText1:
     TX_FAR _PortRoyalText1
@@ -135046,14 +135150,21 @@ RouteD1_h:
 
 RouteD1Object:
     db $f ; border tile
-    db $0 ; warps
+
+    db $1 ; warps
+    db 11,31,0,TEST_MAP_1
+
     db $0 ; signs
+
     db $0 ; people
+
+    ; warp-to
+    EVENT_DISP ROUTE_D1_WIDTH,11,31 ; TEST_MAP_1
 
 RouteD1Blocks:
     INCBIN "maps/routed1.blk"
 
-RouteD1TextPointers: ; 4fd4c (13:7d4c)
+RouteD1TextPointers:
     dw RouteD1Text1
 
 RouteD1Text1:
@@ -135065,5 +135176,38 @@ _RouteD1Text1:
 
 RouteD1Script:
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+; TEST MAP 1
+; ──────────────────────────────────────────────────────────────────────
+
+TestMap1_h:
+    db $05 ; tileset
+    db 4,7 ; dimensions
+    dw TestMap1Blocks,TestMap1TextPointers,TestMap1Script ; blocks,texts,scripts
+    db 0 ; connections
+    dw TestMap1Object
+TestMap1Object:
+    db $3 ; border tile
+
+    db 2 ; warp
+    db 7,6,0,$FF
+    db 7,7,0,$FF
+
+    db 0 ; sign
+
+    db 0 ; people
+
+    ; warp-to
+    EVENT_DISP 7,7,6
+    EVENT_DISP 7,7,7
+
+TestMap1TextPointers:
+    db "@"
+TestMap1Script:
+    ret
+
+TestMap1Blocks:
+    INCBIN "maps/devmap1.blk"
 
 ; ──────────────────────────────────────────────────────────────────────
