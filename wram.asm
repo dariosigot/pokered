@@ -985,7 +985,12 @@ wPlayerMoney: ; d347
 W_RIVALNAME: ; d34a
     ds 11
 
+
+
+wFlagNewAdventureBit5: ; d355 ; bit5 = New Adventure
+
 W_OPTIONS: ; d355
+
 ; bit 7 = battle animation
 ; 0: On
 ; 1: Off
@@ -1352,24 +1357,44 @@ W_SEAFOAMISLANDS5CURSCRIPT: ; d668
     ds 1
 W_ROUTE18GATECURSCRIPT: ; d669
     ds 1
+
 W_DRATINICAVECURSCRIPT: ; d66a
     ds 1
-W_SSANNE4CURSCRIPT:
+W_SSANNE4CURSCRIPT: ; d66b
     ds 1
-W_DIGLETTSCAVECURSCRIPT:
+W_DIGLETTSCAVECURSCRIPT: ; d66c
     ds 1
-W_SAFARIZONECURSCRIPT:
+W_SAFARIZONECURSCRIPT: ; d66d
     ds 1
 
-    ds 161-4
+SECTION "wGameProgressFlagsEnd", WRAMX[$d6b8], BANK[1]
+
+wGameProgressFlagsEnd:
+
+	ds 56
+
+flag_array: MACRO
+    ds ((\1) + 7) / 8
+ENDM
+
+wObtainedHiddenItemsFlags: flag_array 112
+
+wObtainedHiddenCoinsFlags: flag_array 16
+
+; $00 = walking
+; $01 = biking
+; $02 = surfing
+wWalkBikeSurfState:: db
+
+SECTION "W_TOWNVISITEDFLAG_NEW", WRAMX[$d709], BANK[1]
+
+W_TOWNVISITEDFLAG_NEW: ; d709
+; 2 bytes bit array, 1 means visited
+    ds 2
 
 W_TOWNVISITEDFLAG: ; d70b
 ; 2 bytes bit array, 1 means visited
-    ds 1
-
-W_TOWNVISITEDFLAG_PLUS_1: ; d70b
-wFlagNewAdventureBit7:    ; d70b ; bit7 = New Adventure
-    ds 1
+    ds 2
 
 wSafariSteps: ; d70d
 ; starts at 502

@@ -300,7 +300,7 @@ MapHeaderPointers: ; 01ae (0:01ae)
     dw CinnabarIsland_h
     dw IndigoPlateau_h
     dw SaffronCity_h
-    dw PortRoyal_h
+    dw PalletTown_h ; dummytown
     dw Route1_h
     dw Route2_h
     dw Route3_h
@@ -358,7 +358,7 @@ MapHeaderPointers: ; 01ae (0:01ae)
     dw BikeShop_h
     dw CeruleanMart_h
     dw MtMoonPokecenter_h
-    dw RouteD1_h ; unused
+    dw PalletTown_h ; unused
     dw Route5Gate_h
     dw UndergroundTunnelEntranceRoute5_h
     dw DayCareM_h
@@ -2603,7 +2603,7 @@ LoadMapHeader: ; 107c (0:107c)
     ld [$ff8b],a
     bit 7,b
     ret nz
-    ld hl,MapHeaderPointers
+    call GetMapHeaderPointers ; ld hl,MapHeaderPointers
     ld a,[W_CURMAP]
     sla a
     jr nc,.noCarry1
@@ -2954,7 +2954,7 @@ SwitchToMapRomBank: ; 12bc (0:12bc)
     ld b,$00
     ld a,$03
     call BankswitchHome ; switch to ROM bank 3
-    ld hl,MapHeaderBanks
+    call GetMapHeaderBanks ; ld hl,MapHeaderBanks
     add hl,bc
     ld a,[hl]
     ld [$ffe8],a ; save map ROM bank
@@ -3124,9 +3124,14 @@ LoadMonData: ; 1372 (0:1372)
 ;    ld [hl],a
 ;    ret
 
-; Some Free Bytes Bank 0
-
-SECTION "LoadFlippedFrontSpriteByMonIndex",ROM0[$1384]
+CheckNewAdvenureFlag:
+    push bc
+    ld b,a
+    ld a,[wFlagNewAdventureBit5]
+    bit 5,a
+    ld a,b
+    pop bc
+    ret
 
 LoadFlippedFrontSpriteByMonIndex: ; 1384 (0:1384)
     ld a,$1
@@ -3392,10 +3397,6 @@ CheckSurfing:
 .end
     ret
 
-; ds X ; Denim ; 4some free Bytes
-
-SECTION "PrintLevel",ROM0[$150b] ; Denim
-
 ; function to print pokemon level,leaving off the ":L" if the level is at least 100
 ; INPUT:
 ; hl = destination address
@@ -3493,7 +3494,18 @@ GetMonHeader: ; 1537 (0:1537)
     ld [H_LOADEDROMBANK],a
     jp RoutineForRealGB
 
-; Free Space
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $00)
+; ───────────────────────────────────────
+
+GetTownVisitedFlag:
+    ld hl,W_TOWNVISITEDFLAG
+    call CheckNewAdvenureFlag
+    ret z
+    ld hl,W_TOWNVISITEDFLAG_NEW
+    ret
+
+; Free Space in BANK0
 
 SECTION "GetPartyMonName2",ROM0[$15b4]
 
@@ -6103,80 +6115,24 @@ UpdateSprites: ; 2429 (0:2429)
     call RoutineForRealGB
     ret
 
-; mart inventories are below
-; they are texts
-; first byte $FE,next byte # of items,last byte $FF
+; ───────────────────────────────────────
+; Handle New Adventure Data (BANK $00)
+; ───────────────────────────────────────
 
-; Viridian
-ViridianMartText6: ; 2442 (0:2442)
-    db $FE,4,POKE_BALL
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
-
-; Pewter
-PewterMartText1:
-    db $FE,7,POKE_BALL
-    db POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
-    db ESCAPE_ROPE,$FF
-
-; Cerulean
-CeruleanMartText1:
-    db $FE,7,POKE_BALL
-    db POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
-    db REPEL,$FF
-
-; Vermilion
-VermilionMartText1:
-    db $FE,8,POKE_BALL
-    db SUPER_POTION,POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
-    db REPEL,$FF
-
-; Lavender
-LavenderMartText1:
-    db $FE,10,GREAT_BALL
-    db SUPER_POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
-    db SUPER_REPEL
-    db ETHER,ELIXER,$FF
-
-; Celadon Dept. Store 2F (1)
-CeladonMart2Text1:
-    db $FE,13,GREAT_BALL,POKE_BALL
-    db REVIVE
-    db SUPER_POTION,POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
-    db ESCAPE_ROPE,SUPER_REPEL,REPEL,$FF
-
-; Saffron
-SaffronMartText1:
-    db $FE,5,GREAT_BALL
-    db HYPER_POTION
-    db FULL_HEAL
-    db MAX_REPEL,ESCAPE_ROPE,$FF
-
-; Fuchsia
-FuchsiaMartText1:
-    db $FE,5,ULTRA_BALL,GREAT_BALL
-    db SUPER_POTION
-    db FULL_HEAL
-    db SUPER_REPEL,$FF
-
-; Cinnabar
-CinnabarMartText1:
-    db $FE,6,ULTRA_BALL
-    db HYPER_POTION,SUPER_POTION
-    db FULL_HEAL
-    db MAX_REPEL,ESCAPE_ROPE,$FF
-
-; Indigo
-IndigoPlateauLobbyText4:
-    db $FE,7,ULTRA_BALL
-    db REVIVE
-    db FULL_RESTORE,MAX_POTION,HYPER_POTION
-    db FULL_HEAL
-    db MAX_REPEL,$FF
+MapHeaderPointersNew:
+    dw PortRoyal_h      ; PORT_ROYAL
+    dw ViridianCity_h   ; VIRIDIAN_CITY
+    dw PewterCity_h     ; PEWTER_CITY
+    dw CeruleanCity_h   ; CERULEAN_CITY
+    dw LavenderTown_h   ; LAVENDER_TOWN
+    dw VermilionCity_h  ; VERMILION_CITY
+    dw CeladonCity_h    ; CELADON_CITY
+    dw FuchsiaCity_h    ; FUCHSIA_CITY
+    dw CinnabarIsland_h ; CINNABAR_ISLAND
+    dw IndigoPlateau_h  ; INDIGO_PLATEAU
+    dw SaffronCity_h    ; SAFFRON_CITY
+    dw PalletTown_h     ; DUMMY_TOWN
+    dw RouteD1_h        ; ROUTE_D1
 
 SECTION "TextScriptEndingChar",ROM0[$24d6]
 
@@ -7524,10 +7480,7 @@ DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
     ld hl,InitializeChooseQuantityMenu ; 3 byte
     call Bankswitch ; 3 byte
 
-    jp .incrementQuantity
-
-    ; free space in BANK0
-    ds 24+23-8-16
+    jr .incrementQuantity
 
 .waitForKeyPressLoop
     call GetJoypadStateLowSensitivity
@@ -7643,6 +7596,26 @@ InitialQuantityText: ; 2e30 (0:2e30)
 
 SpacesBetweenQuantityAndPriceText: ; 2e34 (0:2e34)
     db "      @"
+
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $00)
+; ───────────────────────────────────────
+
+GetMapHeaderBanks:
+    ld hl,MapHeaderBanks
+    call CheckNewAdvenureFlag
+    ret z
+    ld hl,MapHeaderBanksNew
+    ret
+
+GetMapHeaderPointers:
+    ld hl,MapHeaderPointers
+    call CheckNewAdvenureFlag
+    ret z
+    ld hl,MapHeaderPointersNew
+    ret
+
+SECTION "ExitListMenu",ROM0[$2e3b]
 
 ExitListMenu: ; 2e3b (0:2e3b)
     ld a,[wCurrentMenuItem]
@@ -15040,7 +15013,7 @@ Func_62ff: ; 62ff (1:62ff)
     ld [W_CURMAP],a ; $d35e
     ld a,[$d71e]
     ld c,a
-    ld hl,DungeonWarpList ; $63bf
+    call GetDungeonWarpList ; ld hl,DungeonWarpList ; $63bf
     ld de,$0
     ld a,$6
     ld [$d12f],a
@@ -15060,7 +15033,7 @@ Func_62ff: ; 62ff (1:62ff)
     ld e,a
     jr .asm_6376
 .asm_6388
-    call CheckDiglettsCave ; ld hl,DungeonWarpData ; $63d8
+    call CheckDiglettsCave ; call GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
     add hl,de
     jr .asm_63a4
 .asm_638e
@@ -15068,7 +15041,7 @@ Func_62ff: ; 62ff (1:62ff)
 .asm_6391
     ld b,a
     ld [W_CURMAP],a ; $d35e
-    ld hl,FlyWarpDataPtr ; $6448
+    call GetFlyWarpDataPtr ; ld hl,FlyWarpDataPtr ; $6448
 .asm_6398
     ld a,[hli]
     inc hl
@@ -15182,8 +15155,6 @@ FlyWarpDataPtr: ; 6448 (1:6448)
     dw Map09FlyWarp
     db $0A,0
     dw Map0aFlyWarp
-    db PORT_ROYAL,0
-    dw Map0bFlyWarp
     db $0F,0
     dw Map0fFlyWarp
     db $15,0
@@ -15217,8 +15188,6 @@ Map09FlyWarp:
     FLYWARP_DATA 10,6,9
 Map0aFlyWarp:
     FLYWARP_DATA 20,30,9
-Map0bFlyWarp:
-    FLYWARP_DATA 10,6,5
 Map0fFlyWarp:
     FLYWARP_DATA 45,6,11
 Map15FlyWarp:
@@ -18715,7 +18684,7 @@ CheckDiglettsCave:
     ld a,$06     ; Dark Map
     ld [$d35d],a ; ...
 .done
-    ld hl,DungeonWarpData ; $63d8
+    call GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
     ret
 
 CheckImportantMove:
@@ -18808,6 +18777,53 @@ HandleMenuInput_PrintMoveDetailsBox:
     ld a,b
     ret z
     jr HandleMenuInput_PrintMoveDetailsBox
+
+; ───────────────────────────────────────
+; Handle New Adventure Data (BANK $01)
+; ───────────────────────────────────────
+
+FlyWarpDataPtrNew:
+    db PORT_ROYAL,0
+    dw PortRoyalFlyWarp
+    db VIRIDIAN_CITY,0
+    dw Map01FlyWarp
+
+PortRoyalFlyWarp:
+    FLYWARP_DATA PORT_ROYAL_WIDTH,6,5
+RouteD1FlyWarp:
+    FLYWARP_DATA ROUTE_D1_WIDTH,6,5
+
+DungeonWarpListNew:
+    db $FF
+
+DungeonWarpDataNew:
+
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $01)
+; ───────────────────────────────────────
+
+GetFlyWarpDataPtr:
+    ld hl,FlyWarpDataPtr
+    call CheckNewAdvenureFlag
+    ret z
+    ld hl,FlyWarpDataPtrNew
+    ret
+
+GetDungeonWarpList:
+    ld hl,DungeonWarpList
+    call CheckNewAdvenureFlag
+    ret z
+    ld hl,DungeonWarpListNew
+    ret
+
+GetDungeonWarpData:
+    ld hl,DungeonWarpData
+    call CheckNewAdvenureFlag
+    ret z
+    ld hl,DungeonWarpDataNew
+    ret
+
+; ───────────────────────────────────────
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -21284,7 +21300,7 @@ MapSongBanks: ; c04d (3:404d)
 
 ; see also MapHeaderPointers
 MapHeaderBanks: ; c23d (3:423d)
-    db BANK(PalletTown_h) ;PALLET_TOWN
+    db BANK(PalletTown_h) ; PALLET_TOWN
     db BANK(ViridianCity_h) ; VIRIDIAN_CITY
     db BANK(PewterCity_h) ; PEWTER_CITY
     db BANK(CeruleanCity_h) ; CERULEAN_CITY
@@ -21295,7 +21311,7 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(CinnabarIsland_h) ; CINNABAR_ISLAND
     db BANK(IndigoPlateau_h) ; INDIGO_PLATEAU
     db BANK(SaffronCity_h) ; SAFFRON_CITY
-    db BANK(PortRoyal_h) ; PORT_ROYAL
+    db BANK(PalletTown_h) ; DUMMY_TOWN
     db BANK(Route1_h) ; ROUTE_1
     db BANK(Route2_h) ; ROUTE_2
     db BANK(Route3_h) ; ROUTE_3
@@ -21353,7 +21369,7 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(BikeShop_h)
     db BANK(CeruleanMart_h)
     db BANK(MtMoonPokecenter_h)
-    db BANK(RouteD1_h) ; unused
+    db BANK(PalletTown_h) ; unused
     db BANK(Route5Gate_h)
     db BANK(UndergroundTunnelEntranceRoute5_h)
     db BANK(DayCareM_h)
@@ -23153,6 +23169,29 @@ OldRodData:
     db SAFARI_ZONE_WEST
     db SAFARI_ZONE_CENTER
     db $FF
+
+; ───────────────────────────────────────
+; Handle New Adventure Data (BANK $03)
+; ───────────────────────────────────────
+
+MapHeaderBanksNew:
+    db BANK(PortRoyal_h)      ; PORT_ROYAL
+    db BANK(ViridianCity_h)   ; VIRIDIAN_CITY
+    db BANK(PewterCity_h)     ; PEWTER_CITY
+    db BANK(CeruleanCity_h)   ; CERULEAN_CITY
+    db BANK(LavenderTown_h)   ; LAVENDER_TOWN
+    db BANK(VermilionCity_h)  ; VERMILION_CITY
+    db BANK(CeladonCity_h)    ; CELADON_CITY
+    db BANK(FuchsiaCity_h)    ; FUCHSIA_CITY
+    db BANK(CinnabarIsland_h) ; CINNABAR_ISLAND
+    db BANK(IndigoPlateau_h)  ; INDIGO_PLATEAU
+    db BANK(SaffronCity_h)    ; SAFFRON_CITY
+    db BANK(PalletTown_h)     ; DUMMY_TOWN
+    db BANK(RouteD1_h)        ; ROUTE_D1
+
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $03)
+; ───────────────────────────────────────
 
 SECTION "UseItem_",ROMX[$55c7],BANK[$3]
 
@@ -26600,7 +26639,7 @@ Func_f113: ; f113 (3:7113)
     jr nc,.notInTown
     ld c,a
     ld b,$1
-    ld hl,W_TOWNVISITEDFLAG   ; mark town as visited (for flying)
+    call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG   ; mark town as visited (for flying)
     ld a,$10
     call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
 .notInTown
@@ -27813,7 +27852,7 @@ InitializePlayerData: ; f850 (3:7850)
     ld [hli],a                   ; no coins
     ld [hl],a
     ld hl,W_GAMEPROGRESSFLAGS ; $d5f0
-    ld bc,$c8
+    ld bc,wGameProgressFlagsEnd-W_GAMEPROGRESSFLAGS ; ld bc,$c8
     call FillMemory               ; clear all game progress flags
     jp InitializeMissableObjectsFlags
 
@@ -37955,6 +37994,14 @@ SetTempScriptFlag:
     set 6,[hl] ; Set Temp Script Flag to potentially Lock Cinnabar from Pallet
     jp EnableAutoTextBoxDrawing
 
+; Indigo
+IndigoPlateauLobbyText4:
+    db $FE,7,ULTRA_BALL
+    db REVIVE
+    db FULL_RESTORE,MAX_POTION,HYPER_POTION
+    db FULL_HEAL
+    db MAX_REPEL,$FF
+
 SECTION "bank7",ROMX,BANK[$7]
 
 CinnabarIsland_h: ; 0x1c000 to 0x1c022 (34 bytes) (bank=7) (id=8)
@@ -43923,6 +43970,18 @@ DecreaseFossilStep:
     ret z ; notSafariZone
     ld a,[wSafariSteps] ; $d70d
     jp ContinueSafariSteps
+
+; Viridian
+ViridianMartText6: ; 2442 (0:2442)
+    db $FE,4,POKE_BALL
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
+
+; Fuchsia
+FuchsiaMartText1:
+    db $FE,5,ULTRA_BALL,GREAT_BALL
+    db SUPER_POTION
+    db FULL_HEAL
+    db SUPER_REPEL,$FF
 
 SECTION "bank8",ROMX,BANK[$8]
 
@@ -83150,7 +83209,7 @@ Route21ScriptBarrier:
     pop hl
     jr .Loop
 .CheckCinnabarVisited
-    ld hl,W_TOWNVISITEDFLAG
+    call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG
     ld c,CINNABAR_ISLAND ; bit n
     ld b,2 ; read bit
     ld a,$10
@@ -83172,6 +83231,14 @@ Route21ScriptBarrier:
     db -1+07,05,$6B
     db -1+07,06,$6B
     db $FF
+
+; Celadon Dept. Store 2F (1)
+CeladonMart2Text1:
+    db $FE,13,GREAT_BALL,POKE_BALL
+    db REVIVE
+    db SUPER_POTION,POTION
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
+    db ESCAPE_ROPE,SUPER_REPEL,REPEL,$FF
 
 SECTION "bank16",ROMX,BANK[$16]
 
@@ -91155,6 +91222,35 @@ GiveTechMachAndTM34:
     ld bc,(TECH_MACHINE << 8) | 1
     jp GiveItem
 
+; Cerulean
+CeruleanMartText1:
+    db $FE,7,POKE_BALL
+    db POTION
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
+    db REPEL,$FF
+
+; Vermilion
+VermilionMartText1:
+    db $FE,8,POKE_BALL
+    db SUPER_POTION,POTION
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
+    db REPEL,$FF
+
+; Lavender
+LavenderMartText1:
+    db $FE,10,GREAT_BALL
+    db SUPER_POTION
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
+    db SUPER_REPEL
+    db ETHER,ELIXER,$FF
+
+; Saffron
+SaffronMartText1:
+    db $FE,5,GREAT_BALL
+    db HYPER_POTION
+    db FULL_HEAL
+    db MAX_REPEL,ESCAPE_ROPE,$FF
+
 SECTION "bank18",ROMX,BANK[$18]
 
 ViridianForestBlocks: ; 60000 (18:4000)
@@ -97605,14 +97701,15 @@ ToText: ; 7106d (1c:506d)
     db "To@"
 
 BuildFlyLocationsList: ; 71070 (1c:5070)
-    ld hl,W_TOWNVISITEDFLAG
+    call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG
     ld a,[hli]
     ld e,a
     ld a,[hl]
     ld d,a
-    call NormalizeTownVisitedFlag ; ld hl,wFlyLocationList ; $cd3d
+    ld hl,wFlyLocationList ; $cd3d
     ld a,$ff
     ld [hli],a ; Start of List
+    call GetNumFlyingCity ; ld bc,FlyingCitySortOrderEnd-FlyingCitySortOrder ; Num Flying City
     add hl,bc
     ld [hl],a ; End of List
 .loop
@@ -97904,7 +98001,7 @@ Func_712f1: ; 712f1 (1c:52f1)
     cp REDS_HOUSE_1F
     jr c,.asm_71304
     ld bc,$4
-    ld hl,InternalMapEntries ; $5382
+    call GetInternalMapEntries ; ld hl,InternalMapEntries ; $5382
 .asm_712fb
     cp [hl]
     jr c,.asm_71301
@@ -97914,7 +98011,7 @@ Func_712f1: ; 712f1 (1c:52f1)
     inc hl
     jr .asm_7130d
 .asm_71304
-    ld hl,ExternalMapEntries ; $5313
+    call GetExternalMapEntries ; ld hl,ExternalMapEntries ; $5313
     ld c,a
     ld b,$0
     add hl,bc
@@ -97928,7 +98025,7 @@ Func_712f1: ; 712f1 (1c:52f1)
     ld l,a
     ret
 
-ExternalMapEntries: ; 71313 (1c:5313)
+ExternalMapEntries:
     EMAP $2,$B,PalletTownName
     EMAP $2,$8,ViridianCityName
     EMAP $2,$3,PewterCityName
@@ -97940,7 +98037,7 @@ ExternalMapEntries: ; 71313 (1c:5313)
     EMAP $2,$F,CinnabarIslandName
     EMAP $0,$2,IndigoPlateauName
     EMAP $A,$5,SaffronCityName
-    EMAP $7,$E,PortRoyalName
+    EMAP $2,$B,DummyTownName ; dummytown
     EMAP $2,$A,Route1Name
     EMAP $2,$6,Route2Name
     EMAP $4,$3,Route3Name
@@ -97967,7 +98064,7 @@ ExternalMapEntries: ; 71313 (1c:5313)
     EMAP $A,$1,Route24Name
     EMAP $B,$0,Route25Name
 
-InternalMapEntries: ; 71382 (1c:5382)
+InternalMapEntries:
     IMAP $29,$2,$B,PalletTownName
     IMAP $2E,$2,$8,ViridianCityName
     IMAP $33,$2,$6,Route2Name
@@ -97976,7 +98073,6 @@ InternalMapEntries: ; 71382 (1c:5382)
     IMAP $3E,$6,$2,MountMoonName
     IMAP $44,$A,$2,CeruleanCityName
     IMAP $45,$5,$2,Route4Name
-    IMAP $46,$9,$E,RouteD1Name
     IMAP $49,$A,$4,Route5Name
     IMAP $4C,$A,$7,Route6Name
     IMAP $4F,$9,$5,Route7Name
@@ -98030,115 +98126,113 @@ InternalMapEntries: ; 71382 (1c:5382)
     IMAP $F8,$0,$2,PokemonLeagueName
     db $FF
 
-MapNames: ; 71473 (1c:5473)
-PalletTownName: ; 71473 (1c:5473)
+MapNames:
+PalletTownName:
     db "PALLET TOWN@"
-ViridianCityName: ; 7147f (1c:547f)
+ViridianCityName:
     db "VIRIDIAN CITY@"
-PewterCityName: ; 7148d (1c:548d)
+PewterCityName:
     db "PEWTER CITY@"
-CeruleanCityName: ; 71499 (1c:5499)
+CeruleanCityName:
     db "CERULEAN CITY@"
-LavenderTownName: ; 714a7 (1c:54a7)
+LavenderTownName:
     db "LAVENDER TOWN@"
-VermilionCityName: ; 714b5 (1c:54b5)
+VermilionCityName:
     db "VERMILION CITY@"
-CeladonCityName: ; 714c4 (1c:54c4)
+CeladonCityName:
     db "CELADON CITY@"
-FuchsiaCityName: ; 714d1 (1c:54d1)
+FuchsiaCityName:
     db "FUCHSIA CITY@"
-CinnabarIslandName: ; 714de (1c:54de)
+CinnabarIslandName:
     db "CINNABAR ISLAND@"
-IndigoPlateauName: ; 714ee (1c:54ee)
+IndigoPlateauName:
     db "INDIGO PLATEAU@"
-SaffronCityName: ; 714fd (1c:54fd)
+SaffronCityName:
     db "SAFFRON CITY@"
-Route1Name: ; 7150a (1c:550a)
+Route1Name:
     db "ROUTE 1@"
-Route2Name: ; 71512 (1c:5512)
+Route2Name:
     db "ROUTE 2@"
-Route3Name: ; 7151a (1c:551a)
+Route3Name:
     db "ROUTE 3@"
-Route4Name: ; 71522 (1c:5522)
+Route4Name:
     db "ROUTE 4@"
-Route5Name: ; 7152a (1c:552a)
+Route5Name:
     db "ROUTE 5@"
-Route6Name: ; 71532 (1c:5532)
+Route6Name:
     db "ROUTE 6@"
-Route7Name: ; 7153a (1c:553a)
+Route7Name:
     db "ROUTE 7@"
-Route8Name: ; 71542 (1c:5542)
+Route8Name:
     db "ROUTE 8@"
-Route9Name: ; 7154a (1c:554a)
+Route9Name:
     db "ROUTE 9@"
-Route10Name: ; 71552 (1c:5552)
+Route10Name:
     db "ROUTE 10@"
-Route11Name: ; 7155b (1c:555b)
+Route11Name:
     db "ROUTE 11@"
-Route12Name: ; 71564 (1c:5564)
+Route12Name:
     db "ROUTE 12@"
-Route13Name: ; 7156d (1c:556d)
+Route13Name:
     db "ROUTE 13@"
-Route14Name: ; 71576 (1c:5576)
+Route14Name:
     db "ROUTE 14@"
-Route15Name: ; 7157f (1c:557f)
+Route15Name:
     db "ROUTE 15@"
-Route16Name: ; 71588 (1c:5588)
+Route16Name:
     db "ROUTE 16@"
-Route17Name: ; 71591 (1c:5591)
+Route17Name:
     db "ROUTE 17@"
-Route18Name: ; 7159a (1c:559a)
+Route18Name:
     db "ROUTE 18@"
-Route19Name: ; 715a3 (1c:55a3)
+Route19Name:
     db "SEA ROUTE 19@"
-Route20Name: ; 715b0 (1c:55b0)
+Route20Name:
     db "SEA ROUTE 20@"
-Route21Name: ; 715bd (1c:55bd)
+Route21Name:
     db "SEA ROUTE 21@"
-Route22Name: ; 715ca (1c:55ca)
+Route22Name:
     db "ROUTE 22@"
-Route23Name: ; 715d3 (1c:55d3)
+Route23Name:
     db "ROUTE 23@"
-Route24Name: ; 715dc (1c:55dc)
+Route24Name:
     db "ROUTE 24@"
-Route25Name: ; 715e5 (1c:55e5)
+Route25Name:
     db "ROUTE 25@"
-ViridianForestName: ; 715ee (1c:55ee)
+ViridianForestName:
     db "VIRIDIAN FOREST@"
-MountMoonName: ; 715fe (1c:55fe)
+MountMoonName:
     db "MT.MOON@"
-RockTunnelName: ; 71606 (1c:5606)
+RockTunnelName:
     db "ROCK TUNNEL@"
-SeaCottageName: ; 71612 (1c:5612)
+SeaCottageName:
     db "SEA COTTAGE@"
-SSAnneName: ; 7161e (1c:561e)
+SSAnneName:
     db "S.S.ANNE@"
-PokemonLeagueName: ; 71627 (1c:5627)
+PokemonLeagueName:
     db "#MON LEAGUE@"
-UndergroundPathName: ; 71633 (1c:5633)
+UndergroundPathName:
     db "UNDERGROUND PATH@"
-PokemonTowerName: ; 71644 (1c:5644)
+PokemonTowerName:
     db "#MON TOWER@"
-SeafoamIslandsName: ; 7164f (1c:564f)
+SeafoamIslandsName:
     db "SEAFOAM ISLANDS@"
-VictoryRoadName: ; 7165f (1c:565f)
+VictoryRoadName:
     db "VICTORY ROAD@"
-DiglettsCaveName: ; 7166c (1c:566c)
+DiglettsCaveName:
     db "DIGLETT's CAVE@"
-RocketHQName: ; 7167a (1c:567a)
+RocketHQName:
     db "ROCKET HQ@"
-SilphCoName: ; 71684 (1c:5684)
+SilphCoName:
     db "SILPH CO.@"
-PokemonMansionName: ; 7168e (1c:568e)
+PokemonMansionName:
     db $4a," MANSION@"
-SafariZoneName: ; 71698 (1c:5698)
+SafariZoneName:
     db "SAFARI ZONE@"
-CeruleanCaveName: ; 716a4 (1c:56a4)
+CeruleanCaveName:
     db "CERULEAN CAVE@"
-PowerPlantName: ; 716b2 (1c:56b2)
+PowerPlantName:
     db "POWER PLANT@"
-
-MonNestIcon_Bck:
 
 SECTION "Func_716c6",ROMX[$56c6],BANK[$1c]
 
@@ -99056,11 +99150,8 @@ GetMapPaletteID: ; 71ec7 (1c:5ec7)
     ld hl,PalPacket_72428
     ld de,$cf2d
     ld bc,$10
-    ; ds 3 ; call CopyData
-    ; ds 3 ; ld a,[W_CURMAPTILESET]
-    call GetCustomPaletteID
-    jr z,.town
-    ds 1
+    call CopyData
+    ld a,[W_CURMAPTILESET]
     cp $f
     jr z,.PokemonTowerOrAgatha
     cp $11
@@ -99848,7 +99939,7 @@ MoveRelearnerOAMData:
     db $3D,$3F,$7D,$10 ; pokeballs 1
 
 ; ───────────────────────────────────────
-; Handle New Adventure
+; Handle New Adventure Data (BANK $1C)
 ; ───────────────────────────────────────
 
 CompressedMapNew:
@@ -99861,31 +99952,62 @@ TownMapOrderNewEnd:
 
 FlyingCitySortOrderNew:
     db PORT_ROYAL
+    db VIRIDIAN_CITY
 FlyingCitySortOrderNewEnd:
 
+ExternalMapEntriesNew:
+    EMAP $7,$E,PortRoyalName
+    EMAP $2,$8,ViridianCityName
+    EMAP $2,$3,PewterCityName
+    EMAP $A,$2,CeruleanCityName
+    EMAP $E,$5,LavenderTownName
+    EMAP $A,$9,VermilionCityName
+    EMAP $7,$5,CeladonCityName
+    EMAP $8,$D,FuchsiaCityName
+    EMAP $2,$F,CinnabarIslandName
+    EMAP $0,$2,IndigoPlateauName
+    EMAP $A,$5,SaffronCityName
+    EMAP $2,$B,DummyTownName ; dummytown
+    EMAP $9,$E,RouteD1Name
+
+InternalMapEntriesNew:
+    IMAP $FF,$7,$E,PortRoyalName
+    db $FF
+
+DummyTownName:
+    db "DUMMY TOWN@"
 PortRoyalName:
     db "PORT ROYAL@"
 RouteD1Name:
     db "ROUTE D1@"
 
-CheckNewAdvenureFlag:
-    push bc
-    ld b,a
-    ld a,[wFlagNewAdventureBit7]
-    bit 7,a
-    ld a,b
-    pop bc
-    ret
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $1C)
+; ───────────────────────────────────────
 
 ChoiceCompressedMap:
-    ld de,CompressedMap ; $5100
+    ld de,CompressedMap
     call CheckNewAdvenureFlag
     ret z
     ld de,CompressedMapNew
     ret
 
+GetExternalMapEntries:
+    ld hl,ExternalMapEntries
+    call CheckNewAdvenureFlag
+    ret z
+    ld hl,ExternalMapEntriesNew
+    ret
+
+GetInternalMapEntries:
+    ld hl,InternalMapEntries
+    call CheckNewAdvenureFlag
+    ret z
+    ld hl,InternalMapEntriesNew
+    ret
+
 ChoiceTownMapOrder:
-    ld hl,TownMapOrder ; $4f11
+    ld hl,TownMapOrder
     call CheckNewAdvenureFlag
     ret z
     ld hl,TownMapOrderNew
@@ -99907,55 +100029,18 @@ LoadMaxNumberOfTownInCurrentWorld:
     ld a,TownMapOrderNewEnd-TownMapOrderNew-1 ; number of list items
     ret
 
+GetNumFlyingCity:
+    ld bc,FlyingCitySortOrderEnd-FlyingCitySortOrder
+    call CheckNewAdvenureFlag
+    ret z
+    ld bc,FlyingCitySortOrderNewEnd-FlyingCitySortOrderNew
+    ret
+
 GetFlyingCitySortOrder:
     ld hl,FlyingCitySortOrder
     call CheckNewAdvenureFlag
     ret z
-    ld a,b
-    call ConvertCityId
-    ld b,a
     ld hl,FlyingCitySortOrderNew
-    ret
-
-; a input  = id city original (0,1,2,...) or $FE if not visited
-ConvertCityId:
-    cp $fe
-    jr z,.end
-    call CheckNewAdvenureFlag
-    jr z,.end
-    ld hl,FlyingCitySortOrderNew
-    ld d,0
-    ld e,a
-    add hl,de
-    ld a,[hl]
-.end
-    ld hl,wFlyLocationList+1
-    ret
-
-NormalizeTownVisitedFlag:
-    call CheckNewAdvenureFlag
-    jr z,.old
-    ld b,FlyingCitySortOrderEnd-FlyingCitySortOrder ; Num Flying City
-.loop
-    srl d
-    rr e
-    dec b
-    jr nz,.loop
-    ld bc,FlyingCitySortOrderNewEnd-FlyingCitySortOrderNew ; Num Flying City
-    jr .end
-.old
-    ld bc,FlyingCitySortOrderEnd-FlyingCitySortOrder ; Num Flying City
-.end
-    ld hl,wFlyLocationList ; $cd3d
-    ret
-
-GetCustomPaletteID:
-    call CopyData
-    ld a,[W_CURMAP]
-    cp PORT_ROYAL
-    ld a,PAL_CERULEAN-1
-    ret z
-    ld a,[W_CURMAPTILESET]
     ret
 
 ; ───────────────────────────────────────
@@ -101228,11 +101313,11 @@ CreateMonOvWorldSprInstruction:
     jr c,.Before128_2
     inc a
 .Before128_2
-    push hl
-    ld hl,W_OPTIONS
-    bit 5,[hl]
-    pop hl
-    jr z,.skip
+    ;push hl
+    ;ld hl,W_OPTIONS
+    ;bit 5,[hl]
+    ;pop hl
+    ;jr z,.skip
     add BANK(MonOverworldDataNew_emimonserrate)-BANK(MonOverworldDataNew)
 .skip
     ld [hli],a
@@ -101488,7 +101573,7 @@ InsertFlyingCitySorted:
     jr nz,.Loop
     pop af
     ld b,0
-    call ConvertCityId ; ld hl,wFlyLocationList+1
+    ld hl,wFlyLocationList+1
     add hl,bc
     ld [hl],a
     pop de
@@ -106423,6 +106508,20 @@ CheckSafariStatusAndDelay3:
     ld [$cf0d],a
 .End
     jp Delay3
+
+; Pewter
+PewterMartText1:
+    db $FE,7,POKE_BALL
+    db POTION
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
+    db ESCAPE_ROPE,$FF
+
+; Cinnabar
+CinnabarMartText1:
+    db $FE,6,ULTRA_BALL
+    db HYPER_POTION,SUPER_POTION
+    db FULL_HEAL
+    db MAX_REPEL,ESCAPE_ROPE,$FF
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -131136,7 +131235,7 @@ WildDataPointers:
     dw NoMons        ; CINNABAR_ISLAND
     dw NoMons        ; INDIGO_PLATEAU
     dw NoMons        ; SAFFRON_CITY
-    dw NoMons        ; PORT_ROYAL
+    dw NoMons
     dw Route1Mons    ; ROUTE_1
     dw Route2Mons    ; ROUTE_2
     dw Route3Mons    ; ROUTE_3
@@ -131194,7 +131293,7 @@ WildDataPointers:
     dw NoMons
     dw NoMons
     dw NoMons
-    dw RouteD1Mons ; ROUTE_D1
+    dw NoMons
     dw NoMons
     dw NoMons
     dw NoMons
@@ -132456,30 +132555,6 @@ DungeonMonsB1:
     db $02,$FF ;  5%
     db $02,$FF ;  4%
     db $02,$FF ;  1%
-
-RouteD1Mons:
-    db $19
-    db  2,RATTATA ; 20%
-    db  2,RATTATA ; 20%
-    db  2,RATTATA ; 15%
-    db  2,RATTATA ; 10%
-    db  2,RATTATA ; 10%
-    db  2,RATTATA ; 10%
-    db  2,RATTATA ;  5%
-    db  2,RATTATA ;  5%
-    db  2,RATTATA ;  4%
-    db  2,RATTATA ;  1%
-    db $05
-    db  2,MAGIKARP; 20%
-    db  2,MAGIKARP; 20%
-    db  2,MAGIKARP; 15%
-    db  2,MAGIKARP; 10%
-    db  2,MAGIKARP; 10%
-    db  2,MAGIKARP; 10%
-    db  2,MAGIKARP;  5%
-    db  2,MAGIKARP;  5%
-    db  2,MAGIKARP;  4%
-    db  2,MAGIKARP;  1%
 
 _ReadRodData:
 ; return e = 2 if no fish on this map

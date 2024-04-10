@@ -9,7 +9,7 @@ FUCHSIA_CITY    EQU $07
 CINNABAR_ISLAND EQU $08
 INDIGO_PLATEAU  EQU $09
 SAFFRON_CITY    EQU $0A
-PORT_ROYAL      EQU $0B
+DUMMY_TOWN      EQU $0B
 ROUTE_1         EQU $0C
 ROUTE_2         EQU $0D
 ROUTE_3         EQU $0E
@@ -67,7 +67,7 @@ CERULEAN_GYM EQU $41
 BIKE_SHOP EQU $42
 CERULEAN_MART EQU $43
 MT_MOON_POKECENTER EQU $44
-ROUTE_D1 EQU $45
+;unused EQU $45
 ROUTE_5_GATE EQU $46
 PATH_ENTRANCE_ROUTE_5 EQU $47
 DAYCAREM EQU $48
@@ -254,3 +254,9 @@ AGATHAS_ROOM EQU $F7
 ; unused EQU EQU $FD
 ; unused EQU EQU $FE
 ; unused EQU EQU $FF
+
+; ───────────────────────────────────────
+; New Adventure
+; ───────────────────────────────────────
+PORT_ROYAL    EQU $00
+ROUTE_D1      EQU $0C
