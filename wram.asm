@@ -1436,7 +1436,17 @@ W_RIVALSTARTER: ; d715
 W_PLAYERSTARTER: ; d717
     ds 1
 
-    ds 27
+; sprite index of the boulder the player is trying to push
+wBoulderSpriteIndex:: db
+
+wLastBlackoutMap:: db
+
+; destination map (for certain types of special warps, not ordinary walking)
+wDestinationMap:: db
+
+wUnusedD71B:: db
+
+    ds 23
 
 
 W_FLAGS_D733: ; d733

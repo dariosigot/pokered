@@ -9,7 +9,7 @@ FUCHSIA_CITY    EQU $07
 CINNABAR_ISLAND EQU $08
 INDIGO_PLATEAU  EQU $09
 SAFFRON_CITY    EQU $0A
-DUMMY_TOWN      EQU $0B
+EMPTY_TOWN      EQU $0B
 ROUTE_1         EQU $0C
 ROUTE_2         EQU $0D
 ROUTE_3         EQU $0E
@@ -251,5 +251,6 @@ AGATHAS_ROOM EQU $F7
 ; New Adventure
 ; ───────────────────────────────────────
 PORT_ROYAL                 EQU $00
-ROUTE_D1                   EQU $0C
-TEST_MAP_1                 EQU $0D
+DUMMY_TOWN                 EQU $01
+ROUTE_D1                   EQU $02
+TEST_MAP_1                 EQU $03

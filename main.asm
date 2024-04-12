@@ -876,7 +876,7 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     set 6,[hl]
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a ; clear joypad state
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,CINNABAR_GYM
     jr nz,.notCinnabarGym
     ld hl,$d79b
@@ -884,7 +884,7 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
 .notCinnabarGym
     ld hl,$d72e
     set 5,[hl]
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,OAKS_LAB
     jp z,.noFaintCheck
     ld hl,AnyPokemonAliveCheck
@@ -1270,7 +1270,7 @@ CheckIfInOutsideMap: ; 08e1 (0:08e1)
 ; "function 2" passes when the the tile in front of the player is among a certain set
 ; sets carry if the check passes,otherwise clears carry
 ExtraWarpCheck: ; 08e9 (0:08e9)
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,SS_ANNE_3
     jr z,.useFunction1
     cp a,ROCKET_HIDEOUT_1
@@ -1389,7 +1389,7 @@ LoadPlayerSpriteGraphics: ; 0997 (0:0997)
 ; function to check if bike riding is allowed on the current map
 ; sets carry if bike is allowed,clears carry otherwise
 IsBikeRidingAllowed: ; 09c5 (0:09c5)
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,ROUTE_23
     jr z,.allowed
     cp a,INDIGO_PLATEAU
@@ -2404,7 +2404,7 @@ GetJoypadStateOverworld: ; 0f4d (0:0f4d)
     ld a,[W_FLAGS_D733]
     bit 3,a ; check if a trainer wants a challenge
     jr nz,.notForcedDownwards
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,ROUTE_17 ; Cycling Road
     jr nz,.notForcedDownwards
     ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
@@ -2544,7 +2544,7 @@ RunMapScript: ; 101b (0:101b)
     pop de
     pop hl
     call Func_310e
-    ld a,[W_CURMAP] ; current map number
+    ld a,[W_CURMAP]
     call SwitchToMapRomBank ; change to the ROM bank the map's data is in
     ld hl,W_MAPSCRIPTPTR
     ld a,[hli]
@@ -3114,24 +3114,14 @@ LoadMonData: ; 1372 (0:1372)
     ld b,BANK(LoadMonData_)
     jp Bankswitch
 
-; writes c to $d0dc+b
-;Func_137a: ; 137a (0:137a)
-;    ld hl,$d0dc
-;    ld e,b
-;    ld d,$0
-;    add hl,de
-;    ld a,c
-;    ld [hl],a
-;    ret
-
 CheckNewAdventureFlag:
-    push bc
-    ld b,a
-    ld a,[wFlagNewAdventureBit5]
-    bit 5,a
-    ld a,b
-    pop bc
+    push hl
+    ld hl,wFlagNewAdventureBit5
+    bit 5,[hl]
+    pop hl
     ret
+
+SECTION "LoadFlippedFrontSpriteByMonIndex",ROM0[$1384]
 
 LoadFlippedFrontSpriteByMonIndex: ; 1384 (0:1384)
     ld a,$1
@@ -3383,7 +3373,7 @@ PrintStatusConditionNotFainted: ; 14f6
 CheckSurfing:
     ld b,a
     jr nz,.notsurf
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp ROUTE_19
     jr c,.notsurf
     cp ROUTE_21+1
@@ -3505,7 +3495,12 @@ GetTownVisitedFlag:
     ld hl,W_TOWNVISITEDFLAG_NEW
     ret
 
-; Free Space in BANK0
+GetCurrentOldAdventureMap:
+    ld a,[W_CURMAP]
+    call CheckNewAdventureFlag
+    ret z
+    ld a,$FF
+    ret
 
 SECTION "GetPartyMonName2",ROM0[$15b4]
 
@@ -6121,20 +6116,35 @@ UpdateSprites: ; 2429 (0:2429)
 
 MapHeaderPointersNew:
     dw PortRoyal_h      ; PORT_ROYAL
-    dw ViridianCity_h   ; VIRIDIAN_CITY
-    dw PewterCity_h     ; PEWTER_CITY
-    dw CeruleanCity_h   ; CERULEAN_CITY
-    dw LavenderTown_h   ; LAVENDER_TOWN
-    dw VermilionCity_h  ; VERMILION_CITY
-    dw CeladonCity_h    ; CELADON_CITY
-    dw FuchsiaCity_h    ; FUCHSIA_CITY
-    dw CinnabarIsland_h ; CINNABAR_ISLAND
-    dw IndigoPlateau_h  ; INDIGO_PLATEAU
-    dw SaffronCity_h    ; SAFFRON_CITY
-    dw PalletTown_h     ; DUMMY_TOWN
+    dw ViridianCity_h   ; DUMMY_TOWN
     dw RouteD1_h        ; ROUTE_D1
     dw TestMap1_h       ; TEST_MAP_1
 
+IsCurrentMapTownOrRoute:
+    ld a,[W_CURMAP]
+IsTownOrRoute:
+    call CheckNewAdventureFlag
+    jr nz,.new
+.old
+    cp ROUTE_25 + 1
+    ret
+.new
+    cp ROUTE_D1 + 1
+    ret
+
+IsCurrentMapTown:
+    ld a,[W_CURMAP]
+IsTown:
+    call CheckNewAdventureFlag
+    jr nz,.new
+.old
+    cp ROUTE_1
+    ret
+.new
+    cp ROUTE_D1
+    ret
+
+; ───────────────────────────────────────
 
 SECTION "TextScriptEndingChar",ROM0[$24d6]
 
@@ -10767,7 +10777,7 @@ PointerTable_3f22: ; 3f22 (0:3f22)
     dw UnnamedText_fc45                     ; id = 42
 
 SpeedUpByke: ; Denim,Speed Walk and Byke
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,ROUTE_17 ; Cycling Road
     jr nz,.normalByke
     ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
@@ -14080,7 +14090,7 @@ MainMenu: ; 5af2 (1:5af2)
     ld a,[$D5A2]
     and a
     jp z,Func_5d5f
-    ld a,[W_CURMAP] ; map ID
+    call GetCurrentOldAdventureMap
     cp a,HALL_OF_FAME
     jp nz,Func_5d5f
     xor a
@@ -16689,7 +16699,7 @@ PokemonCenterFarewellText: ; 7072 (1:7072)
 Func_7078: ; 7078 (1:7078)
     push hl
     ld hl,SafariZoneRestHouses
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     ld b,a
 .asm_7080
     ld a,[hli]
@@ -18495,7 +18505,7 @@ ItemQtyTable:
     db $ff
 
 DockException:
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp VERMILION_DOCK
     ld a,[W_GRASSTILE]
     ret nz
@@ -18680,14 +18690,13 @@ DefaultNamesRivalList:
     db "NEW NAME@BLUE@JEANS@GARY@"
 
 CheckDiglettsCave:
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp DIGLETTS_CAVE
     jr nz,.done
     ld a,$06     ; Dark Map
     ld [$d35d],a ; ...
 .done
-    call GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
-    ret
+    jp GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
 
 CheckImportantMove:
 
@@ -18787,13 +18796,11 @@ HandleMenuInput_PrintMoveDetailsBox:
 FlyWarpDataPtrNew:
     db PORT_ROYAL,0
     dw PortRoyalFlyWarp
-    db VIRIDIAN_CITY,0
+    db DUMMY_TOWN,0
     dw Map01FlyWarp
 
 PortRoyalFlyWarp:
     FLYWARP_DATA PORT_ROYAL_WIDTH,6,5
-RouteD1FlyWarp:
-    FLYWARP_DATA ROUTE_D1_WIDTH,6,5
 
 DungeonWarpListNew:
     db $FF
@@ -21365,7 +21372,7 @@ CheckForceBikeOrSurf: ; c38b (3:438b)
     ld b,a
     ld a,[W_XCOORD]
     ld c,a
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     ld d,a
 .loop
     ld a,[hli]
@@ -21379,7 +21386,7 @@ CheckForceBikeOrSurf: ; c38b (3:438b)
     ld a,[hli]
     cp c ;compare x-coord
     jr nz,.loop ; incorrect x-coord,check next item
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp SEAFOAM_ISLANDS_4
     ld a,$2
     ld [W_SEAFOAMISLANDS4CURSCRIPT],a
@@ -21490,7 +21497,7 @@ Func_c44e: ; c44e (3:444e)
     push de
     push bc
     call Func_c589
-    ld a,[W_CURMAP] ; $d35e
+    call GetCurrentOldAdventureMap
     cp SS_ANNE_5
     jr z,.ssAnne5
     ld a,[$c109]
@@ -21656,7 +21663,7 @@ Tileset15WarpTileIDs: ; c52e (3:452e)
     db $FF
 
 Func_c52f: ; c52f (3:452f)
-    ld a,[W_CURMAP] ; $d35e
+    call GetCurrentOldAdventureMap
     cp SAFARI_ZONE_EAST
     ret c
     cp UNKNOWN_DUNGEON_2
@@ -22713,8 +22720,8 @@ IsSurfingAllowed: ; cdc0 (3:4dc0)
     ld a,[$d732]
     bit 5,a
     jr nz,.asm_cdec
-    ld a,[W_CURMAP] ; $d35e
-    cp $a2
+    call GetCurrentOldAdventureMap
+    cp SEAFOAM_ISLANDS_5
     ret nz
     ld a,[$d881]
     and $3
@@ -22930,51 +22937,21 @@ OldRodData:
 
 MapHeaderBanksNew:
     db BANK(PortRoyal_h)      ; PORT_ROYAL
-    db BANK(ViridianCity_h)   ; VIRIDIAN_CITY
-    db BANK(PewterCity_h)     ; PEWTER_CITY
-    db BANK(CeruleanCity_h)   ; CERULEAN_CITY
-    db BANK(LavenderTown_h)   ; LAVENDER_TOWN
-    db BANK(VermilionCity_h)  ; VERMILION_CITY
-    db BANK(CeladonCity_h)    ; CELADON_CITY
-    db BANK(FuchsiaCity_h)    ; FUCHSIA_CITY
-    db BANK(CinnabarIsland_h) ; CINNABAR_ISLAND
-    db BANK(IndigoPlateau_h)  ; INDIGO_PLATEAU
-    db BANK(SaffronCity_h)    ; SAFFRON_CITY
-    db BANK(PalletTown_h)     ; DUMMY_TOWN
+    db BANK(ViridianCity_h)   ; DUMMY_TOWN
     db BANK(RouteD1_h)        ; ROUTE_D1
     db BANK(TestMap1_h)       ; TEST_MAP_1
 
 MapSongBanksNew:
     db (Music_Lavender      -$4000)/3 , BANK(Music_Lavender)      ; PORT_ROYAL
-    db (Music_Cities1       -$4000)/3 , BANK(Music_Cities1)       ; VIRIDIAN_CITY
-    db (Music_Cities1       -$4000)/3 , BANK(Music_Cities1)       ; PEWTER_CITY
-    db (Music_Cities2       -$4000)/3 , BANK(Music_Cities2)       ; CERULEAN_CITY
-    db (Music_Lavender      -$4000)/3 , BANK(Music_Lavender)      ; LAVENDER_TOWN
-    db (Music_Vermilion     -$4000)/3 , BANK(Music_Vermilion)     ; VERMILION_CITY
-    db (Music_Celadon       -$4000)/3 , BANK(Music_Celadon)       ; CELADON_CITY
-    db (Music_Cities2       -$4000)/3 , BANK(Music_Cities2)       ; FUCHSIA_CITY
-    db (Music_Cinnabar      -$4000)/3 , BANK(Music_Cinnabar)      ; CINNABAR_ISLAND
-    db (Music_IndigoPlateau -$4000)/3 , BANK(Music_IndigoPlateau) ; INDIGO_PLATEAU
-    db (Music_Cities1       -$4000)/3 , BANK(Music_Cities1)       ; SAFFRON_CITY
-    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown)    ; unused
+    db (Music_PokemonTower  -$4000)/3 , BANK(Music_PokemonTower)  ; DUMMY_TOWN
     db (Music_PokemonTower  -$4000)/3 , BANK(Music_PokemonTower)  ; ROUTE_D1
     db (Music_PokemonTower  -$4000)/3 , BANK(Music_PokemonTower)  ; TEST_MAP_1
 
 MapHSPointersNew:
-    dw MapHS_PortRoyal
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX ; ROUTE_D1
-    dw MapHSXX ; TEST_MAP_1
+    dw MapHS_PortRoyal ; PORT_ROYAL
+    dw MapHSXX         ; DUMMY_TOWN
+    dw MapHSXX         ; ROUTE_D1
+    dw MapHSXX         ; TEST_MAP_1
     dw $FFFF
 
 MapHS_PortRoyal:
@@ -22985,6 +22962,41 @@ MapHS_PortRoyal:
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $03)
 ; ───────────────────────────────────────
+
+GetOldRodData:
+    ld hl,OldRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,OldRodDataNew
+    ret
+
+GetGoodRodData:
+    ld hl,GoodRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,GoodRodDataNew
+    ret
+
+GetGoodRodData_DE:
+    ld de,GoodRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld de,GoodRodDataNew
+    ret
+
+GetSuperRodData:
+    ld hl,SuperRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,SuperRodDataNew
+    ret
+
+GetSuperRodData_DE:
+    ld de,SuperRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld de,SuperRodDataNew
+    ret
 
 GetMapSongBanks:
     ld hl,MapSongBanks
@@ -23202,7 +23214,7 @@ ItemUseBall: ; d687 (3:5687)
     call CopyData ; save the player's name in the Wild Monster data (part of the Cinnabar Island Missingno glitch)
     jp .BallSuccess    ;$578b
 .notOldManBattle    ;$56e9
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,POKEMONTOWER_6
     jr nz,.loop
     ld a,[W_ENEMYMONID]
@@ -24453,7 +24465,7 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
     ld a,[W_ISINBATTLE]
     and a
     jr nz,.notUsable
-    call CheckDiglettsCaveHole ; ld a,[W_CURMAP]
+    call CheckDiglettsCaveHole
     cp a,AGATHAS_ROOM
     jr z,.notUsable
     ld a,[W_CURMAPTILESET]
@@ -24512,98 +24524,8 @@ ItemUseXAccuracy: ; e013 (3:6013)
     set 0,[hl] ; X Accuracy bit
     jp PrintItemUseTextAndRemoveItem
 
-; This function is bugged and never works. It always jumps to ItemUseNotTime.
-; The Card Key is handled in a different way.
 ItemUseCardKey: ; e022 (3:6022)
-    xor a
-    ld [$d71f],a
-    call Func_c586
-    ld a,[Func_c586] ; $4586
-    cp a,$18
-    jr nz,.next0
-    ld hl,CardKeyTable1
-    jr .next1
-.next0
-    cp a,$24
-    jr nz,.next2
-    ld hl,CardKeyTable2
-    jr .next1
-.next2
-    cp a,$5e
-    jp nz,ItemUseNotTime
-    ld hl,CardKeyTable3
-.next1
-    ld a,[W_CURMAP]
-    ld b,a
-.loop
-    ld a,[hli]
-    cp a,$ff
-    jp z,ItemUseNotTime
-    cp b
-    jr nz,.nextEntry1
-    ld a,[hli]
-    cp d
-    jr nz,.nextEntry2
-    ld a,[hli]
-    cp e
-    jr nz,.nextEntry3
-    ld a,[hl]
-    ld [$d71f],a
-    jr .done
-.nextEntry1
-    inc hl
-.nextEntry2
-    inc hl
-.nextEntry3
-    inc hl
-    jr .loop
-.done
-    ld hl,ItemUseText00
-    call PrintText
-    ld hl,$d728
-    set 7,[hl]
-    ret
-
-; These tables are probably supposed to be door locations in Silph Co.,
-; but they are unused.
-; The reason there are 3 tables is unknown.
-
-; Format:
-; 00: Map ID
-; 01: Y
-; 02: X
-; 03: ID?
-
-CardKeyTable1: ; e072 (3:6072)
-    db  SILPH_CO_2F,$04,$04,$00
-    db  SILPH_CO_2F,$04,$05,$01
-    db  SILPH_CO_4F,$0C,$04,$02
-    db  SILPH_CO_4F,$0C,$05,$03
-    db  SILPH_CO_7F,$06,$0A,$04
-    db  SILPH_CO_7F,$06,$0B,$05
-    db  SILPH_CO_9F,$04,$12,$06
-    db  SILPH_CO_9F,$04,$13,$07
-    db SILPH_CO_10F,$08,$0A,$08
-    db SILPH_CO_10F,$08,$0B,$09
-    db $ff
-
-CardKeyTable2: ; e09b (3:609b)
-    db SILPH_CO_3F,$08,$09,$0A
-    db SILPH_CO_3F,$09,$09,$0B
-    db SILPH_CO_5F,$04,$07,$0C
-    db SILPH_CO_5F,$05,$07,$0D
-    db SILPH_CO_6F,$0C,$05,$0E
-    db SILPH_CO_6F,$0D,$05,$0F
-    db SILPH_CO_8F,$08,$07,$10
-    db SILPH_CO_8F,$09,$07,$11
-    db SILPH_CO_9F,$08,$03,$12
-    db SILPH_CO_9F,$09,$03,$13
-    db $ff
-
-CardKeyTable3: ; e0c4 (3:60c4)
-    db SILPH_CO_11F,$08,$09,$14
-    db SILPH_CO_11F,$09,$09,$15
-    db $ff
+    jp ItemUseNotTime
 
 SECTION "ItemUseGuardSpec",ROMX[$60dc],BANK[$3]
 
@@ -24672,7 +24594,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     jr nz,.inBattle
 ; if not in battle
     call ItemUseReloadOverworldData
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,ROUTE_12
     jr nz,.notRoute12
     ld a,[$d7d8]
@@ -26491,8 +26413,7 @@ CutTreeBlockSwaps: ; f100 (3:7100)
     db $FF ; list terminator
 
 Func_f113: ; f113 (3:7113)
-    ld a,[W_CURMAP] ; $d35e
-    cp ROUTE_1
+    call IsCurrentMapTown
     jr nc,.notInTown
     ld c,a
     ld b,$1
@@ -26501,13 +26422,15 @@ Func_f113: ; f113 (3:7113)
     call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
 .notInTown
     call GetMapHSPointers ; ld hl,MapHSPointers
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     ld b,$0
     ld c,a
     add hl,bc
     add hl,bc
     ld a,[hli]                ; load missable objects pointer in hl
     ld h,[hl]
+
+    ds 2
 
 Func_f132: ; f132 (3:7132)
     ld l,a
@@ -26533,7 +26456,7 @@ Func_f132: ; f132 (3:7132)
     ld [H_DIVISOR],a
     ld b,$2
     call Divide                ; divide difference by 3,resulting in the global offset (number of missable items before ours)
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     ld b,a
     ld a,[H_DIVIDEND+3]
     ld c,a                    ; store global offset in c
@@ -27684,8 +27607,8 @@ InitializePlayerData: ; f850 (3:7850)
     call GenRandom
     ld a,[H_RAND1]
     ld [wPlayerID + 1],a
-    ld a,$ff
-    ld [$d71b],a                 ; XXX what's this?
+    ;ld a,$ff
+    ;ld [$d71b],a                 ; XXX what's this?
     ld hl,W_NUMINPARTY ; $d163
     call InitializeEmptyList      ; no party mons
     ld hl,W_NUMINBOX ; $da80
@@ -27712,6 +27635,8 @@ InitializePlayerData: ; f850 (3:7850)
     ld bc,wGameProgressFlagsEnd-W_GAMEPROGRESSFLAGS ; ld bc,$c8
     call FillMemory               ; clear all game progress flags
     jp InitializeMissableObjectsFlags_OldAndNew
+
+SECTION "InitializeEmptyList",ROMX[$78a0],BANK[$3]
 
 ; writes two bytes $00 $ff to hl
 InitializeEmptyList: ; f8a0 (3:78a0)
@@ -28428,7 +28353,7 @@ GenerateRandomEnemyTrainerIV:
     ret z
     push af
     push de
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp LANCES_ROOM
     jr nz,.Random
     ld a,[$FF00+$e4]
@@ -28748,7 +28673,7 @@ DiglettsCaveAerodactylFluteCoords:
     db $ff ; terminator
 
 CheckDiglettsCaveHole:
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp DIGLETTS_CAVE
     jr nz,.NotEvent
     ld a,[$d152]
@@ -28764,7 +28689,7 @@ CheckDiglettsCaveHole:
     ld [$cd6a],a ; item used
     ret
 .NotEvent
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     ret
 .coordsData
     db 18,13
@@ -31246,8 +31171,7 @@ TryDoWildEncounter: ; 13870 (4:7870)
     cp c
     ld a,[W_WATERRATE] ; $d8a4
     jr z,.CanEncounter
-    ld a,[W_CURMAP] ; $d35e
-    cp REDS_HOUSE_1F
+    call IsCurrentMapTownOrRoute
     jr c,.CantEncounter2
     call HackDockTilesetLikeSafari ; ld a,[W_CURMAPTILESET] ; $d367
     cp $3 ; Viridian Forest/Safari Zone
@@ -31281,7 +31205,6 @@ TryDoWildEncounter: ; 13870 (4:7870)
     ld a,[hli]
     call GetWildEnemyLevel ; ld [W_CURENEMYLVL],a ; $d127
     ld a,[hld] ; Decrese hl to read Exception ID in GetEnemy Routine
-    ds 1 ; ld [$cf91],a ; moved in the Next Subroutine
     call GetEnemy ; ld [W_ENEMYMONID],a
     jr nc,.CantEncounter2
     ld a,[$d0db]
@@ -31306,6 +31229,8 @@ TryDoWildEncounter: ; 13870 (4:7870)
 .willEncounter
     xor a
     ret
+
+SECTION "WildMonEncounterSlotChances",ROMX[$7918],BANK[$4]
 
 WildMonEncounterSlotChances: ; 13918 (4:7918)
 ; There are 10 slots for wild pokemon,and this is the table that defines how common each of
@@ -31702,7 +31627,7 @@ CheckIfTeleportNotAllowed:
     ld a,[W_CURMAPTILESET]
     ld hl,.TilesetNotAllowed
     call .CheckList
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     ld hl,.MapNotAllowed
     call .CheckList
     dec a ; Reset z ; Allowed
@@ -31728,7 +31653,7 @@ CheckIfTeleportNotAllowed:
     db $ff ; terminator
 
 HackDockTilesetLikeSafari:
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     ld hl,.ExceptionList
     ld de,1
     call IsInArray
@@ -31738,7 +31663,6 @@ HackDockTilesetLikeSafari:
     ret
 .ExceptionList
     db VERMILION_DOCK
-    db ROUTE_D1
     db $FF
 
 GetEnemy:
@@ -32875,8 +32799,8 @@ ReadSpriteSheetData: ; 17971 (5:7971)
 ; Loads sprite set for outside maps (cities and routes) and sets VRAM slots.
 ; sets carry if the map is a city or route,unsets carry if not
 InitOutsideMapSprites: ; 1797b (5:797b)
-    ld a,[W_CURMAP]
-    cp a,REDS_HOUSE_1F ; is the map a city or a route (map ID less than $25)?
+    call IsCurrentMapTownOrRoute
+    ds 2 ; cp a,REDS_HOUSE_1F ; is the map a city or a route (map ID less than $25)?
     ret nc ; if not,return
     call GetMapSpriteSets ; ld hl,MapSpriteSets
     add l
@@ -33998,17 +33922,7 @@ Func_17d7d: ; Moved in the Bank
 
 MapSpriteSetsNew:
     db $01 ; PORT_ROYAL
-    db $01 ; VIRIDIAN_CITY
-    db $02 ; PEWTER_CITY
-    db $02 ; CERULEAN_CITY
-    db $03 ; LAVENDER_TOWN
-    db $04 ; VERMILION_CITY
-    db $05 ; CELADON_CITY
-    db $0a ; FUCHSIA_CITY
-    db $01 ; CINNABAR_ISLAND
-    db $06 ; INDIGO_PLATEAU
-    db $07 ; SAFFRON_CITY
-    db $01 ; unused map ID
+    db $01 ; DUMMY_TOWN
     db $01 ; ROUTE_D1
     db $01 ; TEST_MAP_1
 
@@ -34022,6 +33936,8 @@ GetMapSpriteSets:
     ret z
     ld hl,MapSpriteSetsNew
     ret
+
+; ───────────────────────────────────────
 
 SECTION "bank6",ROMX,BANK[$6]
 
@@ -37608,7 +37524,7 @@ RLEList_1a5da: ; 1a5da (6:65da)
 
 ; XXX why would this function want to return on POKEMONTOWER_7?
 Func_1a5e7: ; 1a5e7 (6:65e7)
-    ld a,[W_CURMAP] ; $d35e
+    call GetCurrentOldAdventureMap
     cp POKEMONTOWER_7
     ret z
     ld hl,RivalIDs ; $6605
@@ -41123,7 +41039,7 @@ DiglettsCaveRoute2_h: ; 0x1dea4 to 0x1deb0 (12 bytes) (bank=7) (id=46)
     dw DiglettsCaveRoute2Object ; objects
 
 DiglettsCaveRoute2Script: ; 1deb0 (7:5eb0)
-    ld a,$d
+    ld a,ROUTE_2
     ld [$d365],a
     jp EnableAutoTextBoxDrawing
 
@@ -41923,7 +41839,7 @@ DiglettsCaveEntranceRoute11_h: ; 0x1e5ae to 0x1e5ba (12 bytes) (bank=7) (id=85)
 
 DiglettsCaveEntranceRoute11Script: ; 1e5ba (7:65ba)
     call EnableAutoTextBoxDrawing
-    ld a,$16
+    ld a,ROUTE_11
     ld [$d365],a
     ret
 
@@ -46427,7 +46343,7 @@ INCLUDE "music/defeatedwildmon.asm"
 INCLUDE "music/defeatedgymleader.asm"
 
 RemovePokemonWithHack:
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,CELADON_HOTEL
     jr nz,.RemovePokemon
     ld a,PORYGON
@@ -52769,7 +52685,7 @@ HandlePlayerBlackOut: ; 3c837 (f:4837)
     call DelayFrames
     ld hl,Sony1WinText
     call PrintText
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp OAKS_LAB
     ret z            ; starter battle in oak's lab: don't black out
 .notSony1Battle
@@ -54946,7 +54862,7 @@ IsGhostBattle: ; 3d83a (f:583a)
     ld a,[W_ISINBATTLE]
     dec a
     ret nz
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,POKEMONTOWER_1
     jr c,.next
     cp a,LAVENDER_HOUSE_1
@@ -69454,7 +69370,7 @@ SafariZonePostLapras:
     db SAFARI_ZONE_CENTER,$E9
 
 GetCurrentMapLaprasInfo:
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     ld b,a
 .Loop
     ld a,[hli]
@@ -69470,7 +69386,6 @@ SafariZoneLaprasRunAway:
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $11)
 ; ───────────────────────────────────────
-
 
 HiddenObjectMapsNew:
     db ROUTE_D1
@@ -77778,7 +77693,7 @@ InitBattleVariables: ; 525af (14:65af)
     jr nz,.asm_525e1
     inc a
     ld [$ccd9],a
-    ld a,[W_CURMAP] ; $d35e
+    call GetCurrentOldAdventureMap
     cp SAFARI_ZONE_EAST
     jr c,.asm_525f9
     cp SAFARI_ZONE_REST_HOUSE_1
@@ -77857,7 +77772,7 @@ Func_52613: ; 52613 (14:6613)
 
 Func_52673: ; 52673 (14:6673)
     ld hl,SilphCoMapList
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     ld b,a
 .asm_5267a
     ld a,[hli]
@@ -77873,7 +77788,7 @@ Func_52673: ; 52673 (14:6673)
     cp $24
     jr z,.asm_5269c
     ld b,a
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp SILPH_CO_11F
     ret nz
     ld a,b
@@ -77897,7 +77812,7 @@ Func_52673: ; 52673 (14:6673)
     ld a,e
     ld c,a
     ld [$d740],a
-    ld a,[W_CURMAP] ; $d35e
+    call GetCurrentOldAdventureMap
     cp SILPH_CO_11F
     jr nz,.asm_526c8
     ld a,$3
@@ -82811,7 +82726,7 @@ CheckSpriteCanSeePlayer: ; 569af (15:69af)
 
 ; tests if the player is in front of the sprite (rather than behind it)
 CheckPlayerIsInFrontOfSprite: ; 569e3 (15:69e3)
-    ld a,[W_CURMAP] ; $d35e
+    call GetCurrentOldAdventureMap
     cp POWER_PLANT
     jp z,.engage       ; XXX not sure why bypass this for power plant (maybe to get voltorb fake items to work?)
     ld a,[wTrainerSpriteOffset] ; $cd3d
@@ -83510,7 +83425,7 @@ Func_58d99: ; 58d99 (16:4d99)
     ld a,[W_ISINBATTLE] ; $d057
     dec a
     jr nz,.asm_58dbe
-    ld a,[W_CURMAP] ; $d35e
+    call GetCurrentOldAdventureMap
     cp POKEMONTOWER_3
     jr c,.asm_58daa
     cp LAVENDER_HOUSE_1
@@ -87124,7 +87039,7 @@ CheckMarowak:
     ld [$cf91],a
     cp MAROWAK
     ret nz
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp POKEMONTOWER_6
     ld a,[$cf91]
     ret
@@ -94842,7 +94757,7 @@ GymStatues: ; 62419 (18:6419)
     cp $4
     ret nz
     ld hl,.BadgeFlags
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     ld b,a
 .asm_62429
     ld a,[hli]
@@ -94885,7 +94800,7 @@ GymStatueText2: ; 62458 (18:6458)
 Func_6245d: ; 6245d (18:645d)
     call EnableAutoTextBoxDrawing
     ld hl,PokeCenterMapIDList
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     ld b,a
 .asm_62467
     ld a,[hli]
@@ -96674,7 +96589,7 @@ Func_709ef: ; 709ef (1c:49ef)
     ret
 
 Func_70a19: ; 70a19 (1c:4a19)
-    ld a,[W_CURMAP] ; $d35e
+    call GetCurrentOldAdventureMap
     ld e,a
     ld hl,MapIDList_70a3f ; $4a3f
 .asm_70a20
@@ -97921,7 +97836,7 @@ Func_712d9: ; 712d9 (1c:52d9)
     jr .asm_712e4
 
 Func_712f1: ; 712f1 (1c:52f1)
-    cp REDS_HOUSE_1F
+    call IsTownOrRoute ; cp REDS_HOUSE_1F
     jr c,.asm_71304
     ld bc,$4
     call GetInternalMapEntries ; ld hl,InternalMapEntries ; $5382
@@ -99070,49 +98985,9 @@ Func_71ebb: ; 71ebb (1c:5ebb)
     ret
 
 GetMapPaletteID: ; 71ec7 (1c:5ec7)
-    ld hl,PalPacket_72428
-    ld de,$cf2d
-    ld bc,$10
-    call CopyData
-    ld a,[W_CURMAPTILESET]
-    cp $f
-    jr z,.PokemonTowerOrAgatha
-    cp $11
-    jr z,.caveOrBruno
-    ld a,[W_CURMAP]
-    cp REDS_HOUSE_1F
-    jr c,.townOrRoute
-    cp UNKNOWN_DUNGEON_2
-    jr c,.normalDungeonOrBuilding
-    cp NAME_RATERS_HOUSE
-    jr c,.caveOrBruno
-    cp LORELEIS_ROOM
-    jr z,.Lorelei
-    cp BRUNOS_ROOM
-    jr z,.caveOrBruno
-.normalDungeonOrBuilding
-    ld a,[$d365] ; town or route that current dungeon or building is located
-.townOrRoute
-    cp SAFFRON_CITY + 1
-    jr c,.town
-    ld a,PAL_ROUTE - 1
-.town
-    inc a ; a town's pallete ID is its map ID + 1
-    ld hl,$cf2e
-    ld [hld],a
-    ld de,Unknown_7219e
-    ld a,$9
-    ld [$cf1c],a
-    ret
-.PokemonTowerOrAgatha
-    ld a,PAL_GREYMON - 1
-    jr .town
-.caveOrBruno
-    ld a,PAL_CAVE - 1
-    jr .town
-.Lorelei
-    xor a
-    jr .town
+    ld b,BANK(GetMapPaletteID_)
+    ld hl,GetMapPaletteID_
+    jp Bankswitch
 
 SECTION "GetHallOfFameLinkCableEvolutionPaletteID",ROMX[$5f17],BANK[$1c]
 
@@ -99875,27 +99750,16 @@ TownMapOrderNewEnd:
 
 FlyingCitySortOrderNew:
     db PORT_ROYAL
-    db VIRIDIAN_CITY
+    db DUMMY_TOWN
 FlyingCitySortOrderNewEnd:
 
 ExternalMapEntriesNew:
-    EMAP $7,$E,PortRoyalName
-    EMAP $2,$8,ViridianCityName
-    EMAP $2,$3,PewterCityName
-    EMAP $A,$2,CeruleanCityName
-    EMAP $E,$5,LavenderTownName
-    EMAP $A,$9,VermilionCityName
-    EMAP $7,$5,CeladonCityName
-    EMAP $8,$D,FuchsiaCityName
-    EMAP $2,$F,CinnabarIslandName
-    EMAP $0,$2,IndigoPlateauName
-    EMAP $A,$5,SaffronCityName
-    EMAP $2,$B,DummyTownName ; dummytown
-    EMAP $9,$E,RouteD1Name
-    EMAP $9,$E,RouteD1Name ; TEST_MAP_1
+    EMAP 07,14,PortRoyalName
+    EMAP 03,03,DummyTownName
+    EMAP 09,14,RouteD1Name
 
 InternalMapEntriesNew:
-    IMAP $FF,$7,$E,PortRoyalName
+    IMAP TEST_MAP_1 + 1,9,14,RouteD1Name
     db $FF
 
 DummyTownName:
@@ -101012,7 +100876,7 @@ IsGhostBattlePlus:
     ld a,[W_ENEMYMONID]
     cp MAROWAK
     jr nz,.End
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp POKEMONTOWER_6
 .End
     pop bc
@@ -101025,7 +100889,7 @@ IsGhostBattle_Bank1C:
     ld a,[W_ISINBATTLE]
     dec a
     ret nz
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,POKEMONTOWER_1
     jr c,.next
     cp a,LAVENDER_HOUSE_1
@@ -131132,7 +130996,7 @@ TradingAnimationGraphics2:
     INCBIN "gfx/trade2.2bpp"
 
 CheckDarkMap:
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     cp a,ROCK_TUNNEL_1
     jr z,.Dark
     cp a,VICTORY_ROAD_1
@@ -133118,17 +132982,7 @@ CheckFishingForMon:
 
 WildDataPointersNew:
     dw NoMons        ; PORT_ROYAL
-    dw NoMons        ; VIRIDIAN_CITY
-    dw NoMons        ; PEWTER_CITY
-    dw NoMons        ; CERULEAN_CITY
-    dw NoMons        ; LAVENDER_TOWN
-    dw NoMons        ; VERMILION_CITY
-    dw NoMons        ; CELADON_CITY
-    dw NoMons        ; FUCHSIA_CITY
-    dw NoMons        ; CINNABAR_ISLAND
-    dw NoMons        ; INDIGO_PLATEAU
-    dw NoMons        ; SAFFRON_CITY
-    dw NoMons
+    dw NoMons        ; DUMMY_TOWN
     dw RouteD1Mons   ; ROUTE_D1
     dw NoMons        ; TEST_MAP_1
     dw $FFFF
@@ -133179,41 +133033,6 @@ GetWildDataPointers:
     call CheckNewAdventureFlag
     ret z
     ld hl,WildDataPointersNew
-    ret
-
-GetOldRodData:
-    ld hl,OldRodData
-    call CheckNewAdventureFlag
-    ret z
-    ld hl,OldRodDataNew
-    ret
-
-GetGoodRodData:
-    ld hl,GoodRodData
-    call CheckNewAdventureFlag
-    ret z
-    ld hl,GoodRodDataNew
-    ret
-
-GetGoodRodData_DE:
-    ld de,GoodRodData
-    call CheckNewAdventureFlag
-    ret z
-    ld de,GoodRodDataNew
-    ret
-
-GetSuperRodData:
-    ld hl,SuperRodData
-    call CheckNewAdventureFlag
-    ret z
-    ld hl,SuperRodDataNew
-    ret
-
-GetSuperRodData_DE:
-    ld de,SuperRodData
-    call CheckNewAdventureFlag
-    ret z
-    ld de,SuperRodDataNew
     ret
 
 ; ───────────────────────────────────────
@@ -134893,6 +134712,59 @@ PrintMoveDetailsBox:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+GetMapPaletteID_:
+    ld hl,.EmptyPalSetPacket
+    ld de,$cf2d
+    ld bc,$10
+    call CopyData
+    ld a,[W_CURMAPTILESET]
+    cp $f
+    jr z,.PokemonTowerOrAgatha
+    cp $11
+    jr z,.caveOrBruno
+    call IsCurrentMapTownOrRoute
+    jr c,.townOrRoute
+    call GetCurrentOldAdventureMap
+    cp UNKNOWN_DUNGEON_2
+    jr c,.normalDungeonOrBuilding
+    cp NAME_RATERS_HOUSE
+    jr c,.caveOrBruno
+    cp LORELEIS_ROOM
+    jr z,.Lorelei
+    cp BRUNOS_ROOM
+    jr z,.caveOrBruno
+.normalDungeonOrBuilding
+    ld a,[$d365] ; town or route that current dungeon or building is located
+.townOrRoute
+    call IsTown
+    jr c,.town
+    ld a,PAL_ROUTE - 1
+.town
+    inc a ; a town's pallete ID is its map ID + 1
+    call CheckNewAdventureFlag
+    jr z,.old
+    add PAL_ROUTE_NEW
+.old
+    ld hl,$cf2e
+    ld [hld],a
+    ld de,Unknown_7219e
+    ld a,$9
+    ld [$cf1c],a
+    ret
+.PokemonTowerOrAgatha
+    ld a,PAL_GREYMON - 1
+    jr .town
+.caveOrBruno
+    ld a,PAL_CAVE - 1
+    jr .town
+.Lorelei
+    xor a
+    jr .town
+.EmptyPalSetPacket
+    db $51,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
+; ──────────────────────────────────────────────────────────────────────
+
 CheckSpecialWild_:
     push de
     ld hl,.SpecialWild
@@ -134924,7 +134796,7 @@ CheckSpecialWild_:
     inc hl
     jr .next
 .LevelFound
-    ld a,[W_CURMAP]
+    call GetCurrentOldAdventureMap
     ld b,a
     ld a,[hli]
     cp b
@@ -135134,7 +135006,7 @@ _PortRoyalText1:
     db $0,"!",$57
 
 PortRoyalScript:
-    ret
+    jp EnableAutoTextBoxDrawing
 
 ; ──────────────────────────────────────────────────────────────────────
 ; ROUTE D01
