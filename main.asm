@@ -287,256 +287,7 @@ GetJoypadState: ; 019a (0:019a)
     call RoutineForRealGB
     ret
 
-; see also MapHeaderBanks
-MapHeaderPointers: ; 01ae (0:01ae)
-    dw PalletTown_h
-    dw ViridianCity_h
-    dw PewterCity_h
-    dw CeruleanCity_h
-    dw LavenderTown_h
-    dw VermilionCity_h
-    dw CeladonCity_h
-    dw FuchsiaCity_h
-    dw CinnabarIsland_h
-    dw IndigoPlateau_h
-    dw SaffronCity_h
-    dw EmptyMap_h
-    dw Route1_h
-    dw Route2_h
-    dw Route3_h
-    dw Route4_h
-    dw Route5_h
-    dw Route6_h
-    dw Route7_h
-    dw Route8_h
-    dw Route9_h
-    dw Route10_h
-    dw Route11_h
-    dw Route12_h
-    dw Route13_h
-    dw Route14_h
-    dw Route15_h
-    dw Route16_h
-    dw Route17_h
-    dw Route18_h
-    dw Route19_h
-    dw Route20_h
-    dw Route21_h
-    dw Route22_h
-    dw Route23_h
-    dw Route24_h
-    dw Route25_h
-    dw RedsHouse1F_h
-    dw RedsHouse2F_h
-    dw BluesHouse_h
-    dw OaksLab_h ;id=40
-    dw ViridianPokecenter_h
-    dw ViridianMart_h
-    dw School_h
-    dw ViridianHouse_h
-    dw ViridianGym_h
-    dw DiglettsCaveRoute2_h
-    dw ViridianForestexit_h
-    dw Route2House_h
-    dw Route2Gate_h
-    dw ViridianForestEntrance_h ;id=50
-    dw ViridianForest_h
-    dw MuseumF1_h
-    dw MuseumF2_h
-    dw PewterGym_h
-    dw PewterHouse1_h
-    dw PewterMart_h
-    dw PewterHouse2_h
-    dw PewterPokecenter_h
-    dw MtMoon1_h
-    dw MtMoon2_h ;id=60
-    dw MtMoon3_h
-    dw CeruleanHouseTrashed_h
-    dw CeruleanHouse_h
-    dw CeruleanPokecenter_h
-    dw CeruleanGym_h
-    dw BikeShop_h
-    dw CeruleanMart_h
-    dw MtMoonPokecenter_h
-    dw EmptyMap_h ; unused
-    dw Route5Gate_h
-    dw UndergroundTunnelEntranceRoute5_h
-    dw DayCareM_h
-    dw Route6Gate_h
-    dw UndergroundTunnelEntranceRoute6_h
-    dw EmptyMap_h ; unused
-    dw Route7Gate_h
-    dw UndergroundPathEntranceRoute7_h
-    dw EmptyMap_h ; unused
-    dw Route8Gate_h
-    dw UndergroundPathEntranceRoute8_h ;id=80
-    dw RockTunnelPokecenter_h
-    dw RockTunnel1_h
-    dw PowerPlant_h
-    dw Route11Gate_h
-    dw DiglettsCaveEntranceRoute11_h
-    dw Route11GateUpstairs_h
-    dw Route12Gate_h
-    dw BillsHouse_h
-    dw VermilionPokecenter_h
-    dw FanClub_h ;id=90
-    dw VermilionMart_h
-    dw VermilionGym_h
-    dw VermilionHouse1_h
-    dw VermilionDock_h
-    dw SSAnne1_h
-    dw SSAnne2_h
-    dw SSAnne3_h
-    dw SSAnne4_h
-    dw SSAnne5_h
-    dw SSAnne6_h ;id=100
-    dw SSAnne7_h
-    dw SSAnne8_h
-    dw SSAnne9_h
-    dw SSAnne10_h
-    dw DratiniCave_h
-    dw EmptyMap_h ; unused
-    dw EmptyMap_h ; unused
-    dw VictoryRoad1_h
-    dw VictoryCenter_h
-    dw EmptyMap_h ; unused ;id=110
-    dw EmptyMap_h ; unused
-    dw EmptyMap_h ; unused
-    dw Lance_h
-    dw EmptyMap_h ; unused
-    dw EmptyMap_h ; unused
-    dw EmptyMap_h ; unused
-    dw EmptyMap_h ; unused
-    dw HallofFameRoom_h
-    dw UndergroundPathNS_h
-    dw Gary_h ;id=120
-    dw UndergroundPathWE_h
-    dw CeladonMart1_h
-    dw CeladonMart2_h
-    dw CeladonMart3_h
-    dw CeladonMart4_h
-    dw CeladonMartRoof_h
-    dw CeladonMartElevator_h
-    dw CeladonMansion1_h
-    dw CeladonMansion2_h
-    dw CeladonMansion3_h ;id=130
-    dw CeladonMansion4_h
-    dw CeladonMansion5_h
-    dw CeladonPokecenter_h
-    dw CeladonGym_h
-    dw CeladonGameCorner_h
-    dw CeladonMart5_h
-    dw CeladonPrizeRoom_h
-    dw CeladonDiner_h
-    dw CeladonHouse_h
-    dw CeladonHotel_h ;id=140
-    dw LavenderPokecenter_h
-    dw PokemonTower1_h
-    dw PokemonTower2_h
-    dw PokemonTower3_h
-    dw PokemonTower4_h
-    dw PokemonTower5_h
-    dw PokemonTower6_h
-    dw PokemonTower7_h
-    dw LavenderHouse1_h
-    dw LavenderMart_h ;id=150
-    dw LavenderHouse2_h
-    dw FuchsiaMart_h
-    dw FuchsiaHouse1_h
-    dw FuchsiaPokecenter_h
-    dw FuchsiaHouse2_h
-    dw SafariZoneEntrance_h
-    dw FuchsiaGym_h
-    dw FuchsiaMeetingRoom_h
-    dw SeafoamIslands2_h
-    dw SeafoamIslands3_h ;id=160
-    dw SeafoamIslands4_h
-    dw SeafoamIslands5_h
-    dw VermilionHouse2_h
-    dw FuchsiaHouse3_h
-    dw Mansion1_h
-    dw CinnabarGym_h
-    dw Lab1_h
-    dw Lab2_h
-    dw Lab3_h
-    dw Lab4_h ;id=170
-    dw CinnabarPokecenter_h
-    dw CinnabarMart_h
-    dw EmptyMap_h ; unused
-    dw IndigoPlateauLobby_h
-    dw CopycatsHouseF1_h
-    dw CopycatsHouseF2_h
-    dw FightingDojo_h
-    dw SaffronGym_h
-    dw SaffronHouse1_h
-    dw SaffronMart_h ;id=180
-    dw SilphCo1_h
-    dw SaffronPokecenter_h
-    dw SaffronHouse2_h
-    dw Route15Gate_h
-    dw Route15GateUpstairs_h
-    dw Route16GateMap_h
-    dw Route16GateUpstairs_h
-    dw Route16House_h
-    dw Route12House_h
-    dw Route18Gate_h ;id=190
-    dw Route18GateUpstairs_h
-    dw SeafoamIslands1_h
-    dw Route22Gate_h
-    dw VictoryRoad2_h
-    dw Route12GateUpstairs_h
-    dw VermilionHouse3_h
-    dw DiglettsCave_h
-    dw VictoryRoad3_h
-    dw RocketHideout1_h
-    dw RocketHideout2_h ;200
-    dw RocketHideout3_h
-    dw RocketHideout4_h
-    dw RocketHideoutElevator_h
-    dw EmptyMap_h ; unused
-    dw EmptyMap_h ; unused
-    dw EmptyMap_h ; unused
-    dw SilphCo2_h
-    dw SilphCo3_h
-    dw SilphCo4_h
-    dw SilphCo5_h ;210
-    dw SilphCo6_h
-    dw SilphCo7_h
-    dw SilphCo8_h
-    dw Mansion2_h
-    dw Mansion3_h
-    dw Mansion4_h
-    dw SafariZoneEast_h
-    dw SafariZoneNorth_h
-    dw SafariZoneWest_h
-    dw SafariZoneCenter_h ;220
-    dw SafariZoneRestHouse1_h
-    dw SafariZoneSecretHouse_h
-    dw SafariZoneRestHouse2_h
-    dw SafariZoneRestHouse3_h
-    dw SafariZoneRestHouse4_h
-    dw UnknownDungeon2_h
-    dw UnknownDungeon3_h
-    dw UnknownDungeon1_h
-    dw NameRater_h
-    dw CeruleanHouse2_h
-    dw EmptyMap_h ; unused
-    dw RockTunnel2_h
-    dw SilphCo9_h
-    dw SilphCo10_h
-    dw SilphCo11_h
-    dw SilphCoElevator_h
-    dw EmptyMap_h ; unused
-    dw EmptyMap_h ; unused
-    dw BattleCenterM_h
-    dw TradeCenterM_h
-    dw TestMap1_h ; devmap1
-    dw RouteD1_h  ; devmap2
-    dw EmptyMap_h ; unused
-    dw EmptyMap_h ; unused
-    dw Lorelei_h
-    dw Bruno_h
-    dw Agatha_h ;247
+SECTION "HandleMidJump",ROM0[$039e]
 
 ; this function calls a function that takes necessary actions
 ; at the beginning of each overworld loop iteration as the player jumps
@@ -1041,7 +792,7 @@ WarpFound2: ; 073c (0:073c)
     jr nz,.indoorMaps
 ; this is for handling "outside" maps that can't have the 0xFF destination map
     ld a,[W_CURMAP]
-    ld [$d365],a ; save current map as previous map
+    ld [wLastMap],a ; save current map as previous map
     ld a,[W_CURMAPWIDTH]
     ld [$d366],a
     ld a,[$ff8b] ; destination map number
@@ -1082,7 +833,7 @@ WarpFound2: ; 073c (0:073c)
     res 1,[hl]
     jr .done
 .goBackOutside
-    ld a,[$d365] ; previous map
+    ld a,[wLastMap] ; previous map
     ld [W_CURMAP],a
     call PlayMapChangeSound
     xor a
@@ -2603,20 +2354,26 @@ LoadMapHeader: ; 107c (0:107c)
     ld [$ff8b],a
     bit 7,b
     ret nz
-    call GetMapHeaderPointers ; ld hl,MapHeaderPointers
-    ld a,[W_CURMAP]
-    sla a
-    jr nc,.noCarry1
-    inc h
-.noCarry1
-    add l
-    ld l,a
-    jr nc,.noCarry2
-    inc h
-.noCarry2
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a ; hl = base of map header
+
+    ld b,BANK(GetPointerToBaseOfMapHeader)
+    ld hl,GetPointerToBaseOfMapHeader
+    call Bankswitch ; hl = base of map header
+
+;    call GetMapHeaderPointers ; ld hl,MapHeaderPointers
+;    ld a,[W_CURMAP]
+;    sla a
+;    jr nc,.noCarry1
+;    inc h
+;.noCarry1
+;    add l
+;    ld l,a
+;    jr nc,.noCarry2
+;    inc h
+;.noCarry2
+;    ld a,[hli]
+;    ld h,[hl]
+;    ld l,a ; hl = base of map header
+
 ; copy the first 10 bytes (the fixed area) of the map data to D367-D370
     ld de,$d367
     ld c,$0a
@@ -2870,6 +2627,8 @@ LoadMapHeader: ; 107c (0:107c)
     call RoutineForRealGB
     ret
 
+SECTION "CopyMapConnectionHeader",ROM0[$1238]
+
 ; function to copy map connection data from ROM to WRAM
 ; Input: hl = source,de = destination
 CopyMapConnectionHeader: ; 1238 (0:1238)
@@ -3116,8 +2875,8 @@ LoadMonData: ; 1372 (0:1372)
 
 CheckNewAdventureFlag:
     push hl
-    ld hl,wFlagNewAdventureBit5
-    bit 5,[hl]
+    ld hl,wAdventureMap
+    bit 0,[hl]
     pop hl
     ret
 
@@ -6114,12 +5873,6 @@ UpdateSprites: ; 2429 (0:2429)
 ; Handle New Adventure Data (BANK $00)
 ; ───────────────────────────────────────
 
-MapHeaderPointersNew:
-    dw PortRoyal_h      ; PORT_ROYAL
-    dw ViridianCity_h   ; DUMMY_TOWN
-    dw RouteD1_h        ; ROUTE_D1
-    dw TestMap1_h       ; TEST_MAP_1
-
 IsCurrentMapTownOrRoute:
     ld a,[W_CURMAP]
 IsTownOrRoute:
@@ -7620,12 +7373,7 @@ GetMapHeaderBanks:
     ld hl,MapHeaderBanksNew
     ret
 
-GetMapHeaderPointers:
-    ld hl,MapHeaderPointers
-    call CheckNewAdventureFlag
-    ret z
-    ld hl,MapHeaderPointersNew
-    ret
+; Free
 
 SECTION "ExitListMenu",ROM0[$2e3b]
 
@@ -15008,14 +14756,14 @@ Func_62ff: ; 62ff (1:62ff)
     xor a
     jr .asm_63b3
 .asm_6346
-    ld a,[$d365]
+    ld a,[wLastMap]
     ld hl,$d732
     bit 4,[hl]
     jr nz,.asm_635b
     bit 6,[hl]
     res 6,[hl]
     jr z,.asm_638e
-    ld a,[$d719]
+    call GetLastBlackoutMap ; ld a,[wLastBlackoutMap]
     jr .asm_6391
 .asm_635b
     ld hl,$d72d
@@ -16709,8 +16457,8 @@ Func_7078: ; 7078 (1:7078)
     jr nz,.asm_7080 ; 0x7086 $f8
     jr .asm_7090 ; 0x7088 $6
 .asm_708a
-    ld a,[$d365]
-    ld [$d719],a
+    ld a,[wLastMap]
+    call SetLastBlackoutMap ; ld [wLastBlackoutMap],a
 .asm_7090
     pop hl
     ret
@@ -18832,6 +18580,24 @@ GetDungeonWarpData:
     ld hl,DungeonWarpDataNew
     ret
 
+GetLastBlackoutMap:
+    ld a,[wLastBlackoutAdventureMap]
+    cp $FF
+    jr nz,.done
+    inc a
+.done
+    ld [wAdventureMap],a
+    ld a,[wLastBlackoutMap]
+    ret
+
+SetLastBlackoutMap:
+    push af
+    ld a,[wAdventureMap]
+    ld [wLastBlackoutAdventureMap],a
+    pop af
+    ld [wLastBlackoutMap],a
+    ret
+
 ; ───────────────────────────────────────
 
 SECTION "bank2",ROMX,BANK[$2]
@@ -20879,7 +20645,7 @@ MapSongBanks: ; c04d (3:404d)
     db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; BikeShop
     db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; CeruleanMart
     db (Music_Pokecenter      -$4000)/3 , BANK(Music_Pokecenter)      ; MtMoonPokecenter
-    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; SWAP_MAP
     db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; Route5Gate
     db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; UndergroundTunnelEntranceRoute5
     db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; DayCareM
@@ -21130,7 +20896,7 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(BikeShop_h)
     db BANK(CeruleanMart_h)
     db BANK(MtMoonPokecenter_h)
-    db BANK(EmptyMap_h) ; unused
+    db BANK(SwapMap_h)
     db BANK(Route5Gate_h)
     db BANK(UndergroundTunnelEntranceRoute5_h)
     db BANK(DayCareM_h)
@@ -21304,8 +21070,8 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(TradeCenterM_h)
     db BANK(TestMap1_h) ; devmap1
     db BANK(RouteD1_h)  ; devmap2
-    db BANK(EmptyMap_h) ; unused
-    db BANK(EmptyMap_h) ; unused
+    db BANK(PortRoyal_h) ; devmap3
+    db BANK(SwapMap_h) ; devmap4
     db BANK(Lorelei_h)
     db BANK(Bruno_h)
     db BANK(Agatha_h)
@@ -22064,8 +21830,7 @@ Func_c754: ; c754 (3:4754)
 .asm_c7b1
     ret
 
-DungeonTilesetIDs: ; c7b2 (3:47b2)
-    db $03,$0A,$0D,$11,$12,$13,$0C,$14,$16,$0F,$07,$FF
+SECTION "TilesetsHeadPtr",ROMX[$47be],BANK[$3]
 
 TilesetsHeadPtr: ; c7be (3:47be)
     TSETHEAD Tset00_Block,Tset00_GFX,Tset00_Coll,$FF,$FF,$FF,$52,2
@@ -22936,22 +22701,220 @@ OldRodData:
 ; ───────────────────────────────────────
 
 MapHeaderBanksNew:
-    db BANK(PortRoyal_h)      ; PORT_ROYAL
-    db BANK(ViridianCity_h)   ; DUMMY_TOWN
-    db BANK(RouteD1_h)        ; ROUTE_D1
-    db BANK(TestMap1_h)       ; TEST_MAP_1
+    db BANK(PortRoyal_h)            ; PORT_ROYAL
+    db BANK(ViridianCity_h)         ; DUMMY_TOWN
+    db BANK(RouteD1_h)              ; ROUTE_D1
+    db BANK(TestMap1_h)             ; TEST_MAP_1
+    db BANK(PortRoyalCenter_h)      ; PORT_ROYAL_POKECENTER
+    db BANK(PortRoyalMart_h)        ; PORT_ROYAL_MART
+    db BANK(EmptyMap_h) ; $06
+    db BANK(EmptyMap_h) ; $07
+    db BANK(EmptyMap_h) ; $08
+    db BANK(EmptyMap_h) ; $09
+    db BANK(EmptyMap_h) ; $0A
+    db BANK(EmptyMap_h) ; $0B
+    db BANK(EmptyMap_h) ; $0C
+    db BANK(EmptyMap_h) ; $0D
+    db BANK(EmptyMap_h) ; $0E
+    db BANK(EmptyMap_h) ; $0F
+    db BANK(EmptyMap_h) ; $10
+    db BANK(EmptyMap_h) ; $11
+    db BANK(EmptyMap_h) ; $12
+    db BANK(EmptyMap_h) ; $13
+    db BANK(EmptyMap_h) ; $14
+    db BANK(EmptyMap_h) ; $15
+    db BANK(EmptyMap_h) ; $16
+    db BANK(EmptyMap_h) ; $17
+    db BANK(EmptyMap_h) ; $18
+    db BANK(EmptyMap_h) ; $19
+    db BANK(EmptyMap_h) ; $1A
+    db BANK(EmptyMap_h) ; $1B
+    db BANK(EmptyMap_h) ; $1C
+    db BANK(EmptyMap_h) ; $1D
+    db BANK(EmptyMap_h) ; $1E
+    db BANK(EmptyMap_h) ; $1F
+    db BANK(EmptyMap_h) ; $20
+    db BANK(EmptyMap_h) ; $21
+    db BANK(EmptyMap_h) ; $22
+    db BANK(EmptyMap_h) ; $23
+    db BANK(EmptyMap_h) ; $24
+    db BANK(EmptyMap_h) ; $25
+    db BANK(EmptyMap_h) ; $26
+    db BANK(EmptyMap_h) ; $27
+    db BANK(EmptyMap_h) ; $28
+    db BANK(EmptyMap_h) ; $29
+    db BANK(EmptyMap_h) ; $2A
+    db BANK(EmptyMap_h) ; $2B
+    db BANK(EmptyMap_h) ; $2C
+    db BANK(EmptyMap_h) ; $2D
+    db BANK(EmptyMap_h) ; $2E
+    db BANK(EmptyMap_h) ; $2F
+    db BANK(EmptyMap_h) ; $30
+    db BANK(EmptyMap_h) ; $31
+    db BANK(EmptyMap_h) ; $32
+    db BANK(EmptyMap_h) ; $33
+    db BANK(EmptyMap_h) ; $34
+    db BANK(EmptyMap_h) ; $35
+    db BANK(EmptyMap_h) ; $36
+    db BANK(EmptyMap_h) ; $37
+    db BANK(EmptyMap_h) ; $38
+    db BANK(EmptyMap_h) ; $39
+    db BANK(EmptyMap_h) ; $3A
+    db BANK(EmptyMap_h) ; $3B
+    db BANK(EmptyMap_h) ; $3C
+    db BANK(EmptyMap_h) ; $3D
+    db BANK(EmptyMap_h) ; $3E
+    db BANK(EmptyMap_h) ; $3F
+    db BANK(EmptyMap_h) ; $40
+    db BANK(EmptyMap_h) ; $41
+    db BANK(EmptyMap_h) ; $42
+    db BANK(EmptyMap_h) ; $43
+    db BANK(EmptyMap_h) ; $44
+    db BANK(SwapMap_h)              ; SWAP_MAP
 
 MapSongBanksNew:
     db (Music_Lavender      -$4000)/3 , BANK(Music_Lavender)      ; PORT_ROYAL
     db (Music_PokemonTower  -$4000)/3 , BANK(Music_PokemonTower)  ; DUMMY_TOWN
     db (Music_PokemonTower  -$4000)/3 , BANK(Music_PokemonTower)  ; ROUTE_D1
     db (Music_PokemonTower  -$4000)/3 , BANK(Music_PokemonTower)  ; TEST_MAP_1
+    db (Music_Pokecenter    -$4000)/3 , BANK(Music_Pokecenter)    ; PORT_ROYAL_POKECENTER
+    db (Music_Pokecenter    -$4000)/3 , BANK(Music_Pokecenter)    ; PORT_ROYAL_MART
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $06
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $07
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $08
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $09
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $0A
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $0B
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $0C
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $0D
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $0E
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $0F
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $10
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $11
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $12
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $13
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $14
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $15
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $16
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $17
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $18
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $19
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $1A
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $1B
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $1C
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $1D
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $1E
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $1F
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $20
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $21
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $22
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $23
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $24
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $25
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $26
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $27
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $28
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $29
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $2A
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $2B
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $2C
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $2D
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $2E
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $2F
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $30
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $31
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $32
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $33
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $34
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $35
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $36
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $37
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $38
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $39
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $3A
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $3B
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $3C
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $3D
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $3E
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $3F
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $40
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $41
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $42
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $43
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $44
+    db (Music_Cities2       -$4000)/3 , BANK(Music_Cities2)       ; SWAP_MAP
 
 MapHSPointersNew:
     dw MapHS_PortRoyal ; PORT_ROYAL
     dw MapHSXX         ; DUMMY_TOWN
     dw MapHSXX         ; ROUTE_D1
     dw MapHSXX         ; TEST_MAP_1
+    dw MapHSXX         ; PORT_ROYAL_POKECENTER
+    dw MapHSXX         ; PORT_ROYAL_MART
+    dw MapHSXX ; $06
+    dw MapHSXX ; $07
+    dw MapHSXX ; $08
+    dw MapHSXX ; $09
+    dw MapHSXX ; $0A
+    dw MapHSXX ; $0B
+    dw MapHSXX ; $0C
+    dw MapHSXX ; $0D
+    dw MapHSXX ; $0E
+    dw MapHSXX ; $0F
+    dw MapHSXX ; $10
+    dw MapHSXX ; $11
+    dw MapHSXX ; $12
+    dw MapHSXX ; $13
+    dw MapHSXX ; $14
+    dw MapHSXX ; $15
+    dw MapHSXX ; $16
+    dw MapHSXX ; $17
+    dw MapHSXX ; $18
+    dw MapHSXX ; $19
+    dw MapHSXX ; $1A
+    dw MapHSXX ; $1B
+    dw MapHSXX ; $1C
+    dw MapHSXX ; $1D
+    dw MapHSXX ; $1E
+    dw MapHSXX ; $1F
+    dw MapHSXX ; $20
+    dw MapHSXX ; $21
+    dw MapHSXX ; $22
+    dw MapHSXX ; $23
+    dw MapHSXX ; $24
+    dw MapHSXX ; $25
+    dw MapHSXX ; $26
+    dw MapHSXX ; $27
+    dw MapHSXX ; $28
+    dw MapHSXX ; $29
+    dw MapHSXX ; $2A
+    dw MapHSXX ; $2B
+    dw MapHSXX ; $2C
+    dw MapHSXX ; $2D
+    dw MapHSXX ; $2E
+    dw MapHSXX ; $2F
+    dw MapHSXX ; $30
+    dw MapHSXX ; $31
+    dw MapHSXX ; $32
+    dw MapHSXX ; $33
+    dw MapHSXX ; $34
+    dw MapHSXX ; $35
+    dw MapHSXX ; $36
+    dw MapHSXX ; $37
+    dw MapHSXX ; $38
+    dw MapHSXX ; $39
+    dw MapHSXX ; $3A
+    dw MapHSXX ; $3B
+    dw MapHSXX ; $3C
+    dw MapHSXX ; $3D
+    dw MapHSXX ; $3E
+    dw MapHSXX ; $3F
+    dw MapHSXX ; $40
+    dw MapHSXX ; $41
+    dw MapHSXX ; $42
+    dw MapHSXX ; $43
+    dw MapHSXX ; $44
+    dw MapHSXX         ; SWAP_MAP
     dw $FFFF
 
 MapHS_PortRoyal:
@@ -26276,6 +26239,10 @@ asm_f055:
     ld a,$9
     ld de,UnknownOAM_f060 ; $7060
     jp WriteOAMBlock
+
+DungeonTilesetIDs: ; Moved in the Bank
+    db $03,$0A,$0D,$10,$11,$12,$13,$0C,$14,$16,$0F,$07
+    db $FF
 
 SECTION "Func_f068",ROMX[$7068],BANK[$3]
 
@@ -33924,7 +33891,6 @@ MapSpriteSetsNew:
     db $01 ; PORT_ROYAL
     db $01 ; DUMMY_TOWN
     db $01 ; ROUTE_D1
-    db $01 ; TEST_MAP_1
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $05)
@@ -41040,7 +41006,7 @@ DiglettsCaveRoute2_h: ; 0x1dea4 to 0x1deb0 (12 bytes) (bank=7) (id=46)
 
 DiglettsCaveRoute2Script: ; 1deb0 (7:5eb0)
     ld a,ROUTE_2
-    ld [$d365],a
+    ld [wLastMap],a
     jp EnableAutoTextBoxDrawing
 
 DiglettsCaveRoute2TextPointers: ; 1deb8 (7:5eb8)
@@ -41583,8 +41549,8 @@ UndergroundPathEntranceRoute8_h: ; 0x1e27d to 0x1e289 (12 bytes) (bank=7) (id=80
     dw UndergroundPathEntranceRoute8Object ; objects
 
 UndergroundPathEntranceRoute8Script: ; 1e289 (7:6289)
-    ld a,$13
-    ld [$d365],a
+    ld a,ROUTE_8
+    ld [wLastMap],a
     jp EnableAutoTextBoxDrawing
 
 UndergroundPathEntranceRoute8TextPointers: ; 1e291 (7:6291)
@@ -41840,7 +41806,7 @@ DiglettsCaveEntranceRoute11_h: ; 0x1e5ae to 0x1e5ba (12 bytes) (bank=7) (id=85)
 DiglettsCaveEntranceRoute11Script: ; 1e5ba (7:65ba)
     call EnableAutoTextBoxDrawing
     ld a,ROUTE_11
-    ld [$d365],a
+    ld [wLastMap],a
     ret
 
 DiglettsCaveEntranceRoute11TextPointers: ; 1e5c3 (7:65c3)
@@ -41963,11 +41929,11 @@ Route22GateScript: ; 1e683 (7:6683)
     call CallFunctionInTable
     ld a,[$d361]
     cp $4
-    ld a,$22
+    ld a,ROUTE_23
     jr c,.asm_1e69a ; 0x1e696 $2
-    ld a,$21
+    ld a,ROUTE_22
 .asm_1e69a
-    ld [$d365],a
+    ld [wLastMap],a
     ret
 
 Route22GateScriptPointers: ; 1e69e (7:669e)
@@ -42288,23 +42254,7 @@ UnnamedText_1e8da: ; 1e8da (7:68da)
     TX_FAR _UnnamedText_1e8da
     db "@"
 
-BillsHouseObject: ; 0x1e8df (size=38)
-    db $d ; border tile
-
-    db $2 ; warps
-    db $7,$2,$0,$ff
-    db $7,$3,$0,$ff
-
-    db $0 ; signs
-
-    db $3 ; people
-    db SPRITE_SLOWBRO,$5 + 4,$6 + 4,$ff,$ff,$1 ; person
-    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$4 + 4,$ff,$ff,$2 ; person
-    db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$6 + 4,$ff,$ff,$3 ; person
-
-    ; warp-to
-    EVENT_DISP $4,$7,$2
-    EVENT_DISP $4,$7,$3
+SECTION "BillsHouseBlocks",ROMX[$6905],BANK[$7]
 
 BillsHouseBlocks: ; 1e905 (7:6905)
     INCBIN "maps/billshouse.blk"
@@ -43786,6 +43736,26 @@ FuchsiaMartText1:
     db SUPER_POTION
     db FULL_HEAL
     db SUPER_REPEL,$FF
+
+BillsHouseObject:
+    db $d ; border tile
+
+    db 3 ; warps
+    db 07,02,0,$ff
+    db 07,03,0,$ff
+    db 06,07,1,SWAP_MAP
+
+    db $0 ; signs
+
+    db $3 ; people
+    db SPRITE_SLOWBRO,$5 + 4,$6 + 4,$ff,$ff,$1 ; person
+    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$4 + 4,$ff,$ff,$2 ; person
+    db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$6 + 4,$ff,$ff,$3 ; person
+
+    ; warp-to
+    EVENT_DISP BILLS_HOUSE_WIDTH,07,02
+    EVENT_DISP BILLS_HOUSE_WIDTH,07,03
+    EVENT_DISP BILLS_HOUSE_WIDTH,06,07
 
 SECTION "bank8",ROMX,BANK[$8]
 
@@ -69389,14 +69359,20 @@ SafariZoneLaprasRunAway:
 
 HiddenObjectMapsNew:
     db ROUTE_D1
+    DB PORT_ROYAL_POKECENTER
     db $FF
 
 HiddenObjectPointersNew:
     dw RouteD1HiddenObjects
+    DW PortRoyalCenterObjects
 
 RouteD1HiddenObjects:
     db 13,26,ULTRA_BALL
     dbw BANK(HiddenItems),HiddenItems
+PortRoyalCenterObjects:
+    db 03,13,04
+    dbw BANK(PokeCenterPC),PokeCenterPC
+
     db $FF
 
 ; ───────────────────────────────────────
@@ -86925,7 +86901,7 @@ HallofFameRoomScript2: ; 5a4bb (16:64bb)
     xor a
     ld [W_HALLOFFAMEROOMCURSCRIPT],a
     ld a,$0
-    ld [$d719],a
+    call SetLastBlackoutMapAfterLeague ; ld [wLastBlackoutMap],a
     ld b,BANK(SaveSAVtoSRAM)
     ld hl,SaveSAVtoSRAM
     call Bankswitch
@@ -87081,6 +87057,11 @@ Route16Snorlax:
     ld [W_ROUTE16CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
     jp TextScriptEnd
+
+SetLastBlackoutMapAfterLeague:
+    ld [wLastBlackoutMap],a
+    ld [wLastBlackoutAdventureMap],a
+    ret
 
 SECTION "bank17",ROMX,BANK[$17]
 
@@ -90009,8 +89990,8 @@ UndergroundTunnelEntranceRoute5_h: ; 0x5d69d to 0x5d6a9 (12 bytes) (id=71)
     dw UndergroundTunnelEntranceRoute5Object ; objects
 
 UndergroundTunnelEntranceRoute5Script: ; 5d6a9 (17:56a9)
-    ld a,$10
-    ld [$d365],a
+    ld a,ROUTE_5
+    ld [wLastMap],a
     ret
 
 UndergroundTunnelEntranceRoute5_5d6af: ; 5d6af (17:56af)
@@ -90054,8 +90035,8 @@ UndergroundTunnelEntranceRoute6_h: ; 0x5d6e3 to 0x5d6ef (12 bytes) (id=74)
     dw UndergroundTunnelEntranceRoute6Object ; objects
 
 UndergroundTunnelEntranceRoute6Script: ; 5d6ef (17:56ef)
-    ld a,$11
-    ld [$d365],a
+    ld a,ROUTE_6
+    ld [wLastMap],a
     jp EnableAutoTextBoxDrawing
 
 UndergroundTunnelEntranceRoute6TextPointers: ; 5d6f7 (17:56f7)
@@ -90091,8 +90072,8 @@ UndergroundPathEntranceRoute7_h: ; 0x5d720 to 0x5d72c (12 bytes) (id=77)
     dw UndergroundPathEntranceRoute7Object ; objects
 
 UndergroundPathEntranceRoute7Script: ; 5d72c (17:572c)
-    ld a,$12
-    ld [$d365],a
+    ld a,ROUTE_7
+    ld [wLastMap],a
     jp EnableAutoTextBoxDrawing
 
 UndergroundPathEntranceRoute7TextPointers: ; 5d734 (17:5734)
@@ -92192,8 +92173,8 @@ PokemonTower7Script4: ; 60d86 (18:4d86)
     ld [H_DOWNARROWBLINKCNT1],a ; $FF00+$8b
     ld a,$1
     ld [$d42f],a
-    ld a,$4
-    ld [$d365],a
+    ld a,LAVENDER_TOWN
+    ld [wLastMap],a
     ld hl,$d72d
     set 3,[hl]
     ld a,$0
@@ -97911,6 +97892,7 @@ InternalMapEntries:
     IMAP $3E,$6,$2,MountMoonName
     IMAP $44,$A,$2,CeruleanCityName
     IMAP $45,$5,$2,Route4Name
+    IMAP $46,$C,$0,SeaCottageName
     IMAP $49,$A,$4,Route5Name
     IMAP $4C,$A,$7,Route6Name
     IMAP $4F,$9,$5,Route7Name
@@ -99759,7 +99741,9 @@ ExternalMapEntriesNew:
     EMAP 09,14,RouteD1Name
 
 InternalMapEntriesNew:
-    IMAP TEST_MAP_1 + 1,9,14,RouteD1Name
+    IMAP 1 + TEST_MAP_1            , 09,14,RouteD1Name
+    IMAP 1 + PORT_ROYAL_MART       , 07,14,PortRoyalName
+    IMAP 1 + SWAP_MAP              , 09,14,RouteD1Name
     db $FF
 
 DummyTownName:
@@ -132985,6 +132969,72 @@ WildDataPointersNew:
     dw NoMons        ; DUMMY_TOWN
     dw RouteD1Mons   ; ROUTE_D1
     dw NoMons        ; TEST_MAP_1
+    dw NoMons        ; PORT_ROYAL_POKECENTER
+    dw NoMons        ; PORT_ROYAL_MART
+    dw NoMons ; $06
+    dw NoMons ; $07
+    dw NoMons ; $08
+    dw NoMons ; $09
+    dw NoMons ; $0A
+    dw NoMons ; $0B
+    dw NoMons ; $0C
+    dw NoMons ; $0D
+    dw NoMons ; $0E
+    dw NoMons ; $0F
+    dw NoMons ; $10
+    dw NoMons ; $11
+    dw NoMons ; $12
+    dw NoMons ; $13
+    dw NoMons ; $14
+    dw NoMons ; $15
+    dw NoMons ; $16
+    dw NoMons ; $17
+    dw NoMons ; $18
+    dw NoMons ; $19
+    dw NoMons ; $1A
+    dw NoMons ; $1B
+    dw NoMons ; $1C
+    dw NoMons ; $1D
+    dw NoMons ; $1E
+    dw NoMons ; $1F
+    dw NoMons ; $20
+    dw NoMons ; $21
+    dw NoMons ; $22
+    dw NoMons ; $23
+    dw NoMons ; $24
+    dw NoMons ; $25
+    dw NoMons ; $26
+    dw NoMons ; $27
+    dw NoMons ; $28
+    dw NoMons ; $29
+    dw NoMons ; $2A
+    dw NoMons ; $2B
+    dw NoMons ; $2C
+    dw NoMons ; $2D
+    dw NoMons ; $2E
+    dw NoMons ; $2F
+    dw NoMons ; $30
+    dw NoMons ; $31
+    dw NoMons ; $32
+    dw NoMons ; $33
+    dw NoMons ; $34
+    dw NoMons ; $35
+    dw NoMons ; $36
+    dw NoMons ; $37
+    dw NoMons ; $38
+    dw NoMons ; $39
+    dw NoMons ; $3A
+    dw NoMons ; $3B
+    dw NoMons ; $3C
+    dw NoMons ; $3D
+    dw NoMons ; $3E
+    dw NoMons ; $3F
+    dw NoMons ; $40
+    dw NoMons ; $41
+    dw NoMons ; $42
+    dw NoMons ; $43
+    dw NoMons ; $44
+    dw NoMons        ; SWAP_MAP
     dw $FFFF
 
 RouteD1Mons:
@@ -134734,7 +134784,7 @@ GetMapPaletteID_:
     cp BRUNOS_ROOM
     jr z,.caveOrBruno
 .normalDungeonOrBuilding
-    ld a,[$d365] ; town or route that current dungeon or building is located
+    ld a,[wLastMap] ; town or route that current dungeon or building is located
 .townOrRoute
     call IsTown
     jr c,.town
@@ -134947,9 +134997,363 @@ INCLUDE "constants/pokemon_learnset.asm"
 
 SECTION "Bank3c",ROMX,BANK[$3C]
 
+; see also MapHeaderBanks
+MapHeaderPointers:
+    dw PalletTown_h
+    dw ViridianCity_h
+    dw PewterCity_h
+    dw CeruleanCity_h
+    dw LavenderTown_h
+    dw VermilionCity_h
+    dw CeladonCity_h
+    dw FuchsiaCity_h
+    dw CinnabarIsland_h
+    dw IndigoPlateau_h
+    dw SaffronCity_h
+    dw EmptyMap_h
+    dw Route1_h
+    dw Route2_h
+    dw Route3_h
+    dw Route4_h
+    dw Route5_h
+    dw Route6_h
+    dw Route7_h
+    dw Route8_h
+    dw Route9_h
+    dw Route10_h
+    dw Route11_h
+    dw Route12_h
+    dw Route13_h
+    dw Route14_h
+    dw Route15_h
+    dw Route16_h
+    dw Route17_h
+    dw Route18_h
+    dw Route19_h
+    dw Route20_h
+    dw Route21_h
+    dw Route22_h
+    dw Route23_h
+    dw Route24_h
+    dw Route25_h
+    dw RedsHouse1F_h
+    dw RedsHouse2F_h
+    dw BluesHouse_h
+    dw OaksLab_h ;id=40
+    dw ViridianPokecenter_h
+    dw ViridianMart_h
+    dw School_h
+    dw ViridianHouse_h
+    dw ViridianGym_h
+    dw DiglettsCaveRoute2_h
+    dw ViridianForestexit_h
+    dw Route2House_h
+    dw Route2Gate_h
+    dw ViridianForestEntrance_h ;id=50
+    dw ViridianForest_h
+    dw MuseumF1_h
+    dw MuseumF2_h
+    dw PewterGym_h
+    dw PewterHouse1_h
+    dw PewterMart_h
+    dw PewterHouse2_h
+    dw PewterPokecenter_h
+    dw MtMoon1_h
+    dw MtMoon2_h ;id=60
+    dw MtMoon3_h
+    dw CeruleanHouseTrashed_h
+    dw CeruleanHouse_h
+    dw CeruleanPokecenter_h
+    dw CeruleanGym_h
+    dw BikeShop_h
+    dw CeruleanMart_h
+    dw MtMoonPokecenter_h
+    dw SwapMap_h
+    dw Route5Gate_h
+    dw UndergroundTunnelEntranceRoute5_h
+    dw DayCareM_h
+    dw Route6Gate_h
+    dw UndergroundTunnelEntranceRoute6_h
+    dw EmptyMap_h ; unused
+    dw Route7Gate_h
+    dw UndergroundPathEntranceRoute7_h
+    dw EmptyMap_h ; unused
+    dw Route8Gate_h
+    dw UndergroundPathEntranceRoute8_h ;id=80
+    dw RockTunnelPokecenter_h
+    dw RockTunnel1_h
+    dw PowerPlant_h
+    dw Route11Gate_h
+    dw DiglettsCaveEntranceRoute11_h
+    dw Route11GateUpstairs_h
+    dw Route12Gate_h
+    dw BillsHouse_h
+    dw VermilionPokecenter_h
+    dw FanClub_h ;id=90
+    dw VermilionMart_h
+    dw VermilionGym_h
+    dw VermilionHouse1_h
+    dw VermilionDock_h
+    dw SSAnne1_h
+    dw SSAnne2_h
+    dw SSAnne3_h
+    dw SSAnne4_h
+    dw SSAnne5_h
+    dw SSAnne6_h ;id=100
+    dw SSAnne7_h
+    dw SSAnne8_h
+    dw SSAnne9_h
+    dw SSAnne10_h
+    dw DratiniCave_h
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw VictoryRoad1_h
+    dw VictoryCenter_h
+    dw EmptyMap_h ; unused ;id=110
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw Lance_h
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw HallofFameRoom_h
+    dw UndergroundPathNS_h
+    dw Gary_h ;id=120
+    dw UndergroundPathWE_h
+    dw CeladonMart1_h
+    dw CeladonMart2_h
+    dw CeladonMart3_h
+    dw CeladonMart4_h
+    dw CeladonMartRoof_h
+    dw CeladonMartElevator_h
+    dw CeladonMansion1_h
+    dw CeladonMansion2_h
+    dw CeladonMansion3_h ;id=130
+    dw CeladonMansion4_h
+    dw CeladonMansion5_h
+    dw CeladonPokecenter_h
+    dw CeladonGym_h
+    dw CeladonGameCorner_h
+    dw CeladonMart5_h
+    dw CeladonPrizeRoom_h
+    dw CeladonDiner_h
+    dw CeladonHouse_h
+    dw CeladonHotel_h ;id=140
+    dw LavenderPokecenter_h
+    dw PokemonTower1_h
+    dw PokemonTower2_h
+    dw PokemonTower3_h
+    dw PokemonTower4_h
+    dw PokemonTower5_h
+    dw PokemonTower6_h
+    dw PokemonTower7_h
+    dw LavenderHouse1_h
+    dw LavenderMart_h ;id=150
+    dw LavenderHouse2_h
+    dw FuchsiaMart_h
+    dw FuchsiaHouse1_h
+    dw FuchsiaPokecenter_h
+    dw FuchsiaHouse2_h
+    dw SafariZoneEntrance_h
+    dw FuchsiaGym_h
+    dw FuchsiaMeetingRoom_h
+    dw SeafoamIslands2_h
+    dw SeafoamIslands3_h ;id=160
+    dw SeafoamIslands4_h
+    dw SeafoamIslands5_h
+    dw VermilionHouse2_h
+    dw FuchsiaHouse3_h
+    dw Mansion1_h
+    dw CinnabarGym_h
+    dw Lab1_h
+    dw Lab2_h
+    dw Lab3_h
+    dw Lab4_h ;id=170
+    dw CinnabarPokecenter_h
+    dw CinnabarMart_h
+    dw EmptyMap_h ; unused
+    dw IndigoPlateauLobby_h
+    dw CopycatsHouseF1_h
+    dw CopycatsHouseF2_h
+    dw FightingDojo_h
+    dw SaffronGym_h
+    dw SaffronHouse1_h
+    dw SaffronMart_h ;id=180
+    dw SilphCo1_h
+    dw SaffronPokecenter_h
+    dw SaffronHouse2_h
+    dw Route15Gate_h
+    dw Route15GateUpstairs_h
+    dw Route16GateMap_h
+    dw Route16GateUpstairs_h
+    dw Route16House_h
+    dw Route12House_h
+    dw Route18Gate_h ;id=190
+    dw Route18GateUpstairs_h
+    dw SeafoamIslands1_h
+    dw Route22Gate_h
+    dw VictoryRoad2_h
+    dw Route12GateUpstairs_h
+    dw VermilionHouse3_h
+    dw DiglettsCave_h
+    dw VictoryRoad3_h
+    dw RocketHideout1_h
+    dw RocketHideout2_h ;200
+    dw RocketHideout3_h
+    dw RocketHideout4_h
+    dw RocketHideoutElevator_h
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw SilphCo2_h
+    dw SilphCo3_h
+    dw SilphCo4_h
+    dw SilphCo5_h ;210
+    dw SilphCo6_h
+    dw SilphCo7_h
+    dw SilphCo8_h
+    dw Mansion2_h
+    dw Mansion3_h
+    dw Mansion4_h
+    dw SafariZoneEast_h
+    dw SafariZoneNorth_h
+    dw SafariZoneWest_h
+    dw SafariZoneCenter_h ;220
+    dw SafariZoneRestHouse1_h
+    dw SafariZoneSecretHouse_h
+    dw SafariZoneRestHouse2_h
+    dw SafariZoneRestHouse3_h
+    dw SafariZoneRestHouse4_h
+    dw UnknownDungeon2_h
+    dw UnknownDungeon3_h
+    dw UnknownDungeon1_h
+    dw NameRater_h
+    dw CeruleanHouse2_h
+    dw EmptyMap_h ; unused
+    dw RockTunnel2_h
+    dw SilphCo9_h
+    dw SilphCo10_h
+    dw SilphCo11_h
+    dw SilphCoElevator_h
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw BattleCenterM_h
+    dw TradeCenterM_h
+    dw TestMap1_h ; devmap1
+    dw RouteD1_h  ; devmap2
+    dw PortRoyal_h ; devmap3
+    dw SwapMap_h ; devmap4
+    dw Lorelei_h
+    dw Bruno_h
+    dw Agatha_h ;247
+
+; ───────────────────────────────────────
+; Handle New Adventure Data (BANK $3C)
+; ───────────────────────────────────────
+
+MapHeaderPointersNew:
+    dw PortRoyal_h           ; PORT_ROYAL
+    dw ViridianCity_h        ; DUMMY_TOWN
+    dw RouteD1_h             ; ROUTE_D1
+    dw TestMap1_h            ; TEST_MAP_1
+    dw PortRoyalCenter_h     ; PORT_ROYAL_POKECENTER
+    dw PortRoyalMart_h       ; PORT_ROYAL_MART
+    dw EmptyMap_h ; $06
+    dw EmptyMap_h ; $07
+    dw EmptyMap_h ; $08
+    dw EmptyMap_h ; $09
+    dw EmptyMap_h ; $0A
+    dw EmptyMap_h ; $0B
+    dw EmptyMap_h ; $0C
+    dw EmptyMap_h ; $0D
+    dw EmptyMap_h ; $0E
+    dw EmptyMap_h ; $0F
+    dw EmptyMap_h ; $10
+    dw EmptyMap_h ; $11
+    dw EmptyMap_h ; $12
+    dw EmptyMap_h ; $13
+    dw EmptyMap_h ; $14
+    dw EmptyMap_h ; $15
+    dw EmptyMap_h ; $16
+    dw EmptyMap_h ; $17
+    dw EmptyMap_h ; $18
+    dw EmptyMap_h ; $19
+    dw EmptyMap_h ; $1A
+    dw EmptyMap_h ; $1B
+    dw EmptyMap_h ; $1C
+    dw EmptyMap_h ; $1D
+    dw EmptyMap_h ; $1E
+    dw EmptyMap_h ; $1F
+    dw EmptyMap_h ; $20
+    dw EmptyMap_h ; $21
+    dw EmptyMap_h ; $22
+    dw EmptyMap_h ; $23
+    dw EmptyMap_h ; $24
+    dw EmptyMap_h ; $25
+    dw EmptyMap_h ; $26
+    dw EmptyMap_h ; $27
+    dw EmptyMap_h ; $28
+    dw EmptyMap_h ; $29
+    dw EmptyMap_h ; $2A
+    dw EmptyMap_h ; $2B
+    dw EmptyMap_h ; $2C
+    dw EmptyMap_h ; $2D
+    dw EmptyMap_h ; $2E
+    dw EmptyMap_h ; $2F
+    dw EmptyMap_h ; $30
+    dw EmptyMap_h ; $31
+    dw EmptyMap_h ; $32
+    dw EmptyMap_h ; $33
+    dw EmptyMap_h ; $34
+    dw EmptyMap_h ; $35
+    dw EmptyMap_h ; $36
+    dw EmptyMap_h ; $37
+    dw EmptyMap_h ; $38
+    dw EmptyMap_h ; $39
+    dw EmptyMap_h ; $3A
+    dw EmptyMap_h ; $3B
+    dw EmptyMap_h ; $3C
+    dw EmptyMap_h ; $3D
+    dw EmptyMap_h ; $3E
+    dw EmptyMap_h ; $3F
+    dw EmptyMap_h ; $40
+    dw EmptyMap_h ; $41
+    dw EmptyMap_h ; $42
+    dw EmptyMap_h ; $43
+    dw EmptyMap_h ; $44
+    dw SwapMap_h             ; SWAP_MAP
+
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $3C)
+; ───────────────────────────────────────
+
+GetMapHeaderPointers:
+    ld hl,MapHeaderPointers
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,MapHeaderPointersNew
+    ret
+
+GetPointerToBaseOfMapHeader:
+    call GetMapHeaderPointers ; ld hl,MapHeaderPointers
+    ld a,[W_CURMAP]
+    sla a
+    jr nc,.noCarry1
+    inc h
+.noCarry1
+    add l
+    ld l,a
+    jr nc,.noCarry2
+    inc h
+.noCarry2
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a ; hl = base of map header
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
-; EMPTY MAP
+; EMPTY_TOWN
 ; ──────────────────────────────────────────────────────────────────────
 
 EmptyMap_h:
@@ -134971,7 +135375,7 @@ EmptyMapScript:
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
-; PORT ROYAL
+; PORT_ROYAL
 ; ──────────────────────────────────────────────────────────────────────
 
 PortRoyal_h:
@@ -134984,12 +135388,23 @@ PortRoyal_h:
 
 PortRoyalObject:
     db $f ; border tile
-    db $0 ; warps
-    db $0 ; signs
+
+    db 2 ; warps
+    db 05,05,0,PORT_ROYAL_POKECENTER
+    db 05,09,0,PORT_ROYAL_MART
+
+    db 2 ; signs
+    db 05,06,3 ; PokeCenterSignText
+    db 05,10,4 ; MartSignText
+
 
     db $2 ; people
-    db SPRITE_GIRL,8 + 4,3 + 4,$fe,$00,$00+1 ; person
-    db SPRITE_BALL,9 + 4,3 + 4,$ff,$ff,$80+2,SURFBOARD ; item
+    db SPRITE_GIRL,08 + 4,03 + 4,$fe,$00,$00+1 ; person
+    db SPRITE_BALL,10 + 4,05 + 4,$ff,$ff,$80+2,SURFBOARD ; item
+
+    ; warp-to
+    EVENT_DISP PORT_ROYAL_WIDTH,05,05 ; PORT_ROYAL_POKECENTER
+    EVENT_DISP PORT_ROYAL_WIDTH,05,09 ; PORT_ROYAL_MART
 
 PortRoyalBlocks:
     INCBIN "maps/portroyal.blk"
@@ -134997,6 +135412,8 @@ PortRoyalBlocks:
 PortRoyalTextPointers:
     dw PortRoyalText1
     dw Predef5CText
+    dw PokeCenterSignText
+    dw MartSignText
 
 PortRoyalText1:
     TX_FAR _PortRoyalText1
@@ -135009,7 +135426,7 @@ PortRoyalScript:
     jp EnableAutoTextBoxDrawing
 
 ; ──────────────────────────────────────────────────────────────────────
-; ROUTE D01
+; ROUTE_D1
 ; ──────────────────────────────────────────────────────────────────────
 
 RouteD1_h:
@@ -135023,15 +135440,20 @@ RouteD1_h:
 RouteD1Object:
     db $f ; border tile
 
-    db $1 ; warps
+    db 3 ; warps
     db 11,31,0,TEST_MAP_1
+    db 11,06,0,SWAP_MAP
+    db 11,07,0,SWAP_MAP
 
-    db $0 ; signs
+    db 1 ; signs
+    db 05,01,1 ; CeladonCityText10
 
-    db $0 ; people
+    db 0 ; people
 
     ; warp-to
     EVENT_DISP ROUTE_D1_WIDTH,11,31 ; TEST_MAP_1
+    EVENT_DISP ROUTE_D1_WIDTH,11,06 ; SWAP_MAP
+    EVENT_DISP ROUTE_D1_WIDTH,11,07 ; SWAP_MAP
 
 RouteD1Blocks:
     INCBIN "maps/routed1.blk"
@@ -135050,12 +135472,12 @@ RouteD1Script:
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
-; TEST MAP 1
+; TEST_MAP_1
 ; ──────────────────────────────────────────────────────────────────────
 
 TestMap1_h:
     db $05 ; tileset
-    db 4,7 ; dimensions
+    db TEST_MAP_1_HEIGHT,TEST_MAP_1_WIDTH ; dimensions
     dw TestMap1Blocks,TestMap1TextPointers,TestMap1Script ; blocks,texts,scripts
     db 0 ; connections
     dw TestMap1Object
@@ -135071,8 +135493,8 @@ TestMap1Object:
     db 0 ; people
 
     ; warp-to
-    EVENT_DISP 7,7,6
-    EVENT_DISP 7,7,7
+    EVENT_DISP TEST_MAP_1_WIDTH,7,6
+    EVENT_DISP TEST_MAP_1_WIDTH,7,7
 
 TestMap1TextPointers:
     db "@"
@@ -135081,5 +135503,162 @@ TestMap1Script:
 
 TestMap1Blocks:
     INCBIN "maps/devmap1.blk"
+
+; ──────────────────────────────────────────────────────────────────────
+; PORT_ROYAL_POKECENTER
+; ──────────────────────────────────────────────────────────────────────
+
+PortRoyalCenter_h:
+    db $06 ; tileset
+    db PORT_ROYAL_POKECENTER_HEIGHT,PORT_ROYAL_POKECENTER_WIDTH ; dimensions (y,x)
+    dw PortRoyalPokecenterBlocks,PortRoyalPokecenterTextPointers,PortRoyalPokecenterScript ; blocks,texts,scripts
+    db $00 ; connections
+    dw PortRoyalPokecenterObject ; objects
+
+PortRoyalPokecenterScript:
+    call Func_22fa
+    jp EnableAutoTextBoxDrawing
+
+PortRoyalPokecenterTextPointers:
+    dw PortRoyalPokecenterText1
+    dw PortRoyalPokecenterText2
+
+PortRoyalPokecenterText1:
+    db $ff
+
+PortRoyalPokecenterText2:
+    db $f6
+
+PortRoyalPokecenterObject:
+    db $0 ; border tile
+
+    db $2 ; warps
+    db 7,3,0,$ff
+    db 7,4,0,$ff
+
+    db $0 ; signs
+
+    db $2 ; people
+    db SPRITE_NURSE,$1 + 4,$3 + 4,$ff,$d0,$1 ; person
+    db SPRITE_CABLE_CLUB_WOMAN,$2 + 4,$b + 4,$ff,$d0,$2 ; person
+
+    ; warp-to
+    EVENT_DISP PORT_ROYAL_POKECENTER_WIDTH,7,3
+    EVENT_DISP PORT_ROYAL_POKECENTER_WIDTH,7,4
+
+PortRoyalPokecenterBlocks:
+    INCBIN "maps/portroyalpokecenter.blk"
+
+; ──────────────────────────────────────────────────────────────────────
+; PORT_ROYAL_MART
+; ──────────────────────────────────────────────────────────────────────
+
+PortRoyalMart_h:
+    db $02 ; tileset
+    db PORT_ROYAL_MART_HEIGHT,PORT_ROYAL_MART_WIDTH ; dimensions (y,x)
+    dw PortRoyalMartBlocks,PortRoyalMartTextPointers,PortRoyalMartScript ; blocks,texts,scripts
+    db $00 ; connections
+    dw PortRoyalMartObject ; objects
+
+PortRoyalMartScript:
+    jp EnableAutoTextBoxDrawing
+
+PortRoyalMartTextPointers:
+    dw PortRoyalMartText1
+
+PortRoyalMartObject:
+    db $0 ; border tile
+
+    db 2 ; warps
+    db 07,03,1,$ff
+    db 07,04,1,$ff
+
+    db 0 ; signs
+
+    db 1 ; people
+    db SPRITE_MART_GUY,05 + 4,00 + 4,$ff,$d3,$00+1 ; person
+
+    ; warp-to
+    EVENT_DISP PORT_ROYAL_MART_WIDTH,07,03
+    EVENT_DISP PORT_ROYAL_MART_WIDTH,07,04
+
+PortRoyalMartBlocks:
+    INCBIN "maps/portroyalmart.blk"
+
+PortRoyalMartText1:
+    db $FE,7,POKE_BALL
+    db POTION
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
+    db REPEL,$FF
+
+; ──────────────────────────────────────────────────────────────────────
+; SWAP_MAP
+; ──────────────────────────────────────────────────────────────────────
+
+SwapMap_h:
+    db $10 ; tileset
+    db SWAP_MAP_1_HEIGHT,SWAP_MAP_1_WIDTH ; dimensions
+    dw SwapMapBlocks,SwapMapTextPointers,SwapMapScript ; blocks,texts,scripts
+    db 0 ; connections
+    dw SwapMapObject
+
+SwapMapBlocks:
+    INCBIN "maps/swapmap.blk"
+
+SwapMapObject:
+    db $d ; border tile
+
+    db 2 ; warp
+    db 00,07,1,$FF
+    db 08,09,2,BILLS_HOUSE
+
+    db 0 ; sign
+
+    db 0 ; people
+
+    ; warp-to
+    EVENT_DISP SWAP_MAP_1_WIDTH,00,07
+    EVENT_DISP SWAP_MAP_1_WIDTH,08,09
+
+SwapMapTextPointers:
+    db "@"
+
+SwapMapScript:
+    ld hl,.OldCoord
+    call ArePlayerCoordsInArray
+    jr c,.old
+    ld hl,.NewCoord
+    call ArePlayerCoordsInArray
+    jr c,.new
+    ret
+.old
+    xor a
+    ld [wAdventureMap],a
+    ld a,ROUTE_25
+    ld [wLastMap],a
+    ret
+.new
+    ld a,1
+    ld [wAdventureMap],a
+    ld a,ROUTE_D1
+    ld [wLastMap],a
+    ret
+.OldCoord
+    db 07,08
+    db 07,09
+    db 07,10
+    db 08,08
+    db 08,09
+    db 08,10
+    db 09,08
+    db 09,09
+    db 09,10
+    db $FF
+.NewCoord
+    db 01,06
+    db 01,07
+    db 01,08
+    db 02,07
+    db $FF
 
 ; ──────────────────────────────────────────────────────────────────────

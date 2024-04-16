@@ -985,10 +985,6 @@ wPlayerMoney: ; d347
 W_RIVALNAME: ; d34a
     ds 11
 
-
-
-wFlagNewAdventureBit5: ; d355 ; bit5 = New Adventure
-
 W_OPTIONS: ; d355
 
 ; bit 7 = battle animation
@@ -1030,7 +1026,17 @@ W_YBLOCKCOORD: ; d363
     ds 1
 
 W_XBLOCKCOORD: ; d364
-    ds 3
+    ds 1
+
+wLastMap:: db ; d365
+
+wUnusedD366:: db ; d366 ;joenote - use this to track which ai pokemon have switched
+;bit 1: 1st pkmn (position 0)
+;bit 2: 2nd pkmn (position 1)
+;bit 3: 3rd pkmn (position 2)
+;bit 4: 4th pkmn (position 3)
+;bit 5: 5th pkmn (position 4)
+;bit 6: 6th pkmn (position 5)
 
 W_CURMAPTILESET: ; d367
     ds 1
@@ -1431,7 +1437,7 @@ W_ENEMYMONORTRAINERCLASS: ; d713
 W_RIVALSTARTER: ; d715
     ds 1
 
-    ds 1
+wAdventureMap:: db ; d716
 
 W_PLAYERSTARTER: ; d717
     ds 1
@@ -1444,7 +1450,7 @@ wLastBlackoutMap:: db
 ; destination map (for certain types of special warps, not ordinary walking)
 wDestinationMap:: db
 
-wUnusedD71B:: db
+wLastBlackoutAdventureMap:: db ; d71b
 
     ds 23
 
@@ -1661,14 +1667,7 @@ wFishingLevel: ; df3a
 wFishingSpecies: ; df3b
     ds 1
 
-wUnusedD366:: ; df3c ;joenote - use this to track which ai pokemon have switched
-    ds 1
-;bit 1: 1st pkmn (position 0)
-;bit 2: 2nd pkmn (position 1)
-;bit 3: 3rd pkmn (position 2)
-;bit 4: 4th pkmn (position 3)
-;bit 5: 5th pkmn (position 4)
-;bit 6: 6th pkmn (position 5)
+wUnusedDF3C:: db
 
 wExplodeFlag: ; df3d
 wBackupItemCurrentQty: ; df3d
