@@ -18544,8 +18544,6 @@ HandleMenuInput_PrintMoveDetailsBox:
 FlyWarpDataPtrNew:
     db PORT_ROYAL,0
     dw PortRoyalFlyWarp
-    db DUMMY_TOWN,0
-    dw Map01FlyWarp
 
 PortRoyalFlyWarp:
     FLYWARP_DATA PORT_ROYAL_WIDTH,6,5
@@ -22699,11 +22697,11 @@ OldRodData:
 
 MapHeaderBanksNew:
     db BANK(PortRoyal_h)            ; PORT_ROYAL
-    db BANK(ViridianCity_h)         ; DUMMY_TOWN
     db BANK(RouteD1_h)              ; ROUTE_D1
     db BANK(TestMap1_h)             ; TEST_MAP_1
     db BANK(PortRoyalCenter_h)      ; PORT_ROYAL_POKECENTER
     db BANK(PortRoyalMart_h)        ; PORT_ROYAL_MART
+    db BANK(EmptyMap_h) ; $05
     db BANK(EmptyMap_h) ; $06
     db BANK(EmptyMap_h) ; $07
     db BANK(EmptyMap_h) ; $08
@@ -22770,12 +22768,12 @@ MapHeaderBanksNew:
     db BANK(SwapMap_h)              ; SWAP_MAP
 
 MapSongBanksNew:
-    db (Music_Lavender      -$4000)/3 , BANK(Music_Lavender)      ; PORT_ROYAL
-    db (Music_PokemonTower  -$4000)/3 , BANK(Music_PokemonTower)  ; DUMMY_TOWN
-    db (Music_PokemonTower  -$4000)/3 , BANK(Music_PokemonTower)  ; ROUTE_D1
-    db (Music_PokemonTower  -$4000)/3 , BANK(Music_PokemonTower)  ; TEST_MAP_1
+    db (Music_Cities1       -$4000)/3 , BANK(Music_Cities1)       ; PORT_ROYAL
+    db (Music_Routes1       -$4000)/3 , BANK(Music_Routes1)       ; ROUTE_D1
+    db (Music_Routes1       -$4000)/3 , BANK(Music_Routes1)       ; TEST_MAP_1
     db (Music_Pokecenter    -$4000)/3 , BANK(Music_Pokecenter)    ; PORT_ROYAL_POKECENTER
     db (Music_Pokecenter    -$4000)/3 , BANK(Music_Pokecenter)    ; PORT_ROYAL_MART
+    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $05
     db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $06
     db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $07
     db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $08
@@ -22843,11 +22841,11 @@ MapSongBanksNew:
 
 MapHSPointersNew:
     dw MapHS_PortRoyal ; PORT_ROYAL
-    dw MapHSXX         ; DUMMY_TOWN
     dw MapHSXX         ; ROUTE_D1
     dw MapHSXX         ; TEST_MAP_1
     dw MapHSXX         ; PORT_ROYAL_POKECENTER
     dw MapHSXX         ; PORT_ROYAL_MART
+    dw MapHSXX ; $05
     dw MapHSXX ; $06
     dw MapHSXX ; $07
     dw MapHSXX ; $08
@@ -30173,7 +30171,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .fly
     bit 2,a ; does the player have the Thunder Badge?
     call CheckAirPower ; jp z,.newBadgeRequired
-    call CheckIfInOutsideMap
+    call CheckIfInOutsideMapAndAtLeastOneFlyingMap
     jr z,.canFly
     ld a,[$cf92]
     ld hl,W_PARTYMON1NAME
@@ -31512,13 +31510,9 @@ ElementEnd:
     ld hl,.ElementMissedText
     call PrintText
     jp $70BF ; StartMenu_Pokedex.loop
-.ElementMissedText:
+.ElementMissedText
     TX_FAR _ElementMissedText
     db "@"
-
-_ElementMissedText: ; a4130 (29:4130)
-    db $0,"No! A new POWER",$4f
-    db "is required.",$58
 
 CheckNaturePower: ; CUT
     jr z,DontCheckElement
@@ -32413,6 +32407,15 @@ PartyMenuMessagePointers: ; Moved in the Bank
     dw PartyMenuSwapMonText
     dw PartyMenuItemUseText
     dw PartyMenuNormalText
+
+CheckIfInOutsideMapAndAtLeastOneFlyingMap:
+    call CheckIfInOutsideMap
+    ret nz
+    call GetTownVisitedFlag
+    ld a,[hl]
+    and %00000001 ; check only first bit
+    dec a
+    ret
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -33886,7 +33889,6 @@ Func_17d7d: ; Moved in the Bank
 
 MapSpriteSetsNew:
     db $01 ; PORT_ROYAL
-    db $01 ; DUMMY_TOWN
     db $01 ; ROUTE_D1
 
 ; ───────────────────────────────────────
@@ -43740,7 +43742,7 @@ BillsHouseObject:
     db 3 ; warps
     db 07,02,0,$ff
     db 07,03,0,$ff
-    db 06,07,1,SWAP_MAP
+    db 06,05,1,SWAP_MAP
 
     db $0 ; signs
 
@@ -43752,7 +43754,7 @@ BillsHouseObject:
     ; warp-to
     EVENT_DISP BILLS_HOUSE_WIDTH,07,02
     EVENT_DISP BILLS_HOUSE_WIDTH,07,03
-    EVENT_DISP BILLS_HOUSE_WIDTH,06,07
+    EVENT_DISP BILLS_HOUSE_WIDTH,06,05
 
 SECTION "bank8",ROMX,BANK[$8]
 
@@ -68460,7 +68462,7 @@ HiddenObjectMaps: ; 46a40 (11:6a40)
     db SAFARI_ZONE_REST_HOUSE_2
     db SAFARI_ZONE_REST_HOUSE_3
     db SAFARI_ZONE_REST_HOUSE_4
-    db $B9
+    db SWAP_MAP
     db LAVENDER_HOUSE_1
     db CELADON_MANSION_5
     db FIGHTINGDOJO
@@ -68549,7 +68551,7 @@ HiddenObjectPointers: ; 46a96 (11:6a96)
     dw SafariZoneRestHouse2HiddenObjects
     dw SafariZoneRestHouse3HiddenObjects
     dw SafariZoneRestHouse4HiddenObjects
-    dw UnusedB9HiddenObjects
+    dw SwapMapObjects
     dw LavenderHouse1HiddenObjects
     dw CeladonMansion5HiddenObjects
     dw FightingDojoHiddenObjects
@@ -69039,7 +69041,7 @@ VictoryPokecenterHiddenObjects: ; 46e3a (11:6e3a)
     db $03,$0d,$04 ; XXX,y,x
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-BillsHouseHiddenObjects: ; 46f86 (11:6f86)
+BillsHouseHiddenObjects_Old: ; 46f86 (11:6f86)
     db $04,$01,$04 ; XXX,y,x
     dbw $07,$6b6e
     db $FF
@@ -69065,9 +69067,9 @@ SafariZoneRestHouse4HiddenObjects: ; 46fae (11:6fae)
     db $03,$0d,$04 ; XXX,y,x
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-UnusedB9HiddenObjects: ; 46fbb (11:6fbb)
-    db $02,$01,$04 ; XXX,y,x
-    dbw $17,$5b8f
+SwapMapObjects: ; 46fbb (11:6fbb)
+    db 08,09,$d0 ; XXX,y,x
+    dbw BANK(EnableBillsTeleport2),EnableBillsTeleport2
     db $FF
 LavenderHouse1HiddenObjects: ; 46fc2 (11:6fc2)
     db $01,$00,$00 ; XXX,y,x
@@ -69174,6 +69176,12 @@ CeruleanCityHiddenObjects: ; 4709d (11:709d)
 Route4HiddenObjects: ; 470a4 (11:70a4)
     db $03,$28,GREAT_BALL
     dbw BANK(HiddenItems),HiddenItems
+    db $FF
+BillsHouseHiddenObjects:
+    db $04,$01,$04 ; XXX,y,x
+    dbw $07,$6b6e
+    db 06,05,$d0 ; XXX,y,x
+    dbw BANK(EnableBillsTeleport),EnableBillsTeleport
     db $FF
 
 FlagInstantAndPredefSilphCo: ; xxxxx (11:xxxx) ; Denim
@@ -69356,20 +69364,26 @@ SafariZoneLaprasRunAway:
 
 HiddenObjectMapsNew:
     db ROUTE_D1
-    DB PORT_ROYAL_POKECENTER
+    db PORT_ROYAL_POKECENTER
+    db SWAP_MAP
     db $FF
 
 HiddenObjectPointersNew:
     dw RouteD1HiddenObjects
-    DW PortRoyalCenterObjects
+    dw PortRoyalCenterObjects
+    dw SwapMapObjects2
 
 RouteD1HiddenObjects:
     db 13,26,ULTRA_BALL
     dbw BANK(HiddenItems),HiddenItems
+    db $FF
 PortRoyalCenterObjects:
-    db 03,13,04
+    db 03,13,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
-
+    db $FF
+SwapMapObjects2:
+    db 08,09,$d0 ; XXX,y,x
+    dbw BANK(EnableBillsTeleport2),EnableBillsTeleport2
     db $FF
 
 ; ───────────────────────────────────────
@@ -96232,13 +96246,7 @@ Func_70787: ; 70787 (1c:4787)
     ld [$cd5b],a
     ret
 
-; format: db tileset id,tile id,value to be put in $cd5b
-DataTable_707a9: ; 707a9 (1c:47a9)
-    db $16,$20,$01
-    db $16,$11,$02
-    db $11,$22,$02
-    db $10,$55,$01
-    db $FF
+SECTION "Func_707b6",ROMX[$47b6],BANK[$1c]
 
 Func_707b6: ; 707b6 (1c:47b6)
     ld c,$a
@@ -97364,6 +97372,15 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
 .noUnderflow
     ld [wWhichTrade],a ; $cd3d
     jp .townMapLoop
+
+; format: db tileset id,tile id,value to be put in $cd5b
+DataTable_707a9: ; Moved in the Bank
+    db $16,$20,$01
+    db $16,$11,$02
+    db $11,$22,$02
+    db $10,$55,$01
+    db $10,$00,$01 ; Bills Teleport Fake Tileset
+    db $FF
 
 SECTION "TownMapCursor",ROMX[$4f40],BANK[$1c]
 
@@ -99729,12 +99746,10 @@ TownMapOrderNewEnd:
 
 FlyingCitySortOrderNew:
     db PORT_ROYAL
-    db DUMMY_TOWN
 FlyingCitySortOrderNewEnd:
 
 ExternalMapEntriesNew:
     EMAP 07,14,PortRoyalName
-    EMAP 03,03,DummyTownName
     EMAP 09,14,RouteD1Name
 
 InternalMapEntriesNew:
@@ -127210,6 +127225,10 @@ _AnotherLearnText:
 
 ; ───────────────────────────────
 
+_ElementMissedText:
+    db $0,"No! A new POWER",$4f
+    db "is required.",$58
+
 SECTION "bank29",ROMX,BANK[$29]
 
 _CableClubNPCText5: ; a4000 (29:4000)
@@ -132963,11 +132982,11 @@ CheckFishingForMon:
 
 WildDataPointersNew:
     dw NoMons        ; PORT_ROYAL
-    dw NoMons        ; DUMMY_TOWN
     dw RouteD1Mons   ; ROUTE_D1
     dw NoMons        ; TEST_MAP_1
     dw NoMons        ; PORT_ROYAL_POKECENTER
     dw NoMons        ; PORT_ROYAL_MART
+    dw NoMons ; $05
     dw NoMons ; $06
     dw NoMons ; $07
     dw NoMons ; $08
@@ -134973,6 +134992,32 @@ INCLUDE "constants/special_trainer.asm"
 
 ; ──────────────────────────────────────────────────────────────────────
 
+EnableBillsTeleport:
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    ret z
+    ld b,3 ; Y
+    ld c,2 ; X
+    ld a,$39 ; ID
+    ld [$d09f],a
+    ld a,$17
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+
+EnableBillsTeleport2:
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    ret z
+    ld b,4 ; Y
+    ld c,4 ; X
+    ld a,$39 ; ID
+    ld [$d09f],a
+    ld a,$17
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+
+; ──────────────────────────────────────────────────────────────────────
+
 SECTION "Bank39",ROMX,BANK[$39]
 
 MonOverworldDataNew_emimonserrate:
@@ -135251,11 +135296,11 @@ MapHeaderPointers:
 
 MapHeaderPointersNew:
     dw PortRoyal_h           ; PORT_ROYAL
-    dw ViridianCity_h        ; DUMMY_TOWN
     dw RouteD1_h             ; ROUTE_D1
     dw TestMap1_h            ; TEST_MAP_1
     dw PortRoyalCenter_h     ; PORT_ROYAL_POKECENTER
     dw PortRoyalMart_h       ; PORT_ROYAL_MART
+    dw EmptyMap_h ; $05
     dw EmptyMap_h ; $06
     dw EmptyMap_h ; $07
     dw EmptyMap_h ; $08
@@ -135466,7 +135511,7 @@ _RouteD1Text1:
     db $0,"!",$57
 
 RouteD1Script:
-    ret
+    jp EnableAutoTextBoxDrawing
 
 ; ──────────────────────────────────────────────────────────────────────
 ; TEST_MAP_1
