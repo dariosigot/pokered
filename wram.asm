@@ -986,6 +986,7 @@ W_RIVALNAME: ; d34a
     ds 11
 
 W_OPTIONS: ; d355
+
 ; bit 7 = battle animation
 ; 0: On
 ; 1: Off
@@ -1025,7 +1026,17 @@ W_YBLOCKCOORD: ; d363
     ds 1
 
 W_XBLOCKCOORD: ; d364
-    ds 3
+    ds 1
+
+wLastMap:: db ; d365
+
+wUnusedD366:: db ; d366 ;joenote - use this to track which ai pokemon have switched
+;bit 1: 1st pkmn (position 0)
+;bit 2: 2nd pkmn (position 1)
+;bit 3: 3rd pkmn (position 2)
+;bit 4: 4th pkmn (position 3)
+;bit 5: 5th pkmn (position 4)
+;bit 6: 6th pkmn (position 5)
 
 W_CURMAPTILESET: ; d367
     ds 1
@@ -1130,7 +1141,12 @@ wPlayerCoins: ; d5a4
 
 W_MISSABLEOBJECTFLAGS: ; d5a6
 ; bit array of missable objects. set = removed
-    ds 40
+    ds 32
+
+	ds 7
+
+; temp copy of SPRITESTATEDATA1_IMAGEINDEX (used for sprite facing/anim)
+wd5cd:: db
 
 W_MISSABLEOBJECTLIST: ; d5ce
 ; each entry consists of 2 bytes
@@ -1352,16 +1368,46 @@ W_SEAFOAMISLANDS5CURSCRIPT: ; d668
     ds 1
 W_ROUTE18GATECURSCRIPT: ; d669
     ds 1
+
 W_DRATINICAVECURSCRIPT: ; d66a
     ds 1
-W_SSANNE4CURSCRIPT:
+W_SSANNE4CURSCRIPT: ; d66b
     ds 1
-W_DIGLETTSCAVECURSCRIPT:
+W_DIGLETTSCAVECURSCRIPT: ; d66c
     ds 1
-W_SAFARIZONECURSCRIPT:
+W_SAFARIZONECURSCRIPT: ; d66d
     ds 1
 
-    ds 161-4
+wGameProgressFlagsEnd:
+
+SECTION "W_MISSABLEOBJECTFLAGS_NEW", WRAMX[$d6b8], BANK[1]
+
+W_MISSABLEOBJECTFLAGS_NEW:
+    ds 32
+
+SECTION "HiddenItems", WRAMX[$d6f0], BANK[1]
+
+flag_array: MACRO
+    ds ((\1) + 7) / 8
+ENDM
+wObtainedHiddenItemsFlags: flag_array 112 ; d6f0
+wObtainedHiddenCoinsFlags: flag_array 16  ; d6fe
+
+; $00 = walking
+; $01 = biking
+; $02 = surfing
+wWalkBikeSurfState:: db ; d700
+
+wObtainedHiddenItemsFlags_NEW: flag_array 48 ; d701
+wObtainedHiddenCoinsFlags_NEW: flag_array 8  ; d707
+
+wImportantByte:: db ; d708
+
+SECTION "W_TOWNVISITEDFLAG_NEW", WRAMX[$d709], BANK[1]
+
+W_TOWNVISITEDFLAG_NEW: ; d709
+; 2 bytes bit array, 1 means visited
+    ds 2
 
 W_TOWNVISITEDFLAG: ; d70b
 ; 2 bytes bit array, 1 means visited
@@ -1391,12 +1437,22 @@ W_ENEMYMONORTRAINERCLASS: ; d713
 W_RIVALSTARTER: ; d715
     ds 1
 
-    ds 1
+wAdventureMap:: db ; d716
 
 W_PLAYERSTARTER: ; d717
     ds 1
 
-    ds 27
+; sprite index of the boulder the player is trying to push
+wBoulderSpriteIndex:: db
+
+wLastBlackoutMap:: db
+
+; destination map (for certain types of special warps, not ordinary walking)
+wDestinationMap:: db
+
+wLastBlackoutAdventureMap:: db ; d71b
+
+    ds 23
 
 
 W_FLAGS_D733: ; d733
@@ -1611,14 +1667,7 @@ wFishingLevel: ; df3a
 wFishingSpecies: ; df3b
     ds 1
 
-wUnusedD366:: ; df3c ;joenote - use this to track which ai pokemon have switched
-    ds 1
-;bit 1: 1st pkmn (position 0)
-;bit 2: 2nd pkmn (position 1)
-;bit 3: 3rd pkmn (position 2)
-;bit 4: 4th pkmn (position 3)
-;bit 5: 5th pkmn (position 4)
-;bit 6: 6th pkmn (position 5)
+wUnusedDF3C:: db
 
 wExplodeFlag: ; df3d
 wBackupItemCurrentQty: ; df3d
