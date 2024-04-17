@@ -22695,6 +22695,10 @@ OldRodData:
 ; Handle New Adventure Data (BANK $03)
 ; ───────────────────────────────────────
 
+OldRodDataNew:
+    db ROUTE_D1
+    db $FF
+
 MapHeaderBanksNew:
     db BANK(PortRoyal_h)            ; PORT_ROYAL
     db BANK(RouteD1_h)              ; ROUTE_D1
@@ -22928,25 +22932,11 @@ GetOldRodData:
     ld hl,OldRodDataNew
     ret
 
-GetGoodRodData:
-    ld hl,GoodRodData
-    call CheckNewAdventureFlag
-    ret z
-    ld hl,GoodRodDataNew
-    ret
-
 GetGoodRodData_DE:
     ld de,GoodRodData
     call CheckNewAdventureFlag
     ret z
     ld de,GoodRodDataNew
-    ret
-
-GetSuperRodData:
-    ld hl,SuperRodData
-    call CheckNewAdventureFlag
-    ret z
-    ld hl,SuperRodDataNew
     ret
 
 GetSuperRodData_DE:
@@ -133077,17 +133067,12 @@ RouteD1Mons:
     db  2,MAGIKARP ;  4%
     db  2,MAGIKARP ;  1%
 
-
 GoodRodDataNew:
     dbdw ROUTE_D1, GoodRodGroupBeach
     db $FF
 
 SuperRodDataNew:
     dbdw ROUTE_D1, SuperRodGroupBeach
-    db $FF
-
-OldRodDataNew:
-    db ROUTE_D1
     db $FF
 
 ; ───────────────────────────────────────
@@ -133099,6 +133084,20 @@ GetWildDataPointers:
     call CheckNewAdventureFlag
     ret z
     ld hl,WildDataPointersNew
+    ret
+
+GetGoodRodData:
+    ld hl,GoodRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,GoodRodDataNew
+    ret
+
+GetSuperRodData:
+    ld hl,SuperRodData
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,SuperRodDataNew
     ret
 
 ; ───────────────────────────────────────
