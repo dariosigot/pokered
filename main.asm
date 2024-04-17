@@ -22395,8 +22395,9 @@ MapHSEB: ; cd0f (3:4d0f)
     db SILPH_CO_11F,$04,Show
     db SILPH_CO_11F,$05,Show
 MapHSD6: ; cd18 (3:4d18)
-    db MANSION_2,$05,Show ; New Moltres
-    db MANSION_2,$02,Show
+    db MANSION_2,$02,Show ; New Moltres
+; Unused
+    ds 3
 MapHSD7: ; cd1e (3:4d1e)
     db MANSION_3,$03,Show
     db MANSION_3,$04,Show
@@ -68995,10 +68996,9 @@ Mansion1HiddenObjects: ; 46f2b (11:6f2b)
     db $05,$02,$04 ; XXX,y,x
     dbw BANK(Func_44316),Func_44316
     db $FF
-Mansion2HiddenObjects: ; 46f38 (11:6f38)
-    db $0b,$02,$04 ; XXX,y,x
-    dbw $14,$6037
-    db $FF
+
+SECTION "Mansion3HiddenObjects",ROMX[$6f3f],BANK[$11]
+
 Mansion3HiddenObjects: ; 46f3f (11:6f3f)
     db $09,$01,MAX_REVIVE
     dbw BANK(HiddenItems),HiddenItems
@@ -69172,6 +69172,12 @@ BillsHouseHiddenObjects:
     dbw $07,$6b6e
     db 06,05,$d0 ; XXX,y,x
     dbw BANK(EnableBillsTeleport),EnableBillsTeleport
+    db $FF
+Mansion2HiddenObjects:
+    db $0b,$02,$04 ; XXX,y,x
+    dbw $14,$6037
+    db 07,28,CALCIUM
+    dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 FlagInstantAndPredefSilphCo: ; xxxxx (11:xxxx) ; Denim
@@ -77190,7 +77196,7 @@ Func_52037: ; 52037 (14:6037)
     ret nz
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,$6
+    ld a,$5
     ld [H_SPRITEHEIGHT],a
     jp DisplayTextID
 
@@ -77201,10 +77207,10 @@ Mansion2ScriptPointers: ; 52047 (14:6047)
 
 Mansion2TextPointers: ; 5204d (14:604d)
     dw Mansion2Text1
-    dw Predef5CText
+    ;dw Predef5CText
+    dw Mansion2TextMoltres
     dw Mansion2Text3
     dw Mansion2Text4
-    dw Mansion2TextMoltres
     dw Mansion2Text5
 
 SECTION "Mansion2Text1",ROMX[$6064],BANK[$14]
@@ -77275,12 +77281,12 @@ Mansion2Object: ; Move in the Bank
 
     db $0 ; signs
 
-    db $5 ; people
+    db $4 ; people
     db SPRITE_BLACK_HAIR_BOY_2,$11 + 4,$3 + 4,$fe,$2,$41,BURGLAR + $C8,$4 ; trainer
-    db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
+    ;db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
+    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$42,MOLTRES,55 ; Entry Level (Over)
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
-    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$45,MOLTRES,55 ; Entry Level (Over)
 
     ; warp-to
     EVENT_DISP $f,$a,$5 ; MANSION_1
@@ -106065,7 +106071,7 @@ HiddenItemCoords: ; 766b8 (1d:66b8)
     db ROUTE_23,$5a,$08
     db VICTORY_ROAD_2,$02,$05
     db VICTORY_ROAD_2,$07,$1a
-    db $6f,$0b,$0e
+    db MANSION_2,07,28 ; db $6f,$0b,$0e
     db VIRIDIAN_CITY,$04,$0e
     db ROUTE_11,$05,$30
     db ROUTE_12,$3f,$02
