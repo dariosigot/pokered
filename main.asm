@@ -21830,6 +21830,9 @@ Func_c754: ; c754 (3:4754)
 .asm_c7b1
     ret
 
+CoordsData_cdf7: ; Moved in the Bank
+    db $0B,$07,$FF
+
 SECTION "TilesetsHeadPtr",ROMX[$47be],BANK[$3]
 
 TilesetsHeadPtr: ; c7be (3:47be)
@@ -22421,7 +22424,7 @@ MapHS06:
 MapHSC5:
     db DIGLETTS_CAVE,$01,Show ; $EC -> $CB
 ; Unused
-    ds 2 ; ($CC|$CD)
+    ds 6 ; ($CC|$CD)
 MapHSE2: ; cd54 (3:4d54)
     db UNKNOWN_DUNGEON_2,$01,Show
     db UNKNOWN_DUNGEON_2,$02,Show
@@ -22474,12 +22477,7 @@ MapHSDC:
 
     db $FF,$01,Show
 
-Func_cd99_Old:
-UsedStrengthText_Old:
-
-SECTION "IsSurfingAllowed",ROMX[$4dc0],BANK[$3]
-
-IsSurfingAllowed: ; cdc0 (3:4dc0)
+IsSurfingAllowed:
     ld hl,$d728
     set 1,[hl]
     ld a,[$d732]
@@ -22505,8 +22503,7 @@ IsSurfingAllowed: ; cdc0 (3:4dc0)
     ld hl,UnnamedText_cdff ; $4dff
     jp PrintText
 
-CoordsData_cdf7: ; cdf7 (3:4df7)
-    db $0B,$07,$FF
+SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
 
 UnnamedText_cdfa: ; cdfa (3:4dfa)
     TX_FAR _UnnamedText_cdfa
