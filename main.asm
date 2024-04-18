@@ -37641,8 +37641,6 @@ _CheckForJumping: ; 1a672 (6:6672)
     ld a,[hli]
     cp d
     jr nz,.next3
-    ld a,[hl]
-    ld e,a
     jr .found
 .next0
     inc hl
@@ -37654,6 +37652,15 @@ _CheckForJumping: ; 1a672 (6:6672)
     inc hl
     jr .loop
 .found
+    ld a,[hl]
+    bit 3,a ; check no bike flag
+    res 3,a ; remove no bike flag
+    ld e,a
+    jr z,.skipBikeCheck
+    ld a,[$d700] ; 1 = bike
+    dec a
+    ret z ; no jump during biking
+.skipBikeCheck
     ld a,[H_CURRENTPRESSEDBUTTONS]
     and e
     ret z
@@ -37817,10 +37824,10 @@ JumpTilesetTable: ; Moved in the Bank
     ;db $00,$04,$39,$37,BTN_UP
 
     ; Cave Hole
-    db $11,$00,$20,$22,BTN_B
-    db $11,$08,$20,$22,BTN_B
-    db $11,$0C,$20,$22,BTN_B
-    db $11,$04,$20,$22,BTN_B
+    db $11,$00,$20,$22,BTN_B | %00001000 ; no bike flag
+    db $11,$08,$20,$22,BTN_B | %00001000 ; no bike flag
+    db $11,$0C,$20,$22,BTN_B | %00001000 ; no bike flag
+    db $11,$04,$20,$22,BTN_B | %00001000 ; no bike flag
 
     ; End
     db $FF
