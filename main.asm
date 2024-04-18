@@ -1550,6 +1550,12 @@ CollisionCheckOnLand: ; 0bd1 (0:0bd1)
     and a
     ret
 
+; unsets carry if player is facing water or shore
+IsNextTileShoreOrWater:
+    ld b,BANK(_IsNextTileShoreOrWater)
+    ld hl,_IsNextTileShoreOrWater
+    jp Bankswitch
+
 ; Free
 
 SECTION "CheckTilePassable",ROM0[$0c10]
@@ -99741,29 +99747,39 @@ ATTR_BLK_StatusScreen2:
 ; checks if the tile in front of the player is a shore or water tile
 ; used for surfing and fishing
 ; unsets carry if it is,sets carry if not
-IsNextTileShoreOrWater: ; Moved in the Bank
+_IsNextTileShoreOrWater: ; Moved in the Bank
     ld a,[W_CURMAPTILESET]
     ld hl,WaterTilesets
     ld de,1
     call IsInArray
     jr nc,.notShoreOrWater
+    ld hl,WaterTile
     ld a,[W_CURMAPTILESET]
     cp a,$0e ; Vermilion Dock tileset
-    ld a,[$cfc6] ; tile in front of player
-    jr z,.skipShoreTiles ; if it's the Vermilion Dock tileset
-    cp a,$48 ; eastern shore tile in Safari Zone
-    jr z,.shoreOrWater
-    cp a,$32 ; usual eastern shore tile
-    jr z,.shoreOrWater
+    jr z,.skipShoreTiles
+    cp a,$07 ; Gym tileset
+    jr z,.skipShoreTiles
+    cp a,$05 ; Dojo/Lance/OakLab tileset
+    jr z,.skipShoreTiles
+    ld hl,ShoreTiles
 .skipShoreTiles
-    cp a,$14 ; water tile
-    jr z,.shoreOrWater
+    ld a,[$cfc6] ; tile in front of player
+    ld de,$1
+    call IsInArray
+    jr c,.shoreOrWater
 .notShoreOrWater
     scf
     ret
 .shoreOrWater
     and a
     ret
+
+; shore tiles
+ShoreTiles:
+    db $48,$32
+WaterTile:
+    db $14
+    db $ff ; terminator
 
 ; tilesets with water
 WaterTilesets: ; Moved in the Bank
@@ -129565,9 +129581,7 @@ SelectInOverWorld:
     bit 1,[hl]
     res 1,[hl]
     jp z,.noFloat
-    ld b,BANK(IsNextTileShoreOrWater)
-    ld hl,IsNextTileShoreOrWater
-    call Bankswitch
+    call IsNextTileShoreOrWater
     jp c,.noFloat
     ld hl,TilePairCollisionsWater
     call CheckForTilePairCollisions
@@ -129643,9 +129657,7 @@ SelectInOverWorld:
     ld a,[$d700]
     cp a,2 ; is the player surfing?
     jp z,.noFishing
-    ld b,BANK(IsNextTileShoreOrWater)
-    ld hl,IsNextTileShoreOrWater
-    call Bankswitch ; unsets carry if player is facing water or shore
+    call IsNextTileShoreOrWater ; unsets carry if player is facing water or shore
     jr c,.noFishing
     ld hl,TilePairCollisionsWater
     call CheckForTilePairCollisions
