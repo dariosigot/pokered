@@ -1513,13 +1513,13 @@ IsSpriteInFrontOfPlayer2: ; 0b6d (0:0b6d)
 ; function to check if the player will jump down a ledge and check if the tile ahead is passable (when not surfing)
 ; sets the carry flag if there is a collision,and unsets it if there isn't a collision
 CollisionCheckOnLand: ; 0bd1 (0:0bd1)
-    ld a,[$d736]
-    bit 6,a ; is the player jumping?
-    jr nz,.noCollision
+    ;ld a,[$d736]
+    ;bit 6,a ; is the player jumping?
+    ;jr nz,.noCollision
 ; if not jumping a ledge
-    ld a,[$cd38]
-    and a
-    jr nz,.noCollision
+    ;ld a,[$cd38]
+    ;and a
+    ;jr nz,.noCollision
     ld a,[$d52a] ; the direction that the player is trying to go in
     ld d,a
     ld a,[$c10c] ; the player sprite's collision data (bit field) (set in the sprite movement code)
@@ -1535,7 +1535,7 @@ CollisionCheckOnLand: ; 0bd1 (0:0bd1)
     ld hl,TilePairCollisionsLand
     call CheckForJumpingAndTilePairCollisions
     jr c,.collision
-    call CheckTilePassable
+    call JumpOrCheckTilePassable ; call CheckTilePassable
     jr nc,.noCollision
 .collision
     ld a,[$c02a]
@@ -1549,6 +1549,10 @@ CollisionCheckOnLand: ; 0bd1 (0:0bd1)
 .noCollision
     and a
     ret
+
+; Free
+
+SECTION "CheckTilePassable",ROM0[$0c10]
 
 ; function that checks if the tile in front of the player is passable
 ; clears carry if it is,sets carry if not
@@ -1572,26 +1576,30 @@ CheckTilePassable: ; 0c10 (0:0c10)
     scf
     ret
 
+; Free
+
+SECTION "CheckForJumpingAndTilePairCollisions",ROM0[$0c30]
+
 ; check if the player is going to jump down a small ledge
 ; and check for collisions that only occur between certain pairs of tiles
 ; Input: hl - address of directional collision data
 ; sets carry if there is a collision and unsets carry if not
-CheckForJumpingAndTilePairCollisions: ; 0c2a (0:0c2a)
+CheckForJumpingAndTilePairCollisions: ; 0c30 (0:0c30)
     push hl
     ld a,$35
     call Predef ; get the tile in front of the player
     push de
     push bc
-    ld b,BANK(Func_1a672)
-    ld hl,Func_1a672
+    ld b,BANK(_CheckForJumping)
+    ld hl,_CheckForJumping
     call Bankswitch ; check if the player is trying to jump a ledge
     pop bc
     pop de
     pop hl
     and a
-    ld a,[$d736]
-    bit 6,a ; is the player jumping?
-    ret nz
+    ;ld a,[$d736]
+    ;bit 6,a ; is the player jumping?
+    ;ret nz
 ; if not jumping
 
 Func_c44: ; 0c44 (0:0c44)
@@ -5899,6 +5907,18 @@ IsTown:
 
 ; ───────────────────────────────────────
 
+JumpOrCheckTilePassable:
+    ld a,[$d736]
+    bit 6,a ; jumping a ledge?
+    jr z,.done
+    ld a,[$cd38]
+    and a ; simulate?
+    jr z,.done
+    and a ; rcf -> WTW
+    ret
+.done
+    jp z,CheckTilePassable
+
 SECTION "TextScriptEndingChar",ROM0[$24d6]
 
 TextScriptEndingChar: ; 24d6 (0:24d6)
@@ -7372,6 +7392,8 @@ GetMapHeaderBanks:
     ret z
     ld hl,MapHeaderBanksNew
     ret
+
+; ───────────────────────────────────────
 
 ; Free
 
@@ -37571,13 +37593,19 @@ Tileset16DoorTileIDs: ; 1a66b (6:666b)
 Tileset17DoorTileIDs: ; 1a66f (6:666f)
     db $3b,$1b,$00
 
-Func_1a672: ; 1a672 (6:6672)
+_CheckForJumping: ; 1a672 (6:6672)
     ld a,[$d736]
     bit 6,a
     ret nz
-    ld a,[W_CURMAPTILESET] ; $d367
-    and a
-    ret nz
+
+    ;ld a,[W_CURMAPTILESET] ; $d367
+    ;and a
+    ;ret nz
+
+    ;ld a,[H_JOYPADSTATE]
+    ;and %00000010 ; ▼▲◄►StSeBA
+    ;ret z
+
     ld a,$35
     call Predef ; indirect jump to Func_c586 (c586 (3:4586))
     ld a,[$c109]
@@ -37587,30 +37615,39 @@ Func_1a672: ; 1a672 (6:6672)
     ld c,a
     ld a,[$cfc6]
     ld d,a
-    ld hl,DataTable_1a6cf ; $66cf
-.asm_1a691
+    ld hl,JumpTilesetTable
+.loop
     ld a,[hli]
     cp $ff
     ret z
+
+    ld e,a
+    ld a,[W_CURMAPTILESET]
+    cp e
+    jr nz,.next0
+
+    ld a,[hli]
     cp b
-    jr nz,.asm_1a6a4
+    jr nz,.next1
     ld a,[hli]
     cp c
-    jr nz,.asm_1a6a5
+    jr nz,.next2
     ld a,[hli]
     cp d
-    jr nz,.asm_1a6a6
+    jr nz,.next3
     ld a,[hl]
     ld e,a
-    jr .asm_1a6a9
-.asm_1a6a4
+    jr .found
+.next0
     inc hl
-.asm_1a6a5
+.next1
     inc hl
-.asm_1a6a6
+.next2
     inc hl
-    jr .asm_1a691
-.asm_1a6a9
+.next3
+    inc hl
+    jr .loop
+.found
     ld a,[H_CURRENTPRESSEDBUTTONS]
     and e
     ret z
@@ -37622,23 +37659,14 @@ Func_1a672: ; 1a672 (6:6672)
     ld a,e
     ld [$ccd3],a
     ld [$ccd4],a
-    ld a,$2
+    ld a,$1
     ld [$cd38],a
     call Func_1a6f0
     ld a,$a2
     call PlaySound
     ret
 
-DataTable_1a6cf: ; 1a6cf (6:66cf)
-    db $00,$2C,$37,$80
-    db $00,$39,$36,$80
-    db $00,$39,$37,$80
-    db $08,$2C,$27,$20
-    db $08,$39,$27,$20
-    db $0C,$2C,$0D,$10
-    db $0C,$2C,$1D,$10
-    db $0C,$39,$0D,$10
-    db $FF
+SECTION "Func_1a6f0",ROMX[$66f0],BANK[$6]
 
 Func_1a6f0: ; 1a6f0 (6:66f0)
     ld hl,$8ff0
@@ -37761,6 +37789,35 @@ IndigoPlateauLobbyText4:
     db FULL_RESTORE,MAX_POTION,HYPER_POTION
     db FULL_HEAL
     db MAX_REPEL,$FF
+
+JumpTilesetTable: ; Moved in the Bank
+    ; tileset
+    ; player direction
+    ; tile player standing on
+    ; ledge tile
+    ; input required = ▼▲◄►StSeBA
+    
+    ; Overworld Ledge
+    db $00,$00,$2C,$37,BTN_DOWN
+    db $00,$00,$39,$36,BTN_DOWN
+    db $00,$00,$39,$37,BTN_DOWN
+    db $00,$08,$2C,$27,BTN_LEFT
+    db $00,$08,$39,$27,BTN_LEFT
+    db $00,$0C,$2C,$0D,BTN_RIGHT
+    db $00,$0C,$2C,$1D,BTN_RIGHT
+    db $00,$0C,$39,$0D,BTN_RIGHT
+    ;db $00,$04,$2C,$37,BTN_UP
+    ;db $00,$04,$39,$36,BTN_UP
+    ;db $00,$04,$39,$37,BTN_UP
+
+    ; Cave Hole
+    db $11,$00,$20,$22,BTN_B
+    db $11,$08,$20,$22,BTN_B
+    db $11,$0C,$20,$22,BTN_B
+    db $11,$04,$20,$22,BTN_B
+
+    ; End
+    db $FF
 
 SECTION "bank7",ROMX,BANK[$7]
 
@@ -68266,7 +68323,7 @@ Func_46981: ; 46981 (11:6981)
     ld a,[$d72d]
     bit 4,a
     ret nz
-    call ArePlayerCoordsInArray
+    call CheckJumpAndArePlayerCoordsInArray ; call ArePlayerCoordsInArray
     ret nc
     ld a,[wWhichTrade] ; $cd3d
     ld [$d71e],a
@@ -69401,6 +69458,13 @@ GetHiddenObjectPointers:
     ret
 
 ; ───────────────────────────────────────
+
+CheckJumpAndArePlayerCoordsInArray:
+    ld a,[$d736]
+    bit 6,a ; jumping a ledge?
+    jp z,ArePlayerCoordsInArray
+    and a ; rcf
+    ret
 
 SECTION "bank12",ROMX,BANK[$12]
 
