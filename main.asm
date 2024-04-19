@@ -1517,9 +1517,10 @@ CollisionCheckOnLand: ; 0bd1 (0:0bd1)
     ;bit 6,a ; is the player jumping?
     ;jr nz,.noCollision
 ; if not jumping a ledge
-    ;ld a,[$cd38]
-    ;and a
-    ;jr nz,.noCollision
+    ld a,[$cd38]
+    and a ; simulate?
+    jr nz,.noCollision
+
     ld a,[$d52a] ; the direction that the player is trying to go in
     ld d,a
     ld a,[$c10c] ; the player sprite's collision data (bit field) (set in the sprite movement code)
@@ -1549,12 +1550,6 @@ CollisionCheckOnLand: ; 0bd1 (0:0bd1)
 .noCollision
     and a
     ret
-
-; unsets carry if player is facing water or shore
-IsNextTileShoreOrWater:
-    ld b,BANK(_IsNextTileShoreOrWater)
-    ld hl,_IsNextTileShoreOrWater
-    jp Bankswitch
 
 ; Free
 
@@ -5923,7 +5918,15 @@ JumpOrCheckTilePassable:
     and a ; rcf -> WTW
     ret
 .done
-    jp z,CheckTilePassable
+    jp CheckTilePassable
+
+; unsets carry if player is facing water or shore
+IsNextTileShoreOrWater:
+    ld b,BANK(_IsNextTileShoreOrWater)
+    ld hl,_IsNextTileShoreOrWater
+    jp Bankswitch
+
+; Free
 
 SECTION "TextScriptEndingChar",ROM0[$24d6]
 
@@ -95133,6 +95136,7 @@ DiglettsCaveScriptPointers:
     dw DiglettsCaveScript0
     dw DiglettsCaveHole
     dw DiglettsCavePostAerodactyl
+    dw DiglettCaveWaitOne
 
 DiglettsCaveScript0:
     ld hl,$d126
@@ -95150,6 +95154,8 @@ DiglettsCaveScript0:
     ld [$d71d],a
     ld a,$06     ; Dark Map
     ld [$d35d],a ; ...
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
     ret
 .CheckAerodatyl
     ld hl,wDigCaveAerodactylBeatBit3 ; wDigCaveAerodactylTrigBit0
@@ -95166,20 +95172,34 @@ DiglettsCaveScript0:
     jp DisplayTextID
 
 DiglettsCaveHole:
-    call .Delay
+    ld a,$FF
+    ld [wJoypadForbiddenButtonsMask],a ; Disable Joy
+    call .Delay30
     ld bc,$0906 ; X = 6 ; Y = 9
     ld a,$78
     ld [$d09f],a
     ld a,$17
     call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
-    call .Delay
+    call .Delay30
+    ; EmotionBubble
+    ld hl,$cd4f
+    xor a
+    ld [hli],a
+    ld [hl],a
+    ld a,$4c
+    call Predef ; indirect jump to Func_17c47 (17c47 (5:7c47))
+    call .Delay5
     ld hl,$d126 ; Trigger Check Warp Script 0
     res 6,[hl]  ; ...
-    xor a
+    ld a,3
     ld [W_DIGLETTSCAVECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
     ret
-.Delay
-    ld c,60
+.Delay5
+    ld c,5
+    jp DelayFrames
+.Delay30
+    ld c,30
     jp DelayFrames
 
 DiglettsCaveAerodactyl:
@@ -95231,6 +95251,9 @@ DiglettsCaveResetDefaultScript:
     ld [W_DIGLETTSCAVECURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
     ret
+
+DiglettCaveWaitOne:
+    jp DiglettsCaveResetDefaultScript
 
 DiglettsCaveAerodactylRunAway:
     TX_FAR _DiglettsCaveAerodactylRunAway
