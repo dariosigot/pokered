@@ -1591,6 +1591,13 @@ wEXPBarNeededEXP:
 wEXPBarKeepFullFlag:
     ds 1
 
+NEXTU
+
+wForceWTWBit0:    ; def0, bit0: Force WTW during Jump
+    ds 1
+wJumpingCounter : ; def1
+    ds 1
+
 ENDU
 
 SECTION "wSpriteOAMBySpecies",WRAMX[$df26],BANK[1]

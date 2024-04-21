@@ -1551,8 +1551,6 @@ CollisionCheckOnLand: ; 0bd1 (0:0bd1)
     and a
     ret
 
-; Free
-
 SECTION "CheckTilePassable",ROM0[$0c10]
 
 ; function that checks if the tile in front of the player is passable
@@ -1577,15 +1575,11 @@ CheckTilePassable: ; 0c10 (0:0c10)
     scf
     ret
 
-; Free
-
-SECTION "CheckForJumpingAndTilePairCollisions",ROM0[$0c30]
-
 ; check if the player is going to jump down a small ledge
 ; and check for collisions that only occur between certain pairs of tiles
 ; Input: hl - address of directional collision data
 ; sets carry if there is a collision and unsets carry if not
-CheckForJumpingAndTilePairCollisions: ; 0c30 (0:0c30)
+CheckForJumpingAndTilePairCollisions: ; 0c2a (0:0c2a)
     push hl
     ld a,$35
     call Predef ; get the tile in front of the player
@@ -1597,13 +1591,13 @@ CheckForJumpingAndTilePairCollisions: ; 0c30 (0:0c30)
     pop bc
     pop de
     pop hl
-    and a
-    ;ld a,[$d736]
-    ;bit 6,a ; is the player jumping?
-    ;ret nz
+    and a ; rcf = noCollision
+    ld a,[$d736]
+    bit 6,a ; is the player jumping?
+    ret nz
 ; if not jumping
 
-Func_c44: ; 0c44 (0:0c44)
+CheckForTilePairCollisions2: ; 0c44 (0:0c44)
     FuncCoord 8,9 ; $c45c
     ld a,[Coord] ; tile the player is on
     ld [$cf0e],a
@@ -1653,30 +1647,7 @@ CheckForTilePairCollisions: ; 0c4a (0:0c4a)
     and a
     ret
 
-; FORMAT: tileset number,tile 1,tile 2
-; terminated by 0xFF
-; these entries indicate that the player may not cross between tile 1 and tile 2
-; it's mainly used to simulate differences in elevation
-
-TilePairCollisionsLand: ; 0c7e (0:0c7e)
-    db $11,$20,$05;
-    db $11,$41,$05;
-    db $03,$30,$2E;
-    db $11,$2A,$05;
-    db $11,$05,$21;
-    db $03,$52,$2E;
-    db $03,$55,$2E;
-    db $03,$56,$2E;
-    db $03,$20,$2E;
-    db $03,$5E,$2E;
-    db $03,$5F,$2E;
-    db $FF;
-
-TilePairCollisionsWater: ; 0ca0 (0:0ca0)
-    db $03,$14,$2E;
-    db $03,$48,$2E;
-    db $11,$14,$05;
-    db $FF;
+SECTION "LoadCurrentMapView",ROM0[$0caa]
 
 ; this builds a tile map from the tile block map based on the current X/Y coordinates of the player's character
 LoadCurrentMapView: ; 0caa (0:0caa)
@@ -2236,7 +2207,7 @@ CollisionCheckOnWater: ; 0fb7 (0:0fb7)
     and d ; check if a sprite is in the direction the player is trying to go
     jr nz,.checkIfNextTileIsPassable ; bug?
     ld hl,TilePairCollisionsWater
-    call CheckForJumpingAndTilePairCollisions
+    call CheckForTilePairCollisions2
     jr c,.collision
     ld a,$35
     call Predef ; get tile in front of player (puts it in c and [$CFC6])
@@ -5909,22 +5880,56 @@ IsTown:
 ; ───────────────────────────────────────
 
 JumpOrCheckTilePassable:
-    ld a,[$d736]
-    bit 6,a ; jumping a ledge?
-    jr z,.done
-    ld a,[$cd38]
-    and a ; simulate?
-    jr z,.done
-    and a ; rcf -> WTW
-    ret
-.done
-    jp CheckTilePassable
+    ld b,BANK(_JumpOrCheckTilePassable)
+    ld hl,_JumpOrCheckTilePassable
+    jp Bankswitch
 
 ; unsets carry if player is facing water or shore
 IsNextTileShoreOrWater:
     ld b,BANK(_IsNextTileShoreOrWater)
     ld hl,_IsNextTileShoreOrWater
     jp Bankswitch
+
+; FORMAT: tileset number,tile 1,tile 2
+; terminated by 0xFF
+; these entries indicate that the player may not cross between tile 1 and tile 2
+; it's mainly used to simulate differences in elevation
+
+TilePairCollisionsLand:
+    db $11,$20,$05;
+    db $11,$41,$05;
+    db $03,$30,$2E;
+    db $11,$2A,$05;
+    db $11,$05,$21;
+    db $03,$52,$2E;
+    db $03,$55,$2E;
+    db $03,$56,$2E;
+    db $03,$20,$2E;
+    db $03,$5E,$2E;
+    db $03,$5F,$2E;
+
+    db $00,$10,$11;
+    db $00,$1B,$11;
+    db $00,$20,$11;
+    db $00,$21,$11;
+    db $00,$23,$11;
+    db $00,$2C,$11;
+    db $00,$30,$11;
+    db $00,$31,$11;
+    db $00,$33,$11;
+    db $00,$39,$11;
+    db $00,$52,$11;
+    db $00,$54,$11;
+    db $00,$58,$11;
+    db $00,$5B,$11;
+
+    db $FF;
+
+TilePairCollisionsWater:
+    db $03,$14,$2E;
+    db $03,$48,$2E;
+    db $11,$14,$05;
+    db $FF;
 
 ; Free
 
@@ -21600,8 +21605,8 @@ Func_c60b: ; c60b (3:460b)
     jr z,.asm_c632
     cp c
     jr nz,.asm_c614
-    ld hl,$c7e
-    call Func_c44
+    ld hl,TilePairCollisionsLand
+    call CheckForTilePairCollisions2
     ld a,$ff
     jr c,.asm_c632
     ld a,[$d71c]
@@ -37607,80 +37612,86 @@ _CheckForJumping: ; 1a672 (6:6672)
     bit 6,a
     ret nz
 
-    ;ld a,[W_CURMAPTILESET] ; $d367
-    ;and a
-    ;ret nz
+    ld hl,wForceWTWBit0
+    res 0,[hl]
+    inc hl
+    ld [hl],0
 
-    ;ld a,[H_JOYPADSTATE]
-    ;and %00000010 ; ▼▲◄►StSeBA
-    ;ret z
-
-    ld a,$35
-    call Predef ; indirect jump to Func_c586 (c586 (3:4586))
-    ld a,[$c109]
-    ld b,a
-    FuncCoord 8,9 ; $c45c
-    ld a,[Coord]
-    ld c,a
-    ld a,[$cfc6]
-    ld d,a
-    ld hl,JumpTilesetTable
+    ld bc,$00FF ; -1
 .loop
+    inc c
+    ld a,11
+    ld hl,JumpTilesetTable
+    call AddNTimes
+
+    ; Tileset
+    ld a,[W_CURMAPTILESET]
+    ld d,a
     ld a,[hli]
     cp $ff
     ret z
+    cp d
+    jr nz,.loop
 
-    ld e,a
-    ld a,[W_CURMAPTILESET]
-    cp e
-    jr nz,.next0
-
-    ld a,[hli]
-    cp b
-    jr nz,.next1
-    ld a,[hli]
-    cp c
-    jr nz,.next2
+    ; Direction
+    ld a,[$c109]
+    ld d,a
     ld a,[hli]
     cp d
-    jr nz,.next3
-    jr .found
-.next0
+    jr nz,.loop
+
+    ; Jump Tile
+    ld a,[hli]
+    call GetTileOffset
+    ld a,[hli]
+    cp d
+    jr nz,.loop
+
+    ; Next Tile Simulation
+    ld a,[hli]
+    ld [$cfc6],a
+
+    ; Collision Tile
+    ld a,[hli]
+    call GetTileOffset
+    ld a,[hli]
+    cp d
+    jr z,.loop
+
+    ; Collision Tile After Jump to Check
+    ld a,[hli]
+    call GetTileOffset
+    call CheckPassable
+    jr c,.loop
+
+    ; Exception Flag
+    call CheckJumpExceptionFlag
     inc hl
-.next1
-    inc hl
-.next2
-    inc hl
-.next3
-    inc hl
-    jr .loop
+    jr nc,.loop
+
 .found
+
+    ; Simulation Jump Distance
+    ld a,[hli]
+    ld [$cd38],a
+    ld [wJumpingCounter],a
+
+    ; Direction Output
     ld a,[hl]
-    bit 3,a ; check no bike flag
-    res 3,a ; remove no bike flag
-    ld e,a
-    jr z,.skipBikeCheck
-    ld a,[$d700] ; 1 = bike
-    dec a
-    ret z ; no jump during biking
-.skipBikeCheck
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    and e
-    ret z
+    ld [$ccd3],a
+
     ld a,$ff
     ld [wJoypadForbiddenButtonsMask],a
     ld hl,$d736
     set 6,[hl]
     call Func_3486
-    ld a,e
-    ld [$ccd3],a
-    ld [$ccd4],a
-    ld a,$1
-    ld [$cd38],a
+
+    ld hl,wForceWTWBit0
+    set 0,[hl]
+
     call Func_1a6f0
     ld a,$a2
-    call PlaySound
-    ret
+    jp PlaySound
 
 SECTION "Func_1a6f0",ROMX[$66f0],BANK[$6]
 
@@ -37807,33 +37818,141 @@ IndigoPlateauLobbyText4:
     db MAX_REPEL,$FF
 
 JumpTilesetTable: ; Moved in the Bank
-    ; tileset
-    ; player direction
-    ; tile player standing on
-    ; ledge tile
-    ; input required = ▼▲◄►StSeBA
-    
-    ; Overworld Ledge
-    db $00,$00,$2C,$37,BTN_DOWN
-    db $00,$00,$39,$36,BTN_DOWN
-    db $00,$00,$39,$37,BTN_DOWN
-    db $00,$08,$2C,$27,BTN_LEFT
-    db $00,$08,$39,$27,BTN_LEFT
-    db $00,$0C,$2C,$0D,BTN_RIGHT
-    db $00,$0C,$2C,$1D,BTN_RIGHT
-    db $00,$0C,$39,$0D,BTN_RIGHT
-    ;db $00,$04,$2C,$37,BTN_UP
-    ;db $00,$04,$39,$36,BTN_UP
-    ;db $00,$04,$39,$37,BTN_UP
+    ; Tileset
+    ; Direction
+    ; Jump Tile to check offset
+    ; Jump Tile
+    ; Next Tile Simulation
+    ; Collision Tile to check offset
+    ; Collision Tile ($FF = Skip Check)
+    ; Collision Tile After Jump to Check ($00 = Skip Check)
+    ; Exception Flag
+    ; Simulation Jump Distance
+    ; Direction Output = ▼▲◄►StSeBA
 
-    ; Cave Hole
-    db $11,$00,$20,$22,BTN_B | %00001000 ; no bike flag
-    db $11,$08,$20,$22,BTN_B | %00001000 ; no bike flag
-    db $11,$0C,$20,$22,BTN_B | %00001000 ; no bike flag
-    db $11,$04,$20,$22,BTN_B | %00001000 ; no bike flag
+D_DOWN  EQU $00
+D_UP    EQU $04
+D_LEFT  EQU $08
+D_RIGHT EQU $0C
+
+    ;db $00 , D_DOWN  , (+0)+(+2)*20 , $5F , $FF , (+0)+(+0)*20 , $FF , (+0)+(+4)*20 , %00000000 , 1 , BTN_DOWN
+    ;db $00 , D_LEFT  , (-2)+(+0)*20 , $5E , $FF , (+0)+(+0)*20 , $FF , (-4)+(+0)*20 , %00000000 , 1 , BTN_LEFT
+    ;db $00 , D_RIGHT , (+3)+(+0)*20 , $0D , $FF , (+0)+(+0)*20 , $FF , (+4)+(+0)*20 , %00000000 , 1 , BTN_RIGHT
+    ;db $00 , D_UP    , (+0)+(-1)*20 , $00 , $FF , (+0)+(+0)*20 , $FF , (+0)+(-2)*20 , %00000000 , 0 , 0
+
+    ;db $00 , D_UP    , (+0)+(-2)*20 , $5F , $FF , (+0)+(+0)*20 , $FF , (+0)+(-4)*20 , %00001010 , 1 , BTN_UP
+    ;db $00 , D_RIGHT , (+2)+(+0)*20 , $5E , $FF , (+0)+(+0)*20 , $FF , (+4)+(+0)*20 , %00001010 , 1 , BTN_RIGHT
+    ;db $00 , D_LEFT  , (-1)+(+0)*20 , $0D , $FF , (+0)+(+0)*20 , $FF , (-4)+(+0)*20 , %00001010 , 1 , BTN_LEFT
+    ;db $00 , D_DOWN  , (+0)+(+1)*20 , $00 , $FF , (+1)+(+2)*20 , $0D , (+0)+(+2)*20 , %00001010 , 0 , 0
+
+    ;db $11 , D_DOWN  , (+0)+(+2)*20 , $22 , $22 , (+0)+(+0)*20 , $FF , (+0)+(+0)*20 , %00001010 , 1 , BTN_DOWN
+    ;db $11 , D_LEFT  , (-2)+(+0)*20 , $22 , $22 , (+0)+(+0)*20 , $FF , (+0)+(+0)*20 , %00001010 , 1 , BTN_LEFT
+    ;db $11 , D_RIGHT , (+3)+(+0)*20 , $22 , $22 , (+0)+(+0)*20 , $FF , (+0)+(+0)*20 , %00001010 , 1 , BTN_RIGHT
+    ;db $11 , D_UP    , (+0)+(-2)*20 , $22 , $22 , (+0)+(+0)*20 , $FF , (+0)+(+0)*20 , %00001010 , 1 , BTN_UP
+
+    db $00 , D_DOWN  , (+0)+(+0)*20 , $5F , $FF , (+0)+(+0)*20 , $FF , (+0)+(+2)*20 , %00000000 , 0 , 0
+    db $00 , D_DOWN  , (+1)+(+0)*20 , $5F , $FF , (+0)+(+0)*20 , $FF , (+0)+(+2)*20 , %00000000 , 0 , 0
+    
+    db $00 , D_LEFT  , (+0)+(+0)*20 , $5E , $FF , (+0)+(+0)*20 , $FF , (-2)+(+0)*20 , %00000000 , 0 , 0
+    db $00 , D_LEFT  , (+0)+(-1)*20 , $5E , $FF , (+0)+(+0)*20 , $FF , (-2)+(+0)*20 , %00000000 , 0 , 0
+
+    db $00 , D_RIGHT , (+1)+(+0)*20 , $0D , $FF , (+0)+(+0)*20 , $FF , (+2)+(+0)*20 , %00000000 , 0 , 0
+    db $00 , D_RIGHT , (+1)+(-1)*20 , $0D , $FF , (+0)+(+0)*20 , $FF , (+2)+(+0)*20 , %00000000 , 0 , 0
+
+    db $00 , D_UP    , (+0)+(-1)*20 , $00 , $FF , (+0)+(+0)*20 , $FF , (+0)+(-2)*20 , %00000000 , 0 , 0
+    db $00 , D_UP    , (+1)+(-1)*20 , $00 , $FF , (+0)+(+0)*20 , $FF , (+0)+(-2)*20 , %00000000 , 0 , 0
+
+    db $00 , D_RIGHT , (+2)+(+0)*20 , $27 , $FF , (+3)+(+0)*20 , $27 , (+0)+(+0)*20 , %00000000 , 0 , 0
 
     ; End
     db $FF
+
+GetTileOffset:
+    push hl
+    push de
+    FuncCoord 8,9 ; tile the player is on
+    ld hl,Coord
+    ld e,a
+    ld d,0
+    bit 7,a ; is delta negative?
+    jr z,.done
+    ld d,$FF
+.done
+    add hl,de
+    ld a,[hl]
+    pop de
+    pop hl
+    ld d,a
+    ret
+
+CheckPassable:
+    push hl
+    ld hl,$d530 ; pointer to list of passable tiles
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a ; hl now points to passable tiles
+.loop
+    ld a,[hli]
+    cp a,$ff
+    jr z,.tileNotPassable
+    cp d
+    jr z,.end
+    jr .loop
+.tileNotPassable
+    scf
+.end
+    pop hl
+    ret
+
+CheckJumpExceptionFlag:
+
+    ; Check Bike
+    bit 3,[hl]
+    jr z,.skipBikeCheck
+    ld a,[$d700] ; 1 = bike
+    dec a
+    jr z,.fail
+.skipBikeCheck
+
+    ; Check B pressed
+    bit 1,[hl]
+    jr z,.skipBCheck
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 1,a
+    jr z,.fail
+.skipBCheck
+
+    scf
+    ret
+.fail
+    and a ; rcf
+    ret
+
+_JumpOrCheckTilePassable:
+    ld hl,wForceWTWBit0
+    bit 0,[hl]
+    res 0,[hl]
+    jr z,.NoWTW
+    and a ; rcf -> WTW
+    ret
+.NoWTW
+    ld a,[$d736]
+    bit 6,a ; jumping a ledge?
+    jr z,.CheckTile
+    ld a,[wJumpingCounter]
+    and a
+    jr z,.tileNotPassable
+    dec a
+    ld [wJumpingCounter],a
+.CheckTile
+    ld a,[$cfc6] ; $FF = Not Passable
+    ld d,a
+    call CheckPassable
+    jr c,.tileNotPassable
+    jp CheckTilePassable
+.tileNotPassable
+    scf
+    ret
 
 SECTION "bank7",ROMX,BANK[$7]
 
@@ -95339,52 +95458,52 @@ IF _BLUE
     ; 64 bytes
 ENDC
 
-Tset05_GFX: ; 6807f (1a:407f)
+Tset05_GFX:
     INCBIN "gfx/tilesets/05.2bpp"
-Tset05_Block: ; 6867f (1a:467f)
+Tset05_Block:
     INCBIN "gfx/blocksets/05.bst"
-Tset02_GFX: ; 68dbf (1a:4dbf)
+Tset02_GFX:
     INCBIN "gfx/tilesets/02.2bpp"
-Tset02_Block: ; 693bf (1a:53bf)
+Tset02_Block:
     INCBIN "gfx/blocksets/02.bst"
-Tset09_GFX: ; 6960f (1a:560f)
+Tset09_GFX:
     INCBIN "gfx/tilesets/09.2bpp"
-Tset09_Block: ; 69bff (1a:5bff)
+Tset09_Block:
     INCBIN "gfx/blocksets/09.bst"
-Tset03_GFX: ; 6a3ff (1a:63ff)
+Tset03_GFX:
     INCBIN "gfx/tilesets/03.2bpp"
-Tset03_Block: ; 6a9ff (1a:69ff)
+Tset03_Block:
     INCBIN "gfx/blocksets/03.bst"
-Tset16_GFX: ; 6b1ff (1a:71ff)
+Tset16_GFX:
     INCBIN "gfx/tilesets/16.2bpp"
-Tset16_Block: ; 6b7ff (1a:77ff)
+Tset16_Block:
     INCBIN "gfx/blocksets/16.bst"
 
 SECTION "bank1B",ROMX,BANK[$1B]
 
-Tset0F_GFX: ; 6c000 (1b:4000)
+Tset0F_GFX:
     INCBIN "gfx/tilesets/0f.2bpp"
-Tset0F_Block: ; 6c5c0 (1b:45c0)
+Tset0F_Block:
     INCBIN "gfx/blocksets/0f.bst"
-Tset11_GFX: ; 6cca0 (1b:4ca0)
+Tset11_GFX:
     INCBIN "gfx/tilesets/11.2bpp"
-Tset11_Block: ; 6d0c0 (1b:50c0)
+Tset11_Block:
     INCBIN "gfx/blocksets/11.bst"
-Tset12_GFX: ; 6d8c0 (1b:58c0)
+Tset12_GFX:
     INCBIN "gfx/tilesets/12.2bpp"
-Tset12_Block: ; 6dea0 (1b:5ea0)
+Tset12_Block:
     INCBIN "gfx/blocksets/12.bst"
-Tset14_GFX: ; 6ed10 (1b:6d10)
+Tset14_GFX:
     INCBIN "gfx/tilesets/14.2bpp"
-Tset14_Block: ; 6f2d0 (1b:72d0)
+Tset14_Block:
     INCBIN "gfx/blocksets/14.bst"
-Tset15_GFX: ; 6f670 (1b:7670)
+Tset15_GFX:
     INCBIN "gfx/tilesets/15.2bpp"
-Tset15_Block: ; 6fb20 (1b:7b20)
+Tset15_Block:
     INCBIN "gfx/blocksets/15.bst"
-Tset0B_GFX: ; 6fd60 (1b:7d60)
+Tset0B_GFX:
     INCBIN "gfx/tilesets/0b.2bpp"
-Tset0B_Block: ; 6fef0 (1b:7ef0)
+Tset0B_Block:
     INCBIN "gfx/blocksets/0b.bst"
 
 SECTION "bank1C",ROMX,BANK[$1C]
@@ -135594,7 +135713,7 @@ RouteD1Object:
     db $f ; border tile
 
     db 3 ; warps
-    db 11,31,0,TEST_MAP_1
+    db 15,34,0,TEST_MAP_1
     db 11,06,0,SWAP_MAP
     db 11,07,0,SWAP_MAP
 
@@ -135604,7 +135723,7 @@ RouteD1Object:
     db 0 ; people
 
     ; warp-to
-    EVENT_DISP ROUTE_D1_WIDTH,11,31 ; TEST_MAP_1
+    EVENT_DISP ROUTE_D1_WIDTH,15,34 ; TEST_MAP_1
     EVENT_DISP ROUTE_D1_WIDTH,11,06 ; SWAP_MAP
     EVENT_DISP ROUTE_D1_WIDTH,11,07 ; SWAP_MAP
 
@@ -135629,7 +135748,7 @@ RouteD1Script:
 ; ──────────────────────────────────────────────────────────────────────
 
 TestMap1_h:
-    db $05 ; tileset
+    db $11 ; tileset
     db TEST_MAP_1_HEIGHT,TEST_MAP_1_WIDTH ; dimensions
     dw TestMap1Blocks,TestMap1TextPointers,TestMap1Script ; blocks,texts,scripts
     db 0 ; connections
