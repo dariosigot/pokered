@@ -1600,6 +1600,15 @@ wForceWTWBit0:    ; def0, bit0: Force WTW during Jump
 wJumpingCounter : ; def1
     ds 1
 
+NEXTU
+
+wMoveForgotPriority:: ; def0
+    ds 4
+wNewMoveDamage:: ; $def4
+    db
+wNewMoveType:: ; $def5
+    db
+
 ENDU
 
 SECTION "wSpriteOAMBySpecies",WRAMX[$df26],BANK[1]

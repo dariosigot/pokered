@@ -51140,6 +51140,8 @@ SpecialTrainerMoves:
     SpecialTrainer CHANNELER,16,ChannelerMove16
     db $ff
 
+; ────────────────────────────────────────────────────────────
+
 ShuffleMoves:
     ld a,[$cee9] ; Check Day Care
     and a
@@ -51159,7 +51161,7 @@ ShuffleMoves:
 .loop
     inc b
     ld a,b
-    cp 10
+    cp 20
     pop hl
     ret z
 .retry
@@ -51175,49 +51177,85 @@ ShuffleMoves:
     jr z,.loop
     pop de
     push de
+    call SwapMoves
+    jr .loop
+    ret
+
+ReturnToFirstAndSwapMove:
+    ld d,h
+    ld e,l
+.loop
+    dec c
+    jr z,SwapMoves
+    dec hl
+    jr .loop
+
+SwapMoves:
+    push bc
+    ld a,[hl]
     ld c,a
     ld a,[de]
     ld [hl],a
     ld a,c
     ld [de],a
-    jr .loop
+    pop bc
     ret
 
-CheckAtLeastOneDamageMove:
-    push de
+; INPUT
+; a = Move ID
+; OUTPUT
+; d = damage
+; e = type
+; set z if damage = 0
+GetMoveDamageAndType:
     push hl
-    ; Check New Move
-    dec a ; New Move
+    push bc
+    dec a
     ld hl,Moves+2 ; damage
     ld bc,6
     call AddNTimes
-    ld a,[hl]
+    ld a,[hli] ; damage
+    ld d,a
     and a
-    jr nz,.success
+    ld a,[hl] ; type
+    ld e,a
+    pop bc
+    pop hl
+    ret
+
+SearchMoveToReplace:
+    push de
+    push hl
     ; Check Day Care
+    ld b,a
     ld a,[$cee9] ; Check Day Care
     and a
     jr nz,.success
-    ; Check Last 3 Moves (the 1st must be replaced)
-    inc de ; Point to 2nd Move
-    ld b,0
-.loop
-    inc b
+
+    ; Initialize Move Forgot Priority
+    ld hl,wMoveForgotPriority
+    ld a,5
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+
+    ; Check New Move
     ld a,b
-    cp 4
-    jr z,.fail
-    ld a,[de]
-    dec a
-    ld hl,Moves+2 ; damage
-    push bc
-    ld bc,6
-    call AddNTimes
-    pop bc
-    ld a,[hl]
-    and a
-    jr nz,.success
-    inc de
-    jr .loop
+    push de
+    call GetMoveDamageAndType
+    ld a,d
+    ld [wNewMoveDamage],a
+    ld a,e
+    ld [wNewMoveType],a
+    pop de
+    jr z,.zero
+    call SearchDamageMoveToReplace
+    jr .done
+.zero
+    call SearchNonDamageMoveToReplace    
+.done
+    jr nc,.fail
 .success
     pop hl
     pop de
@@ -51230,6 +51268,145 @@ CheckAtLeastOneDamageMove:
     pop de
     xor a ; rcf
     ret
+
+; Search Zero Damage Move
+SearchNonDamageMoveToReplace:
+    call GenRandom
+    and %00001111 ; 1/16 = 6.25% not learn
+    ret z ; rcf
+    ld c,-1
+.loop
+    inc c
+    ld a,c
+    cp 4
+    jr z,.end
+    ld a,[de]
+    ld hl,wMoveForgotPriority
+    ld b,0
+    add hl,bc
+
+    ; Check Move
+    call CheckUnforgottable
+    jr nc,.notUnforgottable
+    ld [hl],10 ; unforgottable
+.notUnforgottable
+    push de
+    call GetMoveDamageAndType
+    jr nz,.notZero
+    inc [hl]
+.notZero
+    pop de
+    
+.next
+    inc de
+    jr .loop
+.end
+    call ReturnToFirstAndSwapMove
+    scf
+    ret
+
+; Search Same Type and Lower Damage Move
+SearchDamageMoveToReplace:
+    push de ; Backup Damage/Type new Move
+    ld c,0
+.loop
+    inc c
+    ld a,c
+    cp 5
+    jr z,.end
+    ld a,[hl]
+    call CheckUnforgottable
+    jr c,.next
+    pop de  ; Restore & Backup Damage/Type new Move
+    push de ; ...
+    push bc ; Backup c
+    ld b,d ; damage new move
+    ld c,e ; type new move
+    call GetMoveDamageAndType
+    jr z,.next1
+    ; hl = pointer to old move
+    ; b = damage new move
+    ; c = type new move
+    ; d = damage old move
+    ; e = type old move
+    ld a,c
+    cp e
+    jr nz,.next1
+    ld a,b
+    cp d
+    jr c,.next1 ; c = damage old > damage new
+    pop bc  ; Restore & Backup c
+    push bc ; ...
+    call ReturnToFirstAndSwapMove
+    jr .end1
+.next1
+    pop bc ; Restore c
+.next
+    inc hl
+    jr .loop
+.end1
+    pop bc ; Restore c
+.end
+    pop de ; Restore Damage/Type new Move
+    scf
+    ret
+
+CheckUnforgottable:
+    push bc
+    push af
+    push hl
+    push de
+    ld hl,NotForgottableMoves
+    ld de,1
+    call IsInArray
+    pop de
+    pop hl
+    pop bc
+    ld a,b
+    pop bc
+    ret
+
+NotForgottableMoves:
+    db SWORDS_DANCE
+    db BODY_SLAM
+    db TWINEEDLE
+    db SING
+    db FLAMETHROWER
+    db TSUNAMI
+    db ICE_BEAM
+    db DRILL_PECK
+    db SUBMISSION
+    db LOW_KICK
+    db RAZOR_LEAF
+    db SLEEP_POWDER
+    db THUNDERBOLT
+    db THUNDER_WAVE
+    db EARTHQUAKE
+    db PSYCHIC_M
+    db HYPNOSIS
+    db NIGHT_SHADE
+    db RECOVER
+    db SLUDGE
+    db BONE_CLUB
+    db AMNESIA
+    db SOFTBOILED
+    db GLARE
+    db DREAM_EATER
+    db LOVELY_KISS
+    db TRANSFORM
+    db SPORE
+    db CRABHAMMER
+    db EXPLOSION
+    db BONEMERANG
+    db REST
+    db ROCK_SLIDE
+    db HYPER_FANG
+    db SUPER_FANG
+    db SLASH
+    db SUBSTITUTE
+    db $FF
+
+; ────────────────────────────────────────────────────────────
 
 ; writes the moves a mon has at level [W_CURENEMYLVL] to [de]
 ; move slots are being filled up sequentially and shifted if all slots are full
@@ -51300,7 +51477,7 @@ WriteMonMoves: ; Moved in the Bank
     ld a,[hl] ; read new move
     ld h,d
     ld l,e
-    call CheckAtLeastOneDamageMove ; call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
+    call SearchMoveToReplace ; call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
     jr nc,.HackNext ; ld a,[$cee9]
     and a
     jr z,.writeMoveToSlot
@@ -135816,7 +135993,7 @@ RouteD1Object:
     db 05,01,2 ; CeladonCityText10
 
     db 1 ; people
-    db SPRITE_LASS,10 + 4,17 + 4,$ff,$d2,$41,JR__TRAINER_F + $C8,1 ; trainer
+    db SPRITE_LASS,10 + 4,17 + 4,$ff,$d2,$41,JR__TRAINER_F + $C8,24 ; trainer
 
     ; warp-to
     EVENT_DISP ROUTE_D1_WIDTH,15,34 ; TEST_MAP_1

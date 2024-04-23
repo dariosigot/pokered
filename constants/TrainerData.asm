@@ -157,6 +157,8 @@ JrTrainerFData:
     db 29,PIKACHU,RAICHU,0
     db 33,CLEFAIRY,0
     db 29,BELLSPROUT,ODDISH,TANGELA,0
+; Route D1
+    db 60,SANDSLASH,0
 
 PokemaniacData:
 ; Route 10
