@@ -33915,8 +33915,8 @@ Func_17d7d: ; Moved in the Bank
 ; ───────────────────────────────────────
 
 MapSpriteSetsNew:
-    db $01 ; PORT_ROYAL
-    db $01 ; ROUTE_D1
+    db $02 ; PORT_ROYAL
+    db $02 ; ROUTE_D1
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $05)
@@ -135813,9 +135813,10 @@ RouteD1Object:
     db 11,07,0,SWAP_MAP
 
     db 1 ; signs
-    db 05,01,1 ; CeladonCityText10
+    db 05,01,2 ; CeladonCityText10
 
-    db 0 ; people
+    db 1 ; people
+    db SPRITE_LASS,10 + 4,17 + 4,$ff,$d2,$41,JR__TRAINER_F + $C8,1 ; trainer
 
     ; warp-to
     EVENT_DISP ROUTE_D1_WIDTH,15,34 ; TEST_MAP_1
@@ -135827,16 +135828,53 @@ RouteD1Blocks:
 
 RouteD1TextPointers:
     dw RouteD1Text1
+    dw RouteD1Text2
 
-RouteD1Text1:
-    TX_FAR _RouteD1Text1
+RouteD1Text2:
+    TX_FAR _RouteD1Text2
     db "@"
 
-_RouteD1Text1:
-    db $0,"!",$57
+_RouteD1Text2:
+    db $0,"A!",$57
+
+RouteD1Text2End:
+    TX_FAR _RouteD1Text2End
+    db "@"
+
+_RouteD1Text2End:
+    db $0,"A!",$58
 
 RouteD1Script:
-    jp EnableAutoTextBoxDrawing
+    call EnableAutoTextBoxDrawing
+    ld hl,RouteD1TrainerHeaders
+    ld de,RouteD1ScriptPointers
+    ld a,[W_ROUTED1CURSCRIPT]
+    call ExecuteCurMapScriptInTable
+    ld [W_ROUTED1CURSCRIPT],a
+    ret
+
+RouteD1ScriptPointers:
+    dw CheckFightingMapTrainers
+    dw Func_324c
+    dw EndTrainerBattle
+
+RouteD1TrainerHeaders:
+RouteD1TrainerHeader0:
+    db $1 ; flag's bit
+    db ($3 << 4) ; trainer's view range
+    dw $d883 ; flag's byte
+    dw RouteD1Text2 ; TextBeforeBattle
+    dw RouteD1Text2 ; TextAfterBattle
+    dw RouteD1Text2End ; TextEndBattle
+    dw RouteD1Text2End ; TextEndBattle
+
+    db $ff
+
+RouteD1Text1:
+    db $8 ; asm
+    ld hl,RouteD1TrainerHeader0
+    call TalkToTrainer
+    jp TextScriptEnd
 
 ; ──────────────────────────────────────────────────────────────────────
 ; TEST_MAP_1
