@@ -1604,9 +1604,9 @@ NEXTU
 
 wMoveForgotPriority:: ; def0
     ds 4
-wNewMoveDamage:: ; $def4
+wNewMoveDamage:: ; $def5
     db
-wNewMoveType:: ; $def5
+wNewMoveType:: ; $def6
     db
 
 ENDU
