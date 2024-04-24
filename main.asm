@@ -51142,16 +51142,219 @@ SpecialTrainerMoves:
 
 ; ────────────────────────────────────────────────────────────
 
+SearchMoveToReplace:
+    push de
+    push hl
+    push hl
+
+    ; Shuffle Move
+    push af
+    call ShuffleMoves
+    pop af
+
+    ; Check New Move
+    push de
+    call GetMoveDamageAndType
+    ld a,d
+    ld [wNewMoveDamage],a
+    ld a,e
+    ld [wNewMoveType],a
+    pop de
+    ld b,%00111111 ; 1/64 = 1.5625% not learn
+    ld hl,LearnDamageMove
+    jr nz,.done
+    ld b,%00001111 ; 1/16 = 6.25% not learn
+    ld hl,LearnZeroDamageMove
+.done
+    call DefinePriorityMoveToReplace
+    jr nc,.fail
+
+    ; Read Calculated Move Priority to Identify Worst
+.resetloop
+    ld hl,wMoveForgotPriority
+    ld c,-1
+.loop
+    inc c
+    ld a,c
+    cp 4
+    jr z,.resetloop
+    dec [hl]
+    jr z,.endloop
+    inc hl
+    jr .loop
+.endloop
+
+    ; Place Worst Move to first position
+    pop hl
+    ld d,h
+    ld e,l
+    ld b,0
+    add hl,bc
+    call SwapMoves
+
+.end
+    pop hl
+    pop de
+    call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
+    ld a,[$cee9]
+    scf
+    ret
+.fail
+    pop hl
+    pop hl
+    pop de
+    xor a ; rcf
+    ret
+.daycare
+    pop hl
+    jr .end
+
+DefinePriorityMoveToReplace:
+    call GenRandom
+    and b
+    ret z ; rcf
+    ld bc,$00FF ; b = 0 | c = -1
+.loop
+    inc c
+    push hl
+    push bc
+    ld a,c
+    cp 4
+    jr z,.end
+    ld a,[de]
+    ld b,20 ; Start Value
+    push de
+    ld de,.return
+    push de
+    jp hl
+.return
+    pop de
+    ld a,b
+    ld hl,wMoveForgotPriority
+    pop bc
+    add hl,bc
+    ld [hl],a
+    pop hl
+    inc de
+    jr .loop
+.end
+    pop bc
+    pop hl
+    scf
+    ret
+
+LearnZeroDamageMove:
+    ld hl,W_ISINBATTLE
+    ld d,[hl]
+    dec d
+    jr nz,.notWildBattle
+    ld hl,EscapeMoves
+    call CheckList
+    jr nc,.notWildBattle
+    call DiscourageForgot6 ; ▼ Escape
+.notWildBattle
+    ld hl,DreamEaterMoves
+    call CheckList
+    jr nc,.notDreamEater
+    call DiscourageForgot6 ; ▼ DreamEater
+.notDreamEater
+    ld hl,NotForgottableMoves
+    call CheckList
+    jr nc,.notForgottable
+    call DiscourageForgot3 ; ▼ Unforgottable
+.notForgottable
+    call GetMoveDamageAndType
+    jr z,.Zero
+    ld a,d
+    dec a
+    jr z,.One
+    ld a,[W_MONHTYPE1]
+    cp e
+    jr nz,.Stab1Done
+    inc b ; ▼ stab
+    jr .StabDone
+.Stab1Done
+    ld a,[W_MONHTYPE2]
+    cp e
+    jr nz,.StabDone
+    inc b ; ▼ stab
+.StabDone
+    ret
+.Zero
+    jp EncourageForgot3 ; ▲ zero damage
+.One
+    dec b ; ▲ special (1 damage)
+    ret
+
+LearnDamageMove:
+    ld hl,DreamEaterMoves
+    call CheckList
+    jr nc,.notDreamEater
+    call DiscourageForgot6 ; ▼ DreamEater
+.notDreamEater
+    ld hl,NotForgottableMoves
+    call CheckList
+    jr nc,.notForgottable
+    call DiscourageForgot3 ; ▼ Unforgottable
+.notForgottable
+    call GetMoveDamageAndType
+    jr z,.Zero
+    ld a,d
+    dec a
+    jr z,.One
+    ld a,[wNewMoveType]
+    cp e
+    jr nz,.DifferentType
+    dec b ; ▲ same type
+    ld a,[wNewMoveDamage]
+    cp d
+    jr c,.DifferentType ; c = damage old > damage new
+    call EncourageForgot3 ; ▲ same type and new damage >= old damage
+.DifferentType
+    ld a,[W_MONHTYPE1]
+    cp e
+    jr nz,.Stab1Done
+    inc b ; ▼ stab
+    jr .StabDone
+.Stab1Done
+    ld a,[W_MONHTYPE2]
+    cp e
+    jr nz,.StabDone
+    inc b ; ▼ stab
+.StabDone
+    ld a,[wNewMoveDamage]
+    cp d
+    jr nc,.NewLessDamageThanOld ; c = damage old > damage new
+    ; old > new
+    ld e,a ; a = delta
+    ld a,d ; ...
+    sub e  ; ...
+.LoopDeltaDamage1
+    inc b ; ▼ damage old > damage new
+    sub 20
+    jr nc,.LoopDeltaDamage1
+    jr .done
+.NewLessDamageThanOld
+    ; new >= old
+    sub d ; a = delta
+.LoopDeltaDamage2
+    dec b ; ▲ damage new >= old
+    sub 20
+    jr nc,.LoopDeltaDamage2
+.done
+    ret
+.Zero
+    jp DiscourageForgot3 ; ▼ zero damage
+.One
+    dec b ; ▲ special (1 damage)
+    ret
+
 ShuffleMoves:
-    ld a,[$cee9] ; Check Day Care
-    and a
-    ret nz
     push de
     push hl
     call .ShuffleMoves
     pop hl
     pop de
-    ld a,[$cee9]
     ret
 .ShuffleMoves
     ld h,d
@@ -51161,14 +51364,12 @@ ShuffleMoves:
 .loop
     inc b
     ld a,b
-    cp 20
+    cp 30 ; swap slot n times
     pop hl
     ret z
-.retry
     call GenRandom
     and %00000011 ; from 0 to 3
-    jr z,.retry
-    ld e,a ; from 1 to 3
+    ld e,a
     ld d,0
     push hl
     add hl,de
@@ -51178,16 +51379,6 @@ ShuffleMoves:
     pop de
     push de
     call SwapMoves
-    jr .loop
-    ret
-
-ReturnToFirstAndSwapMove:
-    ld d,h
-    ld e,l
-.loop
-    dec c
-    jr z,SwapMoves
-    dec hl
     jr .loop
 
 SwapMoves:
@@ -51223,262 +51414,53 @@ GetMoveDamageAndType:
     pop hl
     ret
 
-SearchMoveToReplace:
-    push de
-    push hl
-    push hl
-    ; Check Day Care
-    ld b,a
-    ld a,[$cee9] ; Check Day Care
-    and a
-    jr nz,.success
-
-    ; Check New Move
-    ld a,b
-    push de
-    call GetMoveDamageAndType
-    ld a,d
-    ld [wNewMoveDamage],a
-    ld a,e
-    ld [wNewMoveType],a
-    pop de
-    jr z,.zero
-    call SearchDamageMoveToReplace
-    jr .done
-.zero
-    call SearchZeroDamageMoveToReplace    
-.done
-    jr nc,.fail
-.success
-
-    ; Read Calculated Move Priority
-.resetloop
-    ld hl,wMoveForgotPriority
-    ld c,-1
-.loop
-    inc c
-    ld a,c
-    cp 4
-    jr z,.resetloop
-    dec [hl]
-    jr z,.endloop
-    inc hl
-    jr .loop
-.endloop
-
-    ; Place worst move to first position
-    pop hl
-    ld b,0
-    add hl,bc
-    inc c
-    call ReturnToFirstAndSwapMove
-
-    pop hl
-    pop de
-    call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
-    ld a,[$cee9]
-    scf
-    ret
-.fail
-    pop hl
-    pop de
-    xor a ; rcf
+DiscourageForgot6:
+    call DiscourageForgot3
+DiscourageForgot3:
+    inc b
+    inc b
+    inc b
     ret
 
-; Search Zero Damage Move
-SearchZeroDamageMoveToReplace:
-    call GenRandom
-    and %00001111 ; 1/16 = 6.25% not learn
-    ret z ; rcf
-    ld bc,$00FF ; b = 0 | c = -1
-.loop
-    inc c
-    push bc
-    ld a,c
-    cp 4
-    jr z,.end
-    ld a,[de]
-    ld b,10 ; Start Value
-
-    ; Check Move
-    call CheckHypnosis
-    jr nc,.notHypnosis
-    inc b ; Hypnosis
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-.notHypnosis
-    call CheckUnforgottable
-    jr nc,.notUnforgottable
-    inc b ; Unforgottable
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-.notUnforgottable
-    push de
-    call GetMoveDamageAndType
-    jr z,.Zero
-    ld a,[W_MONHTYPE1]
-    cp e
-    jr nz,.Stab1Done
-    inc b ; stab
-    jr .StabDone
-.Stab1Done
-    ld a,[W_MONHTYPE2]
-    cp e
-    jr nz,.StabDone
-    inc b ; stab
-.StabDone
-    jr .done
-.Zero
-    dec b ; zero damage
-    dec b ; ...
-.done
-    pop de
-
-.next
-    ld a,b
-    pop bc
-    ld hl,wMoveForgotPriority
-    add hl,bc
-    ld [hl],a
-    inc de
-    jr .loop
-.end
-    pop bc
-    scf
+EncourageForgot6:
+    call EncourageForgot3
+EncourageForgot3:
+    dec b
+    dec b
+    dec b
     ret
 
-; Search Same Type and Lower Damage Move
-SearchDamageMoveToReplace:
-    ld bc,$00FF ; b = 0 | c = -1
-.loop
-    inc c
-    push bc
-    ld a,c
-    cp 4
-    jr z,.end
-    ld a,[de]
-    ld b,10 ; Start Value
-
-    ; Check Move
-    call CheckHypnosis
-    jr nc,.notHypnosis
-    inc b ; Hypnosis
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-.notHypnosis
-    call CheckUnforgottable
-    jr nc,.notUnforgottable
-    inc b ; Unforgottable
-    inc b ; ...
-    inc b ; ...
-    inc b ; ...
-.notUnforgottable
-    push de
-    call GetMoveDamageAndType
-    jr z,.Zero
-    ld a,[wNewMoveType]
-    cp e
-    jr nz,.DifferentType
-    dec b ; same type
-    ld a,[wNewMoveDamage]
-    cp d
-    jr c,.DifferentType ; c = damage old > damage new
-    dec b ; same type and new damage >= old damage
-    dec b ; ...
-    dec b ; ...
-    dec b ; ...
-.DifferentType
-    ld a,[W_MONHTYPE1]
-    cp e
-    jr nz,.Stab1Done
-    inc b ; stab
-    jr .StabDone
-.Stab1Done
-    ld a,[W_MONHTYPE2]
-    cp e
-    jr nz,.StabDone
-    inc b ; stab
-.StabDone
-    ld a,[wNewMoveDamage]
-    cp d
-    jr nc,.NewLessDamageThanOld ; c = damage old > damage new
-    inc b ; damage old > damage new
-    inc b ; ...
-.NewLessDamageThanOld
-    jr .done
-.Zero
-    inc b ; zero damage
-.done
-    pop de
-
-.next
-    ld a,b
-    pop bc
-    ld hl,wMoveForgotPriority
-    add hl,bc
-    ld [hl],a
-    inc de
-    jr .loop
-.end
-    pop bc
-    scf
-    ret
-
-CheckHypnosis:
+CheckList:
     push bc
     push af
-    push hl
     push de
-    ld hl,HypnosisMoves
     ld de,1
     call IsInArray
     pop de
-    pop hl
     pop bc
     ld a,b
     pop bc
     ret
 
-HypnosisMoves:
-    db HYPNOSIS
-    db DREAM_EATER
+EscapeMoves:
+    db ROAR
+    db TELEPORT
+    db WHIRLWIND
     db $FF
 
-CheckUnforgottable:
-    push bc
-    push af
-    push hl
-    push de
-    ld hl,NotForgottableMoves
-    ld de,1
-    call IsInArray
-    pop de
-    pop hl
-    pop bc
-    ld a,b
-    pop bc
-    ret
+DreamEaterMoves:
+    db SING
+    db SLEEP_POWDER
+    db HYPNOSIS
+    db LOVELY_KISS
+    db SPORE
+    db DREAM_EATER
+    db $FF
 
 NotForgottableMoves:
     db SWORDS_DANCE
     db BODY_SLAM
     db TWINEEDLE
-    db SING
     db FLAMETHROWER
     db TSUNAMI
     db ICE_BEAM
@@ -51486,12 +51468,10 @@ NotForgottableMoves:
     db SUBMISSION
     db LOW_KICK
     db RAZOR_LEAF
-    db SLEEP_POWDER
     db THUNDERBOLT
     db THUNDER_WAVE
     db EARTHQUAKE
     db PSYCHIC_M
-    db HYPNOSIS
     db NIGHT_SHADE
     db RECOVER
     db SLUDGE
@@ -51499,10 +51479,7 @@ NotForgottableMoves:
     db AMNESIA
     db SOFTBOILED
     db GLARE
-    db DREAM_EATER
-    db LOVELY_KISS
     db TRANSFORM
-    db SPORE
     db CRABHAMMER
     db EXPLOSION
     db BONEMERANG
@@ -51553,7 +51530,7 @@ WriteMonMoves: ; Moved in the Bank
     ld a,[W_CURENEMYLVL] ; $d127
     cp b
     jp c,.done       ; mon level < move level (assumption: learnset is sorted by level)
-    call ShuffleMoves ; ld a,[$cee9]
+    ld a,[$cee9]
     and a
     jr z,.skipMinLevelCheck
     ld a,[wWhichTrade] ; $cd3d (min move level)
@@ -133656,16 +133633,16 @@ WildDataPointersNew:
 
 RouteD1Mons:
     db $19
-    db  3,RATTATA  ; 20%
-    db  3,RATTATA  ; 20%
-    db  4,RATTATA  ; 15%
-    db  2,RATTATA  ; 10%
-    db  2,RATTATA  ; 10%
-    db  3,RATTATA  ; 10%
-    db  4,RATTATA  ;  5%
-    db  1,RATTATA  ;  5%
-    db  2,RATTATA  ;  4%
-    db  5,RATTATA  ;  1%
+    db 45,KADABRA  ; 20%
+    db 45,KADABRA  ; 20%
+    db 45,KADABRA  ; 15%
+    db 45,KADABRA  ; 10%
+    db 45,KADABRA  ; 10%
+    db 45,KADABRA  ; 10%
+    db 45,KADABRA  ;  5%
+    db 45,KADABRA  ;  5%
+    db 45,KADABRA  ;  4%
+    db 45,KADABRA  ;  1%
     db $05
     db  2,MAGIKARP ; 20%
     db  2,MAGIKARP ; 20%
