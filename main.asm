@@ -23047,6 +23047,38 @@ InitializeMissableObjectsFlagsNew:
 
 ; ───────────────────────────────────────
 
+BackupMovesAndPPAndLoadIVBackupPointer:
+    ld hl,W_ENEMYMONMOVES
+    ld de,wBackupEnemyMoves
+    ld bc,4
+    push bc
+    call CopyData
+    ld hl,W_ENEMYMONPP
+    pop bc
+    call CopyData
+    ld hl,$cceb
+    ret
+
+WriteMonMoves2:
+    ld a,[W_ISINBATTLE]
+    dec a
+    ld a,$3e
+    jp nz,Predef ; indirect jump to WriteMonMoves (3afb8 (e:6fb8))
+    ld hl,wBackupEnemyMoves
+    ld bc,$4
+    jp CopyData
+
+WriteMovePP:
+    ld a,[W_ISINBATTLE]
+    dec a
+    jp nz,AddPokemonToParty_WriteMovePP
+    inc de
+    ld hl,wBackupEnemyPP
+    ld bc,$4
+    call CopyData
+    dec de
+    ret
+
 SECTION "UseItem_",ROMX[$55c7],BANK[$3]
 
 UseItem_: ; d5c7 (3:55c7)
@@ -23418,7 +23450,7 @@ ItemUseBall: ; d687 (3:5687)
     jr .next16
 .next15    ;$5871
     set 3,[hl]
-    ld hl,$cceb
+    call BackupMovesAndPPAndLoadIVBackupPointer ; ld hl,$cceb
     ld a,[W_ENEMYMONATKDEFIV]
     ld [hli],a
     ld a,[W_ENEMYMONSPDSPCIV]
@@ -26881,18 +26913,19 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     inc de
     ld a,[hli]       ; unused (?)
     ld [de],a
-    ld hl,W_MONHMOVES
-    ld a,[hli]
+    ;ld hl,W_MONHMOVES
+    ;ld a,[hli]
     inc de
     push de
+    xor a
     ld [de],a
-    ld a,[hli]
+    ;ld a,[hli]
     inc de
     ld [de],a
-    ld a,[hli]
+    ;ld a,[hli]
     inc de
     ld [de],a
-    ld a,[hli]
+    ;ld a,[hli]
     inc de
     ld [de],a
     push de
@@ -26902,7 +26935,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     xor a
     ld [$cee9],a
     ld a,$3e
-    call Predef ; indirect jump to WriteMonMoves (3afb8 (e:6fb8))
+    call WriteMonMoves2 ; call Predef ; indirect jump to WriteMonMoves (3afb8 (e:6fb8))
     pop de
     ld a,[wPlayerID]  ; set trainer ID to player ID
     inc de
@@ -26937,7 +26970,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     inc de
     inc de
     pop hl
-    call AddPokemonToParty_WriteMovePP
+    call WriteMovePP ; call AddPokemonToParty_WriteMovePP
     inc de
     ld a,[W_CURENEMYLVL] ; $d127
     ld [de],a
@@ -51710,13 +51743,13 @@ Func_3b9ec: ; Moved Upper in the Bank
 
 TransformEffect_: ; Moved Upper in the Bank
     ld hl,W_PLAYERMONID
-    ld de,$cfe5
+    ld de,W_ENEMYMON_START
 ;    ld bc,W_ENEMYBATTSTATUS3 ; $d069
     ld a,[W_ENEMYBATTSTATUS1] ; $d067
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr nz,.asm_3bad1
-    ld hl,$cfe5
+    ld hl,W_ENEMYMON_START
     ld de,W_PLAYERMONID
 ;    ld bc,W_PLAYERBATTSTATUS3 ; $d064
     ld [wPlayerMoveListIndex],a ; $cc2e
@@ -51779,12 +51812,30 @@ TransformEffect_: ; Moved Upper in the Bank
     ld a,[bc]
     bit 3,a ; Pokemon is Just Transformed
     jr nz,.SkipBackupDV
+    push de
+
+    ; Backup IV
     ld a,[de]
     ld [$cceb],a
     inc de
     ld a,[de]
     ld [$ccec],a
-    dec de
+
+    ; Backup Moves & PP
+    push hl
+    push bc
+    ld hl,W_ENEMYMONMOVES
+    ld de,wBackupEnemyMoves
+    ld bc,4
+    push bc
+    call CopyData
+    ld hl,W_ENEMYMONPP
+    pop bc
+    call CopyData
+    pop bc
+    pop hl
+
+    pop de
 .SkipBackupDV
     ld a,[bc]
     set 3,a ; Set Transformed
@@ -55172,9 +55223,9 @@ asm_3d6a9: ; 3d6a9 (f:56a9)
     res 4,[hl]
     res 6,[hl]
 asm_3d6b0: ; 3d6b0 (f:56b0)
-    call Func_3daf5
+    call PrintMonName1Text
     ld hl,DecrementPP
-    ld de,$CCDC ; pointer to the move just used
+    ld de,wPlayerSelectedMove ; pointer to the move just used
     ld b,BANK(DecrementPP)
     call Bankswitch
     ld a,[W_PLAYERMOVEEFFECT] ; effect of the move just used
@@ -55751,7 +55802,7 @@ Func_3daad: ; 3daad (f:5aad)
     ld [H_WHOSETURN],a ; $FF00+$f3
     jp ApplyDamageToPlayerPokemon
 
-Func_3daf5: ; 3daf5 (f:5af5)
+PrintMonName1Text: ; 3daf5 (f:5af5)
     ld hl,UnnamedText_3dafb ; $5afb
     jp PrintText
 
@@ -57640,7 +57691,7 @@ asm_3e70b: ; 3e70b (f:670b)
 asm_3e72b: ; 3e72b (f:672b)
     xor a
     ld [$cced],a
-    call Func_3daf5
+    call DecrementEnemyPP ; call PrintMonName1Text
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     ld hl,EffectsArray1 ; $4000
     ld de,$1
@@ -58135,12 +58186,8 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     jr nz,.asm_3eb33
     ld a,[W_ISINBATTLE] ; $d057
     cp $2
-    call GetEnemyIV ; ld a,$98
-    ds 1            ; ld b,$88
-    jr z,.asm_3eb33
-    call GenRandomInBattle
-    ld b,a
-    call ForceShinyOrRandom ; call GenRandomInBattle
+    call z,GetEnemyIV
+    call nz,ForceShinyOrRandom ; call GenRandomInBattle
 .asm_3eb33
     ld hl,W_ENEMYMONATKDEFIV
     ld [hli],a
@@ -58149,7 +58196,6 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld a,[W_CURENEMYLVL] ; $d127
     ld [de],a
     inc de
-    ds 4
     call CalcStatsAndLoadEnemyMonHp ; call CalcStats
     ld hl,W_ENEMYMONCURHP ; $cfe6
     ld a,[W_ISINBATTLE] ; $d057
@@ -58180,7 +58226,6 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     inc hl
     ld a,[hl]
     ld [W_ENEMYMONSTATUS],a ; $cfe9
-    jr .asm_3eb86
 .asm_3eb86
     ld hl,W_MONHTYPES
     ld de,W_ENEMYMONTYPES ; $cfea
@@ -58196,38 +58241,34 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld a,[W_ISINBATTLE] ; $d057
     cp $2
     jr nz,.asm_3ebb0
-    ld hl,$d8ac
-    ld a,[wWhichPokemon] ; $cf92
-    ld bc,$2c
-    call AddNTimes
-    ld bc,$4
-    call CopyData
+    ld hl,W_ENEMYMON1MOVE3-2 ; move
+    call Copy4Bytes
+    ld de,W_ENEMYMONPP
+    ld hl,W_ENEMYMON1MOVE3+19 ; pp
+    call Copy4Bytes
     jr .asm_3ebca
 .asm_3ebb0
-    ld hl,W_MONHMOVES
-    ld a,[hli]
-    ld [de],a
-    inc de
-    ld a,[hli]
-    ld [de],a
-    inc de
-    ld a,[hli]
-    ld [de],a
-    inc de
-    ld a,[hl]
-    ld [de],a
-    dec de
-    dec de
-    dec de
+    ld a,[W_ENEMYBATTSTATUS3] ; $d069
+    bit 3,a
+    jr z,.FreshMoves
+    ld hl,wBackupEnemyMoves ; move
+    call Copy4BytesDirect
+    jr .resetPP
+.FreshMoves
     xor a
     ld [$cee9],a
+    ld h,d
+    ld l,e
+    ld bc,4
+    call FillMemory
     ld a,$3e
     call WriteMonMovesPlus ; call Predef ; indirect jump to WriteMonMoves (3afb8 (e:6fb8))
-.asm_3ebca
+.resetPP
     ld hl,W_ENEMYMONMOVES
-    ld de,$cffd
+    ld de,W_ENEMYMONPP-1
     ld a,$5e
     call Predef ; indirect jump to LoadMovePPs (f473 (3:7473))
+.asm_3ebca
     ld hl,W_MONHBASESTATS
     ld de,$d002
     ld b,$5
@@ -58273,6 +58314,8 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     dec b
     jr nz,.asm_3ec2d
     ret
+
+SECTION "DoBattleTransitionAndInitBatVar",ROMX[$6c32],BANK[$f]
 
 DoBattleTransitionAndInitBatVar: ; 3ec32 (f:6c32)
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -61136,7 +61179,8 @@ BattleMonPartyAttr:
     jp AddNTimes
 
 ForceShinyOrRandom:
-    ld e,b
+    call GenRandomInBattle
+    ld e,a
     ld b,BANK(ForceShinyOrRandom_)
     ld hl,ForceShinyOrRandom_
     call Bankswitch
@@ -61181,7 +61225,6 @@ UseNextPkmnFixPalette:
     jp DisplayTextBoxID
 
 GetEnemyIV:
-    ret nz ; Not Trainer
     push af
     ld hl,W_ENEMYMON1MOVE3+$11
     ld a,[wWhichPokemon]
@@ -61384,6 +61427,21 @@ WriteMonMovesPlus:
     call Bankswitch
     jr nc,.NormalWild
     ret
+
+DecrementEnemyPP:
+    call PrintMonName1Text
+    ld de,wEnemySelectedMove ; pointer to the move just used
+    ld b,BANK(DecrementEnemyPP_)
+    ld hl,DecrementEnemyPP_
+    jp Bankswitch
+
+Copy4Bytes:
+    ld a,[wWhichPokemon] ; $cf92
+    ld bc,$2c
+    call AddNTimes
+Copy4BytesDirect:
+    ld bc,$4
+    jp CopyData
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -82448,7 +82506,7 @@ Func_562e1: ; 562e1 (15:62e1)
     ld a,$1
     ld [wHPBarMaxHP],a
     ld a,$3e
-    call Predef
+    call Predef ; indirect jump to WriteMonMoves (3afb8 (e:6fb8))
     pop bc
     pop af
     ld hl,W_PARTYMON1_HP
@@ -95770,10 +95828,10 @@ DecrementPP: ; 68000 (1a:4000)
     ret nz               ; if any of these statuses are true,don't decrement PP
     bit 6,[hl]          ; check 6th bit status flag on W_PLAYERBATTSTATUS2
     ret nz               ; and return if it is set
-    ld hl,$D02D         ; PP of first move (in battle)
+    ld hl,W_PLAYERMONPP ; PP of first move (in battle)
     call .DecrementPP
 
-    ld a,[$D064]        ; load pokemon status bits?
+    ld a,[W_PLAYERBATTSTATUS3] ; load pokemon status bits?
     bit 3,a             ; XXX transform status?
     ret nz               ; If it is,return.  Pokemon Red stores the "current pokemon's" PP
                          ; separately from the "Pokemon in your party's" PP.  This is
@@ -95785,12 +95843,12 @@ DecrementPP: ; 68000 (1a:4000)
                          ; its opponent,which is *not* the same as its real PP as part of your
                          ; party.  So we return,and don't do that part.
 
-    ld hl,$D188         ; PP of first move (in party)
-    ld a,[$CC2F]        ; which mon in party is active
+    ld hl,W_PARTYMON1_MOVE1PP ; PP of first move (in party)
+    ld a,[wPlayerMonNumber] ; which mon in party is active
     ld bc,$2C           ; XXX probably size of party pokemon's data structure
     call AddNTimes       ; calculate address of the mon to modify
 .DecrementPP
-    ld a,[$CC2E]        ; which move (0,1,2,3) did we use?
+    ld a,[wPlayerMoveListIndex] ; which move (0,1,2,3) did we use?
     ld c,a
     ld b,0
     add hl ,bc           ; calculate the address in memory of the PP we need to decrement
@@ -135602,6 +135660,54 @@ EnableBillsTeleport2:
     ld [$d09f],a
     ld a,$17
     jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+
+; ──────────────────────────────────────────────────────────────────────
+
+DecrementEnemyPP_:
+; after using a move,decrement pp in battle and (if not transformed?) in party
+    ld a,[de]
+    cp a,STRUGGLE
+    ret z                ; if the pokemon is using "struggle",there's nothing to do
+                         ; we don't decrement PP for "struggle"
+    ld hl,W_ENEMYBATTSTATUS1
+    ld a,[hli]          ; load the W_ENEMYBATTSTATUS1 pokemon status flags and increment hl to load the
+                         ; W_ENEMYBATTSTATUS2 status flags later
+    and a,7             ; check to see if bits 0,1,or 2 are set
+    ret nz               ; if any of these statuses are true,don't decrement PP
+    bit 6,[hl]          ; check 6th bit status flag on W_ENEMYBATTSTATUS2
+    ret nz               ; and return if it is set
+    ld hl,W_ENEMYMONPP  ; PP of first move (in battle)
+    call .DecrementPP
+
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $2
+    ret nz              ; Update Party only in enemy battle
+
+    ld a,[W_ENEMYBATTSTATUS3] ; load pokemon status bits?
+    bit 3,a             ; XXX transform status?
+    ret nz               ; If it is,return.  Pokemon Red stores the "current pokemon's" PP
+                         ; separately from the "Pokemon in your party's" PP.  This is
+                         ; duplication -- in all cases *other* than Pokemon with Transform.
+                         ; Normally,this means we have to go on and make the same
+                         ; modification to the "party's pokemon" PP that we made to the
+                         ; "current pokemon's" PP.  But,if we're dealing with a Transformed
+                         ; Pokemon,it has separate PP for the move set that it copied from
+                         ; its opponent,which is *not* the same as its real PP as part of your
+                         ; party.  So we return,and don't do that part.
+
+    ld hl,wEnemyMon1 + (W_PARTYMON1_MOVE1PP-W_PARTYMON1DATA) ; $CFFE
+                        ; PP of first move (in party)
+    ld a,[W_ENEMYMONNUMBER] ; which mon in party is active
+    ld bc,$2C           ; XXX probably size of party pokemon's data structure
+    call AddNTimes       ; calculate address of the mon to modify
+.DecrementPP
+    ld a,[wEnemyMoveListIndex] ; which move (0,1,2,3) did we use?
+    ld c,a
+    ld b,0
+    add hl ,bc           ; calculate the address in memory of the PP we need to decrement
+                         ; based on the move chosen.
+    dec [hl]             ; Decrement PP
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 

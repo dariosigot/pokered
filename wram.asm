@@ -1593,6 +1593,11 @@ wEXPBarNeededEXP:
 wEXPBarKeepFullFlag:
     ds 1
 
+wBackupEnemyMoves:
+    ds 4
+wBackupEnemyPP:
+    ds 4
+
 NEXTU
 
 wForceWTWBit0:    ; def0, bit0: Force WTW during Jump
