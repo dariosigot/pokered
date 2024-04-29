@@ -2880,14 +2880,14 @@ LoadFrontSpriteByMonIndex: ; 1389 (0:1389)
     ld [hl],b
     and a
     pop hl
-    jr z,.invalidDexNumber  ; dex #0 invalid
-    cp $98
-    jr c,.validDexNumber    ; dex >#151 invalid
-.invalidDexNumber
-    ld a,RHYDON ; $1
-    ld [$cf91],a
-    ret
-.validDexNumber
+;    jr z,.invalidDexNumber  ; dex #0 invalid
+;    cp $98
+;    jr c,.validDexNumber    ; dex >#151 invalid
+;.invalidDexNumber
+;    ld a,RHYDON ; $1
+;    ld [$cf91],a
+;    ret
+;.validDexNumber
     push hl
     ld de,$9000
     call LoadMonFrontSprite
@@ -2907,6 +2907,8 @@ HackLoadUncompressedPicToHLFromStatusScreen:
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ret
+
+SECTION "PlayCry",ROM0[$13d0]
 
 ; plays the cry of a pokemon
 ; INPUT:
@@ -3172,7 +3174,7 @@ Func_152e: ; 152e (0:152e)
 GetMonHeader: ; 1537 (0:1537)
     ld a,[H_LOADEDROMBANK]
     push af
-    ld a,BANK(BulbasaurBaseStats)
+    ld a,BANK(PokemonBaseStats)
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     push bc
@@ -3182,36 +3184,36 @@ GetMonHeader: ; 1537 (0:1537)
     push af
     ld a,[$d0b5]
     ld [$d11e],a
-    ld de,FossilKabutopsPic
-    ld b,$66 ; size of Kabutops fossil and Ghost sprites
-    cp a,FOSSIL_KABUTOPS ; Kabutops fossil
-    jr z,.specialID
-    ld de,GhostPic
-    cp a,MON_GHOST ; Ghost
-    jr z,.specialID
-    ld de,FossilAerodactylPic
-    ld b,$77 ; size of Aerodactyl fossil sprite
-    cp a,FOSSIL_AERODACTYL ; Aerodactyl fossil
-    jr z,.specialID
+;    ld de,FossilKabutopsPic
+;    ld b,$66 ; size of Kabutops fossil and Ghost sprites
+;    cp a,FOSSIL_KABUTOPS ; Kabutops fossil
+;    jr z,.specialID
+;    ld de,GhostPic
+;    cp a,MON_GHOST ; Ghost
+;    jr z,.specialID
+;    ld de,FossilAerodactylPic
+;    ld b,$77 ; size of Aerodactyl fossil sprite
+;    cp a,FOSSIL_AERODACTYL ; Aerodactyl fossil
+;    jr z,.specialID
     ld a,$3a
     call Predef   ; convert pokemon ID in [$D11E] to pokedex number
     ld a,[$d11e]
-    dec a
+;   dec a ; MissingNo First
     ld bc,28
-    ld hl,BulbasaurBaseStats
+    ld hl,PokemonBaseStats
     call AddNTimes
     ld de,W_MONHEADER
     ld bc,28
     call CopyData
-    jr .done
-.specialID
-    ld hl,W_MONHSPRITEDIM
-    ld [hl],b ; write sprite dimensions
-    inc hl
-    ld [hl],e ; write front sprite pointer
-    inc hl
-    ld [hl],d
-.done
+;    jr .done
+;.specialID
+;    ld hl,W_MONHSPRITEDIM
+;    ld [hl],b ; write sprite dimensions
+;    inc hl
+;    ld [hl],e ; write front sprite pointer
+;    inc hl
+;    ld [hl],d
+;.done
     ld a,[$d0b5]
     ld [$d0b8],a
     pop af
@@ -14164,7 +14166,7 @@ Func_5e2f: ; 5e2f (1:5e2f)
 Func_5e42: ; 5e42 (1:5e42)
     push hl
     ld hl,wPokedexOwned ; $d2f7
-    ld b,$13
+    ld b,wPokedexOwnedEnd - wPokedexOwned
     call CountSetBits
     pop hl
     ld de,$d11e
@@ -23476,9 +23478,9 @@ ItemUseBall: ; d687 (3:5687)
     pop af
     ld [hl],a
     ld a,[$cfe5]    ;enemy
-    ld [$d11c],a
     ld [$cf91],a
     ld [$d11e],a
+    call FlagExitBattle ; Denim,ld [$d11c],a
     ld a,[W_BATTLETYPE]
     dec a
     jr z,.printText1
@@ -23490,7 +23492,7 @@ ItemUseBall: ; d687 (3:5687)
     dec a
     ld c,a
     ld b,2
-    ld hl,$d2f7    ;Dex_own_flags (pokemon)
+    ld hl,wPokedexOwned    ;Dex_own_flags (pokemon)
     ld a,$10
     call Predef    ;check Dex flag (own already or not)
     ld a,c
@@ -25929,6 +25931,14 @@ GetTMChoiceItemID:
     db $d6,"            ▶@"
 .X
     db "×@"
+
+; Routine che inserisce 1 in d11c per assicurarsi l'uscita dalla battle quando un pokemon è stato catturato
+; di default veniva inserito il pkmnID ma dava problemi con 'M a causa del suo ID=0 già utilizzato per gli
+; strumenti curativi o il fallimento di cattura
+FlagExitBattle:
+    ld a,1
+    ld [$d11c],a
+    ret
 
 SECTION "DrawBadges",ROMX[$6a03],BANK[$3]
 
@@ -38149,197 +38159,7 @@ DiglettsCaveEntranceRoute11Blocks: ; 1c20e (7:420e)
 DiglettsCaveRoute2Blocks: ; 0x1c20e size=16
     INCBIN "maps/diglettscaveroute2.blk"
 
-MonsterNames: ; 1c21e (7:421e)
-    db "RHYDON@@@@"
-    db "KANGASKHAN"
-    db "NIDORAN@@@"
-    db "CLEFAIRY@@"
-    db "SPEAROW@@@"
-    db "VOLTORB@@@"
-    db "NIDOKING@@"
-    db "SLOWBRO@@@"
-    db "IVYSAUR@@@"
-    db "EXEGGUTOR@"
-    db "LICKITUNG@"
-    db "EXEGGCUTE@"
-    db "GRIMER@@@@"
-    db "GENGAR@@@@"
-    db "NIDORAN@@@"
-    db "NIDOQUEEN@"
-    db "CUBONE@@@@"
-    db "RHYHORN@@@"
-    db "LAPRAS@@@@"
-    db "ARCANINE@@"
-    db "MEW@@@@@@@"
-    db "GYARADOS@@"
-    db "SHELLDER@@"
-    db "TENTACOOL@"
-    db "GASTLY@@@@"
-    db "SCYTHER@@@"
-    db "STARYU@@@@"
-    db "BLASTOISE@"
-    db "PINSIR@@@@"
-    db "TANGELA@@@"
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "GROWLITHE@"
-    db "ONIX@@@@@@"
-    db "FEAROW@@@@"
-    db "PIDGEY@@@@"
-    db "SLOWPOKE@@"
-    db "KADABRA@@@"
-    db "GRAVELER@@"
-    db "CHANSEY@@@"
-    db "MACHOKE@@@"
-    db "MR.MIME@@@"
-    db "HITMONLEE@"
-    db "HITMONCHAN"
-    db "ARBOK@@@@@"
-    db "PARASECT@@"
-    db "PSYDUCK@@@"
-    db "DROWZEE@@@"
-    db "GOLEM@@@@@"
-    db "MISSINGNO."
-    db "MAGMAR@@@@"
-    db "MISSINGNO."
-    db "ELECTABUZZ"
-    db "MAGNETON@@"
-    db "KOFFING@@@"
-    db "MISSINGNO."
-    db "MANKEY@@@@"
-    db "SEEL@@@@@@"
-    db "DIGLETT@@@"
-    db "TAUROS@@@@"
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "FARFETCH'D"
-    db "VENONAT@@@"
-    db "DRAGONITE@"
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "DODUO@@@@@"
-    db "POLIWAG@@@"
-    db "JYNX@@@@@@"
-    db "MOLTRES@@@"
-    db "ARTICUNO@@"
-    db "ZAPDOS@@@@"
-    db "DITTO@@@@@"
-    db "MEOWTH@@@@"
-    db "KRABBY@@@@"
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "VULPIX@@@@"
-    db "NINETALES@"
-    db "PIKACHU@@@"
-    db "RAICHU@@@@"
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "DRATINI@@@"
-    db "DRAGONAIR@"
-    db "KABUTO@@@@"
-    db "KABUTOPS@@"
-    db "HORSEA@@@@"
-    db "SEADRA@@@@"
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "SANDSHREW@"
-    db "SANDSLASH@"
-    db "OMANYTE@@@"
-    db "OMASTAR@@@"
-    db "JIGGLYPUFF"
-    db "WIGGLYTUFF"
-    db "EEVEE@@@@@"
-    db "FLAREON@@@"
-    db "JOLTEON@@@"
-    db "VAPOREON@@"
-    db "MACHOP@@@@"
-    db "ZUBAT@@@@@"
-    db "EKANS@@@@@"
-    db "PARAS@@@@@"
-    db "POLIWHIRL@"
-    db "POLIWRATH@"
-    db "WEEDLE@@@@"
-    db "KAKUNA@@@@"
-    db "BEEDRILL@@"
-    db "MISSINGNO."
-    db "DODRIO@@@@"
-    db "PRIMEAPE@@"
-    db "DUGTRIO@@@"
-    db "VENOMOTH@@"
-    db "DEWGONG@@@"
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "CATERPIE@@"
-    db "METAPOD@@@"
-    db "BUTTERFREE"
-    db "MACHAMP@@@"
-    db "MISSINGNO."
-    db "GOLDUCK@@@"
-    db "HYPNO@@@@@"
-    db "GOLBAT@@@@"
-    db "MEWTWO@@@@"
-    db "SNORLAX@@@"
-    db "MAGIKARP@@"
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "MUK@@@@@@@"
-    db "MISSINGNO."
-    db "KINGLER@@@"
-    db "CLOYSTER@@"
-    db "MISSINGNO."
-    db "ELECTRODE@"
-    db "CLEFABLE@@"
-    db "WEEZING@@@"
-    db "PERSIAN@@@"
-    db "MAROWAK@@@"
-    db "MISSINGNO."
-    db "HAUNTER@@@"
-    db "ABRA@@@@@@"
-    db "ALAKAZAM@@"
-    db "PIDGEOTTO@"
-    db "PIDGEOT@@@"
-    db "STARMIE@@@"
-    db "BULBASAUR@"
-    db "VENUSAUR@@"
-    db "TENTACRUEL"
-    db "MISSINGNO."
-    db "GOLDEEN@@@"
-    db "SEAKING@@@"
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "PONYTA@@@@"
-    db "RAPIDASH@@"
-    db "RATTATA@@@"
-    db "RATICATE@@"
-    db "NIDORINO@@"
-    db "NIDORINA@@"
-    db "GEODUDE@@@"
-    db "PORYGON@@@"
-    db "AERODACTYL"
-    db "MISSINGNO."
-    db "MAGNEMITE@"
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "CHARMANDER"
-    db "SQUIRTLE@@"
-    db "CHARMELEON"
-    db "WARTORTLE@"
-    db "CHARIZARD@"
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "MISSINGNO."
-    db "ODDISH@@@@"
-    db "GLOOM@@@@@"
-    db "VILEPLUME@"
-    db "BELLSPROUT"
-    db "WEEPINBELL"
-    db "VICTREEBEL"
+SECTION "Func_1c98a",ROMX[$498a],BANK[$7]
 
 Func_1c98a: ; 1c98a (7:498a)
     call ClearScreen
@@ -39536,8 +39356,8 @@ OaksLabText5: ; 1d248 (7:5248)
     ld a,[$d747]
     bit 6,a
     jr nz,.asm_50e81 ; 0x1d24e
-    ld hl,$d2f7
-    ld b,$13
+    ld hl,wPokedexOwned
+    ld b,wPokedexOwnedEnd - wPokedexOwned
     call CountSetBits
     ld a,[$d11e]
     cp $2
@@ -42582,8 +42402,8 @@ UnnamedText_1e960: ; 1e960 (7:6960)
     db "@"
 
     call EnableAutoTextBoxDrawing
-    ld hl,$d2f7
-    ld b,$13
+    ld hl,wPokedexOwned ; $d2f7
+    ld b,wPokedexOwnedEnd - wPokedexOwned
     call CountSetBits
     ld a,[$d11e]
     cp $2
@@ -47669,10 +47489,6 @@ SquirtlePicFront: ; 35db8 (d:5db8)
     INCBIN "pic/bmon/squirtle.pic"
 SquirtlePicBack: ; 35e8f (d:5e8f)
     INCBIN "pic/monback/squirtleb.pic"
-FossilAerodactylPic: ; 36536 (d:6536)
-    INCBIN "pic/bmon/fossilaerodactyl.pic"
-GhostPic: ; 366b5 (d:66b5)
-    INCBIN "pic/other/ghost.pic"
 
 SECTION "Unknown_37244",ROMX[$7244],BANK[$D]
 
@@ -48996,200 +48812,7 @@ Moves: ; 38000 (e:4000)
 
 INCLUDE "constants/moves.asm"
 
-SECTION "CryData",ROMX[$5446],BANK[$e]
-
-CryData: ; 39446 (e:5446)
-    ;$BaseCry,$Pitch,$Length
-    db $11,$00,$80; Rhydon
-    db $03,$00,$80; Kangaskhan
-    db $00,$00,$80; Nidoran♂
-    db $19,$CC,$01; Clefairy
-    db $10,$00,$80; Spearow
-    db $06,$ED,$80; Voltorb
-    db $09,$00,$80; Nidoking
-    db $1F,$00,$80; Slowbro
-    db $0F,$20,$80; Ivysaur
-    db $0D,$00,$80; Exeggutor
-    db $0C,$00,$80; Lickitung
-    db $0B,$00,$80; Exeggcute
-    db $05,$00,$80; Grimer
-    db $07,$00,$FF; Gengar
-    db $01,$00,$80; Nidoran♀
-    db $0A,$00,$80; Nidoqueen
-    db $19,$00,$80; Cubone
-    db $04,$00,$80; Rhyhorn
-    db $1B,$00,$80; Lapras
-    db $15,$00,$80; Arcanine
-    db $1E,$EE,$FF; Mew
-    db $17,$00,$80; Gyarados
-    db $18,$00,$80; Shellder
-    db $1A,$00,$80; Tentacool
-    db $1C,$00,$80; Gastly
-    db $16,$00,$80; Scyther
-    db $1E,$02,$20; Staryu
-    db $13,$00,$80; Blastoise
-    db $14,$00,$80; Pinsir
-    db $12,$00,$80; Tangela
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $1F,$20,$40; Growlithe
-    db $17,$FF,$C0; Onix
-    db $18,$40,$A0; Fearow
-    db $0E,$DF,$04; Pidgey
-    db $02,$00,$80; Slowpoke
-    db $1C,$A8,$C0; Kadabra
-    db $24,$00,$80; Graveler
-    db $14,$0A,$C0; Chansey
-    db $1F,$48,$60; Machoke
-    db $20,$08,$40; Mr.Mime
-    db $12,$80,$C0; Hitmonlee
-    db $0C,$EE,$C0; Hitmonchan
-    db $17,$E0,$10; Arbok
-    db $1E,$42,$FF; Parasect
-    db $21,$20,$60; Psyduck
-    db $0D,$88,$20; Drowzee
-    db $12,$E0,$40; Golem
-    db $00,$00,$00; MissingNo.
-    db $04,$FF,$30; Magmar
-    db $00,$00,$00; MissingNo.
-    db $06,$8F,$FF; Electabuzz
-    db $1C,$20,$C0; Magneton
-    db $12,$E6,$DD; Koffing
-    db $00,$00,$00; MissingNo.
-    db $0A,$DD,$60; Mankey
-    db $0C,$88,$C0; Seel
-    db $0B,$AA,$01; Diglett
-    db $1D,$11,$40; Tauros
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $10,$DD,$01; Farfetch'd
-    db $1A,$44,$40; Venonat
-    db $0F,$3C,$C0; Dragonite
-    db $00,$80,$10; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $1D,$E0,$80; MissingNo.
-    db $0B,$BB,$01; Doduo
-    db $0E,$FF,$FF; Poliwag
-    db $0D,$FF,$FF; Jynx
-    db $09,$F8,$40; Moltres
-    db $09,$80,$40; Articuno
-    db $18,$FF,$80; Zapdos
-    db $0E,$FF,$FF; Ditto
-    db $19,$77,$10; Meowth
-    db $20,$20,$E0; Krabby
-    db $22,$FF,$40; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $0E,$E0,$60; MissingNo.
-    db $24,$4F,$10; Vulpix
-    db $24,$88,$60; Ninetales
-    db $0F,$EE,$01; Pikachu
-    db $09,$EE,$08; Raichu
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $0F,$60,$40; Dratini
-    db $0F,$40,$80; Dragonair
-    db $16,$BB,$40; Kabuto
-    db $18,$EE,$01; Kabutops
-    db $19,$99,$10; Horsea
-    db $19,$3C,$01; Seadra
-    db $0F,$40,$C0; MissingNo.
-    db $0F,$20,$C0; MissingNo.
-    db $00,$20,$40; Sandshrew
-    db $00,$FF,$FF; Sandslash
-    db $1F,$F0,$01; Omanyte
-    db $1F,$FF,$40; Omastar
-    db $0E,$FF,$35; Jigglypuff
-    db $0E,$68,$60; Wigglytuff
-    db $1A,$88,$60; Eevee
-    db $1A,$10,$20; Flareon
-    db $1A,$3D,$80; Jolteon
-    db $1A,$AA,$FF; Vaporeon
-    db $1F,$EE,$01; Machop
-    db $1D,$E0,$80; Zubat
-    db $17,$12,$40; Ekans
-    db $1E,$20,$E0; Paras
-    db $0E,$77,$60; Poliwhirl
-    db $0E,$00,$FF; Poliwrath
-    db $15,$EE,$01; Weedle
-    db $13,$FF,$01; Kakuna
-    db $13,$60,$80; Beedrill
-    db $00,$00,$00; MissingNo.
-    db $0B,$99,$20; Dodrio
-    db $0A,$AF,$40; Primeape
-    db $0B,$2A,$10; Dugtrio
-    db $1A,$29,$80; Venomoth
-    db $0C,$23,$FF; Dewgong
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $16,$80,$20; Caterpie
-    db $1C,$CC,$01; Metapod
-    db $16,$77,$40; Butterfree
-    db $1F,$08,$C0; Machamp
-    db $11,$20,$10; MissingNo.
-    db $21,$FF,$40; Golduck
-    db $0D,$EE,$40; Hypno
-    db $1D,$FA,$80; Golbat
-    db $1E,$99,$FF; Mewtwo
-    db $05,$55,$01; Snorlax
-    db $17,$80,$00; Magikarp
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $07,$EF,$FF; Muk
-    db $0F,$40,$80; MissingNo.
-    db $20,$EE,$E0; Kingler
-    db $18,$6F,$E0; Cloyster
-    db $00,$00,$00; MissingNo.
-    db $06,$A8,$90; Electrode
-    db $19,$AA,$20; Clefable
-    db $12,$FF,$FF; Weezing
-    db $19,$99,$FF; Persian
-    db $08,$4F,$60; Marowak
-    db $00,$00,$00; MissingNo.
-    db $1C,$30,$40; Haunter
-    db $1C,$C0,$01; Abra
-    db $1C,$98,$FF; Alakazam
-    db $14,$28,$C0; Pidgeotto
-    db $14,$11,$FF; Pidgeot
-    db $1E,$00,$80; Starmie
-    db $0F,$80,$01; Bulbasaur
-    db $0F,$00,$C0; Venusaur
-    db $1A,$EE,$FF; Tentacruel
-    db $00,$00,$00; MissingNo.
-    db $16,$80,$40; Goldeen
-    db $16,$10,$FF; Seaking
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $25,$00,$80; Ponyta
-    db $25,$20,$C0; Rapidash
-    db $22,$00,$80; Rattata
-    db $22,$20,$FF; Raticate
-    db $00,$2C,$C0; Nidorino
-    db $01,$2C,$E0; Nidorina
-    db $24,$F0,$10; Geodude
-    db $25,$AA,$FF; Porygon
-    db $23,$20,$F0; Aerodactyl
-    db $00,$00,$00; MissingNo.
-    db $1C,$80,$60; Magnemite
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $04,$60,$40; Charmander
-    db $1D,$60,$40; Squirtle
-    db $04,$20,$40; Charmeleon
-    db $1D,$20,$40; Wartortle
-    db $04,$00,$80; Charizard
-    db $1D,$00,$80; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $00,$00,$00; MissingNo.
-    db $08,$DD,$01; Oddish
-    db $08,$AA,$40; Gloom
-    db $23,$22,$FF; Vileplume
-    db $21,$55,$01; Bellsprout
-    db $25,$44,$20; Weepinbell
-    db $25,$66,$CC; Victreebel
+SECTION "Func_39680",ROMX[$5680],BANK[$e]
 
 Func_39680: ; 39680 (e:5680)
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -49347,198 +48970,6 @@ WriteMonMoves_ShiftMoveData: ; Moved in the Bank
 Func_3b057: ; Moved in the Bank
     ld a,$10
     jp Predef ; indirect jump to HandleBitArray (f666 (3:7666))
-
-EvosMovesPointerTable: ; Moved in the Bank
-    dw Mon112_EvosMoves
-    dw Mon115_EvosMoves
-    dw Mon032_EvosMoves
-    dw Mon035_EvosMoves
-    dw Mon021_EvosMoves
-    dw Mon100_EvosMoves
-    dw Mon034_EvosMoves
-    dw Mon080_EvosMoves
-    dw Mon002_EvosMoves
-    dw Mon103_EvosMoves
-    dw Mon108_EvosMoves
-    dw Mon102_EvosMoves
-    dw Mon088_EvosMoves
-    dw Mon094_EvosMoves
-    dw Mon029_EvosMoves
-    dw Mon031_EvosMoves
-    dw Mon104_EvosMoves
-    dw Mon111_EvosMoves
-    dw Mon131_EvosMoves
-    dw Mon059_EvosMoves
-    dw Mon151_EvosMoves
-    dw Mon130_EvosMoves
-    dw Mon090_EvosMoves
-    dw Mon072_EvosMoves
-    dw Mon092_EvosMoves
-    dw Mon123_EvosMoves
-    dw Mon120_EvosMoves
-    dw Mon009_EvosMoves
-    dw Mon127_EvosMoves
-    dw Mon114_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon058_EvosMoves
-    dw Mon095_EvosMoves
-    dw Mon022_EvosMoves
-    dw Mon016_EvosMoves
-    dw Mon079_EvosMoves
-    dw Mon064_EvosMoves
-    dw Mon075_EvosMoves
-    dw Mon113_EvosMoves
-    dw Mon067_EvosMoves
-    dw Mon122_EvosMoves
-    dw Mon106_EvosMoves
-    dw Mon107_EvosMoves
-    dw Mon024_EvosMoves
-    dw Mon047_EvosMoves
-    dw Mon054_EvosMoves
-    dw Mon096_EvosMoves
-    dw Mon076_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon126_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon125_EvosMoves
-    dw Mon082_EvosMoves
-    dw Mon109_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon056_EvosMoves
-    dw Mon086_EvosMoves
-    dw Mon050_EvosMoves
-    dw Mon128_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon083_EvosMoves
-    dw Mon048_EvosMoves
-    dw Mon149_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon084_EvosMoves
-    dw Mon060_EvosMoves
-    dw Mon124_EvosMoves
-    dw Mon146_EvosMoves
-    dw Mon144_EvosMoves
-    dw Mon145_EvosMoves
-    dw Mon132_EvosMoves
-    dw Mon052_EvosMoves
-    dw Mon098_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon037_EvosMoves
-    dw Mon038_EvosMoves
-    dw Mon025_EvosMoves
-    dw Mon026_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon147_EvosMoves
-    dw Mon148_EvosMoves
-    dw Mon140_EvosMoves
-    dw Mon141_EvosMoves
-    dw Mon116_EvosMoves
-    dw Mon117_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon027_EvosMoves
-    dw Mon028_EvosMoves
-    dw Mon138_EvosMoves
-    dw Mon139_EvosMoves
-    dw Mon039_EvosMoves
-    dw Mon040_EvosMoves
-    dw Mon133_EvosMoves
-    dw Mon136_EvosMoves
-    dw Mon135_EvosMoves
-    dw Mon134_EvosMoves
-    dw Mon066_EvosMoves
-    dw Mon041_EvosMoves
-    dw Mon023_EvosMoves
-    dw Mon046_EvosMoves
-    dw Mon061_EvosMoves
-    dw Mon062_EvosMoves
-    dw Mon013_EvosMoves
-    dw Mon014_EvosMoves
-    dw Mon015_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon085_EvosMoves
-    dw Mon057_EvosMoves
-    dw Mon051_EvosMoves
-    dw Mon049_EvosMoves
-    dw Mon087_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon010_EvosMoves
-    dw Mon011_EvosMoves
-    dw Mon012_EvosMoves
-    dw Mon068_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon055_EvosMoves
-    dw Mon097_EvosMoves
-    dw Mon042_EvosMoves
-    dw Mon150_EvosMoves
-    dw Mon143_EvosMoves
-    dw Mon129_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon089_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon099_EvosMoves
-    dw Mon091_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon101_EvosMoves
-    dw Mon036_EvosMoves
-    dw Mon110_EvosMoves
-    dw Mon053_EvosMoves
-    dw Mon105_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon093_EvosMoves
-    dw Mon063_EvosMoves
-    dw Mon065_EvosMoves
-    dw Mon017_EvosMoves
-    dw Mon018_EvosMoves
-    dw Mon121_EvosMoves
-    dw Mon001_EvosMoves
-    dw Mon003_EvosMoves
-    dw Mon073_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon118_EvosMoves
-    dw Mon119_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon077_EvosMoves
-    dw Mon078_EvosMoves
-    dw Mon019_EvosMoves
-    dw Mon020_EvosMoves
-    dw Mon033_EvosMoves
-    dw Mon030_EvosMoves
-    dw Mon074_EvosMoves
-    dw Mon137_EvosMoves
-    dw Mon142_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon081_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon004_EvosMoves
-    dw Mon007_EvosMoves
-    dw Mon005_EvosMoves
-    dw Mon008_EvosMoves
-    dw Mon006_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon043_EvosMoves
-    dw Mon044_EvosMoves
-    dw Mon045_EvosMoves
-    dw Mon069_EvosMoves
-    dw Mon070_EvosMoves
-    dw Mon071_EvosMoves
 
 GoPalSetBattleAndLoadText:
     ld b,1
@@ -50966,12 +50397,12 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     ld a,[$d11e]
-    dec a
-    ld hl,BulbasaurBaseStats ; $43de
+;   dec a ; MissingNo First
+    ld hl,PokemonBaseStats ; $43de
     ld bc,$1c
     call AddNTimes
     ld de,W_MONHEADER
-    ld a,BANK(BulbasaurBaseStats)
+    ld a,BANK(PokemonBaseStats)
     call FarCopyData
     ld a,[$d0b5]
     ld [$d0b8],a
@@ -52071,6 +51502,529 @@ GetEvosMoves:
     ld hl,GenericBuffer+1
     pop de
     ret
+
+EvosMovesPointerTable: ; Moved in the Bank
+    dw Mon112_EvosMoves
+    dw Mon115_EvosMoves
+    dw Mon032_EvosMoves
+    dw Mon035_EvosMoves
+    dw Mon021_EvosMoves
+    dw Mon100_EvosMoves
+    dw Mon034_EvosMoves
+    dw Mon080_EvosMoves
+    dw Mon002_EvosMoves
+    dw Mon103_EvosMoves
+    dw Mon108_EvosMoves
+    dw Mon102_EvosMoves
+    dw Mon088_EvosMoves
+    dw Mon094_EvosMoves
+    dw Mon029_EvosMoves
+    dw Mon031_EvosMoves
+    dw Mon104_EvosMoves
+    dw Mon111_EvosMoves
+    dw Mon131_EvosMoves
+    dw Mon059_EvosMoves
+    dw Mon151_EvosMoves
+    dw Mon130_EvosMoves
+    dw Mon090_EvosMoves
+    dw Mon072_EvosMoves
+    dw Mon092_EvosMoves
+    dw Mon123_EvosMoves
+    dw Mon120_EvosMoves
+    dw Mon009_EvosMoves
+    dw Mon127_EvosMoves
+    dw Mon114_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon058_EvosMoves
+    dw Mon095_EvosMoves
+    dw Mon022_EvosMoves
+    dw Mon016_EvosMoves
+    dw Mon079_EvosMoves
+    dw Mon064_EvosMoves
+    dw Mon075_EvosMoves
+    dw Mon113_EvosMoves
+    dw Mon067_EvosMoves
+    dw Mon122_EvosMoves
+    dw Mon106_EvosMoves
+    dw Mon107_EvosMoves
+    dw Mon024_EvosMoves
+    dw Mon047_EvosMoves
+    dw Mon054_EvosMoves
+    dw Mon096_EvosMoves
+    dw Mon076_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon126_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon125_EvosMoves
+    dw Mon082_EvosMoves
+    dw Mon109_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon056_EvosMoves
+    dw Mon086_EvosMoves
+    dw Mon050_EvosMoves
+    dw Mon128_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon083_EvosMoves
+    dw Mon048_EvosMoves
+    dw Mon149_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon084_EvosMoves
+    dw Mon060_EvosMoves
+    dw Mon124_EvosMoves
+    dw Mon146_EvosMoves
+    dw Mon144_EvosMoves
+    dw Mon145_EvosMoves
+    dw Mon132_EvosMoves
+    dw Mon052_EvosMoves
+    dw Mon098_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon037_EvosMoves
+    dw Mon038_EvosMoves
+    dw Mon025_EvosMoves
+    dw Mon026_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon147_EvosMoves
+    dw Mon148_EvosMoves
+    dw Mon140_EvosMoves
+    dw Mon141_EvosMoves
+    dw Mon116_EvosMoves
+    dw Mon117_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon027_EvosMoves
+    dw Mon028_EvosMoves
+    dw Mon138_EvosMoves
+    dw Mon139_EvosMoves
+    dw Mon039_EvosMoves
+    dw Mon040_EvosMoves
+    dw Mon133_EvosMoves
+    dw Mon136_EvosMoves
+    dw Mon135_EvosMoves
+    dw Mon134_EvosMoves
+    dw Mon066_EvosMoves
+    dw Mon041_EvosMoves
+    dw Mon023_EvosMoves
+    dw Mon046_EvosMoves
+    dw Mon061_EvosMoves
+    dw Mon062_EvosMoves
+    dw Mon013_EvosMoves
+    dw Mon014_EvosMoves
+    dw Mon015_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon085_EvosMoves
+    dw Mon057_EvosMoves
+    dw Mon051_EvosMoves
+    dw Mon049_EvosMoves
+    dw Mon087_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon010_EvosMoves
+    dw Mon011_EvosMoves
+    dw Mon012_EvosMoves
+    dw Mon068_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon055_EvosMoves
+    dw Mon097_EvosMoves
+    dw Mon042_EvosMoves
+    dw Mon150_EvosMoves
+    dw Mon143_EvosMoves
+    dw Mon129_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon089_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon099_EvosMoves
+    dw Mon091_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon101_EvosMoves
+    dw Mon036_EvosMoves
+    dw Mon110_EvosMoves
+    dw Mon053_EvosMoves
+    dw Mon105_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon093_EvosMoves
+    dw Mon063_EvosMoves
+    dw Mon065_EvosMoves
+    dw Mon017_EvosMoves
+    dw Mon018_EvosMoves
+    dw Mon121_EvosMoves
+    dw Mon001_EvosMoves
+    dw Mon003_EvosMoves
+    dw Mon073_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon118_EvosMoves
+    dw Mon119_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon077_EvosMoves
+    dw Mon078_EvosMoves
+    dw Mon019_EvosMoves
+    dw Mon020_EvosMoves
+    dw Mon033_EvosMoves
+    dw Mon030_EvosMoves
+    dw Mon074_EvosMoves
+    dw Mon137_EvosMoves
+    dw Mon142_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon081_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon004_EvosMoves
+    dw Mon007_EvosMoves
+    dw Mon005_EvosMoves
+    dw Mon008_EvosMoves
+    dw Mon006_EvosMoves
+    dw MissingNo_EvosMoves
+    dw Mon141_EvosMoves ; Kabutops Fossil
+    dw Mon142_EvosMoves ; Aerodactyl Fossil
+    dw Mon093_EvosMoves ; Ghost
+    dw Mon043_EvosMoves
+    dw Mon044_EvosMoves
+    dw Mon045_EvosMoves
+    dw Mon069_EvosMoves
+    dw Mon070_EvosMoves
+    dw Mon071_EvosMoves
+    ; Denim
+    dw MissingNo_EvosMoves ; $BF
+    dw MissingNo_EvosMoves ; $C0
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves ; $D0
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves ; $E0
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves ; $F0
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves
+    dw MissingNo_EvosMoves ; $FF
+
+ApostropheMEvosMovesPointerTable:
+    dw MissingNo_EvosMoves ; TODO
+
+CryData: ; Moved in the Bank
+    ;$BaseCry,$Pitch,$Length
+    db $11,$00,$80; Rhydon
+    db $03,$00,$80; Kangaskhan
+    db $00,$00,$80; Nidoran♂
+    db $19,$CC,$01; Clefairy
+    db $10,$00,$80; Spearow
+    db $06,$ED,$80; Voltorb
+    db $09,$00,$80; Nidoking
+    db $1F,$00,$80; Slowbro
+    db $0F,$20,$80; Ivysaur
+    db $0D,$00,$80; Exeggutor
+    db $0C,$00,$80; Lickitung
+    db $0B,$00,$80; Exeggcute
+    db $05,$00,$80; Grimer
+    db $07,$00,$FF; Gengar
+    db $01,$00,$80; Nidoran♀
+    db $0A,$00,$80; Nidoqueen
+    db $19,$00,$80; Cubone
+    db $04,$00,$80; Rhyhorn
+    db $1B,$00,$80; Lapras
+    db $15,$00,$80; Arcanine
+    db $1E,$EE,$FF; Mew
+    db $17,$00,$80; Gyarados
+    db $18,$00,$80; Shellder
+    db $1A,$00,$80; Tentacool
+    db $1C,$00,$80; Gastly
+    db $16,$00,$80; Scyther
+    db $1E,$02,$20; Staryu
+    db $13,$00,$80; Blastoise
+    db $14,$00,$80; Pinsir
+    db $12,$00,$80; Tangela
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $1F,$20,$40; Growlithe
+    db $17,$FF,$C0; Onix
+    db $18,$40,$A0; Fearow
+    db $0E,$DF,$04; Pidgey
+    db $02,$00,$80; Slowpoke
+    db $1C,$A8,$C0; Kadabra
+    db $24,$00,$80; Graveler
+    db $14,$0A,$C0; Chansey
+    db $1F,$48,$60; Machoke
+    db $20,$08,$40; Mr.Mime
+    db $12,$80,$C0; Hitmonlee
+    db $0C,$EE,$C0; Hitmonchan
+    db $17,$E0,$10; Arbok
+    db $1E,$42,$FF; Parasect
+    db $21,$20,$60; Psyduck
+    db $0D,$88,$20; Drowzee
+    db $12,$E0,$40; Golem
+    db $00,$00,$00; MissingNo.
+    db $04,$FF,$30; Magmar
+    db $00,$00,$00; MissingNo.
+    db $06,$8F,$FF; Electabuzz
+    db $1C,$20,$C0; Magneton
+    db $12,$E6,$DD; Koffing
+    db $00,$00,$00; MissingNo.
+    db $0A,$DD,$60; Mankey
+    db $0C,$88,$C0; Seel
+    db $0B,$AA,$01; Diglett
+    db $1D,$11,$40; Tauros
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $10,$DD,$01; Farfetch'd
+    db $1A,$44,$40; Venonat
+    db $0F,$3C,$C0; Dragonite
+    db $00,$80,$10; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $1D,$E0,$80; MissingNo.
+    db $0B,$BB,$01; Doduo
+    db $0E,$FF,$FF; Poliwag
+    db $0D,$FF,$FF; Jynx
+    db $09,$F8,$40; Moltres
+    db $09,$80,$40; Articuno
+    db $18,$FF,$80; Zapdos
+    db $0E,$FF,$FF; Ditto
+    db $19,$77,$10; Meowth
+    db $20,$20,$E0; Krabby
+    db $22,$FF,$40; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $0E,$E0,$60; MissingNo.
+    db $24,$4F,$10; Vulpix
+    db $24,$88,$60; Ninetales
+    db $0F,$EE,$01; Pikachu
+    db $09,$EE,$08; Raichu
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $0F,$60,$40; Dratini
+    db $0F,$40,$80; Dragonair
+    db $16,$BB,$40; Kabuto
+    db $18,$EE,$01; Kabutops
+    db $19,$99,$10; Horsea
+    db $19,$3C,$01; Seadra
+    db $0F,$40,$C0; MissingNo.
+    db $0F,$20,$C0; MissingNo.
+    db $00,$20,$40; Sandshrew
+    db $00,$FF,$FF; Sandslash
+    db $1F,$F0,$01; Omanyte
+    db $1F,$FF,$40; Omastar
+    db $0E,$FF,$35; Jigglypuff
+    db $0E,$68,$60; Wigglytuff
+    db $1A,$88,$60; Eevee
+    db $1A,$10,$20; Flareon
+    db $1A,$3D,$80; Jolteon
+    db $1A,$AA,$FF; Vaporeon
+    db $1F,$EE,$01; Machop
+    db $1D,$E0,$80; Zubat
+    db $17,$12,$40; Ekans
+    db $1E,$20,$E0; Paras
+    db $0E,$77,$60; Poliwhirl
+    db $0E,$00,$FF; Poliwrath
+    db $15,$EE,$01; Weedle
+    db $13,$FF,$01; Kakuna
+    db $13,$60,$80; Beedrill
+    db $00,$00,$00; MissingNo.
+    db $0B,$99,$20; Dodrio
+    db $0A,$AF,$40; Primeape
+    db $0B,$2A,$10; Dugtrio
+    db $1A,$29,$80; Venomoth
+    db $0C,$23,$FF; Dewgong
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $16,$80,$20; Caterpie
+    db $1C,$CC,$01; Metapod
+    db $16,$77,$40; Butterfree
+    db $1F,$08,$C0; Machamp
+    db $11,$20,$10; MissingNo.
+    db $21,$FF,$40; Golduck
+    db $0D,$EE,$40; Hypno
+    db $1D,$FA,$80; Golbat
+    db $1E,$99,$FF; Mewtwo
+    db $05,$55,$01; Snorlax
+    db $17,$80,$00; Magikarp
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $07,$EF,$FF; Muk
+    db $0F,$40,$80; MissingNo.
+    db $20,$EE,$E0; Kingler
+    db $18,$6F,$E0; Cloyster
+    db $00,$00,$00; MissingNo.
+    db $06,$A8,$90; Electrode
+    db $19,$AA,$20; Clefable
+    db $12,$FF,$FF; Weezing
+    db $19,$99,$FF; Persian
+    db $08,$4F,$60; Marowak
+    db $00,$00,$00; MissingNo.
+    db $1C,$30,$40; Haunter
+    db $1C,$C0,$01; Abra
+    db $1C,$98,$FF; Alakazam
+    db $14,$28,$C0; Pidgeotto
+    db $14,$11,$FF; Pidgeot
+    db $1E,$00,$80; Starmie
+    db $0F,$80,$01; Bulbasaur
+    db $0F,$00,$C0; Venusaur
+    db $1A,$EE,$FF; Tentacruel
+    db $00,$00,$00; MissingNo.
+    db $16,$80,$40; Goldeen
+    db $16,$10,$FF; Seaking
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $25,$00,$80; Ponyta
+    db $25,$20,$C0; Rapidash
+    db $22,$00,$80; Rattata
+    db $22,$20,$FF; Raticate
+    db $00,$2C,$C0; Nidorino
+    db $01,$2C,$E0; Nidorina
+    db $24,$F0,$10; Geodude
+    db $25,$AA,$FF; Porygon
+    db $23,$20,$F0; Aerodactyl
+    db $00,$00,$00; MissingNo.
+    db $1C,$80,$60; Magnemite
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $04,$60,$40; Charmander
+    db $1D,$60,$40; Squirtle
+    db $04,$20,$40; Charmeleon
+    db $1D,$20,$40; Wartortle
+    db $04,$00,$80; Charizard
+    db $1D,$00,$80; MissingNo.
+    db $18,$EE,$01; Kabutops Fossil
+    db $23,$20,$F0; Aerodactyl Fossil
+    db $1C,$30,$40; Ghost
+    db $08,$DD,$01; Oddish
+    db $08,$AA,$40; Gloom
+    db $23,$22,$FF; Vileplume
+    db $21,$55,$01; Bellsprout
+    db $25,$44,$20; Weepinbell
+    db $25,$66,$CC; Victreebel
+    ; Denim
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo. ; $C0
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo. ; $D0
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo. ; $E0
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo. ; $F0
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo.
+    db $00,$00,$00; MissingNo. ; $FF
+
+ApostropheMCryData:
+    db $18,$F7,$7E
 
 SECTION "bankF",ROMX,BANK[$F]
 
@@ -60806,26 +60760,32 @@ SMALL_PIC  EQU $55
 MEDIUM_PIC EQU $66
 LARGE_PIC  EQU $77
 
-NUM_OF_HYBRID EQU 3
+NUM_OF_HYBRID EQU 4
 
 HybridSpriteInfo:
     db FOSSIL_KABUTOPS
     db MEDIUM_PIC
     db BANK(FossilKabutopsPic)
     dw FossilKabutopsPic
-    dw 0 ;TODO
+	dw FossilKabutopsBack
 
     db FOSSIL_AERODACTYL
     db LARGE_PIC
     db BANK(FossilAerodactylPic)
     dw FossilAerodactylPic
-    dw 0 ;TODO
+	dw ApostropheMPicBack ; TODO
 
     db MON_GHOST
     db MEDIUM_PIC
     db BANK(GhostPic)
     dw GhostPic
-    dw 0 ;TODO
+	dw ApostropheMPicBack ; TODO
+
+    db CHARIZARD_M
+	db LARGE_PIC
+	db BANK(CharizardMPicFront)
+	dw CharizardMPicFront
+	dw CharizardMPicBack
 
 CheckSpecialHybridSprite: ; Denim
     ld a,[$cf91] ; Pkmn ID
@@ -61640,7 +61600,7 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld hl,Coord
     call DrawPokedexVerticalLine
     ld hl,wPokedexSeen
-    ld b,19
+    ld b,wPokedexSeenEnd - wPokedexSeen
     call CountSetBits
     ld de,$d11e
     FuncCoord 16,3
@@ -61648,7 +61608,7 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld bc,$0103
     call PrintNumber ; print number of seen pokemon
     ld hl,wPokedexOwned
-    ld b,19
+    ld b,wPokedexOwnedEnd - wPokedexOwned
     call CountSetBits
     ld de,$d11e
     FuncCoord 16,6
@@ -62102,197 +62062,14 @@ DrawTileLine: ; 40474 (10:4474)
     pop bc
     ret
 
-PokedexEntryPointers: ; 4047e (10:447e)
-    dw RhydonDexEntry
-    dw KangaskhanDexEntry
-    dw NidoranMDexEntry
-    dw ClefairyDexEntry
-    dw SpearowDexEntry
-    dw VoltorbDexEntry
-    dw NidokingDexEntry
-    dw SlowbroDexEntry
-    dw IvysaurDexEntry
-    dw ExeggutorDexEntry
-    dw LickitungDexEntry
-    dw ExeggcuteDexEntry
-    dw GrimerDexEntry
-    dw GengarDexEntry
-    dw NidoranFDexEntry
-    dw NidoqueenDexEntry
-    dw CuboneDexEntry
-    dw RhyhornDexEntry
-    dw LaprasDexEntry
-    dw ArcanineDexEntry
-    dw MewDexEntry
-    dw GyaradosDexEntry
-    dw ShellderDexEntry
-    dw TentacoolDexEntry
-    dw GastlyDexEntry
-    dw ScytherDexEntry
-    dw StaryuDexEntry
-    dw BlastoiseDexEntry
-    dw PinsirDexEntry
-    dw TangelaDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw GrowlitheDexEntry
-    dw OnixDexEntry
-    dw FearowDexEntry
-    dw PidgeyDexEntry
-    dw SlowpokeDexEntry
-    dw KadabraDexEntry
-    dw GravelerDexEntry
-    dw ChanseyDexEntry
-    dw MachokeDexEntry
-    dw MrMimeDexEntry
-    dw HitmonleeDexEntry
-    dw HitmonchanDexEntry
-    dw ArbokDexEntry
-    dw ParasectDexEntry
-    dw PsyduckDexEntry
-    dw DrowzeeDexEntry
-    dw GolemDexEntry
-    dw MissingNoDexEntry
-    dw MagmarDexEntry
-    dw MissingNoDexEntry
-    dw ElectabuzzDexEntry
-    dw MagnetonDexEntry
-    dw KoffingDexEntry
-    dw MissingNoDexEntry
-    dw MankeyDexEntry
-    dw SeelDexEntry
-    dw DiglettDexEntry
-    dw TaurosDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw FarfetchdDexEntry
-    dw VenonatDexEntry
-    dw DragoniteDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw DoduoDexEntry
-    dw PoliwagDexEntry
-    dw JynxDexEntry
-    dw MoltresDexEntry
-    dw ArticunoDexEntry
-    dw ZapdosDexEntry
-    dw DittoDexEntry
-    dw MeowthDexEntry
-    dw KrabbyDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw VulpixDexEntry
-    dw NinetalesDexEntry
-    dw PikachuDexEntry
-    dw RaichuDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw DratiniDexEntry
-    dw DragonairDexEntry
-    dw KabutoDexEntry
-    dw KabutopsDexEntry
-    dw HorseaDexEntry
-    dw SeadraDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw SandshrewDexEntry
-    dw SandslashDexEntry
-    dw OmanyteDexEntry
-    dw OmastarDexEntry
-    dw JigglypuffDexEntry
-    dw WigglytuffDexEntry
-    dw EeveeDexEntry
-    dw FlareonDexEntry
-    dw JolteonDexEntry
-    dw VaporeonDexEntry
-    dw MachopDexEntry
-    dw ZubatDexEntry
-    dw EkansDexEntry
-    dw ParasDexEntry
-    dw PoliwhirlDexEntry
-    dw PoliwrathDexEntry
-    dw WeedleDexEntry
-    dw KakunaDexEntry
-    dw BeedrillDexEntry
-    dw MissingNoDexEntry
-    dw DodrioDexEntry
-    dw PrimeapeDexEntry
-    dw DugtrioDexEntry
-    dw VenomothDexEntry
-    dw DewgongDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw CaterpieDexEntry
-    dw MetapodDexEntry
-    dw ButterfreeDexEntry
-    dw MachampDexEntry
-    dw MissingNoDexEntry
-    dw GolduckDexEntry
-    dw HypnoDexEntry
-    dw GolbatDexEntry
-    dw MewtwoDexEntry
-    dw SnorlaxDexEntry
-    dw MagikarpDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw MukDexEntry
-    dw MissingNoDexEntry
-    dw KinglerDexEntry
-    dw CloysterDexEntry
-    dw MissingNoDexEntry
-    dw ElectrodeDexEntry
-    dw ClefableDexEntry
-    dw WeezingDexEntry
-    dw PersianDexEntry
-    dw MarowakDexEntry
-    dw MissingNoDexEntry
-    dw HaunterDexEntry
-    dw AbraDexEntry
-    dw AlakazamDexEntry
-    dw PidgeottoDexEntry
-    dw PidgeotDexEntry
-    dw StarmieDexEntry
-    dw BulbasaurDexEntry
-    dw VenusaurDexEntry
-    dw TentacruelDexEntry
-    dw MissingNoDexEntry
-    dw GoldeenDexEntry
-    dw SeakingDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw PonytaDexEntry
-    dw RapidashDexEntry
-    dw RattataDexEntry
-    dw RaticateDexEntry
-    dw NidorinoDexEntry
-    dw NidorinaDexEntry
-    dw GeodudeDexEntry
-    dw PorygonDexEntry
-    dw AerodactylDexEntry
-    dw MissingNoDexEntry
-    dw MagnemiteDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw CharmanderDexEntry
-    dw SquirtleDexEntry
-    dw CharmeleonDexEntry
-    dw WartortleDexEntry
-    dw CharizardDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw MissingNoDexEntry
-    dw OddishDexEntry
-    dw GloomDexEntry
-    dw VileplumeDexEntry
-    dw BellsproutDexEntry
-    dw WeepinbellDexEntry
-    dw VictreebelDexEntry
+ApostropheMDexEntry:
+    db "GLITCH@"
+    db 23,0
+    dw 8806
+    TX_FAR _ApostropheMDexEntry
+    db "@"
+
+SECTION "RhydonDexEntry",ROMX[$45fa],BANK[$10]
 
 ; string: species name
 ; height in feet,inches
@@ -63399,197 +63176,7 @@ IndexToPokedex: ; 41010 (10:5010)
     pop bc
     ret
 
-PokedexOrder: ; 41024 (10:5024)
-    db DEX_RHYDON
-    db DEX_KANGASKHAN
-    db DEX_NIDORAN_M
-    db DEX_CLEFAIRY
-    db DEX_SPEAROW
-    db DEX_VOLTORB
-    db DEX_NIDOKING
-    db DEX_SLOWBRO
-    db DEX_IVYSAUR
-    db DEX_EXEGGUTOR
-    db DEX_LICKITUNG
-    db DEX_EXEGGCUTE
-    db DEX_GRIMER
-    db DEX_GENGAR
-    db DEX_NIDORAN_F
-    db DEX_NIDOQUEEN
-    db DEX_CUBONE
-    db DEX_RHYHORN
-    db DEX_LAPRAS
-    db DEX_ARCANINE
-    db DEX_MEW
-    db DEX_GYARADOS
-    db DEX_SHELLDER
-    db DEX_TENTACOOL
-    db DEX_GASTLY
-    db DEX_SCYTHER
-    db DEX_STARYU
-    db DEX_BLASTOISE
-    db DEX_PINSIR
-    db DEX_TANGELA
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db DEX_GROWLITHE
-    db DEX_ONIX
-    db DEX_FEAROW
-    db DEX_PIDGEY
-    db DEX_SLOWPOKE
-    db DEX_KADABRA
-    db DEX_GRAVELER
-    db DEX_CHANSEY
-    db DEX_MACHOKE
-    db DEX_MR_MIME
-    db DEX_HITMONLEE
-    db DEX_HITMONCHAN
-    db DEX_ARBOK
-    db DEX_PARASECT
-    db DEX_PSYDUCK
-    db DEX_DROWZEE
-    db DEX_GOLEM
-    db 0 ; MISSINGNO.
-    db DEX_MAGMAR
-    db 0 ; MISSINGNO.
-    db DEX_ELECTABUZZ
-    db DEX_MAGNETON
-    db DEX_KOFFING
-    db 0 ; MISSINGNO.
-    db DEX_MANKEY
-    db DEX_SEEL
-    db DEX_DIGLETT
-    db DEX_TAUROS
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db DEX_FARFETCH_D
-    db DEX_VENONAT
-    db DEX_DRAGONITE
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db DEX_DODUO
-    db DEX_POLIWAG
-    db DEX_JYNX
-    db DEX_MOLTRES
-    db DEX_ARTICUNO
-    db DEX_ZAPDOS
-    db DEX_DITTO
-    db DEX_MEOWTH
-    db DEX_KRABBY
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db DEX_VULPIX
-    db DEX_NINETALES
-    db DEX_PIKACHU
-    db DEX_RAICHU
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db DEX_DRATINI
-    db DEX_DRAGONAIR
-    db DEX_KABUTO
-    db DEX_KABUTOPS
-    db DEX_HORSEA
-    db DEX_SEADRA
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db DEX_SANDSHREW
-    db DEX_SANDSLASH
-    db DEX_OMANYTE
-    db DEX_OMASTAR
-    db DEX_JIGGLYPUFF
-    db DEX_WIGGLYTUFF
-    db DEX_EEVEE
-    db DEX_FLAREON
-    db DEX_JOLTEON
-    db DEX_VAPOREON
-    db DEX_MACHOP
-    db DEX_ZUBAT
-    db DEX_EKANS
-    db DEX_PARAS
-    db DEX_POLIWHIRL
-    db DEX_POLIWRATH
-    db DEX_WEEDLE
-    db DEX_KAKUNA
-    db DEX_BEEDRILL
-    db 0 ; MISSINGNO.
-    db DEX_DODRIO
-    db DEX_PRIMEAPE
-    db DEX_DUGTRIO
-    db DEX_VENOMOTH
-    db DEX_DEWGONG
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db DEX_CATERPIE
-    db DEX_METAPOD
-    db DEX_BUTTERFREE
-    db DEX_MACHAMP
-    db 0 ; MISSINGNO.
-    db DEX_GOLDUCK
-    db DEX_HYPNO
-    db DEX_GOLBAT
-    db DEX_MEWTWO
-    db DEX_SNORLAX
-    db DEX_MAGIKARP
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db DEX_MUK
-    db 0 ; MISSINGNO.
-    db DEX_KINGLER
-    db DEX_CLOYSTER
-    db 0 ; MISSINGNO.
-    db DEX_ELECTRODE
-    db DEX_CLEFABLE
-    db DEX_WEEZING
-    db DEX_PERSIAN
-    db DEX_MAROWAK
-    db 0 ; MISSINGNO.
-    db DEX_HAUNTER
-    db DEX_ABRA
-    db DEX_ALAKAZAM
-    db DEX_PIDGEOTTO
-    db DEX_PIDGEOT
-    db DEX_STARMIE
-    db DEX_BULBASAUR
-    db DEX_VENUSAUR
-    db DEX_TENTACRUEL
-    db 0 ; MISSINGNO.
-    db DEX_GOLDEEN
-    db DEX_SEAKING
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db DEX_PONYTA
-    db DEX_RAPIDASH
-    db DEX_RATTATA
-    db DEX_RATICATE
-    db DEX_NIDORINO
-    db DEX_NIDORINA
-    db DEX_GEODUDE
-    db DEX_PORYGON
-    db DEX_AERODACTYL
-    db 0 ; MISSINGNO.
-    db DEX_MAGNEMITE
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db DEX_CHARMANDER
-    db DEX_SQUIRTLE
-    db DEX_CHARMELEON
-    db DEX_WARTORTLE
-    db DEX_CHARIZARD
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db 0 ; MISSINGNO.
-    db DEX_ODDISH
-    db DEX_GLOOM
-    db DEX_VILEPLUME
-    db DEX_BELLSPROUT
-    db DEX_WEEPINBELL
-    db DEX_VICTREEBEL
+SECTION "Func_410e2",ROMX[$50e2],BANK[$10]
 
 Func_410e2: ; 410e2 (10:50e2)
     ld a,[wWhichTrade] ; $cd3d
@@ -64918,6 +64505,525 @@ LoadMonBackSpritePokedex:
     push de
     jp HackBackSprite
 
+PokedexOrder: ; Moved in the Bank
+    db DEX_RHYDON      ; $01
+    db DEX_KANGASKHAN  ; $02
+    db DEX_NIDORAN_M   ; $03
+    db DEX_CLEFAIRY    ; $04
+    db DEX_SPEAROW     ; $05
+    db DEX_VOLTORB     ; $06
+    db DEX_NIDOKING    ; $07
+    db DEX_SLOWBRO     ; $08
+    db DEX_IVYSAUR     ; $09
+    db DEX_EXEGGUTOR   ; $0A
+    db DEX_LICKITUNG   ; $0B
+    db DEX_EXEGGCUTE   ; $0C
+    db DEX_GRIMER      ; $0D
+    db DEX_GENGAR      ; $0E
+    db DEX_NIDORAN_F   ; $0F
+    db DEX_NIDOQUEEN   ; $10
+    db DEX_CUBONE      ; $11
+    db DEX_RHYHORN     ; $12
+    db DEX_LAPRAS      ; $13
+    db DEX_ARCANINE    ; $14
+    db DEX_MEW         ; $15
+    db DEX_GYARADOS    ; $16
+    db DEX_SHELLDER    ; $17
+    db DEX_TENTACOOL   ; $18
+    db DEX_GASTLY      ; $19
+    db DEX_SCYTHER     ; $1A
+    db DEX_STARYU      ; $1B
+    db DEX_BLASTOISE   ; $1C
+    db DEX_PINSIR      ; $1D
+    db DEX_TANGELA     ; $1E
+    db 0 ; MISSINGNO.  ; $1F
+    db 0 ; MISSINGNO.  ; $20
+    db DEX_GROWLITHE   ; $21
+    db DEX_ONIX        ; $22
+    db DEX_FEAROW      ; $23
+    db DEX_PIDGEY      ; $24
+    db DEX_SLOWPOKE    ; $25
+    db DEX_KADABRA     ; $26
+    db DEX_GRAVELER    ; $27
+    db DEX_CHANSEY     ; $28
+    db DEX_MACHOKE     ; $29
+    db DEX_MR_MIME     ; $2A
+    db DEX_HITMONLEE   ; $2B
+    db DEX_HITMONCHAN  ; $2C
+    db DEX_ARBOK       ; $2D
+    db DEX_PARASECT    ; $2E
+    db DEX_PSYDUCK     ; $2F
+    db DEX_DROWZEE     ; $30
+    db DEX_GOLEM       ; $31
+    db 0 ; MISSINGNO.  ; $32
+    db DEX_MAGMAR      ; $33
+    db 0 ; MISSINGNO.  ; $34
+    db DEX_ELECTABUZZ  ; $35
+    db DEX_MAGNETON    ; $36
+    db DEX_KOFFING     ; $37
+    db 0 ; MISSINGNO.  ; $38
+    db DEX_MANKEY      ; $39
+    db DEX_SEEL        ; $3A
+    db DEX_DIGLETT     ; $3B
+    db DEX_TAUROS      ; $3C
+    db 0 ; MISSINGNO.  ; $3D
+    db 0 ; MISSINGNO.  ; $3E
+    db 0 ; MISSINGNO.  ; $3F
+    db DEX_FARFETCH_D  ; $40
+    db DEX_VENONAT     ; $41
+    db DEX_DRAGONITE   ; $42
+    db 0 ; MISSINGNO.  ; $43
+    db 0 ; MISSINGNO.  ; $44
+    db 0 ; MISSINGNO.  ; $45
+    db DEX_DODUO       ; $46
+    db DEX_POLIWAG     ; $47
+    db DEX_JYNX        ; $48
+    db DEX_MOLTRES     ; $49
+    db DEX_ARTICUNO    ; $4A
+    db DEX_ZAPDOS      ; $4B
+    db DEX_DITTO       ; $4C
+    db DEX_MEOWTH      ; $4D
+    db DEX_KRABBY      ; $4E
+    db 0 ; MISSINGNO.  ; $4F
+    db 0 ; MISSINGNO.  ; $50
+    db 0 ; MISSINGNO.  ; $51
+    db DEX_VULPIX      ; $52
+    db DEX_NINETALES   ; $53
+    db DEX_PIKACHU     ; $54
+    db DEX_RAICHU      ; $55
+    db 0 ; MISSINGNO.  ; $56
+    db 0 ; MISSINGNO.  ; $57
+    db DEX_DRATINI     ; $58
+    db DEX_DRAGONAIR   ; $59
+    db DEX_KABUTO      ; $5A
+    db DEX_KABUTOPS    ; $5B
+    db DEX_HORSEA      ; $5C
+    db DEX_SEADRA      ; $5D
+    db 0 ; MISSINGNO.  ; $5E
+    db 0 ; MISSINGNO.  ; $5F
+    db DEX_SANDSHREW   ; $60
+    db DEX_SANDSLASH   ; $61
+    db DEX_OMANYTE     ; $62
+    db DEX_OMASTAR     ; $63
+    db DEX_JIGGLYPUFF  ; $64
+    db DEX_WIGGLYTUFF  ; $65
+    db DEX_EEVEE       ; $66
+    db DEX_FLAREON     ; $67
+    db DEX_JOLTEON     ; $68
+    db DEX_VAPOREON    ; $69
+    db DEX_MACHOP      ; $6A
+    db DEX_ZUBAT       ; $6B
+    db DEX_EKANS       ; $6C
+    db DEX_PARAS       ; $6D
+    db DEX_POLIWHIRL   ; $6E
+    db DEX_POLIWRATH   ; $6F
+    db DEX_WEEDLE      ; $70
+    db DEX_KAKUNA      ; $71
+    db DEX_BEEDRILL    ; $72
+    db 0 ; MISSINGNO.  ; $73
+    db DEX_DODRIO      ; $74
+    db DEX_PRIMEAPE    ; $75
+    db DEX_DUGTRIO     ; $76
+    db DEX_VENOMOTH    ; $77
+    db DEX_DEWGONG     ; $78
+    db 0 ; MISSINGNO.  ; $79
+    db 0 ; MISSINGNO.  ; $7A
+    db DEX_CATERPIE    ; $7B
+    db DEX_METAPOD     ; $7C
+    db DEX_BUTTERFREE  ; $7D
+    db DEX_MACHAMP     ; $7E
+    db 0 ; MISSINGNO.  ; $7F
+    db DEX_GOLDUCK     ; $80
+    db DEX_HYPNO       ; $81
+    db DEX_GOLBAT      ; $82
+    db DEX_MEWTWO      ; $83
+    db DEX_SNORLAX     ; $84
+    db DEX_MAGIKARP    ; $85
+    db 0 ; MISSINGNO.  ; $86
+    db 0 ; MISSINGNO.  ; $87
+    db DEX_MUK         ; $88
+    db 0 ; MISSINGNO.  ; $89
+    db DEX_KINGLER     ; $8A
+    db DEX_CLOYSTER    ; $8B
+    db 0 ; MISSINGNO.  ; $8C
+    db DEX_ELECTRODE   ; $8D
+    db DEX_CLEFABLE    ; $8E
+    db DEX_WEEZING     ; $8F
+    db DEX_PERSIAN     ; $90
+    db DEX_MAROWAK     ; $91
+    db 0 ; MISSINGNO.  ; $92
+    db DEX_HAUNTER     ; $93
+    db DEX_ABRA        ; $94
+    db DEX_ALAKAZAM    ; $95
+    db DEX_PIDGEOTTO   ; $96
+    db DEX_PIDGEOT     ; $97
+    db DEX_STARMIE     ; $98
+    db DEX_BULBASAUR   ; $99
+    db DEX_VENUSAUR    ; $9A
+    db DEX_TENTACRUEL  ; $9B
+    db 0 ; MISSINGNO.  ; $9C
+    db DEX_GOLDEEN     ; $9D
+    db DEX_SEAKING     ; $9E
+    db 0 ; MISSINGNO.  ; $9F
+    db 0 ; MISSINGNO.  ; $A0
+    db 0 ; MISSINGNO.  ; $A1
+    db 0 ; MISSINGNO.  ; $A2
+    db DEX_PONYTA      ; $A3
+    db DEX_RAPIDASH    ; $A4
+    db DEX_RATTATA     ; $A5
+    db DEX_RATICATE    ; $A6
+    db DEX_NIDORINO    ; $A7
+    db DEX_NIDORINA    ; $A8
+    db DEX_GEODUDE     ; $A9
+    db DEX_PORYGON     ; $AA
+    db DEX_AERODACTYL  ; $AB
+    db 0 ; MISSINGNO.  ; $AC
+    db DEX_MAGNEMITE   ; $AD
+    db 0 ; MISSINGNO.  ; $AE
+    db 0 ; MISSINGNO.  ; $AF
+    db DEX_CHARMANDER  ; $B0
+    db DEX_SQUIRTLE    ; $B1
+    db DEX_CHARMELEON  ; $B2
+    db DEX_WARTORTLE   ; $B3
+    db DEX_CHARIZARD   ; $B4
+    db 0 ; MISSINGNO.  ; $B5
+    db DEX_KABUTOPS    ; $B6 ; Kabotops Fossil
+    db DEX_AERODACTYL  ; $B7 ; Aerodactyl Fossil
+    db DEX_HAUNTER     ; $B8 ; Ghost
+    db DEX_ODDISH      ; $B9
+    db DEX_GLOOM       ; $BA
+    db DEX_VILEPLUME   ; $BB
+    db DEX_BELLSPROUT  ; $BC
+    db DEX_WEEPINBELL  ; $BD
+    db DEX_VICTREEBEL  ; $BE
+    db 0 ; MISSINGNO.  ; $BF
+    db 0 ; MISSINGNO.  ; $C0
+    db 0 ; MISSINGNO.  ; $C1
+    db 0 ; MISSINGNO.  ; $C2
+    db 0 ; MISSINGNO.  ; $C3
+    db 0 ; MISSINGNO.  ; $C4
+    db 0 ; MISSINGNO.  ; $C5
+    db 0 ; MISSINGNO.  ; $C6
+    db 0 ; MISSINGNO.  ; $C7
+    db 0 ; MISSINGNO.  ; $C8
+    db 0 ; MISSINGNO.  ; $C9
+    db 0 ; MISSINGNO.  ; $CA
+    db 0 ; MISSINGNO.  ; $CB
+    db 0 ; MISSINGNO.  ; $CC
+    db 0 ; MISSINGNO.  ; $CD
+    db 0 ; MISSINGNO.  ; $CE
+    db 0 ; MISSINGNO.  ; $CF
+    db 0 ; MISSINGNO.  ; $D0
+    db 0 ; MISSINGNO.  ; $D1
+    db 0 ; MISSINGNO.  ; $D2
+    db 0 ; MISSINGNO.  ; $D3
+    db 0 ; MISSINGNO.  ; $D4
+    db 0 ; MISSINGNO.  ; $D5
+    db 0 ; MISSINGNO.  ; $D6
+    db 0 ; MISSINGNO.  ; $D7
+    db 0 ; MISSINGNO.  ; $D8
+    db 0 ; MISSINGNO.  ; $D9
+    db 0 ; MISSINGNO.  ; $DA
+    db 0 ; MISSINGNO.  ; $DB
+    db 0 ; MISSINGNO.  ; $DC
+    db 0 ; MISSINGNO.  ; $DD
+    db 0 ; MISSINGNO.  ; $DE
+    db 0 ; MISSINGNO.  ; $DF
+    db 0 ; MISSINGNO.  ; $E0
+    db 0 ; MISSINGNO.  ; $E1
+    db 0 ; MISSINGNO.  ; $E2
+    db 0 ; MISSINGNO.  ; $E3
+    db 0 ; MISSINGNO.  ; $E4
+    db 0 ; MISSINGNO.  ; $E5
+    db 0 ; MISSINGNO.  ; $E6
+    db 0 ; MISSINGNO.  ; $E7
+    db 0 ; MISSINGNO.  ; $E8
+    db 0 ; MISSINGNO.  ; $E9
+    db 0 ; MISSINGNO.  ; $EA
+    db 0 ; MISSINGNO.  ; $EB
+    db 0 ; MISSINGNO.  ; $EC
+    db 0 ; MISSINGNO.  ; $ED
+    db 0 ; MISSINGNO.  ; $EE
+    db 0 ; MISSINGNO.  ; $EF
+    db 0 ; MISSINGNO.  ; $F0
+    db 0 ; MISSINGNO.  ; $F1
+    db 0 ; MISSINGNO.  ; $F2
+    db 0 ; MISSINGNO.  ; $F3
+    db 0 ; MISSINGNO.  ; $F4
+    db 0 ; MISSINGNO.  ; $F5
+    db 0 ; MISSINGNO.  ; $F6
+    db 0 ; MISSINGNO.  ; $F7
+    db 0 ; MISSINGNO.  ; $F8
+    db 0 ; MISSINGNO.  ; $F9
+    db 0 ; MISSINGNO.  ; $FA
+    db 0 ; MISSINGNO.  ; $FB
+    db 0 ; MISSINGNO.  ; $FC
+    db 0 ; MISSINGNO.  ; $FD
+    db 0 ; MISSINGNO.  ; $FE
+    db DEX_CHARIZARD   ; $FF ; Charizard'M
+    db DEX_MISSINGNO   ; $00 ; ApostropheM
+
+PokedexEntryPointers: ; Moved in the Bank
+    dw RhydonDexEntry
+    dw KangaskhanDexEntry
+    dw NidoranMDexEntry
+    dw ClefairyDexEntry
+    dw SpearowDexEntry
+    dw VoltorbDexEntry
+    dw NidokingDexEntry
+    dw SlowbroDexEntry
+    dw IvysaurDexEntry
+    dw ExeggutorDexEntry
+    dw LickitungDexEntry
+    dw ExeggcuteDexEntry
+    dw GrimerDexEntry
+    dw GengarDexEntry
+    dw NidoranFDexEntry
+    dw NidoqueenDexEntry
+    dw CuboneDexEntry
+    dw RhyhornDexEntry
+    dw LaprasDexEntry
+    dw ArcanineDexEntry
+    dw MewDexEntry
+    dw GyaradosDexEntry
+    dw ShellderDexEntry
+    dw TentacoolDexEntry
+    dw GastlyDexEntry
+    dw ScytherDexEntry
+    dw StaryuDexEntry
+    dw BlastoiseDexEntry
+    dw PinsirDexEntry
+    dw TangelaDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw GrowlitheDexEntry
+    dw OnixDexEntry
+    dw FearowDexEntry
+    dw PidgeyDexEntry
+    dw SlowpokeDexEntry
+    dw KadabraDexEntry
+    dw GravelerDexEntry
+    dw ChanseyDexEntry
+    dw MachokeDexEntry
+    dw MrMimeDexEntry
+    dw HitmonleeDexEntry
+    dw HitmonchanDexEntry
+    dw ArbokDexEntry
+    dw ParasectDexEntry
+    dw PsyduckDexEntry
+    dw DrowzeeDexEntry
+    dw GolemDexEntry
+    dw MissingNoDexEntry
+    dw MagmarDexEntry
+    dw MissingNoDexEntry
+    dw ElectabuzzDexEntry
+    dw MagnetonDexEntry
+    dw KoffingDexEntry
+    dw MissingNoDexEntry
+    dw MankeyDexEntry
+    dw SeelDexEntry
+    dw DiglettDexEntry
+    dw TaurosDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw FarfetchdDexEntry
+    dw VenonatDexEntry
+    dw DragoniteDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw DoduoDexEntry
+    dw PoliwagDexEntry
+    dw JynxDexEntry
+    dw MoltresDexEntry
+    dw ArticunoDexEntry
+    dw ZapdosDexEntry
+    dw DittoDexEntry
+    dw MeowthDexEntry
+    dw KrabbyDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw VulpixDexEntry
+    dw NinetalesDexEntry
+    dw PikachuDexEntry
+    dw RaichuDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw DratiniDexEntry
+    dw DragonairDexEntry
+    dw KabutoDexEntry
+    dw KabutopsDexEntry
+    dw HorseaDexEntry
+    dw SeadraDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw SandshrewDexEntry
+    dw SandslashDexEntry
+    dw OmanyteDexEntry
+    dw OmastarDexEntry
+    dw JigglypuffDexEntry
+    dw WigglytuffDexEntry
+    dw EeveeDexEntry
+    dw FlareonDexEntry
+    dw JolteonDexEntry
+    dw VaporeonDexEntry
+    dw MachopDexEntry
+    dw ZubatDexEntry
+    dw EkansDexEntry
+    dw ParasDexEntry
+    dw PoliwhirlDexEntry
+    dw PoliwrathDexEntry
+    dw WeedleDexEntry
+    dw KakunaDexEntry
+    dw BeedrillDexEntry
+    dw MissingNoDexEntry
+    dw DodrioDexEntry
+    dw PrimeapeDexEntry
+    dw DugtrioDexEntry
+    dw VenomothDexEntry
+    dw DewgongDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw CaterpieDexEntry
+    dw MetapodDexEntry
+    dw ButterfreeDexEntry
+    dw MachampDexEntry
+    dw MissingNoDexEntry
+    dw GolduckDexEntry
+    dw HypnoDexEntry
+    dw GolbatDexEntry
+    dw MewtwoDexEntry
+    dw SnorlaxDexEntry
+    dw MagikarpDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MukDexEntry
+    dw MissingNoDexEntry
+    dw KinglerDexEntry
+    dw CloysterDexEntry
+    dw MissingNoDexEntry
+    dw ElectrodeDexEntry
+    dw ClefableDexEntry
+    dw WeezingDexEntry
+    dw PersianDexEntry
+    dw MarowakDexEntry
+    dw MissingNoDexEntry
+    dw HaunterDexEntry
+    dw AbraDexEntry
+    dw AlakazamDexEntry
+    dw PidgeottoDexEntry
+    dw PidgeotDexEntry
+    dw StarmieDexEntry
+    dw BulbasaurDexEntry
+    dw VenusaurDexEntry
+    dw TentacruelDexEntry
+    dw MissingNoDexEntry
+    dw GoldeenDexEntry
+    dw SeakingDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw PonytaDexEntry
+    dw RapidashDexEntry
+    dw RattataDexEntry
+    dw RaticateDexEntry
+    dw NidorinoDexEntry
+    dw NidorinaDexEntry
+    dw GeodudeDexEntry
+    dw PorygonDexEntry
+    dw AerodactylDexEntry
+    dw MissingNoDexEntry
+    dw MagnemiteDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw CharmanderDexEntry
+    dw SquirtleDexEntry
+    dw CharmeleonDexEntry
+    dw WartortleDexEntry
+    dw CharizardDexEntry
+    dw MissingNoDexEntry
+    dw KabutopsDexEntry ; Kabutops Fossil
+    dw AerodactylDexEntry ; Aerodactyl Fossil
+    dw HaunterDexEntry ; Ghost
+    dw OddishDexEntry
+    dw GloomDexEntry
+    dw VileplumeDexEntry
+    dw BellsproutDexEntry
+    dw WeepinbellDexEntry
+    dw VictreebelDexEntry
+    ; Denim
+    dw MissingNoDexEntry ; $BF
+    dw MissingNoDexEntry ; $C0
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry ; $D0
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry ; $E0
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry ; $F0
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry ; $F3
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry
+    dw MissingNoDexEntry ; $FF
+
+ApostropheMPokedexEntryPointers:
+    dw ApostropheMDexEntry
+
 SECTION "bank11",ROMX,BANK[$11]
 
 LavenderTown_h: ; 0x44000 to 0x4402d (45 bytes) (bank=11) (id=4)
@@ -65040,12 +65146,12 @@ LavenderTownText9: ; 44164 (11:4164)
 
 DisplayDexRating: ; 44169 (11:4169)
     ld hl,wPokedexSeen
-    ld b,$13
+    ld b,wPokedexSeenEnd - wPokedexSeen
     call CountSetBits
     ld a,[$D11E] ; result of CountSetBits (seen count)
     ld [$FFDB],a
     ld hl,wPokedexOwned
-    ld b,$13
+    ld b,wPokedexOwnedEnd - wPokedexOwned
     call CountSetBits
     ld a,[$D11E] ; result of CountSetBits (own count)
     ld [$FFDC],a
@@ -84437,8 +84543,8 @@ Func_59035 ; 0x59035
     ld a,[$cc26]
     and a
     jr nz,.asm_59086 ; 0x59042 $42
-    ld hl,$d2f7
-    ld b,$13
+    ld hl,wPokedexOwned ; $d2f7
+    ld b,wPokedexOwnedEnd - wPokedexOwned
     call CountSetBits
     ld a,[$d11e]
     ld [$ff00+$dd],a
@@ -99565,9 +99671,9 @@ GetPkmnStatPaletteID: ; 71e4f (1c:5e4f)
     ld bc,$10
     call CopyData
     ld a,[$cf91]
-    cp VICTREEBEL + 1
-    jr c,.pokemon
-    ld a,$1 ; not pokemon
+    ds 2 ; cp VICTREEBEL + 1
+    ds 2 ; jr c,.pokemon
+    ds 2 ; ld a,$1 ; not pokemon
 .pokemon
     call CheckShinyAndGetPAL
     push hl ; ...
@@ -99631,6 +99737,27 @@ GetMapPaletteID: ; 71ec7 (1c:5ec7)
     ld b,BANK(GetMapPaletteID_)
     ld hl,GetMapPaletteID_
     jp Bankswitch
+
+SamePalette:
+    db MAGNETON
+    db GOLBAT
+    db RHYDON
+    db GRAVELER
+    db DUGTRIO
+    db OMASTAR
+    db MAROWAK
+    db WARTORTLE
+    db KABUTOPS
+    db WEEZING
+    db ELECTRODE
+    db RAPIDASH
+    db KADABRA
+    db MUK
+    db KINGLER
+    db PIDGEOT
+    db CLEFABLE
+    db WIGGLYTUFF
+    db ARCANINE
 
 SECTION "GetHallOfFameLinkCableEvolutionPaletteID",ROMX[$5f17],BANK[$1c]
 
@@ -100170,6 +100297,66 @@ Unknown_722f4: ; 722f4 (1c:62f4)
 
     db $02,$05 ; 6th Pkmn Hp Bar
     db $0C,$0b,$12,$0b
+
+TrainerPalettes:
+;    PAL_BLUEMON   EQU $11
+;    PAL_REDMON    EQU $12
+;    PAL_CYANMON   EQU $13
+;    PAL_PURPLEMON EQU $14
+;    PAL_BROWNMON  EQU $15
+;    PAL_GREENMON  EQU $16
+;    PAL_PINKMON   EQU $17
+;    PAL_YELLOWMON EQU $18
+;    PAL_GREYMON   EQU $19
+
+    db PAL_MEWMON     ; 'M            ; $00
+    db PAL_CYANMON    ; YOUNGSTER     ; $01
+    db PAL_GREENMON   ; BUG_CATCHER   ; $02
+    db PAL_PINKMON    ; LASS          ; $03
+    db PAL_CYANMON    ; SAILOR        ; $04
+    db PAL_MEWMON     ; JR__TRAINER_M ; $05
+    db PAL_MEWMON     ; JR__TRAINER_F ; $06
+    db PAL_PURPLEMON  ; POKEMANIAC    ; $07
+    db PAL_PURPLEMON  ; SUPER_NERD    ; $08
+    db PAL_BROWNMON   ; HIKER         ; $09
+    db PAL_GREYMON    ; BIKER         ; $0A
+    db PAL_REDMON     ; BURGLAR       ; $0B
+    db PAL_YELLOWMON  ; ENGINEER      ; $0C
+    db PAL_REDMON     ; JUGGLER_X     ; $0D
+    db PAL_CYANMON    ; FISHER        ; $0E
+    db PAL_CYANMON    ; SWIMMER       ; $0F
+    db PAL_GREYMON    ; CUE_BALL      ; $10
+    db PAL_BROWNMON   ; GAMBLER       ; $11
+    db PAL_PINKMON    ; BEAUTY        ; $12
+    db PAL_PURPLEMON  ; PSYCHIC_TR    ; $13
+    db PAL_YELLOWMON  ; ROCKER        ; $14
+    db PAL_REDMON     ; JUGGLER       ; $15
+    db PAL_BROWNMON   ; TAMER         ; $16
+    db PAL_YELLOWMON  ; BIRD_KEEPER   ; $17
+    db PAL_GREYMON    ; BLACKBELT     ; $18
+    db PAL_BLUEMON    ; SONY1         ; $19
+    db PAL_GREYMON    ; PROF_OAK      ; $1A
+    db PAL_GREYMON    ; CHIEF         ; $1B
+    db PAL_GREYMON    ; SCIENTIST     ; $1C
+    db PAL_GREYMON    ; GIOVANNI      ; $1D
+    db PAL_GREYMON    ; ROCKET        ; $1E
+    db PAL_REDMON     ; COOLTRAINER_M ; $1F
+    db PAL_REDMON     ; COOLTRAINER_F ; $20
+    db PAL_BROWNMON   ; BRUNO         ; $21
+    db PAL_BROWNMON   ; BROCK         ; $22
+    db PAL_CYANMON    ; MISTY         ; $23
+    db PAL_YELLOWMON  ; LT__SURGE     ; $24
+    db PAL_GREENMON   ; ERIKA         ; $25
+    db PAL_PURPLEMON  ; KOGA          ; $26
+    db PAL_REDMON     ; BLAINE        ; $27
+    db PAL_PURPLEMON  ; SABRINA       ; $28
+    db PAL_GREYMON    ; GENTLEMAN     ; $29
+    db PAL_BLUEMON    ; SONY2         ; $2A
+    db PAL_BLUEMON    ; SONY3         ; $2B
+    db PAL_CYANMON    ; LORELEI       ; $2C
+    db PAL_GREYMON    ; CHANNELER     ; $2D
+    db PAL_PURPLEMON  ; AGATHA        ; $2E
+    db PAL_VARIOUS    ; LANCE         ; $2F
 
 SECTION "Unknown_72360",ROMX[$6360],BANK[$1c]
 
@@ -101596,33 +101783,42 @@ SAME_PALETTE EQU 19
 DeterminePaletteID: ; xxxxx (1c:xxxx) ; Denim
     push bc
     push de
-    ld [$D11E],a
     and a
     jr z,.idZero
-    ld a,$3A
-    call Predef ; turn Pokemon ID number into Pokedex number
+	cp CHARIZARD_M
+	ld l,PAL_REDMON
+	jr z,.PaletteSingleByteDone
     jr .Standard
 .idZero
     ld hl,wFlagBackFrontSpriteBit56
     bit 5,[hl]
-    res 5,[hl]
     jr nz,.Back
     bit 6,[hl]
-    res 6,[hl]
-    jr nz,.Standard ; TODO,.Front : Gestire i Colori TRAINERCLASS e M Front Sprite in Battle
+    jr nz,.Front
 .ApostropheM
     xor a ; 'M front Sprite out of battle
     jr .AddPalMToA
-.Front ; TODO
+.Front
+    ; Gestire i Colori TRAINERCLASS e M Front Sprite in Battle
+    ld a,[W_TRAINERCLASS]
+    ld e,a
+    ld hl,TrainerPalettes ; Just for Trainer and 'M,Pokemon use another
+    ld d,0
+    add hl,de
+    ld l,[hl]
+    jr .PaletteSingleByteDone
 .Back
     ld hl,wFlagBackSpritePlayerBit4 ; Pointer to Flag BackSpritePlayer (Bit4)
     bit 4,[hl]
-    jr z,.Standard ; TODO,Gestire i Colori TRAINERCLASS
-    ld l,PAL_VARIOUS
+    jr z,.ApostropheM ; if 0 -> 'M Back sprite during battle
+    ld l,PAL_VARIOUS ; if 1 -> Player BackSprite
 .PaletteSingleByteDone
     ld h,0
     jr .PreDone
 .Standard
+    ld [$D11E],a
+    ld a,$3A
+    call Predef ; turn Pokemon ID number into Pokedex number
     ld a,[$D11E] ; Load Directly Dex ID
     call CheckSamePalette
 .AddPalMToA
@@ -101632,6 +101828,9 @@ DeterminePaletteID: ; xxxxx (1c:xxxx) ; Denim
     add hl,bc
 .PreDone
     push hl
+    ld hl,wFlagBackFrontSpriteBit56
+    res 5,[hl]
+    res 6,[hl]
     ld hl,wFlagShinyBit2
     bit 2,[hl]
     res 2,[hl]
@@ -101671,27 +101870,6 @@ CheckSamePalette:
     ld a,b
     sub d
     ret
-
-SamePalette:
-    db MAGNETON
-    db GOLBAT
-    db RHYDON
-    db GRAVELER
-    db DUGTRIO
-    db OMASTAR
-    db MAROWAK
-    db WARTORTLE
-    db KABUTOPS
-    db WEEZING
-    db ELECTRODE
-    db RAPIDASH
-    db KADABRA
-    db MUK
-    db KINGLER
-    db PIDGEOT
-    db CLEFABLE
-    db WIGGLYTUFF
-    db ARCANINE
 
 CreateMonOvWorldSprInstruction:
     ld hl,wSpriteOAMBySpecies
@@ -129568,8 +129746,6 @@ BeedrillPicFront:
     INCBIN "pic/bmon/beedrill.pic"
 BeedrillPicBack:
     INCBIN "pic/monback/beedrillb.pic"
-FossilKabutopsPic:
-    INCBIN "pic/bmon/fossilkabutops.pic"
 HaunterPicFront:
     INCBIN "pic/bmon/haunter.pic"
 HaunterPicBack:
@@ -130388,6 +130564,23 @@ SearchFieldMoveInParty:
     pop bc
     ret
 
+FossilKabutopsPic:
+    INCBIN "pic/bmon/fossilkabutops.pic"
+FossilKabutopsBack:
+    INCBIN "pic/other/BackSpriteKabutopsSkel.pic"
+FossilAerodactylPic:
+    INCBIN "pic/bmon/fossilaerodactyl.pic"
+GhostPic:
+    INCBIN "pic/other/ghost.pic"
+CharizardMPicFront:
+    INCBIN "pic/other/FrontSpriteCharizardM.pic"
+CharizardMPicBack:
+    INCBIN "pic/other/BackSpriteCharizardM.pic"
+ApostropheMPicFront:
+    INCBIN "pic/other/FrontSpriteApostropheM.pic"
+ApostropheMPicBack:
+    INCBIN "pic/other/BackSpriteApostropheM.pic"
+
 SECTION "bank32",ROMX,BANK[$32]
 
 DratiniCave_h:
@@ -130562,8 +130755,10 @@ _DrawCatchGender: ; Denim
     ld [$d11e],a
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
-    ld hl,wPokedexOwned
     ld a,[$d11e]
+    and a
+    jr z,.gender ; MissingNo & ApostropheM don't have catch flag
+    ld hl,wPokedexOwned
     dec a
     ld c,a
     ld b,2
@@ -130581,6 +130776,9 @@ _DrawCatchGender: ; Denim
     call CheckShiny
     call SetTempIV
     jr nz,.NoShiny
+    ld a,[$d11e]
+    and a
+    jr z,.NoShiny ; MissingNo & ApostropheM don't have shiny flag
     FuncCoord 1,1
     ld hl,Coord
     ld de,.ShinyStarIcon
@@ -130809,6 +131007,8 @@ GetGender:
     ld a,$3a
     call Predef ; IndexToPokedex
     ld a,[$d11e]
+    and a
+    jr z,.Genderless ; MissingNo
     dec a ; ApostropheM is not included
     ld b,a
     srl a
@@ -130873,6 +131073,7 @@ IsInTable:
     ret ; nz Found
 
 Genderless:
+    db APOSTROPHE_M
     db ARTICUNO
     db DITTO
     db ELECTRODE
@@ -135765,8 +135966,289 @@ MonOverworldDataNew2_emimonserrate:
 
 SECTION "Bank3b",ROMX,BANK[$3B]
 
+PokemonBaseStats:
 INCLUDE "constants/pokemon_header.asm"
 INCLUDE "constants/pokemon_learnset.asm"
+
+MonsterNames:
+    db "RHYDON@@@@"
+    db "KANGASKHAN"
+    db "NIDORAN@@@"
+    db "CLEFAIRY@@"
+    db "SPEAROW@@@"
+    db "VOLTORB@@@"
+    db "NIDOKING@@"
+    db "SLOWBRO@@@"
+    db "IVYSAUR@@@"
+    db "EXEGGUTOR@"
+    db "LICKITUNG@"
+    db "EXEGGCUTE@"
+    db "GRIMER@@@@"
+    db "GENGAR@@@@"
+    db "NIDORAN@@@"
+    db "NIDOQUEEN@"
+    db "CUBONE@@@@"
+    db "RHYHORN@@@"
+    db "LAPRAS@@@@"
+    db "ARCANINE@@"
+    db "MEW@@@@@@@"
+    db "GYARADOS@@"
+    db "SHELLDER@@"
+    db "TENTACOOL@"
+    db "GASTLY@@@@"
+    db "SCYTHER@@@"
+    db "STARYU@@@@"
+    db "BLASTOISE@"
+    db "PINSIR@@@@"
+    db "TANGELA@@@"
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "GROWLITHE@"
+    db "ONIX@@@@@@"
+    db "FEAROW@@@@"
+    db "PIDGEY@@@@"
+    db "SLOWPOKE@@"
+    db "KADABRA@@@"
+    db "GRAVELER@@"
+    db "CHANSEY@@@"
+    db "MACHOKE@@@"
+    db "MR.MIME@@@"
+    db "HITMONLEE@"
+    db "HITMONCHAN"
+    db "ARBOK@@@@@"
+    db "PARASECT@@"
+    db "PSYDUCK@@@"
+    db "DROWZEE@@@"
+    db "GOLEM@@@@@"
+    db "MISSINGNO."
+    db "MAGMAR@@@@"
+    db "MISSINGNO."
+    db "ELECTABUZZ"
+    db "MAGNETON@@"
+    db "KOFFING@@@"
+    db "MISSINGNO."
+    db "MANKEY@@@@"
+    db "SEEL@@@@@@"
+    db "DIGLETT@@@"
+    db "TAUROS@@@@"
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "FARFETCH'D"
+    db "VENONAT@@@"
+    db "DRAGONITE@"
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "DODUO@@@@@"
+    db "POLIWAG@@@"
+    db "JYNX@@@@@@"
+    db "MOLTRES@@@"
+    db "ARTICUNO@@"
+    db "ZAPDOS@@@@"
+    db "DITTO@@@@@"
+    db "MEOWTH@@@@"
+    db "KRABBY@@@@"
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "VULPIX@@@@"
+    db "NINETALES@"
+    db "PIKACHU@@@"
+    db "RAICHU@@@@"
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "DRATINI@@@"
+    db "DRAGONAIR@"
+    db "KABUTO@@@@"
+    db "KABUTOPS@@"
+    db "HORSEA@@@@"
+    db "SEADRA@@@@"
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "SANDSHREW@"
+    db "SANDSLASH@"
+    db "OMANYTE@@@"
+    db "OMASTAR@@@"
+    db "JIGGLYPUFF"
+    db "WIGGLYTUFF"
+    db "EEVEE@@@@@"
+    db "FLAREON@@@"
+    db "JOLTEON@@@"
+    db "VAPOREON@@"
+    db "MACHOP@@@@"
+    db "ZUBAT@@@@@"
+    db "EKANS@@@@@"
+    db "PARAS@@@@@"
+    db "POLIWHIRL@"
+    db "POLIWRATH@"
+    db "WEEDLE@@@@"
+    db "KAKUNA@@@@"
+    db "BEEDRILL@@"
+    db "MISSINGNO."
+    db "DODRIO@@@@"
+    db "PRIMEAPE@@"
+    db "DUGTRIO@@@"
+    db "VENOMOTH@@"
+    db "DEWGONG@@@"
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "CATERPIE@@"
+    db "METAPOD@@@"
+    db "BUTTERFREE"
+    db "MACHAMP@@@"
+    db "MISSINGNO."
+    db "GOLDUCK@@@"
+    db "HYPNO@@@@@"
+    db "GOLBAT@@@@"
+    db "MEWTWO@@@@"
+    db "SNORLAX@@@"
+    db "MAGIKARP@@"
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MUK@@@@@@@"
+    db "MISSINGNO."
+    db "KINGLER@@@"
+    db "CLOYSTER@@"
+    db "MISSINGNO."
+    db "ELECTRODE@"
+    db "CLEFABLE@@"
+    db "WEEZING@@@"
+    db "PERSIAN@@@"
+    db "MAROWAK@@@"
+    db "MISSINGNO."
+    db "HAUNTER@@@"
+    db "ABRA@@@@@@"
+    db "ALAKAZAM@@"
+    db "PIDGEOTTO@"
+    db "PIDGEOT@@@"
+    db "STARMIE@@@"
+    db "BULBASAUR@"
+    db "VENUSAUR@@"
+    db "TENTACRUEL"
+    db "MISSINGNO."
+    db "GOLDEEN@@@"
+    db "SEAKING@@@"
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "PONYTA@@@@"
+    db "RAPIDASH@@"
+    db "RATTATA@@@"
+    db "RATICATE@@"
+    db "NIDORINO@@"
+    db "NIDORINA@@"
+    db "GEODUDE@@@"
+    db "PORYGON@@@"
+    db "AERODACTYL"
+    db "MISSINGNO."
+    db "MAGNEMITE@"
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "CHARMANDER"
+    db "SQUIRTLE@@"
+    db "CHARMELEON"
+    db "WARTORTLE@"
+    db "CHARIZARD@"
+    db "MISSINGNO."
+    db "KABUTOPS@@" ; Kabutops Fossil
+    db "AERODACTYL" ; Aerodactyl Fossil
+    db "HAUNTER@@@" ; Ghost
+    db "ODDISH@@@@"
+    db "GLOOM@@@@@"
+    db "VILEPLUME@"
+    db "BELLSPROUT"
+    db "WEEPINBELL"
+    db "VICTREEBEL"
+    ; Denim
+    db "MISSINGNO."
+    db "MISSINGNO." ; $C0
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO." ; $D0
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO." ; $E0
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO." ; $F0
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+    db "MISSINGNO."
+
+CharizardMName: ; D73D3E12E08CCD2029CD
+    db $D7,$3D
+	ld a, $12
+	ld [$ff00+$8c], a
+	call DisplayTextID
+	db $CD
+
+ApostropheMName: ; D73D3E13E08CCD2029CD
+    db $D7,$3D
+    ld a,$13
+    ld [$ff00+$8c],a
+    call DisplayTextID
+    db $CD
+
+_ApostropheMDexEntry:
+    db 0 ;----------------|
+    db "This isn't a"      ,$4E
+    db "Glitch!!"          ,$4E
+    db "'M is a new"       ,$49
+    db "cybernetic"        ,$4E
+    db "species like"      ,$4E
+    db "Porygon"           ,$5F,"@"
 
 ; ──────────────────────────────────────────────────────────────────────
 

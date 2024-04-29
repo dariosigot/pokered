@@ -2255,8 +2255,15 @@ MEW_Learnset: MACRO
     db  1,SOFTBOILED
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
+MissingNo_Learnset: MACRO
+    db  1,WATER_GUN
+    db  1,WATER_GUN
+    db  1,SKY_ATTACK
+ENDM
+; ──────────────────────────────────────────────────────────────────────
 MissingNo_EvosMoves:
     db 0
+    MissingNo_Learnset
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 Mon001_EvosMoves:

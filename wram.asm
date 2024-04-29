@@ -974,13 +974,12 @@ W_PARTYMON6NAME: ; d2ec
 SECTION "Pokedex", WRAMX[$d2f7], BANK[1]
 
 wPokedexOwned: ; d2f7
-    ds (150 / 8) + 1
+    ds (255 / 8) + 1
 wPokedexOwnedEnd:
 
-wPokedexSeen: ; d30a
-    ds (150 / 8) + 1
-wPokedexSeenEnd:
+; some free bytes
 
+SECTION "wNumBagItems", WRAMX[$d31d], BANK[1]
 
 wNumBagItems: ; d31d
     ds 1
@@ -1097,7 +1096,15 @@ W_SPRITESETID: ; d3a8
 ; sprite set ID for the current map
     ds 1
 
-    ds 312
+; some free bytes
+
+SECTION "wPokedexSeen", WRAMX[$d490], BANK[1]
+
+wPokedexSeen: ; d490
+    ds (255 / 8) + 1
+wPokedexSeenEnd:
+
+SECTION "W_NUMSPRITES", WRAMX[$d4e1], BANK[1]
 
 W_NUMSPRITES: ; d4e1
 ; number of sprites on the current map
