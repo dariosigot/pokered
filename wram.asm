@@ -290,7 +290,18 @@ wFlags_0xcd60: ; cd60
 ; bit 0: is player engaged by trainer (to avoid being engaged by multiple trainers simultaniously)
     ds 1
 
-    ds 10
+UNION
+
+wBackupEnemyMoves:
+    ds 4
+wBackupEnemyPP:
+    ds 4
+
+    ds 1
+
+ENDU
+
+    ds 1
 
 wJoypadForbiddenButtonsMask: ; cd6b
 ; bit 1 means button presses will be ignored for that button
@@ -1593,16 +1604,9 @@ wEXPBarNeededEXP:
 wEXPBarKeepFullFlag:
     ds 1
 
-wBackupEnemyMoves:
-    ds 4
-wBackupEnemyPP:
-    ds 4
-
 NEXTU
 
-wForceWTWBit0:    ; def0, bit0: Force WTW during Jump
-    ds 1
-wJumpingCounter : ; def1
+wJumpingTile : ; def0
     ds 1
 
 NEXTU

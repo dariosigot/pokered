@@ -37645,11 +37645,6 @@ _CheckForJumping: ; 1a672 (6:6672)
     bit 6,a
     ret nz
 
-    ld hl,wForceWTWBit0
-    res 0,[hl]
-    inc hl
-    ld [hl],0
-
     ld bc,$00FF ; -1
 .loop
     inc c
@@ -37686,14 +37681,7 @@ _CheckForJumping: ; 1a672 (6:6672)
 
     ; Debug
     ld a,c
-    ld [wJumpingCounter+1],a
-
-    ; Collision Tile
-    ;ld a,[hli]
-    ;call GetTileOffset
-    ;ld a,[hli]
-    ;cp d
-    ;ret z
+    ld [wJumpingTile],a
 
     ; Collision Tile After Jump to Check
     ld a,[hli]
@@ -37711,7 +37699,6 @@ _CheckForJumping: ; 1a672 (6:6672)
     ; Simulation Jump Distance
     ld a,[hli]
     ld [$cd38],a
-    ld [wJumpingCounter],a
 
     ; Direction Output
     ld a,[hl]
@@ -37722,9 +37709,6 @@ _CheckForJumping: ; 1a672 (6:6672)
     ld hl,$d736
     set 6,[hl]
     call Func_3486
-
-    ld hl,wForceWTWBit0
-    set 0,[hl]
 
     call Func_1a6f0
     ld a,$a2
@@ -38050,22 +38034,12 @@ CheckJumpExceptionFlag:
     ret
 
 _JumpOrCheckTilePassable:
-    ld hl,wForceWTWBit0
-    bit 0,[hl]
-    res 0,[hl]
+    ld a,[$d736]
+    bit 6,a ; jumping a ledge?
     jr z,.NoWTW
     and a ; rcf -> WTW
     ret
 .NoWTW
-    ld a,[$d736]
-    bit 6,a ; jumping a ledge?
-    jr z,.CheckTile
-    ld a,[wJumpingCounter]
-    and a
-    jr z,.tileNotPassable
-    dec a
-    ld [wJumpingCounter],a
-.CheckTile
     ld a,[$cfc6] ; $FF = Not Passable
     ld d,a
     call CheckPassable
@@ -43568,7 +43542,7 @@ GetMonPotentialMoveList:
     ld [$cc49],a
     call LoadMonData
 
-    ; Get Copy of Level UP EvosMoves in GenericBuffer
+    ; Get Copy of Level UP EvosMoves in GenericBuffer+1
     ld hl,EvosMovesPointerTable
     ld d,0
     ld a,[W_MONHEADER]
@@ -43577,17 +43551,17 @@ GetMonPotentialMoveList:
     rl d
     ld e,a
     add hl,de
-    ld de,GenericBuffer
+    ld de,GenericBuffer+1
     ld a,BANK(EvosMovesPointerTable)
     ld bc,2
     call FarCopyData
-    ld hl,GenericBuffer
+    ld hl,GenericBuffer+1
     ld a,[hli]
     ld h,[hl]
     ld l,a ; hl pointer to Correct EvosMoves
     ld a,BANK(MissingNo_EvosMoves)
-    ld de,GenericBuffer
-    ld bc,96
+    ld de,GenericBuffer+1
+    ld bc,96-1
     call FarCopyData ; copy bc bytes of data from a:hl to de
 
     ; Get Mon Move List from "PreEvolutionMove"
@@ -43613,8 +43587,8 @@ GetMonPotentialMoveList:
     ld de,wMoveRelearnerMoveList+1 ; Final List Pointer
     ld b,0 ; initial counter = 0
 
-    ; Get Mon Move List from Level UP EvosMoves (GenericBuffer)
-    ld hl,GenericBuffer
+    ; Get Mon Move List from Level UP EvosMoves (GenericBuffer+1)
+    ld hl,GenericBuffer+1
 .skipEvolutionDataLoop
     ld a,[hli]
     and a
@@ -51791,6 +51765,29 @@ TransformEffect_: ; Moved Upper in the Bank
     pop de
     pop hl
     push hl
+
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr z,.SkipBackupMoves
+    ld a,[W_ENEMYBATTSTATUS3]
+    bit 3,a ; Pokemon is Just Transformed
+    jr nz,.SkipBackupMoves
+
+    ; Backup Moves & PP
+    push hl
+    push de
+    ld hl,W_ENEMYMONMOVES
+    ld de,wBackupEnemyMoves
+    ld bc,4
+    push bc
+    call CopyData
+    ld hl,W_ENEMYMONPP
+    pop bc
+    call CopyData
+    pop de
+    pop hl
+
+.SkipBackupMoves
     ld a,[hl]
     ld [de],a
     ld bc,$5
@@ -51820,20 +51817,6 @@ TransformEffect_: ; Moved Upper in the Bank
     inc de
     ld a,[de]
     ld [$ccec],a
-
-    ; Backup Moves & PP
-    push hl
-    push bc
-    ld hl,W_ENEMYMONMOVES
-    ld de,wBackupEnemyMoves
-    ld bc,4
-    push bc
-    call CopyData
-    ld hl,W_ENEMYMONPP
-    pop bc
-    call CopyData
-    pop bc
-    pop hl
 
     pop de
 .SkipBackupDV
@@ -52074,18 +52057,18 @@ Func_3aef7: ; Moved in the Bank
     pop de
     jp CopyData
 
-; Get Copy of Level UP EvosMoves in GenericBuffer
+; Get Copy of Level UP EvosMoves in GenericBuffer+1
 GetEvosMoves:
     push de
     ld a,[$CEE9] ; Backup
     push af
     ld a,BANK(MissingNo_EvosMoves)
-    ld de,GenericBuffer
-    ld bc,96
+    ld de,GenericBuffer+1
+    ld bc,96-1
     call FarCopyData ; copy bc bytes of data from a:hl to de
     pop af
     ld [$CEE9],a ; Restore
-    ld hl,GenericBuffer
+    ld hl,GenericBuffer+1
     pop de
     ret
 
