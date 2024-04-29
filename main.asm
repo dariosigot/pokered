@@ -55064,38 +55064,48 @@ SelectEnemyMove: ; 3d564 (f:5564)
     ld a,$ff
     jr .done
 .notCaughtInWrap
-    ld hl,W_ENEMYMONMOVES+1 ; 2nd enemy move
-    ld a,[hld]
+    ;ld hl,W_ENEMYMONMOVES+1 ; 2nd enemy move
+    ;ld a,[hld]
+    ;and a
+    ;jr nz,.atLeastTwoMovesAvailable
+    ;ld a,[W_ENEMYDISABLEDMOVE]
+    ;and a
+    ;ld a,STRUGGLE ; struggle if the only move is disabled
+    ;jr nz,.done
+;.atLeastTwoMovesAvailable
+
+    ; Search At Least One Valid Move
+    ld hl,W_ENEMYMONPP
+    ld b,-1
+.searchNext
+    inc b
+    ld a,b
+    cp 4
+    jr z,.asm_3d601 ; STRUGGLE
+    ; Check PP
+    ld a,[hli]
     and a
-    jr nz,.atLeastTwoMovesAvailable
+    jr z,.searchNext
+    ; Check Disabled
     ld a,[W_ENEMYDISABLEDMOVE]
-    and a
-    ld a,STRUGGLE ; struggle if the only move is disabled
-    jr nz,.done
-.atLeastTwoMovesAvailable
-    ;ld a,[W_ISINBATTLE]
-    ;dec a
-    ;jr z,.chooseRandomMove ; wild encounter
+    swap a
+    and $f
+    dec a
+    cp b
+    jr z,.searchNext
+
+.AtLeastOneValidMove
     ld hl,AIEnemyTrainerChooseMoves
     ld b,BANK(AIEnemyTrainerChooseMoves)
     call Bankswitch
+    ld de,W_ENEMYMONPP
 .chooseRandomMove
     push hl
-    call GenRandomInBattle ; get random
-    ld b,$1
-    cp $3f ; select move 1 in [0,3e] (63/256 chance)
-    jr c,.moveChosen
-    inc hl
-    inc b
-    cp $7f ; select move 1 in [3f,7e] (64/256 chance)
-    jr c,.moveChosen
-    inc hl
-    inc b
-    cp $be ; select move 1 in [7f,bd] (63/256 chance)
-    jr c,.moveChosen
-    inc hl
-    inc b ; select move 4 in [be,ff] (66/256 chance)
-.moveChosen
+    push de
+    call ChooseRandomMove
+    ld a,[de]
+    and a
+    jr z,.noPP
     ld a,b
     dec a
     ld [wEnemyMoveListIndex],a
@@ -55104,6 +55114,8 @@ SelectEnemyMove: ; 3d564 (f:5564)
     and $f
     cp b
     ld a,[hl]
+.noPP
+    pop de
     pop hl
     jr z,.chooseRandomMove ; move disabled,try again
     and a
@@ -55114,6 +55126,8 @@ SelectEnemyMove: ; 3d564 (f:5564)
 .asm_3d601
     ld a,STRUGGLE
     jr .done
+
+SECTION "Func_3d605",ROMX[$5605],BANK[$F]
 
 Func_3d605: ; 3d605 (f:5605)
     ld a,$ff
@@ -61425,6 +61439,26 @@ Copy4Bytes:
 Copy4BytesDirect:
     ld bc,$4
     jp CopyData
+
+ChooseRandomMove:
+    call GenRandomInBattle ; get random
+    ld b,$1
+    cp $3f ; select move 1 in [0,3e] (63/256 chance)
+    ret c
+    inc hl
+    inc de
+    inc b
+    cp $7f ; select move 1 in [3f,7e] (64/256 chance)
+    ret c
+    inc hl
+    inc de
+    inc b
+    cp $be ; select move 1 in [7f,bd] (63/256 chance)
+    ret c
+    inc hl
+    inc de
+    inc b ; select move 4 in [be,ff] (66/256 chance)
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -133785,6 +133819,9 @@ TrainerClassMoveChoiceModifications:
     db 1,3,4,0    ; LANCE
 
 WildAI:
+    db ABRA
+    db KADABRA
+    db ALAKAZAM
     db AERODACTYL
     db SNORLAX
     db ARTICUNO
@@ -133828,6 +133865,26 @@ AIEnemyTrainerChooseMoves:
     inc a ; a = 1
 .done
     ld [wAILastMovePower],a
+
+    ; highly discourage zero pp move
+    ld hl,W_ENEMYMONPP
+    ld bc,$00FF ; b = 0 | c = -1
+.searchNext
+    inc c
+    ld a,c
+    cp 4
+    jr z,.ppdone
+    ld a,[hli]
+    and a
+    jr nz,.searchNext
+    push hl
+    ld hl,$cee9
+    add hl,bc    ; advance pointer to zero pp move
+    ld [hl],$50  ; forbid (highly discourage) zero pp move
+    pop hl
+    jr .searchNext
+.ppdone
+
     ld a,[W_ENEMYDISABLEDMOVE] ; forbid disabled move (if any)
     swap a
     and $f
