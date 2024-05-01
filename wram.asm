@@ -1098,7 +1098,7 @@ W_SPRITESETID: ; d3a8
 
 ; some free bytes
 
-SECTION "wPokedexSeen", WRAMX[$d490], BANK[1]
+SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]
 
 wPokedexSeen: ; d490
     ds (255 / 8) + 1

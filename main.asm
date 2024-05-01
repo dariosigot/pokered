@@ -23489,7 +23489,7 @@ ItemUseBall: ; d687 (3:5687)
     ld a,$3a    ;convert order: Internal->Dex
     call Predef
     ld a,[$d11e]
-    dec a
+    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,2
     ld hl,wPokedexOwned    ;Dex_own_flags (pokemon)
@@ -23498,7 +23498,7 @@ ItemUseBall: ; d687 (3:5687)
     ld a,c
     push af
     ld a,[$d11e]
-    dec a
+    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,1
     ld a,$10    ;set Dex_own_flag?
@@ -26835,7 +26835,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld a,[$cc49]
     and $f
     call GenerateRandomEnemyTrainerIV ; ld a,$98     ; set enemy trainer mon IVs to fixed average values
-    ds 1                              ; ld b,$88
+    ;ds 1                             ; ld b,$88
     jr nz,.writeFreshMonData
     ld a,[$cf91]
     ld [$d11e],a
@@ -26844,7 +26844,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     pop de
     ld a,[$d11e]
-    dec a
+    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$2
     ld hl,wPokedexOwned ; $d2f7
@@ -26852,7 +26852,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld a,c
     ld [$d153],a
     ld a,[$d11e]
-    dec a
+    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
     push bc
@@ -27091,7 +27091,7 @@ _AddEnemyMonToPlayerParty: ; f49d (3:749d)
     ld a,$3a
     call Predef
     ld a,[$d11e]
-    dec a
+    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
     ld hl,wPokedexOwned
@@ -31759,7 +31759,7 @@ GetEnemy:
     push hl
     push bc
     ld hl,wPokedexOwned
-    ld bc,(2 << 8) + DEX_PIKACHU - 1 ; 2 = read bit
+    ld bc,(2 << 8) + DEX_PIKACHU ; TODO : - 1 ; 2 = read bit ; POKEDEXMOD
     ld a,$10
     call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
     ld a,c
@@ -50456,7 +50456,7 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     ld a,[$d11e]
-    dec a
+    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
     ld hl,wPokedexOwned ; $d2f7
@@ -58247,7 +58247,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     ld a,[$d11e]
-    dec a
+    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
     ld hl,wPokedexSeen ; $d30a
@@ -61443,7 +61443,7 @@ DisplayPokedexMenu_: ; 40000 (10:4000)
     call Bankswitch
 .doPokemonListMenu
     ld hl,wTopMenuItemY
-    ld a,3
+    ld a,2
     ld [hli],a ; top menu item Y
     xor a
     ld [hli],a ; top menu item X
@@ -61451,7 +61451,7 @@ DisplayPokedexMenu_: ; 40000 (10:4000)
     ld [$cc37],a
     inc hl
     inc hl
-    ld a,6
+    ld a,7
     ld [hli],a ; max menu item ID
     ld [hl],%00110011 ; menu watched keys (Left,Right,B button,A  button)
     call HandlePokedexListMenu
@@ -61493,7 +61493,7 @@ HandlePokedexSideMenu: ; 4006d (10:406d)
     ld a,[wListScrollOffset]
     push af
     add b
-    inc a
+    ds 1 ; inc a ; POKEDEXMOD
     ld [$d11e],a
     ld a,[$d11e]
     push af
@@ -61623,10 +61623,10 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld hl,Coord
     ld de,PokedexOwnText
     call PlaceString
-    FuncCoord 1,1
-    ld hl,Coord
-    ld de,PokedexContentsText
-    call PlaceString
+    ;FuncCoord 1,1
+    ;ld hl,Coord
+    ;ld de,PokedexContentsText
+    ;call PlaceString
     FuncCoord 16,10
     ld hl,Coord
     ld de,PokedexMenuItemsText
@@ -61652,15 +61652,16 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld [H_AUTOBGTRANSFERENABLED],a
     FuncCoord 4,2
     ld hl,Coord
-    ld bc,$0e0a
+    ld bc,$0f0a
     call ClearScreenArea
-    FuncCoord 1,3
+    FuncCoord 1,2
     ld hl,Coord
     ld a,[wListScrollOffset]
+    dec a ; POKEDEXMOD
     ld [$d11e],a
-    ld d,7
+    ld d,8
     ld a,[$cd3d]
-    cp a,7
+    cp a,8
     jr nc,.printPokemonLoop
     ld d,a
     dec a
@@ -61736,9 +61737,9 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     jr z,.checkIfRightPressed
 .downPressed ; scroll down one row
     ld a,[$cd3d]
-    cp a,7
+    cp a,8
     jp c,.loop
-    sub a,7
+    sub a,8
     ld b,a
     ld a,[wListScrollOffset]
     cp b
@@ -61749,14 +61750,14 @@ HandlePokedexListMenu: ; 40111 (10:4111)
 .checkIfRightPressed
     bit 4,a ; was Right pressed?
     jr z,.checkIfLeftPressed
-.rightPressed ; scroll down 7 rows
+.rightPressed ; scroll down 8 rows
     ld a,[$cd3d]
-    cp a,7
+    cp a,8
     jp c,.loop
-    sub a,6
+    sub a,7
     ld b,a
     ld a,[wListScrollOffset]
-    add a,7
+    add a,8
     ld [wListScrollOffset],a
     cp b
     jp c,.loop
@@ -61764,12 +61765,12 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld a,b
     ld [wListScrollOffset],a
     jp .loop
-.checkIfLeftPressed ; scroll up 7 rows
+.checkIfLeftPressed ; scroll up 8 rows
     bit 5,a ; was Left pressed?
     jr z,.buttonAPressed
 .leftPressed
     ld a,[wListScrollOffset]
-    sub a,7
+    sub a,8
     ld [wListScrollOffset],a
     jp nc,.loop
     xor a
@@ -61782,7 +61783,7 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     and a
     ret
 
-DrawPokedexVerticalLine: ; 4028e (10:428e)
+DrawPokedexVerticalLine:
     ld c,9 ; height of line
     ld de,20 ; width of screen
     ld a,$71 ; vertical line tile
@@ -61794,16 +61795,16 @@ DrawPokedexVerticalLine: ; 4028e (10:428e)
     jr nz,.loop
     ret
 
-PokedexSeenText: ; 4029d (10:429d)
+PokedexSeenText:
     db "SEEN@"
 
-PokedexOwnText: ; 402a2 (10:42a2)
+PokedexOwnText:
     db "OWN@"
 
-PokedexContentsText: ; 402a6 (10:42a6)
-    db "CONTENTS@"
+;PokedexContentsText:
+;    db "CONTENTS@"
 
-PokedexMenuItemsText: ; 402af (10:42af)
+PokedexMenuItemsText:
     db "DATA",$4E
     db "CRY",$4E
     db "AREA",$4E
@@ -61813,9 +61814,9 @@ PokedexMenuItemsText: ; 402af (10:42af)
 ; INPUT:
 ; [$d11e] = pokedex number
 ; hl = address of bit field
-IsPokemonBitSet: ; 402c2 (10:42c2)
+IsPokemonBitSet:
     ld a,[$d11e]
-    dec a
+    ;ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,2
     ld a,$10
@@ -61823,6 +61824,8 @@ IsPokemonBitSet: ; 402c2 (10:42c2)
     ld a,c
     and a
     ret
+
+SECTION "ShowPokedexData",ROMX[$42d1],BANK[$10]
 
 ; function to display pokedex data from outside the pokedex
 ShowPokedexData: ; 402d1 (10:42d1)
@@ -63145,7 +63148,7 @@ PokedexToIndex: ; 40ff9 (10:4ff9)
     push hl
     ld a,[$D11E]
     ld b,a
-    ld c,0
+    ld c,-1 ; ld c,0 ; POKEDEXMOD
     ld hl,PokedexOrder
 
 .loop ; go through the list until we find an entry with a matching dex number
@@ -63165,7 +63168,7 @@ IndexToPokedex: ; 41010 (10:5010)
     push bc
     push hl
     ld a,[$D11E]
-    dec a
+    ds 1 ; dec a ; POKEDEXMOD
     ld hl,PokedexOrder
     ld b,0
     ld c,a
@@ -64506,6 +64509,7 @@ LoadMonBackSpritePokedex:
     jp HackBackSprite
 
 PokedexOrder: ; Moved in the Bank
+    db DEX_MISSINGNO   ; $00 ; ApostropheM
     db DEX_RHYDON      ; $01
     db DEX_KANGASKHAN  ; $02
     db DEX_NIDORAN_M   ; $03
@@ -64761,7 +64765,6 @@ PokedexOrder: ; Moved in the Bank
     db 0 ; MISSINGNO.  ; $FD
     db 0 ; MISSINGNO.  ; $FE
     db DEX_CHARIZARD   ; $FF ; Charizard'M
-    db DEX_MISSINGNO   ; $00 ; ApostropheM
 
 PokedexEntryPointers: ; Moved in the Bank
     dw RhydonDexEntry
@@ -74721,7 +74724,7 @@ SetPokedexOwnedFlag: ; 4fe11 (13:7e11)
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     ld a,[$d11e]
-    dec a
+    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld hl,wPokedexOwned ; $d2f7
     ld b,$1
@@ -84528,15 +84531,16 @@ CalcDSquared: ; 59010 (16:5010)
 ; resulting in
 ;  (a*n^3)/b + sign*c*n^2 + d*n - e
 ; where sign = -1 <=> S=1
-GrowthRateTable: ; 5901d (16:501d)
+GrowthRateTable: ; 5901d (16:501d) ; Don't Move this Subroutine (MissingNo Growth Rate)
     db $11,$00,$00,$00 ; medium fast      n^3
     db $34,$0A,$00,$1E ; (unused?)    3/4 n^3 + 10 n^2         - 30
     db $34,$14,$00,$46 ; (unused?)    3/4 n^3 + 20 n^2         - 70
     db $65,$8F,$64,$8C ; medium slow: 6/5 n^3 - 15 n^2 + 100 n - 140
     db $45,$00,$00,$00 ; fast:        4/5 n^3
     db $54,$00,$00,$00 ; slow:        5/4 n^3
+   ;db $08,$21,$9B,$50 ; missingno:   0/8 n^3 + 33 n^2 + 155 n - 80
 
-Func_59035 ; 0x59035
+Func_59035 ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
     ld hl,UnnamedText_59091 ; $5091
     call PrintText
     call YesNoChoice
@@ -84574,9 +84578,9 @@ Func_59035 ; 0x59035
     ld hl,UnnamedText_59096 ; $5096
     call PrintText
     ld a,$80
-    jr .asm_5908e ; 0x59084 $8
+    jr .asm_5908e ; 0x59084 $8        ; Dex#00 Growth Rate
 .asm_59086
-    ld hl,UnnamedText_5909b ; $509b
+    ld hl,UnnamedText_5909b ; $509b   ; ... = $08,$21,$9B,$50
     call PrintText
     ld a,$ff
 .asm_5908e
@@ -87880,7 +87884,7 @@ RedsHouse2FObject: ; 0x5c0d0 ?
     EVENT_DISP REDS_HOUSE_2F_WIDTH,1,7
 
 Func_5c0dc: ; 5c0dc (17:40dc)
-    ld a,$4b
+    ld a,%10010010 ; ld a,$4b ; POKEDEXMOD
     ld [wPokedexOwned],a ; $d2f7
     ld a,$3d
     call Predef ; indirect jump to ShowPokedexData (402d1 (10:42d1))
@@ -130757,9 +130761,9 @@ _DrawCatchGender: ; Denim
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     ld a,[$d11e]
     and a
-    jr z,.gender ; MissingNo & ApostropheM don't have catch flag
+    ;jr z,.gender ; MissingNo & ApostropheM don't have catch flag
     ld hl,wPokedexOwned
-    dec a
+    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,2
     ld a,$10
@@ -136243,12 +136247,8 @@ ApostropheMName: ; D73D3E13E08CCD2029CD
 
 _ApostropheMDexEntry:
     db 0 ;----------------|
-    db "This isn't a"      ,$4E
-    db "Glitch!!"          ,$4E
-    db "'M is a new"       ,$49
-    db "cybernetic"        ,$4E
-    db "species like"      ,$4E
-    db "Porygon"           ,$5F,"@"
+    db "What's that ???" ,$4E
+    db "It's a Glitch" ,$5f,"@"
 
 ; ──────────────────────────────────────────────────────────────────────
 
