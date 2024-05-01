@@ -22488,7 +22488,7 @@ MapHSA1: ; cd81 (3:4d81)
     db SEAFOAM_ISLANDS_4,$02,Show
     db SEAFOAM_ISLANDS_4,$03,Show
     db SEAFOAM_ISLANDS_4,$05,Hide
-    db SEAFOAM_ISLANDS_4,$06,Hide
+    db SEAFOAM_ISLANDS_4,$06,Hide ; $E0
 MapHSA2: ; cd8d (3:4d8d)
     db SEAFOAM_ISLANDS_5,$01,Hide
     db SEAFOAM_ISLANDS_5,$02,Hide
@@ -22498,11 +22498,11 @@ MapHSD9:
     db SAFARI_ZONE_EAST,$02,Show
     db SAFARI_ZONE_EAST,$03,Show
     db SAFARI_ZONE_EAST,$04,Show
-    db SAFARI_ZONE_EAST,$05,Hide ; $E6 (Lapras)
+    db SAFARI_ZONE_EAST,$05,Hide ; $E6 -> $E8 (Lapras)
 MapHSDA:
     db SAFARI_ZONE_NORTH,$01,Show
     db SAFARI_ZONE_NORTH,$02,Show
-    db SAFARI_ZONE_NORTH,$03,Show ; $E9 (Lapras)
+    db SAFARI_ZONE_NORTH,$03,Show ; $E9 -> $EB (Lapras)
 MapHSDB:
     db SAFARI_ZONE_WEST,$01,Show
     db SAFARI_ZONE_WEST,$02,Show
@@ -22510,7 +22510,7 @@ MapHSDB:
     db SAFARI_ZONE_WEST,$04,Show
 MapHSDC:
     db SAFARI_ZONE_CENTER,$01,Show
-    db SAFARI_ZONE_CENTER,$02,Hide ; $EF (Lapras)
+    db SAFARI_ZONE_CENTER,$02,Hide ; $EF -> $F1 (Lapras)
 
     db $FF,$01,Show
 
@@ -70050,21 +70050,21 @@ SafariZonePostLapras:
     ld [W_CURMAPSCRIPT],a
     ret
 .MissableIdList
-    db SAFARI_ZONE_EAST,$E6
-    db SAFARI_ZONE_NORTH,$E9
-    db SAFARI_ZONE_CENTER,$EF
+    db SAFARI_ZONE_EAST,$E8
+    db SAFARI_ZONE_NORTH,$EB
+    db SAFARI_ZONE_CENTER,$F1
 .RunAwayTextIdList
     db SAFARI_ZONE_EAST,9
     db SAFARI_ZONE_NORTH,9
     db SAFARI_ZONE_CENTER,5
 .ShowLapras1IdList
-    db SAFARI_ZONE_EAST,$E9
-    db SAFARI_ZONE_NORTH,$E6
-    db SAFARI_ZONE_CENTER,$E6
+    db SAFARI_ZONE_EAST,$EB
+    db SAFARI_ZONE_NORTH,$E8
+    db SAFARI_ZONE_CENTER,$E8
 .ShowLapras2IdList
-    db SAFARI_ZONE_EAST,$EF
-    db SAFARI_ZONE_NORTH,$EF
-    db SAFARI_ZONE_CENTER,$E9
+    db SAFARI_ZONE_EAST,$F1
+    db SAFARI_ZONE_NORTH,$F1
+    db SAFARI_ZONE_CENTER,$EB
 
 GetCurrentMapLaprasInfo:
     call GetCurrentOldAdventureMap
