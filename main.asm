@@ -33545,7 +33545,7 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db BANK(ClipboardSprite)
 
     ; SPRITE_SNORLAX
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_SNORLAX-1)%(DEX_MAGIKARP-1)))
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_SNORLAX)%(128)))
     db $40 ; byte count
     db BANK(MonOverworldDataNew2_emimonserrate)
 
@@ -33580,37 +33580,37 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db BANK(BasketSprite)
 
     ; SPRITE_LAPRAS
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_LAPRAS-1)%(DEX_MAGIKARP-1)))
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_LAPRAS)%(128)))
     db $40 ; byte count
     db BANK(MonOverworldDataNew2_emimonserrate)
 
     ; SPRITE_AERODACTYL
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_AERODACTYL-1)%(DEX_MAGIKARP-1)))
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_AERODACTYL)%(128)))
     db $40 ; byte count
     db BANK(MonOverworldDataNew2_emimonserrate)
 
     ; SPRITE_ARTICUNO
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ARTICUNO-1)%(DEX_MAGIKARP-1)))
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ARTICUNO)%(128)))
     db $40 ; byte count
     db BANK(MonOverworldDataNew2_emimonserrate)
 
     ; SPRITE_ZAPDOS
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ZAPDOS-1)%(DEX_MAGIKARP-1)))
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ZAPDOS)%(128)))
     db $40 ; byte count
     db BANK(MonOverworldDataNew2_emimonserrate)
 
     ; SPRITE_MOLTRES
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MOLTRES-1)%(DEX_MAGIKARP-1)))
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MOLTRES)%(128)))
     db $40 ; byte count
     db BANK(MonOverworldDataNew2_emimonserrate)
 
     ; SPRITE_DRATINI
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_DRATINI-1)%(DEX_MAGIKARP-1)))
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_DRATINI)%(128)))
     db $40 ; byte count
     db BANK(MonOverworldDataNew2_emimonserrate)
 
     ; SPRITE_MEWTWO
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MEWTWO-1)%(DEX_MAGIKARP-1)))
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MEWTWO)%(128)))
     db $40 ; byte count
     db BANK(MonOverworldDataNew2_emimonserrate)
 
@@ -101912,10 +101912,10 @@ CreateMonOvWorldSprInstruction:
     push hl ; Backup wLocationMonOvSprInstruction corretta
 
     call IndexToMiniSpriteOrder
-    ld b,129 - 1 ; MAGIKARP in original pokedex
+    ld b,128 ; TAUROS in original pokedex
     cp b
     push af ; Backup flag C
-    jr c,.Before128 ; < MAGIKARP in original pokedex
+    jr c,.Before128 ; < TAUROS in original pokedex
     sub b
 .Before128
     ld hl,$4000 ; Entrambe le liste di immagini mini sprite iniziano a inizio BANK
@@ -102023,7 +102023,7 @@ IndexToMiniSpriteOrder:
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     pop de
     ld a,[$d11e]
-    dec a
+    ;ds 1 ; dec a ; POKEDEXMOD
     ret
 
 PalPacketStatMenu: ; Denim
