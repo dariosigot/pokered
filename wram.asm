@@ -974,7 +974,7 @@ W_PARTYMON6NAME: ; d2ec
 SECTION "Pokedex", WRAMX[$d2f7], BANK[1]
 
 wPokedexOwned: ; d2f7
-    ds (255 / 8) + 1
+    ds (152 / 8)
 wPokedexOwnedEnd:
 
 ; some free bytes
@@ -1101,7 +1101,7 @@ W_SPRITESETID: ; d3a8
 SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]
 
 wPokedexSeen: ; d490
-    ds (255 / 8) + 1
+    ds (152 / 8)
 wPokedexSeenEnd:
 
 SECTION "W_NUMSPRITES", WRAMX[$d4e1], BANK[1]

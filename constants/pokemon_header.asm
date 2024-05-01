@@ -1,11 +1,11 @@
-ApostropheMBaseStats:
+MissingNoBaseStats:
 	db 0              ; pokedex id
 	db 33,MUK,0       ; Hp, Attack, Defense
 	db 29,VOLTORB     ; Speed, Special
 	db VOLTORB,0      ; Bird/Normal
 	db 29,WEEZING,MUK ; CatchRate, BaseExpYield, Sprite Dimension
 	
-	dw ApostropheMPicFront, ApostropheMPicBack ;	db 0,25,KOFFING,WEEZING
+	dw MissingNoPicFront, MissingNoPicBack ;	db 0,25,KOFFING,WEEZING
 
 	dw 0,0 ; db KOFFING,KOFFING,WEEZING,0 ; attacks known at lvl 0: WATER_GUN, WATER_GUN, SKY_ATTACK
 	db 26 ; growth rate
@@ -13,7 +13,7 @@ ApostropheMBaseStats:
 	db KOFFING,KOFFING,GRIMER,KOFFING,0 ; learnset
 	db 28,GRIMER                        ; learnset
 
-	db BANK(ApostropheMPicFront) ;	db GRIMER
+	db BANK(MissingNoPicFront) ;	db GRIMER
 
 BulbasaurBaseStats: ; 383de (e:43de)
     db DEX_BULBASAUR ; pokedex id
