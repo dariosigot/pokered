@@ -364,7 +364,7 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     call HackFromBank0 ; $0433 ; BugFixLongRangeTrainer ; ld a,[$d732]
     and a,$18          ; $0436
     jp nz,HandleFlyOrTeleportAway
-    ld a,[W_CUROPPONENT]
+    ld a,[W_CUROPPONENT] ; $d059
     and a
     jp nz,.newBattle
     ld a,[$d730]
@@ -430,7 +430,7 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
 .changeMap
     jp EnterMap
 .checkForOpponent
-    ld a,[W_CUROPPONENT]
+    ld a,[W_CUROPPONENT] ; $d059
     and a
     jp nz,.newBattle
     jp OverworldLoop
@@ -5933,6 +5933,21 @@ TilePairCollisionsWater:
     db $11,$14,$05;
     db $FF;
 
+ResetButtonPressedAndMapScript: ; Moved in the Bank
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld [H_NEWLYPRESSEDBUTTONS],a
+    ld [H_NEWLYRELEASEDBUTTONS],a
+    ld [W_CURMAPSCRIPT],a               ; reset battle status
+    ret
+
+; calls TrainerWalkUpToPlayer
+TrainerWalkUpToPlayer_Bank0: ; Moved in the Bank
+    ld b,BANK(TrainerWalkUpToPlayer)
+    ld hl,TrainerWalkUpToPlayer
+    jp Bankswitch ; indirect jump to TrainerWalkUpToPlayer (56881 (15:6881))
+
 ; Free
 
 SECTION "TextScriptEndingChar",ROM0[$24d6]
@@ -8094,7 +8109,7 @@ CheckFightingMapTrainers: ; 3219 (0:3219)
     inc [hl]      ; progress to battle phase 1 (engaging)
     ret
 
-Func_324c: ; 324c (0:324c)
+DisplayEnemyTrainerTextAndStartBattle: ; 324c (0:324c)
     ld a,[$d730]
     and $1
     ret nz
@@ -8133,9 +8148,12 @@ EndTrainerBattle: ; 3275 (0:3275)
     ld c,a
     ld b,$1
     call HandleBitArray_Bank0   ; flag trainer as fought
-    ld a,[W_ENEMYMONORTRAINERCLASS]
-    cp $c8
-    jr nc,.skipRemoveSprite    ; test if trainer was fought (in that case skip removing the corresponding sprite)
+    ld hl,W_TRAINERNO
+    ld a,[hl]
+    and a
+    ld a,0
+    ld [hl],a
+    jr nz,.skipRemoveSprite    ; test if trainer was fought (in that case skip removing the corresponding sprite)
     ld hl,W_MISSABLEOBJECTLIST
     ld de,$2
     ld a,[$cf13]
@@ -8150,35 +8168,23 @@ EndTrainerBattle: ; 3275 (0:3275)
     bit 4,[hl]
     res 4,[hl]
     ret nz
-
-ResetButtonPressedAndMapScript: ; 32c1 (0:32c1)
-    xor a
-    ld [wJoypadForbiddenButtonsMask],a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld [H_NEWLYPRESSEDBUTTONS],a
-    ld [H_NEWLYRELEASEDBUTTONS],a
-    ld [W_CURMAPSCRIPT],a               ; reset battle status
-    ret
-
-; calls TrainerWalkUpToPlayer
-TrainerWalkUpToPlayer_Bank0: ; 32cf (0:32cf)
-    ld b,BANK(TrainerWalkUpToPlayer)
-    ld hl,TrainerWalkUpToPlayer
-    jp Bankswitch ; indirect jump to TrainerWalkUpToPlayer (56881 (15:6881))
+    jp ResetButtonPressedAndMapScript
 
 ; sets opponent type and mon set/lvl based on the engaging trainer data
-InitBattleEnemyParameters: ; 32d7 (0:32d7)
+InitBattleEnemyParameters: ; Moved in the Bank
     ld a,[wEngagedTrainerClass]
     ld [W_CUROPPONENT],a ; $d059
-    ld [W_ENEMYMONORTRAINERCLASS],a
-    cp $c8
     ld a,[wEngagedTrainerSet] ; $cd2e
-    jr c,.noTrainer
+    cp OPP_LVL_OFFSET
+    jr c,.Trainer
+    sub OPP_LVL_OFFSET
+    ld [W_CURENEMYLVL],a ; $d127
+    xor a
+.Trainer
     ld [W_TRAINERNO],a ; $d05d
     ret
-.noTrainer
-    ld [W_CURENEMYLVL],a ; $d127
-    ret
+
+SECTION "Func_32ef",ROM0[$32ef]
 
 Func_32ef: ; 32ef (0:32ef)
     ld hl,Func_567f9
@@ -8272,7 +8278,7 @@ EngageMapTrainer: ; 336a (0:336a)
     ld a,[hli]    ; load trainer class
     ld [wEngagedTrainerClass],a
     ld a,[hl]     ; load trainer mon set
-    ld [wEnemyMonAttackMod],a ; $cd2e
+    ld [wEngagedTrainerSet],a ; $cd2e
     jp PlayTrainerMusic
 
 Func_3381: ; 3381 (0:3381)
@@ -8337,11 +8343,11 @@ Func_33dd: ; 33dd (0:33dd)
 
 PlayTrainerMusic: ; 33e8 (0:33e8)
     ld a,[wEngagedTrainerClass]
-    cp $c8 + SONY1
+    cp SONY1
     ret z
-    cp $c8 + SONY2
+    cp SONY2
     ret z
-    cp $c8 + SONY3
+    cp SONY3
     ret z
     ld a,[W_GYMLEADERNO] ; $d05c
     and a
@@ -8381,21 +8387,21 @@ PlayTrainerMusic: ; 33e8 (0:33e8)
     jp PlaySound
 
 FemaleTrainerList: ; 3434 (0:3434)
-    db $c8+LASS
-    db $c8+JR__TRAINER_F
-    db $c8+BEAUTY
-    db $c8+COOLTRAINER_F
+    db LASS
+    db JR__TRAINER_F
+    db BEAUTY
+    db COOLTRAINER_F
     db $FF
 
 EvilTrainerList: ; 3439 (0:3439)
-    db $c8+JUGGLER_X
-    db $c8+GAMBLER
-    db $c8+ROCKER
-    db $c8+JUGGLER
-    db $c8+CHIEF
-    db $c8+SCIENTIST
-    db $c8+GIOVANNI
-    db $c8+ROCKET
+    db JUGGLER_X
+    db GAMBLER
+    db ROCKER
+    db JUGGLER
+    db CHIEF
+    db SCIENTIST
+    db GIOVANNI
+    db ROCKET
     db $FF
 
 Func_3442: ; 3442 (0:3442)
@@ -11863,7 +11869,7 @@ Func_4da6: ; 4da6 (1:4da6)
     ld [W_CURMAP],a
     call AddPokemonToParty
     ld a,$1
-    ld [W_CUROPPONENT],a
+    ld [W_CUROPPONENT],a ; $d059
     ld a,$2c
     call Predef
     ld a,$1
@@ -13051,7 +13057,7 @@ CableClub_DoBattleOrTradeAgain:
     jr nz,.asm_5506
     ld a,$4
     ld [W_ISLINKBATTLE],a ; $d12b
-    ld a,$e1
+    ld a,SONY1
     ld [W_CUROPPONENT],a ; $d059
     call ClearScreen
     call Delay3
@@ -18782,12 +18788,13 @@ PlayBattleMusic: ; 0x90c6
     ld a,(Music_GymLeaderBattle - $4000) / 3
     jr .playSong
 .notGymLeaderBattle
-    ld a,[W_CUROPPONENT]
-    cp $c8
-    jr c,.wildBattle
-    cp SONY3 + $c8
+    ld a,[W_TRAINERNO]
+    and a
+    ds 1
+    jr z,.wildBattle
+    cp SONY3
     jr z,.finalBattle
-    cp LANCE + $c8
+    cp LANCE
     jr nz,.normalTrainerBattle
     ld a,(Music_GymLeaderBattle - $4000) / 3 ; lance also plays gym leader theme
     jr .playSong
@@ -24790,7 +24797,7 @@ RodResponse: ; e28d (3:628d)
     ld a,b ; level
     call GetBiteLevel ; ld [W_CURENEMYLVL],a
     ld a,c ; species
-    ld [W_CUROPPONENT],a
+    ld [W_CUROPPONENT],a ; $d059
 .next
     ld hl,$D700
     ld a,[hl] ; store the value in a
@@ -28411,8 +28418,8 @@ GenerateRandomEnemyTrainerIV:
 GetTrainerMinValue:
     push hl
     ld hl,TrainerMinValueTable
-    ld a,[W_CUROPPONENT]
-    sub $C9 ; Convert Generic Id to Trainer ID
+    ld a,[W_CUROPPONENT] ; $d059
+    dec a ; sub $C9 ; Convert Generic Id to Trainer ID
     add a
     ld e,a
     ld d,0
@@ -31702,6 +31709,11 @@ GetEnemy:
     jr z,.CheckMew
     cp $04
     jr z,.CheckPikachu
+    jr c,.UnknownDungeon ; 0,1,2
+    ; Default $FF = Charizard'M
+    ld [W_CURENEMYLVL],a
+    ld a,CHARIZARD_M
+    jr .WillEncounter
 .UnknownDungeon
     push hl
     push de
@@ -34213,7 +34225,7 @@ CeruleanCityObject: ; 0x18786 (size=170)
 
     db $b ; people
     db SPRITE_BLUE,$2 + 4,$14 + 4,$ff,$d0,$1 ; person
-    db SPRITE_ROCKET,$8 + 4,$1e + 4,$ff,$ff,$42,ROCKET + $C8,$5 ; trainer
+    db SPRITE_ROCKET,$8 + 4,$1e + 4,$ff,$ff,$42,ROCKET,$5 ; trainer
     db SPRITE_BLACK_HAIR_BOY_1,$14 + 4,$1f + 4,$ff,$d0,$3 ; person
     db SPRITE_BLACK_HAIR_BOY_2,$12 + 4,$f + 4,$fe,$1,$4 ; person
     db SPRITE_BLACK_HAIR_BOY_2,$15 + 4,$9 + 4,$fe,$2,$5 ; person
@@ -34680,7 +34692,7 @@ ViridianCityScript1: ; 19062 (6:5062)
     ld a,5
     ld [W_CURENEMYLVL],a
     ld a,WEEDLE
-    ld [W_CUROPPONENT],a
+    ld [W_CUROPPONENT],a ; $d059
     ld a,$2
     ld [W_VIRIDIANCITYCURSCRIPT],a
     ret
@@ -35395,8 +35407,8 @@ CeruleanCityScript1: ; 19567 (6:5567)
     ld hl,UnnamedText_1966d
     ld de,UnnamedText_19672
     call PreBattleSaveRegisters
-    ld a,$e1
-    ld [$d059],a
+    ld a,SONY1
+    ld [W_CUROPPONENT],a ; $d059
 
     ; select which team to use during the encounter
     ld a,[W_RIVALSTARTER]
@@ -36608,7 +36620,7 @@ SilphCo4Script_19d89: ; 19d89 (6:5d89)
 
 SilphCo4ScriptPointers: ; 19d9a (6:5d9a)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SilphCo4TextPointers: ; 19da0 (6:5da0)
@@ -36735,9 +36747,9 @@ SilphCo4Object: ; 0x19e35 (size=111)
 
     db $7 ; people
     db SPRITE_LAPRAS_GIVER,$2 + 4,$6 + 4,$ff,$ff,$1 ; person
-    db SPRITE_ROCKET,$e + 4,$9 + 4,$ff,$d3,$42,ROCKET + $C8,$1a ; trainer
-    db SPRITE_OAK_AIDE,$6 + 4,$e + 4,$ff,$d2,$43,SCIENTIST + $C8,$5 ; trainer
-    db SPRITE_ROCKET,$a + 4,$1a + 4,$ff,$d1,$44,ROCKET + $C8,$1b ; trainer
+    db SPRITE_ROCKET,$e + 4,$9 + 4,$ff,$d3,$42,ROCKET,$1a ; trainer
+    db SPRITE_OAK_AIDE,$6 + 4,$e + 4,$ff,$d2,$43,SCIENTIST,$5 ; trainer
+    db SPRITE_ROCKET,$a + 4,$1a + 4,$ff,$d1,$44,ROCKET,$1b ; trainer
     db SPRITE_BALL,$9 + 4,$3 + 4,$ff,$ff,$85,FULL_HEAL ; item
     db SPRITE_BALL,$7 + 4,$4 + 4,$ff,$ff,$86,MAX_REVIVE ; item
     db SPRITE_BALL,$8 + 4,$5 + 4,$ff,$ff,$87,ESCAPE_ROPE ; item
@@ -36831,7 +36843,7 @@ SilphCo5Script_19f9e: ; 19f9e (6:5f9e)
 
 SilphCo5ScriptPointers: ; 19fb6 (6:5fb6)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SilphCo5TextPointers: ; 19fbc (6:5fbc)
@@ -37001,10 +37013,10 @@ SilphCo5Object: ; 0x1a08d (size=137)
 
     db $b ; people
     db SPRITE_LAPRAS_GIVER,$9 + 4,$d + 4,$ff,$ff,$1 ; person
-    db SPRITE_ROCKET,$10 + 4,$8 + 4,$ff,$d3,$42,ROCKET + $C8,$1c ; trainer
-    db SPRITE_OAK_AIDE,$3 + 4,$8 + 4,$ff,$d3,$43,SCIENTIST + $C8,$6 ; trainer
-    db SPRITE_ROCKER,$a + 4,$12 + 4,$ff,$d1,$44,JUGGLER + $C8,$1 ; trainer
-    db SPRITE_ROCKET,$4 + 4,$1c + 4,$ff,$d1,$45,ROCKET + $C8,$1d ; trainer
+    db SPRITE_ROCKET,$10 + 4,$8 + 4,$ff,$d3,$42,ROCKET,$1c ; trainer
+    db SPRITE_OAK_AIDE,$3 + 4,$8 + 4,$ff,$d3,$43,SCIENTIST,$6 ; trainer
+    db SPRITE_ROCKER,$a + 4,$12 + 4,$ff,$d1,$44,JUGGLER,$1 ; trainer
+    db SPRITE_ROCKET,$4 + 4,$1c + 4,$ff,$d1,$45,ROCKET,$1d ; trainer
     db SPRITE_BALL,$d + 4,$2 + 4,$ff,$ff,$86,TM_09 ; item
     db SPRITE_BALL,$6 + 4,$4 + 4,$ff,$ff,$87,PROTEIN ; item
     db SPRITE_BALL,$10 + 4,$15 + 4,$ff,$ff,$88,CARD_KEY ; item
@@ -37072,7 +37084,7 @@ SilphCo6Script_1a1e6: ; 1a1e6 (6:61e6)
 
 SilphCo6ScriptPointers: ; 1a1f0 (6:61f0)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SilphCo6TextPointers: ; 1a1f6 (6:61f6)
@@ -37275,9 +37287,9 @@ SilphCo6Object: ; 0x1a2fb (size=112)
     db SPRITE_ERIKA,$6 + 4,$15 + 4,$ff,$d0,$3 ; person
     db SPRITE_ERIKA,$a + 4,$b + 4,$ff,$d3,$4 ; person
     db SPRITE_LAPRAS_GIVER,$d + 4,$12 + 4,$ff,$d1,$5 ; person
-    db SPRITE_ROCKET,$3 + 4,$11 + 4,$ff,$d3,$46,ROCKET + $C8,$1e ; trainer
-    db SPRITE_OAK_AIDE,$8 + 4,$7 + 4,$ff,$d0,$47,SCIENTIST + $C8,$7 ; trainer
-    db SPRITE_ROCKET,$f + 4,$e + 4,$ff,$d2,$48,ROCKET + $C8,$1f ; trainer
+    db SPRITE_ROCKET,$3 + 4,$11 + 4,$ff,$d3,$46,ROCKET,$1e ; trainer
+    db SPRITE_OAK_AIDE,$8 + 4,$7 + 4,$ff,$d0,$47,SCIENTIST,$7 ; trainer
+    db SPRITE_ROCKET,$f + 4,$e + 4,$ff,$d2,$48,ROCKET,$1f ; trainer
     db SPRITE_BALL,$c + 4,$3 + 4,$ff,$ff,$89,HP_UP ; item
     db SPRITE_BALL,$f + 4,$2 + 4,$ff,$ff,$8a,X_ACCURACY ; item
 
@@ -37578,9 +37590,9 @@ Func_1a5e7: ; 1a5e7 (6:65e7)
     jp SetSpriteMovementBytesToFF
 
 RivalIDs: ; 1a605 (6:6605)
-    db SONY1 + $c8
-    db SONY2 + $c8
-    db SONY3 + $c8
+    db SONY1
+    db SONY2
+    db SONY3
     db $ff
 
 Func_1a609: ; 1a609 (6:6609)
@@ -38751,8 +38763,8 @@ OaksLabScript11: ; 1cdb9 (7:4db9)
     ret nz
 
     ; define which team rival uses,and fight it
-    ld a,SONY1 + $C8
-    ld [W_CUROPPONENT],a
+    ld a,SONY1
+    ld [W_CUROPPONENT],a ; $d059
     ld a,[W_RIVALSTARTER]
     cp SQUIRTLE
     jr nz,.NotSquirtle ; 0x1cdc9 $4
@@ -39643,7 +39655,7 @@ OaksLabObject: ; 0x1d40a (size=88)
     db $0 ; signs
 
     db $b ; people
-    db SPRITE_BLUE,$3 + 4,$4 + 4,$ff,$ff,$41,SONY1 + $C8,$1 ; trainer
+    db SPRITE_BLUE,$3 + 4,$4 + 4,$ff,$ff,$41,SONY1,$1 ; trainer
     db SPRITE_BALL,$3 + 4,$6 + 4,$ff,$ff,$2 ; person
     db SPRITE_BALL,$3 + 4,$7 + 4,$ff,$ff,$3 ; person
     db SPRITE_BALL,$3 + 4,$8 + 4,$ff,$ff,$4 ; person
@@ -41693,7 +41705,7 @@ PowerPlantScript: ; 1e2c6 (7:62c6)
 
 PowerPlantScriptPointers: ; 1e2d9 (7:62d9)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 PowerPlantTextPointers: ; 1e2df (7:62df)
@@ -41870,15 +41882,15 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db $0 ; signs
 
     db $e ; people
-    db SPRITE_BALL,$14 + 4,$9 + 4,$ff,$ff,$41,VOLTORB,37 ; trainer
-    db SPRITE_BALL,$12 + 4,$20 + 4,$ff,$ff,$42,VOLTORB,37 ; trainer
-    db SPRITE_BALL,$19 + 4,$15 + 4,$ff,$ff,$43,VOLTORB,37 ; trainer
-    db SPRITE_BALL,$12 + 4,$19 + 4,$ff,$ff,$44,ELECTRODE,40 ; trainer
-    db SPRITE_BALL,$22 + 4,$17 + 4,$ff,$ff,$45,VOLTORB,37 ; trainer
-    db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,37 ; trainer
-    db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,40 ; trainer
-    db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,37 ; trainer
-    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,55 ; Entry Level (Over)
+    db SPRITE_BALL,$14 + 4,$9 + 4,$ff,$ff,$41,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_BALL,$12 + 4,$20 + 4,$ff,$ff,$42,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_BALL,$19 + 4,$15 + 4,$ff,$ff,$43,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_BALL,$12 + 4,$19 + 4,$ff,$ff,$44,ELECTRODE,OPP_LVL_OFFSET+40 ; trainer
+    db SPRITE_BALL,$22 + 4,$17 + 4,$ff,$ff,$45,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,OPP_LVL_OFFSET+40 ; trainer
+    db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,OPP_LVL_OFFSET+55 ; Entry Level (Over)
     db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
     db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,HP_UP ; item
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
@@ -53161,7 +53173,7 @@ HandlePlayerBlackOut: ; 3c837 (f:4837)
     cp $4
     jr z,.notSony1Battle
     ld a,[W_CUROPPONENT] ; $d059
-    cp $c8 + SONY1
+    cp SONY1
     jr nz,.notSony1Battle
     ld hl,wTileMap  ; sony 1 battle
     ld bc,$815
@@ -58737,6 +58749,8 @@ InitOpponent: ; 3ef18 (f:6f18)
     ld [W_ENEMYMONID],a
     jr InitBattleCommon
 DetermineWildOpponent: ; 3ef23 (f:6f23)
+    xor a
+    ld [W_TRAINERNO],a
     ld a,[$d732]
     bit 1,a
     jr z,.asm_3ef2f
@@ -58761,9 +58775,12 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     ld hl,InitBattleVariables
     ld b,BANK(InitBattleVariables)
     call Bankswitch ; indirect jump to InitBattleVariables (525af (14:65af))
-    ld a,[W_ENEMYMONID]
-    sub $c8
-    jp c,InitWildBattle
+    ld a,[W_TRAINERNO]
+    and a
+    jr z,.InitWildBattle
+
+.InitTrainerBattle
+    ld a,[W_CUROPPONENT] ; $d059
     ld [W_TRAINERCLASS],a ; $d031
     call Func_3566
     ld hl,ReadTrainer
@@ -58784,9 +58801,9 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     ld [W_ENEMYMONNUMBER],a ; $cfe8
     ld a,$2
     ld [W_ISINBATTLE],a ; $d057
-    jp Func_3efeb
+    jr .Func_3efeb
 
-InitWildBattle: ; 3ef8b (f:6f8b)
+.InitWildBattle
     ld a,$1
     ld [W_ISINBATTLE],a ; $d057
     call LoadEnemyMonData
@@ -58810,7 +58827,7 @@ InitWildBattle: ; 3ef8b (f:6f8b)
     ld a,$1
     call Predef ; indirect jump to Func_3f0c6 (3f0c6 (f:70c6))
 
-Func_3efeb: ; 3efeb (f:6feb)
+.Func_3efeb
     ld b,$0
     call GoPAL_SET
     call Func_3c04c
@@ -65415,7 +65432,7 @@ Func_44316: ; 44316 (11:4316)
 
 Mansion1ScriptPointers: ; 44326 (11:4326)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Mansion1TextPointers: ; 4432c (11:432c)
@@ -65510,7 +65527,7 @@ Mansion1Object: ; 0x443a4 (size=90)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_OAK_AIDE,$11 + 4,$11 + 4,$ff,$d2,$41,SCIENTIST + $C8,$1 ; trainer
+    db SPRITE_OAK_AIDE,$11 + 4,$11 + 4,$ff,$d2,$41,SCIENTIST,$1 ; trainer
     db SPRITE_BALL,$3 + 4,$e + 4,$ff,$ff,$82,ESCAPE_ROPE ; item
     db SPRITE_BALL,$15 + 4,$12 + 4,$ff,$ff,$83,TRADE_STONE ; item
 
@@ -65545,7 +65562,7 @@ RockTunnel1Script: ; 444dc (11:44dc)
 
 RockTunnel1ScriptPointers: ; 444ef (11:44ef)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 RockTunnel1TextPointers: ; 444f5 (11:44f5)
@@ -65766,13 +65783,13 @@ RockTunnel1Object: ; 0x445f6 (size=127)
     db $1d,$b,$8 ; RockTunnel1Text8
 
     db $7 ; people
-    db SPRITE_HIKER,$5 + 4,$7 + 4,$ff,$d0,$41,HIKER + $C8,$c ; trainer
-    db SPRITE_HIKER,$10 + 4,$5 + 4,$ff,$d0,$42,HIKER + $C8,$d ; trainer
-    db SPRITE_HIKER,$f + 4,$11 + 4,$ff,$d2,$43,HIKER + $C8,$e ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$17 + 4,$ff,$d2,$44,POKEMANIAC + $C8,$7 ; trainer
-    db SPRITE_LASS,$15 + 4,$25 + 4,$ff,$d2,$45,JR__TRAINER_F + $C8,$11 ; trainer
-    db SPRITE_LASS,$18 + 4,$16 + 4,$ff,$d0,$46,JR__TRAINER_F + $C8,$12 ; trainer
-    db SPRITE_LASS,$18 + 4,$20 + 4,$ff,$d3,$47,JR__TRAINER_F + $C8,$13 ; trainer
+    db SPRITE_HIKER,$5 + 4,$7 + 4,$ff,$d0,$41,HIKER,$c ; trainer
+    db SPRITE_HIKER,$10 + 4,$5 + 4,$ff,$d0,$42,HIKER,$d ; trainer
+    db SPRITE_HIKER,$f + 4,$11 + 4,$ff,$d2,$43,HIKER,$e ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$17 + 4,$ff,$d2,$44,POKEMANIAC,$7 ; trainer
+    db SPRITE_LASS,$15 + 4,$25 + 4,$ff,$d2,$45,JR__TRAINER_F,$11 ; trainer
+    db SPRITE_LASS,$18 + 4,$16 + 4,$ff,$d0,$46,JR__TRAINER_F,$12 ; trainer
+    db SPRITE_LASS,$18 + 4,$20 + 4,$ff,$d3,$47,JR__TRAINER_F,$13 ; trainer
 
     ; warp-to
     EVENT_DISP $14,$3,$f
@@ -65948,7 +65965,7 @@ VictoryRoad3Script_44996: ; 44996 (11:4996)
 
 VictoryRoad3ScriptPointers: ; 449b1 (11:49b1)
     dw VictoryRoad3Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 VictoryRoad3Script0: ; 449b7 (11:49b7)
@@ -66140,10 +66157,10 @@ VictoryRoad3Object: ; 0x44acd (size=106)
     db $0 ; signs
 
     db $a ; people
-    db SPRITE_BLACK_HAIR_BOY_1,$5 + 4,$1c + 4,$ff,$d2,$41,COOLTRAINER_M + $C8,$2 ; trainer
-    db SPRITE_LASS,$d + 4,$7 + 4,$ff,$d3,$42,COOLTRAINER_F + $C8,$2 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$e + 4,$6 + 4,$ff,$d2,$43,COOLTRAINER_M + $C8,$3 ; trainer
-    db SPRITE_LASS,$3 + 4,$d + 4,$ff,$d3,$44,COOLTRAINER_F + $C8,$3 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$5 + 4,$1c + 4,$ff,$d2,$41,COOLTRAINER_M,$2 ; trainer
+    db SPRITE_LASS,$d + 4,$7 + 4,$ff,$d3,$42,COOLTRAINER_F,$2 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$e + 4,$6 + 4,$ff,$d2,$43,COOLTRAINER_M,$3 ; trainer
+    db SPRITE_LASS,$3 + 4,$d + 4,$ff,$d3,$44,COOLTRAINER_F,$3 ; trainer
     db SPRITE_BALL,$5 + 4,$1a + 4,$ff,$ff,$85,MAX_REVIVE ; item
     db SPRITE_BALL,$7 + 4,$7 + 4,$ff,$ff,$86,TM_47 ; item
     db SPRITE_BOULDER,$3 + 4,$16 + 4,$ff,$10,$7 ; person
@@ -66204,7 +66221,7 @@ Func_44be0: ; 44be0 (11:4be0)
 
 RocketHideout1ScriptPointers: ; 44c0e (11:4c0e)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 RocketHideout1TextPointers: ; 44c14 (11:4c14)
@@ -66374,11 +66391,11 @@ RocketHideout1Object: ; 0x44ce7 (size=98)
     db $0 ; signs
 
     db $7 ; people
-    db SPRITE_ROCKET,$8 + 4,$1a + 4,$ff,$d2,$41,ROCKET + $C8,$8 ; trainer
-    db SPRITE_ROCKET,$6 + 4,$c + 4,$ff,$d3,$42,ROCKET + $C8,$9 ; trainer
-    db SPRITE_ROCKET,$11 + 4,$12 + 4,$ff,$d0,$43,ROCKET + $C8,$a ; trainer
-    db SPRITE_ROCKET,$19 + 4,$f + 4,$ff,$d3,$44,ROCKET + $C8,$b ; trainer
-    db SPRITE_ROCKET,$12 + 4,$1c + 4,$ff,$d2,$45,ROCKET + $C8,$c ; trainer
+    db SPRITE_ROCKET,$8 + 4,$1a + 4,$ff,$d2,$41,ROCKET,$8 ; trainer
+    db SPRITE_ROCKET,$6 + 4,$c + 4,$ff,$d3,$42,ROCKET,$9 ; trainer
+    db SPRITE_ROCKET,$11 + 4,$12 + 4,$ff,$d0,$43,ROCKET,$a ; trainer
+    db SPRITE_ROCKET,$19 + 4,$f + 4,$ff,$d3,$44,ROCKET,$b ; trainer
+    db SPRITE_ROCKET,$12 + 4,$1c + 4,$ff,$d2,$45,ROCKET,$c ; trainer
     db SPRITE_BALL,$e + 4,$b + 4,$ff,$ff,$86,ESCAPE_ROPE ; item
     db SPRITE_BALL,$11 + 4,$9 + 4,$ff,$ff,$87,HYPER_POTION ; item
 
@@ -66410,7 +66427,7 @@ RocketHideout2Script: ; 44e27 (11:4e27)
 
 RocketHideout2ScriptPointers: ; 44e3a (11:4e3a)
     dw RocketHideout2Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw RocketHideout2Script3
 
@@ -66908,7 +66925,7 @@ RocketHideout2Object: ; 0x450f7 (size=80)
     db $0 ; signs
 
     db $5 ; people
-    db SPRITE_ROCKET,$c + 4,$14 + 4,$ff,$d0,$41,ROCKET + $C8,$d ; trainer
+    db SPRITE_ROCKET,$c + 4,$14 + 4,$ff,$d0,$41,ROCKET,$d ; trainer
     db SPRITE_BALL,$b + 4,$1 + 4,$ff,$ff,$82,MOON_STONE ; item
     db SPRITE_BALL,$8 + 4,$10 + 4,$ff,$ff,$83,NUGGET ; item
     db SPRITE_BALL,$c + 4,$6 + 4,$ff,$ff,$84,TM_52 ; item ; SWOOP
@@ -66942,7 +66959,7 @@ RocketHideout3Script: ; 45225 (11:5225)
 
 RocketHideout3ScriptPointers: ; 45238 (11:5238)
     dw RocketHideout3Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw RocketHideout3Script3
 
@@ -67153,8 +67170,8 @@ RocketHideout3Object: ; 0x4534d (size=50)
     db $0 ; signs
 
     db $4 ; people
-    db SPRITE_ROCKET,$16 + 4,$a + 4,$ff,$d3,$41,ROCKET + $C8,$e ; trainer
-    db SPRITE_ROCKET,$c + 4,$1a + 4,$ff,$d1,$42,ROCKET + $C8,$f ; trainer
+    db SPRITE_ROCKET,$16 + 4,$a + 4,$ff,$d3,$41,ROCKET,$e ; trainer
+    db SPRITE_ROCKET,$c + 4,$1a + 4,$ff,$d1,$42,ROCKET,$f ; trainer
     db SPRITE_BALL,$11 + 4,$1a + 4,$ff,$ff,$83,TM_10 ; item
     db SPRITE_BALL,$e + 4,$14 + 4,$ff,$ff,$84,RARE_CANDY ; item
 
@@ -67217,7 +67234,7 @@ Func_454a3: ; 454a3 (11:54a3)
 
 RocketHideout4ScriptPointers: ; 454ae (11:54ae)c
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw RocketHideout4Script3
 
@@ -67416,10 +67433,10 @@ RocketHideout4Object: ; 0x455f1 (size=95)
     db $0 ; signs
 
     db $9 ; people
-    db SPRITE_GIOVANNI,$3 + 4,$19 + 4,$ff,$d0,$41,GIOVANNI + $C8,$1 ; trainer
-    db SPRITE_ROCKET,$c + 4,$17 + 4,$ff,$d0,$42,ROCKET + $C8,$10 ; trainer
-    db SPRITE_ROCKET,$c + 4,$1a + 4,$ff,$d0,$43,ROCKET + $C8,$11 ; trainer
-    db SPRITE_ROCKET,$2 + 4,$b + 4,$ff,$d0,$44,ROCKET + $C8,$12 ; trainer
+    db SPRITE_GIOVANNI,$3 + 4,$19 + 4,$ff,$d0,$41,GIOVANNI,$1 ; trainer
+    db SPRITE_ROCKET,$c + 4,$17 + 4,$ff,$d0,$42,ROCKET,$10 ; trainer
+    db SPRITE_ROCKET,$c + 4,$1a + 4,$ff,$d0,$43,ROCKET,$11 ; trainer
+    db SPRITE_ROCKET,$2 + 4,$b + 4,$ff,$d0,$44,ROCKET,$12 ; trainer
     db SPRITE_BALL,$c + 4,$a + 4,$ff,$ff,$85,HP_UP ; item
     db SPRITE_BALL,$4 + 4,$9 + 4,$ff,$ff,$86,TM_02 ; item
     db SPRITE_BALL,$14 + 4,$c + 4,$ff,$ff,$87,IRON ; item
@@ -68068,7 +68085,7 @@ UnknownDungeon3Script: ; 45ef0 (11:5ef0)
 
 UnknownDungeon3ScriptPointers: ; 45f03 (11:5f03)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 UnknownDungeon3TextPointers: ; 45f09 (11:5f09)
@@ -68111,7 +68128,7 @@ UnknownDungeon3Object: ; 0x45f36 (size=34)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_MEWTWO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,70 ; Entry Level (Over)
+    db SPRITE_MEWTWO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,OPP_LVL_OFFSET+70 ; Entry Level (Over)
     db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$82,ULTRA_BALL ; item
     db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
 
@@ -68139,7 +68156,7 @@ RockTunnel2Script: ; 45feb (11:5feb)
 
 RockTunnel2ScriptPointers: ; 45ffe (11:5ffe)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 RockTunnel2TextPointers: ; 46004 (11:6004)
@@ -68383,14 +68400,14 @@ RockTunnel2Object: ; 0x4613d (size=100)
     db $0 ; signs
 
     db $8 ; people
-    db SPRITE_LASS,$d + 4,$b + 4,$ff,$d0,$41,JR__TRAINER_F + $C8,$9 ; trainer
-    db SPRITE_HIKER,$a + 4,$6 + 4,$ff,$d0,$42,HIKER + $C8,$9 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$3 + 4,$ff,$d0,$43,POKEMANIAC + $C8,$3 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$15 + 4,$14 + 4,$ff,$d3,$44,POKEMANIAC + $C8,$4 ; trainer
-    db SPRITE_HIKER,$a + 4,$1e + 4,$ff,$d0,$45,HIKER + $C8,$a ; trainer
-    db SPRITE_LASS,$1c + 4,$e + 4,$ff,$d3,$46,JR__TRAINER_F + $C8,$a ; trainer
-    db SPRITE_HIKER,$5 + 4,$21 + 4,$ff,$d3,$47,HIKER + $C8,$b ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$1e + 4,$1a + 4,$ff,$d0,$48,POKEMANIAC + $C8,$5 ; trainer
+    db SPRITE_LASS,$d + 4,$b + 4,$ff,$d0,$41,JR__TRAINER_F,$9 ; trainer
+    db SPRITE_HIKER,$a + 4,$6 + 4,$ff,$d0,$42,HIKER,$9 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$3 + 4,$ff,$d0,$43,POKEMANIAC,$3 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$15 + 4,$14 + 4,$ff,$d3,$44,POKEMANIAC,$4 ; trainer
+    db SPRITE_HIKER,$a + 4,$1e + 4,$ff,$d0,$45,HIKER,$a ; trainer
+    db SPRITE_LASS,$1c + 4,$e + 4,$ff,$d3,$46,JR__TRAINER_F,$a ; trainer
+    db SPRITE_HIKER,$5 + 4,$21 + 4,$ff,$d3,$47,HIKER,$b ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$1e + 4,$1a + 4,$ff,$d0,$48,POKEMANIAC,$5 ; trainer
 
     ; warp-to
     EVENT_DISP $14,$19,$21 ; ROCK_TUNNEL_1
@@ -68965,7 +68982,7 @@ SeafoamIslands5Object: ; 0x468bc (size=62)
     db $3 ; people
     db SPRITE_BOULDER,$f + 4,$4 + 4,$ff,$ff,$1 ; person
     db SPRITE_BOULDER,$f + 4,$5 + 4,$ff,$ff,$2 ; person
-    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,55 ; Entry Level (Over)
+    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,OPP_LVL_OFFSET+55 ; Entry Level (Over)
 
     ; warp-to
     EVENT_DISP $f,$11,$14 ; SEAFOAM_ISLANDS_4
@@ -71306,7 +71323,7 @@ Func_48943: ; 48943 (12:4943)
 
 CeladonGymScriptPointers: ; 4894e (12:494e)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw CeladonGymScript3
 
@@ -71625,14 +71642,14 @@ CeladonGymObject: ; 0x48b30 (size=84)
     db $0 ; signs
 
     db $8 ; people
-    db SPRITE_ERIKA,$3 + 4,$4 + 4,$ff,$d0,$41,ERIKA + $C8,$1 ; trainer
-    db SPRITE_LASS,$b + 4,$2 + 4,$ff,$d3,$42,LASS + $C8,$11 ; trainer
-    db SPRITE_FOULARD_WOMAN,$a + 4,$7 + 4,$ff,$d2,$43,BEAUTY + $C8,$1 ; trainer
-    db SPRITE_LASS,$5 + 4,$9 + 4,$ff,$d0,$44,JR__TRAINER_F + $C8,$b ; trainer
-    db SPRITE_FOULARD_WOMAN,$5 + 4,$1 + 4,$ff,$d0,$45,BEAUTY + $C8,$2 ; trainer
-    db SPRITE_LASS,$3 + 4,$6 + 4,$ff,$d0,$46,LASS + $C8,$12 ; trainer
-    db SPRITE_FOULARD_WOMAN,$3 + 4,$3 + 4,$ff,$d0,$47,BEAUTY + $C8,$3 ; trainer
-    db SPRITE_LASS,$3 + 4,$5 + 4,$ff,$d0,$48,COOLTRAINER_F + $C8,$1 ; trainer
+    db SPRITE_ERIKA,$3 + 4,$4 + 4,$ff,$d0,$41,ERIKA,$1 ; trainer
+    db SPRITE_LASS,$b + 4,$2 + 4,$ff,$d3,$42,LASS,$11 ; trainer
+    db SPRITE_FOULARD_WOMAN,$a + 4,$7 + 4,$ff,$d2,$43,BEAUTY,$1 ; trainer
+    db SPRITE_LASS,$5 + 4,$9 + 4,$ff,$d0,$44,JR__TRAINER_F,$b ; trainer
+    db SPRITE_FOULARD_WOMAN,$5 + 4,$1 + 4,$ff,$d0,$45,BEAUTY,$2 ; trainer
+    db SPRITE_LASS,$3 + 4,$6 + 4,$ff,$d0,$46,LASS,$12 ; trainer
+    db SPRITE_FOULARD_WOMAN,$3 + 4,$3 + 4,$ff,$d0,$47,BEAUTY,$3 ; trainer
+    db SPRITE_LASS,$3 + 4,$5 + 4,$ff,$d0,$48,COOLTRAINER_F,$1 ; trainer
 
     ; warp-to
     EVENT_DISP $5,$11,$4
@@ -72207,7 +72224,7 @@ CeladonGameCornerObject: ; 0x48fa0 (size=99)
     db SPRITE_GAMBLER,$f + 4,$b + 4,$ff,$d3,$8 ; person
     db SPRITE_MART_GUY,$b + 4,$e + 4,$ff,$d2,$9 ; person
     db SPRITE_GENTLEMAN,$d + 4,$11 + 4,$ff,$d3,$a ; person
-    db SPRITE_ROCKET,$5 + 4,$9 + 4,$ff,$d1,$4b,ROCKET + $C8,$7 ; trainer
+    db SPRITE_ROCKET,$5 + 4,$9 + 4,$ff,$d1,$4b,ROCKET,$7 ; trainer
 
     ; warp-to
     EVENT_DISP $a,$11,$f
@@ -73546,7 +73563,7 @@ MtMoon1Script: ; 499c8 (12:59c8)
 
 MtMoon1ScriptPointers: ; 499db (12:59db)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 MtMoon1TextPointers: ; 499e1 (12:59e1)
@@ -73775,13 +73792,13 @@ MtMoon1Object: ; 0x49b06 (size=145)
     db $17,$f,$e ; MtMoon1Text14
 
     db $d ; people
-    db SPRITE_HIKER,$6 + 4,$5 + 4,$ff,$d0,$41,HIKER + $C8,$1 ; trainer
-    db SPRITE_BUG_CATCHER,$10 + 4,$c + 4,$ff,$d3,$42,YOUNGSTER + $C8,$3 ; trainer
-    db SPRITE_LASS,$4 + 4,$1e + 4,$ff,$d0,$43,LASS + $C8,$5 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$1f + 4,$18 + 4,$ff,$d1,$44,SUPER_NERD + $C8,$1 ; trainer
-    db SPRITE_LASS,$17 + 4,$10 + 4,$ff,$d0,$45,LASS + $C8,$6 ; trainer
-    db SPRITE_BUG_CATCHER,$16 + 4,$7 + 4,$ff,$d0,$46,BUG_CATCHER + $C8,$7 ; trainer
-    db SPRITE_BUG_CATCHER,$1b + 4,$1e + 4,$ff,$d3,$47,BUG_CATCHER + $C8,$8 ; trainer
+    db SPRITE_HIKER,$6 + 4,$5 + 4,$ff,$d0,$41,HIKER,$1 ; trainer
+    db SPRITE_BUG_CATCHER,$10 + 4,$c + 4,$ff,$d3,$42,YOUNGSTER,$3 ; trainer
+    db SPRITE_LASS,$4 + 4,$1e + 4,$ff,$d0,$43,LASS,$5 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$1f + 4,$18 + 4,$ff,$d1,$44,SUPER_NERD,$1 ; trainer
+    db SPRITE_LASS,$17 + 4,$10 + 4,$ff,$d0,$45,LASS,$6 ; trainer
+    db SPRITE_BUG_CATCHER,$16 + 4,$7 + 4,$ff,$d0,$46,BUG_CATCHER,$7 ; trainer
+    db SPRITE_BUG_CATCHER,$1b + 4,$1e + 4,$ff,$d3,$47,BUG_CATCHER,$8 ; trainer
     db SPRITE_BALL,$14 + 4,$2 + 4,$ff,$ff,$88,POTION ; item
     db SPRITE_BALL,$2 + 4,$2 + 4,$ff,$ff,$89,MOON_STONE ; item
     db SPRITE_BALL,$1f + 4,$23 + 4,$ff,$ff,$8a,RARE_CANDY ; item
@@ -73855,7 +73872,7 @@ Func_49d58: ; 49d58 (12:5d58)
 
 MtMoon3ScriptPointers: ; 49d63 (12:5d63)
     dw MtMoon3Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw MtMoon3Script3
     dw MtMoon3Script4
@@ -74233,11 +74250,11 @@ MtMoon3Object: ; 0x49fdb (size=102)
     db $0 ; signs
 
     db $9 ; people
-    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$c + 4,$ff,$d3,$41,SUPER_NERD + $C8,$2 ; trainer
-    db SPRITE_ROCKET,$10 + 4,$b + 4,$ff,$d0,$42,ROCKET + $C8,$1 ; trainer
-    db SPRITE_ROCKET,$16 + 4,$f + 4,$ff,$d0,$43,ROCKET + $C8,$2 ; trainer
-    db SPRITE_ROCKET,$b + 4,$1d + 4,$ff,$d1,$44,ROCKET + $C8,$3 ; trainer
-    db SPRITE_ROCKET,$11 + 4,$1d + 4,$ff,$d2,$45,ROCKET + $C8,$4 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$c + 4,$ff,$d3,$41,SUPER_NERD,$2 ; trainer
+    db SPRITE_ROCKET,$10 + 4,$b + 4,$ff,$d0,$42,ROCKET,$1 ; trainer
+    db SPRITE_ROCKET,$16 + 4,$f + 4,$ff,$d0,$43,ROCKET,$2 ; trainer
+    db SPRITE_ROCKET,$b + 4,$1d + 4,$ff,$d1,$44,ROCKET,$3 ; trainer
+    db SPRITE_ROCKET,$11 + 4,$1d + 4,$ff,$d2,$45,ROCKET,$4 ; trainer
     db SPRITE_OMANYTE,$6 + 4,$c + 4,$ff,$ff,$6 ; person
     db SPRITE_OMANYTE,$6 + 4,$d + 4,$ff,$ff,$7 ; person
     db SPRITE_BALL,$15 + 4,$19 + 4,$ff,$ff,$88,HP_UP ; item
@@ -74969,16 +74986,16 @@ Route20Object: ; 0x50113 (size=106)
     db $b,$39,$c ; Route20Text12
 
     db $a ; people
-    db SPRITE_SWIMMER,$8 + 4,$57 + 4,$ff,$d1,$41,SWIMMER + $C8,$9 ; trainer
-    db SPRITE_SWIMMER,$b + 4,$44 + 4,$ff,$d1,$42,BEAUTY + $C8,$e ; trainer
-    db SPRITE_SWIMMER,$a + 4,$2d + 4,$ff,$d0,$43,BEAUTY + $C8,$6 ; trainer
-    db SPRITE_SWIMMER,$e + 4,$37 + 4,$ff,$d3,$44,JR__TRAINER_F + $C8,$4 ; trainer
-    db SPRITE_SWIMMER,$d + 4,$26 + 4,$ff,$d0,$45,SWIMMER + $C8,$a ; trainer
-    db SPRITE_SWIMMER,$d + 4,$57 + 4,$ff,$d1,$46,SWIMMER + $C8,$b ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$9 + 4,$22 + 4,$ff,$d1,$47,BIRD_KEEPER + $C8,$b ; trainer
-    db SPRITE_SWIMMER,$7 + 4,$19 + 4,$ff,$d1,$48,BEAUTY + $C8,$7 ; trainer
-    db SPRITE_SWIMMER,$c + 4,$18 + 4,$ff,$d0,$49,JR__TRAINER_F + $C8,$10 ; trainer
-    db SPRITE_SWIMMER,$8 + 4,$f + 4,$ff,$d1,$4a,BEAUTY + $C8,$8 ; trainer
+    db SPRITE_SWIMMER,$8 + 4,$57 + 4,$ff,$d1,$41,SWIMMER,$9 ; trainer
+    db SPRITE_SWIMMER,$b + 4,$44 + 4,$ff,$d1,$42,BEAUTY,$e ; trainer
+    db SPRITE_SWIMMER,$a + 4,$2d + 4,$ff,$d0,$43,BEAUTY,$6 ; trainer
+    db SPRITE_SWIMMER,$e + 4,$37 + 4,$ff,$d3,$44,JR__TRAINER_F,$4 ; trainer
+    db SPRITE_SWIMMER,$d + 4,$26 + 4,$ff,$d0,$45,SWIMMER,$a ; trainer
+    db SPRITE_SWIMMER,$d + 4,$57 + 4,$ff,$d1,$46,SWIMMER,$b ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$9 + 4,$22 + 4,$ff,$d1,$47,BIRD_KEEPER,$b ; trainer
+    db SPRITE_SWIMMER,$7 + 4,$19 + 4,$ff,$d1,$48,BEAUTY,$7 ; trainer
+    db SPRITE_SWIMMER,$c + 4,$18 + 4,$ff,$d0,$49,JR__TRAINER_F,$10 ; trainer
+    db SPRITE_SWIMMER,$8 + 4,$f + 4,$ff,$d1,$4a,BEAUTY,$8 ; trainer
 
     ; warp-to
     EVENT_DISP $32,$5,$30 ; SEAFOAM_ISLANDS_1
@@ -75006,13 +75023,13 @@ Route24Object: ; 0x506a4 (size=67)
     db $0 ; signs
 
     db $8 ; people
-    db SPRITE_BLACK_HAIR_BOY_1,$f + 4,$b + 4,$ff,$d2,$41,ROCKET + $C8,$6 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$14 + 4,$5 + 4,$ff,$d1,$42,JR__TRAINER_M + $C8,$2 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$13 + 4,$b + 4,$ff,$d2,$43,JR__TRAINER_M + $C8,$3 ; trainer
-    db SPRITE_LASS,$16 + 4,$b + 4,$ff,$d2,$44,LASS + $C8,$7 ; trainer
-    db SPRITE_BUG_CATCHER,$19 + 4,$b + 4,$ff,$d2,$45,YOUNGSTER + $C8,$4 ; trainer
-    db SPRITE_LASS,$1c + 4,$b + 4,$ff,$d2,$46,LASS + $C8,$8 ; trainer
-    db SPRITE_BUG_CATCHER,$1f + 4,$b + 4,$ff,$d2,$47,BUG_CATCHER + $C8,$9 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$f + 4,$b + 4,$ff,$d2,$41,ROCKET,$6 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$14 + 4,$5 + 4,$ff,$d1,$42,JR__TRAINER_M,$2 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$13 + 4,$b + 4,$ff,$d2,$43,JR__TRAINER_M,$3 ; trainer
+    db SPRITE_LASS,$16 + 4,$b + 4,$ff,$d2,$44,LASS,$7 ; trainer
+    db SPRITE_BUG_CATCHER,$19 + 4,$b + 4,$ff,$d2,$45,YOUNGSTER,$4 ; trainer
+    db SPRITE_LASS,$1c + 4,$b + 4,$ff,$d2,$46,LASS,$8 ; trainer
+    db SPRITE_BUG_CATCHER,$1f + 4,$b + 4,$ff,$d2,$47,BUG_CATCHER,$9 ; trainer
     db SPRITE_BALL,$5 + 4,$a + 4,$ff,$ff,$88,TM_45 ; item
 
 Route24Blocks: ; 506e7 (14:46e7)
@@ -75036,15 +75053,15 @@ Route25Object: ; 0x507b2 (size=94)
     db $3,$2b,$b ; Route25Text11
 
     db $a ; people
-    db SPRITE_BUG_CATCHER,$2 + 4,$e + 4,$ff,$d0,$41,YOUNGSTER + $C8,$5 ; trainer
-    db SPRITE_BUG_CATCHER,$5 + 4,$12 + 4,$ff,$d1,$42,YOUNGSTER + $C8,$6 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$4 + 4,$18 + 4,$ff,$d0,$43,JR__TRAINER_M + $C8,$2 ; trainer
-    db SPRITE_LASS,$8 + 4,$12 + 4,$ff,$d3,$44,LASS + $C8,$9 ; trainer
-    db SPRITE_BUG_CATCHER,$3 + 4,$20 + 4,$ff,$d2,$45,YOUNGSTER + $C8,$7 ; trainer
-    db SPRITE_LASS,$4 + 4,$25 + 4,$ff,$d0,$46,LASS + $C8,$a ; trainer
-    db SPRITE_HIKER,$4 + 4,$8 + 4,$ff,$d3,$47,HIKER + $C8,$2 ; trainer
-    db SPRITE_HIKER,$9 + 4,$17 + 4,$ff,$d1,$48,HIKER + $C8,$3 ; trainer
-    db SPRITE_HIKER,$7 + 4,$d + 4,$ff,$d3,$49,HIKER + $C8,$4 ; trainer
+    db SPRITE_BUG_CATCHER,$2 + 4,$e + 4,$ff,$d0,$41,YOUNGSTER,$5 ; trainer
+    db SPRITE_BUG_CATCHER,$5 + 4,$12 + 4,$ff,$d1,$42,YOUNGSTER,$6 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$4 + 4,$18 + 4,$ff,$d0,$43,JR__TRAINER_M,$2 ; trainer
+    db SPRITE_LASS,$8 + 4,$12 + 4,$ff,$d3,$44,LASS,$9 ; trainer
+    db SPRITE_BUG_CATCHER,$3 + 4,$20 + 4,$ff,$d2,$45,YOUNGSTER,$7 ; trainer
+    db SPRITE_LASS,$4 + 4,$25 + 4,$ff,$d0,$46,LASS,$a ; trainer
+    db SPRITE_HIKER,$4 + 4,$8 + 4,$ff,$d3,$47,HIKER,$2 ; trainer
+    db SPRITE_HIKER,$9 + 4,$17 + 4,$ff,$d1,$48,HIKER,$3 ; trainer
+    db SPRITE_HIKER,$7 + 4,$d + 4,$ff,$d3,$49,HIKER,$4 ; trainer
     db SPRITE_BALL,$2 + 4,$16 + 4,$ff,$ff,$8a,TM_19 ; item
 
     ; warp-to
@@ -75333,7 +75350,7 @@ Func_50d14: ; 50d14 (14:4d14)
 
 Route20ScriptPointers: ; 50d1c (14:4d1c)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route20TextPointers: ; 50d22 (14:4d22)
@@ -75760,8 +75777,8 @@ Route22Script1: ; 50f62 (14:4f62)
     ld hl,UnnamedText_511b7
     ld de,UnnamedText_511bc
     call PreBattleSaveRegisters
-    ld a,$e1
-    ld [$d059],a
+    ld a,SONY1
+    ld [W_CUROPPONENT],a ; $d059
     ld hl,StarterMons_50faf ; $4faf
     call Func_50ed6
     ld a,$2
@@ -75907,7 +75924,7 @@ Route22Script4: ; 51087 (14:5087)
     ld hl,UnnamedText_511cb ; $51cb
     ld de,UnnamedText_511d0 ; $51d0
     call PreBattleSaveRegisters
-    ld a,$f2
+    ld a,SONY2
     ld [W_CUROPPONENT],a ; $d059
     ld hl,StarterMons_510d9 ; $50d9
     call Func_50ed6
@@ -76327,7 +76344,7 @@ Func_513c0: ; 513c0 (14:53c0)
 
 Route24ScriptPointers: ; 513cb (14:53cb)
     dw Route24Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw Route24Script3
     dw Route24Script4
@@ -76680,7 +76697,7 @@ Route25Script_515e1: ; 515e1 (14:55e1)
 
 Route25ScriptPointers: ; 51622 (14:5622)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route25TextPointers: ; 51628 (14:5628)
@@ -77089,7 +77106,7 @@ VictoryRoad2TrainerHeader5: ; 51865 (14:5865)
 
 VictoryRoad2ScriptPointers: ; Moved in the Bank
     dw VictoryRoad2Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw VictoryRoad2Script3
     dw VictoryRoad2Script4
@@ -77216,12 +77233,12 @@ VictoryRoad2Object: ; 0x51915 (size=154)
     db $0 ; signs
 
     db $d ; people
-    db SPRITE_HIKER,$9 + 4,$c + 4,$ff,$d2,$41,BLACKBELT + $C8,$9 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$d + 4,$15 + 4,$ff,$d2,$42,JUGGLER + $C8,$2 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$8 + 4,$13 + 4,$ff,$d0,$43,TAMER + $C8,$5 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$1 + 4,$10 + 4,$ff,$d0,$44,POKEMANIAC + $C8,$6 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$3 + 4,$1a + 4,$ff,$d2,$45,JUGGLER + $C8,$5 ; trainer
-    db SPRITE_BOULDER,$2 + 4,$4 + 4,$ff,$10,$6;ONIX,62 ; trainer
+    db SPRITE_HIKER,$9 + 4,$c + 4,$ff,$d2,$41,BLACKBELT,$9 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$d + 4,$15 + 4,$ff,$d2,$42,JUGGLER,$2 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$8 + 4,$13 + 4,$ff,$d0,$43,TAMER,$5 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$1 + 4,$10 + 4,$ff,$d0,$44,POKEMANIAC,$6 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$3 + 4,$1a + 4,$ff,$d2,$45,JUGGLER,$5 ; trainer
+    db SPRITE_BOULDER,$2 + 4,$4 + 4,$ff,$10,$6 ; person
     db SPRITE_BALL,$5 + 4,$1b + 4,$ff,$ff,$87,TM_17 ; item
     db SPRITE_BALL,$9 + 4,$12 + 4,$ff,$ff,$88,FULL_HEAL ; item
     db SPRITE_BALL,$b + 4,$9 + 4,$ff,$ff,$89,TM_05 ; item
@@ -77414,7 +77431,7 @@ Func_51c10: ; 51c10 (14:5c10)
 
 SilphCo7ScriptPointers: ; 51c17 (14:5c17)
     dw SilphCo7Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw SilphCo7Script3
     dw SilphCo7Script4
@@ -77482,7 +77499,7 @@ SilphCo7Script3: ; 51c82 (14:5c82)
     ld hl,SilphCo7Text14 ; $5ec8
     ld de,UnnamedText_51ecd ; $5ecd
     call PreBattleSaveRegisters
-    ld a,$f2
+    ld a,SONY2
     ld [W_CUROPPONENT],a ; $d059
     ld a,[W_RIVALSTARTER] ; $d715
     cp $b1
@@ -77842,10 +77859,10 @@ SilphCo7Object: ; 0x51ed7 (size=128)
     db SPRITE_LAPRAS_GIVER,$d + 4,$d + 4,$ff,$d1,$2 ; person
     db SPRITE_LAPRAS_GIVER,$a + 4,$7 + 4,$ff,$ff,$3 ; person
     db SPRITE_ERIKA,$8 + 4,$a + 4,$ff,$ff,$4 ; person
-    db SPRITE_ROCKET,$1 + 4,$d + 4,$ff,$d0,$45,ROCKET + $C8,$20 ; trainer
-    db SPRITE_OAK_AIDE,$d + 4,$2 + 4,$ff,$d0,$46,SCIENTIST + $C8,$8 ; trainer
-    db SPRITE_ROCKET,$2 + 4,$14 + 4,$ff,$d2,$47,ROCKET + $C8,$21 ; trainer
-    db SPRITE_ROCKET,$e + 4,$13 + 4,$ff,$d3,$48,ROCKET + $C8,$22 ; trainer
+    db SPRITE_ROCKET,$1 + 4,$d + 4,$ff,$d0,$45,ROCKET,$20 ; trainer
+    db SPRITE_OAK_AIDE,$d + 4,$2 + 4,$ff,$d0,$46,SCIENTIST,$8 ; trainer
+    db SPRITE_ROCKET,$2 + 4,$14 + 4,$ff,$d2,$47,ROCKET,$21 ; trainer
+    db SPRITE_ROCKET,$e + 4,$13 + 4,$ff,$d3,$48,ROCKET,$22 ; trainer
     db SPRITE_BLUE,$7 + 4,$3 + 4,$ff,$d1,$9 ; person
     db SPRITE_BALL,$9 + 4,$1 + 4,$ff,$ff,$8a,CALCIUM ; item
     db SPRITE_BALL,$b + 4,$18 + 4,$ff,$ff,$8b,TM_03 ; item
@@ -77925,7 +77942,7 @@ Func_52037: ; 52037 (14:6037)
 
 Mansion2ScriptPointers: ; 52047 (14:6047)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Mansion2TextPointers: ; 5204d (14:604d)
@@ -78005,9 +78022,9 @@ Mansion2Object: ; Move in the Bank
     db $0 ; signs
 
     db $4 ; people
-    db SPRITE_BLACK_HAIR_BOY_2,$11 + 4,$3 + 4,$fe,$2,$41,BURGLAR + $C8,$4 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$11 + 4,$3 + 4,$fe,$2,$41,BURGLAR,$4 ; trainer
     ;db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
-    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$42,MOLTRES,55 ; Entry Level (Over)
+    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$42,MOLTRES,OPP_LVL_OFFSET+55 ; Entry Level (Over)
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
 
@@ -78065,7 +78082,7 @@ Mansion3Script_52204: ; 52204 (14:6204)
 
 Mansion3ScriptPointers: ; 52235 (14:6235)
     dw Mansion3Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Mansion3Script0: ; 5223b (14:623b)
@@ -78194,8 +78211,8 @@ Mansion3Object: ; 0x522e6 (size=64)
     db $0 ; signs
 
     db $5 ; people
-    db SPRITE_BLACK_HAIR_BOY_2,$b + 4,$5 + 4,$fe,$2,$41,BURGLAR + $C8,$5 ; trainer
-    db SPRITE_OAK_AIDE,$b + 4,$14 + 4,$ff,$d2,$42,SCIENTIST + $C8,$c ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$b + 4,$5 + 4,$fe,$2,$41,BURGLAR,$5 ; trainer
+    db SPRITE_OAK_AIDE,$b + 4,$14 + 4,$ff,$d2,$42,SCIENTIST,$c ; trainer
     db SPRITE_BALL,$10 + 4,$1 + 4,$ff,$ff,$83,MAX_POTION ; item
     db SPRITE_BALL,$5 + 4,$19 + 4,$ff,$ff,$84,IRON ; item
     db SPRITE_BOOK_MAP_DEX,$c + 4,$6 + 4,$ff,$ff,$5 ; person
@@ -78271,7 +78288,7 @@ Mansion4Script_523cf: ; 523cf (14:63cf)
 
 Mansion4ScriptPointers: ; 52430 (14:6430)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Mansion4TextPointers: ; 52436 (14:6436)
@@ -78355,8 +78372,8 @@ Mansion4Object: ; 0x52498 (size=69)
     db $0 ; signs
 
     db $8 ; people
-    db SPRITE_BLACK_HAIR_BOY_2,$17 + 4,$10 + 4,$ff,$ff,$41,BURGLAR + $C8,$6 ; trainer
-    db SPRITE_OAK_AIDE,$b + 4,$1b + 4,$ff,$d0,$42,SCIENTIST + $C8,$d ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$17 + 4,$10 + 4,$ff,$ff,$41,BURGLAR,$6 ; trainer
+    db SPRITE_OAK_AIDE,$b + 4,$1b + 4,$ff,$d0,$42,SCIENTIST,$d ; trainer
     db SPRITE_BALL,$2 + 4,$a + 4,$ff,$ff,$83,RARE_CANDY ; item
     db SPRITE_BALL,$16 + 4,$1 + 4,$ff,$ff,$84,FULL_RESTORE ; item
     db SPRITE_BALL,$19 + 4,$13 + 4,$ff,$ff,$85,TM_14 ; item
@@ -79205,7 +79222,7 @@ BattleWithShinyOnix:
     ld a,60
     ld [W_CURENEMYLVL],a
     ld a,ONIX
-    ld [W_CUROPPONENT],a
+    ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
     call PlayCry
     call WaitForSoundToFinish
@@ -79390,14 +79407,14 @@ Route3Object: ; 0x54208 (size=77)
 
     db $9 ; people
     db SPRITE_BLACK_HAIR_BOY_2,$b + 4,$39 + 4,$ff,$ff,$1 ; person
-    db SPRITE_BUG_CATCHER,$6 + 4,$a + 4,$ff,$d3,$42,BUG_CATCHER + $C8,$4 ; trainer
-    db SPRITE_BUG_CATCHER,$4 + 4,$e + 4,$ff,$d0,$43,YOUNGSTER + $C8,$1 ; trainer
-    db SPRITE_LASS,$9 + 4,$10 + 4,$ff,$d2,$44,LASS + $C8,$1 ; trainer
-    db SPRITE_BUG_CATCHER,$5 + 4,$13 + 4,$ff,$d0,$45,BUG_CATCHER + $C8,$5 ; trainer
-    db SPRITE_LASS,$4 + 4,$17 + 4,$ff,$d2,$46,LASS + $C8,$2 ; trainer
-    db SPRITE_BUG_CATCHER,$9 + 4,$16 + 4,$ff,$d2,$47,YOUNGSTER + $C8,$2 ; trainer
-    db SPRITE_BUG_CATCHER,$6 + 4,$18 + 4,$ff,$d3,$48,BUG_CATCHER + $C8,$6 ; trainer
-    db SPRITE_LASS,$a + 4,$21 + 4,$ff,$d1,$49,LASS + $C8,$3 ; trainer
+    db SPRITE_BUG_CATCHER,$6 + 4,$a + 4,$ff,$d3,$42,BUG_CATCHER,$4 ; trainer
+    db SPRITE_BUG_CATCHER,$4 + 4,$e + 4,$ff,$d0,$43,YOUNGSTER,$1 ; trainer
+    db SPRITE_LASS,$9 + 4,$10 + 4,$ff,$d2,$44,LASS,$1 ; trainer
+    db SPRITE_BUG_CATCHER,$5 + 4,$13 + 4,$ff,$d0,$45,BUG_CATCHER,$5 ; trainer
+    db SPRITE_LASS,$4 + 4,$17 + 4,$ff,$d2,$46,LASS,$2 ; trainer
+    db SPRITE_BUG_CATCHER,$9 + 4,$16 + 4,$ff,$d2,$47,YOUNGSTER,$2 ; trainer
+    db SPRITE_BUG_CATCHER,$6 + 4,$18 + 4,$ff,$d3,$48,BUG_CATCHER,$6 ; trainer
+    db SPRITE_LASS,$a + 4,$21 + 4,$ff,$d1,$49,LASS,$3 ; trainer
 
 Route3Blocks: ; 54255 (15:4255)
     INCBIN "maps/route3.blk"
@@ -79426,7 +79443,7 @@ Route4Object: ; 0x543b2 (size=58)
 
     db $3 ; people
     db SPRITE_LASS,$8 + 4,$9 + 4,$fe,$0,$1 ; person
-    db SPRITE_LASS,$3 + 4,$3f + 4,$ff,$d3,$42,LASS + $C8,$4 ; trainer
+    db SPRITE_LASS,$3 + 4,$3f + 4,$ff,$d3,$42,LASS,$4 ; trainer
     db SPRITE_BALL,$3 + 4,$39 + 4,$ff,$ff,$83,TM_51 ; item ; BLADE
 
     ; warp-to
@@ -79489,15 +79506,15 @@ Route9Object: ; 0x546a8 (size=86)
     db $7,$19,$b ; Route9Text11
 
     db $a ; people
-    db SPRITE_LASS,$a + 4,$d + 4,$ff,$d2,$41,JR__TRAINER_F + $C8,$5 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$18 + 4,$ff,$d2,$42,JR__TRAINER_M + $C8,$6 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$1f + 4,$ff,$d3,$43,JR__TRAINER_M + $C8,$7 ; trainer
-    db SPRITE_LASS,$8 + 4,$30 + 4,$ff,$d3,$44,JR__TRAINER_F + $C8,$6 ; trainer
-    db SPRITE_HIKER,$f + 4,$10 + 4,$ff,$d2,$45,HIKER + $C8,$b ; trainer
-    db SPRITE_HIKER,$3 + 4,$2b + 4,$ff,$d2,$46,HIKER + $C8,$6 ; trainer
-    db SPRITE_BUG_CATCHER,$2 + 4,$16 + 4,$ff,$d0,$47,BUG_CATCHER + $C8,$c ; trainer
-    db SPRITE_HIKER,$f + 4,$2d + 4,$ff,$d3,$48,HIKER + $C8,$5 ; trainer
-    db SPRITE_BUG_CATCHER,$8 + 4,$28 + 4,$ff,$d3,$49,BUG_CATCHER + $C8,$d ; trainer
+    db SPRITE_LASS,$a + 4,$d + 4,$ff,$d2,$41,JR__TRAINER_F,$5 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$18 + 4,$ff,$d2,$42,JR__TRAINER_M,$6 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$1f + 4,$ff,$d3,$43,JR__TRAINER_M,$7 ; trainer
+    db SPRITE_LASS,$8 + 4,$30 + 4,$ff,$d3,$44,JR__TRAINER_F,$6 ; trainer
+    db SPRITE_HIKER,$f + 4,$10 + 4,$ff,$d2,$45,HIKER,$b ; trainer
+    db SPRITE_HIKER,$3 + 4,$2b + 4,$ff,$d2,$46,HIKER,$6 ; trainer
+    db SPRITE_BUG_CATCHER,$2 + 4,$16 + 4,$ff,$d0,$47,BUG_CATCHER,$c ; trainer
+    db SPRITE_HIKER,$f + 4,$2d + 4,$ff,$d3,$48,HIKER,$5 ; trainer
+    db SPRITE_BUG_CATCHER,$8 + 4,$28 + 4,$ff,$d3,$49,BUG_CATCHER,$d ; trainer
     db SPRITE_BALL,$f + 4,$a + 4,$ff,$ff,$8a,TM_30 ; item
 
 Route9Blocks: ; 546fe (15:46fe)
@@ -79523,16 +79540,16 @@ Route13Object: ; 0x5482e (size=93)
     db $b,$1f,$d ; Route13Text13
 
     db $a ; people
-    db SPRITE_BLACK_HAIR_BOY_1,$a + 4,$31 + 4,$ff,$d3,$41,BIRD_KEEPER + $C8,$1 ; trainer
-    db SPRITE_LASS,$a + 4,$30 + 4,$ff,$d0,$42,JR__TRAINER_F + $C8,$c ; trainer
-    db SPRITE_LASS,$9 + 4,$1b + 4,$ff,$d0,$43,JR__TRAINER_F + $C8,$d ; trainer
-    db SPRITE_LASS,$a + 4,$17 + 4,$ff,$d2,$44,JR__TRAINER_F + $C8,$e ; trainer
-    db SPRITE_LASS,$5 + 4,$32 + 4,$ff,$d0,$45,JR__TRAINER_F + $C8,$f ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$4 + 4,$c + 4,$ff,$d3,$46,BIRD_KEEPER + $C8,$2 ; trainer
-    db SPRITE_FOULARD_WOMAN,$6 + 4,$21 + 4,$ff,$d0,$47,BEAUTY + $C8,$4 ; trainer
-    db SPRITE_FOULARD_WOMAN,$6 + 4,$20 + 4,$ff,$d0,$48,BEAUTY + $C8,$5 ; trainer
-    db SPRITE_BIKER,$7 + 4,$a + 4,$ff,$d1,$49,BIKER + $C8,$1 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$d + 4,$7 + 4,$ff,$d1,$4a,BIRD_KEEPER + $C8,$3 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$a + 4,$31 + 4,$ff,$d3,$41,BIRD_KEEPER,$1 ; trainer
+    db SPRITE_LASS,$a + 4,$30 + 4,$ff,$d0,$42,JR__TRAINER_F,$c ; trainer
+    db SPRITE_LASS,$9 + 4,$1b + 4,$ff,$d0,$43,JR__TRAINER_F,$d ; trainer
+    db SPRITE_LASS,$a + 4,$17 + 4,$ff,$d2,$44,JR__TRAINER_F,$e ; trainer
+    db SPRITE_LASS,$5 + 4,$32 + 4,$ff,$d0,$45,JR__TRAINER_F,$f ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$4 + 4,$c + 4,$ff,$d3,$46,BIRD_KEEPER,$2 ; trainer
+    db SPRITE_FOULARD_WOMAN,$6 + 4,$21 + 4,$ff,$d0,$47,BEAUTY,$4 ; trainer
+    db SPRITE_FOULARD_WOMAN,$6 + 4,$20 + 4,$ff,$d0,$48,BEAUTY,$5 ; trainer
+    db SPRITE_BIKER,$7 + 4,$a + 4,$ff,$d1,$49,BIKER,$1 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$d + 4,$7 + 4,$ff,$d1,$4a,BIRD_KEEPER,$3 ; trainer
 
 Route13Blocks: ; 5488b (15:488b)
     INCBIN "maps/route13.blk"
@@ -79555,16 +79572,16 @@ Route14Object: ; 0x549bb (size=87)
     db $d,$11,$b ; Route14Text11
 
     db $a ; people
-    db SPRITE_BLACK_HAIR_BOY_1,$4 + 4,$4 + 4,$ff,$d0,$41,BIRD_KEEPER + $C8,$c ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$6 + 4,$f + 4,$ff,$d0,$42,BIRD_KEEPER + $C8,$d ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$b + 4,$c + 4,$ff,$d0,$43,BIRD_KEEPER + $C8,$e ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$f + 4,$e + 4,$ff,$d1,$44,BIRD_KEEPER + $C8,$f ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$1f + 4,$f + 4,$ff,$d2,$45,BIRD_KEEPER + $C8,$4 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$31 + 4,$6 + 4,$ff,$d1,$46,BIRD_KEEPER + $C8,$5 ; trainer
-    db SPRITE_BIKER,$27 + 4,$5 + 4,$ff,$d0,$47,BIKER + $C8,$d ; trainer
-    db SPRITE_BIKER,$1e + 4,$4 + 4,$ff,$d3,$48,BIKER + $C8,$e ; trainer
-    db SPRITE_BIKER,$1e + 4,$f + 4,$ff,$d2,$49,BIKER + $C8,$f ; trainer
-    db SPRITE_BIKER,$1f + 4,$4 + 4,$ff,$d3,$4a,BIKER + $C8,$2 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$4 + 4,$4 + 4,$ff,$d0,$41,BIRD_KEEPER,$c ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$6 + 4,$f + 4,$ff,$d0,$42,BIRD_KEEPER,$d ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$b + 4,$c + 4,$ff,$d0,$43,BIRD_KEEPER,$e ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$f + 4,$e + 4,$ff,$d1,$44,BIRD_KEEPER,$f ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$1f + 4,$f + 4,$ff,$d2,$45,BIRD_KEEPER,$4 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$31 + 4,$6 + 4,$ff,$d1,$46,BIRD_KEEPER,$5 ; trainer
+    db SPRITE_BIKER,$27 + 4,$5 + 4,$ff,$d0,$47,BIKER,$d ; trainer
+    db SPRITE_BIKER,$1e + 4,$4 + 4,$ff,$d3,$48,BIKER,$e ; trainer
+    db SPRITE_BIKER,$1e + 4,$f + 4,$ff,$d2,$49,BIKER,$f ; trainer
+    db SPRITE_BIKER,$1f + 4,$4 + 4,$ff,$d3,$4a,BIKER,$2 ; trainer
 
 Route14Blocks: ; 54a12 (15:4a12)
     INCBIN "maps/route14.blk"
@@ -79592,16 +79609,16 @@ Route17Object: ; 0x54b42 (size=102)
     db $8d,$9,$10 ; Route17Text16
 
     db $a ; people
-    db SPRITE_BIKER,$13 + 4,$c + 4,$ff,$d2,$41,CUE_BALL + $C8,$4 ; trainer
-    db SPRITE_BIKER,$10 + 4,$b + 4,$ff,$d3,$42,CUE_BALL + $C8,$5 ; trainer
-    db SPRITE_BIKER,$12 + 4,$4 + 4,$ff,$d1,$43,BIKER + $C8,$8 ; trainer
-    db SPRITE_BIKER,$20 + 4,$7 + 4,$ff,$d2,$44,BIKER + $C8,$9 ; trainer
-    db SPRITE_BIKER,$22 + 4,$e + 4,$ff,$d3,$45,BIKER + $C8,$a ; trainer
-    db SPRITE_BIKER,$3a + 4,$11 + 4,$ff,$d2,$46,CUE_BALL + $C8,$6 ; trainer
-    db SPRITE_BIKER,$44 + 4,$2 + 4,$ff,$d3,$47,CUE_BALL + $C8,$7 ; trainer
-    db SPRITE_BIKER,$62 + 4,$e + 4,$ff,$d3,$48,CUE_BALL + $C8,$8 ; trainer
-    db SPRITE_BIKER,$62 + 4,$5 + 4,$ff,$d2,$49,BIKER + $C8,$b ; trainer
-    db SPRITE_BIKER,$76 + 4,$a + 4,$ff,$d0,$4a,BIKER + $C8,$c ; trainer
+    db SPRITE_BIKER,$13 + 4,$c + 4,$ff,$d2,$41,CUE_BALL,$4 ; trainer
+    db SPRITE_BIKER,$10 + 4,$b + 4,$ff,$d3,$42,CUE_BALL,$5 ; trainer
+    db SPRITE_BIKER,$12 + 4,$4 + 4,$ff,$d1,$43,BIKER,$8 ; trainer
+    db SPRITE_BIKER,$20 + 4,$7 + 4,$ff,$d2,$44,BIKER,$9 ; trainer
+    db SPRITE_BIKER,$22 + 4,$e + 4,$ff,$d3,$45,BIKER,$a ; trainer
+    db SPRITE_BIKER,$3a + 4,$11 + 4,$ff,$d2,$46,CUE_BALL,$6 ; trainer
+    db SPRITE_BIKER,$44 + 4,$2 + 4,$ff,$d3,$47,CUE_BALL,$7 ; trainer
+    db SPRITE_BIKER,$62 + 4,$e + 4,$ff,$d3,$48,CUE_BALL,$8 ; trainer
+    db SPRITE_BIKER,$62 + 4,$5 + 4,$ff,$d2,$49,BIKER,$b ; trainer
+    db SPRITE_BIKER,$76 + 4,$a + 4,$ff,$d0,$4a,BIKER,$c ; trainer
 
 Route17Blocks: ; 54ba8 (15:4ba8)
     INCBIN "maps/route17.blk"
@@ -79624,16 +79641,16 @@ Route19Object: ; 0x54e9a (size=87)
     db $9,$b,$b ; Route19Text11
 
     db $a ; people
-    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$8 + 4,$ff,$d2,$41,SWIMMER + $C8,$2 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$d + 4,$ff,$d2,$42,SWIMMER + $C8,$3 ; trainer
-    db SPRITE_SWIMMER,$19 + 4,$d + 4,$ff,$d2,$43,SWIMMER + $C8,$4 ; trainer
-    db SPRITE_SWIMMER,$1b + 4,$4 + 4,$ff,$d3,$44,SWIMMER + $C8,$5 ; trainer
-    db SPRITE_SWIMMER,$1f + 4,$10 + 4,$ff,$d1,$45,SWIMMER + $C8,$6 ; trainer
-    db SPRITE_SWIMMER,$b + 4,$9 + 4,$ff,$d0,$46,SWIMMER + $C8,$7 ; trainer
-    db SPRITE_SWIMMER,$2b + 4,$8 + 4,$ff,$d2,$47,BEAUTY + $C8,$b ; trainer
-    db SPRITE_SWIMMER,$2b + 4,$b + 4,$ff,$d3,$48,BEAUTY + $C8,$c ; trainer
-    db SPRITE_SWIMMER,$2a + 4,$9 + 4,$ff,$d1,$49,SWIMMER + $C8,$8 ; trainer
-    db SPRITE_SWIMMER,$2c + 4,$a + 4,$ff,$d0,$4a,BEAUTY + $C8,$d ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$8 + 4,$ff,$d2,$41,SWIMMER,$2 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$d + 4,$ff,$d2,$42,SWIMMER,$3 ; trainer
+    db SPRITE_SWIMMER,$19 + 4,$d + 4,$ff,$d2,$43,SWIMMER,$4 ; trainer
+    db SPRITE_SWIMMER,$1b + 4,$4 + 4,$ff,$d3,$44,SWIMMER,$5 ; trainer
+    db SPRITE_SWIMMER,$1f + 4,$10 + 4,$ff,$d1,$45,SWIMMER,$6 ; trainer
+    db SPRITE_SWIMMER,$b + 4,$9 + 4,$ff,$d0,$46,SWIMMER,$7 ; trainer
+    db SPRITE_SWIMMER,$2b + 4,$8 + 4,$ff,$d2,$47,BEAUTY,$b ; trainer
+    db SPRITE_SWIMMER,$2b + 4,$b + 4,$ff,$d3,$48,BEAUTY,$c ; trainer
+    db SPRITE_SWIMMER,$2a + 4,$9 + 4,$ff,$d1,$49,SWIMMER,$8 ; trainer
+    db SPRITE_SWIMMER,$2c + 4,$a + 4,$ff,$d0,$4a,BEAUTY,$d ; trainer
 
 Route19Blocks: ; 54ef1 (15:4ef1)
     INCBIN "maps/route19.blk"
@@ -79655,15 +79672,15 @@ Route21Object: ; 0x55021 (size=76)
     db $0 ; signs
 
     db $9 ; people
-    db SPRITE_FISHER2,$18 + 4,$4 + 4,$ff,$d2,$41,FISHER + $C8,$7 ; trainer
-    db SPRITE_FISHER2,$19 + 4,$6 + 4,$ff,$d0,$42,FISHER + $C8,$9 ; trainer
-    db SPRITE_SWIMMER,$1f + 4,$a + 4,$ff,$d1,$43,SWIMMER + $C8,$c ; trainer
-    db SPRITE_SWIMMER,$1e + 4,$c + 4,$ff,$d3,$44,CUE_BALL + $C8,$9 ; trainer
-    db SPRITE_SWIMMER,$3f + 4,$10 + 4,$ff,$d0,$45,SWIMMER + $C8,$d ; trainer
-    db SPRITE_SWIMMER,$47 + 4,$5 + 4,$ff,$d3,$46,SWIMMER + $C8,$e ; trainer
-    db SPRITE_SWIMMER,$47 + 4,$f + 4,$ff,$d2,$47,SWIMMER + $C8,$f ; trainer
-    db SPRITE_FISHER2,$38 + 4,$e + 4,$ff,$d2,$48,FISHER + $C8,$8 ; trainer
-    db SPRITE_FISHER2,$39 + 4,$11 + 4,$ff,$d3,$49,FISHER + $C8,$a ; trainer
+    db SPRITE_FISHER2,$18 + 4,$4 + 4,$ff,$d2,$41,FISHER,$7 ; trainer
+    db SPRITE_FISHER2,$19 + 4,$6 + 4,$ff,$d0,$42,FISHER,$9 ; trainer
+    db SPRITE_SWIMMER,$1f + 4,$a + 4,$ff,$d1,$43,SWIMMER,$c ; trainer
+    db SPRITE_SWIMMER,$1e + 4,$c + 4,$ff,$d3,$44,CUE_BALL,$9 ; trainer
+    db SPRITE_SWIMMER,$3f + 4,$10 + 4,$ff,$d0,$45,SWIMMER,$d ; trainer
+    db SPRITE_SWIMMER,$47 + 4,$5 + 4,$ff,$d3,$46,SWIMMER,$e ; trainer
+    db SPRITE_SWIMMER,$47 + 4,$f + 4,$ff,$d2,$47,SWIMMER,$f ; trainer
+    db SPRITE_FISHER2,$38 + 4,$e + 4,$ff,$d2,$48,FISHER,$8 ; trainer
+    db SPRITE_FISHER2,$39 + 4,$11 + 4,$ff,$d3,$49,FISHER,$a ; trainer
 
 Route21Blocks: ; 5506d (15:506d)
     INCBIN "maps/route21.blk"
@@ -80101,7 +80118,7 @@ Route3Script: ; 554f8 (15:54f8)
 
 Route3ScriptPointers: ; 5550b (15:550b)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route3TextPointers: ; 55511 (15:5511)
@@ -80354,7 +80371,7 @@ Route4Script: ; 55658 (15:5658)
 
 Route4ScriptPointers: ; 5566b (15:566b)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route4TextPointers: ; 55671 (15:5671)
@@ -80428,7 +80445,7 @@ Route9Script: ; 556bc (15:56bc)
 
 Route9ScriptPointers: ; 556cf (15:56cf)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route9TextPointers: ; 556d5 (15:56d5)
@@ -80698,7 +80715,7 @@ Route13Script: ; 5581e (15:581e)
 
 Route13ScriptPointers: ; 55831 (15:5831)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route13TextPointers: ; 55837 (15:5837)
@@ -81012,7 +81029,7 @@ Route14Script: ; 559d3 (15:59d3)
 
 Route14ScriptPointers: ; 559e6 (15:59e6)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route14TextPointers: ; 559ec (15:59ec)
@@ -81316,7 +81333,7 @@ Route17Script: ; 55b7a (15:5b7a)
 
 Route17ScriptPointers: ; 55b8d (15:5b8d)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route17TextPointers: ; 55b93 (15:5b93)
@@ -81645,7 +81662,7 @@ Route19Script: ; 55d44 (15:5d44)
 
 Route19ScriptPointers: ; 55d57 (15:5d57)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route19TextPointers: ; 55d5d (15:5d5d)
@@ -82887,7 +82904,7 @@ Func_5656d: ; 5656d (15:656d)
 
 SilphCo8ScriptPointers: ; 56577 (15:6577)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SilphCo8TextPointers: ; 5657d (15:657d)
@@ -83015,9 +83032,9 @@ SilphCo8Object: ; 0x56613 (size=90)
 
     db $4 ; people
     db SPRITE_LAPRAS_GIVER,$2 + 4,$4 + 4,$ff,$ff,$1 ; person
-    db SPRITE_ROCKET,$2 + 4,$13 + 4,$ff,$d2,$42,ROCKET + $C8,$23 ; trainer
-    db SPRITE_OAK_AIDE,$2 + 4,$a + 4,$ff,$d0,$43,SCIENTIST + $C8,$9 ; trainer
-    db SPRITE_ROCKET,$f + 4,$c + 4,$ff,$d3,$44,ROCKET + $C8,$24 ; trainer
+    db SPRITE_ROCKET,$2 + 4,$13 + 4,$ff,$d2,$42,ROCKET,$23 ; trainer
+    db SPRITE_OAK_AIDE,$2 + 4,$a + 4,$ff,$d0,$43,SCIENTIST,$9 ; trainer
+    db SPRITE_ROCKET,$f + 4,$c + 4,$ff,$d3,$44,ROCKET,$24 ; trainer
 
     ; warp-to
     EVENT_DISP $d,$0,$10 ; SILPH_CO_9F
@@ -83729,7 +83746,7 @@ CeladonMart2Text2:
 
 Route21ScriptPointers: ; Moved in the Bank
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route21ScriptBarrier:
@@ -83808,12 +83825,12 @@ Route6Object: ; 0x58022 (size=87)
     db $f,$13,$7 ; Route6Text7
 
     db $6 ; people
-    db SPRITE_BLACK_HAIR_BOY_1,$15 + 4,$a + 4,$ff,$d3,$41,JR__TRAINER_M + $C8,$4 ; trainer
-    db SPRITE_LASS,$15 + 4,$b + 4,$ff,$d2,$42,JR__TRAINER_F + $C8,$2 ; trainer
-    db SPRITE_BUG_CATCHER,$f + 4,$0 + 4,$ff,$d3,$43,BUG_CATCHER + $C8,$a ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$1f + 4,$b + 4,$ff,$d2,$44,JR__TRAINER_M + $C8,$5 ; trainer
-    db SPRITE_LASS,$1e + 4,$b + 4,$ff,$d2,$45,JR__TRAINER_F + $C8,$3 ; trainer
-    db SPRITE_BUG_CATCHER,$1a + 4,$13 + 4,$ff,$d2,$46,BUG_CATCHER + $C8,$b ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$15 + 4,$a + 4,$ff,$d3,$41,JR__TRAINER_M,$4 ; trainer
+    db SPRITE_LASS,$15 + 4,$b + 4,$ff,$d2,$42,JR__TRAINER_F,$2 ; trainer
+    db SPRITE_BUG_CATCHER,$f + 4,$0 + 4,$ff,$d3,$43,BUG_CATCHER,$a ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$1f + 4,$b + 4,$ff,$d2,$44,JR__TRAINER_M,$5 ; trainer
+    db SPRITE_LASS,$1e + 4,$b + 4,$ff,$d2,$45,JR__TRAINER_F,$3 ; trainer
+    db SPRITE_BUG_CATCHER,$1a + 4,$13 + 4,$ff,$d2,$46,BUG_CATCHER,$b ; trainer
 
     ; warp-to
     EVENT_DISP $a,$1,$9 ; ROUTE_6_GATE
@@ -83847,15 +83864,15 @@ Route8Object: ; 0x5814f (size=119)
     db $3,$11,$a ; Route8Text10
 
     db $9 ; people
-    db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$8 + 4,$ff,$d3,$41,SUPER_NERD + $C8,$3 ; trainer
-    db SPRITE_GAMBLER,$9 + 4,$d + 4,$ff,$d1,$42,GAMBLER + $C8,$5 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$6 + 4,$2a + 4,$ff,$d1,$43,SUPER_NERD + $C8,$4 ; trainer
-    db SPRITE_LASS,$3 + 4,$1a + 4,$ff,$d2,$44,LASS + $C8,$d ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$1a + 4,$ff,$d3,$45,SUPER_NERD + $C8,$5 ; trainer
-    db SPRITE_LASS,$5 + 4,$1a + 4,$ff,$d2,$46,LASS + $C8,$e ; trainer
-    db SPRITE_LASS,$6 + 4,$1a + 4,$ff,$d3,$47,LASS + $C8,$f ; trainer
-    db SPRITE_GAMBLER,$d + 4,$2e + 4,$ff,$d0,$48,GAMBLER + $C8,$6 ; trainer
-    db SPRITE_LASS,$c + 4,$33 + 4,$ff,$d2,$49,LASS + $C8,$10 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$8 + 4,$ff,$d3,$41,SUPER_NERD,$3 ; trainer
+    db SPRITE_GAMBLER,$9 + 4,$d + 4,$ff,$d1,$42,GAMBLER,$5 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$6 + 4,$2a + 4,$ff,$d1,$43,SUPER_NERD,$4 ; trainer
+    db SPRITE_LASS,$3 + 4,$1a + 4,$ff,$d2,$44,LASS,$d ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$1a + 4,$ff,$d3,$45,SUPER_NERD,$5 ; trainer
+    db SPRITE_LASS,$5 + 4,$1a + 4,$ff,$d2,$46,LASS,$e ; trainer
+    db SPRITE_LASS,$6 + 4,$1a + 4,$ff,$d3,$47,LASS,$f ; trainer
+    db SPRITE_GAMBLER,$d + 4,$2e + 4,$ff,$d0,$48,GAMBLER,$6 ; trainer
+    db SPRITE_LASS,$c + 4,$33 + 4,$ff,$d2,$49,LASS,$10 ; trainer
 
     ; warp-to
     EVENT_DISP $1e,$9,$1 ; ROUTE_8_GATE
@@ -83892,12 +83909,12 @@ Route10Object: ; 0x582f6 (size=96)
     db $29,$5,$a ; Route10Text10
 
     db $6 ; people
-    db SPRITE_BLACK_HAIR_BOY_2,$2c + 4,$a + 4,$ff,$d2,$41,POKEMANIAC + $C8,$1 ; trainer
-    db SPRITE_HIKER,$39 + 4,$3 + 4,$ff,$d1,$42,HIKER + $C8,$7 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$40 + 4,$e + 4,$ff,$d2,$43,POKEMANIAC + $C8,$2 ; trainer
-    db SPRITE_LASS,$19 + 4,$7 + 4,$ff,$d2,$44,JR__TRAINER_F + $C8,$7 ; trainer
-    db SPRITE_HIKER,$3d + 4,$3 + 4,$ff,$d0,$45,HIKER + $C8,$8 ; trainer
-    db SPRITE_LASS,$36 + 4,$7 + 4,$ff,$d0,$46,JR__TRAINER_F + $C8,$8 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$2c + 4,$a + 4,$ff,$d2,$41,POKEMANIAC,$1 ; trainer
+    db SPRITE_HIKER,$39 + 4,$3 + 4,$ff,$d1,$42,HIKER,$7 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$40 + 4,$e + 4,$ff,$d2,$43,POKEMANIAC,$2 ; trainer
+    db SPRITE_LASS,$19 + 4,$7 + 4,$ff,$d2,$44,JR__TRAINER_F,$7 ; trainer
+    db SPRITE_HIKER,$3d + 4,$3 + 4,$ff,$d0,$45,HIKER,$8 ; trainer
+    db SPRITE_LASS,$36 + 4,$7 + 4,$ff,$d0,$46,JR__TRAINER_F,$8 ; trainer
 
     ; warp-to
     EVENT_DISP $a,$13,$b ; ROCK_TUNNEL_POKECENTER
@@ -83931,16 +83948,16 @@ Route11Object: ; 0x584e0 (size=127)
     db $5,$1,$b ; Route11Text11
 
     db $a ; people
-    db SPRITE_GAMBLER,$e + 4,$a + 4,$ff,$d0,$41,GAMBLER + $C8,$1 ; trainer
-    db SPRITE_GAMBLER,$9 + 4,$1a + 4,$ff,$d0,$42,GAMBLER + $C8,$2 ; trainer
-    db SPRITE_BUG_CATCHER,$5 + 4,$d + 4,$ff,$d2,$43,YOUNGSTER + $C8,$9 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$b + 4,$24 + 4,$ff,$d0,$44,ENGINEER + $C8,$1 ; trainer
-    db SPRITE_BUG_CATCHER,$4 + 4,$16 + 4,$ff,$d1,$45,YOUNGSTER + $C8,$a ; trainer
-    db SPRITE_GAMBLER,$7 + 4,$2d + 4,$ff,$d0,$46,GAMBLER + $C8,$3 ; trainer
-    db SPRITE_GAMBLER,$3 + 4,$21 + 4,$ff,$d1,$47,GAMBLER + $C8,$4 ; trainer
-    db SPRITE_BUG_CATCHER,$5 + 4,$2b + 4,$ff,$d3,$48,YOUNGSTER + $C8,$b ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$10 + 4,$2d + 4,$ff,$d2,$49,ENGINEER + $C8,$2 ; trainer
-    db SPRITE_BUG_CATCHER,$c + 4,$16 + 4,$ff,$d1,$4a,YOUNGSTER + $C8,$c ; trainer
+    db SPRITE_GAMBLER,$e + 4,$a + 4,$ff,$d0,$41,GAMBLER,$1 ; trainer
+    db SPRITE_GAMBLER,$9 + 4,$1a + 4,$ff,$d0,$42,GAMBLER,$2 ; trainer
+    db SPRITE_BUG_CATCHER,$5 + 4,$d + 4,$ff,$d2,$43,YOUNGSTER,$9 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$b + 4,$24 + 4,$ff,$d0,$44,ENGINEER,$1 ; trainer
+    db SPRITE_BUG_CATCHER,$4 + 4,$16 + 4,$ff,$d1,$45,YOUNGSTER,$a ; trainer
+    db SPRITE_GAMBLER,$7 + 4,$2d + 4,$ff,$d0,$46,GAMBLER,$3 ; trainer
+    db SPRITE_GAMBLER,$3 + 4,$21 + 4,$ff,$d1,$47,GAMBLER,$4 ; trainer
+    db SPRITE_BUG_CATCHER,$5 + 4,$2b + 4,$ff,$d3,$48,YOUNGSTER,$b ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$10 + 4,$2d + 4,$ff,$d2,$49,ENGINEER,$2 ; trainer
+    db SPRITE_BUG_CATCHER,$c + 4,$16 + 4,$ff,$d1,$4a,YOUNGSTER,$c ; trainer
 
     ; warp-to
     EVENT_DISP $1e,$8,$31 ; ROUTE_11_GATE_1F
@@ -83977,13 +83994,13 @@ Route12Object: ; 0x5869a (size=118)
 
     db $a ; people
     db SPRITE_SNORLAX,$3e + 4,$9 + 4,$ff,$d0,$1 ; person
-    db SPRITE_FISHER2,$1f + 4,$e + 4,$ff,$d2,$42,FISHER + $C8,$3 ; trainer
-    db SPRITE_FISHER2,$27 + 4,$5 + 4,$ff,$d1,$43,FISHER + $C8,$4 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$5c + 4,$b + 4,$ff,$d2,$44,JR__TRAINER_M + $C8,$8 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$4c + 4,$e + 4,$ff,$d1,$45,ROCKER + $C8,$2 ; trainer
-    db SPRITE_FISHER2,$28 + 4,$c + 4,$ff,$d2,$46,FISHER + $C8,$5 ; trainer
-    db SPRITE_FISHER2,$34 + 4,$9 + 4,$ff,$d3,$47,FISHER + $C8,$6 ; trainer
-    db SPRITE_FISHER2,$57 + 4,$6 + 4,$ff,$d0,$48,FISHER + $C8,$b ; trainer
+    db SPRITE_FISHER2,$1f + 4,$e + 4,$ff,$d2,$42,FISHER,$3 ; trainer
+    db SPRITE_FISHER2,$27 + 4,$5 + 4,$ff,$d1,$43,FISHER,$4 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$5c + 4,$b + 4,$ff,$d2,$44,JR__TRAINER_M,$8 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$4c + 4,$e + 4,$ff,$d1,$45,ROCKER,$2 ; trainer
+    db SPRITE_FISHER2,$28 + 4,$c + 4,$ff,$d2,$46,FISHER,$5 ; trainer
+    db SPRITE_FISHER2,$34 + 4,$9 + 4,$ff,$d3,$47,FISHER,$6 ; trainer
+    db SPRITE_FISHER2,$57 + 4,$6 + 4,$ff,$d0,$48,FISHER,$b ; trainer
     db SPRITE_BALL,$23 + 4,$e + 4,$ff,$ff,$89,TM_16 ; item
     db SPRITE_BALL,$59 + 4,$5 + 4,$ff,$ff,$8a,IRON ; item
 
@@ -84018,16 +84035,16 @@ Route15Object: ; 0x5894e (size=126)
     db $9,$27,$c ; Route15Text12
 
     db $b ; people
-    db SPRITE_LASS,$b + 4,$29 + 4,$ff,$d0,$41,JR__TRAINER_F + $C8,$14 ; trainer
-    db SPRITE_LASS,$a + 4,$35 + 4,$ff,$d2,$42,JR__TRAINER_F + $C8,$15 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$d + 4,$1f + 4,$ff,$d1,$43,BIRD_KEEPER + $C8,$6 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$d + 4,$23 + 4,$ff,$d1,$44,BIRD_KEEPER + $C8,$7 ; trainer
-    db SPRITE_FOULARD_WOMAN,$b + 4,$35 + 4,$ff,$d0,$45,BEAUTY + $C8,$9 ; trainer
-    db SPRITE_FOULARD_WOMAN,$a + 4,$29 + 4,$ff,$d3,$46,BEAUTY + $C8,$a ; trainer
-    db SPRITE_BIKER,$a + 4,$30 + 4,$ff,$d0,$47,BIKER + $C8,$3 ; trainer
-    db SPRITE_BIKER,$a + 4,$2e + 4,$ff,$d0,$48,BIKER + $C8,$4 ; trainer
-    db SPRITE_LASS,$5 + 4,$25 + 4,$ff,$d3,$49,JR__TRAINER_F + $C8,$16 ; trainer
-    db SPRITE_LASS,$d + 4,$12 + 4,$ff,$d1,$4a,JR__TRAINER_F + $C8,$17 ; trainer
+    db SPRITE_LASS,$b + 4,$29 + 4,$ff,$d0,$41,JR__TRAINER_F,$14 ; trainer
+    db SPRITE_LASS,$a + 4,$35 + 4,$ff,$d2,$42,JR__TRAINER_F,$15 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$d + 4,$1f + 4,$ff,$d1,$43,BIRD_KEEPER,$6 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$d + 4,$23 + 4,$ff,$d1,$44,BIRD_KEEPER,$7 ; trainer
+    db SPRITE_FOULARD_WOMAN,$b + 4,$35 + 4,$ff,$d0,$45,BEAUTY,$9 ; trainer
+    db SPRITE_FOULARD_WOMAN,$a + 4,$29 + 4,$ff,$d3,$46,BEAUTY,$a ; trainer
+    db SPRITE_BIKER,$a + 4,$30 + 4,$ff,$d0,$47,BIKER,$3 ; trainer
+    db SPRITE_BIKER,$a + 4,$2e + 4,$ff,$d0,$48,BIKER,$4 ; trainer
+    db SPRITE_LASS,$5 + 4,$25 + 4,$ff,$d3,$49,JR__TRAINER_F,$16 ; trainer
+    db SPRITE_LASS,$d + 4,$12 + 4,$ff,$d1,$4a,JR__TRAINER_F,$17 ; trainer
     db SPRITE_BALL,$5 + 4,$12 + 4,$ff,$ff,$8b,PP_UP ; item
 
     ; warp-to
@@ -84067,12 +84084,12 @@ Route16Object: ; 0x58afc (size=136)
     db $11,$5,$9 ; Route16Text9
 
     db $7 ; people
-    db SPRITE_BIKER,$c + 4,$11 + 4,$ff,$d2,$41,BIKER + $C8,$5 ; trainer
-    db SPRITE_BIKER,$d + 4,$e + 4,$ff,$d3,$42,CUE_BALL + $C8,$1 ; trainer
-    db SPRITE_BIKER,$c + 4,$b + 4,$ff,$d1,$43,CUE_BALL + $C8,$2 ; trainer
-    db SPRITE_BIKER,$b + 4,$9 + 4,$ff,$d2,$44,BIKER + $C8,$6 ; trainer
-    db SPRITE_BIKER,$a + 4,$6 + 4,$ff,$d3,$45,CUE_BALL + $C8,$3 ; trainer
-    db SPRITE_BIKER,$c + 4,$3 + 4,$ff,$d3,$46,BIKER + $C8,$7 ; trainer
+    db SPRITE_BIKER,$c + 4,$11 + 4,$ff,$d2,$41,BIKER,$5 ; trainer
+    db SPRITE_BIKER,$d + 4,$e + 4,$ff,$d3,$42,CUE_BALL,$1 ; trainer
+    db SPRITE_BIKER,$c + 4,$b + 4,$ff,$d1,$43,CUE_BALL,$2 ; trainer
+    db SPRITE_BIKER,$b + 4,$9 + 4,$ff,$d2,$44,BIKER,$6 ; trainer
+    db SPRITE_BIKER,$a + 4,$6 + 4,$ff,$d3,$45,CUE_BALL,$3 ; trainer
+    db SPRITE_BIKER,$c + 4,$3 + 4,$ff,$d3,$46,BIKER,$7 ; trainer
     db SPRITE_SNORLAX,$a + 4,$1a + 4,$ff,$d0,$7 ; person
 
     ; warp-to
@@ -84112,9 +84129,9 @@ Route18Object: ; 0x58c5a (size=66)
     db $5,$21,$5 ; Route18Text5
 
     db $3 ; people
-    db SPRITE_BLACK_HAIR_BOY_1,$b + 4,$24 + 4,$ff,$d3,$41,BIRD_KEEPER + $C8,$8 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$f + 4,$28 + 4,$ff,$d2,$42,BIRD_KEEPER + $C8,$9 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$d + 4,$2a + 4,$ff,$d2,$43,BIRD_KEEPER + $C8,$a ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$b + 4,$24 + 4,$ff,$d3,$41,BIRD_KEEPER,$8 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$f + 4,$28 + 4,$ff,$d2,$42,BIRD_KEEPER,$9 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$d + 4,$2a + 4,$ff,$d2,$43,BIRD_KEEPER,$a ; trainer
 
     ; warp-to
     EVENT_DISP $19,$8,$21 ; ROUTE_18_GATE_1F
@@ -84613,7 +84630,7 @@ Route6Script: ; 590b0 (16:50b0)
 
 Route6ScriptPointers: ; 590c3 (16:50c3)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route6TextPointers: ; 590c9 (16:50c9)
@@ -84801,7 +84818,7 @@ Route8Script: ; 591b6 (16:51b6)
 
 Route8ScriptPointers: ; 591c9 (16:51c9)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route8TextPointers: ; 591cf (16:51cf)
@@ -85077,7 +85094,7 @@ Route10Script: ; 59336 (16:5336)
 
 Route10ScriptPointers: ; 59349 (16:5349)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route10TextPointers: ; 5934f (16:534f)
@@ -85277,7 +85294,7 @@ Route11Script: ; 5944c (16:544c)
 
 Route11ScriptPointers: ; 5945f (16:545f)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route11TextPointers: ; 59465 (16:5465)
@@ -85588,7 +85605,7 @@ Route12Script_59606: ; 59606 (16:5606)
 
 Route12ScriptPointers: ; 59611 (16:5611)
     dw Route12Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw Route12Script3
 
@@ -85873,7 +85890,7 @@ Route15Script: ; 597ae (16:57ae)
 
 Route15ScriptPointers: ; 597c1 (16:57c1)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route15TextPointers: ; 597c7 (16:57c7)
@@ -86177,7 +86194,7 @@ Func_59946: ; 59946 (16:5946)
 
 Route16ScriptPointers: ; 59951 (16:5951)
     dw Route16Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw Route16Script3
 
@@ -86431,7 +86448,7 @@ Route18Script: ; 59ac7 (16:5ac7)
 
 Route18ScriptPointers: ; 59ada (16:5ada)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 Route18TextPointers: ; 59ae0 (16:5ae0)
@@ -86837,7 +86854,7 @@ Func_59d6f: ; 59d6f (16:5d6f)
 
 SilphCo2ScriptPointers: ; 59d80 (16:5d80)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SilphCo2TextPointers: ; 59d86 (16:5d86)
@@ -87011,10 +87028,10 @@ SilphCo2Object: ; 0x59e66 (size=98)
 
     db $5 ; people
     db SPRITE_ERIKA,$1 + 4,$a + 4,$ff,$d1,$1 ; person
-    db SPRITE_OAK_AIDE,$c + 4,$5 + 4,$ff,$d0,$42,SCIENTIST + $C8,$2 ; trainer
-    db SPRITE_OAK_AIDE,$d + 4,$18 + 4,$ff,$d2,$43,SCIENTIST + $C8,$3 ; trainer
-    db SPRITE_ROCKET,$b + 4,$10 + 4,$ff,$d1,$44,ROCKET + $C8,$17 ; trainer
-    db SPRITE_ROCKET,$7 + 4,$18 + 4,$ff,$d1,$45,ROCKET + $C8,$18 ; trainer
+    db SPRITE_OAK_AIDE,$c + 4,$5 + 4,$ff,$d0,$42,SCIENTIST,$2 ; trainer
+    db SPRITE_OAK_AIDE,$d + 4,$18 + 4,$ff,$d2,$43,SCIENTIST,$3 ; trainer
+    db SPRITE_ROCKET,$b + 4,$10 + 4,$ff,$d1,$44,ROCKET,$17 ; trainer
+    db SPRITE_ROCKET,$7 + 4,$18 + 4,$ff,$d1,$45,ROCKET,$18 ; trainer
 
     ; warp-to
     EVENT_DISP $f,$0,$18 ; SILPH_CO_1F
@@ -87090,7 +87107,7 @@ Func_59fad: ; 59fad (16:5fad)
 
 SilphCo3ScriptPointers: ; 59fbe (16:5fbe)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SilphCo3TextPointers: ; 59fc4 (16:5fc4)
@@ -87194,8 +87211,8 @@ SilphCo3Object: ; 0x5a035 (size=113)
 
     db $4 ; people
     db SPRITE_LAPRAS_GIVER,$8 + 4,$18 + 4,$ff,$ff,$1 ; person
-    db SPRITE_ROCKET,$7 + 4,$14 + 4,$ff,$d2,$42,ROCKET + $C8,$19 ; trainer
-    db SPRITE_OAK_AIDE,$9 + 4,$7 + 4,$ff,$d0,$43,SCIENTIST + $C8,$4 ; trainer
+    db SPRITE_ROCKET,$7 + 4,$14 + 4,$ff,$d2,$42,ROCKET,$19 ; trainer
+    db SPRITE_OAK_AIDE,$9 + 4,$7 + 4,$ff,$d0,$43,SCIENTIST,$4 ; trainer
     db SPRITE_BALL,$5 + 4,$8 + 4,$ff,$ff,$84,HYPER_POTION ; item
 
     ; warp-to
@@ -87260,7 +87277,7 @@ Func_5a176: ; 5a176 (16:6176)
 
 SilphCo10ScriptPointers: ; 5a180 (16:6180)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SilphCo10TextPointers: ; 5a186 (16:6186)
@@ -87361,8 +87378,8 @@ SilphCo10Object: ; 0x5a1fb (size=95)
     db $0 ; signs
 
     db $6 ; people
-    db SPRITE_ROCKET,$9 + 4,$1 + 4,$ff,$d3,$41,ROCKET + $C8,$16 ; trainer
-    db SPRITE_OAK_AIDE,$2 + 4,$a + 4,$ff,$d2,$42,SCIENTIST + $C8,$b ; trainer
+    db SPRITE_ROCKET,$9 + 4,$1 + 4,$ff,$d3,$41,ROCKET,$16 ; trainer
+    db SPRITE_OAK_AIDE,$2 + 4,$a + 4,$ff,$d2,$42,SCIENTIST,$b ; trainer
     db SPRITE_ERIKA,$f + 4,$9 + 4,$fe,$0,$3 ; person
     db SPRITE_BALL,$c + 4,$2 + 4,$ff,$ff,$84,TM_26 ; item
     db SPRITE_BALL,$e + 4,$4 + 4,$ff,$ff,$85,RARE_CANDY ; item
@@ -87432,7 +87449,7 @@ Func_5a2f5: ; 5a2f5 (16:62f5)
 
 LanceScriptPointers: ; 5a2fa (16:62fa)
     dw LanceScript0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw LanceScript2
     dw LanceScript3
     dw LanceScript4
@@ -87564,7 +87581,7 @@ LanceObject: ; 0x5a3c5 (size=36)
     db $0 ; signs
 
     db $1 ; people
-    db SPRITE_LANCE,$1 + 4,$6 + 4,$ff,$d0,$41,LANCE + $C8,$1 ; trainer
+    db SPRITE_LANCE,$1 + 4,$6 + 4,$ff,$d0,$41,LANCE,$1 ; trainer
 
     ; warp-to
     EVENT_DISP $d,$15,$05 ; LORELEIS_ROOM
@@ -88276,7 +88293,7 @@ Func_5c3bf: ; 5c3bf (17:43bf)
 
 PewterGymScriptPointers: ; 5c3ca (17:43ca)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw PewterGymScript3
 
@@ -88486,8 +88503,8 @@ PewterGymObject: ; 0x5c52e (size=42)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_BLACK_HAIR_BOY_2,$1 + 4,$4 + 4,$ff,$d0,$41,BROCK + $C8,$1 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$6 + 4,$3 + 4,$ff,$d3,$42,JR__TRAINER_M + $C8,$1 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$1 + 4,$4 + 4,$ff,$d0,$41,BROCK,$1 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$6 + 4,$3 + 4,$ff,$d3,$42,JR__TRAINER_M,$1 ; trainer
     db SPRITE_GYM_HELPER,$a + 4,$7 + 4,$ff,$d0,$3 ; person
 
     ; warp-to
@@ -88692,7 +88709,7 @@ Func_5c6ed: ; 5c6ed (17:46ed)
 
 CeruleanGymScriptPointers: ; 5c6f8 (17:46f8)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw CeruleanGymScript3
 
@@ -88891,9 +88908,9 @@ CeruleanGymObject: ; 0x5c834 (size=50)
     db $0 ; signs
 
     db $4 ; people
-    db SPRITE_BRUNETTE_GIRL,$2 + 4,$4 + 4,$ff,$d0,$41,MISTY + $C8,$1 ; trainer
-    db SPRITE_LASS,$3 + 4,$2 + 4,$ff,$d3,$42,JR__TRAINER_F + $C8,$1 ; trainer
-    db SPRITE_SWIMMER,$7 + 4,$8 + 4,$ff,$d2,$43,SWIMMER + $C8,$1 ; trainer
+    db SPRITE_BRUNETTE_GIRL,$2 + 4,$4 + 4,$ff,$d0,$41,MISTY,$1 ; trainer
+    db SPRITE_LASS,$3 + 4,$2 + 4,$ff,$d3,$42,JR__TRAINER_F,$1 ; trainer
+    db SPRITE_SWIMMER,$7 + 4,$8 + 4,$ff,$d2,$43,SWIMMER,$1 ; trainer
     db SPRITE_GYM_HELPER,$a + 4,$7 + 4,$ff,$d0,$4 ; person
 
     ; warp-to
@@ -89205,7 +89222,7 @@ VermilionGymScript_5ca8a: ; 5ca8a (17:4a8a)
 
 VermilionGymScriptPointers: ; 5ca95 (17:4a95)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw VermilionGymScript3
 
@@ -89434,10 +89451,10 @@ VermilionGymObject: ; 0x5cbfe (size=58)
     db $0 ; signs
 
     db $5 ; people
-    db SPRITE_ROCKER,$1 + 4,$5 + 4,$ff,$d0,$41,LT__SURGE + $C8,$1 ; trainer
-    db SPRITE_GENTLEMAN,$6 + 4,$9 + 4,$ff,$d2,$42,GENTLEMAN + $C8,$4 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$3 + 4,$ff,$d2,$43,ROCKER + $C8,$1 ; trainer
-    db SPRITE_SAILOR,$a + 4,$0 + 4,$ff,$d3,$44,SAILOR + $C8,$8 ; trainer
+    db SPRITE_ROCKER,$1 + 4,$5 + 4,$ff,$d0,$41,LT__SURGE,$1 ; trainer
+    db SPRITE_GENTLEMAN,$6 + 4,$9 + 4,$ff,$d2,$42,GENTLEMAN,$4 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$3 + 4,$ff,$d2,$43,ROCKER,$1 ; trainer
+    db SPRITE_SAILOR,$a + 4,$0 + 4,$ff,$d3,$44,SAILOR,$8 ; trainer
     db SPRITE_GYM_HELPER,$e + 4,$4 + 4,$ff,$d0,$5 ; person
 
     ; warp-to
@@ -89604,7 +89621,7 @@ FightingDojoScript_5cd70: ; 5cd70 (17:4d70)
 
 FightingDojoScriptPointers: ; 5cd7b (17:4d7b)
     dw FightingDojoScript1
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw FightingDojoScript3
 
@@ -89938,11 +89955,11 @@ FightingDojoObject: ; 0x5cf9b (size=72)
     db $0 ; signs
 
     db $7 ; people
-    db SPRITE_HIKER,$3 + 4,$5 + 4,$ff,$d0,$41,BLACKBELT + $C8,$1 ; trainer
-    db SPRITE_HIKER,$4 + 4,$3 + 4,$ff,$d3,$42,BLACKBELT + $C8,$2 ; trainer
-    db SPRITE_HIKER,$6 + 4,$3 + 4,$ff,$d3,$43,BLACKBELT + $C8,$3 ; trainer
-    db SPRITE_HIKER,$5 + 4,$5 + 4,$ff,$d2,$44,BLACKBELT + $C8,$4 ; trainer
-    db SPRITE_HIKER,$7 + 4,$5 + 4,$ff,$d2,$45,BLACKBELT + $C8,$5 ; trainer
+    db SPRITE_HIKER,$3 + 4,$5 + 4,$ff,$d0,$41,BLACKBELT,$1 ; trainer
+    db SPRITE_HIKER,$4 + 4,$3 + 4,$ff,$d3,$42,BLACKBELT,$2 ; trainer
+    db SPRITE_HIKER,$6 + 4,$3 + 4,$ff,$d3,$43,BLACKBELT,$3 ; trainer
+    db SPRITE_HIKER,$5 + 4,$5 + 4,$ff,$d2,$44,BLACKBELT,$4 ; trainer
+    db SPRITE_HIKER,$7 + 4,$5 + 4,$ff,$d2,$45,BLACKBELT,$5 ; trainer
     db SPRITE_BALL,$1 + 4,$4 + 4,$ff,$ff,$6 ; person
     db SPRITE_BALL,$1 + 4,$5 + 4,$ff,$ff,$7 ; person
 
@@ -89993,7 +90010,7 @@ Func_5d048: ; 5d048 (17:5048)
 
 SaffronGymScriptPointers: ; 5d053 (17:5053)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw SaffronGymScript3
 
@@ -90365,14 +90382,14 @@ SaffronGymObject: ; 0x5d259 (size=330)
     db $0 ; signs
 
     db $9 ; people
-    db SPRITE_GIRL,$8 + 4,$9 + 4,$ff,$d0,$41,SABRINA + $C8,$1 ; trainer
-    db SPRITE_MEDIUM,$1 + 4,$a + 4,$ff,$d0,$42,CHANNELER + $C8,$e ; trainer
-    db SPRITE_BUG_CATCHER,$1 + 4,$11 + 4,$ff,$d0,$43,PSYCHIC_TR + $C8,$1 ; trainer
-    db SPRITE_MEDIUM,$7 + 4,$3 + 4,$ff,$d0,$44,CHANNELER + $C8,$f ; trainer
-    db SPRITE_BUG_CATCHER,$7 + 4,$11 + 4,$ff,$d0,$45,PSYCHIC_TR + $C8,$2 ; trainer
-    db SPRITE_MEDIUM,$d + 4,$3 + 4,$ff,$d0,$46,CHANNELER + $C8,$10 ; trainer
-    db SPRITE_BUG_CATCHER,$d + 4,$11 + 4,$ff,$d0,$47,PSYCHIC_TR + $C8,$3 ; trainer
-    db SPRITE_BUG_CATCHER,$1 + 4,$3 + 4,$ff,$d0,$48,PSYCHIC_TR + $C8,$4 ; trainer
+    db SPRITE_GIRL,$8 + 4,$9 + 4,$ff,$d0,$41,SABRINA,$1 ; trainer
+    db SPRITE_MEDIUM,$1 + 4,$a + 4,$ff,$d0,$42,CHANNELER,$e ; trainer
+    db SPRITE_BUG_CATCHER,$1 + 4,$11 + 4,$ff,$d0,$43,PSYCHIC_TR,$1 ; trainer
+    db SPRITE_MEDIUM,$7 + 4,$3 + 4,$ff,$d0,$44,CHANNELER,$f ; trainer
+    db SPRITE_BUG_CATCHER,$7 + 4,$11 + 4,$ff,$d0,$45,PSYCHIC_TR,$2 ; trainer
+    db SPRITE_MEDIUM,$d + 4,$3 + 4,$ff,$d0,$46,CHANNELER,$10 ; trainer
+    db SPRITE_BUG_CATCHER,$d + 4,$11 + 4,$ff,$d0,$47,PSYCHIC_TR,$3 ; trainer
+    db SPRITE_BUG_CATCHER,$1 + 4,$3 + 4,$ff,$d0,$48,PSYCHIC_TR,$4 ; trainer
     db SPRITE_GYM_HELPER,$f + 4,$a + 4,$ff,$d0,$9 ; person
 
     ; warp-to
@@ -90964,7 +90981,7 @@ Func_5d863: ; 5d863 (17:5863)
 
 SilphCo9ScriptPointers: ; 5d885 (17:5885)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SilphCo9TextPointers: ; 5d88b (17:588b)
@@ -91104,9 +91121,9 @@ SilphCo9Object: ; 0x5d93f (size=74)
 
     db $4 ; people
     db SPRITE_NURSE,$e + 4,$3 + 4,$ff,$d0,$1 ; person
-    db SPRITE_ROCKET,$4 + 4,$2 + 4,$ff,$d1,$42,ROCKET + $C8,$25 ; trainer
-    db SPRITE_OAK_AIDE,$d + 4,$15 + 4,$ff,$d0,$43,SCIENTIST + $C8,$a ; trainer
-    db SPRITE_ROCKET,$10 + 4,$d + 4,$ff,$d1,$44,ROCKET + $C8,$26 ; trainer
+    db SPRITE_ROCKET,$4 + 4,$2 + 4,$ff,$d1,$42,ROCKET,$25 ; trainer
+    db SPRITE_OAK_AIDE,$d + 4,$15 + 4,$ff,$d0,$43,SCIENTIST,$a ; trainer
+    db SPRITE_ROCKET,$10 + 4,$d + 4,$ff,$d1,$44,ROCKET,$26 ; trainer
 
     ; warp-to
     EVENT_DISP $d,$0,$e ; SILPH_CO_10F
@@ -91149,7 +91166,7 @@ VictoryRoad1Script: ; 5da0a (17:5a0a)
 
 VictoryRoad1ScriptPointers: ; 5da3a (17:5a3a)
     dw VictoryRoad1Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 VictoryRoad1Script0: ; 5da40 (17:5a40)
@@ -91245,8 +91262,8 @@ VictoryRoad1Object: ; 0x5dab8 (size=76)
     db $0 ; signs
 
     db $7 ; people
-    db SPRITE_LASS,$5 + 4,$7 + 4,$ff,$d3,$41,COOLTRAINER_F + $C8,$4 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$2 + 4,$3 + 4,$ff,$d0,$42,COOLTRAINER_M + $C8,$4 ; trainer
+    db SPRITE_LASS,$5 + 4,$7 + 4,$ff,$d3,$41,COOLTRAINER_F,$4 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$2 + 4,$3 + 4,$ff,$d0,$42,COOLTRAINER_M,$4 ; trainer
     db SPRITE_BALL,$0 + 4,$b + 4,$ff,$ff,$83,TM_43 ; item
     db SPRITE_BALL,$2 + 4,$9 + 4,$ff,$ff,$84,RARE_CANDY ; item
     db SPRITE_BOULDER,$f + 4,$5 + 4,$ff,$10,$5 ; person
@@ -92023,8 +92040,8 @@ PokemonTower2Text1: ; 605df (18:45df)
     ld hl,UnnamedText_60632
     ld de,UnnamedText_60637 ; XXX $4637
     call PreBattleSaveRegisters
-    ld a,$f2
-    ld [$d059],a
+    ld a,SONY2
+    ld [W_CUROPPONENT],a ; $d059
 
     ; select which team to use during the encounter
     ld a,[W_RIVALSTARTER]
@@ -92106,7 +92123,7 @@ PokemonTower3Script: ; 606cc (18:46cc)
 
 PokemonTower3ScriptPointers: ; 606df (18:46df)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 PokemonTower3TextPointers: ; 606e5 (18:46e5)
@@ -92208,9 +92225,9 @@ PokemonTower3Object: ; 0x6075d (size=51)
     db $0 ; signs
 
     db $4 ; people
-    db SPRITE_MEDIUM,$3 + 4,$c + 4,$ff,$d2,$41,CHANNELER + $C8,$1 ; trainer
-    db SPRITE_MEDIUM,$8 + 4,$9 + 4,$ff,$d0,$42,CHANNELER + $C8,$2 ; trainer
-    db SPRITE_MEDIUM,$d + 4,$a + 4,$ff,$d0,$43,CHANNELER + $C8,$3 ; trainer
+    db SPRITE_MEDIUM,$3 + 4,$c + 4,$ff,$d2,$41,CHANNELER,$1 ; trainer
+    db SPRITE_MEDIUM,$8 + 4,$9 + 4,$ff,$d0,$42,CHANNELER,$2 ; trainer
+    db SPRITE_MEDIUM,$d + 4,$a + 4,$ff,$d0,$43,CHANNELER,$3 ; trainer
     db SPRITE_BALL,$1 + 4,$c + 4,$ff,$ff,$84,ESCAPE_ROPE ; item
 
     ; warp-to
@@ -92238,7 +92255,7 @@ PokemonTower4Script: ; 607f6 (18:47f6)
 
 PokemonTower4ScriptPointers: ; 60809 (18:4809)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 PokemonTower4TextPointers: ; 6080f (18:480f)
@@ -92343,9 +92360,9 @@ PokemonTower4Object: ; 0x6088b (size=65)
     db $0 ; signs
 
     db $6 ; people
-    db SPRITE_MEDIUM,$a + 4,$5 + 4,$ff,$d3,$41,CHANNELER + $C8,$4 ; trainer
-    db SPRITE_MEDIUM,$7 + 4,$f + 4,$ff,$d0,$42,CHANNELER + $C8,$5 ; trainer
-    db SPRITE_MEDIUM,$c + 4,$e + 4,$ff,$d2,$43,CHANNELER + $C8,$6 ; trainer
+    db SPRITE_MEDIUM,$a + 4,$5 + 4,$ff,$d3,$41,CHANNELER,$4 ; trainer
+    db SPRITE_MEDIUM,$7 + 4,$f + 4,$ff,$d0,$42,CHANNELER,$5 ; trainer
+    db SPRITE_MEDIUM,$c + 4,$e + 4,$ff,$d2,$43,CHANNELER,$6 ; trainer
     db SPRITE_BALL,$a + 4,$c + 4,$ff,$ff,$84,ELIXER ; item
     db SPRITE_BALL,$a + 4,$9 + 4,$ff,$ff,$85,AWAKENING ; item
     db SPRITE_BALL,$10 + 4,$c + 4,$ff,$ff,$86,HP_UP ; item
@@ -92375,7 +92392,7 @@ PokemonTower5Script: ; 60932 (18:4932)
 
 PokemonTower5ScriptPointers: ; 60945 (18:4945)
     dw PokemonTower5Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 PokemonTower5Script0: ; 6094b (18:494b)
@@ -92557,10 +92574,10 @@ PokemonTower5Object: ; 0x60a48 (size=65)
 
     db $6 ; people
     db SPRITE_MEDIUM,$8 + 4,$c + 4,$ff,$ff,$1 ; person
-    db SPRITE_MEDIUM,$7 + 4,$11 + 4,$ff,$d2,$42,CHANNELER + $C8,$a ; trainer
-    db SPRITE_MEDIUM,$3 + 4,$e + 4,$ff,$d2,$43,CHANNELER + $C8,$7 ; trainer
-    db SPRITE_MEDIUM,$a + 4,$6 + 4,$ff,$d3,$44,CHANNELER + $C8,$8 ; trainer
-    db SPRITE_MEDIUM,$10 + 4,$9 + 4,$ff,$d3,$45,CHANNELER + $C8,$9 ; trainer
+    db SPRITE_MEDIUM,$7 + 4,$11 + 4,$ff,$d2,$42,CHANNELER,$a ; trainer
+    db SPRITE_MEDIUM,$3 + 4,$e + 4,$ff,$d2,$43,CHANNELER,$7 ; trainer
+    db SPRITE_MEDIUM,$a + 4,$6 + 4,$ff,$d3,$44,CHANNELER,$8 ; trainer
+    db SPRITE_MEDIUM,$10 + 4,$9 + 4,$ff,$d3,$45,CHANNELER,$9 ; trainer
     db SPRITE_BALL,$e + 4,$6 + 4,$ff,$ff,$86,NUGGET ; item
 
     ; warp-to
@@ -92595,7 +92612,7 @@ Func_60b02: ; 60b02 (18:4b02)
 
 PokemonTower6ScriptPointers: ; 60b0d (18:4b0d)
     dw PokemonTower6Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw PokemonTower6Script3
     dw PokemonTower6Script4
@@ -92612,9 +92629,9 @@ PokemonTower6Script0: ; 60b17 (18:4b17)
     ld a,$6
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
-    ld a,$91
+    ld a,MAROWAK
     ld [W_CUROPPONENT],a ; $d059
-    ld a,$1e
+    ld a,30
     ld [W_CURENEMYLVL],a ; $d127
     ld a,$4
     ld [W_POKEMONTOWER6CURSCRIPT],a
@@ -92803,9 +92820,9 @@ PokemonTower6Object: ; 0x60c5b (size=58)
     db $0 ; signs
 
     db $5 ; people
-    db SPRITE_MEDIUM,$a + 4,$c + 4,$ff,$d3,$41,CHANNELER + $C8,$b ; trainer
-    db SPRITE_MEDIUM,$5 + 4,$9 + 4,$ff,$d0,$42,CHANNELER + $C8,$c ; trainer
-    db SPRITE_MEDIUM,$5 + 4,$10 + 4,$ff,$d2,$43,CHANNELER + $C8,$d ; trainer
+    db SPRITE_MEDIUM,$a + 4,$c + 4,$ff,$d3,$41,CHANNELER,$b ; trainer
+    db SPRITE_MEDIUM,$5 + 4,$9 + 4,$ff,$d0,$42,CHANNELER,$c ; trainer
+    db SPRITE_MEDIUM,$5 + 4,$10 + 4,$ff,$d2,$43,CHANNELER,$d ; trainer
     db SPRITE_BALL,$8 + 4,$6 + 4,$ff,$ff,$84,RARE_CANDY ; item
     db SPRITE_BALL,$e + 4,$e + 4,$ff,$ff,$85,X_ACCURACY ; item
 
@@ -92843,7 +92860,7 @@ Func_60d18: ; 60d18 (18:4d18)
 
 PokemonTower7ScriptPointers: ; 60d23 (18:4d23)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw PokemonTower7Script2
     dw PokemonTower7Script3
     dw PokemonTower7Script4
@@ -93117,9 +93134,9 @@ PokemonTower7Object: ; 0x60ef6 (size=42)
     db $0 ; signs
 
     db $4 ; people
-    db SPRITE_ROCKET,$b + 4,$9 + 4,$ff,$d3,$41,ROCKET + $C8,$13 ; trainer
-    db SPRITE_ROCKET,$9 + 4,$c + 4,$ff,$d2,$42,ROCKET + $C8,$14 ; trainer
-    db SPRITE_ROCKET,$7 + 4,$9 + 4,$ff,$d3,$43,ROCKET + $C8,$15 ; trainer
+    db SPRITE_ROCKET,$b + 4,$9 + 4,$ff,$d3,$41,ROCKET,$13 ; trainer
+    db SPRITE_ROCKET,$9 + 4,$c + 4,$ff,$d2,$42,ROCKET,$14 ; trainer
+    db SPRITE_ROCKET,$7 + 4,$9 + 4,$ff,$d3,$43,ROCKET,$15 ; trainer
     db SPRITE_MR_FUJI,$3 + 4,$a + 4,$ff,$d0,$4 ; person
 
     ; warp-to
@@ -93693,8 +93710,8 @@ SSAnne2Script1: ; 61430 (18:5430)
     ld [$ff00+$8c],a
     call DisplayTextID
     call Delay3
-    ld a,$f2
-    ld [$d059],a
+    ld a,SONY2
+    ld [W_CUROPPONENT],a ; $d059
 
     ; select which team to use during the encounter
     ld a,[W_RIVALSTARTER]
@@ -93827,7 +93844,7 @@ SSAnne2Object: ; 0x61514 (size=90)
 
     db $2 ; people
     db SPRITE_WAITER,$7 + 4,$3 + 4,$fe,$1,$1 ; person
-    db SPRITE_BLUE,$4 + 4,$24 + 4,$ff,$d0,$42,SONY1 + $C8,$1 ; trainer
+    db SPRITE_BLUE,$4 + 4,$24 + 4,$ff,$d0,$42,SONY1,$1 ; trainer
 
     ; warp-to
     EVENT_DISP $14,$b,$9 ; SS_ANNE_9
@@ -93936,7 +93953,7 @@ SSAnne5Script: ; 616ae (18:56ae)
 
 SSAnne5ScriptPointers: ; 616c1 (18:56c1)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SSAnne5TextPointers: ; 616c7 (18:56c7)
@@ -94028,8 +94045,8 @@ SSAnne5Object: ; 0x6172b (size=54)
     db SPRITE_BLACK_HAIR_BOY_2,$2 + 4,$5 + 4,$ff,$d1,$1 ; person
     db SPRITE_SAILOR,$9 + 4,$4 + 4,$ff,$ff,$2 ; person
     db SPRITE_BLACK_HAIR_BOY_1,$b + 4,$7 + 4,$ff,$ff,$3 ; person
-    db SPRITE_SAILOR,$4 + 4,$4 + 4,$ff,$d0,$44,SAILOR + $C8,$1 ; trainer
-    db SPRITE_SAILOR,$8 + 4,$a + 4,$ff,$d1,$45,SAILOR + $C8,$2 ; trainer
+    db SPRITE_SAILOR,$4 + 4,$4 + 4,$ff,$d0,$44,SAILOR,$1 ; trainer
+    db SPRITE_SAILOR,$8 + 4,$a + 4,$ff,$d1,$45,SAILOR,$2 ; trainer
 
     ; warp-to
     EVENT_DISP $a,$6,$d ; SS_ANNE_3
@@ -94282,7 +94299,7 @@ SSAnne8Script: ; 61976 (18:5976)
 
 SSAnne8ScriptPointers: ; 61989 (18:5989)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SSAnne8TextPointers: ; 6198f (18:598f)
@@ -94450,10 +94467,10 @@ SSAnne8Object: ; 0x61a60 (size=127)
     db $0 ; signs
 
     db $b ; people
-    db SPRITE_GENTLEMAN,$3 + 4,$2 + 4,$ff,$d2,$41,GENTLEMAN + $C8,$1 ; trainer
-    db SPRITE_GENTLEMAN,$4 + 4,$b + 4,$ff,$d1,$42,GENTLEMAN + $C8,$2 ; trainer
-    db SPRITE_BUG_CATCHER,$e + 4,$b + 4,$ff,$d1,$43,YOUNGSTER + $C8,$8 ; trainer
-    db SPRITE_LASS,$b + 4,$d + 4,$ff,$d2,$44,LASS + $C8,$b ; trainer
+    db SPRITE_GENTLEMAN,$3 + 4,$2 + 4,$ff,$d2,$41,GENTLEMAN,$1 ; trainer
+    db SPRITE_GENTLEMAN,$4 + 4,$b + 4,$ff,$d1,$42,GENTLEMAN,$2 ; trainer
+    db SPRITE_BUG_CATCHER,$e + 4,$b + 4,$ff,$d1,$43,YOUNGSTER,$8 ; trainer
+    db SPRITE_LASS,$b + 4,$d + 4,$ff,$d2,$44,LASS,$b ; trainer
     db SPRITE_GIRL,$3 + 4,$16 + 4,$fe,$1,$5 ; person
     db SPRITE_FAT_BALD_GUY,$e + 4,$0 + 4,$ff,$ff,$6 ; person
     db SPRITE_LITTLE_GIRL,$b + 4,$2 + 4,$ff,$d0,$7 ; person
@@ -94494,7 +94511,7 @@ SSAnne9Script: ; 61b4b (18:5b4b)
 
 SSAnne9ScriptPointers: ; 61b64 (18:5b64)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SSAnne9TextPointers: ; 61b6a (18:5b6a)
@@ -94717,10 +94734,10 @@ SSAnne9Object: ; 0x61c8d (size=188)
     db $0 ; signs
 
     db $d ; people
-    db SPRITE_GENTLEMAN,$2 + 4,$a + 4,$ff,$d3,$41,GENTLEMAN + $C8,$3 ; trainer
-    db SPRITE_FISHER2,$4 + 4,$d + 4,$ff,$d2,$42,FISHER + $C8,$1 ; trainer
-    db SPRITE_GENTLEMAN,$e + 4,$0 + 4,$ff,$d3,$43,GENTLEMAN + $C8,$5 ; trainer
-    db SPRITE_LASS,$b + 4,$2 + 4,$ff,$d0,$44,LASS + $C8,$c ; trainer
+    db SPRITE_GENTLEMAN,$2 + 4,$a + 4,$ff,$d3,$41,GENTLEMAN,$3 ; trainer
+    db SPRITE_FISHER2,$4 + 4,$d + 4,$ff,$d2,$42,FISHER,$1 ; trainer
+    db SPRITE_GENTLEMAN,$e + 4,$0 + 4,$ff,$d3,$43,GENTLEMAN,$5 ; trainer
+    db SPRITE_LASS,$b + 4,$2 + 4,$ff,$d0,$44,LASS,$c ; trainer
     db SPRITE_GENTLEMAN,$2 + 4,$1 + 4,$ff,$d0,$5 ; person
     db SPRITE_BALL,$1 + 4,$c + 4,$ff,$ff,$86,MAX_ETHER ; item
     db SPRITE_GENTLEMAN,$2 + 4,$15 + 4,$ff,$d0,$7 ; person
@@ -94763,7 +94780,7 @@ SSAnne10Script: ; 61d55 (18:5d55)
 
 SSAnne10ScriptPointers: ; 61d68 (18:5d68)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 SSAnne10TextPointers: ; 61d6e (18:5d6e)
@@ -94973,12 +94990,12 @@ SSAnne10Object: ; 0x61e75 (size=165)
     db $0 ; signs
 
     db $b ; people
-    db SPRITE_SAILOR,$d + 4,$0 + 4,$ff,$d0,$41,SAILOR + $C8,$3 ; trainer
-    db SPRITE_SAILOR,$b + 4,$2 + 4,$ff,$d0,$42,SAILOR + $C8,$4 ; trainer
-    db SPRITE_SAILOR,$3 + 4,$c + 4,$ff,$d2,$43,SAILOR + $C8,$5 ; trainer
-    db SPRITE_SAILOR,$2 + 4,$16 + 4,$ff,$d0,$44,SAILOR + $C8,$6 ; trainer
-    db SPRITE_SAILOR,$2 + 4,$0 + 4,$ff,$d3,$45,SAILOR + $C8,$7 ; trainer
-    db SPRITE_FISHER2,$4 + 4,$0 + 4,$ff,$d3,$46,FISHER + $C8,$2 ; trainer
+    db SPRITE_SAILOR,$d + 4,$0 + 4,$ff,$d0,$41,SAILOR,$3 ; trainer
+    db SPRITE_SAILOR,$b + 4,$2 + 4,$ff,$d0,$42,SAILOR,$4 ; trainer
+    db SPRITE_SAILOR,$3 + 4,$c + 4,$ff,$d2,$43,SAILOR,$5 ; trainer
+    db SPRITE_SAILOR,$2 + 4,$16 + 4,$ff,$d0,$44,SAILOR,$6 ; trainer
+    db SPRITE_SAILOR,$2 + 4,$0 + 4,$ff,$d3,$45,SAILOR,$7 ; trainer
+    db SPRITE_FISHER2,$4 + 4,$0 + 4,$ff,$d3,$46,FISHER,$2 ; trainer
     db SPRITE_BLACK_HAIR_BOY_2,$d + 4,$a + 4,$ff,$d3,$7 ; person
     db SPRITE_SLOWBRO,$c + 4,$b + 4,$ff,$ff,$8 ; person
     db SPRITE_BALL,$2 + 4,$14 + 4,$ff,$ff,$89,ETHER ; item
@@ -95184,7 +95201,7 @@ SilphCo11Script_621c8: ; 621c8 (18:61c8)
 
 SilphCo11ScriptPointers: ; 621cf (18:61cf)
     dw SilphCo11Script0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw SilphCo11Script3
     dw SilphCo11Script4
@@ -95447,9 +95464,9 @@ SilphCo11Object: ; 0x62380 (size=72)
     db $5 ; people
     db SPRITE_MR_MASTERBALL,$5 + 4,$7 + 4,$ff,$d0,$1 ; person
     db SPRITE_FOULARD_WOMAN,$5 + 4,$a + 4,$ff,$d0,$2 ; person
-    db SPRITE_GIOVANNI,$9 + 4,$6 + 4,$ff,$d0,$43,GIOVANNI + $C8,$2 ; trainer
-    db SPRITE_ROCKET,$10 + 4,$3 + 4,$ff,$d1,$44,ROCKET + $C8,$28 ; trainer
-    db SPRITE_ROCKET,$9 + 4,$f + 4,$ff,$d1,$45,ROCKET + $C8,$27 ; trainer
+    db SPRITE_GIOVANNI,$9 + 4,$6 + 4,$ff,$d0,$43,GIOVANNI,$2 ; trainer
+    db SPRITE_ROCKET,$10 + 4,$3 + 4,$ff,$d1,$44,ROCKET,$28 ; trainer
+    db SPRITE_ROCKET,$9 + 4,$f + 4,$ff,$d1,$45,ROCKET,$27 ; trainer
 
     ; warp-to
     EVENT_DISP $9,$0,$9 ; SILPH_CO_10F
@@ -95687,12 +95704,12 @@ ViridianForestObject: ; Moved in the Bank
 
     db $b ; people
     db SPRITE_BUG_CATCHER,$2b + 4,$10 + 4,$ff,$ff,$1 ; person
-    db SPRITE_BUG_CATCHER,$21 + 4,$1e + 4,$ff,$d2,$42,BUG_CATCHER + $C8,$1 ; trainer
-    db SPRITE_BUG_CATCHER,$13 + 4,$1e + 4,$ff,$d2,$43,BUG_CATCHER + $C8,$2 ; trainer
-    db SPRITE_BUG_CATCHER,$12 + 4,$2 + 4,$ff,$d2,$44,BUG_CATCHER + $C8,$3 ; trainer
-    db SPRITE_BUG_CATCHER,$12 + 4,$d + 4,$ff,$d3,$45,BUG_CATCHER + $C8,$e ; trainer
-    db SPRITE_BUG_CATCHER,$3 + 4,$7 + 4,$ff,$d3,$46,BUG_CATCHER + $C8,$f ; trainer
-    db SPRITE_BUG_CATCHER,$18 + 4,$c + 4,$ff,$d2,$47,BUG_CATCHER + $C8,$10 ; trainer
+    db SPRITE_BUG_CATCHER,$21 + 4,$1e + 4,$ff,$d2,$42,BUG_CATCHER,$1 ; trainer
+    db SPRITE_BUG_CATCHER,$13 + 4,$1e + 4,$ff,$d2,$43,BUG_CATCHER,$2 ; trainer
+    db SPRITE_BUG_CATCHER,$12 + 4,$2 + 4,$ff,$d2,$44,BUG_CATCHER,$3 ; trainer
+    db SPRITE_BUG_CATCHER,$12 + 4,$d + 4,$ff,$d3,$45,BUG_CATCHER,$e ; trainer
+    db SPRITE_BUG_CATCHER,$3 + 4,$7 + 4,$ff,$d3,$46,BUG_CATCHER,$f ; trainer
+    db SPRITE_BUG_CATCHER,$18 + 4,$c + 4,$ff,$d2,$47,BUG_CATCHER,$10 ; trainer
     db SPRITE_BALL,$b + 4,$19 + 4,$ff,$ff,$88,ANTIDOTE ; item
     db SPRITE_BALL,$1d + 4,$c + 4,$ff,$ff,$89,POTION ; item
     db SPRITE_BALL,$1f + 4,$1 + 4,$ff,$ff,$8a,POKE_BALL ; item
@@ -95708,7 +95725,7 @@ ViridianForestObject: ; Moved in the Bank
 
 ViridianForestScriptPointers: ; Moved in the Bank
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 ViridianForestText15:
@@ -97167,8 +97184,7 @@ Func_708ca: ; 708ca (1c:48ca)
     jr nz,.asm_7090d
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    call Delay3
-    jp CleanLCD_OAM
+    jp Delay3AndCleanLCD_OAM
 
 Func_7092a: ; 7092a (1c:492a)
     ld de,$9000
@@ -97280,14 +97296,15 @@ PointerTable_709d2: ; 709d2 (1c:49d2)
     dw Func_70bca
 
 Func_709e2: ; 709e2 (1c:49e2)
-    ld a,[W_CUROPPONENT] ; $d059
-    cp $c8
-    jr nc,.asm_709ec
+    ld a,[W_TRAINERNO]
+    and a
+    jr nz,.trainer
     res 0,c
     ret
-.asm_709ec
+.trainer
     set 0,c
     ret
+    ds 1
 
 Func_709ef: ; 709ef (1c:49ef)
     ld hl,W_PARTYMON1_HP ; $d16c
@@ -97346,6 +97363,10 @@ Func_70a19: ; 70a19 (1c:4a19)
 .asm_70a3c
     res 2,c
     ret
+
+Delay3AndCleanLCD_OAM:
+    call Delay3
+    jp CleanLCD_OAM
 
 SECTION "Func_70a4d",ROMX[$4a4d],BANK[$1c]
 
@@ -100303,13 +100324,13 @@ TrainerPalettes:
 ;    PAL_YELLOWMON EQU $18
 ;    PAL_GREYMON   EQU $19
 
-    db PAL_MEWMON     ; 'M            ; $00
+    db PAL_MISSINGNO  ; 'M            ; $00
     db PAL_CYANMON    ; YOUNGSTER     ; $01
     db PAL_GREENMON   ; BUG_CATCHER   ; $02
     db PAL_PINKMON    ; LASS          ; $03
     db PAL_CYANMON    ; SAILOR        ; $04
-    db PAL_MEWMON     ; JR__TRAINER_M ; $05
-    db PAL_MEWMON     ; JR__TRAINER_F ; $06
+    db PAL_MISSINGNO  ; JR__TRAINER_M ; $05
+    db PAL_MISSINGNO  ; JR__TRAINER_F ; $06
     db PAL_PURPLEMON  ; POKEMANIAC    ; $07
     db PAL_PURPLEMON  ; SUPER_NERD    ; $08
     db PAL_BROWNMON   ; HIKER         ; $09
@@ -100666,6 +100687,27 @@ GetFlyingCitySortOrder:
     ret
 
 ; ───────────────────────────────────────
+
+; Funzione per cambiare lo sprite utilizzato dalle ball durante la ricarica al centro pokemon
+LoadAlternateBallPic: ; Denim
+    ld hl,wFlagFlashingHealBallBit7
+    bit 7,[hl]
+    jr z,.Flash
+    jr .Restore
+.Flash
+    set 7,[hl]
+    ld de,PokeCenterFlashingHealBall ; $44b7
+    ld bc,(BANK(PokeCenterFlashingHealBall) << 8) + $03
+    jr .Done
+.Restore
+    res 7,[hl]
+    ld de,PokeCenterHealBall
+    ld bc,(BANK(PokeCenterHealBall) << 8) + $03
+.Done
+    ld hl,$87c0
+    jp CopyVideoData
+PokeCenterFlashingHealBall:
+    INCBIN "gfx/pokecenter_ball_2.2bpp"
 
 SECTION "BorderPalettes",ROMX[$6788],BANK[$1C]
 
@@ -101662,27 +101704,6 @@ ResetPreVRAM2:
     pop af
     ret
 
-; Funzione per cambiare lo sprite utilizzato dalle ball durante la ricarica al centro pokemon
-LoadAlternateBallPic: ; Denim
-    ld hl,wFlagFlashingHealBallBit7
-    bit 7,[hl]
-    jr z,.Flash
-    jr .Restore
-.Flash
-    set 7,[hl]
-    ld de,PokeCenterFlashingHealBall ; $44b7
-    ld bc,(BANK(PokeCenterFlashingHealBall) << 8) + $03
-    jr .Done
-.Restore
-    res 7,[hl]
-    ld de,PokeCenterHealBall
-    ld bc,(BANK(PokeCenterHealBall) << 8) + $03
-.Done
-    ld hl,$87c0
-    jp CopyVideoData
-PokeCenterFlashingHealBall:
-    INCBIN "gfx/pokecenter_ball_2.2bpp"
-
 CheckShinyFrontAndGetPAL:
     push hl
     call IsGhostBattlePlus
@@ -101774,14 +101795,14 @@ HackForInsertDVInHallOfFameDataSecondStep:
 
 SAME_PALETTE EQU 19
 
-DeterminePaletteID: ; xxxxx (1c:xxxx) ; Denim
+DeterminePaletteID:
     push bc
     push de
     and a
     jr z,.idZero
-	cp CHARIZARD_M
-	ld l,PAL_REDMON
-	jr z,.PaletteSingleByteDone
+    cp CHARIZARD_M
+    ld l,PAL_REDMON
+    jr z,.PaletteSingleByteDone
     jr .Standard
 .idZero
     ld hl,wFlagBackFrontSpriteBit56
@@ -101789,14 +101810,15 @@ DeterminePaletteID: ; xxxxx (1c:xxxx) ; Denim
     jr nz,.Back
     bit 6,[hl]
     jr nz,.Front
-.MissingNo00
-    xor a ; MissingNo00 front Sprite out of battle
-    jr .AddPalMToA
+    jr .Standard ; MissingNo00 front Sprite out of battle
 .Front
-    ; Gestire i Colori TRAINERCLASS e M Front Sprite in Battle
+    ld a,[W_TRAINERNO]
+    and a
+    jr z,.Standard ; MissingNo00 front Sprite during wild battle
+    ; Trainer can't use MissingNo00
     ld a,[W_TRAINERCLASS]
     ld e,a
-    ld hl,TrainerPalettes ; Just for Trainer and MissingNo00,Pokemon use another
+    ld hl,TrainerPalettes ; Just for Trainer
     ld d,0
     add hl,de
     ld l,[hl]
@@ -101804,39 +101826,44 @@ DeterminePaletteID: ; xxxxx (1c:xxxx) ; Denim
 .Back
     ld hl,wFlagBackSpritePlayerBit4 ; Pointer to Flag BackSpritePlayer (Bit4)
     bit 4,[hl]
-    jr z,.MissingNo00 ; if 0 -> MissingNo00 Back sprite during battle
+    jr z,.Standard   ; if 0 -> MissingNo00 Back sprite during battle
     ld l,PAL_VARIOUS ; if 1 -> Player BackSprite
 .PaletteSingleByteDone
     ld h,0
-    jr .PreDone
+    jr .End
 .Standard
     ld [$D11E],a
     ld a,$3A
     call Predef ; turn Pokemon ID number into Pokedex number
-    ld a,[$D11E] ; Load Directly Dex ID
+    ld a,[$D11E]
     call CheckSamePalette
-.AddPalMToA
     ld h,0
     ld l,a
-    ld bc,PAL_MEWMON ; Palette MissingNo00 or Standard Trainer
+    ld bc,PAL_MISSINGNO ; Palette MissingNo
     add hl,bc
-.PreDone
+    call .CheckShiny
+    jr z,.End
+    ld bc,152-SAME_PALETTE ; (from dex 0 to 151,SAME_PALETTE Share Same Palette)
+    add hl,bc
+.End
+    call .ResetFlags
+    pop de
+    pop bc
+    ret
+.CheckShiny
+    push hl
+    ld hl,wFlagShinyBit2
+    bit 2,[hl]
+    pop hl
+    ret
+.ResetFlags
     push hl
     ld hl,wFlagBackFrontSpriteBit56
     res 5,[hl]
     res 6,[hl]
     ld hl,wFlagShinyBit2
-    bit 2,[hl]
     res 2,[hl]
     pop hl
-    jr z,.End
-    and a
-    jr z,.End ; MissingNo00 shiny doesn't exist (TODO)
-    ld bc,151-SAME_PALETTE ; (from dex 1 to 151,SAME_PALETTE Share Same Palette)
-    add hl,bc
-.End
-    pop de
-    pop bc
     ret
 
 CheckSamePalette:
@@ -102920,7 +102947,7 @@ Func_748d6: ; 748d6 (1d:48d6)
 
 ViridianGymScriptPointers: ; 748e1 (1d:48e1)
     dw ViridianGymScript0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw ViridianGymScript3
     dw ViridianGymScript4
@@ -103416,15 +103443,15 @@ ViridianGymObject: ; 0x74bde (size=105)
     db $0 ; signs
 
     db $b ; people
-    db SPRITE_GIOVANNI,$1 + 4,$2 + 4,$ff,$d0,$41,GIOVANNI + $C8,$3 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$c + 4,$ff,$d0,$42,COOLTRAINER_M + $C8,$5 ; trainer
-    db SPRITE_HIKER,$b + 4,$b + 4,$ff,$d1,$43,BLACKBELT + $C8,$6 ; trainer
-    db SPRITE_ROCKER,$7 + 4,$a + 4,$ff,$d0,$44,TAMER + $C8,$3 ; trainer
-    db SPRITE_HIKER,$7 + 4,$3 + 4,$ff,$d2,$45,BLACKBELT + $C8,$7 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$5 + 4,$d + 4,$ff,$d3,$46,COOLTRAINER_M + $C8,$6 ; trainer
-    db SPRITE_HIKER,$1 + 4,$a + 4,$ff,$d0,$47,BLACKBELT + $C8,$8 ; trainer
-    db SPRITE_ROCKER,$10 + 4,$2 + 4,$ff,$d3,$48,TAMER + $C8,$4 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$5 + 4,$6 + 4,$ff,$d0,$49,COOLTRAINER_M + $C8,$1 ; trainer
+    db SPRITE_GIOVANNI,$1 + 4,$2 + 4,$ff,$d0,$41,GIOVANNI,$3 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$7 + 4,$c + 4,$ff,$d0,$42,COOLTRAINER_M,$5 ; trainer
+    db SPRITE_HIKER,$b + 4,$b + 4,$ff,$d1,$43,BLACKBELT,$6 ; trainer
+    db SPRITE_ROCKER,$7 + 4,$a + 4,$ff,$d0,$44,TAMER,$3 ; trainer
+    db SPRITE_HIKER,$7 + 4,$3 + 4,$ff,$d2,$45,BLACKBELT,$7 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$5 + 4,$d + 4,$ff,$d3,$46,COOLTRAINER_M,$6 ; trainer
+    db SPRITE_HIKER,$1 + 4,$a + 4,$ff,$d0,$47,BLACKBELT,$8 ; trainer
+    db SPRITE_ROCKER,$10 + 4,$2 + 4,$ff,$d3,$48,TAMER,$4 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_1,$5 + 4,$6 + 4,$ff,$d0,$49,COOLTRAINER_M,$1 ; trainer
     db SPRITE_GYM_HELPER,$f + 4,$10 + 4,$ff,$d0,$a ; person
     db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$8b,REVIVE ; item
 
@@ -104442,7 +104469,7 @@ Func_75477: ; 75477 (1d:5477)
 
 FuchsiaGymScriptPointers: ; 75482 (1d:5482)
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
     dw FuchsiaGymScript3
 
@@ -104752,13 +104779,13 @@ FuchsiaGymObject: ; 0x75658 (size=82)
     db $0 ; signs
 
     db $8 ; people
-    db SPRITE_BLACKBELT,$a + 4,$4 + 4,$ff,$d0,$41,KOGA + $C8,$1 ; trainer
-    db SPRITE_ROCKER,$d + 4,$8 + 4,$ff,$d0,$42,JUGGLER + $C8,$6 ; trainer
-    db SPRITE_ROCKER,$8 + 4,$7 + 4,$ff,$d3,$43,JUGGLER + $C8,$3 ; trainer
-    db SPRITE_ROCKER,$c + 4,$1 + 4,$ff,$d0,$44,JUGGLER + $C8,$7 ; trainer
-    db SPRITE_ROCKER,$5 + 4,$3 + 4,$ff,$d1,$45,TAMER + $C8,$1 ; trainer
-    db SPRITE_ROCKER,$2 + 4,$8 + 4,$ff,$d0,$46,TAMER + $C8,$2 ; trainer
-    db SPRITE_ROCKER,$7 + 4,$2 + 4,$ff,$d2,$47,JUGGLER + $C8,$4 ; trainer
+    db SPRITE_BLACKBELT,$a + 4,$4 + 4,$ff,$d0,$41,KOGA,$1 ; trainer
+    db SPRITE_ROCKER,$d + 4,$8 + 4,$ff,$d0,$42,JUGGLER,$6 ; trainer
+    db SPRITE_ROCKER,$8 + 4,$7 + 4,$ff,$d3,$43,JUGGLER,$3 ; trainer
+    db SPRITE_ROCKER,$c + 4,$1 + 4,$ff,$d0,$44,JUGGLER,$7 ; trainer
+    db SPRITE_ROCKER,$5 + 4,$3 + 4,$ff,$d1,$45,TAMER,$1 ; trainer
+    db SPRITE_ROCKER,$2 + 4,$8 + 4,$ff,$d0,$46,TAMER,$2 ; trainer
+    db SPRITE_ROCKER,$7 + 4,$2 + 4,$ff,$d2,$47,JUGGLER,$4 ; trainer
     db SPRITE_GYM_HELPER,$f + 4,$7 + 4,$ff,$d0,$8 ; person
 
     ; warp-to
@@ -105314,14 +105341,14 @@ CinnabarGymObject: ; 0x75acc (size=90)
     db $0 ; signs
 
     db $9 ; people
-    db SPRITE_FAT_BALD_GUY,$3 + 4,$3 + 4,$ff,$d0,$41,BLAINE + $C8,$1 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$2 + 4,$11 + 4,$ff,$d0,$42,SUPER_NERD + $C8,$6 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$11 + 4,$ff,$d0,$43,BURGLAR + $C8,$1 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$b + 4,$ff,$d0,$44,SUPER_NERD + $C8,$7 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$b + 4,$ff,$d0,$45,BURGLAR + $C8,$2 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$e + 4,$b + 4,$ff,$d0,$46,SUPER_NERD + $C8,$8 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$e + 4,$3 + 4,$ff,$d0,$47,BURGLAR + $C8,$3 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$3 + 4,$ff,$d0,$48,SUPER_NERD + $C8,$9 ; trainer
+    db SPRITE_FAT_BALD_GUY,$3 + 4,$3 + 4,$ff,$d0,$41,BLAINE,$1 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$2 + 4,$11 + 4,$ff,$d0,$42,SUPER_NERD,$6 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$11 + 4,$ff,$d0,$43,BURGLAR,$1 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$b + 4,$ff,$d0,$44,SUPER_NERD,$7 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$b + 4,$ff,$d0,$45,BURGLAR,$2 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$e + 4,$b + 4,$ff,$d0,$46,SUPER_NERD,$8 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$e + 4,$3 + 4,$ff,$d0,$47,BURGLAR,$3 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$3 + 4,$ff,$d0,$48,SUPER_NERD,$9 ; trainer
     db SPRITE_GYM_HELPER,$d + 4,$10 + 4,$ff,$d0,$9 ; person
 
     ; warp-to
@@ -105906,8 +105933,8 @@ GaryScript2: ; 75f6a (1d:5f6a)
     ld hl,UnnamedText_760f9
     ld de,UnnamedText_760fe
     call PreBattleSaveRegisters
-    ld a,$f3
-    ld [$d059],a
+    ld a,SONY3
+    ld [W_CUROPPONENT],a ; $d059
 
     ; select which team to use during the encounter
     ld a,[W_RIVALSTARTER]
@@ -106206,7 +106233,7 @@ Func_761b6: ; 761b6 (1d:61b6)
 
 LoreleiScriptPointers: ; 761bb (1d:61bb)
     dw LoreleiScript0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw LoreleiScript2
     dw LoreleiScript3
     dw LoreleiScript4
@@ -106335,7 +106362,7 @@ LoreleiObject: ; 0x76280 (size=44)
     db $0 ; signs
 
     db $1 ; people
-    db SPRITE_LORELEI,$2 + 4,$5 + 4,$ff,$d0,$41,LORELEI + $C8,$1 ; trainer
+    db SPRITE_LORELEI,$2 + 4,$5 + 4,$ff,$d0,$41,LORELEI,$1 ; trainer
 
     ; warp-to
     EVENT_DISP $5,$b,$4 ; AGATHAS_ROOM
@@ -106389,7 +106416,7 @@ Func_7630d: ; 7630d (1d:630d)
 
 BrunoScriptPointers: ; 76312 (1d:6312)
     dw BrunoScript0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw BrunoScript2
     dw BrunoScript3
     dw BrunoScript4
@@ -106520,7 +106547,7 @@ BrunoObject: ; 0x763d7 (size=44)
     db $0 ; signs
 
     db $1 ; people
-    db SPRITE_BRUNO,$2 + 4,$5 + 4,$ff,$d0,$41,BRUNO + $C8,$1 ; trainer
+    db SPRITE_BRUNO,$2 + 4,$5 + 4,$ff,$d0,$41,BRUNO,$1 ; trainer
 
     ; warp-to
     EVENT_DISP $5,$b,$4 ; INDIGO_PLATEAU_LOBBY
@@ -106574,7 +106601,7 @@ Func_76464: ; 76464 (1d:6464)
 
 AgathaScriptPointers: ; 76469 (1d:6469)
     dw AgathaScript0
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw AgathaScript2
     dw AgathaScript3
     dw AgathaScript4
@@ -106708,7 +106735,7 @@ AgathaObject: ; 0x76534 (size=44)
     db $0 ; signs
 
     db $1 ; people
-    db SPRITE_AGATHA,$2 + 4,$5 + 4,$ff,$d0,$41,AGATHA + $C8,$1 ; trainer
+    db SPRITE_AGATHA,$2 + 4,$5 + 4,$ff,$d0,$41,AGATHA,$1 ; trainer
 
     ; warp-to
     EVENT_DISP $5,$b,$4 ; BRUNOS_ROOM
@@ -130609,7 +130636,7 @@ DratiniCaveScript:
 
 DratiniCaveScriptPointers:
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 DratiniCaveTextPointers:
@@ -130654,7 +130681,7 @@ DratiniCaveObject:
     db $0 ; signs
 
     db $2 ; people
-    db SPRITE_DRATINI,$d + 4,$1a + 4,$ff,$d0,$41,DRATINI,12
+    db SPRITE_DRATINI,$d + 4,$1a + 4,$ff,$d0,$41,DRATINI,OPP_LVL_OFFSET+12
     db SPRITE_BALL,$a + 4,$1b + 4,$ff,$ff,$82,TRADE_STONE ; item
 
     ; warp-to
@@ -134501,7 +134528,7 @@ ForceShinyOrRandom_:
     and $7F ; Attack < 8
     jr .End
 .Safari
-    ld a,[W_CUROPPONENT]
+    ld a,[W_CUROPPONENT] ; $d059
     cp MAGIKARP
     jr nz,.Random
     ld a,[W_CURENEMYLVL]
@@ -136696,7 +136723,7 @@ RouteD1Object:
     db 05,01,2 ; CeladonCityText10
 
     db 1 ; people
-    db SPRITE_LASS,10 + 4,17 + 4,$ff,$d2,$41,JR__TRAINER_F + $C8,24 ; trainer
+    db SPRITE_LASS,10 + 4,17 + 4,$ff,$d2,$41,JR__TRAINER_F,24 ; trainer
 
     ; warp-to
     EVENT_DISP ROUTE_D1_WIDTH,15,34 ; TEST_MAP_1
@@ -136735,7 +136762,7 @@ RouteD1Script:
 
 RouteD1ScriptPointers:
     dw CheckFightingMapTrainers
-    dw Func_324c
+    dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
 RouteD1TrainerHeaders:

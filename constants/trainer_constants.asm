@@ -1,4 +1,5 @@
-; sometimes it's necessary to add $C8 to these values
+OPP_LVL_OFFSET EQU 100
+
 YOUNGSTER     EQU $01
 BUG_CATCHER   EQU $02
 LASS          EQU $03
