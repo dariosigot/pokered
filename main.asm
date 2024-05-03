@@ -5948,6 +5948,18 @@ TrainerWalkUpToPlayer_Bank0: ; Moved in the Bank
     ld hl,TrainerWalkUpToPlayer
     jp Bankswitch ; indirect jump to TrainerWalkUpToPlayer (56881 (15:6881))
 
+LoadEvosMovesPointerTableByPokedex:
+    push bc
+    push de
+    ld [$d11e],a
+    ld a,$3a
+    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
+    ld a,[$d11e]
+    ld hl,EvosMovesPointerTable
+    pop de
+    pop bc
+    ret
+
 ; Free
 
 SECTION "TextScriptEndingChar",ROM0[$24d6]
@@ -29886,10 +29898,10 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     db "NOT ABLE@"
 .evolutionStoneMenu
     push hl
-    ld hl,EvosMovesPointerTable
     ld b,0
     ld a,[$CF98] ; pokemon ID
     ds 1 ; dec a ; 00MOD
+    call LoadEvosMovesPointerTableByPokedex
     add a
     rl b
     ld c,a
@@ -29903,7 +29915,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     ld h,[hl]
     ld l,a
     ld de,$CD6D
-    ld a,BANK(MissingNo_EvosMoves)
+    ld a,BANK(Mon000_EvosMoves)
     ld bc,13 ; Eevee's Evolution Bytes
     call FarCopyData
     ld hl,$CD6D
@@ -43375,9 +43387,9 @@ GetMonPotentialMoveList:
     call LoadMonData
 
     ; Get Copy of Level UP EvosMoves in GenericBuffer+1
-    ld hl,EvosMovesPointerTable
     ld d,0
     ld a,[W_MONHEADER]
+    call LoadEvosMovesPointerTableByPokedex
     ds 1 ; dec a ; 00MOD
     add a
     rl d
@@ -43391,7 +43403,7 @@ GetMonPotentialMoveList:
     ld a,[hli]
     ld h,[hl]
     ld l,a ; hl pointer to Correct EvosMoves
-    ld a,BANK(MissingNo_EvosMoves)
+    ld a,BANK(Mon000_EvosMoves)
     ld de,GenericBuffer+1
     ld bc,96-1
     call FarCopyData ; copy bc bytes of data from a:hl to de
@@ -50144,7 +50156,7 @@ LearnMoveFromLevelUp_AfterEvolutionMove:
     jr z,.mew
     ds 1 ; dec a ; 00MOD
     ld bc,$0
-    ld hl,EvosMovesPointerTable
+    call LoadEvosMovesPointerTableByPokedex
     add a
     rl b
     ld c,a
@@ -50291,7 +50303,7 @@ Evolution_PartyMonLoop: ; Moved in the Bank
     ld a,[$cee9]
     ds 1 ; dec a ; 00MOD
     ld b,$0
-    ld hl,EvosMovesPointerTable
+    call LoadEvosMovesPointerTableByPokedex
     add a
     rl b
     ld c,a
@@ -50951,9 +50963,9 @@ WriteMonMoves: ; Moved in the Bank
     push hl
     push de
     push bc
-    ld hl,EvosMovesPointerTable
     ld b,$0
     ld a,[$cf91]  ; cur mon ID
+    call LoadEvosMovesPointerTableByPokedex
     ds 1 ; dec a ; 00MOD
     add a
     rl b
@@ -50988,6 +51000,9 @@ WriteMonMoves: ; Moved in the Bank
     jr nc,.nextMove2 ; min level >= move level
 .skipMinLevelCheck
     push de
+    ld a,b
+    dec a
+    jr z,.SkipMoveAlreadyLearnedCheck ; Level 1 Moves
     ld c,$4
 .moveAlreadyLearnedCheckLoop
     ld a,[de]
@@ -50996,6 +51011,7 @@ WriteMonMoves: ; Moved in the Bank
     jr z,.nextMove
     dec c
     jr nz,.moveAlreadyLearnedCheckLoop
+.SkipMoveAlreadyLearnedCheck
     pop de
     push de
     ld c,$4
@@ -51505,7 +51521,7 @@ GetEvosMoves:
     push de
     ld a,[$CEE9] ; Backup
     push af
-    ld a,BANK(MissingNo_EvosMoves)
+    ld a,BANK(Mon000_EvosMoves)
     ld de,GenericBuffer+1
     ld bc,96-1
     call FarCopyData ; copy bc bytes of data from a:hl to de
@@ -51516,263 +51532,158 @@ GetEvosMoves:
     ret
 
 EvosMovesPointerTable: ; Moved in the Bank
-    dw MissingNo_EvosMoves
-    dw Mon112_EvosMoves
-    dw Mon115_EvosMoves
-    dw Mon032_EvosMoves
-    dw Mon035_EvosMoves
-    dw Mon021_EvosMoves
-    dw Mon100_EvosMoves
-    dw Mon034_EvosMoves
-    dw Mon080_EvosMoves
+    dw Mon000_EvosMoves
+    dw Mon001_EvosMoves
     dw Mon002_EvosMoves
-    dw Mon103_EvosMoves
-    dw Mon108_EvosMoves
-    dw Mon102_EvosMoves
-    dw Mon088_EvosMoves
-    dw Mon094_EvosMoves
-    dw Mon029_EvosMoves
-    dw Mon031_EvosMoves
-    dw Mon104_EvosMoves
-    dw Mon111_EvosMoves
-    dw Mon131_EvosMoves
-    dw Mon059_EvosMoves
-    dw Mon151_EvosMoves
-    dw Mon130_EvosMoves
-    dw Mon090_EvosMoves
-    dw Mon072_EvosMoves
-    dw Mon092_EvosMoves
-    dw Mon123_EvosMoves
-    dw Mon120_EvosMoves
+    dw Mon003_EvosMoves
+    dw Mon004_EvosMoves
+    dw Mon005_EvosMoves
+    dw Mon006_EvosMoves
+    dw Mon007_EvosMoves
+    dw Mon008_EvosMoves
     dw Mon009_EvosMoves
-    dw Mon127_EvosMoves
-    dw Mon114_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon058_EvosMoves
-    dw Mon095_EvosMoves
-    dw Mon022_EvosMoves
-    dw Mon016_EvosMoves
-    dw Mon079_EvosMoves
-    dw Mon064_EvosMoves
-    dw Mon075_EvosMoves
-    dw Mon113_EvosMoves
-    dw Mon067_EvosMoves
-    dw Mon122_EvosMoves
-    dw Mon106_EvosMoves
-    dw Mon107_EvosMoves
-    dw Mon024_EvosMoves
-    dw Mon047_EvosMoves
-    dw Mon054_EvosMoves
-    dw Mon096_EvosMoves
-    dw Mon076_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon126_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon125_EvosMoves
-    dw Mon082_EvosMoves
-    dw Mon109_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon056_EvosMoves
-    dw Mon086_EvosMoves
-    dw Mon050_EvosMoves
-    dw Mon128_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon083_EvosMoves
-    dw Mon048_EvosMoves
-    dw Mon149_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon084_EvosMoves
-    dw Mon060_EvosMoves
-    dw Mon124_EvosMoves
-    dw Mon146_EvosMoves
-    dw Mon144_EvosMoves
-    dw Mon145_EvosMoves
-    dw Mon132_EvosMoves
-    dw Mon052_EvosMoves
-    dw Mon098_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon037_EvosMoves
-    dw Mon038_EvosMoves
-    dw Mon025_EvosMoves
-    dw Mon026_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon147_EvosMoves
-    dw Mon148_EvosMoves
-    dw Mon140_EvosMoves
-    dw Mon141_EvosMoves
-    dw Mon116_EvosMoves
-    dw Mon117_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon027_EvosMoves
-    dw Mon028_EvosMoves
-    dw Mon138_EvosMoves
-    dw Mon139_EvosMoves
-    dw Mon039_EvosMoves
-    dw Mon040_EvosMoves
-    dw Mon133_EvosMoves
-    dw Mon136_EvosMoves
-    dw Mon135_EvosMoves
-    dw Mon134_EvosMoves
-    dw Mon066_EvosMoves
-    dw Mon041_EvosMoves
-    dw Mon023_EvosMoves
-    dw Mon046_EvosMoves
-    dw Mon061_EvosMoves
-    dw Mon062_EvosMoves
-    dw Mon013_EvosMoves
-    dw Mon014_EvosMoves
-    dw Mon015_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon085_EvosMoves
-    dw Mon057_EvosMoves
-    dw Mon051_EvosMoves
-    dw Mon049_EvosMoves
-    dw Mon087_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
     dw Mon010_EvosMoves
     dw Mon011_EvosMoves
     dw Mon012_EvosMoves
-    dw Mon068_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon055_EvosMoves
-    dw Mon097_EvosMoves
-    dw Mon042_EvosMoves
-    dw Mon150_EvosMoves
-    dw Mon143_EvosMoves
-    dw Mon129_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon089_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon099_EvosMoves
-    dw Mon091_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon101_EvosMoves
-    dw Mon036_EvosMoves
-    dw Mon110_EvosMoves
-    dw Mon053_EvosMoves
-    dw Mon105_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon093_EvosMoves
-    dw Mon063_EvosMoves
-    dw Mon065_EvosMoves
+    dw Mon013_EvosMoves
+    dw Mon014_EvosMoves
+    dw Mon015_EvosMoves
+    dw Mon016_EvosMoves
     dw Mon017_EvosMoves
     dw Mon018_EvosMoves
-    dw Mon121_EvosMoves
-    dw Mon001_EvosMoves
-    dw Mon003_EvosMoves
-    dw Mon073_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon118_EvosMoves
-    dw Mon119_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon077_EvosMoves
-    dw Mon078_EvosMoves
     dw Mon019_EvosMoves
     dw Mon020_EvosMoves
-    dw Mon033_EvosMoves
+    dw Mon021_EvosMoves
+    dw Mon022_EvosMoves
+    dw Mon023_EvosMoves
+    dw Mon024_EvosMoves
+    dw Mon025_EvosMoves
+    dw Mon026_EvosMoves
+    dw Mon027_EvosMoves
+    dw Mon028_EvosMoves
+    dw Mon029_EvosMoves
     dw Mon030_EvosMoves
-    dw Mon074_EvosMoves
-    dw Mon137_EvosMoves
-    dw Mon142_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon081_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon004_EvosMoves
-    dw Mon007_EvosMoves
-    dw Mon005_EvosMoves
-    dw Mon008_EvosMoves
-    dw Mon006_EvosMoves
-    dw MissingNo_EvosMoves
-    dw Mon141_EvosMoves ; Kabutops Fossil
-    dw Mon142_EvosMoves ; Aerodactyl Fossil
-    dw Mon093_EvosMoves ; Ghost
+    dw Mon031_EvosMoves
+    dw Mon032_EvosMoves
+    dw Mon033_EvosMoves
+    dw Mon034_EvosMoves
+    dw Mon035_EvosMoves
+    dw Mon036_EvosMoves
+    dw Mon037_EvosMoves
+    dw Mon038_EvosMoves
+    dw Mon039_EvosMoves
+    dw Mon040_EvosMoves
+    dw Mon041_EvosMoves
+    dw Mon042_EvosMoves
     dw Mon043_EvosMoves
     dw Mon044_EvosMoves
     dw Mon045_EvosMoves
+    dw Mon046_EvosMoves
+    dw Mon047_EvosMoves
+    dw Mon048_EvosMoves
+    dw Mon049_EvosMoves
+    dw Mon050_EvosMoves
+    dw Mon051_EvosMoves
+    dw Mon052_EvosMoves
+    dw Mon053_EvosMoves
+    dw Mon054_EvosMoves
+    dw Mon055_EvosMoves
+    dw Mon056_EvosMoves
+    dw Mon057_EvosMoves
+    dw Mon058_EvosMoves
+    dw Mon059_EvosMoves
+    dw Mon060_EvosMoves
+    dw Mon061_EvosMoves
+    dw Mon062_EvosMoves
+    dw Mon063_EvosMoves
+    dw Mon064_EvosMoves
+    dw Mon065_EvosMoves
+    dw Mon066_EvosMoves
+    dw Mon067_EvosMoves
+    dw Mon068_EvosMoves
     dw Mon069_EvosMoves
     dw Mon070_EvosMoves
     dw Mon071_EvosMoves
-    ; Denim
-    dw MissingNo_EvosMoves ; $BF
-    dw MissingNo_EvosMoves ; $C0
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves ; $D0
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves ; $E0
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves ; $F0
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves
-    dw MissingNo_EvosMoves ; $FF
+    dw Mon072_EvosMoves
+    dw Mon073_EvosMoves
+    dw Mon074_EvosMoves
+    dw Mon075_EvosMoves
+    dw Mon076_EvosMoves
+    dw Mon077_EvosMoves
+    dw Mon078_EvosMoves
+    dw Mon079_EvosMoves
+    dw Mon080_EvosMoves
+    dw Mon081_EvosMoves
+    dw Mon082_EvosMoves
+    dw Mon083_EvosMoves
+    dw Mon084_EvosMoves
+    dw Mon085_EvosMoves
+    dw Mon086_EvosMoves
+    dw Mon087_EvosMoves
+    dw Mon088_EvosMoves
+    dw Mon089_EvosMoves
+    dw Mon090_EvosMoves
+    dw Mon091_EvosMoves
+    dw Mon092_EvosMoves
+    dw Mon093_EvosMoves
+    dw Mon094_EvosMoves
+    dw Mon095_EvosMoves
+    dw Mon096_EvosMoves
+    dw Mon097_EvosMoves
+    dw Mon098_EvosMoves
+    dw Mon099_EvosMoves
+    dw Mon100_EvosMoves
+    dw Mon101_EvosMoves
+    dw Mon102_EvosMoves
+    dw Mon103_EvosMoves
+    dw Mon104_EvosMoves
+    dw Mon105_EvosMoves
+    dw Mon106_EvosMoves
+    dw Mon107_EvosMoves
+    dw Mon108_EvosMoves
+    dw Mon109_EvosMoves
+    dw Mon110_EvosMoves
+    dw Mon111_EvosMoves
+    dw Mon112_EvosMoves
+    dw Mon113_EvosMoves
+    dw Mon114_EvosMoves
+    dw Mon115_EvosMoves
+    dw Mon116_EvosMoves
+    dw Mon117_EvosMoves
+    dw Mon118_EvosMoves
+    dw Mon119_EvosMoves
+    dw Mon120_EvosMoves
+    dw Mon121_EvosMoves
+    dw Mon122_EvosMoves
+    dw Mon123_EvosMoves
+    dw Mon124_EvosMoves
+    dw Mon125_EvosMoves
+    dw Mon126_EvosMoves
+    dw Mon127_EvosMoves
+    dw Mon128_EvosMoves
+    dw Mon129_EvosMoves
+    dw Mon130_EvosMoves
+    dw Mon131_EvosMoves
+    dw Mon132_EvosMoves
+    dw Mon133_EvosMoves
+    dw Mon134_EvosMoves
+    dw Mon135_EvosMoves
+    dw Mon136_EvosMoves
+    dw Mon137_EvosMoves
+    dw Mon138_EvosMoves
+    dw Mon139_EvosMoves
+    dw Mon140_EvosMoves
+    dw Mon141_EvosMoves
+    dw Mon142_EvosMoves
+    dw Mon143_EvosMoves
+    dw Mon144_EvosMoves
+    dw Mon145_EvosMoves
+    dw Mon146_EvosMoves
+    dw Mon147_EvosMoves
+    dw Mon148_EvosMoves
+    dw Mon149_EvosMoves
+    dw Mon150_EvosMoves
+    dw Mon151_EvosMoves
 
 CryData: ; Moved in the Bank
     ;$BaseCry,$Pitch,$Length
@@ -135888,10 +135799,35 @@ LoadSpecialTrainerMoves:
     pop hl
     ld bc,4
     call CopyData ; copy bc bytes of data from hl to de
+    call .WritePP
     pop bc
     inc b
     jr .writeAdditionalMoveDataLoop
 .FinishUp
+    ret
+.WritePP
+    push hl
+    call .HLToMove
+    call .DEToPP
+    ld a,$5e
+    call Predef ; indirect jump to LoadMovePPs (f473 (3:7473))
+    pop hl
+    ret
+.HLToMove
+    ld h,d
+    ld l,e
+    ld bc,-4
+    add hl,bc
+    ret
+.DEToPP
+    push hl
+    ld h,d
+    ld l,e
+    ld de,16
+    add hl,de
+    ld d,h
+    ld e,l
+    pop hl
     ret
 
 INCLUDE "constants/special_trainer.asm"

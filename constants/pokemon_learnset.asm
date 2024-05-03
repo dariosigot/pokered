@@ -1545,7 +1545,7 @@ RHYDON_Learnset: MACRO
     db 60,HYPER_BEAM
 ENDM
 RHYHORN_NoEvo_Learnset: MACRO
-    db 43,DOUBLE_KICK
+    db 43,DOUBLE_KICK ; Exclusive
     db 47,ROCK_SLIDE
     db 57,FISSURE
 ENDM
@@ -2261,7 +2261,7 @@ MissingNo_Learnset: MACRO
     db  1,SKY_ATTACK
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
-MissingNo_EvosMoves:
+Mon000_EvosMoves:
     db 0
     MissingNo_Learnset
     db 0
