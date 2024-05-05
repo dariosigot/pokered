@@ -7,7 +7,7 @@ FM_DIG      EQU %00100000 ; 7
 FM_TELEPORT EQU %01000000 ; 8
 FM_HEAL     EQU %10000000 ; 9
 
-db 0                                                 ; 0   - $00 - 'M
+db 0                                                 ; 0   - $00 - MISSINGNO
 db 0                                                 ; 1   - $01 - BULBASAUR
 db FM_CUT                                            ; 2   - $02 - IVYSAUR
 db FM_CUT+FM_STRENGTH                                ; 3   - $03 - VENUSAUR
