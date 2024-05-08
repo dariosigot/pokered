@@ -3248,6 +3248,11 @@ GetCurrentOldAdventureMap:
     ld a,$FF
     ret
 
+; ───────────────────────────────────────
+
+Tset11_Coll:
+    INCBIN "gfx/tilesets/11.tilecoll"
+
 SECTION "GetPartyMonName2",ROM0[$15b4]
 
 ; copy party pokemon's name to $CD6D
@@ -3567,8 +3572,6 @@ Tset0F_Coll:
     INCBIN "gfx/tilesets/0f.tilecoll"
 Tset10_Coll:
     INCBIN "gfx/tilesets/10.tilecoll"
-Tset11_Coll:
-    INCBIN "gfx/tilesets/11.tilecoll"
 Tset12_Coll:
     INCBIN "gfx/tilesets/12.tilecoll"
 Tset13_Coll:
@@ -5903,11 +5906,11 @@ IsNextTileShoreOrWater:
 ; it's mainly used to simulate differences in elevation
 
 TilePairCollisionsLand:
-    db $11,$20,$05;
-    db $11,$41,$05;
+    ;db $11,$20,$05;
+    ;db $11,$41,$05;
     db $03,$30,$2E;
-    db $11,$2A,$05;
-    db $11,$05,$21;
+    ;db $11,$2A,$05;
+    ;db $11,$05,$21;
     db $03,$52,$2E;
     db $03,$55,$2E;
     db $03,$56,$2E;
@@ -5935,7 +5938,7 @@ TilePairCollisionsLand:
 TilePairCollisionsWater:
     db $03,$14,$2E;
     db $03,$48,$2E;
-    db $11,$14,$05;
+    ;db $11,$14,$05;
     db $FF;
 
 ResetButtonPressedAndMapScript: ; Moved in the Bank
@@ -5969,6 +5972,24 @@ GetMonsterNames:
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     ld hl,MonsterNames ; 421E
+    ret
+
+GetTileOffset:
+    push hl
+    push de
+    FuncCoord 8,9 ; tile the player is on
+    ld hl,Coord
+    ld e,a
+    ld d,0
+    bit 7,a ; is delta negative?
+    jr z,.done
+    ld d,$FF
+.done
+    add hl,de
+    ld a,[hl]
+    pop de
+    pop hl
+    ld d,a
     ret
 
 ; Free
@@ -18617,9 +18638,11 @@ PortRoyalFlyWarp:
     FLYWARP_DATA PORT_ROYAL_WIDTH,6,5
 
 DungeonWarpListNew:
+    db ROUTE_D1,$01
     db $FF
 
 DungeonWarpDataNew:
+    FLYWARP_DATA ROUTE_D1_WIDTH,16,34
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $01)
@@ -37691,6 +37714,9 @@ _CheckForJumping: ; 1a672 (6:6672)
     bit 6,a
     ret nz
 
+    ld hl,wForceWTWBit0
+    res 0,[hl]
+
     ld bc,$00FF ; -1
 .loop
     inc c
@@ -37755,6 +37781,9 @@ _CheckForJumping: ; 1a672 (6:6672)
     ld hl,$d736
     set 6,[hl]
     call Func_3486
+
+    ld hl,wForceWTWBit0
+    set 0,[hl]
 
     call Func_1a6f0
     ld a,$a2
@@ -37895,87 +37924,36 @@ JumpTilesetTable: ; Moved in the Bank
     ; Simulation Jump Distance
     ; Direction Output = ▼▲◄►StSeBA
 
-D_DOWN  EQU $00 ; $37
-D_UP    EQU $04 ; $00
-D_LEFT  EQU $08 ; $27
-D_RIGHT EQU $0C ; $24
-
-EX_FAIL   EQU %10000000
-EX_B      EQU %00000010
-EX_NOBIKE EQU %00001000
-
-Tile_A EQU (+0)+(+0)*20
-Tile_B EQU (+1)+(+0)*20
-Tile_C EQU (+0)+(-1)*20
-Tile_D EQU (+1)+(-1)*20
-Tile_E EQU (-2)+(+0)*20
-Tile_F EQU (-1)+(+0)*20
-Tile_G EQU (-2)+(-1)*20
-Tile_H EQU (-1)+(-1)*20
-Tile_I EQU (+2)+(+0)*20
-Tile_J EQU (+3)+(+0)*20
-Tile_K EQU (+2)+(-1)*20
-Tile_L EQU (+3)+(-1)*20
-Tile_M EQU (+0)+(-2)*20
-Tile_N EQU (+1)+(-2)*20
-Tile_O EQU (+0)+(-3)*20
-Tile_P EQU (+1)+(-3)*20
-Tile_Q EQU (+0)+(+2)*20
-Tile_R EQU (+1)+(+2)*20
-Tile_S EQU (+0)+(+1)*20
-Tile_T EQU (+1)+(+1)*20
-
-COLL_DOWN  EQU Tile_Q
-COLL_UP    EQU Tile_M
-COLL_LEFT  EQU Tile_E
-COLL_RIGHT EQU Tile_I
-
-TILE_00_J_DOWN  EQU $37
-TILE_00_J_UP    EQU $00
-TILE_00_J_LEFT  EQU $27
-TILE_00_J_RIGHT EQU $24
-
-TILE_00_UPP_CTR   EQU $01
-TILE_00_UPP_RGT   EQU $02
-TILE_00_BTM_LFT   EQU $36
-TILE_00_BTM_RGT   EQU $34
-TILE_11_CAVE_HOLE EQU $22
-
-;     O P
-;     M N
-; G H C D K L
-; E F A B I J
-;     S T
-;     Q R
-
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+; TILESET 00
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ; MOUNTAIN BORDER
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-db $00 , D_UP    , Tile_D , TILE_00_UPP_CTR   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_UP    , Tile_P , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_DOWN  , Tile_T , TILE_00_UPP_CTR   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_DOWN  , Tile_T , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_LEFT  , Tile_H , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_LEFT  , Tile_E , TILE_00_J_RIGHT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_RIGHT , Tile_L , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL         , 0 , 0
+db $00 , D_UP    , Tile_D , TILE_00_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_UP    , Tile_P , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_DOWN  , Tile_T , TILE_00_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_DOWN  , Tile_T , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_LEFT  , Tile_H , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_LEFT  , Tile_E , TILE_00_J_RIGHT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_RIGHT , Tile_L , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ; MOUNTAIN STAIRS
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-db $00 , D_LEFT  , Tile_H , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_RIGHT , Tile_K , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_UP    , Tile_N , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_DOWN  , Tile_T , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL         , 0 , 0
+db $00 , D_LEFT  , Tile_H , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_RIGHT , Tile_K , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_UP    , Tile_N , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_DOWN  , Tile_T , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ; MOUNTAIN BOTTOM CORNER
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-db $00 , D_RIGHT , Tile_L , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_UP    , Tile_P , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_LEFT  , Tile_H , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_DOWN  , Tile_T , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_UP    , Tile_O , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_LEFT  , Tile_G , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_RIGHT , Tile_K , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_DOWN  , Tile_S , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL         , 0 , 0
+db $00 , D_RIGHT , Tile_L , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_UP    , Tile_P , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_LEFT  , Tile_H , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_DOWN  , Tile_T , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_UP    , Tile_O , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_LEFT  , Tile_G , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_RIGHT , Tile_K , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $00 , D_DOWN  , Tile_S , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ; GO OUT
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -38002,6 +37980,63 @@ db $00 , D_LEFT  , Tile_H , TILE_00_J_RIGHT   , $FF               , 0          ,
 db $00 , D_LEFT  , Tile_H , TILE_00_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
 db $00 , D_DOWN  , Tile_S , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
 db $00 , D_DOWN  , Tile_T , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
+
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+; TILESET 11
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+; MOUNTAIN BORDER
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+db $11 , D_UP    , Tile_D , TILE_11_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_UP    , Tile_P , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_DOWN  , Tile_T , TILE_11_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_DOWN  , Tile_T , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_LEFT  , Tile_H , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_LEFT  , Tile_E , TILE_11_J_RIGHT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_RIGHT , Tile_L , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+; MOUNTAIN STAIRS
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+db $11 , D_LEFT  , Tile_H , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_RIGHT , Tile_K , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_UP    , Tile_N , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_DOWN  , Tile_T , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+; MOUNTAIN BOTTOM CORNER
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+db $11 , D_RIGHT , Tile_L , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_UP    , Tile_P , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_LEFT  , Tile_H , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_DOWN  , Tile_T , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_UP    , Tile_O , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_LEFT  , Tile_G , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_RIGHT , Tile_K , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0
+db $11 , D_DOWN  , Tile_S , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+; GO OUT
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+db $11 , D_DOWN  , Tile_A , TILE_11_J_DOWN    , $FF               , COLL_DOWN  , 0                , 0 , 0
+db $11 , D_DOWN  , Tile_A , TILE_11_BTM_LFT   , $FF               , COLL_DOWN  , 0                , 0 , 0
+db $11 , D_DOWN  , Tile_B , TILE_11_BTM_RGT   , $FF               , COLL_DOWN  , 0                , 0 , 0
+db $11 , D_LEFT  , Tile_A , TILE_11_J_LEFT    , $FF               , COLL_LEFT  , 0                , 0 , 0
+db $11 , D_LEFT  , Tile_A , TILE_11_BTM_LFT   , $FF               , COLL_LEFT  , 0                , 0 , 0
+db $11 , D_RIGHT , Tile_B , TILE_11_BTM_RGT   , $FF               , COLL_RIGHT , 0                , 0 , 0
+db $11 , D_RIGHT , Tile_D , TILE_11_J_RIGHT   , $FF               , COLL_RIGHT , 0                , 0 , 0
+db $11 , D_RIGHT , Tile_D , TILE_11_UPP_RGT   , $FF               , COLL_RIGHT , 0                , 0 , 0
+db $11 , D_UP    , Tile_C , TILE_11_J_UP      , $FF               , COLL_UP    , 0                , 0 , 0
+db $11 , D_UP    , Tile_D , TILE_11_J_UP      , $FF               , COLL_UP    , 0                , 0 , 0
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+; GO IN
+; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+db $11 , D_UP    , Tile_M , TILE_11_J_DOWN    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
+db $11 , D_UP    , Tile_M , TILE_11_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
+db $11 , D_UP    , Tile_N , TILE_11_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
+db $11 , D_RIGHT , Tile_I , TILE_11_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
+db $11 , D_RIGHT , Tile_I , TILE_11_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
+db $11 , D_LEFT  , Tile_F , TILE_11_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
+db $11 , D_LEFT  , Tile_H , TILE_11_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
+db $11 , D_LEFT  , Tile_H , TILE_11_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
+db $11 , D_DOWN  , Tile_S , TILE_11_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
+db $11 , D_DOWN  , Tile_T , TILE_11_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ; CAVE HOLE
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -38009,28 +38044,11 @@ db $11 , D_DOWN  , Tile_Q , TILE_11_CAVE_HOLE , TILE_11_CAVE_HOLE , 0          ,
 db $11 , D_LEFT  , Tile_E , TILE_11_CAVE_HOLE , TILE_11_CAVE_HOLE , 0          , EX_B | EX_NOBIKE , 1 , BTN_LEFT
 db $11 , D_RIGHT , Tile_J , TILE_11_CAVE_HOLE , TILE_11_CAVE_HOLE , 0          , EX_B | EX_NOBIKE , 1 , BTN_RIGHT
 db $11 , D_UP    , Tile_M , TILE_11_CAVE_HOLE , TILE_11_CAVE_HOLE , 0          , EX_B | EX_NOBIKE , 1 , BTN_UP
+
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ; End
 ; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 db $FF
-
-GetTileOffset:
-    push hl
-    push de
-    FuncCoord 8,9 ; tile the player is on
-    ld hl,Coord
-    ld e,a
-    ld d,0
-    bit 7,a ; is delta negative?
-    jr z,.done
-    ld d,$FF
-.done
-    add hl,de
-    ld a,[hl]
-    pop de
-    pop hl
-    ld d,a
-    ret
 
 CheckPassable:
     push hl
@@ -38080,8 +38098,9 @@ CheckJumpExceptionFlag:
     ret
 
 _JumpOrCheckTilePassable:
-    ld a,[$d736]
-    bit 6,a ; jumping a ledge?
+    ld hl,wForceWTWBit0
+    bit 0,[hl]
+    res 0,[hl]
     jr z,.NoWTW
     and a ; rcf -> WTW
     ret
@@ -69816,12 +69835,14 @@ HiddenObjectMapsNew:
     db ROUTE_D1
     db PORT_ROYAL_POKECENTER
     db SWAP_MAP
+    db TEST_MAP_1
     db $FF
 
 HiddenObjectPointersNew:
     dw RouteD1HiddenObjects
     dw PortRoyalCenterObjects
     dw SwapMapObjects2
+    dw TestMap1Objects
 
 RouteD1HiddenObjects:
     db 13,26,ULTRA_BALL
@@ -69834,6 +69855,12 @@ PortRoyalCenterObjects:
 SwapMapObjects2:
     db 08,09,$d0 ; XXX,y,x
     dbw BANK(EnableBillsTeleport2),EnableBillsTeleport2
+    db $FF
+TestMap1Objects:
+    db 28,01,$d0 ; XXX,y,x
+    dbw BANK(RevealHoleA),RevealHoleA
+    db 28,02,$d0 ; XXX,y,x
+    dbw BANK(RevealHoleA),RevealHoleA
     db $FF
 
 ; ───────────────────────────────────────
@@ -133578,7 +133605,7 @@ CheckFishingForMon:
 WildDataPointersNew:
     dw NoMons        ; PORT_ROYAL
     dw RouteD1Mons   ; ROUTE_D1
-    dw NoMons        ; TEST_MAP_1
+    dw TestMap1Mons  ; TEST_MAP_1
     dw NoMons        ; PORT_ROYAL_POKECENTER
     dw NoMons        ; PORT_ROYAL_MART
     dw NoMons ; $05
@@ -133660,6 +133687,30 @@ RouteD1Mons:
     db 45,KADABRA  ;  5%
     db 45,KADABRA  ;  4%
     db 45,KADABRA  ;  1%
+    db $05
+    db  2,MAGIKARP ; 20%
+    db  2,MAGIKARP ; 20%
+    db  2,MAGIKARP ; 15%
+    db  2,MAGIKARP ; 10%
+    db  2,MAGIKARP ; 10%
+    db  2,MAGIKARP ; 10%
+    db  2,MAGIKARP ;  5%
+    db  2,MAGIKARP ;  5%
+    db  2,MAGIKARP ;  4%
+    db  2,MAGIKARP ;  1%
+
+TestMap1Mons:
+    db $19
+    db  8,ZUBAT    ; 20%
+    db  8,ZUBAT    ; 20%
+    db  8,ZUBAT    ; 15%
+    db  8,ZUBAT    ; 10%
+    db  8,ZUBAT    ; 10%
+    db  8,ZUBAT    ; 10%
+    db  8,ZUBAT    ;  5%
+    db  8,ZUBAT    ;  5%
+    db  8,ZUBAT    ;  4%
+    db  8,ZUBAT    ;  1%
     db $05
     db  2,MAGIKARP ; 20%
     db  2,MAGIKARP ; 20%
@@ -135445,11 +135496,11 @@ GetMapPaletteID_:
     ld [$cf1c],a
     ret
 .PokemonTowerOrAgatha
-    ld a,PAL_GREYMON - 1
-    jr .town
+    ld a,PAL_GREYMON
+    jr .old
 .caveOrBruno
-    ld a,PAL_CAVE - 1
-    jr .town
+    ld a,PAL_CAVE
+    jr .old
 .Lorelei
     xor a
     jr .town
@@ -136426,39 +136477,6 @@ RouteD1Text1:
     jp TextScriptEnd
 
 ; ──────────────────────────────────────────────────────────────────────
-; TEST_MAP_1
-; ──────────────────────────────────────────────────────────────────────
-
-TestMap1_h:
-    db $11 ; tileset
-    db TEST_MAP_1_HEIGHT,TEST_MAP_1_WIDTH ; dimensions
-    dw TestMap1Blocks,TestMap1TextPointers,TestMap1Script ; blocks,texts,scripts
-    db 0 ; connections
-    dw TestMap1Object
-TestMap1Object:
-    db $3 ; border tile
-
-    db 2 ; warp
-    db 7,6,0,$FF
-    db 7,7,0,$FF
-
-    db 0 ; sign
-
-    db 0 ; people
-
-    ; warp-to
-    EVENT_DISP TEST_MAP_1_WIDTH,7,6
-    EVENT_DISP TEST_MAP_1_WIDTH,7,7
-
-TestMap1TextPointers:
-    db "@"
-TestMap1Script:
-    ret
-
-TestMap1Blocks:
-    INCBIN "maps/devmap1.blk"
-
-; ──────────────────────────────────────────────────────────────────────
 ; PORT_ROYAL_POKECENTER
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -136614,5 +136632,131 @@ SwapMapScript:
     db 01,08
     db 02,07
     db $FF
+
+; ──────────────────────────────────────────────────────────────────────
+; TEST_MAP_1
+; ──────────────────────────────────────────────────────────────────────
+
+TestMap1_h:
+    db $11 ; tileset
+    db TEST_MAP_1_HEIGHT,TEST_MAP_1_WIDTH ; dimensions
+    dw TestMap1Blocks,TestMap1TextPointers,TestMap1Script ; blocks,texts,scripts
+    db 0 ; connections
+    dw TestMap1Object
+TestMap1Object:
+    db $3 ; border tile
+
+    db 2 ; warp
+    db 29,06,0,$FF
+    db 29,07,0,$FF
+
+    db 0 ; sign
+
+    db 0 ; people
+
+    ; warp-to
+    EVENT_DISP TEST_MAP_1_WIDTH,29,06
+    EVENT_DISP TEST_MAP_1_WIDTH,29,07
+
+TestMap1TextPointers:
+    db "@"
+
+TestMap1Script:
+    ld a,[$d736]
+    bit 6,a
+    ret nz
+    ld hl,.Coord
+    call ArePlayerCoordsInArray
+    ret nc
+    FuncCoord 8,9 ; tile the player is on
+    ld a,[Coord]
+    cp TILE_11_CAVE_HOLE
+    jr z,.FallInHole
+    call RevealHoleCoord
+.FallInHole
+    ; Start Warp
+    ld a,1 ; Warp ID
+    ld [$d71e],a
+    ld hl,$d72d
+    set 4,[hl]
+    ld hl,$d732
+    set 4,[hl]
+    ld a,ROUTE_D1
+    ld [$d71d],a
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
+    ret
+.Coord
+    db 28,01
+    db 28,02
+    db 25,02
+    db 23,03
+    db 28,25
+    db $FF
+
+RevealHoleA:
+    call .GetDirectionOffset
+    call GetTileOffset
+    cp TILE_11_CAVE_HOLE
+    ret z
+    ld a,[$cd3f]
+    jr RevealHoleCommon
+.GetDirectionOffset
+    ld a,[$c109] ; Direction
+    and a ; D_DOWN
+    jr z,.down
+    cp D_UP
+    jr z,.up
+    cp D_LEFT
+    jr z,.left
+    ld a,COLL_RIGHT
+    ret
+.down
+    ld a,COLL_DOWN
+    ret
+.up
+    ld a,COLL_UP
+    ret
+.left
+    ld a,COLL_LEFT
+    ret
+
+RevealHoleCoord:
+    ld a,[wWhichTrade]
+    dec a
+RevealHoleCommon:
+    ld bc,3
+    ld hl,.Table
+    call AddNTimes
+    ld a,[hli]
+    ld b,a ; Y
+    ld a,[hli]
+    ld c,a ; X
+    ld a,[hli]
+    ld [$d09f],a; ID
+    ld a,$17
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+    FuncCoord 8,9 ; tile the player is on
+    ld a,[Coord]
+    cp TILE_11_CAVE_HOLE
+    ret nz
+    ld a,$FF
+    ld [wJoypadForbiddenButtonsMask],a ; Disable Joy
+    call Delay3
+    ; EmotionBubble
+    ld hl,$cd4f
+    xor a
+    ld [hli],a
+    ld [hl],a
+    ld a,$4c
+    call Predef ; indirect jump to Func_17c47 (17c47 (5:7c47))
+    jp Delay3
+.Table
+   ;db YY,XX,$ID
+    db 14,00,$78
+    db 14,01,$77
+
+TestMap1Blocks:
+    INCBIN "maps/devmap1.blk"
 
 ; ──────────────────────────────────────────────────────────────────────

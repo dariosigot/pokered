@@ -1,0 +1,63 @@
+D_DOWN  EQU $00 ; $37
+D_UP    EQU $04 ; $00
+D_LEFT  EQU $08 ; $27
+D_RIGHT EQU $0C ; $24
+
+EX_FAIL   EQU %10000000
+EX_B      EQU %00000010
+EX_NOBIKE EQU %00001000
+
+Tile_A EQU (+0)+(+0)*20
+Tile_B EQU (+1)+(+0)*20
+Tile_C EQU (+0)+(-1)*20
+Tile_D EQU (+1)+(-1)*20
+Tile_E EQU (-2)+(+0)*20
+Tile_F EQU (-1)+(+0)*20
+Tile_G EQU (-2)+(-1)*20
+Tile_H EQU (-1)+(-1)*20
+Tile_I EQU (+2)+(+0)*20
+Tile_J EQU (+3)+(+0)*20
+Tile_K EQU (+2)+(-1)*20
+Tile_L EQU (+3)+(-1)*20
+Tile_M EQU (+0)+(-2)*20
+Tile_N EQU (+1)+(-2)*20
+Tile_O EQU (+0)+(-3)*20
+Tile_P EQU (+1)+(-3)*20
+Tile_Q EQU (+0)+(+2)*20
+Tile_R EQU (+1)+(+2)*20
+Tile_S EQU (+0)+(+1)*20
+Tile_T EQU (+1)+(+1)*20
+
+;     O P
+;     M N
+; G H C D K L
+; E F A B I J
+;     S T
+;     Q R
+
+COLL_DOWN  EQU Tile_Q
+COLL_UP    EQU Tile_M
+COLL_LEFT  EQU Tile_E
+COLL_RIGHT EQU Tile_I
+
+TILE_00_J_DOWN   EQU $37
+TILE_00_J_UP     EQU $00
+TILE_00_J_LEFT   EQU $27
+TILE_00_J_RIGHT  EQU $24
+
+TILE_00_UPP_CTR  EQU $01
+TILE_00_UPP_RGT  EQU $02
+TILE_00_BTM_LFT  EQU $36
+TILE_00_BTM_RGT  EQU $34
+
+TILE_11_J_DOWN   EQU $10
+TILE_11_J_UP     EQU $41
+TILE_11_J_LEFT   EQU $31
+TILE_11_J_RIGHT  EQU $17
+
+TILE_11_UPP_CTR  EQU $29
+TILE_11_UPP_RGT  EQU $07
+TILE_11_BTM_LFT  EQU $28
+TILE_11_BTM_RGT  EQU $11
+
+TILE_11_CAVE_HOLE EQU $22

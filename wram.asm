@@ -1614,6 +1614,8 @@ NEXTU
 
 wJumpingTile : ; def0
     ds 1
+wForceWTWBit0: ; def1 ; Bit 0
+    ds 1
 
 NEXTU
 
