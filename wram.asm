@@ -1096,6 +1096,26 @@ W_SPRITESETID: ; d3a8
 ; sprite set ID for the current map
     ds 1
 
+SECTION "ChangedBlocks",WRAMX[$d430],BANK[1]
+
+wChangedBlocksMapId:: db
+wChangedBlocksNum: db
+
+UNION
+
+wChangedBlocksH:: db
+wChangedBlocksL:: db
+wChangedBlocksID:: db
+
+NEXTU
+
+wChangedBlocksHLID::
+    ds 3 * 15
+
+ENDU
+
+wChangedBlocksEnd::
+
 ; some free bytes
 
 SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]

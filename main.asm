@@ -287,6 +287,45 @@ GetJoypadState: ; 019a (0:019a)
     call RoutineForRealGB
     ret
 
+ChangeCurMap:
+    push hl
+    ld hl,wChangedBlocksMapId
+    cp [hl]
+    jr z,.same
+    push af
+    push bc
+    ld [hli],a ; Id
+    xor a
+    ld bc,3 * 15 + 1
+    call FillMemory
+    pop bc
+    pop af
+.same
+    pop hl
+    ld [W_CURMAP],a
+    ret
+
+RestoreChangedBlocks:
+    ld hl,wChangedBlocksNum
+    ld a,[hli]
+    and a
+    jr z,.done
+    ld b,a
+.loop
+    ld a,[hli] ; H
+    ld d,a
+    ld a,[hli] ; L
+    ld e,a
+    ld a,[hli] ; ID
+    ld [de],a
+    dec b
+    jr nz,.loop
+.done
+    ld a,[$d371]
+    ret
+
+; Free
+
 SECTION "HandleMidJump",ROM0[$039e]
 
 ; this function calls a function that takes necessary actions
@@ -796,7 +835,7 @@ WarpFound2: ; 073c (0:073c)
     ld a,[W_CURMAPWIDTH]
     ld [$d366],a
     ld a,[$ff8b] ; destination map number
-    ld [W_CURMAP],a ; change current map to destination map
+    call ChangeCurMap ; change current map to destination map
     push bc ; 1
     push af ; 1
     ld b,BANK(CheckDarkMap) ; 2
@@ -813,7 +852,7 @@ WarpFound2: ; 073c (0:073c)
     cp a,$ff
     jr z,.goBackOutside
 ; if not going back to the previous map
-    ld [W_CURMAP],a ; current map number
+    call ChangeCurMap ; current map number
     ld b,BANK(Func_70787)
     ld hl,Func_70787
     call Bankswitch ; check if the warp was a Silph Co. teleporter
@@ -834,7 +873,7 @@ WarpFound2: ; 073c (0:073c)
     jr .done
 .goBackOutside
     ld a,[wLastMap] ; previous map
-    ld [W_CURMAP],a
+    call ChangeCurMap
     call PlayMapChangeSound
     xor a
     ld [$d35d],a
@@ -856,7 +895,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     cp a,$ff
     jr nz,.checkEastMap
     ld a,[$d387]
-    ld [W_CURMAP],a
+    call ChangeCurMap
     ld a,[$d38f] ; new X coordinate upon entering west map
     ld [W_XCOORD],a
     ld a,[W_YCOORD]
@@ -892,7 +931,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     cp b
     jr nz,.checkNorthMap
     ld a,[$d392]
-    ld [W_CURMAP],a
+    call ChangeCurMap
     ld a,[$d39a] ; new X coordinate upon entering east map
     ld [W_XCOORD],a
     ld a,[W_YCOORD]
@@ -927,7 +966,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     cp a,$ff
     jr nz,.checkSouthMap
     ld a,[$d371]
-    ld [W_CURMAP],a
+    call ChangeCurMap
     ld a,[$d378] ; new Y coordinate upon entering north map
     ld [W_YCOORD],a
     ld a,[W_XCOORD]
@@ -954,7 +993,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     cp b
     jr nz,.didNotEnterConnectedMap
     ld a,[$d37c]
-    ld [W_CURMAP],a
+    call ChangeCurMap
     ld a,[$d383] ; new Y coordinate upon entering south map
     ld [W_YCOORD],a
     ld a,[W_XCOORD]
@@ -1232,7 +1271,7 @@ LoadTileBlockMap: ; 09fc (0:09fc)
     dec b
     jr nz,.rowLoop
 .northConnection
-    ld a,[$d371]
+    call RestoreChangedBlocks ; ld a,[$d371]
     cp a,$ff
     jr z,.southConnection
     call SwitchToMapRomBank
@@ -11911,7 +11950,7 @@ Func_4da6: ; 4da6 (1:4da6)
     ld [W_CURENEMYLVL],a
     xor a
     ld [$cc49],a
-    ld [W_CURMAP],a
+    call ChangeCurMap
     call AddPokemonToParty
     ld a,$1
     ld [W_CUROPPONENT],a ; $d059
@@ -14859,7 +14898,7 @@ Func_62ff: ; 62ff (1:62ff)
     res 4,[hl]
     ld a,[$d71d]
     ld b,a
-    ld [W_CURMAP],a ; $d35e
+    call ChangeCurMap ; $d35e
     ld a,[$d71e]
     ld c,a
     call GetDungeonWarpList ; ld hl,DungeonWarpList ; $63bf
@@ -14889,7 +14928,7 @@ Func_62ff: ; 62ff (1:62ff)
     ld a,[$d71a]
 .asm_6391
     ld b,a
-    ld [W_CURMAP],a ; $d35e
+    call ChangeCurMap ; $d35e
     call GetFlyWarpDataPtr ; ld hl,FlyWarpDataPtr ; $6448
 .asm_6398
     ld a,[hli]
@@ -22867,7 +22906,7 @@ MapHeaderBanksNew:
 MapSongBanksNew:
     db (Music_Cities1       -$4000)/3 , BANK(Music_Cities1)       ; PORT_ROYAL
     db (Music_Routes1       -$4000)/3 , BANK(Music_Routes1)       ; ROUTE_D1
-    db (Music_Routes1       -$4000)/3 , BANK(Music_Routes1)       ; TEST_MAP_1
+    db (Music_Dungeon3      -$4000)/3 , BANK(Music_Dungeon3)      ; TEST_MAP_1
     db (Music_Pokecenter    -$4000)/3 , BANK(Music_Pokecenter)    ; PORT_ROYAL_POKECENTER
     db (Music_Pokecenter    -$4000)/3 , BANK(Music_Pokecenter)    ; PORT_ROYAL_MART
     db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $05
@@ -24600,6 +24639,48 @@ ItemUseXAccuracy: ; e013 (3:6013)
 ItemUseCardKey: ; e022 (3:6022)
     jp ItemUseNotTime
 
+BackupChangedBlocks:
+    push hl
+    ld d,h
+    ld e,l
+    ld hl,wChangedBlocksNum
+    ld a,[hli]
+    cp 15
+    jr nc,.done
+    and a
+    jr z,.insert
+    ld b,a
+.loop
+    ld a,[hli] ; H
+    cp d
+    jr nz,.next1
+    ld a,[hli] ; L
+    cp e
+    jr nz,.next2
+.found
+    ld a,[$d09f]
+    ld [hl],a ; ID
+    jr .done
+.next1
+    inc hl
+.next2
+    inc hl
+    dec b
+    jr nz,.loop
+.insert
+    ld a,d
+    ld [hli],a ; H
+    ld a,e
+    ld [hli],a ; L
+    ld a,[$d09f]
+    ld [hl],a ; ID
+    ld hl,wChangedBlocksNum
+    inc [hl]
+.done
+    ld a,[$d09f]
+    pop hl
+    ret
+
 SECTION "ItemUseGuardSpec",ROMX[$60dc],BANK[$3]
 
 ItemUseGuardSpec: ; e0dc (3:60dc)
@@ -26141,7 +26222,7 @@ ReplaceTileBlock: ; ee9e (3:6e9e)
     jr nz,.asm_eeb7
 .asm_eebb
     add hl,bc
-    ld a,[$d09f]
+    call BackupChangedBlocks ; ld a,[$d09f]
     ld [hl],a
     ld a,[$d35f]
     ld c,a
@@ -26162,7 +26243,7 @@ ReplaceTileBlock: ; ee9e (3:6e9e)
     call Func_ef4e
     ret c
 
-Func_eedc: ; eedc (3:6edc)
+RedrawMapView: ; eedc (3:6edc)
     ld a,[W_ISINBATTLE] ; $d057
     inc a
     ret z
@@ -26264,7 +26345,7 @@ CanCut:
     call Func_eff7
     ld de,CutTreeBlockSwaps ; $7100
     call Func_f09f
-    call Func_eedc
+    call RedrawMapView
     ld b,BANK(Func_79e96)
     ld hl,Func_79e96
     call Bankswitch ; indirect jump to Func_79e96 (79e96 (1e:5e96))
@@ -26275,7 +26356,7 @@ CanCut:
     ld a,$90
     ld [$FF00+$b0],a
     call UpdateSprites
-    jp Func_eedc
+    jp RedrawMapView
 .plateau
     call WaitForSoundToFinish
     ld a,$a5
@@ -36602,7 +36683,7 @@ SilphCo4Script_19d21: ; 19d21 (6:5d21)
     ld [$d09f],a
     ld bc,$0602
     ld a,$17
-    call Predef
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_19d48
     bit 1,a
@@ -36611,7 +36692,7 @@ SilphCo4Script_19d21: ; 19d21 (6:5d21)
     ld [$d09f],a
     ld bc,$0406
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 SilphCo4Data19d58: ; 19d58 (6:5d58)
     db $06,$02,$04,$06,$ff
@@ -36846,7 +36927,7 @@ SilphCo5Script_19f4d: ; 19f4d (6:5f4d)
     ld [$d09f],a
     ld bc,$0203
     ld a,$17
-    call Predef
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_19f74
     bit 1,a
@@ -36856,7 +36937,7 @@ SilphCo5Script_19f4d: ; 19f4d (6:5f4d)
     ld [$d09f],a
     ld bc,$0603
     ld a,$17
-    call Predef
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_19f87
     bit 2,a
@@ -36865,7 +36946,7 @@ SilphCo5Script_19f4d: ; 19f4d (6:5f4d)
     ld [$d09f],a
     ld bc,$0507
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 SilphCo5Coords: ; 19f97 (6:5f97) ; coords?
     db $02,$03,$06,$03,$05,$07,$ff
@@ -37115,7 +37196,7 @@ SilphCo6Script_1a1bf: ; 1a1bf (6:61bf)
     ld [$d09f],a
     ld bc,$0602
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 SilphCo6Coords1: ; 1a1e3 (6:61e3)
     db $06,$02
@@ -65957,7 +66038,7 @@ Func_44be0: ; 44be0 (11:4be0)
     ld [$d09f],a
     ld bc,$080c
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 RocketHideout1ScriptPointers: ; 44c0e (11:4c0e)
     dw CheckFightingMapTrainers
@@ -66963,7 +67044,7 @@ Func_45473: ; 45473 (11:5473)
     ld [$d09f],a
     ld bc,$050c
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 Func_454a3: ; 454a3 (11:54a3)
     xor a
@@ -69861,6 +69942,8 @@ TestMap1Objects:
     dbw BANK(RevealHoleA),RevealHoleA
     db 28,02,$d0 ; XXX,y,x
     dbw BANK(RevealHoleA),RevealHoleA
+    db 21,04,$d0 ; XXX,y,x
+    dbw BANK(RevealHoleA),RevealHoleA
     db $FF
 
 ; ───────────────────────────────────────
@@ -71450,7 +71533,7 @@ Func_48bec: ; 48bec (12:4bec)
     ld [$d09f],a
     ld bc,$0208
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 CeladonGameCornerScript_48c07: ; 48c07 (12:4c07)
     xor a
@@ -71872,7 +71955,7 @@ CeladonGameCornerText12: ; 48edd (12:4edd)
     ld [$d09f],a
     ld bc,$0208
     ld a,$17
-    call Predef
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     jp TextScriptEnd
 
 UnnamedText_48f09: ; 48f09 (12:4f09)
@@ -78293,7 +78376,7 @@ Func_52673: ; 52673 (14:6673)
 .asm_526ca
     ld [$d09f],a
     ld a,$17
-    call Predef ; indirect jump to ReplaceTileBlock
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     ld hl,$d126
     set 5,[hl]
     ld a,$ad
@@ -83497,26 +83580,26 @@ Route21ScriptPointers: ; Moved in the Bank
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
+ROUTE21_BARRIER_BLOCK EQU $6B
+
 Route21ScriptBarrier:
     ld hl,$d126
     bit 6,[hl]
     res 6,[hl]
     ret z
+    ld a,[$c78c]
+    cp ROUTE21_BARRIER_BLOCK
+    ret z ; Don't block if just blocked
     call .CheckCinnabarVisited
     ret nz ; Don't block if visited
-    ld hl,.BlockMap
-.Loop
-    ld a,[hli]
-    inc a
-    ret z
-    ld b,a ; b = Y
-    ld a,[hli]
-    ld c,a ; c = X
-    ld a,[hli]
-    push hl
-    call .ReplaceTileBlock
-    pop hl
-    jr .Loop
+    ld hl,.ChangedBlocks
+    ld de,wChangedBlocksNum
+    ld bc,.ChangedBlocksEnd-.ChangedBlocks
+    call CopyData
+    call RestoreChangedBlocks
+    ld b,BANK(RedrawMapView)
+    ld hl,RedrawMapView
+    jp Bankswitch
 .CheckCinnabarVisited
     call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG
     ld c,CINNABAR_ISLAND ; bit n
@@ -83526,20 +83609,21 @@ Route21ScriptBarrier:
     ld a,c
     and a
     ret
-.ReplaceTileBlock
-    ld [$d09f],a
-    ld a,$17
-    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
-    ret
-.BlockMap
-   ;db -1+YY,XX,ID
-    db -1+07,01,$6B
-    db -1+07,02,$6B
-    db -1+07,03,$6B
-    db -1+07,04,$6B
-    db -1+07,05,$6B
-    db -1+07,06,$6B
-    db $FF
+.ChangedBlocks
+    db 6
+    dw $8CC7
+    db ROUTE21_BARRIER_BLOCK
+    dw $8DC7
+    db ROUTE21_BARRIER_BLOCK
+    dw $8EC7
+    db ROUTE21_BARRIER_BLOCK
+    dw $8FC7
+    db ROUTE21_BARRIER_BLOCK
+    dw $90C7
+    db ROUTE21_BARRIER_BLOCK
+    dw $91C7
+    db ROUTE21_BARRIER_BLOCK
+.ChangedBlocksEnd
 
 ; Celadon Dept. Store 2F (1)
 CeladonMart2Text1:
@@ -86537,7 +86621,7 @@ SilphCo2Script_59d07: ; 59d07 (16:5d07)
     ld [$d09f],a
     ld bc,$0202
     ld a,$17
-    call Predef
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_59d2e
     bit 6,a
@@ -86546,7 +86630,7 @@ SilphCo2Script_59d07: ; 59d07 (16:5d07)
     ld [$d09f],a
     ld bc,$0502
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 DataTable_59d3e: ; 59d3e (16:5d3e)
     db $02,$02,$05,$02,$FF
@@ -95589,6 +95673,8 @@ DiglettsCaveHole:
     ld [$d09f],a
     ld a,$17
     call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+    ld a,$ac
+    call PlaySound
     call .Delay30
     ; EmotionBubble
     ld hl,$cd4f
@@ -97083,9 +97169,9 @@ Func_709ef: ; 709ef (1c:49ef)
     ret
 
 Func_70a19: ; 70a19 (1c:4a19)
-    call GetCurrentOldAdventureMap
+    ld a,[W_CURMAP]
     ld e,a
-    ld hl,MapIDList_70a3f ; $4a3f
+    call GetMapIDList_70a3f
 .asm_70a20
     ld a,[hli]
     cp $ff
@@ -97096,7 +97182,7 @@ Func_70a19: ; 70a19 (1c:4a19)
     set 2,c
     ret
 .asm_70a2b
-    ld hl,MapIDList_70a44 ; $4a44
+    call GetMapIDList_70a44
 .asm_70a2e
     ld a,[hli]
     cp $ff
@@ -99162,8 +99248,8 @@ Func_71c07: ; 71c07 (1c:5c07)
     call Bankswitch
     call ClearScreen
     call Func_71ca2
-    ld b,BANK(Func_eedc)
-    ld hl,Func_eedc
+    ld b,BANK(RedrawMapView)
+    ld hl,RedrawMapView
     call Bankswitch
     and a
     ld a,$3
@@ -100316,7 +100402,7 @@ WaterTile:
 WaterTilesets: ; Moved in the Bank
     db $00,$03,$05,$07,$0d,$0e,$11,$16,$17
     db $ff ; terminator
-
+  
 CreateMonOvWorldSprInstruction_End:
     call AddTradeBaloonRule
     ld hl,wSpriteOAMBySpecies
@@ -100371,6 +100457,13 @@ PortRoyalName:
     db "PORT ROYAL@"
 RouteD1Name:
     db "ROUTE D1@"
+
+MapIDList_70a3fNew:
+    db TEST_MAP_1
+    db $FF
+
+MapIDList_70a44New:
+    db $FF
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $1C)
@@ -100434,28 +100527,37 @@ GetFlyingCitySortOrder:
     ld hl,FlyingCitySortOrderNew
     ret
 
+GetMapIDList_70a3f:
+    ld hl,MapIDList_70a3f
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,MapIDList_70a3fNew
+    ret
+
+GetMapIDList_70a44:
+    ld hl,MapIDList_70a44
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,MapIDList_70a44New
+    ret
+
 ; ───────────────────────────────────────
 
-; Funzione per cambiare lo sprite utilizzato dalle ball durante la ricarica al centro pokemon
-LoadAlternateBallPic: ; Denim
-    ld hl,wFlagFlashingHealBallBit7
-    bit 7,[hl]
-    jr z,.Flash
-    jr .Restore
-.Flash
-    set 7,[hl]
-    ld de,PokeCenterFlashingHealBall ; $44b7
-    ld bc,(BANK(PokeCenterFlashingHealBall) << 8) + $03
-    jr .Done
-.Restore
-    res 7,[hl]
-    ld de,PokeCenterHealBall
-    ld bc,(BANK(PokeCenterHealBall) << 8) + $03
-.Done
-    ld hl,$87c0
-    jp CopyVideoData
-PokeCenterFlashingHealBall:
-    INCBIN "gfx/pokecenter_ball_2.2bpp"
+IfNotDarkGBFadeOut2:
+    ld a,[wBackupDarkMap] ; [$d35d]
+    and a
+    jp z,GBFadeOut2
+    ld hl,IncGradGBPalTable_01+5
+    ld b,2
+    jp GBFadeInCommon
+
+IfNotDarkGBFadeIn2:
+    ld a,[$d35d]
+    and a
+    jp z,GBFadeIn2
+    ld hl,IncGradGBPalTable_01
+    ld b,2
+    jp GBFadeOutCommon
 
 SECTION "BorderPalettes",ROMX[$6788],BANK[$1C]
 
@@ -102026,21 +102128,26 @@ GetHealthBarColorWithGhostCheck_:
     ld e,a
     jp GetHealthBarColor
 
-IfNotDarkGBFadeOut2:
-    ld a,[wBackupDarkMap] ; [$d35d]
-    and a
-    jp z,GBFadeOut2
-    ld hl,IncGradGBPalTable_01+5
-    ld b,2
-    jp GBFadeInCommon
-
-IfNotDarkGBFadeIn2:
-    ld a,[$d35d]
-    and a
-    jp z,GBFadeIn2
-    ld hl,IncGradGBPalTable_01
-    ld b,2
-    jp GBFadeOutCommon
+; Funzione per cambiare lo sprite utilizzato dalle ball durante la ricarica al centro pokemon
+LoadAlternateBallPic: ; Denim
+    ld hl,wFlagFlashingHealBallBit7
+    bit 7,[hl]
+    jr z,.Flash
+    jr .Restore
+.Flash
+    set 7,[hl]
+    ld de,PokeCenterFlashingHealBall ; $44b7
+    ld bc,(BANK(PokeCenterFlashingHealBall) << 8) + $03
+    jr .Done
+.Restore
+    res 7,[hl]
+    ld de,PokeCenterHealBall
+    ld bc,(BANK(PokeCenterHealBall) << 8) + $03
+.Done
+    ld hl,$87c0
+    jp CopyVideoData
+PokeCenterFlashingHealBall:
+    INCBIN "gfx/pokecenter_ball_2.2bpp"
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
@@ -135696,25 +135803,27 @@ INCLUDE "constants/special_trainer.asm"
 ; ──────────────────────────────────────────────────────────────────────
 
 EnableBillsTeleport:
-    ld hl,$d126
-    bit 6,[hl]
-    res 6,[hl]
-    ret z
     ld b,3 ; Y
     ld c,2 ; X
+    ld a,[$c729]
+    cp $39
+    ld a,$03 ; ID
+    jr z,.done
     ld a,$39 ; ID
+.done
     ld [$d09f],a
     ld a,$17
     jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 EnableBillsTeleport2:
-    ld hl,$d126
-    bit 6,[hl]
-    res 6,[hl]
-    ret z
     ld b,4 ; Y
     ld c,4 ; X
+    ld a,[$c74a]
+    cp $39
+    ld a,$03 ; ID
+    jr z,.done
     ld a,$39 ; ID
+.done
     ld [$d09f],a
     ld a,$17
     jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
@@ -136689,6 +136798,7 @@ TestMap1Script:
 .Coord
     db 28,01
     db 28,02
+    db 21,04
     db 25,02
     db 23,03
     db 28,25
@@ -136736,6 +136846,8 @@ RevealHoleCommon:
     ld [$d09f],a; ID
     ld a,$17
     call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+    ld a,$ac
+    call PlaySound
     FuncCoord 8,9 ; tile the player is on
     ld a,[Coord]
     cp TILE_11_CAVE_HOLE
@@ -136755,6 +136867,7 @@ RevealHoleCommon:
    ;db YY,XX,$ID
     db 14,00,$78
     db 14,01,$77
+    db 10,02,$68
 
 TestMap1Blocks:
     INCBIN "maps/devmap1.blk"
