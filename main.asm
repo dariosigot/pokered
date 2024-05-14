@@ -324,6 +324,79 @@ RestoreChangedBlocks:
     ld a,[$d371]
     ret
 
+BackupNearPlayerTiles:
+    ld bc,Tile_A_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_B_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_C_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_D_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_E_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_F_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_G_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_H_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_I_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_J_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_K_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_L_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_M_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_N_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_O_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_P_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_Q_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_R_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_S_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_T_OFFSET
+.ReadAndWrite
+    push hl
+    add hl,bc
+    ld a,[hl]
+    pop hl
+    ld [de],a
+    inc de
+    ret
+
+GetDirectionOffset:
+    ld a,[$c109] ; Direction
+    and a ; D_DOWN
+    jr z,.down
+    cp D_UP
+    jr z,.up
+    cp D_LEFT
+    jr z,.left
+    ld a,COLL_RIGHT
+    ld e,COLL_RIGHT_OFFSET
+    ret
+.down
+    ld a,COLL_DOWN
+    ld e,COLL_DOWN_OFFSET
+    ret
+.up
+    ld a,COLL_UP
+    ld e,COLL_UP_OFFSET
+    ret
+.left
+    ld a,COLL_LEFT
+    ld e,COLL_LEFT_OFFSET
+    ret
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -1570,7 +1643,7 @@ CollisionCheckOnLand: ; 0bd1 (0:0bd1)
     jr nz,Collision
 ; if no sprite collision
 
-    ld de,(%00000001 << 8) + 0 ; TryJumping
+    ld d,%00000001 ; TryJumping
     call CheckExceptionTilePassable
     jr nc,NoCollision
 
@@ -1595,10 +1668,10 @@ CheckExceptionTilePassable: ; Moved in the Bank
 
 ; Free
 
-SECTION "LoadCurrentMapView",ROM0[$0caa]
+SECTION "LoadCurrentMapView",ROM0[$0ca2]
 
 ; this builds a tile map from the tile block map based on the current X/Y coordinates of the player's character
-LoadCurrentMapView: ; 0caa (0:0caa)
+LoadCurrentMapView: ; 0ca2 (0:0ca2)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[$d52b] ; tile data ROM bank
@@ -1686,7 +1759,13 @@ LoadCurrentMapView: ; 0caa (0:0caa)
     pop af
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB ; restore previous ROM bank
-    ret
+
+    ld de,wBackupNearPlayerTiles
+    FuncCoord 8,9 ; tile the player is on
+    ld hl,Coord
+    jp BackupNearPlayerTiles
+
+SECTION "AdvancePlayerSprite",ROM0[$0d27]
 
 AdvancePlayerSprite: ; 0d27 (0:0d27)
     ld a,[$c103] ; delta Y
@@ -2156,7 +2235,7 @@ CollisionCheckOnWater: ; 0fb7 (0:0fb7)
     and d ; check if a sprite is in the direction the player is trying to go
     jr nz,.collision
     
-    ld de,(%00000010 << 8) + 0 ; TryStopSurfing
+    ld d,%00000010 ; TryStopSurfing
     call CheckExceptionTilePassable
     jr nc,.noCollision
 
@@ -5844,17 +5923,7 @@ GetMonsterNames:
 GetTileOffset:
     push hl
     push de
-    FuncCoord 8,9 ; tile the player is on
-    ld hl,Coord
-    call .AddOffset
-    ld a,[wCollissionOffset]
-    call .AddOffset
-    ld a,[hl]
-    pop de
-    pop hl
-    ld d,a
-    ret
-.AddOffset
+    ld hl,wBackupNearPlayerTiles ; tile the player is on
     ld e,a
     ld d,0
     bit 7,a ; is delta negative?
@@ -5862,6 +5931,10 @@ GetTileOffset:
     ld d,$FF
 .done
     add hl,de
+    ld a,[hl]
+    pop de
+    pop hl
+    ld d,a
     ret
 
 ; Free
@@ -21521,9 +21594,9 @@ Func_c5be: ; c5be (3:45be)
     ld [$cfc6],a
     ret
 
-SECTION "Func_c636",ROMX[$4636],BANK[$3]
+SECTION "CheckForBoulderCollisionWithSprites",ROMX[$4636],BANK[$3]
 
-Func_c636: ; c636 (3:4636)
+CheckForBoulderCollisionWithSprites: ; c636 (3:4636)
     ld a,[$d718]
     dec a
     swap a
@@ -22984,43 +23057,49 @@ WriteMovePP:
     dec de
     ret
 
-Func_c60b: ; Moved in the Bank
-;    call Func_c5be
-;    ld hl,$d530
-;    ld a,[hli]
-;    ld h,[hl]
-;    ld l,a
-;.asm_c614
-;    ld a,[hli]
-;    cp $ff
-;    jr z,.asm_c632
-;    cp c
-;    jr nz,.asm_c614
-
-    ld a,[$c109]
-    and a
-    ld e,COLL_DOWN
-    jr z,.done
-    cp D_UP
-    ld e,COLL_UP
-    jr z,.done
-    cp D_LEFT
-    ld e,COLL_LEFT
-    jr z,.done
-    ld e,COLL_RIGHT
-.done
-    ld d,%00001000 ; Boulder Flag
+CheckForCollisionWhenPushingBoulder: ; Moved in the Bank
+    ld d,0 ; No Flag
     call CheckExceptionTilePassable
-    ld a,$ff
-    jr c,.asm_c632
-    ld a,[$d71c]
+    jr c,.fail
+
+    ; Backup Boulder Near Tile
+    call GetDirectionOffset
+    FuncCoord 8,9 ; tile the player is on
+    ld hl,Coord
+    ld d,0
+    bit 7,e ; is delta negative?
+    jr z,.done
+    ld d,$FF
+.done
+    add hl,de
+    ld de,wBackupNearPlayerTiles
+    call BackupNearPlayerTiles
+
+    ; Check Stairs
+    call GetDirectionOffset
+    call GetTileOffset
     cp $15
-    ld a,$ff
-    jr z,.asm_c632
-    call Func_c636
-.asm_c632
+    jr z,.fail
+
+    ld d,%00001000 ; Boulder Flag (Useless)
+    call CheckExceptionTilePassable
+
+    ; Restore Player Near Tile
+    push af
+    ld de,wBackupNearPlayerTiles
+    FuncCoord 8,9 ; tile the player is on
+    ld hl,Coord
+    call BackupNearPlayerTiles
+    pop af
+
+    jr c,.fail
+    call CheckForBoulderCollisionWithSprites
+.end
     ld [$d71c],a
     ret
+.fail
+    ld a,$FF
+    jr .end
 
 SECTION "UseItem_",ROMX[$55c7],BANK[$3]
 
@@ -23592,7 +23671,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld a,[$ff8c]
     and a ; is there a sprite in the way?
     jr nz,.cannotStopSurfing
-    ld de,(%00000100 << 8) + 0 ; CanSurfing
+    ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     jr c,.cannotStopSurfing
     ld hl,$d530 ; pointer to list of passable tiles
@@ -23649,7 +23728,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
 .tryToSurf
     call IsNextTileShoreOrWater
     ret c ; jp c,SurfingAttemptFailed
-    ld de,(%00000100 << 8) + 0 ; CanSurfing
+    ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     ret ; jp c,SurfingAttemptFailed
 .HandleSurfboardTextMessage
@@ -24799,7 +24878,7 @@ FishingInit: ; Moved in the Bank
 .notInBattle
     call IsNextTileShoreOrWater
     ret c
-    ld de,(%00000100 << 8) + 0 ; CanSurfing
+    ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     ret c
     ld a,[$d700]
@@ -26671,7 +26750,7 @@ TryPushingBoulder: ; f225 (3:7225)
     and $f0
     ret z
     ld a,$5a
-    call Predef ; indirect jump to Func_c60b (c60b (3:460b))
+    call Predef ; indirect jump to CheckForCollisionWhenPushingBoulder (c60b (3:460b))
     ld a,[$d71c]
     and a
     jp nz,Func_f2dd
@@ -37646,22 +37725,15 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     ; Input
     ld a,d
     ld [wCollisionFlag],a
-    ld a,e
-    ld [wCollissionOffset],a
 
     ; Debug
     ld a,$FF
     ld [wCollisionRule],a
 
 ; get the tile in front of the player (or boulder)
-    ld a,[wCollisionFlag]
-    bit 3,a ; Boulder Flag
-    ld a,$35 ; Func_c586
-    jr z,.noBoulder
-    ld a,$59 ; Func_c5be
-.noBoulder
-    call Predef
-.TileLoaded
+    call GetDirectionOffset
+    call GetTileOffset
+    ld [$cfc6],a
 
     ; Check just Jumping
     ld a,[$d736]
@@ -74769,7 +74841,7 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     db $1E ; uses wrong bank number
     dw Func_70510
     dbw BANK(Func_c5be),Func_c5be
-    dbw BANK(Func_c60b),Func_c60b
+    dbw BANK(CheckForCollisionWhenPushingBoulder),CheckForCollisionWhenPushingBoulder
     dbw BANK(Func_cd99),Func_cd99
     dbw BANK(PickupItem),PickupItem
     dbw BANK(PrintMoveType),PrintMoveType
@@ -130230,7 +130302,7 @@ SelectInOverWorld:
     jp z,.noFloat
     call IsNextTileShoreOrWater
     jp c,.noFloat
-    ld de,(%00000100 << 8) + 0 ; CanSurfing
+    ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     jp c,.noFloat
     ld b,$04 ; FLOAT
@@ -130306,7 +130378,7 @@ SelectInOverWorld:
     jp z,.noFishing
     call IsNextTileShoreOrWater ; unsets carry if player is facing water or shore
     jr c,.noFishing
-    ld de,(%00000100 << 8) + 0 ; CanSurfing
+    ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     jr c,.noFishing
     ;are rods in the bag?
@@ -136819,31 +136891,12 @@ TestMap1Script:
     db $FF
 
 RevealHoleA:
-    call .GetDirectionOffset
+    call GetDirectionOffset
     call GetTileOffset
     cp TILE_11_CAVE_HOLE
     ret z
     ld a,[$cd3f]
     jr RevealHoleCommon
-.GetDirectionOffset
-    ld a,[$c109] ; Direction
-    and a ; D_DOWN
-    jr z,.down
-    cp D_UP
-    jr z,.up
-    cp D_LEFT
-    jr z,.left
-    ld a,COLL_RIGHT
-    ret
-.down
-    ld a,COLL_DOWN
-    ret
-.up
-    ld a,COLL_UP
-    ret
-.left
-    ld a,COLL_LEFT
-    ret
 
 RevealHoleCoord:
     ld a,[wWhichTrade]

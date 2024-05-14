@@ -1116,6 +1116,9 @@ ENDU
 
 wChangedBlocksEnd::
 
+wBackupNearPlayerTiles:
+    ds 20
+
 ; some free bytes
 
 SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]
@@ -1635,8 +1638,6 @@ NEXTU
 wCollisionRule : ; def0
     ds 1
 wCollisionFlag: ; def1
-    ds 1
-wCollissionOffset: ; def2
     ds 1
 
 NEXTU

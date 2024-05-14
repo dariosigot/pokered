@@ -7,26 +7,47 @@ EX_FAIL   EQU %10000000
 EX_B      EQU %00000010
 EX_NOBIKE EQU %00001000
 
-Tile_A EQU (+0)+(+0)*20
-Tile_B EQU (+1)+(+0)*20
-Tile_C EQU (+0)+(-1)*20
-Tile_D EQU (+1)+(-1)*20
-Tile_E EQU (-2)+(+0)*20
-Tile_F EQU (-1)+(+0)*20
-Tile_G EQU (-2)+(-1)*20
-Tile_H EQU (-1)+(-1)*20
-Tile_I EQU (+2)+(+0)*20
-Tile_J EQU (+3)+(+0)*20
-Tile_K EQU (+2)+(-1)*20
-Tile_L EQU (+3)+(-1)*20
-Tile_M EQU (+0)+(-2)*20
-Tile_N EQU (+1)+(-2)*20
-Tile_O EQU (+0)+(-3)*20
-Tile_P EQU (+1)+(-3)*20
-Tile_Q EQU (+0)+(+2)*20
-Tile_R EQU (+1)+(+2)*20
-Tile_S EQU (+0)+(+1)*20
-Tile_T EQU (+1)+(+1)*20
+Tile_A_OFFSET EQU (+0)+(+0)*20
+Tile_B_OFFSET EQU (+1)+(+0)*20
+Tile_C_OFFSET EQU (+0)+(-1)*20
+Tile_D_OFFSET EQU (+1)+(-1)*20
+Tile_E_OFFSET EQU (-2)+(+0)*20
+Tile_F_OFFSET EQU (-1)+(+0)*20
+Tile_G_OFFSET EQU (-2)+(-1)*20
+Tile_H_OFFSET EQU (-1)+(-1)*20
+Tile_I_OFFSET EQU (+2)+(+0)*20
+Tile_J_OFFSET EQU (+3)+(+0)*20
+Tile_K_OFFSET EQU (+2)+(-1)*20
+Tile_L_OFFSET EQU (+3)+(-1)*20
+Tile_M_OFFSET EQU (+0)+(-2)*20
+Tile_N_OFFSET EQU (+1)+(-2)*20
+Tile_O_OFFSET EQU (+0)+(-3)*20
+Tile_P_OFFSET EQU (+1)+(-3)*20
+Tile_Q_OFFSET EQU (+0)+(+2)*20
+Tile_R_OFFSET EQU (+1)+(+2)*20
+Tile_S_OFFSET EQU (+0)+(+1)*20
+Tile_T_OFFSET EQU (+1)+(+1)*20
+
+Tile_A EQU 00
+Tile_B EQU 01
+Tile_C EQU 02
+Tile_D EQU 03
+Tile_E EQU 04
+Tile_F EQU 05
+Tile_G EQU 06
+Tile_H EQU 07
+Tile_I EQU 08
+Tile_J EQU 09
+Tile_K EQU 10
+Tile_L EQU 11
+Tile_M EQU 12
+Tile_N EQU 13
+Tile_O EQU 14
+Tile_P EQU 15
+Tile_Q EQU 16
+Tile_R EQU 17
+Tile_S EQU 18
+Tile_T EQU 19
 
 ;     O P
 ;     M N
@@ -34,6 +55,11 @@ Tile_T EQU (+1)+(+1)*20
 ; E F A B I J
 ;     S T
 ;     Q R
+
+COLL_DOWN_OFFSET  EQU Tile_Q_OFFSET
+COLL_UP_OFFSET    EQU Tile_M_OFFSET
+COLL_LEFT_OFFSET  EQU Tile_E_OFFSET
+COLL_RIGHT_OFFSET EQU Tile_I_OFFSET
 
 COLL_DOWN  EQU Tile_Q
 COLL_UP    EQU Tile_M
