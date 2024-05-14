@@ -1632,9 +1632,11 @@ wEXPBarKeepFullFlag:
 
 NEXTU
 
-wJumpingTile : ; def0
+wCollisionRule : ; def0
     ds 1
-wForceWTWBit0: ; def1 ; Bit 0
+wCollisionFlag: ; def1
+    ds 1
+wCollissionOffset: ; def2
     ds 1
 
 NEXTU
