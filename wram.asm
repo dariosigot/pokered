@@ -1116,6 +1116,9 @@ ENDU
 
 wChangedBlocksEnd::
 
+wUselessD45F:
+    ds 1
+
 wBackupNearPlayerTiles:
     ds 20
 

@@ -21546,7 +21546,7 @@ Func_c589: ; c589 (3:4589)
     ld [$cfc6],a
     ret
 
-Func_c5be: ; c5be (3:45be)
+GetTileTwoStepsInFrontOfPlayer: ; c5be (3:45be)
     xor a
     ld [$FF00+$db],a
     ld hl,W_YCOORD ; $d361
@@ -22861,7 +22861,7 @@ MapSongBanksNew:
 MapHSPointersNew:
     dw MapHS_PortRoyal ; PORT_ROYAL
     dw MapHSXX         ; ROUTE_D1
-    dw MapHSXX         ; TEST_MAP_1
+    dw MapHS_TestMap1  ; TEST_MAP_1
     dw MapHSXX         ; PORT_ROYAL_POKECENTER
     dw MapHSXX         ; PORT_ROYAL_MART
     dw MapHSXX ; $05
@@ -22933,6 +22933,11 @@ MapHSPointersNew:
 
 MapHS_PortRoyal:
     db PORT_ROYAL,2,Show
+MapHS_TestMap1:
+    db TEST_MAP_1,1,Show
+    db TEST_MAP_1,2,Show
+    db TEST_MAP_1,3,Show
+    db TEST_MAP_1,4,Show
 
     db $FF,$01,Show
 
@@ -23058,9 +23063,18 @@ WriteMovePP:
     ret
 
 CheckForCollisionWhenPushingBoulder: ; Moved in the Bank
+
+    ; Check just Jumping
+    ld a,[$d736]
+    bit 6,a
+    jp nz,.fail
+
+    ; Check Base Player Collision
     ld d,0 ; No Flag
     call CheckExceptionTilePassable
     jr c,.fail
+
+    call GetTileTwoStepsInFrontOfPlayer
 
     ; Backup Boulder Near Tile
     call GetDirectionOffset
@@ -23079,6 +23093,10 @@ CheckForCollisionWhenPushingBoulder: ; Moved in the Bank
     call GetDirectionOffset
     call GetTileOffset
     cp $15
+    jr z,.fail
+    cp $42
+    jr z,.fail
+    cp $43
     jr z,.fail
 
     ld d,%00001000 ; Boulder Flag (Useless)
@@ -38080,24 +38098,24 @@ CollissionRule_Tileset00:
 ; GO IN
     db D_UP    , Tile_M , TILE_00_J_DOWN    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1D
     db D_UP    , Tile_M , TILE_00_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1E
-    db D_UP    , Tile_N , TILE_00_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
-    db D_RIGHT , Tile_I , TILE_00_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
-    db D_RIGHT , Tile_I , TILE_00_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
-    db D_LEFT  , Tile_F , TILE_00_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
-    db D_LEFT  , Tile_H , TILE_00_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
-    db D_LEFT  , Tile_H , TILE_00_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
-    db D_DOWN  , Tile_S , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $27
-    db D_DOWN  , Tile_T , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $28
+    db D_UP    , Tile_N , TILE_00_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1F
+    db D_RIGHT , Tile_I , TILE_00_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $20
+    db D_RIGHT , Tile_I , TILE_00_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
+    db D_LEFT  , Tile_F , TILE_00_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
+    db D_LEFT  , Tile_H , TILE_00_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
+    db D_LEFT  , Tile_H , TILE_00_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
+    db D_DOWN  , Tile_S , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
+    db D_DOWN  , Tile_T , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
 
 ; WALK NEAR JUMP BORDER
-    db D_LEFT  , Tile_E , TILE_00_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
-    db D_UP    , Tile_M , TILE_00_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
-    db D_DOWN  , Tile_Q , TILE_00_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
-    db D_DOWN  , Tile_Q , TILE_00_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
-    db D_DOWN  , Tile_Q , TILE_00_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2D
-    db D_LEFT  , Tile_E , TILE_00_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2E
-    db D_LEFT  , Tile_E , TILE_00_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2F
-    db D_RIGHT , Tile_I , TILE_00_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $30
+    db D_LEFT  , Tile_E , TILE_00_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
+    db D_UP    , Tile_M , TILE_00_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
+    db D_DOWN  , Tile_Q , TILE_00_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
+    db D_DOWN  , Tile_Q , TILE_00_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
+    db D_DOWN  , Tile_Q , TILE_00_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
+    db D_LEFT  , Tile_E , TILE_00_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
+    db D_LEFT  , Tile_E , TILE_00_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2D
+    db D_RIGHT , Tile_I , TILE_00_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2E
 
 ; End
     db $FF
@@ -38144,24 +38162,24 @@ CollissionRule_Tileset11:
 ; GO IN
     db D_UP    , Tile_M , TILE_11_J_DOWN    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1D
     db D_UP    , Tile_M , TILE_11_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1E
-    db D_UP    , Tile_N , TILE_11_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
-    db D_RIGHT , Tile_I , TILE_11_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
-    db D_RIGHT , Tile_I , TILE_11_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
-    db D_LEFT  , Tile_F , TILE_11_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
-    db D_LEFT  , Tile_H , TILE_11_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
-    db D_LEFT  , Tile_H , TILE_11_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
-    db D_DOWN  , Tile_S , TILE_11_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $27
-    db D_DOWN  , Tile_T , TILE_11_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $28
+    db D_UP    , Tile_N , TILE_11_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1F
+    db D_RIGHT , Tile_I , TILE_11_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $20
+    db D_RIGHT , Tile_I , TILE_11_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
+    db D_LEFT  , Tile_F , TILE_11_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
+    db D_LEFT  , Tile_H , TILE_11_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
+    db D_LEFT  , Tile_H , TILE_11_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
+    db D_DOWN  , Tile_S , TILE_11_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
+    db D_DOWN  , Tile_T , TILE_11_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
 
 ; WALK NEAR JUMP BORDER
-    db D_LEFT  , Tile_E , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
-    db D_UP    , Tile_M , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
-    db D_DOWN  , Tile_Q , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
-    db D_DOWN  , Tile_Q , TILE_11_BTM_LFT   , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
-    db D_DOWN  , Tile_Q , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2D
-    db D_LEFT  , Tile_E , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2E
-    db D_LEFT  , Tile_E , TILE_11_BTM_LFT   , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2F
-    db D_RIGHT , Tile_I , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $30
+    db D_LEFT  , Tile_E , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
+    db D_UP    , Tile_M , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
+    db D_DOWN  , Tile_Q , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
+    db D_DOWN  , Tile_Q , TILE_11_BTM_LFT   , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
+    db D_DOWN  , Tile_Q , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
+    db D_LEFT  , Tile_E , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
+    db D_LEFT  , Tile_E , TILE_11_BTM_LFT   , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2D
+    db D_RIGHT , Tile_I , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2E
 
 ; CAVE HOLE
     db D_DOWN  , Tile_Q , TILE_11_CAVE_HOLE , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_DOWN  ; $31
@@ -38214,24 +38232,24 @@ CollissionRule_Tileset03:
 ; GO IN
     db D_UP    , Tile_M , TILE_03_J_DOWN    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1D
     db D_UP    , Tile_M , TILE_03_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1E
-    db D_UP    , Tile_N , TILE_03_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
-    db D_RIGHT , Tile_I , TILE_03_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
-    db D_RIGHT , Tile_I , TILE_03_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
-    db D_LEFT  , Tile_F , TILE_03_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
-    db D_LEFT  , Tile_H , TILE_03_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
-    db D_LEFT  , Tile_H , TILE_03_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
-    db D_DOWN  , Tile_S , TILE_03_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $27
-    db D_DOWN  , Tile_T , TILE_03_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $28
+    db D_UP    , Tile_N , TILE_03_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1F
+    db D_RIGHT , Tile_I , TILE_03_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $20
+    db D_RIGHT , Tile_I , TILE_03_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
+    db D_LEFT  , Tile_F , TILE_03_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
+    db D_LEFT  , Tile_H , TILE_03_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
+    db D_LEFT  , Tile_H , TILE_03_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
+    db D_DOWN  , Tile_S , TILE_03_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
+    db D_DOWN  , Tile_T , TILE_03_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
 
 ; WALK NEAR JUMP BORDER
-    db D_LEFT  , Tile_E , TILE_03_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
-    db D_UP    , Tile_M , TILE_03_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
-    db D_DOWN  , Tile_Q , TILE_03_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
-    db D_DOWN  , Tile_Q , TILE_03_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
-    db D_DOWN  , Tile_Q , TILE_03_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2D
-    db D_LEFT  , Tile_E , TILE_03_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2E
-    db D_LEFT  , Tile_E , TILE_03_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2F
-    db D_RIGHT , Tile_I , TILE_03_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $30
+    db D_LEFT  , Tile_E , TILE_03_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
+    db D_UP    , Tile_M , TILE_03_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
+    db D_DOWN  , Tile_Q , TILE_03_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
+    db D_DOWN  , Tile_Q , TILE_03_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
+    db D_DOWN  , Tile_Q , TILE_03_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
+    db D_LEFT  , Tile_E , TILE_03_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
+    db D_LEFT  , Tile_E , TILE_03_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2D
+    db D_RIGHT , Tile_I , TILE_03_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2E
 
 ; End
     db $FF
@@ -74840,7 +74858,7 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     dw _DoFlyOrTeleportAwayGraphics
     db $1E ; uses wrong bank number
     dw Func_70510
-    dbw BANK(Func_c5be),Func_c5be
+    dbw BANK(GetTileTwoStepsInFrontOfPlayer),GetTileTwoStepsInFrontOfPlayer
     dbw BANK(CheckForCollisionWhenPushingBoulder),CheckForCollisionWhenPushingBoulder
     dbw BANK(Func_cd99),Func_cd99
     dbw BANK(PickupItem),PickupItem
@@ -136847,27 +136865,36 @@ TestMap1Object:
 
     db 0 ; sign
 
-    db 0 ; people
+    db 4 ; people
+    db SPRITE_BOULDER,04 + 4,19 + 4,$ff,$10,1 ; person
+    db SPRITE_BOULDER,20 + 4,01 + 4,$ff,$10,2 ; person
+    db SPRITE_BOULDER,23 + 4,01 + 4,$ff,$10,3 ; person
+    db SPRITE_BOULDER,27 + 4,06 + 4,$ff,$10,4 ; person
 
     ; warp-to
     EVENT_DISP TEST_MAP_1_WIDTH,29,06
     EVENT_DISP TEST_MAP_1_WIDTH,29,07
 
 TestMap1TextPointers:
-    db "@"
+    dw BoulderText
+    dw BoulderText
+    dw BoulderText
+    dw BoulderText
 
 TestMap1Script:
+    call EnableAutoTextBoxDrawing
     ld a,[$d736]
-    bit 6,a
+    bit 6,a ; jump hole
     ret nz
     ld hl,.Coord
     call ArePlayerCoordsInArray
-    ret nc
+    jr nc,.CheckBoulder
+
+    ; Check Player
     FuncCoord 8,9 ; tile the player is on
     ld a,[Coord]
     cp TILE_11_CAVE_HOLE
-    jr z,.FallInHole
-    call RevealHoleCoord
+    call nz,RevealHoleCoord
 .FallInHole
     ; Start Warp
     ld a,1 ; Warp ID
@@ -136881,6 +136908,7 @@ TestMap1Script:
     xor a
     ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
     ret
+
 .Coord
     db 28,01
     db 28,02
@@ -136889,6 +136917,46 @@ TestMap1Script:
     db 23,03
     db 28,25
     db $FF
+
+    ; Check Boulder
+.CheckBoulder
+    ld hl,wFlags_0xcd60
+    bit 7,[hl]
+    res 7,[hl]
+    ret z
+    ld hl,.Coord
+    call CheckBoulderCoords
+    ret nc
+
+    ; Reveal Hidden Hole Under Boulder?
+    ld a,[$cd3d] ; Get Coord Occurrency
+    ld [wWhichTrade],a
+    ld a,$59
+    call Predef ; GetTileTwoStepsInFrontOfPlayer
+    ld a,[$d71c] ; Tile Hole or Hidden Hole
+    cp TILE_11_CAVE_HOLE
+    jr z,.skipRevealHole
+    call Delay3
+    call RevealHoleCoord
+    call Delay3
+.skipRevealHole
+
+    ; Hide Boulder
+    ld a,[$ff00+$8c]
+    dec a
+    add 1 ; Hidden Object of this Map start at "1"
+    ld [$cc4d],a
+    ld a,$11
+    call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
+
+    ; Remove Hidden Boulder from Screen
+    ld hl,$c215 ; first sprite position
+    ld a,[$ff00+$8c]
+    dec a
+    ld bc,16
+    call AddNTimes
+    ld [hl],$A0
+    ret
 
 RevealHoleA:
     call GetDirectionOffset
