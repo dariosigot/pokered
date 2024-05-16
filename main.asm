@@ -11628,7 +11628,7 @@ UpdateNonPlayerSprite: ; 4c5c (1:4c5c)
 .unequal
     jp Func_4ed1
 
-Func_4c70: ; 4c70 (1:4c70)
+_DetectCollisionBetweenSprites: ; 4c70 (1:4c70)
     nop
     ld h,$c1
     ld a,[H_CURRENTSPRITEOFFSET]
@@ -11938,7 +11938,7 @@ UpdatePlayerSprite: ; 4e31 (1:4e31)
     ld [$c102],a
     ret
 .asm_4e50
-    call Func_4c70
+    call DetectCollisionBetweenSprites
     ld h,$c1
     ld a,[wWalkCounter] ; $cfc5
     and a
@@ -12526,7 +12526,7 @@ CanWalkOntoTile: ; 516e (1:516e)
     jr nc,.impassable ; don't walk off screen
     push de
     push bc
-    call Func_4c70
+    call DetectCollisionBetweenSprites
     pop bc
     pop de
     ld h,$c1
@@ -18583,11 +18583,23 @@ PortRoyalFlyWarp:
     FLYWARP_DATA PORT_ROYAL_WIDTH,6,5
 
 DungeonWarpListNew:
-    db ROUTE_D1,$01
+    db TEST_MAP_2,01
+    db TEST_MAP_2,02
+    db TEST_MAP_2,03
+    db TEST_MAP_2,04
+    db TEST_MAP_2,05
+    db TEST_MAP_2,06
+    db TEST_MAP_2,07
     db $FF
 
 DungeonWarpDataNew:
-    FLYWARP_DATA ROUTE_D1_WIDTH,16,34
+    FLYWARP_DATA TEST_MAP_2_WIDTH,28,01
+    FLYWARP_DATA TEST_MAP_2_WIDTH,28,02
+    FLYWARP_DATA TEST_MAP_2_WIDTH,21,04
+    FLYWARP_DATA TEST_MAP_2_WIDTH,02,29
+    FLYWARP_DATA TEST_MAP_2_WIDTH,25,02
+    FLYWARP_DATA TEST_MAP_2_WIDTH,23,03
+    FLYWARP_DATA TEST_MAP_2_WIDTH,28,25
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $01)
@@ -18633,6 +18645,17 @@ SetLastBlackoutMap:
     ret
 
 ; ───────────────────────────────────────
+
+DetectCollisionBetweenSprites: ; Restore Original Player Y (Not consider Jump) 
+    ld hl,$c104
+    ld a,[hl]
+    push af
+    ld a,$3C
+    ld [hl],a
+    call _DetectCollisionBetweenSprites
+    pop af
+    ld [$c104],a
+    ret
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -21103,10 +21126,10 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(EmptyMap_h) ; unused
     db BANK(BattleCenterM_h)
     db BANK(TradeCenterM_h)
-    db BANK(TestMap1_h) ; devmap1
-    db BANK(RouteD1_h)  ; devmap2
-    db BANK(PortRoyal_h) ; devmap3
-    db BANK(SwapMap_h) ; devmap4
+    db BANK(TestMap1_h) ; devmap
+    db BANK(TestMap2_h) ; devmap
+    db BANK(RouteD1_h)  ; devmap
+    db BANK(PortRoyal_h) ; devmap
     db BANK(Lorelei_h)
     db BANK(Bruno_h)
     db BANK(Agatha_h)
@@ -22718,9 +22741,9 @@ MapHeaderBanksNew:
     db BANK(PortRoyal_h)            ; PORT_ROYAL
     db BANK(RouteD1_h)              ; ROUTE_D1
     db BANK(TestMap1_h)             ; TEST_MAP_1
+    db BANK(TestMap2_h)             ; TEST_MAP_2
     db BANK(PortRoyalCenter_h)      ; PORT_ROYAL_POKECENTER
     db BANK(PortRoyalMart_h)        ; PORT_ROYAL_MART
-    db BANK(EmptyMap_h) ; $05
     db BANK(EmptyMap_h) ; $06
     db BANK(EmptyMap_h) ; $07
     db BANK(EmptyMap_h) ; $08
@@ -22790,9 +22813,9 @@ MapSongBanksNew:
     db (Music_Cities1       -$4000)/3 , BANK(Music_Cities1)       ; PORT_ROYAL
     db (Music_Routes1       -$4000)/3 , BANK(Music_Routes1)       ; ROUTE_D1
     db (Music_Dungeon3      -$4000)/3 , BANK(Music_Dungeon3)      ; TEST_MAP_1
+    db (Music_Dungeon3      -$4000)/3 , BANK(Music_Dungeon3)      ; TEST_MAP_2
     db (Music_Pokecenter    -$4000)/3 , BANK(Music_Pokecenter)    ; PORT_ROYAL_POKECENTER
     db (Music_Pokecenter    -$4000)/3 , BANK(Music_Pokecenter)    ; PORT_ROYAL_MART
-    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $05
     db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $06
     db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $07
     db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $08
@@ -22862,9 +22885,9 @@ MapHSPointersNew:
     dw MapHS_PortRoyal ; PORT_ROYAL
     dw MapHSXX         ; ROUTE_D1
     dw MapHS_TestMap1  ; TEST_MAP_1
+    dw MapHSXX         ; TEST_MAP_2
     dw MapHSXX         ; PORT_ROYAL_POKECENTER
     dw MapHSXX         ; PORT_ROYAL_MART
-    dw MapHSXX ; $05
     dw MapHSXX ; $06
     dw MapHSXX ; $07
     dw MapHSXX ; $08
@@ -22938,6 +22961,8 @@ MapHS_TestMap1:
     db TEST_MAP_1,2,Show
     db TEST_MAP_1,3,Show
     db TEST_MAP_1,4,Show
+    db TEST_MAP_1,5,Show
+    db TEST_MAP_1,6,Show
 
     db $FF,$01,Show
 
@@ -23089,17 +23114,7 @@ CheckForCollisionWhenPushingBoulder: ; Moved in the Bank
     ld de,wBackupNearPlayerTiles
     call BackupNearPlayerTiles
 
-    ; Check Stairs
-    call GetDirectionOffset
-    call GetTileOffset
-    cp $15
-    jr z,.fail
-    cp $42
-    jr z,.fail
-    cp $43
-    jr z,.fail
-
-    ld d,%00001000 ; Boulder Flag (Useless)
+    ld d,%00001000 ; Boulder Flag
     call CheckExceptionTilePassable
 
     ; Restore Player Near Tile
@@ -37765,7 +37780,7 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
 .RuleLoop
     ld a,[hli]
     cp $FF
-    jr z,.end
+    jp z,.end
     cp d
     jr z,.RuleFound
     inc hl
@@ -37818,14 +37833,27 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     ld [$cfc6],a
 .skipSimulation
 
+    ; Check Try Pushing Boulder
+    ld a,[wCollisionFlag]
+    bit 3,a ; Try Pushing Boulder
+    jr z,.noBoulder
+    inc hl
+    ld a,[hld]
+    bit 4,a ; EX_BOULDER
+    jr z,.noBoulder
+    ld a,$FF
+    ld [$cfc6],a ; Next Tile Simulation
+    jr .end
+.noBoulder
+
     ; Check Float
     ld a,[$d700]
     cp $2
     jr z,.end
 
-    ; Check TryJumping Flag
+    ; Check Try Jumping
     ld a,[wCollisionFlag]
-    bit 0,a
+    bit 0,a ; Try Jumping
     jr z,.end
 
     ; Collision Tile After Jump to Check
@@ -37868,12 +37896,12 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     ld a,[$cfc6] ; $FF = Not Passable
     ld d,a
 
-    ; Check TryStopSurfing Flag
+    ; Check Try Stop Surfing
     ld a,[wCollisionFlag]
-    bit 1,a
+    bit 1,a ; Try Stop Surfing
     jr nz,CheckWaterTilePassable
-    ; Check CanSurfing Flag
-    bit 2,a
+    ; Check Can Surfing
+    bit 2,a ; Can Surfing
     jr nz,CheckWaterTilePassable
 
     ; Check Float
@@ -37920,9 +37948,9 @@ CheckWaterTilePassable:
     ; if it is the boarding platform tile,stop surfing
     ; fall through
 .stopSurfing
-    ; Check TryStopSurfing Flag
+    ; Check Try Stop Surfing
     ld a,[wCollisionFlag]
-    bit 1,a
+    bit 1,a ; Try Stop Surfing
     jr z,.noCollision
     xor a
     ld [$d700],a
@@ -38108,14 +38136,12 @@ CollissionRule_Tileset00:
     db D_DOWN  , Tile_T , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
 
 ; WALK NEAR JUMP BORDER
-    db D_LEFT  , Tile_E , TILE_00_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
-    db D_UP    , Tile_M , TILE_00_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
-    db D_DOWN  , Tile_Q , TILE_00_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
-    db D_DOWN  , Tile_Q , TILE_00_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
-    db D_DOWN  , Tile_Q , TILE_00_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
-    db D_LEFT  , Tile_E , TILE_00_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
-    db D_LEFT  , Tile_E , TILE_00_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2D
-    db D_RIGHT , Tile_I , TILE_00_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2E
+    db D_LEFT  , Tile_E , TILE_00_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
+    db D_DOWN  , Tile_Q , TILE_00_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
+    db D_UP    , Tile_M , TILE_00_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
+    db D_DOWN  , Tile_S , TILE_00_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
+    db D_LEFT  , Tile_F , TILE_00_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
+    db D_RIGHT , Tile_I , TILE_00_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
 
 ; End
     db $FF
@@ -38173,19 +38199,29 @@ CollissionRule_Tileset11:
 
 ; WALK NEAR JUMP BORDER
     db D_LEFT  , Tile_E , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
-    db D_UP    , Tile_M , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
-    db D_DOWN  , Tile_Q , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
-    db D_DOWN  , Tile_Q , TILE_11_BTM_LFT   , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
-    db D_DOWN  , Tile_Q , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
-    db D_LEFT  , Tile_E , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
-    db D_LEFT  , Tile_E , TILE_11_BTM_LFT   , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2D
-    db D_RIGHT , Tile_I , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2E
+    db D_DOWN  , Tile_Q , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
+    db D_UP    , Tile_M , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
+    db D_DOWN  , Tile_S , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
+    db D_LEFT  , Tile_F , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
+    db D_RIGHT , Tile_I , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
 
 ; CAVE HOLE
-    db D_DOWN  , Tile_Q , TILE_11_CAVE_HOLE , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_DOWN  ; $31
-    db D_LEFT  , Tile_E , TILE_11_CAVE_HOLE , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_LEFT  ; $32
-    db D_RIGHT , Tile_J , TILE_11_CAVE_HOLE , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_RIGHT ; $33
-    db D_UP    , Tile_M , TILE_11_CAVE_HOLE , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_UP    ; $34
+    db D_DOWN  , Tile_Q , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_DOWN  ; $2D
+    db D_UP    , Tile_M , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_UP    ; $2E
+    db D_LEFT  , Tile_E , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_LEFT  ; $2F
+    db D_RIGHT , Tile_I , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_RIGHT ; $30
+
+; BOULDER
+    db D_DOWN  , Tile_S , TILE_11_UPP_CTR   , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $31
+    db D_UP    , Tile_M , TILE_11_STRS_HRZ  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $32
+    db D_LEFT  , Tile_F , TILE_11_STRS_VRT  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $33
+    db D_LEFT  , Tile_F , TILE_11_J_RIGHT   , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $34
+    db D_LEFT  , Tile_B , TILE_11_J_RIGHT   , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $35
+    db D_RIGHT , Tile_K , TILE_11_STRS_VRT  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $36
+    db D_RIGHT , Tile_K , TILE_11_J_LEFT    , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $37
+    db D_RIGHT , Tile_C , TILE_11_J_LEFT    , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $38
+    db D_UP    , Tile_M , TILE_11_STRS_STD  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $39
+    db D_UP    , Tile_A , TILE_11_STRS_STD  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $3A
 
 ; End
     db $FF
@@ -38242,34 +38278,32 @@ CollissionRule_Tileset03:
     db D_DOWN  , Tile_T , TILE_03_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
 
 ; WALK NEAR JUMP BORDER
-    db D_LEFT  , Tile_E , TILE_03_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
-    db D_UP    , Tile_M , TILE_03_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
-    db D_DOWN  , Tile_Q , TILE_03_J_LEFT    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
-    db D_DOWN  , Tile_Q , TILE_03_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
-    db D_DOWN  , Tile_Q , TILE_03_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
-    db D_LEFT  , Tile_E , TILE_03_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
-    db D_LEFT  , Tile_E , TILE_03_BTM_LFT   , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2D
-    db D_RIGHT , Tile_I , TILE_03_J_DOWN    , TILE_00_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2E
+    db D_LEFT  , Tile_E , TILE_03_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
+    db D_DOWN  , Tile_Q , TILE_03_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
+    db D_UP    , Tile_M , TILE_03_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
+    db D_DOWN  , Tile_S , TILE_03_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
+    db D_LEFT  , Tile_F , TILE_03_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
+    db D_RIGHT , Tile_I , TILE_03_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
 
 ; End
     db $FF
 
 CheckJumpExceptionFlag:
 
-    ; Check Force Fail
-    bit 7,[hl]
+    ; Check Force Fail Flag
+    bit 7,[hl] ; EX_FAIL
     jr nz,.fail
 
-    ; Check Bike
-    bit 3,[hl]
+    ; Check No Bike Flag
+    bit 3,[hl] ; EX_NOBIKE
     jr z,.skipBikeCheck
     ld a,[$d700] ; 1 = bike
     dec a
     jr z,.fail
 .skipBikeCheck
 
-    ; Check B pressed
-    bit 1,[hl]
+    ; Check B pressed Flag
+    bit 1,[hl] ; EX_B
     jr z,.skipBCheck
     ld a,[H_CURRENTPRESSEDBUTTONS]
     bit 1,a
@@ -70048,6 +70082,8 @@ TestMap1Objects:
     dbw BANK(RevealHoleA),RevealHoleA
     db 21,04,$d0 ; XXX,y,x
     dbw BANK(RevealHoleA),RevealHoleA
+    db 02,29,$d0 ; XXX,y,x
+    dbw BANK(RevealHoleA),RevealHoleA
     db $FF
 
 ; ───────────────────────────────────────
@@ -100550,7 +100586,7 @@ ExternalMapEntriesNew:
     EMAP 09,14,RouteD1Name
 
 InternalMapEntriesNew:
-    IMAP 1 + TEST_MAP_1            , 09,14,RouteD1Name
+    IMAP 1 + TEST_MAP_2            , 09,14,TestMapName
     IMAP 1 + PORT_ROYAL_MART       , 07,14,PortRoyalName
     IMAP 1 + SWAP_MAP              , 09,14,RouteD1Name
     db $FF
@@ -100561,9 +100597,12 @@ PortRoyalName:
     db "PORT ROYAL@"
 RouteD1Name:
     db "ROUTE D1@"
+TestMapName:
+    db "TEST CAVE@"
 
 MapIDList_70a3fNew:
     db TEST_MAP_1
+    db TEST_MAP_2
     db $FF
 
 MapIDList_70a44New:
@@ -133817,9 +133856,9 @@ WildDataPointersNew:
     dw NoMons        ; PORT_ROYAL
     dw RouteD1Mons   ; ROUTE_D1
     dw TestMap1Mons  ; TEST_MAP_1
+    dw NoMons        ; TEST_MAP_2
     dw NoMons        ; PORT_ROYAL_POKECENTER
     dw NoMons        ; PORT_ROYAL_MART
-    dw NoMons ; $05
     dw NoMons ; $06
     dw NoMons ; $07
     dw NoMons ; $08
@@ -136420,10 +136459,10 @@ MapHeaderPointers:
     dw EmptyMap_h ; unused
     dw BattleCenterM_h
     dw TradeCenterM_h
-    dw TestMap1_h ; devmap1
-    dw RouteD1_h  ; devmap2
-    dw PortRoyal_h ; devmap3
-    dw SwapMap_h ; devmap4
+    dw TestMap1_h ; devmap
+    dw TestMap2_h ; devmap
+    dw RouteD1_h  ; devmap
+    dw PortRoyal_h ; devmap
     dw Lorelei_h
     dw Bruno_h
     dw Agatha_h ;247
@@ -136436,9 +136475,9 @@ MapHeaderPointersNew:
     dw PortRoyal_h           ; PORT_ROYAL
     dw RouteD1_h             ; ROUTE_D1
     dw TestMap1_h            ; TEST_MAP_1
+    dw TestMap2_h            ; TEST_MAP_2
     dw PortRoyalCenter_h     ; PORT_ROYAL_POKECENTER
     dw PortRoyalMart_h       ; PORT_ROYAL_MART
-    dw EmptyMap_h ; $05
     dw EmptyMap_h ; $06
     dw EmptyMap_h ; $07
     dw EmptyMap_h ; $08
@@ -136859,23 +136898,29 @@ TestMap1_h:
 TestMap1Object:
     db $3 ; border tile
 
-    db 2 ; warp
+    db 3 ; warp
     db 29,06,0,$FF
     db 29,07,0,$FF
+    db 01,01,0,TEST_MAP_2
 
     db 0 ; sign
 
-    db 4 ; people
+    db 6 ; people
     db SPRITE_BOULDER,04 + 4,19 + 4,$ff,$10,1 ; person
-    db SPRITE_BOULDER,20 + 4,01 + 4,$ff,$10,2 ; person
+    db SPRITE_BOULDER,17 + 4,04 + 4,$ff,$10,2 ; person
     db SPRITE_BOULDER,23 + 4,01 + 4,$ff,$10,3 ; person
     db SPRITE_BOULDER,27 + 4,06 + 4,$ff,$10,4 ; person
+    db SPRITE_BOULDER,01 + 4,27 + 4,$ff,$10,5 ; person
+    db SPRITE_BOULDER,06 + 4,06 + 4,$ff,$10,6 ; person
 
     ; warp-to
     EVENT_DISP TEST_MAP_1_WIDTH,29,06
     EVENT_DISP TEST_MAP_1_WIDTH,29,07
+    EVENT_DISP TEST_MAP_1_WIDTH,01,01
 
 TestMap1TextPointers:
+    dw BoulderText
+    dw BoulderText
     dw BoulderText
     dw BoulderText
     dw BoulderText
@@ -136883,6 +136928,47 @@ TestMap1TextPointers:
 
 TestMap1Script:
     call EnableAutoTextBoxDrawing
+    call RemoveHiddenBoulderFromScreen
+    jp TestMap1HoleAndBoulderScript
+
+RemoveHiddenBoulderFromScreen:
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    ret z
+    ld c,-1
+.loop
+    inc c
+    ld a,c
+    cp 4
+    ret z
+    push bc
+
+    ; Check Current Boulder
+    add 1 ; Hidden Object of this Map start at "1"
+    ld c,a
+    ld b,2
+    ld hl,W_MISSABLEOBJECTFLAGS_NEW
+    ld a,$10
+    call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
+    ld a,c
+    and a
+
+    pop bc
+    call nz,.remove
+
+    jr .loop
+.remove
+    push bc
+    ld a,c
+    ld hl,$c215 ; first sprite position
+    ld bc,16
+    call AddNTimes
+    ld [hl],$A0
+    pop bc
+    ret
+
+TestMap1HoleAndBoulderScript:
     ld a,[$d736]
     bit 6,a ; jump hole
     ret nz
@@ -136893,17 +136979,17 @@ TestMap1Script:
     ; Check Player
     FuncCoord 8,9 ; tile the player is on
     ld a,[Coord]
-    cp TILE_11_CAVE_HOLE
+    cp TILE_11_CAV_HOLE
     call nz,RevealHoleCoord
 .FallInHole
     ; Start Warp
-    ld a,1 ; Warp ID
+    ld a,[$cd3d] ; Warp ID
     ld [$d71e],a
     ld hl,$d72d
     set 4,[hl]
     ld hl,$d732
     set 4,[hl]
-    ld a,ROUTE_D1
+    ld a,TEST_MAP_2
     ld [$d71d],a
     xor a
     ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
@@ -136913,6 +136999,7 @@ TestMap1Script:
     db 28,01
     db 28,02
     db 21,04
+    db 02,29
     db 25,02
     db 23,03
     db 28,25
@@ -136934,7 +137021,7 @@ TestMap1Script:
     ld a,$59
     call Predef ; GetTileTwoStepsInFrontOfPlayer
     ld a,[$d71c] ; Tile Hole or Hidden Hole
-    cp TILE_11_CAVE_HOLE
+    cp TILE_11_CAV_HOLE
     jr z,.skipRevealHole
     call Delay3
     call RevealHoleCoord
@@ -136961,7 +137048,7 @@ TestMap1Script:
 RevealHoleA:
     call GetDirectionOffset
     call GetTileOffset
-    cp TILE_11_CAVE_HOLE
+    cp TILE_11_CAV_HOLE
     ret z
     ld a,[$cd3f]
     jr RevealHoleCommon
@@ -136985,7 +137072,7 @@ RevealHoleCommon:
     call PlaySound
     FuncCoord 8,9 ; tile the player is on
     ld a,[Coord]
-    cp TILE_11_CAVE_HOLE
+    cp TILE_11_CAV_HOLE
     ret nz
     ld a,$FF
     ld [wJoypadForbiddenButtonsMask],a ; Disable Joy
@@ -137003,8 +137090,39 @@ RevealHoleCommon:
     db 14,00,$78
     db 14,01,$77
     db 10,02,$68
+    db 01,14,$78
 
 TestMap1Blocks:
     INCBIN "maps/devmap1.blk"
+
+; ──────────────────────────────────────────────────────────────────────
+; TEST_MAP_2
+; ──────────────────────────────────────────────────────────────────────
+
+TestMap2_h:
+    db $11 ; tileset
+    db TEST_MAP_2_HEIGHT,TEST_MAP_2_WIDTH ; dimensions
+    dw TestMap2Blocks,TestMap2TextPointers,TestMap2Script ; blocks,texts,scripts
+    db 0 ; connections
+    dw TestMap2Object
+TestMap2Object:
+    db $3 ; border tile
+
+    db 1 ; warp
+    db 01,01,2,TEST_MAP_1
+
+    db 0 ; sign
+
+    db 0 ; people
+
+    ; warp-to
+    EVENT_DISP TEST_MAP_2_WIDTH,01,01
+
+TestMap2TextPointers:
+    db "@"
+TestMap2Script:
+    ret
+TestMap2Blocks:
+    INCBIN "maps/devmap2.blk"
 
 ; ──────────────────────────────────────────────────────────────────────

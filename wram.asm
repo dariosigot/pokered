@@ -1638,10 +1638,14 @@ wEXPBarKeepFullFlag:
 
 NEXTU
 
-wCollisionRule : ; def0
-    ds 1
-wCollisionFlag: ; def1
-    ds 1
+wCollisionRule:: db ; def0
+; Debug Collision Rule
+
+wCollisionFlag:: db ; def1
+; bit 0 = Try Jumping
+; bit 1 = Try Stop Surfing
+; bit 2 = Can Surfing
+; bit 3 = Try Pushing Boulder
 
 NEXTU
 
