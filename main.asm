@@ -287,6 +287,118 @@ GetJoypadState: ; 019a (0:019a)
     call RoutineForRealGB
     ret
 
+ChangeCurMap:
+    push hl
+    ld hl,wChangedBlocksMapId
+    cp [hl]
+    jr z,.same
+    push af
+    push bc
+    ld [hli],a ; Id
+    xor a
+    ld bc,3 * 15 + 1
+    call FillMemory
+    pop bc
+    pop af
+.same
+    pop hl
+    ld [W_CURMAP],a
+    ret
+
+RestoreChangedBlocks:
+    ld hl,wChangedBlocksNum
+    ld a,[hli]
+    and a
+    jr z,.done
+    ld b,a
+.loop
+    ld a,[hli] ; H
+    ld d,a
+    ld a,[hli] ; L
+    ld e,a
+    ld a,[hli] ; ID
+    ld [de],a
+    dec b
+    jr nz,.loop
+.done
+    ld a,[$d371]
+    ret
+
+BackupNearPlayerTiles:
+    ld bc,Tile_A_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_B_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_C_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_D_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_E_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_F_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_G_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_H_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_I_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_J_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_K_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_L_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_M_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_N_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_O_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_P_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_Q_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_R_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_S_OFFSET
+    call .ReadAndWrite
+    ld bc,Tile_T_OFFSET
+.ReadAndWrite
+    push hl
+    add hl,bc
+    ld a,[hl]
+    pop hl
+    ld [de],a
+    inc de
+    ret
+
+GetDirectionOffset:
+    ld a,[$c109] ; Direction
+    and a ; D_DOWN
+    jr z,.down
+    cp D_UP
+    jr z,.up
+    cp D_LEFT
+    jr z,.left
+    ld a,COLL_RIGHT
+    ld e,COLL_RIGHT_OFFSET
+    ret
+.down
+    ld a,COLL_DOWN
+    ld e,COLL_DOWN_OFFSET
+    ret
+.up
+    ld a,COLL_UP
+    ld e,COLL_UP_OFFSET
+    ret
+.left
+    ld a,COLL_LEFT
+    ld e,COLL_LEFT_OFFSET
+    ret
+
+; Free
+
 SECTION "HandleMidJump",ROM0[$039e]
 
 ; this function calls a function that takes necessary actions
@@ -796,7 +908,7 @@ WarpFound2: ; 073c (0:073c)
     ld a,[W_CURMAPWIDTH]
     ld [$d366],a
     ld a,[$ff8b] ; destination map number
-    ld [W_CURMAP],a ; change current map to destination map
+    call ChangeCurMap ; change current map to destination map
     push bc ; 1
     push af ; 1
     ld b,BANK(CheckDarkMap) ; 2
@@ -813,7 +925,7 @@ WarpFound2: ; 073c (0:073c)
     cp a,$ff
     jr z,.goBackOutside
 ; if not going back to the previous map
-    ld [W_CURMAP],a ; current map number
+    call ChangeCurMap ; current map number
     ld b,BANK(Func_70787)
     ld hl,Func_70787
     call Bankswitch ; check if the warp was a Silph Co. teleporter
@@ -834,7 +946,7 @@ WarpFound2: ; 073c (0:073c)
     jr .done
 .goBackOutside
     ld a,[wLastMap] ; previous map
-    ld [W_CURMAP],a
+    call ChangeCurMap
     call PlayMapChangeSound
     xor a
     ld [$d35d],a
@@ -856,7 +968,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     cp a,$ff
     jr nz,.checkEastMap
     ld a,[$d387]
-    ld [W_CURMAP],a
+    call ChangeCurMap
     ld a,[$d38f] ; new X coordinate upon entering west map
     ld [W_XCOORD],a
     ld a,[W_YCOORD]
@@ -892,7 +1004,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     cp b
     jr nz,.checkNorthMap
     ld a,[$d392]
-    ld [W_CURMAP],a
+    call ChangeCurMap
     ld a,[$d39a] ; new X coordinate upon entering east map
     ld [W_XCOORD],a
     ld a,[W_YCOORD]
@@ -927,7 +1039,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     cp a,$ff
     jr nz,.checkSouthMap
     ld a,[$d371]
-    ld [W_CURMAP],a
+    call ChangeCurMap
     ld a,[$d378] ; new Y coordinate upon entering north map
     ld [W_YCOORD],a
     ld a,[W_XCOORD]
@@ -954,7 +1066,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     cp b
     jr nz,.didNotEnterConnectedMap
     ld a,[$d37c]
-    ld [W_CURMAP],a
+    call ChangeCurMap
     ld a,[$d383] ; new Y coordinate upon entering south map
     ld [W_YCOORD],a
     ld a,[W_XCOORD]
@@ -1232,7 +1344,7 @@ LoadTileBlockMap: ; 09fc (0:09fc)
     dec b
     jr nz,.rowLoop
 .northConnection
-    ld a,[$d371]
+    call RestoreChangedBlocks ; ld a,[$d371]
     cp a,$ff
     jr z,.southConnection
     call SwitchToMapRomBank
@@ -1513,32 +1625,29 @@ IsSpriteInFrontOfPlayer2: ; 0b6d (0:0b6d)
 ; function to check if the player will jump down a ledge and check if the tile ahead is passable (when not surfing)
 ; sets the carry flag if there is a collision,and unsets it if there isn't a collision
 CollisionCheckOnLand: ; 0bd1 (0:0bd1)
-    ;ld a,[$d736]
-    ;bit 6,a ; is the player jumping?
-    ;jr nz,.noCollision
-; if not jumping a ledge
     ld a,[$cd38]
     and a ; simulate?
-    jr nz,.noCollision
+    jr nz,NoCollision
 
     ld a,[$d52a] ; the direction that the player is trying to go in
     ld d,a
     ld a,[$c10c] ; the player sprite's collision data (bit field) (set in the sprite movement code)
     and d ; check if a sprite is in the direction the player is trying to go
-    jr nz,.collision
+    jr nz,Collision
+
     xor a
     ld [$ff8c],a
     call IsSpriteInFrontOfPlayer ; check for sprite collisions again? when does the above check fail to detect a sprite collision?
     ld a,[$ff8c]
     and a ; was there a sprite collision?
-    jr nz,.collision
+    jr nz,Collision
 ; if no sprite collision
-    ld hl,TilePairCollisionsLand
-    call CheckForJumpingAndTilePairCollisions
-    jr c,.collision
-    call JumpOrCheckTilePassable ; call CheckTilePassable
-    jr nc,.noCollision
-.collision
+
+    ld d,%00000001 ; TryJumping
+    call CheckExceptionTilePassable
+    jr nc,NoCollision
+
+Collision::
     ld a,[$c02a]
     cp a,$b4 ; check if collision sound is already playing
     jr z,.setCarry
@@ -1547,110 +1656,22 @@ CollisionCheckOnLand: ; 0bd1 (0:0bd1)
 .setCarry
     scf
     ret
-.noCollision
+
+NoCollision::
     and a
     ret
 
-SECTION "CheckTilePassable",ROM0[$0c10]
+CheckExceptionTilePassable: ; Moved in the Bank
+    ld b,BANK(_CheckExceptionTilePassable)
+    ld hl,_CheckExceptionTilePassable
+    jp Bankswitch ; check if the player is trying to jump a ledge
 
-; function that checks if the tile in front of the player is passable
-; clears carry if it is,sets carry if not
-CheckTilePassable: ; 0c10 (0:0c10)
-    ld a,$35
-    call Predef ; get tile in front of player
-    ld a,[$cfc6] ; tile in front of player
-    ld c,a
-    ld hl,$d530 ; pointer to list of passable tiles
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a ; hl now points to passable tiles
-.loop
-    ld a,[hli]
-    cp a,$ff
-    jr z,.tileNotPassable
-    cp c
-    ret z
-    jr .loop
-.tileNotPassable
-    scf
-    ret
+; Free
 
-; check if the player is going to jump down a small ledge
-; and check for collisions that only occur between certain pairs of tiles
-; Input: hl - address of directional collision data
-; sets carry if there is a collision and unsets carry if not
-CheckForJumpingAndTilePairCollisions: ; 0c2a (0:0c2a)
-    push hl
-    ld a,$35
-    call Predef ; get the tile in front of the player
-    push de
-    push bc
-    ld b,BANK(_CheckForJumping)
-    ld hl,_CheckForJumping
-    call Bankswitch ; check if the player is trying to jump a ledge
-    pop bc
-    pop de
-    pop hl
-    and a ; rcf = noCollision
-    ld a,[$d736]
-    bit 6,a ; is the player jumping?
-    ret nz
-; if not jumping
-
-CheckForTilePairCollisions2: ; 0c44 (0:0c44)
-    FuncCoord 8,9 ; $c45c
-    ld a,[Coord] ; tile the player is on
-    ld [$cf0e],a
-
-CheckForTilePairCollisions: ; 0c4a (0:0c4a)
-    ld a,[$cfc6] ; tile in front of the player
-    ld c,a
-.tilePairCollisionLoop
-    ld a,[W_CURMAPTILESET] ; tileset number
-    ld b,a
-    ld a,[hli]
-    cp a,$ff
-    jr z,.noMatch
-    cp b
-    jr z,.tilesetMatches
-    inc hl
-.retry
-    inc hl
-    jr .tilePairCollisionLoop
-.tilesetMatches
-    ld a,[$cf0e] ; tile the player is on
-    ld b,a
-    ld a,[hl]
-    cp b
-    jr z,.currentTileMatchesFirstInPair
-    inc hl
-    ld a,[hl]
-    cp b
-    jr z,.currentTileMatchesSecondInPair
-    jr .retry
-.currentTileMatchesFirstInPair
-    inc hl
-    ld a,[hl]
-    cp c
-    jr z,.foundMatch
-    jr .tilePairCollisionLoop
-.currentTileMatchesSecondInPair
-    dec hl
-    ld a,[hli]
-    cp c
-    inc hl
-    jr nz,.tilePairCollisionLoop
-.foundMatch
-    scf
-    ret
-.noMatch
-    and a
-    ret
-
-SECTION "LoadCurrentMapView",ROM0[$0caa]
+SECTION "LoadCurrentMapView",ROM0[$0ca2]
 
 ; this builds a tile map from the tile block map based on the current X/Y coordinates of the player's character
-LoadCurrentMapView: ; 0caa (0:0caa)
+LoadCurrentMapView: ; 0ca2 (0:0ca2)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[$d52b] ; tile data ROM bank
@@ -1738,7 +1759,13 @@ LoadCurrentMapView: ; 0caa (0:0caa)
     pop af
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB ; restore previous ROM bank
-    ret
+
+    ld de,wBackupNearPlayerTiles
+    FuncCoord 8,9 ; tile the player is on
+    ld hl,Coord
+    jp BackupNearPlayerTiles
+
+SECTION "AdvancePlayerSprite",ROM0[$0d27]
 
 AdvancePlayerSprite: ; 0d27 (0:0d27)
     ld a,[$c103] ; delta Y
@@ -2200,61 +2227,26 @@ GetJoypadStateOverworld: ; 0f4d (0:0f4d)
 CollisionCheckOnWater: ; 0fb7 (0:0fb7)
     ld a,[$d730]
     bit 7,a
-    jp nz,.noCollision ; return and clear carry if button presses are being simulated
+    jr nz,.noCollision ; return and clear carry if button presses are being simulated
+
     ld a,[$d52a] ; the direction that the player is trying to go in
     ld d,a
     ld a,[$c10c] ; the player sprite's collision data (bit field) (set in the sprite movement code)
     and d ; check if a sprite is in the direction the player is trying to go
-    jr nz,.checkIfNextTileIsPassable ; bug?
-    ld hl,TilePairCollisionsWater
-    call CheckForJumpingAndTilePairCollisions
-    jr c,.collision
-    ds 2 ; ld a,$35
-    ds 3 ; call Predef ; get tile in front of player (puts it in c and [$CFC6])
-    ld a,[$cfc6] ; tile in front of player
-    cp a,$14 ; water tile
-    jr z,.noCollision ; keep surfing if it's a water tile
-    cp a,$32 ; either the left tile of the S.S. Anne boarding platform or the tile on eastern coastlines (depending on the current tileset)
-    jr z,.checkIfVermilionDockTileset
-    cp a,$48 ; tile on right on coast lines in Safari Zone
-    jr z,.noCollision ; keep surfing
-; check if the [land] tile in front of the player is passable
-.checkIfNextTileIsPassable
-    ld hl,$d530 ; pointer to list of passable tiles
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-.loop
-    ld a,[hli]
-    cp a,$ff
-    jr z,.collision
-    cp c
-    jr z,.stopSurfing ; stop surfing if the tile is passable
-    jr .loop
+    jr nz,.collision
+    
+    ld d,%00000010 ; TryStopSurfing
+    call CheckExceptionTilePassable
+    jr nc,.noCollision
+
 .collision
-    ld a,[$c02a]
-    cp a,$b4 ; check if collision sound is already playing
-    jr z,.setCarry
-    ld a,$b4
-    call PlaySound ; play collision sound (if it's not already playing)
-.setCarry
-    scf
-    jr .done
+    jp Collision
 .noCollision
-    and a
-.done
-    ret
-.stopSurfing
-    xor a
-    ld [$d700],a
-    call LoadPlayerSpriteGraphics
-    call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic
-    jr .noCollision
-.checkIfVermilionDockTileset
-    ld a,[W_CURMAPTILESET] ; tileset
-    cp a,$0e ; Vermilion Dock tileset
-    jr nz,.noCollision ; keep surfing if it's not the boarding platform tile
-    jr .stopSurfing ; if it is the boarding platform tile,stop surfing
+    jp NoCollision
+
+; Free
+
+SECTION "RunMapScript",ROM0[$101b]
 
 ; function to run the current map's script
 RunMapScript: ; 101b (0:101b)
@@ -3248,6 +3240,11 @@ GetCurrentOldAdventureMap:
     ld a,$FF
     ret
 
+; ───────────────────────────────────────
+
+Tset11_Coll:
+    INCBIN "gfx/tilesets/11.tilecoll"
+
 SECTION "GetPartyMonName2",ROM0[$15b4]
 
 ; copy party pokemon's name to $CD6D
@@ -3567,8 +3564,6 @@ Tset0F_Coll:
     INCBIN "gfx/tilesets/0f.tilecoll"
 Tset10_Coll:
     INCBIN "gfx/tilesets/10.tilecoll"
-Tset11_Coll:
-    INCBIN "gfx/tilesets/11.tilecoll"
 Tset12_Coll:
     INCBIN "gfx/tilesets/12.tilecoll"
 Tset13_Coll:
@@ -5886,57 +5881,11 @@ IsTown:
 
 ; ───────────────────────────────────────
 
-JumpOrCheckTilePassable:
-    ld b,BANK(_JumpOrCheckTilePassable)
-    ld hl,_JumpOrCheckTilePassable
-    jp Bankswitch
-
 ; unsets carry if player is facing water or shore
 IsNextTileShoreOrWater:
     ld b,BANK(_IsNextTileShoreOrWater)
     ld hl,_IsNextTileShoreOrWater
     jp Bankswitch
-
-; FORMAT: tileset number,tile 1,tile 2
-; terminated by 0xFF
-; these entries indicate that the player may not cross between tile 1 and tile 2
-; it's mainly used to simulate differences in elevation
-
-TilePairCollisionsLand:
-    db $11,$20,$05;
-    db $11,$41,$05;
-    db $03,$30,$2E;
-    db $11,$2A,$05;
-    db $11,$05,$21;
-    db $03,$52,$2E;
-    db $03,$55,$2E;
-    db $03,$56,$2E;
-    db $03,$20,$2E;
-    db $03,$5E,$2E;
-    db $03,$5F,$2E;
-
-    ;db $00,$10,$11;
-    ;db $00,$1B,$11;
-    ;db $00,$20,$11;
-    ;db $00,$21,$11;
-    ;db $00,$23,$11;
-    ;db $00,$2C,$11;
-    ;db $00,$30,$11;
-    ;db $00,$31,$11;
-    ;db $00,$33,$11;
-    ;db $00,$39,$11;
-    ;db $00,$52,$11;
-    ;db $00,$54,$11;
-    ;db $00,$58,$11;
-    ;db $00,$5B,$11;
-
-    db $FF;
-
-TilePairCollisionsWater:
-    db $03,$14,$2E;
-    db $03,$48,$2E;
-    db $11,$14,$05;
-    db $FF;
 
 ResetButtonPressedAndMapScript: ; Moved in the Bank
     xor a
@@ -5969,6 +5918,23 @@ GetMonsterNames:
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     ld hl,MonsterNames ; 421E
+    ret
+
+GetTileOffset:
+    push hl
+    push de
+    ld hl,wBackupNearPlayerTiles ; tile the player is on
+    ld e,a
+    ld d,0
+    bit 7,a ; is delta negative?
+    jr z,.done
+    ld d,$FF
+.done
+    add hl,de
+    ld a,[hl]
+    pop de
+    pop hl
+    ld d,a
     ret
 
 ; Free
@@ -11662,7 +11628,7 @@ UpdateNonPlayerSprite: ; 4c5c (1:4c5c)
 .unequal
     jp Func_4ed1
 
-Func_4c70: ; 4c70 (1:4c70)
+_DetectCollisionBetweenSprites: ; 4c70 (1:4c70)
     nop
     ld h,$c1
     ld a,[H_CURRENTSPRITEOFFSET]
@@ -11890,7 +11856,7 @@ Func_4da6: ; 4da6 (1:4da6)
     ld [W_CURENEMYLVL],a
     xor a
     ld [$cc49],a
-    ld [W_CURMAP],a
+    call ChangeCurMap
     call AddPokemonToParty
     ld a,$1
     ld [W_CUROPPONENT],a ; $d059
@@ -11972,7 +11938,7 @@ UpdatePlayerSprite: ; 4e31 (1:4e31)
     ld [$c102],a
     ret
 .asm_4e50
-    call Func_4c70
+    call DetectCollisionBetweenSprites
     ld h,$c1
     ld a,[wWalkCounter] ; $cfc5
     and a
@@ -12560,7 +12526,7 @@ CanWalkOntoTile: ; 516e (1:516e)
     jr nc,.impassable ; don't walk off screen
     push de
     push bc
-    call Func_4c70
+    call DetectCollisionBetweenSprites
     pop bc
     pop de
     ld h,$c1
@@ -14838,7 +14804,7 @@ Func_62ff: ; 62ff (1:62ff)
     res 4,[hl]
     ld a,[$d71d]
     ld b,a
-    ld [W_CURMAP],a ; $d35e
+    call ChangeCurMap ; $d35e
     ld a,[$d71e]
     ld c,a
     call GetDungeonWarpList ; ld hl,DungeonWarpList ; $63bf
@@ -14868,7 +14834,7 @@ Func_62ff: ; 62ff (1:62ff)
     ld a,[$d71a]
 .asm_6391
     ld b,a
-    ld [W_CURMAP],a ; $d35e
+    call ChangeCurMap ; $d35e
     call GetFlyWarpDataPtr ; ld hl,FlyWarpDataPtr ; $6448
 .asm_6398
     ld a,[hli]
@@ -18617,9 +18583,23 @@ PortRoyalFlyWarp:
     FLYWARP_DATA PORT_ROYAL_WIDTH,6,5
 
 DungeonWarpListNew:
+    db TEST_MAP_2,01
+    db TEST_MAP_2,02
+    db TEST_MAP_2,03
+    db TEST_MAP_2,04
+    db TEST_MAP_2,05
+    db TEST_MAP_2,06
+    db TEST_MAP_2,07
     db $FF
 
 DungeonWarpDataNew:
+    FLYWARP_DATA TEST_MAP_2_WIDTH,28,01
+    FLYWARP_DATA TEST_MAP_2_WIDTH,28,02
+    FLYWARP_DATA TEST_MAP_2_WIDTH,21,04
+    FLYWARP_DATA TEST_MAP_2_WIDTH,02,29
+    FLYWARP_DATA TEST_MAP_2_WIDTH,25,02
+    FLYWARP_DATA TEST_MAP_2_WIDTH,23,03
+    FLYWARP_DATA TEST_MAP_2_WIDTH,28,25
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $01)
@@ -18665,6 +18645,17 @@ SetLastBlackoutMap:
     ret
 
 ; ───────────────────────────────────────
+
+DetectCollisionBetweenSprites: ; Restore Original Player Y (Not consider Jump) 
+    ld hl,$c104
+    ld a,[hl]
+    push af
+    ld a,$3C
+    ld [hl],a
+    call _DetectCollisionBetweenSprites
+    pop af
+    ld [$c104],a
+    ret
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -21135,10 +21126,10 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(EmptyMap_h) ; unused
     db BANK(BattleCenterM_h)
     db BANK(TradeCenterM_h)
-    db BANK(TestMap1_h) ; devmap1
-    db BANK(RouteD1_h)  ; devmap2
-    db BANK(PortRoyal_h) ; devmap3
-    db BANK(SwapMap_h) ; devmap4
+    db BANK(TestMap1_h) ; devmap
+    db BANK(TestMap2_h) ; devmap
+    db BANK(RouteD1_h)  ; devmap
+    db BANK(PortRoyal_h) ; devmap
     db BANK(Lorelei_h)
     db BANK(Bruno_h)
     db BANK(Agatha_h)
@@ -21578,7 +21569,7 @@ Func_c589: ; c589 (3:4589)
     ld [$cfc6],a
     ret
 
-Func_c5be: ; c5be (3:45be)
+GetTileTwoStepsInFrontOfPlayer: ; c5be (3:45be)
     xor a
     ld [$FF00+$db],a
     ld hl,W_YCOORD ; $d361
@@ -21626,32 +21617,9 @@ Func_c5be: ; c5be (3:45be)
     ld [$cfc6],a
     ret
 
-Func_c60b: ; c60b (3:460b)
-    call Func_c5be
-    ld hl,$d530
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-.asm_c614
-    ld a,[hli]
-    cp $ff
-    jr z,.asm_c632
-    cp c
-    jr nz,.asm_c614
-    ld hl,TilePairCollisionsLand
-    call CheckForTilePairCollisions2
-    ld a,$ff
-    jr c,.asm_c632
-    ld a,[$d71c]
-    cp $15
-    ld a,$ff
-    jr z,.asm_c632
-    call Func_c636
-.asm_c632
-    ld [$d71c],a
-    ret
+SECTION "CheckForBoulderCollisionWithSprites",ROMX[$4636],BANK[$3]
 
-Func_c636: ; c636 (3:4636)
+CheckForBoulderCollisionWithSprites: ; c636 (3:4636)
     ld a,[$d718]
     dec a
     swap a
@@ -22773,9 +22741,9 @@ MapHeaderBanksNew:
     db BANK(PortRoyal_h)            ; PORT_ROYAL
     db BANK(RouteD1_h)              ; ROUTE_D1
     db BANK(TestMap1_h)             ; TEST_MAP_1
+    db BANK(TestMap2_h)             ; TEST_MAP_2
     db BANK(PortRoyalCenter_h)      ; PORT_ROYAL_POKECENTER
     db BANK(PortRoyalMart_h)        ; PORT_ROYAL_MART
-    db BANK(EmptyMap_h) ; $05
     db BANK(EmptyMap_h) ; $06
     db BANK(EmptyMap_h) ; $07
     db BANK(EmptyMap_h) ; $08
@@ -22844,10 +22812,10 @@ MapHeaderBanksNew:
 MapSongBanksNew:
     db (Music_Cities1       -$4000)/3 , BANK(Music_Cities1)       ; PORT_ROYAL
     db (Music_Routes1       -$4000)/3 , BANK(Music_Routes1)       ; ROUTE_D1
-    db (Music_Routes1       -$4000)/3 , BANK(Music_Routes1)       ; TEST_MAP_1
+    db (Music_Dungeon3      -$4000)/3 , BANK(Music_Dungeon3)      ; TEST_MAP_1
+    db (Music_Dungeon3      -$4000)/3 , BANK(Music_Dungeon3)      ; TEST_MAP_2
     db (Music_Pokecenter    -$4000)/3 , BANK(Music_Pokecenter)    ; PORT_ROYAL_POKECENTER
     db (Music_Pokecenter    -$4000)/3 , BANK(Music_Pokecenter)    ; PORT_ROYAL_MART
-    db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $05
     db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $06
     db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $07
     db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $08
@@ -22916,10 +22884,10 @@ MapSongBanksNew:
 MapHSPointersNew:
     dw MapHS_PortRoyal ; PORT_ROYAL
     dw MapHSXX         ; ROUTE_D1
-    dw MapHSXX         ; TEST_MAP_1
+    dw MapHS_TestMap1  ; TEST_MAP_1
+    dw MapHSXX         ; TEST_MAP_2
     dw MapHSXX         ; PORT_ROYAL_POKECENTER
     dw MapHSXX         ; PORT_ROYAL_MART
-    dw MapHSXX ; $05
     dw MapHSXX ; $06
     dw MapHSXX ; $07
     dw MapHSXX ; $08
@@ -22988,6 +22956,13 @@ MapHSPointersNew:
 
 MapHS_PortRoyal:
     db PORT_ROYAL,2,Show
+MapHS_TestMap1:
+    db TEST_MAP_1,1,Show
+    db TEST_MAP_1,2,Show
+    db TEST_MAP_1,3,Show
+    db TEST_MAP_1,4,Show
+    db TEST_MAP_1,5,Show
+    db TEST_MAP_1,6,Show
 
     db $FF,$01,Show
 
@@ -23111,6 +23086,53 @@ WriteMovePP:
     call CopyData
     dec de
     ret
+
+CheckForCollisionWhenPushingBoulder: ; Moved in the Bank
+
+    ; Check just Jumping
+    ld a,[$d736]
+    bit 6,a
+    jp nz,.fail
+
+    ; Check Base Player Collision
+    ld d,0 ; No Flag
+    call CheckExceptionTilePassable
+    jr c,.fail
+
+    call GetTileTwoStepsInFrontOfPlayer
+
+    ; Backup Boulder Near Tile
+    call GetDirectionOffset
+    FuncCoord 8,9 ; tile the player is on
+    ld hl,Coord
+    ld d,0
+    bit 7,e ; is delta negative?
+    jr z,.done
+    ld d,$FF
+.done
+    add hl,de
+    ld de,wBackupNearPlayerTiles
+    call BackupNearPlayerTiles
+
+    ld d,%00001000 ; Boulder Flag
+    call CheckExceptionTilePassable
+
+    ; Restore Player Near Tile
+    push af
+    ld de,wBackupNearPlayerTiles
+    FuncCoord 8,9 ; tile the player is on
+    ld hl,Coord
+    call BackupNearPlayerTiles
+    pop af
+
+    jr c,.fail
+    call CheckForBoulderCollisionWithSprites
+.end
+    ld [$d71c],a
+    ret
+.fail
+    ld a,$FF
+    jr .end
 
 SECTION "UseItem_",ROMX[$55c7],BANK[$3]
 
@@ -23682,8 +23704,8 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld a,[$ff8c]
     and a ; is there a sprite in the way?
     jr nz,.cannotStopSurfing
-    ld hl,TilePairCollisionsWater
-    call CheckForTilePairCollisions
+    ld d,%00000100 ; CanSurfing
+    call CheckExceptionTilePassable
     jr c,.cannotStopSurfing
     ld hl,$d530 ; pointer to list of passable tiles
     ld a,[hli]
@@ -23739,8 +23761,8 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
 .tryToSurf
     call IsNextTileShoreOrWater
     ret c ; jp c,SurfingAttemptFailed
-    ld hl,TilePairCollisionsWater
-    call CheckForTilePairCollisions
+    ld d,%00000100 ; CanSurfing
+    call CheckExceptionTilePassable
     ret ; jp c,SurfingAttemptFailed
 .HandleSurfboardTextMessage
     ld hl,SurfingGotOnText
@@ -24577,6 +24599,48 @@ ItemUseXAccuracy: ; e013 (3:6013)
 ItemUseCardKey: ; e022 (3:6022)
     jp ItemUseNotTime
 
+BackupChangedBlocks:
+    push hl
+    ld d,h
+    ld e,l
+    ld hl,wChangedBlocksNum
+    ld a,[hli]
+    cp 15
+    jr nc,.done
+    and a
+    jr z,.insert
+    ld b,a
+.loop
+    ld a,[hli] ; H
+    cp d
+    jr nz,.next1
+    ld a,[hli] ; L
+    cp e
+    jr nz,.next2
+.found
+    ld a,[$d09f]
+    ld [hl],a ; ID
+    jr .done
+.next1
+    inc hl
+.next2
+    inc hl
+    dec b
+    jr nz,.loop
+.insert
+    ld a,d
+    ld [hli],a ; H
+    ld a,e
+    ld [hli],a ; L
+    ld a,[$d09f]
+    ld [hl],a ; ID
+    ld hl,wChangedBlocksNum
+    inc [hl]
+.done
+    ld a,[$d09f]
+    pop hl
+    ret
+
 SECTION "ItemUseGuardSpec",ROMX[$60dc],BANK[$3]
 
 ItemUseGuardSpec: ; e0dc (3:60dc)
@@ -24836,11 +24900,9 @@ RodResponse: ; e28d (3:628d)
     ld [hl],a
     ret
 
-SECTION "FishingInit",ROMX[$62b4],BANK[$3]
-
 ; checks if fishing is possible and if so,runs initialization code common to all rods
 ; unsets carry if fishing is possible,sets carry if not
-FishingInit: ; e2b4 (3:62b4)
+FishingInit: ; Moved in the Bank
     ld a,[W_ISINBATTLE]
     and a
     jr z,.notInBattle
@@ -24848,6 +24910,9 @@ FishingInit: ; e2b4 (3:62b4)
     ret
 .notInBattle
     call IsNextTileShoreOrWater
+    ret c
+    ld d,%00000100 ; CanSurfing
+    call CheckExceptionTilePassable
     ret c
     ld a,[$d700]
     cp a,2 ; Surfing?
@@ -24864,6 +24929,8 @@ FishingInit: ; e2b4 (3:62b4)
 .surfing
     scf ; can't fish when surfing
     ret
+
+SECTION "ItemUseOaksParcel",ROMX[$62de],BANK[$3]
 
 ItemUseOaksParcel: ; e2de (3:62de)
     jp ItemUseNotYoursToUse
@@ -26118,7 +26185,7 @@ ReplaceTileBlock: ; ee9e (3:6e9e)
     jr nz,.asm_eeb7
 .asm_eebb
     add hl,bc
-    ld a,[$d09f]
+    call BackupChangedBlocks ; ld a,[$d09f]
     ld [hl],a
     ld a,[$d35f]
     ld c,a
@@ -26139,7 +26206,7 @@ ReplaceTileBlock: ; ee9e (3:6e9e)
     call Func_ef4e
     ret c
 
-Func_eedc: ; eedc (3:6edc)
+RedrawMapView: ; eedc (3:6edc)
     ld a,[W_ISINBATTLE] ; $d057
     inc a
     ret z
@@ -26241,7 +26308,7 @@ CanCut:
     call Func_eff7
     ld de,CutTreeBlockSwaps ; $7100
     call Func_f09f
-    call Func_eedc
+    call RedrawMapView
     ld b,BANK(Func_79e96)
     ld hl,Func_79e96
     call Bankswitch ; indirect jump to Func_79e96 (79e96 (1e:5e96))
@@ -26252,7 +26319,7 @@ CanCut:
     ld a,$90
     ld [$FF00+$b0],a
     call UpdateSprites
-    jp Func_eedc
+    jp RedrawMapView
 .plateau
     call WaitForSoundToFinish
     ld a,$a5
@@ -26716,7 +26783,7 @@ TryPushingBoulder: ; f225 (3:7225)
     and $f0
     ret z
     ld a,$5a
-    call Predef ; indirect jump to Func_c60b (c60b (3:460b))
+    call Predef ; indirect jump to CheckForCollisionWhenPushingBoulder (c60b (3:460b))
     ld a,[$d71c]
     and a
     jp nz,Func_f2dd
@@ -36579,7 +36646,7 @@ SilphCo4Script_19d21: ; 19d21 (6:5d21)
     ld [$d09f],a
     ld bc,$0602
     ld a,$17
-    call Predef
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_19d48
     bit 1,a
@@ -36588,7 +36655,7 @@ SilphCo4Script_19d21: ; 19d21 (6:5d21)
     ld [$d09f],a
     ld bc,$0406
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 SilphCo4Data19d58: ; 19d58 (6:5d58)
     db $06,$02,$04,$06,$ff
@@ -36823,7 +36890,7 @@ SilphCo5Script_19f4d: ; 19f4d (6:5f4d)
     ld [$d09f],a
     ld bc,$0203
     ld a,$17
-    call Predef
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_19f74
     bit 1,a
@@ -36833,7 +36900,7 @@ SilphCo5Script_19f4d: ; 19f4d (6:5f4d)
     ld [$d09f],a
     ld bc,$0603
     ld a,$17
-    call Predef
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_19f87
     bit 2,a
@@ -36842,7 +36909,7 @@ SilphCo5Script_19f4d: ; 19f4d (6:5f4d)
     ld [$d09f],a
     ld bc,$0507
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 SilphCo5Coords: ; 19f97 (6:5f97) ; coords?
     db $02,$03,$06,$03,$05,$07,$ff
@@ -37092,7 +37159,7 @@ SilphCo6Script_1a1bf: ; 1a1bf (6:61bf)
     ld [$d09f],a
     ld bc,$0602
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 SilphCo6Coords1: ; 1a1e3 (6:61e3)
     db $06,$02
@@ -37686,31 +37753,62 @@ Tileset16DoorTileIDs: ; 1a66b (6:666b)
 Tileset17DoorTileIDs: ; 1a66f (6:666f)
     db $3b,$1b,$00
 
-_CheckForJumping: ; 1a672 (6:6672)
+_CheckExceptionTilePassable: ; 1a672 (6:6672)
+
+    ; Input
+    ld a,d
+    ld [wCollisionFlag],a
+
+    ; Debug
+    ld a,$FF
+    ld [wCollisionRule],a
+
+; get the tile in front of the player (or boulder)
+    call GetDirectionOffset
+    call GetTileOffset
+    ld [$cfc6],a
+
+    ; Check just Jumping
     ld a,[$d736]
     bit 6,a
-    ret nz
+    jp nz,.end
+
+    ; Search Collision Rule Tileset
+    ld a,[W_CURMAPTILESET]
+    ld d,a
+    ld hl,JumpTilesetHeader
+.RuleLoop
+    ld a,[hli]
+    cp $FF
+    jp z,.end
+    cp d
+    jr z,.RuleFound
+    inc hl
+    inc hl
+    jr .RuleLoop
+.RuleFound
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    push hl ; Backup Collision Rule Start Pointer
 
     ld bc,$00FF ; -1
 .loop
     inc c
-    ld a,9
-    ld hl,JumpTilesetTable
+    ld a,8
+    pop hl  ; Collision Rule Start Pointer
+    push hl ; ...
     call AddNTimes
-
-    ; Tileset
-    ld a,[W_CURMAPTILESET]
-    ld d,a
-    ld a,[hli]
-    cp $ff
-    ret z
-    cp d
-    jr nz,.loop
 
     ; Direction
     ld a,[$c109]
     ld d,a
     ld a,[hli]
+    cp $FF
+    jr nz,.continue
+    pop af ; delete useless stack
+    jr .end
+.continue
     cp d
     jr nz,.loop
 
@@ -37721,26 +37819,58 @@ _CheckForJumping: ; 1a672 (6:6672)
     cp d
     jr nz,.loop
 
-    ; Next Tile Simulation
-    ld a,[hli]
-    ld [$cfc6],a
+.endloop
+    pop af ; delete useless stack
 
     ; Debug
     ld a,c
-    ld [wJumpingTile],a
+    ld [wCollisionRule],a
+
+    ; Next Tile Simulation
+    ld a,[hli]
+    and a
+    jr z,.skipSimulation
+    ld [$cfc6],a
+.skipSimulation
+
+    ; Check Try Pushing Boulder
+    ld a,[wCollisionFlag]
+    bit 3,a ; Try Pushing Boulder
+    jr z,.noBoulder
+    inc hl
+    ld a,[hld]
+    bit 4,a ; EX_BOULDER
+    jr z,.noBoulder
+    ld a,$FF
+    ld [$cfc6],a ; Next Tile Simulation
+    jr .end
+.noBoulder
+
+    ; Check Float
+    ld a,[$d700]
+    cp $2
+    jr z,.end
+
+    ; Check Try Jumping
+    ld a,[wCollisionFlag]
+    bit 0,a ; Try Jumping
+    jr z,.end
 
     ; Collision Tile After Jump to Check
     ld a,[hli]
+    and a
+    jr z,.skipCheckCollision
     call GetTileOffset
-    call CheckPassable
-    ret c
+    call CheckTilePassable
+    jr c,.end
+.skipCheckCollision
 
     ; Exception Flag
     call CheckJumpExceptionFlag
     inc hl
-    ret nc
+    jr nc,.end
 
-.found
+.jumpfound
 
     ; Simulation Jump Distance
     ld a,[hli]
@@ -37760,25 +37890,79 @@ _CheckForJumping: ; 1a672 (6:6672)
     ld a,$a2
     jp PlaySound
 
-SECTION "Func_1a6f0",ROMX[$66f0],BANK[$6]
+    and a ; rcf -> WTW
+    ret
+.end
+    ld a,[$cfc6] ; $FF = Not Passable
+    ld d,a
 
-Func_1a6f0: ; 1a6f0 (6:66f0)
-    ld hl,$8ff0
-    ld de,LedgeHoppingShadow ; $6708
-    ld bc,(BANK(LedgeHoppingShadow) << 8) + $01
-    call CopyVideoDataDouble
-    ld a,$9
-    ld bc,$5448
-    ld de,LedgeHoppingShadowOAM ; $6710
-    call WriteOAMBlock
+    ; Check Try Stop Surfing
+    ld a,[wCollisionFlag]
+    bit 1,a ; Try Stop Surfing
+    jr nz,CheckWaterTilePassable
+    ; Check Can Surfing
+    bit 2,a ; Can Surfing
+    jr nz,CheckWaterTilePassable
+
+    ; Check Float
+    ld a,[$d700]
+    cp $2
+    jr z,CheckWaterTilePassable
+    ; fall through
+
+CheckTilePassable:
+    push hl
+    ld hl,$d530 ; pointer to list of passable tiles
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a ; hl now points to passable tiles
+.loop
+    ld a,[hli]
+    cp a,$ff
+    jr z,.tileNotPassable
+    cp d
+    jr z,.end
+    jr .loop
+.tileNotPassable
+    scf
+.end
+    pop hl
     ret
 
-LedgeHoppingShadow: ; 1a708 (6:6708)
-    INCBIN "gfx/ledge_hopping_shadow.1bpp"
-
-LedgeHoppingShadowOAM: ; 1a710 (6:6710)
-    db $FF,$10,$FF,$20
-    db $FF,$40,$FF,$60
+CheckWaterTilePassable:
+    ld a,d
+    cp a,$14 ; water tile
+    jr z,.noCollision ; keep surfing if it's a water tile
+    cp a,$32 ; either the left tile of the S.S. Anne boarding platform or the tile on eastern coastlines (depending on the current tileset)
+    jr z,.checkIfVermilionDockTileset
+    cp a,$48 ; tile on right on coast lines in Safari Zone
+    jr z,.noCollision ; keep surfing
+; check if the [land] tile in front of the player is passable
+    call CheckTilePassable
+    jr nc,.stopSurfing
+    jr .collision
+.checkIfVermilionDockTileset
+    ld a,[W_CURMAPTILESET] ; tileset
+    cp a,$0e ; Vermilion Dock tileset
+    jr nz,.noCollision ; keep surfing if it's not the boarding platform tile
+    ; if it is the boarding platform tile,stop surfing
+    ; fall through
+.stopSurfing
+    ; Check Try Stop Surfing
+    ld a,[wCollisionFlag]
+    bit 1,a ; Try Stop Surfing
+    jr z,.noCollision
+    xor a
+    ld [$d700],a
+    call LoadPlayerSpriteGraphics
+    call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic
+    ; fall through
+.noCollision
+    and a
+    ret
+.collision
+    scf
+    ret
 
 DoorTileIDPointers: ; Move to Bank's End
     db $00
@@ -37884,7 +38068,12 @@ IndigoPlateauLobbyText4:
     db FULL_HEAL
     db MAX_REPEL,$FF
 
-JumpTilesetTable: ; Moved in the Bank
+JumpTilesetHeader:
+    dbw $00,CollissionRule_Tileset00
+    dbw $11,CollissionRule_Tileset11
+    dbw $03,CollissionRule_Tileset03
+    db $FF
+
     ; Tileset
     ; Direction
     ; Tile offset
@@ -37895,178 +38084,226 @@ JumpTilesetTable: ; Moved in the Bank
     ; Simulation Jump Distance
     ; Direction Output = ▼▲◄►StSeBA
 
-D_DOWN  EQU $00 ; $37
-D_UP    EQU $04 ; $00
-D_LEFT  EQU $08 ; $27
-D_RIGHT EQU $0C ; $24
+CollissionRule_Tileset00:
 
-EX_FAIL   EQU %10000000
-EX_B      EQU %00000010
-EX_NOBIKE EQU %00001000
-
-Tile_A EQU (+0)+(+0)*20
-Tile_B EQU (+1)+(+0)*20
-Tile_C EQU (+0)+(-1)*20
-Tile_D EQU (+1)+(-1)*20
-Tile_E EQU (-2)+(+0)*20
-Tile_F EQU (-1)+(+0)*20
-Tile_G EQU (-2)+(-1)*20
-Tile_H EQU (-1)+(-1)*20
-Tile_I EQU (+2)+(+0)*20
-Tile_J EQU (+3)+(+0)*20
-Tile_K EQU (+2)+(-1)*20
-Tile_L EQU (+3)+(-1)*20
-Tile_M EQU (+0)+(-2)*20
-Tile_N EQU (+1)+(-2)*20
-Tile_O EQU (+0)+(-3)*20
-Tile_P EQU (+1)+(-3)*20
-Tile_Q EQU (+0)+(+2)*20
-Tile_R EQU (+1)+(+2)*20
-Tile_S EQU (+0)+(+1)*20
-Tile_T EQU (+1)+(+1)*20
-
-COLL_DOWN  EQU Tile_Q
-COLL_UP    EQU Tile_M
-COLL_LEFT  EQU Tile_E
-COLL_RIGHT EQU Tile_I
-
-TILE_00_J_DOWN  EQU $37
-TILE_00_J_UP    EQU $00
-TILE_00_J_LEFT  EQU $27
-TILE_00_J_RIGHT EQU $24
-
-TILE_00_UPP_CTR   EQU $01
-TILE_00_UPP_RGT   EQU $02
-TILE_00_BTM_LFT   EQU $36
-TILE_00_BTM_RGT   EQU $34
-TILE_11_CAVE_HOLE EQU $22
-
-;     O P
-;     M N
-; G H C D K L
-; E F A B I J
-;     S T
-;     Q R
-
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ; MOUNTAIN BORDER
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-db $00 , D_UP    , Tile_D , TILE_00_UPP_CTR   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_UP    , Tile_P , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_DOWN  , Tile_T , TILE_00_UPP_CTR   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_DOWN  , Tile_T , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_LEFT  , Tile_H , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_LEFT  , Tile_E , TILE_00_J_RIGHT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_RIGHT , Tile_L , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL         , 0 , 0
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    db D_UP    , Tile_D , TILE_00_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $00
+    db D_UP    , Tile_P , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $01
+    db D_DOWN  , Tile_T , TILE_00_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $02
+    db D_DOWN  , Tile_T , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $03
+    db D_LEFT  , Tile_H , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $04
+    db D_LEFT  , Tile_E , TILE_00_J_RIGHT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $05
+    db D_RIGHT , Tile_L , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $06
+
 ; MOUNTAIN STAIRS
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-db $00 , D_LEFT  , Tile_H , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_RIGHT , Tile_K , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_UP    , Tile_N , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_DOWN  , Tile_T , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL         , 0 , 0
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    db D_LEFT  , Tile_H , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $07
+    db D_RIGHT , Tile_K , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $08
+    db D_UP    , Tile_N , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $09
+    db D_DOWN  , Tile_T , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0A
+
 ; MOUNTAIN BOTTOM CORNER
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-db $00 , D_RIGHT , Tile_L , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_UP    , Tile_P , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_LEFT  , Tile_H , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_DOWN  , Tile_T , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_UP    , Tile_O , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_LEFT  , Tile_G , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_RIGHT , Tile_K , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL         , 0 , 0
-db $00 , D_DOWN  , Tile_S , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL         , 0 , 0
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    db D_RIGHT , Tile_L , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0B
+    db D_UP    , Tile_P , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0C
+    db D_LEFT  , Tile_H , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0D
+    db D_DOWN  , Tile_T , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0E
+    db D_UP    , Tile_O , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0F
+    db D_LEFT  , Tile_G , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $10
+    db D_RIGHT , Tile_K , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $11
+    db D_DOWN  , Tile_S , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $12
+
 ; GO OUT
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-db $00 , D_DOWN  , Tile_A , TILE_00_J_DOWN    , $FF               , COLL_DOWN  , 0                , 0 , 0
-db $00 , D_DOWN  , Tile_A , TILE_00_BTM_LFT   , $FF               , COLL_DOWN  , 0                , 0 , 0
-db $00 , D_DOWN  , Tile_B , TILE_00_BTM_RGT   , $FF               , COLL_DOWN  , 0                , 0 , 0
-db $00 , D_LEFT  , Tile_A , TILE_00_J_LEFT    , $FF               , COLL_LEFT  , 0                , 0 , 0
-db $00 , D_LEFT  , Tile_A , TILE_00_BTM_LFT   , $FF               , COLL_LEFT  , 0                , 0 , 0
-db $00 , D_RIGHT , Tile_B , TILE_00_BTM_RGT   , $FF               , COLL_RIGHT , 0                , 0 , 0
-db $00 , D_RIGHT , Tile_D , TILE_00_J_RIGHT   , $FF               , COLL_RIGHT , 0                , 0 , 0
-db $00 , D_RIGHT , Tile_D , TILE_00_UPP_RGT   , $FF               , COLL_RIGHT , 0                , 0 , 0
-db $00 , D_UP    , Tile_C , TILE_00_J_UP      , $FF               , COLL_UP    , 0                , 0 , 0
-db $00 , D_UP    , Tile_D , TILE_00_J_UP      , $FF               , COLL_UP    , 0                , 0 , 0
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    db D_DOWN  , Tile_A , TILE_00_J_DOWN    , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $13
+    db D_DOWN  , Tile_A , TILE_00_BTM_LFT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $14
+    db D_DOWN  , Tile_B , TILE_00_BTM_RGT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $15
+    db D_LEFT  , Tile_A , TILE_00_J_LEFT    , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $16
+    db D_LEFT  , Tile_A , TILE_00_BTM_LFT   , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $17
+    db D_RIGHT , Tile_B , TILE_00_BTM_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $18
+    db D_RIGHT , Tile_D , TILE_00_J_RIGHT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $19
+    db D_RIGHT , Tile_D , TILE_00_UPP_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $1A
+    db D_UP    , Tile_C , TILE_00_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1B
+    db D_UP    , Tile_D , TILE_00_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1C
+
 ; GO IN
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-db $00 , D_UP    , Tile_M , TILE_00_J_DOWN    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
-db $00 , D_UP    , Tile_M , TILE_00_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
-db $00 , D_UP    , Tile_N , TILE_00_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
-db $00 , D_RIGHT , Tile_I , TILE_00_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
-db $00 , D_RIGHT , Tile_I , TILE_00_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
-db $00 , D_LEFT  , Tile_F , TILE_00_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
-db $00 , D_LEFT  , Tile_H , TILE_00_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
-db $00 , D_LEFT  , Tile_H , TILE_00_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
-db $00 , D_DOWN  , Tile_S , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
-db $00 , D_DOWN  , Tile_T , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-; CAVE HOLE
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-db $11 , D_DOWN  , Tile_Q , TILE_11_CAVE_HOLE , TILE_11_CAVE_HOLE , 0          , EX_B | EX_NOBIKE , 1 , BTN_DOWN
-db $11 , D_LEFT  , Tile_E , TILE_11_CAVE_HOLE , TILE_11_CAVE_HOLE , 0          , EX_B | EX_NOBIKE , 1 , BTN_LEFT
-db $11 , D_RIGHT , Tile_J , TILE_11_CAVE_HOLE , TILE_11_CAVE_HOLE , 0          , EX_B | EX_NOBIKE , 1 , BTN_RIGHT
-db $11 , D_UP    , Tile_M , TILE_11_CAVE_HOLE , TILE_11_CAVE_HOLE , 0          , EX_B | EX_NOBIKE , 1 , BTN_UP
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    db D_UP    , Tile_M , TILE_00_J_DOWN    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1D
+    db D_UP    , Tile_M , TILE_00_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1E
+    db D_UP    , Tile_N , TILE_00_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1F
+    db D_RIGHT , Tile_I , TILE_00_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $20
+    db D_RIGHT , Tile_I , TILE_00_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
+    db D_LEFT  , Tile_F , TILE_00_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
+    db D_LEFT  , Tile_H , TILE_00_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
+    db D_LEFT  , Tile_H , TILE_00_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
+    db D_DOWN  , Tile_S , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
+    db D_DOWN  , Tile_T , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
+
+; WALK NEAR JUMP BORDER
+    db D_LEFT  , Tile_E , TILE_00_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
+    db D_DOWN  , Tile_Q , TILE_00_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
+    db D_UP    , Tile_M , TILE_00_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
+    db D_DOWN  , Tile_S , TILE_00_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
+    db D_LEFT  , Tile_F , TILE_00_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
+    db D_RIGHT , Tile_I , TILE_00_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
+
 ; End
-; ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-db $FF
+    db $FF
 
-GetTileOffset:
-    push hl
-    push de
-    FuncCoord 8,9 ; tile the player is on
-    ld hl,Coord
-    ld e,a
-    ld d,0
-    bit 7,a ; is delta negative?
-    jr z,.done
-    ld d,$FF
-.done
-    add hl,de
-    ld a,[hl]
-    pop de
-    pop hl
-    ld d,a
-    ret
+CollissionRule_Tileset11:
 
-CheckPassable:
-    push hl
-    ld hl,$d530 ; pointer to list of passable tiles
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a ; hl now points to passable tiles
-.loop
-    ld a,[hli]
-    cp a,$ff
-    jr z,.tileNotPassable
-    cp d
-    jr z,.end
-    jr .loop
-.tileNotPassable
-    scf
-.end
-    pop hl
-    ret
+; MOUNTAIN BORDER
+    db D_UP    , Tile_D , TILE_11_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $00
+    db D_UP    , Tile_P , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $01
+    db D_DOWN  , Tile_T , TILE_11_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $02
+    db D_DOWN  , Tile_T , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $03
+    db D_LEFT  , Tile_H , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $04
+    db D_LEFT  , Tile_E , TILE_11_J_RIGHT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $05
+    db D_RIGHT , Tile_L , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $06
+
+; MOUNTAIN STAIRS
+    db D_LEFT  , Tile_H , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $07
+    db D_RIGHT , Tile_K , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $08
+    db D_UP    , Tile_N , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $09
+    db D_DOWN  , Tile_T , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0A
+
+; MOUNTAIN BOTTOM CORNER
+    db D_RIGHT , Tile_L , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0B
+    db D_UP    , Tile_P , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0C
+    db D_LEFT  , Tile_H , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0D
+    db D_DOWN  , Tile_T , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0E
+    db D_UP    , Tile_O , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0F
+    db D_LEFT  , Tile_G , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $10
+    db D_RIGHT , Tile_K , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $11
+    db D_DOWN  , Tile_S , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $12
+
+; GO OUT
+    db D_DOWN  , Tile_A , TILE_11_J_DOWN    , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $13
+    db D_DOWN  , Tile_A , TILE_11_BTM_LFT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $14
+    db D_DOWN  , Tile_B , TILE_11_BTM_RGT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $15
+    db D_LEFT  , Tile_A , TILE_11_J_LEFT    , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $16
+    db D_LEFT  , Tile_A , TILE_11_BTM_LFT   , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $17
+    db D_RIGHT , Tile_B , TILE_11_BTM_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $18
+    db D_RIGHT , Tile_D , TILE_11_J_RIGHT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $19
+    db D_RIGHT , Tile_D , TILE_11_UPP_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $1A
+    db D_UP    , Tile_C , TILE_11_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1B
+    db D_UP    , Tile_D , TILE_11_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1C
+
+; GO IN
+    db D_UP    , Tile_M , TILE_11_J_DOWN    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1D
+    db D_UP    , Tile_M , TILE_11_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1E
+    db D_UP    , Tile_N , TILE_11_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1F
+    db D_RIGHT , Tile_I , TILE_11_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $20
+    db D_RIGHT , Tile_I , TILE_11_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
+    db D_LEFT  , Tile_F , TILE_11_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
+    db D_LEFT  , Tile_H , TILE_11_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
+    db D_LEFT  , Tile_H , TILE_11_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
+    db D_DOWN  , Tile_S , TILE_11_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
+    db D_DOWN  , Tile_T , TILE_11_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
+
+; WALK NEAR JUMP BORDER
+    db D_LEFT  , Tile_E , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
+    db D_DOWN  , Tile_Q , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
+    db D_UP    , Tile_M , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
+    db D_DOWN  , Tile_S , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
+    db D_LEFT  , Tile_F , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
+    db D_RIGHT , Tile_I , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
+
+; CAVE HOLE
+    db D_DOWN  , Tile_Q , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_DOWN  ; $2D
+    db D_UP    , Tile_M , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_UP    ; $2E
+    db D_LEFT  , Tile_E , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_LEFT  ; $2F
+    db D_RIGHT , Tile_I , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_RIGHT ; $30
+
+; BOULDER
+    db D_DOWN  , Tile_S , TILE_11_UPP_CTR   , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $31
+    db D_UP    , Tile_M , TILE_11_STRS_HRZ  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $32
+    db D_LEFT  , Tile_F , TILE_11_STRS_VRT  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $33
+    db D_LEFT  , Tile_F , TILE_11_J_RIGHT   , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $34
+    db D_LEFT  , Tile_B , TILE_11_J_RIGHT   , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $35
+    db D_RIGHT , Tile_K , TILE_11_STRS_VRT  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $36
+    db D_RIGHT , Tile_K , TILE_11_J_LEFT    , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $37
+    db D_RIGHT , Tile_C , TILE_11_J_LEFT    , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $38
+    db D_UP    , Tile_M , TILE_11_STRS_STD  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $39
+    db D_UP    , Tile_A , TILE_11_STRS_STD  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $3A
+
+; End
+    db $FF
+
+CollissionRule_Tileset03:
+
+; MOUNTAIN BORDER
+    db D_UP    , Tile_D , TILE_03_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $00
+    db D_UP    , Tile_P , TILE_03_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $01
+    db D_DOWN  , Tile_T , TILE_03_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $02
+    db D_DOWN  , Tile_T , TILE_03_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $03
+    db D_LEFT  , Tile_H , TILE_03_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $04
+    db D_LEFT  , Tile_E , TILE_03_J_RIGHT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $05
+    db D_RIGHT , Tile_L , TILE_03_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $06
+
+; MOUNTAIN STAIRS
+    db D_LEFT  , Tile_H , TILE_03_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $07
+    db D_RIGHT , Tile_K , TILE_03_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $08
+    db D_UP    , Tile_N , TILE_03_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $09
+    db D_DOWN  , Tile_T , TILE_03_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0A
+
+; MOUNTAIN BOTTOM CORNER
+    db D_RIGHT , Tile_L , TILE_03_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0B
+    db D_UP    , Tile_P , TILE_03_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0C
+    db D_LEFT  , Tile_H , TILE_03_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0D
+    db D_DOWN  , Tile_T , TILE_03_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0E
+    db D_UP    , Tile_O , TILE_03_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0F
+    db D_LEFT  , Tile_G , TILE_03_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $10
+    db D_RIGHT , Tile_K , TILE_03_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $11
+    db D_DOWN  , Tile_S , TILE_03_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $12
+
+; GO OUT
+    db D_DOWN  , Tile_A , TILE_03_J_DOWN    , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $13
+    db D_DOWN  , Tile_A , TILE_03_BTM_LFT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $14
+    db D_DOWN  , Tile_B , TILE_03_BTM_RGT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $15
+    db D_LEFT  , Tile_A , TILE_03_J_LEFT    , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $16
+    db D_LEFT  , Tile_A , TILE_03_BTM_LFT   , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $17
+    db D_RIGHT , Tile_B , TILE_03_BTM_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $18
+    db D_RIGHT , Tile_D , TILE_03_J_RIGHT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $19
+    db D_RIGHT , Tile_D , TILE_03_UPP_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $1A
+    db D_UP    , Tile_C , TILE_03_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1B
+    db D_UP    , Tile_D , TILE_03_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1C
+
+; GO IN
+    db D_UP    , Tile_M , TILE_03_J_DOWN    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1D
+    db D_UP    , Tile_M , TILE_03_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1E
+    db D_UP    , Tile_N , TILE_03_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1F
+    db D_RIGHT , Tile_I , TILE_03_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $20
+    db D_RIGHT , Tile_I , TILE_03_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
+    db D_LEFT  , Tile_F , TILE_03_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
+    db D_LEFT  , Tile_H , TILE_03_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
+    db D_LEFT  , Tile_H , TILE_03_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
+    db D_DOWN  , Tile_S , TILE_03_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
+    db D_DOWN  , Tile_T , TILE_03_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
+
+; WALK NEAR JUMP BORDER
+    db D_LEFT  , Tile_E , TILE_03_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
+    db D_DOWN  , Tile_Q , TILE_03_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
+    db D_UP    , Tile_M , TILE_03_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
+    db D_DOWN  , Tile_S , TILE_03_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
+    db D_LEFT  , Tile_F , TILE_03_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
+    db D_RIGHT , Tile_I , TILE_03_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
+
+; End
+    db $FF
 
 CheckJumpExceptionFlag:
 
-    ; Check Force Fail
-    bit 7,[hl]
+    ; Check Force Fail Flag
+    bit 7,[hl] ; EX_FAIL
     jr nz,.fail
 
-    ; Check Bike
-    bit 3,[hl]
+    ; Check No Bike Flag
+    bit 3,[hl] ; EX_NOBIKE
     jr z,.skipBikeCheck
     ld a,[$d700] ; 1 = bike
     dec a
     jr z,.fail
 .skipBikeCheck
 
-    ; Check B pressed
-    bit 1,[hl]
+    ; Check B pressed Flag
+    bit 1,[hl] ; EX_B
     jr z,.skipBCheck
     ld a,[H_CURRENTPRESSEDBUTTONS]
     bit 1,a
@@ -38079,21 +38316,22 @@ CheckJumpExceptionFlag:
     and a ; rcf
     ret
 
-_JumpOrCheckTilePassable:
-    ld a,[$d736]
-    bit 6,a ; jumping a ledge?
-    jr z,.NoWTW
-    and a ; rcf -> WTW
-    ret
-.NoWTW
-    ld a,[$cfc6] ; $FF = Not Passable
-    ld d,a
-    call CheckPassable
-    jr c,.tileNotPassable
-    jp CheckTilePassable
-.tileNotPassable
-    scf
-    ret
+Func_1a6f0: ; Moved in the Bank
+    ld hl,$8ff0
+    ld de,LedgeHoppingShadow ; $6708
+    ld bc,(BANK(LedgeHoppingShadow) << 8) + $01
+    call CopyVideoDataDouble
+    ld a,$9
+    ld bc,$5448
+    ld de,LedgeHoppingShadowOAM ; $6710
+    jp WriteOAMBlock
+
+LedgeHoppingShadow: ; Moved in the Bank
+    INCBIN "gfx/ledge_hopping_shadow.1bpp"
+
+LedgeHoppingShadowOAM: ; Moved in the Bank
+    db $FF,$10,$FF,$20
+    db $FF,$40,$FF,$60
 
 SECTION "bank7",ROMX,BANK[$7]
 
@@ -65938,7 +66176,7 @@ Func_44be0: ; 44be0 (11:4be0)
     ld [$d09f],a
     ld bc,$080c
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 RocketHideout1ScriptPointers: ; 44c0e (11:4c0e)
     dw CheckFightingMapTrainers
@@ -66944,7 +67182,7 @@ Func_45473: ; 45473 (11:5473)
     ld [$d09f],a
     ld bc,$050c
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 Func_454a3: ; 454a3 (11:54a3)
     xor a
@@ -69816,12 +70054,14 @@ HiddenObjectMapsNew:
     db ROUTE_D1
     db PORT_ROYAL_POKECENTER
     db SWAP_MAP
+    db TEST_MAP_1
     db $FF
 
 HiddenObjectPointersNew:
     dw RouteD1HiddenObjects
     dw PortRoyalCenterObjects
     dw SwapMapObjects2
+    dw TestMap1Objects
 
 RouteD1HiddenObjects:
     db 13,26,ULTRA_BALL
@@ -69834,6 +70074,16 @@ PortRoyalCenterObjects:
 SwapMapObjects2:
     db 08,09,$d0 ; XXX,y,x
     dbw BANK(EnableBillsTeleport2),EnableBillsTeleport2
+    db $FF
+TestMap1Objects:
+    db 28,01,$d0 ; XXX,y,x
+    dbw BANK(RevealHoleA),RevealHoleA
+    db 28,02,$d0 ; XXX,y,x
+    dbw BANK(RevealHoleA),RevealHoleA
+    db 21,04,$d0 ; XXX,y,x
+    dbw BANK(RevealHoleA),RevealHoleA
+    db 02,29,$d0 ; XXX,y,x
+    dbw BANK(RevealHoleA),RevealHoleA
     db $FF
 
 ; ───────────────────────────────────────
@@ -71423,7 +71673,7 @@ Func_48bec: ; 48bec (12:4bec)
     ld [$d09f],a
     ld bc,$0208
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 CeladonGameCornerScript_48c07: ; 48c07 (12:4c07)
     xor a
@@ -71845,7 +72095,7 @@ CeladonGameCornerText12: ; 48edd (12:4edd)
     ld [$d09f],a
     ld bc,$0208
     ld a,$17
-    call Predef
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     jp TextScriptEnd
 
 UnnamedText_48f09: ; 48f09 (12:4f09)
@@ -74644,8 +74894,8 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     dw _DoFlyOrTeleportAwayGraphics
     db $1E ; uses wrong bank number
     dw Func_70510
-    dbw BANK(Func_c5be),Func_c5be
-    dbw BANK(Func_c60b),Func_c60b
+    dbw BANK(GetTileTwoStepsInFrontOfPlayer),GetTileTwoStepsInFrontOfPlayer
+    dbw BANK(CheckForCollisionWhenPushingBoulder),CheckForCollisionWhenPushingBoulder
     dbw BANK(Func_cd99),Func_cd99
     dbw BANK(PickupItem),PickupItem
     dbw BANK(PrintMoveType),PrintMoveType
@@ -78266,7 +78516,7 @@ Func_52673: ; 52673 (14:6673)
 .asm_526ca
     ld [$d09f],a
     ld a,$17
-    call Predef ; indirect jump to ReplaceTileBlock
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     ld hl,$d126
     set 5,[hl]
     ld a,$ad
@@ -83470,26 +83720,26 @@ Route21ScriptPointers: ; Moved in the Bank
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
+ROUTE21_BARRIER_BLOCK EQU $6B
+
 Route21ScriptBarrier:
     ld hl,$d126
     bit 6,[hl]
     res 6,[hl]
     ret z
+    ld a,[$c78c]
+    cp ROUTE21_BARRIER_BLOCK
+    ret z ; Don't block if just blocked
     call .CheckCinnabarVisited
     ret nz ; Don't block if visited
-    ld hl,.BlockMap
-.Loop
-    ld a,[hli]
-    inc a
-    ret z
-    ld b,a ; b = Y
-    ld a,[hli]
-    ld c,a ; c = X
-    ld a,[hli]
-    push hl
-    call .ReplaceTileBlock
-    pop hl
-    jr .Loop
+    ld hl,.ChangedBlocks
+    ld de,wChangedBlocksNum
+    ld bc,.ChangedBlocksEnd-.ChangedBlocks
+    call CopyData
+    call RestoreChangedBlocks
+    ld b,BANK(RedrawMapView)
+    ld hl,RedrawMapView
+    jp Bankswitch
 .CheckCinnabarVisited
     call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG
     ld c,CINNABAR_ISLAND ; bit n
@@ -83499,20 +83749,21 @@ Route21ScriptBarrier:
     ld a,c
     and a
     ret
-.ReplaceTileBlock
-    ld [$d09f],a
-    ld a,$17
-    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
-    ret
-.BlockMap
-   ;db -1+YY,XX,ID
-    db -1+07,01,$6B
-    db -1+07,02,$6B
-    db -1+07,03,$6B
-    db -1+07,04,$6B
-    db -1+07,05,$6B
-    db -1+07,06,$6B
-    db $FF
+.ChangedBlocks
+    db 6
+    dw $8CC7
+    db ROUTE21_BARRIER_BLOCK
+    dw $8DC7
+    db ROUTE21_BARRIER_BLOCK
+    dw $8EC7
+    db ROUTE21_BARRIER_BLOCK
+    dw $8FC7
+    db ROUTE21_BARRIER_BLOCK
+    dw $90C7
+    db ROUTE21_BARRIER_BLOCK
+    dw $91C7
+    db ROUTE21_BARRIER_BLOCK
+.ChangedBlocksEnd
 
 ; Celadon Dept. Store 2F (1)
 CeladonMart2Text1:
@@ -86510,7 +86761,7 @@ SilphCo2Script_59d07: ; 59d07 (16:5d07)
     ld [$d09f],a
     ld bc,$0202
     ld a,$17
-    call Predef
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
     pop af
 .asm_59d2e
     bit 6,a
@@ -86519,7 +86770,7 @@ SilphCo2Script_59d07: ; 59d07 (16:5d07)
     ld [$d09f],a
     ld bc,$0502
     ld a,$17
-    jp Predef
+    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 DataTable_59d3e: ; 59d3e (16:5d3e)
     db $02,$02,$05,$02,$FF
@@ -95562,6 +95813,8 @@ DiglettsCaveHole:
     ld [$d09f],a
     ld a,$17
     call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+    ld a,$ac
+    call PlaySound
     call .Delay30
     ; EmotionBubble
     ld hl,$cd4f
@@ -97056,9 +97309,9 @@ Func_709ef: ; 709ef (1c:49ef)
     ret
 
 Func_70a19: ; 70a19 (1c:4a19)
-    call GetCurrentOldAdventureMap
+    ld a,[W_CURMAP]
     ld e,a
-    ld hl,MapIDList_70a3f ; $4a3f
+    call GetMapIDList_70a3f
 .asm_70a20
     ld a,[hli]
     cp $ff
@@ -97069,7 +97322,7 @@ Func_70a19: ; 70a19 (1c:4a19)
     set 2,c
     ret
 .asm_70a2b
-    ld hl,MapIDList_70a44 ; $4a44
+    call GetMapIDList_70a44
 .asm_70a2e
     ld a,[hli]
     cp $ff
@@ -99135,8 +99388,8 @@ Func_71c07: ; 71c07 (1c:5c07)
     call Bankswitch
     call ClearScreen
     call Func_71ca2
-    ld b,BANK(Func_eedc)
-    ld hl,Func_eedc
+    ld b,BANK(RedrawMapView)
+    ld hl,RedrawMapView
     call Bankswitch
     and a
     ld a,$3
@@ -100289,7 +100542,7 @@ WaterTile:
 WaterTilesets: ; Moved in the Bank
     db $00,$03,$05,$07,$0d,$0e,$11,$16,$17
     db $ff ; terminator
-
+  
 CreateMonOvWorldSprInstruction_End:
     call AddTradeBaloonRule
     ld hl,wSpriteOAMBySpecies
@@ -100333,7 +100586,7 @@ ExternalMapEntriesNew:
     EMAP 09,14,RouteD1Name
 
 InternalMapEntriesNew:
-    IMAP 1 + TEST_MAP_1            , 09,14,RouteD1Name
+    IMAP 1 + TEST_MAP_2            , 09,14,TestMapName
     IMAP 1 + PORT_ROYAL_MART       , 07,14,PortRoyalName
     IMAP 1 + SWAP_MAP              , 09,14,RouteD1Name
     db $FF
@@ -100344,6 +100597,16 @@ PortRoyalName:
     db "PORT ROYAL@"
 RouteD1Name:
     db "ROUTE D1@"
+TestMapName:
+    db "TEST CAVE@"
+
+MapIDList_70a3fNew:
+    db TEST_MAP_1
+    db TEST_MAP_2
+    db $FF
+
+MapIDList_70a44New:
+    db $FF
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $1C)
@@ -100407,28 +100670,37 @@ GetFlyingCitySortOrder:
     ld hl,FlyingCitySortOrderNew
     ret
 
+GetMapIDList_70a3f:
+    ld hl,MapIDList_70a3f
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,MapIDList_70a3fNew
+    ret
+
+GetMapIDList_70a44:
+    ld hl,MapIDList_70a44
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,MapIDList_70a44New
+    ret
+
 ; ───────────────────────────────────────
 
-; Funzione per cambiare lo sprite utilizzato dalle ball durante la ricarica al centro pokemon
-LoadAlternateBallPic: ; Denim
-    ld hl,wFlagFlashingHealBallBit7
-    bit 7,[hl]
-    jr z,.Flash
-    jr .Restore
-.Flash
-    set 7,[hl]
-    ld de,PokeCenterFlashingHealBall ; $44b7
-    ld bc,(BANK(PokeCenterFlashingHealBall) << 8) + $03
-    jr .Done
-.Restore
-    res 7,[hl]
-    ld de,PokeCenterHealBall
-    ld bc,(BANK(PokeCenterHealBall) << 8) + $03
-.Done
-    ld hl,$87c0
-    jp CopyVideoData
-PokeCenterFlashingHealBall:
-    INCBIN "gfx/pokecenter_ball_2.2bpp"
+IfNotDarkGBFadeOut2:
+    ld a,[wBackupDarkMap] ; [$d35d]
+    and a
+    jp z,GBFadeOut2
+    ld hl,IncGradGBPalTable_01+5
+    ld b,2
+    jp GBFadeInCommon
+
+IfNotDarkGBFadeIn2:
+    ld a,[$d35d]
+    and a
+    jp z,GBFadeIn2
+    ld hl,IncGradGBPalTable_01
+    ld b,2
+    jp GBFadeOutCommon
 
 SECTION "BorderPalettes",ROMX[$6788],BANK[$1C]
 
@@ -101999,21 +102271,26 @@ GetHealthBarColorWithGhostCheck_:
     ld e,a
     jp GetHealthBarColor
 
-IfNotDarkGBFadeOut2:
-    ld a,[wBackupDarkMap] ; [$d35d]
-    and a
-    jp z,GBFadeOut2
-    ld hl,IncGradGBPalTable_01+5
-    ld b,2
-    jp GBFadeInCommon
-
-IfNotDarkGBFadeIn2:
-    ld a,[$d35d]
-    and a
-    jp z,GBFadeIn2
-    ld hl,IncGradGBPalTable_01
-    ld b,2
-    jp GBFadeOutCommon
+; Funzione per cambiare lo sprite utilizzato dalle ball durante la ricarica al centro pokemon
+LoadAlternateBallPic: ; Denim
+    ld hl,wFlagFlashingHealBallBit7
+    bit 7,[hl]
+    jr z,.Flash
+    jr .Restore
+.Flash
+    set 7,[hl]
+    ld de,PokeCenterFlashingHealBall ; $44b7
+    ld bc,(BANK(PokeCenterFlashingHealBall) << 8) + $03
+    jr .Done
+.Restore
+    res 7,[hl]
+    ld de,PokeCenterHealBall
+    ld bc,(BANK(PokeCenterHealBall) << 8) + $03
+.Done
+    ld hl,$87c0
+    jp CopyVideoData
+PokeCenterFlashingHealBall:
+    INCBIN "gfx/pokecenter_ball_2.2bpp"
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
@@ -130082,8 +130359,8 @@ SelectInOverWorld:
     jp z,.noFloat
     call IsNextTileShoreOrWater
     jp c,.noFloat
-    ld hl,TilePairCollisionsWater
-    call CheckForTilePairCollisions
+    ld d,%00000100 ; CanSurfing
+    call CheckExceptionTilePassable
     jp c,.noFloat
     ld b,$04 ; FLOAT
     call SearchFieldMoveInParty
@@ -130158,8 +130435,8 @@ SelectInOverWorld:
     jp z,.noFishing
     call IsNextTileShoreOrWater ; unsets carry if player is facing water or shore
     jr c,.noFishing
-    ld hl,TilePairCollisionsWater
-    call CheckForTilePairCollisions
+    ld d,%00000100 ; CanSurfing
+    call CheckExceptionTilePassable
     jr c,.noFishing
     ;are rods in the bag?
     ld b,SUPER_ROD
@@ -133578,10 +133855,10 @@ CheckFishingForMon:
 WildDataPointersNew:
     dw NoMons        ; PORT_ROYAL
     dw RouteD1Mons   ; ROUTE_D1
-    dw NoMons        ; TEST_MAP_1
+    dw TestMap1Mons  ; TEST_MAP_1
+    dw NoMons        ; TEST_MAP_2
     dw NoMons        ; PORT_ROYAL_POKECENTER
     dw NoMons        ; PORT_ROYAL_MART
-    dw NoMons ; $05
     dw NoMons ; $06
     dw NoMons ; $07
     dw NoMons ; $08
@@ -133660,6 +133937,30 @@ RouteD1Mons:
     db 45,KADABRA  ;  5%
     db 45,KADABRA  ;  4%
     db 45,KADABRA  ;  1%
+    db $05
+    db  2,MAGIKARP ; 20%
+    db  2,MAGIKARP ; 20%
+    db  2,MAGIKARP ; 15%
+    db  2,MAGIKARP ; 10%
+    db  2,MAGIKARP ; 10%
+    db  2,MAGIKARP ; 10%
+    db  2,MAGIKARP ;  5%
+    db  2,MAGIKARP ;  5%
+    db  2,MAGIKARP ;  4%
+    db  2,MAGIKARP ;  1%
+
+TestMap1Mons:
+    db $19
+    db  8,ZUBAT    ; 20%
+    db  8,ZUBAT    ; 20%
+    db  8,ZUBAT    ; 15%
+    db  8,ZUBAT    ; 10%
+    db  8,ZUBAT    ; 10%
+    db  8,ZUBAT    ; 10%
+    db  8,ZUBAT    ;  5%
+    db  8,ZUBAT    ;  5%
+    db  8,ZUBAT    ;  4%
+    db  8,ZUBAT    ;  1%
     db $05
     db  2,MAGIKARP ; 20%
     db  2,MAGIKARP ; 20%
@@ -135445,11 +135746,11 @@ GetMapPaletteID_:
     ld [$cf1c],a
     ret
 .PokemonTowerOrAgatha
-    ld a,PAL_GREYMON - 1
-    jr .town
+    ld a,PAL_GREYMON
+    jr .old
 .caveOrBruno
-    ld a,PAL_CAVE - 1
-    jr .town
+    ld a,PAL_CAVE
+    jr .old
 .Lorelei
     xor a
     jr .town
@@ -135645,25 +135946,27 @@ INCLUDE "constants/special_trainer.asm"
 ; ──────────────────────────────────────────────────────────────────────
 
 EnableBillsTeleport:
-    ld hl,$d126
-    bit 6,[hl]
-    res 6,[hl]
-    ret z
     ld b,3 ; Y
     ld c,2 ; X
+    ld a,[$c729]
+    cp $39
+    ld a,$03 ; ID
+    jr z,.done
     ld a,$39 ; ID
+.done
     ld [$d09f],a
     ld a,$17
     jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
 
 EnableBillsTeleport2:
-    ld hl,$d126
-    bit 6,[hl]
-    res 6,[hl]
-    ret z
     ld b,4 ; Y
     ld c,4 ; X
+    ld a,[$c74a]
+    cp $39
+    ld a,$03 ; ID
+    jr z,.done
     ld a,$39 ; ID
+.done
     ld [$d09f],a
     ld a,$17
     jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
@@ -136156,10 +136459,10 @@ MapHeaderPointers:
     dw EmptyMap_h ; unused
     dw BattleCenterM_h
     dw TradeCenterM_h
-    dw TestMap1_h ; devmap1
-    dw RouteD1_h  ; devmap2
-    dw PortRoyal_h ; devmap3
-    dw SwapMap_h ; devmap4
+    dw TestMap1_h ; devmap
+    dw TestMap2_h ; devmap
+    dw RouteD1_h  ; devmap
+    dw PortRoyal_h ; devmap
     dw Lorelei_h
     dw Bruno_h
     dw Agatha_h ;247
@@ -136172,9 +136475,9 @@ MapHeaderPointersNew:
     dw PortRoyal_h           ; PORT_ROYAL
     dw RouteD1_h             ; ROUTE_D1
     dw TestMap1_h            ; TEST_MAP_1
+    dw TestMap2_h            ; TEST_MAP_2
     dw PortRoyalCenter_h     ; PORT_ROYAL_POKECENTER
     dw PortRoyalMart_h       ; PORT_ROYAL_MART
-    dw EmptyMap_h ; $05
     dw EmptyMap_h ; $06
     dw EmptyMap_h ; $07
     dw EmptyMap_h ; $08
@@ -136426,39 +136729,6 @@ RouteD1Text1:
     jp TextScriptEnd
 
 ; ──────────────────────────────────────────────────────────────────────
-; TEST_MAP_1
-; ──────────────────────────────────────────────────────────────────────
-
-TestMap1_h:
-    db $11 ; tileset
-    db TEST_MAP_1_HEIGHT,TEST_MAP_1_WIDTH ; dimensions
-    dw TestMap1Blocks,TestMap1TextPointers,TestMap1Script ; blocks,texts,scripts
-    db 0 ; connections
-    dw TestMap1Object
-TestMap1Object:
-    db $3 ; border tile
-
-    db 2 ; warp
-    db 7,6,0,$FF
-    db 7,7,0,$FF
-
-    db 0 ; sign
-
-    db 0 ; people
-
-    ; warp-to
-    EVENT_DISP TEST_MAP_1_WIDTH,7,6
-    EVENT_DISP TEST_MAP_1_WIDTH,7,7
-
-TestMap1TextPointers:
-    db "@"
-TestMap1Script:
-    ret
-
-TestMap1Blocks:
-    INCBIN "maps/devmap1.blk"
-
-; ──────────────────────────────────────────────────────────────────────
 ; PORT_ROYAL_POKECENTER
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -136614,5 +136884,245 @@ SwapMapScript:
     db 01,08
     db 02,07
     db $FF
+
+; ──────────────────────────────────────────────────────────────────────
+; TEST_MAP_1
+; ──────────────────────────────────────────────────────────────────────
+
+TestMap1_h:
+    db $11 ; tileset
+    db TEST_MAP_1_HEIGHT,TEST_MAP_1_WIDTH ; dimensions
+    dw TestMap1Blocks,TestMap1TextPointers,TestMap1Script ; blocks,texts,scripts
+    db 0 ; connections
+    dw TestMap1Object
+TestMap1Object:
+    db $3 ; border tile
+
+    db 3 ; warp
+    db 29,06,0,$FF
+    db 29,07,0,$FF
+    db 01,01,0,TEST_MAP_2
+
+    db 0 ; sign
+
+    db 6 ; people
+    db SPRITE_BOULDER,04 + 4,19 + 4,$ff,$10,1 ; person
+    db SPRITE_BOULDER,17 + 4,04 + 4,$ff,$10,2 ; person
+    db SPRITE_BOULDER,23 + 4,01 + 4,$ff,$10,3 ; person
+    db SPRITE_BOULDER,27 + 4,06 + 4,$ff,$10,4 ; person
+    db SPRITE_BOULDER,01 + 4,27 + 4,$ff,$10,5 ; person
+    db SPRITE_BOULDER,06 + 4,06 + 4,$ff,$10,6 ; person
+
+    ; warp-to
+    EVENT_DISP TEST_MAP_1_WIDTH,29,06
+    EVENT_DISP TEST_MAP_1_WIDTH,29,07
+    EVENT_DISP TEST_MAP_1_WIDTH,01,01
+
+TestMap1TextPointers:
+    dw BoulderText
+    dw BoulderText
+    dw BoulderText
+    dw BoulderText
+    dw BoulderText
+    dw BoulderText
+
+TestMap1Script:
+    call EnableAutoTextBoxDrawing
+    call RemoveHiddenBoulderFromScreen
+    jp TestMap1HoleAndBoulderScript
+
+RemoveHiddenBoulderFromScreen:
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    ret z
+    ld c,-1
+.loop
+    inc c
+    ld a,c
+    cp 4
+    ret z
+    push bc
+
+    ; Check Current Boulder
+    add 1 ; Hidden Object of this Map start at "1"
+    ld c,a
+    ld b,2
+    ld hl,W_MISSABLEOBJECTFLAGS_NEW
+    ld a,$10
+    call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
+    ld a,c
+    and a
+
+    pop bc
+    call nz,.remove
+
+    jr .loop
+.remove
+    push bc
+    ld a,c
+    ld hl,$c215 ; first sprite position
+    ld bc,16
+    call AddNTimes
+    ld [hl],$A0
+    pop bc
+    ret
+
+TestMap1HoleAndBoulderScript:
+    ld a,[$d736]
+    bit 6,a ; jump hole
+    ret nz
+    ld hl,.Coord
+    call ArePlayerCoordsInArray
+    jr nc,.CheckBoulder
+
+    ; Check Player
+    FuncCoord 8,9 ; tile the player is on
+    ld a,[Coord]
+    cp TILE_11_CAV_HOLE
+    call nz,RevealHoleCoord
+.FallInHole
+    ; Start Warp
+    ld a,[$cd3d] ; Warp ID
+    ld [$d71e],a
+    ld hl,$d72d
+    set 4,[hl]
+    ld hl,$d732
+    set 4,[hl]
+    ld a,TEST_MAP_2
+    ld [$d71d],a
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
+    ret
+
+.Coord
+    db 28,01
+    db 28,02
+    db 21,04
+    db 02,29
+    db 25,02
+    db 23,03
+    db 28,25
+    db $FF
+
+    ; Check Boulder
+.CheckBoulder
+    ld hl,wFlags_0xcd60
+    bit 7,[hl]
+    res 7,[hl]
+    ret z
+    ld hl,.Coord
+    call CheckBoulderCoords
+    ret nc
+
+    ; Reveal Hidden Hole Under Boulder?
+    ld a,[$cd3d] ; Get Coord Occurrency
+    ld [wWhichTrade],a
+    ld a,$59
+    call Predef ; GetTileTwoStepsInFrontOfPlayer
+    ld a,[$d71c] ; Tile Hole or Hidden Hole
+    cp TILE_11_CAV_HOLE
+    jr z,.skipRevealHole
+    call Delay3
+    call RevealHoleCoord
+    call Delay3
+.skipRevealHole
+
+    ; Hide Boulder
+    ld a,[$ff00+$8c]
+    dec a
+    add 1 ; Hidden Object of this Map start at "1"
+    ld [$cc4d],a
+    ld a,$11
+    call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
+
+    ; Remove Hidden Boulder from Screen
+    ld hl,$c215 ; first sprite position
+    ld a,[$ff00+$8c]
+    dec a
+    ld bc,16
+    call AddNTimes
+    ld [hl],$A0
+    ret
+
+RevealHoleA:
+    call GetDirectionOffset
+    call GetTileOffset
+    cp TILE_11_CAV_HOLE
+    ret z
+    ld a,[$cd3f]
+    jr RevealHoleCommon
+
+RevealHoleCoord:
+    ld a,[wWhichTrade]
+    dec a
+RevealHoleCommon:
+    ld bc,3
+    ld hl,.Table
+    call AddNTimes
+    ld a,[hli]
+    ld b,a ; Y
+    ld a,[hli]
+    ld c,a ; X
+    ld a,[hli]
+    ld [$d09f],a; ID
+    ld a,$17
+    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+    ld a,$ac
+    call PlaySound
+    FuncCoord 8,9 ; tile the player is on
+    ld a,[Coord]
+    cp TILE_11_CAV_HOLE
+    ret nz
+    ld a,$FF
+    ld [wJoypadForbiddenButtonsMask],a ; Disable Joy
+    call Delay3
+    ; EmotionBubble
+    ld hl,$cd4f
+    xor a
+    ld [hli],a
+    ld [hl],a
+    ld a,$4c
+    call Predef ; indirect jump to Func_17c47 (17c47 (5:7c47))
+    jp Delay3
+.Table
+   ;db YY,XX,$ID
+    db 14,00,$78
+    db 14,01,$77
+    db 10,02,$68
+    db 01,14,$78
+
+TestMap1Blocks:
+    INCBIN "maps/devmap1.blk"
+
+; ──────────────────────────────────────────────────────────────────────
+; TEST_MAP_2
+; ──────────────────────────────────────────────────────────────────────
+
+TestMap2_h:
+    db $11 ; tileset
+    db TEST_MAP_2_HEIGHT,TEST_MAP_2_WIDTH ; dimensions
+    dw TestMap2Blocks,TestMap2TextPointers,TestMap2Script ; blocks,texts,scripts
+    db 0 ; connections
+    dw TestMap2Object
+TestMap2Object:
+    db $3 ; border tile
+
+    db 1 ; warp
+    db 01,01,2,TEST_MAP_1
+
+    db 0 ; sign
+
+    db 0 ; people
+
+    ; warp-to
+    EVENT_DISP TEST_MAP_2_WIDTH,01,01
+
+TestMap2TextPointers:
+    db "@"
+TestMap2Script:
+    ret
+TestMap2Blocks:
+    INCBIN "maps/devmap2.blk"
 
 ; ──────────────────────────────────────────────────────────────────────

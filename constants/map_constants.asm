@@ -253,7 +253,8 @@ AGATHAS_ROOM EQU $F7
 PORT_ROYAL                 EQU $00
 ROUTE_D1                   EQU $01
 TEST_MAP_1                 EQU $02
-PORT_ROYAL_POKECENTER      EQU $03
-PORT_ROYAL_MART            EQU $04
+TEST_MAP_2                 EQU $03
+PORT_ROYAL_POKECENTER      EQU $04
+PORT_ROYAL_MART            EQU $05
 
 SWAP_MAP                   EQU $45

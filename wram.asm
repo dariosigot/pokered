@@ -1096,6 +1096,32 @@ W_SPRITESETID: ; d3a8
 ; sprite set ID for the current map
     ds 1
 
+SECTION "ChangedBlocks",WRAMX[$d430],BANK[1]
+
+wChangedBlocksMapId:: db
+wChangedBlocksNum: db
+
+UNION
+
+wChangedBlocksH:: db
+wChangedBlocksL:: db
+wChangedBlocksID:: db
+
+NEXTU
+
+wChangedBlocksHLID::
+    ds 3 * 15
+
+ENDU
+
+wChangedBlocksEnd::
+
+wUselessD45F:
+    ds 1
+
+wBackupNearPlayerTiles:
+    ds 20
+
 ; some free bytes
 
 SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]
@@ -1612,8 +1638,14 @@ wEXPBarKeepFullFlag:
 
 NEXTU
 
-wJumpingTile : ; def0
-    ds 1
+wCollisionRule:: db ; def0
+; Debug Collision Rule
+
+wCollisionFlag:: db ; def1
+; bit 0 = Try Jumping
+; bit 1 = Try Stop Surfing
+; bit 2 = Can Surfing
+; bit 3 = Try Pushing Boulder
 
 NEXTU
 
