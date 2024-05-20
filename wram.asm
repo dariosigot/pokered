@@ -1660,8 +1660,9 @@ ENDU
 
 SECTION "wSpriteOAMBySpecies",WRAMX[$df26],BANK[1]
 
-wSpriteOAMBySpecies:      ; df26 ; bit 0 = Flag Tentativo Rinomina
-wStatusScreenJustLoadBit1 ; fd26 ; bit 1 = Status Screen Picture Just Load
+wSpriteOAMBySpecies:       ; df26 ; bit 0 = Flag Tentativo Rinomina
+wStatusScreenJustLoadBit1: ; fd26 ; bit 1 = Status Screen Picture Just Load
+wStatusScreen2OAMBit2:     ; fd26 ; bit 2 = Write OAM in Status Screen 2
     ds 1
 wSpriteOAMBySpeciesId: ; df27 ; Denim
 wLastTechMachIdUsed: ; df27
