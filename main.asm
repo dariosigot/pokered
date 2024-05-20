@@ -397,6 +397,13 @@ GetDirectionOffset:
     ld e,COLL_LEFT_OFFSET
     ret
 
+TestPhysicalSpecial:
+    ld a,$63
+    call Predef ; TestPhysicalSpecial_
+    ld a,b
+    and a
+    ret
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -29477,7 +29484,9 @@ HandleStatusScreen1:
     call PlaceString ; "ID/OT"
     ld d,$0
     call PlaceStatusScreenShinyGenderEtc ; call PrintStatsBox
-    call ExperienceSection
+    ld b,BANK(ExperienceSection)
+    ld hl,ExperienceSection
+    call Bankswitch
     ; End
     call Delay3
     call GBPalNormal
@@ -29498,71 +29507,6 @@ HandleStatusScreen1:
 
 IDNoText:
     db "OT",$d3,$4e,"@"
-
-ExperienceSection:
-    FuncCoord 0,14
-    ld hl,Coord
-    ld de,EXPPointsText
-    call PlaceString
-    ld de,$cfa6
-    FuncCoord 0,15
-    ld hl,Coord
-    ld bc,$0308
-    call PrintNumber ; exp
-    call .asm_12c86
-    ld hl,$cfa6
-    ld a,[hli]
-    ld b,a
-    ld a,[hli]
-    ld c,a
-    ld a,[hl]
-    or b
-    or c
-    and a
-    ret z ; skipExpLevelUp
-    FuncCoord 8,16
-    ld hl,Coord
-    ld de,LevelUpText
-    call PlaceString
-    ld de,$cfa6
-    FuncCoord 0,16
-    ld hl,Coord
-    ld bc,$0308
-    jp PrintNumber
-
-.asm_12c86 ; This does some magic with lvl/exp?
-    ld a,[$cfb9] ; Load level
-    cp $64
-    jr z,.asm_12ca7 ; 0x12c8b $1a ; If 100
-    inc a
-    ld d,a
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
-    ld hl,$cfa8
-    ld a,[$ff00+$98]
-    sub [hl]
-    ld [hld],a
-    ld a,[$ff00+$97]
-    sbc [hl]
-    ld [hld],a
-    ld a,[$ff00+$96]
-    sbc [hl]
-    ld [hld],a
-    ret
-.asm_12ca7
-    ld hl,$cfa6
-    xor a
-    ld [hli],a
-    ld [hli],a
-    ld [hl],a
-    ret
-
-EXPPointsText:
-    db "Exp Pt",$D3,"@"
-
-LevelUpText:
-    db $D4,"@"
 
 Unknown_12a95:
     dw W_PARTYMON1OT
@@ -29727,14 +29671,14 @@ HandleStatusScreen2:
 .Text1
     ld de,.PwrText
     pop hl
-    ld bc,20+11
+    ld bc,20+10
     add hl,bc
     call PlaceString
 
 .Text2
     ld de,.AccrText
     pop hl
-    ld bc,40+11
+    ld bc,40+10
     add hl,bc
     call PlaceString
 
@@ -29781,14 +29725,14 @@ HandleStatusScreen2:
     ; ───────
     ld de,$FF98
     pop hl
-    ld bc,40+15
+    ld bc,40+14
     add hl,bc
     ld bc,$0103
     call PrintNumber
 
 .PlaceMovePwr
     pop hl
-    ld bc,20+15
+    ld bc,20+14
     add hl,bc
     ld a,[W_PLAYERMOVEPOWER]
     and a
@@ -29798,6 +29742,16 @@ HandleStatusScreen2:
     ld de,W_PLAYERMOVEPOWER
     ld bc,$0103
     call PrintNumber
+    ; Print Phi/Spc Symbols
+    push hl
+    ld hl,W_PLAYERMOVENUM
+    call TestPhysicalSpecial
+    pop hl
+    ld de,.PhiText
+    jr z,.PhiSpcPrint
+    ld de,.SpcText
+.PhiSpcPrint
+    call PlaceString
     jr .PowerDone
 .Power0
     inc hl
@@ -29821,11 +29775,15 @@ HandleStatusScreen2:
 .MovesText
     db "'s Moves@"
 .AccrText
-    db "ACR",$D3,"@"
+    db "ACR",$D3,"   ",$D9,"@"
 .PwrText
     db "PWR",$D3,"@"
 .PPText
     db "PP",$D3,"@"
+.PhiText
+    db $D7,"@"
+.SpcText
+    db $D8,"@"
 
 SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
 
@@ -56216,6 +56174,15 @@ WaitButtonPressed:
     ld hl,WaitButtonPressed_
     jp Bankswitch
 
+TestPhysicalSpecialBattle:
+    ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
+    ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
+    and a
+    jr z,.done
+    inc hl
+.done
+    jp TestPhysicalSpecial
+
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
 UnnamedText_3ddb6: ; 3ddb6 (f:5db6)
@@ -56248,9 +56215,10 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     and a
     ld d,a         ;*D = attack base,used later
     ret z           ;return if attack is zero
-    ld a,[hl]      ;*test attacking type
-    cp a,$14       ;types >= $14 are all special
-    jr nc,.specialAttack
+    ;ld a,[hl]      ;*test attacking type
+    ;cp a,$14       ;types >= $14 are all special
+    call TestPhysicalSpecialBattle
+    jr nz,.specialAttack
 .physicalAttack
     ld hl,W_ENEMYMONDEFENSE    ;opponent defense
     ld a,[hli]                 ;*BC = opponent defense used later
@@ -56340,7 +56308,7 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     and a
     ret
 
-Func_3de75: ; 3de75 (f:5e75)
+CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
     ld hl,W_DAMAGE ; $d0d7
     xor a
     ld [hli],a
@@ -56350,9 +56318,10 @@ Func_3de75: ; 3de75 (f:5e75)
     ld d,a
     and a
     ret z
-    ld a,[hl]
-    cp $14
-    jr nc,.asm_3debc
+    ;ld a,[hl]
+    ;cp $14
+    call TestPhysicalSpecialBattle
+    jr nz,.asm_3debc
     ld hl,W_PLAYERMONDEF
     ld a,[hli]
     ld b,a
@@ -57742,7 +57711,7 @@ asm_3e750: ; 3e750 (f:6750)
     call HandleCounterMove
     jr z,asm_3e782
     call Func_3ec81
-    call Func_3de75
+    call CalculateDamageAfterEnemyAttack
     call Func_3ec81
     call MoreCalculateDamage
     jp z,Func_3e7d1
@@ -58006,7 +57975,7 @@ Func_3e8fd: ; 3e8fd (f:68fd)
     ld [hli],a
     xor a
     ld [hl],a
-    call Func_3de75
+    call CalculateDamageAfterEnemyAttack
     call MoreCalculateDamage
     pop af
     pop hl
@@ -74919,6 +74888,7 @@ DrawHPBarPredef: ; 4ff96 (13:7f96)
     dbw BANK(Func_128f6),Func_128f6
     dbw BANK(Func_1c9c6),Func_1c9c6
     dbw BANK(Func_59035),Func_59035
+    dbw BANK(TestPhysicalSpecial_),TestPhysicalSpecial_ ; 63
 
 SECTION "bank14",ROMX,BANK[$14]
 
@@ -129882,6 +129852,7 @@ OtherIcon:
     INCBIN "gfx/denim/doubledot.2bpp"
     INCBIN "gfx/denim/arrowup.2bpp"
     INCBIN "gfx/denim/arrowleft.2bpp"
+    INCBIN "gfx/denim/PhiSpcSplit.2bpp"
 
 SECTION "bank2F",ROMX,BANK[$2F]
 
@@ -134432,7 +134403,7 @@ LoadHpBarAndStatusTilePatterns_:
     call GoodCopyVideoData
     ld de,OtherIcon
     ld hl,$8d00
-    ld bc,(BANK(OtherIcon) << 8 | $7)
+    ld bc,(BANK(OtherIcon) << 8 | $A)
     jp GoodCopyVideoData
 
 ; INPUT
@@ -135543,6 +135514,7 @@ OtherIcon_w:
     INCBIN "gfx/denim/doubledot_w.2bpp"
     INCBIN "gfx/denim/arrowup_w.2bpp"
     INCBIN "gfx/denim/arrowleft_w.2bpp"
+    INCBIN "gfx/denim/PhiSpcSplit_w.2bpp"
 PTile: ; This is a single 1bpp "P" tile
     INCBIN "gfx/p_tile.1bpp"
 
@@ -135580,7 +135552,7 @@ LoadFontTilePatternsWithWall:
     call GoodCopyVideoData
     ld de,OtherIcon_w
     ld hl,$8D20
-    ld bc,(BANK(OtherIcon_w) << 8 | $5)
+    ld bc,(BANK(OtherIcon_w) << 8 | $8)
     call GoodCopyVideoData
     ld de,Empty2bpp
     ld hl,$8CA0
@@ -135707,6 +135679,23 @@ PrintMoveDetailsBox:
     inc hl
 .PowerDone
 
+    ; Print Phi/Spc Symbols
+    ld a,[W_PLAYERMOVEPOWER]
+    and a
+    jr z,.PhiSpcDone
+    dec a
+    jr z,.PhiSpcDone
+    push hl
+    ld hl,W_PLAYERMOVENUM
+    call TestPhysicalSpecial
+    pop hl
+    ld de,.PhiText
+    jr z,.PhiSpcPrint
+    ld de,.SpcText
+.PhiSpcPrint
+    call PlaceString
+.PhiSpcDone
+
     ; PrintMoveType
     ld de,20*(-1)+(-7)
     add hl,de
@@ -135714,9 +135703,13 @@ PrintMoveDetailsBox:
     jp Predef ; indirect jump to PrintMoveType (27d98 (9:7d98))
 
 .AccrText
-    db "ACR",$D3,"@"
+    db "ACR",$D3,"   ",$D9,"@"
 .PwrText
     db "PWR",$D3,"@"
+.PhiText
+    db $D7,"@"
+.SpcText
+    db $D8,"@"
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -136032,6 +136025,129 @@ DecrementEnemyPP_:
                          ; based on the move chosen.
     dec [hl]             ; Decrement PP
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+; input hl = pointer to move id
+; output b = table byte with mask, need to test zero
+TestPhysicalSpecial_:
+    call Load16BitRegisters
+    push bc
+    push de
+    ld a,[hl] ; carico in a l'id dell'attacco
+    srl a
+    srl a
+    srl a ; divido l'id dell'attacco per 8 per individuare il byte corretto nella tabella associativa (1 bit per attacco)
+    ld e,a
+    ld d,0 ; memorizzo in de l'offset per individuare il byte corretto
+    ld a,[hl] ; ricarico in a l'id dell'attacco
+    and a,%00000111 ; isolo in a i primi 3 bit meno significativi per individuare il bit del byte corretto
+    ld b,%10000000
+.CicloExp ; Ciclo di Creazione maschera
+    and a
+    jr z,.CicloExpEnd
+    srl b ; b = b / 2
+    dec a
+    jr .CicloExp
+.CicloExpEnd
+    ld hl,.AttackTypeTable
+    add hl,de ; punto il byte corretto
+    ld a,[hl] ; leggo il byte corretto
+    and b ; applico la maschera per isolare il bit corretto,il bit viene così testato
+    pop de
+    pop bc
+    ld b,a
+    ret
+; tabella associativa attacco/tipologia di danno
+.AttackTypeTable
+db %00000000    ; Zero,Pound,Karate Chop*,Double Slap,Comet Punch,Mega Punch,Pay Day,Fire Punch
+db %00000100    ; Ice Punch,Thunder Punch,Scratch,Vice Grip,Guillotine,Razor Wind,Swords Dance,Cut
+db %10000000    ; Gust*,Wing Attack,Whirlwind,Fly,Bind,Slam,Vine Whip,Stomp
+db %00000000    ; Double Kick,Mega Kick,Jump Kick,Rolling Kick,Sand Attack*,Headbutt,Horn Attack,Fury Attack
+db %00000000    ; Horn Drill,Tackle,Body Slam,Wrap,Take Down,Thrash,Double-Edge,Tail Whip
+db %00000000    ; Poison Sting,Twineedle,Pin Missile,Leer,Bite*,Growl,Roar,Sing
+db %01011101    ; Supersonic,Sonic Boom,Disable,Acid,Ember,Flamethrower,Mist,Water Gun
+db %11111111    ; Hydro Pump,Surf,Ice Beam,Blizzard,Psybeam,Bubble Beam,Aurora Beam,Hyper Beam
+db %00000001    ; Peck,Drill Peck,Submission,Low Kick,Counter,Seismic Toss,Strength,Absorb
+db %10001000    ; Mega Drain,Leech Seed,Growth,Razor Leaf,Solar Beam,Poison Powder,Stun Spore,Sleep Powder
+db %10111101    ; Petal Dance,String Shot,Dragon Rage,Fire Spin,Thunder Shock,Thunderbolt,Thunder Wave,Thunder
+db %00000110    ; Rock Throw,Earthquake,Fissure,Dig,Toxic,Confusion,Psychic,Hypnosis
+db %00000100    ; Meditate,Agility,Quick Attack,Rage,Teleport,Night Shade,Mimic,Screech
+db %00000000    ; Double Team,Recover,Harden,Minimize,Smokescreen,Confuse Ray,Withdraw,Defense Curl
+db %00000000    ; Barrier,Light Screen,Haze,Reflect,Focus Energy,Bide,Metronome,Mirror Move
+db %00011010    ; Self-Destruct,Egg Bomb,Lick,Smog,Sludge,Bone Club,Fire Blast,Waterfall
+db %01000000    ; Clamp,Swift,Skull Bash,Spike Cannon,Constrict,Amnesia,Kinesis,Soft-Boiled
+db %00100000    ; High Jump Kick,Glare,Dream Eater,Poison Gas,Barrage,Leech Life,Lovely Kiss,Sky Attack
+db %01000100    ; Transform,Bubble,Dizzy Punch,Spore,Flash,Psywave,Splash,Acid Armor
+db %00000000    ; Crabhammer,Explosion,Fury Swipes,Bonemerang,Rest,Rock Slide,Hyper Fang,Sharpen
+db %01000000    ; Conversion,Tri Attack,Super Fang,Slash,Substitute,Struggle,???,???
+
+; ──────────────────────────────────────────────────────────────────────
+
+ExperienceSection:
+    FuncCoord 0,14
+    ld hl,Coord
+    ld de,EXPPointsText
+    call PlaceString
+    ld de,$cfa6
+    FuncCoord 0,15
+    ld hl,Coord
+    ld bc,$0308
+    call PrintNumber ; exp
+    call .asm_12c86
+    ld hl,$cfa6
+    ld a,[hli]
+    ld b,a
+    ld a,[hli]
+    ld c,a
+    ld a,[hl]
+    or b
+    or c
+    and a
+    ret z ; skipExpLevelUp
+    FuncCoord 8,16
+    ld hl,Coord
+    ld de,LevelUpText
+    call PlaceString
+    ld de,$cfa6
+    FuncCoord 0,16
+    ld hl,Coord
+    ld bc,$0308
+    jp PrintNumber
+
+.asm_12c86 ; This does some magic with lvl/exp?
+    ld a,[$cfb9] ; Load level
+    cp $64
+    jr z,.asm_12ca7 ; 0x12c8b $1a ; If 100
+    inc a
+    ld d,a
+    ld hl,CalcExperience
+    ld b,BANK(CalcExperience)
+    call Bankswitch
+    ld hl,$cfa8
+    ld a,[$ff00+$98]
+    sub [hl]
+    ld [hld],a
+    ld a,[$ff00+$97]
+    sbc [hl]
+    ld [hld],a
+    ld a,[$ff00+$96]
+    sbc [hl]
+    ld [hld],a
+    ret
+.asm_12ca7
+    ld hl,$cfa6
+    xor a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+    ret
+
+EXPPointsText:
+    db "Exp Pt",$D3,"@"
+
+LevelUpText:
+    db $D4,"@"
 
 ; ──────────────────────────────────────────────────────────────────────
 
