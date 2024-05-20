@@ -29121,111 +29121,70 @@ Func_128d8: ; Moved in the Bank
     ld a,[W_YCOORD] ; $d361
     ld b,a
     ld a,[W_CURMAPHEIGHT] ; $d368
-    call Func_128ea
+    call .Func_128ea
     ret z
     ld a,[W_XCOORD] ; $d362
     ld b,a
     ld a,[W_CURMAPWIDTH] ; $d369
-
-Func_128ea: ; Moved in the Bank
+.Func_128ea: ; Moved in the Bank
     add a
     cp b
     ret z
     inc b
     ret
 
-; fill an area of the screen with blank tile
-; INPUT:
-; hl = address of upper left corner of the area
-; b = height
-; c = width
-FillBlankArea:
-    ld a,$CA ; Blank Tile
-    ld de,20 ; screen width
-.loop
-    push hl
-    push bc
-.innerLoop
-    ld [hli],a
-    dec c
-    jr nz,.innerLoop
-    pop bc
-    pop hl
-    add hl,de
-    dec b
-    jr nz,.loop
-    ret
-
-; Moved in the Bank
-unk_12a7e: ; 0x12a7e ; I don't know what this does,iterates over pointers?
-    ld a,[$cc49]
-    add a
-    ld c,a
-    ld b,$0
-    add hl,bc
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    ld a,[$cc49]
-    cp $3
-    ret z
-    ld a,[wWhichPokemon]
-    jp SkipFixedLengthTextEntries
-
-SECTION "OldAmberSprite",ROMX[$5300],BANK[$4]
-
-OldAmberSprite: ; 11300 (4:5300)
+OldAmberSprite:
     INCBIN "gfx/sprites/old_amber.2bpp" ; was $11300
-LyingOldManSprite: ; 11340 (4:5340)
+LyingOldManSprite:
     INCBIN "gfx/sprites/lying_old_man.2bpp" ; was $11340
 
-PokemonLogoGraphics: ; 11380 (4:5380)
+PokemonLogoGraphics:
     INCBIN "gfx/pokemon_logo.2bpp"
-FontGraphics: ; 11a80 (4:5a80)
+FontGraphics:
     INCBIN "gfx/font.1bpp"
 
-ABTiles: ; 11e80 (4:5e80)
+ABTiles:
     INCBIN "gfx/AB.2bpp"
 
-HpBarAndStatusGraphics: ; 11ea0 (4:5ea0)
+HpBarAndStatusGraphics:
     INCBIN "gfx/hp_bar_and_status.2bpp"
 
-BattleHudTiles1: ; 12080 (4:6080)
+BattleHudTiles1:
     INCBIN "gfx/battle_hud1.1bpp"
 
-BattleHudTiles2: ; 12098 (4:6098)
+BattleHudTiles2:
     INCBIN "gfx/battle_hud2.1bpp"
 
-BattleHudTiles3: ; 120b0 (4:60b0)
+BattleHudTiles3:
     INCBIN "gfx/battle_hud3.1bpp"
 
-NintendoCopyrightLogoGraphics: ; 120c8 (4:60c8)
+NintendoCopyrightLogoGraphics:
     INCBIN "gfx/copyright.2bpp"
 
-GamefreakLogoGraphics: ; 121f8 (4:61f8)
+GamefreakLogoGraphics:
     INCBIN "gfx/gamefreak.2bpp"
 
-TextBoxGraphics: ; 12288 (4:6288)
+TextBoxGraphics:
     INCBIN "gfx/text_box.2bpp"
 
-PokedexTileGraphics: ; 12488 (4:6488)
+PokedexTileGraphics:
     INCBIN "gfx/pokedex.2bpp"
 
-WorldMapTileGraphics: ; 125a8 (4:65a8)
+WorldMapTileGraphics:
     INCBIN "gfx/town_map.2bpp"
 
-PlayerCharacterTitleGraphics: ; 126a8 (4:66a8)
+PlayerCharacterTitleGraphics:
     INCBIN "gfx/player_title.2bpp"
 
-Func_128ef: ; 128ef (4:68ef)
+Func_128ef:
     call Load16BitRegisters
     ld a,$1
     jr asm_128fb
 
-Func_128f6: ; 128f6 (4:68f6)
+Func_128f6:
     call Load16BitRegisters
     ld a,$2
-asm_128fb: ; 128fb (4:68fb)
+asm_128fb:
     ld [wListMenuID],a ; $cf94
     push hl
     ld a,[$cf99]
@@ -29239,7 +29198,7 @@ asm_128fb: ; 128fb (4:68fb)
     ld e,a
     ld a,$6
     ld d,a
-    jp Func_12924
+    jr .asm_12924
 .asm_12913
     ld a,[$cfba]
     ld d,a
@@ -29250,8 +29209,7 @@ asm_128fb: ; 128fb (4:68fb)
     ld a,$6
     ld d,a
     ld c,a
-
-Func_12924: ; 12924 (4:6924)
+.asm_12924
     pop hl
     push de
     push hl
@@ -29278,512 +29236,6 @@ Func_12924: ; 12924 (4:6924)
     pop hl
     pop de
     ret
-
-; Predef 0x38
-StatusScreen2:
-    ret
-
-; Predef 0x37
-StatusScreen:
-    ; prevent audio fade out
-    ld hl,$d72c
-    set 1,[hl]
-    ld a,$33
-    ld [$ff00+$24],a ; Reduce the volume
-    ; Clear Screen & Update Sprites
-    call GBPalWhiteOutWithDelay3
-    call UpdateSprites ; move sprites (?)
-    ; water/flower tile animation
-    ld a,[$ff00+$d7]
-    push af
-    xor a
-    ld [$ff00+$d7],a
-    ; Load Generic Tile
-    ld b,BANK(LoadStatusScreenGenricTile)
-    ld hl,LoadStatusScreenGenricTile
-    call Bankswitch
-    ; Load Custom Tile
-    ld b,BANK(LoadFontTilePatternsWithWall)
-    ld hl,LoadFontTilePatternsWithWall
-    call Bankswitch
-
-; STATUSSCREEN 1
-    jr .skipOnlyFirstTime
-.Status1
-    call GBPalWhiteOutWithDelay3
-.skipOnlyFirstTime
-    call ClearScreen
-    ; Recalculate stats
-    call .LoadMonData
-    call HandleStatusScreen1
-.getJoypadStateLoop1
-    call .GetJoy
-    and %11010011 ; ▼▲◄►StSeBA
-    jr z,.getJoypadStateLoop1
-    bit 1,a ; b pressed?
-    jr nz,.end
-    bit 7,a ; down pressed?
-    jr nz,.downFromStatus1
-    bit 6,a ; up pressed?
-    jr nz,.upFromStatus1
-    ; fall through (b/right)
-
-; STATUSSCREEN 2
-    jr .skipIfDirectlyFromStatus1
-    ; Recalculate stats
-.Status2
-    call .LoadMonData
-.skipIfDirectlyFromStatus1
-    call GBPalWhiteOutWithDelay3
-    call ClearScreen
-    call HandleStatusScreen2
-.getJoypadStateLoop2
-    call .GetJoy
-    and %11100011 ; ▼▲◄►StSeBA
-    jr z,.getJoypadStateLoop2
-    bit 5,a ; left pressed?
-    jr nz,.Status1
-    bit 7,a ; down pressed?
-    jr nz,.downFromStatus2
-    bit 6,a ; up pressed?
-    jr nz,.upFromStatus2
-
-    ; fall through (a/b)
-
-.end
-    ; Update Selected Pokemon Menù ID
-    ld a,[$cf92]
-    ld [$cc2b],a
-    call .ResetFlagStatusScreenJustLoad
-    ; water/flower tile animation
-    pop af
-    ld [$ff00+$d7],a
-    ; prevent audio fade out
-    ld hl,$d72c
-    res 1,[hl]
-    ld a,$77
-    ld [$ff00+$24],a
-    ; Restore Tile & END
-    call GBPalWhiteOut
-    call LoadFontTilePatterns
-    ld de,Empty2bpp
-    ld hl,$97F0
-    ld bc,(BANK(Empty2bpp) << 8 | $1)
-    jp GoodCopyVideoData
-.ResetFlagStatusScreenJustLoad
-    ld hl,wStatusScreenJustLoadBit1
-    res 1,[hl]
-    ret
-.downFromStatus1
-    ld a,[$cf92]
-    inc a
-.commonFromStatus1
-    call CompareWithCurrentPartyBoxNum ; cp 6
-    jr nc,.getJoypadStateLoop1 ; valid only between 0 and [W_NUMINPARTY]/[W_NUMINBOX]
-    ld [$cf92],a
-    call .ResetFlagStatusScreenJustLoad
-    jr .Status1
-.upFromStatus1
-    ld a,[$cf92]
-    dec a
-    jr .commonFromStatus1
-.downFromStatus2
-    ld a,[$cf92]
-    inc a
-.commonFromStatus2
-    call CompareWithCurrentPartyBoxNum ; cp 6
-    jr nc,.getJoypadStateLoop2 ; valid only between 0 and [W_NUMINPARTY]/[W_NUMINBOX]
-    ld [$cf92],a
-    call .ResetFlagStatusScreenJustLoad
-    jr .Status2
-.upFromStatus2
-    ld a,[$cf92]
-    dec a
-    jr .commonFromStatus2
-.GetJoy
-    call GetJoypadStateLowSensitivity
-    ld a,[$ffb5]
-    ret
-.LoadMonData
-    call LoadMonData
-    ;ld hl,wStatusScreenJustLoadBit1
-    ;bit 1,[hl]
-    ;ret nz ; Don't Recalculate
-    ld a,[$cc49]
-    cp $2 ; 2 means we're in a PC box
-    ret c ;  Don't Recalculate
-    ld a,[$cf9b]
-    ld [$cfb9],a
-    ld [$d127],a
-    ld hl,$cfa8
-    ld de,$cfba
-    ld b,$1
-    jp CalcStats ; Recalculate stats
-
-HandleStatusScreen1:
-    FuncCoord 1,0
-    ld hl,Coord
-    ld bc,$0707
-    call FillBlankArea
-    ld a,$CA ; Blank Tile (ShinyStar)
-    FuncCoord 19,6
-    ld [Coord],a
-    FuncCoord 18,3
-    ld hl,Coord
-    ld bc,$0207
-    call DrawLineBox ; Draws the box around name,HP and status
-    FuncCoord 9,7
-    ld hl,Coord
-    ld bc,$0a07
-    call DrawLineBox ; Draws the box around types,ID No. and OT
-    ;FuncCoord 18,0
-    ;ld hl,Coord
-    ;ld de,.Paging1
-    ;call PlaceString
-    FuncCoord 10,3
-    ld hl,Coord
-    PREDEF DrawHPBarPredef ; predef $5f
-    ld hl,$cf25
-    call GetHealthBarColor
-    ld b,$3
-    call GoPAL_SET ; SGB palette
-    FuncCoord 10,2
-    ld hl,Coord
-    ld de,$cf9c
-    call PrintStatusCondition
-    FuncCoord 14,2
-    ld hl,Coord
-    call PrintLevel ; Pokémon level
-    FuncCoord 1,8
-    ld hl,Coord
-    ld a,$4b
-    call Predef ; Prints the type (?)
-    ld hl,Unknown_12a9d ; $6a9d
-    call unk_12a7e
-    ld d,h
-    ld e,l
-    call CopyNameToCF4B
-    FuncCoord 10,1
-    ld hl,Coord
-    call PlaceString ; Pokémon name
-    ld hl,Unknown_12a95 ; $6a95
-    call unk_12a7e
-    ld d,h
-    ld e,l
-    FuncCoord 1,12
-    ld hl,Coord
-    call PlaceString ; OT
-    FuncCoord 4,11
-    ld hl,Coord
-    ld de,$cfa4
-    ld bc,$8205 ; 5
-    call PrintNumber ; ID Number
-    FuncCoord 0,11
-    ld hl,Coord
-    ld de,IDNoText
-    call PlaceString ; "ID/OT"
-    ld d,$0
-    call PlaceStatusScreenShinyGenderEtc ; call PrintStatsBox
-    ld b,BANK(ExperienceSection)
-    ld hl,ExperienceSection
-    call Bankswitch
-    ; End
-    call Delay3
-    call GBPalNormal
-
-    ld a,1
-    ld [W_SPRITEFLIPPED],a
-    ld hl,wStatusScreenJustLoadBit1
-    bit 1,[hl] ; skipUncompressAndCry?
-    set 1,[hl]
-    FuncCoord 1,0
-    ld hl,Coord
-    jp nz,HackLoadUncompressedPicToHLFromStatusScreen
-    call LoadFlippedFrontSpriteByMonIndex ; draw Pokémon picture
-    ld a,[$cf91]
-    jp PlayCry ; play Pokémon cry
-;.Paging1:
-;    db $d6,$ec,"@"
-
-IDNoText:
-    db "OT",$d3,$4e,"@"
-
-Unknown_12a95:
-    dw W_PARTYMON1OT
-    dw W_ENEMYMON1OT
-    dw $DD2A
-    dw $DA54
-
-Unknown_12a9d:
-    dw W_PARTYMON1NAME
-    dw W_ENEMYMON1NAME
-    dw $DE06
-    dw $DA49
-
-; Draws a line starting from hl high b and wide c
-DrawLineBox:
-    ld de,$0014 ; New line
-.PrintVerticalLine
-    ld [hl],$78 ; │
-    add hl,de
-    dec b
-    jr nz,.PrintVerticalLine ; 0x12ace $fa
-    ld [hl],$77 ; ┘
-    dec hl
-.PrintHorizLine
-    ld [hl],$76 ; ─
-    dec hl
-    dec c
-    jr nz,.PrintHorizLine ; 0x12ad7 $fa
-    ld [hl],$6f ; ← (halfarrow ending)
-    ret
-
-HandleStatusScreen2:
-    xor a
-    ld [$ff00+$ba],a ; AutoBGTransferEnabled
-    ld bc,$0005 ; Moves
-    ld hl,$d0dc
-    call FillMemory
-    ld b,14 ; GetPkmnStat2PaletteID
-    call GoPAL_SET
-    FuncCoord 19,2
-    ld hl,Coord
-    ld bc,$0f11
-    call DrawLineBox
-    ;FuncCoord 18,0
-    ;ld hl,Coord
-    ;ld de,.Paging2
-    ;call PlaceString
-    ld hl,Unknown_12a9d ; $6a9d
-    call unk_12a7e
-    ld d,h
-    ld e,l
-    FuncCoord 0,0
-    call CopyNameToCF4B
-    ld hl,Coord
-    call PlaceString ; Pokémon name
-    ld h,b
-    ld l,c
-    ld de,.MovesText
-    call PlaceString
-    ld hl,$cfa0
-    FuncCoord 5,4 ; Move PP
-    ld de,Coord
-    ld b,$0
-.PrintPP ; 12bc3
-    ld a,[hli]
-    and a
-    push bc
-    push hl
-    call nz,.PlaceMoveNameTypeAcrPwr
-    push de
-    jr z,.EmptyMove
-    ld hl,wCurrentMenuItem
-    ld a,[hl]
-    push af
-    ld a,b
-    ld [hl],a
-    push hl
-    ld hl,GetMaxPP
-    ld b,BANK(GetMaxPP)
-    call Bankswitch
-    pop hl
-    pop af
-    ld [hl],a
-    pop de
-    pop hl
-    push hl
-    ld bc,$0014
-    add hl,bc
-    ld a,[hl]
-    and $3f
-    ld [$cd71],a
-    ld h,d
-    ld l,e
-    push hl
-    ld de,$cd71
-    ld bc,$0102
-    call PrintNumber
-    ld a,"/"
-    ld [hli],a
-    ld de,$d11e
-    ld bc,$0102
-    call PrintNumber
-.next
-    pop hl
-    ld de,80
-    add hl,de
-    ld d,h
-    ld e,l
-    pop hl
-    pop bc
-    inc b
-    ld a,b
-    cp $4
-    jr nz,.PrintPP ; 0x12c0f $b2
-.PPDone
-    ; End
-    ld a,$1
-    ld [$ff00+$ba],a ; AutoBGTransferEnabled
-    call Delay3
-    jp GBPalNormal
-;.Paging2:
-;    db $d5,$ed,"@"
-
-.EmptyMove
-    ld h,d
-    ld l,e
-    ld bc,-44 ; Move Name
-    add hl,bc
-    ld bc,$0312
-    call FillBlankArea
-    jr .next
-
-.PlaceMoveNameTypeAcrPwr
-    push af
-    push bc
-    push de
-
-    ld h,d
-    ld l,e
-    ld bc,-44 ; Move Name
-    add hl,bc
-    ld d,h
-    ld e,l
-    
-    push de
-    push de
-    push de
-    push de
-    push de
-    push de
-    push de
-
-    ld [$d0b5],a
-    dec a
-    ld hl,Moves
-    ld bc,6
-    call AddNTimes
-    ld a,BANK(Moves)
-    ld de,W_PLAYERMOVENUM
-    call FarCopyData ; copy bc bytes of data from a:hl to de
-
-.Text1
-    ld de,.PwrText
-    pop hl
-    ld bc,20+10
-    add hl,bc
-    call PlaceString
-
-.Text2
-    ld de,.AccrText
-    pop hl
-    ld bc,40+10
-    add hl,bc
-    call PlaceString
-
-.Text3
-    ld de,.PPText
-    pop hl
-    ld bc,40+1
-    add hl,bc
-    call PlaceString
-
-.PlaceMoveName
-    ld a,$2c
-    ld [$d0b7],a
-    ld a,MOVE_NAME
-    ld [W_LISTTYPE],a
-    call GetName
-    ld de,$cd6d
-    pop hl
-    call PlaceString
-
-.PlaceMoveType
-    pop hl
-    ld bc,20+1
-    add hl,bc
-    ld a,$5d
-    call Predef ; indirect jump to PrintMoveType (27d98 (9:7d98))
-
-.PlaceMoveAcr
-    ; ─────── Move_Accuracy
-    ld hl,$FF95
-    xor a
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld a,[W_PLAYERMOVEACCURACY]
-    ld [hli],a
-    ld a,100
-    ld [hl],a
-    call Multiply
-    ld a,255
-    ld [$FF99],a
-    ld b,4
-    call Divide
-    ; ───────
-    ld de,$FF98
-    pop hl
-    ld bc,40+14
-    add hl,bc
-    ld bc,$0103
-    call PrintNumber
-
-.PlaceMovePwr
-    pop hl
-    ld bc,20+14
-    add hl,bc
-    ld a,[W_PLAYERMOVEPOWER]
-    and a
-    jr z,.Power0
-    dec a
-    jr z,.Power1
-    ld de,W_PLAYERMOVEPOWER
-    ld bc,$0103
-    call PrintNumber
-    ; Print Phi/Spc Symbols
-    push hl
-    ld hl,W_PLAYERMOVENUM
-    call TestPhysicalSpecial
-    pop hl
-    ld de,.PhiText
-    jr z,.PhiSpcPrint
-    ld de,.SpcText
-.PhiSpcPrint
-    call PlaceString
-    jr .PowerDone
-.Power0
-    inc hl
-    inc hl
-    ld [hl],"/"
-    inc hl
-    jr .PowerDone
-.Power1
-    inc hl
-    inc hl
-    ld [hl],"?"
-    inc hl
-.PowerDone
-
-.end
-    pop de
-    pop bc
-    pop af
-    ret
-
-.MovesText
-    db "'s Moves@"
-.AccrText
-    db "ACR",$D3,"   ",$D9,"@"
-.PwrText
-    db "PWR",$D3,"@"
-.PPText
-    db "PP",$D3,"@"
-.PhiText
-    db $D7,"@"
-.SpcText
-    db $D8,"@"
 
 SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
 
@@ -30036,12 +29488,6 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     pop hl
     call PrintText
     jr .done
-
-CopyNameToCF4B:
-    push de
-    call CopyStringToCF4B ; copy name to $cf4b
-    pop de
-    ret
 
 ; items which close the item menu when used
 UsableItems_CloseMenu:
@@ -30624,14 +30070,6 @@ CannotUseItemsHereText: ; 1342a (4:742a)
 CannotGetOffHereText: ; 1342f (4:742f)
     TX_FAR _CannotGetOffHereText
     db "@"
-
-DebugPlayerStats:
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    bit 2,a ; was the select button pressed?
-    ret z
-    ld b,BANK(_DebugPlayerStats)
-    ld hl,_DebugPlayerStats
-    jp Bankswitch
 
 GetMaxLevelBank4:
     ld hl,GetMaxLevel
@@ -31546,58 +30984,6 @@ Func_13a58: ; 13a58 (4:7a58)
     ld bc,$d
     jp CopyData
 
-PlaceStatusScreenShinyGenderEtc:
-    ld b,BANK(PrintEXPBar_StatusScreen)
-    ld hl,PrintEXPBar_StatusScreen
-    call Bankswitch
-    ld b,BANK(PrintStatsBox)
-    ld hl,PrintStatsBox
-    call Bankswitch
-    ld hl,$cfb3 ; .OutOfBattle
-    call SetTempIV
-    ; ────────────────────────────────── Gender
-    call GetGenderOutOfBattle
-    jr c,.Genderless
-    push af
-    ld a,[$cfb9] ; .OutOfBattleLevel
-    cp 10
-    FuncCoord 17,2
-    ld hl,Coord
-    jr nc,.GreaterThen9
-    dec hl
-.GreaterThen9
-    pop af
-    ld de,.MaleIcon
-    jr nz,.Male
-    ld de,.FemaleIcon
-.Male
-    call PlaceString
-.Genderless
-    ; ────────────────────────────────── Debug DV/StatExp
-    call DebugPlayerStats
-    ; ──────────────────────────────────
-    call ResetTempIV
-    ld a,[$cf98] ; Pokemon ID
-    and a
-    jr z,.noShiny
-    cp $FF
-    jr z,.noShiny
-    ld hl,$cfb3 ; .OutOfBattle
-    call CheckShiny
-    jr nz,.noShiny
-    FuncCoord 19,6
-    ld hl,Coord
-    ld de,.ShinyStarIcon
-    call PlaceString
-.noShiny
-    ret
-.ShinyStarIcon
-    db $D1,$50
-.MaleIcon
-    db $EF,$50
-.FemaleIcon
-    db $F5,$50
-
 GetGenderOutOfBattle:
     ld a,[$cf98] ; Pokemon ID
     ld [$d11e],a
@@ -32503,21 +31889,6 @@ PrintLevelAndGender:
     db $EF,$50
 .FemaleIcon
     db $F5,$50
-
-CompareWithCurrentPartyBoxNum:
-    push af
-    ld a,[$cc49] ; (0=Party|2=Box)
-    and a
-    ld hl,W_NUMINPARTY
-    jr z,.party
-.box
-    ld hl,W_NUMINBOX
-.party
-    ld a,[hl]
-    ld b,a
-    pop af
-    cp b
-    ret
 
 PartyMenuItemUseMessagePointers: ; Moved in the Bank
     dw AntidoteText
@@ -99123,7 +98494,7 @@ PlaceAppropriatePokemonIcon: ; 71868 (1c:5868)
     ld a,[hl]
     call IndexToMiniSpritePointer
     ld [$cd5b],a
-    call Func_718c3
+    call WriteMonPartySpriteOAM
     pop bc
     pop de
     pop hl
@@ -99135,7 +98506,7 @@ WriteMonPartySpriteOAMBySpecies: ; 71882 (1c:5882)
     ld a,[$cd5d]
     call IndexToMiniSpritePointer
     ld [$cd5b],a
-    jr Func_718c3
+    jr WriteMonPartySpriteOAM
 
 UnusedPartyMonSpriteFunction: ; 71890 (1c:5890)
     ld a,[$cf91]
@@ -99171,9 +98542,13 @@ Func_718ac: ; 718ac (1c:58ac)
     pop hl
     jp CopyVideoData
 
-Func_718c3: ; 718c3 (1c:58c3)
+WriteMonPartySpriteOAM:
     push af
     ld c,$10
+    call .CheckStatusScreen2
+    jr z,.done1
+    ld c,$98
+.done1
     ld h,$c3
     ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
     swap a
@@ -99181,11 +98556,6 @@ Func_718c3: ; 718c3 (1c:58c3)
     add $10
     ld b,a
     pop af
-    ; Denim
-    ds 2 ; cp $8
-    ds 2 ; jr z,.asm_718da
-    ds 3 ; call Func_712a6
-    ds 2 ; jr .asm_718dd
 .asm_718da
     call Func_71281
 .asm_718dd
@@ -99193,8 +98563,14 @@ Func_718c3: ; 718c3 (1c:58c3)
     ld de,$cc5b
     ld bc,$60
     jp CopyData
+.CheckStatusScreen2
+    push hl
+    ld hl,wStatusScreen2OAMBit2
+    bit 2,[hl]
+    pop hl
+    ret
 
-IndexToMiniSpritePointer: ; 718e9 (1c:58e9)
+IndexToMiniSpritePointer:
     ld b,0
     ld hl,wArrayMiniSpriteLoaded
 .Loop
@@ -100467,21 +99843,29 @@ PaletteHackTwoBytes3: ; Denim ; 12 BYTE
     ret
 
 GetPkmnStat2PaletteID:
-    call GetPkmnStatPaletteID
+    ld hl,PalPacketStatMenu ; call GetPkmnStatPaletteID
+    ld de,$cf2d
+    ld bc,$10
+    call CopyData
+    ld hl,$cf2e
+    ld [hl],PAL_VARIOUS
+    ld hl,$cf2d
     ld de,ATTR_BLK_StatusScreen2
     ret
 
 ATTR_BLK_StatusScreen2:
     db $22
-    db $04
-    db $07,$FA
+    db $05
+    db $07,%11111010
     db $01,$02,$12,$04 ; 1st Move
-    db $03,$0A
+    db $03,%00001010
     db $01,$06,$12,$08 ; 2nd Move
-    db $03,$0A
+    db $03,%00001010
     db $01,$0A,$12,$0C ; 3rd Move
-    db $03,$0A
+    db $03,%00001010
     db $01,$0E,$12,$10 ; 4th Move
+    db $02,%00000000
+    db $12,$00,$13,$01 ; Mini Sprite
     ;db $03,%00000101
     ;db $13,$00,$13,$00 ; Paging
 
@@ -100686,9 +100070,7 @@ IfNotDarkGBFadeIn2:
     ld b,2
     jp GBFadeOutCommon
 
-SECTION "BorderPalettes",ROMX[$6788],BANK[$1C]
-
-BorderPalettes: ; 72788 (1c:6788)
+BorderPalettes:
 IF _RED
     INCBIN "gfx/red/sgbborder.map"
 ENDC
@@ -100696,7 +100078,7 @@ IF _BLUE
     INCBIN "gfx/blue/sgbborder.map"
 ENDC
 
-    ds $56
+SECTION "Unknown_72ede",ROMX[$6ede],BANK[$1C]
 
 Unknown_72ede: ; 72ede (1c:6ede)
     ds $AA
@@ -135518,7 +134900,7 @@ OtherIcon_w:
 PTile: ; This is a single 1bpp "P" tile
     INCBIN "gfx/p_tile.1bpp"
 
-LoadStatusScreenGenricTile:
+LoadStatusScreenGenericTile:
     call LoadHpBarAndStatusTilePatterns
     ld de,BattleHudTiles1  ; $6080 ; source
     ld hl,$96d0 ; dest
@@ -136083,11 +135465,338 @@ db %00000000    ; Crabhammer,Explosion,Fury Swipes,Bonemerang,Rest,Rock Slide,Hy
 db %01000000    ; Conversion,Tri Attack,Super Fang,Slash,Substitute,Struggle,???,???
 
 ; ──────────────────────────────────────────────────────────────────────
+; STATUS SCREEN START
+; ──────────────────────────────────────────────────────────────────────
 
-ExperienceSection:
+; Predef 0x38
+StatusScreen2:
+    ret
+
+; Predef 0x37
+StatusScreen:
+    ; Disable Update Sprites Flag
+    ld hl,$cfcb
+    ld a,[hl]
+    push af ; Backup Update Sprites Flag
+    ld a,$ff
+    ld [hl],a
+    ; prevent audio fade out
+    ld hl,$d72c
+    set 1,[hl]
+    ld a,$33
+    ld [$ff00+$24],a ; Reduce the volume
+    ; Clear Screen & Update Sprites
+    call GBPalWhiteOutWithDelay3
+    call UpdateSprites ; move sprites (?)
+    ; water/flower tile animation
+    ld a,[$ff00+$d7]
+    push af
+    xor a
+    ld [$ff00+$d7],a
+    call LoadStatusScreenGenericTile ; Load Generic Tile
+    call LoadFontTilePatternsWithWall ; Load Custom Tile
+
+; STATUSSCREEN 1
+    jr .skipOnlyFirstTime
+.Status1
+    call GBPalWhiteOutWithDelay3
+.skipOnlyFirstTime
+    call ClearScreen
+    call CleanLCD_OAM ; Remove Mini Sprite
+    ; Recalculate stats
+    call .LoadMonData
+    call HandleStatusScreen1
+.getJoypadStateLoop1
+    call .GetJoy
+    and %11010011 ; ▼▲◄►StSeBA
+    jr z,.getJoypadStateLoop1
+    bit 1,a ; b pressed?
+    jr nz,.end
+    bit 7,a ; down pressed?
+    jr nz,.downFromStatus1
+    bit 6,a ; up pressed?
+    jr nz,.upFromStatus1
+    ; fall through (b/right)
+
+; STATUSSCREEN 2
+    jr .skipIfDirectlyFromStatus1
+    ; Recalculate stats
+.Status2
+    call .LoadMonData
+.skipIfDirectlyFromStatus1
+    call GBPalWhiteOutWithDelay3
+    call ClearScreen
+    call CleanLCD_OAM ; Remove Mini Sprite
+    call HandleStatusScreen2
+.getJoypadStateLoop2
+    call .HandleMiniSprite
+    call .GetJoy
+    and %11100011 ; ▼▲◄►StSeBA
+    jr z,.getJoypadStateLoop2
+    bit 5,a ; left pressed?
+    jr nz,.Status1
+    bit 7,a ; down pressed?
+    jr nz,.downFromStatus2
+    bit 6,a ; up pressed?
+    jr nz,.upFromStatus2
+
+    ; fall through (a/b)
+
+.end
+    ; Update Selected Pokemon Menù ID
+    ld a,[$cf92]
+    ld [$cc2b],a
+    call .ResetFlagStatusScreenJustLoad
+    ; water/flower tile animation
+    pop af
+    ld [$ff00+$d7],a
+    ; prevent audio fade out
+    ld hl,$d72c
+    res 1,[hl]
+    ld a,$77
+    ld [$ff00+$24],a
+    ; Restore Tile
+    call GBPalWhiteOut
+    call LoadFontTilePatterns
+    ld de,Empty2bpp
+    ld hl,$97F0
+    ld bc,(BANK(Empty2bpp) << 8 | $1)
+    call GoodCopyVideoData
+    ; Restore Update Sprites Flag
+    pop af
+    ld [$cfcb],a
+    ; END
+    ret
+
+.ResetFlagStatusScreenJustLoad
+    ld hl,wStatusScreenJustLoadBit1
+    res 1,[hl]
+    ret
+
+.downFromStatus1
+    ld a,[$cf92]
+    inc a
+.commonFromStatus1
+    call .CompareWithCurrentPartyBoxNum ; cp 6
+    jr nc,.getJoypadStateLoop1 ; valid only between 0 and [W_NUMINPARTY]/[W_NUMINBOX]
+    ld [$cf92],a
+    call .ResetFlagStatusScreenJustLoad
+    jp .Status1
+.upFromStatus1
+    ld a,[$cf92]
+    dec a
+    jr .commonFromStatus1
+.downFromStatus2
+    ld a,[$cf92]
+    inc a
+.commonFromStatus2
+    call .CompareWithCurrentPartyBoxNum ; cp 6
+    jr nc,.getJoypadStateLoop2 ; valid only between 0 and [W_NUMINPARTY]/[W_NUMINBOX]
+    ld [$cf92],a
+    call .ResetFlagStatusScreenJustLoad
+    jr .Status2
+.upFromStatus2
+    ld a,[$cf92]
+    dec a
+    jr .commonFromStatus2
+.GetJoy
+    call GetJoypadStateLowSensitivity
+    ld a,[$ffb5]
+    ret
+
+.LoadMonData
+    call LoadMonData
+    ;ld hl,wStatusScreenJustLoadBit1
+    ;bit 1,[hl]
+    ;ret nz ; Don't Recalculate
+    ld a,[$cc49]
+    cp $2 ; 2 means we're in a PC box
+    ret c ;  Don't Recalculate
+    ld a,[$cf9b]
+    ld [$cfb9],a
+    ld [$d127],a
+    ld hl,$cfa8
+    ld de,$cfba
+    ld b,$1
+    jp CalcStats ; Recalculate stats
+
+.HandleMiniSprite
+    ld a,[wCurrentMenuItem]
+    push af
+    ld b,BANK(Func_716f7)
+    ld hl,Func_716f7
+    call Bankswitch
+    pop af
+    ld [wCurrentMenuItem],a
+    ret
+
+.CompareWithCurrentPartyBoxNum
+    push af
+    ld a,[$cc49] ; (0=Party|2=Box)
+    and a
+    ld hl,W_NUMINPARTY
+    jr z,.party
+.box
+    ld hl,W_NUMINBOX
+.party
+    ld a,[hl]
+    ld b,a
+    pop af
+    cp b
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+; STATUS SCREEN 1
+; ──────────────────────────────────────────────────────────────────────
+
+HandleStatusScreen1:
+    FuncCoord 1,0
+    ld hl,Coord
+    ld bc,$0707
+    call FillBlankArea
+    ld a,$CA ; Blank Tile (ShinyStar)
+    FuncCoord 19,6
+    ld [Coord],a
+    FuncCoord 18,3
+    ld hl,Coord
+    ld bc,$0207
+    call DrawLineBox ; Draws the box around name,HP and status
+    FuncCoord 9,7
+    ld hl,Coord
+    ld bc,$0a07
+    call DrawLineBox ; Draws the box around types,ID No. and OT
+    ;FuncCoord 18,0
+    ;ld hl,Coord
+    ;ld de,.Paging1
+    ;call PlaceString
+    FuncCoord 10,3
+    ld hl,Coord
+    PREDEF DrawHPBarPredef ; predef $5f
+    ld hl,$cf25
+    call GetHealthBarColor
+    ld b,$3
+    call GoPAL_SET ; SGB palette
+    FuncCoord 10,2
+    ld hl,Coord
+    ld de,$cf9c
+    call PrintStatusCondition
+    FuncCoord 14,2
+    ld hl,Coord
+    call PrintLevel ; Pokémon level
+    FuncCoord 1,8
+    ld hl,Coord
+    ld a,$4b
+    call Predef ; Prints the type (?)
+    ld hl,Unknown_12a9d ; $6a9d
+    call unk_12a7e
+    ld d,h
+    ld e,l
+    call CopyNameToCF4B
+    FuncCoord 10,1
+    ld hl,Coord
+    call PlaceString ; Pokémon name
+    ld hl,Unknown_12a95 ; $6a95
+    call unk_12a7e
+    ld d,h
+    ld e,l
+    FuncCoord 1,12
+    ld hl,Coord
+    call PlaceString ; OT
+    FuncCoord 4,11
+    ld hl,Coord
+    ld de,$cfa4
+    ld bc,$8205 ; 5
+    call PrintNumber ; ID Number
+    FuncCoord 0,11
+    ld hl,Coord
+    ld de,.IDNoText
+    call PlaceString ; "ID/OT"
+    ld d,$0
+    call .PlaceStatusScreenShinyGenderEtc ; call PrintStatsBox
+    call .ExperienceSection
+    ; End
+    call Delay3
+    call GBPalNormal
+
+    ld a,1
+    ld [W_SPRITEFLIPPED],a
+    ld hl,wStatusScreenJustLoadBit1
+    bit 1,[hl] ; skipUncompressAndCry?
+    set 1,[hl]
+    FuncCoord 1,0
+    ld hl,Coord
+    jp nz,HackLoadUncompressedPicToHLFromStatusScreen
+    call LoadFlippedFrontSpriteByMonIndex ; draw Pokémon picture
+    ld a,[$cf91]
+    jp PlayCry ; play Pokémon cry
+;.Paging1:
+;    db $d6,$ec,"@"
+
+.PlaceStatusScreenShinyGenderEtc
+    ld b,BANK(PrintEXPBar_StatusScreen)
+    ld hl,PrintEXPBar_StatusScreen
+    call Bankswitch
+    ld b,BANK(PrintStatsBox)
+    ld hl,PrintStatsBox
+    call Bankswitch
+    ld hl,$cfb3 ; .OutOfBattle
+    call SetTempIV
+    ; ────────────────────────────────── Gender
+    ld b,BANK(GetGenderOutOfBattle)
+    ld hl,GetGenderOutOfBattle
+    call Bankswitch
+    jr c,.Genderless
+    push af
+    ld a,[$cfb9] ; .OutOfBattleLevel
+    cp 10
+    FuncCoord 17,2
+    ld hl,Coord
+    jr nc,.GreaterThen9
+    dec hl
+.GreaterThen9
+    pop af
+    ld de,.MaleIcon
+    jr nz,.Male
+    ld de,.FemaleIcon
+.Male
+    call PlaceString
+.Genderless
+    ; ────────────────────────────────── Debug DV/StatExp
+    call .DebugPlayerStats
+    ; ──────────────────────────────────
+    call ResetTempIV
+    ld a,[$cf98] ; Pokemon ID
+    and a
+    jr z,.noShiny
+    cp $FF
+    jr z,.noShiny
+    ld hl,$cfb3 ; .OutOfBattle
+    call CheckShiny
+    jr nz,.noShiny
+    FuncCoord 19,6
+    ld hl,Coord
+    ld de,.ShinyStarIcon
+    call PlaceString
+.noShiny
+    ret
+.ShinyStarIcon
+    db $D1,$50
+.MaleIcon
+    db $EF,$50
+.FemaleIcon
+    db $F5,$50
+.DebugPlayerStats:
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 2,a ; was the select button pressed?
+    ret z
+    ld b,BANK(_DebugPlayerStats)
+    ld hl,_DebugPlayerStats
+    jp Bankswitch
+
+.ExperienceSection
     FuncCoord 0,14
     ld hl,Coord
-    ld de,EXPPointsText
+    ld de,.EXPPointsText
     call PlaceString
     ld de,$cfa6
     FuncCoord 0,15
@@ -136107,14 +135816,13 @@ ExperienceSection:
     ret z ; skipExpLevelUp
     FuncCoord 8,16
     ld hl,Coord
-    ld de,LevelUpText
+    ld de,.LevelUpText
     call PlaceString
     ld de,$cfa6
     FuncCoord 0,16
     ld hl,Coord
     ld bc,$0308
     jp PrintNumber
-
 .asm_12c86 ; This does some magic with lvl/exp?
     ld a,[$cfb9] ; Load level
     cp $64
@@ -136142,12 +135850,372 @@ ExperienceSection:
     ld [hli],a
     ld [hl],a
     ret
-
-EXPPointsText:
+.EXPPointsText
     db "Exp Pt",$D3,"@"
-
-LevelUpText:
+.LevelUpText
     db $D4,"@"
+.IDNoText
+    db "OT",$d3,$4e,"@"
+
+; ──────────────────────────────────────────────────────────────────────
+; STATUS SCREEN 2
+; ──────────────────────────────────────────────────────────────────────
+
+HandleStatusScreen2:
+    xor a
+    ld [$ff00+$ba],a ; AutoBGTransferEnabled
+    ld bc,$0005 ; Moves
+    ld hl,$d0dc
+    call FillMemory
+    ld b,14 ; GetPkmnStat2PaletteID
+    call GoPAL_SET
+    FuncCoord 19,2
+    ld hl,Coord
+    ld bc,$0f11
+    call DrawLineBox
+    ;FuncCoord 18,0
+    ;ld hl,Coord
+    ;ld de,.Paging2
+    ;call PlaceString
+    ld hl,Unknown_12a9d ; $6a9d
+    call unk_12a7e
+    ld d,h
+    ld e,l
+    FuncCoord 0,0
+    call CopyNameToCF4B
+    ld hl,Coord
+    call PlaceString ; Pokémon name
+    ld h,b
+    ld l,c
+    ld de,.MovesText
+    call PlaceString
+
+    ; Mini Sprite
+    call .StatusScreenMiniSpriteBackGround
+    ld hl,wSpriteOAMBySpecies
+    set 0,[hl]
+    inc hl
+    ld a,[$cf91]
+    ld [$cd5d],a
+    ld [hl],a ; wSpriteOAMBySpeciesId
+    ld b,BANK(LoadMonPartySpriteGfx)
+    ld hl,LoadMonPartySpriteGfx
+    call Bankswitch
+    ld hl,wStatusScreen2OAMBit2
+    set 2,[hl]
+    ld b,BANK(WriteMonPartySpriteOAMBySpecies)
+    ld hl,WriteMonPartySpriteOAMBySpecies
+    call Bankswitch
+    ld hl,wStatusScreen2OAMBit2
+    res 2,[hl]
+
+    ld hl,$cfa0
+    FuncCoord 5,4 ; Move PP
+    ld de,Coord
+    ld b,$0
+.PrintPP ; 12bc3
+    ld a,[hli]
+    and a
+    push bc
+    push hl
+    call nz,.PlaceMoveNameTypeAcrPwr
+    push de
+    jr z,.EmptyMove
+    ld hl,wCurrentMenuItem
+    ld a,[hl]
+    push af
+    ld a,b
+    ld [hl],a
+    push hl
+    ld hl,GetMaxPP
+    ld b,BANK(GetMaxPP)
+    call Bankswitch
+    pop hl
+    pop af
+    ld [hl],a
+    pop de
+    pop hl
+    push hl
+    ld bc,$0014
+    add hl,bc
+    ld a,[hl]
+    and $3f
+    ld [$cd71],a
+    ld h,d
+    ld l,e
+    push hl
+    ld de,$cd71
+    ld bc,$0102
+    call PrintNumber
+    ld a,"/"
+    ld [hli],a
+    ld de,$d11e
+    ld bc,$0102
+    call PrintNumber
+.next
+    pop hl
+    ld de,80
+    add hl,de
+    ld d,h
+    ld e,l
+    pop hl
+    pop bc
+    inc b
+    ld a,b
+    cp $4
+    jr nz,.PrintPP ; 0x12c0f $b2
+.PPDone
+    ; End
+    ld a,$1
+    ld [$ff00+$ba],a ; AutoBGTransferEnabled
+    call Delay3
+    jp GbPalComplete
+;.Paging2:
+;    db $d5,$ed,"@"
+
+.StatusScreenMiniSpriteBackGround
+    ld a,$CA ; Empty Tile with Color0 (White) background
+    FuncCoord 18,00
+    ld hl,Coord
+    ld [hli],a
+    ld [hld],a
+    FuncCoord 18,01
+    ld hl,Coord
+    ld [hli],a
+    ld [hl],a
+    ret
+
+.EmptyMove
+    ld h,d
+    ld l,e
+    ld bc,-44 ; Move Name
+    add hl,bc
+    ld bc,$0312
+    call FillBlankArea
+    jr .next
+
+.PlaceMoveNameTypeAcrPwr
+    push af
+    push bc
+    push de
+
+    ld h,d
+    ld l,e
+    ld bc,-44 ; Move Name
+    add hl,bc
+    ld d,h
+    ld e,l
+    
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+
+    ld [$d0b5],a
+    dec a
+    ld hl,Moves
+    ld bc,6
+    call AddNTimes
+    ld a,BANK(Moves)
+    ld de,W_PLAYERMOVENUM
+    call FarCopyData ; copy bc bytes of data from a:hl to de
+
+.Text1
+    ld de,.PwrText
+    pop hl
+    ld bc,20+10
+    add hl,bc
+    call PlaceString
+
+.Text2
+    ld de,.AccrText
+    pop hl
+    ld bc,40+10
+    add hl,bc
+    call PlaceString
+
+.Text3
+    ld de,.PPText
+    pop hl
+    ld bc,40+1
+    add hl,bc
+    call PlaceString
+
+.PlaceMoveName
+    ld a,$2c
+    ld [$d0b7],a
+    ld a,MOVE_NAME
+    ld [W_LISTTYPE],a
+    call GetName
+    ld de,$cd6d
+    pop hl
+    call PlaceString
+
+.PlaceMoveType
+    pop hl
+    ld bc,20+1
+    add hl,bc
+    ld a,$5d
+    call Predef ; indirect jump to PrintMoveType (27d98 (9:7d98))
+
+.PlaceMoveAcr
+    ; ─────── Move_Accuracy
+    ld hl,$FF95
+    xor a
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld a,[W_PLAYERMOVEACCURACY]
+    ld [hli],a
+    ld a,100
+    ld [hl],a
+    call Multiply
+    ld a,255
+    ld [$FF99],a
+    ld b,4
+    call Divide
+    ; ───────
+    ld de,$FF98
+    pop hl
+    ld bc,40+14
+    add hl,bc
+    ld bc,$0103
+    call PrintNumber
+
+.PlaceMovePwr
+    pop hl
+    ld bc,20+14
+    add hl,bc
+    ld a,[W_PLAYERMOVEPOWER]
+    and a
+    jr z,.Power0
+    dec a
+    jr z,.Power1
+    ld de,W_PLAYERMOVEPOWER
+    ld bc,$0103
+    call PrintNumber
+    ; Print Phi/Spc Symbols
+    push hl
+    ld hl,W_PLAYERMOVENUM
+    call TestPhysicalSpecial
+    pop hl
+    ld de,.PhiText
+    jr z,.PhiSpcPrint
+    ld de,.SpcText
+.PhiSpcPrint
+    call PlaceString
+    jr .PowerDone
+.Power0
+    inc hl
+    inc hl
+    ld [hl],"/"
+    inc hl
+    jr .PowerDone
+.Power1
+    inc hl
+    inc hl
+    ld [hl],"?"
+    inc hl
+.PowerDone
+
+.end
+    pop de
+    pop bc
+    pop af
+    ret
+
+.MovesText
+    db "'s Moves@"
+.AccrText
+    db "ACR",$D3,"   ",$D9,"@"
+.PwrText
+    db "PWR",$D3,"@"
+.PPText
+    db "PP",$D3,"@"
+.PhiText
+    db $D7,"@"
+.SpcText
+    db $D8,"@"
+
+; ──────────────────────────────────────────────────────────────────────
+; STATUS SCREEN COMMON
+; ──────────────────────────────────────────────────────────────────────
+
+Unknown_12a95:
+    dw W_PARTYMON1OT
+    dw W_ENEMYMON1OT
+    dw $DD2A
+    dw $DA54
+
+Unknown_12a9d:
+    dw W_PARTYMON1NAME
+    dw W_ENEMYMON1NAME
+    dw $DE06
+    dw $DA49
+
+; Draws a line starting from hl high b and wide c
+DrawLineBox:
+    ld de,$0014 ; New line
+.PrintVerticalLine
+    ld [hl],$78 ; │
+    add hl,de
+    dec b
+    jr nz,.PrintVerticalLine ; 0x12ace $fa
+    ld [hl],$77 ; ┘
+    dec hl
+.PrintHorizLine
+    ld [hl],$76 ; ─
+    dec hl
+    dec c
+    jr nz,.PrintHorizLine ; 0x12ad7 $fa
+    ld [hl],$6f ; ← (halfarrow ending)
+    ret
+
+unk_12a7e: ; I don't know what this does,iterates over pointers?
+    ld a,[$cc49]
+    add a
+    ld c,a
+    ld b,$0
+    add hl,bc
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld a,[$cc49]
+    cp $3
+    ret z
+    ld a,[wWhichPokemon]
+    jp SkipFixedLengthTextEntries
+
+CopyNameToCF4B:
+    push de
+    call CopyStringToCF4B ; copy name to $cf4b
+    pop de
+    ret
+
+; fill an area of the screen with blank tile
+; INPUT:
+; hl = address of upper left corner of the area
+; b = height
+; c = width
+FillBlankArea:
+    ld a,$CA ; Blank Tile
+    ld de,20 ; screen width
+.loop
+    push hl
+    push bc
+.innerLoop
+    ld [hli],a
+    dec c
+    jr nz,.innerLoop
+    pop bc
+    pop hl
+    add hl,de
+    dec b
+    jr nz,.loop
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
