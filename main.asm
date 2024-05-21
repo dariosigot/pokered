@@ -60967,10 +60967,10 @@ HandlePokedexSideMenu: ; 4006d (10:406d)
     pop af
     ld [wCurrentMenuItem],a
     push bc
-    FuncCoord 0,3
+    FuncCoord 0,1
     ld hl,Coord
     ld de,20
-    ld bc,$7f0d ; 13 blank tiles
+    ld bc,$7f0f ; 15 blank tiles
     call DrawTileLine ; cover up the menu cursor in the pokemon list
     pop bc
     ret
