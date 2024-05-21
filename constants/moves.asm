@@ -6,18 +6,18 @@
     db DOUBLESLAP   , TWO_TO_FIVE_ATTACKS_EFFECT ,  15 , NORMAL   , 216 , 10 ; 0
     db COMET_PUNCH  , TWO_TO_FIVE_ATTACKS_EFFECT ,  18 , FIGHTING , 216 , 15 ; 0 ; Type Normal -> Fighting
     db MEGA_PUNCH   , NO_ADDITIONAL_EFFECT       ,  80 , FIGHTING , 216 , 20 ; 0 ; Type Normal -> Fighting
-    db PAY_DAY      , PAY_DAY_EFFECT             ,  40 , NORMAL   , 255 , 20 ; 0
+    db PAY_DAY      , PAY_DAY_EFFECT             ,  60 , NORMAL   , 255 , 20 ; 0 ; Pwr 40 -> 60
     db FIRE_PUNCH   , BURN_SIDE_EFFECT1          ,  75 , FIRE     , 255 , 15 ; 0
     db ICE_PUNCH    , FREEZE_SIDE_EFFECT         ,  75 , ICE      , 255 , 15 ; 0
     db THUNDERPUNCH , PARALYZE_SIDE_EFFECT1      ,  75 , ELECTRIC , 255 , 15 ; 0
     db SCRATCH      , NO_ADDITIONAL_EFFECT       ,  40 , NORMAL   , 255 , 35 ; 0
-    db VICEGRIP     , NO_ADDITIONAL_EFFECT       ,  55 , NORMAL   , 255 , 30 ; 0
+    db VICEGRIP     , NO_ADDITIONAL_EFFECT       ,  60 , NORMAL   , 255 , 30 ; 0 ; Pwr 55 -> 60
     db GUILLOTINE   , OHKO_EFFECT                ,   1 , NORMAL   ,  76 ,  5 ; -
     db RAZOR_WIND   , CHARGE_EFFECT              , 120 , FLYING   , 255 , 10 ; 1 ; Type Normal -> Flying ; Acr 191 -> 255 ; Pwr 80 -> 120
     db SWORDS_DANCE , ATTACK_UP2_EFFECT          ,   0 , NORMAL   , 255 , 10 ; - ; PP 30 -> 10
-    db BLADE        , NO_ADDITIONAL_EFFECT       ,  50 , NORMAL   , 242 , 30 ; 0
+    db BLADE        , NO_ADDITIONAL_EFFECT       ,  55 , NORMAL   , 242 , 30 ; 0 ; Pwr 50 -> 55
     db GUST         , NO_ADDITIONAL_EFFECT       ,  40 , FLYING   , 255 , 35 ; 1 ; Type Normal -> Flying
-    db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  60 , FLYING   , 255 , 35 ; 0 ; Pwr 35 -> 60
+    db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  60 , FLYING   , 255 , 25 ; 0 ; Pwr 35 -> 60 ; PP 35 -> 25
     db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,   0 , FLYING   , 255 , 20 ; - ; Type Normal -> Flying ; Acr 216 -> 255
     db SWOOP        , FLY_EFFECT                 ,  90 , FLYING   , 242 , 15 ; 0 ; Pwr 70 -> 90
     db BIND         , TRAPPING_EFFECT            ,  10 , NORMAL   , 153 , 20 ; 0 ; Pwr 15 -> 10 ; Acr 191 -> 153
@@ -33,7 +33,7 @@
     db HORN_ATTACK  , NO_ADDITIONAL_EFFECT       ,  65 , NORMAL   , 255 , 25 ; 0
     db FURY_ATTACK  , TWO_TO_FIVE_ATTACKS_EFFECT ,  15 , NORMAL   , 216 , 20 ; 0
     db HORN_DRILL   , OHKO_EFFECT                ,   1 , NORMAL   ,  76 ,  5 ; -
-    db TACKLE       , NO_ADDITIONAL_EFFECT       ,  50 , NORMAL   , 255 , 35 ; 0 ; Acr 242 -> 255 ; Pwr 35 -> 50
+    db TACKLE       , NO_ADDITIONAL_EFFECT       ,  35 , NORMAL   , 255 , 35 ; 0 ; Acr 242 -> 255
     db BODY_SLAM    , PARALYZE_SIDE_EFFECT2      ,  85 , NORMAL   , 255 , 15 ; 0
     db WRAP         , TRAPPING_EFFECT            ,  10 , NORMAL   , 153 , 20 ; 0 ; Pwr 15 -> 10 ; Acr 216 -> 153
     db TAKE_DOWN    , RECOIL_EFFECT              ,  90 , NORMAL   , 216 , 20 ; 0
