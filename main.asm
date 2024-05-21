@@ -60916,9 +60916,9 @@ HandlePokedexSideMenu: ; 4006d (10:406d)
     ld a,[wListScrollOffset]
     push af
     add b
-    ds 1 ; inc a ; POKEDEXMOD
+    ; ds 1 ; inc a ; POKEDEXMOD
     ld [$d11e],a
-    ld a,[$d11e]
+    ; ds 3 ; ld a,[$d11e]
     push af
     ld a,[$cd3d]
     push af
@@ -60992,12 +60992,15 @@ HandlePokedexSideMenu: ; 4006d (10:406d)
     ld a,[$d11e]
     call GetCryData ; get cry data
     call PlaySound ; play sound
+    call PokedexToIndex
     jr .handleMenuInput
 .choseArea
     ld a,$4a
     call Predef ; display pokemon areas
     ld b,0
     jr .exitSideMenu
+
+SECTION "HandlePokedexListMenu",ROMX[$4111],BANK[$10]
 
 ; handles the list of pokemon on the left of the pokedex screen
 ; sets carry flag if player presses A,unsets carry flag if player presses B
