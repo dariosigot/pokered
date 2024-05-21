@@ -404,6 +404,25 @@ TestPhysicalSpecial:
     and a
     ret
 
+; Input $D11E = Pokemon ID
+; Output a    = Pokedex ID
+IndexToPokedexAndRestoreD11E:
+    push de
+    push bc
+    push hl
+    ld hl,$d11e
+    ld b,[hl]
+    push hl
+    ld a,$3a
+    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
+    pop hl
+    ld a,[hl]
+    ld [hl],b
+    pop hl
+    pop bc
+    pop de
+    ret
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -2919,12 +2938,8 @@ PlayCry: ; Moved in the Bank
 ; INPUT:
 ; a = pokemon ID
 GetCryData: ; Moved in the Bank
-    push de
     ld [$d11e],a
-    ld a,$3a
-    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
-    ld a,[$d11e]
-    pop de
+    call IndexToPokedexAndRestoreD11E
     ld c,a
     ld b,0
     ld hl,CryData
@@ -5910,21 +5925,9 @@ TrainerWalkUpToPlayer_Bank0: ; Moved in the Bank
     jp Bankswitch ; indirect jump to TrainerWalkUpToPlayer (56881 (15:6881))
 
 LoadEvosMovesPointerTableByPokedex:
-    push bc
-    push de
     ld [$d11e],a
-    ld a,$3a
-    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
-    ld a,[$d11e]
+    call IndexToPokedexAndRestoreD11E
     ld hl,EvosMovesPointerTable
-    pop de
-    pop bc
-    ret
-
-GetMonsterNames:
-    ld a,$3a
-    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
-    ld hl,MonsterNames ; 421E
     ret
 
 GetTileOffset:
@@ -7643,8 +7646,8 @@ GetMonName: ; 2f9e (0:2f9e)
     ld a,BANK(MonsterNames) ; 07
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
-    call GetMonsterNames ; ld hl,MonsterNames ; 421E
-    ld a,[$d11e]
+    call IndexToPokedexAndRestoreD11E
+    ld hl,MonsterNames ; 421E
     ld c,10
     ld b,0
     call AddNTimes
@@ -60992,7 +60995,6 @@ HandlePokedexSideMenu: ; 4006d (10:406d)
     ld a,[$d11e]
     call GetCryData ; get cry data
     call PlaySound ; play sound
-    call PokedexToIndex
     jr .handleMenuInput
 .choseArea
     ld a,$4a
@@ -61324,7 +61326,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld hl,Coord
     call PlaceString
     ld hl,PokedexEntryPointers
-    ld a,[$d11e]
+    call IndexToPokedexAndRestoreD11E
     ds 1 ; dec a ; 00MOD
     ld e,a
     ld d,0
