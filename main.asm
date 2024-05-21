@@ -52258,6 +52258,8 @@ FaintEnemyPokemon ; 0x3c567
     ret z
     ld hl,EnemyMonFainted ; $463e
     call PrintText
+
+HackGainExpAfterCatch:
     call Func_3ee94
     call SaveScreenTilesToBuffer1
     xor a
@@ -53679,44 +53681,24 @@ asm_3d05f: ; 3d05f (f:505f)
     ld [wCurrentMenuItem],a ; $cc26
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
-    jr z,.asm_3d09c
+    jr z,.FinalCheck
     ld a,[$cd6a]
     and a
     jp z,asm_3d00e
     ld a,[W_PLAYERBATTSTATUS1] ; $d062
     bit 5,a
-    jr z,.asm_3d09c
+    jr z,.FinalCheck
     ld hl,$d06a
     dec [hl]
-    jr nz,.asm_3d09c
+    jr nz,.FinalCheck
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
     res 5,[hl]
-.asm_3d09c
-    ld a,[$d11c]
-    and a
-    jr nz,.asm_3d0b7
-    ld a,[W_BATTLETYPE] ; $d05a
-    cp $2
-    jr z,.asm_3d0b2
-    call LoadScreenTilesFromBuffer1
-    call DrawHUDsAndHPBars ; redraw name and hp bar?
-    call GoPalSetAndDelay3BankF ; call Delay3
-.asm_3d0b2
-    call GBPalNormal
-    and a
-    ret
-.asm_3d0b7
-    call GBPalNormal
-    xor a
-    ld [$d11c],a
-    ld a,$2
-    ld [$cf0b],a
-    scf
-    ret
+.FinalCheck
+    ld b,BANK(ItemInBattleFinalCheck)
+    ld hl,ItemInBattleFinalCheck
+    jp Bankswitch
 
-ItemsCantBeUsedHere: ; 3d0c5 (f:50c5)
-    TX_FAR ItemsCantBeUsedHere_
-    db "@"
+SECTION "Func_3d0ca",ROMX[$50ca],BANK[$f]
 
 Func_3d0ca: ; 3d0ca (f:50ca)
     dec a
@@ -58302,6 +58284,10 @@ _BaitHealth:
     ld hl,W_ENEMYMONCURHP ; $cfe6
     call HandlePoisonBurnLeechSeed_IncreaseEnemyHP
     jp DrawEnemyHUDAndHPBar
+
+ItemsCantBeUsedHere: ; Moved in the Bank
+    TX_FAR ItemsCantBeUsedHere_
+    db "@"
 
 SECTION "TerminatorText_3f04a",ROMX[$704a],BANK[$f]
 
@@ -136213,6 +136199,60 @@ FillBlankArea:
     dec b
     jr nz,.loop
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+ItemInBattleFinalCheck:
+    ld a,[W_BATTLETYPE] ; $d05a
+    cp $2
+    jr z,.safari
+    call LoadScreenTilesFromBuffer1
+    ld a,[$d11c] ; checkIfMonCaptured
+    and a
+    push af
+    jr z,.NoCapture
+    ld hl,.EmptyText
+    call PrintText
+    call .DrawPlayerHUDAndHPBar
+    jr .done1
+.NoCapture
+    call .DrawHUDsAndHPBars
+.done1
+    call GoPAL_SET_CF1C
+    call Delay3
+    call GBPalNormal
+    pop af
+    jr z,.EndNoCapture
+    call .HackGainExpAfterCatch
+.EndCapture
+    xor a
+    ld [$d11c],a
+    ld a,$2
+    ld [$cf0b],a
+    scf
+    ret
+.safari
+    call GBPalNormal
+    ld a,[$d11c] ; checkIfMonCaptured
+    and a
+    jr nz,.EndCapture
+.EndNoCapture
+    and a
+    ret
+.DrawPlayerHUDAndHPBar
+    ld b,BANK(DrawPlayerHUDAndHPBar)
+    ld hl,DrawPlayerHUDAndHPBar
+    jp Bankswitch
+.DrawHUDsAndHPBars
+    ld b,BANK(DrawHUDsAndHPBars)
+    ld hl,DrawHUDsAndHPBars
+    jp Bankswitch
+.HackGainExpAfterCatch
+    ld b,BANK(HackGainExpAfterCatch)
+    ld hl,HackGainExpAfterCatch
+    jp Bankswitch
+.EmptyText
+    db "@"
 
 ; ──────────────────────────────────────────────────────────────────────
 
