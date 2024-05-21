@@ -61320,7 +61320,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     FuncCoord 9,2
     ld hl,Coord
     call PlaceString
-    call GetPokedexEntryPointers ; ld hl,PokedexEntryPointers
+    ld hl,PokedexEntryPointers
     ld a,[$d11e]
     ds 1 ; dec a ; 00MOD
     ld e,a
@@ -64338,14 +64338,6 @@ PokedexEntryPointers: ; Moved in the Bank
     dw DragoniteDexEntry  ; 149 - DRAGONITE
     dw MewtwoDexEntry     ; 150 - MEWTWO
     dw MewDexEntry        ; 151 - MEW
-
-GetPokedexEntryPointers:
-    push bc
-    ld a,$3a
-    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
-    pop bc
-    ld hl,PokedexEntryPointers
-    ret
 
 SECTION "bank11",ROMX,BANK[$11]
 
