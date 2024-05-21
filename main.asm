@@ -136211,6 +136211,8 @@ ItemInBattleFinalCheck:
     and a
     push af
     jr z,.NoCapture
+    ld hl,.EmptyText
+    call PrintText
     call .DrawPlayerHUDAndHPBar
     jr .done1
 .NoCapture
@@ -136249,6 +136251,8 @@ ItemInBattleFinalCheck:
     ld b,BANK(HackGainExpAfterCatch)
     ld hl,HackGainExpAfterCatch
     jp Bankswitch
+.EmptyText
+    db "@"
 
 ; ──────────────────────────────────────────────────────────────────────
 
