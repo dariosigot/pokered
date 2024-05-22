@@ -423,6 +423,25 @@ IndexToPokedexAndRestoreD11E:
     pop de
     ret
 
+GoodCopyVideoDataDouble:
+    ld a,[rLCDC]
+    bit 7,a ; is the LCD enabled?
+    jp nz,CopyVideoDataDouble ; if LCD is on,transfer during V-blank
+    ld a,b
+    push hl
+    push de
+    ld h,0
+    ld l,c
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    ld b,h
+    ld c,l
+    pop hl
+    pop de
+    jp FarCopyDataDouble ; if LCD is off,transfer all at once
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -8853,20 +8872,16 @@ Func_366b: ; 366b (0:366b)
 
 ; copies the tile patterns for letters and numbers into VRAM
 LoadFontTilePatterns: ; 3680 (0:3680)
-    ld a,[rLCDC]
-    bit 7,a ; is the LCD enabled?
-    jr nz,.lcdEnabled
-.lcdDisabled
-    ld hl,FontGraphics
-    ld de,$8800
-    ld bc,$400
-    ld a,BANK(FontGraphics)
-    jp FarCopyDataDouble ; if LCD is off,transfer all at once
-.lcdEnabled
-    ld de,FontGraphics
+    ld de,FontGraphics1
     ld hl,$8800
-    ld bc,(BANK(FontGraphics) << 8 | $80)
-    jp CopyVideoDataDouble ; if LCD is on,transfer during V-blank
+    ld bc,(BANK(FontGraphics1) << 8 | $40)
+    call GoodCopyVideoDataDouble
+    ld de,FontGraphics2
+    ld hl,$8E00
+    ld bc,(BANK(FontGraphics2) << 8 | $20)
+    jp GoodCopyVideoData
+
+SECTION "LoadTextBoxTilePatterns",ROM0[$36a0]
 
 ; copies the text box tile patterns into VRAM
 LoadTextBoxTilePatterns: ; 36a0 (0:36a0)
@@ -29143,8 +29158,10 @@ LyingOldManSprite:
 
 PokemonLogoGraphics:
     INCBIN "gfx/pokemon_logo.2bpp"
-FontGraphics:
-    INCBIN "gfx/font.1bpp"
+FontGraphics1:
+    INCBIN "gfx/font1.1bpp"
+FontGraphics2:
+    INCBIN "gfx/font2.2bpp"
 
 ABTiles:
     INCBIN "gfx/AB.2bpp"
@@ -134872,8 +134889,6 @@ FontGraphics2GrayWall2bpp:
     INCBIN "gfx/denim/font2.2bpp"
 Wall2bpp:
     INCBIN "gfx/denim/wall.2bpp"
-Empty2bpp:
-    INCBIN "gfx/denim/empty.2bpp"
 OtherIcon_w:
     INCBIN "gfx/denim/plus_w.2bpp"
     INCBIN "gfx/denim/doubledot_w.2bpp"
@@ -134918,10 +134933,6 @@ LoadFontTilePatternsWithWall:
     ld de,OtherIcon_w
     ld hl,$8D20
     ld bc,(BANK(OtherIcon_w) << 8 | $8)
-    call GoodCopyVideoData
-    ld de,Empty2bpp
-    ld hl,$8CA0
-    ld bc,(BANK(Empty2bpp) << 8 | $1)
     jp GoodCopyVideoData
 
 _LoadGhostPic:
@@ -135541,10 +135552,6 @@ StatusScreen:
     ; Restore Tile
     call GBPalWhiteOut
     call LoadFontTilePatterns
-    ld de,Empty2bpp
-    ld hl,$97F0
-    ld bc,(BANK(Empty2bpp) << 8 | $1)
-    call GoodCopyVideoData
     ; Restore Update Sprites Flag
     pop af
     ld [$cfcb],a
@@ -135637,7 +135644,7 @@ HandleStatusScreen1:
     ld hl,Coord
     ld bc,$0707
     call FillBlankArea
-    ld a,$CA ; Blank Tile (ShinyStar)
+    ld a,$E9 ; Blank Tile (ShinyStar)
     FuncCoord 19,6
     ld [Coord],a
     FuncCoord 18,3
@@ -135957,7 +135964,7 @@ HandleStatusScreen2:
 ;    db $d5,$ed,"@"
 
 .StatusScreenMiniSpriteBackGround
-    ld a,$CA ; Empty Tile with Color0 (White) background
+    ld a,$E9 ; Empty Tile with Color0 (White) background
     FuncCoord 18,00
     ld hl,Coord
     ld [hli],a
@@ -136184,7 +136191,7 @@ CopyNameToCF4B:
 ; b = height
 ; c = width
 FillBlankArea:
-    ld a,$CA ; Blank Tile
+    ld a,$E9 ; Blank Tile
     ld de,20 ; screen width
 .loop
     push hl
@@ -136210,7 +136217,7 @@ ItemInBattleFinalCheck:
     and a
     push af
     jr z,.NoCapture
-    call .PrintMonBackAndPlayerHUDAndHPBar
+    call .PrintMonBackAndPlayerHUDAndHPBarAndMoney
     jr .done1
 .NoCapture
     call LoadScreenTilesFromBuffer1
@@ -136238,7 +136245,8 @@ ItemInBattleFinalCheck:
 .EndNoCapture
     and a
     ret
-.PrintMonBackAndPlayerHUDAndHPBar
+.PrintMonBackAndPlayerHUDAndHPBarAndMoney
+    call LoadFontTilePatterns
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; disable transfer
     ld a,[wPlayerMonNumber]
