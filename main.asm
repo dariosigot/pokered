@@ -30567,9 +30567,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db TSUNAMI      ; TM_53
     db STRIKE       ; TM_54
 
-SECTION "Func_137aa",ROMX[$77aa],BANK[$4]
-
-Func_137aa: ; 137aa (4:77aa)
+EndOfBattle: ; Moved in the Bank
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jr nz,.asm_137eb
@@ -30599,8 +30597,11 @@ Func_137aa: ; 137aa (4:77aa)
     jr .asm_1380a
 .asm_137eb
     ld a,[$cf0b]
+    cp 2
+    jr z,.WinOrDraw
     and a
-    jr nz,.asm_13813
+    jr nz,.Lose
+.WinOrDraw
     ld hl,$cce5
     ld a,[hli]
     or [hl]
@@ -30618,7 +30619,7 @@ Func_137aa: ; 137aa (4:77aa)
     ld [$ccd4],a
     ld a,$2a
     call Predef ; indirect jump to EvolutionAfterBattle (3ad1c (e:6d1c))
-.asm_13813
+.Lose
     xor a
     ld [$d083],a
     ld [$c02a],a
@@ -30648,21 +30649,17 @@ Func_137aa: ; 137aa (4:77aa)
     ld a,$ff
     ld [$d42f],a
     ret
-
-YouWinText: ; 13853 (4:7853)
+YouWinText:
     db "YOU WIN@"
-
-YouLoseText: ; 1385b (4:785b)
+YouLoseText:
     db "YOU LOSE@"
-
-DrawText: ; 13864 (4:7864)
+DrawText:
     db "  DRAW@"
-
-UnnamedText_1386b: ; 1386b (4:786b)
+UnnamedText_1386b:
     TX_FAR _UnnamedText_1386b
     db "@"
 
-TryDoWildEncounter: ; 13870 (4:7870)
+TryDoWildEncounter: ; Moved in the Bank
     ld a,[$cc57]
     and a
     ret nz
@@ -52258,12 +52255,12 @@ FaintEnemyPokemon ; 0x3c567
     ret z
     ld hl,EnemyMonFainted ; $463e
     call PrintText
-
-HackGainExpAfterCatch:
     call Func_3ee94
     call SaveScreenTilesToBuffer1
     xor a
     ld [$cf0b],a
+
+HackGainExpAfterCatch:
     call IsFocusInBagOrAllFought
     push af    
     jr c,.focus
@@ -58253,9 +58250,9 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     dec a
     call z,DrawEnemyHUDAndHPBar
     call StartBattle
-    ld hl,Func_137aa
-    ld b,BANK(Func_137aa)
-    call Bankswitch ; indirect jump to Func_137aa (137aa (4:77aa))
+    ld hl,EndOfBattle
+    ld b,BANK(EndOfBattle)
+    call Bankswitch ; indirect jump to EndOfBattle (137aa (4:77aa))
     pop af
     ld [$d358],a
     pop af
