@@ -15183,9 +15183,9 @@ LoadRenameScreen: ; 6596 (1:6596)
     ld a,[W_ISINBATTLE] ; $d057
     and a
     jp z,LoadTextBoxTilePatterns
-    ld hl,Func_3ee5b
-    ld b,BANK(Func_3ee5b)
-    jp Bankswitch ; indirect jump to Func_3ee5b (3ee5b (f:6e5b))
+    ld hl,LoadHudTilePatterns
+    ld b,BANK(LoadHudTilePatterns)
+    jp Bankswitch ; indirect jump to LoadHudTilePatterns (3ee5b (f:6e5b))
 
 .unknownPointerTable_665e: ; 665e (1:665e)
     dw .asm_65fc
@@ -51454,7 +51454,7 @@ Func_3c04c: ; 3c04c (f:404c)
     call ClearScreenArea
     call DisableLCD
     call LoadFontTilePatterns
-    call Func_3ee58
+    call LoadHudAndHpBarAndStatusTilePatterns
     ld hl,$9800
     ld bc,$400
 .asm_3c06f
@@ -51528,7 +51528,7 @@ Func_3c04c: ; 3c04c (f:404c)
     FuncCoord 1,5 ; $c405
     ld hl,Coord
     ld a,$1
-    call Predef ; indirect jump to Func_3f0c6 (3f0c6 (f:70c6))
+    call Predef ; indirect jump to CopyUncompressedPicToTilemap (3f0c6 (f:70c6))
     xor a
     ld [$FF00+$b0],a
     ld [rWY],a ; $FF00+$4a
@@ -52546,7 +52546,7 @@ Func_3c7d8: ; 3c7d8 (f:47d8)
     call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
     call Func_3cba6
     call GBPalWhiteOut
-    call Func_3ee5b
+    call LoadHudTilePatterns
     call LoadScreenTilesFromBuffer1
     call GoPAL_SET_CF1C
     call GBPalNormal
@@ -52824,7 +52824,7 @@ Func_3c92a: ; 3c92a (f:492a)
     ld [$CC26],a
 .next7
     call GBPalWhiteOut
-    call Func_3ee5b
+    call LoadHudTilePatterns
     call LoadScreenTilesFromBuffer1
 .next4
     call CleanLCD_OAM
@@ -53675,7 +53675,7 @@ asm_3d05f: ; 3d05f (f:505f)
     xor a
     ld [$d152],a
     call UseItem
-    call Func_3ee5b
+    call LoadHudTilePatterns
     call CleanLCD_OAM
     xor a
     ld [wCurrentMenuItem],a ; $cc26
@@ -53722,7 +53722,7 @@ asm_3d0ed: ; 3d0ed (f:50ed)
 asm_3d0f0: ; 3d0f0 (f:50f0)
     call CleanLCD_OAM
     call GBPalWhiteOut
-    call Func_3ee5b
+    call LoadHudTilePatterns
     call LoadScreenTilesFromBuffer2
     call GoPAL_SET_CF1C
     call GBPalNormal
@@ -53810,7 +53810,7 @@ Func_3d119: ; 3d119 (f:5119)
     ld [$cd6a],a
     call GBPalWhiteOut
     call CleanLCD_OAM
-    call Func_3ee5b
+    call LoadHudTilePatterns
     call LoadScreenTilesFromBuffer1
     call GoPAL_SET_CF1C
     call GBPalNormal
@@ -57687,9 +57687,9 @@ DoBattleTransitionAndInitBatVar: ; 3ec32 (f:6c32)
     call DelayFrame
     ld a,$30
     call Predef ; indirect jump to Func_7096d (7096d (1c:496d))
-    ld hl,Func_3ee58
-    ld b,BANK(Func_3ee58)
-    call Bankswitch ; indirect jump to Func_3ee58 (3ee58 (f:6e58))
+    ld hl,LoadHudAndHpBarAndStatusTilePatterns
+    ld b,BANK(LoadHudAndHpBarAndStatusTilePatterns)
+    call Bankswitch ; indirect jump to LoadHudAndHpBarAndStatusTilePatterns (3ee58 (f:6e58))
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld a,$ff
@@ -57782,7 +57782,7 @@ Func_3ec92: ; 3ec92 (f:6c92)
     FuncCoord 1,5 ; $c405
     ld hl,Coord
     ld a,$1
-    jp Predef ; indirect jump to Func_3f0c6 (3f0c6 (f:70c6))
+    jp Predef ; indirect jump to CopyUncompressedPicToTilemap (3f0c6 (f:70c6))
 
 Func_3ed02: ; 3ed02 (f:6d02)
     ld hl,Func_39680
@@ -58021,10 +58021,10 @@ Func_3ee35: ; 3ee35 (f:6e35)
     ld [hld],a
     ret
 
-Func_3ee58: ; 3ee58 (f:6e58)
+LoadHudAndHpBarAndStatusTilePatterns: ; 3ee58 (f:6e58)
     call LoadHpBarAndStatusTilePatterns
 
-Func_3ee5b: ; 3ee5b (f:6e5b)
+LoadHudTilePatterns: ; 3ee5b (f:6e5b)
     ld a,[rLCDC] ; $FF00+$40
     add a
     jr c,.asm_3ee7c
@@ -58191,7 +58191,7 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     FuncCoord 12,0 ; $c3ac
     ld hl,Coord
     ld a,$1
-    call Predef ; indirect jump to Func_3f0c6 (3f0c6 (f:70c6))
+    call Predef ; indirect jump to CopyUncompressedPicToTilemap (3f0c6 (f:70c6))
     ld a,$ff
     ld [W_ENEMYMONNUMBER],a ; $cfe8
     ld a,$2
@@ -58220,7 +58220,7 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     FuncCoord 12,0 ; $c3ac
     ld hl,Coord
     ld a,$1
-    call Predef ; indirect jump to Func_3f0c6 (3f0c6 (f:70c6))
+    call Predef ; indirect jump to CopyUncompressedPicToTilemap (3f0c6 (f:70c6))
 
 .Func_3efeb
     ld b,$0
@@ -58359,7 +58359,7 @@ Func_3f073: ; 3f073 (f:7073)
     add $31
     jr CopyUncompressedPicToHL
 
-Func_3f0c6: ; 3f0c6 (f:70c6)
+CopyUncompressedPicToTilemap: ; 3f0c6 (f:70c6)
     ld a,[$cc4f]
     ld h,a
     ld a,[$cc50]
@@ -63908,7 +63908,7 @@ LoadMonSpritePokedexWithDebug:
     call LoadMonBackSpritePokedex
     pop hl
     ld a,$1
-    jp Predef ; indirect jump to Func_3f0c6 (3f0c6 (f:70c6))
+    jp Predef ; indirect jump to CopyUncompressedPicToTilemap (3f0c6 (f:70c6))
 
 LoadMonBackSpritePokedex:
     ld hl,W_MONHBACKSPRITE - W_MONHEADER
@@ -74124,10 +74124,13 @@ GetPredefPointer: ; 4fe49 (13:7e49)
 PredefPointers: ; 4fe79 (13:7e79)
 ; these are pointers to ASM routines.
 ; they appear to be used in overworld map scripts.
+DrawPlayerHUDAndHPBarPredef:
     dbw BANK(DrawPlayerHUDAndHPBar),DrawPlayerHUDAndHPBar
-    dbw BANK(Func_3f0c6),Func_3f0c6
+CopyUncompressedPicToTilemapPredef:
+    dbw BANK(CopyUncompressedPicToTilemap),CopyUncompressedPicToTilemap
     dbw BANK(Func_3f073),Func_3f073
     dbw BANK(ScaleSpriteByTwo),ScaleSpriteByTwo
+LoadMonBackSpritePredef:
     db BANK(LoadMonBackSprite) ; dbw macro gives an error for some reason
     dw LoadMonBackSprite
     dbw BANK(Func_79aba),Func_79aba
@@ -136206,16 +136209,14 @@ ItemInBattleFinalCheck:
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
     jr z,.safari
-    call LoadScreenTilesFromBuffer1
     ld a,[$d11c] ; checkIfMonCaptured
     and a
     push af
     jr z,.NoCapture
-    ld hl,.EmptyText
-    call PrintText
-    call .DrawPlayerHUDAndHPBar
+    call .PrintMonBackAndPlayerHUDAndHPBar
     jr .done1
 .NoCapture
+    call LoadScreenTilesFromBuffer1
     call .DrawHUDsAndHPBars
 .done1
     call GoPAL_SET_CF1C
@@ -136232,6 +136233,7 @@ ItemInBattleFinalCheck:
     scf
     ret
 .safari
+    call LoadScreenTilesFromBuffer1
     call GBPalNormal
     ld a,[$d11c] ; checkIfMonCaptured
     and a
@@ -136239,10 +136241,33 @@ ItemInBattleFinalCheck:
 .EndNoCapture
     and a
     ret
-.DrawPlayerHUDAndHPBar
-    ld b,BANK(DrawPlayerHUDAndHPBar)
-    ld hl,DrawPlayerHUDAndHPBar
-    jp Bankswitch
+.PrintMonBackAndPlayerHUDAndHPBar
+    xor a
+    ld [H_AUTOBGTRANSFERENABLED],a ; disable transfer
+    ld a,[wPlayerMonNumber]
+    ld hl,W_PARTYMON1
+    ld c,a
+    ld b,0
+    add hl,bc
+    ld a,[hl]
+    ld [$d0b5],a
+    call GetMonHeader
+    PREDEF LoadMonBackSpritePredef
+    ld b,BANK(LoadHudAndHpBarAndStatusTilePatterns)
+    ld hl,LoadHudAndHpBarAndStatusTilePatterns
+    call Bankswitch
+    call LoadScreenTilesFromBuffer1
+    ld hl,.EmptyText
+    call PrintText
+    ld a,$31
+    ld [$FF00+$e1],a
+    FuncCoord 01,05
+    ld hl,Coord
+    PREDEF CopyUncompressedPicToTilemapPredef
+    PREDEF DrawPlayerHUDAndHPBarPredef
+    ld a,1
+    ld [H_AUTOBGTRANSFERENABLED],a ; enable transfer
+    ret
 .DrawHUDsAndHPBars
     ld b,BANK(DrawHUDsAndHPBars)
     ld hl,DrawHUDsAndHPBars
