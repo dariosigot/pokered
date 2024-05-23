@@ -10282,7 +10282,7 @@ Func_3dbe: ; 3dbe (0:3dbe)
     call CleanLCD_OAM
     ld a,$1
     ld [$cfcb],a
-    call Func_3e08
+    call ReloadMapSpriteTilePatterns
     call LoadScreenTilesFromBuffer2
     call LoadTextBoxTilePatterns
     call GoPAL_SET_CF1C
@@ -10336,7 +10336,7 @@ GetHealthBarColor: ; 3df9 (0:3df9)
     ld [hl],d
     ret
 
-Func_3e08: ; 3e08 (0:3e08)
+ReloadMapSpriteTilePatterns: ; 3e08 (0:3e08)
     ld hl,$cfc4
     ld a,[hl]
     push af
@@ -15055,7 +15055,7 @@ AskForMonNickname: ; 64eb (1:64eb)
     ld a,[W_ISINBATTLE] ; $d057
     and a
     jr nz,.asm_653e
-    call Func_3e08
+    call ReloadMapSpriteTilePatterns
 .asm_653e
     call LoadScreenTilesFromBuffer1
     pop hl
@@ -43912,7 +43912,7 @@ Func_21588: ; 21588 (8:5588)
 .asm_2159a
     ld hl,wFlags_0xcd60
     res 5,[hl]
-    call LoadScreenTilesFromBuffer2
+    call RestoreScreenAndTilesAfterBillsPC ; call LoadScreenTilesFromBuffer2
     pop af
     ld [wListScrollOffset],a ; $cc36
     ld hl,$d730
@@ -46096,6 +46096,13 @@ PrintTitleName:
 
 ; ────────────────────────────────────────────
 
+RestoreScreenAndTilesAfterBillsPC:
+    call GBPalWhiteOutWithDelay3
+    call ReloadMapSpriteTilePatterns
+    call LoadScreenTilesFromBuffer2
+    call Delay3
+    jp GBPalNormal
+
 SECTION "bank9",ROMX,BANK[$9]
 
 RhydonPicFront: ; 24000 (9:4000)
@@ -47279,7 +47286,7 @@ Func_3730e: ; 3730e (d:730e)
     ld a,$1
     ld [$cfcb],a
     call GoPAL_SET_CF1C
-    call Func_3e08
+    call ReloadMapSpriteTilePatterns
     call ReloadTilesetTilePatterns
 .skip
     call LoadScreenTilesFromBuffer2
@@ -135552,6 +135559,10 @@ StatusScreen:
     ; Restore Tile
     call GBPalWhiteOut
     call LoadFontTilePatterns
+    ld de,FontGraphics2+(9*16) ; EmptyTile
+    ld hl,$97F0
+    ld bc,(BANK(FontGraphics2) << 8 | $1)
+    call GoodCopyVideoData
     ; Restore Update Sprites Flag
     pop af
     ld [$cfcb],a
@@ -135584,7 +135595,7 @@ StatusScreen:
     jr nc,.getJoypadStateLoop2 ; valid only between 0 and [W_NUMINPARTY]/[W_NUMINBOX]
     ld [$cf92],a
     call .ResetFlagStatusScreenJustLoad
-    jr .Status2
+    jp .Status2
 .upFromStatus2
     ld a,[$cf92]
     dec a
