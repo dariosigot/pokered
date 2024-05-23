@@ -25844,7 +25844,7 @@ SendNewMonToBox: ; e7a4 (3:67a4)
 .asm_e867
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld [W_ENEMYMONNUMBER],a ; $cfe8
-    call ResetEnemyHPAndStatus ; ld hl,W_ENEMYMON_START
+    call ResetEnemyHPStatusAndType ; ld hl,W_ENEMYMON_START
     ld de,W_BOXMON1DATA
     ld bc,$c
     call CopyData
@@ -26061,6 +26061,20 @@ GetTMChoiceItemID:
 FlagExitBattle:
     ld a,1
     ld [$d11c],a
+    ret
+
+ResetEnemyHPStatusAndType:
+    xor a
+    ld hl,W_ENEMYMONSTATUS
+    ld [hli],a ; Status
+    ld [hli],a ; Type 1
+    ld [hl],a  ; Type 2
+    ld hl,W_ENEMYMONMAXHP
+    ld a,[hli]
+    ld [W_ENEMYMONCURHP],a
+    ld a,[hl]
+    ld [W_ENEMYMONCURHP+1],a
+    ld hl,W_ENEMYMON_START
     ret
 
 SECTION "DrawBadges",ROMX[$6a03],BANK[$3]
@@ -27038,10 +27052,10 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     inc de
 .copyMonTypesAndMoves
     ld hl,W_MONHTYPES
-    ld a,[hli]       ; type 1
+    xor a ; ld a,[hli]       ; type 1
     ld [de],a
     inc de
-    ld a,[hli]       ; type 2
+    xor a ; ld a,[hli]       ; type 2
     ld [de],a
     inc de
     ld a,[hli]       ; unused (?)
@@ -28448,17 +28462,6 @@ Func_cd99: ; xxxx (3:xxxx) ; Spostato a Fine BANK
     call PrintText
     ld hl,UnnamedText_cdbb ; $4dbb
     jp PrintText
-
-ResetEnemyHPAndStatus:
-    xor a
-    ld [W_ENEMYMONSTATUS],a
-    ld hl,W_ENEMYMONMAXHP
-    ld a,[hli]
-    ld [W_ENEMYMONCURHP],a
-    ld a,[hl]
-    ld [W_ENEMYMONCURHP+1],a
-    ld hl,W_ENEMYMON_START
-    ret
 
 GoPalSetAndDelay3Bank3:
     call GoPAL_SET_CF1C
@@ -39243,7 +39246,6 @@ OaksLabText27: ; 1d3f6 (7:53f6)
 OaksLabText38: ; 1d3fb (7:53fb)
 OaksLabText37: ; 1d3fb (7:53fb)
 OaksLabText11: ; 1d3fb (7:53fb)
-OaksLabText10: ; 1d3fb (7:53fb)
     db $08 ; asm
     ld hl,UnnamedText_1d405
     call PrintText
@@ -43473,6 +43475,32 @@ BillsHouseObject:
     EVENT_DISP BILLS_HOUSE_WIDTH,07,02
     EVENT_DISP BILLS_HOUSE_WIDTH,07,03
     EVENT_DISP BILLS_HOUSE_WIDTH,06,05
+
+OaksLabText10:
+    db $08 ; asm
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 2,a ; was the select button pressed?
+    jr z,.done
+    ld a,[W_NUMINPARTY]
+    ld b,a
+    ld hl,W_PARTYMON1_TYPE1
+    ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
+    xor a
+.loop
+    ld [hli],a
+    ld [hld],a
+    add hl,de
+    dec b
+    jr nz,.loop
+    ld hl,.DoneText
+    jr .end
+.done
+    ld hl,UnnamedText_1d405
+.end
+    call PrintText
+    jp TextScriptEnd
+.DoneText
+    db 0,"Done!",$57,"@"
 
 SECTION "bank8",ROMX,BANK[$8]
 
@@ -51704,7 +51732,7 @@ Func_3c1ad: ; 3c1ad (f:41ad)
     pop bc
     ld a,$10
     call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
-    call Func_3cba6
+    call LoadBattleMonFromParty
     call LoadScreenTilesFromBuffer1
     call Func_3cc91
     jr MainInBattleLoop
@@ -52087,6 +52115,10 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
     call WriteDamageAndUpdateCurMonHPBar ; call UpdateCurMonHPBar
     pop hl
     ret
+
+InsertRealTypes:
+    call GetMonHeader
+    PREDEF_JUMP InsertRealTypesPredef
 
 SECTION "HandlePoisonBurnLeechSeed_IncreaseEnemyHP",ROMX[$44a3],BANK[$f]
 
@@ -52565,7 +52597,7 @@ Func_3c7d8: ; 3c7d8 (f:47d8)
     ld hl,$ccf5
     ld a,$10
     call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
-    call Func_3cba6
+    call LoadBattleMonFromParty
     call GBPalWhiteOut
     call LoadHudTilePatterns
     call LoadScreenTilesFromBuffer1
@@ -53059,7 +53091,7 @@ UnnamedText_3cba1: ; 3cba1 (f:4ba1)
     TX_FAR _UnnamedText_3cba1
     db "@"
 
-Func_3cba6: ; 3cba6 (f:4ba6)
+LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
     ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
@@ -53080,7 +53112,7 @@ Func_3cba6: ; 3cba6 (f:4ba6)
     call CopyData
     ld a,[$cfd9]
     ld [$d0b5],a
-    call GetMonHeader
+    call InsertRealTypes ; call GetMonHeader
     ld hl,W_PARTYMON1NAME ; $d2b5
     ld a,[wPlayerMonNumber] ; $cc2f
     call SkipFixedLengthTextEntries
@@ -53102,7 +53134,7 @@ Func_3cba6: ; 3cba6 (f:4ba6)
     jr nz,.asm_3cc0e
     ret
 
-Func_3cc13: ; 3cc13 (f:4c13)
+LoadEnemyMonFromParty: ; 3cc13 (f:4c13)
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
     ld hl,wEnemyMons ; $d8a4
@@ -53123,7 +53155,7 @@ Func_3cc13: ; 3cc13 (f:4c13)
     call CopyData
     ld a,[$cfe5]
     ld [$d0b5],a
-    call GetMonHeader
+    call InsertRealTypes ; call GetMonHeader
     ld hl,$d9ee
     ld a,[wWhichPokemon] ; $cf92
     call SkipFixedLengthTextEntries
@@ -53855,7 +53887,7 @@ SwitchPlayerMon: ; 3d1ba (f:51ba) ;joedebug - this is where the player switches
     ld hl,$ccf5
     ld a,$10
     call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
-    call Func_3cba6
+    call LoadBattleMonFromParty
     call Func_3cc91
     call SaveScreenTilesToBuffer1
     ld a,$2
@@ -57548,7 +57580,7 @@ GetCurrentMove: ; 3eabe (f:6abe)
 LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
-    jp z,Func_3cc13
+    jp z,LoadEnemyMonFromParty
     ld a,[W_ENEMYMONID]
     ld [$cfe5],a
     ld [$d0b5],a
@@ -74267,6 +74299,8 @@ DrawHPBarPredef: ; 4ff96 (13:7f96)
     dbw BANK(Func_1c9c6),Func_1c9c6
     dbw BANK(Func_59035),Func_59035
     dbw BANK(TestPhysicalSpecial_),TestPhysicalSpecial_ ; 63
+InsertRealTypesPredef:
+    dbw BANK(InsertRealTypes_),InsertRealTypes_ ; 64
 
 SECTION "bank14",ROMX,BANK[$14]
 
@@ -130337,6 +130371,17 @@ _DebugPlayerStats:
     call .PrintStatBR
     ld de,$cfb1
     call .PrintStatBR
+    ; Print Hex Types
+    FuncCoord 01,08
+    ld hl,Coord
+    ld de,$cf9d ; type1
+    ld bc,$8108
+    call PrintNumber
+    FuncCoord 01,09
+    ld hl,Coord
+    ld de,$cf9e ; type2
+    ld bc,$8108
+    call PrintNumber
     ret
 .PrintIV
     push af
@@ -136294,6 +136339,22 @@ ItemInBattleFinalCheck:
     jp Bankswitch
 .EmptyText
     db "@"
+
+; ──────────────────────────────────────────────────────────────────────
+
+InsertRealTypes_:
+    call Load16BitRegisters
+    ld h,d
+    ld l,e
+    ld de,W_PLAYERMONTYPES-W_PLAYERMONPP
+    add hl,de
+    ld de,W_MONHTYPES
+    ld a,[de]
+    ld [hli],a
+    inc de
+    ld a,[de]
+    ld [hl],a
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
