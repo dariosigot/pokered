@@ -27521,7 +27521,7 @@ HealParty: ; f6a5 (3:76a5)
     ld a,[hl]
     and $c0
     add b
-    ld [hl],a
+    nop ; ld [hl],a ; Disable PP Restore
     pop bc
 .HealNext: ; f6eb (3:76eb)
     dec b
@@ -27553,7 +27553,7 @@ HealParty: ; f6a5 (3:76a5)
     ld b,a
 .restoreBonusPPLoop ; loop to restore bonus PP from PP Ups
     push bc
-    call RestoreBonusPP
+    ds 3 ; call RestoreBonusPP ; Disable PP Restore
     pop bc
     ld hl,$cf92
     inc [hl]
@@ -43341,6 +43341,15 @@ HandleExclusiveLearnMove:
     ld hl,$cf9e ; Ex Type2
     ld c,1      ; Byte 1
     call .SearchSetBit
+    ld hl,$cfb6 ; Ex PP 2
+    ld c,2      ; Byte 1
+    call .SearchSetBit
+    ld hl,$cfb7 ; Ex PP 3
+    ld c,3      ; Byte 1
+    call .SearchSetBit
+    ld hl,$cfb8 ; Ex PP 4
+    ld c,4      ; Byte 1
+    call .SearchSetBit
 
     ret
 
@@ -43742,6 +43751,7 @@ DratiniExclusiveMove:
 DragonairExclusiveMove:
 DragoniteExclusiveMove:
 MewtwoExclusiveMove:
+
     db MEGA_PUNCH
     db MEGA_KICK
     db TOXIC
@@ -43750,6 +43760,7 @@ MewtwoExclusiveMove:
     db DOUBLE_EDGE
     db BUBBLEBEAM
     db WATER_GUN
+
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
@@ -43758,6 +43769,7 @@ MewtwoExclusiveMove:
     db COUNTER
     db SEISMIC_TOSS
     db RAGE
+
     db SOLARBEAM
     db THUNDERBOLT
     db THUNDER
@@ -43766,6 +43778,7 @@ MewtwoExclusiveMove:
     db MIMIC
     db DOUBLE_TEAM
     db REFLECT
+
     db BIDE
     db METRONOME
     db SELFDESTRUCT
@@ -43774,11 +43787,14 @@ MewtwoExclusiveMove:
     db SKULL_BASH
     db FLASH
     db REST
+
     db THUNDER_WAVE
     db PSYWAVE
     db TRI_ATTACK
     db SUBSTITUTE
     db STRIKE
+    ds 3
+
 MewExclusiveMove:
     ds 40
 
@@ -43950,6 +43966,10 @@ OaksLabText10:
     ld b,a
     ld hl,W_PARTYMON1_TYPE1
     ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 3,a ; was the start button pressed?
+    ld a,$FF
+    jr nz,.loop
     xor a
 .loop
     ld [hli],a ; Zero Type
