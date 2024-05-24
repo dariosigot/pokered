@@ -39246,6 +39246,7 @@ OaksLabText27: ; 1d3f6 (7:53f6)
 OaksLabText38: ; 1d3fb (7:53fb)
 OaksLabText37: ; 1d3fb (7:53fb)
 OaksLabText11: ; 1d3fb (7:53fb)
+OaksLabText10: ; 1d3fb (7:53fb)
     db $08 ; asm
     ld hl,UnnamedText_1d405
     call PrintText
@@ -42746,6 +42747,11 @@ RELEARN_MOVE_SCREEN_LENGHT EQU 7
 MoveRelearner:
     call SaveScreenTilesToBuffer2
 
+    
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 2,a ; was the select button pressed?
+    jp nz,DebugResetExclusiveLearnAndEnergy
+
     ld hl,wFlagMoveRelearnEngagedBit0
     set 0,[hl]
 
@@ -43329,6 +43335,38 @@ ChoiceRelearnMove:
     res 1,[hl]
     ret
 
+DebugResetExclusiveLearnAndEnergy:
+    ld a,[W_NUMINPARTY]
+    ld b,a
+    ld hl,W_PARTYMON1_TYPE1
+    ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 3,a ; was the start button pressed?
+    ld a,$FF
+    jr nz,.loop
+    xor a
+.loop
+    ld [hli],a ; Zero Type
+    ld [hld],a ; ...
+    push hl
+    push de
+    ld de,W_PARTYMON1_MOVE1PP-W_PARTYMON1_TYPE1
+    add hl,de
+    ld [hli],a ; Zero PP
+    ld [hli],a ; ...
+    ld [hli],a ; ...
+    ld [hl],a  ; ...
+    pop de
+    pop hl
+    add hl,de
+    dec b
+    jr nz,.loop
+    ld hl,.DoneText
+    call PrintText
+    jp TextScriptEnd
+.DoneText
+    db 0,"Done!",$57,"@"
+
 HandleExclusiveLearnMove:
     ; de = Pointer to next Potential Move
 
@@ -43616,6 +43654,23 @@ ButterfreeExclusiveMove:
 WeedleExclusiveMove:
 KakunaExclusiveMove:
 BeedrillExclusiveMove:
+    db RAZOR_WIND
+    db SWORDS_DANCE
+    db TOXIC
+    db TAKE_DOWN
+    db DOUBLE_EDGE
+    db HYPER_BEAM
+    db RAGE
+    db MEGA_DRAIN
+    db MIMIC
+    db DOUBLE_TEAM
+    db REFLECT
+    db BIDE
+    db SWIFT
+    db SKULL_BASH
+    db REST
+    db SUBSTITUTE
+    db BLADE
 PidgeyExclusiveMove:
 PidgeottoExclusiveMove:
 PidgeotExclusiveMove:
@@ -43751,7 +43806,6 @@ DratiniExclusiveMove:
 DragonairExclusiveMove:
 DragoniteExclusiveMove:
 MewtwoExclusiveMove:
-
     db MEGA_PUNCH
     db MEGA_KICK
     db TOXIC
@@ -43760,7 +43814,6 @@ MewtwoExclusiveMove:
     db DOUBLE_EDGE
     db BUBBLEBEAM
     db WATER_GUN
-
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
@@ -43769,7 +43822,6 @@ MewtwoExclusiveMove:
     db COUNTER
     db SEISMIC_TOSS
     db RAGE
-
     db SOLARBEAM
     db THUNDERBOLT
     db THUNDER
@@ -43778,7 +43830,6 @@ MewtwoExclusiveMove:
     db MIMIC
     db DOUBLE_TEAM
     db REFLECT
-
     db BIDE
     db METRONOME
     db SELFDESTRUCT
@@ -43787,14 +43838,11 @@ MewtwoExclusiveMove:
     db SKULL_BASH
     db FLASH
     db REST
-
     db THUNDER_WAVE
     db PSYWAVE
     db TRI_ATTACK
     db SUBSTITUTE
     db STRIKE
-    ds 3
-
 MewExclusiveMove:
     ds 40
 
@@ -43956,46 +44004,6 @@ BillsHouseObject:
     EVENT_DISP BILLS_HOUSE_WIDTH,07,02
     EVENT_DISP BILLS_HOUSE_WIDTH,07,03
     EVENT_DISP BILLS_HOUSE_WIDTH,06,05
-
-OaksLabText10:
-    db $08 ; asm
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    bit 2,a ; was the select button pressed?
-    jr z,.notSelect
-    ld a,[W_NUMINPARTY]
-    ld b,a
-    ld hl,W_PARTYMON1_TYPE1
-    ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    bit 3,a ; was the start button pressed?
-    ld a,$FF
-    jr nz,.loop
-    xor a
-.loop
-    ld [hli],a ; Zero Type
-    ld [hld],a ; ...
-    push hl
-    push de
-    ld de,W_PARTYMON1_MOVE1PP-W_PARTYMON1_TYPE1
-    add hl,de
-    ld [hli],a ; Zero PP
-    ld [hli],a ; ...
-    ld [hli],a ; ...
-    ld [hl],a  ; ...
-    pop de
-    pop hl
-    add hl,de
-    dec b
-    jr nz,.loop
-    ld hl,.DoneText
-    jr .end
-.notSelect
-    ld hl,UnnamedText_1d405
-.end
-    call PrintText
-    jp TextScriptEnd
-.DoneText
-    db 0,"Done!",$57,"@"
 
 SECTION "bank8",ROMX,BANK[$8]
 
@@ -130867,16 +130875,40 @@ _DebugPlayerStats:
     call .PrintStatBR
     ld de,$cfb1
     call .PrintStatBR
-    ; Print Hex Types
+    ; Print Ex Type/PP
+    FuncCoord 00,07
+    ld hl,Coord
+    ld bc,$0309
+    call ClearScreenArea
     FuncCoord 01,08
     ld hl,Coord
     ld de,$cf9d ; type1
-    ld bc,$8108
+    ld bc,$0103
     call PrintNumber
     FuncCoord 01,09
     ld hl,Coord
     ld de,$cf9e ; type2
-    ld bc,$8108
+    ld bc,$0103
+    call PrintNumber
+    FuncCoord 06,07
+    ld hl,Coord
+    ld de,$cfb5 ; exp pp 1
+    ld bc,$0103
+    call PrintNumber
+    FuncCoord 06,08
+    ld hl,Coord
+    ld de,$cfb6 ; exp pp 2
+    ld bc,$0103
+    call PrintNumber
+    FuncCoord 06,09
+    ld hl,Coord
+    ld de,$cfb7 ; exp pp 3
+    ld bc,$0103
+    call PrintNumber
+    FuncCoord 06,10
+    ld hl,Coord
+    ld de,$cfb8 ; exp pp 4
+    ld bc,$0103
     call PrintNumber
     ret
 .PrintIV
