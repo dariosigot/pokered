@@ -43050,9 +43050,21 @@ GetMonPotentialMoveList:
     jr .LearnSetLoop
 .EndLearnSetLoop
 
+    ; Handle Exlusive Learn Move
+    ld b,BANK(HandleExclusiveLearnMove)
+    ld hl,HandleExclusiveLearnMove
+    call Bankswitch
+
     ; Insert End List & Counter
     ld a,$FF
     ld [de],a
+    ld b,-1
+    ld hl,wMoveRelearnerMoveList+1
+.CountLoop
+    inc b
+    ld a,[hli]
+    cp $FF
+    jr nz,.CountLoop
     ld a,b
     ld [wMoveRelearnerMoveList],a ; Insert Counter
     ret
@@ -43316,6 +43328,459 @@ ChoiceRelearnMove:
     ld hl,$fff6
     res 1,[hl]
     ret
+
+HandleExclusiveLearnMove:
+    ; de = Pointer to next Potential Move
+
+    call .GetBufferPointerToCorrectExlusiveLearnMoveList
+
+    ; Process Potential Store Byte
+    ld hl,$cf9d ; Ex Type1
+    ld c,0      ; Byte 0
+    call .SearchSetBit
+    ld hl,$cf9e ; Ex Type2
+    ld c,1      ; Byte 1
+    call .SearchSetBit
+
+    ret
+
+.GetBufferPointerToCorrectExlusiveLearnMoveList
+    push de
+    ld hl,ExclusiveMoveLearnTable
+    ld a,[$cf98] ; Pokemon ID
+    ld [$d11e],a
+    call IndexToPokedexAndRestoreD11E
+    ld b,0
+    add a
+    rl b
+    ld c,a
+    add hl,bc
+    ld de,GenericBuffer+1
+    ld bc,2
+    call CopyData
+    pop de
+    ret
+
+.SearchSetBit
+    ld a,[hl]
+    ld b,8
+.LoopBit
+    srl a
+    jr nc,.NextBit
+    call .BitFound
+.NextBit
+    dec b
+    jr nz,.LoopBit
+    ret
+
+.BitFound
+    ; c = Byte (0,1,...)
+    ; b = Bit  (8,7,...,1)
+    push af
+    push bc
+    push hl
+    ld a,8
+    sub b
+    ld b,a ; b = Bit (0,1,...,7)
+    call .GetPointerToCorrectExlusiveLearnMoveList
+    ld a,c
+    push bc
+    ld bc,8
+    call AddNTimes ; Add "Byte" * 8
+    pop bc
+    ld c,b
+    ld b,0
+    add hl,bc ; Add "Bit"
+
+    ld a,[hl] ; Exclusive Move
+    and a
+    jr z,.skipMoveJustPotentialKnow
+    ld b,a
+    call .CheckMoveJustPotentialKnow
+    jr c,.skipMoveJustPotentialKnow
+    ld a,b
+    ld [de],a
+    inc de
+.skipMoveJustPotentialKnow
+    pop hl
+    pop bc
+    pop af
+    ret
+
+.GetPointerToCorrectExlusiveLearnMoveList
+    ld hl,GenericBuffer+1
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ret
+
+.CheckMoveJustPotentialKnow
+    push hl
+    ld hl,wMoveRelearnerMoveList+1
+.Loop
+    ld a,h
+    cp d ; Actual Position MSB
+    jr nz,.ReadMove
+    ld a,l
+    cp e ; Actual Position LSB
+    jr z,.ConfirmExclusive
+.ReadMove
+    ld a,[hli]
+    cp b
+    jr nz,.Loop
+.MoveJustPotentialKnow
+    scf
+    pop hl
+    ret
+.ConfirmExclusive
+    and a ; rcf
+    pop hl
+    ret
+
+ExclusiveMoveLearnTable:
+    dw MissingNoExclusiveMove  ; 000 - MISSINGNO
+    dw BulbasaurExclusiveMove  ; 001 - BULBASAUR
+    dw IvysaurExclusiveMove    ; 002 - IVYSAUR
+    dw VenusaurExclusiveMove   ; 003 - VENUSAUR
+    dw CharmanderExclusiveMove ; 004 - CHARMANDER
+    dw CharmeleonExclusiveMove ; 005 - CHARMELEON
+    dw CharizardExclusiveMove  ; 006 - CHARIZARD
+    dw SquirtleExclusiveMove   ; 007 - SQUIRTLE
+    dw WartortleExclusiveMove  ; 008 - WARTORTLE
+    dw BlastoiseExclusiveMove  ; 009 - BLASTOISE
+    dw CaterpieExclusiveMove   ; 010 - CATERPIE
+    dw MetapodExclusiveMove    ; 011 - METAPOD
+    dw ButterfreeExclusiveMove ; 012 - BUTTERFREE
+    dw WeedleExclusiveMove     ; 013 - WEEDLE
+    dw KakunaExclusiveMove     ; 014 - KAKUNA
+    dw BeedrillExclusiveMove   ; 015 - BEEDRILL
+    dw PidgeyExclusiveMove     ; 016 - PIDGEY
+    dw PidgeottoExclusiveMove  ; 017 - PIDGEOTTO
+    dw PidgeotExclusiveMove    ; 018 - PIDGEOT
+    dw RattataExclusiveMove    ; 019 - RATTATA
+    dw RaticateExclusiveMove   ; 020 - RATICATE
+    dw SpearowExclusiveMove    ; 021 - SPEAROW
+    dw FearowExclusiveMove     ; 022 - FEAROW
+    dw EkansExclusiveMove      ; 023 - EKANS
+    dw ArbokExclusiveMove      ; 024 - ARBOK
+    dw PikachuExclusiveMove    ; 025 - PIKACHU
+    dw RaichuExclusiveMove     ; 026 - RAICHU
+    dw SandshrewExclusiveMove  ; 027 - SANDSHREW
+    dw SandslashExclusiveMove  ; 028 - SANDSLASH
+    dw NidoranFExclusiveMove   ; 029 - NIDORAN_F
+    dw NidorinaExclusiveMove   ; 030 - NIDORINA
+    dw NidoqueenExclusiveMove  ; 031 - NIDOQUEEN
+    dw NidoranMExclusiveMove   ; 032 - NIDORAN_M
+    dw NidorinoExclusiveMove   ; 033 - NIDORINO
+    dw NidokingExclusiveMove   ; 034 - NIDOKING
+    dw ClefairyExclusiveMove   ; 035 - CLEFAIRY
+    dw ClefableExclusiveMove   ; 036 - CLEFABLE
+    dw VulpixExclusiveMove     ; 037 - VULPIX
+    dw NinetalesExclusiveMove  ; 038 - NINETALES
+    dw JigglypuffExclusiveMove ; 039 - JIGGLYPUFF
+    dw WigglytuffExclusiveMove ; 040 - WIGGLYTUFF
+    dw ZubatExclusiveMove      ; 041 - ZUBAT
+    dw GolbatExclusiveMove     ; 042 - GOLBAT
+    dw OddishExclusiveMove     ; 043 - ODDISH
+    dw GloomExclusiveMove      ; 044 - GLOOM
+    dw VileplumeExclusiveMove  ; 045 - VILEPLUME
+    dw ParasExclusiveMove      ; 046 - PARAS
+    dw ParasectExclusiveMove   ; 047 - PARASECT
+    dw VenonatExclusiveMove    ; 048 - VENONAT
+    dw VenomothExclusiveMove   ; 049 - VENOMOTH
+    dw DiglettExclusiveMove    ; 050 - DIGLETT
+    dw DugtrioExclusiveMove    ; 051 - DUGTRIO
+    dw MeowthExclusiveMove     ; 052 - MEOWTH
+    dw PersianExclusiveMove    ; 053 - PERSIAN
+    dw PsyduckExclusiveMove    ; 054 - PSYDUCK
+    dw GolduckExclusiveMove    ; 055 - GOLDUCK
+    dw MankeyExclusiveMove     ; 056 - MANKEY
+    dw PrimeapeExclusiveMove   ; 057 - PRIMEAPE
+    dw GrowlitheExclusiveMove  ; 058 - GROWLITHE
+    dw ArcanineExclusiveMove   ; 059 - ARCANINE
+    dw PoliwagExclusiveMove    ; 060 - POLIWAG
+    dw PoliwhirlExclusiveMove  ; 061 - POLIWHIRL
+    dw PoliwrathExclusiveMove  ; 062 - POLIWRATH
+    dw AbraExclusiveMove       ; 063 - ABRA
+    dw KadabraExclusiveMove    ; 064 - KADABRA
+    dw AlakazamExclusiveMove   ; 065 - ALAKAZAM
+    dw MachopExclusiveMove     ; 066 - MACHOP
+    dw MachokeExclusiveMove    ; 067 - MACHOKE
+    dw MachampExclusiveMove    ; 068 - MACHAMP
+    dw BellsproutExclusiveMove ; 069 - BELLSPROUT
+    dw WeepinbellExclusiveMove ; 070 - WEEPINBELL
+    dw VictreebelExclusiveMove ; 071 - VICTREEBEL
+    dw TentacoolExclusiveMove  ; 072 - TENTACOOL
+    dw TentacruelExclusiveMove ; 073 - TENTACRUEL
+    dw GeodudeExclusiveMove    ; 074 - GEODUDE
+    dw GravelerExclusiveMove   ; 075 - GRAVELER
+    dw GolemExclusiveMove      ; 076 - GOLEM
+    dw PonytaExclusiveMove     ; 077 - PONYTA
+    dw RapidashExclusiveMove   ; 078 - RAPIDASH
+    dw SlowpokeExclusiveMove   ; 079 - SLOWPOKE
+    dw SlowbroExclusiveMove    ; 080 - SLOWBRO
+    dw MagnemiteExclusiveMove  ; 081 - MAGNEMITE
+    dw MagnetonExclusiveMove   ; 082 - MAGNETON
+    dw FarfetchdExclusiveMove  ; 083 - FARFETCH_D
+    dw DoduoExclusiveMove      ; 084 - DODUO
+    dw DodrioExclusiveMove     ; 085 - DODRIO
+    dw SeelExclusiveMove       ; 086 - SEEL
+    dw DewgongExclusiveMove    ; 087 - DEWGONG
+    dw GrimerExclusiveMove     ; 088 - GRIMER
+    dw MukExclusiveMove        ; 089 - MUK
+    dw ShellderExclusiveMove   ; 090 - SHELLDER
+    dw CloysterExclusiveMove   ; 091 - CLOYSTER
+    dw GastlyExclusiveMove     ; 092 - GASTLY
+    dw HaunterExclusiveMove    ; 093 - HAUNTER
+    dw GengarExclusiveMove     ; 094 - GENGAR
+    dw OnixExclusiveMove       ; 095 - ONIX
+    dw DrowzeeExclusiveMove    ; 096 - DROWZEE
+    dw HypnoExclusiveMove      ; 097 - HYPNO
+    dw KrabbyExclusiveMove     ; 098 - KRABBY
+    dw KinglerExclusiveMove    ; 099 - KINGLER
+    dw VoltorbExclusiveMove    ; 100 - VOLTORB
+    dw ElectrodeExclusiveMove  ; 101 - ELECTRODE
+    dw ExeggcuteExclusiveMove  ; 102 - EXEGGCUTE
+    dw ExeggutorExclusiveMove  ; 103 - EXEGGUTOR
+    dw CuboneExclusiveMove     ; 104 - CUBONE
+    dw MarowakExclusiveMove    ; 105 - MAROWAK
+    dw HitmonleeExclusiveMove  ; 106 - HITMONLEE
+    dw HitmonchanExclusiveMove ; 107 - HITMONCHAN
+    dw LickitungExclusiveMove  ; 108 - LICKITUNG
+    dw KoffingExclusiveMove    ; 109 - KOFFING
+    dw WeezingExclusiveMove    ; 110 - WEEZING
+    dw RhyhornExclusiveMove    ; 111 - RHYHORN
+    dw RhydonExclusiveMove     ; 112 - RHYDON
+    dw ChanseyExclusiveMove    ; 113 - CHANSEY
+    dw TangelaExclusiveMove    ; 114 - TANGELA
+    dw KangaskhanExclusiveMove ; 115 - KANGASKHAN
+    dw HorseaExclusiveMove     ; 116 - HORSEA
+    dw SeadraExclusiveMove     ; 117 - SEADRA
+    dw GoldeenExclusiveMove    ; 118 - GOLDEEN
+    dw SeakingExclusiveMove    ; 119 - SEAKING
+    dw StaryuExclusiveMove     ; 120 - STARYU
+    dw StarmieExclusiveMove    ; 121 - STARMIE
+    dw MrMimeExclusiveMove     ; 122 - MR_MIME
+    dw ScytherExclusiveMove    ; 123 - SCYTHER
+    dw JynxExclusiveMove       ; 124 - JYNX
+    dw ElectabuzzExclusiveMove ; 125 - ELECTABUZZ
+    dw MagmarExclusiveMove     ; 126 - MAGMAR
+    dw PinsirExclusiveMove     ; 127 - PINSIR
+    dw TaurosExclusiveMove     ; 128 - TAUROS
+    dw MagikarpExclusiveMove   ; 129 - MAGIKARP
+    dw GyaradosExclusiveMove   ; 130 - GYARADOS
+    dw LaprasExclusiveMove     ; 131 - LAPRAS
+    dw DittoExclusiveMove      ; 132 - DITTO
+    dw EeveeExclusiveMove      ; 133 - EEVEE
+    dw VaporeonExclusiveMove   ; 134 - VAPOREON
+    dw JolteonExclusiveMove    ; 135 - JOLTEON
+    dw FlareonExclusiveMove    ; 136 - FLAREON
+    dw PorygonExclusiveMove    ; 137 - PORYGON
+    dw OmanyteExclusiveMove    ; 138 - OMANYTE
+    dw OmastarExclusiveMove    ; 139 - OMASTAR
+    dw KabutoExclusiveMove     ; 140 - KABUTO
+    dw KabutopsExclusiveMove   ; 141 - KABUTOPS
+    dw AerodactylExclusiveMove ; 142 - AERODACTYL
+    dw SnorlaxExclusiveMove    ; 143 - SNORLAX
+    dw ArticunoExclusiveMove   ; 144 - ARTICUNO
+    dw ZapdosExclusiveMove     ; 145 - ZAPDOS
+    dw MoltresExclusiveMove    ; 146 - MOLTRES
+    dw DratiniExclusiveMove    ; 147 - DRATINI
+    dw DragonairExclusiveMove  ; 148 - DRAGONAIR
+    dw DragoniteExclusiveMove  ; 149 - DRAGONITE
+    dw MewtwoExclusiveMove     ; 150 - MEWTWO
+    dw MewExclusiveMove        ; 151 - MEW
+
+MissingNoExclusiveMove:
+BulbasaurExclusiveMove:
+IvysaurExclusiveMove:
+VenusaurExclusiveMove:
+CharmanderExclusiveMove:
+CharmeleonExclusiveMove:
+CharizardExclusiveMove:
+SquirtleExclusiveMove:
+WartortleExclusiveMove:
+BlastoiseExclusiveMove:
+CaterpieExclusiveMove:
+MetapodExclusiveMove:
+ButterfreeExclusiveMove:
+WeedleExclusiveMove:
+KakunaExclusiveMove:
+BeedrillExclusiveMove:
+PidgeyExclusiveMove:
+PidgeottoExclusiveMove:
+PidgeotExclusiveMove:
+RattataExclusiveMove:
+RaticateExclusiveMove:
+SpearowExclusiveMove:
+FearowExclusiveMove:
+EkansExclusiveMove:
+ArbokExclusiveMove:
+PikachuExclusiveMove:
+RaichuExclusiveMove:
+SandshrewExclusiveMove:
+SandslashExclusiveMove:
+NidoranFExclusiveMove:
+NidorinaExclusiveMove:
+NidoqueenExclusiveMove:
+NidoranMExclusiveMove:
+NidorinoExclusiveMove:
+NidokingExclusiveMove:
+ClefairyExclusiveMove:
+ClefableExclusiveMove:
+VulpixExclusiveMove:
+NinetalesExclusiveMove:
+JigglypuffExclusiveMove:
+WigglytuffExclusiveMove:
+ZubatExclusiveMove:
+GolbatExclusiveMove:
+OddishExclusiveMove:
+GloomExclusiveMove:
+VileplumeExclusiveMove:
+ParasExclusiveMove:
+ParasectExclusiveMove:
+VenonatExclusiveMove:
+VenomothExclusiveMove:
+DiglettExclusiveMove:
+DugtrioExclusiveMove:
+MeowthExclusiveMove:
+PersianExclusiveMove:
+PsyduckExclusiveMove:
+GolduckExclusiveMove:
+MankeyExclusiveMove:
+PrimeapeExclusiveMove:
+GrowlitheExclusiveMove:
+ArcanineExclusiveMove:
+PoliwagExclusiveMove:
+PoliwhirlExclusiveMove:
+PoliwrathExclusiveMove:
+AbraExclusiveMove:
+KadabraExclusiveMove:
+AlakazamExclusiveMove:
+MachopExclusiveMove:
+MachokeExclusiveMove:
+MachampExclusiveMove:
+BellsproutExclusiveMove:
+WeepinbellExclusiveMove:
+VictreebelExclusiveMove:
+TentacoolExclusiveMove:
+TentacruelExclusiveMove:
+GeodudeExclusiveMove:
+GravelerExclusiveMove:
+GolemExclusiveMove:
+PonytaExclusiveMove:
+RapidashExclusiveMove:
+SlowpokeExclusiveMove:
+SlowbroExclusiveMove:
+MagnemiteExclusiveMove:
+MagnetonExclusiveMove:
+FarfetchdExclusiveMove:
+DoduoExclusiveMove:
+DodrioExclusiveMove:
+SeelExclusiveMove:
+DewgongExclusiveMove:
+GrimerExclusiveMove:
+MukExclusiveMove:
+ShellderExclusiveMove:
+CloysterExclusiveMove:
+GastlyExclusiveMove:
+HaunterExclusiveMove:
+GengarExclusiveMove:
+OnixExclusiveMove:
+DrowzeeExclusiveMove:
+HypnoExclusiveMove:
+KrabbyExclusiveMove:
+KinglerExclusiveMove:
+VoltorbExclusiveMove:
+ElectrodeExclusiveMove:
+ExeggcuteExclusiveMove:
+ExeggutorExclusiveMove:
+CuboneExclusiveMove:
+MarowakExclusiveMove:
+HitmonleeExclusiveMove:
+HitmonchanExclusiveMove:
+LickitungExclusiveMove:
+KoffingExclusiveMove:
+WeezingExclusiveMove:
+RhyhornExclusiveMove:
+RhydonExclusiveMove:
+ChanseyExclusiveMove:
+TangelaExclusiveMove:
+KangaskhanExclusiveMove:
+HorseaExclusiveMove:
+SeadraExclusiveMove:
+GoldeenExclusiveMove:
+SeakingExclusiveMove:
+StaryuExclusiveMove:
+StarmieExclusiveMove:
+MrMimeExclusiveMove:
+ScytherExclusiveMove:
+JynxExclusiveMove:
+ElectabuzzExclusiveMove:
+MagmarExclusiveMove:
+PinsirExclusiveMove:
+TaurosExclusiveMove:
+MagikarpExclusiveMove:
+GyaradosExclusiveMove:
+LaprasExclusiveMove:
+DittoExclusiveMove:
+EeveeExclusiveMove:
+VaporeonExclusiveMove:
+JolteonExclusiveMove:
+FlareonExclusiveMove:
+PorygonExclusiveMove:
+OmanyteExclusiveMove:
+OmastarExclusiveMove:
+KabutoExclusiveMove:
+KabutopsExclusiveMove:
+AerodactylExclusiveMove:
+SnorlaxExclusiveMove:
+ArticunoExclusiveMove:
+ZapdosExclusiveMove:
+MoltresExclusiveMove:
+DratiniExclusiveMove:
+DragonairExclusiveMove:
+DragoniteExclusiveMove:
+MewtwoExclusiveMove:
+    db MEGA_PUNCH
+    db MEGA_KICK
+    db TOXIC
+    db BODY_SLAM
+    db TAKE_DOWN
+    db DOUBLE_EDGE
+    db BUBBLEBEAM
+    db WATER_GUN
+    db ICE_BEAM
+    db BLIZZARD
+    db HYPER_BEAM
+    db PAY_DAY
+    db SUBMISSION
+    db COUNTER
+    db SEISMIC_TOSS
+    db RAGE
+    db SOLARBEAM
+    db THUNDERBOLT
+    db THUNDER
+    db PSYCHIC_M
+    db TELEPORT
+    db MIMIC
+    db DOUBLE_TEAM
+    db REFLECT
+    db BIDE
+    db METRONOME
+    db SELFDESTRUCT
+    db FIRE_BLAST
+    db SWIFT
+    db SKULL_BASH
+    db FLASH
+    db REST
+    db THUNDER_WAVE
+    db PSYWAVE
+    db TRI_ATTACK
+    db SUBSTITUTE
+    db STRIKE
+MewExclusiveMove:
+    ds 40
 
 ; ────────────────────────────────────────────────────────────
 
