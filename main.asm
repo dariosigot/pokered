@@ -23257,11 +23257,11 @@ ItemUsePtrTable: ; d5e1 (3:55e1)
     dw ItemUseOldRod     ; OLD_ROD
     dw ItemUseGoodRod    ; GOOD_ROD
     dw ItemUseSuperRod   ; SUPER_ROD
-    dw ItemUsePPUp       ; PP_UP (real one)
-    dw ItemUsePPRestore  ; ETHER
-    dw ItemUsePPRestore  ; MAX_ETHER
-    dw ItemUsePPRestore  ; ELIXER
-    dw ItemUsePPRestore  ; MAX_ELIXER
+    dw UnusableItem ; ItemUsePPUp       ; PP_UP (real one)
+    dw UnusableItem ; ItemUsePPRestore  ; ETHER
+    dw UnusableItem ; ItemUsePPRestore  ; MAX_ETHER
+    dw UnusableItem ; ItemUsePPRestore  ; ELIXER
+    dw UnusableItem ; ItemUsePPRestore  ; MAX_ELIXER
 
 ItemUseBall: ; d687 (3:5687)
     ld a,[W_ISINBATTLE]
@@ -27152,7 +27152,7 @@ LoadMovePPs: ; f473 (3:7473)
 AddPokemonToParty_WriteMovePP: ; f476 (3:7476)
     ld b,$4
 .pploop
-    ld a,[hli]     ; read move ID
+    xor a ; Force all PP to zero ; ld a,[hli]     ; read move ID
     and a
     jr z,.empty
     dec a
@@ -43945,21 +43945,31 @@ OaksLabText10:
     db $08 ; asm
     ld a,[H_CURRENTPRESSEDBUTTONS]
     bit 2,a ; was the select button pressed?
-    jr z,.done
+    jr z,.notSelect
     ld a,[W_NUMINPARTY]
     ld b,a
     ld hl,W_PARTYMON1_TYPE1
     ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
     xor a
 .loop
-    ld [hli],a
-    ld [hld],a
+    ld [hli],a ; Zero Type
+    ld [hld],a ; ...
+    push hl
+    push de
+    ld de,W_PARTYMON1_MOVE1PP-W_PARTYMON1_TYPE1
+    add hl,de
+    ld [hli],a ; Zero PP
+    ld [hli],a ; ...
+    ld [hli],a ; ...
+    ld [hl],a  ; ...
+    pop de
+    pop hl
     add hl,de
     dec b
     jr nz,.loop
     ld hl,.DoneText
     jr .end
-.done
+.notSelect
     ld hl,UnnamedText_1d405
 .end
     call PrintText
@@ -54566,13 +54576,13 @@ SelectMenuItem: ; 3d2fe (f:52fe)
 .moveselected
     pop af
     ret nz
-    ld hl,W_PLAYERMONPP ; $d02d
+    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
     ld a,[wCurrentMenuItem] ; $cc26
     ld c,a
     ld b,$0
     add hl,bc
     ld a,[hl]
-    and $3f
+    and a ; and $3f
     jr z,.nopp
     ld a,[W_PLAYERDISABLEDMOVE] ; $d06d
     swap a
@@ -54644,11 +54654,11 @@ LoadScreenTilesFromBuffer1AndGoPalSet: ; After MIMIC
 SECTION "AnyMoveToSelect",ROMX[$53f5],BANK[$f]
 
 AnyMoveToSelect: ; 3d3f5 (f:53f5)
-    ld a,$a5
+    ld a,STRUGGLE
     ld [wPlayerSelectedMove],a ; $ccdc
     ld a,[W_PLAYERDISABLEDMOVE] ; $d06d
     and a
-    ld hl,W_PLAYERMONPP ; $d02d
+    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
     jr nz,.asm_3d40e
     ld a,[hli]
     or [hl]
@@ -54656,7 +54666,7 @@ AnyMoveToSelect: ; 3d3f5 (f:53f5)
     or [hl]
     inc hl
     or [hl]
-    and $3f
+    ds 2 ; and $3f
     ret nz
     jr .asm_3d423
 .asm_3d40e
@@ -54678,16 +54688,17 @@ AnyMoveToSelect: ; 3d3f5 (f:53f5)
     and a
     ret nz
 .asm_3d423
-    ld hl,UnnamedText_3d430 ; $5430
+    ld hl,.UnnamedText_3d430
     call PrintText
     ld c,$3c
     call DelayFrames
     xor a
     ret
-
-UnnamedText_3d430: ; 3d430 (f:5430)
+.UnnamedText_3d430
     TX_FAR _UnnamedText_3d430
     db "@"
+
+SECTION "SwapMovesInMenu",ROMX[$5435],BANK[$f]
 
 SwapMovesInMenu: ; 3d435 (f:5435)
     call CheckTransformed ; ld a,[$cc35]
@@ -54695,8 +54706,8 @@ SwapMovesInMenu: ; 3d435 (f:5435)
     jr z,asm_3d4ad
     ld hl,W_PLAYERMONMOVES
     call Func_3d493
-    ld hl,W_PLAYERMONPP ; $d02d
-    call Func_3d493
+    ds 3 ; ld hl,W_PLAYERMONPP ; $d02d  ; Don't Swap PP
+    ds 3 ; call Func_3d493              ; ...
     ld hl,W_PLAYERDISABLEDMOVE ; $d06d
     ld a,[hl]
     swap a
@@ -54734,7 +54745,7 @@ SwapMovesInMenu: ; 3d435 (f:5435)
     pop hl
     ld bc,$15
     add hl,bc
-    call Func_3d493
+    ds 3 ; call Func_3d493 ; Don't Swap PP
     xor a
     ld [$cc35],a
     jp AlignIndexMenu ; jp MoveSelectionMenu
@@ -54812,10 +54823,10 @@ PrintMenuItem: ; 3d4b6 (f:54b6)
     ld c,[hl]
     inc [hl]
     ld b,$0
-    ld hl,W_PLAYERMONPP ; $d02d
+    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
     add hl,bc
     ld a,[hl]
-    and $3f
+    ds 2 ; and $3f
     ld [$cd6d],a
 
     ; Print Move Details Box
@@ -54933,9 +54944,9 @@ SelectEnemyMove: ; 3d564 (f:5564)
     cp 4
     jr z,.asm_3d601 ; STRUGGLE
     ; Check PP
-    ld a,[hli]
-    and a
-    jr z,.searchNext
+    ; ld a,[hli]        ; Disable Check PP
+    ; and a             ; ...
+    ; jr z,.searchNext  ; ...
     ; Check Disabled
     ld a,[W_ENEMYDISABLEDMOVE]
     swap a
@@ -54953,9 +54964,9 @@ SelectEnemyMove: ; 3d564 (f:5564)
     push hl
     push de
     call ChooseRandomMove
-    ld a,[de]
-    and a
-    jr z,.noPP
+    ; ld a,[de]  ; Disable Check PP
+    ; and a      ; ...
+    ; jr z,.noPP ; ...
     ld a,b
     dec a
     ld [wEnemyMoveListIndex],a
@@ -55958,21 +55969,21 @@ Func_3dc88: ; 3dc88 (f:5c88)
     ld a,[wPlayerSelectedMove] ; $ccdc
     cp $a5
     jr z,.asm_3dd20
-    ld hl,W_PLAYERMONPP ; $d02d
+    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
     push hl
     ld a,[hli]
-    and $3f
+    ds 2 ; and $3f
     ld b,a
     ld a,[hli]
-    and $3f
+    ds 2 ; and $3f
     add b
     ld b,a
     ld a,[hli]
-    and $3f
+    ds 2 ; and $3f
     add b
     ld b,a
     ld a,[hl]
-    and $3f
+    ds 2 ; and $3f
     add b
     pop hl
     push af
@@ -55981,7 +55992,7 @@ Func_3dc88: ; 3dc88 (f:5c88)
     ld b,$0
     add hl,bc
     ld a,[hl]
-    and $3f
+    ds 2 ; and $3f
     ld b,a
     pop af
     cp b
@@ -56000,7 +56011,7 @@ Func_3dc88: ; 3dc88 (f:5c88)
     cp c
     jr z,.asm_3dd86
     ld [wCurrentMenuItem],a ; $cc26
-    ld hl,W_PLAYERMONPP ; $d02d
+    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
     ld e,a
     ld d,$0
     add hl,de
@@ -57030,7 +57041,7 @@ IncrementMovePP: ; 3e373 (f:6373)
     ld b,$00
     ld c,a
     add hl,bc
-    inc [hl] ; increment PP in the currently battling pokemon memory location
+    nop ; Not Increment ; inc [hl] ; increment PP in the currently battling pokemon memory location
     ld h,d
     ld l,e
     add hl,bc
@@ -57042,7 +57053,7 @@ IncrementMovePP: ; 3e373 (f:6373)
 .next2
     ld bc,$002c
     call AddNTimes
-    inc [hl] ; increment PP in the party memory location
+    nop ; Not Increment ; inc [hl] ; increment PP in the party memory location
     ret
 
 ; function to adjust the base damage of an attack to account for type effectiveness
@@ -60368,14 +60379,14 @@ Func_3fa8a: ; 3fa8a (f:7a8a)
     push hl
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ld hl,W_PLAYERMONPP ; $d02d
+    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
     jr nz,.asm_3facf
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     pop hl
     jr nz,.asm_3fae1
     push hl
-    ld hl,W_ENEMYMONPP ; $cffe
+    ld hl,W_ENEMYMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_ENEMYMONPP ; $cffe
 .asm_3facf
     push hl
     ld a,[hli]
@@ -60384,7 +60395,7 @@ Func_3fa8a: ; 3fa8a (f:7a8a)
     or [hl]
     inc hl
     or [hl]
-    and $3f
+    ds 2 ; and $3f
     pop hl
     jr z,.asm_3fb05
     add hl,bc
@@ -95822,7 +95833,7 @@ DecrementPP: ; 68000 (1a:4000)
     ld b,0
     add hl ,bc           ; calculate the address in memory of the PP we need to decrement
                          ; based on the move chosen.
-    dec [hl]             ; Decrement PP
+    nop ; Not Decrement ; dec [hl]             ; Decrement PP
     ret
 
 Version_GFX: ; 6802f (1a:402f)
@@ -133994,6 +134005,9 @@ AIEnemyTrainerChooseMoves:
     ld [wAILastMovePower],a
 
     ; highly discourage zero pp move
+
+    jr .ppdone ; Disable Check PP
+
     ld hl,W_ENEMYMONPP
     ld bc,$00FF ; b = 0 | c = -1
 .searchNext
@@ -135916,7 +135930,7 @@ DecrementEnemyPP_:
     ld b,0
     add hl ,bc           ; calculate the address in memory of the PP we need to decrement
                          ; based on the move chosen.
-    dec [hl]             ; Decrement PP
+    nop ; Not Decrement ; dec [hl]             ; Decrement PP
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
