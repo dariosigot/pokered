@@ -1119,8 +1119,19 @@ wChangedBlocksEnd::
 wUselessD45F:
     ds 1
 
-wBackupNearPlayerTiles:
+wBackupNearPlayerTiles: ; d460
     ds 20
+
+wEXPBarPixelLength: ; d474
+    ds 1
+wEXPBarBaseEXP:
+    ds 3
+wEXPBarCurEXP:
+    ds 3
+wEXPBarNeededEXP:
+    ds 3
+wEXPBarKeepFullFlag:
+    ds 1
 
 ; some free bytes
 
@@ -1656,17 +1667,6 @@ wBlkCoordinateY1Upper: ; def3
 wBlkCoordinateX2Right: ; def4
     ds 1
 wBlkCoordinateY2Lower: ; def5
-    ds 1
-
-wEXPBarPixelLength: ; def6
-    ds 1
-wEXPBarBaseEXP:
-    ds 3
-wEXPBarCurEXP:
-    ds 3
-wEXPBarNeededEXP:
-    ds 3
-wEXPBarKeepFullFlag:
     ds 1
 
 ENDU

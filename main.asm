@@ -24406,8 +24406,9 @@ ItemUseMedicine: ; dabb (3:5abb)
     push hl
     ld bc,33
     add hl,bc ; hl now points to level
-    ld a,[hl] ; a = level
-    cp a,100
+    call CheckLevelDuringRareCandy
+    ; ld a,[hl] ; a = level
+    ; cp a,100
     jr z,.vitaminNoEffect ; can't raise level above 100
     inc a
     ld [hl],a ; store incremented level
@@ -24482,8 +24483,7 @@ ItemUseMedicine: ; dabb (3:5abb)
     call WaitForTextScrollButtonPress ; wait for button press
     xor a
     ld [$cc49],a
-    ld a,$1a
-    call Predef ; LearnMoveFromLevelUp
+    PREDEF LearnMoveFromLevelUpPredef
     xor a
     ld [$ccd4],a
     ld hl,TryEvolvingMon
@@ -25280,8 +25280,7 @@ ItemUseTMHM: ; e479 (3:6479)
     call PrintText
     jr .chooseMon
 .continue
-    ld a,$1b
-    call Predef ; indirect jump to LearnMove (6e43 (1:6e43))
+    PREDEF LearnMovePredef
     pop af
     ld [$cf91],a
     pop af
@@ -29056,6 +29055,14 @@ SurfingGotOnText:
 SurfingNoPlaceToGetOffText:
     TX_FAR _SurfingNoPlaceToGetOffText
     db "@"
+
+CheckLevelDuringRareCandy:
+    ld a,[hl] ; a = level
+    cp a,100
+    ret z
+    ld [$cd46],a ; ($cd46 = wTempCoins1) - fixing skip move-learn glitch: need to store the current level in wram
+    ;wTempCoins1 was chosen because it's used only for slot machine and gets defaulted to 1 during the mini-game
+    ret
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -42831,8 +42838,7 @@ MovesMenu:
     jp z,.PrintAndReturn ; Move Just Known
 
     ; Learn Move
-    ld a,$1b
-    call Predef ; indirect jump to LearnMove (6e43 (1:6e43))
+    PREDEF LearnMovePredef
 
     ; Check Result
     ld a,b
@@ -42905,6 +42911,8 @@ ChoiceRelearnMove:
     ld [wListPointer+1],a
 
     ; Initialize Screen "Offset"
+    ld a,[wListScrollOffset]
+    push af ; Backup Screen "Offset"
     xor a
     ld [wListScrollOffset],a
 
@@ -42932,14 +42940,14 @@ ChoiceRelearnMove:
 
     call .HandleMenuInput
     bit 1,a ; was the B button pressed?
-    ret nz
+    jr nz,.return
     bit 5,a ; was left button pressed?
     jr nz,.LeftPressed
     bit 4,a ; was left button pressed?
     jr nz,.RightPressed
     and %11000000 ; was up or down button pressed?
     jr nz,.UpOrDownPressed
-    ret ; A pressed
+    jr .return ; A pressed
 
 .LeftPressed
     ld a,[wListScrollOffset]
@@ -42965,6 +42973,12 @@ ChoiceRelearnMove:
 .UpOrDownPressed
     call .GetCurrentMove
     jr .MenuLoop
+
+.return
+    pop bc
+    ld a,b
+    ld [wListScrollOffset],a ; Restore Screen "Offset"
+    ret
 
 .GetCurrentMove
     ;call .ClearScreenAreaDetails
@@ -49996,6 +50010,26 @@ LearnMoveAfterEvolution:
     ld b,BANK(GetMonPotentialMoveList)
     ld hl,GetMonPotentialMoveList
     call Bankswitch
+    ; Save Exclusive Move in Mon Internal Bytes After Evolution Done
+    ld hl,wMoveRelearnerMoveList
+    ld a,[hli]
+    ld b,a
+.Loop
+    ld a,[hli]
+    cp $FF
+    jr z,.EndLoop
+    ld [$d0e0],a
+    push bc
+    push hl
+    ld b,BANK(TryToAddExclusiveMove)
+    ld hl,TryToAddExclusiveMove
+    call Bankswitch
+    pop hl
+    pop bc
+    dec b
+    jr nz,.Loop
+.EndLoop
+    ; End
     pop af
     jr LearnMoveCommon
 
@@ -50013,10 +50047,10 @@ LearnMoveFromLevelUp:
     push hl ; Backup Level
     push af ; ...
     ld a,[$cd46] ; load the current level into a ($cd46 = wTempCoins1)
-    ld [hl],a    ; ...
-    dec [hl] ; Old Level because "CheckMonAlreadyKnowMove"
-             ; fail 100% if not
-    ; Get Pre Evolution Form Move List
+    ld [hl],a ; Old Level because "CheckMonAlreadyKnowMove" fail 100% if not
+    xor a
+    ld [$cd46],a
+    ; Get Move List
     ld b,BANK(GetMonPotentialMoveList)
     ld hl,GetMonPotentialMoveList
     call Bankswitch
@@ -50062,8 +50096,7 @@ LearnMoveCommon:
     ld [$d11e],a
     call GetMoveName
     call CopyStringToCF4B
-    ld a,$1b
-    call Predef ; LearnMove
+    PREDEF LearnMovePredef
 .LearnEndOrJustKnow
     pop hl ; Restore Pointer to Current Learn Move's Level
     jr .learnSetLoop
@@ -50408,8 +50441,7 @@ TryRandomForMew:
     ld [$d11e],a
     call GetMoveName
     call CopyStringToCF4B
-    ld a,$1b
-    jp Predef ; indirect jump to LearnMove (6e43 (1:6e43))
+    PREDEF_JUMP LearnMovePredef
 
 SpecialTrainer: MACRO
     db \1,\2
@@ -74441,8 +74473,10 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     db BANK(InitializePlayerData)
     dw InitializePlayerData
     dbw BANK(Func_c754),Func_c754
+LearnMoveFromLevelUpPredef:
     db BANK(LearnMoveFromLevelUp)
     dw LearnMoveFromLevelUp
+LearnMovePredef:
     dbw BANK(LearnMove),LearnMove
     dbw BANK(Func_f8a5),Func_f8a5; 1C,used in Pokémon Tower
     dbw $03,Func_3eb5 ; for these two,the bank number is actually 0
@@ -79455,7 +79489,7 @@ GainExperience: ; 5524f (15:524f)
     call Bankswitch ; indirect jump to Func_58f43 (58f43 (16:4f43))
     pop hl
     ld a,[hl] ; current level
-    ld [$cd46],a ; ($cd46 = wTempCoins1) joenote - fixing skip move-learn glitch: need to store the current level in wram
+    ld [$cd46],a ; ($cd46 = wTempCoins1) - fixing skip move-learn glitch: need to store the current level in wram
     ;wTempCoins1 was chosen because it's used only for slot machine and gets defaulted to 1 during the mini-game
     cp d
     jp z,.nextMon
@@ -79559,8 +79593,7 @@ GainExperience: ; 5524f (15:524f)
     ld [$cc49],a
     ld a,[$d0b5]
     ld [$d11e],a
-    ld a,$1a
-    call Predef ; LearnMoveFromLevelUp
+    PREDEF LearnMoveFromLevelUpPredef
     ld hl,$ccd3
     ld a,[wWhichPokemon] ; $cf92
     ld c,a
@@ -131467,14 +131500,14 @@ Route22Mons:
     db $19
     db  3,NIDORAN_M ; 20% ; Entry Level
     db  3,NIDORAN_F ; 20% ; Entry Level
-    db  4,SPEAROW   ; 15%
+    db  3,MANKEY    ; 15%
     db  4,NIDORAN_M ; 10%
     db  4,NIDORAN_F ; 10%
     db  3,SPEAROW   ; 10%
     db  2,MANKEY    ;  5% ; Entry Level
     db  5,SPEAROW   ;  5%
-    db  3,MANKEY    ;  4%
-    db  4,MANKEY    ;  1%
+    db  4,MANKEY    ;  4%
+    db  3,PSYDUCK   ;  1% ; Entry Level
     db $00
 
 ForestMons:
@@ -131655,7 +131688,7 @@ Route6Mons:
     db 11,POLIWAG    ; 10%
     db 15,ODDISH     ; 10%
     db 15,BELLSPROUT ; 10%
-    db 11,PSYDUCK    ;  5% ; Entry Level
+    db 11,PSYDUCK    ;  5%
     db 11,FARFETCH_D ;  5%
     db 13,POLIWAG    ;  4%
     db 13,PSYDUCK    ;  1%

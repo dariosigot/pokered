@@ -80,7 +80,7 @@
     db POISONPOWDER , POISON_EFFECT              ,   0 , POISON   , 191 , 25 ; - ; PP 35 -> 25
     db STUN_SPORE   , PARALYZE_EFFECT            ,   0 , GRASS    , 191 , 20 ; - ; PP 30 -> 20
     db SLEEP_POWDER , SLEEP_EFFECT               ,   0 , GRASS    , 191 , 10 ; - ; PP 15 -> 10
-    db PETAL_DANCE  , THRASH_PETAL_DANCE_EFFECT  ,  70 , GRASS    , 255 , 10 ; 1 ; Pwr 70 -> 120 ; PP 20 -> 10
+    db PETAL_DANCE  , THRASH_PETAL_DANCE_EFFECT  , 120 , GRASS    , 255 , 10 ; 1 ; Pwr 70 -> 120 ; PP 20 -> 10
     db STRING_SHOT  , SPEED_DOWN1_EFFECT         ,   0 , BUG      , 242 , 30 ; - ; PP 40 -> 30
     db DRAGON_RAGE  , SPECIAL_DAMAGE_EFFECT      ,   1 , DRAGON   , 255 , 10 ; -
     db FIRE_SPIN    , TRAPPING_EFFECT            ,  10 , FIRE     , 153 , 15 ; 1 ; Pwr 15 -> 10 ; Acr 178 -> 153
