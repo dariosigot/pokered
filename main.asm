@@ -16218,12 +16218,19 @@ LearnMove: ; 6e43 (1:6e43)
     ld hl,wFlagMoveRelearnEngagedBit7
     bit 7,[hl]
     jr nz,.skip
-    ld b,BANK(TryToAddExclusiveMove)
-    ld hl,TryToAddExclusiveMove
-    call Bankswitch
     ; XX learned YY! ♫♪
     ld hl,.LearnedTextPlusSound
     call PrintText
+    ; Get Mon Start to Try Add Exclusive Move
+    ld hl,W_PARTYMON1_NUM
+    ld a,[wWhichPokemon]
+    ld bc,$2c
+    call AddNTimes
+    ld d,h
+    ld e,l
+    ld b,BANK(TryToAddExclusiveMove)
+    ld hl,TryToAddExclusiveMove
+    call Bankswitch
 .skip
     ld hl,W_PARTYMON1_MOVE1 ; $d173
     ld bc,$2c
@@ -18528,13 +18535,22 @@ CheckImportantMove:
     push af ; Backup Move to Delete
     push bc ; Backup Move Offset
 
-    ; Get Move Name and Potential Move List
     push af
+
+    ; Get Move Name
     ld [$d11e],a
     call GetMoveName
+
+    ; Get Potential Move List
+    ld a,[wWhichPokemon]
+    ld [$cf92],a
+    xor a ; player party
+    ld [$cc49],a
+    call LoadMonData
     ld b,BANK(GetMonPotentialMoveList)
     ld hl,GetMonPotentialMoveList
     call Bankswitch
+
     pop af
 
     ; Search Move to Delete in Potential Move List
@@ -25818,7 +25834,7 @@ SendNewMonToBox: ; e7a4 (3:67a4)
 .asm_e867
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld [W_ENEMYMONNUMBER],a ; $cfe8
-    call ResetEnemyHPStatusAndType ; ld hl,W_ENEMYMON_START
+    call ResetEnemyHPStatusTypeAndPP ; ld hl,W_ENEMYMON_START
     ld de,W_BOXMON1DATA
     ld bc,$c
     call CopyData
@@ -25866,7 +25882,9 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     ld [de],a
     dec b
     jr nz,.asm_e8b1
-    ret
+    ld b,BANK(SentNewMonToBox_TryToAddExclusiveMove)
+    ld hl,SentNewMonToBox_TryToAddExclusiveMove
+    jp Bankswitch
 
 ItemUseTechMach:
     ld a,[$d152]
@@ -26035,20 +26053,6 @@ GetTMChoiceItemID:
 FlagExitBattle:
     ld a,1
     ld [$d11c],a
-    ret
-
-ResetEnemyHPStatusAndType:
-    xor a
-    ld hl,W_ENEMYMONSTATUS
-    ld [hli],a ; Status
-    ld [hli],a ; Type 1
-    ld [hl],a  ; Type 2
-    ld hl,W_ENEMYMONMAXHP
-    ld a,[hli]
-    ld [W_ENEMYMONCURHP],a
-    ld a,[hl]
-    ld [W_ENEMYMONCURHP+1],a
-    ld hl,W_ENEMYMON_START
     ret
 
 SECTION "DrawBadges",ROMX[$6a03],BANK[$3]
@@ -27055,7 +27059,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     dec de
     xor a
     ld [$cee9],a
-    ld a,$3e
+    ;ld a,$3e
     call WriteMonMoves2 ; call Predef ; indirect jump to WriteMonMoves (3afb8 (e:6fb8))
     pop de
     ld a,[wPlayerID]  ; set trainer ID to player ID
@@ -27111,6 +27115,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld b,$1 ; Consider also stat exp
     call CalcStatsAndSetCurrentHpToMax ; call CalcStats         ; calculate fresh set of stats
 .done
+    call AddPokemonToParty_TryToAddExclusiveMove
     scf
     ret
 
@@ -27118,37 +27123,41 @@ ItemUsePokedex: ; Moved in the Bank
     ld a,$29
     jp Predef
 
-SECTION "LoadMovePPs",ROMX[$7473],BANK[$3]
-
-LoadMovePPs: ; f473 (3:7473)
+LoadMovePPs: ; Moved in the Bank
     call Load16BitRegisters
     ; fallthrough
-AddPokemonToParty_WriteMovePP: ; f476 (3:7476)
+AddPokemonToParty_WriteMovePP: ; Moved in the Bank
     ld b,$4
 .pploop
-    xor a ; Force all PP to zero ; ld a,[hli]     ; read move ID
-    and a
-    jr z,.empty
-    dec a
-    push hl
-    push de
-    push bc
-    ld hl,Moves
-    ld bc,$6
-    call AddNTimes
-    ld de,$cd6d
-    ld a,BANK(Moves)
-    call FarCopyData
-    pop bc
-    pop de
-    pop hl
-    ld a,[$cd72] ; sixth move byte = pp
-.empty
+    ld a,b
+    cp 4
+    ld a,255 ; Energy
+    jr z,.skip
+    xor a ; Force all PP to zero
+.skip
     inc de
     ld [de],a
     dec b
     jr nz,.pploop ; there are still moves to read
     ret
+
+ResetEnemyHPStatusTypeAndPP:
+    xor a
+    ld hl,W_ENEMYMONSTATUS
+    ld [hli],a ; Status
+    ld [hli],a ; Type 1
+    ld [hl],a  ; Type 2
+    ld hl,W_ENEMYMONMAXHP
+    ld a,[hli]
+    ld [W_ENEMYMONCURHP],a
+    ld a,[hl]
+    ld [W_ENEMYMONCURHP+1],a
+    ld a,$FF
+    ld [W_ENEMYMONPP],a
+    ld hl,W_ENEMYMON_START
+    ret
+
+SECTION "_AddEnemyMonToPlayerParty",ROMX[$749d],BANK[$3]
 
 ; adds enemy mon [$cf91] (at position [$cf92] in enemy list) to own party
 ; no known uses in the game
@@ -29063,6 +29072,14 @@ CheckLevelDuringRareCandy:
     ld [$cd46],a ; ($cd46 = wTempCoins1) - fixing skip move-learn glitch: need to store the current level in wram
     ;wTempCoins1 was chosen because it's used only for slot machine and gets defaulted to 1 during the mini-game
     ret
+
+AddPokemonToParty_TryToAddExclusiveMove:
+    ld a,[$cc49]
+    and $f
+    ret nz
+    ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
+    ld hl,AddPokemonToParty_TryToAddExclusiveMove_
+    jp Bankswitch
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -42725,19 +42742,20 @@ DebugNPC:
 
 GetMonPotentialMoveList:
 
-    ; Load Mon Choice Data
-    ld a,[wWhichPokemon] ; $cf92 ; Index of Choice Pkmn
-    ld [$cc2b],a ; Backup Index of Choice Pkmn
-    ld [$cf92],a
-    xor a ; player party
-    ld [$cc49],a
-    call LoadMonData
+    ; Standarize Level
+    ld a,[$cc49]
+    and a ; is it a list of party pokemon or box pokemon?
+    jr z,.skipCopyingLevel
+.copyLevel
+    ld a,[$cf9b]
+    ld [$cfb9],a
+.skipCopyingLevel
 
     ; Get Copy of Level UP EvosMoves in GenericBuffer+1
     ld d,0
     ld a,[W_MONHEADER]
     call LoadEvosMovesPointerTableByPokedex
-    ds 1 ; dec a ; 00MOD
+    ; ds 1 ; dec a ; 00MOD
     add a
     rl d
     ld e,a
@@ -42756,7 +42774,6 @@ GetMonPotentialMoveList:
     call FarCopyData ; copy bc bytes of data from a:hl to de
 
     ld de,wMoveRelearnerMoveList+1 ; Final List Pointer
-    ld b,0 ; initial counter = 0
 
     ; Get Mon Move List from Level UP EvosMoves (GenericBuffer+1)
     ld hl,GenericBuffer+1
@@ -42805,6 +42822,11 @@ MovesMenu:
     set 7,[hl]
 
     ; Get Mon Potential Move List in wMoveRelearnerMoveList
+    ld a,[wWhichPokemon]
+    ld [$cf92],a
+    xor a ; player party
+    ld [$cc49],a
+    call LoadMonData
     call GetMonPotentialMoveList
 
     ; Check at least one move
@@ -43339,13 +43361,86 @@ HandleExclusiveLearnMove:
     pop hl
     ret
 
+AddPokemonToParty_TryToAddExclusiveMove_:
+    ; Backup
+    ld a,[$cf92]
+    push af
+    ld a,[$cc49]
+    push af
+    ; Get Move List
+    ld a,[$FF00+$e4] ; Mon Id +1
+    dec a
+    ld [$cf92],a
+    xor a ; player party
+    ld [$cc49],a
+    call LoadMonData
+    call GetMonPotentialMoveList
+    ; Save Exclusive Move in Mon Internal Bytes After Evolution Done
+    ld hl,wMoveRelearnerMoveList
+    ld a,[hli]
+    ld b,a
+.Loop
+    ld a,[hli]
+    cp $FF
+    jr z,.EndLoop
+    ld [$d0e0],a
+    push bc
+    push hl
+    ; Get Mon Start to Try Add Exclusive Move
+    ld hl,W_PARTYMON1_NUM
+    ld a,[$FF00+$e4] ; Mon Id +1
+    dec a
+    ld bc,$2c
+    call AddNTimes
+    ld d,h
+    ld e,l
+    call TryToAddExclusiveMove
+    pop hl
+    pop bc
+    dec b
+    jr nz,.Loop
+.EndLoop
+    ; Restore
+    pop af
+    ld [$cf92],a
+    pop af
+    ld [$cc49],a
+    ret
+
+SentNewMonToBox_TryToAddExclusiveMove:
+    ; Get Pre Evolution Form Move List
+    xor a ; id = 0
+    ld [$cf92],a
+    ld a,2 ; current box
+    ld [$cc49],a
+    call LoadMonData
+    call GetMonPotentialMoveList
+    ; Save Exclusive Move in Mon Internal Bytes After Evolution Done
+    ld hl,wMoveRelearnerMoveList
+    ld a,[hli]
+    ld b,a
+.Loop
+    ld a,[hli]
+    cp $FF
+    jr z,.EndLoop
+    ld [$d0e0],a
+    push bc
+    push hl
+    ; Get Mon Start to Try Add Exclusive Move
+    ld de,W_BOXMON1DATA
+    call TryToAddExclusiveMove
+    pop hl
+    pop bc
+    dec b
+    jr nz,.Loop
+.EndLoop
+    ret
+
+; Input
+; [$d0e0] = Learned Move
+; [de] = Mon Start
 TryToAddExclusiveMove:
-    ld a,[wWhichPokemon]
-    ld hl,W_PARTYMON1
-    ld c,a
-    ld b,0
-    add hl,bc
-    ld a,[hl] ; mon ID
+    ld a,[de] ; mon ID
     ld hl,ExclusiveMoveLearnTable
     ld [$d11e],a
     call IndexToPokedexAndRestoreD11E
@@ -43371,22 +43466,18 @@ TryToAddExclusiveMove:
 .MoveFound
     ; c = id move in Table
     ; wWhichPokemon
-    ld hl,.LocationByte
+    push de
+    ld hl,.LocationByteOffset
     ld d,0
     ld e,c
     srl e ; Divided by 8
     srl e ; ...
     srl e ; ...
-    sla e ; Moltiplied by 2
     add hl,de
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    ld a,[wWhichPokemon]
-    push bc
-    ld bc,$2c
-    call AddNTimes
-    pop bc
+    pop de
+    ld l,[hl]
+    ld h,0
+    add hl,de
     ; hl = pointer to mon corrent Byte to flag
     ld a,c
     and %00000111 ; Mask to obtain bit id (0,1,...,7)
@@ -43403,12 +43494,12 @@ TryToAddExclusiveMove:
     or c ; set correct bit
     ld [hl],a
     ret
-.LocationByte
-    dw W_PARTYMON1_TYPE1
-    dw W_PARTYMON1_TYPE2
-    dw W_PARTYMON1_MOVE2PP
-    dw W_PARTYMON1_MOVE3PP
-    dw W_PARTYMON1_MOVE4PP
+.LocationByteOffset
+    db W_PARTYMON1_TYPE1-W_PARTYMON1_NUM
+    db W_PARTYMON1_TYPE2-W_PARTYMON1_NUM
+    db W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
+    db W_PARTYMON1_MOVE3PP-W_PARTYMON1_NUM
+    db W_PARTYMON1_MOVE4PP-W_PARTYMON1_NUM
 
 ExclusiveMoveLearnTable:
     dw MissingNoExclusiveMove  ; 000 - MISSINGNO
@@ -43570,6 +43661,11 @@ INCLUDE "constants/pokemon_exclusive.asm"
 ; $d0e0 = Move ID
 ; wWhichPokemon = Mon Party ID
 CheckMonAlreadyKnowMove:
+    ld a,[wWhichPokemon]
+    ld [$cf92],a
+    xor a ; player party
+    ld [$cc49],a
+    call LoadMonData
     call GetMonPotentialMoveList
 CheckMonAlreadyKnowMoveQuick:
     ld a,[$d0e0]
@@ -50007,9 +50103,7 @@ LearnMoveAfterEvolution:
     ld [$cf91],a
     push af
     ; Get Pre Evolution Form Move List
-    ld b,BANK(GetMonPotentialMoveList)
-    ld hl,GetMonPotentialMoveList
-    call Bankswitch
+    call GetMoveList
     ; Save Exclusive Move in Mon Internal Bytes After Evolution Done
     ld hl,wMoveRelearnerMoveList
     ld a,[hli]
@@ -50021,6 +50115,13 @@ LearnMoveAfterEvolution:
     ld [$d0e0],a
     push bc
     push hl
+    ; Get Mon Start to Try Add Exclusive Move
+    ld hl,W_PARTYMON1_NUM
+    ld a,[wWhichPokemon]
+    ld bc,$2c
+    call AddNTimes
+    ld d,h
+    ld e,l
     ld b,BANK(TryToAddExclusiveMove)
     ld hl,TryToAddExclusiveMove
     call Bankswitch
@@ -50032,6 +50133,16 @@ LearnMoveAfterEvolution:
     ; End
     pop af
     jr LearnMoveCommon
+
+GetMoveList:
+    ld a,[wWhichPokemon]
+    ld [$cf92],a
+    xor a ; player party
+    ld [$cc49],a
+    call LoadMonData
+    ld b,BANK(GetMonPotentialMoveList)
+    ld hl,GetMonPotentialMoveList
+    jp Bankswitch
 
 LearnMoveFromLevelUp:
     ld a,[$d11e]
@@ -50050,10 +50161,7 @@ LearnMoveFromLevelUp:
     ld [hl],a ; Old Level because "CheckMonAlreadyKnowMove" fail 100% if not
     xor a
     ld [$cd46],a
-    ; Get Move List
-    ld b,BANK(GetMonPotentialMoveList)
-    ld hl,GetMonPotentialMoveList
-    call Bankswitch
+    call GetMoveList
     pop af    ; Restore Level
     pop hl    ; ...
     ld [hl],a ; ...
