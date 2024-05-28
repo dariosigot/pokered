@@ -50004,7 +50004,6 @@ LearnMoveFromLevelUp:
     ld [$cf91],a
     cp a,MEW
     jp z,MewLearnMove
-
     push af
     ld hl,W_PARTYMON1_LEVEL
     ld a,[wWhichPokemon] ; $cf92
@@ -50012,14 +50011,18 @@ LearnMoveFromLevelUp:
     call AddNTimes
     ld a,[hl]
     push hl ; Backup Level
-    dec [hl] ; Level -1 because "CheckMonAlreadyKnowMoveQuick"
+    push af ; ...
+    ld a,[$cd46] ; load the current level into a ($cd46 = wTempCoins1)
+    ld [hl],a    ; ...
+    dec [hl] ; Old Level because "CheckMonAlreadyKnowMove"
              ; fail 100% if not
     ; Get Pre Evolution Form Move List
     ld b,BANK(GetMonPotentialMoveList)
     ld hl,GetMonPotentialMoveList
     call Bankswitch
-    pop hl   ; Restore Level
-    inc [hl] ; ...
+    pop af    ; Restore Level
+    pop hl    ; ...
+    ld [hl],a ; ...
     pop af
     ; fall through
 
