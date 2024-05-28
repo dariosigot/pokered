@@ -43402,12 +43402,17 @@ AddPokemonToParty_TryToAddExclusiveMove_:
 .EndLoop
     ; Restore
     pop af
-    ld [$cf92],a
-    pop af
     ld [$cc49],a
+    pop af
+    ld [$cf92],a
     ret
 
 SentNewMonToBox_TryToAddExclusiveMove:
+    ; Backup
+    ld a,[$cf92]
+    push af
+    ld a,[$cc49]
+    push af
     ; Get Pre Evolution Form Move List
     xor a ; id = 0
     ld [$cf92],a
@@ -43434,6 +43439,11 @@ SentNewMonToBox_TryToAddExclusiveMove:
     dec b
     jr nz,.Loop
 .EndLoop
+    ; Restore
+    pop af
+    ld [$cc49],a
+    pop af
+    ld [$cf92],a
     ret
 
 ; Input
