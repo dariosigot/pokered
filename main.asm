@@ -16215,11 +16215,16 @@ LearnMove: ; 6e43 (1:6e43)
     ld de,$d036
     ld bc,$b
     call CopyData
-    ; XX learned YY! ♫♪
     ld hl,wFlagMoveRelearnEngagedBit7
     bit 7,[hl]
+    jr nz,.skip
+    ld b,BANK(TryToAddExclusiveMove)
+    ld hl,TryToAddExclusiveMove
+    call Bankswitch
+    ; XX learned YY! ♫♪
     ld hl,.LearnedTextPlusSound
-    call z,PrintText
+    call PrintText
+.skip
     ld hl,W_PARTYMON1_MOVE1 ; $d173
     ld bc,$2c
     ld a,[wWhichPokemon] ; $cf92
@@ -17523,8 +17528,8 @@ FieldMoveNames: ; 778d (1:778d)
     db "HEAL@"   ; Move : SOFTBOILED
 
 PokemonMenuEntries: ; 77c2 (1:77c2)
-    db "MOVES",$4E
     db "STATS",$4E
+    db "MOVES",$4E
     db "SWITCH","@" ; Eliminato "CANCEL"
 
 SECTION "GetMonFieldMoves",ROMX[$77d6],BANK[$1]
@@ -18229,13 +18234,14 @@ PrintGenderInRenameScreen:
 ; During Battle clear Pokemon Stat and Change Palette to avoid Yes/No bad Palette Border
 InsertIVAndLoadTextCoord:
     ld hl,wDVForShinyAtkDef
-    ld a,[W_ISINBATTLE] ; $d057
-    and a
-    jr nz,.copyEnemyMonData
     ld a,[wFlagAddPkmnToPartyBit0]
     bit 0,a
     res 0,a
+    ld [wFlagAddPkmnToPartyBit0],a
     jr z,.copyEnemyMonData
+    ld a,[W_ISINBATTLE] ; $d057
+    and a
+    jr nz,.copyEnemyMonData
     call GenRandom
     ld [hli],a
     call GenRandom
@@ -24477,7 +24483,7 @@ ItemUseMedicine: ; dabb (3:5abb)
     xor a
     ld [$cc49],a
     ld a,$1a
-    call Predef ; learn level up move,if any
+    call Predef ; LearnMoveFromLevelUp
     xor a
     ld [$ccd4],a
     ld hl,TryEvolvingMon
@@ -29671,10 +29677,10 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jr z,.choseSwitch
     dec b
     cp b
-    jp z,.choseStats
+    jp z,.choseMoves
     dec b
     cp b
-    jp z,.choseMoves
+    jp z,.choseStats
     ld c,a
     ld b,0
     ld hl,wFieldMoves ; $cd3d-1
@@ -42742,26 +42748,6 @@ GetMonPotentialMoveList:
     ld bc,96-1
     call FarCopyData ; copy bc bytes of data from a:hl to de
 
-    ; Get Mon Move List from "PreEvolutionMove"
-    ; ld de,wMoveRelearnerMoveList+1 ; Backup Final List Pointer to $CD6D
-    ; ld hl,$CD6D                    ; ...
-    ; ld a,e                         ; ...
-    ; ld [hli],a                     ; ...
-    ; ld a,d                         ; ...
-    ; ld [hl],a                      ; ...
-    ; ld a,[$cf91]
-    ; ld d,a ; pokemon ID
-    ; ld e,0 ; initial counter = 0
-    ; ld b,BANK(GetPreEvolutionMove) ; TODO Learnset
-    ; ld hl,GetPreEvolutionMove
-    ; call Bankswitch
-    ; ld b,e ; restore counter
-    ; ld hl,$CD6D
-    ; ld a,[hli]
-    ; ld d,[hl]
-    ; ld e,a ; de pointer to current Final List
-
-    ; TODO Learnset
     ld de,wMoveRelearnerMoveList+1 ; Final List Pointer
     ld b,0 ; initial counter = 0
 
@@ -43263,29 +43249,51 @@ HandleExclusiveLearnMove:
     sub b
     ld b,a ; b = Bit (0,1,...,7)
     call .GetPointerToCorrectExlusiveLearnMoveList
+    push de ; Backup Pointer to Move List Current Elements
     ld a,c
-    push bc
-    ld bc,8
-    call AddNTimes ; Add "Byte" * 8
-    pop bc
-    ld c,b
-    ld b,0
-    add hl,bc ; Add "Bit"
-
+    and a
+    jr z,.SkipLoopCByte
+    ld d,c
+.LoopCByte
+    ld e,8
+.Loop8Bit
+    ld a,[hli]
+    and a
+    jr z,.OutOfRange
+    dec e
+    jr nz,.Loop8Bit
+    dec d
+    jr nz,.LoopCByte
+.SkipLoopCByte
+    ld a,b
+    and a
+    jr z,.SkipLoopBBit
+    ld e,b
+.LoopBBit
+    ld a,[hli]
+    and a
+    jr z,.OutOfRange
+    dec e
+    jr nz,.LoopBBit
+.SkipLoopBBit
     ld a,[hl] ; Exclusive Move
     and a
-    jr z,.skipMoveJustPotentialKnow
+    jr z,.OutOfRange
+    pop de ; Restore Pointer to Move List Current Elements
     ld b,a
     call .CheckMoveJustPotentialKnow
-    jr c,.skipMoveJustPotentialKnow
+    jr c,.end
     ld a,b
     ld [de],a
     inc de
-.skipMoveJustPotentialKnow
+.end
     pop hl
     pop bc
     pop af
     ret
+.OutOfRange
+    pop de ; Restore Pointer to Move List Current Elements
+    jr .end
 
 .GetPointerToCorrectExlusiveLearnMoveList
     ld hl,GenericBuffer+1
@@ -43316,6 +43324,77 @@ HandleExclusiveLearnMove:
     and a ; rcf
     pop hl
     ret
+
+TryToAddExclusiveMove:
+    ld a,[wWhichPokemon]
+    ld hl,W_PARTYMON1
+    ld c,a
+    ld b,0
+    add hl,bc
+    ld a,[hl] ; mon ID
+    ld hl,ExclusiveMoveLearnTable
+    ld [$d11e],a
+    call IndexToPokedexAndRestoreD11E
+    ld b,0
+    add a
+    rl b
+    ld c,a
+    add hl,bc
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld a,[$d0e0] ; Learned Move
+    ld b,a
+    ld c,0
+.Loop
+    ld a,[hli]
+    and a
+    ret z
+    cp b
+    jr z,.MoveFound
+    inc c
+    jr .Loop
+.MoveFound
+    ; c = id move in Table
+    ; wWhichPokemon
+    ld hl,.LocationByte
+    ld d,0
+    ld e,c
+    srl e ; Divided by 8
+    srl e ; ...
+    srl e ; ...
+    sla e ; Moltiplied by 2
+    add hl,de
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld a,[wWhichPokemon]
+    push bc
+    ld bc,$2c
+    call AddNTimes
+    pop bc
+    ; hl = pointer to mon corrent Byte to flag
+    ld a,c
+    and %00000111 ; Mask to obtain bit id (0,1,...,7)
+    ld b,a
+    inc b ; (1,2,...,8)
+    ld c,%00000000 ; Start Final Bit Mask with all bit reset
+    scf
+.LoopBit
+    rl c ; rotate Final Bit Mask
+    and a ; rcf
+    dec b
+    jr nz,.LoopBit
+    ld a,[hl]
+    or c ; set correct bit
+    ld [hl],a
+    ret
+.LocationByte
+    dw W_PARTYMON1_TYPE1
+    dw W_PARTYMON1_TYPE2
+    dw W_PARTYMON1_MOVE2PP
+    dw W_PARTYMON1_MOVE3PP
+    dw W_PARTYMON1_MOVE4PP
 
 ExclusiveMoveLearnTable:
     dw MissingNoExclusiveMove  ; 000 - MISSINGNO
@@ -43471,219 +43550,14 @@ ExclusiveMoveLearnTable:
     dw MewtwoExclusiveMove     ; 150 - MEWTWO
     dw MewExclusiveMove        ; 151 - MEW
 
-MissingNoExclusiveMove:
-BulbasaurExclusiveMove:
-IvysaurExclusiveMove:
-VenusaurExclusiveMove:
-CharmanderExclusiveMove:
-CharmeleonExclusiveMove:
-CharizardExclusiveMove:
-SquirtleExclusiveMove:
-WartortleExclusiveMove:
-BlastoiseExclusiveMove:
-CaterpieExclusiveMove:
-MetapodExclusiveMove:
-ButterfreeExclusiveMove:
-WeedleExclusiveMove:
-KakunaExclusiveMove:
-BeedrillExclusiveMove:
-    db RAZOR_WIND
-    db SWORDS_DANCE
-    db TOXIC
-    db TAKE_DOWN
-    db DOUBLE_EDGE
-    db HYPER_BEAM
-    db RAGE
-    db MEGA_DRAIN
-    db MIMIC
-    db DOUBLE_TEAM
-    db REFLECT
-    db BIDE
-    db SWIFT
-    db SKULL_BASH
-    db REST
-    db SUBSTITUTE
-    db BLADE
-PidgeyExclusiveMove:
-PidgeottoExclusiveMove:
-PidgeotExclusiveMove:
-RattataExclusiveMove:
-RaticateExclusiveMove:
-SpearowExclusiveMove:
-FearowExclusiveMove:
-EkansExclusiveMove:
-ArbokExclusiveMove:
-PikachuExclusiveMove:
-RaichuExclusiveMove:
-SandshrewExclusiveMove:
-SandslashExclusiveMove:
-NidoranFExclusiveMove:
-NidorinaExclusiveMove:
-NidoqueenExclusiveMove:
-NidoranMExclusiveMove:
-NidorinoExclusiveMove:
-NidokingExclusiveMove:
-ClefairyExclusiveMove:
-ClefableExclusiveMove:
-VulpixExclusiveMove:
-NinetalesExclusiveMove:
-JigglypuffExclusiveMove:
-WigglytuffExclusiveMove:
-ZubatExclusiveMove:
-GolbatExclusiveMove:
-OddishExclusiveMove:
-GloomExclusiveMove:
-VileplumeExclusiveMove:
-ParasExclusiveMove:
-ParasectExclusiveMove:
-VenonatExclusiveMove:
-VenomothExclusiveMove:
-DiglettExclusiveMove:
-DugtrioExclusiveMove:
-MeowthExclusiveMove:
-PersianExclusiveMove:
-PsyduckExclusiveMove:
-GolduckExclusiveMove:
-MankeyExclusiveMove:
-PrimeapeExclusiveMove:
-GrowlitheExclusiveMove:
-ArcanineExclusiveMove:
-PoliwagExclusiveMove:
-PoliwhirlExclusiveMove:
-PoliwrathExclusiveMove:
-AbraExclusiveMove:
-KadabraExclusiveMove:
-AlakazamExclusiveMove:
-MachopExclusiveMove:
-MachokeExclusiveMove:
-MachampExclusiveMove:
-BellsproutExclusiveMove:
-WeepinbellExclusiveMove:
-VictreebelExclusiveMove:
-TentacoolExclusiveMove:
-TentacruelExclusiveMove:
-GeodudeExclusiveMove:
-GravelerExclusiveMove:
-GolemExclusiveMove:
-PonytaExclusiveMove:
-RapidashExclusiveMove:
-SlowpokeExclusiveMove:
-SlowbroExclusiveMove:
-MagnemiteExclusiveMove:
-MagnetonExclusiveMove:
-FarfetchdExclusiveMove:
-DoduoExclusiveMove:
-DodrioExclusiveMove:
-SeelExclusiveMove:
-DewgongExclusiveMove:
-GrimerExclusiveMove:
-MukExclusiveMove:
-ShellderExclusiveMove:
-CloysterExclusiveMove:
-GastlyExclusiveMove:
-HaunterExclusiveMove:
-GengarExclusiveMove:
-OnixExclusiveMove:
-DrowzeeExclusiveMove:
-HypnoExclusiveMove:
-KrabbyExclusiveMove:
-KinglerExclusiveMove:
-VoltorbExclusiveMove:
-ElectrodeExclusiveMove:
-ExeggcuteExclusiveMove:
-ExeggutorExclusiveMove:
-CuboneExclusiveMove:
-MarowakExclusiveMove:
-HitmonleeExclusiveMove:
-HitmonchanExclusiveMove:
-LickitungExclusiveMove:
-KoffingExclusiveMove:
-WeezingExclusiveMove:
-RhyhornExclusiveMove:
-RhydonExclusiveMove:
-ChanseyExclusiveMove:
-TangelaExclusiveMove:
-KangaskhanExclusiveMove:
-HorseaExclusiveMove:
-SeadraExclusiveMove:
-GoldeenExclusiveMove:
-SeakingExclusiveMove:
-StaryuExclusiveMove:
-StarmieExclusiveMove:
-MrMimeExclusiveMove:
-ScytherExclusiveMove:
-JynxExclusiveMove:
-ElectabuzzExclusiveMove:
-MagmarExclusiveMove:
-PinsirExclusiveMove:
-TaurosExclusiveMove:
-MagikarpExclusiveMove:
-GyaradosExclusiveMove:
-LaprasExclusiveMove:
-DittoExclusiveMove:
-EeveeExclusiveMove:
-VaporeonExclusiveMove:
-JolteonExclusiveMove:
-FlareonExclusiveMove:
-PorygonExclusiveMove:
-OmanyteExclusiveMove:
-OmastarExclusiveMove:
-KabutoExclusiveMove:
-KabutopsExclusiveMove:
-AerodactylExclusiveMove:
-SnorlaxExclusiveMove:
-ArticunoExclusiveMove:
-ZapdosExclusiveMove:
-MoltresExclusiveMove:
-DratiniExclusiveMove:
-DragonairExclusiveMove:
-DragoniteExclusiveMove:
-MewtwoExclusiveMove:
-    db MEGA_PUNCH
-    db MEGA_KICK
-    db TOXIC
-    db BODY_SLAM
-    db TAKE_DOWN
-    db DOUBLE_EDGE
-    db BUBBLEBEAM
-    db WATER_GUN
-    db ICE_BEAM
-    db BLIZZARD
-    db HYPER_BEAM
-    db PAY_DAY
-    db SUBMISSION
-    db COUNTER
-    db SEISMIC_TOSS
-    db RAGE
-    db SOLARBEAM
-    db THUNDERBOLT
-    db THUNDER
-    db PSYCHIC_M
-    db TELEPORT
-    db MIMIC
-    db DOUBLE_TEAM
-    db REFLECT
-    db BIDE
-    db METRONOME
-    db SELFDESTRUCT
-    db FIRE_BLAST
-    db SWIFT
-    db SKULL_BASH
-    db FLASH
-    db REST
-    db THUNDER_WAVE
-    db PSYWAVE
-    db TRI_ATTACK
-    db SUBSTITUTE
-    db STRIKE
-MewExclusiveMove:
-    ds 40
+INCLUDE "constants/pokemon_exclusive.asm"
 
 ; Input
 ; $d0e0 = Move ID
 ; wWhichPokemon = Mon Party ID
 CheckMonAlreadyKnowMove:
     call GetMonPotentialMoveList
+CheckMonAlreadyKnowMoveQuick:
     ld a,[$d0e0]
     ld b,a
     ld hl,wMoveRelearnerMoveList
@@ -50114,15 +49988,43 @@ Func_3a948: ; 3a948 (e:6948)
     ld hl,$c318
     jp Func_3a8e1
 
+LearnMoveAfterEvolution:
+    ld a,[$d11e]
+    ld [$cf91],a
+    push af
+    ; Get Pre Evolution Form Move List
+    ld b,BANK(GetMonPotentialMoveList)
+    ld hl,GetMonPotentialMoveList
+    call Bankswitch
+    pop af
+    jr LearnMoveCommon
+
 LearnMoveFromLevelUp:
-    xor a
-    ld [wEvolutionMove],a ; Initialize to ZERO
-LearnMoveFromLevelUp_AfterEvolutionMove:
     ld a,[$d11e]
     ld [$cf91],a
     cp a,MEW
-    jr z,.mew
-    ds 1 ; dec a ; 00MOD
+    jp z,MewLearnMove
+
+    push af
+    ld hl,W_PARTYMON1_LEVEL
+    ld a,[wWhichPokemon] ; $cf92
+    ld bc,$2c
+    call AddNTimes
+    ld a,[hl]
+    push hl ; Backup Level
+    dec [hl] ; Level -1 because "CheckMonAlreadyKnowMoveQuick"
+             ; fail 100% if not
+    ; Get Pre Evolution Form Move List
+    ld b,BANK(GetMonPotentialMoveList)
+    ld hl,GetMonPotentialMoveList
+    call Bankswitch
+    pop hl   ; Restore Level
+    inc [hl] ; ...
+    pop af
+    ; fall through
+
+LearnMoveCommon:
+    ; ds 1 ; dec a ; 00MOD
     ld bc,$0
     call LoadEvosMovesPointerTableByPokedex
     add a
@@ -50145,36 +50047,12 @@ LearnMoveFromLevelUp_AfterEvolutionMove:
     ld a,[W_CURENEMYLVL] ; $d127
     cp b
     ld a,[hli]
-    jr nz,.learnSetLoop
+    jr c,.done ; end if next move level is too high
 .learnmove
-    ld d,a
     ld [$d0e0],a
-    ld a,[wEvolutionMove] ; Is Different than Actual?
-    cp d
-    jr z,.learnSetLoop
     push hl ; Backup Pointer to Current Learn Move's Level
-;    ld hl,W_PARTYMON1_MOVE1 ; $d173
-;    ld a,[wWhichPokemon] ; $cf92
-;    ld bc,$2c
-;    call AddNTimes
-;    ld b,$4
-;.checkCurrentMovesLoop
-;    ld a,[hli]
-;    cp d
-;    jr z,.LearnEndOrJustKnow
-;    dec b
-;    jr nz,.checkCurrentMovesLoop
-
-    ld hl,W_PARTYMON1_LEVEL
-    ld a,[wWhichPokemon] ; $cf92
-    ld bc,$2c
-    call AddNTimes
-    ld a,[hl]
-    push hl ; Backup Level
-    dec [hl] ; Level -1 because "CheckMonAlreadyKnowMove"
-             ; fail 100% if not
-    ld b,BANK(CheckMonAlreadyKnowMove)
-    ld hl,CheckMonAlreadyKnowMove
+    ld b,BANK(CheckMonAlreadyKnowMoveQuick)
+    ld hl,CheckMonAlreadyKnowMoveQuick
     call Bankswitch
     jr c,.LearnEndOrJustKnow
     ld a,[$d0e0]
@@ -50182,19 +50060,20 @@ LearnMoveFromLevelUp_AfterEvolutionMove:
     call GetMoveName
     call CopyStringToCF4B
     ld a,$1b
-    call Predef ; indirect jump to LearnMove (6e43 (1:6e43))
+    call Predef ; LearnMove
 .LearnEndOrJustKnow
-    pop hl   ; Restore Level
-    inc [hl] ; ...
     pop hl ; Restore Pointer to Current Learn Move's Level
     jr .learnSetLoop
 .done
     ld a,[$cf91]
     ld [$d11e],a
     ret
-.mew
-    call TryRandomForMew
-    jr .done
+
+MewLearnMove:
+    call TryRandomForMew ; TODO
+    ld a,[$cf91]
+    ld [$d11e],a
+    ret
 
 Func_3bb8c: ; Moved in the Bank
     ld hl,Func_3fb53 ; $7b53
@@ -50366,9 +50245,9 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     ld a,$ff
     ld [$cfcb],a
     call CleanLCD_OAM
-    ld hl,Func_7bde9
-    ld b,BANK(Func_7bde9)
-    call Bankswitch ; indirect jump to Func_7bde9 (7bde9 (1e:7de9))
+    ld hl,EvolveMon
+    ld b,BANK(EvolveMon)
+    call Bankswitch ; indirect jump to EvolveMon (7bde9 (1e:7de9))
     jp c,Func_3af2e
     ld hl,UnnamedText_3af3e ; $6f3e
     call PrintText
@@ -50448,17 +50327,18 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     ld [$d11e],a
     xor a
     ld [$cc49],a
-    call CheckEvolutionMove ; call LearnMoveFromLevelUp
+    call LearnMoveAfterEvolution
     pop hl
-    ld a,$42
-    call Predef ; indirect jump to SetPartyMonTypes (5db5e (17:5b5e))
+    ; Don't Overwrite "Types"
+    ; ld a,$42
+    ; call Predef ; indirect jump to SetPartyMonTypes (5db5e (17:5b5e))
     ld a,[W_ISINBATTLE] ; $d057
     and a
     call z,Func_3af52
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     ld a,[$d11e]
-    ds 1 ; dec a ; POKEDEXMOD
+    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
     ld hl,wPokedexOwned ; $d2f7
@@ -50482,12 +50362,6 @@ nextEvoEntry1: ; Moved in the Bank
 nextEvoEntry2: ; Moved in the Bank
     inc hl
     jp TryEvolution
-
-CheckEvolutionMove:
-    ld hl,_CheckEvolutionMove
-    ld b,BANK(_CheckEvolutionMove)
-    call Bankswitch
-    jp LearnMoveFromLevelUp_AfterEvolutionMove
 
 UnnamedText_3bbd7: ; Moved in the Bank
     TX_FAR _UnnamedText_3bbd7
@@ -79683,7 +79557,7 @@ GainExperience: ; 5524f (15:524f)
     ld a,[$d0b5]
     ld [$d11e],a
     ld a,$1a
-    call LevelByLevelFix ; call Predef ; indirect jump to LearnMoveFromLevelUp (3af5b (e:6f5b))
+    call Predef ; LearnMoveFromLevelUp
     ld hl,$ccd3
     ld a,[wWhichPokemon] ; $cf92
     ld c,a
@@ -83412,35 +83286,6 @@ CheckReachLevelLimit:
     ld a,[$d008]
     scf ; Set Carry Flag
     ret
-
-LevelByLevelFix:
-    ;;;;;;;;;;;;;;;;;;;;
-    ;joenote - fixing skip move-learn glitch: here is where moves are learned from level-up, but it needs some changes
-    ld a,[W_CURENEMYLVL]    ; load the level to advance to into a. this starts out as the final level.
-    ld c,a    ; load the final level to grow to over to c
-    ld a,[$cd46]    ; load the current level into a ($cd46 = wTempCoins1)
-    ld b,a    ; load the current level over to b
-    ; Check Error
-    cp c
-    jr nc,.Error_FinalLevelNotGreaterThenPrevious
-.inc_level    ; marker for looping back 
-    inc b    ;increment     the current level
-    ld a,b    ;put the current level in a
-    ld [W_CURENEMYLVL],a    ;and reset the level to advance to as merely 1 higher
-    push bc    ;save b & c on the stack as they hold the current a true final level
-    ld a,$1a
-    call Predef ; indirect jump to LearnMoveFromLevelUp (3af5b (e:6f5b))
-    pop bc    ;get the current and final level values back from the stack
-    ld a,b    ;load the current level into a
-    cp c    ;compare it with the final level
-    jr nz,.inc_level    ;loop back again if final level has not been reached
-    ;;;;;;;;;;;;;;;;;;;;
-    ret
-.Error_FinalLevelNotGreaterThenPrevious
-    ld a,c
-    dec a
-    ld b,a ; Force current level to final-1
-    jr .inc_level
 
 ; Celadon Dept. Store 2F (2)
 CeladonMart2Text2:
@@ -113637,7 +113482,7 @@ FrameBlockBaseCoords: ; 7bc85 (1e:7c85)
 FrameBlock00: ; 7bde7 (1e:7de7)
     db $00,$00
 
-Func_7bde9: ; 7bde9 (1e:7de9)
+EvolveMon: ; 7bde9 (1e:7de9)
     push hl
     push de
     push bc
@@ -131220,426 +131065,6 @@ ItemNames: ; 472b (1:472b)
     db "TM54:STRIKE@"  ; $FE ; TM_54
     db "CANCEL@"       ; $FF
     db "ITEM 00@"      ; $00
-
-_CheckEvolutionMove:
-    ld a,[$d11e] ; Read Original
-    ld [$cf91],a ; ...
-    ld a,$3a
-    call Predef ; indirect jump to IndexToPokedex
-    ld a,[$d11e]
-    dec a
-    ld hl,EvolutionMove
-    ld b,0
-    ld c,a
-    add hl,bc
-    ld a,[hl]
-    and a
-    jr z,.done
-    ld d,a
-    ; Useless Code
-    ;ld a,[$cc49]
-    ;and a
-    ;jr nz,.next
-    ld hl,W_PARTYMON1_MOVE1 ; $d173
-    ld a,[wWhichPokemon] ; $cf92
-    ld bc,$2c
-    call AddNTimes
-;.next
-    ld b,$4
-.checkCurrentMovesLoop
-    ld a,[hli]
-    cp d
-    jr z,.done
-    dec b
-    jr nz,.checkCurrentMovesLoop
-    ld a,d
-    ld [$d0e0],a
-    ld [$d11e],a
-    ld [wEvolutionMove],a
-    call GetMoveName
-    call CopyStringToCF4B
-    ld a,$1b
-    call Predef ; indirect jump to LearnMove (6e43 (1:6e43)) ; LearnMove
-.done
-    ld a,[$cf91] ; Restore Original
-    ld [$d11e],a ; ...
-    ret
-
-EvolutionMove:
-    db 0                    ; BULBASAUR
-    db POISONPOWDER         ; IVYSAUR
-    db PETAL_DANCE          ; VENUSAUR
-    db 0                    ; CHARMANDER
-    db FOCUS_ENERGY         ; CHARMELEON
-    db SWOOP                ; CHARIZARD
-    db 0                    ; SQUIRTLE
-    db WITHDRAW             ; WARTORTLE
-    db TSUNAMI              ; BLASTOISE
-    db 0                    ; CATERPIE
-    db HARDEN               ; METAPOD
-    db CONFUSION            ; BUTTERFREE
-    db 0                    ; WEEDLE
-    db HARDEN               ; KAKUNA
-    db TWINEEDLE            ; BEEDRILL
-    db 0                    ; PIDGEY
-    db WING_ATTACK          ; PIDGEOTTO
-    db DOUBLE_TEAM          ; PIDGEOT
-    db 0                    ; RATTATA
-    db TRAPHOLE             ; RATICATE
-    db 0                    ; SPEAROW
-    db SWOOP                ; FEAROW
-    db 0                    ; EKANS
-    db TRAPHOLE             ; ARBOK
-    db 0                    ; PIKACHU
-    db THUNDERBOLT          ; RAICHU
-    db 0                    ; SANDSHREW
-    db TRAPHOLE             ; SANDSLASH
-    db 0                    ; NIDORAN_F
-    db DOUBLE_KICK          ; NIDORINA
-    db THRASH               ; NIDOQUEEN
-    db 0                    ; NIDORAN_M
-    db DOUBLE_KICK          ; NIDORINO
-    db THRASH               ; NIDOKING
-    db 0                    ; CLEFAIRY
-    db SWIFT                ; CLEFABLE
-    db 0                    ; VULPIX
-    db BITE                 ; NINETALES
-    db 0                    ; JIGGLYPUFF
-    db SWIFT                ; WIGGLYTUFF
-    db 0                    ; ZUBAT
-    db WING_ATTACK          ; GOLBAT
-    db 0                    ; ODDISH
-    db SLEEP_POWDER         ; GLOOM
-    db MEGA_DRAIN           ; VILEPLUME
-    db 0                    ; PARAS
-    db GROWTH               ; PARASECT
-    db 0                    ; VENONAT
-    db PIN_MISSILE          ; VENOMOTH
-    db 0                    ; DIGLETT
-    db TRI_ATTACK           ; DUGTRIO
-    db 0                    ; MEOWTH
-    db HYPER_FANG           ; PERSIAN
-    db 0                    ; PSYDUCK
-    db WATER_GUN            ; GOLDUCK
-    db 0                    ; MANKEY
-    db JUMP_KICK            ; PRIMEAPE
-    db 0                    ; GROWLITHE
-    db HYPER_FANG           ; ARCANINE
-    db 0                    ; POLIWAG
-    db SLAM                 ; POLIWHIRL
-    db LOW_KICK             ; POLIWRATH
-    db 0                    ; ABRA
-    db KINESIS              ; KADABRA
-    db PSYBEAM              ; ALAKAZAM
-    db 0                    ; MACHOP
-    db ROLLING_KICK         ; MACHOKE
-    db JUMP_KICK            ; MACHAMP
-    db 0                    ; BELLSPROUT
-    db STUN_SPORE           ; WEEPINBELL
-    db WRAP                 ; VICTREEBEL
-    db 0                    ; TENTACOOL
-    db SLUDGE               ; TENTACRUEL
-    db 0                    ; GEODUDE
-    db STOMP                ; GRAVELER
-    db BODY_SLAM            ; GOLEM
-    db 0                    ; PONYTA
-    db HORN_ATTACK          ; RAPIDASH
-    db 0                    ; SLOWPOKE
-    db MEGA_PUNCH           ; SLOWBRO
-    db 0                    ; MAGNEMITE
-    db TRI_ATTACK           ; MAGNETON
-    db 0                    ; FARFETCH_D
-    db 0                    ; DODUO
-    db TRI_ATTACK           ; DODRIO
-    db 0                    ; SEEL
-    db TSUNAMI              ; DEWGONG
-    db 0                    ; GRIMER
-    db ACID_ARMOR           ; MUK
-    db 0                    ; SHELLDER
-    db SPIKE_CANNON         ; CLOYSTER
-    db 0                    ; GASTLY
-    db PSYWAVE              ; HAUNTER
-    db POISON_GAS           ; GENGAR
-    db 0                    ; ONIX
-    db 0                    ; DROWZEE
-    db PSYBEAM              ; HYPNO
-    db 0                    ; KRABBY
-    db CRABHAMMER           ; KINGLER
-    db 0                    ; VOLTORB
-    db THUNDERBOLT          ; ELECTRODE
-    db 0                    ; EXEGGCUTE
-    db STOMP                ; EXEGGUTOR
-    db 0                    ; CUBONE
-    db NIGHT_SHADE          ; MAROWAK
-    db 0                    ; HITMONLEE
-    db 0                    ; HITMONCHAN
-    db 0                    ; LICKITUNG
-    db 0                    ; KOFFING
-    db EXPLOSION            ; WEEZING
-    db 0                    ; RHYHORN
-    db ROCK_SLIDE           ; RHYDON
-    db 0                    ; CHANSEY
-    db 0                    ; TANGELA
-    db 0                    ; KANGASKHAN
-    db 0                    ; HORSEA
-    db DRAGON_RAGE          ; SEADRA
-    db 0                    ; GOLDEEN
-    db WATERFALL            ; SEAKING
-    db 0                    ; STARYU
-    db BUBBLEBEAM           ; STARMIE
-    db 0                    ; MR_MIME
-    db 0                    ; SCYTHER
-    db 0                    ; JYNX
-    db 0                    ; ELECTABUZZ
-    db 0                    ; MAGMAR
-    db 0                    ; PINSIR
-    db 0                    ; TAUROS
-    db 0                    ; MAGIKARP
-    db BITE                 ; GYARADOS
-    db 0                    ; LAPRAS
-    db 0                    ; DITTO
-    db 0                    ; EEVEE
-    db WATER_GUN            ; VAPOREON
-    db THUNDERSHOCK         ; JOLTEON
-    db EMBER                ; FLAREON
-    db 0                    ; PORYGON
-    db 0                    ; OMANYTE
-    db SPIKE_CANNON         ; OMASTAR
-    db 0                    ; KABUTO
-    db SLASH                ; KABUTOPS
-    db 0                    ; AERODACTYL
-    db 0                    ; SNORLAX
-    db 0                    ; ARTICUNO
-    db 0                    ; ZAPDOS
-    db 0                    ; MOLTRES
-    db 0                    ; DRATINI
-    db DRAGON_RAGE          ; DRAGONAIR
-    db SWOOP                ; DRAGONITE
-    db 0                    ; MEWTWO
-    db 0                    ; MEW
-
-; INPUT : $CD6D = Pointer to Mon Move List
-;         d = pokemon ID
-;         e = initial counter = 0
-;GetPreEvolutionMove:
-;    ld hl,.Pointer
-;.next
-;    ld a,[hli]
-;    cp $FF ; Check $FF
-;    jr z,.end
-;    cp d ; Check Search Mon ID
-;    jr z,.found
-;    inc hl
-;    inc hl
-;    jr .next
-;.found
-;    ld a,[hli]
-;    ld b,a
-;    ld h,[hl]
-;    ld l,b ; hl point to current mon pre evolution moves
-;    ld b,e ; counter to b
-;    call .getPointerToMonMoveList_DE
-;.LoopMoves
-;    ld a,[hli]
-;    cp $FF
-;    jr z,.endLoopMoves
-;    ld [de],a
-;    inc de
-;    inc b ; counter++
-;    jr .LoopMoves
-;.endLoopMoves
-;    call .setPointerToMonMoveList_DE
-;    ld e,b ; counter to e
-;.end
-;    ret
-;.getPointerToMonMoveList_DE
-;    push hl
-;    ld hl,$CD6D
-;    ld a,[hli]
-;    ld e,a
-;    ld d,[hl]
-;    pop hl
-;    ret
-;.setPointerToMonMoveList_DE
-;    ld hl,$CD6D
-;    ld a,e
-;    ld [hli],a
-;    ld a,d
-;    ld [hl],d
-;    ret
-;.Pointer
-;    PreEvolution IVYSAUR
-;    PreEvolution VENUSAUR
-;    PreEvolution CHARMELEON
-;    PreEvolution CHARIZARD
-;    PreEvolution WARTORTLE
-;    PreEvolution BLASTOISE
-;    PreEvolution PIDGEOTTO
-;    PreEvolution PIDGEOT
-;    PreEvolution RATICATE
-;    PreEvolution FEAROW
-;    PreEvolution ARBOK
-;    PreEvolution SANDSLASH
-;    PreEvolution NIDORINA
-;    PreEvolution NIDOQUEEN
-;    PreEvolution NIDORINO
-;    PreEvolution NIDOKING
-;    PreEvolution GOLBAT
-;    PreEvolution GLOOM
-;    PreEvolution VILEPLUME
-;    PreEvolution PARASECT
-;    PreEvolution VENOMOTH
-;    PreEvolution DUGTRIO
-;    PreEvolution PERSIAN
-;    PreEvolution GOLDUCK
-;    PreEvolution PRIMEAPE
-;    PreEvolution POLIWHIRL
-;    PreEvolution POLIWRATH
-;    PreEvolution KADABRA
-;    PreEvolution ALAKAZAM
-;    PreEvolution MACHOKE
-;    PreEvolution MACHAMP
-;    PreEvolution WEEPINBELL
-;    PreEvolution VICTREEBEL
-;    PreEvolution TENTACRUEL
-;    PreEvolution GRAVELER
-;    PreEvolution GOLEM
-;    PreEvolution RAPIDASH
-;    PreEvolution SLOWBRO
-;    PreEvolution MAGNETON
-;    PreEvolution DODRIO
-;    PreEvolution DEWGONG
-;    PreEvolution MUK
-;    PreEvolution HAUNTER
-;    PreEvolution GENGAR
-;    PreEvolution HYPNO
-;    PreEvolution KINGLER
-;    PreEvolution ELECTRODE
-;    PreEvolution MAROWAK
-;    PreEvolution WEEZING
-;    PreEvolution RHYDON
-;    PreEvolution SEADRA
-;    PreEvolution SEAKING
-;    PreEvolution GYARADOS
-;    PreEvolution OMASTAR
-;    PreEvolution KABUTOPS
-;    PreEvolution DRAGONAIR
-;    PreEvolution DRAGONITE
-;    db $FF
-;.IVYSAUR
-;    db TACKLE,GROWL,$FF
-;.VENUSAUR
-;    db TACKLE,GROWL,LEECH_SEED,CONSTRICT,VINE_WHIP,POISONPOWDER,DOUBLE_KICK,$FF
-;.CHARMELEON
-;    db SCRATCH,GROWL,$FF
-;.CHARIZARD
-;    db SCRATCH,GROWL,EMBER,LEER,FURY_SWIPES,FOCUS_ENERGY,SMOKESCREEN,$FF
-;.WARTORTLE
-;    db TACKLE,TAIL_WHIP,$FF
-;.BLASTOISE
-;    db TACKLE,TAIL_WHIP,BUBBLE,DOUBLESLAP,WATER_GUN,WITHDRAW,BITE,$FF
-;.PIDGEOTTO
-;    db GUST,GROWL,$FF
-;.PIDGEOT
-;    db GUST,GROWL,SAND_ATTACK,QUICK_ATTACK,PECK,WING_ATTACK,$FF
-;.RATICATE
-;    db TACKLE,TAIL_WHIP,SCRATCH,FURY_SWIPES,$FF
-;.FEAROW
-;    db GUST,GROWL,LEER,PECK,$FF
-;.ARBOK
-;    db WRAP,LEER,POISON_STING,LEECH_LIFE,$FF
-;.SANDSLASH
-;    db SCRATCH,DEFENSE_CURL,SAND_ATTACK,$FF
-;.NIDORINA
-;    db SCRATCH,GROWL,$FF
-;.NIDOQUEEN
-;    db SCRATCH,GROWL,TAIL_WHIP,$FF
-;.NIDORINO
-;    db TACKLE,LEER,$FF
-;.NIDOKING
-;    db TACKLE,LEER,HORN_ATTACK,$FF
-;.GOLBAT
-;    db LEECH_LIFE,SUPERSONIC,POISON_STING,$FF
-;.GLOOM
-;    db ABSORB,GROWTH,LEECH_SEED,$FF
-;.VILEPLUME
-;    db ABSORB,GROWTH,LEECH_SEED,ACID,$FF
-;.PARASECT
-;    db SCRATCH,STUN_SPORE,LEECH_SEED,LEECH_LIFE,POISONPOWDER,$FF
-;.VENOMOTH
-;    db TACKLE,DISABLE,SUPERSONIC,PSYWAVE,POISONPOWDER,CONFUSION,$FF
-;.DUGTRIO
-;    db SCRATCH,GROWL,AGILITY,$FF
-;.PERSIAN
-;    db SCRATCH,GROWL,TAIL_WHIP,PAY_DAY,QUICK_ATTACK,BITE,FURY_SWIPES,$FF
-;.GOLDUCK
-;    db SCRATCH,TAIL_WHIP,PSYWAVE,DISABLE,CONFUSION,PECK,FURY_SWIPES,$FF
-;.PRIMEAPE
-;    db SCRATCH,LEER,LOW_KICK,DOUBLE_TEAM,KARATE_CHOP,$FF
-;.POLIWHIRL
-;    db BUBBLE,HYPNOSIS,TACKLE,$FF
-;.POLIWRATH
-;    db BUBBLE,HYPNOSIS,TACKLE,WATER_GUN,$FF
-;.KADABRA
-;    db TELEPORT,$FF
-;.ALAKAZAM
-;    db TELEPORT,PSYWAVE,$FF
-;.MACHOKE
-;    db KARATE_CHOP,LEER,LOW_KICK,MEGA_PUNCH,$FF
-;.MACHAMP
-;    db KARATE_CHOP,LEER,LOW_KICK,MEGA_PUNCH,FOCUS_ENERGY,$FF
-;.WEEPINBELL
-;    db VINE_WHIP,GROWTH,LEECH_LIFE,$FF
-;.VICTREEBEL
-;    db VINE_WHIP,GROWTH,LEECH_LIFE,ACID,$FF
-;.TENTACRUEL
-;    db CONSTRICT,SUPERSONIC,ACID,LEECH_LIFE,WRAP,POISON_STING,$FF
-;.GRAVELER
-;    db TACKLE,DEFENSE_CURL,DOUBLESLAP,$FF
-;.GOLEM
-;    db TACKLE,DEFENSE_CURL,DOUBLESLAP,ROCK_THROW,$FF
-;.RAPIDASH
-;    db TACKLE,GROWL,AGILITY,QUICK_ATTACK,EMBER,STOMP,TAIL_WHIP,DOUBLE_KICK,SLAM,FIRE_SPIN,$FF
-;.SLOWBRO
-;    db TACKLE,GROWL,PSYWAVE,CONFUSION,WATER_GUN,DISABLE,HEADBUTT,$FF
-;.MAGNETON
-;    db TACKLE,FLASH,THUNDERSHOCK,SUPERSONIC,$FF
-;.DODRIO
-;    db PECK,GROWL,FURY_ATTACK,QUICK_ATTACK,STOMP,$FF
-;.DEWGONG
-;    db HEADBUTT,GROWL,LICK,DISABLE,WATER_GUN,TAKE_DOWN,AURORA_BEAM,$FF
-;.MUK
-;    db POUND,POISON_GAS,HARDEN,ACID,SCREECH,LICK,DISABLE,$FF
-;.HAUNTER
-;    db LICK,CONFUSE_RAY,LEECH_LIFE,$FF
-;.GENGAR
-;    db LICK,CONFUSE_RAY,LEECH_LIFE,NIGHT_SHADE,$FF
-;.HYPNO
-;    db POUND,DISABLE,TELEPORT,PSYWAVE,HYPNOSIS,DREAM_EATER,$FF
-;.KINGLER
-;    db BUBBLE,LEER,BLADE,VICEGRIP,CLAMP,$FF
-;.ELECTRODE
-;    db TACKLE,SCREECH,FLASH,SONICBOOM,$FF
-;.MAROWAK
-;    db TACKLE,GROWL,TAIL_WHIP,BONE_CLUB,LEER,$FF
-;.WEEZING
-;    db TACKLE,POISON_GAS,SMOG,ACID,SCREECH,HARDEN,SELFDESTRUCT,$FF
-;.RHYDON
-;    db HORN_ATTACK,TAIL_WHIP,HARDEN,STOMP,FURY_ATTACK,STRIKE,LEER,TAKE_DOWN,ROCK_THROW,BODY_SLAM,$FF
-;.SEADRA
-;    db BUBBLE,SMOKESCREEN,LEER,DISABLE,WATER_GUN,SMOG,$FF
-;.SEAKING
-;    db SPLASH,TAIL_WHIP,PECK,SUPERSONIC,BUBBLE,HORN_ATTACK,WATER_GUN,POISON_STING,AGILITY,$FF
-;.GYARADOS
-;    db SPLASH,$FF
-;.OMASTAR
-;    db CONSTRICT,WITHDRAW,WATER_GUN,BITE,LEER,SLAM,BUBBLEBEAM,AURORA_BEAM,REST,ROCK_THROW,$FF
-;.KABUTOPS
-;    db SCRATCH,HARDEN,ABSORB,BUBBLE,LEER,BLADE,WATER_GUN,AURORA_BEAM,LEECH_LIFE,ROCK_THROW,$FF
-;.DRAGONAIR
-;    db WRAP,LEER,SUPERSONIC,THUNDER_WAVE,BUBBLEBEAM,SLAM,THUNDERSHOCK,EMBER,$FF
-;.DRAGONITE
-;    db WRAP,LEER,SUPERSONIC,THUNDER_WAVE,BUBBLEBEAM,SLAM,THUNDERSHOCK,EMBER,AURORA_BEAM,AGILITY,MIST,DRAGON_RAGE,LIGHT_SCREEN,HAZE,ICE_BEAM,FLAMETHROWER,THUNDERBOLT,BODY_SLAM,$FF
 
 ; four tiles: pokeball,black pokeball (status ailment),crossed out pokeball (faited) and pokeball slot (no mon)
 PokeballTileGraphics:

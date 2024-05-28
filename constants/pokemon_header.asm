@@ -970,7 +970,7 @@ RaichuBaseStats: ; 3869a (e:469a)
     tmlearn 1,5,6,8                ; MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM
     tmlearn 9,10,15,16             ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY
     tmlearn 17,19,20,24            ; SUBMISSION|SEISMIC_TOSS|RAGE|THUNDERBOLT
-    tmlearn 25,31,32               ; THUNDER|MIMIC|DOUBLE_TEAM
+    tmlearn 25,31                  ; THUNDER|MIMIC
     tmlearn 33,34,39,40            ; REFLECT|BIDE|SWIFT|SKULL_BASH
     tmlearn 41,44,45               ; FLASH|REST|THUNDER_WAVE
     tmlearn 50                     ; SUBSTITUTE

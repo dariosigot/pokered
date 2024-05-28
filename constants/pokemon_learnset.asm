@@ -74,7 +74,7 @@ CHARMANDER_NoEvo_Learnset: MACRO
     db 22,SMOKESCREEN
     db 25,FIRE_PUNCH
     db 30,SLASH
-    db 34,AGILITY
+    db 34,AGILITY ; Exclusive
     db 38,FLAMETHROWER
     db 43,SLAM ; Exclusive
 ENDM

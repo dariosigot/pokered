@@ -1627,19 +1627,6 @@ wLocationMonOvSprInstruction: ; def0
 
 NEXTU
 
-wEXPBarPixelLength: ; def0
-    ds 1
-wEXPBarBaseEXP:
-    ds 3
-wEXPBarCurEXP:
-    ds 3
-wEXPBarNeededEXP:
-    ds 3
-wEXPBarKeepFullFlag:
-    ds 1
-
-NEXTU
-
 wCollisionRule:: db ; def0
 ; Debug Collision Rule
 
@@ -1671,6 +1658,17 @@ wBlkCoordinateX2Right: ; def4
 wBlkCoordinateY2Lower: ; def5
     ds 1
 
+wEXPBarPixelLength: ; def6
+    ds 1
+wEXPBarBaseEXP:
+    ds 3
+wEXPBarCurEXP:
+    ds 3
+wEXPBarNeededEXP:
+    ds 3
+wEXPBarKeepFullFlag:
+    ds 1
+
 ENDU
 
 ; ────────────────────────────────────────────────────
@@ -1698,7 +1696,6 @@ wDVForShinyAtkDef     ; df36
 wTempStatHI           ; df36
     ds 1
 
-wEvolutionMove         ; df37
 wMaxLevel              ; df37
 wChoicePkmnMoveDeleter ; df37
 wDVForShinySpdSpc      ; df37
