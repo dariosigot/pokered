@@ -361,10 +361,7 @@ wStringBuffer2: ; cf70
 wStringBuffer3: ; cf81
     ds 10
 
-wListPointer: ; $cf8b
-    ds 1
-
-    ds 5
+    ds 6
 
 wcf91: ; $cf91
     ds 1
@@ -1630,8 +1627,6 @@ wMoveRelearnerMoveList: ; def0
 
 NEXTU
 
-wSpriteOAMBySpeciesId:  ; def0
-
 wLocationMonOvSprInstruction: ; def0
     ds 6*6
     ds 2*6
@@ -1689,11 +1684,13 @@ wFlagBackFrontSpriteBit56  ; df35 ; bit 5
                            ; df35 ; bit 6
 wFlagFlashingHealBallBit7  ; df35 ; bit 7
 wSpriteOAMBySpeciesBit7    ; df35 ; bit 7 = Flag Single Mon ID Sprite
+wDrawMoveDetailsBit7       ; df35 ; bit 7 = Enable Move Details in Moves Menu
     ds 1
 
 wFlagPlaceTitleScreen ; df36 ; counter for title screen
 wDVForShinyAtkDef     ; df36
 wTempStatHI           ; df36
+wSpriteOAMBySpeciesId ; df36
     ds 1
 
 wMaxLevel              ; df37
