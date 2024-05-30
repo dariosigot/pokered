@@ -42764,9 +42764,6 @@ OnlyOneMoveText:
 
 RELEARN_MOVE_SCREEN_LENGHT EQU 9
 
-DebugNPC:
-    jp DebugResetExclusiveLearnAndEnergy
-
 GetMonPotentialMoveList:
 
     ; Standarize Level
@@ -43134,6 +43131,7 @@ ChoiceRelearnMove:
     jr nc,.start
     ld [wCurrentMenuItem],a
 .start
+    call .ClearScreenArea
     call .PrintMovesAndArrows
     call .GetCurrentMove
     call .GetMaxCurrentScreenMenuLenght
@@ -43141,7 +43139,7 @@ ChoiceRelearnMove:
     jr .MenuLoop
 
 .UpOrDownPressed
-    call .ClearLittleScreenArea
+    call .ClearScreenArea
     call .PrintMoves
     call .GetCurrentMove
     jr .MenuLoop
@@ -43209,17 +43207,16 @@ ChoiceRelearnMove:
     ld hl,PrintMoveDetailsBox
     call Bankswitch
 
+    ; Enable Transfer
+    ld a,1
+    ld [H_AUTOBGTRANSFERENABLED],a
+
     ; Get Move Name
     call GetMoveName
     ld de,$cd6d
     jp CopyStringToCF4B
 
 .PrintMovesAndArrows
-
-    ; ClearScreenArea
-    push bc
-    call .ClearScreenArea
-    pop bc
 
     ; Check more than one screen
     call .GetNumberOfScreenMenu ; b = max num of screen (1,2,...)
@@ -43340,15 +43337,12 @@ ChoiceRelearnMove:
     ret
 
 .ClearScreenArea
+    ; Disable Transfer
+    xor a
+    ld [H_AUTOBGTRANSFERENABLED],a
     FuncCoord 01,03
     ld hl,Coord
     ld bc,$0912
-    jp ClearScreenArea
-
-.ClearLittleScreenArea
-    FuncCoord 10,03
-    ld hl,Coord
-    ld bc,$0909
     jp ClearScreenArea
 
 .HandleMenuInput
@@ -43363,17 +43357,23 @@ ChoiceRelearnMove:
     res 1,[hl]
     ret
 
-DebugResetExclusiveLearnAndEnergy:
+DebugNPC:
+    ; Backup
+    ld a,[$cf92]
+    push af
+    ld a,[$cc49]
+    push af
+
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 3,a ; was the start button pressed?
+    jr z,.standard
+
     ld a,[W_NUMINPARTY]
     ld b,a
     ld hl,W_PARTYMON1_TYPE1
     ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    bit 3,a ; was the start button pressed?
-    ld a,$FF
-    jr nz,.loop
     xor a
-.loop
+.loop1
     ld [hli],a ; Zero Type
     ld [hld],a ; ...
     push hl
@@ -43388,9 +43388,38 @@ DebugResetExclusiveLearnAndEnergy:
     pop hl
     add hl,de
     dec b
-    jr nz,.loop
+    jr nz,.loop1
+    jr .end
+
+.standard
+    ld a,[W_NUMINPARTY]
+    ld b,a
+    ld c,0
+.loop2
+    push bc
+    ld a,[$FF00+$e4]
+    push af
+    ld a,c
+    inc a
+    ld [$FF00+$e4],a ; Mon Id +1
+    ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
+    ld hl,AddPokemonToParty_TryToAddExclusiveMove_
+    call Bankswitch
+    pop af
+    ld [$FF00+$e4],a
+    pop bc
+    inc c
+    dec b
+    jr nz,.loop2
+
+.end
     ld hl,.DoneText
     call PrintText
+    ; Restore
+    pop af
+    ld [$cc49],a
+    pop af
+    ld [$cf92],a
     jp TextScriptEnd
 .DoneText
     db 0,"Done!",$57,"@"
@@ -43540,6 +43569,7 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     push af
     ld a,[$cc49]
     push af
+
     ; Get Move List
     ld a,[$FF00+$e4] ; Mon Id +1
     dec a
@@ -43548,14 +43578,34 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     ld [$cc49],a
     call LoadMonData
     call GetMonPotentialMoveList
-    ; Save Exclusive Move in Mon Internal Bytes After Evolution Done
+
+    ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
     ld hl,wMoveRelearnerMoveList
     ld a,[hli]
     ld b,a
+    call .Loop
+    
+    ; Save Exclusive Move in Mon Internal Bytes from 4 Moves
+    ld hl,W_PARTYMON1_MOVE1
+    ld a,[$FF00+$e4] ; Mon Id +1
+    dec a
+    ld bc,$2c
+    call AddNTimes
+    ld b,4
+    call .Loop
+
+    ; Restore
+    pop af
+    ld [$cc49],a
+    pop af
+    ld [$cf92],a
+    ret
 .Loop
     ld a,[hli]
     cp $FF
-    jr z,.EndLoop
+    ret z
+    and a
+    jr z,.next
     ld [$d0e0],a
     push bc
     push hl
@@ -43570,14 +43620,9 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     call TryToAddExclusiveMove
     pop hl
     pop bc
+.next
     dec b
     jr nz,.Loop
-.EndLoop
-    ; Restore
-    pop af
-    ld [$cc49],a
-    pop af
-    ld [$cf92],a
     ret
 
 SentNewMonToBox_TryToAddExclusiveMove:
@@ -43586,21 +43631,38 @@ SentNewMonToBox_TryToAddExclusiveMove:
     push af
     ld a,[$cc49]
     push af
-    ; Get Pre Evolution Form Move List
+
+    ; Get Move List
     xor a ; id = 0
     ld [$cf92],a
     ld a,2 ; current box
     ld [$cc49],a
     call LoadMonData
     call GetMonPotentialMoveList
-    ; Save Exclusive Move in Mon Internal Bytes After Evolution Done
+
+    ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
     ld hl,wMoveRelearnerMoveList
     ld a,[hli]
     ld b,a
+    call .Loop
+    
+    ; Save Exclusive Move in Mon Internal Bytes from 4 Moves
+    ld hl,W_BOXMON1DATA+(W_PARTYMON1_MOVE1-W_PARTYMON1DATA)
+    ld b,4
+    call .Loop
+
+    ; Restore
+    pop af
+    ld [$cc49],a
+    pop af
+    ld [$cf92],a
+    ret
 .Loop
     ld a,[hli]
     cp $FF
-    jr z,.EndLoop
+    ret z
+    and a
+    jr z,.next
     ld [$d0e0],a
     push bc
     push hl
@@ -43609,14 +43671,9 @@ SentNewMonToBox_TryToAddExclusiveMove:
     call TryToAddExclusiveMove
     pop hl
     pop bc
+.next
     dec b
     jr nz,.Loop
-.EndLoop
-    ; Restore
-    pop af
-    ld [$cc49],a
-    pop af
-    ld [$cf92],a
     ret
 
 ; Input
@@ -50281,20 +50338,46 @@ Func_3a948: ; 3a948 (e:6948)
     ld hl,$c318
     jp Func_3a8e1
 
-LearnMoveAfterEvolution:
+AfterEvolution_TryToAddExclusiveMove:
+    ; Backup
     ld a,[$d11e]
     ld [$cf91],a
     push af
+    ld a,[$cf92]
+    push af
+    ld a,[$cc49]
+    push af
+
     ; Get Pre Evolution Form Move List
     call GetMoveList
-    ; Save Exclusive Move in Mon Internal Bytes After Evolution Done
+
+    ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
     ld hl,wMoveRelearnerMoveList
     ld a,[hli]
     ld b,a
+    call .Loop
+    
+    ; Save Exclusive Move in Mon Internal Bytes from 4 Moves
+    ld hl,W_PARTYMON1_MOVE1
+    ld a,[wWhichPokemon]
+    ld bc,$2c
+    call AddNTimes
+    ld b,4
+    call .Loop
+
+    ; Restore
+    pop af
+    ld [$cc49],a
+    pop af
+    ld [$cf92],a
+    pop af
+    jr LearnMoveCommon
 .Loop
     ld a,[hli]
     cp $FF
-    jr z,.EndLoop
+    ret z
+    and a
+    jr z,.next
     ld [$d0e0],a
     push bc
     push hl
@@ -50310,12 +50393,10 @@ LearnMoveAfterEvolution:
     call Bankswitch
     pop hl
     pop bc
+.next
     dec b
     jr nz,.Loop
-.EndLoop
-    ; End
-    pop af
-    jr LearnMoveCommon
+    ret
 
 GetMoveList:
     ld a,[wWhichPokemon]
@@ -50654,7 +50735,7 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     ld [$d11e],a
     xor a
     ld [$cc49],a
-    call LearnMoveAfterEvolution
+    call AfterEvolution_TryToAddExclusiveMove
     pop hl
     ; Don't Overwrite "Types"
     ; ld a,$42
@@ -100454,9 +100535,11 @@ PalPacketMovesMenu: ; Denim
 
 ATTR_BLK_MovesMenu:
     db $21
-    db $01
-    db $07,%00010101
-    db $00,$00,$13,$11
+    db $02
+    db %00000111,%00010101
+    db 00,00,19,17
+    db %00000010,%00000000
+    db 18,00,19,01
 
 ; checks if the tile in front of the player is a shore or water tile
 ; used for surfing and fishing
@@ -135393,6 +135476,7 @@ CheckSpecialWild_:
     ret
 
 .SpecialWild
+    db DRATINI,12,DRATINI_CAVE ; DratiniCave_ShinyDratini
     db MAROWAK,30,POKEMONTOWER_6 ; PokemonTower6_Marowak
     db SNORLAX,30,ROUTE_12 ; Route12_Snorlax
     db SNORLAX,30,ROUTE_16 ; Route16_Snorlax
@@ -135408,6 +135492,11 @@ CheckSpecialWild_:
     db $FF
 
 .SpecialWildMoves
+; DratiniCave_ShinyDratini
+    db SUPERSONIC
+    db THUNDER_WAVE
+    db WRAP
+    db DRAGON_RAGE
 ; PokemonTower6_Marowak
     db HEADBUTT
     db FOCUS_ENERGY
