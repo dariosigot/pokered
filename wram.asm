@@ -1677,6 +1677,7 @@ SECTION "DenimFlags",WRAMX[$df35],BANK[1]
 
 wDigCaveAerodactylTrigBit0 ; df35 ; bit 0
 wFlagDamageToPlayerBit1    ; df35 ; bit 1
+wFlagSortMoveBit1          ; df35 ; bit 1 = Sort Moves in Moves Menu (SELECT)
 wFlagShinyBit2             ; df35 ; bit 2
 wDigCaveAerodactylBeatBit3 ; df35 ; bit 3
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
