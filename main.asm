@@ -54871,7 +54871,7 @@ SelectMenuItem: ; 3d2fe (f:52fe)
     add hl,bc
     ld a,[hl]
     and a ; and $3f
-    jr z,.nopp
+    jr z,.nopp ; PP ► ENERGY
     ld a,[W_PLAYERDISABLEDMOVE] ; $d06d
     swap a
     and $f
@@ -54955,7 +54955,7 @@ AnyMoveToSelect: ; 3d3f5 (f:53f5)
     inc hl
     or [hl]
     ds 2 ; and $3f
-    ret nz
+    ret nz ; PP ► ENERGY
     jr .asm_3d423
 .asm_3d40e
     swap a
@@ -55230,7 +55230,7 @@ SelectEnemyMove: ; 3d564 (f:5564)
     cp 4
     jr z,.asm_3d601 ; STRUGGLE
     ; Check PP
-    ; ld a,[hli]        ; Disable Check PP
+    ; ld a,[hli]        ; Disable Check PP ; PP ► ENERGY
     ; and a             ; ...
     ; jr z,.searchNext  ; ...
     ; Check Disabled
@@ -55250,7 +55250,7 @@ SelectEnemyMove: ; 3d564 (f:5564)
     push hl
     push de
     call ChooseRandomMove
-    ; ld a,[de]  ; Disable Check PP
+    ; ld a,[de]  ; Disable Check PP ; PP ► ENERGY
     ; and a      ; ...
     ; jr z,.noPP ; ...
     ld a,b
@@ -56282,7 +56282,7 @@ Func_3dc88: ; 3dc88 (f:5c88)
     ld b,a
     pop af
     cp b
-    jr z,.asm_3dd20
+    jr z,.asm_3dd20 ; PP ► ENERGY
     ld a,$1
     ld [$cced],a
     ld a,[wMaxMenuItem] ; $cc28
@@ -56303,7 +56303,7 @@ Func_3dc88: ; 3dc88 (f:5c88)
     add hl,de
     ld a,[hl]
     and a
-    jr z,.asm_3dd86
+    jr z,.asm_3dd86 ; PP ► ENERGY
     ld a,[wCurrentMenuItem] ; $cc26
     ld c,a
     ld b,$0
@@ -57311,7 +57311,7 @@ MetronomePickMove: ; 3e348 (f:6348)
 ; this function increments the current move's PP
 ; it's used to prevent moves that run another move within the same turn
 ; (like Mirror Move and Metronome) from losing 2 PP
-IncrementMovePP: ; 3e373 (f:6373)
+IncrementMovePP: ; 3e373 (f:6373) ; PP ► ENERGY
     ld a,[H_WHOSETURN]
     and a
 ; values for player turn
@@ -60683,7 +60683,7 @@ Func_3fa8a: ; 3fa8a (f:7a8a)
     or [hl]
     ds 2 ; and $3f
     pop hl
-    jr z,.asm_3fb05
+    jr z,.asm_3fb05 ; PP ► ENERGY
     add hl,bc
     ld a,[hl]
     pop hl
@@ -96071,7 +96071,7 @@ Tset17_Block:
 
 SECTION "bank1A",ROMX,BANK[$1A]
 
-DecrementPP: ; 68000 (1a:4000)
+DecrementPP: ; 68000 (1a:4000) ; PP ► ENERGY
 ; after using a move,decrement pp in battle and (if not transformed?) in party
     ld a,[de]
     cp a,STRUGGLE
@@ -133858,7 +133858,7 @@ AIEnemyTrainerChooseMoves:
 .done
     ld [wAILastMovePower],a
 
-    ; highly discourage zero pp move
+    ; highly discourage zero pp move ; PP ► ENERGY
 
     jr .ppdone ; Disable Check PP
 
@@ -135761,7 +135761,7 @@ EnableBillsTeleport2:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-DecrementEnemyPP_:
+DecrementEnemyPP_: ; PP ► ENERGY
 ; after using a move,decrement pp in battle and (if not transformed?) in party
     ld a,[de]
     cp a,STRUGGLE
