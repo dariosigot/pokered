@@ -53676,6 +53676,9 @@ Func_3c92a: ; 3c92a (f:492a)
     call SaveScreenTilesToBuffer1
     jp SwitchPlayerMon
 
+DisabledText: ; Moved in the Bank
+    db "Disabled@"
+
 SECTION "TrainerAboutToUseText",ROMX[$4a79],BANK[$f]
 
 TrainerAboutToUseText: ; 3ca79 (f:4a79)
@@ -54812,7 +54815,7 @@ SelectMenuItem: ; 3d2fe (f:52fe)
     jr nz,.select
     FuncCoord 1,14 ; $c4b9
     ld hl,Coord
-    ld de,WhichTechniqueString ; $53b8
+    ld de,.WhichTechniqueString ; $53b8
     call PlaceString
     jr .select
 .battleselect
@@ -54864,24 +54867,20 @@ SelectMenuItem: ; 3d2fe (f:52fe)
 .moveselected
     pop af
     ret nz
-    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
-    ld a,[wCurrentMenuItem] ; $cc26
+; PP ► ENERGY - DONE
+    ld de,W_PLAYERMONMOVES
+    ld b,BANK(CheckEnoughEnergy)
+    ld hl,CheckEnoughEnergy
+    call Bankswitch
+    jr c,.nopp
+    ld a,[wCurrentMenuItem]
     ld c,a
-    ld b,$0
-    add hl,bc
-    ld a,[hl]
-    and a ; and $3f
-    jr z,.nopp ; PP ► ENERGY
     ld a,[W_PLAYERDISABLEDMOVE] ; $d06d
     swap a
     and $f
     dec a
-    cp c
+    cp d
     jr z,.disabled
-    ld a,[W_PLAYERBATTSTATUS3] ; $d064
-    bit 3,a ; transformed
-    jr nz,.dummy ; game freak derp
-.dummy
     ld a,[wCurrentMenuItem] ; $cc26
     ld hl,W_PLAYERMONMOVES
     ld c,a
@@ -54892,27 +54891,25 @@ SelectMenuItem: ; 3d2fe (f:52fe)
     xor a
     ret
 .disabled
-    ld hl,MoveDisabledText
+    ld hl,.MoveDisabledText
     jr .print
 .nopp
-    ld hl,MoveNoPPText
+    ld hl,.MoveNoPPText
 .print
     call PrintText
     call LoadScreenTilesFromBuffer1
     jp MoveSelectionMenu
 
-MoveNoPPText: ; 3d3ae (f:53ae)
+.MoveNoPPText
     TX_FAR _MoveNoPPText
     db "@"
-
-MoveDisabledText: ; 3d3b3 (f:53b3)
+.MoveDisabledText
     TX_FAR _MoveDisabledText
     db "@"
-
-WhichTechniqueString: ; 3d3b8 (f:53b8)
+.WhichTechniqueString
     db "WHICH TECHNIQUE?@"
 
-Func_3d3c9: ; 3d3c9 (f:53c9)
+Func_3d3c9: ; Moved in the Bank
     ld a,[wCurrentMenuItem] ; $cc26
     and a
     jp nz,SelectMenuItem
@@ -54922,7 +54919,7 @@ Func_3d3c9: ; 3d3c9 (f:53c9)
     ld [wCurrentMenuItem],a ; $cc26
     jp SelectMenuItem
 
-Func_3d3dd: ; 3d3dd (f:53dd)
+Func_3d3dd: ; Moved in the Bank
     ld a,[wCurrentMenuItem] ; $cc26
     ld b,a
     ld a,[$cd6c]
@@ -54939,43 +54936,34 @@ LoadScreenTilesFromBuffer1AndGoPalSet: ; After MIMIC
     call LoadScreenTilesFromBuffer1
     jp GoPAL_SET_CF1C
 
-SECTION "AnyMoveToSelect",ROMX[$53f5],BANK[$f]
-
-AnyMoveToSelect: ; 3d3f5 (f:53f5)
+AnyMoveToSelect: ; Moved in the Bank
     ld a,STRUGGLE
     ld [wPlayerSelectedMove],a ; $ccdc
+; PP ► ENERGY - DONE
+    ld b,0
+.Loop
+    ld a,b
+    cp 4
+    jr z,.LoopEnd
+    ld [wCurrentMenuItem],a
+    push bc
+    ld de,W_PLAYERMONMOVES
+    ld b,BANK(CheckEnoughEnergy)
+    ld hl,CheckEnoughEnergy
+    call Bankswitch
+    pop bc
+    jr c,.Next
     ld a,[W_PLAYERDISABLEDMOVE] ; $d06d
-    and a
-    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
-    jr nz,.asm_3d40e
-    ld a,[hli]
-    or [hl]
-    inc hl
-    or [hl]
-    inc hl
-    or [hl]
-    ds 2 ; and $3f
-    ret nz ; PP ► ENERGY
-    jr .asm_3d423
-.asm_3d40e
     swap a
     and $f
-    ld b,a
-    ld d,$5
-    xor a
-.asm_3d416
-    dec d
-    jr z,.asm_3d421
-    ld c,[hl]
-    inc hl
-    dec b
-    jr z,.asm_3d416
-    or c
-    jr .asm_3d416
-.asm_3d421
-    and a
-    ret nz
-.asm_3d423
+    dec a
+    cp b
+    jr z,.Next
+    ret
+.Next
+    inc b
+    jr .Loop
+.LoopEnd
     ld hl,.UnnamedText_3d430
     call PrintText
     ld c,$3c
@@ -54985,6 +54973,9 @@ AnyMoveToSelect: ; 3d3f5 (f:53f5)
 .UnnamedText_3d430
     TX_FAR _UnnamedText_3d430
     db "@"
+
+TypeText: ; Moved in the Bank
+    db "TYPE@"
 
 SECTION "SwapMovesInMenu",ROMX[$5435],BANK[$f]
 
@@ -55079,11 +55070,11 @@ PrintMenuItem: ; 3d4b6 (f:54b6)
     ld a,[wCurrentMenuItem] ; $cc26
     cp b
     jr nz,.asm_3d4df
-    FuncCoord 0,8
+    FuncCoord 00,07
     ld hl,Coord
-    ld bc,$0308
+    ld bc,$0408
     call TextBoxBorder
-    FuncCoord 1,10 ; $c469
+    FuncCoord 01,09
     ld hl,Coord
     ld de,DisabledText ; $5555
     call PlaceString
@@ -55154,16 +55145,7 @@ CheckTransformed:
     ld a,[$cc35]
     ret
 
-SECTION "DisabledText",ROMX[$5555],BANK[$F]
-
-DisabledText: ; 3d555 (f:5555)
-    db "Disabled@" ; db "disabled!@"
-    ds 1
-
-TypeText: ; 3d55f (f:555f)
-    db "TYPE@"
-
-SelectEnemyMove: ; 3d564 (f:5564)
+SelectEnemyMove: ; Moved in the Bank
     ld a,[W_ISLINKBATTLE]
     sub $4
     jr nz,.noLinkBattle
@@ -55172,7 +55154,7 @@ SelectEnemyMove: ; 3d564 (f:5564)
     call LoadScreenTilesFromBuffer1
     ld a,[$cc3e]
     cp $e
-    jp z,.asm_3d601
+    jp z,.struggle
     cp $d
     jr z,.unableToMove
     cp $4
@@ -55183,7 +55165,7 @@ SelectEnemyMove: ; 3d564 (f:5564)
     ld b,$0
     add hl,bc
     ld a,[hl]
-    jr .done
+    jp .done
 .noLinkBattle
     ld a,[W_ENEMYBATTSTATUS2]
     and $60     ; need to recharge or using rage
@@ -55209,31 +55191,25 @@ SelectEnemyMove: ; 3d564 (f:5564)
     call nz,NoAttackAICall ;joenote - get ai routines. flag register is preserved
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld a,$ff
-    jr .done
+    jp .done
 .notCaughtInWrap
-    ;ld hl,W_ENEMYMONMOVES+1 ; 2nd enemy move
-    ;ld a,[hld]
-    ;and a
-    ;jr nz,.atLeastTwoMovesAvailable
-    ;ld a,[W_ENEMYDISABLEDMOVE]
-    ;and a
-    ;ld a,STRUGGLE ; struggle if the only move is disabled
-    ;jr nz,.done
-;.atLeastTwoMovesAvailable
 
+; PP ► ENERGY - DONE
     ; Search At Least One Valid Move
-    ld hl,W_ENEMYMONPP
     ld b,-1
 .searchNext
     inc b
     ld a,b
     cp 4
-    jr z,.asm_3d601 ; STRUGGLE
-    ; Check PP
-    ; ld a,[hli]        ; Disable Check PP ; PP ► ENERGY
-    ; and a             ; ...
-    ; jr z,.searchNext  ; ...
-    ; Check Disabled
+    jr z,.struggle
+    ld [wCurrentMenuItem],a
+    push bc
+    ld de,W_ENEMYMONMOVES
+    ld b,BANK(CheckEnoughEnergy)
+    ld hl,CheckEnoughEnergy
+    call Bankswitch
+    pop bc
+    jr c,.searchNext
     ld a,[W_ENEMYDISABLEDMOVE]
     swap a
     and $f
@@ -55241,36 +55217,34 @@ SelectEnemyMove: ; 3d564 (f:5564)
     cp b
     jr z,.searchNext
 
+; PP ► ENERGY - DONE
 .AtLeastOneValidMove
     ld hl,AIEnemyTrainerChooseMoves
     ld b,BANK(AIEnemyTrainerChooseMoves)
     call Bankswitch
-    ld de,W_ENEMYMONPP
+    ld d,h
+    ld e,l
 .chooseRandomMove
-    push hl
-    push de
     call ChooseRandomMove
-    ; ld a,[de]  ; Disable Check PP ; PP ► ENERGY
-    ; and a      ; ...
-    ; jr z,.noPP ; ...
-    ld a,b
-    dec a
-    ld [wEnemyMoveListIndex],a
+    push af ; Backup a=Move
+    push bc
+    ld b,BANK(CheckEnoughEnergy)
+    ld hl,CheckEnoughEnergy
+    call Bankswitch
+    pop bc
+    pop hl ; Restore h=Move
+    jr c,.chooseRandomMove
     ld a,[W_ENEMYDISABLEDMOVE]
     swap a
     and $f
-    cp b
-    ld a,[hl]
-.noPP
-    pop de
-    pop hl
+    inc c
+    cp c
     jr z,.chooseRandomMove ; move disabled,try again
-    and a
-    jr z,.chooseRandomMove ; move non-existant,try again
+    ld a,h
 .done
     ld [wEnemySelectedMove],a
     ret
-.asm_3d601
+.struggle
     ld a,STRUGGLE
     jr .done
 
@@ -61642,22 +61616,25 @@ Copy4BytesDirect:
 
 ChooseRandomMove:
     call GenRandomInBattle ; get random
-    ld b,$1
+    ld c,0
     cp $3f ; select move 1 in [0,3e] (63/256 chance)
-    ret c
-    inc hl
-    inc de
-    inc b
-    cp $7f ; select move 1 in [3f,7e] (64/256 chance)
-    ret c
-    inc hl
-    inc de
-    inc b
-    cp $be ; select move 1 in [7f,bd] (63/256 chance)
-    ret c
-    inc hl
-    inc de
-    inc b ; select move 4 in [be,ff] (66/256 chance)
+    jr c,.end
+    inc c
+    cp $7f ; select move 2 in [3f,7e] (64/256 chance)
+    jr c,.end
+    inc c
+    cp $be ; select move 3 in [7f,bd] (63/256 chance)
+    jr c,.end
+    inc c ; select move 4 in [be,ff] (66/256 chance)
+.end
+    ld a,c
+    ld [wEnemyMoveListIndex],a
+    ld [wCurrentMenuItem],a
+    ld h,d
+    ld l,e
+    ld b,0
+    add hl,bc
+    ld a,[hl]
     ret
 
 SECTION "bank10",ROMX,BANK[$10]
@@ -119644,18 +119621,11 @@ _UnnamedText_3d1f5: ; 8984b (22:584b)
     db $0," is",$4f
     db "already out!",$58
 
-_MoveNoPPText: ; 89860 (22:5860)
-    db $0,"No PP left for",$4f
-    db "this move!",$58
-
-_MoveDisabledText: ; 8987b (22:587b)
+_MoveDisabledText:
     db $0,"The move is",$4f
     db "disabled!",$58
 
-_UnnamedText_3d430: ; 89892 (22:5892)
-    TX_RAM W_PLAYERMONNAME
-    db $0," has no",$4f
-    db "moves left!",$57
+SECTION "_MoveDisabledText",ROMX[$587b],BANK[$22] 
 
 _MultiHitText: ; 898aa (22:58aa)
     db 0,"Hit the enemy",$4F,"@"
@@ -120496,6 +120466,15 @@ _PartyMenuSoftboiledUseText:
 _MustChoiceActiveText:
     db $0,"You must choice",$4F
     db "ACTIVE #MON!",$58
+
+_MoveNoPPText:
+    db $0,"Not Enough Energy",$4f
+    db "for this move!",$58
+
+_UnnamedText_3d430:
+    TX_RAM W_PLAYERMONNAME
+    db $0," has not",$4f
+    db "Enough Energy!",$57
 
 SECTION "bank23",ROMX,BANK[$23]
 
@@ -136691,6 +136670,47 @@ InsertRealTypes_:
     inc de
     ld a,[de]
     ld [hl],a
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+; Input
+; de = Pointer to First Move
+; wCurrentMenuItem = Move Index (0,1,2,3)
+; Output
+; carry flag, set = not enough energy or no move
+CheckEnoughEnergy:
+    push de
+    ld h,d
+    ld l,e
+    push hl
+    ld a,[wCurrentMenuItem]
+    ld c,a
+    ld b,$0
+    add hl,bc
+    ld a,[hl] ; Move ID
+    and a
+    jr z,.NoMove
+    dec a
+    ld hl,Moves ; $4000
+    ld bc,6
+    call AddNTimes
+    ld a,BANK(Moves)
+    ld de,W_PLAYERMOVENUM
+    call FarCopyData
+    pop hl
+    ld bc,W_PLAYERMONPP-W_PLAYERMONMOVES
+    add hl,bc
+    ld a,[W_PLAYERMOVEMAXPP]
+    ld b,a ; Move Selected Energy
+    ld a,[hl] ; Mon Energy
+    sub b
+    pop de
+    ret
+.NoMove
+    pop hl
+    pop de
+    scf
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
