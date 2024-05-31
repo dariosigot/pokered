@@ -27490,40 +27490,41 @@ HealParty: ; f6a5 (3:76a5)
     xor a
     ld [hl],a ; Clean status conditions
     push de
-    ld b,$4 ; A Pokémon has 4 moves
-.RestorePP: ; f6bb (3:76bb)
+;    ld b,$4 ; A Pokémon has 4 moves
+;.RestorePP
     ld hl,$0007 ; Move offset
     add hl,de
-    ld a,[hl]
-    and a
-    jr z,.HealNext ; Skip if there's no move here
-    dec a
+;    ld a,[hl]
+;    and a
+;    jr z,.HealNext ; Skip if there's no move here
+;    dec a
     ld hl,$001c ; PP offset
     add hl,de
-    push hl
-    push de
-    push bc
-    ld hl,Moves
-    ld bc,$0006
-    call AddNTimes
-    ld de,$cd6d
-    ld a,BANK(Moves)
-    call FarCopyData ; copy move header to memory
-    ld a,[$cd72] ; get default PP
-    pop bc
-    pop de
-    pop hl
-    inc de
-    push bc
-    ld b,a
-    ld a,[hl]
-    and $c0
-    add b
-    nop ; ld [hl],a ; Disable PP Restore
-    pop bc
-.HealNext: ; f6eb (3:76eb)
-    dec b
-    jr nz,.RestorePP ; Continue if there's still moves
+;    push hl
+;    push de
+;    push bc
+;    ld hl,Moves
+;    ld bc,$0006
+;    call AddNTimes
+;    ld de,$cd6d
+;    ld a,BANK(Moves)
+;    call FarCopyData ; copy move header to memory
+;    ld a,[$cd72] ; get default PP
+;    pop bc
+;    pop de
+;    pop hl
+;    inc de
+;    push bc
+;    ld b,a
+;    ld a,[hl]
+;    and $c0
+;    add b
+    ld a,255  ; Energy 255
+    ld [hl],a ; Disable PP Restore (Energy 255)
+;    pop bc
+;.HealNext
+;    dec b
+;    jr nz,.RestorePP ; Continue if there's still moves
     pop de
     ld hl,$0021 ; Max HP offset
     add hl,de
@@ -27551,13 +27552,15 @@ HealParty: ; f6a5 (3:76a5)
     ld b,a
 .restoreBonusPPLoop ; loop to restore bonus PP from PP Ups
     push bc
-    ds 3 ; call RestoreBonusPP ; Disable PP Restore
+    ; call RestoreBonusPP ; Disable PP Restore
     pop bc
     ld hl,$cf92
     inc [hl]
     dec b
     jr nz,.restoreBonusPPLoop
     ret
+
+SECTION "Func_f71e",ROMX[$771e],BANK[$3]
 
 ; predef $9
 ; predef $a
@@ -136304,6 +136307,14 @@ HandleStatusScreen2:
     call Bankswitch
     ld hl,wStatusScreen2OAMBit0
     res 0,[hl]
+
+    ; Energy
+    ld de,$cfb5 ; PP/Energy
+    FuncCoord 13,01
+    ld hl,Coord
+    ld bc,$0103
+    call PrintNumber
+    ld [hl],$DA
 
     ld hl,$cfa0
     FuncCoord 5,4 ; Move PP
