@@ -10787,16 +10787,9 @@ NewMoveDetails:
     ; Print Move Details Box
     ld a,[$d0e0] ; New Move Learned
     ld [wPlayerSelectedMove],a
-    call CheckMoveRelearn
-    FuncCoord 4,9
+    FuncCoord 04,08
     ld de,Coord
-    jr z,.NotMoveRelearn
-    FuncCoord 4,7
-    ld de,Coord
-.NotMoveRelearn
-    ld b,BANK(PrintMoveDetailsBox)
-    ld hl,PrintMoveDetailsBox
-    call Bankswitch
+    PREDEF PrintMoveDetailsBoxPredef
 
     ; Restore
     pop af
@@ -16467,7 +16460,7 @@ LearnMove: ; 6e43 (1:6e43)
     set 1,[hl]
     pop hl
     push hl
-    call HandleMenuInput_PrintMoveDetailsBox ; call HandleMenuInput
+    call HandleMenuInput_PrintMoveBox ; call HandleMenuInput
     ld hl,$fff6
     res 1,[hl]
     push af
@@ -18610,7 +18603,7 @@ CheckImportantMove:
     TX_FAR _ImportantText
     db "@"
 
-HandleMenuInput_PrintMoveDetailsBox:
+HandleMenuInput_PrintMoveBox:
     push hl
     ; Get Move to Delete
     ld a,[wCurrentMenuItem] ; $cc26
@@ -18625,18 +18618,16 @@ HandleMenuInput_PrintMoveDetailsBox:
     ld de,Coord
     call CheckMoveRelearn
     jr z,.skip
-    FuncCoord 00,07
+    FuncCoord 09,05
     ld de,Coord
-    FuncCoord 10,02
+    FuncCoord 19,02
     ld a,[Coord]
-    cp $79 ; Upper Left Corner
+    cp $7B ; Upper Right Corner
     jr nz,.skip
-    FuncCoord 00,02
+    FuncCoord 09,01
     ld de,Coord
 .skip
-    ld b,BANK(PrintMoveDetailsBox)
-    ld hl,PrintMoveDetailsBox
-    call Bankswitch
+    PREDEF PrintMoveDetailsBoxPredef
 
     ; Menu
     ld hl,wMenuWrappingEnabled
@@ -18647,7 +18638,7 @@ HandleMenuInput_PrintMoveDetailsBox:
     and %11000000 ; ▼▲◄►StSeBA
     ld a,b
     ret z
-    jr HandleMenuInput_PrintMoveDetailsBox
+    jr HandleMenuInput_PrintMoveBox
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $01)
@@ -26061,9 +26052,7 @@ GetTMChoiceItemID:
     ; Print Move Details Box
     FuncCoord 10,5
     ld de,Coord
-    ld b,BANK(PrintMoveDetailsBox)
-    ld hl,PrintMoveDetailsBox
-    jp Bankswitch
+    PREDEF_JUMP PrintMoveDetailsBoxPredef
 
 .ChoiceTMText:
     TX_FAR _ChoiceTMText
@@ -42889,14 +42878,7 @@ MovesMenu:
     call TextBoxBorder
 
     ; Print Title
-    call GetPartyMonName2
-    FuncCoord 00,00
-    ld hl,Coord
-    call PlaceString
-    ld h,b
-    ld l,c
-    ld de,.MovesText
-    call PlaceString
+    call MovesMenuPrintTitle
 
     ; Get Actual Moves and Mon Potential Move List in wMoveRelearnerMoveList
     call LoadMonDataAndPrintActualMoves
@@ -42909,13 +42891,9 @@ MovesMenu:
     ; Mini Sprite
     ld a,[$cf98]
     ld [$cd5d],a
-    ld hl,wStatusScreen2OAMBit0
-    set 0,[hl]
     ld b,BANK(WriteMonPartySpriteOAMBySpecies)
     ld hl,WriteMonPartySpriteOAMBySpecies
     call Bankswitch
-    ld hl,wStatusScreen2OAMBit0
-    res 0,[hl]
 
     ; Initialize Menù Config
     ld hl,wTopMenuItemY ; $cc24
@@ -42943,7 +42921,7 @@ MovesMenu:
     ; Check Move Just Known
     ld a,[$d11e]
     call .CheckMoveJustKnown
-    jp z,.Retry ; Move Just Known
+    jr z,.MoveJustKnown
 
     ; Backup Menu
     ld hl,wTopMenuItemY
@@ -42971,6 +42949,11 @@ MovesMenu:
     and a
     jr z,.Retry
     call LoadMonDataAndPrintActualMoves
+    jr .Retry
+
+.MoveJustKnown
+    ld a,$a5 ; Error
+    call PlaySoundWaitForCurrent ; play sound
     jr .Retry
 
 .return
@@ -43028,6 +43011,15 @@ MovesMenu:
     ld bc,$0401
     jp ClearScreenArea
 
+MovesMenuPrintTitle:
+    call GetPartyMonName2
+    FuncCoord 03,00
+    ld hl,Coord
+    call PlaceString
+    ld h,b
+    ld l,c
+    ld de,.MovesText
+    jp PlaceString
 .MovesText
     db "'s Moves@"
 
@@ -43137,43 +43129,22 @@ ChoiceRelearnMove:
     ; Set Move for Name
     ld [$d11e],a
 
-    ; Fix Border
-    push af
-    ld a,$7A ; Horizonal Border
-    FuncCoord 09,02
-    ld [Coord],a
-    FuncCoord 10,02
-    ld [Coord],a
-    ld a,$7C ; Vertical Border
-    FuncCoord 00,06
-    ld [Coord],a
-    FuncCoord 00,07
-    ld [Coord],a
-    FuncCoord 00,11
-    ld [Coord],a
-    FuncCoord 19,06
-    ld [Coord],a
-    FuncCoord 19,07
-    ld [Coord],a
-    FuncCoord 19,11
-    ld [Coord],a
-    pop af
+    ; Fix Border and Print Title
+    call .FixBorderAndPrintTitle
 
     ; Print Move Details Box
     ld [wPlayerSelectedMove],a
-    FuncCoord 10,07
+    FuncCoord 10,06
     ld hl,Coord
     ld a,[wCurrentMenuItem]
-    cp 4
+    cp 3
     jr c,.SkipMoveDetails
-    ld de,-100 ; 5 Rows
+    ld de,-120 ; 6 Rows
     add hl,de
 .SkipMoveDetails
     ld d,h
     ld e,l
-    ld b,BANK(PrintMoveDetailsBox)
-    ld hl,PrintMoveDetailsBox
-    call Bankswitch
+    PREDEF PrintMoveDetailsBoxPredef
 
     ; Enable Transfer
     ld a,1
@@ -43183,6 +43154,33 @@ ChoiceRelearnMove:
     call GetMoveName
     ld de,$cd6d
     jp CopyStringToCF4B
+
+.FixBorderAndPrintTitle
+    push af
+    ld a,$7B ; Upper Right Corner
+    FuncCoord 19,02
+    ld [Coord],a
+    ld a,$7A ; Horizonal Border
+    FuncCoord 09,02
+    ld hl,Coord
+    ld d,10
+.LoopFixHrzBrd
+    ld [hli],a
+    dec d
+    jr nz,.LoopFixHrzBrd
+    ld a,$7C ; Vertical Border
+    FuncCoord 19,03
+    ld hl,Coord
+    ld d,9
+    ld bc,20
+.LoopFixVrtBrd
+    ld [hl],a
+    add hl,bc
+    dec d
+    jr nz,.LoopFixVrtBrd
+    call MovesMenuPrintTitle
+    pop af
+    ret
 
 .PrintMovesAndArrows
 
@@ -43195,7 +43193,7 @@ ChoiceRelearnMove:
     ld a,[wListScrollOffset]
     ld c,a
     add "1"
-    FuncCoord 01,01
+    FuncCoord 05,01
     ld [Coord],a
 
     ; Print Left Arrow
@@ -43205,7 +43203,7 @@ ChoiceRelearnMove:
     jr nz,.NotScreen0
     ld a,$7f;$d5 ; left arrow transparent
 .NotScreen0
-    FuncCoord 00,01
+    FuncCoord 04,01
     ld [Coord],a
 
     ; Print Right Arrow
@@ -43215,7 +43213,7 @@ ChoiceRelearnMove:
     jr nz,.NotLastScreen
     ld a,$7f;$ec ; right arrow transparent
 .NotLastScreen
-    FuncCoord 02,01
+    FuncCoord 06,01
     ld [Coord],a
 
 .PrintMoves
@@ -43311,6 +43309,10 @@ ChoiceRelearnMove:
     FuncCoord 01,03
     ld hl,Coord
     ld bc,$0912
+    call ClearScreenArea
+    FuncCoord 09,00
+    ld hl,Coord
+    ld bc,$020b
     jp ClearScreenArea
 
 .HandleMenuInput
@@ -43467,18 +43469,16 @@ SortMoves:
     ld [$d11e],a
     ; Print Move Details Box
     ld [wPlayerSelectedMove],a
-    FuncCoord 00,07
+    FuncCoord 09,05
     ld de,Coord
-    FuncCoord 10,02
+    FuncCoord 19,02
     ld a,[Coord]
-    cp $79 ; Upper Left Corner
+    cp $7B ; Upper Right Corner
     jr nz,.skip
-    FuncCoord 00,02
+    FuncCoord 09,01
     ld de,Coord
 .skip
-    ld b,BANK(PrintMoveDetailsBox)
-    ld hl,PrintMoveDetailsBox
-    jp Bankswitch
+    PREDEF_JUMP PrintMoveDetailsBoxPredef
 
 DebugNPC:
     ; Backup
@@ -51700,25 +51700,26 @@ TransformEffect_: ; Moved Upper in the Bank
     inc de
     ld bc,$8
     call CopyData
-    ld bc,$ffef
-    add hl,bc
-    ld b,$4
-.asm_3bb4a
-    ld a,[hli]
-    and a
-    jr z,.asm_3bb57
-    ld a,$5
-    ld [de],a
-    inc de
-    dec b
-    jr nz,.asm_3bb4a
-    jr .asm_3bb5d
-.asm_3bb57
-    xor a
-    ld [de],a
-    inc de
-    dec b
-    jr nz,.asm_3bb57
+; Don't touch PP slot (Energy)
+;    ld bc,$ffef
+;    add hl,bc
+;    ld b,$4
+;.asm_3bb4a
+;    ld a,[hli]
+;    and a
+;    jr z,.asm_3bb57
+;    ld a,$5
+;    ld [de],a
+;    inc de
+;    dec b
+;    jr nz,.asm_3bb4a
+;    jr .asm_3bb5d
+;.asm_3bb57
+;    xor a
+;    ld [de],a
+;    inc de
+;    dec b
+;    jr nz,.asm_3bb57
 .asm_3bb5d
     pop hl
     ld a,[hl]
@@ -54212,7 +54213,7 @@ Func_3ce7f: ; 3ce7f (f:4e7f)
     ;FuncCoord 2,2 ; $c3ca
     ;ld hl,Coord
     call DrawCatchGenderAndLoadCoord ; Denim
-    call DrawHPBar
+    call nc,DrawHPBar
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld hl,$cf1e
@@ -55114,11 +55115,9 @@ PrintMenuItem: ; 3d4b6 (f:54b6)
     ld [$cd6d],a
 
     ; Print Move Details Box
-    FuncCoord 0,8
+    FuncCoord 00,07
     ld de,Coord
-    ld b,BANK(PrintMoveDetailsBox)
-    ld hl,PrintMoveDetailsBox
-    call Bankswitch
+    PREDEF PrintMoveDetailsBoxPredef
 
 .asm_3d54e
     ld a,$1
@@ -61060,79 +61059,92 @@ DrawCatchGenderAndLoadCoord ; Denim
     ret
 
 WritePPAllMoves: ; Denim ; TODO,sistemare routine e posizioni
-    ld a,[wCurrentMenuItem]
-    push af
-
-    ld a,$4
-    ld [$cc49],a
-    ld d,4
-.Loop4Moves
-    push de
-    ld a,d
-    dec a
-    ld [wCurrentMenuItem],a
-    ld e,a
-
-    call DebugMonOrEnemyMoves ; ld hl,W_PLAYERMONMOVES
-    ld b,0
-    ld c,a
-    add hl,bc
-    ld a,[hl]
-    and a
-    jr z,.SkipCurrentMove
-
-    ld a,e
-    push af ; Backup CurrentMenuItem
-    ;push af ; ..
-    ;push af ; ..
-
-    ;FuncCoord 16,13 ; $c459
-    ;ld hl,Coord
-    ;ld bc,20
-    ;call AddNTimes
-    ;ld [hl],"/"
-
-    ;ld hl,GetMaxPP
-    ;ld b,BANK(GetMaxPP)
-    ;call Bankswitch ; indirect jump to GetMaxPP (e677 (3:6677))
+;    ld a,[wCurrentMenuItem]
+;    push af
+;
+;    ld a,$4
+;    ld [$cc49],a
+;    ld d,4
+;.Loop4Moves
+;    push de
+;    ld a,d
+;    dec a
+;    ld [wCurrentMenuItem],a
+;    ld e,a
+;
+;    call DebugMonOrEnemyMoves ; ld hl,W_PLAYERMONMOVES
+;    ld b,0
+;    ld c,a
+;    add hl,bc
+;    ld a,[hl]
+;    and a
+;    jr z,.SkipCurrentMove
+;
+;    ld a,e
+;    push af ; Backup CurrentMenuItem
+;    ;push af ; ..
+;    ;push af ; ..
+;
+;    ;FuncCoord 16,13 ; $c459
+;    ;ld hl,Coord
+;    ;ld bc,20
+;    ;call AddNTimes
+;    ;ld [hl],"/"
+;
+;    ;ld hl,GetMaxPP
+;    ;ld b,BANK(GetMaxPP)
+;    ;call Bankswitch ; indirect jump to GetMaxPP (e677 (3:6677))
+;
+;    call DebugMonOrEnemyPP ; ld hl,W_PLAYERMONPP ; $d02d
+;    ld b,0
+;    ;pop af ; Restore CurrentMenuItem
+;    ld c,a
+;    add hl,bc
+;    ld a,[hl]
+;    and a,%00111111
+;    ld [$cd6d],a
+;
+;    pop af ; Restore CurrentMenuItem
+;    FuncCoord 14 + 3,13 ; FuncCoord 14,13
+;    ld hl,Coord
+;    ld bc,20
+;    call AddNTimes
+;    ld de,$cd6d
+;    ld bc,$102
+;    call PrintNumber
+;
+;    ;pop af ; Restore CurrentMenuItem
+;    ;FuncCoord 17,13
+;    ;ld hl,Coord
+;    ;ld bc,20
+;    ;call AddNTimes
+;    ;ld de,$d11e
+;    ;ld bc,$102
+;    ;call PrintNumber
+;
+;.SkipCurrentMove
+;    pop de
+;    dec d
+;    jr nz,.Loop4Moves
+;
+;    pop af
+;    ld [wCurrentMenuItem],a
 
     call DebugMonOrEnemyPP ; ld hl,W_PLAYERMONPP ; $d02d
-    ld b,0
-    ;pop af ; Restore CurrentMenuItem
-    ld c,a
-    add hl,bc
-    ld a,[hl]
-    and a,%00111111
-    ld [$cd6d],a
-
-    pop af ; Restore CurrentMenuItem
-    FuncCoord 14 + 3,13 ; FuncCoord 14,13
+    ld d,h
+    ld e,l
+    FuncCoord 15,13
     ld hl,Coord
-    ld bc,20
-    call AddNTimes
-    ld de,$cd6d
-    ld bc,$102
+    ld bc,$0103
     call PrintNumber
+    ld de,.EnergyIcon
+    call PlaceString
 
-    ;pop af ; Restore CurrentMenuItem
-    ;FuncCoord 17,13
-    ;ld hl,Coord
-    ;ld bc,20
-    ;call AddNTimes
-    ;ld de,$d11e
-    ;ld bc,$102
-    ;call PrintNumber
-
-.SkipCurrentMove
-    pop de
-    dec d
-    jr nz,.Loop4Moves
-
-    pop af
-    ld [wCurrentMenuItem],a
     FuncCoord 2,13 ; $c4aa
     ld hl,Coord
     ret
+.EnergyIcon
+    db $DA,"@"
 
 ; Le seguenti 2 funzioni servono a gestire il flag per la corretta palette del backsprite del player
 ; aggiunta gestione red ball in battle
@@ -75053,6 +75065,7 @@ LearnMovePredef:
     dbw BANK(CheckForCollisionWhenPushingBoulder),CheckForCollisionWhenPushingBoulder
     dbw BANK(Func_cd99),Func_cd99
     dbw BANK(PickupItem),PickupItem
+PrintMoveTypePredef:
     dbw BANK(PrintMoveType),PrintMoveType
     dbw BANK(LoadMovePPs),LoadMovePPs
 DrawHPBarPredef: ; 4ff96 (13:7f96)
@@ -75065,6 +75078,8 @@ InsertRealTypesPredef:
     dbw BANK(InsertRealTypes_),InsertRealTypes_ ; 64
 MovesMenuPredef:
     dbw BANK(MovesMenu),MovesMenu ; 65
+PrintMoveDetailsBoxPredef:
+    dbw BANK(PrintMoveDetailsBox),PrintMoveDetailsBox ; 66
 
 SECTION "bank14",ROMX,BANK[$14]
 
@@ -100666,11 +100681,9 @@ PalPacketMovesMenu: ; Denim
 
 ATTR_BLK_MovesMenu:
     db $21
-    db $02
-    db %00000111,%00010101
-    db 00,00,19,17
-    db %00000010,%00000000
-    db 18,00,19,01
+    db $01
+    db %00000110,%00010000
+    db 01,00,02,01
 
 ; checks if the tile in front of the player is a shore or water tile
 ; used for surfing and fishing
@@ -130973,6 +130986,7 @@ _DrawCurrentMonGenderInBattle:
     db $F5,$50
 
 DebugEnemyStats:
+    and a ; rcf
     ld a,[H_CURRENTPRESSEDBUTTONS]
     bit 2,a ; was the select button pressed?
     ret z
@@ -131009,7 +131023,16 @@ DebugEnemyStats:
     ld de,W_ENEMYMONMAXHP
     call .PrintStatBR
     ld de,W_ENEMYMONCURHP
-    jp PrintNumber
+    call PrintNumber
+    ; Print Energy
+    FuncCoord 00,02
+    ld bc,$0103
+    ld hl,Coord
+    ld de,W_ENEMYMONPP
+    call PrintNumber
+    scf
+    ret
+
 .PrintIV
     push af
     srl a
@@ -134144,7 +134167,7 @@ LoadHpBarAndStatusTilePatterns_:
     call GoodCopyVideoData
     ld de,OtherIcon
     ld hl,$8d00
-    ld bc,(BANK(OtherIcon) << 8 | $A)
+    ld bc,(BANK(OtherIcon) << 8 | $B)
     jp GoodCopyVideoData
 
 ; INPUT
@@ -135291,7 +135314,7 @@ LoadFontTilePatternsWithWall:
     call GoodCopyVideoData
     ld de,OtherIcon_w
     ld hl,$8D20
-    ld bc,(BANK(OtherIcon_w) << 8 | $8)
+    ld bc,(BANK(OtherIcon_w) << 8 | $9)
     jp GoodCopyVideoData
 
 _LoadGhostPic:
@@ -135335,6 +135358,7 @@ _LoadGhostPic:
 ; input : [wPlayerSelectedMove] = Move ID
 ;         [de] = Upper left Corner Coord
 PrintMoveDetailsBox:
+    call Load16BitRegisters
 
     ; Get Current Move
     push de
@@ -135353,11 +135377,11 @@ PrintMoveDetailsBox:
     ld l,e
 
     ; Print Border
-    ld bc,$0308
+    ld bc,$0408
     call TextBoxBorder
 
     ; Move_Accuracy
-    ld de,20*(-1)+(-8)
+    ld de,20*(-2)+(-8)
     add hl,de
     ld de,.AccrText
     call PlaceString
@@ -135434,13 +135458,26 @@ PrintMoveDetailsBox:
     ; PrintMoveType
     ld de,20*(-1)+(-7)
     add hl,de
-    ld a,$5d
-    jp Predef ; indirect jump to PrintMoveType (27d98 (9:7d98))
+    PREDEF PrintMoveTypePredef
+
+    ; Move_Energy
+    ld de,20*(+3)+(+0)
+    add hl,de
+    ld de,.EneText
+    call PlaceString
+    ld de,20*(+0)+(+4)
+    add hl,de
+    ld de,W_PLAYERMOVEMAXPP
+    ld b,%00000001
+    ld c,3
+    jp PrintNumber
 
 .AccrText
     db "ACR",$D3,"   ",$D9,"@"
 .PwrText
     db "PWR",$D3,"@"
+.EneText
+    db "ENE",$D3,"   ",$DA,"@"
 .PhiText
     db $D7,"@"
 .SpcText
@@ -136272,45 +136309,14 @@ HandleStatusScreen2:
     FuncCoord 5,4 ; Move PP
     ld de,Coord
     ld b,$0
-.PrintPP ; 12bc3
+.LoopMove
     ld a,[hli]
     and a
     push bc
     push hl
-    call nz,.PlaceMoveNameTypeAcrPwr
+    call nz,.PlaceMoveNameTypeAcrPwrEne
     push de
-    jr z,.EmptyMove
-    ld hl,wCurrentMenuItem
-    ld a,[hl]
-    push af
-    ld a,b
-    ld [hl],a
-    push hl
-    ld hl,GetMaxPP
-    ld b,BANK(GetMaxPP)
-    call Bankswitch
-    pop hl
-    pop af
-    ld [hl],a
-    pop de
-    pop hl
-    push hl
-    ld bc,$0014
-    add hl,bc
-    ld a,[hl]
-    and $3f
-    ld [$cd71],a
-    ld h,d
-    ld l,e
-    push hl
-    ld de,$cd71
-    ld bc,$0102
-    call PrintNumber
-    ld a,"/"
-    ld [hli],a
-    ld de,$d11e
-    ld bc,$0102
-    call PrintNumber
+    call z,.EmptyMove
 .next
     pop hl
     ld de,80
@@ -136322,8 +136328,7 @@ HandleStatusScreen2:
     inc b
     ld a,b
     cp $4
-    jr nz,.PrintPP ; 0x12c0f $b2
-.PPDone
+    jr nz,.LoopMove
     ; End
     ld a,$1
     ld [$ff00+$ba],a ; AutoBGTransferEnabled
@@ -136350,10 +136355,9 @@ HandleStatusScreen2:
     ld bc,-44 ; Move Name
     add hl,bc
     ld bc,$0312
-    call FillBlankArea
-    jr .next
+    jp FillBlankArea
 
-.PlaceMoveNameTypeAcrPwr
+.PlaceMoveNameTypeAcrPwrEne
     push af
     push bc
     push de
@@ -136365,6 +136369,7 @@ HandleStatusScreen2:
     ld d,h
     ld e,l
     
+    push de
     push de
     push de
     push de
@@ -136397,7 +136402,7 @@ HandleStatusScreen2:
     call PlaceString
 
 .Text3
-    ld de,.PPText
+    ld de,.EneText
     pop hl
     ld bc,40+1
     add hl,bc
@@ -136480,6 +136485,14 @@ HandleStatusScreen2:
     inc hl
 .PowerDone
 
+.PlaceMoveEne
+    ld de,W_PLAYERMOVEMAXPP
+    pop hl
+    ld bc,40+5
+    add hl,bc
+    ld bc,$0103
+    call PrintNumber
+
 .end
     pop de
     pop bc
@@ -136492,8 +136505,8 @@ HandleStatusScreen2:
     db "ACR",$D3,"   ",$D9,"@"
 .PwrText
     db "PWR",$D3,"@"
-.PPText
-    db "PP",$D3,"@"
+.EneText
+    db "ENE",$D3,"   ",$DA,"@"
 .PhiText
     db $D7,"@"
 .SpcText
