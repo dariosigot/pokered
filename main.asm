@@ -55195,6 +55195,9 @@ SelectEnemyMove: ; Moved in the Bank
 .notCaughtInWrap
 
 ; PP ► ENERGY - DONE
+    ; Backup Current Menu Item
+    ld a,[wCurrentMenuItem]
+    push af
     ; Search At Least One Valid Move
     ld b,-1
 .searchNext
@@ -55243,6 +55246,9 @@ SelectEnemyMove: ; Moved in the Bank
     ld a,h
 .done
     ld [wEnemySelectedMove],a
+    ; Restore Current Menu Item
+    pop af
+    ld [wCurrentMenuItem],a
     ret
 .struggle
     ld a,STRUGGLE
@@ -55895,7 +55901,7 @@ Func_3daad: ; 3daad (f:5aad)
     push af
     xor a
     ld [hli],a
-    ld [$d05e],a
+    call FixItSelfDamage ; ld [$d05e],a
     ld a,$28
     ld [hli],a
     xor a
@@ -56152,7 +56158,7 @@ Func_3dc88: ; 3dc88 (f:5c88)
     ld [$cced],a
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
-    jp z,Obey
+    jp z,.Obey
     ld b,BANK(GetMaxLevel)
     ld hl,GetMaxLevel
     call Bankswitch
@@ -56167,14 +56173,14 @@ Func_3dc88: ; 3dc88 (f:5c88)
 .asm_3dcda
     ld a,c
     cp d
-    jp nc,Obey
+    jp nc,.Obey
 .asm_3dcdf
     call GenRandomInBattle
     swap a
     cp b
     jr nc,.asm_3dcdf
     cp c
-    jp c,Obey
+    jp c,.Obey
 .asm_3dceb
     call GenRandomInBattle
     cp b
@@ -56189,11 +56195,11 @@ Func_3dc88: ; 3dc88 (f:5c88)
     sub b
     jr c,.asm_3dd0e
     cp b
-    jr nc,.asm_3dd20
+    jr nc,.monDoesNothing
     ld hl,UnnamedText_3ddc0 ; $5dc0
     call PrintText
     call Func_3daad
-    jp Func_3ddb4
+    jp .cannotUseMove
 .asm_3dd0e
     call GenRandomInBattle
     add a
@@ -56203,7 +56209,7 @@ Func_3dc88: ; 3dc88 (f:5c88)
     ld [W_PLAYERMONSTATUS],a ; $d018
     ld hl,UnnamedText_3ddbb ; $5dbb
     jr .asm_3dd3a
-.asm_3dd20
+.monDoesNothing
     call GenRandomInBattle
     and $3
     ld hl,UnnamedText_3ddb6 ; $5db6
@@ -56218,66 +56224,64 @@ Func_3dc88: ; 3dc88 (f:5c88)
     ld hl,UnnamedText_3ddca ; $5dca
 .asm_3dd3a
     call PrintText
-    jr Func_3ddb4
+    jr .cannotUseMove
 .asm_3dd3f
     ld a,[$d01d]
     and a
-    jr z,.asm_3dd20
+    jr z,.monDoesNothing
     ld a,[$ccee]
     and a
-    jr nz,.asm_3dd20
+    jr nz,.monDoesNothing
     ld a,[wPlayerSelectedMove] ; $ccdc
     cp $a5
-    jr z,.asm_3dd20
-    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
-    push hl
-    ld a,[hli]
-    ds 2 ; and $3f
-    ld b,a
-    ld a,[hli]
-    ds 2 ; and $3f
-    add b
-    ld b,a
-    ld a,[hli]
-    ds 2 ; and $3f
-    add b
-    ld b,a
-    ld a,[hl]
-    ds 2 ; and $3f
-    add b
-    pop hl
+    jr z,.monDoesNothing
+; PP ► ENERGY - DONE
+    ; Backup Current Menu Item
+    ld a,[wCurrentMenuItem]
     push af
-    ld a,[wCurrentMenuItem] ; $cc26
-    ld c,a
-    ld b,$0
-    add hl,bc
-    ld a,[hl]
-    ds 2 ; and $3f
-    ld b,a
+    ld bc,0
+.Loop
+    ld a,b
+    cp 4
+    jr z,.LoopEnd
+    ld [wCurrentMenuItem],a
+    push bc
+    ld de,W_PLAYERMONMOVES
+    ld b,BANK(CheckEnoughEnergy)
+    ld hl,CheckEnoughEnergy
+    call Bankswitch
+    pop bc
+    jr c,.Next
+    inc c
+.Next
+    inc b
+    jr .Loop
+.LoopEnd
+    ; Restore Current Menu Item
     pop af
-    cp b
-    jr z,.asm_3dd20 ; PP ► ENERGY
+    ld [wCurrentMenuItem],a
+    dec c ; mon will not use move if only one move has enough energy
+    jr z,.monDoesNothing
     ld a,$1
     ld [$cced],a
     ld a,[wMaxMenuItem] ; $cc28
     ld b,a
     ld a,[wCurrentMenuItem] ; $cc26
     ld c,a
-.asm_3dd86
+.chooseMove
     call GenRandomInBattle
     and $3
     cp b
-    jr nc,.asm_3dd86
+    jr nc,.chooseMove
     cp c
-    jr z,.asm_3dd86
+    jr z,.chooseMove
+; PP ► ENERGY - DONE
     ld [wCurrentMenuItem],a ; $cc26
-    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
-    ld e,a
-    ld d,$0
-    add hl,de
-    ld a,[hl]
-    and a
-    jr z,.asm_3dd86 ; PP ► ENERGY
+    ld hl,W_PLAYERMONMOVES
+    ld b,BANK(CheckEnoughEnergy)
+    ld hl,CheckEnoughEnergy
+    call Bankswitch
+    jr c,.chooseMove
     ld a,[wCurrentMenuItem] ; $cc26
     ld c,a
     ld b,$0
@@ -56286,13 +56290,11 @@ Func_3dc88: ; 3dc88 (f:5c88)
     ld a,[hl]
     ld [wPlayerSelectedMove],a ; $ccdc
     call GetCurrentMove
-
-Obey: ; 3ddb0 (f:5db0)
+.Obey
     ld a,$1
     and a
     ret
-
-Func_3ddb4: ; 3ddb4 (f:5db4)
+.cannotUseMove
     xor a
     ret
 
@@ -56320,12 +56322,7 @@ WaitButtonPressed:
     jp Bankswitch
 
 TestPhysicalSpecialBattle:
-    ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
-    ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
-    and a
-    jr z,.done
-    inc hl
-.done
+    call GetSelectedMovePointer
     jp TestPhysicalSpecial
 
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
@@ -57247,7 +57244,7 @@ ReloadMoveData: ; 3e329 (f:6329)
     call AddNTimes
     ld a,BANK(Moves)
     call FarCopyData ; copy the move's stats
-    call IncrementMovePP
+    call ZeroMoveEnergy
 ; the follow two function calls are used to reload the move name
     call GetMoveName
     call CopyStringToCF4B
@@ -57282,39 +57279,23 @@ MetronomePickMove: ; 3e348 (f:6348)
     ld [hl],a
     jr ReloadMoveData
 
-; this function increments the current move's PP
+; this function set to zero the current move's Energy
 ; it's used to prevent moves that run another move within the same turn
-; (like Mirror Move and Metronome) from losing 2 PP
-IncrementMovePP: ; 3e373 (f:6373) ; PP ► ENERGY
+; (like Mirror Move and Metronome) from losing energy 2 times
+ZeroMoveEnergy: ; 3e373 (f:6373)
+; PP ► ENERGY - DONE
     ld a,[H_WHOSETURN]
     and a
 ; values for player turn
-    ld hl,W_PLAYERMONPP
-    ld de,W_PARTYMON1_MOVE1PP
-    ld a,[wPlayerMoveListIndex]
+    ld hl,W_PLAYERMOVEMAXPP
     jr z,.next
 ; values for enemy turn
-    ld hl,W_ENEMYMONPP
-    ld de,$d8c1 ; enemy party pokemon 1 PP
-    ld a,[wEnemyMoveListIndex]
+    ld hl,W_ENEMYMOVEMAXPP
 .next
-    ld b,$00
-    ld c,a
-    add hl,bc
-    nop ; Not Increment ; inc [hl] ; increment PP in the currently battling pokemon memory location
-    ld h,d
-    ld l,e
-    add hl,bc
-    ld a,[H_WHOSETURN]
-    and a
-    ld a,[wPlayerMonNumber] ; value for player turn
-    jr z,.next2
-    ld a,[W_ENEMYMONNUMBER] ; value for enemy turn
-.next2
-    ld bc,$002c
-    call AddNTimes
-    nop ; Not Increment ; inc [hl] ; increment PP in the party memory location
+    ld [hl],0
     ret
+
+SECTION "AdjustDamageForMoveType",ROMX[$63a5],BANK[$f]
 
 ; function to adjust the base damage of an attack to account for type effectiveness
 AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
@@ -58115,7 +58096,7 @@ Func_3e8fd: ; 3e8fd (f:68fd)
     push af
     xor a
     ld [hli],a
-    ld [$d05e],a
+    call FixItSelfDamage ; ld [$d05e],a
     ld a,$28
     ld [hli],a
     xor a
@@ -61635,6 +61616,23 @@ ChooseRandomMove:
     ld b,0
     add hl,bc
     ld a,[hl]
+    ret
+
+GetSelectedMovePointer:
+    ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
+    ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
+    and a
+    ret z
+    inc hl
+    ret
+
+FixItSelfDamage:
+    ld [$d05e],a
+    push hl
+    call GetSelectedMovePointer
+    ld a,POUND
+    ld [hli],a
+    pop hl
     ret
 
 SECTION "bank10",ROMX,BANK[$10]
