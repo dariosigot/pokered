@@ -1692,6 +1692,7 @@ wFlagPlaceTitleScreen ; df36 ; counter for title screen
 wDVForShinyAtkDef     ; df36
 wTempStatHI           ; df36
 wSpriteOAMBySpeciesId ; df36
+wTempMoveEnergy       ; df36 ; Temp Buffer for Move Energy
     ds 1
 
 wMaxLevel              ; df37

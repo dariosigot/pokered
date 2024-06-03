@@ -52582,7 +52582,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     pop af
     jr nz,MainInBattleLoop
 .asm_3c2a6
-    call SelectEnemyMove
+    call BakcupCurMenuItemAndSelectEnemyMove
     ld a,[W_ISLINKBATTLE]
     cp $4
     jr nz,.noLinkBattle
@@ -54517,6 +54517,14 @@ asm_3d05f: ; 3d05f (f:505f)
     ld hl,ItemInBattleFinalCheck
     jp Bankswitch
 
+BakcupCurMenuItemAndSelectEnemyMove:
+    ld a,[wCurrentMenuItem] ; Backup Current Menu Item
+    push af                 ; ...
+    call SelectEnemyMove
+    pop af                  ; Restore Current Menu Item
+    ld [wCurrentMenuItem],a ; ...
+    ret
+
 SECTION "Func_3d0ca",ROMX[$50ca],BANK[$f]
 
 Func_3d0ca: ; 3d0ca (f:50ca)
@@ -55195,9 +55203,6 @@ SelectEnemyMove: ; Moved in the Bank
 .notCaughtInWrap
 
 ; PP ► ENERGY - DONE
-    ; Backup Current Menu Item
-    ld a,[wCurrentMenuItem]
-    push af
     ; Search At Least One Valid Move
     ld b,-1
 .searchNext
@@ -55229,11 +55234,15 @@ SelectEnemyMove: ; Moved in the Bank
     ld e,l
 .chooseRandomMove
     call ChooseRandomMove
+    jr z,.chooseRandomMove
     push af ; Backup a=Move
     push bc
+    push de
+    ld de,W_ENEMYMONMOVES
     ld b,BANK(CheckEnoughEnergy)
     ld hl,CheckEnoughEnergy
     call Bankswitch
+    pop de
     pop bc
     pop hl ; Restore h=Move
     jr c,.chooseRandomMove
@@ -55246,9 +55255,6 @@ SelectEnemyMove: ; Moved in the Bank
     ld a,h
 .done
     ld [wEnemySelectedMove],a
-    ; Restore Current Menu Item
-    pop af
-    ld [wCurrentMenuItem],a
     ret
 .struggle
     ld a,STRUGGLE
@@ -56236,30 +56242,8 @@ Func_3dc88: ; 3dc88 (f:5c88)
     cp $a5
     jr z,.monDoesNothing
 ; PP ► ENERGY - DONE
-    ; Backup Current Menu Item
-    ld a,[wCurrentMenuItem]
-    push af
-    ld bc,0
-.Loop
-    ld a,b
-    cp 4
-    jr z,.LoopEnd
-    ld [wCurrentMenuItem],a
-    push bc
     ld de,W_PLAYERMONMOVES
-    ld b,BANK(CheckEnoughEnergy)
-    ld hl,CheckEnoughEnergy
-    call Bankswitch
-    pop bc
-    jr c,.Next
-    inc c
-.Next
-    inc b
-    jr .Loop
-.LoopEnd
-    ; Restore Current Menu Item
-    pop af
-    ld [wCurrentMenuItem],a
+    call HowManyMovesWithEnoughEnergy
     dec c ; mon will not use move if only one move has enough energy
     jr z,.monDoesNothing
     ld a,$1
@@ -57293,6 +57277,33 @@ ZeroMoveEnergy: ; 3e373 (f:6373)
     ld hl,W_ENEMYMOVEMAXPP
 .next
     ld [hl],0
+    ret
+
+; Input de = pointer to first move
+; Output c = numer of moves
+;        z flag = set if 0 moves
+HowManyMovesWithEnoughEnergy:
+    ld a,[wCurrentMenuItem] ; Backup Current Menu Item
+    push af                 ; ...
+    ld bc,0
+.Loop
+    ld a,b
+    cp 4
+    jr z,.End
+    ld [wCurrentMenuItem],a
+    push bc
+    ld b,BANK(CheckEnoughEnergy)
+    ld hl,CheckEnoughEnergy
+    call Bankswitch
+    pop bc
+    jr c,.Next
+    inc c
+.Next
+    inc b
+    jr .Loop
+.End
+    pop af                  ; Restore Current Menu Item
+    ld [wCurrentMenuItem],a ; ...
     ret
 
 SECTION "AdjustDamageForMoveType",ROMX[$63a5],BANK[$f]
@@ -58439,6 +58450,11 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     jr nz,.asm_3ec2d
     ret
 
+Func_3fb0e: ; Moved in the Bank
+    ld hl,Func_2feb8
+    ld b,BANK(Func_2feb8)
+    jp Bankswitch
+
 SECTION "DoBattleTransitionAndInitBatVar",ROMX[$6c32],BANK[$f]
 
 DoBattleTransitionAndInitBatVar: ; 3ec32 (f:6c32)
@@ -59316,7 +59332,7 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw $0000
      dw Func_3fa7c
      dw Func_3fa84
-     dw Func_3fa8a
+     dw DisableEffect
 
 Func_3f1fc: ; 3f1fc (f:71fc)
     ld de,W_ENEMYMONSTATUS ; $cfe9
@@ -59354,7 +59370,7 @@ Func_3f20e: ; 3f20e (f:720e)
     and $7
     jr z,.asm_3f231
     ld [de],a
-    call Func_3fb89
+    call PlayCurrentMoveAnimation2
     ld hl,UnnamedText_3f245 ; $7245
     jp PrintText
 .asm_3f242
@@ -59443,7 +59459,7 @@ Func_3f24f: ; 3f24f (f:724f)
     call Func_3fb96
     jp PrintText
 .asm_3f2cd
-    call Func_3fb89
+    call PlayCurrentMoveAnimation2
     jp PrintText
 .asm_3f2d3
     ld a,[de]
@@ -59963,7 +59979,7 @@ asm_3f62c: ; 3f62c (f:762c)
     ld a,[de]
     cp $44
     jr nc,.asm_3f63b
-    call Func_3fb89
+    call PlayCurrentMoveAnimation2
 .asm_3f63b
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -60447,7 +60463,7 @@ Func_3f96f: ; 3f96f (f:796f)
     ld [bc],a
     pop af
     cp $4c
-    call nz,Func_3fb89
+    call nz,PlayCurrentMoveAnimation2
     ld hl,UnnamedText_3f9a1 ; $79a1
     jp PrintText
 
@@ -60589,23 +60605,34 @@ Func_3fa84: ; 3fa84 (f:7a84)
     call Func_3fba8
     jp Func_3fb43
 
-Func_3fa8a: ; 3fa8a (f:7a8a)
+DisableEffect: ; 3fa8a (f:7a8a)
     call MoveHitTest
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jr nz,.asm_3fb06
+    jr nz,.moveMissed
     ld de,W_ENEMYDISABLEDMOVE ; $d072
     ld hl,W_ENEMYMONMOVES
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_3faa4
+    jr z,.disableEffect
     ld de,W_PLAYERDISABLEDMOVE ; $d06d
     ld hl,W_PLAYERMONMOVES
-.asm_3faa4
+.disableEffect
     ld a,[de]
     and a
-    jr nz,.asm_3fb06
-.asm_3faa8
+    jr nz,.moveMissed
+; PP ► ENERGY - DONE
+    push hl
+    ld d,h
+    ld e,l
+    call HowManyMovesWithEnoughEnergy
+    pop hl
+    ld a,c
+    and a
+    jr z,.moveMissed ; if 0 moves with enough energy
+    ld a,[wCurrentMenuItem] ; Backup Current Menu Item
+    push af                 ; ...
+.pickMoveToDisable
     push hl
     call GenRandomInBattle
     and $3
@@ -60615,36 +60642,24 @@ Func_3fa8a: ; 3fa8a (f:7a8a)
     ld a,[hl]
     pop hl
     and a
-    jr z,.asm_3faa8
+    jr z,.pickMoveToDisable
     ld [$d11e],a
-    push hl
+    ld a,c
+    ld [wCurrentMenuItem],a
+    push bc
+    ld b,BANK(CheckEnoughEnergy)
+    ld hl,CheckEnoughEnergy
+    call Bankswitch
+    pop bc
+    jr c,.pickMoveToDisable
+    pop af                  ; Restore Current Menu Item
+    ld [wCurrentMenuItem],a ; ...
+    ld de,W_ENEMYDISABLEDMOVE ; $d072
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
-    jr nz,.asm_3facf
-    ld a,[W_ISLINKBATTLE] ; $d12b
-    cp $4
-    pop hl
-    jr nz,.asm_3fae1
-    push hl
-    ld hl,W_ENEMYMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_ENEMYMONPP ; $cffe
-.asm_3facf
-    push hl
-    ld a,[hli]
-    or [hl]
-    inc hl
-    or [hl]
-    inc hl
-    or [hl]
-    ds 2 ; and $3f
-    pop hl
-    jr z,.asm_3fb05 ; PP ► ENERGY
-    add hl,bc
-    ld a,[hl]
-    pop hl
-    and a
-    jr z,.asm_3faa8
-.asm_3fae1
+    jr z,.next
+    ld de,W_PLAYERDISABLEDMOVE ; $d06d
+.next
     call GenRandomInBattle
     and $7
     inc a
@@ -60652,31 +60667,26 @@ Func_3fa8a: ; 3fa8a (f:7a8a)
     swap c
     add c
     ld [de],a
-    call Func_3fb89
+    call PlayCurrentMoveAnimation2
     ld hl,$ccee
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr nz,.asm_3faf8
+    jr nz,.printDisableText
     inc hl
-.asm_3faf8
+.printDisableText
     ld a,[$d11e]
     ld [hl],a
     call GetMoveName
-    ld hl,UnnamedText_3fb09 ; $7b09
+    ld hl,.UnnamedText_3fb09 ; $7b09
     jp PrintText
-.asm_3fb05
-    pop hl
-.asm_3fb06
+.moveMissed
     jp Func_3fb53
 
-UnnamedText_3fb09: ; 3fb09 (f:7b09)
+.UnnamedText_3fb09
     TX_FAR _UnnamedText_3fb09
     db "@"
 
-Func_3fb0e: ; 3fb0e (f:7b0e)
-    ld hl,Func_2feb8
-    ld b,BANK(Func_2feb8)
-    jp Bankswitch
+SECTION "Func_3fb16",ROMX[$7b16],BANK[$f]
 
 Func_3fb16: ; 3fb16 (f:7b16)
     ld hl,Func_139a3
@@ -60760,7 +60770,7 @@ CheckTargetSubstitute: ; 3fb79 (f:7b79)
     pop hl
     ret
 
-Func_3fb89: ; 3fb89 (f:7b89)
+PlayCurrentMoveAnimation2: ; 3fb89 (f:7b89)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVENUM] ; $cfd2
@@ -61616,6 +61626,7 @@ ChooseRandomMove:
     ld b,0
     add hl,bc
     ld a,[hl]
+    and a
     ret
 
 GetSelectedMovePointer:
@@ -96046,46 +96057,7 @@ Tset17_Block:
 
 SECTION "bank1A",ROMX,BANK[$1A]
 
-DecrementPP: ; 68000 (1a:4000) ; PP ► ENERGY
-; after using a move,decrement pp in battle and (if not transformed?) in party
-    ld a,[de]
-    cp a,STRUGGLE
-    ret z                ; if the pokemon is using "struggle",there's nothing to do
-                         ; we don't decrement PP for "struggle"
-    ld hl,W_PLAYERBATTSTATUS1
-    ld a,[hli]          ; load the W_PLAYERBATTSTATUS1 pokemon status flags and increment hl to load the
-                         ; W_PLAYERBATTSTATUS2 status flags later
-    and a,7             ; check to see if bits 0,1,or 2 are set
-    ret nz               ; if any of these statuses are true,don't decrement PP
-    bit 6,[hl]          ; check 6th bit status flag on W_PLAYERBATTSTATUS2
-    ret nz               ; and return if it is set
-    ld hl,W_PLAYERMONPP ; PP of first move (in battle)
-    call .DecrementPP
-
-    ld a,[W_PLAYERBATTSTATUS3] ; load pokemon status bits?
-    bit 3,a             ; XXX transform status?
-    ret nz               ; If it is,return.  Pokemon Red stores the "current pokemon's" PP
-                         ; separately from the "Pokemon in your party's" PP.  This is
-                         ; duplication -- in all cases *other* than Pokemon with Transform.
-                         ; Normally,this means we have to go on and make the same
-                         ; modification to the "party's pokemon" PP that we made to the
-                         ; "current pokemon's" PP.  But,if we're dealing with a Transformed
-                         ; Pokemon,it has separate PP for the move set that it copied from
-                         ; its opponent,which is *not* the same as its real PP as part of your
-                         ; party.  So we return,and don't do that part.
-
-    ld hl,W_PARTYMON1_MOVE1PP ; PP of first move (in party)
-    ld a,[wPlayerMonNumber] ; which mon in party is active
-    ld bc,$2C           ; XXX probably size of party pokemon's data structure
-    call AddNTimes       ; calculate address of the mon to modify
-.DecrementPP
-    ld a,[wPlayerMoveListIndex] ; which move (0,1,2,3) did we use?
-    ld c,a
-    ld b,0
-    add hl ,bc           ; calculate the address in memory of the PP we need to decrement
-                         ; based on the move chosen.
-    nop ; Not Decrement ; dec [hl]             ; Decrement PP
-    ret
+SECTION "Version_GFX",ROMX[$402f],BANK[$1A]
 
 Version_GFX: ; 6802f (1a:402f)
 IF _RED
@@ -109270,7 +109242,7 @@ Func_795f8: ; 795f8 (1e:55f8)
 Func_79633: ; 79633 (1e:5633)
     ld a,[hl]
     add $7
-    cp $61
+    cp $61+1 ; Bugfix Softboiled Slice Animation
     ret c
     ld a,$7f
     ret
@@ -109278,7 +109250,7 @@ Func_79633: ; 79633 (1e:5633)
 Func_7963c: ; 7963c (1e:563c)
     ld a,[hl]
     sub $7
-    cp $30
+    cp $30+1 ; Bugfix Softboiled Slice Animation
     ret c
     ld a,$7f
     ret
@@ -133835,20 +133807,31 @@ AIEnemyTrainerChooseMoves:
 .done
     ld [wAILastMovePower],a
 
-    ; highly discourage zero pp move ; PP ► ENERGY
-
-    jr .ppdone ; Disable Check PP
-
-    ld hl,W_ENEMYMONPP
+; PP ► ENERGY - DONE
+    ; highly discourage not enough energy move
+    ld a,[wCurrentMenuItem] ; Backup Current Menu Item
+    push af                 ; ...
+    ld hl,W_ENEMYMONMOVES
+    ld d,h
+    ld e,l
     ld bc,$00FF ; b = 0 | c = -1
 .searchNext
     inc c
     ld a,c
     cp 4
     jr z,.ppdone
+    ld [wCurrentMenuItem],a
     ld a,[hli]
     and a
-    jr nz,.searchNext
+    jr z,.searchNext
+    push hl
+    push bc
+    ld b,BANK(CheckEnoughEnergy)
+    ld hl,CheckEnoughEnergy
+    call Bankswitch
+    pop bc
+    pop hl
+    jr nc,.searchNext
     push hl
     ld hl,$cee9
     add hl,bc    ; advance pointer to zero pp move
@@ -133856,6 +133839,8 @@ AIEnemyTrainerChooseMoves:
     pop hl
     jr .searchNext
 .ppdone
+    pop af                  ; Restore Current Menu Item
+    ld [wCurrentMenuItem],a ; ...
 
     ld a,[W_ENEMYDISABLEDMOVE] ; forbid disabled move (if any)
     swap a
@@ -135738,7 +135723,36 @@ EnableBillsTeleport2:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-DecrementEnemyPP_: ; PP ► ENERGY
+; PP ► ENERGY - DONE
+DecrementPP: ; 68000 (1a:4000)
+; after using a move,decrement pp in battle and (if not transformed?) in party
+    ld a,[de]
+    cp a,STRUGGLE
+    ret z                ; if the pokemon is using "struggle",there's nothing to do
+                         ; we don't decrement PP for "struggle"
+    ld hl,W_PLAYERBATTSTATUS1
+    ld a,[hli]          ; load the W_PLAYERBATTSTATUS1 pokemon status flags and increment hl to load the
+                         ; W_PLAYERBATTSTATUS2 status flags later
+    and a,7             ; check to see if bits 0,1,or 2 are set
+    ret nz               ; if any of these statuses are true,don't decrement PP
+    bit 6,[hl]          ; check 6th bit status flag on W_PLAYERBATTSTATUS2
+    ret nz               ; and return if it is set
+    ld hl,W_PLAYERMONPP ; PP of first move (in battle)
+    call .DecrementPP
+    ld hl,W_PARTYMON1_MOVE1PP ; PP of first move (in party)
+    ld a,[wPlayerMonNumber] ; which mon in party is active
+    ld bc,$2C           ; XXX probably size of party pokemon's data structure
+    call AddNTimes       ; calculate address of the mon to modify
+.DecrementPP
+    ld a,[W_PLAYERMOVEMAXPP] ; Energy
+    ld b,a
+    ld a,[hl]
+    sub b ; dec [hl]     ; Decrement PP
+    ld [hl],a
+    ret
+
+; PP ► ENERGY - DONE
+DecrementEnemyPP_:
 ; after using a move,decrement pp in battle and (if not transformed?) in party
     ld a,[de]
     cp a,STRUGGLE
@@ -135758,30 +135772,17 @@ DecrementEnemyPP_: ; PP ► ENERGY
     cp $2
     ret nz              ; Update Party only in enemy battle
 
-    ld a,[W_ENEMYBATTSTATUS3] ; load pokemon status bits?
-    bit 3,a             ; XXX transform status?
-    ret nz               ; If it is,return.  Pokemon Red stores the "current pokemon's" PP
-                         ; separately from the "Pokemon in your party's" PP.  This is
-                         ; duplication -- in all cases *other* than Pokemon with Transform.
-                         ; Normally,this means we have to go on and make the same
-                         ; modification to the "party's pokemon" PP that we made to the
-                         ; "current pokemon's" PP.  But,if we're dealing with a Transformed
-                         ; Pokemon,it has separate PP for the move set that it copied from
-                         ; its opponent,which is *not* the same as its real PP as part of your
-                         ; party.  So we return,and don't do that part.
-
     ld hl,wEnemyMon1 + (W_PARTYMON1_MOVE1PP-W_PARTYMON1DATA) ; $CFFE
                         ; PP of first move (in party)
     ld a,[W_ENEMYMONNUMBER] ; which mon in party is active
     ld bc,$2C           ; XXX probably size of party pokemon's data structure
     call AddNTimes       ; calculate address of the mon to modify
 .DecrementPP
-    ld a,[wEnemyMoveListIndex] ; which move (0,1,2,3) did we use?
-    ld c,a
-    ld b,0
-    add hl ,bc           ; calculate the address in memory of the PP we need to decrement
-                         ; based on the move chosen.
-    nop ; Not Decrement ; dec [hl]             ; Decrement PP
+    ld a,[W_ENEMYMOVEMAXPP] ; Energy
+    ld b,a
+    ld a,[hl]
+    sub b ; dec [hl]     ; Decrement PP
+    ld [hl],a
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -136689,26 +136690,48 @@ CheckEnoughEnergy:
     ld a,[hl] ; Move ID
     and a
     jr z,.NoMove
-    dec a
-    ld hl,Moves ; $4000
-    ld bc,6
-    call AddNTimes
-    ld a,BANK(Moves)
-    ld de,W_PLAYERMOVENUM
-    call FarCopyData
+    ld d,a
+    call GetMoveEnergy ; d = Move Selected Energy
     pop hl
+    push hl
     ld bc,W_PLAYERMONPP-W_PLAYERMONMOVES
     add hl,bc
-    ld a,[W_PLAYERMOVEMAXPP]
-    ld b,a ; Move Selected Energy
     ld a,[hl] ; Mon Energy
-    sub b
+    sub d
+.end
+    pop hl
     pop de
     ret
 .NoMove
-    pop hl
-    pop de
     scf
+    jr .end
+
+; Input : a = move ID
+; Output : [wTempMoveEnergy] = Move Energy
+GetMoveEnergy_:
+    dec a
+    ld hl,Moves+5 ; Move Energy
+    ld bc,6
+    call AddNTimes
+    ld a,[$cee9]
+    push af
+    ld a,BANK(Moves)
+    ld de,wTempMoveEnergy
+    ld bc,1
+    call FarCopyData
+    pop af
+    ld [$cee9],a
+    ret
+
+; Input : d = move ID
+; Output : d = Move Energy
+GetMoveEnergy:
+    ld a,d
+    call GetMoveEnergy_
+    ld a,[wTempMoveEnergy]
+    ld d,a
+    xor a
+    ld [wTempMoveEnergy],a
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
