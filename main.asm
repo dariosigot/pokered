@@ -53739,17 +53739,13 @@ TryRunningFromBattle: ; 3cab9 (f:4ab9)
     ld a,[W_ISINBATTLE] ; $d057
     dec a
     jr nz,.trainerBattle
-    ; ds 3 ; ld a,[$d120]
-    ; ds 1 ; inc a
-    ; ds 3 ; ld [$d120],a
     call CheckNotEscapeWildPokemon
     jr c,.cantEscape
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
     jp z,.canEscape
     ld a,[hli]
-    ld [$FF00+$97],a
-    ld a,[hl]
+    call HalvePlayerSpeedAfterRun
     ld [$FF00+$98],a
     ld a,[de]
     ld [$FF00+$8d],a
@@ -53806,10 +53802,10 @@ TryRunningFromBattle: ; 3cab9 (f:4ab9)
 .cantEscape
     ld a,$1
     ld [$cd6a],a
-    ld hl,UnnamedText_3cb97 ; $4b97
+    ld hl,.UnnamedText_3cb97
     jr .asm_3cb4f
 .trainerBattle
-    ld hl,UnnamedText_3cb9c ; $4b9c
+    ld hl,.UnnamedText_3cb9c
 .asm_3cb4f
     call PrintText
     ld a,$1
@@ -53838,24 +53834,24 @@ TryRunningFromBattle: ; 3cab9 (f:4ab9)
     ld [$cf0b],a
     ld a,$97
     call PlaySoundWaitForCurrent
-    ld hl,UnnamedText_3cba1 ; $4ba1
+    ld hl,.UnnamedText_3cba1
     call PrintText
     call WaitForSoundToFinish
     call SaveScreenTilesToBuffer1
     scf
     ret
 
-UnnamedText_3cb97: ; 3cb97 (f:4b97)
+.UnnamedText_3cb97
     TX_FAR _UnnamedText_3cb97
     db "@"
-
-UnnamedText_3cb9c: ; 3cb9c (f:4b9c)
+.UnnamedText_3cb9c
     TX_FAR _UnnamedText_3cb9c
     db "@"
-
-UnnamedText_3cba1: ; 3cba1 (f:4ba1)
+.UnnamedText_3cba1
     TX_FAR _UnnamedText_3cba1
     db "@"
+
+SECTION "LoadBattleMonFromParty",ROMX[$4ba6],BANK[$f]
 
 LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
     ld a,[wWhichPokemon] ; $cf92
@@ -54523,6 +54519,13 @@ BakcupCurMenuItemAndSelectEnemyMove:
     call SelectEnemyMove
     pop af                  ; Restore Current Menu Item
     ld [wCurrentMenuItem],a ; ...
+    ret
+
+HalvePlayerSpeedAfterRun:
+    srl a ; Player Speed divided by 2
+    ld [$FF00+$97],a
+    ld a,[hl]
+    rr a  ; Player Speed divided by 2
     ret
 
 SECTION "Func_3d0ca",ROMX[$50ca],BANK[$f]
@@ -134479,59 +134482,13 @@ _CheckNotEscapeWildPokemon:
     jr .CheckShiny
 
 .NotEscapeWildPokemon
-    db VENUSAUR
-    db CHARIZARD
-    db BLASTOISE
-    db BEEDRILL
-    db PIDGEOT
-    db RATICATE
-    db FEAROW
-    db ARBOK
-    db RAICHU
-    db SANDSLASH
-    db NIDOQUEEN
-    db NIDOKING
-    db NINETALES
-    db GOLBAT
-    db GLOOM
-    db VILEPLUME
-    db DIGLETT
-    db DUGTRIO
-    db PERSIAN
-    db GOLDUCK
-    db PRIMEAPE
-    db ARCANINE
-    db POLIWRATH
-    db WEEPINBELL
-    db VICTREEBEL
-    db TENTACRUEL
-    db RAPIDASH
-    db DODRIO
-    db MUK
-    db HAUNTER
-    db GENGAR
-    db ONIX
     db VOLTORB
     db ELECTRODE
-    db HITMONLEE
-    db HITMONCHAN
-    db WEEZING
-    db SCYTHER
-    db JYNX
-    db ELECTABUZZ
-    db MAGMAR
-    db PINSIR
-    db GYARADOS
-    db LAPRAS
-    db VAPOREON
-    db JOLTEON
-    db FLAREON
     db AERODACTYL
     db SNORLAX
     db ARTICUNO
     db ZAPDOS
     db MOLTRES
-    db DRAGONAIR
     db DRAGONITE
     db MEWTWO
     db MEW
