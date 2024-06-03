@@ -361,10 +361,7 @@ wStringBuffer2: ; cf70
 wStringBuffer3: ; cf81
     ds 10
 
-wListPointer: ; $cf8b
-    ds 1
-
-    ds 5
+    ds 6
 
 wcf91: ; $cf91
     ds 1
@@ -1119,8 +1116,19 @@ wChangedBlocksEnd::
 wUselessD45F:
     ds 1
 
-wBackupNearPlayerTiles:
+wBackupNearPlayerTiles: ; d460
     ds 20
+
+wEXPBarPixelLength: ; d474
+    ds 1
+wEXPBarBaseEXP:
+    ds 3
+wEXPBarCurEXP:
+    ds 3
+wEXPBarNeededEXP:
+    ds 3
+wEXPBarKeepFullFlag:
+    ds 1
 
 ; some free bytes
 
@@ -1608,33 +1616,20 @@ W_BOXMON2DATA: ; dab7
 
 ; dd2a
 
-SECTION "wLocationMonOvSprInstruction", WRAMX[$def0], BANK[1]
+; ────────────────────────────────────────────────────
 
-UNION ; 54 Byte
+SECTION "DenimBuffer",WRAMX[$def0],BANK[$1]
+
+UNION ; 63 Byte
 
 wMoveRelearnerMoveList: ; def0
-    ds 54
+    ds 63
 
 NEXTU
 
-wLocationMonOvSprInstruction: ; def0 ; Denim
+wLocationMonOvSprInstruction: ; def0
     ds 6*6
     ds 2*6
-wArrayMiniSpriteLoaded: ; df20 ; Denim
-    ds 6
-
-NEXTU
-
-wEXPBarPixelLength: ; def0 ; Denim, ExpBar
-    ds 1
-wEXPBarBaseEXP:
-    ds 3
-wEXPBarCurEXP:
-    ds 3
-wEXPBarNeededEXP:
-    ds 3
-wEXPBarKeepFullFlag:
-    ds 1
 
 NEXTU
 
@@ -1656,51 +1651,50 @@ wNewMoveDamage:: ; $def5
 wNewMoveType:: ; $def6
     db
 
+NEXTU
+
+wBlkCurrentPaletteColor: ; def1
+    ds 1
+wBlkCoordinateX1Left: ; def2
+    ds 1
+wBlkCoordinateY1Upper: ; def3
+    ds 1
+wBlkCoordinateX2Right: ; def4
+    ds 1
+wBlkCoordinateY2Lower: ; def5
+    ds 1
+
 ENDU
 
-SECTION "wSpriteOAMBySpecies",WRAMX[$df26],BANK[1]
+; ────────────────────────────────────────────────────
 
-wSpriteOAMBySpecies:       ; df26 ; bit 0 = Flag Tentativo Rinomina
-wStatusScreenJustLoadBit1: ; fd26 ; bit 1 = Status Screen Picture Just Load
-wStatusScreen2OAMBit2:     ; fd26 ; bit 2 = Write OAM in Status Screen 2
-    ds 1
-wSpriteOAMBySpeciesId: ; df27 ; Denim
-wLastTechMachIdUsed: ; df27
-    ds 1
+SECTION "wArrayMiniSpriteLoaded",WRAMX[$df2f],BANK[1]
 
-SECTION "wBlkCurrentPaletteColor", WRAMX[$df30], BANK[1] ; Denim
+wArrayMiniSpriteLoaded: ; df2f
+    ds 6
 
-wBlkCurrentPaletteColor: ; df30
-    ds 1
-
-wBlkCoordinateX1Left: ; df31
-    ds 1
-
-wBlkCoordinateY1Upper: ; df32
-    ds 1
-
-wBlkCoordinateX2Right: ; df33
-    ds 1
-
-wBlkCoordinateY2Lower: ; df34
-    ds 1
+SECTION "DenimFlags",WRAMX[$df35],BANK[1]
 
 wDigCaveAerodactylTrigBit0 ; df35 ; bit 0
 wFlagDamageToPlayerBit1    ; df35 ; bit 1
+wFlagSortMoveBit1          ; df35 ; bit 1 = Sort Moves in Moves Menu (SELECT)
 wFlagShinyBit2             ; df35 ; bit 2
 wDigCaveAerodactylBeatBit3 ; df35 ; bit 3
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
 wFlagBackFrontSpriteBit56  ; df35 ; bit 5
                            ; df35 ; bit 6
 wFlagFlashingHealBallBit7  ; df35 ; bit 7
+wSpriteOAMBySpeciesBit7    ; df35 ; bit 7 = Flag Single Mon ID Sprite
+wDrawMoveDetailsBit7       ; df35 ; bit 7 = Enable Move Details in Moves Menu
     ds 1
 
 wFlagPlaceTitleScreen ; df36 ; counter for title screen
 wDVForShinyAtkDef     ; df36
 wTempStatHI           ; df36
+wSpriteOAMBySpeciesId ; df36
+wTempMoveEnergy       ; df36 ; Temp Buffer for Move Energy
     ds 1
 
-wEvolutionMove         ; df37
 wMaxLevel              ; df37
 wChoicePkmnMoveDeleter ; df37
 wDVForShinySpdSpc      ; df37
@@ -1709,7 +1703,7 @@ wTempStatLO            ; df37
     ds 1
 
 wFlagAddPkmnToPartyBit0     ; df38 ; bit 0
-wFlagMoveRelearnEngagedBit0 ; df38 ; bit 0
+wStatusScreen2OAMBit0       ; df38 ; bit 0 = Write OAM in Status Screen 2
 wFlagDratiniCaveBit1        ; df38 ; bit 1
 wFlagNoHpPalBit2            ; df38 ; bit 2
 wFlagEnableOakLastPkmnBit3  ; df38 ; bit 3
@@ -1717,7 +1711,9 @@ wFlagEnableDojoLastPkmnBit4 ; df38 ; bit 4
 wMewEventBit5               ; df38 ; bit 5
 wFirstExpAllMessageBit6     ; df38 ; bit 6
 wSelectInOverworldOnBit6    ; df38 ; bit 6
+wStatusScreenJustLoadBit6   ; df38 ; bit 6 = Status Screen Picture Just Load
 wDebugEnemyMoveBit7         ; df38 ; bit 7
+wFlagMoveRelearnEngagedBit7 ; df38 ; bit 7
     ds 1
 
 wFlagListMenuSpc: ; df39 ; Denim
@@ -1727,7 +1723,8 @@ wFlagListMenuSpc: ; df39 ; Denim
                   ; bit 3 = Rocket Hideout Elevator
     ds 1
 
-wFishingLevel: ; df3a
+wFishingLevel:       ; df3a
+wLastTechMachIdUsed: ; df3a
     ds 1
 
 wFishingSpecies: ; df3b

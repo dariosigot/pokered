@@ -74,7 +74,7 @@ CHARMANDER_NoEvo_Learnset: MACRO
     db 22,SMOKESCREEN
     db 25,FIRE_PUNCH
     db 30,SLASH
-    db 34,AGILITY
+    db 34,AGILITY ; Exclusive
     db 38,FLAMETHROWER
     db 43,SLAM ; Exclusive
 ENDM
@@ -1928,13 +1928,13 @@ EEVEE_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  8,SAND_ATTACK
-    db 11,GROWL
+    db 11,GROWL ; Exclusive
     db 16,QUICK_ATTACK
     db 19,DOUBLE_KICK
     db 23,BITE
     db 27,DOUBLE_TEAM
     db 32,SKULL_BASH
-    db 36,FOCUS_ENERGY
+    db 36,FOCUS_ENERGY ; Exclusive
     db 39,MIMIC
     db 42,TAKE_DOWN
     db 57,BODY_SLAM

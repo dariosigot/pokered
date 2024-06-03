@@ -70,10 +70,6 @@ dbdw: MACRO
     dw \2
     ENDM
 
-PreEvolution: MACRO
-    dbdw \1,.\1
-    ENDM
-
 bcd3: MACRO
 	dn ((\1) / 100000) % 10, ((\1) / 10000) % 10
 	dn ((\1) / 1000) % 10, ((\1) / 100) % 10
