@@ -18618,6 +18618,15 @@ HandleMenuInput_PrintMoveBox:
     ld de,Coord
     call CheckMoveRelearn
     jr z,.skip
+    ; Energy
+    ld de,$cfb5
+    FuncCoord 15,13
+    ld hl,Coord
+    ld bc,$0103
+    call PrintNumber
+    ld de,.EnergyIcon
+    call PlaceString
+    ; Print Move Details Box (Move Relearner)
     FuncCoord 09,05
     ld de,Coord
     FuncCoord 19,02
@@ -18639,6 +18648,8 @@ HandleMenuInput_PrintMoveBox:
     ld a,b
     ret z
     jr HandleMenuInput_PrintMoveBox
+.EnergyIcon
+    db $DA,"@"
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $01)
@@ -29926,10 +29937,11 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .goBackToMap
     call Func_3dbe
     jp CloseTextDisplay
-.newBadgeRequired
+
+NewBadgeRequired:
     ld hl,.newBadgeRequiredText
     call PrintText
-    jp .loop
+    jp $70BF ; StartMenu_Pokedex.loop
 .newBadgeRequiredText
     TX_FAR _NewBadgeRequiredText
     db "@"
@@ -31049,7 +31061,7 @@ HandleMenuInputPlusWrapping:
 
 DontCheckElement:
     pop af ; Delete Call Back Return
-    jp $72DF ; StartMenu_Pokemon.newBadgeRequired
+    jp NewBadgeRequired
 
 ElementEnd:
     ret nz
@@ -43053,7 +43065,17 @@ LoadMonDataAndPrintActualMoves:
     ld a,[$FF00+$f6]
     res 2,a
     ld [$FF00+$f6],a
+    ; Energy
+    ld de,$cfb5
+    FuncCoord 15,13
+    ld hl,Coord
+    ld bc,$0103
+    call PrintNumber
+    ld de,.EnergyIcon
+    call PlaceString
     ret
+.EnergyIcon
+    db $DA,"@"
 
 ; Choice Relearn Move Selected Pokemon (a = party index)
 ; output a = Flag Result,[wCurrentMenuItem] = Index of Choice
