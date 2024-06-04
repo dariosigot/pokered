@@ -3372,7 +3372,7 @@ CloysterBaseStats: ; 38db6 (e:4db6)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6                      ; TOXIC
+    tmlearn 6,8                    ; TOXIC|BODY_SLAM
     tmlearn 10,11,12,13,14,15      ; DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM
     tmlearn 20                     ; RAGE
     tmlearn 31                     ; MIMIC
@@ -3816,7 +3816,7 @@ ExeggutorBaseStats: ; 38f06 (e:4f06)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 3,6                    ; SWORDS_DANCE|TOXIC
+    tmlearn 3,6,8                  ; SWORDS_DANCE|TOXIC|BODY_SLAM
     tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
     tmlearn 20,21,22               ; RAGE|MEGA_DRAIN|SOLARBEAM
     tmlearn 29,30,31               ; PSYCHIC_M|TELEPORT|MIMIC
@@ -4408,7 +4408,7 @@ SeakingBaseStats: ; 390c6 (e:50c6)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,7                  ; SWORDS_DANCE|TOXIC|HORN_DRILL
+    tmlearn 3,6,7,8                ; SWORDS_DANCE|TOXIC|HORN_DRILL|BODY_SLAM
     tmlearn 9,10,11,12,13,14,15    ; TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM
     tmlearn 20                     ; RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
@@ -5481,7 +5481,7 @@ DragonairBaseStats: ; 393f2 (e:53f2)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6,8                    ; TOXIC|BODY_SLAM
+    tmlearn 6,7,8                  ; TOXIC|HORN_DRILL|BODY_SLAM
     tmlearn 9,11,12,13,14,15       ; TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM
     tmlearn 20,23,24               ; RAGE|DRAGON_RAGE|THUNDERBOLT
     tmlearn 25,31,32               ; THUNDER|MIMIC|DOUBLE_TEAM
@@ -5518,7 +5518,7 @@ DragoniteBaseStats: ; 3940e (e:540e)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 1,2,5,6,8              ; MEGA_PUNCH|RAZOR_WIND|MEGA_KICK|TOXIC|BODY_SLAM
+    tmlearn 1,2,5,6,7,8            ; MEGA_PUNCH|RAZOR_WIND|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM
     tmlearn 9,10,11,12,13,14,15    ; TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM
     tmlearn 20,23,24               ; RAGE|DRAGON_RAGE|THUNDERBOLT
     tmlearn 25,31,32               ; THUNDER|MIMIC|DOUBLE_TEAM

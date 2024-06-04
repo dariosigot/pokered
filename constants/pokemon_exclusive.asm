@@ -1092,6 +1092,7 @@ CloysterExclusiveMove:
     db TSUNAMI
     db BUBBLE
     db LICK
+    db BODY_SLAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GastlyExclusiveMove:
@@ -1246,6 +1247,7 @@ ExeggutorExclusiveMove:
     db POISONPOWDER
     db SLEEP_POWDER
     db SWORDS_DANCE
+    db BODY_SLAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CuboneExclusiveMove:
@@ -2079,6 +2081,7 @@ DragoniteExclusiveMove:
     db STRIKE
     db MEGA_PUNCH
     db MEGA_KICK
+    db HORN_DRILL
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewtwoExclusiveMove:
