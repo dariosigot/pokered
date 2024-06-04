@@ -454,7 +454,7 @@ ButterfreeBaseStats: ; 38512 (e:4512)
     tmlearn 20,21,22               ; RAGE|MEGA_DRAIN|SOLARBEAM
     tmlearn 29,30,31,32            ; PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM
     tmlearn 33,34,39               ; REFLECT|BIDE|SWIFT
-    tmlearn 41,44,46               ; FLASH|REST|PSYWAVE
+    tmlearn 41,42,44,46            ; FLASH|DREAM_EATER|REST|PSYWAVE
     tmlearn 50                     ; SUBSTITUTE
 
     db BANK(ButterfreePicFront)
@@ -1305,7 +1305,7 @@ ClefairyBaseStats: ; 38796 (e:4796)
     tmlearn 20,24                  ; RAGE|THUNDERBOLT
     tmlearn 31                     ; MIMIC
     tmlearn 33,34,35,39,40         ; REFLECT|BIDE|METRONOME|SWIFT|SKULL_BASH
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50,54               ; TRI_ATTACK|SUBSTITUTE|STRIKE
 
     db BANK(ClefairyPicFront)
@@ -1342,7 +1342,7 @@ ClefableBaseStats: ; 387b2 (e:47b2)
     tmlearn 17,18,19,20,22,24      ; SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|SOLARBEAM|THUNDERBOLT
     tmlearn 25,29,31               ; THUNDER|PSYCHIC_M|MIMIC
     tmlearn 33,34,35,38,39,40      ; REFLECT|BIDE|METRONOME|FIRE_BLAST|SWIFT|SKULL_BASH
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50,54               ; TRI_ATTACK|SUBSTITUTE|STRIKE
 
     db BANK(ClefablePicFront)
@@ -1416,7 +1416,7 @@ NinetalesBaseStats: ; 387ea (e:47ea)
     tmlearn 20                     ; RAGE
     tmlearn 28,31,32               ; TRAPHOLE|MIMIC|DOUBLE_TEAM
     tmlearn 33,34,38,39,40         ; REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH
-    tmlearn 44                     ; REST
+    tmlearn 42,44                  ; DREAM_EATER|REST
     tmlearn 50                     ; SUBSTITUTE
 
     db BANK(NinetalesPicFront)
@@ -1453,7 +1453,7 @@ JigglypuffBaseStats: ; 38806 (e:4806)
     tmlearn 20,24                  ; RAGE|THUNDERBOLT
     tmlearn 31                     ; MIMIC
     tmlearn 33,34,39,40            ; REFLECT|BIDE|SWIFT|SKULL_BASH
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50,54               ; TRI_ATTACK|SUBSTITUTE|STRIKE
 
     db BANK(JigglypuffPicFront)
@@ -1490,7 +1490,7 @@ WigglytuffBaseStats: ; 38822 (e:4822)
     tmlearn 17,18,19,20,22,24      ; SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|SOLARBEAM|THUNDERBOLT
     tmlearn 25,29,31               ; THUNDER|PSYCHIC_M|MIMIC
     tmlearn 33,34,38,39,           ; REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50,54               ; TRI_ATTACK|SUBSTITUTE|STRIKE
 
     db BANK(WigglytuffPicFront)
@@ -1823,7 +1823,7 @@ VenomothBaseStats: ; 3891e (e:491e)
     tmlearn 20,21,22               ; RAGE|MEGA_DRAIN|SOLARBEAM
     tmlearn 29,30,31,32            ; PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM
     tmlearn 33,34,39               ; REFLECT|BIDE|SWIFT
-    tmlearn 41,44,46               ; FLASH|REST|PSYWAVE
+    tmlearn 41,42,44,46            ; FLASH|DREAM_EATER|REST|PSYWAVE
     tmlearn 50                     ; SUBSTITUTE
 
     db BANK(VenomothPicFront)
@@ -1934,7 +1934,7 @@ MeowthBaseStats: ; 38972 (e:4972)
     tmlearn 20,24                  ; RAGE|THUNDERBOLT
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
     tmlearn 34,39,40               ; BIDE|SWIFT|SKULL_BASH
-    tmlearn 44                     ; REST
+    tmlearn 42,44                  ; DREAM_EATER|REST
     tmlearn 50                     ; SUBSTITUTE
 
     db BANK(MeowthPicFront)
@@ -1971,7 +1971,7 @@ PersianBaseStats: ; 3898e (e:498e)
     tmlearn 20,24                  ; RAGE|THUNDERBOLT
     tmlearn 25,31,32               ; THUNDER|MIMIC|DOUBLE_TEAM
     tmlearn 34,39,40               ; BIDE|SWIFT|SKULL_BASH
-    tmlearn 44                     ; REST
+    tmlearn 42,44                  ; DREAM_EATER|REST
     tmlearn 50,51                  ; SUBSTITUTE|BLADE
 
     db BANK(PersianPicFront)
@@ -2341,7 +2341,7 @@ AbraBaseStats: ; 38aa6 (e:4aa6)
     tmlearn 20                     ; RAGE
     tmlearn 29,30,31,32            ; PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM
     tmlearn 33,34,35,40            ; REFLECT|BIDE|METRONOME|SKULL_BASH
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50                  ; TRI_ATTACK|SUBSTITUTE
 
     db BANK(AbraPicFront)
@@ -2378,7 +2378,7 @@ KadabraBaseStats: ; 38ac2 (e:4ac2)
     tmlearn 19,20                  ; SEISMIC_TOSS|RAGE
     tmlearn 29,30,31,32            ; PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM
     tmlearn 33,34,35,40            ; REFLECT|BIDE|METRONOME|SKULL_BASH
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50                  ; TRI_ATTACK|SUBSTITUTE
 
     db BANK(KadabraPicFront)
@@ -2415,7 +2415,7 @@ AlakazamBaseStats: ; 38ade (e:4ade)
     tmlearn 19,20                  ; SEISMIC_TOSS|RAGE
     tmlearn 29,30,31,32            ; PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM
     tmlearn 33,34,35,40            ; REFLECT|BIDE|METRONOME|SKULL_BASH
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50                  ; TRI_ATTACK|SUBSTITUTE
 
     db BANK(AlakazamPicFront)
@@ -2933,7 +2933,7 @@ SlowpokeBaseStats: ; 38c66 (e:4c66)
     tmlearn 20                     ; RAGE
     tmlearn 29,30,31               ; PSYCHIC_M|TELEPORT|MIMIC
     tmlearn 33,34,39,40            ; REFLECT|BIDE|SWIFT|SKULL_BASH
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50,53,54            ; TRI_ATTACK|SUBSTITUTE|TSUNAMI|STRIKE
 
     db BANK(SlowpokePicFront)
@@ -2970,7 +2970,7 @@ SlowbroBaseStats: ; 38c82 (e:4c82)
     tmlearn 17,18,19,20            ; SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE
     tmlearn 26,27,29,30,31         ; EARTHQUAKE|FISSURE|PSYCHIC_M|TELEPORT|MIMIC
     tmlearn 33,34,38,39,40         ; REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50,53,54            ; TRI_ATTACK|SUBSTITUTE|TSUNAMI|STRIKE
 
     db BANK(SlowbroPicFront)
@@ -4006,7 +4006,7 @@ LickitungBaseStats: ; 38f92 (e:4f92)
     tmlearn 17,18,19,20,24         ; SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|THUNDERBOLT
     tmlearn 25,26,27,31            ; THUNDER|EARTHQUAKE|FISSURE|MIMIC
     tmlearn 34,38,40               ; BIDE|FIRE_BLAST|SKULL_BASH
-    tmlearn 44                     ; REST
+    tmlearn 42,44                  ; DREAM_EATER|REST
     tmlearn 50,51,53,54            ; SUBSTITUTE|BLADE|TSUNAMI|STRIKE
 
     db BANK(LickitungPicFront)
@@ -4191,7 +4191,7 @@ ChanseyBaseStats: ; 3901e (e:501e)
     tmlearn 17,18,19,20,22,24      ; SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|SOLARBEAM|THUNDERBOLT
     tmlearn 25,29,31               ; THUNDER|PSYCHIC_M|MIMIC
     tmlearn 33,34,35,37,38,40      ; REFLECT|BIDE|METRONOME|EGG_BOMB|FIRE_BLAST|SKULL_BASH
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50,54               ; TRI_ATTACK|SUBSTITUTE|STRIKE
 
     db BANK(ChanseyPicFront)
@@ -4487,7 +4487,7 @@ StarmieBaseStats: ; 390fe (e:50fe)
     tmlearn 20,24                  ; RAGE|THUNDERBOLT
     tmlearn 25,29,30,31,32         ; THUNDER|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM
     tmlearn 33,34,39               ; REFLECT|BIDE|SWIFT
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50,53               ; TRI_ATTACK|SUBSTITUTE|TSUNAMI
 
     db BANK(StarmiePicFront)
@@ -4857,7 +4857,7 @@ LaprasBaseStats: ; 39216 (e:5216)
     tmlearn 20,22,23,24            ; RAGE|SOLARBEAM|DRAGON_RAGE|THUNDERBOLT
     tmlearn 25,29,31               ; THUNDER|PSYCHIC_M|MIMIC
     tmlearn 33,34,40               ; REFLECT|BIDE|SKULL_BASH
-    tmlearn 44,46                  ; REST|PSYWAVE
+    tmlearn 42,44,46               ; DREAM_EATER|REST|PSYWAVE
     tmlearn 50,53                  ; SUBSTITUTE|TSUNAMI
 
     db BANK(LaprasPicFront)
@@ -5560,7 +5560,7 @@ MewtwoBaseStats: ; 3942a (e:542a)
     tmlearn 17,18,19,20,22,24      ; SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|SOLARBEAM|THUNDERBOLT
     tmlearn 25,29,30,31,32         ; THUNDER|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM
     tmlearn 33,34,35,36,38,39,40   ; REFLECT|BIDE|METRONOME|SELFDESTRUCT|FIRE_BLAST|SWIFT|SKULL_BASH
-    tmlearn 41,44,45,46            ; FLASH|REST|THUNDER_WAVE|PSYWAVE
+    tmlearn 41,42,44,45,46         ; FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE
     tmlearn 49,50,54               ; TRI_ATTACK|SUBSTITUTE|STRIKE
 
     db BANK(MewtwoPicFront)

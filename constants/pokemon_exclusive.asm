@@ -124,6 +124,7 @@ ButterfreeExclusiveMove:
     db CONFUSION
     db SELFDESTRUCT
     db EXPLOSION
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 WeedleExclusiveMove:
@@ -430,6 +431,7 @@ ClefableExclusiveMove:
     db SING
     db LIGHT_SCREEN
     db MINIMIZE
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VulpixExclusiveMove:
@@ -455,6 +457,7 @@ NinetalesExclusiveMove:
     db FLAMETHROWER
     db SLAM
     db FIRE_SPIN
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 JigglypuffExclusiveMove:
@@ -494,6 +497,7 @@ WigglytuffExclusiveMove:
     db DEFENSE_CURL
     db DISABLE
     db DOUBLESLAP
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ZubatExclusiveMove:
@@ -583,6 +587,7 @@ VenomothExclusiveMove:
     db REST
     db PSYWAVE
     db SUBSTITUTE
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DiglettExclusiveMove:
@@ -628,6 +633,7 @@ PersianExclusiveMove:
     db REST
     db SUBSTITUTE
     db BLADE
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PsyduckExclusiveMove:
@@ -783,6 +789,7 @@ AlakazamExclusiveMove:
     db PSYWAVE
     db TRI_ATTACK
     db SUBSTITUTE
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MachopExclusiveMove:
@@ -953,6 +960,7 @@ SlowbroExclusiveMove:
     db TSUNAMI
     db STRIKE
     db AMNESIA
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MagnemiteExclusiveMove:
@@ -1348,6 +1356,7 @@ LickitungExclusiveMove:
     db BLADE
     db TSUNAMI
     db STRIKE
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KoffingExclusiveMove:
@@ -1436,6 +1445,7 @@ ChanseyExclusiveMove:
     db TRI_ATTACK
     db SUBSTITUTE
     db STRIKE
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TangelaExclusiveMove:
@@ -1559,6 +1569,7 @@ StarmieExclusiveMove:
     db TSUNAMI
     db MINIMIZE
     db SUPERSONIC
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MrMimeExclusiveMove:
@@ -1789,6 +1800,7 @@ LaprasExclusiveMove:
     db PSYWAVE
     db SUBSTITUTE
     db TSUNAMI
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DittoExclusiveMove:
@@ -2122,6 +2134,7 @@ MewtwoExclusiveMove:
     db TRI_ATTACK
     db SUBSTITUTE
     db STRIKE
+    db DREAM_EATER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewExclusiveMove:
