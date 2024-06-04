@@ -42,7 +42,7 @@ BulbasaurBaseStats: ; 383de (e:43de)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 3,6                    ; SWORDS_DANCE|TOXIC
+    tmlearn 2,3,6                  ; RAZOR_WIND|SWORDS_DANCE|TOXIC
     tmlearn 0
     tmlearn 20,21,22               ; RAGE|MEGA_DRAIN|SOLARBEAM
     tmlearn 31                     ; MIMIC
@@ -79,7 +79,7 @@ IvysaurBaseStats: ; 383fa (e:43fa)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                  ; SWORDS_DANCE|TOXIC|BODY_SLAM
+    tmlearn 2,3,6,8                ; RAZOR_WIND|SWORDS_DANCE|TOXIC|BODY_SLAM
     tmlearn 9                      ; TAKE_DOWN
     tmlearn 20,21,22               ; RAGE|MEGA_DRAIN|SOLARBEAM
     tmlearn 31                     ; MIMIC
@@ -116,7 +116,7 @@ VenusaurBaseStats: ; 38416 (e:4416)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                  ; SWORDS_DANCE|TOXIC|BODY_SLAM
+    tmlearn 2,3,6,8                ; RAZOR_WIND|SWORDS_DANCE|TOXIC|BODY_SLAM
     tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
     tmlearn 20,21,22               ; RAGE|MEGA_DRAIN|SOLARBEAM
     tmlearn 31                     ; MIMIC
@@ -745,7 +745,7 @@ RaticateBaseStats: ; 385f2 (e:45f2)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                    ; TOXIC|BODY_SLAM
+    tmlearn 3,6,8                  ; SWORDS_DANCE|TOXIC|BODY_SLAM
     tmlearn 9,10,11,12,13,14,15    ; TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM
     tmlearn 20,24                  ; RAGE|THUNDERBOLT
     tmlearn 25,26,28,31,32         ; THUNDER|EARTHQUAKE|TRAPHOLE|MIMIC|DOUBLE_TEAM
@@ -1855,7 +1855,7 @@ DiglettBaseStats: ; 3893a (e:493a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                      ; TOXIC
+    tmlearn 3,6                    ; SWORDS_DANCE|TOXIC
     tmlearn 0
     tmlearn 20                     ; RAGE
     tmlearn 26,27,28,31,32         ; EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM
@@ -2891,7 +2891,7 @@ RapidashBaseStats: ; 38c4a (e:4c4a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,7,8                  ; TOXIC|HORN_DRILL|BODY_SLAM
+    tmlearn 3,6,7,8                ; SWORDS_DANCE|TOXIC|HORN_DRILL|BODY_SLAM
     tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
     tmlearn 20                     ; RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
@@ -3113,7 +3113,7 @@ DoduoBaseStats: ; 38cf2 (e:4cf2)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                    ; TOXIC|BODY_SLAM
+    tmlearn 3,6,8                  ; SWORDS_DANCE|TOXIC|BODY_SLAM
     tmlearn 9                      ; TAKE_DOWN
     tmlearn 20                     ; RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
@@ -3150,7 +3150,7 @@ DodrioBaseStats: ; 38d0e (e:4d0e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                    ; TOXIC|BODY_SLAM
+    tmlearn 3,6,8                  ; SWORDS_DANCE|TOXIC|BODY_SLAM
     tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
     tmlearn 20                     ; RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
@@ -3779,7 +3779,7 @@ ExeggcuteBaseStats: ; 38eea (e:4eea)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6                      ; TOXIC
+    tmlearn 3,6                    ; SWORDS_DANCE|TOXIC
     tmlearn 0
     tmlearn 20,22                  ; RAGE|SOLARBEAM
     tmlearn 29,30,31               ; PSYCHIC_M|TELEPORT|MIMIC
@@ -3816,7 +3816,7 @@ ExeggutorBaseStats: ; 38f06 (e:4f06)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6                      ; TOXIC
+    tmlearn 3,6                    ; SWORDS_DANCE|TOXIC
     tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
     tmlearn 20,21,22               ; RAGE|MEGA_DRAIN|SOLARBEAM
     tmlearn 29,30,31               ; PSYCHIC_M|TELEPORT|MIMIC
@@ -3853,7 +3853,7 @@ CuboneBaseStats: ; 38f22 (e:4f22)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,6                    ; MEGA_PUNCH|TOXIC
+    tmlearn 1,3,6                  ; MEGA_PUNCH|SWORDS_DANCE|TOXIC
     tmlearn 11,12,13               ; BUBBLEBEAM|WATER_GUN|ICE_BEAM
     tmlearn 20                     ; RAGE
     tmlearn 26,27,28,31            ; EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC
@@ -3927,7 +3927,7 @@ HitmonleeBaseStats: ; 38f5a (e:4f5a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                ; MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM
+    tmlearn 1,3,5,6,8              ; MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM
     tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
     tmlearn 17,18,19,20            ; SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE
     tmlearn 26,27,31,32            ; EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM
@@ -3964,7 +3964,7 @@ HitmonchanBaseStats: ; 38f76 (e:4f76)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                ; MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM
+    tmlearn 1,3,5,6,8              ; MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM
     tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
     tmlearn 17,18,19,20            ; SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE
     tmlearn 26,27,31,32            ; EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM
@@ -4297,7 +4297,7 @@ HorseaBaseStats: ; 39072 (e:5072)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                      ; TOXIC
+    tmlearn 2,6                    ; RAZOR_WIND|TOXIC
     tmlearn 11,12,13               ; BUBBLEBEAM|WATER_GUN|ICE_BEAM
     tmlearn 20,23                  ; RAGE|DRAGON_RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
@@ -4334,7 +4334,7 @@ SeadraBaseStats: ; 3908e (e:508e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                      ; TOXIC
+    tmlearn 2,6                    ; RAZOR_WIND|TOXIC
     tmlearn 11,12,13,14,15         ; BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM
     tmlearn 20,23                  ; RAGE|DRAGON_RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
@@ -4371,7 +4371,7 @@ GoldeenBaseStats: ; 390aa (e:50aa)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,7                    ; TOXIC|HORN_DRILL
+    tmlearn 3,6,7                  ; SWORDS_DANCE|TOXIC|HORN_DRILL
     tmlearn 9,11,12,13             ; TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM
     tmlearn 20                     ; RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
@@ -5518,7 +5518,7 @@ DragoniteBaseStats: ; 3940e (e:540e)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 2,6,8                  ; RAZOR_WIND|TOXIC|BODY_SLAM
+    tmlearn 1,2,5,6,8              ; MEGA_PUNCH|RAZOR_WIND|MEGA_KICK|TOXIC|BODY_SLAM
     tmlearn 9,10,11,12,13,14,15    ; TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM
     tmlearn 20,23,24               ; RAGE|DRAGON_RAGE|THUNDERBOLT
     tmlearn 25,31,32               ; THUNDER|MIMIC|DOUBLE_TEAM

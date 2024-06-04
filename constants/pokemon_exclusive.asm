@@ -24,6 +24,7 @@ VenusaurExclusiveMove:
     db SLEEP_POWDER
     db SLUDGE
     db BIND
+    db RAZOR_WIND
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CharmanderExclusiveMove:
@@ -203,6 +204,7 @@ RaticateExclusiveMove:
     db FOCUS_ENERGY
     db SLASH
     db SUPER_FANG
+    db SWORDS_DANCE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SpearowExclusiveMove:
@@ -921,6 +923,7 @@ RapidashExclusiveMove:
     db SKULL_BASH
     db REST
     db SUBSTITUTE
+    db SWORDS_DANCE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SlowpokeExclusiveMove:
@@ -1022,6 +1025,7 @@ DodrioExclusiveMove:
     db TRI_ATTACK
     db SUBSTITUTE
     db BLADE
+    db SWORDS_DANCE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SeelExclusiveMove:
@@ -1241,6 +1245,7 @@ ExeggutorExclusiveMove:
     db STUN_SPORE
     db POISONPOWDER
     db SLEEP_POWDER
+    db SWORDS_DANCE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CuboneExclusiveMove:
@@ -1277,30 +1282,6 @@ MarowakExclusiveMove:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HitmonleeExclusiveMove:
-    db MEGA_PUNCH
-    db MEGA_KICK
-    db TOXIC
-    db BODY_SLAM
-    db TAKE_DOWN
-    db DOUBLE_EDGE
-    db HYPER_BEAM
-    db SUBMISSION
-    db COUNTER
-    db SEISMIC_TOSS
-    db RAGE
-    db EARTHQUAKE
-    db FISSURE
-    db MIMIC
-    db DOUBLE_TEAM
-    db BIDE
-    db METRONOME
-    db SWIFT
-    db SKULL_BASH
-    db REST
-    db SUBSTITUTE
-    db STRIKE
-    db 0
-; ──────────────────────────────────────────────────────────────────────
 HitmonchanExclusiveMove:
     db MEGA_PUNCH
     db MEGA_KICK
@@ -1324,6 +1305,7 @@ HitmonchanExclusiveMove:
     db REST
     db SUBSTITUTE
     db STRIKE
+    db SWORDS_DANCE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LickitungExclusiveMove:
@@ -1517,6 +1499,7 @@ SeadraExclusiveMove:
     db TSUNAMI
     db HAZE
     db HYDRO_PUMP
+    db RAZOR_WIND
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GoldeenExclusiveMove:
@@ -2094,6 +2077,8 @@ DragoniteExclusiveMove:
     db SWOOP
     db TSUNAMI
     db STRIKE
+    db MEGA_PUNCH
+    db MEGA_KICK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewtwoExclusiveMove:
