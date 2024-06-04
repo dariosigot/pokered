@@ -205,6 +205,7 @@ RaticateExclusiveMove:
     db SLASH
     db SUPER_FANG
     db SWORDS_DANCE
+    db COUNTER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SpearowExclusiveMove:
@@ -308,6 +309,7 @@ SandslashExclusiveMove:
     db SUBSTITUTE
     db BLADE
     db STRIKE
+    db COUNTER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 NidoranFExclusiveMove:
@@ -566,6 +568,7 @@ ParasectExclusiveMove:
     db REST
     db SUBSTITUTE
     db BLADE
+    db COUNTER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VenonatExclusiveMove:
@@ -924,6 +927,7 @@ RapidashExclusiveMove:
     db REST
     db SUBSTITUTE
     db SWORDS_DANCE
+    db PAY_DAY
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SlowpokeExclusiveMove:
@@ -1600,6 +1604,7 @@ ScytherExclusiveMove:
     db SUBSTITUTE
     db BLADE
     db SWOOP
+    db COUNTER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 JynxExclusiveMove:
@@ -1826,6 +1831,7 @@ FlareonExclusiveMove:
     db GROWL
     db QUICK_ATTACK
     db DOUBLE_KICK
+    db PAY_DAY
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PorygonExclusiveMove:

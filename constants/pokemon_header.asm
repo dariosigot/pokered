@@ -747,7 +747,7 @@ RaticateBaseStats: ; 385f2 (e:45f2)
     ; learnset
     tmlearn 3,6,8                  ; SWORDS_DANCE|TOXIC|BODY_SLAM
     tmlearn 9,10,11,12,13,14,15    ; TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM
-    tmlearn 20,24                  ; RAGE|THUNDERBOLT
+    tmlearn 18,20,24               ; COUNTER|RAGE|THUNDERBOLT
     tmlearn 25,26,28,31,32         ; THUNDER|EARTHQUAKE|TRAPHOLE|MIMIC|DOUBLE_TEAM
     tmlearn 34,39,40               ; BIDE|SWIFT|SKULL_BASH
     tmlearn 44                     ; REST
@@ -1043,7 +1043,7 @@ SandslashBaseStats: ; 386d2 (e:46d2)
     ; learnset
     tmlearn 3,6,8                  ; SWORDS_DANCE|TOXIC|BODY_SLAM
     tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
-    tmlearn 17,19,20               ; SUBMISSION|SEISMIC_TOSS|RAGE
+    tmlearn 17,18,19,20            ; SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE
     tmlearn 26,27,28,31            ; EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC
     tmlearn 34,39,40               ; BIDE|SWIFT|SKULL_BASH
     tmlearn 44,48                  ; REST|ROCK_SLIDE
@@ -1746,7 +1746,7 @@ ParasectBaseStats: ; 388e6 (e:48e6)
     ; learnset
     tmlearn 3,6,8                  ; SWORDS_DANCE|TOXIC|BODY_SLAM
     tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
-    tmlearn 20,21,22               ; RAGE|MEGA_DRAIN|SOLARBEAM
+    tmlearn 18,20,21,22            ; COUNTER|RAGE|MEGA_DRAIN|SOLARBEAM
     tmlearn 28,31                  ; TRAPHOLE|MIMIC
     tmlearn 33,34                  ; REFLECT|BIDE
     tmlearn 44                     ; REST
@@ -2892,7 +2892,7 @@ RapidashBaseStats: ; 38c4a (e:4c4a)
 
     ; learnset
     tmlearn 3,6,7,8                ; SWORDS_DANCE|TOXIC|HORN_DRILL|BODY_SLAM
-    tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
+    tmlearn 9,10,15,16             ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY
     tmlearn 20                     ; RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
     tmlearn 33,34,38,39,40         ; REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH
@@ -4558,7 +4558,7 @@ ScytherBaseStats: ; 39136 (e:5136)
     ; learnset
     tmlearn 2,3,6                  ; RAZOR_WIND|SWORDS_DANCE|TOXIC
     tmlearn 9,15                   ; TAKE_DOWN|HYPER_BEAM
-    tmlearn 20                     ; RAGE
+    tmlearn 18,20                  ; COUNTER|RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
     tmlearn 34,39,40               ; BIDE|SWIFT|SKULL_BASH
     tmlearn 43,44                  ; SKY_ATTACK|REST
@@ -4927,7 +4927,7 @@ EeveeBaseStats: ; 3924e (e:524e)
 
     ; learnset
     tmlearn 6,8                    ; TOXIC|BODY_SLAM
-    tmlearn 9,10                   ; TAKE_DOWN|DOUBLE_EDGE
+    tmlearn 9,10,16                ; TAKE_DOWN|DOUBLE_EDGE|PAY_DAY
     tmlearn 20                     ; RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
     tmlearn 33,34,39,40            ; REFLECT|BIDE|SWIFT|SKULL_BASH
@@ -4964,7 +4964,7 @@ VaporeonBaseStats: ; 3926a (e:526a)
 
     ; learnset
     tmlearn 6,8                    ; TOXIC|BODY_SLAM
-    tmlearn 9,10,11,12,13,14,15    ; TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM
+    tmlearn 9,10,11,12,13,14,15,16 ; TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY
     tmlearn 20                     ; RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
     tmlearn 33,34,39,40            ; REFLECT|BIDE|SWIFT|SKULL_BASH
@@ -5001,7 +5001,7 @@ JolteonBaseStats: ; 39286 (e:5286)
 
     ; learnset
     tmlearn 6,8                    ; TOXIC|BODY_SLAM
-    tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
+    tmlearn 9,10,15,16             ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY
     tmlearn 20,24                  ; RAGE|THUNDERBOLT
     tmlearn 25,31,32               ; THUNDER|MIMIC|DOUBLE_TEAM
     tmlearn 33,34,39,40            ; REFLECT|BIDE|SWIFT|SKULL_BASH
@@ -5038,7 +5038,7 @@ FlareonBaseStats: ; 392a2 (e:52a2)
 
     ; learnset
     tmlearn 6,8                    ; TOXIC|BODY_SLAM
-    tmlearn 9,10,15                ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM
+    tmlearn 9,10,15,16             ; TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY
     tmlearn 20                     ; RAGE
     tmlearn 31,32                  ; MIMIC|DOUBLE_TEAM
     tmlearn 33,34,38,39,40         ; REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH
