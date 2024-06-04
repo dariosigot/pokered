@@ -134,7 +134,7 @@
     db SPIKE_CANNON , TWO_TO_FIVE_ATTACKS_EFFECT ,  25 , NORMAL   , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Water ; Pwr 20 -> 25
     db CONSTRICT    , SPEED_DOWN_SIDE_EFFECT     ,  10 , NORMAL   , 255 , 06 ; pp 35 ; 0
     db AMNESIA      , SPECIAL_UP2_EFFECT         ,   0 , PSYCHIC  , 255 , 40 ; pp  5 ; - ; PP 20 -> 5
-    db KINESIS      , ACCURACY_DOWN1_EFFECT      ,   0 , PSYCHIC  , 204 , 14 ; pp 15 ; - ; PP 20 -> 5
+    db KINESIS      , ACCURACY_DOWN1_EFFECT      ,   0 , PSYCHIC  , 204 , 40 ; pp  5 ; - ; PP 20 -> 5
     db SOFTBOILED   , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
     db HI_JUMP_KICK , JUMP_KICK_EFFECT           ,  85 , FIGHTING , 229 , 20 ; pp 10 ; 0 ; Pwr 85 -> 130 ; PP 20 -> 10
     db GLARE        , PARALYZE_EFFECT            ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Acr 191 -> 255 ; PP 30 -> 15
