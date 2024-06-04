@@ -137312,7 +137312,7 @@ PortRoyalObject:
 
 
     db $2 ; people
-    db SPRITE_GIRL,08 + 4,03 + 4,$fe,$00,$00+1 ; person
+    db SPRITE_LASS,08 + 4,03 + 4,$fe,$00,$00+1 ; person
     db SPRITE_BALL,10 + 4,05 + 4,$ff,$ff,$80+2,SURFBOARD ; item
 
     ; warp-to
