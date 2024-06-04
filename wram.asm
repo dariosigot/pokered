@@ -1130,6 +1130,11 @@ wEXPBarNeededEXP:
 wEXPBarKeepFullFlag:
     ds 1
 
+wDVForShinyAtkDef ; d47f
+    db
+wDVForShinySpdSpc ; d480
+    db
+
 ; some free bytes
 
 SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]
@@ -1689,7 +1694,6 @@ wDrawMoveDetailsBit7       ; df35 ; bit 7 = Enable Move Details in Moves Menu
     ds 1
 
 wFlagPlaceTitleScreen ; df36 ; counter for title screen
-wDVForShinyAtkDef     ; df36
 wTempStatHI           ; df36
 wSpriteOAMBySpeciesId ; df36
 wTempMoveEnergy       ; df36 ; Temp Buffer for Move Energy
@@ -1697,7 +1701,6 @@ wTempMoveEnergy       ; df36 ; Temp Buffer for Move Energy
 
 wMaxLevel              ; df37
 wChoicePkmnMoveDeleter ; df37
-wDVForShinySpdSpc      ; df37
 wBackupDarkMap         ; df37
 wTempStatLO            ; df37
     ds 1
