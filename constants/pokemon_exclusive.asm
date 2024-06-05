@@ -403,74 +403,6 @@ NidokingExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 ClefairyExclusiveMove:
 ClefableExclusiveMove:
-    db MEGA_PUNCH
-    db MEGA_KICK
-    db TOXIC
-    db BODY_SLAM
-    db TAKE_DOWN
-    db DOUBLE_EDGE
-    db BUBBLEBEAM
-    db WATER_GUN
-    db ICE_BEAM
-    db BLIZZARD
-    db HYPER_BEAM
-    db SUBMISSION
-    db COUNTER
-    db SEISMIC_TOSS
-    db RAGE
-    db SOLARBEAM
-    db THUNDERBOLT
-    db THUNDER
-    db PSYCHIC_M
-    db MIMIC
-    db REFLECT
-    db BIDE
-    db METRONOME
-    db FIRE_BLAST
-    db SWIFT
-    db SKULL_BASH
-    db FLASH
-    db REST
-    db THUNDER_WAVE
-    db PSYWAVE
-    db TRI_ATTACK
-    db SUBSTITUTE
-    db STRIKE
-    db DEFENSE_CURL
-    db SING
-    db LIGHT_SCREEN
-    db MINIMIZE
-    db DREAM_EATER
-    db TRAPHOLE
-    db 0
-; ──────────────────────────────────────────────────────────────────────
-VulpixExclusiveMove:
-NinetalesExclusiveMove:
-    db TOXIC
-    db BODY_SLAM
-    db TAKE_DOWN
-    db DOUBLE_EDGE
-    db HYPER_BEAM
-    db RAGE
-    db TRAPHOLE
-    db MIMIC
-    db DOUBLE_TEAM
-    db REFLECT
-    db BIDE
-    db FIRE_BLAST
-    db SWIFT
-    db SKULL_BASH
-    db REST
-    db SUBSTITUTE
-    db EMBER
-    db QUICK_ATTACK
-    db FLAMETHROWER
-    db SLAM
-    db FIRE_SPIN
-    db DREAM_EATER
-    db SOLARBEAM
-    db 0
-; ──────────────────────────────────────────────────────────────────────
 JigglypuffExclusiveMove:
 WigglytuffExclusiveMove:
     db MEGA_PUNCH
@@ -507,9 +439,38 @@ WigglytuffExclusiveMove:
     db STRIKE
     db DEFENSE_CURL
     db DISABLE
-    db DOUBLESLAP
+    db SING
+    db MINIMIZE
     db DREAM_EATER
     db TRAPHOLE
+    db METRONOME
+    db 0
+; ──────────────────────────────────────────────────────────────────────
+VulpixExclusiveMove:
+NinetalesExclusiveMove:
+    db TOXIC
+    db BODY_SLAM
+    db TAKE_DOWN
+    db DOUBLE_EDGE
+    db HYPER_BEAM
+    db RAGE
+    db TRAPHOLE
+    db MIMIC
+    db DOUBLE_TEAM
+    db REFLECT
+    db BIDE
+    db FIRE_BLAST
+    db SWIFT
+    db SKULL_BASH
+    db REST
+    db SUBSTITUTE
+    db EMBER
+    db QUICK_ATTACK
+    db FLAMETHROWER
+    db SLAM
+    db FIRE_SPIN
+    db DREAM_EATER
+    db SOLARBEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ZubatExclusiveMove:
