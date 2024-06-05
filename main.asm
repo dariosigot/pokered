@@ -7683,114 +7683,35 @@ GetMonName: ; 2f9e (0:2f9e)
     pop hl
     ret
 
-SECTION "GetItemName",ROM0[$2fcf]
-
-GetItemName: ; 2fcf (0:2fcf)
+GetItemName: ; Moved in the Bank
 ; given an item ID at [$D11E],store the name of the item into a string
-;     starting at $CD6D
+; starting at $CD6D
     push hl
     push bc
     ld a,[$D11E]
-    dw 0 ; cp HM_01 ; is this a TM/HM?
-    dw 0 ; jr nc,.Machine
-
     ld [$D0B5],a
     ld a,ITEM_NAME
     ld [W_LISTTYPE],a
     ld a,BANK(ItemNames)
     ld [$D0B7],a
     call GetName
-    jr .Finish
-
-.Machine
-    call GetMachineName
-.Finish
     ld de,$CD6D ; pointer to where item name is stored in RAM
     pop bc
     pop hl
     ret
 
-GetMachineName: ; 2ff3 (0:2ff3)
-; copies the name of the TM/HM in [$D11E] to $CD6D
-    push hl
-    push de
-    push bc
-    ld a,[$D11E]
-    push af
-    cp TM_01 ; is this a TM? [not HM]
-    jr nc,.WriteTM
-; if HM,then write "HM" and add 5 to the item ID,so we can reuse the
-; TM printing code
-    add 5
-    ld [$D11E],a
-    ld hl,HiddenPrefix ; points to "HM"
-    ld bc,2
-    jr .WriteMachinePrefix
-.WriteTM
-    ld hl,TechnicalPrefix ; points to "TM"
-    ld bc,2
-.WriteMachinePrefix
-    ld de,$CD6D
-    call CopyData
-
-; now get the machine number and convert it to text
-    ld a,[$D11E]
-    sub TM_01 - 1
-    ld b,$F6 ; "0"
-.FirstDigit
-    sub 10
-    jr c,.SecondDigit
-    inc b
-    jr .FirstDigit
-.SecondDigit
-    add 10
-    push af
-    ld a,b
-    ld [de],a
-    inc de
-    pop af
-    ld b,$F6 ; "0"
-    add b
-    ld [de],a
-    inc de
-    ld a,"@"
-    ld [de],a
-
-    pop af
-    ld [$D11E],a
-    pop bc
-    pop de
-    pop hl
-    ret
-
-TechnicalPrefix: ; 303c (0:303c)
-    db "TM"
-HiddenPrefix: ; 303e (0:303e)
-    db "HM"
-
 ; sets carry if item is HM,clears carry if item is not HM
 ; Input: a = item ID
-IsItemHM: ; 3040 (0:3040)
-    cp a,HM_01
-    jr c,.notHM
-    cp a,TM_01
-    ret
-.notHM
-    and a
-    ret
+;IsItemHM: ; Moved in the Bank
+;    cp a,HM_01
+;    jr c,.notHM
+;    cp a,TM_01
+;    ret
+;.notHM
+;    and a
+;    ret
 
-; sets carry if move is an HM,clears carry if move is not an HM
-; Input: a = move ID
-IsMoveHM: ; 3049 (0:3049)
-    ld hl,HMMoves
-    ld de,1
-    jp IsInArray
-
-HMMoves: ; 3052 (0:3052)
-    db $ff ; terminator
-    ds 5
-
-GetMoveName: ; 3058 (0:3058)
+GetMoveName: ; Moved in the Bank
     push hl
     ld a,MOVE_NAME
     ld [W_LISTTYPE],a
@@ -7802,6 +7723,8 @@ GetMoveName: ; 3058 (0:3058)
     ld de,$cd6d ; pointer to where move name is stored in RAM
     pop hl
     ret
+
+SECTION "ReloadMapData",ROM0[$3071]
 
 ; reloads text box tile patterns,current map view,and tileset tile patterns
 ReloadMapData: ; 3071 (0:3071)
@@ -9040,8 +8963,6 @@ GetName: ; 376b (0:376b)
 ; returns pointer to name in de
     ld a,[$d0b5]
     ld [$d11e],a
-    ds 2 ; cp a,$C4        ;it's TM/HM
-    ds 3; jp nc,GetMachineName
     ld a,[H_LOADEDROMBANK]
     push af
     push hl
@@ -9112,6 +9033,8 @@ GetName: ; 376b (0:376b)
     call RoutineForRealGB
     ret
 
+SECTION "GetItemPrice",ROM0[$37df]
+
 GetItemPrice: ; 37df (0:37df)
     ld a,[H_LOADEDROMBANK]
     push af
@@ -9128,7 +9051,7 @@ GetItemPrice: ; 37df (0:37df)
     ld h,[hl]
     ld l,a
     ld a,[$cf91]
-    cp HM_01
+    cp TM_01
     jr nc,.asm_3812
     ld bc,$3
 .asm_3802
@@ -16072,8 +15995,8 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     and a
     jr nz,.unsellableItem
     ld a,[$cf91]
-    call IsItemHM
-    jr c,.unsellableItem
+    ds 3 ; call IsItemHM
+    ds 2 ; jr c,.unsellableItem
     ld a,PRICEDITEMLISTMENU
     ld [wListMenuID],a
     ld [$ff8e],a ; halve prices when selling
@@ -17987,8 +17910,8 @@ Func_7aa5: ; 7aa5 (1:7aa5)
     and a
     jr nz,.asm_7aef
     ld a,[$cf91]
-    call IsItemHM
-    jr c,.asm_7aef
+    ds 3 ; call IsItemHM
+    ds 2 ; jr c,.asm_7aef
     push hl
     ld hl,UnnamedText_7b63 ; $7b63
     call PrintText
@@ -23214,15 +23137,13 @@ CheckForCollisionWhenPushingBoulder: ; Moved in the Bank
     ld a,$FF
     jr .end
 
-SECTION "UseItem_",ROMX[$55c7],BANK[$3]
-
-UseItem_: ; d5c7 (3:55c7)
+UseItem_: ; Moved in the Bank
     ld a,1
     ld [$cd6a],a
     ld a,[$cf91]    ;contains item_ID
-    cp a,HM_01
+    cp a,TM_01
     jp nc,ItemUseTMHM
-    ld hl,ItemUsePtrTable
+    ld hl,.ItemUsePtrTable
     dec a
     add a
     ld c,a
@@ -23232,8 +23153,7 @@ UseItem_: ; d5c7 (3:55c7)
     ld h,[hl]
     ld l,a
     jp hl
-
-ItemUsePtrTable: ; d5e1 (3:55e1)
+.ItemUsePtrTable
     dw ItemUseBall       ; MASTER_BALL
     dw ItemUseBall       ; ULTRA_BALL
     dw ItemUseBall       ; GREAT_BALL
@@ -23317,6 +23237,13 @@ ItemUsePtrTable: ; d5e1 (3:55e1)
     dw UnusableItem ; ItemUsePPRestore  ; MAX_ETHER
     dw UnusableItem ; ItemUsePPRestore  ; ELIXER
     dw UnusableItem ; ItemUsePPRestore  ; MAX_ELIXER
+    dw UnusableItem      ; HM_01 : NATURE POWER
+    dw UnusableItem      ; HM_02 : AIR POWER
+    dw UnusableItem      ; HM_03 : WATER POWER
+    dw UnusableItem      ; HM_04 : EARTH POWER
+    dw UnusableItem      ; HM_05 : FIRE POWER
+
+SECTION "ItemUseBall",ROMX[$5687],BANK[$3]
 
 ItemUseBall: ; d687 (3:5687)
     ld a,[W_ISINBATTLE]
@@ -25333,8 +25260,8 @@ ItemUseTMHM: ; e479 (3:6479)
     and a
     ld a,[$cf91]
     jr nz,.TechMach ; if use TECH.MACHINE don't remove it
-    call IsItemHM
-    ret c
+    ds 3 ; call IsItemHM
+    ds 1 ; ret c
     jp RemoveUsedItem
 .TechMach
     jp RemoveTMQty ; but remove inside TM
@@ -25633,9 +25560,9 @@ GetSelectedMoveOffset2: ; e6e9 (3:66e9)
 TossItem_: ; e6f1 (3:66f1)
     push hl
     ld a,[$cf91]
-    call IsItemHM
+    ds 3 ; call IsItemHM
     pop hl
-    jr c,.tooImportantToToss
+    ds 2 ; jr c,.tooImportantToToss
     push hl
     call IsKeyItem_
     ld a,[$d124]
@@ -25704,11 +25631,9 @@ IsKeyItem_: ; e764 (3:6764)
     ld a,$01
     ld [$d124],a
     ld a,[$cf91]
-    cp a,HM_01 ; is the item an HM or TM?
-    jr nc,.checkIfItemIsHM
-; if the item is not an HM or TM
+; if the item is not a TM
     push af
-    ld hl,KeyItemBitfield
+    ld hl,.KeyItemBitfield
     ld de,$cee9
     ld bc,15 ; only 11 bytes are actually used
     call CopyData
@@ -25722,15 +25647,10 @@ IsKeyItem_: ; e764 (3:6764)
     ld a,c
     and a
     ret nz
-.checkIfItemIsHM
-    ld a,[$cf91]
-    call IsItemHM
-    ret c
     xor a
     ld [$d124],a
     ret
-
-KeyItemBitfield: ; e799 (3:6799)
+.KeyItemBitfield
     db %11110000
     db %00000001
     db %11110000
@@ -25741,7 +25661,9 @@ KeyItemBitfield: ; e799 (3:6799)
     db %11000000
     db %11110000
     db %00111111
-    db %00000000
+    db %11111000
+
+SECTION "SendNewMonToBox",ROMX[$67a4],BANK[$3]
 
 SendNewMonToBox: ; e7a4 (3:67a4)
     ld de,W_NUMINBOX ; $da80
@@ -25936,7 +25858,7 @@ ItemUseTechMach:
 GetTMChoiceItemID:
     cp TM_01 ; less then TM01?
     jr c,.Init
-    cp TM_54+1 ; greater then TM54?
+    cp TM_56+1 ; greater then TM54?
     jr nc,.Init
     call GetTMQty
     jr z,.Init
@@ -25946,7 +25868,7 @@ GetTMChoiceItemID:
     jr .start
 .Init
     ld hl,wTM
-    ld b,((TM_54-TM_01+1) >> 2)+1
+    ld b,((TM_56-TM_01+1) >> 2)+1
 .LoopSearchAtLeastOne
     ld a,[hli]
     and a
@@ -25960,7 +25882,7 @@ GetTMChoiceItemID:
     ld a,TM_01-1
 .TryNext
     inc a
-    cp TM_54+1
+    cp TM_56+1
     jr nz,.continue1
     ld a,TM_01
 .continue1
@@ -25971,7 +25893,7 @@ GetTMChoiceItemID:
     dec a
     cp TM_01-1
     jr nz,.continue2
-    ld a,TM_54
+    ld a,TM_56
 .continue2
     call GetTMQty ; input a = TM ID | output c = Qty | z if Qty=0
     jr z,.TryPrev
@@ -29283,6 +29205,22 @@ asm_128fb:
     pop de
     ret
 
+WildMonEncounterSlotChances: ; Moved in the Bank
+; There are 10 slots for wild pokemon,and this is the table that defines how common each of
+; those 10 slots is. A random number is generated and then the first byte of each pair in this
+; table is compared against that random number. If the random number is less than or equal
+; to the first byte,then that slot is chosen.  The second byte is double the slot number.
+    db $32,$00 ; 51/256 = 19.9% chance of slot 0
+    db $65,$02 ; 51/256 = 19.9% chance of slot 1
+    db $8C,$04 ; 39/256 = 15.2% chance of slot 2
+    db $A5,$06 ; 25/256 =  9.8% chance of slot 3
+    db $BE,$08 ; 25/256 =  9.8% chance of slot 4
+    db $D7,$0A ; 25/256 =  9.8% chance of slot 5
+    db $E4,$0C ; 13/256 =  5.1% chance of slot 6
+    db $F1,$0E ; 13/256 =  5.1% chance of slot 7
+    db $FC,$10 ; 11/256 =  4.3% chance of slot 8
+    db $FF,$12 ;  3/256 =  1.2% chance of slot 9
+
 SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
 
 ; [$D07D] = menu type / message ID
@@ -30102,8 +30040,8 @@ StartMenu_Item: ; 13302 (4:7302)
     and a
     jr nz,.skipAskingQuantity
     ld a,[$cf91]
-    call IsItemHM
-    jr c,.skipAskingQuantity
+    ds 3 ; call IsItemHM
+    ds 2 ; jr c,.skipAskingQuantity
     call DisplayChooseQuantityMenu
     inc a
     jr z,.tossZeroItems
@@ -30599,7 +30537,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db FIRE_BLAST   ; TM_38
     db SWIFT        ; TM_39
     db SKULL_BASH   ; TM_40
-    db FLASH        ; TM_55
+    db STRUGGLE     ; TM_41
     db DREAM_EATER  ; TM_42
     db SKY_ATTACK   ; TM_43
     db REST         ; TM_44
@@ -30613,6 +30551,8 @@ TechnicalMachines: ; 13773 (4:7773)
     db SWOOP        ; TM_52
     db TSUNAMI      ; TM_53
     db STRIKE       ; TM_54
+    db FLASH        ; TM_55
+    db STRUGGLE     ; TM_56
 
 EndOfBattle: ; Moved in the Bank
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -30803,23 +30743,7 @@ TryDoWildEncounter: ; Moved in the Bank
     xor a
     ret
 
-SECTION "WildMonEncounterSlotChances",ROMX[$7918],BANK[$4]
-
-WildMonEncounterSlotChances: ; 13918 (4:7918)
-; There are 10 slots for wild pokemon,and this is the table that defines how common each of
-; those 10 slots is. A random number is generated and then the first byte of each pair in this
-; table is compared against that random number. If the random number is less than or equal
-; to the first byte,then that slot is chosen.  The second byte is double the slot number.
-    db $32,$00 ; 51/256 = 19.9% chance of slot 0
-    db $65,$02 ; 51/256 = 19.9% chance of slot 1
-    db $8C,$04 ; 39/256 = 15.2% chance of slot 2
-    db $A5,$06 ; 25/256 =  9.8% chance of slot 3
-    db $BE,$08 ; 25/256 =  9.8% chance of slot 4
-    db $D7,$0A ; 25/256 =  9.8% chance of slot 5
-    db $E4,$0C ; 13/256 =  5.1% chance of slot 6
-    db $F1,$0E ; 13/256 =  5.1% chance of slot 7
-    db $FC,$10 ; 11/256 =  4.3% chance of slot 8
-    db $FF,$12 ;  3/256 =  1.2% chance of slot 9
+SECTION "Func_1392c",ROMX[$792c],BANK[$4]
 
 Func_1392c: ; 1392c (4:792c)
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -83859,7 +83783,7 @@ CheckReachLevelLimit:
 
 ; Celadon Dept. Store 2F (2)
 CeladonMart2Text2:
-    db $FE,14
+    db $FE,12
     db TM_01 ; MEGA_PUNCH
     db TM_02 ; RAZOR_WIND
     db TM_04 ; WHIRLWIND
@@ -131404,11 +131328,11 @@ ItemNames: ; 472b (1:472b)
     db "MAX ETHER@"    ; $51
     db "ELIXER@"       ; $52
     db "MAX ELIXER@"   ; $53
-    db "?@"            ; $54
-    db "?@"            ; $55
-    db "?@"            ; $56
-    db "?@"            ; $57
-    db "?@"            ; $58
+    db "NATURE POWER@" ; $54
+    db "AIR POWER@"    ; $55
+    db "WATER POWER@"  ; $56
+    db "EARTH POWER@"  ; $57
+    db "FIRE POWER@"   ; $58
     db "?@"            ; $59
     db "?@"            ; $5A
     db "?@"            ; $5B
@@ -131516,65 +131440,65 @@ ItemNames: ; 472b (1:472b)
     db "?@"            ; $C1
     db "?@"            ; $C2
     db "?@"            ; $C3
-    db "NATURE POWER@" ; $C4
-    db "AIR POWER@"    ; $C5
-    db "WATER POWER@"  ; $C6
-    db "EARTH POWER@"  ; $C7
-    db "FIRE POWER@"   ; $C8
-    db "TM01:M.PNCH@"  ; $C9 ; TM_01 ; Market
-    db "TM02:RAZ.WND@" ; $CA ; TM_02 ; Market
-    db "TM03:SW.DNCE@" ; $CB ; TM_03
-    db "TM04:WHRLWND@" ; $CC ; TM_04
-    db "TM05:MEG.KCK@" ; $CD ; TM_05 ; Market
-    db "TM06:TOXIC@"   ; $CE ; TM_06
-    db "TM07:HRN DR.@" ; $CF ; TM_07 ; Market
-    db "TM08:BDY SLM@" ; $D0 ; TM_08
-    db "TM09:TAK.DWN@" ; $D1 ; TM_09 ; Market
-    db "TM10:DB.EDG@"  ; $D2 ; TM_10
-    db "TM11:BUB.B.@"  ; $D3 ; TM_11
-    db "TM12:WTR GUN@" ; $D4 ; TM_12
-    db "TM13:ICE BM.@" ; $D5 ; TM_13
-    db "TM14:BLZZARD@" ; $D6 ; TM_14
-    db "TM15:HYP.B.@"  ; $D7 ; TM_15
-    db "TM16:PAY DAY@" ; $D8 ; TM_16
-    db "TM17:SUBMIS.@" ; $D9 ; TM_17 ; Market
-    db "TM18:COUNTER@" ; $DA ; TM_18
-    db "TM19:SSM TOS@" ; $DB ; TM_19
-    db "TM20:RAGE@"    ; $DC ; TM_20
-    db "TM21:M.DRAIN@" ; $DD ; TM_21
-    db "TM22:SOLRBM.@" ; $DE ; TM_22
-    db "TM23:DRG RGE@" ; $DF ; TM_23
-    db "TM24:THUNDRB@" ; $E0 ; TM_24
-    db "TM25:THUNDER@" ; $E1 ; TM_25
-    db "TM26:EARTHQ.@" ; $E2 ; TM_26
-    db "TM27:FISSURE@" ; $E3 ; TM_27
-    db "TM28:DIG@"     ; $E4 ; TM_28
-    db "TM29:PSYCHIC@" ; $E5 ; TM_29
-    db "TM30:TELEPRT@" ; $E6 ; TM_30
-    db "TM31:MIMIC@"   ; $E7 ; TM_31
-    db "TM32:DB.TEAM@" ; $E8 ; TM_32 ; Market
-    db "TM33:REFLECT@" ; $E9 ; TM_33 ; Market
-    db "TM34:BIDE@"    ; $EA ; TM_34
-    db "TM35:METRONM@" ; $EB ; TM_35
-    db "TM36:SELFDST@" ; $EC ; TM_36
-    db "TM37:FLMTRWR@" ; $ED ; TM_37
-    db "TM38:FIR.BLS@" ; $EE ; TM_38
-    db "TM39:SWIFT@"   ; $EF ; TM_39
-    db "TM40:SKUL B.@" ; $F0 ; TM_40
-    db "TM55:FLASH@"   ; $F1 ; TM_55
-    db "TM42:DRM EAT@" ; $F2 ; TM_42
-    db "TM43:SKY ATK@" ; $F3 ; TM_43
-    db "TM44:REST@"    ; $F4 ; TM_44
-    db "TM45:THND WV@" ; $F5 ; TM_45
-    db "TM46:PSYWAVE@" ; $F6 ; TM_46
-    db "TM47:EXPLOS.@" ; $F7 ; TM_47
-    db "TM48:RCK SLD@" ; $F8 ; TM_48
-    db "TM49:TRI ATK@" ; $F9 ; TM_49
-    db "TM50:SUBSTIT@" ; $FA ; TM_50
-    db "TM51:BLADE@"   ; $FB ; TM_51
-    db "TM52:SWOOP@"   ; $FC ; TM_52
-    db "TM53:TSUNAMI@" ; $FD ; TM_53
-    db "TM54:STRIKE@"  ; $FE ; TM_54
+    db "TM01:M.PNCH@"  ; $C4 ; TM_01 ; Market
+    db "TM02:RAZ.WND@" ; $C5 ; TM_02 ; Market
+    db "TM03:SW.DNCE@" ; $C6 ; TM_03
+    db "TM04:WHRLWND@" ; $C7 ; TM_04
+    db "TM05:MEG.KCK@" ; $C8 ; TM_05 ; Market
+    db "TM06:TOXIC@"   ; $C9 ; TM_06
+    db "TM07:HRN DR.@" ; $CA ; TM_07 ; Market
+    db "TM08:BDY SLM@" ; $CB ; TM_08
+    db "TM09:TAK.DWN@" ; $CC ; TM_09 ; Market
+    db "TM10:DB.EDG@"  ; $CD ; TM_10
+    db "TM11:BUB.B.@"  ; $CE ; TM_11
+    db "TM12:WTR GUN@" ; $CF ; TM_12
+    db "TM13:ICE BM.@" ; $D0 ; TM_13
+    db "TM14:BLZZARD@" ; $D1 ; TM_14
+    db "TM15:HYP.B.@"  ; $D2 ; TM_15
+    db "TM16:PAY DAY@" ; $D3 ; TM_16
+    db "TM17:SUBMIS.@" ; $D4 ; TM_17 ; Market
+    db "TM18:COUNTER@" ; $D5 ; TM_18
+    db "TM19:SSM TOS@" ; $D6 ; TM_19
+    db "TM20:RAGE@"    ; $D7 ; TM_20
+    db "TM21:M.DRAIN@" ; $D8 ; TM_21
+    db "TM22:SOLRBM.@" ; $D9 ; TM_22
+    db "TM23:DRG RGE@" ; $DA ; TM_23
+    db "TM24:THUNDRB@" ; $DB ; TM_24
+    db "TM25:THUNDER@" ; $DC ; TM_25
+    db "TM26:EARTHQ.@" ; $DD ; TM_26
+    db "TM27:FISSURE@" ; $DE ; TM_27
+    db "TM28:DIG@"     ; $DF ; TM_28
+    db "TM29:PSYCHIC@" ; $E0 ; TM_29
+    db "TM30:TELEPRT@" ; $E1 ; TM_30
+    db "TM31:MIMIC@"   ; $E2 ; TM_31
+    db "TM32:DB.TEAM@" ; $E3 ; TM_32 ; Market
+    db "TM33:REFLECT@" ; $E4 ; TM_33 ; Market
+    db "TM34:BIDE@"    ; $E5 ; TM_34
+    db "TM35:METRONM@" ; $E6 ; TM_35
+    db "TM36:SELFDST@" ; $E7 ; TM_36
+    db "TM37:FLMTRWR@" ; $E8 ; TM_37
+    db "TM38:FIR.BLS@" ; $E9 ; TM_38
+    db "TM39:SWIFT@"   ; $EA ; TM_39
+    db "TM40:SKUL B.@" ; $EB ; TM_40
+    db "TM41:STRUGGLE" ; $FB ; TM_41
+    db "TM42:DRM EAT@" ; $ED ; TM_42
+    db "TM43:SKY ATK@" ; $EE ; TM_43
+    db "TM44:REST@"    ; $EF ; TM_44
+    db "TM45:THND WV@" ; $F0 ; TM_45
+    db "TM46:PSYWAVE@" ; $F1 ; TM_46
+    db "TM47:EXPLOS.@" ; $F2 ; TM_47
+    db "TM48:RCK SLD@" ; $F3 ; TM_48
+    db "TM49:TRI ATK@" ; $F4 ; TM_49
+    db "TM50:SUBSTIT@" ; $F5 ; TM_50
+    db "TM51:BLADE@"   ; $F6 ; TM_51
+    db "TM52:SWOOP@"   ; $F7 ; TM_52
+    db "TM53:TSUNAMI@" ; $F8 ; TM_53
+    db "TM54:STRIKE@"  ; $F9 ; TM_54
+    db "TM55:FLASH@"   ; $EC ; TM_55
+    db "TM56:STRUGGLE" ; $FB ; TM_56
+    db "?@"            ; $FC
+    db "?@"            ; $FD
+    db "?@"            ; $FE
     db "CANCEL@"       ; $FF
     db "ITEM 00@"      ; $00
 

@@ -82,63 +82,66 @@ ETHER         EQU $50
 MAX_ETHER     EQU $51
 ELIXER        EQU $52
 MAX_ELIXER    EQU $53
-HM_01         EQU $C4 ; NATURE POWER
-HM_02         EQU $C5 ; AIR POWER
-HM_03         EQU $C6 ; WATER POWER
-HM_04         EQU $C7 ; EARTH POWER
-HM_05         EQU $C8 ; FIRE POWER
-TM_01         EQU $C9
-TM_02         EQU $CA
-TM_03         EQU $CB
-TM_04         EQU $CC
-TM_05         EQU $CD
-TM_06         EQU $CE
-TM_07         EQU $CF
-TM_08         EQU $D0
-TM_09         EQU $D1
-TM_10         EQU $D2
-TM_11         EQU $D3
-TM_12         EQU $D4
-TM_13         EQU $D5
-TM_14         EQU $D6
-TM_15         EQU $D7
-TM_16         EQU $D8
-TM_17         EQU $D9
-TM_18         EQU $DA
-TM_19         EQU $DB
-TM_20         EQU $DC
-TM_21         EQU $DD
-TM_22         EQU $DE
-TM_23         EQU $DF
-TM_24         EQU $E0
-TM_25         EQU $E1
-TM_26         EQU $E2
-TM_27         EQU $E3
-TM_28         EQU $E4
-TM_29         EQU $E5
-TM_30         EQU $E6
-TM_31         EQU $E7
-TM_32         EQU $E8
-TM_33         EQU $E9
-TM_34         EQU $EA
-TM_35         EQU $EB
-TM_36         EQU $EC
-TM_37         EQU $ED
-TM_38         EQU $EE
-TM_39         EQU $EF
-TM_40         EQU $F0
-;TM_41        EQU $F1 ; TODO : Softboiled Sostituito
-TM_55         EQU $F1
-TM_42         EQU $F2
-TM_43         EQU $F3
-TM_44         EQU $F4
-TM_45         EQU $F5
-TM_46         EQU $F6
-TM_47         EQU $F7
-TM_48         EQU $F8
-TM_49         EQU $F9
-TM_50         EQU $FA
-TM_51         EQU $FB
-TM_52         EQU $FC
-TM_53         EQU $FD
-TM_54         EQU $FE
+
+HM_01         EQU $54 ; NATURE POWER
+HM_02         EQU $55 ; AIR POWER
+HM_03         EQU $56 ; WATER POWER
+HM_04         EQU $57 ; EARTH POWER
+HM_05         EQU $58 ; FIRE POWER
+
+TM_01         EQU $C4
+TM_02         EQU $C5
+TM_03         EQU $C6
+TM_04         EQU $C7
+TM_05         EQU $C8
+TM_06         EQU $C9
+TM_07         EQU $CA
+TM_08         EQU $CB
+TM_09         EQU $CC
+TM_10         EQU $CD
+TM_11         EQU $CE
+TM_12         EQU $CF
+TM_13         EQU $D0
+TM_14         EQU $D1
+TM_15         EQU $D2
+TM_16         EQU $D3
+TM_17         EQU $D4
+TM_18         EQU $D5
+TM_19         EQU $D6
+TM_20         EQU $D7
+TM_21         EQU $D8
+TM_22         EQU $D9
+TM_23         EQU $DA
+TM_24         EQU $DB
+TM_25         EQU $DC
+TM_26         EQU $DD
+TM_27         EQU $DE
+TM_28         EQU $DF
+TM_29         EQU $E0
+TM_30         EQU $E1
+TM_31         EQU $E2
+TM_32         EQU $E3
+TM_33         EQU $E4
+TM_34         EQU $E5
+TM_35         EQU $E6
+TM_36         EQU $E7
+TM_37         EQU $E8
+TM_38         EQU $E9
+TM_39         EQU $EA
+TM_40         EQU $EB
+TM_41         EQU $EC
+TM_42         EQU $ED
+TM_43         EQU $EE
+TM_44         EQU $EF
+TM_45         EQU $F0
+TM_46         EQU $F1
+TM_47         EQU $F2
+TM_48         EQU $F3
+TM_49         EQU $F4
+TM_50         EQU $F5
+TM_51         EQU $F6
+TM_52         EQU $F7
+TM_53         EQU $F8
+TM_54         EQU $F9
+TM_55         EQU $FA
+TM_56         EQU $FB
