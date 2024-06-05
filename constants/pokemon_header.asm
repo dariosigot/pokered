@@ -42,7 +42,7 @@ BulbasaurBaseStats: ; 383de (e:43de)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 2,3,6                   ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
+    tmlearn 02,03,06                ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
     tmlearn 0
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
@@ -79,8 +79,8 @@ IvysaurBaseStats: ; 383fa (e:43fa)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 2,3,6,8                 ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 02,03,06,08             ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
     tmlearn 33,34                   ; |REFLECT|BIDE|
@@ -116,8 +116,8 @@ VenusaurBaseStats: ; 38416 (e:4416)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 2,3,6,8                 ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 02,03,06,08             ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 26,27,31                ; |EARTHQUAKE|FISSURE|MIMIC|
     tmlearn 33,34                   ; |REFLECT|BIDE|
@@ -153,7 +153,7 @@ CharmanderBaseStats: ; 38432 (e:4432)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,3,6                   ; |MEGA_PUNCH|SWORDS_DANCE|TOXIC|
+    tmlearn 01,03,06                ; |MEGA_PUNCH|SWORDS_DANCE|TOXIC|
     tmlearn 0
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -190,8 +190,8 @@ CharmeleonBaseStats: ; 3844e (e:444e)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,3,5,6                 ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 01,03,05,06             ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 19,23                   ; |SEISMIC_TOSS|DRAGON_RAGE|
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -227,8 +227,8 @@ CharizardBaseStats: ; 3846a (e:446a)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,3,5,6,8               ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 01,03,05,06,08          ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19,22,23          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|DRAGON_RAGE|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -264,7 +264,7 @@ SquirtleBaseStats: ; 38486 (e:4486)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,6                     ; |MEGA_PUNCH|TOXIC|
+    tmlearn 01,06                   ; |MEGA_PUNCH|TOXIC|
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 0
     tmlearn 31                      ; |MIMIC|
@@ -301,8 +301,8 @@ WartortleBaseStats: ; 384a2 (e:44a2)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,11,12,13,14           ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,11,12,13,14          ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|
     tmlearn 19                      ; |SEISMIC_TOSS|
     tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
@@ -338,8 +338,8 @@ BlastoiseBaseStats: ; 384be (e:44be)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
@@ -449,7 +449,7 @@ ButterfreeBaseStats: ; 38512 (e:4512)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
@@ -560,8 +560,8 @@ BeedrillBaseStats: ; 38566 (e:4566)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,3,6                   ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 02,03,06                ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
@@ -597,7 +597,7 @@ PidgeyBaseStats: ; 38582 (e:4582)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
     tmlearn 0
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -634,8 +634,8 @@ PidgeottoBaseStats: ; 3859e (e:459e)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
@@ -671,8 +671,8 @@ PidgeotBaseStats: ; 385ba (e:45ba)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
@@ -708,7 +708,7 @@ RattataBaseStats: ; 385d6 (e:45d6)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 0
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
@@ -745,8 +745,8 @@ RaticateBaseStats: ; 385f2 (e:45f2)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 18,24                   ; |COUNTER|THUNDERBOLT|
     tmlearn 25,26,28,31,32          ; |THUNDER|EARTHQUAKE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
@@ -782,8 +782,8 @@ SpearowBaseStats: ; 3860e (e:460e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,39                   ; |BIDE|SWIFT|
@@ -819,8 +819,8 @@ FearowBaseStats: ; 3862a (e:462a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,39                   ; |BIDE|SWIFT|
@@ -856,8 +856,8 @@ EkansBaseStats: ; 38646 (e:4646)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 06                      ; |TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 21                      ; |MEGA_DRAIN|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,40                   ; |BIDE|SKULL_BASH|
@@ -893,8 +893,8 @@ ArbokBaseStats: ; 38662 (e:4662)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 21                      ; |MEGA_DRAIN|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,40                   ; |BIDE|SKULL_BASH|
@@ -930,7 +930,7 @@ PikachuBaseStats: ; 3867e (e:467e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,6                     ; |MEGA_PUNCH|TOXIC|
+    tmlearn 01,06                   ; |MEGA_PUNCH|TOXIC|
     tmlearn 16                      ; |PAY_DAY|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
@@ -967,8 +967,8 @@ RaichuBaseStats: ; 3869a (e:469a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15,16              ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
     tmlearn 17,19,24                ; |SUBMISSION|SEISMIC_TOSS|THUNDERBOLT|
     tmlearn 25,28,31                ; |THUNDER|TRAPHOLE|MIMIC|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
@@ -1004,8 +1004,8 @@ SandshrewBaseStats: ; 386b6 (e:46b6)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6                     ; |SWORDS_DANCE|TOXIC|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 0
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
@@ -1041,8 +1041,8 @@ SandslashBaseStats: ; 386d2 (e:46d2)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
@@ -1078,7 +1078,7 @@ NidoranFBaseStats: ; 386ee (e:46ee)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 0
     tmlearn 31                      ; |MIMIC|
@@ -1115,8 +1115,8 @@ NidorinaBaseStats: ; 3870a (e:470a)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,11,12,13              ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
     tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
@@ -1152,8 +1152,8 @@ NidoqueenBaseStats: ; 38726 (e:4726)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,7,8               ; |MEGA_PUNCH|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
+    tmlearn 01,05,06,07,08          ; |MEGA_PUNCH|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -1189,7 +1189,7 @@ NidoranMBaseStats: ; 38742 (e:4742)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 6,7                     ; |TOXIC|HORN_DRILL|
+    tmlearn 06,07                   ; |TOXIC|HORN_DRILL|
     tmlearn 0
     tmlearn 0
     tmlearn 31                      ; |MIMIC|
@@ -1226,8 +1226,8 @@ NidorinoBaseStats: ; 3875e (e:475e)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 6,7,8                   ; |TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,11,12,13              ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
+    tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
     tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
@@ -1263,8 +1263,8 @@ NidokingBaseStats: ; 3877a (e:477a)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,7,8               ; |MEGA_PUNCH|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
+    tmlearn 01,05,06,07,08          ; |MEGA_PUNCH|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -1300,8 +1300,8 @@ ClefairyBaseStats: ; 38796 (e:4796)
     db 4 ; growth rate
 
     ; learnset
-    tmlearn 1,6,8                   ; |MEGA_PUNCH|TOXIC|BODY_SLAM|
-    tmlearn 9,11,12,13              ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
+    tmlearn 01,06,08                ; |MEGA_PUNCH|TOXIC|BODY_SLAM|
+    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 31                      ; |MIMIC|
     tmlearn 33,34,35,37,39,40       ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|SWIFT|SKULL_BASH|
@@ -1337,8 +1337,8 @@ ClefableBaseStats: ; 387b2 (e:47b2)
     db 4 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,29,31                ; |THUNDER|PSYCHIC_M|MIMIC|
     tmlearn 33,34,35,37,38,39,40    ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -1374,8 +1374,8 @@ VulpixBaseStats: ; 387ce (e:47ce)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 06                      ; |TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -1411,8 +1411,8 @@ NinetalesBaseStats: ; 387ea (e:47ea)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 22                      ; |SOLARBEAM|
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -1448,8 +1448,8 @@ JigglypuffBaseStats: ; 38806 (e:4806)
     db 4 ; growth rate
 
     ; learnset
-    tmlearn 1,6,8                   ; |MEGA_PUNCH|TOXIC|BODY_SLAM|
-    tmlearn 9,11,12,13              ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
+    tmlearn 01,06,08                ; |MEGA_PUNCH|TOXIC|BODY_SLAM|
+    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 31                      ; |MIMIC|
     tmlearn 33,34,35,37,39,40       ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|SWIFT|SKULL_BASH|
@@ -1485,8 +1485,8 @@ WigglytuffBaseStats: ; 38822 (e:4822)
     db 4 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,29,31                ; |THUNDER|PSYCHIC_M|MIMIC|
     tmlearn 33,34,35,37,38,39,40    ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -1522,7 +1522,7 @@ ZubatBaseStats: ; 3883e (e:483e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
     tmlearn 0
     tmlearn 21                      ; |MEGA_DRAIN|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -1559,8 +1559,8 @@ GolbatBaseStats: ; 3885a (e:485a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 9,15                    ; |TAKE_DOWN|HYPER_BEAM|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 09,15                   ; |TAKE_DOWN|HYPER_BEAM|
     tmlearn 21                      ; |MEGA_DRAIN|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,39                   ; |BIDE|SWIFT|
@@ -1596,7 +1596,7 @@ OddishBaseStats: ; 38876 (e:4876)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 3,6                     ; |SWORDS_DANCE|TOXIC|
+    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
     tmlearn 0
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
@@ -1633,8 +1633,8 @@ GloomBaseStats: ; 38892 (e:4892)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 3,6                     ; |SWORDS_DANCE|TOXIC|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
     tmlearn 33,34                   ; |REFLECT|BIDE|
@@ -1670,8 +1670,8 @@ VileplumeBaseStats: ; 388ae (e:48ae)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
     tmlearn 33,34                   ; |REFLECT|BIDE|
@@ -1707,8 +1707,8 @@ ParasBaseStats: ; 388ca (e:48ca)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6                     ; |SWORDS_DANCE|TOXIC|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
     tmlearn 33,34                   ; |REFLECT|BIDE|
@@ -1744,8 +1744,8 @@ ParasectBaseStats: ; 388e6 (e:48e6)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 18,21,22                ; |COUNTER|MEGA_DRAIN|SOLARBEAM|
     tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
     tmlearn 33,34                   ; |REFLECT|BIDE|
@@ -1781,7 +1781,7 @@ VenonatBaseStats: ; 38902 (e:4902)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 21                      ; |MEGA_DRAIN|
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
@@ -1818,7 +1818,7 @@ VenomothBaseStats: ; 3891e (e:491e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
     tmlearn 10,15                   ; |DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
@@ -1855,7 +1855,7 @@ DiglettBaseStats: ; 3893a (e:493a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6                     ; |SWORDS_DANCE|TOXIC|
+    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
     tmlearn 0
     tmlearn 0
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
@@ -1892,8 +1892,8 @@ DugtrioBaseStats: ; 38956 (e:4956)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 0
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34                      ; |BIDE|
@@ -1929,7 +1929,7 @@ MeowthBaseStats: ; 38972 (e:4972)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 11,12,16                ; |BUBBLEBEAM|WATER_GUN|PAY_DAY|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -1966,8 +1966,8 @@ PersianBaseStats: ; 3898e (e:498e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,15,16        ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|HYPER_BEAM|PAY_DAY|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,15,16       ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|HYPER_BEAM|PAY_DAY|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,28,31,32             ; |THUNDER|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
@@ -2003,7 +2003,7 @@ PsyduckBaseStats: ; 389aa (e:49aa)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,6                     ; |MEGA_PUNCH|TOXIC|
+    tmlearn 01,06                   ; |MEGA_PUNCH|TOXIC|
     tmlearn 11,12,13,16             ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|PAY_DAY|
     tmlearn 0
     tmlearn 29,30,31                ; |PSYCHIC_M|TELEPORT|MIMIC|
@@ -2040,8 +2040,8 @@ GolduckBaseStats: ; 389c6 (e:49c6)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,11,12,13,14,15,16     ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,11,12,13,14,15,16    ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 28,29,30,31,32          ; |TRAPHOLE|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
@@ -2077,8 +2077,8 @@ MankeyBaseStats: ; 389e2 (e:49e2)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6                   ; |MEGA_PUNCH|MEGA_KICK|TOXIC|
-    tmlearn 9,16                    ; |TAKE_DOWN|PAY_DAY|
+    tmlearn 01,05,06                ; |MEGA_PUNCH|MEGA_KICK|TOXIC|
+    tmlearn 09,16                   ; |TAKE_DOWN|PAY_DAY|
     tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
@@ -2114,8 +2114,8 @@ PrimeapeBaseStats: ; 389fe (e:49fe)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15,16              ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
     tmlearn 25,26,28,31,32          ; |THUNDER|EARTHQUAKE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
@@ -2151,8 +2151,8 @@ GrowlitheBaseStats: ; 38a1a (e:4a1a)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 06                      ; |TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -2188,8 +2188,8 @@ ArcanineBaseStats: ; 38a36 (e:4a36)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 22,23                   ; |SOLARBEAM|DRAGON_RAGE|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -2225,7 +2225,7 @@ PoliwagBaseStats: ; 38a52 (e:4a52)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -2262,8 +2262,8 @@ PoliwhirlBaseStats: ; 38a6e (e:4a6e)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,11,12,13,14           ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,11,12,13,14          ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 28,29,31,32             ; |TRAPHOLE|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
@@ -2299,8 +2299,8 @@ PoliwrathBaseStats: ; 38a8a (e:4a8a)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,29,31,32       ; |EARTHQUAKE|FISSURE|TRAPHOLE|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
@@ -2336,7 +2336,7 @@ AbraBaseStats: ; 38aa6 (e:4aa6)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 0
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
@@ -2373,7 +2373,7 @@ KadabraBaseStats: ; 38ac2 (e:4ac2)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 19                      ; |SEISMIC_TOSS|
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
@@ -2410,7 +2410,7 @@ AlakazamBaseStats: ; 38ade (e:4ade)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 19                      ; |SEISMIC_TOSS|
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
@@ -2447,8 +2447,8 @@ MachopBaseStats: ; 38afa (e:4afa)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6                   ; |MEGA_PUNCH|MEGA_KICK|TOXIC|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 01,05,06                ; |MEGA_PUNCH|MEGA_KICK|TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,40                ; |BIDE|METRONOME|SKULL_BASH|
@@ -2484,8 +2484,8 @@ MachokeBaseStats: ; 38b16 (e:4b16)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10                    ; |TAKE_DOWN|DOUBLE_EDGE|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10                   ; |TAKE_DOWN|DOUBLE_EDGE|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,37,38,40          ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -2521,8 +2521,8 @@ MachampBaseStats: ; 38b32 (e:4b32)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,37,38,40          ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -2558,7 +2558,7 @@ BellsproutBaseStats: ; 38b4e (e:4b4e)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 3,6                     ; |SWORDS_DANCE|TOXIC|
+    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
     tmlearn 0
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
@@ -2595,8 +2595,8 @@ WeepinbellBaseStats: ; 38b6a (e:4b6a)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 3,6                     ; |SWORDS_DANCE|TOXIC|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
     tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
@@ -2632,8 +2632,8 @@ VictreebelBaseStats: ; 38b86 (e:4b86)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
     tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
@@ -2669,8 +2669,8 @@ TentacoolBaseStats: ; 38ba2 (e:4ba2)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 3,6                     ; |SWORDS_DANCE|TOXIC|
-    tmlearn 9,11,12,13              ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
+    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
+    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 21                      ; |MEGA_DRAIN|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
@@ -2706,8 +2706,8 @@ TentacruelBaseStats: ; 38bbe (e:4bbe)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 3,6                     ; |SWORDS_DANCE|TOXIC|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 21                      ; |MEGA_DRAIN|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
@@ -2743,8 +2743,8 @@ GeodudeBaseStats: ; 38bda (e:4bda)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,6,8                   ; |MEGA_PUNCH|TOXIC|BODY_SLAM|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 01,06,08                ; |MEGA_PUNCH|TOXIC|BODY_SLAM|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,35,36                ; |BIDE|METRONOME|SELFDESTRUCT|
@@ -2780,8 +2780,8 @@ GravelerBaseStats: ; 38bf6 (e:4bf6)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10                    ; |TAKE_DOWN|DOUBLE_EDGE|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10                   ; |TAKE_DOWN|DOUBLE_EDGE|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,35,36,37,38          ; |BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|
@@ -2817,8 +2817,8 @@ GolemBaseStats: ; 38c12 (e:4c12)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,35,36,37,38          ; |BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|
@@ -2854,8 +2854,8 @@ PonytaBaseStats: ; 38c2e (e:4c2e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -2891,8 +2891,8 @@ RapidashBaseStats: ; 38c4a (e:4c4a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,7,8                 ; |SWORDS_DANCE|TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,10,15,16              ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
+    tmlearn 03,06,07,08             ; |SWORDS_DANCE|TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
     tmlearn 22                      ; |SOLARBEAM|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -2928,8 +2928,8 @@ SlowpokeBaseStats: ; 38c66 (e:4c66)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,11,12,13,16           ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|PAY_DAY|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,11,12,13,16          ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|PAY_DAY|
     tmlearn 0
     tmlearn 29,30,31                ; |PSYCHIC_M|TELEPORT|MIMIC|
     tmlearn 33,34,37,39,40          ; |REFLECT|BIDE|FLAMETHROWER|SWIFT|SKULL_BASH|
@@ -2965,8 +2965,8 @@ SlowbroBaseStats: ; 38c82 (e:4c82)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,29,30,31          ; |EARTHQUAKE|FISSURE|PSYCHIC_M|TELEPORT|MIMIC|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -3002,7 +3002,7 @@ MagnemiteBaseStats: ; 38c9e (e:4c9e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,31                   ; |THUNDER|MIMIC|
@@ -3039,7 +3039,7 @@ MagnetonBaseStats: ; 38cba (e:4cba)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
     tmlearn 25,31                   ; |THUNDER|MIMIC|
@@ -3076,7 +3076,7 @@ FarfetchdBaseStats: ; 38cd6 (e:4cd6)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,3,4,6                 ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|TOXIC|
+    tmlearn 02,03,04,06             ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -3113,8 +3113,8 @@ DoduoBaseStats: ; 38cf2 (e:4cf2)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9                       ; |TAKE_DOWN|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
@@ -3150,8 +3150,8 @@ DodrioBaseStats: ; 38d0e (e:4d0e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
@@ -3187,8 +3187,8 @@ SeelBaseStats: ; 38d2a (e:4d2a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,7,8                   ; |TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,11,12,13,14,16        ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|PAY_DAY|
+    tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,11,12,13,14,16       ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|PAY_DAY|
     tmlearn 0
     tmlearn 31                      ; |MIMIC|
     tmlearn 34,40                   ; |BIDE|SKULL_BASH|
@@ -3224,8 +3224,8 @@ DewgongBaseStats: ; 38d46 (e:4d46)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,7,8                   ; |TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
+    tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 0
     tmlearn 31                      ; |MIMIC|
     tmlearn 34,40                   ; |BIDE|SKULL_BASH|
@@ -3261,7 +3261,7 @@ GrimerBaseStats: ; 38d62 (e:4d62)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
     tmlearn 31                      ; |MIMIC|
@@ -3298,7 +3298,7 @@ MukBaseStats: ; 38d7e (e:4d7e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
     tmlearn 25,31                   ; |THUNDER|MIMIC|
@@ -3335,7 +3335,7 @@ ShellderBaseStats: ; 38d9a (e:4d9a)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 0
     tmlearn 31                      ; |MIMIC|
@@ -3372,7 +3372,7 @@ CloysterBaseStats: ; 38db6 (e:4db6)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
     tmlearn 10,11,12,13,14,15       ; |DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 0
     tmlearn 31                      ; |MIMIC|
@@ -3409,7 +3409,7 @@ GastlyBaseStats: ; 38dd2 (e:4dd2)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
     tmlearn 29,31,32                ; |PSYCHIC_M|MIMIC|DOUBLE_TEAM|
@@ -3446,7 +3446,7 @@ HaunterBaseStats: ; 38dee (e:4dee)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
     tmlearn 25,29,31,32             ; |THUNDER|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
@@ -3483,7 +3483,7 @@ GengarBaseStats: ; 38e0a (e:4e0a)
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
     tmlearn 25,29,31,32             ; |THUNDER|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
@@ -3520,8 +3520,8 @@ OnixBaseStats: ; 38e26 (e:4e26)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 0
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,36,40                ; |BIDE|SELFDESTRUCT|SKULL_BASH|
@@ -3557,7 +3557,7 @@ DrowzeeBaseStats: ; 38e42 (e:4e42)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,6                     ; |MEGA_PUNCH|TOXIC|
+    tmlearn 01,06                   ; |MEGA_PUNCH|TOXIC|
     tmlearn 0
     tmlearn 0
     tmlearn 29,30,31                ; |PSYCHIC_M|TELEPORT|MIMIC|
@@ -3594,7 +3594,7 @@ HypnoBaseStats: ; 38e5e (e:4e5e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
     tmlearn 10,15                   ; |DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
@@ -3631,7 +3631,7 @@ KrabbyBaseStats: ; 38e7a (e:4e7a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6                     ; |SWORDS_DANCE|TOXIC|
+    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 0
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
@@ -3668,8 +3668,8 @@ KinglerBaseStats: ; 38e96 (e:4e96)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 0
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34                      ; |BIDE|
@@ -3705,7 +3705,7 @@ VoltorbBaseStats: ; 38eb2 (e:4eb2)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
@@ -3742,7 +3742,7 @@ ElectrodeBaseStats: ; 38ece (e:4ece)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
     tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
@@ -3779,7 +3779,7 @@ ExeggcuteBaseStats: ; 38eea (e:4eea)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 3,6                     ; |SWORDS_DANCE|TOXIC|
+    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
     tmlearn 0
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 29,30,31                ; |PSYCHIC_M|TELEPORT|MIMIC|
@@ -3816,8 +3816,8 @@ ExeggutorBaseStats: ; 38f06 (e:4f06)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 26,29,30,31             ; |EARTHQUAKE|PSYCHIC_M|TELEPORT|MIMIC|
     tmlearn 33,34,36                ; |REFLECT|BIDE|SELFDESTRUCT|
@@ -3853,7 +3853,7 @@ CuboneBaseStats: ; 38f22 (e:4f22)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,3,6                   ; |MEGA_PUNCH|SWORDS_DANCE|TOXIC|
+    tmlearn 01,03,06                ; |MEGA_PUNCH|SWORDS_DANCE|TOXIC|
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 0
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
@@ -3890,8 +3890,8 @@ MarowakBaseStats: ; 38f3e (e:4f3e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,3,5,6,8               ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 01,03,05,06,08          ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,37,38,39,40          ; |BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -3927,8 +3927,8 @@ HitmonleeBaseStats: ; 38f5a (e:4f5a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,3,5,6,8               ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 01,03,05,06,08          ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,31,32             ; |EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
@@ -3964,8 +3964,8 @@ HitmonchanBaseStats: ; 38f76 (e:4f76)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,3,5,6,8               ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 01,03,05,06,08          ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,31,32             ; |EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
@@ -4001,8 +4001,8 @@ LickitungBaseStats: ; 38f92 (e:4f92)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,3,5,6,8               ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 01,03,05,06,08          ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,27,31             ; |THUNDER|EARTHQUAKE|FISSURE|MIMIC|
     tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -4038,7 +4038,7 @@ KoffingBaseStats: ; 38fae (e:4fae)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -4075,7 +4075,7 @@ WeezingBaseStats: ; 38fca (e:4fca)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
@@ -4112,8 +4112,8 @@ RhyhornBaseStats: ; 38fe6 (e:4fe6)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 3,6,7,8                 ; |SWORDS_DANCE|TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,10                    ; |TAKE_DOWN|DOUBLE_EDGE|
+    tmlearn 03,06,07,08             ; |SWORDS_DANCE|TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10                   ; |TAKE_DOWN|DOUBLE_EDGE|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -4149,8 +4149,8 @@ RhydonBaseStats: ; 39002 (e:5002)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 1,3,5,6,7,8             ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
+    tmlearn 01,03,05,06,07,08       ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -4186,8 +4186,8 @@ ChanseyBaseStats: ; 3901e (e:501e)
     db 4 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,29,31             ; |THUNDER|EARTHQUAKE|PSYCHIC_M|MIMIC|
     tmlearn 33,34,35,37,38,40       ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -4223,8 +4223,8 @@ TangelaBaseStats: ; 3903a (e:503a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,15                    ; |TAKE_DOWN|HYPER_BEAM|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,15                   ; |TAKE_DOWN|HYPER_BEAM|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
     tmlearn 34,40                   ; |BIDE|SKULL_BASH|
@@ -4260,8 +4260,8 @@ KangaskhanBaseStats: ; 39056 (e:5056)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,27,28,31,32       ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -4297,7 +4297,7 @@ HorseaBaseStats: ; 39072 (e:5072)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,6                     ; |RAZOR_WIND|TOXIC|
+    tmlearn 02,06                   ; |RAZOR_WIND|TOXIC|
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 23                      ; |DRAGON_RAGE|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -4334,7 +4334,7 @@ SeadraBaseStats: ; 3908e (e:508e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,6                     ; |RAZOR_WIND|TOXIC|
+    tmlearn 02,06                   ; |RAZOR_WIND|TOXIC|
     tmlearn 11,12,13,14,15          ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 23                      ; |DRAGON_RAGE|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -4371,8 +4371,8 @@ GoldeenBaseStats: ; 390aa (e:50aa)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,7                   ; |SWORDS_DANCE|TOXIC|HORN_DRILL|
-    tmlearn 9,11,12,13              ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
+    tmlearn 03,06,07                ; |SWORDS_DANCE|TOXIC|HORN_DRILL|
+    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
@@ -4408,8 +4408,8 @@ SeakingBaseStats: ; 390c6 (e:50c6)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 3,6,7,8                 ; |SWORDS_DANCE|TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 03,06,07,08             ; |SWORDS_DANCE|TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
@@ -4445,7 +4445,7 @@ StaryuBaseStats: ; 390e2 (e:50e2)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
@@ -4482,7 +4482,7 @@ StarmieBaseStats: ; 390fe (e:50fe)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 11,12,13,14,15          ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,29,30,31,32          ; |THUNDER|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
@@ -4519,7 +4519,7 @@ MrMimeBaseStats: ; 3911a (e:511a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6                   ; |MEGA_PUNCH|MEGA_KICK|TOXIC|
+    tmlearn 01,05,06                ; |MEGA_PUNCH|MEGA_KICK|TOXIC|
     tmlearn 10,15                   ; |DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 19,22,24                ; |SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,29,30,31,32          ; |THUNDER|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
@@ -4556,8 +4556,8 @@ ScytherBaseStats: ; 39136 (e:5136)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,3,6                   ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
-    tmlearn 9,15                    ; |TAKE_DOWN|HYPER_BEAM|
+    tmlearn 02,03,06                ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
+    tmlearn 09,15                   ; |TAKE_DOWN|HYPER_BEAM|
     tmlearn 18                      ; |COUNTER|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
@@ -4593,8 +4593,8 @@ JynxBaseStats: ; 39152 (e:5152)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,35,40             ; |REFLECT|BIDE|METRONOME|SKULL_BASH|
@@ -4630,8 +4630,8 @@ ElectabuzzBaseStats: ; 3916e (e:516e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
     tmlearn 25,29,31,32             ; |THUNDER|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,35,39,40          ; |REFLECT|BIDE|METRONOME|SWIFT|SKULL_BASH|
@@ -4667,8 +4667,8 @@ MagmarBaseStats: ; 3918a (e:518a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 29,31,32                ; |PSYCHIC_M|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,37,38,40          ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -4704,8 +4704,8 @@ PinsirBaseStats: ; 391a6 (e:51a6)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 3,6,8                   ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 26,27,28,34             ; |EARTHQUAKE|FISSURE|TRAPHOLE|BIDE|
@@ -4741,8 +4741,8 @@ TaurosBaseStats: ; 391c2 (e:51c2)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6,7,8                   ; |TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,10,13,14,15           ; |TAKE_DOWN|DOUBLE_EDGE|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10,13,14,15          ; |TAKE_DOWN|DOUBLE_EDGE|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,27,31,32          ; |THUNDER|EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -4815,8 +4815,8 @@ GyaradosBaseStats: ; 391fa (e:51fa)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
     tmlearn 25,26,31                ; |THUNDER|EARTHQUAKE|MIMIC|
     tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -4852,8 +4852,8 @@ LaprasBaseStats: ; 39216 (e:5216)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6,7,8                   ; |TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 22,23,24                ; |SOLARBEAM|DRAGON_RAGE|THUNDERBOLT|
     tmlearn 25,26,27,29,31          ; |THUNDER|EARTHQUAKE|FISSURE|PSYCHIC_M|MIMIC|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
@@ -4926,8 +4926,8 @@ EeveeBaseStats: ; 3924e (e:524e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,10,16                 ; |TAKE_DOWN|DOUBLE_EDGE|PAY_DAY|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,16                ; |TAKE_DOWN|DOUBLE_EDGE|PAY_DAY|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
@@ -4963,8 +4963,8 @@ VaporeonBaseStats: ; 3926a (e:526a)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
@@ -5000,8 +5000,8 @@ JolteonBaseStats: ; 39286 (e:5286)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,10,15,16              ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
@@ -5037,8 +5037,8 @@ FlareonBaseStats: ; 392a2 (e:52a2)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,8                     ; |TOXIC|BODY_SLAM|
-    tmlearn 9,10,15,16              ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -5074,7 +5074,7 @@ PorygonBaseStats: ; 392be (e:52be)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 13,14,15                ; |ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
     tmlearn 25,29,30,31             ; |THUNDER|PSYCHIC_M|TELEPORT|MIMIC|
@@ -5111,7 +5111,7 @@ OmanyteBaseStats: ; 392da (e:52da)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 0
     tmlearn 31                      ; |MIMIC|
@@ -5148,8 +5148,8 @@ OmastarBaseStats: ; 392f6 (e:52f6)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6,7,8                   ; |TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 0
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
@@ -5185,7 +5185,7 @@ KabutoBaseStats: ; 39312 (e:5312)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 21                      ; |MEGA_DRAIN|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -5222,8 +5222,8 @@ KabutopsBaseStats: ; 3932e (e:532e)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 2,3,5,6,8               ; |RAZOR_WIND|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 02,03,05,06,08          ; |RAZOR_WIND|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,19,21                ; |SUBMISSION|SEISMIC_TOSS|MEGA_DRAIN|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
@@ -5259,8 +5259,8 @@ AerodactylBaseStats: ; 3934a (e:534a)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6,8                 ; |RAZOR_WIND|WHIRLWIND|TOXIC|BODY_SLAM|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 02,04,06,08             ; |RAZOR_WIND|WHIRLWIND|TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 23                      ; |DRAGON_RAGE|
     tmlearn 26,27,31,32             ; |EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|
@@ -5296,8 +5296,8 @@ SnorlaxBaseStats: ; 39366 (e:5366)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,27,29,31          ; |THUNDER|EARTHQUAKE|FISSURE|PSYCHIC_M|MIMIC|
     tmlearn 33,34,35,36,37,38,40    ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
@@ -5333,8 +5333,8 @@ ArticunoBaseStats: ; 39382 (e:5382)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
@@ -5370,8 +5370,8 @@ ZapdosBaseStats: ; 3939e (e:539e)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
@@ -5407,8 +5407,8 @@ MoltresBaseStats: ; 393ba (e:53ba)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 2,4,6                   ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 22                      ; |SOLARBEAM|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|
@@ -5444,7 +5444,7 @@ DratiniBaseStats: ; 393d6 (e:53d6)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6                       ; |TOXIC|
+    tmlearn 06                      ; |TOXIC|
     tmlearn 11,12,13,14             ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|
     tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
     tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
@@ -5481,8 +5481,8 @@ DragonairBaseStats: ; 393f2 (e:53f2)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 6,7,8                   ; |TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,11,12,13,14,15        ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,11,12,13,14,15       ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
     tmlearn 25,28,31,32             ; |THUNDER|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -5518,8 +5518,8 @@ DragoniteBaseStats: ; 3940e (e:540e)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 1,2,5,6,7,8             ; |MEGA_PUNCH|RAZOR_WIND|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
+    tmlearn 01,02,05,06,07,08       ; |MEGA_PUNCH|RAZOR_WIND|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
     tmlearn 25,26,27,28,31,32       ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
@@ -5555,8 +5555,8 @@ MewtwoBaseStats: ; 3942a (e:542a)
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 1,5,6,8                 ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
+    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,29,30,31,32       ; |THUNDER|EARTHQUAKE|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,35,36,37,38,39,40 ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
