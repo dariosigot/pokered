@@ -447,7 +447,6 @@ WigglytuffExclusiveMove:
     db SING
     db MINIMIZE
     db DREAM_EATER
-    db TRAPHOLE
     db METRONOME
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -1534,6 +1533,7 @@ SeakingExclusiveMove:
     db REST
     db SUBSTITUTE
     db TSUNAMI
+    db BODY_SLAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 StaryuExclusiveMove:
