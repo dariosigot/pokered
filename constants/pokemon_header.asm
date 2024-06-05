@@ -157,7 +157,7 @@ CharmanderBaseStats: ; 38432 (e:4432)
     tmlearn 0
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
 
@@ -194,7 +194,7 @@ CharmeleonBaseStats: ; 3844e (e:444e)
     tmlearn 9                       ; |TAKE_DOWN|
     tmlearn 19,23                   ; |SEISMIC_TOSS|DRAGON_RAGE|
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
 
@@ -231,7 +231,7 @@ CharizardBaseStats: ; 3846a (e:446a)
     tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19,22,23          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|DRAGON_RAGE|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 43,44,48                ; |SKY_ATTACK|REST|ROCK_SLIDE|
     tmlearn 50,51,52,54             ; |SUBSTITUTE|BLADE|SWOOP|STRIKE|
 
@@ -1119,7 +1119,7 @@ NidorinaBaseStats: ; 3870a (e:470a)
     tmlearn 9,11,12,13              ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
+    tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
 
@@ -1156,7 +1156,7 @@ NidoqueenBaseStats: ; 38726 (e:4726)
     tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 33,34,38,40             ; |REFLECT|BIDE|FIRE_BLAST|SKULL_BASH|
+    tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,51,53,54             ; |SUBSTITUTE|BLADE|TSUNAMI|STRIKE|
 
@@ -1230,7 +1230,7 @@ NidorinoBaseStats: ; 3875e (e:475e)
     tmlearn 9,11,12,13              ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
+    tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -1267,7 +1267,7 @@ NidokingBaseStats: ; 3877a (e:477a)
     tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 33,34,38,40             ; |REFLECT|BIDE|FIRE_BLAST|SKULL_BASH|
+    tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,51,53,54             ; |SUBSTITUTE|BLADE|TSUNAMI|STRIKE|
 
@@ -1304,7 +1304,7 @@ ClefairyBaseStats: ; 38796 (e:4796)
     tmlearn 9,11,12,13              ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,35,39,40          ; |REFLECT|BIDE|METRONOME|SWIFT|SKULL_BASH|
+    tmlearn 33,34,35,37,39,40       ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|SWIFT|SKULL_BASH|
     tmlearn 41,42,44,45,46          ; |FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
     tmlearn 49,50,54                ; |TRI_ATTACK|SUBSTITUTE|STRIKE|
 
@@ -1341,7 +1341,7 @@ ClefableBaseStats: ; 387b2 (e:47b2)
     tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,29,31                ; |THUNDER|PSYCHIC_M|MIMIC|
-    tmlearn 33,34,35,38,39,40       ; |REFLECT|BIDE|METRONOME|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,35,37,38,39,40    ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,42,44,45,46          ; |FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
     tmlearn 49,50,54                ; |TRI_ATTACK|SUBSTITUTE|STRIKE|
 
@@ -1378,7 +1378,7 @@ VulpixBaseStats: ; 387ce (e:47ce)
     tmlearn 9                       ; |TAKE_DOWN|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -1415,7 +1415,7 @@ NinetalesBaseStats: ; 387ea (e:47ea)
     tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 22                      ; |SOLARBEAM|
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 42,44                   ; |DREAM_EATER|REST|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -1452,7 +1452,7 @@ JigglypuffBaseStats: ; 38806 (e:4806)
     tmlearn 9,11,12,13              ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,35,39,40          ; |REFLECT|BIDE|METRONOME|SWIFT|SKULL_BASH|
+    tmlearn 33,34,35,37,39,40       ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|SWIFT|SKULL_BASH|
     tmlearn 41,42,44,45,46          ; |FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
     tmlearn 49,50,54                ; |TRI_ATTACK|SUBSTITUTE|STRIKE|
 
@@ -1489,7 +1489,7 @@ WigglytuffBaseStats: ; 38822 (e:4822)
     tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,29,31                ; |THUNDER|PSYCHIC_M|MIMIC|
-    tmlearn 33,34,35,38,39,40       ; |REFLECT|BIDE|METRONOME|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,35,37,38,39,40    ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,42,44,45,46          ; |FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
     tmlearn 49,50,54                ; |TRI_ATTACK|SUBSTITUTE|STRIKE|
 
@@ -2155,7 +2155,7 @@ GrowlitheBaseStats: ; 38a1a (e:4a1a)
     tmlearn 9                       ; |TAKE_DOWN|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -2192,7 +2192,7 @@ ArcanineBaseStats: ; 38a36 (e:4a36)
     tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 22,23                   ; |SOLARBEAM|DRAGON_RAGE|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -2488,7 +2488,7 @@ MachokeBaseStats: ; 38b16 (e:4b16)
     tmlearn 9,10                    ; |TAKE_DOWN|DOUBLE_EDGE|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,38,40             ; |BIDE|METRONOME|FIRE_BLAST|SKULL_BASH|
+    tmlearn 34,35,37,38,40          ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
 
@@ -2525,7 +2525,7 @@ MachampBaseStats: ; 38b32 (e:4b32)
     tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,38,40             ; |BIDE|METRONOME|FIRE_BLAST|SKULL_BASH|
+    tmlearn 34,35,37,38,40          ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
 
@@ -2784,7 +2784,7 @@ GravelerBaseStats: ; 38bf6 (e:4bf6)
     tmlearn 9,10                    ; |TAKE_DOWN|DOUBLE_EDGE|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,35,36,38             ; |BIDE|METRONOME|SELFDESTRUCT|FIRE_BLAST|
+    tmlearn 34,35,36,37,38          ; |BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|
     tmlearn 44,47,48                ; |REST|EXPLOSION|ROCK_SLIDE|
     tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
 
@@ -2821,7 +2821,7 @@ GolemBaseStats: ; 38c12 (e:4c12)
     tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,35,36,38             ; |BIDE|METRONOME|SELFDESTRUCT|FIRE_BLAST|
+    tmlearn 34,35,36,37,38          ; |BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|
     tmlearn 44,47,48                ; |REST|EXPLOSION|ROCK_SLIDE|
     tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
 
@@ -2858,7 +2858,7 @@ PonytaBaseStats: ; 38c2e (e:4c2e)
     tmlearn 9                       ; |TAKE_DOWN|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -2895,7 +2895,7 @@ RapidashBaseStats: ; 38c4a (e:4c4a)
     tmlearn 9,10,15,16              ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
     tmlearn 22                      ; |SOLARBEAM|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -2932,7 +2932,7 @@ SlowpokeBaseStats: ; 38c66 (e:4c66)
     tmlearn 9,11,12,13,16           ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|PAY_DAY|
     tmlearn 0
     tmlearn 29,30,31                ; |PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,39,40          ; |REFLECT|BIDE|FLAMETHROWER|SWIFT|SKULL_BASH|
     tmlearn 41,42,44,45,46          ; |FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
     tmlearn 49,50,53,54             ; |TRI_ATTACK|SUBSTITUTE|TSUNAMI|STRIKE|
 
@@ -2969,7 +2969,7 @@ SlowbroBaseStats: ; 38c82 (e:4c82)
     tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,29,30,31          ; |EARTHQUAKE|FISSURE|PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,42,44,45,46          ; |FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
     tmlearn 49,50,53,54             ; |TRI_ATTACK|SUBSTITUTE|TSUNAMI|STRIKE|
 
@@ -3265,7 +3265,7 @@ GrimerBaseStats: ; 38d62 (e:4d62)
     tmlearn 0
     tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
     tmlearn 31                      ; |MIMIC|
-    tmlearn 34,36                   ; |BIDE|SELFDESTRUCT|
+    tmlearn 34,36,37                ; |BIDE|SELFDESTRUCT|FLAMETHROWER|
     tmlearn 44,47                   ; |REST|EXPLOSION|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -3302,7 +3302,7 @@ MukBaseStats: ; 38d7e (e:4d7e)
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
     tmlearn 25,31                   ; |THUNDER|MIMIC|
-    tmlearn 34,36,38,39             ; |BIDE|SELFDESTRUCT|FIRE_BLAST|SWIFT|
+    tmlearn 34,36,37,38,39          ; |BIDE|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SWIFT|
     tmlearn 44,45,47,48             ; |REST|THUNDER_WAVE|EXPLOSION|ROCK_SLIDE|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -3783,7 +3783,7 @@ ExeggcuteBaseStats: ; 38eea (e:4eea)
     tmlearn 0
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 29,30,31                ; |PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 33,34,36,37             ; |REFLECT|BIDE|SELFDESTRUCT|EGG_BOMB|
+    tmlearn 33,34,36                ; |REFLECT|BIDE|SELFDESTRUCT|
     tmlearn 42,44,46,47             ; |DREAM_EATER|REST|PSYWAVE|EXPLOSION|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -3820,7 +3820,7 @@ ExeggutorBaseStats: ; 38f06 (e:4f06)
     tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 26,29,30,31             ; |EARTHQUAKE|PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 33,34,36,37             ; |REFLECT|BIDE|SELFDESTRUCT|EGG_BOMB|
+    tmlearn 33,34,36                ; |REFLECT|BIDE|SELFDESTRUCT|
     tmlearn 42,44,46,47             ; |DREAM_EATER|REST|PSYWAVE|EXPLOSION|
     tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
 
@@ -3857,7 +3857,7 @@ CuboneBaseStats: ; 38f22 (e:4f22)
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 0
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,40                   ; |BIDE|SKULL_BASH|
+    tmlearn 34,37,40                ; |BIDE|FLAMETHROWER|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
 
@@ -3894,7 +3894,7 @@ MarowakBaseStats: ; 38f3e (e:4f3e)
     tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,38,39,40             ; |BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 34,37,38,39,40          ; |BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
 
@@ -4005,7 +4005,7 @@ LickitungBaseStats: ; 38f92 (e:4f92)
     tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,27,31             ; |THUNDER|EARTHQUAKE|FISSURE|MIMIC|
-    tmlearn 34,38,40                ; |BIDE|FIRE_BLAST|SKULL_BASH|
+    tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 42,44,48                ; |DREAM_EATER|REST|ROCK_SLIDE|
     tmlearn 50,51,53,54             ; |SUBSTITUTE|BLADE|TSUNAMI|STRIKE|
 
@@ -4042,7 +4042,7 @@ KoffingBaseStats: ; 38fae (e:4fae)
     tmlearn 0
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,36                   ; |BIDE|SELFDESTRUCT|
+    tmlearn 34,36,37                ; |BIDE|SELFDESTRUCT|FLAMETHROWER|
     tmlearn 44,46,47                ; |REST|PSYWAVE|EXPLOSION|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -4079,7 +4079,7 @@ WeezingBaseStats: ; 38fca (e:4fca)
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,36,38                ; |BIDE|SELFDESTRUCT|FIRE_BLAST|
+    tmlearn 34,36,37,38             ; |BIDE|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|
     tmlearn 44,45,46,47             ; |REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -4116,7 +4116,7 @@ RhyhornBaseStats: ; 38fe6 (e:4fe6)
     tmlearn 9,10                    ; |TAKE_DOWN|DOUBLE_EDGE|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,38,40                ; |BIDE|FIRE_BLAST|SKULL_BASH|
+    tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
 
@@ -4153,7 +4153,7 @@ RhydonBaseStats: ; 39002 (e:5002)
     tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,38,40                ; |BIDE|FIRE_BLAST|SKULL_BASH|
+    tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
 
@@ -4190,7 +4190,7 @@ ChanseyBaseStats: ; 3901e (e:501e)
     tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,29,31             ; |THUNDER|EARTHQUAKE|PSYCHIC_M|MIMIC|
-    tmlearn 33,34,35,37,38,40       ; |REFLECT|BIDE|METRONOME|EGG_BOMB|FIRE_BLAST|SKULL_BASH|
+    tmlearn 33,34,35,37,38,40       ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 41,42,44,45,46,48       ; |FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|ROCK_SLIDE|
     tmlearn 49,50,54                ; |TRI_ATTACK|SUBSTITUTE|STRIKE|
 
@@ -4264,7 +4264,7 @@ KangaskhanBaseStats: ; 39056 (e:5056)
     tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,27,28,31,32       ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,38,40                ; |BIDE|FIRE_BLAST|SKULL_BASH|
+    tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
 
@@ -4671,7 +4671,7 @@ MagmarBaseStats: ; 3918a (e:518a)
     tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 29,31,32                ; |PSYCHIC_M|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,38,40             ; |BIDE|METRONOME|FIRE_BLAST|SKULL_BASH|
+    tmlearn 34,35,37,38,40          ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,46                   ; |REST|PSYWAVE|
     tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
 
@@ -4745,7 +4745,7 @@ TaurosBaseStats: ; 391c2 (e:51c2)
     tmlearn 9,10,13,14,15           ; |TAKE_DOWN|DOUBLE_EDGE|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,27,31,32          ; |THUNDER|EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,38,40                ; |BIDE|FIRE_BLAST|SKULL_BASH|
+    tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
 
@@ -4819,7 +4819,7 @@ GyaradosBaseStats: ; 391fa (e:51fa)
     tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
     tmlearn 25,26,31                ; |THUNDER|EARTHQUAKE|MIMIC|
-    tmlearn 33,34,38,40             ; |REFLECT|BIDE|FIRE_BLAST|SKULL_BASH|
+    tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,45                   ; |REST|THUNDER_WAVE|
     tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
 
@@ -5041,7 +5041,7 @@ FlareonBaseStats: ; 392a2 (e:52a2)
     tmlearn 9,10,15,16              ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -5263,7 +5263,7 @@ AerodactylBaseStats: ; 3934a (e:534a)
     tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 23                      ; |DRAGON_RAGE|
     tmlearn 26,27,31,32             ; |EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39             ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|
+    tmlearn 33,34,37,38,39          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|
     tmlearn 43,44,48                ; |SKY_ATTACK|REST|ROCK_SLIDE|
     tmlearn 50,51,52,54             ; |SUBSTITUTE|BLADE|SWOOP|STRIKE|
 
@@ -5300,7 +5300,7 @@ SnorlaxBaseStats: ; 39366 (e:5366)
     tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,27,29,31          ; |THUNDER|EARTHQUAKE|FISSURE|PSYCHIC_M|MIMIC|
-    tmlearn 33,34,35,36,38,40       ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FIRE_BLAST|SKULL_BASH|
+    tmlearn 33,34,35,36,37,38,40    ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,46,48                ; |REST|PSYWAVE|ROCK_SLIDE|
     tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
 
@@ -5411,7 +5411,7 @@ MoltresBaseStats: ; 393ba (e:53ba)
     tmlearn 9,10,15                 ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 22                      ; |SOLARBEAM|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39             ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|
+    tmlearn 33,34,37,38,39          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|
     tmlearn 43,44                   ; |SKY_ATTACK|REST|
     tmlearn 50,52                   ; |SUBSTITUTE|SWOOP|
 
@@ -5448,7 +5448,7 @@ DratiniBaseStats: ; 393d6 (e:53d6)
     tmlearn 11,12,13,14             ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|
     tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
     tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,38,39,40          ; |REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44,45                   ; |REST|THUNDER_WAVE|
     tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
 
@@ -5484,8 +5484,8 @@ DragonairBaseStats: ; 393f2 (e:53f2)
     tmlearn 6,7,8                   ; |TOXIC|HORN_DRILL|BODY_SLAM|
     tmlearn 9,11,12,13,14,15        ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
-    tmlearn 28,33,34,38,39,40       ; |TRAPHOLE|REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 25,28,31,32             ; |THUNDER|TRAPHOLE|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44,45                   ; |REST|THUNDER_WAVE|
     tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
 
@@ -5521,8 +5521,8 @@ DragoniteBaseStats: ; 3940e (e:540e)
     tmlearn 1,2,5,6,7,8             ; |MEGA_PUNCH|RAZOR_WIND|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
     tmlearn 9,10,11,12,13,14,15     ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
-    tmlearn 26,27,28,33,34,38,39,40 ; |EARTHQUAKE|FISSURE|TRAPHOLE|REFLECT|BIDE|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 25,26,27,28,31,32       ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 43,44,45,48             ; |SKY_ATTACK|REST|THUNDER_WAVE|ROCK_SLIDE|
     tmlearn 50,51,52,53,54          ; |SUBSTITUTE|BLADE|SWOOP|TSUNAMI|STRIKE|
 
@@ -5559,7 +5559,7 @@ MewtwoBaseStats: ; 3942a (e:542a)
     tmlearn 9,10,11,12,13,14,15,16  ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,29,30,31,32       ; |THUNDER|EARTHQUAKE|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,36,38,39,40    ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,35,36,37,38,39,40 ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,42,44,45,46,48       ; |FLASH|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|ROCK_SLIDE|
     tmlearn 49,50,54                ; |TRI_ATTACK|SUBSTITUTE|STRIKE|
 

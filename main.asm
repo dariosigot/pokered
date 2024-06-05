@@ -30595,7 +30595,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db BIDE         ; TM_34
     db METRONOME    ; TM_35
     db SELFDESTRUCT ; TM_36
-    db EGG_BOMB     ; TM_37 ; Market
+    db FLAMETHROWER ; TM_37
     db FIRE_BLAST   ; TM_38
     db SWIFT        ; TM_39
     db SKULL_BASH   ; TM_40
@@ -83869,11 +83869,9 @@ CeladonMart2Text2:
     db TM_10 ; DOUBLE_EDGE
     db TM_12 ; WATER_GUN
     db TM_17 ; SUBMISSION
-    db TM_20 ; RAGE
     db TM_30 ; TELEPORT
     db TM_32 ; DOUBLE_TEAM
     db TM_33 ; REFLECT
-    db TM_37 ; EGG_BOMB
     db $FF
 
 Route21ScriptPointers: ; Moved in the Bank
@@ -92957,7 +92955,7 @@ PokemonTower6Object: ; 0x60c5b (size=58)
     db SPRITE_MEDIUM,$5 + 4,$9 + 4,$ff,$d0,$42,CHANNELER,$c ; trainer
     db SPRITE_MEDIUM,$5 + 4,$10 + 4,$ff,$d2,$43,CHANNELER,$d ; trainer
     db SPRITE_BALL,$8 + 4,$6 + 4,$ff,$ff,$84,RARE_CANDY ; item
-    db SPRITE_BALL,$e + 4,$e + 4,$ff,$ff,$85,X_ACCURACY ; item
+    db SPRITE_BALL,$e + 4,$e + 4,$ff,$ff,$85,TM_37 ; item
 
     ; warp-to
     EVENT_DISP $a,$9,$12 ; POKEMONTOWER_5
@@ -114292,7 +114290,7 @@ TechnicalMachinePrices: ; 7bfa7 (1e:7fa7)
     db $32,$21,$34,$24,$34
     db $21,$45,$55,$32,$32
     db $55,$52,$54,$52,$41
-    db $21,$12,$42,$25,$24
+    db $21,$12,$42,$45,$24
     db $22,$52,$24,$34,$42
     db $24,$43
     
@@ -131559,7 +131557,7 @@ ItemNames: ; 472b (1:472b)
     db "TM34:BIDE@"    ; $EA ; TM_34
     db "TM35:METRONM@" ; $EB ; TM_35
     db "TM36:SELFDST@" ; $EC ; TM_36
-    db "TM37:EGG BMB@" ; $ED ; TM_37 ; Market
+    db "TM37:FLMTRWR@" ; $ED ; TM_37
     db "TM38:FIR.BLS@" ; $EE ; TM_38
     db "TM39:SWIFT@"   ; $EF ; TM_39
     db "TM40:SKUL B.@" ; $F0 ; TM_40
