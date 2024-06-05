@@ -43675,6 +43675,8 @@ HandleExclusiveLearnMove:
     jr z,.OutOfRange
     pop de ; Restore Pointer to Move List Current Elements
     ld b,a
+    inc a
+    jr z,.end ; $FF = Empty Move
     call .CheckMoveJustPotentialKnow
     jr c,.end
     ld a,b

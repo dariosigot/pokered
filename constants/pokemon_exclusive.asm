@@ -11,7 +11,7 @@ VenusaurExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db SOLARBEAM
     db MIMIC
@@ -44,7 +44,7 @@ CharizardExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db DRAGON_RAGE
     db EARTHQUAKE
     db FISSURE
@@ -89,7 +89,7 @@ BlastoiseExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db TRAPHOLE
@@ -113,7 +113,7 @@ ButterfreeExclusiveMove:
     db WHIRLWIND
     db TOXIC
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db SOLARBEAM
     db PSYCHIC_M
@@ -143,7 +143,7 @@ BeedrillExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db MIMIC
     db DOUBLE_TEAM
@@ -170,7 +170,7 @@ PidgeotExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MIMIC
     db DOUBLE_TEAM
     db REFLECT
@@ -196,7 +196,7 @@ RaticateExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db EARTHQUAKE
@@ -224,7 +224,7 @@ FearowExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MIMIC
     db DOUBLE_TEAM
     db BIDE
@@ -247,7 +247,7 @@ ArbokExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db EARTHQUAKE
     db FISSURE
@@ -276,7 +276,7 @@ RaichuExclusiveMove:
     db PAY_DAY
     db SUBMISSION
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db MIMIC
@@ -306,7 +306,7 @@ SandslashExclusiveMove:
     db HYPER_BEAM
     db SUBMISSION
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db TRAPHOLE
@@ -341,7 +341,7 @@ NidoqueenExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db EARTHQUAKE
@@ -383,7 +383,7 @@ NidokingExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db EARTHQUAKE
@@ -424,7 +424,7 @@ WigglytuffExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db SOLARBEAM
     db THUNDERBOLT
     db THUNDER
@@ -457,7 +457,7 @@ NinetalesExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db TRAPHOLE
     db MIMIC
     db DOUBLE_TEAM
@@ -484,7 +484,7 @@ GolbatExclusiveMove:
     db TOXIC
     db TAKE_DOWN
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db MIMIC
     db DOUBLE_TEAM
@@ -509,7 +509,7 @@ VileplumeExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db SOLARBEAM
     db MIMIC
@@ -531,7 +531,7 @@ ParasectExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db SOLARBEAM
     db TRAPHOLE
@@ -551,7 +551,7 @@ VenomothExclusiveMove:
     db TOXIC
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db SOLARBEAM
     db PSYCHIC_M
@@ -576,7 +576,7 @@ DugtrioExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db TRAPHOLE
@@ -600,7 +600,7 @@ PersianExclusiveMove:
     db WATER_GUN
     db HYPER_BEAM
     db PAY_DAY
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db MIMIC
@@ -632,7 +632,7 @@ GolduckExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db TRAPHOLE
     db PSYCHIC_M
     db TELEPORT
@@ -664,7 +664,7 @@ PrimeapeExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db EARTHQUAKE
@@ -692,7 +692,7 @@ ArcanineExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db DRAGON_RAGE
     db EARTHQUAKE
     db FISSURE
@@ -731,7 +731,7 @@ PoliwrathExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db PSYCHIC_M
@@ -760,7 +760,7 @@ AlakazamExclusiveMove:
     db TOXIC
     db HYPER_BEAM
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db PSYCHIC_M
     db TELEPORT
     db MIMIC
@@ -792,7 +792,7 @@ MachampExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db TRAPHOLE
@@ -819,7 +819,7 @@ VictreebelExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db SOLARBEAM
     db MIMIC
@@ -844,7 +844,7 @@ TentacruelExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db MIMIC
     db DOUBLE_TEAM
@@ -874,7 +874,7 @@ GolemExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db TRAPHOLE
@@ -900,7 +900,7 @@ RapidashExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MIMIC
     db DOUBLE_TEAM
     db REFLECT
@@ -932,7 +932,7 @@ SlowbroExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db PSYCHIC_M
@@ -959,7 +959,7 @@ MagnemiteExclusiveMove:
 MagnetonExclusiveMove:
     db TOXIC
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db SOLARBEAM
     db THUNDERBOLT
     db THUNDER
@@ -985,7 +985,7 @@ FarfetchdExclusiveMove:
     db WHIRLWIND
     db TOXIC
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MIMIC
     db DOUBLE_TEAM
     db REFLECT
@@ -1006,7 +1006,7 @@ DodrioExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MIMIC
     db DOUBLE_TEAM
     db REFLECT
@@ -1033,7 +1033,7 @@ DewgongExclusiveMove:
     db BLIZZARD
     db HYPER_BEAM
     db PAY_DAY
-    db RAGE
+    db $FF
     db MIMIC
     db BIDE
     db SKULL_BASH
@@ -1049,7 +1049,7 @@ MukExclusiveMove:
     db TOXIC
     db BODY_SLAM
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db THUNDERBOLT
     db THUNDER
@@ -1074,7 +1074,7 @@ CloysterExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MIMIC
     db REFLECT
     db BIDE
@@ -1121,7 +1121,7 @@ OnixExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db TRAPHOLE
@@ -1147,7 +1147,7 @@ HypnoExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db PSYCHIC_M
     db TELEPORT
     db MIMIC
@@ -1179,7 +1179,7 @@ KinglerExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db TRAPHOLE
     db MIMIC
     db DOUBLE_TEAM
@@ -1198,7 +1198,7 @@ VoltorbExclusiveMove:
 ElectrodeExclusiveMove:
     db TOXIC
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db SOLARBEAM
     db THUNDERBOLT
     db THUNDER
@@ -1223,7 +1223,7 @@ ExeggutorExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db SOLARBEAM
     db PSYCHIC_M
@@ -1265,7 +1265,7 @@ MarowakExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db TRAPHOLE
@@ -1294,7 +1294,7 @@ HitmonchanExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db MIMIC
@@ -1326,7 +1326,7 @@ LickitungExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db EARTHQUAKE
@@ -1349,7 +1349,7 @@ KoffingExclusiveMove:
 WeezingExclusiveMove:
     db TOXIC
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db MIMIC
@@ -1383,7 +1383,7 @@ RhydonExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db EARTHQUAKE
@@ -1414,7 +1414,7 @@ ChanseyExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db SOLARBEAM
     db THUNDERBOLT
     db THUNDER
@@ -1444,7 +1444,7 @@ TangelaExclusiveMove:
     db BODY_SLAM
     db TAKE_DOWN
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db SOLARBEAM
     db MIMIC
@@ -1470,7 +1470,7 @@ KangaskhanExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db EARTHQUAKE
@@ -1497,7 +1497,7 @@ SeadraExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db DRAGON_RAGE
     db MIMIC
     db DOUBLE_TEAM
@@ -1524,7 +1524,7 @@ SeakingExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MIMIC
     db DOUBLE_TEAM
     db BIDE
@@ -1544,7 +1544,7 @@ StarmieExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db PSYCHIC_M
@@ -1573,7 +1573,7 @@ MrMimeExclusiveMove:
     db DOUBLE_EDGE
     db HYPER_BEAM
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db PSYCHIC_M
@@ -1599,7 +1599,7 @@ ScytherExclusiveMove:
     db TOXIC
     db TAKE_DOWN
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MIMIC
     db DOUBLE_TEAM
     db BIDE
@@ -1628,7 +1628,7 @@ JynxExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db PSYCHIC_M
     db TELEPORT
     db MIMIC
@@ -1654,7 +1654,7 @@ ElectabuzzExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db PSYCHIC_M
@@ -1684,7 +1684,7 @@ MagmarExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db PSYCHIC_M
     db MIMIC
     db DOUBLE_TEAM
@@ -1708,7 +1708,7 @@ PinsirExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db MIMIC
     db DOUBLE_TEAM
     db EARTHQUAKE
@@ -1731,7 +1731,7 @@ TaurosExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db EARTHQUAKE
@@ -1759,7 +1759,7 @@ GyaradosExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db DRAGON_RAGE
     db THUNDERBOLT
     db THUNDER
@@ -1788,7 +1788,7 @@ LaprasExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db SOLARBEAM
     db DRAGON_RAGE
     db THUNDERBOLT
@@ -1828,7 +1828,7 @@ FlareonExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db MIMIC
@@ -1854,7 +1854,7 @@ PorygonExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db SOLARBEAM
     db THUNDERBOLT
     db THUNDER
@@ -1886,7 +1886,7 @@ OmastarExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db TRAPHOLE
@@ -1916,7 +1916,7 @@ KabutopsExclusiveMove:
     db HYPER_BEAM
     db SUBMISSION
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db MEGA_DRAIN
     db EARTHQUAKE
     db FISSURE
@@ -1941,7 +1941,7 @@ AerodactylExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db DRAGON_RAGE
     db EARTHQUAKE
     db FISSURE
@@ -1976,7 +1976,7 @@ SnorlaxExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db SOLARBEAM
     db THUNDERBOLT
     db THUNDER
@@ -2009,7 +2009,7 @@ ArticunoExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MIMIC
     db DOUBLE_TEAM
     db REFLECT
@@ -2029,7 +2029,7 @@ ZapdosExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db THUNDERBOLT
     db THUNDER
     db MIMIC
@@ -2052,7 +2052,7 @@ MoltresExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db MIMIC
     db DOUBLE_TEAM
     db REFLECT
@@ -2079,7 +2079,7 @@ DragoniteExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db RAGE
+    db $FF
     db DRAGON_RAGE
     db THUNDERBOLT
     db THUNDER
@@ -2123,7 +2123,7 @@ MewtwoExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db RAGE
+    db $FF
     db SOLARBEAM
     db THUNDERBOLT
     db THUNDER
