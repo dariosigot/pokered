@@ -25,6 +25,8 @@ VenusaurExclusiveMove:
     db SLUDGE
     db BIND
     db RAZOR_WIND
+    db EARTHQUAKE
+    db FISSURE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CharmanderExclusiveMove:
@@ -65,6 +67,7 @@ CharizardExclusiveMove:
     db FLAMETHROWER
     db SLAM
     db FIRE_SPIN
+    db SOLARBEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SquirtleExclusiveMove:
@@ -152,6 +155,7 @@ BeedrillExclusiveMove:
     db TWINEEDLE
     db SELFDESTRUCT
     db EXPLOSION
+    db SOLARBEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PidgeyExclusiveMove:
@@ -284,6 +288,7 @@ RaichuExclusiveMove:
     db QUICK_ATTACK
     db SLAM
     db AGILITY
+    db TRAPHOLE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SandshrewExclusiveMove:
@@ -436,6 +441,7 @@ ClefableExclusiveMove:
     db LIGHT_SCREEN
     db MINIMIZE
     db DREAM_EATER
+    db TRAPHOLE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VulpixExclusiveMove:
@@ -462,6 +468,7 @@ NinetalesExclusiveMove:
     db SLAM
     db FIRE_SPIN
     db DREAM_EATER
+    db SOLARBEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 JigglypuffExclusiveMove:
@@ -502,6 +509,7 @@ WigglytuffExclusiveMove:
     db DISABLE
     db DOUBLESLAP
     db DREAM_EATER
+    db TRAPHOLE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ZubatExclusiveMove:
@@ -639,6 +647,7 @@ PersianExclusiveMove:
     db SUBSTITUTE
     db BLADE
     db DREAM_EATER
+    db TRAPHOLE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PsyduckExclusiveMove:
@@ -734,6 +743,7 @@ ArcanineExclusiveMove:
     db AGILITY
     db FLAMETHROWER
     db SLAM
+    db SOLARBEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PoliwagExclusiveMove:
@@ -771,6 +781,7 @@ PoliwrathExclusiveMove:
     db AMNESIA
     db HYDRO_PUMP
     db DOUBLE_TEAM
+    db TRAPHOLE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 AbraExclusiveMove:
@@ -928,6 +939,7 @@ RapidashExclusiveMove:
     db SUBSTITUTE
     db SWORDS_DANCE
     db PAY_DAY
+    db SOLARBEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SlowpokeExclusiveMove:
@@ -1252,6 +1264,7 @@ ExeggutorExclusiveMove:
     db SLEEP_POWDER
     db SWORDS_DANCE
     db BODY_SLAM
+    db EARTHQUAKE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CuboneExclusiveMove:
@@ -1345,6 +1358,7 @@ LickitungExclusiveMove:
     db TSUNAMI
     db STRIKE
     db DREAM_EATER
+    db SOLARBEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KoffingExclusiveMove:
@@ -1434,6 +1448,7 @@ ChanseyExclusiveMove:
     db SUBSTITUTE
     db STRIKE
     db DREAM_EATER
+    db EARTHQUAKE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TangelaExclusiveMove:
@@ -1483,6 +1498,8 @@ KangaskhanExclusiveMove:
     db SUBSTITUTE
     db TSUNAMI
     db STRIKE
+    db SOLARBEAM
+    db TRAPHOLE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HorseaExclusiveMove:
@@ -1585,6 +1602,7 @@ MrMimeExclusiveMove:
     db THUNDER_WAVE
     db PSYWAVE
     db SUBSTITUTE
+    db SOLARBEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ScytherExclusiveMove:
@@ -1712,6 +1730,7 @@ PinsirExclusiveMove:
     db SUBSTITUTE
     db BLADE
     db STRIKE
+    db TRAPHOLE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TaurosExclusiveMove:
@@ -1736,6 +1755,7 @@ TaurosExclusiveMove:
     db REST
     db SUBSTITUTE
     db STRIKE
+    db SOLARBEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MagikarpExclusiveMove:
@@ -1763,6 +1783,7 @@ GyaradosExclusiveMove:
     db TSUNAMI
     db STRIKE
     db AMNESIA
+    db EARTHQUAKE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LaprasExclusiveMove:
@@ -1791,6 +1812,8 @@ LaprasExclusiveMove:
     db SUBSTITUTE
     db TSUNAMI
     db DREAM_EATER
+    db EARTHQUAKE
+    db FISSURE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DittoExclusiveMove:
@@ -2048,6 +2071,7 @@ MoltresExclusiveMove:
     db REST
     db SUBSTITUTE
     db SWOOP
+    db SOLARBEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DratiniExclusiveMove:
@@ -2129,6 +2153,7 @@ MewtwoExclusiveMove:
     db SUBSTITUTE
     db STRIKE
     db DREAM_EATER
+    db EARTHQUAKE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewExclusiveMove:
