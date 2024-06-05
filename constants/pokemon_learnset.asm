@@ -1117,7 +1117,8 @@ ENDM
 DODUO_Learnset: MACRO
     db  1,PECK
     db  1,GROWL
-    db 10,FURY_ATTACK
+    db  7,FURY_ATTACK
+    db 10,WING_ATTACK
     db 13,QUICK_ATTACK
     db 18,STOMP
     db 21,SCREECH

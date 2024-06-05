@@ -27,6 +27,7 @@ VenusaurExclusiveMove:
     db RAZOR_WIND
     db EARTHQUAKE
     db FISSURE
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CharmanderExclusiveMove:
@@ -68,6 +69,7 @@ CharizardExclusiveMove:
     db SLAM
     db FIRE_SPIN
     db SOLARBEAM
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SquirtleExclusiveMove:
@@ -101,6 +103,7 @@ BlastoiseExclusiveMove:
     db STRIKE
     db HAZE
     db HYDRO_PUMP
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CaterpieExclusiveMove:
@@ -210,6 +213,7 @@ RaticateExclusiveMove:
     db SUPER_FANG
     db SWORDS_DANCE
     db COUNTER
+    db THUNDER_WAVE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SpearowExclusiveMove:
@@ -233,6 +237,7 @@ FearowExclusiveMove:
     db MIRROR_MOVE
     db AGILITY
     db QUICK_ATTACK
+    db TRI_ATTACK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 EkansExclusiveMove:
@@ -609,6 +614,7 @@ PersianExclusiveMove:
     db BLADE
     db DREAM_EATER
     db TRAPHOLE
+    db THUNDER_WAVE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PsyduckExclusiveMove:
@@ -643,6 +649,7 @@ GolduckExclusiveMove:
     db TSUNAMI
     db STRIKE
     db AMNESIA
+    db TRI_ATTACK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MankeyExclusiveMove:
@@ -676,6 +683,7 @@ PrimeapeExclusiveMove:
     db STRIKE
     db THRASH
     db SCREECH
+    db THUNDER_WAVE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GrowlitheExclusiveMove:
@@ -743,6 +751,8 @@ PoliwrathExclusiveMove:
     db HYDRO_PUMP
     db DOUBLE_TEAM
     db TRAPHOLE
+    db SWIFT
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 AbraExclusiveMove:
@@ -767,6 +777,7 @@ AlakazamExclusiveMove:
     db TRI_ATTACK
     db SUBSTITUTE
     db DREAM_EATER
+    db SWIFT
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MachopExclusiveMove:
@@ -820,6 +831,7 @@ VictreebelExclusiveMove:
     db BLADE
     db RAZOR_LEAF
     db SLUDGE
+    db SWIFT
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TentacoolExclusiveMove:
@@ -847,6 +859,7 @@ TentacruelExclusiveMove:
     db BARRIER
     db SCREECH
     db HYDRO_PUMP
+    db SWIFT
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GeodudeExclusiveMove:
@@ -963,6 +976,8 @@ MagnetonExclusiveMove:
     db CONVERSION
     db SCREECH
     db LIGHT_SCREEN
+    db SELFDESTRUCT
+    db EXPLOSION
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 FarfetchdExclusiveMove:
@@ -1003,6 +1018,7 @@ DodrioExclusiveMove:
     db SUBSTITUTE
     db BLADE
     db SWORDS_DANCE
+    db SWIFT
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SeelExclusiveMove:
@@ -1045,6 +1061,9 @@ MukExclusiveMove:
     db REST
     db EXPLOSION
     db SUBSTITUTE
+    db SWIFT
+    db THUNDER_WAVE
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ShellderExclusiveMove:
@@ -1094,6 +1113,7 @@ GengarExclusiveMove:
     db SUBSTITUTE
     db SMOG
     db AMNESIA
+    db THUNDER_WAVE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OnixExclusiveMove:
@@ -1172,6 +1192,7 @@ KinglerExclusiveMove:
     db STRIKE
     db STOMP
     db HAZE
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VoltorbExclusiveMove:
@@ -1259,6 +1280,7 @@ MarowakExclusiveMove:
     db SUBSTITUTE
     db STRIKE
     db THRASH
+    db SWIFT
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HitmonleeExclusiveMove:
@@ -1286,6 +1308,7 @@ HitmonchanExclusiveMove:
     db SUBSTITUTE
     db STRIKE
     db SWORDS_DANCE
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LickitungExclusiveMove:
@@ -1320,6 +1343,7 @@ LickitungExclusiveMove:
     db STRIKE
     db DREAM_EATER
     db SOLARBEAM
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KoffingExclusiveMove:
@@ -1337,6 +1361,8 @@ WeezingExclusiveMove:
     db REST
     db EXPLOSION
     db SUBSTITUTE
+    db THUNDER_WAVE
+    db PSYWAVE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RhyhornExclusiveMove:
@@ -1410,6 +1436,7 @@ ChanseyExclusiveMove:
     db STRIKE
     db DREAM_EATER
     db EARTHQUAKE
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TangelaExclusiveMove:
@@ -1692,6 +1719,7 @@ PinsirExclusiveMove:
     db BLADE
     db STRIKE
     db TRAPHOLE
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TaurosExclusiveMove:
@@ -1717,6 +1745,7 @@ TaurosExclusiveMove:
     db SUBSTITUTE
     db STRIKE
     db SOLARBEAM
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MagikarpExclusiveMove:
@@ -1745,6 +1774,7 @@ GyaradosExclusiveMove:
     db STRIKE
     db AMNESIA
     db EARTHQUAKE
+    db THUNDER_WAVE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LaprasExclusiveMove:
@@ -1775,6 +1805,7 @@ LaprasExclusiveMove:
     db DREAM_EATER
     db EARTHQUAKE
     db FISSURE
+    db THUNDER_WAVE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DittoExclusiveMove:
@@ -2073,6 +2104,7 @@ DragoniteExclusiveMove:
     db MEGA_PUNCH
     db MEGA_KICK
     db HORN_DRILL
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewtwoExclusiveMove:
@@ -2115,6 +2147,7 @@ MewtwoExclusiveMove:
     db STRIKE
     db DREAM_EATER
     db EARTHQUAKE
+    db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewExclusiveMove:
