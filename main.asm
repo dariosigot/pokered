@@ -18463,7 +18463,7 @@ CheckImportantMove:
     push af ; Backup Move to Delete
     push bc ; Backup Move Offset
 
-    push af
+    push af ; Backup Move
 
     ; Get Move Name
     ld [$d11e],a
@@ -18482,12 +18482,16 @@ CheckImportantMove:
     call Bankswitch
 .skip
 
-    pop af
+    pop bc ; Restore Move
+    ld a,[$cf98]
+    cp MEW
+    jr z,.ConfirmDelete
 
     ; Search Move to Delete in Potential Move List
-    ld b,a
     ld hl,wMoveRelearnerMoveList
     ld a,[hli]
+    and a
+    jr z,.NotFindThenImportant
     ld c,a
 .Loop
     ld a,[hli]
@@ -42692,6 +42696,18 @@ OnlyOneMoveText:
 
 GetMonPotentialMoveList:
 
+    ; Reset Output
+    xor a
+    ld hl,wMoveRelearnerMoveList
+    ld [hli],a
+    dec a ; a = $FF
+    ld [hl],a
+
+    ; Check Not MEW
+    ld a,[$cf98]
+    cp MEW
+    ret z
+
     ; Standarize Level
     ld a,[$cc49]
     and a ; is it a list of party pokemon or box pokemon?
@@ -43070,7 +43086,12 @@ ChoiceRelearnMove:
     ld b,0
     ld c,d
     add hl,bc ; add [wCurrentMenuItem]
+    ld a,[$cf98]
+    cp MEW
+    ld a,l
+    jr z,.SkipReadMoveHL
     ld a,[hl] ; get New Move ; a = Move ID
+.SkipReadMoveHL
 
     ; Set Move Relearned
     ld [$d0e0],a
@@ -43142,7 +43163,7 @@ ChoiceRelearnMove:
     ld a,[wListScrollOffset]
     ld c,a
     add "1"
-    FuncCoord 05,01
+    FuncCoord 06,01
     ld [Coord],a
 
     ; Print Left Arrow
@@ -43152,7 +43173,7 @@ ChoiceRelearnMove:
     jr nz,.NotScreen0
     ld a,$7f;$d5 ; left arrow transparent
 .NotScreen0
-    FuncCoord 04,01
+    FuncCoord 05,01
     ld [Coord],a
 
     ; Print Right Arrow
@@ -43162,7 +43183,7 @@ ChoiceRelearnMove:
     jr nz,.NotLastScreen
     ld a,$7f;$ec ; right arrow transparent
 .NotLastScreen
-    FuncCoord 06,01
+    FuncCoord 07,01
     ld [Coord],a
 
 .PrintMoves
@@ -43187,8 +43208,15 @@ ChoiceRelearnMove:
     ld hl,Coord
     ld b,RELEARN_MOVE_SCREEN_LENGHT
 .LoopMove
+    ld a,[$cf98]
+    cp MEW
+    ld a,e
+    jr z,.SkipReadMoveDE
     ld a,[de] ; Read Move Id
+.SkipReadMoveDE
     cp $FF
+    jr z,.end ; EndOfList
+    cp STRUGGLE
     jr z,.end ; EndOfList
     push bc
     call .PrintMove
@@ -43213,6 +43241,11 @@ ChoiceRelearnMove:
     ret
 
 .ListLenghtAndPointerToFirst
+    ld a,[$cf98]
+    cp MEW
+    ld a,STRUGGLE-1
+    ld hl,1
+    ret z
     ld hl,wMoveRelearnerMoveList
     ld a,[hli] ; List Lenght
     ret
@@ -43624,6 +43657,10 @@ HandleExclusiveLearnMove:
 
 .CheckMoveJustPotentialKnow
     push hl
+    ld a,[$cf98]
+    cp MEW
+    ld hl,1
+    jr z,.Loop
     ld hl,wMoveRelearnerMoveList+1
 .Loop
     ld a,h
@@ -43659,6 +43696,9 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
+    ld a,[$cf98]
+    cp MEW
+    jr z,.end
     call GetMonPotentialMoveList
 
     ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
@@ -43677,6 +43717,7 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     call .Loop
 
     ; Restore
+.end
     pop af
     ld [$cc49],a
     pop af
@@ -43720,6 +43761,9 @@ SentNewMonToBox_TryToAddExclusiveMove:
     ld a,2 ; current box
     ld [$cc49],a
     call LoadMonData
+    ld a,[$cf98]
+    cp MEW
+    jr z,.end
     call GetMonPotentialMoveList
 
     ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
@@ -43734,6 +43778,7 @@ SentNewMonToBox_TryToAddExclusiveMove:
     call .Loop
 
     ; Restore
+.end
     pop af
     ld [$cc49],a
     pop af
@@ -43990,6 +44035,9 @@ CheckMonAlreadyKnowMove:
     call LoadMonData
     call GetMonPotentialMoveList
 CheckMonAlreadyKnowMoveQuick:
+    ld a,[$cf98]
+    cp MEW
+    jr z,.Find
     ld a,[$d0e0]
     ld b,a
     ld hl,wMoveRelearnerMoveList
