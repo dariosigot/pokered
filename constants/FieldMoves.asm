@@ -1,11 +1,11 @@
 FM_CUT      EQU %00000001 ; 1
 FM_FLY      EQU %00000010 ; 2
-FM_FLOAT    EQU %00000100 ; 4 ; slot 3 is a not-used field move
-FM_STRENGTH EQU %00001000 ; 5
-FM_LIGHT    EQU %00010000 ; 6
-FM_DIG      EQU %00100000 ; 7
-FM_TELEPORT EQU %01000000 ; 8
-FM_HEAL     EQU %10000000 ; 9
+FM_FLOAT    EQU %00000100 ; 3
+FM_STRENGTH EQU %00001000 ; 4
+FM_LIGHT    EQU %00010000 ; 5
+FM_DIG      EQU %00100000 ; 6
+FM_TELEPORT EQU %01000000 ; 7
+FM_HEAL     EQU %10000000 ; 8
 
 db 0                                                 ; 0   - $00 - MISSINGNO
 db 0                                                 ; 1   - $01 - BULBASAUR

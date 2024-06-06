@@ -17506,7 +17506,6 @@ Func_76e1: ; 76e1 (1:36e1)
 FieldMoveNames: ; 778d (1:778d)
     db "CUT@"    ; Move : BLADE
     db "FLY@"    ; Move : SWOOP
-    db "@"
     db "FLOAT@"  ; Move : TSUNAMI (SURF)
     db "STR.TH@" ; Move : STRIKE
     db "LIGHT@"  ; Move : FLASH
@@ -17542,10 +17541,6 @@ GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "
 .Loop8BitRule
     ld a,8+1
     sub c ; a=a-c ; Move id
-    cp 3 ; (Set c if a<3)
-    jr c,.Continue
-    inc a ; inc a if move id >= 3 because there is a "unused field move"
-.Continue
     srl e
     jr nc,.FieldMoveNotFound
 .FieldMoveFound
@@ -17554,7 +17549,6 @@ GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "
     ld a,b
     cp 5 ; Max Possible Number of Field Moves
     jr z,.End
-    jr .FieldMoveNotFound
 .FieldMoveNotFound
     dec c
     jr nz,.Loop8BitRule
@@ -29602,6 +29596,8 @@ StartMenu_Pokedex: ; 13095 (4:7095)
     call UpdateSprites
     jp RedisplayStartMenu
 
+SECTION "StartMenu_Pokemon",ROMX[$70a9],BANK[$4]
+
 StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[W_NUMINPARTY]
     and a
@@ -29612,7 +29608,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld [$cfcb],a
     call DisplayPartyMenu
     jr .checkIfPokemonChosen
-.loop
+.loop ; $70BF ► Don't Move this Pointer!!!
     xor a
     ld [$cc35],a
     ld [$d07d],a
@@ -29722,7 +29718,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .outOfBattleMovePointers
     dw .cut
     dw .fly
-    dw .surf
     dw .surf
     dw .strength
     dw .flash
@@ -29883,7 +29878,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 NewBadgeRequired:
     ld hl,.newBadgeRequiredText
     call PrintText
-    jp $70BF ; StartMenu_Pokedex.loop
+    jp $70BF ; StartMenu_Pokemon.loop
 .newBadgeRequiredText
     TX_FAR _NewBadgeRequiredText
     db "@"
@@ -30996,7 +30991,7 @@ ElementEnd:
     pop af ; Delete Call Back Return
     ld hl,.ElementMissedText
     call PrintText
-    jp $70BF ; StartMenu_Pokedex.loop
+    jp $70BF ; StartMenu_Pokemon.loop
 .ElementMissedText
     TX_FAR _ElementMissedText
     db "@"
