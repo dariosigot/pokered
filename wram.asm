@@ -247,10 +247,10 @@ wEnemyMonAccuracyMod: ; cd32
 wEnemyMonEvasionMod: ; cd33
     ds 1
 
-    ds 9-1
+    ds 9-4
 
 wFieldMoves:
-    ds 1 ; + 4
+    ds 4 ; + 4
 
 wFlyLocationList: ; cd3d
 wWhichTrade: ; cd3d

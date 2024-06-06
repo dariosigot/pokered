@@ -462,7 +462,7 @@ CLEFAIRY_Learnset: MACRO
     db 20,SWIFT
     db 24,MINIMIZE
     db 31,METRONOME
-    db 34,LIGHT_SCREEN
+    db 34,BODY_SLAM
 ENDM
 CLEFABLE_Learnset: MACRO
     db  1,POUND
@@ -524,7 +524,7 @@ WIGGLYTUFF_Learnset: MACRO
     db  1,POUND
     db  1,SING
     db  1,SWIFT
-    db 20,DOUBLESLAP
+    db 16,DOUBLESLAP
     db 27,MINIMIZE
     db 31,REST
     db 34,BODY_SLAM
@@ -1117,7 +1117,8 @@ ENDM
 DODUO_Learnset: MACRO
     db  1,PECK
     db  1,GROWL
-    db 10,FURY_ATTACK
+    db  7,FURY_ATTACK
+    db 10,WING_ATTACK
     db 13,QUICK_ATTACK
     db 18,STOMP
     db 21,SCREECH

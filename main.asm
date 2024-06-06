@@ -7683,114 +7683,35 @@ GetMonName: ; 2f9e (0:2f9e)
     pop hl
     ret
 
-SECTION "GetItemName",ROM0[$2fcf]
-
-GetItemName: ; 2fcf (0:2fcf)
+GetItemName: ; Moved in the Bank
 ; given an item ID at [$D11E],store the name of the item into a string
-;     starting at $CD6D
+; starting at $CD6D
     push hl
     push bc
     ld a,[$D11E]
-    dw 0 ; cp HM_01 ; is this a TM/HM?
-    dw 0 ; jr nc,.Machine
-
     ld [$D0B5],a
     ld a,ITEM_NAME
     ld [W_LISTTYPE],a
     ld a,BANK(ItemNames)
     ld [$D0B7],a
     call GetName
-    jr .Finish
-
-.Machine
-    call GetMachineName
-.Finish
     ld de,$CD6D ; pointer to where item name is stored in RAM
     pop bc
     pop hl
     ret
 
-GetMachineName: ; 2ff3 (0:2ff3)
-; copies the name of the TM/HM in [$D11E] to $CD6D
-    push hl
-    push de
-    push bc
-    ld a,[$D11E]
-    push af
-    cp TM_01 ; is this a TM? [not HM]
-    jr nc,.WriteTM
-; if HM,then write "HM" and add 5 to the item ID,so we can reuse the
-; TM printing code
-    add 5
-    ld [$D11E],a
-    ld hl,HiddenPrefix ; points to "HM"
-    ld bc,2
-    jr .WriteMachinePrefix
-.WriteTM
-    ld hl,TechnicalPrefix ; points to "TM"
-    ld bc,2
-.WriteMachinePrefix
-    ld de,$CD6D
-    call CopyData
-
-; now get the machine number and convert it to text
-    ld a,[$D11E]
-    sub TM_01 - 1
-    ld b,$F6 ; "0"
-.FirstDigit
-    sub 10
-    jr c,.SecondDigit
-    inc b
-    jr .FirstDigit
-.SecondDigit
-    add 10
-    push af
-    ld a,b
-    ld [de],a
-    inc de
-    pop af
-    ld b,$F6 ; "0"
-    add b
-    ld [de],a
-    inc de
-    ld a,"@"
-    ld [de],a
-
-    pop af
-    ld [$D11E],a
-    pop bc
-    pop de
-    pop hl
-    ret
-
-TechnicalPrefix: ; 303c (0:303c)
-    db "TM"
-HiddenPrefix: ; 303e (0:303e)
-    db "HM"
-
 ; sets carry if item is HM,clears carry if item is not HM
 ; Input: a = item ID
-IsItemHM: ; 3040 (0:3040)
-    cp a,HM_01
-    jr c,.notHM
-    cp a,TM_01
-    ret
-.notHM
-    and a
-    ret
+;IsItemHM: ; Moved in the Bank
+;    cp a,HM_01
+;    jr c,.notHM
+;    cp a,TM_01
+;    ret
+;.notHM
+;    and a
+;    ret
 
-; sets carry if move is an HM,clears carry if move is not an HM
-; Input: a = move ID
-IsMoveHM: ; 3049 (0:3049)
-    ld hl,HMMoves
-    ld de,1
-    jp IsInArray
-
-HMMoves: ; 3052 (0:3052)
-    db $ff ; terminator
-    ds 5
-
-GetMoveName: ; 3058 (0:3058)
+GetMoveName: ; Moved in the Bank
     push hl
     ld a,MOVE_NAME
     ld [W_LISTTYPE],a
@@ -7802,6 +7723,8 @@ GetMoveName: ; 3058 (0:3058)
     ld de,$cd6d ; pointer to where move name is stored in RAM
     pop hl
     ret
+
+SECTION "ReloadMapData",ROM0[$3071]
 
 ; reloads text box tile patterns,current map view,and tileset tile patterns
 ReloadMapData: ; 3071 (0:3071)
@@ -9040,8 +8963,6 @@ GetName: ; 376b (0:376b)
 ; returns pointer to name in de
     ld a,[$d0b5]
     ld [$d11e],a
-    ds 2 ; cp a,$C4        ;it's TM/HM
-    ds 3; jp nc,GetMachineName
     ld a,[H_LOADEDROMBANK]
     push af
     push hl
@@ -9112,6 +9033,8 @@ GetName: ; 376b (0:376b)
     call RoutineForRealGB
     ret
 
+SECTION "GetItemPrice",ROM0[$37df]
+
 GetItemPrice: ; 37df (0:37df)
     ld a,[H_LOADEDROMBANK]
     push af
@@ -9128,7 +9051,7 @@ GetItemPrice: ; 37df (0:37df)
     ld h,[hl]
     ld l,a
     ld a,[$cf91]
-    cp HM_01
+    cp TM_01
     jr nc,.asm_3812
     ld bc,$3
 .asm_3802
@@ -11437,10 +11360,10 @@ ItemPrices: ; 4608 (1:4608)
     bcd3      0 ; GOOD_ROD
     bcd3      0 ; SUPER_ROD
     bcd3   9800 ; PP_UP
-    bcd3   3000 ; ETHER
-    bcd3  10000 ; MAX_ETHER
-    bcd3   5000 ; ELIXER
-    bcd3  17000 ; MAX_ELIXER
+    bcd3    700 ; ETHER
+    bcd3   1200 ; MAX_ETHER
+    bcd3    900 ; ELIXER
+    bcd3   1500 ; MAX_ELIXER
 
 ItemNames_Old: ; 472b (1:472b)
 
@@ -16072,8 +15995,8 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     and a
     jr nz,.unsellableItem
     ld a,[$cf91]
-    call IsItemHM
-    jr c,.unsellableItem
+    ds 3 ; call IsItemHM
+    ds 2 ; jr c,.unsellableItem
     ld a,PRICEDITEMLISTMENU
     ld [wListMenuID],a
     ld [$ff8e],a ; halve prices when selling
@@ -17073,7 +16996,8 @@ GetAddressOfScreenCoords: ; 7375 (1:7375)
 TextBoxFunctionTable: ; 7387 (1:7387)
     dbw $13,Func_74ba
     dbw $15,Func_74ea
-    dbw $04,Func_76e1
+    dbw $04,FieldMovesMenu
+    dbw $03,ChoiceMonSimpleMenu
     db $ff ; terminator
 
 TextBoxCoordTable_Old:
@@ -17470,91 +17394,49 @@ MenuStrings: ; 7671 (1:7671)
 .HealCancelMenu ; 76d5 (1:36d5)
     db "HEAL",$4E,"CANCEL@"
 
-Func_76e1: ; 76e1 (1:36e1)
-    xor a
-    ld hl,wFieldMoves ; $cd3d-1
-    ld [hli],a
-    ld [hli],a
-    ;ld [hli],a
-    ;ld [hli],a
-    ;ld [hli],a
-    call HackForAddAndResetFieldMovesSlot
-    ld [hl],$c ; Larghezza Fissa Menù Party Pokemon
-    call GetMonFieldMoves
-    ld a,[wNumFieldMoves] ; [$cd41]
-    and a
-    jr nz,.asm_770f
-    FuncCoord 11,10 ; Bordo MOVES/STATS/SWITCH,Eliminato "CANCEL"
+FieldMovesMenu: ; 76e1 (1:36e1)
+    FuncCoord 03,16
     ld hl,Coord
-    ld b,6 ; Eliminato "CANCEL"
-    ld c,$7
+    ld b,0
+    ld a,[wNumFieldMoves]
+    ld de,-40
+.loop1
+    add hl,de
+    inc b
+    inc b
+    dec a
+    jr nz,.loop1
+    ld c,7
     call TextBoxBorder
     call UpdateSprites
-    ld a,$c
-    ld [$FF00+$f7],a
-    FuncCoord 13,12 ; Eliminato "CANCEL" dal Menù Party
+    FuncCoord 05,18
     ld hl,Coord
-    ld de,PokemonMenuEntries ; $77c2
-    jp PlaceString
-.asm_770f
-    push af
-    FuncCoord 0,11 ; Eliminato "CANCEL" dal Menù Party
-    ld hl,Coord
-    ld a,[wFieldMovesLeftmostXCoord] ; [$cd42]
-    dec a
-    ld e,a
-    ld d,$0
-    add hl,de
-    ld b,5 ; Eliminato "CANCEL" dal Menù Party
-    ld a,$12
-    sub e
-    ld c,a
-    pop af
-    ld de,$ffd8
-.asm_7725
-    add hl,de
-    inc b
-    inc b
-    dec a
-    jr nz,.asm_7725
-    ld de,$ffec
-    add hl,de
-    inc b
-    call TextBoxBorder
-    call UpdateSprites
-    FuncCoord 0,12 ; Eliminato "CANCEL"
-    ld hl,Coord
-    ld a,[wFieldMovesLeftmostXCoord] ; [$cd42]
-    inc a
-    ld e,a
-    ld d,$0
-    add hl,de
-    ld de,$ffd8
-    ld a,[wNumFieldMoves] ; [$cd41]
-.asm_7747
+    ld a,[wNumFieldMoves]
+    ld de,-40
+.loop2
     add hl,de
     dec a
-    jr nz,.asm_7747
+    jr nz,.loop2
     xor a
-    ld [wNumFieldMoves],a ; [$cd41]
-    ld de,wFieldMoves ; $cd3d-1
-.asm_7752
+    ld [wNumFieldMoves],a
+    ld de,wFieldMoves
+.LoopFieldMoves
     push hl
-    ld hl,FieldMoveNames ; $778d
+    ld hl,.FieldMoveNames
     ld a,[de]
     and a
-    jr z,.asm_7776
+    jr z,.LoopFieldMovesEnd
     inc de
     ld b,a
-.asm_775c
+.LoopMoveNames
     dec b
-    jr z,.asm_7766
-.asm_775f
+    jr z,.LoopMoveNamesEnd
+.LoopMoveNameChars
     ld a,[hli]
     cp $50
-    jr nz,.asm_775f
-    jr .asm_775c
-.asm_7766
+    jr nz,.LoopMoveNameChars
+    jr .LoopMoveNames
+.LoopMoveNamesEnd
     ld b,h
     ld c,l
     pop hl
@@ -17562,28 +17444,17 @@ Func_76e1: ; 76e1 (1:36e1)
     ld d,b
     ld e,c
     call PlaceString
-    ld bc,$28
+    ld bc,40
     add hl,bc
     pop de
-    jr .asm_7752
-.asm_7776
+    jr .LoopFieldMoves
+.LoopFieldMovesEnd
     pop hl
-    ld a,[wFieldMovesLeftmostXCoord] ; [$cd42]
-    ld [$FF00+$f7],a
-    FuncCoord 0,12 ; Eliminato "CANCEL" dal Menù Party
-    ld hl,Coord
-    ld a,[wFieldMovesLeftmostXCoord] ; [$cd42]
-    inc a
-    ld e,a
-    ld d,$0
-    add hl,de
-    ld de,PokemonMenuEntries ; $77c2
-    jp PlaceString
+    ret
 
-FieldMoveNames: ; 778d (1:778d)
+.FieldMoveNames
     db "CUT@"    ; Move : BLADE
     db "FLY@"    ; Move : SWOOP
-    db "@"
     db "FLOAT@"  ; Move : TSUNAMI (SURF)
     db "STR.TH@" ; Move : STRIKE
     db "LIGHT@"  ; Move : FLASH
@@ -17591,14 +17462,40 @@ FieldMoveNames: ; 778d (1:778d)
     db "TELEP.@" ; Move : TELEPORT
     db "HEAL@"   ; Move : SOFTBOILED
 
-PokemonMenuEntries: ; 77c2 (1:77c2)
+ChoiceMonSimpleMenu:
+    ld b,BANK(GetMonFieldMoves)
+    ld hl,GetMonFieldMoves
+    call Bankswitch
+    FuncCoord 11,08
+    ld hl,Coord
+    ld b,8
+    ld c,7
+    call TextBoxBorder
+    call UpdateSprites
+    ld a,$c
+    ld [$FF00+$f7],a ; hFieldMoveMonMenuTopMenuItemX
+    FuncCoord 13,10
+    ld hl,Coord
+    ld de,.PokemonMenuEntries
+    jp PlaceString
+.PokemonMenuEntries
+    db "FIELD",$4E
     db "STATS",$4E
     db "MOVES",$4E
-    db "SWITCH","@" ; Eliminato "CANCEL"
+    db "SWITCH","@"
 
-SECTION "GetMonFieldMoves",ROMX[$77d6],BANK[$1]
-
-GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "FieldMoves"
+GetMonFieldMoves: ; Moved in the Bank
+; Totalmente Ristrutturato basato su Tabella "FieldMoves"
+    xor a
+    ld hl,wFieldMoves ; $cd3d-1
+    ld [hli],a ; Standard
+    ld [hli],a ; Standard
+    ld [hli],a ; Standard
+    ld [hli],a ; Standard
+    ld [hli],a ; Standard
+    ld [hli],a ; New
+    ld [hli],a ; New
+    ld [hli],a ; New
     ld a,[wWhichPokemon] ; $cf92
     ld d,0
     ld e,a
@@ -17606,9 +17503,7 @@ GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "
     add hl,de
     ld a,[hl]
     ld [$d11e],a
-    ld a,$3a
-    call Predef ; convert pokemon ID in [$D11E] to pokedex number
-    ld a,[$d11e]
+    call IndexToPokedexAndRestoreD11E
     ld e,a
     ld hl,GetFieldMovesRulesByte
     ld b,BANK(GetFieldMovesRulesByte)
@@ -17619,32 +17514,20 @@ GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "
 .Loop8BitRule
     ld a,8+1
     sub c ; a=a-c ; Move id
-    cp 3 ; (Set c if a<3)
-    jr c,.Continue
-    inc a ; inc a if move id >= 3 because there is a "unused field move"
-.Continue
     srl e
     jr nc,.FieldMoveNotFound
 .FieldMoveFound
     inc b ; num of founded moves
     ld [hli],a ; store field move id in wFieldMoves vector
     ld a,b
-    cp 5 ; Max Possible Number of Field Moves
+    cp 8 ; Max Possible Number of Field Moves
     jr z,.End
-    jr .FieldMoveNotFound
 .FieldMoveNotFound
     dec c
     jr nz,.Loop8BitRule
 .End
     ld a,b
     ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
-    ret
-
-HackForAddAndResetFieldMovesSlot:
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; New
     ret
 
 ; Some Bytes Free
@@ -17987,8 +17870,8 @@ Func_7aa5: ; 7aa5 (1:7aa5)
     and a
     jr nz,.asm_7aef
     ld a,[$cf91]
-    call IsItemHM
-    jr c,.asm_7aef
+    ds 3 ; call IsItemHM
+    ds 2 ; jr c,.asm_7aef
     push hl
     ld hl,UnnamedText_7b63 ; $7b63
     call PrintText
@@ -18540,7 +18423,7 @@ CheckImportantMove:
     push af ; Backup Move to Delete
     push bc ; Backup Move Offset
 
-    push af
+    push af ; Backup Move
 
     ; Get Move Name
     ld [$d11e],a
@@ -18559,12 +18442,16 @@ CheckImportantMove:
     call Bankswitch
 .skip
 
-    pop af
+    pop bc ; Restore Move
+    ld a,[$cf98]
+    cp MEW
+    jr z,.ConfirmDelete
 
     ; Search Move to Delete in Potential Move List
-    ld b,a
     ld hl,wMoveRelearnerMoveList
     ld a,[hli]
+    and a
+    jr z,.NotFindThenImportant
     ld c,a
 .Loop
     ld a,[hli]
@@ -23214,15 +23101,13 @@ CheckForCollisionWhenPushingBoulder: ; Moved in the Bank
     ld a,$FF
     jr .end
 
-SECTION "UseItem_",ROMX[$55c7],BANK[$3]
-
-UseItem_: ; d5c7 (3:55c7)
+UseItem_: ; Moved in the Bank
     ld a,1
     ld [$cd6a],a
     ld a,[$cf91]    ;contains item_ID
-    cp a,HM_01
+    cp a,TM_01
     jp nc,ItemUseTMHM
-    ld hl,ItemUsePtrTable
+    ld hl,.ItemUsePtrTable
     dec a
     add a
     ld c,a
@@ -23232,8 +23117,7 @@ UseItem_: ; d5c7 (3:55c7)
     ld h,[hl]
     ld l,a
     jp hl
-
-ItemUsePtrTable: ; d5e1 (3:55e1)
+.ItemUsePtrTable
     dw ItemUseBall       ; MASTER_BALL
     dw ItemUseBall       ; ULTRA_BALL
     dw ItemUseBall       ; GREAT_BALL
@@ -23313,10 +23197,17 @@ ItemUsePtrTable: ; d5e1 (3:55e1)
     dw ItemUseGoodRod    ; GOOD_ROD
     dw ItemUseSuperRod   ; SUPER_ROD
     dw UnusableItem ; ItemUsePPUp       ; PP_UP (real one)
-    dw UnusableItem ; ItemUsePPRestore  ; ETHER
-    dw UnusableItem ; ItemUsePPRestore  ; MAX_ETHER
-    dw UnusableItem ; ItemUsePPRestore  ; ELIXER
-    dw UnusableItem ; ItemUsePPRestore  ; MAX_ELIXER
+    dw ItemUsePPRestore  ; ETHER
+    dw ItemUsePPRestore  ; MAX_ETHER
+    dw ItemUsePPRestore  ; ELIXER
+    dw ItemUsePPRestore  ; MAX_ELIXER
+    dw UnusableItem      ; HM_01 : NATURE POWER
+    dw UnusableItem      ; HM_02 : AIR POWER
+    dw UnusableItem      ; HM_03 : WATER POWER
+    dw UnusableItem      ; HM_04 : EARTH POWER
+    dw UnusableItem      ; HM_05 : FIRE POWER
+
+SECTION "ItemUseBall",ROMX[$5687],BANK[$3]
 
 ItemUseBall: ; d687 (3:5687)
     ld a,[W_ISINBATTLE]
@@ -25046,11 +24937,12 @@ ItemfinderFoundNothingText: ; e312 (3:6312)
     db "@"
 
 ItemUsePPUp: ; e317 (3:6317)
+    ret
+
+ItemUsePPRestore: ; Moved in the Bank
     ld a,[W_ISINBATTLE]
     and a
     jp nz,ItemUseNotTime
-
-ItemUsePPRestore: ; e31e (3:631e)
     ld a,[$cf92]
     push af
     ld a,[$cf91]
@@ -25058,166 +24950,97 @@ ItemUsePPRestore: ; e31e (3:631e)
 .chooseMon
     xor a
     ld [$cfcb],a
-    ld a,$01 ; item use party menu
+    ld a,$06 ; Ether/Elixer Menu
     ld [$d07d],a
     call DisplayPartyMenu
-    jr nc,.chooseMove
+    jr nc,.useEther
     jp .itemNotUsed
-.chooseMove
-    ld a,[$cd3d]
-    cp a,ELIXER
-    jp nc,.useElixir ; if Elixir or Max Elixir
-    ld a,$02
-    ld [wMoveMenuType],a
-    ld hl,RaisePPWhichTechniqueText
-    ld a,[$cd3d]
-    cp a,ETHER ; is it a PP Up?
-    jr c,.printWhichTechniqueMessage ; if so,print the raise PP message
-    ld hl,RestorePPWhichTechniqueText ; otherwise,print the restore PP message
-.printWhichTechniqueMessage
-    call PrintText
-    xor a
-    ld [$cc2e],a
-    ld hl,MoveSelectionMenu
-    ld b,BANK(MoveSelectionMenu)
-    call Bankswitch ; move selection menu
-    ld a,0
-    ld [$cc2e],a
-    jr nz,.chooseMon
-    ld hl,W_PARTYMON1_MOVE1
-    ld bc,44
-    call GetSelectedMoveOffset
+.afterRestoringPP ; after using a (Max) Ether/Elixir
+    ld a,$8e
+    call PlaySound
+    ld a,[hl]
+    ld b,a
+    ld hl,$d11e
+    ld a,[hl]
+    push af
     push hl
-    ld a,[hl]
-    ld [$d11e],a
-    call GetMoveName
-    call CopyStringToCF4B ; copy name to $cf4b
+    ld [hl],b
+    FuncCoord 13,01
+    ld hl,Coord
+    ld a,[$cf92]
+    ld bc,40
+    call AddNTimes
+    ld de,$d11e
+    ld bc,$0103
+    call PrintNumber
     pop hl
-    ld a,[$cd3d]
-    cp a,ETHER
-    jr nc,.useEther ; if Ether or Max Ether
-.usePPUp
-    ld bc,21
-    add hl,bc
-    ld a,[hl] ; move PP
-    cp a,3 << 6 ; have 3 PP Ups already been used?
-    jr c,.PPNotMaxedOut
-    ld hl,PPMaxedOutText
-    call PrintText
-    jr .chooseMove
-.PPNotMaxedOut
-    ld a,[hl]
-    add a,1 << 6 ; increase PP Up count by 1
+    pop af
     ld [hl],a
-    ld a,1 ; 1 PP Up used
-    ld [$d11e],a
-    call RestoreBonusPP ; add the bonus PP to current PP
-    ld hl,PPIncreasedText
+    ld hl,.PPRestoredText
     call PrintText
-.done
     pop af
     ld [$cf92],a
     call GBPalWhiteOut
     call GoPAL_SET_CF1C
     jp RemoveUsedItem
-.afterRestoringPP ; after using a (Max) Ether/Elixir
-    ld a,[$cf92]
-    ld b,a
-    ld a,[wPlayerMonNumber]
-    cp b ; is the pokemon whose PP was restored active in battle?
-    jr nz,.skipUpdatingInBattleData
-    ld hl,W_PARTYMON1_MOVE1PP
-    ld bc,44
-    call AddNTimes
-    ld de,W_PLAYERMONPP
-    ld bc,4
-    call CopyData ; copy party data to in-battle data
-.skipUpdatingInBattleData
-    ld a,$8e
-    call PlaySound
-    ld hl,PPRestoredText
-    call PrintText
-    jr .done
 .useEther
     call .restorePP
     jr nz,.afterRestoringPP
     jp .noEffect
-; unsets zero flag if PP was restored,sets zero flag if not
-; however,this is bugged for Max Ethers and Max Elixirs (see below)
 .restorePP
-    xor a
-    ld [$cc49],a ; party pokemon
-    call GetMaxPP
-    ld hl,W_PARTYMON1_MOVE1
-    ld bc,44
-    call GetSelectedMoveOffset
-    ld bc,21
-    add hl,bc ; hl now points to move's PP
-    ld a,[$d11e]
-    ld b,a ; b = max PP
     ld a,[$cd3d]
-    cp a,MAX_ETHER
-    jr z,.fullyRestorePP
-    ld a,[hl] ; move PP
-    and a,%00111111 ; lower 6 bit bits store current PP
-    cp b ; does current PP equal max PP?
-    ret z ; if so,return
-    add a,10 ; increase current PP by 10
-; b holds the max PP amount and b will hold the new PP amount.
-; So,if the new amount meets or exceeds the max amount,
-; cap the amount to the max amount by leaving b unchanged.
-; Otherwise,store the new amount in b.
-    cp b ; does the new amount meet or exceed the maximum?
-    jr nc,.storeNewAmount
     ld b,a
-.storeNewAmount
-    ld a,[hl] ; move PP
-    and a,%11000000 ; PP Up counter bits
-    add b
-    ld [hl],a
-    ret
-.fullyRestorePP
-    ld a,[hl] ; move PP
-; Note that this code has a bug. It doesn't mask out the upper two bits,which
-; are used to count how many PP Ups have been used on the move. So,Max Ethers
-; and Max Elixirs will not be detected as having no effect on a move with full
-; PP if the move has had any PP Ups used on it.
-    cp b ; does current PP equal max PP?
-    ret z
-    jr .storeNewAmount
-.useElixir
-; decrement the item ID so that ELIXER becomes ETHER and MAX_ELIXER becomes MAX_ETHER
-    ld hl,$cd3d
-    dec [hl]
-    dec [hl]
-    xor a
-    ld hl,wCurrentMenuItem
-    ld [hli],a
-    ld [hl],a ; zero the counter for number of moves that had their PP restored
-    ld b,4
-; loop through each move and restore PP
-.elixirLoop
-    push bc
-    ld hl,W_PARTYMON1_MOVE1
-    ld bc,44
-    call GetSelectedMoveOffset
+    ld hl,.Table
+.next
+    ld a,[hli]
+    cp b
+    jr z,.found
+    inc hl
+    jr .next
+.found
     ld a,[hl]
-    and a ; does the current slot have a move?
-    jr z,.nextMove
-    call .restorePP
-    jr z,.nextMove
-; if some PP was restored
-    ld hl,$cc27 ; counter for number of moves that had their PP restored
-    inc [hl]
-.nextMove
-    ld hl,wCurrentMenuItem
-    inc [hl]
-    pop bc
-    dec b
-    jr nz,.elixirLoop
-    ld a,[$cc27]
-    and a ; did any moves have their PP restored?
-    jp nz,.afterRestoringPP
+    ld d,a ; Amount
+    ld [$d11e],a
+    ld a,255
+    sub d
+    inc a
+    ld e,a ; Check
+    ld hl,W_PARTYMON1_MOVE1PP
+    ld bc,44
+    ld a,[$cf92]
+    call AddNTimes ; hl now points to move's PP
+    ld a,[hl] ; Read Energy
+    cp 255
+    jr z,.NoEffect
+    cp e ; Check
+    jr c,.LessThenE
+    push hl
+    ld d,a
+    ld a,255
+    sub d
+    ld hl,$d11e
+    ld [hl],a
+    pop hl
+    ld a,255
+    jr .storeNewAmount
+.LessThenE
+    add d ; Amount
+    push hl
+    ld hl,$d11e
+    ld [hl],d
+    pop hl
+.storeNewAmount
+    ld [hl],a
+    and a
+    ret
+.Table
+    db ETHER,100
+    db MAX_ETHER,200
+    db ELIXER,150
+    db MAX_ELIXER,255
+.NoEffect
+    xor a
+    ret
 .noEffect
     call ItemUseNoEffect
 .itemNotUsed
@@ -25227,26 +25050,13 @@ ItemUsePPRestore: ; e31e (3:631e)
     xor a
     ld [$cd6a],a ; item use failed
     ret
-
-RaisePPWhichTechniqueText: ; e45d (3:645d)
-    TX_FAR _RaisePPWhichTechniqueText
-    db "@"
-
-RestorePPWhichTechniqueText: ; e462 (3:6462)
-    TX_FAR _RestorePPWhichTechniqueText
-    db "@"
-
-PPMaxedOutText: ; e467 (3:6467)
-    TX_FAR _PPMaxedOutText
-    db "@"
-
-PPIncreasedText: ; e46c (3:646c)
-    TX_FAR _PPIncreasedText
-    db "@"
-
-PPRestoredText: ; e471 (3:6471)
+.PPRestoredText
     TX_FAR _PPRestoredText
     db "@"
+
+; Free Space
+
+SECTION "UnusableItem",ROMX[$6476],BANK[$3]
 
 ; for items that can't be used from the Item menu
 UnusableItem: ; e476 (3:6476)
@@ -25333,8 +25143,8 @@ ItemUseTMHM: ; e479 (3:6479)
     and a
     ld a,[$cf91]
     jr nz,.TechMach ; if use TECH.MACHINE don't remove it
-    call IsItemHM
-    ret c
+    ds 3 ; call IsItemHM
+    ds 1 ; ret c
     jp RemoveUsedItem
 .TechMach
     jp RemoveTMQty ; but remove inside TM
@@ -25633,9 +25443,9 @@ GetSelectedMoveOffset2: ; e6e9 (3:66e9)
 TossItem_: ; e6f1 (3:66f1)
     push hl
     ld a,[$cf91]
-    call IsItemHM
+    ds 3 ; call IsItemHM
     pop hl
-    jr c,.tooImportantToToss
+    ds 2 ; jr c,.tooImportantToToss
     push hl
     call IsKeyItem_
     ld a,[$d124]
@@ -25704,11 +25514,9 @@ IsKeyItem_: ; e764 (3:6764)
     ld a,$01
     ld [$d124],a
     ld a,[$cf91]
-    cp a,HM_01 ; is the item an HM or TM?
-    jr nc,.checkIfItemIsHM
-; if the item is not an HM or TM
+; if the item is not a TM
     push af
-    ld hl,KeyItemBitfield
+    ld hl,.KeyItemBitfield
     ld de,$cee9
     ld bc,15 ; only 11 bytes are actually used
     call CopyData
@@ -25722,15 +25530,10 @@ IsKeyItem_: ; e764 (3:6764)
     ld a,c
     and a
     ret nz
-.checkIfItemIsHM
-    ld a,[$cf91]
-    call IsItemHM
-    ret c
     xor a
     ld [$d124],a
     ret
-
-KeyItemBitfield: ; e799 (3:6799)
+.KeyItemBitfield
     db %11110000
     db %00000001
     db %11110000
@@ -25741,7 +25544,9 @@ KeyItemBitfield: ; e799 (3:6799)
     db %11000000
     db %11110000
     db %00111111
-    db %00000000
+    db %11111000
+
+SECTION "SendNewMonToBox",ROMX[$67a4],BANK[$3]
 
 SendNewMonToBox: ; e7a4 (3:67a4)
     ld de,W_NUMINBOX ; $da80
@@ -25936,7 +25741,7 @@ ItemUseTechMach:
 GetTMChoiceItemID:
     cp TM_01 ; less then TM01?
     jr c,.Init
-    cp TM_54+1 ; greater then TM54?
+    cp TM_56+1 ; greater then TM54?
     jr nc,.Init
     call GetTMQty
     jr z,.Init
@@ -25946,7 +25751,7 @@ GetTMChoiceItemID:
     jr .start
 .Init
     ld hl,wTM
-    ld b,((TM_54-TM_01+1) >> 2)+1
+    ld b,((TM_56-TM_01+1) >> 2)+1
 .LoopSearchAtLeastOne
     ld a,[hli]
     and a
@@ -25960,7 +25765,7 @@ GetTMChoiceItemID:
     ld a,TM_01-1
 .TryNext
     inc a
-    cp TM_54+1
+    cp TM_56+1
     jr nz,.continue1
     ld a,TM_01
 .continue1
@@ -25971,7 +25776,7 @@ GetTMChoiceItemID:
     dec a
     cp TM_01-1
     jr nz,.continue2
-    ld a,TM_54
+    ld a,TM_56
 .continue2
     call GetTMQty ; input a = TM ID | output c = Qty | z if Qty=0
     jr z,.TryPrev
@@ -29283,6 +29088,22 @@ asm_128fb:
     pop de
     ret
 
+WildMonEncounterSlotChances: ; Moved in the Bank
+; There are 10 slots for wild pokemon,and this is the table that defines how common each of
+; those 10 slots is. A random number is generated and then the first byte of each pair in this
+; table is compared against that random number. If the random number is less than or equal
+; to the first byte,then that slot is chosen.  The second byte is double the slot number.
+    db $32,$00 ; 51/256 = 19.9% chance of slot 0
+    db $65,$02 ; 51/256 = 19.9% chance of slot 1
+    db $8C,$04 ; 39/256 = 15.2% chance of slot 2
+    db $A5,$06 ; 25/256 =  9.8% chance of slot 3
+    db $BE,$08 ; 25/256 =  9.8% chance of slot 4
+    db $D7,$0A ; 25/256 =  9.8% chance of slot 5
+    db $E4,$0C ; 13/256 =  5.1% chance of slot 6
+    db $F1,$0E ; 13/256 =  5.1% chance of slot 7
+    db $FC,$10 ; 11/256 =  4.3% chance of slot 8
+    db $FF,$12 ;  3/256 =  1.2% chance of slot 9
+
 SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
 
 ; [$D07D] = menu type / message ID
@@ -29294,7 +29115,7 @@ SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
 ; 03: learn TM/HM menu
 ; 04: swap pokemon positions menu
 ; 05: use evolution stone on pokemon menu
-; 06 : Move Relearner ; TODO Eliminare
+; 06 : Ether/Elixer Menu
 ; otherwise,it is a message ID
 ; f0: poison healed
 ; f1: burn healed
@@ -29376,7 +29197,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     cp a,$05
     jr z,.evolutionStoneMenu
     cp a,$06
-    jr z,.moveRelearnerMenu
+    jr z,.EtherElixerMenu
     push hl
     ld bc,14+6 ; Denim,Spostato Stato a capo ; ld bc,14 ; 14 columns to the right
     add hl,bc
@@ -29397,7 +29218,15 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     call Func_12ec7 ; color the HP bar (on SGB)
     pop hl
     jr .printLevel
-.moveRelearnerMenu
+.EtherElixerMenu
+    push hl
+    ld bc,(+01*20)+10
+    add hl,bc
+    ld de,$cfb5 ; Energy
+    ld bc,$0103
+    call PrintNumber
+    ld [hl],$DA ; Energy Symbol
+    pop hl
     jr .printLevel
 .teachMoveMenu
     push hl
@@ -29660,6 +29489,8 @@ StartMenu_Pokedex: ; 13095 (4:7095)
     call UpdateSprites
     jp RedisplayStartMenu
 
+SECTION "StartMenu_Pokemon",ROMX[$70a9],BANK[$4]
+
 StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[W_NUMINPARTY]
     and a
@@ -29670,7 +29501,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld [$cfcb],a
     call DisplayPartyMenu
     jr .checkIfPokemonChosen
-.loop
+.loop ; $70BF ► Don't Move this Pointer!!!
     xor a
     ld [$cc35],a
     ld [$d07d],a
@@ -29685,12 +29516,71 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jp RedisplayStartMenu
 .chosePokemon
     call SaveScreenTilesToBuffer1 ; save screen
-    ld a,$04
+.RedrawMenu
+    ld a,3 ; ChoiceMonSimpleMenu
     ld [$d125],a
     call DisplayTextBoxID ; display pokemon menu options
-    ld hl,wFieldMoves ; $cd3d-1
-    ld bc,$020c ; ld bc,$020c ; max menu item ID,top menu item Y
-    ld e,5+1 ; Max Number of Field Moves + 1
+    ld bc,$030a ; ld bc,$020c ; max menu item ID,top menu item Y
+    ld d,12 ; top menu item X
+    call HandlePkmnSubMenu
+    bit 1,a ; was the B button pressed?
+    jr nz,.ReloadScreenAndLoop
+    ld a,[wCurrentMenuItem]
+    and a
+    jr z,.choseFieldMove
+    push af
+    call LoadScreenTilesFromBuffer1 ; restore saved screen
+    pop af
+    dec a
+    jr z,.choseStats
+    dec a
+    jr z,.choseMoves
+    ; fall through
+
+.choseSwitch
+    ld a,[W_NUMINPARTY]
+    cp a,2 ; is there more than one pokemon in the party?
+    jr c,StartMenu_Pokemon ; if not,no switching
+    call Func_13653
+    ld a,$04 ; swap pokemon positions menu
+    ld [$d07d],a
+    jr .checkIfPokemonChosen2
+
+.choseStats
+    call CleanLCD_OAM
+    xor a
+    ld [$cc49],a
+    ld a,$36
+    call Predef ; indirect jump to StatusScreen (12953 (4:6953))
+.ReturnToPartyMenu
+    call ReloadMapData
+    jr StartMenu_Pokemon
+
+.choseMoves
+    PREDEF MovesMenuPredef
+    jr .ReturnToPartyMenu
+
+.ReloadScreenAndLoop
+    call LoadScreenTilesFromBuffer1 ; restore saved screen
+.MiddleJumpToLoop
+    jr .loop
+
+.NoFieldMoves
+    ld a,$a5 ; Error
+    call PlaySoundWaitForCurrent ; play sound
+    jr .RedrawMenu
+
+.choseFieldMove
+    ld a,[wNumFieldMoves]
+    and a
+    jr z,.NoFieldMoves
+    ld a,4 ; FieldMovesMenu
+    ld [$d125],a
+    call DisplayTextBoxID ; display pokemon field moves
+    ld bc,$ff12 ; max menu item ID,top menu item Y
+    ld d,04 ; top menu item X
+    ld hl,wFieldMoves
+    ld e,8+1 ; Max Number of Field Moves + 1
 .adjustMenuVariablesLoop
     dec e
     jr z,.storeMenuVariables
@@ -29702,63 +29592,19 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     dec c
     jr .adjustMenuVariablesLoop
 .storeMenuVariables
-    ld hl,wTopMenuItemY
-    ld a,c
-    ld [hli],a ; top menu item Y
-    ld a,[$fff7]
-    ld [hli],a ; top menu item X
-    xor a
-    ld [hli],a ; current menu item ID
-    inc hl
-    ld a,b
-    ld [hli],a ; max menu item ID
-    ld a,%00000011 ; A button,B button
-    ld [hli],a ; menu watched keys
-    xor a
-    ld [hl],a
-    call HandleMenuInputPlusWrapping
+    call HandlePkmnSubMenu
     push af
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     pop af
     bit 1,a ; was the B button pressed?
-    jp nz,.loop
-; if the B button wasn't pressed
-    ld a,[wMaxMenuItem]
-    ld b,a
-    ld a,[wCurrentMenuItem] ; menu selection
-    cp b
-    jr z,.choseSwitch
-    dec b
-    cp b
-    jp z,.choseMoves
-    dec b
-    cp b
-    jp z,.choseStats
-    ld c,a
+    jr nz,.MiddleJumpToLoop
+    ld hl,wFieldMoves
     ld b,0
-    ld hl,wFieldMoves ; $cd3d-1
+    ld a,[wCurrentMenuItem]
+    ld c,a
     add hl,bc
-    jp .choseOutOfBattleMove
-.choseSwitch
-    ld a,[W_NUMINPARTY]
-    cp a,2 ; is there more than one pokemon in the party?
-    jp c,StartMenu_Pokemon ; if not,no switching
-    call Func_13653
-    ld a,$04 ; swap pokemon positions menu
-    ld [$d07d],a
-    jp .checkIfPokemonChosen2
-.choseStats
-    call CleanLCD_OAM
-    xor a
-    ld [$cc49],a
-    ld a,$36
-    call Predef ; indirect jump to StatusScreen (12953 (4:6953))
-.ReturnToPartyMenu
-    call ReloadMapData
-    jp StartMenu_Pokemon
-.choseMoves
-    PREDEF MovesMenuPredef
-    jr .ReturnToPartyMenu
+    ; fall through
+
 .choseOutOfBattleMove
     push hl
     ld a,[$cf92]
@@ -29780,7 +29626,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .outOfBattleMovePointers
     dw .cut
     dw .fly
-    dw .surf
     dw .surf
     dw .strength
     dw .flash
@@ -29938,14 +29783,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call Func_3dbe
     jp CloseTextDisplay
 
-NewBadgeRequired:
-    ld hl,.newBadgeRequiredText
-    call PrintText
-    jp $70BF ; StartMenu_Pokedex.loop
-.newBadgeRequiredText
-    TX_FAR _NewBadgeRequiredText
-    db "@"
-
 SECTION "ErasePartyMenuCursors",ROMX[$72ed],BANK[$4]
 
 ; writes a blank tile to all possible menu cursor positions on the party menu
@@ -30102,8 +29939,8 @@ StartMenu_Item: ; 13302 (4:7302)
     and a
     jr nz,.skipAskingQuantity
     ld a,[$cf91]
-    call IsItemHM
-    jr c,.skipAskingQuantity
+    ds 3 ; call IsItemHM
+    ds 2 ; jr c,.skipAskingQuantity
     call DisplayChooseQuantityMenu
     inc a
     jr z,.tossZeroItems
@@ -30595,11 +30432,11 @@ TechnicalMachines: ; 13773 (4:7773)
     db BIDE         ; TM_34
     db METRONOME    ; TM_35
     db SELFDESTRUCT ; TM_36
-    db EGG_BOMB     ; TM_37 ; Market
+    db FLAMETHROWER ; TM_37
     db FIRE_BLAST   ; TM_38
     db SWIFT        ; TM_39
     db SKULL_BASH   ; TM_40
-    db FLASH        ; TM_55
+    db STRUGGLE     ; TM_41
     db DREAM_EATER  ; TM_42
     db SKY_ATTACK   ; TM_43
     db REST         ; TM_44
@@ -30613,6 +30450,8 @@ TechnicalMachines: ; 13773 (4:7773)
     db SWOOP        ; TM_52
     db TSUNAMI      ; TM_53
     db STRIKE       ; TM_54
+    db FLASH        ; TM_55
+    db STRUGGLE     ; TM_56
 
 EndOfBattle: ; Moved in the Bank
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -30803,23 +30642,7 @@ TryDoWildEncounter: ; Moved in the Bank
     xor a
     ret
 
-SECTION "WildMonEncounterSlotChances",ROMX[$7918],BANK[$4]
-
-WildMonEncounterSlotChances: ; 13918 (4:7918)
-; There are 10 slots for wild pokemon,and this is the table that defines how common each of
-; those 10 slots is. A random number is generated and then the first byte of each pair in this
-; table is compared against that random number. If the random number is less than or equal
-; to the first byte,then that slot is chosen.  The second byte is double the slot number.
-    db $32,$00 ; 51/256 = 19.9% chance of slot 0
-    db $65,$02 ; 51/256 = 19.9% chance of slot 1
-    db $8C,$04 ; 39/256 = 15.2% chance of slot 2
-    db $A5,$06 ; 25/256 =  9.8% chance of slot 3
-    db $BE,$08 ; 25/256 =  9.8% chance of slot 4
-    db $D7,$0A ; 25/256 =  9.8% chance of slot 5
-    db $E4,$0C ; 13/256 =  5.1% chance of slot 6
-    db $F1,$0E ; 13/256 =  5.1% chance of slot 7
-    db $FC,$10 ; 11/256 =  4.3% chance of slot 8
-    db $FF,$12 ;  3/256 =  1.2% chance of slot 9
+SECTION "Func_1392c",ROMX[$792c],BANK[$4]
 
 Func_1392c: ; 1392c (4:792c)
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -31054,11 +30877,6 @@ DisplayDamageAndUpdateHPBar: ; During Recoil
     call Bankswitch
     ret
 
-HandleMenuInputPlusWrapping:
-    ld a,1
-    ld [wMenuWrappingEnabled],a ; $cc4a
-    jp HandleMenuInput
-
 DontCheckElement:
     pop af ; Delete Call Back Return
     jp NewBadgeRequired
@@ -31068,7 +30886,7 @@ ElementEnd:
     pop af ; Delete Call Back Return
     ld hl,.ElementMissedText
     call PrintText
-    jp $70BF ; StartMenu_Pokedex.loop
+    jp $70BF ; StartMenu_Pokemon.loop
 .ElementMissedText
     TX_FAR _ElementMissedText
     db "@"
@@ -31965,6 +31783,34 @@ CheckIfInOutsideMapAndAtLeastOneFlyingMap:
     and %00000001 ; check only first bit
     dec a
     ret
+
+NewBadgeRequired:
+    ld hl,.newBadgeRequiredText
+    call PrintText
+    jp $70BF ; StartMenu_Pokemon.loop
+.newBadgeRequiredText
+    TX_FAR _NewBadgeRequiredText
+    db "@"
+
+HandlePkmnSubMenu:
+    ld hl,wTopMenuItemY
+    ld a,c
+    ld [hli],a ; top menu item Y
+    ld a,d
+    ld [hli],a ; top menu item X
+    xor a
+    ld [hli],a ; current menu item ID
+    inc hl
+    ld a,b
+    ld [hli],a ; max menu item ID
+    ld a,%00000011 ; A button,B button
+    ld [hli],a ; menu watched keys
+    xor a
+    ld [hl],a
+    ld a,1
+    ld [wMenuWrappingEnabled],a ; $cc4a
+    call HandleMenuInput
+    jp PlaceUnfilledArrowMenuCursor
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -42768,6 +42614,18 @@ OnlyOneMoveText:
 
 GetMonPotentialMoveList:
 
+    ; Reset Output
+    xor a
+    ld hl,wMoveRelearnerMoveList
+    ld [hli],a
+    dec a ; a = $FF
+    ld [hl],a
+
+    ; Check Not MEW
+    ld a,[$cf98]
+    cp MEW
+    ret z
+
     ; Standarize Level
     ld a,[$cc49]
     and a ; is it a list of party pokemon or box pokemon?
@@ -43146,7 +43004,12 @@ ChoiceRelearnMove:
     ld b,0
     ld c,d
     add hl,bc ; add [wCurrentMenuItem]
+    ld a,[$cf98]
+    cp MEW
+    ld a,l
+    jr z,.SkipReadMoveHL
     ld a,[hl] ; get New Move ; a = Move ID
+.SkipReadMoveHL
 
     ; Set Move Relearned
     ld [$d0e0],a
@@ -43217,7 +43080,13 @@ ChoiceRelearnMove:
     ; Print Screen Page Number
     ld a,[wListScrollOffset]
     ld c,a
-    add "1"
+    ld a,[$cf98]
+    cp MEW
+    ld a,"A"
+    jr z,.mew
+    ld a,"1"
+.mew
+    add c
     FuncCoord 05,01
     ld [Coord],a
 
@@ -43263,8 +43132,15 @@ ChoiceRelearnMove:
     ld hl,Coord
     ld b,RELEARN_MOVE_SCREEN_LENGHT
 .LoopMove
+    ld a,[$cf98]
+    cp MEW
+    ld a,e
+    jr z,.SkipReadMoveDE
     ld a,[de] ; Read Move Id
+.SkipReadMoveDE
     cp $FF
+    jr z,.end ; EndOfList
+    cp STRUGGLE
     jr z,.end ; EndOfList
     push bc
     call .PrintMove
@@ -43289,6 +43165,11 @@ ChoiceRelearnMove:
     ret
 
 .ListLenghtAndPointerToFirst
+    ld a,[$cf98]
+    cp MEW
+    ld a,STRUGGLE-1
+    ld hl,1
+    ret z
     ld hl,wMoveRelearnerMoveList
     ld a,[hli] ; List Lenght
     ret
@@ -43675,6 +43556,8 @@ HandleExclusiveLearnMove:
     jr z,.OutOfRange
     pop de ; Restore Pointer to Move List Current Elements
     ld b,a
+    inc a
+    jr z,.end ; $FF = Empty Move
     call .CheckMoveJustPotentialKnow
     jr c,.end
     ld a,b
@@ -43698,6 +43581,10 @@ HandleExclusiveLearnMove:
 
 .CheckMoveJustPotentialKnow
     push hl
+    ld a,[$cf98]
+    cp MEW
+    ld hl,1
+    jr z,.Loop
     ld hl,wMoveRelearnerMoveList+1
 .Loop
     ld a,h
@@ -43733,6 +43620,9 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
+    ld a,[$cf98]
+    cp MEW
+    jr z,.end
     call GetMonPotentialMoveList
 
     ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
@@ -43751,6 +43641,7 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     call .Loop
 
     ; Restore
+.end
     pop af
     ld [$cc49],a
     pop af
@@ -43794,6 +43685,9 @@ SentNewMonToBox_TryToAddExclusiveMove:
     ld a,2 ; current box
     ld [$cc49],a
     call LoadMonData
+    ld a,[$cf98]
+    cp MEW
+    jr z,.end
     call GetMonPotentialMoveList
 
     ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
@@ -43808,6 +43702,7 @@ SentNewMonToBox_TryToAddExclusiveMove:
     call .Loop
 
     ; Restore
+.end
     pop af
     ld [$cc49],a
     pop af
@@ -44064,6 +43959,9 @@ CheckMonAlreadyKnowMove:
     call LoadMonData
     call GetMonPotentialMoveList
 CheckMonAlreadyKnowMoveQuick:
+    ld a,[$cf98]
+    cp MEW
+    jr z,.Find
     ld a,[$d0e0]
     ld b,a
     ld hl,wMoveRelearnerMoveList
@@ -50568,7 +50466,7 @@ LearnMoveFromLevelUp:
     ld a,[$d11e]
     ld [$cf91],a
     cp a,MEW
-    jp z,MewLearnMove
+    ret z ; Mew just know every Move!
     push af
     ld hl,W_PARTYMON1_LEVEL
     ld a,[wWhichPokemon] ; $cf92
@@ -50629,12 +50527,6 @@ LearnMoveCommon:
     pop hl ; Restore Pointer to Current Learn Move's Level
     jr .learnSetLoop
 .done
-    ld a,[$cf91]
-    ld [$d11e],a
-    ret
-
-MewLearnMove:
-    call TryRandomForMew ; TODO
     ld a,[$cf91]
     ld [$d11e],a
     ret
@@ -50944,32 +50836,6 @@ SetAttributeOamRedBall:
     ld a,3
     ld [hli],a
     ret
-
-TryRandomForMew:
-    call GenRandom
-    cp STRUGGLE ; C - Set for no borrow. (Set if A < n.)
-    jr z,TryRandomForMew ; no id = 0
-    jr c,.TestMewJustKnow
-    jr TryRandomForMew
-.TestMewJustKnow
-    ld d,a
-    ld hl,W_PARTYMON1_MOVE1 ; $d173
-    ld a,[wWhichPokemon] ; $cf92
-    ld bc,$2c
-    call AddNTimes
-    ld b,4
-.checkCurrentMovesLoop2
-    ld a,[hli]
-    cp d
-    jr z,TryRandomForMew ; if mew just know the move
-    dec b
-    jr nz,.checkCurrentMovesLoop2
-    ld a,d
-    ld [$d0e0],a
-    ld [$d11e],a
-    call GetMoveName
-    call CopyStringToCF4B
-    PREDEF_JUMP LearnMovePredef
 
 SpecialTrainer: MACRO
     db \1,\2
@@ -83857,7 +83723,7 @@ CheckReachLevelLimit:
 
 ; Celadon Dept. Store 2F (2)
 CeladonMart2Text2:
-    db $FE,14
+    db $FE,12
     db TM_01 ; MEGA_PUNCH
     db TM_02 ; RAZOR_WIND
     db TM_04 ; WHIRLWIND
@@ -83867,11 +83733,9 @@ CeladonMart2Text2:
     db TM_10 ; DOUBLE_EDGE
     db TM_12 ; WATER_GUN
     db TM_17 ; SUBMISSION
-    db TM_20 ; RAGE
     db TM_30 ; TELEPORT
     db TM_32 ; DOUBLE_TEAM
     db TM_33 ; REFLECT
-    db TM_37 ; EGG_BOMB
     db $FF
 
 Route21ScriptPointers: ; Moved in the Bank
@@ -92955,7 +92819,7 @@ PokemonTower6Object: ; 0x60c5b (size=58)
     db SPRITE_MEDIUM,$5 + 4,$9 + 4,$ff,$d0,$42,CHANNELER,$c ; trainer
     db SPRITE_MEDIUM,$5 + 4,$10 + 4,$ff,$d2,$43,CHANNELER,$d ; trainer
     db SPRITE_BALL,$8 + 4,$6 + 4,$ff,$ff,$84,RARE_CANDY ; item
-    db SPRITE_BALL,$e + 4,$e + 4,$ff,$ff,$85,X_ACCURACY ; item
+    db SPRITE_BALL,$e + 4,$e + 4,$ff,$ff,$85,TM_37 ; item
 
     ; warp-to
     EVENT_DISP $a,$9,$12 ; POKEMONTOWER_5
@@ -114290,7 +114154,7 @@ TechnicalMachinePrices: ; 7bfa7 (1e:7fa7)
     db $32,$21,$34,$24,$34
     db $21,$45,$55,$32,$32
     db $55,$52,$54,$52,$41
-    db $21,$12,$42,$25,$24
+    db $21,$12,$42,$45,$24
     db $22,$52,$24,$34,$42
     db $24,$43
     
@@ -129315,26 +129179,12 @@ _ItemfinderFoundNothingText: ; a6981 (29:6981)
     db $0,"Nope! ITEMFINDER",$4f
     db "isn't responding.",$58
 
-_RaisePPWhichTechniqueText: ; a69a4 (29:69a4)
-    db $0,"Raise PP of which",$4f
-    db "technique?",$57
-
-_RestorePPWhichTechniqueText: ; a69c2 (29:69c2)
-    db $0,"Restore PP of",$4f
-    db "which technique?",$57
-
-_PPMaxedOutText: ; a69e2 (29:69e2)
-    TX_RAM $cf4b
-    db $0,"'s PP",$4f
-    db "is maxed out.",$58
-
-_PPIncreasedText: ; a69f9 (29:69f9)
-    TX_RAM $cf4b
-    db $0,"'s PP",$4f
-    db "increased.",$58
-
 _PPRestoredText: ; a6a0d (29:6a0d)
-    db $0,"PP was restored.",$58
+    TX_NUM $d11e,1,3
+    db $0,$DA," ENERGY",$4f
+    db "Restored!",$58
+
+SECTION "_BootedUpTMText",ROMX[$6a1f],BANK[$29]
 
 _BootedUpTMText: ; a6a1f (29:6a1f)
     db $0,"Booted up a TM!",$58
@@ -131404,11 +131254,11 @@ ItemNames: ; 472b (1:472b)
     db "MAX ETHER@"    ; $51
     db "ELIXER@"       ; $52
     db "MAX ELIXER@"   ; $53
-    db "?@"            ; $54
-    db "?@"            ; $55
-    db "?@"            ; $56
-    db "?@"            ; $57
-    db "?@"            ; $58
+    db "NATURE POWER@" ; $54
+    db "AIR POWER@"    ; $55
+    db "WATER POWER@"  ; $56
+    db "EARTH POWER@"  ; $57
+    db "FIRE POWER@"   ; $58
     db "?@"            ; $59
     db "?@"            ; $5A
     db "?@"            ; $5B
@@ -131516,65 +131366,65 @@ ItemNames: ; 472b (1:472b)
     db "?@"            ; $C1
     db "?@"            ; $C2
     db "?@"            ; $C3
-    db "NATURE POWER@" ; $C4
-    db "AIR POWER@"    ; $C5
-    db "WATER POWER@"  ; $C6
-    db "EARTH POWER@"  ; $C7
-    db "FIRE POWER@"   ; $C8
-    db "TM01:M.PNCH@"  ; $C9 ; TM_01 ; Market
-    db "TM02:RAZ.WND@" ; $CA ; TM_02 ; Market
-    db "TM03:SW.DNCE@" ; $CB ; TM_03
-    db "TM04:WHRLWND@" ; $CC ; TM_04
-    db "TM05:MEG.KCK@" ; $CD ; TM_05 ; Market
-    db "TM06:TOXIC@"   ; $CE ; TM_06
-    db "TM07:HRN DR.@" ; $CF ; TM_07 ; Market
-    db "TM08:BDY SLM@" ; $D0 ; TM_08
-    db "TM09:TAK.DWN@" ; $D1 ; TM_09 ; Market
-    db "TM10:DB.EDG@"  ; $D2 ; TM_10
-    db "TM11:BUB.B.@"  ; $D3 ; TM_11
-    db "TM12:WTR GUN@" ; $D4 ; TM_12
-    db "TM13:ICE BM.@" ; $D5 ; TM_13
-    db "TM14:BLZZARD@" ; $D6 ; TM_14
-    db "TM15:HYP.B.@"  ; $D7 ; TM_15
-    db "TM16:PAY DAY@" ; $D8 ; TM_16
-    db "TM17:SUBMIS.@" ; $D9 ; TM_17 ; Market
-    db "TM18:COUNTER@" ; $DA ; TM_18
-    db "TM19:SSM TOS@" ; $DB ; TM_19
-    db "TM20:RAGE@"    ; $DC ; TM_20
-    db "TM21:M.DRAIN@" ; $DD ; TM_21
-    db "TM22:SOLRBM.@" ; $DE ; TM_22
-    db "TM23:DRG RGE@" ; $DF ; TM_23
-    db "TM24:THUNDRB@" ; $E0 ; TM_24
-    db "TM25:THUNDER@" ; $E1 ; TM_25
-    db "TM26:EARTHQ.@" ; $E2 ; TM_26
-    db "TM27:FISSURE@" ; $E3 ; TM_27
-    db "TM28:DIG@"     ; $E4 ; TM_28
-    db "TM29:PSYCHIC@" ; $E5 ; TM_29
-    db "TM30:TELEPRT@" ; $E6 ; TM_30
-    db "TM31:MIMIC@"   ; $E7 ; TM_31
-    db "TM32:DB.TEAM@" ; $E8 ; TM_32 ; Market
-    db "TM33:REFLECT@" ; $E9 ; TM_33 ; Market
-    db "TM34:BIDE@"    ; $EA ; TM_34
-    db "TM35:METRONM@" ; $EB ; TM_35
-    db "TM36:SELFDST@" ; $EC ; TM_36
-    db "TM37:EGG BMB@" ; $ED ; TM_37 ; Market
-    db "TM38:FIR.BLS@" ; $EE ; TM_38
-    db "TM39:SWIFT@"   ; $EF ; TM_39
-    db "TM40:SKUL B.@" ; $F0 ; TM_40
-    db "TM55:FLASH@"   ; $F1 ; TM_55
-    db "TM42:DRM EAT@" ; $F2 ; TM_42
-    db "TM43:SKY ATK@" ; $F3 ; TM_43
-    db "TM44:REST@"    ; $F4 ; TM_44
-    db "TM45:THND WV@" ; $F5 ; TM_45
-    db "TM46:PSYWAVE@" ; $F6 ; TM_46
-    db "TM47:EXPLOS.@" ; $F7 ; TM_47
-    db "TM48:RCK SLD@" ; $F8 ; TM_48
-    db "TM49:TRI ATK@" ; $F9 ; TM_49
-    db "TM50:SUBSTIT@" ; $FA ; TM_50
-    db "TM51:BLADE@"   ; $FB ; TM_51
-    db "TM52:SWOOP@"   ; $FC ; TM_52
-    db "TM53:TSUNAMI@" ; $FD ; TM_53
-    db "TM54:STRIKE@"  ; $FE ; TM_54
+    db "TM01:M.PNCH@"  ; $C4 ; TM_01 ; Market
+    db "TM02:RAZ.WND@" ; $C5 ; TM_02 ; Market
+    db "TM03:SW.DNCE@" ; $C6 ; TM_03
+    db "TM04:WHRLWND@" ; $C7 ; TM_04
+    db "TM05:MEG.KCK@" ; $C8 ; TM_05 ; Market
+    db "TM06:TOXIC@"   ; $C9 ; TM_06
+    db "TM07:HRN DR.@" ; $CA ; TM_07 ; Market
+    db "TM08:BDY SLM@" ; $CB ; TM_08
+    db "TM09:TAK.DWN@" ; $CC ; TM_09 ; Market
+    db "TM10:DB.EDG@"  ; $CD ; TM_10
+    db "TM11:BUB.B.@"  ; $CE ; TM_11
+    db "TM12:WTR GUN@" ; $CF ; TM_12
+    db "TM13:ICE BM.@" ; $D0 ; TM_13
+    db "TM14:BLZZARD@" ; $D1 ; TM_14
+    db "TM15:HYP.B.@"  ; $D2 ; TM_15
+    db "TM16:PAY DAY@" ; $D3 ; TM_16
+    db "TM17:SUBMIS.@" ; $D4 ; TM_17 ; Market
+    db "TM18:COUNTER@" ; $D5 ; TM_18
+    db "TM19:SSM TOS@" ; $D6 ; TM_19
+    db "TM20:RAGE@"    ; $D7 ; TM_20
+    db "TM21:M.DRAIN@" ; $D8 ; TM_21
+    db "TM22:SOLRBM.@" ; $D9 ; TM_22
+    db "TM23:DRG RGE@" ; $DA ; TM_23
+    db "TM24:THUNDRB@" ; $DB ; TM_24
+    db "TM25:THUNDER@" ; $DC ; TM_25
+    db "TM26:EARTHQ.@" ; $DD ; TM_26
+    db "TM27:FISSURE@" ; $DE ; TM_27
+    db "TM28:DIG@"     ; $DF ; TM_28
+    db "TM29:PSYCHIC@" ; $E0 ; TM_29
+    db "TM30:TELEPRT@" ; $E1 ; TM_30
+    db "TM31:MIMIC@"   ; $E2 ; TM_31
+    db "TM32:DB.TEAM@" ; $E3 ; TM_32 ; Market
+    db "TM33:REFLECT@" ; $E4 ; TM_33 ; Market
+    db "TM34:BIDE@"    ; $E5 ; TM_34
+    db "TM35:METRONM@" ; $E6 ; TM_35
+    db "TM36:SELFDST@" ; $E7 ; TM_36
+    db "TM37:FLMTRWR@" ; $E8 ; TM_37
+    db "TM38:FIR.BLS@" ; $E9 ; TM_38
+    db "TM39:SWIFT@"   ; $EA ; TM_39
+    db "TM40:SKUL B.@" ; $EB ; TM_40
+    db "TM41:STRUGGLE" ; $FB ; TM_41
+    db "TM42:DRM EAT@" ; $ED ; TM_42
+    db "TM43:SKY ATK@" ; $EE ; TM_43
+    db "TM44:REST@"    ; $EF ; TM_44
+    db "TM45:THND WV@" ; $F0 ; TM_45
+    db "TM46:PSYWAVE@" ; $F1 ; TM_46
+    db "TM47:EXPLOS.@" ; $F2 ; TM_47
+    db "TM48:RCK SLD@" ; $F3 ; TM_48
+    db "TM49:TRI ATK@" ; $F4 ; TM_49
+    db "TM50:SUBSTIT@" ; $F5 ; TM_50
+    db "TM51:BLADE@"   ; $F6 ; TM_51
+    db "TM52:SWOOP@"   ; $F7 ; TM_52
+    db "TM53:TSUNAMI@" ; $F8 ; TM_53
+    db "TM54:STRIKE@"  ; $F9 ; TM_54
+    db "TM55:FLASH@"   ; $EC ; TM_55
+    db "TM56:STRUGGLE" ; $FB ; TM_56
+    db "?@"            ; $FC
+    db "?@"            ; $FD
+    db "?@"            ; $FE
     db "CANCEL@"       ; $FF
     db "ITEM 00@"      ; $00
 
