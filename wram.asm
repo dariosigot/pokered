@@ -1703,6 +1703,7 @@ wMaxLevel              ; df37
 wChoicePkmnMoveDeleter ; df37
 wBackupDarkMap         ; df37
 wTempStatLO            ; df37
+wFieldMoveMonID        ; df37 = Mon ID used for Cry
     ds 1
 
 wFlagAddPkmnToPartyBit0     ; df38 ; bit 0

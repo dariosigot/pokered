@@ -442,6 +442,14 @@ GoodCopyVideoDataDouble:
     pop de
     jp FarCopyDataDouble ; if LCD is off,transfer all at once
 
+FieldMovePlayCry:
+    ld a,[wFieldMoveMonID]
+    call GetCryData ; get cry data
+    call PlaySound ; play sound
+    xor a
+    ld [wFieldMoveMonID],a
+    ret
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -23736,7 +23744,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     call CheckExceptionTilePassable
     ret ; jp c,SurfingAttemptFailed
 .HandleSurfboardTextMessage
-    ld hl,SurfingGotOnText
+    call SurfingCry ; ld hl,SurfingGotOnText
 .PrintText
     jp PrintText
 
@@ -24533,7 +24541,7 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
     inc a
     ld [$d078],a
     ld [$cd6a],a ; item used
-    ld a,[$d152]
+    call UsingDigCry ; ld a,[$d152]
     and a ; using Dig?
     ret nz ; if so,return
     call ItemUseReloadOverworldData
@@ -24541,7 +24549,7 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
     call DelayFrames
     jp RemoveUsedItem
 .notUsable
-    jp ItemUseNotTime
+    jp DigNotUsable
 
 EscapeRopeTilesets: ; dffd (3:5ffd)
     db $03,$0f,$11,$16,$10
@@ -25052,6 +25060,31 @@ ItemUsePPRestore: ; Moved in the Bank
     ret
 .PPRestoredText
     TX_FAR _PPRestoredText
+    db "@"
+
+UsingDigCry:
+    ld a,[$d152]
+    and a
+    ret z
+    push af
+    call FieldMovePlayCry
+    pop af
+    ret
+
+SurfingCry:
+    call FieldMovePlayCry
+    call WaitForSoundToFinish
+    ld hl,SurfingGotOnText
+    ret
+
+DigNotUsable:
+    ld a,[$d152]
+    and a
+    jp z,ItemUseNotTime
+    ld hl,.cannotDigHereText
+    jp ItemUseFailed
+.cannotDigHereText
+    TX_FAR _CannotDigHereText
     db "@"
 
 ; Free Space
@@ -28586,8 +28619,8 @@ ItemUsePokedoll:
 UsedStrengthText: ; Moved in the Bank
     TX_FAR _UsedStrengthText
     db $08 ; asm
-    ld a,[$cf91]
-    call PlayCry
+    call FieldMovePlayCry
+    call WaitForSoundToFinish
     call Delay3
     jp TextScriptEnd
 
@@ -29508,6 +29541,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .checkIfPokemonChosen2
     call GoBackToPartyMenu
 .checkIfPokemonChosen
+    ld a,0
+    ld [wFieldMoveMonID],a
     jr nc,.chosePokemon
 .exitMenu
     call GBPalWhiteOutWithDelay3
@@ -29579,20 +29614,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call DisplayTextBoxID ; display pokemon field moves
     ld bc,$ff12 ; max menu item ID,top menu item Y
     ld d,04 ; top menu item X
-    ld hl,wFieldMoves
-    ld e,8+1 ; Max Number of Field Moves + 1
-.adjustMenuVariablesLoop
-    dec e
-    jr z,.storeMenuVariables
-    ld a,[hli]
-    and a
-    jr z,.storeMenuVariables
-    inc b
-    dec c
-    dec c
-    jr .adjustMenuVariablesLoop
-.storeMenuVariables
-    call HandlePkmnSubMenu
+    call HandlePkmnSubMenuFieldMoves
     push af
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     pop af
@@ -29603,14 +29625,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[wCurrentMenuItem]
     ld c,a
     add hl,bc
-    ; fall through
-
-.choseOutOfBattleMove
-    push hl
-    ld a,[$cf92]
-    ld hl,W_PARTYMON1NAME
-    call GetPartyMonName
-    pop hl
+    call GetPartyMonIDAndName
     ld a,[hl]
     dec a
     add a
@@ -29647,7 +29662,10 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call ChooseFlyDestination
     ld a,[$d732]
     bit 3,a ; did the player decide to fly?
-    jp nz,.goBackToMap
+    jr z,.undoFly
+    call FieldMovePlayCry
+    jp .goBackToMap
+.undoFly
     call LoadFontTilePatterns
     ld hl,$d72e
     set 1,[hl]
@@ -29655,8 +29673,12 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .cut
     bit 1,a ; does the player have the Cascade Badge?
     call CheckNaturePower ; jp z,.newBadgeRequired
+    ld b,BANK(CheckCutTile)
+    ld hl,CheckCutTile
+    call Bankswitch
+    call z,FieldMovePlayCry
     ld a,$3c
-    call Predef
+    call Predef ; UsedCut
     ld a,[$cd6a]
     and a
     jp z,.loop
@@ -29678,6 +29700,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[$cd6a]
     and a
     jp z,.loop
+.WhiteScreenAndGotoMap
     call GBPalWhiteOutWithDelay3
     jp .goBackToMap
 .strength
@@ -29685,17 +29708,16 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call CheckEarthPower ; jp z,.newBadgeRequired
     ld a,$5b
     call Predef
-    call GBPalWhiteOutWithDelay3
-    jp .goBackToMap
+    jr .WhiteScreenAndGotoMap
 .flash
     bit 0,a ; does the player have the Boulder Badge?
     call CheckFirePower ; jp z,.newBadgeRequired
+    call FieldMovePlayCry
     xor a
     ld [$d35d],a
     ld hl,.flashLightsAreaText
     call PrintText
-    call GBPalWhiteOutWithDelay3
-    jp .goBackToMap
+    jr .WhiteScreenAndGotoMap
 .flashLightsAreaText
     TX_FAR _FlashLightsAreaText
     db "@"
@@ -29707,8 +29729,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[$cd6a]
     and a
     jp z,.loop
-    call GBPalWhiteOutWithDelay3
-    jp .goBackToMap
+    jr .WhiteScreenAndGotoMap
 .teleport
     call CheckIfTeleportNotAllowed
     jr nz,.canTeleport
@@ -29719,6 +29740,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call PrintText
     jp .loop
 .canTeleport
+    call FieldMovePlayCry
     ld hl,.warpToLastPokemonCenterText
     call PrintText
     ld hl,$d732
@@ -29763,6 +29785,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[H_QUOTIENT + 2]
     sbc b
     jp nc,.notHealthyEnough
+    call FieldMovePlayCry
     ld a,[$cc2b]
     push af
     ld a,POTION
@@ -31792,6 +31815,22 @@ NewBadgeRequired:
     TX_FAR _NewBadgeRequiredText
     db "@"
 
+HandlePkmnSubMenuFieldMoves:
+    ld hl,wFieldMoves
+    ld e,8+1 ; Max Number of Field Moves + 1
+.adjustMenuVariablesLoop
+    dec e
+    jr z,.storeMenuVariables
+    ld a,[hli]
+    and a
+    jr z,.storeMenuVariables
+    inc b
+    dec c
+    dec c
+    jr .adjustMenuVariablesLoop
+.storeMenuVariables
+    ; fall through
+
 HandlePkmnSubMenu:
     ld hl,wTopMenuItemY
     ld a,c
@@ -31811,6 +31850,21 @@ HandlePkmnSubMenu:
     ld [wMenuWrappingEnabled],a ; $cc4a
     call HandleMenuInput
     jp PlaceUnfilledArrowMenuCursor
+
+GetPartyMonIDAndName:
+    push hl
+    ld a,[$cf92]
+    ld hl,W_PARTYMON1
+    ld c,a
+    ld b,0
+    add hl,bc
+    ld b,[hl]
+    ld hl,wFieldMoveMonID
+    ld [hl],b
+    ld hl,W_PARTYMON1NAME
+    call GetPartyMonName
+    pop hl
+    ret
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -129268,6 +129322,11 @@ _ItemUseBallText07:
     TX_NUM W_NUMINBOX,1,2
     db 0,"/20)",$58
 
+_CannotDigHereText:
+    TX_RAM $cd6d
+    db $0," can't",$4f
+    db "DIG here.",$58
+
 SECTION "bank2A",ROMX,BANK[$2A]
 
 _ItemUseText001: ; a8000 (2a:4000)
@@ -130310,12 +130369,13 @@ SelectInOverWorld:
     ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     jp c,.noFloat
-    ld b,$04 ; FLOAT
+    ld b,$03 ; FLOAT
     call SearchFieldMoveInParty
     jr nc,.noFloat
 .canFloat
     call .StartCustomSelectFunction
     call .PlayCry
+    call WaitForSoundToFinish
     ld a,SURFBOARD
     ld [$cf91],a
     ld [$d152],a
@@ -130336,7 +130396,7 @@ SelectInOverWorld:
     ld hl,$d7c2 ; FirePower
     bit 0,[hl]  ; ...
     jr z,.noLight
-    ld b,$06 ; LIGHT
+    ld b,$05 ; LIGHT
     call SearchFieldMoveInParty
     jr nc,.noLight
 .canLight
@@ -130363,7 +130423,7 @@ SelectInOverWorld:
     ld hl,$d78e ; EarthPower
     bit 0,[hl]  ; ...
     jr z,.noStrength
-    ld b,$05 ; STRENGTH
+    ld b,$04 ; STRENGTH
     call SearchFieldMoveInParty
     jr nc,.noStrength
 .canStrength
@@ -130473,8 +130533,8 @@ SelectInOverWorld:
     ld c,a
     add hl,bc
     ld a,[hl]
-    call PlayCry
-    jp WaitForSoundToFinish
+    call GetCryData ; get cry data
+    jp PlaySound ; play sound
 
 .InitializeTextBox
     ; initialize a text box without drawing anything special
