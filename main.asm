@@ -11360,10 +11360,10 @@ ItemPrices: ; 4608 (1:4608)
     bcd3      0 ; GOOD_ROD
     bcd3      0 ; SUPER_ROD
     bcd3   9800 ; PP_UP
-    bcd3   3000 ; ETHER
-    bcd3  10000 ; MAX_ETHER
-    bcd3   5000 ; ELIXER
-    bcd3  17000 ; MAX_ELIXER
+    bcd3    700 ; ETHER
+    bcd3   1200 ; MAX_ETHER
+    bcd3    900 ; ELIXER
+    bcd3   1500 ; MAX_ELIXER
 
 ItemNames_Old: ; 472b (1:472b)
 
@@ -23197,10 +23197,10 @@ UseItem_: ; Moved in the Bank
     dw ItemUseGoodRod    ; GOOD_ROD
     dw ItemUseSuperRod   ; SUPER_ROD
     dw UnusableItem ; ItemUsePPUp       ; PP_UP (real one)
-    dw UnusableItem ; ItemUsePPRestore  ; ETHER
-    dw UnusableItem ; ItemUsePPRestore  ; MAX_ETHER
-    dw UnusableItem ; ItemUsePPRestore  ; ELIXER
-    dw UnusableItem ; ItemUsePPRestore  ; MAX_ELIXER
+    dw ItemUsePPRestore  ; ETHER
+    dw ItemUsePPRestore  ; MAX_ETHER
+    dw ItemUsePPRestore  ; ELIXER
+    dw ItemUsePPRestore  ; MAX_ELIXER
     dw UnusableItem      ; HM_01 : NATURE POWER
     dw UnusableItem      ; HM_02 : AIR POWER
     dw UnusableItem      ; HM_03 : WATER POWER
@@ -24937,11 +24937,12 @@ ItemfinderFoundNothingText: ; e312 (3:6312)
     db "@"
 
 ItemUsePPUp: ; e317 (3:6317)
+    ret
+
+ItemUsePPRestore: ; Moved in the Bank
     ld a,[W_ISINBATTLE]
     and a
     jp nz,ItemUseNotTime
-
-ItemUsePPRestore: ; e31e (3:631e)
     ld a,[$cf92]
     push af
     ld a,[$cf91]
@@ -24949,166 +24950,97 @@ ItemUsePPRestore: ; e31e (3:631e)
 .chooseMon
     xor a
     ld [$cfcb],a
-    ld a,$01 ; item use party menu
+    ld a,$06 ; Ether/Elixer Menu
     ld [$d07d],a
     call DisplayPartyMenu
-    jr nc,.chooseMove
+    jr nc,.useEther
     jp .itemNotUsed
-.chooseMove
-    ld a,[$cd3d]
-    cp a,ELIXER
-    jp nc,.useElixir ; if Elixir or Max Elixir
-    ld a,$02
-    ld [wMoveMenuType],a
-    ld hl,RaisePPWhichTechniqueText
-    ld a,[$cd3d]
-    cp a,ETHER ; is it a PP Up?
-    jr c,.printWhichTechniqueMessage ; if so,print the raise PP message
-    ld hl,RestorePPWhichTechniqueText ; otherwise,print the restore PP message
-.printWhichTechniqueMessage
-    call PrintText
-    xor a
-    ld [$cc2e],a
-    ld hl,MoveSelectionMenu
-    ld b,BANK(MoveSelectionMenu)
-    call Bankswitch ; move selection menu
-    ld a,0
-    ld [$cc2e],a
-    jr nz,.chooseMon
-    ld hl,W_PARTYMON1_MOVE1
-    ld bc,44
-    call GetSelectedMoveOffset
+.afterRestoringPP ; after using a (Max) Ether/Elixir
+    ld a,$8e
+    call PlaySound
+    ld a,[hl]
+    ld b,a
+    ld hl,$d11e
+    ld a,[hl]
+    push af
     push hl
-    ld a,[hl]
-    ld [$d11e],a
-    call GetMoveName
-    call CopyStringToCF4B ; copy name to $cf4b
+    ld [hl],b
+    FuncCoord 13,01
+    ld hl,Coord
+    ld a,[$cf92]
+    ld bc,40
+    call AddNTimes
+    ld de,$d11e
+    ld bc,$0103
+    call PrintNumber
     pop hl
-    ld a,[$cd3d]
-    cp a,ETHER
-    jr nc,.useEther ; if Ether or Max Ether
-.usePPUp
-    ld bc,21
-    add hl,bc
-    ld a,[hl] ; move PP
-    cp a,3 << 6 ; have 3 PP Ups already been used?
-    jr c,.PPNotMaxedOut
-    ld hl,PPMaxedOutText
-    call PrintText
-    jr .chooseMove
-.PPNotMaxedOut
-    ld a,[hl]
-    add a,1 << 6 ; increase PP Up count by 1
+    pop af
     ld [hl],a
-    ld a,1 ; 1 PP Up used
-    ld [$d11e],a
-    call RestoreBonusPP ; add the bonus PP to current PP
-    ld hl,PPIncreasedText
+    ld hl,.PPRestoredText
     call PrintText
-.done
     pop af
     ld [$cf92],a
     call GBPalWhiteOut
     call GoPAL_SET_CF1C
     jp RemoveUsedItem
-.afterRestoringPP ; after using a (Max) Ether/Elixir
-    ld a,[$cf92]
-    ld b,a
-    ld a,[wPlayerMonNumber]
-    cp b ; is the pokemon whose PP was restored active in battle?
-    jr nz,.skipUpdatingInBattleData
-    ld hl,W_PARTYMON1_MOVE1PP
-    ld bc,44
-    call AddNTimes
-    ld de,W_PLAYERMONPP
-    ld bc,4
-    call CopyData ; copy party data to in-battle data
-.skipUpdatingInBattleData
-    ld a,$8e
-    call PlaySound
-    ld hl,PPRestoredText
-    call PrintText
-    jr .done
 .useEther
     call .restorePP
     jr nz,.afterRestoringPP
     jp .noEffect
-; unsets zero flag if PP was restored,sets zero flag if not
-; however,this is bugged for Max Ethers and Max Elixirs (see below)
 .restorePP
-    xor a
-    ld [$cc49],a ; party pokemon
-    call GetMaxPP
-    ld hl,W_PARTYMON1_MOVE1
-    ld bc,44
-    call GetSelectedMoveOffset
-    ld bc,21
-    add hl,bc ; hl now points to move's PP
-    ld a,[$d11e]
-    ld b,a ; b = max PP
     ld a,[$cd3d]
-    cp a,MAX_ETHER
-    jr z,.fullyRestorePP
-    ld a,[hl] ; move PP
-    and a,%00111111 ; lower 6 bit bits store current PP
-    cp b ; does current PP equal max PP?
-    ret z ; if so,return
-    add a,10 ; increase current PP by 10
-; b holds the max PP amount and b will hold the new PP amount.
-; So,if the new amount meets or exceeds the max amount,
-; cap the amount to the max amount by leaving b unchanged.
-; Otherwise,store the new amount in b.
-    cp b ; does the new amount meet or exceed the maximum?
-    jr nc,.storeNewAmount
     ld b,a
-.storeNewAmount
-    ld a,[hl] ; move PP
-    and a,%11000000 ; PP Up counter bits
-    add b
-    ld [hl],a
-    ret
-.fullyRestorePP
-    ld a,[hl] ; move PP
-; Note that this code has a bug. It doesn't mask out the upper two bits,which
-; are used to count how many PP Ups have been used on the move. So,Max Ethers
-; and Max Elixirs will not be detected as having no effect on a move with full
-; PP if the move has had any PP Ups used on it.
-    cp b ; does current PP equal max PP?
-    ret z
-    jr .storeNewAmount
-.useElixir
-; decrement the item ID so that ELIXER becomes ETHER and MAX_ELIXER becomes MAX_ETHER
-    ld hl,$cd3d
-    dec [hl]
-    dec [hl]
-    xor a
-    ld hl,wCurrentMenuItem
-    ld [hli],a
-    ld [hl],a ; zero the counter for number of moves that had their PP restored
-    ld b,4
-; loop through each move and restore PP
-.elixirLoop
-    push bc
-    ld hl,W_PARTYMON1_MOVE1
-    ld bc,44
-    call GetSelectedMoveOffset
+    ld hl,.Table
+.next
+    ld a,[hli]
+    cp b
+    jr z,.found
+    inc hl
+    jr .next
+.found
     ld a,[hl]
-    and a ; does the current slot have a move?
-    jr z,.nextMove
-    call .restorePP
-    jr z,.nextMove
-; if some PP was restored
-    ld hl,$cc27 ; counter for number of moves that had their PP restored
-    inc [hl]
-.nextMove
-    ld hl,wCurrentMenuItem
-    inc [hl]
-    pop bc
-    dec b
-    jr nz,.elixirLoop
-    ld a,[$cc27]
-    and a ; did any moves have their PP restored?
-    jp nz,.afterRestoringPP
+    ld d,a ; Amount
+    ld [$d11e],a
+    ld a,255
+    sub d
+    inc a
+    ld e,a ; Check
+    ld hl,W_PARTYMON1_MOVE1PP
+    ld bc,44
+    ld a,[$cf92]
+    call AddNTimes ; hl now points to move's PP
+    ld a,[hl] ; Read Energy
+    cp 255
+    jr z,.NoEffect
+    cp e ; Check
+    jr c,.LessThenE
+    push hl
+    ld d,a
+    ld a,255
+    sub d
+    ld hl,$d11e
+    ld [hl],a
+    pop hl
+    ld a,255
+    jr .storeNewAmount
+.LessThenE
+    add d ; Amount
+    push hl
+    ld hl,$d11e
+    ld [hl],d
+    pop hl
+.storeNewAmount
+    ld [hl],a
+    and a
+    ret
+.Table
+    db ETHER,100
+    db MAX_ETHER,200
+    db ELIXER,150
+    db MAX_ELIXER,255
+.NoEffect
+    xor a
+    ret
 .noEffect
     call ItemUseNoEffect
 .itemNotUsed
@@ -25118,26 +25050,13 @@ ItemUsePPRestore: ; e31e (3:631e)
     xor a
     ld [$cd6a],a ; item use failed
     ret
-
-RaisePPWhichTechniqueText: ; e45d (3:645d)
-    TX_FAR _RaisePPWhichTechniqueText
-    db "@"
-
-RestorePPWhichTechniqueText: ; e462 (3:6462)
-    TX_FAR _RestorePPWhichTechniqueText
-    db "@"
-
-PPMaxedOutText: ; e467 (3:6467)
-    TX_FAR _PPMaxedOutText
-    db "@"
-
-PPIncreasedText: ; e46c (3:646c)
-    TX_FAR _PPIncreasedText
-    db "@"
-
-PPRestoredText: ; e471 (3:6471)
+.PPRestoredText
     TX_FAR _PPRestoredText
     db "@"
+
+; Free Space
+
+SECTION "UnusableItem",ROMX[$6476],BANK[$3]
 
 ; for items that can't be used from the Item menu
 UnusableItem: ; e476 (3:6476)
@@ -29196,7 +29115,7 @@ SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
 ; 03: learn TM/HM menu
 ; 04: swap pokemon positions menu
 ; 05: use evolution stone on pokemon menu
-; 06 : Move Relearner ; TODO Eliminare
+; 06 : Ether/Elixer Menu
 ; otherwise,it is a message ID
 ; f0: poison healed
 ; f1: burn healed
@@ -29278,7 +29197,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     cp a,$05
     jr z,.evolutionStoneMenu
     cp a,$06
-    jr z,.moveRelearnerMenu
+    jr z,.EtherElixerMenu
     push hl
     ld bc,14+6 ; Denim,Spostato Stato a capo ; ld bc,14 ; 14 columns to the right
     add hl,bc
@@ -29299,7 +29218,15 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     call Func_12ec7 ; color the HP bar (on SGB)
     pop hl
     jr .printLevel
-.moveRelearnerMenu
+.EtherElixerMenu
+    push hl
+    ld bc,(+01*20)+10
+    add hl,bc
+    ld de,$cfb5 ; Energy
+    ld bc,$0103
+    call PrintNumber
+    ld [hl],$DA ; Energy Symbol
+    pop hl
     jr .printLevel
 .teachMoveMenu
     push hl
@@ -129252,26 +129179,12 @@ _ItemfinderFoundNothingText: ; a6981 (29:6981)
     db $0,"Nope! ITEMFINDER",$4f
     db "isn't responding.",$58
 
-_RaisePPWhichTechniqueText: ; a69a4 (29:69a4)
-    db $0,"Raise PP of which",$4f
-    db "technique?",$57
-
-_RestorePPWhichTechniqueText: ; a69c2 (29:69c2)
-    db $0,"Restore PP of",$4f
-    db "which technique?",$57
-
-_PPMaxedOutText: ; a69e2 (29:69e2)
-    TX_RAM $cf4b
-    db $0,"'s PP",$4f
-    db "is maxed out.",$58
-
-_PPIncreasedText: ; a69f9 (29:69f9)
-    TX_RAM $cf4b
-    db $0,"'s PP",$4f
-    db "increased.",$58
-
 _PPRestoredText: ; a6a0d (29:6a0d)
-    db $0,"PP was restored.",$58
+    TX_NUM $d11e,1,3
+    db $0,$DA," ENERGY",$4f
+    db "Restored!",$58
+
+SECTION "_BootedUpTMText",ROMX[$6a1f],BANK[$29]
 
 _BootedUpTMText: ; a6a1f (29:6a1f)
     db $0,"Booted up a TM!",$58
