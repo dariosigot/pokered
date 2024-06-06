@@ -43162,8 +43162,14 @@ ChoiceRelearnMove:
     ; Print Screen Page Number
     ld a,[wListScrollOffset]
     ld c,a
-    add "1"
-    FuncCoord 06,01
+    ld a,[$cf98]
+    cp MEW
+    ld a,"A"
+    jr z,.mew
+    ld a,"1"
+.mew
+    add c
+    FuncCoord 05,01
     ld [Coord],a
 
     ; Print Left Arrow
@@ -43173,7 +43179,7 @@ ChoiceRelearnMove:
     jr nz,.NotScreen0
     ld a,$7f;$d5 ; left arrow transparent
 .NotScreen0
-    FuncCoord 05,01
+    FuncCoord 04,01
     ld [Coord],a
 
     ; Print Right Arrow
@@ -43183,7 +43189,7 @@ ChoiceRelearnMove:
     jr nz,.NotLastScreen
     ld a,$7f;$ec ; right arrow transparent
 .NotLastScreen
-    FuncCoord 07,01
+    FuncCoord 06,01
     ld [Coord],a
 
 .PrintMoves
