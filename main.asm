@@ -50539,7 +50539,7 @@ LearnMoveFromLevelUp:
     ld a,[$d11e]
     ld [$cf91],a
     cp a,MEW
-    jp z,MewLearnMove
+    ret z ; Mew just know every Move!
     push af
     ld hl,W_PARTYMON1_LEVEL
     ld a,[wWhichPokemon] ; $cf92
@@ -50600,12 +50600,6 @@ LearnMoveCommon:
     pop hl ; Restore Pointer to Current Learn Move's Level
     jr .learnSetLoop
 .done
-    ld a,[$cf91]
-    ld [$d11e],a
-    ret
-
-MewLearnMove:
-    call TryRandomForMew ; TODO
     ld a,[$cf91]
     ld [$d11e],a
     ret
@@ -50915,32 +50909,6 @@ SetAttributeOamRedBall:
     ld a,3
     ld [hli],a
     ret
-
-TryRandomForMew:
-    call GenRandom
-    cp STRUGGLE ; C - Set for no borrow. (Set if A < n.)
-    jr z,TryRandomForMew ; no id = 0
-    jr c,.TestMewJustKnow
-    jr TryRandomForMew
-.TestMewJustKnow
-    ld d,a
-    ld hl,W_PARTYMON1_MOVE1 ; $d173
-    ld a,[wWhichPokemon] ; $cf92
-    ld bc,$2c
-    call AddNTimes
-    ld b,4
-.checkCurrentMovesLoop2
-    ld a,[hli]
-    cp d
-    jr z,TryRandomForMew ; if mew just know the move
-    dec b
-    jr nz,.checkCurrentMovesLoop2
-    ld a,d
-    ld [$d0e0],a
-    ld [$d11e],a
-    call GetMoveName
-    call CopyStringToCF4B
-    PREDEF_JUMP LearnMovePredef
 
 SpecialTrainer: MACRO
     db \1,\2
