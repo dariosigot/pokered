@@ -158,4 +158,4 @@ db 0                                                 ; 147 - $93 - DRATINI
 db FM_FLOAT+FM_DIG                                   ; 148 - $94 - DRAGONAIR
 db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_DIG         ; 149 - $95 - DRAGONITE
 db FM_STRENGTH+FM_TELEPORT                           ; 150 - $96 - MEWTWO
-db FM_TELEPORT+FM_HEAL                               ; 151 - $97 - MEW
+db $FF                                               ; 151 - $97 - MEW

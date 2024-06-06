@@ -16996,7 +16996,8 @@ GetAddressOfScreenCoords: ; 7375 (1:7375)
 TextBoxFunctionTable: ; 7387 (1:7387)
     dbw $13,Func_74ba
     dbw $15,Func_74ea
-    dbw $04,Func_76e1
+    dbw $04,FieldMovesMenu
+    dbw $03,ChoiceMonSimpleMenu
     db $ff ; terminator
 
 TextBoxCoordTable_Old:
@@ -17393,91 +17394,49 @@ MenuStrings: ; 7671 (1:7671)
 .HealCancelMenu ; 76d5 (1:36d5)
     db "HEAL",$4E,"CANCEL@"
 
-Func_76e1: ; 76e1 (1:36e1)
-    xor a
-    ld hl,wFieldMoves ; $cd3d-1
-    ld [hli],a
-    ld [hli],a
-    ;ld [hli],a
-    ;ld [hli],a
-    ;ld [hli],a
-    call HackForAddAndResetFieldMovesSlot
-    ld [hl],$c ; Larghezza Fissa Menù Party Pokemon
-    call GetMonFieldMoves
-    ld a,[wNumFieldMoves] ; [$cd41]
-    and a
-    jr nz,.asm_770f
-    FuncCoord 11,10 ; Bordo MOVES/STATS/SWITCH,Eliminato "CANCEL"
+FieldMovesMenu: ; 76e1 (1:36e1)
+    FuncCoord 03,16
     ld hl,Coord
-    ld b,6 ; Eliminato "CANCEL"
-    ld c,$7
+    ld b,0
+    ld a,[wNumFieldMoves]
+    ld de,-40
+.loop1
+    add hl,de
+    inc b
+    inc b
+    dec a
+    jr nz,.loop1
+    ld c,7
     call TextBoxBorder
     call UpdateSprites
-    ld a,$c
-    ld [$FF00+$f7],a
-    FuncCoord 13,12 ; Eliminato "CANCEL" dal Menù Party
+    FuncCoord 05,18
     ld hl,Coord
-    ld de,PokemonMenuEntries ; $77c2
-    jp PlaceString
-.asm_770f
-    push af
-    FuncCoord 0,11 ; Eliminato "CANCEL" dal Menù Party
-    ld hl,Coord
-    ld a,[wFieldMovesLeftmostXCoord] ; [$cd42]
-    dec a
-    ld e,a
-    ld d,$0
-    add hl,de
-    ld b,5 ; Eliminato "CANCEL" dal Menù Party
-    ld a,$12
-    sub e
-    ld c,a
-    pop af
-    ld de,$ffd8
-.asm_7725
-    add hl,de
-    inc b
-    inc b
-    dec a
-    jr nz,.asm_7725
-    ld de,$ffec
-    add hl,de
-    inc b
-    call TextBoxBorder
-    call UpdateSprites
-    FuncCoord 0,12 ; Eliminato "CANCEL"
-    ld hl,Coord
-    ld a,[wFieldMovesLeftmostXCoord] ; [$cd42]
-    inc a
-    ld e,a
-    ld d,$0
-    add hl,de
-    ld de,$ffd8
-    ld a,[wNumFieldMoves] ; [$cd41]
-.asm_7747
+    ld a,[wNumFieldMoves]
+    ld de,-40
+.loop2
     add hl,de
     dec a
-    jr nz,.asm_7747
+    jr nz,.loop2
     xor a
-    ld [wNumFieldMoves],a ; [$cd41]
-    ld de,wFieldMoves ; $cd3d-1
-.asm_7752
+    ld [wNumFieldMoves],a
+    ld de,wFieldMoves
+.LoopFieldMoves
     push hl
-    ld hl,FieldMoveNames ; $778d
+    ld hl,.FieldMoveNames
     ld a,[de]
     and a
-    jr z,.asm_7776
+    jr z,.LoopFieldMovesEnd
     inc de
     ld b,a
-.asm_775c
+.LoopMoveNames
     dec b
-    jr z,.asm_7766
-.asm_775f
+    jr z,.LoopMoveNamesEnd
+.LoopMoveNameChars
     ld a,[hli]
     cp $50
-    jr nz,.asm_775f
-    jr .asm_775c
-.asm_7766
+    jr nz,.LoopMoveNameChars
+    jr .LoopMoveNames
+.LoopMoveNamesEnd
     ld b,h
     ld c,l
     pop hl
@@ -17485,25 +17444,15 @@ Func_76e1: ; 76e1 (1:36e1)
     ld d,b
     ld e,c
     call PlaceString
-    ld bc,$28
+    ld bc,40
     add hl,bc
     pop de
-    jr .asm_7752
-.asm_7776
+    jr .LoopFieldMoves
+.LoopFieldMovesEnd
     pop hl
-    ld a,[wFieldMovesLeftmostXCoord] ; [$cd42]
-    ld [$FF00+$f7],a
-    FuncCoord 0,12 ; Eliminato "CANCEL" dal Menù Party
-    ld hl,Coord
-    ld a,[wFieldMovesLeftmostXCoord] ; [$cd42]
-    inc a
-    ld e,a
-    ld d,$0
-    add hl,de
-    ld de,PokemonMenuEntries ; $77c2
-    jp PlaceString
+    ret
 
-FieldMoveNames: ; 778d (1:778d)
+.FieldMoveNames
     db "CUT@"    ; Move : BLADE
     db "FLY@"    ; Move : SWOOP
     db "FLOAT@"  ; Move : TSUNAMI (SURF)
@@ -17513,14 +17462,40 @@ FieldMoveNames: ; 778d (1:778d)
     db "TELEP.@" ; Move : TELEPORT
     db "HEAL@"   ; Move : SOFTBOILED
 
-PokemonMenuEntries: ; 77c2 (1:77c2)
+ChoiceMonSimpleMenu:
+    ld b,BANK(GetMonFieldMoves)
+    ld hl,GetMonFieldMoves
+    call Bankswitch
+    FuncCoord 11,08
+    ld hl,Coord
+    ld b,8
+    ld c,7
+    call TextBoxBorder
+    call UpdateSprites
+    ld a,$c
+    ld [$FF00+$f7],a ; hFieldMoveMonMenuTopMenuItemX
+    FuncCoord 13,10
+    ld hl,Coord
+    ld de,.PokemonMenuEntries
+    jp PlaceString
+.PokemonMenuEntries
+    db "FIELD",$4E
     db "STATS",$4E
     db "MOVES",$4E
-    db "SWITCH","@" ; Eliminato "CANCEL"
+    db "SWITCH","@"
 
-SECTION "GetMonFieldMoves",ROMX[$77d6],BANK[$1]
-
-GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "FieldMoves"
+GetMonFieldMoves: ; Moved in the Bank
+; Totalmente Ristrutturato basato su Tabella "FieldMoves"
+    xor a
+    ld hl,wFieldMoves ; $cd3d-1
+    ld [hli],a ; Standard
+    ld [hli],a ; Standard
+    ld [hli],a ; Standard
+    ld [hli],a ; Standard
+    ld [hli],a ; Standard
+    ld [hli],a ; New
+    ld [hli],a ; New
+    ld [hli],a ; New
     ld a,[wWhichPokemon] ; $cf92
     ld d,0
     ld e,a
@@ -17528,9 +17503,7 @@ GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "
     add hl,de
     ld a,[hl]
     ld [$d11e],a
-    ld a,$3a
-    call Predef ; convert pokemon ID in [$D11E] to pokedex number
-    ld a,[$d11e]
+    call IndexToPokedexAndRestoreD11E
     ld e,a
     ld hl,GetFieldMovesRulesByte
     ld b,BANK(GetFieldMovesRulesByte)
@@ -17547,7 +17520,7 @@ GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "
     inc b ; num of founded moves
     ld [hli],a ; store field move id in wFieldMoves vector
     ld a,b
-    cp 5 ; Max Possible Number of Field Moves
+    cp 8 ; Max Possible Number of Field Moves
     jr z,.End
 .FieldMoveNotFound
     dec c
@@ -17555,13 +17528,6 @@ GetMonFieldMoves: ; 77d6 (1:77d6) ; Totalmente Ristrutturato basato su Tabella "
 .End
     ld a,b
     ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
-    ret
-
-HackForAddAndResetFieldMovesSlot:
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; New
     ret
 
 ; Some Bytes Free
@@ -29623,12 +29589,71 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jp RedisplayStartMenu
 .chosePokemon
     call SaveScreenTilesToBuffer1 ; save screen
-    ld a,$04
+.RedrawMenu
+    ld a,3 ; ChoiceMonSimpleMenu
     ld [$d125],a
     call DisplayTextBoxID ; display pokemon menu options
-    ld hl,wFieldMoves ; $cd3d-1
-    ld bc,$020c ; ld bc,$020c ; max menu item ID,top menu item Y
-    ld e,5+1 ; Max Number of Field Moves + 1
+    ld bc,$030a ; ld bc,$020c ; max menu item ID,top menu item Y
+    ld d,12 ; top menu item X
+    call HandlePkmnSubMenu
+    bit 1,a ; was the B button pressed?
+    jr nz,.ReloadScreenAndLoop
+    ld a,[wCurrentMenuItem]
+    and a
+    jr z,.choseFieldMove
+    push af
+    call LoadScreenTilesFromBuffer1 ; restore saved screen
+    pop af
+    dec a
+    jr z,.choseStats
+    dec a
+    jr z,.choseMoves
+    ; fall through
+
+.choseSwitch
+    ld a,[W_NUMINPARTY]
+    cp a,2 ; is there more than one pokemon in the party?
+    jr c,StartMenu_Pokemon ; if not,no switching
+    call Func_13653
+    ld a,$04 ; swap pokemon positions menu
+    ld [$d07d],a
+    jr .checkIfPokemonChosen2
+
+.choseStats
+    call CleanLCD_OAM
+    xor a
+    ld [$cc49],a
+    ld a,$36
+    call Predef ; indirect jump to StatusScreen (12953 (4:6953))
+.ReturnToPartyMenu
+    call ReloadMapData
+    jr StartMenu_Pokemon
+
+.choseMoves
+    PREDEF MovesMenuPredef
+    jr .ReturnToPartyMenu
+
+.ReloadScreenAndLoop
+    call LoadScreenTilesFromBuffer1 ; restore saved screen
+.MiddleJumpToLoop
+    jr .loop
+
+.NoFieldMoves
+    ld a,$a5 ; Error
+    call PlaySoundWaitForCurrent ; play sound
+    jr .RedrawMenu
+
+.choseFieldMove
+    ld a,[wNumFieldMoves]
+    and a
+    jr z,.NoFieldMoves
+    ld a,4 ; FieldMovesMenu
+    ld [$d125],a
+    call DisplayTextBoxID ; display pokemon field moves
+    ld bc,$ff12 ; max menu item ID,top menu item Y
+    ld d,04 ; top menu item X
+    ld hl,wFieldMoves
+    ld e,8+1 ; Max Number of Field Moves + 1
 .adjustMenuVariablesLoop
     dec e
     jr z,.storeMenuVariables
@@ -29640,63 +29665,19 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     dec c
     jr .adjustMenuVariablesLoop
 .storeMenuVariables
-    ld hl,wTopMenuItemY
-    ld a,c
-    ld [hli],a ; top menu item Y
-    ld a,[$fff7]
-    ld [hli],a ; top menu item X
-    xor a
-    ld [hli],a ; current menu item ID
-    inc hl
-    ld a,b
-    ld [hli],a ; max menu item ID
-    ld a,%00000011 ; A button,B button
-    ld [hli],a ; menu watched keys
-    xor a
-    ld [hl],a
-    call HandleMenuInputPlusWrapping
+    call HandlePkmnSubMenu
     push af
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     pop af
     bit 1,a ; was the B button pressed?
-    jp nz,.loop
-; if the B button wasn't pressed
-    ld a,[wMaxMenuItem]
-    ld b,a
-    ld a,[wCurrentMenuItem] ; menu selection
-    cp b
-    jr z,.choseSwitch
-    dec b
-    cp b
-    jp z,.choseMoves
-    dec b
-    cp b
-    jp z,.choseStats
-    ld c,a
+    jr nz,.MiddleJumpToLoop
+    ld hl,wFieldMoves
     ld b,0
-    ld hl,wFieldMoves ; $cd3d-1
+    ld a,[wCurrentMenuItem]
+    ld c,a
     add hl,bc
-    jp .choseOutOfBattleMove
-.choseSwitch
-    ld a,[W_NUMINPARTY]
-    cp a,2 ; is there more than one pokemon in the party?
-    jp c,StartMenu_Pokemon ; if not,no switching
-    call Func_13653
-    ld a,$04 ; swap pokemon positions menu
-    ld [$d07d],a
-    jp .checkIfPokemonChosen2
-.choseStats
-    call CleanLCD_OAM
-    xor a
-    ld [$cc49],a
-    ld a,$36
-    call Predef ; indirect jump to StatusScreen (12953 (4:6953))
-.ReturnToPartyMenu
-    call ReloadMapData
-    jp StartMenu_Pokemon
-.choseMoves
-    PREDEF MovesMenuPredef
-    jr .ReturnToPartyMenu
+    ; fall through
+
 .choseOutOfBattleMove
     push hl
     ld a,[$cf92]
@@ -29874,14 +29855,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .goBackToMap
     call Func_3dbe
     jp CloseTextDisplay
-
-NewBadgeRequired:
-    ld hl,.newBadgeRequiredText
-    call PrintText
-    jp $70BF ; StartMenu_Pokemon.loop
-.newBadgeRequiredText
-    TX_FAR _NewBadgeRequiredText
-    db "@"
 
 SECTION "ErasePartyMenuCursors",ROMX[$72ed],BANK[$4]
 
@@ -30977,11 +30950,6 @@ DisplayDamageAndUpdateHPBar: ; During Recoil
     call Bankswitch
     ret
 
-HandleMenuInputPlusWrapping:
-    ld a,1
-    ld [wMenuWrappingEnabled],a ; $cc4a
-    jp HandleMenuInput
-
 DontCheckElement:
     pop af ; Delete Call Back Return
     jp NewBadgeRequired
@@ -31888,6 +31856,34 @@ CheckIfInOutsideMapAndAtLeastOneFlyingMap:
     and %00000001 ; check only first bit
     dec a
     ret
+
+NewBadgeRequired:
+    ld hl,.newBadgeRequiredText
+    call PrintText
+    jp $70BF ; StartMenu_Pokemon.loop
+.newBadgeRequiredText
+    TX_FAR _NewBadgeRequiredText
+    db "@"
+
+HandlePkmnSubMenu:
+    ld hl,wTopMenuItemY
+    ld a,c
+    ld [hli],a ; top menu item Y
+    ld a,d
+    ld [hli],a ; top menu item X
+    xor a
+    ld [hli],a ; current menu item ID
+    inc hl
+    ld a,b
+    ld [hli],a ; max menu item ID
+    ld a,%00000011 ; A button,B button
+    ld [hli],a ; menu watched keys
+    xor a
+    ld [hl],a
+    ld a,1
+    ld [wMenuWrappingEnabled],a ; $cc4a
+    call HandleMenuInput
+    jp PlaceUnfilledArrowMenuCursor
 
 SECTION "bank5",ROMX,BANK[$5]
 
