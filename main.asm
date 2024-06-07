@@ -98042,7 +98042,7 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     ld de,TownMapUpArrow ; $5093
     ld hl,$8ed0
     ld bc,(BANK(TownMapUpArrow) << 8) + $01
-    call CopyVideoDataDouble
+    call GoodCopyVideoData
     call BuildFlyLocationsList
     ld hl,$cfcb
     ld a,[hl]
@@ -98175,10 +98175,7 @@ BuildFlyLocationsList: ; 71070 (1c:5070)
     jr nz,.loop
     ret
 
-SECTION "TownMapUpArrow",ROMX[$5093],BANK[$1c]
-
-TownMapUpArrow: ; 71093 (1c:5093)
-    INCBIN "gfx/up_arrow.1bpp"
+SECTION "_LoadTownMap",ROMX[$509b],BANK[$1c]
 
 _LoadTownMap: ; 7109b (1c:509b)
     call GBPalWhiteOutWithDelay3
@@ -99120,6 +99117,9 @@ IndexToMiniSpritePointer:
     swap a
     srl a
     ret
+
+TownMapUpArrow: ; Moved in the Bank
+    INCBIN "gfx/up_arrow.2bpp"
 
 SECTION "MonOverworldSprites",ROMX[$5959],BANK[$1C]
 
