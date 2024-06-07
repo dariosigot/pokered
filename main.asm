@@ -25758,12 +25758,16 @@ ItemUseTechMach:
     ld [$d152],a
     push af
     call LoadHpBarAndStatusTilePatterns
+    ld a,1
+    ld [$ffb7],a
     ld a,[wLastTechMachIdUsed] ; restore last choice
     ld [$cf91],a
     call GetTMChoiceItemID ; put item_ID in $cf91
     ld a,[$cf91]
     ld [wLastTechMachIdUsed],a ; overwrite last choice
     call c,ItemUseTMHM
+    xor a
+    ld [$ffb7],a
     pop af
     ld [$cf91],a
     pop af
@@ -25773,7 +25777,7 @@ ItemUseTechMach:
 GetTMChoiceItemID:
     cp TM_01 ; less then TM01?
     jr c,.Init
-    cp TM_56+1 ; greater then TM54?
+    cp TM_56+1 ; greater then TM56?
     jr nc,.Init
     call GetTMQty
     jr z,.Init
@@ -25824,12 +25828,20 @@ GetTMChoiceItemID:
     bit 4,a ; pressed Right key?
     jr z,.checkIfLeftPressed
 ;Right
+    FuncCoord 18,11
+    ld hl,Coord
+    ld [hl]," "
+    call Delay3
     ld a,[$cf91]
     jr .TryNext
 .checkIfLeftPressed
     bit 5,a ; pressed Left key?
     jr z,.checkIfAPressed
 ;Left
+    FuncCoord 05,11
+    ld hl,Coord
+    ld [hl]," "
+    call Delay3
     ld a,[$cf91]
     jr .TryPrev
 .checkIfAPressed
@@ -25849,11 +25861,7 @@ GetTMChoiceItemID:
     FuncCoord 4,10
     ld hl,Coord
     ld bc,$020e ; 2,14
-    call TextBoxBorder
-    FuncCoord 5,11
-    ld hl,Coord
-    ld de,.Arrows
-    jp PlaceString
+    jp TextBoxBorder
 
 .ClearScreenArea
     FuncCoord 6,11
@@ -25862,6 +25870,12 @@ GetTMChoiceItemID:
     jp ClearScreenArea
 
 .GetAndPlaceTMStats
+    FuncCoord 05,11
+    ld hl,Coord
+    ld [hl],$D6 ; Arrow Left
+    FuncCoord 18,11
+    ld hl,Coord
+    ld [hl],$ED ; Arrow Right
     FuncCoord 14,12
     ld hl,Coord
     ld de,.X
@@ -25905,8 +25919,6 @@ GetTMChoiceItemID:
 .ChoiceTMText:
     TX_FAR _ChoiceTMText
     db "@"
-.Arrows
-    db $d6,"            ▶@"
 .X
     db "×@"
 
@@ -42783,6 +42795,9 @@ MovesMenu:
     push af
     xor a
     ld [$ff00+$d7],a
+    ; Quick Joypad
+    ld a,1
+    ld [$ffb7],a
 
     ; Clear Screen and Sprite and No HP Bar Palette
     call GBPalWhiteOutWithDelay3
@@ -42884,6 +42899,9 @@ MovesMenu:
     ; Enable Transfer
     ld a,1
     ld [H_AUTOBGTRANSFERENABLED],a
+    ; Quick Joypad
+    xor a
+    ld [$ffb7],a
     ; water/flower tile animation
     pop af
     ld [$ff00+$d7],a
@@ -43007,17 +43025,23 @@ ChoiceRelearnMove:
     jp PlaceUnfilledArrowMenuCursor ; A pressed then return (z flag set)
 
 .LeftPressed
+    FuncCoord 04,01
+    ld hl,Coord
     ld a,[wListScrollOffset]
     dec a
     jr .LeftRightCommon
 .RightPressed
+    FuncCoord 06,01
+    ld hl,Coord
     ld a,[wListScrollOffset]
     inc a
 .LeftRightCommon
     call .GetNumberOfScreenMenu
     cp b
     jr nc,.MenuLoop
+    ld [hl]," "
     ld [wListScrollOffset],a
+    call Delay3
     ld a,[wCurrentMenuItem]
     ld b,a
     call .GetMaxCurrentScreenMenuLenght
@@ -43227,7 +43251,9 @@ ChoiceRelearnMove:
 
 .GetNumberOfScreenMenu
     push af
+    push hl
     call .ListLenghtAndPointerToFirst
+    pop hl
     dec a
     ld b,0
 .LoopUntilUnderFlow
@@ -43239,7 +43265,9 @@ ChoiceRelearnMove:
 
 .GetMaxCurrentScreenMenuLenght
     push bc
+    push hl
     call .ListLenghtAndPointerToFirst
+    pop hl
     ld b,a
     ld a,[wListScrollOffset]
     and a
@@ -136478,6 +136506,9 @@ DisplayDepositWithdrawMenu_:
     ; Emulate Move Relearner Status Only to Animate Mini Sprite
     ld hl,wFlagMoveRelearnEngagedBit7
     set 7,[hl]
+    ; Quick Joypad
+    ld a,1
+    ld [$ffb7],a
     ; Disable Update Sprites Flag
     ld hl,$cfcb
     ld a,[hl]
@@ -136586,17 +136617,26 @@ DisplayDepositWithdrawMenu_:
     ; Reset Move Relearner Status
     ld hl,wFlagMoveRelearnEngagedBit7
     res 7,[hl]
+    ; Quick Joypad
+    xor a
+    ld [$ffb7],a
     ret
 .right
+    FuncCoord 18,04
+    ld hl,Coord
     inc a
     jr .RightLeftCommon
 .left
+    FuncCoord 05,04
+    ld hl,Coord
     dec a
 .RightLeftCommon
     call .GetNumberOfMon
     cp b
     jp nc,.ReturnFromStatusScreenOrShiftNull
+    ld [hl]," "
     ld [$cf92],a
+    call Delay3
     jp .StartOrShiftMon
 .GetNumberOfMon
     push af
