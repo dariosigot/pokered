@@ -17495,15 +17495,9 @@ ChoiceMonSimpleMenu:
 GetMonFieldMoves: ; Moved in the Bank
 ; Totalmente Ristrutturato basato su Tabella "FieldMoves"
     xor a
-    ld hl,wFieldMoves ; $cd3d-1
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; New
-    ld [hli],a ; New
-    ld [hli],a ; New
+    ld hl,wFieldMoves
+    ld bc,8+1
+    call FillMemory
     ld a,[wWhichPokemon] ; $cf92
     ld d,0
     ld e,a
@@ -17518,7 +17512,7 @@ GetMonFieldMoves: ; Moved in the Bank
     call Bankswitch
     ld c,8
     ld b,0
-    ld hl,wFieldMoves ; $cd3d-1
+    ld hl,wFieldMoves
 .Loop8BitRule
     ld a,8+1
     sub c ; a=a-c ; Move id
@@ -25073,7 +25067,6 @@ UsingDigCry:
 
 SurfingCry:
     call FieldMovePlayCry
-    call WaitForSoundToFinish
     ld hl,SurfingGotOnText
     ret
 
@@ -130375,7 +130368,6 @@ SelectInOverWorld:
 .canFloat
     call .StartCustomSelectFunction
     call .PlayCry
-    call WaitForSoundToFinish
     ld a,SURFBOARD
     ld [$cf91],a
     ld [$d152],a

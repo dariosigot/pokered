@@ -247,10 +247,9 @@ wEnemyMonAccuracyMod: ; cd32
 wEnemyMonEvasionMod: ; cd33
     ds 1
 
-    ds 9-4
+; At Least 5 free Bytes, Attention to cd38!
 
-wFieldMoves:
-    ds 4 ; + 4
+SECTION "wFlyLocationList",WRAM0[$cd3d]
 
 wFlyLocationList: ; cd3d
 wWhichTrade: ; cd3d
@@ -1651,23 +1650,28 @@ NEXTU
 
 wMoveForgotPriority:: ; def0
     ds 4
-wNewMoveDamage:: ; $def5
+wNewMoveDamage:: ; $def4
     db
-wNewMoveType:: ; $def6
+wNewMoveType:: ; $def5
     db
 
 NEXTU
 
-wBlkCurrentPaletteColor: ; def1
+wBlkCurrentPaletteColor: ; def0
     ds 1
-wBlkCoordinateX1Left: ; def2
+wBlkCoordinateX1Left: ; def1
     ds 1
-wBlkCoordinateY1Upper: ; def3
+wBlkCoordinateY1Upper: ; def2
     ds 1
-wBlkCoordinateX2Right: ; def4
+wBlkCoordinateX2Right: ; def3
     ds 1
-wBlkCoordinateY2Lower: ; def5
+wBlkCoordinateY2Lower: ; def4
     ds 1
+
+NEXTU
+
+wFieldMoves: ; def0
+    ds 9
 
 ENDU
 
