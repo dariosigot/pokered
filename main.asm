@@ -442,6 +442,29 @@ GoodCopyVideoDataDouble:
     pop de
     jp FarCopyDataDouble ; if LCD is off,transfer all at once
 
+FieldMovePlayCry:
+    ld a,[wFieldMoveMonID]
+    call GetCryData ; get cry data
+    call PlaySound ; play sound
+    xor a
+    ld [wFieldMoveMonID],a
+    ret
+
+; copies the tile patterns for letters and numbers into VRAM
+LoadFontTilePatterns: ; Moved in the Bank
+    ld de,FontGraphics1
+    ld hl,$8800
+    ld bc,(BANK(FontGraphics1) << 8 | $40)
+    call GoodCopyVideoDataDouble
+    ld de,FontGraphics2
+    ld hl,$8E00
+    ld bc,(BANK(FontGraphics2) << 8 | $20)
+    call GoodCopyVideoData
+    ld de,OtherIcon
+    ld hl,$8d00
+    ld bc,(BANK(OtherIcon) << 8 | $B)
+    jp GoodCopyVideoData
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -8793,16 +8816,7 @@ Func_366b: ; 366b (0:366b)
     pop hl
     ret
 
-; copies the tile patterns for letters and numbers into VRAM
-LoadFontTilePatterns: ; 3680 (0:3680)
-    ld de,FontGraphics1
-    ld hl,$8800
-    ld bc,(BANK(FontGraphics1) << 8 | $40)
-    call GoodCopyVideoDataDouble
-    ld de,FontGraphics2
-    ld hl,$8E00
-    ld bc,(BANK(FontGraphics2) << 8 | $20)
-    jp GoodCopyVideoData
+; Free Space
 
 SECTION "LoadTextBoxTilePatterns",ROM0[$36a0]
 
@@ -13406,7 +13420,7 @@ Func_57d6:
     ld a,[$cc26]
     ld [$cf92],a
     ld a,$36
-    call Predef ; indirect jump to StatusScreen (12953 (4:6953))
+    call Predef ; StatusScreen
     call GBPalNormal
     call Func_5ae6
     call Func_57f2
@@ -17487,15 +17501,9 @@ ChoiceMonSimpleMenu:
 GetMonFieldMoves: ; Moved in the Bank
 ; Totalmente Ristrutturato basato su Tabella "FieldMoves"
     xor a
-    ld hl,wFieldMoves ; $cd3d-1
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; Standard
-    ld [hli],a ; New
-    ld [hli],a ; New
-    ld [hli],a ; New
+    ld hl,wFieldMoves
+    ld bc,8+1
+    call FillMemory
     ld a,[wWhichPokemon] ; $cf92
     ld d,0
     ld e,a
@@ -17510,7 +17518,7 @@ GetMonFieldMoves: ; Moved in the Bank
     call Bankswitch
     ld c,8
     ld b,0
-    ld hl,wFieldMoves ; $cd3d-1
+    ld hl,wFieldMoves
 .Loop8BitRule
     ld a,8+1
     sub c ; a=a-c ; Move id
@@ -23736,7 +23744,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     call CheckExceptionTilePassable
     ret ; jp c,SurfingAttemptFailed
 .HandleSurfboardTextMessage
-    ld hl,SurfingGotOnText
+    call SurfingCry ; ld hl,SurfingGotOnText
 .PrintText
     jp PrintText
 
@@ -24533,7 +24541,7 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
     inc a
     ld [$d078],a
     ld [$cd6a],a ; item used
-    ld a,[$d152]
+    call UsingDigCry ; ld a,[$d152]
     and a ; using Dig?
     ret nz ; if so,return
     call ItemUseReloadOverworldData
@@ -24541,7 +24549,7 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
     call DelayFrames
     jp RemoveUsedItem
 .notUsable
-    jp ItemUseNotTime
+    jp DigNotUsable
 
 EscapeRopeTilesets: ; dffd (3:5ffd)
     db $03,$0f,$11,$16,$10
@@ -25052,6 +25060,30 @@ ItemUsePPRestore: ; Moved in the Bank
     ret
 .PPRestoredText
     TX_FAR _PPRestoredText
+    db "@"
+
+UsingDigCry:
+    ld a,[$d152]
+    and a
+    ret z
+    push af
+    call FieldMovePlayCry
+    pop af
+    ret
+
+SurfingCry:
+    call FieldMovePlayCry
+    ld hl,SurfingGotOnText
+    ret
+
+DigNotUsable:
+    ld a,[$d152]
+    and a
+    jp z,ItemUseNotTime
+    ld hl,.cannotDigHereText
+    jp ItemUseFailed
+.cannotDigHereText
+    TX_FAR _CannotDigHereText
     db "@"
 
 ; Free Space
@@ -25726,12 +25758,16 @@ ItemUseTechMach:
     ld [$d152],a
     push af
     call LoadHpBarAndStatusTilePatterns
+    ld a,1
+    ld [$ffb7],a
     ld a,[wLastTechMachIdUsed] ; restore last choice
     ld [$cf91],a
     call GetTMChoiceItemID ; put item_ID in $cf91
     ld a,[$cf91]
     ld [wLastTechMachIdUsed],a ; overwrite last choice
     call c,ItemUseTMHM
+    xor a
+    ld [$ffb7],a
     pop af
     ld [$cf91],a
     pop af
@@ -25741,7 +25777,7 @@ ItemUseTechMach:
 GetTMChoiceItemID:
     cp TM_01 ; less then TM01?
     jr c,.Init
-    cp TM_56+1 ; greater then TM54?
+    cp TM_56+1 ; greater then TM56?
     jr nc,.Init
     call GetTMQty
     jr z,.Init
@@ -25792,12 +25828,20 @@ GetTMChoiceItemID:
     bit 4,a ; pressed Right key?
     jr z,.checkIfLeftPressed
 ;Right
+    FuncCoord 18,11
+    ld hl,Coord
+    ld [hl]," "
+    call Delay3
     ld a,[$cf91]
     jr .TryNext
 .checkIfLeftPressed
     bit 5,a ; pressed Left key?
     jr z,.checkIfAPressed
 ;Left
+    FuncCoord 05,11
+    ld hl,Coord
+    ld [hl]," "
+    call Delay3
     ld a,[$cf91]
     jr .TryPrev
 .checkIfAPressed
@@ -25817,11 +25861,7 @@ GetTMChoiceItemID:
     FuncCoord 4,10
     ld hl,Coord
     ld bc,$020e ; 2,14
-    call TextBoxBorder
-    FuncCoord 5,11
-    ld hl,Coord
-    ld de,.Arrows
-    jp PlaceString
+    jp TextBoxBorder
 
 .ClearScreenArea
     FuncCoord 6,11
@@ -25830,6 +25870,12 @@ GetTMChoiceItemID:
     jp ClearScreenArea
 
 .GetAndPlaceTMStats
+    FuncCoord 05,11
+    ld hl,Coord
+    ld [hl],$D6 ; Arrow Left
+    FuncCoord 18,11
+    ld hl,Coord
+    ld [hl],$ED ; Arrow Right
     FuncCoord 14,12
     ld hl,Coord
     ld de,.X
@@ -25873,8 +25919,6 @@ GetTMChoiceItemID:
 .ChoiceTMText:
     TX_FAR _ChoiceTMText
     db "@"
-.Arrows
-    db $d6,"            ▶@"
 .X
     db "×@"
 
@@ -28586,8 +28630,8 @@ ItemUsePokedoll:
 UsedStrengthText: ; Moved in the Bank
     TX_FAR _UsedStrengthText
     db $08 ; asm
-    ld a,[$cf91]
-    call PlayCry
+    call FieldMovePlayCry
+    call WaitForSoundToFinish
     call Delay3
     jp TextScriptEnd
 
@@ -29508,6 +29552,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .checkIfPokemonChosen2
     call GoBackToPartyMenu
 .checkIfPokemonChosen
+    ld a,0
+    ld [wFieldMoveMonID],a
     jr nc,.chosePokemon
 .exitMenu
     call GBPalWhiteOutWithDelay3
@@ -29551,7 +29597,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     xor a
     ld [$cc49],a
     ld a,$36
-    call Predef ; indirect jump to StatusScreen (12953 (4:6953))
+    call Predef ; StatusScreen
 .ReturnToPartyMenu
     call ReloadMapData
     jr StartMenu_Pokemon
@@ -29579,20 +29625,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call DisplayTextBoxID ; display pokemon field moves
     ld bc,$ff12 ; max menu item ID,top menu item Y
     ld d,04 ; top menu item X
-    ld hl,wFieldMoves
-    ld e,8+1 ; Max Number of Field Moves + 1
-.adjustMenuVariablesLoop
-    dec e
-    jr z,.storeMenuVariables
-    ld a,[hli]
-    and a
-    jr z,.storeMenuVariables
-    inc b
-    dec c
-    dec c
-    jr .adjustMenuVariablesLoop
-.storeMenuVariables
-    call HandlePkmnSubMenu
+    call HandlePkmnSubMenuFieldMoves
     push af
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     pop af
@@ -29603,14 +29636,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[wCurrentMenuItem]
     ld c,a
     add hl,bc
-    ; fall through
-
-.choseOutOfBattleMove
-    push hl
-    ld a,[$cf92]
-    ld hl,W_PARTYMON1NAME
-    call GetPartyMonName
-    pop hl
+    call GetPartyMonIDAndName
     ld a,[hl]
     dec a
     add a
@@ -29647,7 +29673,10 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call ChooseFlyDestination
     ld a,[$d732]
     bit 3,a ; did the player decide to fly?
-    jp nz,.goBackToMap
+    jr z,.undoFly
+    call FieldMovePlayCry
+    jp .goBackToMap
+.undoFly
     call LoadFontTilePatterns
     ld hl,$d72e
     set 1,[hl]
@@ -29655,8 +29684,12 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .cut
     bit 1,a ; does the player have the Cascade Badge?
     call CheckNaturePower ; jp z,.newBadgeRequired
+    ld b,BANK(CheckCutTile)
+    ld hl,CheckCutTile
+    call Bankswitch
+    call z,FieldMovePlayCry
     ld a,$3c
-    call Predef
+    call Predef ; UsedCut
     ld a,[$cd6a]
     and a
     jp z,.loop
@@ -29678,6 +29711,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[$cd6a]
     and a
     jp z,.loop
+.WhiteScreenAndGotoMap
     call GBPalWhiteOutWithDelay3
     jp .goBackToMap
 .strength
@@ -29685,17 +29719,16 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call CheckEarthPower ; jp z,.newBadgeRequired
     ld a,$5b
     call Predef
-    call GBPalWhiteOutWithDelay3
-    jp .goBackToMap
+    jr .WhiteScreenAndGotoMap
 .flash
     bit 0,a ; does the player have the Boulder Badge?
     call CheckFirePower ; jp z,.newBadgeRequired
+    call FieldMovePlayCry
     xor a
     ld [$d35d],a
     ld hl,.flashLightsAreaText
     call PrintText
-    call GBPalWhiteOutWithDelay3
-    jp .goBackToMap
+    jr .WhiteScreenAndGotoMap
 .flashLightsAreaText
     TX_FAR _FlashLightsAreaText
     db "@"
@@ -29707,8 +29740,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[$cd6a]
     and a
     jp z,.loop
-    call GBPalWhiteOutWithDelay3
-    jp .goBackToMap
+    jr .WhiteScreenAndGotoMap
 .teleport
     call CheckIfTeleportNotAllowed
     jr nz,.canTeleport
@@ -29719,6 +29751,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call PrintText
     jp .loop
 .canTeleport
+    call FieldMovePlayCry
     ld hl,.warpToLastPokemonCenterText
     call PrintText
     ld hl,$d732
@@ -29763,6 +29796,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[H_QUOTIENT + 2]
     sbc b
     jp nc,.notHealthyEnough
+    call FieldMovePlayCry
     ld a,[$cc2b]
     push af
     ld a,POTION
@@ -31792,6 +31826,22 @@ NewBadgeRequired:
     TX_FAR _NewBadgeRequiredText
     db "@"
 
+HandlePkmnSubMenuFieldMoves:
+    ld hl,wFieldMoves
+    ld e,8+1 ; Max Number of Field Moves + 1
+.adjustMenuVariablesLoop
+    dec e
+    jr z,.storeMenuVariables
+    ld a,[hli]
+    and a
+    jr z,.storeMenuVariables
+    inc b
+    dec c
+    dec c
+    jr .adjustMenuVariablesLoop
+.storeMenuVariables
+    ; fall through
+
 HandlePkmnSubMenu:
     ld hl,wTopMenuItemY
     ld a,c
@@ -31811,6 +31861,21 @@ HandlePkmnSubMenu:
     ld [wMenuWrappingEnabled],a ; $cc4a
     call HandleMenuInput
     jp PlaceUnfilledArrowMenuCursor
+
+GetPartyMonIDAndName:
+    push hl
+    ld a,[$cf92]
+    ld hl,W_PARTYMON1
+    ld c,a
+    ld b,0
+    add hl,bc
+    ld b,[hl]
+    ld hl,wFieldMoveMonID
+    ld [hl],b
+    ld hl,W_PARTYMON1NAME
+    call GetPartyMonName
+    pop hl
+    ret
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -42730,13 +42795,14 @@ MovesMenu:
     push af
     xor a
     ld [$ff00+$d7],a
+    ; Quick Joypad
+    ld a,1
+    ld [$ffb7],a
 
     ; Clear Screen and Sprite and No HP Bar Palette
     call GBPalWhiteOutWithDelay3
     call ClearScreen
     call CleanLCD_OAM ; Remove Mini Sprite
-    ld hl,wFlagNoHpPalBit2
-    set 2,[hl]
     ld b,15 ; GetMovesMenuPalatteID
     call GoPAL_SET
     ; Disable Transfer
@@ -42833,6 +42899,9 @@ MovesMenu:
     ; Enable Transfer
     ld a,1
     ld [H_AUTOBGTRANSFERENABLED],a
+    ; Quick Joypad
+    xor a
+    ld [$ffb7],a
     ; water/flower tile animation
     pop af
     ld [$ff00+$d7],a
@@ -42956,17 +43025,23 @@ ChoiceRelearnMove:
     jp PlaceUnfilledArrowMenuCursor ; A pressed then return (z flag set)
 
 .LeftPressed
+    FuncCoord 04,01
+    ld hl,Coord
     ld a,[wListScrollOffset]
     dec a
     jr .LeftRightCommon
 .RightPressed
+    FuncCoord 06,01
+    ld hl,Coord
     ld a,[wListScrollOffset]
     inc a
 .LeftRightCommon
     call .GetNumberOfScreenMenu
     cp b
     jr nc,.MenuLoop
+    ld [hl]," "
     ld [wListScrollOffset],a
+    call Delay3
     ld a,[wCurrentMenuItem]
     ld b,a
     call .GetMaxCurrentScreenMenuLenght
@@ -43176,7 +43251,9 @@ ChoiceRelearnMove:
 
 .GetNumberOfScreenMenu
     push af
+    push hl
     call .ListLenghtAndPointerToFirst
+    pop hl
     dec a
     ld b,0
 .LoopUntilUnderFlow
@@ -43188,7 +43265,9 @@ ChoiceRelearnMove:
 
 .GetMaxCurrentScreenMenuLenght
     push bc
+    push hl
     call .ListLenghtAndPointerToFirst
+    pop hl
     ld b,a
     ld a,[wListScrollOffset]
     and a
@@ -44592,23 +44671,23 @@ BillsPCDeposit: ; 215ac (8:55ac)
     jp c,BillsPCMenu
     call DisplayDepositWithdrawMenu
     jp nc,BillsPCMenu
-    ld a,[W_NUMINPARTY] ; $d163
-    dec a
-    jr nz,.partyLargeEnough
-    ld hl,CantDepositLastMonText
-    call PrintText
-    jp BillsPCMenu
-.partyLargeEnough
-    ld a,[W_NUMINBOX] ; $da80
-    cp $14
-    jr nz,.boxNotFull
-    ld hl,BoxFullText ; $5802
-    call PrintText
-    jp BillsPCMenu
-.boxNotFull
-    ld a,[$cf91]
-    call GetCryData
-    call PlaySoundWaitForCurrent
+;    ld a,[W_NUMINPARTY] ; $d163
+;    dec a
+;    jr nz,.partyLargeEnough
+;    ld hl,CantDepositLastMonText
+;    call PrintText
+;    jp BillsPCMenu
+;.partyLargeEnough
+;    ld a,[W_NUMINBOX] ; $da80
+;    cp $14
+;    jr nz,.boxNotFull
+;    ld hl,BoxFullText ; $5802
+;    call PrintText
+;    jp BillsPCMenu
+;.boxNotFull
+;    ld a,[$cf91]
+;    call GetCryData
+;    call PlaySoundWaitForCurrent
     ld a,$1
     ld [$cf95],a
     call MoveMon
@@ -44648,19 +44727,19 @@ BillsPCWithdraw: ; 21618 (8:5618)
     jp c,BillsPCMenu
     call DisplayDepositWithdrawMenu
     jp nc,BillsPCMenu
-    ld a,[W_NUMINPARTY] ; $d163
-    cp $6
-    jr nz,.Continue
-    ld hl,CantTakeMonText ; $5811
-    call PrintText
-    jp BillsPCMenu
-.Continue
-    ld a,[wWhichPokemon] ; $cf92
-    ld hl,$de06
-    call GetPartyMonName
-    ld a,[$cf91]
-    call GetCryData
-    call PlaySoundWaitForCurrent
+;    ld a,[W_NUMINPARTY] ; $d163
+;    cp $6
+;    jr nz,.Continue
+;    ld hl,CantTakeMonText ; $5811
+;    call PrintText
+;    jp BillsPCMenu
+;.Continue
+;    ld a,[wWhichPokemon] ; $cf92
+;    ld hl,$de06
+;    call GetPartyMonName
+;    ld a,[$cf91]
+;    call GetCryData
+;    call PlaySoundWaitForCurrent
     xor a
     ld [$cf95],a
     call MoveMon
@@ -44728,116 +44807,10 @@ BillsPCMenuText: ; 216e1 (8:56e1)
 BoxNoPCText: ; 21713 (8:5713)
     db "BOX No.@"
 
-Func_2171b: ; 2171b (8:571b)
-    ld hl,$d173
-    ld bc,$002c
-    jr .asm_21729 ; 0x21721 $6
-    ld hl,$da9e
-    ld bc,$0021
-.asm_21729
-    ld a,[$cf92]
-    call AddNTimes
-    ld b,$4
-.asm_21731
-    ld a,[hli]
-    push hl
-    push bc
-    ld hl,HMMoveArray ; $5745
-    ld de,$0001
-    call IsInArray
-    pop bc
-    pop hl
-    ret c
-    dec b
-    jr nz,.asm_21731 ; 0x21741 $ee
-    and a
-    ret
-
-HMMoveArray: ; 21745 (8:5745)
-    db $ff
-    ds 5
-
-DisplayDepositWithdrawMenu: ; 2174b (8:574b)
-    FuncCoord 4,2
-    ld hl,Coord
-    ld b,9
-    ld c,14
-    call TextBoxBorderDepositWithdrawMenu ; call TextBoxBorder
-    ld a,[$ccd3]
-    and a
-    ld de,DepositPCText ; $57cb
-    jr nz,.asm_21761
-    ld de,WithdrawPCText ; $57d3
-.asm_21761
-    FuncCoord 11,7
-    ld hl,Coord
-    call PlaceString
-    FuncCoord 11,9
-    ld hl,Coord
-    ld de,StatsCancelPCText ; $57dc
-    call PlaceString
-    ld hl,wTopMenuItemY ; $cc24
-    ld a,7
-    ld [hli],a
-    ld a,10
-    ld [hli],a
-    xor a
-    ld [hli],a
-    inc hl
-    ld a,$2
-    ld [hli],a
-    ld a,$3
-    ld [hli],a
-    xor a
-    ld [hl],a
-    ld hl,wListScrollOffset ; $cc36
-    ld [hli],a
-    ld [hl],a
-    ld [wPlayerMonNumber],a ; $cc2f
-    ld [$cc2b],a
-.asm_2178f
-    call PrintTitleName_HandleMenuInput ; call HandleMenuInput
-    bit 1,a
-    jr nz,.asm_2179f
-    ld a,[wCurrentMenuItem] ; $cc26
-    and a
-    jr z,.asm_217a1
-    dec a
-    jr z,.asm_217a3
-.asm_2179f
-    and a
-    ret
-.asm_217a1
-    scf
-    ret
-.asm_217a3
-    call SaveScreenTilesToBuffer1
-    ld a,[$ccd3]
-    and a
-    ld a,$0
-    jr nz,.asm_217b0
-    ld a,$2
-.asm_217b0
-    ld [$cc49],a
-    ld a,$36
-    call Predef ; indirect jump to StatusScreen (12953 (4:6953))
-    call LoadScreenTilesFromBuffer1
-    call PrintTitleName
-    call ReloadTilesetTilePatterns
-    call GoPAL_SET_CF1C
-    call LoadGBPal
-    jr .asm_2178f
-
-SECTION "DepositPCText",ROMX[$57cb],BANK[8]
-
-DepositPCText: ; 217cb (8:57cb)
-    db "DEPOSIT@"
-
-WithdrawPCText: ; 217d3 (8:57d3)
-    db "WITHDRAW@"
-
-StatsCancelPCText: ; 217dc (8:57dc)
-    db "STATS",$4e,"CANCEL@"
+DisplayDepositWithdrawMenu:
+    ld b,BANK(DisplayDepositWithdrawMenu_)
+    ld hl,DisplayDepositWithdrawMenu_
+    jp Bankswitch
 
 SwitchOnText: ; 0x217e9
     TX_FAR _SwitchOnText
@@ -44855,24 +44828,12 @@ MonWasStoredText: ; 0x217f8
     TX_FAR _MonWasStoredText
     db "@"
 
-CantDepositLastMonText: ; 0x217fd
-    TX_FAR _CantDepositLastMonText
-    db "@"
-
-BoxFullText: ; 0x21802
-    TX_FAR _BoxFullText
-    db "@"
-
 MonIsTakenOutText: ; 0x21807
     TX_FAR _MonIsTakenOutText
     db "@"
 
 NoMonText: ; 0x2180c
     TX_FAR _NoMonText
-    db "@"
-
-CantTakeMonText: ; 0x21811
-    TX_FAR _CantTakeMonText
     db "@"
 
 ReleaseWhichMonText: ; 0x21816
@@ -44924,6 +44885,8 @@ MonWasReleasedText: ; 0x21820
 UnnamedText_21865: ; 21865 (8:5865)
     TX_FAR _UnnamedText_21865
     db "@"
+
+SECTION "BillPC",ROMX[$586A],BANK[8]
 
 BillPC: ; 2186A (8:586A)
     ld a,[$c109]
@@ -46721,47 +46684,6 @@ PlaceStringAndBoxPkmnNumber:
 
 BoxNoPkmnNumber:
     db $E1,$E2,"    /20@"
-
-; ────────────────────────────────────────────
-; DisplayDepositWithdrawMenu EDIT
-; ────────────────────────────────────────────
-
-TextBoxBorderDepositWithdrawMenu
-    call TextBoxBorder
-    FuncCoord 9,6
-    ld hl,Coord
-    ld b,5
-    ld c,9
-    jp TextBoxBorder
-
-PrintTitleName_HandleMenuInput:
-    call PrintTitleName
-    jp HandleMenuInput
-
-PrintTitleName:
-    ; Clear Title Area
-    FuncCoord 5,3
-    ld bc,$030e ; 3,14
-    ld hl,Coord
-    call ClearScreenArea
-    ; Level
-    call LoadMonData
-    ld a,[$cc49]
-    cp $2 ; 2 means we're in a PC box
-    jr nz,.skip
-    ld a,[$cf9b] ; box level
-    ld [$cfb9],a ; real level
-.skip
-    FuncCoord 14,5
-    ld hl,Coord
-    call PrintLevel ; Pokémon level
-    ; Name
-    ld de,$cf4b
-    FuncCoord 6,4
-    ld hl,Coord
-    jp PlaceString
-
-; ────────────────────────────────────────────
 
 RestoreScreenAndTilesAfterBillsPC:
     call GBPalWhiteOutWithDelay3
@@ -54489,7 +54411,7 @@ Func_3d119: ; 3d119 (f:5119)
     ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
     call CleanLCD_OAM
     ld a,$36
-    call Predef ; indirect jump to StatusScreen (12953 (4:6953))
+    call Predef ; StatusScreen
     ds 2 ; ld a,$37
     ds 3 ; call Predef ; indirect jump to StatusScreen2 (12b57 (4:6b57))
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
@@ -61036,6 +60958,8 @@ HackRemoveCancelFromBattle: ; Eliminato "CANCEL" da Party in Battle
     ld [hli],a
     xor a
     ld [hli],a
+    ld a,1
+    ld [wMenuWrappingEnabled],a ; $cc4a
     ret
 
 ClearScreenAreaAndGoPalSet: ; Reset Battle Standard Palette after red ball
@@ -82511,11 +82435,11 @@ DayCareMText1: ; 56254 (15:6254)
     pop af
     ld hl,UnnamedText_56437
     jp c,Func_56409
-    ld hl,Func_2171b
-    ld b,BANK(Func_2171b)
-    call Bankswitch
-    ld hl,UnnamedText_5644a
-    jp c,Func_56409
+    ds 3 ; ld hl,DayCareCheckHM
+    ds 2 ; ld b,BANK(DayCareCheckHM)
+    ds 3 ; call Bankswitch
+    ds 3 ; ld hl,UnnamedText_5644a
+    ds 3 ; jp c,Func_56409
     xor a
     ld [$cc2b],a
     ld a,[$cf92]
@@ -98146,7 +98070,10 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     ld de,TownMapUpArrow ; $5093
     ld hl,$8ed0
     ld bc,(BANK(TownMapUpArrow) << 8) + $01
-    call CopyVideoDataDouble
+    call GoodCopyVideoData
+    ; Quick Joypad
+    ld a,1
+    ld [$ffb7],a
     call BuildFlyLocationsList
     ld hl,$cfcb
     ld a,[hl]
@@ -98154,7 +98081,7 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     ld [hl],$ff
     push hl
     ld hl,wTileMap
-    ld de,ToText ; $506d
+    ld de,.ToText ; $506d
     call PlaceString
     ld a,[W_CURMAP] ; $d35e
     ld b,$0
@@ -98163,7 +98090,7 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     FuncCoord 18,0 ; $c3b2
     ld de,Coord
 
-Func_70fd6: ; 70fd6 (1c:4fd6)
+.Func_70fd6
     ld a,$7f
     ld [de],a
     push hl
@@ -98180,8 +98107,8 @@ Func_70fd6: ; 70fd6 (1c:4fd6)
     ld hl,Coord
     ld de,$cd6d
     call PlaceString
-    ld c,$f
-    call DelayFrames
+    ;ld c,$f
+    call Delay3;call DelayFrames
     FuncCoord 18,0 ; $c3b2
     ld hl,Coord
     ld [hl],$ed
@@ -98191,7 +98118,7 @@ Func_70fd6: ; 70fd6 (1c:4fd6)
     pop hl
 .asm_71004
     push hl
-    call DelayFrame
+    call Delay3;call DelayFrames
     call GetJoypadStateLowSensitivity
     ld a,[$FF00+$b5]
     ld b,a
@@ -98220,6 +98147,9 @@ Func_70fd6: ; 70fd6 (1c:4fd6)
     xor a
     ld [$d09b],a
     call GBPalWhiteOutWithDelay3
+    ; Quick Joypad
+    xor a
+    ld [$ffb7],a
     pop hl
     pop af
     ld [hl],a
@@ -98233,10 +98163,10 @@ Func_70fd6: ; 70fd6 (1c:4fd6)
     jr z,.asm_71052
     cp $fe
     jr z,.asm_71042
-    jp Func_70fd6
+    jp .Func_70fd6
 .asm_71052
     ld hl,$cd3e
-    jp Func_70fd6
+    jp .Func_70fd6
 .asm_71058
     FuncCoord 19,0 ; $c3b3
     ld de,Coord
@@ -98246,15 +98176,15 @@ Func_70fd6: ; 70fd6 (1c:4fd6)
     jr z,.asm_71068
     cp $fe
     jr z,.asm_71058
-    jp Func_70fd6
+    jp .Func_70fd6
 .asm_71068
     call CalcFlyingEndPointer ; ld hl,$cd49
     jr .asm_71058
 
-ToText: ; 7106d (1c:506d)
+.ToText
     db "To@"
 
-BuildFlyLocationsList: ; 71070 (1c:5070)
+BuildFlyLocationsList: ; Moved in the Bank
     call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG
     ld a,[hli]
     ld e,a
@@ -98279,10 +98209,7 @@ BuildFlyLocationsList: ; 71070 (1c:5070)
     jr nz,.loop
     ret
 
-SECTION "TownMapUpArrow",ROMX[$5093],BANK[$1c]
-
-TownMapUpArrow: ; 71093 (1c:5093)
-    INCBIN "gfx/up_arrow.1bpp"
+SECTION "_LoadTownMap",ROMX[$509b],BANK[$1c]
 
 _LoadTownMap: ; 7109b (1c:509b)
     call GBPalWhiteOutWithDelay3
@@ -99182,13 +99109,18 @@ WriteMonPartySpriteOAM:
     ld c,$10
     call .CheckStatusScreen2
     jr z,.done1
-    ld c,$98
+    ld c,d
 .done1
     ld h,$c3
     ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
     swap a
     ld l,a
-    add $10
+    ld b,$10
+    call .CheckStatusScreen2
+    jr z,.done2
+    ld b,e
+.done2
+    add b
     ld b,a
     pop af
 .asm_718da
@@ -99219,6 +99151,9 @@ IndexToMiniSpritePointer:
     swap a
     srl a
     ret
+
+TownMapUpArrow: ; Moved in the Bank
+    INCBIN "gfx/up_arrow.2bpp"
 
 SECTION "MonOverworldSprites",ROMX[$5959],BANK[$1C]
 
@@ -129268,6 +129203,11 @@ _ItemUseBallText07:
     TX_NUM W_NUMINBOX,1,2
     db 0,"/20)",$58
 
+_CannotDigHereText:
+    TX_RAM $cd6d
+    db $0," can't",$4f
+    db "DIG here.",$58
+
 SECTION "bank2A",ROMX,BANK[$2A]
 
 _ItemUseText001: ; a8000 (2a:4000)
@@ -130310,7 +130250,7 @@ SelectInOverWorld:
     ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     jp c,.noFloat
-    ld b,$04 ; FLOAT
+    ld b,$03 ; FLOAT
     call SearchFieldMoveInParty
     jr nc,.noFloat
 .canFloat
@@ -130336,7 +130276,7 @@ SelectInOverWorld:
     ld hl,$d7c2 ; FirePower
     bit 0,[hl]  ; ...
     jr z,.noLight
-    ld b,$06 ; LIGHT
+    ld b,$05 ; LIGHT
     call SearchFieldMoveInParty
     jr nc,.noLight
 .canLight
@@ -130363,7 +130303,7 @@ SelectInOverWorld:
     ld hl,$d78e ; EarthPower
     bit 0,[hl]  ; ...
     jr z,.noStrength
-    ld b,$05 ; STRENGTH
+    ld b,$04 ; STRENGTH
     call SearchFieldMoveInParty
     jr nc,.noStrength
 .canStrength
@@ -130473,8 +130413,8 @@ SelectInOverWorld:
     ld c,a
     add hl,bc
     ld a,[hl]
-    call PlayCry
-    jp WaitForSoundToFinish
+    call GetCryData ; get cry data
+    jp PlaySound ; play sound
 
 .InitializeTextBox
     ; initialize a text box without drawing anything special
@@ -136109,6 +136049,7 @@ HandleStatusScreen2:
     call Bankswitch
     ld hl,wStatusScreen2OAMBit0
     set 0,[hl]
+    ld de,$9810
     ld b,BANK(WriteMonPartySpriteOAMBySpecies)
     ld hl,WriteMonPartySpriteOAMBySpecies
     call Bankswitch
@@ -136561,6 +136502,307 @@ GetMoveEnergy:
     ld d,a
     xor a
     ld [wTempMoveEnergy],a
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+; DisplayDepositWithdrawMenu
+; ──────────────────────────────────────────────────────────────────────
+
+DisplayDepositWithdrawMenu_:
+    ; Emulate Move Relearner Status Only to Animate Mini Sprite
+    ld hl,wFlagMoveRelearnEngagedBit7
+    set 7,[hl]
+    ; Quick Joypad
+    ld a,1
+    ld [$ffb7],a
+    ; Disable Update Sprites Flag
+    ld hl,$cfcb
+    ld a,[hl]
+    push af ; Backup Update Sprites Flag
+    ld a,$ff
+    ld [hl],a
+    call .DepositWithdrawBorder
+    ld a,[$ccd3]
+    and a
+    ld de,.DepositPCText
+    jr nz,.asm_21761
+    ld de,.WithdrawPCText
+.asm_21761
+    FuncCoord 11,09
+    ld hl,Coord
+    call PlaceString
+    FuncCoord 11,11
+    ld hl,Coord
+    ld de,.StatsPCText
+    call PlaceString
+    ld hl,wTopMenuItemY ; $cc24
+    ld a,09
+    ld [hli],a ; wTopMenuItemY
+    ld a,10
+    ld [hli],a ; wTopMenuItemX
+    xor a
+    ld [hli],a ; wCurrentMenuItem
+    inc hl
+    ld a,1
+    ld [hli],a ; wMaxMenuItem
+    ld a,%00110011 ; ▼▲◄►StSeBA
+    ld [hli],a ; wMenuWatchedKeys
+    xor a
+    ld [hl],a
+    ld hl,wListScrollOffset ; $cc36
+    ld [hli],a
+    ld [hl],a
+    ld [wPlayerMonNumber],a ; $cc2f
+    ld [$cc2b],a
+.StartOrShiftMon
+    call .DepositWithdrawMonTitle
+.ReturnFromStatusScreenOrShiftNull
+    ld a,$40
+    ld [$d09b],a
+    ld a,1
+    ld [wMenuWrappingEnabled],a ; $cc4a
+    call HandleMenuInputPokemonSelection
+    ld b,a
+    xor a
+    ld [$d09b],a
+    ld a,[$cf92]
+    bit 1,b
+    jr nz,.exit
+    bit 4,b
+    jr nz,.right
+    bit 5,b
+    jr nz,.left
+    ld a,[wCurrentMenuItem]
+    and a
+    jr z,.choseDepositWithdraw
+    dec a
+    jr z,.viewStats
+.exit
+    ; Restore Update Sprites Flag
+    pop bc
+    call .ResetConditions
+    and a ; rcf
+    ret
+.choseDepositWithdraw
+    call PlaceUnfilledArrowMenuCursor
+    ld a,[$ccd3] ; 0 = withdraw | 1 = Deposit
+    and a
+    jr z,.Withdraw
+.Deposit
+    call .TryDeposit
+    jr .end
+.Withdraw
+    call .TryWithdraw
+.end
+    call c,.RemoveLevel
+    ; Restore Update Sprites Flag
+    pop bc
+    call .ResetConditions
+    ret
+.viewStats
+    call SaveScreenTilesToBuffer1
+    ld a,[$ccd3]
+    and a
+    ld a,$0
+    jr nz,.asm_217b0
+    ld a,$2
+.asm_217b0
+    ld [$cc49],a
+    ld a,$36
+    call Predef ; StatusScreen
+    call LoadScreenTilesFromBuffer1
+    call .DepositWithdrawMonTitle
+    call ReloadTilesetTilePatterns
+    call GoPAL_SET_CF1C
+    call LoadGBPal
+    jr .ReturnFromStatusScreenOrShiftNull
+.ResetConditions
+    ; Restore Update Sprites Flag
+    ld a,b
+    ld [$cfcb],a
+    ; Reset Move Relearner Status
+    ld hl,wFlagMoveRelearnEngagedBit7
+    res 7,[hl]
+    ; Quick Joypad
+    xor a
+    ld [$ffb7],a
+    ret
+.right
+    FuncCoord 18,04
+    ld hl,Coord
+    inc a
+    jr .RightLeftCommon
+.left
+    FuncCoord 05,04
+    ld hl,Coord
+    dec a
+.RightLeftCommon
+    call .GetNumberOfMon
+    cp b
+    jp nc,.ReturnFromStatusScreenOrShiftNull
+    ld [hl]," "
+    ld [$cf92],a
+    call Delay3
+    jp .StartOrShiftMon
+.GetNumberOfMon
+    push af
+    ld a,[$ccd3]
+    and a
+    ld a,[W_NUMINPARTY]
+    jr nz,.getNumber
+    ld a,[W_NUMINBOX]
+.getNumber
+    ld b,a
+    pop af
+    ret
+
+.DepositPCText
+    db "DEPOSIT@"
+.WithdrawPCText
+    db "WITHDRAW@"
+.StatsPCText
+    db "STATS@"
+
+.DepositWithdrawBorder
+    FuncCoord 4,2
+    ld hl,Coord
+    ld b,9
+    ld c,14
+    jp TextBoxBorder
+
+.RemoveLevel
+    push af
+    FuncCoord 06,09
+    ld bc,$0103 ; 01,03
+    ld hl,Coord
+    call ClearScreenArea
+    pop af
+    ret   
+
+.DepositWithdrawMonTitle
+    ; Clear Title Area
+    FuncCoord 05,03
+    ld bc,$030e ; 03,14
+    ld hl,Coord
+    call ClearScreenArea
+    FuncCoord 05,06
+    ld bc,$0604 ; 06,04
+    ld hl,Coord
+    call ClearScreenArea
+    ; Arrow
+    ld a,[$cf92]
+    push af ; current list id
+    and a
+    jr z,.skipLeftArrow
+    FuncCoord 05,04
+    ld a,$D6 ; Left Arrow
+    ld [Coord],a
+.skipLeftArrow
+    call .GetNumberOfMon
+    pop af ; current list id
+    inc a
+    cp b
+    jr z,.skipRightArrow
+    FuncCoord 18,04
+    ld a,$ED ; Right Arrow
+    ld [Coord],a
+.skipRightArrow
+    ; Level
+    call LoadMonData
+    ld a,[$cc49]
+    cp $2 ; 2 means we're in a PC box
+    jr nz,.skip
+    ld a,[$cf9b] ; box level
+    ld [$cfb9],a ; real level
+.skip
+    FuncCoord 06,09
+    ld hl,Coord
+    call PrintLevel ; Pokémon level
+    ; Name
+    ld a,[$ccd3]
+    and a
+    ld hl,W_PARTYMON1NAME
+    jr nz,.getPokemonName
+    ld hl,$de06 ; box pokemon names
+.getPokemonName
+    ld a,[$cf92]
+    call GetPartyMonName
+    call CopyStringToCF4B
+    ld de,$cf4b
+    FuncCoord 07,04
+    ld hl,Coord
+    call PlaceString
+    ; Mini Sprite
+    ld hl,wSpriteOAMBySpeciesBit7
+    set 7,[hl]
+    inc hl
+    ld a,[$cf91]
+    ld [$cd5d],a
+    ld [hl],a ; wSpriteOAMBySpeciesId
+    ld b,BANK(LoadMonPartySpriteGfx)
+    ld hl,LoadMonPartySpriteGfx
+    call Bankswitch
+    ld hl,wStatusScreen2OAMBit0
+    set 0,[hl]
+    ld de,$3E44
+    ld b,BANK(WriteMonPartySpriteOAMBySpecies)
+    ld hl,WriteMonPartySpriteOAMBySpecies
+    call Bankswitch
+    ld hl,wStatusScreen2OAMBit0
+    res 0,[hl]
+    ret
+
+.TryWithdraw
+    ld a,[W_NUMINPARTY]
+    cp 6
+    jr nz,.Continue
+    ld hl,.CantTakeMonText
+    jp .Error
+.Continue
+    ld a,[wWhichPokemon]
+    ld hl,$de06
+    call GetPartyMonName
+    ld a,[$cf91]
+    call GetCryData
+    call PlaySoundWaitForCurrent
+    scf
+    ret
+.CantTakeMonText
+    TX_FAR _CantTakeMonText
+    db "@"
+
+.TryDeposit
+    ld a,[W_NUMINPARTY]
+    dec a
+    jr nz,.partyLargeEnough
+    ld hl,.CantDepositLastMonText
+    jp .Error
+.partyLargeEnough
+    ld a,[W_NUMINBOX]
+    cp $14
+    jr nz,.boxNotFull
+    ld hl,.BoxFullText
+    jp .Error
+.boxNotFull
+    ld a,[$cf91]
+    call GetCryData
+    call PlaySoundWaitForCurrent
+    scf
+    ret
+.CantDepositLastMonText
+    TX_FAR _CantDepositLastMonText
+    db "@"
+.BoxFullText
+    TX_FAR _BoxFullText
+    db "@"
+
+.Error
+    push hl
+    ld a,$a5 ; Error
+    call PlaySoundWaitForCurrent ; play sound
+    pop hl
+    call PrintText
+    and a ; rcf
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
