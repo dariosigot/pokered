@@ -42788,8 +42788,6 @@ MovesMenu:
     call GBPalWhiteOutWithDelay3
     call ClearScreen
     call CleanLCD_OAM ; Remove Mini Sprite
-    ld hl,wFlagNoHpPalBit2
-    set 2,[hl]
     ld b,15 ; GetMovesMenuPalatteID
     call GoPAL_SET
     ; Disable Transfer
