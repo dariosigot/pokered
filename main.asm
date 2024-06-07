@@ -98071,6 +98071,9 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     ld hl,$8ed0
     ld bc,(BANK(TownMapUpArrow) << 8) + $01
     call GoodCopyVideoData
+    ; Quick Joypad
+    ld a,1
+    ld [$ffb7],a
     call BuildFlyLocationsList
     ld hl,$cfcb
     ld a,[hl]
@@ -98078,7 +98081,7 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     ld [hl],$ff
     push hl
     ld hl,wTileMap
-    ld de,ToText ; $506d
+    ld de,.ToText ; $506d
     call PlaceString
     ld a,[W_CURMAP] ; $d35e
     ld b,$0
@@ -98087,7 +98090,7 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     FuncCoord 18,0 ; $c3b2
     ld de,Coord
 
-Func_70fd6: ; 70fd6 (1c:4fd6)
+.Func_70fd6
     ld a,$7f
     ld [de],a
     push hl
@@ -98104,8 +98107,8 @@ Func_70fd6: ; 70fd6 (1c:4fd6)
     ld hl,Coord
     ld de,$cd6d
     call PlaceString
-    ld c,$f
-    call DelayFrames
+    ;ld c,$f
+    call Delay3;call DelayFrames
     FuncCoord 18,0 ; $c3b2
     ld hl,Coord
     ld [hl],$ed
@@ -98115,7 +98118,7 @@ Func_70fd6: ; 70fd6 (1c:4fd6)
     pop hl
 .asm_71004
     push hl
-    call DelayFrame
+    call Delay3;call DelayFrames
     call GetJoypadStateLowSensitivity
     ld a,[$FF00+$b5]
     ld b,a
@@ -98144,6 +98147,9 @@ Func_70fd6: ; 70fd6 (1c:4fd6)
     xor a
     ld [$d09b],a
     call GBPalWhiteOutWithDelay3
+    ; Quick Joypad
+    xor a
+    ld [$ffb7],a
     pop hl
     pop af
     ld [hl],a
@@ -98157,10 +98163,10 @@ Func_70fd6: ; 70fd6 (1c:4fd6)
     jr z,.asm_71052
     cp $fe
     jr z,.asm_71042
-    jp Func_70fd6
+    jp .Func_70fd6
 .asm_71052
     ld hl,$cd3e
-    jp Func_70fd6
+    jp .Func_70fd6
 .asm_71058
     FuncCoord 19,0 ; $c3b3
     ld de,Coord
@@ -98170,15 +98176,15 @@ Func_70fd6: ; 70fd6 (1c:4fd6)
     jr z,.asm_71068
     cp $fe
     jr z,.asm_71058
-    jp Func_70fd6
+    jp .Func_70fd6
 .asm_71068
     call CalcFlyingEndPointer ; ld hl,$cd49
     jr .asm_71058
 
-ToText: ; 7106d (1c:506d)
+.ToText
     db "To@"
 
-BuildFlyLocationsList: ; 71070 (1c:5070)
+BuildFlyLocationsList: ; Moved in the Bank
     call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG
     ld a,[hli]
     ld e,a
