@@ -60930,6 +60930,8 @@ HackRemoveCancelFromBattle: ; Eliminato "CANCEL" da Party in Battle
     ld [hli],a
     xor a
     ld [hli],a
+    ld a,1
+    ld [wMenuWrappingEnabled],a ; $cc4a
     ret
 
 ClearScreenAreaAndGoPalSet: ; Reset Battle Standard Palette after red ball
