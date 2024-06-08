@@ -56758,7 +56758,7 @@ ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
     ld a,$48
     call Predef ; animate the HP bar shortening
 ApplyAttackToEnemyPokemonDone: ; 3e19d (f:619d)
-    jp RemoveDiplayedDamageAndDrawHUDsAndHPBars ; Denim ; jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
+    jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
 SECTION "ApplyAttackToPlayerPokemon",ROMX[$61a0],BANK[$f]
 
@@ -56880,11 +56880,11 @@ ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
     ld a,$48
     call Predef ; animate the HP bar shortening
 ApplyAttackToPlayerPokemonDone
-    jp RemoveDiplayedDamageAndDrawHUDsAndHPBars ; Denim ; jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
+    jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
 AttackSubstitute: ; 3e25e (f:625e)
     ld hl,SubstituteTookDamageText
-    call RemoveDiplayedDamageAndPrintText ; call PrintText
+    call PrintText
 ; values for player turn
     ld de,wEnemySubstituteHP
     ld bc,W_ENEMYBATTSTATUS2
@@ -60624,6 +60624,10 @@ MultiplyD05B: ; xxxxx (f:xxxx) ; Denim
     ld [H_MULTIPLIER],a
     ret
 
+; ────────────────────────────────────────────────────────────────
+; PRINT DAMAGE
+; ────────────────────────────────────────────────────────────────
+
 PrintDamageNearPlayerHpBarAndLoadHlDamage:
     ld hl,wFlagDamageToPlayerBit1
     set 1,[hl]
@@ -60637,8 +60641,26 @@ PrintDamageNearHpBar:
     ld de,W_DAMAGE
     ld b,%00000010
     ld c,5
-    call GetHlPointerToDamageTextArea
-    jp PrintNumber
+    call .GetHlPointerToDamageTextArea
+    push hl
+    call PrintNumber
+    pop hl
+    ld c,32
+    call DelayFrames
+    ld bc,$0105
+    jp ClearScreenArea
+.GetHlPointerToDamageTextArea
+    FuncCoord 7,4 ; Damage to Enemy
+    ld hl,Coord
+    push hl
+    ld hl,wFlagDamageToPlayerBit1
+    bit 1,[hl]
+    res 1,[hl]
+    pop hl
+    ret z ; Damage to Enemy
+    FuncCoord 4,5 ; Damage to Player
+    ld hl,Coord
+    ret ; Damage to Player
 
 WriteDamageAndUpdateCurMonHPBar: ; During Poison/Burn/LeechSeed
     push bc
@@ -60650,7 +60672,6 @@ WriteDamageAndUpdateCurMonHPBar: ; During Poison/Burn/LeechSeed
     call CheckIfPlayerTurnForPrintDamage
     call PrintDamageNearHpBar
     call UpdateCurMonHPBar
-    call RemoveDiplayedDamage
     pop bc
     ret
 
@@ -60660,8 +60681,7 @@ _DisplayDamageAndUpdateHPBar: ; During Recoil
     call PrintDamageNearHpBar
     pop hl
     ld a,$48
-    call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
-    jp RemoveDiplayedDamage
+    jp Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
 
 CheckIfPlayerTurnForPrintDamage:
     ld a,[H_WHOSETURN] ; 0 on player’s turn,1 on enemy’s turn
@@ -60671,34 +60691,7 @@ CheckIfPlayerTurnForPrintDamage:
     set 1,[hl]
     ret
 
-RemoveDiplayedDamageAndDrawHUDsAndHPBars:
-    call RemoveDiplayedDamage
-    jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
-
-RemoveDiplayedDamageAndPrintText:
-    call PrintText
-    jp RemoveDiplayedDamage
-
-RemoveDiplayedDamage:
-    call GetHlPointerToDamageTextArea
-    push hl
-    ld hl,wFlagDamageToPlayerBit1
-    res 1,[hl]
-    pop hl
-    ld bc,$0105
-    jp ClearScreenArea
-
-GetHlPointerToDamageTextArea:
-    FuncCoord 7,4 ; Damage to Enemy
-    ld hl,Coord
-    push hl
-    ld hl,wFlagDamageToPlayerBit1
-    bit 1,[hl]
-    pop hl
-    ret z ; Damage to Enemy
-    FuncCoord 4,5 ; Damage to Player
-    ld hl,Coord
-    ret ; Damage to Player
+; ────────────────────────────────────────────────────────────────
 
 DoubleIncB: ; Denim
     inc b
