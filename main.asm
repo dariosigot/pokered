@@ -136616,7 +136616,7 @@ DisplayDepositWithdrawMenu_:
     call GoPAL_SET_CF1C
     call LoadGBPal
     jr .ReturnFromStatusScreenOrShiftNull
-.ResetConditions
+.ResetConditions ; carry flag contains function result, don't override it!
     ; Restore Update Sprites Flag
     ld a,b
     ld [$cfcb],a
@@ -136624,7 +136624,7 @@ DisplayDepositWithdrawMenu_:
     ld hl,wFlagMoveRelearnEngagedBit7
     res 7,[hl]
     ; Quick Joypad
-    xor a
+    ld a,0
     ld [$ffb7],a
     ret
 .right
