@@ -17621,7 +17621,7 @@ Func_7861: ; 7861 (1:7861)
 .asm_78aa
     ld [wListMenuID],a ; $cf94
     ld a,$48
-    call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
+    call Predef ; UpdateHPBar
     ld a,$0
     call Predef ; indirect jump to DrawPlayerHUDAndHPBar (3cd60 (f:4d60))
     ld a,$49
@@ -25086,6 +25086,11 @@ DigNotUsable:
     TX_FAR _CannotDigHereText
     db "@"
 
+PrintDamageNearHpBar:
+    ld b,BANK(PrintDamageNearHpBar_)
+    ld hl,PrintDamageNearHpBar_
+    jp Bankswitch
+
 ; Free Space
 
 SECTION "UnusableItem",ROMX[$6476],BANK[$3]
@@ -27936,7 +27941,7 @@ UpdateHPBar_CalcNumberOfHPBarPixels: ; f9df (3:79df)
 ; predef $48
 UpdateHPBar: ; fa1d (3:7a1d)
     push hl
-    ld hl,wHPBarOldHP
+    call PrintDamageNearHpBar ; ld hl,wHPBarOldHP
     ld a,[hli]
     ld c,a      ; old HP into bc
     ld a,[hli]
@@ -30741,7 +30746,7 @@ Func_1392c: ; 1392c (4:792c)
 .asm_13990
     ld [wListMenuID],a ; $cf94
     ds 2; ld a,$48
-    call DisplayDamageAndUpdateHPBar ; call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
+    call SetDamageDuringRecoil ; call Predef ; UpdateHPBar
     ld hl,UnnamedText_1399e ; $799e
     jp PrintText
 UnnamedText_1399e: ; 1399e (4:799e)
@@ -30896,7 +30901,7 @@ GetGenderOutOfBattle:
 EXPBarGraphics: ; Denim,ExpBar
     INCBIN "gfx/denim/exp_bar.2bpp"
 
-DisplayDamageAndUpdateHPBar: ; During Recoil
+SetDamageDuringRecoil:
     ld d,h
     ld e,l
     ld hl,W_DAMAGE
@@ -30904,10 +30909,9 @@ DisplayDamageAndUpdateHPBar: ; During Recoil
     ld [hli],a
     ld a,c
     ld [hl],a
-    ld b,BANK(_DisplayDamageAndUpdateHPBar)
-    ld hl,_DisplayDamageAndUpdateHPBar
-    call Bankswitch
-    ret
+    ld b,BANK(SetDamageDuringRecoil_)
+    ld hl,SetDamageDuringRecoil_
+    jp Bankswitch
 
 DontCheckElement:
     pop af ; Delete Call Back Return
@@ -51368,7 +51372,7 @@ Func_3b9ec: ; Moved Upper in the Bank
 .asm_3ba83
     ld [wListMenuID],a ; $cf94
     ld a,$48
-    call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
+    call Predef ; UpdateHPBar
     ld hl,DrawHUDsAndHPBars ; $4d5a
     call BankswitchEtoF
     ld hl,UnnamedText_3baac ; $7aac
@@ -52682,7 +52686,7 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
     ld [wHPBarNewHP],a
     ld [wHPBarNewHP+1],a
 .noOverkill
-    call WriteDamageAndUpdateCurMonHPBar ; call UpdateCurMonHPBar
+    call SetDamageDuringPoisonBurnLeechSeed ; call UpdateCurMonHPBar
     pop hl
     ret
 
@@ -52757,7 +52761,7 @@ UpdateCurMonHPBar: ; 3c4f6 (f:44f6)
     push bc
     ld [wListMenuID],a ; $cf94
     ld a,$48
-    call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
+    call Predef ; UpdateHPBar
     pop bc
     ret
 
@@ -56706,7 +56710,7 @@ ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
     ld [hl],a
 
 ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
-    call PrintDamageNearHpBarAndLoadHlDamage ; Denim ; ld hl,W_DAMAGE
+    call SetDamageDirectToEnemy ; Denim ; ld hl,W_DAMAGE
     ld a,[hli]
     ld b,a
     ld a,[hl]
@@ -56829,7 +56833,7 @@ ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
     ld [hl],a
 
 ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
-    call PrintDamageNearPlayerHpBarAndLoadHlDamage ; Denim ; ld hl,W_DAMAGE
+    call SetDamageDirectToPlayer ; Denim ; ld hl,W_DAMAGE
     ld a,[hli]
     ld b,a
     ld a,[hl]
@@ -60628,17 +60632,12 @@ MultiplyD05B: ; xxxxx (f:xxxx) ; Denim
 ; PRINT DAMAGE
 ; ────────────────────────────────────────────────────────────────
 
-PrintDamageNearPlayerHpBarAndLoadHlDamage:
-    ld hl,wFlagDamageToPlayerBit1
-    set 1,[hl]
-
-PrintDamageNearHpBarAndLoadHlDamage:
-    call PrintDamageNearHpBar
-    ld hl,W_DAMAGE
-    ret
-
-PrintDamageNearHpBar:
-    ld de,W_DAMAGE
+PrintDamageNearHpBar_:
+    ld hl,wPrintBattleDamageBit0
+    bit 0,[hl]
+    res 0,[hl]
+    ret z
+    ld de,wDamageToPrint
     ld b,%00000010
     ld c,5
     call .GetHlPointerToDamageTextArea
@@ -60648,48 +60647,77 @@ PrintDamageNearHpBar:
     ld c,32
     call DelayFrames
     ld bc,$0105
-    jp ClearScreenArea
+    call ClearScreenArea
+    ld hl,wHPBarOldHP
+    ret
 .GetHlPointerToDamageTextArea
-    FuncCoord 7,4 ; Damage to Enemy
-    ld hl,Coord
-    push hl
     ld hl,wFlagDamageToPlayerBit1
     bit 1,[hl]
     res 1,[hl]
-    pop hl
+    FuncCoord 7,4 ; Damage to Enemy
+    ld hl,Coord
     ret z ; Damage to Enemy
     FuncCoord 4,5 ; Damage to Player
     ld hl,Coord
     ret ; Damage to Player
 
-WriteDamageAndUpdateCurMonHPBar: ; During Poison/Burn/LeechSeed
+CheckDamageToPlayer:
+    ld hl,wFlagDamageToPlayerBit1
+    res 1,[hl]
+    ld a,[H_WHOSETURN] ; 0 on player’s turn,1 on enemy’s turn
+    and a
+    ret nz
+    set 1,[hl]
+    ret
+
+CopyDamage:
+    ld hl,W_DAMAGE
+    ld de,wDamageToPrint
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hld]
+    ld [de],a
+    ret
+
+;;;;;;;;;;
+
+SetDamageDirectToPlayer:
+    ld hl,wPrintBattleDamageBit0
+    set 0,[hl]
+    set 1,[hl] ; wFlagDamageToPlayerBit1
+    jp CopyDamage
+
+SetDamageDirectToEnemy:
+    ld hl,wPrintBattleDamageBit0
+    set 0,[hl]
+    res 1,[hl] ; wFlagDamageToPlayerBit1
+    jp CopyDamage
+
+SetDamageDuringPoisonBurnLeechSeed:
     push bc
     ld hl,W_DAMAGE
     ld a,b
     ld [hli],a
     ld a,c
     ld [hl],a
-    call CheckIfPlayerTurnForPrintDamage
-    call PrintDamageNearHpBar
-    call UpdateCurMonHPBar
+    ld hl,wPrintBattleDamageBit0
+    set 0,[hl]
+    call CheckDamageToPlayer
+    call CopyDamage
     pop bc
-    ret
+    jp UpdateCurMonHPBar
 
-_DisplayDamageAndUpdateHPBar: ; During Recoil
+SetDamageDuringRecoil_:
     push de
-    call CheckIfPlayerTurnForPrintDamage
-    call PrintDamageNearHpBar
+    ld [hl],a
+    ld hl,wPrintBattleDamageBit0
+    set 0,[hl]
+    call CheckDamageToPlayer
+    call CopyDamage
     pop hl
     ld a,$48
-    jp Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
-
-CheckIfPlayerTurnForPrintDamage:
-    ld a,[H_WHOSETURN] ; 0 on player’s turn,1 on enemy’s turn
-    and a
-    ret nz
-    ld hl,wFlagDamageToPlayerBit1
-    set 1,[hl]
-    ret
+    jp Predef ; UpdateHPBar
 
 ; ────────────────────────────────────────────────────────────────
 

@@ -1673,6 +1673,11 @@ NEXTU
 wFieldMoves: ; def0
     ds 9
 
+NEXTU
+
+wDamageToPrint: ; def0
+    ds 2
+
 ENDU
 
 ; ────────────────────────────────────────────────────
@@ -1685,7 +1690,8 @@ wArrayMiniSpriteLoaded: ; df2f
 SECTION "DenimFlags",WRAMX[$df35],BANK[1]
 
 wDigCaveAerodactylTrigBit0 ; df35 ; bit 0
-wFlagDamageToPlayerBit1    ; df35 ; bit 1
+wPrintBattleDamageBit0     ; df35 ; bit 0 = Trigger Print Battle Damage
+wFlagDamageToPlayerBit1    ; df35 ; bit 1 = Print Damage to Player
 wFlagSortMoveBit1          ; df35 ; bit 1 = Sort Moves in Moves Menu (SELECT)
 wFlagShinyBit2             ; df35 ; bit 2
 wDigCaveAerodactylBeatBit3 ; df35 ; bit 3
