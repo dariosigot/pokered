@@ -14413,6 +14413,11 @@ SetOptionsFromCursorPositions:
     ld [W_OPTIONS],a
     ret
 
+SetCureDuringAbsorb:
+    ld b,BANK(SetCureDuringAbsorb_)
+    ld hl,SetCureDuringAbsorb_
+    jp Bankswitch
+
 ; Free Space
 
 SECTION "SetCursorPositionsFromOptions",ROMX[$604c],BANK[$1] 
@@ -17611,17 +17616,20 @@ Func_7861: ; 7861 (1:7861)
 .asm_789c
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    FuncCoord 10,9 ; $c45e
+    FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord
     ld a,$1
     jr z,.asm_78aa
-    FuncCoord 2,2 ; $c3ca
+    FuncCoord 02,02 ; Enemy Bar in Battle
     ld hl,Coord
     xor a
 .asm_78aa
     ld [wListMenuID],a ; $cf94
-    ld a,$48
-    call Predef ; UpdateHPBar
+    ; ld a,$48
+    ; call Predef ; UpdateHPBar
+    ld d,h
+    ld e,l
+    call SetCureDuringAbsorb
     ld a,$0
     call Predef ; indirect jump to DrawPlayerHUDAndHPBar (3cd60 (f:4d60))
     ld a,$49
@@ -25086,10 +25094,12 @@ DigNotUsable:
     TX_FAR _CannotDigHereText
     db "@"
 
-PrintDamageNearHpBar:
-    ld b,BANK(PrintDamageNearHpBar_)
-    ld hl,PrintDamageNearHpBar_
-    jp Bankswitch
+PrintBattleValueNearMon:
+    ld b,BANK(PrintBattleValueNearMon_)
+    ld hl,PrintBattleValueNearMon_
+    call Bankswitch
+    ld hl,wHPBarOldHP
+    ret
 
 ; Free Space
 
@@ -27941,7 +27951,7 @@ UpdateHPBar_CalcNumberOfHPBarPixels: ; f9df (3:79df)
 ; predef $48
 UpdateHPBar: ; fa1d (3:7a1d)
     push hl
-    call PrintDamageNearHpBar ; ld hl,wHPBarOldHP
+    call PrintBattleValueNearMon ; ld hl,wHPBarOldHP
     ld a,[hli]
     ld c,a      ; old HP into bc
     ld a,[hli]
@@ -30734,13 +30744,13 @@ Func_1392c: ; 1392c (4:792c)
     ld [hli],a
     ld [hl],a
 .asm_13982
-    FuncCoord 10,9 ; $c45e
+    FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,$1
     jr z,.asm_13990
-    FuncCoord 2,2 ; $c3ca
+    FuncCoord 02,02 ; Enemy Bar in Battle 
     ld hl,Coord
     xor a
 .asm_13990
@@ -30905,7 +30915,7 @@ SetDamageDuringRecoil:
     ld d,h
     ld e,l
     ld hl,W_DAMAGE
-    xor a
+    ld a,b
     ld [hli],a
     ld a,c
     ld [hl],a
@@ -51330,6 +51340,18 @@ Func_3b9ec: ; Moved Upper in the Bank
     srl b
     rr c
 .asm_3ba47
+    ; ────────────
+    push hl
+    push de
+    push bc
+    ld d,b
+    ld e,c
+    ld hl,SetCureDirect
+    call BankswitchEtoF
+    pop bc
+    pop de
+    pop hl
+    ; ────────────
     ld a,[de]
     ld [wHPBarOldHP],a
     add c
@@ -52740,7 +52762,7 @@ HandlePoisonBurnLeechSeed_IncreaseEnemyHP: ; 3c4a3 (f:44a3)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     xor $1
     ld [H_WHOSETURN],a ; $FF00+$f3
-    call UpdateCurMonHPBar
+    call SetCureDuringLeechSeed ; call UpdateCurMonHPBar
     ld a,[H_WHOSETURN] ; $FF00+$f3
     xor $1
     ld [H_WHOSETURN],a ; $FF00+$f3
@@ -52754,7 +52776,7 @@ UpdateCurMonHPBar: ; 3c4f6 (f:44f6)
     and a
     ld a,$1
     jr z,.playersTurn
-    FuncCoord 2,2 ; $c3ca
+    FuncCoord 02,02 ; Enemy Bar in Battle 
     ld hl,Coord    ; tile pointer to enemy HP bar
     xor a
 .playersTurn
@@ -52931,6 +52953,10 @@ GetHealthBarColorWithGhostCheck:
     ld hl,GetHealthBarColorWithGhostCheck_
     ld b,BANK(GetHealthBarColorWithGhostCheck_)
     jp Bankswitch
+
+SetDEAndLoadMonFrontSprite:
+    ld de,$9000
+    jp LoadMonFrontSprite
 
 SECTION "Func_3c64f",ROMX[$464f],BANK[$f]
 
@@ -54043,6 +54069,23 @@ GetBattleHealthBarColor: ; Moved in the Bank
     ret z
     ld b,$1
     jp GoPAL_SET
+
+FixItSelfDamage:
+    ld [$d05e],a
+    push hl
+    call GetSelectedMovePointer
+    ld a,POUND
+    ld [hli],a
+    pop hl
+    ret
+
+GetSelectedMovePointer:
+    ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
+    ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
+    and a
+    ret z
+    inc hl
+    ret
 
 SECTION "InitBattleMenu",ROMX[$4eb3],BANK[$f]
 
@@ -56110,6 +56153,30 @@ TestPhysicalSpecialBattle:
     call GetSelectedMovePointer
     jp TestPhysicalSpecial
 
+ChooseRandomMove:
+    call GenRandomInBattle ; get random
+    ld c,0
+    cp $3f ; select move 1 in [0,3e] (63/256 chance)
+    jr c,.end
+    inc c
+    cp $7f ; select move 2 in [3f,7e] (64/256 chance)
+    jr c,.end
+    inc c
+    cp $be ; select move 3 in [7f,bd] (63/256 chance)
+    jr c,.end
+    inc c ; select move 4 in [be,ff] (66/256 chance)
+.end
+    ld a,c
+    ld [wEnemyMoveListIndex],a
+    ld [wCurrentMenuItem],a
+    ld h,d
+    ld l,e
+    ld b,0
+    add hl,bc
+    ld a,[hl]
+    and a
+    ret
+
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
 UnnamedText_3ddb6: ; 3ddb6 (f:5db6)
@@ -56755,7 +56822,7 @@ ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
     ld [wHPBarNewHP+1],a
     ld a,[hl]
     ld [wHPBarNewHP],a
-    FuncCoord 2,2 ; $c3ca
+    FuncCoord 02,02 ; Enemy Bar in Battle
     ld hl,Coord
     xor a
     ld [$cf94],a
@@ -56887,7 +56954,7 @@ ApplyAttackToPlayerPokemonDone
     jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
 AttackSubstitute: ; 3e25e (f:625e)
-    ld hl,SubstituteTookDamageText
+    call PrintBattleValueNearSubstitute ; ld hl,SubstituteTookDamageText
     call PrintText
 ; values for player turn
     ld de,wEnemySubstituteHP
@@ -60632,37 +60699,8 @@ MultiplyD05B: ; xxxxx (f:xxxx) ; Denim
 ; PRINT DAMAGE
 ; ────────────────────────────────────────────────────────────────
 
-PrintDamageNearHpBar_:
-    ld hl,wPrintBattleDamageBit0
-    bit 0,[hl]
-    res 0,[hl]
-    ret z
-    ld de,wDamageToPrint
-    ld b,%00000010
-    ld c,5
-    call .GetHlPointerToDamageTextArea
-    push hl
-    call PrintNumber
-    pop hl
-    ld c,32
-    call DelayFrames
-    ld bc,$0105
-    call ClearScreenArea
-    ld hl,wHPBarOldHP
-    ret
-.GetHlPointerToDamageTextArea
-    ld hl,wFlagDamageToPlayerBit1
-    bit 1,[hl]
-    res 1,[hl]
-    FuncCoord 7,4 ; Damage to Enemy
-    ld hl,Coord
-    ret z ; Damage to Enemy
-    FuncCoord 4,5 ; Damage to Player
-    ld hl,Coord
-    ret ; Damage to Player
-
 CheckDamageToPlayer:
-    ld hl,wFlagDamageToPlayerBit1
+    ld hl,wFlagValueToPlayerBit1
     res 1,[hl]
     ld a,[H_WHOSETURN] ; 0 on player’s turn,1 on enemy’s turn
     and a
@@ -60680,18 +60718,25 @@ CopyDamage:
     ld [de],a
     ret
 
-;;;;;;;;;;
+PrintBattleValueNearSubstitute:
+    ld b,BANK(PrintBattleValueNearMon_)
+    ld hl,PrintBattleValueNearMon_
+    call Bankswitch
+    ld hl,SubstituteTookDamageText
+    ret
 
 SetDamageDirectToPlayer:
-    ld hl,wPrintBattleDamageBit0
+    ld hl,wPrintBattleValueBit0
     set 0,[hl]
-    set 1,[hl] ; wFlagDamageToPlayerBit1
+    set 1,[hl] ; wFlagValueToPlayerBit1
+    res 7,[hl] ; wFlagBattleCureBit7
     jp CopyDamage
 
 SetDamageDirectToEnemy:
-    ld hl,wPrintBattleDamageBit0
+    ld hl,wPrintBattleValueBit0
     set 0,[hl]
-    res 1,[hl] ; wFlagDamageToPlayerBit1
+    res 1,[hl] ; wFlagValueToPlayerBit1
+    res 7,[hl] ; wFlagBattleCureBit7
     jp CopyDamage
 
 SetDamageDuringPoisonBurnLeechSeed:
@@ -60701,9 +60746,10 @@ SetDamageDuringPoisonBurnLeechSeed:
     ld [hli],a
     ld a,c
     ld [hl],a
-    ld hl,wPrintBattleDamageBit0
+    ld hl,wPrintBattleValueBit0
     set 0,[hl]
     call CheckDamageToPlayer
+    res 7,[hl] ; wFlagBattleCureBit7
     call CopyDamage
     pop bc
     jp UpdateCurMonHPBar
@@ -60711,9 +60757,43 @@ SetDamageDuringPoisonBurnLeechSeed:
 SetDamageDuringRecoil_:
     push de
     ld [hl],a
-    ld hl,wPrintBattleDamageBit0
+    ld hl,wPrintBattleValueBit0
     set 0,[hl]
     call CheckDamageToPlayer
+    res 7,[hl] ; wFlagBattleCureBit7
+    call CopyDamage
+    pop hl
+    ld a,$48
+    jp Predef ; UpdateHPBar
+
+SetCureDirect:
+    ld hl,W_DAMAGE
+    ld a,d
+    ld [hli],a
+    ld a,e
+    ld [hl],a
+    ld hl,wPrintBattleValueBit0
+    set 0,[hl]
+    call CheckDamageToPlayer
+    set 7,[hl] ; wFlagBattleCureBit7
+    jp CopyDamage
+
+SetCureDuringLeechSeed:
+    push bc
+    ld hl,wPrintBattleValueBit0
+    set 0,[hl]
+    call CheckDamageToPlayer
+    set 7,[hl] ; wFlagBattleCureBit7
+    call CopyDamage
+    pop bc
+    jp UpdateCurMonHPBar
+
+SetCureDuringAbsorb_:
+    push de
+    ld hl,wPrintBattleValueBit0
+    set 0,[hl]
+    call CheckDamageToPlayer
+    set 7,[hl] ; wFlagBattleCureBit7
     call CopyDamage
     pop hl
     ld a,$48
@@ -61310,10 +61390,6 @@ LoadMonFrontSpriteOrGhost:
     jp nz,LoadMonFrontSprite
     jp LoadGhostPic
 
-SetDEAndLoadMonFrontSprite:
-    ld de,$9000
-    jp LoadMonFrontSprite
-
 WriteMonMovesPlus:
     ld a,[W_ISINBATTLE]
     dec a
@@ -61342,47 +61418,6 @@ Copy4Bytes:
 Copy4BytesDirect:
     ld bc,$4
     jp CopyData
-
-ChooseRandomMove:
-    call GenRandomInBattle ; get random
-    ld c,0
-    cp $3f ; select move 1 in [0,3e] (63/256 chance)
-    jr c,.end
-    inc c
-    cp $7f ; select move 2 in [3f,7e] (64/256 chance)
-    jr c,.end
-    inc c
-    cp $be ; select move 3 in [7f,bd] (63/256 chance)
-    jr c,.end
-    inc c ; select move 4 in [be,ff] (66/256 chance)
-.end
-    ld a,c
-    ld [wEnemyMoveListIndex],a
-    ld [wCurrentMenuItem],a
-    ld h,d
-    ld l,e
-    ld b,0
-    add hl,bc
-    ld a,[hl]
-    and a
-    ret
-
-GetSelectedMovePointer:
-    ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
-    ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
-    and a
-    ret z
-    inc hl
-    ret
-
-FixItSelfDamage:
-    ld [$d05e],a
-    push hl
-    call GetSelectedMovePointer
-    ld a,POUND
-    ld [hli],a
-    pop hl
-    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -100035,8 +100070,8 @@ Unknown_7219e: ; 7219e (1c:619e)
 
 Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP nella battaglia e altre migliorie ; TODO
 ;INCBIN "baserom.gbc",$721b5,$721fa - $721b5
-    db $22
-    db $05
+    db $23
+    db $06
 
     ; main palette = backsprite player,bottombox using
     db $07,$00 ; $07,$0A
@@ -100053,6 +100088,10 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
     ; frontsprite opponent
     db $03,$05 ; $03,$0F
     db $0B,$00,$13,$06
+
+    ; Damage/Cure Line Opponent
+    db $02,%00000101
+    db $00,$04,$0A,$04
 
     ; Catch Flag opponent
     db $02,$05 ; $03,$0F
@@ -136726,6 +136765,65 @@ DisplayDepositWithdrawMenu_:
     pop hl
     call PrintText
     and a ; rcf
+    ret
+
+; ────────────────────────────────────────────────────────────────
+; PRINT DAMAGE
+; ────────────────────────────────────────────────────────────────
+
+PrintBattleValueNearMon_:
+    ld hl,wPrintBattleValueBit0
+    bit 0,[hl]
+    res 0,[hl]
+    ret z
+    call .GetHlPointerToTextArea
+    push hl
+    call .ClearScreenArea
+    pop hl
+    push hl
+    inc hl ; Potential Plus Space
+    ld de,wDamageToPrint
+    ld bc,$0205 ; %00000010 | 05
+    call PrintNumber
+    call .PrintSign
+    pop hl
+    ld c,50
+    call DelayFrames
+    ; fall through
+    
+.ClearScreenArea
+    ld bc,$0106 ; 01 | 06
+    jp ClearScreenArea
+
+.GetHlPointerToTextArea
+    bit 1,[hl] ; wFlagValueToPlayerBit1
+    res 1,[hl] ; ...
+    FuncCoord 06,04 ; Damage to Enemy
+    ld hl,Coord
+    ret z ; Damage to Enemy
+    FuncCoord 03,05 ; Damage to Player
+    ld hl,Coord
+    ret ; Damage to Player
+
+.CheckCure
+    push hl
+    ld hl,wFlagBattleCureBit7
+    bit 7,[hl]
+    res 7,[hl]
+    pop hl
+    ret
+
+.PrintSign
+    dec hl
+    ld a,[hl]
+    cp $7F ; Empty Space
+    jr nz,.PrintSign
+    call .CheckCure
+    ld a,$D2 ; Plus Symbol
+    jr nz,.SignDone
+    ld a,$E3 ; Minus Symbol
+.SignDone
+    ld [hl],a
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
