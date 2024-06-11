@@ -25101,6 +25101,39 @@ PrintBattleValueNearMon:
     ld hl,wHPBarOldHP
     ret
 
+DecreaseValCounterAndPrintHPNumber:
+    call UpdateHPBar_PrintHPNumber
+    push af
+    push hl
+    push de
+    ld hl,wBattleValueCounter
+    ld a,[hl]
+    and a
+    jr z,.end
+    dec [hl]
+    call z,RemoveBattleValue
+.end
+    pop de
+    pop hl
+    pop af
+    ret
+
+RemoveBattleValue:
+    ld b,BANK(RemoveBattleValue_)
+    ld hl,RemoveBattleValue_
+    jp Bankswitch
+    
+RemoveValueAndPrintHPNumber:
+    call UpdateHPBar_PrintHPNumber
+    push af
+    push hl
+    push de
+    call RemoveBattleValue
+    pop de
+    pop hl
+    pop af
+    ret
+
 ; Free Space
 
 SECTION "UnusableItem",ROMX[$6476],BANK[$3]
@@ -28009,7 +28042,7 @@ UpdateHPBar: ; fa1d (3:7a1d)
     ld a,d
     sub e         ; calc pixel difference
 .asm_fa7e
-    call UpdateHPBar_PrintHPNumber
+    call DecreaseValCounterAndPrintHPNumber ; call UpdateHPBar_PrintHPNumber
     and a
     jr z,.noPixelDifference
     call UpdateHPBar_AnimateHPBar
@@ -28031,7 +28064,7 @@ UpdateHPBar: ; fa1d (3:7a1d)
     call UpdateHPBar_CalcOldNewHPBarPixels
     ld d,e
 .monFainted
-    call UpdateHPBar_PrintHPNumber
+    call RemoveValueAndPrintHPNumber ; call UpdateHPBar_PrintHPNumber
     ld a,$1
     call UpdateHPBar_AnimateHPBar
     jp Delay3
@@ -60710,7 +60743,7 @@ CheckDamageToPlayer:
 
 CopyDamage:
     ld hl,W_DAMAGE
-    ld de,wDamageToPrint
+    ld de,wBattleValueToPrint
     ld a,[hli]
     ld [de],a
     inc de
@@ -136780,16 +136813,14 @@ PrintBattleValueNearMon_:
     push hl
     call .ClearScreenArea
     pop hl
-    push hl
-    inc hl ; Potential Plus Space
-    ld de,wDamageToPrint
+    inc hl ; Sign Space
+    ld de,wBattleValueToPrint
     ld bc,$0205 ; %00000010 | 05
     call PrintNumber
     call .PrintSign
-    pop hl
-    ld c,50
-    call DelayFrames
-    ; fall through
+    ld hl,wBattleValueCounter
+    ld [hl],25
+    ret
     
 .ClearScreenArea
     ld bc,$0106 ; 01 | 06
@@ -136800,10 +136831,17 @@ PrintBattleValueNearMon_:
     res 1,[hl] ; ...
     FuncCoord 06,04 ; Damage to Enemy
     ld hl,Coord
-    ret z ; Damage to Enemy
+    jr z,.Store
     FuncCoord 03,05 ; Damage to Player
     ld hl,Coord
-    ret ; Damage to Player
+.Store
+    ld de,wBattleValueTextArea
+    ld a,h
+    ld [de],a
+    inc de
+    ld a,l
+    ld [de],a
+    ret
 
 .CheckCure
     push hl
@@ -136825,6 +136863,23 @@ PrintBattleValueNearMon_:
 .SignDone
     ld [hl],a
     ret
+
+RemoveBattleValue_:
+    ld hl,wBattleValueCounter
+.loop
+    ld a,[hl]
+    and a
+    jr z,.skip
+    call Delay3
+    dec [hl]
+    jr nz,.loop
+.skip
+    ld hl,wBattleValueTextArea
+    ld a,[hli]
+    ld l,[hl]
+    ld h,a
+    ld bc,$0106 ; 01 | 06
+    jp ClearScreenArea
 
 ; ──────────────────────────────────────────────────────────────────────
 

@@ -1675,7 +1675,11 @@ wFieldMoves: ; def0
 
 NEXTU
 
-wDamageToPrint: ; def0
+wBattleValueToPrint: ; def0
+    ds 2
+wBattleValueCounter: ; def2
+    ds 1
+wBattleValueTextArea: ; def3
     ds 2
 
 ENDU
