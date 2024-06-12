@@ -25102,10 +25102,10 @@ PrintBattleValueNearMon:
     ret
 
 DecreaseValCounterAndPrintHPNumber:
-    call UpdateHPBar_PrintHPNumber
     push af
-    push hl
     push de
+    call UpdateHPBar_PrintHPNumber
+    push hl
     ld hl,wBattleValueCounter
     ld a,[hl]
     and a
@@ -25113,8 +25113,8 @@ DecreaseValCounterAndPrintHPNumber:
     dec [hl]
     call z,RemoveBattleValue
 .end
-    pop de
     pop hl
+    pop de
     pop af
     ret
 
@@ -25122,17 +25122,6 @@ RemoveBattleValue:
     ld b,BANK(RemoveBattleValue_)
     ld hl,RemoveBattleValue_
     jp Bankswitch
-    
-RemoveValueAndPrintHPNumber:
-    call UpdateHPBar_PrintHPNumber
-    push af
-    push hl
-    push de
-    call RemoveBattleValue
-    pop de
-    pop hl
-    pop af
-    ret
 
 ; Free Space
 
@@ -28064,10 +28053,10 @@ UpdateHPBar: ; fa1d (3:7a1d)
     call UpdateHPBar_CalcOldNewHPBarPixels
     ld d,e
 .monFainted
-    call RemoveValueAndPrintHPNumber ; call UpdateHPBar_PrintHPNumber
+    call UpdateHPBar_PrintHPNumber
     ld a,$1
     call UpdateHPBar_AnimateHPBar
-    jp Delay3
+    jp RemoveBattleValue ; jp Delay3
 
 ; animates the HP bar going up or down for (a) ticks (two waiting frames each)
 ; stops prematurely if bar is filled up
@@ -60927,7 +60916,7 @@ CheckSpecialHybridSprite: ; Denim
     xor a ; Reset Carry Flag
     ret
 
-DrawCatchGenderAndLoadCoord ; Denim
+DrawCatchGenderAndLoadCoord: ; Denim
     push de
     push bc
     ld hl,_DrawCatchGender
@@ -136821,8 +136810,19 @@ PrintBattleValueNearMon_:
     ld bc,$0205 ; %00000010 | 05
     call PrintNumber
     call .PrintSign
-    ld hl,wBattleValueCounter
-    ld [hl],16
+    ; Initialize Counter
+    ld a,[$fff3] ; whose turn?
+    and a
+    ld a,[W_PLAYERMOVEEFFECT]
+    jr z,.effect
+    ld a,[W_ENEMYMOVEEFFECT]
+.effect
+    cp TWO_TO_FIVE_ATTACKS_EFFECT
+    ld a,4
+    jr z,.StoreCounter
+    ld a,20
+.StoreCounter
+    ld [wBattleValueCounter],a
     ret
     
 .ClearScreenArea
@@ -136834,16 +136834,9 @@ PrintBattleValueNearMon_:
     res 1,[hl] ; ...
     FuncCoord 06,04 ; Damage to Enemy
     ld hl,Coord
-    jr z,.Store
+    ret z
     FuncCoord 03,05 ; Damage to Player
     ld hl,Coord
-.Store
-    ld de,wBattleValueTextArea
-    ld a,h
-    ld [de],a
-    inc de
-    ld a,l
-    ld [de],a
     ret
 
 .CheckCure
@@ -136870,18 +136863,16 @@ PrintBattleValueNearMon_:
 RemoveBattleValue_:
     ld hl,wBattleValueCounter
 .loop
+    call Delay3
     ld a,[hl]
     and a
     jr z,.skip
-    call Delay3
     dec [hl]
     jr nz,.loop
 .skip
-    ld hl,wBattleValueTextArea
-    ld a,[hli]
-    ld l,[hl]
-    ld h,a
-    ld bc,$0106 ; 01 | 06
+    FuncCoord 00,04
+    ld hl,Coord
+    ld bc,$020C ; 02 | 12
     jp ClearScreenArea
 
 ; ──────────────────────────────────────────────────────────────────────
