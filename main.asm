@@ -462,7 +462,7 @@ LoadFontTilePatterns: ; Moved in the Bank
     call GoodCopyVideoData
     ld de,OtherIcon
     ld hl,$8d00
-    ld bc,(BANK(OtherIcon) << 8 | $B)
+    ld bc,(BANK(OtherIcon) << 8 | 12)
     jp GoodCopyVideoData
 
 ; Free
@@ -2908,7 +2908,7 @@ DrawHPBar: ; 1336 (0:1336)
 ; [$cf91] = pokemon ID
 ; $cf98 = base address of pokemon data
 ; $d0b8 = base address of base stats
-LoadMonData: ; 1372 (0:1372)
+LoadMonData: ; Moved in the Bank
     ld hl,LoadMonData_
     ld b,BANK(LoadMonData_)
     jp Bankswitch
@@ -14413,6 +14413,11 @@ SetOptionsFromCursorPositions:
     ld [W_OPTIONS],a
     ret
 
+SetCureDuringAbsorb:
+    ld b,BANK(SetCureDuringAbsorb_)
+    ld hl,SetCureDuringAbsorb_
+    jp Bankswitch
+
 ; Free Space
 
 SECTION "SetCursorPositionsFromOptions",ROMX[$604c],BANK[$1] 
@@ -16254,11 +16259,11 @@ LearnMove: ; 6e43 (1:6e43)
     push hl
     push de
     call IsTryingToLearnPalFix_End
-    call CheckMoveRelearn
-    jr nz,.DoLearn2
-    ld hl,.ForgotAndLearnText
-    call PrintText
-.DoLearn2
+;    call CheckMoveRelearn
+;    jr nz,.DoLearn2
+;    ld hl,.ForgotAndLearnText
+;    call PrintText
+;.DoLearn2
     pop de
     pop hl
     ld c,2 ; result
@@ -17611,17 +17616,20 @@ Func_7861: ; 7861 (1:7861)
 .asm_789c
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    FuncCoord 10,9 ; $c45e
+    FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord
     ld a,$1
     jr z,.asm_78aa
-    FuncCoord 2,2 ; $c3ca
+    FuncCoord 02,02 ; Enemy Bar in Battle
     ld hl,Coord
     xor a
 .asm_78aa
     ld [wListMenuID],a ; $cf94
-    ld a,$48
-    call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
+    ; ld a,$48
+    ; call Predef ; UpdateHPBar
+    ld d,h
+    ld e,l
+    call SetCureDuringAbsorb
     ld a,$0
     call Predef ; indirect jump to DrawPlayerHUDAndHPBar (3cd60 (f:4d60))
     ld a,$49
@@ -24958,7 +24966,7 @@ ItemUsePPRestore: ; Moved in the Bank
 .chooseMon
     xor a
     ld [$cfcb],a
-    ld a,$06 ; Ether/Elixer Menu
+    ld a,$01 ; item use party menu
     ld [$d07d],a
     call DisplayPartyMenu
     jr nc,.useEther
@@ -24973,7 +24981,7 @@ ItemUsePPRestore: ; Moved in the Bank
     push af
     push hl
     ld [hl],b
-    FuncCoord 13,01
+    FuncCoord 07,01 ; Party Ether Update Energy
     ld hl,Coord
     ld a,[$cf92]
     ld bc,40
@@ -25085,6 +25093,35 @@ DigNotUsable:
 .cannotDigHereText
     TX_FAR _CannotDigHereText
     db "@"
+
+PrintBattleValueNearMon:
+    ld b,BANK(PrintBattleValueNearMon_)
+    ld hl,PrintBattleValueNearMon_
+    call Bankswitch
+    ld hl,wHPBarOldHP
+    ret
+
+DecreaseValCounterAndPrintHPNumber:
+    push af
+    push de
+    call UpdateHPBar_PrintHPNumber
+    push hl
+    ld hl,wBattleValueCounter
+    ld a,[hl]
+    and a
+    jr z,.end
+    dec [hl]
+    call z,RemoveBattleValue
+.end
+    pop hl
+    pop de
+    pop af
+    ret
+
+RemoveBattleValue:
+    ld b,BANK(RemoveBattleValue_)
+    ld hl,RemoveBattleValue_
+    jp Bankswitch
 
 ; Free Space
 
@@ -27936,7 +27973,7 @@ UpdateHPBar_CalcNumberOfHPBarPixels: ; f9df (3:79df)
 ; predef $48
 UpdateHPBar: ; fa1d (3:7a1d)
     push hl
-    ld hl,wHPBarOldHP
+    call PrintBattleValueNearMon ; ld hl,wHPBarOldHP
     ld a,[hli]
     ld c,a      ; old HP into bc
     ld a,[hli]
@@ -27994,7 +28031,7 @@ UpdateHPBar: ; fa1d (3:7a1d)
     ld a,d
     sub e         ; calc pixel difference
 .asm_fa7e
-    call UpdateHPBar_PrintHPNumber
+    call DecreaseValCounterAndPrintHPNumber ; call UpdateHPBar_PrintHPNumber
     and a
     jr z,.noPixelDifference
     call UpdateHPBar_AnimateHPBar
@@ -28019,7 +28056,7 @@ UpdateHPBar: ; fa1d (3:7a1d)
     call UpdateHPBar_PrintHPNumber
     ld a,$1
     call UpdateHPBar_AnimateHPBar
-    jp Delay3
+    jp RemoveBattleValue ; jp Delay3
 
 ; animates the HP bar going up or down for (a) ticks (two waiting frames each)
 ; stops prematurely if bar is filled up
@@ -28102,10 +28139,10 @@ UpdateHPBar_PrintHPNumber: ; faf5 (3:7af5)
     ld a,[$FF00+$f6]
     bit 0,a
     jr z,.asm_fb15
-    ld de,9-7-20 ; Denim ; Spostata l'indicazione HP durante la Cura/Danno nel meny party
+    ld de,-18 ; Offset HP Number Party
     jr .asm_fb18
 .asm_fb15
-    ld de,$15
+    ld de,+20 ; Offset HP Number Battle
 .asm_fb18
     add hl,de
     push hl
@@ -29071,12 +29108,14 @@ WorldMapTileGraphics:
 PlayerCharacterTitleGraphics:
     INCBIN "gfx/player_title.2bpp"
 
-Func_128ef:
+DrawPlayerHPBarStatusBattle:
+; Draws the HP bar in the stats screen and battle
     call Load16BitRegisters
     ld a,$1
     jr asm_128fb
 
-Func_128f6:
+DrawPlayerHPBarParty:
+; Draws the HP bar in the party screen
     call Load16BitRegisters
     ld a,$2
 asm_128fb:
@@ -29114,20 +29153,29 @@ asm_128fb:
     ld a,[$FF00+$f6]
     bit 0,a
     jr z,.asm_12937
-    ld bc,$9 - 20 - 7 ; Denim ,spostato scritta HP nel menù party alla riga precedente
+    ld bc,-18 ; Offset HP Number Party
     jr .asm_1293a
 .asm_12937
-    ld bc,$15
+    ld bc,+20 ; Offset HP Number Battle
 .asm_1293a
     add hl,bc
-    ld de,$cf99
-    ld bc,$203
+    ld de,$cf99 ; Current HP
+    ld bc,$0203
     call PrintNumber
-    ld a,"/"
-    ld [hli],a
-    ld de,$cfba
-    ld bc,$203
+    ld [hl],$DB ; Hp Symbol
+    ld a,[$FF00+$f6]
+    bit 0,a
+    jr z,.skip2
+    ld bc,+11
+    jr .done2
+.skip2
+    ld bc,+01
+.done2
+    add hl,bc
+    ld de,$cfb5 ; Energy
+    ld bc,$0103
     call PrintNumber
+    ld [hl],$DA ; Energy Symbol
     pop hl
     pop de
     ret
@@ -29159,7 +29207,6 @@ SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
 ; 03: learn TM/HM menu
 ; 04: swap pokemon positions menu
 ; 05: use evolution stone on pokemon menu
-; 06 : Ether/Elixer Menu
 ; otherwise,it is a message ID
 ; f0: poison healed
 ; f1: burn healed
@@ -29240,16 +29287,14 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     jr z,.teachMoveMenu
     cp a,$05
     jr z,.evolutionStoneMenu
-    cp a,$06
-    jr z,.EtherElixerMenu
     push hl
-    ld bc,14+6 ; Denim,Spostato Stato a capo ; ld bc,14 ; 14 columns to the right
+    ld bc,20 ; Party Menu Status
     add hl,bc
     ld de,$CF9C
     call PrintStatusCondition
     pop hl
     push hl
-    ld bc,20+1+7 ; Denim,Spostata a destra la barra hp nel menù party ; ld bc,20 + 1 ; down 1 row and right 1 column
+    ld bc,28 ; Party Menu Hp Bar
     ld a,[$FFF6]
     set 0,a
     ld [$FFF6],a
@@ -29260,16 +29305,6 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     res 0,a
     ld [$FFF6],a
     call Func_12ec7 ; color the HP bar (on SGB)
-    pop hl
-    jr .printLevel
-.EtherElixerMenu
-    push hl
-    ld bc,(+01*20)+10
-    add hl,bc
-    ld de,$cfb5 ; Energy
-    ld bc,$0103
-    call PrintNumber
-    ld [hl],$DA ; Energy Symbol
     pop hl
     jr .printLevel
 .teachMoveMenu
@@ -29289,7 +29324,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     call FixTMPalette ; call PlaceString
     pop hl
 .printLevel
-    ld bc,10 + 14 ; Denim,Spostato Livello Riga a Capo ; ld bc,10 ; move 10 columns to the right
+    ld bc,14 ; Party Mon Level
     add hl,bc
     call PrintLevelAndGender ; call PrintLevel
     pop hl
@@ -30731,19 +30766,19 @@ Func_1392c: ; 1392c (4:792c)
     ld [hli],a
     ld [hl],a
 .asm_13982
-    FuncCoord 10,9 ; $c45e
+    FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,$1
     jr z,.asm_13990
-    FuncCoord 2,2 ; $c3ca
+    FuncCoord 02,02 ; Enemy Bar in Battle 
     ld hl,Coord
     xor a
 .asm_13990
     ld [wListMenuID],a ; $cf94
     ds 2; ld a,$48
-    call DisplayDamageAndUpdateHPBar ; call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
+    call SetDamageDuringRecoil ; call Predef ; UpdateHPBar
     ld hl,UnnamedText_1399e ; $799e
     jp PrintText
 UnnamedText_1399e: ; 1399e (4:799e)
@@ -30898,18 +30933,17 @@ GetGenderOutOfBattle:
 EXPBarGraphics: ; Denim,ExpBar
     INCBIN "gfx/denim/exp_bar.2bpp"
 
-DisplayDamageAndUpdateHPBar: ; During Recoil
+SetDamageDuringRecoil:
     ld d,h
     ld e,l
     ld hl,W_DAMAGE
-    xor a
+    ld a,b
     ld [hli],a
     ld a,c
     ld [hl],a
-    ld b,BANK(_DisplayDamageAndUpdateHPBar)
-    ld hl,_DisplayDamageAndUpdateHPBar
-    call Bankswitch
-    ret
+    ld b,BANK(SetDamageDuringRecoil_)
+    ld hl,SetDamageDuringRecoil_
+    jp Bankswitch
 
 DontCheckElement:
     pop af ; Delete Call Back Return
@@ -31765,9 +31799,8 @@ PrintLevelAndGender:
     call ResetTempIV
     pop hl
     push af
-    inc hl
-    inc hl
-    inc hl
+    ld de,+09 ; Party Gender
+    add hl,de
     pop af
     jr c,.Genderless
     push af
@@ -50247,7 +50280,7 @@ Func_3a902: ; 3a902 (e:6902)
     ld de,$cd3f
     ld bc,$3
     call CopyData
-    FuncCoord 18,10 ; $c47a
+    FuncCoord 18,10 ; Vertical Element in Player HUD
     ld hl,Coord
     ld de,rIE ; $ffff
     jr Func_3a930
@@ -51329,6 +51362,18 @@ Func_3b9ec: ; Moved Upper in the Bank
     srl b
     rr c
 .asm_3ba47
+    ; ────────────
+    push hl
+    push de
+    push bc
+    ld d,b
+    ld e,c
+    ld hl,SetCureDirect
+    call BankswitchEtoF
+    pop bc
+    pop de
+    pop hl
+    ; ────────────
     ld a,[de]
     ld [wHPBarOldHP],a
     add c
@@ -51361,17 +51406,17 @@ Func_3b9ec: ; Moved Upper in the Bank
     call BankswitchEtoF
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    FuncCoord 10,9 ; $c45e
+    FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord
     ld a,$1
     jr z,.asm_3ba83
-    FuncCoord 2,2 ; $c3ca
+    FuncCoord 02,02 ; Enemy Bar in Battle
     ld hl,Coord
     xor a
 .asm_3ba83
     ld [wListMenuID],a ; $cf94
     ld a,$48
-    call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
+    call Predef ; UpdateHPBar
     ld hl,DrawHUDsAndHPBars ; $4d5a
     call BankswitchEtoF
     ld hl,UnnamedText_3baac ; $7aac
@@ -52685,7 +52730,7 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
     ld [wHPBarNewHP],a
     ld [wHPBarNewHP+1],a
 .noOverkill
-    call WriteDamageAndUpdateCurMonHPBar ; call UpdateCurMonHPBar
+    call SetDamageDuringPoisonBurnLeechSeed ; call UpdateCurMonHPBar
     pop hl
     ret
 
@@ -52739,7 +52784,7 @@ HandlePoisonBurnLeechSeed_IncreaseEnemyHP: ; 3c4a3 (f:44a3)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     xor $1
     ld [H_WHOSETURN],a ; $FF00+$f3
-    call UpdateCurMonHPBar
+    call SetCureDuringLeechSeed ; call UpdateCurMonHPBar
     ld a,[H_WHOSETURN] ; $FF00+$f3
     xor $1
     ld [H_WHOSETURN],a ; $FF00+$f3
@@ -52747,20 +52792,20 @@ HandlePoisonBurnLeechSeed_IncreaseEnemyHP: ; 3c4a3 (f:44a3)
     ret
 
 UpdateCurMonHPBar: ; 3c4f6 (f:44f6)
-    FuncCoord 10,9 ; $c45e
+    FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord    ; tile pointer to player HP bar
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,$1
     jr z,.playersTurn
-    FuncCoord 2,2 ; $c3ca
+    FuncCoord 02,02 ; Enemy Bar in Battle 
     ld hl,Coord    ; tile pointer to enemy HP bar
     xor a
 .playersTurn
     push bc
     ld [wListMenuID],a ; $cf94
     ld a,$48
-    call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
+    call Predef ; UpdateHPBar
     pop bc
     ret
 
@@ -52930,6 +52975,10 @@ GetHealthBarColorWithGhostCheck:
     ld hl,GetHealthBarColorWithGhostCheck_
     ld b,BANK(GetHealthBarColorWithGhostCheck_)
     jp Bankswitch
+
+SetDEAndLoadMonFrontSprite:
+    ld de,$9000
+    jp LoadMonFrontSprite
 
 SECTION "Func_3c64f",ROMX[$464f],BANK[$f]
 
@@ -53862,49 +53911,59 @@ ReadPlayerMonCurHPAndStatus: ; 3cd43 (f:4d43)
 DrawPlayerHUDAndHPBar: ; Moved in the Bank
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    FuncCoord 9,7 ; $c435
+    FuncCoord 09,07 ; Player Battle Hub Reset Screen
     ld hl,Coord
-    ld bc,$50b
+    ld bc,$50b ; 05 | 11
     call ClearScreenArea
     ld hl,Func_3a902
     ld b,BANK(Func_3a902)
     call Bankswitch ; indirect jump to Func_3a902 (3a902 (e:6902))
-    FuncCoord 18,9 ; $c466
-    ld hl,Coord
-    ld [hl],$73
+
+; Standard Player Name
     ld de,W_PLAYERMONNAME
-    FuncCoord 10,7 ; $c436
+    FuncCoord 10,07
     ld hl,Coord
-    ds 3 ; call CenterMonName
     call PlaceString
+
+; Adaptive Player Name - Not Used
+;    FuncCoord 20,07
+;    ld hl,Coord
+;    ld de,W_PLAYERMONNAME
+;    push de
+;.LoopString
+;    dec hl
+;    ld a,[de]
+;    inc de
+;    cp "@"
+;    jr nz,.LoopString
+;.StringEnd
+;    pop de
+;    call PlaceString
+
     call PrintEXPBar ; Denim,ExpBar
     ld hl,W_PLAYERMONID
     ld de,$cf98
-    ld bc,$c
+    ld bc,12
     call CopyData
     ld hl,W_PLAYERMONLEVEL ; $d022
     ld de,$cfb9
-    ld bc,$b
+    ld bc,11
     call CopyData
-    FuncCoord 10,8
+    ld a,[W_PLAYERMONPP] ; Energy
+    ld [$cfb5],a         ; ...
+    FuncCoord 10,08 ; Player Battle Status
     ld hl,Coord
-    ds 1 ; push hl
-    ds 1 ; inc hl
     ld de,$cf9c
     call PrintStatusConditionNotFainted
-    ; ds 1 ; pop hl
-    ; ds 2 ; jr nz,.asm_3cdae
-    FuncCoord 14,8
+    FuncCoord 14,08 ; Player Battle Level
     ld hl,Coord
     call PrintLevel
-;.asm_3cdae
     ld a,[$cf98]
     ld [$cf91],a
-    ;FuncCoord 10,9 ; $c45e
-    ;ld hl,Coord
     call DrawCurrentMonGenderInBattle
-    ld a,$5f
-    call Predef ; indirect jump to Func_128ef (128ef (4:68ef))
+    FuncCoord 10,09 ; Player Bar in Battle
+    ld hl,Coord
+    PREDEF DrawPlayerHPBarStatusBattlePredef ; predef $5f
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld hl,$cf1d
@@ -53934,7 +53993,6 @@ DrawPlayerHUDAndHPBar: ; Moved in the Bank
 
 DrawHUDsAndHPBars: ; Moved in the Bank
     call DrawPlayerHUDAndHPBar
-    ; ds 3 ; jp DrawEnemyHUDAndHPBar
 
 DrawEnemyHUDAndHPBar: ; Moved in the Bank
     xor a
@@ -53948,16 +54006,11 @@ DrawEnemyHUDAndHPBar: ; Moved in the Bank
     ld de,W_ENEMYMONNAME
     FuncCoord 1,0 ; $c3a1
     ld hl,Coord
-    ds 3 ; call CenterMonName
     call PlaceString
     FuncCoord 8,1
     ld hl,Coord
-    ds 1 ; push hl
-    ds 1 ; inc hl
     ld de,W_ENEMYMONSTATUS ; $cfe9
     call PrintStatusConditionNotFainted
-    ; ds 1 ; pop hl
-    ; ds 2 ; jr nz,.asm_3ce23
     FuncCoord 3,1
     ld hl,Coord
     ld a,[W_ENEMYMONLEVEL] ; $cff3
@@ -54022,17 +54075,15 @@ DrawEnemyHUDAndHPBar: ; Moved in the Bank
 Func_3ce7f: ; 3ce7f (f:4e7f)
     xor a
     ld [wListMenuID],a ; $cf94
-    ;FuncCoord 2,2 ; $c3ca
-    ;ld hl,Coord
     call DrawCatchGenderAndLoadCoord ; Denim
+    FuncCoord 02,02 ; Enemy Bar in Battle
+    ld hl,Coord
     call nc,DrawHPBar
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld hl,$cf1e
 
-SECTION "GetBattleHealthBarColor",ROMX[$4e90],BANK[$f]
-
-GetBattleHealthBarColor: ; 3ce90 (f:4e90)
+GetBattleHealthBarColor: ; Moved in the Bank
     ld b,[hl]
     call GetHealthBarColorWithGhostCheck ; call GetHealthBarColor
     ld a,[hl]
@@ -54041,31 +54092,24 @@ GetBattleHealthBarColor: ; 3ce90 (f:4e90)
     ld b,$1
     jp GoPAL_SET
 
-; center's mon's name on the battle screen
-; if the name is 1 or 2 letters long, it is printed 2 spaces more to the right than usual
-; (i.e. for names longer than 4 letters)
-; if the name is 3 or 4 letters long, it is printed 1 space more to the right than usual
-; (i.e. for names longer than 4 letters)
-CenterMonName:
-    push de
-    inc hl
-    inc hl
-    ld b,$2
-.loop
-    inc de
-    ld a,[de]
-    cp "@"
-    jr z,.done
-    inc de
-    ld a,[de]
-    cp "@"
-    jr z,.done
-    dec hl
-    dec b
-    jr nz,.loop
-.done
-    pop de
+FixItSelfDamage:
+    ld [$d05e],a
+    push hl
+    call GetSelectedMovePointer
+    ld a,POUND
+    ld [hli],a
+    pop hl
     ret
+
+GetSelectedMovePointer:
+    ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
+    ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
+    and a
+    ret z
+    inc hl
+    ret
+
+SECTION "InitBattleMenu",ROMX[$4eb3],BANK[$f]
 
 InitBattleMenu: ; 3ceb3 (f:4eb3)
     call LoadScreenTilesFromBuffer1 ; restore saved screen
@@ -54338,6 +54382,17 @@ HalvePlayerSpeedAfterRun:
     rr a  ; Player Speed divided by 2
     ret
 
+Func_3fb36: ; Moved in the Bank
+    ld hl,Func_3bb97
+    ld b,BANK(Func_3bb97)
+    jp Bankswitch
+
+HackBackSpriteAccess:
+    ld a,$66 ; BackSprite dimension
+    ld de,$9310
+    push de
+    jp HackBackSprite
+
 SECTION "Func_3d0ca",ROMX[$50ca],BANK[$f]
 
 Func_3d0ca: ; 3d0ca (f:50ca)
@@ -54540,14 +54595,8 @@ MoveSelectionMenu: ; 3d219 (f:5219)
     ld c,$e + 4
     di
     call TextBoxBorder
-    ;FuncCoord 0,12 ; $c494
-    ;ld hl,Coord
-    ;ld [hl],$7a
-    ;FuncCoord 8,12 ; $c49a
-    ;ld hl,Coord
-    ;ld [hl],$7e
     ei
-    call WritePPAllMoves ; Denim
+    call WriteEnergyAllMoves ; Denim
     call .writemoves
     ld b,5-4
     ld a,$c
@@ -54798,16 +54847,12 @@ AnyMoveToSelect: ; Moved in the Bank
 TypeText: ; Moved in the Bank
     db "TYPE@"
 
-SECTION "SwapMovesInMenu",ROMX[$5435],BANK[$f]
-
-SwapMovesInMenu: ; 3d435 (f:5435)
+SwapMovesInMenu: ; Moved in the Bank
     call CheckTransformed ; ld a,[$cc35]
     and a
     jr z,asm_3d4ad
     ld hl,W_PLAYERMONMOVES
     call Func_3d493
-    ds 3 ; ld hl,W_PLAYERMONPP ; $d02d  ; Don't Swap PP
-    ds 3 ; call Func_3d493              ; ...
     ld hl,W_PLAYERDISABLEDMOVE ; $d06d
     ld a,[hl]
     swap a
@@ -54845,7 +54890,6 @@ SwapMovesInMenu: ; 3d435 (f:5435)
     pop hl
     ld bc,$15
     add hl,bc
-    ds 3 ; call Func_3d493 ; Don't Swap PP
     xor a
     ld [$cc35],a
     jp AlignIndexMenu ; jp MoveSelectionMenu
@@ -54926,7 +54970,6 @@ PrintMenuItem: ; 3d4b6 (f:54b6)
     ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
     add hl,bc
     ld a,[hl]
-    ds 2 ; and $3f
     ld [$cd6d],a
 
     ; Print Move Details Box
@@ -55072,6 +55115,16 @@ SelectEnemyMove: ; Moved in the Bank
 .struggle
     ld a,STRUGGLE
     jr .done
+
+Func_3fb26: ; Moved in the Bank
+    ld hl,Func_3b9ec
+    ld b,BANK(Func_3b9ec)
+    jp Bankswitch
+
+TransformEffect: ; Moved in the Bank
+    ld hl,TransformEffect_
+    ld b,BANK(TransformEffect_)
+    jp Bankswitch
 
 SECTION "Func_3d605",ROMX[$5605],BANK[$F]
 
@@ -56122,6 +56175,30 @@ TestPhysicalSpecialBattle:
     call GetSelectedMovePointer
     jp TestPhysicalSpecial
 
+ChooseRandomMove:
+    call GenRandomInBattle ; get random
+    ld c,0
+    cp $3f ; select move 1 in [0,3e] (63/256 chance)
+    jr c,.end
+    inc c
+    cp $7f ; select move 2 in [3f,7e] (64/256 chance)
+    jr c,.end
+    inc c
+    cp $be ; select move 3 in [7f,bd] (63/256 chance)
+    jr c,.end
+    inc c ; select move 4 in [be,ff] (66/256 chance)
+.end
+    ld a,c
+    ld [wEnemyMoveListIndex],a
+    ld [wCurrentMenuItem],a
+    ld h,d
+    ld l,e
+    ld b,0
+    add hl,bc
+    ld a,[hl]
+    and a
+    ret
+
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
 UnnamedText_3ddb6: ; 3ddb6 (f:5db6)
@@ -56389,124 +56466,161 @@ Func_3df1c: ; 3df1c (f:5f1c)
     ret
 
 MoreCalculateDamage: ; 3df65 (f:5f65)
-    ld a,[$ff00+$f3]  ;FFF3 decides which address to use
+; input:
+;    b: attack
+;    c: opponent defense
+;    d: base power
+;    e: level
+
+    ld a,[$fff3] ; whose turn?
     and a
     ld a,[W_PLAYERMOVEEFFECT]
-    jr z,.next
-    ld a,[$cfcd]
-.next
-    cp a,7  ;effect to halve opponent defense [suicide moves]
-    jr nz,.next2
-.halveDefense
-    srl c  ;explosion and selfdestruct will halve the defense...
-    jr nz,.next2
-    inc c  ;...with a minimum value of 1 [it is used as a divisor later on]
-.next2
-    cp a,$1d
-    jr z,.next3
+    jr z,.effect
+    ld a,[W_ENEMYMOVEEFFECT]
+.effect
+
+; EXPLODE_EFFECT halves defense.
+    cp a,EXPLODE_EFFECT
+    jr nz,.ok
+    srl c
+    jr nz,.ok
+    inc c ; ...with a minimum value of 1 (used as a divisor later on)
+.ok
+
+; Multi-hit attacks may or may not have 0 bp.
+    cp a,TWO_TO_FIVE_ATTACKS_EFFECT
+    jr z,.skipbp
     cp a,$1e
-    jr z,.next3
-    cp a,$26    ;OHKO?
+    jr z,.skipbp
+
+; Calculate OHKO damage based on remaining HP.
+    cp a,OHKO_EFFECT
     jp z,Func_3e016
-    ld a,d      ;if attack base power zero then do nothing
+
+; Don't calculate damage for moves that don't do any.
+    ld a,d ; base power
     and a
     ret z
-.next3
+.skipbp
+
     xor a
-    ld hl,$ff95  ;multiplication address
-    ldi [hl],a   ;init to zero
+    ld hl,H_DIVIDEND
+    ldi [hl],a
     ldi [hl],a
     ld [hl],a
-    ld a,e
-    add a         ;A = level *2
-    jr nc,.noCarry
-.carry
+
+; Multiply level by 2
+    ld a,e ; level
+    add a
+    jr nc,.nc
     push af
-    ld a,1     ;add carry for level if needed
-    ld [hl],a  ;level high byte [previously zero]
+    ld a,1
+    ld [hl],a
     pop af
-.noCarry
+.nc
     inc hl
-    ldi [hl],a  ;level low byte
-    ld a,5      ;[divisor] = 5
+    ldi [hl],a
+
+; Divide by 5
+    ld a,5
     ldd [hl],a
     push bc
     ld b,4
-    call Divide  ;divide level by 5
+    call Divide
     pop bc
-    inc [hl]  ;+2 [?]
+
+; Add 2
     inc [hl]
-    inc hl    ;8bit multiplier
+    inc [hl]
+
+    inc hl ; multiplier
+
+; Multiply by attack base power
     ld [hl],d
-    call Multiply  ;*multiply by attack base power
+    call Multiply
+
+; Multiply by attack stat
     ld [hl],b
-    call Multiply  ;*multiply by attacker attack stat
+    call Multiply
+
+; Divide by defender's defense stat
     ld [hl],c
     ld b,4
-    call Divide    ;*divide by defender defense stat
-    ld [hl],$32
-    ld b,4
-    call Divide      ;divide above result by 50
-    ld hl,W_DAMAGE  ;[stuff below I never got to,was only interested in stuff above]
+    call Divide
 
+; Divide by 50
+    ld [hl],50
+    ld b,4
+    call Divide
+
+    ld hl,W_DAMAGE
     ld b,[hl]
-    ld a,[$FF00+$98]
+    ld a,[H_QUOTIENT + 3]
     add b
-    ld [$FF00+$98],a
+    ld [H_QUOTIENT + 3],a
     jr nc,.asm_3dfd0
-    ld a,[$FF00+$97]
+
+    ld a,[H_QUOTIENT + 2]
     inc a
-    ld [$FF00+$97],a
+    ld [H_QUOTIENT + 2],a
     and a
     jr z,.asm_3e004
+
 .asm_3dfd0
-    ld a,[H_DIVIDEND] ; $FF00+$95 (aliases: H_PRODUCT,H_PASTLEADINGZEROES,H_QUOTIENT)
+    ld a,[H_QUOTIENT]
     ld b,a
-    ld a,[H_NUMTOPRINT] ; $FF00+$96 (aliases: H_MULTIPLICAND)
+    ld a,[H_QUOTIENT + 1]
     or a
     jr nz,.asm_3e004
-    ld a,[$FF00+$97]
-    cp $3
+
+    ld a,[H_QUOTIENT + 2]
+    cp 65279 / $100 ; cp 998 / $100 ; Denim,aumentato danno massimo a $FEFF
     jr c,.asm_3dfe8
-    cp $4
+    cp 65279 / $100 + 1
     jr nc,.asm_3e004
-    ld a,[$FF00+$98]
-    cp $e6
+    ld a,[H_QUOTIENT + 3]
+    cp 65279 % $100
     jr nc,.asm_3e004
+
 .asm_3dfe8
     inc hl
-    ld a,[$FF00+$98]
+    ld a,[H_QUOTIENT + 3]
     ld b,[hl]
     add b
     ld [hld],a
-    ld a,[$FF00+$97]
+
+    ld a,[H_QUOTIENT + 2]
     ld b,[hl]
     adc b
     ld [hl],a
     jr c,.asm_3e004
+
     ld a,[hl]
-    cp $3
+    cp 65279 / $100
     jr c,.asm_3e00a
-    cp $4
+    cp 65279 / $100 + 1
     jr nc,.asm_3e004
     inc hl
     ld a,[hld]
-    cp $e6
+    cp 65279 % $100
     jr c,.asm_3e00a
+
 .asm_3e004
-    ld a,$3
+    ld a,65278 / $100
     ld [hli],a
-    ld a,$e5
+    ld a,65278 % $100
     ld [hld],a
+
 .asm_3e00a
     inc hl
     ld a,[hl]
-    add $2
+    add 2
     ld [hld],a
-    jr nc,.asm_3e012
+    jr nc,.done
     inc [hl]
-.asm_3e012
-    ld a,$1
+.done
+
+    ld a,1
     and a
     ret
 
@@ -56586,8 +56700,6 @@ DrawCurrentMonGenderInBattle:
     call Bankswitch
     pop bc
     pop de
-    FuncCoord 10,9 ; $c45e
-    ld hl,Coord
     ret
 
 ResetBattleFlagAndLoadCurrentOpponent:
@@ -56724,7 +56836,7 @@ ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
     ld [hl],a
 
 ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
-    call PrintDamageNearHpBarAndLoadHlDamage ; Denim ; ld hl,W_DAMAGE
+    call SetDamageDirectToEnemy ; Denim ; ld hl,W_DAMAGE
     ld a,[hli]
     ld b,a
     ld a,[hl]
@@ -56769,14 +56881,16 @@ ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
     ld [wHPBarNewHP+1],a
     ld a,[hl]
     ld [wHPBarNewHP],a
-    FuncCoord 2,2 ; $c3ca
+    FuncCoord 02,02 ; Enemy Bar in Battle
     ld hl,Coord
     xor a
     ld [$cf94],a
     ld a,$48
     call Predef ; animate the HP bar shortening
 ApplyAttackToEnemyPokemonDone: ; 3e19d (f:619d)
-    jp RemoveDiplayedDamageAndDrawHUDsAndHPBars ; Denim ; jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
+    jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
+
+SECTION "ApplyAttackToPlayerPokemon",ROMX[$61a0],BANK[$f]
 
 ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
     ld a,[W_ENEMYMOVEEFFECT]
@@ -56845,7 +56959,7 @@ ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
     ld [hl],a
 
 ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
-    call PrintDamageNearPlayerHpBarAndLoadHlDamage ; Denim ; ld hl,W_DAMAGE
+    call SetDamageDirectToPlayer ; Denim ; ld hl,W_DAMAGE
     ld a,[hli]
     ld b,a
     ld a,[hl]
@@ -56889,18 +57003,18 @@ ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
     ld [wHPBarMaxHP+1],a
     ld a,[hl]
     ld [wHPBarMaxHP],a
-    FuncCoord 10,9 ; $c45e
+    FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord
     ld a,$01
     ld [$cf94],a
     ld a,$48
     call Predef ; animate the HP bar shortening
 ApplyAttackToPlayerPokemonDone
-    jp RemoveDiplayedDamageAndDrawHUDsAndHPBars ; Denim ; jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
+    jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
 AttackSubstitute: ; 3e25e (f:625e)
-    ld hl,SubstituteTookDamageText
-    call RemoveDiplayedDamageAndPrintText ; call PrintText
+    call PrintBattleValueNearSubstitute ; ld hl,SubstituteTookDamageText
+    call PrintText
 ; values for player turn
     ld de,wEnemySubstituteHP
     ld bc,W_ENEMYBATTSTATUS2
@@ -57353,6 +57467,7 @@ HandleEnemySwitchingOrUsingAnItemAndThenExecutePlayerMove:
 HandleMenuInputLockedDuringDebugEnemyMove:
     ld hl,wDebugEnemyMoveBit7
     bit 7,[hl]
+    res 7,[hl]
     jp z,HandleMenuInput ; No Lock
     call WaitButtonPressed
     ld a,%0000010 ; Emulate B press to Close Debug Enemy Move Menù
@@ -58839,9 +58954,9 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     ld a,$9c
     ld [$FF00+$bd],a
     call LoadScreenTilesFromBuffer1
-    FuncCoord 9,7 ; $c435
+    FuncCoord 09,07 ; Initialize Player Battle HUD
     ld hl,Coord
-    ld bc,$50a
+    ld bc,$50b ; 05 | 11
     call ClearScreenArea
     FuncCoord 1,0 ; $c3a1
     ld hl,Coord
@@ -58888,10 +59003,15 @@ ItemsCantBeUsedHere: ; Moved in the Bank
     TX_FAR ItemsCantBeUsedHere_
     db "@"
 
-SECTION "TerminatorText_3f04a",ROMX[$704a],BANK[$f]
-
 TerminatorText_3f04a: ; 3f04a (f:704a)
     db "@"
+
+Func_3fb16: ; Moved in the Bank
+    ld hl,Func_139a3
+    ld b,BANK(Func_139a3)
+    jp Bankswitch
+
+SECTION "_LoadTrainerPic",ROMX[$704b],BANK[$f]
 
 _LoadTrainerPic: ; 3f04b (f:704b)
     ld a,[$d033]
@@ -59024,7 +59144,6 @@ LoadMonBackSprite: ; 3f103 (f:7103)
     call UncompressMonSprite
     ; Denim,Per inpedire il ridimensionamento BackSprite
     call HackBackSpriteAccess
-    dw 0,0,0,0
 ;    ld a,$3
 ;    call Predef ; indirect jump to ScaleSpriteByTwo (2fe40 (b:7e40))
 ;    ld de,$9310
@@ -59035,6 +59154,13 @@ LoadMonBackSprite: ; 3f103 (f:7103)
     ld a,[H_LOADEDROMBANK]
     ld b,a
     jp CopyVideoData
+
+Func_3fb1e: ; Moved in the Bank
+    ld hl,Func_139da
+    ld b,BANK(Func_139da)
+    jp Bankswitch
+
+SECTION "Func_3f132",ROMX[$7132],BANK[$f]
 
 Func_3f132: ; 3f132 (f:7132)
     call JumpMoveEffect
@@ -60499,79 +60625,52 @@ DisableEffect: ; 3fa8a (f:7a8a)
     TX_FAR _UnnamedText_3fb09
     db "@"
 
-SECTION "Func_3fb16",ROMX[$7b16],BANK[$f]
-
-Func_3fb16: ; 3fb16 (f:7b16)
-    ld hl,Func_139a3
-    ld b,BANK(Func_139a3)
-    jp Bankswitch
-
-Func_3fb1e: ; 3fb1e (f:7b1e)
-    ld hl,Func_139da
-    ld b,BANK(Func_139da)
-    jp Bankswitch
-
-Func_3fb26: ; 3fb26 (f:7b26)
-    ld hl,Func_3b9ec
-    ld b,BANK(Func_3b9ec)
-    jp Bankswitch
-
-TransformEffect: ; 3fb2e (f:7b2e)
-    ld hl,TransformEffect_
-    ld b,BANK(TransformEffect_)
-    jp Bankswitch
-
-Func_3fb36: ; 3fb36 (f:7b36)
-    ld hl,Func_3bb97
-    ld b,BANK(Func_3bb97)
-    jp Bankswitch
-
-UnnamedText_3fb3e: ; 3fb3e (f:7b3e)
+UnnamedText_3fb3e: ; Moved in the Bank
     TX_FAR _UnnamedText_3fb3e
     db "@"
 
-Func_3fb43: ; 3fb43 (f:7b43)
+Func_3fb43: ; Moved in the Bank
     ld hl,UnnamedText_3fb49
     jp PrintText
 
-UnnamedText_3fb49: ; 3fb49 (f:7b49)
+UnnamedText_3fb49: ; Moved in the Bank
     TX_FAR _UnnamedText_3fb49
     db "@"
 
-Func_3fb4e: ; 3fb4e (f:7b4e)
+Func_3fb4e: ; Moved in the Bank
     ld a,[$ccf4]
     and a
     ret nz
 
-Func_3fb53: ; 3fb53 (f:7b53)
+Func_3fb53: ; Moved in the Bank
     ld hl,UnnamedText_3fb59 ; $7b59
     jp PrintText
 
-UnnamedText_3fb59: ; 3fb59 (f:7b59)
+UnnamedText_3fb59: ; Moved in the Bank
     TX_FAR _UnnamedText_3fb59
     db "@"
 
-Func_3fb5e: ; 3fb5e (f:7b5e)
+Func_3fb5e: ; Moved in the Bank
     ld hl,UnnamedText_3fb64 ; $7b64
     jp PrintText
 
-UnnamedText_3fb64: ; 3fb64 (f:7b64)
+UnnamedText_3fb64: ; Moved in the Bank
     TX_FAR _UnnamedText_3fb64
     db "@"
 
-UnnamedText_3fb69: ; 3fb69 (f:7b69)
+UnnamedText_3fb69: ; Moved in the Bank
     TX_FAR _UnnamedText_3fb69
     db "@"
 
-Func_3fb6e: ; 3fb6e (f:7b6e)
+Func_3fb6e: ; Moved in the Bank
     ld hl,UnnamedText_3fb74 ; $7b74
     jp PrintText
 
-UnnamedText_3fb74: ; 3fb74 (f:7b74)
+UnnamedText_3fb74: ; Moved in the Bank
     TX_FAR _UnnamedText_3fb74
     db "@"
 
-CheckTargetSubstitute: ; 3fb79 (f:7b79)
+CheckTargetSubstitute: ; Moved in the Bank
     push hl
     ld hl,$d068
     ld a,[$ff00+$f3]   ;whose turn?
@@ -60583,7 +60682,7 @@ CheckTargetSubstitute: ; 3fb79 (f:7b79)
     pop hl
     ret
 
-PlayCurrentMoveAnimation2: ; 3fb89 (f:7b89)
+PlayCurrentMoveAnimation2: ; Moved in the Bank
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVENUM] ; $cfd2
@@ -60593,7 +60692,7 @@ PlayCurrentMoveAnimation2: ; 3fb89 (f:7b89)
     and a
     ret z
 
-Func_3fb96: ; 3fb96 (f:7b96)
+Func_3fb96: ; Moved in the Bank
     ld [W_ANIMATIONID],a ; $d07c
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -60604,7 +60703,7 @@ Func_3fb96: ; 3fb96 (f:7b96)
     ld [$cc5b],a
     jp Func_3fbbc
 
-Func_3fba8: ; 3fba8 (f:7ba8)
+Func_3fba8: ; Moved in the Bank
     xor a
     ld [$cc5b],a
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -60616,7 +60715,7 @@ Func_3fba8: ; 3fba8 (f:7ba8)
     and a
     ret z
 
-Func_3fbb9: ; 3fbb9 (f:7bb9)
+Func_3fbb9: ; Moved in the Bank
     ld [W_ANIMATIONID],a ; $d07c
 
 Func_3fbbc: ; 3fbbc (f:7bbc)
@@ -60655,81 +60754,114 @@ MultiplyD05B: ; xxxxx (f:xxxx) ; Denim
     ld [H_MULTIPLIER],a
     ret
 
-PrintDamageNearPlayerHpBarAndLoadHlDamage:
-    ld hl,wFlagDamageToPlayerBit1
-    set 1,[hl]
+; ────────────────────────────────────────────────────────────────
+; PRINT DAMAGE
+; ────────────────────────────────────────────────────────────────
 
-PrintDamageNearHpBarAndLoadHlDamage:
-    call PrintDamageNearHpBar
-    ld hl,W_DAMAGE
+CheckDamageToPlayer:
+    ld hl,wFlagValueToPlayerBit1
+    res 1,[hl]
+    ld a,[H_WHOSETURN] ; 0 on player’s turn,1 on enemy’s turn
+    and a
+    ret nz
+    set 1,[hl]
     ret
 
-PrintDamageNearHpBar:
-    ld de,W_DAMAGE
-    ld b,%00000010
-    ld c,5
-    call GetHlPointerToDamageTextArea
-    jp PrintNumber
+CopyDamage:
+    ld hl,W_DAMAGE
+    ld de,wBattleValueToPrint
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hld]
+    ld [de],a
+    ret
 
-WriteDamageAndUpdateCurMonHPBar: ; During Poison/Burn/LeechSeed
+PrintBattleValueNearSubstitute:
+    ld b,BANK(PrintBattleValueNearMon_)
+    ld hl,PrintBattleValueNearMon_
+    call Bankswitch
+    ld b,BANK(RemoveBattleValue_)
+    ld hl,RemoveBattleValue_
+    call Bankswitch
+    ld hl,SubstituteTookDamageText
+    ret
+
+SetDamageDirectToPlayer:
+    ld hl,wPrintBattleValueBit0
+    set 0,[hl]
+    set 1,[hl] ; wFlagValueToPlayerBit1
+    res 7,[hl] ; wFlagBattleCureBit7
+    jp CopyDamage
+
+SetDamageDirectToEnemy:
+    ld hl,wPrintBattleValueBit0
+    set 0,[hl]
+    res 1,[hl] ; wFlagValueToPlayerBit1
+    res 7,[hl] ; wFlagBattleCureBit7
+    jp CopyDamage
+
+SetDamageDuringPoisonBurnLeechSeed:
     push bc
     ld hl,W_DAMAGE
     ld a,b
     ld [hli],a
     ld a,c
     ld [hl],a
-    call CheckIfPlayerTurnForPrintDamage
-    call PrintDamageNearHpBar
-    call UpdateCurMonHPBar
-    call RemoveDiplayedDamage
+    ld hl,wPrintBattleValueBit0
+    set 0,[hl]
+    call CheckDamageToPlayer
+    res 7,[hl] ; wFlagBattleCureBit7
+    call CopyDamage
     pop bc
-    ret
+    jp UpdateCurMonHPBar
 
-_DisplayDamageAndUpdateHPBar: ; During Recoil
+SetDamageDuringRecoil_:
     push de
-    call CheckIfPlayerTurnForPrintDamage
-    call PrintDamageNearHpBar
+    ld [hl],a
+    ld hl,wPrintBattleValueBit0
+    set 0,[hl]
+    call CheckDamageToPlayer
+    res 7,[hl] ; wFlagBattleCureBit7
+    call CopyDamage
     pop hl
     ld a,$48
-    call Predef ; indirect jump to UpdateHPBar (fa1d (3:7a1d))
-    jp RemoveDiplayedDamage
+    jp Predef ; UpdateHPBar
 
-CheckIfPlayerTurnForPrintDamage:
-    ld a,[H_WHOSETURN] ; 0 on player’s turn,1 on enemy’s turn
-    and a
-    ret nz
-    ld hl,wFlagDamageToPlayerBit1
-    set 1,[hl]
-    ret
+SetCureDirect:
+    ld hl,W_DAMAGE
+    ld a,d
+    ld [hli],a
+    ld a,e
+    ld [hl],a
+    ld hl,wPrintBattleValueBit0
+    set 0,[hl]
+    call CheckDamageToPlayer
+    set 7,[hl] ; wFlagBattleCureBit7
+    jp CopyDamage
 
-RemoveDiplayedDamageAndDrawHUDsAndHPBars:
-    call RemoveDiplayedDamage
-    jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
+SetCureDuringLeechSeed:
+    push bc
+    ld hl,wPrintBattleValueBit0
+    set 0,[hl]
+    call CheckDamageToPlayer
+    set 7,[hl] ; wFlagBattleCureBit7
+    call CopyDamage
+    pop bc
+    jp UpdateCurMonHPBar
 
-RemoveDiplayedDamageAndPrintText:
-    call PrintText
-    jp RemoveDiplayedDamage
-
-RemoveDiplayedDamage:
-    call GetHlPointerToDamageTextArea
-    push hl
-    ld hl,wFlagDamageToPlayerBit1
-    res 1,[hl]
+SetCureDuringAbsorb_:
+    push de
+    ld hl,wPrintBattleValueBit0
+    set 0,[hl]
+    call CheckDamageToPlayer
+    set 7,[hl] ; wFlagBattleCureBit7
+    call CopyDamage
     pop hl
-    ld bc,$0105
-    jp ClearScreenArea
+    ld a,$48
+    jp Predef ; UpdateHPBar
 
-GetHlPointerToDamageTextArea:
-    FuncCoord 7,4 ; Damage to Enemy
-    ld hl,Coord
-    push hl
-    ld hl,wFlagDamageToPlayerBit1
-    bit 1,[hl]
-    pop hl
-    ret z ; Damage to Enemy
-    FuncCoord 4,5 ; Damage to Player
-    ld hl,Coord
-    ret ; Damage to Player
+; ────────────────────────────────────────────────────────────────
 
 DoubleIncB: ; Denim
     inc b
@@ -60752,12 +60884,6 @@ DoubleDecHL: ; Denim
     dec [hl]
     add hl,de
     ret
-
-HackBackSpriteAccess:
-    ld a,$66 ; BackSprite dimension
-    ld de,$9310
-    push de
-    jp HackBackSprite
 
 FRONT_SPRITE EQU $0B
 
@@ -60827,7 +60953,7 @@ CheckSpecialHybridSprite: ; Denim
     xor a ; Reset Carry Flag
     ret
 
-DrawCatchGenderAndLoadCoord ; Denim
+DrawCatchGenderAndLoadCoord: ; Denim
     push de
     push bc
     ld hl,_DrawCatchGender
@@ -60835,93 +60961,49 @@ DrawCatchGenderAndLoadCoord ; Denim
     call Bankswitch
     pop bc
     pop de
-    FuncCoord 2,2 ; $c3ca
-    ld hl,Coord
     ret
 
-WritePPAllMoves: ; Denim ; TODO,sistemare routine e posizioni
-;    ld a,[wCurrentMenuItem]
-;    push af
-;
-;    ld a,$4
-;    ld [$cc49],a
-;    ld d,4
-;.Loop4Moves
-;    push de
-;    ld a,d
-;    dec a
-;    ld [wCurrentMenuItem],a
-;    ld e,a
-;
-;    call DebugMonOrEnemyMoves ; ld hl,W_PLAYERMONMOVES
-;    ld b,0
-;    ld c,a
-;    add hl,bc
-;    ld a,[hl]
-;    and a
-;    jr z,.SkipCurrentMove
-;
-;    ld a,e
-;    push af ; Backup CurrentMenuItem
-;    ;push af ; ..
-;    ;push af ; ..
-;
-;    ;FuncCoord 16,13 ; $c459
-;    ;ld hl,Coord
-;    ;ld bc,20
-;    ;call AddNTimes
-;    ;ld [hl],"/"
-;
-;    ;ld hl,GetMaxPP
-;    ;ld b,BANK(GetMaxPP)
-;    ;call Bankswitch ; indirect jump to GetMaxPP (e677 (3:6677))
-;
-;    call DebugMonOrEnemyPP ; ld hl,W_PLAYERMONPP ; $d02d
-;    ld b,0
-;    ;pop af ; Restore CurrentMenuItem
-;    ld c,a
-;    add hl,bc
-;    ld a,[hl]
-;    and a,%00111111
-;    ld [$cd6d],a
-;
-;    pop af ; Restore CurrentMenuItem
-;    FuncCoord 14 + 3,13 ; FuncCoord 14,13
-;    ld hl,Coord
-;    ld bc,20
-;    call AddNTimes
-;    ld de,$cd6d
-;    ld bc,$102
-;    call PrintNumber
-;
-;    ;pop af ; Restore CurrentMenuItem
-;    ;FuncCoord 17,13
-;    ;ld hl,Coord
-;    ;ld bc,20
-;    ;call AddNTimes
-;    ;ld de,$d11e
-;    ;ld bc,$102
-;    ;call PrintNumber
-;
-;.SkipCurrentMove
-;    pop de
-;    dec d
-;    jr nz,.Loop4Moves
-;
-;    pop af
-;    ld [wCurrentMenuItem],a
-
-    call DebugMonOrEnemyPP ; ld hl,W_PLAYERMONPP ; $d02d
-    ld d,h
-    ld e,l
+WriteEnergyAllMoves:
+    ld a,$4
+    ld [$cc49],a
+    ld d,4
+.Loop4Moves
+    push de
+    ld c,d
+    dec c
+    call DebugMonOrEnemyMoves ; ld hl,W_PLAYERMONMOVES
+    ld b,0
+    add hl,bc
+    ld a,[hl]
+    and a
+    jr z,.SkipCurrentMove
+    push bc
+    ; Get Current Move
+    dec a
+    ld hl,Moves+5 ; Move Energy
+    ld bc,6
+    call AddNTimes
+    ld a,BANK(Moves)
+    ld de,W_PLAYERMOVEMAXPP ; Energy
+    ld bc,1
+    call FarCopyData
+    ; Print Current Energy
+    pop bc
+    ld a,c
     FuncCoord 15,13
     ld hl,Coord
+    ld bc,20
+    call AddNTimes
+    ld de,W_PLAYERMOVEMAXPP ; Energy
     ld bc,$0103
     call PrintNumber
     ld de,.EnergyIcon
     call PlaceString
-
-    FuncCoord 2,13 ; $c4aa
+.SkipCurrentMove
+    pop de
+    dec d
+    jr nz,.Loop4Moves
+    FuncCoord 02,13
     ld hl,Coord
     ret
 .EnergyIcon
@@ -61227,31 +61309,14 @@ CalcStatsAndLoadEnemyMonHp:
     jp CalcStats
 
 DebugMonOrEnemyMoves:
-    ld hl,wDebugEnemyMoveBit7
-    res 7,[hl] ; Reset during a New Move Menu Open
     push af
     ld hl,W_PLAYERMONMOVES
     ld a,[H_CURRENTPRESSEDBUTTONS]
     bit 3,a ; was the start button pressed?
     jr z,.Done
-    bit 2,a ; was the select button pressed?
-    jr nz,.Done
-    ld hl,W_ENEMYMONMOVES
-.Done
-    pop af
-    ret
-
-DebugMonOrEnemyPP:
-    push af
-    ld hl,W_PLAYERMONPP ; $d02d
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    bit 3,a ; was the start button pressed?
-    jr z,.Done
-    bit 2,a ; was the select button pressed?
-    jr nz,.Done
     ld hl,wDebugEnemyMoveBit7
     set 7,[hl] ; Set during a Debug Enemy Move Menu Open
-    ld hl,W_ENEMYMONPP
+    ld hl,W_ENEMYMONMOVES
 .Done
     pop af
     ret
@@ -61387,10 +61452,6 @@ LoadMonFrontSpriteOrGhost:
     jp nz,LoadMonFrontSprite
     jp LoadGhostPic
 
-SetDEAndLoadMonFrontSprite:
-    ld de,$9000
-    jp LoadMonFrontSprite
-
 WriteMonMovesPlus:
     ld a,[W_ISINBATTLE]
     dec a
@@ -61419,47 +61480,6 @@ Copy4Bytes:
 Copy4BytesDirect:
     ld bc,$4
     jp CopyData
-
-ChooseRandomMove:
-    call GenRandomInBattle ; get random
-    ld c,0
-    cp $3f ; select move 1 in [0,3e] (63/256 chance)
-    jr c,.end
-    inc c
-    cp $7f ; select move 2 in [3f,7e] (64/256 chance)
-    jr c,.end
-    inc c
-    cp $be ; select move 3 in [7f,bd] (63/256 chance)
-    jr c,.end
-    inc c ; select move 4 in [be,ff] (66/256 chance)
-.end
-    ld a,c
-    ld [wEnemyMoveListIndex],a
-    ld [wCurrentMenuItem],a
-    ld h,d
-    ld l,e
-    ld b,0
-    add hl,bc
-    ld a,[hl]
-    and a
-    ret
-
-GetSelectedMovePointer:
-    ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
-    ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
-    and a
-    ret z
-    inc hl
-    ret
-
-FixItSelfDamage:
-    ld [$d05e],a
-    push hl
-    call GetSelectedMovePointer
-    ld a,POUND
-    ld [hli],a
-    pop hl
-    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -74872,9 +74892,9 @@ LearnMovePredef:
 PrintMoveTypePredef:
     dbw BANK(PrintMoveType),PrintMoveType
     dbw BANK(LoadMovePPs),LoadMovePPs
-DrawHPBarPredef: ; 4ff96 (13:7f96)
-    dbw BANK(Func_128ef),Func_128ef ; 5F draw HP bar
-    dbw BANK(Func_128f6),Func_128f6
+DrawPlayerHPBarStatusBattlePredef: ; 4ff96 (13:7f96)
+    dbw BANK(DrawPlayerHPBarStatusBattle),DrawPlayerHPBarStatusBattle ; 5F
+    dbw BANK(DrawPlayerHPBarParty),DrawPlayerHPBarParty
     dbw BANK(Func_1c9c6),Func_1c9c6
     dbw BANK(Func_59035),Func_59035
     dbw BANK(TestPhysicalSpecial_),TestPhysicalSpecial_ ; 63
@@ -100112,8 +100132,8 @@ Unknown_7219e: ; 7219e (1c:619e)
 
 Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP nella battaglia e altre migliorie ; TODO
 ;INCBIN "baserom.gbc",$721b5,$721fa - $721b5
-    db $22
-    db $05
+    db $23
+    db $06
 
     ; main palette = backsprite player,bottombox using
     db $07,$00 ; $07,$0A
@@ -100130,6 +100150,10 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
     ; frontsprite opponent
     db $03,$05 ; $03,$0F
     db $0B,$00,$13,$06
+
+    ; Damage/Cure Line Opponent
+    db $02,%00000101
+    db $00,$04,$0A,$04
 
     ; Catch Flag opponent
     db $02,$05 ; $03,$0F
@@ -130733,7 +130757,7 @@ _DrawCurrentMonGenderInBattle:
     push af
     ld a,[W_PLAYERMONLEVEL]
     cp 10
-    FuncCoord 17,8
+    FuncCoord 17,08 ; Player Gender in Battle
     ld hl,Coord
     jr nc,.GreaterThen9
     dec hl
@@ -134157,9 +134181,9 @@ HidePlayerBattleHudAndStandarizePalette_:
     and a
     ret z
     ; Remove Player Battle Stats Frame
-    FuncCoord 10,7
+    FuncCoord 09,07
     ld hl,Coord
-    ld bc,$050A
+    ld bc,$050B ; 05 | 11
     call ClearScreenArea
     ; Change Battle Screen Palette to Player's Pkmn Color
     ld hl,wFlagNoHpPalBit2
@@ -134342,12 +134366,12 @@ DetermineCoordinateStatsBox:
     and a
     jr z,.OutOfBattleBattle
 .InBattle
-    FuncCoord 0,4
+    FuncCoord 00,06
     ld hl,Coord
     ld b,$a
     ld c,$8
     call TextBoxBorder
-    FuncCoord 1,5
+    FuncCoord 01,07
     ld hl,Coord
     ld bc,$0019
     ret
@@ -135048,7 +135072,7 @@ LoadFontTilePatternsWithWall:
     call GoodCopyVideoData
     ld de,OtherIcon_w
     ld hl,$8D20
-    ld bc,(BANK(OtherIcon_w) << 8 | $9)
+    ld bc,(BANK(OtherIcon_w) << 8 | 10)
     jp GoodCopyVideoData
 
 _LoadGhostPic:
@@ -135817,7 +135841,7 @@ HandleStatusScreen1:
     ;call PlaceString
     FuncCoord 10,3
     ld hl,Coord
-    PREDEF DrawHPBarPredef ; predef $5f
+    PREDEF DrawPlayerHPBarStatusBattlePredef ; predef $5f
     ld hl,$cf25
     call GetHealthBarColor
     ld b,$3
@@ -136616,7 +136640,7 @@ DisplayDepositWithdrawMenu_:
     call GoPAL_SET_CF1C
     call LoadGBPal
     jr .ReturnFromStatusScreenOrShiftNull
-.ResetConditions
+.ResetConditions ; carry flag contains function result, don't override it!
     ; Restore Update Sprites Flag
     ld a,b
     ld [$cfcb],a
@@ -136624,7 +136648,7 @@ DisplayDepositWithdrawMenu_:
     ld hl,wFlagMoveRelearnEngagedBit7
     res 7,[hl]
     ; Quick Joypad
-    xor a
+    ld a,0
     ld [$ffb7],a
     ret
 .right
@@ -136804,6 +136828,89 @@ DisplayDepositWithdrawMenu_:
     call PrintText
     and a ; rcf
     ret
+
+; ────────────────────────────────────────────────────────────────
+; PRINT DAMAGE
+; ────────────────────────────────────────────────────────────────
+
+PrintBattleValueNearMon_:
+    ld hl,wPrintBattleValueBit0
+    bit 0,[hl]
+    res 0,[hl]
+    ret z
+    call .GetHlPointerToTextArea
+    push hl
+    call .ClearScreenArea
+    pop hl
+    inc hl ; Sign Space
+    ld de,wBattleValueToPrint
+    ld bc,$0205 ; %00000010 | 05
+    call PrintNumber
+    call .PrintSign
+    ; Initialize Counter
+    ld a,[$fff3] ; whose turn?
+    and a
+    ld a,[W_PLAYERMOVEEFFECT]
+    jr z,.effect
+    ld a,[W_ENEMYMOVEEFFECT]
+.effect
+    cp TWO_TO_FIVE_ATTACKS_EFFECT
+    ld a,4
+    jr z,.StoreCounter
+    ld a,20
+.StoreCounter
+    ld [wBattleValueCounter],a
+    ret
+    
+.ClearScreenArea
+    ld bc,$0106 ; 01 | 06
+    jp ClearScreenArea
+
+.GetHlPointerToTextArea
+    bit 1,[hl] ; wFlagValueToPlayerBit1
+    res 1,[hl] ; ...
+    FuncCoord 06,04 ; Damage to Enemy
+    ld hl,Coord
+    ret z
+    FuncCoord 03,05 ; Damage to Player
+    ld hl,Coord
+    ret
+
+.CheckCure
+    push hl
+    ld hl,wFlagBattleCureBit7
+    bit 7,[hl]
+    res 7,[hl]
+    pop hl
+    ret
+
+.PrintSign
+    dec hl
+    ld a,[hl]
+    cp $7F ; Empty Space
+    jr nz,.PrintSign
+    call .CheckCure
+    ld a,$D2 ; Plus Symbol
+    jr nz,.SignDone
+    ld a,$E3 ; Minus Symbol
+.SignDone
+    ld [hl],a
+    ret
+
+RemoveBattleValue_:
+    ld hl,wBattleValueCounter
+.loop
+    call Delay3
+    ld a,[hl]
+    and a
+    jr z,.skip
+    dec [hl]
+    jr nz,.loop
+.skip
+    FuncCoord 00,04
+    ld hl,Coord
+    ld bc,$020C ; 02 | 12
+    jp ClearScreenArea
 
 ; ──────────────────────────────────────────────────────────────────────
 

@@ -1673,6 +1673,13 @@ NEXTU
 wFieldMoves: ; def0
     ds 9
 
+NEXTU
+
+wBattleValueToPrint: ; def0
+    ds 2
+wBattleValueCounter: ; def2
+    ds 1
+
 ENDU
 
 ; ────────────────────────────────────────────────────
@@ -1685,7 +1692,8 @@ wArrayMiniSpriteLoaded: ; df2f
 SECTION "DenimFlags",WRAMX[$df35],BANK[1]
 
 wDigCaveAerodactylTrigBit0 ; df35 ; bit 0
-wFlagDamageToPlayerBit1    ; df35 ; bit 1
+wPrintBattleValueBit0      ; df35 ; bit 0 = Trigger Print Battle Value
+wFlagValueToPlayerBit1     ; df35 ; bit 1 = Print Battle Value to Player
 wFlagSortMoveBit1          ; df35 ; bit 1 = Sort Moves in Moves Menu (SELECT)
 wFlagShinyBit2             ; df35 ; bit 2
 wDigCaveAerodactylBeatBit3 ; df35 ; bit 3
@@ -1694,7 +1702,7 @@ wFlagBackFrontSpriteBit56  ; df35 ; bit 5
                            ; df35 ; bit 6
 wFlagFlashingHealBallBit7  ; df35 ; bit 7
 wSpriteOAMBySpeciesBit7    ; df35 ; bit 7 = Flag Single Mon ID Sprite
-wDrawMoveDetailsBit7       ; df35 ; bit 7 = Enable Move Details in Moves Menu
+wFlagBattleCureBit7        ; df35 ; bit 7 = Print "Cure" intead of damage
     ds 1
 
 wFlagPlaceTitleScreen ; df36 ; counter for title screen
