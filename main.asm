@@ -134366,12 +134366,12 @@ DetermineCoordinateStatsBox:
     and a
     jr z,.OutOfBattleBattle
 .InBattle
-    FuncCoord 0,4
+    FuncCoord 00,06
     ld hl,Coord
     ld b,$a
     ld c,$8
     call TextBoxBorder
-    FuncCoord 1,5
+    FuncCoord 01,07
     ld hl,Coord
     ld bc,$0019
     ret
