@@ -60755,6 +60755,9 @@ PrintBattleValueNearSubstitute:
     ld b,BANK(PrintBattleValueNearMon_)
     ld hl,PrintBattleValueNearMon_
     call Bankswitch
+    ld b,BANK(RemoveBattleValue_)
+    ld hl,RemoveBattleValue_
+    call Bankswitch
     ld hl,SubstituteTookDamageText
     ret
 
@@ -136819,7 +136822,7 @@ PrintBattleValueNearMon_:
     call PrintNumber
     call .PrintSign
     ld hl,wBattleValueCounter
-    ld [hl],25
+    ld [hl],16
     ret
     
 .ClearScreenArea
