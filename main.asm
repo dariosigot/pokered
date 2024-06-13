@@ -23121,10 +23121,16 @@ UseItem_: ; Moved in the Bank
     ld a,1
     ld [$cd6a],a
     ld a,[$cf91]    ;contains item_ID
-    cp a,TM_01
+    cp $FF
+    jr z,.skip
+    cp TM_01
     jp nc,ItemUseTMHM
+    cp ITEM_END_LIST
+    jr c,.skip
+    ld a,$FF
+.skip
     ld hl,.ItemUsePtrTable
-    dec a
+    inc a
     add a
     ld c,a
     ld b,0
@@ -23134,6 +23140,8 @@ UseItem_: ; Moved in the Bank
     ld l,a
     jp hl
 .ItemUsePtrTable
+    dw UnusableItem      ; ITEM_FF
+    dw UnusableItem      ; ITEM_00
     dw ItemUseBall       ; MASTER_BALL
     dw ItemUseBall       ; ULTRA_BALL
     dw ItemUseBall       ; GREAT_BALL
@@ -29965,6 +29973,8 @@ StartMenu_Item: ; 13302 (4:7302)
 .useItem
     ld [$d152],a
     ld a,[$cf91]
+    cp $FF
+    jr z,.useItem_Standard
     cp a,TM_01
     jr nc,.useItem_partyMenu
     ld hl,UsableItems_CloseMenu
@@ -29976,6 +29986,7 @@ StartMenu_Item: ; 13302 (4:7302)
     ld de,1
     call IsInArray
     jr c,.useItem_partyMenu
+.useItem_Standard
     call UseItem
     jp ItemMenuLoop
 .useItem_closeMenu
@@ -30008,8 +30019,6 @@ StartMenu_Item: ; 13302 (4:7302)
     and a
     jr nz,.skipAskingQuantity
     ld a,[$cf91]
-    ds 3 ; call IsItemHM
-    ds 2 ; jr c,.skipAskingQuantity
     call DisplayChooseQuantityMenu
     inc a
     jr z,.tossZeroItems
@@ -131134,7 +131143,7 @@ GenderTable:
     dsn OTHGEND,OTHGEND,OTHGEND,MALE_50 ; ARTICUNO,ZAPDOS,MOLTRES,DRATINI
     dsn MALE_50,MALE_50,OTHGEND,OTHGEND ; DRAGONAIR,DRAGONITE,MEWTWO,MEW
 
-ItemNames: ; 472b (1:472b)
+ItemNames:
     db "MASTER BALL@"  ; $01
     db "ULTRA BALL@"   ; $02
     db "GREAT BALL@"   ; $03
@@ -131330,67 +131339,67 @@ ItemNames: ; 472b (1:472b)
     db "?@"            ; $C1
     db "?@"            ; $C2
     db "?@"            ; $C3
-    db "TM01:M.PNCH@"  ; $C4 ; TM_01 ; Market
-    db "TM02:RAZ.WND@" ; $C5 ; TM_02 ; Market
-    db "TM03:SW.DNCE@" ; $C6 ; TM_03
-    db "TM04:WHRLWND@" ; $C7 ; TM_04
-    db "TM05:MEG.KCK@" ; $C8 ; TM_05 ; Market
-    db "TM06:TOXIC@"   ; $C9 ; TM_06
-    db "TM07:HRN DR.@" ; $CA ; TM_07 ; Market
-    db "TM08:BDY SLM@" ; $CB ; TM_08
-    db "TM09:TAK.DWN@" ; $CC ; TM_09 ; Market
-    db "TM10:DB.EDG@"  ; $CD ; TM_10
-    db "TM11:BUB.B.@"  ; $CE ; TM_11
-    db "TM12:WTR GUN@" ; $CF ; TM_12
-    db "TM13:ICE BM.@" ; $D0 ; TM_13
-    db "TM14:BLZZARD@" ; $D1 ; TM_14
-    db "TM15:HYP.B.@"  ; $D2 ; TM_15
-    db "TM16:PAY DAY@" ; $D3 ; TM_16
-    db "TM17:SUBMIS.@" ; $D4 ; TM_17 ; Market
-    db "TM18:COUNTER@" ; $D5 ; TM_18
-    db "TM19:SSM TOS@" ; $D6 ; TM_19
-    db "TM20:RAGE@"    ; $D7 ; TM_20
-    db "TM21:M.DRAIN@" ; $D8 ; TM_21
-    db "TM22:SOLRBM.@" ; $D9 ; TM_22
-    db "TM23:DRG RGE@" ; $DA ; TM_23
-    db "TM24:THUNDRB@" ; $DB ; TM_24
-    db "TM25:THUNDER@" ; $DC ; TM_25
-    db "TM26:EARTHQ.@" ; $DD ; TM_26
-    db "TM27:FISSURE@" ; $DE ; TM_27
-    db "TM28:DIG@"     ; $DF ; TM_28
-    db "TM29:PSYCHIC@" ; $E0 ; TM_29
-    db "TM30:TELEPRT@" ; $E1 ; TM_30
-    db "TM31:MIMIC@"   ; $E2 ; TM_31
-    db "TM32:DB.TEAM@" ; $E3 ; TM_32 ; Market
-    db "TM33:REFLECT@" ; $E4 ; TM_33 ; Market
-    db "TM34:BIDE@"    ; $E5 ; TM_34
-    db "TM35:METRONM@" ; $E6 ; TM_35
-    db "TM36:SELFDST@" ; $E7 ; TM_36
-    db "TM37:FLMTRWR@" ; $E8 ; TM_37
-    db "TM38:FIR.BLS@" ; $E9 ; TM_38
-    db "TM39:SWIFT@"   ; $EA ; TM_39
-    db "TM40:SKUL B.@" ; $EB ; TM_40
-    db "TM41:STRGGLE@" ; $EC ; TM_41
-    db "TM42:DRM EAT@" ; $ED ; TM_42
-    db "TM43:SKY ATK@" ; $EE ; TM_43
-    db "TM44:REST@"    ; $EF ; TM_44
-    db "TM45:THND WV@" ; $F0 ; TM_45
-    db "TM46:PSYWAVE@" ; $F1 ; TM_46
-    db "TM47:EXPLOS.@" ; $F2 ; TM_47
-    db "TM48:RCK SLD@" ; $F3 ; TM_48
-    db "TM49:TRI ATK@" ; $F4 ; TM_49
-    db "TM50:SUBSTIT@" ; $F5 ; TM_50
-    db "TM51:BLADE@"   ; $F6 ; TM_51
-    db "TM52:SWOOP@"   ; $F7 ; TM_52
-    db "TM53:TSUNAMI@" ; $F8 ; TM_53
-    db "TM54:STRIKE@"  ; $F9 ; TM_54
-    db "TM55:FLASH@"   ; $FA ; TM_55
-    db "TM56:STRGGLE@" ; $FB ; TM_56
-    db "?@"            ; $FC
-    db "?@"            ; $FD
-    db "?@"            ; $FE
+    db "?@"            ; $C4
+    db "?@"            ; $C5
+    db "?@"            ; $C6
+    db "TM01:M.PNCH@"  ; $C7 ; TM_01 ; Market
+    db "TM02:RAZ.WND@" ; $C8 ; TM_02 ; Market
+    db "TM03:SW.DNCE@" ; $C9 ; TM_03
+    db "TM04:WHRLWND@" ; $CA ; TM_04
+    db "TM05:MEG.KCK@" ; $CB ; TM_05 ; Market
+    db "TM06:TOXIC@"   ; $CC ; TM_06
+    db "TM07:HRN DR.@" ; $CD ; TM_07 ; Market
+    db "TM08:BDY SLM@" ; $CE ; TM_08
+    db "TM09:TAK.DWN@" ; $CF ; TM_09 ; Market
+    db "TM10:DB.EDG@"  ; $D0 ; TM_10
+    db "TM11:BUB.B.@"  ; $D1 ; TM_11
+    db "TM12:WTR GUN@" ; $D2 ; TM_12
+    db "TM13:ICE BM.@" ; $D3 ; TM_13
+    db "TM14:BLZZARD@" ; $D4 ; TM_14
+    db "TM15:HYP.B.@"  ; $D5 ; TM_15
+    db "TM16:PAY DAY@" ; $D6 ; TM_16
+    db "TM17:SUBMIS.@" ; $D7 ; TM_17 ; Market
+    db "TM18:COUNTER@" ; $D8 ; TM_18
+    db "TM19:SSM TOS@" ; $D9 ; TM_19
+    db "TM20:RAGE@"    ; $DA ; TM_20
+    db "TM21:M.DRAIN@" ; $DB ; TM_21
+    db "TM22:SOLRBM.@" ; $DC ; TM_22
+    db "TM23:DRG RGE@" ; $DD ; TM_23
+    db "TM24:THUNDRB@" ; $DE ; TM_24
+    db "TM25:THUNDER@" ; $DF ; TM_25
+    db "TM26:EARTHQ.@" ; $E0 ; TM_26
+    db "TM27:FISSURE@" ; $E1 ; TM_27
+    db "TM28:DIG@"     ; $E2 ; TM_28
+    db "TM29:PSYCHIC@" ; $E3 ; TM_29
+    db "TM30:TELEPRT@" ; $E4 ; TM_30
+    db "TM31:MIMIC@"   ; $E5 ; TM_31
+    db "TM32:DB.TEAM@" ; $E6 ; TM_32 ; Market
+    db "TM33:REFLECT@" ; $E7 ; TM_33 ; Market
+    db "TM34:BIDE@"    ; $E8 ; TM_34
+    db "TM35:METRONM@" ; $E9 ; TM_35
+    db "TM36:SELFDST@" ; $EA ; TM_36
+    db "TM37:FLMTRWR@" ; $EB ; TM_37
+    db "TM38:FIR.BLS@" ; $EC ; TM_38
+    db "TM39:SWIFT@"   ; $ED ; TM_39
+    db "TM40:SKUL B.@" ; $EE ; TM_40
+    db "TM41:STRGGLE@" ; $EF ; TM_41
+    db "TM42:DRM EAT@" ; $F0 ; TM_42
+    db "TM43:SKY ATK@" ; $F1 ; TM_43
+    db "TM44:REST@"    ; $F2 ; TM_44
+    db "TM45:THND WV@" ; $F3 ; TM_45
+    db "TM46:PSYWAVE@" ; $F4 ; TM_46
+    db "TM47:EXPLOS.@" ; $F5 ; TM_47
+    db "TM48:RCK SLD@" ; $F6 ; TM_48
+    db "TM49:TRI ATK@" ; $F7 ; TM_49
+    db "TM50:SUBSTIT@" ; $F8 ; TM_50
+    db "TM51:BLADE@"   ; $F9 ; TM_51
+    db "TM52:SWOOP@"   ; $FA ; TM_52
+    db "TM53:TSUNAMI@" ; $FB ; TM_53
+    db "TM54:STRIKE@"  ; $FC ; TM_54
+    db "TM55:FLASH@"   ; $FD ; TM_55
+    db "TM56:STRGGLE@" ; $FE ; TM_56
     db "CANCEL@"       ; $FF
-    db "ITEM 00@"      ; $00
+    db "?@"            ; $00
 
 ; four tiles: pokeball,black pokeball (status ailment),crossed out pokeball (faited) and pokeball slot (no mon)
 PokeballTileGraphics:
