@@ -13,13 +13,13 @@
     db SCRATCH      , NO_ADDITIONAL_EFFECT       ,  40 , NORMAL   , 255 , 06 ; pp 35 ; 0
     db VICEGRIP     , NO_ADDITIONAL_EFFECT       ,  60 , NORMAL   , 255 , 07 ; pp 30 ; 0 ; Pwr 55 -> 60
     db GUILLOTINE   , OHKO_EFFECT                ,   1 , NORMAL   ,  76 , 40 ; pp  5 ; -
-    db RAZOR_WIND   , CHARGE_EFFECT              , 120 , FLYING   , 255 , 20 ; pp 10 ; 1 ; Type Normal -> Flying ; Acr 191 -> 255 ; Pwr 80 -> 120
+    db RAZOR_WIND   , CHARGE_EFFECT              , 120 , WIND     , 255 , 20 ; pp 10 ; 1 ; Type Normal -> WIND   ; Acr 191 -> 255 ; Pwr 80 -> 120
     db SWORDS_DANCE , ATTACK_UP2_EFFECT          ,   0 , NORMAL   , 255 , 20 ; pp 10 ; - ; PP 30 -> 10
     db BLADE        , NO_ADDITIONAL_EFFECT       ,  55 , NORMAL   , 242 , 07 ; pp 30 ; 0 ; Pwr 50 -> 55
-    db GUST         , NO_ADDITIONAL_EFFECT       ,  40 , FLYING   , 255 , 06 ; pp 35 ; 1 ; Type Normal -> Flying
-    db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  60 , FLYING   , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 60 ; PP 35 -> 25
-    db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,   0 , FLYING   , 255 , 10 ; pp 20 ; - ; Type Normal -> Flying ; Acr 216 -> 255
-    db SWOOP        , FLY_EFFECT                 ,  90 , FLYING   , 242 , 14 ; pp 15 ; 0 ; Pwr 70 -> 90
+    db GUST         , NO_ADDITIONAL_EFFECT       ,  40 , WIND     , 255 , 06 ; pp 35 ; 1 ; Type Normal -> WIND  
+    db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  60 , WIND     , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 60 ; PP 35 -> 25
+    db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,   0 , WIND     , 255 , 10 ; pp 20 ; - ; Type Normal -> WIND   ; Acr 216 -> 255
+    db SWOOP        , FLY_EFFECT                 ,  90 , WIND     , 242 , 14 ; pp 15 ; 0 ; Pwr 70 -> 90
     db BIND         , TRAPPING_EFFECT            ,  10 , NORMAL   , 153 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Acr 191 -> 153
     db SLAM         , NO_ADDITIONAL_EFFECT       ,  80 , NORMAL   , 191 , 10 ; pp 20 ; 0
     db VINE_WHIP    , NO_ADDITIONAL_EFFECT       ,  45 , GRASS    , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 45 ; PP 10 -> 25
@@ -64,8 +64,8 @@
     db BUBBLEBEAM   , SPEED_DOWN_SIDE_EFFECT     ,  65 , WATER    , 255 , 10 ; pp 20 ; 1
     db AURORA_BEAM  , ATTACK_DOWN_SIDE_EFFECT    ,  65 , ICE      , 255 , 10 ; pp 20 ; 1
     db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , NORMAL   , 229 , 40 ; pp  5 ; 1
-    db PECK         , NO_ADDITIONAL_EFFECT       ,  35 , FLYING   , 255 , 06 ; pp 35 ; 0
-    db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  80 , FLYING   , 255 , 10 ; pp 20 ; 0
+    db PECK         , NO_ADDITIONAL_EFFECT       ,  35 , WIND     , 255 , 06 ; pp 35 ; 0
+    db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  80 , WIND     , 255 , 10 ; pp 20 ; 0
     db SUBMISSION   , RECOIL_EFFECT              ,  80 , FIGHTING , 204 , 08 ; pp 25 ; 0
     db LOW_KICK     , FLINCH_SIDE_EFFECT2        ,  50 , FIGHTING , 255 , 10 ; pp 20 ; 0 ; Acr 229 -> 255
     db COUNTER      , NO_ADDITIONAL_EFFECT       ,   1 , FIGHTING , 255 , 10 ; pp 20 ; -
@@ -119,7 +119,7 @@
     db FOCUS_ENERGY , FOCUS_ENERGY_EFFECT        ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
     db BIDE         , BIDE_EFFECT                ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
     db METRONOME    , METRONOME_EFFECT           ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
-    db MIRROR_MOVE  , MIRROR_MOVE_EFFECT         ,   0 , FLYING   , 255 , 10 ; pp 20 ; -
+    db MIRROR_MOVE  , MIRROR_MOVE_EFFECT         ,   0 , WIND     , 255 , 10 ; pp 20 ; -
     db SELFDESTRUCT , EXPLODE_EFFECT             , 200 , NORMAL   , 255 , 40 ; pp  5 ; 0 ; Pwr 130 -> 200
     db EGG_BOMB     , NO_ADDITIONAL_EFFECT       , 100 , NORMAL   , 191 , 20 ; pp 10 ; 0
     db LICK         , PARALYZE_SIDE_EFFECT2      ,  30 , GHOST    , 255 , 07 ; pp 30 ; 0 ; Pwr 20 -> 30
@@ -143,7 +143,7 @@
     db BARRAGE      , TWO_TO_FIVE_ATTACKS_EFFECT ,  15 , GRASS    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Grass
     db LEECH_LIFE   , DRAIN_HP_EFFECT            ,  20 , BUG      , 255 , 14 ; pp 15 ; 0
     db LOVELY_KISS  , SLEEP_EFFECT               ,   0 , NORMAL   , 191 , 20 ; pp 10 ; -
-    db SKY_ATTACK   , CHARGE_EFFECT              , 140 , FLYING   , 229 , 40 ; pp  5 ; 0
+    db SKY_ATTACK   , CHARGE_EFFECT              , 140 , WIND     , 229 , 40 ; pp  5 ; 0
     db TRANSFORM    , TRANSFORM_EFFECT           ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
     db BUBBLE       , SPEED_DOWN_SIDE_EFFECT     ,  30 , WATER    , 255 , 07 ; pp 30 ; 1 ; Pwr 20 -> 30
     db DIZZY_PUNCH  , NO_ADDITIONAL_EFFECT       ,  70 , NORMAL   , 255 , 20 ; pp 10 ; 0
@@ -165,4 +165,4 @@
     db SUPER_FANG   , SUPER_FANG_EFFECT          ,   1 , NORMAL   , 229 , 20 ; pp 10 ; -
     db SLASH        , NO_ADDITIONAL_EFFECT       ,  70 , NORMAL   , 255 , 10 ; pp 20 ; 0
     db SUBSTITUTE   , SUBSTITUTE_EFFECT          ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
-    db STRUGGLE     , RECOIL_EFFECT              ,  50 , NORMAL   , 255 , 20 ; pp 10 ; 0
+    db STRUGGLE     , RECOIL_EFFECT              ,  50 , TYPE_NA  , 255 , 20 ; pp 10 ; 0 ; Type Normal -> N.A.

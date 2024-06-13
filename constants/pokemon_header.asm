@@ -2,7 +2,7 @@ MissingNoBaseStats:
 	db 0              ; pokedex id
 	db 33,MUK,0       ; Hp, Attack, Defense
 	db 29,VOLTORB     ; Speed, Special
-	db VOLTORB,0      ; Bird/Normal
+	db TYPE_NA,TYPE_NA ; db VOLTORB,0      ; Bird/Normal
 	db 29,WEEZING,MUK ; CatchRate, BaseExpYield, Sprite Dimension
 	
 	dw MissingNoPicFront, MissingNoPicBack ;	db 0,25,KOFFING,WEEZING
@@ -209,7 +209,7 @@ CharizardBaseStats: ; 3846a (e:446a)
     db 85 ; base special
 
     db FIRE ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 45 ; catch rate
     db 209 ; base exp yield
@@ -431,7 +431,7 @@ ButterfreeBaseStats: ; 38512 (e:4512)
     db 80 ; base special
 
     db BUG ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 45 ; catch rate
     db 160 ; base exp yield
@@ -579,7 +579,7 @@ PidgeyBaseStats: ; 38582 (e:4582)
     db 35 ; base special
 
     db NORMAL ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 255 ; catch rate
     db 55 ; base exp yield
@@ -616,7 +616,7 @@ PidgeottoBaseStats: ; 3859e (e:459e)
     db 50 ; base special
 
     db NORMAL ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 120 ; catch rate
     db 113 ; base exp yield
@@ -653,7 +653,7 @@ PidgeotBaseStats: ; 385ba (e:45ba)
     db 70 ; base special
 
     db NORMAL ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 45 ; catch rate
     db 172 ; base exp yield
@@ -764,7 +764,7 @@ SpearowBaseStats: ; 3860e (e:460e)
     db 31 ; base special
 
     db NORMAL ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 255 ; catch rate
     db 58 ; base exp yield
@@ -801,7 +801,7 @@ FearowBaseStats: ; 3862a (e:462a)
     db 61 ; base special
 
     db NORMAL ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 90 ; catch rate
     db 162 ; base exp yield
@@ -1504,7 +1504,7 @@ ZubatBaseStats: ; 3883e (e:483e)
     db 40 ; base special
 
     db POISON ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 255 ; catch rate
     db 54 ; base exp yield
@@ -1541,7 +1541,7 @@ GolbatBaseStats: ; 3885a (e:485a)
     db 75 ; base special
 
     db POISON ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 90 ; catch rate
     db 171 ; base exp yield
@@ -3058,7 +3058,7 @@ FarfetchdBaseStats: ; 38cd6 (e:4cd6)
     db 58 ; base special
 
     db NORMAL ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 45 ; catch rate
     db 94 ; base exp yield
@@ -3095,7 +3095,7 @@ DoduoBaseStats: ; 38cf2 (e:4cf2)
     db 35 ; base special
 
     db NORMAL ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 190 ; catch rate
     db 96 ; base exp yield
@@ -3132,7 +3132,7 @@ DodrioBaseStats: ; 38d0e (e:4d0e)
     db 60 ; base special
 
     db NORMAL ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 45 ; catch rate
     db 158 ; base exp yield
@@ -4538,7 +4538,7 @@ ScytherBaseStats: ; 39136 (e:5136)
     db 55 ; base special
 
     db BUG ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 45 ; catch rate
     db 187 ; base exp yield
@@ -4797,7 +4797,7 @@ GyaradosBaseStats: ; 391fa (e:51fa)
     db 100 ; base special
 
     db WATER ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 45 ; catch rate
     db 214 ; base exp yield
@@ -5241,7 +5241,7 @@ AerodactylBaseStats: ; 3934a (e:534a)
     db 60 ; base special
 
     db ROCK ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 45 ; catch rate
     db 202 ; base exp yield
@@ -5315,7 +5315,7 @@ ArticunoBaseStats: ; 39382 (e:5382)
     db 125 ; base special
 
     db ICE ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 3 ; catch rate
     db 215 ; base exp yield
@@ -5352,7 +5352,7 @@ ZapdosBaseStats: ; 3939e (e:539e)
     db 125 ; base special
 
     db ELECTRIC ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 3 ; catch rate
     db 216 ; base exp yield
@@ -5389,7 +5389,7 @@ MoltresBaseStats: ; 393ba (e:53ba)
     db 125 ; base special
 
     db FIRE ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 3 ; catch rate
     db 217 ; base exp yield
@@ -5500,7 +5500,7 @@ DragoniteBaseStats: ; 3940e (e:540e)
     db 100 ; base special
 
     db DRAGON ; species type 1
-    db FLYING ; species type 2
+    db WIND ; species type 2
 
     db 45 ; catch rate
     db 218 ; base exp yield

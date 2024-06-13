@@ -46870,67 +46870,46 @@ asm_27d9f: ; 27d9f (9:7d9f)
     pop hl
     jp PlaceString
 
-TypeNamePointers: ; 27dae (9:7dae)
-    dw Type00Name
-    dw Type01Name
-    dw Type02Name
-    dw Type03Name
-    dw Type04Name
-    dw Type05Name
-    dw Type06Name
-    dw Type07Name
-    dw Type08Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type14Name
-    dw Type15Name
-    dw Type16Name
-    dw Type17Name
-    dw Type18Name
-    dw Type19Name
-    dw Type1AName
-
-Type00Name: ; 27de4 (9:7de4)
+Type00Name:
     db "NORMAL@"
-Type01Name: ; 27deb (9:7deb)
+Type01Name:
     db "FIGHTING@"
-Type02Name: ; 27df4 (9:7df4)
-    db "FLYING@"
-Type03Name: ; 27dfb (9:7dfb)
+Type02Name:
+    db "WIND@"
+Type03Name:
     db "POISON@"
-Type14Name: ; 27e02 (9:7e02)
-    db "FIRE@"
-Type15Name: ; 27e07 (9:7e07)
-    db "WATER@"
-Type16Name: ; 27e0d (9:7e0d)
-    db "GRASS@"
-Type17Name: ; 27e13 (9:7e13)
-    db "ELECTRIC@"
-Type18Name: ; 27e1c (9:7e1c)
-    db "PSYCHIC@"
-Type19Name: ; 27e24 (9:7e24)
-    db "ICE@"
-Type04Name: ; 27e28 (9:7e28)
+Type04Name:
     db "GROUND@"
-Type05Name: ; 27e2f (9:7e2f)
+Type05Name:
     db "ROCK@"
-Type06Name: ; 27e34 (9:7e34)
-    db "BIRD@"
-Type07Name: ; 27e39 (9:7e39)
+Type07Name:
     db "BUG@"
-Type08Name: ; 27e3d (9:7e3d)
+Type08Name:
     db "GHOST@"
-Type1AName: ; 27e43 (9:7e43)
+Type09Name:
+    db "METAL@"
+Type12Name:
+    db "IVORY@"
+Type13Name:
+    db "RUBBER@"
+Type14Name:
+    db "FIRE@"
+Type15Name:
+    db "WATER@"
+Type16Name:
+    db "GRASS@"
+Type17Name:
+    db "ELECTRIC@"
+Type18Name:
+    db "PSYCHIC@"
+Type19Name:
+    db "ICE@"
+Type1AName:
     db "DRAGON@"
+TypeNAName:
+    db "N.A.@"
+
+SECTION "SaveTrainerName",ROMX[$7E4A],BANK[$9]
 
 SaveTrainerName: ; 27e4a (9:7e4a)
     ld hl,TrainerNamePointers
@@ -47071,6 +47050,35 @@ UnnamedText_27fb3: ; 27fb3 (9:7fb3)
     db $0a
     TX_FAR _UnnamedText_27fb3
     db "@"
+
+TypeNamePointers:
+    dw Type00Name ; $00 : Normal
+    dw Type01Name ; $01 : Fighting
+    dw Type02Name ; $02 : Wind
+    dw Type03Name ; $03 : Poison
+    dw Type04Name ; $04 : Ground
+    dw Type05Name ; $05 : Rock
+    dw TypeNAName ;
+    dw Type07Name ; $07 : Bug
+    dw Type08Name ; $08 : Ghost
+    dw Type09Name ; $09 : Metal
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw Type12Name ; $12 : Ivory
+    dw Type13Name ; $13 : Rubber
+    dw Type14Name ; $14 : Fire
+    dw Type15Name ; $15 : Water
+    dw Type16Name ; $16 : Grass
+    dw Type17Name ; $17 : Electric
+    dw Type18Name ; $18 : Psychic
+    dw Type19Name ; $19 : Ice
+    dw Type1AName ; $1A : Dragon
 
 SECTION "bankA",ROMX,BANK[$A]
 GrowlithePicFront: ; 28000 (a:4000)
@@ -57365,103 +57373,7 @@ TypeEffects:
 ;     05 is ×0.5
 ;     00 is ×0
 
-    db NORMAL,ROCK,05
-    db NORMAL,GHOST,00
-
-    db FIGHTING,NORMAL,20
-    db FIGHTING,POISON,05
-    db FIGHTING,FLYING,05
-    db FIGHTING,PSYCHIC,05
-    db FIGHTING,BUG,05
-    db FIGHTING,ROCK,20
-    db FIGHTING,ICE,20
-    db FIGHTING,GHOST,00
-
-    db FLYING,ELECTRIC,05
-    db FLYING,FIGHTING,20
-    db FLYING,BUG,20
-    db FLYING,GRASS,20
-    db FLYING,ROCK,05
-    db FLYING,GHOST,20
-
-    db POISON,GRASS,20
-    db POISON,POISON,05
-    db POISON,GROUND,05
-    db POISON,BUG,20
-    db POISON,ROCK,05
-    db POISON,FIGHTING,20
-
-    db GROUND,FIRE,20
-    db GROUND,ELECTRIC,20
-    db GROUND,GRASS,05
-    db GROUND,BUG,05
-    db GROUND,ROCK,20
-    db GROUND,POISON,20
-    db GROUND,FLYING,00
-
-    db ROCK,FIRE,20
-    db ROCK,FIGHTING,05
-    db ROCK,GROUND,05
-    db ROCK,FLYING,20
-    db ROCK,BUG,20
-    db ROCK,ICE,20
-
-    db BUG,FIRE,05
-    db BUG,GRASS,20
-    db BUG,FIGHTING,05
-    db BUG,FLYING,05
-    db BUG,PSYCHIC,20
-    db BUG,POISON,05
-
-    db GHOST,PSYCHIC,20
-
-    db FIRE,FIRE,05
-    db FIRE,GRASS,20
-    db FIRE,ICE,20
-    db FIRE,WATER,05
-    db FIRE,BUG,20
-    db FIRE,ROCK,05
-    db FIRE,DRAGON,05
-
-    db WATER,WATER,05
-    db WATER,FIRE,20
-    db WATER,ROCK,20
-    db WATER,GRASS,05
-    db WATER,GROUND,20
-    db WATER,DRAGON,05
-
-    db GRASS,GRASS,05
-    db GRASS,WATER,20
-    db GRASS,FIRE,05
-    db GRASS,GROUND,20
-    db GRASS,BUG,05
-    db GRASS,POISON,05
-    db GRASS,ROCK,20
-    db GRASS,FLYING,05
-    db GRASS,DRAGON,05
-
-    db ELECTRIC,WATER,20
-    db ELECTRIC,ELECTRIC,05
-    db ELECTRIC,GRASS,05
-    db ELECTRIC,GROUND,00
-    db ELECTRIC,FLYING,20
-    db ELECTRIC,DRAGON,05
-
-    db PSYCHIC,PSYCHIC,05
-    db PSYCHIC,FIGHTING,20
-    db PSYCHIC,POISON,20
-    db PSYCHIC,GHOST,05
-    db PSYCHIC,BUG,05
-
-    db ICE,ICE,05
-    db ICE,WATER,05
-    db ICE,GRASS,20
-    db ICE,GROUND,20
-    db ICE,FLYING,20
-    db ICE,DRAGON,20
-    db ICE,FIRE,05
-    db ICE,BUG,20
-    db ICE,FIGHTING,05
+    INCLUDE "constants/type_effect.asm"
     db $FF
 
 HandleEnemySwitchingOrUsingAnItemAndThenExecutePlayerMove:
