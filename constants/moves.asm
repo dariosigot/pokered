@@ -48,7 +48,7 @@
     db GROWL        , ATTACK_DOWN1_EFFECT        ,   0 , NORMAL   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
     db ROAR         , SWITCH_AND_TELEPORT_EFFECT ,   0 , NORMAL   , 255 , 10 ; pp 20 ; -
     db SING         , SLEEP_EFFECT               ,   0 , NORMAL   , 140 , 20 ; pp 10 ; - ; PP 15 -> 10
-    db SUPERSONIC   , CONFUSION_EFFECT           ,   0 , NORMAL   , 165 , 10 ; pp 20 ; - ; Acr 140 -> 165
+    db SUPERSONIC   , CONFUSION_EFFECT           ,   0 , NORMAL   , 229 , 14 ; pp 15 ; - ; Acr 140 -> 229 ; PP 20 -> 15
     db SONICBOOM    , SPECIAL_DAMAGE_EFFECT      ,   1 , NORMAL   , 229 , 10 ; pp 20 ; -
     db DISABLE      , DISABLE_EFFECT             ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; Acr 140 -> 255
     db ACID         , DEFENSE_DOWN_SIDE_EFFECT   ,  40 , POISON   , 255 , 07 ; pp 30 ; 1
