@@ -131370,7 +131370,7 @@ ItemNames: ; 472b (1:472b)
     db "TM38:FIR.BLS@" ; $E9 ; TM_38
     db "TM39:SWIFT@"   ; $EA ; TM_39
     db "TM40:SKUL B.@" ; $EB ; TM_40
-    db "TM41:STRUGGLE" ; $FB ; TM_41
+    db "TM41:STRGGLE@" ; $EC ; TM_41
     db "TM42:DRM EAT@" ; $ED ; TM_42
     db "TM43:SKY ATK@" ; $EE ; TM_43
     db "TM44:REST@"    ; $EF ; TM_44
@@ -131384,8 +131384,8 @@ ItemNames: ; 472b (1:472b)
     db "TM52:SWOOP@"   ; $F7 ; TM_52
     db "TM53:TSUNAMI@" ; $F8 ; TM_53
     db "TM54:STRIKE@"  ; $F9 ; TM_54
-    db "TM55:FLASH@"   ; $EC ; TM_55
-    db "TM56:STRUGGLE" ; $FB ; TM_56
+    db "TM55:FLASH@"   ; $FA ; TM_55
+    db "TM56:STRGGLE@" ; $FB ; TM_56
     db "?@"            ; $FC
     db "?@"            ; $FD
     db "?@"            ; $FE
