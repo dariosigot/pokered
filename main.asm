@@ -60786,13 +60786,16 @@ CopyDamage:
     ld [de],a
     ret
 
+RemoveBattleValueBankF:
+    ld b,BANK(RemoveBattleValue_)
+    ld hl,RemoveBattleValue_
+    jp Bankswitch
+
 PrintBattleValueNearSubstitute:
     ld b,BANK(PrintBattleValueNearMon_)
     ld hl,PrintBattleValueNearMon_
     call Bankswitch
-    ld b,BANK(RemoveBattleValue_)
-    ld hl,RemoveBattleValue_
-    call Bankswitch
+    call RemoveBattleValueBankF
     ld hl,SubstituteTookDamageText
     ret
 
@@ -60857,7 +60860,8 @@ SetCureDuringLeechSeed:
     set 7,[hl] ; wFlagBattleCureBit7
     call CopyDamage
     pop bc
-    jp UpdateCurMonHPBar
+    call UpdateCurMonHPBar
+    jp RemoveBattleValueBankF
 
 SetCureDuringAbsorb_:
     push de
@@ -60868,7 +60872,8 @@ SetCureDuringAbsorb_:
     call CopyDamage
     pop hl
     ld a,$48
-    jp Predef ; UpdateHPBar
+    call Predef ; UpdateHPBar
+    jp RemoveBattleValueBankF
 
 ; ────────────────────────────────────────────────────────────────
 
@@ -119060,12 +119065,11 @@ TMNotebookText: ; 88bfd (22:4bfd)
     db $0,"It's a pamphlet",$4f
     db "on TMs.",$51
     db "...",$51
-    db "There are 50 TMs",$4f
+    db "There are 56 TMs",$4f
     db "in all.",$51
-    db "There are also 5",$4f
-    db "PWR that can be",$55
-    db "used repeatedly.",$51
     db "SILPH CO.@@"
+
+SECTION "_TurnPageText",ROMX[$4c6f],BANK[$22]
 
 _TurnPageText: ; 88c6f (22:4c6f)
     db $0,"Turn the page?",$57
@@ -136845,7 +136849,6 @@ DisplayDepositWithdrawMenu_:
 PrintBattleValueNearMon_:
     ld hl,wPrintBattleValueBit0
     bit 0,[hl]
-    res 0,[hl]
     ret z
     call .GetHlPointerToTextArea
     push hl
@@ -136864,11 +136867,21 @@ PrintBattleValueNearMon_:
     ld a,[W_ENEMYMOVEEFFECT]
 .effect
     cp TWO_TO_FIVE_ATTACKS_EFFECT
-    ld a,4
+    ld b,4
     jr z,.StoreCounter
-    ld a,20
+    cp TRAPPING_EFFECT
+    ld b,6
+    jr z,.StoreCounter
+    cp ATTACK_TWICE_EFFECT
+    ld b,10
+    jr z,.StoreCounter
+    cp TWINEEDLE_EFFECT
+    ld b,10
+    jr z,.StoreCounter
+    ld b,20
 .StoreCounter
-    ld [wBattleValueCounter],a
+    ld hl,wBattleValueCounter
+    ld [hl],b
     ret
     
 .ClearScreenArea
@@ -136907,6 +136920,10 @@ PrintBattleValueNearMon_:
     ret
 
 RemoveBattleValue_:
+    ld hl,wPrintBattleValueBit0
+    bit 0,[hl]
+    res 0,[hl]
+    ret z
     ld hl,wBattleValueCounter
 .loop
     call Delay3
