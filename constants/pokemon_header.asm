@@ -24,7 +24,7 @@ BulbasaurBaseStats: ; 383de (e:43de)
     db 65 ; base special
 
     db GRASS ; species type 1
-    db POISON ; species type 2
+    db GRASS ; species type 2
 
     db 45 ; catch rate
     db 64 ; base exp yield
@@ -61,7 +61,7 @@ IvysaurBaseStats: ; 383fa (e:43fa)
     db 80 ; base special
 
     db GRASS ; species type 1
-    db POISON ; species type 2
+    db GRASS ; species type 2
 
     db 45 ; catch rate
     db 141 ; base exp yield
@@ -209,7 +209,7 @@ CharizardBaseStats: ; 3846a (e:446a)
     db 85 ; base special
 
     db FIRE ; species type 1
-    db WIND ; species type 2
+    db DRAGON ; species type 2
 
     db 45 ; catch rate
     db 209 ; base exp yield
@@ -320,7 +320,7 @@ BlastoiseBaseStats: ; 384be (e:44be)
     db 85 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db IVORY ; species type 2
 
     db 45 ; catch rate
     db 210 ; base exp yield
@@ -394,7 +394,7 @@ MetapodBaseStats: ; 384f6 (e:44f6)
     db 25 ; base special
 
     db BUG ; species type 1
-    db BUG ; species type 2
+    db IVORY ; species type 2
 
     db 120 ; catch rate
     db 72 ; base exp yield
@@ -505,7 +505,7 @@ KakunaBaseStats: ; 3854a (e:454a)
     db 25 ; base special
 
     db BUG ; species type 1
-    db POISON ; species type 2
+    db IVORY ; species type 2
 
     db 120 ; catch rate
     db 71 ; base exp yield
@@ -578,7 +578,7 @@ PidgeyBaseStats: ; 38582 (e:4582)
     db 56 ; base speed
     db 35 ; base special
 
-    db NORMAL ; species type 1
+    db WIND ; species type 1
     db WIND ; species type 2
 
     db 255 ; catch rate
@@ -615,7 +615,7 @@ PidgeottoBaseStats: ; 3859e (e:459e)
     db 71 ; base speed
     db 50 ; base special
 
-    db NORMAL ; species type 1
+    db WIND ; species type 1
     db WIND ; species type 2
 
     db 120 ; catch rate
@@ -652,8 +652,8 @@ PidgeotBaseStats: ; 385ba (e:45ba)
     db 91 ; base speed
     db 70 ; base special
 
-    db NORMAL ; species type 1
-    db WIND ; species type 2
+    db WIND ; species type 1
+    db IVORY ; species type 2
 
     db 45 ; catch rate
     db 172 ; base exp yield
@@ -763,7 +763,7 @@ SpearowBaseStats: ; 3860e (e:460e)
     db 70 ; base speed
     db 31 ; base special
 
-    db NORMAL ; species type 1
+    db WIND ; species type 1
     db WIND ; species type 2
 
     db 255 ; catch rate
@@ -800,8 +800,8 @@ FearowBaseStats: ; 3862a (e:462a)
     db 100 ; base speed
     db 61 ; base special
 
-    db NORMAL ; species type 1
-    db WIND ; species type 2
+    db WIND ; species type 1
+    db IVORY ; species type 2
 
     db 90 ; catch rate
     db 162 ; base exp yield
@@ -1134,7 +1134,7 @@ NidoqueenBaseStats: ; 38726 (e:4726)
     db 75 ; base special
 
     db POISON ; species type 1
-    db GROUND ; species type 2
+    db IVORY ; species type 2
 
     db 45 ; catch rate
     db 194 ; base exp yield
@@ -1245,7 +1245,7 @@ NidokingBaseStats: ; 3877a (e:477a)
     db 75 ; base special
 
     db POISON ; species type 1
-    db GROUND ; species type 2
+    db IVORY ; species type 2
 
     db 45 ; catch rate
     db 195 ; base exp yield
@@ -1281,8 +1281,8 @@ ClefairyBaseStats: ; 38796 (e:4796)
     db 35 ; base speed
     db 60 ; base special
 
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db RUBBER ; species type 1
+    db RUBBER ; species type 2
 
     db 150 ; catch rate
     db 68 ; base exp yield
@@ -1318,8 +1318,8 @@ ClefableBaseStats: ; 387b2 (e:47b2)
     db 60 ; base speed
     db 85 ; base special
 
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db RUBBER ; species type 1
+    db RUBBER ; species type 2
 
     db 25 ; catch rate
     db 129 ; base exp yield
@@ -1429,8 +1429,8 @@ JigglypuffBaseStats: ; 38806 (e:4806)
     db 20 ; base speed
     db 25 ; base special
 
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db RUBBER ; species type 1
+    db RUBBER ; species type 2
 
     db 170 ; catch rate
     db 76 ; base exp yield
@@ -1466,8 +1466,8 @@ WigglytuffBaseStats: ; 38822 (e:4822)
     db 45 ; base speed
     db 50 ; base special
 
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db RUBBER ; species type 1
+    db RUBBER ; species type 2
 
     db 50 ; catch rate
     db 109 ; base exp yield
@@ -1578,7 +1578,7 @@ OddishBaseStats: ; 38876 (e:4876)
     db 75 ; base special
 
     db GRASS ; species type 1
-    db POISON ; species type 2
+    db GRASS ; species type 2
 
     db 255 ; catch rate
     db 78 ; base exp yield
@@ -1763,7 +1763,7 @@ VenonatBaseStats: ; 38902 (e:4902)
     db 40 ; base special
 
     db BUG ; species type 1
-    db POISON ; species type 2
+    db PSYCHIC ; species type 2
 
     db 190 ; catch rate
     db 75 ; base exp yield
@@ -1800,7 +1800,7 @@ VenomothBaseStats: ; 3891e (e:491e)
     db 90 ; base special
 
     db BUG ; species type 1
-    db POISON ; species type 2
+    db PSYCHIC ; species type 2
 
     db 75 ; catch rate
     db 138 ; base exp yield
@@ -1985,7 +1985,7 @@ PsyduckBaseStats: ; 389aa (e:49aa)
     db 50 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db PSYCHIC ; species type 2
 
     db 190 ; catch rate
     db 80 ; base exp yield
@@ -2022,7 +2022,7 @@ GolduckBaseStats: ; 389c6 (e:49c6)
     db 80 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db PSYCHIC ; species type 2
 
     db 75 ; catch rate
     db 174 ; base exp yield
@@ -2540,7 +2540,7 @@ BellsproutBaseStats: ; 38b4e (e:4b4e)
     db 70 ; base special
 
     db GRASS ; species type 1
-    db POISON ; species type 2
+    db GRASS ; species type 2
 
     db 255 ; catch rate
     db 84 ; base exp yield
@@ -2725,7 +2725,7 @@ GeodudeBaseStats: ; 38bda (e:4bda)
     db 30 ; base special
 
     db ROCK ; species type 1
-    db GROUND ; species type 2
+    db ROCK ; species type 2
 
     db 255 ; catch rate
     db 86 ; base exp yield
@@ -2762,7 +2762,7 @@ GravelerBaseStats: ; 38bf6 (e:4bf6)
     db 45 ; base special
 
     db ROCK ; species type 1
-    db GROUND ; species type 2
+    db ROCK ; species type 2
 
     db 120 ; catch rate
     db 134 ; base exp yield
@@ -2799,7 +2799,7 @@ GolemBaseStats: ; 38c12 (e:4c12)
     db 55 ; base special
 
     db ROCK ; species type 1
-    db GROUND ; species type 2
+    db ROCK ; species type 2
 
     db 45 ; catch rate
     db 177 ; base exp yield
@@ -2873,7 +2873,7 @@ RapidashBaseStats: ; 38c4a (e:4c4a)
     db 80 ; base special
 
     db FIRE ; species type 1
-    db FIRE ; species type 2
+    db IVORY ; species type 2
 
     db 60 ; catch rate
     db 192 ; base exp yield
@@ -2984,7 +2984,7 @@ MagnemiteBaseStats: ; 38c9e (e:4c9e)
     db 95 ; base special
 
     db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
+    db METAL ; species type 2
 
     db 190 ; catch rate
     db 89 ; base exp yield
@@ -3021,7 +3021,7 @@ MagnetonBaseStats: ; 38cba (e:4cba)
     db 120 ; base special
 
     db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
+    db METAL ; species type 2
 
     db 60 ; catch rate
     db 161 ; base exp yield
@@ -3057,7 +3057,7 @@ FarfetchdBaseStats: ; 38cd6 (e:4cd6)
     db 60 ; base speed
     db 58 ; base special
 
-    db NORMAL ; species type 1
+    db WIND ; species type 1
     db WIND ; species type 2
 
     db 45 ; catch rate
@@ -3094,8 +3094,8 @@ DoduoBaseStats: ; 38cf2 (e:4cf2)
     db 75 ; base speed
     db 35 ; base special
 
-    db NORMAL ; species type 1
-    db WIND ; species type 2
+    db IVORY ; species type 1
+    db IVORY ; species type 2
 
     db 190 ; catch rate
     db 96 ; base exp yield
@@ -3131,8 +3131,8 @@ DodrioBaseStats: ; 38d0e (e:4d0e)
     db 100 ; base speed
     db 60 ; base special
 
-    db NORMAL ; species type 1
-    db WIND ; species type 2
+    db IVORY ; species type 1
+    db IVORY ; species type 2
 
     db 45 ; catch rate
     db 158 ; base exp yield
@@ -3169,7 +3169,7 @@ SeelBaseStats: ; 38d2a (e:4d2a)
     db 70 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db ICE ; species type 2
 
     db 190 ; catch rate
     db 100 ; base exp yield
@@ -3316,7 +3316,7 @@ ShellderBaseStats: ; 38d9a (e:4d9a)
     db 40 ; base speed
     db 45 ; base special
 
-    db WATER ; species type 1
+    db IVORY ; species type 1
     db WATER ; species type 2
 
     db 190 ; catch rate
@@ -3353,7 +3353,7 @@ CloysterBaseStats: ; 38db6 (e:4db6)
     db 70 ; base speed
     db 85 ; base special
 
-    db WATER ; species type 1
+    db IVORY ; species type 1
     db ICE ; species type 2
 
     db 60 ; catch rate
@@ -3391,7 +3391,7 @@ GastlyBaseStats: ; 38dd2 (e:4dd2)
     db 100 ; base special
 
     db GHOST ; species type 1
-    db POISON ; species type 2
+    db GHOST ; species type 2
 
     db 190 ; catch rate
     db 95 ; base exp yield
@@ -3502,7 +3502,7 @@ OnixBaseStats: ; 38e26 (e:4e26)
     db 30 ; base special
 
     db ROCK ; species type 1
-    db GROUND ; species type 2
+    db METAL ; species type 2
 
     db 45 ; catch rate
     db 108 ; base exp yield
@@ -3613,7 +3613,7 @@ KrabbyBaseStats: ; 38e7a (e:4e7a)
     db 25 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db IVORY ; species type 2
 
     db 225 ; catch rate
     db 115 ; base exp yield
@@ -3650,7 +3650,7 @@ KinglerBaseStats: ; 38e96 (e:4e96)
     db 50 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db IVORY ; species type 2
 
     db 60 ; catch rate
     db 206 ; base exp yield
@@ -3687,7 +3687,7 @@ VoltorbBaseStats: ; 38eb2 (e:4eb2)
     db 55 ; base special
 
     db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
+    db RUBBER ; species type 2
 
     db 190 ; catch rate
     db 103 ; base exp yield
@@ -3724,7 +3724,7 @@ ElectrodeBaseStats: ; 38ece (e:4ece)
     db 80 ; base special
 
     db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
+    db RUBBER ; species type 2
 
     db 60 ; catch rate
     db 150 ; base exp yield
@@ -3834,7 +3834,7 @@ CuboneBaseStats: ; 38f22 (e:4f22)
     db 35 ; base speed
     db 40 ; base special
 
-    db GROUND ; species type 1
+    db IVORY ; species type 1
     db GROUND ; species type 2
 
     db 190 ; catch rate
@@ -3871,7 +3871,7 @@ MarowakBaseStats: ; 38f3e (e:4f3e)
     db 45 ; base speed
     db 50 ; base special
 
-    db GROUND ; species type 1
+    db IVORY ; species type 1
     db GROUND ; species type 2
 
     db 75 ; catch rate
@@ -3982,8 +3982,8 @@ LickitungBaseStats: ; 38f92 (e:4f92)
     db 30 ; base speed
     db 60 ; base special
 
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db RUBBER ; species type 1
+    db RUBBER ; species type 2
 
     db 45 ; catch rate
     db 127 ; base exp yield
@@ -4093,8 +4093,8 @@ RhyhornBaseStats: ; 38fe6 (e:4fe6)
     db 25 ; base speed
     db 30 ; base special
 
-    db GROUND ; species type 1
-    db ROCK ; species type 2
+    db ROCK ; species type 1
+    db IVORY ; species type 2
 
     db 120 ; catch rate
     db 135 ; base exp yield
@@ -4130,8 +4130,8 @@ RhydonBaseStats: ; 39002 (e:5002)
     db 40 ; base speed
     db 45 ; base special
 
-    db GROUND ; species type 1
-    db ROCK ; species type 2
+    db ROCK ; species type 1
+    db IVORY ; species type 2
 
     db 60 ; catch rate
     db 204 ; base exp yield
@@ -4167,8 +4167,8 @@ ChanseyBaseStats: ; 3901e (e:501e)
     db 50 ; base speed
     db 105 ; base special
 
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db RUBBER ; species type 1
+    db RUBBER ; species type 2
 
     db 30 ; catch rate
     db 255 ; base exp yield
@@ -4241,8 +4241,8 @@ KangaskhanBaseStats: ; 39056 (e:5056)
     db 90 ; base speed
     db 40 ; base special
 
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db IVORY ; species type 1
+    db IVORY ; species type 2
 
     db 45 ; catch rate
     db 175 ; base exp yield
@@ -4316,7 +4316,7 @@ SeadraBaseStats: ; 3908e (e:508e)
     db 95 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db DRAGON ; species type 2
 
     db 75 ; catch rate
     db 155 ; base exp yield
@@ -4390,7 +4390,7 @@ SeakingBaseStats: ; 390c6 (e:50c6)
     db 80 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db IVORY ; species type 2
 
     db 60 ; catch rate
     db 170 ; base exp yield
@@ -4427,7 +4427,7 @@ StaryuBaseStats: ; 390e2 (e:50e2)
     db 70 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db PSYCHIC ; species type 2
 
     db 225 ; catch rate
     db 106 ; base exp yield
@@ -4612,7 +4612,7 @@ ElectabuzzBaseStats: ; 3916e (e:516e)
     db 85 ; base special
 
     db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
+    db FIGHTING ; species type 2
 
     db 45 ; catch rate
     db 156 ; base exp yield
@@ -4649,7 +4649,7 @@ MagmarBaseStats: ; 3918a (e:518a)
     db 85 ; base special
 
     db FIRE ; species type 1
-    db FIRE ; species type 2
+    db POISON ; species type 2
 
     db 45 ; catch rate
     db 167 ; base exp yield
@@ -4686,7 +4686,7 @@ PinsirBaseStats: ; 391a6 (e:51a6)
     db 55 ; base special
 
     db BUG ; species type 1
-    db BUG ; species type 2
+    db IVORY ; species type 2
 
     db 45 ; catch rate
     db 200 ; base exp yield
@@ -4722,8 +4722,8 @@ TaurosBaseStats: ; 391c2 (e:51c2)
     db 110 ; base speed
     db 70 ; base special
 
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db IVORY ; species type 1
+    db IVORY ; species type 2
 
     db 45 ; catch rate
     db 211 ; base exp yield
@@ -4797,7 +4797,7 @@ GyaradosBaseStats: ; 391fa (e:51fa)
     db 100 ; base special
 
     db WATER ; species type 1
-    db WIND ; species type 2
+    db DRAGON ; species type 2
 
     db 45 ; catch rate
     db 214 ; base exp yield
@@ -4870,8 +4870,8 @@ DittoBaseStats: ; 39232 (e:5232)
     db 48 ; base speed
     db 48 ; base special
 
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db RUBBER ; species type 1
+    db RUBBER ; species type 2
 
     db 35 ; catch rate
     db 61 ; base exp yield
@@ -5055,8 +5055,8 @@ PorygonBaseStats: ; 392be (e:52be)
     db 40 ; base speed
     db 75 ; base special
 
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db METAL ; species type 1
+    db METAL ; species type 2
 
     db 45 ; catch rate
     db 130 ; base exp yield
@@ -5129,7 +5129,7 @@ OmastarBaseStats: ; 392f6 (e:52f6)
     db 55 ; base speed
     db 115 ; base special
 
-    db ROCK ; species type 1
+    db IVORY ; species type 1
     db WATER ; species type 2
 
     db 45 ; catch rate
@@ -5203,7 +5203,7 @@ KabutopsBaseStats: ; 3932e (e:532e)
     db 80 ; base speed
     db 70 ; base special
 
-    db ROCK ; species type 1
+    db IVORY ; species type 1
     db WATER ; species type 2
 
     db 45 ; catch rate
@@ -5241,7 +5241,7 @@ AerodactylBaseStats: ; 3934a (e:534a)
     db 60 ; base special
 
     db ROCK ; species type 1
-    db WIND ; species type 2
+    db DRAGON ; species type 2
 
     db 45 ; catch rate
     db 202 ; base exp yield
@@ -5277,8 +5277,8 @@ SnorlaxBaseStats: ; 39366 (e:5366)
     db 30 ; base speed
     db 65 ; base special
 
-    db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db RUBBER ; species type 1
+    db RUBBER ; species type 2
 
     db 25 ; catch rate
     db 154 ; base exp yield
@@ -5500,7 +5500,7 @@ DragoniteBaseStats: ; 3940e (e:540e)
     db 100 ; base special
 
     db DRAGON ; species type 1
-    db WIND ; species type 2
+    db DRAGON ; species type 2
 
     db 45 ; catch rate
     db 218 ; base exp yield

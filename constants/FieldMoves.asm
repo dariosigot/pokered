@@ -116,8 +116,8 @@ db FM_DIG+FM_STRENGTH                                ; 105 - $69 - MAROWAK
 db FM_FLOAT+FM_STRENGTH                              ; 106 - $6A - HITMONLEE
 db FM_FLOAT+FM_STRENGTH                              ; 107 - $6B - HITMONCHAN
 db FM_CUT+FM_FLOAT+FM_HEAL                           ; 108 - $6C - LICKITUNG
-db 0                                                 ; 109 - $6D - KOFFING
-db 0                                                 ; 110 - $6E - WEEZING
+db FM_LIGHT                                          ; 109 - $6D - KOFFING
+db FM_LIGHT                                          ; 110 - $6E - WEEZING
 db FM_STRENGTH+FM_DIG                                ; 111 - $6F - RHYHORN
 db FM_FLOAT+FM_STRENGTH+FM_DIG                       ; 112 - $70 - RHYDON
 db FM_HEAL                                           ; 113 - $71 - CHANSEY

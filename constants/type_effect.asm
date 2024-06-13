@@ -39,6 +39,7 @@
     db GROUND,WIND,00
     db GROUND,RUBBER,05
     db GROUND,DRAGON,05
+    db GROUND,METAL,15
 
     db ROCK,ROCK,05
     db ROCK,FIRE,20
@@ -75,6 +76,8 @@
     db IVORY,METAL,05
     db IVORY,RUBBER,20
     db IVORY,FIRE,05
+    db IVORY,BUG,15
+    db IVORY,GRASS,15
 
     db RUBBER,ROCK,05
     db RUBBER,GHOST,00
@@ -84,7 +87,7 @@
 
     db FIRE,FIRE,05
     db FIRE,GRASS,20
-    db FIRE,ICE,25
+    db FIRE,ICE,20
     db FIRE,WATER,05
     db FIRE,BUG,20
     db FIRE,ROCK,05
@@ -117,7 +120,7 @@
     db ELECTRIC,GRASS,05
     db ELECTRIC,GROUND,00
     db ELECTRIC,WIND,20
-    db ELECTRIC,DRAGON,20
+    db ELECTRIC,DRAGON,15
     db ELECTRIC,RUBBER,05
     db ELECTRIC,METAL,25
     db ELECTRIC,ROCK,02
@@ -135,8 +138,8 @@
     db ICE,GRASS,20
     db ICE,GROUND,20
     db ICE,WIND,20
-    db ICE,DRAGON,20
-    db ICE,FIRE,00
+    db ICE,DRAGON,25
+    db ICE,FIRE,05
     db ICE,BUG,20
     db ICE,FIGHTING,05
     db ICE,RUBBER,15

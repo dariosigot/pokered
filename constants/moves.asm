@@ -128,7 +128,7 @@
     db BONE_CLUB    , FLINCH_SIDE_EFFECT1        ,  65 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Ground -> Ivory
     db FIRE_BLAST   , BURN_SIDE_EFFECT2          , 110 , FIRE     , 216 , 40 ; pp  5 ; 1 ; Pwr 120 -> 110
     db WATERFALL    , NO_ADDITIONAL_EFFECT       ,  80 , WATER    , 255 , 14 ; pp 15 ; 0
-    db CLAMP        , TRAPPING_EFFECT            ,  10 , WATER    , 153 , 20 ; pp 10 ; 0 ; Pwr 35 -> 10 ; Acr 191 -> 153
+    db CLAMP        , TRAPPING_EFFECT            ,  10 , IVORY    , 153 , 20 ; pp 10 ; 0 ; Pwr 35 -> 10 ; Acr 191 -> 153 ; Type Water -> Ivory
     db SWIFT        , SWIFT_EFFECT               ,  60 , NORMAL   , 255 , 10 ; pp 20 ; 1
     db SKULL_BASH   , CHARGE_EFFECT              , 130 , NORMAL   , 255 , 20 ; pp 10 ; 0 ; Pwr 100 -> 130 ; PP 15 -> 10
     db SPIKE_CANNON , TWO_TO_FIVE_ATTACKS_EFFECT ,  25 , IVORY    , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Ivory ; Pwr 20 -> 25
