@@ -57307,7 +57307,7 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
 .skipSameTypeAttackBonus
     ld a,[$d11e]
     ld b,a ; b = move type
-    ld hl,TypeEffects
+    call GetTypeEffects
 .loop
     ld a,[hli] ; a = "attacking type" of the current type pair
     cp a,$ff
@@ -57366,16 +57366,6 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
 .done
     ret
 
-TypeEffects:
-; format: attacking type,defending type,damage multiplier
-; the multiplier is a (decimal) fixed-point number:
-;     20 is ×2.0
-;     05 is ×0.5
-;     00 is ×0
-
-    INCLUDE "constants/type_effect.asm"
-    db $FF
-
 HandleEnemySwitchingOrUsingAnItemAndThenExecutePlayerMove:
     ld a,$1
     ld [H_WHOSETURN],a
@@ -57393,6 +57383,19 @@ HandleMenuInputLockedDuringDebugEnemyMove:
     call WaitButtonPressed
     ld a,%0000010 ; Emulate B press to Close Debug Enemy Move Menù
     ret
+
+GetTypeEffects:
+    push bc
+    push de
+    ld b,BANK(GetTypeEffects_)
+    ld hl,GetTypeEffects_
+    call Bankswitch
+    pop de
+    pop bc
+    ld hl,wBufferTypeEffects
+    ret
+
+; Free
 
 SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
 
@@ -61273,9 +61276,11 @@ AIGetTypeEffectiveness:
     ld b,[hl]                    ; b = type 1 of player's pokemon
     inc hl
     ld c,[hl]                    ; c = type 2 of player's pokemon
+    ld a,d
+    ld [$d11e],a
+    call GetTypeEffects
     ld a,$0A
     ld [$d11e],a                 ; initialize [$D11E] to neutral effectiveness
-    ld hl,TypeEffects
 .loop
     ld a,[hli]
     cp a,$ff
@@ -136849,6 +136854,48 @@ RemoveBattleValue_:
     ld hl,Coord
     ld bc,$020C ; 02 | 12
     jp ClearScreenArea
+
+; ──────────────────────────────────────────────────────────────────────
+; Type Effects
+; ──────────────────────────────────────────────────────────────────────
+
+TypeEffects:
+; format: attacking type,defending type,damage multiplier
+; the multiplier is a (decimal) fixed-point number:
+;     20 is ×2.0
+;     05 is ×0.5
+;     00 is ×0
+
+    INCLUDE "constants/type_effect.asm"
+    db $FF
+
+GetTypeEffects_:
+    ld a,[$d11e]
+    ld b,a
+    ld hl,TypeEffects
+    ld de,wBufferTypeEffects
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.end
+    cp b
+    jr nz,.next
+    ld [de],a
+    inc de
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hli]
+    ld [de],a
+    inc de
+    jr .loop
+.next
+    inc hl
+    inc hl
+    jr .loop
+.end
+    ld [de],a ; $FF
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
