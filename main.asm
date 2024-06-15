@@ -47318,26 +47318,76 @@ FlareonPicFront: ; 2e68d (b:668d)
 FlareonPicBack: ; 2e806 (b:6806)
     INCBIN "pic/monback/flareonb.pic"
 
-SECTION "DisplayEffectiveness",ROMX[$7b7b],BANK[$B]
-
-DisplayEffectiveness: ; 2fb7b (b:7b7b)
+DisplayEffectiveness: ; Moved in the Bank
+    xor a
+    ld hl,H_MULTIPLICAND
+    ld [hli],a
+    ld [hli],a
     ld a,[$D05B]
-    and a,$7F
-    cp a,$0A
+    and a,%01111111
+    push af
+    ld [hli],a
+    ld [hl],10
+    call Multiply
+    ld a,[H_PRODUCT+2]
+    ld [wTmpDmgMultiplier],a
+    ld a,[H_PRODUCT+3]
+    ld [wTmpDmgMultiplier+1],a
+    pop af
+    cp a,10
     ret z
-    ld hl,UnnamedText_2fb8e    ; It's super effective!
+    cp 35
+    ld hl,.ExtremelyEffectiveText
     jr nc,.done
-    ld hl,UnnamedText_2fb93    ; It's not very effective...
+    cp 25
+    ld hl,.UltraEffectiveText
+    jr nc,.done
+    cp 20
+    ld hl,.SuperEffectiveText
+    jr nc,.done
+    cp 15
+    ld hl,.VeryEffectiveText
+    jr nc,.done
+    cp 12
+    ld hl,.QuiteEffectiveText
+    jr nc,.done
+    cp 09
+    ret nc
+    cp 07
+    ld hl,.AlmostEffectiveText
+    jr nc,.done
+    cp 05
+    ld hl,.NotVeryEffectiveText
+    jr nc,.done
+    ld hl,.AlmostIneffectiveText
 .done
     jp PrintText
-
-UnnamedText_2fb8e: ; 2fb8e (b:7b8e)
-    TX_FAR _UnnamedText_2fb8e
+.ExtremelyEffectiveText
+    TX_FAR _ExtremelyEffectiveText
+    db "@"
+.UltraEffectiveText
+    TX_FAR _UltraEffectiveText
+    db "@"
+.SuperEffectiveText
+    TX_FAR _SuperEffectiveText
+    db "@"
+.VeryEffectiveText
+    TX_FAR _VeryEffectiveText
+    db "@"
+.QuiteEffectiveText
+    TX_FAR _QuiteEffectiveText
+    db "@"
+.AlmostEffectiveText
+    TX_FAR _AlmostEffectiveText
+    db "@"
+.NotVeryEffectiveText
+    TX_FAR _NotVeryEffectiveText
+    db "@"
+.AlmostIneffectiveText
+    TX_FAR _AlmostIneffectiveText
     db "@"
 
-UnnamedText_2fb93: ; 2fb93 (b:7b93)
-    TX_FAR _UnnamedText_2fb93
-    db "@"
+SECTION "TrainerInfoTextBoxTileGraphics",ROMX[$7b98],BANK[$B]
 
 TrainerInfoTextBoxTileGraphics: ; 2fb98 (b:7b98)
     INCBIN "gfx/trainer_info.2bpp"
@@ -119655,13 +119705,7 @@ _UnnamedText_58f3e: ; 89d15 (22:5d15)
     db $0,$4f
     db "Come back!",$57
 
-_UnnamedText_2fb8e: ; 89d22 (22:5d22)
-    db $0,"It's super",$4f
-    db "effective!",$58
-
-_UnnamedText_2fb93: ; 89d38 (22:5d38)
-    db $0,"It's not very",$4f
-    db "effective...",$58
+SECTION "SafariZoneEatingText",ROMX[$5d53],BANK[$22]
 
 SafariZoneEatingText: ; 89d53 (22:5d53)
     db $0,"Wild @"
@@ -120223,6 +120267,66 @@ _UnnamedText_3d430:
     TX_RAM W_PLAYERMONNAME
     db $0," has not",$4f
     db "Enough Energy!",$57
+
+; ───────────────────────────────────
+; Display Effectiveness
+; ───────────────────────────────────
+
+DEBUG_DAMAGE_MULTIPLIER: MACRO
+    db " (@"
+    TX_NUM wTmpDmgMultiplier,2,3
+    db 0,$D9,")"
+    ENDM
+
+_ExtremelyEffectiveText:
+    db 0,"It's extremely",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_UltraEffectiveText:
+    db 0,"It's ultra",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_SuperEffectiveText:
+    db 0,"It's super",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_VeryEffectiveText:
+    db 0,"It's very",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_QuiteEffectiveText:
+    db 0,"It's quite",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_AlmostEffectiveText:
+    db 0,"It's almost",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_NotVeryEffectiveText:
+    db 0,"It's not very"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $4f
+    db "effective...",$58
+
+_AlmostIneffectiveText:
+    db 0,"It's not"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $4f
+    db "effective at all!",$58
+
+; ───────────────────────────────────
 
 SECTION "bank23",ROMX,BANK[$23]
 

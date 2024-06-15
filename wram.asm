@@ -1683,10 +1683,11 @@ wBattleValueCounter: ; def2
 NEXTU
 
 wBufferTypeEffects: ; def0
-    ds 62
+    ds 60
 wBufferTypeEffectsEnd:
     db
-
+wTmpDmgMultiplier:
+    ds 2
 ENDU
 
 ; ────────────────────────────────────────────────────

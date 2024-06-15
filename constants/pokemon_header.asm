@@ -3391,7 +3391,7 @@ GastlyBaseStats: ; 38dd2 (e:4dd2)
     db 100 ; base special
 
     db GHOST ; species type 1
-    db GHOST ; species type 2
+    db POISON ; species type 2
 
     db 190 ; catch rate
     db 95 ; base exp yield
