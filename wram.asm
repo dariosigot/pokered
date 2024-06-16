@@ -1680,6 +1680,14 @@ wBattleValueToPrint: ; def0
 wBattleValueCounter: ; def2
     ds 1
 
+NEXTU
+
+wBufferTypeEffects: ; def0
+    ds 60
+wBufferTypeEffectsEnd:
+    db
+wTmpDmgMultiplier:
+    ds 2
 ENDU
 
 ; ────────────────────────────────────────────────────

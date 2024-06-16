@@ -102,7 +102,7 @@ db 0                                                 ; 91  - $5B - CLOYSTER
 db FM_TELEPORT                                       ; 92  - $5C - GASTLY
 db FM_TELEPORT                                       ; 93  - $5D - HAUNTER
 db FM_TELEPORT                                       ; 94  - $5E - GENGAR
-db FM_STRENGTH+FM_DIG                                ; 95  - $5F - ONIX
+db FM_CUT+FM_STRENGTH+FM_DIG                         ; 95  - $5F - ONIX
 db FM_TELEPORT                                       ; 96  - $60 - DROWZEE
 db FM_TELEPORT                                       ; 97  - $61 - HYPNO
 db FM_CUT+FM_DIG                                     ; 98  - $62 - KRABBY
@@ -116,8 +116,8 @@ db FM_DIG+FM_STRENGTH                                ; 105 - $69 - MAROWAK
 db FM_FLOAT+FM_STRENGTH                              ; 106 - $6A - HITMONLEE
 db FM_FLOAT+FM_STRENGTH                              ; 107 - $6B - HITMONCHAN
 db FM_CUT+FM_FLOAT+FM_HEAL                           ; 108 - $6C - LICKITUNG
-db 0                                                 ; 109 - $6D - KOFFING
-db 0                                                 ; 110 - $6E - WEEZING
+db FM_LIGHT                                          ; 109 - $6D - KOFFING
+db FM_LIGHT                                          ; 110 - $6E - WEEZING
 db FM_STRENGTH+FM_DIG                                ; 111 - $6F - RHYHORN
 db FM_FLOAT+FM_STRENGTH+FM_DIG                       ; 112 - $70 - RHYDON
 db FM_HEAL                                           ; 113 - $71 - CHANSEY
@@ -144,7 +144,7 @@ db 0                                                 ; 133 - $85 - EEVEE
 db FM_FLOAT                                          ; 134 - $86 - VAPOREON
 db FM_LIGHT                                          ; 135 - $87 - JOLTEON
 db FM_LIGHT                                          ; 136 - $88 - FLAREON
-db FM_TELEPORT+FM_HEAL                               ; 137 - $89 - PORYGON
+db FM_CUT+FM_TELEPORT+FM_HEAL                        ; 137 - $89 - PORYGON
 db 0                                                 ; 138 - $8A - OMANYTE
 db FM_FLOAT+FM_DIG                                   ; 139 - $8B - OMASTAR
 db 0                                                 ; 140 - $8C - KABUTO

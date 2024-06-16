@@ -1121,7 +1121,7 @@ OnixExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db $FF
+    db BLADE
     db EARTHQUAKE
     db FISSURE
     db TRAPHOLE
@@ -1854,7 +1854,7 @@ PorygonExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db $FF
+    db BLADE
     db SOLARBEAM
     db THUNDERBOLT
     db THUNDER

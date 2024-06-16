@@ -23121,10 +23121,16 @@ UseItem_: ; Moved in the Bank
     ld a,1
     ld [$cd6a],a
     ld a,[$cf91]    ;contains item_ID
-    cp a,TM_01
+    cp $FF
+    jr z,.skip
+    cp TM_01
     jp nc,ItemUseTMHM
+    cp ITEM_END_LIST
+    jr c,.skip
+    ld a,$FF
+.skip
     ld hl,.ItemUsePtrTable
-    dec a
+    inc a
     add a
     ld c,a
     ld b,0
@@ -23134,6 +23140,8 @@ UseItem_: ; Moved in the Bank
     ld l,a
     jp hl
 .ItemUsePtrTable
+    dw UnusableItem      ; ITEM_FF
+    dw UnusableItem      ; ITEM_00
     dw ItemUseBall       ; MASTER_BALL
     dw ItemUseBall       ; ULTRA_BALL
     dw ItemUseBall       ; GREAT_BALL
@@ -29965,6 +29973,8 @@ StartMenu_Item: ; 13302 (4:7302)
 .useItem
     ld [$d152],a
     ld a,[$cf91]
+    cp $FF
+    jr z,.useItem_Standard
     cp a,TM_01
     jr nc,.useItem_partyMenu
     ld hl,UsableItems_CloseMenu
@@ -29976,6 +29986,7 @@ StartMenu_Item: ; 13302 (4:7302)
     ld de,1
     call IsInArray
     jr c,.useItem_partyMenu
+.useItem_Standard
     call UseItem
     jp ItemMenuLoop
 .useItem_closeMenu
@@ -30008,8 +30019,6 @@ StartMenu_Item: ; 13302 (4:7302)
     and a
     jr nz,.skipAskingQuantity
     ld a,[$cf91]
-    ds 3 ; call IsItemHM
-    ds 2 ; jr c,.skipAskingQuantity
     call DisplayChooseQuantityMenu
     inc a
     jr z,.tossZeroItems
@@ -46861,67 +46870,46 @@ asm_27d9f: ; 27d9f (9:7d9f)
     pop hl
     jp PlaceString
 
-TypeNamePointers: ; 27dae (9:7dae)
-    dw Type00Name
-    dw Type01Name
-    dw Type02Name
-    dw Type03Name
-    dw Type04Name
-    dw Type05Name
-    dw Type06Name
-    dw Type07Name
-    dw Type08Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type00Name
-    dw Type14Name
-    dw Type15Name
-    dw Type16Name
-    dw Type17Name
-    dw Type18Name
-    dw Type19Name
-    dw Type1AName
-
-Type00Name: ; 27de4 (9:7de4)
+Type00Name:
     db "NORMAL@"
-Type01Name: ; 27deb (9:7deb)
+Type01Name:
     db "FIGHTING@"
-Type02Name: ; 27df4 (9:7df4)
-    db "FLYING@"
-Type03Name: ; 27dfb (9:7dfb)
+Type02Name:
+    db "WIND@"
+Type03Name:
     db "POISON@"
-Type14Name: ; 27e02 (9:7e02)
-    db "FIRE@"
-Type15Name: ; 27e07 (9:7e07)
-    db "WATER@"
-Type16Name: ; 27e0d (9:7e0d)
-    db "GRASS@"
-Type17Name: ; 27e13 (9:7e13)
-    db "ELECTRIC@"
-Type18Name: ; 27e1c (9:7e1c)
-    db "PSYCHIC@"
-Type19Name: ; 27e24 (9:7e24)
-    db "ICE@"
-Type04Name: ; 27e28 (9:7e28)
+Type04Name:
     db "GROUND@"
-Type05Name: ; 27e2f (9:7e2f)
+Type05Name:
     db "ROCK@"
-Type06Name: ; 27e34 (9:7e34)
-    db "BIRD@"
-Type07Name: ; 27e39 (9:7e39)
+Type07Name:
     db "BUG@"
-Type08Name: ; 27e3d (9:7e3d)
+Type08Name:
     db "GHOST@"
-Type1AName: ; 27e43 (9:7e43)
+Type09Name:
+    db "METAL@"
+Type12Name:
+    db "IVORY@"
+Type13Name:
+    db "RUBBER@"
+Type14Name:
+    db "FIRE@"
+Type15Name:
+    db "WATER@"
+Type16Name:
+    db "GRASS@"
+Type17Name:
+    db "ELECTRIC@"
+Type18Name:
+    db "PSYCHIC@"
+Type19Name:
+    db "ICE@"
+Type1AName:
     db "DRAGON@"
+TypeNAName:
+    db "N.A.@"
+
+SECTION "SaveTrainerName",ROMX[$7E4A],BANK[$9]
 
 SaveTrainerName: ; 27e4a (9:7e4a)
     ld hl,TrainerNamePointers
@@ -47062,6 +47050,35 @@ UnnamedText_27fb3: ; 27fb3 (9:7fb3)
     db $0a
     TX_FAR _UnnamedText_27fb3
     db "@"
+
+TypeNamePointers:
+    dw Type00Name ; $00 : Normal
+    dw Type01Name ; $01 : Fighting
+    dw Type02Name ; $02 : Wind
+    dw Type03Name ; $03 : Poison
+    dw Type04Name ; $04 : Ground
+    dw Type05Name ; $05 : Rock
+    dw TypeNAName ;
+    dw Type07Name ; $07 : Bug
+    dw Type08Name ; $08 : Ghost
+    dw Type09Name ; $09 : Metal
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw TypeNAName ; 
+    dw Type12Name ; $12 : Ivory
+    dw Type13Name ; $13 : Rubber
+    dw Type14Name ; $14 : Fire
+    dw Type15Name ; $15 : Water
+    dw Type16Name ; $16 : Grass
+    dw Type17Name ; $17 : Electric
+    dw Type18Name ; $18 : Psychic
+    dw Type19Name ; $19 : Ice
+    dw Type1AName ; $1A : Dragon
 
 SECTION "bankA",ROMX,BANK[$A]
 GrowlithePicFront: ; 28000 (a:4000)
@@ -47301,26 +47318,74 @@ FlareonPicFront: ; 2e68d (b:668d)
 FlareonPicBack: ; 2e806 (b:6806)
     INCBIN "pic/monback/flareonb.pic"
 
-SECTION "DisplayEffectiveness",ROMX[$7b7b],BANK[$B]
-
-DisplayEffectiveness: ; 2fb7b (b:7b7b)
+DisplayEffectiveness: ; Moved in the Bank
+    xor a
+    ld hl,H_MULTIPLICAND
+    ld [hli],a
+    ld [hli],a
     ld a,[$D05B]
-    and a,$7F
-    cp a,$0A
+    and a,%01111111
+    push af
+    ld [hli],a
+    ld [hl],10
+    call Multiply
+    ld a,[H_PRODUCT+2]
+    ld [wTmpDmgMultiplier],a
+    ld a,[H_PRODUCT+3]
+    ld [wTmpDmgMultiplier+1],a
+    pop af
+    cp a,10
     ret z
-    ld hl,UnnamedText_2fb8e    ; It's super effective!
+    cp 35
+    ld hl,.ExtremelyEffectiveText
     jr nc,.done
-    ld hl,UnnamedText_2fb93    ; It's not very effective...
+    cp 25
+    ld hl,.UltraEffectiveText
+    jr nc,.done
+    cp 20
+    ld hl,.SuperEffectiveText
+    jr nc,.done
+    cp 15
+    ld hl,.VeryEffectiveText
+    jr nc,.done
+    cp 10
+    ld hl,.QuiteEffectiveText
+    jr nc,.done
+    cp 08
+    ld hl,.AlmostEffectiveText
+    jr nc,.done
+    cp 05
+    ld hl,.NotVeryEffectiveText
+    jr nc,.done
+    ld hl,.AlmostIneffectiveText
 .done
     jp PrintText
-
-UnnamedText_2fb8e: ; 2fb8e (b:7b8e)
-    TX_FAR _UnnamedText_2fb8e
+.ExtremelyEffectiveText
+    TX_FAR _ExtremelyEffectiveText
+    db "@"
+.UltraEffectiveText
+    TX_FAR _UltraEffectiveText
+    db "@"
+.SuperEffectiveText
+    TX_FAR _SuperEffectiveText
+    db "@"
+.VeryEffectiveText
+    TX_FAR _VeryEffectiveText
+    db "@"
+.QuiteEffectiveText
+    TX_FAR _QuiteEffectiveText
+    db "@"
+.AlmostEffectiveText
+    TX_FAR _AlmostEffectiveText
+    db "@"
+.NotVeryEffectiveText
+    TX_FAR _NotVeryEffectiveText
+    db "@"
+.AlmostIneffectiveText
+    TX_FAR _AlmostIneffectiveText
     db "@"
 
-UnnamedText_2fb93: ; 2fb93 (b:7b93)
-    TX_FAR _UnnamedText_2fb93
-    db "@"
+SECTION "TrainerInfoTextBoxTileGraphics",ROMX[$7b98],BANK[$B]
 
 TrainerInfoTextBoxTileGraphics: ; 2fb98 (b:7b98)
     INCBIN "gfx/trainer_info.2bpp"
@@ -57290,7 +57355,7 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
 .skipSameTypeAttackBonus
     ld a,[$d11e]
     ld b,a ; b = move type
-    ld hl,TypeEffects
+    call GetTypeEffects
 .loop
     ld a,[hli] ; a = "attacking type" of the current type pair
     cp a,$ff
@@ -57349,112 +57414,6 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
 .done
     ret
 
-TypeEffects:
-; format: attacking type,defending type,damage multiplier
-; the multiplier is a (decimal) fixed-point number:
-;     20 is ×2.0
-;     05 is ×0.5
-;     00 is ×0
-
-    db NORMAL,ROCK,05
-    db NORMAL,GHOST,00
-
-    db FIGHTING,NORMAL,20
-    db FIGHTING,POISON,05
-    db FIGHTING,FLYING,05
-    db FIGHTING,PSYCHIC,05
-    db FIGHTING,BUG,05
-    db FIGHTING,ROCK,20
-    db FIGHTING,ICE,20
-    db FIGHTING,GHOST,00
-
-    db FLYING,ELECTRIC,05
-    db FLYING,FIGHTING,20
-    db FLYING,BUG,20
-    db FLYING,GRASS,20
-    db FLYING,ROCK,05
-    db FLYING,GHOST,20
-
-    db POISON,GRASS,20
-    db POISON,POISON,05
-    db POISON,GROUND,05
-    db POISON,BUG,20
-    db POISON,ROCK,05
-    db POISON,FIGHTING,20
-
-    db GROUND,FIRE,20
-    db GROUND,ELECTRIC,20
-    db GROUND,GRASS,05
-    db GROUND,BUG,05
-    db GROUND,ROCK,20
-    db GROUND,POISON,20
-    db GROUND,FLYING,00
-
-    db ROCK,FIRE,20
-    db ROCK,FIGHTING,05
-    db ROCK,GROUND,05
-    db ROCK,FLYING,20
-    db ROCK,BUG,20
-    db ROCK,ICE,20
-
-    db BUG,FIRE,05
-    db BUG,GRASS,20
-    db BUG,FIGHTING,05
-    db BUG,FLYING,05
-    db BUG,PSYCHIC,20
-    db BUG,POISON,05
-
-    db GHOST,PSYCHIC,20
-
-    db FIRE,FIRE,05
-    db FIRE,GRASS,20
-    db FIRE,ICE,20
-    db FIRE,WATER,05
-    db FIRE,BUG,20
-    db FIRE,ROCK,05
-    db FIRE,DRAGON,05
-
-    db WATER,WATER,05
-    db WATER,FIRE,20
-    db WATER,ROCK,20
-    db WATER,GRASS,05
-    db WATER,GROUND,20
-    db WATER,DRAGON,05
-
-    db GRASS,GRASS,05
-    db GRASS,WATER,20
-    db GRASS,FIRE,05
-    db GRASS,GROUND,20
-    db GRASS,BUG,05
-    db GRASS,POISON,05
-    db GRASS,ROCK,20
-    db GRASS,FLYING,05
-    db GRASS,DRAGON,05
-
-    db ELECTRIC,WATER,20
-    db ELECTRIC,ELECTRIC,05
-    db ELECTRIC,GRASS,05
-    db ELECTRIC,GROUND,00
-    db ELECTRIC,FLYING,20
-    db ELECTRIC,DRAGON,05
-
-    db PSYCHIC,PSYCHIC,05
-    db PSYCHIC,FIGHTING,20
-    db PSYCHIC,POISON,20
-    db PSYCHIC,GHOST,05
-    db PSYCHIC,BUG,05
-
-    db ICE,ICE,05
-    db ICE,WATER,05
-    db ICE,GRASS,20
-    db ICE,GROUND,20
-    db ICE,FLYING,20
-    db ICE,DRAGON,20
-    db ICE,FIRE,05
-    db ICE,BUG,20
-    db ICE,FIGHTING,05
-    db $FF
-
 HandleEnemySwitchingOrUsingAnItemAndThenExecutePlayerMove:
     ld a,$1
     ld [H_WHOSETURN],a
@@ -57472,6 +57431,19 @@ HandleMenuInputLockedDuringDebugEnemyMove:
     call WaitButtonPressed
     ld a,%0000010 ; Emulate B press to Close Debug Enemy Move Menù
     ret
+
+GetTypeEffects:
+    push bc
+    push de
+    ld b,BANK(GetTypeEffects_)
+    ld hl,GetTypeEffects_
+    call Bankswitch
+    pop de
+    pop bc
+    ld hl,wBufferTypeEffects
+    ret
+
+; Free
 
 SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
 
@@ -60777,13 +60749,16 @@ CopyDamage:
     ld [de],a
     ret
 
+RemoveBattleValueBankF:
+    ld b,BANK(RemoveBattleValue_)
+    ld hl,RemoveBattleValue_
+    jp Bankswitch
+
 PrintBattleValueNearSubstitute:
     ld b,BANK(PrintBattleValueNearMon_)
     ld hl,PrintBattleValueNearMon_
     call Bankswitch
-    ld b,BANK(RemoveBattleValue_)
-    ld hl,RemoveBattleValue_
-    call Bankswitch
+    call RemoveBattleValueBankF
     ld hl,SubstituteTookDamageText
     ret
 
@@ -60848,7 +60823,8 @@ SetCureDuringLeechSeed:
     set 7,[hl] ; wFlagBattleCureBit7
     call CopyDamage
     pop bc
-    jp UpdateCurMonHPBar
+    call UpdateCurMonHPBar
+    jp RemoveBattleValueBankF
 
 SetCureDuringAbsorb_:
     push de
@@ -60859,7 +60835,8 @@ SetCureDuringAbsorb_:
     call CopyDamage
     pop hl
     ld a,$48
-    jp Predef ; UpdateHPBar
+    call Predef ; UpdateHPBar
+    jp RemoveBattleValueBankF
 
 ; ────────────────────────────────────────────────────────────────
 
@@ -61347,9 +61324,11 @@ AIGetTypeEffectiveness:
     ld b,[hl]                    ; b = type 1 of player's pokemon
     inc hl
     ld c,[hl]                    ; c = type 2 of player's pokemon
+    ld a,d
+    ld [$d11e],a
+    call GetTypeEffects
     ld a,$0A
     ld [$d11e],a                 ; initialize [$D11E] to neutral effectiveness
-    ld hl,TypeEffects
 .loop
     ld a,[hli]
     cp a,$ff
@@ -119051,12 +119030,11 @@ TMNotebookText: ; 88bfd (22:4bfd)
     db $0,"It's a pamphlet",$4f
     db "on TMs.",$51
     db "...",$51
-    db "There are 50 TMs",$4f
+    db "There are 56 TMs",$4f
     db "in all.",$51
-    db "There are also 5",$4f
-    db "PWR that can be",$55
-    db "used repeatedly.",$51
     db "SILPH CO.@@"
+
+SECTION "_TurnPageText",ROMX[$4c6f],BANK[$22]
 
 _TurnPageText: ; 88c6f (22:4c6f)
     db $0,"Turn the page?",$57
@@ -119725,13 +119703,7 @@ _UnnamedText_58f3e: ; 89d15 (22:5d15)
     db $0,$4f
     db "Come back!",$57
 
-_UnnamedText_2fb8e: ; 89d22 (22:5d22)
-    db $0,"It's super",$4f
-    db "effective!",$58
-
-_UnnamedText_2fb93: ; 89d38 (22:5d38)
-    db $0,"It's not very",$4f
-    db "effective...",$58
+SECTION "SafariZoneEatingText",ROMX[$5d53],BANK[$22]
 
 SafariZoneEatingText: ; 89d53 (22:5d53)
     db $0,"Wild @"
@@ -120293,6 +120265,66 @@ _UnnamedText_3d430:
     TX_RAM W_PLAYERMONNAME
     db $0," has not",$4f
     db "Enough Energy!",$57
+
+; ───────────────────────────────────
+; Display Effectiveness
+; ───────────────────────────────────
+
+DEBUG_DAMAGE_MULTIPLIER: MACRO
+    db " (@"
+    TX_NUM wTmpDmgMultiplier,2,3
+    db 0,$D9,")"
+    ENDM
+
+_ExtremelyEffectiveText:
+    db 0,"It's extremely",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_UltraEffectiveText:
+    db 0,"It's ultra",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_SuperEffectiveText:
+    db 0,"It's super",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_VeryEffectiveText:
+    db 0,"It's very",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_QuiteEffectiveText:
+    db 0,"It's quite",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_AlmostEffectiveText:
+    db 0,"It's almost",$4f
+    db "effective!"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $58
+
+_NotVeryEffectiveText:
+    db 0,"It's not very"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $4f
+    db "effective...",$58
+
+_AlmostIneffectiveText:
+    db 0,"It's not"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $4f
+    db "effective at all!",$58
+
+; ───────────────────────────────────
 
 SECTION "bank23",ROMX,BANK[$23]
 
@@ -131134,7 +131166,7 @@ GenderTable:
     dsn OTHGEND,OTHGEND,OTHGEND,MALE_50 ; ARTICUNO,ZAPDOS,MOLTRES,DRATINI
     dsn MALE_50,MALE_50,OTHGEND,OTHGEND ; DRAGONAIR,DRAGONITE,MEWTWO,MEW
 
-ItemNames: ; 472b (1:472b)
+ItemNames:
     db "MASTER BALL@"  ; $01
     db "ULTRA BALL@"   ; $02
     db "GREAT BALL@"   ; $03
@@ -131330,67 +131362,67 @@ ItemNames: ; 472b (1:472b)
     db "?@"            ; $C1
     db "?@"            ; $C2
     db "?@"            ; $C3
-    db "TM01:M.PNCH@"  ; $C4 ; TM_01 ; Market
-    db "TM02:RAZ.WND@" ; $C5 ; TM_02 ; Market
-    db "TM03:SW.DNCE@" ; $C6 ; TM_03
-    db "TM04:WHRLWND@" ; $C7 ; TM_04
-    db "TM05:MEG.KCK@" ; $C8 ; TM_05 ; Market
-    db "TM06:TOXIC@"   ; $C9 ; TM_06
-    db "TM07:HRN DR.@" ; $CA ; TM_07 ; Market
-    db "TM08:BDY SLM@" ; $CB ; TM_08
-    db "TM09:TAK.DWN@" ; $CC ; TM_09 ; Market
-    db "TM10:DB.EDG@"  ; $CD ; TM_10
-    db "TM11:BUB.B.@"  ; $CE ; TM_11
-    db "TM12:WTR GUN@" ; $CF ; TM_12
-    db "TM13:ICE BM.@" ; $D0 ; TM_13
-    db "TM14:BLZZARD@" ; $D1 ; TM_14
-    db "TM15:HYP.B.@"  ; $D2 ; TM_15
-    db "TM16:PAY DAY@" ; $D3 ; TM_16
-    db "TM17:SUBMIS.@" ; $D4 ; TM_17 ; Market
-    db "TM18:COUNTER@" ; $D5 ; TM_18
-    db "TM19:SSM TOS@" ; $D6 ; TM_19
-    db "TM20:RAGE@"    ; $D7 ; TM_20
-    db "TM21:M.DRAIN@" ; $D8 ; TM_21
-    db "TM22:SOLRBM.@" ; $D9 ; TM_22
-    db "TM23:DRG RGE@" ; $DA ; TM_23
-    db "TM24:THUNDRB@" ; $DB ; TM_24
-    db "TM25:THUNDER@" ; $DC ; TM_25
-    db "TM26:EARTHQ.@" ; $DD ; TM_26
-    db "TM27:FISSURE@" ; $DE ; TM_27
-    db "TM28:DIG@"     ; $DF ; TM_28
-    db "TM29:PSYCHIC@" ; $E0 ; TM_29
-    db "TM30:TELEPRT@" ; $E1 ; TM_30
-    db "TM31:MIMIC@"   ; $E2 ; TM_31
-    db "TM32:DB.TEAM@" ; $E3 ; TM_32 ; Market
-    db "TM33:REFLECT@" ; $E4 ; TM_33 ; Market
-    db "TM34:BIDE@"    ; $E5 ; TM_34
-    db "TM35:METRONM@" ; $E6 ; TM_35
-    db "TM36:SELFDST@" ; $E7 ; TM_36
-    db "TM37:FLMTRWR@" ; $E8 ; TM_37
-    db "TM38:FIR.BLS@" ; $E9 ; TM_38
-    db "TM39:SWIFT@"   ; $EA ; TM_39
-    db "TM40:SKUL B.@" ; $EB ; TM_40
-    db "TM41:STRUGGLE" ; $FB ; TM_41
-    db "TM42:DRM EAT@" ; $ED ; TM_42
-    db "TM43:SKY ATK@" ; $EE ; TM_43
-    db "TM44:REST@"    ; $EF ; TM_44
-    db "TM45:THND WV@" ; $F0 ; TM_45
-    db "TM46:PSYWAVE@" ; $F1 ; TM_46
-    db "TM47:EXPLOS.@" ; $F2 ; TM_47
-    db "TM48:RCK SLD@" ; $F3 ; TM_48
-    db "TM49:TRI ATK@" ; $F4 ; TM_49
-    db "TM50:SUBSTIT@" ; $F5 ; TM_50
-    db "TM51:BLADE@"   ; $F6 ; TM_51
-    db "TM52:SWOOP@"   ; $F7 ; TM_52
-    db "TM53:TSUNAMI@" ; $F8 ; TM_53
-    db "TM54:STRIKE@"  ; $F9 ; TM_54
-    db "TM55:FLASH@"   ; $EC ; TM_55
-    db "TM56:STRUGGLE" ; $FB ; TM_56
-    db "?@"            ; $FC
-    db "?@"            ; $FD
-    db "?@"            ; $FE
+    db "?@"            ; $C4
+    db "?@"            ; $C5
+    db "?@"            ; $C6
+    db "TM01:M.PNCH@"  ; $C7 ; TM_01 ; Market
+    db "TM02:RAZ.WND@" ; $C8 ; TM_02 ; Market
+    db "TM03:SW.DNCE@" ; $C9 ; TM_03
+    db "TM04:WHRLWND@" ; $CA ; TM_04
+    db "TM05:MEG.KCK@" ; $CB ; TM_05 ; Market
+    db "TM06:TOXIC@"   ; $CC ; TM_06
+    db "TM07:HRN DR.@" ; $CD ; TM_07 ; Market
+    db "TM08:BDY SLM@" ; $CE ; TM_08
+    db "TM09:TAK.DWN@" ; $CF ; TM_09 ; Market
+    db "TM10:DB.EDG@"  ; $D0 ; TM_10
+    db "TM11:BUB.B.@"  ; $D1 ; TM_11
+    db "TM12:WTR GUN@" ; $D2 ; TM_12
+    db "TM13:ICE BM.@" ; $D3 ; TM_13
+    db "TM14:BLZZARD@" ; $D4 ; TM_14
+    db "TM15:HYP.B.@"  ; $D5 ; TM_15
+    db "TM16:PAY DAY@" ; $D6 ; TM_16
+    db "TM17:SUBMIS.@" ; $D7 ; TM_17 ; Market
+    db "TM18:COUNTER@" ; $D8 ; TM_18
+    db "TM19:SSM TOS@" ; $D9 ; TM_19
+    db "TM20:RAGE@"    ; $DA ; TM_20
+    db "TM21:M.DRAIN@" ; $DB ; TM_21
+    db "TM22:SOLRBM.@" ; $DC ; TM_22
+    db "TM23:DRG RGE@" ; $DD ; TM_23
+    db "TM24:THUNDRB@" ; $DE ; TM_24
+    db "TM25:THUNDER@" ; $DF ; TM_25
+    db "TM26:EARTHQ.@" ; $E0 ; TM_26
+    db "TM27:FISSURE@" ; $E1 ; TM_27
+    db "TM28:DIG@"     ; $E2 ; TM_28
+    db "TM29:PSYCHIC@" ; $E3 ; TM_29
+    db "TM30:TELEPRT@" ; $E4 ; TM_30
+    db "TM31:MIMIC@"   ; $E5 ; TM_31
+    db "TM32:DB.TEAM@" ; $E6 ; TM_32 ; Market
+    db "TM33:REFLECT@" ; $E7 ; TM_33 ; Market
+    db "TM34:BIDE@"    ; $E8 ; TM_34
+    db "TM35:METRONM@" ; $E9 ; TM_35
+    db "TM36:SELFDST@" ; $EA ; TM_36
+    db "TM37:FLMTRWR@" ; $EB ; TM_37
+    db "TM38:FIR.BLS@" ; $EC ; TM_38
+    db "TM39:SWIFT@"   ; $ED ; TM_39
+    db "TM40:SKUL B.@" ; $EE ; TM_40
+    db "TM41:STRGGLE@" ; $EF ; TM_41
+    db "TM42:DRM EAT@" ; $F0 ; TM_42
+    db "TM43:SKY ATK@" ; $F1 ; TM_43
+    db "TM44:REST@"    ; $F2 ; TM_44
+    db "TM45:THND WV@" ; $F3 ; TM_45
+    db "TM46:PSYWAVE@" ; $F4 ; TM_46
+    db "TM47:EXPLOS.@" ; $F5 ; TM_47
+    db "TM48:RCK SLD@" ; $F6 ; TM_48
+    db "TM49:TRI ATK@" ; $F7 ; TM_49
+    db "TM50:SUBSTIT@" ; $F8 ; TM_50
+    db "TM51:BLADE@"   ; $F9 ; TM_51
+    db "TM52:SWOOP@"   ; $FA ; TM_52
+    db "TM53:TSUNAMI@" ; $FB ; TM_53
+    db "TM54:STRIKE@"  ; $FC ; TM_54
+    db "TM55:FLASH@"   ; $FD ; TM_55
+    db "TM56:STRGGLE@" ; $FE ; TM_56
     db "CANCEL@"       ; $FF
-    db "ITEM 00@"      ; $00
+    db "?@"            ; $00
 
 ; four tiles: pokeball,black pokeball (status ailment),crossed out pokeball (faited) and pokeball slot (no mon)
 PokeballTileGraphics:
@@ -136836,7 +136868,6 @@ DisplayDepositWithdrawMenu_:
 PrintBattleValueNearMon_:
     ld hl,wPrintBattleValueBit0
     bit 0,[hl]
-    res 0,[hl]
     ret z
     call .GetHlPointerToTextArea
     push hl
@@ -136855,11 +136886,21 @@ PrintBattleValueNearMon_:
     ld a,[W_ENEMYMOVEEFFECT]
 .effect
     cp TWO_TO_FIVE_ATTACKS_EFFECT
-    ld a,4
+    ld b,4
     jr z,.StoreCounter
-    ld a,20
+    cp TRAPPING_EFFECT
+    ld b,6
+    jr z,.StoreCounter
+    cp ATTACK_TWICE_EFFECT
+    ld b,10
+    jr z,.StoreCounter
+    cp TWINEEDLE_EFFECT
+    ld b,10
+    jr z,.StoreCounter
+    ld b,20
 .StoreCounter
-    ld [wBattleValueCounter],a
+    ld hl,wBattleValueCounter
+    ld [hl],b
     ret
     
 .ClearScreenArea
@@ -136898,6 +136939,10 @@ PrintBattleValueNearMon_:
     ret
 
 RemoveBattleValue_:
+    ld hl,wPrintBattleValueBit0
+    bit 0,[hl]
+    res 0,[hl]
+    ret z
     ld hl,wBattleValueCounter
 .loop
     call Delay3
@@ -136911,6 +136956,48 @@ RemoveBattleValue_:
     ld hl,Coord
     ld bc,$020C ; 02 | 12
     jp ClearScreenArea
+
+; ──────────────────────────────────────────────────────────────────────
+; Type Effects
+; ──────────────────────────────────────────────────────────────────────
+
+TypeEffects:
+; format: attacking type,defending type,damage multiplier
+; the multiplier is a (decimal) fixed-point number:
+;     20 is ×2.0
+;     05 is ×0.5
+;     00 is ×0
+
+    INCLUDE "constants/type_effect.asm"
+    db $FF
+
+GetTypeEffects_:
+    ld a,[$d11e]
+    ld b,a
+    ld hl,TypeEffects
+    ld de,wBufferTypeEffects
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.end
+    cp b
+    jr nz,.next
+    ld [de],a
+    inc de
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hli]
+    ld [de],a
+    inc de
+    jr .loop
+.next
+    inc hl
+    inc hl
+    jr .loop
+.end
+    ld [de],a ; $FF
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 

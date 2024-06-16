@@ -69,7 +69,7 @@ AIMoveChoiceModification1:
     jr z,.countercheck_end    ; continue on if countering a normal move
     cp FIGHTING
     jr z,.countercheck_end    ; continue on if countering a fighting move
-    cp BIRD
+    cp TYPE_NA
     jr z,.countercheck_end    ; continue on if countering STRUGGLE or other typeless move
     jp .heavydiscourage    ;else heavily discourage since the player move type is not applicable to counter
 .countercheck_end
