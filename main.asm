@@ -47348,12 +47348,10 @@ DisplayEffectiveness: ; Moved in the Bank
     cp 15
     ld hl,.VeryEffectiveText
     jr nc,.done
-    cp 12
+    cp 10
     ld hl,.QuiteEffectiveText
     jr nc,.done
-    cp 09
-    ret nc
-    cp 07
+    cp 08
     ld hl,.AlmostEffectiveText
     jr nc,.done
     cp 05
