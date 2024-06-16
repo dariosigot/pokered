@@ -65,6 +65,7 @@
     db METAL,FIRE,08
     db METAL,ELECTRIC,05
     db METAL,DRAGON,20
+    db METAL,GHOST,00
 
     db IVORY,ROCK,05
     db IVORY,GHOST,00
