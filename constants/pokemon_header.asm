@@ -3526,7 +3526,7 @@ OnixBaseStats: ; 38e26 (e:4e26)
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,36,40                ; |BIDE|SELFDESTRUCT|SKULL_BASH|
     tmlearn 44,47,48                ; |REST|EXPLOSION|ROCK_SLIDE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
 
     db BANK(OnixPicFront)
 
@@ -5080,7 +5080,7 @@ PorygonBaseStats: ; 392be (e:52be)
     tmlearn 25,29,30,31             ; |THUNDER|PSYCHIC_M|TELEPORT|MIMIC|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
     tmlearn 42,44,45,46             ; |DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
+    tmlearn 49,50,51,55             ; |TRI_ATTACK|SUBSTITUTE|BLADE|FLASH|
 
     db BANK(PorygonPicFront)
 

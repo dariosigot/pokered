@@ -1276,10 +1276,11 @@ ONIX_Learnset: MACRO
     db 12,ROCK_THROW
     db 14,SLAM
     db 15,BIND
-    db 19,STRIKE
+    db 19,BLADE
+    db 21,SHARPEN
     db 23,TRAPHOLE
     db 26,HARDEN
-    db 29,MEDITATE
+    db 29,STRIKE
     db 31,BODY_SLAM
     db 36,EXPLOSION
     db 39,ROCK_SLIDE
@@ -2003,8 +2004,9 @@ PORYGON_Learnset: MACRO
     db 12,TELEPORT
     db 14,SONICBOOM
     db 17,FLASH
-    db 20,SWIFT
-    db 23,SHARPEN
+    db 19,BLADE
+    db 21,SHARPEN
+    db 23,SWIFT
     db 25,RECOVER
     db 29,PSYBEAM
     db 31,LIGHT_SCREEN
