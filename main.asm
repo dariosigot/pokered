@@ -57443,6 +57443,18 @@ GetTypeEffects:
     ld hl,wBufferTypeEffects
     ret
 
+CheckPoisonableMon:
+    ld a,[hli]
+    cp POISON ; can't poison a poison-type target
+    ret z
+    cp METAL
+    ret z
+    ld a,[hld]
+    cp POISON ; can't poison a poison-type target
+    ret z
+    cp METAL
+    ret
+
 ; Free
 
 SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
@@ -59159,7 +59171,7 @@ JumpMoveEffect: ; 3f138 (f:7138)
 
 MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3f1fc
-     dw Func_3f24f
+     dw PoisonEffect
      dw Func_3f2e9
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
@@ -59190,7 +59202,7 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3f811
      dw Func_3f85b
      dw Func_3f1fc
-     dw Func_3f24f
+     dw PoisonEffect
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
@@ -59223,7 +59235,7 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3f54c
      dw Func_3fb36
      dw Func_3fb36
-     dw Func_3f24f
+     dw PoisonEffect
      dw Func_3f9b1
      dw Func_3f54c
      dw Func_3f54c
@@ -59295,7 +59307,7 @@ UnnamedText_3f24a: ; 3f24a (f:724a)
     TX_FAR _UnnamedText_3f24a
     db "@"
 
-Func_3f24f: ; 3f24f (f:724f)
+PoisonEffect: ; 3f24f (f:724f)
     ld hl,W_ENEMYMONSTATUS ; $cfe9
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -59305,17 +59317,19 @@ Func_3f24f: ; 3f24f (f:724f)
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
 .asm_3f260
     call CheckTargetSubstitute
-    jr nz,.asm_3f2d3
+    jr nz,.noEffect ; can't poison a substitute target
     ld a,[hli]
     ld b,a
     and a
-    jr nz,.asm_3f2d3
-    ld a,[hli]
-    cp $3
-    jr z,.asm_3f2d3
-    ld a,[hld]
-    cp $3
-    jr z,.asm_3f2d3
+    jr nz,.noEffect ; miss if target is already statused
+    ;ld a,[hli]
+    ;cp POISON ; can't poison a poison-type target
+    ;jr z,.noEffect
+    ;ld a,[hld]
+    ;cp POISON ; can't poison a poison-type target
+    ;jr z,.noEffect
+    call CheckPoisonableMon
+    jr z,.noEffect
     ld a,[de]
     cp $2
     ld b,$34
@@ -59357,10 +59371,10 @@ Func_3f24f: ; 3f24f (f:724f)
     set 0,[hl]
     xor a
     ld [de],a
-    ld hl,UnnamedText_3f2e4 ; $72e4
+    ld hl,.UnnamedText_3f2e4 ; $72e4
     jr .asm_3f2c0
 .asm_3f2bd
-    ld hl,UnnamedText_3f2df ; $72df
+    ld hl,.UnnamedText_3f2df ; $72df
 .asm_3f2c0
     pop de
     ld a,[de]
@@ -59372,7 +59386,7 @@ Func_3f24f: ; 3f24f (f:724f)
 .asm_3f2cd
     call PlayCurrentMoveAnimation2
     jp PrintText
-.asm_3f2d3
+.noEffect
     ld a,[de]
     cp $42
     ret nz
@@ -59380,14 +59394,14 @@ Func_3f24f: ; 3f24f (f:724f)
     ld c,$32
     call DelayFrames
     jp Func_3fb5e
-
-UnnamedText_3f2df: ; 3f2df (f:72df)
+.UnnamedText_3f2df
     TX_FAR _UnnamedText_3f2df
     db "@"
-
-UnnamedText_3f2e4: ; 3f2e4 (f:72e4)
+.UnnamedText_3f2e4
     TX_FAR _UnnamedText_3f2e4
     db "@"
+
+SECTION "Func_3f2e9",ROMX[$72e9],BANK[$f]
 
 Func_3f2e9: ; 3f2e9 (f:72e9)
     ld hl,Func_783f
@@ -135410,7 +135424,7 @@ CheckSpecialWild_:
     db NIGHT_SHADE
 ; Route12_Snorlax
     db REST
-    db DEFENSE_CURL
+    db ROCK_THROW
     db AMNESIA
     db BODY_SLAM
 ; Route16_Snorlax
