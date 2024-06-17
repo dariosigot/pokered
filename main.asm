@@ -465,6 +465,35 @@ LoadFontTilePatterns: ; Moved in the Bank
     ld bc,(BANK(OtherIcon) << 8 | 12)
     jp GoodCopyVideoData
 
+PlayCryAndDisplayPokedex:
+    ld [wMonIdCryAndDex],a
+    call PlayCry
+    ld b,2 ; read
+    call .HandleBit
+    ld a,c
+    and a ; rcf
+    ret nz
+.wait
+    call GetJoypadStateLowSensitivity
+    ld a,[$ffb5]
+    and %00000011 ; ▼▲◄►StSeBA
+    and a ; was a key pressed?
+    jr z,.wait
+    ld a,[wMonIdCryAndDex]
+    call DisplayPokedex
+    ld b,1 ; set
+    call .HandleBit
+    scf
+    ret
+.HandleBit
+    ld a,[wMonIdCryAndDex]
+    ld [$d11e],a
+    call IndexToPokedexAndRestoreD11E
+    ld hl,wPokedexSeen
+    ld c,a
+    ld a,$10
+    jp Predef
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -35096,7 +35125,7 @@ CeruleanCityText8: ; 1973f (6:573f)
     ld hl,UnnamedText_1977e
     call PrintText
 .asm_f2f38 ; 0x1976c
-    jp TextScriptEnd
+    jp CeruleanSlowbro
 
 UnnamedText_1976f: ; 1976f (6:576f)
     TX_FAR _UnnamedText_1976f
@@ -35369,10 +35398,10 @@ VermilionCityText5: ; 19922 (6:5922)
     TX_FAR _VermilionCityText5
     db $08 ; asm
     ld a,MACHOP
-    call PlayCry
-    call WaitForSoundToFinish
-    ld hl,VermilionCityText14 ; $5933
-    ret
+    call PlayCryAndDisplayPokedex
+    jp VermilionMachop
+
+SECTION "VermilionCityText14",ROMX[$5933],BANK[$6]
 
 VermilionCityText14: ; 19933 (6:5933)
     TX_FAR _VermilionCityText14
@@ -35496,7 +35525,7 @@ CeladonCityText7: ; 199ec (6:59ec)
     TX_FAR _CeladonCityText7
     db $08 ; asm
     ld a,POLIWRATH
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 CeladonCityText8: ; 199f9 (6:59f9)
@@ -37662,6 +37691,24 @@ LedgeHoppingShadowOAM: ; Moved in the Bank
     db $FF,$10,$FF,$20
     db $FF,$40,$FF,$60
 
+CeruleanSlowbro:
+    ld a,SLOWBRO
+    call PlayCryAndDisplayPokedex
+    jp TextScriptEnd
+
+VermilionMachop:
+    ld hl,.VermilionCityText14_Dex
+    jr c,.end
+    call WaitForSoundToFinish
+    ld hl,VermilionCityText14
+    ret
+.end
+    call PrintText
+    jp TextScriptEnd
+.VermilionCityText14_Dex
+    TX_FAR _VermilionCityText14_Dex
+    db "@"
+
 SECTION "bank7",ROMX,BANK[$7]
 
 CinnabarIsland_h: ; 0x1c000 to 0x1c022 (34 bytes) (bank=7) (id=8)
@@ -39456,7 +39503,7 @@ ViridianHouseText3: ; 1d59f (7:559f)
     ld hl,UnnamedText_1d5b1
     call PrintText
     ld a,SPEAROW
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -39506,7 +39553,7 @@ PewterHouse1Text1: ; 1d5fc (7:55fc)
     TX_FAR _PewterHouse1Text1
     db $08 ; asm
     ld a,NIDORAN_M
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -39935,14 +39982,14 @@ LavenderHouse1Text3: ; 1d8fe (7:58fe)
     TX_FAR _LavenderHouse1Text3
     db $8
     ld a,PSYDUCK
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 LavenderHouse1Text4: ; 1d90b (7:590b)
     TX_FAR _LavenderHouse1Text4
     db $8
     ld a,NIDORINO
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 LavenderHouse1Text5: ; 1d918 (7:5918)
@@ -40032,7 +40079,7 @@ LavenderHouse2Text1: ; 1d9b6 (7:59b6)
     TX_FAR _LavenderHouse2Text1
     db $8
     ld a,CUBONE
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 LavenderHouse2Text2: ; 1d9c3 (7:59c3)
@@ -40220,7 +40267,7 @@ VermilionHouse1Text2: ; 1db0b (7:5b0b)
     TX_FAR _VermilionHouse1Text2
     db $08 ; asm
     ld a,PIDGEY
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -40597,7 +40644,7 @@ SaffronHouse1Text2: ; 1dded (7:5ded)
     TX_FAR _SaffronHouse1Text2
     db $8
     ld a,PIDGEY
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 SaffronHouse1Text3: ; 1ddfa (7:5dfa)
@@ -41590,7 +41637,7 @@ Route16HouseText2: ; 1e640 (7:6640)
     ld hl,UnnamedText_1e652
     call PrintText
     ld a,FEAROW
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -57443,6 +57490,18 @@ GetTypeEffects:
     ld hl,wBufferTypeEffects
     ret
 
+CheckPoisonableMon:
+    ld a,[hli]
+    cp POISON ; can't poison a poison-type target
+    ret z
+    cp METAL
+    ret z
+    ld a,[hld]
+    cp POISON ; can't poison a poison-type target
+    ret z
+    cp METAL
+    ret
+
 ; Free
 
 SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
@@ -59159,7 +59218,7 @@ JumpMoveEffect: ; 3f138 (f:7138)
 
 MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3f1fc
-     dw Func_3f24f
+     dw PoisonEffect
      dw Func_3f2e9
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
@@ -59190,7 +59249,7 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3f811
      dw Func_3f85b
      dw Func_3f1fc
-     dw Func_3f24f
+     dw PoisonEffect
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
@@ -59223,7 +59282,7 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3f54c
      dw Func_3fb36
      dw Func_3fb36
-     dw Func_3f24f
+     dw PoisonEffect
      dw Func_3f9b1
      dw Func_3f54c
      dw Func_3f54c
@@ -59295,7 +59354,7 @@ UnnamedText_3f24a: ; 3f24a (f:724a)
     TX_FAR _UnnamedText_3f24a
     db "@"
 
-Func_3f24f: ; 3f24f (f:724f)
+PoisonEffect: ; 3f24f (f:724f)
     ld hl,W_ENEMYMONSTATUS ; $cfe9
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -59305,17 +59364,19 @@ Func_3f24f: ; 3f24f (f:724f)
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
 .asm_3f260
     call CheckTargetSubstitute
-    jr nz,.asm_3f2d3
+    jr nz,.noEffect ; can't poison a substitute target
     ld a,[hli]
     ld b,a
     and a
-    jr nz,.asm_3f2d3
-    ld a,[hli]
-    cp $3
-    jr z,.asm_3f2d3
-    ld a,[hld]
-    cp $3
-    jr z,.asm_3f2d3
+    jr nz,.noEffect ; miss if target is already statused
+    ;ld a,[hli]
+    ;cp POISON ; can't poison a poison-type target
+    ;jr z,.noEffect
+    ;ld a,[hld]
+    ;cp POISON ; can't poison a poison-type target
+    ;jr z,.noEffect
+    call CheckPoisonableMon
+    jr z,.noEffect
     ld a,[de]
     cp $2
     ld b,$34
@@ -59357,10 +59418,10 @@ Func_3f24f: ; 3f24f (f:724f)
     set 0,[hl]
     xor a
     ld [de],a
-    ld hl,UnnamedText_3f2e4 ; $72e4
+    ld hl,.UnnamedText_3f2e4 ; $72e4
     jr .asm_3f2c0
 .asm_3f2bd
-    ld hl,UnnamedText_3f2df ; $72df
+    ld hl,.UnnamedText_3f2df ; $72df
 .asm_3f2c0
     pop de
     ld a,[de]
@@ -59372,7 +59433,7 @@ Func_3f24f: ; 3f24f (f:724f)
 .asm_3f2cd
     call PlayCurrentMoveAnimation2
     jp PrintText
-.asm_3f2d3
+.noEffect
     ld a,[de]
     cp $42
     ret nz
@@ -59380,14 +59441,14 @@ Func_3f24f: ; 3f24f (f:724f)
     ld c,$32
     call DelayFrames
     jp Func_3fb5e
-
-UnnamedText_3f2df: ; 3f2df (f:72df)
+.UnnamedText_3f2df
     TX_FAR _UnnamedText_3f2df
     db "@"
-
-UnnamedText_3f2e4: ; 3f2e4 (f:72e4)
+.UnnamedText_3f2e4
     TX_FAR _UnnamedText_3f2e4
     db "@"
+
+SECTION "Func_3f2e9",ROMX[$72e9],BANK[$f]
 
 Func_3f2e9: ; 3f2e9 (f:72e9)
     ld hl,Func_783f
@@ -70921,13 +70982,13 @@ CeladonMansion1TextPointers: ; 48697 (12:4697)
     dw CeladonMansion1Text5
 
 Func_486a1: ; 486a1 (12:46a1)
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 CeladonMansion1Text1: ; 486a7 (12:46a7)
     TX_FAR _CeladonMansion1Text1
     db $08 ; asm
-    ld a,$4d
+    ld a,MEOWTH
     jp Func_486a1
 
 CeladonMansion1Text2: ; 486b1 (12:46b1)
@@ -70937,13 +70998,13 @@ CeladonMansion1Text2: ; 486b1 (12:46b1)
 CeladonMansion1Text3: ; 486b6 (12:46b6)
     TX_FAR _CeladonMansion1Text3
     db $8
-    ld a,$4
+    ld a,CLEFAIRY
     jp Func_486a1
 
 CeladonMansion1Text4: ; 486c0 (12:46c0)
     TX_FAR _CeladonMansion1Text4
     db $8
-    ld a,$f
+    ld a,NIDORAN_F
     jp Func_486a1
 
 CeladonMansion1Text5: ; 486ca (12:46ca)
@@ -75189,9 +75250,7 @@ SaffronCityText11: ; 50c67 (14:4c67)
     TX_FAR _SaffronCityText11
     db "@"
 
-SaffronCityText12: ; 50c6c (14:4c6c)
-    TX_FAR _SaffronCityText12
-    db $15,"@"
+SECTION "SaffronCityText13",ROMX[$4c72],BANK[$14]
 
 SaffronCityText13: ; 50c72 (14:4c72)
     TX_FAR _SaffronCityText13
@@ -79288,6 +79347,13 @@ Route23TextPointers: ; Moved in the Bank
     dw Route23Text7
     dw Predef5CText
     dw Route23Text8
+
+SaffronCityText12: ; Moved in the Bank
+    TX_FAR _SaffronCityText12
+    db $08 ; asm
+    ld a,PIDGEOT
+    call PlayCryAndDisplayPokedex
+    jp TextScriptEnd
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -85650,9 +85716,7 @@ Route12TrainerHeader6: ; 596d9 (16:56d9)
 
     db $ff
 
-Route12Text1: ; 596e6 (16:56e6)
-    TX_FAR _Route12Text1
-    db "@"
+SECTION "Route12SnorlaxText",ROMX[$56eb],BANK[$16]
 
 Route12SnorlaxText: ; 596eb (16:56eb)
     TX_FAR _Route12SnorlaxText
@@ -86335,9 +86399,7 @@ Route16AfterBattleText6: ; 59aa9 (16:5aa9)
     TX_FAR _Route16AfterBattleText6
     db "@"
 
-Route16Text7: ; 59aae (16:5aae)
-    TX_FAR _Route16Text7
-    db "@"
+SECTION "Route16SnorlaxText",ROMX[$5ab3],BANK[$16]
 
 Route16SnorlaxText: ; 59ab3 (16:5ab3)
     TX_FAR _Route16SnorlaxText
@@ -86555,7 +86617,7 @@ FanClubText3: ; 59bee (16:5bee)
     ld hl,UnnamedText_59c00
     call PrintText
     ld a,PIKACHU
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -86568,7 +86630,7 @@ FanClubText4: ; 59c05 (16:5c05)
     ld hl,UnnamedText_59c17
     call PrintText
     ld a,SEEL
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -87729,6 +87791,20 @@ SetLastBlackoutMapAfterLeague:
     ld [wLastBlackoutAdventureMap],a
     ret
 
+Route12Text1: ; Moved in the Bank
+    TX_FAR _Route12Text1
+    db $08 ; asm
+    ld a,SNORLAX
+    call PlayCryAndDisplayPokedex
+    jp TextScriptEnd
+
+Route16Text7: ; Moved in the Bank
+    TX_FAR _Route16Text7
+    db $08 ; asm
+    ld a,SNORLAX
+    call PlayCryAndDisplayPokedex
+    jp TextScriptEnd
+
 SECTION "bank17",ROMX,BANK[$17]
 
 SaffronMartBlocks: ; 5c000 (17:4000)
@@ -88503,7 +88579,7 @@ PewterPokecenterText3: ; 5c59b (17:459b)
     ld c,$30
     call DelayFrames
     call PlayDefaultMusic
-    jp TextScriptEnd
+    jp PewterJigglypuff
 
 PewterPokecenterText5: ; 5c603 (17:4603)
     TX_FAR _PewterPokecenterText5 ; 0x98744
@@ -89461,9 +89537,7 @@ TM31NoRoomText: ; 5ccee (17:4cee)
     TX_FAR _TM31NoRoomText ; 0xa1733
     db $d,"@"
 
-CopycatsHouseF2Text2: ; 5ccf4 (17:4cf4)
-    TX_FAR _CopycatsHouseF2Text2
-    db "@"
+SECTION "CopycatsHouseF2Text5",ROMX[$4cf9],BANK[$17]
 
 CopycatsHouseF2Text5: ; 5ccf9 (17:4cf9)
 CopycatsHouseF2Text4: ; 5ccf9 (17:4cf9)
@@ -91735,6 +91809,31 @@ SaffronMartText1:
     db HYPER_POTION
     db FULL_HEAL
     db MAX_REPEL,ESCAPE_ROPE,$FF
+
+PewterJigglypuff:
+    ld a,JIGGLYPUFF
+    call PlayCryAndDisplayPokedex
+    jp TextScriptEnd
+
+CopycatsHouseF2Text2: ; Moved in the Bank
+    TX_FAR _CopycatsHouseF2Text2
+    db $08 ; asm
+    ld a,DODUO
+    call PlayCryAndDisplayPokedex
+    ld hl,.CopycatsHouseF2Text2_Part2_Dex
+    jr c,.end
+    call WaitForSoundToFinish
+    ld hl,.CopycatsHouseF2Text2_Part2
+    ret
+.end
+    call PrintText
+    jp TextScriptEnd
+.CopycatsHouseF2Text2_Part2
+    TX_FAR _CopycatsHouseF2Text2_Part2
+    db "@"
+.CopycatsHouseF2Text2_Part2_Dex
+    TX_FAR _CopycatsHouseF2Text2_Part2_Dex
+    db "@"
 
 SECTION "bank18",ROMX,BANK[$18]
 
@@ -94300,7 +94399,7 @@ SSAnne8Text8: ; 619fe (18:59fe)
     TX_FAR _SSAnne8Text8
     db $08 ; asm
     ld a,WIGGLYTUFF
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 SSAnne8BattleText1: ; 61a0b (18:5a0b)
@@ -94811,7 +94910,7 @@ SSAnne10Text8: ; 61e09 (18:5e09)
     TX_FAR _SSAnne10Text8
     db $8 ; 0x61e0d
     ld a,MACHOKE
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 SSAnne10BattleText1: ; 61e16 (18:5e16)
@@ -105782,7 +105881,7 @@ CopycatsHouseF1Text3: ; 75ed6 (1d:5ed6)
     TX_FAR _CopycatsHouseF1Text3
     db $8
     ld a,CHANSEY
-    call PlayCry
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 CopycatsHouseF1Object: ; 0x75ee3 (size=46)
@@ -127413,11 +127512,9 @@ _TM31NoRoomText: ; a1733 (28:5733)
     db "this?@@"
 
 _CopycatsHouseF2Text2: ; a1749 (28:5749)
-    db $0,"DODUO: Giiih!",$51
-    db "MIRROR MIRROR ON",$4f
-    db "THE WALL,WHO IS",$55
-    db "THE FAIREST ONE",$55
-    db "OF ALL?",$57
+    db $0,"DODUO: Giiih!@@"
+
+SECTION "_CopycatsHouseF2Text3",ROMX[$5792],BANK[$28]
 
 _CopycatsHouseF2Text3: ; a1792 (28:5792)
     db $0,"This is a rare",$4f
@@ -128034,6 +128131,20 @@ _NoPartyText:
 _ElementMissedText:
     db $0,"No! A new POWER",$4f
     db "is required.",$58
+
+_CopycatsHouseF2Text2_Part2:
+    db $0,$51
+    db "MIRROR MIRROR ON",$4f
+    db "THE WALL,WHO IS",$55
+    db "THE FAIREST ONE",$55
+    db "OF ALL?",$57
+
+_CopycatsHouseF2Text2_Part2_Dex:
+    db $0
+    db "MIRROR MIRROR ON",$4f
+    db "THE WALL,WHO IS",$55
+    db "THE FAIREST ONE",$55
+    db "OF ALL?",$58
 
 SECTION "bank29",ROMX,BANK[$29]
 
@@ -129263,6 +129374,12 @@ _CannotDigHereText:
     TX_RAM $cd6d
     db $0," can't",$4f
     db "DIG here.",$58
+
+_VermilionCityText14_Dex:
+    db $0
+    db "A MACHOP is",$4f
+    db "stomping the land",$55
+    db "flat.",$58
 
 SECTION "bank2A",ROMX,BANK[$2A]
 
@@ -135410,7 +135527,7 @@ CheckSpecialWild_:
     db NIGHT_SHADE
 ; Route12_Snorlax
     db REST
-    db DEFENSE_CURL
+    db ROCK_THROW
     db AMNESIA
     db BODY_SLAM
 ; Route16_Snorlax
@@ -136469,7 +136586,7 @@ ItemInBattleFinalCheck:
     PREDEF DrawPlayerHUDAndHPBarPredef
     ld a,1
     ld [H_AUTOBGTRANSFERENABLED],a ; enable transfer
-    ret
+    jp SaveScreenTilesToBuffer1
 .DrawHUDsAndHPBars
     ld b,BANK(DrawHUDsAndHPBars)
     ld hl,DrawHUDsAndHPBars

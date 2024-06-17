@@ -61,7 +61,7 @@ IvysaurBaseStats: ; 383fa (e:43fa)
     db 80 ; base special
 
     db GRASS ; species type 1
-    db GRASS ; species type 2
+    db POISON ; species type 2
 
     db 45 ; catch rate
     db 141 ; base exp yield
@@ -172,7 +172,7 @@ CharmeleonBaseStats: ; 3844e (e:444e)
     db 65 ; base special
 
     db FIRE ; species type 1
-    db FIRE ; species type 2
+    db DRAGON ; species type 2
 
     db 45 ; catch rate
     db 142 ; base exp yield
@@ -283,7 +283,7 @@ WartortleBaseStats: ; 384a2 (e:44a2)
     db 65 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db IVORY ; species type 2
 
     db 45 ; catch rate
     db 143 ; base exp yield

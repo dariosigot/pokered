@@ -86,7 +86,7 @@ DojoLeader:
     db ROLLING_KICK
     db JUMP_KICK
     db HI_JUMP_KICK
-    db SUBMISSION
+    db EARTHQUAKE
     ; Hitmonchan (Level 39)
     db FIRE_PUNCH
     db ICE_PUNCH
@@ -153,7 +153,7 @@ Giovanni3Move:
     db HYPER_BEAM
     db REST
     db SLASH
-    db DOUBLE_TEAM
+    db GLARE
     ; Nidoqueen (Level 55)
     db SLUDGE
     db EARTHQUAKE
@@ -452,7 +452,7 @@ Sony2MoveB:
     db SUBSTITUTE
     db BODY_SLAM
     ; Cloyster (Level 45)
-    db CLAMP
+    db SPIKE_CANNON
     db MIST
     db SELFDESTRUCT
     db ICE_BEAM
@@ -490,7 +490,7 @@ Sony2MoveC:
     db PSYCHIC_M
     db EGG_BOMB
     ; Cloyster (Level 47)
-    db CLAMP
+    db SPIKE_CANNON
     db MIST
     db SELFDESTRUCT
     db ICE_BEAM
@@ -661,7 +661,7 @@ CooltrainerFMove3:
     db HYPER_BEAM
     ; Rapidash (Level 43)
     db AGILITY
-    db BODY_SLAM
+    db HORN_ATTACK
     db FLAMETHROWER
     db HORN_DRILL
     ; Chansey (Level 46)
@@ -673,7 +673,7 @@ CooltrainerFMove3:
 
 CooltrainerFMove4:
     ; Persian (Level 41)
-    db DOUBLE_TEAM
+    db GLARE
     db SLASH
     db REST
     db THUNDERBOLT
@@ -711,7 +711,7 @@ CooltrainerMMove2:
     db PSYCHIC_M
     db EXPLOSION
     ; Cloyster (Level 44)
-    db CLAMP
+    db SPIKE_CANNON
     db REST
     db BLIZZARD
     db EXPLOSION
@@ -745,7 +745,7 @@ CooltrainerMMove3:
     db REFLECT
     db THUNDER_WAVE
     ; Tauros (Level 43)
-    db BODY_SLAM
+    db BONE_CLUB
     db REST
     db BLIZZARD
     db EARTHQUAKE
@@ -921,7 +921,7 @@ TamerMove5:
     db CONFUSE_RAY
     ; Kangaskhan (Level 44)
     db EARTHQUAKE
-    db BODY_SLAM
+    db DIZZY_PUNCH
     db SUBSTITUTE
     db SLASH
     ; Arbok (Level 45)
