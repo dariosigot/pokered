@@ -136483,7 +136483,7 @@ ItemInBattleFinalCheck:
     PREDEF DrawPlayerHUDAndHPBarPredef
     ld a,1
     ld [H_AUTOBGTRANSFERENABLED],a ; enable transfer
-    ret
+    jp SaveScreenTilesToBuffer1
 .DrawHUDsAndHPBars
     ld b,BANK(DrawHUDsAndHPBars)
     ld hl,DrawHUDsAndHPBars
