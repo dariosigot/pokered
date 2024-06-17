@@ -1688,6 +1688,7 @@ wBufferTypeEffectsEnd:
     db
 wTmpDmgMultiplier:
     ds 2
+
 ENDU
 
 ; ────────────────────────────────────────────────────
@@ -1724,6 +1725,7 @@ wChoicePkmnMoveDeleter ; df37
 wBackupDarkMap         ; df37
 wTempStatLO            ; df37
 wFieldMoveMonID        ; df37 = Mon ID used for Cry
+wMonIdCryAndDex        ; df37 = Mon ID used for PlayCryAndDisplayPokedex
     ds 1
 
 wFlagAddPkmnToPartyBit0     ; df38 ; bit 0
