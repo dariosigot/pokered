@@ -481,8 +481,6 @@ PlayCryAndDisplayPokedex:
     jr z,.wait
     ld a,[wMonIdCryAndDex]
     call DisplayPokedex
-    ld b,1 ; set
-    call .HandleBit
     scf
     ret
 .HandleBit
@@ -18099,10 +18097,10 @@ Func_7c18: ; 7c18 (1:7c18)
     ld a,$3a
     call Predef
     ld a,[$d11e]
-    dec a
+    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
-    ld hl,$d30a
+    ld hl,wPokedexSeen
     ld a,$10
     call Predef
     ld a,$1
@@ -26922,7 +26920,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     push bc
     call _HandleBitArray
     pop bc
-    ld hl,wPokedexSeen ; $d30a
+    ld hl,wPokedexSeen
     call _HandleBitArray
     pop hl
     push hl
@@ -35647,7 +35645,7 @@ FuchsiaCityText19: ; 19a90 (6:5a90)
     ld hl,FuchsiaCityChanseyText
     call PrintText
     ld a,CHANSEY
-    call DisplayPokedex
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 FuchsiaCityChanseyText: ; 19a9f (6:5a9f)
@@ -35659,7 +35657,7 @@ FuchsiaCityText20: ; 19aa4 (6:5aa4)
     ld hl,FuchsiaCityVoltorbText
     call PrintText
     ld a,VOLTORB
-    call DisplayPokedex
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 FuchsiaCityVoltorbText: ; 19ab3 (6:5ab3)
@@ -35671,7 +35669,7 @@ FuchsiaCityText21: ; 19ab8 (6:5ab8)
     ld hl,FuchsiaCityKangaskhanText
     call PrintText
     ld a,KANGASKHAN
-    call DisplayPokedex
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 FuchsiaCityKangaskhanText: ; 19ac7 (6:5ac7)
@@ -35683,7 +35681,7 @@ FuchsiaCityText22: ; 19acc (6:5acc)
     ld hl,FuchsiaCitySlowpokeText
     call PrintText
     ld a,SLOWPOKE
-    call DisplayPokedex
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 FuchsiaCitySlowpokeText: ; 19adb (6:5adb)
@@ -35695,7 +35693,7 @@ FuchsiaCityText23: ; 19ae0 (6:5ae0)
     ld hl,FuchsiaCityLaprasText
     call PrintText
     ld a,LAPRAS
-    call DisplayPokedex
+    call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
 FuchsiaCityLaprasText: ; 19aef (6:5aef)
@@ -35715,14 +35713,14 @@ FuchsiaCityText24: ; 19af4 (6:5af4)
 .asm_3b4e8 ; 0x19b08
     ld hl,FuchsiaCityOmanyteText
     call PrintText
-    ld a,$62
+    ld a,OMANYTE
     jr .asm_81556 ; 0x19b10
 .asm_667d5 ; 0x19b12
     ld hl,FuchsiaCityKabutoText
     call PrintText
     ld a,KABUTO
 .asm_81556 ; 0x19b1a
-    call DisplayPokedex
+    call PlayCryAndDisplayPokedex
 .asm_4343f ; 0x19b1d
     jp TextScriptEnd
 
@@ -50888,7 +50886,7 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     push bc
     call Func_3b057
     pop bc
-    ld hl,wPokedexSeen ; $d30a
+    ld hl,wPokedexSeen
     call Func_3b057
     pop de
     pop hl
@@ -58413,7 +58411,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
-    ld hl,wPokedexSeen ; $d30a
+    ld hl,wPokedexSeen
     ld a,$10
     call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
     ld hl,W_ENEMYMONLEVEL ; $cff3
@@ -129012,41 +129010,41 @@ _FuchsiaCityText18: ; a6011 (29:6011)
 _FuchsiaCityChanseyText: ; a6050 (29:6050)
     db $0,"Name: CHANSEY",$51
     db "Catching one is",$4f
-    db "all up to chance.",$58
+    db "all up to chance.",$57
 
 _FuchsiaCityVoltorbText: ; a6081 (29:6081)
     db $0,"Name: VOLTORB",$51
     db "The very image of",$4f
-    db "a # BALL.",$58
+    db "a # BALL.",$57
 
 _FuchsiaCityKangaskhanText: ; a60ac (29:60ac)
     db $0,"Name: KANGASKHAN",$51
     db "A maternal #MON",$4f
     db "that raises its",$55
     db "young in a pouch",$55
-    db "on its belly.",$58
+    db "on its belly.",$57
 
 _FuchsiaCitySlowpokeText: ; a60fd (29:60fd)
     db $0,"Name: SLOWPOKE",$51
     db "Friendly and very",$4f
-    db "slow moving.",$58
+    db "slow moving.",$57
 
 _FuchsiaCityLaprasText: ; a612c (29:612c)
     db $0,"Name: LAPRAS",$51
     db "A.K.A. the king",$4f
-    db "of the seas.",$58
+    db "of the seas.",$57
 
 _FuchsiaCityOmanyteText: ; a6157 (29:6157)
     db $0,"Name: OMANYTE",$51
     db "A #MON that",$4f
     db "was resurrected",$55
-    db "from a fossil.",$58
+    db "from a fossil.",$57
 
 _FuchsiaCityKabutoText: ; a6191 (29:6191)
     db $0,"Name: KABUTO",$51
     db "A #MON that",$4f
     db "was resurrected",$55
-    db "from a fossil.",$58
+    db "from a fossil.",$57
 
 _UnnamedText_19b2a: ; a61ca (29:61ca)
     db $0,"...",$57
