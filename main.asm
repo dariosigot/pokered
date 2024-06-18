@@ -43562,9 +43562,43 @@ DebugNPC:
     push af
 
     ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 2,a ; was the start button pressed?
+    jr nz,.select
     bit 3,a ; was the start button pressed?
-    jr z,.standard
+    jr nz,.start
+    jr .standard
 
+.select
+    ld hl,W_NUMINPARTY
+    ld a,[hli]
+    ld b,a
+.loop0
+    ld a,[hli]
+    push bc
+    push hl
+    ld [$d11e],a
+    call IndexToPokedexAndRestoreD11E
+    ld b,1 ; set
+    ld c,a
+    push bc
+    ld hl,wPokedexSeen
+    call .HandleBit
+    pop bc
+    ld hl,wPokedexOwned
+    call .HandleBit
+    pop hl
+    pop bc
+    dec b
+    jr nz,.loop0
+    ld hl,.DoneTextSelect
+    jp .end
+.HandleBit
+    ld a,$10
+    jp Predef
+.DoneTextSelect
+    db 0,"Done! (select)",$57,"@"
+
+.start
     ld a,[W_NUMINPARTY]
     ld b,a
     ld hl,W_PARTYMON1_TYPE1
@@ -43588,7 +43622,10 @@ DebugNPC:
     add hl,de
     dec b
     jr nz,.loop1
-    jr .end
+    ld hl,.DoneTextStart
+    jp .end
+.DoneTextStart
+    db 0,"Done! (start)",$57,"@"
 
 .standard
     ld a,[W_NUMINPARTY]
@@ -43616,9 +43653,12 @@ DebugNPC:
     inc c
     dec b
     jr nz,.loop2
+    ld hl,.DoneText
+    jp .end
+.DoneText
+    db 0,"Done!",$57,"@"
 
 .end
-    ld hl,.DoneText
     call PrintText
     ; Restore
     pop af
@@ -43626,8 +43666,6 @@ DebugNPC:
     pop af
     ld [$cf92],a
     jp TextScriptEnd
-.DoneText
-    db 0,"Done!",$57,"@"
 
 HandleExclusiveLearnMove:
     ; de = Pointer to next Potential Move
@@ -44177,22 +44215,6 @@ EnableLastPkmnText:
     TX_FAR _EnableLastPkmnText
     db "@"
 
-_EnableLastPkmnText:
-    db $0,"OAK: WOW! ",$51
-    db "Have you already",$4f
-    db "won @"
-    TX_NUM $d11e,1,3
-    db $0," badges",$55
-    db "yet?",$51
-    db "Wonderfull!",$51
-    db "I knew that the",$4f
-    db "energy of a real",$55
-    db "trainer flows",$55
-    db "through you!",$51
-    db "Why don't you take",$4f
-    db "care of my last",$55
-    db "#MON?",$57
-
 GetOakLastPkmn:
     ld hl,wFlagEnableOakLastPkmnBit3
     bit 3,[hl]
@@ -44245,10 +44267,6 @@ GiveVoltorb:
 VoltorbText:
     TX_FAR _VoltorbText
     db "@"
-
-_VoltorbText:
-    db $0,"Wow!",$4f
-    db "A Voltorb...",$58
 
 DecreaseFossilStep:
     ld hl,$d7a3
@@ -129382,6 +129400,26 @@ _VermilionCityText14_Dex:
     db "A MACHOP is",$4f
     db "stomping the land",$55
     db "flat.",$58
+
+_VoltorbText:
+    db $0,"Wow!",$4f
+    db "A Voltorb...",$58
+
+_EnableLastPkmnText:
+    db $0,"OAK: WOW! ",$51
+    db "Have you already",$4f
+    db "won @"
+    TX_NUM $d11e,1,3
+    db $0," badges",$55
+    db "yet?",$51
+    db "Wonderfull!",$51
+    db "I knew that the",$4f
+    db "energy of a real",$55
+    db "trainer flows",$55
+    db "through you!",$51
+    db "Why don't you take",$4f
+    db "care of my last",$55
+    db "#MON?",$57
 
 SECTION "bank2A",ROMX,BANK[$2A]
 
