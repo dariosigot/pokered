@@ -50492,6 +50492,8 @@ AfterEvolution_TryToAddExclusiveMove:
     pop af
     ld [$cf92],a
     pop af
+    ld [$d11e],a
+    ld [$cf91],a
     jr LearnMoveCommon
 .Loop
     ld a,[hli]
