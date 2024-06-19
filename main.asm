@@ -137113,6 +137113,11 @@ RemoveBattleValue_:
     FuncCoord 00,04
     ld hl,Coord
     ld bc,$020C ; 02 | 12
+    ld a,[W_BATTLETYPE]
+    cp 2 ; safari?
+    jr nz,.continue
+    dec b
+.continue
     jp ClearScreenArea
 
 ; ──────────────────────────────────────────────────────────────────────
