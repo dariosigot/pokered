@@ -28853,6 +28853,9 @@ RemoveTMQty:
     dec e
     jr .LoopForMaskAndRightNibble
 .RightMaskAndNibble
+    ld a,b
+    and %00000011 ; Mask to Only Actual TM Qty
+    ld b,a
     dec b ; Remove 1 Unit to TM Qty
 .LoopToRevertSlide
     ld a,d
