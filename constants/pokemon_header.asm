@@ -3168,8 +3168,8 @@ SeelBaseStats: ; 38d2a (e:4d2a)
     db 45 ; base speed
     db 70 ; base special
 
-    db WATER ; species type 1
-    db ICE ; species type 2
+    db ICE ; species type 1
+    db WATER ; species type 2
 
     db 190 ; catch rate
     db 100 ; base exp yield
@@ -3205,8 +3205,8 @@ DewgongBaseStats: ; 38d46 (e:4d46)
     db 70 ; base speed
     db 95 ; base special
 
-    db WATER ; species type 1
-    db ICE ; species type 2
+    db ICE ; species type 1
+    db WATER ; species type 2
 
     db 75 ; catch rate
     db 176 ; base exp yield
@@ -3316,7 +3316,7 @@ ShellderBaseStats: ; 38d9a (e:4d9a)
     db 40 ; base speed
     db 45 ; base special
 
-    db IVORY ; species type 1
+    db WATER ; species type 1
     db WATER ; species type 2
 
     db 190 ; catch rate
@@ -3353,7 +3353,7 @@ CloysterBaseStats: ; 38db6 (e:4db6)
     db 70 ; base speed
     db 85 ; base special
 
-    db IVORY ; species type 1
+    db WATER ; species type 1
     db ICE ; species type 2
 
     db 60 ; catch rate
@@ -3613,7 +3613,7 @@ KrabbyBaseStats: ; 38e7a (e:4e7a)
     db 25 ; base special
 
     db WATER ; species type 1
-    db IVORY ; species type 2
+    db WATER ; species type 2
 
     db 225 ; catch rate
     db 115 ; base exp yield
@@ -4833,8 +4833,8 @@ LaprasBaseStats: ; 39216 (e:5216)
     db 60 ; base speed
     db 95 ; base special
 
-    db WATER ; species type 1
-    db ICE ; species type 2
+    db ICE ; species type 1
+    db WATER ; species type 2
 
     db 45 ; catch rate
     db 219 ; base exp yield
@@ -5129,7 +5129,7 @@ OmastarBaseStats: ; 392f6 (e:52f6)
     db 55 ; base speed
     db 115 ; base special
 
-    db IVORY ; species type 1
+    db ROCK ; species type 1
     db WATER ; species type 2
 
     db 45 ; catch rate
@@ -5203,7 +5203,7 @@ KabutopsBaseStats: ; 3932e (e:532e)
     db 80 ; base speed
     db 70 ; base special
 
-    db IVORY ; species type 1
+    db ROCK ; species type 1
     db WATER ; species type 2
 
     db 45 ; catch rate
