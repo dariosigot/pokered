@@ -137037,6 +137037,8 @@ PrintBattleValueNearMon_:
     call PrintNumber
     call .PrintSign
     ; Initialize Counter
+    ld b,12
+    jr nz,.StoreCounter ; flag obtained in ".PrintSign"
     ld a,[$fff3] ; whose turn?
     and a
     ld a,[W_PLAYERMOVEEFFECT]

@@ -3,7 +3,7 @@
 
     db POUND        , NO_ADDITIONAL_EFFECT       ,  40 , RUBBER   , 255 , 06 ; pp 35 ; 0 ; Type Normal -> Rubber
     db KARATE_CHOP  , NO_ADDITIONAL_EFFECT       ,  50 , FIGHTING , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Fighting
-    db DOUBLESLAP   , TWO_TO_FIVE_ATTACKS_EFFECT ,  15 , RUBBER   , 216 , 20 ; pp 10 ; 0 ; Type Normal -> Rubber
+    db DOUBLESLAP   , TWO_TO_FIVE_ATTACKS_EFFECT ,  15 , RUBBER   , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber ; PP 10 -> 20
     db COMET_PUNCH  , TWO_TO_FIVE_ATTACKS_EFFECT ,  18 , FIGHTING , 216 , 14 ; pp 15 ; 0 ; Type Normal -> Fighting
     db MEGA_PUNCH   , NO_ADDITIONAL_EFFECT       ,  80 , FIGHTING , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Fighting
     db PAY_DAY      , PAY_DAY_EFFECT             ,  60 , NORMAL   , 255 , 10 ; pp 20 ; 0 ; Pwr 40 -> 60
@@ -165,4 +165,4 @@
     db SUPER_FANG   , SUPER_FANG_EFFECT          ,   1 , NORMAL   , 229 , 20 ; pp 10 ; -
     db SLASH        , NO_ADDITIONAL_EFFECT       ,  70 , NORMAL   , 255 , 10 ; pp 20 ; 0
     db SUBSTITUTE   , SUBSTITUTE_EFFECT          ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
-    db STRUGGLE     , RECOIL_EFFECT              ,  60 , TYPE_NA  , 255 , 20 ; pp 10 ; 0 ; Type Normal -> N.A. ; Pwr 50 -> 60
+    db STRUGGLE     , RECOIL_EFFECT              ,  60 , TYPE_NA  , 255 , 00 ; pp 10 ; 0 ; Type Normal -> N.A. ; Pwr 50 -> 60 ; PP 10 -> inf
