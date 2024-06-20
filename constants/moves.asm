@@ -3,7 +3,7 @@
 
     db POUND        , NO_ADDITIONAL_EFFECT       ,  40 , RUBBER   , 255 , 06 ; pp 35 ; 0 ; Type Normal -> Rubber
     db KARATE_CHOP  , NO_ADDITIONAL_EFFECT       ,  50 , FIGHTING , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Fighting
-    db DOUBLESLAP   , TWO_TO_FIVE_ATTACKS_EFFECT ,  15 , RUBBER   , 216 , 20 ; pp 10 ; 0 ; Type Normal -> Rubber
+    db DOUBLESLAP   , TWO_TO_FIVE_ATTACKS_EFFECT ,  15 , RUBBER   , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber ; PP 10 -> 20
     db COMET_PUNCH  , TWO_TO_FIVE_ATTACKS_EFFECT ,  18 , FIGHTING , 216 , 14 ; pp 15 ; 0 ; Type Normal -> Fighting
     db MEGA_PUNCH   , NO_ADDITIONAL_EFFECT       ,  80 , FIGHTING , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Fighting
     db PAY_DAY      , PAY_DAY_EFFECT             ,  60 , NORMAL   , 255 , 10 ; pp 20 ; 0 ; Pwr 40 -> 60
@@ -23,7 +23,7 @@
     db BIND         , TRAPPING_EFFECT            ,  10 , NORMAL   , 153 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Acr 191 -> 153
     db SLAM         , NO_ADDITIONAL_EFFECT       ,  80 , RUBBER   , 191 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber
     db VINE_WHIP    , NO_ADDITIONAL_EFFECT       ,  45 , GRASS    , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 45 ; PP 10 -> 25
-    db STOMP        , FLINCH_SIDE_EFFECT2        ,  65 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Normal -> Ivory
+    db STOMP        , FLINCH_SIDE_EFFECT2        ,  65 , NORMAL   , 255 , 10 ; pp 20 ; 0
     db DOUBLE_KICK  , ATTACK_TWICE_EFFECT        ,  30 , FIGHTING , 255 , 07 ; pp 30 ; 0
     db MEGA_KICK    , NO_ADDITIONAL_EFFECT       , 120 , FIGHTING , 191 , 40 ; pp  5 ; 0 ; Type Normal -> Fighting
     db JUMP_KICK    , JUMP_KICK_EFFECT           , 100 , FIGHTING , 242 , 08 ; pp 25 ; 0 ; Pwr 70 -> 100
@@ -42,7 +42,7 @@
     db TAIL_WHIP    , DEFENSE_DOWN1_EFFECT       ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
     db POISON_STING , POISON_SIDE_EFFECT1        ,  15 , POISON   , 255 , 06 ; pp 35 ; 0
     db TWINEEDLE    , TWINEEDLE_EFFECT           ,  30 , BUG      , 255 , 10 ; pp 20 ; 0 ; Pwr 25 -> 30
-    db PIN_MISSILE  , TWO_TO_FIVE_ATTACKS_EFFECT ,  25 , BUG      , 242 , 10 ; pp 20 ; 0 ; Acr 216 -> 242 ; Pwr 14 -> 25
+    db PIN_MISSILE  , TWO_TO_FIVE_ATTACKS_EFFECT ,  25 , BUG      , 242 , 10 ; pp 20 ; 1 ; Acr 216 -> 242 ; Pwr 14 -> 25 ; Special
     db LEER         , DEFENSE_DOWN1_EFFECT       ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
     db BITE         , FLINCH_SIDE_EFFECT1        ,  60 , NORMAL   , 255 , 08 ; pp 25 ; 0
     db GROWL        , ATTACK_DOWN1_EFFECT        ,   0 , NORMAL   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
@@ -51,7 +51,7 @@
     db SUPERSONIC   , CONFUSION_EFFECT           ,   0 , NORMAL   , 229 , 14 ; pp 15 ; - ; Acr 140 -> 229 ; PP 20 -> 15
     db SONICBOOM    , SPECIAL_DAMAGE_EFFECT      ,   1 , NORMAL   , 229 , 10 ; pp 20 ; -
     db DISABLE      , DISABLE_EFFECT             ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; Acr 140 -> 255
-    db ACID         , DEFENSE_DOWN_SIDE_EFFECT   ,  40 , POISON   , 255 , 07 ; pp 30 ; 1
+    db ACID         , DEFENSE_DOWN_SIDE_EFFECT   ,  40 , POISON   , 255 , 07 ; pp 30 ; 0 ; Phisical
     db EMBER        , BURN_SIDE_EFFECT1          ,  40 , FIRE     , 255 , 08 ; pp 25 ; 1
     db FLAMETHROWER , BURN_SIDE_EFFECT1          ,  90 , FIRE     , 255 , 14 ; pp 15 ; 1 ; Pwr 95 -> 90
     db MIST         , MIST_EFFECT                ,   0 , ICE      , 255 , 07 ; pp 30 ; -
@@ -106,11 +106,11 @@
     db SCREECH      , DEFENSE_DOWN2_EFFECT       ,   0 , NORMAL   , 216 , 08 ; pp 25 ; - ; PP 40 -> 25
     db DOUBLE_TEAM  , EVASION_UP1_EFFECT         ,   0 , NORMAL   , 255 , 40 ; pp  5 ; - ; PP 15 -> 5
     db RECOVER      , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 20 ; pp 10 ; - ; PP 20 -> 10
-    db HARDEN       , DEFENSE_UP1_EFFECT         ,   0 , ROCK     , 255 , 07 ; pp 30 ; - ; Type Normal -> Rock
+    db HARDEN       , DEFENSE_UP2_EFFECT         ,   0 , ROCK     , 255 , 07 ; pp 30 ; - ; Type Normal -> Rock ; Defense 2x
     db MINIMIZE     , EVASION_UP1_EFFECT         ,   0 , RUBBER   , 255 , 40 ; pp  5 ; - ; PP 20 -> 5 ; Type Normal -> Rubber
     db SMOKESCREEN  , ACCURACY_DOWN1_EFFECT      ,   0 , POISON   , 204 , 40 ; pp  5 ; - ; Type Normal -> Poison ; Acr 255 -> 204 ; PP 20 -> 5
     db CONFUSE_RAY  , CONFUSION_EFFECT           ,   0 , GHOST    , 255 , 20 ; pp 10 ; -
-    db WITHDRAW     , DEFENSE_UP1_EFFECT         ,   0 , WATER    , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
+    db WITHDRAW     , DEFENSE_UP2_EFFECT         ,   0 , WATER    , 255 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Defense 2x
     db DEFENSE_CURL , DEFENSE_UP1_EFFECT         ,   0 , RUBBER   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Type Normal -> Rubber
     db BARRIER      , DEFENSE_UP2_EFFECT         ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; - ; PP 30 -> 20
     db LIGHT_SCREEN , LIGHT_SCREEN_EFFECT        ,   0 , PSYCHIC  , 255 , 07 ; pp 30 ; -
@@ -124,7 +124,7 @@
     db EGG_BOMB     , NO_ADDITIONAL_EFFECT       , 100 , RUBBER   , 191 , 20 ; pp 10 ; 0 ; Type Normal -> Rubber
     db LICK         , PARALYZE_SIDE_EFFECT2      ,  30 , GHOST    , 255 , 07 ; pp 30 ; 0 ; Pwr 20 -> 30
     db SMOG         , POISON_SIDE_EFFECT2        ,  30 , POISON   , 178 , 10 ; pp 20 ; 1 ; Pwr 20 -> 30
-    db SLUDGE       , POISON_SIDE_EFFECT2        ,  65 , POISON   , 255 , 10 ; pp 20 ; 1
+    db SLUDGE       , POISON_SIDE_EFFECT2        ,  75 , POISON   , 255 , 10 ; pp 20 ; 0 ; Pwr 65 -> 75 ; Phisical
     db BONE_CLUB    , FLINCH_SIDE_EFFECT1        ,  65 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Ground -> Ivory
     db FIRE_BLAST   , BURN_SIDE_EFFECT2          , 110 , FIRE     , 216 , 40 ; pp  5 ; 1 ; Pwr 120 -> 110
     db WATERFALL    , NO_ADDITIONAL_EFFECT       ,  80 , WATER    , 255 , 14 ; pp 15 ; 0
@@ -146,7 +146,7 @@
     db SKY_ATTACK   , CHARGE_EFFECT              , 140 , WIND     , 229 , 40 ; pp  5 ; 0
     db TRANSFORM    , TRANSFORM_EFFECT           ,   0 , RUBBER   , 255 , 20 ; pp 10 ; - ; Type Normal -> Rubber
     db BUBBLE       , SPEED_DOWN_SIDE_EFFECT     ,  30 , WATER    , 255 , 07 ; pp 30 ; 1 ; Pwr 20 -> 30
-    db DIZZY_PUNCH  , NO_ADDITIONAL_EFFECT       ,  70 , IVORY    , 255 , 20 ; pp 10 ; 0 ; Type Normal -> Ivory
+    db DIZZY_PUNCH  , NO_ADDITIONAL_EFFECT       ,  90 , IVORY    , 255 , 20 ; pp 10 ; 0 ; Type Normal -> Ivory ; Pwr 70 -> 90
     db SPORE        , SLEEP_EFFECT               ,   0 , GRASS    , 255 , 20 ; pp 10 ; - ; PP 15 -> 10
     db FLASH        , ACCURACY_DOWN1_EFFECT      ,   0 , ELECTRIC , 204 , 40 ; pp  5 ; - ; Type Normal -> Electric ; Acr 178 -> 204 ; PP 20 -> 5
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 14 ; pp 15 ; - ; Acr 204 -> 255
@@ -165,4 +165,4 @@
     db SUPER_FANG   , SUPER_FANG_EFFECT          ,   1 , NORMAL   , 229 , 20 ; pp 10 ; -
     db SLASH        , NO_ADDITIONAL_EFFECT       ,  70 , NORMAL   , 255 , 10 ; pp 20 ; 0
     db SUBSTITUTE   , SUBSTITUTE_EFFECT          ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
-    db STRUGGLE     , RECOIL_EFFECT              ,  50 , TYPE_NA  , 255 , 20 ; pp 10 ; 0 ; Type Normal -> N.A.
+    db STRUGGLE     , RECOIL_EFFECT              ,  60 , TYPE_NA  , 255 , 00 ; pp 10 ; 0 ; Type Normal -> N.A. ; Pwr 50 -> 60 ; PP 10 -> inf

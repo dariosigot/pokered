@@ -157,12 +157,12 @@ Giovanni3Move:
     ; Nidoqueen (Level 55)
     db SLUDGE
     db EARTHQUAKE
-    db BODY_SLAM
+    db DIZZY_PUNCH
     db BLIZZARD
     ; Nidoking (Level 55)
     db SLUDGE
     db EARTHQUAKE
-    db BODY_SLAM
+    db DIZZY_PUNCH
     db THUNDER
     ; Rhydon (Level 56)
     db EARTHQUAKE

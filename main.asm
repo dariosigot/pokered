@@ -135807,8 +135807,8 @@ db %00000100    ; Ice Punch,Thunder Punch,Scratch,Vice Grip,Guillotine,Razor Win
 db %10000000    ; Gust*,Wing Attack,Whirlwind,Fly,Bind,Slam,Vine Whip,Stomp
 db %00000000    ; Double Kick,Mega Kick,Jump Kick,Rolling Kick,Sand Attack*,Headbutt,Horn Attack,Fury Attack
 db %00000000    ; Horn Drill,Tackle,Body Slam,Wrap,Take Down,Thrash,Double-Edge,Tail Whip
-db %00000000    ; Poison Sting,Twineedle,Pin Missile,Leer,Bite*,Growl,Roar,Sing
-db %01011101    ; Supersonic,Sonic Boom,Disable,Acid,Ember,Flamethrower,Mist,Water Gun
+db %00100000    ; Poison Sting,Twineedle,Pin Missile,Leer,Bite*,Growl,Roar,Sing
+db %01010101    ; Supersonic,Sonic Boom,Disable,Acid,Ember,Flamethrower,Mist,Water Gun
 db %11111111    ; Hydro Pump,Surf,Ice Beam,Blizzard,Psybeam,Bubble Beam,Aurora Beam,Hyper Beam
 db %00000001    ; Peck,Drill Peck,Submission,Low Kick,Counter,Seismic Toss,Strength,Absorb
 db %10001000    ; Mega Drain,Leech Seed,Growth,Razor Leaf,Solar Beam,Poison Powder,Stun Spore,Sleep Powder
@@ -135817,7 +135817,7 @@ db %00000110    ; Rock Throw,Earthquake,Fissure,Dig,Toxic,Confusion,Psychic,Hypn
 db %00000100    ; Meditate,Agility,Quick Attack,Rage,Teleport,Night Shade,Mimic,Screech
 db %00000000    ; Double Team,Recover,Harden,Minimize,Smokescreen,Confuse Ray,Withdraw,Defense Curl
 db %00000000    ; Barrier,Light Screen,Haze,Reflect,Focus Energy,Bide,Metronome,Mirror Move
-db %00011010    ; Self-Destruct,Egg Bomb,Lick,Smog,Sludge,Bone Club,Fire Blast,Waterfall
+db %00010010    ; Self-Destruct,Egg Bomb,Lick,Smog,Sludge,Bone Club,Fire Blast,Waterfall
 db %01000000    ; Clamp,Swift,Skull Bash,Spike Cannon,Constrict,Amnesia,Kinesis,Soft-Boiled
 db %00100000    ; High Jump Kick,Glare,Dream Eater,Poison Gas,Barrage,Leech Life,Lovely Kiss,Sky Attack
 db %01000100    ; Transform,Bubble,Dizzy Punch,Spore,Flash,Psywave,Splash,Acid Armor
@@ -137037,6 +137037,8 @@ PrintBattleValueNearMon_:
     call PrintNumber
     call .PrintSign
     ; Initialize Counter
+    ld b,12
+    jr nz,.StoreCounter ; flag obtained in ".PrintSign"
     ld a,[$fff3] ; whose turn?
     and a
     ld a,[W_PLAYERMOVEEFFECT]

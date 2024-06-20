@@ -35,7 +35,7 @@ db FM_LIGHT+FM_DIG                                   ; 24  - $18 - ARBOK
 db FM_LIGHT                                          ; 25  - $19 - PIKACHU
 db FM_LIGHT                                          ; 26  - $1A - RAICHU
 db FM_DIG                                            ; 27  - $1B - SANDSHREW
-db FM_CUT+FM_DIG                                     ; 28  - $1C - SANDSLASH
+db FM_CUT+FM_STRENGTH+FM_DIG                         ; 28  - $1C - SANDSLASH
 db 0                                                 ; 29  - $1D - NIDORAN_F
 db FM_CUT                                            ; 30  - $1E - NIDORINA
 db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG                ; 31  - $1F - NIDOQUEEN
@@ -58,7 +58,7 @@ db FM_CUT+FM_DIG                                     ; 47  - $2F - PARASECT
 db FM_TELEPORT                                       ; 48  - $30 - VENONAT
 db FM_FLY+FM_TELEPORT                                ; 49  - $31 - VENOMOTH
 db FM_DIG                                            ; 50  - $32 - DIGLETT
-db FM_CUT+FM_DIG+FM_STRENGTH                         ; 51  - $33 - DUGTRIO
+db FM_CUT+FM_STRENGTH+FM_DIG                         ; 51  - $33 - DUGTRIO
 db FM_LIGHT                                          ; 52  - $34 - MEOWTH
 db FM_CUT+FM_LIGHT                                   ; 53  - $35 - PERSIAN
 db FM_TELEPORT                                       ; 54  - $36 - PSYDUCK
@@ -81,7 +81,7 @@ db FM_CUT                                            ; 70  - $46 - WEEPINBELL
 db FM_CUT                                            ; 71  - $47 - VICTREEBEL
 db FM_FLOAT                                          ; 72  - $48 - TENTACOOL
 db FM_CUT+FM_FLOAT                                   ; 73  - $49 - TENTACRUEL
-db FM_DIG                                            ; 74  - $4A - GEODUDE
+db FM_STRENGTH+FM_DIG                                ; 74  - $4A - GEODUDE
 db FM_STRENGTH+FM_DIG                                ; 75  - $4B - GRAVELER
 db FM_STRENGTH+FM_DIG                                ; 76  - $4C - GOLEM
 db FM_LIGHT                                          ; 77  - $4D - PONYTA
@@ -97,7 +97,7 @@ db FM_FLOAT                                          ; 86  - $56 - SEEL
 db FM_FLOAT                                          ; 87  - $57 - DEWGONG
 db 0                                                 ; 88  - $58 - GRIMER
 db FM_FLOAT                                          ; 89  - $59 - MUK
-db FM_FLOAT                                          ; 90  - $5A - SHELLDER
+db 0                                                 ; 90  - $5A - SHELLDER
 db FM_FLOAT                                          ; 91  - $5B - CLOYSTER
 db FM_TELEPORT                                       ; 92  - $5C - GASTLY
 db FM_TELEPORT                                       ; 93  - $5D - HAUNTER
@@ -121,14 +121,14 @@ db FM_LIGHT+FM_FLOAT                                 ; 110 - $6E - WEEZING
 db FM_STRENGTH+FM_DIG                                ; 111 - $6F - RHYHORN
 db FM_FLOAT+FM_STRENGTH+FM_DIG                       ; 112 - $70 - RHYDON
 db FM_HEAL                                           ; 113 - $71 - CHANSEY
-db FM_CUT                                            ; 114 - $72 - TANGELA
+db FM_CUT+FM_HEAL                                    ; 114 - $72 - TANGELA
 db FM_FLOAT+FM_STRENGTH                              ; 115 - $73 - KANGASKHAN
 db FM_FLOAT                                          ; 116 - $74 - HORSEA
 db FM_FLOAT                                          ; 117 - $75 - SEADRA
 db FM_FLOAT                                          ; 118 - $76 - GOLDEEN
 db FM_FLOAT                                          ; 119 - $77 - SEAKING
-db FM_FLOAT+FM_TELEPORT                              ; 120 - $78 - STARYU
-db FM_FLOAT+FM_TELEPORT                              ; 121 - $79 - STARMIE
+db FM_LIGHT+FM_TELEPORT                              ; 120 - $78 - STARYU
+db FM_FLOAT+FM_LIGHT+FM_TELEPORT                     ; 121 - $79 - STARMIE
 db FM_TELEPORT                                       ; 122 - $7A - MR_MIME
 db FM_CUT+FM_FLY                                     ; 123 - $7B - SCYTHER
 db FM_TELEPORT                                       ; 124 - $7C - JYNX
