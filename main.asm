@@ -8344,57 +8344,13 @@ PlayTrainerMusic: ; 33e8 (0:33e8)
     ld a,[W_GYMLEADERNO] ; $d05c
     and a
     ret nz
-    xor a
-    ld [wMusicHeaderPointer],a
-    ld a,$ff
-    call PlaySound      ; stop music
-    ld a,BANK(Music_MeetEvilTrainer)
-    ld [$c0ef],a
-    ld [$c0f0],a
-    ld a,[wEngagedTrainerClass]
-    ld b,a
-    ld hl,EvilTrainerList
-.evilTrainerListLoop
-    ld a,[hli]
-    cp $ff
-    jr z,.noEvilTrainer
-    cp b
-    jr nz,.evilTrainerListLoop
-    ld a,(Music_MeetEvilTrainer - $4000) / 3
-    jr .PlaySound
-.noEvilTrainer
-    ld hl,FemaleTrainerList
-.femaleTrainerListLoop
-    ld a,[hli]
-    cp $ff
-    jr z,.maleTrainer
-    cp b
-    jr nz,.femaleTrainerListLoop
-    ld a,(Music_MeetFemaleTrainer - $4000) / 3
-    jr .PlaySound
-.maleTrainer
-    ld a,(Music_MeetMaleTrainer - $4000) / 3
-.PlaySound
-    ld [$c0ee],a
-    jp PlaySound
+    ld b,BANK(PlayTrainerMusic_)
+    ld hl,PlayTrainerMusic_
+    jp Bankswitch
 
-FemaleTrainerList: ; 3434 (0:3434)
-    db LASS
-    db JR__TRAINER_F
-    db BEAUTY
-    db COOLTRAINER_F
-    db $FF
+; Free
 
-EvilTrainerList: ; 3439 (0:3439)
-    db JUGGLER_X
-    db GAMBLER
-    db ROCKER
-    db JUGGLER
-    db CHIEF
-    db SCIENTIST
-    db GIOVANNI
-    db ROCKET
-    db $FF
+SECTION "Func_3442",ROM0[$3442]
 
 Func_3442: ; 3442 (0:3442)
     ld a,[hli]
@@ -137163,6 +137119,64 @@ GetTypeEffects_:
 .end
     ld [de],a ; $FF
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+; PlayTrainerMusic
+; ──────────────────────────────────────────────────────────────────────
+
+PlayTrainerMusic_:
+    xor a
+    ld [wMusicHeaderPointer],a
+    ld a,$ff
+    call PlaySound      ; stop music
+    ld a,BANK(Music_MeetEvilTrainer)
+    ld [$c0ef],a
+    ld [$c0f0],a
+    ld a,[wEngagedTrainerSet] ; If Special Wild PLay "Male Music"
+    cp OPP_LVL_OFFSET         ; ...
+    jr nc,.maleTrainer        ; ...
+    ld a,[wEngagedTrainerClass]
+    ld b,a
+    ld hl,.EvilTrainerList
+.evilTrainerListLoop
+    ld a,[hli]
+    cp $ff
+    jr z,.noEvilTrainer
+    cp b
+    jr nz,.evilTrainerListLoop
+    ld a,(Music_MeetEvilTrainer - $4000) / 3
+    jr .PlaySound
+.noEvilTrainer
+    ld hl,.FemaleTrainerList
+.femaleTrainerListLoop
+    ld a,[hli]
+    cp $ff
+    jr z,.maleTrainer
+    cp b
+    jr nz,.femaleTrainerListLoop
+    ld a,(Music_MeetFemaleTrainer - $4000) / 3
+    jr .PlaySound
+.maleTrainer
+    ld a,(Music_MeetMaleTrainer - $4000) / 3
+.PlaySound
+    ld [$c0ee],a
+    jp PlaySound
+.FemaleTrainerList
+    db LASS
+    db JR__TRAINER_F
+    db BEAUTY
+    db COOLTRAINER_F
+    db $FF
+.EvilTrainerList
+    db JUGGLER_X
+    db GAMBLER
+    db ROCKER
+    db JUGGLER
+    db CHIEF
+    db SCIENTIST
+    db GIOVANNI
+    db ROCKET
+    db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
 
