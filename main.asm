@@ -24619,6 +24619,61 @@ BackupChangedBlocks:
     pop hl
     ret
 
+ItemUseCoinCase: ; Moved in the Bank
+    ld a,[W_ISINBATTLE]
+    and a
+    jp nz,ItemUseNotTime
+    ld hl,.CoinCaseNumCoinsText
+    jp PrintText
+.CoinCaseNumCoinsText
+    TX_FAR _CoinCaseNumCoinsText
+    db "@"
+
+LoadFluteSprite:
+    ld a,$8e
+    call PlaySound ; play sound
+    ld c,90
+    call DelayFrames
+    ld hl,$d736
+    set 6,[hl]
+    ld de,RedSprite ; $4180
+    ld hl,$8000
+    ld bc,(BANK(RedSprite) << 8) + $0c
+    call CopyVideoData
+    ld a,4
+    ld hl,.UnknownFluteAnim
+    ld bc,0
+.loop
+    push af
+    push bc
+    push hl
+    add hl,bc
+    ld a,[hli]
+    ld e,a
+    ld a,[hli]
+    ld d,a
+    ld a,[hli]
+    ld c,a
+    ld a,[hli]
+    ld b,a
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    call CopyVideoData
+    pop hl
+    pop bc
+    ld a,6
+    add c
+    ld c,a
+    pop af
+    dec a
+    jr nz,.loop
+    ld hl,$d736
+    res 6,[hl]
+    ret
+.UnknownFluteAnim
+INCBIN "baserom.gbc",$70866,$7087e - $70866
+
 SECTION "ItemUseGuardSpec",ROMX[$60dc],BANK[$3]
 
 ItemUseGuardSpec: ; e0dc (3:60dc)
@@ -24682,22 +24737,64 @@ ItemUseXStat: ; e104 (3:6104)
 
 ItemUsePokeflute: ; e140 (3:6140)
     ld a,[W_ISINBATTLE]
+    cp 2
+    jp z,ItemUseNotTime ; Trainer Battle
+
+    ; Init Context
     and a
-    jr nz,.inBattle
-; if not in battle
+    jr nz,.BattleContext
+    call ItemUseReloadOverworldData
+    jr .ContextDone
+.BattleContext
+    call LoadScreenBufferAndGoPalSet
+.ContextDone
+
+    ; Play Flute
+    ld hl,.PlayedFluteHadEffectText
+    call PrintText
+
+    ; Wake Up Entire Party
+    xor a
+    ld [$cd3d],a ; initialize variable that indicates if any pokemon were woken up to zero
+    ld b,~SLP & $FF
+    ld hl,W_PARTYMON1_STATUS
+    call WakeUpEntireParty
+    
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.NotInBattle
+
+.inBattle
+    ld hl,W_PLAYERMONSTATUS
+    ld a,[hl]
+    and b ; remove Sleep status
+    ld [hl],a
+    ld hl,W_ENEMYMONSTATUS
+    ld a,[hl]
+    push af
+    and a,SLP ; is pokemon asleep?
+    jr z,.notAsleep
+    ld a,1
+    ld [$cd3d],a ; indicate that a pokemon had to be woken up
+.notAsleep
+    pop af
+    and b ; remove Sleep status
+    ld [hl],a
+    jr .PrintFluteResult
+
+.NotInBattle
+    call .PrintFluteResult
     call ItemUseReloadOverworldData
     call GetCurrentOldAdventureMap
     cp a,ROUTE_12
     jr nz,.notRoute12
     ld a,[$d7d8]
     bit 7,a ; has the player beaten Route 12 Snorlax yet?
-    jr nz,.noSnorlaxToWakeUp
+    ret nz
 ; if the player hasn't beaten Route 12 Snorlax
     ld hl,Route12SnorlaxFluteCoords
     call ArePlayerCoordsInArray
-    jr nc,.noSnorlaxToWakeUp
-    ld hl,PlayedFluteHadEffectText
-    call PrintText
+    ret nc
     ld hl,$d7d8
     set 6,[hl] ; trigger Snorlax fight (handled by map script)
     ret
@@ -24706,122 +24803,81 @@ ItemUsePokeflute: ; e140 (3:6140)
     jr nz,.notRoute16
     ld a,[$d7e0]
     bit 1,a ; has the player beaten Route 16 Snorlax yet?
-    jr nz,.noSnorlaxToWakeUp
+    ret nz
 ; if the player hasn't beaten Route 16 Snorlax
     ld hl,Route16SnorlaxFluteCoords
     call ArePlayerCoordsInArray
-    jr nc,.noSnorlaxToWakeUp
-    ld hl,PlayedFluteHadEffectText
-    call PrintText
+    ret nc
     ld hl,$d7e0
     set 0,[hl] ; trigger Snorlax fight (handled by map script)
     ret
 .notRoute16
     cp a,DIGLETTS_CAVE
-    jr nz,.noSnorlaxToWakeUp
+    ret nz
     ld a,[wDigCaveAerodactylBeatBit3]
     bit 3,a ; has the player beaten Diglett's Cave Aerodactyl yet?
-    jr nz,.noSnorlaxToWakeUp
+    ret nz
 ; if the player hasn't beaten Diglett's Cave Aerodactyl
     ld a,[$d35d]
     and a ; if it's not dark
-    jr nz,.noSnorlaxToWakeUp
+    ret nz
     ld hl,DiglettsCaveAerodactylFluteCoords
     call ArePlayerCoordsInArray
-    jr nc,.noSnorlaxToWakeUp
-    ld hl,PlayedFluteHadEffectText
-    call PrintText
+    ret nc
     ld hl,wDigCaveAerodactylTrigBit0
     set 0,[hl] ; trigger Aerodactyl fight (handled by map script)
     ret
-.noSnorlaxToWakeUp
-    ld hl,PlayedFluteNoEffectText
-    jp PrintText
-.inBattle
-    xor a
-    ld [$cd3d],a ; initialize variable that indicates if any pokemon were woken up to zero
-    ld b,~SLP & $FF
-    ld hl,W_PARTYMON1_STATUS
-    call WakeUpEntireParty
-    ld a,[W_ISINBATTLE]
-    dec a ; is it a trainer battle?
-    jr z,.skipWakingUpEnemyParty
-; if it's a trainer battle
-    ld hl,$d8a8 ; enemy party pokemon 1 status
-    call WakeUpEntireParty
-.skipWakingUpEnemyParty
-    ld hl,W_PLAYERMONSTATUS
-    ld a,[hl]
-    and b ; remove Sleep status
-    ld [hl],a
-    ld hl,W_ENEMYMONSTATUS
-    ld a,[hl]
-    and b ; remove Sleep status
-    ld [hl],a
-    call LoadScreenBufferAndGoPalSet ; call LoadScreenTilesFromBuffer2 ; restore saved screen
+
+.PrintFluteResult
     ld a,[$cd3d]
     and a ; were any pokemon asleep before playing the flute?
-    ld hl,PlayedFluteNoEffectText
-    jp z,PrintText ; if no pokemon were asleep
-; if some pokemon were asleep
-    ld hl,PlayedFluteHadEffectText
-    call PrintText
-    ld a,[$d083]
-    and a,$80
-    jr nz,.skipMusic
-    call WaitForSoundToFinish ; wait for sound to end
-    ld b,BANK(Music_PokeFluteInBattle)
-    ld hl,Music_PokeFluteInBattle
-    call Bankswitch ; play in-battle pokeflute music
-.musicWaitLoop ; wait for music to finish playing
-    ld a,[$c02c]
-    and a ; music off?
-    jr nz,.musicWaitLoop
-.skipMusic
-    ld hl,FluteWokeUpText
+    ret z
+    ld hl,.FluteWokeUpText
     jp PrintText
 
-SECTION "PlayedFluteNoEffectText",ROMX[$620b],BANK[$3]
-
-PlayedFluteNoEffectText: ; e20b (3:620b)
-    TX_FAR _PlayedFluteNoEffectText
-    db "@"
-
-FluteWokeUpText: ; e210 (3:6210)
+.FluteWokeUpText
     TX_FAR _FluteWokeUpText
     db "@"
 
-PlayedFluteHadEffectText: ; e215 (3:6215)
+.PlayedFluteHadEffectText
     TX_FAR _PlayedFluteHadEffectText
-    db $06
     db $08
     ld a,[W_ISINBATTLE]
     and a
-    jr nz,.done
+    jr nz,.MusicInBattle
 ; play out-of-battle pokeflute music
+    call LoadFluteSprite
     ld a,$ff
     call PlaySound ; turn off music
     ld a,(SFX_02_5e - $4000) / 3
     ld c,BANK(SFX_02_5e)
     call PlayMusic ; play music
-.musicWaitLoop ; wait for music to finish playing
+.musicWaitLoop1 ; wait for music to finish playing
     ld a,[$c028]
     cp a,$b8
-    jr z,.musicWaitLoop
+    jr z,.musicWaitLoop1
     call PlayDefaultMusic ; start playing normal music again
+    jr .done
+.MusicInBattle
+    ld a,[$d083]
+    and a,$80
+    jr nz,.BattleAlarm
+    call WaitForSoundToFinish ; wait for sound to end
+    ld b,BANK(Music_PokeFluteInBattle)
+    ld hl,Music_PokeFluteInBattle
+    call Bankswitch ; play in-battle pokeflute music
+.musicWaitLoop2 ; wait for music to finish playing
+    ld a,[$c02c]
+    and a ; music off?
+    jr nz,.musicWaitLoop2
 .done
     jp TextScriptEnd ; end text
+.BattleAlarm
+    ld c,50
+    call DelayFrames
+    jr .done
 
-ItemUseCoinCase: ; e23a (3:623a)
-    ld a,[W_ISINBATTLE]
-    and a
-    jp nz,ItemUseNotTime
-    ld hl,CoinCaseNumCoinsText
-    jp PrintText
-
-CoinCaseNumCoinsText: ; e247 (3:6247)
-    TX_FAR _CoinCaseNumCoinsText
-    db "@"
+SECTION "ItemUseOldRod",ROMX[$623a],BANK[$3]
 
 ItemUseOldRod:
     call FishingInit
@@ -28692,7 +28748,7 @@ WakeUpEntireParty: ; Moved in the Bank
 ; Format:
 ; 00: Y
 ; 01: X
-Route12SnorlaxFluteCoords: ; e1fd (3:61fd)
+Route12SnorlaxFluteCoords:
     db 62,8  ; one space West of Snorlax
     db 62,10 ; one space East of Snorlax
     db $ff ; terminator
@@ -28700,7 +28756,7 @@ Route12SnorlaxFluteCoords: ; e1fd (3:61fd)
 ; Format:
 ; 00: Y
 ; 01: X
-Route16SnorlaxFluteCoords: ; e206 (3:6206)
+Route16SnorlaxFluteCoords:
     db 10,27 ; one space East of Snorlax
     db 10,25 ; one space West of Snorlax
     db $ff ; terminator
@@ -50925,6 +50981,7 @@ SpecialTrainerMoves:
     SpecialTrainer CHANNELER,14,ChannelerMove14
     SpecialTrainer CHANNELER,15,ChannelerMove15
     SpecialTrainer CHANNELER,16,ChannelerMove16
+    SpecialTrainer POKEMANIAC,8,PokemaniacMove8
     db $ff
 
 ; ────────────────────────────────────────────────────────────
@@ -61380,31 +61437,52 @@ AIGetTypeEffectiveness:
     jr z,.AImatchingPairFound
     jr .nextTypePair2
 ; ──────────────────────────────────────────────────
-.AImatchingPairFound
-    ld a,[hl]                    ; get damage multiplier
-    cp $05                       ; is it halved?
-    jr nz,.AInothalf             ; jump down of not half
-    ld a,[$d11e]                 ; else get the effectiveness multiplier
-    srl a                        ; halve the multiplier
-    ld [$d11e],a                 ; store damage multiplier
-    jr .nextTypePair2            ; get next pair in list
-.AInothalf
-    cp $14                       ; is it double?
-    jr nz,.AImustbezero          ; if not double either,it must be zero so skip ahead
-    ld a,[$d11e]                 ; else get the effectiveness multiplier
-    sla a                        ; double the multiplier
-    ld [$d11e],a                 ; store damage multiplier
-    jr .nextTypePair2            ; get next pair in list
-.AImustbezero
-    xor a                        ; clear a to 00
-    ld [$d11e],a                 ; store damage multiplier
-    ret
+;.AImatchingPairFound
+;    ld a,[hl]                    ; get damage multiplier
+;    cp $05                       ; is it halved?
+;    jr nz,.AInothalf             ; jump down of not half
+;    ld a,[$d11e]                 ; else get the effectiveness multiplier
+;    srl a                        ; halve the multiplier
+;    ld [$d11e],a                 ; store damage multiplier
+;    jr .nextTypePair2            ; get next pair in list
+;.AInothalf
+;    cp $14                       ; is it double?
+;    jr nz,.AImustbezero          ; if not double either,it must be zero so skip ahead
+;    ld a,[$d11e]                 ; else get the effectiveness multiplier
+;    sla a                        ; double the multiplier
+;    ld [$d11e],a                 ; store damage multiplier
+;    jr .nextTypePair2            ; get next pair in list
+;.AImustbezero
+;    xor a                        ; clear a to 00
+;    ld [$d11e],a                 ; store damage multiplier
+;    ret
 ; ──────────────────────────────────────────────────
 .nextTypePair1
     inc hl
 .nextTypePair2
     inc hl
     jr .loop
+; ──────────────────────────────────────────────────
+.AImatchingPairFound
+    push hl
+    push bc
+    ld a,[hl] ; a = damage multiplier
+    ld [H_MULTIPLIER],a
+    xor a
+    ld [H_MULTIPLICAND],a
+    ld [H_MULTIPLICAND + 1],a
+    ld a,[$d11e]
+    ld [H_MULTIPLICAND + 2],a
+    call Multiply
+    ld a,10
+    ld [H_DIVISOR],a
+    ld b,4
+    call Divide
+    ld a,[H_QUOTIENT + 3]
+    ld [$d11e],a
+    pop bc
+    pop hl
+    jr .nextTypePair2
 
 PlayBattleMusicAndDoBattleTransitionAndInitBatVar:
    ld hl,PlayBattleMusic
@@ -129229,19 +129307,15 @@ _ThrewRockText: ; a68cc (29:68cc)
     db $0,$52," threw a",$4f
     db "ROCK.",$57
 
-_PlayedFluteNoEffectText: ; a68dd (29:68dd)
-    db $0,"Played the #",$4f
-    db "FLUTE.",$51
-    db "Now,that's a",$4f
-    db "catchy tune!",$58
-
-_FluteWokeUpText: ; a690c (29:690c)
+_FluteWokeUpText:
     db $0,"All sleeping",$4f
-    db "#MON woke up.",$58
+    db "#MON woke up!",$58
 
-_PlayedFluteHadEffectText: ; a6928 (29:6928)
+_PlayedFluteHadEffectText:
     db $0,$52," played the",$4f
-    db "# FLUTE.@@"
+    db "# FLUTE.",$57
+
+SECTION "_CoinCaseNumCoinsText",ROMX[$6940],BANK[$29]
 
 _CoinCaseNumCoinsText: ; a6940 (29:6940)
     db $0,"Coins",$4f
@@ -137827,7 +137901,7 @@ RouteD1Object:
     db 05,01,2 ; CeladonCityText10
 
     db 1 ; people
-    db SPRITE_LASS,10 + 4,17 + 4,$ff,$d2,$41,JR__TRAINER_F,24 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,10 + 4,17 + 4,$ff,$d2,$41,POKEMANIAC,8 ; trainer
 
     ; warp-to
     EVENT_DISP ROUTE_D1_WIDTH,15,34 ; TEST_MAP_1

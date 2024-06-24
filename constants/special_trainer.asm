@@ -1007,3 +1007,36 @@ ChannelerMove16:
     db NIGHT_SHADE
     db CONFUSION
     db 0
+
+PokemaniacMove8:
+    ; Pidgeot (Level 37)
+    db QUICK_ATTACK
+    db WING_ATTACK
+    db SWOOP
+    db RAZOR_WIND
+    ; Magneton (Level 38)
+    db SONICBOOM
+    db THUNDER_WAVE
+    db THUNDERBOLT
+    db TRI_ATTACK
+    ; Exeggutor (Level 35)
+    db LEECH_SEED
+    db EGG_BOMB
+    db SLEEP_POWDER
+    db PSYBEAM
+    ; Alakazam (Level 35)
+    db CONFUSION
+    db KINESIS
+    db PSYBEAM
+    db RECOVER
+    ; Rhyhorn (Level 38)
+    db BODY_SLAM
+    db ROCK_THROW
+    db BLIZZARD
+    db THRASH
+    ; Blastoise (Level 40)
+    db WITHDRAW
+    db SEISMIC_TOSS
+    db BODY_SLAM
+    db TSUNAMI
+    db 0

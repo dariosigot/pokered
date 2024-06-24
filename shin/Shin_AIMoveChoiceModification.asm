@@ -1068,7 +1068,7 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     pop bc
     pop hl
     ld a,[$d11e]    ;get the multiplier effectiveness for the player's move
-    cp $14    ;is it < 20?
+    cp 12    ;is it < 12?
     jr c,.skipSwitchEffectiveEnd    ;if so,skip to end of this block
     push bc
     ld a,[W_PLAYERMOVEPOWER]    ;get the power of the player's move into a
