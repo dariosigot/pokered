@@ -23021,17 +23021,16 @@ InitializeMissableObjectsFlagsNew:
 
 ; ───────────────────────────────────────
 
-BackupMovesAndPPAndLoadIVBackupPointer:
+BackupMoves:
     ld hl,W_ENEMYMONMOVES
     ld de,wBackupEnemyMoves
-    ld bc,4
-    push bc
-    call CopyData
+    jr BackupCommon
+BackupPP:
     ld hl,W_ENEMYMONPP
-    pop bc
-    call CopyData
-    ld hl,$cceb
-    ret
+    ld de,wBackupEnemyPP
+BackupCommon:
+    ld bc,4
+    jp CopyData
 
 WriteMonMoves2:
     ld a,[W_ISINBATTLE]
@@ -23475,15 +23474,13 @@ ItemUseBall: ; d687 (3:5687)
     ld a,[hl]
     push af        ;...and status ailments
     push hl
+    call BackupPP
     ld hl,W_ENEMYBATTSTATUS3
     bit 3,[hl]
-    jr z,.next15
-    ds 2 ; ld a,DITTO
-    ds 3 ; ld [W_ENEMYMONID],a
-    jr .next16
-.next15    ;$5871
+    jr nz,.next16
     set 3,[hl]
-    call BackupMovesAndPPAndLoadIVBackupPointer ; ld hl,$cceb
+    call BackupMoves
+    ld hl,$cceb
     ld a,[W_ENEMYMONATKDEFIV]
     ld [hli],a
     ld a,[W_ENEMYMONSPDSPCIV]
@@ -23520,7 +23517,7 @@ ItemUseBall: ; d687 (3:5687)
     ld a,$3a    ;convert order: Internal->Dex
     call Predef
     ld a,[$d11e]
-    ds 1 ; dec a ; POKEDEXMOD
+    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,2
     ld hl,wPokedexOwned    ;Dex_own_flags (pokemon)
@@ -23529,7 +23526,7 @@ ItemUseBall: ; d687 (3:5687)
     ld a,c
     push af
     ld a,[$d11e]
-    ds 1 ; dec a ; POKEDEXMOD
+    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,1
     ld a,$10    ;set Dex_own_flag?
@@ -23577,6 +23574,9 @@ ItemUseBall: ; d687 (3:5687)
     inc a
     ld [$cf96],a
     jp RemoveItemFromInventory    ;remove ITEM (XXX)
+
+SECTION "ItemUseBallText00",ROMX[$5937],BANK[$3]
+
 ItemUseBallText00: ; d937 (3:5937)
 ;"It dodged the thrown ball!"
 ;"This pokemon can't be caught"
@@ -51626,16 +51626,12 @@ TransformEffect_: ; Moved Upper in the Bank
     bit 3,a ; Pokemon is Just Transformed
     jr nz,.SkipBackupMoves
 
-    ; Backup Moves & PP
+    ; Backup Moves
     push hl
     push de
     ld hl,W_ENEMYMONMOVES
     ld de,wBackupEnemyMoves
     ld bc,4
-    push bc
-    call CopyData
-    ld hl,W_ENEMYMONPP
-    pop bc
     call CopyData
     pop de
     pop hl
@@ -57536,6 +57532,28 @@ CheckPoisonableMon:
     cp METAL
     ret
 
+BackupMovesBeforeEnemyMimic:
+    push af
+    push de
+    jr z,.end
+    ld a,[W_ISINBATTLE]
+    dec a ; wild?
+    jr nz,.end
+    ld hl,W_ENEMYBATTSTATUS3
+    bit 3,[hl] ; Pokemon is Just Transformed
+    jr nz,.end
+    ; Backup Moves
+    set 3,[hl] ; Set Transformed
+    ld hl,W_ENEMYMONMOVES
+    ld de,wBackupEnemyMoves
+    ld bc,4
+    call CopyData
+.end
+    pop de
+    pop af
+    ld hl,W_PLAYERMONMOVES
+    ret
+
 ; Free
 
 SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
@@ -60560,7 +60578,7 @@ Func_3f9ed: ; 3f9ed (f:79ed)
     ld d,a
     ld a,[H_WHOSETURN]
     and a
-    ld hl,W_PLAYERMONMOVES
+    call BackupMovesBeforeEnemyMimic ; ld hl,W_PLAYERMONMOVES
     ld a,[wPlayerMoveListIndex]
     jr z,.asm_3fa5f
     ld hl,W_ENEMYMONMOVES
