@@ -10,9 +10,11 @@ ENDM
 IVYSAUR_Learnset: MACRO
     BULBASAUR_Learnset
     db 16,POISONPOWDER
-    db 20,DOUBLE_KICK
+    db 18,POISON_STING
+    db 21,DOUBLE_KICK
     db 23,RAZOR_LEAF
-    db 26,SLAM
+    db 25,SLAM
+    db 27,ACID
     db 29,STUN_SPORE
     ;  32,VENUSAUR
 ENDM
@@ -23,23 +25,29 @@ VENUSAUR_Learnset: MACRO
     db 38,GROWTH
     db 40,BODY_SLAM
     db 44,SLUDGE
-    db 49,SLEEP_POWDER
-    db 56,SOLARBEAM
+    db 47,SLEEP_POWDER
+    db 52,SOLARBEAM
+    db 57,EARTHQUAKE
 ENDM
 BULBASAUR_NoEvo_Learnset: MACRO
-    db 18,POISONPOWDER
-    db 20,DOUBLE_KICK
-    db 23,RAZOR_LEAF
-    db 27,STUN_SPORE
-    db 35,SOLARBEAM
-    db 37,SLEEP_POWDER
-    db 46,MEGA_DRAIN ; Exclusive
+    db 18,ABSORB ; Exclusive
+    db 22,DOUBLE_KICK
+    db 25,RAZOR_LEAF
+    db 29,SLAM
+    db 32,MEGA_DRAIN ; Exclusive
+    db 35,STUN_SPORE
+    db 39,BIND ; Exclusive
+    db 43,GROWTH
+    db 48,SLEEP_POWDER
+    db 54,SOLARBEAM
 ENDM
 IVYSAUR_NoEvo_Learnset: MACRO
-    db 38,SLUDGE
-    db 41,SLEEP_POWDER
-    db 44,BIND ; Exclusive
-    db 50,SOLARBEAM
+    db 34,BIND ; Exclusive
+    db 38,STOMP
+    db 42,GROWTH
+    db 46,SLUDGE
+    db 48,SLEEP_POWDER
+    db 54,SOLARBEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 CHARMANDER_Learnset: MACRO
@@ -53,10 +61,12 @@ ENDM
 CHARMELEON_Learnset: MACRO
     CHARMANDER_Learnset
     db 16,FOCUS_ENERGY
-    db 21,SMOKESCREEN
-    db 24,TRAPHOLE
-    db 27,FIRE_PUNCH
+    db 19,SMOKESCREEN
+    db 22,FIRE_PUNCH
+    db 25,TRAPHOLE
+    db 28,MEGA_PUNCH
     db 32,SLASH
+    db 34,FLAMETHROWER
     ;  36,CHARIZARD
 ENDM
 CHARIZARD_Learnset: MACRO
@@ -64,41 +74,49 @@ CHARIZARD_Learnset: MACRO
     db 36,SWOOP
     db 39,DRAGON_RAGE
     db 41,SEISMIC_TOSS
-    db 44,FLAMETHROWER
-    db 49,FIRE_SPIN
+    db 44,FIRE_SPIN
+    db 48,BODY_SLAM
     db 53,FIRE_BLAST
-    db 56,SWORDS_DANCE
+    db 57,SWORDS_DANCE
+    db 60,EARTHQUAKE
 ENDM
 CHARMANDER_NoEvo_Learnset: MACRO
-    db 19,FOCUS_ENERGY
-    db 22,SMOKESCREEN
-    db 25,FIRE_PUNCH
-    db 30,SLASH
-    db 34,AGILITY ; Exclusive
-    db 38,FLAMETHROWER
-    db 43,SLAM ; Exclusive
+    db 18,QUICK_ATTACK ; Exclusive
+    db 21,FOCUS_ENERGY
+    db 24,SMOKESCREEN
+    db 26,FIRE_PUNCH
+    db 30,AGILITY ; Exclusive
+    db 35,SLASH
+    db 40,FLAMETHROWER
+    db 45,SLAM ; Exclusive
+    db 50,FIRE_SPIN
+    db 55,FIRE_BLAST
 ENDM
 CHARMELEON_NoEvo_Learnset: MACRO
-    db 38,AGILITY ; Exclusive
-    db 42,FLAMETHROWER
+    db 38,SLAM ; Exclusive
+    db 41,DRAGON_RAGE
+    db 44,SEISMIC_TOSS
     db 46,FIRE_SPIN
-    db 57,FIRE_BLAST
+    db 51,SWORDS_DANCE
+    db 55,FIRE_BLAST
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 SQUIRTLE_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  8,BUBBLE
-    db 10,DOUBLESLAP
-    db 13,WATER_GUN
+    db 10,PECK
+    db 13,DOUBLESLAP
     ;  16,WARTORTLE
 ENDM
 WARTORTLE_Learnset: MACRO
     SQUIRTLE_Learnset
-    db 16,WITHDRAW
+    db 16,WATER_GUN
+    db 18,WITHDRAW
     db 21,BITE
     db 25,SCREECH
     db 28,HEADBUTT
+    db 31,BUBBLEBEAM
     db 33,HAZE
     ;  36,BLASTOISE
 ENDM
@@ -110,22 +128,28 @@ BLASTOISE_Learnset: MACRO
     db 42,SKULL_BASH
     db 46,BODY_SLAM
     db 51,HYDRO_PUMP
+    db 56,CRABHAMMER
     db 59,EARTHQUAKE
 ENDM
 SQUIRTLE_NoEvo_Learnset: MACRO
-    db 19,WITHDRAW
-    db 21,BITE
-    db 25,SCREECH
-    db 29,HAZE
-    db 34,BUBBLEBEAM ; Exclusive
-    db 35,SKULL_BASH
-    db 42,HYDRO_PUMP
+    db 18,SONICBOOM ; Exclusive
+    db 20,WATER_GUN
+    db 22,WITHDRAW
+    db 24,BITE
+    db 29,SUPERSONIC ; Exclusive
+    db 34,HEADBUTT
+    db 39,BUBBLEBEAM
+    db 44,TRAPHOLE ; Exclusive
+    db 49,SKULL_BASH
+    db 54,HYDRO_PUMP
 ENDM
 WARTORTLE_NoEvo_Learnset: MACRO
-    db 37,TSUNAMI
-    db 39,SKULL_BASH
-    db 47,HYDRO_PUMP
-    db 55,TRAPHOLE ; Exclusive
+    db 38,TRAPHOLE ; Exclusive
+    db 42,TSUNAMI
+    db 46,SPIKE_CANNON
+    db 50,BODY_SLAM
+    db 52,SKULL_BASH
+    db 54,HYDRO_PUMP
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 CATERPIE_Learnset: MACRO

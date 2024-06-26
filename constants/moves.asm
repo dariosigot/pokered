@@ -64,7 +64,7 @@
     db BUBBLEBEAM   , SPEED_DOWN_SIDE_EFFECT     ,  65 , WATER    , 255 , 10 ; pp 20 ; 1
     db AURORA_BEAM  , ATTACK_DOWN_SIDE_EFFECT    ,  65 , ICE      , 255 , 10 ; pp 20 ; 1
     db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , NORMAL   , 229 , 40 ; pp  5 ; 1
-    db PECK         , NO_ADDITIONAL_EFFECT       ,  35 , IVORY    , 255 , 06 ; pp 35 ; 0 ; Type Wind -> Ivory
+    db PECK         , NO_ADDITIONAL_EFFECT       ,  45 , IVORY    , 255 , 06 ; pp 35 ; 0 ; Type Wind -> Ivory ; Pwr 35 -> 45
     db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
     db SUBMISSION   , RECOIL_EFFECT              ,  80 , FIGHTING , 204 , 08 ; pp 25 ; 0
     db LOW_KICK     , FLINCH_SIDE_EFFECT2        ,  50 , FIGHTING , 255 , 10 ; pp 20 ; 0 ; Acr 229 -> 255

@@ -11,7 +11,7 @@ VenusaurExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db $FF
+    db ABSORB
     db MEGA_DRAIN
     db SOLARBEAM
     db MIMIC
@@ -20,11 +20,11 @@ VenusaurExclusiveMove:
     db REST
     db SUBSTITUTE
     db BLADE
-    db STUN_SPORE
-    db SLEEP_POWDER
-    db SLUDGE
+    db $FF
+    db $FF
+    db $FF
     db BIND
-    db RAZOR_WIND
+    db $FF
     db EARTHQUAKE
     db FISSURE
     db ROCK_SLIDE
@@ -62,12 +62,12 @@ CharizardExclusiveMove:
     db BLADE
     db SWOOP
     db STRIKE
-    db FIRE_PUNCH
-    db SLASH
+    db QUICK_ATTACK
+    db $FF
     db AGILITY
-    db FLAMETHROWER
+    db $FF
     db SLAM
-    db FIRE_SPIN
+    db $FF
     db SOLARBEAM
     db ROCK_SLIDE
     db 0
@@ -89,7 +89,7 @@ BlastoiseExclusiveMove:
     db SUBMISSION
     db COUNTER
     db SEISMIC_TOSS
-    db $FF
+    db SONICBOOM
     db EARTHQUAKE
     db FISSURE
     db TRAPHOLE
@@ -101,8 +101,8 @@ BlastoiseExclusiveMove:
     db SUBSTITUTE
     db TSUNAMI
     db STRIKE
-    db HAZE
-    db HYDRO_PUMP
+    db SUPERSONIC
+    db $FF
     db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
