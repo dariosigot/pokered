@@ -5573,8 +5573,8 @@ MewBaseStats: ; 425b (1:425b)
     db 100 ; base speed
     db 100 ; base special
 
-    db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
 
     db 3 ; catch rate
     db 64 ; base exp yield
