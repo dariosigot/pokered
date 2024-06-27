@@ -11,7 +11,7 @@ VenusaurExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db ABSORB
+    db LEECH_LIFE
     db MEGA_DRAIN
     db SOLARBEAM
     db MIMIC
@@ -20,7 +20,7 @@ VenusaurExclusiveMove:
     db REST
     db SUBSTITUTE
     db BLADE
-    db $FF
+    db BARRAGE
     db $FF
     db $FF
     db BIND
@@ -102,7 +102,7 @@ BlastoiseExclusiveMove:
     db TSUNAMI
     db STRIKE
     db SUPERSONIC
-    db $FF
+    db HEADBUTT
     db ROCK_SLIDE
     db 0
 ; ──────────────────────────────────────────────────────────────────────

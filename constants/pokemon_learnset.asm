@@ -20,6 +20,7 @@ IVYSAUR_Learnset: MACRO
 ENDM
 VENUSAUR_Learnset: MACRO
     IVYSAUR_Learnset
+    db 32,ABSORB
     db 32,PETAL_DANCE
     db 36,STOMP
     db 38,GROWTH
@@ -30,23 +31,23 @@ VENUSAUR_Learnset: MACRO
     db 57,EARTHQUAKE
 ENDM
 BULBASAUR_NoEvo_Learnset: MACRO
-    db 18,ABSORB ; Exclusive
+    db 18,LEECH_LIFE ; Exclusive
     db 22,DOUBLE_KICK
     db 25,RAZOR_LEAF
     db 29,SLAM
-    db 32,MEGA_DRAIN ; Exclusive
+    db 32,BARRAGE ; Exclusive
     db 35,STUN_SPORE
     db 39,BIND ; Exclusive
-    db 43,GROWTH
-    db 48,SLEEP_POWDER
+    db 44,GROWTH
+    db 49,SLEEP_POWDER
     db 54,SOLARBEAM
 ENDM
 IVYSAUR_NoEvo_Learnset: MACRO
     db 34,BIND ; Exclusive
-    db 38,STOMP
+    db 38,ABSORB
     db 42,GROWTH
     db 46,SLUDGE
-    db 48,SLEEP_POWDER
+    db 49,SLEEP_POWDER
     db 54,SOLARBEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
@@ -71,6 +72,7 @@ CHARMELEON_Learnset: MACRO
 ENDM
 CHARIZARD_Learnset: MACRO
     CHARMELEON_Learnset
+    db 36,WING_ATTACK
     db 36,SWOOP
     db 39,DRAGON_RAGE
     db 41,SEISMIC_TOSS
@@ -115,15 +117,16 @@ WARTORTLE_Learnset: MACRO
     db 18,WITHDRAW
     db 21,BITE
     db 25,SCREECH
-    db 28,HEADBUTT
+    db 28,TRAPHOLE
     db 31,BUBBLEBEAM
     db 33,HAZE
     ;  36,BLASTOISE
 ENDM
 BLASTOISE_Learnset: MACRO
     WARTORTLE_Learnset
+    db 36,SPIKE_CANNON
     db 36,TSUNAMI
-    db 38,SPIKE_CANNON
+    db 38,MIST
     db 40,STOMP
     db 42,SKULL_BASH
     db 46,BODY_SLAM
@@ -137,18 +140,18 @@ SQUIRTLE_NoEvo_Learnset: MACRO
     db 22,WITHDRAW
     db 24,BITE
     db 29,SUPERSONIC ; Exclusive
-    db 34,HEADBUTT
+    db 34,TRAPHOLE
     db 39,BUBBLEBEAM
-    db 44,TRAPHOLE ; Exclusive
+    db 44,HEADBUTT ; Exclusive
     db 49,SKULL_BASH
     db 54,HYDRO_PUMP
 ENDM
 WARTORTLE_NoEvo_Learnset: MACRO
-    db 38,TRAPHOLE ; Exclusive
+    db 38,HEADBUTT ; Exclusive
     db 42,TSUNAMI
-    db 46,SPIKE_CANNON
-    db 50,BODY_SLAM
-    db 52,SKULL_BASH
+    db 46,MIST
+    db 50,SKULL_BASH
+    db 52,BODY_SLAM
     db 54,HYDRO_PUMP
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
@@ -175,7 +178,8 @@ BUTTERFREE_Learnset: MACRO
     db 31,PSYBEAM
     db 36,RAZOR_WIND
     db 41,SPORE
-    db 46,MEGA_DRAIN
+    db 45,MEGA_DRAIN
+    db 50,
     db 55,PSYCHIC_M
 ENDM
 CATERPIE_NoEvo_Learnset: MACRO
@@ -210,8 +214,9 @@ BEEDRILL_Learnset: MACRO
     db 30,PIN_MISSILE
     db 34,AGILITY
     db 37,SLAM
-    db 40,RAZOR_WIND
-    db 44,SLUDGE
+    db 41,SLUDGE
+    db 45,RAZOR_WIND
+    db 50,
     db 55,SWORDS_DANCE
 ENDM
 WEEDLE_NoEvo_Learnset: MACRO
