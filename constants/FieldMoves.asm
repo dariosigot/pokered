@@ -111,8 +111,8 @@ db FM_LIGHT                                          ; 100 - $64 - VOLTORB
 db FM_LIGHT                                          ; 101 - $65 - ELECTRODE
 db FM_TELEPORT                                       ; 102 - $66 - EXEGGCUTE
 db FM_TELEPORT                                       ; 103 - $67 - EXEGGUTOR
-db FM_DIG                                            ; 104 - $68 - CUBONE
-db FM_DIG+FM_STRENGTH                                ; 105 - $69 - MAROWAK
+db FM_CUT+FM_DIG                                     ; 104 - $68 - CUBONE
+db FM_CUT+FM_STRENGTH+FM_DIG                         ; 105 - $69 - MAROWAK
 db FM_FLOAT+FM_STRENGTH                              ; 106 - $6A - HITMONLEE
 db FM_FLOAT+FM_STRENGTH                              ; 107 - $6B - HITMONCHAN
 db FM_CUT+FM_FLOAT+FM_HEAL                           ; 108 - $6C - LICKITUNG

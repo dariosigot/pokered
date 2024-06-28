@@ -454,8 +454,8 @@ ButterfreeBaseStats: ; 38512 (e:4512)
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 42,44,46                ; |DREAM_EATER|REST|PSYWAVE|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    tmlearn 42,43,44,46             ; |DREAM_EATER|SKY_ATTACK|REST|PSYWAVE|
+    tmlearn 50,52,55                ; |SUBSTITUTE|SWOOP|FLASH|
 
     db BANK(ButterfreePicFront)
 
@@ -565,8 +565,8 @@ BeedrillBaseStats: ; 38566 (e:4566)
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    tmlearn 43,44                   ; |SKY_ATTACK|REST|
+    tmlearn 50,51,52                ; |SUBSTITUTE|BLADE|SWOOP|
 
     db BANK(BeedrillPicFront)
 
@@ -3859,7 +3859,7 @@ CuboneBaseStats: ; 38f22 (e:4f22)
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,37,40                ; |BIDE|FLAMETHROWER|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
 
     db BANK(CubonePicFront)
 
@@ -3896,7 +3896,7 @@ MarowakBaseStats: ; 38f3e (e:4f3e)
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,37,38,39,40          ; |BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
 
     db BANK(MarowakPicFront)
 

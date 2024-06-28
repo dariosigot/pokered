@@ -15,7 +15,7 @@
     db GUILLOTINE   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 40 ; pp  5 ; - ; Type Normal -> Ivory
     db RAZOR_WIND   , CHARGE_EFFECT              , 120 , WIND     , 255 , 20 ; pp 10 ; 1 ; Type Normal -> Wind ; Acr 191 -> 255 ; Pwr 80 -> 120
     db SWORDS_DANCE , ATTACK_UP2_EFFECT          ,   0 , METAL    , 255 , 20 ; pp 10 ; - ; PP 30 -> 10 ; Type Normal -> Metal
-    db BLADE        , NO_ADDITIONAL_EFFECT       ,  55 , METAL    , 242 , 07 ; pp 30 ; 0 ; Pwr 50 -> 55 ; Type Normal -> Metal
+    db BLADE        , NO_ADDITIONAL_EFFECT       ,  65 , METAL    , 242 , 07 ; pp 30 ; 0 ; Pwr 50 -> 65 ; Type Normal -> Metal
     db GUST         , NO_ADDITIONAL_EFFECT       ,  40 , WIND     , 255 , 06 ; pp 35 ; 1 ; Type Normal -> Wind  
     db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  60 , WIND     , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 60 ; PP 35 -> 25
     db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,   0 , WIND     , 255 , 10 ; pp 20 ; - ; Type Normal -> Wind ; Acr 216 -> 255
@@ -141,7 +141,7 @@
     db DREAM_EATER  , DREAM_EATER_EFFECT         , 100 , GHOST    , 255 , 20 ; pp 10 ; 1 ; Type Psychic -> Ghost ; PP 15 -> 10
     db POISON_GAS   , POISON_EFFECT              ,   0 , POISON   , 229 , 07 ; pp 30 ; - ; Acr 140 -> 229 ; PP 40 -> 30
     db BARRAGE      , TWO_TO_FIVE_ATTACKS_EFFECT ,  25 , GRASS    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Grass ; Pwr 15 -> 25
-    db LEECH_LIFE   , DRAIN_HP_EFFECT            ,  20 , BUG      , 255 , 14 ; pp 15 ; 0
+    db LEECH_LIFE   , DRAIN_HP_EFFECT            ,  30 , BUG      , 255 , 14 ; pp 15 ; 0 ; Pwr 20 -> 30
     db LOVELY_KISS  , SLEEP_EFFECT               ,   0 , NORMAL   , 191 , 20 ; pp 10 ; -
     db SKY_ATTACK   , CHARGE_EFFECT              , 140 , WIND     , 229 , 40 ; pp  5 ; 0
     db TRANSFORM    , TRANSFORM_EFFECT           ,   0 , RUBBER   , 255 , 20 ; pp 10 ; - ; Type Normal -> Rubber
@@ -152,7 +152,7 @@
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 14 ; pp 15 ; - ; Acr 204 -> 255
     db SPLASH       , SPLASH_EFFECT              ,   0 , WATER    , 255 , 00 ; pp 40 ; - ; Type Normal -> Water
     db ACID_ARMOR   , DEFENSE_UP2_EFFECT         ,   0 , POISON   , 255 , 10 ; pp 20 ; - ; PP 40 -> 20
-    db CRABHAMMER   , NO_ADDITIONAL_EFFECT       ,  90 , WATER    , 229 , 20 ; pp 10 ; 0 ; Acr 216 -> 229 ; Pwr 90 -> 100
+    db CRABHAMMER   , NO_ADDITIONAL_EFFECT       , 100 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Acr 216 -> 229 ; Pwr 90 -> 100
     db EXPLOSION    , EXPLODE_EFFECT             , 255 , NORMAL   , 255 , 40 ; pp  5 ; 0 ; Pwr 170 -> 255
     db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  20 , NORMAL   , 204 , 14 ; pp 15 ; 0 ; Pwr 18 -> 20
     db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  50 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Ground -> Ivory

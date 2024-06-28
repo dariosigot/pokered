@@ -113,7 +113,7 @@ ButterfreeExclusiveMove:
     db WHIRLWIND
     db TOXIC
     db HYPER_BEAM
-    db $FF
+    db SWOOP
     db MEGA_DRAIN
     db SOLARBEAM
     db PSYCHIC_M
@@ -132,6 +132,7 @@ ButterfreeExclusiveMove:
     db SELFDESTRUCT
     db EXPLOSION
     db DREAM_EATER
+    db SKY_ATTACK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 WeedleExclusiveMove:
@@ -143,7 +144,7 @@ BeedrillExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db $FF
+    db SWOOP
     db MEGA_DRAIN
     db MIMIC
     db DOUBLE_TEAM
@@ -170,7 +171,7 @@ PidgeotExclusiveMove:
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db $FF
+    db TACKLE
     db MIMIC
     db DOUBLE_TEAM
     db REFLECT
@@ -181,8 +182,8 @@ PidgeotExclusiveMove:
     db SUBSTITUTE
     db BLADE
     db SWOOP
-    db AGILITY
-    db MIRROR_MOVE
+    db $FF
+    db $FF
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RattataExclusiveMove:
@@ -196,7 +197,7 @@ RaticateExclusiveMove:
     db ICE_BEAM
     db BLIZZARD
     db HYPER_BEAM
-    db $FF
+    db AGILITY
     db THUNDERBOLT
     db THUNDER
     db EARTHQUAKE
@@ -208,9 +209,9 @@ RaticateExclusiveMove:
     db SKULL_BASH
     db REST
     db SUBSTITUTE
-    db FOCUS_ENERGY
-    db SLASH
-    db SUPER_FANG
+    db $FF
+    db $FF
+    db $FF
     db SWORDS_DANCE
     db COUNTER
     db THUNDER_WAVE
@@ -234,8 +235,8 @@ FearowExclusiveMove:
     db SUBSTITUTE
     db BLADE
     db SWOOP
-    db MIRROR_MOVE
-    db AGILITY
+    db $FF
+    db $FF
     db QUICK_ATTACK
     db TRI_ATTACK
     db 0
@@ -260,7 +261,7 @@ ArbokExclusiveMove:
     db ROCK_SLIDE
     db SUBSTITUTE
     db STRIKE
-    db SCREECH
+    db $FF
     db ABSORB
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -276,7 +277,7 @@ RaichuExclusiveMove:
     db PAY_DAY
     db SUBMISSION
     db SEISMIC_TOSS
-    db $FF
+    db LOVELY_KISS
     db THUNDERBOLT
     db THUNDER
     db MIMIC
@@ -289,9 +290,9 @@ RaichuExclusiveMove:
     db REST
     db THUNDER_WAVE
     db SUBSTITUTE
-    db TAIL_WHIP
+    db $FF
     db QUICK_ATTACK
-    db SLAM
+    db $FF
     db AGILITY
     db TRAPHOLE
     db 0
@@ -358,10 +359,10 @@ NidoqueenExclusiveMove:
     db BLADE
     db TSUNAMI
     db STRIKE
-    db SLASH
     db DOUBLE_TEAM
-    db BITE
-    db FOCUS_ENERGY
+    db AGILITY
+    db $FF
+    db $FF
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 NidoranMExclusiveMove:
@@ -400,10 +401,10 @@ NidokingExclusiveMove:
     db BLADE
     db TSUNAMI
     db STRIKE
-    db HYPER_FANG
     db DOUBLE_TEAM
-    db SLAM
-    db FOCUS_ENERGY
+    db AGILITY
+    db $FF
+    db $FF
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ClefairyExclusiveMove:
@@ -600,7 +601,7 @@ PersianExclusiveMove:
     db WATER_GUN
     db HYPER_BEAM
     db PAY_DAY
-    db $FF
+    db KINESIS
     db THUNDERBOLT
     db THUNDER
     db MIMIC

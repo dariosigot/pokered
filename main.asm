@@ -57381,9 +57381,7 @@ SECTION "AdjustDamageForMoveType",ROMX[$63a5],BANK[$f]
 AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
 ; values for player turn
     ld hl,W_PLAYERMONTYPES
-    ld a,[hli]
-    ld b,a    ; b = type 1 of attacker
-    ld c,[hl] ; c = type 2 of attacker
+    call GetAttackerType ; b = type 1 | c = type 2
     ld hl,W_ENEMYMONTYPES
     ld a,[hli]
     ld d,a    ; d = type 1 of defender
@@ -57395,9 +57393,7 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
     jr z,.next
 ; values for enemy turn
     ld hl,W_ENEMYMONTYPES
-    ld a,[hli]
-    ld b,a    ; b = type 1 of attacker
-    ld c,[hl] ; c = type 2 of attacker
+    call GetAttackerType ; b = type 1 | c = type 2
     ld hl,W_PLAYERMONTYPES
     ld a,[hli]
     ld d,a    ; d = type 1 of defender
@@ -61593,6 +61589,22 @@ Copy4Bytes:
 Copy4BytesDirect:
     ld bc,$4
     jp CopyData
+
+; b = type 1 of attacker
+; c = type 2 of attacker
+; Note = DRAGON Type gain WIND STAB
+GetAttackerType:
+    call .GetType
+    ld b,a
+    call .GetType
+    ld c,a
+    ret
+.GetType
+    ld a,[hli]
+    cp DRAGON
+    ret nz
+    ld a,WIND
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
