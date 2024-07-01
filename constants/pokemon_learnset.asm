@@ -172,6 +172,7 @@ BUTTERFREE_Learnset: MACRO
     db 14,STUN_SPORE
     db 15,SLEEP_POWDER
     db 18,GUST
+    db 20,SONICBOOM
     db 23,SUPERSONIC
     db 26,LEECH_LIFE
     db 27,WHIRLWIND
@@ -210,6 +211,7 @@ BEEDRILL_Learnset: MACRO
     db 15,FOCUS_ENERGY
     db 18,FURY_ATTACK
     db 21,LEECH_LIFE
+    db 23,SONICBOOM
     db 24,ACID
     db 27,DOUBLE_TEAM
     db 30,PIN_MISSILE
@@ -580,81 +582,112 @@ ENDM
 CLEFAIRY_Learnset: MACRO
     db  1,POUND
     db  1,GROWL
-    db  8,DEFENSE_CURL ; Exclusive
-    db 13,SING ; Exclusive
+    db  7,DEFENSE_CURL ; Exclusive
+    db 10,DISABLE
+    db 13,SING
     db 16,DOUBLESLAP
     db 20,SWIFT
+    db 22,SLAM
     db 24,MINIMIZE
-    db 31,METRONOME
-    db 34,BODY_SLAM
+    db 28,METRONOME
+    db 32,REST
+    db 37,BODY_SLAM
+    db 42,SOFTBOILED
+    db 47,LIGHT_SCREEN
+    db 52,REFLECT
+    db 57,DOUBLE_EDGE
 ENDM
 CLEFABLE_Learnset: MACRO
     db  1,POUND
     db  1,GROWL
     db  1,SWIFT
-    db 16,DOUBLESLAP
-    db 27,MINIMIZE
-    db 31,METRONOME
+    db  8,DISABLE
+    db 12,SING
+    db 15,DOUBLESLAP
+    db 19,SLAM
+    db 23,MINIMIZE
+    db 27,METRONOME
+    db 31,REST
     db 34,BODY_SLAM
-    db 45,LIGHT_SCREEN
+    db 39,SOFTBOILED
+    db 44,LIGHT_SCREEN
     db 48,REFLECT
     db 51,DOUBLE_EDGE
+    db 56,LOVELY_KISS
     db 60,HYPER_BEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 VULPIX_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
-    db  8,EMBER
-    db 13,QUICK_ATTACK ; Exclusive
-    db 18,BITE
-    db 21,ROAR
+    db  8,EMBER ; Exclusive
+    db 13,ROAR
+    db 17,BITE
+    db 21,QUICK_ATTACK ; Exclusive
     db 25,DOUBLE_KICK
     db 28,CONFUSE_RAY
-    db 31,DOUBLE_TEAM ; Exclusive
-    db 35,FLAMETHROWER
-    db 38,SLAM ; Exclusive
-    db 42,FIRE_SPIN
+    db 32,DOUBLE_TEAM ; Exclusive
+    db 37,SLAM
+    db 42,FLAMETHROWER
+    db 47,FIRE_SPIN
+    db 52,SLASH
     db 56,FIRE_BLAST
 ENDM
 NINETALES_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  1,BITE
-    db 14,ROAR
-    db 19,EMBER
+    db  8,ROAR
+    db 13,SMOKESCREEN
+    db 17,EMBER
     db 22,DOUBLE_KICK
     db 25,CONFUSE_RAY
-    db 31,TRAPHOLE
-    db 36,FLAMETHROWER
+    db 31,SLAM
+    db 33,FLAMETHROWER
+    db 36,SKULL_BASH
+    db 38,TRAPHOLE
     db 43,FIRE_SPIN
     db 45,SLASH
-    db 55,FIRE_BLAST
-    db 60,BODY_SLAM
+    db 50,FIRE_BLAST
+    db 55,BODY_SLAM
+    db 60,NIGHT_SHADE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 JIGGLYPUFF_Learnset: MACRO
     db  1,POUND
     db  1,SING
-    db  8,DEFENSE_CURL ; Exclusive
-    db 13,DISABLE ; Exclusive
+    db  7,DEFENSE_CURL ; Exclusive
+    db 10,GROWL
+    db 13,DISABLE
     db 16,DOUBLESLAP
     db 20,SWIFT
+    db 22,SLAM
     db 24,MINIMIZE
-    db 31,REST
-    db 34,BODY_SLAM
+    db 28,REST
+    db 32,METRONOME
+    db 37,BODY_SLAM
+    db 42,SOFTBOILED
+    db 47,REFLECT
+    db 52,LIGHT_SCREEN
+    db 57,DOUBLE_EDGE
 ENDM
 WIGGLYTUFF_Learnset: MACRO
     db  1,POUND
     db  1,SING
     db  1,SWIFT
-    db 16,DOUBLESLAP
-    db 27,MINIMIZE
-    db 31,REST
+    db  8,GROWL
+    db 12,DISABLE
+    db 15,DOUBLESLAP
+    db 19,SLAM
+    db 23,MINIMIZE
+    db 27,REST
+    db 31,METRONOME
     db 34,BODY_SLAM
-    db 45,REFLECT
+    db 39,SOFTBOILED
+    db 44,REFLECT
     db 48,LIGHT_SCREEN
     db 51,DOUBLE_EDGE
+    db 56,LOVELY_KISS
     db 60,HYPER_BEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
@@ -663,64 +696,91 @@ ZUBAT_Learnset: MACRO
     db  1,SUPERSONIC
     db  7,POISON_STING
     db 11,BITE
-    db 16,ACID
+    db 13,LEER
+    db 15,ACID
+    db 17,GUST
+    db 19,SCREECH
     db 21,HYPER_FANG
     ;  22,GOLBAT
 ENDM
 GOLBAT_Learnset: MACRO
     ZUBAT_Learnset
     db 22,WING_ATTACK
+    db 24,AGILITY
     db 26,RAZOR_WIND
-    db 31,MEGA_DRAIN
-    db 34,SWOOP
-    db 37,CONFUSE_RAY
-    db 41,HAZE
-    db 44,SLUDGE
-    db 49,DOUBLE_TEAM
+    db 28,MEGA_DRAIN
+    db 30,SONICBOOM
+    db 32,SWOOP
+    db 35,CONFUSE_RAY
+    db 37,DISABLE
+    db 40,HAZE
+    db 43,SLUDGE
+    db 47,DOUBLE_TEAM
+    db 51,TOXIC
+    db 55,SUPER_FANG
+    db 58,NIGHT_SHADE
     db 60,SKY_ATTACK
 ENDM
 ZUBAT_NoEvo_Learnset: MACRO
+    db 24,LICK ; Exclusive
     db 27,WING_ATTACK
-    db 31,ABSORB ; Exclusive
-    db 34,CONFUSE_RAY
-    db 39,HAZE
-    db 42,SLUDGE
-    db 49,DOUBLE_TEAM
+    db 30,AGILITY
+    db 33,ABSORB ; Exclusive
+    db 37,SONICBOOM
+    db 40,CONFUSE_RAY
+    db 43,DISABLE
+    db 46,HAZE
+    db 49,SLUDGE
+    db 53,DOUBLE_TEAM
+    db 57,TOXIC
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 ODDISH_Learnset: MACRO
     db  1,ABSORB
     db  1,GROWTH
     db  9,LEECH_SEED
-    db 13,ACID
+    db 11,DEFENSE_CURL
+    db 13,POISON_STING
     db 15,POISONPOWDER
-    db 18,STUN_SPORE
+    db 17,SLEEP_POWDER
+    db 19,STUN_SPORE
     ;  21,GLOOM
 ENDM
 GLOOM_Learnset: MACRO
     ODDISH_Learnset
-    db 21,SLEEP_POWDER
+    db 21,ACID
     db 25,MEGA_DRAIN
     db 28,SLUDGE
-    db 34,PETAL_DANCE
+    db 32,PETAL_DANCE
+    db 37,SLAM
+    db 42,BARRAGE
+    db 45,HAZE
+    db 47,SPORE
     db 52,SOLARBEAM
 ENDM
 VILEPLUME_Learnset: MACRO
     ODDISH_Learnset
-    db 21,SLEEP_POWDER
+    db 21,ACID
     db 21,MEGA_DRAIN
     db 25,PETAL_DANCE
-    db 29,SLUDGE
+    db 28,SLUDGE
+    db 32,SLAM
+    db 36,BARRAGE
+    db 39,REFLECT
+    db 42,HAZE
     db 44,SPORE
-    db 52,SOLARBEAM
+    db 49,SOLARBEAM
+    db 52,TOXIC
+    db 58,NIGHT_SHADE
     db 60,SWORDS_DANCE
 ENDM
 ODDISH_NoEvo_Learnset: MACRO
-    db 22,SLEEP_POWDER
-    db 25,MEGA_DRAIN
-    db 29,RAZOR_LEAF ; Exclusive
-    db 37,SLUDGE
-    db 52,SLAM ; Exclusive
+    db 23,LEECH_LIFE ; Exclusive
+    db 27,MEGA_DRAIN
+    db 31,VINE_WHIP ; Exclusive
+    db 35,RAZOR_LEAF ; Exclusive
+    db 39,SLAM
+    db 44,BARRAGE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 PARAS_Learnset: MACRO
@@ -729,6 +789,7 @@ PARAS_Learnset: MACRO
     db  9,LEECH_SEED
     db 11,LEECH_LIFE
     db 13,POISONPOWDER
+    db 15,FURY_SWIPES
     db 17,ABSORB
     db 19,BLADE
     db 22,VICEGRIP
@@ -737,9 +798,12 @@ ENDM
 PARASECT_Learnset: MACRO
     PARAS_Learnset
     db 24,GROWTH
+    db 25,PIN_MISSILE
     db 27,SPORE
     db 30,MEGA_DRAIN
     db 34,SLASH
+    db 35,LIGHT_SCREEN
+    db 37,BARRAGE
     db 39,TRAPHOLE
     db 42,TWINEEDLE
     db 45,SOLARBEAM
@@ -748,10 +812,15 @@ PARASECT_Learnset: MACRO
 ENDM
 PARAS_NoEvo_Learnset: MACRO
     db 25,GROWTH
-    db 28,SPORE
-    db 31,MEGA_DRAIN
-    db 35,SLASH
-    db 44,SOLARBEAM
+    db 27,CONFUSION ; Exclusive
+    db 29,PIN_MISSILE
+    db 33,SPORE
+    db 37,MEGA_DRAIN
+    db 39,SLASH
+    db 43,LIGHT_SCREEN
+    db 47,BARRAGE
+    db 53,TWINEEDLE
+    db 57,SOLARBEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 VENONAT_Learnset: MACRO
@@ -762,7 +831,10 @@ VENONAT_Learnset: MACRO
     db 11,POISONPOWDER
     db 13,CONFUSION
     db 15,LEECH_LIFE
+    db 17,HYPNOSIS
+    db 19,SONICBOOM
     db 23,STUN_SPORE
+    db 26,LIGHT_SCREEN
     db 28,SLEEP_POWDER
     ;  31,VENOMOTH
 ENDM
@@ -775,11 +847,18 @@ VENOMOTH_Learnset: MACRO
     db 39,SLUDGE
     db 41,SPORE
     db 46,PSYCHIC_M
+    db 50,BARRIER
+    db 55,NIGHT_SHADE
     db 60,TOXIC
 ENDM
 VENONAT_NoEvo_Learnset: MACRO
-    db 35,PSYBEAM
-    db 43,PSYCHIC_M
+    db 32,STRING_SHOT ; Exclusive
+    db 36,PIN_MISSILE
+    db 40,PSYBEAM
+    db 45,SPORE
+    db 50,PSYCHIC_M
+    db 54,BARRIER
+    db 58,NIGHT_SHADE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 DIGLETT_Learnset: MACRO
@@ -915,32 +994,37 @@ ENDM
 GROWLITHE_Learnset: MACRO
     db  1,BITE
     db  1,ROAR
-    db  8,EMBER
+    db  8,EMBER ; Exclusive
     db 13,LEER
-    db 18,HYPER_FANG
+    db 17,HYPER_FANG
     db 21,AGILITY ; Exclusive
     db 25,DOUBLE_KICK
     db 28,TAKE_DOWN
-    db 31,DOUBLE_TEAM ; Exclusive
-    db 35,FLAMETHROWER
-    db 38,SLAM ; Exclusive
-    db 42,FIRE_SPIN
+    db 32,DOUBLE_TEAM ; Exclusive
+    db 37,SLAM
+    db 42,FLAMETHROWER
+    db 47,FIRE_SPIN
+    db 52,SUPER_FANG
     db 56,FIRE_BLAST
 ENDM
 ARCANINE_Learnset: MACRO
     db  1,BITE
     db  1,ROAR
     db  1,HYPER_FANG
-    db 14,LEER
-    db 19,EMBER
+    db  8,LEER
+    db 13,SMOKESCREEN
+    db 17,EMBER
     db 22,DOUBLE_KICK
     db 25,TAKE_DOWN
-    db 31,BODY_SLAM
-    db 36,FLAMETHROWER
+    db 31,SLAM
+    db 33,FLAMETHROWER
+    db 36,SKULL_BASH
+    db 38,BODY_SLAM
     db 40,FIRE_SPIN
     db 45,SUPER_FANG
-    db 55,FIRE_BLAST
-    db 60,EARTHQUAKE
+    db 50,FIRE_BLAST
+    db 55,EARTHQUAKE
+    db 60,SOLARBEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 POLIWAG_Learnset: MACRO
@@ -1052,35 +1136,48 @@ BELLSPROUT_Learnset: MACRO
     db  1,VINE_WHIP
     db  1,GROWTH
     db  9,LEECH_LIFE
-    db 13,ACID
+    db 11,CONSTRICT
+    db 13,POISON_STING
     db 15,POISONPOWDER
-    db 18,SLEEP_POWDER
+    db 17,SLEEP_POWDER
+    db 19,STUN_SPORE
     ;  21,WEEPINBELL
 ENDM
 WEEPINBELL_Learnset: MACRO
     BELLSPROUT_Learnset
-    db 21,STUN_SPORE
+    db 21,ACID
     db 25,WRAP
     db 28,SLUDGE
-    db 34,RAZOR_LEAF
-    db 52,SLAM
+    db 32,RAZOR_LEAF
+    db 37,SLAM
+    db 42,PIN_MISSILE
+    db 45,HAZE
+    db 47,SPORE
+    db 52,SOLARBEAM
 ENDM
 VICTREEBEL_Learnset: MACRO
     BELLSPROUT_Learnset
-    db 21,STUN_SPORE
+    db 21,ACID
     db 21,WRAP
     db 25,RAZOR_LEAF
-    db 29,SLUDGE
+    db 28,SLUDGE
+    db 32,SLAM
+    db 36,PIN_MISSILE
+    db 40,LIGHT_SCREEN
+    db 42,HAZE
     db 44,SPORE
-    db 52,SLAM
+    db 49,SOLARBEAM
+    db 52,TOXIC
+    db 58,SUPER_FANG
     db 60,SWORDS_DANCE
 ENDM
 BELLSPROUT_NoEvo_Learnset: MACRO
-    db 22,STUN_SPORE
-    db 25,WRAP
-    db 29,RAZOR_LEAF
-    db 37,SLUDGE
-    db 52,MEGA_DRAIN ; Exclusive
+    db 23,ABSORB ; Exclusive
+    db 27,WRAP
+    db 31,LEECH_SEED ; Exclusive
+    db 35,RAZOR_LEAF
+    db 39,SLAM
+    db 44,PIN_MISSILE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 TENTACOOL_Learnset: MACRO

@@ -1637,7 +1637,7 @@ GloomBaseStats: ; 38892 (e:4892)
     tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34                   ; |REFLECT|BIDE|
+    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
     tmlearn 44                      ; |REST|
     tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
 
@@ -1674,7 +1674,7 @@ VileplumeBaseStats: ; 388ae (e:48ae)
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34                   ; |REFLECT|BIDE|
+    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
     tmlearn 44                      ; |REST|
     tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
 

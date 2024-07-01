@@ -444,9 +444,9 @@ WigglytuffExclusiveMove:
     db SUBSTITUTE
     db STRIKE
     db DEFENSE_CURL
-    db DISABLE
-    db SING
-    db MINIMIZE
+    db $FF
+    db $FF
+    db $FF
     db DREAM_EATER
     db METRONOME
     db 0
@@ -471,9 +471,9 @@ NinetalesExclusiveMove:
     db SUBSTITUTE
     db EMBER
     db QUICK_ATTACK
-    db FLAMETHROWER
-    db SLAM
-    db FIRE_SPIN
+    db $FF
+    db $FF
+    db $FF
     db DREAM_EATER
     db SOLARBEAM
     db 0
@@ -497,20 +497,23 @@ GolbatExclusiveMove:
     db BLADE
     db SWOOP
     db ABSORB
-    db CONFUSE_RAY
-    db HAZE
+    db LICK
+    db $FF
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OddishExclusiveMove:
 GloomExclusiveMove:
 VileplumeExclusiveMove:
+BellsproutExclusiveMove:
+WeepinbellExclusiveMove:
+VictreebelExclusiveMove:
     db SWORDS_DANCE
     db TOXIC
     db BODY_SLAM
     db TAKE_DOWN
     db DOUBLE_EDGE
     db HYPER_BEAM
-    db $FF
+    db SWIFT
     db MEGA_DRAIN
     db SOLARBEAM
     db MIMIC
@@ -520,8 +523,11 @@ VileplumeExclusiveMove:
     db SUBSTITUTE
     db BLADE
     db RAZOR_LEAF
-    db SLUDGE
-    db SLAM
+    db ABSORB
+    db $FF
+    db LEECH_LIFE
+    db LEECH_SEED
+    db VINE_WHIP
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ParasExclusiveMove:
@@ -543,6 +549,7 @@ ParasectExclusiveMove:
     db SUBSTITUTE
     db BLADE
     db COUNTER
+    db CONFUSION
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VenonatExclusiveMove:
@@ -567,6 +574,7 @@ VenomothExclusiveMove:
     db PSYWAVE
     db SUBSTITUTE
     db DREAM_EATER
+    db STRING_SHOT
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DiglettExclusiveMove:
@@ -708,10 +716,10 @@ ArcanineExclusiveMove:
     db REST
     db SUBSTITUTE
     db EMBER
-    db LEER
+    db $FF
     db AGILITY
-    db FLAMETHROWER
-    db SLAM
+    db $FF
+    db $FF
     db SOLARBEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -809,29 +817,6 @@ MachampExclusiveMove:
     db TSUNAMI
     db STRIKE
     db ROCK_THROW
-    db 0
-; ──────────────────────────────────────────────────────────────────────
-BellsproutExclusiveMove:
-WeepinbellExclusiveMove:
-VictreebelExclusiveMove:
-    db SWORDS_DANCE
-    db TOXIC
-    db BODY_SLAM
-    db TAKE_DOWN
-    db DOUBLE_EDGE
-    db HYPER_BEAM
-    db $FF
-    db MEGA_DRAIN
-    db SOLARBEAM
-    db MIMIC
-    db REFLECT
-    db BIDE
-    db REST
-    db SUBSTITUTE
-    db BLADE
-    db RAZOR_LEAF
-    db SLUDGE
-    db SWIFT
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TentacoolExclusiveMove:
