@@ -857,25 +857,28 @@ SlowbroExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 MagnemiteExclusiveMove:
 MagnetonExclusiveMove:
+VoltorbExclusiveMove:
+ElectrodeExclusiveMove:
     db TOXIC ; TM06
+    db BODY_SLAM ; TM08
     db HYPER_BEAM ; TM15
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
     db THUNDER ; TM25
+    db TELEPORT ; TM30
     db MIMIC ; TM31
+    db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
     db BIDE ; TM34
+    db SELFDESTRUCT ; TM36
     db SWIFT ; TM39
-    db FLASH ; TM55
     db REST ; TM44
     db THUNDER_WAVE ; TM45
+    db EXPLOSION ; TM47
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
-    db CONVERSION
-    db SCREECH
-    db LIGHT_SCREEN
-    db SELFDESTRUCT ; TM36
-    db EXPLOSION ; TM47
+    db FLASH ; TM55
+    db DISABLE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 FarfetchdExclusiveMove:
@@ -899,6 +902,7 @@ FarfetchdExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 DoduoExclusiveMove:
 DodrioExclusiveMove:
+    db SWORDS_DANCE ; TM03
     db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
@@ -908,13 +912,12 @@ DodrioExclusiveMove:
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
     db BIDE ; TM34
+    db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db REST ; TM44
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
-    db SWORDS_DANCE ; TM03
-    db SWIFT ; TM39
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SeelExclusiveMove:
@@ -937,7 +940,7 @@ DewgongExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db AMNESIA
+    db SCREECH
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GrimerExclusiveMove:
@@ -1085,28 +1088,6 @@ KinglerExclusiveMove:
     db STOMP
     db HAZE
     db ROCK_SLIDE ; TM48
-    db 0
-; ──────────────────────────────────────────────────────────────────────
-VoltorbExclusiveMove:
-ElectrodeExclusiveMove:
-    db TOXIC ; TM06
-    db HYPER_BEAM ; TM15
-    db SOLARBEAM ; TM22
-    db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
-    db MIMIC ; TM31
-    db DOUBLE_TEAM ; TM32
-    db REFLECT ; TM33
-    db BIDE ; TM34
-    db SELFDESTRUCT ; TM36
-    db SWIFT ; TM39
-    db SKULL_BASH ; TM40
-    db FLASH ; TM55
-    db REST ; TM44
-    db THUNDER_WAVE ; TM45
-    db EXPLOSION ; TM47
-    db SUBSTITUTE ; TM50
-    db CONVERSION
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ExeggcuteExclusiveMove:

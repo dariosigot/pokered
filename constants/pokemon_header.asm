@@ -3005,7 +3005,7 @@ MagnemiteBaseStats: ; 38c9e (e:4c9e)
     tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,31                   ; |THUNDER|MIMIC|
+    tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
     tmlearn 44,45,47                ; |REST|THUNDER_WAVE|EXPLOSION|
     tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
@@ -3039,10 +3039,10 @@ MagnetonBaseStats: ; 38cba (e:4cba)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,31                   ; |THUNDER|MIMIC|
+    tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
     tmlearn 44,45,47                ; |REST|THUNDER_WAVE|EXPLOSION|
     tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
@@ -3708,7 +3708,7 @@ VoltorbBaseStats: ; 38eb2 (e:4eb2)
     tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
+    tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
     tmlearn 44,45,47                ; |REST|THUNDER_WAVE|EXPLOSION|
     tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
@@ -3742,13 +3742,13 @@ ElectrodeBaseStats: ; 38ece (e:4ece)
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,36,39,40          ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|SKULL_BASH|
+    tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
     tmlearn 44,45,47                ; |REST|THUNDER_WAVE|EXPLOSION|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
 
     db BANK(ElectrodePicFront)
 
