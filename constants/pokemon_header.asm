@@ -2244,7 +2244,7 @@ PoliwhirlBaseStats: ; 38a6e (e:4a6e)
     db 50 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db FIGHTING ; species type 2
 
     db 120 ; catch rate
     db 131 ; base exp yield

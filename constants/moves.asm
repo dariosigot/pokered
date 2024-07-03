@@ -26,7 +26,7 @@
     db STOMP        , FLINCH_SIDE_EFFECT2        ,  65 , NORMAL   , 255 , 10 ; pp 20 ; 0
     db DOUBLE_KICK  , ATTACK_TWICE_EFFECT        ,  30 , FIGHTING , 255 , 07 ; pp 30 ; 0
     db MEGA_KICK    , NO_ADDITIONAL_EFFECT       , 120 , FIGHTING , 191 , 40 ; pp  5 ; 0 ; Type Normal -> Fighting
-    db JUMP_KICK    , JUMP_KICK_EFFECT           , 100 , FIGHTING , 242 , 08 ; pp 25 ; 0 ; Pwr 70 -> 100
+    db JUMP_KICK    , JUMP_KICK_EFFECT           , 100 , FIGHTING , 242 , 20 ; pp 10 ; 0 ; Pwr 70 -> 100 ; PP 25 -> 10
     db ROLLING_KICK , FLINCH_SIDE_EFFECT2        ,  60 , FIGHTING , 216 , 14 ; pp 15 ; 0
     db SAND_ATTACK  , ACCURACY_DOWN1_EFFECT      ,   0 , GROUND   , 204 , 40 ; pp  5 ; - ; Type Normal -> Ground ; Acr 255 -> 204 ; PP 15 -> 5
     db HEADBUTT     , FLINCH_SIDE_EFFECT2        ,  70 , NORMAL   , 255 , 14 ; pp 15 ; 0
@@ -66,7 +66,7 @@
     db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , NORMAL   , 229 , 40 ; pp  5 ; 1
     db PECK         , NO_ADDITIONAL_EFFECT       ,  45 , IVORY    , 255 , 06 ; pp 35 ; 0 ; Type Wind -> Ivory ; Pwr 35 -> 45
     db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
-    db SUBMISSION   , RECOIL_EFFECT              ,  80 , FIGHTING , 204 , 08 ; pp 25 ; 0
+    db SUBMISSION   , RECOIL_EFFECT              ,  95 , FIGHTING , 204 , 10 ; pp 20 ; 0 ; Pwr 80 -> 95 ; PP 25 -> 20
     db LOW_KICK     , FLINCH_SIDE_EFFECT2        ,  50 , FIGHTING , 255 , 10 ; pp 20 ; 0 ; Acr 229 -> 255
     db COUNTER      , NO_ADDITIONAL_EFFECT       ,   1 , FIGHTING , 255 , 10 ; pp 20 ; -
     db SEISMIC_TOSS , SPECIAL_DAMAGE_EFFECT      ,   1 , FIGHTING , 255 , 10 ; pp 20 ; -
@@ -136,7 +136,7 @@
     db AMNESIA      , SPECIAL_UP2_EFFECT         ,   0 , PSYCHIC  , 255 , 40 ; pp  5 ; - ; PP 20 -> 5
     db KINESIS      , ACCURACY_DOWN1_EFFECT      ,   0 , PSYCHIC  , 204 , 40 ; pp  5 ; - ; PP 20 -> 5
     db SOFTBOILED   , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
-    db HI_JUMP_KICK , JUMP_KICK_EFFECT           ,  85 , FIGHTING , 229 , 20 ; pp 10 ; 0 ; Pwr 85 -> 130 ; PP 20 -> 10
+    db HI_JUMP_KICK , JUMP_KICK_EFFECT           , 130 , FIGHTING , 229 , 20 ; pp 10 ; 0 ; Pwr 85 -> 130 ; PP 20 -> 10
     db GLARE        , PARALYZE_EFFECT            ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Acr 191 -> 255 ; PP 30 -> 15
     db DREAM_EATER  , DREAM_EATER_EFFECT         , 100 , GHOST    , 255 , 20 ; pp 10 ; 1 ; Type Psychic -> Ghost ; PP 15 -> 10
     db POISON_GAS   , POISON_EFFECT              ,   0 , POISON   , 229 , 07 ; pp 30 ; - ; Acr 140 -> 229 ; PP 40 -> 30
