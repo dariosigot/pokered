@@ -585,6 +585,7 @@ GolduckExclusiveMove:
     db TSUNAMI ; TM53
     db STRIKE ; TM54
     db AMNESIA
+    db GLARE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MankeyExclusiveMove:
@@ -948,25 +949,27 @@ MukExclusiveMove:
     db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db HYPER_BEAM ; TM15
-    db FLAMETHROWER ; TM37
     db MEGA_DRAIN ; TM21
     db THUNDERBOLT ; TM24
     db THUNDER ; TM25
     db MIMIC ; TM31
     db BIDE ; TM34
     db SELFDESTRUCT ; TM36
+    db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
-    db REST ; TM44
-    db EXPLOSION ; TM47
-    db SUBSTITUTE ; TM50
     db SWIFT ; TM39
+    db REST ; TM44
     db THUNDER_WAVE ; TM45
+    db EXPLOSION ; TM47
     db ROCK_SLIDE ; TM48
+    db SUBSTITUTE ; TM50
+    db LEECH_LIFE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ShellderExclusiveMove:
 CloysterExclusiveMove:
     db TOXIC ; TM06
+    db BODY_SLAM ; TM08
     db DOUBLE_EDGE ; TM10
     db BUBBLEBEAM ; TM11
     db WATER_GUN ; TM12
@@ -983,9 +986,7 @@ CloysterExclusiveMove:
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
-    db BUBBLE
-    db LICK
-    db BODY_SLAM ; TM08
+    db LOVELY_KISS
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GastlyExclusiveMove:
@@ -1219,19 +1220,21 @@ KoffingExclusiveMove:
 WeezingExclusiveMove:
     db TOXIC ; TM06
     db HYPER_BEAM ; TM15
-    db FLAMETHROWER ; TM37
     db THUNDERBOLT ; TM24
     db THUNDER ; TM25
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db BIDE ; TM34
     db SELFDESTRUCT ; TM36
+    db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db REST ; TM44
-    db EXPLOSION ; TM47
-    db SUBSTITUTE ; TM50
     db THUNDER_WAVE ; TM45
     db PSYWAVE ; TM46
+    db EXPLOSION ; TM47
+    db SUBSTITUTE ; TM50
+    db FLASH ; TM55
+    db ABSORB
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RhyhornExclusiveMove:

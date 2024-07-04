@@ -964,10 +964,11 @@ GOLDUCK_Learnset: MACRO
     db 35,SLASH
     db 37,WATERFALL
     db 39,SONICBOOM
-    db 41,AMNESIA
-    db 43,TSUNAMI
-    db 45,LIGHT_SCREEN
-    db 47,ICE_PUNCH
+    db 40,AMNESIA
+    db 42,TSUNAMI
+    db 44,GLARE
+    db 46,LIGHT_SCREEN
+    db 48,ICE_PUNCH
     db 52,HYDRO_PUMP
     db 55,PSYCHIC_M
     db 58,DRILL_PECK
@@ -975,10 +976,11 @@ GOLDUCK_Learnset: MACRO
 ENDM
 PSYDUCK_NoEvo_Learnset: MACRO
     db 35,AMNESIA ; Exclusive
-    db 40,SLASH
-    db 45,SONICBOOM
-    db 50,LIGHT_SCREEN
-    db 55,PSYCHIC_M
+    db 38,GLARE ; Exclusive
+    db 43,SLASH
+    db 48,SONICBOOM
+    db 53,LIGHT_SCREEN
+    db 58,PSYCHIC_M
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 MANKEY_Learnset: MACRO
@@ -1127,7 +1129,8 @@ KADABRA_ALAKAZAM_Learnset: MACRO
     db 24,SWIFT
     db 27,FLASH
     db 31,RECOVER
-    db 34,AGILITY
+    db 33,GLARE
+    db 35,AGILITY
     db 38,PSYCHIC_M
     db 41,HYPNOSIS
     db 44,REFLECT
@@ -1257,7 +1260,7 @@ TENTACOOL_Learnset: MACRO
     db 20,WRAP
     db 22,WATER_GUN
     db 24,ABSORB
-    db 26,STUN_SPORE
+    db 26,GLARE
     db 28,BUBBLEBEAM
     ;  30,TENTACRUEL
 ENDM
@@ -1532,7 +1535,7 @@ DEWGONG_Learnset: MACRO
     db 60,AMNESIA
 ENDM
 SEEL_NoEvo_Learnset: MACRO
-    db 38, ; Exclusive
+    db 38,SCREECH ; Exclusive
     db 42,TSUNAMI
     db 45,BODY_SLAM
     db 48,HAZE
@@ -1545,59 +1548,87 @@ GRIMER_Learnset: MACRO
     db  1,POUND
     db  1,POISON_GAS
     db  9,DEFENSE_CURL
-    db 12,ACID
-    db 14,SCREECH
-    db 16,LICK
+    db 11,ACID
+    db 13,DOUBLESLAP
+    db 15,LICK
+    db 17,SMOG
     db 19,DISABLE
     db 21,SLUDGE
+    db 23,FOCUS_ENERGY
     db 25,MINIMIZE
-    db 29,HARDEN
+    db 27,HARDEN
+    db 30,SLAM
+    db 32,ROCK_THROW
     db 34,HAZE
+    db 35,SCREECH
     ;  38,MUK
 ENDM
 MUK_Learnset: MACRO
     GRIMER_Learnset
     db 38,ACID_ARMOR
+    db 41,SWIFT
     db 44,THUNDERPUNCH
     db 48,MEGA_DRAIN
     db 51,TOXIC
     db 54,RECOVER
+    db 57,BODY_SLAM
     db 60,SUBSTITUTE
 ENDM
 GRIMER_NoEvo_Learnset: MACRO
-    db 40,ACID_ARMOR
-    db 51,TOXIC
-    db 54,RECOVER
+    db 39,LEECH_LIFE ; Exclusive
+    db 42,ACID_ARMOR
+    db 45,THUNDERPUNCH
+    db 49,MEGA_DRAIN
+    db 53,TOXIC
+    db 57,RECOVER
+    db 60,SUBSTITUTE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 SHELLDER_Learnset: MACRO
     db  1,TACKLE
     db  1,WITHDRAW
-    db  6,BUBBLE ; Exclusive
-    db 10,LICK ; Exclusive
+    db  6,BUBBLE
+    db 10,LICK
+    db 12,SONICBOOM
     db 14,SUPERSONIC
     db 18,CLAMP
-    db 21,LEER
-    db 23,WATER_GUN
+    db 20,LEER
+    db 22,WATER_GUN
+    db 26,SCREECH
     db 30,AURORA_BEAM
     db 32,BUBBLEBEAM ; Exclusive
-    db 50,ICE_BEAM
+    db 34,LOVELY_KISS ; Exclusive
+    db 36,BIDE
+    db 40,HAZE
+    db 44,WATERFALL
+    db 48,ICE_BEAM
+    db 52,SELFDESTRUCT
 ENDM
 CLOYSTER_Learnset: MACRO
     db  1,TACKLE
     db  1,WITHDRAW
     db  1,SPIKE_CANNON
+    db  5,BUBBLE
+    db  7,LICK
+    db  9,SONICBOOM
     db 11,SUPERSONIC
-    db 15,CLAMP
-    db 19,AURORA_BEAM
-    db 21,LEER
-    db 23,WATER_GUN
-    db 27,MIST
-    db 32,BARRIER
-    db 37,HAZE
-    db 42,ICE_BEAM
-    db 55,BLIZZARD
-    db 60,EXPLOSION
+    db 13,CLAMP
+    db 15,AURORA_BEAM
+    db 19,LEER
+    db 21,WATER_GUN
+    db 23,MIST
+    db 25,SCREECH
+    db 27,WATERFALL
+    db 31,BARRIER
+    db 33,HAZE
+    db 35,BIDE
+    db 37,SELFDESTRUCT
+    db 41,ICE_BEAM
+    db 45,TSUNAMI
+    db 49,HYDRO_PUMP
+    db 53,BLIZZARD
+    db 57,EXPLOSION
+    db 60,CRABHAMMER
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 GASTLY_Learnset: MACRO
@@ -1886,28 +1917,40 @@ KOFFING_Learnset: MACRO
     db  1,TACKLE
     db  1,POISON_GAS
     db  9,SMOG
-    db 12,ACID
-    db 14,SCREECH
-    db 16,HARDEN ; TODO, DEFENSE_CURL
+    db 11,ACID
+    db 13,SMOKESCREEN
+    db 15,SCREECH
+    db 17,DEFENSE_CURL
     db 19,SELFDESTRUCT
     db 21,SLUDGE
-    db 25,SMOKESCREEN
+    db 23,FOCUS_ENERGY
+    db 25,SONICBOOM
+    db 27,THUNDERSHOCK
+    db 30,HARDEN
+    db 32,SUPERSONIC
     db 34,HAZE
     ;  35,WEEZING
 ENDM
 WEEZING_Learnset: MACRO
     KOFFING_Learnset
     db 35,EXPLOSION
+    db 38,GLARE
+    db 41,SWIFT
     db 44,PSYBEAM
     db 48,THUNDERBOLT
     db 51,TOXIC
     db 54,RECOVER
-    db 60,FLAMETHROWER
+    db 57,FLAMETHROWER
+    db 60,SUBSTITUTE
 ENDM
 KOFFING_NoEvo_Learnset: MACRO
-    db 40,EXPLOSION
-    db 51,TOXIC
-    db 54,RECOVER
+    db 39,ABSORB ; Exclusive
+    db 42,EXPLOSION
+    db 45,GLARE
+    db 49,THUNDERBOLT
+    db 53,TOXIC
+    db 57,RECOVER
+    db 60,SUBSTITUTE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 RHYHORN_Learnset: MACRO
@@ -2087,6 +2130,9 @@ STARYU_Learnset: MACRO
     db 29,SWIFT
     db 32,SONICBOOM
     db 36,BUBBLEBEAM
+
+    ; TODO, GLARE
+
     db 40,REFLECT
     db 43,CONFUSION
     db 46,LIGHT_SCREEN

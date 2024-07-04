@@ -4044,7 +4044,7 @@ KoffingBaseStats: ; 38fae (e:4fae)
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,36,37                ; |BIDE|SELFDESTRUCT|FLAMETHROWER|
     tmlearn 44,46,47                ; |REST|PSYWAVE|EXPLOSION|
-    tmlearn 50                      ; |SUBSTITUTE|
+    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
 
     db BANK(KoffingPicFront)
 
@@ -4081,7 +4081,7 @@ WeezingBaseStats: ; 38fca (e:4fca)
     tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
     tmlearn 34,36,37,38             ; |BIDE|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|
     tmlearn 44,45,46,47             ; |REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
-    tmlearn 50                      ; |SUBSTITUTE|
+    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
 
     db BANK(WeezingPicFront)
 
