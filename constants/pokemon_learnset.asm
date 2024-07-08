@@ -1136,7 +1136,8 @@ KADABRA_ALAKAZAM_Learnset: MACRO
     db 44,REFLECT
     db 48,LIGHT_SCREEN
     db 51,BARRIER
-    db 55,NIGHT_SHADE
+    db 54,NIGHT_SHADE
+    db 58,HYPNOSIS
     db 60,HYPER_BEAM
 ENDM
 KADABRA_Learnset: MACRO
@@ -1305,11 +1306,11 @@ GRAVELER_GOLEM_Learnset: MACRO
     GEODUDE_Learnset
     db 25,STOMP
     db \1,BODY_SLAM
-    db 30,SKULL_BASH
-    db 33,REST
-    db 36,FIRE_PUNCH
-    db 40,EARTHQUAKE
-    db 44,ROCK_SLIDE
+    db 30,ROCK_SLIDE
+    db 33,SKULL_BASH
+    db 36,EARTHQUAKE
+    db 40,REST
+    db 44,FIRE_PUNCH
     db 48,THRASH
     db 51,EXPLOSION
     db 54,FLAMETHROWER
@@ -1634,24 +1635,35 @@ ENDM
 GASTLY_Learnset: MACRO
     db  1,LICK
     db  1,CONFUSE_RAY
-    db 10,LEECH_LIFE
+    db  7,DISABLE
+    db  9,LEECH_LIFE
+    db 11,SONICBOOM
+    db 13,POISON_GAS
     db 15,NIGHT_SHADE
+    db 17,PSYWAVE
+    db 19,SMOKESCREEN
+    db 21,SMOG
     db 23,HYPNOSIS
     db 24,DREAM_EATER
     ;  25,HAUNTER
 ENDM
 HAUNTER_GENGAR_Learnset: MACRO
     GASTLY_Learnset
-    db 25,PSYWAVE
-    db \1,POISON_GAS
-    db 31,CONFUSION
-    db 35,MEGA_DRAIN
+    db 25,CONFUSION
+    db \1,ACID
+    db 30,MIST
+    db 32,SCREECH
+    db 34,MEGA_DRAIN
+    db 36,REFLECT
     db 38,THUNDERPUNCH
+    db 40,PSYBEAM
     db 42,SLUDGE
     db 44,HAZE
-    db 47,PSYCHIC_M
-    db 51,TOXIC
-    db 60,ACID_ARMOR
+    db 46,PSYCHIC_M
+    db 49,TRANSFORM
+    db 52,TOXIC
+    db 55,ACID_ARMOR
+    db 60,SUBSTITUTE
 ENDM
 HAUNTER_Learnset: MACRO
     HAUNTER_GENGAR_Learnset 28
@@ -1660,11 +1672,15 @@ GENGAR_Learnset: MACRO
     HAUNTER_GENGAR_Learnset 25
 ENDM
 GASTLY_NoEvo_Learnset: MACRO
-    db 26,SMOG ; Exclusive
-    db 30,POISON_GAS
-    db 36,MEGA_DRAIN
-    db 44,HAZE
-    db 47,PSYCHIC_M
+    db 29,CONFUSION
+    db 32,MIST
+    db 35,ABSORB ; Exclusive
+    db 39,REFLECT
+    db 43,PSYBEAM
+    db 48,HAZE
+    db 53,PSYCHIC_M
+    db 55,TRANSFORM
+    db 58,SUBSTITUTE
     db 60,AMNESIA ; Exclusive
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
@@ -1680,12 +1696,15 @@ ONIX_Learnset: MACRO
     db 21,SHARPEN
     db 23,TRAPHOLE
     db 26,HARDEN
-    db 29,STRIKE
-    db 31,BODY_SLAM
-    db 36,EXPLOSION
-    db 39,ROCK_SLIDE
+    db 29,ROCK_SLIDE
+    db 31,STRIKE
+    db 34,BODY_SLAM
+    db 36,SELFDESTRUCT
+    db 39,THRASH
     db 42,DRAGON_RAGE
     db 46,EARTHQUAKE
+    db 50,EXPLOSION
+    db 55,SUBSTITUTE
     db 60,HYPER_BEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
@@ -1697,27 +1716,36 @@ DROWZEE_Learnset: MACRO
     db 13,HYPNOSIS
     db 14,DREAM_EATER
     db 17,CONFUSION
-    db 21,HEADBUTT
+    db 20,HEADBUTT
+    db 23,CONFUSE_RAY
     db 26,MEDITATE
     ;  26,HYPNO
 ENDM
 HYPNO_Learnset: MACRO
     DROWZEE_Learnset
     db 26,PSYBEAM
+    db 28,SWIFT
+    db 30,KINESIS
     db 32,POISON_GAS
+    db 35,REFLECT
     db 38,PSYCHIC_M
     db 42,LIGHT_SCREEN
     db 45,REST
+    db 49,NIGHT_SHADE
     db 52,BARRIER
-    db 58,NIGHT_SHADE
+    db 55,HAZE
+    db 58,RECOVER
+    db 60,HYPER_BEAM
 ENDM
 DROWZEE_NoEvo_Learnset: MACRO
-    db 31,POISON_GAS
-    db 35,PSYBEAM
-    db 38,LIGHT_SCREEN
-    db 42,REST
-    db 50,PSYCHIC_M
-    db 60,NIGHT_SHADE
+    db 31,PSYBEAM
+    db 34,SWIFT
+    db 37,POISON_GAS
+    db 41,REFLECT
+    db 45,PSYCHIC_M
+    db 49,LIGHT_SCREEN
+    db 55,REST
+    db 59,NIGHT_SHADE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 KRABBY_Learnset: MACRO

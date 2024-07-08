@@ -3412,8 +3412,8 @@ GastlyBaseStats: ; 38dd2 (e:4dd2)
     tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
-    tmlearn 29,31,32                ; |PSYCHIC_M|MIMIC|DOUBLE_TEAM|
-    tmlearn 30,34,35,36             ; |TELEPORT|BIDE|METRONOME|SELFDESTRUCT|
+    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,35,36             ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|
     tmlearn 42,44,46,47             ; |DREAM_EATER|REST|PSYWAVE|EXPLOSION|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -3449,8 +3449,8 @@ HaunterBaseStats: ; 38dee (e:4dee)
     tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
-    tmlearn 25,29,31,32             ; |THUNDER|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
-    tmlearn 30,34,35,36             ; |TELEPORT|BIDE|METRONOME|SELFDESTRUCT|
+    tmlearn 25,29,30,31,32          ; |THUNDER|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,35,36             ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|
     tmlearn 42,44,45,46,47          ; |DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
     tmlearn 50                      ; |SUBSTITUTE|
 
@@ -3486,8 +3486,8 @@ GengarBaseStats: ; 38e0a (e:4e0a)
     tmlearn 06                      ; |TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
-    tmlearn 25,29,31,32             ; |THUNDER|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
-    tmlearn 30,34,35,36             ; |TELEPORT|BIDE|METRONOME|SELFDESTRUCT|
+    tmlearn 25,29,30,31,32          ; |THUNDER|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,35,36             ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|
     tmlearn 42,44,45,46,47          ; |DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
     tmlearn 50                      ; |SUBSTITUTE|
 

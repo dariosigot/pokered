@@ -998,20 +998,21 @@ GengarExclusiveMove:
     db THUNDERBOLT ; TM24
     db THUNDER ; TM25
     db PSYCHIC_M ; TM29
+    db TELEPORT ; TM30
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db TELEPORT ; TM30
+    db REFLECT ; TM33
     db BIDE ; TM34
     db METRONOME ; TM35
     db SELFDESTRUCT ; TM36
     db DREAM_EATER ; TM42
     db REST ; TM44
+    db THUNDER_WAVE ; TM45
     db PSYWAVE ; TM46
     db EXPLOSION ; TM47
     db SUBSTITUTE ; TM50
-    db SMOG
+    db ABSORB
     db AMNESIA
-    db THUNDER_WAVE ; TM45
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OnixExclusiveMove:
@@ -1020,7 +1021,6 @@ OnixExclusiveMove:
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
-    db BLADE ; TM51
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
@@ -1032,6 +1032,7 @@ OnixExclusiveMove:
     db EXPLOSION ; TM47
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
+    db BLADE ; TM51
     db STRIKE ; TM54
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -1054,15 +1055,13 @@ HypnoExclusiveMove:
     db BIDE ; TM34
     db METRONOME ; TM35
     db SKULL_BASH ; TM40
-    db FLASH ; TM55
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
     db PSYWAVE ; TM46
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
-    db POISON_GAS
-    db LIGHT_SCREEN
+    db FLASH ; TM55
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KrabbyExclusiveMove:
