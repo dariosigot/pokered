@@ -24725,8 +24725,8 @@ ItemUseXStat: ; e104 (3:6104)
     call GoPalSetAndDelay3Bank3 ; call Delay3
     xor a
     ld [H_WHOSETURN],a ; set turn to player's turn
-    ld b,BANK(Func_3f428)
-    ld hl,Func_3f428
+    ld b,BANK(StatModifierUpEffect)
+    ld hl,StatModifierUpEffect
     call Bankswitch ; do stat increase move
     pop hl
     pop af
@@ -50271,8 +50271,8 @@ AIIncreaseStat: ; 3a808 (e:6808)
     ld a,$AF
     ld [hli],a
     ld [hl],b
-    ld hl,Func_3f428
-    ld b,BANK(Func_3f428)
+    ld hl,StatModifierUpEffect
+    ld b,BANK(StatModifierUpEffect)
     call Bankswitch
     pop hl
     pop af
@@ -57242,7 +57242,7 @@ HandleBuildingRage: ; 3e2b6 (f:62b6)
     push hl
     ld hl,BuildingRageText
     call PrintText
-    call Func_3f428 ; stat modifier raising function
+    call StatModifierUpEffect ; stat modifier raising function
     pop hl
     xor a
     ldd [hl],a ; null move effect
@@ -57549,6 +57549,55 @@ BackupMovesBeforeEnemyMimic:
     pop af
     ld hl,W_PLAYERMONMOVES
     ret
+
+Func_3fb1e: ; Moved in the Bank
+    ld hl,Func_139da
+    ld b,BANK(Func_139da)
+    jp Bankswitch
+
+Func_3f132: ; Moved in the Bank
+    call JumpMoveEffect
+    ld b,$1
+    ret
+
+CheckDefrost: ; Moved in the Bank
+    and a,FRZ            ;are they frozen?
+    ret z                ;return if so
+                        ;not frozen
+    ld a,[$ff00+$f3]    ;whose turn?
+    and a
+    jr nz,.opponent
+    ;player [attacker]
+    ld a,[W_PLAYERMOVETYPE]
+    sub a,FIRE
+    ret nz        ;return if it isn't fire
+                ;type is fire
+    ld [W_ENEMYMONSTATUS],a        ;set opponent status to 00 ["defrost" a frozen monster]
+    ld hl,$d8a8                    ;status of first opponent monster in their roster
+    ld a,[W_ENEMYMONNUMBER]
+    ld bc,$002c        ;$2C bytes per roster entry
+    call AddNTimes
+    xor a
+    ld [hl],a            ;clear status in roster
+    ld hl,.UnnamedText_3f423
+    jr .common
+.opponent
+    ld a,[W_ENEMYMOVETYPE]        ;same as above with addresses swapped
+    sub a,$14
+    ret nz
+    ld [W_PLAYERMONSTATUS],a
+    ld hl,$d16f
+    ld a,[wPlayerMonNumber]
+    ld bc,$002c
+    call AddNTimes
+    xor a
+    ld [hl],a
+    ld hl,.UnnamedText_3f423
+.common
+    jp PrintText
+.UnnamedText_3f423
+    TX_FAR _UnnamedText_3f423
+    db "@"
 
 ; Free
 
@@ -59234,19 +59283,7 @@ LoadMonBackSprite: ; 3f103 (f:7103)
     ld b,a
     jp CopyVideoData
 
-Func_3fb1e: ; Moved in the Bank
-    ld hl,Func_139da
-    ld b,BANK(Func_139da)
-    jp Bankswitch
-
-SECTION "Func_3f132",ROMX[$7132],BANK[$f]
-
-Func_3f132: ; 3f132 (f:7132)
-    call JumpMoveEffect
-    ld b,$1
-    ret
-
-JumpMoveEffect: ; 3f138 (f:7138)
+JumpMoveEffect: ; Moved in the Bank
     ld a,[$ff00+$f3]  ;whose turn?
     and a
     ld a,[W_PLAYERMOVEEFFECT]
@@ -59255,7 +59292,7 @@ JumpMoveEffect: ; 3f138 (f:7138)
 .next1
     dec a         ;subtract 1,there is no special effect for 00
     add a         ;x2,16bit pointers
-    ld hl,MoveEffectPointerTable
+    ld hl,.MoveEffectPointerTable
     ld b,0
     ld c,a
     add hl,bc
@@ -59263,8 +59300,7 @@ JumpMoveEffect: ; 3f138 (f:7138)
     ld h,[hl]
     ld l,a
     jp hl       ;jump to special effect handler
-
-MoveEffectPointerTable: ; 3f150 (f:7150)
+.MoveEffectPointerTable
      dw Func_3f1fc
      dw PoisonEffect
      dw Func_3f2e9
@@ -59274,12 +59310,12 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw ExplodeEffect
      dw Func_3f2e9
      dw $0000
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
      dw Func_3fb0e
      dw $0000
      dw Func_3f54c
@@ -59314,12 +59350,12 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3f949
      dw Func_3f951
      dw Func_3f961
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
      dw Func_3fb26
      dw TransformEffect
      dw Func_3f54c
@@ -59351,6 +59387,14 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3fa7c
      dw Func_3fa84
      dw DisableEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+
+SECTION "Func_3f1fc",ROMX[$71fc],BANK[$f]
 
 Func_3f1fc: ; 3f1fc (f:71fc)
     ld de,W_ENEMYMONSTATUS ; $cfe9
@@ -59635,47 +59679,7 @@ UnnamedText_3f3dd: ; 3f3dd (f:73dd)
     TX_FAR _UnnamedText_3f3dd
     db "@"
 
-CheckDefrost: ; 3f3e2 (f:73e2)
-    and a,FRZ            ;are they frozen?
-    ret z                ;return if so
-                        ;not frozen
-    ld a,[$ff00+$f3]    ;whose turn?
-    and a
-    jr nz,.opponent
-    ;player [attacker]
-    ld a,[W_PLAYERMOVETYPE]
-    sub a,FIRE
-    ret nz        ;return if it isn't fire
-                ;type is fire
-    ld [W_ENEMYMONSTATUS],a        ;set opponent status to 00 ["defrost" a frozen monster]
-    ld hl,$d8a8                    ;status of first opponent monster in their roster
-    ld a,[W_ENEMYMONNUMBER]
-    ld bc,$002c        ;$2C bytes per roster entry
-    call AddNTimes
-    xor a
-    ld [hl],a            ;clear status in roster
-    ld hl,UnnamedText_3f423
-    jr .common
-.opponent
-    ld a,[W_ENEMYMOVETYPE]        ;same as above with addresses swapped
-    sub a,$14
-    ret nz
-    ld [W_PLAYERMONSTATUS],a
-    ld hl,$d16f
-    ld a,[wPlayerMonNumber]
-    ld bc,$002c
-    call AddNTimes
-    xor a
-    ld [hl],a
-    ld hl,UnnamedText_3f423
-.common
-    jp PrintText
-
-UnnamedText_3f423: ; 3f423 (f:7423)
-    TX_FAR _UnnamedText_3f423
-    db "@"
-
-Func_3f428: ; 3f428 (f:7428)
+StatModifierUpEffect: ; Moved in the Bank
     ld hl,wPlayerMonStatMods ; $cd1a
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -59685,11 +59689,14 @@ Func_3f428: ; 3f428 (f:7428)
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
 .asm_3f439
     ld a,[de]
-    sub $a
-    cp $8
-    jr c,.asm_3f442
-    sub $28
-.asm_3f442
+    sub ATTACK_UP1_EFFECT    ;normalize the effects from 0 to 5 to get an offset
+    cp 6 ; regular "UP Effect" base from 0 to 5
+    jr c,.statupcheck
+    sub ATTACK_UP2_EFFECT - ATTACK_UP1_EFFECT ; map +2 effects to corresponding +1 effect
+    cp 6 ; regular "UP Effect" base from 0 to 5
+    jr c,.statupcheck
+    sub ATTACK_UP3_EFFECT - ATTACK_UP2_EFFECT ; map +3 effects to corresponding +1 effect
+.statupcheck
     ld c,a
     ld b,$0
     add hl,bc
@@ -59697,20 +59704,32 @@ Func_3f428: ; 3f428 (f:7428)
     inc b
     ld a,$d
     cp b
-    jp c,Func_3f522
+    jp c,.PrintNothingHappenedText
+    ; Check up2
     ld a,[de]
-    cp $12
-    jr c,.asm_3f45a
+    cp EVASION_UP1_EFFECT + 1 ; is it a +2 effect?
+    jr c,.ok3
     inc b
     ld a,$d
     cp b
-    jr nc,.asm_3f45a
+    jr nc,.ok2
     ld b,a
-.asm_3f45a
+    jr .ok3
+.ok2
+    ; Check up3
+    ld a,[de]
+    cp EVASION_UP2_EFFECT + 1 ; is it a +3 effect?
+    jr c,.ok3
+    inc b
+    ld a,$d
+    cp b
+    jr nc,.ok3
+    ld b,a
+.ok3
     ld [hl],b
     ld a,c
     cp $4
-    jr nc,asm_3f4ca
+    jr nc,.asm_3f4ca
     push hl
     ld hl,$d026
     ld de,$cd12
@@ -59736,7 +59755,7 @@ Func_3f428: ; 3f428 (f:7428)
     jr nz,.asm_3f48a
     ld a,[hl]
     sbc $3
-    jp z,Func_3f520
+    jp z,.Func_3f520
 .asm_3f48a
     push hl
     push bc
@@ -59766,19 +59785,18 @@ Func_3f428: ; 3f428 (f:7428)
     sub $e7
     ld a,[$FF00+$97]
     sbc $3
-    jp c,Func_3f4c3
+    jr c,.Func_3f4c3
     ld a,$3
     ld [$FF00+$97],a
     ld a,$e7
     ld [$FF00+$98],a
-
-Func_3f4c3: ; 3f4c3 (f:74c3)
+.Func_3f4c3
     ld a,[$FF00+$97]
     ld [hli],a
     ld a,[$FF00+$98]
     ld [hl],a
     pop hl
-asm_3f4ca: ; 3f4ca (f:74ca)
+.asm_3f4ca
     ld b,c
     inc b
     call Func_3f688
@@ -59819,41 +59837,48 @@ asm_3f4ca: ; 3f4ca (f:74ca)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     call z,Func_3ee19
-    ld hl,UnnamedText_3f528 ; $7528
+    ld hl,.UnnamedText_3f528
     call PrintText
     call Func_3ed27
     jp Func_3ed64
-
-Func_3f520: ; 3f520 (f:7520)
+.Func_3f520
     pop hl
     dec [hl]
-
-Func_3f522: ; 3f522 (f:7522)
+.PrintNothingHappenedText
     ld hl,UnnamedText_3fb3e ; $7b3e
     jp PrintText
-
-UnnamedText_3f528: ; 3f528 (f:7528)
+.UnnamedText_3f528
     TX_FAR _UnnamedText_3f528
     db $08 ; asm
-    ld hl,UnnamedText_3f542 ; $7542
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVEEFFECT] ; $cfd3
     jr z,.asm_3f53b
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
 .asm_3f53b
-    cp $12
-    ret nc
-    ld hl,UnnamedText_3f547 ; $7547
+    cp EVASION_UP1_EFFECT + 1
+    ld hl,.RoseText
+    ret c
+    cp EVASION_UP2_EFFECT + 1
+    ld hl,.GreatlyText
+    ret c
+    ld hl,.EnormouslyText
     ret
-
-UnnamedText_3f542: ; 3f542 (f:7542)
+.GreatlyText
     db $0a
-    TX_FAR _UnnamedText_3f542
-
-UnnamedText_3f547: ; 3f547 (f:7547)
-    TX_FAR _UnnamedText_3f547
+    TX_FAR _GreatlyText
+.RoseText
+    TX_FAR _RoseText
     db "@"
+.EnormouslyText
+    db $0a
+    TX_FAR _EnormouslyText
+    TX_FAR _RoseText
+    db "@"
+
+; Free
+
+SECTION "Func_3f54c",ROMX[$754c],BANK[$f]
 
 Func_3f54c: ; 3f54c (f:754c)
     ld hl,wEnemyMonStatMods ; $cd2e
@@ -123591,10 +123616,10 @@ UnnamedText_9479a: ; 9479a (25:479a)
     TX_RAM $cf4b
     db $0,"@@"
 
-_UnnamedText_3f542: ; 947a0 (25:47a0)
+_GreatlyText: ; 947a0 (25:47a0)
     db $0,$4c,"greatly@@"
 
-_UnnamedText_3f547: ; 947ab (25:47ab)
+_RoseText: ; 947ab (25:47ab)
     db $0," rose!",$58
 
 _UnnamedText_3f661: ; 947b3 (25:47b3)
@@ -124582,6 +124607,9 @@ _UnnamedText_5c49e: ; 9697a (25:697a)
     db "to challenge me?",$55
     db "Fine then! Show",$55
     db "me your best!",$57
+
+_EnormouslyText:
+    db $0,$4c,"enormously@@"
 
 SECTION "bank26",ROMX,BANK[$26]
 

@@ -81,6 +81,12 @@ METRONOME_EFFECT           EQU $53
 LEECH_SEED_EFFECT          EQU $54 ; AI Layer 2
 SPLASH_EFFECT              EQU $55
 DISABLE_EFFECT             EQU $56 ; AI Layer 2
+ATTACK_UP3_EFFECT          EQU $57 ; AI Layer 2
+DEFENSE_UP3_EFFECT         EQU $58 ; AI Layer 2
+SPEED_UP3_EFFECT           EQU $59 ; AI Layer 2
+SPECIAL_UP3_EFFECT         EQU $5A ; AI Layer 2
+ACCURACY_UP3_EFFECT        EQU $5B ; AI Layer 2
+EVASION_UP3_EFFECT         EQU $5C ; AI Layer 2
 
 ; fixed damage constants
 SONICBOOM_DAMAGE   EQU 20

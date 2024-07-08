@@ -81,7 +81,7 @@
     db STUN_SPORE   , PARALYZE_EFFECT            ,   0 , GRASS    , 191 , 10 ; pp 20 ; - ; PP 30 -> 20
     db SLEEP_POWDER , SLEEP_EFFECT               ,   0 , GRASS    , 191 , 20 ; pp 10 ; - ; PP 15 -> 10
     db PETAL_DANCE  , THRASH_PETAL_DANCE_EFFECT  , 120 , GRASS    , 255 , 20 ; pp 10 ; 1 ; Pwr 70 -> 120 ; PP 20 -> 10
-    db STRING_SHOT  , SPEED_DOWN1_EFFECT         ,   0 , BUG      , 242 , 07 ; pp 30 ; - ; PP 40 -> 30
+    db STRING_SHOT  , SPEED_DOWN2_EFFECT         ,   0 , BUG      , 242 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Speed -2x
     db DRAGON_RAGE  , SPECIAL_DAMAGE_EFFECT      ,   1 , DRAGON   , 255 , 20 ; pp 10 ; -
     db FIRE_SPIN    , TRAPPING_EFFECT            ,  10 , FIRE     , 153 , 14 ; pp 15 ; 1 ; Pwr 15 -> 10 ; Acr 178 -> 153
     db THUNDERSHOCK , PARALYZE_SIDE_EFFECT1      ,  40 , ELECTRIC , 255 , 07 ; pp 30 ; 1
@@ -112,7 +112,7 @@
     db CONFUSE_RAY  , CONFUSION_EFFECT           ,   0 , GHOST    , 255 , 20 ; pp 10 ; -
     db WITHDRAW     , DEFENSE_UP2_EFFECT         ,   0 , WATER    , 255 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Defense 2x
     db DEFENSE_CURL , DEFENSE_UP1_EFFECT         ,   0 , RUBBER   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Type Normal -> Rubber
-    db BARRIER      , DEFENSE_UP2_EFFECT         ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; - ; PP 30 -> 20
+    db BARRIER      , DEFENSE_UP3_EFFECT         ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; - ; PP 30 -> 20 ; Defense 3x
     db LIGHT_SCREEN , LIGHT_SCREEN_EFFECT        ,   0 , PSYCHIC  , 255 , 07 ; pp 30 ; -
     db HAZE         , HAZE_EFFECT                ,   0 , ICE      , 255 , 07 ; pp 30 ; -
     db REFLECT      , REFLECT_EFFECT             ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; -
@@ -151,7 +151,7 @@
     db FLASH        , ACCURACY_DOWN1_EFFECT      ,   0 , ELECTRIC , 204 , 40 ; pp  5 ; - ; Type Normal -> Electric ; Acr 178 -> 204 ; PP 20 -> 5
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 14 ; pp 15 ; - ; Acr 204 -> 255
     db SPLASH       , SPLASH_EFFECT              ,   0 , WATER    , 255 , 00 ; pp 40 ; - ; Type Normal -> Water
-    db ACID_ARMOR   , DEFENSE_UP2_EFFECT         ,   0 , POISON   , 255 , 10 ; pp 20 ; - ; PP 40 -> 20
+    db ACID_ARMOR   , DEFENSE_UP3_EFFECT         ,   0 , POISON   , 255 , 10 ; pp 20 ; - ; PP 40 -> 20 ; Defense 3x
     db CRABHAMMER   , NO_ADDITIONAL_EFFECT       , 100 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Acr 216 -> 229 ; Pwr 90 -> 100
     db EXPLOSION    , EXPLODE_EFFECT             , 255 , NORMAL   , 255 , 40 ; pp  5 ; 0 ; Pwr 170 -> 255
     db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  20 , NORMAL   , 204 , 14 ; pp 15 ; 0 ; Pwr 18 -> 20
