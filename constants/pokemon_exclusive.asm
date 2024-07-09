@@ -1464,6 +1464,7 @@ ScytherExclusiveMove:
     db TOXIC ; TM06
     db TAKE_DOWN ; TM09
     db HYPER_BEAM ; TM15
+    db COUNTER ; TM18
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db BIDE ; TM34
@@ -1474,7 +1475,6 @@ ScytherExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
-    db COUNTER ; TM18
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 JynxExclusiveMove:
@@ -1570,17 +1570,17 @@ PinsirExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
-    db MIMIC ; TM31
-    db DOUBLE_TEAM ; TM32
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
+    db TRAPHOLE ; TM28
+    db MIMIC ; TM31
+    db DOUBLE_TEAM ; TM32
     db BIDE ; TM34
     db REST ; TM44
+    db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db STRIKE ; TM54
-    db TRAPHOLE ; TM28
-    db ROCK_SLIDE ; TM48
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TaurosExclusiveMove:

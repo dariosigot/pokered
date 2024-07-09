@@ -815,8 +815,8 @@ PARASECT_Learnset: MACRO
     db 34,SLASH
     db 35,LIGHT_SCREEN
     db 37,BARRAGE
-    db 39,TRAPHOLE
-    db 42,TWINEEDLE
+    db 39,TWINEEDLE
+    db 42,TRAPHOLE
     db 45,SOLARBEAM
     db 48,SWORDS_DANCE
     db 56,GUILLOTINE
@@ -2337,21 +2337,27 @@ MR_MIME_Learnset: MACRO
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 SCYTHER_Learnset: MACRO
-    db  1,QUICK_ATTACK
+    db  1,SCRATCH
     db  1,LEER
     db  7,AGILITY
-    db 10,BLADE
-    db 13,RAZOR_WIND
+    db 10,QUICK_ATTACK
+    db 13,GUST
+    db 15,FURY_SWIPES
     db 17,PIN_MISSILE
-    db 21,FOCUS_ENERGY
-    db 25,DOUBLE_TEAM
+    db 19,BLADE
+    db 21,DOUBLE_TEAM
+    db 23,WING_ATTACK
+    db 25,RAZOR_WIND
     db 28,SLASH
-    db 31,WING_ATTACK
+    db 31,FOCUS_ENERGY
     db 33,SWORDS_DANCE
+    db 35,WHIRLWIND
     db 37,SWOOP
-    db 42,TWINEEDLE
+    db 39,TWINEEDLE
+    db 42,SHARPEN
     db 44,RAZOR_LEAF
     db 49,LIGHT_SCREEN
+    db 52,JUMP_KICK
     db 55,GUILLOTINE
     db 60,SKY_ATTACK
 ENDM
@@ -2431,17 +2437,23 @@ PINSIR_Learnset: MACRO
     db  7,VICEGRIP
     db 10,HARDEN
     db 13,FURY_ATTACK
+    db 15,LEER
     db 17,PIN_MISSILE
+    db 19,BONE_CLUB
     db 21,CLAMP
+    db 23,SHARPEN
     db 25,SEISMIC_TOSS
     db 28,STRIKE
     db 31,GUILLOTINE
-    db 33,BARRIER ; ???
-    db 37,SLASH
-    db 42,TWINEEDLE
-    db 44,SUBMISSION
+    db 33,TRAPHOLE
+    db 35,SLASH
+    db 37,SPIKE_CANNON
+    db 39,TWINEEDLE
+    db 42,SUBMISSION
+    db 44,DIZZY_PUNCH
     db 49,COUNTER
-    db 55,SWORDS_DANCE
+    db 52,SWORDS_DANCE
+    db 55,CRABHAMMER
     db 60,EARTHQUAKE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
