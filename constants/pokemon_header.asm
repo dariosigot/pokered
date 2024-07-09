@@ -3930,7 +3930,7 @@ HitmonleeBaseStats: ; 38f5a (e:4f5a)
     tmlearn 01,03,05,06,08          ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,31,32             ; |EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
+    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
@@ -3967,7 +3967,7 @@ HitmonchanBaseStats: ; 38f76 (e:4f76)
     tmlearn 01,03,05,06,08          ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,31,32             ; |EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
+    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
@@ -4226,8 +4226,8 @@ TangelaBaseStats: ; 3903a (e:503a)
     tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
     tmlearn 09,15                   ; |TAKE_DOWN|HYPER_BEAM|
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 34,40                   ; |BIDE|SKULL_BASH|
+    tmlearn 29,31                   ; |PSYCHIC_M|MIMIC|
+    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
 

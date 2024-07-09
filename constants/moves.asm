@@ -20,7 +20,7 @@
     db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  60 , WIND     , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 60 ; PP 35 -> 25
     db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,   0 , WIND     , 255 , 10 ; pp 20 ; - ; Type Normal -> Wind ; Acr 216 -> 255
     db SWOOP        , FLY_EFFECT                 ,  90 , WIND     , 242 , 14 ; pp 15 ; 0 ; Pwr 70 -> 90
-    db BIND         , TRAPPING_EFFECT            ,  10 , NORMAL   , 153 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Acr 191 -> 153
+    db BIND         , TRAPPING_EFFECT            ,  10 , NORMAL   , 140 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Acr 191 -> 140
     db SLAM         , NO_ADDITIONAL_EFFECT       ,  80 , RUBBER   , 191 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber
     db VINE_WHIP    , NO_ADDITIONAL_EFFECT       ,  45 , GRASS    , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 45 ; PP 10 -> 25
     db STOMP        , FLINCH_SIDE_EFFECT2        ,  65 , NORMAL   , 255 , 10 ; pp 20 ; 0
@@ -110,7 +110,7 @@
     db MINIMIZE     , EVASION_UP1_EFFECT         ,   0 , RUBBER   , 255 , 40 ; pp  5 ; - ; PP 20 -> 5 ; Type Normal -> Rubber
     db SMOKESCREEN  , ACCURACY_DOWN1_EFFECT      ,   0 , POISON   , 204 , 40 ; pp  5 ; - ; Type Normal -> Poison ; Acr 255 -> 204 ; PP 20 -> 5
     db CONFUSE_RAY  , CONFUSION_EFFECT           ,   0 , GHOST    , 255 , 20 ; pp 10 ; -
-    db WITHDRAW     , DEFENSE_UP2_EFFECT         ,   0 , WATER    , 255 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Defense 2x
+    db WITHDRAW     , DEFENSE_UP2_EFFECT         ,   0 , IVORY    , 255 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Defense 2x ; Type Water -> Ivory
     db DEFENSE_CURL , DEFENSE_UP1_EFFECT         ,   0 , RUBBER   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Type Normal -> Rubber
     db BARRIER      , DEFENSE_UP3_EFFECT         ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; - ; PP 30 -> 20 ; Defense 3x
     db LIGHT_SCREEN , LIGHT_SCREEN_EFFECT        ,   0 , PSYCHIC  , 255 , 07 ; pp 30 ; -
@@ -125,10 +125,10 @@
     db LICK         , PARALYZE_SIDE_EFFECT2      ,  30 , GHOST    , 255 , 07 ; pp 30 ; 0 ; Pwr 20 -> 30
     db SMOG         , POISON_SIDE_EFFECT2        ,  30 , POISON   , 178 , 10 ; pp 20 ; 1 ; Pwr 20 -> 30
     db SLUDGE       , POISON_SIDE_EFFECT2        ,  75 , POISON   , 255 , 10 ; pp 20 ; 0 ; Pwr 65 -> 75 ; Phisical
-    db BONE_CLUB    , FLINCH_SIDE_EFFECT1        ,  65 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Ground -> Ivory
+    db BONE_CLUB    , FLINCH_SIDE_EFFECT1        ,  70 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Ground -> Ivory ; Pwr 65 -> 70
     db FIRE_BLAST   , BURN_SIDE_EFFECT2          , 110 , FIRE     , 216 , 40 ; pp  5 ; 1 ; Pwr 120 -> 110
     db WATERFALL    , NO_ADDITIONAL_EFFECT       ,  80 , WATER    , 255 , 14 ; pp 15 ; 0
-    db CLAMP        , TRAPPING_EFFECT            ,  10 , IVORY    , 153 , 20 ; pp 10 ; 0 ; Pwr 35 -> 10 ; Acr 191 -> 153 ; Type Water -> Ivory
+    db CLAMP        , TRAPPING_EFFECT            ,  10 , IVORY    , 140 , 20 ; pp 10 ; 0 ; Pwr 35 -> 10 ; Acr 191 -> 140 ; Type Water -> Ivory
     db SWIFT        , SWIFT_EFFECT               ,  60 , NORMAL   , 255 , 10 ; pp 20 ; 1
     db SKULL_BASH   , CHARGE_EFFECT              , 130 , NORMAL   , 255 , 20 ; pp 10 ; 0 ; Pwr 100 -> 130 ; PP 15 -> 10
     db SPIKE_CANNON , TWO_TO_FIVE_ATTACKS_EFFECT ,  25 , IVORY    , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Ivory ; Pwr 20 -> 25
