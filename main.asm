@@ -59367,7 +59367,7 @@ JumpMoveEffect: ; Moved in the Bank
      dw Func_3fb36
      dw Func_3fb36
      dw PoisonEffect
-     dw Func_3f9b1
+     dw ParalyzeEffect
      dw Func_3f54c
      dw Func_3f54c
      dw Func_3f54c
@@ -60523,10 +60523,10 @@ Func_3f9a6: ; 3f9a6 (f:79a6)
     call DelayFrames
     jp Func_3fb4e
 
-Func_3f9b1: ; 3f9b1 (f:79b1)
-    ld hl,Func_52601
-    ld b,BANK(Func_52601)
-    jp Bankswitch ; indirect jump to Func_52601 (52601 (14:6601))
+ParalyzeEffect: ; 3f9b1 (f:79b1)
+    ld hl,ParalyzeEffect_
+    ld b,BANK(ParalyzeEffect_)
+    jp Bankswitch ; indirect jump to ParalyzeEffect_ (52601 (14:6601))
 
 Func_3f9b9: ; 3f9b9 (f:79b9)
     ld hl,SubstituteEffectHandler
@@ -78549,35 +78549,30 @@ InitBattleVariables: ; 525af (14:65af)
     ld hl,InitExplodeFlag
     jp Bankswitch
 
-SECTION "Func_52601",ROMX[$6601],BANK[$14]
-
-Func_52601: ; 52601 (14:6601)
+ParalyzeEffect_: ; Moved in the Bank
     ld hl,W_ENEMYMONSTATUS ; $cfe9
     ld de,W_PLAYERMOVETYPE ; $cfd5
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jp z,Func_52613
+    jr z,.next
     ld hl,W_PLAYERMONSTATUS ; $d018
     ld de,W_ENEMYMOVETYPE ; $cfcf
-
-Func_52613: ; 52613 (14:6613)
+.next
     ld a,[hl]
     and a
-    jr nz,.asm_52659
+    jr nz,.didntAffect
     ld a,[de]
     cp $17
-    jr nz,.asm_5262a
+    jr nz,.hitTest
     ld b,h
     ld c,l
     inc bc
-    ld a,[bc]
-    cp $4
-    jr z,.asm_52666
+    call CheckGoundOrRock
+    jr z,.doesntAffect
     inc bc
-    ld a,[bc]
-    cp $4
-    jr z,.asm_52666
-.asm_5262a
+    call CheckGoundOrRock
+    jr z,.doesntAffect
+.hitTest
     push hl
     ld hl,MoveHitTest
     ld b,BANK(MoveHitTest)
@@ -78585,7 +78580,7 @@ Func_52613: ; 52613 (14:6613)
     pop hl
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jr nz,.asm_52659
+    jr nz,.didntAffect
     set 6,[hl]
     ld hl,Func_3ed27
     ld b,BANK(Func_3ed27)
@@ -78598,18 +78593,20 @@ Func_52613: ; 52613 (14:6613)
     ld hl,Func_3fb6e
     ld b,BANK(Func_3fb6e)
     jp Bankswitch ; indirect jump to Func_3fb6e (3fb6e (f:7b6e))
-.asm_52659
+.didntAffect
     ld c,$32
     call DelayFrames
     ld hl,Func_3fb5e
     ld b,BANK(Func_3fb5e)
     jp Bankswitch ; indirect jump to Func_3fb5e (3fb5e (f:7b5e))
-.asm_52666
+.doesntAffect
     ld c,$32
     call DelayFrames
     ld hl,Func_3dc51
     ld b,BANK(Func_3dc51)
     jp Bankswitch ; indirect jump to Func_3dc51 (3dc51 (f:5c51))
+
+SECTION "Func_52673",ROMX[$6673],BANK[$14]
 
 Func_52673: ; 52673 (14:6673)
     ld hl,SilphCoMapList
@@ -79464,6 +79461,13 @@ SaffronCityText12: ; Moved in the Bank
     ld a,PIDGEOT
     call PlayCryAndDisplayPokedex
     jp TextScriptEnd
+
+CheckGoundOrRock:
+    ld a,[bc]
+    cp GROUND
+    ret z
+    cp ROCK
+    ret
 
 SECTION "bank15",ROMX,BANK[$15]
 
