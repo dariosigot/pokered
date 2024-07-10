@@ -5056,7 +5056,7 @@ PorygonBaseStats: ; 392be (e:52be)
     db 75 ; base special
 
     db METAL ; species type 1
-    db METAL ; species type 2
+    db PSYCHIC ; species type 2
 
     db 45 ; catch rate
     db 130 ; base exp yield

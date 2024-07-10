@@ -366,8 +366,9 @@ SPEAROW_NoEvo_Learnset: MACRO
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 EKANS_Learnset: MACRO
-    db  1,BIND
+    db  1,CONSTRICT
     db  1,LEER
+    db  5,BIND
     db  7,POISON_STING
     db 11,LEECH_LIFE
     db 15,BITE
@@ -1515,12 +1516,12 @@ SEEL_Learnset: MACRO
     db  1,HEADBUTT
     db  1,GROWL
     db  6,LICK
-    db  9,TAIL_WHIP
-    db 11,BUBBLE
-    db 13,DISABLE
-    db 15,WATER_GUN
-    db 17,TAKE_DOWN
-    db 19,AURORA_BEAM
+    db  9,BUBBLE
+    db 11,TAIL_WHIP
+    db 13,WATER_GUN
+    db 15,DISABLE
+    db 17,AURORA_BEAM
+    db 19,TAKE_DOWN
     db 21,BUBBLEBEAM
     db 23,SKULL_BASH
     db 26,WATERFALL
@@ -1621,7 +1622,7 @@ CLOYSTER_Learnset: MACRO
     db  9,SONICBOOM
     db 11,SUPERSONIC
     db 13,CLAMP
-    db 15,AURORA_BEAM
+    db 16,AURORA_BEAM
     db 19,LEER
     db 21,WATER_GUN
     db 23,MIST
@@ -2367,68 +2368,89 @@ JYNX_Learnset: MACRO
     db  1,LOVELY_KISS
     db  5,LICK
     db  8,DOUBLESLAP
-    db 10,MIST
+    db 10,PSYWAVE
     db 12,AURORA_BEAM
-    db 15,REFLECT
-    db 18,KARATE_CHOP
+    db 14,CONFUSION
+    db 16,BARRIER
+    db 18,MIST
     db 20,ICE_PUNCH
-    db 24,CONFUSION
+    db 21,SLAM
+    db 22,DISABLE
+    db 24,KARATE_CHOP
+    db 25,SWIFT
     db 27,MEDITATE
-    db 31,BARRIER
+    db 29,REFLECT
+    db 31,LIGHT_SCREEN
     db 34,ICE_BEAM
-    db 37,BODY_SLAM
-    db 40,PSYBEAM
+    db 36,PSYBEAM
+    db 38,BODY_SLAM
+    db 40,CONFUSE_RAY
     db 43,HAZE
-    db 47,THRASH
+    db 46,PSYCHIC_M
+    db 48,THRASH
     db 50,BLIZZARD
-    db 55,PSYCHIC_M
-    db 60,DREAM_EATER
+    db 55,DREAM_EATER
+    db 60,SUBSTITUTE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 ELECTABUZZ_Learnset: MACRO
-    db  1,QUICK_ATTACK
+    db  1,KARATE_CHOP
     db  1,LEER
     db  5,FLASH
     db  8,THUNDERSHOCK
-    db 10,DOUBLE_TEAM
+    db 10,QUICK_ATTACK
     db 12,THUNDER_WAVE
-    db 15,LIGHT_SCREEN
-    db 18,KARATE_CHOP
+    db 14,LOW_KICK
+    db 16,LIGHT_SCREEN
+    db 18,DOUBLE_TEAM
     db 20,THUNDERPUNCH
+    db 21,FOCUS_ENERGY
+    db 22,SCREECH
     db 24,SWIFT
+    db 25,MEGA_PUNCH
     db 27,MEDITATE
+    db 29,STRIKE
     db 31,REFLECT
     db 34,THUNDERBOLT
-    db 37,BODY_SLAM
+    db 36,SEISMIC_TOSS
+    db 38,BODY_SLAM
     db 40,AGILITY
-    db 43,SCREECH
-    db 47,THRASH
+    db 43,SUBMISSION
+    db 46,JUMP_KICK
+    db 48,THRASH
     db 50,THUNDER
-    db 55,PSYCHIC_M
-    db 60,SUBMISSION
+    db 55,MEGA_KICK
+    db 60,HI_JUMP_KICK
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 MAGMAR_Learnset: MACRO
-    db  1,TACKLE
+    db  1,SCRATCH
     db  1,LEER
     db  5,SMOG
     db  8,EMBER
     db 10,SMOKESCREEN
-    db 12,POISON_GAS
-    db 15,BARRIER
-    db 18,KARATE_CHOP
+    db 12,PECK
+    db 14,ACID
+    db 16,POISON_GAS
+    db 18,REFLECT
     db 20,FIRE_PUNCH
+    db 21,SLAM
+    db 22,KARATE_CHOP
     db 24,FIRE_SPIN
+    db 25,FOCUS_ENERGY
     db 27,MEDITATE
+    db 29,MEGA_PUNCH
     db 31,LIGHT_SCREEN
     db 34,FLAMETHROWER
-    db 37,BODY_SLAM
+    db 36,STRIKE
+    db 38,BODY_SLAM
     db 40,CONFUSE_RAY
     db 43,SCREECH
-    db 47,THRASH
+    db 46,SLUDGE
+    db 48,THRASH
     db 50,FIRE_BLAST
-    db 55,PSYCHIC_M
-    db 60,SLUDGE
+    db 55,TOXIC
+    db 60,DRILL_PECK
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 PINSIR_Learnset: MACRO
@@ -2494,21 +2516,32 @@ ENDM
 GYARADOS_Learnset: MACRO
     MAGIKARP_Learnset
     db 20,BITE
+    db 20,GROWL
     db 20,LEER
-    db 21,BUBBLEBEAM
-    db 23,DRAGON_RAGE
-    db 26,SLAM
-    db 28,HYPER_FANG
-    db 31,TAKE_DOWN
+    db 20,WATER_GUN
+    db 20,ROAR
+    db 20,DRAGON_RAGE
+    db 21,FOCUS_ENERGY
+    db 22,SLAM
+    db 24,WATERFALL
+    db 25,BIND
+    db 26,HYPER_FANG
+    db 28,TAKE_DOWN
+    db 31,AURORA_BEAM
+    db 33,STRIKE
     db 35,TSUNAMI
     db 37,HAZE
+    db 38,SKULL_BASH
+    db 39,MIST
     db 40,BODY_SLAM
     db 41,HYDRO_PUMP
-    db 45,HYPER_BEAM
-    db 49,ICE_BEAM
-    db 52,THUNDERBOLT
-    db 56,FLAMETHROWER
-    db 60,SUPER_FANG
+    db 43,THRASH
+    db 45,ICE_BEAM
+    db 47,THUNDERBOLT
+    db 49,FLAMETHROWER
+    db 52,HYPER_BEAM
+    db 56,SUPER_FANG
+    db 60,EARTHQUAKE
 ENDM
 MAGIKARP_NoEvo_Learnset: MACRO
     db 30,SLAM
@@ -2518,23 +2551,30 @@ MAGIKARP_NoEvo_Learnset: MACRO
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 LAPRAS_Learnset: MACRO
-    db  1,WATER_GUN
+    db  1,BUBBLE
     db  1,GROWL
     db  7,BIDE
+    db  9,WATER_GUN
     db 11,SING
-    db 16,CONFUSE_RAY
-    db 19,SKULL_BASH
-    db 21,AURORA_BEAM
-    db 24,TAKE_DOWN
-    db 26,MIST
-    db 29,BODY_SLAM
-    db 32,TSUNAMI
+    db 13,MIST
+    db 15,AURORA_BEAM
+    db 17,WITHDRAW
+    db 19,CONFUSE_RAY
+    db 21,BUBBLEBEAM
+    db 23,TAKE_DOWN
+    db 25,WATERFALL
+    db 27,SCREECH
+    db 29,SKULL_BASH
+    db 31,BODY_SLAM
+    db 33,TSUNAMI
     db 35,THUNDERSHOCK
+    db 37,SPIKE_CANNON
     db 39,HAZE
     db 42,ICE_BEAM
     db 46,HYDRO_PUMP
-    db 50,SPIKE_CANNON
+    db 49,THRASH
     db 54,BLIZZARD
+    db 56,CRABHAMMER
     db 58,HYPER_BEAM
     db 60,HORN_DRILL
 ENDM
@@ -2550,70 +2590,96 @@ EEVEE_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  8,SAND_ATTACK
-    db 11,GROWL ; Exclusive
-    db 16,QUICK_ATTACK
-    db 19,DOUBLE_KICK
-    db 23,BITE
-    db 27,DOUBLE_TEAM
+    db 11,GROWL
+    db 15,QUICK_ATTACK
+    db 18,DOUBLE_KICK
+    db 22,BITE
+    db 26,DOUBLE_TEAM
+    db 29,SLAM
     db 32,SKULL_BASH
-    db 36,FOCUS_ENERGY ; Exclusive
-    db 39,MIMIC
-    db 42,TAKE_DOWN
-    db 57,BODY_SLAM
+    db 36,FOCUS_ENERGY
+    db 40,MIMIC ; Exclusive
+    db 45,HYPER_FANG
+    db 50,TAKE_DOWN
+    db 53,BODY_SLAM
+    db 57,DOUBLE_EDGE
+    db 60,HYPER_BEAM ; Exclusive
 ENDM
 VAPOREON_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  1,WATER_GUN
-    db  8,SAND_ATTACK
-    db 15,MIST
-    db 18,QUICK_ATTACK
-    db 20,DOUBLE_KICK
-    db 23,BITE
-    db 26,ACID_ARMOR
+    db  6,SAND_ATTACK
+    db  8,GROWL
+    db 11,MIST
+    db 14,QUICK_ATTACK
+    db 16,DOUBLE_KICK
+    db 19,BITE
+    db 22,ACID_ARMOR
+    db 25,DOUBLE_TEAM
+    db 26,SLAM
     db 28,BUBBLEBEAM
-    db 30,DOUBLE_TEAM
+    db 30,SKULL_BASH
     db 32,AURORA_BEAM
+    db 34,FOCUS_ENERGY
     db 37,TSUNAMI
-    db 42,HAZE
-    db 52,HYDRO_PUMP
-    db 57,BODY_SLAM
+    db 39,HAZE
+    db 42,HYPER_FANG
+    db 45,TAKE_DOWN
+    db 48,HYDRO_PUMP
+    db 50,BODY_SLAM
+    db 55,DOUBLE_EDGE
+    db 60,SUPER_FANG
 ENDM
 JOLTEON_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  1,THUNDERSHOCK
-    db  8,SAND_ATTACK
-    db 15,AGILITY
-    db 18,QUICK_ATTACK
-    db 20,DOUBLE_KICK
-    db 23,BITE
-    db 26,THUNDER_WAVE
+    db  6,SAND_ATTACK
+    db  8,GROWL
+    db 11,AGILITY
+    db 14,QUICK_ATTACK
+    db 16,DOUBLE_KICK
+    db 19,BITE
+    db 22,THUNDER_WAVE
+    db 25,DOUBLE_TEAM
+    db 26,SLAM
     db 28,SWIFT
-    db 30,DOUBLE_TEAM
     db 32,PIN_MISSILE
+    db 34,FOCUS_ENERGY
     db 37,THUNDERBOLT
-    db 42,FLASH
-    db 52,THUNDER
-    db 57,BODY_SLAM
+    db 39,FLASH
+    db 42,HYPER_FANG
+    db 45,TAKE_DOWN
+    db 48,THUNDER
+    db 50,BODY_SLAM
+    db 55,DOUBLE_EDGE
+    db 60,SUPER_FANG
 ENDM
 FLAREON_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  1,EMBER
-    db  8,SAND_ATTACK
-    db 15,LEER
-    db 18,QUICK_ATTACK
-    db 20,DOUBLE_KICK
-    db 23,BITE
-    db 26,SMOKESCREEN
+    db  6,SAND_ATTACK
+    db  8,GROWL
+    db 11,LEER
+    db 14,QUICK_ATTACK
+    db 16,DOUBLE_KICK
+    db 19,BITE
+    db 22,SMOKESCREEN
+    db 25,DOUBLE_TEAM
+    db 26,SLAM
     db 28,SMOG
-    db 30,DOUBLE_TEAM
     db 32,FIRE_SPIN
+    db 34,FOCUS_ENERGY
     db 37,FLAMETHROWER
-    db 42,POISON_GAS
-    db 52,FIRE_BLAST
-    db 57,BODY_SLAM
+    db 39,POISON_GAS
+    db 42,HYPER_FANG
+    db 45,TAKE_DOWN
+    db 48,FIRE_BLAST
+    db 50,BODY_SLAM
+    db 55,DOUBLE_EDGE
+    db 60,SUPER_FANG
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 PORYGON_Learnset: MACRO
@@ -2621,21 +2687,26 @@ PORYGON_Learnset: MACRO
     db  1,CONVERSION
     db  6,AGILITY
     db  9,PSYWAVE
-    db 12,TELEPORT
-    db 14,SONICBOOM
-    db 17,FLASH
-    db 19,BLADE
+    db 11,TELEPORT
+    db 13,SONICBOOM
+    db 14,SUPERSONIC
+    db 15,CONFUSION
+    db 17,BLADE
+    db 19,FLASH
     db 21,SHARPEN
     db 23,SWIFT
     db 25,RECOVER
-    db 29,PSYBEAM
+    db 27,PSYBEAM
+    db 29,DISABLE
     db 31,LIGHT_SCREEN
     db 33,THUNDER_WAVE
     db 35,BARRIER
     db 38,HYPNOSIS
     db 39,DREAM_EATER
     db 41,TRI_ATTACK
+    db 40,SCREECH
     db 44,REFLECT
+    db 47,PSYCHIC_M
     db 51,AMNESIA
     db 55,THUNDERBOLT
     db 60,HYPER_BEAM
