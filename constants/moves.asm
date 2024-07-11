@@ -20,7 +20,7 @@
     db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  60 , WIND     , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 60 ; PP 35 -> 25
     db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,   0 , WIND     , 255 , 10 ; pp 20 ; - ; Type Normal -> Wind ; Acr 216 -> 255
     db SWOOP        , FLY_EFFECT                 ,  90 , WIND     , 242 , 14 ; pp 15 ; 0 ; Pwr 70 -> 90
-    db BIND         , TRAPPING_EFFECT            ,  10 , NORMAL   , 153 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Acr 191 -> 153
+    db BIND         , TRAPPING_EFFECT            ,  10 , NORMAL   , 140 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Acr 191 -> 140
     db SLAM         , NO_ADDITIONAL_EFFECT       ,  80 , RUBBER   , 191 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber
     db VINE_WHIP    , NO_ADDITIONAL_EFFECT       ,  45 , GRASS    , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 45 ; PP 10 -> 25
     db STOMP        , FLINCH_SIDE_EFFECT2        ,  65 , NORMAL   , 255 , 10 ; pp 20 ; 0
@@ -35,7 +35,7 @@
     db HORN_DRILL   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 40 ; pp  5 ; - ; Type Normal -> Ivory
     db TACKLE       , NO_ADDITIONAL_EFFECT       ,  35 , NORMAL   , 255 , 06 ; pp 35 ; 0 ; Acr 242 -> 255
     db BODY_SLAM    , PARALYZE_SIDE_EFFECT2      ,  85 , RUBBER   , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Rubber
-    db WRAP         , TRAPPING_EFFECT            ,  10 , NORMAL   , 140 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Acr 216 -> 140
+    db WRAP         , TRAPPING_EFFECT            ,  10 , NORMAL   , 153 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Acr 216 -> 153
     db TAKE_DOWN    , RECOIL_EFFECT              ,  90 , NORMAL   , 216 , 10 ; pp 20 ; 0
     db THRASH       , THRASH_PETAL_DANCE_EFFECT  , 120 , NORMAL   , 255 , 20 ; pp 10 ; 0 ; Pwr 90 -> 120 ; PP 20 -> 10
     db DOUBLE_EDGE  , RECOIL_EFFECT              , 120 , NORMAL   , 255 , 14 ; pp 15 ; 0 ; Pwr 100 -> 120

@@ -39,13 +39,13 @@ BULBASAUR_NoEvo_Learnset: MACRO
     db 29,SLAM
     db 32,BARRAGE ; Exclusive
     db 35,STUN_SPORE
-    db 39,WRAP ; Exclusive
+    db 39,BIND ; Exclusive
     db 44,GROWTH
     db 49,SLEEP_POWDER
     db 54,SOLARBEAM
 ENDM
 IVYSAUR_NoEvo_Learnset: MACRO
-    db 34,WRAP ; Exclusive
+    db 34,BIND ; Exclusive
     db 38,ABSORB
     db 42,GROWTH
     db 46,SLUDGE
@@ -368,7 +368,7 @@ ENDM
 EKANS_Learnset: MACRO
     db  1,CONSTRICT
     db  1,LEER
-    db  5,BIND
+    db  5,WRAP
     db  7,POISON_STING
     db 11,LEECH_LIFE
     db 15,BITE
@@ -1222,7 +1222,7 @@ ENDM
 WEEPINBELL_Learnset: MACRO
     BELLSPROUT_Learnset
     db 21,ACID
-    db 25,WRAP
+    db 25,BIND
     db 28,SLUDGE
     db 32,RAZOR_LEAF
     db 37,SLAM
@@ -1234,7 +1234,7 @@ ENDM
 VICTREEBEL_Learnset: MACRO
     BELLSPROUT_Learnset
     db 21,ACID
-    db 21,WRAP
+    db 21,BIND
     db 25,RAZOR_LEAF
     db 28,SLUDGE
     db 32,SLAM
@@ -1249,7 +1249,7 @@ VICTREEBEL_Learnset: MACRO
 ENDM
 BELLSPROUT_NoEvo_Learnset: MACRO
     db 23,ABSORB ; Exclusive
-    db 27,WRAP
+    db 27,BIND
     db 31,LEECH_SEED ; Exclusive
     db 35,RAZOR_LEAF
     db 39,SLAM
@@ -1266,7 +1266,7 @@ TENTACOOL_Learnset: MACRO
     db 14,BUBBLE
     db 16,SONICBOOM
     db 18,POISONPOWDER
-    db 20,WRAP
+    db 20,BIND
     db 22,WATER_GUN
     db 24,ABSORB
     db 26,GLARE
@@ -1413,10 +1413,11 @@ SLOWBRO_Learnset: MACRO
     db 59,HYDRO_PUMP
 ENDM
 SLOWPOKE_NoEvo_Learnset: MACRO
-    db 38,AMNESIA ; Exclusive
-    db 43,TSUNAMI
-    db 45,MIST
-    db 48,PSYCHIC_M
+    db 40,AMNESIA ; Exclusive
+    db 45,TSUNAMI
+    db 50,MIST
+    db 55,PSYCHIC_M
+    db 60,HYDRO_PUMP
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 MAGNEMITE_Learnset: MACRO
@@ -1709,7 +1710,7 @@ ONIX_Learnset: MACRO
     db  8,BIDE
     db 12,ROCK_THROW
     db 14,SLAM
-    db 15,BIND
+    db 15,WRAP
     db 19,BLADE
     db 21,SHARPEN
     db 23,TRAPHOLE
@@ -2134,7 +2135,7 @@ TANGELA_Learnset: MACRO
     db  1,CONSTRICT
     db  1,SLEEP_POWDER
     db  8,VINE_WHIP
-    db 10,WRAP
+    db 10,BIND
     db 12,LEECH_SEED
     db 14,ABSORB
     db 16,POISONPOWDER
@@ -2534,7 +2535,7 @@ GYARADOS_Learnset: MACRO
     db 21,FOCUS_ENERGY
     db 22,SLAM
     db 24,WATERFALL
-    db 25,BIND
+    db 25,WRAP
     db 26,HYPER_FANG
     db 28,TAKE_DOWN
     db 31,AURORA_BEAM
@@ -2731,7 +2732,7 @@ OMANYTE_Learnset: MACRO
     db 15,WATER_GUN
     db 17,LEER
     db 18,SONICBOOM
-    db 19,WRAP
+    db 19,BIND
     db 19,VINE_WHIP
     db 20,BUBBLEBEAM
     db 22,AURORA_BEAM
@@ -2914,7 +2915,7 @@ MOLTRES_Learnset: MACRO
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 DRATINI_Learnset: MACRO
-    db  1,BIND
+    db  1,WRAP
     db  1,LEER
     db  8,SUPERSONIC
     db 10,THUNDER_WAVE
