@@ -31,6 +31,7 @@ CharmanderExclusiveMove:
 CharmeleonExclusiveMove:
 CharizardExclusiveMove:
     db MEGA_PUNCH ; TM01
+    db RAZOR_WIND ; TM02
     db SWORDS_DANCE ; TM03
     db MEGA_KICK ; TM05
     db TOXIC ; TM06
@@ -1798,7 +1799,6 @@ AerodactylExclusiveMove:
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
-    db FLAMETHROWER ; TM37
     db DRAGON_RAGE ; TM23
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
@@ -1806,6 +1806,7 @@ AerodactylExclusiveMove:
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
     db BIDE ; TM34
+    db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKY_ATTACK ; TM43
@@ -1833,7 +1834,6 @@ SnorlaxExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
-    db FLAMETHROWER ; TM37
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
     db THUNDER ; TM25
@@ -1845,6 +1845,7 @@ SnorlaxExclusiveMove:
     db BIDE ; TM34
     db METRONOME ; TM35
     db SELFDESTRUCT ; TM36
+    db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SKULL_BASH ; TM40
     db REST ; TM44

@@ -1304,9 +1304,9 @@ GEODUDE_Learnset: MACRO
     db  9,DOUBLESLAP
     db 12,ROCK_THROW
     db 14,HEADBUTT
-    db 15,MEGA_PUNCH
+    db 15,HARDEN
     db 17,TRAPHOLE
-    db 19,HARDEN
+    db 19,MEGA_PUNCH
     db 21,SELFDESTRUCT
     ;  25,GRAVELER
 ENDM
@@ -2531,12 +2531,12 @@ GYARADOS_Learnset: MACRO
     db 20,LEER
     db 20,WATER_GUN
     db 20,ROAR
-    db 20,DRAGON_RAGE
+    db 20,HYPER_FANG
     db 21,FOCUS_ENERGY
     db 22,SLAM
     db 24,WATERFALL
     db 25,WRAP
-    db 26,HYPER_FANG
+    db 26,DRAGON_RAGE
     db 28,TAKE_DOWN
     db 31,AURORA_BEAM
     db 33,STRIKE
@@ -2816,42 +2816,55 @@ KABUTO_NoEvo_Learnset: MACRO
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 AERODACTYL_Learnset: MACRO
-    db  1,WING_ATTACK
+    db  1,GUST
     db  1,AGILITY
+    db  6,WING_ATTACK
     db  8,WHIRLWIND
-    db 11,SUPERSONIC
-    db 14,BITE
-    db 17,ROCK_THROW
+    db 11,BITE
+    db 13,ROCK_THROW
+    db 15,SUPERSONIC
+    db 17,HYPER_FANG
+    db 19,SCREECH
     db 21,SWOOP
+    db 23,REST
     db 25,DOUBLE_TEAM
-    db 29,TAKE_DOWN
-    db 33,HYPER_FANG
+    db 27,RAZOR_WIND
+    db 29,ROCK_SLIDE
+    db 33,DRAGON_RAGE
     db 37,BODY_SLAM
-    db 40,DRAGON_RAGE
-    db 43,ROCK_SLIDE
-    db 49,FLAMETHROWER
+    db 40,TAKE_DOWN
+    db 44,THRASH
+    db 48,FLAMETHROWER
     db 52,EARTHQUAKE
     db 54,HYPER_BEAM
-    db 60,SKY_ATTACK
+    db 59,SKY_ATTACK
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 SNORLAX_Learnset: MACRO
     db  1,LICK
     db  1,DEFENSE_CURL
+    db  6,POUND
     db  8,BITE
     db 11,STOMP
+    db 13,DOUBLESLAP
     db 16,REST
-    db 19,ROCK_THROW
+    db 18,SLAM
+    db 20,ROCK_THROW
     db 21,HEADBUTT
+    db 22,MEGA_PUNCH
     db 24,BODY_SLAM
     db 27,AMNESIA
-    db 30,DISABLE
+    db 29,DISABLE
+    db 31,STRIKE
+    db 32,TAKE_DOWN
     db 34,HARDEN
+    db 37,ROAR
     db 40,EARTHQUAKE
     db 43,TSUNAMI
     db 47,DOUBLE_EDGE
     db 51,ROCK_SLIDE
     db 55,HYPER_BEAM
+    db 60,FISSURE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 ARTICUNO_Learnset: MACRO
