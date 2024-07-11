@@ -5115,7 +5115,7 @@ OmanyteBaseStats: ; 392da (e:52da)
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 0
     tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34                   ; |REFLECT|BIDE|
+    tmlearn 33,34,36                ; |REFLECT|BIDE|SELFDESTRUCT|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
 
@@ -5152,8 +5152,8 @@ OmastarBaseStats: ; 392f6 (e:52f6)
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 0
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
+    tmlearn 33,34,36,40             ; |REFLECT|BIDE|SELFDESTRUCT|SKULL_BASH|
+    tmlearn 44,47,48                ; |REST|EXPLOSION|ROCK_SLIDE|
     tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
 
     db BANK(OmastarPicFront)

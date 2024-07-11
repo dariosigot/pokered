@@ -1749,8 +1749,10 @@ OmastarExclusiveMove:
     db MIMIC ; TM31
     db REFLECT ; TM33
     db BIDE ; TM34
+    db SELFDESTRUCT ; TM36
     db SKULL_BASH ; TM40
     db REST ; TM44
+    db EXPLOSION ; TM47
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53

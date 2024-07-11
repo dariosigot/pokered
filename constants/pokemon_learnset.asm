@@ -1199,11 +1199,13 @@ MACHAMP_Learnset: MACRO
     MACHOKE_MACHAMP_Learnset 28
 ENDM
 MACHOP_NoEvo_Learnset: MACRO
-    db 30,ROLLING_KICK
-    db 35,JUMP_KICK
-    db 39,ROCK_THROW ; Exclusive
-    db 48,SUBMISSION
-    db 56,MEGA_KICK
+    db 31,AGILITY ; Exclusive
+    db 34,STRIKE
+    db 37,SUBMISSION
+    db 41,SEISMIC_TOSS
+    db 45,JUMP_KICK
+    db 50,COUNTER
+    db 55,MEGA_KICK
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 BELLSPROUT_Learnset: MACRO
@@ -1331,14 +1333,13 @@ GOLEM_Learnset: MACRO
 ENDM
 GEODUDE_NoEvo_Learnset: MACRO
     db 26,LEER ; Exclusive
-    db 31,SKULL_BASH
-    db 36,REST
-    db 40,BODY_SLAM
-    db 44,FIRE_PUNCH
-    db 48,EARTHQUAKE
-    db 52,ROCK_SLIDE
-    db 55,THRASH
-    db 59,EXPLOSION
+    db 31,BODY_SLAM
+    db 35,ROCK_SLIDE
+    db 38,SKULL_BASH
+    db 42,EARTHQUAKE
+    db 47,REST
+    db 52,FIRE_PUNCH
+    db 57,EXPLOSION
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 PONYTA_Learnset: MACRO
@@ -1387,25 +1388,34 @@ SLOWPOKE_Learnset: MACRO
     db 12,CONFUSION
     db 14,DISABLE
     db 16,WATER_GUN
-    db 19,MEDITATE
-    db 22,HEADBUTT
-    db 25,BIDE
-    db 29,REST
-    db 33,PSYBEAM
+    db 18,BIDE
+    db 20,MEDITATE
+    db 22,KINESIS
+    db 24,WATERFALL
+    db 26,REST
+    db 28,HEADBUTT
+    db 30,PSYBEAM
+    db 32,HAZE
+    db 34,BUBBLEBEAM
+    db 36,SKULL_BASH
     ;  37,SLOWBRO
 ENDM
 SLOWBRO_Learnset: MACRO
     SLOWPOKE_Learnset
     db 37,MEGA_PUNCH
     db 37,WITHDRAW
-    db 41,TSUNAMI
+    db 40,TSUNAMI
+    db 42,MIST
     db 44,AMNESIA
     db 48,PSYCHIC_M
-    db 60,HYDRO_PUMP
+    db 52,ICE_PUNCH
+    db 56,CRABHAMMER
+    db 59,HYDRO_PUMP
 ENDM
 SLOWPOKE_NoEvo_Learnset: MACRO
     db 38,AMNESIA ; Exclusive
     db 43,TSUNAMI
+    db 45,MIST
     db 48,PSYCHIC_M
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
@@ -2715,62 +2725,93 @@ ENDM
 OMANYTE_Learnset: MACRO
     db  1,CONSTRICT
     db  1,WITHDRAW
-    db  8,WATER_GUN
-    db 13,BITE
-    db 15,LEER
-    db 17,SLAM
+    db  8,BUBBLE
+    db 11,BITE
+    db 13,ROCK_THROW
+    db 15,WATER_GUN
+    db 17,LEER
+    db 18,SONICBOOM
+    db 19,WRAP
+    db 19,VINE_WHIP
     db 20,BUBBLEBEAM
     db 22,AURORA_BEAM
     db 24,REST
-    db 26,ROCK_THROW
-    ; TODO WRAP
+    db 26,SCREECH
+    db 28,WATERFALL
     db 30,SUPERSONIC
-    db 34,HAZE
+    db 31,SLAM
+    db 33,HAZE
+    db 35,ROCK_SLIDE
     db 38,TSUNAMI
     ;  40,OMASTAR
 ENDM
 OMASTAR_Learnset: MACRO
     OMANYTE_Learnset
+    db 40,HORN_ATTACK
+    db 40,FURY_ATTACK
     db 40,SPIKE_CANNON
-    db 41,HORN_ATTACK
     db 43,TRAPHOLE
-    db 45,ROCK_SLIDE
-    db 49,HYDRO_PUMP
-    db 52,BODY_SLAM
-    db 56,HORN_DRILL
+    db 45,SELFDESTRUCT
+    db 47,HYDRO_PUMP
+    db 49,BODY_SLAM
+    db 52,HORN_DRILL
+    db 56,EARTHQUAKE
+    db 58,EXPLOSION
+    db 60,CRABHAMMER
 ENDM
 OMANYTE_NoEvo_Learnset: MACRO
-    db 53,HYDRO_PUMP
+    db 43,TRAPHOLE
+    db 46,SELFDESTRUCT
+    db 49,HYDRO_PUMP
+    db 53,EARTHQUAKE
+    db 58,EXPLOSION
+    db 60,CRABHAMMER
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 KABUTO_Learnset: MACRO
     db  1,SCRATCH
     db  1,HARDEN
-    db  8,ABSORB
-    db 13,BUBBLE
-    db 15,LEER
-    db 17,BLADE
-    db 20,WATER_GUN
+    db  8,BUBBLE
+    db 11,ABSORB
+    db 13,ROCK_THROW
+    db 15,WATER_GUN
+    db 17,LEER
+    db 18,SAND_ATTACK
+    db 19,BLADE
+    db 19,SHARPEN
+    db 20,BUBBLEBEAM
     db 22,AURORA_BEAM
-    db 24,LEECH_LIFE
-    db 26,ROCK_THROW
-    db 30,REST
-    db 34,MEGA_DRAIN
+    db 24,REST
+    db 26,LEECH_LIFE
+    db 28,WATERFALL
+    db 30,FOCUS_ENERGY
+    db 31,SLAM
+    db 33,MEGA_DRAIN
+    db 35,ROCK_SLIDE
     db 38,TSUNAMI
     ;  40,KABUTOPS
 ENDM
 KABUTOPS_Learnset: MACRO
     KABUTO_Learnset
+    db 40,FURY_SWIPES
     db 40,SLASH
-    db 41,GUILLOTINE
+    db 40,GUILLOTINE
     db 43,TRAPHOLE
-    db 45,ROCK_SLIDE
-    db 49,HYDRO_PUMP
-    db 52,BODY_SLAM
-    db 56,SWORDS_DANCE
+    db 45,SWORDS_DANCE
+    db 47,HYDRO_PUMP
+    db 49,BODY_SLAM
+    db 52,CONFUSE_RAY
+    db 56,EARTHQUAKE
+    db 58,TWINEEDLE
+    db 60,CRABHAMMER
 ENDM
 KABUTO_NoEvo_Learnset: MACRO
+    db 43,SLASH
+    db 46,TRAPHOLE
+    db 49,SWORDS_DANCE
     db 53,HYDRO_PUMP
+    db 58,EARTHQUAKE
+    db 60,TWINEEDLE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 AERODACTYL_Learnset: MACRO
@@ -2873,7 +2914,7 @@ MOLTRES_Learnset: MACRO
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 DRATINI_Learnset: MACRO
-    db  1,WRAP
+    db  1,BIND
     db  1,LEER
     db  8,SUPERSONIC
     db 10,THUNDER_WAVE
