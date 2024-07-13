@@ -34,13 +34,13 @@ LtSurgeMove:
 
 ErikaMove:
     ; Tangela (Level 30)
-    db WRAP
-    db MEGA_DRAIN
+    db BIND
+    db BARRAGE
     db STUN_SPORE
     db LEECH_SEED
     ; Weepinbell (Level 34)
     db STUN_SPORE
-    db WRAP
+    db BIND
     db SLUDGE
     db RAZOR_LEAF
     ; Erika's Gloom (Level 38)
@@ -53,7 +53,7 @@ ErikaMove:
 KogaMove:
     ; Venomoth (Level 48)
     db SUPERSONIC
-    db SLUDGE
+    db PIN_MISSILE
     db SPORE
     db PSYCHIC_M
     ; Golbat (Level 52)
@@ -71,20 +71,20 @@ BlaineMove:
     db FIRE_SPIN
     ; Rhydon (Level 47)
     db FIRE_BLAST
-    db EARTHQUAKE
+    db DIZZY_PUNCH
     db HORN_DRILL
     db ROCK_SLIDE
     ; Magmar (Level 55)
     db CONFUSE_RAY
-    db FLAMETHROWER
+    db BODY_SLAM
     db FIRE_BLAST
-    db PSYCHIC_M
+    db SLUDGE
     db 0
 
 DojoLeader:
     ; Hitmonlee (Level 39)
-    db ROLLING_KICK
-    db JUMP_KICK
+    db ROCK_THROW
+    db TRAPHOLE
     db HI_JUMP_KICK
     db EARTHQUAKE
     ; Hitmonchan (Level 39)
@@ -103,7 +103,7 @@ SabrinaMove:
     ; Kadabra (Level 52)
     db RECOVER
     db PSYCHIC_M
-    db THUNDER_WAVE
+    db GLARE
     db REFLECT
     db 0
 
@@ -115,12 +115,12 @@ Giovanni1Move:
     db SELFDESTRUCT
     ; Rhyhorn (Level 38)
     db STOMP
-    db TAKE_DOWN
-    db ROCK_THROW
+    db TRAPHOLE
+    db ROCK_SLIDE
     db BODY_SLAM
     ; Persian (Level 40)
-    db SCREECH
-    db HYPER_FANG
+    db GLARE
+    db TRAPHOLE
     db REST
     db SLASH
     db 0
@@ -128,14 +128,14 @@ Giovanni1Move:
 Giovanni2Move:
     ; Nidorino (Level 42)
     db DOUBLE_KICK
-    db FOCUS_ENERGY
-    db HYPER_FANG
+    db DOUBLE_TEAM
+    db TRAPHOLE
     db SLUDGE
     ; Persian (Level 43)
-    db HYPER_FANG
+    db GLARE
+    db TRAPHOLE
     db REST
     db SLASH
-    db DOUBLE_TEAM
     ; Rhydon (Level 44)
     db BODY_SLAM
     db DOUBLE_KICK
@@ -150,10 +150,10 @@ Giovanni2Move:
 
 Giovanni3Move:
     ; Persian (Level 53)
-    db HYPER_BEAM
-    db REST
-    db SLASH
     db GLARE
+    db TRAPHOLE
+    db REST
+    db HYPER_BEAM
     ; Nidoqueen (Level 55)
     db SLUDGE
     db EARTHQUAKE
