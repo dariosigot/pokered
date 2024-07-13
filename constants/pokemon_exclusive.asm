@@ -34,7 +34,6 @@ CharizardExclusiveMove:
     db RAZOR_WIND ; TM02
     db SWORDS_DANCE ; TM03
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -72,7 +71,6 @@ WartortleExclusiveMove:
 BlastoiseExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -162,7 +160,6 @@ PidgeottoExclusiveMove:
 PidgeotExclusiveMove:
     db RAZOR_WIND ; TM02
     db WHIRLWIND ; TM04
-    db TOXIC ; TM06
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
@@ -182,7 +179,6 @@ PidgeotExclusiveMove:
 RattataExclusiveMove:
 RaticateExclusiveMove:
     db SWORDS_DANCE ; TM03
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -211,7 +207,6 @@ SpearowExclusiveMove:
 FearowExclusiveMove:
     db RAZOR_WIND ; TM02
     db WHIRLWIND ; TM04
-    db TOXIC ; TM06
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
@@ -254,7 +249,6 @@ PikachuExclusiveMove:
 RaichuExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -354,7 +348,6 @@ JigglypuffExclusiveMove:
 WigglytuffExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -510,7 +503,6 @@ VenomothExclusiveMove:
 DiglettExclusiveMove:
 DugtrioExclusiveMove:
     db SWORDS_DANCE ; TM03
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -530,7 +522,6 @@ DugtrioExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 MeowthExclusiveMove:
 PersianExclusiveMove:
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -558,7 +549,6 @@ PsyduckExclusiveMove:
 GolduckExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db BUBBLEBEAM ; TM11
@@ -593,7 +583,6 @@ MankeyExclusiveMove:
 PrimeapeExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -652,7 +641,6 @@ PoliwhirlExclusiveMove:
 PoliwrathExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -687,7 +675,6 @@ PoliwrathExclusiveMove:
 AbraExclusiveMove:
 KadabraExclusiveMove:
 AlakazamExclusiveMove:
-    db TOXIC ; TM06
     db HYPER_BEAM ; TM15
     db SEISMIC_TOSS ; TM19
     db PSYCHIC_M ; TM29
@@ -713,7 +700,6 @@ MachokeExclusiveMove:
 MachampExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -769,7 +755,6 @@ GravelerExclusiveMove:
 GolemExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -797,7 +782,6 @@ GolemExclusiveMove:
 PonytaExclusiveMove:
 RapidashExclusiveMove:
     db SWORDS_DANCE ; TM03
-    db TOXIC ; TM06
     db HORN_DRILL ; TM07
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
@@ -821,7 +805,6 @@ SlowpokeExclusiveMove:
 SlowbroExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -861,7 +844,6 @@ MagnemiteExclusiveMove:
 MagnetonExclusiveMove:
 VoltorbExclusiveMove:
 ElectrodeExclusiveMove:
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db HYPER_BEAM ; TM15
     db SOLARBEAM ; TM22
@@ -887,7 +869,6 @@ FarfetchdExclusiveMove:
     db RAZOR_WIND ; TM02
     db SWORDS_DANCE ; TM03
     db WHIRLWIND ; TM04
-    db TOXIC ; TM06
     db HYPER_BEAM ; TM15
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
@@ -905,7 +886,6 @@ FarfetchdExclusiveMove:
 DoduoExclusiveMove:
 DodrioExclusiveMove:
     db SWORDS_DANCE ; TM03
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -924,7 +904,6 @@ DodrioExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 SeelExclusiveMove:
 DewgongExclusiveMove:
-    db TOXIC ; TM06
     db HORN_DRILL ; TM07
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
@@ -969,7 +948,6 @@ MukExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 ShellderExclusiveMove:
 CloysterExclusiveMove:
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db DOUBLE_EDGE ; TM10
     db BUBBLEBEAM ; TM11
@@ -1017,7 +995,6 @@ GengarExclusiveMove:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OnixExclusiveMove:
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1068,7 +1045,6 @@ HypnoExclusiveMove:
 KrabbyExclusiveMove:
 KinglerExclusiveMove:
     db SWORDS_DANCE ; TM03
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1122,7 +1098,6 @@ MarowakExclusiveMove:
     db MEGA_PUNCH ; TM01
     db SWORDS_DANCE ; TM03
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1156,7 +1131,6 @@ HitmonchanExclusiveMove:
     db MEGA_PUNCH ; TM01
     db SWORDS_DANCE ; TM03
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1240,7 +1214,6 @@ RhydonExclusiveMove:
     db MEGA_PUNCH ; TM01
     db SWORDS_DANCE ; TM03
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db HORN_DRILL ; TM07
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
@@ -1273,7 +1246,6 @@ RhydonExclusiveMove:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ChanseyExclusiveMove:
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1329,7 +1301,6 @@ TangelaExclusiveMove:
 KangaskhanExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1407,7 +1378,6 @@ SeakingExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 StaryuExclusiveMove:
 StarmieExclusiveMove:
-    db TOXIC ; TM06
     db BUBBLEBEAM ; TM11
     db WATER_GUN ; TM12
     db ICE_BEAM ; TM13
@@ -1436,7 +1406,6 @@ StarmieExclusiveMove:
 MrMimeExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
     db SEISMIC_TOSS ; TM19
@@ -1481,7 +1450,6 @@ ScytherExclusiveMove:
 JynxExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1510,7 +1478,6 @@ JynxExclusiveMove:
 ElectabuzzExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1585,7 +1552,6 @@ PinsirExclusiveMove:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TaurosExclusiveMove:
-    db TOXIC ; TM06
     db HORN_DRILL ; TM07
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
@@ -1612,7 +1578,6 @@ TaurosExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 MagikarpExclusiveMove:
 GyaradosExclusiveMove:
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1640,7 +1605,6 @@ GyaradosExclusiveMove:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LaprasExclusiveMove:
-    db TOXIC ; TM06
     db HORN_DRILL ; TM07
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
@@ -1680,7 +1644,6 @@ EeveeExclusiveMove:
 VaporeonExclusiveMove:
 JolteonExclusiveMove:
 FlareonExclusiveMove:
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1708,7 +1671,6 @@ FlareonExclusiveMove:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PorygonExclusiveMove:
-    db TOXIC ; TM06
     db ICE_BEAM ; TM13
     db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
@@ -1764,7 +1726,6 @@ KabutopsExclusiveMove:
     db RAZOR_WIND ; TM02
     db SWORDS_DANCE ; TM03
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1794,7 +1755,6 @@ KabutopsExclusiveMove:
 AerodactylExclusiveMove:
     db RAZOR_WIND ; TM02
     db WHIRLWIND ; TM04
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1821,7 +1781,6 @@ AerodactylExclusiveMove:
 SnorlaxExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1859,7 +1818,6 @@ SnorlaxExclusiveMove:
 ArticunoExclusiveMove:
     db RAZOR_WIND ; TM02
     db WHIRLWIND ; TM04
-    db TOXIC ; TM06
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db BUBBLEBEAM ; TM11
@@ -1882,7 +1840,6 @@ ArticunoExclusiveMove:
 ZapdosExclusiveMove:
     db RAZOR_WIND ; TM02
     db WHIRLWIND ; TM04
-    db TOXIC ; TM06
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
@@ -1904,7 +1861,6 @@ ZapdosExclusiveMove:
 MoltresExclusiveMove:
     db RAZOR_WIND ; TM02
     db WHIRLWIND ; TM04
-    db TOXIC ; TM06
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
@@ -1929,7 +1885,6 @@ DragoniteExclusiveMove:
     db RAZOR_WIND ; TM02
     db WHIRLWIND ; TM04
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db HORN_DRILL ; TM07
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
