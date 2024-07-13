@@ -1142,8 +1142,7 @@ KADABRA_ALAKAZAM_Learnset: MACRO
     db 44,REFLECT
     db 48,LIGHT_SCREEN
     db 51,BARRIER
-    db 54,NIGHT_SHADE
-    db 58,HYPNOSIS
+    db 56,NIGHT_SHADE
     db 60,HYPER_BEAM
 ENDM
 KADABRA_Learnset: MACRO
@@ -2955,24 +2954,33 @@ MOLTRES_Learnset: MACRO
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 DRATINI_Learnset: MACRO
-    db  1,WRAP
+    db  1,CONSTRICT
     db  1,LEER
+    db  6,WRAP
     db  8,SUPERSONIC
+    db  9,WATER_GUN
     db 10,THUNDER_WAVE
     db 13,BUBBLEBEAM
+    db 15,BITE
     db 17,SLAM
     db 20,THUNDERSHOCK
     db 21,EMBER
     db 22,AURORA_BEAM
-    db 20,AGILITY
-    db 25,MIST
+    db 24,DRAGON_RAGE
+    db 26,AGILITY
+    db 28,MIST
+    db 30,WATERFALL
     ;  30,DRAGONAIR
 ENDM
 DRAGONAIR_Learnset: MACRO
     DRATINI_Learnset
-    db 30,DRAGON_RAGE
+    db 30,HORN_ATTACK
+    db 30,FURY_ATTACK
+    db 32,HYPER_FANG
     db 34,LIGHT_SCREEN
+    db 36,SKULL_BASH
     db 38,HAZE
+    db 41,TRAPHOLE
     db 43,ICE_BEAM
     db 44,FLAMETHROWER
     db 45,THUNDERBOLT
@@ -2984,42 +2992,60 @@ DRAGONAIR_Learnset: MACRO
 ENDM
 DRAGONITE_Learnset: MACRO
     DRAGONAIR_Learnset
+    db 55,GUST
     db 55,SWOOP
+    db 55,RAZOR_WIND
     db 56,HYDRO_PUMP
     db 57,THUNDER
     db 58,BLIZZARD
     db 59,FIRE_BLAST
+    db 60,HORN_DRILL
     db 60,SKY_ATTACK
+    db 65,ROAR
 ENDM
 DRATINI_NoEvo_Learnset: MACRO
-    db 32,DRAGON_RAGE
-    db 34,LIGHT_SCREEN
-    db 43,ICE_BEAM
-    db 48,TSUNAMI
-    db 50,HYPER_BEAM
+    db 35,LIGHT_SCREEN
+    db 40,HAZE
+    db 45,ICE_BEAM
+    db 46,FLAMETHROWER
+    db 47,THUNDERBOLT
+    db 50,TSUNAMI
+    db 55,HYPER_BEAM
+    db 60,HYDRO_PUMP
 ENDM
 DRAGONAIR_NoEvo_Learnset: MACRO
-    db 56,HYDRO_PUMP
+    db 58,HYDRO_PUMP
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 MEWTWO_Learnset: MACRO
     db  1,CONFUSION
     db  1,DISABLE
     db  7,REFLECT
-    db 11,PSYWAVE
+    db  8,PSYWAVE
+    db 10,TELEPORT
+    db 14,KINESIS
     db 16,PSYBEAM
+    db 18,MEDITATE
     db 20,LIGHT_SCREEN
+    db 22,SUPERSONIC
     db 25,PSYCHIC_M
+    db 28,SWIFT
     db 30,RECOVER
-    db 35,SWIFT
+    db 33,HYPNOSIS
+    db 34,DREAM_EATER
+    db 38,MIST
     db 40,SUBSTITUTE
-    db 44,MIST
-    db 48,BARRIER
-    db 53,THUNDERBOLT
-    db 58,ICE_BEAM
+    db 44,BARRIER
+    db 48,NIGHT_SHADE
+    db 50,THUNDERBOLT
+    db 53,FLAMETHROWER
+    db 56,ICE_BEAM
+    db 58,SOLARBEAM
+    db 61,SELFDESTRUCT
     db 63,AMNESIA
+    db 65,ROCK_SLIDE
     db 68,EARTHQUAKE
-    db 73,HYPER_BEAM
+    db 70,HYPER_BEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 MEW_Learnset: MACRO

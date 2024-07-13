@@ -1925,8 +1925,12 @@ MoltresExclusiveMove:
 DratiniExclusiveMove:
 DragonairExclusiveMove:
 DragoniteExclusiveMove:
+    db MEGA_PUNCH ; TM01
     db RAZOR_WIND ; TM02
+    db WHIRLWIND ; TM04
+    db MEGA_KICK ; TM05
     db TOXIC ; TM06
+    db HORN_DRILL ; TM07
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1935,32 +1939,30 @@ DragoniteExclusiveMove:
     db ICE_BEAM ; TM13
     db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
-    db FLAMETHROWER ; TM37
+    db SEISMIC_TOSS ; TM19
     db DRAGON_RAGE ; TM23
     db THUNDERBOLT ; TM24
     db THUNDER ; TM25
-    db MIMIC ; TM31
-    db DOUBLE_TEAM ; TM32
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
+    db MIMIC ; TM31
+    db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
     db BIDE ; TM34
+    db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db SKY_ATTACK ; TM43
     db REST ; TM44
     db THUNDER_WAVE ; TM45
+    db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db MEGA_PUNCH ; TM01
-    db MEGA_KICK ; TM05
-    db HORN_DRILL ; TM07
-    db ROCK_SLIDE ; TM48
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewtwoExclusiveMove:
@@ -1979,10 +1981,10 @@ MewtwoExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
-    db FLAMETHROWER ; TM37
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
     db THUNDER ; TM25
+    db EARTHQUAKE ; TM26
     db PSYCHIC_M ; TM29
     db TELEPORT ; TM30
     db MIMIC ; TM31
@@ -1991,19 +1993,19 @@ MewtwoExclusiveMove:
     db BIDE ; TM34
     db METRONOME ; TM35
     db SELFDESTRUCT ; TM36
+    db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
-    db FLASH ; TM55
+    db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
     db PSYWAVE ; TM46
+    db ROCK_SLIDE ; TM48
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
-    db DREAM_EATER ; TM42
-    db EARTHQUAKE ; TM26
-    db ROCK_SLIDE ; TM48
+    db FLASH ; TM55
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewExclusiveMove:
