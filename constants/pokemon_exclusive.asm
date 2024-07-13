@@ -1893,12 +1893,12 @@ ZapdosExclusiveMove:
     db REFLECT ; TM33
     db BIDE ; TM34
     db SWIFT ; TM39
-    db FLASH ; TM55
     db SKY_ATTACK ; TM43
     db REST ; TM44
     db THUNDER_WAVE ; TM45
     db SUBSTITUTE ; TM50
     db SWOOP ; TM52
+    db FLASH ; TM55
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MoltresExclusiveMove:
@@ -1908,18 +1908,18 @@ MoltresExclusiveMove:
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
-    db FLAMETHROWER ; TM37
+    db SOLARBEAM ; TM22
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
     db BIDE ; TM34
+    db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKY_ATTACK ; TM43
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db SWOOP ; TM52
-    db SOLARBEAM ; TM22
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DratiniExclusiveMove:

@@ -2872,19 +2872,28 @@ ARTICUNO_Learnset: MACRO
     db  1,MIST
     db  9,PECK
     db 13,WATER_GUN
-    db 18,WING_ATTACK
-    db 23,SWOOP
+    db 16,WING_ATTACK
+    db 18,WHIRLWIND
+    db 21,SWOOP
+    db 23,HAZE
+    db 25,SCREECH
     db 28,REFLECT
-    db 33,HAZE
+    db 31,RAZOR_WIND
+    db 33,MIRROR_MOVE
+    db 35,ICE_BEAM
     db 38,AURORA_BEAM
+    db 40,ICE_PUNCH
     db 43,SWIFT
-    db 48,ICE_BEAM
+    db 46,LIGHT_SCREEN
+    db 48,DOUBLE_EDGE
     db 51,AGILITY
-    db 56,TSUNAMI
+    db 54,EGG_BOMB
+    db 56,DRILL_PECK
     db 58,BLIZZARD
     db 60,BARRIER
-    db 62,DRILL_PECK
+    db 62,TSUNAMI
     db 65,SKY_ATTACK
+    db 70,HYPER_BEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 ZAPDOS_Learnset: MACRO
@@ -2892,19 +2901,28 @@ ZAPDOS_Learnset: MACRO
     db  1,FLASH
     db  9,PECK
     db 13,THUNDERSHOCK
-    db 18,WING_ATTACK
-    db 23,SWOOP
+    db 16,WING_ATTACK
+    db 18,WHIRLWIND
+    db 21,SWOOP
+    db 23,THUNDER_WAVE
+    db 25,SCREECH
     db 28,LIGHT_SCREEN
-    db 33,THUNDER_WAVE
+    db 31,RAZOR_WIND
+    db 33,MIRROR_MOVE
+    db 35,THUNDERBOLT
     db 38,DRILL_PECK
+    db 40,THUNDERPUNCH
     db 43,SWIFT
-    db 48,THUNDERBOLT
+    db 46,BARRIER
+    db 48,DOUBLE_EDGE
     db 51,AGILITY
+    db 54,EGG_BOMB
     db 56,PIN_MISSILE
     db 58,THUNDER
     db 60,REFLECT
     db 62,TWINEEDLE
     db 65,SKY_ATTACK
+    db 70,HYPER_BEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 MOLTRES_Learnset: MACRO
@@ -2912,19 +2930,28 @@ MOLTRES_Learnset: MACRO
     db  1,LEER
     db  9,PECK
     db 13,EMBER
-    db 18,WING_ATTACK
-    db 23,SWOOP
+    db 16,WING_ATTACK
+    db 18,WHIRLWIND
+    db 21,SWOOP
+    db 23,POISON_GAS
+    db 25,SCREECH
     db 28,BARRIER
-    db 33,POISON_GAS
+    db 31,RAZOR_WIND
+    db 33,MIRROR_MOVE
+    db 35,FLAMETHROWER
     db 38,FIRE_SPIN
+    db 40,FIRE_PUNCH
     db 43,SWIFT
-    db 48,FLAMETHROWER
+    db 46,REFLECT
+    db 48,DOUBLE_EDGE
     db 51,AGILITY
+    db 54,EGG_BOMB
     db 56,DRILL_PECK
     db 58,FIRE_BLAST
     db 60,LIGHT_SCREEN
     db 62,SOLARBEAM
     db 65,SKY_ATTACK
+    db 70,HYPER_BEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 DRATINI_Learnset: MACRO
