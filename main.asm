@@ -137369,6 +137369,7 @@ SECTION "Bank3b",ROMX,BANK[$3B]
 PokemonBaseStats:
 INCLUDE "constants/pokemon_header.asm"
 INCLUDE "constants/pokemon_learnset.asm"
+INCLUDE "constants/pokemon_learnset_config.asm"
 
 MonsterNames:
     db "MISSINGNO." ; 001 - MISSINGNO
