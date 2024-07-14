@@ -25998,6 +25998,8 @@ GetTMChoiceItemID:
     ; Print Move Details Box
     FuncCoord 10,5
     ld de,Coord
+    ld hl,wHyperBeamUnknownTypeBit4
+    set 4,[hl]
     PREDEF_JUMP PrintMoveDetailsBoxPredef
 
 .ChoiceTMText:
@@ -54238,17 +54240,18 @@ FixItSelfDamage:
     ld [$d05e],a
     push hl
     call GetSelectedMovePointer
-    ld a,POUND
-    ld [hli],a
+    ld [hl],SCRATCH
     pop hl
     ret
 
 GetSelectedMovePointer:
     ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
+    ld bc,W_PLAYERMONID
     ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
     and a
     ret z
     inc hl
+    ld bc,W_ENEMYMONID
     ret
 
 SECTION "InitBattleMenu",ROMX[$4eb3],BANK[$f]
@@ -135479,6 +135482,17 @@ PrintMoveDetailsBox:
 .PowerDone
 
     ; Print Phi/Spc Symbols
+    push hl
+    ld hl,wHyperBeamUnknownTypeBit4
+    bit 4,[hl]
+    res 4,[hl]
+    pop hl
+    jr z,.skipHyperBeamException
+    ld a,[W_PLAYERMOVENUM]
+    cp HYPER_BEAM
+    ld de,.HyperBeamExceptionText
+    jr z,.PhiSpcPrint
+.skipHyperBeamException
     ld a,[W_PLAYERMOVEPOWER]
     and a
     jr z,.PhiSpcDone
@@ -135486,6 +135500,7 @@ PrintMoveDetailsBox:
     jr z,.PhiSpcDone
     push hl
     ld hl,W_PLAYERMOVENUM
+    ld bc,$cf91
     call TestPhysicalSpecial
     pop hl
     ld de,.PhiText
@@ -135522,6 +135537,8 @@ PrintMoveDetailsBox:
     db $D7,"@"
 .SpcText
     db $D8,"@"
+.HyperBeamExceptionText
+    db "?@"
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -135863,12 +135880,14 @@ DecrementEnemyPP_:
 ; ──────────────────────────────────────────────────────────────────────
 
 ; input hl = pointer to move id
+; input bc = pointer to mon id
 ; output b = table byte with mask, need to test zero
 TestPhysicalSpecial_:
     call Load16BitRegisters
-    push bc
     push de
     ld a,[hl] ; carico in a l'id dell'attacco
+    cp HYPER_BEAM
+    jr z,.hyperbeam
     srl a
     srl a
     srl a ; divido l'id dell'attacco per 8 per individuare il byte corretto nella tabella associativa (1 bit per attacco)
@@ -135888,10 +135907,26 @@ TestPhysicalSpecial_:
     add hl,de ; punto il byte corretto
     ld a,[hl] ; leggo il byte corretto
     and b ; applico la maschera per isolare il bit corretto,il bit viene così testato
+.end
     pop de
-    pop bc
     ld b,a
     ret
+.hyperbeam
+    ld a,[bc]
+    ld [$D0B5],a
+    call GetMonHeader
+    ld a,[W_MONHBASESPECIAL]
+    ld b,a
+    ld a,[W_MONHBASEATTACK] ; b = special | a = attack
+    cp b
+    jr c,.special
+.phisical
+    xor a
+    jr .end
+.special
+    ld a,1
+    and a
+    jr .end
 ; tabella associativa attacco/tipologia di danno
 .AttackTypeTable
 db %00000000    ; Zero,Pound,Karate Chop*,Double Slap,Comet Punch,Mega Punch,Pay Day,Fire Punch
@@ -135901,7 +135936,7 @@ db %00000000    ; Double Kick,Mega Kick,Jump Kick,Rolling Kick,Sand Attack*,Head
 db %00000000    ; Horn Drill,Tackle,Body Slam,Wrap,Take Down,Thrash,Double-Edge,Tail Whip
 db %00100000    ; Poison Sting,Twineedle,Pin Missile,Leer,Bite*,Growl,Roar,Sing
 db %01010101    ; Supersonic,Sonic Boom,Disable,Acid,Ember,Flamethrower,Mist,Water Gun
-db %11111111    ; Hydro Pump,Surf,Ice Beam,Blizzard,Psybeam,Bubble Beam,Aurora Beam,Hyper Beam
+db %11111110    ; Hydro Pump,Surf,Ice Beam,Blizzard,Psybeam,Bubble Beam,Aurora Beam,Hyper Beam
 db %00000001    ; Peck,Drill Peck,Submission,Low Kick,Counter,Seismic Toss,Strength,Absorb
 db %10001000    ; Mega Drain,Leech Seed,Growth,Razor Leaf,Solar Beam,Poison Powder,Stun Spore,Sleep Powder
 db %10111101    ; Petal Dance,String Shot,Dragon Rage,Fire Spin,Thunder Shock,Thunderbolt,Thunder Wave,Thunder
@@ -136529,6 +136564,7 @@ HandleStatusScreen2:
     ; Print Phi/Spc Symbols
     push hl
     ld hl,W_PLAYERMOVENUM
+    ld bc,$cf91
     call TestPhysicalSpecial
     pop hl
     ld de,.PhiText

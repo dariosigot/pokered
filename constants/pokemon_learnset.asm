@@ -527,6 +527,7 @@ NIDOQUEEN_Learnset: MACRO
     db 53,ROCK_SLIDE
     db 57,TOXIC
     db 60,FISSURE
+    db 65,HYPER_BEAM
 ENDM
 NIDORAN_F_NoEvo_Learnset: MACRO
     db 21,DOUBLE_TEAM ; Exclusive
@@ -580,6 +581,7 @@ NIDOKING_Learnset: MACRO
     db 53,ROCK_SLIDE
     db 57,TOXIC
     db 60,FISSURE
+    db 65,HYPER_BEAM
 ENDM
 NIDORAN_M_NoEvo_Learnset: MACRO
     db 21,DOUBLE_TEAM ; Exclusive
@@ -1285,6 +1287,7 @@ TENTACRUEL_Learnset: MACRO
     db 55,BODY_SLAM
     db 58,TOXIC
     db 60,SWORDS_DANCE
+    db 65,HYPER_BEAM
 ENDM
 TENTACOOL_NoEvo_Learnset: MACRO
     db 33,VINE_WHIP ; Exclusive
@@ -1923,6 +1926,7 @@ MAROWAK_Learnset: MACRO
     db 55,SWORDS_DANCE
     db 57,FISSURE
     db 60,CRABHAMMER
+    db 65,HYPER_BEAM
 ENDM
 CUBONE_NoEvo_Learnset: MACRO
     db 30,MEDITATE ; Exclusive
@@ -2216,8 +2220,8 @@ SEADRA_Learnset: MACRO
     db 43,TSUNAMI
     db 47,ICE_BEAM
     db 51,HYDRO_PUMP
-    db 56,TOXIC
-    db 60,HYPER_BEAM
+    db 56,HYPER_BEAM
+    db 60,TOXIC
 ENDM
 HORSEA_NoEvo_Learnset: MACRO
     db 36,DOUBLE_TEAM ; Exclusive
