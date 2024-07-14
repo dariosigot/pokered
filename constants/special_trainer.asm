@@ -150,7 +150,7 @@ Giovanni2Move:
 
 Giovanni3Move:
     ; Persian (Level 53)
-    db GLARE
+    db LOVELY_KISS
     db TRAPHOLE
     db REST
     db HYPER_BEAM
@@ -178,7 +178,7 @@ Giovanni3Move:
 
 LoreleiMove:
     ; Dewgong (Level 54)
-    db TSUNAMI
+    db WATERFALL
     db BODY_SLAM
     db REST
     db ICE_BEAM
@@ -188,35 +188,35 @@ LoreleiMove:
     db CLAMP
     db SPIKE_CANNON
     ; Slowbro (Level 54)
-    db WITHDRAW
+    db TSUNAMI
     db ICE_BEAM
     db AMNESIA
     db PSYCHIC_M
     ; Blastoise (55)
     db COUNTER
     db HYDRO_PUMP
-    db EARTHQUAKE
+    db DIZZY_PUNCH
     db ICE_BEAM
     ; Jynx (Level 56)
-    db ICE_BEAM
+    db REFLECT
     db LOVELY_KISS
     db BLIZZARD
     db PSYCHIC_M
     ; Lapras (Level 56)
     db THUNDERBOLT
     db REST
-    db BODY_SLAM
+    db CRABHAMMER
     db BLIZZARD
     db 0
 
 BrunoMove:
     ; Primeape (Level 53)
-    db SUBMISSION
+    db JUMP_KICK
     db SCREECH
     db SEISMIC_TOSS
     db ROCK_SLIDE
     ; Hitmonchan (Level 55)
-    db SUBMISSION
+    db MEGA_PUNCH
     db BODY_SLAM
     db AGILITY
     db ICE_PUNCH
@@ -232,11 +232,11 @@ BrunoMove:
     db EARTHQUAKE
     ; Pinsir (Level 57)
     db SUBMISSION
-    db SLASH
+    db CRABHAMMER
     db SWORDS_DANCE
     db TWINEEDLE
     ; Machamp (Level 58)
-    db LOW_KICK
+    db HI_JUMP_KICK
     db EARTHQUAKE
     db BODY_SLAM
     db COUNTER
@@ -265,7 +265,7 @@ AgathaMove:
     db TOXIC
     ; Hypno (Level 58)
     db HYPNOSIS
-    db POISON_GAS
+    db RECOVER
     db PSYCHIC_M
     db NIGHT_SHADE
     ; Gengar (Level 60)
@@ -325,13 +325,13 @@ Sony2Move7:
     db SLEEP_POWDER
     db PSYBEAM
     ; Alakazam (Level 35)
-    db CONFUSION
+    db GLARE
     db KINESIS
     db PSYBEAM
     db RECOVER
     ; Rhyhorn (Level 38)
     db BODY_SLAM
-    db ROCK_THROW
+    db ROCK_SLIDE
     db TRAPHOLE
     db THRASH
     ; Blastoise (Level 40)
@@ -356,15 +356,15 @@ Sony2Move8:
     db HYPER_FANG
     db DOUBLE_KICK
     db AGILITY
-    db EMBER
+    db FLAMETHROWER
     ; Alakazam (Level 35)
-    db CONFUSION
+    db GLARE
     db KINESIS
     db PSYBEAM
     db RECOVER
     ; Rhyhorn (Level 38)
     db BODY_SLAM
-    db ROCK_THROW
+    db ROCK_SLIDE
     db TRAPHOLE
     db THRASH
     ; Venusaur (Level 40)
@@ -391,13 +391,13 @@ Sony2Move9:
     db AURORA_BEAM
     db MIST
     ; Alakazam (Level 35)
-    db CONFUSION
+    db GLARE
     db KINESIS
     db PSYBEAM
     db RECOVER
     ; Rhyhorn (Level 38)
     db BODY_SLAM
-    db ROCK_THROW
+    db ROCK_SLIDE
     db TRAPHOLE
     db THRASH
     ; Charizard (Level 40)
@@ -412,14 +412,14 @@ Sony2MoveA:
     db SWOOP
     db AGILITY
     db MIRROR_MOVE
-    db QUICK_ATTACK
+    db DRILL_PECK
     ; Rhydon (Level 45)
     db DOUBLE_KICK
     db EARTHQUAKE
     db SUBSTITUTE
     db BODY_SLAM
     ; Arcanine (Level 45)
-    db HYPER_FANG
+    db SUPER_FANG
     db AGILITY
     db FIRE_SPIN
     db FLAMETHROWER
@@ -432,10 +432,10 @@ Sony2MoveA:
     db RECOVER
     db PSYCHIC_M
     db REFLECT
-    db THUNDER_WAVE
+    db GLARE
     ; Blastoise (Level 53)
     db TSUNAMI
-    db BODY_SLAM
+    db DIZZY_PUNCH
     db EARTHQUAKE
     db HYDRO_PUMP
     db 0
@@ -445,7 +445,7 @@ Sony2MoveB:
     db SWOOP
     db AGILITY
     db MIRROR_MOVE
-    db QUICK_ATTACK
+    db DRILL_PECK
     ; Rhydon (Level 45)
     db DOUBLE_KICK
     db EARTHQUAKE
@@ -457,7 +457,7 @@ Sony2MoveB:
     db SELFDESTRUCT
     db ICE_BEAM
     ; Arcanine (Level 47)
-    db HYPER_FANG
+    db SUPER_FANG
     db AGILITY
     db FIRE_SPIN
     db FLAMETHROWER
@@ -465,7 +465,7 @@ Sony2MoveB:
     db RECOVER
     db PSYCHIC_M
     db REFLECT
-    db THUNDER_WAVE
+    db GLARE
     ; Venusaur (Level 53)
     db RAZOR_LEAF
     db SLUDGE
@@ -478,7 +478,7 @@ Sony2MoveC:
     db SWOOP
     db AGILITY
     db MIRROR_MOVE
-    db QUICK_ATTACK
+    db DRILL_PECK
     ; Rhydon (Level 45)
     db DOUBLE_KICK
     db EARTHQUAKE
@@ -498,7 +498,7 @@ Sony2MoveC:
     db RECOVER
     db PSYCHIC_M
     db REFLECT
-    db THUNDER_WAVE
+    db GLARE
     ; Charizard (Level 53)
     db SLASH
     db EARTHQUAKE
@@ -510,18 +510,18 @@ Sony3Move1:
     ; Pidgeot (Level 61)
     db DRILL_PECK
     db AGILITY
-    db DOUBLE_EDGE
+    db EGG_BOMB
     db SKY_ATTACK
     ; Alakazam (Level 59)
     db RECOVER
     db PSYCHIC_M
     db REFLECT
-    db THUNDER_WAVE
+    db GLARE
     ; Rhydon (Level 61)
     db ROCK_SLIDE
     db EARTHQUAKE
     db SUBSTITUTE
-    db BODY_SLAM
+    db DIZZY_PUNCH
     ; Arcanine (Level 61)
     db BODY_SLAM
     db AGILITY
@@ -529,12 +529,12 @@ Sony3Move1:
     db FIRE_BLAST
     ; Exeggutor (Level 63)
     db SLEEP_POWDER
-    db MEGA_DRAIN
+    db RAZOR_LEAF
     db PSYCHIC_M
     db EXPLOSION
     ; Blastoise (Level 65)
     db ICE_BEAM
-    db BODY_SLAM
+    db CRABHAMMER
     db EARTHQUAKE
     db HYDRO_PUMP
     db 0
@@ -543,20 +543,20 @@ Sony3Move2:
     ; Pidgeot (Level 61)
     db DRILL_PECK
     db AGILITY
-    db DOUBLE_EDGE
+    db EGG_BOMB
     db SKY_ATTACK
     ; Alakazam (Level 59)
     db RECOVER
     db PSYCHIC_M
     db REFLECT
-    db THUNDER_WAVE
+    db GLARE
     ; Rhydon (Level 61)
     db ROCK_SLIDE
     db EARTHQUAKE
     db SUBSTITUTE
-    db BODY_SLAM
+    db DIZZY_PUNCH
     ; Cloyster (Level 61)
-    db CLAMP
+    db CRABHAMMER
     db REST
     db EXPLOSION
     db BLIZZARD
@@ -576,25 +576,25 @@ Sony3Move3:
     ; Pidgeot (Level 61)
     db DRILL_PECK
     db AGILITY
-    db DOUBLE_EDGE
+    db EGG_BOMB
     db SKY_ATTACK
     ; Alakazam (Level 59)
     db RECOVER
     db PSYCHIC_M
     db REFLECT
-    db THUNDER_WAVE
+    db GLARE
     ; Rhydon (Level 61)
     db ROCK_SLIDE
     db EARTHQUAKE
     db SUBSTITUTE
-    db BODY_SLAM
+    db DIZZY_PUNCH
     ; Exeggutor (Level 61)
     db SLEEP_POWDER
-    db MEGA_DRAIN
+    db RAZOR_LEAF
     db PSYCHIC_M
     db EXPLOSION
     ; Cloyster (Level 63)
-    db CLAMP
+    db CRABHAMMER
     db REST
     db EXPLOSION
     db BLIZZARD
@@ -609,11 +609,11 @@ CooltrainerFMove2:
     ; Victreebel (Level 44)
     db RAZOR_LEAF
     db SLUDGE
-    db SLEEP_POWDER
-    db WRAP
+    db SPORE
+    db BIND
     ; Wigglytuff (Level 43)
     db BODY_SLAM
-    db REST
+    db SOFTBOILED
     db SING
     db HYPER_BEAM
     ; Venomoth (Level 45)
@@ -630,10 +630,10 @@ CooltrainerFMove2:
     db FIRE_PUNCH
     db ICE_PUNCH
     db THUNDERPUNCH
-    db SUBMISSION
+    db MEGA_PUNCH
     ; Pinsir (Level 45)
     db GUILLOTINE
-    db SLASH
+    db DIZZY_PUNCH
     db SWORDS_DANCE
     db TWINEEDLE
     db 0
@@ -642,7 +642,7 @@ CooltrainerFMove3:
     ; Vileplume (Level 44)
     db RAZOR_LEAF
     db SLUDGE
-    db SLEEP_POWDER
+    db SPORE
     db STUN_SPORE
     ; Dewgong (Level 43)
     db BODY_SLAM
@@ -683,22 +683,22 @@ CooltrainerFMove4:
     db FLAMETHROWER
     db FIRE_SPIN
     ; Seadra (Level 43)
-    db CONFUSION
+    db DRAGON_RAGE
     db AGILITY
     db TSUNAMI
     db AURORA_BEAM
     ; Butterfree (Level 44)
-    db SLEEP_POWDER
+    db STUN_SPORE
     db LEECH_LIFE
     db PSYCHIC_M
     db SPORE
     ; Electrode (Level 40)
-    db SWIFT
+    db BODY_SLAM
     db LIGHT_SCREEN
     db THUNDERBOLT
     db EXPLOSION
     ; Nidoqueen (Level 45)
-    db BODY_SLAM
+    db DIZZY_PUNCH
     db BLIZZARD
     db SLUDGE
     db EARTHQUAKE
@@ -726,12 +726,12 @@ CooltrainerMMove2:
     db MIRROR_MOVE
     db HYPER_BEAM
     ; Clefable (Level 43)
-    db SWIFT
+    db SOFTBOILED
     db MINIMIZE
     db BODY_SLAM
     db METRONOME
     ; Weezing (Level 45)
-    db THUNDERBOLT
+    db GLARE
     db SLUDGE
     db PSYBEAM
     db EXPLOSION
@@ -742,7 +742,7 @@ CooltrainerMMove3:
     ; Kadabra (Level 44)
     db RECOVER
     db PSYCHIC_M
-    db REFLECT
+    db HYPNOSIS
     db THUNDER_WAVE
     ; Tauros (Level 43)
     db BONE_CLUB
@@ -753,7 +753,7 @@ CooltrainerMMove3:
     db CRABHAMMER
     db SWORDS_DANCE
     db HYPER_BEAM
-    db STOMP
+    db WATERFALL
     ; Kabutops (Level 44)
     db AURORA_BEAM
     db REST
@@ -763,9 +763,9 @@ CooltrainerMMove3:
     db SEISMIC_TOSS
     db COUNTER
     db HI_JUMP_KICK
-    db SUBMISSION
+    db MEGA_KICK
     ; Gyarados (Level 45)
-    db HYPER_FANG
+    db ICE_BEAM
     db BODY_SLAM
     db HYDRO_PUMP
     db HYPER_BEAM
@@ -773,13 +773,13 @@ CooltrainerMMove3:
 
 CooltrainerMMove4:
     ; Magneton (Level 42)
-    db SWIFT
+    db TRI_ATTACK
     db CONVERSION
     db THUNDER_WAVE
     db THUNDER
     ; Dugtrio (Level 41)
     db SLASH
-    db TRAPHOLE
+    db EARTHQUAKE
     db ROCK_THROW
     db FISSURE
     ; Golduck (Level 43)
@@ -794,36 +794,36 @@ CooltrainerMMove4:
     db TWINEEDLE
     ; Raticate (Level 44)
     db DOUBLE_TEAM
-    db QUICK_ATTACK
+    db THUNDERBOLT
     db HYPER_FANG
     db SUPER_FANG
     ; Nidoking (Level 45)
-    db BODY_SLAM
+    db DIZZY_PUNCH
     db SLUDGE
     db EARTHQUAKE
-    db THUNDERBOLT
+    db THUNDER
     db 0
 
 BlackBeltMove9:
     ; Machoke (Level 43)
-    db LOW_KICK
+    db TRAPHOLE
     db JUMP_KICK
     db SEISMIC_TOSS
     db BODY_SLAM
     ; Graveler (Level 45)
-    db ROCK_THROW
+    db ROCK_SLIDE
     db BODY_SLAM
     db EARTHQUAKE
     db EXPLOSION
     ; Parasect (Level 42)
     db SLASH
     db TWINEEDLE
-    db MEGA_DRAIN
+    db BARRAGE
     db SPORE
     ; Snorlax (Level 42)
     db HYPER_BEAM
     db AMNESIA
-    db TSUNAMI
+    db EARTHQUAKE
     db BODY_SLAM
     ; Golbat (Level 44)
     db SWOOP
@@ -846,18 +846,18 @@ JugglerMove2:
     ; Tentacruel (Level 43)
     db REST
     db ICE_BEAM
-    db TSUNAMI
+    db WATERFALL
     db SLUDGE
     ; Raichu (Level 42)
     db THUNDERBOLT
     db THUNDER_WAVE
     db THUNDER
-    db SUBMISSION
+    db HYPER_FANG
     ; Dodrio (Level 44)
     db DRILL_PECK
     db AGILITY
     db HYPER_BEAM
-    db DOUBLE_TEAM
+    db ROLLING_KICK
     ; Rhyhorn (Level 41)
     db THUNDERBOLT
     db SUBSTITUTE
@@ -884,22 +884,22 @@ JugglerMove5:
     ; Pidgeot (Level 44)
     db REFLECT
     db AGILITY
-    db SWOOP
+    db DRILL_PECK
     db HYPER_BEAM
     ; Marowak (Level 41)
     db SWORDS_DANCE
     db BLIZZARD
-    db ROCK_SLIDE
+    db EARTHQUAKE
     db BONEMERANG
     ; Primeape (Level 42)
-    db LOW_KICK
+    db JUMP_KICK
     db TRAPHOLE
     db SEISMIC_TOSS
     db SUBMISSION
     ; Tangela (Level 43)
     db LEECH_SEED
     db SLEEP_POWDER
-    db WRAP
+    db BIND
     db SOLARBEAM
     db 0
 
@@ -939,8 +939,8 @@ TamerMove5:
 PokemaniacMove6:
     ; Porygon (Level 45)
     db RECOVER
-    db THUNDER_WAVE
-    db REFLECT
+    db HYPNOSIS
+    db LIGHT_SCREEN
     db PSYCHIC_M
     ; Lapras (Level 43)
     db THUNDER
@@ -955,7 +955,7 @@ PokemaniacMove6:
     ; Lickitung (Level 45)
     db EARTHQUAKE
     db BODY_SLAM
-    db TSUNAMI
+    db SOFTBOILED
     db SWORDS_DANCE
     ; Haunter (Level 42)
     db HYPNOSIS
@@ -963,7 +963,7 @@ PokemaniacMove6:
     db PSYCHIC_M
     db THUNDERBOLT
     ; Farfetch'd (Level 44)
-    db TOXIC
+    db BLADE
     db SWORDS_DANCE
     db SLASH
     db SWOOP
@@ -971,13 +971,13 @@ PokemaniacMove6:
 
 ChannelerMove14:
     ; Gastly (Level 35)
-    db LEECH_LIFE
+    db ABSORB
     db LICK
     db POISON_GAS
-    db SMOG
+    db NIGHT_SHADE
     ; Haunter (Level 35)
     db MEGA_DRAIN
-    db POISON_GAS
+    db SMOG
     db CONFUSION
     db NIGHT_SHADE
     db 0

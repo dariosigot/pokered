@@ -2339,7 +2339,7 @@ MR_MIME_Learnset: MACRO
     db 36,MIMIC
     db 39,REFLECT
     db 42,PSYCHIC_M
-    db 46,MIRROR_MOVE
+    db 45,MIRROR_MOVE
     db 48,SEISMIC_TOSS
     db 50,HYPNOSIS
     db 55,DOUBLE_TEAM
