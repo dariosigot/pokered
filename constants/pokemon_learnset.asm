@@ -1474,12 +1474,13 @@ FARFETCH_D_Learnset: MACRO
     db 20,QUICK_ATTACK
     db 23,SWORDS_DANCE
     db 26,WING_ATTACK
-    db 29,DOUBLE_TEAM
+    db 29,SWOOP
     db 32,AGILITY
     db 35,RAZOR_WIND
     db 39,SLASH
-    db 43,SWOOP
-    db 46,MIRROR_MOVE
+    db 43,DOUBLE_TEAM
+    db 45,MIRROR_MOVE
+    db 47,DRILL_PECK
     db 49,MIMIC
     db 53,DOUBLE_EDGE
     db 56,EGG_BOMB
