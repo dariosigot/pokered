@@ -1011,8 +1011,8 @@ ChannelerMove16:
 PokemaniacMove8:
     ; Muk (Level 50)
     db ACID_ARMOR
-    db HARDEN
-    db DEFENSE_CURL
+    db ACID_ARMOR
+    db ACID_ARMOR
     db WRAP
     ; Gengar (Level 70)
     db ACID_ARMOR

@@ -109360,7 +109360,7 @@ AnimationSlideMonDownAndHide: ; 795c9 (1e:55c9)
 ; Slides the mon's sprite down and disappears. Used in Acid Armor.
     ld a,$1
     ld c,$2
-.asm_795cd
+.loop
     push bc
     push af
     call AnimationHideMonPic
@@ -109375,13 +109375,14 @@ AnimationSlideMonDownAndHide: ; 795c9 (1e:55c9)
     inc a
     pop bc
     dec c
-    jr nz,.asm_795cd
+    jr nz,.loop
     call AnimationHideMonPic
-    ld hl,$c6e8
-    ld bc,$0310
-    xor a
-    call FillMemory
-    jp Func_79652
+    ld c,30
+    call DelayFrames
+    call AnimationSlideMonUp
+	jp AnimationShowMonPic
+
+SECTION "Func_795f8",ROMX[$55f8],BANK[$1e]
 
 Func_795f8: ; 795f8 (1e:55f8)
     ld a,[H_WHOSETURN] ; $FF00+$f3
