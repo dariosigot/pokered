@@ -1269,7 +1269,7 @@ HandleBlackOut: ; 0931 (0:0931)
     ld a,$01
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
-    call Func_40b0
+    call ResetStatusAndHalveMoneyOnBlackout
     call Func_62ce
     call PlayDefaultMusicFadeOutCurrent
     jp Func_5d5f
@@ -10628,7 +10628,7 @@ SpriteOAMParametersFlipped: ; 40a4 (1:40a4)
     db $08,$08,OAMFLAG_VFLIPPED | OAMFLAG_CANBEMASKED
     db $08,$00,OAMFLAG_VFLIPPED | OAMFLAG_CANBEMASKED | OAMFLAG_ENDOFDATA
 
-Func_40b0: ; 40b0 (1:40b0)
+ResetStatusAndHalveMoneyOnBlackout: ; 40b0 (1:40b0)
     xor a
     ld [$cf0b],a
     ld [$d700],a
@@ -10638,31 +10638,31 @@ Func_40b0: ; 40b0 (1:40b0)
     ld [H_CURRENTPRESSEDBUTTONS],a
     ld [$cc57],a
     ld [wFlags_0xcd60],a
-    ld [$FF00+$9f],a
-    ld [$FF00+$a0],a
-    ld [$FF00+$a1],a
-    call HasEnoughMoney
-    jr c,.asm_40ff
-    ld a,[wPlayerMoney] ; $d347
-    ld [$FF00+$9f],a
-    ld a,[wPlayerMoney + 1] ; $d348
-    ld [$FF00+$a0],a
-    ld a,[wPlayerMoney + 2] ; $d349
-    ld [$FF00+$a1],a
-    xor a
-    ld [$FF00+$a2],a
-    ld [$FF00+$a3],a
-    ld a,$2
-    ld [$FF00+$a4],a
-    ld a,$d
-    call Predef ; indirect jump to Func_f71e (f71e (3:771e))
-    ld a,[$FF00+$a2]
-    ld [wPlayerMoney],a ; $d347
-    ld a,[$FF00+$a3]
-    ld [wPlayerMoney + 1],a ; $d348
-    ld a,[$FF00+$a4]
-    ld [wPlayerMoney + 2],a ; $d349
-.asm_40ff
+    ;ld [$FF00+$9f],a
+    ;ld [$FF00+$a0],a
+    ;ld [$FF00+$a1],a
+    ;call HasEnoughMoney
+    ;jr c,.asm_40ff
+    ;ld a,[wPlayerMoney] ; $d347
+    ;ld [$FF00+$9f],a
+    ;ld a,[wPlayerMoney + 1] ; $d348
+    ;ld [$FF00+$a0],a
+    ;ld a,[wPlayerMoney + 2] ; $d349
+    ;ld [$FF00+$a1],a
+    ;xor a
+    ;ld [$FF00+$a2],a
+    ;ld [$FF00+$a3],a
+    ;ld a,$2
+    ;ld [$FF00+$a4],a
+    ;ld a,$d
+    ;call Predef ; indirect jump to Func_f71e (f71e (3:771e))
+    ;ld a,[$FF00+$a2]
+    ;ld [wPlayerMoney],a ; $d347
+    ;ld a,[$FF00+$a3]
+    ;ld [wPlayerMoney + 1],a ; $d348
+    ;ld a,[$FF00+$a4]
+    ;ld [wPlayerMoney + 2],a ; $d349
+;.asm_40ff
     ld hl,$d732
     set 2,[hl]
     res 3,[hl]
@@ -31841,13 +31841,13 @@ PrintLevelAndGender:
     add hl,de
     pop af
     jr c,.Genderless
-    push af
-    ld a,[$cfb9] ; .OutOfBattleLevel
-    cp 10
-    jr nc,.GreaterThen9
-    dec hl
-.GreaterThen9
-    pop af
+;    push af
+;    ld a,[$cfb9] ; .OutOfBattleLevel
+;    cp 10
+;    jr nc,.GreaterThen9
+;    dec hl
+;.GreaterThen9
+;    pop af
     ld de,.MaleIcon
     jr nz,.Male
     ld de,.FemaleIcon
@@ -34138,9 +34138,9 @@ ViridianCityScript1: ; 19062 (6:5062)
     ; set up battle for Old Man
     ld a,$1
     ld [W_BATTLETYPE],a
-    ld a,5
+    ld a,2
     ld [W_CURENEMYLVL],a
-    ld a,WEEDLE
+    ld a,PIDGEY
     ld [W_CUROPPONENT],a ; $d059
     ld a,$2
     ld [W_VIRIDIANCITYCURSCRIPT],a
@@ -131101,17 +131101,11 @@ _DrawCatchGender: ; Denim
     ld b,BANK(IsGhostBattle)
     call Bankswitch
     jr z,.Ghost ; No Gender,Pokedex or Debug If Ghost Battle
-    ld a,[W_ISINBATTLE] ; trainer battle,this is 2
-    dec a
-    dec a
-    jr z,.gender
     ld a,[W_ENEMYMONID]
     ld [$d11e],a
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     ld a,[$d11e]
-    ;and a
-    ;jr z,.gender ; MissingNo doesn't have catch flag
     ld hl,wPokedexOwned
     ;ds 1 ; dec a ; POKEDEXMOD
     ld c,a
@@ -131120,19 +131114,21 @@ _DrawCatchGender: ; Denim
     call Predef ; IsPokemonBitSet_bankF
     ld a,c
     and a
-    jr z,.gender
+    push af ; Backup Pokedex Flag Test
+    jr z,.SkipCatchFlagIcon
+    ld a,[W_ISINBATTLE] ; trainer battle,this is 2
+    dec a
+    dec a
+    jr z,.SkipCatchFlagIcon
     FuncCoord 1,1
     ld hl,Coord
     ld de,.PokeBallCatchFlagIcon
     call PlaceString
-.gender
+.SkipCatchFlagIcon
     ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
     call CheckShiny
     call SetTempIV
     jr nz,.NoShiny
-    ;ld a,[$d11e]
-    ;and a
-    ;jr z,.NoShiny ; MissingNo doesn't have shiny flag
     FuncCoord 1,1
     ld hl,Coord
     ld de,.ShinyStarIcon
@@ -131140,6 +131136,14 @@ _DrawCatchGender: ; Denim
 .NoShiny
     ld a,[W_ENEMYMONID]
     ld [$d11e],a
+    call .CheckMarowak
+    jr nz,.noMarowak
+    pop af ; Restore Pokedex Flag Test
+    jr .GetGender
+.noMarowak
+    pop af ; Restore Pokedex Flag Test
+    jr z,.Genderless
+.GetGender
     call GetGender
     jr c,.Genderless
     push af
@@ -131169,6 +131173,12 @@ _DrawCatchGender: ; Denim
     db $F5,$50
 .ShinyStarIcon
     db $D1,$50
+.CheckMarowak
+    cp MAROWAK
+    ret nz
+    call GetCurrentOldAdventureMap
+    cp POKEMONTOWER_6
+    ret
 
 _DrawCurrentMonGenderInBattle:
     ld hl,W_PLAYERMONIVS ; .BackSpriteInBattle
@@ -136810,8 +136820,8 @@ FillBlankArea:
 
 ItemInBattleFinalCheck:
     ld a,[W_BATTLETYPE] ; $d05a
-    cp $2
-    jr z,.safari
+    and a
+    jr nz,.safariOrOldMan
     ld a,[$d11c] ; checkIfMonCaptured
     and a
     push af
@@ -136835,7 +136845,7 @@ ItemInBattleFinalCheck:
     ld [$cf0b],a
     scf
     ret
-.safari
+.safariOrOldMan
     call LoadScreenTilesFromBuffer1
     call GBPalNormal
     ld a,[$d11c] ; checkIfMonCaptured
