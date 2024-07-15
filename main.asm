@@ -52235,23 +52235,113 @@ CheckTrappingMoveAndLoadEnemyMonNumber:
 SECTION "bankF",ROMX,BANK[$F]
 
 ; These are move effects (second value from the Moves table in bank $E).
-EffectsArray1: ; 3c000 (f:4000)
-    db $18,$19,$1C,$2E,$2F,$31,$38,$39,$40,$41,$42,$43,$4F,$52,$54,$55,$FF
-EffectsArray2: ; 3c011 (f:4011)
+
+; ResidualEffects1
+EffectsArray1:
+; most non-side effects
+	db CONVERSION_EFFECT
+	db HAZE_EFFECT
+	db SWITCH_AND_TELEPORT_EFFECT
+	db MIST_EFFECT
+	db FOCUS_ENERGY_EFFECT
+	db CONFUSION_EFFECT
+	db HEAL_EFFECT
+	db TRANSFORM_EFFECT
+	db LIGHT_SCREEN_EFFECT
+	db REFLECT_EFFECT
+	db POISON_EFFECT
+	db PARALYZE_EFFECT
+	db SUBSTITUTE_EFFECT
+	db MIMIC_EFFECT
+	db LEECH_SEED_EFFECT
+	db SPLASH_EFFECT
+    db $FF
+
+; SetDamageEffects
+EffectsArray2:
 ; moves that do damage but not through normal calculations
-; e.g.,Super Fang,Psywave
-    db $28,$29,$FF
-EffectsArray3: ; 3c014 (f:4014)
-; non-damaging,stat‐affecting or status‐causing moves?
-; e.g.,Meditate,Bide,Hypnosis
-    db $01,$0A,$0B,$0C,$0D,$0E,$0F,$12,$13,$14,$15,$16,$17,$1A,$20,$32,$33,$34,$35,$36,$37,$3A,$3B,$3C,$3D,$3E,$3F,$FF
-EffectsArray4: ; 3c030 (f:4030)
-    db $03,$07,$08,$10,$1D,$1E,$2C,$30,$4D,$51,$FF
-EffectsArray5: ; 3c03b (f:403b)
-    db $03,$07,$08,$10,$11,$1D,$1E,$27,$28,$29,$2B,$2C,$2D,$30 ; fallthru
-EffectsArray5B: ; 3c049 (f:4049)
-; moves that prevent the player from switching moves?
-    db $1B,$2A,$FF
+; e.g., Super Fang, Psywave
+	db SUPER_FANG_EFFECT
+	db SPECIAL_DAMAGE_EFFECT
+    db $FF
+
+; ResidualEffects2
+EffectsArray3:
+; non-side effects not included in ResidualEffects1
+; stat-affecting moves, sleep-inflicting moves, and Bide
+; e.g., Meditate, Bide, Hypnosis
+	db $01
+	db ATTACK_UP1_EFFECT
+	db DEFENSE_UP1_EFFECT
+	db SPEED_UP1_EFFECT
+	db SPECIAL_UP1_EFFECT
+	db ACCURACY_UP1_EFFECT
+	db EVASION_UP1_EFFECT
+	db ATTACK_DOWN1_EFFECT
+	db DEFENSE_DOWN1_EFFECT
+	db SPEED_DOWN1_EFFECT
+	db SPECIAL_DOWN1_EFFECT
+	db ACCURACY_DOWN1_EFFECT
+	db EVASION_DOWN1_EFFECT
+	db BIDE_EFFECT
+	db SLEEP_EFFECT
+	db ATTACK_UP2_EFFECT
+	db DEFENSE_UP2_EFFECT
+	db SPEED_UP2_EFFECT
+	db SPECIAL_UP2_EFFECT
+	db ACCURACY_UP2_EFFECT
+	db EVASION_UP2_EFFECT
+	db ATTACK_DOWN2_EFFECT
+	db DEFENSE_DOWN2_EFFECT
+	db SPEED_DOWN2_EFFECT
+	db SPECIAL_DOWN2_EFFECT
+	db ACCURACY_DOWN2_EFFECT
+	db EVASION_DOWN2_EFFECT
+    db $FF
+
+; AlwaysHappenSideEffects
+EffectsArray4:
+; Attacks that aren't finished after they faint the opponent.
+	db DRAIN_HP_EFFECT
+	db EXPLODE_EFFECT
+	db DREAM_EATER_EFFECT
+	db PAY_DAY_EFFECT
+	db TWO_TO_FIVE_ATTACKS_EFFECT
+	db ATTACK_TWICE_EFFECT
+	db RECOIL_EFFECT
+	db TWINEEDLE_EFFECT
+	db RAGE_EFFECT
+    db HYPER_BEAM_EFFECT
+    db $FF
+
+; SpecialEffects
+EffectsArray5:
+; Effects from arrays 2, 4, and 5B, minus Twineedle and Rage.
+; Includes all effects that do not need to be called at the end of
+; ExecutePlayerMove (or ExecuteEnemyMove), because they have already been handled
+	db DRAIN_HP_EFFECT
+	db EXPLODE_EFFECT
+	db DREAM_EATER_EFFECT
+	db PAY_DAY_EFFECT
+	db SWIFT_EFFECT
+	db TWO_TO_FIVE_ATTACKS_EFFECT
+	db CHARGE_EFFECT
+	db SUPER_FANG_EFFECT
+	db SPECIAL_DAMAGE_EFFECT
+	db FLY_EFFECT
+	db ATTACK_TWICE_EFFECT
+	db JUMP_KICK_EFFECT
+	db RECOIL_EFFECT
+    ; fallthru
+
+; SpecialEffectsCont
+EffectsArray5B:
+; damaging moves whose effect is executed prior to damage calculation
+	db THRASH_PETAL_DANCE_EFFECT
+	db TRAPPING_EFFECT
+    db $FF
+
+SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
 Func_3c04c: ; 3c04c (f:404c)
     call Func_3ec92
