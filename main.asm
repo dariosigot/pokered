@@ -31841,13 +31841,13 @@ PrintLevelAndGender:
     add hl,de
     pop af
     jr c,.Genderless
-    push af
-    ld a,[$cfb9] ; .OutOfBattleLevel
-    cp 10
-    jr nc,.GreaterThen9
-    dec hl
-.GreaterThen9
-    pop af
+;    push af
+;    ld a,[$cfb9] ; .OutOfBattleLevel
+;    cp 10
+;    jr nc,.GreaterThen9
+;    dec hl
+;.GreaterThen9
+;    pop af
     ld de,.MaleIcon
     jr nz,.Male
     ld de,.FemaleIcon
