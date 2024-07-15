@@ -30546,7 +30546,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db FIRE_BLAST   ; TM_38
     db SWIFT        ; TM_39
     db SKULL_BASH   ; TM_40
-    db STRUGGLE     ; TM_41
+    db LIGHT_SCREEN ; TM_41
     db DREAM_EATER  ; TM_42
     db SKY_ATTACK   ; TM_43
     db REST         ; TM_44
@@ -41530,7 +41530,7 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
     db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,OPP_LVL_OFFSET+55 ; Entry Level (Over)
     db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
-    db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,HP_UP ; item
+    db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,TM_41 ; item
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
     db SPRITE_BALL,$20 + 4,$1a + 4,$ff,$ff,$8d,TM_25 ; item
     db SPRITE_BALL,$20 + 4,$14 + 4,$ff,$ff,$8e,TM_55 ; item ; FLASH
@@ -83974,7 +83974,7 @@ CheckReachLevelLimit:
 
 ; Celadon Dept. Store 2F (2)
 CeladonMart2Text2:
-    db $FE,12
+    db $FE,13
     db TM_01 ; MEGA_PUNCH
     db TM_02 ; RAZOR_WIND
     db TM_04 ; WHIRLWIND
@@ -83987,6 +83987,7 @@ CeladonMart2Text2:
     db TM_30 ; TELEPORT
     db TM_32 ; DOUBLE_TEAM
     db TM_33 ; REFLECT
+    db TM_41 ; LIGHT_SCREEN
     db $FF
 
 Route21ScriptPointers: ; Moved in the Bank
@@ -131795,7 +131796,7 @@ ItemNames:
     db "TM38:FIR.BLS@" ; $EC ; TM_38
     db "TM39:SWIFT@"   ; $ED ; TM_39
     db "TM40:SKUL B.@" ; $EE ; TM_40
-    db "TM41:STRGGLE@" ; $EF ; TM_41
+    db "TM41:LGT SCR@" ; $EF ; TM_41
     db "TM42:DRM EAT@" ; $F0 ; TM_42
     db "TM43:SKY ATK@" ; $F1 ; TM_43
     db "TM44:REST@"    ; $F2 ; TM_44

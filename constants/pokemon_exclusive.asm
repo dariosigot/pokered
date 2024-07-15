@@ -18,6 +18,7 @@ VenusaurExclusiveMove:
     db MIMIC ; TM31
     db REFLECT ; TM33
     db BIDE ; TM34
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
@@ -54,6 +55,7 @@ CharizardExclusiveMove:
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db SKY_ATTACK ; TM43
     db REST ; TM44
     db ROCK_SLIDE ; TM48
@@ -89,6 +91,7 @@ BlastoiseExclusiveMove:
     db REFLECT ; TM33
     db BIDE ; TM34
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
@@ -116,6 +119,7 @@ ButterfreeExclusiveMove:
     db BIDE ; TM34
     db SELFDESTRUCT ; TM36
     db SWIFT ; TM39
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db SKY_ATTACK ; TM43
     db REST ; TM44
@@ -238,6 +242,7 @@ ArbokExclusiveMove:
     db DOUBLE_TEAM ; TM32
     db BIDE ; TM34
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
@@ -265,6 +270,7 @@ RaichuExclusiveMove:
     db BIDE ; TM34
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db FLASH ; TM55
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -371,6 +377,7 @@ WigglytuffExclusiveMove:
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -399,6 +406,7 @@ NinetalesExclusiveMove:
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db SUBSTITUTE ; TM50
@@ -445,6 +453,7 @@ VictreebelExclusiveMove:
     db REFLECT ; TM33
     db BIDE ; TM34
     db SWIFT ; TM39
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
@@ -470,6 +479,7 @@ ParasectExclusiveMove:
     db MIMIC ; TM31
     db REFLECT ; TM33
     db BIDE ; TM34
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
@@ -492,6 +502,7 @@ VenomothExclusiveMove:
     db REFLECT ; TM33
     db BIDE ; TM34
     db SWIFT ; TM39
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db PSYWAVE ; TM46
@@ -537,6 +548,7 @@ PersianExclusiveMove:
     db BIDE ; TM34
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -568,6 +580,7 @@ GolduckExclusiveMove:
     db BIDE ; TM34
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db PSYWAVE ; TM46
     db TRI_ATTACK ; TM49
@@ -687,6 +700,7 @@ AlakazamExclusiveMove:
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db FLASH ; TM55
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -743,6 +757,7 @@ TentacruelExclusiveMove:
     db BIDE ; TM34
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
@@ -797,6 +812,7 @@ RapidashExclusiveMove:
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db 0
@@ -828,6 +844,7 @@ SlowbroExclusiveMove:
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -856,6 +873,7 @@ ElectrodeExclusiveMove:
     db BIDE ; TM34
     db SELFDESTRUCT ; TM36
     db SWIFT ; TM39
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db THUNDER_WAVE ; TM45
     db EXPLOSION ; TM47
@@ -960,6 +978,7 @@ CloysterExclusiveMove:
     db BIDE ; TM34
     db SELFDESTRUCT ; TM36
     db SWIFT ; TM39
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db EXPLOSION ; TM47
     db TRI_ATTACK ; TM49
@@ -1006,6 +1025,7 @@ OnixExclusiveMove:
     db BIDE ; TM34
     db SELFDESTRUCT ; TM36
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db EXPLOSION ; TM47
     db ROCK_SLIDE ; TM48
@@ -1033,6 +1053,7 @@ HypnoExclusiveMove:
     db BIDE ; TM34
     db METRONOME ; TM35
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -1082,6 +1103,7 @@ ExeggutorExclusiveMove:
     db REFLECT ; TM33
     db BIDE ; TM34
     db SELFDESTRUCT ; TM36
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db PSYWAVE ; TM46
@@ -1179,6 +1201,7 @@ LickitungExclusiveMove:
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db ROCK_SLIDE ; TM48
@@ -1269,6 +1292,7 @@ ChanseyExclusiveMove:
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -1293,6 +1317,7 @@ TangelaExclusiveMove:
     db REFLECT ; TM33
     db BIDE ; TM34
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
@@ -1392,6 +1417,7 @@ StarmieExclusiveMove:
     db REFLECT ; TM33
     db BIDE ; TM34
     db SWIFT ; TM39
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -1420,6 +1446,7 @@ MrMimeExclusiveMove:
     db BIDE ; TM34
     db METRONOME ; TM35
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -1440,6 +1467,7 @@ ScytherExclusiveMove:
     db BIDE ; TM34
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db SKY_ATTACK ; TM43
     db REST ; TM44
     db SUBSTITUTE ; TM50
@@ -1469,6 +1497,7 @@ JynxExclusiveMove:
     db BIDE ; TM34
     db METRONOME ; TM35
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db PSYWAVE ; TM46
@@ -1495,6 +1524,7 @@ ElectabuzzExclusiveMove:
     db METRONOME ; TM35
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db THUNDER_WAVE ; TM45
     db PSYWAVE ; TM46
@@ -1522,6 +1552,7 @@ MagmarExclusiveMove:
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
@@ -1625,6 +1656,7 @@ LaprasExclusiveMove:
     db REFLECT ; TM33
     db BIDE ; TM34
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -1663,6 +1695,7 @@ FlareonExclusiveMove:
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db THUNDER_WAVE ; TM45
     db SUBSTITUTE ; TM50
@@ -1685,13 +1718,14 @@ PorygonExclusiveMove:
     db BIDE ; TM34
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
-    db FLASH ; TM55
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45
     db PSYWAVE ; TM46
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
+    db FLASH ; TM55
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OmanyteExclusiveMove:
@@ -1830,6 +1864,7 @@ ArticunoExclusiveMove:
     db REFLECT ; TM33
     db BIDE ; TM34
     db SWIFT ; TM39
+    db LIGHT_SCREEN ; TM41
     db SKY_ATTACK ; TM43
     db REST ; TM44
     db SUBSTITUTE ; TM50
@@ -1850,6 +1885,7 @@ ZapdosExclusiveMove:
     db REFLECT ; TM33
     db BIDE ; TM34
     db SWIFT ; TM39
+    db LIGHT_SCREEN ; TM41
     db SKY_ATTACK ; TM43
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -1872,6 +1908,7 @@ MoltresExclusiveMove:
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
+    db LIGHT_SCREEN ; TM41
     db SKY_ATTACK ; TM43
     db REST ; TM44
     db SUBSTITUTE ; TM50
@@ -1909,6 +1946,7 @@ DragoniteExclusiveMove:
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db SKY_ATTACK ; TM43
     db REST ; TM44
     db THUNDER_WAVE ; TM45
@@ -1923,7 +1961,6 @@ DragoniteExclusiveMove:
 MewtwoExclusiveMove:
     db MEGA_PUNCH ; TM01
     db MEGA_KICK ; TM05
-    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1952,6 +1989,7 @@ MewtwoExclusiveMove:
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
+    db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db THUNDER_WAVE ; TM45

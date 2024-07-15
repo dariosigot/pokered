@@ -113,7 +113,7 @@
     db WITHDRAW     , DEFENSE_UP2_EFFECT         ,   0 , IVORY    , 255 , 08 ; pp 30 ; - ; PP 40 -> 30 ; Defense 2x ; Type Water -> Ivory ; Ene 07 -> 08
     db DEFENSE_CURL , DEFENSE_UP1_EFFECT         ,   0 , RUBBER   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Type Normal -> Rubber
     db BARRIER      , DEFENSE_UP3_EFFECT         ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; - ; PP 30 -> 20 ; Defense 3x
-    db LIGHT_SCREEN , LIGHT_SCREEN_EFFECT        ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; - ; PP 30 -> 20
+    db LIGHT_SCREEN , LIGHT_SCREEN_EFFECT        ,   0 , ELECTRIC , 255 , 10 ; pp 20 ; - ; PP 30 -> 20
     db HAZE         , HAZE_EFFECT                ,   0 , ICE      , 255 , 07 ; pp 30 ; -
     db REFLECT      , REFLECT_EFFECT             ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; -
     db FOCUS_ENERGY , FOCUS_ENERGY_EFFECT        ,   0 , FIGHTING , 255 , 07 ; pp 30 ; - ; Type Normal -> Fighting
