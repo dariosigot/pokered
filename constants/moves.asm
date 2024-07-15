@@ -146,7 +146,7 @@
     db SKY_ATTACK   , CHARGE_EFFECT              , 140 , WIND     , 229 , 36 ; pp  5 ; 0 ; Ene 40 -> 36
     db TRANSFORM    , TRANSFORM_EFFECT           ,   0 , RUBBER   , 255 , 20 ; pp 10 ; - ; Type Normal -> Rubber
     db BUBBLE       , SPEED_DOWN_SIDE_EFFECT     ,  30 , WATER    , 255 , 06 ; pp 35 ; 1 ; Pwr 20 -> 30 ; PP 30 -> 35
-    db DIZZY_PUNCH  , NO_ADDITIONAL_EFFECT       ,  90 , IVORY    , 255 , 16 ; pp 10 ; 0 ; Type Normal -> Ivory ; Pwr 70 -> 90 ; PP 10 -> 15 ; Ene 14 -> 16
+    db DIZZY_PUNCH  , CONFUSION_SIDE_EFFECT      ,  90 , IVORY    , 255 , 16 ; pp 10 ; 0 ; Type Normal -> Ivory ; Pwr 70 -> 90 ; PP 10 -> 15 ; Ene 14 -> 16
     db SPORE        , SLEEP_EFFECT               ,   0 , GRASS    , 255 , 28 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 28
     db FLASH        , ACCURACY_DOWN1_EFFECT      ,   0 , ELECTRIC , 204 , 40 ; pp  5 ; - ; Type Normal -> Electric ; Acr 178 -> 204 ; PP 20 -> 5
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; Acr 204 -> 255 ; PP 15 -> 30
