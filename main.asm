@@ -131101,17 +131101,11 @@ _DrawCatchGender: ; Denim
     ld b,BANK(IsGhostBattle)
     call Bankswitch
     jr z,.Ghost ; No Gender,Pokedex or Debug If Ghost Battle
-    ld a,[W_ISINBATTLE] ; trainer battle,this is 2
-    dec a
-    dec a
-    jr z,.gender
     ld a,[W_ENEMYMONID]
     ld [$d11e],a
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     ld a,[$d11e]
-    ;and a
-    ;jr z,.gender ; MissingNo doesn't have catch flag
     ld hl,wPokedexOwned
     ;ds 1 ; dec a ; POKEDEXMOD
     ld c,a
@@ -131120,19 +131114,21 @@ _DrawCatchGender: ; Denim
     call Predef ; IsPokemonBitSet_bankF
     ld a,c
     and a
-    jr z,.gender
+    push af ; Backup Pokedex Flag Test
+    jr z,.SkipCatchFlagIcon
+    ld a,[W_ISINBATTLE] ; trainer battle,this is 2
+    dec a
+    dec a
+    jr z,.SkipCatchFlagIcon
     FuncCoord 1,1
     ld hl,Coord
     ld de,.PokeBallCatchFlagIcon
     call PlaceString
-.gender
+.SkipCatchFlagIcon
     ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
     call CheckShiny
     call SetTempIV
     jr nz,.NoShiny
-    ;ld a,[$d11e]
-    ;and a
-    ;jr z,.NoShiny ; MissingNo doesn't have shiny flag
     FuncCoord 1,1
     ld hl,Coord
     ld de,.ShinyStarIcon
@@ -131140,6 +131136,14 @@ _DrawCatchGender: ; Denim
 .NoShiny
     ld a,[W_ENEMYMONID]
     ld [$d11e],a
+    call .CheckMarowak
+    jr nz,.noMarowak
+    pop af ; Restore Pokedex Flag Test
+    jr .GetGender
+.noMarowak
+    pop af ; Restore Pokedex Flag Test
+    jr z,.Genderless
+.GetGender
     call GetGender
     jr c,.Genderless
     push af
@@ -131169,6 +131173,12 @@ _DrawCatchGender: ; Denim
     db $F5,$50
 .ShinyStarIcon
     db $D1,$50
+.CheckMarowak
+    cp MAROWAK
+    ret nz
+    call GetCurrentOldAdventureMap
+    cp POKEMONTOWER_6
+    ret
 
 _DrawCurrentMonGenderInBattle:
     ld hl,W_PLAYERMONIVS ; .BackSpriteInBattle
