@@ -171,7 +171,7 @@ PokemaniacData:
 ; Rock Tunnel 1F
     db 23,CUBONE,SLOWPOKE,0
 ; Route D1
-    db $FF,40,MUK,40,GENGAR,0
+    db $FF,50,MUK,70,GENGAR,0
 
 SuperNerdData:
 ; Mt. Moon 1F

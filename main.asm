@@ -50123,7 +50123,7 @@ SwitchEnemyMon: ; 3a74b (e:674b)
 
 ; prepare to withdraw the active monster: copy hp,number,and status to roster
 
-    ld a,[W_ENEMYMONNUMBER]
+    call CheckTrappingMoveAndLoadEnemyMonNumber ; ld a,[W_ENEMYMONNUMBER]
     ld hl,W_ENEMYMON1HP
     ld bc,$2C
     call AddNTimes
@@ -52217,6 +52217,20 @@ CryData: ; Moved in the Bank
     db $0F,$3C,$C0; 149 - DRAGONITE
     db $1E,$99,$FF; 150 - MEWTWO
     db $1E,$EE,$FF; 151 - MEW
+
+;joenote - if player using trapping move, then end their move
+CheckTrappingMoveAndLoadEnemyMonNumber:
+    ld hl,W_PLAYERBATTSTATUS1
+    bit USING_TRAPPING_MOVE,[hl]
+    res USING_TRAPPING_MOVE,[hl]
+    jr z,.end
+    xor a
+    ld [$d06a],a ; wPlayerNumAttacksLeft
+    ld a,$FF
+    ld [wPlayerSelectedMove],a
+.end
+    ld a,[W_ENEMYMONNUMBER]
+    ret
 
 SECTION "bankF",ROMX,BANK[$F]
 
@@ -56774,6 +56788,8 @@ CriticalHitTest:
     jp Bankswitch
 
 ResetLeechSeedFlagAndReadPlayerMonCurHPAndStatus:
+    ;joenote - zero the damage from last round if not using a trapping move
+    call CheckTrappingToResetDamage
     ;joenote - clear custom battle flags
     ld a,[wUnusedC000]
     res 7,a ;reset the bit that causes counter to miss
@@ -56907,7 +56923,7 @@ ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
     jr z,.superFangEffect
     cp a,SPECIAL_DAMAGE_EFFECT
     jr z,.specialDamage
-    ld a,[W_PLAYERMOVEPOWER]
+    call CheckTrappingToResetPlayerHyperBeam ; ld a,[W_PLAYERMOVEPOWER]
     and a
     jp z,ApplyAttackToEnemyPokemonDone
     jr ApplyDamageToEnemyPokemon
@@ -57030,7 +57046,7 @@ ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
     jr z,.superFangEffect
     cp a,SPECIAL_DAMAGE_EFFECT
     jr z,.specialDamage
-    ld a,[W_ENEMYMOVEPOWER]
+    call CheckTrappingToResetEnemyHyperBeam ; ld a,[W_ENEMYMOVEPOWER]
     and a
     jp z,ApplyAttackToPlayerPokemonDone
     jr ApplyDamageToPlayerPokemon
@@ -57586,6 +57602,69 @@ CheckDefrost: ; Moved in the Bank
 .UnnamedText_3f423
     TX_FAR _UnnamedText_3f423
     db "@"
+
+;joenote - zero the damage from last round if not using a trapping move
+CheckTrappingToResetDamage:
+    ld a,[W_ENEMYBATTSTATUS1]
+    bit USING_TRAPPING_MOVE,a
+    ret nz
+    ld a,[W_PLAYERBATTSTATUS1]
+    bit USING_TRAPPING_MOVE,a
+    ret nz
+    ; fall through ; joenote - prevent counter shenanigans of all sorts
+
+;joenote - this sets the last damage dealt to zero
+;meant for fixing counter glitches
+ZeroLastDamage:
+    push af
+    push hl
+    ld a,0
+    ld hl,W_DAMAGE
+    ld [hli],a
+    ld [hl],a
+    pop hl
+    pop af
+    ret
+
+TrappingEffect:
+    ld hl,wUnusedC000
+    set 3,[hl]
+    ld hl,W_PLAYERBATTSTATUS1 ; $d062
+    ld de,$d06a
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr z,.done
+    ld hl,wUnusedC000
+    res 3,[hl]
+    ld hl,W_ENEMYBATTSTATUS1 ; $d067
+    ld de,$d06f
+.done
+    bit 5,[hl]
+    ret nz
+    push hl
+    push bc
+    push de
+    call AIGetTypeEffectiveness
+    pop de
+    pop bc
+    pop hl
+    ld a,[$d11e]
+    and a
+    ret z
+    ;call ClearHyperBeam ; since this effect is called before testing whether the move will hit,
+                         ; the target won't need to recharge even if the trapping move missed
+                         ; joenote - will do this later under ApplyAttackToEnemy/Player functions
+    set 5,[hl]
+    call GenRandomInBattle
+    and $3
+    cp $2
+    jr c,.setTrappingCounter
+    call GenRandomInBattle
+    and $3
+.setTrappingCounter
+    inc a
+    ld [de],a
+    ret
 
 ; Free
 
@@ -59330,7 +59409,7 @@ JumpMoveEffect: ; Moved in the Bank
      dw Func_3f88c
      dw $0000
      dw $0000
-     dw Func_3f917
+     dw TrappingEffect
      dw Func_3f88c
      dw Func_3f811
      dw $0000
@@ -59607,7 +59686,7 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     ld hl,UnnamedText_3f3d8
     jp PrintText
 .freeze
-    call Func_3f9cf  ;resets bit 5 of the D063/D068 flags
+    call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
     ld a,FRZ
     ld [W_ENEMYMONSTATUS],a
     ld a,$a9
@@ -60331,7 +60410,7 @@ Func_3f85b: ; 3f85b (f:785b)
     cp b
     ret nc
     set 3,[hl]
-    call Func_3f9cf
+    call ClearHyperBeam
     ret
 
 Func_3f884: ; 3f884 (f:7884)
@@ -60421,29 +60500,21 @@ UnnamedText_3f912: ; 3f912 (f:7912)
     TX_FAR _UnnamedText_3f912
     db "@"
 
-Func_3f917: ; 3f917 (f:7917)
-    ld hl,W_PLAYERBATTSTATUS1 ; $d062
-    ld de,$d06a
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.asm_3f928
-    ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    ld de,$d06f
-.asm_3f928
-    bit 5,[hl]
-    ret nz
-    call Func_3f9cf
-    set 5,[hl]
-    call GenRandomInBattle
-    and $3
-    cp $2
-    jr c,.asm_3f93e
-    call GenRandomInBattle
-    and $3
-.asm_3f93e
-    inc a
-    ld [de],a
+CheckTrappingToResetPlayerHyperBeam:
+    cp TRAPPING_EFFECT	;joenote - clear hyper beam if target hit with trapping effect
+    call z,ClearHyperBeam
+    ld a,[W_PLAYERMOVEPOWER]
     ret
+
+CheckTrappingToResetEnemyHyperBeam:
+    cp TRAPPING_EFFECT	;joenote - clear hyper beam if target hit with trapping effect
+    call z,ClearHyperBeam
+    ld a,[W_ENEMYMOVEPOWER]
+    ret
+
+; Free
+
+SECTION "Func_3f941",ROMX[$7941],BANK[$f]
 
 Func_3f941: ; 3f941 (f:7941)
     ld hl,Func_33f2b
@@ -60531,7 +60602,7 @@ Func_3f9c1: ; 3f9c1 (f:79c1)
     set 5,[hl]
     ret
 
-Func_3f9cf: ; 3f9cf (f:79cf)
+ClearHyperBeam: ; 3f9cf (f:79cf)
     push hl
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -61541,19 +61612,18 @@ NoAttackAICall:
     pop af ;get flags from stack
     ret
 
-CheckTrappingMoveAndSetEnemyActedBitAndLoadHl:
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - if enemy using trapping move, then end their move
-    ld a,[W_ENEMYBATTSTATUS1]
-    bit USING_TRAPPING_MOVE, a
-    jr z,.preparewithdraw
+CheckTrappingMoveAndSetEnemyActedBitAndLoadHl:
     ld hl,W_ENEMYBATTSTATUS1
+    bit USING_TRAPPING_MOVE,[hl]
     res USING_TRAPPING_MOVE,[hl]
+    jr z,.end
+    xor a
+    ld [$d06f],a ; wEnemyNumAttacksLeft
     ld a,$FF
     ld [wEnemySelectedMove],a
     call SetEnemyActedBit
-.preparewithdraw
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.end
     ld hl,RetreatMon
     ret
 
