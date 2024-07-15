@@ -1269,7 +1269,7 @@ HandleBlackOut: ; 0931 (0:0931)
     ld a,$01
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
-    call Func_40b0
+    call ResetStatusAndHalveMoneyOnBlackout
     call Func_62ce
     call PlayDefaultMusicFadeOutCurrent
     jp Func_5d5f
@@ -10628,7 +10628,7 @@ SpriteOAMParametersFlipped: ; 40a4 (1:40a4)
     db $08,$08,OAMFLAG_VFLIPPED | OAMFLAG_CANBEMASKED
     db $08,$00,OAMFLAG_VFLIPPED | OAMFLAG_CANBEMASKED | OAMFLAG_ENDOFDATA
 
-Func_40b0: ; 40b0 (1:40b0)
+ResetStatusAndHalveMoneyOnBlackout: ; 40b0 (1:40b0)
     xor a
     ld [$cf0b],a
     ld [$d700],a
@@ -10638,31 +10638,31 @@ Func_40b0: ; 40b0 (1:40b0)
     ld [H_CURRENTPRESSEDBUTTONS],a
     ld [$cc57],a
     ld [wFlags_0xcd60],a
-    ld [$FF00+$9f],a
-    ld [$FF00+$a0],a
-    ld [$FF00+$a1],a
-    call HasEnoughMoney
-    jr c,.asm_40ff
-    ld a,[wPlayerMoney] ; $d347
-    ld [$FF00+$9f],a
-    ld a,[wPlayerMoney + 1] ; $d348
-    ld [$FF00+$a0],a
-    ld a,[wPlayerMoney + 2] ; $d349
-    ld [$FF00+$a1],a
-    xor a
-    ld [$FF00+$a2],a
-    ld [$FF00+$a3],a
-    ld a,$2
-    ld [$FF00+$a4],a
-    ld a,$d
-    call Predef ; indirect jump to Func_f71e (f71e (3:771e))
-    ld a,[$FF00+$a2]
-    ld [wPlayerMoney],a ; $d347
-    ld a,[$FF00+$a3]
-    ld [wPlayerMoney + 1],a ; $d348
-    ld a,[$FF00+$a4]
-    ld [wPlayerMoney + 2],a ; $d349
-.asm_40ff
+    ;ld [$FF00+$9f],a
+    ;ld [$FF00+$a0],a
+    ;ld [$FF00+$a1],a
+    ;call HasEnoughMoney
+    ;jr c,.asm_40ff
+    ;ld a,[wPlayerMoney] ; $d347
+    ;ld [$FF00+$9f],a
+    ;ld a,[wPlayerMoney + 1] ; $d348
+    ;ld [$FF00+$a0],a
+    ;ld a,[wPlayerMoney + 2] ; $d349
+    ;ld [$FF00+$a1],a
+    ;xor a
+    ;ld [$FF00+$a2],a
+    ;ld [$FF00+$a3],a
+    ;ld a,$2
+    ;ld [$FF00+$a4],a
+    ;ld a,$d
+    ;call Predef ; indirect jump to Func_f71e (f71e (3:771e))
+    ;ld a,[$FF00+$a2]
+    ;ld [wPlayerMoney],a ; $d347
+    ;ld a,[$FF00+$a3]
+    ;ld [wPlayerMoney + 1],a ; $d348
+    ;ld a,[$FF00+$a4]
+    ;ld [wPlayerMoney + 2],a ; $d349
+;.asm_40ff
     ld hl,$d732
     set 2,[hl]
     res 3,[hl]
