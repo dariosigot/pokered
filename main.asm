@@ -452,17 +452,9 @@ FieldMovePlayCry:
 
 ; copies the tile patterns for letters and numbers into VRAM
 LoadFontTilePatterns: ; Moved in the Bank
-    ld de,FontGraphics1
+    ld de,FontGraphics
     ld hl,$8800
-    ld bc,(BANK(FontGraphics1) << 8 | $40)
-    call GoodCopyVideoDataDouble
-    ld de,FontGraphics2
-    ld hl,$8E00
-    ld bc,(BANK(FontGraphics2) << 8 | $20)
-    call GoodCopyVideoData
-    ld de,OtherIcon
-    ld hl,$8d00
-    ld bc,(BANK(OtherIcon) << 8 | 12)
+    ld bc,(BANK(FontGraphics) << 8 | $80)
     jp GoodCopyVideoData
 
 PlayCryAndDisplayPokedex:
@@ -29122,10 +29114,6 @@ LyingOldManSprite:
 
 PokemonLogoGraphics:
     INCBIN "gfx/pokemon_logo.2bpp"
-FontGraphics1:
-    INCBIN "gfx/font1.1bpp"
-FontGraphics2:
-    INCBIN "gfx/font2.2bpp"
 
 ABTiles:
     INCBIN "gfx/AB.2bpp"
@@ -30982,9 +30970,6 @@ GetGenderOutOfBattle:
     ld hl,GetGender
     ld b,BANK(GetGender)
     jp Bankswitch
-
-EXPBarGraphics: ; Denim,ExpBar
-    INCBIN "gfx/denim/exp_bar.2bpp"
 
 SetDamageDuringRecoil:
     ld d,h
@@ -130057,15 +130042,6 @@ MewPicFront:
 MewPicBack:
     INCBIN "pic/monback/mewb.pic"
 
-OtherIcon:
-    INCBIN "gfx/denim/held_item.2bpp"
-    INCBIN "gfx/denim/ShinyStar.2bpp"
-    INCBIN "gfx/denim/plus.2bpp"
-    INCBIN "gfx/denim/doubledot.2bpp"
-    INCBIN "gfx/denim/arrowup.2bpp"
-    INCBIN "gfx/denim/arrowleft.2bpp"
-    INCBIN "gfx/denim/PhiSpcSplit.2bpp"
-
 SECTION "bank2F",ROMX,BANK[$2F]
 
 SECTION "InizializzaParametriGBC",ROMX[$4400],BANK[$30]
@@ -134249,14 +134225,6 @@ LoadHpBarAndStatusTilePatterns_:
     ld de,HpBarAndStatusGraphics
     ld hl,$9620
     ld bc,(BANK(HpBarAndStatusGraphics) << 8 | $1e)
-    call GoodCopyVideoData
-    ld de,EXPBarGraphics
-    ld hl,$8c00
-    ld bc,(BANK(EXPBarGraphics) << 8 | $A)
-    call GoodCopyVideoData
-    ld de,OtherIcon
-    ld hl,$8d00
-    ld bc,(BANK(OtherIcon) << 8 | $B)
     jp GoodCopyVideoData
 
 ; INPUT
@@ -135308,18 +135276,12 @@ SubThreeByteNum_StatusScreen:
     inc de
     ret
 
-FontGraphics1GrayWall2bpp:
-    INCBIN "gfx/denim/font1.2bpp"
-FontGraphics2GrayWall2bpp:
-    INCBIN "gfx/denim/font2.2bpp"
+FontGraphics:
+    INCBIN "gfx/font.2bpp"
+FontGraphicsGrayWall2bpp:
+    INCBIN "gfx/denim/font.2bpp"
 Wall2bpp:
     INCBIN "gfx/denim/wall.2bpp"
-OtherIcon_w:
-    INCBIN "gfx/denim/plus_w.2bpp"
-    INCBIN "gfx/denim/doubledot_w.2bpp"
-    INCBIN "gfx/denim/arrowup_w.2bpp"
-    INCBIN "gfx/denim/arrowleft_w.2bpp"
-    INCBIN "gfx/denim/PhiSpcSplit_w.2bpp"
 PTile: ; This is a single 1bpp "P" tile
     INCBIN "gfx/p_tile.1bpp"
 
@@ -135343,21 +135305,13 @@ LoadStatusScreenGenericTile:
     jp CopyVideoDataDouble ; P (for PP),inline
 
 LoadFontTilePatternsWithWall:
-    ld de,FontGraphics1GrayWall2bpp
+    ld de,FontGraphicsGrayWall2bpp
     ld hl,$8800
-    ld bc,(BANK(FontGraphics1GrayWall2bpp) << 8 | $40)
-    call GoodCopyVideoData
-    ld de,FontGraphics2GrayWall2bpp
-    ld hl,$8E00
-    ld bc,(BANK(FontGraphics2GrayWall2bpp) << 8 | $20)
+    ld bc,(BANK(FontGraphicsGrayWall2bpp) << 8 | $80)
     call GoodCopyVideoData
     ld de,Wall2bpp
     ld hl,$97F0
     ld bc,(BANK(Wall2bpp) << 8 | $1)
-    call GoodCopyVideoData
-    ld de,OtherIcon_w
-    ld hl,$8D20
-    ld bc,(BANK(OtherIcon_w) << 8 | 10)
     jp GoodCopyVideoData
 
 _LoadGhostPic:
@@ -136045,9 +135999,9 @@ StatusScreen:
     ; Restore Tile
     call GBPalWhiteOut
     call LoadFontTilePatterns
-    ld de,FontGraphics2+(9*16) ; EmptyTile
+    ld de,FontGraphics+(6*16*16)+(9*16) ; EmptyTile
     ld hl,$97F0
-    ld bc,(BANK(FontGraphics2) << 8 | $1)
+    ld bc,(BANK(FontGraphics) << 8 | $1)
     call GoodCopyVideoData
     ; Restore Update Sprites Flag
     pop af
