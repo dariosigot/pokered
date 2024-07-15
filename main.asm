@@ -34138,9 +34138,9 @@ ViridianCityScript1: ; 19062 (6:5062)
     ; set up battle for Old Man
     ld a,$1
     ld [W_BATTLETYPE],a
-    ld a,5
+    ld a,2
     ld [W_CURENEMYLVL],a
-    ld a,WEEDLE
+    ld a,PIDGEY
     ld [W_CUROPPONENT],a ; $d059
     ld a,$2
     ld [W_VIRIDIANCITYCURSCRIPT],a
@@ -136810,8 +136810,8 @@ FillBlankArea:
 
 ItemInBattleFinalCheck:
     ld a,[W_BATTLETYPE] ; $d05a
-    cp $2
-    jr z,.safari
+    and a
+    jr nz,.safariOrOldMan
     ld a,[$d11c] ; checkIfMonCaptured
     and a
     push af
@@ -136835,7 +136835,7 @@ ItemInBattleFinalCheck:
     ld [$cf0b],a
     scf
     ret
-.safari
+.safariOrOldMan
     call LoadScreenTilesFromBuffer1
     call GBPalNormal
     ld a,[$d11c] ; checkIfMonCaptured
