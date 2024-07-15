@@ -105,7 +105,7 @@
     db MIMIC        , MIMIC_EFFECT               ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; PP 10 -> 20
     db SCREECH      , DEFENSE_DOWN2_EFFECT       ,   0 , NORMAL   , 216 , 08 ; pp 25 ; - ; PP 40 -> 25
     db DOUBLE_TEAM  , EVASION_UP1_EFFECT         ,   0 , NORMAL   , 255 , 40 ; pp  5 ; - ; PP 15 -> 5
-    db RECOVER      , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 20 ; pp 10 ; - ; PP 20 -> 10
+    db RECOVER      , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 23 ; pp 10 ; - ; PP 20 -> 10 ; Ene 20 -> 23
     db HARDEN       , DEFENSE_UP2_EFFECT         ,   0 , ROCK     , 255 , 08 ; pp 30 ; - ; Type Normal -> Rock ; Defense 2x ; Ene 07 -> 08
     db MINIMIZE     , EVASION_UP1_EFFECT         ,   0 , RUBBER   , 255 , 40 ; pp  5 ; - ; PP 20 -> 5 ; Type Normal -> Rubber
     db SMOKESCREEN  , ACCURACY_DOWN1_EFFECT      ,   0 , POISON   , 204 , 40 ; pp  5 ; - ; Type Normal -> Poison ; Acr 255 -> 204 ; PP 20 -> 5
@@ -135,7 +135,7 @@
     db CONSTRICT    , SPEED_DOWN_SIDE_EFFECT     ,  10 , NORMAL   , 255 , 02 ; pp 35 ; 0 ; Ene 06 -> 02
     db AMNESIA      , SPECIAL_UP2_EFFECT         ,   0 , PSYCHIC  , 255 , 40 ; pp  5 ; - ; PP 20 -> 5
     db KINESIS      , ACCURACY_DOWN1_EFFECT      ,   0 , PSYCHIC  , 204 , 40 ; pp  5 ; - ; PP 20 -> 5
-    db SOFTBOILED   , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
+    db SOFTBOILED   , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 21 ; pp 10 ; - ; Ene 20 -> 21
     db HI_JUMP_KICK , JUMP_KICK_EFFECT           , 130 , FIGHTING , 229 , 23 ; pp 10 ; 0 ; Pwr 85 -> 130 ; PP 20 -> 10 ; Ene 20 -> 23
     db GLARE        , PARALYZE_EFFECT            ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Acr 191 -> 255 ; PP 30 -> 15
     db DREAM_EATER  , DREAM_EATER_EFFECT         , 100 , GHOST    , 255 , 17 ; pp 10 ; 1 ; Type Psychic -> Ghost ; PP 15 -> 10 ; Ene 20 -> 17
@@ -145,7 +145,7 @@
     db LOVELY_KISS  , SLEEP_EFFECT               ,   0 , NORMAL   , 191 , 24 ; pp 10 ; - ; Ene 20 -> 24
     db SKY_ATTACK   , CHARGE_EFFECT              , 140 , WIND     , 229 , 36 ; pp  5 ; 0 ; Ene 40 -> 36
     db TRANSFORM    , TRANSFORM_EFFECT           ,   0 , RUBBER   , 255 , 20 ; pp 10 ; - ; Type Normal -> Rubber
-    db BUBBLE       , SPEED_DOWN_SIDE_EFFECT     ,  30 , WATER    , 255 , 07 ; pp 30 ; 1 ; Pwr 20 -> 30
+    db BUBBLE       , SPEED_DOWN_SIDE_EFFECT     ,  30 , WATER    , 255 , 06 ; pp 35 ; 1 ; Pwr 20 -> 30 ; PP 30 -> 35
     db DIZZY_PUNCH  , NO_ADDITIONAL_EFFECT       ,  90 , IVORY    , 255 , 16 ; pp 10 ; 0 ; Type Normal -> Ivory ; Pwr 70 -> 90 ; PP 10 -> 15 ; Ene 14 -> 16
     db SPORE        , SLEEP_EFFECT               ,   0 , GRASS    , 255 , 28 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 28
     db FLASH        , ACCURACY_DOWN1_EFFECT      ,   0 , ELECTRIC , 204 , 40 ; pp  5 ; - ; Type Normal -> Electric ; Acr 178 -> 204 ; PP 20 -> 5
