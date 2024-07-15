@@ -171,7 +171,7 @@ PokemaniacData:
 ; Rock Tunnel 1F
     db 23,CUBONE,SLOWPOKE,0
 ; Route D1
-    db $FF,37,PIDGEOT,38,MAGNETON,35,EXEGGUTOR,35,ALAKAZAM,38,RHYHORN,40,BLASTOISE,0
+    db $FF,50,MUK,70,GENGAR,0
 
 SuperNerdData:
 ; Mt. Moon 1F

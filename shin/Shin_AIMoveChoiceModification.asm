@@ -236,6 +236,8 @@ AIMoveChoiceModification1:
     cp DEFENSE_UP1_EFFECT
     jr z,.do_def_check
     cp DEFENSE_UP2_EFFECT
+    jr z,.do_def_check
+    cp DEFENSE_UP3_EFFECT
     jr nz,.nodefupmove
 .do_def_check
     ld a,[W_PLAYERMOVEEFFECT]
@@ -288,18 +290,25 @@ AIMoveChoiceModification1:
     ld a,[W_ENEMYMOVEEFFECT]    ;get the move effect
     cp ATTACK_UP1_EFFECT
     jr c,.endstatmod    ;if value is < the ATTACK_UP1_EFFECT value,jump out
-    cp EVASION_UP2_EFFECT + $1
-    jr nc,.endstatmod    ;if value >= EVASION_UP2_EFFECT value + $1,jump out
-    cp EVASION_UP1_EFFECT + $1
-    jr c,.statupmod    ;if value < EVASION_UP1_EFFECT value + $1,there is a stat up move
+    cp EVASION_UP1_EFFECT + 1
+    jr c,.statupmod    ;if value is <= the EVASION_UP1_EFFECT value,stat mod
     cp ATTACK_UP2_EFFECT
-    jr nc,.statupmod    ;if value is >= the ATTACK_UP2_EFFECT value,there is a stat up move
+    jr c,.endstatmod    ;if value is < the ATTACK_UP2_EFFECT value,jump out
+    cp EVASION_UP2_EFFECT + 1
+    jr c,.statupmod    ;if value is <= the EVASION_UP2_EFFECT value,stat mod
+    cp ATTACK_UP3_EFFECT
+    jr c,.endstatmod    ;if value is < the ATTACK_UP3_EFFECT value,jump out
+    cp EVASION_UP3_EFFECT + 1
+    jr c,.statupmod    ;if value is <= the EVASION_UP3_EFFECT value,stat mod
     jr .endstatmod; else the effect is something else in-between the target values
 .statupmod
     sub ATTACK_UP1_EFFECT    ;normalize the effects from 0 to 5 to get an offset
-    cp EVASION_UP1_EFFECT + $1 - ATTACK_UP1_EFFECT ; covers all +1 effects
+    cp 6 ; regular "UP Effect" base from 0 to 5
     jr c,.statupcheck
     sub ATTACK_UP2_EFFECT - ATTACK_UP1_EFFECT ; map +2 effects to corresponding +1 effect
+    cp 6 ; regular "UP Effect" base from 0 to 5
+    jr c,.statupcheck
+    sub ATTACK_UP3_EFFECT - ATTACK_UP2_EFFECT ; map +3 effects to corresponding +1 effect
 .statupcheck
     push hl
     push bc
@@ -658,6 +667,11 @@ AIMoveChoiceModification2:
     cp ATTACK_UP2_EFFECT
     jr c,.nextMove
     cp HEAL_EFFECT
+    jr c,.preferMove
+
+    cp ATTACK_UP3_EFFECT
+    jr c,.nextMove
+    cp EVASION_UP3_EFFECT+1
     jr c,.preferMove
 
     cp ATTACK_DOWN2_EFFECT

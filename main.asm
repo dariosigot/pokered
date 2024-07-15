@@ -452,17 +452,9 @@ FieldMovePlayCry:
 
 ; copies the tile patterns for letters and numbers into VRAM
 LoadFontTilePatterns: ; Moved in the Bank
-    ld de,FontGraphics1
+    ld de,FontGraphics
     ld hl,$8800
-    ld bc,(BANK(FontGraphics1) << 8 | $40)
-    call GoodCopyVideoDataDouble
-    ld de,FontGraphics2
-    ld hl,$8E00
-    ld bc,(BANK(FontGraphics2) << 8 | $20)
-    call GoodCopyVideoData
-    ld de,OtherIcon
-    ld hl,$8d00
-    ld bc,(BANK(OtherIcon) << 8 | 12)
+    ld bc,(BANK(FontGraphics) << 8 | $80)
     jp GoodCopyVideoData
 
 PlayCryAndDisplayPokedex:
@@ -23021,17 +23013,16 @@ InitializeMissableObjectsFlagsNew:
 
 ; ───────────────────────────────────────
 
-BackupMovesAndPPAndLoadIVBackupPointer:
+BackupMoves:
     ld hl,W_ENEMYMONMOVES
     ld de,wBackupEnemyMoves
-    ld bc,4
-    push bc
-    call CopyData
+    jr BackupCommon
+BackupPP:
     ld hl,W_ENEMYMONPP
-    pop bc
-    call CopyData
-    ld hl,$cceb
-    ret
+    ld de,wBackupEnemyPP
+BackupCommon:
+    ld bc,4
+    jp CopyData
 
 WriteMonMoves2:
     ld a,[W_ISINBATTLE]
@@ -23475,15 +23466,13 @@ ItemUseBall: ; d687 (3:5687)
     ld a,[hl]
     push af        ;...and status ailments
     push hl
+    call BackupPP
     ld hl,W_ENEMYBATTSTATUS3
     bit 3,[hl]
-    jr z,.next15
-    ds 2 ; ld a,DITTO
-    ds 3 ; ld [W_ENEMYMONID],a
-    jr .next16
-.next15    ;$5871
+    jr nz,.next16
     set 3,[hl]
-    call BackupMovesAndPPAndLoadIVBackupPointer ; ld hl,$cceb
+    call BackupMoves
+    ld hl,$cceb
     ld a,[W_ENEMYMONATKDEFIV]
     ld [hli],a
     ld a,[W_ENEMYMONSPDSPCIV]
@@ -23520,7 +23509,7 @@ ItemUseBall: ; d687 (3:5687)
     ld a,$3a    ;convert order: Internal->Dex
     call Predef
     ld a,[$d11e]
-    ds 1 ; dec a ; POKEDEXMOD
+    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,2
     ld hl,wPokedexOwned    ;Dex_own_flags (pokemon)
@@ -23529,7 +23518,7 @@ ItemUseBall: ; d687 (3:5687)
     ld a,c
     push af
     ld a,[$d11e]
-    ds 1 ; dec a ; POKEDEXMOD
+    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,1
     ld a,$10    ;set Dex_own_flag?
@@ -23577,6 +23566,9 @@ ItemUseBall: ; d687 (3:5687)
     inc a
     ld [$cf96],a
     jp RemoveItemFromInventory    ;remove ITEM (XXX)
+
+SECTION "ItemUseBallText00",ROMX[$5937],BANK[$3]
+
 ItemUseBallText00: ; d937 (3:5937)
 ;"It dodged the thrown ball!"
 ;"This pokemon can't be caught"
@@ -24725,8 +24717,8 @@ ItemUseXStat: ; e104 (3:6104)
     call GoPalSetAndDelay3Bank3 ; call Delay3
     xor a
     ld [H_WHOSETURN],a ; set turn to player's turn
-    ld b,BANK(Func_3f428)
-    ld hl,Func_3f428
+    ld b,BANK(StatModifierUpEffect)
+    ld hl,StatModifierUpEffect
     call Bankswitch ; do stat increase move
     pop hl
     pop af
@@ -25998,6 +25990,8 @@ GetTMChoiceItemID:
     ; Print Move Details Box
     FuncCoord 10,5
     ld de,Coord
+    ld hl,wHyperBeamUnknownTypeBit4
+    set 4,[hl]
     PREDEF_JUMP PrintMoveDetailsBoxPredef
 
 .ChoiceTMText:
@@ -29120,10 +29114,6 @@ LyingOldManSprite:
 
 PokemonLogoGraphics:
     INCBIN "gfx/pokemon_logo.2bpp"
-FontGraphics1:
-    INCBIN "gfx/font1.1bpp"
-FontGraphics2:
-    INCBIN "gfx/font2.2bpp"
 
 ABTiles:
     INCBIN "gfx/AB.2bpp"
@@ -30556,7 +30546,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db FIRE_BLAST   ; TM_38
     db SWIFT        ; TM_39
     db SKULL_BASH   ; TM_40
-    db STRUGGLE     ; TM_41
+    db LIGHT_SCREEN ; TM_41
     db DREAM_EATER  ; TM_42
     db SKY_ATTACK   ; TM_43
     db REST         ; TM_44
@@ -30980,9 +30970,6 @@ GetGenderOutOfBattle:
     ld hl,GetGender
     ld b,BANK(GetGender)
     jp Bankswitch
-
-EXPBarGraphics: ; Denim,ExpBar
-    INCBIN "gfx/denim/exp_bar.2bpp"
 
 SetDamageDuringRecoil:
     ld d,h
@@ -41543,7 +41530,7 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
     db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,OPP_LVL_OFFSET+55 ; Entry Level (Over)
     db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
-    db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,HP_UP ; item
+    db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,TM_41 ; item
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
     db SPRITE_BALL,$20 + 4,$1a + 4,$ff,$ff,$8d,TM_25 ; item
     db SPRITE_BALL,$20 + 4,$14 + 4,$ff,$ff,$8e,TM_55 ; item ; FLASH
@@ -50136,7 +50123,7 @@ SwitchEnemyMon: ; 3a74b (e:674b)
 
 ; prepare to withdraw the active monster: copy hp,number,and status to roster
 
-    ld a,[W_ENEMYMONNUMBER]
+    call CheckTrappingMoveAndLoadEnemyMonNumber ; ld a,[W_ENEMYMONNUMBER]
     ld hl,W_ENEMYMON1HP
     ld bc,$2C
     call AddNTimes
@@ -50271,8 +50258,8 @@ AIIncreaseStat: ; 3a808 (e:6808)
     ld a,$AF
     ld [hli],a
     ld [hl],b
-    ld hl,Func_3f428
-    ld b,BANK(Func_3f428)
+    ld hl,StatModifierUpEffect
+    ld b,BANK(StatModifierUpEffect)
     call Bankswitch
     pop hl
     pop af
@@ -51626,16 +51613,12 @@ TransformEffect_: ; Moved Upper in the Bank
     bit 3,a ; Pokemon is Just Transformed
     jr nz,.SkipBackupMoves
 
-    ; Backup Moves & PP
+    ; Backup Moves
     push hl
     push de
     ld hl,W_ENEMYMONMOVES
     ld de,wBackupEnemyMoves
     ld bc,4
-    push bc
-    call CopyData
-    ld hl,W_ENEMYMONPP
-    pop bc
     call CopyData
     pop de
     pop hl
@@ -52235,26 +52218,130 @@ CryData: ; Moved in the Bank
     db $1E,$99,$FF; 150 - MEWTWO
     db $1E,$EE,$FF; 151 - MEW
 
+;joenote - if player using trapping move, then end their move
+CheckTrappingMoveAndLoadEnemyMonNumber:
+    ld hl,W_PLAYERBATTSTATUS1
+    bit USING_TRAPPING_MOVE,[hl]
+    res USING_TRAPPING_MOVE,[hl]
+    jr z,.end
+    xor a
+    ld [$d06a],a ; wPlayerNumAttacksLeft
+    ld a,$FF
+    ld [wPlayerSelectedMove],a
+.end
+    ld a,[W_ENEMYMONNUMBER]
+    ret
+
 SECTION "bankF",ROMX,BANK[$F]
 
 ; These are move effects (second value from the Moves table in bank $E).
-EffectsArray1: ; 3c000 (f:4000)
-    db $18,$19,$1C,$2E,$2F,$31,$38,$39,$40,$41,$42,$43,$4F,$52,$54,$55,$FF
-EffectsArray2: ; 3c011 (f:4011)
+
+; ResidualEffects1
+EffectsArray1:
+; most non-side effects
+	db CONVERSION_EFFECT
+	db HAZE_EFFECT
+	db SWITCH_AND_TELEPORT_EFFECT
+	db MIST_EFFECT
+	db FOCUS_ENERGY_EFFECT
+	db CONFUSION_EFFECT
+	db HEAL_EFFECT
+	db TRANSFORM_EFFECT
+	db LIGHT_SCREEN_EFFECT
+	db REFLECT_EFFECT
+	db POISON_EFFECT
+	db PARALYZE_EFFECT
+	db SUBSTITUTE_EFFECT
+	db MIMIC_EFFECT
+	db LEECH_SEED_EFFECT
+	db SPLASH_EFFECT
+    db $FF
+
+; SetDamageEffects
+EffectsArray2:
 ; moves that do damage but not through normal calculations
-; e.g.,Super Fang,Psywave
-    db $28,$29,$FF
-EffectsArray3: ; 3c014 (f:4014)
-; non-damaging,stat‐affecting or status‐causing moves?
-; e.g.,Meditate,Bide,Hypnosis
-    db $01,$0A,$0B,$0C,$0D,$0E,$0F,$12,$13,$14,$15,$16,$17,$1A,$20,$32,$33,$34,$35,$36,$37,$3A,$3B,$3C,$3D,$3E,$3F,$FF
-EffectsArray4: ; 3c030 (f:4030)
-    db $03,$07,$08,$10,$1D,$1E,$2C,$30,$4D,$51,$FF
-EffectsArray5: ; 3c03b (f:403b)
-    db $03,$07,$08,$10,$11,$1D,$1E,$27,$28,$29,$2B,$2C,$2D,$30 ; fallthru
-EffectsArray5B: ; 3c049 (f:4049)
-; moves that prevent the player from switching moves?
-    db $1B,$2A,$FF
+; e.g., Super Fang, Psywave
+	db SUPER_FANG_EFFECT
+	db SPECIAL_DAMAGE_EFFECT
+    db $FF
+
+; ResidualEffects2
+EffectsArray3:
+; non-side effects not included in ResidualEffects1
+; stat-affecting moves, sleep-inflicting moves, and Bide
+; e.g., Meditate, Bide, Hypnosis
+	db $01
+	db ATTACK_UP1_EFFECT
+	db DEFENSE_UP1_EFFECT
+	db SPEED_UP1_EFFECT
+	db SPECIAL_UP1_EFFECT
+	db ACCURACY_UP1_EFFECT
+	db EVASION_UP1_EFFECT
+	db ATTACK_DOWN1_EFFECT
+	db DEFENSE_DOWN1_EFFECT
+	db SPEED_DOWN1_EFFECT
+	db SPECIAL_DOWN1_EFFECT
+	db ACCURACY_DOWN1_EFFECT
+	db EVASION_DOWN1_EFFECT
+	db BIDE_EFFECT
+	db SLEEP_EFFECT
+	db ATTACK_UP2_EFFECT
+	db DEFENSE_UP2_EFFECT
+	db SPEED_UP2_EFFECT
+	db SPECIAL_UP2_EFFECT
+	db ACCURACY_UP2_EFFECT
+	db EVASION_UP2_EFFECT
+	db ATTACK_DOWN2_EFFECT
+	db DEFENSE_DOWN2_EFFECT
+	db SPEED_DOWN2_EFFECT
+	db SPECIAL_DOWN2_EFFECT
+	db ACCURACY_DOWN2_EFFECT
+	db EVASION_DOWN2_EFFECT
+    db $FF
+
+; AlwaysHappenSideEffects
+EffectsArray4:
+; Attacks that aren't finished after they faint the opponent.
+	db DRAIN_HP_EFFECT
+	db EXPLODE_EFFECT
+	db DREAM_EATER_EFFECT
+	db PAY_DAY_EFFECT
+	db TWO_TO_FIVE_ATTACKS_EFFECT
+	db ATTACK_TWICE_EFFECT
+	db RECOIL_EFFECT
+	db TWINEEDLE_EFFECT
+	db RAGE_EFFECT
+    db HYPER_BEAM_EFFECT
+    db $FF
+
+; SpecialEffects
+EffectsArray5:
+; Effects from arrays 2, 4, and 5B, minus Twineedle and Rage.
+; Includes all effects that do not need to be called at the end of
+; ExecutePlayerMove (or ExecuteEnemyMove), because they have already been handled
+	db DRAIN_HP_EFFECT
+	db EXPLODE_EFFECT
+	db DREAM_EATER_EFFECT
+	db PAY_DAY_EFFECT
+	db SWIFT_EFFECT
+	db TWO_TO_FIVE_ATTACKS_EFFECT
+	db CHARGE_EFFECT
+	db SUPER_FANG_EFFECT
+	db SPECIAL_DAMAGE_EFFECT
+	db FLY_EFFECT
+	db ATTACK_TWICE_EFFECT
+	db JUMP_KICK_EFFECT
+	db RECOIL_EFFECT
+    ; fallthru
+
+; SpecialEffectsCont
+EffectsArray5B:
+; damaging moves whose effect is executed prior to damage calculation
+	db THRASH_PETAL_DANCE_EFFECT
+	db TRAPPING_EFFECT
+    db $FF
+
+SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
 Func_3c04c: ; 3c04c (f:404c)
     call Func_3ec92
@@ -54242,17 +54329,18 @@ FixItSelfDamage:
     ld [$d05e],a
     push hl
     call GetSelectedMovePointer
-    ld a,POUND
-    ld [hli],a
+    ld [hl],SCRATCH
     pop hl
     ret
 
 GetSelectedMovePointer:
     ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
+    ld bc,W_PLAYERMONID
     ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
     and a
     ret z
     inc hl
+    ld bc,W_ENEMYMONID
     ret
 
 SECTION "InitBattleMenu",ROMX[$4eb3],BANK[$f]
@@ -56790,6 +56878,8 @@ CriticalHitTest:
     jp Bankswitch
 
 ResetLeechSeedFlagAndReadPlayerMonCurHPAndStatus:
+    ;joenote - zero the damage from last round if not using a trapping move
+    call CheckTrappingToResetDamage
     ;joenote - clear custom battle flags
     ld a,[wUnusedC000]
     res 7,a ;reset the bit that causes counter to miss
@@ -56923,7 +57013,7 @@ ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
     jr z,.superFangEffect
     cp a,SPECIAL_DAMAGE_EFFECT
     jr z,.specialDamage
-    ld a,[W_PLAYERMOVEPOWER]
+    call CheckTrappingToResetPlayerHyperBeam ; ld a,[W_PLAYERMOVEPOWER]
     and a
     jp z,ApplyAttackToEnemyPokemonDone
     jr ApplyDamageToEnemyPokemon
@@ -57046,7 +57136,7 @@ ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
     jr z,.superFangEffect
     cp a,SPECIAL_DAMAGE_EFFECT
     jr z,.specialDamage
-    ld a,[W_ENEMYMOVEPOWER]
+    call CheckTrappingToResetEnemyHyperBeam ; ld a,[W_ENEMYMOVEPOWER]
     and a
     jp z,ApplyAttackToPlayerPokemonDone
     jr ApplyDamageToPlayerPokemon
@@ -57246,7 +57336,7 @@ HandleBuildingRage: ; 3e2b6 (f:62b6)
     push hl
     ld hl,BuildingRageText
     call PrintText
-    call Func_3f428 ; stat modifier raising function
+    call StatModifierUpEffect ; stat modifier raising function
     pop hl
     xor a
     ldd [hl],a ; null move effect
@@ -57385,9 +57475,7 @@ SECTION "AdjustDamageForMoveType",ROMX[$63a5],BANK[$f]
 AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
 ; values for player turn
     ld hl,W_PLAYERMONTYPES
-    ld a,[hli]
-    ld b,a    ; b = type 1 of attacker
-    ld c,[hl] ; c = type 2 of attacker
+    call GetAttackerType ; b = type 1 | c = type 2
     ld hl,W_ENEMYMONTYPES
     ld a,[hli]
     ld d,a    ; d = type 1 of defender
@@ -57399,9 +57487,7 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
     jr z,.next
 ; values for enemy turn
     ld hl,W_ENEMYMONTYPES
-    ld a,[hli]
-    ld b,a    ; b = type 1 of attacker
-    ld c,[hl] ; c = type 2 of attacker
+    call GetAttackerType ; b = type 1 | c = type 2
     ld hl,W_PLAYERMONTYPES
     ld a,[hli]
     ld d,a    ; d = type 1 of defender
@@ -57534,6 +57620,140 @@ CheckPoisonableMon:
     cp POISON ; can't poison a poison-type target
     ret z
     cp METAL
+    ret
+
+BackupMovesBeforeEnemyMimic:
+    push af
+    push de
+    jr z,.end
+    ld a,[W_ISINBATTLE]
+    dec a ; wild?
+    jr nz,.end
+    ld hl,W_ENEMYBATTSTATUS3
+    bit 3,[hl] ; Pokemon is Just Transformed
+    jr nz,.end
+    ; Backup Moves
+    set 3,[hl] ; Set Transformed
+    ld hl,W_ENEMYMONMOVES
+    ld de,wBackupEnemyMoves
+    ld bc,4
+    call CopyData
+.end
+    pop de
+    pop af
+    ld hl,W_PLAYERMONMOVES
+    ret
+
+Func_3fb1e: ; Moved in the Bank
+    ld hl,Func_139da
+    ld b,BANK(Func_139da)
+    jp Bankswitch
+
+Func_3f132: ; Moved in the Bank
+    call JumpMoveEffect
+    ld b,$1
+    ret
+
+CheckDefrost: ; Moved in the Bank
+    and a,FRZ            ;are they frozen?
+    ret z                ;return if so
+                        ;not frozen
+    ld a,[$ff00+$f3]    ;whose turn?
+    and a
+    jr nz,.opponent
+    ;player [attacker]
+    ld a,[W_PLAYERMOVETYPE]
+    sub a,FIRE
+    ret nz        ;return if it isn't fire
+                ;type is fire
+    ld [W_ENEMYMONSTATUS],a        ;set opponent status to 00 ["defrost" a frozen monster]
+    ld hl,$d8a8                    ;status of first opponent monster in their roster
+    ld a,[W_ENEMYMONNUMBER]
+    ld bc,$002c        ;$2C bytes per roster entry
+    call AddNTimes
+    xor a
+    ld [hl],a            ;clear status in roster
+    ld hl,.UnnamedText_3f423
+    jr .common
+.opponent
+    ld a,[W_ENEMYMOVETYPE]        ;same as above with addresses swapped
+    sub a,$14
+    ret nz
+    ld [W_PLAYERMONSTATUS],a
+    ld hl,$d16f
+    ld a,[wPlayerMonNumber]
+    ld bc,$002c
+    call AddNTimes
+    xor a
+    ld [hl],a
+    ld hl,.UnnamedText_3f423
+.common
+    jp PrintText
+.UnnamedText_3f423
+    TX_FAR _UnnamedText_3f423
+    db "@"
+
+;joenote - zero the damage from last round if not using a trapping move
+CheckTrappingToResetDamage:
+    ld a,[W_ENEMYBATTSTATUS1]
+    bit USING_TRAPPING_MOVE,a
+    ret nz
+    ld a,[W_PLAYERBATTSTATUS1]
+    bit USING_TRAPPING_MOVE,a
+    ret nz
+    ; fall through ; joenote - prevent counter shenanigans of all sorts
+
+;joenote - this sets the last damage dealt to zero
+;meant for fixing counter glitches
+ZeroLastDamage:
+    push af
+    push hl
+    ld a,0
+    ld hl,W_DAMAGE
+    ld [hli],a
+    ld [hl],a
+    pop hl
+    pop af
+    ret
+
+TrappingEffect:
+    ld hl,wUnusedC000
+    set 3,[hl]
+    ld hl,W_PLAYERBATTSTATUS1 ; $d062
+    ld de,$d06a
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr z,.done
+    ld hl,wUnusedC000
+    res 3,[hl]
+    ld hl,W_ENEMYBATTSTATUS1 ; $d067
+    ld de,$d06f
+.done
+    bit 5,[hl]
+    ret nz
+    push hl
+    push bc
+    push de
+    call AIGetTypeEffectiveness
+    pop de
+    pop bc
+    pop hl
+    ld a,[$d11e]
+    and a
+    ret z
+    ;call ClearHyperBeam ; since this effect is called before testing whether the move will hit,
+                         ; the target won't need to recharge even if the trapping move missed
+                         ; joenote - will do this later under ApplyAttackToEnemy/Player functions
+    set 5,[hl]
+    call GenRandomInBattle
+    and $3
+    cp $2
+    jr c,.setTrappingCounter
+    call GenRandomInBattle
+    and $3
+.setTrappingCounter
+    inc a
+    ld [de],a
     ret
 
 ; Free
@@ -59220,19 +59440,7 @@ LoadMonBackSprite: ; 3f103 (f:7103)
     ld b,a
     jp CopyVideoData
 
-Func_3fb1e: ; Moved in the Bank
-    ld hl,Func_139da
-    ld b,BANK(Func_139da)
-    jp Bankswitch
-
-SECTION "Func_3f132",ROMX[$7132],BANK[$f]
-
-Func_3f132: ; 3f132 (f:7132)
-    call JumpMoveEffect
-    ld b,$1
-    ret
-
-JumpMoveEffect: ; 3f138 (f:7138)
+JumpMoveEffect: ; Moved in the Bank
     ld a,[$ff00+$f3]  ;whose turn?
     and a
     ld a,[W_PLAYERMOVEEFFECT]
@@ -59241,7 +59449,7 @@ JumpMoveEffect: ; 3f138 (f:7138)
 .next1
     dec a         ;subtract 1,there is no special effect for 00
     add a         ;x2,16bit pointers
-    ld hl,MoveEffectPointerTable
+    ld hl,.MoveEffectPointerTable
     ld b,0
     ld c,a
     add hl,bc
@@ -59249,8 +59457,7 @@ JumpMoveEffect: ; 3f138 (f:7138)
     ld h,[hl]
     ld l,a
     jp hl       ;jump to special effect handler
-
-MoveEffectPointerTable: ; 3f150 (f:7150)
+.MoveEffectPointerTable
      dw Func_3f1fc
      dw PoisonEffect
      dw Func_3f2e9
@@ -59260,12 +59467,12 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw ExplodeEffect
      dw Func_3f2e9
      dw $0000
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
      dw Func_3fb0e
      dw $0000
      dw Func_3f54c
@@ -59292,7 +59499,7 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3f88c
      dw $0000
      dw $0000
-     dw Func_3f917
+     dw TrappingEffect
      dw Func_3f88c
      dw Func_3f811
      dw $0000
@@ -59300,12 +59507,12 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3f949
      dw Func_3f951
      dw Func_3f961
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
-     dw Func_3f428
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
      dw Func_3fb26
      dw TransformEffect
      dw Func_3f54c
@@ -59317,7 +59524,7 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3fb36
      dw Func_3fb36
      dw PoisonEffect
-     dw Func_3f9b1
+     dw ParalyzeEffect
      dw Func_3f54c
      dw Func_3f54c
      dw Func_3f54c
@@ -59337,6 +59544,14 @@ MoveEffectPointerTable: ; 3f150 (f:7150)
      dw Func_3fa7c
      dw Func_3fa84
      dw DisableEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+     dw StatModifierUpEffect
+
+SECTION "Func_3f1fc",ROMX[$71fc],BANK[$f]
 
 Func_3f1fc: ; 3f1fc (f:71fc)
     ld de,W_ENEMYMONSTATUS ; $cfe9
@@ -59561,7 +59776,7 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     ld hl,UnnamedText_3f3d8
     jp PrintText
 .freeze
-    call Func_3f9cf  ;resets bit 5 of the D063/D068 flags
+    call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
     ld a,FRZ
     ld [W_ENEMYMONSTATUS],a
     ld a,$a9
@@ -59621,47 +59836,7 @@ UnnamedText_3f3dd: ; 3f3dd (f:73dd)
     TX_FAR _UnnamedText_3f3dd
     db "@"
 
-CheckDefrost: ; 3f3e2 (f:73e2)
-    and a,FRZ            ;are they frozen?
-    ret z                ;return if so
-                        ;not frozen
-    ld a,[$ff00+$f3]    ;whose turn?
-    and a
-    jr nz,.opponent
-    ;player [attacker]
-    ld a,[W_PLAYERMOVETYPE]
-    sub a,FIRE
-    ret nz        ;return if it isn't fire
-                ;type is fire
-    ld [W_ENEMYMONSTATUS],a        ;set opponent status to 00 ["defrost" a frozen monster]
-    ld hl,$d8a8                    ;status of first opponent monster in their roster
-    ld a,[W_ENEMYMONNUMBER]
-    ld bc,$002c        ;$2C bytes per roster entry
-    call AddNTimes
-    xor a
-    ld [hl],a            ;clear status in roster
-    ld hl,UnnamedText_3f423
-    jr .common
-.opponent
-    ld a,[W_ENEMYMOVETYPE]        ;same as above with addresses swapped
-    sub a,$14
-    ret nz
-    ld [W_PLAYERMONSTATUS],a
-    ld hl,$d16f
-    ld a,[wPlayerMonNumber]
-    ld bc,$002c
-    call AddNTimes
-    xor a
-    ld [hl],a
-    ld hl,UnnamedText_3f423
-.common
-    jp PrintText
-
-UnnamedText_3f423: ; 3f423 (f:7423)
-    TX_FAR _UnnamedText_3f423
-    db "@"
-
-Func_3f428: ; 3f428 (f:7428)
+StatModifierUpEffect: ; Moved in the Bank
     ld hl,wPlayerMonStatMods ; $cd1a
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -59671,11 +59846,14 @@ Func_3f428: ; 3f428 (f:7428)
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
 .asm_3f439
     ld a,[de]
-    sub $a
-    cp $8
-    jr c,.asm_3f442
-    sub $28
-.asm_3f442
+    sub ATTACK_UP1_EFFECT    ;normalize the effects from 0 to 5 to get an offset
+    cp 6 ; regular "UP Effect" base from 0 to 5
+    jr c,.statupcheck
+    sub ATTACK_UP2_EFFECT - ATTACK_UP1_EFFECT ; map +2 effects to corresponding +1 effect
+    cp 6 ; regular "UP Effect" base from 0 to 5
+    jr c,.statupcheck
+    sub ATTACK_UP3_EFFECT - ATTACK_UP2_EFFECT ; map +3 effects to corresponding +1 effect
+.statupcheck
     ld c,a
     ld b,$0
     add hl,bc
@@ -59683,20 +59861,32 @@ Func_3f428: ; 3f428 (f:7428)
     inc b
     ld a,$d
     cp b
-    jp c,Func_3f522
+    jp c,.PrintNothingHappenedText
+    ; Check up2
     ld a,[de]
-    cp $12
-    jr c,.asm_3f45a
+    cp EVASION_UP1_EFFECT + 1 ; is it a +2 effect?
+    jr c,.ok3
     inc b
     ld a,$d
     cp b
-    jr nc,.asm_3f45a
+    jr nc,.ok2
     ld b,a
-.asm_3f45a
+    jr .ok3
+.ok2
+    ; Check up3
+    ld a,[de]
+    cp EVASION_UP2_EFFECT + 1 ; is it a +3 effect?
+    jr c,.ok3
+    inc b
+    ld a,$d
+    cp b
+    jr nc,.ok3
+    ld b,a
+.ok3
     ld [hl],b
     ld a,c
     cp $4
-    jr nc,asm_3f4ca
+    jr nc,.asm_3f4ca
     push hl
     ld hl,$d026
     ld de,$cd12
@@ -59722,7 +59912,7 @@ Func_3f428: ; 3f428 (f:7428)
     jr nz,.asm_3f48a
     ld a,[hl]
     sbc $3
-    jp z,Func_3f520
+    jp z,.Func_3f520
 .asm_3f48a
     push hl
     push bc
@@ -59752,19 +59942,18 @@ Func_3f428: ; 3f428 (f:7428)
     sub $e7
     ld a,[$FF00+$97]
     sbc $3
-    jp c,Func_3f4c3
+    jr c,.Func_3f4c3
     ld a,$3
     ld [$FF00+$97],a
     ld a,$e7
     ld [$FF00+$98],a
-
-Func_3f4c3: ; 3f4c3 (f:74c3)
+.Func_3f4c3
     ld a,[$FF00+$97]
     ld [hli],a
     ld a,[$FF00+$98]
     ld [hl],a
     pop hl
-asm_3f4ca: ; 3f4ca (f:74ca)
+.asm_3f4ca
     ld b,c
     inc b
     call Func_3f688
@@ -59805,41 +59994,48 @@ asm_3f4ca: ; 3f4ca (f:74ca)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     call z,Func_3ee19
-    ld hl,UnnamedText_3f528 ; $7528
+    ld hl,.UnnamedText_3f528
     call PrintText
     call Func_3ed27
     jp Func_3ed64
-
-Func_3f520: ; 3f520 (f:7520)
+.Func_3f520
     pop hl
     dec [hl]
-
-Func_3f522: ; 3f522 (f:7522)
+.PrintNothingHappenedText
     ld hl,UnnamedText_3fb3e ; $7b3e
     jp PrintText
-
-UnnamedText_3f528: ; 3f528 (f:7528)
+.UnnamedText_3f528
     TX_FAR _UnnamedText_3f528
     db $08 ; asm
-    ld hl,UnnamedText_3f542 ; $7542
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVEEFFECT] ; $cfd3
     jr z,.asm_3f53b
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
 .asm_3f53b
-    cp $12
-    ret nc
-    ld hl,UnnamedText_3f547 ; $7547
+    cp EVASION_UP1_EFFECT + 1
+    ld hl,.RoseText
+    ret c
+    cp EVASION_UP2_EFFECT + 1
+    ld hl,.GreatlyText
+    ret c
+    ld hl,.EnormouslyText
     ret
-
-UnnamedText_3f542: ; 3f542 (f:7542)
+.GreatlyText
     db $0a
-    TX_FAR _UnnamedText_3f542
-
-UnnamedText_3f547: ; 3f547 (f:7547)
-    TX_FAR _UnnamedText_3f547
+    TX_FAR _GreatlyText
+.RoseText
+    TX_FAR _RoseText
     db "@"
+.EnormouslyText
+    db $0a
+    TX_FAR _EnormouslyText
+    TX_FAR _RoseText
+    db "@"
+
+; Free
+
+SECTION "Func_3f54c",ROMX[$754c],BANK[$f]
 
 Func_3f54c: ; 3f54c (f:754c)
     ld hl,wEnemyMonStatMods ; $cd2e
@@ -60304,7 +60500,7 @@ Func_3f85b: ; 3f85b (f:785b)
     cp b
     ret nc
     set 3,[hl]
-    call Func_3f9cf
+    call ClearHyperBeam
     ret
 
 Func_3f884: ; 3f884 (f:7884)
@@ -60394,29 +60590,21 @@ UnnamedText_3f912: ; 3f912 (f:7912)
     TX_FAR _UnnamedText_3f912
     db "@"
 
-Func_3f917: ; 3f917 (f:7917)
-    ld hl,W_PLAYERBATTSTATUS1 ; $d062
-    ld de,$d06a
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.asm_3f928
-    ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    ld de,$d06f
-.asm_3f928
-    bit 5,[hl]
-    ret nz
-    call Func_3f9cf
-    set 5,[hl]
-    call GenRandomInBattle
-    and $3
-    cp $2
-    jr c,.asm_3f93e
-    call GenRandomInBattle
-    and $3
-.asm_3f93e
-    inc a
-    ld [de],a
+CheckTrappingToResetPlayerHyperBeam:
+    cp TRAPPING_EFFECT	;joenote - clear hyper beam if target hit with trapping effect
+    call z,ClearHyperBeam
+    ld a,[W_PLAYERMOVEPOWER]
     ret
+
+CheckTrappingToResetEnemyHyperBeam:
+    cp TRAPPING_EFFECT	;joenote - clear hyper beam if target hit with trapping effect
+    call z,ClearHyperBeam
+    ld a,[W_ENEMYMOVEPOWER]
+    ret
+
+; Free
+
+SECTION "Func_3f941",ROMX[$7941],BANK[$f]
 
 Func_3f941: ; 3f941 (f:7941)
     ld hl,Func_33f2b
@@ -60484,10 +60672,10 @@ Func_3f9a6: ; 3f9a6 (f:79a6)
     call DelayFrames
     jp Func_3fb4e
 
-Func_3f9b1: ; 3f9b1 (f:79b1)
-    ld hl,Func_52601
-    ld b,BANK(Func_52601)
-    jp Bankswitch ; indirect jump to Func_52601 (52601 (14:6601))
+ParalyzeEffect: ; 3f9b1 (f:79b1)
+    ld hl,ParalyzeEffect_
+    ld b,BANK(ParalyzeEffect_)
+    jp Bankswitch ; indirect jump to ParalyzeEffect_ (52601 (14:6601))
 
 Func_3f9b9: ; 3f9b9 (f:79b9)
     ld hl,SubstituteEffectHandler
@@ -60504,7 +60692,7 @@ Func_3f9c1: ; 3f9c1 (f:79c1)
     set 5,[hl]
     ret
 
-Func_3f9cf: ; 3f9cf (f:79cf)
+ClearHyperBeam: ; 3f9cf (f:79cf)
     push hl
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -60560,7 +60748,7 @@ Func_3f9ed: ; 3f9ed (f:79ed)
     ld d,a
     ld a,[H_WHOSETURN]
     and a
-    ld hl,W_PLAYERMONMOVES
+    call BackupMovesBeforeEnemyMimic ; ld hl,W_PLAYERMONMOVES
     ld a,[wPlayerMoveListIndex]
     jr z,.asm_3fa5f
     ld hl,W_ENEMYMONMOVES
@@ -61514,19 +61702,18 @@ NoAttackAICall:
     pop af ;get flags from stack
     ret
 
-CheckTrappingMoveAndSetEnemyActedBitAndLoadHl:
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - if enemy using trapping move, then end their move
-    ld a,[W_ENEMYBATTSTATUS1]
-    bit USING_TRAPPING_MOVE, a
-    jr z,.preparewithdraw
+CheckTrappingMoveAndSetEnemyActedBitAndLoadHl:
     ld hl,W_ENEMYBATTSTATUS1
+    bit USING_TRAPPING_MOVE,[hl]
     res USING_TRAPPING_MOVE,[hl]
+    jr z,.end
+    xor a
+    ld [$d06f],a ; wEnemyNumAttacksLeft
     ld a,$FF
     ld [wEnemySelectedMove],a
     call SetEnemyActedBit
-.preparewithdraw
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.end
     ld hl,RetreatMon
     ret
 
@@ -61575,6 +61762,22 @@ Copy4Bytes:
 Copy4BytesDirect:
     ld bc,$4
     jp CopyData
+
+; b = type 1 of attacker
+; c = type 2 of attacker
+; Note = DRAGON Type gain WIND STAB
+GetAttackerType:
+    call .GetType
+    ld b,a
+    call .GetType
+    ld c,a
+    ret
+.GetType
+    ld a,[hli]
+    cp DRAGON
+    ret nz
+    ld a,WIND
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -78494,35 +78697,30 @@ InitBattleVariables: ; 525af (14:65af)
     ld hl,InitExplodeFlag
     jp Bankswitch
 
-SECTION "Func_52601",ROMX[$6601],BANK[$14]
-
-Func_52601: ; 52601 (14:6601)
+ParalyzeEffect_: ; Moved in the Bank
     ld hl,W_ENEMYMONSTATUS ; $cfe9
     ld de,W_PLAYERMOVETYPE ; $cfd5
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jp z,Func_52613
+    jr z,.next
     ld hl,W_PLAYERMONSTATUS ; $d018
     ld de,W_ENEMYMOVETYPE ; $cfcf
-
-Func_52613: ; 52613 (14:6613)
+.next
     ld a,[hl]
     and a
-    jr nz,.asm_52659
+    jr nz,.didntAffect
     ld a,[de]
     cp $17
-    jr nz,.asm_5262a
+    jr nz,.hitTest
     ld b,h
     ld c,l
     inc bc
-    ld a,[bc]
-    cp $4
-    jr z,.asm_52666
+    call CheckGoundOrRock
+    jr z,.doesntAffect
     inc bc
-    ld a,[bc]
-    cp $4
-    jr z,.asm_52666
-.asm_5262a
+    call CheckGoundOrRock
+    jr z,.doesntAffect
+.hitTest
     push hl
     ld hl,MoveHitTest
     ld b,BANK(MoveHitTest)
@@ -78530,7 +78728,7 @@ Func_52613: ; 52613 (14:6613)
     pop hl
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jr nz,.asm_52659
+    jr nz,.didntAffect
     set 6,[hl]
     ld hl,Func_3ed27
     ld b,BANK(Func_3ed27)
@@ -78543,18 +78741,20 @@ Func_52613: ; 52613 (14:6613)
     ld hl,Func_3fb6e
     ld b,BANK(Func_3fb6e)
     jp Bankswitch ; indirect jump to Func_3fb6e (3fb6e (f:7b6e))
-.asm_52659
+.didntAffect
     ld c,$32
     call DelayFrames
     ld hl,Func_3fb5e
     ld b,BANK(Func_3fb5e)
     jp Bankswitch ; indirect jump to Func_3fb5e (3fb5e (f:7b5e))
-.asm_52666
+.doesntAffect
     ld c,$32
     call DelayFrames
     ld hl,Func_3dc51
     ld b,BANK(Func_3dc51)
     jp Bankswitch ; indirect jump to Func_3dc51 (3dc51 (f:5c51))
+
+SECTION "Func_52673",ROMX[$6673],BANK[$14]
 
 Func_52673: ; 52673 (14:6673)
     ld hl,SilphCoMapList
@@ -79409,6 +79609,13 @@ SaffronCityText12: ; Moved in the Bank
     ld a,PIDGEOT
     call PlayCryAndDisplayPokedex
     jp TextScriptEnd
+
+CheckGoundOrRock:
+    ld a,[bc]
+    cp GROUND
+    ret z
+    cp ROCK
+    ret
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -83767,7 +83974,7 @@ CheckReachLevelLimit:
 
 ; Celadon Dept. Store 2F (2)
 CeladonMart2Text2:
-    db $FE,12
+    db $FE,13
     db TM_01 ; MEGA_PUNCH
     db TM_02 ; RAZOR_WIND
     db TM_04 ; WHIRLWIND
@@ -83780,6 +83987,7 @@ CeladonMart2Text2:
     db TM_30 ; TELEPORT
     db TM_32 ; DOUBLE_TEAM
     db TM_33 ; REFLECT
+    db TM_41 ; LIGHT_SCREEN
     db $FF
 
 Route21ScriptPointers: ; Moved in the Bank
@@ -109153,7 +109361,7 @@ AnimationSlideMonDownAndHide: ; 795c9 (1e:55c9)
 ; Slides the mon's sprite down and disappears. Used in Acid Armor.
     ld a,$1
     ld c,$2
-.asm_795cd
+.loop
     push bc
     push af
     call AnimationHideMonPic
@@ -109168,13 +109376,14 @@ AnimationSlideMonDownAndHide: ; 795c9 (1e:55c9)
     inc a
     pop bc
     dec c
-    jr nz,.asm_795cd
+    jr nz,.loop
     call AnimationHideMonPic
-    ld hl,$c6e8
-    ld bc,$0310
-    xor a
-    call FillMemory
-    jp Func_79652
+    ld c,30
+    call DelayFrames
+    call AnimationSlideMonUp
+	jp AnimationShowMonPic
+
+SECTION "Func_795f8",ROMX[$55f8],BANK[$1e]
 
 Func_795f8: ; 795f8 (1e:55f8)
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -123561,10 +123770,10 @@ UnnamedText_9479a: ; 9479a (25:479a)
     TX_RAM $cf4b
     db $0,"@@"
 
-_UnnamedText_3f542: ; 947a0 (25:47a0)
+_GreatlyText: ; 947a0 (25:47a0)
     db $0,$4c,"greatly@@"
 
-_UnnamedText_3f547: ; 947ab (25:47ab)
+_RoseText: ; 947ab (25:47ab)
     db $0," rose!",$58
 
 _UnnamedText_3f661: ; 947b3 (25:47b3)
@@ -124552,6 +124761,9 @@ _UnnamedText_5c49e: ; 9697a (25:697a)
     db "to challenge me?",$55
     db "Fine then! Show",$55
     db "me your best!",$57
+
+_EnormouslyText:
+    db $0,$4c,"enormously@@"
 
 SECTION "bank26",ROMX,BANK[$26]
 
@@ -129992,15 +130204,6 @@ MewPicFront:
 MewPicBack:
     INCBIN "pic/monback/mewb.pic"
 
-OtherIcon:
-    INCBIN "gfx/denim/held_item.2bpp"
-    INCBIN "gfx/denim/ShinyStar.2bpp"
-    INCBIN "gfx/denim/plus.2bpp"
-    INCBIN "gfx/denim/doubledot.2bpp"
-    INCBIN "gfx/denim/arrowup.2bpp"
-    INCBIN "gfx/denim/arrowleft.2bpp"
-    INCBIN "gfx/denim/PhiSpcSplit.2bpp"
-
 SECTION "bank2F",ROMX,BANK[$2F]
 
 SECTION "InizializzaParametriGBC",ROMX[$4400],BANK[$30]
@@ -131593,7 +131796,7 @@ ItemNames:
     db "TM38:FIR.BLS@" ; $EC ; TM_38
     db "TM39:SWIFT@"   ; $ED ; TM_39
     db "TM40:SKUL B.@" ; $EE ; TM_40
-    db "TM41:STRGGLE@" ; $EF ; TM_41
+    db "TM41:LGT SCR@" ; $EF ; TM_41
     db "TM42:DRM EAT@" ; $F0 ; TM_42
     db "TM43:SKY ATK@" ; $F1 ; TM_43
     db "TM44:REST@"    ; $F2 ; TM_44
@@ -134184,14 +134387,6 @@ LoadHpBarAndStatusTilePatterns_:
     ld de,HpBarAndStatusGraphics
     ld hl,$9620
     ld bc,(BANK(HpBarAndStatusGraphics) << 8 | $1e)
-    call GoodCopyVideoData
-    ld de,EXPBarGraphics
-    ld hl,$8c00
-    ld bc,(BANK(EXPBarGraphics) << 8 | $A)
-    call GoodCopyVideoData
-    ld de,OtherIcon
-    ld hl,$8d00
-    ld bc,(BANK(OtherIcon) << 8 | $B)
     jp GoodCopyVideoData
 
 ; INPUT
@@ -135243,18 +135438,12 @@ SubThreeByteNum_StatusScreen:
     inc de
     ret
 
-FontGraphics1GrayWall2bpp:
-    INCBIN "gfx/denim/font1.2bpp"
-FontGraphics2GrayWall2bpp:
-    INCBIN "gfx/denim/font2.2bpp"
+FontGraphics:
+    INCBIN "gfx/font.2bpp"
+FontGraphicsGrayWall2bpp:
+    INCBIN "gfx/denim/font.2bpp"
 Wall2bpp:
     INCBIN "gfx/denim/wall.2bpp"
-OtherIcon_w:
-    INCBIN "gfx/denim/plus_w.2bpp"
-    INCBIN "gfx/denim/doubledot_w.2bpp"
-    INCBIN "gfx/denim/arrowup_w.2bpp"
-    INCBIN "gfx/denim/arrowleft_w.2bpp"
-    INCBIN "gfx/denim/PhiSpcSplit_w.2bpp"
 PTile: ; This is a single 1bpp "P" tile
     INCBIN "gfx/p_tile.1bpp"
 
@@ -135278,21 +135467,13 @@ LoadStatusScreenGenericTile:
     jp CopyVideoDataDouble ; P (for PP),inline
 
 LoadFontTilePatternsWithWall:
-    ld de,FontGraphics1GrayWall2bpp
+    ld de,FontGraphicsGrayWall2bpp
     ld hl,$8800
-    ld bc,(BANK(FontGraphics1GrayWall2bpp) << 8 | $40)
-    call GoodCopyVideoData
-    ld de,FontGraphics2GrayWall2bpp
-    ld hl,$8E00
-    ld bc,(BANK(FontGraphics2GrayWall2bpp) << 8 | $20)
+    ld bc,(BANK(FontGraphicsGrayWall2bpp) << 8 | $80)
     call GoodCopyVideoData
     ld de,Wall2bpp
     ld hl,$97F0
     ld bc,(BANK(Wall2bpp) << 8 | $1)
-    call GoodCopyVideoData
-    ld de,OtherIcon_w
-    ld hl,$8D20
-    ld bc,(BANK(OtherIcon_w) << 8 | 10)
     jp GoodCopyVideoData
 
 _LoadGhostPic:
@@ -135417,6 +135598,17 @@ PrintMoveDetailsBox:
 .PowerDone
 
     ; Print Phi/Spc Symbols
+    push hl
+    ld hl,wHyperBeamUnknownTypeBit4
+    bit 4,[hl]
+    res 4,[hl]
+    pop hl
+    jr z,.skipHyperBeamException
+    ld a,[W_PLAYERMOVENUM]
+    cp HYPER_BEAM
+    ld de,.HyperBeamExceptionText
+    jr z,.PhiSpcPrint
+.skipHyperBeamException
     ld a,[W_PLAYERMOVEPOWER]
     and a
     jr z,.PhiSpcDone
@@ -135424,6 +135616,7 @@ PrintMoveDetailsBox:
     jr z,.PhiSpcDone
     push hl
     ld hl,W_PLAYERMOVENUM
+    ld bc,$cf91
     call TestPhysicalSpecial
     pop hl
     ld de,.PhiText
@@ -135460,6 +135653,8 @@ PrintMoveDetailsBox:
     db $D7,"@"
 .SpcText
     db $D8,"@"
+.HyperBeamExceptionText
+    db "?@"
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -135801,12 +135996,14 @@ DecrementEnemyPP_:
 ; ──────────────────────────────────────────────────────────────────────
 
 ; input hl = pointer to move id
+; input bc = pointer to mon id
 ; output b = table byte with mask, need to test zero
 TestPhysicalSpecial_:
     call Load16BitRegisters
-    push bc
     push de
     ld a,[hl] ; carico in a l'id dell'attacco
+    cp HYPER_BEAM
+    jr z,.hyperbeam
     srl a
     srl a
     srl a ; divido l'id dell'attacco per 8 per individuare il byte corretto nella tabella associativa (1 bit per attacco)
@@ -135826,10 +136023,26 @@ TestPhysicalSpecial_:
     add hl,de ; punto il byte corretto
     ld a,[hl] ; leggo il byte corretto
     and b ; applico la maschera per isolare il bit corretto,il bit viene così testato
+.end
     pop de
-    pop bc
     ld b,a
     ret
+.hyperbeam
+    ld a,[bc]
+    ld [$D0B5],a
+    call GetMonHeader
+    ld a,[W_MONHBASESPECIAL]
+    ld b,a
+    ld a,[W_MONHBASEATTACK] ; b = special | a = attack
+    cp b
+    jr c,.special
+.phisical
+    xor a
+    jr .end
+.special
+    ld a,1
+    and a
+    jr .end
 ; tabella associativa attacco/tipologia di danno
 .AttackTypeTable
 db %00000000    ; Zero,Pound,Karate Chop*,Double Slap,Comet Punch,Mega Punch,Pay Day,Fire Punch
@@ -135839,7 +136052,7 @@ db %00000000    ; Double Kick,Mega Kick,Jump Kick,Rolling Kick,Sand Attack*,Head
 db %00000000    ; Horn Drill,Tackle,Body Slam,Wrap,Take Down,Thrash,Double-Edge,Tail Whip
 db %00100000    ; Poison Sting,Twineedle,Pin Missile,Leer,Bite*,Growl,Roar,Sing
 db %01010101    ; Supersonic,Sonic Boom,Disable,Acid,Ember,Flamethrower,Mist,Water Gun
-db %11111111    ; Hydro Pump,Surf,Ice Beam,Blizzard,Psybeam,Bubble Beam,Aurora Beam,Hyper Beam
+db %11111110    ; Hydro Pump,Surf,Ice Beam,Blizzard,Psybeam,Bubble Beam,Aurora Beam,Hyper Beam
 db %00000001    ; Peck,Drill Peck,Submission,Low Kick,Counter,Seismic Toss,Strength,Absorb
 db %10001000    ; Mega Drain,Leech Seed,Growth,Razor Leaf,Solar Beam,Poison Powder,Stun Spore,Sleep Powder
 db %10111101    ; Petal Dance,String Shot,Dragon Rage,Fire Spin,Thunder Shock,Thunderbolt,Thunder Wave,Thunder
@@ -135948,9 +136161,9 @@ StatusScreen:
     ; Restore Tile
     call GBPalWhiteOut
     call LoadFontTilePatterns
-    ld de,FontGraphics2+(9*16) ; EmptyTile
+    ld de,FontGraphics+(6*16*16)+(9*16) ; EmptyTile
     ld hl,$97F0
-    ld bc,(BANK(FontGraphics2) << 8 | $1)
+    ld bc,(BANK(FontGraphics) << 8 | $1)
     call GoodCopyVideoData
     ; Restore Update Sprites Flag
     pop af
@@ -136467,6 +136680,7 @@ HandleStatusScreen2:
     ; Print Phi/Spc Symbols
     push hl
     ld hl,W_PLAYERMOVENUM
+    ld bc,$cf91
     call TestPhysicalSpecial
     pop hl
     ld de,.PhiText
@@ -137271,6 +137485,7 @@ SECTION "Bank3b",ROMX,BANK[$3B]
 PokemonBaseStats:
 INCLUDE "constants/pokemon_header.asm"
 INCLUDE "constants/pokemon_learnset.asm"
+INCLUDE "constants/pokemon_learnset_config.asm"
 
 MonsterNames:
     db "MISSINGNO." ; 001 - MISSINGNO

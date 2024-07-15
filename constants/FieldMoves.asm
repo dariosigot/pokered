@@ -89,7 +89,7 @@ db FM_LIGHT                                          ; 78  - $4E - RAPIDASH
 db FM_TELEPORT                                       ; 79  - $4F - SLOWPOKE
 db FM_FLOAT+FM_TELEPORT                              ; 80  - $50 - SLOWBRO
 db FM_LIGHT                                          ; 81  - $51 - MAGNEMITE
-db FM_LIGHT                                          ; 82  - $52 - MAGNETON
+db FM_LIGHT+FM_TELEPORT                              ; 82  - $52 - MAGNETON
 db FM_CUT                                            ; 83  - $53 - FARFETCH_D
 db FM_CUT                                            ; 84  - $54 - DODUO
 db FM_CUT                                            ; 85  - $55 - DODRIO
@@ -108,11 +108,11 @@ db FM_TELEPORT                                       ; 97  - $61 - HYPNO
 db FM_CUT+FM_DIG                                     ; 98  - $62 - KRABBY
 db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG                ; 99  - $63 - KINGLER
 db FM_LIGHT                                          ; 100 - $64 - VOLTORB
-db FM_LIGHT                                          ; 101 - $65 - ELECTRODE
+db FM_LIGHT+FM_TELEPORT                              ; 101 - $65 - ELECTRODE
 db FM_TELEPORT                                       ; 102 - $66 - EXEGGCUTE
 db FM_TELEPORT                                       ; 103 - $67 - EXEGGUTOR
-db FM_DIG                                            ; 104 - $68 - CUBONE
-db FM_DIG+FM_STRENGTH                                ; 105 - $69 - MAROWAK
+db FM_CUT+FM_DIG                                     ; 104 - $68 - CUBONE
+db FM_CUT+FM_STRENGTH+FM_DIG                         ; 105 - $69 - MAROWAK
 db FM_FLOAT+FM_STRENGTH                              ; 106 - $6A - HITMONLEE
 db FM_FLOAT+FM_STRENGTH                              ; 107 - $6B - HITMONCHAN
 db FM_CUT+FM_FLOAT+FM_HEAL                           ; 108 - $6C - LICKITUNG

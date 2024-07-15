@@ -1742,11 +1742,11 @@ wDebugEnemyMoveBit7         ; df38 ; bit 7
 wFlagMoveRelearnEngagedBit7 ; df38 ; bit 7
     ds 1
 
-wFlagListMenuSpc: ; df39 ; Denim
-                  ; bit 0 = BadgeName
-                  ; bit 1 = Celadon Mart Elevator
-                  ; bit 2 = Silph Co Elevator
-                  ; bit 3 = Rocket Hideout Elevator
+wFlagListMenuSpc:           ; df39 ; bit 0 = BadgeName
+                            ; df39 ; bit 1 = Celadon Mart Elevator
+                            ; df39 ; bit 2 = Silph Co Elevator
+                            ; df39 ; bit 3 = Rocket Hideout Elevator
+wHyperBeamUnknownTypeBit4   ; df39 ; bit 4 = Set Hyper Beam to Unknown Type
     ds 1
 
 wFishingLevel:       ; df3a
