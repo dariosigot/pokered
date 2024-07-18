@@ -16387,10 +16387,15 @@ LearnMove: ; 6e43 (1:6e43)
     pop hl
     bit 1,a
     jr nz,.asm_6fab_B_Pressed
-    push hl
-    call CheckImportantMove
-    pop hl
-    jp c,.ChoiceAnotherMoveToDelete
+    ;push hl
+    ;call CheckImportantMove
+    ;pop hl
+    ;jp c,.ChoiceAnotherMoveToDelete
+
+    ld a,[wCurrentMenuItem] ; $cc26
+    ld c,a
+    ld b,$0
+
     add hl,bc
     and a ; rcf
     ret
@@ -18402,87 +18407,84 @@ CheckDiglettsCave:
 .done
     jp GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
 
-CheckImportantMove:
-
-    ; Get Move to Delete
-    ld a,[wCurrentMenuItem] ; $cc26
-    ld c,a
-    ld b,$0
-    add hl,bc
-    ld a,[hl]
-
-    push af ; Backup Move to Delete
-    push bc ; Backup Move Offset
-
-    push af ; Backup Move
-
-    ; Get Move Name
-    ld [$d11e],a
-    call GetMoveName
-
-    ; Get Potential Move List
-    call CheckMoveRelearn
-    jr nz,.skip
-    ld hl,wDontUpdateMoveListsBit5
-    bit 5,[hl]
-    jr nz,.skip
-    ld a,[wWhichPokemon]
-    ld [$cf92],a
-    xor a ; player party
-    ld [$cc49],a
-    call LoadMonData
-    ld b,BANK(GetMonPotentialMoveList)
-    ld hl,GetMonPotentialMoveList
-    call Bankswitch
-.skip
-
-    pop bc ; Restore Move
-    ld a,[$cf98]
-    cp MEW
-    jr z,.ConfirmDelete
-
-    ; Search Move to Delete in Potential Move List
-    ld hl,wMoveRelearnerMoveList
-    ld a,[hli]
-    and a
-    jr z,.NotFindThenImportant
-    ld c,a
-.Loop
-    ld a,[hli]
-    cp $FF
-    jr z,.NotFindThenImportant
-    cp b
-    jr z,.FindThenNotImportant
-    dec c
-    jr nz,.Loop
-.NotFindThenImportant
-
-    ld hl,.ImportantText
-    call IsTryingToLearnPalFix_PrintText
-
-    FuncCoord 14,7 ; $c43a
-    ld hl,Coord
-    ld bc,$80f
-    ld a,$14
-    ld [$d125],a
-    call DisplayTextBoxID
-    ld a,[wCurrentMenuItem] ; $cc26
-    and a
-    jr z,.ConfirmDelete
-
-    pop bc ; Restore Move Offset
-    pop af ; Backup Move to Delete
-    scf
-    ret
-.FindThenNotImportant
-.ConfirmDelete
-    pop bc ; Restore Move Offset
-    pop af ; Backup Move to Delete
-    and a ; rcf
-    ret
-.ImportantText
-    TX_FAR _ImportantText
-    db "@"
+;CheckImportantMove:
+;
+;    ; Get Move to Delete
+;    ld a,[wCurrentMenuItem] ; $cc26
+;    ld c,a
+;    ld b,$0
+;    add hl,bc
+;    ld a,[hl]
+;
+;    push af ; Backup Move to Delete
+;    push bc ; Backup Move Offset
+;
+;    push af ; Backup Move
+;
+;    ; Get Move Name
+;    ld [$d11e],a
+;    call GetMoveName
+;
+;    ; Get Potential Move List
+;    call CheckMoveRelearn
+;    jr nz,.skip
+;    ld a,[wWhichPokemon]
+;    ld [$cf92],a
+;    xor a ; player party
+;    ld [$cc49],a
+;    call LoadMonData
+;    ld b,BANK(GetMonPotentialMoveList)
+;    ld hl,GetMonPotentialMoveList
+;    call Bankswitch
+;.skip
+;
+;    pop bc ; Restore Move
+;    ld a,[$cf98]
+;    cp MEW
+;    jr z,.ConfirmDelete
+;
+;    ; Search Move to Delete in Potential Move List
+;    ld hl,wMoveRelearnerMoveList
+;    ld a,[hli]
+;    and a
+;    jr z,.NotFindThenImportant
+;    ld c,a
+;.Loop
+;    ld a,[hli]
+;    cp $FF
+;    jr z,.NotFindThenImportant
+;    cp b
+;    jr z,.FindThenNotImportant
+;    dec c
+;    jr nz,.Loop
+;.NotFindThenImportant
+;
+;    ld hl,.ImportantText
+;    call IsTryingToLearnPalFix_PrintText
+;
+;    FuncCoord 14,7 ; $c43a
+;    ld hl,Coord
+;    ld bc,$80f
+;    ld a,$14
+;    ld [$d125],a
+;    call DisplayTextBoxID
+;    ld a,[wCurrentMenuItem] ; $cc26
+;    and a
+;    jr z,.ConfirmDelete
+;
+;    pop bc ; Restore Move Offset
+;    pop af ; Backup Move to Delete
+;    scf
+;    ret
+;.FindThenNotImportant
+;.ConfirmDelete
+;    pop bc ; Restore Move Offset
+;    pop af ; Backup Move to Delete
+;    and a ; rcf
+;    ret
+;.ImportantText
+;    TX_FAR _ImportantText
+;    db "@"
 
 HandleMenuInput_PrintMoveBox:
     push hl
@@ -50515,6 +50517,7 @@ AfterEvolution_TryToAddExclusiveMove:
     pop af
     ld [$d11e],a
     ld [$cf91],a
+    ld [wNewMonIdDuringLearnMove],a
     jr LearnMoveCommon
 .Loop
     ld a,[hli]
@@ -50557,7 +50560,7 @@ LearnMoveFromLevelUp:
     ld [$cf91],a
     cp a,MEW
     ret z ; Mew just know every Move!
-    push af
+    ld [wNewMonIdDuringLearnMove],a
     ld hl,W_PARTYMON1_LEVEL
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
@@ -50570,26 +50573,14 @@ LearnMoveFromLevelUp:
     xor a
     ld [$cd46],a
     call GetMoveList
+    call LearnMoveCommon
     pop af    ; Restore Level
     pop hl    ; ...
     ld [hl],a ; ...
-    pop af
-    ; fall through
+    ret
 
 LearnMoveCommon:
-    ld hl,wDontUpdateMoveListsBit5
-    set 5,[hl]
-    ; ds 1 ; dec a ; 00MOD
-    ld bc,$0
-    call LoadEvosMovesPointerTableByPokedex
-    add a
-    rl b
-    ld c,a
-    add hl,bc
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    call GetEvosMoves
+    call .GetEvosMoves
 .skipEvolutionDataLoop
     ld a,[hli]
     and a
@@ -50615,15 +50606,29 @@ LearnMoveCommon:
     call GetMoveName
     call CopyStringToCF4B
     PREDEF LearnMovePredef
+    call GetMoveList
+    call .GetEvosMoves
 .LearnEndOrJustKnow
     pop hl ; Restore Pointer to Current Learn Move's Level
     jr .learnSetLoop
 .done
-    ld hl,wDontUpdateMoveListsBit5
-    res 5,[hl]
-    ld a,[$cf91]
+    ld a,[wNewMonIdDuringLearnMove]
+    ld [$cf91],a
     ld [$d11e],a
     ret
+.GetEvosMoves
+    ld a,[wNewMonIdDuringLearnMove]
+    ; ds 1 ; dec a ; 00MOD
+    ld bc,$0
+    call LoadEvosMovesPointerTableByPokedex
+    add a
+    rl b
+    ld c,a
+    add hl,bc
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    jp GetEvosMoves
 
 Func_3bb8c: ; Moved in the Bank
     ld hl,Func_3fb53 ; $7b53
@@ -128269,19 +128274,19 @@ _ReplaceAMoveForText:
     TX_RAM $cf4b
     db $0,"?",$57
 
-_ImportantText:
-    TX_RAM $cd6d
-    db $0," is a",$4f,"@"
-    TX_RAM $d036
-    db 0,"'s",$55
-    db "Exclusive Move!",$51
-    db "If replaced,",$4f,"@"
-    TX_RAM $d036
-    db 0," can't",$55
-    db "relearn it again!",$51
-    db "Permanently forget",$4f,"@"
-    TX_RAM $cd6d
-    db 0,"?",$57
+;_ImportantText:
+;    TX_RAM $cd6d
+;    db $0," is a",$4f,"@"
+;    TX_RAM $d036
+;    db 0,"'s",$55
+;    db "Exclusive Move!",$51
+;    db "If replaced,",$4f,"@"
+;    TX_RAM $d036
+;    db 0," can't",$55
+;    db "relearn it again!",$51
+;    db "Permanently forget",$4f,"@"
+;    TX_RAM $cd6d
+;    db 0,"?",$57
 
 _ForgotAndLearnText:
     ;db 0,"Ok! Replaced",$4f,"@"
