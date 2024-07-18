@@ -18423,6 +18423,9 @@ CheckImportantMove:
     ; Get Potential Move List
     call CheckMoveRelearn
     jr nz,.skip
+    ld hl,wDontUpdateMoveListsBit5
+    bit 5,[hl]
+    jr nz,.skip
     ld a,[wWhichPokemon]
     ld [$cf92],a
     xor a ; player party
@@ -50574,6 +50577,8 @@ LearnMoveFromLevelUp:
     ; fall through
 
 LearnMoveCommon:
+    ld hl,wDontUpdateMoveListsBit5
+    set 5,[hl]
     ; ds 1 ; dec a ; 00MOD
     ld bc,$0
     call LoadEvosMovesPointerTableByPokedex
@@ -50614,6 +50619,8 @@ LearnMoveCommon:
     pop hl ; Restore Pointer to Current Learn Move's Level
     jr .learnSetLoop
 .done
+    ld hl,wDontUpdateMoveListsBit5
+    res 5,[hl]
     ld a,[$cf91]
     ld [$d11e],a
     ret
