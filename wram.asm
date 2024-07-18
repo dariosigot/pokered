@@ -1747,6 +1747,7 @@ wFlagListMenuSpc:           ; df39 ; bit 0 = BadgeName
                             ; df39 ; bit 2 = Silph Co Elevator
                             ; df39 ; bit 3 = Rocket Hideout Elevator
 wHyperBeamUnknownTypeBit4   ; df39 ; bit 4 = Set Hyper Beam to Unknown Type
+wDontUpdateMoveListsBit5    ; df39 ; bit 5 = Set to don't remove Moves List during LearnMove
     ds 1
 
 wFishingLevel:       ; df3a
