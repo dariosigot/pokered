@@ -136073,7 +136073,7 @@ db %10000000    ; Gust*,Wing Attack,Whirlwind,Fly,Bind,Slam,Vine Whip,Stomp
 db %00000000    ; Double Kick,Mega Kick,Jump Kick,Rolling Kick,Sand Attack*,Headbutt,Horn Attack,Fury Attack
 db %00000000    ; Horn Drill,Tackle,Body Slam,Wrap,Take Down,Thrash,Double-Edge,Tail Whip
 db %00100000    ; Poison Sting,Twineedle,Pin Missile,Leer,Bite*,Growl,Roar,Sing
-db %01010101    ; Supersonic,Sonic Boom,Disable,Acid,Ember,Flamethrower,Mist,Water Gun
+db %01001101    ; Supersonic,Sonic Boom,Disable,Acid,Ember,Flamethrower,Mist,Water Gun
 db %11111110    ; Hydro Pump,Surf,Ice Beam,Blizzard,Psybeam,Bubble Beam,Aurora Beam,Hyper Beam
 db %00000001    ; Peck,Drill Peck,Submission,Low Kick,Counter,Seismic Toss,Strength,Absorb
 db %10001000    ; Mega Drain,Leech Seed,Growth,Razor Leaf,Solar Beam,Poison Powder,Stun Spore,Sleep Powder
