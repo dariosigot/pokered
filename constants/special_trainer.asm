@@ -1009,14 +1009,9 @@ ChannelerMove16:
     db 0
 
 PokemaniacMove8:
-    ; Muk (Level 50)
-    db ACID_ARMOR
-    db ACID_ARMOR
-    db ACID_ARMOR
-    db WRAP
-    ; Gengar (Level 70)
-    db ACID_ARMOR
-    db BIND
-    db WRAP
-    db FIRE_SPIN
+    ; Kadabra (Level 16)
+    db PSYWAVE
+    db CONFUSION
+    db DISABLE
+    db KINESIS
     db 0

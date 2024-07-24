@@ -37668,6 +37668,9 @@ CheckJumpExceptionFlag:
     ; Check B pressed Flag
     bit 1,[hl] ; EX_B
     jr z,.skipBCheck
+    ld a,[$d5a2] ; hall of fame
+    and a
+    jr z,.fail
     ld a,[H_CURRENTPRESSEDBUTTONS]
     bit 1,a
     jr z,.fail
@@ -138089,7 +138092,7 @@ PortRoyalObject:
 
     db $2 ; people
     db SPRITE_LASS,08 + 4,03 + 4,$fe,$00,$00+1 ; person
-    db SPRITE_BALL,10 + 4,05 + 4,$ff,$ff,$80+2,SURFBOARD ; item
+    db SPRITE_BALL,10 + 4,05 + 4,$ff,$ff,$80+2,RARE_CANDY ; item
 
     ; warp-to
     EVENT_DISP PORT_ROYAL_WIDTH,05,05 ; PORT_ROYAL_POKECENTER
