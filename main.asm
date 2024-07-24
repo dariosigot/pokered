@@ -68310,7 +68310,7 @@ UnknownDungeon2Object: ; 0x45e14 (size=73)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_BALL,$9 + 4,$1d + 4,$ff,$ff,$81,PP_UP ; item
+    db SPRITE_BALL,$9 + 4,$1d + 4,$ff,$ff,$81,MAX_ELIXER ; item
     db SPRITE_BALL,$f + 4,$4 + 4,$ff,$ff,$82,ULTRA_BALL ; item
     db SPRITE_BALL,$6 + 4,$d + 4,$ff,$ff,$83,FULL_RESTORE ; item
 
@@ -69912,7 +69912,7 @@ Route10HiddenObjects: ; 46e9c (11:6e9c)
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 RocketHideout1HiddenObjects: ; 46ea9 (11:6ea9)
-    db $0f,$15,PP_UP
+    db $0f,$15,MAX_ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 RocketHideout3HiddenObjects: ; 46eb0 (11:6eb0)
@@ -69934,7 +69934,7 @@ PokemonTower5HiddenObjects: ; 46ecb (11:6ecb)
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 Route13HiddenObjects: ; 46ed2 (11:6ed2)
-    db $0e,$01,PP_UP
+    db $0e,$01,MAX_ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $0d,$10,CALCIUM
     dbw BANK(HiddenItems),HiddenItems
@@ -69970,7 +69970,7 @@ UnknownDungeon3HiddenObjects: ; 46f09 (11:6f09)
 PowerPlantHiddenObjects: ; 46f10 (11:6f10)
     db $10,$11,MAX_ELIXER
     dbw BANK(HiddenItems),HiddenItems
-    db $01,$0c,PP_UP
+    db $01,$0c,MAX_ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 SeafoamIslands3HiddenObjects: ; 46f1d (11:6f1d)
@@ -70119,7 +70119,7 @@ Route17HiddenObjects: ; 4704f (11:704f)
     dbw BANK(HiddenItems),HiddenItems
     db $2d,$08,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
-    db $48,$11,PP_UP
+    db $48,$11,MAX_ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $5b,$04,MAX_REVIVE
     dbw BANK(HiddenItems),HiddenItems
@@ -70139,7 +70139,7 @@ UndergroundPathWeHiddenObjects: ; 4707b (11:707b)
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 CeladonCityHiddenObjects: ; 47088 (11:7088)
-    db $0f,$30,PP_UP
+    db $0f,$30,MAX_ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 SeafoamIslands4HiddenObjects: ; 4708f (11:708f)
@@ -84307,7 +84307,7 @@ Route15Object: ; 0x5894e (size=126)
     db SPRITE_BIKER,$a + 4,$2e + 4,$ff,$d0,$48,BIKER,$4 ; trainer
     db SPRITE_LASS,$5 + 4,$25 + 4,$ff,$d3,$49,JR__TRAINER_F,$16 ; trainer
     db SPRITE_LASS,$d + 4,$12 + 4,$ff,$d1,$4a,JR__TRAINER_F,$17 ; trainer
-    db SPRITE_BALL,$5 + 4,$12 + 4,$ff,$ff,$8b,PP_UP ; item
+    db SPRITE_BALL,$5 + 4,$12 + 4,$ff,$ff,$8b,MAX_ELIXER ; item
 
     ; warp-to
     EVENT_DISP $1e,$8,$7 ; ROUTE_15_GATE_1F
