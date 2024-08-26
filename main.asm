@@ -25833,6 +25833,9 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     jp Bankswitch
 
 ItemUseTechMach:
+    ld a,[W_ISINBATTLE]
+    and a
+    jp nz,ItemUseNotTime
     ld a,[$d152]
     push af
     ld a,[$cf91]
@@ -26004,14 +26007,6 @@ GetTMChoiceItemID:
     db "@"
 .X
     db "×@"
-
-; Routine che inserisce 1 in d11c per assicurarsi l'uscita dalla battle quando un pokemon è stato catturato
-; di default veniva inserito il pkmnID ma dava problemi con 'M a causa del suo ID=0 già utilizzato per gli
-; strumenti curativi o il fallimento di cattura
-FlagExitBattle:
-    ld a,1
-    ld [$d11c],a
-    ret
 
 SECTION "DrawBadges",ROMX[$6a03],BANK[$3]
 
@@ -27501,6 +27496,14 @@ HealParty: ; f6a5 (3:76a5)
     inc [hl]
     dec b
     jr nz,.restoreBonusPPLoop
+    ret
+
+; Routine che inserisce 1 in d11c per assicurarsi l'uscita dalla battle quando un pokemon è stato catturato
+; di default veniva inserito il pkmnID ma dava problemi con 'M a causa del suo ID=0 già utilizzato per gli
+; strumenti curativi o il fallimento di cattura
+FlagExitBattle:
+    ld a,1
+    ld [$d11c],a
     ret
 
 SECTION "Func_f71e",ROMX[$771e],BANK[$3]
