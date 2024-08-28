@@ -1514,7 +1514,26 @@ wLastBlackoutAdventureMap:: db ; d71b
 
 W_FLAGS_D733: ; d733
 ; bit 4: use variable [W_CURMAPSCRIPT] instead of the provided index for next frame's map script (used to start battle when talking to trainers)
-    ds 340
+    ds 1
+
+SECTION "wEventFlags",WRAMX[$d747],BANK[$1]
+
+wEventFlags: ; $d747
+
+SECTION "DenimEventFlags",WRAMX[$d882],BANK[$1]
+
+wEventBeatArticunoBit2       ; d882 ; bit 2
+wEventBeatDratiniBit3        ; d882 ; bit 3
+wEventEnableOakLastPkmnBit4  ; d882 ; bit 4
+wEventBeatAerodactylBit5     ; d882 ; bit 5
+wEventEnableDojoLastPkmnBit6 ; d882 ; bit 6
+wEventEncounterMewBit7       ; d882 ; bit 7
+    ds 1
+
+wEventRouteD1Trainer0Bit1    ; d883 ; bit 1
+    ds 1
+
+SECTION "W_GRASSRATE",WRAMX[$d887],BANK[$1] 
 
 W_GRASSRATE: ; d887
     ds 1
@@ -1705,7 +1724,6 @@ wPrintBattleValueBit0      ; df35 ; bit 0 = Trigger Print Battle Value
 wFlagValueToPlayerBit1     ; df35 ; bit 1 = Print Battle Value to Player
 wFlagSortMoveBit1          ; df35 ; bit 1 = Sort Moves in Moves Menu (SELECT)
 wFlagShinyBit2             ; df35 ; bit 2
-wDigCaveAerodactylBeatBit3 ; df35 ; bit 3
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
 wFlagBackFrontSpriteBit56  ; df35 ; bit 5
                            ; df35 ; bit 6
@@ -1730,11 +1748,7 @@ wMonIdCryAndDex        ; df37 = Mon ID used for PlayCryAndDisplayPokedex
 
 wFlagAddPkmnToPartyBit0     ; df38 ; bit 0
 wStatusScreen2OAMBit0       ; df38 ; bit 0 = Write OAM in Status Screen 2
-wFlagDratiniCaveBit1        ; df38 ; bit 1
 wFlagNoHpPalBit2            ; df38 ; bit 2
-wFlagEnableOakLastPkmnBit3  ; df38 ; bit 3
-wFlagEnableDojoLastPkmnBit4 ; df38 ; bit 4
-wMewEventBit5               ; df38 ; bit 5
 wFirstExpAllMessageBit6     ; df38 ; bit 6
 wSelectInOverworldOnBit6    ; df38 ; bit 6
 wStatusScreenJustLoadBit6   ; df38 ; bit 6 = Status Screen Picture Just Load

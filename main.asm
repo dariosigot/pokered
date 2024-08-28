@@ -24811,8 +24811,8 @@ ItemUsePokeflute: ; e140 (3:6140)
 .notRoute16
     cp a,DIGLETTS_CAVE
     ret nz
-    ld a,[wDigCaveAerodactylBeatBit3]
-    bit 3,a ; has the player beaten Diglett's Cave Aerodactyl yet?
+    ld a,[wEventBeatAerodactylBit5]
+    bit 5,a ; has the player beaten Diglett's Cave Aerodactyl yet?
     ret nz
 ; if the player hasn't beaten Diglett's Cave Aerodactyl
     ld a,[$d35d]
@@ -31200,9 +31200,9 @@ GetEnemy:
     pop hl
     jr z,.NotEncounter
     push hl
-    ld hl,wMewEventBit5
-    bit 5,[hl]
-    set 5,[hl]
+    ld hl,wEventEncounterMewBit7
+    bit 7,[hl]
+    set 7,[hl]
     pop hl
     jr nz,.NotEncounter
 .MewFirstEncounter
@@ -44202,8 +44202,8 @@ CheckMonAlreadyKnowMoveQuick:
 ; ────────────────────────────────────────────────────────────
 
 CheckEnableLastPkmn:
-    ld hl,wFlagEnableOakLastPkmnBit3
-    bit 3,[hl]
+    ld hl,wEventEnableOakLastPkmnBit4
+    bit 4,[hl]
     jr nz,.Ignore
     push hl
     ld hl,W_OBTAINEDBADGES
@@ -44213,7 +44213,7 @@ CheckEnableLastPkmn:
     cp 3
     pop hl
     jr c,.Ignore
-    set 3,[hl]
+    set 4,[hl]
     pop hl ; Delete Return Pointer
     ld hl,EnableLastPkmnText
     call PrintText
@@ -44227,8 +44227,8 @@ EnableLastPkmnText:
     db "@"
 
 GetOakLastPkmn:
-    ld hl,wFlagEnableOakLastPkmnBit3
-    bit 3,[hl]
+    ld hl,wEventEnableOakLastPkmnBit4
+    bit 4,[hl]
     jr z,.Ignore
     ld a,[W_PLAYERSTARTER]
     cp CHARMANDER
@@ -69193,9 +69193,9 @@ SeafoamIslands5TextPointers: ; 4687c (11:687c)
 
 SeafoamIslands5TrainerHeaders: ; 46886 (11:6886)
 SeafoamIslands5TrainerHeader0: ; 46886 (11:6886)
-    db $2 ; flag's bit
+    db 2 ; flag's bit
     db ($0 << 4) ; trainer's view range
-    dw $d882 ; flag's byte
+    dw wEventBeatArticunoBit2 ; flag's byte
     dw SeafoamIslands5BattleText2 ; 0x68a2 TextBeforeBattle
     dw SeafoamIslands5BattleText2 ; 0x68a2 TextAfterBattle
     dw SeafoamIslands5BattleText2 ; 0x68a2 TextEndBattle
@@ -91993,15 +91993,15 @@ VermilionGymTrashFailText: ; 5df02 (17:5f02)
     jp TextScriptEnd
 
 CheckEnableOtherHitmon:
-    ld hl,wFlagEnableDojoLastPkmnBit4
-    bit 4,[hl]
+    ld hl,wEventEnableDojoLastPkmnBit6
+    bit 6,[hl]
     jr nz,.Ignore
     push hl
     ld hl,W_OBTAINEDBADGES
     bit 5,[hl] ; MARSHBADGE
     pop hl
     jr z,.Ignore
-    set 4,[hl]
+    set 6,[hl]
     pop hl ; Delete Return Pointer
     ld hl,EnableLastDojoPkmnText
     call PrintText
@@ -92024,8 +92024,8 @@ _EnableLastDojoPkmnText:
     db "Fighter!",$57
 
 GetLastFighter:
-    ld hl,wFlagEnableDojoLastPkmnBit4
-    bit 4,[hl]
+    ld hl,wEventEnableDojoLastPkmnBit6
+    bit 6,[hl]
     jr z,.Ignore
     ld hl,$d7b1
     bit 6,[hl]
@@ -92048,7 +92048,7 @@ GetLastFighter:
     call DisplayPokedex
     pop af
     ld b,a
-    ld c,10
+    ld c,30
     call GivePokemon
     pop de
     ret nc ; PartyFull
@@ -96117,8 +96117,8 @@ DiglettsCaveScript0:
     ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
     ret
 .CheckAerodatyl
-    ld hl,wDigCaveAerodactylBeatBit3 ; wDigCaveAerodactylTrigBit0
-    bit 3,[hl]
+    ld hl,wEventBeatAerodactylBit5 ; wDigCaveAerodactylTrigBit0
+    bit 5,[hl]
     ret nz
     bit 0,[hl]
     res 0,[hl]
@@ -96202,8 +96202,8 @@ DiglettsCavePostAerodactyl:
     ld a,$11
     call Predef ; indirect jump to RemoveMissableObject (f1d7 (3:71d7))
     call UpdateSprites
-    ld hl,wDigCaveAerodactylBeatBit3
-    set 3,[hl]
+    ld hl,wEventBeatAerodactylBit5
+    set 5,[hl]
     call Delay3
     ; fallthrough
 
@@ -106536,8 +106536,7 @@ LoreleiScript_76191: ; 76191 (1d:6191)
     bit 5,[hl]
     res 5,[hl]
     ret z
-    ld hl,$d734
-    set 1,[hl]
+    ds 5
     ld a,[$d863]
     bit 1,a
     jr z,.asm_761a9
@@ -106720,7 +106719,7 @@ BrunoScript_762ec: ; 762ec (1d:62ec)
     bit 5,[hl]
     res 5,[hl]
     ret z
-    ld a,[$d864]
+    call InitialilzeEliteFour ; ld a,[$d864]
     bit 1,a
     jr z,.asm_76300
     ld a,$5
@@ -107532,6 +107531,12 @@ GetObtainedHiddenCoinsFlags:
     ret
 
 ; ───────────────────────────────────────
+
+InitialilzeEliteFour:
+    ld hl,$d734
+    set 1,[hl]
+    ld a,[$d864]
+    ret
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -130996,9 +131001,9 @@ DratiniCaveTextPointers:
 
 DratiniCaveTrainerHeaders:
 DratiniCaveTrainerHeader0:
-    db $1 ; flag's bit
+    db 3 ; flag's bit
     db ($0 << 4) ; trainer's view range
-    dw wFlagDratiniCaveBit1 ; flag's byte
+    dw wEventBeatDratiniBit3 ; flag's byte
     dw DratiniCaveDratiniText ; TextBeforeBattle
     dw DratiniCaveDratiniText ; TextAfterBattle
     dw DratiniCaveDratiniText ; TextEndBattle
@@ -134648,6 +134653,10 @@ IsFocusInBagOrAllFought_:
 
 CheckIfAllFought:
     call DefineMonLiveFlag        ; ► d = flag mon live
+    call DefinePartyFlag          ; ► e = party
+    ld a,d
+    and e
+    ld d,a
     ld a,[W_PLAYERMONSALIVEFLAGS] ; ► a = flag has fought
     cp d
     ret
@@ -138188,9 +138197,9 @@ RouteD1ScriptPointers:
 
 RouteD1TrainerHeaders:
 RouteD1TrainerHeader0:
-    db $1 ; flag's bit
+    db 1 ; flag's bit
     db ($3 << 4) ; trainer's view range
-    dw $d883 ; flag's byte
+    dw wEventRouteD1Trainer0Bit1 ; flag's byte
     dw RouteD1Text2 ; TextBeforeBattle
     dw RouteD1Text2 ; TextAfterBattle
     dw RouteD1Text2End ; TextEndBattle
