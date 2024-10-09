@@ -159,3 +159,11 @@ db FM_FLOAT+FM_DIG                                   ; 148 - $94 - DRAGONAIR
 db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_DIG         ; 149 - $95 - DRAGONITE
 db FM_CUT+FM_FLY+FM_STRENGTH+FM_LIGHT+FM_TELEPORT    ; 150 - $96 - MEWTWO
 db $FF                                               ; 151 - $97 - MEW
+db FM_LIGHT+FM_TELEPORT                              ; 152 - $98 - LITWICK
+db FM_LIGHT+FM_TELEPORT                              ; 153 - $99 - LAMPENT
+db FM_LIGHT+FM_TELEPORT                              ; 154 - $9A - CHANDELURE
+db 0                                                 ; 155 - $9B - MON_155
+db 0                                                 ; 156 - $9C - MON_156
+db 0                                                 ; 157 - $9D - MON_157
+db 0                                                 ; 158 - $9E - MON_158
+db 0                                                 ; 159 - $9F - MON_159

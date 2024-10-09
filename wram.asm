@@ -969,8 +969,10 @@ W_PARTYMON6NAME: ; d2ec
 
 SECTION "Pokedex", WRAMX[$d2f7], BANK[1]
 
+DEX_NUM_MON EQU 160
+
 wPokedexOwned: ; d2f7
-    ds (152 / 8)
+    ds (DEX_NUM_MON / 8)
 wPokedexOwnedEnd:
 
 ; some free bytes
@@ -1139,7 +1141,7 @@ wDVForShinySpdSpc ; d480
 SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]
 
 wPokedexSeen: ; d490
-    ds (152 / 8)
+    ds (DEX_NUM_MON / 8)
 wPokedexSeenEnd:
 
 SECTION "W_NUMSPRITES", WRAMX[$d4e1], BANK[1]

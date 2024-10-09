@@ -815,3 +815,19 @@ Mon151_EvosMoves:
     MEW_Learnset
     db 0
 ; ──────────────────────────────────────────────────────────────────────
+Mon152_EvosMoves:
+    db EV_LEVEL,41,LAMPENT
+    db 0
+    LITWICK_Learnset
+    LITWICK_NoEvo_Learnset
+    db 0
+Mon153_EvosMoves:
+    db EV_ITEM,DUSK_STONE,1,CHANDELURE
+    db 0
+    LAMPENT_Learnset
+    db 0
+Mon154_EvosMoves:
+    db 0
+    CHANDELURE_Learnset
+    db 0
+; ──────────────────────────────────────────────────────────────────────

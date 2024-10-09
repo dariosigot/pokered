@@ -21,7 +21,7 @@ SUPER_POTION  EQU $13
 POTION        EQU $14
 BAIT_ITEM     EQU $15
 ROCK_ITEM     EQU $16
-; XXX ????? EQU $17
+DUSK_STONE    EQU $17
 ; XXX ????? EQU $18
 ; XXX ????? EQU $19
 ; XXX ????? EQU $1A
@@ -77,7 +77,6 @@ FOCUS         EQU $4B
 OLD_ROD       EQU $4C
 GOOD_ROD      EQU $4D
 SUPER_ROD     EQU $4E
-; XXX todo: compare this to $32
 PP_UP         EQU $4F
 ETHER         EQU $50
 MAX_ETHER     EQU $51

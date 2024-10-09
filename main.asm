@@ -23141,14 +23141,14 @@ UseItem_: ; Moved in the Bank
     dw ItemUseMedicine   ; HYPER_POTION
     dw ItemUseMedicine   ; SUPER_POTION
     dw ItemUseMedicine   ; POTION
-    dw ItemUseBait       ; BOULDERBADGE
-    dw ItemUseRock       ; CASCADEBADGE
-    dw UnusableItem      ; THUNDERBADGE
-    dw UnusableItem      ; RAINBOWBADGE
-    dw UnusableItem      ; SOULBADGE
-    dw UnusableItem      ; MARSHBADGE
-    dw UnusableItem      ; VOLCANOBADGE
-    dw UnusableItem      ; EARTHBADGE
+    dw ItemUseBait       ; 
+    dw ItemUseRock       ; 
+    dw ItemUseEvoStone   ; DUSK_STONE
+    dw UnusableItem      ; 
+    dw UnusableItem      ; 
+    dw UnusableItem      ; 
+    dw UnusableItem      ; 
+    dw UnusableItem      ; 
     dw ItemUseEscapeRope ; ESCAPE_ROPE
     dw ItemUseRepel      ; REPEL
     dw UnusableItem      ; OLD_AMBER
@@ -25649,8 +25649,8 @@ IsKeyItem_: ; e764 (3:6764)
 .KeyItemBitfield
     db %11110000
     db %00000001
-    db %11110000
-    db %01001111
+    db %00110000
+    db %01000000
     db %00000000
     db %10010111
     db %00000010
@@ -44162,6 +44162,14 @@ ExclusiveMoveLearnTable:
     dw DragoniteExclusiveMove  ; 149 - DRAGONITE
     dw MewtwoExclusiveMove     ; 150 - MEWTWO
     dw MewExclusiveMove        ; 151 - MEW
+    dw LitwickExclusiveMove    ; 152 - LITWICK
+    dw LampentExclusiveMove    ; 153 - LAMPENT
+    dw ChandelureExclusiveMove ; 154 - CHANDELURE
+    dw MissingNoExclusiveMove  ; 155 - MON_155
+    dw MissingNoExclusiveMove  ; 156 - MON_156
+    dw MissingNoExclusiveMove  ; 157 - MON_157
+    dw MissingNoExclusiveMove  ; 158 - MON_158
+    dw MissingNoExclusiveMove  ; 159 - MON_159
 
 INCLUDE "constants/pokemon_exclusive.asm"
 
@@ -52080,6 +52088,14 @@ EvosMovesPointerTable: ; Moved in the Bank
     dw Mon149_EvosMoves
     dw Mon150_EvosMoves
     dw Mon151_EvosMoves
+    dw Mon152_EvosMoves
+    dw Mon153_EvosMoves
+    dw Mon154_EvosMoves
+    dw Mon000_EvosMoves ; 155
+    dw Mon000_EvosMoves ; 156
+    dw Mon000_EvosMoves ; 157
+    dw Mon000_EvosMoves ; 158
+    dw Mon000_EvosMoves ; 159
 
 CryData: ; Moved in the Bank
     ;$BaseCry,$Pitch,$Length
@@ -52235,6 +52251,14 @@ CryData: ; Moved in the Bank
     db $0F,$3C,$C0; 149 - DRAGONITE
     db $1E,$99,$FF; 150 - MEWTWO
     db $1E,$EE,$FF; 151 - MEW
+    db $1D,$EE,$20; 152 - LITWICK
+    db $1D,$DD,$30; 153 - LAMPENT
+    db $1D,$CC,$40; 154 - CHANDELURE
+    db $18,$F7,$7E; 155 - MON_155
+    db $18,$F7,$7E; 156 - MON_156
+    db $18,$F7,$7E; 157 - MON_157
+    db $18,$F7,$7E; 158 - MON_158
+    db $18,$F7,$7E; 159 - MON_159
 
 ;joenote - if player using trapping move, then end their move
 CheckTrappingMoveAndLoadEnemyMonNumber:
@@ -62011,8 +62035,8 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld de,PokedexMenuItemsText
     call PlaceString
 ; find the highest pokedex number among the pokemon the player has seen
-    ld hl,wPokedexSeen + 18
-    ld b,153
+    ld hl,wPokedexSeenEnd - 1
+    ld b,DEX_NUM_MON + 1
 .maxSeenPokemonLoop
     ld a,[hld]
     ld c,8
@@ -63515,9 +63539,28 @@ VictreebelDexEntry: ; 40fd1 (10:4fd1)
     TX_FAR _VictreebelDexEntry
     db "@"
 
-SECTION "PokedexToIndex",ROMX[$4ff9],BANK[$10]
+LitwickDexEntry:
+    db "CANDLE@"
+    db 1,0
+    dw 68
+    TX_FAR _LitwickDexEntry
+    db "@"
 
-PokedexToIndex: ; 40ff9 (10:4ff9)
+LampentDexEntry:
+    db "LAMP@"
+    db 2,0
+    dw 287
+    TX_FAR _LampentDexEntry
+    db "@"
+
+ChandelureDexEntry:
+    db "LURING@"
+    db 3,3
+    dw 756
+    TX_FAR _ChandelureDexEntry
+    db "@"
+
+PokedexToIndex: ; Moved in the Bank
     ; converts the Pokédex number at $D11E to an index
     push bc
     push hl
@@ -63538,7 +63581,7 @@ PokedexToIndex: ; 40ff9 (10:4ff9)
     pop bc
     ret
 
-IndexToPokedex: ; 41010 (10:5010)
+IndexToPokedex: ; Moved in the Bank
     ; converts the indexédex number at $D11E to a Pokédex number
     push bc
     push hl
@@ -65075,14 +65118,14 @@ PokedexOrder: ; Moved in the Bank
     db DEX_BELLSPROUT  ; $BC
     db DEX_WEEPINBELL  ; $BD
     db DEX_VICTREEBEL  ; $BE
-    db DEX_MISSINGNO   ; $BF
-    db DEX_MISSINGNO   ; $C0
-    db DEX_MISSINGNO   ; $C1
-    db DEX_MISSINGNO   ; $C2
-    db DEX_MISSINGNO   ; $C3
-    db DEX_MISSINGNO   ; $C4
-    db DEX_MISSINGNO   ; $C5
-    db DEX_MISSINGNO   ; $C6
+    db DEX_LITWICK     ; $BF
+    db DEX_LAMPENT     ; $C0
+    db DEX_CHANDELURE  ; $C1
+    db DEX_MON_155     ; $C2
+    db DEX_MON_156     ; $C3
+    db DEX_MON_157     ; $C4
+    db DEX_MON_158     ; $C5
+    db DEX_MON_159     ; $C6
     db DEX_MISSINGNO   ; $C7
     db DEX_MISSINGNO   ; $C8
     db DEX_MISSINGNO   ; $C9
@@ -65294,6 +65337,14 @@ PokedexEntryPointers: ; Moved in the Bank
     dw DragoniteDexEntry  ; 149 - DRAGONITE
     dw MewtwoDexEntry     ; 150 - MEWTWO
     dw MewDexEntry        ; 151 - MEW
+    dw LitwickDexEntry    ; 152 - LITWICK
+    dw LampentDexEntry    ; 153 - LAMPENT
+    dw ChandelureDexEntry ; 154 - CHANDELURE
+    dw MissingNoDexEntry  ; 155 - MON_155
+    dw MissingNoDexEntry  ; 156 - MON_156
+    dw MissingNoDexEntry  ; 157 - MON_157
+    dw MissingNoDexEntry  ; 158 - MON_158
+    dw MissingNoDexEntry  ; 159 - MON_159
 
 SECTION "bank11",ROMX,BANK[$11]
 
@@ -102162,7 +102213,7 @@ DeterminePaletteID:
     add hl,bc
     call .CheckShiny
     jr z,.End
-    ld bc,152-SAME_PALETTE ; (from dex 0 to 151,SAME_PALETTE Share Same Palette)
+    ld bc,DEX_NUM_MON-SAME_PALETTE ; (from dex 0 to 151,SAME_PALETTE Share Same Palette)
     add hl,bc
 .End
     call .ResetFlags
@@ -130226,6 +130277,18 @@ MewPicFront:
     INCBIN "pic/bmon/mew.pic"
 MewPicBack:
     INCBIN "pic/monback/mewb.pic"
+LitwickPicFront:
+    INCBIN "pic/bmon/litwick.pic"
+LitwickPicBack:
+    INCBIN "pic/monback/litwickb.pic"
+LampentPicFront:
+    INCBIN "pic/bmon/lampent.pic"
+LampentPicBack:
+    INCBIN "pic/monback/lampentb.pic"
+ChandelurePicFront:
+    INCBIN "pic/bmon/chandelure.pic"
+ChandelurePicBack:
+    INCBIN "pic/monback/chandelureb.pic"
 
 SECTION "bank2F",ROMX,BANK[$2F]
 
@@ -131589,6 +131652,8 @@ GenderTable:
     dsn MALE_87,MALE_87,MALE_87,MALE_87 ; KABUTO,KABUTOPS,AERODACTYL,SNORLAX
     dsn OTHGEND,OTHGEND,OTHGEND,MALE_50 ; ARTICUNO,ZAPDOS,MOLTRES,DRATINI
     dsn MALE_50,MALE_50,OTHGEND,OTHGEND ; DRAGONAIR,DRAGONITE,MEWTWO,MEW
+    dsn MALE_50,MALE_50,MALE_50,OTHGEND ; LITWICK,LAMPENT,CHANDELURE,MON_155
+    dsn OTHGEND,OTHGEND,OTHGEND,OTHGEND ; MON_156,MON_157,MON_158,MON_159
 
 ItemNames:
     db "MASTER BALL@"  ; $01
@@ -131613,7 +131678,7 @@ ItemNames:
     db "POTION@"       ; $14
     db "?@"            ; $15
     db "?@"            ; $16
-    db "?@"            ; $17
+    db "DUSK STONE@"   ; $17
     db "?@"            ; $18
     db "?@"            ; $19
     db "?@"            ; $1A
@@ -133944,16 +134009,16 @@ RouteD1Mons:
 
 TestMap1Mons:
     db $19
-    db  8,ZUBAT    ; 20%
-    db  8,ZUBAT    ; 20%
-    db  8,ZUBAT    ; 15%
-    db  8,ZUBAT    ; 10%
-    db  8,ZUBAT    ; 10%
-    db  8,ZUBAT    ; 10%
-    db  8,ZUBAT    ;  5%
-    db  8,ZUBAT    ;  5%
-    db  8,ZUBAT    ;  4%
-    db  8,ZUBAT    ;  1%
+    db   8,LITWICK    ; 20%
+    db   8,LITWICK    ; 20%
+    db   8,LITWICK    ; 15%
+    db  41,LAMPENT    ; 10%
+    db  41,LAMPENT    ; 10%
+    db  41,LAMPENT    ; 10%
+    db  50,CHANDELURE ;  5%
+    db  50,CHANDELURE ;  5%
+    db  50,CHANDELURE ;  4%
+    db  50,CHANDELURE ;  1%
     db $05
     db  2,MAGIKARP ; 20%
     db  2,MAGIKARP ; 20%
@@ -137677,6 +137742,14 @@ MonsterNames:
     db "DRAGONITE@" ; 149 - DRAGONITE
     db "MEWTWO@@@@" ; 150 - MEWTWO
     db "MEW@@@@@@@" ; 151 - MEW
+    db "LITWICK@@@" ; 152 - LITWICK
+    db "LAMPENT@@@" ; 153 - LAMPENT
+    db "CHANDELURE" ; 154 - CHANDELURE
+    db "MISSINGNO." ; 155 - MISSINGNO
+    db "MISSINGNO." ; 156 - MISSINGNO
+    db "MISSINGNO." ; 157 - MISSINGNO
+    db "MISSINGNO." ; 158 - MISSINGNO
+    db "MISSINGNO." ; 159 - MISSINGNO
 
 ;CharizardMName: ; D73D3E12E08CCD2029CD
 ;    db $D7,$3D

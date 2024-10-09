@@ -1,4 +1,10 @@
 ; ──────────────────────────────────────────────────────────────────────
+MissingNo_Learnset: MACRO
+    db  1,WATER_GUN
+    db  1,WATER_GUN
+    db  1,SKY_ATTACK
+ENDM
+; ──────────────────────────────────────────────────────────────────────
 BULBASAUR_Learnset: MACRO
     db  1,TACKLE
     db  1,GROWL
@@ -3063,9 +3069,48 @@ MEW_Learnset: MACRO
     db  1,SOFTBOILED
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
-MissingNo_Learnset: MACRO
-    db  1,WATER_GUN
-    db  1,WATER_GUN
-    db  1,SKY_ATTACK
+LITWICK_Learnset: MACRO
+    db  1,SMOG
+    db  1,MINIMIZE
+    db  5,TELEPORT
+    db  7,DEFENSE_CURL
+    db  9,EMBER
+    db 11,FLASH
+    db 13,CONFUSE_RAY
+    db 15,SMOKESCREEN
+    db 17,NIGHT_SHADE
+    db 20,PSYWAVE
+    db 23,FIRE_PUNCH
+    db 25,SONICBOOM
+    db 27,CONFUSION
+    db 31,HYPNOSIS
+    db 32,DREAM_EATER
+    db 35,HAZE
+    db 38,FLAMETHROWER
+    db 40,PSYBEAM
+    ;  41,LAMPENT
+ENDM
+LAMPENT_Learnset: MACRO
+    LITWICK_Learnset
+    db 41,ACID
+    db 43,FIRE_SPIN
+    db 45,REFLECT
+    db 47,PSYCHIC_M
+    db 50,SELFDESTRUCT
+    db 53,FIRE_BLAST
+ENDM
+CHANDELURE_Learnset: MACRO
+    LAMPENT_Learnset
+    db 43,FIRE_SPIN
+    db 45,REFLECT
+    db 47,PSYCHIC_M
+    db 50,SELFDESTRUCT
+    db 53,FIRE_BLAST
+    db 57,SUBSTITUTE
+    db 60,RECOVER
+ENDM
+LITWICK_NoEvo_Learnset: MACRO
+    db 45,FIRE_SPIN
+    db 50,ACID_ARMOR ; Exclusive
 ENDM
 ; ──────────────────────────────────────────────────────────────────────

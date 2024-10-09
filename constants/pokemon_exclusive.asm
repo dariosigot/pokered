@@ -2004,3 +2004,29 @@ MewtwoExclusiveMove:
 MewExclusiveMove:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
+LitwickExclusiveMove:
+LampentExclusiveMove:
+ChandelureExclusiveMove:
+    db TOXIC ; TM06
+    db HYPER_BEAM ; TM15
+    db SOLARBEAM ; TM22
+    db PSYCHIC_M ; TM29
+    db TELEPORT ; TM30
+    db MIMIC ; TM31
+    db DOUBLE_TEAM ; TM32
+    db REFLECT ; TM33
+    db BIDE ; TM34
+    db METRONOME ; TM35
+    db SELFDESTRUCT ; TM36
+    db FLAMETHROWER ; TM37
+    db FIRE_BLAST ; TM38
+    db LIGHT_SCREEN ; TM41
+    db DREAM_EATER ; TM42
+    db REST ; TM44
+    db PSYWAVE ; TM46
+    db EXPLOSION ; TM47
+    db SUBSTITUTE ; TM50
+    db FLASH ; TM55
+    db ACID_ARMOR
+    db 0
+; ──────────────────────────────────────────────────────────────────────

@@ -5595,3 +5595,299 @@ MewBaseStats: ; 425b (1:425b)
 	db $ff,$ff,$ff,$ff,$ff,$ff,$ff
 
     db BANK(MewPicFront)
+
+LitwickBaseStats:
+    db DEX_LITWICK ; pokedex id
+    db 50 ; base hp
+    db 30 ; base attack
+    db 55 ; base defense
+    db 20 ; base speed
+    db 65 ; base special
+
+    db GHOST ; species type 1
+    db FIRE ; species type 2
+
+    db 190 ; catch rate
+    db 55 ; base exp yield
+    db $55 ; sprite dimensions
+
+    dw LitwickPicFront
+    dw LitwickPicBack
+
+    ; attacks known at lvl 0
+    db 0
+    db 0
+    db 0
+    db 0
+
+    db 3 ; growth rate
+
+    ; learnset
+    tmlearn 06                      ; |TOXIC|
+    tmlearn 0
+    tmlearn 0
+    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,35,36,37,38,39    ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SWIFT|
+    tmlearn 41,42,44,46,47          ; |LIGHT_SCREEN|DREAM_EATER|REST|PSYWAVE|EXPLOSION|
+    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+
+    db BANK(LitwickPicFront)
+
+LampentBaseStats:
+    db DEX_LAMPENT ; pokedex id
+    db 60 ; base hp
+    db 40 ; base attack
+    db 60 ; base defense
+    db 55 ; base speed
+    db 95 ; base special
+
+    db GHOST ; species type 1
+    db FIRE ; species type 2
+
+    db 90 ; catch rate
+    db 130 ; base exp yield
+    db $66 ; sprite dimensions
+
+    dw LampentPicFront
+    dw LampentPicBack
+
+    ; attacks known at lvl 0
+    db 0
+    db 0
+    db 0
+    db 0
+
+    db 3 ; growth rate
+
+    ; learnset
+    tmlearn 06                      ; |TOXIC|
+    tmlearn 0
+    tmlearn 22                      ; |SOLARBEAM|
+    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,35,36,37,38,39    ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SWIFT|
+    tmlearn 41,42,44,46,47          ; |LIGHT_SCREEN|DREAM_EATER|REST|PSYWAVE|EXPLOSION|
+    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+
+    db BANK(LampentPicFront)
+
+ChandelureBaseStats:
+    db DEX_CHANDELURE ; pokedex id
+    db 60 ; base hp
+    db 55 ; base attack
+    db 90 ; base defense
+    db 80 ; base speed
+    db 145 ; base special
+
+    db GHOST ; species type 1
+    db FIRE ; species type 2
+
+    db 45 ; catch rate
+    db 234 ; base exp yield
+    db $77 ; sprite dimensions
+
+    dw ChandelurePicFront
+    dw ChandelurePicBack
+
+    ; attacks known at lvl 0
+    db 0
+    db 0
+    db 0
+    db 0
+
+    db 3 ; growth rate
+
+    ; learnset
+    tmlearn 06                      ; |TOXIC|
+    tmlearn 15                      ; |HYPER_BEAM|
+    tmlearn 22                      ; |SOLARBEAM|
+    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,35,36,37,38,39    ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SWIFT|
+    tmlearn 41,42,44,46,47          ; |LIGHT_SCREEN|DREAM_EATER|REST|PSYWAVE|EXPLOSION|
+    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+
+    db BANK(ChandelurePicFront)
+
+Mon155BaseStats:
+    db DEX_MON_155 ; pokedex id
+    db 00 ; base hp
+    db 00 ; base attack
+    db 00 ; base defense
+    db 00 ; base speed
+    db 00 ; base special
+
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
+
+    db 255 ; catch rate
+    db 0 ; base exp yield
+    db $88 ; sprite dimensions
+
+    dw MissingNoPicFront
+    dw MissingNoPicBack
+
+    ; attacks known at lvl 0
+    db 0
+    db 0
+    db 0
+    db 0
+
+    db 3 ; growth rate
+
+    ; learnset
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+
+    db BANK(MissingNoPicFront)
+
+Mon156BaseStats:
+    db DEX_MON_156 ; pokedex id
+    db 00 ; base hp
+    db 00 ; base attack
+    db 00 ; base defense
+    db 00 ; base speed
+    db 00 ; base special
+
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
+
+    db 255 ; catch rate
+    db 0 ; base exp yield
+    db $88 ; sprite dimensions
+
+    dw MissingNoPicFront
+    dw MissingNoPicBack
+
+    ; attacks known at lvl 0
+    db 0
+    db 0
+    db 0
+    db 0
+
+    db 3 ; growth rate
+
+    ; learnset
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+
+    db BANK(MissingNoPicFront)
+
+Mon157BaseStats:
+    db DEX_MON_157 ; pokedex id
+    db 00 ; base hp
+    db 00 ; base attack
+    db 00 ; base defense
+    db 00 ; base speed
+    db 00 ; base special
+
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
+
+    db 255 ; catch rate
+    db 0 ; base exp yield
+    db $88 ; sprite dimensions
+
+    dw MissingNoPicFront
+    dw MissingNoPicBack
+
+    ; attacks known at lvl 0
+    db 0
+    db 0
+    db 0
+    db 0
+
+    db 3 ; growth rate
+
+    ; learnset
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+
+    db BANK(MissingNoPicFront)
+
+Mon158BaseStats:
+    db DEX_MON_158 ; pokedex id
+    db 00 ; base hp
+    db 00 ; base attack
+    db 00 ; base defense
+    db 00 ; base speed
+    db 00 ; base special
+
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
+
+    db 255 ; catch rate
+    db 0 ; base exp yield
+    db $88 ; sprite dimensions
+
+    dw MissingNoPicFront
+    dw MissingNoPicBack
+
+    ; attacks known at lvl 0
+    db 0
+    db 0
+    db 0
+    db 0
+
+    db 3 ; growth rate
+
+    ; learnset
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+
+    db BANK(MissingNoPicFront)
+
+Mon159BaseStats:
+    db DEX_MON_159 ; pokedex id
+    db 00 ; base hp
+    db 00 ; base attack
+    db 00 ; base defense
+    db 00 ; base speed
+    db 00 ; base special
+
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
+
+    db 255 ; catch rate
+    db 0 ; base exp yield
+    db $88 ; sprite dimensions
+
+    dw MissingNoPicFront
+    dw MissingNoPicBack
+
+    ; attacks known at lvl 0
+    db 0
+    db 0
+    db 0
+    db 0
+
+    db 3 ; growth rate
+
+    ; learnset
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+    tmlearn 0
+
+    db BANK(MissingNoPicFront)
