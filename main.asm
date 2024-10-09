@@ -98504,10 +98504,11 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     call _LoadTownMap
     call LoadPlayerSpriteGraphics
     call LoadFontTilePatterns
-    ld de,BirdSprite ; $4d80
-    ld hl,$8040
-    ld bc,(BANK(BirdSprite) << 8) + $0c
-    call CopyVideoData
+    ;ld de,BirdSprite ; $4d80
+    ;ld hl,$8000
+    ;ld bc,(BANK(BirdSprite) << 8) + $0c
+    ;call CopyVideoData
+    call .LoadFlyingMonSprite
     ld de,TownMapUpArrow ; $5093
     ld hl,$8ed0
     ld bc,(BANK(TownMapUpArrow) << 8) + $01
@@ -98625,6 +98626,17 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
 .ToText
     db "To@"
 
+.LoadFlyingMonSprite
+    ld hl,wFlagFlyingMonSpriteBit0
+    set 0,[hl]
+    ld hl,wSpriteOAMBySpeciesBit7
+    set 7,[hl]
+    inc hl
+    ld a,[wFieldMoveMonID]
+    ld [$cd5d],a
+    ld [hl],a ; wSpriteOAMBySpeciesId
+    jp LoadMonPartySpriteGfx
+
 BuildFlyLocationsList: ; Moved in the Bank
     call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG
     ld a,[hli]
@@ -98650,9 +98662,7 @@ BuildFlyLocationsList: ; Moved in the Bank
     jr nz,.loop
     ret
 
-SECTION "_LoadTownMap",ROMX[$509b],BANK[$1c]
-
-_LoadTownMap: ; 7109b (1c:509b)
+_LoadTownMap: ; Moved in the Bank
     call GBPalWhiteOutWithDelay3
     call ClearScreen
     call UpdateSprites
@@ -98702,11 +98712,11 @@ _LoadTownMap: ; 7109b (1c:509b)
     ld [$d09b],a
     ret
 
-CompressedMap: ; 71100 (1c:5100)
+CompressedMap: ; Moved in the Bank
 ; you can decompress this file with the redrle program in the extras/ dir
     INCBIN "gfx/town_map.rle"
 
-Func_711ab: ; 711ab (1c:51ab)
+Func_711ab: ; Moved in the Bank
     xor a
     ld [$d09b],a
     call GBPalWhiteOut
@@ -98717,7 +98727,7 @@ Func_711ab: ; 711ab (1c:51ab)
     call UpdateSprites
     jp GoPAL_SET_CF1C
 
-Func_711c4: ; 711c4 (1c:51c4)
+Func_711c4: ; Moved in the Bank
     push af
     ld a,b
     ld [$cd5b],a
@@ -98741,7 +98751,7 @@ Func_711c4: ; 711c4 (1c:51c4)
     ld bc,$a0
     jp CopyData
 
-Func_711ef: ; 711ef (1c:51ef)
+Func_711ef: ; Moved in the Bank
     ld b,BANK(FindWildLocationsOfMon)
     ld hl,FindWildLocationsOfMon
     call Bankswitch ; indirect jump to FindWildLocationsOfMon (e9cb (3:69cb))
@@ -98752,8 +98762,8 @@ Func_711ef: ; 711ef (1c:51ef)
     ld a,[de]
     cp $ff
     jr z,.asm_7121d
-    ds 1 ;and a            ; Include Also Pallet in Nest Pkmn
-    ds 2 ;jr z,.asm_7121a  ; ...
+    ;and a            ; Include Also Pallet in Nest Pkmn
+    ;jr z,.asm_7121a  ; ...
     push hl
     call Func_712f1
     pop hl
@@ -101109,6 +101119,17 @@ DataTable_707a9: ; Moved in the Bank
     db $10,$00,$01 ; Bills Teleport Fake Tileset
     db $FF
 
+CheckFlyingMonSprite:
+    push hl
+    ld hl,wFlagFlyingMonSpriteBit0
+    bit 0,[hl]
+    res 0,[hl]
+    pop hl
+    ret z
+    ld bc,$40
+    add hl,bc
+    ret
+
 SECTION "Unknown_72ede",ROMX[$6ede],BANK[$1C]
 
 Unknown_72ede: ; 72ede (1c:6ede)
@@ -102357,6 +102378,7 @@ CreateMonOvWorldSprInstruction:
     ld bc,$80
     ld hl,$8000
     call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
+    call CheckFlyingMonSprite
     ld b,h
     ld c,l
     pop hl ; Restore wLocationMonOvSprInstruction
