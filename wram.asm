@@ -1723,6 +1723,7 @@ SECTION "DenimFlags",WRAMX[$df35],BANK[1]
 
 wDigCaveAerodactylTrigBit0 ; df35 ; bit 0
 wPrintBattleValueBit0      ; df35 ; bit 0 = Trigger Print Battle Value
+wTownMapBeforeJoypadBit0   ; df35 ; bit 0 = Show Town Map Before Joypad Press
 wFlagValueToPlayerBit1     ; df35 ; bit 1 = Print Battle Value to Player
 wFlagSortMoveBit1          ; df35 ; bit 1 = Sort Moves in Moves Menu (SELECT)
 wFlagShinyBit2             ; df35 ; bit 2

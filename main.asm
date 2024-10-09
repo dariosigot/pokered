@@ -98366,8 +98366,15 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
     xor a
     ld [wWhichTrade],a ; $cd3d
     pop af
+.RestartCurrentMap
+    call SetTownMapBeforeJoypad
     jr .enterLoop
 .townMapLoop:
+    call TestAndResetTownMapBeforeJoypad
+    jr z,.skip
+    xor a
+    ld [wWhichTrade],a ; $cd3d
+.skip
     ld hl,wTileMap
     ld bc,$114
     call ClearScreenArea
@@ -98408,14 +98415,17 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
     call GetJoypadStateLowSensitivity
     ld a,[$FF00+$b5]
     ld b,a
-    and $c3
+    and %11000111 ; ▼▲◄►StSeBA
     jr z,.inputLoop
     ld a,$8c
     call PlaySound
+    bit 2,b
+    jr nz,.selectPressed
     bit 6,b
     jr nz,.pressedUp
     bit 7,b
     jr nz,.pressedDown
+    call TestAndResetTownMapBeforeJoypad
     xor a
     ld [$d09b],a
     ld [$FF00+$b7],a
@@ -98443,19 +98453,20 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
 .noUnderflow
     ld [wWhichTrade],a ; $cd3d
     jp .townMapLoop
+.selectPressed
+    ld a,[W_CURMAP] ; $d35e
+    jp .RestartCurrentMap
 
-; format: db tileset id,tile id,value to be put in $cd5b
-DataTable_707a9: ; Moved in the Bank
-    db $16,$20,$01
-    db $16,$11,$02
-    db $11,$22,$02
-    db $10,$55,$01
-    db $10,$00,$01 ; Bills Teleport Fake Tileset
-    db $FF
+SetTownMapBeforeJoypad:
+    ld hl,wTownMapBeforeJoypadBit0
+    set 0,[hl]
+    ret
 
-MidJumpVerticalCoord: ; Moved in the Bank
-   ;db $38,$36,$34,$32,$31,$30,$30,$30,$31,$32,$33,$34,$36,$38,$3C,$3C
-    db $37,$35,$33,$31,$30,$30,$31,$32,$33,$34,$36,$38,$3C,$3C,$3C,$3C
+TestAndResetTownMapBeforeJoypad:
+    ld hl,wTownMapBeforeJoypadBit0
+    bit 0,[hl]
+    res 0,[hl]
+    ret
 
 SECTION "TownMapCursor",ROMX[$4f40],BANK[$1c]
 
@@ -101089,6 +101100,15 @@ IF _BLUE
     INCBIN "gfx/blue/sgbborder.map"
 ENDC
 
+; format: db tileset id,tile id,value to be put in $cd5b
+DataTable_707a9: ; Moved in the Bank
+    db $16,$20,$01
+    db $16,$11,$02
+    db $11,$22,$02
+    db $10,$55,$01
+    db $10,$00,$01 ; Bills Teleport Fake Tileset
+    db $FF
+
 SECTION "Unknown_72ede",ROMX[$6ede],BANK[$1C]
 
 Unknown_72ede: ; 72ede (1c:6ede)
@@ -102669,6 +102689,10 @@ LoadAlternateBallPic: ; Denim
     jp CopyVideoData
 PokeCenterFlashingHealBall:
     INCBIN "gfx/pokecenter_ball_2.2bpp"
+
+MidJumpVerticalCoord: ; Moved in the Bank
+   ;db $38,$36,$34,$32,$31,$30,$30,$30,$31,$32,$33,$34,$36,$38,$3C,$3C
+    db $37,$35,$33,$31,$30,$30,$31,$32,$33,$34,$36,$38,$3C,$3C,$3C,$3C
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
