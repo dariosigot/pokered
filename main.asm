@@ -54749,10 +54749,10 @@ Func_3d119: ; 3d119 (f:5119)
     bit 4,a
     ld hl,AnimationSubstitute
     jr nz,.asm_3d182
-    ld a,[$ccf3]
-    and a
-    ld hl,AnimationMinimizeMon
-    jr nz,.asm_3d182
+    ds 3 ; ld a,[$ccf3]
+    ds 1 ; and a
+    ds 3 ; ld hl,AnimationMinimizeMon
+    ds 2 ; jr nz,.asm_3d182
     ld a,[$cfe5]
     ld [$cf91],a
     ld [$d0b5],a
@@ -109405,31 +109405,35 @@ Unknown_79598: ; 79598 (1e:5598)
 INCBIN "baserom.gbc",$79598,$7959f - $79598
 
 AnimationMinimizeMon: ; 7959f (1e:559f)
+jp AnimationSlideMonDownAndHide ; Use Acid Armor Animation
+
 ; Changes the mon's sprite to a mini black sprite. Used by the
 ; Minimize animation.
-    ld hl,$c6e8
-    push hl
-    xor a
-    ld bc,$310
-    call FillMemory
-    pop hl
-    ld de,$194
-    add hl,de
-    ld de,Unknown_795c4 ; $55c4
-    ld c,$5
-.asm_795b4
-    ld a,[de]
-    ld [hli],a
-    ld [hli],a
-    inc de
-    dec c
-    jr nz,.asm_795b4
-    call Func_79652
-    call Delay3
-    jp AnimationShowMonPic
+;    ld hl,$c6e8
+;    push hl
+;    xor a
+;    ld bc,$310
+;    call FillMemory
+;    pop hl
+;    ld de,$194
+;    add hl,de
+;    ld de,Unknown_795c4 ; $55c4
+;    ld c,$5
+;.asm_795b4
+;    ld a,[de]
+;    ld [hli],a
+;    ld [hli],a
+;    inc de
+;    dec c
+;    jr nz,.asm_795b4
+;    call Func_79652
+;    call Delay3
+;    jp AnimationShowMonPic
 
-Unknown_795c4: ; 795c4 (1e:55c4)
-INCBIN "baserom.gbc",$795c4,$795c9 - $795c4
+;Unknown_795c4: ; 795c4 (1e:55c4)
+;INCBIN "baserom.gbc",$795c4,$795c9 - $795c4
+
+SECTION "AnimationSlideMonDownAndHide",ROMX[$55c9],BANK[$1e]
 
 AnimationSlideMonDownAndHide: ; 795c9 (1e:55c9)
 ; Slides the mon's sprite down and disappears. Used in Acid Armor.
@@ -109657,11 +109661,13 @@ Func_79747: ; 79747 (1e:5747)
     call AnimationSlideMonOut
 .asm_79765
     pop hl
-    ld a,[hl]
-    and a
-    jp nz,AnimationMinimizeMon
+    ; ld a,[hl]
+    ; and a
+    ; jp nz,AnimationMinimizeMon
     call AnimationFlashMonPic
     jp AnimationShowMonPic
+
+SECTION "Func_79771",ROMX[$5771],BANK[$1e]
 
 Func_79771: ; 79771 (1e:5771)
     call AnimationSlideMonOut
