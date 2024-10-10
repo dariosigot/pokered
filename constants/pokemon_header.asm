@@ -1081,7 +1081,7 @@ NidoranFBaseStats: ; 386ee (e:46ee)
     tmlearn 06                      ; |TOXIC|
     tmlearn 0
     tmlearn 0
-    tmlearn 31                      ; |MIMIC|
+    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|
@@ -1118,7 +1118,7 @@ NidorinaBaseStats: ; 3870a (e:470a)
     tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
     tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
+    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
@@ -1192,7 +1192,7 @@ NidoranMBaseStats: ; 38742 (e:4742)
     tmlearn 06,07                   ; |TOXIC|HORN_DRILL|
     tmlearn 0
     tmlearn 0
-    tmlearn 31                      ; |MIMIC|
+    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|
@@ -1229,7 +1229,7 @@ NidorinoBaseStats: ; 3875e (e:475e)
     tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
     tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
+    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|

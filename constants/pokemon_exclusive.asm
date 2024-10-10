@@ -177,7 +177,6 @@ PidgeotExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
-    db TACKLE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RattataExclusiveMove:
@@ -277,7 +276,6 @@ RaichuExclusiveMove:
     db SUBSTITUTE ; TM50
     db QUICK_ATTACK
     db AGILITY
-    db LOVELY_KISS
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SandshrewExclusiveMove:
@@ -412,6 +410,7 @@ NinetalesExclusiveMove:
     db SUBSTITUTE ; TM50
     db EMBER
     db QUICK_ATTACK
+    db AGILITY
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ZubatExclusiveMove:
@@ -431,8 +430,8 @@ GolbatExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
-    db LICK
     db ABSORB
+    db LICK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OddishExclusiveMove:
@@ -460,7 +459,6 @@ VictreebelExclusiveMove:
     db ABSORB
     db LEECH_LIFE
     db LEECH_SEED
-    db VINE_WHIP
     db RAZOR_LEAF
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -483,7 +481,6 @@ ParasectExclusiveMove:
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
-    db CONFUSION
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VenonatExclusiveMove:
@@ -508,7 +505,6 @@ VenomothExclusiveMove:
     db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
     db FLASH ; TM55
-    db STRING_SHOT
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DiglettExclusiveMove:
@@ -647,6 +643,7 @@ ArcanineExclusiveMove:
     db SUBSTITUTE ; TM50
     db EMBER
     db AGILITY
+    db QUICK_ATTACK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PoliwagExclusiveMove:
@@ -682,7 +679,6 @@ PoliwrathExclusiveMove:
     db TSUNAMI ; TM53
     db STRIKE ; TM54
     db AMNESIA
-    db CONFUSION
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 AbraExclusiveMove:
@@ -1010,7 +1006,6 @@ GengarExclusiveMove:
     db EXPLOSION ; TM47
     db SUBSTITUTE ; TM50
     db ABSORB
-    db AMNESIA
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OnixExclusiveMove:
@@ -1397,7 +1392,6 @@ SeakingExclusiveMove:
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
-    db AGILITY
     db LOVELY_KISS
     db 0
 ; ──────────────────────────────────────────────────────────────────────
