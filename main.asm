@@ -64892,6 +64892,7 @@ StoreTradeLeftToRightPkmnIdAndInitGameboyTransferGfx:
     push hl
     ld hl,wSpriteOAMBySpeciesBit7
     set 7,[hl]
+    set 3,[hl] ; wFlagBaloonSpriteBit3
     inc hl
     ld a,[$cd5e]
     ld [hl],a ; wSpriteOAMBySpeciesId
@@ -64902,6 +64903,7 @@ StoreTradeRightToLeftPkmnIdAndInitGameboyTransferGfx:
     push hl
     ld hl,wSpriteOAMBySpeciesBit7
     set 7,[hl]
+    set 3,[hl] ; wFlagBaloonSpriteBit3
     inc hl
     ld a,[$cd5f]
     ld [hl],a ; wSpriteOAMBySpeciesId
@@ -96957,6 +96959,27 @@ Func_70433: ; 70433 (1c:4433)
 PokeCenterHealBall:
     INCBIN "gfx/pokecenter_ball.2bpp"
 
+GetMonSpriteNumOfTiles:
+    push af
+    ld a,[wFlagFlyingMonSpriteBit0]
+    ; wFlagFlyingMonSpriteBit1
+    ; wFlagFlyingMonSpriteBit2
+    and %00000111 ; Check Bit 0,1,2
+    ld b,8
+    jr z,.end
+    ld b,4
+.end
+    pop af
+    ld a,b
+    ret
+
+CheckBaloonRule:
+    ld hl,wFlagBaloonSpriteBit3
+    bit 3,[hl]
+    res 3,[hl]
+    ld hl,wLocationMonOvSprInstruction
+    ret    
+
 SECTION "FlashingBallHealPokecenter",ROMX[$44f3],BANK[$1C]
 
 ; known jump sources: 7049f (1c:449f),708f3 (1c:48f3)
@@ -97033,11 +97056,11 @@ Func_70510: ; 70510 (1c:4510)
     jr .asm_7055b
 .asm_70568
     pop hl
-    ld de,BirdSprite ; $4d80
-    ld hl,$8000
-    ld bc,(BANK(BirdSprite) << 8) + $0c
-    call CopyVideoData
-    call Func_706d7
+    ;ld de,BirdSprite ; $4d80
+    ;ld hl,$8000
+    ;ld bc,(BANK(BirdSprite) << 8) + $0c
+    ;call CopyVideoData
+    call LoadFlyingMonSprite_Overworld ; call Func_706d7
     ld a,$a4
     call PlaySound
     ld hl,wWhichTrade ; $cd3d
@@ -97050,6 +97073,8 @@ Func_70510: ; 70510 (1c:4510)
     call Func_706ae
     call LoadPlayerSpriteGraphics
     jr .asm_70558
+
+SECTION "Unknown_70592",ROMX[$4592],BANK[$1c]
 
 Unknown_70592: ; 70592 (1c:4592)
 INCBIN "baserom.gbc",$70592,$705aa - $70592
@@ -97110,7 +97135,7 @@ _DoFlyOrTeleportAwayGraphics: ; 705ba (1c:45ba)
     call Func_70730
     jr .asm_705c8
 .asm_70610
-    call Func_706d7
+    call LoadFlyingMonSprite_Overworld ; call Func_706d7
     ld hl,wWhichTrade ; $cd3d
     ld a,$ff
     ld [hli],a
@@ -97189,15 +97214,24 @@ Func_706ae: ; 706ae (1c:46ae)
     jr nz,Func_706ae
     ret
 
-Func_706d7: ; 706d7 (1c:46d7)
-    ld de,BirdSprite ; $4d80
-    ld hl,$8000
-    ld bc,(BANK(BirdSprite) << 8) + $0c
-    call CopyVideoData
-    ld de,BirdSprite + $c0 ; $4e40 ; moving amination sprite
-    ld hl,$8800
-    ld bc,(BANK(BirdSprite) << 8) + $0c
-    jp CopyVideoData
+;Func_706d7: ; 706d7 (1c:46d7)
+;    ld de,BirdSprite ; $4d80
+;    ld hl,$8000
+;    ld bc,(BANK(BirdSprite) << 8) + $0c
+;    call CopyVideoData
+;    ld de,BirdSprite + $c0 ; $4e40 ; moving amination sprite
+;    ld hl,$8800
+;    ld bc,(BANK(BirdSprite) << 8) + $0c
+;    jp CopyVideoData
+
+LoadFlyingMonSprite_Overworld:
+    ld hl,wFlagFlyingMonSpriteBit1
+    set 1,[hl]
+    set 2,[hl] ; wFlagFlyingMonSpriteBit2
+    call LoadFlyingMonSprite
+    jp LoadFlyingMonSprite
+
+SECTION "Func_706ef",ROMX[$46ef],BANK[$1c]
 
 Func_706ef: ; 706ef (1c:46ef)
     ld a,[$c102]
@@ -97308,6 +97342,17 @@ Func_70787: ; 70787 (1c:4787)
 .asm_707a4
     ld a,b
     ld [$cd5b],a
+    ret
+
+CheckFlyingMonSprite2:
+    ld a,[wFlagFlyingMonSpriteBit0]
+    ; wFlagFlyingMonSpriteBit1
+    ; wFlagFlyingMonSpriteBit2
+    and %00000111 ; Check Bit 0,1,2
+    cp %00000100 ; Only bit 2
+    ret nz
+    ld bc,$0040
+    add hl,bc
     ret
 
 SECTION "Func_707b6",ROMX[$47b6],BANK[$1c]
@@ -98629,10 +98674,13 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
 .LoadFlyingMonSprite
     ld hl,wFlagFlyingMonSpriteBit0
     set 0,[hl]
+    jr LoadFlyingMonSprite
+
+LoadFlyingMonSprite:
     ld hl,wSpriteOAMBySpeciesBit7
     set 7,[hl]
     inc hl
-    ld a,[wFieldMoveMonID]
+    ld a,[$cf91]
     ld [$cd5d],a
     ld [hl],a ; wSpriteOAMBySpeciesId
     jp LoadMonPartySpriteGfx
@@ -100129,6 +100177,33 @@ SamePalette:
     db WIGGLYTUFF
     db ARCANINE
 
+CheckFlyingMonSprite:
+    push hl
+    ld hl,wFlagFlyingMonSpriteBit0
+    bit 0,[hl]
+    res 0,[hl]
+    jr z,.CheckBit1
+    ld bc,$0040
+    jr .end
+.CheckBit1
+    bit 1,[hl] ; wFlagFlyingMonSpriteBit1
+    res 1,[hl]
+    jr z,.CheckBit2
+    ld bc,$0080
+    jr .end
+.CheckBit2
+    bit 2,[hl] ; wFlagFlyingMonSpriteBit2
+    res 2,[hl]
+    jr z,.skip
+    ld bc,$0880
+.end
+    pop hl
+    add hl,bc
+    ret
+.skip
+    pop hl
+    ret
+
 SECTION "GetHallOfFameLinkCableEvolutionPaletteID",ROMX[$5f17],BANK[$1c]
 
 ; HallOfFame or LinkCable or Evolution
@@ -101118,17 +101193,6 @@ DataTable_707a9: ; Moved in the Bank
     db $10,$55,$01
     db $10,$00,$01 ; Bills Teleport Fake Tileset
     db $FF
-
-CheckFlyingMonSprite:
-    push hl
-    ld hl,wFlagFlyingMonSpriteBit0
-    bit 0,[hl]
-    res 0,[hl]
-    pop hl
-    ret z
-    ld bc,$40
-    add hl,bc
-    ret
 
 SECTION "Unknown_72ede",ROMX[$6ede],BANK[$1C]
 
@@ -102350,6 +102414,7 @@ CreateMonOvWorldSprInstruction:
     ld hl,$4000 ; Entrambe le liste di immagini mini sprite iniziano a inizio BANK
     ld bc,$80
     call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
+    call CheckFlyingMonSprite2
     ld b,h
     ld c,l
 
@@ -102359,7 +102424,7 @@ CreateMonOvWorldSprInstruction:
     ld [hli],a
     ld a,b
     ld [hli],a
-    ld a,$08
+    call GetMonSpriteNumOfTiles ; ld a,$08
     ld [hli],a
     ld a,BANK(MonOverworldDataNew)
     jr c,.Before128_2
@@ -102397,17 +102462,17 @@ CreateMonOvWorldSprInstruction:
     jr nz,.Done
     inc a
 .Done
-    call AddTradeBaloonRule
-    ld hl,wLocationMonOvSprInstruction
+    call CheckBaloonRule ; ld hl,wLocationMonOvSprInstruction
+    call nz,AddTradeBaloonRule
     ret
 
 AddTradeBaloonRule:
     push af
+    push hl
     ;dw MonOverworldSprites + $100
     ;db $40 / $10 ; $40 bytes
     ;db BANK(MonOverworldSprites)
     ;dw $8380
-    ld hl,wLocationMonOvSprInstruction
     ld bc,$06
     call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
     ld a,(MonOverworldSprites + $100) % $100
@@ -102438,6 +102503,7 @@ AddTradeBaloonRule:
     ld [hli],a
     ld a,$83
     ld [hl],a
+    pop hl
     pop af
     inc a
     inc a
