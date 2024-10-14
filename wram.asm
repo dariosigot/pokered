@@ -1725,6 +1725,7 @@ wDigCaveAerodactylTrigBit0 ; df35 ; bit 0
 wPrintBattleValueBit0      ; df35 ; bit 0 = Trigger Print Battle Value
 wTownMapBeforeJoypadBit0   ; df35 ; bit 0 = Show Town Map Before Joypad Press
 wFlagFlyingMonSpriteBit0   ; df35 ; bit 0 = Force to Load Mon Sprite with $0040 offset
+wFlagAmnesiaSideEffectBit0 ; df35 ; bit 0 = Run Amnesia Side Effect
 wFlagValueToPlayerBit1     ; df35 ; bit 1 = Print Battle Value to Player
 wFlagSortMoveBit1          ; df35 ; bit 1 = Sort Moves in Moves Menu (SELECT)
 wFlagFlyingMonSpriteBit1   ; df35 ; bit 1 = Force to Load Mon Sprite with $0080 offset

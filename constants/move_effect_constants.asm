@@ -87,6 +87,7 @@ SPEED_UP3_EFFECT           EQU $59 ; AI Layer 2
 SPECIAL_UP3_EFFECT         EQU $5A ; AI Layer 2
 ACCURACY_UP3_EFFECT        EQU $5B ; AI Layer 2
 EVASION_UP3_EFFECT         EQU $5C ; AI Layer 2
+AMNESIA_NEW_EFFECT         EQU $5D
 
 ; fixed damage constants
 SONICBOOM_DAMAGE   EQU 20

@@ -56987,6 +56987,11 @@ ResetBattleFlagAndLoadCurrentOpponent:
     ld a,[W_CUROPPONENT] ; $d059
     ret
 
+RunAmnesiaSideEffect:
+    ld hl,wFlagAmnesiaSideEffectBit0
+    set 0,[hl]
+    jp StatModifierDownEffect
+
 SECTION "HandleCounterMove",ROMX[$6093],BANK[$f]
 
 ; function to determine if Counter hits and if so,how much damage it does
@@ -57796,6 +57801,16 @@ TrappingEffect:
 .setTrappingCounter
     inc a
     ld [de],a
+    ret
+
+GetDefaultAmnesiaEnv:
+    ld hl,wPlayerMonSpecialMod ; $cd1d
+    ld de,W_PLAYERMOVEEFFECT ; $cfd3
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    ret z
+    ld hl,wEnemyMonSpecialMod ; $cd31
+    ld de,W_ENEMYMOVEEFFECT ; $cfcd
     ret
 
 ; Free
@@ -59517,12 +59532,12 @@ JumpMoveEffect: ; Moved in the Bank
      dw StatModifierUpEffect
      dw Func_3fb0e
      dw $0000
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
      dw Func_3fb16
      dw Func_3fb1e
      dw Func_3f6e5
@@ -59557,24 +59572,24 @@ JumpMoveEffect: ; Moved in the Bank
      dw StatModifierUpEffect
      dw Func_3fb26
      dw TransformEffect
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
      dw Func_3fb36
      dw Func_3fb36
      dw PoisonEffect
      dw ParalyzeEffect
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
-     dw Func_3f54c
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
+     dw StatModifierDownEffect
      dw Func_3f959
      dw Func_3f811
      dw $0000
@@ -59592,6 +59607,7 @@ JumpMoveEffect: ; Moved in the Bank
      dw StatModifierUpEffect
      dw StatModifierUpEffect
      dw StatModifierUpEffect
+     dw AmnesiaNewEffect
 
 SECTION "Func_3f1fc",ROMX[$71fc],BANK[$f]
 
@@ -59883,10 +59899,10 @@ StatModifierUpEffect: ; Moved in the Bank
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_3f439
+    jr z,.done
     ld hl,wEnemyMonStatMods ; $cd2e
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
-.asm_3f439
+.done
     ld a,[de]
     sub ATTACK_UP1_EFFECT    ;normalize the effects from 0 to 5 to get an offset
     cp 6 ; regular "UP Effect" base from 0 to 5
@@ -60044,7 +60060,7 @@ StatModifierUpEffect: ; Moved in the Bank
     pop hl
     dec [hl]
 .PrintNothingHappenedText
-    ld hl,UnnamedText_3fb3e ; $7b3e
+    ld hl,NothingHappenedText ; $7b3e
     jp PrintText
 .UnnamedText_3f528
     TX_FAR _UnnamedText_3f528
@@ -60075,39 +60091,66 @@ StatModifierUpEffect: ; Moved in the Bank
     TX_FAR _RoseText
     db "@"
 
+AmnesiaNewEffect:
+    call GetDefaultAmnesiaEnv
+    ld a,[hl] ; SpcMod
+    push af
+    push hl
+    push de
+    ld a,SPECIAL_UP1_EFFECT
+    ld [de],a
+    call StatModifierUpEffect
+    pop de
+    pop hl
+    pop af
+    cp [hl]
+    jr z,.end ; end if "NothingHappened"
+    push de
+    ld a,SPECIAL_DOWN_SIDE_EFFECT
+    ld [de],a
+    call RunAmnesiaSideEffect
+    pop de
+.end
+    ld a,AMNESIA_NEW_EFFECT
+    ld [de],a
+    ret
+
 ; Free
 
-SECTION "Func_3f54c",ROMX[$754c],BANK[$f]
+SECTION "StatModifierDownEffect",ROMX[$754c],BANK[$f]
 
-Func_3f54c: ; 3f54c (f:754c)
+StatModifierDownEffect: ; 3f54c (f:754c)
     ld hl,wEnemyMonStatMods ; $cd2e
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld bc,W_ENEMYBATTSTATUS1 ; $d067
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_3f572
+    jr z,.statModifierDownEffect
     ld hl,wPlayerMonStatMods ; $cd1a
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
     ld bc,W_PLAYERBATTSTATUS1 ; $d062
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
-    jr z,.asm_3f572
+    jr z,.statModifierDownEffect
     call GenRandomInBattle
     cp $40
-    jp c,Func_3f65a
-.asm_3f572
+    jp c,MoveMissed
+.statModifierDownEffect
     call CheckTargetSubstitute
-    jp nz,Func_3f65a
+    jp nz,MoveMissed
+    ld a,[bc]
+    bit 6,a ; fly/dig
+    jp nz,MoveMissed
     ld a,[de]
-    cp $44
-    jr c,.asm_3f58a
-    call GenRandomInBattle
+    cp ATTACK_DOWN_SIDE_EFFECT
+    jr c,.nonSideEffect
+    call CheckAmnesiaSideEffect ; GenRandomInBattle
     cp $55
-    jp nc,Func_3f650
+    jp nc,CantLowerAnymore
     ld a,[de]
-    sub $44
-    jr .asm_3f5a9
-.asm_3f58a
+    sub ATTACK_DOWN_SIDE_EFFECT ; map each stat to 0-3
+    jr .decrementStatMod
+.nonSideEffect
     push hl
     push de
     push bc
@@ -60117,45 +60160,42 @@ Func_3f54c: ; 3f54c (f:754c)
     pop hl
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jp nz,Func_3f65a
-    ld a,[bc]
-    bit 6,a
-    jp nz,Func_3f65a
+    jp nz,MoveMissed
     ld a,[de]
-    sub $12
-    cp $8
-    jr c,.asm_3f5a9
-    sub $28
-.asm_3f5a9
+    sub ATTACK_DOWN1_EFFECT
+    cp EVASION_DOWN1_EFFECT + $3 - ATTACK_DOWN1_EFFECT ; covers all -1 effects
+    jr c,.decrementStatMod
+    sub ATTACK_DOWN2_EFFECT - ATTACK_DOWN1_EFFECT ; map -2 effects to corresponding -1 effect
+.decrementStatMod
     ld c,a
     ld b,$0
     add hl,bc
     ld b,[hl]
-    dec b
-    jp z,Func_3f650
+    dec b ; dec corresponding stat mod
+    jp z,CantLowerAnymore
     ld a,[de]
-    cp $24
-    jr c,.asm_3f5bf
-    cp $44
-    jr nc,.asm_3f5bf
-    dec b
-    jr nz,.asm_3f5bf
-    inc b
-.asm_3f5bf
+    cp ATTACK_DOWN2_EFFECT - $16 ; $24
+    jr c,.ok
+    cp EVASION_DOWN2_EFFECT + $5 ; $44
+    jr nc,.ok
+    dec b ; stat down 2 effects only (dec mod again)
+    jr nz,.ok
+    inc b ; increment mod to 1 (-6) if it would become 0 (-7)
+.ok
     ld [hl],b
     ld a,c
     cp $4
-    jr nc,asm_3f62c
+    jr nc,UpdateLoweredStatDone ; jump for evasion/accuracy
     push hl
     push de
     ld hl,$cff7
     ld de,$cd26
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_3f5d8
+    jr z,.pointToStat
     ld hl,$d026
     ld de,$cd12
-.asm_3f5d8
+.pointToStat
     push bc
     sla c
     ld b,$0
@@ -60163,17 +60203,17 @@ Func_3f54c: ; 3f54c (f:754c)
     ld a,c
     add e
     ld e,a
-    jr nc,.asm_3f5e4
+    jr nc,.noCarry
     inc d
-.asm_3f5e4
+.noCarry
     pop bc
     ld a,[hld]
     sub $1
-    jr nz,.asm_3f5ef
+    jr nz,.recalculateStat
     ld a,[hl]
     and a
-    jp z,Func_3f64d
-.asm_3f5ef
+    jp z,CantLowerAnymore_Pop
+.recalculateStat
     push hl
     push bc
     ld hl,StatModifierRatios ; $76cb
@@ -60202,29 +60242,29 @@ Func_3f54c: ; 3f54c (f:754c)
     ld b,a
     ld a,[$FF00+$97]
     or b
-    jp nz,Func_3f624
+    jp nz,UpdateLoweredStat
     ld [$FF00+$97],a
     ld a,$1
     ld [$FF00+$98],a
 
-Func_3f624: ; 3f624 (f:7624)
+UpdateLoweredStat: ; 3f624 (f:7624)
     ld a,[$FF00+$97]
     ld [hli],a
     ld a,[$FF00+$98]
     ld [hl],a
     pop de
     pop hl
-asm_3f62c: ; 3f62c (f:762c)
+UpdateLoweredStatDone: ; 3f62c (f:762c)
     ld b,c
     inc b
     push de
     call Func_3f688
     pop de
     ld a,[de]
-    cp $44
-    jr nc,.asm_3f63b
+    cp ATTACK_DOWN_SIDE_EFFECT
+    jr nc,.ApplyBadgeBoostsAndStatusPenalties
     call PlayCurrentMoveAnimation2
-.asm_3f63b
+.ApplyBadgeBoostsAndStatusPenalties
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     call nz,Func_3ee19
@@ -60233,21 +60273,21 @@ asm_3f62c: ; 3f62c (f:762c)
     call Func_3ed27
     jp Func_3ed64
 
-Func_3f64d: ; 3f64d (f:764d)
+CantLowerAnymore_Pop: ; 3f64d (f:764d)
     pop de
     pop hl
     inc [hl]
 
-Func_3f650: ; 3f650 (f:7650)
+CantLowerAnymore: ; 3f650 (f:7650)
     ld a,[de]
-    cp $44
+    cp ATTACK_DOWN_SIDE_EFFECT
     ret nc
-    ld hl,UnnamedText_3fb3e ; $7b3e
+    ld hl,NothingHappenedText ; $7b3e
     jp PrintText
 
-Func_3f65a: ; 3f65a (f:765a)
+MoveMissed: ; 3f65a (f:765a)
     ld a,[de]
-    cp $44
+    cp ATTACK_DOWN_SIDE_EFFECT
     ret nc
     jp Func_3fb4e
 
@@ -60922,8 +60962,8 @@ DisableEffect: ; 3fa8a (f:7a8a)
     TX_FAR _UnnamedText_3fb09
     db "@"
 
-UnnamedText_3fb3e: ; Moved in the Bank
-    TX_FAR _UnnamedText_3fb3e
+NothingHappenedText: ; Moved in the Bank
+    TX_FAR _NothingHappenedText
     db "@"
 
 Func_3fb43: ; Moved in the Bank
@@ -61819,6 +61859,16 @@ GetAttackerType:
     cp DRAGON
     ret nz
     ld a,WIND
+    ret
+
+CheckAmnesiaSideEffect:
+    push hl
+    ld hl,wFlagAmnesiaSideEffectBit0
+    bit 0,[hl]
+    res 0,[hl]
+    pop hl
+    call z,GenRandomInBattle
+    xor a ; Force Success
     ret
 
 SECTION "bank10",ROMX,BANK[$10]
@@ -124043,7 +124093,7 @@ UnnamedText_948a3: ; 948a3 (25:48a3)
     db $0," was",$55
     db "disabled!",$58
 
-_UnnamedText_3fb3e: ; 948b6 (25:48b6)
+_NothingHappenedText: ; 948b6 (25:48b6)
     db $0,"Nothing happened!",$58
 
 _UnnamedText_3fb49: ; 948c9 (25:48c9)

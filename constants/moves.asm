@@ -133,7 +133,7 @@
     db SKULL_BASH   , CHARGE_EFFECT              , 130 , NORMAL   , 255 , 20 ; pp 10 ; 0 ; Pwr 100 -> 130 ; PP 15 -> 10
     db SPIKE_CANNON , TWO_TO_FIVE_ATTACKS_EFFECT ,  25 , IVORY    , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Ivory ; Pwr 20 -> 25
     db CONSTRICT    , SPEED_DOWN_SIDE_EFFECT     ,  10 , NORMAL   , 255 , 02 ; pp 35 ; 0 ; Ene 06 -> 02
-    db AMNESIA      , SPECIAL_UP2_EFFECT         ,   0 , PSYCHIC  , 255 , 40 ; pp  5 ; - ; PP 20 -> 5
+    db AMNESIA      , AMNESIA_NEW_EFFECT         ,   0 , PSYCHIC  , 255 , 20 ; pp  5 ; - ; PP 20 -> 10
     db KINESIS      , ACCURACY_DOWN1_EFFECT      ,   0 , PSYCHIC  , 204 , 40 ; pp  5 ; - ; PP 20 -> 5
     db SOFTBOILED   , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 21 ; pp 10 ; - ; Ene 20 -> 21
     db HI_JUMP_KICK , JUMP_KICK_EFFECT           , 130 , FIGHTING , 229 , 23 ; pp 10 ; 0 ; Pwr 85 -> 130 ; PP 20 -> 10 ; Ene 20 -> 23
