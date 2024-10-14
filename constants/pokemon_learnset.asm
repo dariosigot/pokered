@@ -820,6 +820,7 @@ GLOOM_Learnset: MACRO
     db 45,HAZE
     db 47,SPORE
     db 52,SOLARBEAM
+    db 56,RAZOR_LEAF ; Exclusive
 ENDM
 VILEPLUME_Learnset: MACRO
     ODDISH_Learnset
@@ -839,11 +840,12 @@ VILEPLUME_Learnset: MACRO
     db 52,TOXIC
     db 58,NIGHT_SHADE
     db 60,SWORDS_DANCE
+    db 60,RAZOR_LEAF
 ENDM
 ODDISH_NoEvo_Learnset: MACRO
     db 23,LEECH_LIFE ; Exclusive
     db 27,MEGA_DRAIN
-    db 31,RAZOR_LEAF ; Exclusive*
+    db 31,RAZOR_LEAF ; Exclusive
     db 35,VINE_WHIP
     db 39,SLAM
     db 44,BARRAGE
@@ -1216,7 +1218,8 @@ KADABRA_ALAKAZAM_Learnset: MACRO
     db 48,LIGHT_SCREEN
     db 51,BARRIER
     db 56,NIGHT_SHADE
-    db 60,HYPER_BEAM
+    db 60,DREAM_EATER
+    db 65,HYPER_BEAM
 ENDM
 KADABRA_Learnset: MACRO
     KADABRA_ALAKAZAM_Learnset 20
@@ -1263,7 +1266,8 @@ MACHOKE_MACHAMP_Learnset: MACRO
     db 51,MEGA_KICK
     db 55,EARTHQUAKE
     db 58,HI_JUMP_KICK
-    db 60,HYPER_BEAM
+    db 60,FISSURE
+    db 65,HYPER_BEAM
 ENDM
 MACHOKE_Learnset: MACRO
     MACHOKE_MACHAMP_Learnset 31
@@ -1306,6 +1310,7 @@ WEEPINBELL_Learnset: MACRO
     db 45,HAZE
     db 47,SPORE
     db 52,SOLARBEAM
+    db 56,LEECH_SEED ; Exclusive
 ENDM
 VICTREEBEL_Learnset: MACRO
     BELLSPROUT_Learnset
@@ -1325,11 +1330,12 @@ VICTREEBEL_Learnset: MACRO
     db 52,TOXIC
     db 58,SUPER_FANG
     db 60,SWORDS_DANCE
+    db 60,LEECH_SEED
 ENDM
 BELLSPROUT_NoEvo_Learnset: MACRO
     db 23,ABSORB ; Exclusive
     db 27,BIND
-    db 31,LEECH_SEED ; Exclusive*
+    db 31,LEECH_SEED ; Exclusive
     db 35,RAZOR_LEAF
     db 39,SLAM
     db 44,PIN_MISSILE
@@ -1408,6 +1414,7 @@ GRAVELER_GOLEM_Learnset: MACRO
     db 54,FLAMETHROWER
     db 58,FISSURE
     db 60,SUBSTITUTE
+    db 65,HYPER_BEAM
 ENDM
 GRAVELER_Learnset: MACRO
     GRAVELER_GOLEM_Learnset 28
@@ -1778,6 +1785,8 @@ HAUNTER_GENGAR_Learnset: MACRO
     db 52,TOXIC
     db 55,ACID_ARMOR
     db 60,SUBSTITUTE
+    db 60,AMNESIA
+    db 65,HYPER_BEAM
 ENDM
 HAUNTER_Learnset: MACRO
     HAUNTER_GENGAR_Learnset 28
@@ -1790,6 +1799,7 @@ GASTLY_NoEvo_Learnset: MACRO
     db 32,CONFUSION
     db 35,MIST
     db 39,REFLECT
+    db 40,AMNESIA ; Exclusive
     db 43,PSYBEAM
     db 48,HAZE
     db 53,PSYCHIC_M
@@ -1914,8 +1924,8 @@ VOLTORB_Learnset: MACRO
     db 12,LIGHT_SCREEN
     db 14,SUPERSONIC
     db 16,THUNDERSHOCK
-    db 18,QUICK_ATTACK
-    db 21,SELFDESTRUCT
+    db 17,SELFDESTRUCT
+    db 20,QUICK_ATTACK
     db 24,THUNDER_WAVE
     db 26,SLAM
     db 28,SWIFT
@@ -1956,9 +1966,9 @@ EXEGGCUTE_Learnset: MACRO
     db 19,LEECH_SEED
     db 22,SLAM
     db 25,ABSORB
-    db 27,STUN_SPORE ; Exclusive*
-    db 29,POISONPOWDER ; Exclusive*
-    db 31,SLEEP_POWDER ; Exclusive*
+    db 27,STUN_SPORE ; Exclusive
+    db 29,POISONPOWDER ; Exclusive
+    db 31,SLEEP_POWDER ; Exclusive
     db 35,EGG_BOMB
     db 37,STRING_SHOT
     db 39,PSYBEAM
@@ -1986,10 +1996,13 @@ EXEGGUTOR_Learnset: MACRO
     db 35,SELFDESTRUCT
     db 37,MEGA_DRAIN
     db 39,RAZOR_LEAF
+    db 40,STUN_SPORE
     db 42,SOLARBEAM
     db 44,PSYCHIC_M
+    db 49,POISONPOWDER
     db 52,EXPLOSION
     db 56,BODY_SLAM
+    db 60,SLEEP_POWDER
     db 60,DREAM_EATER
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
@@ -2662,8 +2675,8 @@ GYARADOS_Learnset: MACRO
     db 49,FLAMETHROWER
     db 52,HYPER_BEAM
     db 56,SUPER_FANG
-    db 58,AMNESIA
     db 60,EARTHQUAKE
+    db 65,AMNESIA
 ENDM
 MAGIKARP_NoEvo_Learnset: MACRO
     db 30,SLAM
