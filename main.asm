@@ -55541,10 +55541,12 @@ handleIfPlayerMoveMissed:
     ld a,[W_MOVEMISSED]
     and a
     jr z,getPlayerAnimationType
-    ld a,[W_PLAYERMOVEEFFECT]
-    sub EXPLODE_EFFECT
-    jr z,playPlayerMoveAnimation ; don't play any animation if the move missed, unless it was EXPLODE_EFFECT
-    jr playerCheckIfFlyOrChargeEffect ; 574B
+;    ld a,[W_PLAYERMOVEEFFECT]
+;    sub EXPLODE_EFFECT
+;    jr z,playPlayerMoveAnimation ; don't play any animation if the move missed, unless it was EXPLODE_EFFECT
+;    jr playerCheckIfFlyOrChargeEffect ; 574B
+    xor a
+    jr playPlayerMoveAnimation
 
 getPlayerAnimationType:
     ld a,[W_PLAYERMOVEEFFECT]
@@ -55659,11 +55661,7 @@ MirrorMoveCheck:
     ld de,1
     call IsInArray
     call nc,JumpMoveEffect
-    jp ExecutePlayerMoveDone
-
-MultiHitText:
-    TX_FAR _MultiHitText
-    db "@"
+    ; fall through
 
 ExecutePlayerMoveDone:
     xor a
@@ -55671,7 +55669,13 @@ ExecutePlayerMoveDone:
     ld b,1
     ret
 
+MultiHitText:
+    TX_FAR _MultiHitText
+    db "@"
+
 ; ──────────────────────────────────────────
+
+SECTION "PrintGhostText",ROMX[$5811],BANK[$f]
 
 PrintGhostText: ; 3d811 (f:5811)
 ; print the ghost battle messages
@@ -58157,10 +58161,11 @@ handleIfEnemyMoveMissed:
     ld a,[W_MOVEMISSED] ; $d05f
     and a
     jr z,.moveDidNotMiss
-    ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    cp EXPLODE_EFFECT
-    jr z,handleExplosionMiss
-    jr EnemyCheckIfFlyOrChargeEffect
+;    ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
+;    cp EXPLODE_EFFECT
+;    jr z,handleExplosionMiss
+;    jr EnemyCheckIfFlyOrChargeEffect
+    jr handleExplosionMiss
 .moveDidNotMiss
     call SwapPlayerAndEnemyLevels
 
@@ -58279,17 +58284,19 @@ EnemyCheckIfMirrorMoveEffect:
     ld de,$1
     call IsInArray
     call nc,JumpMoveEffect
-    jr ExecuteEnemyMoveDone
-
-HitXTimesText:
-    TX_FAR _HitXTimesText
-    db "@"
+    ; fall through
 
 ExecuteEnemyMoveDone:
     ld b,$1
     ret
 
+HitXTimesText:
+    TX_FAR _HitXTimesText
+    db "@"
+
 ; ──────────────────────────────────────────
+
+SECTION "CheckEnemyStatusConditions",ROMX[$688f],BANK[$f]
 
 CheckEnemyStatusConditions: ; 3e88f (f:688f)
     ld hl,W_ENEMYMONSTATUS ; $cfe9
