@@ -59784,7 +59784,7 @@ PoisonEffect: ; 3f24f (f:724f)
     cp $42
     jr z,.asm_3f2cd
     ld a,b
-    call Func_3fb96
+    call PlayBattleAnimation2
     jp PrintText
 .asm_3f2cd
     call PlayCurrentMoveAnimation2
@@ -60430,7 +60430,7 @@ BideEffect: ; 3f6e5 (f:76e5)
     ld [bc],a
     ld a,[H_WHOSETURN]
     add $ae
-    jp Func_3fb96
+    jp PlayBattleAnimation2
 
 ThrashPetalDanceEffect: ; 3f717 (f:7717)
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
@@ -60449,7 +60449,7 @@ ThrashPetalDanceEffect: ; 3f717 (f:7717)
     ld [de],a
     ld a,[H_WHOSETURN] ; $FF00+$f3
     add $b0
-    jp Func_3fb96
+    jp PlayBattleAnimation2
 
 SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -61069,6 +61069,8 @@ CheckTargetSubstitute: ; Moved in the Bank
     ret
 
 PlayCurrentMoveAnimation2: ; Moved in the Bank
+; animation at MOVENUM will be played unless MOVENUM is 0
+; plays wAnimationType 3 or 6
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVENUM] ; $cfd2
@@ -61078,16 +61080,17 @@ PlayCurrentMoveAnimation2: ; Moved in the Bank
     and a
     ret z
 
-Func_3fb96: ; Moved in the Bank
+PlayBattleAnimation2: ; Moved in the Bank
+; play animation ID at a and animation type 6 or 3
     ld [W_ANIMATIONID],a ; $d07c
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ld a,$6
-    jr z,.asm_3fba2
-    ld a,$3
-.asm_3fba2
+    ld a,6
+    jr z,.storeAnimationType
+    ld a,3
+.storeAnimationType
     ld [$cc5b],a
-    jp Func_3fbbc
+    jp PlayBattleAnimationGotID
 
 PlayCurrentMoveAnimation: ; Moved in the Bank
     xor a
@@ -61104,7 +61107,7 @@ PlayCurrentMoveAnimation: ; Moved in the Bank
 Func_3fbb9: ; Moved in the Bank
     ld [W_ANIMATIONID],a ; $d07c
 
-Func_3fbbc: ; 3fbbc (f:7bbc)
+PlayBattleAnimationGotID: ; 3fbbc (f:7bbc)
     push hl
     push de
     push bc
