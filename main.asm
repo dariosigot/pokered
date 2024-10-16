@@ -30855,7 +30855,7 @@ Func_139a3: ; 139a3 (4:79a3)
     inc de
     ld a,[hl]
     ld [de],a
-    ld hl,Func_3fba8
+    ld hl,PlayCurrentMoveAnimation
     call Func_139d5
     ld hl,UnnamedText_139cd
     jp PrintText
@@ -30909,7 +30909,7 @@ Func_139da: ; 139da (4:79da)
     call Func_13a37
     ld hl,W_ENEMYBATTSTATUS1
     call Func_13a37
-    ld hl,Func_3fba8
+    ld hl,PlayCurrentMoveAnimation
     call Func_139d5
     ld hl,UnnamedText_13a53
     jp PrintText
@@ -33191,8 +33191,8 @@ SubstituteEffectHandler: ; 17dad (5:7dad)
     set 4,[hl]    ;set bit 4 of flags,user now has substitute
     ld a,[$d355]  ;load options
     bit 7,a       ;battle animation is enabled?
-    ld hl,Func_3fba8    ; $7ba8 ;animation enabled: 0F:7BA8
-    ld b,BANK(Func_3fba8)
+    ld hl,PlayCurrentMoveAnimation    ; $7ba8 ;animation enabled: 0F:7BA8
+    ld b,BANK(PlayCurrentMoveAnimation)
     jr z,.animationEnabled
     ld hl,AnimationSubstitute   ;animation disabled: 1E:56E0
     ld b,BANK(AnimationSubstitute)
@@ -47118,9 +47118,9 @@ Func_27f86: ; 27f86 (9:7f86)
     bit 2,[hl]
     jr nz,.asm_27fa5
     set 2,[hl]
-    ld hl,Func_3fba8
-    ld b,BANK(Func_3fba8)
-    call Bankswitch ; indirect jump to Func_3fba8 (3fba8 (f:7ba8))
+    ld hl,PlayCurrentMoveAnimation
+    ld b,BANK(PlayCurrentMoveAnimation)
+    call Bankswitch ; indirect jump to PlayCurrentMoveAnimation (3fba8 (f:7ba8))
     ld hl,UnnamedText_27fb3 ; $7fb2
     jp PrintText
 .asm_27fa5
@@ -47270,42 +47270,42 @@ LeechSeedEffect_: ; 2bea9 (a:7ea9)
     call Bankswitch ; indirect jump to MoveHitTest (3e56b (f:656b))
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jr nz,.asm_2bee7
+    jr nz,.moveMissed
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
     ld de,W_ENEMYMONTYPE1 ; $cfea (aliases: W_ENEMYMONTYPES)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_2bec8
+    jr z,.leechSeedEffect
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
     ld de,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES)
-.asm_2bec8
+.leechSeedEffect
     ld a,[de]
-    cp $16
-    jr z,.asm_2bee7
+    cp GRASS
+    jr z,.moveMissed
     inc de
     ld a,[de]
-    cp $16
-    jr z,.asm_2bee7
-    bit 7,[hl]
-    jr nz,.asm_2bee7
-    set 7,[hl]
-    ld hl,Func_3fba8
-    ld b,BANK(Func_3fba8)
-    call Bankswitch ; indirect jump to Func_3fba8 (3fba8 (f:7ba8))
-    ld hl,UnnamedText_2bef2 ; $7ef2
+    cp GRASS
+    jr z,.moveMissed
+    bit 7,[hl] ; SEEDED
+    jr nz,.moveMissed
+    set 7,[hl] ; SEEDED
+    ld hl,PlayCurrentMoveAnimation
+    ld b,BANK(PlayCurrentMoveAnimation)
+    call Bankswitch ; indirect jump to PlayCurrentMoveAnimation (3fba8 (f:7ba8))
+    ld hl,WasSeededText ; $7ef2
     jp PrintText
-.asm_2bee7
+.moveMissed
     ld c,$32
     call DelayFrames
-    ld hl,UnnamedText_2bef7 ; $7ef7
+    ld hl,EvadedAttackText ; $7ef7
     jp PrintText
 
-UnnamedText_2bef2: ; 2bef2 (a:7ef2)
-    TX_FAR _UnnamedText_2bef2
+WasSeededText: ; 2bef2 (a:7ef2)
+    TX_FAR _WasSeededText
     db "@"
 
-UnnamedText_2bef7: ; 2bef7 (a:7ef7)
-    TX_FAR _UnnamedText_2bef7
+EvadedAttackText: ; 2bef7 (a:7ef7)
+    TX_FAR _EvadedAttackText
     db "@"
 
 SECTION "bankB",ROMX,BANK[$B]
@@ -47743,8 +47743,8 @@ Func_33f2b: ; 33f2b (c:7f2b)
     bit 1,[hl]
     jr nz,.asm_33f4a
     set 1,[hl]
-    ld hl,Func_3fba8
-    ld b,BANK(Func_3fba8)
+    ld hl,PlayCurrentMoveAnimation
+    ld b,BANK(PlayCurrentMoveAnimation)
     call Bankswitch
     ld hl,UnnamedText_33f52
     jp PrintText
@@ -50676,7 +50676,7 @@ Func_3bb97: ; Moved in the Bank
     ld hl,UnnamedText_3bbdc ; $7bdc
 .asm_3bbc1
     push hl
-    ld hl,Func_3fba8 ; $7ba8
+    ld hl,PlayCurrentMoveAnimation ; $7ba8
     call BankswitchEtoF
     pop hl
     jp PrintText
@@ -51561,7 +51561,7 @@ Func_3b9ec: ; Moved Upper in the Bank
     ld [de],a
     ld [wHPBarNewHP],a
 .asm_3ba6f
-    ld hl,Func_3fba8 ; $7ba8
+    ld hl,PlayCurrentMoveAnimation ; $7ba8
     call BankswitchEtoF
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -51613,8 +51613,8 @@ TransformEffect_: ; Moved Upper in the Bank
     call nz,Bankswitch
     ld a,[W_OPTIONS] ; $d355
     add a
-    ld hl,Func_3fba8 ; $7ba8
-    ld b,BANK(Func_3fba8)
+    ld hl,PlayCurrentMoveAnimation ; $7ba8
+    ld b,BANK(PlayCurrentMoveAnimation)
     jr nc,.asm_3baff
     ld hl,AnimationTransformMon
     ld b,BANK(AnimationTransformMon)
@@ -56221,28 +56221,32 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_3dbed
+    jr z,.playersTurn
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
-.asm_3dbed
-    ld hl,UnnamedText_3dc57 ; $5c57
-    ld a,[$d05b]
-    and $7f
-    jr z,.asm_3dc04
-    ld hl,UnnamedText_3dc42 ; $5c42
-    ld a,[$d05e]
+.playersTurn
+    ld hl,DoesntAffectMonText ; $5c57
+    ld a,[$d05b] ; DamageMultipliers
+    and %01111111
+    jr z,.gotTextToPrint
+    ld hl,AttackMissedText ; $5c42
+    ld a,[$d05e] ; CriticalHitOrOHKO
     cp $ff
-    jr nz,.asm_3dc04
-    ld hl,UnnamedText_3dc4c ; $5c4c
-.asm_3dc04
+    jr nz,.gotTextToPrint
+    ld hl,UnaffectedText ; $5c4c
+.gotTextToPrint
     push de
     call PrintText
     xor a
-    ld [$d05e],a
+    ld [$d05e],a ; CriticalHitOrOHKO
     pop de
     ld a,[de]
-    cp $2d
+    cp JUMP_KICK_EFFECT
     ret nz
-    ld hl,W_DAMAGE ; $d0d7
+
+    ; if you get here, the mon used jump kick or hi jump kick and missed
+    ld hl,W_DAMAGE ; since the move missed, wDamage will always contain 0 at this point.
+                   ; Thus, recoil damage will always be equal to 1
+                   ; even if it was intended to be potential damage/8.
     ld a,[hli]
     ld b,[hl]
     srl a
@@ -56255,40 +56259,40 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     dec hl
     ld [hli],a
     or b
-    jr nz,.asm_3dc2a
+    jr nz,.applyRecoil
     inc a
     ld [hl],a
-.asm_3dc2a
-    ld hl,UnnamedText_3dc47 ; $5c47
+.applyRecoil
+    ld hl,KeptGoingAndCrashedText ; $5c47
     call PrintText
     ld b,$4
     ld a,$24
-    call Predef ; indirect jump to Func_48125 (48125 (12:4125))
+    call Predef ; indirect jump to PredefShakeScreenHorizontally (48125 (12:4125))
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr nz,.asm_3dc3f
+    jr nz,.enemyTurn
     jp ApplyDamageToPlayerPokemon
-.asm_3dc3f
+.enemyTurn
     jp ApplyDamageToEnemyPokemon
 
-UnnamedText_3dc42: ; 3dc42 (f:5c42)
-    TX_FAR _UnnamedText_3dc42
+AttackMissedText: ; 3dc42 (f:5c42)
+    TX_FAR _AttackMissedText
     db "@"
 
-UnnamedText_3dc47: ; 3dc47 (f:5c47)
-    TX_FAR _UnnamedText_3dc47
+KeptGoingAndCrashedText: ; 3dc47 (f:5c47)
+    TX_FAR _KeptGoingAndCrashedText
     db "@"
 
-UnnamedText_3dc4c: ; 3dc4c (f:5c4c)
-    TX_FAR _UnnamedText_3dc4c
+UnaffectedText: ; 3dc4c (f:5c4c)
+    TX_FAR _UnaffectedText
     db "@"
 
 Func_3dc51: ; 3dc51 (f:5c51)
-    ld hl,UnnamedText_3dc57 ; $5c57
+    ld hl,DoesntAffectMonText ; $5c57
     jp PrintText
 
-UnnamedText_3dc57: ; 3dc57 (f:5c57)
-    TX_FAR _UnnamedText_3dc57
+DoesntAffectMonText: ; 3dc57 (f:5c57)
+    TX_FAR _DoesntAffectMonText
     db "@"
 
 PrintCriticalOHKOText: ; 3dc5c (f:5c5c)
@@ -60075,7 +60079,7 @@ StatModifierUpEffect: ; Moved in the Bank
     call nz,Bankswitch
     pop de
 .asm_3f4f9
-    call Func_3fba8
+    call PlayCurrentMoveAnimation
     ld a,[de]
     cp $6b
     jr nz,.asm_3f50e
@@ -60900,7 +60904,7 @@ MimicEffect: ; 3f9ed (f:79ed)
     ld [hl],a
     ld [$d11e],a
     call GetMoveName
-    call Func_3fba8
+    call PlayCurrentMoveAnimation
     ld hl,UnnamedText_3fa77
     jp PrintText
 .asm_3fa74
@@ -60916,7 +60920,7 @@ LeechSeedEffect: ; 3fa7c (f:7a7c)
     jp Bankswitch ; indirect jump to LeechSeedEffect_ (2bea9 (a:7ea9))
 
 SplashEffect: ; 3fa84 (f:7a84)
-    call Func_3fba8
+    call PlayCurrentMoveAnimation
     jp Func_3fb43
 
 DisableEffect: ; 3fa8a (f:7a8a)
@@ -61078,7 +61082,7 @@ Func_3fb96: ; Moved in the Bank
     ld [$cc5b],a
     jp Func_3fbbc
 
-Func_3fba8: ; Moved in the Bank
+PlayCurrentMoveAnimation: ; Moved in the Bank
     xor a
     ld [$cc5b],a
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -70645,7 +70649,7 @@ Func_48119: ; 48119 (12:4119)
     ld c,$3
     jp DelayFrames
 
-Func_48125: ; 48125 (12:4125)
+PredefShakeScreenHorizontally: ; 48125 (12:4125)
     call Load16BitRegisters
     xor a
 .asm_48129
@@ -75282,7 +75286,7 @@ LearnMovePredef:
     dbw BANK(Func_480ff),Func_480ff
     dbw BANK(Func_f929),Func_f929
     dbw BANK(Func_f9a0),Func_f9a0
-    dbw BANK(Func_48125),Func_48125
+    dbw BANK(PredefShakeScreenHorizontally),PredefShakeScreenHorizontally
     dbw BANK(UpdateHPBar),UpdateHPBar
     dbw BANK(Func_f9dc),Func_f9dc
     dbw BANK(Func_5ab0),Func_5ab0
@@ -78894,9 +78898,9 @@ ParalyzeEffect_: ; Moved in the Bank
     call Bankswitch ; indirect jump to Func_3ed27 (3ed27 (f:6d27))
     ld c,$1e
     call DelayFrames
-    ld hl,Func_3fba8
-    ld b,BANK(Func_3fba8)
-    call Bankswitch ; indirect jump to Func_3fba8 (3fba8 (f:7ba8))
+    ld hl,PlayCurrentMoveAnimation
+    ld b,BANK(PlayCurrentMoveAnimation)
+    call Bankswitch ; indirect jump to PlayCurrentMoveAnimation (3fba8 (f:7ba8))
     ld hl,Func_3fb6e
     ld b,BANK(Func_3fb6e)
     jp Bankswitch ; indirect jump to Func_3fb6e (3fb6e (f:7b6e))
@@ -109035,7 +109039,7 @@ AnimationShakeScreen: ; 7920e (1e:520e)
 
 Func_79210: ; 79210 (1e:5210)
     ld a,$24
-    jp Predef ; indirect jump to Func_48125 (48125 (12:4125))
+    jp Predef ; indirect jump to PredefShakeScreenHorizontally (48125 (12:4125))
 
 AnimationWaterDropletsEverywhere: ; 79215 (1e:5215)
 ; Draws water droplets all over the screen and makes them
@@ -120184,20 +120188,20 @@ _UnnamedText_3db7b: ; 89a70 (22:5a70)
 _UnnamedText_3db80: ; 89a73 (22:5a73)
     db $0,"!",$57
 
-_UnnamedText_3dc42: ; 89a76 (22:5a76)
+_AttackMissedText: ; 89a76 (22:5a76)
     db $0,$5a,"'s",$4f
     db "attack missed!",$58
 
-_UnnamedText_3dc47: ; 89a89 (22:5a89)
+_KeptGoingAndCrashedText: ; 89a89 (22:5a89)
     db $0,$5a,$4f
     db "kept going and",$55
     db "crashed!",$58
 
-_UnnamedText_3dc4c: ; 89aa4 (22:5aa4)
+_UnaffectedText: ; 89aa4 (22:5aa4)
     db $0,$59,"'s",$4f
     db "unaffected!",$58
 
-_UnnamedText_3dc57: ; 89ab4 (22:5ab4)
+_DoesntAffectMonText: ; 89ab4 (22:5ab4)
     db $0,"It doesn't affect",$4f
     db $59,"!",$58
 
@@ -124173,11 +124177,11 @@ _UnnamedText_27fb3: ; 9499b (25:499b)
     db $0,$5a,"'s",$4f
     db "getting pumped!",$58
 
-_UnnamedText_2bef2: ; 949af (25:49af)
+_WasSeededText: ; 949af (25:49af)
     db $0,$59,$4f
     db "was seeded!",$58
 
-_UnnamedText_2bef7: ; 949be (25:49be)
+_EvadedAttackText: ; 949be (25:49be)
     db $0,$59,$4f
     db "evaded attack!",$58
 
