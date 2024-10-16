@@ -57694,12 +57694,12 @@ CheckPoisonableMon:
     ld a,[hli]
     cp POISON ; can't poison a poison-type target
     ret z
-    cp METAL
+    cp METAL ; can't poison a metal-type target
     ret z
     ld a,[hld]
     cp POISON ; can't poison a poison-type target
     ret z
-    cp METAL
+    cp METAL ; can't poison a metal-type target
     ret
 
 BackupMovesBeforeEnemyMimic:
@@ -59700,7 +59700,7 @@ SleepEffect: ; 3f1fc (f:71fc)
     ld hl,.FellAsleepText ; $7245
     jp PrintText
 .didntAffect
-    jp Func_3fb5e
+    jp PrintDidntAffectText
 .FellAsleepText
     TX_FAR _FellAsleepText
     db "@"
@@ -59708,38 +59708,30 @@ SleepEffect: ; 3f1fc (f:71fc)
     TX_FAR _AlreadyAsleepText
     db "@"
 
-SECTION "PoisonEffect",ROMX[$724f],BANK[$f]
-
-PoisonEffect: ; 3f24f (f:724f)
+PoisonEffect: ; Moved in the Bank
     ld hl,W_ENEMYMONSTATUS ; $cfe9
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_3f260
+    jr z,.poisonEffect
     ld hl,W_PLAYERMONSTATUS ; $d018
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
-.asm_3f260
+.poisonEffect
     call CheckTargetSubstitute
     jr nz,.noEffect ; can't poison a substitute target
     ld a,[hli]
     ld b,a
     and a
     jr nz,.noEffect ; miss if target is already statused
-    ;ld a,[hli]
-    ;cp POISON ; can't poison a poison-type target
-    ;jr z,.noEffect
-    ;ld a,[hld]
-    ;cp POISON ; can't poison a poison-type target
-    ;jr z,.noEffect
     call CheckPoisonableMon
     jr z,.noEffect
     ld a,[de]
-    cp $2
-    ld b,$34
-    jr z,.asm_3f290
-    cp $21
-    ld b,$67
-    jr z,.asm_3f290
+    cp POISON_SIDE_EFFECT1
+    ld b,$34 ; 20% chance of poisoning
+    jr z,.sideEffectTest
+    cp POISON_SIDE_EFFECT2
+    ld b,$67 ; 40% chance of poisoning
+    jr z,.sideEffectTest
     push hl
     push de
     call MoveHitTest
@@ -59747,61 +59739,61 @@ PoisonEffect: ; 3f24f (f:724f)
     pop hl
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jr nz,.asm_3f2d7
-    jr .asm_3f295
-.asm_3f290
+    jr nz,.didntAffect
+    jr .inflictPoison
+.sideEffectTest
     call GenRandomInBattle
     cp b
     ret nc
-.asm_3f295
+.inflictPoison
     dec hl
-    set 3,[hl]
+    set 3,[hl] ; mon is now poisoned
     push de
     dec de
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ld b,$c7
+    ld b,$c7 ; ANIM_C7
     ld hl,W_PLAYERBATTSTATUS3 ; $d064
     ld a,[de]
     ld de,W_PLAYERTOXICCOUNTER ; $d06c
-    jr nz,.asm_3f2b0
-    ld b,$a9
+    jr nz,.ok
+    ld b,$a9 ; ANIM_A9
     ld hl,W_ENEMYBATTSTATUS3 ; $d069
     ld de,W_ENEMYTOXICCOUNTER ; $d071
-.asm_3f2b0
-    cp $5c
-    jr nz,.asm_3f2bd
-    set 0,[hl]
+.ok
+    cp TOXIC
+    jr nz,.normalPoison ; done if move is not Toxic
+    set 0,[hl] ; BADLY_POISONED ; else set Toxic battstatus
     xor a
     ld [de],a
-    ld hl,.UnnamedText_3f2e4 ; $72e4
-    jr .asm_3f2c0
-.asm_3f2bd
-    ld hl,.UnnamedText_3f2df ; $72df
-.asm_3f2c0
+    ld hl,.BadlyPoisonedText ; $72e4
+    jr .continue
+.normalPoison
+    ld hl,.PoisonedText ; $72df
+.continue
     pop de
     ld a,[de]
-    cp $42
-    jr z,.asm_3f2cd
+    cp POISON_EFFECT
+    jr z,.regularPoisonEffect
     ld a,b
     call PlayBattleAnimation2
     jp PrintText
-.asm_3f2cd
+.regularPoisonEffect
     call PlayCurrentMoveAnimation2
     jp PrintText
 .noEffect
     ld a,[de]
-    cp $42
+    cp POISON_EFFECT
     ret nz
-.asm_3f2d7
+.didntAffect
     ld c,$32
     call DelayFrames
-    jp Func_3fb5e
-.UnnamedText_3f2df
-    TX_FAR _UnnamedText_3f2df
+    jp PrintDidntAffectText
+.PoisonedText
+    TX_FAR _PoisonedText
     db "@"
-.UnnamedText_3f2e4
-    TX_FAR _UnnamedText_3f2e4
+.BadlyPoisonedText
+    TX_FAR _BadlyPoisonedText
     db "@"
 
 SECTION "DrainHPEffect",ROMX[$72e9],BANK[$f]
@@ -60478,7 +60470,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     call DelayFrames
     ld a,[W_PLAYERMOVENUM] ; $cfd2
     cp $64
-    jp nz,Func_3fb5e
+    jp nz,PrintDidntAffectText
     jp Func_3fb53
 .asm_3f76e
     call ReadPlayerMonCurHPAndStatus
@@ -60520,7 +60512,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     call DelayFrames
     ld a,[W_ENEMYMOVENUM] ; $cfcc
     cp $64
-    jp nz,Func_3fb5e
+    jp nz,PrintDidntAffectText
     jp Func_3fb53
 .asm_3f7c1
     call ReadPlayerMonCurHPAndStatus
@@ -61036,12 +61028,12 @@ UnnamedText_3fb59: ; Moved in the Bank
     TX_FAR _UnnamedText_3fb59
     db "@"
 
-Func_3fb5e: ; Moved in the Bank
-    ld hl,UnnamedText_3fb64 ; $7b64
+PrintDidntAffectText: ; Moved in the Bank
+    ld hl,DidntAffectText ; $7b64
     jp PrintText
 
-UnnamedText_3fb64: ; Moved in the Bank
-    TX_FAR _UnnamedText_3fb64
+DidntAffectText: ; Moved in the Bank
+    TX_FAR _DidntAffectText
     db "@"
 
 UnnamedText_3fb69: ; Moved in the Bank
@@ -78917,9 +78909,9 @@ ParalyzeEffect_: ; Moved in the Bank
 .didntAffect
     ld c,$32
     call DelayFrames
-    ld hl,Func_3fb5e
-    ld b,BANK(Func_3fb5e)
-    jp Bankswitch ; indirect jump to Func_3fb5e (3fb5e (f:7b5e))
+    ld hl,PrintDidntAffectText
+    ld b,BANK(PrintDidntAffectText)
+    jp Bankswitch ; indirect jump to PrintDidntAffectText (3fb5e (f:7b5e))
 .doesntAffect
     ld c,$32
     call DelayFrames
@@ -124036,11 +124028,11 @@ _AlreadyAsleepText: ; 94725 (25:4725)
     db $0,$59,"'s",$4f
     db "already asleep!",$58
 
-_UnnamedText_3f2df: ; 94739 (25:4739)
+_PoisonedText: ; 94739 (25:4739)
     db $0,$59,$4f
     db "was poisoned!",$58
 
-_UnnamedText_3f2e4: ; 9474a (25:474a)
+_BadlyPoisonedText: ; 9474a (25:474a)
     db $0,$59,"'s",$4f
     db "badly poisoned!",$58
 
@@ -124154,7 +124146,7 @@ _UnnamedText_3fb49: ; 948c9 (25:48c9)
 _UnnamedText_3fb59: ; 948d5 (25:48d5)
     db $0,"But,it failed! ",$58
 
-_UnnamedText_3fb64: ; 948e7 (25:48e7)
+_DidntAffectText: ; 948e7 (25:48e7)
     db $0,"It didn't affect",$4f
     db $59,"!",$58
 
