@@ -59661,6 +59661,7 @@ JumpMoveEffect_: ; Moved in the Bank
 SECTION "SleepEffect",ROMX[$71fc],BANK[$f]
 
 SleepEffect: ; 3f1fc (f:71fc)
+    call PlayCurrentMoveAnimation2
     ld de,W_ENEMYMONSTATUS ; $cfe9
     ld bc,W_ENEMYBATTSTATUS2 ; $d068
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -59693,10 +59694,9 @@ SleepEffect: ; 3f1fc (f:71fc)
     jr nz,.didntAffect
 .setSleepCounter
     call GenRandomInBattle
-    and $7
+    and %00000111 ; SLEEP
     jr z,.setSleepCounter
     ld [de],a
-    call PlayCurrentMoveAnimation2
     ld hl,.FellAsleepText ; $7245
     jp PrintText
 .didntAffect
