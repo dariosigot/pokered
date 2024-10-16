@@ -51608,8 +51608,8 @@ TransformEffect_: ; Moved Upper in the Bank
 .asm_3bae4
     bit 4,[hl]
     push af
-    ld hl,Func_79747
-    ld b,BANK(Func_79747)
+    ld hl,HideSubstituteShowMonAnim
+    ld b,BANK(HideSubstituteShowMonAnim)
     call nz,Bankswitch
     ld a,[W_OPTIONS] ; $d355
     add a
@@ -51620,8 +51620,8 @@ TransformEffect_: ; Moved Upper in the Bank
     ld b,BANK(AnimationTransformMon)
 .asm_3baff
     call Bankswitch
-    ld hl,Func_79771
-    ld b,BANK(Func_79771)
+    ld hl,ReshowSubstituteAnim
+    ld b,BANK(ReshowSubstituteAnim)
     pop af
     call nz,Bankswitch
 ;    pop bc
@@ -55453,48 +55453,55 @@ Func_3d605: ; 3d605 (f:5605)
     jr nz,.asm_3d654
     ret
 
+; ──────────────────────────────────────────
+; ExecutePlayerMove
+; ──────────────────────────────────────────
+
 ExecutePlayerMove: ; 3d65e (f:565e)
     xor a
-    ld [H_WHOSETURN],a ; $FF00+$f3
+    ld [H_WHOSETURN],a ; set player's turn
     ld a,[wPlayerSelectedMove] ; $ccdc
     inc a
-    jp z,Func_3d80a
+    jp z,ExecutePlayerMoveDone ; for selected move = FF, skip most of player's turn
     xor a
     ld [W_MOVEMISSED],a ; $d05f
-    ld [$cced],a
-    ld [$ccf4],a
-    ld a,$a
-    ld [$d05b],a
-    ld a,[$cd6a]
-    and a
-    jp nz,Func_3d80a
-    call Func_3d811
-    jp z,Func_3d80a
-    call Func_3d854
-    jr nz,.asm_3d68a
+    ld [$cced],a ; MonIsDisobedient
+    ld [$ccf4],a ; MoveDidntMiss
+    ld a,10
+    ld [$d05b],a ; DamageMultipliers
+    ld a,[$cd6a] ; ActionResultOrTookBattleTurn
+    and a ; has the player already used the turn (e.g. by using an item, trying to run or switching pokemon)
+    jp nz,ExecutePlayerMoveDone
+    call PrintGhostText
+    jp z,ExecutePlayerMoveDone
+    call CheckPlayerStatusConditions
+    jr nz,.playerHasNoSpecialCondition
     jp hl
-.asm_3d68a
+.playerHasNoSpecialCondition
     call GetCurrentMove
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
-    bit 4,[hl]
-    jr nz,asm_3d6a9
-    call Func_3dc88
-    jp z,Func_3d80a
+    bit 4,[hl] ; charging up for attack
+    jr nz,PlayerCanExecuteChargingMove
+    call CheckForDisobedience
+    jp z,ExecutePlayerMoveDone
 
-Func_3d69a: ; 3d69a (f:569a)
+CheckIfPlayerNeedsToChargeUp:
     ld a,[W_PLAYERMOVEEFFECT] ; $cfd3
-    cp $27
-    jp z,Func_3f132
-    cp $2b
-    jp z,Func_3f132
-    jr asm_3d6b0
+    cp CHARGE_EFFECT
+    jp z,JumpMoveEffect
+    cp FLY_EFFECT
+    jp z,JumpMoveEffect
+    jr PlayerCanExecuteMove
 
 ; in-battle stuff
-asm_3d6a9: ; 3d6a9 (f:56a9)
-    ld hl,W_PLAYERBATTSTATUS1
+PlayerCanExecuteChargingMove:
+    ld hl,W_PLAYERBATTSTATUS1 ; reset charging up and invulnerability statuses if mon was charging up for an attack
+                              ; being fully paralyzed or hurting oneself in confusion removes charging up status
+                              ; resulting in the Pokemon being invulnerable for the whole battle
     res 4,[hl]
     res 6,[hl]
-asm_3d6b0: ; 3d6b0 (f:56b0)
+
+PlayerCanExecuteMove:
     call PrintMonName1Text
     ld hl,DecrementPP
     ld de,wPlayerSelectedMove ; pointer to the move just used
@@ -55504,158 +55511,169 @@ asm_3d6b0: ; 3d6b0 (f:56b0)
     ld hl,EffectsArray1
     ld de,1
     call IsInArray
-    jp c,Func_3f132
+    jp c,JumpMoveEffect ; ResidualEffects1 moves skip damage calculation and accuracy tests
+                        ; unless executed as part of their exclusive effect functions
     ld a,[W_PLAYERMOVEEFFECT]
     ld hl,EffectsArray5B
     ld de,1
     call IsInArray
-    call c,Func_3f132
-asm_3d6dc: ; 3d6dc (f:56dc)
+    call c,JumpMoveEffect ; execute the effects of SpecialEffectsCont moves (e.g. Wrap, Thrash) but don't skip anything
+
+PlayerCalcMoveDamage:
     ld a,[W_PLAYERMOVEEFFECT]
     ld hl,EffectsArray2
     ld de,1
     call IsInArray
-    jp c,.asm_3d702
+    jp c,.moveHitTest ; SetDamageEffects moves (e.g. Seismic Toss and Super Fang) skip damage calculation
     call CriticalHitTest
     call HandleCounterMove
-    jr z,asm_3d705
+    jr z,handleIfPlayerMoveMissed
     call CalculateDamage
     call MoreCalculateDamage
-    jp z,asm_3d74b
+    jp z,playerCheckIfFlyOrChargeEffect ; for moves with 0 BP, skip any further damage calculation and, for now, skip MoveHitTest
+                                        ; for these moves, accuracy tests will only occur if they are called as part of the effect itself
     call AdjustDamageForMoveType
-    call Func_3e687
-.asm_3d702
+    call RandomizeDamage
+.moveHitTest
     call MoveHitTest
-asm_3d705
+
+handleIfPlayerMoveMissed:
     ld a,[W_MOVEMISSED]
     and a
-    jr z,asm_3d714
+    jr z,getPlayerAnimationType
     ld a,[W_PLAYERMOVEEFFECT]
-    sub a,7
-    jr z,asm_3d71e
-    jr asm_3d74b ; 574B
-asm_3d714
+    sub EXPLODE_EFFECT
+    jr z,playPlayerMoveAnimation ; don't play any animation if the move missed, unless it was EXPLODE_EFFECT
+    jr playerCheckIfFlyOrChargeEffect ; 574B
+
+getPlayerAnimationType:
     ld a,[W_PLAYERMOVEEFFECT]
     and a
-    ld a,4
-    jr z,asm_3d71e
-    ld a,5
-asm_3d71e
+    ld a,4 ; move has no effect other than dealing damage
+    jr z,playPlayerMoveAnimation
+    ld a,5 ; move has effect
+
+playPlayerMoveAnimation:
     push af
     ld a,[W_PLAYERBATTSTATUS2]
-    bit 4,a
-    ld hl,Func_79747
-    ld b,BANK(Func_79747)
+    bit 4,a ; HAS_SUBSTITUTE_UP
+    ld hl,HideSubstituteShowMonAnim
+    ld b,BANK(HideSubstituteShowMonAnim)
     call nz,Bankswitch
     pop af
-    ld [$CC5B],a
+    ld [$CC5B],a ; AnimationType
     ld a,[W_PLAYERMOVENUM]
     call PlayMoveAnimation
-    call Func_3eed3
+    call HandleExplodingAnimation
     call DrawPlayerHUDAndHPBar
     ld a,[W_PLAYERBATTSTATUS2]
-    bit 4,a
-    ld hl,Func_79771
-    ld b,BANK(Func_79771)
+    bit 4,a ; HAS_SUBSTITUTE_UP
+    ld hl,ReshowSubstituteAnim
+    ld b,BANK(ReshowSubstituteAnim)
     call nz,Bankswitch
-    jr asm_3d766
-asm_3d74b
+    jr MirrorMoveCheck
+
+playerCheckIfFlyOrChargeEffect:
     ld c,$1E
     call DelayFrames
     ld a,[W_PLAYERMOVEEFFECT]
-    cp a,$2B
-    jr z,.next5
-    cp a,$27 ; XXX SLP | FRZ ?
-    jr z,.next5
-    jr asm_3d766
-.next5
+    cp a,FLY_EFFECT
+    jr z,.playAnim
+    cp a,CHARGE_EFFECT
+    jr z,.playAnim
+    jr MirrorMoveCheck
+.playAnim
     xor a
     ld [$CC5B],a
-    ld a,$A7
+    ld a,$A7 ; STATUS_AFFECTED_ANIM
     call PlayMoveAnimation
-asm_3d766
+
+MirrorMoveCheck:
     ld a,[W_PLAYERMOVEEFFECT]
-    cp a,9
-    jr nz,.next6 ; 577A
+    cp MIRROR_MOVE_EFFECT
+    jr nz,.metronomeCheck
     call MirrorMoveCopyMove
-    jp z,Func_3d80a
+    jp z,ExecutePlayerMoveDone
     xor a
     ld [$CCED],a
-    jp Func_3d69a
-.next6
-    cp a,$53
-    jr nz,.next7 ; 5784
+    jp CheckIfPlayerNeedsToChargeUp
+.metronomeCheck
+    cp a,METRONOME_EFFECT
+    jr nz,.next
     call MetronomePickMove
-    jp Func_3d69a
-.next7
+    jp CheckIfPlayerNeedsToChargeUp ; if Mirror Move was successful go back to damage calculation for copied move
+.next
     ld a,[W_PLAYERMOVEEFFECT]
     ld hl,EffectsArray3
     ld de,1
     call IsInArray
-    jp c,Func_3f132
+    jp c,JumpMoveEffect ; done here after executing effects of EffectsArray3
     ld a,[W_MOVEMISSED]
     and a
-    jr z,.next8 ; 57A6
-    call Func_3dbe2
+    jr z,.moveDidNotMiss
+    call PrintMoveFailureText
     ld a,[W_PLAYERMOVEEFFECT]
-    cp a,7
-    jr z,.next9 ; 57B9
-    jp Func_3d80a
-.next8
+    cp EXPLODE_EFFECT ; even if Explosion or Selfdestruct missed, its effect still needs to be activated
+    jr z,.notDone
+    jp ExecutePlayerMoveDone ; otherwise, we're done if the move missed
+.moveDidNotMiss
     call ApplyAttackToEnemyPokemon
-    call Func_3dc5c
-    ld hl,DisplayEffectiveness ; MyFunction
-    ld b,BANK(DisplayEffectiveness) ; BANK(MyFunction)
+    call PrintCriticalOHKOText
+    ld hl,DisplayEffectiveness
+    ld b,BANK(DisplayEffectiveness)
     call Bankswitch
     ld a,1
-    ld [$CCF4],a
-.next9
+    ld [$CCF4],a ; MoveDidntMiss
+.notDone
     ld a,[W_PLAYERMOVEEFFECT]
     ld hl,EffectsArray4
     ld de,1
     call IsInArray
-    call c,Func_3f132
-    ld hl,$CFE6
+    call c,JumpMoveEffect ; not done after executing effects of EffectsArray4
+    ld hl,W_ENEMYMONCURHP
     ld a,[hli]
     ld b,[hl]
     or b
-    ret z
+    ret z ; don't do anything else if the enemy fainted
     call HandleBuildingRage
 
     ld hl,W_PLAYERBATTSTATUS1
-    bit 2,[hl]
-    jr z,.next10 ; 57EF
-    ld a,[$D06A]
+    bit 2,[hl] ; ATTACKING_MULTIPLE_TIMES
+    jr z,.executeOtherEffects
+    ld a,[$D06A] ; PlayerNumAttacksLeft
     dec a
-    ld [$D06A],a
-    jp nz,asm_3d714
+    ld [$D06A],a ; PlayerNumAttacksLeft
+    jp nz,getPlayerAnimationType ; for multi-hit moves, apply attack until PlayerNumAttacksLeft hits 0 or the enemy faints.
+                                 ; damage calculation and accuracy tests only happen for the first hit
 
-    res 2,[hl]
+    res 2,[hl] ; ATTACKING_MULTIPLE_TIMES
     ld hl,MultiHitText
     call PrintText
     xor a
     ld [W_NUMHITS],a ; reset
-.next10
+.executeOtherEffects
     ld a,[W_PLAYERMOVEEFFECT]
     and a
-    jp z,Func_3d80a
+    jp z,ExecutePlayerMoveDone
     ld hl,EffectsArray5
     ld de,1
     call IsInArray
-    call nc,Func_3f132
-    jp Func_3d80a
+    call nc,JumpMoveEffect
+    jp ExecutePlayerMoveDone
 
-MultiHitText: ; 3d805 (f:5805)
+MultiHitText:
     TX_FAR _MultiHitText
     db "@"
 
-Func_3d80a: ; 3d80a (f:580a)
+ExecutePlayerMoveDone:
     xor a
     ld [$CD6A],a
     ld b,1
     ret
 
-Func_3d811: ; 3d811 (f:5811)
+; ──────────────────────────────────────────
+
+PrintGhostText: ; 3d811 (f:5811)
 ; print the ghost battle messages
     call IsGhostBattle
     ret nz
@@ -55700,7 +55718,7 @@ IsGhostBattle: ; 3d83a (f:583a)
     and a
     ret
 
-Func_3d854: ; 3d854 (f:5854)
+CheckPlayerStatusConditions: ; 3d854 (f:5854)
     ld hl,W_PLAYERMONSTATUS
     ld a,[hl]
     and a,SLP
@@ -55724,7 +55742,7 @@ Func_3d854: ; 3d854 (f:5854)
 .sleepDone
     xor a
     ld [$CCF1],a
-    ld hl,Func_3d80a
+    ld hl,ExecutePlayerMoveDone
     jp Func_3da37
 
 .FrozenCheck
@@ -55734,7 +55752,7 @@ Func_3d854: ; 3d854 (f:5854)
     call PrintText
     xor a
     ld [$CCF1],a
-    ld hl,Func_3d80a
+    ld hl,ExecutePlayerMoveDone
     jp Func_3da37
 
 .HeldInPlaceCheck
@@ -55743,7 +55761,7 @@ Func_3d854: ; 3d854 (f:5854)
     jp z,FlinchedCheck
     ld hl,CantMoveText
     call PrintText
-    ld hl,Func_3d80a
+    ld hl,ExecutePlayerMoveDone
     jp Func_3da37
 
 FlinchedCheck: ; 3d8ac (f:58ac)
@@ -55753,7 +55771,7 @@ FlinchedCheck: ; 3d8ac (f:58ac)
     res 3,[hl]
     ld hl,FlinchedText
     call PrintText
-    ld hl,Func_3d80a
+    ld hl,ExecutePlayerMoveDone
     jp Func_3da37
 
 HyperBeamCheck: ; 3d8c2 (f:58c2)
@@ -55763,7 +55781,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     res 5,[hl]
     ld hl,MustRechargeText
     call PrintText
-    ld hl,Func_3d80a ; $580a
+    ld hl,ExecutePlayerMoveDone ; $580a
     jp Func_3da37
 .next
     ld hl,$D06D
@@ -55814,7 +55832,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     cp [hl]
     jr nz,.ParalysisCheck
     call Func_3da88
-    ld hl,Func_3d80a ; $580a
+    ld hl,ExecutePlayerMoveDone ; $580a
     jp Func_3da37
 .ParalysisCheck
     ld hl,W_PLAYERMONSTATUS
@@ -55842,7 +55860,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld a,$A7
     call PlayMoveAnimation
 .next9
-    ld hl,Func_3d80a ; $580a
+    ld hl,ExecutePlayerMoveDone ; $580a
     jp Func_3da37
 .next7
     ld hl,W_PLAYERBATTSTATUS1
@@ -55864,7 +55882,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld hl,$D06A
     dec [hl]
     jr z,.next11 ; 599B
-    ld hl,Func_3d80a ; $580a
+    ld hl,ExecutePlayerMoveDone ; $580a
     jp Func_3da37
 .next11
     ld hl,W_PLAYERBATTSTATUS1
@@ -55891,7 +55909,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld [hl],a
     ld a,$75
     ld [W_PLAYERMOVENUM],a
-    ld hl,asm_3d705 ; $5705
+    ld hl,handleIfPlayerMoveMissed ; $5705
     jp Func_3da37
 .next10
     bit 1,[hl]
@@ -55902,7 +55920,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     call PrintText
     ld hl,$D06A
     dec [hl]
-    ld hl,asm_3d6dc ; $56dc
+    ld hl,PlayerCalcMoveDamage ; $56dc
     jp nz,Func_3da37
     push hl
     ld hl,W_PLAYERBATTSTATUS1
@@ -55923,7 +55941,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld a,[$D06A]
     dec a
     ld [$D06A],a
-    ld hl,asm_3d714 ; $5714
+    ld hl,getPlayerAnimationType ; $5714
     jp nz,Func_3da37
     jp Func_3da37
 
@@ -55937,7 +55955,7 @@ Func_3da1a: ; 3da1a (f:5a1a)
     call CopyStringToCF4B
     xor a
     ld [W_PLAYERMOVEEFFECT],a ; $cfd3
-    ld hl,asm_3d6b0 ; $56b0
+    ld hl,PlayerCanExecuteMove ; $56b0
     jp Func_3da37
 
 Func_3da37: ; 3da37 (f:5a37)
@@ -56195,7 +56213,7 @@ Func_3db85: ; 3db85 (f:5b85)
 Unknown_3dba3: ; 3dba3 (f:5ba3)
 INCBIN "baserom.gbc",$3dba3,$3dbe2 - $3dba3
 
-Func_3dbe2: ; 3dbe2 (f:5be2)
+PrintMoveFailureText: ; 3dbe2 (f:5be2)
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -56269,7 +56287,7 @@ UnnamedText_3dc57: ; 3dc57 (f:5c57)
     TX_FAR _UnnamedText_3dc57
     db "@"
 
-Func_3dc5c: ; 3dc5c (f:5c5c)
+PrintCriticalOHKOText: ; 3dc5c (f:5c5c)
     ld a,[$d05e]
     and a
     jr z,.asm_3dc75
@@ -56301,7 +56319,7 @@ UnnamedText_3dc83: ; 3dc83 (f:5c83)
     TX_FAR _UnnamedText_3dc83
     db "@"
 
-Func_3dc88: ; 3dc88 (f:5c88)
+CheckForDisobedience: ; 3dc88 (f:5c88)
     xor a
     ld [$cced],a
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -56901,7 +56919,7 @@ MoreCalculateDamage: ; 3df65 (f:5f65)
     ret
 
 Func_3e016: ; 3e016 (f:6016)
-    call Func_3f132
+    call JumpMoveEffect
     ld a,[W_MOVEMISSED] ; $d05f
     dec a
     ret
@@ -57327,8 +57345,8 @@ AttackSubstitute: ; 3e25e (f:625e)
     ld a,[H_WHOSETURN]
     xor a,$01
     ld [H_WHOSETURN],a
-    ld hl,Func_79747
-    ld b,BANK(Func_79747) ; animate the substitute breaking
+    ld hl,HideSubstituteShowMonAnim
+    ld b,BANK(HideSubstituteShowMonAnim) ; animate the substitute breaking
     call Bankswitch ; substitute
 ; flip the turn back to the way it was
     ld a,[H_WHOSETURN]
@@ -57696,8 +57714,8 @@ Func_3fb1e: ; Moved in the Bank
     ld b,BANK(Func_139da)
     jp Bankswitch
 
-Func_3f132: ; Moved in the Bank
-    call JumpMoveEffect
+JumpMoveEffect: ; Moved in the Bank
+    call JumpMoveEffect_
     ld b,$1
     ret
 
@@ -58007,7 +58025,7 @@ CalcHitChance: ; 3e624 (f:6624)
     ld [hl],a ; store the hit chance in the move accuracy variable
     ret
 
-Func_3e687: ; 3e687 (f:6687)
+RandomizeDamage: ; 3e687 (f:6687)
     ld hl,W_DAMAGE ; $d0d7
     ld a,[hli]
     and a
@@ -58041,59 +58059,65 @@ Func_3e687: ; 3e687 (f:6687)
     ld [hl],a
     ret
 
+; ──────────────────────────────────────────
+; ExecuteEnemyMove
+; ──────────────────────────────────────────
+
 ExecuteEnemyMove: ; 3e6bc (f:66bc)
     ld a,[wEnemySelectedMove] ; $ccdd
     inc a
-    jp z,Func_3e88c
-    call Func_3d811
-    jp z,Func_3e88c
+    jp z,ExecuteEnemyMoveDone
+    call PrintGhostText
+    jp z,ExecuteEnemyMoveDone
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
-    jr nz,.asm_3e6dc
+    jr nz,.executeEnemyMove
     ld b,$1
-    ld a,[$cc3e]
-    cp $e
-    jr z,.asm_3e6dc
+    ld a,[$cc3e] ; SerialExchangeNybbleReceiveData
+    cp $e ; LINKBATTLE_STRUGGLE
+    jr z,.executeEnemyMove
     cp $4
     ret nc
-.asm_3e6dc
-    ld hl,$ccd5
+.executeEnemyMove
+    ld hl,$ccd5 ; AILayer2Encouragement
     inc [hl]
     xor a
     ld [W_MOVEMISSED],a ; $d05f
-    ld [$ccf4],a
-    ld a,$a
-    ld [$d05b],a
-    call Func_3e88f
-    jr nz,.asm_3e6f2
+    ld [$ccf4],a ; MoveDidntMiss
+    ld a,10
+    ld [$d05b],a ; DamageMultipliers
+    call CheckEnemyStatusConditions
+    jr nz,.enemyHasNoSpecialConditions
     jp hl
-.asm_3e6f2
+.enemyHasNoSpecialConditions
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    bit 4,[hl]
-    jr nz,asm_3e70b
+    bit 4,[hl] ; is the enemy charging up for attack?
+    jr nz,EnemyCanExecuteChargingMove
     call GetCurrentMove
 
-Func_3e6fc: ; 3e6fc (f:66fc)
+CheckIfEnemyNeedsToChargeUp:
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    cp $27
-    jp z,Func_3f132
-    cp $2b
-    jp z,Func_3f132
-    jr asm_3e72b
-asm_3e70b: ; 3e70b (f:670b)
+    cp CHARGE_EFFECT
+    jp z,JumpMoveEffect
+    cp FLY_EFFECT
+    jp z,JumpMoveEffect
+    jr EnemyCanExecuteMove
+
+EnemyCanExecuteChargingMove:
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    res 4,[hl]
-    res 6,[hl]
+    res 4,[hl] ; no longer charging up for attack
+    res 6,[hl] ; no longer invulnerable to typical attacks
     ld a,[W_ENEMYMOVENUM] ; $cfcc
     ld [$d0b5],a
-    ld a,$2c
+    ld a,BANK(MoveNames)
     ld [$d0b7],a
     ld a,MOVE_NAME
     ld [W_LISTTYPE],a
     call GetName
     ld de,$cd6d
     call CopyStringToCF4B
-asm_3e72b: ; 3e72b (f:672b)
+
+EnemyCanExecuteMove:
     xor a
     ld [$cced],a
     call DecrementEnemyPP ; call PrintMonName1Text
@@ -58101,128 +58125,133 @@ asm_3e72b: ; 3e72b (f:672b)
     ld hl,EffectsArray1 ; $4000
     ld de,$1
     call IsInArray
-    jp c,Func_3f132
+    jp c,JumpMoveEffect
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     ld hl,EffectsArray5B ; $4049
     ld de,$1
     call IsInArray
-    call c,Func_3f132
-asm_3e750: ; 3e750 (f:6750)
-    call Func_3ec81
+    call c,JumpMoveEffect
+
+EnemyCalcMoveDamage:
+    call SwapPlayerAndEnemyLevels
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     ld hl,EffectsArray2 ; $4011
     ld de,$1
     call IsInArray
-    jp c,Func_3e77f
+    jp c,EnemyMoveHitTest
     call CriticalHitTest
     call HandleCounterMove
-    jr z,asm_3e782
-    call Func_3ec81
+    jr z,handleIfEnemyMoveMissed
+    call SwapPlayerAndEnemyLevels
     call CalculateDamageAfterEnemyAttack
-    call Func_3ec81
+    call SwapPlayerAndEnemyLevels
     call MoreCalculateDamage
-    jp z,Func_3e7d1
+    jp z,EnemyCheckIfFlyOrChargeEffect
     call AdjustDamageForMoveType
-    call Func_3e687
+    call RandomizeDamage
 
-Func_3e77f: ; 3e77f (f:677f)
+EnemyMoveHitTest:
     call MoveHitTest
-asm_3e782: ; 3e782 (f:6782)
+
+handleIfEnemyMoveMissed:
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jr z,.asm_3e791
+    jr z,.moveDidNotMiss
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    cp $7
-    jr z,asm_3e7a0
-    jr Func_3e7d1
-.asm_3e791
-    call Func_3ec81
+    cp EXPLODE_EFFECT
+    jr z,handleExplosionMiss
+    jr EnemyCheckIfFlyOrChargeEffect
+.moveDidNotMiss
+    call SwapPlayerAndEnemyLevels
 
-Func_3e794: ; 3e794 (f:6794)
+GetEnemyAnimationType:
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     and a
-    ld a,$1
-    jr z,asm_3e7a4
-    ld a,$2
-    jr asm_3e7a4
-asm_3e7a0: ; 3e7a0 (f:67a0)
-    call Func_3ec81
+    ld a,1
+    jr z,playEnemyMoveAnimation
+    ld a,2
+    jr playEnemyMoveAnimation
+
+handleExplosionMiss:
+    call SwapPlayerAndEnemyLevels
     xor a
-asm_3e7a4: ; 3e7a4 (f:67a4)
+
+playEnemyMoveAnimation:
     push af
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
-    bit 4,a
-    ld hl,Func_79747
-    ld b,BANK(Func_79747)
+    bit 4,a ; does mon have a substitute?
+    ld hl,HideSubstituteShowMonAnim
+    ld b,BANK(HideSubstituteShowMonAnim)
     call nz,Bankswitch
     pop af
-    ld [$cc5b],a
+    ld [$CC5B],a ; AnimationType
     ld a,[W_ENEMYMOVENUM] ; $cfcc
     call PlayMoveAnimation
-    call Func_3eed3
+    call HandleExplodingAnimation
     call DrawEnemyHUDAndHPBar
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
-    bit 4,a
-    ld hl,Func_79771
-    ld b,BANK(Func_79771)
+    bit 4,a ; does mon have a substitute?
+    ld hl,ReshowSubstituteAnim
+    ld b,BANK(ReshowSubstituteAnim)
     call nz,Bankswitch
-    jr asm_3e7ef
+    jr EnemyCheckIfMirrorMoveEffect
 
-Func_3e7d1: ; 3e7d1 (f:67d1)
-    call Func_3ec81
+EnemyCheckIfFlyOrChargeEffect:
+    call SwapPlayerAndEnemyLevels
     ld c,$1e
     call DelayFrames
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    cp $2b
-    jr z,.asm_3e7e6
-    cp $27
-    jr z,.asm_3e7e6
-    jr asm_3e7ef
-.asm_3e7e6
+    cp FLY_EFFECT
+    jr z,.playAnim
+    cp CHARGE_EFFECT
+    jr z,.playAnim
+    jr EnemyCheckIfMirrorMoveEffect
+.playAnim
     xor a
-    ld [$cc5b],a
-    ld a,$a7
+    ld [$CC5B],a ; AnimationType
+    ld a,$a7 ; STATUS_AFFECTED_ANIM
     call PlayMoveAnimation
-asm_3e7ef: ; 3e7ef (f:67ef)
+
+EnemyCheckIfMirrorMoveEffect:
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    cp $9
-    jr nz,.asm_3e7ff
+    cp MIRROR_MOVE_EFFECT
+    jr nz,.notMirrorMoveEffect
     call MirrorMoveCopyMove
-    jp z,Func_3e88c
-    jp Func_3e6fc
-.asm_3e7ff
-    cp $53
-    jr nz,.asm_3e809
+    jp z,ExecuteEnemyMoveDone
+    jp CheckIfEnemyNeedsToChargeUp
+.notMirrorMoveEffect
+    cp METRONOME_EFFECT
+    jr nz,.notMetronomeEffect
     call MetronomePickMove
-    jp Func_3e6fc
-.asm_3e809
+    jp CheckIfEnemyNeedsToChargeUp
+.notMetronomeEffect
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     ld hl,EffectsArray3 ; $4014
     ld de,$1
     call IsInArray
-    jp c,Func_3f132
+    jp c,JumpMoveEffect
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jr z,.asm_3e82b
-    call Func_3dbe2
+    jr z,.moveDidNotMiss
+    call PrintMoveFailureText
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    cp $7
-    jr z,.asm_3e83e
-    jp Func_3e88c
-.asm_3e82b
+    cp EXPLODE_EFFECT
+    jr z,.handleExplosionMiss
+    jp ExecuteEnemyMoveDone
+.moveDidNotMiss
     call ApplyAttackToPlayerPokemon
-    call Func_3dc5c
+    call PrintCriticalOHKOText
     ld hl,DisplayEffectiveness
     ld b,BANK(DisplayEffectiveness)
     call Bankswitch ; indirect jump to DisplayEffectiveness (2fb7b (b:7b7b))
     ld a,$1
-    ld [$ccf4],a
-.asm_3e83e
+    ld [$ccf4],a ; MoveDidntMiss
+.handleExplosionMiss
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     ld hl,EffectsArray4 ; $4030
     ld de,$1
     call IsInArray
-    call c,Func_3f132
+    call c,JumpMoveEffect
     ld hl,W_PLAYERMONCURHP ; $d015
     ld a,[hli]
     ld b,[hl]
@@ -58230,37 +58259,39 @@ asm_3e7ef: ; 3e7ef (f:67ef)
     ret z
     call HandleBuildingRage
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    bit 2,[hl]
-    jr z,.asm_3e873
+    bit 2,[hl] ; ATTACKING_MULTIPLE_TIMES ; is mon hitting multiple times? (example: double kick)
+    jr z,.notMultiHitMove
     push hl
-    ld hl,$d06f
+    ld hl,$d06f ; EnemyNumAttacksLeft
     dec [hl]
     pop hl
-    jp nz,Func_3e794
-    res 2,[hl]
-    ld hl,UnnamedText_3e887 ; $6887
+    jp nz,GetEnemyAnimationType
+    res 2,[hl] ; ATTACKING_MULTIPLE_TIMES
+    ld hl,HitXTimesText
     call PrintText
     xor a
     ld [$cd05],a
-.asm_3e873
+.notMultiHitMove
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     and a
-    jr z,Func_3e88c
+    jr z,ExecuteEnemyMoveDone
     ld hl,EffectsArray5 ; $403b
     ld de,$1
     call IsInArray
-    call nc,Func_3f132
-    jr Func_3e88c
+    call nc,JumpMoveEffect
+    jr ExecuteEnemyMoveDone
 
-UnnamedText_3e887: ; 3e887 (f:6887)
-    TX_FAR _UnnamedText_3e887
+HitXTimesText:
+    TX_FAR _HitXTimesText
     db "@"
 
-Func_3e88c: ; 3e88c (f:688c)
+ExecuteEnemyMoveDone:
     ld b,$1
     ret
 
-Func_3e88f: ; 3e88f (f:688f)
+; ──────────────────────────────────────────
+
+CheckEnemyStatusConditions: ; 3e88f (f:688f)
     ld hl,W_ENEMYMONSTATUS ; $cfe9
     ld a,[hl]
     and $7
@@ -58282,7 +58313,7 @@ Func_3e88f: ; 3e88f (f:688f)
 .asm_3e8b5
     xor a
     ld [$ccf2],a
-    ld hl,Func_3e88c ; $688c
+    ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
 .asm_3e8bf
     bit 5,[hl]
@@ -58291,7 +58322,7 @@ Func_3e88f: ; 3e88f (f:688f)
     call PrintText
     xor a
     ld [$ccf2],a
-    ld hl,Func_3e88c ; $688c
+    ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
 .asm_3e8d3
     ld a,[W_PLAYERBATTSTATUS1] ; $d062
@@ -58299,7 +58330,7 @@ Func_3e88f: ; 3e88f (f:688f)
     jp z,Func_3e8e7
     ld hl,CantMoveText ; $5a83
     call PrintText
-    ld hl,Func_3e88c ; $688c
+    ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
 
 Func_3e8e7: ; 3e8e7 (f:68e7)
@@ -58309,7 +58340,7 @@ Func_3e8e7: ; 3e8e7 (f:68e7)
     res 3,[hl]
     ld hl,FlinchedText ; $5a51
     call PrintText
-    ld hl,Func_3e88c ; $688c
+    ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
 
 Func_3e8fd: ; 3e8fd (f:68fd)
@@ -58319,7 +58350,7 @@ Func_3e8fd: ; 3e8fd (f:68fd)
     res 5,[hl]
     ld hl,MustRechargeText ; $5a56
     call PrintText
-    ld hl,Func_3e88c ; $688c
+    ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
 .asm_3e912
     ld hl,W_ENEMYDISABLEDMOVE ; $d072
@@ -58410,7 +58441,7 @@ Func_3e9aa: ; 3e9aa (f:69aa)
     cp [hl]
     jr nz,.asm_3e9bf
     call Func_3da88
-    ld hl,Func_3e88c ; $688c
+    ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
 .asm_3e9bf
     ld hl,W_ENEMYMONSTATUS ; $cfe9
@@ -58438,7 +58469,7 @@ asm_3e9d3: ; 3e9d3 (f:69d3)
     ld a,$a7
     call PlayMoveAnimation
 .asm_3e9f0
-    ld hl,Func_3e88c ; $688c
+    ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
 asm_3e9f6: ; 3e9f6 (f:69f6)
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
@@ -58460,7 +58491,7 @@ asm_3e9f6: ; 3e9f6 (f:69f6)
     ld hl,$d06f
     dec [hl]
     jr z,.asm_3ea1c
-    ld hl,Func_3e88c ; $688c
+    ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
 .asm_3ea1c
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
@@ -58487,8 +58518,8 @@ asm_3e9f6: ; 3e9f6 (f:69f6)
     ld [hl],a
     ld a,$75
     ld [W_ENEMYMOVENUM],a ; $cfcc
-    call Func_3ec81
-    ld hl,asm_3e782 ; $6782
+    call SwapPlayerAndEnemyLevels
+    ld hl,handleIfEnemyMoveMissed ; $6782
     jp Func_3eab8
 .asm_3ea54
     bit 1,[hl]
@@ -58499,7 +58530,7 @@ asm_3e9f6: ; 3e9f6 (f:69f6)
     call PrintText
     ld hl,$d06f
     dec [hl]
-    ld hl,asm_3e750 ; $6750
+    ld hl,EnemyCalcMoveDamage ; $6750
     jp nz,Func_3eab8
     push hl
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
@@ -58519,7 +58550,7 @@ asm_3e9f6: ; 3e9f6 (f:69f6)
     call PrintText
     ld hl,$d06f
     dec [hl]
-    ld hl,Func_3e794 ; $6794
+    ld hl,GetEnemyAnimationType ; $6794
     jp nz,Func_3eab8
     jp Func_3eab8
 
@@ -58533,7 +58564,7 @@ Func_3ea9b: ; 3ea9b (f:6a9b)
     call CopyStringToCF4B
     xor a
     ld [W_ENEMYMOVEEFFECT],a ; $cfcd
-    ld hl,asm_3e72b ; $672b
+    ld hl,EnemyCanExecuteMove ; $672b
     jp Func_3eab8
 
 Func_3eab8: ; 3eab8 (f:6ab8)
@@ -58766,7 +58797,7 @@ DoBattleTransitionAndInitBatVar: ; 3ec32 (f:6c32)
     ld [W_PLAYERDISABLEDMOVE],a ; $d06d
     ret
 
-Func_3ec81: ; 3ec81 (f:6c81)
+SwapPlayerAndEnemyLevels: ; 3ec81 (f:6c81)
     push bc
     ld a,[W_PLAYERMONLEVEL] ; $d022
     ld b,a
@@ -59153,7 +59184,7 @@ GenRandomInBattle: ; 3ee9b (f:6e9b)
     pop hl
     ret
 
-Func_3eed3: ; 3eed3 (f:6ed3)
+HandleExplodingAnimation: ; 3eed3 (f:6ed3)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld hl,W_ENEMYMONTYPE1 ; $cfea (aliases: W_ENEMYMONTYPES)
@@ -59497,7 +59528,7 @@ LoadMonBackSprite: ; 3f103 (f:7103)
     ld b,a
     jp CopyVideoData
 
-JumpMoveEffect: ; Moved in the Bank
+JumpMoveEffect_: ; Moved in the Bank
     ld a,[$ff00+$f3]  ;whose turn?
     and a
     ld a,[W_PLAYERMOVEEFFECT]
@@ -60031,8 +60062,8 @@ StatModifierUpEffect: ; Moved in the Bank
     bit 4,[hl]
     push af
     push bc
-    ld hl,Func_79747
-    ld b,BANK(Func_79747)
+    ld hl,HideSubstituteShowMonAnim
+    ld b,BANK(HideSubstituteShowMonAnim)
     push de
     call nz,Bankswitch
     pop de
@@ -60044,8 +60075,8 @@ StatModifierUpEffect: ; Moved in the Bank
     pop bc
     ld a,$1
     ld [bc],a
-    ld hl,Func_79771
-    ld b,BANK(Func_79771)
+    ld hl,ReshowSubstituteAnim
+    ld b,BANK(ReshowSubstituteAnim)
     pop af
     call nz,Bankswitch
 .asm_3f50e
@@ -109805,7 +109836,7 @@ CopySlowbroSpriteData: ; 7973f (1e:573f)
     ld a,BANK(SlowbroSprite)
     jp FarCopyData2
 
-Func_79747: ; 79747 (1e:5747)
+HideSubstituteShowMonAnim: ; 79747 (1e:5747)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld hl,$ccf7
@@ -109829,9 +109860,9 @@ Func_79747: ; 79747 (1e:5747)
     call AnimationFlashMonPic
     jp AnimationShowMonPic
 
-SECTION "Func_79771",ROMX[$5771],BANK[$1e]
+SECTION "ReshowSubstituteAnim",ROMX[$5771],BANK[$1e]
 
-Func_79771: ; 79771 (1e:5771)
+ReshowSubstituteAnim: ; 79771 (1e:5771)
     call AnimationSlideMonOut
     call AnimationSubstitute
     jp AnimationShowMonPic
@@ -120210,7 +120241,7 @@ _BuildingRageText: ; 89b80 (22:5b80)
 _MirrorMoveFailedText: ; 89b96 (22:5b96)
     db $0,"The MIRROR MOVE",$4e,"failed!",$58
 
-_UnnamedText_3e887: ; 89baf (22:5baf)
+_HitXTimesText: ; 89baf (22:5baf)
     db $0,"Hit @"
 
 UnnamedText_89bb5: ; 89bb5 (22:5bb5)
