@@ -47262,9 +47262,9 @@ DiglettPicFront: ; 2ad33 (a:6d33)
 DiglettPicBack: ; 2ae10 (a:6e10)
     INCBIN "pic/monback/diglettb.pic"
 
-SECTION "Func_2bea9",ROMX[$7ea9],BANK[$A]
+SECTION "LeechSeedEffect_",ROMX[$7ea9],BANK[$A]
 
-Func_2bea9: ; 2bea9 (a:7ea9)
+LeechSeedEffect_: ; 2bea9 (a:7ea9)
     ld hl,MoveHitTest
     ld b,BANK(MoveHitTest)
     call Bankswitch ; indirect jump to MoveHitTest (3e56b (f:656b))
@@ -54658,7 +54658,7 @@ HalvePlayerSpeedAfterRun:
     rr a  ; Player Speed divided by 2
     ret
 
-Func_3fb36: ; Moved in the Bank
+ReflectLightScreenEffect: ; Moved in the Bank
     ld hl,Func_3bb97
     ld b,BANK(Func_3bb97)
     jp Bankswitch
@@ -55392,7 +55392,7 @@ SelectEnemyMove: ; Moved in the Bank
     ld a,STRUGGLE
     jr .done
 
-Func_3fb26: ; Moved in the Bank
+HealEffect: ; Moved in the Bank
     ld hl,Func_3b9ec
     ld b,BANK(Func_3b9ec)
     jp Bankswitch
@@ -57713,7 +57713,7 @@ BackupMovesBeforeEnemyMimic:
     ld hl,W_PLAYERMONMOVES
     ret
 
-Func_3fb1e: ; Moved in the Bank
+HazeEffect: ; Moved in the Bank
     ld hl,Func_139da
     ld b,BANK(Func_139da)
     jp Bankswitch
@@ -58758,7 +58758,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     jr nz,.asm_3ec2d
     ret
 
-Func_3fb0e: ; Moved in the Bank
+PayDayEffect: ; Moved in the Bank
     ld hl,Func_2feb8
     ld b,BANK(Func_2feb8)
     jp Bankswitch
@@ -59386,7 +59386,7 @@ ItemsCantBeUsedHere: ; Moved in the Bank
 TerminatorText_3f04a: ; 3f04a (f:704a)
     db "@"
 
-Func_3fb16: ; Moved in the Bank
+ConversionEffect: ; Moved in the Bank
     ld hl,Func_139a3
     ld b,BANK(Func_139a3)
     jp Bankswitch
@@ -59553,14 +59553,14 @@ JumpMoveEffect_: ; Moved in the Bank
     ld l,a
     jp hl       ;jump to special effect handler
 .MoveEffectPointerTable
-     dw Func_3f1fc
+     dw SleepEffect
      dw PoisonEffect
-     dw Func_3f2e9
+     dw DrainHPEffect
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
      dw ExplodeEffect
-     dw Func_3f2e9
+     dw DrainHPEffect
      dw $0000
      dw StatModifierUpEffect
      dw StatModifierUpEffect
@@ -59568,7 +59568,7 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierUpEffect
      dw StatModifierUpEffect
      dw StatModifierUpEffect
-     dw Func_3fb0e
+     dw PayDayEffect
      dw $0000
      dw StatModifierDownEffect
      dw StatModifierDownEffect
@@ -59576,39 +59576,39 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierDownEffect
      dw StatModifierDownEffect
      dw StatModifierDownEffect
-     dw Func_3fb16
-     dw Func_3fb1e
-     dw Func_3f6e5
-     dw Func_3f717
-     dw Func_3f739
-     dw Func_3f811
-     dw Func_3f811
-     dw Func_3f85b
-     dw Func_3f1fc
+     dw ConversionEffect
+     dw HazeEffect
+     dw BideEffect
+     dw ThrashPetalDanceEffect
+     dw SwitchAndTeleportEffect
+     dw TwoToFiveAttacksEffect
+     dw TwoToFiveAttacksEffect
+     dw FlinchSideEffect
+     dw SleepEffect
      dw PoisonEffect
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
      dw FreezeBurnParalyzeEffect
-     dw Func_3f85b
-     dw Func_3f884
-     dw Func_3f88c
+     dw FlinchSideEffect
+     dw OneHitKOEffect
+     dw ChargeEffect
      dw $0000
      dw $0000
      dw TrappingEffect
-     dw Func_3f88c
-     dw Func_3f811
+     dw ChargeEffect
+     dw TwoToFiveAttacksEffect
      dw $0000
-     dw Func_3f941
-     dw Func_3f949
-     dw Func_3f951
-     dw Func_3f961
+     dw MistEffect
+     dw FocusEnergyEffect
+     dw RecoilEffect
+     dw ConfusionEffect
      dw StatModifierUpEffect
      dw StatModifierUpEffect
      dw StatModifierUpEffect
      dw StatModifierUpEffect
      dw StatModifierUpEffect
      dw StatModifierUpEffect
-     dw Func_3fb26
+     dw HealEffect
      dw TransformEffect
      dw StatModifierDownEffect
      dw StatModifierDownEffect
@@ -59616,8 +59616,8 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierDownEffect
      dw StatModifierDownEffect
      dw StatModifierDownEffect
-     dw Func_3fb36
-     dw Func_3fb36
+     dw ReflectLightScreenEffect
+     dw ReflectLightScreenEffect
      dw PoisonEffect
      dw ParalyzeEffect
      dw StatModifierDownEffect
@@ -59628,16 +59628,16 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierDownEffect
      dw StatModifierDownEffect
      dw StatModifierDownEffect
-     dw Func_3f959
-     dw Func_3f811
+     dw ConfusionSideEffect
+     dw TwoToFiveAttacksEffect
      dw $0000
-     dw Func_3f9b9
-     dw Func_3f9c1
-     dw Func_3f9df
-     dw Func_3f9ed
+     dw SubstituteEffect
+     dw HyperBeamEffect
+     dw RageEffect
+     dw MimicEffect
      dw $0000
-     dw Func_3fa7c
-     dw Func_3fa84
+     dw LeechSeedEffect
+     dw SplashEffect
      dw DisableEffect
      dw StatModifierUpEffect
      dw StatModifierUpEffect
@@ -59647,9 +59647,9 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierUpEffect
      dw AmnesiaNewEffect
 
-SECTION "Func_3f1fc",ROMX[$71fc],BANK[$f]
+SECTION "SleepEffect",ROMX[$71fc],BANK[$f]
 
-Func_3f1fc: ; 3f1fc (f:71fc)
+SleepEffect: ; 3f1fc (f:71fc)
     ld de,W_ENEMYMONSTATUS ; $cfe9
     ld bc,W_ENEMYBATTSTATUS2 ; $d068
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -59793,9 +59793,9 @@ PoisonEffect: ; 3f24f (f:724f)
     TX_FAR _UnnamedText_3f2e4
     db "@"
 
-SECTION "Func_3f2e9",ROMX[$72e9],BANK[$f]
+SECTION "DrainHPEffect",ROMX[$72e9],BANK[$f]
 
-Func_3f2e9: ; 3f2e9 (f:72e9)
+DrainHPEffect: ; 3f2e9 (f:72e9)
     ld hl,Func_783f
     ld b,BANK(Func_783f)
     jp Bankswitch ; indirect jump to Func_783f (783f (1:783f))
@@ -60394,7 +60394,7 @@ StatModifierRatios: ; 3f6cb (f:76cb)
     db 35,10  ; 3.50
     db  4,1  ; 4.00
 
-Func_3f6e5: ; 3f6e5 (f:76e5)
+BideEffect: ; 3f6e5 (f:76e5)
     ld hl,W_PLAYERBATTSTATUS1
     ld de,W_NUMHITS
     ld bc,$d06a
@@ -60421,7 +60421,7 @@ Func_3f6e5: ; 3f6e5 (f:76e5)
     add $ae
     jp Func_3fb96
 
-Func_3f717: ; 3f717 (f:7717)
+ThrashPetalDanceEffect: ; 3f717 (f:7717)
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
     ld de,$d06a
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -60440,7 +60440,7 @@ Func_3f717: ; 3f717 (f:7717)
     add $b0
     jp Func_3fb96
 
-Func_3f739: ; 3f739 (f:7739)
+SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr nz,.asm_3f791
@@ -60555,7 +60555,7 @@ UnnamedText_3f80c: ; 3f80c (f:780c)
     TX_FAR _UnnamedText_3f80c
     db "@"
 
-Func_3f811: ; 3f811 (f:7811)
+TwoToFiveAttacksEffect: ; 3f811 (f:7811)
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
     ld de,$d06a
     ld bc,W_NUMHITS ; $d074
@@ -60599,7 +60599,7 @@ Func_3f811: ; 3f811 (f:7811)
     ld [hl],a
     jr .asm_3f853
 
-Func_3f85b: ; 3f85b (f:785b)
+FlinchSideEffect: ; 3f85b (f:785b)
     call CheckTargetSubstitute
     ret nz
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
@@ -60623,12 +60623,12 @@ Func_3f85b: ; 3f85b (f:785b)
     call ClearHyperBeam
     ret
 
-Func_3f884: ; 3f884 (f:7884)
+OneHitKOEffect: ; 3f884 (f:7884)
     ld hl,Func_33f57
     ld b,BANK(Func_33f57)
     jp Bankswitch ; indirect jump to Func_33f57 (33f57 (c:7f57))
 
-Func_3f88c: ; 3f88c (f:788c)
+ChargeEffect: ; 3f88c (f:788c)
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -60724,30 +60724,30 @@ CheckTrappingToResetEnemyHyperBeam:
 
 ; Free
 
-SECTION "Func_3f941",ROMX[$7941],BANK[$f]
+SECTION "MistEffect",ROMX[$7941],BANK[$f]
 
-Func_3f941: ; 3f941 (f:7941)
+MistEffect: ; 3f941 (f:7941)
     ld hl,Func_33f2b
     ld b,BANK(Func_33f2b)
     jp Bankswitch
 
-Func_3f949: ; 3f949 (f:7949)
+FocusEnergyEffect: ; 3f949 (f:7949)
     ld hl,Func_27f86
     ld b,BANK(Func_27f86)
     jp Bankswitch
 
-Func_3f951: ; 3f951 (f:7951)
+RecoilEffect: ; 3f951 (f:7951)
     ld hl,Func_1392c
     ld b,BANK(Func_1392c)
     jp Bankswitch
 
-Func_3f959: ; 3f959 (f:7959)
+ConfusionSideEffect: ; 3f959 (f:7959)
     call GenRandomInBattle
     cp $19
     ret nc
     jr Func_3f96f
 
-Func_3f961: ; 3f961 (f:7961)
+ConfusionEffect: ; 3f961 (f:7961)
     call CheckTargetSubstitute
     jr nz,Func_3f9a6
     call MoveHitTest
@@ -60797,12 +60797,12 @@ ParalyzeEffect: ; 3f9b1 (f:79b1)
     ld b,BANK(ParalyzeEffect_)
     jp Bankswitch ; indirect jump to ParalyzeEffect_ (52601 (14:6601))
 
-Func_3f9b9: ; 3f9b9 (f:79b9)
+SubstituteEffect: ; 3f9b9 (f:79b9)
     ld hl,SubstituteEffectHandler
     ld b,BANK(SubstituteEffectHandler)
     jp Bankswitch
 
-Func_3f9c1: ; 3f9c1 (f:79c1)
+HyperBeamEffect: ; 3f9c1 (f:79c1)
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -60824,7 +60824,7 @@ ClearHyperBeam: ; 3f9cf (f:79cf)
     pop hl
     ret
 
-Func_3f9df: ; 3f9df (f:79df)
+RageEffect: ; 3f9df (f:79df)
     ld hl,W_PLAYERBATTSTATUS2
     ld a,[H_WHOSETURN]
     and a
@@ -60834,7 +60834,7 @@ Func_3f9df: ; 3f9df (f:79df)
     set 6,[hl]
     ret
 
-Func_3f9ed: ; 3f9ed (f:79ed)
+MimicEffect: ; 3f9ed (f:79ed)
     ld c,$32
     call DelayFrames
     call MoveHitTest
@@ -60910,12 +60910,12 @@ UnnamedText_3fa77: ; 3fa77 (f:7a77)
     TX_FAR _UnnamedText_3fa77
     db "@"
 
-Func_3fa7c: ; 3fa7c (f:7a7c)
-    ld hl,Func_2bea9
-    ld b,BANK(Func_2bea9)
-    jp Bankswitch ; indirect jump to Func_2bea9 (2bea9 (a:7ea9))
+LeechSeedEffect: ; 3fa7c (f:7a7c)
+    ld hl,LeechSeedEffect_
+    ld b,BANK(LeechSeedEffect_)
+    jp Bankswitch ; indirect jump to LeechSeedEffect_ (2bea9 (a:7ea9))
 
-Func_3fa84: ; 3fa84 (f:7a84)
+SplashEffect: ; 3fa84 (f:7a84)
     call Func_3fba8
     jp Func_3fb43
 

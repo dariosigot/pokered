@@ -3,6 +3,7 @@
 ; {status condition}_side_effect means that the move has a side chance of causing that condition
 ; {status condition}_effect means that the move causes the status condition every time it hits the target
 NO_ADDITIONAL_EFFECT       EQU $00
+;EFFECT_01                 EQU $01
 POISON_SIDE_EFFECT1        EQU $02
 DRAIN_HP_EFFECT            EQU $03
 BURN_SIDE_EFFECT1          EQU $04
