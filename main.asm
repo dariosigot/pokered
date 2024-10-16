@@ -59665,50 +59665,50 @@ SleepEffect: ; 3f1fc (f:71fc)
     ld bc,W_ENEMYBATTSTATUS2 ; $d068
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jp z,Func_3f20e
+    jr z,.sleepEffect
     ld de,W_PLAYERMONSTATUS ; $d018
     ld bc,W_PLAYERBATTSTATUS2 ; $d063
-
-Func_3f20e: ; 3f20e (f:720e)
+.sleepEffect
     ld a,[bc]
-    bit 5,a
-    res 5,a
+    bit 5,a ; does the target need to recharge? (hyper beam)
+    res 5,a ; target no longer needs to recharge
     ld [bc],a
-    jr nz,.asm_3f231
+    jr nz,.setSleepCounter ; if the target had to recharge, all hit tests will be skipped
+                           ; including the event where the target already has another status
     ld a,[de]
     ld b,a
-    and $7
-    jr z,.asm_3f222
-    ld hl,UnnamedText_3f24a ; $724a
+    and %00000111 ; SLEEP
+    jr z,.notAlreadySleeping
+    ld hl,.AlreadyAsleepText ; $724a
     jp PrintText
-.asm_3f222
+.notAlreadySleeping
     ld a,b
     and a
-    jr nz,.asm_3f242
+    jr nz,.didntAffect
     push de
     call MoveHitTest
     pop de
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jr nz,.asm_3f242
-.asm_3f231
+    jr nz,.didntAffect
+.setSleepCounter
     call GenRandomInBattle
     and $7
-    jr z,.asm_3f231
+    jr z,.setSleepCounter
     ld [de],a
     call PlayCurrentMoveAnimation2
-    ld hl,UnnamedText_3f245 ; $7245
+    ld hl,.FellAsleepText ; $7245
     jp PrintText
-.asm_3f242
+.didntAffect
     jp Func_3fb5e
-
-UnnamedText_3f245: ; 3f245 (f:7245)
-    TX_FAR _UnnamedText_3f245
+.FellAsleepText
+    TX_FAR _FellAsleepText
+    db "@"
+.AlreadyAsleepText
+    TX_FAR _AlreadyAsleepText
     db "@"
 
-UnnamedText_3f24a: ; 3f24a (f:724a)
-    TX_FAR _UnnamedText_3f24a
-    db "@"
+SECTION "PoisonEffect",ROMX[$724f],BANK[$f]
 
 PoisonEffect: ; 3f24f (f:724f)
     ld hl,W_ENEMYMONSTATUS ; $cfe9
@@ -124025,11 +124025,11 @@ UnnamedText_94703: ; 94703 (25:4703)
     db $0,$4f
     db "is evolving!",$57
 
-_UnnamedText_3f245: ; 94715 (25:4715)
+_FellAsleepText: ; 94715 (25:4715)
     db $0,$59,$4f
     db "fell asleep!",$58
 
-_UnnamedText_3f24a: ; 94725 (25:4725)
+_AlreadyAsleepText: ; 94725 (25:4725)
     db $0,$59,"'s",$4f
     db "already asleep!",$58
 
