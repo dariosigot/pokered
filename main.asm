@@ -47262,12 +47262,15 @@ DiglettPicFront: ; 2ad33 (a:6d33)
 DiglettPicBack: ; 2ae10 (a:6e10)
     INCBIN "pic/monback/diglettb.pic"
 
-SECTION "LeechSeedEffect_",ROMX[$7ea9],BANK[$A]
-
-LeechSeedEffect_: ; 2bea9 (a:7ea9)
+LeechSeedEffect_:
+    ld hl,PlayCurrentMoveAnimation
+    ld b,BANK(PlayCurrentMoveAnimation)
+    call Bankswitch ; indirect jump to PlayCurrentMoveAnimation (3fba8 (f:7ba8))
     ld hl,MoveHitTest
     ld b,BANK(MoveHitTest)
     call Bankswitch ; indirect jump to MoveHitTest (3e56b (f:656b))
+    ld a,1 ; Initialize Missed Text to "Missed"
+    ld [$d05b],a ; DamageMultipliers
     ld a,[W_MOVEMISSED] ; $d05f
     and a
     jr nz,.moveMissed
@@ -47279,6 +47282,8 @@ LeechSeedEffect_: ; 2bea9 (a:7ea9)
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
     ld de,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES)
 .leechSeedEffect
+    xor a ; Missed Text to "DoesntAffect"
+    ld [$d05b],a ; DamageMultipliers
     ld a,[de]
     cp GRASS
     jr z,.moveMissed
@@ -47287,25 +47292,27 @@ LeechSeedEffect_: ; 2bea9 (a:7ea9)
     cp GRASS
     jr z,.moveMissed
     bit 7,[hl] ; SEEDED
-    jr nz,.moveMissed
+    jr nz,.justSeeded
     set 7,[hl] ; SEEDED
-    ld hl,PlayCurrentMoveAnimation
-    ld b,BANK(PlayCurrentMoveAnimation)
-    call Bankswitch ; indirect jump to PlayCurrentMoveAnimation (3fba8 (f:7ba8))
-    ld hl,WasSeededText ; $7ef2
+    ld hl,.WasSeededText ; $7ef2
     jp PrintText
 .moveMissed
-    ld c,$32
-    call DelayFrames
-    ld hl,EvadedAttackText ; $7ef7
+    call .Delay
+    ld b,BANK(PrintMoveFailureText)
+    ld hl,PrintMoveFailureText
+    jp Bankswitch
+.justSeeded
+    call .Delay
+    ld hl,.WasJustSeededText
     jp PrintText
-
-WasSeededText: ; 2bef2 (a:7ef2)
+.Delay
+    ld c,$32
+    jp DelayFrames
+.WasSeededText
     TX_FAR _WasSeededText
     db "@"
-
-EvadedAttackText: ; 2bef7 (a:7ef7)
-    TX_FAR _EvadedAttackText
+.WasJustSeededText
+    TX_FAR _WasJustSeededText
     db "@"
 
 SECTION "bankB",ROMX,BANK[$B]
@@ -124181,9 +124188,11 @@ _WasSeededText: ; 949af (25:49af)
     db $0,$59,$4f
     db "was seeded!",$58
 
-_EvadedAttackText: ; 949be (25:49be)
-    db $0,$59,$4f
-    db "evaded attack!",$58
+;_EvadedAttackText: ; 949be (25:49be)
+;    db $0,$59,$4f
+;    db "evaded attack!",$58
+
+SECTION "_UnnamedText_1399e",ROMX[$49d0],BANK[$25]
 
 _UnnamedText_1399e: ; 949d0 (25:49d0)
     db $0,$5a,"'s",$4f
@@ -125048,6 +125057,10 @@ _UnnamedText_5c49e: ; 9697a (25:697a)
 
 _EnormouslyText:
     db $0,$4c,"enormously@@"
+
+_WasJustSeededText:
+    db $0,$59,$4f
+    db "was just seeded!",$58
 
 SECTION "bank26",ROMX,BANK[$26]
 
