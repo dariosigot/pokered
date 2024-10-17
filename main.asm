@@ -47263,25 +47263,14 @@ DiglettPicBack: ; 2ae10 (a:6e10)
     INCBIN "pic/monback/diglettb.pic"
 
 LeechSeedEffect_:
-    ld hl,PlayCurrentMoveAnimation
-    ld b,BANK(PlayCurrentMoveAnimation)
-    call Bankswitch ; indirect jump to PlayCurrentMoveAnimation (3fba8 (f:7ba8))
-    ld hl,MoveHitTest
-    ld b,BANK(MoveHitTest)
-    call Bankswitch ; indirect jump to MoveHitTest (3e56b (f:656b))
-    ld a,1 ; Initialize Missed Text to "Missed"
-    ld [$d05b],a ; DamageMultipliers
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
-    jr nz,.moveMissed
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
     ld de,W_ENEMYMONTYPE1 ; $cfea (aliases: W_ENEMYMONTYPES)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.leechSeedEffect
+    jr z,.done
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
     ld de,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES)
-.leechSeedEffect
+.done
     xor a ; Missed Text to "DoesntAffect"
     ld [$d05b],a ; DamageMultipliers
     ld a,[de]
@@ -47293,21 +47282,37 @@ LeechSeedEffect_:
     jr z,.moveMissed
     bit 7,[hl] ; SEEDED
     jr nz,.justSeeded
+    push hl
+    ld hl,MoveHitTest
+    ld b,BANK(MoveHitTest)
+    call Bankswitch
+    pop hl
+    ld a,1 ; Initialize Missed Text to "Missed"
+    ld [$d05b],a ; DamageMultipliers
+    ld a,[W_MOVEMISSED] ; $d05f
+    and a
+    jr nz,.moveMissed
     set 7,[hl] ; SEEDED
+    ld hl,PlayCurrentMoveAnimation2
+    ld b,BANK(PlayCurrentMoveAnimation2)
+    call Bankswitch
     ld hl,.WasSeededText ; $7ef2
     jp PrintText
 .moveMissed
-    call .Delay
+    call .PlayCurrentMoveAnimation
     ld b,BANK(PrintMoveFailureText)
     ld hl,PrintMoveFailureText
     jp Bankswitch
 .justSeeded
-    call .Delay
+    call .PlayCurrentMoveAnimation
+    ld c,50
+    call DelayFrames
     ld hl,.WasJustSeededText
     jp PrintText
-.Delay
-    ld c,$32
-    jp DelayFrames
+.PlayCurrentMoveAnimation
+    ld hl,PlayCurrentMoveAnimation
+    ld b,BANK(PlayCurrentMoveAnimation)
+    jp Bankswitch
 .WasSeededText
     TX_FAR _WasSeededText
     db "@"
@@ -56242,7 +56247,7 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     ld hl,UnaffectedText ; $5c4c
 .gotTextToPrint
     push de
-    call PrintText
+    call Delay50AndPrintText
     xor a
     ld [$d05e],a ; CriticalHitOrOHKO
     pop de
@@ -56294,11 +56299,10 @@ UnaffectedText: ; 3dc4c (f:5c4c)
     TX_FAR _UnaffectedText
     db "@"
 
-Func_3dc51: ; 3dc51 (f:5c51)
-    ld hl,DoesntAffectMonText ; $5c57
-    jp PrintText
-
-DoesntAffectMonText: ; 3dc57 (f:5c57)
+PrintDoesntAffectMonText: ; 3dc51 (f:5c51)
+    ld hl,DoesntAffectMonText
+    jp Delay50AndPrintText
+DoesntAffectMonText:
     TX_FAR _DoesntAffectMonText
     db "@"
 
@@ -59661,15 +59665,14 @@ JumpMoveEffect_: ; Moved in the Bank
 SECTION "SleepEffect",ROMX[$71fc],BANK[$f]
 
 SleepEffect: ; 3f1fc (f:71fc)
-    call PlayCurrentMoveAnimation2
     ld de,W_ENEMYMONSTATUS ; $cfe9
     ld bc,W_ENEMYBATTSTATUS2 ; $d068
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.sleepEffect
+    jr z,.done
     ld de,W_PLAYERMONSTATUS ; $d018
     ld bc,W_PLAYERBATTSTATUS2 ; $d063
-.sleepEffect
+.done
     ld a,[bc]
     bit 5,a ; does the target need to recharge? (hyper beam)
     res 5,a ; target no longer needs to recharge
@@ -59677,15 +59680,8 @@ SleepEffect: ; 3f1fc (f:71fc)
     jr nz,.setSleepCounter ; if the target had to recharge, all hit tests will be skipped
                            ; including the event where the target already has another status
     ld a,[de]
-    ld b,a
-    and %00000111 ; SLEEP
-    jr z,.notAlreadySleeping
-    ld hl,.AlreadyAsleepText ; $724a
-    jp PrintText
-.notAlreadySleeping
-    ld a,b
     and a
-    jr nz,.didntAffect
+    jr nz,.alreadyStatused
     push de
     call MoveHitTest
     pop de
@@ -59698,14 +59694,16 @@ SleepEffect: ; 3f1fc (f:71fc)
     jr z,.setSleepCounter
     ld [de],a
     ld hl,.FellAsleepText ; $7245
+    call PlayCurrentMoveAnimation2
     jp PrintText
 .didntAffect
+    call PlayCurrentMoveAnimation
     jp PrintDidntAffectText
+.alreadyStatused
+    call PlayCurrentMoveAnimation
+    jp PrintAlreadyStatusedText
 .FellAsleepText
     TX_FAR _FellAsleepText
-    db "@"
-.AlreadyAsleepText
-    TX_FAR _AlreadyAsleepText
     db "@"
 
 PoisonEffect: ; Moved in the Bank
@@ -59713,18 +59711,18 @@ PoisonEffect: ; Moved in the Bank
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.poisonEffect
+    jr z,.done
     ld hl,W_PLAYERMONSTATUS ; $d018
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
-.poisonEffect
+.done
     call CheckTargetSubstitute
-    jr nz,.noEffect ; can't poison a substitute target
+    jr nz,.didntAffect ; can't poison a substitute target
     ld a,[hli]
     ld b,a
     and a
-    jr nz,.noEffect ; miss if target is already statused
+    jr nz,.alreadyStatused ; miss if target is already statused
     call CheckPoisonableMon
-    jr z,.noEffect
+    jr z,.doesntAffect
     ld a,[de]
     cp POISON_SIDE_EFFECT1
     ld b,$34 ; 20% chance of poisoning
@@ -59781,14 +59779,21 @@ PoisonEffect: ; Moved in the Bank
 .regularPoisonEffect
     call PlayCurrentMoveAnimation2
     jp PrintText
-.noEffect
+.doesntAffect
+    ld hl,PrintDoesntAffectMonText
+    jr .checkEnd
+.didntAffect
+    ld hl,PrintDidntAffectText
+    jr .checkEnd
+.alreadyStatused
+    ld hl,PrintAlreadyStatusedText
+    ; fall through
+.checkEnd
     ld a,[de]
     cp POISON_EFFECT
     ret nz
-.didntAffect
-    ld c,$32
-    call DelayFrames
-    jp PrintDidntAffectText
+    call PlayCurrentMoveAnimation
+    jp hl
 .PoisonedText
     TX_FAR _PoisonedText
     db "@"
@@ -59864,14 +59869,14 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     ld [W_ENEMYMONSTATUS],a
     call Func_3ed27  ;quarter speed of affected monster
     ld a,$a9
-    call Func_3fbb9  ;animation
+    call PlayBattleAnimation  ;animation
     jp Func_3fb6e    ;print paralysis text
 .burn
     ld a,BRN
     ld [W_ENEMYMONSTATUS],a
     call Func_3ed64
     ld a,$a9
-    call Func_3fbb9  ;animation
+    call PlayBattleAnimation  ;animation
     ld hl,UnnamedText_3f3d8
     jp PrintText
 .freeze
@@ -59879,7 +59884,7 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     ld a,FRZ
     ld [W_ENEMYMONSTATUS],a
     ld a,$a9
-    call Func_3fbb9  ;animation
+    call PlayBattleAnimation  ;animation
     ld hl,UnnamedText_3f3dd
     jp PrintText
 opponentAttacker: ; 3f382 (f:7382)
@@ -60532,7 +60537,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     jp Func_3fb4e
 .asm_3f7e4
     push af
-    call Func_3fbb9
+    call PlayBattleAnimation
     ld c,$14
     call DelayFrames
     pop af
@@ -60659,7 +60664,7 @@ ChargeEffect: ; 3f88c (f:788c)
     xor a
     ld [$cc5b],a
     ld a,b
-    call Func_3fbb9
+    call PlayBattleAnimation
     ld a,[de]
     ld [wWhichTrade],a ; $cd3d
     ld hl,UnnamedText_3f8c8 ; $78c8
@@ -60724,6 +60729,18 @@ CheckTrappingToResetEnemyHyperBeam:
     call z,ClearHyperBeam
     ld a,[W_ENEMYMOVEPOWER]
     ret
+
+Delay50AndPrintText:
+    ld c,50
+    call DelayFrames
+    jp PrintText
+
+PrintAlreadyStatusedText:
+    ld hl,.AlreadyStatusedText
+    jp Delay50AndPrintText
+.AlreadyStatusedText
+    TX_FAR _AlreadyStatusedText
+    db "@"
 
 ; Free
 
@@ -61029,10 +61046,9 @@ UnnamedText_3fb59: ; Moved in the Bank
     db "@"
 
 PrintDidntAffectText: ; Moved in the Bank
-    ld hl,DidntAffectText ; $7b64
-    jp PrintText
-
-DidntAffectText: ; Moved in the Bank
+    ld hl,.DidntAffectText
+    jp Delay50AndPrintText
+.DidntAffectText
     TX_FAR _DidntAffectText
     db "@"
 
@@ -61066,9 +61082,9 @@ PlayCurrentMoveAnimation2: ; Moved in the Bank
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVENUM] ; $cfd2
-    jr z,.asm_3fb94
+    jr z,.done
     ld a,[W_ENEMYMOVENUM] ; $cfcc
-.asm_3fb94
+.done
     and a
     ret z
 
@@ -61081,22 +61097,22 @@ PlayBattleAnimation2: ; Moved in the Bank
     jr z,.storeAnimationType
     ld a,3
 .storeAnimationType
-    ld [$cc5b],a
+    ld [$cc5b],a ; AnimationType
     jp PlayBattleAnimationGotID
 
 PlayCurrentMoveAnimation: ; Moved in the Bank
     xor a
-    ld [$cc5b],a
+    ld [$cc5b],a ; AnimationType
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVENUM] ; $cfd2
-    jr z,.asm_3fbb7
+    jr z,.done
     ld a,[W_ENEMYMOVENUM] ; $cfcc
-.asm_3fbb7
+.done
     and a
     ret z
 
-Func_3fbb9: ; Moved in the Bank
+PlayBattleAnimation: ; Moved in the Bank
     ld [W_ANIMATIONID],a ; $d07c
 
 PlayBattleAnimationGotID: ; 3fbbc (f:7bbc)
@@ -78915,9 +78931,9 @@ ParalyzeEffect_: ; Moved in the Bank
 .doesntAffect
     ld c,$32
     call DelayFrames
-    ld hl,Func_3dc51
-    ld b,BANK(Func_3dc51)
-    jp Bankswitch ; indirect jump to Func_3dc51 (3dc51 (f:5c51))
+    ld hl,PrintDoesntAffectMonText
+    ld b,BANK(PrintDoesntAffectMonText)
+    jp Bankswitch ; indirect jump to PrintDoesntAffectMonText (3dc51 (f:5c51))
 
 SECTION "Func_52673",ROMX[$6673],BANK[$14]
 
@@ -124024,9 +124040,11 @@ _FellAsleepText: ; 94715 (25:4715)
     db $0,$59,$4f
     db "fell asleep!",$58
 
-_AlreadyAsleepText: ; 94725 (25:4725)
-    db $0,$59,"'s",$4f
-    db "already asleep!",$58
+;_AlreadyAsleepText: ; 94725 (25:4725)
+;    db $0,$59,"'s",$4f
+;    db "already asleep!",$58
+
+SECTION "_PoisonedText",ROMX[$4739],BANK[$25]
 
 _PoisonedText: ; 94739 (25:4739)
     db $0,$59,$4f
@@ -125056,6 +125074,10 @@ _EnormouslyText:
 _WasJustSeededText:
     db $0,$59,$4f
     db "was just seeded!",$58
+
+_AlreadyStatusedText:
+    db $0,$59,$4f
+    db "already statused!",$58
 
 SECTION "bank26",ROMX,BANK[$26]
 
