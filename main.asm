@@ -30849,14 +30849,14 @@ Func_139a3: ; 139a3 (4:79a3)
 
 .asm_139b8
     bit 6,a
-    jr nz,Func_139d2
+    jr nz,PrintButItFailedText
     ld a,[hli]
     ld [de],a
     inc de
     ld a,[hl]
     ld [de],a
     ld hl,PlayCurrentMoveAnimation
-    call Func_139d5
+    call CallBankF
     ld hl,UnnamedText_139cd
     jp PrintText
 
@@ -30864,10 +30864,10 @@ UnnamedText_139cd: ; 139cd (4:79cd)
     TX_FAR _UnnamedText_139cd
     db "@"
 
-Func_139d2: ; 139d2 (4:79d2)
-    ld hl,Func_3fb53
-Func_139d5: ; 139d5 (4:79d5)
-    ld b,BANK(Func_3fb53)
+PrintButItFailedText: ; 139d2 (4:79d2)
+    ld hl,PrintButItFailedText_
+CallBankF: ; 139d5 (4:79d5)
+    ld b,BANK(PrintButItFailedText_) ; bank f
     jp Bankswitch
 
 Func_139da: ; 139da (4:79da)
@@ -30910,7 +30910,7 @@ Func_139da: ; 139da (4:79da)
     ld hl,W_ENEMYBATTSTATUS1
     call Func_13a37
     ld hl,PlayCurrentMoveAnimation
-    call Func_139d5
+    call CallBankF
     ld hl,UnnamedText_13a53
     jp PrintText
 
@@ -47126,9 +47126,9 @@ Func_27f86: ; 27f86 (9:7f86)
 .asm_27fa5
     ld c,$32
     call DelayFrames
-    ld hl,Func_3fb53
-    ld b,BANK(Func_3fb53)
-    jp Bankswitch ; indirect jump to Func_3fb53 (3fb53 (f:7b53))
+    ld hl,PrintButItFailedText_
+    ld b,BANK(PrintButItFailedText_)
+    jp Bankswitch ; indirect jump to PrintButItFailedText_ (3fb53 (f:7b53))
 
 UnnamedText_27fb3: ; 27fb3 (9:7fb3)
     db $0a
@@ -47761,8 +47761,8 @@ Func_33f2b: ; 33f2b (c:7f2b)
     ld hl,UnnamedText_33f52
     jp PrintText
 .asm_33f4a
-    ld hl,Func_3fb53
-    ld b,BANK(Func_3fb53)
+    ld hl,PrintButItFailedText_
+    ld b,BANK(PrintButItFailedText_)
     jp Bankswitch
 
 UnnamedText_33f52: ; 33f52 (c:7f52)
@@ -49339,7 +49339,7 @@ Func_3bb7d: ; Moved in the Bank
 Func_3ba97: ; Moved in the Bank
     ld c,$32
     call DelayFrames
-    ld hl,Func_3fb53
+    ld hl,PrintButItFailedText_
     jp BankswitchEtoF
 
 ; shifts all move data one up (freeing 4th move slot)
@@ -50657,7 +50657,7 @@ LearnMoveCommon:
     jp GetEvosMoves
 
 Func_3bb8c: ; Moved in the Bank
-    ld hl,Func_3fb53 ; $7b53
+    ld hl,PrintButItFailedText_ ; $7b53
     jp BankswitchEtoF
 
 UnnamedText_3bb92: ; Moved in the Bank
@@ -50695,7 +50695,7 @@ Func_3bb97: ; Moved in the Bank
 .asm_3bbcc
     ld c,$32
     call DelayFrames
-    ld hl,Func_3fb53 ; $7b53
+    ld hl,PrintButItFailedText_ ; $7b53
     jp BankswitchEtoF
 
 TryEvolvingMon: ; Moved in the Bank
@@ -54032,7 +54032,7 @@ LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
     ld bc,$b
     call CopyData
     call Func_3ed1a
-    call Func_3ee19
+    call ApplyBadgeStatBoosts
     ld a,$7
     ld b,$8
     ld hl,wPlayerMonAttackMod ; $cd1a
@@ -58311,6 +58311,12 @@ HitXTimesText:
 
 ; ──────────────────────────────────────────
 
+QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down:
+    ld hl,QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_
+QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up:
+    ld b,BANK(QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_)
+    jp Bankswitch
+
 SECTION "CheckEnemyStatusConditions",ROMX[$688f],BANK[$f]
 
 CheckEnemyStatusConditions: ; 3e88f (f:688f)
@@ -58914,10 +58920,10 @@ Func_3ed1e: ; 3ed1e (f:6d1e)
     xor a
 asm_3ed1f: ; 3ed1f (f:6d1f)
     ld [H_WHOSETURN],a ; $FF00+$f3
-    call Func_3ed27
-    jp Func_3ed64
+    call QuarterSpeedDueToParalysis
+    jp HalveAttackDueToBurn
 
-Func_3ed27: ; 3ed27 (f:6d27)
+QuarterSpeedDueToParalysis: ; 3ed27 (f:6d27)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.asm_3ed48
@@ -58959,7 +58965,7 @@ Func_3ed27: ; 3ed27 (f:6d27)
     ld [hl],b
     ret
 
-Func_3ed64: ; 3ed64 (f:6d64)
+HalveAttackDueToBurn: ; 3ed64 (f:6d64)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.asm_3ed81
@@ -59085,7 +59091,7 @@ Func_3ee0c: ; 3ee0c (f:6e0c)
     pop bc
     ret
 
-Func_3ee19: ; 3ee19 (f:6e19)
+ApplyBadgeStatBoosts: ; 3ee19 (f:6e19)
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     ret z
@@ -59867,14 +59873,14 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     jr z,.freeze
     ld a,PAR
     ld [W_ENEMYMONSTATUS],a
-    call Func_3ed27  ;quarter speed of affected monster
+    call QuarterSpeedDueToParalysis  ;quarter speed of affected monster
     ld a,$a9
     call PlayBattleAnimation  ;animation
     jp Func_3fb6e    ;print paralysis text
 .burn
     ld a,BRN
     ld [W_ENEMYMONSTATUS],a
-    call Func_3ed64
+    call HalveAttackDueToBurn
     ld a,$a9
     call PlayBattleAnimation  ;animation
     ld hl,UnnamedText_3f3d8
@@ -59918,12 +59924,12 @@ opponentAttacker: ; 3f382 (f:7382)
     jr z,.freeze
     ld a,PAR
     ld [W_PLAYERMONSTATUS],a
-    call Func_3ed27
+    call QuarterSpeedDueToParalysis
     jp Func_3fb6e
 .burn
     ld a,BRN
     ld [W_PLAYERMONSTATUS],a
-    call Func_3ed64
+    call HalveAttackDueToBurn
     ld hl,UnnamedText_3f3d8
     jp PrintText
 .freeze
@@ -59939,6 +59945,10 @@ UnnamedText_3f3d8: ; 3f3d8 (f:73d8)
 UnnamedText_3f3dd: ; 3f3dd (f:73dd)
     TX_FAR _UnnamedText_3f3dd
     db "@"
+
+; ──────────────────────────────────────────────────────────────────────
+; StatModifierUpEffect
+; ──────────────────────────────────────────────────────────────────────
 
 StatModifierUpEffect: ; Moved in the Bank
     ld hl,wPlayerMonStatMods ; $cd1a
@@ -59965,7 +59975,7 @@ StatModifierUpEffect: ; Moved in the Bank
     inc b
     ld a,$d
     cp b
-    jp c,.PrintNothingHappenedText
+    jp c,.NothingHappened
     ; Check up2
     ld a,[de]
     cp EVASION_UP1_EFFECT + 1 ; is it a +2 effect?
@@ -59990,34 +60000,36 @@ StatModifierUpEffect: ; Moved in the Bank
     ld [hl],b
     ld a,c
     cp $4
-    jr nc,.asm_3f4ca
+    jr nc,.UpdateStatDone ; jump if mod affected is evasion/accuracy
     push hl
     ld hl,$d026
     ld de,$cd12
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_3f472
-    ld hl,$cff7
-    ld de,$cd26
-.asm_3f472
+    jr z,.pointToStats
+    ld hl,W_ENEMYMONATTACK+1
+    ld de,$cd26 ; EnemyMonUnmodifiedAttack
+.pointToStats
     push bc
     sla c
     ld b,$0
-    add hl,bc
+    add hl,bc ; hl = modified stat
     ld a,c
     add e
     ld e,a
-    jr nc,.asm_3f47e
-    inc d
-.asm_3f47e
+    jr nc,.checkIf999
+    inc d ; de = unmodified (original) stat
+.checkIf999
     pop bc
+	; check if stat is already 999
     ld a,[hld]
     sub $e7
-    jr nz,.asm_3f48a
+    jr nz,.recalculateStat
     ld a,[hl]
     sbc $3
-    jp z,.Func_3f520
-.asm_3f48a
+    jp z,RestoreOriginalStatModifier
+.recalculateStat ; recalculate affected stat
+                 ; paralysis and burn penalties, as well as badge boosts are ignored
     push hl
     push bc
     ld hl,StatModifierRatios ; $76cb
@@ -60046,35 +60058,35 @@ StatModifierUpEffect: ; Moved in the Bank
     sub $e7
     ld a,[$FF00+$97]
     sbc $3
-    jr c,.Func_3f4c3
+    jr c,.UpdateStat
     ld a,$3
     ld [$FF00+$97],a
     ld a,$e7
     ld [$FF00+$98],a
-.Func_3f4c3
+.UpdateStat
     ld a,[$FF00+$97]
     ld [hli],a
     ld a,[$FF00+$98]
     ld [hl],a
     pop hl
-.asm_3f4ca
+.UpdateStatDone
     ld b,c
     inc b
-    call Func_3f688
+    call PrintStatText
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
     ld de,W_PLAYERMOVENUM ; $cfd2
     ld bc,$ccf7
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_3f4e6
+    jr z,.playerTurn
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
     ld de,W_ENEMYMOVENUM ; $cfcc
     ld bc,$ccf3
-.asm_3f4e6
+.playerTurn
     ld a,[de]
-    cp $6b
-    jr nz,.asm_3f4f9
-    bit 4,[hl]
+    cp MINIMIZE
+    jr nz,.notMinimize
+    bit 4,[hl] ; HAS_SUBSTITUTE_UP
     push af
     push bc
     ld hl,HideSubstituteShowMonAnim
@@ -60082,11 +60094,11 @@ StatModifierUpEffect: ; Moved in the Bank
     push de
     call nz,Bankswitch
     pop de
-.asm_3f4f9
+.notMinimize
     call PlayCurrentMoveAnimation
     ld a,[de]
-    cp $6b
-    jr nz,.asm_3f50e
+    cp MINIMIZE
+    jr nz,.applyBadgeBoostsAndStatusPenalties
     pop bc
     ld a,$1
     ld [bc],a
@@ -60094,29 +60106,26 @@ StatModifierUpEffect: ; Moved in the Bank
     ld b,BANK(ReshowSubstituteAnim)
     pop af
     call nz,Bankswitch
-.asm_3f50e
+.applyBadgeBoostsAndStatusPenalties
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    call z,Func_3ee19
-    ld hl,.UnnamedText_3f528
+    call z,ApplyBadgeStatBoosts
+    ld hl,.MonsStatsRoseText
     call PrintText
-    call Func_3ed27
-    jp Func_3ed64
-.Func_3f520
-    pop hl
-    dec [hl]
-.PrintNothingHappenedText
-    ld hl,NothingHappenedText ; $7b3e
-    jp PrintText
-.UnnamedText_3f528
-    TX_FAR _UnnamedText_3f528
+    ld hl,QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_
+    jp QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up
+.NothingHappened
+    call PlayCurrentMoveAnimation
+    jp PrintNothingHappenedText
+.MonsStatsRoseText
+    TX_FAR _MonsStatsRoseText
     db $08 ; asm
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVEEFFECT] ; $cfd3
-    jr z,.asm_3f53b
+    jr z,.done1
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-.asm_3f53b
+.done1
     cp EVASION_UP1_EFFECT + 1
     ld hl,.RoseText
     ret c
@@ -60136,6 +60145,20 @@ StatModifierUpEffect: ; Moved in the Bank
     TX_FAR _EnormouslyText
     TX_FAR _RoseText
     db "@"
+
+; ──────────────────────────────────────────────────────────────────────
+
+RestoreOriginalStatModifier:
+    pop hl
+    dec [hl]
+    call PlayCurrentMoveAnimation
+    ; fall through
+
+PrintNothingHappenedText:
+    ld hl,NothingHappenedText ; $7b3e
+    jp Delay50AndPrintText
+
+; ──────────────────────────────────────────────────────────────────────
 
 AmnesiaNewEffect:
     call GetDefaultAmnesiaEnv
@@ -60161,41 +60184,57 @@ AmnesiaNewEffect:
     ld [de],a
     ret
 
-; Free
+; ──────────────────────────────────────────────────────────────────────
+; StatModifierDownEffect
+; ──────────────────────────────────────────────────────────────────────
 
-SECTION "StatModifierDownEffect",ROMX[$754c],BANK[$f]
-
-StatModifierDownEffect: ; 3f54c (f:754c)
+StatModifierDownEffect: ; Moved in the Bank
     ld hl,wEnemyMonStatMods ; $cd2e
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld bc,W_ENEMYBATTSTATUS1 ; $d067
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.statModifierDownEffect
+    jr z,.done
     ld hl,wPlayerMonStatMods ; $cd1a
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
     ld bc,W_PLAYERBATTSTATUS1 ; $d062
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
-    jr z,.statModifierDownEffect
+    jr z,.done
     call GenRandomInBattle
     cp $40
-    jp c,MoveMissed
-.statModifierDownEffect
+    jr c,.MoveMissed
+.done
     call CheckTargetSubstitute
-    jp nz,MoveMissed
+    jr nz,.MoveMissed
     ld a,[bc]
     bit 6,a ; fly/dig
-    jp nz,MoveMissed
+    jr nz,.MoveMissed
     ld a,[de]
     cp ATTACK_DOWN_SIDE_EFFECT
     jr c,.nonSideEffect
     call CheckAmnesiaSideEffect ; GenRandomInBattle
-    cp $55
-    jp nc,CantLowerAnymore
+    cp $55 ; 33%
+    jr nc,.CantLowerAnymore
     ld a,[de]
     sub ATTACK_DOWN_SIDE_EFFECT ; map each stat to 0-3
     jr .decrementStatMod
+.MoveMissed
+    ld a,[de]
+    cp ATTACK_DOWN_SIDE_EFFECT
+    ret nc
+    call PlayCurrentMoveAnimation
+    jp ConditionalPrintButItFailed
+.CantLowerAnymore_Pop
+    pop de
+    pop hl
+    inc [hl]
+.CantLowerAnymore
+    ld a,[de]
+    cp ATTACK_DOWN_SIDE_EFFECT
+    ret nc
+    call PlayCurrentMoveAnimation
+    jp PrintNothingHappenedText
 .nonSideEffect
     push hl
     push de
@@ -60206,7 +60245,7 @@ StatModifierDownEffect: ; 3f54c (f:754c)
     pop hl
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jp nz,MoveMissed
+    jr nz,.MoveMissed
     ld a,[de]
     sub ATTACK_DOWN1_EFFECT
     cp EVASION_DOWN1_EFFECT + $3 - ATTACK_DOWN1_EFFECT ; covers all -1 effects
@@ -60218,7 +60257,7 @@ StatModifierDownEffect: ; 3f54c (f:754c)
     add hl,bc
     ld b,[hl]
     dec b ; dec corresponding stat mod
-    jp z,CantLowerAnymore
+    jr z,.CantLowerAnymore
     ld a,[de]
     cp ATTACK_DOWN2_EFFECT - $16 ; $24
     jr c,.ok
@@ -60231,34 +60270,34 @@ StatModifierDownEffect: ; 3f54c (f:754c)
     ld [hl],b
     ld a,c
     cp $4
-    jr nc,UpdateLoweredStatDone ; jump for evasion/accuracy
+    jr nc,.UpdateLoweredStatDone ; jump for evasion/accuracy
     push hl
     push de
-    ld hl,$cff7
-    ld de,$cd26
+    ld hl,W_ENEMYMONATTACK+1
+    ld de,$cd26 ; EnemyMonUnmodifiedAttack
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.pointToStat
-    ld hl,$d026
-    ld de,$cd12
+    ld hl,W_PLAYERMONATK+1
+    ld de,$cd12 ; PlayerMonUnmodifiedAttack
 .pointToStat
     push bc
     sla c
     ld b,$0
-    add hl,bc
+    add hl,bc ; hl = modified stat
     ld a,c
     add e
     ld e,a
     jr nc,.noCarry
-    inc d
+    inc d ; de = unmodified stat
 .noCarry
     pop bc
     ld a,[hld]
-    sub $1
+    sub 1 ; can't lower stat below 1 (-6)
     jr nz,.recalculateStat
     ld a,[hl]
     and a
-    jp z,CantLowerAnymore_Pop
+    jr z,.CantLowerAnymore_Pop
 .recalculateStat
     push hl
     push bc
@@ -60288,23 +60327,22 @@ StatModifierDownEffect: ; 3f54c (f:754c)
     ld b,a
     ld a,[$FF00+$97]
     or b
-    jp nz,UpdateLoweredStat
+    jr nz,.UpdateLoweredStat
     ld [$FF00+$97],a
     ld a,$1
     ld [$FF00+$98],a
-
-UpdateLoweredStat: ; 3f624 (f:7624)
+.UpdateLoweredStat
     ld a,[$FF00+$97]
     ld [hli],a
     ld a,[$FF00+$98]
     ld [hl],a
     pop de
     pop hl
-UpdateLoweredStatDone: ; 3f62c (f:762c)
+.UpdateLoweredStatDone
     ld b,c
     inc b
     push de
-    call Func_3f688
+    call PrintStatText
     pop de
     ld a,[de]
     cp ATTACK_DOWN_SIDE_EFFECT
@@ -60313,68 +60351,51 @@ UpdateLoweredStatDone: ; 3f62c (f:762c)
 .ApplyBadgeBoostsAndStatusPenalties
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    call nz,Func_3ee19
-    ld hl,UnnamedText_3f661 ; $7661
+    call nz,ApplyBadgeStatBoosts ; whenever the player uses a stat-down move, badge boosts get reapplied again to every stat,
+                                 ; even to those not affected by the stat-up move (will be boosted further)
+    ld hl,.MonsStatsFellText
     call PrintText
-    call Func_3ed27
-    jp Func_3ed64
-
-CantLowerAnymore_Pop: ; 3f64d (f:764d)
-    pop de
-    pop hl
-    inc [hl]
-
-CantLowerAnymore: ; 3f650 (f:7650)
-    ld a,[de]
-    cp ATTACK_DOWN_SIDE_EFFECT
-    ret nc
-    ld hl,NothingHappenedText ; $7b3e
-    jp PrintText
-
-MoveMissed: ; 3f65a (f:765a)
-    ld a,[de]
-    cp ATTACK_DOWN_SIDE_EFFECT
-    ret nc
-    jp Func_3fb4e
-
-UnnamedText_3f661: ; 3f661 (f:7661)
-    TX_FAR _UnnamedText_3f661
+    jp QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down
+.MonsStatsFellText
+    TX_FAR _MonsStatsFellText
     db $08 ; asm
-    ld hl,UnnamedText_3f683 ; $7683
+    ld hl,.FellText
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVEEFFECT] ; $cfd3
-    jr z,.asm_3f674
+    jr z,.done2
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-.asm_3f674
-    cp $1a
+.done2
+    cp BIDE_EFFECT
     ret c
-    cp $44
+    cp ATTACK_DOWN_SIDE_EFFECT
     ret nc
-    ld hl,UnnamedText_3f67e ; $767e
+    ld hl,.GreatlyFellText
     ret
-
-UnnamedText_3f67e: ; 3f67e (f:767e)
+.GreatlyFellText
     db $0a
-    TX_FAR _UnnamedText_3f67e
-
-UnnamedText_3f683: ; 3f683 (f:7683)
-    TX_FAR _UnnamedText_3f683
+    TX_FAR _GreatlyFellText
+.FellText
+    TX_FAR _FellText
     db "@"
 
-Func_3f688: ; 3f688 (f:7688)
+; ──────────────────────────────────────────────────────────────────────
+
+SECTION "PrintStatText",ROMX[$7688],BANK[$f]
+
+PrintStatText: ; 3f688 (f:7688)
     ld hl,StatsTextStrings ; $769f
-    ld c,$50
-.asm_3f68d
+    ld c,"@"
+.findStatName_outer
     dec b
-    jr z,.asm_3f696
-.asm_3f690
+    jr z,.foundStatName
+.findStatName_inner
     ld a,[hli]
     cp c
-    jr z,.asm_3f68d
-    jr .asm_3f690
-.asm_3f696
-    ld de,$cf4b
+    jr z,.findStatName_outer
+    jr .findStatName_inner
+.foundStatName
+    ld de,$cf4b ; StringBuffer
     ld bc,$a
     jp CopyData
 
@@ -60476,7 +60497,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld a,[W_PLAYERMOVENUM] ; $cfd2
     cp $64
     jp nz,PrintDidntAffectText
-    jp Func_3fb53
+    jp PrintButItFailedText_
 .asm_3f76e
     call ReadPlayerMonCurHPAndStatus
     xor a
@@ -60492,7 +60513,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld a,[W_PLAYERMOVENUM] ; $cfd2
     cp $64
     jp nz,PrintText
-    jp Func_3fb53
+    jp PrintButItFailedText_
 .asm_3f791
     ld a,[W_ISINBATTLE] ; $d057
     dec a
@@ -60518,7 +60539,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld a,[W_ENEMYMOVENUM] ; $cfcc
     cp $64
     jp nz,PrintDidntAffectText
-    jp Func_3fb53
+    jp PrintButItFailedText_
 .asm_3f7c1
     call ReadPlayerMonCurHPAndStatus
     xor a
@@ -60534,7 +60555,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld a,[W_ENEMYMOVENUM] ; $cfcc
     cp $64
     jp nz,PrintText
-    jp Func_3fb4e
+    jp ConditionalPrintButItFailed
 .asm_3f7e4
     push af
     call PlayBattleAnimation
@@ -60810,7 +60831,7 @@ Func_3f9a6: ; 3f9a6 (f:79a6)
     ret z
     ld c,$32
     call DelayFrames
-    jp Func_3fb4e
+    jp ConditionalPrintButItFailed
 
 ParalyzeEffect: ; 3f9b1 (f:79b1)
     ld hl,ParalyzeEffect_
@@ -60924,7 +60945,7 @@ MimicEffect: ; 3f9ed (f:79ed)
     ld hl,UnnamedText_3fa77
     jp PrintText
 .asm_3fa74
-    jp Func_3fb53
+    jp PrintButItFailedText_
 
 UnnamedText_3fa77: ; 3fa77 (f:7a77)
     TX_FAR _UnnamedText_3fa77
@@ -61014,7 +61035,7 @@ DisableEffect: ; 3fa8a (f:7a8a)
     ld hl,.UnnamedText_3fb09 ; $7b09
     jp PrintText
 .moveMissed
-    jp Func_3fb53
+    jp PrintButItFailedText_
 
 .UnnamedText_3fb09
     TX_FAR _UnnamedText_3fb09
@@ -61032,17 +61053,16 @@ UnnamedText_3fb49: ; Moved in the Bank
     TX_FAR _UnnamedText_3fb49
     db "@"
 
-Func_3fb4e: ; Moved in the Bank
-    ld a,[$ccf4]
+ConditionalPrintButItFailed: ; Moved in the Bank
+    ld a,[$ccf4] ; MoveDidntMiss
     and a
-    ret nz
+    ret nz ; return if the side effect failed, yet the attack was successful
 
-Func_3fb53: ; Moved in the Bank
-    ld hl,UnnamedText_3fb59 ; $7b59
-    jp PrintText
-
-UnnamedText_3fb59: ; Moved in the Bank
-    TX_FAR _UnnamedText_3fb59
+PrintButItFailedText_: ; Moved in the Bank
+    ld hl,.ButItFailedText
+    jp Delay50AndPrintText
+.ButItFailedText
+    TX_FAR _ButItFailedText
     db "@"
 
 PrintDidntAffectText: ; Moved in the Bank
@@ -78911,9 +78931,9 @@ ParalyzeEffect_: ; Moved in the Bank
     and a
     jr nz,.didntAffect
     set 6,[hl]
-    ld hl,Func_3ed27
-    ld b,BANK(Func_3ed27)
-    call Bankswitch ; indirect jump to Func_3ed27 (3ed27 (f:6d27))
+    ld hl,QuarterSpeedDueToParalysis
+    ld b,BANK(QuarterSpeedDueToParalysis)
+    call Bankswitch ; indirect jump to QuarterSpeedDueToParalysis (3ed27 (f:6d27))
     ld c,$1e
     call DelayFrames
     ld hl,PlayCurrentMoveAnimation
@@ -80397,9 +80417,9 @@ GainExperience: ; 5524f (15:524f)
     ld hl,Func_3ed1a
     ld b,BANK(Func_3ed1a)
     call Bankswitch ; indirect jump to Func_3ed1a (3ed1a (f:6d1a))
-    ld hl,Func_3ee19
-    ld b,BANK(Func_3ee19)
-    call Bankswitch ; indirect jump to Func_3ee19 (3ee19 (f:6e19))
+    ld hl,ApplyBadgeStatBoosts
+    ld b,BANK(ApplyBadgeStatBoosts)
+    call Bankswitch ; indirect jump to ApplyBadgeStatBoosts (3ee19 (f:6e19))
     ld hl,DrawPlayerHUDAndHPBar
     ld b,BANK(DrawPlayerHUDAndHPBar)
     call Bankswitch ; indirect jump to DrawPlayerHUDAndHPBar (3cd60 (f:4d60))
@@ -124066,7 +124086,7 @@ _UnnamedText_3f423: ; 94782 (25:4782)
     db $0,"Fire defrosted",$4f
     db $59,"!",$58
 
-_UnnamedText_3f528: ; 94795 (25:4795)
+_MonsStatsRoseText: ; 94795 (25:4795)
     db $0,$5a,"'s",$4f
     db "@"
 
@@ -124080,7 +124100,7 @@ _GreatlyText: ; 947a0 (25:47a0)
 _RoseText: ; 947ab (25:47ab)
     db $0," rose!",$58
 
-_UnnamedText_3f661: ; 947b3 (25:47b3)
+_MonsStatsFellText: ; 947b3 (25:47b3)
     db $0,$59,"'s",$4f
     db "@"
 
@@ -124088,10 +124108,10 @@ UnnamedText_947b8: ; 947b8 (25:47b8)
     TX_RAM $cf4b
     db $0,"@@"
 
-_UnnamedText_3f67e: ; 947be (25:47be)
+_GreatlyFellText: ; 947be (25:47be)
     db $0,$4c,"greatly@@"
 
-_UnnamedText_3f683: ; 947c9 (25:47c9)
+_FellText: ; 947c9 (25:47c9)
     db $0," fell!",$58
 
 _UnnamedText_3f802: ; 947d1 (25:47d1)
@@ -124161,7 +124181,7 @@ _NothingHappenedText: ; 948b6 (25:48b6)
 _UnnamedText_3fb49: ; 948c9 (25:48c9)
     db $0,"No effect!",$58
 
-_UnnamedText_3fb59: ; 948d5 (25:48d5)
+_ButItFailedText: ; 948d5 (25:48d5)
     db $0,"But,it failed! ",$58
 
 _DidntAffectText: ; 948e7 (25:48e7)
@@ -137807,6 +137827,97 @@ PlayTrainerMusic_:
     db GIOVANNI
     db ROCKET
     db $FF
+
+; ──────────────────────────────────────────────────────────────────────
+QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_:
+; ──────────────────────────────────────────────────────────────────────
+
+; These where probably added given that a stat-down move affecting speed or attack will override
+; the stat penalties from paralysis and burn respectively.
+; But they are always called regardless of the stat affected by the stat-down move.
+    ;call QuarterSpeedDueToParalysis ; apply speed penalty to the player whose turn is not, if it's paralyzed
+    ;jp HalveAttackDueToBurn ; apply attack penalty to the player whose turn is not, if it's burned
+;joenote - now to fix this to properly apply the BRN and PAR stat penalties.
+;In pokemon generation 1, stat-downs are always dealt to an opponent during the active pkmn's turn.
+;So the penalty functions have the correct assumption that whoever is getting a stat-down is not their turn
+;The correct function needs to be called depending on the stat-down being applied
+    push de                               ; preserve de on the stack
+    ld de,W_PLAYERMOVEEFFECT              ; get the player move effect
+    ld a,[H_WHOSETURN]                    ; load the turn
+    and a                                 ; check the turn
+    jr z,.skip1                           ; if it is not the player's turn...
+    ld de,W_ENEMYMOVEEFFECT               ; ...then it's the enemy's turn - load enemy move effect
+.skip1
+    ld a,[de]                             ; get the move effect into a
+    cp ATTACK_DOWN1_EFFECT
+    jr z,.skip_brn                        ; attack effect. skip to brn penalty
+    cp ATTACK_DOWN2_EFFECT
+    jr z,.skip_brn                        ; attack effect. skip to brn penalty
+    cp SPEED_DOWN1_EFFECT
+    jr z,.skip_par                        ; speed effect. skip to par penalty.
+    cp SPEED_DOWN2_EFFECT
+    jr z,.skip_par                        ; speed effect. skip to par penalty.
+    jr .skip_end                          ; no attack or speed effect if at this line. skip to end.
+.skip_brn
+    ld hl,HalveAttackDueToBurn            ; the non-active pkmn has a new recalculated attack. the active pkmn applies brn penalty to its opponent.
+    ld b,BANK(HalveAttackDueToBurn)       ; ...
+    call Bankswitch                       ; ...
+    jr .skip_end
+.skip_par
+    ld hl,QuarterSpeedDueToParalysis      ; the non-active pkmn has a new recalculated speed. the active pkmn applies par penalty to its opponent.
+    ld b,BANK(QuarterSpeedDueToParalysis) ; ...
+    call Bankswitch                       ; ...
+.skip_end
+    pop de                                ; restore de from the stack
+    ret                                   ; remember to return
+
+; ──────────────────────────────────────────────────────────────────────
+QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_:
+; ──────────────────────────────────────────────────────────────────────
+
+; these shouldn't be here
+    ;call QuarterSpeedDueToParalysis ; apply speed penalty to the player whose turn is not, if it's paralyzed
+    ;jp HalveAttackDueToBurn ; apply attack penalty to the player whose turn is not, if it's burned
+;joenote - now to fix this to properly apply the BRN and PAR stat penalties.
+;In pokemon generation 1, stat-ups are always dealt to a pkmn's self on its own turn.
+;But the default penalty functions are written to apply penalties to the opponent of whoever's turn it is.
+;So if speed or attack rises: invert H_WHOSETURN, call the appropriate function, when revert H_WHOSETURN.
+;This make it so the penalties are applied to the self of whoever's turn it is.
+;All that remains is to check which stat-up is applied and call the appropriate function.
+    push de                               ; preserve de on the stack
+    ld de,W_PLAYERMOVEEFFECT              ; get the player move effect
+    ld a,[H_WHOSETURN]                    ; load the turn
+    and a                                 ; check the turn
+    jr z,.skip1                           ; if it is not the player's turn...
+    ld de,W_ENEMYMOVEEFFECT               ; ...then it's the enemy's turn - load enemy move effect
+.skip1
+    xor $1                                ; invert the turn
+    ld [H_WHOSETURN],a                    ; store the inverted turn
+    ld a,[de]                             ; get the move effect into a
+    cp ATTACK_UP1_EFFECT
+    jr z,.skip_brn                        ; attack effect. skip to brn penalty
+    cp ATTACK_UP2_EFFECT
+    jr z,.skip_brn                        ; attack effect. skip to brn penalty
+    cp SPEED_UP1_EFFECT
+    jr z,.skip_par                        ; speed effect. skip to par penalty.
+    cp SPEED_UP2_EFFECT
+    jr z,.skip_par                        ; speed effect. skip to par penalty.
+    jr .skip_end                          ; no attack or speed effect if at this line. skip to end.
+.skip_brn
+    ld hl,HalveAttackDueToBurn            ; the active pkmn has a new recalculated attack. the non-active pkmn applies brn penalty to its opponent.
+    ld b,BANK(HalveAttackDueToBurn)       ; ...
+    call Bankswitch                       ; ...
+    jr .skip_end
+.skip_par
+    ld hl,QuarterSpeedDueToParalysis      ; the active pkmn has a new recalculated speed. the non-active pkmn applies par penalty to its opponent.
+    ld b,BANK(QuarterSpeedDueToParalysis) ; ...
+    call Bankswitch                       ; ...
+.skip_end
+    ld a,[H_WHOSETURN]                    ; load the inverted turn
+    xor $1                                ; revert the turn back to normal
+    ld [H_WHOSETURN],a                    ; store the normal turn
+    pop de                                ; restore de from the stack
+    ret                                   ; remember to return
 
 ; ──────────────────────────────────────────────────────────────────────
 
