@@ -60786,52 +60786,52 @@ ConfusionSideEffect: ; 3f959 (f:7959)
     call GenRandomInBattle
     cp $19
     ret nc
-    jr Func_3f96f
+    jr ConfusionSideEffectSuccess
 
 ConfusionEffect: ; 3f961 (f:7961)
     call CheckTargetSubstitute
-    jr nz,Func_3f9a6
+    jr nz,ConfusionEffectFailed
     call MoveHitTest
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jr nz,Func_3f9a6
+    jr nz,ConfusionEffectFailed
 
-Func_3f96f: ; 3f96f (f:796f)
+ConfusionSideEffectSuccess: ; 3f96f (f:796f)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    ld bc,$d070
+    ld bc,$d070 ; EnemyConfusedCounter
     ld a,[W_PLAYERMOVEEFFECT] ; $cfd3
-    jr z,.asm_3f986
+    jr z,.done
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
-    ld bc,$d06b
+    ld bc,$d06b ; PlayerConfusedCounter
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-.asm_3f986
-    bit 7,[hl]
-    jr nz,Func_3f9a6
-    set 7,[hl]
+.done
+    bit 7,[hl] ; CONFUSED ; is mon confused?
+    jr nz,ConfusionEffectFailed
+    set 7,[hl] ; CONFUSED ; mon is now confused
     push af
     call GenRandomInBattle
     and $3
     inc a
     inc a
-    ld [bc],a
+    ld [bc],a ; confusion status will last 2-5 turns
     pop af
-    cp $4c
+    cp CONFUSION_SIDE_EFFECT
     call nz,PlayCurrentMoveAnimation2
-    ld hl,UnnamedText_3f9a1 ; $79a1
+    ld hl,.BecameConfusedText
     jp PrintText
-
-UnnamedText_3f9a1: ; 3f9a1 (f:79a1)
-    TX_FAR _UnnamedText_3f9a1
+.BecameConfusedText
+    TX_FAR _BecameConfusedText
     db "@"
 
-Func_3f9a6: ; 3f9a6 (f:79a6)
-    cp $4c
+ConfusionEffectFailed: ; 3f9a6 (f:79a6)
+    cp CONFUSION_SIDE_EFFECT
     ret z
-    ld c,$32
-    call DelayFrames
+    call PlayCurrentMoveAnimation
     jp ConditionalPrintButItFailed
+
+SECTION "ParalyzeEffect",ROMX[$79b1],BANK[$f]
 
 ParalyzeEffect: ; 3f9b1 (f:79b1)
     ld hl,ParalyzeEffect_
@@ -124153,7 +124153,7 @@ _UnnamedText_3f912: ; 9486a (25:486a)
     db $0,$4f
     db "dug a hole!",$58
 
-_UnnamedText_3f9a1: ; 94878 (25:4878)
+_BecameConfusedText: ; 94878 (25:4878)
     db $0,$59,$4f
     db "became confused!",$58
 
