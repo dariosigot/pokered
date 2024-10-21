@@ -59876,7 +59876,7 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     call QuarterSpeedDueToParalysis  ;quarter speed of affected monster
     ld a,$a9
     call PlayBattleAnimation  ;animation
-    jp Func_3fb6e    ;print paralysis text
+    jp PrintMayNotAttackText    ;print paralysis text
 .burn
     ld a,BRN
     ld [W_ENEMYMONSTATUS],a
@@ -59925,7 +59925,7 @@ opponentAttacker: ; 3f382 (f:7382)
     ld a,PAR
     ld [W_PLAYERMONSTATUS],a
     call QuarterSpeedDueToParalysis
-    jp Func_3fb6e
+    jp PrintMayNotAttackText
 .burn
     ld a,BRN
     ld [W_PLAYERMONSTATUS],a
@@ -60876,26 +60876,26 @@ RageEffect: ; 3f9df (f:79df)
     ret
 
 MimicEffect: ; 3f9ed (f:79ed)
-    ld c,$32
+    ld c,50
     call DelayFrames
     call MoveHitTest
     ld a,[W_MOVEMISSED]
     and a
-    jr nz,.asm_3fa74
+    jr nz,.mimicMissed
     ld a,[H_WHOSETURN]
     and a
     ld hl,W_PLAYERMONMOVES
     ld a,[W_PLAYERBATTSTATUS1]
-    jr nz,.asm_3fa13
+    jr nz,.enemyTurn
     ld a,[W_ISLINKBATTLE]
     cp $4
-    jr nz,.asm_3fa3a
+    jr nz,.letPlayerChooseMove
     ld hl,W_ENEMYMONMOVES
     ld a,[W_ENEMYBATTSTATUS1]
-.asm_3fa13
-    bit 6,a
-    jr nz,.asm_3fa74
-.asm_3fa17
+.enemyTurn
+    bit 6,a ; INVULNERABLE
+    jr nz,.mimicMissed
+.getRandomMove
     push hl
     call GenRandomInBattle
     and $3
@@ -60905,20 +60905,20 @@ MimicEffect: ; 3f9ed (f:79ed)
     ld a,[hl]
     pop hl
     and a
-    jr z,.asm_3fa17
+    jr z,.getRandomMove
     ld d,a
     ld a,[H_WHOSETURN]
     and a
     call BackupMovesBeforeEnemyMimic ; ld hl,W_PLAYERMONMOVES
     ld a,[wPlayerMoveListIndex]
-    jr z,.asm_3fa5f
+    jr z,.playerTurn
     ld hl,W_ENEMYMONMOVES
     ld a,[wEnemyMoveListIndex]
-    jr .asm_3fa5f
-.asm_3fa3a
+    jr .playerTurn
+.letPlayerChooseMove
     ld a,[W_ENEMYBATTSTATUS1]
-    bit 6,a
-    jr nz,.asm_3fa74
+    bit 6,a ; INVULNERABLE
+    jr nz,.mimicMissed
     ld a,[wCurrentMenuItem]
     push af
     ld a,$1
@@ -60933,7 +60933,7 @@ MimicEffect: ; 3f9ed (f:79ed)
     ld d,[hl]
     pop af
     ld hl,W_PLAYERMONMOVES
-.asm_3fa5f
+.playerTurn
     ld c,a
     ld b,$0
     add hl,bc
@@ -60942,25 +60942,20 @@ MimicEffect: ; 3f9ed (f:79ed)
     ld [$d11e],a
     call GetMoveName
     call PlayCurrentMoveAnimation
-    ld hl,UnnamedText_3fa77
+    ld hl,.MimicLearnedMoveText
     jp PrintText
-.asm_3fa74
+.mimicMissed
     jp PrintButItFailedText_
-
-UnnamedText_3fa77: ; 3fa77 (f:7a77)
-    TX_FAR _UnnamedText_3fa77
+.MimicLearnedMoveText
+    TX_FAR _MimicLearnedMoveText
     db "@"
 
-LeechSeedEffect: ; 3fa7c (f:7a7c)
+LeechSeedEffect: ; Moved in the Bank
     ld hl,LeechSeedEffect_
     ld b,BANK(LeechSeedEffect_)
     jp Bankswitch ; indirect jump to LeechSeedEffect_ (2bea9 (a:7ea9))
 
-SplashEffect: ; 3fa84 (f:7a84)
-    call PlayCurrentMoveAnimation
-    jp Func_3fb43
-
-DisableEffect: ; 3fa8a (f:7a8a)
+DisableEffect: ; Moved in the Bank
     call MoveHitTest
     ld a,[W_MOVEMISSED] ; $d05f
     and a
@@ -61032,25 +61027,25 @@ DisableEffect: ; 3fa8a (f:7a8a)
     ld a,[$d11e]
     ld [hl],a
     call GetMoveName
-    ld hl,.UnnamedText_3fb09 ; $7b09
+    ld hl,.MoveWasDisabledText ; $7b09
     jp PrintText
 .moveMissed
+    call PlayCurrentMoveAnimation
     jp PrintButItFailedText_
-
-.UnnamedText_3fb09
-    TX_FAR _UnnamedText_3fb09
+.MoveWasDisabledText
+    TX_FAR _MoveWasDisabledText
     db "@"
 
 NothingHappenedText: ; Moved in the Bank
     TX_FAR _NothingHappenedText
     db "@"
 
-Func_3fb43: ; Moved in the Bank
-    ld hl,UnnamedText_3fb49
+SplashEffect: ; Moved in the Bank
+    call PlayCurrentMoveAnimation
+    ld hl,.NoEffectText
     jp PrintText
-
-UnnamedText_3fb49: ; Moved in the Bank
-    TX_FAR _UnnamedText_3fb49
+.NoEffectText
+    TX_FAR _NoEffectText
     db "@"
 
 ConditionalPrintButItFailed: ; Moved in the Bank
@@ -61076,7 +61071,7 @@ UnnamedText_3fb69: ; Moved in the Bank
     TX_FAR _UnnamedText_3fb69
     db "@"
 
-Func_3fb6e: ; Moved in the Bank
+PrintMayNotAttackText: ; Moved in the Bank
     ld hl,UnnamedText_3fb74 ; $7b74
     jp PrintText
 
@@ -78909,9 +78904,9 @@ ParalyzeEffect_: ; Moved in the Bank
 .next
     ld a,[hl]
     and a
-    jr nz,.didntAffect
+    jr nz,.alreadyStatused ; miss if target is already statused
     ld a,[de]
-    cp $17
+    cp ELECTRIC
     jr nz,.hitTest
     ld b,h
     ld c,l
@@ -78925,7 +78920,7 @@ ParalyzeEffect_: ; Moved in the Bank
     push hl
     ld hl,MoveHitTest
     ld b,BANK(MoveHitTest)
-    call Bankswitch ; indirect jump to MoveHitTest (3e56b (f:656b))
+    call Bankswitch
     pop hl
     ld a,[W_MOVEMISSED] ; $d05f
     and a
@@ -78933,27 +78928,33 @@ ParalyzeEffect_: ; Moved in the Bank
     set 6,[hl]
     ld hl,QuarterSpeedDueToParalysis
     ld b,BANK(QuarterSpeedDueToParalysis)
-    call Bankswitch ; indirect jump to QuarterSpeedDueToParalysis (3ed27 (f:6d27))
-    ld c,$1e
+    call Bankswitch
+    ld c,30
     call DelayFrames
-    ld hl,PlayCurrentMoveAnimation
-    ld b,BANK(PlayCurrentMoveAnimation)
-    call Bankswitch ; indirect jump to PlayCurrentMoveAnimation (3fba8 (f:7ba8))
-    ld hl,Func_3fb6e
-    ld b,BANK(Func_3fb6e)
-    jp Bankswitch ; indirect jump to Func_3fb6e (3fb6e (f:7b6e))
+    ld hl,PlayCurrentMoveAnimation2
+    call .BankswitchToF
+    ld hl,PrintMayNotAttackText
+    jr .BankswitchToF
+.alreadyStatused
+    ld hl,PrintAlreadyStatusedText
+    jr .PlayAnimationAndTextFail
 .didntAffect
-    ld c,$32
-    call DelayFrames
     ld hl,PrintDidntAffectText
-    ld b,BANK(PrintDidntAffectText)
-    jp Bankswitch ; indirect jump to PrintDidntAffectText (3fb5e (f:7b5e))
+    jr .PlayAnimationAndTextFail
 .doesntAffect
-    ld c,$32
-    call DelayFrames
     ld hl,PrintDoesntAffectMonText
-    ld b,BANK(PrintDoesntAffectMonText)
-    jp Bankswitch ; indirect jump to PrintDoesntAffectMonText (3dc51 (f:5c51))
+    ; fall through
+.PlayAnimationAndTextFail
+    push hl
+    call .PlayCurrentMoveAnimation
+    pop hl
+    jr .BankswitchToF
+.PlayCurrentMoveAnimation
+    ld hl,PlayCurrentMoveAnimation
+    ; fall through
+.BankswitchToF
+    ld b,$F
+    jp Bankswitch
 
 SECTION "Func_52673",ROMX[$6673],BANK[$14]
 
@@ -124157,7 +124158,7 @@ _BecameConfusedText: ; 94878 (25:4878)
     db $0,$59,$4f
     db "became confused!",$58
 
-_UnnamedText_3fa77: ; 9488c (25:488c)
+_MimicLearnedMoveText: ; 9488c (25:488c)
     db $0,$5a,$4f
     db "learned",$55
     db "@"
@@ -124166,7 +124167,7 @@ UnnamedText_94898: ; 94898 (25:4898)
     TX_RAM $cd6d
     db $0,"!",$58
 
-_UnnamedText_3fb09: ; 9489e (25:489e)
+_MoveWasDisabledText: ; 9489e (25:489e)
     db $0,$59,"'s",$4f
     db "@"
 
@@ -124178,7 +124179,7 @@ UnnamedText_948a3: ; 948a3 (25:48a3)
 _NothingHappenedText: ; 948b6 (25:48b6)
     db $0,"Nothing happened!",$58
 
-_UnnamedText_3fb49: ; 948c9 (25:48c9)
+_NoEffectText: ; 948c9 (25:48c9)
     db $0,"No effect!",$58
 
 _ButItFailedText: ; 948d5 (25:48d5)
