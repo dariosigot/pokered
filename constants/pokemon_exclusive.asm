@@ -584,7 +584,6 @@ GolduckExclusiveMove:
     db BLADE ; TM51
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db AMNESIA
     db GLARE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -850,7 +849,6 @@ SlowbroExclusiveMove:
     db TSUNAMI ; TM53
     db STRIKE ; TM54
     db FLASH ; TM55
-    db AMNESIA
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MagnemiteExclusiveMove:
@@ -1006,6 +1004,7 @@ GengarExclusiveMove:
     db EXPLOSION ; TM47
     db SUBSTITUTE ; TM50
     db ABSORB
+    db AMNESIA
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OnixExclusiveMove:
