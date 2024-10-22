@@ -1015,6 +1015,7 @@ PSYDUCK_Learnset: MACRO
     db 10,DISABLE
     db 13,CONFUSION
     db 17,PECK
+    db 19,AMNESIA
     db 21,FURY_SWIPES
     db 23,BUBBLE
     db 25,MEDITATE
@@ -1031,7 +1032,6 @@ GOLDUCK_Learnset: MACRO
     db 35,SLASH
     db 37,WATERFALL
     db 39,SONICBOOM
-    db 40,AMNESIA
     db 42,TSUNAMI
     db 44,GLARE
     db 46,LIGHT_SCREEN
@@ -1042,8 +1042,7 @@ GOLDUCK_Learnset: MACRO
     db 60,HYPER_BEAM
 ENDM
 PSYDUCK_NoEvo_Learnset: MACRO
-    db 35,AMNESIA ; Exclusive
-    db 38,GLARE ; Exclusive
+    db 36,GLARE ; Exclusive
     db 40,PAY_DAY
     db 43,SLASH
     db 48,SONICBOOM
@@ -1154,10 +1153,10 @@ POLIWHIRL_Learnset: MACRO
     db 25,KARATE_CHOP
     db 27,WATERFALL
     db 29,MEGA_PUNCH
-    db 32,STRIKE
+    db 32,AMNESIA ; Exclusive
     db 32,DOUBLE_TEAM
-    db 34,HAZE
-    db 36,AMNESIA ; Exclusive
+    db 34,STRIKE
+    db 36,HAZE
     db 40,TSUNAMI
     db 45,SUBMISSION
     db 47,CONFUSION ; Exclusive
@@ -1173,7 +1172,7 @@ POLIWRATH_Learnset: MACRO
     db 28,MEGA_PUNCH
     db 30,STRIKE
     db 32,HAZE
-    db 32,DOUBLE_TEAM
+    db 33,DOUBLE_TEAM
     db 34,SEISMIC_TOSS
     db 36,TSUNAMI
     db 39,SUBMISSION
@@ -1188,10 +1187,10 @@ POLIWRATH_Learnset: MACRO
 ENDM
 POLIWAG_NoEvo_Learnset: MACRO
     db 28,AMNESIA ; Exclusive
-    db 32,DOUBLE_TEAM
-    db 36,WATERFALL
-    db 41,CONFUSION ; Exclusive
-    db 46,HAZE
+    db 32,CONFUSION ; Exclusive
+    db 36,HAZE
+    db 41,WATERFALL
+    db 46,DOUBLE_TEAM
     db 51,TSUNAMI
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
@@ -1483,12 +1482,13 @@ SLOWPOKE_Learnset: MACRO
     db 20,MEDITATE
     db 22,KINESIS
     db 24,WATERFALL
+    db 26,AMNESIA
     db 26,REST
     db 28,HEADBUTT
     db 30,PSYBEAM
     db 32,HAZE
     db 34,BUBBLEBEAM
-    db 36,SKULL_BASH
+    db 37,SKULL_BASH
     ;  37,SLOWBRO
 ENDM
 SLOWBRO_Learnset: MACRO
@@ -1497,7 +1497,6 @@ SLOWBRO_Learnset: MACRO
     db 37,WITHDRAW
     db 40,TSUNAMI
     db 42,MIST
-    db 44,AMNESIA
     db 46,HYPNOSIS
     db 48,PSYCHIC_M
     db 52,ICE_PUNCH
@@ -1505,9 +1504,8 @@ SLOWBRO_Learnset: MACRO
     db 59,HYDRO_PUMP
 ENDM
 SLOWPOKE_NoEvo_Learnset: MACRO
-    db 40,AMNESIA ; Exclusive
-    db 45,TSUNAMI
-    db 50,MIST
+    db 42,TSUNAMI
+    db 47,MIST
     db 52,HYPNOSIS
     db 55,PSYCHIC_M
     db 60,HYDRO_PUMP
@@ -1632,6 +1630,7 @@ SEEL_Learnset: MACRO
     db 23,SKULL_BASH
     db 26,WATERFALL
     db 28,DEFENSE_CURL
+    db 29,AMNESIA
     db 30,REST
     db 33,MIST
     ;  34,DEWGONG
@@ -1648,7 +1647,7 @@ DEWGONG_Learnset: MACRO
     db 46,HYDRO_PUMP
     db 50,HORN_DRILL
     db 55,BLIZZARD
-    db 60,AMNESIA
+    db 60,SUBSTITUTE
 ENDM
 SEEL_NoEvo_Learnset: MACRO
     db 38,SCREECH ; Exclusive
@@ -1781,11 +1780,11 @@ HAUNTER_GENGAR_Learnset: MACRO
     db 42,SLUDGE
     db 44,HAZE
     db 46,PSYCHIC_M
+    db 48,AMNESIA
     db 49,TRANSFORM
     db 52,TOXIC
     db 55,ACID_ARMOR
     db 60,SUBSTITUTE
-    db 60,AMNESIA
     db 65,HYPER_BEAM
 ENDM
 HAUNTER_Learnset: MACRO
@@ -1796,10 +1795,10 @@ GENGAR_Learnset: MACRO
 ENDM
 GASTLY_NoEvo_Learnset: MACRO
     db 27,ABSORB ; Exclusive
+    db 29,AMNESIA ; Exclusive
     db 32,CONFUSION
     db 35,MIST
     db 39,REFLECT
-    db 40,AMNESIA ; Exclusive
     db 43,PSYBEAM
     db 48,HAZE
     db 53,PSYCHIC_M
@@ -2265,12 +2264,13 @@ TANGELA_Learnset: MACRO
     db 33,CONFUSION
     db 35,RAZOR_LEAF
     db 37,HAZE
+    db 39,AMNESIA
     db 40,SOLARBEAM
     db 44,PSYBEAM
     db 48,BODY_SLAM
     db 51,SWORDS_DANCE
     db 55,RECOVER
-    db 60,AMNESIA
+    db 60,TOXIC
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 KANGASKHAN_Learnset: MACRO
@@ -2838,11 +2838,11 @@ PORYGON_Learnset: MACRO
     db 35,BARRIER
     db 38,HYPNOSIS
     db 39,DREAM_EATER
-    db 41,TRI_ATTACK
-    db 40,SCREECH
-    db 44,REFLECT
+    db 41,AMNESIA
+    db 40,TRI_ATTACK
+    db 44,SCREECH
     db 47,PSYCHIC_M
-    db 51,AMNESIA
+    db 51,REFLECT
     db 55,THUNDERBOLT
     db 60,HYPER_BEAM
 ENDM
@@ -3150,24 +3150,24 @@ MEWTWO_Learnset: MACRO
     db 10,TELEPORT
     db 14,KINESIS
     db 16,PSYBEAM
-    db 18,MEDITATE
-    db 20,LIGHT_SCREEN
-    db 22,SUPERSONIC
-    db 25,PSYCHIC_M
-    db 28,SWIFT
-    db 30,RECOVER
-    db 33,HYPNOSIS
-    db 34,DREAM_EATER
-    db 38,MIST
-    db 40,SUBSTITUTE
-    db 44,BARRIER
-    db 48,NIGHT_SHADE
-    db 50,THUNDERBOLT
-    db 53,FLAMETHROWER
-    db 56,ICE_BEAM
-    db 58,SOLARBEAM
-    db 61,SELFDESTRUCT
-    db 63,AMNESIA
+    db 18,AMNESIA
+    db 20,MEDITATE
+    db 22,LIGHT_SCREEN
+    db 25,SUPERSONIC
+    db 28,PSYCHIC_M
+    db 30,SWIFT
+    db 33,RECOVER
+    db 34,HYPNOSIS
+    db 38,DREAM_EATER
+    db 40,MIST
+    db 44,SUBSTITUTE
+    db 48,BARRIER
+    db 50,NIGHT_SHADE
+    db 53,THUNDERBOLT
+    db 56,FLAMETHROWER
+    db 58,ICE_BEAM
+    db 61,SOLARBEAM
+    db 63,SELFDESTRUCT
     db 65,ROCK_SLIDE
     db 68,EARTHQUAKE
     db 70,HYPER_BEAM

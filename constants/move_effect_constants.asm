@@ -3,6 +3,7 @@
 ; {status condition}_side_effect means that the move has a side chance of causing that condition
 ; {status condition}_effect means that the move causes the status condition every time it hits the target
 NO_ADDITIONAL_EFFECT       EQU $00
+;EFFECT_01                 EQU $01
 POISON_SIDE_EFFECT1        EQU $02
 DRAIN_HP_EFFECT            EQU $03
 BURN_SIDE_EFFECT1          EQU $04
@@ -73,6 +74,7 @@ SPEED_DOWN_SIDE_EFFECT     EQU $46
 SPECIAL_DOWN_SIDE_EFFECT   EQU $47
 CONFUSION_SIDE_EFFECT      EQU $4C
 TWINEEDLE_EFFECT           EQU $4D
+AMNESIA_NEW_EFFECT         EQU $4E
 SUBSTITUTE_EFFECT          EQU $4F ; AI Layer 2
 HYPER_BEAM_EFFECT          EQU $50
 RAGE_EFFECT                EQU $51
@@ -87,7 +89,6 @@ SPEED_UP3_EFFECT           EQU $59 ; AI Layer 2
 SPECIAL_UP3_EFFECT         EQU $5A ; AI Layer 2
 ACCURACY_UP3_EFFECT        EQU $5B ; AI Layer 2
 EVASION_UP3_EFFECT         EQU $5C ; AI Layer 2
-AMNESIA_NEW_EFFECT         EQU $5D
 
 ; fixed damage constants
 SONICBOOM_DAMAGE   EQU 20
