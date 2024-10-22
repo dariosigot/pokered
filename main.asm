@@ -60473,117 +60473,116 @@ ThrashPetalDanceEffect: ; 3f717 (f:7717)
 SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr nz,.asm_3f791
+    jr nz,.handleEnemy
     ld a,[W_ISINBATTLE] ; $d057
     dec a
-    jr nz,.asm_3f77e
+    jr nz,.notWildBattle1
     ld a,[W_CURENEMYLVL] ; $d127
     ld b,a
     ld a,[W_PLAYERMONLEVEL] ; $d022
+    cp b ; is the player's level greater than the enemy's level?
+    jr nc,.playerMoveWasSuccessful ; if so, teleport will always succeed
+    add b
+    ld c,a
+    inc c ; c = playerLevel + enemyLevel + 1
+.rejectionSampleLoop1
+    call GenRandomInBattle
+    cp c ; get a random number between 0 and c
+    jr nc,.rejectionSampleLoop1
+    srl b
+    srl b ; b = enemyLevel / 4
+    cp b ; is rand[0, playerLevel + enemyLevel] >= (enemyLevel / 4)?
+    jr nc,.playerMoveWasSuccessful ; if so, allow teleporting
+    ld a,[W_PLAYERMOVENUM] ; $cfd2
+    jr .handleFailed
+.playerMoveWasSuccessful
+    call ReadPlayerMonCurHPAndStatus
+    xor a
+    ld [$cc5b],a ; AnimationType
+    inc a
+    ld [$d078],a ; EscapedFromBattle
+    ld a,[W_PLAYERMOVENUM] ; $cfd2
+    jr .playAnimAndPrintText
+.notWildBattle1
+    ld a,[W_PLAYERMOVENUM] ; $cfd2
+    cp TELEPORT
+    jp z,PrintButItFailedText_
+    call PlayCurrentMoveAnimation
+    jp PrintIsUnaffectedText
+.handleFailed
+    cp TELEPORT
+    jp z,PrintButItFailedText_
+    call PlayCurrentMoveAnimation
+    jp PrintDidntAffectText
+.handleEnemy
+    ld a,[W_ISINBATTLE] ; $d057
+    dec a
+    jr nz,.notWildBattle2
+    ld a,[W_PLAYERMONLEVEL] ; $d022
+    ld b,a
+    ld a,[W_CURENEMYLVL] ; $d127
     cp b
-    jr nc,.asm_3f76e
+    jr nc,.enemyMoveWasSuccessful
     add b
     ld c,a
     inc c
-.asm_3f751
+.rejectionSampleLoop2
     call GenRandomInBattle
     cp c
-    jr nc,.asm_3f751
+    jr nc,.rejectionSampleLoop2
     srl b
     srl b
     cp b
-    jr nc,.asm_3f76e
-    ld c,$32
-    call DelayFrames
-    ld a,[W_PLAYERMOVENUM] ; $cfd2
-    cp $64
-    jp nz,PrintDidntAffectText
-    jp PrintButItFailedText_
-.asm_3f76e
+    jr nc,.enemyMoveWasSuccessful
+    ld a,[W_ENEMYMOVENUM] ; $cfcc
+    jr .handleFailed
+.enemyMoveWasSuccessful
     call ReadPlayerMonCurHPAndStatus
     xor a
     ld [$cc5b],a
     inc a
     ld [$d078],a
-    ld a,[W_PLAYERMOVENUM] ; $cfd2
-    jr .asm_3f7e4
-.asm_3f77e
-    ld c,$32
-    call DelayFrames
-    ld hl,UnnamedText_3fb69 ; $7b69
-    ld a,[W_PLAYERMOVENUM] ; $cfd2
-    cp $64
-    jp nz,PrintText
-    jp PrintButItFailedText_
-.asm_3f791
-    ld a,[W_ISINBATTLE] ; $d057
-    dec a
-    jr nz,.asm_3f7d1
-    ld a,[W_PLAYERMONLEVEL] ; $d022
-    ld b,a
-    ld a,[W_CURENEMYLVL] ; $d127
-    cp b
-    jr nc,.asm_3f7c1
-    add b
-    ld c,a
-    inc c
-.asm_3f7a4
-    call GenRandomInBattle
-    cp c
-    jr nc,.asm_3f7a4
-    srl b
-    srl b
-    cp b
-    jr nc,.asm_3f7c1
-    ld c,$32
-    call DelayFrames
     ld a,[W_ENEMYMOVENUM] ; $cfcc
-    cp $64
-    jp nz,PrintDidntAffectText
-    jp PrintButItFailedText_
-.asm_3f7c1
-    call ReadPlayerMonCurHPAndStatus
-    xor a
-    ld [$cc5b],a
-    inc a
-    ld [$d078],a
+    jr .playAnimAndPrintText
+.notWildBattle2
     ld a,[W_ENEMYMOVENUM] ; $cfcc
-    jr .asm_3f7e4
-.asm_3f7d1
-    ld c,$32
-    call DelayFrames
-    ld hl,UnnamedText_3fb69 ; $7b69
-    ld a,[W_ENEMYMOVENUM] ; $cfcc
-    cp $64
-    jp nz,PrintText
-    jp ConditionalPrintButItFailed
-.asm_3f7e4
+    cp TELEPORT
+    jp z,ConditionalPrintButItFailed
+    call PlayCurrentMoveAnimation
+    jp PrintIsUnaffectedText
+.playAnimAndPrintText
     push af
     call PlayBattleAnimation
-    ld c,$14
+    ld c,20
     call DelayFrames
     pop af
-    ld hl,UnnamedText_3f802 ; $7802
-    cp $64
-    jr z,.asm_3f7ff
-    ld hl,UnnamedText_3f807 ; $7807
-    cp $2e
-    jr z,.asm_3f7ff
-    ld hl,UnnamedText_3f80c ; $780c
-.asm_3f7ff
+    ld hl,.RanFromBattleText
+    cp TELEPORT
+    jr z,.printText
+    ld hl,.RanAwayScaredText
+    cp ROAR
+    jr z,.printText
+    ld hl,.WasBlownAwayText
+.printText
     jp PrintText
-
-UnnamedText_3f802: ; 3f802 (f:7802)
-    TX_FAR _UnnamedText_3f802
+.RanFromBattleText
+    TX_FAR _RanFromBattleText
+    db "@"
+.RanAwayScaredText
+    TX_FAR _RanAwayScaredText
+    db "@"
+.WasBlownAwayText
+    TX_FAR _WasBlownAwayText
     db "@"
 
-UnnamedText_3f807: ; 3f807 (f:7807)
-    TX_FAR _UnnamedText_3f807
+PrintIsUnaffectedText:
+    ld hl,.IsUnaffectedText
+    jp Delay50AndPrintText
+.IsUnaffectedText
+    TX_FAR _IsUnaffectedText
     db "@"
 
-UnnamedText_3f80c: ; 3f80c (f:780c)
-    TX_FAR _UnnamedText_3f80c
-    db "@"
+SECTION "TwoToFiveAttacksEffect",ROMX[$7811],BANK[$f]
 
 TwoToFiveAttacksEffect: ; 3f811 (f:7811)
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
@@ -61066,10 +61065,6 @@ PrintDidntAffectText: ; Moved in the Bank
     jp Delay50AndPrintText
 .DidntAffectText
     TX_FAR _DidntAffectText
-    db "@"
-
-UnnamedText_3fb69: ; Moved in the Bank
-    TX_FAR _UnnamedText_3fb69
     db "@"
 
 PrintMayNotAttackText: ; Moved in the Bank
@@ -111200,8 +111195,10 @@ WingAttackAnim: ; 7a277 (1e:6277)
 
 WhirlwindAnim: ; 7a27b (1e:627b)
     db $46,$11,$10
-    db SE_SLIDE_ENEMY_MON_OUT,$FF
+    ;db SE_SLIDE_ENEMY_MON_OUT,$FF
     db $FF
+
+SECTION "FlyAnim",ROMX[$6281],BANK[$1e]
 
 FlyAnim: ; 7a281 (1e:6281)
     db $46,$12,$04
@@ -124116,15 +124113,15 @@ _GreatlyFellText: ; 947be (25:47be)
 _FellText: ; 947c9 (25:47c9)
     db $0," fell!",$58
 
-_UnnamedText_3f802: ; 947d1 (25:47d1)
+_RanFromBattleText: ; 947d1 (25:47d1)
     db $0,$5a,$4f
     db "ran from battle!",$58
 
-_UnnamedText_3f807: ; 947e5 (25:47e5)
+_RanAwayScaredText: ; 947e5 (25:47e5)
     db $0,$59,$4f
     db "ran away scared!",$58
 
-_UnnamedText_3f80c: ; 947f9 (25:47f9)
+_WasBlownAwayText: ; 947f9 (25:47f9)
     db $0,$59,$4f
     db "was blown away!",$58
 
@@ -124190,7 +124187,7 @@ _DidntAffectText: ; 948e7 (25:48e7)
     db $0,"It didn't affect",$4f
     db $59,"!",$58
 
-_UnnamedText_3fb69: ; 948fb (25:48fb)
+_IsUnaffectedText: ; 948fb (25:48fb)
     db $0,$59,$4f
     db "is unaffected!",$58
 
