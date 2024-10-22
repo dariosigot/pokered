@@ -50662,39 +50662,40 @@ UnnamedText_3bb92: ; Moved in the Bank
     TX_FAR _UnnamedText_3bb92
     db "@"
 
-Func_3bb97: ; Moved in the Bank
+ReflectLightScreenEffect_: ; Moved in the Bank
+    ld hl,PlayCurrentMoveAnimation ; $7ba8
+    call BankswitchEtoF
     ld hl,W_PLAYERBATTSTATUS3 ; $d064
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_3bba8
+    jr z,.done
     ld hl,W_ENEMYBATTSTATUS3 ; $d069
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
-.asm_3bba8
+.done
     ld a,[de]
-    cp $40
-    jr nz,.asm_3bbb8
-    bit 1,[hl]
-    jr nz,.asm_3bbcc
-    set 1,[hl]
-    ld hl,UnnamedText_3bbd7 ; $7bd7
-    jr .asm_3bbc1
-.asm_3bbb8
-    bit 2,[hl]
-    jr nz,.asm_3bbcc
-    set 2,[hl]
-    ld hl,UnnamedText_3bbdc ; $7bdc
-.asm_3bbc1
-    push hl
-    ld hl,PlayCurrentMoveAnimation ; $7ba8
-    call BankswitchEtoF
-    pop hl
+    cp LIGHT_SCREEN_EFFECT
+    jr nz,.reflect
+    bit 1,[hl] ; HAS_LIGHT_SCREEN_UP ; is mon already protected by light screen?
+    jr nz,.moveFailed
+    set 1,[hl] ; mon is now protected by light screen
+    ld hl,LightScreenProtectedText ; $7bd7
+    jr .PrintText
+.reflect
+    bit 2,[hl] ; HAS_REFLECT_UP ; is mon already protected by reflect?
+    jr nz,.moveFailed
+    set 2,[hl] ; mon is now protected by reflect
+    ld hl,ReflectGainedArmorText ; $7bdc
+.PrintText
     jp PrintText
-.asm_3bbcc
-    ld c,$32
+.moveFailed
+    ld c,50
     call DelayFrames
-    ld hl,PrintButItFailedText_ ; $7b53
-    jp BankswitchEtoF
+    ld hl,.AlreadyProtectedText
+    jr .PrintText
+.AlreadyProtectedText
+    TX_FAR _AlreadyProtectedText
+    db "@"
 
 TryEvolvingMon: ; Moved in the Bank
     ld hl,$ccd3
@@ -50942,12 +50943,12 @@ nextEvoEntry2: ; Moved in the Bank
     inc hl
     jp TryEvolution
 
-UnnamedText_3bbd7: ; Moved in the Bank
-    TX_FAR _UnnamedText_3bbd7
+LightScreenProtectedText: ; Moved in the Bank
+    TX_FAR _LightScreenProtectedText
     db "@"
 
-UnnamedText_3bbdc: ; Moved in the Bank
-    TX_FAR _UnnamedText_3bbdc
+ReflectGainedArmorText: ; Moved in the Bank
+    TX_FAR _ReflectGainedArmorText
     db "@"
 
 BankswitchEtoF: ; Moved in the Bank
@@ -54672,8 +54673,8 @@ HalvePlayerSpeedAfterRun:
     ret
 
 ReflectLightScreenEffect: ; Moved in the Bank
-    ld hl,Func_3bb97
-    ld b,BANK(Func_3bb97)
+    ld hl,ReflectLightScreenEffect_
+    ld b,BANK(ReflectLightScreenEffect_)
     jp Bankswitch
 
 HackBackSpriteAccess:
@@ -124262,12 +124263,12 @@ UnnamedText_94a81: ; 94a81 (25:4a81)
     TX_RAM $cd6d
     db $0,"!",$58
 
-_UnnamedText_3bbd7: ; 94a87 (25:4a87)
+_LightScreenProtectedText: ; 94a87 (25:4a87)
     db $0,$5a,"'s",$4f
     db "protected against",$55
     db "special attacks!",$58
 
-_UnnamedText_3bbdc: ; 94aae (25:4aae)
+_ReflectGainedArmorText: ; 94aae (25:4aae)
     db $0,$5a,$4f
     db "gained armor!",$58
 
@@ -125107,6 +125108,11 @@ _MistAlreadyInUseText:
 _FocusEnergyAlreadyInUseText:
     db $0,$5a,"'s",$4f
     db "already pumped!",$58
+
+_AlreadyProtectedText:
+    db $0,$5a,"'s",$4f
+    db "already",$55
+    db "protected!",$58
 
 SECTION "bank26",ROMX,BANK[$26]
 
