@@ -47108,31 +47108,29 @@ CooltrainerMName: ; 27f6c (9:7f6c)
 CooltrainerFName: ; 27f79 (9:7f79)
     db "COOLTRAINER♀@"
 
-Func_27f86: ; 27f86 (9:7f86)
+FocusEnergyEffect_: ; 27f86 (9:7f86)
+    ld hl,PlayCurrentMoveAnimation
+    ld b,BANK(PlayCurrentMoveAnimation)
+    call Bankswitch
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_27f91
+    jr z,.done
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
-.asm_27f91
+.done
     bit 2,[hl]
-    jr nz,.asm_27fa5
     set 2,[hl]
-    ld hl,PlayCurrentMoveAnimation
-    ld b,BANK(PlayCurrentMoveAnimation)
-    call Bankswitch ; indirect jump to PlayCurrentMoveAnimation (3fba8 (f:7ba8))
-    ld hl,UnnamedText_27fb3 ; $7fb2
+    ld hl,.FocusEnergyAlreadyInUseText
+    jr nz,.Print
+    ld hl,.GettingPumpedText
+.Print
     jp PrintText
-.asm_27fa5
-    ld c,$32
-    call DelayFrames
-    ld hl,PrintButItFailedText_
-    ld b,BANK(PrintButItFailedText_)
-    jp Bankswitch ; indirect jump to PrintButItFailedText_ (3fb53 (f:7b53))
-
-UnnamedText_27fb3: ; 27fb3 (9:7fb3)
+.GettingPumpedText
     db $0a
-    TX_FAR _UnnamedText_27fb3
+    TX_FAR _GettingPumpedText
+    db "@"
+.FocusEnergyAlreadyInUseText
+    TX_FAR _FocusEnergyAlreadyInUseText
     db "@"
 
 TypeNamePointers:
@@ -60774,8 +60772,8 @@ MistEffect: ; 3f941 (f:7941)
     jp Bankswitch
 
 FocusEnergyEffect: ; 3f949 (f:7949)
-    ld hl,Func_27f86
-    ld b,BANK(Func_27f86)
+    ld hl,FocusEnergyEffect_
+    ld b,BANK(FocusEnergyEffect_)
     jp Bankswitch
 
 RecoilEffect: ; 3f951 (f:7951)
@@ -124215,7 +124213,7 @@ _UnnamedText_2ff04: ; 9497e (25:497e)
     db $0,"Coins scattered",$4f
     db "everywhere!",$58
 
-_UnnamedText_27fb3: ; 9499b (25:499b)
+_GettingPumpedText: ; 9499b (25:499b)
     db $0,$5a,"'s",$4f
     db "getting pumped!",$58
 
@@ -125104,6 +125102,10 @@ _AlreadyStatusedText:
 _MistAlreadyInUseText:
     db $0,$5a,"'s",$4f
     db "already in mist!",$58
+
+_FocusEnergyAlreadyInUseText:
+    db $0,$5a,"'s",$4f
+    db "already pumped!",$58
 
 SECTION "bank26",ROMX,BANK[$26]
 
