@@ -18502,13 +18502,17 @@ HandleMenuInput_PrintMoveBox:
     call CheckMoveRelearn
     jr z,.skip
     ; Energy
-    ld de,$cfb5
-    FuncCoord 15,13
-    ld hl,Coord
-    ld bc,$0103
-    call PrintNumber
-    ld de,.EnergyIcon
-    call PlaceString
+    ld hl,WriteEnergyAllMovesDuringMoveRelearn
+    ld b,BANK(WriteEnergyAllMovesDuringMoveRelearn)
+    call Bankswitch
+    ; Energy
+    ;ld de,$cfb5
+    ;FuncCoord 15,13
+    ;ld hl,Coord
+    ;ld bc,$0103
+    ;call PrintNumber
+    ;ld de,.EnergyIcon
+    ;call PlaceString
     ; Print Move Details Box (Move Relearner)
     FuncCoord 09,05
     ld de,Coord
@@ -18531,8 +18535,8 @@ HandleMenuInput_PrintMoveBox:
     ld a,b
     ret z
     jr HandleMenuInput_PrintMoveBox
-.EnergyIcon
-    db $DA,"@"
+;.EnergyIcon
+;    db $DA,"@"
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $01)
@@ -42921,6 +42925,7 @@ MovesMenu:
 
     ; Get Actual Moves and Mon Potential Move List in wMoveRelearnerMoveList
     call LoadMonDataAndPrintActualMoves
+    call WriteEnergyAllMovesDuringMoveRelearn
     call GetMonPotentialMoveList
 
     ; Check at least one move
@@ -42988,6 +42993,7 @@ MovesMenu:
     and a
     jr z,.Retry
     call LoadMonDataAndPrintActualMoves
+    call WriteEnergyAllMovesDuringMoveRelearn
     jr .Retry
 
 .MoveJustKnown
@@ -43093,13 +43099,57 @@ LoadMonDataAndPrintActualMoves:
     res 2,a
     ld [$FF00+$f6],a
     ; Energy
-    ld de,$cfb5
+    ;ld de,$cfb5
+    ;FuncCoord 15,13
+    ;ld hl,Coord
+    ;ld bc,$0103
+    ;call PrintNumber
+    ;ld de,.EnergyIcon
+    ;call PlaceString
+    ret
+;.EnergyIcon
+;    db $DA,"@"
+
+WriteEnergyAllMovesDuringMoveRelearn:
+    ld a,$4
+    ld [$cc49],a
+    ld d,4
+.Loop4Moves
+    push de
+    ld c,d
+    dec c
+    ld hl,$cfa0 ; Moves
+    ld b,0
+    add hl,bc
+    ld a,[hl]
+    and a
+    jr z,.SkipCurrentMove
+    push bc
+    ; Get Current Move
+    dec a
+    ld hl,Moves+5 ; Move Energy
+    ld bc,6
+    call AddNTimes
+    ld a,BANK(Moves)
+    ld de,W_PLAYERMOVEMAXPP ; Energy
+    ld bc,1
+    call FarCopyData
+    ; Print Current Energy
+    pop bc
+    ld a,c
     FuncCoord 15,13
     ld hl,Coord
+    ld bc,20
+    call AddNTimes
+    ld de,W_PLAYERMOVEMAXPP ; Energy
     ld bc,$0103
     call PrintNumber
     ld de,.EnergyIcon
     call PlaceString
+.SkipCurrentMove
+    pop de
+    dec d
+    jr nz,.Loop4Moves
     ret
 .EnergyIcon
     db $DA,"@"
@@ -43524,6 +43574,7 @@ SortMoves:
     ld a,b
     ld [de],a
     call LoadMonDataAndPrintActualMoves
+    call WriteEnergyAllMovesDuringMoveRelearn
     ld a,1
     and a
     jr .ResetAndLoop
