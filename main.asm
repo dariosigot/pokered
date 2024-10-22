@@ -57948,13 +57948,13 @@ MoveHitTest: ; 3e56b (f:656b)
 .playerTurn
 ; this checks if the move effect is disallowed by mist
     ld a,[W_PLAYERMOVEEFFECT]
-    cp a,$12
+    cp a,ATTACK_DOWN1_EFFECT
     jr c,.skipEnemyMistCheck
-    cp a,$1a
+    cp a,HAZE_EFFECT+1
     jr c,.enemyMistCheck
-    cp a,$3a
+    cp a,ATTACK_DOWN2_EFFECT
     jr c,.skipEnemyMistCheck
-    cp a,$42
+    cp a,REFLECT_EFFECT+1
     jr c,.enemyMistCheck
     jr .skipEnemyMistCheck
 .enemyMistCheck
@@ -57966,32 +57966,32 @@ MoveHitTest: ; 3e56b (f:656b)
 ; function is not called when those moves are used
 ; XXX are there are any others like those three?
     ld a,[W_ENEMYBATTSTATUS2]
-    bit 1,a
+    bit 1,a ; PROTECTED_BY_MIST
     jp nz,.moveMissed
 .skipEnemyMistCheck
     ld a,[W_PLAYERBATTSTATUS2]
-    bit 0,a ; is the player using X Accuracy?
+    bit 0,a ; USING_X_ACCURACY ; is the player using X Accuracy?
     ret nz ; if so,always hit regardless of accuracy/evasion
     jr .calcHitChance
 .enemyTurn
     ld a,[W_ENEMYMOVEEFFECT]
-    cp a,$12
+    cp a,ATTACK_DOWN1_EFFECT
     jr c,.skipPlayerMistCheck
-    cp a,$1a
+    cp a,HAZE_EFFECT+1
     jr c,.playerMistCheck
-    cp a,$3a
+    cp a,ATTACK_DOWN2_EFFECT
     jr c,.skipPlayerMistCheck
-    cp a,$42
+    cp aREFLECT_EFFECT+1
     jr c,.playerMistCheck
     jr .skipPlayerMistCheck
 .playerMistCheck
 ; similar to enemy mist check
     ld a,[W_PLAYERBATTSTATUS2]
-    bit 1,a
+    bit 1,a ; PROTECTED_BY_MIST
     jp nz,.moveMissed
 .skipPlayerMistCheck
     ld a,[W_ENEMYBATTSTATUS2]
-    bit 0,a ; is the enemy using X Accuracy?
+    bit 0,a ; USING_X_ACCURACY ; is the enemy using X Accuracy?
     ret nz ; if so,always hit regardless of accuracy/evasion
 .calcHitChance
     call CalcHitChance ; scale the move accuracy according to attacker's accuracy and target's evasion
