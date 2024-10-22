@@ -47743,31 +47743,33 @@ ClefablePicFront: ; 3288c (c:688c)
 ClefablePicBack: ; 329b8 (c:69b8)
     INCBIN "pic/monback/clefableb.pic"
 
-SECTION "Func_33f2b",ROMX[$7f2b],BANK[$C]
+SECTION "MistEffect_",ROMX[$7f2b],BANK[$C]
 
-Func_33f2b: ; 33f2b (c:7f2b)
-    ld hl,$d063
-    ld a,[$ff00+$f3]
-    and a
-    jr z,.asm_33f36
-    ld hl,$d068
-.asm_33f36
-    bit 1,[hl]
-    jr nz,.asm_33f4a
-    set 1,[hl]
+MistEffect_: ; 33f2b (c:7f2b)
     ld hl,PlayCurrentMoveAnimation
     ld b,BANK(PlayCurrentMoveAnimation)
     call Bankswitch
-    ld hl,UnnamedText_33f52
+    ld hl,W_PLAYERBATTSTATUS2
+    ld a,[H_WHOSETURN]
+    and a
+    jr z,.done
+    ld hl,W_ENEMYBATTSTATUS2
+.done
+    bit 1,[hl] ; PROTECTED_BY_MIST ; is mon protected by mist?
+    set 1,[hl] ; mon is now protected by mist
+    ld hl,.MistAlreadyInUseText
+    jr nz,.Print
+    ld hl,.ShroudedInMistText
+.Print
     jp PrintText
-.asm_33f4a
-    ld hl,PrintButItFailedText_
-    ld b,BANK(PrintButItFailedText_)
-    jp Bankswitch
-
-UnnamedText_33f52: ; 33f52 (c:7f52)
-    TX_FAR _UnnamedText_33f52
+.ShroudedInMistText
+    TX_FAR _ShroudedInMistText
     db "@"
+.MistAlreadyInUseText
+    TX_FAR _MistAlreadyInUseText
+    db "@"
+
+SECTION "Func_33f57",ROMX[$7f57],BANK[$c]
 
 Func_33f57: ; 33f57 (c:7f57)
     ld hl,W_DAMAGE ; $d0d7
@@ -60767,8 +60769,8 @@ PrintAlreadyStatusedText:
 SECTION "MistEffect",ROMX[$7941],BANK[$f]
 
 MistEffect: ; 3f941 (f:7941)
-    ld hl,Func_33f2b
-    ld b,BANK(Func_33f2b)
+    ld hl,MistEffect_
+    ld b,BANK(MistEffect_)
     jp Bankswitch
 
 FocusEnergyEffect: ; 3f949 (f:7949)
@@ -124270,7 +124272,7 @@ _UnnamedText_3bbdc: ; 94aae (25:4aae)
     db $0,$5a,$4f
     db "gained armor!",$58
 
-_UnnamedText_33f52: ; 94abf (25:4abf)
+_ShroudedInMistText: ; 94abf (25:4abf)
     db $0,$5a,"'s",$4f
     db "shrouded in mist!",$58
 
@@ -125098,6 +125100,10 @@ _WasJustSeededText:
 _AlreadyStatusedText:
     db $0,$59,$4f
     db "already statused!",$58
+
+_MistAlreadyInUseText:
+    db $0,$5a,"'s",$4f
+    db "already in mist!",$58
 
 SECTION "bank26",ROMX,BANK[$26]
 
