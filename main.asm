@@ -49312,16 +49312,16 @@ Func_39707: ; 39707 (e:5707)
     pop hl
     ret
 
-UnnamedText_3baa2: ; Moved in the Bank
-    TX_FAR _UnnamedText_3baa2
+StartedSleepingEffect: ; Moved in the Bank
+    TX_FAR _StartedSleepingEffect
     db "@"
 
-UnnamedText_3baa7: ; Moved in the Bank
-    TX_FAR _UnnamedText_3baa7
+FellAsleepBecameHealthyText: ; Moved in the Bank
+    TX_FAR _FellAsleepBecameHealthyText
     db "@"
 
-UnnamedText_3baac: ; Moved in the Bank
-    TX_FAR _UnnamedText_3baac
+RegainedHealthText: ; Moved in the Bank
+    TX_FAR _RegainedHealthText
     db "@"
 
 Func_3bb7d: ; Moved in the Bank
@@ -49336,9 +49336,7 @@ Func_3bb7d: ; Moved in the Bank
     ld bc,$8
     jp CopyData
 
-Func_3ba97: ; Moved in the Bank
-    ld c,$32
-    call DelayFrames
+HealFailed: ; Moved in the Bank
     ld hl,PrintButItFailedText_
     jp BankswitchEtoF
 
@@ -51478,61 +51476,64 @@ WriteMonMoves: ; Moved in the Bank
     pop hl
     ret
 
-Func_3b9ec: ; Moved Upper in the Bank
+HealEffect_: ; Moved Upper in the Bank
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld de,W_PLAYERMONCURHP ; $d015
     ld hl,W_PLAYERMONMAXHP ; $d023
     ld a,[W_PLAYERMOVENUM] ; $cfd2
-    jr z,.asm_3ba03
+    jr z,.done
     ld de,W_ENEMYMONCURHP ; $cfe6
     ld hl,W_ENEMYMONMAXHP ; $cff4
     ld a,[W_ENEMYMOVENUM] ; $cfcc
-.asm_3ba03
+.done
     ld b,a
     ld a,[de]
-    cp [hl]
+    cp [hl] ; most significant bytes comparison is ignored
+            ; causes the move to miss if max HP is 255 or 511 points higher than the current HP
     inc de
     inc hl
     ld a,[de]
     sbc [hl]
-    jp z,Func_3ba97
+    jp z,HealFailed ; no effect if user's HP is already at its maximum
     ld a,b
-    cp $9c
-    jr nz,.asm_3ba37
+    cp REST
+    jr nz,.healHP
     push hl
     push de
     push af
-    ld c,$32
+    ld c,50
     call DelayFrames
     ld hl,W_PLAYERMONSTATUS ; $d018
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr z,.asm_3ba25
+    jr z,.restEffect
     ld hl,W_ENEMYMONSTATUS ; $cfe9
-.asm_3ba25
+.restEffect
     ld a,[hl]
     and a
-    ld [hl],$2
-    ld hl,UnnamedText_3baa2 ; $7aa2
-    jr z,.asm_3ba31
-    ld hl,UnnamedText_3baa7 ; $7aa7
-.asm_3ba31
+    ld [hl],2 ; clear status and set number of turns asleep to 2
+    ld hl,StartedSleepingEffect
+    jr z,.printRestText
+    ld hl,FellAsleepBecameHealthyText ; if mon had an status
+.printRestText
     call PrintText
     pop af
     pop de
     pop hl
-.asm_3ba37
+.healHP
     ld a,[hld]
     ld [wHPBarMaxHP],a
     ld c,a
     ld a,[hl]
     ld [wHPBarMaxHP+1],a
     ld b,a
-    jr z,.asm_3ba47
+    jr z,.gotHPAmountToHeal
+; Recover and Softboiled only heal for half the mon's max HP
     srl b
     rr c
-.asm_3ba47
+.gotHPAmountToHeal
+; update HP
     ; ────────────
     push hl
     push de
@@ -51564,7 +51565,7 @@ Func_3b9ec: ; Moved Upper in the Bank
     dec hl
     ld a,[de]
     sbc [hl]
-    jr c,.asm_3ba6f
+    jr c,.playAnim
     ld a,[hli]
     ld [de],a
     ld [wHPBarNewHP+1],a
@@ -51572,7 +51573,7 @@ Func_3b9ec: ; Moved Upper in the Bank
     ld a,[hl]
     ld [de],a
     ld [wHPBarNewHP],a
-.asm_3ba6f
+.playAnim
     ld hl,PlayCurrentMoveAnimation ; $7ba8
     call BankswitchEtoF
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -51580,17 +51581,17 @@ Func_3b9ec: ; Moved Upper in the Bank
     FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord
     ld a,$1
-    jr z,.asm_3ba83
+    jr z,.updateHPBar
     FuncCoord 02,02 ; Enemy Bar in Battle
     ld hl,Coord
     xor a
-.asm_3ba83
+.updateHPBar
     ld [wListMenuID],a ; $cf94
     ld a,$48
     call Predef ; UpdateHPBar
     ld hl,DrawHUDsAndHPBars ; $4d5a
     call BankswitchEtoF
-    ld hl,UnnamedText_3baac ; $7aac
+    ld hl,RegainedHealthText ; $7aac
     jp PrintText
 
 TransformEffect_: ; Moved Upper in the Bank
@@ -55405,8 +55406,8 @@ SelectEnemyMove: ; Moved in the Bank
     jr .done
 
 HealEffect: ; Moved in the Bank
-    ld hl,Func_3b9ec
-    ld b,BANK(Func_3b9ec)
+    ld hl,HealEffect_
+    ld b,BANK(HealEffect_)
     jp Bankswitch
 
 TransformEffect: ; Moved in the Bank
@@ -124239,16 +124240,16 @@ _UnnamedText_13a53: ; 949fc (25:49fc)
     db $0,"All STATUS changes",$4f
     db "are eliminated!",$58
 
-_UnnamedText_3baa2: ; 94a20 (25:4a20)
+_StartedSleepingEffect: ; 94a20 (25:4a20)
     db $0,$5a,$4f
     db "started sleeping!",$57
 
-_UnnamedText_3baa7: ; 94a35 (25:4a35)
+_FellAsleepBecameHealthyText: ; 94a35 (25:4a35)
     db $0,$5a,$4f
     db "fell asleep and",$55
     db "became healthy!",$57
 
-_UnnamedText_3baac: ; 94a58 (25:4a58)
+_RegainedHealthText: ; 94a58 (25:4a58)
     db $0,$5a,$4f
     db "regained health!",$58
 
