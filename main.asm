@@ -57903,8 +57903,6 @@ GetDefaultAmnesiaEnv:
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
     ret
 
-; Free
-
 SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
 
 ; some tests that need to pass for a move to hit
@@ -57948,13 +57946,13 @@ MoveHitTest: ; 3e56b (f:656b)
 .playerTurn
 ; this checks if the move effect is disallowed by mist
     ld a,[W_PLAYERMOVEEFFECT]
-    cp a,ATTACK_DOWN1_EFFECT
+    cp ATTACK_DOWN1_EFFECT
     jr c,.skipEnemyMistCheck
-    cp a,HAZE_EFFECT+1
+    cp HAZE_EFFECT+1
     jr c,.enemyMistCheck
-    cp a,ATTACK_DOWN2_EFFECT
+    cp ATTACK_DOWN2_EFFECT
     jr c,.skipEnemyMistCheck
-    cp a,REFLECT_EFFECT+1
+    cp REFLECT_EFFECT+1
     jr c,.enemyMistCheck
     jr .skipEnemyMistCheck
 .enemyMistCheck
@@ -57975,13 +57973,13 @@ MoveHitTest: ; 3e56b (f:656b)
     jr .calcHitChance
 .enemyTurn
     ld a,[W_ENEMYMOVEEFFECT]
-    cp a,ATTACK_DOWN1_EFFECT
+    cp ATTACK_DOWN1_EFFECT
     jr c,.skipPlayerMistCheck
-    cp a,HAZE_EFFECT+1
+    cp HAZE_EFFECT+1
     jr c,.playerMistCheck
-    cp a,ATTACK_DOWN2_EFFECT
+    cp ATTACK_DOWN2_EFFECT
     jr c,.skipPlayerMistCheck
-    cp aREFLECT_EFFECT+1
+    cp REFLECT_EFFECT+1
     jr c,.playerMistCheck
     jr .skipPlayerMistCheck
 .playerMistCheck
@@ -60461,19 +60459,19 @@ StatsTextStrings: ; 3f69f (f:769f)
 
 StatModifierRatios: ; 3f6cb (f:76cb)
 ; first byte is numerator,second byte is denominator
-    db 25,100  ; 0.25
-    db 28,100  ; 0.28
-    db 33,100  ; 0.33
-    db 40,100  ; 0.40
-    db 50,100  ; 0.50
-    db 66,100  ; 0.66
-    db  1,1  ; 1.00
-    db 15,10  ; 1.50
-    db  2,1  ; 2.00
-    db 25,10  ; 2.50
-    db  3,1  ; 3.00
-    db 35,10  ; 3.50
-    db  4,1  ; 4.00
+    db 025,100  ; 0.25
+    db 028,100  ; 0.28
+    db 033,100  ; 0.33
+    db 040,100  ; 0.40
+    db 050,100  ; 0.50
+    db 066,100  ; 0.66
+    db 001,001  ; 1.00
+    db 015,010  ; 1.50
+    db 002,001  ; 2.00
+    db 025,010  ; 2.50
+    db 003,001  ; 3.00
+    db 035,010  ; 3.50
+    db 004,001  ; 4.00
 
 BideEffect: ; 3f6e5 (f:76e5)
     ld hl,W_PLAYERBATTSTATUS1
@@ -60813,8 +60811,6 @@ PrintAlreadyStatusedText:
 .AlreadyStatusedText
     TX_FAR _AlreadyStatusedText
     db "@"
-
-; Free
 
 SECTION "MistEffect",ROMX[$7941],BANK[$f]
 
@@ -61553,153 +61549,10 @@ CalcEXPBarPixelLength:
     ld a,$40
     ld [H_QUOTIENT + 3],a
     ret
-
 .start
-    ; get the base exp needed for the current level
-    ld a,[W_PLAYERBATTSTATUS3]
-    ld hl,W_PLAYERMONID
-    bit 3,a
-    jr z,.skip
-    ld hl,W_PARTYMON1_NUM
-    call BattleMonPartyAttr
-.skip
-    ld a,[hl]
-    ld [$d0b5],a
-    call GetMonHeader
-    ld a,[W_PLAYERMONLEVEL]
-    ld d,a
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
-    ld hl,H_MULTIPLICAND
-    ld de,wEXPBarBaseEXP
-    ld a,[hli]
-    ld [de],a
-    inc de
-    ld a,[hli]
-    ld [de],a
-    inc de
-    ld a,[hl]
-    ld [de],a
-
-    ; get the exp needed to gain a level
-    ld a,[W_PLAYERMONLEVEL]
-    ld d,a
-    inc d
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
-
-    ; get the address of the active Pokemon's current experience
-    ld hl,W_PARTYMON1_EXP
-    call BattleMonPartyAttr
-
-    ; current exp - base exp
-    ld b,h
-    ld c,l
-    ld hl,wEXPBarBaseEXP
-    ld de,wEXPBarCurEXP
-    call SubThreeByteNum
-
-    ; exp needed - base exp
-    ld bc,H_MULTIPLICAND
-    ld hl,wEXPBarBaseEXP
-    ld de,wEXPBarNeededEXP
-    call SubThreeByteNum
-
-    ; make the divisor an 8-bit number
-    ld hl,wEXPBarNeededEXP
-    ld de,wEXPBarCurEXP + 1
-    ld a,[hli]
-    and a
-    jr z,.twoBytes
-    ld a,[hli]
-    ld [hld],a
-    dec hl
-    ld a,[hli]
-    ld [hld],a
-    ld a,[de]
-    inc de
-    ld [de],a
-    dec de
-    dec de
-    ld a,[de]
-    inc de
-    ld [de],a
-    dec de
-    xor a
-    ld [hli],a
-    ld [de],a
-    inc de
-.twoBytes
-    ld a,[hl]
-    and a
-    jr z,.oneByte
-    srl a
-    ld [hli],a
-    ld a,[hl]
-    rr a
-    ld [hld],a
-    ld a,[de]
-    srl a
-    ld [de],a
-    inc de
-    ld a,[de]
-    rr a
-    ld [de],a
-    dec de
-    jr .twoBytes
-.oneByte
-
-    ; current exp * (8 tiles * 8 pixels)
-    ld hl,H_MULTIPLICAND
-    ld de,wEXPBarCurEXP
-    ld a,[de]
-    inc de
-    ld [hli],a
-    ld a,[de]
-    inc de
-    ld [hli],a
-    ld a,[de]
-    ld [hl],a
-    ld a,$40
-    ld [H_MULTIPLIER],a
-    call Multiply
-
-    ; product / needed exp = pixel length
-    ld a,[wEXPBarNeededEXP + 2]
-    ld [H_DIVISOR],a
-    ld b,$04
-    jp Divide
-
-; calculates the three byte number starting at [bc]
-; minus the three byte number starting at [hl]
-; and stores it into the three bytes starting at [de]
-; assumes that [hl] is smaller than [bc]
-SubThreeByteNum:
-    call .subByte
-    call .subByte
-.subByte
-    ld a,[bc]
-    inc bc
-    sub [hl]
-    inc hl
-    ld [de],a
-    jr nc,.noCarry
-    dec de
-    ld a,[de]
-    dec a
-    ld [de],a
-    inc de
-.noCarry
-    inc de
-    ret
-
-; return the address of the BattleMon's party struct attribute in hl
-BattleMonPartyAttr:
-    ld a,[wPlayerMonNumber]
-    ld bc,W_PARTYMON2DATA - W_PARTYMON1DATA
-    jp AddNTimes
+    ld hl,CalcEXPBarPixelLength_
+    ld b,BANK(CalcEXPBarPixelLength_)
+    jp Bankswitch
 
 ForceShinyOrRandom:
     call GenRandomInBattle
@@ -135733,135 +135586,14 @@ PrintEXPBar_StatusScreen:
     jr .loop2
 
 CalcEXPBarPixelLength_StatusScreen:
-
     ; get the base exp needed for the current level
     ld a,[$cfb9] ; Level
-    ld d,a
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
-    ld hl,H_MULTIPLICAND
-    ld de,wEXPBarBaseEXP
-    ld a,[hli]
-    ld [de],a
-    inc de
-    ld a,[hli]
-    ld [de],a
-    inc de
-    ld a,[hl]
-    ld [de],a
-
+    call CalcEXPBarPixelLength_.Start
     ; get the exp needed to gain a level
-    ld a,[$cfb9] ; Level
-    ld d,a
-    inc d
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
-
+    call GetTheExpNeededToGainALevel
     ; get the address of the active Pokemon's current experience
     ld hl,$cfa6
-
-    ; current exp - base exp
-    ld b,h
-    ld c,l
-    ld hl,wEXPBarBaseEXP
-    ld de,wEXPBarCurEXP
-    call SubThreeByteNum_StatusScreen
-
-    ; exp needed - base exp
-    ld bc,H_MULTIPLICAND
-    ld hl,wEXPBarBaseEXP
-    ld de,wEXPBarNeededEXP
-    call SubThreeByteNum_StatusScreen
-
-    ; make the divisor an 8-bit number
-    ld hl,wEXPBarNeededEXP
-    ld de,wEXPBarCurEXP + 1
-    ld a,[hli]
-    and a
-    jr z,.twoBytes
-    ld a,[hli]
-    ld [hld],a
-    dec hl
-    ld a,[hli]
-    ld [hld],a
-    ld a,[de]
-    inc de
-    ld [de],a
-    dec de
-    dec de
-    ld a,[de]
-    inc de
-    ld [de],a
-    dec de
-    xor a
-    ld [hli],a
-    ld [de],a
-    inc de
-.twoBytes
-    ld a,[hl]
-    and a
-    jr z,.oneByte
-    srl a
-    ld [hli],a
-    ld a,[hl]
-    rr a
-    ld [hld],a
-    ld a,[de]
-    srl a
-    ld [de],a
-    inc de
-    ld a,[de]
-    rr a
-    ld [de],a
-    dec de
-    jr .twoBytes
-.oneByte
-
-    ; current exp * (8 tiles * 8 pixels)
-    ld hl,H_MULTIPLICAND
-    ld de,wEXPBarCurEXP
-    ld a,[de]
-    inc de
-    ld [hli],a
-    ld a,[de]
-    inc de
-    ld [hli],a
-    ld a,[de]
-    ld [hl],a
-    ld a,$40
-    ld [H_MULTIPLIER],a
-    call Multiply
-
-    ; product / needed exp = pixel length
-    ld a,[wEXPBarNeededEXP + 2]
-    ld [H_DIVISOR],a
-    ld b,$04
-    jp Divide
-
-; calculates the three byte number starting at [bc]
-; minus the three byte number starting at [hl]
-; and stores it into the three bytes starting at [de]
-; assumes that [hl] is smaller than [bc]
-SubThreeByteNum_StatusScreen:
-    call .subByte
-    call .subByte
-.subByte
-    ld a,[bc]
-    inc bc
-    sub [hl]
-    inc hl
-    ld [de],a
-    jr nc,.noCarry
-    dec de
-    ld a,[de]
-    dec a
-    ld [de],a
-    inc de
-.noCarry
-    inc de
-    ret
+    jp CalcEXPBarPixelLength_.Common
 
 FontGraphics:
     INCBIN "gfx/font.2bpp"
@@ -137981,6 +137713,168 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_:
     ld [H_WHOSETURN],a                    ; store the normal turn
     pop de                                ; restore de from the stack
     ret                                   ; remember to return
+
+; ──────────────────────────────────────────────────────────────────────
+; CalcEXPBarPixelLength_
+; ──────────────────────────────────────────────────────────────────────
+
+CalcEXPBarPixelLength_:
+; get the base exp needed for the current level
+    ld a,[W_PLAYERBATTSTATUS3]
+    ld hl,W_PLAYERMONID
+    bit 3,a
+    jr z,.skip
+    ld hl,W_PARTYMON1_NUM
+    call BattleMonPartyAttr
+.skip
+    ld a,[hl]
+    ld [$d0b5],a
+    call GetMonHeader
+    ld a,[W_PLAYERMONLEVEL]
+    call CalcEXPBarPixelLength_.Start
+
+    ; get the exp needed to gain a level
+    call GetTheExpNeededToGainALevel
+
+    ; get the address of the active Pokemon's current experience
+    ld hl,W_PARTYMON1_EXP
+    call BattleMonPartyAttr
+
+CalcEXPBarPixelLength_.Common:
+
+    ; current exp - base exp
+    ld b,h
+    ld c,l
+    ld hl,wEXPBarBaseEXP
+    ld de,wEXPBarCurEXP
+    call SubThreeByteNum
+
+    ; exp needed - base exp
+    ld bc,H_MULTIPLICAND
+    ld hl,wEXPBarBaseEXP
+    ld de,wEXPBarNeededEXP
+    call SubThreeByteNum
+
+    ; make the divisor an 8-bit number
+    ld hl,wEXPBarNeededEXP
+    ld de,wEXPBarCurEXP + 1
+    ld a,[hli]
+    and a
+    jr z,.twoBytes
+    ld a,[hli]
+    ld [hld],a
+    dec hl
+    ld a,[hli]
+    ld [hld],a
+    ld a,[de]
+    inc de
+    ld [de],a
+    dec de
+    dec de
+    ld a,[de]
+    inc de
+    ld [de],a
+    dec de
+    xor a
+    ld [hli],a
+    ld [de],a
+    inc de
+.twoBytes
+    ld a,[hl]
+    and a
+    jr z,.oneByte
+    srl a
+    ld [hli],a
+    ld a,[hl]
+    rr a
+    ld [hld],a
+    ld a,[de]
+    srl a
+    ld [de],a
+    inc de
+    ld a,[de]
+    rr a
+    ld [de],a
+    dec de
+    jr .twoBytes
+.oneByte
+
+    ; current exp * (8 tiles * 8 pixels)
+    ld hl,H_MULTIPLICAND
+    ld de,wEXPBarCurEXP
+    ld a,[de]
+    inc de
+    ld [hli],a
+    ld a,[de]
+    inc de
+    ld [hli],a
+    ld a,[de]
+    ld [hl],a
+    ld a,$40
+    ld [H_MULTIPLIER],a
+    call Multiply
+
+    ; product / needed exp = pixel length
+    ld a,[wEXPBarNeededEXP + 2]
+    ld [H_DIVISOR],a
+    ld b,$04
+    call Divide
+    ret
+
+CalcEXPBarPixelLength_.Start:
+    ld d,a
+    ld hl,CalcExperience
+    ld b,BANK(CalcExperience)
+    call Bankswitch
+    ld hl,H_MULTIPLICAND
+    ld de,wEXPBarBaseEXP
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hl]
+    ld [de],a
+    ret
+
+GetTheExpNeededToGainALevel:
+    ; get the exp needed to gain a level
+    ld a,[$cfb9] ; Level
+    ld d,a
+    inc d
+    ld hl,CalcExperience
+    ld b,BANK(CalcExperience)
+    jp Bankswitch
+
+; calculates the three byte number starting at [bc]
+; minus the three byte number starting at [hl]
+; and stores it into the three bytes starting at [de]
+; assumes that [hl] is smaller than [bc]
+SubThreeByteNum:
+    call .subByte
+    call .subByte
+.subByte
+    ld a,[bc]
+    inc bc
+    sub [hl]
+    inc hl
+    ld [de],a
+    jr nc,.noCarry
+    dec de
+    ld a,[de]
+    dec a
+    ld [de],a
+    inc de
+.noCarry
+    inc de
+    ret
+
+; return the address of the BattleMon's party struct attribute in hl
+BattleMonPartyAttr:
+    ld a,[wPlayerMonNumber]
+    ld bc,W_PARTYMON2DATA - W_PARTYMON1DATA
+    jp AddNTimes
 
 ; ──────────────────────────────────────────────────────────────────────
 
