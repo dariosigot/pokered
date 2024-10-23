@@ -43111,8 +43111,6 @@ LoadMonDataAndPrintActualMoves:
 ;    db $DA,"@"
 
 WriteEnergyAllMovesDuringMoveRelearn:
-    ld a,$4
-    ld [$cc49],a
     ld d,4
 .Loop4Moves
     push de
@@ -61424,8 +61422,6 @@ DrawCatchGenderAndLoadCoord: ; Denim
     ret
 
 WriteEnergyAllMoves:
-    ld a,$4
-    ld [$cc49],a
     ld d,4
 .Loop4Moves
     push de
@@ -131423,7 +131419,7 @@ _DrawCatchGender: ; Denim
 .Male
     call PlaceString
 .Genderless
-    call DebugEnemyStats
+    call DebugStats
     call ResetTempIV
 .Ghost
     ret
@@ -131471,54 +131467,80 @@ _DrawCurrentMonGenderInBattle:
 .FemaleIcon
     db $F5,$50
 
-DebugEnemyStats:
+DebugStats:
     and a ; rcf
     ld a,[H_CURRENTPRESSEDBUTTONS]
     bit 2,a ; was the select button pressed?
     ret z
+    ; ──────────────────────────
+    ; ENEMY
+    ; ──────────────────────────
     ; Clear Screen Area
-    FuncCoord 0,0 ; $c4a5
+    FuncCoord 00,00
     ld hl,Coord
     ld bc,$040B
     call ClearScreenArea
     ; Print IV
-    FuncCoord 0,3
+    FuncCoord 00,00
     ld hl,Coord
-    ld a,[wDVForShinyAtkDef]
-    call .PrintIV
-    swap a
-    call .PrintIV
-    ld a,[wDVForShinySpdSpc]
-    call .PrintIV
-    swap a
-    call .PrintIV
-    ; Print ATK/DEF
-    FuncCoord 0,0
+    ld de,wDVForShinyAtkDef
+    call .Print4IV
+    ; Print ATK/DEF/SPD/SPC
+    FuncCoord 03,00
     ld hl,Coord
-    ld bc,$0203 ; three digits
     ld de,W_ENEMYMONATTACK
-    call .PrintStatBR
-    ld de,W_ENEMYMONDEFENSE
-    call .PrintStat
-    ; Print SPD/SPC
-    ld de,W_ENEMYMONSPEED
-    call .PrintStatBR
-    ld de,W_ENEMYMONSPECIAL
-    call .PrintStat
+    call .Print4Stat
     ; Print Current HP / Max HP
-    ld de,W_ENEMYMONMAXHP
-    call .PrintStatBR
-    ld de,W_ENEMYMONCURHP
-    call PrintNumber
-    ; Print Energy
-    FuncCoord 00,02
-    ld bc,$0103
+    FuncCoord 07,00
     ld hl,Coord
+    ld de,W_ENEMYMONMAXHP
+    call .PrintStat
+    ld de,W_ENEMYMONCURHP
+    call .PrintStat
+    ; Print Energy
     ld de,W_ENEMYMONPP
-    call PrintNumber
+    call .PrintEnergy
+    ; ──────────────────────────
+    ; PLAYER
+    ; ──────────────────────────
+    ; Clear Screen Area
+    FuncCoord 09,07
+    ld hl,Coord
+    ld bc,$050B
+    call ClearScreenArea
+    ; Print IV
+    FuncCoord 09,08
+    ld hl,Coord
+    ld de,W_PLAYERMONIVS
+    call .Print4IV
+    ; Print ATK/DEF/SPD/SPC
+    FuncCoord 12,08
+    ld hl,Coord
+    ld de,W_PLAYERMONATK
+    call .Print4Stat
+    ; Print Current HP / Max HP
+    FuncCoord 16,08
+    ld hl,Coord
+    ld de,W_PLAYERMONMAXHP
+    call .PrintStat
+    ld de,W_PLAYERMONCURHP
+    call .PrintStat
+    ; Print Energy
+    ld de,W_PLAYERMONPP
+    call .PrintEnergy
+    ; End
     scf
     ret
 
+.Print4IV
+    push de
+    call .Print2IV
+    pop de
+    inc de
+.Print2IV
+    ld a,[de]
+    call .PrintIV
+    swap a
 .PrintIV
     push af
     srl a
@@ -131527,22 +131549,30 @@ DebugEnemyStats:
     srl a
     ld [$d11e],a
     ld de,$d11e
-    ld c,2
-    ld b,%10000001
+    ld bc,(%10000001<<8)+2 ; two digits
     call PrintNumber
-    inc hl
+    ld de,18
+    add hl,de
     pop af
     ret
+.Print4Stat
+    call .PrintStat
+    call .PrintStat
+.Print2Stat
+    call .PrintStat
 .PrintStat
-    call PrintNumber
-    ld de,-19
-    add hl,de
-    ret
-.PrintStatBR
+    push de
+    ld bc,$0203 ; three digits
     call PrintNumber
     ld de,17
     add hl,de
+    pop de
+    inc de
+    inc de
     ret
+.PrintEnergy
+    ld bc,$0103 ; three digits
+    jp PrintNumber
 
 _DebugPlayerStats:
     ; Remove Stat Text
@@ -135590,6 +135620,7 @@ CalcEXPBarPixelLength_StatusScreen:
     ld a,[$cfb9] ; Level
     call CalcEXPBarPixelLength_.Start
     ; get the exp needed to gain a level
+    ld a,[$cfb9] ; Level
     call GetTheExpNeededToGainALevel
     ; get the address of the active Pokemon's current experience
     ld hl,$cfa6
@@ -137734,6 +137765,7 @@ CalcEXPBarPixelLength_:
     call CalcEXPBarPixelLength_.Start
 
     ; get the exp needed to gain a level
+    ld a,[W_PLAYERMONLEVEL]
     call GetTheExpNeededToGainALevel
 
     ; get the address of the active Pokemon's current experience
@@ -137840,7 +137872,6 @@ CalcEXPBarPixelLength_.Start:
 
 GetTheExpNeededToGainALevel:
     ; get the exp needed to gain a level
-    ld a,[$cfb9] ; Level
     ld d,a
     inc d
     ld hl,CalcExperience
