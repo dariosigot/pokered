@@ -1511,8 +1511,21 @@ wDestinationMap:: db
 
 wLastBlackoutAdventureMap:: db ; d71b
 
-    ds 23
+SECTION "wUnusedD71F",WRAMX[$d71f],BANK[$1]
 
+;joenote - used as a backup address for a stat being raised/lowered via stat mods
+    ;0 = none
+    ;1 = attack
+    ;2 = defense
+    ;3 = speed
+    ;4 = special
+    ;5 = accuracy
+    ;6 = evasion
+wBackupStatRaisedLoweredType:: db ; d71f
+
+; Some Free (see shinpokered)
+
+SECTION "W_FLAGS_D733",WRAMX[$d733],BANK[$1]
 
 W_FLAGS_D733: ; d733
 ; bit 4: use variable [W_CURMAPSCRIPT] instead of the provided index for next frame's map script (used to start battle when talking to trainers)

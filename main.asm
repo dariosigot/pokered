@@ -57891,15 +57891,7 @@ TrappingEffect:
     ld [de],a
     ret
 
-GetDefaultAmnesiaEnv:
-    ld hl,wPlayerMonSpecialMod ; $cd1d
-    ld de,W_PLAYERMOVEEFFECT ; $cfd3
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    ret z
-    ld hl,wEnemyMonSpecialMod ; $cd31
-    ld de,W_ENEMYMOVEEFFECT ; $cfcd
-    ret
+; Free
 
 SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
 
@@ -58055,7 +58047,7 @@ CalcHitChance: ; 3e624 (f:6624)
 ; loop to do the calculations,the first iteration multiplies by the accuracy ratio and the second iteration multiplies by the evasion ratio
 .loop
     push bc
-    ld hl,StatModifierRatios  ; $76cb ; stat modifier ratios
+    ld hl,StatModifierRatiosAccuracyEvasion  ; stat modifier ratios (ACR/EVA)
     dec b
     sla b
     ld c,b
@@ -59142,48 +59134,34 @@ Func_3ee0c: ; 3ee0c (f:6e0c)
 
 ApplyBadgeStatBoosts: ; 3ee19 (f:6e19)
     ld a,[W_ISLINKBATTLE] ; $d12b
-    cp $4
+    cp $4 ; LINK_STATE_BATTLING
     ret z
     ld a,[W_OBTAINEDBADGES] ; $d356
     ld b,a
+    call SwapBit2And4 ; bugfix Thunder & Soul
+	call SelectiveBadgeBoost
     ld hl,W_PLAYERMONATK
     ld c,$4
-.asm_3ee28
+; the boost is applied for badges whose bit position is even
+; the order of boosts matches the order they are laid out in RAM
+; Boulder (bit 0) - attack
+; Thunder (bit 2) - defense -> speed
+; Soul (bit 4) - speed -> defense
+; Volcano (bit 6) - special
+.loop
     srl b
-    call c,Func_3ee35
+    call c,ApplyBoostToStat
     inc hl
     inc hl
     srl b
     dec c
-    jr nz,.asm_3ee28
+    jr nz,.loop
+    ;joenote - clear out stat mod address offset backup
+    xor a
+    ld [wBackupStatRaisedLoweredType],a
     ret
 
-Func_3ee35: ; 3ee35 (f:6e35)
-    ld a,[hli]
-    ld d,a
-    ld e,[hl]
-    srl d
-    rr e
-    srl d
-    rr e
-    srl d
-    rr e
-    ld a,[hl]
-    add e
-    ld [hld],a
-    ld a,[hl]
-    adc d
-    ld [hli],a
-    ld a,[hld]
-    sub $e7
-    ld a,[hl]
-    sbc $3
-    ret c
-    ld a,$3
-    ld [hli],a
-    ld a,$e7
-    ld [hld],a
-    ret
+SECTION "LoadHudAndHpBarAndStatusTilePatterns",ROMX[$6e58],BANK[$f]
 
 LoadHudAndHpBarAndStatusTilePatterns: ; 3ee58 (f:6e58)
     call LoadHpBarAndStatusTilePatterns
@@ -60018,6 +59996,8 @@ StatModifierUpEffect: ; Moved in the Bank
 .statupcheck
     ld c,a
     ld b,$0
+    inc a              ; joenote - backup the address offset for the stat mod 
+    ld [wBackupStatRaisedLoweredType],a ; ...
     add hl,bc
     ld b,[hl]
     inc b
@@ -60207,32 +60187,6 @@ PrintNothingHappenedText:
     jp Delay50AndPrintText
 
 ; ──────────────────────────────────────────────────────────────────────
-
-AmnesiaNewEffect:
-    call GetDefaultAmnesiaEnv
-    ld a,[hl] ; SpcMod
-    push af
-    push hl
-    push de
-    ld a,SPECIAL_UP1_EFFECT
-    ld [de],a
-    call StatModifierUpEffect
-    pop de
-    pop hl
-    pop af
-    cp [hl]
-    jr z,.end ; end if "NothingHappened"
-    push de
-    ld a,SPECIAL_DOWN_SIDE_EFFECT
-    ld [de],a
-    call RunAmnesiaSideEffect
-    pop de
-.end
-    ld a,AMNESIA_NEW_EFFECT
-    ld [de],a
-    ret
-
-; ──────────────────────────────────────────────────────────────────────
 ; StatModifierDownEffect
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -60302,6 +60256,8 @@ StatModifierDownEffect: ; Moved in the Bank
 .decrementStatMod
     ld c,a
     ld b,$0
+    inc a              ; joenote - backup the address offset for the stat mod 
+    ld [wBackupStatRaisedLoweredType],a ; ...
     add hl,bc
     ld b,[hl]
     dec b ; dec corresponding stat mod
@@ -61832,6 +61788,36 @@ GetAttackerType:
     ld a,WIND
     ret
 
+AmnesiaNewEffect:
+    ld hl,wPlayerMonSpecialMod ; $cd1d
+    ld de,W_PLAYERMOVEEFFECT ; $cfd3
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    ret z
+    ld hl,wEnemyMonSpecialMod ; $cd31
+    ld de,W_ENEMYMOVEEFFECT ; $cfcd
+    ld a,[hl] ; SpcMod
+    push af
+    push hl
+    push de
+    ld a,SPECIAL_UP1_EFFECT
+    ld [de],a
+    call StatModifierUpEffect
+    pop de
+    pop hl
+    pop af
+    cp [hl]
+    jr z,.end ; end if "NothingHappened"
+    push de
+    ld a,SPECIAL_DOWN_SIDE_EFFECT
+    ld [de],a
+    call RunAmnesiaSideEffect
+    pop de
+.end
+    ld a,AMNESIA_NEW_EFFECT
+    ld [de],a
+    ret
+
 CheckAmnesiaSideEffect:
     push hl
     ld hl,wFlagAmnesiaSideEffectBit0
@@ -61840,6 +61826,91 @@ CheckAmnesiaSideEffect:
     pop hl
     call z,GenRandomInBattle
     xor a ; Force Success
+    ret
+
+StatModifierRatiosAccuracyEvasion:
+; first byte is numerator,second byte is denominator
+    db 060,180  ; 0.333
+    db 060,160  ; 0.375
+    db 060,140  ; 0.428
+    db 050,100  ; 0.500
+    db 060,100  ; 0.600
+    db 075,100  ; 0.750
+    db 001,001  ; 1.000
+    db 040,030  ; 1.333
+    db 050,030  ; 1.666
+    db 002,001  ; 2.000
+    db 070,030  ; 2.333
+    db 080,030  ; 2.666
+    db 003,001  ; 3.000
+
+; multiply stat at hl by 1.125
+; cap stat at MAX_STAT_VALUE (999)
+ApplyBoostToStat:
+    ld a,[hli]
+    ld d,a
+    ld e,[hl]
+    srl d
+    rr e
+    srl d
+    rr e
+    srl d
+    rr e
+    ld a,[hl]
+    add e
+    ld [hld],a
+    ld a,[hl]
+    adc d
+    ld [hli],a
+    ld a,[hld]
+    sub $e7
+    ld a,[hl]
+    sbc $3
+    ret c
+    ld a,$3
+    ld [hli],a
+    ld a,$e7
+    ld [hld],a
+    ret
+
+;joenote - check for backed up stat mod address offset to selectively apply badge boosts
+SelectiveBadgeBoost:
+    ;b holds the obtained badge bits that are used to apply boosts
+    ld a,[wBackupStatRaisedLoweredType] ;get the backed-up offset into 'a'
+    and a
+    ret z              ;kick out if zero so the function will apply all normal badge boosts
+    ld c,$5            ;load a value of 5 into c
+    cp c               ;set carry  flag if the offset in a is < c's value (stat being affected is neither accuracy or evasion)
+    jr nc,.NoBoost     ;kick out if carry flag not set so the function will not apply any badge boosts
+    ld c,a             ;put the offset value into c. it should be 1, 2, 3, or 4. use it as a loop counter.
+    ld a,%10000000     ;set an initial bit that gets rolled around
+.selectloop
+    rla
+    rla
+    dec c
+    jr nz,.selectloop
+    and b              ;AND a with b to clear the badge boost if you don't have that badge
+    and %01010101      ;AND a with Boost Badge Flag (Boulder,Thunder,Soul,Volcano)
+    ld b,a             ;store it back into b
+    ret
+.NoBoost
+    ld b,0
+    ret
+
+SwapBit2And4:
+    and %11101011 ; Mask Every Badge bits Except 2 and 4
+    ld c,a
+    xor a
+    bit 2,b
+    jr z,.skip
+    set 4,a
+.skip
+    bit 4,b
+    jr z,.skip2
+    set 2,a
+.skip2
+    or c ; Restore other bits
+    ld b,a
     ret
 
 SECTION "bank10",ROMX,BANK[$10]
@@ -135119,7 +135190,11 @@ CalcStatNoStatExp:
     inc c ; Start with Atk
     push hl
     ld hl,$cfa8 ; actual mon stat exp - 1
-    call CalcStat
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 3,a ; was the start button pressed?
+    push af
+    call nz,CalcStat
+    pop af
     pop hl
     call .PrintSingleStat
     ld a,c
@@ -135134,23 +135209,28 @@ CalcStatNoStatExp:
     push bc
     push de
 
+    jr nz,.ShowDetailedStat
+
+    ; Print Actual Stat
+    push bc
+    ld a,[de]
+    ld [wTempStatHI],a
+    inc de
+    ld a,[de]
+    ld [wTempStatLO],a
+    dec de
+    ld bc,$0203 ; three digits
+    call .PrintStat
+    pop bc
+    jr .done2
+
+.ShowDetailedStat
+
     ; [de] : actual stat
     ; [H_MULTIPLICAND+1] : stat without stat exp
     call .GetBaseAndActualStatIn_DEBC
     ; de : actual stat
     ; bc : stat without stat exp
-
-    ; Print Actual Stat
-    ;push bc
-    ;ld bc,-20
-    ;add hl,bc
-    ;ld a,e
-    ;ld [wTempStatLO],a
-    ;ld a,d
-    ;ld [wTempStatHI],a
-    ;ld bc,$0203 ; three digits
-    ;call .PrintStat
-    ;pop bc
 
     ; de : actual stat
     ; bc : stat without stat exp
