@@ -131681,37 +131681,42 @@ _DebugPlayerStats:
     call .PrintStatBR
     ld de,$cfb1
     call .PrintStatBR
-    ; Print Ex Type/PP
+    ; Clear Screen for Exclusive
     FuncCoord 00,07
     ld hl,Coord
     ld bc,$0309
     call ClearScreenArea
-    FuncCoord 01,08
+    FuncCoord 00,11
+    ld hl,Coord
+    ld de,.DebugOTText
+    call PlaceString
+    ; Print Exclusive Moves Flag
+    FuncCoord 00,07
     ld hl,Coord
     ld de,$cf9d ; type1
     ld bc,$0103
     call PrintNumber
-    FuncCoord 01,09
+    FuncCoord 00,08
     ld hl,Coord
     ld de,$cf9e ; type2
     ld bc,$0103
     call PrintNumber
-    FuncCoord 06,07
-    ld hl,Coord
-    ld de,$cfb5 ; exp pp 1
-    ld bc,$0103
-    call PrintNumber
-    FuncCoord 06,08
+    ;FuncCoord 00,09
+    ;ld hl,Coord
+    ;ld de,$cfb5 ; exp pp 1
+    ;ld bc,$0103
+    ;call PrintNumber
+    FuncCoord 00,09
     ld hl,Coord
     ld de,$cfb6 ; exp pp 2
     ld bc,$0103
     call PrintNumber
-    FuncCoord 06,09
+    FuncCoord 00,10
     ld hl,Coord
     ld de,$cfb7 ; exp pp 3
     ld bc,$0103
     call PrintNumber
-    FuncCoord 06,10
+    FuncCoord 00,11
     ld hl,Coord
     ld de,$cfb8 ; exp pp 4
     ld bc,$0103
@@ -131750,6 +131755,8 @@ _DebugPlayerStats:
     db "   ",$4e
     db "   ",$4e
     db "   ",$4e
+    db "   @"
+.DebugOTText
     db "   @"
 
 ; INPUT :
