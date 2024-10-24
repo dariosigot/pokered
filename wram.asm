@@ -1523,6 +1523,13 @@ SECTION "wUnusedD71F",WRAMX[$d71f],BANK[$1]
     ;6 = evasion
 wBackupStatRaisedLoweredType:: db ; d71f
 
+SECTION "wUnusedD722",WRAMX[$d722],BANK[$1]
+
+wTempEnemyMinMaxIVAtk:: db
+wTempEnemyMinMaxIVDef:: db
+wTempEnemyMinMaxIVSpd:: db
+wTempEnemyMinMaxIVSpc:: db
+
 ; Some Free (see shinpokered)
 
 SECTION "W_FLAGS_D733",WRAMX[$d733],BANK[$1]
@@ -1765,6 +1772,7 @@ wBackupDarkMap         ; df37
 wTempStatLO            ; df37
 wFieldMoveMonID        ; df37 = Mon ID used for Cry
 wMonIdCryAndDex        ; df37 = Mon ID used for PlayCryAndDisplayPokedex
+wTempEnemyMinMaxIV        ; df37 = Temp Min Enemy IV Value
     ds 1
 
 wFlagAddPkmnToPartyBit0     ; df38 ; bit 0

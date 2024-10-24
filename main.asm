@@ -137944,31 +137944,23 @@ GenerateRandomEnemyTrainerIV_:
     ret
 
 .Random
-    call .GetTrainerMinValue ; Output d=Atk/Def e=Spd/Spc
-
-    ; Old Code
-    ;call GenRandom ; generate random IVs Spd/Spc
-    ;or e
-    ;ld b,a
-    ;call GenRandom ; generate random IVs Atk/Def
-    ;or d
-    ;ld c,a
+    call .GetTrainerMinMaxValue
 
     ; Split (d|e = Atk/Def|Spd/Spc) to (b|c|d|e = Atk|Def|Spd|Spc)
-    ld a,d
-    swap a
-    and %00001111
-    ld b,a ; b = Atk
-    ld a,d
-    and %00001111
-    ld c,a ; c = Def
-    ld a,e
-    swap a
-    and %00001111
-    ld d,a ; d = Spd
-    ld a,e
-    and %00001111
-    ld e,a ; e = Spc
+    ;ld a,d
+    ;swap a
+    ;and %00001111
+    ;ld b,a ; b = Atk
+    ;ld a,d
+    ;and %00001111
+    ;ld c,a ; c = Def
+    ;ld a,e
+    ;swap a
+    ;and %00001111
+    ;ld d,a ; d = Spd
+    ;ld a,e
+    ;and %00001111
+    ;ld e,a ; e = Spc
 
     ; Generate Random IV
     call GenRandom
@@ -137976,36 +137968,37 @@ GenerateRandomEnemyTrainerIV_:
     push af
     call GenRandom
     push af
+    push af
 
     ; Read random IVs Atk
+    ld a,[wTempEnemyMinMaxIVAtk]
+    ld [wTempEnemyMinMaxIV],a
+    pop af
     swap a
-    and %00001111
-    cp b ; A < B = c | A > B = nc
-    jr c,.AtkDone
+    call .BalanceValue
     ld b,a ; b = Atk
-.AtkDone
+
     ; Read random IVs Def
+    ld a,[wTempEnemyMinMaxIVDef]
+    ld [wTempEnemyMinMaxIV],a
     pop af
-    and %00001111
-    cp c ; A < C = c | A > C = nc
-    jr c,.DefDone
+    call .BalanceValue
     ld c,a ; c = Def
-.DefDone
+
     ; Read random IVs Spd
+    ld a,[wTempEnemyMinMaxIVSpd]
+    ld [wTempEnemyMinMaxIV],a
     pop af
     swap a
-    and %00001111
-    cp d ; A < D = c | A > D = nc
-    jr c,.SpdDone
+    call .BalanceValue
     ld d,a ; d = Spd
-.SpdDone
+
     ; Read random IVs Spc
+    ld a,[wTempEnemyMinMaxIVSpc]
+    ld [wTempEnemyMinMaxIV],a
     pop af
-    and %00001111
-    cp e ; A < E = c | A > E = nc
-    jr c,.SpcDone
+    call .BalanceValue
     ld e,a ; e = Spc
-.SpcDone
 
     ; combine bc|de (Atk/Def|Spd/Spc) to (c|b)
     ld a,b
@@ -138021,70 +138014,126 @@ GenerateRandomEnemyTrainerIV_:
 .End
     ret
 
-.GetTrainerMinValue
-    push hl
-    ld hl,.TrainerMinValueTable
+.GetTrainerMinMaxValue
+    ld hl,.TrainerMinMaxValueTable
     ld a,[W_CUROPPONENT] ; $d059
     dec a ; sub $C9 ; Convert Generic Id to Trainer ID
-    add a
+    add a ; x2
+    add a ; x4
     ld e,a
     ld d,0
+    jr nc,.noCarry
+    inc d
+.noCarry
     add hl,de
-    ld e,[hl]
-    inc hl
-    ld d,[hl]
-    pop hl
+    ld de,wTempEnemyMinMaxIVAtk
+    call .Read ; wTempEnemyMinMaxIVAtk
+    call .Read ; wTempEnemyMinMaxIVDef
+    call .Read ; wTempEnemyMinMaxIVSpd
+    call .Read ; wTempEnemyMinMaxIVSpc
+    ret
+.Read
+    ld a,[hli]
+    ld [de],a
+    inc de
     ret
 
-.TrainerMinValueTable
-    dw $0000 ; YOUNGSTER     ; $01 ; 1/8192
-    dw $0000 ; BUG_CATCHER   ; $02 ; 1/8192
-    dw $2222 ; LASS          ; $03 ; 1/512
-    dw $9828 ; SAILOR        ; $04 ; 1/1024
-    dw $8220 ; JR__TRAINER_M ; $05 ; 1/2048
-    dw $0822 ; JR__TRAINER_F ; $06 ; 1/1024
-    dw $2AAA ; POKEMANIAC    ; $07 ; 1/64
-    dw $2AAA ; SUPER_NERD    ; $08 ; 1/64
-    dw $1A00 ; HIKER         ; $09 ; 1/2048
-    dw $9880 ; BIKER         ; $0A ; 1/2048
-    dw $98A8 ; BURGLAR       ; $0B ; 1/512
-    dw $9A2A ; ENGINEER      ; $0C ; 1/256
-    dw $988A ; JUGGLER_X     ; $0D ; 1/512
-    dw $9828 ; FISHER        ; $0E ; 1/1024
-    dw $92A8 ; SWIMMER       ; $0F ; 1/512
-    dw $9880 ; CUE_BALL      ; $10 ; 1/2048
-    dw $B888 ; GAMBLER       ; $11 ; 1/512
-    dw $8A88 ; BEAUTY        ; $12 ; 1/512
-    dw $82AA ; PSYCHIC_TR    ; $13 ; 1/256
-    dw $98A8 ; ROCKER        ; $14 ; 1/512
-    dw $988A ; JUGGLER       ; $15 ; 1/512
-    dw $B888 ; TAMER         ; $16 ; 1/512
-    dw $92A8 ; BIRD_KEEPER   ; $17 ; 1/512
-    dw $B2A0 ; BLACKBELT     ; $18 ; 1/512
-    dw $BAAB ; SONY1         ; $19 ; 0
-    dw $FFFF ; PROF_OAK      ; $1A ; 0
-    dw $988A ; CHIEF         ; $1B ; 1/512
-    dw $988A ; SCIENTIST     ; $1C ; 1/512
-    dw $BFA9 ; GIOVANNI      ; $1D ; 0
-    dw $9280 ; ROCKET        ; $1E ; 1/2048
-    dw $B88A ; COOLTRAINER_M ; $1F ; 1/256
-    dw $2A8A ; COOLTRAINER_F ; $20 ; 1/128
-    dw $BFA9 ; BRUNO         ; $21 ; 0
-    dw $9A81 ; BROCK         ; $22 ; 0
-    dw $98A9 ; MISTY         ; $23 ; 0
-    dw $980B ; LT__SURGE     ; $24 ; 0
-    dw $1B8B ; ERIKA         ; $25 ; 0
-    dw $98AB ; KOGA          ; $26 ; 0
-    dw $B88B ; BLAINE        ; $27 ; 0
-    dw $08FF ; SABRINA       ; $28 ; 0
-    dw $98A8 ; GENTLEMAN     ; $29 ; 1/512
-    dw $BAAB ; SONY2         ; $2A ; 0
-    dw $BAAB ; SONY3         ; $2B ; 0
-    dw $1BBB ; LORELEI       ; $2C ; 0
-    dw $AAAA ; CHANNELER     ; $2D ; 1/64
-    dw $BABB ; AGATHA        ; $2E ; 0
-    dw $FBA9 ; LANCE         ; $2F ; 0
+; ARROTONDA.DIFETTO.MAT((MAX-MIN)*RND/15+MIN)
+; a = RND
+; [wTempEnemyMinMaxIV] = MIN|MAX
+.BalanceValue
+    push bc
+    push de
+    and %00001111 ; LSB
+    push af ; Backup RND
+    call .GetMIN
+    ld b,a ; b = MIN
+    call .GetMAX ; a = MAX
+    sub b ; a = (MAX-MIN)
+    cp 15
+    jr z,.NotNeedBalance
+    ld [H_MULTIPLIER],a     ; (MAX-MIN)
+    xor a
+    ld [H_MULTIPLICAND+1],a ; 0
+    ld [H_MULTIPLICAND],a   ; 0
+    pop af ; Restore RND
+    ld [H_MULTIPLICAND+2],a ; RND
+    call Multiply ; (MAX-MIN)*RND
+    ld a,15
+    ld [H_DIVISOR],a
+    ld b,4 ; 4 bytes
+    call Divide ; (MAX-MIN)*RND/15
+    ld a,[H_MULTIPLICAND+2] ; a = (MAX-MIN)*RND/15
+    ld b,a
+    call .GetMIN ; a = MIN
+    add b ; a = (MAX-MIN)*RND/15+MIN
+    pop de
+    pop bc
+    ret
+.NotNeedBalance
+    pop af ; Restore RND
+    pop de
+    pop bc
+    ret
+.GetMIN
+    ld a,[wTempEnemyMinMaxIV]
+    swap a
+    and %00001111
+    ret
+.GetMAX
+    ld a,[wTempEnemyMinMaxIV]
+    and %00001111
+    ret
 
+; db $MinMaxAtk,$MinMaxDef,....
+.TrainerMinMaxValueTable
+    db $0F,$0F,$0F,$0F ; dw $0000 ; YOUNGSTER     ; $01 ; (08*01*01*01)/(16^4)*100 = 0.012%
+    db $0F,$0F,$0F,$0F ; dw $0000 ; BUG_CATCHER   ; $02 ; (08*01*01*01)/(16^4)*100 = 0.012%
+    db $0F,$0F,$0F,$0F ; dw $0000 ; LASS          ; $03 ; (08*01*01*01)/(16^4)*100 = 0.012%
+    db $2F,$0F,$0F,$6F ; dw $9828 ; SAILOR        ; $04 ; (09*01*01*02)/(16^4)*100 = 0.027%
+    db $8F,$07,$0F,$0F ; dw $8000 ; JR__TRAINER_M ; $05 ;
+    db $07,$8F,$0F,$0F ; dw $0800 ; JR__TRAINER_F ; $06 ; (07*02*01*01)/(16^4)*100 = 0.021%
+    db $2B,$9C,$9C,$AB ; dw $2AAA ; POKEMANIAC    ; $07 ; (09*05*05*15)/(16^4)*100 = 5.150%
+    db $2B,$8D,$8D,$AC ; dw $2AAA ; SUPER_NERD    ; $08 ; (09*03*03*08)/(16^4)*100 = 0.989%
+    db $1F,$AF,$0F,$0F ; dw $1A00 ; HIKER         ; $09 ; (08*03*01*01)/(16^4)*100 = 0.037%
+    db $8F,$0F,$0F,$07 ; dw $9880 ; BIKER         ; $0A ;
+    db $0F,$0F,$AF,$0F ; dw $98A8 ; BURGLAR       ; $0B ; (08*01*03*01)/(16^4)*100 = 0.037%
+    db $0F,$AF,$0F,$AF ; dw $9A2A ; ENGINEER      ; $0C ; (08*03*03*01)/(16^4)*100 = 0.110%
+    db $0F,$0F,$0F,$AF ; dw $988A ; JUGGLER_X     ; $0D ; (08*01*01*03)/(16^4)*100 = 0.037%
+    db $2F,$0F,$0F,$6F ; dw $9828 ; FISHER        ; $0E ; (09*01*01*02)/(16^4)*100 = 0.027%
+    db $0F,$0F,$AF,$0F ; dw $92A8 ; SWIMMER       ; $0F ; (08*01*03*01)/(16^4)*100 = 0.037%
+    db $8F,$0F,$0F,$07 ; dw $9880 ; CUE_BALL      ; $10 ;
+    db $AF,$0F,$0F,$0F ; dw $B888 ; GAMBLER       ; $11 ; (10*01*01*01)/(16^4)*100 = 0.015%
+    db $07,$AF,$0F,$0F ; dw $8A88 ; BEAUTY        ; $12 ; (07*03*01*01)/(16^4)*100 = 0.032%
+    db $2B,$0A,$AF,$AF ; dw $82AA ; PSYCHIC_TR    ; $13 ; (09*01*03*03)/(16^4)*100 = 0.124%
+    db $0F,$0F,$AF,$0F ; dw $98A8 ; ROCKER        ; $14 ; (08*01*03*01)/(16^4)*100 = 0.037%
+    db $0F,$0F,$0F,$AF ; dw $988A ; JUGGLER       ; $15 ; (08*01*01*03)/(16^4)*100 = 0.037%
+    db $AF,$0F,$0F,$0F ; dw $B888 ; TAMER         ; $16 ; (10*01*01*01)/(16^4)*100 = 0.015%
+    db $0F,$0F,$AF,$0F ; dw $92A8 ; BIRD_KEEPER   ; $17 ; (08*01*03*01)/(16^4)*100 = 0.037%
+    db $AF,$0A,$8F,$0A ; dw $B2A0 ; BLACKBELT     ; $18 ; (10*01*03*02)/(16^4)*100 = 0.096%
+    db $BF,$AF,$AF,$BF ; dw $BAAB ; SONY1         ; $19 ;
+    db $FF,$FF,$FF,$FF ; dw $FFFF ; PROF_OAK      ; $1A ;
+    db $0F,$0F,$0F,$AF ; dw $988A ; CHIEF         ; $1B ; (08*01*01*03)/(16^4)*100 = 0.037%
+    db $0F,$0F,$0F,$AF ; dw $988A ; SCIENTIST     ; $1C ; (08*01*01*03)/(16^4)*100 = 0.037%
+    db $BF,$FF,$AF,$9F ; dw $BFA9 ; GIOVANNI      ; $1D ;
+    db $9F,$0A,$8F,$08 ; dw $9280 ; ROCKET        ; $1E ;
+    db $BF,$8F,$8F,$AF ; dw $B88A ; COOLTRAINER_M ; $1F ; (08*02*02*03)/(16^4)*100 = 0.146%
+    db $27,$AF,$8F,$AF ; dw $2A8A ; COOLTRAINER_F ; $20 ; (10*03*02*03)/(16^4)*100 = 0.275%
+    db $BF,$FF,$AF,$9F ; dw $BFA9 ; BRUNO         ; $21 ;
+    db $9F,$AF,$8F,$1F ; dw $9A81 ; BROCK         ; $22 ;
+    db $9F,$8F,$AF,$9F ; dw $98A9 ; MISTY         ; $23 ;
+    db $9F,$8F,$0F,$BF ; dw $980B ; LT__SURGE     ; $24 ;
+    db $1F,$BF,$8F,$BF ; dw $1B8B ; ERIKA         ; $25 ;
+    db $9F,$8F,$AF,$BF ; dw $98AB ; KOGA          ; $26 ;
+    db $BF,$8F,$8F,$BF ; dw $B88B ; BLAINE        ; $27 ;
+    db $0F,$8F,$FF,$FF ; dw $08FF ; SABRINA       ; $28 ;
+    db $0F,$0F,$AF,$0F ; dw $98A8 ; GENTLEMAN     ; $29 ; (08*01*03*01)/(16^4)*100 = 0.037%
+    db $BF,$AF,$AF,$BF ; dw $BAAB ; SONY2         ; $2A ;
+    db $BF,$AF,$AF,$BF ; dw $BAAB ; SONY3         ; $2B ;
+    db $1F,$BF,$BF,$BF ; dw $1BBB ; LORELEI       ; $2C ;
+    db $2B,$8D,$8D,$AC ; dw $AAAA ; CHANNELER     ; $2D ; (09*03*03*08)/(16^4)*100 = 0.989%
+    db $BF,$AF,$BF,$BF ; dw $BABB ; AGATHA        ; $2E ;
+    db $FF,$BF,$AF,$9F ; dw $FBA9 ; LANCE         ; $2F ;
 
 ; ──────────────────────────────────────────────────────────────────────
 
