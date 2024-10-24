@@ -61725,9 +61725,10 @@ AmnesiaNewEffect:
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ret z
+    jr z,.done
     ld hl,wEnemyMonSpecialMod ; $cd31
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
+.done
     ld a,[hl] ; SpcMod
     push af
     push hl
@@ -137945,22 +137946,6 @@ GenerateRandomEnemyTrainerIV_:
 
 .Random
     call .GetTrainerMinMaxValue
-
-    ; Split (d|e = Atk/Def|Spd/Spc) to (b|c|d|e = Atk|Def|Spd|Spc)
-    ;ld a,d
-    ;swap a
-    ;and %00001111
-    ;ld b,a ; b = Atk
-    ;ld a,d
-    ;and %00001111
-    ;ld c,a ; c = Def
-    ;ld a,e
-    ;swap a
-    ;and %00001111
-    ;ld d,a ; d = Spd
-    ;ld a,e
-    ;and %00001111
-    ;ld e,a ; e = Spc
 
     ; Generate Random IV
     call GenRandom
