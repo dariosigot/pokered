@@ -21584,6 +21584,28 @@ GetTileTwoStepsInFrontOfPlayer: ; c5be (3:45be)
     ld [$cfc6],a
     ret
 
+; Input a = Level
+; Output ac = stat exp
+GetStatExpByLevel:
+    cp 6 ; C - Set for no borrow. (Set if A < n.)
+    jr nc,.LevelGreaterThen5
+    xor a
+.LevelGreaterThen5
+    push af
+    ld [H_MULTIPLIER],a
+    ld [H_MULTIPLICAND+2],a
+    xor a
+    ld [H_MULTIPLICAND+1],a
+    ld [H_MULTIPLICAND],a
+    call Multiply
+    pop af
+    ld [H_MULTIPLIER],a
+    call Multiply
+    ld a,16
+    ld [H_DIVISOR],a
+    ld b,4 ; 4 bytes
+    jp Divide
+
 SECTION "CheckForBoulderCollisionWithSprites",ROMX[$4636],BANK[$3]
 
 CheckForBoulderCollisionWithSprites: ; c636 (3:4636)
@@ -28455,94 +28477,19 @@ PartyMenuHPAndStandarizePalette:
 ; Output IV a=Atk/Def b=Spd/Spc
 GenerateRandomEnemyTrainerIV:
     ret z
+    push hl
     push af
     push de
-    call GetCurrentOldAdventureMap
-    cp LANCES_ROOM
-    jr nz,.Random
-    ld a,[$FF00+$e4]
-    dec a
-    jr nz,.Random
-    ld c,$EA ; Lance's Gyarados
-    ld b,$AA
-    jr .End
-.Random
-    call GetTrainerMinValue ; Output d=Atk/Def e=Spd/Spc
-    call GenRandom ; generate random IVs Spd/Spc
-    or e
-    ld b,a
-    call GenRandom ; generate random IVs Atk/Def
-    or d
-    ld c,a
-.End
+    ld hl,GenerateRandomEnemyTrainerIV_
+    ld b,BANK(GenerateRandomEnemyTrainerIV_)
+    call Bankswitch
+    ld c,d
+    ld b,e
     pop de
     pop af
     ld a,c
-    ret
-
-GetTrainerMinValue:
-    push hl
-    ld hl,TrainerMinValueTable
-    ld a,[W_CUROPPONENT] ; $d059
-    dec a ; sub $C9 ; Convert Generic Id to Trainer ID
-    add a
-    ld e,a
-    ld d,0
-    add hl,de
-    ld e,[hl]
-    inc hl
-    ld d,[hl]
     pop hl
     ret
-
-TrainerMinValueTable:
-    dw $0000 ; YOUNGSTER     ; $01 ; 1/8192
-    dw $0000 ; BUG_CATCHER   ; $02 ; 1/8192
-    dw $2222 ; LASS          ; $03 ; 1/512
-    dw $9828 ; SAILOR        ; $04 ; 1/1024
-    dw $8220 ; JR__TRAINER_M ; $05 ; 1/2048
-    dw $0822 ; JR__TRAINER_F ; $06 ; 1/1024
-    dw $2AAA ; POKEMANIAC    ; $07 ; 1/64
-    dw $2AAA ; SUPER_NERD    ; $08 ; 1/64
-    dw $1A00 ; HIKER         ; $09 ; 1/2048
-    dw $9880 ; BIKER         ; $0A ; 1/2048
-    dw $98A8 ; BURGLAR       ; $0B ; 1/512
-    dw $9A2A ; ENGINEER      ; $0C ; 1/256
-    dw $988A ; JUGGLER_X     ; $0D ; 1/512
-    dw $9828 ; FISHER        ; $0E ; 1/1024
-    dw $92A8 ; SWIMMER       ; $0F ; 1/512
-    dw $9880 ; CUE_BALL      ; $10 ; 1/2048
-    dw $B888 ; GAMBLER       ; $11 ; 1/512
-    dw $8A88 ; BEAUTY        ; $12 ; 1/512
-    dw $82AA ; PSYCHIC_TR    ; $13 ; 1/256
-    dw $98A8 ; ROCKER        ; $14 ; 1/512
-    dw $988A ; JUGGLER       ; $15 ; 1/512
-    dw $B888 ; TAMER         ; $16 ; 1/512
-    dw $92A8 ; BIRD_KEEPER   ; $17 ; 1/512
-    dw $B2A0 ; BLACKBELT     ; $18 ; 1/512
-    dw $BAAB ; SONY1         ; $19 ; 0
-    dw $FFFF ; PROF_OAK      ; $1A ; 0
-    dw $988A ; CHIEF         ; $1B ; 1/512
-    dw $988A ; SCIENTIST     ; $1C ; 1/512
-    dw $BFA9 ; GIOVANNI      ; $1D ; 0
-    dw $9280 ; ROCKET        ; $1E ; 1/2048
-    dw $B88A ; COOLTRAINER_M ; $1F ; 1/256
-    dw $2A8A ; COOLTRAINER_F ; $20 ; 1/128
-    dw $BFA9 ; BRUNO         ; $21 ; 0
-    dw $9A81 ; BROCK         ; $22 ; 0
-    dw $98A9 ; MISTY         ; $23 ; 0
-    dw $980B ; LT__SURGE     ; $24 ; 0
-    dw $1B8B ; ERIKA         ; $25 ; 0
-    dw $98AB ; KOGA          ; $26 ; 0
-    dw $B88B ; BLAINE        ; $27 ; 0
-    dw $08FF ; SABRINA       ; $28 ; 0
-    dw $98A8 ; GENTLEMAN     ; $29 ; 1/512
-    dw $BAAB ; SONY2         ; $2A ; 0
-    dw $BAAB ; SONY3         ; $2B ; 0
-    dw $1BBB ; LORELEI       ; $2C ; 0
-    dw $AAAA ; CHANNELER     ; $2D ; 1/64
-    dw $BABB ; AGATHA        ; $2E ; 0
-    dw $FBA9 ; LANCE         ; $2F ; 0
 
 CalcStatsAndSetCurrentHpToMax:
     call CalcStats
@@ -28582,26 +28529,6 @@ SetStatExp:
     dec b
     jr nz,.writeEVsLoop
     ret
-
-; Input a = Level
-; Output ac = stat exp
-GetStatExpByLevel:
-    cp 6 ; C - Set for no borrow. (Set if A < n.)
-    jr nc,.LevelGreaterThen5
-    xor a
-    jr .Done
-.LevelGreaterThen5
-    sub 5
-.Done
-    ld [H_MULTIPLIER],a
-    ld [H_MULTIPLICAND+2],a
-    xor a
-    ld [H_MULTIPLICAND+1],a
-    ld [H_MULTIPLICAND],a
-    call Multiply
-    ld a,7
-    ld [H_MULTIPLIER],a
-    jp Multiply
 
 BootedUpTMText: ; e54f (3:654f)
     TX_FAR _BootedUpTMText
@@ -59136,6 +59063,9 @@ ApplyBadgeStatBoosts: ; 3ee19 (f:6e19)
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4 ; LINK_STATE_BATTLING
     ret z
+    ld a,[W_ISINBATTLE] ; 1 = wild
+    dec a
+    ret nz ; return if not wild battle
     ld a,[W_OBTAINEDBADGES] ; $d356
     ld b,a
     call SwapBit2And4 ; bugfix Thunder & Soul
@@ -59160,6 +59090,8 @@ ApplyBadgeStatBoosts: ; 3ee19 (f:6e19)
     xor a
     ld [wBackupStatRaisedLoweredType],a
     ret
+
+; Free
 
 SECTION "LoadHudAndHpBarAndStatusTilePatterns",ROMX[$6e58],BANK[$f]
 
@@ -137993,6 +137925,166 @@ BattleMonPartyAttr:
     ld a,[wPlayerMonNumber]
     ld bc,W_PARTYMON2DATA - W_PARTYMON1DATA
     jp AddNTimes
+
+; ──────────────────────────────────────────────────────────────────────
+; GenerateRandomEnemyTrainerIV_
+; ──────────────────────────────────────────────────────────────────────
+
+GenerateRandomEnemyTrainerIV_:
+
+    ; Handle Custom IV
+    call GetCurrentOldAdventureMap
+    cp LANCES_ROOM
+    jr nz,.Random
+    ld a,[$FF00+$e4]
+    dec a
+    jr nz,.Random
+    ld d,$EA ; Lance's Gyarados
+    ld e,$AA
+    ret
+
+.Random
+    call .GetTrainerMinValue ; Output d=Atk/Def e=Spd/Spc
+
+    ; Old Code
+    ;call GenRandom ; generate random IVs Spd/Spc
+    ;or e
+    ;ld b,a
+    ;call GenRandom ; generate random IVs Atk/Def
+    ;or d
+    ;ld c,a
+
+    ; Split (d|e = Atk/Def|Spd/Spc) to (b|c|d|e = Atk|Def|Spd|Spc)
+    ld a,d
+    swap a
+    and %00001111
+    ld b,a ; b = Atk
+    ld a,d
+    and %00001111
+    ld c,a ; c = Def
+    ld a,e
+    swap a
+    and %00001111
+    ld d,a ; d = Spd
+    ld a,e
+    and %00001111
+    ld e,a ; e = Spc
+
+    ; Generate Random IV
+    call GenRandom
+    push af
+    push af
+    call GenRandom
+    push af
+
+    ; Read random IVs Atk
+    swap a
+    and %00001111
+    cp b ; A < B = c | A > B = nc
+    jr c,.AtkDone
+    ld b,a ; b = Atk
+.AtkDone
+    ; Read random IVs Def
+    pop af
+    and %00001111
+    cp c ; A < C = c | A > C = nc
+    jr c,.DefDone
+    ld c,a ; c = Def
+.DefDone
+    ; Read random IVs Spd
+    pop af
+    swap a
+    and %00001111
+    cp d ; A < D = c | A > D = nc
+    jr c,.SpdDone
+    ld d,a ; d = Spd
+.SpdDone
+    ; Read random IVs Spc
+    pop af
+    and %00001111
+    cp e ; A < E = c | A > E = nc
+    jr c,.SpcDone
+    ld e,a ; e = Spc
+.SpcDone
+
+    ; combine bc|de (Atk/Def|Spd/Spc) to (c|b)
+    ld a,b
+    swap a
+    add c
+    ld b,a ; b = Atk/Def
+    ld a,d
+    swap a
+    add e
+    ld e,a ; e = Spd/Spc
+    ld d,b ; d = Atk/Def
+
+.End
+    ret
+
+.GetTrainerMinValue
+    push hl
+    ld hl,.TrainerMinValueTable
+    ld a,[W_CUROPPONENT] ; $d059
+    dec a ; sub $C9 ; Convert Generic Id to Trainer ID
+    add a
+    ld e,a
+    ld d,0
+    add hl,de
+    ld e,[hl]
+    inc hl
+    ld d,[hl]
+    pop hl
+    ret
+
+.TrainerMinValueTable
+    dw $0000 ; YOUNGSTER     ; $01 ; 1/8192
+    dw $0000 ; BUG_CATCHER   ; $02 ; 1/8192
+    dw $2222 ; LASS          ; $03 ; 1/512
+    dw $9828 ; SAILOR        ; $04 ; 1/1024
+    dw $8220 ; JR__TRAINER_M ; $05 ; 1/2048
+    dw $0822 ; JR__TRAINER_F ; $06 ; 1/1024
+    dw $2AAA ; POKEMANIAC    ; $07 ; 1/64
+    dw $2AAA ; SUPER_NERD    ; $08 ; 1/64
+    dw $1A00 ; HIKER         ; $09 ; 1/2048
+    dw $9880 ; BIKER         ; $0A ; 1/2048
+    dw $98A8 ; BURGLAR       ; $0B ; 1/512
+    dw $9A2A ; ENGINEER      ; $0C ; 1/256
+    dw $988A ; JUGGLER_X     ; $0D ; 1/512
+    dw $9828 ; FISHER        ; $0E ; 1/1024
+    dw $92A8 ; SWIMMER       ; $0F ; 1/512
+    dw $9880 ; CUE_BALL      ; $10 ; 1/2048
+    dw $B888 ; GAMBLER       ; $11 ; 1/512
+    dw $8A88 ; BEAUTY        ; $12 ; 1/512
+    dw $82AA ; PSYCHIC_TR    ; $13 ; 1/256
+    dw $98A8 ; ROCKER        ; $14 ; 1/512
+    dw $988A ; JUGGLER       ; $15 ; 1/512
+    dw $B888 ; TAMER         ; $16 ; 1/512
+    dw $92A8 ; BIRD_KEEPER   ; $17 ; 1/512
+    dw $B2A0 ; BLACKBELT     ; $18 ; 1/512
+    dw $BAAB ; SONY1         ; $19 ; 0
+    dw $FFFF ; PROF_OAK      ; $1A ; 0
+    dw $988A ; CHIEF         ; $1B ; 1/512
+    dw $988A ; SCIENTIST     ; $1C ; 1/512
+    dw $BFA9 ; GIOVANNI      ; $1D ; 0
+    dw $9280 ; ROCKET        ; $1E ; 1/2048
+    dw $B88A ; COOLTRAINER_M ; $1F ; 1/256
+    dw $2A8A ; COOLTRAINER_F ; $20 ; 1/128
+    dw $BFA9 ; BRUNO         ; $21 ; 0
+    dw $9A81 ; BROCK         ; $22 ; 0
+    dw $98A9 ; MISTY         ; $23 ; 0
+    dw $980B ; LT__SURGE     ; $24 ; 0
+    dw $1B8B ; ERIKA         ; $25 ; 0
+    dw $98AB ; KOGA          ; $26 ; 0
+    dw $B88B ; BLAINE        ; $27 ; 0
+    dw $08FF ; SABRINA       ; $28 ; 0
+    dw $98A8 ; GENTLEMAN     ; $29 ; 1/512
+    dw $BAAB ; SONY2         ; $2A ; 0
+    dw $BAAB ; SONY3         ; $2B ; 0
+    dw $1BBB ; LORELEI       ; $2C ; 0
+    dw $AAAA ; CHANNELER     ; $2D ; 1/64
+    dw $BABB ; AGATHA        ; $2E ; 0
+    dw $FBA9 ; LANCE         ; $2F ; 0
+
 
 ; ──────────────────────────────────────────────────────────────────────
 
