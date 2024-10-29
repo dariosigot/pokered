@@ -39140,7 +39140,7 @@ OaksLabText13: ; 1d390 (7:5390)
     db $8
     ld hl,OaksLabRivalPickingMonText
     call PrintText
-    jp TextScriptEnd
+    jp GetRandomEnemyStarterIV ; jp TextScriptEnd
 
 OaksLabRivalPickingMonText: ; 1d39a (7:539a)
     TX_FAR _OaksLabRivalPickingMonText
@@ -40182,6 +40182,13 @@ UnnamedText_1dad1: ; 1dad1 (7:5ad1)
     db "@"
 
 NameRaterObject_OLD: ; 0x1dad6 (size=26)
+
+GetRandomEnemyStarterIV:
+    call GenRandom
+    ld [wRivalStarterIV_AtkDef],a
+    call GenRandom
+    ld [wRivalStarterIV_SpdSpc],a
+    jp TextScriptEnd
 
 SECTION "VermilionHouse1_h",ROMX[$5AF0],BANK[$7]
 
@@ -131508,22 +131515,22 @@ DebugStats:
     ; PLAYER
     ; ──────────────────────────
     ; Clear Screen Area
-    FuncCoord 09,07
+    FuncCoord 10,07
     ld hl,Coord
-    ld bc,$050B
+    ld bc,$050A
     call ClearScreenArea
     ; Print IV
-    FuncCoord 09,08
+    FuncCoord 10,08
     ld hl,Coord
     ld de,W_PLAYERMONIVS
     call .Print4IV
     ; Print ATK/DEF/SPD/SPC
-    FuncCoord 12,08
+    FuncCoord 13,08
     ld hl,Coord
     ld de,W_PLAYERMONATK
     call .Print4Stat
     ; Print Current HP / Max HP
-    FuncCoord 16,08
+    FuncCoord 17,08
     ld hl,Coord
     ld de,W_PLAYERMONMAXHP
     call .PrintStat
@@ -137933,16 +137940,8 @@ BattleMonPartyAttr:
 
 GenerateRandomEnemyTrainerIV_:
 
-    ; Handle Custom IV
-    call GetCurrentOldAdventureMap
-    cp LANCES_ROOM
-    jr nz,.Random
-    ld a,[$FF00+$e4]
-    dec a
-    jr nz,.Random
-    ld d,$EA ; Lance's Gyarados
-    ld e,$AA
-    ret
+    call .HandleCustomTrainer
+    ret c
 
 .Random
     call .GetTrainerMinMaxValue
@@ -138119,6 +138118,166 @@ GenerateRandomEnemyTrainerIV_:
     db $2B,$8D,$8D,$AC ; dw $AAAA ; CHANNELER     ; $2D ; (09*03*03*08)/(16^4)*100 = 0.989%
     db $BF,$AF,$BF,$BF ; dw $BABB ; AGATHA        ; $2E ;
     db $FF,$BF,$AF,$9F ; dw $FBA9 ; LANCE         ; $2F ;
+
+.HandleCustomTrainer ; Handle Custom IV
+    ld a,[W_CUROPPONENT]
+    CP SONY2
+    jr nz,.skip1
+    ld a,SONY1
+.skip1
+    CP SONY3
+    jr nz,.skip2
+    ld a,SONY1
+.skip2
+    ld b,a
+    ld a,[$cf91]
+    ld c,a
+    ld hl,.CustomTrainer
+    call .loop
+    ret nc
+    push af
+    or e ; Check if both IV = 0
+    jr nz,.NotStarter
+    ; Starter
+    ld a,[wRivalStarterIV_AtkDef]
+    ld d,a
+    ld a,[wRivalStarterIV_SpdSpc]
+    ld e,a
+.NotStarter
+    pop af
+    ret
+
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFound
+    cp b
+    jr nz,.next3
+    ld a,[hli]
+    cp c
+    jr nz,.next2
+.found
+    ld a,[hli]
+    ld d,a
+    ld e,[hl]
+    scf ; scf = found
+    ret
+.next3
+    inc hl
+.next2
+    inc hl
+    inc hl
+    jr .loop
+.NotFound
+    and a ; rcf = not found
+    ret
+
+.CustomTrainer
+
+    ; Pokemaniac
+    db POKEMANIAC,CHARMANDER,$2A,$AA
+
+    ; Green1
+    db SONY1,SQUIRTLE,$00,$00
+    db SONY1,WARTORTLE,$00,$00
+    db SONY1,BLASTOISE,$00,$00
+    db SONY1,BULBASAUR,$00,$00
+    db SONY1,IVYSAUR,$00,$00
+    db SONY1,VENUSAUR,$00,$00
+    db SONY1,CHARMANDER,$00,$00
+    db SONY1,CHARMELEON,$00,$00
+    db SONY1,CHARIZARD,$00,$00
+    db SONY1,NIDORAN_F,$05,$54
+    db SONY1,NIDORINA,$05,$54
+    db SONY1,RATTATA,$62,$77
+    db SONY1,RATICATE,$62,$77
+    db SONY1,PIDGEY,$DC,$FA
+    db SONY1,PIDGEOTTO,$DC,$FA
+    db SONY1,PIDGEOT,$DC,$FA
+    db SONY1,ABRA,$88,$FF
+    db SONY1,KADABRA,$88,$FF
+    db SONY1,ALAKAZAM,$88,$FF
+    db SONY1,GEODUDE,$9B,$00
+    db SONY1,GRAVELER,$9B,$00
+    db SONY1,GROWLITHE,$F5,$EE
+    db SONY1,ARCANINE,$F5,$EE
+    db SONY1,EXEGGCUTE,$EE,$5F
+    db SONY1,EXEGGUTOR,$EE,$5F
+    db SONY1,SHELLDER,$5F,$EE
+    db SONY1,CLOYSTER,$5F,$EE
+    db SONY1,RHYHORN,$FF,$79
+    db SONY1,RHYDON,$FF,$79
+
+    ; Brock
+    db BROCK,GEODUDE,$55,$55
+    db BROCK,ONIX,$0F,$F0
+
+    ; Misty
+    db MISTY,STARYU,$2A,$A9
+    db MISTY,STARMIE,$B8,$F9
+
+    ; LtSurge
+    db LT__SURGE,RAICHU,$B8,$0E
+
+    ; Erika
+    db ERIKA,TANGELA,$7D,$5A
+    db ERIKA,WEEPINBELL,$E7,$BB
+    db ERIKA,GLOOM,$7E,$9E
+
+    ; Koga
+    db KOGA,VENOMOTH,$7C,$FD
+    db KOGA,GOLBAT,$F4,$F4
+
+    ; Sabrina
+    db SABRINA,HAUNTER,$29,$DD
+    db SABRINA,KADABRA,$3F,$CD
+
+    ; Blaine
+    db BLAINE,NINETALES,$EB,$BA
+    db BLAINE,RHYDON,$DD,$DD
+    db BLAINE,MAGMAR,$BE,$9E
+
+    ; Giovanni
+    db GIOVANNI,GEODUDE,$FF,$0F
+    db GIOVANNI,GOLEM,$FF,$0F
+    db GIOVANNI,RHYHORN,$EE,$EE
+    db GIOVANNI,RHYDON,$EE,$EE
+    db GIOVANNI,PERSIAN,$CC,$FC
+    db GIOVANNI,NIDORINO,$CB,$CB
+    db GIOVANNI,NIDOKING,$CB,$CB
+    db GIOVANNI,NIDOQUEEN,$BC,$BC
+
+    ; Bruno
+    db BRUNO,PRIMEAPE,$C9,$F8
+    db BRUNO,HITMONCHAN,$8F,$BE
+    db BRUNO,HITMONLEE,$F5,$E7
+    db BRUNO,ONIX,$FF,$F0
+    db BRUNO,PINSIR,$DE,$CF
+    db BRUNO,MACHAMP,$F9,$F9
+
+    ; Agatha
+    db AGATHA,HAUNTER,$9B,$EF
+    db AGATHA,GOLBAT,$F4,$FA
+    db AGATHA,ARBOK,$DB,$C9
+    db AGATHA,VENUSAUR,$AB,$9F
+    db AGATHA,HYPNO,$DA,$AE
+    db AGATHA,GENGAR,$AA,$FF
+
+    ; Lorelei
+    db LORELEI,DEWGONG,$AA,$4A
+    db LORELEI,CLOYSTER,$BF,$8C
+    db LORELEI,SLOWBRO,$8C,$0F
+    db LORELEI,BLASTOISE,$CF,$AB
+    db LORELEI,JYNX,$E9,$DE
+    db LORELEI,LAPRAS,$BF,$AE
+
+    ; Lance
+    db LANCE,GYARADOS,$EA,$AA
+    db LANCE,DRAGONAIR,$DA,$DA
+    db LANCE,CHARIZARD,$DD,$EE
+    db LANCE,AERODACTYL,$F9,$F9
+    db LANCE,DRAGONITE,$FF,$FF
+    db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
 

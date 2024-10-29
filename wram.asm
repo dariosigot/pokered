@@ -1530,6 +1530,9 @@ wTempEnemyMinMaxIVDef:: db
 wTempEnemyMinMaxIVSpd:: db
 wTempEnemyMinMaxIVSpc:: db
 
+wRivalStarterIV_AtkDef:: db ; $d726
+wRivalStarterIV_SpdSpc:: db ; $d727
+
 ; Some Free (see shinpokered)
 
 SECTION "W_FLAGS_D733",WRAMX[$d733],BANK[$1]
