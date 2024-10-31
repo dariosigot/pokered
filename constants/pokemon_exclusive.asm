@@ -1,6 +1,6 @@
 ; ──────────────────────────────────────────────────────────────────────
 MissingNoExclusiveMove:
-    db 0
+    db 0 ; TODO
 ; ──────────────────────────────────────────────────────────────────────
 BulbasaurExclusiveMove:
 IvysaurExclusiveMove:

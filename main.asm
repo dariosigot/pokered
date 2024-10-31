@@ -3264,38 +3264,26 @@ GetMonHeader: ; 1537 (0:1537)
     push af
     ld a,[$d0b5]
     ld [$d11e],a
-;    ld de,FossilKabutopsPic
-;    ld b,$66 ; size of Kabutops fossil and Ghost sprites
-;    cp a,FOSSIL_KABUTOPS ; Kabutops fossil
-;    jr z,.specialID
-;    ld de,GhostPic
-;    cp a,MON_GHOST ; Ghost
-;    jr z,.specialID
-;    ld de,FossilAerodactylPic
-;    ld b,$77 ; size of Aerodactyl fossil sprite
-;    cp a,FOSSIL_AERODACTYL ; Aerodactyl fossil
-;    jr z,.specialID
-    ld a,$3a
-    call Predef   ; convert pokemon ID in [$D11E] to pokedex number
-    ld a,[$d11e]
-;   dec a ; MissingNo First
-    ld bc,28
+    call IndexToPokedexAndRestoreD11E
     ld hl,PokemonBaseStats
-    call AddNTimes
-    ld de,W_MONHEADER
     ld bc,28
-    call CopyData
-;    jr .done
-;.specialID
-;    ld hl,W_MONHSPRITEDIM
-;    ld [hl],b ; write sprite dimensions
-;    inc hl
-;    ld [hl],e ; write front sprite pointer
-;    inc hl
-;    ld [hl],d
-;.done
-    ld a,[$d0b5]
-    ld [$d0b8],a
+    call AddNTimes
+.retry
+    call .CopyData
+    ld hl,wAlternateFormIndex
+    ld a,[hl]
+    and a
+    jr z,.done
+    dec a
+    ld [hl],a
+    ld hl,W_MONHMOVES ; Actual Pointer to Alternate Forms
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    or h
+    jr z,.done
+    jr .retry
+.done
     pop af
     ld [$d11e],a
     pop hl
@@ -3304,6 +3292,10 @@ GetMonHeader: ; 1537 (0:1537)
     pop af
     ld [H_LOADEDROMBANK],a
     jp RoutineForRealGB
+.CopyData
+    ld bc,28
+    ld de,W_MONHEADER
+    jp CopyData
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $00)
@@ -8937,7 +8929,7 @@ WaitForSoundToFinish: ; 3748 (0:3748)
 NamePointers: ; 375d (0:375d)
     dw MonsterNames
     dw MoveNames
-    dw UnusedNames
+    dw 0 ; UnusedNames
     dw ItemNames
     dw W_PARTYMON1OT ; player's OT names list
     dw W_ENEMYMON1OT ; enemy's OT names list
@@ -10731,15 +10723,13 @@ IsTryingToLearnPalFix_End:
     call LoadScreenTilesFromBuffer1
     jp GoPAL_SET_CF1C
 
-SECTION "Func_4277",ROMX[$4277],BANK[$1]
-
-Func_4277: ; 4277 (1:4277)
+Func_4277: ; Moved in the Bank
     ld hl,$cce9
     ld a,[hl]
     and a
     jr z,.asm_4284
     dec [hl]
-    ld hl,UnnamedText_42a7 ; $42a7
+    ld hl,.UnnamedText_42a7
     jr .asm_429f
 .asm_4284
     dec hl
@@ -10747,11 +10737,13 @@ Func_4277: ; 4277 (1:4277)
     and a
     ret z
     dec [hl]
-    ld hl,UnnamedText_42ac ; $42ac
+    ld hl,.UnnamedText_42ac
     jr nz,.asm_429f
     push hl
     ld a,[$cfe5]
     ld [$d0b5],a
+    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld [wAlternateFormIndex],a ; Save AlternateFormIndex
     call GetMonHeader
     ld a,[W_MONHCATCHRATE]
     ld [$d007],a
@@ -10761,14 +10753,14 @@ Func_4277: ; 4277 (1:4277)
     call LoadScreenTilesFromBuffer1
     pop hl
     jp PrintText
-
-UnnamedText_42a7: ; 42a7 (1:42a7)
+.UnnamedText_42a7
     TX_FAR SafariZoneEatingText
     db "@"
-
-UnnamedText_42ac: ; 42ac (1:42ac)
+.UnnamedText_42ac
     TX_FAR SafariZoneAngryText
     db "@"
+
+SECTION "CopyFixedLengthText",ROMX[$42b1],BANK[$1]
 
 ; copy text of fixed length $b (like player name,rival name,mon names,...)
 CopyFixedLengthText: ; 42b1 (1:42b1)
@@ -10891,7 +10883,7 @@ ENDC
     call EnableLCD
     ld a,DRATINI ; which Pokemon to show first on the title screen
     ld [wWhichTrade],a ; $cd3d
-    call Func_4524
+    call LoadTitleMonSprite
     ld a,$9b
     call Func_4533
     call SaveScreenTilesToBuffer1
@@ -11034,7 +11026,7 @@ Func_4496: ; 4496 (1:4496)
     cp [hl]
     jr z,.asm_449b
     ld [hl],a
-    call Func_4524
+    call LoadTitleMonSprite
     ld a,$90
     ld [$FF00+$b0],a
     ld d,$1
@@ -11107,12 +11099,12 @@ Func_4519: ; 4519 (1:4519)
     ld a,$7f
     jp FillMemory
 
-Func_4524: ; 4524 (1:4524)
+LoadTitleMonSprite: ; 4524 (1:4524)
     ld [$cf91],a
     ld [$d0b5],a
     FuncCoord 5,10 ; $c46d
     ld hl,Coord
-    call GetMonHeader
+    call LoadTitleMonSprite_HandleAlternative ; call GetMonHeader
     jp LoadFrontSpriteByMonIndex
 
 Func_4533: ; 4533 (1:4533)
@@ -11142,7 +11134,6 @@ CopyrightTextString: ; 4556 (1:4556)
 
 TitleMons: ; 4588 (1:4588)
 ; mons on the title screen are randomly chosen from here
-IF _RED
     db CHARMANDER
     db SQUIRTLE
     db BULBASAUR
@@ -11150,7 +11141,7 @@ IF _RED
     db NIDORAN_M
     db SCYTHER
     db PIKACHU
-    db CLEFAIRY
+    db VOLTORB
     db RHYDON
     db ABRA
     db HAUNTER ; db GASTLY
@@ -11159,43 +11150,6 @@ IF _RED
     db ONIX
     db PONYTA
     db MAGIKARP
-ENDC
-IF _GREEN
-    db BULBASAUR
-    db CHARMANDER
-    db SQUIRTLE
-    db CATERPIE
-    db NIDORAN_F
-    db PINSIR
-    db PIKACHU
-    db CLEFAIRY
-    db RHYDON
-    db ABRA
-    db GASTLY
-    db DITTO
-    db PIDGEOTTO
-    db ONIX
-    db PONYTA
-    db MAGIKARP
-ENDC
-IF _BLUE
-    db SQUIRTLE
-    db CHARMANDER
-    db BULBASAUR
-    db MANKEY
-    db HITMONLEE
-    db VULPIX
-    db CHANSEY
-    db AERODACTYL
-    db JOLTEON
-    db SNORLAX
-    db GLOOM
-    db POLIWAG
-    db DODUO
-    db PORYGON
-    db GENGAR
-    db RAICHU
-ENDC
 
 ; prints version text (red,blue)
 PrintGameVersionOnTitleScreen: ; 4598 (1:4598)
@@ -11221,7 +11175,7 @@ SonyText: ; 45b1 (1:45b1)
     db "SONY@"
 
 ; loads pokemon data from one of multiple sources to $cf98
-; loads base stats to $d0b8
+; loads base stats to $d0b8 (W_MONHEADER)
 ; INPUT:
 ; [$cf92] = index of pokemon within party/box
 ; [$cc49] = source
@@ -11232,22 +11186,34 @@ SonyText: ; 45b1 (1:45b1)
 ; OUTPUT:
 ; [$cf91] = pokemon ID
 ; $cf98 = base address of pokemon data
-; $d0b8 = base address of base stats
+; $d0b8 = base address of base stats (W_MONHEADER)
 LoadMonData_: ; 45b6 (1:45b6)
     ld a,[$da5f] ; daycare pokemon ID
     ld [$cf91],a
     ld a,[$cc49]
     cp a,$03
-    jr z,.GetMonHeader
+    jr z,.done
     ld a,[$cf92]
     ld e,a
-    ld hl,Func_39c37
-    ld b,BANK(Func_39c37)
-    call Bankswitch ; get pokemon ID
-.GetMonHeader
+    ld hl,W_PARTYMON1 ; $d164
+    ld a,[$cc49]
+    and a
+    jr z,.getSpecies
+    dec a
+    jr z,.enemyParty
+    ld hl,W_NUMINBOX+1 ; $da81
+    jr .getSpecies
+.enemyParty
+    ld hl,wEnemyPartyMons ; $d89d
+.getSpecies
+    ld d,$0
+    add hl,de
+    ld a,[hl]
+    ld [$cf91],a
+
+.done
     ld a,[$cf91]
     ld [$d0b5],a ; input for GetMonHeader
-    call GetMonHeader ; load base stats to $d0b8
     ld hl,W_PARTYMON1DATA
     ld bc,44
     ld a,[$cc49]
@@ -11267,9 +11233,32 @@ LoadMonData_: ; 45b6 (1:45b6)
 .copyMonData
     ld de,$cf98
     ld bc,44
-    jp CopyData
+    call CopyData
 
-ItemPrices: ; 4608 (1:4608)
+    ; Copy Exclusive
+    ld hl,W_PARTYMON1OT+8
+    ld a,[$cc49]
+    cp a,$01
+    ret z ; Enemy Exclusive doesn't exists
+    jr c,.getExclusive
+    cp a,$02
+    ld hl,$dd2a+8 ; BOXMON1OT
+    ret nz ; day care Exclusive doesn't exists
+.getExclusive
+    ld a,[$cf92]
+    ld bc,11
+    call AddNTimes
+    ld de,wTempExclusive
+    ld bc,3
+    call CopyData ; copy bc bytes of data from hl to de
+
+    ; Save AlternateFormIndex
+    ld a,[$cfb6] ; move2pp
+    ld [wAlternateFormIndex],a
+
+    jp GetMonHeader ; load base stats to $d0b8
+
+ItemPrices: ; Moved in the Bank
     bcd3 200000 ; MASTER_BALL
     bcd3   1200 ; ULTRA_BALL
     bcd3    600 ; GREAT_BALL
@@ -11354,30 +11343,7 @@ ItemPrices: ; 4608 (1:4608)
     bcd3    900 ; ELIXER
     bcd3   1500 ; MAX_ELIXER
 
-ItemNames_Old: ; 472b (1:472b)
-
-SECTION "UnusedNames",ROMX[$4a92],BANK[$1]
-
-UnusedNames: ; 4a92 (1:4a92)
-    db "かみなりバッヂ@"
-    db "かいがらバッヂ@"
-    db "おじぞうバッヂ@"
-    db "はやぶさバッヂ@"
-    db "ひんやりバッヂ@"
-    db "なかよしバッヂ@"
-    db "バラバッヂ@"
-    db "ひのたまバッヂ@"
-    db "ゴールドバッヂ@"
-    db "たまご@"
-    db "ひよこ@"
-    db "ブロンズ@"
-    db "シルバー@"
-    db "ゴールド@"
-    db "プチキャプテン@"
-    db "キャプテン@"
-    db "プチマスター@"
-    db "マスター@"
-    db "エクセレント"
+SECTION "PrepareOAMData",ROMX[$4b0f],BANK[$1]
 
 ; calculates the OAM data for all currently visible sprites and writes it to wOAMBuffer
 PrepareOAMData: ; 4b0f (1:4b0f)
@@ -16197,6 +16163,17 @@ LearnMove: ; 6e43 (1:6e43)
     ; XX learned YY! ♫♪
     ld hl,.LearnedTextPlusSound
     call PrintText
+    ; Get Mon OT Name to Try Add Exclusive Move
+    ld hl,W_PARTYMON1OT+8
+    ld a,[wWhichPokemon]
+    ld bc,11
+    call AddNTimes
+    ld d,h
+    ld e,l
+    ld hl,GenericBuffer+1
+    ld a,e
+    ld [hli],a
+    ld [hl],d
     ; Get Mon Start to Try Add Exclusive Move
     ld hl,W_PARTYMON1_NUM
     ld a,[wWhichPokemon]
@@ -18394,9 +18371,18 @@ DefaultNamesRival:
     db "NEW NAME",$4E,"BLUE",$4E,"JEANS",$4E,"GARY@"
 
 DefaultNamesPlayerList:
-    db "NEW NAME@RED@DENIM@ASH@"
+    db "@"
+    db "RED@"
+    ds 7
+    db "DENIM@"
+    ds 5
+    db "ASH@"
+    ds 7
 DefaultNamesRivalList:
-    db "NEW NAME@BLUE@JEANS@GARY@"
+    db "@"
+    db "BLUE@"
+    db "JEANS@"
+    db "GARY@"
 
 CheckDiglettsCave:
     call GetCurrentOldAdventureMap
@@ -18623,6 +18609,16 @@ DetectCollisionBetweenSprites: ; Restore Original Player Y (Not consider Jump)
     pop af
     ld [$c104],a
     ret
+
+LoadTitleMonSprite_HandleAlternative:
+    push af
+    cp VOLTORB
+    jr nz,.done
+    ld a,1
+    ld [wAlternateFormIndex],a
+.done
+    pop af
+    jp GetMonHeader
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -24298,7 +24294,7 @@ ItemUseMedicine: ; dabb (3:5abb)
     add hl,bc ; hl now points to level
     ld a,[hl] ; a = level
     ld [$d127],a ; store level
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     push de
     ld a,d
     ld hl,W_PARTYMON1NAME
@@ -25704,7 +25700,7 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     ld [de],a
     cp $ff
     jr nz,.asm_e7b1
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld hl,$dd2a
     ld bc,$b
     ld a,[W_NUMINBOX] ; $da80
@@ -26919,7 +26915,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     push hl
     ld a,[$cf91]
     ld [$d0b5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld hl,W_MONHEADER
     ld a,[hli]
     ld [de],a
@@ -27008,14 +27004,15 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld [de],a
     inc de
 .copyMonTypesAndMoves
-    ld hl,W_MONHTYPES
+    ;ld hl,W_MONHTYPES
     xor a ; ld a,[hli]       ; type 1
+    inc a ; TODO : Test Alternate Form, to handle
     ld [de],a
     inc de
     xor a ; ld a,[hli]       ; type 2
     ld [de],a
     inc de
-    ld a,[hli]       ; unused (?)
+    ;ld a,[hl]       ; unused (?)
     ld [de],a
     ;ld hl,W_MONHMOVES
     ;ld a,[hli]
@@ -30412,7 +30409,7 @@ Func_13653: ; 13653 (4:7653)
 TestMonMoveCompatibility: ; 1373e (4:773e)
     ld a,[$cf91]
     ld [$d0b5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld hl,W_MONHLEARNSET
     push hl
     ld a,[$d0e0]
@@ -43006,8 +43003,6 @@ MovesMenuPrintTitle:
     db "'s Moves@"
 
 LoadMonDataAndPrintActualMoves:
-    ld a,[wWhichPokemon]
-    ld [$cf92],a
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
@@ -43032,17 +43027,7 @@ LoadMonDataAndPrintActualMoves:
     ld a,[$FF00+$f6]
     res 2,a
     ld [$FF00+$f6],a
-    ; Energy
-    ;ld de,$cfb5
-    ;FuncCoord 15,13
-    ;ld hl,Coord
-    ;ld bc,$0103
-    ;call PrintNumber
-    ;ld de,.EnergyIcon
-    ;call PlaceString
     ret
-;.EnergyIcon
-;    db $DA,"@"
 
 WriteEnergyAllMovesDuringMoveRelearn:
     ld d,4
@@ -43556,11 +43541,11 @@ DebugNPC:
     push af
 
     ld a,[H_CURRENTPRESSEDBUTTONS]
-    bit 2,a ; was the start button pressed?
+    bit 2,a ; was the select button pressed?
     jr nz,.select
     bit 3,a ; was the start button pressed?
     jr nz,.start
-    jr .standard
+    jp .standard
 
 .select
     ld hl,W_NUMINPARTY
@@ -43590,15 +43575,15 @@ DebugNPC:
     ld a,$10
     jp Predef
 .DoneTextSelect
-    db 0,"Done! (select)",$57,"@"
+    db 0,"Done! (Pokedex)",$57,"@"
 
 .start
     ld a,[W_NUMINPARTY]
     ld b,a
     ld hl,W_PARTYMON1_TYPE1
     ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
-    xor a
 .loop1
+    xor a
     ld [hli],a ; Zero Type
     ld [hld],a ; ...
     push hl
@@ -43607,19 +43592,36 @@ DebugNPC:
     add hl,de
     dec a
     ld [hli],a ; 255 Energy
-    inc a
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 6,a ; was the up button pressed?
+    jr z,.skip1
+    xor a
     ld [hli],a ; Zero PP
     ld [hli],a ; ...
     ld [hl],a  ; ...
+.skip1
     pop de
     pop hl
     add hl,de
     dec b
     jr nz,.loop1
+    ld a,[W_NUMINPARTY]
+    ld b,a
+    ld hl,W_PARTYMON1OT+8
+    ld de,11
+    xor a
+.loop1b
+    ld [hli],a ; Mon OT + 8
+    ld [hli],a ; Mon OT + 9
+    ld [hld],a ; Mon OT + 10
+    dec hl
+    add hl,de
+    dec b
+    jr nz,.loop1b
     ld hl,.DoneTextStart
     jp .end
 .DoneTextStart
-    db 0,"Done! (start)",$57,"@"
+    db 0,"Done! (Reset TM)",$57,"@"
 
 .standard
     ld a,[W_NUMINPARTY]
@@ -43641,6 +43643,7 @@ DebugNPC:
     ld bc,$2c
     call AddNTimes
     ld [hl],255 ; 255 Energy
+    call .CopyPPToOT
     pop af
     ld [$FF00+$e4],a
     pop bc
@@ -43651,6 +43654,50 @@ DebugNPC:
     jp .end
 .DoneText
     db 0,"Done!",$57,"@"
+.CopyPPToOT
+    ld hl,W_PARTYMON1_MOVE2PP
+    ld a,[$FF00+$e4]
+    dec a
+    ld bc,$2c
+    call AddNTimes
+    push hl
+    ld hl,W_PARTYMON1OT+8
+    ld a,[$FF00+$e4]
+    dec a
+    ld bc,11
+    call AddNTimes
+    ld d,h
+    ld e,l
+    pop hl
+    ; hl = PP
+    ; de = OT
+    ld a,[de]
+    ld b,a
+    ld a,[hli]
+    or b
+    ld [de],a
+    inc de
+    ld a,[de]
+    ld b,a
+    ld a,[hli]
+    or b
+    ld [de],a
+    inc de
+    ld a,[de]
+    ld b,a
+    ld a,[hl]
+    or b
+    ld [de],a
+    ; hl = PP
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 6,a ; was the up button pressed?
+    jr z,.skip
+    xor a
+    ld [hld],a
+    ld [hld],a
+    ld [hl],a
+.skip
+    ret
 
 .end
     call PrintText
@@ -43673,16 +43720,26 @@ HandleExclusiveLearnMove:
     ld hl,$cf9e ; Ex Type2
     ld c,1      ; Byte 1
     call .SearchSetBit
-    ld hl,$cfb6 ; Ex PP 2
-    ld c,2      ; Byte 1
+    ld hl,wTempExclusiveByte01
+    ld c,2      ; Byte 2
     call .SearchSetBit
-    ld hl,$cfb7 ; Ex PP 3
-    ld c,3      ; Byte 1
+    ld hl,wTempExclusiveByte02
+    ld c,3      ; Byte 3
     call .SearchSetBit
-    ld hl,$cfb8 ; Ex PP 4
-    ld c,4      ; Byte 1
-    call .SearchSetBit
+    ld hl,wTempExclusiveByte03
+    ld c,4      ; Byte 4
+    ; fall through
 
+.SearchSetBit
+    ld a,[hl]
+    ld b,8
+.LoopBit
+    srl a
+    jr nc,.NextBit
+    call .BitFound
+.NextBit
+    dec b
+    jr nz,.LoopBit
     ret
 
 .GetBufferPointerToCorrectExlusiveLearnMoveList
@@ -43700,18 +43757,6 @@ HandleExclusiveLearnMove:
     ld bc,2
     call CopyData
     pop de
-    ret
-
-.SearchSetBit
-    ld a,[hl]
-    ld b,8
-.LoopBit
-    srl a
-    jr nc,.NextBit
-    call .BitFound
-.NextBit
-    dec b
-    jr nz,.LoopBit
     ret
 
 .BitFound
@@ -43808,7 +43853,7 @@ HandleExclusiveLearnMove:
 
 AddPokemonToParty_TryToAddExclusiveMove_:
     ; Backup
-    ld a,[$cf92]
+    ld a,[wWhichPokemon]
     push af
     ld a,[$cc49]
     push af
@@ -43816,7 +43861,7 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     ; Get Move List
     ld a,[$FF00+$e4] ; Mon Id +1
     dec a
-    ld [$cf92],a
+    ld [wWhichPokemon],a
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
@@ -43833,8 +43878,7 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     
     ; Save Exclusive Move in Mon Internal Bytes from 4 Moves
     ld hl,W_PARTYMON1_MOVE1
-    ld a,[$FF00+$e4] ; Mon Id +1
-    dec a
+    ld a,[wWhichPokemon]
     ld bc,$2c
     call AddNTimes
     ld b,4
@@ -43845,7 +43889,7 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     pop af
     ld [$cc49],a
     pop af
-    ld [$cf92],a
+    ld [wWhichPokemon],a
     ret
 .Loop
     ld a,[hli]
@@ -43856,10 +43900,20 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     ld [$d0e0],a
     push bc
     push hl
+    ; Get Mon OT Name to Try Add Exclusive Move
+    ld hl,W_PARTYMON1OT+8
+    ld a,[wWhichPokemon]
+    ld bc,11
+    call AddNTimes
+    ld d,h
+    ld e,l
+    ld hl,GenericBuffer+1
+    ld a,e
+    ld [hli],a
+    ld [hl],d
     ; Get Mon Start to Try Add Exclusive Move
     ld hl,W_PARTYMON1_NUM
-    ld a,[$FF00+$e4] ; Mon Id +1
-    dec a
+    ld a,[wWhichPokemon]
     ld bc,$2c
     call AddNTimes
     ld d,h
@@ -43874,14 +43928,14 @@ AddPokemonToParty_TryToAddExclusiveMove_:
 
 SentNewMonToBox_TryToAddExclusiveMove:
     ; Backup
-    ld a,[$cf92]
+    ld a,[wWhichPokemon]
     push af
     ld a,[$cc49]
     push af
 
     ; Get Move List
     xor a ; id = 0
-    ld [$cf92],a
+    ld [wWhichPokemon],a
     ld a,2 ; current box
     ld [$cc49],a
     call LoadMonData
@@ -43906,7 +43960,7 @@ SentNewMonToBox_TryToAddExclusiveMove:
     pop af
     ld [$cc49],a
     pop af
-    ld [$cf92],a
+    ld [wWhichPokemon],a
     ret
 .Loop
     ld a,[hli]
@@ -43917,6 +43971,12 @@ SentNewMonToBox_TryToAddExclusiveMove:
     ld [$d0e0],a
     push bc
     push hl
+    ; Get Mon OT Name to Try Add Exclusive Move
+    ld de,$dd2a+8 ; BOXMON1OT
+    ld hl,GenericBuffer+1
+    ld a,e
+    ld [hli],a
+    ld [hl],d
     ; Get Mon Start to Try Add Exclusive Move
     ld de,W_BOXMON1DATA
     call TryToAddExclusiveMove
@@ -43930,6 +43990,7 @@ SentNewMonToBox_TryToAddExclusiveMove:
 ; Input
 ; [$d0e0] = Learned Move
 ; [de] = Mon Start
+; [GenericBuffer+1]=Pointer to Mon OT last 3 Byte
 TryToAddExclusiveMove:
     ld a,[de] ; mon ID
     ld hl,ExclusiveMoveLearnTable
@@ -43954,9 +44015,16 @@ TryToAddExclusiveMove:
     jr z,.MoveFound
     inc c
     jr .Loop
-.MoveFound
-    ; c = id move in Table
-    ; wWhichPokemon
+.MoveFound ; c = id move in Table
+    ; Get correct start point in de
+    ld a,c
+    cp 8*2 ; check if the move is in the first 2 bytes
+    jr c,.notInOTName
+    ld hl,GenericBuffer+1
+    ld a,[hli]
+    ld d,[hl]
+    ld e,a
+.notInOTName
     push de
     ld hl,.LocationByteOffset
     ld d,0
@@ -43969,7 +44037,7 @@ TryToAddExclusiveMove:
     ld l,[hl]
     ld h,0
     add hl,de
-    ; hl = pointer to mon corrent Byte to flag
+    ; hl = pointer to mon correct Byte to flag
     ld a,c
     and %00000111 ; Mask to obtain bit id (0,1,...,7)
     ld b,a
@@ -43988,9 +44056,9 @@ TryToAddExclusiveMove:
 .LocationByteOffset
     db W_PARTYMON1_TYPE1-W_PARTYMON1_NUM
     db W_PARTYMON1_TYPE2-W_PARTYMON1_NUM
-    db W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
-    db W_PARTYMON1_MOVE3PP-W_PARTYMON1_NUM
-    db W_PARTYMON1_MOVE4PP-W_PARTYMON1_NUM
+    db 0
+    db 1
+    db 2
 
 ExclusiveMoveLearnTable:
     dw MissingNoExclusiveMove  ; 000 - MISSINGNO
@@ -46892,13 +46960,11 @@ ShellderPicFront: ; 26cb6 (9:6cb6)
 ShellderPicBack: ; 26dc3 (9:6dc3)
     INCBIN "pic/monback/shellderb.pic"
 
-SECTION "Func_27d6b",ROMX[$7d6b],BANK[$9]
-
-Func_27d6b: ; 27d6b (9:7d6b)
+Func_27d6b: ; Moved in the Bank
     call Load16BitRegisters
-    push hl
-    call GetMonHeader
-    pop hl
+    ;push hl
+    ;call GetMonHeader
+    ;pop hl
     push hl
     ld a,[W_MONHTYPE1]
     call Func_27d89
@@ -46911,7 +46977,7 @@ Func_27d6b: ; 27d6b (9:7d6b)
     ld bc,$14 ; Denim ; ld bc,$28 ; Tipo2 a capo
     add hl,bc
 
-Func_27d89: ; 27d89 (9:7d89)
+Func_27d89: ; Moved in the Bank
     push hl
     jr asm_27d9f
 asm_27d8c: ; 27d8c (9:7d8c)
@@ -46921,7 +46987,7 @@ asm_27d8c: ; 27d8c (9:7d8c)
     ld bc,$6
     jp FillMemory
 
-PrintMoveType: ; 27d98 (9:7d98)
+PrintMoveType: ; Moved in the Bank
     call Load16BitRegisters
     push hl
     ld a,[W_PLAYERMOVETYPE] ; $cfd5
@@ -49675,23 +49741,9 @@ Func_39bd5: ; 39bd5 (e:5bd5)
     ld [$cf90],a
     ret
 
-Func_39c37: ; 39c37 (e:5c37)
-    ld hl,W_PARTYMON1 ; $d164
-    ld a,[$cc49]
-    and a
-    jr z,.asm_39c4b
-    dec a
-    jr z,.asm_39c48
-    ld hl,$da81
-    jr .asm_39c4b
-.asm_39c48
-    ld hl,$d89d
-.asm_39c4b
-    ld d,$0
-    add hl,de
-    ld a,[hl]
-    ld [$cf91],a
-    ret
+; Free
+
+SECTION "ReadTrainer",ROMX[$5c53],BANK[$e]
 
 ReadTrainer: ; 39c53 (e:5c53)
 
@@ -50494,7 +50546,7 @@ AfterEvolution_TryToAddExclusiveMove:
     ld a,[$d11e]
     ld [$cf91],a
     push af
-    ld a,[$cf92]
+    ld a,[wWhichPokemon]
     push af
     ld a,[$cc49]
     push af
@@ -50520,7 +50572,7 @@ AfterEvolution_TryToAddExclusiveMove:
     pop af
     ld [$cc49],a
     pop af
-    ld [$cf92],a
+    ld [wWhichPokemon],a
     pop af
     ld [$d11e],a
     ld [$cf91],a
@@ -50535,6 +50587,17 @@ AfterEvolution_TryToAddExclusiveMove:
     ld [$d0e0],a
     push bc
     push hl
+    ; Get Mon OT Name to Try Add Exclusive Move
+    ld hl,W_PARTYMON1OT+8
+    ld a,[wWhichPokemon]
+    ld bc,11
+    call AddNTimes
+    ld d,h
+    ld e,l
+    ld hl,GenericBuffer+1
+    ld a,e
+    ld [hli],a
+    ld [hl],d
     ; Get Mon Start to Try Add Exclusive Move
     ld hl,W_PARTYMON1_NUM
     ld a,[wWhichPokemon]
@@ -50553,8 +50616,6 @@ AfterEvolution_TryToAddExclusiveMove:
     ret
 
 GetMoveList:
-    ld a,[wWhichPokemon]
-    ld [$cf92],a
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
@@ -50834,24 +50895,27 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     call DelayFrames
     call ClearScreen
     call Func_3aef7
-    ld a,[$d11e]
-    push af
-    ld a,[$d0b5]
-    ld [$d11e],a
-    ld a,$3a
-    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
-    ld a,[$d11e]
-;   dec a ; MissingNo First
-    ld hl,PokemonBaseStats ; $43de
-    ld bc,$1c
-    call AddNTimes
-    ld de,W_MONHEADER
-    ld a,BANK(PokemonBaseStats)
-    call FarCopyData
-    ld a,[$d0b5]
-    ld [$d0b8],a
-    pop af
-    ld [$d11e],a
+;    ld a,[$d11e]
+;    push af
+;    ld a,[$d0b5]
+;    ld [$d11e],a
+;    ld a,$3a
+;    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
+;    ld a,[$d11e]
+;;   dec a ; MissingNo First
+;    ld hl,PokemonBaseStats ; $43de
+;    ld bc,$1c
+;    call AddNTimes
+;    ld de,W_MONHEADER
+;    ld a,BANK(PokemonBaseStats)
+;    call FarCopyData
+;    ld a,[$d0b5]
+;    ld [$d0b8],a
+;    pop af
+;    ld [$d11e],a
+
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
+
     ld hl,$cfa8
     ld de,$cfba
     ld b,$1
@@ -53007,7 +53071,7 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
     ret
 
 InsertRealTypes:
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     PREDEF_JUMP InsertRealTypesPredef
 
 SECTION "HandlePoisonBurnLeechSeed_IncreaseEnemyHP",ROMX[$44a3],BANK[$f]
@@ -53786,7 +53850,7 @@ Func_3c92a: ; 3c92a (f:492a)
     ld a,[W_ENEMYMONID]
     ld [$CF91],a
     ld [$D0B5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld de,$9000
     call LoadMonFrontSprite
     ld a,$CF
@@ -54005,7 +54069,7 @@ LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
     call CopyData
     ld a,[$cfd9]
     ld [$d0b5],a
-    call InsertRealTypes ; call GetMonHeader
+    call InsertRealTypes
     ld hl,W_PARTYMON1NAME ; $d2b5
     ld a,[wPlayerMonNumber] ; $cc2f
     call SkipFixedLengthTextEntries
@@ -54048,7 +54112,7 @@ LoadEnemyMonFromParty: ; 3cc13 (f:4c13)
     call CopyData
     ld a,[$cfe5]
     ld [$d0b5],a
-    call InsertRealTypes ; call GetMonHeader
+    call InsertRealTypes
     ld hl,$d9ee
     ld a,[wWhichPokemon] ; $cf92
     call SkipFixedLengthTextEntries
@@ -54753,7 +54817,7 @@ Func_3d119: ; 3d119 (f:5119)
     ld a,[$cfe5]
     ld [$cf91],a
     ld [$d0b5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld de,$9000
     call LoadMonFrontSpriteOrGhost ; call LoadMonFrontSprite
     jr .asm_3d187
@@ -56748,7 +56812,7 @@ Func_3df1c: ; 3df1c (f:5f1c)
     ld [W_CURENEMYLVL],a ; $d127
     ld a,[$cfe5]
     ld [$d0b5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld hl,$cff1
     ld de,$cfaf
     ld a,[hli]
@@ -57825,6 +57889,12 @@ TrappingEffect:
     ld [de],a
     ret
 
+LoadEnemyMonData_GetAlternateMonHeader:
+    ld hl,LoadEnemyMonData_GetAlternateMonHeader_
+    ld b,BANK(LoadEnemyMonData_GetAlternateMonHeader_)
+    call Bankswitch
+    jp GetMonHeader
+
 ; Free
 
 SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
@@ -58616,7 +58686,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld a,[W_ENEMYMONID]
     ld [$cfe5],a
     ld [$d0b5],a
-    call GetMonHeader
+    call LoadEnemyMonData_GetAlternateMonHeader ; call GetMonHeader
     ld a,[W_ENEMYBATTSTATUS3] ; $d069
     bit 3,a
     ld hl,$cceb
@@ -80262,7 +80332,7 @@ GainExperience: ; 5524f (15:524f)
     ld a,[hl]
     ld [$d0b5],a
     ld [$d11e],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld bc,$23
     add hl,bc
     push hl
@@ -84035,7 +84105,7 @@ WithExpAllText:
     db "@"
 
 GetMonHeaderAndMaxLevel:
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld hl,GetMaxLevel
     ld b,BANK(GetMaxLevel)
     jp Bankswitch
@@ -84750,7 +84820,7 @@ UnnamedText_58f3e: ; 58f3e (16:4f3e)
 Func_58f43: ; 58f43 (16:4f43)
     ld a,[$cf98]
     ld [$d0b5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld d,$1
 .asm_58f4e
     inc d
@@ -91650,7 +91720,7 @@ SetPartyMonTypes: ; 5db5e (17:5b5e)
     ld a,[$d11e]
     ld [$d0b5],a
     push hl
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     pop hl
     ld a,[W_MONHTYPE1]
     ld [hli],a
@@ -91730,7 +91800,7 @@ DisplayMonFrontSpriteInBox: ; 5dbd9 (17:5bd9)
     call UpdateSprites
     ld a,[$cf91]
     ld [$d0b5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld de,$8b10
     call LoadMonFrontSprite
     ld a,$80
@@ -96740,7 +96810,7 @@ Func_70278: ; 70278 (1c:4278)
 .asm_7029d
     FuncCoord 12,5 ; $c410
     ld hl,Coord
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     call LoadFrontSpriteByMonIndex
     ld a,$4
     call Predef ; indirect jump to LoadMonBackSprite (3f103 (f:7103))
@@ -99692,6 +99762,37 @@ IndexToMiniSpritePointer:
 TownMapUpArrow: ; Moved in the Bank
     INCBIN "gfx/up_arrow.2bpp"
 
+HackForInsertDVInHallOfFameDataFirstStep:
+    ld a,[$cd3e] ; Pokemon Party Order
+    ld hl,W_PARTYMON1_IV
+    ld bc,44 ; Pokemon Data Lenght
+    call AddNTimes
+    call IsShiny
+    call SetTempIV
+    push hl
+    inc hl
+    inc hl
+    inc hl
+    ld a,[hl] ; Read move2pp
+    ld [wAlternateFormIndex],a
+    ld [wTempAlternateFormIndex],a
+    pop hl
+    jp Func_70278
+
+HackForInsertDVInHallOfFameDataSecondStep:
+    call CopyData
+    ld h,d
+    ld l,e
+    ld a,[wDVForShinyAtkDef] ; DV Atk/Def
+    ld [hli],a
+    ld a,[wDVForShinySpdSpc] ; DV Spd/Spc
+    ld [hli],a
+    ld a,[wTempAlternateFormIndex] ; Alternate Form ID
+    ld [hld],a
+    xor a
+    ld [wTempAlternateFormIndex],a ; Alternate Form ID
+    jp ResetTempIV
+
 SECTION "MonOverworldSprites",ROMX[$5959],BANK[$1C]
 
 MonOverworldSprites: ; 71959 (1c:5959)
@@ -99947,7 +100048,8 @@ Func_71d4f: ; 71d4f (1c:5d4f)
     ret
 
 Unknown_71d59: ; 71d59 (1c:5d59)
-INCBIN "baserom.gbc",$71d59,$71d64 - $71d59
+    db $5D,$50
+    ds 9 ; "Trainer" Name
 
 InGameTradeTextPointers: ; 71d64 (1c:5d64)
     dw TradeTextPointers1
@@ -102287,25 +102389,6 @@ SkipShinyAndGetPAL:
     pop hl
     jp DeterminePaletteID
 
-HackForInsertDVInHallOfFameDataFirstStep:
-    ld a,[$cd3e] ; Pokemon Party Order
-    ld hl,W_PARTYMON1_IV
-    ld bc,44 ; Pokemon Data Lenght
-    call AddNTimes
-    call IsShiny
-    call SetTempIV
-    jp Func_70278
-
-HackForInsertDVInHallOfFameDataSecondStep:
-    call CopyData
-    ld h,d
-    ld l,e
-    ld a,[wDVForShinyAtkDef] ; DV Atk/Def
-    ld [hli],a
-    ld a,[wDVForShinySpdSpc] ; DV Spd/Spc
-    ld [hl],a
-    jp ResetTempIV
-
 SAME_PALETTE EQU 19
 
 DeterminePaletteID:
@@ -102907,7 +102990,7 @@ Func_740cb: ; 740cb (1d:40cb)
     ld [$D0B5],a
     FuncCoord 8,6 ; $c420
     ld hl,Coord
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     call LoadFrontSpriteByMonIndex
     ld hl,$980C
     call Func_74164
@@ -107364,7 +107447,7 @@ Func_76610: ; 76610 (1d:6610)
     ld [$CD3F],a
     ld de,$CD6D
     ld bc,$000B
-    call CheckShinyFromHallOfFameData ; call CopyData
+    call CheckShinyAndAlternativeFromHallOfFameData ; call CopyData
     ld b,$0B
     ld c,0
     call GoPAL_SET
@@ -107636,10 +107719,17 @@ Func_76857: ; 76857 (1d:6857)
     inc hl
     jr .loop
 
-CheckShinyFromHallOfFameData:
+CheckShinyAndAlternativeFromHallOfFameData:
     call CopyData
     call IsShiny
-    jp SetTempIV
+    call SetTempIV
+    push hl
+    inc hl
+    inc hl
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    pop hl
+    ret
 
 BankswitchAndRemoveIVFromCheckShinyArea:
     call Bankswitch
@@ -109853,7 +109943,7 @@ Func_79793: ; 79793 (1e:5793)
     ld [$d0b5],a
     xor a
     ld [W_SPRITEFLIPPED],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     FuncCoord 12,0 ; $c3ac
     ld hl,Coord
     call LoadFrontSpriteByMonIndex
@@ -109864,7 +109954,7 @@ Func_79793: ; 79793 (1e:5793)
     ld a,[$ceea]
     ld [$cfd9],a
     ld [$d0b5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld a,$4
     call Predef ; indirect jump to LoadMonBackSprite (3f103 (f:7103))
     xor a
@@ -114531,7 +114621,7 @@ Func_7beb4: ; 7beb4 (1e:7eb4)
     jp GoPAL_SET
 
 Func_7beb9: ; 7beb9 (1e:7eb9)
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     FuncCoord 7,2 ; $c3cf
     ld hl,Coord
     jp LoadFlippedFrontSpriteByMonIndex
@@ -131204,6 +131294,11 @@ MissingNoPicFront:
 MissingNoPicBack:
     INCBIN "pic/other/BackSpriteMissingNo.pic"
 
+HisuiVoltorbPicFront:
+    INCBIN "pic/bmon/husuivoltorb.pic"
+HisuiVoltorbPicBack:
+    INCBIN "pic/monback/husuivoltorbb.pic"
+
 SECTION "bank32",ROMX,BANK[$32]
 
 DratiniCave_h:
@@ -131508,9 +131603,9 @@ DebugStats:
     call .PrintStat
     ld de,W_ENEMYMONCURHP
     call .PrintStat
-    ; Print Energy
+    ; Print Energy & Alternate Form ID
     ld de,W_ENEMYMONPP
-    call .PrintEnergy
+    call .Print2Stat1Byte
     ; ──────────────────────────
     ; PLAYER
     ; ──────────────────────────
@@ -131536,9 +131631,9 @@ DebugStats:
     call .PrintStat
     ld de,W_PLAYERMONCURHP
     call .PrintStat
-    ; Print Energy
+    ; Print Energy & Alternate Form ID
     ld de,W_PLAYERMONPP
-    call .PrintEnergy
+    call .Print2Stat1Byte
     ; End
     scf
     ret
@@ -131581,9 +131676,17 @@ DebugStats:
     inc de
     inc de
     ret
-.PrintEnergy
+.Print2Stat1Byte
+    call .PrintStat1Byte
+.PrintStat1Byte
+    push de
     ld bc,$0103 ; three digits
-    jp PrintNumber
+    call PrintNumber
+    ld de,17
+    add hl,de
+    pop de
+    inc de
+    ret
 
 _DebugPlayerStats:
     ; Remove Stat Text
@@ -131621,15 +131724,11 @@ _DebugPlayerStats:
     call .PrintStatBR
     ld de,$cfb1
     call .PrintStatBR
-    ; Clear Screen for Exclusive
+    ; Clear Screen for Exclusive & Type
     FuncCoord 00,07
     ld hl,Coord
-    ld bc,$0309
+    ld bc,$0609
     call ClearScreenArea
-    FuncCoord 00,11
-    ld hl,Coord
-    ld de,.DebugOTText
-    call PlaceString
     ; Print Exclusive Moves Flag
     FuncCoord 00,07
     ld hl,Coord
@@ -131641,22 +131740,33 @@ _DebugPlayerStats:
     ld de,$cf9e ; type2
     ld bc,$0103
     call PrintNumber
-    ;FuncCoord 00,09
-    ;ld hl,Coord
-    ;ld de,$cfb5 ; exp pp 1
-    ;ld bc,$0103
-    ;call PrintNumber
     FuncCoord 00,09
     ld hl,Coord
-    ld de,$cfb6 ; exp pp 2
+    ld de,wTempExclusiveByte01
     ld bc,$0103
     call PrintNumber
     FuncCoord 00,10
     ld hl,Coord
-    ld de,$cfb7 ; exp pp 3
+    ld de,wTempExclusiveByte02
     ld bc,$0103
     call PrintNumber
     FuncCoord 00,11
+    ld hl,Coord
+    ld de,wTempExclusiveByte03
+    ld bc,$0103
+    call PrintNumber
+    ; Print Ex PP
+    FuncCoord 04,09
+    ld hl,Coord
+    ld de,$cfb6 ; exp pp 2
+    ld bc,$0103
+    call PrintNumber
+    FuncCoord 04,10
+    ld hl,Coord
+    ld de,$cfb7 ; exp pp 3
+    ld bc,$0103
+    call PrintNumber
+    FuncCoord 04,11
     ld hl,Coord
     ld de,$cfb8 ; exp pp 4
     ld bc,$0103
@@ -131695,8 +131805,6 @@ _DebugPlayerStats:
     db "   ",$4e
     db "   ",$4e
     db "   ",$4e
-    db "   @"
-.DebugOTText
     db "   @"
 
 ; INPUT :
@@ -135545,7 +135653,7 @@ _CriticalHitTest_NoBug:
     ld a,[W_PLAYERMONID]
 .handleEnemy
     ld [$d0b5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld a,[W_MONHBASESPEED]
     ld b,a
     srl b                        ; /2 for regular move (effective (base speed / 2)) --> base crit rate
@@ -136245,7 +136353,7 @@ TestPhysicalSpecial_:
 .hyperbeam
     ld a,[bc]
     ld [$D0B5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld a,[W_MONHBASESPECIAL]
     ld b,a
     ld a,[W_MONHBASEATTACK] ; b = special | a = attack
@@ -136334,7 +136442,7 @@ StatusScreen:
     jr nz,.downFromStatus1
     bit 6,a ; up pressed?
     jr nz,.upFromStatus1
-    ; fall through (b/right)
+    ; fall through (a/right)
 
 ; STATUSSCREEN 2
     jr .skipIfDirectlyFromStatus1
@@ -136517,6 +136625,13 @@ HandleStatusScreen1:
     call unk_12a7e
     ld d,h
     ld e,l
+    push de
+    ld de,8
+    add hl,de
+    ld de,wTempExclusive
+    ld bc,3
+    call CopyData ; copy bc bytes of data from hl to de
+    pop de
     FuncCoord 1,12
     ld hl,Coord
     call PlaceString ; OT
@@ -137070,7 +137185,7 @@ ItemInBattleFinalCheck:
     add hl,bc
     ld a,[hl]
     ld [$d0b5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     PREDEF LoadMonBackSpritePredef
     ld b,BANK(LoadHudAndHpBarAndStatusTilePatterns)
     ld hl,LoadHudAndHpBarAndStatusTilePatterns
@@ -137787,7 +137902,7 @@ CalcEXPBarPixelLength_:
 .skip
     ld a,[hl]
     ld [$d0b5],a
-    call GetMonHeader
+    call GetMonHeader ; TODO:HandleAlternateFormIndex
     ld a,[W_PLAYERMONLEVEL]
     call CalcEXPBarPixelLength_.Start
 
@@ -138281,6 +138396,25 @@ GenerateRandomEnemyTrainerIV_:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+LoadEnemyMonData_GetAlternateMonHeader_:
+    ld a,[W_ISINBATTLE]
+    cp 2
+    jr z,.TrainerBattle
+.WildBattle
+    xor a
+    jr .end
+.TrainerBattle
+    ld hl,wEnemyMon1+(W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM) ; move2pp
+    ld a,[wWhichPokemon]
+    ld bc,44
+    call AddNTimes
+    ld a,[hl]
+.end
+    ld [wAlternateFormIndex],a
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
 SECTION "Bank39",ROMX,BANK[$39]
 
 MonOverworldDataNew_emimonserrate:
@@ -138297,6 +138431,7 @@ SECTION "Bank3b",ROMX,BANK[$3B]
 
 PokemonBaseStats:
 INCLUDE "constants/pokemon_header.asm"
+INCLUDE "constants/pokemon_header_alternate_forms.asm"
 INCLUDE "constants/pokemon_learnset.asm"
 INCLUDE "constants/pokemon_learnset_config.asm"
 

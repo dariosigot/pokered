@@ -815,7 +815,10 @@ W_MONHLEARNSET: ; d0cc
 ; bit field
     ds 7
 
-    ds 4
+    ds 2
+
+wAlternateFormIndex:: db ; $d0d5
+wTempAlternateFormIndex:: db ; $d0d6
 
 W_MONHPADDING: ; d0d7
 
@@ -1525,10 +1528,21 @@ wBackupStatRaisedLoweredType:: db ; d71f
 
 SECTION "wUnusedD722",WRAMX[$d722],BANK[$1]
 
+UNION
+
 wTempEnemyMinMaxIVAtk:: db
 wTempEnemyMinMaxIVDef:: db
 wTempEnemyMinMaxIVSpd:: db
 wTempEnemyMinMaxIVSpc:: db
+
+NEXTU
+
+wTempExclusive:
+wTempExclusiveByte01:: db
+wTempExclusiveByte02:: db
+wTempExclusiveByte03:: db
+
+ENDU
 
 wRivalStarterIV_AtkDef:: db ; $d726
 wRivalStarterIV_SpdSpc:: db ; $d727
@@ -1775,7 +1789,7 @@ wBackupDarkMap         ; df37
 wTempStatLO            ; df37
 wFieldMoveMonID        ; df37 = Mon ID used for Cry
 wMonIdCryAndDex        ; df37 = Mon ID used for PlayCryAndDisplayPokedex
-wTempEnemyMinMaxIV        ; df37 = Temp Min Enemy IV Value
+wTempEnemyMinMaxIV     ; df37 = Temp Min Enemy IV Value
     ds 1
 
 wFlagAddPkmnToPartyBit0     ; df38 ; bit 0
