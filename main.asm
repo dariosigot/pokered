@@ -23063,12 +23063,14 @@ WriteMonMoves2:
 WriteMovePP:
     ld a,[W_ISINBATTLE]
     dec a
-    jp nz,AddPokemonToParty_WriteMovePP
+    jp nz,ResetMovePPs_
     inc de
     ld hl,wBackupEnemyPP
     ld bc,$4
     call CopyData
     dec de
+    xor a
+    ld [wTempAlternateFormIndex],a
     ret
 
 CheckForCollisionWhenPushingBoulder: ; Moved in the Bank
@@ -23766,57 +23768,21 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
 .PrintText
     jp PrintText
 
-SECTION "ItemUsePokedex",ROMX[$5a5b],BANK[$3]
-
-ItemUseEvoStone: ; da5b (3:5a5b)
+ItemUseEvoStone: ; Moved in the Bank
     ld a,[W_ISINBATTLE]
     and a
     jp nz,ItemUseNotTime
-    ld a,[$cf92]
-    push af
-    ld a,[$cf91]
-    ld [$d156],a
-    push af
-    ld a,$05 ; evolution stone party menu
-    ld [$d07d],a
-    ld a,$ff
-    ld [$cfcb],a
-    call DisplayPartyMenu
-    pop bc
-    jr c,.canceledItemUse
-    ld a,b
-    ld [$cf91],a
-    ld a,$01
-    ld [$ccd4],a
-    ld a,$8e
-    call PlaySoundWaitForCurrent ; play sound
-    call WaitForSoundToFinish ; wait for sound to end
-    ld hl,TryEvolvingMon
-    ld b,BANK(TryEvolvingMon)
-    call Bankswitch ; try to evolve pokemon
-    ld a,[$d121]
-    and a
-    jr z,.noEffect
-    pop af
-    ld [$cf92],a
-    ld hl,wNumBagItems
-    ld a,1 ; remove 1 stone
-    ld [$cf96],a
-    jp RemoveItemFromInventory
-.noEffect
-    call ItemUseNoEffect
-.canceledItemUse
-    xor a
-    ld [$cd6a],a
-    pop af
-    ret
+    ld hl,ItemUseEvoStone_
+    ld b,BANK(ItemUseEvoStone_)
+    jp Bankswitch
 
-ItemUseVitamin: ; dab4 (3:5ab4)
+ItemUseVitamin: ; Moved in the Bank
     ld a,[W_ISINBATTLE]
     and a
     jp nz,ItemUseNotTime
+    ; fall through
 
-ItemUseMedicine: ; dabb (3:5abb)
+ItemUseMedicine: ; Moved in the Bank
     ld a,[W_NUMINPARTY]
     and a
     jp z,.emptyParty
@@ -23842,31 +23808,41 @@ ItemUseMedicine: ; dabb (3:5abb)
 .emptyPartyText
     db $0,"You don't have",$4F
     db "any #MON!",$58
+.MustChoiceActiveText
+    TX_FAR _MustChoiceActiveText
+    db "@"
 .notUsingSoftboiled
     call DisplayPartyMenu
 .getPartyMonDataAddress
     jp c,.canceledItemUse
-    ; ds 3 ; ld hl,W_PARTYMON1DATA
-    ; ds 3 ; ld bc,44
-    ; ds 3 ; ld a,[$cf92]
-    ; ds 3 ; call AddNTimes
-    ; ds 3 ; ld a,[$cf92]
-    ; ds 3 ; ld [$cf06],a
-    ; ds 1 ; ld d,a
-    ; ds 3 ; ld a,[$cf91]
-    ; ds 1 ; ld e,a
-    ; ds 3 ; ld [$d0b5],a
-    call CheckMedicineActive
-    jr z,.continue
+    ; CheckMedicineActive
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.continue ; continue if not in battle
+    ld a,[wPlayerMonNumber]
+    ld b,a
+    ld a,[$cf92]
+    cp b
+    jr z,.continue ; continue if active mon is choice in battle
     pop af
     ld [$cf91],a
     pop af
     ld [$cf92],a
-    ld hl,MustChoiceActiveText
+    ld hl,.MustChoiceActiveText
     call PrintText
+.forceAnotherChoice
     jr ItemUseMedicine ; force another choice
-    ds 26 - 21
 .continue
+    ld hl,W_PARTYMON1DATA
+    ld bc,44
+    ld a,[$cf92]
+    call AddNTimes
+    ld a,[$cf92]
+    ld [$cf06],a
+    ld d,a
+    ld a,[$cf91]
+    ld e,a
+    ld [$d0b5],a
     pop af
     ld [$cf91],a
     pop af
@@ -23877,7 +23853,7 @@ ItemUseMedicine: ; dabb (3:5abb)
 ; if using softboiled
     ld a,[$cf92]
     cp d ; is the pokemon trying to use softboiled on itself?
-    jr z,ItemUseMedicine ; if so,force another choice
+    jr z,.forceAnotherChoice ; if so,force another choice
 .checkItemType
     ld a,[$cf91]
     cp a,REVIVE
@@ -23890,12 +23866,11 @@ ItemUseMedicine: ; dabb (3:5abb)
     jr nc,.healHP ; if it's a Full Restore or one of the potions
 ; fall through if it's one of the status-specifc healing items
 .cureStatusAilment
-    ;ds 3 ; ld bc,4
-    ;ds 1 ; add hl,bc ; hl now points to status
-    ;ds 3 ; ld a,[$cf91]
-    call LoadPointerToStatusItemIDAndCheckFaintened
+    ld bc,4
+    add hl,bc ; hl now points to status
+    call CheckFaintenedFromStatusPointer
+    ld a,[$cf91]
     jp z,.healingItemNoEffect
-    nop
     ld bc,$f008
     cp a,ANTIDOTE
     jr z,.checkMonStatus
@@ -23961,29 +23936,6 @@ ItemUseMedicine: ; dabb (3:5abb)
     and a
     jr z,.compareCurrentHPToMaxHP
     jp .healingItemNoEffect
-    ;ds 1 ; push hl
-    ;ds 1 ; push de
-    ;ds 1 ; push bc
-    ds 3 ; ld a,[$cf06]
-    ds 1 ; ld c,a
-    ds 3 ; ld hl,$ccf5
-    ds 2 ; ld b,$02
-    ds 2 ; ld a,$10
-    ds 3 ; call Predef
-    ds 1 ; ld a,c
-    ds 1 ; and a
-    ds 2 ; jr z,.next
-    ds 3 ; ld a,[$cf06]
-    ds 1 ; ld c,a
-    ds 3 ; ld hl,W_PLAYERMONSALIVEFLAGS
-    ds 2 ; ld b,$01
-    ds 2 ; ld a,$10
-    ds 3 ; call Predef
-.next
-    ds 1 ; pop bc
-    ds 1 ; pop de
-    ds 1 ; pop hl
-    ds 2 ; jr .compareCurrentHPToMaxHP
 .notFainted
     ld a,[$cf91]
     cp a,REVIVE
@@ -24292,9 +24244,13 @@ ItemUseMedicine: ; dabb (3:5abb)
     ld [$d11e],a
     ld bc,33
     add hl,bc ; hl now points to level
-    ld a,[hl] ; a = level
+    ld a,[hld] ; a = level
     ld [$d127],a ; store level
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    dec hl
+    dec hl ; hl now points to move2pp
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    call GetMonHeader
     push de
     ld a,d
     ld hl,W_PARTYMON1NAME
@@ -24326,7 +24282,7 @@ ItemUseMedicine: ; dabb (3:5abb)
     ld [hl],a
     pop hl
     call .recalculateStats
-    ld hl,VitaminText
+    ld hl,.VitaminText
     ld a,[$cf91]
     sub a,HP_UP - 1
     ld c,a
@@ -24346,12 +24302,12 @@ ItemUseMedicine: ; dabb (3:5abb)
     call CopyData ; copy the stat's name to $cf4b
     ld a,$8e
     call PlaySound ; play sound
-    ld hl,VitaminStatRoseText
+    ld hl,.VitaminStatRoseText
     call PrintText
     jp RemoveUsedItem
 .vitaminNoEffect
     pop hl
-    ld hl,VitaminNoEffectText
+    ld hl,.VitaminNoEffectText
     call PrintText
     jp GBPalWhiteOut
 .recalculateStats
@@ -24367,10 +24323,11 @@ ItemUseMedicine: ; dabb (3:5abb)
     push hl
     ld bc,33
     add hl,bc ; hl now points to level
-    call CheckLevelDuringRareCandy
-    ; ld a,[hl] ; a = level
-    ; cp a,100
+    ld a,[hl] ; a = level
+    cp a,100
     jr z,.vitaminNoEffect ; can't raise level above 100
+    ld [$cd46],a ; ($cd46 = wTempCoins1) - fixing skip move-learn glitch: need to store the current level in wram
+                 ; wTempCoins1 was chosen because it's used only for slot machine and gets defaulted to 1 during the mini-game
     inc a
     ld [hl],a ; store incremented level
     ld [$d127],a
@@ -24457,21 +24414,22 @@ ItemUseMedicine: ; dabb (3:5abb)
     pop af
     ld [$cf92],a
     jp RemoveUsedItem
-
-VitaminStatRoseText: ; df24 (3:5f24)
+.VitaminStatRoseText
     TX_FAR _VitaminStatRoseText
     db "@"
-
-VitaminNoEffectText: ; df29 (3:5f29)
+.VitaminNoEffectText
     TX_FAR _VitaminNoEffectText
     db "@"
-
-VitaminText: ; df2e (3:5f2e)
+.VitaminText
     db "HEALTH@"
     db "ATTACK@"
     db "DEFENSE@"
     db "SPEED@"
     db "SPECIAL@"
+
+; Free
+
+SECTION "ItemUseBait",ROMX[$5f52],BANK[$3]
 
 ItemUseBait: ; df52 (3:5f52)
     ld hl,ThrewBaitText
@@ -25681,9 +25639,7 @@ IsKeyItem_: ; e764 (3:6764)
     db %00111111
     db %11111000
 
-SECTION "SendNewMonToBox",ROMX[$67a4],BANK[$3]
-
-SendNewMonToBox: ; e7a4 (3:67a4)
+SendNewMonToBox: ; Moved in the Bank
     ld de,W_NUMINBOX ; $da80
     ld a,[de]
     inc a
@@ -25691,7 +25647,7 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     ld a,[$cf91]
     ld [$d0b5],a
     ld c,a
-.asm_e7b1
+.loop
     inc de
     ld a,[de]
     ld b,a
@@ -25699,13 +25655,16 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     ld c,b
     ld [de],a
     cp $ff
-    jr nz,.asm_e7b1
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    jr nz,.loop
+    xor a        ; Used in GetAlternateForm
+    ld [$cc49],a ; ...
+    call GetAlternateForm
+    call GetMonHeader
     ld hl,$dd2a
     ld bc,$b
     ld a,[W_NUMINBOX] ; $da80
     dec a
-    jr z,.asm_e7ee
+    jr z,.skip
     dec a
     call AddNTimes
     push hl
@@ -25717,7 +25676,7 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     ld a,[W_NUMINBOX] ; $da80
     dec a
     ld b,a
-.asm_e7db
+.loop2
     push bc
     push hl
     ld bc,$b
@@ -25729,15 +25688,15 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     add hl,bc
     pop bc
     dec b
-    jr nz,.asm_e7db
-.asm_e7ee
+    jr nz,.loop2
+.skip
     ld hl,W_PLAYERNAME ; $d158
     ld de,$dd2a
     ld bc,$b
     call CopyData
     ld a,[W_NUMINBOX] ; $da80
     dec a
-    jr z,.asm_e82a
+    jr z,.skip2
     ld hl,$de06
     ld bc,$b
     dec a
@@ -25751,7 +25710,7 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     ld a,[W_NUMINBOX] ; $da80
     dec a
     ld b,a
-.asm_e817
+.loop3
     push bc
     push hl
     ld bc,$b
@@ -25763,8 +25722,8 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     add hl,bc
     pop bc
     dec b
-    jr nz,.asm_e817
-.asm_e82a
+    jr nz,.loop3
+.skip2
     ld hl,$de06
     ld a,$2
     ld [$d07d],a
@@ -25772,7 +25731,7 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     call Predef ; indirect jump to AskForMonNickname (64eb (1:64eb))
     ld a,[W_NUMINBOX] ; $da80
     dec a
-    jr z,.asm_e867
+    jr z,.skip3
     ld hl,W_BOXMON1DATA
     ld bc,$21
     dec a
@@ -25786,7 +25745,7 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     ld a,[W_NUMINBOX] ; $da80
     dec a
     ld b,a
-.asm_e854
+.loop4
     push bc
     push hl
     ld bc,$21
@@ -25798,8 +25757,8 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     add hl,bc
     pop bc
     dec b
-    jr nz,.asm_e854
-.asm_e867
+    jr nz,.loop4
+.skip3
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld [W_ENEMYMONNUMBER],a ; $cfe8
     call ResetEnemyHPStatusTypeAndPP ; ld hl,W_ENEMYMON_START
@@ -25831,25 +25790,19 @@ SendNewMonToBox: ; e7a4 (3:67a4)
     inc de
     xor a
     ld b,$a
-.asm_e89f
+.loop5
     ld [de],a
     inc de
     dec b
-    jr nz,.asm_e89f
+    jr nz,.loop5
     ld hl,W_ENEMYMONATKDEFIV
     ld a,[hli]
     ld [de],a
     inc de
     ld a,[hli]
     ld [de],a
-    call ResetIvAndLoadHl ; ld hl,W_ENEMYMONPP ; $cffe
-    ld b,$4
-.asm_e8b1
-    ld a,[hli]
-    inc de
-    ld [de],a
-    dec b
-    jr nz,.asm_e8b1
+    call ResetTempIV
+    call ResetMovePPs_
     ld b,BANK(SentNewMonToBox_TryToAddExclusiveMove)
     ld hl,SentNewMonToBox_TryToAddExclusiveMove
     jp Bankswitch
@@ -26851,36 +26804,40 @@ Func_f2dd: ; f2dd (3:72dd)
     ret
 
 _AddPokemonToParty: ; f2e5 (3:72e5)
+; Adds a new mon to the player's or enemy's party.
+; [$cc49] is used in an unusual way in this function.
+; If the lower nybble is 0, the mon is added to the player's party, else the enemy's.
+; If the entire value is 0, then the player is allowed to name the mon.
     ld de,W_NUMINPARTY ; $d163
     ld a,[$cc49]
     and $f
-    jr z,.asm_f2f2
+    jr z,.next
     ld de,wEnemyPartyCount ; $d89c
-.asm_f2f2
+.next
     ld a,[de]
     inc a
-    cp $7
-    ret nc
+    cp $7 ; PARTY_LENGTH+1
+    ret nc ; return if the party is already full
     ld [de],a
     ld a,[de]
-    ld [$FF00+$e4],a
+    ld [$FF00+$e4],a ; NewPartyLength
     add e
     ld e,a
-    jr nc,.asm_f300
+    jr nc,.noCarry
     inc d
-.asm_f300
+.noCarry
     ld a,[$cf91]
-    ld [de],a
+    ld [de],a ; write species of new mon in party list
     inc de
-    ld a,$ff
+    ld a,$ff ; terminator
     ld [de],a
     ld hl,W_PARTYMON1OT ; $d273
     ld a,[$cc49]
     and $f
-    jr z,.asm_f315
+    jr z,.next2
     ld hl,W_ENEMYMON1OT
-.asm_f315
-    ld a,[$FF00+$e4]
+.next2
+    ld a,[$FF00+$e4] ; NewPartyLength
     dec a
     call SkipFixedLengthTextEntries
     ld d,h
@@ -26890,23 +26847,23 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     call CopyData
     ld a,[$cc49]
     and a
-    jr nz,.asm_f33f
+    jr nz,.skipNaming
     ld hl,W_PARTYMON1NAME ; $d2b5
-    ld a,[$FF00+$e4]
+    ld a,[$FF00+$e4] ; NewPartyLength
     dec a
     call SkipFixedLengthTextEntries
-    ld a,$2
-    ld [$d07d],a
+    ld a,$2 ; NAME_MON_SCREEN
+    ld [$d07d],a ; NamingScreenType
     ld a,$4e
     call SetFlagAndAskForMonNickname ; call Predef ; indirect jump to AskForMonNickname (64eb (1:64eb))
-.asm_f33f
+.skipNaming
     ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
     ld a,[$cc49]
     and $f
-    jr z,.asm_f34c
+    jr z,.next3
     ld hl,wEnemyMons ; $d8a4
-.asm_f34c
-    ld a,[$FF00+$e4]
+.next3
+    ld a,[$FF00+$e4] ; NewPartyLength
     dec a
     ld bc,$2c
     call AddNTimes
@@ -26915,7 +26872,8 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     push hl
     ld a,[$cf91]
     ld [$d0b5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    call GetAlternateForm
+    call GetMonHeader
     ld hl,W_MONHEADER
     ld a,[hli]
     ld [de],a
@@ -26927,6 +26885,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     call GenerateRandomEnemyTrainerIV ; ld a,$98     ; set enemy trainer mon IVs to fixed average values
     ;ds 1                             ; ld b,$88
     jr nz,.writeFreshMonData
+    ; If the mon is being added to the player's party, update the pokedex.
     ld a,[$cf91]
     ld [$d11e],a
     push de
@@ -26934,7 +26893,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     pop de
     ld a,[$d11e]
-    ds 1 ; dec a ; POKEDEXMOD
+    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$2
     ld hl,wPokedexOwned ; $d2f7
@@ -26942,7 +26901,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld a,c
     ld [$d153],a
     ld a,[$d11e]
-    ds 1 ; dec a ; POKEDEXMOD
+    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
     push bc
@@ -26953,19 +26912,20 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     pop hl
     push hl
     ld a,[W_ISINBATTLE] ; $d057
-    and a
+    and a ; is this a wild mon caught in battle?
     jr nz,.copyEnemyMonData
+    ; Not wild.
     ld a,[wDVForShinySpdSpc] ; call GenRandom
     ld b,a
     ld a,[wDVForShinyAtkDef] ; call GenRandom
 .writeFreshMonData ; f3b3
     push bc
-    ld bc,$1b
+    ld bc,$1b ; go to IV
     add hl,bc
     pop bc
     ld [hli],a
     ld [hl],b         ; write IVs
-    ld bc,$fff4
+    ld bc,$fff4 ; go to exp
     add hl,bc
     ld a,$1
     ld c,a
@@ -26985,7 +26945,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     inc de
     jr .copyMonTypesAndMoves
 .copyEnemyMonData
-    ld bc,$1b
+    ld bc,$1b ; go to IV
     add hl,bc
     ld a,[W_ENEMYMONATKDEFIV] ; copy IVs from cur enemy mon
     ld [hli],a
@@ -27004,74 +26964,50 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld [de],a
     inc de
 .copyMonTypesAndMoves
-    ;ld hl,W_MONHTYPES
-    xor a ; ld a,[hli]       ; type 1
-    inc a ; TODO : Test Alternate Form, to handle
-    ld [de],a
-    inc de
-    xor a ; ld a,[hli]       ; type 2
-    ld [de],a
-    inc de
-    ;ld a,[hl]       ; unused (?)
-    ld [de],a
-    ;ld hl,W_MONHMOVES
-    ;ld a,[hli]
-    inc de
-    push de
+    ld h,d
+    ld l,e
     xor a
-    ld [de],a
-    ;ld a,[hli]
-    inc de
-    ld [de],a
-    ;ld a,[hli]
-    inc de
-    ld [de],a
-    ;ld a,[hli]
-    inc de
-    ld [de],a
-    push de
-    dec de
-    dec de
-    dec de
+    ld [hli],a ; type 1
+    ld [hli],a ; type 2
+    ld [hli],a ; catch rate (held item in gen 2)
+    ld [hli],a ; move 1
+    ld [hli],a ; move 2
+    ld [hli],a ; move 3
+    ld [hli],a ; move 4
+    push hl
+    dec hl
+    dec hl
+    dec hl
+    dec hl ; go to move 1
     xor a
-    ld [$cee9],a
-    ;ld a,$3e
+    ld [$cee9],a ; LearningMovesFromDayCare
+    ld d,h
+    ld e,l
     call WriteMonMoves2 ; call Predef ; indirect jump to WriteMonMoves (3afb8 (e:6fb8))
-    pop de
+    pop hl
     ld a,[wPlayerID]  ; set trainer ID to player ID
-    inc de
-    ld [de],a
+    ld [hli],a
     ld a,[wPlayerID + 1]
-    inc de
-    ld [de],a
-    push de
+    ld [hli],a
+    push hl
     ld a,[W_CURENEMYLVL]
     ld d,a
     ld hl,CalcExperience
     ld b,BANK(CalcExperience)
     call Bankswitch ; indirect jump to CalcExperience (58f6a (16:4f6a))
-    pop de
-    inc de
-    ld a,[H_MULTIPLICAND] ; write experience
-    ld [de],a
-    inc de
-    ld a,[H_MULTIPLICAND+1]
-    ld [de],a
-    inc de
-    ld a,[H_MULTIPLICAND+2]
-    ld [de],a
-    call SetStatExp
-    ; xor a
-    ; ld b,$a
-;.writeEVsLoop              ; set all EVs to 0
-    ; inc de
-    ; ld [de],a
-    ; dec b
-    ; jr nz,.writeEVsLoop
-    inc de
-    inc de
     pop hl
-    call WriteMovePP ; call AddPokemonToParty_WriteMovePP
+    ld a,[H_MULTIPLICAND] ; write experience
+    ld [hli],a
+    ld a,[H_MULTIPLICAND+1]
+    ld [hli],a
+    ld a,[H_MULTIPLICAND+2]
+    ld [hl],a
+    ld d,h
+    ld e,l
+    call SetStatExp
+    inc de
+    inc de
+    call WriteMovePP
     inc de
     ld a,[W_CURENEMYLVL] ; $d127
     ld [de],a
@@ -27099,22 +27035,22 @@ ItemUsePokedex: ; Moved in the Bank
     ld a,$29
     jp Predef
 
-LoadMovePPs: ; Moved in the Bank
+ResetMovePPs: ; Moved in the Bank
     call Load16BitRegisters
     ; fallthrough
-AddPokemonToParty_WriteMovePP: ; Moved in the Bank
-    ld b,$4
-.pploop
-    ld a,b
-    cp 4
-    ld a,255 ; Energy
-    jr z,.skip
-    xor a ; Force all PP to zero
-.skip
+ResetMovePPs_: ; Moved in the Bank
+    inc de
+    ld a,255
+    ld [de],a
+    inc de
+    ld a,[wTempAlternateFormIndex]
+    ld [de],a
+    inc de
+    xor a
+    ld [de],a
     inc de
     ld [de],a
-    dec b
-    jr nz,.pploop ; there are still moves to read
+    ld [wTempAlternateFormIndex],a
     ret
 
 ResetEnemyHPStatusTypeAndPP:
@@ -28409,10 +28345,6 @@ ResetIVAndCheckIsInBattle:
     ld a,[W_ISINBATTLE] ; $d057
     jp ResetTempIV
 
-ResetIvAndLoadHl:
-    ld hl,W_ENEMYMONPP ; $cffe
-    jp ResetTempIV
-
 SetFlagAndAskForMonNickname:
     push hl
     ld hl,wFlagAddPkmnToPartyBit0
@@ -28593,40 +28525,6 @@ CheckFaintenedFromStatusPointer:
     inc hl
     or b ; Set z if Zero HP
     ret
-
-LoadPointerToStatusItemIDAndCheckFaintened:
-    ld bc,4
-    add hl,bc ; hl now points to status
-    call CheckFaintenedFromStatusPointer
-    ld a,[$cf91]
-    ret
-
-CheckMedicineActive:
-    ld a,[W_ISINBATTLE]
-    and a
-    jr z,.continue ; continue if not in battle
-    ld a,[wPlayerMonNumber]
-    ld b,a
-    ld a,[$cf92]
-    cp b
-    jr z,.continue ; continue if active mon is choice in battle
-    ret nz
-.continue
-    ld hl,W_PARTYMON1DATA
-    ld bc,44
-    ld a,[$cf92]
-    call AddNTimes
-    ld a,[$cf92]
-    ld [$cf06],a
-    ld d,a
-    ld a,[$cf91]
-    ld e,a
-    ld [$d0b5],a
-    ret
-
-MustChoiceActiveText:
-    TX_FAR _MustChoiceActiveText
-    db "@"
 
 ItemUsePokedoll:
     ld a,[W_ISINBATTLE]
@@ -28960,14 +28858,6 @@ SurfingNoPlaceToGetOffText:
     TX_FAR _SurfingNoPlaceToGetOffText
     db "@"
 
-CheckLevelDuringRareCandy:
-    ld a,[hl] ; a = level
-    cp a,100
-    ret z
-    ld [$cd46],a ; ($cd46 = wTempCoins1) - fixing skip move-learn glitch: need to store the current level in wram
-    ;wTempCoins1 was chosen because it's used only for slot machine and gets defaulted to 1 during the mini-game
-    ret
-
 AddPokemonToParty_TryToAddExclusiveMove:
     ld a,[$cc49]
     and $f
@@ -28975,6 +28865,26 @@ AddPokemonToParty_TryToAddExclusiveMove:
     ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
     ld hl,AddPokemonToParty_TryToAddExclusiveMove_
     jp Bankswitch
+
+GetAlternateForm:
+    ld a,[$cc49]
+    and $f
+    jr nz,.enemy
+.player
+    ld a,[W_ISINBATTLE] ; $d057
+    and a ; is this a wild mon caught in battle?
+    jr nz,.copyEnemyMonData
+    xor a ; TODO:SpecialMonToPlayerAlternateForm
+    jr .end
+.copyEnemyMonData
+    ld a,[W_ENEMYMONPP+1] ; move2pp
+    jr .end
+.enemy
+    xor a ; TODO:SpecialTrainerAlternateForm
+.end
+    ld [wAlternateFormIndex],a ; Save AlternateFormIndex
+    ld [wTempAlternateFormIndex],a
+    ret
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -52335,6 +52245,44 @@ CheckTrappingMoveAndLoadEnemyMonNumber:
     ld a,[W_ENEMYMONNUMBER]
     ret
 
+ItemUseEvoStone_:
+    ld a,[$cf92]
+    push af
+    ld a,[$cf91]
+    ld [$d156],a
+    push af
+    ld a,$05 ; evolution stone party menu
+    ld [$d07d],a
+    ld a,$ff
+    ld [$cfcb],a
+    call DisplayPartyMenu
+    pop bc
+    jr c,.canceledItemUse
+    ld a,b
+    ld [$cf91],a
+    ld a,$01
+    ld [$ccd4],a
+    ld a,$8e
+    call PlaySoundWaitForCurrent ; play sound
+    call WaitForSoundToFinish ; wait for sound to end
+    call TryEvolvingMon ; try to evolve pokemon
+    ld a,[$d121]
+    and a
+    jr z,.noEffect
+    pop af
+    ld [$cf92],a
+    ld hl,wNumBagItems
+    ld a,1 ; remove 1 stone
+    ld [$cf96],a
+    jp RemoveItemFromInventory
+.noEffect
+    call ItemUseNoEffect
+.canceledItemUse
+    xor a
+    ld [$cd6a],a
+    pop af
+    ret
+
 SECTION "bankF",ROMX,BANK[$F]
 
 ; These are move effects (second value from the Moves table in bank $E).
@@ -58692,12 +58640,12 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld hl,$cceb
     ld a,[hli]
     ld b,[hl]
-    jr nz,.asm_3eb33
+    jr nz,.storeDVs
     ld a,[W_ISINBATTLE] ; $d057
     cp $2
     call z,GetEnemyIV
     call nz,ForceShinyOrRandom ; call GenRandomInBattle
-.asm_3eb33
+.storeDVs
     ld hl,W_ENEMYMONATKDEFIV
     ld [hli],a
     ld [hl],b
@@ -58709,10 +58657,10 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld hl,W_ENEMYMONCURHP ; $cfe6
     ld a,[W_ISINBATTLE] ; $d057
     cp $2
-    jr z,.asm_3eb65
+    jr z,.copyHPAndStatusFromPartyData
     ld a,[W_ENEMYBATTSTATUS3] ; $d069
     bit 3,a
-    jr nz,.asm_3eb86
+    jr nz,.copyTypes
     ld a,[W_ENEMYMONMAXHP] ; $cff4
     ld [hli],a
     ld a,[W_ENEMYMONMAXHP+1]
@@ -58720,8 +58668,8 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     xor a
     inc hl
     ld [hl],a
-    jr .asm_3eb86
-.asm_3eb65
+    jr .copyTypes
+.copyHPAndStatusFromPartyData
     ld hl,W_ENEMYMON1HP ; $d8a5 (aliases: W_WATERMONS)
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
@@ -58735,7 +58683,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     inc hl
     ld a,[hl]
     ld [W_ENEMYMONSTATUS],a ; $cfe9
-.asm_3eb86
+.copyTypes
     ld hl,W_MONHTYPES
     ld de,W_ENEMYMONTYPES ; $cfea
     ld a,[hli]            ; copy type 1
@@ -58749,20 +58697,23 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     inc de
     ld a,[W_ISINBATTLE] ; $d057
     cp $2
-    jr nz,.asm_3ebb0
+    jr nz,.copyStandardMoves
     ld hl,W_ENEMYMON1MOVE3-2 ; move
     call Copy4Bytes
     ld de,W_ENEMYMONPP
     ld hl,W_ENEMYMON1MOVE3+19 ; pp
     call Copy4Bytes
-    jr .asm_3ebca
-.asm_3ebb0
+    jr .continue
+.copyStandardMoves
     ld a,[W_ENEMYBATTSTATUS3] ; $d069
     bit 3,a
     jr z,.FreshMoves
     ld hl,wBackupEnemyMoves ; move
     call Copy4BytesDirect
-    jr .resetPP
+    ld hl,wBackupEnemyPP ; pp
+    ld de,W_ENEMYMONPP
+    call Copy4BytesDirect
+    jr .continue
 .FreshMoves
     xor a
     ld [$cee9],a
@@ -58773,20 +58724,19 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld a,$3e
     call WriteMonMovesPlus ; call Predef ; indirect jump to WriteMonMoves (3afb8 (e:6fb8))
 .resetPP
-    ld hl,W_ENEMYMONMOVES
     ld de,W_ENEMYMONPP-1
     ld a,$5e
-    call Predef ; indirect jump to LoadMovePPs (f473 (3:7473))
-.asm_3ebca
+    call Predef ; indirect jump to ResetMovePPs (f473 (3:7473))
+.continue
     ld hl,W_MONHBASESTATS
     ld de,$d002
     ld b,$5
-.asm_3ebdd
+.copyBaseStatsLoop
     ld a,[hli]
     ld [de],a
     inc de
     dec b
-    jr nz,.asm_3ebdd
+    jr nz,.copyBaseStatsLoop
     ld hl,W_MONHCATCHRATE
     ld a,[hli]
     ld [de],a
@@ -58805,7 +58755,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
     ld a,[$d11e]
-    ds 1 ; dec a ; POKEDEXMOD
+    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
     ld hl,wPokedexSeen
@@ -58818,16 +58768,11 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld a,$7
     ld b,$8
     ld hl,wEnemyMonStatMods ; $cd2e
-.asm_3ec2d
+.statModLoop
     ld [hli],a
     dec b
-    jr nz,.asm_3ec2d
+    jr nz,.statModLoop
     ret
-
-PayDayEffect: ; Moved in the Bank
-    ld hl,Func_2feb8
-    ld b,BANK(Func_2feb8)
-    jp Bankswitch
 
 SECTION "DoBattleTransitionAndInitBatVar",ROMX[$6c32],BANK[$f]
 
@@ -61922,6 +61867,11 @@ SwapBit2And4:
     or c ; Restore other bits
     ld b,a
     ret
+
+PayDayEffect: ; Moved in the Bank
+    ld hl,Func_2feb8
+    ld b,BANK(Func_2feb8)
+    jp Bankswitch
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -75362,7 +75312,7 @@ LearnMovePredef:
     dbw BANK(PickupItem),PickupItem
 PrintMoveTypePredef:
     dbw BANK(PrintMoveType),PrintMoveType
-    dbw BANK(LoadMovePPs),LoadMovePPs
+    dbw BANK(ResetMovePPs),ResetMovePPs
 DrawPlayerHPBarStatusBattlePredef: ; 4ff96 (13:7f96)
     dbw BANK(DrawPlayerHPBarStatusBattle),DrawPlayerHPBarStatusBattle ; 5F
     dbw BANK(DrawPlayerHPBarParty),DrawPlayerHPBarParty
@@ -136202,7 +136152,7 @@ LoadSpecialTrainerMoves:
     call .HLToMove
     call .DEToPP
     ld a,$5e
-    call Predef ; indirect jump to LoadMovePPs (f473 (3:7473))
+    call Predef ; indirect jump to ResetMovePPs (f473 (3:7473))
     pop hl
     ret
 .HLToMove
