@@ -4899,7 +4899,7 @@ KabutoBaseStats:
     dw KabutoPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw FossilKabutoBaseStats
     dw 0
 
     db 0 ; growth rate
@@ -4934,7 +4934,7 @@ KabutopsBaseStats:
     dw KabutopsPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw FossilKabutopsBaseStats
     dw 0
 
     db 0 ; growth rate
@@ -4969,7 +4969,7 @@ AerodactylBaseStats:
     dw AerodactylPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw FossilAerodactylBaseStats
     dw 0
 
     db 5 ; growth rate

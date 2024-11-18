@@ -27291,9 +27291,9 @@ Func_f51e: ; f51e (3:751e)
     add $2
     ld [$cc49],a
     call LoadMonData
-    ld b,BANK(Func_58f43)
-    ld hl,Func_58f43
-    call Bankswitch ; indirect jump to Func_58f43 (58f43 (16:4f43))
+    ld b,BANK(CalcLevelFromExperience)
+    ld hl,CalcLevelFromExperience
+    call Bankswitch ; indirect jump to CalcLevelFromExperience (58f43 (16:4f43))
     ld a,d
     ld [W_CURENEMYLVL],a ; $d127
     pop hl
@@ -30319,7 +30319,7 @@ Func_13653: ; 13653 (4:7653)
 TestMonMoveCompatibility: ; 1373e (4:773e)
     ld a,[$cf91]
     ld [$d0b5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    call TestMonMoveCompatibility_HandleAlternative
     ld hl,W_MONHLEARNSET
     push hl
     ld a,[$d0e0]
@@ -31793,6 +31793,15 @@ GetPartyMonIDAndName:
     call GetPartyMonName
     pop hl
     ret
+
+TestMonMoveCompatibility_HandleAlternative:
+    ld hl,W_PARTYMON1_MOVE2PP
+    ld a,[wWhichPokemon]
+    ld bc,$2c
+    call AddNTimes
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    jp GetMonHeader
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -50824,7 +50833,7 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
 ;    pop af
 ;    ld [$d11e],a
 
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    call DoEvolution_HandleAlternative ; call GetMonHeader
 
     ld hl,$cfa8
     ld de,$cfba
@@ -51684,7 +51693,7 @@ TransformEffect_: ; Moved Upper in the Bank
     inc de
     ld bc,$8
     call CopyData
-; Don't touch PP slot (Energy)
+; Don't touch PP slot (Energy) ; TODO:HandleAlternateFormIndex
 ;    ld bc,$ffef
 ;    add hl,bc
 ;    ld b,$4
@@ -52282,6 +52291,15 @@ ItemUseEvoStone_:
     ld [$cd6a],a
     pop af
     ret
+
+DoEvolution_HandleAlternative:
+    ld hl,W_PARTYMON1_MOVE2PP
+    ld a,[wWhichPokemon]
+    ld bc,$2c
+    call AddNTimes
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    jp GetMonHeader
 
 SECTION "bankF",ROMX,BANK[$F]
 
@@ -53019,7 +53037,7 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
     ret
 
 InsertRealTypes:
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    call GetMonHeader
     PREDEF_JUMP InsertRealTypesPredef
 
 SECTION "HandlePoisonBurnLeechSeed_IncreaseEnemyHP",ROMX[$44a3],BANK[$f]
@@ -53798,7 +53816,9 @@ Func_3c92a: ; 3c92a (f:492a)
     ld a,[W_ENEMYMONID]
     ld [$CF91],a
     ld [$D0B5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld [wAlternateFormIndex],a
+    call GetMonHeader
     ld de,$9000
     call LoadMonFrontSprite
     ld a,$CF
@@ -53818,9 +53838,6 @@ Func_3c92a: ; 3c92a (f:492a)
     ld [$CCF5],a
     call SaveScreenTilesToBuffer1
     jp SwitchPlayerMon
-
-DisabledText: ; Moved in the Bank
-    db "Disabled@"
 
 SECTION "TrainerAboutToUseText",ROMX[$4a79],BANK[$f]
 
@@ -54017,7 +54034,7 @@ LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
     call CopyData
     ld a,[$cfd9]
     ld [$d0b5],a
-    call InsertRealTypes
+    call LoadBattleMonFromParty_HandleAlternative ; call InsertRealTypes
     ld hl,W_PARTYMON1NAME ; $d2b5
     ld a,[wPlayerMonNumber] ; $cc2f
     call SkipFixedLengthTextEntries
@@ -54060,7 +54077,7 @@ LoadEnemyMonFromParty: ; 3cc13 (f:4c13)
     call CopyData
     ld a,[$cfe5]
     ld [$d0b5],a
-    call InsertRealTypes
+    call LoadEnemyMonFromParty_HandleAlternative ; call InsertRealTypes
     ld hl,$d9ee
     ld a,[wWhichPokemon] ; $cf92
     call SkipFixedLengthTextEntries
@@ -54752,20 +54769,22 @@ Func_3d119: ; 3d119 (f:5119)
     call CleanLCD_OAM
     ld a,$36
     call Predef ; StatusScreen
-    ds 2 ; ld a,$37
-    ds 3 ; call Predef ; indirect jump to StatusScreen2 (12b57 (4:6b57))
+    ; ds 2 ; ld a,$37
+    ; ds 3 ; call Predef ; indirect jump to StatusScreen2 (12b57 (4:6b57))
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
     bit 4,a
     ld hl,AnimationSubstitute
     jr nz,.asm_3d182
-    ds 3 ; ld a,[$ccf3]
-    ds 1 ; and a
-    ds 3 ; ld hl,AnimationMinimizeMon
-    ds 2 ; jr nz,.asm_3d182
+    ; ds 3 ; ld a,[$ccf3]
+    ; ds 1 ; and a
+    ; ds 3 ; ld hl,AnimationMinimizeMon
+    ; ds 2 ; jr nz,.asm_3d182
     ld a,[$cfe5]
     ld [$cf91],a
     ld [$d0b5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld [wAlternateFormIndex],a ; Save AlternateFormIndex
+    call GetMonHeader
     ld de,$9000
     call LoadMonFrontSpriteOrGhost ; call LoadMonFrontSprite
     jr .asm_3d187
@@ -54794,6 +54813,8 @@ Func_3d119: ; 3d119 (f:5119)
     call LoadScreenTilesFromBuffer1
     call GoPAL_SET_CF1C
     call GBPalNormal
+
+SECTION "SwitchPlayerMon",ROMX[$51ba],BANK[$f]
 
 SwitchPlayerMon: ; 3d1ba (f:51ba) ;joedebug - this is where the player switches
     call CheckTrappingMoveAndSetEnemyActedBitAndLoadHl ; ld hl,RetreatMon
@@ -56562,7 +56583,7 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     and a
     jr z,.next3
     ld c,3
-    call Func_3df1c
+    call GetEnemyMonStat
     ld a,[$ff00+$97]
     ld b,a
     ld a,[$ff00+$98]
@@ -56592,7 +56613,7 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     jr z,.next3  ;skip portion of code that pulls up inactive pokemon
 .loadOtherPoke
     ld c,5
-    call Func_3df1c
+    call GetEnemyMonStat
     ld a,[$ff00+$97]
     ld b,a
     ld a,[$ff00+$98]
@@ -56671,7 +56692,7 @@ CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
     ld c,[hl]
     push bc
     ld c,$2
-    call Func_3df1c
+    call GetEnemyMonStat
     ld hl,$ff97
     pop bc
     jr .asm_3deef
@@ -56699,7 +56720,7 @@ CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
     ld c,[hl]
     push bc
     ld c,$5
-    call Func_3df1c
+    call GetEnemyMonStat
     ld hl,$ff97
     pop bc
 .asm_3deef
@@ -56734,7 +56755,9 @@ CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
     and a
     ret
 
-Func_3df1c: ; 3df1c (f:5f1c)
+; get stat c of enemy mon
+; c: stat to get (HP=1,Attack=2,Defense=3,Speed=4,Special=5)
+GetEnemyMonStat: ; 3df1c (f:5f1c)
     push de
     push bc
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -56758,9 +56781,9 @@ Func_3df1c: ; 3df1c (f:5f1c)
 .asm_3df40
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld [W_CURENEMYLVL],a ; $d127
-    ld a,[$cfe5]
+    ld a,[W_ENEMYMON_START]
     ld [$d0b5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    call GetEnemyMonStat_HandleAlternative ; call GetMonHeader
     ld hl,$cff1
     ld de,$cfaf
     ld a,[hli]
@@ -61259,20 +61282,9 @@ SMALL_PIC  EQU $55
 MEDIUM_PIC EQU $66
 LARGE_PIC  EQU $77
 
-NUM_OF_HYBRID EQU 4
+NUM_OF_HYBRID EQU 2
 
 HybridSpriteInfo:
-    db FOSSIL_KABUTOPS
-    db MEDIUM_PIC
-    db BANK(FossilKabutopsPic)
-    dw FossilKabutopsPic
-	dw FossilKabutopsBack
-
-    db FOSSIL_AERODACTYL
-    db LARGE_PIC
-    db BANK(FossilAerodactylPic)
-    dw FossilAerodactylPic
-	dw MissingNoPicBack ; TODO
 
     db MON_GHOST
     db MEDIUM_PIC
@@ -61872,6 +61884,30 @@ PayDayEffect: ; Moved in the Bank
     ld hl,Func_2feb8
     ld b,BANK(Func_2feb8)
     jp Bankswitch
+
+LoadBattleMonFromParty_HandleAlternative:
+    ld hl,W_PARTYMON1_MOVE2PP
+    jr LoadMonFromParty_HandleAlternative_Common
+
+LoadEnemyMonFromParty_HandleAlternative:
+    ld hl,wEnemyMon1+(W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM) ; move2pp
+    ; fall through
+
+LoadMonFromParty_HandleAlternative_Common:
+    ld a,[wWhichPokemon]
+    ld bc,$2c
+    call AddNTimes
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    jp InsertRealTypes
+
+GetEnemyMonStat_HandleAlternative:
+    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld [wAlternateFormIndex],a
+    jp GetMonHeader
+
+DisabledText: ; Moved in the Bank
+    db "Disabled@"
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -65163,8 +65199,8 @@ PokedexOrder: ; Moved in the Bank
     db DEX_WARTORTLE   ; $B3
     db DEX_CHARIZARD   ; $B4
     db DEX_MISSINGNO   ; $B5
-    db DEX_KABUTOPS    ; $B6 ; Kabotops Fossil
-    db DEX_AERODACTYL  ; $B7 ; Aerodactyl Fossil
+    db DEX_MISSINGNO   ; $B6
+    db DEX_MISSINGNO   ; $B7
     db DEX_HAUNTER     ; $B8 ; Ghost
     db DEX_ODDISH      ; $B9
     db DEX_GLOOM       ; $BA
@@ -69721,9 +69757,9 @@ ViridianGymHiddenObjects: ; 46bae (11:6bae)
     db $FF
 Museum1FHiddenObjects: ; 46bbb (11:6bbb)
     db $03,$02,$04 ; XXX,y,x
-    dbw $17,$5bad
+    dbw BANK(AerodactylFossil),AerodactylFossil
     db $06,$02,$04 ; XXX,y,x
-    dbw $17,$5bc3
+    dbw BANK(KabutopsFossil),KabutopsFossil
     db $FF
 PewterGymHiddenObjects: ; 46bc8 (11:6bc8)
     db $0a,$03,$04 ; XXX,y,x
@@ -75278,7 +75314,7 @@ LearnMovePredef:
     dbw BANK(SaveSAV),SaveSAV
     dbw BANK(Func_7202b),Func_7202b
     dbw BANK(Func_f113),Func_f113
-    dbw BANK(SetPartyMonTypes),SetPartyMonTypes
+    db 0,0,0 ; dbw BANK(SetPartyMonTypes),SetPartyMonTypes
     db BANK(TestMonMoveCompatibility)
     dw TestMonMoveCompatibility
     dbw BANK(TMToMove),TMToMove
@@ -80221,7 +80257,7 @@ GainExperience: ; 5524f (15:524f)
     ld a,[hl]
     ld [$d0b5],a
     call GetMonHeaderAndMaxLevel ; call GetMonHeader
-    ds 2 ; ld d,100
+    ; ds 2 ; ld d,100
     ld hl,CalcExperience
     ld b,BANK(CalcExperience)
     call Bankswitch ; indirect jump to CalcExperience (58f6a (16:4f6a))
@@ -80262,9 +80298,9 @@ GainExperience: ; 5524f (15:524f)
     ld bc,$13
     add hl,bc
     push hl
-    ld b,BANK(Func_58f43)
-    ld hl,Func_58f43
-    call Bankswitch ; indirect jump to Func_58f43 (58f43 (16:4f43))
+    ld b,BANK(CalcLevelFromExperience)
+    ld hl,CalcLevelFromExperience
+    call Bankswitch ; indirect jump to CalcLevelFromExperience (58f43 (16:4f43))
     pop hl
     ld a,[hl] ; current level
     ld [$cd46],a ; ($cd46 = wTempCoins1) - fixing skip move-learn glitch: need to store the current level in wram
@@ -80282,7 +80318,13 @@ GainExperience: ; 5524f (15:524f)
     ld a,[hl]
     ld [$d0b5],a
     ld [$d11e],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    push hl
+    ld bc,W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM ; go to move2pp
+    add hl,bc
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    pop hl
+    call GetMonHeader
     ld bc,$23
     add hl,bc
     push hl
@@ -82923,8 +82965,8 @@ Func_562e1: ; 562e1 (15:62e1)
     ld a,$3
     ld [$cc49],a
     call LoadMonData
-    ld hl,Func_58f43
-    ld b,BANK(Func_58f43)
+    ld hl,CalcLevelFromExperience
+    ld b,BANK(CalcLevelFromExperience)
     call Bankswitch
     ld a,d
     cp $64
@@ -84055,7 +84097,13 @@ WithExpAllText:
     db "@"
 
 GetMonHeaderAndMaxLevel:
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    ld hl,W_PARTYMON1_MOVE2PP
+    ld a,[wWhichPokemon]
+    ld bc,$2c
+    call AddNTimes
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    call GetMonHeader
     ld hl,GetMaxLevel
     ld b,BANK(GetMaxLevel)
     jp Bankswitch
@@ -84767,10 +84815,11 @@ UnnamedText_58f3e: ; 58f3e (16:4f3e)
     TX_FAR _UnnamedText_58f3e
     db "@"
 
-Func_58f43: ; 58f43 (16:4f43)
+; calculates the level a mon should be based on its current exp
+CalcLevelFromExperience: ; 58f43 (16:4f43)
     ld a,[$cf98]
     ld [$d0b5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    call CalcLevelFromExperience_HandleAlternative ; call GetMonHeader
     ld d,$1
 .asm_58f4e
     inc d
@@ -88196,6 +88245,11 @@ Route16Text7: ; Moved in the Bank
     ld a,SNORLAX
     call PlayCryAndDisplayPokedex
     jp TextScriptEnd
+
+CalcLevelFromExperience_HandleAlternative:
+    ld a,[$cfb6] ; move2pp
+    ld [wAlternateFormIndex],a
+    jp GetMonHeader
 
 SECTION "bank17",ROMX,BANK[$17]
 
@@ -91663,20 +91717,22 @@ VictoryRoad1Blocks: ; 5db04 (17:5b04)
     INCBIN "maps/victoryroad1.blk"
 
 ; updates the types of a party mon (pointed to in hl) to the ones of the mon specified in $d11e
-SetPartyMonTypes: ; 5db5e (17:5b5e)
-    call Load16BitRegisters
-    ld bc,W_PARTYMON1_TYPE1 - W_PARTYMON1DATA ; $5
-    add hl,bc
-    ld a,[$d11e]
-    ld [$d0b5],a
-    push hl
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
-    pop hl
-    ld a,[W_MONHTYPE1]
-    ld [hli],a
-    ld a,[W_MONHTYPE2]
-    ld [hl],a
-    ret
+;SetPartyMonTypes: ; 5db5e (17:5b5e)
+;    call Load16BitRegisters
+;    ld bc,W_PARTYMON1_TYPE1 - W_PARTYMON1DATA ; $5
+;    add hl,bc
+;    ld a,[$d11e]
+;    ld [$d0b5],a
+;    push hl
+;    call GetMonHeader
+;    pop hl
+;    ld a,[W_MONHTYPE1]
+;    ld [hli],a
+;    ld a,[W_MONHTYPE2]
+;    ld [hl],a
+;    ret
+
+SECTION "Func_5db79",ROMX[$5b79],BANK[$17]
 
 Func_5db79: ; 5db79 (17:5b79)
     call EnableAutoTextBoxDrawing
@@ -91711,8 +91767,11 @@ Route15UpstairsBinocularsText: ; 5dba8 (17:5ba8)
     TX_FAR _Route15UpstairsBinocularsText
     db "@"
 
-    ld a,$b7
+AerodactylFossil:
+    ld a,AERODACTYL
     ld [$cf91],a
+    ld a,1
+    ld [wAlternateFormIndex],a
     call DisplayMonFrontSpriteInBox
     call EnableAutoTextBoxDrawing
     ld a,$9
@@ -91723,8 +91782,11 @@ AerodactylFossilText: ; 5dbbe (17:5bbe)
     TX_FAR _AerodactylFossilText
     db "@"
 
-    ld a,$b6
+KabutopsFossil:
+    ld a,KABUTOPS
     ld [$cf91],a
+    ld a,1
+    ld [wAlternateFormIndex],a
     call DisplayMonFrontSpriteInBox
     call EnableAutoTextBoxDrawing
     ld a,$b
@@ -91735,36 +91797,9 @@ KabutopsFossilText: ; 5dbd4 (17:5bd4)
     TX_FAR _KabutopsFossilText
     db "@"
 
-DisplayMonFrontSpriteInBox: ; 5dbd9 (17:5bd9)
-; Displays a pokemon's front sprite in a pop-up window.
-; [$cf91] = pokemon interal id number
-    ld a,$1
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    call Delay3
-    xor a
-    ld [$FF00+$b0],a
-    call SaveScreenTilesToBuffer1
-    ld a,$11
-    ld [$d125],a
-    call DisplayTextBoxID
-    call UpdateSprites
-    ld a,[$cf91]
-    ld [$d0b5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
-    ld de,$8b10
-    call LoadMonFrontSprite
-    ld a,$80
-    ld [$FF00+$e1],a
-    FuncCoord 10,11 ; $c486
-    ld hl,Coord
-    ld a,$2
-    call Predef ; indirect jump to Func_3f073 (3f073 (f:7073))
-    call WaitForTextScrollButtonPress
-    call LoadScreenTilesFromBuffer1
-    call Delay3
-    ld a,$90
-    ld [$FF00+$b0],a
-    ret
+; Free
+
+SECTION "Func_5dc1a",ROMX[$5c1a],BANK[$17]
 
 Func_5dc1a: ; 5dc1a (17:5c1a)
     call EnableAutoTextBoxDrawing
@@ -92226,6 +92261,37 @@ CopycatsHouseF2Text2: ; Moved in the Bank
 .CopycatsHouseF2Text2_Part2_Dex
     TX_FAR _CopycatsHouseF2Text2_Part2_Dex
     db "@"
+
+DisplayMonFrontSpriteInBox: ; 5dbd9 (17:5bd9)
+; Displays a pokemon's front sprite in a pop-up window.
+; [$cf91] = pokemon interal id number
+    ld a,$1
+    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
+    call Delay3
+    xor a
+    ld [$FF00+$b0],a
+    call SaveScreenTilesToBuffer1
+    ld a,$11
+    ld [$d125],a
+    call DisplayTextBoxID
+    call UpdateSprites
+    ld a,[$cf91]
+    ld [$d0b5],a
+    call GetMonHeader
+    ld de,$8b10
+    call LoadMonFrontSprite
+    ld a,$80
+    ld [$FF00+$e1],a
+    FuncCoord 10,11 ; $c486
+    ld hl,Coord
+    ld a,$2
+    call Predef ; indirect jump to Func_3f073 (3f073 (f:7073))
+    call WaitForTextScrollButtonPress
+    call LoadScreenTilesFromBuffer1
+    call Delay3
+    ld a,$90
+    ld [$FF00+$b0],a
+    ret
 
 SECTION "bank18",ROMX,BANK[$18]
 
@@ -96760,7 +96826,7 @@ Func_70278: ; 70278 (1c:4278)
 .asm_7029d
     FuncCoord 12,5 ; $c410
     ld hl,Coord
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    call GetMonHeader
     call LoadFrontSpriteByMonIndex
     ld a,$4
     call Predef ; indirect jump to LoadMonBackSprite (3f103 (f:7103))
@@ -102940,7 +103006,7 @@ Func_740cb: ; 740cb (1d:40cb)
     ld [$D0B5],a
     FuncCoord 8,6 ; $c420
     ld hl,Coord
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    call CreditsMons_HandleAlternative ; call GetMonHeader
     call LoadFrontSpriteByMonIndex
     ld hl,$980C
     call Func_74164
@@ -107779,6 +107845,11 @@ InitialilzeEliteFour:
     ld a,[$d864]
     ret
 
+CreditsMons_HandleAlternative:
+    xor a
+    ld [wAlternateFormIndex],a
+    jp GetMonHeader
+
 SECTION "bank1E",ROMX,BANK[$1E]
 
 ; Draws a "frame block". Frame blocks are blocks of tiles that are put
@@ -109893,7 +109964,7 @@ Func_79793: ; 79793 (1e:5793)
     ld [$d0b5],a
     xor a
     ld [W_SPRITEFLIPPED],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    call BattleSprite_Front_HandleAlternateForm ; call GetMonHeader
     FuncCoord 12,0 ; $c3ac
     ld hl,Coord
     call LoadFrontSpriteByMonIndex
@@ -109904,7 +109975,7 @@ Func_79793: ; 79793 (1e:5793)
     ld a,[$ceea]
     ld [$cfd9],a
     ld [$d0b5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    call BattleSprite_Back_HandleAlternateForm ; call GetMonHeader
     ld a,$4
     call Predef ; indirect jump to LoadMonBackSprite (3f103 (f:7103))
     xor a
@@ -114500,7 +114571,7 @@ EvolveMon: ; 7bde9 (1e:7de9)
     ld a,[$ceea]
     ld [$cf91],a
     ld [$d0b5],a
-    call Func_7beb9
+    call Func_7beb9_HandleAlternateForm ; call Func_7beb9
     ld de,$9000
     ld hl,$9310
     ld bc,$31
@@ -114508,7 +114579,7 @@ EvolveMon: ; 7bde9 (1e:7de9)
     ld a,[$cee9]
     ld [$cf91],a
     ld [$d0b5],a
-    call Func_7beb9
+    call Func_7beb9_HandleAlternateForm ; call Func_7beb9
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld a,[$cee9]
@@ -114571,7 +114642,7 @@ Func_7beb4: ; 7beb4 (1e:7eb4)
     jp GoPAL_SET
 
 Func_7beb9: ; 7beb9 (1e:7eb9)
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    call GetMonHeader
     FuncCoord 7,2 ; $c3cf
     ld hl,Coord
     jp LoadFlippedFrontSpriteByMonIndex
@@ -114730,7 +114801,6 @@ TechnicalMachinePrices: ; 7bfa7 (1e:7fa7)
     db $21,$12,$42,$45,$24
     db $22,$52,$24,$34,$42
     db $24,$43
-    
 
 CheckShinyDuringEvolution:
     push af
@@ -114743,6 +114813,25 @@ CheckShinyDuringEvolution:
     pop bc
     pop af
     jp Func_7beb4
+
+BattleSprite_Front_HandleAlternateForm:
+    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld [wAlternateFormIndex],a
+    jp GetMonHeader
+
+BattleSprite_Back_HandleAlternateForm:
+    ld a,[W_PLAYERMONPP+1] ; move2pp
+    ld [wAlternateFormIndex],a
+    jp GetMonHeader
+
+Func_7beb9_HandleAlternateForm:
+    ld hl,W_PARTYMON1_MOVE2PP
+    ld a,[wWhichPokemon]
+    ld bc,$2c
+    call AddNTimes
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    jp Func_7beb9
 
 SECTION "bank1F",ROMX,BANK[$1F]
 
@@ -131227,11 +131316,11 @@ SearchFieldMoveInParty:
     pop bc
     ret
 
-FossilKabutopsPic:
+FossilKabutopsPicFront:
     INCBIN "pic/bmon/fossilkabutops.pic"
-FossilKabutopsBack:
+FossilKabutopsPicBack:
     INCBIN "pic/other/BackSpriteKabutopsSkel.pic"
-FossilAerodactylPic:
+FossilAerodactylPicFront:
     INCBIN "pic/bmon/fossilaerodactyl.pic"
 GhostPic:
     INCBIN "pic/other/ghost.pic"
@@ -135598,12 +135687,18 @@ _CriticalHitTest_NoBug:
     ld [$d05e],a
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ld a,[$cfe5]
+    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld b,a
+    ld a,[W_ENEMYMON_START]
     jr nz,.handleEnemy
+    ld a,[W_PLAYERMONPP+1] ; move2pp
+    ld b,a
     ld a,[W_PLAYERMONID]
 .handleEnemy
     ld [$d0b5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    ld a,b
+    ld [wAlternateFormIndex],a
+    call GetMonHeader
     ld a,[W_MONHBASESPEED]
     ld b,a
     srl b                        ; /2 for regular move (effective (base speed / 2)) --> base crit rate
@@ -137135,7 +137230,13 @@ ItemInBattleFinalCheck:
     add hl,bc
     ld a,[hl]
     ld [$d0b5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    ld hl,W_PARTYMON1_MOVE2PP
+    ld a,[wPlayerMonNumber]
+    ld bc,$2c
+    call AddNTimes
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    call GetMonHeader
     PREDEF LoadMonBackSpritePredef
     ld b,BANK(LoadHudAndHpBarAndStatusTilePatterns)
     ld hl,LoadHudAndHpBarAndStatusTilePatterns
@@ -137852,7 +137953,11 @@ CalcEXPBarPixelLength_:
 .skip
     ld a,[hl]
     ld [$d0b5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    ld hl,W_PARTYMON1_MOVE2PP ; move2pp
+    call BattleMonPartyAttr
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    call GetMonHeader
     ld a,[W_PLAYERMONLEVEL]
     call CalcEXPBarPixelLength_.Start
 
