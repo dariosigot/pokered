@@ -805,8 +805,11 @@ W_MONHFRONTSPRITE: ; d0c3
 W_MONHBACKSPRITE: ; d0c5
     ds 2
 
-W_MONHMOVES: ; d0c7
-    ds 4
+W_MON_NEXT_ALTFORM: ; d0c7
+    ds 2
+
+W_MON_LEARNSET_POINTER: ; d0c9
+    ds 2
 
 W_MONHGROWTHRATE: ; d0cb
     ds 1

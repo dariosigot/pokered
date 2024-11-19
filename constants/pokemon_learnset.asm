@@ -1955,6 +1955,56 @@ VOLTORB_NoEvo_Learnset: MACRO
     db 58,THUNDER
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
+VOLTORB_HUSUI_Learnset: MACRO
+    db  1,TACKLE
+    db  1,SCREECH
+    db  6,FLASH
+    db  8,DEFENSE_CURL
+    db 10,SONICBOOM
+    db 12,LIGHT_SCREEN
+    db 14,SUPERSONIC
+    db 16,THUNDERSHOCK
+    db 17,SELFDESTRUCT
+    db 20,QUICK_ATTACK
+    db 24,THUNDER_WAVE
+    db 26,SLAM ; TODO
+    db 28,SWIFT
+    db 33,DISABLE
+    db 36,EXPLOSION
+    db 40,THUNDERBOLT
+    db 44,AGILITY
+    db 48,DOUBLE_TEAM
+    db 53,REFLECT
+    db 58,THUNDER
+ENDM
+ELECTRODE_HUSUI_Learnset: MACRO
+    db  1,TACKLE
+    db  1,SCREECH
+    db  6,FLASH
+    db  8,DEFENSE_CURL
+    db 10,SONICBOOM
+    db 12,LIGHT_SCREEN
+    db 14,SUPERSONIC
+    db 16,THUNDERSHOCK
+    db 17,SELFDESTRUCT
+    db 20,QUICK_ATTACK
+    db 24,THUNDER_WAVE
+    db 26,SLAM ; TODO
+    db 28,SWIFT
+    db 30,EXPLOSION
+    db 33,THUNDERBOLT
+    db 35,AGILITY
+    db 37,DOUBLE_TEAM
+    db 40,BODY_SLAM ; TODO
+    db 41,DISABLE
+    db 43,CONVERSION
+    db 45,REFLECT
+    db 48,TELEPORT
+    db 51,THUNDER
+    db 56,RECOVER
+    db 60,PSYBEAM ; TODO
+ENDM
+; ──────────────────────────────────────────────────────────────────────
 EXEGGCUTE_Learnset: MACRO
     db  1,BARRAGE
     db  1,HYPNOSIS

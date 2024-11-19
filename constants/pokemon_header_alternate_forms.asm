@@ -1,4 +1,4 @@
-HisuiVoltorbBaseStats:
+VoltorbHisuiBaseStats:
     db VOLTORB ; mon id
     db 40 ; base hp
     db 30 ; base attack
@@ -18,7 +18,9 @@ HisuiVoltorbBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Voltorb_Husui_EvosMoves
 
     db 0 ; growth rate
 
@@ -32,6 +34,43 @@ HisuiVoltorbBaseStats:
     tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
  
     db BANK(HisuiVoltorbPicFront)
+
+ElectrodeHisuiBaseStats:
+    db ELECTRODE ; mon id
+    db 60 ; base hp
+    db 50 ; base attack
+    db 70 ; base defense
+    db 140 ; base speed
+    db 80 ; base special
+
+    db ELECTRIC ; species type 1
+    db GRASS ; species type 2
+
+    db 60 ; catch rate
+    db 150 ; base exp yield
+    db $55 ; sprite dimensions
+
+    dw ElectrodePicFront ; TODO
+    dw ElectrodePicBack ; TODO
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Electrode_Husui_EvosMoves
+
+    db 0 ; growth rate
+
+    ; learnset
+    tmlearn 08                      ; |BODY_SLAM|
+    tmlearn 15                      ; |HYPER_BEAM|
+    tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
+    tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
+    tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
+    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
+
+    db BANK(ElectrodePicFront) ; TODO
 
 FossilKabutoBaseStats:
     db KABUTO ; mon id
@@ -53,7 +92,9 @@ FossilKabutoBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Kabuto_EvosMoves
 
     db 0 ; growth rate
 
@@ -88,7 +129,9 @@ FossilKabutopsBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Kabutops_EvosMoves
 
     db 0 ; growth rate
 
@@ -123,7 +166,9 @@ FossilAerodactylBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Aerodactyl_EvosMoves
 
     db 5 ; growth rate
 

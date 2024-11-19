@@ -7,7 +7,14 @@ MissingNoBaseStats:
 	
 	dw MissingNoPicFront, MissingNoPicBack ;	db 0,25,KOFFING,WEEZING
 
-	dw 0,0 ; db KOFFING,KOFFING,WEEZING,0 ; attacks known at lvl 0: WATER_GUN, WATER_GUN, SKY_ATTACK
+	;dw 0,0 ; db KOFFING,KOFFING,WEEZING,0 ; attacks known at lvl 0: WATER_GUN, WATER_GUN, SKY_ATTACK
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
+
 	db 26 ; growth rate
 
 	db KOFFING,KOFFING,GRIMER,KOFFING,0 ; learnset
@@ -35,7 +42,9 @@ BulbasaurBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Bulbasaur_EvosMoves
 
     db 3 ; growth rate
 
@@ -70,7 +79,9 @@ IvysaurBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Ivysaur_EvosMoves
 
     db 3 ; growth rate
 
@@ -105,7 +116,9 @@ VenusaurBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Venusaur_EvosMoves
 
     db 3 ; growth rate
 
@@ -140,7 +153,9 @@ CharmanderBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Charmander_EvosMoves
 
     db 3 ; growth rate
 
@@ -175,7 +190,9 @@ CharmeleonBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Charmeleon_EvosMoves
 
     db 3 ; growth rate
 
@@ -210,7 +227,9 @@ CharizardBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Charizard_EvosMoves
 
     db 3 ; growth rate
 
@@ -245,7 +264,9 @@ SquirtleBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Squirtle_EvosMoves
 
     db 3 ; growth rate
 
@@ -280,7 +301,9 @@ WartortleBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Wartortle_EvosMoves
 
     db 3 ; growth rate
 
@@ -315,7 +338,9 @@ BlastoiseBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Blastoise_EvosMoves
 
     db 3 ; growth rate
 
@@ -350,7 +375,9 @@ CaterpieBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Caterpie_EvosMoves
 
     db 0 ; growth rate
 
@@ -385,7 +412,9 @@ MetapodBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Metapod_EvosMoves
 
     db 0 ; growth rate
 
@@ -420,7 +449,9 @@ ButterfreeBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Butterfree_EvosMoves
 
     db 0 ; growth rate
 
@@ -455,7 +486,9 @@ WeedleBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Weedle_EvosMoves
 
     db 0 ; growth rate
 
@@ -490,7 +523,9 @@ KakunaBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Kakuna_EvosMoves
 
     db 0 ; growth rate
 
@@ -525,7 +560,9 @@ BeedrillBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Beedrill_EvosMoves
 
     db 0 ; growth rate
 
@@ -560,7 +597,9 @@ PidgeyBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Pidgey_EvosMoves
 
     db 3 ; growth rate
 
@@ -595,7 +634,9 @@ PidgeottoBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Pidgeotto_EvosMoves
 
     db 3 ; growth rate
 
@@ -630,7 +671,9 @@ PidgeotBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Pidgeot_EvosMoves
 
     db 3 ; growth rate
 
@@ -665,7 +708,9 @@ RattataBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Rattata_EvosMoves
 
     db 0 ; growth rate
 
@@ -700,7 +745,9 @@ RaticateBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Raticate_EvosMoves
 
     db 0 ; growth rate
 
@@ -735,7 +782,9 @@ SpearowBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Spearow_EvosMoves
 
     db 0 ; growth rate
 
@@ -770,7 +819,9 @@ FearowBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Fearow_EvosMoves
 
     db 0 ; growth rate
 
@@ -805,7 +856,9 @@ EkansBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Ekans_EvosMoves
 
     db 0 ; growth rate
 
@@ -840,7 +893,9 @@ ArbokBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Arbok_EvosMoves
 
     db 0 ; growth rate
 
@@ -875,7 +930,9 @@ PikachuBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Pikachu_EvosMoves
 
     db 0 ; growth rate
 
@@ -910,7 +967,9 @@ RaichuBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Raichu_EvosMoves
 
     db 0 ; growth rate
 
@@ -945,7 +1004,9 @@ SandshrewBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Sandshrew_EvosMoves
 
     db 0 ; growth rate
 
@@ -980,7 +1041,9 @@ SandslashBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Sandslash_EvosMoves
 
     db 0 ; growth rate
 
@@ -1015,7 +1078,9 @@ NidoranFBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw NidoranF_EvosMoves
 
     db 3 ; growth rate
 
@@ -1050,7 +1115,9 @@ NidorinaBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Nidorina_EvosMoves
 
     db 3 ; growth rate
 
@@ -1085,7 +1152,9 @@ NidoqueenBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Nidoqueen_EvosMoves
 
     db 3 ; growth rate
 
@@ -1120,7 +1189,9 @@ NidoranMBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw NidoranM_EvosMoves
 
     db 3 ; growth rate
 
@@ -1155,7 +1226,9 @@ NidorinoBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Nidorino_EvosMoves
 
     db 3 ; growth rate
 
@@ -1190,7 +1263,9 @@ NidokingBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Nidoking_EvosMoves
 
     db 3 ; growth rate
 
@@ -1225,7 +1300,9 @@ ClefairyBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Clefairy_EvosMoves
 
     db 4 ; growth rate
 
@@ -1260,7 +1337,9 @@ ClefableBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Clefable_EvosMoves
 
     db 4 ; growth rate
 
@@ -1295,7 +1374,9 @@ VulpixBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Vulpix_EvosMoves
 
     db 0 ; growth rate
 
@@ -1330,7 +1411,9 @@ NinetalesBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Ninetales_EvosMoves
 
     db 0 ; growth rate
 
@@ -1365,7 +1448,9 @@ JigglypuffBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Jigglypuff_EvosMoves
 
     db 4 ; growth rate
 
@@ -1400,7 +1485,9 @@ WigglytuffBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Wigglytuff_EvosMoves
 
     db 4 ; growth rate
 
@@ -1435,7 +1522,9 @@ ZubatBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Zubat_EvosMoves
 
     db 0 ; growth rate
 
@@ -1470,7 +1559,9 @@ GolbatBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Golbat_EvosMoves
 
     db 0 ; growth rate
 
@@ -1505,7 +1596,9 @@ OddishBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Oddish_EvosMoves
 
     db 3 ; growth rate
 
@@ -1540,7 +1633,9 @@ GloomBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Gloom_EvosMoves
 
     db 3 ; growth rate
 
@@ -1575,7 +1670,9 @@ VileplumeBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Vileplume_EvosMoves
 
     db 3 ; growth rate
 
@@ -1610,7 +1707,9 @@ ParasBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Paras_EvosMoves
 
     db 0 ; growth rate
 
@@ -1645,7 +1744,9 @@ ParasectBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Parasect_EvosMoves
 
     db 0 ; growth rate
 
@@ -1680,7 +1781,9 @@ VenonatBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Venonat_EvosMoves
 
     db 0 ; growth rate
 
@@ -1715,7 +1818,9 @@ VenomothBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Venomoth_EvosMoves
 
     db 0 ; growth rate
 
@@ -1750,7 +1855,9 @@ DiglettBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Diglett_EvosMoves
 
     db 0 ; growth rate
 
@@ -1785,7 +1892,9 @@ DugtrioBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Dugtrio_EvosMoves
 
     db 0 ; growth rate
 
@@ -1820,7 +1929,9 @@ MeowthBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Meowth_EvosMoves
 
     db 0 ; growth rate
 
@@ -1855,7 +1966,9 @@ PersianBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Persian_EvosMoves
 
     db 0 ; growth rate
 
@@ -1890,7 +2003,9 @@ PsyduckBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Psyduck_EvosMoves
 
     db 0 ; growth rate
 
@@ -1925,7 +2040,9 @@ GolduckBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Golduck_EvosMoves
 
     db 0 ; growth rate
 
@@ -1960,7 +2077,9 @@ MankeyBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Mankey_EvosMoves
 
     db 0 ; growth rate
 
@@ -1995,7 +2114,9 @@ PrimeapeBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Primeape_EvosMoves
 
     db 0 ; growth rate
 
@@ -2030,7 +2151,9 @@ GrowlitheBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Growlithe_EvosMoves
 
     db 5 ; growth rate
 
@@ -2065,7 +2188,9 @@ ArcanineBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Arcanine_EvosMoves
 
     db 5 ; growth rate
 
@@ -2100,7 +2225,9 @@ PoliwagBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Poliwag_EvosMoves
 
     db 3 ; growth rate
 
@@ -2135,7 +2262,9 @@ PoliwhirlBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Poliwhirl_EvosMoves
 
     db 3 ; growth rate
 
@@ -2170,7 +2299,9 @@ PoliwrathBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Poliwrath_EvosMoves
 
     db 3 ; growth rate
 
@@ -2205,7 +2336,9 @@ AbraBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Abra_EvosMoves
 
     db 3 ; growth rate
 
@@ -2240,7 +2373,9 @@ KadabraBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Kadabra_EvosMoves
 
     db 3 ; growth rate
 
@@ -2275,7 +2410,9 @@ AlakazamBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Alakazam_EvosMoves
 
     db 3 ; growth rate
 
@@ -2310,7 +2447,9 @@ MachopBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Machop_EvosMoves
 
     db 3 ; growth rate
 
@@ -2345,7 +2484,9 @@ MachokeBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Machoke_EvosMoves
 
     db 3 ; growth rate
 
@@ -2380,7 +2521,9 @@ MachampBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Machamp_EvosMoves
 
     db 3 ; growth rate
 
@@ -2415,7 +2558,9 @@ BellsproutBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Bellsprout_EvosMoves
 
     db 3 ; growth rate
 
@@ -2450,7 +2595,9 @@ WeepinbellBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Weepinbell_EvosMoves
 
     db 3 ; growth rate
 
@@ -2485,7 +2632,9 @@ VictreebelBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Victreebel_EvosMoves
 
     db 3 ; growth rate
 
@@ -2520,7 +2669,9 @@ TentacoolBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Tentacool_EvosMoves
 
     db 5 ; growth rate
 
@@ -2555,7 +2706,9 @@ TentacruelBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Tentacruel_EvosMoves
 
     db 5 ; growth rate
 
@@ -2590,7 +2743,9 @@ GeodudeBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Geodude_EvosMoves
 
     db 3 ; growth rate
 
@@ -2625,7 +2780,9 @@ GravelerBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Graveler_EvosMoves
 
     db 3 ; growth rate
 
@@ -2660,7 +2817,9 @@ GolemBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Golem_EvosMoves
 
     db 3 ; growth rate
 
@@ -2695,7 +2854,9 @@ PonytaBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Ponyta_EvosMoves
 
     db 0 ; growth rate
 
@@ -2730,7 +2891,9 @@ RapidashBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Rapidash_EvosMoves
 
     db 0 ; growth rate
 
@@ -2765,7 +2928,9 @@ SlowpokeBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Slowpoke_EvosMoves
 
     db 0 ; growth rate
 
@@ -2800,7 +2965,9 @@ SlowbroBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Slowbro_EvosMoves
 
     db 0 ; growth rate
 
@@ -2835,7 +3002,9 @@ MagnemiteBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Magnemite_EvosMoves
 
     db 0 ; growth rate
 
@@ -2870,7 +3039,9 @@ MagnetonBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Magneton_EvosMoves
 
     db 0 ; growth rate
 
@@ -2905,7 +3076,9 @@ FarfetchdBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Farfetchd_EvosMoves
 
     db 0 ; growth rate
 
@@ -2940,7 +3113,9 @@ DoduoBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Doduo_EvosMoves
 
     db 0 ; growth rate
 
@@ -2975,7 +3150,9 @@ DodrioBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Dodrio_EvosMoves
 
     db 0 ; growth rate
 
@@ -3010,7 +3187,9 @@ SeelBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Seel_EvosMoves
 
     db 0 ; growth rate
 
@@ -3045,7 +3224,9 @@ DewgongBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Dewgong_EvosMoves
 
     db 0 ; growth rate
 
@@ -3080,7 +3261,9 @@ GrimerBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Grimer_EvosMoves
 
     db 0 ; growth rate
 
@@ -3115,7 +3298,9 @@ MukBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Muk_EvosMoves
 
     db 0 ; growth rate
 
@@ -3150,7 +3335,9 @@ ShellderBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Shellder_EvosMoves
 
     db 5 ; growth rate
 
@@ -3185,7 +3372,9 @@ CloysterBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Cloyster_EvosMoves
 
     db 5 ; growth rate
 
@@ -3220,7 +3409,9 @@ GastlyBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Gastly_EvosMoves
 
     db 3 ; growth rate
 
@@ -3255,7 +3446,9 @@ HaunterBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Haunter_EvosMoves
 
     db 3 ; growth rate
 
@@ -3290,7 +3483,9 @@ GengarBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Gengar_EvosMoves
 
     db 3 ; growth rate
 
@@ -3325,7 +3520,9 @@ OnixBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Onix_EvosMoves
 
     db 0 ; growth rate
 
@@ -3360,7 +3557,9 @@ DrowzeeBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Drowzee_EvosMoves
 
     db 0 ; growth rate
 
@@ -3395,7 +3594,9 @@ HypnoBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Hypno_EvosMoves
 
     db 0 ; growth rate
 
@@ -3430,7 +3631,9 @@ KrabbyBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Krabby_EvosMoves
 
     db 0 ; growth rate
 
@@ -3465,7 +3668,9 @@ KinglerBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Kingler_EvosMoves
 
     db 0 ; growth rate
 
@@ -3499,8 +3704,10 @@ VoltorbBaseStats:
     dw VoltorbPicBack
 
     ; pointer to alternate forms
-    dw HisuiVoltorbBaseStats
-    dw 0
+    dw VoltorbHisuiBaseStats
+
+    ; pointer to evomoves
+    dw Voltorb_EvosMoves
 
     db 0 ; growth rate
 
@@ -3534,8 +3741,10 @@ ElectrodeBaseStats:
     dw ElectrodePicBack
 
     ; pointer to alternate forms
-    dw 0
-    dw 0
+    dw ElectrodeHisuiBaseStats
+
+    ; pointer to evomoves
+    dw Electrode_EvosMoves
 
     db 0 ; growth rate
 
@@ -3570,7 +3779,9 @@ ExeggcuteBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Exeggcute_EvosMoves
 
     db 5 ; growth rate
 
@@ -3605,7 +3816,9 @@ ExeggutorBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Exeggutor_EvosMoves
 
     db 5 ; growth rate
 
@@ -3640,7 +3853,9 @@ CuboneBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Cubone_EvosMoves
 
     db 0 ; growth rate
 
@@ -3675,7 +3890,9 @@ MarowakBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Marowak_EvosMoves
 
     db 0 ; growth rate
 
@@ -3710,7 +3927,9 @@ HitmonleeBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Hitmonlee_EvosMoves
 
     db 0 ; growth rate
 
@@ -3745,7 +3964,9 @@ HitmonchanBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Hitmonchan_EvosMoves
 
     db 0 ; growth rate
 
@@ -3780,7 +4001,9 @@ LickitungBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Lickitung_EvosMoves
 
     db 0 ; growth rate
 
@@ -3815,7 +4038,9 @@ KoffingBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Koffing_EvosMoves
 
     db 0 ; growth rate
 
@@ -3850,7 +4075,9 @@ WeezingBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Weezing_EvosMoves
 
     db 0 ; growth rate
 
@@ -3885,7 +4112,9 @@ RhyhornBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Rhyhorn_EvosMoves
 
     db 5 ; growth rate
 
@@ -3920,7 +4149,9 @@ RhydonBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Rhydon_EvosMoves
 
     db 5 ; growth rate
 
@@ -3955,7 +4186,9 @@ ChanseyBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Chansey_EvosMoves
 
     db 4 ; growth rate
 
@@ -3990,7 +4223,9 @@ TangelaBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Tangela_EvosMoves
 
     db 0 ; growth rate
 
@@ -4025,7 +4260,9 @@ KangaskhanBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Kangaskhan_EvosMoves
 
     db 0 ; growth rate
 
@@ -4060,7 +4297,9 @@ HorseaBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Horsea_EvosMoves
 
     db 0 ; growth rate
 
@@ -4095,7 +4334,9 @@ SeadraBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Seadra_EvosMoves
 
     db 0 ; growth rate
 
@@ -4130,7 +4371,9 @@ GoldeenBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Goldeen_EvosMoves
 
     db 0 ; growth rate
 
@@ -4165,7 +4408,9 @@ SeakingBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Seaking_EvosMoves
 
     db 0 ; growth rate
 
@@ -4200,7 +4445,9 @@ StaryuBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Staryu_EvosMoves
 
     db 5 ; growth rate
 
@@ -4235,7 +4482,9 @@ StarmieBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Starmie_EvosMoves
 
     db 5 ; growth rate
 
@@ -4270,7 +4519,9 @@ MrMimeBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw MrMime_EvosMoves
 
     db 0 ; growth rate
 
@@ -4305,7 +4556,9 @@ ScytherBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Scyther_EvosMoves
 
     db 0 ; growth rate
 
@@ -4340,7 +4593,9 @@ JynxBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Jynx_EvosMoves
 
     db 0 ; growth rate
 
@@ -4375,7 +4630,9 @@ ElectabuzzBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Electabuzz_EvosMoves
 
     db 0 ; growth rate
 
@@ -4410,7 +4667,9 @@ MagmarBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Magmar_EvosMoves
 
     db 0 ; growth rate
 
@@ -4445,7 +4704,9 @@ PinsirBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Pinsir_EvosMoves
 
     db 5 ; growth rate
 
@@ -4480,7 +4741,9 @@ TaurosBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Tauros_EvosMoves
 
     db 5 ; growth rate
 
@@ -4515,7 +4778,9 @@ MagikarpBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Magikarp_EvosMoves
 
     db 5 ; growth rate
 
@@ -4550,7 +4815,9 @@ GyaradosBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Gyarados_EvosMoves
 
     db 5 ; growth rate
 
@@ -4585,7 +4852,9 @@ LaprasBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Lapras_EvosMoves
 
     db 5 ; growth rate
 
@@ -4620,7 +4889,9 @@ DittoBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Ditto_EvosMoves
 
     db 0 ; growth rate
 
@@ -4655,7 +4926,9 @@ EeveeBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Eevee_EvosMoves
 
     db 0 ; growth rate
 
@@ -4690,7 +4963,9 @@ VaporeonBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Vaporeon_EvosMoves
 
     db 0 ; growth rate
 
@@ -4725,7 +5000,9 @@ JolteonBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Jolteon_EvosMoves
 
     db 0 ; growth rate
 
@@ -4760,7 +5037,9 @@ FlareonBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Flareon_EvosMoves
 
     db 0 ; growth rate
 
@@ -4795,7 +5074,9 @@ PorygonBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Porygon_EvosMoves
 
     db 0 ; growth rate
 
@@ -4830,7 +5111,9 @@ OmanyteBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Omanyte_EvosMoves
 
     db 0 ; growth rate
 
@@ -4865,7 +5148,9 @@ OmastarBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Omastar_EvosMoves
 
     db 0 ; growth rate
 
@@ -4900,7 +5185,9 @@ KabutoBaseStats:
 
     ; pointer to alternate forms
     dw FossilKabutoBaseStats
-    dw 0
+
+    ; pointer to evomoves
+    dw Kabuto_EvosMoves
 
     db 0 ; growth rate
 
@@ -4935,7 +5222,9 @@ KabutopsBaseStats:
 
     ; pointer to alternate forms
     dw FossilKabutopsBaseStats
-    dw 0
+
+    ; pointer to evomoves
+    dw Kabutops_EvosMoves
 
     db 0 ; growth rate
 
@@ -4970,7 +5259,9 @@ AerodactylBaseStats:
 
     ; pointer to alternate forms
     dw FossilAerodactylBaseStats
-    dw 0
+
+    ; pointer to evomoves
+    dw Aerodactyl_EvosMoves
 
     db 5 ; growth rate
 
@@ -5005,7 +5296,9 @@ SnorlaxBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Snorlax_EvosMoves
 
     db 5 ; growth rate
 
@@ -5040,7 +5333,9 @@ ArticunoBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Articuno_EvosMoves
 
     db 5 ; growth rate
 
@@ -5075,7 +5370,9 @@ ZapdosBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Zapdos_EvosMoves
 
     db 5 ; growth rate
 
@@ -5110,7 +5407,9 @@ MoltresBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Moltres_EvosMoves
 
     db 5 ; growth rate
 
@@ -5145,7 +5444,9 @@ DratiniBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Dratini_EvosMoves
 
     db 5 ; growth rate
 
@@ -5180,7 +5481,9 @@ DragonairBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Dragonair_EvosMoves
 
     db 5 ; growth rate
 
@@ -5215,7 +5518,9 @@ DragoniteBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Dragonite_EvosMoves
 
     db 5 ; growth rate
 
@@ -5250,7 +5555,9 @@ MewtwoBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Mewtwo_EvosMoves
 
     db 5 ; growth rate
 
@@ -5285,7 +5592,9 @@ MewBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Mew_EvosMoves
 
     db 3 ; growth rate
 
@@ -5314,7 +5623,9 @@ LitwickBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Litwick_EvosMoves
 
     db 3 ; growth rate
 
@@ -5349,7 +5660,9 @@ LampentBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Lampent_EvosMoves
 
     db 3 ; growth rate
 
@@ -5384,7 +5697,9 @@ ChandelureBaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw Chandelure_EvosMoves
 
     db 3 ; growth rate
 
@@ -5419,7 +5734,9 @@ Mon155BaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
 
     db 3 ; growth rate
 
@@ -5454,7 +5771,9 @@ Mon156BaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
 
     db 3 ; growth rate
 
@@ -5489,7 +5808,9 @@ Mon157BaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
 
     db 3 ; growth rate
 
@@ -5524,7 +5845,9 @@ Mon158BaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
 
     db 3 ; growth rate
 
@@ -5559,7 +5882,9 @@ Mon159BaseStats:
 
     ; pointer to alternate forms
     dw 0
-    dw 0
+
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
 
     db 3 ; growth rate
 
