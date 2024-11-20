@@ -23495,18 +23495,7 @@ ItemUseBall: ; d687 (3:5687)
     ld a,[hl]
     push af        ;...and status ailments
     push hl
-    call BackupPP
-    ld hl,W_ENEMYBATTSTATUS3
-    bit 3,[hl]
-    jr nz,.next16
-    set 3,[hl]
-    call BackupMoves
-    ld hl,$cceb
-    ld a,[W_ENEMYMONATKDEFIV]
-    ld [hli],a
-    ld a,[W_ENEMYMONSPDSPCIV]
-    ld [hl],a
-.next16    ;$587e
+    call HandleBackupAfterBallCatch
     ld a,[$cf91]
     push af
     ld a,[W_ENEMYMONID]
@@ -24426,6 +24415,23 @@ ItemUseMedicine: ; Moved in the Bank
     db "DEFENSE@"
     db "SPEED@"
     db "SPECIAL@"
+
+HandleBackupAfterBallCatch:
+    ld hl,W_ENEMYBATTSTATUS3
+    bit 3,[hl]
+    jr nz,.justTransformed
+    set 3,[hl]
+    call BackupMoves
+    call BackupPP
+    ld hl,$cceb
+    ld a,[W_ENEMYMONATKDEFIV]
+    ld [hli],a
+    ld a,[W_ENEMYMONSPDSPCIV]
+    ld [hl],a
+.justTransformed
+    ld a,[W_ENEMYMONPP]   ; Backup Current Energy
+    ld [wBackupEnemyPP],a ; ...
+    ret
 
 ; Free
 
@@ -28877,6 +28883,10 @@ GetAlternateForm:
     xor a ; TODO:SpecialMonToPlayerAlternateForm
     jr .end
 .copyEnemyMonData
+    ld a,[W_ENEMYBATTSTATUS3]
+    bit 3,a
+    ld a,[wBackupEnemyPP+1] ; if transformed copy from backup
+    jr nz,.end
     ld a,[W_ENEMYMONPP+1] ; move2pp
     jr .end
 .enemy
@@ -43567,7 +43577,9 @@ DebugNPC:
     ld bc,$2c
     call AddNTimes
     ld [hl],255 ; 255 Energy
-    call .CopyPPToOT
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 6,a ; was the up button pressed?
+    call nz,.CopyPPToOT
     pop af
     ld [$FF00+$e4],a
     pop bc
@@ -51593,71 +51605,37 @@ HealEffect_: ; Moved Upper in the Bank
 TransformEffect_: ; Moved Upper in the Bank
     ld hl,W_PLAYERMONID
     ld de,W_ENEMYMON_START
-;    ld bc,W_ENEMYBATTSTATUS3 ; $d069
     ld a,[W_ENEMYBATTSTATUS1] ; $d067
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr nz,.asm_3bad1
     ld hl,W_ENEMYMON_START
     ld de,W_PLAYERMONID
-;    ld bc,W_PLAYERBATTSTATUS3 ; $d064
     ld [wPlayerMoveListIndex],a ; $cc2e
     ld a,[W_PLAYERBATTSTATUS1] ; $d062
 .asm_3bad1
     bit 6,a
     jp nz,Func_3bb8c
     push hl
-    push de
-;    push bc
-    ld hl,W_PLAYERBATTSTATUS2 ; $d063
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.asm_3bae4
-    ld hl,W_ENEMYBATTSTATUS2 ; $d068
-.asm_3bae4
-    bit 4,[hl]
-    push af
-    ld hl,HideSubstituteShowMonAnim
-    ld b,BANK(HideSubstituteShowMonAnim)
-    call nz,Bankswitch
-    ld a,[W_OPTIONS] ; $d355
-    add a
-    ld hl,PlayCurrentMoveAnimation ; $7ba8
-    ld b,BANK(PlayCurrentMoveAnimation)
-    jr nc,.asm_3baff
-    ld hl,AnimationTransformMon
-    ld b,BANK(AnimationTransformMon)
-.asm_3baff
-    call Bankswitch
-    ld hl,ReshowSubstituteAnim
-    ld b,BANK(ReshowSubstituteAnim)
-    pop af
-    call nz,Bankswitch
-;    pop bc
-;    ld a,[bc]
-;    set 3,a
-;    ld [bc],a
-    pop de
-    pop hl
-    push hl
-
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.SkipBackupMoves
     ld a,[W_ENEMYBATTSTATUS3]
     bit 3,a ; Pokemon is Just Transformed
     jr nz,.SkipBackupMoves
-
-    ; Backup Moves
+    ; Backup Moves & PP
     push hl
     push de
     ld hl,W_ENEMYMONMOVES
     ld de,wBackupEnemyMoves
     ld bc,4
     call CopyData
+    ld hl,W_ENEMYMONPP
+    ld de,wBackupEnemyPP
+    ld bc,4
+    call CopyData
     pop de
     pop hl
-
 .SkipBackupMoves
     ld a,[hl]
     ld [de],a
@@ -51681,14 +51659,12 @@ TransformEffect_: ; Moved Upper in the Bank
     bit 3,a ; Pokemon is Just Transformed
     jr nz,.SkipBackupDV
     push de
-
     ; Backup IV
     ld a,[de]
     ld [$cceb],a
     inc de
     ld a,[de]
     ld [$ccec],a
-
     pop de
 .SkipBackupDV
     ld a,[bc]
@@ -51722,27 +51698,12 @@ TransformEffect_: ; Moved Upper in the Bank
     inc de
     ld bc,$8
     call CopyData
-; Don't touch PP slot (Energy) ; TODO:HandleAlternateFormIndex
-;    ld bc,$ffef
-;    add hl,bc
-;    ld b,$4
-;.asm_3bb4a
-;    ld a,[hli]
-;    and a
-;    jr z,.asm_3bb57
-;    ld a,$5
-;    ld [de],a
-;    inc de
-;    dec b
-;    jr nz,.asm_3bb4a
-;    jr .asm_3bb5d
-;.asm_3bb57
-;    xor a
-;    ld [de],a
-;    inc de
-;    dec b
-;    jr nz,.asm_3bb57
-.asm_3bb5d
+    ; Handle Alternate Form Index
+    inc hl ; move to move2pp
+    inc de ; ...
+    ld a,[hl]
+    ld [de],a
+    call .TransformAnimation
     pop hl
     ld a,[hl]
     ld [$d11e],a
@@ -51755,6 +51716,36 @@ TransformEffect_: ; Moved Upper in the Bank
     call Func_3bb7d
     call GoPalSetBattleAndLoadText ; Denim ; ld hl,UnnamedText_3bb92 ; $7b92
     jp PrintText
+.TransformAnimation
+    push hl
+    push de
+    ld hl,W_PLAYERBATTSTATUS2 ; $d063
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr z,.asm_3bae4
+    ld hl,W_ENEMYBATTSTATUS2 ; $d068
+.asm_3bae4
+    bit 4,[hl]
+    push af
+    ld hl,HideSubstituteShowMonAnim
+    ld b,BANK(HideSubstituteShowMonAnim)
+    call nz,Bankswitch
+    ld a,[W_OPTIONS] ; $d355
+    add a
+    ld hl,PlayCurrentMoveAnimation ; $7ba8
+    ld b,BANK(PlayCurrentMoveAnimation)
+    jr nc,.asm_3baff
+    ld hl,AnimationTransformMon
+    ld b,BANK(AnimationTransformMon)
+.asm_3baff
+    call Bankswitch
+    ld hl,ReshowSubstituteAnim
+    ld b,BANK(ReshowSubstituteAnim)
+    pop af
+    call nz,Bankswitch
+    pop de
+    pop hl
+    ret
 
 ; ─────────────────────────────────────────────────────────────
 
@@ -52314,7 +52305,9 @@ ItemUseEvoStone_:
     ld [$cf96],a
     jp RemoveItemFromInventory
 .noEffect
-    call ItemUseNoEffect
+    ld hl,ItemUseNoEffect
+    ld b,BANK(ItemUseNoEffect)
+    call Bankswitch
 .canceledItemUse
     xor a
     ld [$cd6a],a
@@ -137252,18 +137245,9 @@ ItemInBattleFinalCheck:
     call LoadFontTilePatterns
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; disable transfer
-    ld a,[wPlayerMonNumber]
-    ld hl,W_PARTYMON1
-    ld c,a
-    ld b,0
-    add hl,bc
-    ld a,[hl]
+    ld a,[W_PLAYERMONID]
     ld [$d0b5],a
-    ld hl,W_PARTYMON1_MOVE2PP
-    ld a,[wPlayerMonNumber]
-    ld bc,$2c
-    call AddNTimes
-    ld a,[hl]
+    ld a,[W_PLAYERMONPP+1] ; move2pp
     ld [wAlternateFormIndex],a
     call GetMonHeader
     PREDEF LoadMonBackSpritePredef
