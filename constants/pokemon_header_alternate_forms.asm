@@ -13,8 +13,8 @@ VoltorbHisuiBaseStats:
     db 103 ; base exp yield
     db $55 ; sprite dimensions
 
-    dw HisuiVoltorbPicFront
-    dw HisuiVoltorbPicBack
+    dw VoltorbHisuiPicFront
+    dw VoltorbHisuiPicBack
 
     ; pointer to alternate forms
     dw 0
@@ -33,7 +33,7 @@ VoltorbHisuiBaseStats:
     tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
     tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
  
-    db BANK(HisuiVoltorbPicFront)
+    db BANK(VoltorbHisuiPicFront)
 
 ElectrodeHisuiBaseStats:
     db ELECTRODE ; mon id
@@ -50,8 +50,8 @@ ElectrodeHisuiBaseStats:
     db 150 ; base exp yield
     db $55 ; sprite dimensions
 
-    dw ElectrodePicFront ; TODO
-    dw ElectrodePicBack ; TODO
+    dw ElectrodeHisuiPicFront
+    dw ElectrodeHisuiPicBack
 
     ; pointer to alternate forms
     dw 0
@@ -62,7 +62,7 @@ ElectrodeHisuiBaseStats:
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
+    tmlearn 0
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
     tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
@@ -70,7 +70,7 @@ ElectrodeHisuiBaseStats:
     tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
     tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
 
-    db BANK(ElectrodePicFront) ; TODO
+    db BANK(ElectrodeHisuiPicFront)
 
 FossilKabutoBaseStats:
     db KABUTO ; mon id

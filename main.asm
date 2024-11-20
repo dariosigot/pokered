@@ -21988,7 +21988,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHSXX
     dw MapHSXX
     dw MapHSXX
-    dw MapHSXX
+    dw MapHS51
     dw MapHSXX
     dw MapHS53
     dw MapHSXX
@@ -22418,8 +22418,8 @@ MapHSEB: ; cd0f (3:4d0f)
     db SILPH_CO_11F,$05,Show
 MapHSD6: ; cd18 (3:4d18)
     db MANSION_2,$02,Show ; New Moltres
-; Unused
-    ds 3
+MapHS51:
+    db ROCK_TUNNEL_POKECENTER,$05,Show ; $BB
 MapHSD7: ; cd1e (3:4d1e)
     db MANSION_3,$03,Show
     db MANSION_3,$04,Show
@@ -28880,7 +28880,8 @@ GetAlternateForm:
     ld a,[W_ISINBATTLE] ; $d057
     and a ; is this a wild mon caught in battle?
     jr nz,.copyEnemyMonData
-    xor a ; TODO:SpecialMonToPlayerAlternateForm
+    ;SpecialMonToPlayerAlternateForm
+    ld a,[wTempAlternateFormIndex]
     jr .end
 .copyEnemyMonData
     ld a,[W_ENEMYBATTSTATUS3]
@@ -28888,13 +28889,74 @@ GetAlternateForm:
     ld a,[wBackupEnemyPP+1] ; if transformed copy from backup
     jr nz,.end
     ld a,[W_ENEMYMONPP+1] ; move2pp
-    jr .end
-.enemy
-    xor a ; TODO:SpecialTrainerAlternateForm
+    ; fall through
 .end
     ld [wAlternateFormIndex],a ; Save AlternateFormIndex
     ld [wTempAlternateFormIndex],a
     ret
+.enemy
+    ;SpecialTrainerAlternateForm
+    push de
+    ld a,[W_CUROPPONENT]
+    cp SONY2
+    jr nz,.skip1
+    ld a,SONY1
+.skip1
+    cp SONY3
+    jr nz,.skip2
+    ld a,SONY1
+.skip2
+    ld b,a
+    ld a,[$cf91]
+    ld c,a
+    ld hl,.CustomTrainer
+    call .loop
+    ld a,0
+    jr nc,.enemyend
+    ld a,d
+.enemyend
+    pop de
+    ret
+
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFound
+    cp b
+    jr nz,.next3
+    ld a,[hli]
+    cp c
+    jr nz,.next2
+.found
+    ld a,[hli]
+    ld d,a
+    ld e,[hl]
+    scf ; scf = found
+    ret
+.next3
+    inc hl
+.next2
+    inc hl
+    inc hl
+    jr .loop
+.NotFound
+    and a ; rcf = not found
+    ret
+
+.CustomTrainer
+
+    ; Green1
+    db SONY1,SQUIRTLE,$01,$00
+    db SONY1,WARTORTLE,$01,$00
+    db SONY1,BLASTOISE,$01,$00
+    db SONY1,BULBASAUR,$01,$00
+    db SONY1,IVYSAUR,$01,$00
+    db SONY1,VENUSAUR,$01,$00
+    db SONY1,CHARMANDER,$01,$00
+    db SONY1,CHARMELEON,$01,$00
+    db SONY1,CHARIZARD,$01,$00
+
+    db $FF
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -38835,7 +38897,7 @@ asm_1d1e5: ; 1d1e5 (7:51e5)
     ld [$d127],a
     ld a,[$cf91]
     ld [$d11e],a
-    call AddPokemonToParty
+    call AddStarterToParty ; call AddPokemonToParty
     ld hl,$d72e
     set 3,[hl]
     ld a,$fc
@@ -44248,6 +44310,8 @@ GetOakLastPkmn:
     pop af
     ld b,a
     ld c,5
+    ld a,1
+    ld [wTempAlternateFormIndex],a
     call GivePokemon
     pop de
     ret nc ; PartyFull
@@ -44332,6 +44396,11 @@ BillsHouseObject:
     EVENT_DISP BILLS_HOUSE_WIDTH,07,02
     EVENT_DISP BILLS_HOUSE_WIDTH,07,03
     EVENT_DISP BILLS_HOUSE_WIDTH,06,05
+
+AddStarterToParty:
+    ld a,1
+    ld [wTempAlternateFormIndex],a
+    jp AddPokemonToParty
 
 SECTION "bank8",ROMX,BANK[$8]
 
@@ -73112,39 +73181,25 @@ RockTunnelPokecenterTextPointers: ; 493c0 (12:53c0)
     dw RockTunnelPokecenterText2
     dw RockTunnelPokecenterText3
     dw RockTunnelPokecenterText4
+    dw RockTunnelPokecenterText5
 
-RockTunnelPokecenterText1: ; 493c8 (12:53c8)
+RockTunnelPokecenterText1: ; Moved in the Bank
     db $ff
 
-RockTunnelPokecenterText2: ; 493c9 (12:53c9)
+RockTunnelPokecenterText2: ; Moved in the Bank
     TX_FAR _RockTunnelPokecenterText1
     db "@"
 
-RockTunnelPokecenterText3: ; 493ce (12:53ce)
+RockTunnelPokecenterText3: ; Moved in the Bank
     TX_FAR _RockTunnelPokecenterText3
     db "@"
 
-RockTunnelPokecenterText4: ; 493d3 (12:53d3)
+RockTunnelPokecenterText4: ; Moved in the Bank
     db $f6
 
-RockTunnelPokecenterObject: ; 0x493d4 (size=44)
-    db $0 ; border tile
+; Free
 
-    db $2 ; warps
-    db $7,$3,$0,$ff
-    db $7,$4,$0,$ff
-
-    db $0 ; signs
-
-    db $4 ; people
-    db SPRITE_NURSE,$1 + 4,$3 + 4,$ff,$d0,$1 ; person
-    db SPRITE_GENTLEMAN,$3 + 4,$7 + 4,$fe,$2,$2 ; person
-    db SPRITE_FISHER2,$5 + 4,$2 + 4,$ff,$ff,$3 ; person
-    db SPRITE_CABLE_CLUB_WOMAN,$2 + 4,$b + 4,$ff,$d0,$4 ; person
-
-    ; warp-to
-    EVENT_DISP $7,$7,$3
-    EVENT_DISP $7,$7,$4
+SECTION "Route11Gate_h",ROMX[$5400],BANK[$12]
 
 Route11Gate_h: ; 0x49400 to 0x4940c (12 bytes) (id=84)
     db $0c ; tileset
@@ -74923,6 +74978,54 @@ CeladonMart5Text3:
 CeladonMart5Text4:
     db $FE,5,HP_UP,PROTEIN,IRON,CARBOS,CALCIUM,$FF
 
+RockTunnelPokecenterObject: ; Moved in the Bank
+    db $0 ; border tile
+
+    db $2 ; warps
+    db $7,$3,$0,$ff
+    db $7,$4,$0,$ff
+
+    db $0 ; signs
+
+    db $5 ; people
+    db SPRITE_NURSE,$1 + 4,$3 + 4,$ff,$d0,$1 ; person
+    db SPRITE_GENTLEMAN,$3 + 4,$7 + 4,$fe,$2,$2 ; person
+    db SPRITE_FISHER2,$5 + 4,$2 + 4,$ff,$ff,$3 ; person
+    db SPRITE_CABLE_CLUB_WOMAN,$2 + 4,$b + 4,$ff,$d0,$4 ; person
+    db SPRITE_BALL,$3 + 4,$6 + 4,$ff,$ff,$5 ; person
+
+    ; warp-to
+    EVENT_DISP $7,$7,$3
+    EVENT_DISP $7,$7,$4
+
+RockTunnelPokecenterText5: ; 1dd46 (7:5d46)
+    db $08 ; asm
+    ld hl,.VoltorbText1
+    call PrintText
+    ld bc,(VOLTORB << 8) | 16
+    ld a,b
+    push bc
+    call DisplayPokedex
+    ld hl,.VoltorbText2
+    call PrintText
+    pop bc
+    ld a,1
+    ld [wTempAlternateFormIndex],a
+    call GivePokemon
+    jr nc,.error
+    ld a,$BB
+    ld [$cc4d],a
+    ld a,$11
+    call Predef
+.error
+    jp TextScriptEnd
+.VoltorbText1
+    TX_FAR _VoltorbHusuiText
+    db "@"
+.VoltorbText2
+    TX_FAR _VoltorbHusui2Text
+    db "@"
+
 SECTION "bank13",ROMX,BANK[$13]
 
 YoungsterPic: ; 4c000 (13:4000)
@@ -75120,9 +75223,7 @@ _GivePokemon: ; 4fda5 (13:7da5)
     ld [W_ENEMYBATTSTATUS3],a ; $d069
     ld a,[$cf91]
     ld [W_ENEMYMONID],a
-    ld hl,LoadEnemyMonData
-    ld b,BANK(LoadEnemyMonData)
-    call Bankswitch ; indirect jump to LoadEnemyMonData (3eb01 (f:6b01))
+    call GivePokemon_LoadEnemyMonData
     call SetPokedexOwnedFlag
     ld hl,SendNewMonToBox
     ld b,BANK(SendNewMonToBox)
@@ -75383,6 +75484,19 @@ MovesMenuPredef:
     dbw BANK(MovesMenu),MovesMenu ; 65
 PrintMoveDetailsBoxPredef:
     dbw BANK(PrintMoveDetailsBox),PrintMoveDetailsBox ; 66
+
+GivePokemon_LoadEnemyMonData:
+    ld hl,wTempAlternateFormIndex
+    ld a,[hl]
+    push af
+    push hl
+    ld hl,LoadEnemyMonData
+    ld b,BANK(LoadEnemyMonData)
+    call Bankswitch
+    pop hl
+    pop af
+    ld [hl],a
+    ret
 
 SECTION "bank14",ROMX,BANK[$14]
 
@@ -130054,7 +130168,15 @@ _VermilionCityText14_Dex:
 
 _VoltorbText:
     db $0,"Wow!",$4f
-    db "A Voltorb...",$58
+    db "A VOLTORB...",$58
+
+_VoltorbHusuiText:
+    db $0,"Wow! Is it",$4f
+    db "a VOLTORB?",$58
+
+_VoltorbHusui2Text:
+    db $0,"It's different",$4f
+    db "from the #DEX!",$58
 
 _EnableLastPkmnText:
     db $0,"OAK: WOW! ",$51
@@ -131355,10 +131477,14 @@ MissingNoPicFront:
 MissingNoPicBack:
     INCBIN "pic/other/BackSpriteMissingNo.pic"
 
-HisuiVoltorbPicFront:
-    INCBIN "pic/bmon/husuivoltorb.pic"
-HisuiVoltorbPicBack:
-    INCBIN "pic/monback/husuivoltorbb.pic"
+VoltorbHisuiPicFront:
+    INCBIN "pic/bmon/voltorbhusui.pic"
+VoltorbHisuiPicBack:
+    INCBIN "pic/monback/voltorbhusuib.pic"
+ElectrodeHisuiPicFront:
+    INCBIN "pic/bmon/electrodehusui.pic"
+ElectrodeHisuiPicBack:
+    INCBIN "pic/monback/electrodehusuib.pic"
 
 SECTION "bank32",ROMX,BANK[$32]
 
@@ -138304,11 +138430,11 @@ GenerateRandomEnemyTrainerIV_:
 
 .HandleCustomTrainer ; Handle Custom IV
     ld a,[W_CUROPPONENT]
-    CP SONY2
+    cp SONY2
     jr nz,.skip1
     ld a,SONY1
 .skip1
-    CP SONY3
+    cp SONY3
     jr nz,.skip2
     ld a,SONY1
 .skip2
@@ -138460,16 +138586,22 @@ GenerateRandomEnemyTrainerIV_:
     db LANCE,CHARIZARD,$DD,$EE
     db LANCE,AERODACTYL,$F9,$F9
     db LANCE,DRAGONITE,$FF,$FF
+
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
 
 LoadEnemyMonData_GetAlternateMonHeader_:
     ld a,[W_ISINBATTLE]
+    and a
+    jr z,.outOfBattle
     cp 2
     jr z,.TrainerBattle
 .WildBattle
-    xor a
+    xor a ; TODO
+    jr .end
+.outOfBattle
+    ld a,[wTempAlternateFormIndex]
     jr .end
 .TrainerBattle
     ld hl,wEnemyMon1+(W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM) ; move2pp

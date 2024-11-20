@@ -1957,52 +1957,50 @@ ENDM
 ; ──────────────────────────────────────────────────────────────────────
 VOLTORB_HUSUI_Learnset: MACRO
     db  1,TACKLE
-    db  1,SCREECH
-    db  6,FLASH
-    db  8,DEFENSE_CURL
-    db 10,SONICBOOM
-    db 12,LIGHT_SCREEN
-    db 14,SUPERSONIC
+    db  1,GROWTH
+    db  7,LEECH_SEED
+    db 10,FLASH
+    db 12,STUN_SPORE
+    db 14,ABSORB
     db 16,THUNDERSHOCK
     db 17,SELFDESTRUCT
     db 20,QUICK_ATTACK
-    db 24,THUNDER_WAVE
-    db 26,SLAM ; TODO
+    db 24,SLEEP_POWDER
+    db 26,MEGA_DRAIN
     db 28,SWIFT
-    db 33,DISABLE
+    db 33,DISABLE ; Exclusive
     db 36,EXPLOSION
     db 40,THUNDERBOLT
     db 44,AGILITY
     db 48,DOUBLE_TEAM
-    db 53,REFLECT
-    db 58,THUNDER
+    db 53,LIGHT_SCREEN
+    db 58,SOLARBEAM
 ENDM
 ELECTRODE_HUSUI_Learnset: MACRO
     db  1,TACKLE
-    db  1,SCREECH
-    db  6,FLASH
-    db  8,DEFENSE_CURL
-    db 10,SONICBOOM
-    db 12,LIGHT_SCREEN
-    db 14,SUPERSONIC
-    db 16,THUNDERSHOCK
-    db 17,SELFDESTRUCT
-    db 20,QUICK_ATTACK
-    db 24,THUNDER_WAVE
-    db 26,SLAM ; TODO
-    db 28,SWIFT
+    db  1,GROWTH
+    db  6,LEECH_SEED
+    db  9,FLASH
+    db 11,STUN_SPORE
+    db 13,ABSORB
+    db 15,THUNDERSHOCK
+    db 16,SELFDESTRUCT
+    db 18,QUICK_ATTACK
+    db 21,SLEEP_POWDER
+    db 24,MEGA_DRAIN
+    db 27,SWIFT
     db 30,EXPLOSION
     db 33,THUNDERBOLT
     db 35,AGILITY
     db 37,DOUBLE_TEAM
-    db 40,BODY_SLAM ; TODO
+    db 40,BARRAGE
     db 41,DISABLE
     db 43,CONVERSION
-    db 45,REFLECT
+    db 45,LIGHT_SCREEN
     db 48,TELEPORT
-    db 51,THUNDER
+    db 51,SOLARBEAM
     db 56,RECOVER
-    db 60,PSYBEAM ; TODO
+    db 60,THUNDER
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 EXEGGCUTE_Learnset: MACRO
