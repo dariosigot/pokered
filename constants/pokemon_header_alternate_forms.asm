@@ -25,9 +25,9 @@ VoltorbHisuiBaseStats:
     db 0 ; growth rate
 
     ; learnset
+    tmlearn 6                       ; |TOXIC|
     tmlearn 0
-    tmlearn 0
-    tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
+    tmlearn 21,22,24                ; |MEGA_DRAIN|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
     tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
@@ -62,9 +62,9 @@ ElectrodeHisuiBaseStats:
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
+    tmlearn 6                       ; |TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
-    tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
+    tmlearn 21,22,24                ; |MEGA_DRAIN|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
     tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|

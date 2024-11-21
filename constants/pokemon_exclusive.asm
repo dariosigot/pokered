@@ -855,8 +855,10 @@ MagnemiteExclusiveMove:
 MagnetonExclusiveMove:
 VoltorbExclusiveMove:
 ElectrodeExclusiveMove:
+    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db HYPER_BEAM ; TM15
+    db MEGA_DRAIN ; TM21
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
     db THUNDER ; TM25
