@@ -41,7 +41,7 @@ BulbasaurBaseStats:
     dw BulbasaurPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw BulbasaurStarterBaseStats
 
     ; pointer to evomoves
     dw Bulbasaur_EvosMoves
@@ -78,7 +78,7 @@ IvysaurBaseStats:
     dw IvysaurPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw IvysaurStarterBaseStats
 
     ; pointer to evomoves
     dw Ivysaur_EvosMoves
@@ -115,7 +115,7 @@ VenusaurBaseStats:
     dw VenusaurPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw VenusaurStarterBaseStats
 
     ; pointer to evomoves
     dw Venusaur_EvosMoves
@@ -152,7 +152,7 @@ CharmanderBaseStats:
     dw CharmanderPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw CharmanderStarterBaseStats
 
     ; pointer to evomoves
     dw Charmander_EvosMoves
@@ -189,7 +189,7 @@ CharmeleonBaseStats:
     dw CharmeleonPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw CharmeleonStarterBaseStats
 
     ; pointer to evomoves
     dw Charmeleon_EvosMoves
@@ -226,7 +226,7 @@ CharizardBaseStats:
     dw CharizardPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw CharizardStarterBaseStats
 
     ; pointer to evomoves
     dw Charizard_EvosMoves
@@ -263,7 +263,7 @@ SquirtleBaseStats:
     dw SquirtlePicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw SquirtleStarterBaseStats
 
     ; pointer to evomoves
     dw Squirtle_EvosMoves
@@ -300,7 +300,7 @@ WartortleBaseStats:
     dw WartortlePicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw WartortleStarterBaseStats
 
     ; pointer to evomoves
     dw Wartortle_EvosMoves
@@ -337,7 +337,7 @@ BlastoiseBaseStats:
     dw BlastoisePicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw BlastoiseStarterBaseStats
 
     ; pointer to evomoves
     dw Blastoise_EvosMoves

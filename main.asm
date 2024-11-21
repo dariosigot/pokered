@@ -28894,6 +28894,7 @@ GetAlternateForm:
     ld [wAlternateFormIndex],a ; Save AlternateFormIndex
     ld [wTempAlternateFormIndex],a
     ret
+
 .enemy
     ;SpecialTrainerAlternateForm
     push de
@@ -28916,7 +28917,7 @@ GetAlternateForm:
     ld a,d
 .enemyend
     pop de
-    ret
+    jr .end
 
 .loop
     ld a,[hli]
@@ -28928,15 +28929,13 @@ GetAlternateForm:
     cp c
     jr nz,.next2
 .found
-    ld a,[hli]
+    ld a,[hl]
     ld d,a
-    ld e,[hl]
     scf ; scf = found
     ret
 .next3
     inc hl
 .next2
-    inc hl
     inc hl
     jr .loop
 .NotFound
@@ -28946,15 +28945,15 @@ GetAlternateForm:
 .CustomTrainer
 
     ; Green1
-    db SONY1,SQUIRTLE,$01,$00
-    db SONY1,WARTORTLE,$01,$00
-    db SONY1,BLASTOISE,$01,$00
-    db SONY1,BULBASAUR,$01,$00
-    db SONY1,IVYSAUR,$01,$00
-    db SONY1,VENUSAUR,$01,$00
-    db SONY1,CHARMANDER,$01,$00
-    db SONY1,CHARMELEON,$01,$00
-    db SONY1,CHARIZARD,$01,$00
+    db SONY1,SQUIRTLE,$01
+    db SONY1,WARTORTLE,$01
+    db SONY1,BLASTOISE,$01
+    db SONY1,BULBASAUR,$01
+    db SONY1,IVYSAUR,$01
+    db SONY1,VENUSAUR,$01
+    db SONY1,CHARMANDER,$01
+    db SONY1,CHARMELEON,$01
+    db SONY1,CHARIZARD,$01
 
     db $FF
 
