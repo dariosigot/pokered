@@ -1,13 +1,13 @@
 MissingNoBaseStats:
-	db 0              ; mon id
-	db 33,MUK,0       ; Hp, Attack, Defense
-	db 29,VOLTORB     ; Speed, Special
-	db TYPE_NA,TYPE_NA ; db VOLTORB,0      ; Bird/Normal
-	db 29,WEEZING,MUK ; CatchRate, BaseExpYield, Sprite Dimension
-	
-	dw MissingNoPicFront, MissingNoPicBack ;	db 0,25,KOFFING,WEEZING
+    db 0              ; mon id
+    db 33,MUK,0       ; Hp, Attack, Defense
+    db 29,VOLTORB     ; Speed, Special
+    db TYPE_NA,TYPE_NA ; db VOLTORB,0      ; Bird/Normal
+    db 29,WEEZING,MUK ; CatchRate, BaseExpYield, Sprite Dimension
+    
+    dw MissingNoPicFront, MissingNoPicBack ;    db 0,25,KOFFING,WEEZING
 
-	;dw 0,0 ; db KOFFING,KOFFING,WEEZING,0 ; attacks known at lvl 0: WATER_GUN, WATER_GUN, SKY_ATTACK
+    ;dw 0,0 ; db KOFFING,KOFFING,WEEZING,0 ; attacks known at lvl 0: WATER_GUN, WATER_GUN, SKY_ATTACK
 
     ; pointer to alternate forms
     dw 0
@@ -15,14 +15,17 @@ MissingNoBaseStats:
     ; pointer to evomoves
     dw MissingNo_EvosMoves
 
-	db 26 ; growth rate
+    db 26 ; growth rate
 
     ; learnset
-	dw MissingNoTMCompatibility
+    dw MissingNoTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MISSINGNO
 
-	db BANK(MissingNoPicFront) ;	db GRIMER
+    ds 3
+
+    db BANK(MissingNoPicFront) ;    db GRIMER
 
 BulbasaurBaseStats:
     db BULBASAUR ; mon id
@@ -53,7 +56,10 @@ BulbasaurBaseStats:
     ; learnset
     dw BulbasaurTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_BULBASAUR
+
+    ds 3
 
     db BANK(BulbasaurPicFront)
 
@@ -86,7 +92,10 @@ IvysaurBaseStats:
     ; learnset
     dw IvysaurTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_IVYSAUR
+
+    ds 3
 
     db BANK(IvysaurPicFront)
 
@@ -119,7 +128,10 @@ VenusaurBaseStats:
     ; learnset
     dw VenusaurTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_VENUSAUR
+
+    ds 3
 
     db BANK(VenusaurPicFront)
 
@@ -152,7 +164,10 @@ CharmanderBaseStats:
     ; learnset
     dw CharmanderTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CHARMANDER
+
+    ds 3
 
     db BANK(CharmanderPicFront)
 
@@ -185,7 +200,10 @@ CharmeleonBaseStats:
     ; learnset
     dw CharmeleonTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CHARMELEON
+
+    ds 3
 
     db BANK(CharmeleonPicFront)
 
@@ -218,7 +236,10 @@ CharizardBaseStats:
     ; learnset
     dw CharizardTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CHARIZARD
+
+    ds 3
 
     db BANK(CharizardPicFront)
 
@@ -251,7 +272,10 @@ SquirtleBaseStats:
     ; learnset
     dw SquirtleTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SQUIRTLE
+
+    ds 3
 
     db BANK(SquirtlePicFront)
 
@@ -284,7 +308,10 @@ WartortleBaseStats:
     ; learnset
     dw WartortleTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_WARTORTLE
+
+    ds 3
 
     db BANK(WartortlePicFront)
 
@@ -317,7 +344,10 @@ BlastoiseBaseStats:
     ; learnset
     dw BlastoiseTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_BLASTOISE
+
+    ds 3
 
     db BANK(BlastoisePicFront)
 
@@ -350,7 +380,10 @@ CaterpieBaseStats:
     ; learnset
     dw CaterpieTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CATERPIE
+
+    ds 3
 
     db BANK(CaterpiePicFront)
 
@@ -383,7 +416,10 @@ MetapodBaseStats:
     ; learnset
     dw MetapodTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_METAPOD
+
+    ds 3
 
     db BANK(MetapodPicFront)
 
@@ -416,7 +452,10 @@ ButterfreeBaseStats:
     ; learnset
     dw ButterfreeTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_BUTTERFREE
+
+    ds 3
 
     db BANK(ButterfreePicFront)
 
@@ -449,7 +488,10 @@ WeedleBaseStats:
     ; learnset
     dw WeedleTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_WEEDLE
+
+    ds 3
 
     db BANK(WeedlePicFront)
 
@@ -482,7 +524,10 @@ KakunaBaseStats:
     ; learnset
     dw KakunaTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_KAKUNA
+
+    ds 3
 
     db BANK(KakunaPicFront)
 
@@ -515,7 +560,10 @@ BeedrillBaseStats:
     ; learnset
     dw BeedrillTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_BEEDRILL
+
+    ds 3
 
     db BANK(BeedrillPicFront)
 
@@ -548,7 +596,10 @@ PidgeyBaseStats:
     ; learnset
     dw PidgeyTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PIDGEY
+
+    ds 3
 
     db BANK(PidgeyPicFront)
 
@@ -581,7 +632,10 @@ PidgeottoBaseStats:
     ; learnset
     dw PidgeottoTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PIDGEOTTO
+
+    ds 3
 
     db BANK(PidgeottoPicFront)
 
@@ -614,7 +668,10 @@ PidgeotBaseStats:
     ; learnset
     dw PidgeotTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PIDGEOT
+
+    ds 3
 
     db BANK(PidgeotPicFront)
 
@@ -647,7 +704,10 @@ RattataBaseStats:
     ; learnset
     dw RattataTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_RATTATA
+
+    ds 3
 
     db BANK(RattataPicFront)
 
@@ -680,7 +740,10 @@ RaticateBaseStats:
     ; learnset
     dw RaticateTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_RATICATE
+
+    ds 3
 
     db BANK(RaticatePicFront)
 
@@ -713,7 +776,10 @@ SpearowBaseStats:
     ; learnset
     dw SpearowTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SPEAROW
+
+    ds 3
 
     db BANK(SpearowPicFront)
 
@@ -746,7 +812,10 @@ FearowBaseStats:
     ; learnset
     dw FearowTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_FEAROW
+
+    ds 3
 
     db BANK(FearowPicFront)
 
@@ -779,7 +848,10 @@ EkansBaseStats:
     ; learnset
     dw EkansTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_EKANS
+
+    ds 3
 
     db BANK(EkansPicFront)
 
@@ -812,7 +884,10 @@ ArbokBaseStats:
     ; learnset
     dw ArbokTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ARBOK
+
+    ds 3
 
     db BANK(ArbokPicFront)
 
@@ -845,7 +920,10 @@ PikachuBaseStats:
     ; learnset
     dw PikachuTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PIKACHU
+
+    ds 3
 
     db BANK(PikachuPicFront)
 
@@ -878,7 +956,10 @@ RaichuBaseStats:
     ; learnset
     dw RaichuTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_RAICHU
+
+    ds 3
 
     db BANK(RaichuPicFront)
 
@@ -911,7 +992,10 @@ SandshrewBaseStats:
     ; learnset
     dw SandshrewTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SANDSHREW
+
+    ds 3
 
     db BANK(SandshrewPicFront)
 
@@ -944,7 +1028,10 @@ SandslashBaseStats:
     ; learnset
     dw SandslashTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SANDSLASH
+
+    ds 3
 
     db BANK(SandslashPicFront)
 
@@ -977,7 +1064,10 @@ NidoranFBaseStats:
     ; learnset
     dw NidoranFTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_NIDORAN_F
+
+    ds 3
 
     db BANK(NidoranFPicFront)
 
@@ -1010,7 +1100,10 @@ NidorinaBaseStats:
     ; learnset
     dw NidorinaTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_NIDORINA
+
+    ds 3
 
     db BANK(NidorinaPicFront)
 
@@ -1043,7 +1136,10 @@ NidoqueenBaseStats:
     ; learnset
     dw NidoqueenTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_NIDOQUEEN
+
+    ds 3
 
     db BANK(NidoqueenPicFront)
 
@@ -1076,7 +1172,10 @@ NidoranMBaseStats:
     ; learnset
     dw NidoranMTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_NIDORAN_M
+
+    ds 3
 
     db BANK(NidoranMPicFront)
 
@@ -1109,7 +1208,10 @@ NidorinoBaseStats:
     ; learnset
     dw NidorinoTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_NIDORINO
+
+    ds 3
 
     db BANK(NidorinoPicFront)
 
@@ -1142,7 +1244,10 @@ NidokingBaseStats:
     ; learnset
     dw NidokingTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_NIDOKING
+
+    ds 3
 
     db BANK(NidokingPicFront)
 
@@ -1175,7 +1280,10 @@ ClefairyBaseStats:
     ; learnset
     dw ClefairyTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CLEFAIRY
+
+    ds 3
 
     db BANK(ClefairyPicFront)
 
@@ -1208,7 +1316,10 @@ ClefableBaseStats:
     ; learnset
     dw ClefableTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CLEFABLE
+
+    ds 3
 
     db BANK(ClefablePicFront)
 
@@ -1241,7 +1352,10 @@ VulpixBaseStats:
     ; learnset
     dw VulpixTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_VULPIX
+
+    ds 3
 
     db BANK(VulpixPicFront)
 
@@ -1274,7 +1388,10 @@ NinetalesBaseStats:
     ; learnset
     dw NinetalesTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_NINETALES
+
+    ds 3
 
     db BANK(NinetalesPicFront)
 
@@ -1307,7 +1424,10 @@ JigglypuffBaseStats:
     ; learnset
     dw JigglypuffTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_JIGGLYPUFF
+
+    ds 3
 
     db BANK(JigglypuffPicFront)
 
@@ -1340,7 +1460,10 @@ WigglytuffBaseStats:
     ; learnset
     dw WigglytuffTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_WIGGLYTUFF
+
+    ds 3
 
     db BANK(WigglytuffPicFront)
 
@@ -1373,7 +1496,10 @@ ZubatBaseStats:
     ; learnset
     dw ZubatTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ZUBAT
+
+    ds 3
 
     db BANK(ZubatPicFront)
 
@@ -1406,7 +1532,10 @@ GolbatBaseStats:
     ; learnset
     dw GolbatTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GOLBAT
+
+    ds 3
 
     db BANK(GolbatPicFront)
 
@@ -1439,7 +1568,10 @@ OddishBaseStats:
     ; learnset
     dw OddishTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ODDISH
+
+    ds 3
 
     db BANK(OddishPicFront)
 
@@ -1472,7 +1604,10 @@ GloomBaseStats:
     ; learnset
     dw GloomTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GLOOM
+
+    ds 3
 
     db BANK(GloomPicFront)
 
@@ -1505,7 +1640,10 @@ VileplumeBaseStats:
     ; learnset
     dw VileplumeTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_VILEPLUME
+
+    ds 3
 
     db BANK(VileplumePicFront)
 
@@ -1538,7 +1676,10 @@ ParasBaseStats:
     ; learnset
     dw ParasTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PARAS
+
+    ds 3
 
     db BANK(ParasPicFront)
 
@@ -1571,7 +1712,10 @@ ParasectBaseStats:
     ; learnset
     dw ParasectTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PARASECT
+
+    ds 3
 
     db BANK(ParasectPicFront)
 
@@ -1604,7 +1748,10 @@ VenonatBaseStats:
     ; learnset
     dw VenonatTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_VENONAT
+
+    ds 3
 
     db BANK(VenonatPicFront)
 
@@ -1637,7 +1784,10 @@ VenomothBaseStats:
     ; learnset
     dw VenomothTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_VENOMOTH
+
+    ds 3
 
     db BANK(VenomothPicFront)
 
@@ -1670,7 +1820,10 @@ DiglettBaseStats:
     ; learnset
     dw DiglettTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_DIGLETT
+
+    ds 3
 
     db BANK(DiglettPicFront)
 
@@ -1703,7 +1856,10 @@ DugtrioBaseStats:
     ; learnset
     dw DugtrioTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_DUGTRIO
+
+    ds 3
 
     db BANK(DugtrioPicFront)
 
@@ -1736,7 +1892,10 @@ MeowthBaseStats:
     ; learnset
     dw MeowthTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MEOWTH
+
+    ds 3
 
     db BANK(MeowthPicFront)
 
@@ -1769,7 +1928,10 @@ PersianBaseStats:
     ; learnset
     dw PersianTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PERSIAN
+
+    ds 3
 
     db BANK(PersianPicFront)
 
@@ -1802,7 +1964,10 @@ PsyduckBaseStats:
     ; learnset
     dw PsyduckTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PSYDUCK
+
+    ds 3
 
     db BANK(PsyduckPicFront)
 
@@ -1835,7 +2000,10 @@ GolduckBaseStats:
     ; learnset
     dw GolduckTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GOLDUCK
+
+    ds 3
 
     db BANK(GolduckPicFront)
 
@@ -1868,7 +2036,10 @@ MankeyBaseStats:
     ; learnset
     dw MankeyTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MANKEY
+
+    ds 3
 
     db BANK(MankeyPicFront)
 
@@ -1901,7 +2072,10 @@ PrimeapeBaseStats:
     ; learnset
     dw PrimeapeTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PRIMEAPE
+
+    ds 3
 
     db BANK(PrimeapePicFront)
 
@@ -1934,7 +2108,10 @@ GrowlitheBaseStats:
     ; learnset
     dw GrowlitheTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GROWLITHE
+
+    ds 3
 
     db BANK(GrowlithePicFront)
 
@@ -1967,7 +2144,10 @@ ArcanineBaseStats:
     ; learnset
     dw ArcanineTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ARCANINE
+
+    ds 3
 
     db BANK(ArcaninePicFront)
 
@@ -2000,7 +2180,10 @@ PoliwagBaseStats:
     ; learnset
     dw PoliwagTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_POLIWAG
+
+    ds 3
 
     db BANK(PoliwagPicFront)
 
@@ -2033,7 +2216,10 @@ PoliwhirlBaseStats:
     ; learnset
     dw PoliwhirlTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_POLIWHIRL
+
+    ds 3
 
     db BANK(PoliwhirlPicFront)
 
@@ -2066,7 +2252,10 @@ PoliwrathBaseStats:
     ; learnset
     dw PoliwrathTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_POLIWRATH
+
+    ds 3
 
     db BANK(PoliwrathPicFront)
 
@@ -2099,7 +2288,10 @@ AbraBaseStats:
     ; learnset
     dw AbraTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ABRA
+
+    ds 3
 
     db BANK(AbraPicFront)
 
@@ -2132,7 +2324,10 @@ KadabraBaseStats:
     ; learnset
     dw KadabraTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_KADABRA
+
+    ds 3
 
     db BANK(KadabraPicFront)
 
@@ -2165,7 +2360,10 @@ AlakazamBaseStats:
     ; learnset
     dw AlakazamTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ALAKAZAM
+
+    ds 3
 
     db BANK(AlakazamPicFront)
 
@@ -2198,7 +2396,10 @@ MachopBaseStats:
     ; learnset
     dw MachopTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MACHOP
+
+    ds 3
 
     db BANK(MachopPicFront)
 
@@ -2231,7 +2432,10 @@ MachokeBaseStats:
     ; learnset
     dw MachokeTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MACHOKE
+
+    ds 3
 
     db BANK(MachokePicFront)
 
@@ -2264,7 +2468,10 @@ MachampBaseStats:
     ; learnset
     dw MachampTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MACHAMP
+
+    ds 3
 
     db BANK(MachampPicFront)
 
@@ -2297,7 +2504,10 @@ BellsproutBaseStats:
     ; learnset
     dw BellsproutTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_BELLSPROUT
+
+    ds 3
 
     db BANK(BellsproutPicFront)
 
@@ -2330,7 +2540,10 @@ WeepinbellBaseStats:
     ; learnset
     dw WeepinbellTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_WEEPINBELL
+
+    ds 3
 
     db BANK(WeepinbellPicFront)
 
@@ -2363,7 +2576,10 @@ VictreebelBaseStats:
     ; learnset
     dw VictreebelTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_VICTREEBEL
+
+    ds 3
 
     db BANK(VictreebelPicFront)
 
@@ -2396,7 +2612,10 @@ TentacoolBaseStats:
     ; learnset
     dw TentacoolTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_TENTACOOL
+
+    ds 3
 
     db BANK(TentacoolPicFront)
 
@@ -2429,7 +2648,10 @@ TentacruelBaseStats:
     ; learnset
     dw TentacruelTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_TENTACRUEL
+
+    ds 3
 
     db BANK(TentacruelPicFront)
 
@@ -2462,7 +2684,10 @@ GeodudeBaseStats:
     ; learnset
     dw GeodudeTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GEODUDE
+
+    ds 3
 
     db BANK(GeodudePicFront)
 
@@ -2495,7 +2720,10 @@ GravelerBaseStats:
     ; learnset
     dw GravelerTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GRAVELER
+
+    ds 3
 
     db BANK(GravelerPicFront)
 
@@ -2528,7 +2756,10 @@ GolemBaseStats:
     ; learnset
     dw GolemTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GOLEM
+
+    ds 3
 
     db BANK(GolemPicFront)
 
@@ -2561,7 +2792,10 @@ PonytaBaseStats:
     ; learnset
     dw PonytaTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PONYTA
+
+    ds 3
 
     db BANK(PonytaPicFront)
 
@@ -2594,7 +2828,10 @@ RapidashBaseStats:
     ; learnset
     dw RapidashTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_RAPIDASH
+
+    ds 3
 
     db BANK(RapidashPicFront)
 
@@ -2627,7 +2864,10 @@ SlowpokeBaseStats:
     ; learnset
     dw SlowpokeTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SLOWPOKE
+
+    ds 3
 
     db BANK(SlowpokePicFront)
 
@@ -2660,7 +2900,10 @@ SlowbroBaseStats:
     ; learnset
     dw SlowbroTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SLOWBRO
+
+    ds 3
 
     db BANK(SlowbroPicFront)
 
@@ -2693,7 +2936,10 @@ MagnemiteBaseStats:
     ; learnset
     dw MagnemiteTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MAGNEMITE
+
+    ds 3
 
     db BANK(MagnemitePicFront)
 
@@ -2726,7 +2972,10 @@ MagnetonBaseStats:
     ; learnset
     dw MagnetonTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MAGNETON
+
+    ds 3
 
     db BANK(MagnetonPicFront)
 
@@ -2759,7 +3008,10 @@ FarfetchdBaseStats:
     ; learnset
     dw FarfetchdTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_FARFETCH_D
+
+    ds 3
 
     db BANK(FarfetchdPicFront)
 
@@ -2792,7 +3044,10 @@ DoduoBaseStats:
     ; learnset
     dw DoduoTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_DODUO
+
+    ds 3
 
     db BANK(DoduoPicFront)
 
@@ -2825,7 +3080,10 @@ DodrioBaseStats:
     ; learnset
     dw DodrioTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_DODRIO
+
+    ds 3
 
     db BANK(DodrioPicFront)
 
@@ -2858,7 +3116,10 @@ SeelBaseStats:
     ; learnset
     dw SeelTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SEEL
+
+    ds 3
 
     db BANK(SeelPicFront)
 
@@ -2891,7 +3152,10 @@ DewgongBaseStats:
     ; learnset
     dw DewgongTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_DEWGONG
+
+    ds 3
 
     db BANK(DewgongPicFront)
 
@@ -2924,7 +3188,10 @@ GrimerBaseStats:
     ; learnset
     dw GrimerTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GRIMER
+
+    ds 3
 
     db BANK(GrimerPicFront)
 
@@ -2957,7 +3224,10 @@ MukBaseStats:
     ; learnset
     dw MukTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MUK
+
+    ds 3
 
     db BANK(MukPicFront)
 
@@ -2990,7 +3260,10 @@ ShellderBaseStats:
     ; learnset
     dw ShellderTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SHELLDER
+
+    ds 3
 
     db BANK(ShellderPicFront)
 
@@ -3023,7 +3296,10 @@ CloysterBaseStats:
     ; learnset
     dw CloysterTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CLOYSTER
+
+    ds 3
 
     db BANK(CloysterPicFront)
 
@@ -3056,7 +3332,10 @@ GastlyBaseStats:
     ; learnset
     dw GastlyTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GASTLY
+
+    ds 3
 
     db BANK(GastlyPicFront)
 
@@ -3089,7 +3368,10 @@ HaunterBaseStats:
     ; learnset
     dw HaunterTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_HAUNTER
+
+    ds 3
 
     db BANK(HaunterPicFront)
 
@@ -3122,7 +3404,10 @@ GengarBaseStats:
     ; learnset
     dw GengarTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GENGAR
+
+    ds 3
 
     db BANK(GengarPicFront)
 
@@ -3155,7 +3440,10 @@ OnixBaseStats:
     ; learnset
     dw OnixTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ONIX
+
+    ds 3
 
     db BANK(OnixPicFront)
 
@@ -3188,7 +3476,10 @@ DrowzeeBaseStats:
     ; learnset
     dw DrowzeeTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_DROWZEE
+
+    ds 3
 
     db BANK(DrowzeePicFront)
 
@@ -3221,7 +3512,10 @@ HypnoBaseStats:
     ; learnset
     dw HypnoTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_HYPNO
+
+    ds 3
 
     db BANK(HypnoPicFront)
 
@@ -3254,7 +3548,10 @@ KrabbyBaseStats:
     ; learnset
     dw KrabbyTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_KRABBY
+
+    ds 3
 
     db BANK(KrabbyPicFront)
 
@@ -3287,7 +3584,10 @@ KinglerBaseStats:
     ; learnset
     dw KinglerTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_KINGLER
+
+    ds 3
 
     db BANK(KinglerPicFront)
 
@@ -3320,7 +3620,10 @@ VoltorbBaseStats:
     ; learnset
     dw VoltorbTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_VOLTORB
+
+    ds 3
  
     db BANK(VoltorbPicFront)
 
@@ -3353,7 +3656,10 @@ ElectrodeBaseStats:
     ; learnset
     dw ElectrodeTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ELECTRODE
+
+    ds 3
 
     db BANK(ElectrodePicFront)
 
@@ -3386,7 +3692,10 @@ ExeggcuteBaseStats:
     ; learnset
     dw ExeggcuteTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_EXEGGCUTE
+
+    ds 3
 
     db BANK(ExeggcutePicFront)
 
@@ -3419,7 +3728,10 @@ ExeggutorBaseStats:
     ; learnset
     dw ExeggutorTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_EXEGGUTOR
+
+    ds 3
 
     db BANK(ExeggutorPicFront)
 
@@ -3452,7 +3764,10 @@ CuboneBaseStats:
     ; learnset
     dw CuboneTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CUBONE
+
+    ds 3
 
     db BANK(CubonePicFront)
 
@@ -3485,7 +3800,10 @@ MarowakBaseStats:
     ; learnset
     dw MarowakTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MAROWAK
+
+    ds 3
 
     db BANK(MarowakPicFront)
 
@@ -3518,7 +3836,10 @@ HitmonleeBaseStats:
     ; learnset
     dw HitmonleeTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_HITMONLEE
+
+    ds 3
 
     db BANK(HitmonleePicFront)
 
@@ -3551,7 +3872,10 @@ HitmonchanBaseStats:
     ; learnset
     dw HitmonchanTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_HITMONCHAN
+
+    ds 3
 
     db BANK(HitmonchanPicFront)
 
@@ -3584,7 +3908,10 @@ LickitungBaseStats:
     ; learnset
     dw LickitungTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_LICKITUNG
+
+    ds 3
 
     db BANK(LickitungPicFront)
 
@@ -3617,7 +3944,10 @@ KoffingBaseStats:
     ; learnset
     dw KoffingTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_KOFFING
+
+    ds 3
 
     db BANK(KoffingPicFront)
 
@@ -3650,7 +3980,10 @@ WeezingBaseStats:
     ; learnset
     dw WeezingTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_WEEZING
+
+    ds 3
 
     db BANK(WeezingPicFront)
 
@@ -3683,7 +4016,10 @@ RhyhornBaseStats:
     ; learnset
     dw RhyhornTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_RHYHORN
+
+    ds 3
 
     db BANK(RhyhornPicFront)
 
@@ -3716,7 +4052,10 @@ RhydonBaseStats:
     ; learnset
     dw RhydonTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_RHYDON
+
+    ds 3
 
     db BANK(RhydonPicFront)
 
@@ -3749,7 +4088,10 @@ ChanseyBaseStats:
     ; learnset
     dw ChanseyTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CHANSEY
+
+    ds 3
 
     db BANK(ChanseyPicFront)
 
@@ -3782,7 +4124,10 @@ TangelaBaseStats:
     ; learnset
     dw TangelaTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_TANGELA
+
+    ds 3
 
     db BANK(TangelaPicFront)
 
@@ -3815,7 +4160,10 @@ KangaskhanBaseStats:
     ; learnset
     dw KangaskhanTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_KANGASKHAN
+
+    ds 3
 
     db BANK(KangaskhanPicFront)
 
@@ -3848,7 +4196,10 @@ HorseaBaseStats:
     ; learnset
     dw HorseaTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_HORSEA
+
+    ds 3
 
     db BANK(HorseaPicFront)
 
@@ -3881,7 +4232,10 @@ SeadraBaseStats:
     ; learnset
     dw SeadraTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SEADRA
+
+    ds 3
 
     db BANK(SeadraPicFront)
 
@@ -3914,7 +4268,10 @@ GoldeenBaseStats:
     ; learnset
     dw GoldeenTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GOLDEEN
+
+    ds 3
 
     db BANK(GoldeenPicFront)
 
@@ -3947,7 +4304,10 @@ SeakingBaseStats:
     ; learnset
     dw SeakingTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SEAKING
+
+    ds 3
 
     db BANK(SeakingPicFront)
 
@@ -3980,7 +4340,10 @@ StaryuBaseStats:
     ; learnset
     dw StaryuTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_STARYU
+
+    ds 3
 
     db BANK(StaryuPicFront)
 
@@ -4013,7 +4376,10 @@ StarmieBaseStats:
     ; learnset
     dw StarmieTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_STARMIE
+
+    ds 3
 
     db BANK(StarmiePicFront)
 
@@ -4046,7 +4412,10 @@ MrMimeBaseStats:
     ; learnset
     dw MrMimeTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MR_MIME
+
+    ds 3
 
     db BANK(MrMimePicFront)
 
@@ -4079,7 +4448,10 @@ ScytherBaseStats:
     ; learnset
     dw ScytherTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SCYTHER
+
+    ds 3
 
     db BANK(ScytherPicFront)
 
@@ -4112,7 +4484,10 @@ JynxBaseStats:
     ; learnset
     dw JynxTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_JYNX
+
+    ds 3
 
     db BANK(JynxPicFront)
 
@@ -4145,7 +4520,10 @@ ElectabuzzBaseStats:
     ; learnset
     dw ElectabuzzTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ELECTABUZZ
+
+    ds 3
 
     db BANK(ElectabuzzPicFront)
 
@@ -4178,7 +4556,10 @@ MagmarBaseStats:
     ; learnset
     dw MagmarTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MAGMAR
+
+    ds 3
 
     db BANK(MagmarPicFront)
 
@@ -4211,7 +4592,10 @@ PinsirBaseStats:
     ; learnset
     dw PinsirTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PINSIR
+
+    ds 3
 
     db BANK(PinsirPicFront)
 
@@ -4244,7 +4628,10 @@ TaurosBaseStats:
     ; learnset
     dw TaurosTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_TAUROS
+
+    ds 3
 
     db BANK(TaurosPicFront)
 
@@ -4277,7 +4664,10 @@ MagikarpBaseStats:
     ; learnset
     dw MagikarpTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MAGIKARP
+
+    ds 3
 
     db BANK(MagikarpPicFront)
 
@@ -4310,7 +4700,10 @@ GyaradosBaseStats:
     ; learnset
     dw GyaradosTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_GYARADOS
+
+    ds 3
 
     db BANK(GyaradosPicFront)
 
@@ -4343,7 +4736,10 @@ LaprasBaseStats:
     ; learnset
     dw LaprasTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_LAPRAS
+
+    ds 3
 
     db BANK(LaprasPicFront)
 
@@ -4376,7 +4772,10 @@ DittoBaseStats:
     ; learnset
     dw DittoTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_DITTO
+
+    ds 3
 
     db BANK(DittoPicFront)
 
@@ -4409,7 +4808,10 @@ EeveeBaseStats:
     ; learnset
     dw EeveeTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_EEVEE
+
+    ds 3
 
     db BANK(EeveePicFront)
 
@@ -4442,7 +4844,10 @@ VaporeonBaseStats:
     ; learnset
     dw VaporeonTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_VAPOREON
+
+    ds 3
 
     db BANK(VaporeonPicFront)
 
@@ -4475,7 +4880,10 @@ JolteonBaseStats:
     ; learnset
     dw JolteonTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_JOLTEON
+
+    ds 3
 
     db BANK(JolteonPicFront)
 
@@ -4508,7 +4916,10 @@ FlareonBaseStats:
     ; learnset
     dw FlareonTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_FLAREON
+
+    ds 3
 
     db BANK(FlareonPicFront)
 
@@ -4541,7 +4952,10 @@ PorygonBaseStats:
     ; learnset
     dw PorygonTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_PORYGON
+
+    ds 3
 
     db BANK(PorygonPicFront)
 
@@ -4574,7 +4988,10 @@ OmanyteBaseStats:
     ; learnset
     dw OmanyteTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_OMANYTE
+
+    ds 3
 
     db BANK(OmanytePicFront)
 
@@ -4607,7 +5024,10 @@ OmastarBaseStats:
     ; learnset
     dw OmastarTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_OMASTAR
+
+    ds 3
 
     db BANK(OmastarPicFront)
 
@@ -4640,7 +5060,10 @@ KabutoBaseStats:
     ; learnset
     dw KabutoTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_KABUTO
+
+    ds 3
 
     db BANK(KabutoPicFront)
 
@@ -4673,7 +5096,10 @@ KabutopsBaseStats:
     ; learnset
     dw KabutopsTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_KABUTOPS
+
+    ds 3
 
     db BANK(KabutopsPicFront)
 
@@ -4706,7 +5132,10 @@ AerodactylBaseStats:
     ; learnset
     dw AerodactylTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_AERODACTYL
+
+    ds 3
 
     db BANK(AerodactylPicFront)
 
@@ -4739,7 +5168,10 @@ SnorlaxBaseStats:
     ; learnset
     dw SnorlaxTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SNORLAX
+
+    ds 3
 
     db BANK(SnorlaxPicFront)
 
@@ -4772,7 +5204,10 @@ ArticunoBaseStats:
     ; learnset
     dw ArticunoTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ARTICUNO
+
+    ds 3
 
     db BANK(ArticunoPicFront)
 
@@ -4805,7 +5240,10 @@ ZapdosBaseStats:
     ; learnset
     dw ZapdosTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ZAPDOS
+
+    ds 3
 
     db BANK(ZapdosPicFront)
 
@@ -4838,7 +5276,10 @@ MoltresBaseStats:
     ; learnset
     dw MoltresTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MOLTRES
+
+    ds 3
 
     db BANK(MoltresPicFront)
 
@@ -4871,7 +5312,10 @@ DratiniBaseStats:
     ; learnset
     dw DratiniTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_DRATINI
+
+    ds 3
 
     db BANK(DratiniPicFront)
 
@@ -4904,7 +5348,10 @@ DragonairBaseStats:
     ; learnset
     dw DragonairTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_DRAGONAIR
+
+    ds 3
 
     db BANK(DragonairPicFront)
 
@@ -4937,7 +5384,10 @@ DragoniteBaseStats:
     ; learnset
     dw DragoniteTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_DRAGONITE
+
+    ds 3
 
     db BANK(DragonitePicFront)
 
@@ -4970,7 +5420,10 @@ MewtwoBaseStats:
     ; learnset
     dw MewtwoTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MEWTWO
+
+    ds 3
 
     db BANK(MewtwoPicFront)
 
@@ -5003,7 +5456,10 @@ MewBaseStats:
     ; learnset
     dw MewTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MEW
+
+    ds 3
 
     db BANK(MewPicFront)
 
@@ -5036,7 +5492,10 @@ LitwickBaseStats:
     ; learnset
     dw LitwickTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_LITWICK
+
+    ds 3
 
     db BANK(LitwickPicFront)
 
@@ -5069,7 +5528,10 @@ LampentBaseStats:
     ; learnset
     dw LampentTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_LAMPENT
+
+    ds 3
 
     db BANK(LampentPicFront)
 
@@ -5102,7 +5564,10 @@ ChandelureBaseStats:
     ; learnset
     dw ChandelureTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CHANDELURE
+
+    ds 3
 
     db BANK(ChandelurePicFront)
 
@@ -5135,7 +5600,10 @@ Mon155BaseStats:
     ; learnset
     dw Mon155TMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MON_155
+
+    ds 3
 
     db BANK(MissingNoPicFront)
 
@@ -5168,7 +5636,10 @@ Mon156BaseStats:
     ; learnset
     dw Mon156TMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MON_156
+
+    ds 3
 
     db BANK(MissingNoPicFront)
 
@@ -5201,7 +5672,10 @@ Mon157BaseStats:
     ; learnset
     dw Mon157TMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MON_157
+
+    ds 3
 
     db BANK(MissingNoPicFront)
 
@@ -5234,7 +5708,10 @@ Mon158BaseStats:
     ; learnset
     dw Mon158TMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MON_158
+
+    ds 3
 
     db BANK(MissingNoPicFront)
 
@@ -5267,6 +5744,9 @@ Mon159BaseStats:
     ; learnset
     dw Mon159TMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_MON_159
+
+    ds 3
 
     db BANK(MissingNoPicFront)

@@ -814,9 +814,13 @@ W_MON_LEARNSET_POINTER: ; d0c9
 W_MONHGROWTHRATE: ; d0cb
     ds 1
 
-W_MONHLEARNSET: ; d0cc
-; bit field
-    ds 7
+W_MONHLEARNSET_POINTER: ; d0cc
+    ds 2
+
+W_MONH_PALETTE_ID: ; d0ce
+    ds 2
+
+    ds 3
 
     ds 2
 

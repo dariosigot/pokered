@@ -27,7 +27,10 @@ VoltorbHisuiBaseStats:
     ; learnset
     dw VoltorbHisuiTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_VOLTORB_HUSUI
+
+    ds 3
  
     db BANK(VoltorbHisuiPicFront)
 
@@ -60,7 +63,10 @@ ElectrodeHisuiBaseStats:
     ; learnset
     dw ElectrodeHisuiTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_ELECTRODE_HUSUI
+
+    ds 3
 
     db BANK(ElectrodeHisuiPicFront)
 
@@ -93,7 +99,10 @@ FossilKabutoBaseStats:
     ; learnset
     dw KabutoTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_KABUTO
+
+    ds 3
 
     db BANK(MissingNoPicFront)
 
@@ -126,7 +135,10 @@ FossilKabutopsBaseStats:
     ; learnset
     dw KabutopsTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_KABUTOPS
+
+    ds 3
 
     db BANK(FossilKabutopsPicFront)
 
@@ -159,7 +171,10 @@ FossilAerodactylBaseStats:
     ; learnset
     dw AerodactylTMCompatibility
     
-    ds 5
+    ; palette
+    dw PAL_AERODACTYL
+
+    ds 3
 
     db BANK(FossilAerodactylPicFront)
 
@@ -192,7 +207,10 @@ BulbasaurStarterBaseStats:
     ; learnset
     dw BulbasaurTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_BULBASAUR
+
+    ds 3
 
     db BANK(BulbasaurPicFront)
 
@@ -225,7 +243,10 @@ IvysaurStarterBaseStats:
     ; learnset
     dw IvysaurTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_IVYSAUR
+
+    ds 3
 
     db BANK(IvysaurPicFront)
 
@@ -258,7 +279,10 @@ VenusaurStarterBaseStats:
     ; learnset
     dw VenusaurTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_VENUSAUR
+
+    ds 3
 
     db BANK(VenusaurPicFront)
 
@@ -291,7 +315,10 @@ CharmanderStarterBaseStats:
     ; learnset
     dw CharmanderTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CHARMANDER
+
+    ds 3
 
     db BANK(CharmanderPicFront)
 
@@ -324,7 +351,10 @@ CharmeleonStarterBaseStats:
     ; learnset
     dw CharmeleonTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CHARMELEON
+
+    ds 3
 
     db BANK(CharmeleonPicFront)
 
@@ -357,7 +387,10 @@ CharizardStarterBaseStats:
     ; learnset
     dw CharizardTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_CHARIZARD
+
+    ds 3
 
     db BANK(CharizardPicFront)
 
@@ -390,7 +423,10 @@ SquirtleStarterBaseStats:
     ; learnset
     dw SquirtleTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_SQUIRTLE
+
+    ds 3
 
     db BANK(SquirtlePicFront)
 
@@ -423,7 +459,10 @@ WartortleStarterBaseStats:
     ; learnset
     dw WartortleTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_WARTORTLE
+
+    ds 3
 
     db BANK(WartortlePicFront)
 
@@ -456,6 +495,9 @@ BlastoiseStarterBaseStats:
     ; learnset
     dw BlastoiseTMCompatibility
 
-    ds 5
+    ; palette
+    dw PAL_BLASTOISE
+
+    ds 3
 
     db BANK(BlastoisePicFront)

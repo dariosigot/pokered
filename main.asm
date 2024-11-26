@@ -31875,7 +31875,7 @@ TestMonMoveCompatibility_HandleAlternative:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,W_MONHLEARNSET
+    ld hl,W_MONHLEARNSET_POINTER
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -62527,7 +62527,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     push hl
     call Delay3
     call GBPalNormal
-    call GetMonHeader ; load pokemon picture location
+    ; header just loaded in "GetPokedexPaletteID" ; call GetMonHeader ; load pokemon picture location
     FuncCoord 1,1
     ld hl,Coord
     call LoadMonSpritePokedexWithDebug ; call LoadFlippedFrontSpriteByMonIndex ; draw pokemon picture
@@ -64437,13 +64437,13 @@ Func_415a4: ; 415a4 (10:55a4)
     ld [$cf91],a
     ld [$d0b5],a
     ld [$cf1d],a
+    call GetMonHeader
     ld b,$b
     ld c,$0
     call GoPAL_SET
     ld a,[H_AUTOBGTRANSFERENABLED] ; $FF00+$ba
     xor $1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    call GetMonHeader
     FuncCoord 7,2 ; $c3cf
     ld hl,Coord
     call LoadFlippedFrontSpriteByMonIndex
@@ -65067,12 +65067,12 @@ CheckShinyDuringTradeInSend:
     call IsShiny
     call ResetTempIV
     pop af
-    jp Func_415a4 ; Invio
+    jp Func_415a4 ; Invio ; TODO:Palette
 
 CheckShinyDuringTradeInReceive:
-    ld hl,$cfb3 ; TradeIn Enemy's Pkmn
+    ld hl,$cfb3 ; TradeIn Enemy's Pkmn ; TODO, bug during NPC TradeIn
     call IsShiny
-    jp Func_415a4 ; Ricezione
+    jp Func_415a4 ; Ricezione ; TODO:Palette
 
 StoreTradeLeftToRightPkmnIdAndInitGameboyTransferGfx:
     push hl
@@ -84962,7 +84962,7 @@ UnnamedText_58f3e: ; 58f3e (16:4f3e)
 CalcLevelFromExperience: ; 58f43 (16:4f43)
     ld a,[$cf98]
     ld [$d0b5],a
-    call CalcLevelFromExperience_HandleAlternative ; call GetMonHeader
+    call GetLoadedMonHeader ; call GetMonHeader
     ld d,$1
 .asm_58f4e
     inc d
@@ -88389,7 +88389,7 @@ Route16Text7: ; Moved in the Bank
     call PlayCryAndDisplayPokedex
     jp TextScriptEnd
 
-CalcLevelFromExperience_HandleAlternative:
+GetLoadedMonHeader:
     ld a,[$cfb6] ; move2pp
     ld [wAlternateFormIndex],a
     jp GetMonHeader
@@ -100338,19 +100338,19 @@ GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
 ;    ld a,[W_PLAYERBATTSTATUS3]
     ld hl,W_PLAYERMONID
     ld a,[hl]
-    call CheckShinyBackAndGetPAL
-    ld b,h
-    ld c,l
+    call CheckShinyBackAndGetPAL ; TODO:Palette Done
+    push hl ; Backup backsprite palette
 ;    ld a,[W_ENEMYBATTSTATUS3]
     ld hl,W_ENEMYMONID
     ld a,[hl]
-    call CheckShinyFrontAndGetPAL
+    call CheckShinyFrontAndGetPAL ; TODO:Palette Done
     ld d,h
     ld e,l
 
     ld hl,$cf2e
 
     ; backsprite palette
+    pop bc ; Restore backsprite palette
     ld a,c
     ld [hli],a
     ld a,b
@@ -100375,24 +100375,18 @@ GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
     ld [$cf1c],a
     ret
 
-SECTION "Func_71e48",ROMX[$5e48],BANK[$1C]
-
-Func_71e48: ; 71e48 (1c:5e48)
+Func_71e48: ; Moved in the Bank
     ld hl,PalPacket_72458
     ld de,Unknown_7219e
     ret
 
-GetPkmnStatPaletteID: ; 71e4f (1c:5e4f)
+GetPkmnStatPaletteID: ;Moved in the Bank
     ld hl,PalPacketStatMenu ; Denim ; PalPacket_72428
     ld de,$cf2d
     ld bc,$10
     call CopyData
     ld a,[$cf91]
-    ds 2 ; cp VICTREEBEL + 1
-    ds 2 ; jr c,.pokemon
-    ds 2 ; ld a,$1 ; not pokemon
-.pokemon
-    call CheckShinyAndGetPAL
+    call CheckShinyAndGetPAL ; TODO:Palette Done
     push hl ; ...
     ld hl,$cf2e
     ld a,[$cf25]
@@ -100405,76 +100399,66 @@ GetPkmnStatPaletteID: ; 71e4f (1c:5e4f)
     ld de,ATTR_BLK_StatusScreen
     ret
 
-GetPartyMenuPaletteID: ; 71e7b (1c:5e7b)
+GetPartyMenuPaletteID: ; Moved in the Bank
     call GetPointerToPartyMenuPalPacket ; ld hl,PalPacket_72438
     ld de,$cf2e
     ret
 
-GetPokedexPaletteID: ; 71e82 (1c:5e82)
+GetPokedexPaletteID: ; Moved in the Bank
     ld hl,PalPacket_72468
     ld de,$cf2d
     ld bc,$10
     call CopyData
     ld a,[$cf91]
-    call DeterminePaletteIDWithShinyDebug ; call DeterminePaletteID
+    push af
+    ld [$d0b5],a
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 4,a ; was right button pressed?
+    ld a,1
+    jr nz,.done
+    xor a
+.done
+    ld [wAlternateFormIndex],a ; pokedex alternate form
+    call GetMonHeader
+    pop af
+    call DeterminePaletteIDWithShinyDebug ; call DeterminePaletteID ; TODO:Palette Done
     call PaletteHackTwoBytes2 ; Denim ; ld hl,$cf30
     nop               ; ...   ; ld [hl],a
     ld hl,$cf2d
     ld de,Unknown_72222
     ret
 
-Func_71e9f: ; 71e9f (1c:5e9f)
+Func_71e9f: ; Moved in the Bank
     ld hl,PalPacket_72478
     ld de,Unknown_7224f
     ret
 
-Func_71ea6: ; 71ea6 (1c:5ea6)
+Func_71ea6: ; Moved in the Bank
     ld hl,PalPacket_72488
     ld de,Unknown_7228e
     ret
 
-Func_71ead: ; 71ead (1c:5ead)
+Func_71ead: ; Moved in the Bank
     ld hl,PalPacket_724a8
     ld de,Unknown_7219e
     ret
 
-Func_71eb4: ; 71eb4 (1c:5eb4)
+Func_71eb4: ; Moved in the Bank
     ld hl,PalPacket_724b8
     ld de,Unknown_722c1
     ret
 
-Func_71ebb: ; 71ebb (1c:5ebb)
+Func_71ebb: ; Moved in the Bank
     ld hl,PalPacket_724c8
     ld de,Unknown_723dd
     ld a,$8
     ld [$cf1c],a
     ret
 
-GetMapPaletteID: ; 71ec7 (1c:5ec7)
+GetMapPaletteID: ; Moved in the Bank
     ld b,BANK(GetMapPaletteID_)
     ld hl,GetMapPaletteID_
     jp Bankswitch
-
-SamePalette:
-    db MAGNETON
-    db GOLBAT
-    db RHYDON
-    db GRAVELER
-    db DUGTRIO
-    db OMASTAR
-    db MAROWAK
-    db WARTORTLE
-    db KABUTOPS
-    db WEEZING
-    db ELECTRODE
-    db RAPIDASH
-    db KADABRA
-    db MUK
-    db KINGLER
-    db PIDGEOT
-    db CLEFABLE
-    db WIGGLYTUFF
-    db ARCANINE
 
 CheckFlyingMonSprite:
     push hl
@@ -100519,7 +100503,7 @@ GetHallOfFameLinkCableEvolutionPaletteID: ; 71f17 (1c:5f17)
     ld l,PAL_BLACK ; Used during Evolution
     jr nz,.asm_71f31
     ld a,[$cf1d]
-    call DeterminePaletteID
+    call DeterminePaletteID ; TODO:Palette
 .asm_71f31
     call PaletteHackTwoBytes3 ; Denim ; ld [$cf2e],a
     ds 1                      ; ...   ; ld hl,$cf2d
@@ -102492,6 +102476,11 @@ CheckShinyFrontAndGetPAL:
     jr z,.NoTransform
     ld a,[$cfe5]
 .NoTransform
+    push af
+    ld [$d0b5],a
+    ld hl,GetBattleFrontMonHeader
+    ld b,BANK(GetBattleFrontMonHeader)
+    call Bankswitch
     ld hl,W_ENEMYMONATKDEFIV
     jr GetPalCommon
 
@@ -102533,6 +102522,11 @@ IsGhostBattle_Bank1C:
 
 CheckShinyBackAndGetPAL:
     push hl
+    push af
+    ld [$d0b5],a
+    ld hl,GetBattleBackMonHeader
+    ld b,BANK(GetBattleBackMonHeader)
+    call Bankswitch
     ld hl,wFlagBackFrontSpriteBit56
     set 5,[hl]
     ld hl,W_PLAYERMONIVS
@@ -102540,17 +102534,22 @@ CheckShinyBackAndGetPAL:
 
 CheckShinyAndGetPAL:
     push hl
+    push af
+    ld [$d0b5],a
+    ld hl,GetLoadedMonHeader
+    ld b,BANK(GetLoadedMonHeader)
+    call Bankswitch
     ld hl,$cfb3
+    ; fall through
 
 GetPalCommon:
+    pop af
     call IsShiny
 SkipShinyAndGetPAL:
     pop hl
-    jp DeterminePaletteID
+    ; fall through
 
-SAME_PALETTE EQU 19
-
-DeterminePaletteID:
+DeterminePaletteID: ; TODO:Palette
     push bc
     push de
     and a
@@ -102586,20 +102585,28 @@ DeterminePaletteID:
 .PaletteSingleByteDone
     ld h,0
     jr .End
+;.Standard
+;    ld [$D11E],a
+;    ld a,$3A
+;    call Predef ; turn Pokemon ID number into Pokedex number
+;    ld a,[$D11E]
+;    ld h,0
+;    ld l,a
+;    ld bc,PAL_MISSINGNO ; Palette MissingNo
+;    add hl,bc
+;    call .CheckShiny
+;    jr z,.End
+;    ld bc,DEX_NUM_MON ; (from dex 0 to 151)
+;    add hl,bc
 .Standard
-    ld [$D11E],a
-    ld a,$3A
-    call Predef ; turn Pokemon ID number into Pokedex number
-    ld a,[$D11E]
-    call CheckSamePalette
-    ld h,0
-    ld l,a
-    ld bc,PAL_MISSINGNO ; Palette MissingNo
-    add hl,bc
-    call .CheckShiny
-    jr z,.End
-    ld bc,DEX_NUM_MON-SAME_PALETTE ; (from dex 0 to 151,SAME_PALETTE Share Same Palette)
-    add hl,bc
+     ld hl,W_MONH_PALETTE_ID
+     ld a,[hli]
+     ld h,[hl]
+     ld l,a
+     call .CheckShiny
+     jr z,.End
+     ld bc,1
+     add hl,bc
 .End
     call .ResetFlags
     pop de
@@ -102619,32 +102626,6 @@ DeterminePaletteID:
     ld hl,wFlagShinyBit2
     res 2,[hl]
     pop hl
-    ret
-
-CheckSamePalette:
-    ld b,a
-    ld hl,SamePalette
-    ld c,SAME_PALETTE
-    ld d,0
-.Loop
-    ld a,[hli]
-    ld [$D11E],a
-    ld a,$3A
-    push de
-    push hl
-    call Predef ; turn Pokemon ID number into Pokedex number
-    pop hl
-    pop de
-    ld a,[$D11E]
-    dec a
-    cp b
-    jr nc,.NotEqual
-    inc d
-.NotEqual
-    dec c
-    jr nz,.Loop
-    ld a,b
-    sub d
     ret
 
 CreateMonOvWorldSprInstruction:
@@ -107607,12 +107588,12 @@ Func_76610: ; 76610 (1d:6610)
     ld de,$CD6D
     ld bc,$000B
     call CheckShinyAndAlternativeFromHallOfFameData ; call CopyData
+    call GetMonHeader
     ld b,$0B
     ld c,0
     call GoPAL_SET
     FuncCoord 12,5 ; $c410
     ld hl,Coord
-    call GetMonHeader
     call LoadFrontSpriteByMonIndex
     call GBPalNormal
     FuncCoord 0,13 ; $c4a4
@@ -110107,7 +110088,7 @@ Func_79793: ; 79793 (1e:5793)
     ld [$d0b5],a
     xor a
     ld [W_SPRITEFLIPPED],a
-    call BattleSprite_Front_HandleAlternateForm ; call GetMonHeader
+    call GetBattleFrontMonHeader ; call GetMonHeader
     FuncCoord 12,0 ; $c3ac
     ld hl,Coord
     call LoadFrontSpriteByMonIndex
@@ -110118,7 +110099,7 @@ Func_79793: ; 79793 (1e:5793)
     ld a,[$ceea]
     ld [$cfd9],a
     ld [$d0b5],a
-    call BattleSprite_Back_HandleAlternateForm ; call GetMonHeader
+    call GetBattleBackMonHeader ; call GetMonHeader
     ld a,$4
     call Predef ; indirect jump to LoadMonBackSprite (3f103 (f:7103))
     xor a
@@ -114760,7 +114741,7 @@ EvolveMon: ; 7bde9 (1e:7de9)
     ld a,[$cf1d]
     call PlayCry
     ld c,$0
-    call CheckShinyDuringEvolution ; call Func_7beb4
+    call CheckShinyDuringEvolution ; call Func_7beb4 ; TODO:Palette (ricaricare il nuovo header dopo evoluzione)
     pop af
     ld [$d0b5],a
     pop af
@@ -114945,7 +114926,7 @@ TechnicalMachinePrices: ; 7bfa7 (1e:7fa7)
     db $22,$52,$24,$34,$42
     db $24,$43
 
-CheckShinyDuringEvolution:
+CheckShinyDuringEvolution: ; TODO:Palette Done
     push af
     push bc
     ld a,[wWhichPokemon] ; $cf92
@@ -114957,12 +114938,12 @@ CheckShinyDuringEvolution:
     pop af
     jp Func_7beb4
 
-BattleSprite_Front_HandleAlternateForm:
+GetBattleFrontMonHeader:
     ld a,[W_ENEMYMONPP+1] ; move2pp
     ld [wAlternateFormIndex],a
     jp GetMonHeader
 
-BattleSprite_Back_HandleAlternateForm:
+GetBattleBackMonHeader:
     ld a,[W_PLAYERMONPP+1] ; move2pp
     ld [wAlternateFormIndex],a
     jp GetMonHeader
