@@ -30393,7 +30393,7 @@ TestMonMoveCompatibility: ; 1373e (4:773e)
     ld a,[$cf91]
     ld [$d0b5],a
     call TestMonMoveCompatibility_HandleAlternative
-    ld hl,W_MONHLEARNSET
+    ld hl,wTmpMonLearnset
     push hl
     ld a,[$d0e0]
     ld b,a
@@ -31874,7 +31874,15 @@ TestMonMoveCompatibility_HandleAlternative:
     call AddNTimes
     ld a,[hl]
     ld [wAlternateFormIndex],a
-    jp GetMonHeader
+    call GetMonHeader
+    ld hl,W_MONHLEARNSET
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld de,wTmpMonLearnset
+    ld bc,7
+    ld a,BANK(PokemonBaseStats)
+    jp FarCopyData ; copy bc bytes of data from a:hl to de
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -138633,6 +138641,9 @@ INCLUDE "constants/pokemon_header.asm"
 INCLUDE "constants/pokemon_header_alternate_forms.asm"
 INCLUDE "constants/pokemon_learnset.asm"
 INCLUDE "constants/pokemon_learnset_config.asm"
+INCLUDE "constants/pokemon_tm_compatibility.asm"
+
+; ──────────────────────────────────────────────────────────────────────
 
 MonsterNames:
     db "MISSINGNO." ; 001 - MISSINGNO

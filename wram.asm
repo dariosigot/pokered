@@ -1142,6 +1142,9 @@ wDVForShinyAtkDef ; d47f
 wDVForShinySpdSpc ; d480
     db
 
+wTmpMonLearnset: ; d481
+    ds 7
+
 ; some free bytes
 
 SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]
