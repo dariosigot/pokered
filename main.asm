@@ -13414,7 +13414,7 @@ Func_57f2:
     inc c
     jr .asm_5829 ; 0x5847 $e0
 
-Func_5849:
+TradeCenter_Trade:
     ld c,$64
     call DelayFrames
     xor a
@@ -13491,23 +13491,23 @@ Func_5849:
     ld a,[$cd3d]
     ld hl,W_PARTYMON1OT ; OT names of player
     call SkipFixedLengthTextEntries
-    ld de,$cd41
+    ld de,$cd41 ; TradedPlayerMonOT
     ld bc,$000b
     call CopyData
-    ld hl,$d16b
+    ld hl,W_PARTYMON1_NUM
     ld a,[$cd3d]
     ld bc,$002c
     call AddNTimes
-    ld bc,$000c
+    ld bc,$000c ; Go to OT
     add hl,bc
     ld a,[hli]
-    ld [$cd4c],a
-    ld a,[hl]
+    ld [$cd4c],a ; TradedPlayerMonOTID
+    ld a,[hld]
     ld [$cd4d],a
-    ld a,[$cd3e]
+    call Trade_BackupPlayerIVandAltForm ; ld a,[$cd3e]
     ld hl,W_ENEMYMON1OT ; OT names of other player
     call SkipFixedLengthTextEntries
-    ld de,$cd4e
+    ld de,$cd4e ; TradedEnemyMonOT
     ld bc,$000b
     call CopyData
     ld hl,wEnemyMons
@@ -13517,10 +13517,10 @@ Func_5849:
     ld bc,$000c
     add hl,bc
     ld a,[hli]
-    ld [$cd59],a
-    ld a,[hl]
+    ld [$cd59],a ; TradedEnemyMonOTID
+    ld a,[hld]
     ld [$cd5a],a
-    ld a,[$cd3d]
+    call Trade_BackupEnemyIVandAltForm ; ld a,[$cd3d]
     ld [$cf92],a
     ld hl,$d164
     ld b,$0
@@ -13530,7 +13530,7 @@ Func_5849:
     ld [$cd3d],a
     xor a
     ld [$cf95],a
-    call HackForBackupDVDuringTradeIn ; call RemovePokemon
+    call RemovePokemon ; call HackForBackupDVDuringTradeIn
     ld a,[$cd3e]
     ld c,a
     ld [$cf92],a
@@ -13625,7 +13625,7 @@ TradeCanceled:
 
 PointerTable_5a5b: ; 5a5b (1:5a5b)
     dw Func_5530
-    dw Func_5849
+    dw TradeCenter_Trade
 
 Func_5a5f: ; 5a5f (1:5a5f)
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -18096,14 +18096,14 @@ SpriteAttributeHandler: ; Denim
     ret
 
 HackForBackupDVDuringTradeIn:
-    push af
-    ld a,[wWhichPokemon] ; $cf92
-    ld hl,W_PARTYMON1_IV
-    ld bc,44 ; Pokemon Data Lenght
-    call AddNTimes
-    call SetTempIV
-    pop af
-    jp RemovePokemon
+;    push af
+;    ld a,[wWhichPokemon] ; $cf92
+;    ld hl,W_PARTYMON1_IV
+;    ld bc,44 ; Pokemon Data Lenght
+;    call AddNTimes
+;    call SetTempIV
+;    pop af
+;    jp RemovePokemon
 
 BattleMenuText: ; Denim,allargato menu battaglia
     db "FIGHT       ",$E1,$E2,$4E
@@ -18619,6 +18619,46 @@ LoadTitleMonSprite_HandleAlternative:
 .done
     pop af
     jp GetMonHeader
+
+Trade_BackupPlayerIVandAltForm:
+    ; hl point to OT
+    ld de,W_PARTYMON1_IV-W_PARTYMON1_OTID
+    add hl,de
+    ld de,wTradedPlayerMonIV
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hld]
+    ld [de],a
+    ; hl point to IV
+    ld de,W_PARTYMON1_MOVE2PP-W_PARTYMON1_IV
+    add hl,de
+    ld de,wTradePlayerMonAltForm
+    ld a,[hl]
+    ld [de],a
+    ; endhack
+    ld a,[$cd3e]
+    ret
+
+Trade_BackupEnemyIVandAltForm:
+    ; hl point to OT
+    ld de,W_PARTYMON1_IV-W_PARTYMON1_OTID
+    add hl,de
+    ld de,wTradedEnemyMonIV
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hld]
+    ld [de],a
+    ; hl point to IV
+    ld de,W_PARTYMON1_MOVE2PP-W_PARTYMON1_IV
+    add hl,de
+    ld de,wTradeEnemyMonAltForm
+    ld a,[hl]
+    ld [de],a
+    ; endhack
+    ld a,[$cd3d]
+    ret
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -43537,6 +43577,14 @@ SortMoves:
     PREDEF_JUMP PrintMoveDetailsBoxPredef
 
 DebugNPC:
+
+    ; Standard CableClubNPC
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 1,a
+    ld hl,CableClubNPC
+    ld b,BANK(CableClubNPC)
+    jp nz,Bankswitch
+
     ; Backup
     ld a,[$cf92]
     push af
@@ -45037,6 +45085,9 @@ MonWasReleasedText: ; 0x21820
     TX_FAR _MonWasReleasedText
     db "@"
 
+SECTION "CableClubLeftGameboy",ROMX[$5825],BANK[$8]
+
+CableClubLeftGameboy:
     ld a,[$ff00+$aa]
     cp $1
     ret z
@@ -45054,6 +45105,7 @@ MonWasReleasedText: ; 0x21820
     ld a,$22
     jp Func_3ef5
 
+CableClubRightGameboy:
     ld a,[$ff00+$aa]
     cp $2
     ret z
@@ -50928,7 +50980,7 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     ld c,$28
     call DelayFrames
     call ClearScreen
-    call Func_3aef7
+    call RenameEvolvedMon
 ;    ld a,[$d11e]
 ;    push af
 ;    ld a,[$d0b5]
@@ -51968,7 +52020,9 @@ GenericAI:
 
 ; ─────────────────────────────────────────────────────────────
 
-Func_3aef7: ; Moved in the Bank
+; Renames the mon to its new, evolved form's standard name unless it had a
+; nickname, in which case the nickname is kept.
+RenameEvolvedMon: ; Moved in the Bank
     ld a,[$d0b5]
     push af
     ld a,[$d0b8]
@@ -65063,16 +65117,22 @@ OTString67E5: ; 427e5 (10:67e5)
 
 CheckShinyDuringTradeInSend:
     push af
-    ld hl,wDVForShinyAtkDef
-    call IsShiny
-    call ResetTempIV
-    pop af
-    jp Func_415a4 ; Invio ; TODO:Palette
+    ld hl,wTradedPlayerMonIV
+    jr CheckShinyDuringTradeInCommon
 
 CheckShinyDuringTradeInReceive:
-    ld hl,$cfb3 ; TradeIn Enemy's Pkmn ; TODO, bug during NPC TradeIn
+    push af
+    ld hl,wTradedEnemyMonIV
+    ; fall through
+
+CheckShinyDuringTradeInCommon:
     call IsShiny
-    jp Func_415a4 ; Ricezione ; TODO:Palette
+    inc hl
+    inc hl
+    ld a,[hl] ; wTradePlayerMonAltForm / wTradeEnemyMonAltForm
+    ld [wAlternateFormIndex],a
+    pop af
+    jp Func_415a4 ; DONE:Palette
 
 StoreTradeLeftToRightPkmnIdAndInitGameboyTransferGfx:
     push hl
@@ -69799,15 +69859,15 @@ HiddenObjectPointers: ; 46a96 (11:6a96)
 
 BattleCenterHiddenObjects: ; 46b40 (11:6b40)
     db $04,$05,$d0 ; XXX,y,x
-    dbw $08,$5845
+    dbw BANK(CableClubRightGameboy),CableClubRightGameboy
     db $04,$04,$d0 ; XXX,y,x
-    dbw $08,$5825
+    dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
     db $FF
 TradeCenterHiddenObjects: ; 46b4d (11:6b4d)
     db $04,$05,$d0 ; XXX,y,x
-    dbw $08,$5845
+    dbw BANK(CableClubRightGameboy),CableClubRightGameboy
     db $04,$04,$d0 ; XXX,y,x
-    dbw $08,$5825
+    dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
     db $FF
 RedsHouse2FHiddenObjects: ; 46b5a (11:6b5a)
     db $01,$00,$04 ; XXX,y,x
@@ -100093,7 +100153,7 @@ Func_71c07: ; 71c07 (1c:5c07)
     ld a,[$d127]
     push af
     call LoadHpBarAndStatusTilePatterns
-    call Func_71cc1
+    call InGameTrade_PrepareTradeData
     ld a,$38
     call Predef
     pop af
@@ -100109,7 +100169,7 @@ Func_71c07: ; 71c07 (1c:5c07)
     ld a,$80
     ld [$cc49],a
     call AddPokemonToParty
-    call Func_71d19
+    call InGameTrade_CopyDataToReceivedMon
     ld hl,Func_17d7d
     ld b,BANK(Func_17d7d)
     call Bankswitch
@@ -100140,37 +100200,36 @@ Func_71ca2: ; 71ca2 (1c:5ca2)
     ld hl,LoadWildData
     jp Bankswitch ; indirect jump to LoadWildData (ceb8 (3:4eb8))
 
-Func_71cc1: ; 71cc1 (1c:5cc1)
+InGameTrade_PrepareTradeData: ; 71cc1 (1c:5cc1)
     ld hl,wWhichTrade ; $cd3d
-    ld a,[$cd0f]
+    ld a,[$cd0f] ; InGameTradeGiveMonSpecies
     ld [hli],a
-    ld a,[$cd34]
+    ld a,[$cd34] ; InGameTradeReceiveMonSpecies
     ld [hl],a
     ld hl,W_PARTYMON1OT ; $d273
     ld bc,$b
     ld a,[wWhichPokemon] ; $cf92
     call AddNTimes
-    ld de,$cd41
+    ld de,$cd41 ; TradedPlayerMonOT
     ld bc,$b
-    call Func_71d11
-    ld hl,Unknown_71d59 ; $5d59
-    ld de,$cd4e
-    call Func_71d11
+    call .CopyData
+    ld hl,InGameTrade_TrainerString ; $5d59
+    ld de,$cd4e ; TradedEnemyMonOT
+    call .CopyData
     ld de,W_GRASSRATE ; $d887
-    call Func_71d11
+    call .CopyData
     ld hl,W_PARTYMON1_OTID ; $d177
     ld bc,$2c
     ld a,[wWhichPokemon] ; $cf92
     call AddNTimes
-    ld de,$cd4c
+    ld de,$cd4c ; TradedPlayerMonOTID
     ld bc,$2
-    call Func_71d11
-    call GenRandom
+    call .CopyData
+    call InGameTrade_BackupPlayerIVandAltForm ; call GenRandom
     ld hl,H_RAND1 ; $ffd3
-    ld de,$cd59
+    ld de,$cd59 ; TradedEnemyMonOTID
     jp CopyData
-
-Func_71d11: ; 71d11 (1c:5d11)
+.CopyData
     push hl
     push bc
     call CopyData
@@ -100178,7 +100237,7 @@ Func_71d11: ; 71d11 (1c:5d11)
     pop hl
     ret
 
-Func_71d19: ; 71d19 (1c:5d19)
+InGameTrade_CopyDataToReceivedMon: ; 71d19 (1c:5d19)
     ld hl,W_PARTYMON1NAME ; $d2b5
     ld bc,$b
     call Func_71d4f
@@ -100188,13 +100247,13 @@ Func_71d19: ; 71d19 (1c:5d19)
     ld hl,W_PARTYMON1OT ; $d273
     ld bc,$b
     call Func_71d4f
-    ld hl,Unknown_71d59 ; $5d59
+    ld hl,InGameTrade_TrainerString ; $5d59
     ld bc,$b
     call CopyData
     ld hl,W_PARTYMON1_OTID ; $d177
     ld bc,$2c
     call Func_71d4f
-    ld hl,$cd59
+    ld hl,$cd59 ; TradedEnemyMonOTID
     ld bc,$2
     jp CopyData
 
@@ -100206,7 +100265,7 @@ Func_71d4f: ; 71d4f (1c:5d4f)
     ld d,h
     ret
 
-Unknown_71d59: ; 71d59 (1c:5d59)
+InGameTrade_TrainerString: ; 71d59 (1c:5d59)
     db $5D,$50
     ds 9 ; "Trainer" Name
 
@@ -100338,12 +100397,12 @@ GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
 ;    ld a,[W_PLAYERBATTSTATUS3]
     ld hl,W_PLAYERMONID
     ld a,[hl]
-    call CheckShinyBackAndGetPAL ; TODO:Palette Done
+    call CheckShinyBackAndGetPAL ; DONE:Palette
     push hl ; Backup backsprite palette
 ;    ld a,[W_ENEMYBATTSTATUS3]
     ld hl,W_ENEMYMONID
     ld a,[hl]
-    call CheckShinyFrontAndGetPAL ; TODO:Palette Done
+    call CheckShinyFrontAndGetPAL ; DONE:Palette
     ld d,h
     ld e,l
 
@@ -100386,7 +100445,7 @@ GetPkmnStatPaletteID: ;Moved in the Bank
     ld bc,$10
     call CopyData
     ld a,[$cf91]
-    call CheckShinyAndGetPAL ; TODO:Palette Done
+    call CheckShinyAndGetPAL ; DONE:Palette
     push hl ; ...
     ld hl,$cf2e
     ld a,[$cf25]
@@ -100421,7 +100480,7 @@ GetPokedexPaletteID: ; Moved in the Bank
     ld [wAlternateFormIndex],a ; pokedex alternate form
     call GetMonHeader
     pop af
-    call DeterminePaletteIDWithShinyDebug ; call DeterminePaletteID ; TODO:Palette Done
+    call DeterminePaletteIDWithShinyDebug ; call DeterminePaletteID ; DONE:Palette
     call PaletteHackTwoBytes2 ; Denim ; ld hl,$cf30
     nop               ; ...   ; ld [hl],a
     ld hl,$cf2d
@@ -100503,7 +100562,7 @@ GetHallOfFameLinkCableEvolutionPaletteID: ; 71f17 (1c:5f17)
     ld l,PAL_BLACK ; Used during Evolution
     jr nz,.asm_71f31
     ld a,[$cf1d]
-    call DeterminePaletteID ; TODO:Palette
+    call DeterminePaletteID ; DONE:Palette
 .asm_71f31
     call PaletteHackTwoBytes3 ; Denim ; ld [$cf2e],a
     ds 1                      ; ...   ; ld hl,$cf2d
@@ -102549,7 +102608,7 @@ SkipShinyAndGetPAL:
     pop hl
     ; fall through
 
-DeterminePaletteID: ; TODO:Palette
+DeterminePaletteID: ; DONE:Palette
     push bc
     push de
     and a
@@ -103042,6 +103101,31 @@ PokeCenterFlashingHealBall:
 MidJumpVerticalCoord: ; Moved in the Bank
    ;db $38,$36,$34,$32,$31,$30,$30,$30,$31,$32,$33,$34,$36,$38,$3C,$3C
     db $37,$35,$33,$31,$30,$30,$31,$32,$33,$34,$36,$38,$3C,$3C,$3C,$3C
+
+InGameTrade_BackupPlayerIVandAltForm:
+    ; hl point to OT
+    ld de,W_PARTYMON1_IV-W_PARTYMON1_OTID
+    add hl,de
+    ld de,wTradedPlayerMonIV
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hld]
+    ld [de],a
+    ; hl point to IV
+    ld de,W_PARTYMON1_MOVE2PP-W_PARTYMON1_IV
+    add hl,de
+    ld de,wTradePlayerMonAltForm
+    ld a,[hl]
+    ld [de],a
+    ; TODO : Handle InGameTrade special mon
+    xor a
+    ld hl,wTradedEnemyMonIV
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a ; wTradeEnemyMonAltForm
+    ; endhack
+    jp GenRandom
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
@@ -109789,37 +109873,29 @@ INCBIN "baserom.gbc",$79591,$79598 - $79591
 Unknown_79598: ; 79598 (1e:5598)
 INCBIN "baserom.gbc",$79598,$7959f - $79598
 
-AnimationMinimizeMon: ; 7959f (1e:559f)
-jp AnimationSlideMonDownAndHide ; Use Acid Armor Animation
+RestoreOldMonHeader:
+    ld a,[$cee9] ; EvoOldSpecies
+    ld [$d0b5],a
+    ; fall through
 
-; Changes the mon's sprite to a mini black sprite. Used by the
-; Minimize animation.
-;    ld hl,$c6e8
-;    push hl
-;    xor a
-;    ld bc,$310
-;    call FillMemory
-;    pop hl
-;    ld de,$194
-;    add hl,de
-;    ld de,Unknown_795c4 ; $55c4
-;    ld c,$5
-;.asm_795b4
-;    ld a,[de]
-;    ld [hli],a
-;    ld [hli],a
-;    inc de
-;    dec c
-;    jr nz,.asm_795b4
-;    call Func_79652
-;    call Delay3
-;    jp AnimationShowMonPic
+Evolution_GetMonHeader_HandleAlternateForm:
+    ld hl,W_PARTYMON1_MOVE2PP
+    ld a,[wWhichPokemon]
+    ld bc,$2c
+    call AddNTimes
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    jp GetMonHeader
 
-;Unknown_795c4: ; 795c4 (1e:55c4)
-;INCBIN "baserom.gbc",$795c4,$795c9 - $795c4
+Evolution_LoadPic_HandleAlternateForm:
+    call Evolution_GetMonHeader_HandleAlternateForm
+    jp Evolution_LoadPic
+
+; Free
 
 SECTION "AnimationSlideMonDownAndHide",ROMX[$55c9],BANK[$1e]
 
+AnimationMinimizeMon: ; Moved in the Bank
 AnimationSlideMonDownAndHide: ; 795c9 (1e:55c9)
 ; Slides the mon's sprite down and disappears. Used in Acid Armor.
     ld a,$1
@@ -114675,38 +114751,38 @@ EvolveMon: ; 7bde9 (1e:7de9)
     ld a,[$d0b5]
     push af
     xor a
-    ld [$d083],a
-    ld [$c02a],a
-    dec a
-    ld [$c0ee],a
+    ld [$d083],a ; LowHealthAlarm
+    ld [$c02a],a ; ChannelSoundIDs + CHAN5
+    dec a ; SFX_STOP_ALL_MUSIC
+    ld [$c0ee],a ; NewSoundID
     call PlaySound
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ld a,$8c
+    ld a,$8c ; SFX_TINK
     call PlaySound
     call Delay3
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ld [$FF00+$d7],a
-    ld a,[$cee9]
-    ld [$cf1d],a
+    ld [$FF00+$d7],a ; TileAnimations
+    ld a,[$cee9] ; EvoOldSpecies
+    ld [$cf1d],a ; WholeScreenPaletteMonSpecies
     ld c,$0
-    call CheckShinyDuringEvolution ; call Func_7beb4
-    ld a,[$ceea]
+    call CheckShinyDuringEvolution ; call EvolutionSetWholeScreenPalette
+    ld a,[$ceea] ; EvoNewSpecies
     ld [$cf91],a
     ld [$d0b5],a
-    call Func_7beb9_HandleAlternateForm ; call Func_7beb9
-    ld de,$9000
-    ld hl,$9310
-    ld bc,$31
+    call Evolution_LoadPic_HandleAlternateForm ; call Evolution_LoadPic
+    ld de,$9000 ; FrontPic
+    ld hl,$9310 ; BackPic
+    ld bc,$31 ; 7 * 7
     call CopyVideoData
-    ld a,[$cee9]
+    ld a,[$cee9] ; EvoOldSpecies
     ld [$cf91],a
     ld [$d0b5],a
-    call Func_7beb9_HandleAlternateForm ; call Func_7beb9
+    call Evolution_LoadPic_HandleAlternateForm ; call Evolution_LoadPic
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ld a,[$cee9]
+    ld a,[$cee9] ; EvoOldSpecies
     call PlayCry
     call WaitForSoundToFinish
     ld c,BANK(Music_SafariZone)
@@ -114714,34 +114790,35 @@ EvolveMon: ; 7bde9 (1e:7de9)
     call PlayMusic
     ld c,$50
     call DelayFrames
-    ld c,$1
-    call Func_7beb4
+    ld c,$1 ; set PAL_BLACK instead of mon palette
+    call EvolutionSetWholeScreenPalette
     ld bc,$110
-.asm_7be63
+.animLoop
     push bc
-    call asm_7befa
-    jr c,.asm_7bea9
-    call asm_7bec2
+    call Evolution_CheckForCancel
+    jr c,.evolutionCancelled
+    call Evolution_BackAndForthAnim
     pop bc
     inc b
     dec c
     dec c
-    jr nz,.asm_7be63
+    jr nz,.animLoop
     xor a
-    ld [$ceec],a
+    ld [$ceec],a ; EvoCancelled
     ld a,$31
-    ld [$ceeb],a
-    call Func_7bed6
-    ld a,[$ceea]
-.asm_7be81
-    ld [$cf1d],a
-    ld a,$ff
-    ld [$c0ee],a
+    ld [$ceeb],a ; EvoMonTileOffset
+    call Evolution_ChangeMonPic
+    ld a,[$ceea] ; EvoNewSpecies
+.done
+    ld [$cf1d],a ; WholeScreenPaletteMonSpecies
+    ld a,$ff ; SFX_STOP_ALL_MUSIC
+    ld [$c0ee],a ; NewSoundID
     call PlaySound
-    ld a,[$cf1d]
+    ld a,[$cf1d] ; WholeScreenPaletteMonSpecies
     call PlayCry
     ld c,$0
-    call CheckShinyDuringEvolution ; call Func_7beb4 ; TODO:Palette (ricaricare il nuovo header dopo evoluzione)
+    call CheckShinyDuringEvolution ; call EvolutionSetWholeScreenPalette ; DONE:Palette
+    call RestoreOldMonHeader
     pop af
     ld [$d0b5],a
     pop af
@@ -114749,39 +114826,42 @@ EvolveMon: ; 7bde9 (1e:7de9)
     pop bc
     pop de
     pop hl
-    ld a,[$ceec]
+    ld a,[$ceec] ; EvoCancelled
     and a
     ret z
     scf
     ret
-.asm_7bea9
+.evolutionCancelled
     pop bc
     ld a,$1
-    ld [$ceec],a
-    ld a,[$cee9]
-    jr .asm_7be81
+    ld [$ceec],a ; EvoCancelled
+    ld a,[$cee9] ; EvoOldSpecies
+    jr .done
 
-Func_7beb4: ; 7beb4 (1e:7eb4)
+EvolutionSetWholeScreenPalette: ; 7beb4 (1e:7eb4)
     ld b,$b
     jp GoPAL_SET
 
-Func_7beb9: ; 7beb9 (1e:7eb9)
-    call GetMonHeader
+Evolution_LoadPic: ; 7beb9 (1e:7eb9)
     FuncCoord 7,2 ; $c3cf
     ld hl,Coord
     jp LoadFlippedFrontSpriteByMonIndex
-asm_7bec2: ; 7bec2 (1e:7ec2)
+
+SECTION "Evolution_BackAndForthAnim",ROMX[$7ec2],BANK[$1e]
+
+; show the mon change back and forth between the new and old species b times
+Evolution_BackAndForthAnim: ; 7bec2 (1e:7ec2)
     ld a,$31
-    ld [$ceeb],a
-    call Func_7bed6
-    ld a,$cf
-    ld [$ceeb],a
-    call Func_7bed6
+    ld [$ceeb],a ; EvoMonTileOffset
+    call Evolution_ChangeMonPic
+    ld a,$cf ; -$31
+    ld [$ceeb],a ; wEvoMonTileOffset
+    call Evolution_ChangeMonPic
     dec b
-    jr nz,asm_7bec2
+    jr nz,Evolution_BackAndForthAnim
     ret
 
-Func_7bed6: ; 7bed6 (1e:7ed6)
+Evolution_ChangeMonPic: ; 7bed6 (1e:7ed6)
     push bc
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
@@ -114806,7 +114886,8 @@ Func_7bed6: ; 7bed6 (1e:7ed6)
     call Delay3
     pop bc
     ret
-asm_7befa: ; 7befa (1e:7efa)
+
+Evolution_CheckForCancel: ; 7befa (1e:7efa)
     call DelayFrame
     push bc
     call GetJoypadStateLowSensitivity
@@ -114816,7 +114897,7 @@ asm_7befa: ; 7befa (1e:7efa)
     jr nz,.asm_7bf0d
 .asm_7bf08
     dec c
-    jr nz,asm_7befa
+    jr nz,Evolution_CheckForCancel
     and a
     ret
 .asm_7bf0d
@@ -114926,7 +115007,7 @@ TechnicalMachinePrices: ; 7bfa7 (1e:7fa7)
     db $22,$52,$24,$34,$42
     db $24,$43
 
-CheckShinyDuringEvolution: ; TODO:Palette Done
+CheckShinyDuringEvolution: ; DONE:Palette
     push af
     push bc
     ld a,[wWhichPokemon] ; $cf92
@@ -114934,9 +115015,12 @@ CheckShinyDuringEvolution: ; TODO:Palette Done
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
     call IsShiny
+    ld a,[$cf1d]
+    ld [$d0b5],a
+    call Evolution_GetMonHeader_HandleAlternateForm
     pop bc
     pop af
-    jp Func_7beb4
+    jp EvolutionSetWholeScreenPalette
 
 GetBattleFrontMonHeader:
     ld a,[W_ENEMYMONPP+1] ; move2pp
@@ -114947,15 +115031,6 @@ GetBattleBackMonHeader:
     ld a,[W_PLAYERMONPP+1] ; move2pp
     ld [wAlternateFormIndex],a
     jp GetMonHeader
-
-Func_7beb9_HandleAlternateForm:
-    ld hl,W_PARTYMON1_MOVE2PP
-    ld a,[wWhichPokemon]
-    ld bc,$2c
-    call AddNTimes
-    ld a,[hl]
-    ld [wAlternateFormIndex],a
-    jp Func_7beb9
 
 SECTION "bank1F",ROMX,BANK[$1F]
 

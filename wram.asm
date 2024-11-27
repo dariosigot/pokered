@@ -1146,8 +1146,23 @@ wDVForShinyAtkDef ; d47f
 wDVForShinySpdSpc ; d480
     db
 
+UNION
+
 wTmpMonLearnset: ; d481
     ds 7
+
+NEXTU
+
+wTradedPlayerMonIV: ; d481
+    ds 2
+wTradePlayerMonAltForm: ; d483
+    ds 1
+wTradedEnemyMonIV: ; d484
+    ds 2
+wTradeEnemyMonAltForm: ; d486
+    ds 1
+
+ENDU
 
 ; some free bytes
 
