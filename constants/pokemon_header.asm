@@ -3430,7 +3430,7 @@ OnixBaseStats:
     dw OnixPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw OnixCrystalBaseStats
 
     ; pointer to evomoves
     dw Onix_EvosMoves
@@ -5050,7 +5050,7 @@ KabutoBaseStats:
     dw KabutoPicBack
 
     ; pointer to alternate forms
-    dw FossilKabutoBaseStats
+    dw KabutoFossilBaseStats
 
     ; pointer to evomoves
     dw Kabuto_EvosMoves
@@ -5086,7 +5086,7 @@ KabutopsBaseStats:
     dw KabutopsPicBack
 
     ; pointer to alternate forms
-    dw FossilKabutopsBaseStats
+    dw KabutopsFossilBaseStats
 
     ; pointer to evomoves
     dw Kabutops_EvosMoves
@@ -5122,7 +5122,7 @@ AerodactylBaseStats:
     dw AerodactylPicBack
 
     ; pointer to alternate forms
-    dw FossilAerodactylBaseStats
+    dw AerodactylFossilBaseStats
 
     ; pointer to evomoves
     dw Aerodactyl_EvosMoves

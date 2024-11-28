@@ -70,7 +70,7 @@ ElectrodeHisuiBaseStats:
 
     db BANK(ElectrodeHisuiPicFront)
 
-FossilKabutoBaseStats:
+KabutoFossilBaseStats:
     db KABUTO ; mon id
     db 30 ; base hp
     db 80 ; base attack
@@ -106,7 +106,7 @@ FossilKabutoBaseStats:
 
     db BANK(MissingNoPicFront)
 
-FossilKabutopsBaseStats:
+KabutopsFossilBaseStats:
     db KABUTOPS ; mon id
     db 60 ; base hp
     db 115 ; base attack
@@ -142,7 +142,7 @@ FossilKabutopsBaseStats:
 
     db BANK(FossilKabutopsPicFront)
 
-FossilAerodactylBaseStats:
+AerodactylFossilBaseStats:
     db AERODACTYL ; mon id
     db 80 ; base hp
     db 105 ; base attack
@@ -501,3 +501,39 @@ BlastoiseStarterBaseStats:
     ds 3
 
     db BANK(BlastoisePicFront)
+
+OnixCrystalBaseStats:
+    db ONIX ; mon id
+    db 35 ; base hp
+    db 45 ; base attack
+    db 160 ; base defense
+    db 70 ; base speed
+    db 30 ; base special
+
+    db CRYSTAL ; species type 1
+    db METAL ; species type 2
+
+    db 45 ; catch rate
+    db 108 ; base exp yield
+    db $77 ; sprite dimensions
+
+    dw OnixPicFront
+    dw OnixPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Onix_EvosMoves
+
+    db 0 ; growth rate
+
+    ; learnset
+    dw OnixTMCompatibility
+
+    ; palette
+    dw PAL_ONIX_CRYSTAL
+
+    ds 3
+
+    db BANK(OnixPicFront)

@@ -47079,6 +47079,8 @@ Type04Name:
     db "GROUND@"
 Type05Name:
     db "ROCK@"
+Type06Name:
+    db "CRYSTAL@"
 Type07Name:
     db "BUG@"
 Type08Name:
@@ -47253,7 +47255,7 @@ TypeNamePointers:
     dw Type03Name ; $03 : Poison
     dw Type04Name ; $04 : Ground
     dw Type05Name ; $05 : Rock
-    dw TypeNAName ;
+    dw Type06Name ; $06 : Crystal
     dw Type07Name ; $07 : Bug
     dw Type08Name ; $08 : Ghost
     dw Type09Name ; $09 : Metal
