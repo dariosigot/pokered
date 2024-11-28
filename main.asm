@@ -3251,6 +3251,7 @@ Func_152e: ; 152e (0:152e)
 ; copies the base stat data of a pokemon to $D0B8 (W_MONHEADER)
 ; INPUT:
 ; [$D0B5] = pokemon ID
+; [wAlternateFormIndex] = Alternate Form Index
 GetMonHeader: ; 1537 (0:1537)
     ld a,[H_LOADEDROMBANK]
     push af
@@ -3281,7 +3282,7 @@ GetMonHeader: ; 1537 (0:1537)
     ld h,[hl]
     ld l,a
     or h
-    jr z,.done
+    jr z,.NoOthersAltForm
     jr .retry
 .done
     pop af
@@ -3296,6 +3297,10 @@ GetMonHeader: ; 1537 (0:1537)
     ld bc,28
     ld de,W_MONHEADER
     jp CopyData
+.NoOthersAltForm
+    xor a
+    ld [wAlternateFormIndex],a
+    jr .done
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $00)
