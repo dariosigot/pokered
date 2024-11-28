@@ -21983,7 +21983,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHS2D
     dw MapHSXX
     dw MapHSXX
-    dw MapHSXX
+    dw MapHS30
     dw MapHSXX
     dw MapHSXX
     dw MapHS33
@@ -22016,7 +22016,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHSXX
     dw MapHSXX
     dw MapHSXX
-    dw MapHS51
+    dw MapHSXX
     dw MapHSXX
     dw MapHS53
     dw MapHSXX
@@ -22446,8 +22446,8 @@ MapHSEB: ; cd0f (3:4d0f)
     db SILPH_CO_11F,$05,Show
 MapHSD6: ; cd18 (3:4d18)
     db MANSION_2,$02,Show ; New Moltres
-MapHS51:
-    db ROCK_TUNNEL_POKECENTER,$05,Show ; $BB
+MapHS30:
+    db ROUTE_2_HOUSE,$03,Show ; $BB
 MapHSD7: ; cd1e (3:4d1e)
     db MANSION_3,$03,Show
     db MANSION_3,$04,Show
@@ -37798,6 +37798,83 @@ DiglettsCaveEntranceRoute11Blocks: ; 1c20e (7:420e)
 DiglettsCaveRoute2Blocks: ; 0x1c20e size=16
     INCBIN "maps/diglettscaveroute2.blk"
 
+Route2HouseObject: ; Moved in the Bank
+    db $a ; border tile
+
+    db $2 ; warps
+    db $7,$2,$2,$ff
+    db $7,$3,$2,$ff
+
+    db $0 ; signs
+
+    db $3 ; people
+    db SPRITE_OAK_AIDE,$4 + 4,$2 + 4,$ff,$d3,$1 ; person
+    db SPRITE_LASS,$3 + 4,$5 + 4,$ff,$d0,$2 ; person
+    db SPRITE_BALL,$3 + 4,$4 + 4,$ff,$ff,$3 ; person
+
+    ; warp-to
+    EVENT_DISP $4,$7,$2
+    EVENT_DISP $4,$7,$3
+
+Route2HouseScript0:
+    ret
+
+Route2HouseScript1:
+    ld a,VOLTORB
+    ld [$cf91],a
+    call PlayCry
+    ld a,1
+    ld [wAlternateFormIndex],a
+    ld hl,DisplayMonFrontSpriteInBox
+    ld b,BANK(DisplayMonFrontSpriteInBox)
+    call Bankswitch
+    ld a,2
+    ld [W_ROUTE2HOUSECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+Route2HouseScript2:
+    ld a,4
+    ld [$ff00+$8c],a
+    call DisplayTextID
+    xor a
+    ld [W_ROUTE2HOUSECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+Route2HouseText3:
+    db $08 ; asm
+    ld hl,.VoltorbText1
+    call PrintText
+    ld a,VOLTORB
+    call DisplayPokedex
+    ld hl,.VoltorbText2
+    call PrintText
+    ld a,1
+    ld [W_ROUTE2HOUSECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    jp TextScriptEnd
+.VoltorbText1
+    TX_FAR _VoltorbHusuiText
+    db "@"
+.VoltorbText2
+    TX_FAR _VoltorbHusui2Text
+    db "@"
+
+Route2HouseText4:
+    db $08 ; asm
+    ld bc,(VOLTORB << 8) | 15
+    ld a,1
+    ld [wTempAlternateFormIndex],a
+    call GivePokemon
+    jr nc,.error
+    ld a,$BB
+    ld [$cc4d],a
+    ld a,$11
+    call Predef
+.error
+    jp TextScriptEnd
+
 SECTION "Func_1c98a",ROMX[$498a],BANK[$7]
 
 Func_1c98a: ; 1c98a (7:498a)
@@ -40785,40 +40862,39 @@ Route2House_h: ; 0x1dee1 to 0x1deed (12 bytes) (bank=7) (id=48)
     dw Route2HouseObject ; objects
 
 Route2HouseScript: ; 1deed (7:5eed)
-    jp EnableAutoTextBoxDrawing
+    call EnableAutoTextBoxDrawing
+    ld hl,Route2HouseScriptPointers
+    ld a,[W_ROUTE2HOUSECURSCRIPT]
+    jp CallFunctionInTable
 
-Route2HouseTextPointers: ; 1def0 (7:5ef0)
+Route2HouseScriptPointers:
+    dw Route2HouseScript0
+    dw Route2HouseScript1
+    dw Route2HouseScript2
+
+Route2HouseTextPointers: ; Moved in the Bank
     dw Route2HouseText1
     dw Route2HouseText2
+    dw Route2HouseText3
+    dw Route2HouseText4
 
-Route2HouseText1: ; 1def4 (7:5ef4)
+Route2HouseText1: ; Moved in the Bank
     TX_FAR _Route2HouseText1
     db "@"
 
-Route2HouseText2: ; 1def9 (7:5ef9)
-    db $08 ; asm
-    ld a,$1
-    ld [wWhichTrade],a
-    ld a,$54
-    call Predef
-    jp TextScriptEnd
+Route2HouseText2: ; Moved in the Bank
+    ;db $08 ; asm
+    ;ld a,$1
+    ;ld [wWhichTrade],a
+    ;ld a,$54
+    ;call Predef
+    ;jp TextScriptEnd
+    TX_FAR _Route2HouseText2
+    db "@"
 
-Route2HouseObject: ; 0x1df07 (size=32)
-    db $a ; border tile
+; Free
 
-    db $2 ; warps
-    db $7,$2,$2,$ff
-    db $7,$3,$2,$ff
-
-    db $0 ; signs
-
-    db $2 ; people
-    db SPRITE_OAK_AIDE,$4 + 4,$2 + 4,$ff,$d3,$1 ; person
-    db SPRITE_GAMEBOY_KID_COPY,$1 + 4,$4 + 4,$ff,$d0,$2 ; person
-
-    ; warp-to
-    EVENT_DISP $4,$7,$2
-    EVENT_DISP $4,$7,$3
+SECTION "Route5Gate_h",ROMX[$5f27],BANK[$7] 
 
 Route5Gate_h: ; 0x1df27 to 0x1df33 (12 bytes) (bank=7) (id=70)
     db $0c ; tileset
@@ -69779,6 +69855,7 @@ HiddenObjectMaps: ; 46a40 (11:6a40)
     db VERMILION_CITY
     db CERULEAN_CITY
     db ROUTE_4
+    db ROUTE_15_GATE_2F
     db $FF
 
 HiddenObjectPointers: ; 46a96 (11:6a96)
@@ -69868,19 +69945,10 @@ HiddenObjectPointers: ; 46a96 (11:6a96)
     dw VermilionCityHiddenObjects
     dw CeruleanCityHiddenObjects
     dw Route4HiddenObjects
+    dw B9HiddenObjects
 
-BattleCenterHiddenObjects: ; 46b40 (11:6b40)
-    db $04,$05,$d0 ; XXX,y,x
-    dbw BANK(CableClubRightGameboy),CableClubRightGameboy
-    db $04,$04,$d0 ; XXX,y,x
-    dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
-    db $FF
-TradeCenterHiddenObjects: ; 46b4d (11:6b4d)
-    db $04,$05,$d0 ; XXX,y,x
-    dbw BANK(CableClubRightGameboy),CableClubRightGameboy
-    db $04,$04,$d0 ; XXX,y,x
-    dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
-    db $FF
+SECTION "RedsHouse2FHiddenObjects",ROMX[$6b5a],BANK[$11]
+
 RedsHouse2FHiddenObjects: ; 46b5a (11:6b5a)
     db $01,$00,$04 ; XXX,y,x
     dbw $17,$5b86
@@ -70483,6 +70551,22 @@ Mansion2HiddenObjects:
     dbw $14,$6037
     db 07,28,CALCIUM
     dbw BANK(HiddenItems),HiddenItems
+    db $FF
+B9HiddenObjects:
+    db $02,$01,$04 ; XXX,y,x
+    dbw BANK(Route15UpstairsLeftBinoculars),Route15UpstairsLeftBinoculars
+    db $FF
+BattleCenterHiddenObjects:
+    db $04,$05,$d0 ; XXX,y,x
+    dbw BANK(CableClubRightGameboy),CableClubRightGameboy
+    db $04,$04,$d0 ; XXX,y,x
+    dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
+    db $FF
+TradeCenterHiddenObjects:
+    db $04,$05,$d0 ; XXX,y,x
+    dbw BANK(CableClubRightGameboy),CableClubRightGameboy
+    db $04,$04,$d0 ; XXX,y,x
+    dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
     db $FF
 
 FlagInstantAndPredefSilphCo: ; xxxxx (11:xxxx) ; Denim
@@ -73260,25 +73344,39 @@ RockTunnelPokecenterTextPointers: ; 493c0 (12:53c0)
     dw RockTunnelPokecenterText2
     dw RockTunnelPokecenterText3
     dw RockTunnelPokecenterText4
-    dw RockTunnelPokecenterText5
 
-RockTunnelPokecenterText1: ; Moved in the Bank
+RockTunnelPokecenterText1: ; 493c8 (12:53c8)
     db $ff
 
-RockTunnelPokecenterText2: ; Moved in the Bank
+RockTunnelPokecenterText2: ; 493c9 (12:53c9)
     TX_FAR _RockTunnelPokecenterText1
     db "@"
 
-RockTunnelPokecenterText3: ; Moved in the Bank
+RockTunnelPokecenterText3: ; 493ce (12:53ce)
     TX_FAR _RockTunnelPokecenterText3
     db "@"
 
-RockTunnelPokecenterText4: ; Moved in the Bank
+RockTunnelPokecenterText4: ; 493d3 (12:53d3)
     db $f6
 
-; Free
+RockTunnelPokecenterObject: ; 0x493d4 (size=44)
+    db $0 ; border tile
 
-SECTION "Route11Gate_h",ROMX[$5400],BANK[$12]
+    db $2 ; warps
+    db $7,$3,$0,$ff
+    db $7,$4,$0,$ff
+
+    db $0 ; signs
+
+    db $4 ; people
+    db SPRITE_NURSE,$1 + 4,$3 + 4,$ff,$d0,$1 ; person
+    db SPRITE_GENTLEMAN,$3 + 4,$7 + 4,$fe,$2,$2 ; person
+    db SPRITE_FISHER2,$5 + 4,$2 + 4,$ff,$ff,$3 ; person
+    db SPRITE_CABLE_CLUB_WOMAN,$2 + 4,$b + 4,$ff,$d0,$4 ; person
+
+    ; warp-to
+    EVENT_DISP $7,$7,$3
+    EVENT_DISP $7,$7,$4
 
 Route11Gate_h: ; 0x49400 to 0x4940c (12 bytes) (id=84)
     db $0c ; tileset
@@ -75056,54 +75154,6 @@ CeladonMart5Text3:
 ; Celadon Dept. Store 5F (2)
 CeladonMart5Text4:
     db $FE,5,HP_UP,PROTEIN,IRON,CARBOS,CALCIUM,$FF
-
-RockTunnelPokecenterObject: ; Moved in the Bank
-    db $0 ; border tile
-
-    db $2 ; warps
-    db $7,$3,$0,$ff
-    db $7,$4,$0,$ff
-
-    db $0 ; signs
-
-    db $5 ; people
-    db SPRITE_NURSE,$1 + 4,$3 + 4,$ff,$d0,$1 ; person
-    db SPRITE_GENTLEMAN,$3 + 4,$7 + 4,$fe,$2,$2 ; person
-    db SPRITE_FISHER2,$5 + 4,$2 + 4,$ff,$ff,$3 ; person
-    db SPRITE_CABLE_CLUB_WOMAN,$2 + 4,$b + 4,$ff,$d0,$4 ; person
-    db SPRITE_BALL,$3 + 4,$6 + 4,$ff,$ff,$5 ; person
-
-    ; warp-to
-    EVENT_DISP $7,$7,$3
-    EVENT_DISP $7,$7,$4
-
-RockTunnelPokecenterText5: ; 1dd46 (7:5d46)
-    db $08 ; asm
-    ld hl,.VoltorbText1
-    call PrintText
-    ld bc,(VOLTORB << 8) | 16
-    ld a,b
-    push bc
-    call DisplayPokedex
-    ld hl,.VoltorbText2
-    call PrintText
-    pop bc
-    ld a,1
-    ld [wTempAlternateFormIndex],a
-    call GivePokemon
-    jr nc,.error
-    ld a,$BB
-    ld [$cc4d],a
-    ld a,$11
-    call Predef
-.error
-    jp TextScriptEnd
-.VoltorbText1
-    TX_FAR _VoltorbHusuiText
-    db "@"
-.VoltorbText2
-    TX_FAR _VoltorbHusui2Text
-    db "@"
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -121261,6 +121311,12 @@ _AlmostIneffectiveText:
     db $4f
     db "effective at all!",$58
 
+_Route2HouseText2:
+    db $0,"I found this",$4f
+    db "strange VOLTORB",$55
+    db "in my bag after",$55
+    db "the holidays!",$57
+
 ; ───────────────────────────────────
 
 SECTION "bank23",ROMX,BANK[$23]
@@ -130249,7 +130305,9 @@ _VoltorbText:
 
 _VoltorbHusuiText:
     db $0,"Wow! Is it",$4f
-    db "a VOLTORB?",$58
+    db "a VOLTORB?",$51
+    db "I must check",$4f
+    db "the #DEX!",$58
 
 _VoltorbHusui2Text:
     db $0,"It's different",$4f
