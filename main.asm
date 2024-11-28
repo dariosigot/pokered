@@ -14974,7 +14974,7 @@ AskForMonNickname: ; 64eb (1:64eb)
     ld a,[$cf91]
     ld [$d11e],a
     call GetMonName
-    call InsertIVAndLoadTextCoord ; ld hl,DoYouWantToNicknameText ; $6557
+    call HidePlayerBattleHudAndStandarizePaletteBeforeRenameInBattle ; ld hl,DoYouWantToNicknameText ; $6557
     call PrintText
     FuncCoord 14,7 ; $c43a
     ld hl,Coord
@@ -18150,28 +18150,11 @@ PrintGenderInRenameScreen:
     pop bc
     ret
 
-; Generate Random only if Out Of Battle And Pkmn Is Added ToParty
 ; During Battle clear Pokemon Stat and Change Palette to avoid Yes/No bad Palette Border
-InsertIVAndLoadTextCoord:
-    ld hl,wDVForShinyAtkDef
-    ld a,[wFlagAddPkmnToPartyBit0]
-    bit 0,a
-    res 0,a
-    ld [wFlagAddPkmnToPartyBit0],a
-    jr z,.copyEnemyMonData
+HidePlayerBattleHudAndStandarizePaletteBeforeRenameInBattle:
     ld a,[W_ISINBATTLE] ; $d057
     and a
-    jr nz,.copyEnemyMonData
-    call GenRandom
-    ld [hli],a
-    call GenRandom
-    ld [hl],a
-    jr .Done
-.copyEnemyMonData
-    ld a,[W_ENEMYMONATKDEFIV]
-    ld [hli],a
-    ld a,[W_ENEMYMONSPDSPCIV]
-    ld [hl],a
+    jr z,.Done
     ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
     ld hl,HidePlayerBattleHudAndStandarizePalette
     call Bankswitch
@@ -26891,6 +26874,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld hl,W_PLAYERNAME ; $d158
     ld bc,$b
     call CopyData
+    call InsertIVDuringAddMonToParty
     ld a,[$cc49]
     and a
     jr nz,.skipNaming
@@ -26901,7 +26885,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld a,$2 ; NAME_MON_SCREEN
     ld [$d07d],a ; NamingScreenType
     ld a,$4e
-    call SetFlagAndAskForMonNickname ; call Predef ; indirect jump to AskForMonNickname (64eb (1:64eb))
+    call Predef ; indirect jump to AskForMonNickname (64eb (1:64eb))
 .skipNaming
     ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
     ld a,[$cc49]
@@ -28391,13 +28375,6 @@ ResetIVAndCheckIsInBattle:
     ld a,[W_ISINBATTLE] ; $d057
     jp ResetTempIV
 
-SetFlagAndAskForMonNickname:
-    push hl
-    ld hl,wFlagAddPkmnToPartyBit0
-    set 0,[hl]
-    pop hl
-    jp Predef ; indirect jump to AskForMonNickname (64eb (1:64eb))
-
 Func_cd99: ; xxxx (3:xxxx) ; Spostato a Fine BANK
     ld hl,$d728
     set 0,[hl]
@@ -28996,6 +28973,34 @@ GetAlternateForm:
     db SONY1,CHARIZARD,$01
 
     db $FF
+
+; Generate Random only if 
+; • Pkmn Is Added ToParty with Rename Screen (Out Of Battle)
+; • Pkmn Is Added ToParty without Rename Screen
+InsertIVDuringAddMonToParty:
+    ld hl,wDVForShinyAtkDef
+    ld a,[$cc49]
+    and a
+    jr z,.rename ; AddToPlayerPartyWithRename
+    and $0F
+    jr z,.random ; AddToPlayerPartyWithoutRename
+    ret
+.rename
+    ld a,[W_ISINBATTLE]
+    and a
+    jr nz,.copyEnemyMonData
+.random
+    call GenRandom
+    ld [hli],a
+    call GenRandom
+    ld [hl],a
+    ret
+.copyEnemyMonData
+    ld a,[W_ENEMYMONATKDEFIV]
+    ld [hli],a
+    ld a,[W_ENEMYMONSPDSPCIV]
+    ld [hl],a
+    ret
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -100396,28 +100401,30 @@ GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
     ld de,$cf2d
     ld bc,$10
     call CopyData
-;    ld a,[W_PLAYERBATTSTATUS3]
-    ld hl,W_PLAYERMONID
-    ld a,[hl]
-    call CheckShinyBackAndGetPAL ; DONE:Palette
-    push hl ; Backup backsprite palette
-;    ld a,[W_ENEMYBATTSTATUS3]
+
+    ; Get Front Palette
     ld hl,W_ENEMYMONID
     ld a,[hl]
     call CheckShinyFrontAndGetPAL ; DONE:Palette
-    ld d,h
-    ld e,l
+    push hl ; Backup frontsprite palette
+
+    ; Get Back Palette
+    ld hl,W_PLAYERMONID
+    ld a,[hl]
+    call CheckShinyBackAndGetPAL ; DONE:Palette
+    ld b,h
+    ld c,l
 
     ld hl,$cf2e
 
     ; backsprite palette
-    pop bc ; Restore backsprite palette
     ld a,c
     ld [hli],a
     ld a,b
     ld [hli],a
 
     ; frontsprite palette
+    pop de ; Restore frontsprite palette
     ld a,e
     ld [hli],a
     ld a,d

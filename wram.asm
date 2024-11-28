@@ -1817,7 +1817,6 @@ wMonIdCryAndDex        ; df37 = Mon ID used for PlayCryAndDisplayPokedex
 wTempEnemyMinMaxIV     ; df37 = Temp Min Enemy IV Value
     ds 1
 
-wFlagAddPkmnToPartyBit0     ; df38 ; bit 0
 wStatusScreen2OAMBit0       ; df38 ; bit 0 = Write OAM in Status Screen 2
 wFlagNoHpPalBit2            ; df38 ; bit 2
 wFirstExpAllMessageBit6     ; df38 ; bit 6
