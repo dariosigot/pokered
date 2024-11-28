@@ -1205,3 +1205,27 @@ _VictreebelDexEntry:
 	db "although no one",$4E
 	db "has ever returned",$4E
 	db "from there",$5F,"@"
+
+_LitwickDexEntry:
+    db 0,"Litwick shines a",$4E
+    db "light that absorbs",$4E
+    db "the life energy of",$49
+    db "people and #MON",$4E
+    db "which becomes fuel",$4E
+    db "that it burns",$5F,"@"
+
+_LampentDexEntry:
+    db 0,"This ominous",$4E
+    db "#MON is feared.",$4E
+    db "Through cities it,",$49
+    db "wanders searching",$4E
+    db "for the spirits",$4E
+    db "of the fallen",$5F,"@"
+
+_ChandelureDexEntry:
+    db 0,"It absorbs spirit",$4E
+    db "which it burns.",$4E
+    db "By waving flames,",$49
+    db "it puts its",$4E
+    db "foes into a",$4E
+    db "hypnotic trance",$5F,"@"

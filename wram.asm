@@ -805,17 +805,27 @@ W_MONHFRONTSPRITE: ; d0c3
 W_MONHBACKSPRITE: ; d0c5
     ds 2
 
-W_MONHMOVES: ; d0c7
-    ds 4
+W_MON_NEXT_ALTFORM: ; d0c7
+    ds 2
+
+W_MON_LEARNSET_POINTER: ; d0c9
+    ds 2
 
 W_MONHGROWTHRATE: ; d0cb
     ds 1
 
-W_MONHLEARNSET: ; d0cc
-; bit field
-    ds 7
+W_MONHLEARNSET_POINTER: ; d0cc
+    ds 2
 
-    ds 4
+W_MONH_PALETTE_ID: ; d0ce
+    ds 2
+
+    ds 3
+
+    ds 2
+
+wAlternateFormIndex:: db ; $d0d5
+wTempAlternateFormIndex:: db ; $d0d6
 
 W_MONHPADDING: ; d0d7
 
@@ -969,8 +979,10 @@ W_PARTYMON6NAME: ; d2ec
 
 SECTION "Pokedex", WRAMX[$d2f7], BANK[1]
 
+DEX_NUM_MON EQU 160
+
 wPokedexOwned: ; d2f7
-    ds (152 / 8)
+    ds (DEX_NUM_MON / 8)
 wPokedexOwnedEnd:
 
 ; some free bytes
@@ -1134,12 +1146,30 @@ wDVForShinyAtkDef ; d47f
 wDVForShinySpdSpc ; d480
     db
 
+UNION
+
+wTmpMonLearnset: ; d481
+    ds 7
+
+NEXTU
+
+wTradedPlayerMonIV: ; d481
+    ds 2
+wTradePlayerMonAltForm: ; d483
+    ds 1
+wTradedEnemyMonIV: ; d484
+    ds 2
+wTradeEnemyMonAltForm: ; d486
+    ds 1
+
+ENDU
+
 ; some free bytes
 
 SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]
 
 wPokedexSeen: ; d490
-    ds (152 / 8)
+    ds (DEX_NUM_MON / 8)
 wPokedexSeenEnd:
 
 SECTION "W_NUMSPRITES", WRAMX[$d4e1], BANK[1]
@@ -1264,6 +1294,7 @@ W_SSANNE9CURSCRIPT: ; d609
     ds 1
 W_ROUTE22CURSCRIPT: ; d60a
     ds 1
+W_ROUTE2HOUSECURSCRIPT: ; d60b
     ds 1
 W_REDSHOUSE2CURSCRIPT: ; d60c
     ds 1
@@ -1509,12 +1540,65 @@ wDestinationMap:: db
 
 wLastBlackoutAdventureMap:: db ; d71b
 
-    ds 23
+SECTION "wUnusedD71F",WRAMX[$d71f],BANK[$1]
 
+;joenote - used as a backup address for a stat being raised/lowered via stat mods
+    ;0 = none
+    ;1 = attack
+    ;2 = defense
+    ;3 = speed
+    ;4 = special
+    ;5 = accuracy
+    ;6 = evasion
+wBackupStatRaisedLoweredType:: db ; d71f
+
+SECTION "wUnusedD722",WRAMX[$d722],BANK[$1]
+
+UNION
+
+wTempEnemyMinMaxIVAtk:: db
+wTempEnemyMinMaxIVDef:: db
+wTempEnemyMinMaxIVSpd:: db
+wTempEnemyMinMaxIVSpc:: db
+
+NEXTU
+
+wTempExclusive:
+wTempExclusiveByte01:: db
+wTempExclusiveByte02:: db
+wTempExclusiveByte03:: db
+
+ENDU
+
+wRivalStarterIV_AtkDef:: db ; $d726
+wRivalStarterIV_SpdSpc:: db ; $d727
+
+; Some Free (see shinpokered)
+
+SECTION "W_FLAGS_D733",WRAMX[$d733],BANK[$1]
 
 W_FLAGS_D733: ; d733
 ; bit 4: use variable [W_CURMAPSCRIPT] instead of the provided index for next frame's map script (used to start battle when talking to trainers)
-    ds 340
+    ds 1
+
+SECTION "wEventFlags",WRAMX[$d747],BANK[$1]
+
+wEventFlags: ; $d747
+
+SECTION "DenimEventFlags",WRAMX[$d882],BANK[$1]
+
+wEventBeatArticunoBit2       ; d882 ; bit 2
+wEventBeatDratiniBit3        ; d882 ; bit 3
+wEventEnableOakLastPkmnBit4  ; d882 ; bit 4
+wEventBeatAerodactylBit5     ; d882 ; bit 5
+wEventEnableDojoLastPkmnBit6 ; d882 ; bit 6
+wEventEncounterMewBit7       ; d882 ; bit 7
+    ds 1
+
+wEventRouteD1Trainer0Bit1    ; d883 ; bit 1
+    ds 1
+
+SECTION "W_GRASSRATE",WRAMX[$d887],BANK[$1] 
 
 W_GRASSRATE: ; d887
     ds 1
@@ -1702,10 +1786,15 @@ SECTION "DenimFlags",WRAMX[$df35],BANK[1]
 
 wDigCaveAerodactylTrigBit0 ; df35 ; bit 0
 wPrintBattleValueBit0      ; df35 ; bit 0 = Trigger Print Battle Value
+wTownMapBeforeJoypadBit0   ; df35 ; bit 0 = Show Town Map Before Joypad Press
+wFlagFlyingMonSpriteBit0   ; df35 ; bit 0 = Force to Load Mon Sprite with $0040 offset
+wFlagAmnesiaSideEffectBit0 ; df35 ; bit 0 = Run Amnesia Side Effect
 wFlagValueToPlayerBit1     ; df35 ; bit 1 = Print Battle Value to Player
 wFlagSortMoveBit1          ; df35 ; bit 1 = Sort Moves in Moves Menu (SELECT)
+wFlagFlyingMonSpriteBit1   ; df35 ; bit 1 = Force to Load Mon Sprite with $0080 offset
 wFlagShinyBit2             ; df35 ; bit 2
-wDigCaveAerodactylBeatBit3 ; df35 ; bit 3
+wFlagFlyingMonSpriteBit2   ; df35 ; bit 2 = Force to Load Mon Sprite with $0880 offset
+wFlagBaloonSpriteBit3      ; df35 ; bit 3 = Enable Baloon Sprite durint Trade
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
 wFlagBackFrontSpriteBit56  ; df35 ; bit 5
                            ; df35 ; bit 6
@@ -1726,15 +1815,11 @@ wBackupDarkMap         ; df37
 wTempStatLO            ; df37
 wFieldMoveMonID        ; df37 = Mon ID used for Cry
 wMonIdCryAndDex        ; df37 = Mon ID used for PlayCryAndDisplayPokedex
+wTempEnemyMinMaxIV     ; df37 = Temp Min Enemy IV Value
     ds 1
 
-wFlagAddPkmnToPartyBit0     ; df38 ; bit 0
 wStatusScreen2OAMBit0       ; df38 ; bit 0 = Write OAM in Status Screen 2
-wFlagDratiniCaveBit1        ; df38 ; bit 1
 wFlagNoHpPalBit2            ; df38 ; bit 2
-wFlagEnableOakLastPkmnBit3  ; df38 ; bit 3
-wFlagEnableDojoLastPkmnBit4 ; df38 ; bit 4
-wMewEventBit5               ; df38 ; bit 5
 wFirstExpAllMessageBit6     ; df38 ; bit 6
 wSelectInOverworldOnBit6    ; df38 ; bit 6
 wStatusScreenJustLoadBit6   ; df38 ; bit 6 = Status Screen Picture Just Load

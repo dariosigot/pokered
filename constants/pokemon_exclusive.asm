@@ -1,6 +1,6 @@
 ; ──────────────────────────────────────────────────────────────────────
 MissingNoExclusiveMove:
-    db 0
+    db 0 ; TODO
 ; ──────────────────────────────────────────────────────────────────────
 BulbasaurExclusiveMove:
 IvysaurExclusiveMove:
@@ -177,7 +177,6 @@ PidgeotExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
-    db TACKLE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RattataExclusiveMove:
@@ -277,7 +276,6 @@ RaichuExclusiveMove:
     db SUBSTITUTE ; TM50
     db QUICK_ATTACK
     db AGILITY
-    db LOVELY_KISS
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SandshrewExclusiveMove:
@@ -412,6 +410,7 @@ NinetalesExclusiveMove:
     db SUBSTITUTE ; TM50
     db EMBER
     db QUICK_ATTACK
+    db AGILITY
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ZubatExclusiveMove:
@@ -431,8 +430,8 @@ GolbatExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
-    db LICK
     db ABSORB
+    db LICK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OddishExclusiveMove:
@@ -460,7 +459,6 @@ VictreebelExclusiveMove:
     db ABSORB
     db LEECH_LIFE
     db LEECH_SEED
-    db VINE_WHIP
     db RAZOR_LEAF
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -483,7 +481,6 @@ ParasectExclusiveMove:
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
-    db CONFUSION
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VenonatExclusiveMove:
@@ -508,7 +505,6 @@ VenomothExclusiveMove:
     db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
     db FLASH ; TM55
-    db STRING_SHOT
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DiglettExclusiveMove:
@@ -588,7 +584,6 @@ GolduckExclusiveMove:
     db BLADE ; TM51
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db AMNESIA
     db GLARE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -647,6 +642,7 @@ ArcanineExclusiveMove:
     db SUBSTITUTE ; TM50
     db EMBER
     db AGILITY
+    db QUICK_ATTACK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PoliwagExclusiveMove:
@@ -682,7 +678,6 @@ PoliwrathExclusiveMove:
     db TSUNAMI ; TM53
     db STRIKE ; TM54
     db AMNESIA
-    db CONFUSION
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 AbraExclusiveMove:
@@ -854,15 +849,16 @@ SlowbroExclusiveMove:
     db TSUNAMI ; TM53
     db STRIKE ; TM54
     db FLASH ; TM55
-    db AMNESIA
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MagnemiteExclusiveMove:
 MagnetonExclusiveMove:
 VoltorbExclusiveMove:
 ElectrodeExclusiveMove:
+    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db HYPER_BEAM ; TM15
+    db MEGA_DRAIN ; TM21
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
     db THUNDER ; TM25
@@ -1397,7 +1393,6 @@ SeakingExclusiveMove:
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
-    db AGILITY
     db LOVELY_KISS
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -2002,5 +1997,31 @@ MewtwoExclusiveMove:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewExclusiveMove:
+    db 0
+; ──────────────────────────────────────────────────────────────────────
+LitwickExclusiveMove:
+LampentExclusiveMove:
+ChandelureExclusiveMove:
+    db TOXIC ; TM06
+    db HYPER_BEAM ; TM15
+    db SOLARBEAM ; TM22
+    db PSYCHIC_M ; TM29
+    db TELEPORT ; TM30
+    db MIMIC ; TM31
+    db DOUBLE_TEAM ; TM32
+    db REFLECT ; TM33
+    db BIDE ; TM34
+    db METRONOME ; TM35
+    db SELFDESTRUCT ; TM36
+    db FLAMETHROWER ; TM37
+    db FIRE_BLAST ; TM38
+    db LIGHT_SCREEN ; TM41
+    db DREAM_EATER ; TM42
+    db REST ; TM44
+    db PSYWAVE ; TM46
+    db EXPLOSION ; TM47
+    db SUBSTITUTE ; TM50
+    db FLASH ; TM55
+    db ACID_ARMOR
     db 0
 ; ──────────────────────────────────────────────────────────────────────

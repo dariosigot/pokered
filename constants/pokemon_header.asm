@@ -1,22 +1,34 @@
 MissingNoBaseStats:
-	db 0              ; pokedex id
-	db 33,MUK,0       ; Hp, Attack, Defense
-	db 29,VOLTORB     ; Speed, Special
-	db TYPE_NA,TYPE_NA ; db VOLTORB,0      ; Bird/Normal
-	db 29,WEEZING,MUK ; CatchRate, BaseExpYield, Sprite Dimension
-	
-	dw MissingNoPicFront, MissingNoPicBack ;	db 0,25,KOFFING,WEEZING
+    db 0              ; mon id
+    db 33,MUK,0       ; Hp, Attack, Defense
+    db 29,VOLTORB     ; Speed, Special
+    db TYPE_NA,TYPE_NA ; db VOLTORB,0      ; Bird/Normal
+    db 29,WEEZING,MUK ; CatchRate, BaseExpYield, Sprite Dimension
+    
+    dw MissingNoPicFront, MissingNoPicBack ;    db 0,25,KOFFING,WEEZING
 
-	dw 0,0 ; db KOFFING,KOFFING,WEEZING,0 ; attacks known at lvl 0: WATER_GUN, WATER_GUN, SKY_ATTACK
-	db 26 ; growth rate
+    ;dw 0,0 ; db KOFFING,KOFFING,WEEZING,0 ; attacks known at lvl 0: WATER_GUN, WATER_GUN, SKY_ATTACK
 
-	db KOFFING,KOFFING,GRIMER,KOFFING,0 ; learnset
-	db 28,GRIMER                        ; learnset
+    ; pointer to alternate forms
+    dw 0
 
-	db BANK(MissingNoPicFront) ;	db GRIMER
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
 
-BulbasaurBaseStats: ; 383de (e:43de)
-    db DEX_BULBASAUR ; pokedex id
+    db 26 ; growth rate
+
+    ; learnset
+    dw MissingNoTMCompatibility
+
+    ; palette
+    dw PAL_MISSINGNO
+
+    ds 3
+
+    db BANK(MissingNoPicFront) ;    db GRIMER
+
+BulbasaurBaseStats:
+    db BULBASAUR ; mon id
     db 45 ; base hp
     db 49 ; base attack
     db 49 ; base defense
@@ -33,27 +45,26 @@ BulbasaurBaseStats: ; 383de (e:43de)
     dw BulbasaurPicFront
     dw BulbasaurPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw BulbasaurStarterBaseStats
+
+    ; pointer to evomoves
+    dw Bulbasaur_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 02,03,06                ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
-    tmlearn 0
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw BulbasaurTMCompatibility
+
+    ; palette
+    dw PAL_BULBASAUR
+
+    ds 3
 
     db BANK(BulbasaurPicFront)
 
-IvysaurBaseStats: ; 383fa (e:43fa)
-    db DEX_IVYSAUR ; pokedex id
+IvysaurBaseStats:
+    db IVYSAUR ; mon id
     db 60 ; base hp
     db 62 ; base attack
     db 63 ; base defense
@@ -70,27 +81,26 @@ IvysaurBaseStats: ; 383fa (e:43fa)
     dw IvysaurPicFront
     dw IvysaurPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw IvysaurStarterBaseStats
+
+    ; pointer to evomoves
+    dw Ivysaur_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 02,03,06,08             ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw IvysaurTMCompatibility
+
+    ; palette
+    dw PAL_IVYSAUR
+
+    ds 3
 
     db BANK(IvysaurPicFront)
 
-VenusaurBaseStats: ; 38416 (e:4416)
-    db DEX_VENUSAUR ; pokedex id
+VenusaurBaseStats:
+    db VENUSAUR ; mon id
     db 80 ; base hp
     db 82 ; base attack
     db 83 ; base defense
@@ -107,27 +117,26 @@ VenusaurBaseStats: ; 38416 (e:4416)
     dw VenusaurPicFront
     dw VenusaurPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw VenusaurStarterBaseStats
+
+    ; pointer to evomoves
+    dw Venusaur_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 02,03,06,08             ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 26,27,31                ; |EARTHQUAKE|FISSURE|MIMIC|
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 41,44,48                ; |LIGHT_SCREEN|REST|ROCK_SLIDE|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw VenusaurTMCompatibility
+
+    ; palette
+    dw PAL_VENUSAUR
+
+    ds 3
 
     db BANK(VenusaurPicFront)
 
-CharmanderBaseStats: ; 38432 (e:4432)
-    db DEX_CHARMANDER ; pokedex id
+CharmanderBaseStats:
+    db CHARMANDER ; mon id
     db 39 ; base hp
     db 52 ; base attack
     db 43 ; base defense
@@ -144,27 +153,26 @@ CharmanderBaseStats: ; 38432 (e:4432)
     dw CharmanderPicFront
     dw CharmanderPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw CharmanderStarterBaseStats
+
+    ; pointer to evomoves
+    dw Charmander_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,03                   ; |MEGA_PUNCH|SWORDS_DANCE|
-    tmlearn 0
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
+    dw CharmanderTMCompatibility
+
+    ; palette
+    dw PAL_CHARMANDER
+
+    ds 3
 
     db BANK(CharmanderPicFront)
 
-CharmeleonBaseStats: ; 3844e (e:444e)
-    db DEX_CHARMELEON ; pokedex id
+CharmeleonBaseStats:
+    db CHARMELEON ; mon id
     db 58 ; base hp
     db 64 ; base attack
     db 58 ; base defense
@@ -181,27 +189,26 @@ CharmeleonBaseStats: ; 3844e (e:444e)
     dw CharmeleonPicFront
     dw CharmeleonPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw CharmeleonStarterBaseStats
+
+    ; pointer to evomoves
+    dw Charmeleon_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,03,05                ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 19,23                   ; |SEISMIC_TOSS|DRAGON_RAGE|
-    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
+    dw CharmeleonTMCompatibility
+
+    ; palette
+    dw PAL_CHARMELEON
+
+    ds 3
 
     db BANK(CharmeleonPicFront)
 
-CharizardBaseStats: ; 3846a (e:446a)
-    db DEX_CHARIZARD ; pokedex id
+CharizardBaseStats:
+    db CHARIZARD ; mon id
     db 78 ; base hp
     db 84 ; base attack
     db 78 ; base defense
@@ -218,27 +225,26 @@ CharizardBaseStats: ; 3846a (e:446a)
     dw CharizardPicFront
     dw CharizardPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw CharizardStarterBaseStats
+
+    ; pointer to evomoves
+    dw Charizard_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,02,03,05,08          ; |MEGA_PUNCH|RAZOR_WIND|SWORDS_DANCE|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19,22,23          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|DRAGON_RAGE|
-    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,43,44,48             ; |LIGHT_SCREEN|SKY_ATTACK|REST|ROCK_SLIDE|
-    tmlearn 50,51,52,54             ; |SUBSTITUTE|BLADE|SWOOP|STRIKE|
+    dw CharizardTMCompatibility
+
+    ; palette
+    dw PAL_CHARIZARD
+
+    ds 3
 
     db BANK(CharizardPicFront)
 
-SquirtleBaseStats: ; 38486 (e:4486)
-    db DEX_SQUIRTLE ; pokedex id
+SquirtleBaseStats:
+    db SQUIRTLE ; mon id
     db 44 ; base hp
     db 48 ; base attack
     db 65 ; base defense
@@ -255,27 +261,26 @@ SquirtleBaseStats: ; 38486 (e:4486)
     dw SquirtlePicFront
     dw SquirtlePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw SquirtleStarterBaseStats
+
+    ; pointer to evomoves
+    dw Squirtle_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01                      ; |MEGA_PUNCH|
-    tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 0
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw SquirtleTMCompatibility
+
+    ; palette
+    dw PAL_SQUIRTLE
+
+    ds 3
 
     db BANK(SquirtlePicFront)
 
-WartortleBaseStats: ; 384a2 (e:44a2)
-    db DEX_WARTORTLE ; pokedex id
+WartortleBaseStats:
+    db WARTORTLE ; mon id
     db 59 ; base hp
     db 63 ; base attack
     db 80 ; base defense
@@ -292,27 +297,26 @@ WartortleBaseStats: ; 384a2 (e:44a2)
     dw WartortlePicFront
     dw WartortlePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw WartortleStarterBaseStats
+
+    ; pointer to evomoves
+    dw Wartortle_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,11,12,13,14          ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|
-    tmlearn 19                      ; |SEISMIC_TOSS|
-    tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw WartortleTMCompatibility
+
+    ; palette
+    dw PAL_WARTORTLE
+
+    ds 3
 
     db BANK(WartortlePicFront)
 
-BlastoiseBaseStats: ; 384be (e:44be)
-    db DEX_BLASTOISE ; pokedex id
+BlastoiseBaseStats:
+    db BLASTOISE ; mon id
     db 79 ; base hp
     db 83 ; base attack
     db 100 ; base defense
@@ -329,27 +333,26 @@ BlastoiseBaseStats: ; 384be (e:44be)
     dw BlastoisePicFront
     dw BlastoisePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw BlastoiseStarterBaseStats
+
+    ; pointer to evomoves
+    dw Blastoise_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 41,44,48                ; |LIGHT_SCREEN|REST|ROCK_SLIDE|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw BlastoiseTMCompatibility
+
+    ; palette
+    dw PAL_BLASTOISE
+
+    ds 3
 
     db BANK(BlastoisePicFront)
 
-CaterpieBaseStats: ; 384da (e:44da)
-    db DEX_CATERPIE ; pokedex id
+CaterpieBaseStats:
+    db CATERPIE ; mon id
     db 45 ; base hp
     db 30 ; base attack
     db 35 ; base defense
@@ -366,27 +369,26 @@ CaterpieBaseStats: ; 384da (e:44da)
     dw CaterpiePicFront
     dw CaterpiePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Caterpie_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw CaterpieTMCompatibility
+
+    ; palette
+    dw PAL_CATERPIE
+
+    ds 3
 
     db BANK(CaterpiePicFront)
 
-MetapodBaseStats: ; 384f6 (e:44f6)
-    db DEX_METAPOD ; pokedex id
+MetapodBaseStats:
+    db METAPOD ; mon id
     db 50 ; base hp
     db 20 ; base attack
     db 55 ; base defense
@@ -403,27 +405,26 @@ MetapodBaseStats: ; 384f6 (e:44f6)
     dw MetapodPicFront
     dw MetapodPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Metapod_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw MetapodTMCompatibility
+
+    ; palette
+    dw PAL_METAPOD
+
+    ds 3
 
     db BANK(MetapodPicFront)
 
-ButterfreeBaseStats: ; 38512 (e:4512)
-    db DEX_BUTTERFREE ; pokedex id
+ButterfreeBaseStats:
+    db BUTTERFREE ; mon id
     db 60 ; base hp
     db 45 ; base attack
     db 50 ; base defense
@@ -440,27 +441,26 @@ ButterfreeBaseStats: ; 38512 (e:4512)
     dw ButterfreePicFront
     dw ButterfreePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Butterfree_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 15                      ; |HYPER_BEAM|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 41,42,43,44,46          ; |LIGHT_SCREEN|DREAM_EATER|SKY_ATTACK|REST|PSYWAVE|
-    tmlearn 50,52,55                ; |SUBSTITUTE|SWOOP|FLASH|
+    dw ButterfreeTMCompatibility
+
+    ; palette
+    dw PAL_BUTTERFREE
+
+    ds 3
 
     db BANK(ButterfreePicFront)
 
-WeedleBaseStats: ; 3852e (e:452e)
-    db DEX_WEEDLE ; pokedex id
+WeedleBaseStats:
+    db WEEDLE ; mon id
     db 40 ; base hp
     db 35 ; base attack
     db 30 ; base defense
@@ -477,27 +477,26 @@ WeedleBaseStats: ; 3852e (e:452e)
     dw WeedlePicFront
     dw WeedlePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Weedle_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw WeedleTMCompatibility
+
+    ; palette
+    dw PAL_WEEDLE
+
+    ds 3
 
     db BANK(WeedlePicFront)
 
-KakunaBaseStats: ; 3854a (e:454a)
-    db DEX_KAKUNA ; pokedex id
+KakunaBaseStats:
+    db KAKUNA ; mon id
     db 45 ; base hp
     db 25 ; base attack
     db 50 ; base defense
@@ -514,27 +513,26 @@ KakunaBaseStats: ; 3854a (e:454a)
     dw KakunaPicFront
     dw KakunaPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Kakuna_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw KakunaTMCompatibility
+
+    ; palette
+    dw PAL_KAKUNA
+
+    ds 3
 
     db BANK(KakunaPicFront)
 
-BeedrillBaseStats: ; 38566 (e:4566)
-    db DEX_BEEDRILL ; pokedex id
+BeedrillBaseStats:
+    db BEEDRILL ; mon id
     db 65 ; base hp
     db 80 ; base attack
     db 40 ; base defense
@@ -551,27 +549,26 @@ BeedrillBaseStats: ; 38566 (e:4566)
     dw BeedrillPicFront
     dw BeedrillPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Beedrill_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,03,06                ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
-    tmlearn 43,44                   ; |SKY_ATTACK|REST|
-    tmlearn 50,51,52                ; |SUBSTITUTE|BLADE|SWOOP|
+    dw BeedrillTMCompatibility
+
+    ; palette
+    dw PAL_BEEDRILL
+
+    ds 3
 
     db BANK(BeedrillPicFront)
 
-PidgeyBaseStats: ; 38582 (e:4582)
-    db DEX_PIDGEY ; pokedex id
+PidgeyBaseStats:
+    db PIDGEY ; mon id
     db 40 ; base hp
     db 45 ; base attack
     db 40 ; base defense
@@ -588,27 +585,26 @@ PidgeyBaseStats: ; 38582 (e:4582)
     dw PidgeyPicFront
     dw PidgeyPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Pidgey_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
-    tmlearn 0
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 43,44                   ; |SKY_ATTACK|REST|
-    tmlearn 50,52                   ; |SUBSTITUTE|SWOOP|
+    dw PidgeyTMCompatibility
+
+    ; palette
+    dw PAL_PIDGEY
+
+    ds 3
 
     db BANK(PidgeyPicFront)
 
-PidgeottoBaseStats: ; 3859e (e:459e)
-    db DEX_PIDGEOTTO ; pokedex id
+PidgeottoBaseStats:
+    db PIDGEOTTO ; mon id
     db 63 ; base hp
     db 60 ; base attack
     db 55 ; base defense
@@ -625,27 +621,26 @@ PidgeottoBaseStats: ; 3859e (e:459e)
     dw PidgeottoPicFront
     dw PidgeottoPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Pidgeotto_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 43,44                   ; |SKY_ATTACK|REST|
-    tmlearn 50,51,52                ; |SUBSTITUTE|BLADE|SWOOP|
+    dw PidgeottoTMCompatibility
+
+    ; palette
+    dw PAL_PIDGEOTTO
+
+    ds 3
 
     db BANK(PidgeottoPicFront)
 
-PidgeotBaseStats: ; 385ba (e:45ba)
-    db DEX_PIDGEOT ; pokedex id
+PidgeotBaseStats:
+    db PIDGEOT ; mon id
     db 83 ; base hp
     db 80 ; base attack
     db 75 ; base defense
@@ -662,27 +657,26 @@ PidgeotBaseStats: ; 385ba (e:45ba)
     dw PidgeotPicFront
     dw PidgeotPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Pidgeot_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 43,44                   ; |SKY_ATTACK|REST|
-    tmlearn 50,51,52                ; |SUBSTITUTE|BLADE|SWOOP|
+    dw PidgeotTMCompatibility
+
+    ; palette
+    dw PAL_PIDGEOT
+
+    ds 3
 
     db BANK(PidgeotPicFront)
 
-RattataBaseStats: ; 385d6 (e:45d6)
-    db DEX_RATTATA ; pokedex id
+RattataBaseStats:
+    db RATTATA ; mon id
     db 30 ; base hp
     db 56 ; base attack
     db 35 ; base defense
@@ -699,27 +693,26 @@ RattataBaseStats: ; 385d6 (e:45d6)
     dw RattataPicFront
     dw RattataPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Rattata_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw RattataTMCompatibility
+
+    ; palette
+    dw PAL_RATTATA
+
+    ds 3
 
     db BANK(RattataPicFront)
 
-RaticateBaseStats: ; 385f2 (e:45f2)
-    db DEX_RATICATE ; pokedex id
+RaticateBaseStats:
+    db RATICATE ; mon id
     db 55 ; base hp
     db 81 ; base attack
     db 60 ; base defense
@@ -736,27 +729,26 @@ RaticateBaseStats: ; 385f2 (e:45f2)
     dw RaticatePicFront
     dw RaticatePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Raticate_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,08                   ; |SWORDS_DANCE|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 18,24                   ; |COUNTER|THUNDERBOLT|
-    tmlearn 25,26,28,31,32          ; |THUNDER|EARTHQUAKE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44,45                   ; |REST|THUNDER_WAVE|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw RaticateTMCompatibility
+
+    ; palette
+    dw PAL_RATICATE
+
+    ds 3
 
     db BANK(RaticatePicFront)
 
-SpearowBaseStats: ; 3860e (e:460e)
-    db DEX_SPEAROW ; pokedex id
+SpearowBaseStats:
+    db SPEAROW ; mon id
     db 40 ; base hp
     db 60 ; base attack
     db 30 ; base defense
@@ -773,27 +765,26 @@ SpearowBaseStats: ; 3860e (e:460e)
     dw SpearowPicFront
     dw SpearowPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Spearow_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39                   ; |BIDE|SWIFT|
-    tmlearn 43,44                   ; |SKY_ATTACK|REST|
-    tmlearn 49,50,52                ; |TRI_ATTACK|SUBSTITUTE|SWOOP|
+    dw SpearowTMCompatibility
+
+    ; palette
+    dw PAL_SPEAROW
+
+    ds 3
 
     db BANK(SpearowPicFront)
 
-FearowBaseStats: ; 3862a (e:462a)
-    db DEX_FEAROW ; pokedex id
+FearowBaseStats:
+    db FEAROW ; mon id
     db 65 ; base hp
     db 90 ; base attack
     db 65 ; base defense
@@ -810,27 +801,26 @@ FearowBaseStats: ; 3862a (e:462a)
     dw FearowPicFront
     dw FearowPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Fearow_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39                   ; |BIDE|SWIFT|
-    tmlearn 43,44                   ; |SKY_ATTACK|REST|
-    tmlearn 49,50,51,52             ; |TRI_ATTACK|SUBSTITUTE|BLADE|SWOOP|
+    dw FearowTMCompatibility
+
+    ; palette
+    dw PAL_FEAROW
+
+    ds 3
 
     db BANK(FearowPicFront)
 
-EkansBaseStats: ; 38646 (e:4646)
-    db DEX_EKANS ; pokedex id
+EkansBaseStats:
+    db EKANS ; mon id
     db 35 ; base hp
     db 60 ; base attack
     db 44 ; base defense
@@ -847,27 +837,26 @@ EkansBaseStats: ; 38646 (e:4646)
     dw EkansPicFront
     dw EkansPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Ekans_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 21                      ; |MEGA_DRAIN|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,40                   ; |BIDE|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw EkansTMCompatibility
+
+    ; palette
+    dw PAL_EKANS
+
+    ds 3
 
     db BANK(EkansPicFront)
 
-ArbokBaseStats: ; 38662 (e:4662)
-    db DEX_ARBOK ; pokedex id
+ArbokBaseStats:
+    db ARBOK ; mon id
     db 60 ; base hp
     db 85 ; base attack
     db 69 ; base defense
@@ -884,27 +873,26 @@ ArbokBaseStats: ; 38662 (e:4662)
     dw ArbokPicFront
     dw ArbokPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Arbok_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 21                      ; |MEGA_DRAIN|
-    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,40                   ; |BIDE|SKULL_BASH|
-    tmlearn 41,44,48                ; |LIGHT_SCREEN|REST|ROCK_SLIDE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw ArbokTMCompatibility
+
+    ; palette
+    dw PAL_ARBOK
+
+    ds 3
 
     db BANK(ArbokPicFront)
 
-PikachuBaseStats: ; 3867e (e:467e)
-    db DEX_PIKACHU ; pokedex id
+PikachuBaseStats:
+    db PIKACHU ; mon id
     db 35 ; base hp
     db 55 ; base attack
     db 30 ; base defense
@@ -921,27 +909,26 @@ PikachuBaseStats: ; 3867e (e:467e)
     dw PikachuPicFront
     dw PikachuPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Pikachu_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01                      ; |MEGA_PUNCH|
-    tmlearn 16                      ; |PAY_DAY|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
-    tmlearn 41,44,45                ; |LIGHT_SCREEN|REST|THUNDER_WAVE|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    dw PikachuTMCompatibility
+
+    ; palette
+    dw PAL_PIKACHU
+
+    ds 3
 
     db BANK(PikachuPicFront)
 
-RaichuBaseStats: ; 3869a (e:469a)
-    db DEX_RAICHU ; pokedex id
+RaichuBaseStats:
+    db RAICHU ; mon id
     db 60 ; base hp
     db 90 ; base attack
     db 55 ; base defense
@@ -958,27 +945,26 @@ RaichuBaseStats: ; 3869a (e:469a)
     dw RaichuPicFront
     dw RaichuPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Raichu_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,19,24                ; |SUBMISSION|SEISMIC_TOSS|THUNDERBOLT|
-    tmlearn 25,28,31                ; |THUNDER|TRAPHOLE|MIMIC|
-    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
-    tmlearn 41,44,45                ; |LIGHT_SCREEN|REST|THUNDER_WAVE|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    dw RaichuTMCompatibility
+
+    ; palette
+    dw PAL_RAICHU
+
+    ds 3
 
     db BANK(RaichuPicFront)
 
-SandshrewBaseStats: ; 386b6 (e:46b6)
-    db DEX_SANDSHREW ; pokedex id
+SandshrewBaseStats:
+    db SANDSHREW ; mon id
     db 50 ; base hp
     db 75 ; base attack
     db 85 ; base defense
@@ -995,27 +981,26 @@ SandshrewBaseStats: ; 386b6 (e:46b6)
     dw SandshrewPicFront
     dw SandshrewPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Sandshrew_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 0
-    tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
+    dw SandshrewTMCompatibility
+
+    ; palette
+    dw PAL_SANDSHREW
+
+    ds 3
 
     db BANK(SandshrewPicFront)
 
-SandslashBaseStats: ; 386d2 (e:46d2)
-    db DEX_SANDSLASH ; pokedex id
+SandslashBaseStats:
+    db SANDSLASH ; mon id
     db 75 ; base hp
     db 100 ; base attack
     db 110 ; base defense
@@ -1032,27 +1017,26 @@ SandslashBaseStats: ; 386d2 (e:46d2)
     dw SandslashPicFront
     dw SandslashPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Sandslash_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
+    dw SandslashTMCompatibility
+
+    ; palette
+    dw PAL_SANDSLASH
+
+    ds 3
 
     db BANK(SandslashPicFront)
 
-NidoranFBaseStats: ; 386ee (e:46ee)
-    db DEX_NIDORAN_F ; pokedex id
+NidoranFBaseStats:
+    db NIDORAN_F ; mon id
     db 55 ; base hp
     db 47 ; base attack
     db 52 ; base defense
@@ -1069,27 +1053,26 @@ NidoranFBaseStats: ; 386ee (e:46ee)
     dw NidoranFPicFront
     dw NidoranFPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw NidoranF_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 0
-    tmlearn 0
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw NidoranFTMCompatibility
+
+    ; palette
+    dw PAL_NIDORAN_F
+
+    ds 3
 
     db BANK(NidoranFPicFront)
 
-NidorinaBaseStats: ; 3870a (e:470a)
-    db DEX_NIDORINA ; pokedex id
+NidorinaBaseStats:
+    db NIDORINA ; mon id
     db 70 ; base hp
     db 62 ; base attack
     db 67 ; base defense
@@ -1106,27 +1089,26 @@ NidorinaBaseStats: ; 3870a (e:470a)
     dw NidorinaPicFront
     dw NidorinaPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Nidorina_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
-    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
-    tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw NidorinaTMCompatibility
+
+    ; palette
+    dw PAL_NIDORINA
+
+    ds 3
 
     db BANK(NidorinaPicFront)
 
-NidoqueenBaseStats: ; 38726 (e:4726)
-    db DEX_NIDOQUEEN ; pokedex id
+NidoqueenBaseStats:
+    db NIDOQUEEN ; mon id
     db 90 ; base hp
     db 82 ; base attack
     db 87 ; base defense
@@ -1143,27 +1125,26 @@ NidoqueenBaseStats: ; 38726 (e:4726)
     dw NidoqueenPicFront
     dw NidoqueenPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Nidoqueen_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,05,06,07,08          ; |MEGA_PUNCH|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
-    tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,51,53,54             ; |SUBSTITUTE|BLADE|TSUNAMI|STRIKE|
+    dw NidoqueenTMCompatibility
+
+    ; palette
+    dw PAL_NIDOQUEEN
+
+    ds 3
 
     db BANK(NidoqueenPicFront)
 
-NidoranMBaseStats: ; 38742 (e:4742)
-    db DEX_NIDORAN_M ; pokedex id
+NidoranMBaseStats:
+    db NIDORAN_M ; mon id
     db 46 ; base hp
     db 57 ; base attack
     db 40 ; base defense
@@ -1180,27 +1161,26 @@ NidoranMBaseStats: ; 38742 (e:4742)
     dw NidoranMPicFront
     dw NidoranMPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw NidoranM_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 06,07                   ; |TOXIC|HORN_DRILL|
-    tmlearn 0
-    tmlearn 0
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw NidoranMTMCompatibility
+
+    ; palette
+    dw PAL_NIDORAN_M
+
+    ds 3
 
     db BANK(NidoranMPicFront)
 
-NidorinoBaseStats: ; 3875e (e:475e)
-    db DEX_NIDORINO ; pokedex id
+NidorinoBaseStats:
+    db NIDORINO ; mon id
     db 61 ; base hp
     db 72 ; base attack
     db 57 ; base defense
@@ -1217,27 +1197,26 @@ NidorinoBaseStats: ; 3875e (e:475e)
     dw NidorinoPicFront
     dw NidorinoPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Nidorino_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
-    tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw NidorinoTMCompatibility
+
+    ; palette
+    dw PAL_NIDORINO
+
+    ds 3
 
     db BANK(NidorinoPicFront)
 
-NidokingBaseStats: ; 3877a (e:477a)
-    db DEX_NIDOKING ; pokedex id
+NidokingBaseStats:
+    db NIDOKING ; mon id
     db 81 ; base hp
     db 92 ; base attack
     db 77 ; base defense
@@ -1254,27 +1233,26 @@ NidokingBaseStats: ; 3877a (e:477a)
     dw NidokingPicFront
     dw NidokingPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Nidoking_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,05,06,07,08          ; |MEGA_PUNCH|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
-    tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,51,53,54             ; |SUBSTITUTE|BLADE|TSUNAMI|STRIKE|
+    dw NidokingTMCompatibility
+
+    ; palette
+    dw PAL_NIDOKING
+
+    ds 3
 
     db BANK(NidokingPicFront)
 
-ClefairyBaseStats: ; 38796 (e:4796)
-    db DEX_CLEFAIRY ; pokedex id
+ClefairyBaseStats:
+    db CLEFAIRY ; mon id
     db 70 ; base hp
     db 45 ; base attack
     db 48 ; base defense
@@ -1291,27 +1269,26 @@ ClefairyBaseStats: ; 38796 (e:4796)
     dw ClefairyPicFront
     dw ClefairyPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Clefairy_EvosMoves
 
     db 4 ; growth rate
 
     ; learnset
-    tmlearn 01,08                   ; |MEGA_PUNCH|BODY_SLAM|
-    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,35,37,39,40       ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,54,55             ; |TRI_ATTACK|SUBSTITUTE|STRIKE|FLASH|
+    dw ClefairyTMCompatibility
+
+    ; palette
+    dw PAL_CLEFAIRY
+
+    ds 3
 
     db BANK(ClefairyPicFront)
 
-ClefableBaseStats: ; 387b2 (e:47b2)
-    db DEX_CLEFABLE ; pokedex id
+ClefableBaseStats:
+    db CLEFABLE ; mon id
     db 95 ; base hp
     db 70 ; base attack
     db 73 ; base defense
@@ -1328,27 +1305,26 @@ ClefableBaseStats: ; 387b2 (e:47b2)
     dw ClefablePicFront
     dw ClefablePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Clefable_EvosMoves
 
     db 4 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,29,31                ; |THUNDER|PSYCHIC_M|MIMIC|
-    tmlearn 33,34,35,37,38,39,40    ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,54,55             ; |TRI_ATTACK|SUBSTITUTE|STRIKE|FLASH|
+    dw ClefableTMCompatibility
+
+    ; palette
+    dw PAL_CLEFABLE
+
+    ds 3
 
     db BANK(ClefablePicFront)
 
-VulpixBaseStats: ; 387ce (e:47ce)
-    db DEX_VULPIX ; pokedex id
+VulpixBaseStats:
+    db VULPIX ; mon id
     db 38 ; base hp
     db 41 ; base attack
     db 40 ; base defense
@@ -1365,27 +1341,26 @@ VulpixBaseStats: ; 387ce (e:47ce)
     dw VulpixPicFront
     dw VulpixPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Vulpix_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw VulpixTMCompatibility
+
+    ; palette
+    dw PAL_VULPIX
+
+    ds 3
 
     db BANK(VulpixPicFront)
 
-NinetalesBaseStats: ; 387ea (e:47ea)
-    db DEX_NINETALES ; pokedex id
+NinetalesBaseStats:
+    db NINETALES ; mon id
     db 73 ; base hp
     db 76 ; base attack
     db 75 ; base defense
@@ -1402,27 +1377,26 @@ NinetalesBaseStats: ; 387ea (e:47ea)
     dw NinetalesPicFront
     dw NinetalesPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Ninetales_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 22                      ; |SOLARBEAM|
-    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44                ; |LIGHT_SCREEN|DREAM_EATER|REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw NinetalesTMCompatibility
+
+    ; palette
+    dw PAL_NINETALES
+
+    ds 3
 
     db BANK(NinetalesPicFront)
 
-JigglypuffBaseStats: ; 38806 (e:4806)
-    db DEX_JIGGLYPUFF ; pokedex id
+JigglypuffBaseStats:
+    db JIGGLYPUFF ; mon id
     db 115 ; base hp
     db 45 ; base attack
     db 20 ; base defense
@@ -1439,27 +1413,26 @@ JigglypuffBaseStats: ; 38806 (e:4806)
     dw JigglypuffPicFront
     dw JigglypuffPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Jigglypuff_EvosMoves
 
     db 4 ; growth rate
 
     ; learnset
-    tmlearn 01,08                   ; |MEGA_PUNCH|BODY_SLAM|
-    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,35,37,39,40       ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,54,55             ; |TRI_ATTACK|SUBSTITUTE|STRIKE|FLASH|
+    dw JigglypuffTMCompatibility
+
+    ; palette
+    dw PAL_JIGGLYPUFF
+
+    ds 3
 
     db BANK(JigglypuffPicFront)
 
-WigglytuffBaseStats: ; 38822 (e:4822)
-    db DEX_WIGGLYTUFF ; pokedex id
+WigglytuffBaseStats:
+    db WIGGLYTUFF ; mon id
     db 140 ; base hp
     db 70 ; base attack
     db 45 ; base defense
@@ -1476,27 +1449,26 @@ WigglytuffBaseStats: ; 38822 (e:4822)
     dw WigglytuffPicFront
     dw WigglytuffPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Wigglytuff_EvosMoves
 
     db 4 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,29,31                ; |THUNDER|PSYCHIC_M|MIMIC|
-    tmlearn 33,34,35,37,38,39,40    ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,54,55             ; |TRI_ATTACK|SUBSTITUTE|STRIKE|FLASH|
+    dw WigglytuffTMCompatibility
+
+    ; palette
+    dw PAL_WIGGLYTUFF
+
+    ds 3
 
     db BANK(WigglytuffPicFront)
 
-ZubatBaseStats: ; 3883e (e:483e)
-    db DEX_ZUBAT ; pokedex id
+ZubatBaseStats:
+    db ZUBAT ; mon id
     db 40 ; base hp
     db 45 ; base attack
     db 35 ; base defense
@@ -1513,27 +1485,26 @@ ZubatBaseStats: ; 3883e (e:483e)
     dw ZubatPicFront
     dw ZubatPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Zubat_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 0
-    tmlearn 21                      ; |MEGA_DRAIN|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39                   ; |BIDE|SWIFT|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw ZubatTMCompatibility
+
+    ; palette
+    dw PAL_ZUBAT
+
+    ds 3
 
     db BANK(ZubatPicFront)
 
-GolbatBaseStats: ; 3885a (e:485a)
-    db DEX_GOLBAT ; pokedex id
+GolbatBaseStats:
+    db GOLBAT ; mon id
     db 75 ; base hp
     db 80 ; base attack
     db 70 ; base defense
@@ -1550,27 +1521,26 @@ GolbatBaseStats: ; 3885a (e:485a)
     dw GolbatPicFront
     dw GolbatPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Golbat_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 09,15                   ; |TAKE_DOWN|HYPER_BEAM|
-    tmlearn 21                      ; |MEGA_DRAIN|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39                   ; |BIDE|SWIFT|
-    tmlearn 43,44                   ; |SKY_ATTACK|REST|
-    tmlearn 50,51,52                ; |SUBSTITUTE|BLADE|SWOOP|
+    dw GolbatTMCompatibility
+
+    ; palette
+    dw PAL_GOLBAT
+
+    ds 3
 
     db BANK(GolbatPicFront)
 
-OddishBaseStats: ; 38876 (e:4876)
-    db DEX_ODDISH ; pokedex id
+OddishBaseStats:
+    db ODDISH ; mon id
     db 45 ; base hp
     db 50 ; base attack
     db 55 ; base defense
@@ -1587,27 +1557,26 @@ OddishBaseStats: ; 38876 (e:4876)
     dw OddishPicFront
     dw OddishPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Oddish_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
-    tmlearn 0
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw OddishTMCompatibility
+
+    ; palette
+    dw PAL_ODDISH
+
+    ds 3
 
     db BANK(OddishPicFront)
 
-GloomBaseStats: ; 38892 (e:4892)
-    db DEX_GLOOM ; pokedex id
+GloomBaseStats:
+    db GLOOM ; mon id
     db 60 ; base hp
     db 65 ; base attack
     db 70 ; base defense
@@ -1624,27 +1593,26 @@ GloomBaseStats: ; 38892 (e:4892)
     dw GloomPicFront
     dw GloomPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Gloom_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw GloomTMCompatibility
+
+    ; palette
+    dw PAL_GLOOM
+
+    ds 3
 
     db BANK(GloomPicFront)
 
-VileplumeBaseStats: ; 388ae (e:48ae)
-    db DEX_VILEPLUME ; pokedex id
+VileplumeBaseStats:
+    db VILEPLUME ; mon id
     db 75 ; base hp
     db 80 ; base attack
     db 85 ; base defense
@@ -1661,27 +1629,26 @@ VileplumeBaseStats: ; 388ae (e:48ae)
     dw VileplumePicFront
     dw VileplumePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Vileplume_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw VileplumeTMCompatibility
+
+    ; palette
+    dw PAL_VILEPLUME
+
+    ds 3
 
     db BANK(VileplumePicFront)
 
-ParasBaseStats: ; 388ca (e:48ca)
-    db DEX_PARAS ; pokedex id
+ParasBaseStats:
+    db PARAS ; mon id
     db 35 ; base hp
     db 70 ; base attack
     db 55 ; base defense
@@ -1698,27 +1665,26 @@ ParasBaseStats: ; 388ca (e:48ca)
     dw ParasPicFront
     dw ParasPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Paras_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw ParasTMCompatibility
+
+    ; palette
+    dw PAL_PARAS
+
+    ds 3
 
     db BANK(ParasPicFront)
 
-ParasectBaseStats: ; 388e6 (e:48e6)
-    db DEX_PARASECT ; pokedex id
+ParasectBaseStats:
+    db PARASECT ; mon id
     db 60 ; base hp
     db 95 ; base attack
     db 80 ; base defense
@@ -1735,27 +1701,26 @@ ParasectBaseStats: ; 388e6 (e:48e6)
     dw ParasectPicFront
     dw ParasectPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Parasect_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 18,21,22                ; |COUNTER|MEGA_DRAIN|SOLARBEAM|
-    tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw ParasectTMCompatibility
+
+    ; palette
+    dw PAL_PARASECT
+
+    ds 3
 
     db BANK(ParasectPicFront)
 
-VenonatBaseStats: ; 38902 (e:4902)
-    db DEX_VENONAT ; pokedex id
+VenonatBaseStats:
+    db VENONAT ; mon id
     db 60 ; base hp
     db 55 ; base attack
     db 50 ; base defense
@@ -1772,27 +1737,26 @@ VenonatBaseStats: ; 38902 (e:4902)
     dw VenonatPicFront
     dw VenonatPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Venonat_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 0
-    tmlearn 21                      ; |MEGA_DRAIN|
-    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 41,44,46                ; |LIGHT_SCREEN|REST|PSYWAVE|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    dw VenonatTMCompatibility
+
+    ; palette
+    dw PAL_VENONAT
+
+    ds 3
 
     db BANK(VenonatPicFront)
 
-VenomothBaseStats: ; 3891e (e:491e)
-    db DEX_VENOMOTH ; pokedex id
+VenomothBaseStats:
+    db VENOMOTH ; mon id
     db 70 ; base hp
     db 65 ; base attack
     db 60 ; base defense
@@ -1809,27 +1773,26 @@ VenomothBaseStats: ; 3891e (e:491e)
     dw VenomothPicFront
     dw VenomothPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Venomoth_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,04,06                ; |RAZOR_WIND|WHIRLWIND|TOXIC|
-    tmlearn 10,15                   ; |DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 41,42,44,46             ; |LIGHT_SCREEN|DREAM_EATER|REST|PSYWAVE|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    dw VenomothTMCompatibility
+
+    ; palette
+    dw PAL_VENOMOTH
+
+    ds 3
 
     db BANK(VenomothPicFront)
 
-DiglettBaseStats: ; 3893a (e:493a)
-    db DEX_DIGLETT ; pokedex id
+DiglettBaseStats:
+    db DIGLETT ; mon id
     db 10 ; base hp
     db 55 ; base attack
     db 25 ; base defense
@@ -1846,27 +1809,26 @@ DiglettBaseStats: ; 3893a (e:493a)
     dw DiglettPicFront
     dw DiglettPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Diglett_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03                      ; |SWORDS_DANCE|
-    tmlearn 0
-    tmlearn 0
-    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34                      ; |BIDE|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw DiglettTMCompatibility
+
+    ; palette
+    dw PAL_DIGLETT
+
+    ds 3
 
     db BANK(DiglettPicFront)
 
-DugtrioBaseStats: ; 38956 (e:4956)
-    db DEX_DUGTRIO ; pokedex id
+DugtrioBaseStats:
+    db DUGTRIO ; mon id
     db 35 ; base hp
     db 80 ; base attack
     db 50 ; base defense
@@ -1883,27 +1845,26 @@ DugtrioBaseStats: ; 38956 (e:4956)
     dw DugtrioPicFront
     dw DugtrioPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Dugtrio_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,08                   ; |SWORDS_DANCE|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 0
-    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34                      ; |BIDE|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 49,50,51                ; |TRI_ATTACK|SUBSTITUTE|BLADE|
+    dw DugtrioTMCompatibility
+
+    ; palette
+    dw PAL_DUGTRIO
+
+    ds 3
 
     db BANK(DugtrioPicFront)
 
-MeowthBaseStats: ; 38972 (e:4972)
-    db DEX_MEOWTH ; pokedex id
+MeowthBaseStats:
+    db MEOWTH ; mon id
     db 40 ; base hp
     db 45 ; base attack
     db 35 ; base defense
@@ -1920,27 +1881,26 @@ MeowthBaseStats: ; 38972 (e:4972)
     dw MeowthPicFront
     dw MeowthPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Meowth_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 11,12,16                ; |BUBBLEBEAM|WATER_GUN|PAY_DAY|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 42,44                   ; |DREAM_EATER|REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw MeowthTMCompatibility
+
+    ; palette
+    dw PAL_MEOWTH
+
+    ds 3
 
     db BANK(MeowthPicFront)
 
-PersianBaseStats: ; 3898e (e:498e)
-    db DEX_PERSIAN ; pokedex id
+PersianBaseStats:
+    db PERSIAN ; mon id
     db 65 ; base hp
     db 70 ; base attack
     db 60 ; base defense
@@ -1957,27 +1917,26 @@ PersianBaseStats: ; 3898e (e:498e)
     dw PersianPicFront
     dw PersianPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Persian_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 09,10,11,12,15,16       ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|HYPER_BEAM|PAY_DAY|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,28,31,32             ; |THUNDER|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44,45             ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw PersianTMCompatibility
+
+    ; palette
+    dw PAL_PERSIAN
+
+    ds 3
 
     db BANK(PersianPicFront)
 
-PsyduckBaseStats: ; 389aa (e:49aa)
-    db DEX_PSYDUCK ; pokedex id
+PsyduckBaseStats:
+    db PSYDUCK ; mon id
     db 50 ; base hp
     db 52 ; base attack
     db 48 ; base defense
@@ -1994,27 +1953,26 @@ PsyduckBaseStats: ; 389aa (e:49aa)
     dw PsyduckPicFront
     dw PsyduckPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Psyduck_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01                      ; |MEGA_PUNCH|
-    tmlearn 11,12,13,16             ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|PAY_DAY|
-    tmlearn 0
-    tmlearn 29,30,31                ; |PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 41,44,46                ; |LIGHT_SCREEN|REST|PSYWAVE|
-    tmlearn 49,50,53,54             ; |TRI_ATTACK|SUBSTITUTE|TSUNAMI|STRIKE|
+    dw PsyduckTMCompatibility
+
+    ; palette
+    dw PAL_PSYDUCK
+
+    ds 3
 
     db BANK(PsyduckPicFront)
 
-GolduckBaseStats: ; 389c6 (e:49c6)
-    db DEX_GOLDUCK ; pokedex id
+GolduckBaseStats:
+    db GOLDUCK ; mon id
     db 80 ; base hp
     db 82 ; base attack
     db 78 ; base defense
@@ -2031,27 +1989,26 @@ GolduckBaseStats: ; 389c6 (e:49c6)
     dw GolduckPicFront
     dw GolduckPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Golduck_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,11,12,13,14,15,16    ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 28,29,30,31,32          ; |TRAPHOLE|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 41,44,46                ; |LIGHT_SCREEN|REST|PSYWAVE|
-    tmlearn 49,50,51,53,54          ; |TRI_ATTACK|SUBSTITUTE|BLADE|TSUNAMI|STRIKE|
+    dw GolduckTMCompatibility
+
+    ; palette
+    dw PAL_GOLDUCK
+
+    ds 3
 
     db BANK(GolduckPicFront)
 
-MankeyBaseStats: ; 389e2 (e:49e2)
-    db DEX_MANKEY ; pokedex id
+MankeyBaseStats:
+    db MANKEY ; mon id
     db 40 ; base hp
     db 80 ; base attack
     db 35 ; base defense
@@ -2068,27 +2025,26 @@ MankeyBaseStats: ; 389e2 (e:49e2)
     dw MankeyPicFront
     dw MankeyPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Mankey_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,05                   ; |MEGA_PUNCH|MEGA_KICK|
-    tmlearn 09,16                   ; |TAKE_DOWN|PAY_DAY|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
-    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw MankeyTMCompatibility
+
+    ; palette
+    dw PAL_MANKEY
+
+    ds 3
 
     db BANK(MankeyPicFront)
 
-PrimeapeBaseStats: ; 389fe (e:49fe)
-    db DEX_PRIMEAPE ; pokedex id
+PrimeapeBaseStats:
+    db PRIMEAPE ; mon id
     db 65 ; base hp
     db 105 ; base attack
     db 60 ; base defense
@@ -2105,27 +2061,26 @@ PrimeapeBaseStats: ; 389fe (e:49fe)
     dw PrimeapePicFront
     dw PrimeapePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Primeape_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
-    tmlearn 25,26,28,31,32          ; |THUNDER|EARTHQUAKE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
-    tmlearn 44,45,48                ; |REST|THUNDER_WAVE|ROCK_SLIDE|
-    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
+    dw PrimeapeTMCompatibility
+
+    ; palette
+    dw PAL_PRIMEAPE
+
+    ds 3
 
     db BANK(PrimeapePicFront)
 
-GrowlitheBaseStats: ; 38a1a (e:4a1a)
-    db DEX_GROWLITHE ; pokedex id
+GrowlitheBaseStats:
+    db GROWLITHE ; mon id
     db 55 ; base hp
     db 70 ; base attack
     db 45 ; base defense
@@ -2142,27 +2097,26 @@ GrowlitheBaseStats: ; 38a1a (e:4a1a)
     dw GrowlithePicFront
     dw GrowlithePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Growlithe_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw GrowlitheTMCompatibility
+
+    ; palette
+    dw PAL_GROWLITHE
+
+    ds 3
 
     db BANK(GrowlithePicFront)
 
-ArcanineBaseStats: ; 38a36 (e:4a36)
-    db DEX_ARCANINE ; pokedex id
+ArcanineBaseStats:
+    db ARCANINE ; mon id
     db 90 ; base hp
     db 110 ; base attack
     db 80 ; base defense
@@ -2179,27 +2133,26 @@ ArcanineBaseStats: ; 38a36 (e:4a36)
     dw ArcaninePicFront
     dw ArcaninePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Arcanine_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 22,23                   ; |SOLARBEAM|DRAGON_RAGE|
-    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw ArcanineTMCompatibility
+
+    ; palette
+    dw PAL_ARCANINE
+
+    ds 3
 
     db BANK(ArcaninePicFront)
 
-PoliwagBaseStats: ; 38a52 (e:4a52)
-    db DEX_POLIWAG ; pokedex id
+PoliwagBaseStats:
+    db POLIWAG ; mon id
     db 40 ; base hp
     db 50 ; base attack
     db 40 ; base defense
@@ -2216,27 +2169,26 @@ PoliwagBaseStats: ; 38a52 (e:4a52)
     dw PoliwagPicFront
     dw PoliwagPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Poliwag_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,40                   ; |BIDE|SKULL_BASH|
-    tmlearn 44,46                   ; |REST|PSYWAVE|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw PoliwagTMCompatibility
+
+    ; palette
+    dw PAL_POLIWAG
+
+    ds 3
 
     db BANK(PoliwagPicFront)
 
-PoliwhirlBaseStats: ; 38a6e (e:4a6e)
-    db DEX_POLIWHIRL ; pokedex id
+PoliwhirlBaseStats:
+    db POLIWHIRL ; mon id
     db 65 ; base hp
     db 65 ; base attack
     db 65 ; base defense
@@ -2253,27 +2205,26 @@ PoliwhirlBaseStats: ; 38a6e (e:4a6e)
     dw PoliwhirlPicFront
     dw PoliwhirlPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Poliwhirl_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,11,12,13,14          ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 28,29,31,32             ; |TRAPHOLE|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
-    tmlearn 44,46                   ; |REST|PSYWAVE|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw PoliwhirlTMCompatibility
+
+    ; palette
+    dw PAL_POLIWHIRL
+
+    ds 3
 
     db BANK(PoliwhirlPicFront)
 
-PoliwrathBaseStats: ; 38a8a (e:4a8a)
-    db DEX_POLIWRATH ; pokedex id
+PoliwrathBaseStats:
+    db POLIWRATH ; mon id
     db 90 ; base hp
     db 85 ; base attack
     db 95 ; base defense
@@ -2290,27 +2241,26 @@ PoliwrathBaseStats: ; 38a8a (e:4a8a)
     dw PoliwrathPicFront
     dw PoliwrathPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Poliwrath_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,28,29,31,32       ; |EARTHQUAKE|FISSURE|TRAPHOLE|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
-    tmlearn 44,46,48                ; |REST|PSYWAVE|ROCK_SLIDE|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw PoliwrathTMCompatibility
+
+    ; palette
+    dw PAL_POLIWRATH
+
+    ds 3
 
     db BANK(PoliwrathPicFront)
 
-AbraBaseStats: ; 38aa6 (e:4aa6)
-    db DEX_ABRA ; pokedex id
+AbraBaseStats:
+    db ABRA ; mon id
     db 25 ; base hp
     db 20 ; base attack
     db 15 ; base defense
@@ -2327,27 +2277,26 @@ AbraBaseStats: ; 38aa6 (e:4aa6)
     dw AbraPicFront
     dw AbraPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Abra_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,40             ; |REFLECT|BIDE|METRONOME|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
+    dw AbraTMCompatibility
+
+    ; palette
+    dw PAL_ABRA
+
+    ds 3
 
     db BANK(AbraPicFront)
 
-KadabraBaseStats: ; 38ac2 (e:4ac2)
-    db DEX_KADABRA ; pokedex id
+KadabraBaseStats:
+    db KADABRA ; mon id
     db 40 ; base hp
     db 35 ; base attack
     db 30 ; base defense
@@ -2364,27 +2313,26 @@ KadabraBaseStats: ; 38ac2 (e:4ac2)
     dw KadabraPicFront
     dw KadabraPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Kadabra_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 0
-    tmlearn 19                      ; |SEISMIC_TOSS|
-    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,39,40          ; |REFLECT|BIDE|METRONOME|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
+    dw KadabraTMCompatibility
+
+    ; palette
+    dw PAL_KADABRA
+
+    ds 3
 
     db BANK(KadabraPicFront)
 
-AlakazamBaseStats: ; 38ade (e:4ade)
-    db DEX_ALAKAZAM ; pokedex id
+AlakazamBaseStats:
+    db ALAKAZAM ; mon id
     db 55 ; base hp
     db 50 ; base attack
     db 45 ; base defense
@@ -2401,27 +2349,26 @@ AlakazamBaseStats: ; 38ade (e:4ade)
     dw AlakazamPicFront
     dw AlakazamPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Alakazam_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 15                      ; |HYPER_BEAM|
-    tmlearn 19                      ; |SEISMIC_TOSS|
-    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,39,40          ; |REFLECT|BIDE|METRONOME|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
+    dw AlakazamTMCompatibility
+
+    ; palette
+    dw PAL_ALAKAZAM
+
+    ds 3
 
     db BANK(AlakazamPicFront)
 
-MachopBaseStats: ; 38afa (e:4afa)
-    db DEX_MACHOP ; pokedex id
+MachopBaseStats:
+    db MACHOP ; mon id
     db 70 ; base hp
     db 80 ; base attack
     db 50 ; base defense
@@ -2438,27 +2385,26 @@ MachopBaseStats: ; 38afa (e:4afa)
     dw MachopPicFront
     dw MachopPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Machop_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,05                   ; |MEGA_PUNCH|MEGA_KICK|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,40                ; |BIDE|METRONOME|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw MachopTMCompatibility
+
+    ; palette
+    dw PAL_MACHOP
+
+    ds 3
 
     db BANK(MachopPicFront)
 
-MachokeBaseStats: ; 38b16 (e:4b16)
-    db DEX_MACHOKE ; pokedex id
+MachokeBaseStats:
+    db MACHOKE ; mon id
     db 80 ; base hp
     db 100 ; base attack
     db 70 ; base defense
@@ -2475,27 +2421,26 @@ MachokeBaseStats: ; 38b16 (e:4b16)
     dw MachokePicFront
     dw MachokePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Machoke_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10                   ; |TAKE_DOWN|DOUBLE_EDGE|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,37,38,40          ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw MachokeTMCompatibility
+
+    ; palette
+    dw PAL_MACHOKE
+
+    ds 3
 
     db BANK(MachokePicFront)
 
-MachampBaseStats: ; 38b32 (e:4b32)
-    db DEX_MACHAMP ; pokedex id
+MachampBaseStats:
+    db MACHAMP ; mon id
     db 90 ; base hp
     db 130 ; base attack
     db 80 ; base defense
@@ -2512,27 +2457,26 @@ MachampBaseStats: ; 38b32 (e:4b32)
     dw MachampPicFront
     dw MachampPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Machamp_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,37,38,40          ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw MachampTMCompatibility
+
+    ; palette
+    dw PAL_MACHAMP
+
+    ds 3
 
     db BANK(MachampPicFront)
 
-BellsproutBaseStats: ; 38b4e (e:4b4e)
-    db DEX_BELLSPROUT ; pokedex id
+BellsproutBaseStats:
+    db BELLSPROUT ; mon id
     db 50 ; base hp
     db 75 ; base attack
     db 35 ; base defense
@@ -2549,27 +2493,26 @@ BellsproutBaseStats: ; 38b4e (e:4b4e)
     dw BellsproutPicFront
     dw BellsproutPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Bellsprout_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
-    tmlearn 0
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw BellsproutTMCompatibility
+
+    ; palette
+    dw PAL_BELLSPROUT
+
+    ds 3
 
     db BANK(BellsproutPicFront)
 
-WeepinbellBaseStats: ; 38b6a (e:4b6a)
-    db DEX_WEEPINBELL ; pokedex id
+WeepinbellBaseStats:
+    db WEEPINBELL ; mon id
     db 65 ; base hp
     db 90 ; base attack
     db 50 ; base defense
@@ -2586,27 +2529,26 @@ WeepinbellBaseStats: ; 38b6a (e:4b6a)
     dw WeepinbellPicFront
     dw WeepinbellPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Weepinbell_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw WeepinbellTMCompatibility
+
+    ; palette
+    dw PAL_WEEPINBELL
+
+    ds 3
 
     db BANK(WeepinbellPicFront)
 
-VictreebelBaseStats: ; 38b86 (e:4b86)
-    db DEX_VICTREEBEL ; pokedex id
+VictreebelBaseStats:
+    db VICTREEBEL ; mon id
     db 80 ; base hp
     db 105 ; base attack
     db 65 ; base defense
@@ -2623,27 +2565,26 @@ VictreebelBaseStats: ; 38b86 (e:4b86)
     dw VictreebelPicFront
     dw VictreebelPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Victreebel_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw VictreebelTMCompatibility
+
+    ; palette
+    dw PAL_VICTREEBEL
+
+    ds 3
 
     db BANK(VictreebelPicFront)
 
-TentacoolBaseStats: ; 38ba2 (e:4ba2)
-    db DEX_TENTACOOL ; pokedex id
+TentacoolBaseStats:
+    db TENTACOOL ; mon id
     db 40 ; base hp
     db 40 ; base attack
     db 35 ; base defense
@@ -2660,27 +2601,26 @@ TentacoolBaseStats: ; 38ba2 (e:4ba2)
     dw TentacoolPicFront
     dw TentacoolPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Tentacool_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
-    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 21                      ; |MEGA_DRAIN|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51,53                ; |SUBSTITUTE|BLADE|TSUNAMI|
+    dw TentacoolTMCompatibility
+
+    ; palette
+    dw PAL_TENTACOOL
+
+    ds 3
 
     db BANK(TentacoolPicFront)
 
-TentacruelBaseStats: ; 38bbe (e:4bbe)
-    db DEX_TENTACRUEL ; pokedex id
+TentacruelBaseStats:
+    db TENTACRUEL ; mon id
     db 80 ; base hp
     db 70 ; base attack
     db 65 ; base defense
@@ -2697,27 +2637,26 @@ TentacruelBaseStats: ; 38bbe (e:4bbe)
     dw TentacruelPicFront
     dw TentacruelPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Tentacruel_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 21                      ; |MEGA_DRAIN|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
-    tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
-    tmlearn 50,51,53                ; |SUBSTITUTE|BLADE|TSUNAMI|
+    dw TentacruelTMCompatibility
+
+    ; palette
+    dw PAL_TENTACRUEL
+
+    ds 3
 
     db BANK(TentacruelPicFront)
 
-GeodudeBaseStats: ; 38bda (e:4bda)
-    db DEX_GEODUDE ; pokedex id
+GeodudeBaseStats:
+    db GEODUDE ; mon id
     db 40 ; base hp
     db 80 ; base attack
     db 100 ; base defense
@@ -2734,27 +2673,26 @@ GeodudeBaseStats: ; 38bda (e:4bda)
     dw GeodudePicFront
     dw GeodudePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Geodude_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,08                   ; |MEGA_PUNCH|BODY_SLAM|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,35,36                ; |BIDE|METRONOME|SELFDESTRUCT|
-    tmlearn 44,47,48                ; |REST|EXPLOSION|ROCK_SLIDE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw GeodudeTMCompatibility
+
+    ; palette
+    dw PAL_GEODUDE
+
+    ds 3
 
     db BANK(GeodudePicFront)
 
-GravelerBaseStats: ; 38bf6 (e:4bf6)
-    db DEX_GRAVELER ; pokedex id
+GravelerBaseStats:
+    db GRAVELER ; mon id
     db 55 ; base hp
     db 95 ; base attack
     db 115 ; base defense
@@ -2771,27 +2709,26 @@ GravelerBaseStats: ; 38bf6 (e:4bf6)
     dw GravelerPicFront
     dw GravelerPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Graveler_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10                   ; |TAKE_DOWN|DOUBLE_EDGE|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,35,36,37,38          ; |BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|
-    tmlearn 44,47,48                ; |REST|EXPLOSION|ROCK_SLIDE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw GravelerTMCompatibility
+
+    ; palette
+    dw PAL_GRAVELER
+
+    ds 3
 
     db BANK(GravelerPicFront)
 
-GolemBaseStats: ; 38c12 (e:4c12)
-    db DEX_GOLEM ; pokedex id
+GolemBaseStats:
+    db GOLEM ; mon id
     db 80 ; base hp
     db 110 ; base attack
     db 130 ; base defense
@@ -2808,27 +2745,26 @@ GolemBaseStats: ; 38c12 (e:4c12)
     dw GolemPicFront
     dw GolemPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Golem_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,35,36,37,38          ; |BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|
-    tmlearn 44,47,48                ; |REST|EXPLOSION|ROCK_SLIDE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw GolemTMCompatibility
+
+    ; palette
+    dw PAL_GOLEM
+
+    ds 3
 
     db BANK(GolemPicFront)
 
-PonytaBaseStats: ; 38c2e (e:4c2e)
-    db DEX_PONYTA ; pokedex id
+PonytaBaseStats:
+    db PONYTA ; mon id
     db 50 ; base hp
     db 85 ; base attack
     db 55 ; base defense
@@ -2845,27 +2781,26 @@ PonytaBaseStats: ; 38c2e (e:4c2e)
     dw PonytaPicFront
     dw PonytaPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Ponyta_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw PonytaTMCompatibility
+
+    ; palette
+    dw PAL_PONYTA
+
+    ds 3
 
     db BANK(PonytaPicFront)
 
-RapidashBaseStats: ; 38c4a (e:4c4a)
-    db DEX_RAPIDASH ; pokedex id
+RapidashBaseStats:
+    db RAPIDASH ; mon id
     db 65 ; base hp
     db 100 ; base attack
     db 70 ; base defense
@@ -2882,27 +2817,26 @@ RapidashBaseStats: ; 38c4a (e:4c4a)
     dw RapidashPicFront
     dw RapidashPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Rapidash_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,07,08                ; |SWORDS_DANCE|HORN_DRILL|BODY_SLAM|
-    tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
-    tmlearn 22                      ; |SOLARBEAM|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw RapidashTMCompatibility
+
+    ; palette
+    dw PAL_RAPIDASH
+
+    ds 3
 
     db BANK(RapidashPicFront)
 
-SlowpokeBaseStats: ; 38c66 (e:4c66)
-    db DEX_SLOWPOKE ; pokedex id
+SlowpokeBaseStats:
+    db SLOWPOKE ; mon id
     db 90 ; base hp
     db 65 ; base attack
     db 65 ; base defense
@@ -2919,27 +2853,26 @@ SlowpokeBaseStats: ; 38c66 (e:4c66)
     dw SlowpokePicFront
     dw SlowpokePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Slowpoke_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 09,11,12,13,16          ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|PAY_DAY|
-    tmlearn 0
-    tmlearn 29,30,31                ; |PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 33,34,37,39,40          ; |REFLECT|BIDE|FLAMETHROWER|SWIFT|SKULL_BASH|
-    tmlearn 42,44,45,46             ; |DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,53,54,55          ; |TRI_ATTACK|SUBSTITUTE|TSUNAMI|STRIKE|FLASH|
+    dw SlowpokeTMCompatibility
+
+    ; palette
+    dw PAL_SLOWPOKE
+
+    ds 3
 
     db BANK(SlowpokePicFront)
 
-SlowbroBaseStats: ; 38c82 (e:4c82)
-    db DEX_SLOWBRO ; pokedex id
+SlowbroBaseStats:
+    db SLOWBRO ; mon id
     db 95 ; base hp
     db 75 ; base attack
     db 110 ; base defense
@@ -2956,27 +2889,26 @@ SlowbroBaseStats: ; 38c82 (e:4c82)
     dw SlowbroPicFront
     dw SlowbroPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Slowbro_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,29,30,31          ; |EARTHQUAKE|FISSURE|PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,53,54,55          ; |TRI_ATTACK|SUBSTITUTE|TSUNAMI|STRIKE|FLASH|
+    dw SlowbroTMCompatibility
+
+    ; palette
+    dw PAL_SLOWBRO
+
+    ds 3
 
     db BANK(SlowbroPicFront)
 
-MagnemiteBaseStats: ; 38c9e (e:4c9e)
-    db DEX_MAGNEMITE ; pokedex id
+MagnemiteBaseStats:
+    db MAGNEMITE ; mon id
     db 25 ; base hp
     db 35 ; base attack
     db 70 ; base defense
@@ -2993,27 +2925,26 @@ MagnemiteBaseStats: ; 38c9e (e:4c9e)
     dw MagnemitePicFront
     dw MagnemitePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Magnemite_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 0
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
-    tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    dw MagnemiteTMCompatibility
+
+    ; palette
+    dw PAL_MAGNEMITE
+
+    ds 3
 
     db BANK(MagnemitePicFront)
 
-MagnetonBaseStats: ; 38cba (e:4cba)
-    db DEX_MAGNETON ; pokedex id
+MagnetonBaseStats:
+    db MAGNETON ; mon id
     db 50 ; base hp
     db 60 ; base attack
     db 95 ; base defense
@@ -3030,27 +2961,26 @@ MagnetonBaseStats: ; 38cba (e:4cba)
     dw MagnetonPicFront
     dw MagnetonPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Magneton_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 15                      ; |HYPER_BEAM|
-    tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
-    tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
-    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
+    dw MagnetonTMCompatibility
+
+    ; palette
+    dw PAL_MAGNETON
+
+    ds 3
 
     db BANK(MagnetonPicFront)
 
-FarfetchdBaseStats: ; 38cd6 (e:4cd6)
-    db DEX_FARFETCH_D ; pokedex id
+FarfetchdBaseStats:
+    db FARFETCH_D ; mon id
     db 52 ; base hp
     db 65 ; base attack
     db 55 ; base defense
@@ -3067,27 +2997,26 @@ FarfetchdBaseStats: ; 38cd6 (e:4cd6)
     dw FarfetchdPicFront
     dw FarfetchdPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Farfetchd_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,03,04                ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|
-    tmlearn 15                      ; |HYPER_BEAM|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
-    tmlearn 43,44                   ; |SKY_ATTACK|REST|
-    tmlearn 50,51,52                ; |SUBSTITUTE|BLADE|SWOOP|
+    dw FarfetchdTMCompatibility
+
+    ; palette
+    dw PAL_FARFETCH_D
+
+    ds 3
 
     db BANK(FarfetchdPicFront)
 
-DoduoBaseStats: ; 38cf2 (e:4cf2)
-    db DEX_DODUO ; pokedex id
+DoduoBaseStats:
+    db DODUO ; mon id
     db 35 ; base hp
     db 85 ; base attack
     db 45 ; base defense
@@ -3104,27 +3033,26 @@ DoduoBaseStats: ; 38cf2 (e:4cf2)
     dw DoduoPicFront
     dw DoduoPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Doduo_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,08                   ; |SWORDS_DANCE|BODY_SLAM|
-    tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw DoduoTMCompatibility
+
+    ; palette
+    dw PAL_DODUO
+
+    ds 3
 
     db BANK(DoduoPicFront)
 
-DodrioBaseStats: ; 38d0e (e:4d0e)
-    db DEX_DODRIO ; pokedex id
+DodrioBaseStats:
+    db DODRIO ; mon id
     db 60 ; base hp
     db 110 ; base attack
     db 70 ; base defense
@@ -3141,27 +3069,26 @@ DodrioBaseStats: ; 38d0e (e:4d0e)
     dw DodrioPicFront
     dw DodrioPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Dodrio_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,08                   ; |SWORDS_DANCE|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 49,50,51                ; |TRI_ATTACK|SUBSTITUTE|BLADE|
+    dw DodrioTMCompatibility
+
+    ; palette
+    dw PAL_DODRIO
+
+    ds 3
 
     db BANK(DodrioPicFront)
 
-SeelBaseStats: ; 38d2a (e:4d2a)
-    db DEX_SEEL ; pokedex id
+SeelBaseStats:
+    db SEEL ; mon id
     db 65 ; base hp
     db 45 ; base attack
     db 55 ; base defense
@@ -3178,27 +3105,26 @@ SeelBaseStats: ; 38d2a (e:4d2a)
     dw SeelPicFront
     dw SeelPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Seel_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 07,08                ; |HORN_DRILL|BODY_SLAM|
-    tmlearn 09,11,12,13,14,16       ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|PAY_DAY|
-    tmlearn 0
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 34,40                   ; |BIDE|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw SeelTMCompatibility
+
+    ; palette
+    dw PAL_SEEL
+
+    ds 3
 
     db BANK(SeelPicFront)
 
-DewgongBaseStats: ; 38d46 (e:4d46)
-    db DEX_DEWGONG ; pokedex id
+DewgongBaseStats:
+    db DEWGONG ; mon id
     db 90 ; base hp
     db 70 ; base attack
     db 80 ; base defense
@@ -3215,27 +3141,26 @@ DewgongBaseStats: ; 38d46 (e:4d46)
     dw DewgongPicFront
     dw DewgongPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Dewgong_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 07,08                   ; |HORN_DRILL|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 0
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 34,40                   ; |BIDE|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw DewgongTMCompatibility
+
+    ; palette
+    dw PAL_DEWGONG
+
+    ds 3
 
     db BANK(DewgongPicFront)
 
-GrimerBaseStats: ; 38d62 (e:4d62)
-    db DEX_GRIMER ; pokedex id
+GrimerBaseStats:
+    db GRIMER ; mon id
     db 80 ; base hp
     db 80 ; base attack
     db 50 ; base defense
@@ -3252,27 +3177,26 @@ GrimerBaseStats: ; 38d62 (e:4d62)
     dw GrimerPicFront
     dw GrimerPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Grimer_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 0
-    tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 34,36,37                ; |BIDE|SELFDESTRUCT|FLAMETHROWER|
-    tmlearn 44,47                   ; |REST|EXPLOSION|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw GrimerTMCompatibility
+
+    ; palette
+    dw PAL_GRIMER
+
+    ds 3
 
     db BANK(GrimerPicFront)
 
-MukBaseStats: ; 38d7e (e:4d7e)
-    db DEX_MUK ; pokedex id
+MukBaseStats:
+    db MUK ; mon id
     db 105 ; base hp
     db 105 ; base attack
     db 75 ; base defense
@@ -3289,27 +3213,26 @@ MukBaseStats: ; 38d7e (e:4d7e)
     dw MukPicFront
     dw MukPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Muk_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
-    tmlearn 15                      ; |HYPER_BEAM|
-    tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
-    tmlearn 25,31                   ; |THUNDER|MIMIC|
-    tmlearn 34,36,37,38,39          ; |BIDE|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SWIFT|
-    tmlearn 44,45,47,48             ; |REST|THUNDER_WAVE|EXPLOSION|ROCK_SLIDE|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw MukTMCompatibility
+
+    ; palette
+    dw PAL_MUK
+
+    ds 3
 
     db BANK(MukPicFront)
 
-ShellderBaseStats: ; 38d9a (e:4d9a)
-    db DEX_SHELLDER ; pokedex id
+ShellderBaseStats:
+    db SHELLDER ; mon id
     db 30 ; base hp
     db 65 ; base attack
     db 100 ; base defense
@@ -3326,27 +3249,26 @@ ShellderBaseStats: ; 38d9a (e:4d9a)
     dw ShellderPicFront
     dw ShellderPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Shellder_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 0
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
-    tmlearn 44,47                   ; |REST|EXPLOSION|
-    tmlearn 49,50                   ; |TRI_ATTACK|SUBSTITUTE|
+    dw ShellderTMCompatibility
+
+    ; palette
+    dw PAL_SHELLDER
+
+    ds 3
 
     db BANK(ShellderPicFront)
 
-CloysterBaseStats: ; 38db6 (e:4db6)
-    db DEX_CLOYSTER ; pokedex id
+CloysterBaseStats:
+    db CLOYSTER ; mon id
     db 50 ; base hp
     db 95 ; base attack
     db 180 ; base defense
@@ -3363,27 +3285,26 @@ CloysterBaseStats: ; 38db6 (e:4db6)
     dw CloysterPicFront
     dw CloysterPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Cloyster_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 10,11,12,13,14,15       ; |DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 0
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
-    tmlearn 41,44,47                ; |LIGHT_SCREEN|REST|EXPLOSION|
-    tmlearn 49,50,53                ; |TRI_ATTACK|SUBSTITUTE|TSUNAMI|
+    dw CloysterTMCompatibility
+
+    ; palette
+    dw PAL_CLOYSTER
+
+    ds 3
 
     db BANK(CloysterPicFront)
 
-GastlyBaseStats: ; 38dd2 (e:4dd2)
-    db DEX_GASTLY ; pokedex id
+GastlyBaseStats:
+    db GASTLY ; mon id
     db 30 ; base hp
     db 35 ; base attack
     db 30 ; base defense
@@ -3400,27 +3321,26 @@ GastlyBaseStats: ; 38dd2 (e:4dd2)
     dw GastlyPicFront
     dw GastlyPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Gastly_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 0
-    tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
-    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,36             ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|
-    tmlearn 42,44,46,47             ; |DREAM_EATER|REST|PSYWAVE|EXPLOSION|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw GastlyTMCompatibility
+
+    ; palette
+    dw PAL_GASTLY
+
+    ds 3
 
     db BANK(GastlyPicFront)
 
-HaunterBaseStats: ; 38dee (e:4dee)
-    db DEX_HAUNTER ; pokedex id
+HaunterBaseStats:
+    db HAUNTER ; mon id
     db 45 ; base hp
     db 50 ; base attack
     db 45 ; base defense
@@ -3437,27 +3357,26 @@ HaunterBaseStats: ; 38dee (e:4dee)
     dw HaunterPicFront
     dw HaunterPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Haunter_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 0
-    tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
-    tmlearn 25,29,30,31,32          ; |THUNDER|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,36             ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|
-    tmlearn 42,44,45,46,47          ; |DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw HaunterTMCompatibility
+
+    ; palette
+    dw PAL_HAUNTER
+
+    ds 3
 
     db BANK(HaunterPicFront)
 
-GengarBaseStats: ; 38e0a (e:4e0a)
-    db DEX_GENGAR ; pokedex id
+GengarBaseStats:
+    db GENGAR ; mon id
     db 60 ; base hp
     db 65 ; base attack
     db 60 ; base defense
@@ -3474,27 +3393,26 @@ GengarBaseStats: ; 38e0a (e:4e0a)
     dw GengarPicFront
     dw GengarPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Gengar_EvosMoves
 
     db 3 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 15                      ; |HYPER_BEAM|
-    tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
-    tmlearn 25,29,30,31,32          ; |THUNDER|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,36             ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|
-    tmlearn 42,44,45,46,47          ; |DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw GengarTMCompatibility
+
+    ; palette
+    dw PAL_GENGAR
+
+    ds 3
 
     db BANK(GengarPicFront)
 
-OnixBaseStats: ; 38e26 (e:4e26)
-    db DEX_ONIX ; pokedex id
+OnixBaseStats:
+    db ONIX ; mon id
     db 35 ; base hp
     db 45 ; base attack
     db 160 ; base defense
@@ -3511,27 +3429,26 @@ OnixBaseStats: ; 38e26 (e:4e26)
     dw OnixPicFront
     dw OnixPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw OnixCrystalBaseStats
+
+    ; pointer to evomoves
+    dw Onix_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 0
-    tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,36,40                ; |BIDE|SELFDESTRUCT|SKULL_BASH|
-    tmlearn 41,44,47,48             ; |LIGHT_SCREEN|REST|EXPLOSION|ROCK_SLIDE|
-    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
+    dw OnixTMCompatibility
+
+    ; palette
+    dw PAL_ONIX
+
+    ds 3
 
     db BANK(OnixPicFront)
 
-DrowzeeBaseStats: ; 38e42 (e:4e42)
-    db DEX_DROWZEE ; pokedex id
+DrowzeeBaseStats:
+    db DROWZEE ; mon id
     db 60 ; base hp
     db 48 ; base attack
     db 45 ; base defense
@@ -3548,27 +3465,26 @@ DrowzeeBaseStats: ; 38e42 (e:4e42)
     dw DrowzeePicFront
     dw DrowzeePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Drowzee_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,06                   ; |MEGA_PUNCH|TOXIC|
-    tmlearn 0
-    tmlearn 0
-    tmlearn 29,30,31                ; |PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 33,34,35,40             ; |REFLECT|BIDE|METRONOME|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
+    dw DrowzeeTMCompatibility
+
+    ; palette
+    dw PAL_DROWZEE
+
+    ds 3
 
     db BANK(DrowzeePicFront)
 
-HypnoBaseStats: ; 38e5e (e:4e5e)
-    db DEX_HYPNO ; pokedex id
+HypnoBaseStats:
+    db HYPNO ; mon id
     db 85 ; base hp
     db 73 ; base attack
     db 70 ; base defense
@@ -3585,27 +3501,26 @@ HypnoBaseStats: ; 38e5e (e:4e5e)
     dw HypnoPicFront
     dw HypnoPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Hypno_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 10,15                   ; |DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,40             ; |REFLECT|BIDE|METRONOME|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
+    dw HypnoTMCompatibility
+
+    ; palette
+    dw PAL_HYPNO
+
+    ds 3
 
     db BANK(HypnoPicFront)
 
-KrabbyBaseStats: ; 38e7a (e:4e7a)
-    db DEX_KRABBY ; pokedex id
+KrabbyBaseStats:
+    db KRABBY ; mon id
     db 30 ; base hp
     db 105 ; base attack
     db 90 ; base defense
@@ -3622,27 +3537,26 @@ KrabbyBaseStats: ; 38e7a (e:4e7a)
     dw KrabbyPicFront
     dw KrabbyPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Krabby_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03                      ; |SWORDS_DANCE|
-    tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 0
-    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34                      ; |BIDE|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,51,53                ; |SUBSTITUTE|TSUNAMI|BLADE|
+    dw KrabbyTMCompatibility
+
+    ; palette
+    dw PAL_KRABBY
+
+    ds 3
 
     db BANK(KrabbyPicFront)
 
-KinglerBaseStats: ; 38e96 (e:4e96)
-    db DEX_KINGLER ; pokedex id
+KinglerBaseStats:
+    db KINGLER ; mon id
     db 55 ; base hp
     db 130 ; base attack
     db 115 ; base defense
@@ -3659,27 +3573,26 @@ KinglerBaseStats: ; 38e96 (e:4e96)
     dw KinglerPicFront
     dw KinglerPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Kingler_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,08                   ; |SWORDS_DANCE|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 0
-    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34                      ; |BIDE|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,51,53,54             ; |SUBSTITUTE|BLADE|TSUNAMI|STRIKE|
+    dw KinglerTMCompatibility
+
+    ; palette
+    dw PAL_KINGLER
+
+    ds 3
 
     db BANK(KinglerPicFront)
 
-VoltorbBaseStats: ; 38eb2 (e:4eb2)
-    db DEX_VOLTORB ; pokedex id
+VoltorbBaseStats:
+    db VOLTORB ; mon id
     db 40 ; base hp
     db 30 ; base attack
     db 50 ; base defense
@@ -3696,27 +3609,26 @@ VoltorbBaseStats: ; 38eb2 (e:4eb2)
     dw VoltorbPicFront
     dw VoltorbPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw VoltorbHisuiBaseStats
+
+    ; pointer to evomoves
+    dw Voltorb_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 0
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
-    tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    dw VoltorbTMCompatibility
+
+    ; palette
+    dw PAL_VOLTORB
+
+    ds 3
  
     db BANK(VoltorbPicFront)
 
-ElectrodeBaseStats: ; 38ece (e:4ece)
-    db DEX_ELECTRODE ; pokedex id
+ElectrodeBaseStats:
+    db ELECTRODE ; mon id
     db 60 ; base hp
     db 50 ; base attack
     db 70 ; base defense
@@ -3733,27 +3645,26 @@ ElectrodeBaseStats: ; 38ece (e:4ece)
     dw ElectrodePicFront
     dw ElectrodePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw ElectrodeHisuiBaseStats
+
+    ; pointer to evomoves
+    dw Electrode_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 15                      ; |HYPER_BEAM|
-    tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,30,31,32             ; |THUNDER|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
-    tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
-    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
+    dw ElectrodeTMCompatibility
+
+    ; palette
+    dw PAL_ELECTRODE
+
+    ds 3
 
     db BANK(ElectrodePicFront)
 
-ExeggcuteBaseStats: ; 38eea (e:4eea)
-    db DEX_EXEGGCUTE ; pokedex id
+ExeggcuteBaseStats:
+    db EXEGGCUTE ; mon id
     db 60 ; base hp
     db 40 ; base attack
     db 80 ; base defense
@@ -3770,27 +3681,26 @@ ExeggcuteBaseStats: ; 38eea (e:4eea)
     dw ExeggcutePicFront
     dw ExeggcutePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Exeggcute_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
-    tmlearn 0
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 29,30,31                ; |PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 33,34,36                ; |REFLECT|BIDE|SELFDESTRUCT|
-    tmlearn 42,44,46,47             ; |DREAM_EATER|REST|PSYWAVE|EXPLOSION|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw ExeggcuteTMCompatibility
+
+    ; palette
+    dw PAL_EXEGGCUTE
+
+    ds 3
 
     db BANK(ExeggcutePicFront)
 
-ExeggutorBaseStats: ; 38f06 (e:4f06)
-    db DEX_EXEGGUTOR ; pokedex id
+ExeggutorBaseStats:
+    db EXEGGUTOR ; mon id
     db 95 ; base hp
     db 95 ; base attack
     db 85 ; base defense
@@ -3807,27 +3717,26 @@ ExeggutorBaseStats: ; 38f06 (e:4f06)
     dw ExeggutorPicFront
     dw ExeggutorPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Exeggutor_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 26,29,30,31             ; |EARTHQUAKE|PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 33,34,36                ; |REFLECT|BIDE|SELFDESTRUCT|
-    tmlearn 41,42,44,46,47          ; |LIGHT_SCREEN|DREAM_EATER|REST|PSYWAVE|EXPLOSION|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw ExeggutorTMCompatibility
+
+    ; palette
+    dw PAL_EXEGGUTOR
+
+    ds 3
 
     db BANK(ExeggutorPicFront)
 
-CuboneBaseStats: ; 38f22 (e:4f22)
-    db DEX_CUBONE ; pokedex id
+CuboneBaseStats:
+    db CUBONE ; mon id
     db 50 ; base hp
     db 50 ; base attack
     db 95 ; base defense
@@ -3844,27 +3753,26 @@ CuboneBaseStats: ; 38f22 (e:4f22)
     dw CubonePicFront
     dw CubonePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Cubone_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,03                   ; |MEGA_PUNCH|SWORDS_DANCE|
-    tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 0
-    tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,37,40                ; |BIDE|FLAMETHROWER|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
+    dw CuboneTMCompatibility
+
+    ; palette
+    dw PAL_CUBONE
+
+    ds 3
 
     db BANK(CubonePicFront)
 
-MarowakBaseStats: ; 38f3e (e:4f3e)
-    db DEX_MAROWAK ; pokedex id
+MarowakBaseStats:
+    db MAROWAK ; mon id
     db 60 ; base hp
     db 80 ; base attack
     db 110 ; base defense
@@ -3881,27 +3789,26 @@ MarowakBaseStats: ; 38f3e (e:4f3e)
     dw MarowakPicFront
     dw MarowakPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Marowak_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,03,05,08             ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,37,38,39,40          ; |BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
+    dw MarowakTMCompatibility
+
+    ; palette
+    dw PAL_MAROWAK
+
+    ds 3
 
     db BANK(MarowakPicFront)
 
-HitmonleeBaseStats: ; 38f5a (e:4f5a)
-    db DEX_HITMONLEE ; pokedex id
+HitmonleeBaseStats:
+    db HITMONLEE ; mon id
     db 50 ; base hp
     db 120 ; base attack
     db 53 ; base defense
@@ -3918,27 +3825,26 @@ HitmonleeBaseStats: ; 38f5a (e:4f5a)
     dw HitmonleePicFront
     dw HitmonleePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Hitmonlee_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,03,05,08             ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw HitmonleeTMCompatibility
+
+    ; palette
+    dw PAL_HITMONLEE
+
+    ds 3
 
     db BANK(HitmonleePicFront)
 
-HitmonchanBaseStats: ; 38f76 (e:4f76)
-    db DEX_HITMONCHAN ; pokedex id
+HitmonchanBaseStats:
+    db HITMONCHAN ; mon id
     db 50 ; base hp
     db 105 ; base attack
     db 79 ; base defense
@@ -3955,27 +3861,26 @@ HitmonchanBaseStats: ; 38f76 (e:4f76)
     dw HitmonchanPicFront
     dw HitmonchanPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Hitmonchan_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,03,05,08             ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw HitmonchanTMCompatibility
+
+    ; palette
+    dw PAL_HITMONCHAN
+
+    ds 3
 
     db BANK(HitmonchanPicFront)
 
-LickitungBaseStats: ; 38f92 (e:4f92)
-    db DEX_LICKITUNG ; pokedex id
+LickitungBaseStats:
+    db LICKITUNG ; mon id
     db 90 ; base hp
     db 55 ; base attack
     db 75 ; base defense
@@ -3992,27 +3897,26 @@ LickitungBaseStats: ; 38f92 (e:4f92)
     dw LickitungPicFront
     dw LickitungPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Lickitung_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,03,05,06,08          ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,26,27,31             ; |THUNDER|EARTHQUAKE|FISSURE|MIMIC|
-    tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 41,42,44,48             ; |LIGHT_SCREEN|DREAM_EATER|REST|ROCK_SLIDE|
-    tmlearn 50,51,53,54             ; |SUBSTITUTE|BLADE|TSUNAMI|STRIKE|
+    dw LickitungTMCompatibility
+
+    ; palette
+    dw PAL_LICKITUNG
+
+    ds 3
 
     db BANK(LickitungPicFront)
 
-KoffingBaseStats: ; 38fae (e:4fae)
-    db DEX_KOFFING ; pokedex id
+KoffingBaseStats:
+    db KOFFING ; mon id
     db 40 ; base hp
     db 65 ; base attack
     db 95 ; base defense
@@ -4029,27 +3933,26 @@ KoffingBaseStats: ; 38fae (e:4fae)
     dw KoffingPicFront
     dw KoffingPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Koffing_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 0
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,36,37                ; |BIDE|SELFDESTRUCT|FLAMETHROWER|
-    tmlearn 44,46,47                ; |REST|PSYWAVE|EXPLOSION|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    dw KoffingTMCompatibility
+
+    ; palette
+    dw PAL_KOFFING
+
+    ds 3
 
     db BANK(KoffingPicFront)
 
-WeezingBaseStats: ; 38fca (e:4fca)
-    db DEX_WEEZING ; pokedex id
+WeezingBaseStats:
+    db WEEZING ; mon id
     db 65 ; base hp
     db 90 ; base attack
     db 120 ; base defense
@@ -4066,27 +3969,26 @@ WeezingBaseStats: ; 38fca (e:4fca)
     dw WeezingPicFront
     dw WeezingPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Weezing_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 15                      ; |HYPER_BEAM|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,36,37,38             ; |BIDE|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|
-    tmlearn 44,45,46,47             ; |REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    dw WeezingTMCompatibility
+
+    ; palette
+    dw PAL_WEEZING
+
+    ds 3
 
     db BANK(WeezingPicFront)
 
-RhyhornBaseStats: ; 38fe6 (e:4fe6)
-    db DEX_RHYHORN ; pokedex id
+RhyhornBaseStats:
+    db RHYHORN ; mon id
     db 80 ; base hp
     db 85 ; base attack
     db 95 ; base defense
@@ -4103,27 +4005,26 @@ RhyhornBaseStats: ; 38fe6 (e:4fe6)
     dw RhyhornPicFront
     dw RhyhornPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Rhyhorn_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 03,07,08                ; |SWORDS_DANCE|HORN_DRILL|BODY_SLAM|
-    tmlearn 09,10                   ; |TAKE_DOWN|DOUBLE_EDGE|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw RhyhornTMCompatibility
+
+    ; palette
+    dw PAL_RHYHORN
+
+    ds 3
 
     db BANK(RhyhornPicFront)
 
-RhydonBaseStats: ; 39002 (e:5002)
-    db DEX_RHYDON ; pokedex id
+RhydonBaseStats:
+    db RHYDON ; mon id
     db 105 ; base hp
     db 130 ; base attack
     db 120 ; base defense
@@ -4140,27 +4041,26 @@ RhydonBaseStats: ; 39002 (e:5002)
     dw RhydonPicFront
     dw RhydonPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Rhydon_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 01,03,05,07,08          ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|HORN_DRILL|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
-    tmlearn 25,26,27,28,31          ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw RhydonTMCompatibility
+
+    ; palette
+    dw PAL_RHYDON
+
+    ds 3
 
     db BANK(RhydonPicFront)
 
-ChanseyBaseStats: ; 3901e (e:501e)
-    db DEX_CHANSEY ; pokedex id
+ChanseyBaseStats:
+    db CHANSEY ; mon id
     db 250 ; base hp
     db 5 ; base attack
     db 5 ; base defense
@@ -4177,27 +4077,26 @@ ChanseyBaseStats: ; 3901e (e:501e)
     dw ChanseyPicFront
     dw ChanseyPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Chansey_EvosMoves
 
     db 4 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,26,29,31             ; |THUNDER|EARTHQUAKE|PSYCHIC_M|MIMIC|
-    tmlearn 33,34,35,37,38,40       ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 41,42,44,45,46,48       ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|ROCK_SLIDE|
-    tmlearn 49,50,54,55             ; |TRI_ATTACK|SUBSTITUTE|STRIKE|FLASH|
+    dw ChanseyTMCompatibility
+
+    ; palette
+    dw PAL_CHANSEY
+
+    ds 3
 
     db BANK(ChanseyPicFront)
 
-TangelaBaseStats: ; 3903a (e:503a)
-    db DEX_TANGELA ; pokedex id
+TangelaBaseStats:
+    db TANGELA ; mon id
     db 65 ; base hp
     db 55 ; base attack
     db 115 ; base defense
@@ -4214,27 +4113,26 @@ TangelaBaseStats: ; 3903a (e:503a)
     dw TangelaPicFront
     dw TangelaPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Tangela_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 09,15                   ; |TAKE_DOWN|HYPER_BEAM|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
-    tmlearn 29,31                   ; |PSYCHIC_M|MIMIC|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
-    tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
+    dw TangelaTMCompatibility
+
+    ; palette
+    dw PAL_TANGELA
+
+    ds 3
 
     db BANK(TangelaPicFront)
 
-KangaskhanBaseStats: ; 39056 (e:5056)
-    db DEX_KANGASKHAN ; pokedex id
+KangaskhanBaseStats:
+    db KANGASKHAN ; mon id
     db 105 ; base hp
     db 95 ; base attack
     db 80 ; base defense
@@ -4251,27 +4149,26 @@ KangaskhanBaseStats: ; 39056 (e:5056)
     dw KangaskhanPicFront
     dw KangaskhanPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Kangaskhan_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,26,27,28,31,32       ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw KangaskhanTMCompatibility
+
+    ; palette
+    dw PAL_KANGASKHAN
+
+    ds 3
 
     db BANK(KangaskhanPicFront)
 
-HorseaBaseStats: ; 39072 (e:5072)
-    db DEX_HORSEA ; pokedex id
+HorseaBaseStats:
+    db HORSEA ; mon id
     db 30 ; base hp
     db 40 ; base attack
     db 70 ; base defense
@@ -4288,27 +4185,26 @@ HorseaBaseStats: ; 39072 (e:5072)
     dw HorseaPicFront
     dw HorseaPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Horsea_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,06                   ; |RAZOR_WIND|TOXIC|
-    tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 23                      ; |DRAGON_RAGE|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw HorseaTMCompatibility
+
+    ; palette
+    dw PAL_HORSEA
+
+    ds 3
 
     db BANK(HorseaPicFront)
 
-SeadraBaseStats: ; 3908e (e:508e)
-    db DEX_SEADRA ; pokedex id
+SeadraBaseStats:
+    db SEADRA ; mon id
     db 55 ; base hp
     db 65 ; base attack
     db 95 ; base defense
@@ -4325,27 +4221,26 @@ SeadraBaseStats: ; 3908e (e:508e)
     dw SeadraPicFront
     dw SeadraPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Seadra_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,06                   ; |RAZOR_WIND|TOXIC|
-    tmlearn 11,12,13,14,15          ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 23                      ; |DRAGON_RAGE|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw SeadraTMCompatibility
+
+    ; palette
+    dw PAL_SEADRA
+
+    ds 3
 
     db BANK(SeadraPicFront)
 
-GoldeenBaseStats: ; 390aa (e:50aa)
-    db DEX_GOLDEEN ; pokedex id
+GoldeenBaseStats:
+    db GOLDEEN ; mon id
     db 45 ; base hp
     db 67 ; base attack
     db 60 ; base defense
@@ -4362,27 +4257,26 @@ GoldeenBaseStats: ; 390aa (e:50aa)
     dw GoldeenPicFront
     dw GoldeenPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Goldeen_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,06,07                ; |SWORDS_DANCE|TOXIC|HORN_DRILL|
-    tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw GoldeenTMCompatibility
+
+    ; palette
+    dw PAL_GOLDEEN
+
+    ds 3
 
     db BANK(GoldeenPicFront)
 
-SeakingBaseStats: ; 390c6 (e:50c6)
-    db DEX_SEAKING ; pokedex id
+SeakingBaseStats:
+    db SEAKING ; mon id
     db 80 ; base hp
     db 92 ; base attack
     db 65 ; base defense
@@ -4399,27 +4293,26 @@ SeakingBaseStats: ; 390c6 (e:50c6)
     dw SeakingPicFront
     dw SeakingPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Seaking_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 03,06,07,08             ; |SWORDS_DANCE|TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw SeakingTMCompatibility
+
+    ; palette
+    dw PAL_SEAKING
+
+    ds 3
 
     db BANK(SeakingPicFront)
 
-StaryuBaseStats: ; 390e2 (e:50e2)
-    db DEX_STARYU ; pokedex id
+StaryuBaseStats:
+    db STARYU ; mon id
     db 30 ; base hp
     db 45 ; base attack
     db 55 ; base defense
@@ -4436,27 +4329,26 @@ StaryuBaseStats: ; 390e2 (e:50e2)
     dw StaryuPicFront
     dw StaryuPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Staryu_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 41,44,45,46             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
+    dw StaryuTMCompatibility
+
+    ; palette
+    dw PAL_STARYU
+
+    ds 3
 
     db BANK(StaryuPicFront)
 
-StarmieBaseStats: ; 390fe (e:50fe)
-    db DEX_STARMIE ; pokedex id
+StarmieBaseStats:
+    db STARMIE ; mon id
     db 60 ; base hp
     db 75 ; base attack
     db 85 ; base defense
@@ -4473,27 +4365,26 @@ StarmieBaseStats: ; 390fe (e:50fe)
     dw StarmiePicFront
     dw StarmiePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Starmie_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 11,12,13,14,15          ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,29,30,31,32          ; |THUNDER|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,53,55             ; |TRI_ATTACK|SUBSTITUTE|TSUNAMI|FLASH|
+    dw StarmieTMCompatibility
+
+    ; palette
+    dw PAL_STARMIE
+
+    ds 3
 
     db BANK(StarmiePicFront)
 
-MrMimeBaseStats: ; 3911a (e:511a)
-    db DEX_MR_MIME ; pokedex id
+MrMimeBaseStats:
+    db MR_MIME ; mon id
     db 40 ; base hp
     db 45 ; base attack
     db 65 ; base defense
@@ -4510,27 +4401,26 @@ MrMimeBaseStats: ; 3911a (e:511a)
     dw MrMimePicFront
     dw MrMimePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw MrMime_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,05                   ; |MEGA_PUNCH|MEGA_KICK|
-    tmlearn 10,15                   ; |DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 19,22,24                ; |SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,29,30,31,32          ; |THUNDER|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,40             ; |REFLECT|BIDE|METRONOME|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    dw MrMimeTMCompatibility
+
+    ; palette
+    dw PAL_MR_MIME
+
+    ds 3
 
     db BANK(MrMimePicFront)
 
-ScytherBaseStats: ; 39136 (e:5136)
-    db DEX_SCYTHER ; pokedex id
+ScytherBaseStats:
+    db SCYTHER ; mon id
     db 70 ; base hp
     db 110 ; base attack
     db 80 ; base defense
@@ -4547,27 +4437,26 @@ ScytherBaseStats: ; 39136 (e:5136)
     dw ScytherPicFront
     dw ScytherPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Scyther_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,03,06                ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
-    tmlearn 09,15                   ; |TAKE_DOWN|HYPER_BEAM|
-    tmlearn 18                      ; |COUNTER|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 41,43,44                ; |LIGHT_SCREEN|SKY_ATTACK|REST|
-    tmlearn 50,51,52                ; |SUBSTITUTE|BLADE|SWOOP|
+    dw ScytherTMCompatibility
+
+    ; palette
+    dw PAL_SCYTHER
+
+    ds 3
 
     db BANK(ScytherPicFront)
 
-JynxBaseStats: ; 39152 (e:5152)
-    db DEX_JYNX ; pokedex id
+JynxBaseStats:
+    db JYNX ; mon id
     db 65 ; base hp
     db 50 ; base attack
     db 35 ; base defense
@@ -4584,27 +4473,26 @@ JynxBaseStats: ; 39152 (e:5152)
     dw JynxPicFront
     dw JynxPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Jynx_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,40             ; |REFLECT|BIDE|METRONOME|SKULL_BASH|
-    tmlearn 41,42,44,46             ; |LIGHT_SCREEN|DREAM_EATER|REST|PSYWAVE|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw JynxTMCompatibility
+
+    ; palette
+    dw PAL_JYNX
+
+    ds 3
 
     db BANK(JynxPicFront)
 
-ElectabuzzBaseStats: ; 3916e (e:516e)
-    db DEX_ELECTABUZZ ; pokedex id
+ElectabuzzBaseStats:
+    db ELECTABUZZ ; mon id
     db 65 ; base hp
     db 83 ; base attack
     db 57 ; base defense
@@ -4621,27 +4509,26 @@ ElectabuzzBaseStats: ; 3916e (e:516e)
     dw ElectabuzzPicFront
     dw ElectabuzzPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Electabuzz_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
-    tmlearn 25,29,31,32             ; |THUNDER|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,39,40          ; |REFLECT|BIDE|METRONOME|SWIFT|SKULL_BASH|
-    tmlearn 41,44,45,46             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 50,54,55                ; |SUBSTITUTE|STRIKE|FLASH|
+    dw ElectabuzzTMCompatibility
+
+    ; palette
+    dw PAL_ELECTABUZZ
+
+    ds 3
 
     db BANK(ElectabuzzPicFront)
 
-MagmarBaseStats: ; 3918a (e:518a)
-    db DEX_MAGMAR ; pokedex id
+MagmarBaseStats:
+    db MAGMAR ; mon id
     db 65 ; base hp
     db 95 ; base attack
     db 57 ; base defense
@@ -4658,27 +4545,26 @@ MagmarBaseStats: ; 3918a (e:518a)
     dw MagmarPicFront
     dw MagmarPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Magmar_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 29,31,32                ; |PSYCHIC_M|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,37,38,40          ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 41,44,46                ; |LIGHT_SCREEN|REST|PSYWAVE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw MagmarTMCompatibility
+
+    ; palette
+    dw PAL_MAGMAR
+
+    ds 3
 
     db BANK(MagmarPicFront)
 
-PinsirBaseStats: ; 391a6 (e:51a6)
-    db DEX_PINSIR ; pokedex id
+PinsirBaseStats:
+    db PINSIR ; mon id
     db 65 ; base hp
     db 125 ; base attack
     db 100 ; base defense
@@ -4695,27 +4581,26 @@ PinsirBaseStats: ; 391a6 (e:51a6)
     dw PinsirPicFront
     dw PinsirPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Pinsir_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 26,27,28,34             ; |EARTHQUAKE|FISSURE|TRAPHOLE|BIDE|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
+    dw PinsirTMCompatibility
+
+    ; palette
+    dw PAL_PINSIR
+
+    ds 3
 
     db BANK(PinsirPicFront)
 
-TaurosBaseStats: ; 391c2 (e:51c2)
-    db DEX_TAUROS ; pokedex id
+TaurosBaseStats:
+    db TAUROS ; mon id
     db 75 ; base hp
     db 100 ; base attack
     db 95 ; base defense
@@ -4732,27 +4617,26 @@ TaurosBaseStats: ; 391c2 (e:51c2)
     dw TaurosPicFront
     dw TaurosPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Tauros_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 07,08                   ; |HORN_DRILL|BODY_SLAM|
-    tmlearn 09,10,13,14,15          ; |TAKE_DOWN|DOUBLE_EDGE|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,26,27,31,32          ; |THUNDER|EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,54                   ; |SUBSTITUTE|STRIKE|
+    dw TaurosTMCompatibility
+
+    ; palette
+    dw PAL_TAUROS
+
+    ds 3
 
     db BANK(TaurosPicFront)
 
-MagikarpBaseStats: ; 391de (e:51de)
-    db DEX_MAGIKARP ; pokedex id
+MagikarpBaseStats:
+    db MAGIKARP ; mon id
     db 20 ; base hp
     db 10 ; base attack
     db 55 ; base defense
@@ -4769,27 +4653,26 @@ MagikarpBaseStats: ; 391de (e:51de)
     dw MagikarpPicFront
     dw MagikarpPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Magikarp_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
+    dw MagikarpTMCompatibility
+
+    ; palette
+    dw PAL_MAGIKARP
+
+    ds 3
 
     db BANK(MagikarpPicFront)
 
-GyaradosBaseStats: ; 391fa (e:51fa)
-    db DEX_GYARADOS ; pokedex id
+GyaradosBaseStats:
+    db GYARADOS ; mon id
     db 95 ; base hp
     db 125 ; base attack
     db 79 ; base defense
@@ -4806,27 +4689,26 @@ GyaradosBaseStats: ; 391fa (e:51fa)
     dw GyaradosPicFront
     dw GyaradosPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Gyarados_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
-    tmlearn 25,26,31                ; |THUNDER|EARTHQUAKE|MIMIC|
-    tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 44,45                   ; |REST|THUNDER_WAVE|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw GyaradosTMCompatibility
+
+    ; palette
+    dw PAL_GYARADOS
+
+    ds 3
 
     db BANK(GyaradosPicFront)
 
-LaprasBaseStats: ; 39216 (e:5216)
-    db DEX_LAPRAS ; pokedex id
+LaprasBaseStats:
+    db LAPRAS ; mon id
     db 130 ; base hp
     db 85 ; base attack
     db 80 ; base defense
@@ -4843,27 +4725,26 @@ LaprasBaseStats: ; 39216 (e:5216)
     dw LaprasPicFront
     dw LaprasPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Lapras_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 07,08                   ; |HORN_DRILL|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 22,23,24                ; |SOLARBEAM|DRAGON_RAGE|THUNDERBOLT|
-    tmlearn 25,26,27,29,31          ; |THUNDER|EARTHQUAKE|FISSURE|PSYCHIC_M|MIMIC|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw LaprasTMCompatibility
+
+    ; palette
+    dw PAL_LAPRAS
+
+    ds 3
 
     db BANK(LaprasPicFront)
 
-DittoBaseStats: ; 39232 (e:5232)
-    db DEX_DITTO ; pokedex id
+DittoBaseStats:
+    db DITTO ; mon id
     db 48 ; base hp
     db 48 ; base attack
     db 48 ; base defense
@@ -4880,27 +4761,26 @@ DittoBaseStats: ; 39232 (e:5232)
     dw DittoPicFront
     dw DittoPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Ditto_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 0
-    tmlearn 0
-    tmlearn 31,35                   ; |MIMIC|METRONOME|
-    tmlearn 0
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw DittoTMCompatibility
+
+    ; palette
+    dw PAL_DITTO
+
+    ds 3
 
     db BANK(DittoPicFront)
 
-EeveeBaseStats: ; 3924e (e:524e)
-    db DEX_EEVEE ; pokedex id
+EeveeBaseStats:
+    db EEVEE ; mon id
     db 55 ; base hp
     db 55 ; base attack
     db 50 ; base defense
@@ -4917,27 +4797,26 @@ EeveeBaseStats: ; 3924e (e:524e)
     dw EeveePicFront
     dw EeveePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Eevee_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 09,10,16                ; |TAKE_DOWN|DOUBLE_EDGE|PAY_DAY|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw EeveeTMCompatibility
+
+    ; palette
+    dw PAL_EEVEE
+
+    ds 3
 
     db BANK(EeveePicFront)
 
-VaporeonBaseStats: ; 3926a (e:526a)
-    db DEX_VAPOREON ; pokedex id
+VaporeonBaseStats:
+    db VAPOREON ; mon id
     db 130 ; base hp
     db 65 ; base attack
     db 60 ; base defense
@@ -4954,27 +4833,26 @@ VaporeonBaseStats: ; 3926a (e:526a)
     dw VaporeonPicFront
     dw VaporeonPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Vaporeon_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
-    tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw VaporeonTMCompatibility
+
+    ; palette
+    dw PAL_VAPOREON
+
+    ds 3
 
     db BANK(VaporeonPicFront)
 
-JolteonBaseStats: ; 39286 (e:5286)
-    db DEX_JOLTEON ; pokedex id
+JolteonBaseStats:
+    db JOLTEON ; mon id
     db 65 ; base hp
     db 65 ; base attack
     db 60 ; base defense
@@ -4991,27 +4869,26 @@ JolteonBaseStats: ; 39286 (e:5286)
     dw JolteonPicFront
     dw JolteonPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Jolteon_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
-    tmlearn 41,44,45                ; |LIGHT_SCREEN|REST|THUNDER_WAVE|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    dw JolteonTMCompatibility
+
+    ; palette
+    dw PAL_JOLTEON
+
+    ds 3
 
     db BANK(JolteonPicFront)
 
-FlareonBaseStats: ; 392a2 (e:52a2)
-    db DEX_FLAREON ; pokedex id
+FlareonBaseStats:
+    db FLAREON ; mon id
     db 65 ; base hp
     db 130 ; base attack
     db 60 ; base defense
@@ -5028,27 +4905,26 @@ FlareonBaseStats: ; 392a2 (e:52a2)
     dw FlareonPicFront
     dw FlareonPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Flareon_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 08                      ; |BODY_SLAM|
-    tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
-    tmlearn 50                      ; |SUBSTITUTE|
+    dw FlareonTMCompatibility
+
+    ; palette
+    dw PAL_FLAREON
+
+    ds 3
 
     db BANK(FlareonPicFront)
 
-PorygonBaseStats: ; 392be (e:52be)
-    db DEX_PORYGON ; pokedex id
+PorygonBaseStats:
+    db PORYGON ; mon id
     db 65 ; base hp
     db 60 ; base attack
     db 70 ; base defense
@@ -5065,27 +4941,26 @@ PorygonBaseStats: ; 392be (e:52be)
     dw PorygonPicFront
     dw PorygonPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Porygon_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 13,14,15                ; |ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,29,30,31             ; |THUNDER|PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
-    tmlearn 49,50,51,55             ; |TRI_ATTACK|SUBSTITUTE|BLADE|FLASH|
+    dw PorygonTMCompatibility
+
+    ; palette
+    dw PAL_PORYGON
+
+    ds 3
 
     db BANK(PorygonPicFront)
 
-OmanyteBaseStats: ; 392da (e:52da)
-    db DEX_OMANYTE ; pokedex id
+OmanyteBaseStats:
+    db OMANYTE ; mon id
     db 35 ; base hp
     db 40 ; base attack
     db 100 ; base defense
@@ -5102,27 +4977,26 @@ OmanyteBaseStats: ; 392da (e:52da)
     dw OmanytePicFront
     dw OmanytePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Omanyte_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06                      ; |TOXIC|
-    tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 0
-    tmlearn 31                      ; |MIMIC|
-    tmlearn 33,34,36                ; |REFLECT|BIDE|SELFDESTRUCT|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw OmanyteTMCompatibility
+
+    ; palette
+    dw PAL_OMANYTE
+
+    ds 3
 
     db BANK(OmanytePicFront)
 
-OmastarBaseStats: ; 392f6 (e:52f6)
-    db DEX_OMASTAR ; pokedex id
+OmastarBaseStats:
+    db OMASTAR ; mon id
     db 70 ; base hp
     db 60 ; base attack
     db 125 ; base defense
@@ -5139,27 +5013,26 @@ OmastarBaseStats: ; 392f6 (e:52f6)
     dw OmastarPicFront
     dw OmastarPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Omastar_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 0
-    tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
-    tmlearn 33,34,36,40             ; |REFLECT|BIDE|SELFDESTRUCT|SKULL_BASH|
-    tmlearn 44,47,48                ; |REST|EXPLOSION|ROCK_SLIDE|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw OmastarTMCompatibility
+
+    ; palette
+    dw PAL_OMASTAR
+
+    ds 3
 
     db BANK(OmastarPicFront)
 
-KabutoBaseStats: ; 39312 (e:5312)
-    db DEX_KABUTO ; pokedex id
+KabutoBaseStats:
+    db KABUTO ; mon id
     db 30 ; base hp
     db 80 ; base attack
     db 90 ; base defense
@@ -5176,27 +5049,26 @@ KabutoBaseStats: ; 39312 (e:5312)
     dw KabutoPicFront
     dw KabutoPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw KabutoFossilBaseStats
+
+    ; pointer to evomoves
+    dw Kabuto_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 21                      ; |MEGA_DRAIN|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw KabutoTMCompatibility
+
+    ; palette
+    dw PAL_KABUTO
+
+    ds 3
 
     db BANK(KabutoPicFront)
 
-KabutopsBaseStats: ; 3932e (e:532e)
-    db DEX_KABUTOPS ; pokedex id
+KabutopsBaseStats:
+    db KABUTOPS ; mon id
     db 60 ; base hp
     db 115 ; base attack
     db 105 ; base defense
@@ -5213,27 +5085,26 @@ KabutopsBaseStats: ; 3932e (e:532e)
     dw KabutopsPicFront
     dw KabutopsPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw KabutopsFossilBaseStats
+
+    ; pointer to evomoves
+    dw Kabutops_EvosMoves
 
     db 0 ; growth rate
 
     ; learnset
-    tmlearn 02,03,05,08             ; |RAZOR_WIND|SWORDS_DANCE|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,19,21                ; |SUBMISSION|SEISMIC_TOSS|MEGA_DRAIN|
-    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 44,48                   ; |REST|ROCK_SLIDE|
-    tmlearn 50,51,53                ; |SUBSTITUTE|BLADE|TSUNAMI|
+    dw KabutopsTMCompatibility
+
+    ; palette
+    dw PAL_KABUTOPS
+
+    ds 3
 
     db BANK(KabutopsPicFront)
 
-AerodactylBaseStats: ; 3934a (e:534a)
-    db DEX_AERODACTYL ; pokedex id
+AerodactylBaseStats:
+    db AERODACTYL ; mon id
     db 80 ; base hp
     db 105 ; base attack
     db 65 ; base defense
@@ -5250,27 +5121,26 @@ AerodactylBaseStats: ; 3934a (e:534a)
     dw AerodactylPicFront
     dw AerodactylPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw AerodactylFossilBaseStats
+
+    ; pointer to evomoves
+    dw Aerodactyl_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 02,04,08                ; |RAZOR_WIND|WHIRLWIND|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 23                      ; |DRAGON_RAGE|
-    tmlearn 26,27,31,32             ; |EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|
-    tmlearn 43,44,48                ; |SKY_ATTACK|REST|ROCK_SLIDE|
-    tmlearn 50,51,52,54             ; |SUBSTITUTE|BLADE|SWOOP|STRIKE|
+    dw AerodactylTMCompatibility
+
+    ; palette
+    dw PAL_AERODACTYL
+
+    ds 3
 
     db BANK(AerodactylPicFront)
 
-SnorlaxBaseStats: ; 39366 (e:5366)
-    db DEX_SNORLAX ; pokedex id
+SnorlaxBaseStats:
+    db SNORLAX ; mon id
     db 160 ; base hp
     db 110 ; base attack
     db 65 ; base defense
@@ -5287,27 +5157,26 @@ SnorlaxBaseStats: ; 39366 (e:5366)
     dw SnorlaxPicFront
     dw SnorlaxPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Snorlax_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,26,27,29,31          ; |THUNDER|EARTHQUAKE|FISSURE|PSYCHIC_M|MIMIC|
-    tmlearn 33,34,35,36,37,38,40    ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
-    tmlearn 44,46,48                ; |REST|PSYWAVE|ROCK_SLIDE|
-    tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
+    dw SnorlaxTMCompatibility
+
+    ; palette
+    dw PAL_SNORLAX
+
+    ds 3
 
     db BANK(SnorlaxPicFront)
 
-ArticunoBaseStats: ; 39382 (e:5382)
-    db DEX_ARTICUNO ; pokedex id
+ArticunoBaseStats:
+    db ARTICUNO ; mon id
     db 90 ; base hp
     db 85 ; base attack
     db 100 ; base defense
@@ -5324,27 +5193,26 @@ ArticunoBaseStats: ; 39382 (e:5382)
     dw ArticunoPicFront
     dw ArticunoPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Articuno_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 41,43,44                ; |LIGHT_SCREEN|SKY_ATTACK|REST|
-    tmlearn 50,52,53                ; |SUBSTITUTE|SWOOP|TSUNAMI|
+    dw ArticunoTMCompatibility
+
+    ; palette
+    dw PAL_ARTICUNO
+
+    ds 3
 
     db BANK(ArticunoPicFront)
 
-ZapdosBaseStats: ; 3939e (e:539e)
-    db DEX_ZAPDOS ; pokedex id
+ZapdosBaseStats:
+    db ZAPDOS ; mon id
     db 90 ; base hp
     db 90 ; base attack
     db 85 ; base defense
@@ -5361,27 +5229,26 @@ ZapdosBaseStats: ; 3939e (e:539e)
     dw ZapdosPicFront
     dw ZapdosPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Zapdos_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,39                ; |REFLECT|BIDE|SWIFT|
-    tmlearn 41,43,44,45             ; |LIGHT_SCREEN|SKY_ATTACK|REST|THUNDER_WAVE|
-    tmlearn 50,52,55                ; |SUBSTITUTE|SWOOP|FLASH|
+    dw ZapdosTMCompatibility
+
+    ; palette
+    dw PAL_ZAPDOS
+
+    ds 3
 
     db BANK(ZapdosPicFront)
 
-MoltresBaseStats: ; 393ba (e:53ba)
-    db DEX_MOLTRES ; pokedex id
+MoltresBaseStats:
+    db MOLTRES ; mon id
     db 90 ; base hp
     db 100 ; base attack
     db 90 ; base defense
@@ -5398,27 +5265,26 @@ MoltresBaseStats: ; 393ba (e:53ba)
     dw MoltresPicFront
     dw MoltresPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Moltres_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 22                      ; |SOLARBEAM|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|
-    tmlearn 41,43,44                ; |LIGHT_SCREEN|SKY_ATTACK|REST|
-    tmlearn 50,52                   ; |SUBSTITUTE|SWOOP|
+    dw MoltresTMCompatibility
+
+    ; palette
+    dw PAL_MOLTRES
+
+    ds 3
 
     db BANK(MoltresPicFront)
 
-DratiniBaseStats: ; 393d6 (e:53d6)
-    db DEX_DRATINI ; pokedex id
+DratiniBaseStats:
+    db DRATINI ; mon id
     db 41 ; base hp
     db 64 ; base attack
     db 45 ; base defense
@@ -5435,27 +5301,26 @@ DratiniBaseStats: ; 393d6 (e:53d6)
     dw DratiniPicFront
     dw DratiniPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Dratini_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 0
-    tmlearn 11,12,13,14             ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|
-    tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,44,45                ; |LIGHT_SCREEN|REST|THUNDER_WAVE|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw DratiniTMCompatibility
+
+    ; palette
+    dw PAL_DRATINI
+
+    ds 3
 
     db BANK(DratiniPicFront)
 
-DragonairBaseStats: ; 393f2 (e:53f2)
-    db DEX_DRAGONAIR ; pokedex id
+DragonairBaseStats:
+    db DRAGONAIR ; mon id
     db 61 ; base hp
     db 84 ; base attack
     db 65 ; base defense
@@ -5472,27 +5337,26 @@ DragonairBaseStats: ; 393f2 (e:53f2)
     dw DragonairPicFront
     dw DragonairPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Dragonair_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 07,08                   ; |HORN_DRILL|BODY_SLAM|
-    tmlearn 09,11,12,13,14,15       ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
-    tmlearn 25,28,31,32             ; |THUNDER|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,44,45                ; |LIGHT_SCREEN|REST|THUNDER_WAVE|
-    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    dw DragonairTMCompatibility
+
+    ; palette
+    dw PAL_DRAGONAIR
+
+    ds 3
 
     db BANK(DragonairPicFront)
 
-DragoniteBaseStats: ; 3940e (e:540e)
-    db DEX_DRAGONITE ; pokedex id
+DragoniteBaseStats:
+    db DRAGONITE ; mon id
     db 91 ; base hp
     db 134 ; base attack
     db 95 ; base defense
@@ -5509,27 +5373,26 @@ DragoniteBaseStats: ; 3940e (e:540e)
     dw DragonitePicFront
     dw DragonitePicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Dragonite_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 01,02,04,05,07,08       ; |MEGA_PUNCH|RAZOR_WIND|WHIRLWIND|MEGA_KICK|HORN_DRILL|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 19,23,24                ; |SEISMIC_TOSS|DRAGON_RAGE|THUNDERBOLT|
-    tmlearn 25,26,27,28,31,32       ; |THUNDER|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,43,44,45,48          ; |LIGHT_SCREEN|SKY_ATTACK|REST|THUNDER_WAVE|ROCK_SLIDE|
-    tmlearn 50,51,52,53,54          ; |SUBSTITUTE|BLADE|SWOOP|TSUNAMI|STRIKE|
+    dw DragoniteTMCompatibility
+
+    ; palette
+    dw PAL_DRAGONITE
+
+    ds 3
 
     db BANK(DragonitePicFront)
 
-MewtwoBaseStats: ; 3942a (e:542a)
-    db DEX_MEWTWO ; pokedex id
+MewtwoBaseStats:
+    db MEWTWO ; mon id
     db 106 ; base hp
     db 110 ; base attack
     db 90 ; base defense
@@ -5546,27 +5409,26 @@ MewtwoBaseStats: ; 3942a (e:542a)
     dw MewtwoPicFront
     dw MewtwoPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Mewtwo_EvosMoves
 
     db 5 ; growth rate
 
     ; learnset
-    tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
-    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,26,29,30,31,32       ; |THUNDER|EARTHQUAKE|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,36,37,38,39,40 ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44,45,46,48       ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|ROCK_SLIDE|
-    tmlearn 49,50,54,55             ; |TRI_ATTACK|SUBSTITUTE|STRIKE|FLASH|
+    dw MewtwoTMCompatibility
+
+    ; palette
+    dw PAL_MEWTWO
+
+    ds 3
 
     db BANK(MewtwoPicFront)
 
-MewBaseStats: ; 425b (1:425b)
-    db DEX_MEW ; pokedex id
+MewBaseStats:
+    db MEW ; mon id
     db 100 ; base hp
     db 100 ; base attack
     db 100 ; base defense
@@ -5583,15 +5445,308 @@ MewBaseStats: ; 425b (1:425b)
     dw MewPicFront
     dw MewPicBack
 
-    ; attacks known at lvl 0
-    db 0
-    db 0
-    db 0
-    db 0
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Mew_EvosMoves
 
     db 3 ; growth rate
 
-    ; include learnset directly
-	db $ff,$ff,$ff,$ff,$ff,$ff,$ff
+    ; learnset
+    dw MewTMCompatibility
+
+    ; palette
+    dw PAL_MEW
+
+    ds 3
 
     db BANK(MewPicFront)
+
+LitwickBaseStats:
+    db LITWICK ; mon id
+    db 50 ; base hp
+    db 30 ; base attack
+    db 55 ; base defense
+    db 20 ; base speed
+    db 65 ; base special
+
+    db GHOST ; species type 1
+    db FIRE ; species type 2
+
+    db 190 ; catch rate
+    db 55 ; base exp yield
+    db $55 ; sprite dimensions
+
+    dw LitwickPicFront
+    dw LitwickPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Litwick_EvosMoves
+
+    db 3 ; growth rate
+
+    ; learnset
+    dw LitwickTMCompatibility
+
+    ; palette
+    dw PAL_LITWICK
+
+    ds 3
+
+    db BANK(LitwickPicFront)
+
+LampentBaseStats:
+    db LAMPENT ; mon id
+    db 60 ; base hp
+    db 40 ; base attack
+    db 60 ; base defense
+    db 55 ; base speed
+    db 95 ; base special
+
+    db GHOST ; species type 1
+    db FIRE ; species type 2
+
+    db 90 ; catch rate
+    db 130 ; base exp yield
+    db $66 ; sprite dimensions
+
+    dw LampentPicFront
+    dw LampentPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Lampent_EvosMoves
+
+    db 3 ; growth rate
+
+    ; learnset
+    dw LampentTMCompatibility
+
+    ; palette
+    dw PAL_LAMPENT
+
+    ds 3
+
+    db BANK(LampentPicFront)
+
+ChandelureBaseStats:
+    db CHANDELURE ; mon id
+    db 60 ; base hp
+    db 55 ; base attack
+    db 90 ; base defense
+    db 80 ; base speed
+    db 145 ; base special
+
+    db GHOST ; species type 1
+    db FIRE ; species type 2
+
+    db 45 ; catch rate
+    db 234 ; base exp yield
+    db $77 ; sprite dimensions
+
+    dw ChandelurePicFront
+    dw ChandelurePicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Chandelure_EvosMoves
+
+    db 3 ; growth rate
+
+    ; learnset
+    dw ChandelureTMCompatibility
+
+    ; palette
+    dw PAL_CHANDELURE
+
+    ds 3
+
+    db BANK(ChandelurePicFront)
+
+Mon155BaseStats:
+    db MON_155 ; mon id
+    db 00 ; base hp
+    db 00 ; base attack
+    db 00 ; base defense
+    db 00 ; base speed
+    db 00 ; base special
+
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
+
+    db 255 ; catch rate
+    db 0 ; base exp yield
+    db $88 ; sprite dimensions
+
+    dw MissingNoPicFront
+    dw MissingNoPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
+
+    db 3 ; growth rate
+
+    ; learnset
+    dw Mon155TMCompatibility
+
+    ; palette
+    dw PAL_MON_155
+
+    ds 3
+
+    db BANK(MissingNoPicFront)
+
+Mon156BaseStats:
+    db MON_156 ; mon id
+    db 00 ; base hp
+    db 00 ; base attack
+    db 00 ; base defense
+    db 00 ; base speed
+    db 00 ; base special
+
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
+
+    db 255 ; catch rate
+    db 0 ; base exp yield
+    db $88 ; sprite dimensions
+
+    dw MissingNoPicFront
+    dw MissingNoPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
+
+    db 3 ; growth rate
+
+    ; learnset
+    dw Mon156TMCompatibility
+
+    ; palette
+    dw PAL_MON_156
+
+    ds 3
+
+    db BANK(MissingNoPicFront)
+
+Mon157BaseStats:
+    db MON_157 ; mon id
+    db 00 ; base hp
+    db 00 ; base attack
+    db 00 ; base defense
+    db 00 ; base speed
+    db 00 ; base special
+
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
+
+    db 255 ; catch rate
+    db 0 ; base exp yield
+    db $88 ; sprite dimensions
+
+    dw MissingNoPicFront
+    dw MissingNoPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
+
+    db 3 ; growth rate
+
+    ; learnset
+    dw Mon157TMCompatibility
+
+    ; palette
+    dw PAL_MON_157
+
+    ds 3
+
+    db BANK(MissingNoPicFront)
+
+Mon158BaseStats:
+    db MON_158 ; mon id
+    db 00 ; base hp
+    db 00 ; base attack
+    db 00 ; base defense
+    db 00 ; base speed
+    db 00 ; base special
+
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
+
+    db 255 ; catch rate
+    db 0 ; base exp yield
+    db $88 ; sprite dimensions
+
+    dw MissingNoPicFront
+    dw MissingNoPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
+
+    db 3 ; growth rate
+
+    ; learnset
+    dw Mon158TMCompatibility
+
+    ; palette
+    dw PAL_MON_158
+
+    ds 3
+
+    db BANK(MissingNoPicFront)
+
+Mon159BaseStats:
+    db MON_159 ; mon id
+    db 00 ; base hp
+    db 00 ; base attack
+    db 00 ; base defense
+    db 00 ; base speed
+    db 00 ; base special
+
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
+
+    db 255 ; catch rate
+    db 0 ; base exp yield
+    db $88 ; sprite dimensions
+
+    dw MissingNoPicFront
+    dw MissingNoPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw MissingNo_EvosMoves
+
+    db 3 ; growth rate
+
+    ; learnset
+    dw Mon159TMCompatibility
+
+    ; palette
+    dw PAL_MON_159
+
+    ds 3
+
+    db BANK(MissingNoPicFront)
