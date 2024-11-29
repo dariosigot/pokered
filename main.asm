@@ -17396,13 +17396,13 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     ret
 
 .FieldMoveNames
-    db "CUT@"    ; Move : BLADE
     db "FLY@"    ; Move : SWOOP
+    db "TELEP.@" ; Move : TELEPORT
+    db "DIG@"    ; Move : TRAPHOLE
+    db "CUT@"    ; Move : BLADE
     db "FLOAT@"  ; Move : TSUNAMI (SURF)
     db "STR.TH@" ; Move : STRIKE
     db "LIGHT@"  ; Move : FLASH
-    db "DIG@"    ; Move : TRAPHOLE
-    db "TELEP.@" ; Move : TELEPORT
     db "HEAL@"   ; Move : SOFTBOILED
 
 ChoiceMonSimpleMenu:
@@ -29657,13 +29657,13 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[W_OBTAINEDBADGES] ; badges obtained
     jp hl
 .outOfBattleMovePointers
-    dw .cut
     dw .fly
+    dw .teleport
+    dw .dig
+    dw .cut
     dw .surf
     dw .strength
     dw .flash
-    dw .dig
-    dw .teleport
     dw .softboiled
 .fly
     bit 2,a ; does the player have the Thunder Badge?
@@ -131296,7 +131296,7 @@ SelectInOverWorld:
     ld hl,$d803 ; NaturePower
     bit 0,[hl]  ; ...
     jr z,.noCut
-    ld b,$01 ; CUT
+    ld b,4 ; CUT
     call SearchFieldMoveInParty
     jr nc,.noCut
 .canCut
@@ -131337,7 +131337,7 @@ SelectInOverWorld:
     ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     jp c,.noFloat
-    ld b,$03 ; FLOAT
+    ld b,5 ; FLOAT
     call SearchFieldMoveInParty
     jr nc,.noFloat
 .canFloat
@@ -131363,7 +131363,7 @@ SelectInOverWorld:
     ld hl,$d7c2 ; FirePower
     bit 0,[hl]  ; ...
     jr z,.noLight
-    ld b,$05 ; LIGHT
+    ld b,7 ; LIGHT
     call SearchFieldMoveInParty
     jr nc,.noLight
 .canLight
@@ -131390,7 +131390,7 @@ SelectInOverWorld:
     ld hl,$d78e ; EarthPower
     bit 0,[hl]  ; ...
     jr z,.noStrength
-    ld b,$04 ; STRENGTH
+    ld b,6 ; STRENGTH
     call SearchFieldMoveInParty
     jr nc,.noStrength
 .canStrength
