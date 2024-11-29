@@ -484,6 +484,18 @@ PlayCryAndDisplayPokedex:
     ld a,$10
     jp Predef
 
+BackupHeader:
+    ld hl,W_MONHEADER
+    ld de,GenericBuffer+1
+    ld bc,28
+    jp CopyData
+
+RestoreHeader:
+    ld hl,GenericBuffer+1
+    ld de,W_MONHEADER
+    ld bc,28
+    jp CopyData
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -25653,10 +25665,7 @@ SendNewMonToBox: ; Moved in the Bank
     ld [de],a
     cp $ff
     jr nz,.loop
-    xor a        ; Used in GetAlternateForm
-    ld [$cc49],a ; ...
-    call GetAlternateForm
-    call GetMonHeader
+    call .GetMonHeader
     ld hl,$dd2a
     ld bc,$b
     ld a,[W_NUMINBOX] ; $da80
@@ -25770,6 +25779,7 @@ SendNewMonToBox: ; Moved in the Bank
     ld [de],a
     inc de
     push de
+    call .GetMonHeader
     ld a,[W_CURENEMYLVL] ; $d127
     ld d,a
     ld hl,CalcExperience
@@ -25803,6 +25813,13 @@ SendNewMonToBox: ; Moved in the Bank
     ld b,BANK(SentNewMonToBox_TryToAddExclusiveMove)
     ld hl,SentNewMonToBox_TryToAddExclusiveMove
     jp Bankswitch
+.GetMonHeader
+    ld a,[$cf91]
+    ld [$d0b5],a
+    xor a        ; Used in GetAlternateForm
+    ld [$cc49],a ; ...
+    call GetAlternateForm
+    jp GetMonHeader
 
 ItemUseTechMach:
     ld a,[W_ISINBATTLE]
@@ -100420,6 +100437,8 @@ GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
     ld bc,$10
     call CopyData
 
+    call BackupHeader
+
     ; Get Front Palette
     ld hl,W_ENEMYMONID
     ld a,[hl]
@@ -100430,12 +100449,14 @@ GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
     ld hl,W_PLAYERMONID
     ld a,[hl]
     call CheckShinyBackAndGetPAL ; DONE:Palette
-    ld b,h
-    ld c,l
+    push hl ; Backup backsprite palette
+
+    call RestoreHeader
 
     ld hl,$cf2e
 
     ; backsprite palette
+    pop bc ; Restore backsprite palette
     ld a,c
     ld [hli],a
     ld a,b
