@@ -15485,7 +15485,7 @@ Func_695d: ; 695d (1:695d)
     and a
     jr z,.asm_697a
     ld hl,DefaultNamesPlayerList ; $6af2
-    call Func_6ad6
+    call GetDefaultName
     ld de,W_PLAYERNAME ; $d158
     call Func_69ec
     jr .asm_6999
@@ -15518,7 +15518,7 @@ Func_69a4: ; 69a4 (1:69a4)
     and a
     jr z,.asm_69c1
     ld hl,DefaultNamesRivalList
-    call Func_6ad6
+    call GetDefaultName
     ld de,W_RIVALNAME ; $d34a
     call Func_69ec
     jr .asm_69e1
@@ -15664,54 +15664,16 @@ Func_6a6c: ; 6a6c (1:6a6c)
 .namestring ; 6aa3 (1:6aa3)
     db "NAME@"
 
-;IF _RED
-;DefaultNamesPlayer: ; 6aa8 (1:6aa8)
-;    db "NEW NAME",$4E,"RED",$4E,"ASH",$4E,"JACK@"
-;DefaultNamesRival: ; 6abe (1:6abe)
-;    db "NEW NAME",$4E,"BLUE",$4E,"GARY",$4E,"JOHN@"
-;ENDC
-;IF _BLUE
-;DefaultNamesPlayer: ; 6aa8 (1:6aa8)
-;    db "NEW NAME",$4E,"BLUE",$4E,"GARY",$4E,"JOHN@"
-;DefaultNamesRival: ; 6abe (1:6abe)
-;    db "NEW NAME",$4E,"RED",$4E,"ASH",$4E,"JACK@"
-;ENDC
-
-SECTION "Func_6ad6",ROMX[$6ad6],BANK[$1]
-
-Func_6ad6: ; 6ad6 (1:6ad6)
-    ld b,a
-    ld c,$0
-.asm_6ad9
-    ld d,h
-    ld e,l
-.asm_6adb
-    ld a,[hli]
-    cp $50
-    jr nz,.asm_6adb
-    ld a,b
-    cp c
-    jr z,.asm_6ae7
-    inc c
-    jr .asm_6ad9
-.asm_6ae7
-    ld h,d
-    ld l,e
+; a = name index
+; hl = name list
+GetDefaultName:
+    dec a
+    call SkipFixedLengthTextEntries
     ld de,$cd6d
-    ld bc,$14
+    ld bc,$b
     jp CopyData
-;IF _RED
-;DefaultNamesPlayerList: ; 6af2 (1:6af2)
-;    db "NEW NAME@RED@ASH@JACK@"
-;DefaultNamesRivalList: ; 6b08 (1:6b08)
-;    db "NEW NAME@BLUE@GARY@JOHN@"
-;ENDC
-;IF _BLUE
-;DefaultNamesPlayerList: ; 6af2 (1:6af2)
-;    db "NEW NAME@BLUE@GARY@JOHN@"
-;DefaultNamesRivalList: ; 6b08 (1:6b08)
-;    db "NEW NAME@RED@ASH@JACK@"
-;ENDC
+
+; Free
 
 SECTION "TextTerminator_6b20",ROMX[$6b20],BANK[$1]
 
@@ -18359,7 +18321,6 @@ DefaultNamesRival:
     db "NEW NAME",$4E,"BLUE",$4E,"JEANS",$4E,"GARY@"
 
 DefaultNamesPlayerList:
-    db "@"
     db "RED@"
     ds 7
     db "DENIM@"
@@ -18367,10 +18328,12 @@ DefaultNamesPlayerList:
     db "ASH@"
     ds 7
 DefaultNamesRivalList:
-    db "@"
     db "BLUE@"
+    ds 6
     db "JEANS@"
+    ds 5
     db "GARY@"
+    ds 6
 
 CheckDiglettsCave:
     call GetCurrentOldAdventureMap
