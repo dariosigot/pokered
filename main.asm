@@ -25699,7 +25699,7 @@ SendNewMonToBox: ; Moved in the Bank
     ld hl,W_PLAYERNAME ; $d158
     ld de,$dd2a
     ld bc,$b
-    call CopyData
+    call CopyDataAndInsertIVDuringSendNewMonToBox ; call CopyData
     ld a,[W_NUMINBOX] ; $da80
     dec a
     jr z,.skip2
@@ -28973,19 +28973,25 @@ InsertIVDuringAddMonToParty:
 .rename
     ld a,[W_ISINBATTLE]
     and a
-    jr nz,.copyEnemyMonData
+    jr nz,InsertIVFromEnemyMonData
 .random
     call GenRandom
     ld [hli],a
     call GenRandom
     ld [hl],a
     ret
-.copyEnemyMonData
+
+CopyDataAndInsertIVDuringSendNewMonToBox:
+    call CopyData
+    ld hl,wDVForShinyAtkDef
+    ; fall through
+
+InsertIVFromEnemyMonData:
     ld a,[W_ENEMYMONATKDEFIV]
     ld [hli],a
     ld a,[W_ENEMYMONSPDSPCIV]
     ld [hl],a
-    ret
+    ret    
 
 SECTION "bank4",ROMX,BANK[$4]
 
