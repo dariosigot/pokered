@@ -30788,9 +30788,9 @@ UnnamedText_1399e: ; 1399e (4:799e)
 
 ; Free
 
-SECTION "Func_139da",ROMX[$79da],BANK[$4]
+SECTION "HazeEffect_",ROMX[$79da],BANK[$4]
 
-Func_139da: ; 139da (4:79da)
+HazeEffect_: ; 139da (4:79da)
     ld a,$7
     ld hl,wPlayerMonAttackMod
     call Func_13a43
@@ -47966,9 +47966,9 @@ MistEffect_: ; 33f2b (c:7f2b)
     TX_FAR _MistAlreadyInUseText
     db "@"
 
-SECTION "Func_33f57",ROMX[$7f57],BANK[$c]
+SECTION "OneHitKOEffect_",ROMX[$7f57],BANK[$c]
 
-Func_33f57: ; 33f57 (c:7f57)
+OneHitKOEffect_: ; 33f57 (c:7f57)
     ld hl,W_DAMAGE ; $d0d7
     xor a
     ld [hli],a
@@ -58026,8 +58026,8 @@ BackupMovesBeforeEnemyMimic:
     ret
 
 HazeEffect: ; Moved in the Bank
-    ld hl,Func_139da
-    ld b,BANK(Func_139da)
+    ld hl,HazeEffect_
+    ld b,BANK(HazeEffect_)
     jp Bankswitch
 
 JumpMoveEffect: ; Moved in the Bank
@@ -60732,6 +60732,8 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr nz,.handleEnemy
+
+.handlePlayer
     ld a,[W_ISINBATTLE] ; $d057
     dec a
     jr nz,.notWildBattle1
@@ -60751,6 +60753,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     srl b ; b = enemyLevel / 4
     cp b ; is rand[0, playerLevel + enemyLevel] >= (enemyLevel / 4)?
     jr nc,.playerMoveWasSuccessful ; if so, allow teleporting
+.notWildBattle1
     ld a,[W_PLAYERMOVENUM] ; $cfd2
     jr .handleFailed
 .playerMoveWasSuccessful
@@ -60761,17 +60764,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld [$d078],a ; EscapedFromBattle
     ld a,[W_PLAYERMOVENUM] ; $cfd2
     jr .playAnimAndPrintText
-.notWildBattle1
-    ld a,[W_PLAYERMOVENUM] ; $cfd2
-    cp TELEPORT
-    jp z,PrintButItFailedText_
-    call PlayCurrentMoveAnimation
-    jp PrintIsUnaffectedText
-.handleFailed
-    cp TELEPORT
-    jp z,PrintButItFailedText_
-    call PlayCurrentMoveAnimation
-    jp PrintDidntAffectText
+
 .handleEnemy
     ld a,[W_ISINBATTLE] ; $d057
     dec a
@@ -60792,6 +60785,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     srl b
     cp b
     jr nc,.enemyMoveWasSuccessful
+.notWildBattle2
     ld a,[W_ENEMYMOVENUM] ; $cfcc
     jr .handleFailed
 .enemyMoveWasSuccessful
@@ -60802,12 +60796,22 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld [$d078],a
     ld a,[W_ENEMYMOVENUM] ; $cfcc
     jr .playAnimAndPrintText
-.notWildBattle2
-    ld a,[W_ENEMYMOVENUM] ; $cfcc
+
+.handleFailed
     cp TELEPORT
-    jp z,ConditionalPrintButItFailed
+    jp z,PrintButItFailedText_
+    cp WHIRLWIND
+    jr nz,.notwhirlwind
+    xor a
+    ld [$cc5b],a
+    ld a,$CD ; WhirlwindFailAnim
+    call PlayBattleAnimation
+    jr .failDone
+.notwhirlwind
     call PlayCurrentMoveAnimation
+.failDone
     jp PrintIsUnaffectedText
+
 .playAnimAndPrintText
     push af
     call PlayBattleAnimation
@@ -60823,6 +60827,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld hl,.WasBlownAwayText
 .printText
     jp PrintText
+
 .RanFromBattleText
     TX_FAR _RanFromBattleText
     db "@"
@@ -60839,6 +60844,8 @@ PrintIsUnaffectedText:
 .IsUnaffectedText
     TX_FAR _IsUnaffectedText
     db "@"
+
+; Free
 
 SECTION "TwoToFiveAttacksEffect",ROMX[$7811],BANK[$f]
 
@@ -60911,9 +60918,9 @@ FlinchSideEffect: ; 3f85b (f:785b)
     ret
 
 OneHitKOEffect: ; 3f884 (f:7884)
-    ld hl,Func_33f57
-    ld b,BANK(Func_33f57)
-    jp Bankswitch ; indirect jump to Func_33f57 (33f57 (c:7f57))
+    ld hl,OneHitKOEffect_
+    ld b,BANK(OneHitKOEffect_)
+    jp Bankswitch ; indirect jump to OneHitKOEffect_ (33f57 (c:7f57))
 
 ChargeEffect: ; 3f88c (f:788c)
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
@@ -110018,6 +110025,10 @@ ZigZagScreenAnim: ; Moved in the Bank
     db SE_WAVY_SCREEN,$FF
     db $FF
 
+WhirlwindFailAnim:
+    db $46,$11,$10
+    db $FF
+
 ; Free
 
 SECTION "AnimationSlideMonDownAndHide",ROMX[$55c9],BANK[$1e]
@@ -111456,6 +111467,7 @@ AttackAnimationPointers: ; 7a07d (1e:607d)
     dw ThrowBaitAnim
     dw ZigZagScreenAnim
     dw TransformFailAnim ; $CC
+    dw WhirlwindFailAnim ; $CD
 
 ; each animation is a list of subanimations and special effects
 ; if first byte < $56
@@ -111544,10 +111556,8 @@ WingAttackAnim: ; 7a277 (1e:6277)
 
 WhirlwindAnim: ; 7a27b (1e:627b)
     db $46,$11,$10
-    ;db SE_SLIDE_ENEMY_MON_OUT,$FF
+    db SE_SLIDE_ENEMY_MON_OUT,$FF
     db $FF
-
-SECTION "FlyAnim",ROMX[$6281],BANK[$1e]
 
 FlyAnim: ; 7a281 (1e:6281)
     db $46,$12,$04
