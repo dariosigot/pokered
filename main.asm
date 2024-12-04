@@ -30712,9 +30712,9 @@ TryDoWildEncounter: ; Moved in the Bank
     xor a
     ret
 
-SECTION "Func_1392c",ROMX[$792c],BANK[$4]
+SECTION "RecoilEffect_",ROMX[$792c],BANK[$4]
 
-Func_1392c: ; 1392c (4:792c)
+RecoilEffect_: ; 1392c (4:792c)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVENUM] ; $cfd2
@@ -30778,7 +30778,7 @@ Func_1392c: ; 1392c (4:792c)
     xor a
 .asm_13990
     ld [wListMenuID],a ; $cf94
-    ds 2; ld a,$48
+    ; ds 2; ld a,$48
     call SetDamageDuringRecoil ; call Predef ; UpdateHPBar
     ld hl,UnnamedText_1399e ; $799e
     jp PrintText
@@ -59951,7 +59951,7 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierDownEffect       ; unused effect
      dw StatModifierDownEffect       ; unused effect
      dw StatModifierDownEffect       ; unused effect
-     dw ConfusionSideEffect          ; CONFUSION_SIDE_EFFECT
+     dw ConfusionEffect              ; CONFUSION_SIDE_EFFECT
      dw TwoToFiveAttacksEffect       ; TWINEEDLE_EFFECT
      dw AmnesiaNewEffect             ; AMNESIA_NEW_EFFECT
      dw SubstituteEffect             ; SUBSTITUTE_EFFECT
@@ -60640,6 +60640,13 @@ StatModifierDownEffect: ; Moved in the Bank
 
 ; ──────────────────────────────────────────────────────────────────────
 
+RecoilEffect: ; Moved in the Bank
+    ld hl,RecoilEffect_
+    ld b,BANK(RecoilEffect_)
+    jp Bankswitch
+
+; Free
+
 SECTION "PrintStatText",ROMX[$7688],BANK[$f]
 
 PrintStatText: ; 3f688 (f:7688)
@@ -60845,6 +60852,16 @@ PrintIsUnaffectedText:
     TX_FAR _IsUnaffectedText
     db "@"
 
+MistEffect: ; Moved in the Bank
+    ld hl,MistEffect_
+    ld b,BANK(MistEffect_)
+    jp Bankswitch
+
+FocusEnergyEffect: ; Moved in the Bank
+    ld hl,FocusEnergyEffect_
+    ld b,BANK(FocusEnergyEffect_)
+    jp Bankswitch
+
 ; Free
 
 SECTION "TwoToFiveAttacksEffect",ROMX[$7811],BANK[$f]
@@ -61028,58 +61045,41 @@ PrintAlreadyStatusedText:
     TX_FAR _AlreadyStatusedText
     db "@"
 
-SECTION "MistEffect",ROMX[$7941],BANK[$f]
-
-MistEffect: ; 3f941 (f:7941)
-    ld hl,MistEffect_
-    ld b,BANK(MistEffect_)
-    jp Bankswitch
-
-FocusEnergyEffect: ; 3f949 (f:7949)
-    ld hl,FocusEnergyEffect_
-    ld b,BANK(FocusEnergyEffect_)
-    jp Bankswitch
-
-RecoilEffect: ; 3f951 (f:7951)
-    ld hl,Func_1392c
-    ld b,BANK(Func_1392c)
-    jp Bankswitch
-
-ConfusionSideEffect: ; 3f959 (f:7959)
-    call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle
-    cp $19
-    ret nc
-    jr ConfusionSideEffectSuccess
-
-ConfusionEffect: ; 3f961 (f:7961)
-    call CheckTargetSubstitute
-    jr nz,ConfusionEffectFailed
-    call MoveHitTest
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
-    jr nz,ConfusionEffectFailed
-
-ConfusionSideEffectSuccess: ; 3f96f (f:796f)
+ConfusionEffect: ; Moved in the Bank
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     ld bc,$d070 ; EnemyConfusedCounter
-    ld a,[W_PLAYERMOVEEFFECT] ; $cfd3
+    ld de,W_PLAYERMOVEEFFECT ; $cfd3
     jr z,.done
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
     ld bc,$d06b ; PlayerConfusedCounter
-    ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
+    ld de,W_ENEMYMOVEEFFECT ; $cfcd
 .done
+    ld a,[de]
+    cp CONFUSION_EFFECT
+    jr nz,.skipMoveHitTest
+    call MoveHitTestPlus
+    jr nz,.attackMissed
+.skipMoveHitTest
+    call CheckTargetSubstitute
+    jr nz,.didntAffect
+    ld a,[de]
+    cp CONFUSION_SIDE_EFFECT
+    jr nz,.skipCheckSideEffect
+    call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle
+    cp $19
+    ret nc
+.skipCheckSideEffect
     bit 7,[hl] ; CONFUSED ; is mon confused?
-    jr nz,ConfusionEffectFailed
+    jr nz,.alreadyConfused
     set 7,[hl] ; CONFUSED ; mon is now confused
-    push af
     call GenRandomInBattle
     and $3
     inc a
     inc a
     ld [bc],a ; confusion status will last 2-5 turns
-    pop af
+    ld a,[de]
     cp CONFUSION_SIDE_EFFECT
     call nz,PlayCurrentMoveAnimation2
     ld hl,.BecameConfusedText
@@ -61087,12 +61087,30 @@ ConfusionSideEffectSuccess: ; 3f96f (f:796f)
 .BecameConfusedText
     TX_FAR _BecameConfusedText
     db "@"
-
-ConfusionEffectFailed: ; 3f9a6 (f:79a6)
+.attackMissed
+    ld hl,PrintMoveFailureText
+    jr .checkEnd
+.didntAffect
+    ld hl,PrintDidntAffectText
+    jr .checkEnd
+.alreadyConfused
+    ld hl,PrintAlreadyConfusedText
+    ; fall through
+.checkEnd
+    ld a,[de]
     cp CONFUSION_SIDE_EFFECT
     ret z
     call PlayCurrentMoveAnimation
-    jp ConditionalPrintButItFailed
+    jp hl
+
+PrintAlreadyConfusedText:
+    ld hl,.AlreadyConfusedText
+    jp Delay50AndPrintText
+.AlreadyConfusedText
+    TX_FAR _AlreadyConfusedText
+    db "@"
+
+; Free
 
 SECTION "ParalyzeEffect",ROMX[$79b1],BANK[$f]
 
@@ -61310,11 +61328,6 @@ SplashEffect: ; Moved in the Bank
 .NoEffectText
     TX_FAR _NoEffectText
     db "@"
-
-ConditionalPrintButItFailed: ; Moved in the Bank
-    ld a,[$ccf4] ; MoveDidntMiss
-    and a
-    ret nz ; return if the side effect failed, yet the attack was successful
 
 PrintButItFailedText_: ; Moved in the Bank
     ld hl,.ButItFailedText
@@ -125492,6 +125505,10 @@ _AlreadyStatusedText:
     db $0,$59,$4f
     db "already statused!",$58
 
+_AlreadyConfusedText:
+    db $0,$59,$4f
+    db "already confused!",$58
+
 _MistAlreadyInUseText:
     db $0,$5a,"'s",$4f
     db "already in mist!",$58
@@ -134909,7 +134926,7 @@ AIEnemyTrainerChooseMoves:
     dec a
     jr nz,.notwildbattle
     ;wild battle confirmed at this point
-    ld a,[W_ENEMYMON_START]
+    ld a,[W_ENEMYMONID]
     ld hl,WildAI
     ld de,$0001
     call IsInArray
