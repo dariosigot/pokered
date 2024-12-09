@@ -558,7 +558,17 @@ W_TRAINERNO: ; d05d
 W_MOVEMISSED: ; d05f
     ds 1
 
-    ds 2
+wPlayerStatsToDouble:: ; d060
+; always 0
+;joenote - putting this back into use
+;set bit to flag the stat
+;bit 0 - attack
+;bit 1 - defence
+;bit 2 - speed
+;bit 3 - special
+    ds 1
+
+    ds 1
 
 W_PLAYERBATTSTATUS1: ; d062
 ; bit 0 - bide
@@ -588,7 +598,17 @@ W_PLAYERBATTSTATUS3: ; d064
 ; bit 3 - tranformed
     ds 1
 
-    ds 2
+wEnemyStatsToDouble:: ; d065
+; always 0
+;joenote - putting this back into use
+;set bit to flag the stat
+;bit 0 - attack
+;bit 1 - defence
+;bit 2 - speed
+;bit 3 - special
+    ds 1
+
+    ds 1
 
 W_ENEMYBATTSTATUS1: ; d067
     ds 1

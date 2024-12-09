@@ -23892,19 +23892,21 @@ ItemUseMedicine: ; Moved in the Bank
     cp d ; is pokemon the item was used on active in battle?
     jp nz,.doneHealing
 ; if it is active in battle
+;joenote - this part is getting a bit of a rewrite to prevent resetting all stats when using a status healing item
+    ld a,[H_WHOSETURN] ; Backup Turn
+    push af            ; ...
+    xor a              ; Force player turn
+    ld [H_WHOSETURN],a ; ...
+    ld hl,UndoBurnParStats
+    ld b,BANK(UndoBurnParStats)
+    call Bankswitch
+    pop af             ; Restore Turn
+    ld [H_WHOSETURN],a ; ...
     xor a
     ld [W_PLAYERMONSTATUS],a ; remove the status ailment in the in-battle pokemon data
-    push hl
+    ld [W_PLAYERTOXICCOUNTER],a ; clear toxic counter
     ld hl,W_PLAYERBATTSTATUS3
     res 0,[hl] ; heal Toxic status
-    pop hl
-    ld bc,30
-    add hl,bc ; hl now points to party stats
-    ld de,W_PLAYERMONMAXHP
-    ld bc,10
-    call CopyData ; copy party stats to in-battle stat data
-    ld a,$28
-    call Predef
     jp .doneHealing
 .healHP
     inc hl ; hl = address of current HP
@@ -30786,86 +30788,100 @@ UnnamedText_1399e: ; 1399e (4:799e)
     TX_FAR _UnnamedText_1399e
     db "@"
 
-; Free
-
-SECTION "HazeEffect_",ROMX[$79da],BANK[$4]
-
-HazeEffect_: ; 139da (4:79da)
+HazeEffect_: ; Moved in the Bank
     ld a,$7
+; store 7 on every stat mod
     ld hl,wPlayerMonAttackMod
-    call Func_13a43
+    call .ResetStatMods
     ld hl,wEnemyMonAttackMod
-    call Func_13a43
-    ld hl,$cd12
+    call .ResetStatMods
+; copy unmodified stats to battle stats
+    ld hl,$cd12 ; PlayerMonUnmodifiedAttack
     ld de,W_PLAYERMONATK
-    call Func_13a4a
-    ld hl,$cd26
+    call .ResetStats
+    ld hl,$cd26 ; EnemyMonUnmodifiedAttack
     ld de,W_ENEMYMONATTACK
-    call Func_13a4a
+    call .ResetStats
+; cure non-volatile status, but only for the target
+; joenote - do the non-volatile statuses even for the user as was originally intended
     ld hl,W_ENEMYMONSTATUS
-    ld de,wEnemySelectedMove
-    ld a,[H_WHOSETURN]
-    and a
-    jr z,.asm_13a09
-    ld hl,W_PLAYERMONSTATUS
-    dec de
-
-.asm_13a09
-    ld a,[hl]
-    ld [hl],$0
-    and $27
-    jr z,.asm_13a13
-    ld a,$ff
-    ld [de],a
-
-.asm_13a13
+;    ld de,wEnemySelectedMove
+;    ld a,[H_WHOSETURN]
+;    and a
+;    jr z,.cureStatuses
     xor a
+    ld [hl],a ; joenote - added
+    ld [W_ENEMYTOXICCOUNTER],a	;joenote - clear toxic counter
+    ld hl,W_PLAYERMONSTATUS
+;    dec de ; wPlayerSelectedMove
+
+;.cureStatuses
+	;joenote - making sure to clear statuses and toxic counter
+    ld [W_PLAYERTOXICCOUNTER],a	;clear toxic counter
+    ld [hl],a ;clear status
+;    ld a,[hl]
+;    ld [hl],$0
+;    and %00100111 ; (1 << FRZ) | SLP_MASK
+;    jr z,.cureVolatileStatuses
+; prevent the Pokemon from executing a move if it was asleep or frozen
+;joenote - causes a glitch with multi-turn moves like bide and hyper beam. don't do this.
+;    ld a,$ff
+;    ld [de],a
+
+;.cureVolatileStatuses
+;    xor a
     ld [W_PLAYERDISABLEDMOVE],a
     ld [W_ENEMYDISABLEDMOVE],a
-    ld hl,$ccee
+    ld hl,$ccee ; PlayerDisabledMoveNumber
     ld [hli],a
     ld [hl],a
     ld hl,W_PLAYERBATTSTATUS1
-    call Func_13a37
+    call .CureVolatileStatuses
     ld hl,W_ENEMYBATTSTATUS1
-    call Func_13a37
+    call .CureVolatileStatuses
     ld hl,PlayCurrentMoveAnimation
     call Bankswitch4toF
-    ld hl,UnnamedText_13a53
+    ld hl,.StatusChangesEliminatedText
     jp PrintText
 
-Func_13a37: ; 13a37 (4:7a37)
-    res 7,[hl]
-    inc hl
+.CureVolatileStatuses
+    res 7,[hl] ; confused
+    inc hl ; BATTSTATUS2
     ld a,[hl]
-    and $78
-    ld [hli],a
+	; clear USING_X_ACCURACY, PROTECTED_BY_MIST, GETTING_PUMPED, and SEEDED statuses
+    and %01111000
+    ld [hli],a ; BATTSTATUS3
     ld a,[hl]
-    and $f8
+    ; clear Bad Poison, Reflect and Light Screen statuses
+    and %11111000
     ld [hl],a
     ret
 
-Func_13a43: ; 13a43 (4:7a43)
+.ResetStatMods
     ld b,$8
-.loop
+.loop1
     ld [hli],a
     dec b
-    jr nz,.loop
+    jr nz,.loop1
     ret
 
-Func_13a4a: ; 13a4a (4:7a4a)
+.ResetStats
     ld b,$8
-.loop
+.loop2
     ld a,[hli]
     ld [de],a
     inc de
     dec b
-    jr nz,.loop
+    jr nz,.loop2
     ret
 
-UnnamedText_13a53: ; 13a53 (4:7a53)
-    TX_FAR _UnnamedText_13a53
+.StatusChangesEliminatedText
+    TX_FAR _StatusChangesEliminatedText
     db "@"
+
+; Free
+
+SECTION "Func_13a58",ROMX[$7a58],BANK[$4]
 
 Func_13a58: ; 13a58 (4:7a58)
     ld hl,W_GRASSRATE ; $d887
@@ -49397,70 +49413,94 @@ Moves: ; 38000 (e:4000)
 
 INCLUDE "constants/moves.asm"
 
-SECTION "DoubleSelectedStats",ROMX[$5680],BANK[$e]
+; ──────────────────────────────────────────────────────────────────────────
 
-DoubleSelectedStats: ; 39680 (e:5680)
-    ld a,[H_WHOSETURN] ; $FF00+$f3
+;joenote - this function checks to see if a pkmn is paralyzed or burned
+;then it doubles attack if burned or quadruples speed if paralyzed.
+;It's meant to be run right before healing paralysis or burn so as to 
+;undo the stat changes.
+UndoBurnParStats:
+    ld hl,W_PLAYERMONSTATUS
+    ld de,wPlayerStatsToDouble
+    ld a,[H_WHOSETURN]
     and a
-    ld a,[$d060]
-    ld hl,$d026
-    jr z,.asm_39691
-    ld a,[$d065]
-    ld hl,$cff7
-.asm_39691
-    ld c,$4
-    ld b,a
-.asm_39694
-    srl b
-    call c,Func_3969f
-    inc hl
-    inc hl
-    dec c
-    ret z
-    jr .asm_39694
-
-Func_3969f: ; 3969f (e:569f)
-    ld a,[hl]
-    add a
-    ld [hld],a
-    ld a,[hl]
-    rl a
-    ld [hli],a
+    jr z,.checkburn
+    ld hl,W_ENEMYMONSTATUS
+    ld de,wEnemyStatsToDouble
+.checkburn
+    ld a,[hl]        ;load statuses
+    bit 4,a          ;test for burn
+    jr z,.checkpar
+    ld a,%0000001
+    ld [de],a        ;set attack to be doubled to undo the stat change of BRN
+    call DoubleSelectedStats
+    jr .return
+.checkpar
+    bit 6,a          ;test for paralyze
+    jr z,.return
+    ld a,%00000100
+    ld [de],a        ;set speed to be doubled (done twice) to undo the stat change of PAR
+    call DoubleSelectedStats
+    call DoubleSelectedStats
+.return
+    xor a
+    ld [de],a        ;reset the stat change bits
     ret
 
-HalveSelectedStats: ; 396a7 (e:56a7)
-    ld a,[H_WHOSETURN] ; $FF00+$f3
+;joenote - let's get this working again and put it to use
+DoubleSelectedStats:
+    ld a,[H_WHOSETURN]
     and a
-    ld a,[$d061]
+    ld a,[wPlayerStatsToDouble]
     ld hl,W_PLAYERMONATK
-    jr z,.asm_396b8
-    ld a,[$d066]
+    jr z,.notEnemyTurn
+    ld a,[wEnemyStatsToDouble]
     ld hl,W_ENEMYMONATTACK
-.asm_396b8
-    ld c,$4
+.notEnemyTurn
+    ld c,4
     ld b,a
-.asm_396bb
+.loop
     srl b
-    call c,Func_396c6
+    call c,.doubleStat
     inc hl
     inc hl
     dec c
     ret z
-    jr .asm_396bb
-
-Func_396c6: ; 396c6 (e:56c6)
-    ld a,[hl]
-    srl a
-    ld [hli],a
-    rr [hl]
-    or [hl]
-    jr nz,.asm_396d1
-    ld [hl],$1
-.asm_396d1
-    dec hl
+    jr .loop
+.doubleStat
+    push bc
+    ld a,[hli]
+    ld b,a
+    ld c,[hl] ; bc holds value of stat to double
+;double the stat
+    sla c
+    rl b
+;cap stat at 999
+    ;b register contains high byte & c register contains low byte
+    ld a,c ;let's work on low byte first. Note that decimal 999 is $03E7 in hex.
+    sub 999 % $100 ;a = a - ($03E7 % $100). Gives a = a - $E7. A byte % $100 always gives the lesser nibble.
+    ;Note that if a < $E7 then the carry bit 'c' in the flag register gets set due to overflowing with a negative result.
+    ld a,b ;now let's work on the high byte
+    sbc 999 / $100 ;a = a - ($03E7 / $100 + c_flag). Gives a = a - ($03 + c_flag). A byte / $100 always gives the greater nibble.
+    ;Note again that if a < $03 then the carry bit remains set. 
+    ;If the bit is already set from the lesser nibble,then its addition here can still make it remain set if a is low enough.
+    jr c,.donecapping ;jump to next marker if the c_flag is set. This only remains set if BC <  the cap of $03E7.
+    ;else let's continue and set the 999 cap
+    ld a,999 / $100 ; else load $03 into a
+    ld b,a ;and store it as the high byte
+    ld a,999 % $100 ; else load $E7 into a
+    ld c,a ;and store it as the low byte
+    ;now registers b & c together contain $03E7 for a capped stat value of 999
+.donecapping
+    ld a,c
+    ld [hld],a
+    ld [hl],b
+    pop bc
     ret
 
-Func_396d3: ; 396d3 (e:56d3)
+; ──────────────────────────────────────────────────────────────────────────
+
+Func_396d3: ; Moved in the Bank
     xor a
     ld [W_ENEMYMONID],a
     ld b,$1
@@ -49494,7 +49534,7 @@ Func_396d3: ; 396d3 (e:56d3)
     dec hl
     jr .asm_396e9
 
-Func_39707: ; 39707 (e:5707)
+Func_39707: ; Moved in the Bank
     push hl
     push de
     push bc
@@ -49534,10 +49574,6 @@ Func_3bb7d: ; Moved in the Bank
 .asm_3bb86
     ld bc,$8
     jp CopyData
-
-HealFailed: ; Moved in the Bank
-    ld hl,PrintButItFailedText_
-    jp BankswitchEtoF
 
 ; shifts all move data one up (freeing 4th move slot)
 WriteMonMoves_ShiftMoveData: ; Moved in the Bank
@@ -51707,7 +51743,7 @@ HealEffect_: ; Moved Upper in the Bank
     jr nz,.passed
     ld a,[de]
     sbc [hl]
-    jp z,HealFailed ;no effect if user's HP is already at its maximum
+    jp z,.HealFailed ;no effect if user's HP is already at its maximum
 .passed
     ld a,b
     cp REST
@@ -51723,6 +51759,23 @@ HealEffect_: ; Moved Upper in the Bank
     jr z,.restEffect
     ld hl,W_ENEMYMONSTATUS ; $cfe9
 .restEffect
+    push hl
+;undo the stat-changing effects of burn and paralyze and clear toxic info
+    ld hl,UndoBurnParStats
+    ld b,BANK(UndoBurnParStats)
+    call Bankswitch
+    ld hl,W_PLAYERBATTSTATUS3     ;load in for toxic bit
+    ld de,W_PLAYERTOXICCOUNTER    ;load in for toxic counter
+    ld a,[H_WHOSETURN]
+    and a
+    jr z,.undoToxic
+    ld hl,W_ENEMYBATTSTATUS3      ;load in for toxic bit
+    ld de,W_ENEMYTOXICCOUNTER     ;load in for toxic counter
+.undoToxic
+    res 0,[hl]                    ; heal Toxic status
+    xor a                         ;clear a
+    ld [de],a                     ;write a to toxic counter
+    pop hl
     ld a,[hl]
     and a
     ld [hl],2 ; clear status and set number of turns asleep to 2
@@ -51806,6 +51859,9 @@ HealEffect_: ; Moved Upper in the Bank
     call BankswitchEtoF
     ld hl,RegainedHealthText ; $7aac
     jp PrintText
+.HealFailed
+    ld hl,PrintButItFailedText_
+    jp BankswitchEtoF
 
 TransformEffect_: ; Moved Upper in the Bank
     call .HideSubstitute
@@ -54318,12 +54374,12 @@ LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
     ld de,W_PLAYERMONNAME
     ld bc,$b
     call CopyData
+    call ApplyBadgeStatBoostsFull
     ld hl,W_PLAYERMONLEVEL ; $d022
     ld de,$cd0f
     ld bc,$b
     call CopyData
     call ApplyBurnAndParalysisPenaltiesToPlayer
-    call ApplyBadgeStatBoostsFull
     ld a,$7
     ld b,$8
     ld hl,wPlayerMonAttackMod ; $cd1a
@@ -59191,13 +59247,7 @@ Func_3ec92: ; 3ec92 (f:6c92)
     ld a,$1
     jp Predef ; indirect jump to CopyUncompressedPicToTilemap (3f0c6 (f:70c6))
 
-DoubleOrHalveSelectedStats: ; 3ed02 (f:6d02)
-    ld hl,DoubleSelectedStats
-    ld b,BANK(DoubleSelectedStats)
-    call Bankswitch ; indirect jump to DoubleSelectedStats (39680 (e:5680))
-    ld hl,HalveSelectedStats
-    ld b,BANK(HalveSelectedStats)
-    jp Bankswitch ; indirect jump to HalveSelectedStats (396a7 (e:56a7))
+SECTION "Func_3ed12",ROMX[$6d12],BANK[$f]
 
 Func_3ed12: ; 3ed12 (f:6d12)
     ld hl,Func_396d3
@@ -75634,7 +75684,7 @@ LearnMovePredef:
     dbw BANK(UpdateHPBar),UpdateHPBar
     dbw BANK(Func_f9dc),Func_f9dc
     dbw BANK(Func_5ab0),Func_5ab0
-    dbw BANK(DoubleOrHalveSelectedStats),DoubleOrHalveSelectedStats
+    db 0,0,0 ; Unused
     db BANK(DisplayPokedexMenu_)
     dw DisplayPokedexMenu_
     dbw BANK(EvolutionAfterBattle),EvolutionAfterBattle
@@ -80745,12 +80795,12 @@ GainExperience: ; 5524f (15:524f)
     ld hl,Func_3ed99
     ld b,BANK(Func_3ed99)
     call Bankswitch ; indirect jump to Func_3ed99 (3ed99 (f:6d99))
-    ld hl,ApplyBurnAndParalysisPenaltiesToPlayer
-    ld b,BANK(ApplyBurnAndParalysisPenaltiesToPlayer)
-    call Bankswitch ; indirect jump to ApplyBurnAndParalysisPenaltiesToPlayer (3ed1a (f:6d1a))
     ld hl,ApplyBadgeStatBoostsFull
     ld b,BANK(ApplyBadgeStatBoostsFull)
     call Bankswitch ; indirect jump to ApplyBadgeStatBoostsFull (3ee19 (f:6e19))
+    ld hl,ApplyBurnAndParalysisPenaltiesToPlayer
+    ld b,BANK(ApplyBurnAndParalysisPenaltiesToPlayer)
+    call Bankswitch ; indirect jump to ApplyBurnAndParalysisPenaltiesToPlayer (3ed1a (f:6d1a))
     ld hl,DrawPlayerHUDAndHPBar
     ld b,BANK(DrawPlayerHUDAndHPBar)
     call Bankswitch ; indirect jump to DrawPlayerHUDAndHPBar (3cd60 (f:4d60))
@@ -124662,7 +124712,7 @@ _ConvertedTypeToText: ; 949e5 (25:49e5)
     db $0,"Converted type to",$4f
     db $59,"'s!",$58
 
-_UnnamedText_13a53: ; 949fc (25:49fc)
+_StatusChangesEliminatedText: ; 949fc (25:49fc)
     db $0,"All STATUS changes",$4f
     db "are eliminated!",$58
 
