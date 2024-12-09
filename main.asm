@@ -49397,9 +49397,9 @@ Moves: ; 38000 (e:4000)
 
 INCLUDE "constants/moves.asm"
 
-SECTION "Func_39680",ROMX[$5680],BANK[$e]
+SECTION "DoubleSelectedStats",ROMX[$5680],BANK[$e]
 
-Func_39680: ; 39680 (e:5680)
+DoubleSelectedStats: ; 39680 (e:5680)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[$d060]
@@ -49428,7 +49428,7 @@ Func_3969f: ; 3969f (e:569f)
     ld [hli],a
     ret
 
-Func_396a7: ; 396a7 (e:56a7)
+HalveSelectedStats: ; 396a7 (e:56a7)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[$d061]
@@ -51701,13 +51701,14 @@ HealEffect_: ; Moved Upper in the Bank
 .done
     ld b,a
     ld a,[de]
-    cp [hl] ; most significant bytes comparison is ignored
-            ; causes the move to miss if max HP is 255 or 511 points higher than the current HP
+    cp [hl]
     inc de
     inc hl
+    jr nz,.passed
     ld a,[de]
     sbc [hl]
-    jp z,HealFailed ; no effect if user's HP is already at its maximum
+    jp z,HealFailed ;no effect if user's HP is already at its maximum
+.passed
     ld a,b
     cp REST
     jr nz,.healHP
@@ -54321,7 +54322,7 @@ LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
     ld de,$cd0f
     ld bc,$b
     call CopyData
-    call Func_3ed1a
+    call ApplyBurnAndParalysisPenaltiesToPlayer
     call ApplyBadgeStatBoostsFull
     ld a,$7
     ld b,$8
@@ -54364,7 +54365,7 @@ LoadEnemyMonFromParty: ; 3cc13 (f:4c13)
     ld de,$cd23
     ld bc,$b
     call CopyData
-    call Func_3ed1e
+    call ApplyBurnAndParalysisPenaltiesToEnemy
     ld hl,W_MONHBASESTATS
     ld de,$d002
     ld b,$5
@@ -59190,26 +59191,26 @@ Func_3ec92: ; 3ec92 (f:6c92)
     ld a,$1
     jp Predef ; indirect jump to CopyUncompressedPicToTilemap (3f0c6 (f:70c6))
 
-Func_3ed02: ; 3ed02 (f:6d02)
-    ld hl,Func_39680
-    ld b,BANK(Func_39680)
-    call Bankswitch ; indirect jump to Func_39680 (39680 (e:5680))
-    ld hl,Func_396a7
-    ld b,BANK(Func_396a7)
-    jp Bankswitch ; indirect jump to Func_396a7 (396a7 (e:56a7))
+DoubleOrHalveSelectedStats: ; 3ed02 (f:6d02)
+    ld hl,DoubleSelectedStats
+    ld b,BANK(DoubleSelectedStats)
+    call Bankswitch ; indirect jump to DoubleSelectedStats (39680 (e:5680))
+    ld hl,HalveSelectedStats
+    ld b,BANK(HalveSelectedStats)
+    jp Bankswitch ; indirect jump to HalveSelectedStats (396a7 (e:56a7))
 
 Func_3ed12: ; 3ed12 (f:6d12)
     ld hl,Func_396d3
     ld b,BANK(Func_396d3)
     jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
 
-Func_3ed1a: ; 3ed1a (f:6d1a)
+ApplyBurnAndParalysisPenaltiesToPlayer: ; 3ed1a (f:6d1a)
     ld a,$1
-    jr asm_3ed1f
+    jr ApplyBurnAndParalysisPenalties
 
-Func_3ed1e: ; 3ed1e (f:6d1e)
+ApplyBurnAndParalysisPenaltiesToEnemy: ; 3ed1e (f:6d1e)
     xor a
-asm_3ed1f: ; 3ed1f (f:6d1f)
+ApplyBurnAndParalysisPenalties: ; 3ed1f (f:6d1f)
     ld [H_WHOSETURN],a ; $FF00+$f3
     call QuarterSpeedDueToParalysis
     jp HalveAttackDueToBurn
@@ -75633,7 +75634,7 @@ LearnMovePredef:
     dbw BANK(UpdateHPBar),UpdateHPBar
     dbw BANK(Func_f9dc),Func_f9dc
     dbw BANK(Func_5ab0),Func_5ab0
-    dbw BANK(Func_3ed02),Func_3ed02
+    dbw BANK(DoubleOrHalveSelectedStats),DoubleOrHalveSelectedStats
     db BANK(DisplayPokedexMenu_)
     dw DisplayPokedexMenu_
     dbw BANK(EvolutionAfterBattle),EvolutionAfterBattle
@@ -80744,9 +80745,9 @@ GainExperience: ; 5524f (15:524f)
     ld hl,Func_3ed99
     ld b,BANK(Func_3ed99)
     call Bankswitch ; indirect jump to Func_3ed99 (3ed99 (f:6d99))
-    ld hl,Func_3ed1a
-    ld b,BANK(Func_3ed1a)
-    call Bankswitch ; indirect jump to Func_3ed1a (3ed1a (f:6d1a))
+    ld hl,ApplyBurnAndParalysisPenaltiesToPlayer
+    ld b,BANK(ApplyBurnAndParalysisPenaltiesToPlayer)
+    call Bankswitch ; indirect jump to ApplyBurnAndParalysisPenaltiesToPlayer (3ed1a (f:6d1a))
     ld hl,ApplyBadgeStatBoostsFull
     ld b,BANK(ApplyBadgeStatBoostsFull)
     call Bankswitch ; indirect jump to ApplyBadgeStatBoostsFull (3ee19 (f:6e19))
