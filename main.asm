@@ -24134,6 +24134,29 @@ ItemUseMedicine: ; Moved in the Bank
     jr nz,.updateInBattleData
     ld bc,-31
     add hl,bc
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - undo brn/par stat changes for Full Restore after restoring HP in battle
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.clearParBrn    ;do not adjust the stats if not currently in battle
+    push hl
+    push de
+    ld a,[H_WHOSETURN]
+    push af
+    xor a    ;forcibly set it to the player's turn
+    ld [H_WHOSETURN],a
+    ;undo brn/par stat changes
+    ld hl,UndoBurnParStats
+    ld b,BANK(UndoBurnParStats)
+    call Bankswitch
+    pop af
+    ld [H_WHOSETURN],a
+    pop de
+    pop hl
+.clearParBrn
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
     xor a
     ld [hl],a ; remove the status ailment in the party data
 .updateInBattleData
@@ -50404,25 +50427,14 @@ AIUseFullHeal: ; 3a786 (e:6786)
     ld a,FULL_HEAL
     jp AIPrintItemUse
 
-AICureStatus: ; 3a791 (e:6791)
-; cures the status of enemy's active pokemon
-    ld a,[W_ENEMYMONNUMBER]
-    ld hl,$D8A8
-    ld bc,$2C
-    call AddNTimes
-    xor a
-    ld [hl],a ; clear status in enemy team roster
-    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy
-    ld hl,$D069
-    res 0,[hl]
-    ret
-
-AIUseXAccuracy: ; 0x3a7a8 unused
+AIUseXAccuracy: ; Moved in the Bank
     call Func_3a69b
     ld hl,$D068
     set 0,[hl]
     ld a,X_ACCURACY
     jp AIPrintItemUse
+
+SECTION "AIUseGuardSpec",ROMX[$67b5],BANK[$e]
 
 AIUseGuardSpec: ; 3a7b5 (e:67b5)
     call Func_3a69b
@@ -52633,6 +52645,37 @@ DoEvolution_HandleAlternative:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     jp GetMonHeader
+
+AICureStatus: ; Moved in the Bank
+; cures the status of enemy's active pokemon
+    ld a,[W_ENEMYMONNUMBER]
+    ld hl,$D8A8
+    ld bc,$2C
+    call AddNTimes
+    xor a
+    ld [hl],a ; clear status in enemy team roster
+    ld a,[H_WHOSETURN]
+    push af
+    ld a,1 ; forcibly set it to the AI's turn
+    ld [H_WHOSETURN],a
+    ; undo brn/par stat changes
+    ld hl,UndoBurnParStats
+    ld b,BANK(UndoBurnParStats)
+    call Bankswitch
+    pop af
+    ld [H_WHOSETURN],a
+    xor a
+    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy
+	ld [W_ENEMYTOXICCOUNTER], a	;clear toxic counter
+    ld hl,W_ENEMYBATTSTATUS3 ;clear toxic bit
+    res 0,[hl]
+    ; need to redraw the enemy trainer hud 
+    push af
+    ld hl,DrawEnemyHUDAndHPBar
+    ld b,BANK(DrawEnemyHUDAndHPBar)
+    call Bankswitch
+    pop af
+    ret
 
 SECTION "bankF",ROMX,BANK[$F]
 
