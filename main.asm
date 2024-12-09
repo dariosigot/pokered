@@ -131888,7 +131888,7 @@ _DrawCatchGender: ; Denim
     ld hl,IsGhostBattle
     ld b,BANK(IsGhostBattle)
     call Bankswitch
-    jr z,.Ghost ; No Gender,Pokedex or Debug If Ghost Battle
+    jp z,.Ghost ; No Gender,Pokedex or Debug If Ghost Battle
     ld a,[W_ENEMYMON_START]
     ld [$d11e],a
     ld a,$3a
@@ -131922,6 +131922,10 @@ _DrawCatchGender: ; Denim
     ld de,.ShinyStarIcon
     call PlaceString
 .NoShiny
+    ld hl,W_ENEMYBATTSTATUS1
+    bit 7,[hl] ; confused?
+    ld de,.ConfusedIcon
+    jr nz,.PrintConfused
     ld a,[W_ENEMYMON_START]
     ld [$d11e],a
     call .CheckMarowak
@@ -131944,21 +131948,28 @@ _DrawCatchGender: ; Denim
 .GreaterThen9
     pop af
     ld de,.MaleIcon
-    jr nz,.Male
+    jr nz,.PrintGenderOrConfused
     ld de,.FemaleIcon
-.Male
+.PrintGenderOrConfused
     call PlaceString
 .Genderless
     call DebugStats
     call ResetTempIV
 .Ghost
     ret
+.PrintConfused
+    pop af ; Restore Pokedex Flag Test
+    FuncCoord 6,1
+    ld hl,Coord
+    jr .PrintGenderOrConfused
 .PokeBallCatchFlagIcon:
     db $c9,$50
 .MaleIcon
     db $EF,$50
 .FemaleIcon
     db $F5,$50
+.ConfusedIcon
+    db $E6,$50
 .ShinyStarIcon
     db $D1,$50
 .CheckMarowak
@@ -131969,6 +131980,14 @@ _DrawCatchGender: ; Denim
     ret
 
 _DrawCurrentMonGenderInBattle:
+    ld hl,W_PLAYERBATTSTATUS1
+    bit 7,[hl] ; confused?
+    jr z,.NotConfused
+    FuncCoord 17,08
+    ld hl,Coord
+    ld de,.ConfusedIcon
+    jp PlaceString
+.NotConfused
     ld hl,W_PLAYERMONIVS ; .BackSpriteInBattle
     call SetTempIV
     ld a,[W_PLAYERMONID]
@@ -131996,6 +132015,8 @@ _DrawCurrentMonGenderInBattle:
     db $EF,$50
 .FemaleIcon
     db $F5,$50
+.ConfusedIcon
+    db $E6,$50
 
 DebugStats:
     and a ; rcf
