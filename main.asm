@@ -56116,7 +56116,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld hl,W_PLAYERBATTSTATUS1
     res 7,[hl]
     ld hl,ConfusedNoMoreText
-    call PrintText
+    call PrintTextAndDrawHub ; call PrintText
     jr .next3
 .next4
     ld hl,IsConfusedText
@@ -57631,18 +57631,17 @@ ApplyAttackToPlayerPokemonDone
     jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
 AttackSubstitute: ; 3e25e (f:625e)
-    call PrintBattleValueNearSubstitute ; ld hl,SubstituteTookDamageText
+    call GetPlayerOrEnemyTurnWithSubstitute
+    push de
+    push bc
+    ld b,BANK(PrintBattleValueNearMon_)
+    ld hl,PrintBattleValueNearMon_
+    call Bankswitch
+    call RemoveBattleValueBankF
+    ld hl,.SubstituteTookDamageText
     call PrintText
-; values for player turn
-    ld de,wEnemySubstituteHP
-    ld bc,W_ENEMYBATTSTATUS2
-    ld a,[H_WHOSETURN]
-    and a
-    jr z,.applyDamageToSubstitute
-; values for enemy turn
-    ld de,wPlayerSubstituteHP
-    ld bc,W_PLAYERBATTSTATUS2
-.applyDamageToSubstitute
+    pop bc
+    pop de
     ld hl,W_DAMAGE
     ld a,[hli]
     and a
@@ -57656,19 +57655,15 @@ AttackSubstitute: ; 3e25e (f:625e)
     ld h,b
     ld l,c
     res 4,[hl] ; unset the substitute bit
-    ld hl,SubstituteBrokeText
+    ld hl,.SubstituteBrokeText
     call PrintText
 ; flip whose turn it is for the next function call
-    ld a,[H_WHOSETURN]
-    xor a,$01
-    ld [H_WHOSETURN],a
+    call FlipTurn
     ld hl,HideSubstituteShowMonAnim
     ld b,BANK(HideSubstituteShowMonAnim) ; animate the substitute breaking
     call Bankswitch ; substitute
 ; flip the turn back to the way it was
-    ld a,[H_WHOSETURN]
-    xor a,$01
-    ld [H_WHOSETURN],a
+    call FlipTurn
     ld hl,W_PLAYERMOVEEFFECT ; value for player's turn
     and a
     jr z,.nullifyEffect
@@ -57677,14 +57672,16 @@ AttackSubstitute: ; 3e25e (f:625e)
     xor a
     ld [hl],a ; zero the effect of the attacker's move
     jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
-
-SubstituteTookDamageText: ; 3e2ac (f:62ac)
+.SubstituteBrokeText
+    TX_FAR _SubstituteBrokeText
+    db "@"
+.SubstituteTookDamageText
     TX_FAR _SubstituteTookDamageText
     db "@"
 
-SubstituteBrokeText: ; 3e2b1 (f:62b1)
-    TX_FAR _SubstituteBrokeText
-    db "@"
+; Free
+
+SECTION "HandleBuildingRage",ROMX[$62b6],BANK[$f]
 
 ; this function raises the attack modifier of a pokemon using Rage when that pokemon is attacked
 HandleBuildingRage: ; 3e2b6 (f:62b6)
@@ -58699,8 +58696,8 @@ Func_3e8fd: ; 3e8fd (f:68fd)
     jr nz,.asm_3e944
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     res 7,[hl]
-    ld hl,ConfusedNoMoreText ; $5a6a
-    call PrintText
+    ld hl,ConfusedNoMoreText
+    call PrintTextAndDrawHub ; call PrintText
     jp Func_3e9aa
 .asm_3e944
     ld hl,IsConfusedText ; $5a60
@@ -60645,6 +60642,33 @@ RecoilEffect: ; Moved in the Bank
     ld b,BANK(RecoilEffect_)
     jp Bankswitch
 
+GetPlayerOrEnemyTurnWithSubstitute:
+    ld de,wEnemySubstituteHP
+    ld bc,W_ENEMYBATTSTATUS2
+    ld a,[wFlagValueToPlayerBit1]
+    bit 1,a
+    jr z,.DamageToEnemy
+    ld de,wPlayerSubstituteHP
+    ld bc,W_PLAYERBATTSTATUS2
+;DamageToPlayer
+    call .CheckTurn
+    ret nz
+    jr FlipTurn
+.DamageToEnemy
+    call .CheckTurn
+    ret z
+    jr FlipTurn
+.CheckTurn
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    ret
+
+FlipTurn:
+    ld a,[H_WHOSETURN]
+    xor a,$01
+    ld [H_WHOSETURN],a
+    ret
+
 ; Free
 
 SECTION "PrintStatText",ROMX[$7688],BANK[$f]
@@ -61466,14 +61490,6 @@ RemoveBattleValueBankF:
     ld hl,RemoveBattleValue_
     jp Bankswitch
 
-PrintBattleValueNearSubstitute:
-    ld b,BANK(PrintBattleValueNearMon_)
-    ld hl,PrintBattleValueNearMon_
-    call Bankswitch
-    call RemoveBattleValueBankF
-    ld hl,SubstituteTookDamageText
-    ret
-
 SetDamageDirectToPlayer:
     ld hl,wPrintBattleValueBit0
     set 0,[hl]
@@ -62223,6 +62239,10 @@ GetEnemyMonStat_HandleAlternative:
 
 DisabledText: ; Moved in the Bank
     db "Disabled@"
+
+PrintTextAndDrawHub:
+    call PrintText
+    jp DrawHUDsAndHPBars
 
 SECTION "bank10",ROMX,BANK[$10]
 
