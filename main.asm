@@ -53549,8 +53549,17 @@ FaintEnemyPokemon ; 0x3c567
 .wild
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
     res 2,[hl]
+; Bug. This only zeroes the high byte of the player's accumulated damage,
+; setting the accumulated damage to itself mod 256 instead of 0 as was probably
+; intended. That alone is problematic, but this mistake has another more severe
+; effect. This function's counterpart for when the player mon faints,
+; RemoveFaintedPlayerMon, zeroes both the high byte and the low byte. In a link
+; battle, the other player's Game Boy will call that function in response to
+; the enemy mon (the player mon from the other side's perspective) fainting,
+; and the states of the two Game Boys will go out of sync unless the damage
+; was congruent to 0 modulo 256.
     xor a
-    ld [W_NUMHITS],a ; $d074
+    call ResetPlayerBideAccumulatedDamage ; ld [W_NUMHITS],a ; $d074
     ld hl,$d065 ; enemy statuses
     ld [hli],a
     ld [hli],a
@@ -56030,8 +56039,7 @@ MirrorMoveCheck:
     ld hl,DisplayEffectiveness
     ld b,BANK(DisplayEffectiveness)
     call Bankswitch
-    ld a,1
-    ld [$CCF4],a ; MoveDidntMiss
+    call PlayerMoveDidntMissAndEnemyBideAccum
 .notDone
     ld a,[W_PLAYERMOVEEFFECT]
     ld hl,EffectsArray4
@@ -56080,6 +56088,8 @@ MultiHitText:
     db "@"
 
 ; ──────────────────────────────────────────
+
+; Free
 
 SECTION "PrintGhostText",ROMX[$5811],BANK[$f]
 
@@ -56276,25 +56286,26 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld hl,W_PLAYERBATTSTATUS1
     bit 0,[hl]
     jr z,.next10 ; 59D0
-    xor a
-    ld [W_PLAYERMOVENUM],a
-    ld hl,$D0D7
-    ld a,[hli]
-    ld b,a
-    ld c,[hl]
-    ld hl,$D075
-    ld a,[hl]
-    add c
-    ld [hld],a
-    ld a,[hl]
-    adc b
-    ld [hl],a
+;joenote - done elsewhere using PlayerBideAccum
+;    xor a
+;    ld [W_PLAYERMOVENUM],a
+;    ld hl,$D0D7
+;    ld a,[hli]
+;    ld b,a
+;    ld c,[hl]
+;    ld hl,$D075
+;    ld a,[hl]
+;    add c
+;    ld [hld],a
+;    ld a,[hl]
+;    adc b
+;    ld [hl],a
     ld hl,$D06A
     dec [hl]
-    jr z,.next11 ; 599B
+    jr z,.UnleashEnergy ; 599B
     ld hl,ExecutePlayerMoveDone ; $580a
     jp Func_3da37
-.next11
+.UnleashEnergy
     ld hl,W_PLAYERBATTSTATUS1
     res 0,[hl]
     ld hl,UnleashedEnergyText
@@ -56354,6 +56365,22 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld hl,getPlayerAnimationType ; $5714
     jp nz,Func_3da37
     jp Func_3da37
+
+; TODO : move to appropriate part of bank F
+EnemyMoveDidntMissAndPlayerBideAccum:
+    ld hl,PlayerBideAccum_
+    jr BideAccumCommon
+PlayerMoveDidntMissAndEnemyBideAccum:
+    ld hl,EnemyBideAccum_
+    ; fall through
+BideAccumCommon:
+    ld b,bank(EnemyBideAccum_) ; same PlayerBideAccum_
+    call Bankswitch
+    ld a,1
+    ld [$CCF4],a ; MoveDidntMiss
+    ret
+
+SECTION "Func_3da1a",ROMX[$5a1a],BANK[$f]
 
 Func_3da1a: ; 3da1a (f:5a1a)
     ld a,[W_PLAYERBATTSTATUS2] ; $d063
@@ -57779,7 +57806,10 @@ AttackSubstitute: ; 3e25e (f:625e)
     TX_FAR _SubstituteTookDamageText
     db "@"
 
-; Free
+ResetPlayerBideAccumulatedDamage:
+    ld [W_NUMHITS],a ; $d074
+    ld [W_NUMHITS+1],a ; $d074
+    ret
 
 SECTION "HandleBuildingRage",ROMX[$62b6],BANK[$f]
 
@@ -58658,8 +58688,7 @@ EnemyCheckIfMirrorMoveEffect:
     ld hl,DisplayEffectiveness
     ld b,BANK(DisplayEffectiveness)
     call Bankswitch ; indirect jump to DisplayEffectiveness (2fb7b (b:7b7b))
-    ld a,$1
-    ld [$ccf4],a ; MoveDidntMiss
+    call EnemyMoveDidntMissAndPlayerBideAccum
 .handleExplosionMiss
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     ld hl,EffectsArray4 ; $4030
@@ -58897,25 +58926,26 @@ asm_3e9f6: ; 3e9f6 (f:69f6)
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     bit 0,[hl]
     jr z,.asm_3ea54
-    xor a
-    ld [W_ENEMYMOVENUM],a ; $cfcc
-    ld hl,W_DAMAGE ; $d0d7
-    ld a,[hli]
-    ld b,a
-    ld c,[hl]
-    ld hl,$cd06
-    ld a,[hl]
-    add c
-    ld [hld],a
-    ld a,[hl]
-    adc b
-    ld [hl],a
+;joenote - doing this elsewhere with function EnemyBideAccum
+;    xor a
+;    ld [W_ENEMYMOVENUM],a ; $cfcc
+;    ld hl,W_DAMAGE ; $d0d7
+;    ld a,[hli]
+;    ld b,a
+;    ld c,[hl]
+;    ld hl,$cd06
+;    ld a,[hl]
+;    add c
+;    ld [hld],a
+;    ld a,[hl]
+;    adc b
+;    ld [hl],a
     ld hl,$d06f
     dec [hl]
-    jr z,.asm_3ea1c
+    jr z,.unleashEnergy
     ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
-.asm_3ea1c
+.unleashEnergy
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     res 0,[hl]
     ld hl,UnleashedEnergyText ; $5a74
@@ -58975,6 +59005,10 @@ asm_3e9f6: ; 3e9f6 (f:69f6)
     ld hl,GetEnemyAnimationType ; $6794
     jp nz,Func_3eab8
     jp Func_3eab8
+
+; Free : Following functions is part of the previous
+
+SECTION "Func_3ea9b",ROMX[$6a9b],BANK[$f]
 
 Func_3ea9b: ; 3ea9b (f:6a9b)
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
@@ -60762,8 +60796,6 @@ FlipTurn:
     xor a,$01
     ld [H_WHOSETURN],a
     ret
-
-; Free
 
 SECTION "PrintStatText",ROMX[$7688],BANK[$f]
 
@@ -139013,6 +139045,46 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     ld a,[hl]
 .end
     ld [wAlternateFormIndex],a
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+PlayerBideAccum_:
+    ld hl,W_PLAYERBATTSTATUS1
+    bit 0,[hl] ; is mon using bide?
+    ret z
+    xor a
+    ld [W_PLAYERMOVENUM],a
+    ld hl,W_DAMAGE
+    ld a,[hli]
+    ld b,a
+    ld c,[hl]
+    ld hl,$d074 + 1 ; PlayerBideAccumulatedDamage
+    ld a,[hl]
+    add c ; accumulate damage taken
+    ld [hld],a
+    ld a,[hl]
+    adc b
+    ld [hl],a
+    ret
+
+EnemyBideAccum_:
+    ld hl,W_ENEMYBATTSTATUS1
+    bit 0,[hl] ; is mon using bide?
+    ret z
+    xor a
+    ld [W_ENEMYMOVENUM],a
+    ld hl,W_DAMAGE
+    ld a,[hli]
+    ld b,a
+    ld c,[hl]
+    ld hl,$cd05 + 1 ; EnemyBideAccumulatedDamage
+    ld a,[hl]
+    add c ; accumulate damage taken
+    ld [hld],a
+    ld a,[hl]
+    adc b
+    ld [hl],a
     ret
 
 ; ──────────────────────────────────────────────────────────────────────

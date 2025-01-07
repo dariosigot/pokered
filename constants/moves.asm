@@ -117,9 +117,9 @@
     db HAZE         , HAZE_EFFECT                ,   0 , ICE      , 255 , 07 ; pp 30 ; -
     db REFLECT      , REFLECT_EFFECT             ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; -
     db FOCUS_ENERGY , FOCUS_ENERGY_EFFECT        ,   0 , FIGHTING , 255 , 07 ; pp 30 ; - ; Type Normal -> Fighting
-    db BIDE         , BIDE_EFFECT                ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
-    db METRONOME    , METRONOME_EFFECT           ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
-    db MIRROR_MOVE  , MIRROR_MOVE_EFFECT         ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; Typw Wind -> Normal
+    db BIDE         , BIDE_EFFECT                ,   0 , TYPE_NA  , 255 , 20 ; pp 10 ; -
+    db METRONOME    , METRONOME_EFFECT           ,   0 , TYPE_NA  , 255 , 20 ; pp 10 ; -
+    db MIRROR_MOVE  , MIRROR_MOVE_EFFECT         ,   0 , TYPE_NA  , 255 , 10 ; pp 20 ; - ; Typw Wind -> Normal
     db SELFDESTRUCT , EXPLODE_EFFECT             , 200 , NORMAL   , 255 , 50 ; pp  5 ; 0 ; Pwr 130 -> 200 ; Ene 40 -> 50
     db EGG_BOMB     , NO_ADDITIONAL_EFFECT       , 100 , RUBBER   , 191 , 20 ; pp 10 ; 0 ; Type Normal -> Rubber
     db LICK         , PARALYZE_SIDE_EFFECT2      ,  30 , GHOST    , 255 , 07 ; pp 30 ; 0 ; Pwr 20 -> 30
