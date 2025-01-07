@@ -33154,9 +33154,7 @@ Func_17c47: ; Move in the Bank
 EmotionBubbles: ; 17cbd (5:7cbd)
     INCBIN "gfx/emotion_bubbles.2bpp"
 
-SECTION "SubstituteEffectHandler",ROMX[$7dad],BANK[$5]
-
-SubstituteEffectHandler: ; 17dad (5:7dad)
+SubstituteEffectHandler: ; Moved in the Bank
     ld c,50
     call DelayFrames
     ld hl,W_PLAYERMONMAXHP
@@ -33193,7 +33191,11 @@ SubstituteEffectHandler: ; 17dad (5:7dad)
     sbc a,0      ;borrow from high byte if needed
     pop bc
     jr c,.notEnoughHP  ;underflow means user would be left with negative health
-                        ;bug: note since it only brances on carry,it will possibly leave user with 0HP
+                        ;fixedbug: note since it only brances on carry,it will possibly leave user with 0HP
+;;;;joenote - fix the bug to also check for exactly 0 hp
+    inc d
+    dec d
+    jr z,.notEnoughHP
 .userHasZeroOrMoreHP
     ldi [hl],a  ;store high byte HP
     ld [hl],d   ;store low byte HP
@@ -33233,6 +33235,8 @@ UnnamedText_17e22: ; 17e22 (5:7e22)
 UnnamedText_17e27: ; 17e27 (5:7e27)
     TX_FAR _UnnamedText_17e27
     db "@"
+
+SECTION "ActivatePC",ROMX[$7e2c],BANK[$5]
 
 ActivatePC: ; 17e2c (5:7e2c)
     call SaveScreenTilesToBuffer2  ;XXX: copy background from wTileMap to wTileMapBackup2
