@@ -135594,7 +135594,7 @@ ForceShinyOrRandom_:
 
 SetExplodeFlag_:
     xor a ; Reset Carry Flag
-    ld a,[wWhichPokemon]
+    ld a,[wPlayerMonNumber]
     ld e,%00000001 ; 1 bit to rotate 
 .Loop
     and a
