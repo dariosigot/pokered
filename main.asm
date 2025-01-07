@@ -51739,27 +51739,18 @@ WriteMonMoves: ; Moved in the Bank
 HealEffect_: ; Moved Upper in the Bank
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ld de,W_PLAYERMONCURHP ; $d015
-    ld hl,W_PLAYERMONMAXHP ; $d023
+    ld de,W_PLAYERMONCURHP+1 ; $d015
+    ld hl,W_PLAYERMONMAXHP+1 ; $d023
     ld a,[W_PLAYERMOVENUM] ; $cfd2
     jr z,.done
-    ld de,W_ENEMYMONCURHP ; $cfe6
-    ld hl,W_ENEMYMONMAXHP ; $cff4
+    ld de,W_ENEMYMONCURHP+1 ; $cfe6
+    ld hl,W_ENEMYMONMAXHP+1 ; $cff4
     ld a,[W_ENEMYMOVENUM] ; $cfcc
 .done
-    ld b,a
-    ld a,[de]
-    cp [hl]
-    inc de
-    inc hl
-    jr nz,.passed
-    ld a,[de]
-    sbc [hl]
-    jp z,.HealFailed ;no effect if user's HP is already at its maximum
-.passed
-    ld a,b
     cp REST
     jr nz,.healHP
+
+.healStatusAndSleep
     push hl
     push de
     push af
@@ -51799,6 +51790,8 @@ HealEffect_: ; Moved Upper in the Bank
     pop af
     pop de
     pop hl
+    ; fall through
+
 .healHP
     ld a,[hld]
     ld [wHPBarMaxHP],a
@@ -51871,9 +51864,6 @@ HealEffect_: ; Moved Upper in the Bank
     call BankswitchEtoF
     ld hl,RegainedHealthText ; $7aac
     jp PrintText
-.HealFailed
-    ld hl,PrintButItFailedText_
-    jp BankswitchEtoF
 
 TransformEffect_: ; Moved Upper in the Bank
     call .HideSubstitute
