@@ -47509,21 +47509,19 @@ LeechSeedEffect_:
 .done
     push hl
     push de
-    ld hl,MoveHitTest
-    ld b,BANK(MoveHitTest)
+    ld hl,MoveHitTestPlus
+    ld b,BANK(MoveHitTestPlus)
     call Bankswitch
     pop de
     pop hl
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
     jr nz,.moveMissed
     ld a,[de]
     cp GRASS
-    jr z,.moveMissed
+    jr z,.doesntAffect
     inc de
     ld a,[de]
     cp GRASS
-    jr z,.moveMissed
+    jr z,.doesntAffect
     bit 7,[hl] ; SEEDED
     jr nz,.justSeeded
     set 7,[hl] ; SEEDED
@@ -47536,6 +47534,11 @@ LeechSeedEffect_:
     call .PlayCurrentMoveAnimation
     ld b,BANK(PrintMoveFailureText)
     ld hl,PrintMoveFailureText
+    jp Bankswitch
+.doesntAffect
+    call .PlayCurrentMoveAnimation
+    ld b,BANK(PrintDoesntAffectMonText)
+    ld hl,PrintDoesntAffectMonText
     jp Bankswitch
 .justSeeded
     call .PlayCurrentMoveAnimation
@@ -60950,7 +60953,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
 
 .handleFailed
     cp TELEPORT
-    jp z,PrintButItFailedText_
+    jp z,PrintButItFailedText
     cp WHIRLWIND
     jr nz,.notwhirlwind
     xor a
@@ -61303,9 +61306,7 @@ RageEffect: ; 3f9df (f:79df)
 MimicEffect: ; 3f9ed (f:79ed)
     ld c,50
     call DelayFrames
-    call MoveHitTest
-    ld a,[W_MOVEMISSED]
-    and a
+    call MoveHitTestPlus
     jr nz,.mimicMissed
     ld a,[H_WHOSETURN]
     and a
@@ -61318,8 +61319,6 @@ MimicEffect: ; 3f9ed (f:79ed)
     ld hl,W_ENEMYMONMOVES
     ld a,[W_ENEMYBATTSTATUS1]
 .enemyTurn
-    bit 6,a ; INVULNERABLE
-    jr nz,.mimicMissed
 .getRandomMove
     push hl
     call GenRandomInBattle
@@ -61341,9 +61340,6 @@ MimicEffect: ; 3f9ed (f:79ed)
     ld a,[wEnemyMoveListIndex]
     jr .playerTurn
 .letPlayerChooseMove
-    ld a,[W_ENEMYBATTSTATUS1]
-    bit 6,a ; INVULNERABLE
-    jr nz,.mimicMissed
     ld a,[wCurrentMenuItem]
     push af
     ld a,$1
@@ -61370,7 +61366,7 @@ MimicEffect: ; 3f9ed (f:79ed)
     ld hl,.MimicLearnedMoveText
     jp PrintText
 .mimicMissed
-    jp PrintButItFailedText_
+    jp PrintMoveFailureText
 .MimicLearnedMoveText
     TX_FAR _MimicLearnedMoveText
     db "@"
@@ -61381,9 +61377,7 @@ LeechSeedEffect: ; Moved in the Bank
     jp Bankswitch ; indirect jump to LeechSeedEffect_ (2bea9 (a:7ea9))
 
 DisableEffect: ; Moved in the Bank
-    call MoveHitTest
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
+    call MoveHitTestPlus
     jr nz,.moveMissed
     ld de,W_ENEMYDISABLEDMOVE ; $d072
     ld hl,W_ENEMYMONMOVES
@@ -61395,7 +61389,7 @@ DisableEffect: ; Moved in the Bank
 .disableEffect
     ld a,[de]
     and a
-    jr nz,.moveMissed
+    jr nz,.alreadyDisabled
 ; PP ► ENERGY - DONE
     push hl
     ld d,h
@@ -61404,7 +61398,7 @@ DisableEffect: ; Moved in the Bank
     pop hl
     ld a,c
     and a
-    jr z,.moveMissed ; if 0 moves with enough energy
+    jr z,.noEnergy ; if 0 moves with enough energy
     ld a,[wCurrentMenuItem] ; Backup Current Menu Item
     push af                 ; ...
 .pickMoveToDisable
@@ -61456,9 +61450,23 @@ DisableEffect: ; Moved in the Bank
     jp PrintText
 .moveMissed
     call PlayCurrentMoveAnimation
-    jp PrintButItFailedText_
+    jp PrintMoveFailureText
+.noEnergy
+    call PlayCurrentMoveAnimation
+    ld hl,.NoEnergyText
+    jp Delay50AndPrintText
+.alreadyDisabled
+    call PlayCurrentMoveAnimation
+    ld hl,.AlreadyDisabledText
+    jp Delay50AndPrintText
 .MoveWasDisabledText
     TX_FAR _MoveWasDisabledText
+    db "@"
+.NoEnergyText
+    TX_FAR _NoEnergyText
+    db "@"
+.AlreadyDisabledText
+    TX_FAR _AlreadyDisabledText
     db "@"
 
 NothingHappenedText: ; Moved in the Bank
@@ -61473,7 +61481,7 @@ SplashEffect: ; Moved in the Bank
     TX_FAR _NoEffectText
     db "@"
 
-PrintButItFailedText_: ; Moved in the Bank
+PrintButItFailedText: ; Moved in the Bank
     ld hl,.ButItFailedText
     jp Delay50AndPrintText
 .ButItFailedText
@@ -79361,12 +79369,10 @@ ParalyzeEffect_: ; Moved in the Bank
     jr z,.doesntAffect
 .hitTest
     push hl
-    ld hl,MoveHitTest
-    ld b,BANK(MoveHitTest)
+    ld hl,MoveHitTestPlus
+    ld b,BANK(MoveHitTestPlus)
     call Bankswitch
     pop hl
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
     jr nz,.didntAffect
     set 6,[hl]
     ld hl,QuarterSpeedDueToParalysis
@@ -125661,6 +125667,16 @@ _AlreadyProtectedText:
     db $0,$5a,"'s",$4f
     db "already",$55
     db "protected!",$58
+
+_NoEnergyText:
+    db $0,$59,$4f
+    db "has run out",$55
+    db "of energy!",$58
+
+_AlreadyDisabledText:
+    db $0,$59,"'s",$4f
+    db "already",$55
+    db "disabled!",$58
 
 SECTION "bank26",ROMX,BANK[$26]
 
