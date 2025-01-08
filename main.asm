@@ -51788,7 +51788,7 @@ HealEffect_: ; Moved Upper in the Bank
     pop hl
     ld a,[hl]
     and a
-    ld [hl],2 ; clear status and set number of turns asleep to 2
+    ld [hl],3 ; clear status and set number of turns asleep to 3
     ld hl,StartedSleepingEffect
     jr z,.printRestText
     ld hl,FellAsleepBecameHealthyText ; if mon had an status
@@ -53084,9 +53084,12 @@ MainInBattleLoop: ; 3c233 (f:4233)
     ld a,[$d078]
     and a
     ret nz
-    ld a,[$d018]
-    and $27
-    jr nz,.asm_3c2a6 ; 0x3c271 $33
+;joenote - This whole thing is problematic. Just comment it all out.
+;		-allow the player to select a move even if frozen in order to prevent PP underflow and link desyncs
+;		-also allow the player to select a move if you don't want sleep to waste a turn on wakeup
+;    ld a,[$d018]                    ; joedebug - sleep won't waste turn
+;    and $27                         ; ...
+;    jr nz,.asm_3c2a6 ; 0x3c271 $33  ; ...
     ld a,[$d062]
     and $21
     jr nz,.asm_3c2a6 ; 0x3c278 $2c
@@ -55727,7 +55730,8 @@ SelectEnemyMove: ; Moved in the Bank
     and $12     ; using multi-turn move or bide
     ret nz
     ld a,[W_ENEMYMONSTATUS]
-    and SLP | FRZ ; sleeping or frozen
+    and SLP_NOMOVE | FRZ ; sleeping or frozen ; joedebug - sleep won't waste turn on wakeup
+                                              ; but it will if wakeup won't occur (prevents PP decrementing with AI)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     call nz,NoAttackAICall ;joenote - get ai routines. flag register is preserved
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -56138,13 +56142,13 @@ IsGhostBattle: ; 3d83a (f:583a)
 CheckPlayerStatusConditions: ; 3d854 (f:5854)
     ld hl,W_PLAYERMONSTATUS
     ld a,[hl]
-    and a,SLP
-    jr z,.FrozenCheck ; to 5884
+    and SLP
+    jr z,.FrozenCheck
 
     dec a
     ld [W_PLAYERMONSTATUS],a ; decrement sleep count
     and a
-    jr z,.WakeUp ; to 5874
+    jr z,.WakeUp
 
     xor a
     ld [$CC5B],a
@@ -56152,15 +56156,16 @@ CheckPlayerStatusConditions: ; 3d854 (f:5854)
     call PlayMoveAnimation
     ld hl,FastAsleepText
     call PrintText
-    jr .sleepDone
-.WakeUp
-    ld hl,WokeUpText
-    call PrintText
-.sleepDone
+    ds 2 ; jr .sleepDone ; joedebug - sleep won't waste turn
+;.sleepDone
     xor a
     ld [$CCF1],a
     ld hl,ExecutePlayerMoveDone
     jp Func_3da37
+
+.WakeUp
+    ld hl,WokeUpText
+    call PrintText
 
 .FrozenCheck
     bit 5,[hl] ; frozen?
@@ -58742,28 +58747,33 @@ SECTION "CheckEnemyStatusConditions",ROMX[$688f],BANK[$f]
 CheckEnemyStatusConditions: ; 3e88f (f:688f)
     ld hl,W_ENEMYMONSTATUS ; $cfe9
     ld a,[hl]
-    and $7
-    jr z,.asm_3e8bf
+    and SLP
+    jr z,.FrozenCheck
+
     dec a
     ld [W_ENEMYMONSTATUS],a ; $cfe9
     and a
-    jr z,.asm_3e8af
+    jr z,.WakeUp
+
     ld hl,FastAsleepText ; $5a3d
     call PrintText
     xor a
     ld [$cc5b],a
     ld a,$bd
     call PlayMoveAnimation
-    jr .asm_3e8b5
-.asm_3e8af
-    ld hl,WokeUpText ; $5a42
-    call PrintText
-.asm_3e8b5
+    ds 2 ; jr .sleepDone ; joedebug - sleep won't waste turn
+
+;.sleepDone
     xor a
     ld [$ccf2],a
     ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
-.asm_3e8bf
+
+.WakeUp
+    ld hl,WokeUpText ; $5a42
+    call PrintText
+
+.FrozenCheck
     bit 5,[hl]
     jr z,.asm_3e8d3
     ld hl,FrozenText ; $5a47
