@@ -47,7 +47,7 @@
     db BITE         , FLINCH_SIDE_EFFECT1        ,  60 , NORMAL   , 255 , 08 ; pp 25 ; 0
     db GROWL        , ATTACK_DOWN1_EFFECT        ,   0 , NORMAL   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
     db ROAR         , SWITCH_AND_TELEPORT_EFFECT ,   0 , NORMAL   , 255 , 04 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 04
-    db SING         , SLEEP_EFFECT               ,   0 , NORMAL   , 140 , 19 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 19
+    db SING         , SLEEP_EFFECT               ,   0 , NORMAL   , 140 , 16 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 16
     db SUPERSONIC   , CONFUSION_EFFECT           ,   0 , NORMAL   , 229 , 14 ; pp 15 ; - ; Acr 140 -> 229 ; PP 20 -> 15
     db SONICBOOM    , SPECIAL_DAMAGE_EFFECT      ,   1 , NORMAL   , 229 , 10 ; pp 20 ; -
     db DISABLE      , DISABLE_EFFECT             ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; Acr 140 -> 255
@@ -79,7 +79,7 @@
     db SOLARBEAM    , CHARGE_EFFECT              , 140 , GRASS    , 255 , 20 ; pp 10 ; 1 ; Pwr 120 -> 140
     db POISONPOWDER , POISON_EFFECT              ,   0 , POISON   , 191 , 08 ; pp 25 ; - ; PP 35 -> 25
     db STUN_SPORE   , PARALYZE_EFFECT            ,   0 , GRASS    , 191 , 10 ; pp 20 ; - ; PP 30 -> 20
-    db SLEEP_POWDER , SLEEP_EFFECT               ,   0 , GRASS    , 191 , 24 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 24
+    db SLEEP_POWDER , SLEEP_EFFECT               ,   0 , GRASS    , 191 , 22 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 24
     db PETAL_DANCE  , THRASH_PETAL_DANCE_EFFECT  , 120 , GRASS    , 255 , 15 ; pp 15 ; 1 ; Pwr 70 -> 120 ; PP 20 -> 15 ; Ene 14 -> 15
     db STRING_SHOT  , SPEED_DOWN2_EFFECT         ,   0 , BUG      , 242 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Speed -2x
     db DRAGON_RAGE  , SPECIAL_DAMAGE_EFFECT      ,   1 , DRAGON   , 255 , 14 ; pp 15 ; - ; PP 10 -> 15
@@ -95,7 +95,7 @@
     db TOXIC        , POISON_EFFECT              ,   0 , POISON   , 229 , 20 ; pp 10 ; - ; Acr 216 -> 229
     db CONFUSION    , CONFUSION_SIDE_EFFECT      ,  50 , PSYCHIC  , 255 , 08 ; pp 25 ; 1
     db PSYCHIC_M    , SPECIAL_DOWN_SIDE_EFFECT   ,  90 , PSYCHIC  , 255 , 20 ; pp 10 ; 1
-    db HYPNOSIS     , SLEEP_EFFECT               ,   0 , PSYCHIC  , 153 , 20 ; pp 10 ; - ; PP 20 -> 10
+    db HYPNOSIS     , SLEEP_EFFECT               ,   0 , PSYCHIC  , 153 , 18 ; pp 10 ; - ; PP 20 -> 10
     db MEDITATE     , ATTACK_UP1_EFFECT          ,   0 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
     db AGILITY      , SPEED_UP2_EFFECT           ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Type Psychic -> Normal ; PP 30 -> 15
     db QUICK_ATTACK , NO_ADDITIONAL_EFFECT       ,  40 , NORMAL   , 255 , 07 ; pp 30 ; 0
@@ -117,9 +117,9 @@
     db HAZE         , HAZE_EFFECT                ,   0 , ICE      , 255 , 07 ; pp 30 ; -
     db REFLECT      , REFLECT_EFFECT             ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; -
     db FOCUS_ENERGY , FOCUS_ENERGY_EFFECT        ,   0 , FIGHTING , 255 , 07 ; pp 30 ; - ; Type Normal -> Fighting
-    db BIDE         , BIDE_EFFECT                ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
-    db METRONOME    , METRONOME_EFFECT           ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
-    db MIRROR_MOVE  , MIRROR_MOVE_EFFECT         ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; Typw Wind -> Normal
+    db BIDE         , BIDE_EFFECT                ,   0 , TYPE_NA  , 255 , 20 ; pp 10 ; -
+    db METRONOME    , METRONOME_EFFECT           ,   0 , TYPE_NA  , 255 , 20 ; pp 10 ; -
+    db MIRROR_MOVE  , MIRROR_MOVE_EFFECT         ,   0 , TYPE_NA  , 255 , 10 ; pp 20 ; - ; Typw Wind -> Normal
     db SELFDESTRUCT , EXPLODE_EFFECT             , 200 , NORMAL   , 255 , 50 ; pp  5 ; 0 ; Pwr 130 -> 200 ; Ene 40 -> 50
     db EGG_BOMB     , NO_ADDITIONAL_EFFECT       , 100 , RUBBER   , 191 , 20 ; pp 10 ; 0 ; Type Normal -> Rubber
     db LICK         , PARALYZE_SIDE_EFFECT2      ,  30 , GHOST    , 255 , 07 ; pp 30 ; 0 ; Pwr 20 -> 30
@@ -142,12 +142,12 @@
     db POISON_GAS   , POISON_EFFECT              ,   0 , POISON   , 229 , 07 ; pp 30 ; - ; Acr 140 -> 229 ; PP 40 -> 30
     db BARRAGE      , TWO_TO_FIVE_ATTACKS_EFFECT ,  25 , GRASS    , 216 , 14 ; pp 15 ; 0 ; Type Normal -> Grass ; Pwr 15 -> 25 ; PP 20 -> 15
     db LEECH_LIFE   , DRAIN_HP_EFFECT            ,  30 , BUG      , 255 , 08 ; pp 25 ; 0 ; Pwr 20 -> 30 ; PP 15 -> 25
-    db LOVELY_KISS  , SLEEP_EFFECT               ,   0 , NORMAL   , 191 , 24 ; pp 10 ; - ; Ene 20 -> 24
+    db LOVELY_KISS  , SLEEP_EFFECT               ,   0 , NORMAL   , 191 , 22 ; pp 10 ; - ; Ene 20 -> 24
     db SKY_ATTACK   , CHARGE_EFFECT              , 140 , WIND     , 229 , 36 ; pp  5 ; 0 ; Ene 40 -> 36
     db TRANSFORM    , TRANSFORM_EFFECT           ,   0 , RUBBER   , 255 , 20 ; pp 10 ; - ; Type Normal -> Rubber
     db BUBBLE       , SPEED_DOWN_SIDE_EFFECT     ,  30 , WATER    , 255 , 06 ; pp 35 ; 1 ; Pwr 20 -> 30 ; PP 30 -> 35
     db DIZZY_PUNCH  , CONFUSION_SIDE_EFFECT      ,  90 , IVORY    , 255 , 16 ; pp 10 ; 0 ; Type Normal -> Ivory ; Pwr 70 -> 90 ; PP 10 -> 15 ; Ene 14 -> 16
-    db SPORE        , SLEEP_EFFECT               ,   0 , GRASS    , 216 , 28 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 28 ; Acr 255 -> 216
+    db SPORE        , SLEEP_EFFECT               ,   0 , GRASS    , 216 , 24 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 28 ; Acr 255 -> 216
     db FLASH        , ACCURACY_DOWN1_EFFECT      ,   0 , ELECTRIC , 204 , 18 ; pp 15 ; - ; Type Normal -> Electric ; Acr 178 -> 204 ; PP 20 -> 15 ; Ene 14 -> 18
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; Acr 204 -> 255 ; PP 15 -> 30
     db SPLASH       , SPLASH_EFFECT              ,   0 , WATER    , 255 , 00 ; pp 40 ; - ; Type Normal -> Water
@@ -156,7 +156,7 @@
     db EXPLOSION    , EXPLODE_EFFECT             , 255 , NORMAL   , 255 , 60 ; pp  5 ; 0 ; Pwr 170 -> 255 ; Ene 40 -> 60
     db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  20 , NORMAL   , 204 , 12 ; pp 15 ; 0 ; Pwr 18 -> 20 ; Ene 14 -> 12
     db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  50 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Ground -> Ivory
-    db REST         , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 20 ; pp 10 ; - ; Type Psychic -> Normal
+    db REST         , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 28 ; pp 10 ; - ; Type Psychic -> Normal ; Ene 20 -> 28
     db ROCK_SLIDE   , NO_ADDITIONAL_EFFECT       ,  85 , ROCK     , 229 , 14 ; pp 10 ; 0 ; Pwr 75 -> 85 ; PP 10 -> 15
     db HYPER_FANG   , FLINCH_SIDE_EFFECT1        ,  80 , NORMAL   , 229 , 14 ; pp 15 ; 0
     db SHARPEN      , ATTACK_UP1_EFFECT          ,   0 , METAL    , 255 , 07 ; pp 30 ; - ; Type Normal -> Metal

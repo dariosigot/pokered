@@ -5040,7 +5040,7 @@ KabutoBaseStats:
     db 45 ; base special
 
     db ROCK ; species type 1
-    db WATER ; species type 2
+    db BUG ; species type 2
 
     db 45 ; catch rate
     db 119 ; base exp yield
@@ -5076,7 +5076,7 @@ KabutopsBaseStats:
     db 70 ; base special
 
     db ROCK ; species type 1
-    db WATER ; species type 2
+    db BUG ; species type 2
 
     db 45 ; catch rate
     db 201 ; base exp yield

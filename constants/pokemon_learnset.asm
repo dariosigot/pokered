@@ -2945,23 +2945,23 @@ KABUTO_Learnset: MACRO
     db  1,SCRATCH
     db  1,HARDEN
     db  8,BUBBLE
-    db 11,ABSORB
+    db 11,LEECH_LIFE
     db 13,ROCK_THROW
-    db 15,WATER_GUN
+    db 15,AGILITY
     db 17,LEER
     db 18,SAND_ATTACK
     db 19,BLADE
     db 19,SHARPEN
-    db 20,BUBBLEBEAM
-    db 22,AURORA_BEAM
+    db 20,PIN_MISSILE
+    db 22,STRING_SHOT
     db 24,REST
-    db 26,LEECH_LIFE
-    db 28,WATERFALL
+    db 26,ABSORB
+    db 28,DOUBLE_TEAM
     db 30,FOCUS_ENERGY
     db 31,SLAM
     db 33,MEGA_DRAIN
     db 35,ROCK_SLIDE
-    db 38,TSUNAMI
+    db 38,TWINEEDLE
     ;  40,KABUTOPS
 ENDM
 KABUTOPS_Learnset: MACRO
@@ -2971,20 +2971,20 @@ KABUTOPS_Learnset: MACRO
     db 40,GUILLOTINE
     db 43,TRAPHOLE
     db 45,SWORDS_DANCE
-    db 47,HYDRO_PUMP
+    db 47,WATERFALL
     db 49,BODY_SLAM
     db 52,CONFUSE_RAY
     db 56,EARTHQUAKE
-    db 58,TWINEEDLE
+    db 58,COUNTER
     db 60,CRABHAMMER
 ENDM
 KABUTO_NoEvo_Learnset: MACRO
     db 43,SLASH
     db 46,TRAPHOLE
     db 49,SWORDS_DANCE
-    db 53,HYDRO_PUMP
+    db 53,WATERFALL
     db 58,EARTHQUAKE
-    db 60,TWINEEDLE
+    db 60,CRABHAMMER
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 AERODACTYL_Learnset: MACRO

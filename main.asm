@@ -23892,19 +23892,21 @@ ItemUseMedicine: ; Moved in the Bank
     cp d ; is pokemon the item was used on active in battle?
     jp nz,.doneHealing
 ; if it is active in battle
+;joenote - this part is getting a bit of a rewrite to prevent resetting all stats when using a status healing item
+    ld a,[H_WHOSETURN] ; Backup Turn
+    push af            ; ...
+    xor a              ; Force player turn
+    ld [H_WHOSETURN],a ; ...
+    ld hl,UndoBurnParStats
+    ld b,BANK(UndoBurnParStats)
+    call Bankswitch
+    pop af             ; Restore Turn
+    ld [H_WHOSETURN],a ; ...
     xor a
     ld [W_PLAYERMONSTATUS],a ; remove the status ailment in the in-battle pokemon data
-    push hl
+    ld [W_PLAYERTOXICCOUNTER],a ; clear toxic counter
     ld hl,W_PLAYERBATTSTATUS3
     res 0,[hl] ; heal Toxic status
-    pop hl
-    ld bc,30
-    add hl,bc ; hl now points to party stats
-    ld de,W_PLAYERMONMAXHP
-    ld bc,10
-    call CopyData ; copy party stats to in-battle stat data
-    ld a,$28
-    call Predef
     jp .doneHealing
 .healHP
     inc hl ; hl = address of current HP
@@ -24132,6 +24134,29 @@ ItemUseMedicine: ; Moved in the Bank
     jr nz,.updateInBattleData
     ld bc,-31
     add hl,bc
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - undo brn/par stat changes for Full Restore after restoring HP in battle
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.clearParBrn    ;do not adjust the stats if not currently in battle
+    push hl
+    push de
+    ld a,[H_WHOSETURN]
+    push af
+    xor a    ;forcibly set it to the player's turn
+    ld [H_WHOSETURN],a
+    ;undo brn/par stat changes
+    ld hl,UndoBurnParStats
+    ld b,BANK(UndoBurnParStats)
+    call Bankswitch
+    pop af
+    ld [H_WHOSETURN],a
+    pop de
+    pop hl
+.clearParBrn
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
     xor a
     ld [hl],a ; remove the status ailment in the party data
 .updateInBattleData
@@ -28015,7 +28040,7 @@ UpdateHPBar: ; fa1d (3:7a1d)
     pop bc
     pop de
     call UpdateHPBar_CompareNewHPToOldHP
-    ret z
+    jr z,.end
     ld a,$ff
     jr c,.HPdecrease
     ld a,$1
@@ -28079,35 +28104,12 @@ UpdateHPBar: ; fa1d (3:7a1d)
     call UpdateHPBar_PrintHPNumber
     ld a,$1
     call UpdateHPBar_AnimateHPBar
+.end
     jp RemoveBattleValue ; jp Delay3
 
-; animates the HP bar going up or down for (a) ticks (two waiting frames each)
-; stops prematurely if bar is filled up
-; e: current health (in pixels) to start with
-UpdateHPBar_AnimateHPBar: ; fab1 (3:7ab1)
-    push hl
-.barAnimationLoop
-    push af
-    push de
-    ld d,$6
-    call DrawHPBar
-    ld c,$2
-    call DelayFrames
-    pop de
-    ld a,[wHPBarDelta] ; +1 or -1
-    add e
-    cp $31
-    jr nc,.barFilledUp
-    ld e,a
-    pop af
-    dec a
-    jr nz,.barAnimationLoop
-    pop hl
-    ret
-.barFilledUp
-    pop af
-    pop hl
-    ret
+; Free
+
+SECTION "UpdateHPBar_CompareNewHPToOldHP",ROMX[$7ad1],BANK[$3]
 
 ; compares old HP and new HP and sets c and z flags accordingly
 UpdateHPBar_CompareNewHPToOldHP: ; fad1 (3:7ad1)
@@ -28992,6 +28994,34 @@ InsertIVFromEnemyMonData:
     ld a,[W_ENEMYMONSPDSPCIV]
     ld [hl],a
     ret    
+
+; animates the HP bar going up or down for (a) ticks (two waiting frames each)
+; stops prematurely if bar is filled up
+; e: current health (in pixels) to start with
+UpdateHPBar_AnimateHPBar: ; Moved in the Bank
+    push hl
+.barAnimationLoop
+    push af
+    push de
+    ld d,$6
+    call DrawHPBar
+    ld c,$2
+    call DelayFrames
+    pop de
+    ld a,[wHPBarDelta] ; +1 or -1
+    add e
+    cp $31
+    jr nc,.barFilledUp
+    ld e,a
+    pop af
+    dec a
+    jr nz,.barAnimationLoop
+    pop hl
+    ret
+.barFilledUp
+    pop af
+    pop hl
+    ret
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -30707,9 +30737,9 @@ TryDoWildEncounter: ; Moved in the Bank
     xor a
     ret
 
-SECTION "Func_1392c",ROMX[$792c],BANK[$4]
+SECTION "RecoilEffect_",ROMX[$792c],BANK[$4]
 
-Func_1392c: ; 1392c (4:792c)
+RecoilEffect_: ; 1392c (4:792c)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVENUM] ; $cfd2
@@ -30773,7 +30803,7 @@ Func_1392c: ; 1392c (4:792c)
     xor a
 .asm_13990
     ld [wListMenuID],a ; $cf94
-    ds 2; ld a,$48
+    ; ds 2; ld a,$48
     call SetDamageDuringRecoil ; call Predef ; UpdateHPBar
     ld hl,UnnamedText_1399e ; $799e
     jp PrintText
@@ -30781,118 +30811,100 @@ UnnamedText_1399e: ; 1399e (4:799e)
     TX_FAR _UnnamedText_1399e
     db "@"
 
-Func_139a3: ; 139a3 (4:79a3)
-    ld hl,W_ENEMYMONTYPE1
-    ld de,W_PLAYERMONTYPE1
-    ld a,[H_WHOSETURN]
-    and a
-    ld a,[W_ENEMYBATTSTATUS1]
-    jr z,.asm_139b8
-    push hl
-    ld h,d
-    ld l,e
-    pop de
-    ld a,[W_PLAYERBATTSTATUS1]
-
-.asm_139b8
-    bit 6,a
-    jr nz,PrintButItFailedText
-    ld a,[hli]
-    ld [de],a
-    inc de
-    ld a,[hl]
-    ld [de],a
-    ld hl,PlayCurrentMoveAnimation
-    call CallBankF
-    ld hl,UnnamedText_139cd
-    jp PrintText
-
-UnnamedText_139cd: ; 139cd (4:79cd)
-    TX_FAR _UnnamedText_139cd
-    db "@"
-
-PrintButItFailedText: ; 139d2 (4:79d2)
-    ld hl,PrintButItFailedText_
-CallBankF: ; 139d5 (4:79d5)
-    ld b,BANK(PrintButItFailedText_) ; bank f
-    jp Bankswitch
-
-Func_139da: ; 139da (4:79da)
+HazeEffect_: ; Moved in the Bank
     ld a,$7
+; store 7 on every stat mod
     ld hl,wPlayerMonAttackMod
-    call Func_13a43
+    call .ResetStatMods
     ld hl,wEnemyMonAttackMod
-    call Func_13a43
-    ld hl,$cd12
+    call .ResetStatMods
+; copy unmodified stats to battle stats
+    ld hl,$cd12 ; PlayerMonUnmodifiedAttack
     ld de,W_PLAYERMONATK
-    call Func_13a4a
-    ld hl,$cd26
+    call .ResetStats
+    ld hl,$cd26 ; EnemyMonUnmodifiedAttack
     ld de,W_ENEMYMONATTACK
-    call Func_13a4a
+    call .ResetStats
+; cure non-volatile status, but only for the target
+; joenote - do the non-volatile statuses even for the user as was originally intended
     ld hl,W_ENEMYMONSTATUS
-    ld de,wEnemySelectedMove
-    ld a,[H_WHOSETURN]
-    and a
-    jr z,.asm_13a09
-    ld hl,W_PLAYERMONSTATUS
-    dec de
-
-.asm_13a09
-    ld a,[hl]
-    ld [hl],$0
-    and $27
-    jr z,.asm_13a13
-    ld a,$ff
-    ld [de],a
-
-.asm_13a13
+;    ld de,wEnemySelectedMove
+;    ld a,[H_WHOSETURN]
+;    and a
+;    jr z,.cureStatuses
     xor a
+    ld [hl],a ; joenote - added
+    ld [W_ENEMYTOXICCOUNTER],a	;joenote - clear toxic counter
+    ld hl,W_PLAYERMONSTATUS
+;    dec de ; wPlayerSelectedMove
+
+;.cureStatuses
+	;joenote - making sure to clear statuses and toxic counter
+    ld [W_PLAYERTOXICCOUNTER],a	;clear toxic counter
+    ld [hl],a ;clear status
+;    ld a,[hl]
+;    ld [hl],$0
+;    and %00100111 ; (1 << FRZ) | SLP_MASK
+;    jr z,.cureVolatileStatuses
+; prevent the Pokemon from executing a move if it was asleep or frozen
+;joenote - causes a glitch with multi-turn moves like bide and hyper beam. don't do this.
+;    ld a,$ff
+;    ld [de],a
+
+;.cureVolatileStatuses
+;    xor a
     ld [W_PLAYERDISABLEDMOVE],a
     ld [W_ENEMYDISABLEDMOVE],a
-    ld hl,$ccee
+    ld hl,$ccee ; PlayerDisabledMoveNumber
     ld [hli],a
     ld [hl],a
     ld hl,W_PLAYERBATTSTATUS1
-    call Func_13a37
+    call .CureVolatileStatuses
     ld hl,W_ENEMYBATTSTATUS1
-    call Func_13a37
+    call .CureVolatileStatuses
     ld hl,PlayCurrentMoveAnimation
-    call CallBankF
-    ld hl,UnnamedText_13a53
+    call Bankswitch4toF
+    ld hl,.StatusChangesEliminatedText
     jp PrintText
 
-Func_13a37: ; 13a37 (4:7a37)
-    res 7,[hl]
-    inc hl
+.CureVolatileStatuses
+    res 7,[hl] ; confused
+    inc hl ; BATTSTATUS2
     ld a,[hl]
-    and $78
-    ld [hli],a
+	; clear USING_X_ACCURACY, PROTECTED_BY_MIST, GETTING_PUMPED, and SEEDED statuses
+    and %01111000
+    ld [hli],a ; BATTSTATUS3
     ld a,[hl]
-    and $f8
+    ; clear Bad Poison, Reflect and Light Screen statuses
+    and %11111000
     ld [hl],a
     ret
 
-Func_13a43: ; 13a43 (4:7a43)
+.ResetStatMods
     ld b,$8
-.loop
+.loop1
     ld [hli],a
     dec b
-    jr nz,.loop
+    jr nz,.loop1
     ret
 
-Func_13a4a: ; 13a4a (4:7a4a)
+.ResetStats
     ld b,$8
-.loop
+.loop2
     ld a,[hli]
     ld [de],a
     inc de
     dec b
-    jr nz,.loop
+    jr nz,.loop2
     ret
 
-UnnamedText_13a53: ; 13a53 (4:7a53)
-    TX_FAR _UnnamedText_13a53
+.StatusChangesEliminatedText
+    TX_FAR _StatusChangesEliminatedText
     db "@"
+
+; Free
+
+SECTION "Func_13a58",ROMX[$7a58],BANK[$4]
 
 Func_13a58: ; 13a58 (4:7a58)
     ld hl,W_GRASSRATE ; $d887
@@ -31919,6 +31931,41 @@ TestMonMoveCompatibility_HandleAlternative:
     ld bc,7
     ld a,BANK(PokemonBaseStats)
     jp FarCopyData ; copy bc bytes of data from a:hl to de
+
+ConversionEffect_: ; Moved in the Bank
+    ld hl,PlayCurrentMoveAnimation
+    call Bankswitch4toF
+    ld hl,W_ENEMYMONTYPE1
+    ld de,W_PLAYERMONTYPE1
+    ld a,[H_WHOSETURN]
+    and a
+    ld a,[W_ENEMYBATTSTATUS1]
+    jr z,.done
+    push hl
+    ld h,d
+    ld l,e
+    pop de
+    ld a,[W_PLAYERBATTSTATUS1]
+.done
+    bit 6,a ; invulnerable
+    jr nz,.attackMissed
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hl]
+    ld [de],a
+    ld hl,.ConvertedTypeToText
+    jp PrintText
+.ConvertedTypeToText
+    TX_FAR _ConvertedTypeToText
+    db "@"
+.attackMissed
+    ld hl,PrintMoveFailureText
+    ; fall through
+
+Bankswitch4toF: ; Moved in the Bank
+    ld b,$f
+    jp Bankswitch
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -33107,9 +33154,7 @@ Func_17c47: ; Move in the Bank
 EmotionBubbles: ; 17cbd (5:7cbd)
     INCBIN "gfx/emotion_bubbles.2bpp"
 
-SECTION "SubstituteEffectHandler",ROMX[$7dad],BANK[$5]
-
-SubstituteEffectHandler: ; 17dad (5:7dad)
+SubstituteEffectHandler: ; Moved in the Bank
     ld c,50
     call DelayFrames
     ld hl,W_PLAYERMONMAXHP
@@ -33146,7 +33191,11 @@ SubstituteEffectHandler: ; 17dad (5:7dad)
     sbc a,0      ;borrow from high byte if needed
     pop bc
     jr c,.notEnoughHP  ;underflow means user would be left with negative health
-                        ;bug: note since it only brances on carry,it will possibly leave user with 0HP
+                        ;fixedbug: note since it only brances on carry,it will possibly leave user with 0HP
+;;;;joenote - fix the bug to also check for exactly 0 hp
+    inc d
+    dec d
+    jr z,.notEnoughHP
 .userHasZeroOrMoreHP
     ldi [hl],a  ;store high byte HP
     ld [hl],d   ;store low byte HP
@@ -33186,6 +33235,8 @@ UnnamedText_17e22: ; 17e22 (5:7e22)
 UnnamedText_17e27: ; 17e27 (5:7e27)
     TX_FAR _UnnamedText_17e27
     db "@"
+
+SECTION "ActivatePC",ROMX[$7e2c],BANK[$5]
 
 ActivatePC: ; 17e2c (5:7e2c)
     call SaveScreenTilesToBuffer2  ;XXX: copy background from wTileMap to wTileMapBackup2
@@ -47456,27 +47507,23 @@ LeechSeedEffect_:
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
     ld de,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES)
 .done
-    xor a ; Missed Text to "DoesntAffect"
-    ld [$d05b],a ; DamageMultipliers
+    push hl
+    push de
+    ld hl,MoveHitTestPlus
+    ld b,BANK(MoveHitTestPlus)
+    call Bankswitch
+    pop de
+    pop hl
+    jr nz,.moveMissed
     ld a,[de]
     cp GRASS
-    jr z,.moveMissed
+    jr z,.doesntAffect
     inc de
     ld a,[de]
     cp GRASS
-    jr z,.moveMissed
+    jr z,.doesntAffect
     bit 7,[hl] ; SEEDED
     jr nz,.justSeeded
-    push hl
-    ld hl,MoveHitTest
-    ld b,BANK(MoveHitTest)
-    call Bankswitch
-    pop hl
-    ld a,1 ; Initialize Missed Text to "Missed"
-    ld [$d05b],a ; DamageMultipliers
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
-    jr nz,.moveMissed
     set 7,[hl] ; SEEDED
     ld hl,PlayCurrentMoveAnimation2
     ld b,BANK(PlayCurrentMoveAnimation2)
@@ -47487,6 +47534,11 @@ LeechSeedEffect_:
     call .PlayCurrentMoveAnimation
     ld b,BANK(PrintMoveFailureText)
     ld hl,PrintMoveFailureText
+    jp Bankswitch
+.doesntAffect
+    call .PlayCurrentMoveAnimation
+    ld b,BANK(PrintDoesntAffectMonText)
+    ld hl,PrintDoesntAffectMonText
     jp Bankswitch
 .justSeeded
     call .PlayCurrentMoveAnimation
@@ -47638,7 +47690,10 @@ DisplayEffectiveness: ; Moved in the Bank
     cp 05
     ld hl,.NotVeryEffectiveText
     jr nc,.done
+    and a ; cp 00
     ld hl,.AlmostIneffectiveText
+    jr nz,.done
+    ld hl,.IneffectiveText
 .done
     jp PrintText
 .ExtremelyEffectiveText
@@ -47664,6 +47719,9 @@ DisplayEffectiveness: ; Moved in the Bank
     db "@"
 .AlmostIneffectiveText
     TX_FAR _AlmostIneffectiveText
+    db "@"
+.IneffectiveText
+    TX_FAR _IneffectiveText
     db "@"
 
 SECTION "TrainerInfoTextBoxTileGraphics",ROMX[$7b98],BANK[$B]
@@ -47954,9 +48012,9 @@ MistEffect_: ; 33f2b (c:7f2b)
     TX_FAR _MistAlreadyInUseText
     db "@"
 
-SECTION "Func_33f57",ROMX[$7f57],BANK[$c]
+SECTION "OneHitKOEffect_",ROMX[$7f57],BANK[$c]
 
-Func_33f57: ; 33f57 (c:7f57)
+OneHitKOEffect_: ; 33f57 (c:7f57)
     ld hl,W_DAMAGE ; $d0d7
     xor a
     ld [hli],a
@@ -49385,70 +49443,94 @@ Moves: ; 38000 (e:4000)
 
 INCLUDE "constants/moves.asm"
 
-SECTION "Func_39680",ROMX[$5680],BANK[$e]
+; ──────────────────────────────────────────────────────────────────────────
 
-Func_39680: ; 39680 (e:5680)
-    ld a,[H_WHOSETURN] ; $FF00+$f3
+;joenote - this function checks to see if a pkmn is paralyzed or burned
+;then it doubles attack if burned or quadruples speed if paralyzed.
+;It's meant to be run right before healing paralysis or burn so as to 
+;undo the stat changes.
+UndoBurnParStats:
+    ld hl,W_PLAYERMONSTATUS
+    ld de,wPlayerStatsToDouble
+    ld a,[H_WHOSETURN]
     and a
-    ld a,[$d060]
-    ld hl,$d026
-    jr z,.asm_39691
-    ld a,[$d065]
-    ld hl,$cff7
-.asm_39691
-    ld c,$4
-    ld b,a
-.asm_39694
-    srl b
-    call c,Func_3969f
-    inc hl
-    inc hl
-    dec c
-    ret z
-    jr .asm_39694
-
-Func_3969f: ; 3969f (e:569f)
-    ld a,[hl]
-    add a
-    ld [hld],a
-    ld a,[hl]
-    rl a
-    ld [hli],a
+    jr z,.checkburn
+    ld hl,W_ENEMYMONSTATUS
+    ld de,wEnemyStatsToDouble
+.checkburn
+    ld a,[hl]        ;load statuses
+    bit 4,a          ;test for burn
+    jr z,.checkpar
+    ld a,%0000001
+    ld [de],a        ;set attack to be doubled to undo the stat change of BRN
+    call DoubleSelectedStats
+    jr .return
+.checkpar
+    bit 6,a          ;test for paralyze
+    jr z,.return
+    ld a,%00000100
+    ld [de],a        ;set speed to be doubled (done twice) to undo the stat change of PAR
+    call DoubleSelectedStats
+    call DoubleSelectedStats
+.return
+    xor a
+    ld [de],a        ;reset the stat change bits
     ret
 
-Func_396a7: ; 396a7 (e:56a7)
-    ld a,[H_WHOSETURN] ; $FF00+$f3
+;joenote - let's get this working again and put it to use
+DoubleSelectedStats:
+    ld a,[H_WHOSETURN]
     and a
-    ld a,[$d061]
+    ld a,[wPlayerStatsToDouble]
     ld hl,W_PLAYERMONATK
-    jr z,.asm_396b8
-    ld a,[$d066]
+    jr z,.notEnemyTurn
+    ld a,[wEnemyStatsToDouble]
     ld hl,W_ENEMYMONATTACK
-.asm_396b8
-    ld c,$4
+.notEnemyTurn
+    ld c,4
     ld b,a
-.asm_396bb
+.loop
     srl b
-    call c,Func_396c6
+    call c,.doubleStat
     inc hl
     inc hl
     dec c
     ret z
-    jr .asm_396bb
-
-Func_396c6: ; 396c6 (e:56c6)
-    ld a,[hl]
-    srl a
-    ld [hli],a
-    rr [hl]
-    or [hl]
-    jr nz,.asm_396d1
-    ld [hl],$1
-.asm_396d1
-    dec hl
+    jr .loop
+.doubleStat
+    push bc
+    ld a,[hli]
+    ld b,a
+    ld c,[hl] ; bc holds value of stat to double
+;double the stat
+    sla c
+    rl b
+;cap stat at 999
+    ;b register contains high byte & c register contains low byte
+    ld a,c ;let's work on low byte first. Note that decimal 999 is $03E7 in hex.
+    sub 999 % $100 ;a = a - ($03E7 % $100). Gives a = a - $E7. A byte % $100 always gives the lesser nibble.
+    ;Note that if a < $E7 then the carry bit 'c' in the flag register gets set due to overflowing with a negative result.
+    ld a,b ;now let's work on the high byte
+    sbc 999 / $100 ;a = a - ($03E7 / $100 + c_flag). Gives a = a - ($03 + c_flag). A byte / $100 always gives the greater nibble.
+    ;Note again that if a < $03 then the carry bit remains set. 
+    ;If the bit is already set from the lesser nibble,then its addition here can still make it remain set if a is low enough.
+    jr c,.donecapping ;jump to next marker if the c_flag is set. This only remains set if BC <  the cap of $03E7.
+    ;else let's continue and set the 999 cap
+    ld a,999 / $100 ; else load $03 into a
+    ld b,a ;and store it as the high byte
+    ld a,999 % $100 ; else load $E7 into a
+    ld c,a ;and store it as the low byte
+    ;now registers b & c together contain $03E7 for a capped stat value of 999
+.donecapping
+    ld a,c
+    ld [hld],a
+    ld [hl],b
+    pop bc
     ret
 
-Func_396d3: ; 396d3 (e:56d3)
+; ──────────────────────────────────────────────────────────────────────────
+
+Func_396d3: ; Moved in the Bank
     xor a
     ld [W_ENEMYMONID],a
     ld b,$1
@@ -49482,7 +49564,7 @@ Func_396d3: ; 396d3 (e:56d3)
     dec hl
     jr .asm_396e9
 
-Func_39707: ; 39707 (e:5707)
+Func_39707: ; Moved in the Bank
     push hl
     push de
     push bc
@@ -49523,10 +49605,6 @@ Func_3bb7d: ; Moved in the Bank
     ld bc,$8
     jp CopyData
 
-HealFailed: ; Moved in the Bank
-    ld hl,PrintButItFailedText_
-    jp BankswitchEtoF
-
 ; shifts all move data one up (freeing 4th move slot)
 WriteMonMoves_ShiftMoveData: ; Moved in the Bank
     ld c,$3
@@ -49541,12 +49619,6 @@ WriteMonMoves_ShiftMoveData: ; Moved in the Bank
 Func_3b057: ; Moved in the Bank
     ld a,$10
     jp Predef ; indirect jump to HandleBitArray (f666 (3:7666))
-
-GoPalSetBattleAndLoadText:
-    ld b,1
-    call GoPAL_SET
-    ld hl,UnnamedText_3bb92 ; $7b92
-    ret
 
 RedBallColorDuringEnemySwitch:
     ld a,PAL_REDBALL - PAL_GREENBAR
@@ -50362,25 +50434,14 @@ AIUseFullHeal: ; 3a786 (e:6786)
     ld a,FULL_HEAL
     jp AIPrintItemUse
 
-AICureStatus: ; 3a791 (e:6791)
-; cures the status of enemy's active pokemon
-    ld a,[W_ENEMYMONNUMBER]
-    ld hl,$D8A8
-    ld bc,$2C
-    call AddNTimes
-    xor a
-    ld [hl],a ; clear status in enemy team roster
-    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy
-    ld hl,$D069
-    res 0,[hl]
-    ret
-
-AIUseXAccuracy: ; 0x3a7a8 unused
+AIUseXAccuracy: ; Moved in the Bank
     call Func_3a69b
     ld hl,$D068
     set 0,[hl]
     ld a,X_ACCURACY
     jp AIPrintItemUse
+
+SECTION "AIUseGuardSpec",ROMX[$67b5],BANK[$e]
 
 AIUseGuardSpec: ; 3a7b5 (e:67b5)
     call Func_3a69b
@@ -50846,10 +50907,6 @@ LearnMoveCommon:
     ld h,[hl]
     ld l,a
     jp GetEvosMoves
-
-Func_3bb8c: ; Moved in the Bank
-    ld hl,PrintButItFailedText_ ; $7b53
-    jp BankswitchEtoF
 
 UnnamedText_3bb92: ; Moved in the Bank
     TX_FAR _UnnamedText_3bb92
@@ -51689,26 +51746,18 @@ WriteMonMoves: ; Moved in the Bank
 HealEffect_: ; Moved Upper in the Bank
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ld de,W_PLAYERMONCURHP ; $d015
-    ld hl,W_PLAYERMONMAXHP ; $d023
+    ld de,W_PLAYERMONCURHP+1 ; $d015
+    ld hl,W_PLAYERMONMAXHP+1 ; $d023
     ld a,[W_PLAYERMOVENUM] ; $cfd2
     jr z,.done
-    ld de,W_ENEMYMONCURHP ; $cfe6
-    ld hl,W_ENEMYMONMAXHP ; $cff4
+    ld de,W_ENEMYMONCURHP+1 ; $cfe6
+    ld hl,W_ENEMYMONMAXHP+1 ; $cff4
     ld a,[W_ENEMYMOVENUM] ; $cfcc
 .done
-    ld b,a
-    ld a,[de]
-    cp [hl] ; most significant bytes comparison is ignored
-            ; causes the move to miss if max HP is 255 or 511 points higher than the current HP
-    inc de
-    inc hl
-    ld a,[de]
-    sbc [hl]
-    jp z,HealFailed ; no effect if user's HP is already at its maximum
-    ld a,b
     cp REST
     jr nz,.healHP
+
+.healStatusAndSleep
     push hl
     push de
     push af
@@ -51720,9 +51769,26 @@ HealEffect_: ; Moved Upper in the Bank
     jr z,.restEffect
     ld hl,W_ENEMYMONSTATUS ; $cfe9
 .restEffect
+    push hl
+;undo the stat-changing effects of burn and paralyze and clear toxic info
+    ld hl,UndoBurnParStats
+    ld b,BANK(UndoBurnParStats)
+    call Bankswitch
+    ld hl,W_PLAYERBATTSTATUS3     ;load in for toxic bit
+    ld de,W_PLAYERTOXICCOUNTER    ;load in for toxic counter
+    ld a,[H_WHOSETURN]
+    and a
+    jr z,.undoToxic
+    ld hl,W_ENEMYBATTSTATUS3      ;load in for toxic bit
+    ld de,W_ENEMYTOXICCOUNTER     ;load in for toxic counter
+.undoToxic
+    res 0,[hl]                    ; heal Toxic status
+    xor a                         ;clear a
+    ld [de],a                     ;write a to toxic counter
+    pop hl
     ld a,[hl]
     and a
-    ld [hl],2 ; clear status and set number of turns asleep to 2
+    ld [hl],3 ; clear status and set number of turns asleep to 3
     ld hl,StartedSleepingEffect
     jr z,.printRestText
     ld hl,FellAsleepBecameHealthyText ; if mon had an status
@@ -51731,6 +51797,8 @@ HealEffect_: ; Moved Upper in the Bank
     pop af
     pop de
     pop hl
+    ; fall through
+
 .healHP
     ld a,[hld]
     ld [wHPBarMaxHP],a
@@ -51805,22 +51873,28 @@ HealEffect_: ; Moved Upper in the Bank
     jp PrintText
 
 TransformEffect_: ; Moved Upper in the Bank
+    call .HideSubstitute
     ld hl,W_PLAYERMONID
     ld de,W_ENEMYMON_START
-    ld a,[W_ENEMYBATTSTATUS1] ; $d067
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jr nz,.asm_3bad1
-    ld hl,W_ENEMYMON_START
-    ld de,W_PLAYERMONID
-    ld [wPlayerMoveListIndex],a ; $cc2e
-    ld a,[W_PLAYERBATTSTATUS1] ; $d062
-.asm_3bad1
-    bit 6,a
-    jp nz,Func_3bb8c
+    ld a,[W_PLAYERBATTSTATUS1]
+    jr nz,.done
+    push hl
+    ld h,d
+    ld l,e
+    pop de
+    ld a,[W_ENEMYBATTSTATUS1]
+.done
+    bit 6,a ; invulnerable
+    jp nz,.attackMissed
     push hl
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
+    jr nz,.skipResetLastMove
+    ld a,0                        ; If Success during player
+    ld [wPlayerMoveListIndex],a   ; turn reset move last choice
+.skipResetLastMove
     jr z,.SkipBackupMoves
     ld a,[W_ENEMYBATTSTATUS3]
     bit 3,a ; Pokemon is Just Transformed
@@ -51905,7 +51979,6 @@ TransformEffect_: ; Moved Upper in the Bank
     inc de ; ...
     ld a,[hl]
     ld [de],a
-    call .TransformAnimation
     pop hl
     ld a,[hl]
     ld [$d11e],a
@@ -51916,38 +51989,81 @@ TransformEffect_: ; Moved Upper in the Bank
     ld hl,wEnemyMonStatMods ; $cd2e
     ld de,wPlayerMonStatMods ; $cd1a
     call Func_3bb7d
-    call GoPalSetBattleAndLoadText ; Denim ; ld hl,UnnamedText_3bb92 ; $7b92
+    call .TransformAnimation
+    call Delay3
+    call .RestoreSubstitute
+    ld hl,UnnamedText_3bb92 ; $7b92
     jp PrintText
-.TransformAnimation
+.attackMissed
+    ld a,1
+    ld [W_MOVEMISSED],a
+    call .TransformAnimation
+    call .RestoreSubstitute
+    ld hl,PrintMoveFailureText
+    jp BankswitchEtoF
+.HideSubstitute
     push hl
     push de
-    ld hl,W_PLAYERBATTSTATUS2 ; $d063
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.asm_3bae4
-    ld hl,W_ENEMYBATTSTATUS2 ; $d068
-.asm_3bae4
-    bit 4,[hl]
-    push af
+    call .GetSubstituteFlag
     ld hl,HideSubstituteShowMonAnim
     ld b,BANK(HideSubstituteShowMonAnim)
-    call nz,Bankswitch
-    ld a,[W_OPTIONS] ; $d355
-    add a
-    ld hl,PlayCurrentMoveAnimation ; $7ba8
-    ld b,BANK(PlayCurrentMoveAnimation)
-    jr nc,.asm_3baff
-    ld hl,AnimationTransformMon
-    ld b,BANK(AnimationTransformMon)
-.asm_3baff
-    call Bankswitch
-    ld hl,ReshowSubstituteAnim
-    ld b,BANK(ReshowSubstituteAnim)
-    pop af
     call nz,Bankswitch
     pop de
     pop hl
     ret
+.RestoreSubstitute
+    push hl
+    push de
+    call .GetSubstituteFlag
+    ld hl,ReshowSubstituteAnim
+    ld b,BANK(ReshowSubstituteAnim)
+    call nz,Bankswitch
+    pop de
+    pop hl
+    ret
+.GetSubstituteFlag
+    ld hl,W_PLAYERBATTSTATUS2 ; $d063
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr z,.getsubstflg
+    ld hl,W_ENEMYBATTSTATUS2 ; $d068
+.getsubstflg
+    bit 4,[hl]
+    ret
+.TransformAnimation
+    ; (1) Battle Animation ON - Success
+    ; (2) Battle Animation ON - Fail
+    ; (3) Battle Animation OFF - Success
+    ; (4) Battle Animation OFF - Fail
+    push hl
+    push de
+    ld a,[W_OPTIONS] ; $d355
+    add a
+    ld hl,PlayCurrentMoveAnimation ; (1)
+    ld b,BANK(PlayCurrentMoveAnimation)
+    jr nc,.done2
+    ld hl,AnimationTransformMon ; (3)
+    ld b,BANK(AnimationTransformMon)
+.done2
+    ld a,[W_MOVEMISSED]
+    and a
+    push af
+    call z,Bankswitch
+    pop af
+    call nz,.MissedAnimation
+    pop de
+    pop hl
+    ret
+.MissedAnimation
+    ld a,[W_OPTIONS] ; $d355
+    add a
+    ret c ; (4)
+    xor a
+    ld [$cc5b],a
+    ld d,$CC ; TransformFailAnim
+    ld hl,PlayBattleAnimationFromAnotherBank ; (2)
+    ld b,BANK(PlayBattleAnimationFromAnotherBank)
+    jp Bankswitch
 
 ; ─────────────────────────────────────────────────────────────
 
@@ -52527,6 +52643,37 @@ DoEvolution_HandleAlternative:
     ld [wAlternateFormIndex],a
     jp GetMonHeader
 
+AICureStatus: ; Moved in the Bank
+; cures the status of enemy's active pokemon
+    ld a,[W_ENEMYMONNUMBER]
+    ld hl,$D8A8
+    ld bc,$2C
+    call AddNTimes
+    xor a
+    ld [hl],a ; clear status in enemy team roster
+    ld a,[H_WHOSETURN]
+    push af
+    ld a,1 ; forcibly set it to the AI's turn
+    ld [H_WHOSETURN],a
+    ; undo brn/par stat changes
+    ld hl,UndoBurnParStats
+    ld b,BANK(UndoBurnParStats)
+    call Bankswitch
+    pop af
+    ld [H_WHOSETURN],a
+    xor a
+    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy
+	ld [W_ENEMYTOXICCOUNTER], a	;clear toxic counter
+    ld hl,W_ENEMYBATTSTATUS3 ;clear toxic bit
+    res 0,[hl]
+    ; need to redraw the enemy trainer hud 
+    push af
+    ld hl,DrawEnemyHUDAndHPBar
+    ld b,BANK(DrawEnemyHUDAndHPBar)
+    call Bankswitch
+    pop af
+    ret
+
 SECTION "bankF",ROMX,BANK[$F]
 
 ; These are move effects (second value from the Moves table in bank $E).
@@ -52937,9 +53084,12 @@ MainInBattleLoop: ; 3c233 (f:4233)
     ld a,[$d078]
     and a
     ret nz
-    ld a,[$d018]
-    and $27
-    jr nz,.asm_3c2a6 ; 0x3c271 $33
+;joenote - This whole thing is problematic. Just comment it all out.
+;		-allow the player to select a move even if frozen in order to prevent PP underflow and link desyncs
+;		-also allow the player to select a move if you don't want sleep to waste a turn on wakeup
+;    ld a,[$d018]                    ; joedebug - sleep won't waste turn
+;    and $27                         ; ...
+;    jr nz,.asm_3c2a6 ; 0x3c271 $33  ; ...
     ld a,[$d062]
     and $21
     jr nz,.asm_3c2a6 ; 0x3c278 $2c
@@ -53399,8 +53549,17 @@ FaintEnemyPokemon ; 0x3c567
 .wild
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
     res 2,[hl]
+; Bug. This only zeroes the high byte of the player's accumulated damage,
+; setting the accumulated damage to itself mod 256 instead of 0 as was probably
+; intended. That alone is problematic, but this mistake has another more severe
+; effect. This function's counterpart for when the player mon faints,
+; RemoveFaintedPlayerMon, zeroes both the high byte and the low byte. In a link
+; battle, the other player's Game Boy will call that function in response to
+; the enemy mon (the player mon from the other side's perspective) fainting,
+; and the states of the two Game Boys will go out of sync unless the damage
+; was congruent to 0 modulo 256.
     xor a
-    ld [W_NUMHITS],a ; $d074
+    call ResetPlayerBideAccumulatedDamage ; ld [W_NUMHITS],a ; $d074
     ld hl,$d065 ; enemy statuses
     ld [hli],a
     ld [hli],a
@@ -54267,12 +54426,12 @@ LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
     ld de,W_PLAYERMONNAME
     ld bc,$b
     call CopyData
+    call ApplyBadgeStatBoostsFull
     ld hl,W_PLAYERMONLEVEL ; $d022
     ld de,$cd0f
     ld bc,$b
     call CopyData
-    call Func_3ed1a
-    call ApplyBadgeStatBoosts
+    call ApplyBurnAndParalysisPenaltiesToPlayer
     ld a,$7
     ld b,$8
     ld hl,wPlayerMonAttackMod ; $cd1a
@@ -54314,7 +54473,7 @@ LoadEnemyMonFromParty: ; 3cc13 (f:4c13)
     ld de,$cd23
     ld bc,$b
     call CopyData
-    call Func_3ed1e
+    call ApplyBurnAndParalysisPenaltiesToEnemy
     ld hl,W_MONHBASESTATS
     ld de,$d002
     ld b,$5
@@ -55571,7 +55730,8 @@ SelectEnemyMove: ; Moved in the Bank
     and $12     ; using multi-turn move or bide
     ret nz
     ld a,[W_ENEMYMONSTATUS]
-    and SLP | FRZ ; sleeping or frozen
+    and SLP_NOMOVE | FRZ ; sleeping or frozen ; joedebug - sleep won't waste turn on wakeup
+                                              ; but it will if wakeup won't occur (prevents PP decrementing with AI)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     call nz,NoAttackAICall ;joenote - get ai routines. flag register is preserved
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -55880,8 +56040,7 @@ MirrorMoveCheck:
     ld hl,DisplayEffectiveness
     ld b,BANK(DisplayEffectiveness)
     call Bankswitch
-    ld a,1
-    ld [$CCF4],a ; MoveDidntMiss
+    call PlayerMoveDidntMissAndEnemyBideAccum
 .notDone
     ld a,[W_PLAYERMOVEEFFECT]
     ld hl,EffectsArray4
@@ -55930,6 +56089,12 @@ MultiHitText:
     db "@"
 
 ; ──────────────────────────────────────────
+
+SetCounterToMiss:
+    ld hl,wUnusedC000
+    set 7,[hl] ; setting this bit causes counter to miss
+    ld hl,HurtItselfText ; $5a65
+    ret
 
 SECTION "PrintGhostText",ROMX[$5811],BANK[$f]
 
@@ -55981,13 +56146,13 @@ IsGhostBattle: ; 3d83a (f:583a)
 CheckPlayerStatusConditions: ; 3d854 (f:5854)
     ld hl,W_PLAYERMONSTATUS
     ld a,[hl]
-    and a,SLP
-    jr z,.FrozenCheck ; to 5884
+    and SLP
+    jr z,.FrozenCheck
 
     dec a
     ld [W_PLAYERMONSTATUS],a ; decrement sleep count
     and a
-    jr z,.WakeUp ; to 5874
+    jr z,.WakeUp
 
     xor a
     ld [$CC5B],a
@@ -55995,15 +56160,16 @@ CheckPlayerStatusConditions: ; 3d854 (f:5854)
     call PlayMoveAnimation
     ld hl,FastAsleepText
     call PrintText
-    jr .sleepDone
-.WakeUp
-    ld hl,WokeUpText
-    call PrintText
-.sleepDone
+    ds 2 ; jr .sleepDone ; joedebug - sleep won't waste turn
+;.sleepDone
     xor a
     ld [$CCF1],a
     ld hl,ExecutePlayerMoveDone
     jp Func_3da37
+
+.WakeUp
+    ld hl,WokeUpText
+    call PrintText
 
 .FrozenCheck
     bit 5,[hl] ; frozen?
@@ -56066,7 +56232,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld hl,W_PLAYERBATTSTATUS1
     res 7,[hl]
     ld hl,ConfusedNoMoreText
-    call PrintText
+    call PrintTextAndDrawHub ; call PrintText
     jr .next3
 .next4
     ld hl,IsConfusedText
@@ -56083,7 +56249,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     and a,$80
     ld [hl],a
     call Func_3daad
-    jr .next5 ; 5952
+    jr .MonHurtItselfOrFullyParalysed ; 5952
 .next3
     ld a,[$CCEE]
     and a
@@ -56103,15 +56269,15 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     jr nc,.next7
     ld hl,FullyParalyzedText
     call PrintText
-.next5
+.MonHurtItselfOrFullyParalysed
     ld hl,W_PLAYERBATTSTATUS1
     ld a,[hl]
-    and a,$CC
+    and %10001100 ; Reset also invulnerablility
     ld [hl],a
     ld a,[W_PLAYERMOVEEFFECT]
-    cp a,$2B
+    cp FLY_EFFECT
     jr z,.next8 ; 5966
-    cp a,$27
+    cp CHARGE_EFFECT
     jr z,.next8
     jr .next9 ; 596F
 .next8
@@ -56126,25 +56292,26 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld hl,W_PLAYERBATTSTATUS1
     bit 0,[hl]
     jr z,.next10 ; 59D0
-    xor a
-    ld [W_PLAYERMOVENUM],a
-    ld hl,$D0D7
-    ld a,[hli]
-    ld b,a
-    ld c,[hl]
-    ld hl,$D075
-    ld a,[hl]
-    add c
-    ld [hld],a
-    ld a,[hl]
-    adc b
-    ld [hl],a
+;joenote - done elsewhere using PlayerBideAccum
+;    xor a
+;    ld [W_PLAYERMOVENUM],a
+;    ld hl,$D0D7
+;    ld a,[hli]
+;    ld b,a
+;    ld c,[hl]
+;    ld hl,$D075
+;    ld a,[hl]
+;    add c
+;    ld [hld],a
+;    ld a,[hl]
+;    adc b
+;    ld [hl],a
     ld hl,$D06A
     dec [hl]
-    jr z,.next11 ; 599B
+    jr z,.UnleashEnergy ; 599B
     ld hl,ExecutePlayerMoveDone ; $580a
     jp Func_3da37
-.next11
+.UnleashEnergy
     ld hl,W_PLAYERBATTSTATUS1
     res 0,[hl]
     ld hl,UnleashedEnergyText
@@ -56204,6 +56371,22 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld hl,getPlayerAnimationType ; $5714
     jp nz,Func_3da37
     jp Func_3da37
+
+; TODO : move to appropriate part of bank F
+EnemyMoveDidntMissAndPlayerBideAccum:
+    ld hl,PlayerBideAccum_
+    jr BideAccumCommon
+PlayerMoveDidntMissAndEnemyBideAccum:
+    ld hl,EnemyBideAccum_
+    ; fall through
+BideAccumCommon:
+    ld b,bank(EnemyBideAccum_) ; same PlayerBideAccum_
+    call Bankswitch
+    ld a,1
+    ld [$CCF4],a ; MoveDidntMiss
+    ret
+
+SECTION "Func_3da1a",ROMX[$5a1a],BANK[$f]
 
 Func_3da1a: ; 3da1a (f:5a1a)
     ld a,[W_PLAYERBATTSTATUS2] ; $d063
@@ -56310,7 +56493,7 @@ UnnamedText_3daa8: ; 3daa8 (f:5aa8)
     db "@"
 
 Func_3daad: ; 3daad (f:5aad)
-    ld hl,HurtItselfText ; $5a65
+    call SetCounterToMiss ; ld hl,HurtItselfText ; $5a65
     call PrintText
     ld hl,W_ENEMYMONDEFENSE ; $cff8
     ld a,[hli]
@@ -56480,10 +56663,10 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     jr z,.playersTurn
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
 .playersTurn
-    ld hl,DoesntAffectMonText ; $5c57
-    ld a,[$d05b] ; DamageMultipliers
-    and %01111111
-    jr z,.gotTextToPrint
+;    ld hl,DoesntAffectMonText ; $5c57
+;    ld a,[W_MOVEMISSED]
+;    and a
+;    jr z,.gotTextToPrint
     ld hl,AttackMissedText ; $5c42
     ld a,[$d05e] ; CriticalHitOrOHKO
     cp $ff
@@ -56500,6 +56683,10 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     ret nz
 
     ; if you get here, the mon used jump kick or hi jump kick and missed
+
+    ld hl,wUnusedC000
+    set 7,[hl] ; setting this bit causes counter to miss
+
     ld hl,W_DAMAGE ; since the move missed, wDamage will always contain 0 at this point.
                    ; Thus, recoil damage will always be equal to 1
                    ; even if it was intended to be potential damage/8.
@@ -56531,24 +56718,26 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
 .enemyTurn
     jp ApplyDamageToEnemyPokemon
 
-AttackMissedText: ; 3dc42 (f:5c42)
+AttackMissedText: ; Moved in the Bank
     TX_FAR _AttackMissedText
     db "@"
 
-KeptGoingAndCrashedText: ; 3dc47 (f:5c47)
+KeptGoingAndCrashedText: ; Moved in the Bank
     TX_FAR _KeptGoingAndCrashedText
     db "@"
 
-UnaffectedText: ; 3dc4c (f:5c4c)
+UnaffectedText: ; Moved in the Bank
     TX_FAR _UnaffectedText
     db "@"
 
-PrintDoesntAffectMonText: ; 3dc51 (f:5c51)
+PrintDoesntAffectMonText: ; Moved in the Bank
     ld hl,DoesntAffectMonText
     jp Delay50AndPrintText
 DoesntAffectMonText:
     TX_FAR _DoesntAffectMonText
     db "@"
+
+SECTION "PrintCriticalOHKOText",ROMX[$5c5c],BANK[$f]
 
 PrintCriticalOHKOText: ; 3dc5c (f:5c5c)
     ld a,[$d05e]
@@ -57283,12 +57472,14 @@ HandleCounterMove: ; 3e093 (f:6093)
     and a
 ; player's turn
     ld hl,wEnemySelectedMove
-    ld de,W_ENEMYMOVEPOWER
+    ld bc,W_ENEMYMON_START
+;    ld de,W_ENEMYMOVEPOWER
     ld a,[wPlayerSelectedMove]
     jr z,.next
 ; enemy's turn
     ld hl,wPlayerSelectedMove
-    ld de,W_PLAYERMOVEPOWER
+    ld bc,W_PLAYERMONID
+;    ld de,W_PLAYERMOVEPOWER
     ld a,[wEnemySelectedMove]
 .next
     cp a,COUNTER
@@ -57298,19 +57489,24 @@ HandleCounterMove: ; 3e093 (f:6093)
     ld a,[hl]
     cp a,COUNTER
     ret z ; if the target also used Counter,miss
-    ld a,[de]
-    and a
-    ret z ; if the move the target used has 0 power,miss
+
+;    ld a,[de]
+;    and a
+;    ret z ; if the move the target used has 0 power,miss
 ; check if the move the target used was Normal or Fighting type
-    inc de
-    ld a,[de]
-    and a ; normal type
-    jr z,.counterableType
-    cp a,FIGHTING
-    jr z,.counterableType
+;    inc de
+;    ld a,[de]
+;    and a ; normal type
+;    jr z,.counterableType
+;    cp a,FIGHTING
+;    jr z,.counterableType
 ; if the move wasn't Normal or Fighting type,miss
-    xor a
-    ret
+;    xor a
+;    ret
+
+    call TestPhysicalSpecial
+    jr nz,.specialAttackFail
+
 .counterableType
     ld hl,W_DAMAGE
     ld a,[hli]
@@ -57334,6 +57530,13 @@ HandleCounterMove: ; 3e093 (f:6093)
     call MoveHitTest ; do the normal move hit test in addition to Counter's special rules
     xor a
     ret
+.specialAttackFail
+    xor a
+    ret
+
+; Free
+
+SECTION "ApplyAttackToEnemyPokemon",ROMX[$60df],BANK[$f]
 
 ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
     ld a,[W_PLAYERMOVEEFFECT]
@@ -57407,7 +57610,7 @@ ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
     ld b,a
     ld a,[hl]
     or b
-    jr z,ApplyAttackToEnemyPokemonDone ; we're done if damage is 0
+    ;jr z,ApplyAttackToEnemyPokemonDone ; we're done if damage is 0
     ld a,[W_ENEMYBATTSTATUS2]
     bit 4,a ; does the enemy have a substitute?
     jp nz,AttackSubstitute
@@ -57530,7 +57733,7 @@ ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
     ld b,a
     ld a,[hl]
     or b
-    jr z,ApplyAttackToPlayerPokemonDone ; we're done if damage is 0
+    ;jr z,ApplyAttackToPlayerPokemonDone ; we're done if damage is 0
     ld a,[W_PLAYERBATTSTATUS2]
     bit 4,a ; does the player have a substitute?
     jp nz,AttackSubstitute
@@ -57579,18 +57782,17 @@ ApplyAttackToPlayerPokemonDone
     jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
 AttackSubstitute: ; 3e25e (f:625e)
-    call PrintBattleValueNearSubstitute ; ld hl,SubstituteTookDamageText
+    call GetPlayerOrEnemyTurnWithSubstitute
+    push de
+    push bc
+    ld b,BANK(PrintBattleValueNearMon_)
+    ld hl,PrintBattleValueNearMon_
+    call Bankswitch
+    call RemoveBattleValueBankF
+    ld hl,.SubstituteTookDamageText
     call PrintText
-; values for player turn
-    ld de,wEnemySubstituteHP
-    ld bc,W_ENEMYBATTSTATUS2
-    ld a,[H_WHOSETURN]
-    and a
-    jr z,.applyDamageToSubstitute
-; values for enemy turn
-    ld de,wPlayerSubstituteHP
-    ld bc,W_PLAYERBATTSTATUS2
-.applyDamageToSubstitute
+    pop bc
+    pop de
     ld hl,W_DAMAGE
     ld a,[hli]
     and a
@@ -57604,19 +57806,15 @@ AttackSubstitute: ; 3e25e (f:625e)
     ld h,b
     ld l,c
     res 4,[hl] ; unset the substitute bit
-    ld hl,SubstituteBrokeText
+    ld hl,.SubstituteBrokeText
     call PrintText
 ; flip whose turn it is for the next function call
-    ld a,[H_WHOSETURN]
-    xor a,$01
-    ld [H_WHOSETURN],a
+    call FlipTurn
     ld hl,HideSubstituteShowMonAnim
     ld b,BANK(HideSubstituteShowMonAnim) ; animate the substitute breaking
     call Bankswitch ; substitute
 ; flip the turn back to the way it was
-    ld a,[H_WHOSETURN]
-    xor a,$01
-    ld [H_WHOSETURN],a
+    call FlipTurn
     ld hl,W_PLAYERMOVEEFFECT ; value for player's turn
     and a
     jr z,.nullifyEffect
@@ -57625,14 +57823,19 @@ AttackSubstitute: ; 3e25e (f:625e)
     xor a
     ld [hl],a ; zero the effect of the attacker's move
     jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
-
-SubstituteTookDamageText: ; 3e2ac (f:62ac)
+.SubstituteBrokeText
+    TX_FAR _SubstituteBrokeText
+    db "@"
+.SubstituteTookDamageText
     TX_FAR _SubstituteTookDamageText
     db "@"
 
-SubstituteBrokeText: ; 3e2b1 (f:62b1)
-    TX_FAR _SubstituteBrokeText
-    db "@"
+ResetPlayerBideAccumulatedDamage:
+    ld [W_NUMHITS],a ; $d074
+    ld [W_NUMHITS+1],a ; $d074
+    ret
+
+SECTION "HandleBuildingRage",ROMX[$62b6],BANK[$f]
 
 ; this function raises the attack modifier of a pokemon using Rage when that pokemon is attacked
 HandleBuildingRage: ; 3e2b6 (f:62b6)
@@ -57871,12 +58074,12 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
     push bc
     inc hl
     ld a,[$d05b]
-    ds 2 ; and a,$80
+    ; and a,$80
     ld b,a
     ld a,[hl] ; a = damage multiplier
     ld [H_MULTIPLIER],a
-    ds 1 ; add b
-    ds 0 ; ld [$d05b],a
+    ; add b
+    ; ld [$d05b],a
     call MultiplyD05B ; Denim,corretto bug superefficace!
     xor a
     ld [H_MULTIPLICAND],a
@@ -57897,10 +58100,9 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
     ld [hl],a
     or b ; is damage 0?
     jr nz,.skipTypeImmunity
-.typeImmunity
-; if damage is 0,make the move miss
-    inc a
-    ld [W_MOVEMISSED],a
+;    inc a               ; if damage is 0,make the move miss
+;    ld [W_MOVEMISSED],a ; ...
+    ld [$d05e],a ; if damage is 0,delete crit hit flag
 .skipTypeImmunity
     pop bc
     pop hl
@@ -57975,8 +58177,8 @@ BackupMovesBeforeEnemyMimic:
     ret
 
 HazeEffect: ; Moved in the Bank
-    ld hl,Func_139da
-    ld b,BANK(Func_139da)
+    ld hl,HazeEffect_
+    ld b,BANK(HazeEffect_)
     jp Bankswitch
 
 JumpMoveEffect: ; Moved in the Bank
@@ -58091,6 +58293,10 @@ LoadEnemyMonData_GetAlternateMonHeader:
     ld b,BANK(LoadEnemyMonData_GetAlternateMonHeader_)
     call Bankswitch
     jp GetMonHeader
+
+PlayBattleAnimationFromAnotherBank:
+   ld a,d
+   jp PlayBattleAnimation
 
 ; Free
 
@@ -58506,8 +58712,7 @@ EnemyCheckIfMirrorMoveEffect:
     ld hl,DisplayEffectiveness
     ld b,BANK(DisplayEffectiveness)
     call Bankswitch ; indirect jump to DisplayEffectiveness (2fb7b (b:7b7b))
-    ld a,$1
-    ld [$ccf4],a ; MoveDidntMiss
+    call EnemyMoveDidntMissAndPlayerBideAccum
 .handleExplosionMiss
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     ld hl,EffectsArray4 ; $4030
@@ -58564,28 +58769,33 @@ SECTION "CheckEnemyStatusConditions",ROMX[$688f],BANK[$f]
 CheckEnemyStatusConditions: ; 3e88f (f:688f)
     ld hl,W_ENEMYMONSTATUS ; $cfe9
     ld a,[hl]
-    and $7
-    jr z,.asm_3e8bf
+    and SLP
+    jr z,.FrozenCheck
+
     dec a
     ld [W_ENEMYMONSTATUS],a ; $cfe9
     and a
-    jr z,.asm_3e8af
+    jr z,.WakeUp
+
     ld hl,FastAsleepText ; $5a3d
     call PrintText
     xor a
     ld [$cc5b],a
     ld a,$bd
     call PlayMoveAnimation
-    jr .asm_3e8b5
-.asm_3e8af
-    ld hl,WokeUpText ; $5a42
-    call PrintText
-.asm_3e8b5
+    ds 2 ; jr .sleepDone ; joedebug - sleep won't waste turn
+
+;.sleepDone
     xor a
     ld [$ccf2],a
     ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
-.asm_3e8bf
+
+.WakeUp
+    ld hl,WokeUpText ; $5a42
+    call PrintText
+
+.FrozenCheck
     bit 5,[hl]
     jr z,.asm_3e8d3
     ld hl,FrozenText ; $5a47
@@ -58644,8 +58854,8 @@ Func_3e8fd: ; 3e8fd (f:68fd)
     jr nz,.asm_3e944
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     res 7,[hl]
-    ld hl,ConfusedNoMoreText ; $5a6a
-    call PrintText
+    ld hl,ConfusedNoMoreText
+    call PrintTextAndDrawHub ; call PrintText
     jp Func_3e9aa
 .asm_3e944
     ld hl,IsConfusedText ; $5a60
@@ -58701,7 +58911,7 @@ Func_3e8fd: ; 3e8fd (f:68fd)
     ld a,$1
     ld [H_WHOSETURN],a ; $FF00+$f3
     call ApplyDamageToEnemyPokemon
-    jr asm_3e9d3
+    jr MonHurtItselfOrFullyParalysed
 
 Func_3e9aa: ; 3e9aa (f:69aa)
     ld a,[$ccef]
@@ -58722,15 +58932,15 @@ Func_3e9aa: ; 3e9aa (f:69aa)
     jr nc,asm_3e9f6
     ld hl,FullyParalyzedText ; $5a4c
     call PrintText
-asm_3e9d3: ; 3e9d3 (f:69d3)
+MonHurtItselfOrFullyParalysed: ; 3e9d3 (f:69d3)
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     ld a,[hl]
-    and $cc
+    and %10001100 ; Reset also invulnerablility
     ld [hl],a
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    cp $2b
+    cp FLY_EFFECT
     jr z,.asm_3e9e7
-    cp $27
+    cp CHARGE_EFFECT
     jr z,.asm_3e9e7
     jr .asm_3e9f0
 .asm_3e9e7
@@ -58745,25 +58955,26 @@ asm_3e9f6: ; 3e9f6 (f:69f6)
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     bit 0,[hl]
     jr z,.asm_3ea54
-    xor a
-    ld [W_ENEMYMOVENUM],a ; $cfcc
-    ld hl,W_DAMAGE ; $d0d7
-    ld a,[hli]
-    ld b,a
-    ld c,[hl]
-    ld hl,$cd06
-    ld a,[hl]
-    add c
-    ld [hld],a
-    ld a,[hl]
-    adc b
-    ld [hl],a
+;joenote - doing this elsewhere with function EnemyBideAccum
+;    xor a
+;    ld [W_ENEMYMOVENUM],a ; $cfcc
+;    ld hl,W_DAMAGE ; $d0d7
+;    ld a,[hli]
+;    ld b,a
+;    ld c,[hl]
+;    ld hl,$cd06
+;    ld a,[hl]
+;    add c
+;    ld [hld],a
+;    ld a,[hl]
+;    adc b
+;    ld [hl],a
     ld hl,$d06f
     dec [hl]
-    jr z,.asm_3ea1c
+    jr z,.unleashEnergy
     ld hl,ExecuteEnemyMoveDone ; $688c
     jp Func_3eab8
-.asm_3ea1c
+.unleashEnergy
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     res 0,[hl]
     ld hl,UnleashedEnergyText ; $5a74
@@ -58823,6 +59034,10 @@ asm_3e9f6: ; 3e9f6 (f:69f6)
     ld hl,GetEnemyAnimationType ; $6794
     jp nz,Func_3eab8
     jp Func_3eab8
+
+; Free : Following functions is part of the previous
+
+SECTION "Func_3ea9b",ROMX[$6a9b],BANK[$f]
 
 Func_3ea9b: ; 3ea9b (f:6a9b)
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
@@ -59138,26 +59353,20 @@ Func_3ec92: ; 3ec92 (f:6c92)
     ld a,$1
     jp Predef ; indirect jump to CopyUncompressedPicToTilemap (3f0c6 (f:70c6))
 
-Func_3ed02: ; 3ed02 (f:6d02)
-    ld hl,Func_39680
-    ld b,BANK(Func_39680)
-    call Bankswitch ; indirect jump to Func_39680 (39680 (e:5680))
-    ld hl,Func_396a7
-    ld b,BANK(Func_396a7)
-    jp Bankswitch ; indirect jump to Func_396a7 (396a7 (e:56a7))
+SECTION "Func_3ed12",ROMX[$6d12],BANK[$f]
 
 Func_3ed12: ; 3ed12 (f:6d12)
     ld hl,Func_396d3
     ld b,BANK(Func_396d3)
     jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
 
-Func_3ed1a: ; 3ed1a (f:6d1a)
+ApplyBurnAndParalysisPenaltiesToPlayer: ; 3ed1a (f:6d1a)
     ld a,$1
-    jr asm_3ed1f
+    jr ApplyBurnAndParalysisPenalties
 
-Func_3ed1e: ; 3ed1e (f:6d1e)
+ApplyBurnAndParalysisPenaltiesToEnemy: ; 3ed1e (f:6d1e)
     xor a
-asm_3ed1f: ; 3ed1f (f:6d1f)
+ApplyBurnAndParalysisPenalties: ; 3ed1f (f:6d1f)
     ld [H_WHOSETURN],a ; $FF00+$f3
     call QuarterSpeedDueToParalysis
     jp HalveAttackDueToBurn
@@ -59330,7 +59539,12 @@ Func_3ee0c: ; 3ee0c (f:6e0c)
     pop bc
     ret
 
-ApplyBadgeStatBoosts: ; 3ee19 (f:6e19)
+ApplyBadgeStatBoostsFull:
+    xor a
+    ld [wBackupStatRaisedLoweredType],a
+    ; fall through
+
+ApplyBadgeStatBoosts: ; Moved in the Bank
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4 ; LINK_STATE_BATTLING
     ret z
@@ -59360,6 +59574,18 @@ ApplyBadgeStatBoosts: ; 3ee19 (f:6e19)
     ;joenote - clear out stat mod address offset backup
     xor a
     ld [wBackupStatRaisedLoweredType],a
+    ret
+
+MoveHitTestPlus:
+    push bc
+    push hl
+    push de
+    call MoveHitTest
+    pop de
+    pop hl
+    pop bc
+    ld a,[W_MOVEMISSED]
+    and a
     ret
 
 ; Free
@@ -59638,8 +59864,8 @@ TerminatorText_3f04a: ; 3f04a (f:704a)
     db "@"
 
 ConversionEffect: ; Moved in the Bank
-    ld hl,Func_139a3
-    ld b,BANK(Func_139a3)
+    ld hl,ConversionEffect_
+    ld b,BANK(ConversionEffect_)
     jp Bankswitch
 
 SECTION "_LoadTrainerPic",ROMX[$704b],BANK[$f]
@@ -59879,7 +60105,7 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierDownEffect       ; unused effect
      dw StatModifierDownEffect       ; unused effect
      dw StatModifierDownEffect       ; unused effect
-     dw ConfusionSideEffect          ; CONFUSION_SIDE_EFFECT
+     dw ConfusionEffect              ; CONFUSION_SIDE_EFFECT
      dw TwoToFiveAttacksEffect       ; TWINEEDLE_EFFECT
      dw AmnesiaNewEffect             ; AMNESIA_NEW_EFFECT
      dw SubstituteEffect             ; SUBSTITUTE_EFFECT
@@ -59897,9 +60123,7 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierUpEffect         ; ACCURACY_UP3_EFFECT
      dw StatModifierUpEffect         ; EVASION_UP3_EFFECT
 
-SECTION "SleepEffect",ROMX[$71fc],BANK[$f]
-
-SleepEffect: ; 3f1fc (f:71fc)
+SleepEffect: ; Moved in the Bank
     ld de,W_ENEMYMONSTATUS ; $cfe9
     ld bc,W_ENEMYBATTSTATUS2 ; $d068
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -59908,21 +60132,14 @@ SleepEffect: ; 3f1fc (f:71fc)
     ld de,W_PLAYERMONSTATUS ; $d018
     ld bc,W_PLAYERBATTSTATUS2 ; $d063
 .done
-    ld a,[bc]
-    bit 5,a ; does the target need to recharge? (hyper beam)
-    res 5,a ; target no longer needs to recharge
-    ld [bc],a
-    jr nz,.setSleepCounter ; if the target had to recharge, all hit tests will be skipped
-                           ; including the event where the target already has another status
+    call MoveHitTestPlus
+    jr nz,.attackMissed
     ld a,[de]
     and a
     jr nz,.alreadyStatused
-    push de
-    call MoveHitTest
-    pop de
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
-    jr nz,.didntAffect
+    ld a,[bc] ; target no longer needs to recharge (hyper beam)
+    res 5,a   ; ...
+    ld [bc],a ; ...
 .setSleepCounter
     call GenRandomInBattle
     and %00000111 ; SLEEP
@@ -59931,9 +60148,9 @@ SleepEffect: ; 3f1fc (f:71fc)
     ld hl,.FellAsleepText ; $7245
     call PlayCurrentMoveAnimation2
     jp PrintText
-.didntAffect
+.attackMissed
     call PlayCurrentMoveAnimation
-    jp PrintDidntAffectText
+    jp PrintMoveFailureText
 .alreadyStatused
     call PlayCurrentMoveAnimation
     jp PrintAlreadyStatusedText
@@ -59950,9 +60167,15 @@ PoisonEffect: ; Moved in the Bank
     ld hl,W_PLAYERMONSTATUS ; $d018
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
 .done
+    ld a,[de]
+    cp POISON_EFFECT
+    jr nz,.skipMoveHitTest
+    call MoveHitTestPlus
+    jr nz,.attackMissed
+.skipMoveHitTest
     call CheckTargetSubstitute
     jr nz,.didntAffect ; can't poison a substitute target
-    ld a,[hli]
+    ld a,[hli] ; hl now point to type
     ld b,a
     and a
     jr nz,.alreadyStatused ; miss if target is already statused
@@ -59964,18 +60187,9 @@ PoisonEffect: ; Moved in the Bank
     jr z,.sideEffectTest
     cp POISON_SIDE_EFFECT2
     ld b,$67 ; 40% chance of poisoning
-    jr z,.sideEffectTest
-    push hl
-    push de
-    call MoveHitTest
-    pop de
-    pop hl
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
-    jr nz,.didntAffect
-    jr .inflictPoison
+    jr nz,.inflictPoison
 .sideEffectTest
-    call GenRandomInBattle
+    call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle
     cp b
     ret nc
 .inflictPoison
@@ -60014,6 +60228,9 @@ PoisonEffect: ; Moved in the Bank
 .regularPoisonEffect
     call PlayCurrentMoveAnimation2
     jp PrintText
+.attackMissed
+    ld hl,PrintMoveFailureText
+    jr .checkEnd
 .doesntAffect
     ld hl,PrintDoesntAffectMonText
     jr .checkEnd
@@ -60090,7 +60307,7 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     sub a,$1e      ;subtract $1E to map to equivalent 10% chance effects
 .next1
     push af     ;push effect...
-    call GenRandomInBattle  ;get random 8bit value for probability test
+    call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle  ;get random 8bit value for probability test
     cp b        ;success?
     pop bc      ;...pop effect into C
     ret nc      ;do nothing if random value is >= 1A or 4D [no status applied]
@@ -60142,7 +60359,7 @@ opponentAttacker: ; 3f382 (f:7382)
     sub a,$1e
 .next1
     push af
-    call GenRandomInBattle
+    call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle
     cp b
     pop bc
     ret nc
@@ -60403,54 +60620,44 @@ StatModifierDownEffect: ; Moved in the Bank
     ld hl,wPlayerMonStatMods ; $cd1a
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
     ld bc,W_PLAYERBATTSTATUS1 ; $d062
-    ld a,[W_ISLINKBATTLE] ; $d12b
-    cp $4
-    jr z,.done
-    call GenRandomInBattle
-    cp $40
-    jr c,.MoveMissed
 .done
+    ld a,[de]
+    cp ATTACK_DOWN_SIDE_EFFECT
+    jr nc,.skipMoveHitTest
+    call MoveHitTestPlus
+    jr nz,.attackMissed
+.skipMoveHitTest
     call CheckTargetSubstitute
-    jr nz,.MoveMissed
-    ld a,[bc]
-    bit 6,a ; fly/dig
-    jr nz,.MoveMissed
+    jr nz,.didntAffect
     ld a,[de]
     cp ATTACK_DOWN_SIDE_EFFECT
     jr c,.nonSideEffect
-    call CheckAmnesiaSideEffect ; GenRandomInBattle
+    call CheckCustomSideEffect ; GenRandomInBattle
     cp $55 ; 33%
-    jr nc,.CantLowerAnymore
+    ret nc ; don't apply side effect
     ld a,[de]
     sub ATTACK_DOWN_SIDE_EFFECT ; map each stat to 0-3
     jr .decrementStatMod
-.MoveMissed
-    ld a,[de]
-    cp ATTACK_DOWN_SIDE_EFFECT
-    ret nc
-    call PlayCurrentMoveAnimation
-    jp ConditionalPrintButItFailed
 .CantLowerAnymore_Pop
     pop de
     pop hl
     inc [hl]
 .CantLowerAnymore
+    ld hl,PrintNothingHappenedText
+    jr .checkEnd
+.attackMissed
+    ld hl,PrintMoveFailureText
+    jr .checkEnd
+.didntAffect
+    ld hl,PrintDidntAffectText
+    ; fall through
+.checkEnd
     ld a,[de]
     cp ATTACK_DOWN_SIDE_EFFECT
     ret nc
     call PlayCurrentMoveAnimation
-    jp PrintNothingHappenedText
+    jp hl
 .nonSideEffect
-    push hl
-    push de
-    push bc
-    call MoveHitTest
-    pop bc
-    pop de
-    pop hl
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
-    jr nz,.MoveMissed
     ld a,[de]
     sub ATTACK_DOWN1_EFFECT
     cp EVASION_DOWN1_EFFECT + $3 - ATTACK_DOWN1_EFFECT ; covers all -1 effects
@@ -60558,8 +60765,7 @@ StatModifierDownEffect: ; Moved in the Bank
 .ApplyBadgeBoostsAndStatusPenalties
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    call nz,ApplyBadgeStatBoosts ; whenever the player uses a stat-down move, badge boosts get reapplied again to every stat,
-                                 ; even to those not affected by the stat-up move (will be boosted further)
+    call nz,ApplyBadgeStatBoosts
     ld hl,.MonsStatsFellText
     call PrintText
     jp QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down
@@ -60587,6 +60793,38 @@ StatModifierDownEffect: ; Moved in the Bank
     db "@"
 
 ; ──────────────────────────────────────────────────────────────────────
+
+RecoilEffect: ; Moved in the Bank
+    ld hl,RecoilEffect_
+    ld b,BANK(RecoilEffect_)
+    jp Bankswitch
+
+GetPlayerOrEnemyTurnWithSubstitute:
+    ld de,wEnemySubstituteHP
+    ld bc,W_ENEMYBATTSTATUS2
+    ld a,[wFlagValueToPlayerBit1]
+    bit 1,a
+    jr z,.DamageToEnemy
+    ld de,wPlayerSubstituteHP
+    ld bc,W_PLAYERBATTSTATUS2
+;DamageToPlayer
+    call .CheckTurn
+    ret nz
+    jr FlipTurn
+.DamageToEnemy
+    call .CheckTurn
+    ret z
+    jr FlipTurn
+.CheckTurn
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    ret
+
+FlipTurn:
+    ld a,[H_WHOSETURN]
+    xor a,$01
+    ld [H_WHOSETURN],a
+    ret
 
 SECTION "PrintStatText",ROMX[$7688],BANK[$f]
 
@@ -60680,6 +60918,8 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr nz,.handleEnemy
+
+.handlePlayer
     ld a,[W_ISINBATTLE] ; $d057
     dec a
     jr nz,.notWildBattle1
@@ -60699,6 +60939,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     srl b ; b = enemyLevel / 4
     cp b ; is rand[0, playerLevel + enemyLevel] >= (enemyLevel / 4)?
     jr nc,.playerMoveWasSuccessful ; if so, allow teleporting
+.notWildBattle1
     ld a,[W_PLAYERMOVENUM] ; $cfd2
     jr .handleFailed
 .playerMoveWasSuccessful
@@ -60709,17 +60950,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld [$d078],a ; EscapedFromBattle
     ld a,[W_PLAYERMOVENUM] ; $cfd2
     jr .playAnimAndPrintText
-.notWildBattle1
-    ld a,[W_PLAYERMOVENUM] ; $cfd2
-    cp TELEPORT
-    jp z,PrintButItFailedText_
-    call PlayCurrentMoveAnimation
-    jp PrintIsUnaffectedText
-.handleFailed
-    cp TELEPORT
-    jp z,PrintButItFailedText_
-    call PlayCurrentMoveAnimation
-    jp PrintDidntAffectText
+
 .handleEnemy
     ld a,[W_ISINBATTLE] ; $d057
     dec a
@@ -60740,6 +60971,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     srl b
     cp b
     jr nc,.enemyMoveWasSuccessful
+.notWildBattle2
     ld a,[W_ENEMYMOVENUM] ; $cfcc
     jr .handleFailed
 .enemyMoveWasSuccessful
@@ -60750,12 +60982,22 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld [$d078],a
     ld a,[W_ENEMYMOVENUM] ; $cfcc
     jr .playAnimAndPrintText
-.notWildBattle2
-    ld a,[W_ENEMYMOVENUM] ; $cfcc
+
+.handleFailed
     cp TELEPORT
-    jp z,ConditionalPrintButItFailed
+    jp z,PrintButItFailedText
+    cp WHIRLWIND
+    jr nz,.notwhirlwind
+    xor a
+    ld [$cc5b],a
+    ld a,$CD ; WhirlwindFailAnim
+    call PlayBattleAnimation
+    jr .failDone
+.notwhirlwind
     call PlayCurrentMoveAnimation
+.failDone
     jp PrintIsUnaffectedText
+
 .playAnimAndPrintText
     push af
     call PlayBattleAnimation
@@ -60771,6 +61013,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld hl,.WasBlownAwayText
 .printText
     jp PrintText
+
 .RanFromBattleText
     TX_FAR _RanFromBattleText
     db "@"
@@ -60787,6 +61030,18 @@ PrintIsUnaffectedText:
 .IsUnaffectedText
     TX_FAR _IsUnaffectedText
     db "@"
+
+MistEffect: ; Moved in the Bank
+    ld hl,MistEffect_
+    ld b,BANK(MistEffect_)
+    jp Bankswitch
+
+FocusEnergyEffect: ; Moved in the Bank
+    ld hl,FocusEnergyEffect_
+    ld b,BANK(FocusEnergyEffect_)
+    jp Bankswitch
+
+; Free
 
 SECTION "TwoToFiveAttacksEffect",ROMX[$7811],BANK[$f]
 
@@ -60846,12 +61101,12 @@ FlinchSideEffect: ; 3f85b (f:785b)
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
 .asm_3f870
     ld a,[de]
-    cp $1f
+    cp FLINCH_SIDE_EFFECT1
     ld b,$1a
     jr z,.asm_3f879
     ld b,$4d
 .asm_3f879
-    call GenRandomInBattle
+    call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle
     cp b
     ret nc
     set 3,[hl]
@@ -60859,9 +61114,9 @@ FlinchSideEffect: ; 3f85b (f:785b)
     ret
 
 OneHitKOEffect: ; 3f884 (f:7884)
-    ld hl,Func_33f57
-    ld b,BANK(Func_33f57)
-    jp Bankswitch ; indirect jump to Func_33f57 (33f57 (c:7f57))
+    ld hl,OneHitKOEffect_
+    ld b,BANK(OneHitKOEffect_)
+    jp Bankswitch ; indirect jump to OneHitKOEffect_ (33f57 (c:7f57))
 
 ChargeEffect: ; 3f88c (f:788c)
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
@@ -60969,58 +61224,41 @@ PrintAlreadyStatusedText:
     TX_FAR _AlreadyStatusedText
     db "@"
 
-SECTION "MistEffect",ROMX[$7941],BANK[$f]
-
-MistEffect: ; 3f941 (f:7941)
-    ld hl,MistEffect_
-    ld b,BANK(MistEffect_)
-    jp Bankswitch
-
-FocusEnergyEffect: ; 3f949 (f:7949)
-    ld hl,FocusEnergyEffect_
-    ld b,BANK(FocusEnergyEffect_)
-    jp Bankswitch
-
-RecoilEffect: ; 3f951 (f:7951)
-    ld hl,Func_1392c
-    ld b,BANK(Func_1392c)
-    jp Bankswitch
-
-ConfusionSideEffect: ; 3f959 (f:7959)
-    call GenRandomInBattle
-    cp $19
-    ret nc
-    jr ConfusionSideEffectSuccess
-
-ConfusionEffect: ; 3f961 (f:7961)
-    call CheckTargetSubstitute
-    jr nz,ConfusionEffectFailed
-    call MoveHitTest
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
-    jr nz,ConfusionEffectFailed
-
-ConfusionSideEffectSuccess: ; 3f96f (f:796f)
+ConfusionEffect: ; Moved in the Bank
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     ld bc,$d070 ; EnemyConfusedCounter
-    ld a,[W_PLAYERMOVEEFFECT] ; $cfd3
+    ld de,W_PLAYERMOVEEFFECT ; $cfd3
     jr z,.done
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
     ld bc,$d06b ; PlayerConfusedCounter
-    ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
+    ld de,W_ENEMYMOVEEFFECT ; $cfcd
 .done
+    ld a,[de]
+    cp CONFUSION_EFFECT
+    jr nz,.skipMoveHitTest
+    call MoveHitTestPlus
+    jr nz,.attackMissed
+.skipMoveHitTest
+    call CheckTargetSubstitute
+    jr nz,.didntAffect
+    ld a,[de]
+    cp CONFUSION_SIDE_EFFECT
+    jr nz,.skipCheckSideEffect
+    call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle
+    cp $19
+    ret nc
+.skipCheckSideEffect
     bit 7,[hl] ; CONFUSED ; is mon confused?
-    jr nz,ConfusionEffectFailed
+    jr nz,.alreadyConfused
     set 7,[hl] ; CONFUSED ; mon is now confused
-    push af
     call GenRandomInBattle
     and $3
     inc a
     inc a
     ld [bc],a ; confusion status will last 2-5 turns
-    pop af
+    ld a,[de]
     cp CONFUSION_SIDE_EFFECT
     call nz,PlayCurrentMoveAnimation2
     ld hl,.BecameConfusedText
@@ -61028,12 +61266,30 @@ ConfusionSideEffectSuccess: ; 3f96f (f:796f)
 .BecameConfusedText
     TX_FAR _BecameConfusedText
     db "@"
-
-ConfusionEffectFailed: ; 3f9a6 (f:79a6)
+.attackMissed
+    ld hl,PrintMoveFailureText
+    jr .checkEnd
+.didntAffect
+    ld hl,PrintDidntAffectText
+    jr .checkEnd
+.alreadyConfused
+    ld hl,PrintAlreadyConfusedText
+    ; fall through
+.checkEnd
+    ld a,[de]
     cp CONFUSION_SIDE_EFFECT
     ret z
     call PlayCurrentMoveAnimation
-    jp ConditionalPrintButItFailed
+    jp hl
+
+PrintAlreadyConfusedText:
+    ld hl,.AlreadyConfusedText
+    jp Delay50AndPrintText
+.AlreadyConfusedText
+    TX_FAR _AlreadyConfusedText
+    db "@"
+
+; Free
 
 SECTION "ParalyzeEffect",ROMX[$79b1],BANK[$f]
 
@@ -61082,9 +61338,7 @@ RageEffect: ; 3f9df (f:79df)
 MimicEffect: ; 3f9ed (f:79ed)
     ld c,50
     call DelayFrames
-    call MoveHitTest
-    ld a,[W_MOVEMISSED]
-    and a
+    call MoveHitTestPlus
     jr nz,.mimicMissed
     ld a,[H_WHOSETURN]
     and a
@@ -61097,8 +61351,6 @@ MimicEffect: ; 3f9ed (f:79ed)
     ld hl,W_ENEMYMONMOVES
     ld a,[W_ENEMYBATTSTATUS1]
 .enemyTurn
-    bit 6,a ; INVULNERABLE
-    jr nz,.mimicMissed
 .getRandomMove
     push hl
     call GenRandomInBattle
@@ -61120,9 +61372,6 @@ MimicEffect: ; 3f9ed (f:79ed)
     ld a,[wEnemyMoveListIndex]
     jr .playerTurn
 .letPlayerChooseMove
-    ld a,[W_ENEMYBATTSTATUS1]
-    bit 6,a ; INVULNERABLE
-    jr nz,.mimicMissed
     ld a,[wCurrentMenuItem]
     push af
     ld a,$1
@@ -61149,7 +61398,7 @@ MimicEffect: ; 3f9ed (f:79ed)
     ld hl,.MimicLearnedMoveText
     jp PrintText
 .mimicMissed
-    jp PrintButItFailedText_
+    jp PrintMoveFailureText
 .MimicLearnedMoveText
     TX_FAR _MimicLearnedMoveText
     db "@"
@@ -61160,9 +61409,7 @@ LeechSeedEffect: ; Moved in the Bank
     jp Bankswitch ; indirect jump to LeechSeedEffect_ (2bea9 (a:7ea9))
 
 DisableEffect: ; Moved in the Bank
-    call MoveHitTest
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
+    call MoveHitTestPlus
     jr nz,.moveMissed
     ld de,W_ENEMYDISABLEDMOVE ; $d072
     ld hl,W_ENEMYMONMOVES
@@ -61174,7 +61421,7 @@ DisableEffect: ; Moved in the Bank
 .disableEffect
     ld a,[de]
     and a
-    jr nz,.moveMissed
+    jr nz,.alreadyDisabled
 ; PP ► ENERGY - DONE
     push hl
     ld d,h
@@ -61183,7 +61430,7 @@ DisableEffect: ; Moved in the Bank
     pop hl
     ld a,c
     and a
-    jr z,.moveMissed ; if 0 moves with enough energy
+    jr z,.noEnergy ; if 0 moves with enough energy
     ld a,[wCurrentMenuItem] ; Backup Current Menu Item
     push af                 ; ...
 .pickMoveToDisable
@@ -61235,9 +61482,23 @@ DisableEffect: ; Moved in the Bank
     jp PrintText
 .moveMissed
     call PlayCurrentMoveAnimation
-    jp PrintButItFailedText_
+    jp PrintMoveFailureText
+.noEnergy
+    call PlayCurrentMoveAnimation
+    ld hl,.NoEnergyText
+    jp Delay50AndPrintText
+.alreadyDisabled
+    call PlayCurrentMoveAnimation
+    ld hl,.AlreadyDisabledText
+    jp Delay50AndPrintText
 .MoveWasDisabledText
     TX_FAR _MoveWasDisabledText
+    db "@"
+.NoEnergyText
+    TX_FAR _NoEnergyText
+    db "@"
+.AlreadyDisabledText
+    TX_FAR _AlreadyDisabledText
     db "@"
 
 NothingHappenedText: ; Moved in the Bank
@@ -61252,12 +61513,7 @@ SplashEffect: ; Moved in the Bank
     TX_FAR _NoEffectText
     db "@"
 
-ConditionalPrintButItFailed: ; Moved in the Bank
-    ld a,[$ccf4] ; MoveDidntMiss
-    and a
-    ret nz ; return if the side effect failed, yet the attack was successful
-
-PrintButItFailedText_: ; Moved in the Bank
+PrintButItFailedText: ; Moved in the Bank
     ld hl,.ButItFailedText
     jp Delay50AndPrintText
 .ButItFailedText
@@ -61281,13 +61537,13 @@ UnnamedText_3fb74: ; Moved in the Bank
 
 CheckTargetSubstitute: ; Moved in the Bank
     push hl
-    ld hl,$d068
-    ld a,[$ff00+$f3]   ;whose turn?
+    ld hl,W_ENEMYBATTSTATUS2
+    ld a,[H_WHOSETURN]
     and a
     jr z,.next1
-    ld hl,$d063
+    ld hl,W_PLAYERBATTSTATUS2
 .next1
-    bit 4,[hl]         ;test bit 4 in d063/d068 flags
+    bit 4,[hl]
     pop hl
     ret
 
@@ -61393,14 +61649,6 @@ RemoveBattleValueBankF:
     ld b,BANK(RemoveBattleValue_)
     ld hl,RemoveBattleValue_
     jp Bankswitch
-
-PrintBattleValueNearSubstitute:
-    ld b,BANK(PrintBattleValueNearMon_)
-    ld hl,PrintBattleValueNearMon_
-    call Bankswitch
-    call RemoveBattleValueBankF
-    ld hl,SubstituteTookDamageText
-    ret
 
 SetDamageDirectToPlayer:
     ld hl,wPrintBattleValueBit0
@@ -62011,15 +62259,32 @@ AmnesiaNewEffect:
     ld [de],a
     ret
 
-CheckAmnesiaSideEffect:
+CheckCustomSideEffect:
     push hl
     ld hl,wFlagAmnesiaSideEffectBit0
     bit 0,[hl]
     res 0,[hl]
     pop hl
-    call z,GenRandomInBattle
+    jp z,CheckZeroDamageOrSideEffectRandom
     xor a ; Force Success
     ret
+
+CheckZeroDamageOrSideEffectRandom:
+    push hl
+    push bc
+    ld hl,W_DAMAGE
+    ld a,[hli]
+    ld b,[hl]
+    or b
+    jr z,.ZeroDamage
+    call GenRandomInBattle
+.end
+    pop bc
+    pop hl
+    ret
+.ZeroDamage
+    dec a ; $FF = Force Fail
+    jr .end
 
 StatModifierRatiosAccuracyEvasion:
 ; first byte is numerator,second byte is denominator
@@ -62134,6 +62399,10 @@ GetEnemyMonStat_HandleAlternative:
 
 DisabledText: ; Moved in the Bank
     db "Disabled@"
+
+PrintTextAndDrawHub:
+    call PrintText
+    jp DrawHUDsAndHPBars
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -75524,7 +75793,7 @@ LearnMovePredef:
     dbw BANK(UpdateHPBar),UpdateHPBar
     dbw BANK(Func_f9dc),Func_f9dc
     dbw BANK(Func_5ab0),Func_5ab0
-    dbw BANK(Func_3ed02),Func_3ed02
+    db 0,0,0 ; Unused
     db BANK(DisplayPokedexMenu_)
     dw DisplayPokedexMenu_
     dbw BANK(EvolutionAfterBattle),EvolutionAfterBattle
@@ -79132,12 +79401,10 @@ ParalyzeEffect_: ; Moved in the Bank
     jr z,.doesntAffect
 .hitTest
     push hl
-    ld hl,MoveHitTest
-    ld b,BANK(MoveHitTest)
+    ld hl,MoveHitTestPlus
+    ld b,BANK(MoveHitTestPlus)
     call Bankswitch
     pop hl
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
     jr nz,.didntAffect
     set 6,[hl]
     ld hl,QuarterSpeedDueToParalysis
@@ -80635,12 +80902,12 @@ GainExperience: ; 5524f (15:524f)
     ld hl,Func_3ed99
     ld b,BANK(Func_3ed99)
     call Bankswitch ; indirect jump to Func_3ed99 (3ed99 (f:6d99))
-    ld hl,Func_3ed1a
-    ld b,BANK(Func_3ed1a)
-    call Bankswitch ; indirect jump to Func_3ed1a (3ed1a (f:6d1a))
-    ld hl,ApplyBadgeStatBoosts
-    ld b,BANK(ApplyBadgeStatBoosts)
-    call Bankswitch ; indirect jump to ApplyBadgeStatBoosts (3ee19 (f:6e19))
+    ld hl,ApplyBadgeStatBoostsFull
+    ld b,BANK(ApplyBadgeStatBoostsFull)
+    call Bankswitch ; indirect jump to ApplyBadgeStatBoostsFull (3ee19 (f:6e19))
+    ld hl,ApplyBurnAndParalysisPenaltiesToPlayer
+    ld b,BANK(ApplyBurnAndParalysisPenaltiesToPlayer)
+    call Bankswitch ; indirect jump to ApplyBurnAndParalysisPenaltiesToPlayer (3ed1a (f:6d1a))
     ld hl,DrawPlayerHUDAndHPBar
     ld b,BANK(DrawPlayerHUDAndHPBar)
     call Bankswitch ; indirect jump to DrawPlayerHUDAndHPBar (3cd60 (f:4d60))
@@ -109945,6 +110212,14 @@ Evolution_LoadPic_HandleAlternateForm:
     call Evolution_GetMonHeader_HandleAlternateForm
     jp Evolution_LoadPic
 
+ZigZagScreenAnim: ; Moved in the Bank
+    db SE_WAVY_SCREEN,$FF
+    db $FF
+
+WhirlwindFailAnim:
+    db $46,$11,$10
+    db $FF
+
 ; Free
 
 SECTION "AnimationSlideMonDownAndHide",ROMX[$55c9],BANK[$1e]
@@ -110182,6 +110457,11 @@ HideSubstituteShowMonAnim: ; 79747 (1e:5747)
     call AnimationFlashMonPic
     jp AnimationShowMonPic
 
+PoundAnim: ; Moved in the Bank
+StruggleAnim: ; Moved in the Bank
+    db $08,$00,$01
+    db $FF
+
 SECTION "ReshowSubstituteAnim",ROMX[$5771],BANK[$1e]
 
 ReshowSubstituteAnim: ; 79771 (1e:5771)
@@ -110204,7 +110484,7 @@ AnimationBoundUpAndDown: ; 7977a (1e:577a)
 AnimationTransformMon: ; 79787 (1e:5787)
 ; Redraws this mon's sprite as the back/front sprite of the opposing mon.
 ; Used in Transform.
-    ld a,[$cfe5]
+    ld a,[W_ENEMYMON_START]
     ld [$ceea],a
     ld a,[W_PLAYERMONID]
     ld [$cee9],a
@@ -111377,6 +111657,8 @@ AttackAnimationPointers: ; 7a07d (1e:607d)
     dw ThrowRockAnim
     dw ThrowBaitAnim
     dw ZigZagScreenAnim
+    dw TransformFailAnim ; $CC
+    dw WhirlwindFailAnim ; $CD
 
 ; each animation is a list of subanimations and special effects
 ; if first byte < $56
@@ -111384,14 +111666,8 @@ AttackAnimationPointers: ; 7a07d (1e:607d)
 ; if first byte >= $D8
 ;    db special_effect_id,sound_id
 ; $FF terminated
-ZigZagScreenAnim: ; 7a213 (1e:6213)
-    db SE_WAVY_SCREEN,$FF
-    db $FF
 
-PoundAnim: ; 7a216 (1e:6216)
-StruggleAnim: ; 7a216 (1e:6216)
-    db $08,$00,$01
-    db $FF
+SECTION "KarateChopAnim",ROMX[$621a],BANK[$1e]
 
 KarateChopAnim: ; 7a21a (1e:621a)
     db $08,$01,$03
@@ -111471,10 +111747,8 @@ WingAttackAnim: ; 7a277 (1e:6277)
 
 WhirlwindAnim: ; 7a27b (1e:627b)
     db $46,$11,$10
-    ;db SE_SLIDE_ENEMY_MON_OUT,$FF
+    db SE_SLIDE_ENEMY_MON_OUT,$FF
     db $FF
-
-SECTION "FlyAnim",ROMX[$6281],BANK[$1e]
 
 FlyAnim: ; 7a281 (1e:6281)
     db $46,$12,$04
@@ -115085,6 +115359,12 @@ GetBattleBackMonHeader:
     ld a,[W_PLAYERMONPP+1] ; move2pp
     ld [wAlternateFormIndex],a
     jp GetMonHeader
+
+TransformFailAnim:
+    db $46,$8F,$21
+    db $44,$8F,$22
+    db $08,$FF,$47
+    db $FF
 
 SECTION "bank1F",ROMX,BANK[$1F]
 
@@ -121301,6 +121581,12 @@ _AlmostIneffectiveText:
     db $4f
     db "effective at all!",$58
 
+_IneffectiveText:
+    db 0,"It's totally"
+    DEBUG_DAMAGE_MULTIPLIER
+    db $4f
+    db "ineffective!",$58
+
 _Route2HouseText2:
     db $0,"I found this",$4f
     db "strange VOLTORB",$55
@@ -124529,11 +124815,11 @@ _UnnamedText_1399e: ; 949d0 (25:49d0)
     db $0,$5a,"'s",$4f
     db "hit with recoil!",$58
 
-_UnnamedText_139cd: ; 949e5 (25:49e5)
+_ConvertedTypeToText: ; 949e5 (25:49e5)
     db $0,"Converted type to",$4f
     db $59,"'s!",$58
 
-_UnnamedText_13a53: ; 949fc (25:49fc)
+_StatusChangesEliminatedText: ; 949fc (25:49fc)
     db $0,"All STATUS changes",$4f
     db "are eliminated!",$58
 
@@ -125397,6 +125683,10 @@ _AlreadyStatusedText:
     db $0,$59,$4f
     db "already statused!",$58
 
+_AlreadyConfusedText:
+    db $0,$59,$4f
+    db "already confused!",$58
+
 _MistAlreadyInUseText:
     db $0,$5a,"'s",$4f
     db "already in mist!",$58
@@ -125409,6 +125699,16 @@ _AlreadyProtectedText:
     db $0,$5a,"'s",$4f
     db "already",$55
     db "protected!",$58
+
+_NoEnergyText:
+    db $0,$59,$4f
+    db "has run out",$55
+    db "of energy!",$58
+
+_AlreadyDisabledText:
+    db $0,$59,"'s",$4f
+    db "already",$55
+    db "disabled!",$58
 
 SECTION "bank26",ROMX,BANK[$26]
 
@@ -131776,8 +132076,8 @@ _DrawCatchGender: ; Denim
     ld hl,IsGhostBattle
     ld b,BANK(IsGhostBattle)
     call Bankswitch
-    jr z,.Ghost ; No Gender,Pokedex or Debug If Ghost Battle
-    ld a,[W_ENEMYMONID]
+    jp z,.Ghost ; No Gender,Pokedex or Debug If Ghost Battle
+    ld a,[W_ENEMYMON_START]
     ld [$d11e],a
     ld a,$3a
     call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
@@ -131810,7 +132110,11 @@ _DrawCatchGender: ; Denim
     ld de,.ShinyStarIcon
     call PlaceString
 .NoShiny
-    ld a,[W_ENEMYMONID]
+    ld hl,W_ENEMYBATTSTATUS1
+    bit 7,[hl] ; confused?
+    ld de,.ConfusedIcon
+    jr nz,.PrintConfused
+    ld a,[W_ENEMYMON_START]
     ld [$d11e],a
     call .CheckMarowak
     jr nz,.noMarowak
@@ -131832,21 +132136,28 @@ _DrawCatchGender: ; Denim
 .GreaterThen9
     pop af
     ld de,.MaleIcon
-    jr nz,.Male
+    jr nz,.PrintGenderOrConfused
     ld de,.FemaleIcon
-.Male
+.PrintGenderOrConfused
     call PlaceString
 .Genderless
     call DebugStats
     call ResetTempIV
 .Ghost
     ret
+.PrintConfused
+    pop af ; Restore Pokedex Flag Test
+    FuncCoord 6,1
+    ld hl,Coord
+    jr .PrintGenderOrConfused
 .PokeBallCatchFlagIcon:
     db $c9,$50
 .MaleIcon
     db $EF,$50
 .FemaleIcon
     db $F5,$50
+.ConfusedIcon
+    db $E6,$50
 .ShinyStarIcon
     db $D1,$50
 .CheckMarowak
@@ -131857,6 +132168,14 @@ _DrawCatchGender: ; Denim
     ret
 
 _DrawCurrentMonGenderInBattle:
+    ld hl,W_PLAYERBATTSTATUS1
+    bit 7,[hl] ; confused?
+    jr z,.NotConfused
+    FuncCoord 17,08
+    ld hl,Coord
+    ld de,.ConfusedIcon
+    jp PlaceString
+.NotConfused
     ld hl,W_PLAYERMONIVS ; .BackSpriteInBattle
     call SetTempIV
     ld a,[W_PLAYERMONID]
@@ -131884,6 +132203,8 @@ _DrawCurrentMonGenderInBattle:
     db $EF,$50
 .FemaleIcon
     db $F5,$50
+.ConfusedIcon
+    db $E6,$50
 
 DebugStats:
     and a ; rcf
@@ -131903,6 +132224,11 @@ DebugStats:
     ld hl,Coord
     ld de,wDVForShinyAtkDef
     call .Print4IV
+    ; Print Stat Mod
+    FuncCoord 06,00
+    ld hl,Coord
+    ld de,wEnemyMonStatMods
+    call .PrintStatMod
     ; Print ATK/DEF/SPD/SPC
     FuncCoord 03,00
     ld hl,Coord
@@ -131931,6 +132257,11 @@ DebugStats:
     ld hl,Coord
     ld de,W_PLAYERMONIVS
     call .Print4IV
+    ; Print Stat Mod
+    FuncCoord 16,08
+    ld hl,Coord
+    ld de,wPlayerMonStatMods
+    call .PrintStatMod
     ; Print ATK/DEF/SPD/SPC
     FuncCoord 13,08
     ld hl,Coord
@@ -131998,6 +132329,26 @@ DebugStats:
     add hl,de
     pop de
     inc de
+    ret
+.PrintStatMod
+    ld c,4
+.loop
+    push bc
+    ld a,[de]
+    inc de
+    cp 7
+    ld [hl],$7F ; neutral
+    jr z,.next
+    cp 8
+    ld [hl],$D2 ; plus
+    jr nc,.next
+    ld [hl],$E3 ; minus
+.next
+    ld bc,20
+    add hl,bc
+    pop bc
+    dec c
+    jr nz,.loop
     ret
 
 _DebugPlayerStats:
@@ -134784,7 +135135,7 @@ AIEnemyTrainerChooseMoves:
     dec a
     jr nz,.notwildbattle
     ;wild battle confirmed at this point
-    ld a,[W_ENEMYMON_START]
+    ld a,[W_ENEMYMONID]
     ld hl,WildAI
     ld de,$0001
     call IsInArray
@@ -135285,7 +135636,7 @@ ForceShinyOrRandom_:
 
 SetExplodeFlag_:
     xor a ; Reset Carry Flag
-    ld a,[wWhichPokemon]
+    ld a,[wPlayerMonNumber]
     ld e,%00000001 ; 1 bit to rotate 
 .Loop
     and a
@@ -138736,6 +139087,46 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     ld a,[hl]
 .end
     ld [wAlternateFormIndex],a
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+PlayerBideAccum_:
+    ld hl,W_PLAYERBATTSTATUS1
+    bit 0,[hl] ; is mon using bide?
+    ret z
+    xor a
+    ld [W_PLAYERMOVENUM],a
+    ld hl,W_DAMAGE
+    ld a,[hli]
+    ld b,a
+    ld c,[hl]
+    ld hl,$d074 + 1 ; PlayerBideAccumulatedDamage
+    ld a,[hl]
+    add c ; accumulate damage taken
+    ld [hld],a
+    ld a,[hl]
+    adc b
+    ld [hl],a
+    ret
+
+EnemyBideAccum_:
+    ld hl,W_ENEMYBATTSTATUS1
+    bit 0,[hl] ; is mon using bide?
+    ret z
+    xor a
+    ld [W_ENEMYMOVENUM],a
+    ld hl,W_DAMAGE
+    ld a,[hli]
+    ld b,a
+    ld c,[hl]
+    ld hl,$cd05 + 1 ; EnemyBideAccumulatedDamage
+    ld a,[hl]
+    add c ; accumulate damage taken
+    ld [hld],a
+    ld a,[hl]
+    adc b
+    ld [hl],a
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
