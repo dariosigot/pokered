@@ -56090,7 +56090,11 @@ MultiHitText:
 
 ; ──────────────────────────────────────────
 
-; Free
+SetCounterToMiss:
+    ld hl,wUnusedC000
+    set 7,[hl] ; setting this bit causes counter to miss
+    ld hl,HurtItselfText ; $5a65
+    ret
 
 SECTION "PrintGhostText",ROMX[$5811],BANK[$f]
 
@@ -56489,7 +56493,7 @@ UnnamedText_3daa8: ; 3daa8 (f:5aa8)
     db "@"
 
 Func_3daad: ; 3daad (f:5aad)
-    ld hl,HurtItselfText ; $5a65
+    call SetCounterToMiss ; ld hl,HurtItselfText ; $5a65
     call PrintText
     ld hl,W_ENEMYMONDEFENSE ; $cff8
     ld a,[hli]
@@ -56679,6 +56683,10 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     ret nz
 
     ; if you get here, the mon used jump kick or hi jump kick and missed
+
+    ld hl,wUnusedC000
+    set 7,[hl] ; setting this bit causes counter to miss
+
     ld hl,W_DAMAGE ; since the move missed, wDamage will always contain 0 at this point.
                    ; Thus, recoil damage will always be equal to 1
                    ; even if it was intended to be potential damage/8.
@@ -57464,12 +57472,14 @@ HandleCounterMove: ; 3e093 (f:6093)
     and a
 ; player's turn
     ld hl,wEnemySelectedMove
-    ld de,W_ENEMYMOVEPOWER
+    ld bc,W_ENEMYMON_START
+;    ld de,W_ENEMYMOVEPOWER
     ld a,[wPlayerSelectedMove]
     jr z,.next
 ; enemy's turn
     ld hl,wPlayerSelectedMove
-    ld de,W_PLAYERMOVEPOWER
+    ld bc,W_PLAYERMONID
+;    ld de,W_PLAYERMOVEPOWER
     ld a,[wEnemySelectedMove]
 .next
     cp a,COUNTER
@@ -57479,19 +57489,24 @@ HandleCounterMove: ; 3e093 (f:6093)
     ld a,[hl]
     cp a,COUNTER
     ret z ; if the target also used Counter,miss
-    ld a,[de]
-    and a
-    ret z ; if the move the target used has 0 power,miss
+
+;    ld a,[de]
+;    and a
+;    ret z ; if the move the target used has 0 power,miss
 ; check if the move the target used was Normal or Fighting type
-    inc de
-    ld a,[de]
-    and a ; normal type
-    jr z,.counterableType
-    cp a,FIGHTING
-    jr z,.counterableType
+;    inc de
+;    ld a,[de]
+;    and a ; normal type
+;    jr z,.counterableType
+;    cp a,FIGHTING
+;    jr z,.counterableType
 ; if the move wasn't Normal or Fighting type,miss
-    xor a
-    ret
+;    xor a
+;    ret
+
+    call TestPhysicalSpecial
+    jr nz,.specialAttackFail
+
 .counterableType
     ld hl,W_DAMAGE
     ld a,[hli]
@@ -57515,6 +57530,13 @@ HandleCounterMove: ; 3e093 (f:6093)
     call MoveHitTest ; do the normal move hit test in addition to Counter's special rules
     xor a
     ret
+.specialAttackFail
+    xor a
+    ret
+
+; Free
+
+SECTION "ApplyAttackToEnemyPokemon",ROMX[$60df],BANK[$f]
 
 ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
     ld a,[W_PLAYERMOVEEFFECT]
