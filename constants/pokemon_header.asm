@@ -3790,7 +3790,7 @@ MarowakBaseStats:
     dw MarowakPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw MarowakAlolaBaseStats
 
     ; pointer to evomoves
     dw Marowak_EvosMoves

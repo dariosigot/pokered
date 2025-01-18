@@ -93621,10 +93621,10 @@ PokemonTower6Script0: ; 60b17 (18:4b17)
     ld [H_CURRENTPRESSEDBUTTONS],a
     ld a,$6
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call DisplayTextID
+    call DisplayTextIDAndForceGhostPal ; call DisplayTextID
     ld a,MAROWAK
     ld [W_CUROPPONENT],a ; $d059
-    ld a,30
+    ld a,40
     ld [W_CURENEMYLVL],a ; $d127
     ld a,$4
     ld [W_POKEMONTOWER6CURSCRIPT],a
@@ -96915,6 +96915,12 @@ DiglettsCaveAerodactylRunAway:
     TX_FAR _DiglettsCaveAerodactylRunAway
     db "@"
 
+DisplayTextIDAndForceGhostPal:
+    call DisplayTextID
+    ld hl,wFlagForceGhostPalBit3
+    set 3,[hl]
+    ret
+
 SECTION "bank19",ROMX,BANK[$19]
 
 Tset00_GFX:
@@ -98161,7 +98167,7 @@ Func_708ca: ; 708ca (1c:48ca)
     sla a
     call UpdateSpriteDuringMarowakEvent ; ld [rOBP1],a ; $FF00+$49
     jr nz,.asm_708f6
-    call CleanLCD_OAM
+    call CleanLCD_OAMAndResetForceGhostPal ; call CleanLCD_OAM
     call Func_7092a
     ld b,$e4
 .asm_7090d
@@ -100867,6 +100873,21 @@ CheckFlyingMonSprite:
     pop hl
     ret
 
+IsGhostBattlePlus:
+    push bc
+    push de
+    push af
+    call IsGhostBattle_Bank1C
+    jr z,.End
+    ; If No Standard Ghost Check Marowak Event
+    call CheckMarowak_Bank1C
+.End
+    pop bc
+    ld a,b
+    pop de
+    pop bc
+    ret
+
 SECTION "GetHallOfFameLinkCableEvolutionPaletteID",ROMX[$5f17],BANK[$1c]
 
 ; HallOfFame or LinkCable or Evolution
@@ -100949,6 +100970,13 @@ PointerTable_71f73: ; 71f73 (1c:5f73)
 ; each byte is the number of loops to make in .asm_71f5b for each badge
 LoopCounts_71f8f: ; Moved in the Bank
     db $06,$06,$06,$12,$06,$06,$06,$06
+
+CleanLCD_OAMAndResetForceGhostPal:
+    call CleanLCD_OAM
+    ld hl,wFlagForceGhostPalBit3
+    res 3,[hl]
+    ld b,$1
+    jp GoPAL_SET
 
 SECTION "Func_71fb6",ROMX[$5fb6],BANK[$1C]
 
@@ -102846,8 +102874,19 @@ CheckShinyFrontAndGetPAL:
     push hl
     call IsGhostBattlePlus
     jr nz,.NoGhost
+    call CheckMarowak_Bank1C
+    jr nz,.SimpleGhost
+    ld hl,wFlagForceGhostPalBit3
+    bit 3,[hl]
+    jr z,.NoGhost ; Ghost Marowak Real Palette after SILPH_SCOPE
+.SimpleGhost
+    ld hl,W_MONH_PALETTE_ID
+    ld a,PAL_GASTLY ; Ghost Color is Gastly Color
+    ld [hli],a
+    xor a
+    ld [hl],a
     ld a,GASTLY ; Ghost Color is Gastly Color
-    jr SkipShinyAndGetPAL
+    jp SkipShinyAndGetPAL
 .NoGhost
     ld hl,wFlagBackFrontSpriteBit56
     set 6,[hl]
@@ -102864,23 +102903,16 @@ CheckShinyFrontAndGetPAL:
     ld hl,W_ENEMYMONATKDEFIV
     jr GetPalCommon
 
-IsGhostBattlePlus:
-    push bc
-    push de
+CheckMarowak_Bank1C:
     push af
-    call IsGhostBattle_Bank1C
-    jr z,.End
-    ; If No Standard Ghost Check Marowak Event
     ld a,[W_ENEMYMONID]
     cp MAROWAK
-    jr nz,.End
+    jr nz,.end
     call GetCurrentOldAdventureMap
     cp POKEMONTOWER_6
-.End
+.end
     pop bc
     ld a,b
-    pop de
-    pop bc
     ret
 
 IsGhostBattle_Bank1C:
@@ -131910,6 +131942,10 @@ ElectrodeHisuiPicFront:
     INCBIN "pic/bmon/electrodehusui.pic"
 ElectrodeHisuiPicBack:
     INCBIN "pic/monback/electrodehusuib.pic"
+MarowakAlolaPicFront:
+    INCBIN "pic/bmon/marowakalola.pic"
+MarowakAlolaPicBack:
+    INCBIN "pic/monback/marowakalolab.pic"
 
 SECTION "bank32",ROMX,BANK[$32]
 
@@ -132142,9 +132178,11 @@ _DrawCatchGender: ; Denim
     call PlaceString
 .Genderless
     call DebugStats
-    call ResetTempIV
+    jp ResetTempIV
 .Ghost
-    ret
+    ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
+    call SetTempIV
+    jr .Genderless
 .PrintConfused
     pop af ; Restore Pokedex Flag Test
     FuncCoord 6,1
@@ -136758,7 +136796,7 @@ CheckSpecialWild_:
 
 .SpecialWild
     db DRATINI,12,DRATINI_CAVE ; DratiniCave_ShinyDratini
-    db MAROWAK,30,POKEMONTOWER_6 ; PokemonTower6_Marowak
+    db MAROWAK,40,POKEMONTOWER_6 ; PokemonTower6_Marowak
     db SNORLAX,30,ROUTE_12 ; Route12_Snorlax
     db SNORLAX,30,ROUTE_16 ; Route16_Snorlax
     db AERODACTYL,30,DIGLETTS_CAVE ; DiglettsCave_Aerodactyl
@@ -136779,10 +136817,10 @@ CheckSpecialWild_:
     db WRAP
     db DRAGON_RAGE
 ; PokemonTower6_Marowak
-    db HEADBUTT
-    db FOCUS_ENERGY
     db BONEMERANG
+    db FOCUS_ENERGY
     db NIGHT_SHADE
+    db FLAMETHROWER
 ; Route12_Snorlax
     db REST
     db ROCK_THROW
@@ -139074,6 +139112,12 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     cp 2
     jr z,.TrainerBattle
 .WildBattle
+    call .CheckMarowak
+    jr nz,.noMarowak
+    ld a,1 ; Marowak Ghost
+    ld [wTempAlternateFormIndex],a
+    jr .end
+.noMarowak
     xor a ; TODO
     jr .end
 .outOfBattle
@@ -139087,6 +139131,13 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     ld a,[hl]
 .end
     ld [wAlternateFormIndex],a
+    ret
+.CheckMarowak
+    ld a,[W_CUROPPONENT]
+    cp MAROWAK
+    ret nz
+    call GetCurrentOldAdventureMap
+    cp POKEMONTOWER_6
     ret
 
 ; ──────────────────────────────────────────────────────────────────────

@@ -537,3 +537,39 @@ OnixCrystalBaseStats:
     ds 3
 
     db BANK(OnixPicFront)
+
+MarowakAlolaBaseStats:
+    db MAROWAK ; mon id
+    db 60 ; base hp
+    db 80 ; base attack
+    db 110 ; base defense
+    db 45 ; base speed
+    db 50 ; base special
+
+    db FIRE ; species type 1
+    db GHOST ; species type 2
+
+    db 75 ; catch rate
+    db 124 ; base exp yield
+    db $66 ; sprite dimensions
+
+    dw MarowakAlolaPicFront
+    dw MarowakAlolaPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Marowak_Alola_EvosMoves
+
+    db 0 ; growth rate
+
+    ; learnset
+    dw MarowakAlolaTMCompatibility
+
+    ; palette
+    dw PAL_MAROWAK_ALOLA
+
+    ds 3
+
+    db BANK(MarowakAlolaPicFront)
