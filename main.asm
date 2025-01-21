@@ -103100,17 +103100,10 @@ CreateMonOvWorldSprInstruction:
     ld [hli],a
     call GetMonSpriteNumOfTiles ; ld a,$08
     ld [hli],a
-    ld a,BANK(MonOverworldDataNew)
+    ld a,BANK(MonOverworldDataNew_emimonserrate)
     jr c,.Before128_2
     inc a
 .Before128_2
-    ;push hl
-    ;ld hl,W_OPTIONS
-    ;bit 5,[hl]
-    ;pop hl
-    ;jr z,.skip
-    add BANK(MonOverworldDataNew_emimonserrate)-BANK(MonOverworldDataNew)
-.skip
     ld [hli],a
     push hl ; Backup wLocationMonOvSprInstruction
     ld a,e
@@ -132963,16 +132956,6 @@ CheckDarkMap:
     ld a,$06
     ld [$d35d],a
     jp GBFadeIn1
-
-SECTION "bank34",ROMX,BANK[$34] ; Denim
-
-MonOverworldDataNew:
-    INCBIN "gfx/denim/party_mon_sprites1.w32.2bpp"
-
-SECTION "bank35",ROMX,BANK[$35] ; Denim
-
-MonOverworldDataNew2:
-    INCBIN "gfx/denim/party_mon_sprites2.w32.2bpp"
 
 SECTION "Wild Pkmn",ROMX,BANK[$36]
 
