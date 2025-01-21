@@ -14227,7 +14227,7 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     call PlaySound ; play sound
     ret
 .Version
-    db "0.85.101@"
+    db "0.85.102@"
 .eraseOldMenuCursor
     ld [wTopMenuItemX],a
     call EraseMenuCursor
@@ -18186,7 +18186,7 @@ PrintDenimVersionAndSaveScreenTilesToBuffer2:
     jr nz,.Loop
     ret
 .Version
-    db "0.85.101"
+    db "0.85.102"
 .GBC
     db $41
 
