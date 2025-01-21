@@ -96847,9 +96847,10 @@ DiglettsCaveScript0:
     ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
     ret
 .CheckAerodatyl
-    ld hl,wEventBeatAerodactylBit5 ; wDigCaveAerodactylTrigBit0
+    ld hl,wEventBeatAerodactylBit5
     bit 5,[hl]
     ret nz
+    ld hl,wDigCaveAerodactylTrigBit0
     bit 0,[hl]
     res 0,[hl]
     ret z
