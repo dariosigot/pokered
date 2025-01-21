@@ -840,7 +840,10 @@ W_MONHLEARNSET_POINTER: ; d0cc
 W_MONH_PALETTE_ID: ; d0ce
     ds 2
 
-    ds 3
+W_MONH_FIELDMOVES: ; d0d0
+    ds 1
+
+    ds 2
 
     ds 2
 

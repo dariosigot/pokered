@@ -17418,9 +17418,7 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     db "HEAL@"   ; Move : SOFTBOILED
 
 ChoiceMonSimpleMenu:
-    ld b,BANK(GetMonFieldMoves)
-    ld hl,GetMonFieldMoves
-    call Bankswitch
+    call GetMonFieldMoves
     FuncCoord 11,08
     ld hl,Coord
     ld b,8
@@ -17445,18 +17443,9 @@ GetMonFieldMoves: ; Moved in the Bank
     ld hl,wFieldMoves
     ld bc,8+1
     call FillMemory
-    ld a,[wWhichPokemon] ; $cf92
-    ld d,0
+    call .GetMonHeader
+    ld a,[W_MONH_FIELDMOVES]
     ld e,a
-    ld hl,W_PARTYMON1
-    add hl,de
-    ld a,[hl]
-    ld [$d11e],a
-    call IndexToPokedexAndRestoreD11E
-    ld e,a
-    ld hl,GetFieldMovesRulesByte
-    ld b,BANK(GetFieldMovesRulesByte)
-    call Bankswitch
     ld c,8
     ld b,0
     ld hl,wFieldMoves
@@ -17478,8 +17467,20 @@ GetMonFieldMoves: ; Moved in the Bank
     ld a,b
     ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
     ret
+.GetMonHeader
+    ld hl,W_PARTYMON1_NUM
+    ld a,[wWhichPokemon]
+    ld bc,44
+    call AddNTimes
+    ld a,[hl]
+    ld [$d0b5],a
+    ld de,W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
+    add hl,de
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    jp GetMonHeader
 
-; Some Bytes Free
+; Free
 
 SECTION "Func_783f",ROMX[$783f],BANK[$1]
 
@@ -131609,19 +131610,6 @@ SECTION "bank31",ROMX,BANK[$31]
 
 SuperPalettes:
     INCLUDE "constants/SuperPalettes.asm"
-
-FieldMoves:
-    INCLUDE "constants/FieldMoves.asm"
-
-; INPUT e = Pokemon Pokedex ID (0 : 'M,1: Bulbasaur,...)
-; OUTPUT e = Regola da applicare
-GetFieldMovesRulesByte:
-    ld d,0
-    ld hl,FieldMoves
-    add hl,de
-    ld a,[hl]
-    ld e,a
-    ret
 
 SelectInOverWorld:
     ld a,$35
