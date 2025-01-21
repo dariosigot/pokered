@@ -10199,7 +10199,7 @@ IsInArrayCummulativeCount: ; 3dad (0:3dad)
     scf
     ret
 
-Func_3dbe: ; 3dbe (0:3dbe)
+RestoreScreenTilesAndReloadTilePatterns: ; 3dbe (0:3dbe)
     call CleanLCD_OAM
     ld a,$1
     ld [$cfcb],a
@@ -15034,15 +15034,15 @@ DoYouWantToNicknameText: ; 0x6557
     TX_FAR _DoYouWantToNicknameText
     db "@"
 
-Func_655c: ; 655c (1:655c)
+DisplayNameRaterScreen: ; 655c (1:655c)
     ld hl,$cee9
     xor a
     ld [$cfcb],a
     ld a,$2
     ld [$d07d],a
-    call InsertIVDuringNameRater
+    call HandleIVAndLoadRenameScreenDuringNameRater
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     ld a,[$cf4b]
     cp $50
@@ -17419,15 +17419,15 @@ FieldMovesMenu: ; 76e1 (1:36e1)
 
 ChoiceMonSimpleMenu:
     call GetMonFieldMoves
-    FuncCoord 11,08
+    FuncCoord 11,06
     ld hl,Coord
-    ld b,8
-    ld c,7
+    ld b,10
+    ld c,07
     call TextBoxBorder
     call UpdateSprites
     ld a,$c
     ld [$FF00+$f7],a ; hFieldMoveMonMenuTopMenuItemX
-    FuncCoord 13,10
+    FuncCoord 13,08
     ld hl,Coord
     ld de,.PokemonMenuEntries
     jp PlaceString
@@ -17435,6 +17435,7 @@ ChoiceMonSimpleMenu:
     db "FIELD",$4E
     db "STATS",$4E
     db "MOVES",$4E
+    db "RENAME",$4E
     db "SWITCH","@"
 
 GetMonFieldMoves: ; Moved in the Bank
@@ -18101,7 +18102,7 @@ StoreCatchPkmnIdAndFlagBeforeRename: ; Denim
     pop hl
     jp LoadRenameScreen
 
-InsertIVDuringNameRater:
+HandleIVAndLoadRenameScreenDuringNameRater:
     push hl
     ld a,[wWhichPokemon] ; Pokemon Party Order
     ld hl,W_PARTYMON1_IV
@@ -18623,6 +18624,11 @@ Trade_BackupEnemyIVandAltForm:
     ; endhack
     ld a,[$cd3d]
     ret
+
+HandleIVAndLoadRenameScreenDuringNameRater_FromAnotherBank:
+    ld h,d
+    ld l,e
+    jp HandleIVAndLoadRenameScreenDuringNameRater 
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -26321,7 +26327,7 @@ CanCut:
     set 6,[hl]
     call GBPalWhiteOutWithDelay3
     call CleanLCD_OAM
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     ld a,$90
     ld [$FF00+$b0],a
     call Delay3
@@ -29618,7 +29624,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jr nc,.chosePokemon
 .exitMenu
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     jp RedisplayStartMenu
 .chosePokemon
@@ -29627,7 +29633,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,3 ; ChoiceMonSimpleMenu
     ld [$d125],a
     call DisplayTextBoxID ; display pokemon menu options
-    ld bc,$030a ; ld bc,$020c ; max menu item ID,top menu item Y
+    ld bc,$0408 ; ld bc,$020c ; max menu item ID,top menu item Y
     ld d,12 ; top menu item X
     call HandlePkmnSubMenu
     bit 1,a ; was the B button pressed?
@@ -29642,6 +29648,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jr z,.choseStats
     dec a
     jr z,.choseMoves
+    dec a
+    jr z,.choseRename
     ; fall through
 
 .choseSwitch
@@ -29665,6 +29673,10 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 
 .choseMoves
     PREDEF MovesMenuPredef
+    jr .ReturnToPartyMenu
+
+.choseRename
+    call DisplayPartyRenameScreen
     jr .ReturnToPartyMenu
 
 .ReloadScreenAndLoop
@@ -29875,7 +29887,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     TX_FAR _NotHealthyEnoughText
     db "@"
 .goBackToMap
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     jp CloseTextDisplay
 
 SECTION "ErasePartyMenuCursors",ROMX[$72ed],BANK[$4]
@@ -30023,7 +30035,7 @@ StartMenu_Item: ; 13302 (4:7302)
     cp a,$02
     jp z,.partyMenuNotDisplayed
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     pop af
     ld [$cfcb],a
     jp StartMenu_Item
@@ -31967,6 +31979,28 @@ ConversionEffect_: ; Moved in the Bank
 Bankswitch4toF: ; Moved in the Bank
     ld b,$f
     jp Bankswitch
+
+DisplayPartyRenameScreen:
+    ld de,$cee9
+    xor a
+    ld [$cfcb],a
+    ld a,$2
+    ld [$d07d],a
+    ld b,BANK(HandleIVAndLoadRenameScreenDuringNameRater_FromAnotherBank)
+    ld hl,HandleIVAndLoadRenameScreenDuringNameRater_FromAnotherBank
+    call Bankswitch
+    ld a,[$cf4b]
+    cp $50
+    ret z
+    ld hl,W_PARTYMON1NAME ; $d2b5
+    ld bc,$b
+    ld a,[wWhichPokemon] ; $cf92
+    call AddNTimes
+    ld e,l
+    ld d,h
+    ld hl,$cee9
+    ld bc,$b
+    jp CopyData
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -40290,7 +40324,7 @@ NameRaterText1: ; 1da56 (7:5a56)
     call DisplayPartyMenu
     push af
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     pop af
     jr c,.asm_1daae ; 0x1da80 $2c
@@ -40303,8 +40337,8 @@ NameRaterText1: ; 1da56 (7:5a56)
     jr nz,.asm_1daae ; 0x1da93 $19
     ld hl,UnnamedText_1dac2
     call PrintText
-    ld b,BANK(Func_655c)
-    ld hl,Func_655c
+    ld b,BANK(DisplayNameRaterScreen)
+    ld hl,DisplayNameRaterScreen
     call Bankswitch
     jr c,.asm_1daae ; 0x1daa3 $9
     ld hl,UnnamedText_1dac7
@@ -42672,7 +42706,7 @@ MoveDeleterText:
     jr nc,.ChosePokemon
 .ExitMenu
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     ld hl,AnswerNoText
 .PrintTextAndEndScript
@@ -83447,7 +83481,7 @@ DayCareMText1: ; 56254 (15:6254)
     call DisplayPartyMenu
     push af
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     pop af
     ld hl,UnnamedText_56437
@@ -84083,7 +84117,7 @@ DisplayDiploma: ; 566e2 (15:66e2)
     ld hl,$d730
     res 6,[hl]
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call Delay3
     jp GBPalNormal
 
@@ -100511,7 +100545,7 @@ Func_71c07: ; 71c07 (1c:5c07)
 
 Func_71ca2: ; 71ca2 (1c:5ca2)
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call ReloadTilesetTilePatterns
     call LoadScreenTilesFromBuffer2
     call Delay3
