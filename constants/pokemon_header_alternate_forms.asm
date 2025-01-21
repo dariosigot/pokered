@@ -30,7 +30,10 @@ VoltorbHisuiBaseStats:
     ; palette
     dw PAL_VOLTORB_HUSUI
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
  
     db BANK(VoltorbHisuiPicFront)
 
@@ -66,7 +69,10 @@ ElectrodeHisuiBaseStats:
     ; palette
     dw PAL_ELECTRODE_HUSUI
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_TELEPORT
+
+    ds 2
 
     db BANK(ElectrodeHisuiPicFront)
 
@@ -102,7 +108,10 @@ KabutoFossilBaseStats:
     ; palette
     dw PAL_KABUTO
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(MissingNoPicFront)
 
@@ -138,7 +147,10 @@ KabutopsFossilBaseStats:
     ; palette
     dw PAL_KABUTOPS
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(FossilKabutopsPicFront)
 
@@ -174,7 +186,10 @@ AerodactylFossilBaseStats:
     ; palette
     dw PAL_AERODACTYL
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(FossilAerodactylPicFront)
 
@@ -210,7 +225,10 @@ BulbasaurStarterBaseStats:
     ; palette
     dw PAL_BULBASAUR
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(BulbasaurPicFront)
 
@@ -246,7 +264,10 @@ IvysaurStarterBaseStats:
     ; palette
     dw PAL_IVYSAUR
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(IvysaurPicFront)
 
@@ -282,7 +303,10 @@ VenusaurStarterBaseStats:
     ; palette
     dw PAL_VENUSAUR
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_STRENGTH
+
+    ds 2
 
     db BANK(VenusaurPicFront)
 
@@ -318,7 +342,10 @@ CharmanderStarterBaseStats:
     ; palette
     dw PAL_CHARMANDER
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(CharmanderPicFront)
 
@@ -354,7 +381,10 @@ CharmeleonStarterBaseStats:
     ; palette
     dw PAL_CHARMELEON
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_LIGHT+FM_DIG
+
+    ds 2
 
     db BANK(CharmeleonPicFront)
 
@@ -390,7 +420,10 @@ CharizardStarterBaseStats:
     ; palette
     dw PAL_CHARIZARD
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY+FM_STRENGTH+FM_LIGHT+FM_DIG
+
+    ds 2
 
     db BANK(CharizardPicFront)
 
@@ -426,7 +459,10 @@ SquirtleStarterBaseStats:
     ; palette
     dw PAL_SQUIRTLE
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(SquirtlePicFront)
 
@@ -462,7 +498,10 @@ WartortleStarterBaseStats:
     ; palette
     dw PAL_WARTORTLE
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_DIG
+
+    ds 2
 
     db BANK(WartortlePicFront)
 
@@ -498,7 +537,10 @@ BlastoiseStarterBaseStats:
     ; palette
     dw PAL_BLASTOISE
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(BlastoisePicFront)
 
@@ -534,6 +576,48 @@ OnixCrystalBaseStats:
     ; palette
     dw PAL_ONIX_CRYSTAL
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(OnixPicFront)
+
+MarowakAlolaBaseStats:
+    db MAROWAK ; mon id
+    db 60 ; base hp
+    db 80 ; base attack
+    db 110 ; base defense
+    db 45 ; base speed
+    db 50 ; base special
+
+    db FIRE ; species type 1
+    db GHOST ; species type 2
+
+    db 75 ; catch rate
+    db 124 ; base exp yield
+    db $66 ; sprite dimensions
+
+    dw MarowakAlolaPicFront
+    dw MarowakAlolaPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Marowak_Alola_EvosMoves
+
+    db 0 ; growth rate
+
+    ; learnset
+    dw MarowakAlolaTMCompatibility
+
+    ; palette
+    dw PAL_MAROWAK_ALOLA
+
+    ; field moves
+    db FM_CUT+FM_LIGHT+FM_TELEPORT+FM_DIG
+
+    ds 2
+
+    db BANK(MarowakAlolaPicFront)

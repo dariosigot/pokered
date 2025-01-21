@@ -23,7 +23,10 @@ MissingNoBaseStats:
     ; palette
     dw PAL_MISSINGNO
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(MissingNoPicFront) ;    db GRIMER
 
@@ -59,7 +62,10 @@ BulbasaurBaseStats:
     ; palette
     dw PAL_BULBASAUR
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(BulbasaurPicFront)
 
@@ -95,7 +101,10 @@ IvysaurBaseStats:
     ; palette
     dw PAL_IVYSAUR
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(IvysaurPicFront)
 
@@ -131,7 +140,10 @@ VenusaurBaseStats:
     ; palette
     dw PAL_VENUSAUR
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_STRENGTH
+
+    ds 2
 
     db BANK(VenusaurPicFront)
 
@@ -167,7 +179,10 @@ CharmanderBaseStats:
     ; palette
     dw PAL_CHARMANDER
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(CharmanderPicFront)
 
@@ -203,7 +218,10 @@ CharmeleonBaseStats:
     ; palette
     dw PAL_CHARMELEON
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_LIGHT+FM_DIG
+
+    ds 2
 
     db BANK(CharmeleonPicFront)
 
@@ -239,7 +257,10 @@ CharizardBaseStats:
     ; palette
     dw PAL_CHARIZARD
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY+FM_STRENGTH+FM_LIGHT+FM_DIG
+
+    ds 2
 
     db BANK(CharizardPicFront)
 
@@ -275,7 +296,10 @@ SquirtleBaseStats:
     ; palette
     dw PAL_SQUIRTLE
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(SquirtlePicFront)
 
@@ -311,7 +335,10 @@ WartortleBaseStats:
     ; palette
     dw PAL_WARTORTLE
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_DIG
+
+    ds 2
 
     db BANK(WartortlePicFront)
 
@@ -347,7 +374,10 @@ BlastoiseBaseStats:
     ; palette
     dw PAL_BLASTOISE
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(BlastoisePicFront)
 
@@ -383,7 +413,10 @@ CaterpieBaseStats:
     ; palette
     dw PAL_CATERPIE
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(CaterpiePicFront)
 
@@ -419,7 +452,10 @@ MetapodBaseStats:
     ; palette
     dw PAL_METAPOD
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(MetapodPicFront)
 
@@ -455,7 +491,10 @@ ButterfreeBaseStats:
     ; palette
     dw PAL_BUTTERFREE
 
-    ds 3
+    ; field moves
+    db FM_FLY+FM_TELEPORT
+
+    ds 2
 
     db BANK(ButterfreePicFront)
 
@@ -491,7 +530,10 @@ WeedleBaseStats:
     ; palette
     dw PAL_WEEDLE
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(WeedlePicFront)
 
@@ -527,7 +569,10 @@ KakunaBaseStats:
     ; palette
     dw PAL_KAKUNA
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(KakunaPicFront)
 
@@ -563,7 +608,10 @@ BeedrillBaseStats:
     ; palette
     dw PAL_BEEDRILL
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY
+
+    ds 2
 
     db BANK(BeedrillPicFront)
 
@@ -599,7 +647,10 @@ PidgeyBaseStats:
     ; palette
     dw PAL_PIDGEY
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(PidgeyPicFront)
 
@@ -635,7 +686,10 @@ PidgeottoBaseStats:
     ; palette
     dw PAL_PIDGEOTTO
 
-    ds 3
+    ; field moves
+    db FM_FLY
+
+    ds 2
 
     db BANK(PidgeottoPicFront)
 
@@ -671,7 +725,10 @@ PidgeotBaseStats:
     ; palette
     dw PAL_PIDGEOT
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY
+
+    ds 2
 
     db BANK(PidgeotPicFront)
 
@@ -707,7 +764,10 @@ RattataBaseStats:
     ; palette
     dw PAL_RATTATA
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(RattataPicFront)
 
@@ -743,7 +803,10 @@ RaticateBaseStats:
     ; palette
     dw PAL_RATICATE
 
-    ds 3
+    ; field moves
+    db FM_DIG
+
+    ds 2
 
     db BANK(RaticatePicFront)
 
@@ -779,7 +842,10 @@ SpearowBaseStats:
     ; palette
     dw PAL_SPEAROW
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(SpearowPicFront)
 
@@ -815,7 +881,10 @@ FearowBaseStats:
     ; palette
     dw PAL_FEAROW
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY
+
+    ds 2
 
     db BANK(FearowPicFront)
 
@@ -851,7 +920,10 @@ EkansBaseStats:
     ; palette
     dw PAL_EKANS
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(EkansPicFront)
 
@@ -887,7 +959,10 @@ ArbokBaseStats:
     ; palette
     dw PAL_ARBOK
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_DIG
+
+    ds 2
 
     db BANK(ArbokPicFront)
 
@@ -923,7 +998,10 @@ PikachuBaseStats:
     ; palette
     dw PAL_PIKACHU
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(PikachuPicFront)
 
@@ -959,7 +1037,10 @@ RaichuBaseStats:
     ; palette
     dw PAL_RAICHU
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_DIG
+
+    ds 2
 
     db BANK(RaichuPicFront)
 
@@ -995,7 +1076,10 @@ SandshrewBaseStats:
     ; palette
     dw PAL_SANDSHREW
 
-    ds 3
+    ; field moves
+    db FM_DIG
+
+    ds 2
 
     db BANK(SandshrewPicFront)
 
@@ -1031,7 +1115,10 @@ SandslashBaseStats:
     ; palette
     dw PAL_SANDSLASH
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(SandslashPicFront)
 
@@ -1067,7 +1154,10 @@ NidoranFBaseStats:
     ; palette
     dw PAL_NIDORAN_F
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(NidoranFPicFront)
 
@@ -1103,7 +1193,10 @@ NidorinaBaseStats:
     ; palette
     dw PAL_NIDORINA
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(NidorinaPicFront)
 
@@ -1139,7 +1232,10 @@ NidoqueenBaseStats:
     ; palette
     dw PAL_NIDOQUEEN
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(NidoqueenPicFront)
 
@@ -1175,7 +1271,10 @@ NidoranMBaseStats:
     ; palette
     dw PAL_NIDORAN_M
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(NidoranMPicFront)
 
@@ -1211,7 +1310,10 @@ NidorinoBaseStats:
     ; palette
     dw PAL_NIDORINO
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(NidorinoPicFront)
 
@@ -1247,7 +1349,10 @@ NidokingBaseStats:
     ; palette
     dw PAL_NIDOKING
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(NidokingPicFront)
 
@@ -1283,7 +1388,10 @@ ClefairyBaseStats:
     ; palette
     dw PAL_CLEFAIRY
 
-    ds 3
+    ; field moves
+    db FM_HEAL
+
+    ds 2
 
     db BANK(ClefairyPicFront)
 
@@ -1319,7 +1427,10 @@ ClefableBaseStats:
     ; palette
     dw PAL_CLEFABLE
 
-    ds 3
+    ; field moves
+    db FM_HEAL
+
+    ds 2
 
     db BANK(ClefablePicFront)
 
@@ -1355,7 +1466,10 @@ VulpixBaseStats:
     ; palette
     dw PAL_VULPIX
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(VulpixPicFront)
 
@@ -1391,7 +1505,10 @@ NinetalesBaseStats:
     ; palette
     dw PAL_NINETALES
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_DIG
+
+    ds 2
 
     db BANK(NinetalesPicFront)
 
@@ -1427,7 +1544,10 @@ JigglypuffBaseStats:
     ; palette
     dw PAL_JIGGLYPUFF
 
-    ds 3
+    ; field moves
+    db FM_HEAL
+
+    ds 2
 
     db BANK(JigglypuffPicFront)
 
@@ -1463,7 +1583,10 @@ WigglytuffBaseStats:
     ; palette
     dw PAL_WIGGLYTUFF
 
-    ds 3
+    ; field moves
+    db FM_HEAL
+
+    ds 2
 
     db BANK(WigglytuffPicFront)
 
@@ -1499,7 +1622,10 @@ ZubatBaseStats:
     ; palette
     dw PAL_ZUBAT
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(ZubatPicFront)
 
@@ -1535,7 +1661,10 @@ GolbatBaseStats:
     ; palette
     dw PAL_GOLBAT
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY
+
+    ds 2
 
     db BANK(GolbatPicFront)
 
@@ -1571,7 +1700,10 @@ OddishBaseStats:
     ; palette
     dw PAL_ODDISH
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(OddishPicFront)
 
@@ -1607,7 +1739,10 @@ GloomBaseStats:
     ; palette
     dw PAL_GLOOM
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(GloomPicFront)
 
@@ -1643,7 +1778,10 @@ VileplumeBaseStats:
     ; palette
     dw PAL_VILEPLUME
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(VileplumePicFront)
 
@@ -1679,7 +1817,10 @@ ParasBaseStats:
     ; palette
     dw PAL_PARAS
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(ParasPicFront)
 
@@ -1715,7 +1856,10 @@ ParasectBaseStats:
     ; palette
     dw PAL_PARASECT
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_DIG
+
+    ds 2
 
     db BANK(ParasectPicFront)
 
@@ -1751,7 +1895,10 @@ VenonatBaseStats:
     ; palette
     dw PAL_VENONAT
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(VenonatPicFront)
 
@@ -1787,7 +1934,10 @@ VenomothBaseStats:
     ; palette
     dw PAL_VENOMOTH
 
-    ds 3
+    ; field moves
+    db FM_FLY+FM_TELEPORT
+
+    ds 2
 
     db BANK(VenomothPicFront)
 
@@ -1823,7 +1973,10 @@ DiglettBaseStats:
     ; palette
     dw PAL_DIGLETT
 
-    ds 3
+    ; field moves
+    db FM_DIG
+
+    ds 2
 
     db BANK(DiglettPicFront)
 
@@ -1859,7 +2012,10 @@ DugtrioBaseStats:
     ; palette
     dw PAL_DUGTRIO
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(DugtrioPicFront)
 
@@ -1895,7 +2051,10 @@ MeowthBaseStats:
     ; palette
     dw PAL_MEOWTH
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(MeowthPicFront)
 
@@ -1931,7 +2090,10 @@ PersianBaseStats:
     ; palette
     dw PAL_PERSIAN
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_LIGHT
+
+    ds 2
 
     db BANK(PersianPicFront)
 
@@ -1967,7 +2129,10 @@ PsyduckBaseStats:
     ; palette
     dw PAL_PSYDUCK
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(PsyduckPicFront)
 
@@ -2003,7 +2168,10 @@ GolduckBaseStats:
     ; palette
     dw PAL_GOLDUCK
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLOAT+FM_LIGHT+FM_TELEPORT+FM_DIG
+
+    ds 2
 
     db BANK(GolduckPicFront)
 
@@ -2039,7 +2207,10 @@ MankeyBaseStats:
     ; palette
     dw PAL_MANKEY
 
-    ds 3
+    ; field moves
+    db FM_STRENGTH
+
+    ds 2
 
     db BANK(MankeyPicFront)
 
@@ -2075,7 +2246,10 @@ PrimeapeBaseStats:
     ; palette
     dw PAL_PRIMEAPE
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(PrimeapePicFront)
 
@@ -2111,7 +2285,10 @@ GrowlitheBaseStats:
     ; palette
     dw PAL_GROWLITHE
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(GrowlithePicFront)
 
@@ -2147,7 +2324,10 @@ ArcanineBaseStats:
     ; palette
     dw PAL_ARCANINE
 
-    ds 3
+    ; field moves
+    db FM_STRENGTH+FM_LIGHT+FM_DIG
+
+    ds 2
 
     db BANK(ArcaninePicFront)
 
@@ -2183,7 +2363,10 @@ PoliwagBaseStats:
     ; palette
     dw PAL_POLIWAG
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(PoliwagPicFront)
 
@@ -2219,7 +2402,10 @@ PoliwhirlBaseStats:
     ; palette
     dw PAL_POLIWHIRL
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_STRENGTH
+
+    ds 2
 
     db BANK(PoliwhirlPicFront)
 
@@ -2255,7 +2441,10 @@ PoliwrathBaseStats:
     ; palette
     dw PAL_POLIWRATH
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_STRENGTH
+
+    ds 2
 
     db BANK(PoliwrathPicFront)
 
@@ -2291,7 +2480,10 @@ AbraBaseStats:
     ; palette
     dw PAL_ABRA
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(AbraPicFront)
 
@@ -2327,7 +2519,10 @@ KadabraBaseStats:
     ; palette
     dw PAL_KADABRA
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(KadabraPicFront)
 
@@ -2363,7 +2558,10 @@ AlakazamBaseStats:
     ; palette
     dw PAL_ALAKAZAM
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(AlakazamPicFront)
 
@@ -2399,7 +2597,10 @@ MachopBaseStats:
     ; palette
     dw PAL_MACHOP
 
-    ds 3
+    ; field moves
+    db FM_STRENGTH
+
+    ds 2
 
     db BANK(MachopPicFront)
 
@@ -2435,7 +2636,10 @@ MachokeBaseStats:
     ; palette
     dw PAL_MACHOKE
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(MachokePicFront)
 
@@ -2471,7 +2675,10 @@ MachampBaseStats:
     ; palette
     dw PAL_MACHAMP
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(MachampPicFront)
 
@@ -2507,7 +2714,10 @@ BellsproutBaseStats:
     ; palette
     dw PAL_BELLSPROUT
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(BellsproutPicFront)
 
@@ -2543,7 +2753,10 @@ WeepinbellBaseStats:
     ; palette
     dw PAL_WEEPINBELL
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(WeepinbellPicFront)
 
@@ -2579,7 +2792,10 @@ VictreebelBaseStats:
     ; palette
     dw PAL_VICTREEBEL
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(VictreebelPicFront)
 
@@ -2615,7 +2831,10 @@ TentacoolBaseStats:
     ; palette
     dw PAL_TENTACOOL
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(TentacoolPicFront)
 
@@ -2651,7 +2870,10 @@ TentacruelBaseStats:
     ; palette
     dw PAL_TENTACRUEL
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLOAT
+
+    ds 2
 
     db BANK(TentacruelPicFront)
 
@@ -2687,7 +2909,10 @@ GeodudeBaseStats:
     ; palette
     dw PAL_GEODUDE
 
-    ds 3
+    ; field moves
+    db FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(GeodudePicFront)
 
@@ -2723,7 +2948,10 @@ GravelerBaseStats:
     ; palette
     dw PAL_GRAVELER
 
-    ds 3
+    ; field moves
+    db FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(GravelerPicFront)
 
@@ -2759,7 +2987,10 @@ GolemBaseStats:
     ; palette
     dw PAL_GOLEM
 
-    ds 3
+    ; field moves
+    db FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(GolemPicFront)
 
@@ -2795,7 +3026,10 @@ PonytaBaseStats:
     ; palette
     dw PAL_PONYTA
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(PonytaPicFront)
 
@@ -2831,7 +3065,10 @@ RapidashBaseStats:
     ; palette
     dw PAL_RAPIDASH
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(RapidashPicFront)
 
@@ -2867,7 +3104,10 @@ SlowpokeBaseStats:
     ; palette
     dw PAL_SLOWPOKE
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(SlowpokePicFront)
 
@@ -2903,7 +3143,10 @@ SlowbroBaseStats:
     ; palette
     dw PAL_SLOWBRO
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_TELEPORT
+
+    ds 2
 
     db BANK(SlowbroPicFront)
 
@@ -2939,7 +3182,10 @@ MagnemiteBaseStats:
     ; palette
     dw PAL_MAGNEMITE
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(MagnemitePicFront)
 
@@ -2975,7 +3221,10 @@ MagnetonBaseStats:
     ; palette
     dw PAL_MAGNETON
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_TELEPORT
+
+    ds 2
 
     db BANK(MagnetonPicFront)
 
@@ -3011,7 +3260,10 @@ FarfetchdBaseStats:
     ; palette
     dw PAL_FARFETCH_D
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(FarfetchdPicFront)
 
@@ -3047,7 +3299,10 @@ DoduoBaseStats:
     ; palette
     dw PAL_DODUO
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(DoduoPicFront)
 
@@ -3083,7 +3338,10 @@ DodrioBaseStats:
     ; palette
     dw PAL_DODRIO
 
-    ds 3
+    ; field moves
+    db FM_CUT
+
+    ds 2
 
     db BANK(DodrioPicFront)
 
@@ -3119,7 +3377,10 @@ SeelBaseStats:
     ; palette
     dw PAL_SEEL
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(SeelPicFront)
 
@@ -3155,7 +3416,10 @@ DewgongBaseStats:
     ; palette
     dw PAL_DEWGONG
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(DewgongPicFront)
 
@@ -3191,7 +3455,10 @@ GrimerBaseStats:
     ; palette
     dw PAL_GRIMER
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(GrimerPicFront)
 
@@ -3227,7 +3494,10 @@ MukBaseStats:
     ; palette
     dw PAL_MUK
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(MukPicFront)
 
@@ -3263,7 +3533,10 @@ ShellderBaseStats:
     ; palette
     dw PAL_SHELLDER
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(ShellderPicFront)
 
@@ -3299,7 +3572,10 @@ CloysterBaseStats:
     ; palette
     dw PAL_CLOYSTER
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(CloysterPicFront)
 
@@ -3335,7 +3611,10 @@ GastlyBaseStats:
     ; palette
     dw PAL_GASTLY
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(GastlyPicFront)
 
@@ -3371,7 +3650,10 @@ HaunterBaseStats:
     ; palette
     dw PAL_HAUNTER
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(HaunterPicFront)
 
@@ -3407,7 +3689,10 @@ GengarBaseStats:
     ; palette
     dw PAL_GENGAR
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(GengarPicFront)
 
@@ -3443,7 +3728,10 @@ OnixBaseStats:
     ; palette
     dw PAL_ONIX
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(OnixPicFront)
 
@@ -3479,7 +3767,10 @@ DrowzeeBaseStats:
     ; palette
     dw PAL_DROWZEE
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(DrowzeePicFront)
 
@@ -3515,7 +3806,10 @@ HypnoBaseStats:
     ; palette
     dw PAL_HYPNO
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(HypnoPicFront)
 
@@ -3551,7 +3845,10 @@ KrabbyBaseStats:
     ; palette
     dw PAL_KRABBY
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_DIG
+
+    ds 2
 
     db BANK(KrabbyPicFront)
 
@@ -3587,7 +3884,10 @@ KinglerBaseStats:
     ; palette
     dw PAL_KINGLER
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(KinglerPicFront)
 
@@ -3623,7 +3923,10 @@ VoltorbBaseStats:
     ; palette
     dw PAL_VOLTORB
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
  
     db BANK(VoltorbPicFront)
 
@@ -3659,7 +3962,10 @@ ElectrodeBaseStats:
     ; palette
     dw PAL_ELECTRODE
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_TELEPORT
+
+    ds 2
 
     db BANK(ElectrodePicFront)
 
@@ -3695,7 +4001,10 @@ ExeggcuteBaseStats:
     ; palette
     dw PAL_EXEGGCUTE
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(ExeggcutePicFront)
 
@@ -3731,7 +4040,10 @@ ExeggutorBaseStats:
     ; palette
     dw PAL_EXEGGUTOR
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(ExeggutorPicFront)
 
@@ -3767,7 +4079,10 @@ CuboneBaseStats:
     ; palette
     dw PAL_CUBONE
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_DIG
+
+    ds 2
 
     db BANK(CubonePicFront)
 
@@ -3790,7 +4105,7 @@ MarowakBaseStats:
     dw MarowakPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw MarowakAlolaBaseStats
 
     ; pointer to evomoves
     dw Marowak_EvosMoves
@@ -3803,7 +4118,10 @@ MarowakBaseStats:
     ; palette
     dw PAL_MAROWAK
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(MarowakPicFront)
 
@@ -3839,7 +4157,10 @@ HitmonleeBaseStats:
     ; palette
     dw PAL_HITMONLEE
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_STRENGTH
+
+    ds 2
 
     db BANK(HitmonleePicFront)
 
@@ -3875,7 +4196,10 @@ HitmonchanBaseStats:
     ; palette
     dw PAL_HITMONCHAN
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_STRENGTH
+
+    ds 2
 
     db BANK(HitmonchanPicFront)
 
@@ -3911,7 +4235,10 @@ LickitungBaseStats:
     ; palette
     dw PAL_LICKITUNG
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLOAT+FM_HEAL
+
+    ds 2
 
     db BANK(LickitungPicFront)
 
@@ -3947,7 +4274,10 @@ KoffingBaseStats:
     ; palette
     dw PAL_KOFFING
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_FLOAT
+
+    ds 2
 
     db BANK(KoffingPicFront)
 
@@ -3983,7 +4313,10 @@ WeezingBaseStats:
     ; palette
     dw PAL_WEEZING
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_FLOAT
+
+    ds 2
 
     db BANK(WeezingPicFront)
 
@@ -4019,7 +4352,10 @@ RhyhornBaseStats:
     ; palette
     dw PAL_RHYHORN
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(RhyhornPicFront)
 
@@ -4055,7 +4391,10 @@ RhydonBaseStats:
     ; palette
     dw PAL_RHYDON
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(RhydonPicFront)
 
@@ -4091,7 +4430,10 @@ ChanseyBaseStats:
     ; palette
     dw PAL_CHANSEY
 
-    ds 3
+    ; field moves
+    db FM_HEAL
+
+    ds 2
 
     db BANK(ChanseyPicFront)
 
@@ -4127,7 +4469,10 @@ TangelaBaseStats:
     ; palette
     dw PAL_TANGELA
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_HEAL
+
+    ds 2
 
     db BANK(TangelaPicFront)
 
@@ -4163,7 +4508,10 @@ KangaskhanBaseStats:
     ; palette
     dw PAL_KANGASKHAN
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_STRENGTH
+
+    ds 2
 
     db BANK(KangaskhanPicFront)
 
@@ -4199,7 +4547,10 @@ HorseaBaseStats:
     ; palette
     dw PAL_HORSEA
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(HorseaPicFront)
 
@@ -4235,7 +4586,10 @@ SeadraBaseStats:
     ; palette
     dw PAL_SEADRA
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(SeadraPicFront)
 
@@ -4271,7 +4625,10 @@ GoldeenBaseStats:
     ; palette
     dw PAL_GOLDEEN
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(GoldeenPicFront)
 
@@ -4307,7 +4664,10 @@ SeakingBaseStats:
     ; palette
     dw PAL_SEAKING
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(SeakingPicFront)
 
@@ -4343,7 +4703,10 @@ StaryuBaseStats:
     ; palette
     dw PAL_STARYU
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_TELEPORT
+
+    ds 2
 
     db BANK(StaryuPicFront)
 
@@ -4379,7 +4742,10 @@ StarmieBaseStats:
     ; palette
     dw PAL_STARMIE
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_LIGHT+FM_TELEPORT
+
+    ds 2
 
     db BANK(StarmiePicFront)
 
@@ -4415,7 +4781,10 @@ MrMimeBaseStats:
     ; palette
     dw PAL_MR_MIME
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(MrMimePicFront)
 
@@ -4451,7 +4820,10 @@ ScytherBaseStats:
     ; palette
     dw PAL_SCYTHER
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY
+
+    ds 2
 
     db BANK(ScytherPicFront)
 
@@ -4487,7 +4859,10 @@ JynxBaseStats:
     ; palette
     dw PAL_JYNX
 
-    ds 3
+    ; field moves
+    db FM_TELEPORT
+
+    ds 2
 
     db BANK(JynxPicFront)
 
@@ -4523,7 +4898,10 @@ ElectabuzzBaseStats:
     ; palette
     dw PAL_ELECTABUZZ
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(ElectabuzzPicFront)
 
@@ -4559,7 +4937,10 @@ MagmarBaseStats:
     ; palette
     dw PAL_MAGMAR
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(MagmarPicFront)
 
@@ -4595,7 +4976,10 @@ PinsirBaseStats:
     ; palette
     dw PAL_PINSIR
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_STRENGTH
+
+    ds 2
 
     db BANK(PinsirPicFront)
 
@@ -4631,7 +5015,10 @@ TaurosBaseStats:
     ; palette
     dw PAL_TAUROS
 
-    ds 3
+    ; field moves
+    db FM_STRENGTH
+
+    ds 2
 
     db BANK(TaurosPicFront)
 
@@ -4667,7 +5054,10 @@ MagikarpBaseStats:
     ; palette
     dw PAL_MAGIKARP
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(MagikarpPicFront)
 
@@ -4703,7 +5093,10 @@ GyaradosBaseStats:
     ; palette
     dw PAL_GYARADOS
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_STRENGTH
+
+    ds 2
 
     db BANK(GyaradosPicFront)
 
@@ -4739,7 +5132,10 @@ LaprasBaseStats:
     ; palette
     dw PAL_LAPRAS
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(LaprasPicFront)
 
@@ -4775,7 +5171,10 @@ DittoBaseStats:
     ; palette
     dw PAL_DITTO
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(DittoPicFront)
 
@@ -4811,7 +5210,10 @@ EeveeBaseStats:
     ; palette
     dw PAL_EEVEE
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(EeveePicFront)
 
@@ -4847,7 +5249,10 @@ VaporeonBaseStats:
     ; palette
     dw PAL_VAPOREON
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(VaporeonPicFront)
 
@@ -4883,7 +5288,10 @@ JolteonBaseStats:
     ; palette
     dw PAL_JOLTEON
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(JolteonPicFront)
 
@@ -4919,7 +5327,10 @@ FlareonBaseStats:
     ; palette
     dw PAL_FLAREON
 
-    ds 3
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
 
     db BANK(FlareonPicFront)
 
@@ -4955,7 +5366,10 @@ PorygonBaseStats:
     ; palette
     dw PAL_PORYGON
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_LIGHT+FM_TELEPORT+FM_HEAL
+
+    ds 2
 
     db BANK(PorygonPicFront)
 
@@ -4991,7 +5405,10 @@ OmanyteBaseStats:
     ; palette
     dw PAL_OMANYTE
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(OmanytePicFront)
 
@@ -5027,7 +5444,10 @@ OmastarBaseStats:
     ; palette
     dw PAL_OMASTAR
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLOAT+FM_DIG
+
+    ds 2
 
     db BANK(OmastarPicFront)
 
@@ -5063,7 +5483,10 @@ KabutoBaseStats:
     ; palette
     dw PAL_KABUTO
 
-    ds 3
+    ; field moves
+    db 0
+
+    ds 2
 
     db BANK(KabutoPicFront)
 
@@ -5099,7 +5522,10 @@ KabutopsBaseStats:
     ; palette
     dw PAL_KABUTOPS
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(KabutopsPicFront)
 
@@ -5135,7 +5561,10 @@ AerodactylBaseStats:
     ; palette
     dw PAL_AERODACTYL
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(AerodactylPicFront)
 
@@ -5171,7 +5600,10 @@ SnorlaxBaseStats:
     ; palette
     dw PAL_SNORLAX
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_STRENGTH
+
+    ds 2
 
     db BANK(SnorlaxPicFront)
 
@@ -5207,7 +5639,10 @@ ArticunoBaseStats:
     ; palette
     dw PAL_ARTICUNO
 
-    ds 3
+    ; field moves
+    db FM_FLY+FM_FLOAT
+
+    ds 2
 
     db BANK(ArticunoPicFront)
 
@@ -5243,7 +5678,10 @@ ZapdosBaseStats:
     ; palette
     dw PAL_ZAPDOS
 
-    ds 3
+    ; field moves
+    db FM_FLY+FM_LIGHT
+
+    ds 2
 
     db BANK(ZapdosPicFront)
 
@@ -5279,7 +5717,10 @@ MoltresBaseStats:
     ; palette
     dw PAL_MOLTRES
 
-    ds 3
+    ; field moves
+    db FM_FLY+FM_LIGHT
+
+    ds 2
 
     db BANK(MoltresPicFront)
 
@@ -5315,7 +5756,10 @@ DratiniBaseStats:
     ; palette
     dw PAL_DRATINI
 
-    ds 3
+    ; field moves
+    db FM_FLOAT
+
+    ds 2
 
     db BANK(DratiniPicFront)
 
@@ -5351,7 +5795,10 @@ DragonairBaseStats:
     ; palette
     dw PAL_DRAGONAIR
 
-    ds 3
+    ; field moves
+    db FM_FLOAT+FM_DIG
+
+    ds 2
 
     db BANK(DragonairPicFront)
 
@@ -5387,7 +5834,10 @@ DragoniteBaseStats:
     ; palette
     dw PAL_DRAGONITE
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_DIG
+
+    ds 2
 
     db BANK(DragonitePicFront)
 
@@ -5423,7 +5873,10 @@ MewtwoBaseStats:
     ; palette
     dw PAL_MEWTWO
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY+FM_STRENGTH+FM_LIGHT+FM_TELEPORT
+
+    ds 2
 
     db BANK(MewtwoPicFront)
 
@@ -5459,7 +5912,10 @@ MewBaseStats:
     ; palette
     dw PAL_MEW
 
-    ds 3
+    ; field moves
+    db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_LIGHT+FM_TELEPORT+FM_DIG+FM_HEAL
+
+    ds 2
 
     db BANK(MewPicFront)
 
@@ -5495,7 +5951,10 @@ LitwickBaseStats:
     ; palette
     dw PAL_LITWICK
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_TELEPORT
+
+    ds 2
 
     db BANK(LitwickPicFront)
 
@@ -5531,7 +5990,10 @@ LampentBaseStats:
     ; palette
     dw PAL_LAMPENT
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_TELEPORT
+
+    ds 2
 
     db BANK(LampentPicFront)
 
@@ -5567,7 +6029,10 @@ ChandelureBaseStats:
     ; palette
     dw PAL_CHANDELURE
 
-    ds 3
+    ; field moves
+    db FM_LIGHT+FM_TELEPORT
+
+    ds 2
 
     db BANK(ChandelurePicFront)
 
@@ -5603,7 +6068,10 @@ Mon155BaseStats:
     ; palette
     dw PAL_MON_155
 
-    ds 3
+    ; field moves
+    db 
+
+    ds 2
 
     db BANK(MissingNoPicFront)
 
@@ -5639,7 +6107,10 @@ Mon156BaseStats:
     ; palette
     dw PAL_MON_156
 
-    ds 3
+    ; field moves
+    db 
+
+    ds 2
 
     db BANK(MissingNoPicFront)
 
@@ -5675,7 +6146,10 @@ Mon157BaseStats:
     ; palette
     dw PAL_MON_157
 
-    ds 3
+    ; field moves
+    db 
+
+    ds 2
 
     db BANK(MissingNoPicFront)
 
@@ -5711,7 +6185,10 @@ Mon158BaseStats:
     ; palette
     dw PAL_MON_158
 
-    ds 3
+    ; field moves
+    db 
+
+    ds 2
 
     db BANK(MissingNoPicFront)
 
@@ -5747,6 +6224,9 @@ Mon159BaseStats:
     ; palette
     dw PAL_MON_159
 
-    ds 3
+    ; field moves
+    db 
+
+    ds 2
 
     db BANK(MissingNoPicFront)

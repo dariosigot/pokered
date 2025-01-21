@@ -2084,6 +2084,25 @@ MAROWAK_Learnset: MACRO
     db 60,CRABHAMMER
     db 65,HYPER_BEAM
 ENDM
+MAROWAK_Alola_Learnset: MACRO
+    CUBONE_Learnset
+    db 28,EMBER
+    db 28,FLASH
+    db 28,CONFUSE_RAY
+    db 28,NIGHT_SHADE
+    db 32,FIRE_PUNCH
+    db 35,HAZE
+    db 37,MEDITATE
+    db 39,FLAMETHROWER
+    db 42,THRASH
+    db 44,FIRE_SPIN
+    db 47,DIZZY_PUNCH
+    db 50,SUBSTITUTE
+    db 55,SWORDS_DANCE
+    db 57,FIRE_BLAST
+    db 60,CRABHAMMER
+    db 65,HYPER_BEAM
+ENDM
 CUBONE_NoEvo_Learnset: MACRO
     db 30,MEDITATE ; Exclusive
     db 34,ROCK_THROW

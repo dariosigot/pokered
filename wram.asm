@@ -840,7 +840,10 @@ W_MONHLEARNSET_POINTER: ; d0cc
 W_MONH_PALETTE_ID: ; d0ce
     ds 2
 
-    ds 3
+W_MONH_FIELDMOVES: ; d0d0
+    ds 1
+
+    ds 2
 
     ds 2
 
@@ -1815,6 +1818,7 @@ wFlagFlyingMonSpriteBit1   ; df35 ; bit 1 = Force to Load Mon Sprite with $0080 
 wFlagShinyBit2             ; df35 ; bit 2
 wFlagFlyingMonSpriteBit2   ; df35 ; bit 2 = Force to Load Mon Sprite with $0880 offset
 wFlagBaloonSpriteBit3      ; df35 ; bit 3 = Enable Baloon Sprite durint Trade
+wFlagForceGhostPalBit3     ; df35 ; bit 3 = Force Ghost Palette during Ghost Marowak Encounter
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
 wFlagBackFrontSpriteBit56  ; df35 ; bit 5
                            ; df35 ; bit 6

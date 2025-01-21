@@ -10199,7 +10199,7 @@ IsInArrayCummulativeCount: ; 3dad (0:3dad)
     scf
     ret
 
-Func_3dbe: ; 3dbe (0:3dbe)
+RestoreScreenTilesAndReloadTilePatterns: ; 3dbe (0:3dbe)
     call CleanLCD_OAM
     ld a,$1
     ld [$cfcb],a
@@ -15034,15 +15034,15 @@ DoYouWantToNicknameText: ; 0x6557
     TX_FAR _DoYouWantToNicknameText
     db "@"
 
-Func_655c: ; 655c (1:655c)
+DisplayNameRaterScreen: ; 655c (1:655c)
     ld hl,$cee9
     xor a
     ld [$cfcb],a
     ld a,$2
     ld [$d07d],a
-    call InsertIVDuringNameRater
+    call HandleIVAndLoadRenameScreenDuringNameRater
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     ld a,[$cf4b]
     cp $50
@@ -17418,18 +17418,16 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     db "HEAL@"   ; Move : SOFTBOILED
 
 ChoiceMonSimpleMenu:
-    ld b,BANK(GetMonFieldMoves)
-    ld hl,GetMonFieldMoves
-    call Bankswitch
-    FuncCoord 11,08
+    call GetMonFieldMoves
+    FuncCoord 11,06
     ld hl,Coord
-    ld b,8
-    ld c,7
+    ld b,10
+    ld c,07
     call TextBoxBorder
     call UpdateSprites
     ld a,$c
     ld [$FF00+$f7],a ; hFieldMoveMonMenuTopMenuItemX
-    FuncCoord 13,10
+    FuncCoord 13,08
     ld hl,Coord
     ld de,.PokemonMenuEntries
     jp PlaceString
@@ -17437,6 +17435,7 @@ ChoiceMonSimpleMenu:
     db "FIELD",$4E
     db "STATS",$4E
     db "MOVES",$4E
+    db "RENAME",$4E
     db "SWITCH","@"
 
 GetMonFieldMoves: ; Moved in the Bank
@@ -17445,18 +17444,9 @@ GetMonFieldMoves: ; Moved in the Bank
     ld hl,wFieldMoves
     ld bc,8+1
     call FillMemory
-    ld a,[wWhichPokemon] ; $cf92
-    ld d,0
+    call .GetMonHeader
+    ld a,[W_MONH_FIELDMOVES]
     ld e,a
-    ld hl,W_PARTYMON1
-    add hl,de
-    ld a,[hl]
-    ld [$d11e],a
-    call IndexToPokedexAndRestoreD11E
-    ld e,a
-    ld hl,GetFieldMovesRulesByte
-    ld b,BANK(GetFieldMovesRulesByte)
-    call Bankswitch
     ld c,8
     ld b,0
     ld hl,wFieldMoves
@@ -17478,8 +17468,20 @@ GetMonFieldMoves: ; Moved in the Bank
     ld a,b
     ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
     ret
+.GetMonHeader
+    ld hl,W_PARTYMON1_NUM
+    ld a,[wWhichPokemon]
+    ld bc,44
+    call AddNTimes
+    ld a,[hl]
+    ld [$d0b5],a
+    ld de,W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
+    add hl,de
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    jp GetMonHeader
 
-; Some Bytes Free
+; Free
 
 SECTION "Func_783f",ROMX[$783f],BANK[$1]
 
@@ -18100,7 +18102,7 @@ StoreCatchPkmnIdAndFlagBeforeRename: ; Denim
     pop hl
     jp LoadRenameScreen
 
-InsertIVDuringNameRater:
+HandleIVAndLoadRenameScreenDuringNameRater:
     push hl
     ld a,[wWhichPokemon] ; Pokemon Party Order
     ld hl,W_PARTYMON1_IV
@@ -18622,6 +18624,11 @@ Trade_BackupEnemyIVandAltForm:
     ; endhack
     ld a,[$cd3d]
     ret
+
+HandleIVAndLoadRenameScreenDuringNameRater_FromAnotherBank:
+    ld h,d
+    ld l,e
+    jp HandleIVAndLoadRenameScreenDuringNameRater 
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -26320,7 +26327,7 @@ CanCut:
     set 6,[hl]
     call GBPalWhiteOutWithDelay3
     call CleanLCD_OAM
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     ld a,$90
     ld [$FF00+$b0],a
     call Delay3
@@ -29617,7 +29624,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jr nc,.chosePokemon
 .exitMenu
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     jp RedisplayStartMenu
 .chosePokemon
@@ -29626,7 +29633,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,3 ; ChoiceMonSimpleMenu
     ld [$d125],a
     call DisplayTextBoxID ; display pokemon menu options
-    ld bc,$030a ; ld bc,$020c ; max menu item ID,top menu item Y
+    ld bc,$0408 ; ld bc,$020c ; max menu item ID,top menu item Y
     ld d,12 ; top menu item X
     call HandlePkmnSubMenu
     bit 1,a ; was the B button pressed?
@@ -29641,6 +29648,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jr z,.choseStats
     dec a
     jr z,.choseMoves
+    dec a
+    jr z,.choseRename
     ; fall through
 
 .choseSwitch
@@ -29664,6 +29673,10 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 
 .choseMoves
     PREDEF MovesMenuPredef
+    jr .ReturnToPartyMenu
+
+.choseRename
+    call DisplayPartyRenameScreen
     jr .ReturnToPartyMenu
 
 .ReloadScreenAndLoop
@@ -29874,7 +29887,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     TX_FAR _NotHealthyEnoughText
     db "@"
 .goBackToMap
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     jp CloseTextDisplay
 
 SECTION "ErasePartyMenuCursors",ROMX[$72ed],BANK[$4]
@@ -30022,7 +30035,7 @@ StartMenu_Item: ; 13302 (4:7302)
     cp a,$02
     jp z,.partyMenuNotDisplayed
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     pop af
     ld [$cfcb],a
     jp StartMenu_Item
@@ -31966,6 +31979,28 @@ ConversionEffect_: ; Moved in the Bank
 Bankswitch4toF: ; Moved in the Bank
     ld b,$f
     jp Bankswitch
+
+DisplayPartyRenameScreen:
+    ld de,$cee9
+    xor a
+    ld [$cfcb],a
+    ld a,$2
+    ld [$d07d],a
+    ld b,BANK(HandleIVAndLoadRenameScreenDuringNameRater_FromAnotherBank)
+    ld hl,HandleIVAndLoadRenameScreenDuringNameRater_FromAnotherBank
+    call Bankswitch
+    ld a,[$cf4b]
+    cp $50
+    ret z
+    ld hl,W_PARTYMON1NAME ; $d2b5
+    ld bc,$b
+    ld a,[wWhichPokemon] ; $cf92
+    call AddNTimes
+    ld e,l
+    ld d,h
+    ld hl,$cee9
+    ld bc,$b
+    jp CopyData
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -40289,7 +40324,7 @@ NameRaterText1: ; 1da56 (7:5a56)
     call DisplayPartyMenu
     push af
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     pop af
     jr c,.asm_1daae ; 0x1da80 $2c
@@ -40302,8 +40337,8 @@ NameRaterText1: ; 1da56 (7:5a56)
     jr nz,.asm_1daae ; 0x1da93 $19
     ld hl,UnnamedText_1dac2
     call PrintText
-    ld b,BANK(Func_655c)
-    ld hl,Func_655c
+    ld b,BANK(DisplayNameRaterScreen)
+    ld hl,DisplayNameRaterScreen
     call Bankswitch
     jr c,.asm_1daae ; 0x1daa3 $9
     ld hl,UnnamedText_1dac7
@@ -42671,7 +42706,7 @@ MoveDeleterText:
     jr nc,.ChosePokemon
 .ExitMenu
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     ld hl,AnswerNoText
 .PrintTextAndEndScript
@@ -83446,7 +83481,7 @@ DayCareMText1: ; 56254 (15:6254)
     call DisplayPartyMenu
     push af
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     pop af
     ld hl,UnnamedText_56437
@@ -84082,7 +84117,7 @@ DisplayDiploma: ; 566e2 (15:66e2)
     ld hl,$d730
     res 6,[hl]
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call Delay3
     jp GBPalNormal
 
@@ -93621,10 +93656,10 @@ PokemonTower6Script0: ; 60b17 (18:4b17)
     ld [H_CURRENTPRESSEDBUTTONS],a
     ld a,$6
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call DisplayTextID
+    call DisplayTextIDAndForceGhostPal ; call DisplayTextID
     ld a,MAROWAK
     ld [W_CUROPPONENT],a ; $d059
-    ld a,30
+    ld a,40
     ld [W_CURENEMYLVL],a ; $d127
     ld a,$4
     ld [W_POKEMONTOWER6CURSCRIPT],a
@@ -96915,6 +96950,12 @@ DiglettsCaveAerodactylRunAway:
     TX_FAR _DiglettsCaveAerodactylRunAway
     db "@"
 
+DisplayTextIDAndForceGhostPal:
+    call DisplayTextID
+    ld hl,wFlagForceGhostPalBit3
+    set 3,[hl]
+    ret
+
 SECTION "bank19",ROMX,BANK[$19]
 
 Tset00_GFX:
@@ -98161,7 +98202,7 @@ Func_708ca: ; 708ca (1c:48ca)
     sla a
     call UpdateSpriteDuringMarowakEvent ; ld [rOBP1],a ; $FF00+$49
     jr nz,.asm_708f6
-    call CleanLCD_OAM
+    call CleanLCD_OAMAndResetForceGhostPal ; call CleanLCD_OAM
     call Func_7092a
     ld b,$e4
 .asm_7090d
@@ -100504,7 +100545,7 @@ Func_71c07: ; 71c07 (1c:5c07)
 
 Func_71ca2: ; 71ca2 (1c:5ca2)
     call GBPalWhiteOutWithDelay3
-    call Func_3dbe
+    call RestoreScreenTilesAndReloadTilePatterns
     call ReloadTilesetTilePatterns
     call LoadScreenTilesFromBuffer2
     call Delay3
@@ -100867,6 +100908,21 @@ CheckFlyingMonSprite:
     pop hl
     ret
 
+IsGhostBattlePlus:
+    push bc
+    push de
+    push af
+    call IsGhostBattle_Bank1C
+    jr z,.End
+    ; If No Standard Ghost Check Marowak Event
+    call CheckMarowak_Bank1C
+.End
+    pop bc
+    ld a,b
+    pop de
+    pop bc
+    ret
+
 SECTION "GetHallOfFameLinkCableEvolutionPaletteID",ROMX[$5f17],BANK[$1c]
 
 ; HallOfFame or LinkCable or Evolution
@@ -100949,6 +101005,13 @@ PointerTable_71f73: ; 71f73 (1c:5f73)
 ; each byte is the number of loops to make in .asm_71f5b for each badge
 LoopCounts_71f8f: ; Moved in the Bank
     db $06,$06,$06,$12,$06,$06,$06,$06
+
+CleanLCD_OAMAndResetForceGhostPal:
+    call CleanLCD_OAM
+    ld hl,wFlagForceGhostPalBit3
+    res 3,[hl]
+    ld b,$1
+    jp GoPAL_SET
 
 SECTION "Func_71fb6",ROMX[$5fb6],BANK[$1C]
 
@@ -102846,8 +102909,19 @@ CheckShinyFrontAndGetPAL:
     push hl
     call IsGhostBattlePlus
     jr nz,.NoGhost
+    call CheckMarowak_Bank1C
+    jr nz,.SimpleGhost
+    ld hl,wFlagForceGhostPalBit3
+    bit 3,[hl]
+    jr z,.NoGhost ; Ghost Marowak Real Palette after SILPH_SCOPE
+.SimpleGhost
+    ld hl,W_MONH_PALETTE_ID
+    ld a,PAL_GASTLY ; Ghost Color is Gastly Color
+    ld [hli],a
+    xor a
+    ld [hl],a
     ld a,GASTLY ; Ghost Color is Gastly Color
-    jr SkipShinyAndGetPAL
+    jp SkipShinyAndGetPAL
 .NoGhost
     ld hl,wFlagBackFrontSpriteBit56
     set 6,[hl]
@@ -102864,23 +102938,16 @@ CheckShinyFrontAndGetPAL:
     ld hl,W_ENEMYMONATKDEFIV
     jr GetPalCommon
 
-IsGhostBattlePlus:
-    push bc
-    push de
+CheckMarowak_Bank1C:
     push af
-    call IsGhostBattle_Bank1C
-    jr z,.End
-    ; If No Standard Ghost Check Marowak Event
     ld a,[W_ENEMYMONID]
     cp MAROWAK
-    jr nz,.End
+    jr nz,.end
     call GetCurrentOldAdventureMap
     cp POKEMONTOWER_6
-.End
+.end
     pop bc
     ld a,b
-    pop de
-    pop bc
     ret
 
 IsGhostBattle_Bank1C:
@@ -103067,17 +103134,10 @@ CreateMonOvWorldSprInstruction:
     ld [hli],a
     call GetMonSpriteNumOfTiles ; ld a,$08
     ld [hli],a
-    ld a,BANK(MonOverworldDataNew)
+    ld a,BANK(MonOverworldDataNew_emimonserrate)
     jr c,.Before128_2
     inc a
 .Before128_2
-    ;push hl
-    ;ld hl,W_OPTIONS
-    ;bit 5,[hl]
-    ;pop hl
-    ;jr z,.skip
-    add BANK(MonOverworldDataNew_emimonserrate)-BANK(MonOverworldDataNew)
-.skip
     ld [hli],a
     push hl ; Backup wLocationMonOvSprInstruction
     ld a,e
@@ -131578,19 +131638,6 @@ SECTION "bank31",ROMX,BANK[$31]
 SuperPalettes:
     INCLUDE "constants/SuperPalettes.asm"
 
-FieldMoves:
-    INCLUDE "constants/FieldMoves.asm"
-
-; INPUT e = Pokemon Pokedex ID (0 : 'M,1: Bulbasaur,...)
-; OUTPUT e = Regola da applicare
-GetFieldMovesRulesByte:
-    ld d,0
-    ld hl,FieldMoves
-    add hl,de
-    ld a,[hl]
-    ld e,a
-    ret
-
 SelectInOverWorld:
     ld a,$35
     call Predef ; Update Next Tile
@@ -131910,6 +131957,10 @@ ElectrodeHisuiPicFront:
     INCBIN "pic/bmon/electrodehusui.pic"
 ElectrodeHisuiPicBack:
     INCBIN "pic/monback/electrodehusuib.pic"
+MarowakAlolaPicFront:
+    INCBIN "pic/bmon/marowakalola.pic"
+MarowakAlolaPicBack:
+    INCBIN "pic/monback/marowakalolab.pic"
 
 SECTION "bank32",ROMX,BANK[$32]
 
@@ -132142,9 +132193,11 @@ _DrawCatchGender: ; Denim
     call PlaceString
 .Genderless
     call DebugStats
-    call ResetTempIV
+    jp ResetTempIV
 .Ghost
-    ret
+    ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
+    call SetTempIV
+    jr .Genderless
 .PrintConfused
     pop af ; Restore Pokedex Flag Test
     FuncCoord 6,1
@@ -132937,16 +132990,6 @@ CheckDarkMap:
     ld a,$06
     ld [$d35d],a
     jp GBFadeIn1
-
-SECTION "bank34",ROMX,BANK[$34] ; Denim
-
-MonOverworldDataNew:
-    INCBIN "gfx/denim/party_mon_sprites1.w32.2bpp"
-
-SECTION "bank35",ROMX,BANK[$35] ; Denim
-
-MonOverworldDataNew2:
-    INCBIN "gfx/denim/party_mon_sprites2.w32.2bpp"
 
 SECTION "Wild Pkmn",ROMX,BANK[$36]
 
@@ -136758,7 +136801,7 @@ CheckSpecialWild_:
 
 .SpecialWild
     db DRATINI,12,DRATINI_CAVE ; DratiniCave_ShinyDratini
-    db MAROWAK,30,POKEMONTOWER_6 ; PokemonTower6_Marowak
+    db MAROWAK,40,POKEMONTOWER_6 ; PokemonTower6_Marowak
     db SNORLAX,30,ROUTE_12 ; Route12_Snorlax
     db SNORLAX,30,ROUTE_16 ; Route16_Snorlax
     db AERODACTYL,30,DIGLETTS_CAVE ; DiglettsCave_Aerodactyl
@@ -136779,10 +136822,10 @@ CheckSpecialWild_:
     db WRAP
     db DRAGON_RAGE
 ; PokemonTower6_Marowak
-    db HEADBUTT
-    db FOCUS_ENERGY
     db BONEMERANG
+    db FOCUS_ENERGY
     db NIGHT_SHADE
+    db FLAMETHROWER
 ; Route12_Snorlax
     db REST
     db ROCK_THROW
@@ -139074,6 +139117,12 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     cp 2
     jr z,.TrainerBattle
 .WildBattle
+    call .CheckMarowak
+    jr nz,.noMarowak
+    ld a,1 ; Marowak Ghost
+    ld [wTempAlternateFormIndex],a
+    jr .end
+.noMarowak
     xor a ; TODO
     jr .end
 .outOfBattle
@@ -139087,6 +139136,13 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     ld a,[hl]
 .end
     ld [wAlternateFormIndex],a
+    ret
+.CheckMarowak
+    ld a,[W_CUROPPONENT]
+    cp MAROWAK
+    ret nz
+    call GetCurrentOldAdventureMap
+    cp POKEMONTOWER_6
     ret
 
 ; ──────────────────────────────────────────────────────────────────────

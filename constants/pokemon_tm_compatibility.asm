@@ -905,6 +905,14 @@ MarowakTMCompatibility:
     tmlearn 34,37,38,39,40          ; |BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
+MarowakAlolaTMCompatibility:
+    tmlearn 01,03,06                ; |MEGA_PUNCH|SWORDS_DANCE|TOXIC|
+    tmlearn 10,11,12,13,15          ; |DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|HYPER_BEAM|
+    tmlearn 0
+    tmlearn 26,27,28,29,30,31,32    ; |EARTHQUAKE|FISSURE|TRAPHOLE|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 34,37,38,39,40          ; |BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 44,46,48                ; |REST|PSYWAVE|ROCK_SLIDE|
+    tmlearn 50,51,54,55             ; |SUBSTITUTE|BLADE|STRIKE|FLASH|
 ; ──────────────────────────────────────────────────────────────────────
 HitmonleeTMCompatibility:
     tmlearn 01,03,05,08             ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|BODY_SLAM|

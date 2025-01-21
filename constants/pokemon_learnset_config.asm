@@ -585,6 +585,10 @@ Marowak_EvosMoves:
     db 0
     MAROWAK_Learnset
     db 0
+Marowak_Alola_EvosMoves:
+    db 0
+    MAROWAK_Alola_Learnset
+    db 0
 ; ──────────────────────────────────────────────────────────────────────
 Hitmonlee_EvosMoves:
     db 0
