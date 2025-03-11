@@ -17481,38 +17481,41 @@ GetMonFieldMoves: ; Moved in the Bank
     ld [wAlternateFormIndex],a
     jp GetMonHeader
 
-; Free
-
-SECTION "Func_783f",ROMX[$783f],BANK[$1]
-
-Func_783f: ; 783f (1:783f)
-    ld hl,W_DAMAGE ; $d0d7
-    ld a,[hl]
+DrainHPEffect_: ; Moved in the Bank
+    ld de,W_DAMAGE+1
+    ld hl,wBattleValueToPrint+1
+    ld a,[de]
+    ld [hld],a
+    dec de
+    ld a,[de]
+    ld [hl],a
     srl a
     ld [hli],a
     ld a,[hl]
     rr a
     ld [hld],a
     or [hl]
-    jr nz,.asm_784f
+    jr nz,.getAttackerHP
+; if damage is 0, increase to 1 so that the attacker gains at least 1 HP
     inc hl
     inc [hl]
-.asm_784f
+.getAttackerHP
     ld hl,W_PLAYERMONCURHP ; $d015
     ld de,W_PLAYERMONMAXHP ; $d023
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    jp z,Func_7861
+    jr z,.addDamageToAttackerHP
     ld hl,W_ENEMYMONCURHP ; $cfe6
     ld de,W_ENEMYMONMAXHP ; $cff4
-
-Func_7861: ; 7861 (1:7861)
+.addDamageToAttackerHP
     ld bc,wHPBarOldHP+1
+; copy current HP to wHPBarOldHP
     ld a,[hli]
     ld [bc],a
     ld a,[hl]
     dec bc
     ld [bc],a
+; copy max HP to wHPBarMaxHP
     ld a,[de]
     dec bc
     ld [bc],a
@@ -17520,17 +17523,19 @@ Func_7861: ; 7861 (1:7861)
     ld a,[de]
     dec bc
     ld [bc],a
-    ld a,[$d0d8]
+; add damage to attacker's HP and copy new HP to wHPBarNewHP
+    ld a,[wBattleValueToPrint+1]
     ld b,[hl]
     add b
     ld [hld],a
     ld [wHPBarNewHP],a
-    ld a,[W_DAMAGE] ; $d0d7
+    ld a,[wBattleValueToPrint]
     ld b,[hl]
     adc b
     ld [hli],a
     ld [wHPBarNewHP+1],a
-    jr c,.asm_7890
+    jr c,.capToMaxHP ; if HP > 65,535, cap to max HP
+; compare HP with max HP
     ld a,[hld]
     ld b,a
     ld a,[de]
@@ -17541,8 +17546,8 @@ Func_7861: ; 7861 (1:7861)
     ld a,[de]
     inc de
     sbc b
-    jr nc,.asm_789c
-.asm_7890
+    jr nc,.next
+.capToMaxHP
     ld a,[de]
     ld [hld],a
     ld [wHPBarNewHP],a
@@ -17551,20 +17556,18 @@ Func_7861: ; 7861 (1:7861)
     ld [hli],a
     ld [wHPBarNewHP+1],a
     inc de
-.asm_789c
+.next
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord
     ld a,$1
-    jr z,.asm_78aa
+    jr z,.next2
     FuncCoord 02,02 ; Enemy Bar in Battle
     ld hl,Coord
     xor a
-.asm_78aa
+.next2
     ld [wListMenuID],a ; $cf94
-    ; ld a,$48
-    ; call Predef ; UpdateHPBar
     ld d,h
     ld e,l
     call SetCureDuringAbsorb
@@ -17575,26 +17578,28 @@ Func_7861: ; 7861 (1:7861)
     ld hl,ReadPlayerMonCurHPAndStatus
     ld b,BANK(ReadPlayerMonCurHPAndStatus)
     call Bankswitch ; indirect jump to ReadPlayerMonCurHPAndStatus (3cd43 (f:4d43))
-    ld hl,UnnamedText_78dc ; $78dc
+    ld hl,.SuckedHealthText
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVEEFFECT] ; $cfd3
-    jr z,.asm_78d2
+    jr z,.next3
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-.asm_78d2
-    cp $8
-    jr nz,.asm_78d9
-    ld hl,UnnamedText_78e1 ; $78e1
-.asm_78d9
+.next3
+    cp DREAM_EATER_EFFECT
+    jr nz,.printText
+    ld hl,.DreamWasEatenText
+.printText
     jp PrintText
-
-UnnamedText_78dc: ; 78dc (1:78dc)
-    TX_FAR _UnnamedText_78dc
+.SuckedHealthText
+    TX_FAR _SuckedHealthText
+    db "@"
+.DreamWasEatenText
+    TX_FAR _DreamWasEatenText
     db "@"
 
-UnnamedText_78e1: ; 78e1 (1:78e1)
-    TX_FAR _UnnamedText_78e1
-    db "@"
+; Free
+
+SECTION "Func_78e6",ROMX[$78e6],BANK[$1]
 
 Func_78e6: ; 78e6 (1:78e6)
     ld hl,$d730
@@ -30954,7 +30959,7 @@ GetGenderOutOfBattle:
 SetDamageDuringRecoil:
     ld d,h
     ld e,l
-    ld hl,W_DAMAGE
+    ld hl,wBattleValueToPrint
     ld a,b
     ld [hli],a
     ld a,c
@@ -55992,10 +55997,6 @@ handleIfPlayerMoveMissed:
     ld a,[W_MOVEMISSED]
     and a
     jr z,getPlayerAnimationType
-;    ld a,[W_PLAYERMOVEEFFECT]
-;    sub EXPLODE_EFFECT
-;    jr z,playPlayerMoveAnimation ; don't play any animation if the move missed, unless it was EXPLODE_EFFECT
-;    jr playerCheckIfFlyOrChargeEffect ; 574B
     xor a
     jr playPlayerMoveAnimation
 
@@ -57499,22 +57500,20 @@ RunAmnesiaSideEffect:
     set 0,[hl]
     jp StatModifierDownEffect
 
-SECTION "HandleCounterMove",ROMX[$6093],BANK[$f]
-
 ; function to determine if Counter hits and if so,how much damage it does
-HandleCounterMove: ; 3e093 (f:6093)
+HandleCounterMove: ; Moved in the Bank
     ld a,[H_WHOSETURN] ; whose turn
     and a
 ; player's turn
     ld hl,wEnemySelectedMove
     ld bc,W_ENEMYMON_START
-;    ld de,W_ENEMYMOVEPOWER
+    ld de,W_ENEMYMOVEPOWER
     ld a,[wPlayerSelectedMove]
     jr z,.next
 ; enemy's turn
     ld hl,wPlayerSelectedMove
     ld bc,W_PLAYERMONID
-;    ld de,W_PLAYERMOVEPOWER
+    ld de,W_PLAYERMOVEPOWER
     ld a,[wEnemySelectedMove]
 .next
     cp a,COUNTER
@@ -57524,29 +57523,15 @@ HandleCounterMove: ; 3e093 (f:6093)
     ld a,[hl]
     cp a,COUNTER
     ret z ; if the target also used Counter,miss
-
-;    ld a,[de]
-;    and a
-;    ret z ; if the move the target used has 0 power,miss
-; check if the move the target used was Normal or Fighting type
-;    inc de
-;    ld a,[de]
-;    and a ; normal type
-;    jr z,.counterableType
-;    cp a,FIGHTING
-;    jr z,.counterableType
-; if the move wasn't Normal or Fighting type,miss
-;    xor a
-;    ret
-
+    ld a,[de]
+    and a
+    ret z ; if the move the target used has 0 power,miss
+    push bc ; Backup Target ID
     call TestPhysicalSpecial
+    pop de ; Restore Target ID
     jr nz,.specialAttackFail
-
-.counterableType
-    ld hl,W_DAMAGE
-    ld a,[hli]
-    or [hl]
-    ret z ; Counter misses if the target did no damage to the Counter user
+    call CheckCounterFail
+    ret z
 ; double the damage that the target did to the Counter user
     ld a,[hl]
     add a
@@ -57563,8 +57548,6 @@ HandleCounterMove: ; 3e093 (f:6093)
     xor a
     ld [W_MOVEMISSED],a
     call MoveHitTest ; do the normal move hit test in addition to Counter's special rules
-    xor a
-    ret
 .specialAttackFail
     xor a
     ret
@@ -57855,8 +57838,11 @@ AttackSubstitute: ; 3e25e (f:625e)
     jr z,.nullifyEffect
     ld hl,W_ENEMYMOVEEFFECT ; value for enemy's turn
 .nullifyEffect
+    call CheckNotNullifyEffectWithSubstitute
+    jr z,.skipNullify
     xor a
     ld [hl],a ; zero the effect of the attacker's move
+.skipNullify
     jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 .SubstituteBrokeText
     TX_FAR _SubstituteBrokeText
@@ -57864,11 +57850,6 @@ AttackSubstitute: ; 3e25e (f:625e)
 .SubstituteTookDamageText
     TX_FAR _SubstituteTookDamageText
     db "@"
-
-ResetPlayerBideAccumulatedDamage:
-    ld [W_NUMHITS],a ; $d074
-    ld [W_NUMHITS+1],a ; $d074
-    ret
 
 SECTION "HandleBuildingRage",ROMX[$62b6],BANK[$f]
 
@@ -58329,34 +58310,35 @@ LoadEnemyMonData_GetAlternateMonHeader:
     call Bankswitch
     jp GetMonHeader
 
-PlayBattleAnimationFromAnotherBank:
-   ld a,d
-   jp PlayBattleAnimation
-
-; Free
-
-SECTION "MoveHitTest",ROMX[$656b],BANK[$f]
-
 ; some tests that need to pass for a move to hit
-MoveHitTest: ; 3e56b (f:656b)
-; player's turn
+MoveHitTest: ; Moved in the Bank
     ld hl,W_ENEMYBATTSTATUS1
     ld de,W_PLAYERMOVEEFFECT
     ld bc,W_ENEMYMONSTATUS
     ld a,[H_WHOSETURN]
     and a
-    jr z,.dreamEaterCheck
+    jr z,.done
 ; enemy's turn
     ld hl,W_PLAYERBATTSTATUS1
     ld de,W_ENEMYMOVEEFFECT
     ld bc,W_PLAYERMONSTATUS
+.done
+    ld a,[de]
+    cp JUMP_KICK_EFFECT
+    jr nz,.dreamEaterCheck
+    push hl
+    ld hl,W_DAMAGE
+    ld a,[hli]
+    or [hl]
+    pop hl
+    jr z,.moveMissed2
 .dreamEaterCheck
     ld a,[de]
     cp a,DREAM_EATER_EFFECT
     jr nz,.swiftCheck
     ld a,[bc]
     and a,$07 ; is the target pokemon sleeping?
-    jp z,.moveMissed
+    jr z,.moveMissed2
 .swiftCheck
     ld a,[de]
     cp a,SWIFT_EFFECT
@@ -58366,12 +58348,12 @@ MoveHitTest: ; 3e56b (f:656b)
 ; this code is buggy. it's supposed to prevent HP draining moves from working on substitutes.
 ; since $7b79 overwrites a with either $00 or $01,it never works.
     cp a,DRAIN_HP_EFFECT ; $03
-    jp z,.moveMissed
+    jr z,.moveMissed2
     cp a,DREAM_EATER_EFFECT ; $08
-    jp z,.moveMissed
+    jr z,.moveMissed2
 .checkForDigOrFlyStatus
     bit 6,[hl]
-    jp nz,.moveMissed
+    jr nz,.moveMissed2
     ld a,[H_WHOSETURN]
     and a
     jr nz,.enemyTurn
@@ -58385,8 +58367,7 @@ MoveHitTest: ; 3e56b (f:656b)
     cp ATTACK_DOWN2_EFFECT
     jr c,.skipEnemyMistCheck
     cp REFLECT_EFFECT+1
-    jr c,.enemyMistCheck
-    jr .skipEnemyMistCheck
+    jr nc,.skipEnemyMistCheck
 .enemyMistCheck
 ; if move effect is from $12 to $19 inclusive or $3a to $41 inclusive
 ; i.e. the following moves
@@ -58397,12 +58378,14 @@ MoveHitTest: ; 3e56b (f:656b)
 ; XXX are there are any others like those three?
     ld a,[W_ENEMYBATTSTATUS2]
     bit 1,a ; PROTECTED_BY_MIST
-    jp nz,.moveMissed
+    jr nz,.moveMissed
 .skipEnemyMistCheck
     ld a,[W_PLAYERBATTSTATUS2]
     bit 0,a ; USING_X_ACCURACY ; is the player using X Accuracy?
     ret nz ; if so,always hit regardless of accuracy/evasion
     jr .calcHitChance
+.moveMissed2
+    jr .moveMissed
 .enemyTurn
     ld a,[W_ENEMYMOVEEFFECT]
     cp ATTACK_DOWN1_EFFECT
@@ -58418,7 +58401,7 @@ MoveHitTest: ; 3e56b (f:656b)
 ; similar to enemy mist check
     ld a,[W_PLAYERBATTSTATUS2]
     bit 1,a ; PROTECTED_BY_MIST
-    jp nz,.moveMissed
+    jr nz,.moveMissed
 .skipPlayerMistCheck
     ld a,[W_ENEMYBATTSTATUS2]
     bit 0,a ; USING_X_ACCURACY ; is the enemy using X Accuracy?
@@ -58457,6 +58440,8 @@ MoveHitTest: ; 3e56b (f:656b)
     ld hl,W_PLAYERBATTSTATUS1
     res 5,[hl] ; end multi-turn attack e.g. wrap
     ret
+
+SECTION "CalcHitChance",ROMX[$6624],BANK[$f]
 
 ; values for player turn
 CalcHitChance: ; 3e624 (f:6624)
@@ -58659,10 +58644,6 @@ handleIfEnemyMoveMissed:
     ld a,[W_MOVEMISSED] ; $d05f
     and a
     jr z,.moveDidNotMiss
-;    ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-;    cp EXPLODE_EFFECT
-;    jr z,handleExplosionMiss
-;    jr EnemyCheckIfFlyOrChargeEffect
     jr handleExplosionMiss
 .moveDidNotMiss
     call SwapPlayerAndEnemyLevels
@@ -59706,38 +59687,62 @@ GenRandomInBattle: ; 3ee9b (f:6e9b)
 HandleExplodingAnimation: ; 3eed3 (f:6ed3)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ld hl,W_ENEMYMONTYPE1 ; $cfea (aliases: W_ENEMYMONTYPES)
-    ld de,W_ENEMYBATTSTATUS1 ; $d067
+    ;ld hl,W_ENEMYMONTYPE1 ; $cfea (aliases: W_ENEMYMONTYPES)
+    ;ld de,W_ENEMYBATTSTATUS1 ; $d067
     ld a,[W_PLAYERMOVENUM] ; $cfd2
-    jr z,.asm_3eeea
-    ld hl,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES)
-    ld de,W_ENEMYBATTSTATUS1 ; $d067
+    jr z,.done
+    ;ld hl,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES)
+    ;ld de,W_ENEMYBATTSTATUS1 ; $d067
     ld a,[W_ENEMYMOVENUM] ; $cfcc
-.asm_3eeea
-    cp $78
-    jr z,.asm_3eef1
-    cp $99
+.done
+    cp SELFDESTRUCT
+    jr z,.explodeMove
+    cp EXPLOSION
     ret nz
-.asm_3eef1
-    ld a,[de]
-    bit 6,a
-    ret nz
-    ld a,[hli]
-    cp $8
-    ret z
-    ld a,[hl]
-    cp $8
-    ret z
-    ld a,[W_MOVEMISSED] ; $d05f
-    and a
-    ret nz
-    ld a,$5
+.explodeMove
+    ;ld a,[de]
+    ;bit 6,a
+    ;ret nz
+    ;ld a,[hli]
+    ;cp GHOST
+    ;ret z
+    ;ld a,[hl]
+    ;cp GHOST
+    ;ret z
+    ;ld a,[W_MOVEMISSED] ; $d05f
+    ;and a
+    ;ret nz
+    ld a,$5 ; MegaPunchAnim
     ld [$cc5b],a
+    ; fall through
 
-PlayMoveAnimation: ; 3ef07 (f:6f07)
+PlayMoveAnimation:
     ld [$D07C],a
     call Delay3
     PREDEF_JUMP MoveAnimationPredef ; predef 8
+
+CheckNotNullifyEffectWithSubstitute:
+    ld a,[hl]
+    cp HYPER_BEAM_EFFECT
+    ret z
+    cp EXPLODE_EFFECT
+    ret z
+    cp RECOIL_EFFECT
+    ret
+
+CheckCounterFail:
+    ld hl,_CheckCounterFail
+    ld b,BANK(_CheckCounterFail)
+    call Bankswitch
+    ld hl,W_DAMAGE+1
+    ret
+
+ResetPlayerBideAccumulatedDamage:
+    ld [W_NUMHITS],a ; $d074
+    ld [W_NUMHITS+1],a ; $d074
+    ret
+
+SECTION "InitBattle",ROMX[$6f12],BANK[$f]
 
 InitBattle: ; 3ef12 (f:6f12)
     call ResetBattleFlagAndLoadCurrentOpponent ; ld a,[W_CUROPPONENT] ; $d059
@@ -60291,9 +60296,9 @@ PoisonEffect: ; Moved in the Bank
 SECTION "DrainHPEffect",ROMX[$72e9],BANK[$f]
 
 DrainHPEffect: ; 3f2e9 (f:72e9)
-    ld hl,Func_783f
-    ld b,BANK(Func_783f)
-    jp Bankswitch ; indirect jump to Func_783f (783f (1:783f))
+    ld hl,DrainHPEffect_
+    ld b,BANK(DrainHPEffect_)
+    jp Bankswitch ; indirect jump to DrainHPEffect_ (783f (1:783f))
 
 ExplodeEffect: ; 3f2f1 (f:72f1)
     ld hl,W_ENEMYMONCURHP ; $cfe6
@@ -61324,7 +61329,9 @@ PrintAlreadyConfusedText:
     TX_FAR _AlreadyConfusedText
     db "@"
 
-; Free
+PlayBattleAnimationFromAnotherBank:
+   ld a,d
+   jp PlayBattleAnimation
 
 SECTION "ParalyzeEffect",ROMX[$79b1],BANK[$f]
 
@@ -61701,7 +61708,7 @@ SetDamageDirectToEnemy:
 
 SetDamageDuringPoisonBurnLeechSeed:
     push bc
-    ld hl,W_DAMAGE
+    ld hl,wBattleValueToPrint
     ld a,b
     ld [hli],a
     ld a,c
@@ -61710,7 +61717,6 @@ SetDamageDuringPoisonBurnLeechSeed:
     set 0,[hl]
     call CheckDamageToPlayer
     res 7,[hl] ; wFlagBattleCureBit7
-    call CopyDamage
     pop bc
     jp UpdateCurMonHPBar
 
@@ -61721,13 +61727,12 @@ SetDamageDuringRecoil_:
     set 0,[hl]
     call CheckDamageToPlayer
     res 7,[hl] ; wFlagBattleCureBit7
-    call CopyDamage
     pop hl
     ld a,$48
     jp Predef ; UpdateHPBar
 
 SetCureDirect:
-    ld hl,W_DAMAGE
+    ld hl,wBattleValueToPrint
     ld a,d
     ld [hli],a
     ld a,e
@@ -61736,7 +61741,7 @@ SetCureDirect:
     set 0,[hl]
     call CheckDamageToPlayer
     set 7,[hl] ; wFlagBattleCureBit7
-    jp CopyDamage
+    ret
 
 SetCureDuringLeechSeed:
     push bc
@@ -61744,7 +61749,6 @@ SetCureDuringLeechSeed:
     set 0,[hl]
     call CheckDamageToPlayer
     set 7,[hl] ; wFlagBattleCureBit7
-    call CopyDamage
     pop bc
     call UpdateCurMonHPBar
     jp RemoveBattleValueBankF
@@ -61755,7 +61759,6 @@ SetCureDuringAbsorb_:
     set 0,[hl]
     call CheckDamageToPlayer
     set 7,[hl] ; wFlagBattleCureBit7
-    call CopyDamage
     pop hl
     ld a,$48
     call Predef ; UpdateHPBar
@@ -124919,11 +124922,11 @@ _ShroudedInMistText: ; 94abf (25:4abf)
     db $0,$5a,"'s",$4f
     db "shrouded in mist!",$58
 
-_UnnamedText_78dc: ; 94ad5 (25:4ad5)
+_SuckedHealthText: ; 94ad5 (25:4ad5)
     db $0,"Sucked health from",$4f
     db $59,"!",$58
 
-_UnnamedText_78e1: ; 94aec (25:4aec)
+_DreamWasEatenText: ; 94aec (25:4aec)
     db $0,$59,"'s",$4f
     db "dream was eaten!",$58
 
@@ -136839,9 +136842,9 @@ CheckSpecialWild_:
     db BODY_SLAM
 ; DiglettsCave_Aerodactyl
     db WHIRLWIND
-    db ROCK_THROW
     db SWOOP
     db DOUBLE_TEAM
+    db ROCK_SLIDE
 ; PowerPlant_Voltorb
     db THUNDERSHOCK
     db SELFDESTRUCT
@@ -139184,6 +139187,34 @@ EnemyBideAccum_:
     ld a,[hl]
     adc b
     ld [hl],a
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+_CheckCounterFail:
+    ; Check Force MISS
+    ld hl,wUnusedC000
+    bit 7,[hl] ;check for Counter miss bit
+    res 7,[hl] ; resets the bit (does not affect flags)
+    jr nz,.Fail ; return if bit is set causing Counter to miss.
+    ; Check Target Ghost
+    ld h,d
+    ld l,e ; hl = Pointer to Mon ID
+    ld de,W_PLAYERMONTYPES-W_PLAYERMONID
+    add hl,de ; hl = Pointer to Type
+    ld a,[hli]
+    cp GHOST
+    ret z
+    ld a,[hl]
+    cp GHOST
+    ret z
+    ; Check Previous Damage
+    ld hl,W_DAMAGE
+    ld a,[hli]
+    or [hl] ; Counter misses if the target did no damage to the Counter user
+    ret
+.Fail
+    xor a ; set z flag
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
