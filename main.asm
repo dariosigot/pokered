@@ -24761,11 +24761,18 @@ ItemUseXStat: ; e104 (3:6104)
 ItemUsePokeflute: ; e140 (3:6140)
     ld a,[W_ISINBATTLE]
     cp 2
+.ItemUseNotTime
     jp z,ItemUseNotTime ; Trainer Battle
 
     ; Init Context
     and a
     jr nz,.BattleContext
+
+    ; Check Surfing
+    ld a,[$d700]
+    cp a,2 ; Surfing?
+    jr z,.ItemUseNotTime
+
     call ItemUseReloadOverworldData
     jr .ContextDone
 .BattleContext
