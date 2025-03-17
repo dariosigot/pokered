@@ -131949,7 +131949,7 @@ CharizardMPicFront:
 CharizardMPicBack:
     INCBIN "pic/other/BackSpriteCharizardM.pic"
 MissingNoPicFront:
-    INCBIN "pic/other/FrontSpriteMissingNo.pic"
+    INCBIN "pic/other/FrontSpriteMissingNo.bin"
 MissingNoPicBack:
     INCBIN "pic/other/BackSpriteMissingNo.pic"
 
