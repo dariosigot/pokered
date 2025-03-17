@@ -44577,14 +44577,47 @@ DecreaseFossilStep:
     ld a,c
     ld [wFossilSteps+1],a ; $d70e
 .Skip
+    call .HandleEnergySteps
     ld a,[$d790]
     bit 7,a ; in the safari zone?
     ret z ; notSafariZone
     ld a,[wSafariSteps] ; $d70d
     jp ContinueSafariSteps
 
+.HandleEnergySteps
+    ld a,[wEnergySteps]
+    ld b,a
+    dec a
+    and %00001111
+    push af
+    ld c,a
+    ld a,b
+    and %11110000
+    or c
+    ld [wEnergySteps],a
+    pop af
+    ret nz
+    ; RestorePartyEnergy
+    ld a,[W_NUMINPARTY]
+    ld d,a
+    ld e,0
+.loop
+    ld hl,W_PARTYMON1_MOVE1PP
+    ld bc,44
+    ld a,e
+    call AddNTimes ; hl now points to move's PP
+    ld a,[hl] ; Read Energy
+    inc a
+    jr z,.JustMax
+    ld [hl],a
+.JustMax
+    inc e
+    dec d
+    jr nz,.loop
+    ret
+
 ; Viridian
-ViridianMartText6: ; 2442 (0:2442)
+ViridianMartText6:
     db $FE,4,POKE_BALL
     db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
 
