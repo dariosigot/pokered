@@ -1102,8 +1102,8 @@ PinsirTMCompatibility:
     tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 26,27,28,34             ; |EARTHQUAKE|FISSURE|TRAPHOLE|BIDE|
+    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
+    tmlearn 34                      ; |BIDE|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
     tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
 ; ──────────────────────────────────────────────────────────────────────

@@ -1540,9 +1540,10 @@ W_FOSSILMON: ; d710
 wFossilSteps: ; d711
     ds 2
 
-NewUnused: ; d713
+wEnergySteps: ; d713
     ds 1
 
+wNewUnused: ; d714
     ds 1
 
 W_RIVALSTARTER: ; d715

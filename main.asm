@@ -24761,11 +24761,18 @@ ItemUseXStat: ; e104 (3:6104)
 ItemUsePokeflute: ; e140 (3:6140)
     ld a,[W_ISINBATTLE]
     cp 2
+.ItemUseNotTime
     jp z,ItemUseNotTime ; Trainer Battle
 
     ; Init Context
     and a
     jr nz,.BattleContext
+
+    ; Check Surfing
+    ld a,[$d700]
+    cp a,2 ; Surfing?
+    jr z,.ItemUseNotTime
+
     call ItemUseReloadOverworldData
     jr .ContextDone
 .BattleContext
@@ -44577,14 +44584,47 @@ DecreaseFossilStep:
     ld a,c
     ld [wFossilSteps+1],a ; $d70e
 .Skip
+    call .HandleEnergySteps
     ld a,[$d790]
     bit 7,a ; in the safari zone?
     ret z ; notSafariZone
     ld a,[wSafariSteps] ; $d70d
     jp ContinueSafariSteps
 
+.HandleEnergySteps
+    ld a,[wEnergySteps]
+    ld b,a
+    dec a
+    and %00001111
+    push af
+    ld c,a
+    ld a,b
+    and %11110000
+    or c
+    ld [wEnergySteps],a
+    pop af
+    ret nz
+    ; RestorePartyEnergy
+    ld a,[W_NUMINPARTY]
+    ld d,a
+    ld e,0
+.loop
+    ld hl,W_PARTYMON1_MOVE1PP
+    ld bc,44
+    ld a,e
+    call AddNTimes ; hl now points to move's PP
+    ld a,[hl] ; Read Energy
+    inc a
+    jr z,.JustMax
+    ld [hl],a
+.JustMax
+    inc e
+    dec d
+    jr nz,.loop
+    ret
+
 ; Viridian
-ViridianMartText6: ; 2442 (0:2442)
+ViridianMartText6:
     db $FE,4,POKE_BALL
     db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
 
@@ -123431,13 +123471,7 @@ _Route15EndBattleText1: ; 90c6e (24:4c6e)
     db $0,"Not",$4f
     db "good enough!",$58
 
-_Route15AfterBattleText1: ; 90c80 (24:4c80)
-    db $0,"You can't change",$4f
-    db "the nickname of",$55
-    db "any #MON you",$55
-    db "get in a trade.",$51
-    db "Only the Original",$4f
-    db "Trainer can.",$57
+SECTION "_Route15BattleText2",ROMX[$4cdd],BANK[$24]
 
 _Route15BattleText2: ; 90cdd (24:4cdd)
     db $0,"You look gentle,",$4f
@@ -124437,6 +124471,15 @@ _SafariZoneLaprasRunAway:
     db "the lake.",$51
     db "He won't have",$4f
     db "gone far!",$57
+
+_Route15AfterBattleText1:
+    db $0,"You can change",$4f
+    db "the nickname of",$55
+    db "any #MON you",$55
+    db "get in a trade.",$51
+    db "Even if you aren't",$4f
+    db "the Original",$55
+    db "Trainer.",$57
 
 SECTION "bank25",ROMX,BANK[$25]
 
@@ -131949,7 +131992,7 @@ CharizardMPicFront:
 CharizardMPicBack:
     INCBIN "pic/other/BackSpriteCharizardM.pic"
 MissingNoPicFront:
-    INCBIN "pic/other/FrontSpriteMissingNo.pic"
+    INCBIN "pic/other/FrontSpriteMissingNo.bin"
 MissingNoPicBack:
     INCBIN "pic/other/BackSpriteMissingNo.pic"
 
