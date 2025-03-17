@@ -123471,13 +123471,7 @@ _Route15EndBattleText1: ; 90c6e (24:4c6e)
     db $0,"Not",$4f
     db "good enough!",$58
 
-_Route15AfterBattleText1: ; 90c80 (24:4c80)
-    db $0,"You can't change",$4f
-    db "the nickname of",$55
-    db "any #MON you",$55
-    db "get in a trade.",$51
-    db "Only the Original",$4f
-    db "Trainer can.",$57
+SECTION "_Route15BattleText2",ROMX[$4cdd],BANK[$24]
 
 _Route15BattleText2: ; 90cdd (24:4cdd)
     db $0,"You look gentle,",$4f
@@ -124477,6 +124471,15 @@ _SafariZoneLaprasRunAway:
     db "the lake.",$51
     db "He won't have",$4f
     db "gone far!",$57
+
+_Route15AfterBattleText1:
+    db $0,"You can change",$4f
+    db "the nickname of",$55
+    db "any #MON you",$55
+    db "get in a trade.",$51
+    db "Even if you aren't",$4f
+    db "the Original",$55
+    db "Trainer.",$57
 
 SECTION "bank25",ROMX,BANK[$25]
 
