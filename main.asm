@@ -34,10 +34,6 @@ HackForCloseText:
     ld a,[$d4e1] ; number of sprites
     jp ReturnInDisplayTextIDHack
 
-GbPalComplete:
-    ld a,%11100100
-    jp GBPalCommon
-
 ResetTempIV:
     push hl
     push af
@@ -495,6 +491,13 @@ RestoreHeader:
     ld de,W_MONHEADER
     ld bc,28
     jp CopyData
+
+GbPalComplete:
+    ld a,[wRunningOnSGB]
+    and a
+    jp z,GBPalNormal
+    ld a,%11100100
+    jp GBPalCommon
 
 ; Free
 
@@ -3157,7 +3160,7 @@ HandlePartyMenuInput: ; 145a (0:145a)
     jr HandlePartyMenuInput
 
 DrawPartyMenu: ; 14d4 (0:14d4)
-    ld hl,$6cd2
+    ld hl,DrawPartyMenu_
     jr DrawPartyMenuCommon
 
 RedrawPartyMenu: ; 14d9 (0:14d9)
@@ -10238,7 +10241,7 @@ GBPalWhiteOut: ; 3de5 (0:3de5)
 GoPAL_SET_CF1C: ; 3ded (0:3ded)
     ld b,$ff
 GoPAL_SET: ; 3def (0:3def)
-    ld a,[$cf1b]
+    ld a,[wRunningOnSGB]
     and a
     ret z
     ld a,$45
@@ -62889,6 +62892,14 @@ IsPokemonBitSet:
     and a
     ret
 
+HandleColorlessGameBoyOrGoPAL_SET:
+    ld a,[wRunningOnSGB]
+    and a
+    jp nz,GoPAL_SET
+    ld a,[$cf91]
+    ld [$d0b5],a
+    jp GetMonHeader
+
 SECTION "ShowPokedexData",ROMX[$42d1],BANK[$10]
 
 ; function to display pokedex data from outside the pokedex
@@ -62912,7 +62923,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld [$cf91],a
     push af
     ld b,04
-    call GoPAL_SET
+    call HandleColorlessGameBoyOrGoPAL_SET ; call GoPAL_SET
     pop af
     ld [$d11e],a
     ld a,[$ffd7]
@@ -64384,7 +64395,7 @@ Func_411a1: ; 411a1 (10:51a1)
     ld [$cfcb],a
     ld hl,$d730
     set 6,[hl]
-    ld a,[$cf1b]
+    ld a,[wRunningOnSGB]
     and a
     ld a,$e4
     jr z,.asm_411e5
@@ -97443,7 +97454,7 @@ Func_70278: ; 70278 (1c:4278)
     call Func_7036d
     ld d,$a0
     ld e,$4
-    ld a,[$cf1b]
+    ld a,[wRunningOnSGB]
     and a
     jr z,.asm_702c7
     sla e
@@ -109588,7 +109599,7 @@ CallWithTurnFlipped: ; 79155 (1e:5155)
 AnimationFlashScreenLong: ; 79165 (1e:5165)
     ld a,3 ; cycle through the palettes 3 times
     ld [$D08A],a
-    ld a,[$cf1b] ; running on SGB?
+    ld a,[wRunningOnSGB] ; running on SGB?
     and a
     ld hl,FlashScreenLongMonochrome
     jr z,.loop
@@ -109708,7 +109719,7 @@ Func_791f9: ; 791f9 (1e:51f9)
     ld bc,$4040
 
 Func_791fc: ; 791fc (1e:51fc)
-    ld a,[$cf1b]
+    ld a,[wRunningOnSGB]
     and a
     ld a,b
     jr z,.asm_79204
@@ -137179,7 +137190,9 @@ StatusScreen:
     xor a
     ld [$ff00+$d7],a
     call LoadStatusScreenGenericTile ; Load Generic Tile
-    call LoadFontTilePatternsWithWall ; Load Custom Tile
+    ld a,[wRunningOnSGB]
+    and a
+    call nz,LoadFontTilePatternsWithWall ; Load Custom Tile
 
 ; STATUSSCREEN 1
     jr .skipOnlyFirstTime
