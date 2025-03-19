@@ -2871,7 +2871,7 @@ TentacruelBaseStats:
     dw PAL_TENTACRUEL
 
     ; field moves
-    db FM_CUT+FM_FLOAT+FM_FLASH
+    db FM_CUT+FM_FLOAT+FM_LIGHT
 
     ds 2
 
