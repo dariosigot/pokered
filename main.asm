@@ -53304,7 +53304,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     jp z,HandlePlayerMonFainted
 .AIActionUsedEnemyFirst
     call HandlePoisonBurnLeechSeed
-    jp z,HandleEnemyMonFainted
+    jr z,.HandleEnemyMonFainted
     call DrawHUDsAndHPBars
     call ExecutePlayerMove ; execute player move
     ld a,[$d078] ; was Teleport, Road, or Whirlwind used to escape from battle?
@@ -53312,7 +53312,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     ret nz
     ld a,b
     and a
-    jp z,HandleEnemyMonFainted
+    jr z,.HandleEnemyMonFainted
     call HandlePoisonBurnLeechSeed
     jp z,HandlePlayerMonFainted
     call DrawHUDsAndHPBars
@@ -53330,7 +53330,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     push af
     call z,CheckandResetEnemyActedBit ;reset enemy acted bit if enemy pkmn fainted
     pop af
-    jp z,HandleEnemyMonFainted
+    jr z,.HandleEnemyMonFainted
     call HandlePoisonBurnLeechSeed
     jp z,HandlePlayerMonFainted
     call DrawHUDsAndHPBars
@@ -53352,10 +53352,17 @@ MainInBattleLoop: ; 3c233 (f:4233)
     jp z,HandlePlayerMonFainted
 .AIActionUsedPlayerFirst
     call HandlePoisonBurnLeechSeed
-    jp z,HandleEnemyMonFainted
+    jr z,.HandleEnemyMonFainted
     call DrawHUDsAndHPBars
     call CheckNumAttacksLeft
     jp MainInBattleLoop
+.HandleEnemyMonFainted
+    jp HandleEnemyMonFainted
+
+RunAmnesiaSideEffect:
+    ld hl,wFlagAmnesiaSideEffectBit0
+    set 0,[hl]
+    jp StatModifierDownEffect
 
 SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
 
@@ -54878,23 +54885,19 @@ GetBattleHealthBarColor: ; Moved in the Bank
     ld b,$1
     jp GoPAL_SET
 
-FixItSelfDamage:
-    ld [$d05e],a
-    push hl
-    call GetSelectedMovePointer
-    ld [hl],SCRATCH
-    pop hl
-    ret
-
 GetSelectedMovePointer:
     ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
     ld bc,W_PLAYERMONID
+    ld de,W_PLAYERMONPP+1 ; move2pp
     ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
     and a
     ret z
     inc hl
-    ld bc,W_ENEMYMONID
+    ld bc,W_ENEMYMON_START
+    ld de,W_ENEMYMONPP+1 ; move2pp
     ret
+
+; Free
 
 SECTION "InitBattleMenu",ROMX[$4eb3],BANK[$f]
 
@@ -57008,14 +57011,12 @@ AlignIndexMenu:
     ld [wPlayerMoveListIndex],a ; $cc2e
     jp MoveSelectionMenu
 
-WaitButtonPressed:
-    ld b,BANK(WaitButtonPressed_)
-    ld hl,WaitButtonPressed_
-    jp Bankswitch
-
 TestPhysicalSpecialBattle:
+    push de
     call GetSelectedMovePointer
-    jp TestPhysicalSpecial
+    call TestPhysicalSpecial
+    pop de
+    ret
 
 ChooseRandomMove:
     call GenRandomInBattle ; get random
@@ -57040,6 +57041,8 @@ ChooseRandomMove:
     ld a,[hl]
     and a
     ret
+
+; Free
 
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
@@ -57555,11 +57558,6 @@ ResetBattleFlagAndLoadCurrentOpponent:
     ld a,[W_CUROPPONENT] ; $d059
     ret
 
-RunAmnesiaSideEffect:
-    ld hl,wFlagAmnesiaSideEffectBit0
-    set 0,[hl]
-    jp StatModifierDownEffect
-
 ; function to determine if Counter hits and if so,how much damage it does
 HandleCounterMove: ; Moved in the Bank
     ld a,[H_WHOSETURN] ; whose turn
@@ -57587,6 +57585,10 @@ HandleCounterMove: ; Moved in the Bank
     and a
     ret z ; if the move the target used has 0 power,miss
     push bc ; Backup Target ID
+    ld hl,(W_PLAYERMONPP+1)-W_PLAYERMONID
+    add hl,bc
+    ld d,h
+    ld e,l ; de point to move2pp
     call TestPhysicalSpecial
     pop de ; Restore Target ID
     jr nz,.specialAttackFail
@@ -57611,8 +57613,6 @@ HandleCounterMove: ; Moved in the Bank
 .specialAttackFail
     xor a
     ret
-
-; Free
 
 SECTION "ApplyAttackToEnemyPokemon",ROMX[$60df],BANK[$f]
 
@@ -59111,11 +59111,7 @@ asm_3e9f6: ; 3e9f6 (f:69f6)
     jp nz,Func_3eab8
     jp Func_3eab8
 
-; Free : Following functions is part of the previous
-
-SECTION "Func_3ea9b",ROMX[$6a9b],BANK[$f]
-
-Func_3ea9b: ; 3ea9b (f:6a9b)
+Func_3ea9b:
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
     bit 6,a
     jp z,Func_3eaba
@@ -59128,14 +59124,28 @@ Func_3ea9b: ; 3ea9b (f:6a9b)
     ld hl,EnemyCanExecuteMove ; $672b
     jp Func_3eab8
 
-Func_3eab8: ; 3eab8 (f:6ab8)
+Func_3eab8:
     xor a
     ret
 
-Func_3eaba: ; 3eaba (f:6aba)
+Func_3eaba:
     ld a,$1
     and a
     ret
+
+FixItSelfDamage:
+    ld [$d05e],a
+    push hl
+    push de
+    call GetSelectedMovePointer
+    ld [hl],SCRATCH
+    pop de
+    pop hl
+    ret
+
+; Free
+
+SECTION "GetCurrentMove",ROMX[$6abe],BANK[$f]
 
 GetCurrentMove: ; 3eabe (f:6abe)
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -59663,8 +59673,6 @@ MoveHitTestPlus:
     ld a,[W_MOVEMISSED]
     and a
     ret
-
-; Free
 
 SECTION "LoadHudAndHpBarAndStatusTilePatterns",ROMX[$6e58],BANK[$f]
 
@@ -61134,14 +61142,20 @@ PrintIsUnaffectedText:
 MistEffect: ; Moved in the Bank
     ld hl,MistEffect_
     ld b,BANK(MistEffect_)
-    jp Bankswitch
+    jr BankswitchFronBankF
 
 FocusEnergyEffect: ; Moved in the Bank
     ld hl,FocusEnergyEffect_
     ld b,BANK(FocusEnergyEffect_)
-    jp Bankswitch
+    jr BankswitchFronBankF
 
-; Free
+WaitButtonPressed:
+    ld b,BANK(WaitButtonPressed_)
+    ld hl,WaitButtonPressed_
+    ; fall through
+
+BankswitchFronBankF:
+    jp Bankswitch
 
 SECTION "TwoToFiveAttacksEffect",ROMX[$7811],BANK[$f]
 
@@ -136734,6 +136748,7 @@ PrintMoveDetailsBox:
     dec a
     jr z,.PhiSpcDone
     push hl
+    call .GetAlternateForm
     ld hl,W_PLAYERMOVENUM
     ld bc,$cf91
     call TestPhysicalSpecial
@@ -136761,6 +136776,15 @@ PrintMoveDetailsBox:
     ld b,%00000001
     ld c,3
     jp PrintNumber
+
+.GetAlternateForm
+    ld a,[wWhichPokemon]
+    ld hl,W_PARTYMON1_MOVE2PP ; move2pp
+    ld bc,44
+    call AddNTimes
+    ld d,h
+    ld e,l
+    ret
 
 .AccrText
     db "ACR",$D3,"   ",$D9,"@"
@@ -137116,10 +137140,10 @@ DecrementEnemyPP_:
 
 ; input hl = pointer to move id
 ; input bc = pointer to mon id
+; input de = pointer to alternate form
 ; output b = table byte with mask, need to test zero
 TestPhysicalSpecial_:
     call Load16BitRegisters
-    push de
     ld a,[hl] ; carico in a l'id dell'attacco
     cp HYPER_BEAM
     jr z,.hyperbeam
@@ -137143,13 +137167,14 @@ TestPhysicalSpecial_:
     ld a,[hl] ; leggo il byte corretto
     and b ; applico la maschera per isolare il bit corretto,il bit viene così testato
 .end
-    pop de
     ld b,a
     ret
 .hyperbeam
     ld a,[bc]
     ld [$D0B5],a
-    call GetMonHeader ; TODO:HandleAlternateFormIndex
+    ld a,[de]
+    ld [wAlternateFormIndex],a
+    call GetMonHeader
     ld a,[W_MONHBASESPECIAL]
     ld b,a
     ld a,[W_MONHBASEATTACK] ; b = special | a = attack
@@ -137807,6 +137832,7 @@ HandleStatusScreen2:
     call PrintNumber
     ; Print Phi/Spc Symbols
     push hl
+    call .GetAlternateForm
     ld hl,W_PLAYERMOVENUM
     ld bc,$cf91
     call TestPhysicalSpecial
@@ -137842,6 +137868,15 @@ HandleStatusScreen2:
     pop de
     pop bc
     pop af
+    ret
+
+.GetAlternateForm
+    ld a,[wWhichPokemon]
+    ld hl,W_PARTYMON1_MOVE2PP ; move2pp
+    ld bc,44
+    call AddNTimes
+    ld d,h
+    ld e,l
     ret
 
 .MovesText
