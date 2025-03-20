@@ -2832,7 +2832,7 @@ TentacoolBaseStats:
     dw PAL_TENTACOOL
 
     ; field moves
-    db FM_FLOAT
+    db FM_FLOAT+FM_LIGHT
 
     ds 2
 
@@ -2871,7 +2871,7 @@ TentacruelBaseStats:
     dw PAL_TENTACRUEL
 
     ; field moves
-    db FM_CUT+FM_FLOAT
+    db FM_CUT+FM_FLOAT+FM_LIGHT
 
     ds 2
 
@@ -5133,7 +5133,7 @@ LaprasBaseStats:
     dw PAL_LAPRAS
 
     ; field moves
-    db FM_FLOAT
+    db FM_FLOAT+FM_STRENGTH
 
     ds 2
 
@@ -5796,7 +5796,7 @@ DragonairBaseStats:
     dw PAL_DRAGONAIR
 
     ; field moves
-    db FM_FLOAT+FM_DIG
+    db FM_FLY+FM_FLOAT+FM_DIG
 
     ds 2
 
