@@ -438,12 +438,29 @@ GoodCopyVideoDataDouble:
     pop de
     jp FarCopyDataDouble ; if LCD is off,transfer all at once
 
-FieldMovePlayCry:
+PlayCryAndDecreaseFieldMoveEnergy:
+    call CheckAndDecreaseFieldMoveEnergy
     ld a,[wFieldMoveMonID]
     call GetCryData ; get cry data
     call PlaySound ; play sound
     xor a
     ld [wFieldMoveMonID],a
+    ret
+
+CheckFieldMoveEnergy:
+    ld a,[wWhichPokemon]
+    ld hl,W_PARTYMON1_MOVE1PP
+    ld bc,44
+    call AddNTimes
+    ld a,[hl]
+    sub 10
+    ret
+
+CheckAndDecreaseFieldMoveEnergy:
+    call CheckFieldMoveEnergy
+    jr c,.noEnergy
+    ld [hl],a ; New Energy Value
+.noEnergy
     ret
 
 ; copies the tile patterns for letters and numbers into VRAM
@@ -23996,6 +24013,7 @@ ItemUseMedicine: ; Moved in the Bank
     and a ; using Softboiled?
     jp z,.notUsingSoftboiled2
 ; if using softboiled
+    call PlayCryAndDecreaseFieldMoveEnergy
     ld hl,wHPBarMaxHP
     ld a,[hli]
     push af
@@ -24475,8 +24493,6 @@ HandleBackupAfterBallCatch:
     ld a,[W_ENEMYMONPP]   ; Backup Current Energy
     ld [wBackupEnemyPP],a ; ...
     ret
-
-; Free
 
 SECTION "ItemUseBait",ROMX[$5f52],BANK[$3]
 
@@ -25155,12 +25171,12 @@ UsingDigCry:
     and a
     ret z
     push af
-    call FieldMovePlayCry
+    call PlayCryAndDecreaseFieldMoveEnergy
     pop af
     ret
 
 SurfingCry:
-    call FieldMovePlayCry
+    call PlayCryAndDecreaseFieldMoveEnergy
     ld hl,SurfingGotOnText
     ret
 
@@ -28574,7 +28590,7 @@ ItemUsePokedoll:
 UsedStrengthText: ; Moved in the Bank
     TX_FAR _UsedStrengthText
     db $08 ; asm
-    call FieldMovePlayCry
+    call PlayCryAndDecreaseFieldMoveEnergy
     call WaitForSoundToFinish
     call Delay3
     jp TextScriptEnd
@@ -29708,6 +29724,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[wNumFieldMoves]
     and a
     jr z,.NoFieldMoves
+    call CheckFieldMoveEnergy
+    jr c,.NoFieldMoves
     ld a,4 ; FieldMovesMenu
     ld [$d125],a
     call DisplayTextBoxID ; display pokemon field moves
@@ -29762,7 +29780,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[$d732]
     bit 3,a ; did the player decide to fly?
     jr z,.undoFly
-    call FieldMovePlayCry
+    call PlayCryAndDecreaseFieldMoveEnergy
     jp .goBackToMap
 .undoFly
     call LoadFontTilePatterns
@@ -29775,7 +29793,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld b,BANK(CheckCutTile)
     ld hl,CheckCutTile
     call Bankswitch
-    call z,FieldMovePlayCry
+    call z,PlayCryAndDecreaseFieldMoveEnergy
     ld a,$3c
     call Predef ; UsedCut
     ld a,[$cd6a]
@@ -29811,7 +29829,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .flash
     bit 0,a ; does the player have the Boulder Badge?
     call CheckFirePower ; jp z,.newBadgeRequired
-    call FieldMovePlayCry
+    call PlayCryAndDecreaseFieldMoveEnergy
     xor a
     ld [$d35d],a
     ld hl,.flashLightsAreaText
@@ -29839,7 +29857,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call PrintText
     jp .loop
 .canTeleport
-    call FieldMovePlayCry
+    call PlayCryAndDecreaseFieldMoveEnergy
     ld hl,.warpToLastPokemonCenterText
     call PrintText
     ld hl,$d732
@@ -29884,7 +29902,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[H_QUOTIENT + 2]
     sbc b
     jp nc,.notHealthyEnough
-    call FieldMovePlayCry
     ld a,[$cc2b]
     push af
     ld a,POTION
@@ -29905,20 +29922,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call RestoreScreenTilesAndReloadTilePatterns
     jp CloseTextDisplay
 
-SECTION "ErasePartyMenuCursors",ROMX[$72ed],BANK[$4]
-
-; writes a blank tile to all possible menu cursor positions on the party menu
-ErasePartyMenuCursors: ; 132ed (4:72ed)
-    FuncCoord 0,1
-    ld hl,Coord
-    ld bc,2 * 20 ; menu cursor positions are 2 rows apart
-    ld a,6 ; 6 menu cursor positions
-.loop
-    ld [hl]," "
-    add hl,bc
-    dec a
-    jr nz,.loop
-    ret
+SECTION "ItemMenuLoop",ROMX[$72fc],BANK[$4]
 
 ItemMenuLoop: ; 132fc (4:72fc)
     call LoadScreenTilesFromBuffer2DisableBGTransfer ; restore saved screen
@@ -32016,6 +32020,19 @@ DisplayPartyRenameScreen:
     ld hl,$cee9
     ld bc,$b
     jp CopyData
+
+; writes a blank tile to all possible menu cursor positions on the party menu
+ErasePartyMenuCursors: ; Moved in the Bank
+    FuncCoord 0,1
+    ld hl,Coord
+    ld bc,2 * 20 ; menu cursor positions are 2 rows apart
+    ld a,6 ; 6 menu cursor positions
+.loop
+    ld [hl]," "
+    add hl,bc
+    dec a
+    jr nz,.loop
+    ret
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -131978,6 +131995,8 @@ SearchFieldMoveInParty:
     xor a ; rcf
     ret
 .found
+    call .CheckAndDecreaseFieldMoveEnergy
+    jr c,.NextMon
     scf
     ret
 .GetMonFieldMoves
@@ -131987,6 +132006,13 @@ SearchFieldMoveInParty:
     ld hl,GetMonFieldMoves
     call Bankswitch
     pop de
+    pop bc
+    ret
+.CheckAndDecreaseFieldMoveEnergy
+    push bc
+    ld hl,CheckAndDecreaseFieldMoveEnergy
+    ld b,BANK(CheckAndDecreaseFieldMoveEnergy)
+    call Bankswitch
     pop bc
     ret
 
