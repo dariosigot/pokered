@@ -1352,6 +1352,7 @@ TENTACOOL_Learnset: MACRO
     db 18,POISONPOWDER
     db 20,BIND
     db 22,WATER_GUN
+    db 21,FLASH
     db 24,ABSORB
     db 26,GLARE
     db 28,BUBBLEBEAM

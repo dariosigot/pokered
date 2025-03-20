@@ -608,7 +608,7 @@ TentacoolTMCompatibility:
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
     tmlearn 44                      ; |REST|
-    tmlearn 50,51,53                ; |SUBSTITUTE|BLADE|TSUNAMI|
+    tmlearn 50,51,53,55             ; |SUBSTITUTE|BLADE|TSUNAMI|FLASH|
 TentacruelTMCompatibility:
     tmlearn 03,06                   ; |SWORDS_DANCE|TOXIC|
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
@@ -616,7 +616,7 @@ TentacruelTMCompatibility:
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
     tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
-    tmlearn 50,51,53                ; |SUBSTITUTE|BLADE|TSUNAMI|
+    tmlearn 50,51,53,55             ; |SUBSTITUTE|BLADE|TSUNAMI|FLASH|
 ; ──────────────────────────────────────────────────────────────────────
 GeodudeTMCompatibility:
     tmlearn 01,08                   ; |MEGA_PUNCH|BODY_SLAM|

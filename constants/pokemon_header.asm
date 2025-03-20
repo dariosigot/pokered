@@ -141,7 +141,7 @@ VenusaurBaseStats:
     dw PAL_VENUSAUR
 
     ; field moves
-    db FM_CUT+FM_STRENGTH
+    db FM_CUT+FM_STRENGTH+FM_HEAL
 
     ds 2
 
@@ -1779,7 +1779,7 @@ VileplumeBaseStats:
     dw PAL_VILEPLUME
 
     ; field moves
-    db FM_CUT
+    db FM_CUT+FM_HEAL
 
     ds 2
 
@@ -1857,7 +1857,7 @@ ParasectBaseStats:
     dw PAL_PARASECT
 
     ; field moves
-    db FM_CUT+FM_DIG
+    db FM_CUT+FM_DIG+FM_HEAL
 
     ds 2
 
@@ -2793,7 +2793,7 @@ VictreebelBaseStats:
     dw PAL_VICTREEBEL
 
     ; field moves
-    db FM_CUT
+    db FM_CUT+FM_HEAL
 
     ds 2
 
@@ -2832,7 +2832,7 @@ TentacoolBaseStats:
     dw PAL_TENTACOOL
 
     ; field moves
-    db FM_FLOAT
+    db FM_FLOAT+FM_LIGHT
 
     ds 2
 
@@ -2871,7 +2871,7 @@ TentacruelBaseStats:
     dw PAL_TENTACRUEL
 
     ; field moves
-    db FM_CUT+FM_FLOAT
+    db FM_CUT+FM_FLOAT+FM_LIGHT
 
     ds 2
 
@@ -4002,7 +4002,7 @@ ExeggcuteBaseStats:
     dw PAL_EXEGGCUTE
 
     ; field moves
-    db FM_TELEPORT
+    db FM_TELEPORT+FM_HEAL
 
     ds 2
 
@@ -4041,7 +4041,7 @@ ExeggutorBaseStats:
     dw PAL_EXEGGUTOR
 
     ; field moves
-    db FM_TELEPORT
+    db FM_TELEPORT+FM_HEAL
 
     ds 2
 
@@ -5133,7 +5133,7 @@ LaprasBaseStats:
     dw PAL_LAPRAS
 
     ; field moves
-    db FM_FLOAT
+    db FM_FLOAT+FM_STRENGTH
 
     ds 2
 
@@ -5796,7 +5796,7 @@ DragonairBaseStats:
     dw PAL_DRAGONAIR
 
     ; field moves
-    db FM_FLOAT+FM_DIG
+    db FM_FLY+FM_FLOAT+FM_DIG
 
     ds 2
 
