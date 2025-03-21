@@ -492,7 +492,7 @@ ButterfreeBaseStats:
     dw PAL_BUTTERFREE
 
     ; field moves
-    db FM_FLY+FM_TELEPORT
+    db FM_FLY+FM_TELEPORT+FM_HEAL
 
     ds 2
 
@@ -1935,7 +1935,7 @@ VenomothBaseStats:
     dw PAL_VENOMOTH
 
     ; field moves
-    db FM_FLY+FM_TELEPORT
+    db FM_FLY+FM_TELEPORT+FM_HEAL
 
     ds 2
 
