@@ -70,7 +70,7 @@ ElectrodeHisuiBaseStats:
     dw PAL_ELECTRODE_HUSUI
 
     ; field moves
-    db FM_LIGHT+FM_TELEPORT
+    db FM_LIGHT+FM_TELEPORT+FM_HEAL
 
     ds 2
 
@@ -304,7 +304,7 @@ VenusaurStarterBaseStats:
     dw PAL_VENUSAUR
 
     ; field moves
-    db FM_CUT+FM_STRENGTH
+    db FM_CUT+FM_STRENGTH+FM_HEAL
 
     ds 2
 
