@@ -137011,36 +137011,36 @@ LoadSpecialTrainerMoves:
     pop hl
     ld bc,4
     call CopyData ; copy bc bytes of data from hl to de
-    call .WritePP
+;    call .WritePP
     pop bc
     inc b
     jr .writeAdditionalMoveDataLoop
 .FinishUp
     ret
-.WritePP
-    push hl
-    call .HLToMove
-    call .DEToPP
-    ld a,$5e
-    call Predef ; indirect jump to ResetMovePPs (f473 (3:7473))
-    pop hl
-    ret
-.HLToMove
-    ld h,d
-    ld l,e
-    ld bc,-4
-    add hl,bc
-    ret
-.DEToPP
-    push hl
-    ld h,d
-    ld l,e
-    ld de,16
-    add hl,de
-    ld d,h
-    ld e,l
-    pop hl
-    ret
+;.WritePP
+;    push hl
+;    call .HLToMove
+;    call .DEToPP
+;    ld a,$5e
+;    call Predef ; indirect jump to ResetMovePPs (f473 (3:7473))
+;    pop hl
+;    ret
+;.HLToMove
+;    ld h,d
+;    ld l,e
+;    ld bc,-4
+;    add hl,bc
+;    ret
+;.DEToPP
+;    push hl
+;    ld h,d
+;    ld l,e
+;    ld de,16
+;    add hl,de
+;    ld d,h
+;    ld e,l
+;    pop hl
+;    ret
 
 INCLUDE "constants/special_trainer.asm"
 
