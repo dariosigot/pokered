@@ -1194,7 +1194,7 @@ NidorinaBaseStats:
     dw PAL_NIDORINA
 
     ; field moves
-    db FM_CUT
+    db FM_CUT+FM_DIG
 
     ds 2
 
@@ -1311,7 +1311,7 @@ NidorinoBaseStats:
     dw PAL_NIDORINO
 
     ; field moves
-    db FM_CUT
+    db FM_CUT+FM_DIG
 
     ds 2
 
@@ -1428,7 +1428,7 @@ ClefableBaseStats:
     dw PAL_CLEFABLE
 
     ; field moves
-    db FM_HEAL
+    db FM_FLOAT+FM_TELEPORT+FM_HEAL
 
     ds 2
 
@@ -1506,7 +1506,7 @@ NinetalesBaseStats:
     dw PAL_NINETALES
 
     ; field moves
-    db FM_LIGHT+FM_DIG
+    db FM_CUT+FM_LIGHT+FM_DIG
 
     ds 2
 
@@ -1584,7 +1584,7 @@ WigglytuffBaseStats:
     dw PAL_WIGGLYTUFF
 
     ; field moves
-    db FM_HEAL
+    db FM_FLOAT+FM_TELEPORT+FM_HEAL
 
     ds 2
 
@@ -1896,7 +1896,7 @@ VenonatBaseStats:
     dw PAL_VENONAT
 
     ; field moves
-    db FM_TELEPORT
+    db FM_LIGHT+FM_TELEPORT
 
     ds 2
 
@@ -1935,7 +1935,7 @@ VenomothBaseStats:
     dw PAL_VENOMOTH
 
     ; field moves
-    db FM_FLY+FM_TELEPORT+FM_HEAL
+    db FM_FLY+FM_LIGHT+FM_TELEPORT+FM_HEAL
 
     ds 2
 
@@ -2091,7 +2091,7 @@ PersianBaseStats:
     dw PAL_PERSIAN
 
     ; field moves
-    db FM_CUT+FM_LIGHT
+    db FM_CUT+FM_LIGHT+FM_DIG
 
     ds 2
 
@@ -2286,7 +2286,7 @@ GrowlitheBaseStats:
     dw PAL_GROWLITHE
 
     ; field moves
-    db FM_LIGHT
+    db FM_LIGHT+FM_DIG
 
     ds 2
 
@@ -3066,7 +3066,7 @@ RapidashBaseStats:
     dw PAL_RAPIDASH
 
     ; field moves
-    db FM_LIGHT
+    db FM_STRENGTH+FM_LIGHT
 
     ds 2
 
@@ -3261,7 +3261,7 @@ FarfetchdBaseStats:
     dw PAL_FARFETCH_D
 
     ; field moves
-    db FM_CUT
+    db FM_CUT+FM_FLY
 
     ds 2
 
@@ -3495,7 +3495,7 @@ MukBaseStats:
     dw PAL_MUK
 
     ; field moves
-    db FM_FLOAT
+    db FM_FLOAT+FM_STRENGTH
 
     ds 2
 
@@ -4314,7 +4314,7 @@ WeezingBaseStats:
     dw PAL_WEEZING
 
     ; field moves
-    db FM_LIGHT+FM_FLOAT
+    db FM_FLY+FM_LIGHT+FM_FLOAT
 
     ds 2
 
@@ -4431,7 +4431,7 @@ ChanseyBaseStats:
     dw PAL_CHANSEY
 
     ; field moves
-    db FM_HEAL
+    db FM_HEAL+FM_FLOAT
 
     ds 2
 
@@ -4587,7 +4587,7 @@ SeadraBaseStats:
     dw PAL_SEADRA
 
     ; field moves
-    db FM_FLOAT
+    db FM_FLOAT+FM_HEAL
 
     ds 2
 
@@ -5250,7 +5250,7 @@ VaporeonBaseStats:
     dw PAL_VAPOREON
 
     ; field moves
-    db FM_FLOAT
+    db FM_FLOAT+FM_DIG
 
     ds 2
 
@@ -5289,7 +5289,7 @@ JolteonBaseStats:
     dw PAL_JOLTEON
 
     ; field moves
-    db FM_LIGHT
+    db FM_LIGHT+FM_DIG
 
     ds 2
 
@@ -5328,7 +5328,7 @@ FlareonBaseStats:
     dw PAL_FLAREON
 
     ; field moves
-    db FM_LIGHT
+    db FM_LIGHT+FM_DIG
 
     ds 2
 
@@ -5367,7 +5367,7 @@ PorygonBaseStats:
     dw PAL_PORYGON
 
     ; field moves
-    db FM_CUT+FM_LIGHT+FM_TELEPORT+FM_HEAL
+    db FM_CUT+FM_FLY+FM_LIGHT+FM_TELEPORT+FM_HEAL
 
     ds 2
 
@@ -5484,7 +5484,7 @@ KabutoBaseStats:
     dw PAL_KABUTO
 
     ; field moves
-    db 0
+    db FM_CUT
 
     ds 2
 
@@ -5640,7 +5640,7 @@ ArticunoBaseStats:
     dw PAL_ARTICUNO
 
     ; field moves
-    db FM_FLY+FM_FLOAT
+    db FM_CUT+FM_FLY+FM_FLOAT
 
     ds 2
 
@@ -5679,7 +5679,7 @@ ZapdosBaseStats:
     dw PAL_ZAPDOS
 
     ; field moves
-    db FM_FLY+FM_LIGHT
+    db FM_CUT+FM_FLY+FM_LIGHT
 
     ds 2
 
@@ -5718,7 +5718,7 @@ MoltresBaseStats:
     dw PAL_MOLTRES
 
     ; field moves
-    db FM_FLY+FM_LIGHT
+    db FM_CUT+FM_FLY+FM_LIGHT
 
     ds 2
 
