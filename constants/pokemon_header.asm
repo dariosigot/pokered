@@ -4977,7 +4977,7 @@ PinsirBaseStats:
     dw PAL_PINSIR
 
     ; field moves
-    db FM_CUT+FM_STRENGTH
+    db FM_CUT+FM_STRENGTH+FM_DIG
 
     ds 2
 
