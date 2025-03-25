@@ -53169,16 +53169,16 @@ MainInBattleLoop: ; 3c233 (f:4233)
     call SaveScreenTilesToBuffer1
     xor a
     ld [$d11d],a
-    ld a,[$d063]
+    ld a,[W_PLAYERBATTSTATUS2]
     and $60
-    jr nz,.asm_3c2a6 ; 0x3c252 $52
-    ld hl,$d067
+    jr nz,.selectEnemyMove
+    ld hl,W_ENEMYBATTSTATUS1
     res 3,[hl]
-    ld hl,$d062
+    ld hl,W_PLAYERBATTSTATUS1
     res 3,[hl]
     ld a,[hl]
     and $12
-    jr nz,.asm_3c2a6 ; 0x3c261 $43
+    jr nz,.selectEnemyMove
     call InitBattleMenu ; show battle menu
     ret c
     ld a,[$d078]
@@ -53187,25 +53187,25 @@ MainInBattleLoop: ; 3c233 (f:4233)
 ;joenote - This whole thing is problematic. Just comment it all out.
 ;		-allow the player to select a move even if frozen in order to prevent PP underflow and link desyncs
 ;		-also allow the player to select a move if you don't want sleep to waste a turn on wakeup
-;    ld a,[$d018]                    ; joedebug - sleep won't waste turn
+;    ld a,[W_PLAYERMONSTATUS]        ; joedebug - sleep won't waste turn
 ;    and $27                         ; ...
-;    jr nz,.asm_3c2a6 ; 0x3c271 $33  ; ...
-    ld a,[$d062]
-    and $21
-    jr nz,.asm_3c2a6 ; 0x3c278 $2c
-    ld a,[$d067]
-    bit 5,a
-    jr z,.asm_3c288 ; 0x3c27f $7
+;    jr nz,.selectEnemyMove
+    ld a,[W_PLAYERBATTSTATUS1]
+    and %00100001 ; bide OR using multi-turn move (e.g. wrap) ; check player is using Bide or using a multi-turn attack like wrap
+    jr nz,.selectEnemyMove
+    ld a,[W_ENEMYBATTSTATUS1]
+    bit 5,a ; using multi-turn move (e.g. wrap)
+    jr z,.selectPlayerMove
     ld a,$ff
-    ld [$ccdc],a
-    jr .asm_3c2a6 ; 0x3c286 $1e
-.asm_3c288
+    ld [wPlayerSelectedMove],a
+    jr .selectEnemyMove
+.selectPlayerMove
     ld a,[$cd6a]
     and a
-    jr nz,.asm_3c2a6 ; 0x3c28c $18
-    ld [$ccdb],a
+    jr nz,.selectEnemyMove
+    ld [wMoveMenuType],a
     inc a
-    ld [$d07c],a
+    ld [W_ANIMATIONID],a
     xor a
     ld [$cc35],a
     call MoveSelectionMenu
@@ -53214,7 +53214,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     call DrawHUDsAndHPBars
     pop af
     jr nz,MainInBattleLoop
-.asm_3c2a6
+.selectEnemyMove
     call BakcupCurMenuItemAndSelectEnemyMove
     ld a,[W_ISLINKBATTLE]
     cp $4
