@@ -59322,7 +59322,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld [hli],a
     dec b
     jr nz,.statModLoop
-    ret
+    jp ApplyBurnAndParalysisPenaltiesToEnemy
 
 SECTION "DoBattleTransitionAndInitBatVar",ROMX[$6c32],BANK[$f]
 
