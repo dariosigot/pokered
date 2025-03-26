@@ -53065,7 +53065,7 @@ StartBattle: ; 3c11e (f:411e)
     ld a,[$cffb]
     add a
     ld b,a
-    jp c,asm_3c202
+    jp c,EnemyRan
     ld a,[$cce9]
     and a
     jr z,.asm_3c194
@@ -53082,7 +53082,7 @@ StartBattle: ; 3c11e (f:411e)
     call GenRandom
     cp b
     jr nc,.asm_3c14f
-    jr asm_3c202
+    jr EnemyRan
 
 UnnamedText_3c1a8: ; 3c1a8 (f:41a8)
     TX_FAR _UnnamedText_3c1a8
@@ -53129,7 +53129,7 @@ Func_3c1ad: ; 3c1ad (f:41ad)
     call LoadScreenTilesFromBuffer1
     call Func_3cc91
     jr MainInBattleLoop
-asm_3c202: ; 3c202 (f:4202)
+EnemyRan: ; 3c202 (f:4202)
     call LoadScreenTilesFromBuffer1
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
@@ -53169,43 +53169,50 @@ MainInBattleLoop: ; 3c233 (f:4233)
     call SaveScreenTilesToBuffer1
     xor a
     ld [$d11d],a
-    ld a,[$d063]
-    and $60
-    jr nz,.asm_3c2a6 ; 0x3c252 $52
-    ld hl,$d067
-    res 3,[hl]
-    ld hl,$d062
-    res 3,[hl]
+
+    call SelectEnemyMove
+
+    ld a,[W_PLAYERBATTSTATUS2]
+    and %01100000 ; check if the player is using Rage or needs to recharge
+    jr nz,.selectEnemyMove
+    ld hl,W_ENEMYBATTSTATUS1
+    res 3,[hl] ; reset flinch bit
+    ld hl,W_PLAYERBATTSTATUS1
+    res 3,[hl] ; reset flinch bit
     ld a,[hl]
-    and $12
-    jr nz,.asm_3c2a6 ; 0x3c261 $43
+    and %00010010 ; check if the player is thrashing about or charging for an attack
+    jr nz,.selectEnemyMove
+
+.InitBattleMenu
     call InitBattleMenu ; show battle menu
-    ret c
+    ret c ; return if player ran from battle
     ld a,[$d078]
     and a
-    ret nz
+    ret nz ; return if pokedoll was used to escape from battle
+
 ;joenote - This whole thing is problematic. Just comment it all out.
 ;		-allow the player to select a move even if frozen in order to prevent PP underflow and link desyncs
 ;		-also allow the player to select a move if you don't want sleep to waste a turn on wakeup
-;    ld a,[$d018]                    ; joedebug - sleep won't waste turn
+;    ld a,[W_PLAYERMONSTATUS]        ; joedebug - sleep won't waste turn
 ;    and $27                         ; ...
-;    jr nz,.asm_3c2a6 ; 0x3c271 $33  ; ...
-    ld a,[$d062]
-    and $21
-    jr nz,.asm_3c2a6 ; 0x3c278 $2c
-    ld a,[$d067]
-    bit 5,a
-    jr z,.asm_3c288 ; 0x3c27f $7
+;    jr nz,.selectEnemyMove
+    ld a,[W_PLAYERBATTSTATUS1]
+    and %00100001 ; bide OR using multi-turn move (e.g. wrap) ; check player is using Bide or using a multi-turn attack like wrap
+    jr nz,.selectEnemyMove
+    ld a,[W_ENEMYBATTSTATUS1]
+    bit 5,a ; using multi-turn move (e.g. wrap)
+    jr z,.selectPlayerMove
     ld a,$ff
-    ld [$ccdc],a
-    jr .asm_3c2a6 ; 0x3c286 $1e
-.asm_3c288
-    ld a,[$cd6a]
-    and a
-    jr nz,.asm_3c2a6 ; 0x3c28c $18
-    ld [$ccdb],a
+    ld [wPlayerSelectedMove],a
+    jr .selectEnemyMove
+
+.selectPlayerMove
+    ld a,[$cd6a] ; ActionResultOrTookBattleTurn
+    and a ; has the player already used the turn (e.g. by using an item, trying to run or switching pokemon)
+    jr nz,.selectEnemyMove
+    ld [wMoveMenuType],a
     inc a
-    ld [$d07c],a
+    ld [W_ANIMATIONID],a
     xor a
     ld [$cc35],a
     call MoveSelectionMenu
@@ -53213,24 +53220,27 @@ MainInBattleLoop: ; 3c233 (f:4233)
     call LoadScreenTilesFromBuffer1
     call DrawHUDsAndHPBars
     pop af
-    jr nz,MainInBattleLoop
-.asm_3c2a6
-    call BakcupCurMenuItemAndSelectEnemyMove
+    jr nz,.InitBattleMenu
+
+.selectEnemyMove
+;    call BackupCurMenuItemAndSelectEnemyMove
     ld a,[W_ISLINKBATTLE]
     cp $4
     jr nz,.noLinkBattle
-    ld a,[$cc3e]
-    cp $f
-    jp z,asm_3c202
-    cp $e
+; link battle
+    ld a,[$cc3e] ; SerialExchangeNybbleReceiveData
+    cp $f ; LINKBATTLE_RUN
+    jp z,EnemyRan
+    cp $e ; LINKBATTLE_STRUGGLE
     jr z,.noLinkBattle
-    cp $d
+    cp $d ; LINKBATTLE_NO_ACTION
     jr z,.noLinkBattle
     sub $4
     jr c,.noLinkBattle
-    ld a,[$d062]
-    bit 5,a
-    jr z,.asm_3c2dd ; 0x3c2c9 $12
+; the link battle enemy has switched mons
+    ld a,[W_PLAYERBATTSTATUS1]
+    bit 5,a ; check if using multi-turn move like Wrap
+    jr z,.specialMoveNotUsed
     ld a,[$cc2e]
     ld hl,W_PLAYERMONMOVES
     ld c,a
@@ -53238,12 +53248,13 @@ MainInBattleLoop: ; 3c233 (f:4233)
     add hl,bc
     ld a,[hl]
     cp $76
-    jr nz,.asm_3c2dd ; 0x3c2d8 $3
+    jr nz,.specialMoveNotUsed
     ld [wPlayerSelectedMove],a
-.asm_3c2dd
+.specialMoveNotUsed
     ld hl,SwitchEnemyMon
     ld b,BANK(SwitchEnemyMon)
     call Bankswitch
+
 .noLinkBattle
     ld a,[wPlayerSelectedMove]
     cp QUICK_ATTACK
@@ -53288,6 +53299,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     cp $80
     jr c,.enemyMovesFirst
     jr .playerMovesFirst
+
 .enemyMovesFirst
     ld a,$1
     ld [H_WHOSETURN],a
@@ -53301,7 +53313,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     ret nz
     ld a,b
     and a
-    jp z,HandlePlayerMonFainted
+    jr z,.HandlePlayerMonFainted
 .AIActionUsedEnemyFirst
     call HandlePoisonBurnLeechSeed
     jr z,.HandleEnemyMonFainted
@@ -53314,10 +53326,9 @@ MainInBattleLoop: ; 3c233 (f:4233)
     and a
     jr z,.HandleEnemyMonFainted
     call HandlePoisonBurnLeechSeed
-    jp z,HandlePlayerMonFainted
-    call DrawHUDsAndHPBars
-    call CheckNumAttacksLeft
-    jp MainInBattleLoop
+    jr z,.HandlePlayerMonFainted
+    jr .end
+
 .playerMovesFirst
 ;#1 - handle enemy switching or using an item
     call HandleEnemySwitchingOrUsingAnItemAndThenExecutePlayerMove ; call ExecutePlayerMove ; execute player move ;note: this function writes zero to H_WHOSETURN
@@ -53332,7 +53343,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     pop af
     jr z,.HandleEnemyMonFainted
     call HandlePoisonBurnLeechSeed
-    jp z,HandlePlayerMonFainted
+    jr z,.HandlePlayerMonFainted
     call DrawHUDsAndHPBars
 ;#3 - handle enemy using move
     ld a,$1
@@ -53349,20 +53360,27 @@ MainInBattleLoop: ; 3c233 (f:4233)
     ret nz
     ld a,b
     and a
-    jp z,HandlePlayerMonFainted
+    jr z,.HandlePlayerMonFainted
 .AIActionUsedPlayerFirst
     call HandlePoisonBurnLeechSeed
     jr z,.HandleEnemyMonFainted
+
+.end
     call DrawHUDsAndHPBars
     call CheckNumAttacksLeft
     jp MainInBattleLoop
+
 .HandleEnemyMonFainted
     jp HandleEnemyMonFainted
+.HandlePlayerMonFainted
+    jp HandlePlayerMonFainted
 
 RunAmnesiaSideEffect:
     ld hl,wFlagAmnesiaSideEffectBit0
     set 0,[hl]
     jp StatModifierDownEffect
+
+; Free
 
 SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
 
@@ -53636,7 +53654,7 @@ HandleEnemyMonFainted: ; 3c525 (f:4525)
     ld a,$1
     ld [$cd6a],a
     call Func_3c664
-    jp z,asm_3c202
+    jp z,EnemyRan
     xor a
     ld [$cd6a],a
     jp MainInBattleLoop
@@ -53897,7 +53915,7 @@ HandlePlayerMonFainted: ; 3c700 (f:4700)
     ld a,$1
     ld [$cd6a],a
     call Func_3c664
-    jp z,asm_3c202
+    jp z,EnemyRan
     xor a
     ld [$cd6a],a
     jp MainInBattleLoop
@@ -55157,13 +55175,13 @@ asm_3d05f: ; 3d05f (f:505f)
     ld hl,ItemInBattleFinalCheck
     jp Bankswitch
 
-BakcupCurMenuItemAndSelectEnemyMove:
-    ld a,[wCurrentMenuItem] ; Backup Current Menu Item
-    push af                 ; ...
-    call SelectEnemyMove
-    pop af                  ; Restore Current Menu Item
-    ld [wCurrentMenuItem],a ; ...
-    ret
+;BackupCurMenuItemAndSelectEnemyMove:
+;    ld a,[wCurrentMenuItem] ; Backup Current Menu Item
+;    push af                 ; ...
+;    call SelectEnemyMove
+;    pop af                  ; Restore Current Menu Item
+;    ld [wCurrentMenuItem],a ; ...
+;    ret
 
 HalvePlayerSpeedAfterRun:
     srl a ; Player Speed divided by 2
@@ -59322,7 +59340,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     ld [hli],a
     dec b
     jr nz,.statModLoop
-    ret
+    jp ApplyBurnAndParalysisPenaltiesToEnemy
 
 SECTION "DoBattleTransitionAndInitBatVar",ROMX[$6c32],BANK[$f]
 
