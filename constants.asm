@@ -2,6 +2,11 @@ _JAPAN EQU 0
 _GREEN EQU 0
 _YELLOW EQU 0
 
+
+VERSION: MACRO
+    db "0.85.160"
+    ENDM
+
 INCLUDE "macros.asm"
 
 INCLUDE "hram.asm"
