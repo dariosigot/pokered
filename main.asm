@@ -30897,7 +30897,7 @@ HazeEffect_: ; Moved in the Bank
     ld hl,PlayCurrentMoveAnimation
     call Bankswitch4toF
     ld hl,.StatusChangesEliminatedText
-    jp PrintText
+    jp DrawHudAndPrintTextBank4
 
 .CureVolatileStatuses
     res 7,[hl] ; confused
@@ -30933,6 +30933,13 @@ HazeEffect_: ; Moved in the Bank
 .StatusChangesEliminatedText
     TX_FAR _StatusChangesEliminatedText
     db "@"
+
+DrawHudAndPrintTextBank4:
+    push hl
+    ld hl,DrawHUDsAndHPBars
+    call Bankswitch4toF
+    pop hl
+    jp PrintText
 
 ; Free
 
@@ -51893,7 +51900,7 @@ HealEffect_: ; Moved Upper in the Bank
     jr z,.printRestText
     ld hl,FellAsleepBecameHealthyText ; if mon had an status
 .printRestText
-    call PrintText
+    call DrawHudAndPrintTextBankE
     pop af
     pop de
     pop hl
@@ -51967,10 +51974,8 @@ HealEffect_: ; Moved Upper in the Bank
     ld [wListMenuID],a ; $cf94
     ld a,$48
     call Predef ; UpdateHPBar
-    ld hl,DrawHUDsAndHPBars ; $4d5a
-    call BankswitchEtoF
     ld hl,RegainedHealthText ; $7aac
-    jp PrintText
+    jp DrawHudAndPrintTextBankE
 
 TransformEffect_: ; Moved Upper in the Bank
     call .HideSubstitute
@@ -52093,7 +52098,7 @@ TransformEffect_: ; Moved Upper in the Bank
     call Delay3
     call .RestoreSubstitute
     ld hl,UnnamedText_3bb92 ; $7b92
-    jp PrintText
+    jp DrawHudAndPrintTextBankE
 .attackMissed
     ld a,1
     ld [W_MOVEMISSED],a
@@ -52773,6 +52778,13 @@ AICureStatus: ; Moved in the Bank
     call Bankswitch
     pop af
     ret
+
+DrawHudAndPrintTextBankE:
+    push hl
+    ld hl,DrawHUDsAndHPBars
+    call BankswitchEtoF
+    pop hl
+    jp PrintText
 
 SECTION "bankF",ROMX,BANK[$F]
 
@@ -54630,9 +54642,6 @@ Func_3cc91: ; 3cc91 (f:4c91)
     call DrawEnemyHUDAndHPBar
 
 Func_3cca4: ; 3cca4 (f:4ca4)
-    call DrawPlayerHUDAndHPBar
-    ld a,$4
-    call Predef ; indirect jump to LoadMonBackSprite (3f103 (f:7103))
     xor a
     ld [$FF00+$e1],a
     ld hl,$cc2d
@@ -54653,6 +54662,9 @@ Func_3cca4: ; 3cca4 (f:4ca4)
     ld [W_PLAYERDISABLEDMOVE],a ; $d06d
     ld [$ccee],a
     ld [$ccf7],a
+    call DrawPlayerHUDAndHPBar
+    ld a,$4
+    call Predef ; indirect jump to LoadMonBackSprite (3f103 (f:7103))
     ld b,$1
     call GoPAL_SET
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
@@ -54722,7 +54734,7 @@ ReadPlayerMonCurHPAndStatus: ; 3cd43 (f:4d43)
 DrawPlayerHUDAndHPBar: ; Moved in the Bank
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    FuncCoord 09,07 ; Player Battle Hub Reset Screen
+    FuncCoord 09,07 ; Player Battle Hud Reset Screen
     ld hl,Coord
     ld bc,$50b ; 05 | 11
     call ClearScreenArea
@@ -56260,6 +56272,10 @@ IsGhostBattle: ; 3d83a (f:583a)
     and a
     ret
 
+; ──────────────────────────────────────────────────────────────────────
+; CheckPlayerStatusConditions
+; ──────────────────────────────────────────────────────────────────────
+
 CheckPlayerStatusConditions: ; 3d854 (f:5854)
     ld hl,W_PLAYERMONSTATUS
     ld a,[hl]
@@ -56277,16 +56293,17 @@ CheckPlayerStatusConditions: ; 3d854 (f:5854)
     call PlayMoveAnimation
     ld hl,FastAsleepText
     call PrintText
-    ds 2 ; jr .sleepDone ; joedebug - sleep won't waste turn
+;    jr .sleepDone ; joedebug - sleep won't waste turn
+
 ;.sleepDone
     xor a
     ld [$CCF1],a
-    ld hl,ExecutePlayerMoveDone
-    jp Func_3da37
+    jr .ExecutePlayerMoveDone
 
 .WakeUp
     ld hl,WokeUpText
-    call PrintText
+    call .DrawHudAndPrintText ; call PrintText
+    jr .HeldInPlaceCheck
 
 .FrozenCheck
     bit 5,[hl] ; frozen?
@@ -56295,37 +56312,37 @@ CheckPlayerStatusConditions: ; 3d854 (f:5854)
     call PrintText
     xor a
     ld [$CCF1],a
-    ld hl,ExecutePlayerMoveDone
-    jp Func_3da37
+    jr .ExecutePlayerMoveDone
 
 .HeldInPlaceCheck
     ld a,[W_ENEMYBATTSTATUS1]
     bit 5,a
-    jp z,FlinchedCheck
+    jr z,.FlinchedCheck
     ld hl,CantMoveText
     call PrintText
-    ld hl,ExecutePlayerMoveDone
-    jp Func_3da37
+    ; fall through
 
-FlinchedCheck: ; 3d8ac (f:58ac)
+.ExecutePlayerMoveDone
+    ld hl,ExecutePlayerMoveDone
+    jp .Func_3da37
+
+.FlinchedCheck
     ld hl,W_PLAYERBATTSTATUS1
     bit 3,[hl]
-    jp z,HyperBeamCheck
+    jr z,.HyperBeamCheck
     res 3,[hl]
     ld hl,FlinchedText
     call PrintText
-    ld hl,ExecutePlayerMoveDone
-    jp Func_3da37
+    jr .ExecutePlayerMoveDone
 
-HyperBeamCheck: ; 3d8c2 (f:58c2)
+.HyperBeamCheck
     ld hl,W_PLAYERBATTSTATUS2
     bit 5,[hl]
     jr z,.next ; 58D7
     res 5,[hl]
     ld hl,MustRechargeText
     call PrintText
-    ld hl,ExecutePlayerMoveDone ; $580a
-    jp Func_3da37
+    jr .ExecutePlayerMoveDone
 .next
     ld hl,$D06D
     ld a,[hl]
@@ -56349,7 +56366,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld hl,W_PLAYERBATTSTATUS1
     res 7,[hl]
     ld hl,ConfusedNoMoreText
-    call PrintTextAndDrawHub ; call PrintText
+    call .DrawHudAndPrintText ; call PrintText
     jr .next3
 .next4
     ld hl,IsConfusedText
@@ -56365,7 +56382,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld a,[hl]
     and a,$80
     ld [hl],a
-    call Func_3daad
+    call PlayerHurtItself
     jr .MonHurtItselfOrFullyParalysed ; 5952
 .next3
     ld a,[$CCEE]
@@ -56375,8 +56392,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     cp [hl]
     jr nz,.ParalysisCheck
     call Func_3da88
-    ld hl,ExecutePlayerMoveDone ; $580a
-    jp Func_3da37
+    jp .ExecutePlayerMoveDone
 .ParalysisCheck
     ld hl,W_PLAYERMONSTATUS
     bit 6,[hl]
@@ -56395,16 +56411,13 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     cp FLY_EFFECT
     jr z,.next8 ; 5966
     cp CHARGE_EFFECT
-    jr z,.next8
-    jr .next9 ; 596F
+    jp nz,.ExecutePlayerMoveDone
 .next8
     xor a
     ld [$CC5B],a
     ld a,$A7
     call PlayMoveAnimation
-.next9
-    ld hl,ExecutePlayerMoveDone ; $580a
-    jp Func_3da37
+    jp .ExecutePlayerMoveDone
 .next7
     ld hl,W_PLAYERBATTSTATUS1
     bit 0,[hl]
@@ -56425,10 +56438,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
 ;    ld [hl],a
     ld hl,$D06A
     dec [hl]
-    jr z,.UnleashEnergy ; 599B
-    ld hl,ExecutePlayerMoveDone ; $580a
-    jp Func_3da37
-.UnleashEnergy
+    jp nz,.ExecutePlayerMoveDone
     ld hl,W_PLAYERBATTSTATUS1
     res 0,[hl]
     ld hl,UnleashedEnergyText
@@ -56454,7 +56464,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld a,$75
     ld [W_PLAYERMOVENUM],a
     ld hl,handleIfPlayerMoveMissed ; $5705
-    jp Func_3da37
+    jr .Func_3da37
 .next10
     bit 1,[hl]
     jr z,.next13 ; 59FF
@@ -56465,7 +56475,7 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     ld hl,$D06A
     dec [hl]
     ld hl,PlayerCalcMoveDamage ; $56dc
-    jp nz,Func_3da37
+    jr nz,.Func_3da37
     push hl
     ld hl,W_PLAYERBATTSTATUS1
     res 1,[hl]
@@ -56476,20 +56486,48 @@ HyperBeamCheck: ; 3d8c2 (f:58c2)
     inc a
     ld [$D06B],a
     pop hl
-    jp Func_3da37
+    jr .Func_3da37
 .next13
     bit 5,[hl]
-    jp z,Func_3da1a
+    jr z,.Func_3da1a
     ld hl,AttackContinuesText
     call PrintText
     ld a,[$D06A]
     dec a
     ld [$D06A],a
     ld hl,getPlayerAnimationType ; $5714
-    jp nz,Func_3da37
-    jp Func_3da37
+    jr .Func_3da37
 
-; TODO : move to appropriate part of bank F
+.Func_3da1a
+    ld a,[W_PLAYERBATTSTATUS2] ; $d063
+    bit 6,a
+    jr z,.Func_3da39
+    ld a,$63
+    ld [$d11e],a
+    call GetMoveName
+    call CopyStringToCF4B
+    xor a
+    ld [W_PLAYERMOVEEFFECT],a ; $cfd3
+    ld hl,PlayerCanExecuteMove ; $56b0
+    ; fall through
+
+.Func_3da37
+    xor a
+    ret
+
+.Func_3da39
+    ld a,$1
+    and a
+    ret
+
+.DrawHudAndPrintText
+    push hl
+    call DrawPlayerHUDAndHPBar
+    pop hl
+    jp PrintText
+
+; ──────────────────────────────────────────────────────────────────────
+
 EnemyMoveDidntMissAndPlayerBideAccum:
     ld hl,PlayerBideAccum_
     jr BideAccumCommon
@@ -56503,29 +56541,15 @@ BideAccumCommon:
     ld [$CCF4],a ; MoveDidntMiss
     ret
 
-SECTION "Func_3da1a",ROMX[$5a1a],BANK[$f]
+DrawHudAndPrintText:
+    push hl
+    call DrawHUDsAndHPBars
+    pop hl
+    jp PrintText
 
-Func_3da1a: ; 3da1a (f:5a1a)
-    ld a,[W_PLAYERBATTSTATUS2] ; $d063
-    bit 6,a
-    jp z,Func_3da39
-    ld a,$63
-    ld [$d11e],a
-    call GetMoveName
-    call CopyStringToCF4B
-    xor a
-    ld [W_PLAYERMOVEEFFECT],a ; $cfd3
-    ld hl,PlayerCanExecuteMove ; $56b0
-    jp Func_3da37
+; Free
 
-Func_3da37: ; 3da37 (f:5a37)
-    xor a
-    ret
-
-Func_3da39: ; 3da39 (f:5a39)
-    ld a,$1
-    and a
-    ret
+SECTION "FastAsleepText",ROMX[$5a3d],BANK[$f]
 
 FastAsleepText: ; 3da3d (f:5a3d)
     TX_FAR _FastAsleepText
@@ -56609,7 +56633,7 @@ UnnamedText_3daa8: ; 3daa8 (f:5aa8)
     TX_FAR _UnnamedText_3daa8
     db "@"
 
-Func_3daad: ; 3daad (f:5aad)
+PlayerHurtItself: ; 3daad (f:5aad)
     call SetCounterToMiss ; ld hl,HurtItselfText ; $5a65
     call PrintText
     ld hl,W_ENEMYMONDEFENSE ; $cff8
@@ -56933,7 +56957,7 @@ CheckForDisobedience: ; 3dc88 (f:5c88)
     jr nc,.monDoesNothing
     ld hl,UnnamedText_3ddc0 ; $5dc0
     call PrintText
-    call Func_3daad
+    call PlayerHurtItself
     jp .cannotUseMove
 .asm_3dd0e
     call GenRandomInBattle
@@ -58860,6 +58884,10 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up:
 
 SECTION "CheckEnemyStatusConditions",ROMX[$688f],BANK[$f]
 
+; ──────────────────────────────────────────────────────────────────────
+; CheckEnemyStatusConditions
+; ──────────────────────────────────────────────────────────────────────
+
 CheckEnemyStatusConditions: ; 3e88f (f:688f)
     ld hl,W_ENEMYMONSTATUS ; $cfe9
     ld a,[hl]
@@ -58877,81 +58905,82 @@ CheckEnemyStatusConditions: ; 3e88f (f:688f)
     ld [$cc5b],a
     ld a,$bd
     call PlayMoveAnimation
-    ds 2 ; jr .sleepDone ; joedebug - sleep won't waste turn
+;    jr .sleepDone ; joedebug - sleep won't waste turn
 
 ;.sleepDone
     xor a
     ld [$ccf2],a
-    ld hl,ExecuteEnemyMoveDone ; $688c
-    jp Func_3eab8
+    jr .ExecuteEnemyMoveDone
 
 .WakeUp
     ld hl,WokeUpText ; $5a42
-    call PrintText
+    call .DrawHudAndPrintText ; call PrintText
+    jr .HeldInPlaceCheck
 
 .FrozenCheck
     bit 5,[hl]
-    jr z,.asm_3e8d3
+    jr z,.HeldInPlaceCheck
     ld hl,FrozenText ; $5a47
     call PrintText
     xor a
     ld [$ccf2],a
-    ld hl,ExecuteEnemyMoveDone ; $688c
-    jp Func_3eab8
-.asm_3e8d3
+    jr .ExecuteEnemyMoveDone
+
+.HeldInPlaceCheck
     ld a,[W_PLAYERBATTSTATUS1] ; $d062
     bit 5,a
-    jp z,Func_3e8e7
+    jp z,.FlinchedCheck
     ld hl,CantMoveText ; $5a83
     call PrintText
-    ld hl,ExecuteEnemyMoveDone ; $688c
-    jp Func_3eab8
+    ; fall through
 
-Func_3e8e7: ; 3e8e7 (f:68e7)
+.ExecuteEnemyMoveDone
+    ld hl,ExecuteEnemyMoveDone
+    jp .Func_3eab8
+
+.FlinchedCheck
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     bit 3,[hl]
-    jp z,Func_3e8fd
+    jr z,.HyperBeamCheck
     res 3,[hl]
     ld hl,FlinchedText ; $5a51
     call PrintText
-    ld hl,ExecuteEnemyMoveDone ; $688c
-    jp Func_3eab8
+    jr .ExecuteEnemyMoveDone
 
-Func_3e8fd: ; 3e8fd (f:68fd)
+.HyperBeamCheck
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
     bit 5,[hl]
-    jr z,.asm_3e912
+    jr z,.next
     res 5,[hl]
     ld hl,MustRechargeText ; $5a56
     call PrintText
-    ld hl,ExecuteEnemyMoveDone ; $688c
-    jp Func_3eab8
-.asm_3e912
+    jr .ExecuteEnemyMoveDone
+.next
     ld hl,W_ENEMYDISABLEDMOVE ; $d072
     ld a,[hl]
     and a
-    jr z,.asm_3e929
+    jr z,.next2
     dec a
     ld [hl],a
     and $f
-    jr nz,.asm_3e929
+    jr nz,.next2
     ld [hl],a
     ld [$ccef],a
     ld hl,DisabledNoMoreText ; $5a5b
     call PrintText
-.asm_3e929
+.next2
     ld a,[W_ENEMYBATTSTATUS1] ; $d067
     add a
-    jp nc,Func_3e9aa
+    jp nc,.next3
     ld hl,$d070
     dec [hl]
-    jr nz,.asm_3e944
+    jr nz,.next4
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     res 7,[hl]
     ld hl,ConfusedNoMoreText
-    call PrintTextAndDrawHub ; call PrintText
-    jp Func_3e9aa
-.asm_3e944
+    call .DrawHudAndPrintText ; call PrintText
+    jp .next3
+.next4
     ld hl,IsConfusedText ; $5a60
     call PrintText
     xor a
@@ -58960,12 +58989,159 @@ Func_3e8fd: ; 3e8fd (f:68fd)
     call PlayMoveAnimation
     call GenRandomInBattle
     cp $80
-    jr c,Func_3e9aa
+    jr c,.next3
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     ld a,[hl]
     and $80
     ld [hl],a
-    ld hl,HurtItselfText ; $5a65
+    call EnemyHurtItself
+    jr .MonHurtItselfOrFullyParalysed
+.next3
+    ld a,[$ccef]
+    and a
+    jr z,.ParalysisCheck
+    ld hl,wEnemySelectedMove ; $ccdd
+    cp [hl]
+    jr nz,.ParalysisCheck
+    call Func_3da88
+    jp .ExecuteEnemyMoveDone
+.ParalysisCheck
+    ld hl,W_ENEMYMONSTATUS ; $cfe9
+    bit 6,[hl]
+    jr z,.next7
+    call GenRandomInBattle
+    cp $3f
+    jr nc,.next7
+    ld hl,FullyParalyzedText ; $5a4c
+    call PrintText
+.MonHurtItselfOrFullyParalysed
+    ld hl,W_ENEMYBATTSTATUS1 ; $d067
+    ld a,[hl]
+    and %10001100 ; Reset also invulnerablility
+    ld [hl],a
+    ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
+    cp FLY_EFFECT
+    jr z,.next8
+    cp CHARGE_EFFECT
+    jp nz,.ExecuteEnemyMoveDone
+.next8
+    xor a
+    ld [$cc5b],a
+    ld a,$a7
+    call PlayMoveAnimation
+    jp .ExecuteEnemyMoveDone
+.next7
+    ld hl,W_ENEMYBATTSTATUS1 ; $d067
+    bit 0,[hl]
+    jr z,.next10
+;joenote - doing this elsewhere with function EnemyBideAccum
+;    xor a
+;    ld [W_ENEMYMOVENUM],a ; $cfcc
+;    ld hl,W_DAMAGE ; $d0d7
+;    ld a,[hli]
+;    ld b,a
+;    ld c,[hl]
+;    ld hl,$cd06
+;    ld a,[hl]
+;    add c
+;    ld [hld],a
+;    ld a,[hl]
+;    adc b
+;    ld [hl],a
+    ld hl,$d06f
+    dec [hl]
+    jp nz,.ExecuteEnemyMoveDone
+    ld hl,W_ENEMYBATTSTATUS1 ; $d067
+    res 0,[hl]
+    ld hl,UnleashedEnergyText ; $5a74
+    call PrintText
+    ld a,$1
+    ld [W_ENEMYMOVEPOWER],a ; $cfce
+    ld hl,$cd06
+    ld a,[hld]
+    add a
+    ld b,a
+    ld [$d0d8],a
+    ld a,[hl]
+    rl a
+    ld [W_DAMAGE],a ; $d0d7
+    or b
+    jr nz,.next12
+    ld a,$1
+    ld [W_MOVEMISSED],a ; $d05f
+.next12
+    xor a
+    ld [hli],a
+    ld [hl],a
+    ld a,$75
+    ld [W_ENEMYMOVENUM],a ; $cfcc
+    call SwapPlayerAndEnemyLevels
+    ld hl,handleIfEnemyMoveMissed ; $6782
+    jr .Func_3eab8
+.next10
+    bit 1,[hl]
+    jr z,.next13
+    ld a,$25
+    ld [W_ENEMYMOVENUM],a ; $cfcc
+    ld hl,ThrashingAboutText ; $5a79
+    call PrintText
+    ld hl,$d06f
+    dec [hl]
+    ld hl,EnemyCalcMoveDamage ; $6750
+    jr nz,.Func_3eab8
+    push hl
+    ld hl,W_ENEMYBATTSTATUS1 ; $d067
+    res 1,[hl]
+    set 7,[hl]
+    call GenRandomInBattle
+    and $3
+    inc a
+    inc a
+    ld [$d070],a
+    pop hl
+    jr .Func_3eab8
+.next13
+    bit 5,[hl]
+    jr z,.Func_3ea9b
+    ld hl,AttackContinuesText ; $5a7e
+    call PrintText
+    ld hl,$d06f
+    dec [hl]
+    ld hl,GetEnemyAnimationType ; $6794
+    jr .Func_3eab8
+
+.Func_3ea9b
+    ld a,[W_ENEMYBATTSTATUS2] ; $d068
+    bit 6,a
+    jr z,.Func_3eaba
+    ld a,$63
+    ld [$d11e],a
+    call GetMoveName
+    call CopyStringToCF4B
+    xor a
+    ld [W_ENEMYMOVEEFFECT],a ; $cfcd
+    ld hl,EnemyCanExecuteMove ; $672b
+    ; fall through
+
+.Func_3eab8
+    xor a
+    ret
+
+.Func_3eaba
+    ld a,$1
+    and a
+    ret
+
+.DrawHudAndPrintText
+    push hl
+    call DrawEnemyHUDAndHPBar
+    pop hl
+    jp PrintText
+
+; ──────────────────────────────────────────────────────────────────────
+
+EnemyHurtItself:
+    call SetCounterToMiss ; ld hl,HurtItselfText ; $5a65
     call PrintText
     ld hl,W_PLAYERMONDEF
     ld a,[hli]
@@ -59004,152 +59180,7 @@ Func_3e8fd: ; 3e8fd (f:68fd)
     call PlayMoveAnimation
     ld a,$1
     ld [H_WHOSETURN],a ; $FF00+$f3
-    call ApplyDamageToEnemyPokemon
-    jr MonHurtItselfOrFullyParalysed
-
-Func_3e9aa: ; 3e9aa (f:69aa)
-    ld a,[$ccef]
-    and a
-    jr z,.asm_3e9bf
-    ld hl,wEnemySelectedMove ; $ccdd
-    cp [hl]
-    jr nz,.asm_3e9bf
-    call Func_3da88
-    ld hl,ExecuteEnemyMoveDone ; $688c
-    jp Func_3eab8
-.asm_3e9bf
-    ld hl,W_ENEMYMONSTATUS ; $cfe9
-    bit 6,[hl]
-    jr z,asm_3e9f6
-    call GenRandomInBattle
-    cp $3f
-    jr nc,asm_3e9f6
-    ld hl,FullyParalyzedText ; $5a4c
-    call PrintText
-MonHurtItselfOrFullyParalysed: ; 3e9d3 (f:69d3)
-    ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    ld a,[hl]
-    and %10001100 ; Reset also invulnerablility
-    ld [hl],a
-    ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    cp FLY_EFFECT
-    jr z,.asm_3e9e7
-    cp CHARGE_EFFECT
-    jr z,.asm_3e9e7
-    jr .asm_3e9f0
-.asm_3e9e7
-    xor a
-    ld [$cc5b],a
-    ld a,$a7
-    call PlayMoveAnimation
-.asm_3e9f0
-    ld hl,ExecuteEnemyMoveDone ; $688c
-    jp Func_3eab8
-asm_3e9f6: ; 3e9f6 (f:69f6)
-    ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    bit 0,[hl]
-    jr z,.asm_3ea54
-;joenote - doing this elsewhere with function EnemyBideAccum
-;    xor a
-;    ld [W_ENEMYMOVENUM],a ; $cfcc
-;    ld hl,W_DAMAGE ; $d0d7
-;    ld a,[hli]
-;    ld b,a
-;    ld c,[hl]
-;    ld hl,$cd06
-;    ld a,[hl]
-;    add c
-;    ld [hld],a
-;    ld a,[hl]
-;    adc b
-;    ld [hl],a
-    ld hl,$d06f
-    dec [hl]
-    jr z,.unleashEnergy
-    ld hl,ExecuteEnemyMoveDone ; $688c
-    jp Func_3eab8
-.unleashEnergy
-    ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    res 0,[hl]
-    ld hl,UnleashedEnergyText ; $5a74
-    call PrintText
-    ld a,$1
-    ld [W_ENEMYMOVEPOWER],a ; $cfce
-    ld hl,$cd06
-    ld a,[hld]
-    add a
-    ld b,a
-    ld [$d0d8],a
-    ld a,[hl]
-    rl a
-    ld [W_DAMAGE],a ; $d0d7
-    or b
-    jr nz,.asm_3ea43
-    ld a,$1
-    ld [W_MOVEMISSED],a ; $d05f
-.asm_3ea43
-    xor a
-    ld [hli],a
-    ld [hl],a
-    ld a,$75
-    ld [W_ENEMYMOVENUM],a ; $cfcc
-    call SwapPlayerAndEnemyLevels
-    ld hl,handleIfEnemyMoveMissed ; $6782
-    jp Func_3eab8
-.asm_3ea54
-    bit 1,[hl]
-    jr z,.asm_3ea83
-    ld a,$25
-    ld [W_ENEMYMOVENUM],a ; $cfcc
-    ld hl,ThrashingAboutText ; $5a79
-    call PrintText
-    ld hl,$d06f
-    dec [hl]
-    ld hl,EnemyCalcMoveDamage ; $6750
-    jp nz,Func_3eab8
-    push hl
-    ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    res 1,[hl]
-    set 7,[hl]
-    call GenRandomInBattle
-    and $3
-    inc a
-    inc a
-    ld [$d070],a
-    pop hl
-    jp Func_3eab8
-.asm_3ea83
-    bit 5,[hl]
-    jp z,Func_3ea9b
-    ld hl,AttackContinuesText ; $5a7e
-    call PrintText
-    ld hl,$d06f
-    dec [hl]
-    ld hl,GetEnemyAnimationType ; $6794
-    jp nz,Func_3eab8
-    jp Func_3eab8
-
-Func_3ea9b:
-    ld a,[W_ENEMYBATTSTATUS2] ; $d068
-    bit 6,a
-    jp z,Func_3eaba
-    ld a,$63
-    ld [$d11e],a
-    call GetMoveName
-    call CopyStringToCF4B
-    xor a
-    ld [W_ENEMYMOVEEFFECT],a ; $cfcd
-    ld hl,EnemyCanExecuteMove ; $672b
-    jp Func_3eab8
-
-Func_3eab8:
-    xor a
-    ret
-
-Func_3eaba:
-    ld a,$1
-    and a
-    ret
+    jp ApplyDamageToEnemyPokemon
 
 FixItSelfDamage:
     ld [$d05e],a
@@ -60273,7 +60304,7 @@ SleepEffect: ; Moved in the Bank
     ld [de],a
     ld hl,.FellAsleepText ; $7245
     call PlayCurrentMoveAnimation2
-    jp PrintText
+    jp DrawHudAndPrintText
 .attackMissed
     call PlayCurrentMoveAnimation
     jp PrintMoveFailureText
@@ -60350,10 +60381,10 @@ PoisonEffect: ; Moved in the Bank
     jr z,.regularPoisonEffect
     ld a,b
     call PlayBattleAnimation2
-    jp PrintText
+    jp DrawHudAndPrintText
 .regularPoisonEffect
     call PlayCurrentMoveAnimation2
-    jp PrintText
+    jp DrawHudAndPrintText
 .attackMissed
     ld hl,PrintMoveFailureText
     jr .checkEnd
@@ -60456,7 +60487,7 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     ld a,$a9
     call PlayBattleAnimation  ;animation
     ld hl,UnnamedText_3f3d8
-    jp PrintText
+    jp DrawHudAndPrintText
 .freeze
     call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
     ld a,FRZ
@@ -60464,7 +60495,7 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     ld a,$a9
     call PlayBattleAnimation  ;animation
     ld hl,UnnamedText_3f3dd
-    jp PrintText
+    jp DrawHudAndPrintText
 opponentAttacker: ; 3f382 (f:7382)
     ld a,[W_PLAYERMONSTATUS]  ;this appears to the same as above with addresses swapped for opponent
     and a
@@ -60503,12 +60534,12 @@ opponentAttacker: ; 3f382 (f:7382)
     ld [W_PLAYERMONSTATUS],a
     call HalveAttackDueToBurn
     ld hl,UnnamedText_3f3d8
-    jp PrintText
+    jp DrawHudAndPrintText
 .freeze
     ld a,FRZ
     ld [W_PLAYERMONSTATUS],a
     ld hl,UnnamedText_3f3dd
-    jp PrintText
+    jp DrawHudAndPrintText
 
 UnnamedText_3f3d8: ; 3f3d8 (f:73d8)
     TX_FAR _UnnamedText_3f3d8
@@ -61394,7 +61425,7 @@ ConfusionEffect: ; Moved in the Bank
     cp CONFUSION_SIDE_EFFECT
     call nz,PlayCurrentMoveAnimation2
     ld hl,.BecameConfusedText
-    jp PrintText
+    jp DrawHudAndPrintText
 .BecameConfusedText
     TX_FAR _BecameConfusedText
     db "@"
@@ -61663,7 +61694,7 @@ PrintDidntAffectText: ; Moved in the Bank
 
 PrintMayNotAttackText: ; Moved in the Bank
     ld hl,UnnamedText_3fb74 ; $7b74
-    jp PrintText
+    jp DrawHudAndPrintText
 
 UnnamedText_3fb74: ; Moved in the Bank
     TX_FAR _UnnamedText_3fb74
@@ -62529,10 +62560,6 @@ GetEnemyMonStat_HandleAlternative:
 
 DisabledText: ; Moved in the Bank
     db "Disabled@"
-
-PrintTextAndDrawHub:
-    call PrintText
-    jp DrawHUDsAndHPBars
 
 SECTION "bank10",ROMX,BANK[$10]
 
