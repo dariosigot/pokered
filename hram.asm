@@ -31,6 +31,10 @@ H_NUMTOPRINT        EQU $FF96 ; 3 bytes, big endian order
 H_POWEROFTEN        EQU $FF99 ; 3 bytes, big endian order
 H_SAVEDNUMTOPRINT   EQU $FF9C ; 3 bytes, big endian order (to back out of a subtraction)
 
+hDivideBCDDivisor  EQU $FFA2 ; 3-byte BCD number
+hDivideBCDQuotient EQU $FFA2 ; 3-byte BCD number
+hDivideBCDBuffer   EQU $FFA5 ; 3-byte BCD number
+
 H_OLDPRESSEDBUTTONS     EQU $FFB1
 H_NEWLYRELEASEDBUTTONS  EQU $FFB2
 H_NEWLYPRESSEDBUTTONS   EQU $FFB3

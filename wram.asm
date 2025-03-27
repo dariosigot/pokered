@@ -553,6 +553,7 @@ W_TRAINERNO: ; d05d
 ; which instance of [youngster, lass, etc] is this?
     ds 1
 
+wCriticalHitOrOHKO: ; d05e
     ds 1
 
 W_MOVEMISSED: ; d05f
