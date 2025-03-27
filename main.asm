@@ -44634,6 +44634,8 @@ DecreaseFossilStep:
     ret nz
     ; RestorePartyEnergy
     ld a,[W_NUMINPARTY]
+    and a
+    ret z
     ld d,a
     ld e,0
 .loop
