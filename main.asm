@@ -52862,6 +52862,25 @@ EffectsArray5B:
 	db TRAPPING_EFFECT
     db $FF
 
+BC999cap:
+    ;b register contains high byte & c register contains low byte
+    ld a,c ;let's work on low byte first. Note that decimal 999 is $03E7 in hex.
+    sub 999 % $100 ;a = a - ($03E7 % $100). Gives a = a - $E7. A byte % $100 always gives the lesser nibble.
+    ;Note that if a < $E7 then the carry bit 'c' in the flag register gets set due to overflowing with a negative result.
+    ld a,b ;now let's work on the high byte
+    sbc 999 / $100 ;a = a - ($03E7 / $100 + c_flag). Gives a = a - ($03 + c_flag). A byte / $100 always gives the greater nibble.
+    ;Note again that if a < $03 then the carry bit remains set. 
+    ;If the bit is already set from the lesser nibble, then its addition here can still make it remain set if a is low enough.
+    jr c,.donecapping ;jump to next marker if the c_flag is set. This only remains set if BC <  the cap of $03E7.
+    ;else let's continue and set the 999 cap
+    ld a,999 / $100 ; else load $03 into a
+    ld b,a ;and store it as the high byte
+    ld a,999 % $100 ; else load $E7 into a
+    ld c,a ;and store it as the low byte
+    ;now registers b & c together contain $03E7 for a capped stat value of 999
+.donecapping
+    ret
+
 ; Free
 
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
@@ -53355,11 +53374,6 @@ MainInBattleLoop: ; 3c233 (f:4233)
     jp HandleEnemyMonFainted
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
-
-RunAmnesiaSideEffect:
-    ld hl,wFlagAmnesiaSideEffectBit0
-    set 0,[hl]
-    jp StatModifierDownEffect
 
 ; Free
 
@@ -57097,11 +57111,14 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     ld b,a
     ld c,[hl]
     ld a,[W_ENEMYBATTSTATUS3]  ;test for reflect
-    bit 2,a
+    bit 2,a ; reflect
     jr z,.next
 .doubleDefense
     sla c  ;x2 defense if bit2 of D069 is set
     rl b
+; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
+; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
+    call BC999cap
 .next
     ld hl,W_PLAYERMONATK  ;attack pointer
     ld a,[$d05e]
@@ -57126,11 +57143,14 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     ld b,a
     ld c,[hl]
     ld a,[W_ENEMYBATTSTATUS3]  ;test for lightscreen
-    bit 1,a
+    bit 1,a ; light screen
     jr z,.next2
 .doubleSpecialDefense
     sla c           ;x2 special defense if bit1 of D069 set
     rl b
+; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
+; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
+    call BC999cap
 .next2
     ld hl,W_PLAYERMONSPECIAL
     ld a,[$d05e]   ;XXX
@@ -57150,23 +57170,7 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     call AddNTimes
     pop bc
 .next3
-    ld a,[hli]  ;HL: when this was taken
-    ld l,[hl]
-    ld h,a      ;*HL = attacker attack
-    or b         ;is either attack or defense high byte nonzero?
-    jr z,.next4
-    srl b  ;[defense] BC /= 4 [this is just so it fits into a single byte,10bits max]
-    rr c
-    srl b
-    rr c
-    srl h  ;[attack] HL /= 4 [to apply equal scaling]
-    rr l
-    srl h
-    rr l
-    ld a,l
-    or h
-    jr nz,.next4  ;is HL result zero?
-    inc l            ;minimum HL = 1
+    call GetDamageVarsScaleStats
 .next4
     ld b,l        ;*B = attack [possibly scaled] [C contains defense]
     ld a,[$d022]  ;*E = level
@@ -57180,7 +57184,7 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     and a
     ret
 
-CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
+CalculateDamageAfterEnemyAttack: ; Moved in the Bank
     ld hl,W_DAMAGE ; $d0d7
     xor a
     ld [hli],a
@@ -57193,21 +57197,24 @@ CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
     ;ld a,[hl]
     ;cp $14
     call TestPhysicalSpecialBattle
-    jr nz,.asm_3debc
+    jr nz,.specialAttack
     ld hl,W_PLAYERMONDEF
     ld a,[hli]
     ld b,a
     ld c,[hl]
     ld a,[W_PLAYERBATTSTATUS3] ; $d064
-    bit 2,a
-    jr z,.asm_3de98
+    bit 2,a ; reflect
+    jr z,.next
     sla c
     rl b
-.asm_3de98
+; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
+; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
+    call BC999cap
+.next
     ld hl,W_ENEMYMONATTACK
     ld a,[$d05e]
     and a
-    jr z,.asm_3deef
+    jr z,.next3
     ld hl,W_PARTYMON1_DEFENSE ; $d191
     ld a,[wPlayerMonNumber] ; $cc2f
     ld bc,$2c
@@ -57220,22 +57227,25 @@ CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
     call GetEnemyMonStat
     ld hl,$ff97
     pop bc
-    jr .asm_3deef
-.asm_3debc
+    jr .next3
+.specialAttack
     ld hl,W_PLAYERMONSPECIAL
     ld a,[hli]
     ld b,a
     ld c,[hl]
     ld a,[W_PLAYERBATTSTATUS3] ; $d064
-    bit 1,a
-    jr z,.asm_3decd
+    bit 1,a ; light screen
+    jr z,.next2
     sla c
     rl b
-.asm_3decd
+; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
+; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
+    call BC999cap
+.next2
     ld hl,W_ENEMYMONSPECIAL ; $cffc
     ld a,[$d05e]
     and a
-    jr z,.asm_3deef
+    jr z,.next3
     ld hl,W_PARTYMON1_SPECIAL ; $d195
     ld a,[wPlayerMonNumber] ; $cc2f
     ld bc,$2c
@@ -57248,37 +57258,48 @@ CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
     call GetEnemyMonStat
     ld hl,$ff97
     pop bc
-.asm_3deef
-    ld a,[hli]
-    ld l,[hl]
-    ld h,a
-    or b
-    jr z,.asm_3df0a
-    srl b
-    rr c
-    srl b
-    rr c
-    srl h
-    rr l
-    srl h
-    rr l
-    ld a,l
-    or h
-    jr nz,.asm_3df0a
-    inc l
-.asm_3df0a
+.next3
+    call GetDamageVarsScaleStats
+.next4
     ld b,l
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld e,a
     ld a,[$d05e]
     and a
-    jr z,.asm_3df17
+    jr z,.next5
     sla e
-.asm_3df17
-    ld a,$1
+.next5
+    ld a,1
     and a
     and a
     ret
+
+GetDamageVarsScaleStats:
+    ld a,[hli]  ;HL: when this was taken
+    ld l,[hl]
+    ld h,a      ;*HL = attacker attack
+    or b         ;is either attack or defense high byte nonzero?
+    ret z
+    srl b  ;[defense] BC /= 4 [this is just so it fits into a single byte,10bits max]
+    rr c
+    srl b
+    rr c
+    srl h  ;[attack] HL /= 4 [to apply equal scaling]
+    rr l
+    srl h
+    rr l
+    ld a,l
+    or h
+    jr nz,.next
+    inc l
+.next
+    ld a,c
+    or b
+    ret nz
+    inc c
+    ret
+
+SECTION "GetEnemyMonStat",ROMX[$5f1c],BANK[$f]
 
 ; get stat c of enemy mon
 ; c: stat to get (HP=1,Attack=2,Defense=3,Speed=4,Special=5)
@@ -62398,35 +62419,9 @@ GetAttackerType:
     ret
 
 AmnesiaNewEffect:
-    ld hl,wPlayerMonSpecialMod ; $cd1d
-    ld de,W_PLAYERMOVEEFFECT ; $cfd3
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.done
-    ld hl,wEnemyMonSpecialMod ; $cd31
-    ld de,W_ENEMYMOVEEFFECT ; $cfcd
-.done
-    ld a,[hl] ; SpcMod
-    push af
-    push hl
-    push de
-    ld a,SPECIAL_UP1_EFFECT
-    ld [de],a
-    call StatModifierUpEffect
-    pop de
-    pop hl
-    pop af
-    cp [hl]
-    jr z,.end ; end if "NothingHappened"
-    push de
-    ld a,SPECIAL_DOWN_SIDE_EFFECT
-    ld [de],a
-    call RunAmnesiaSideEffect
-    pop de
-.end
-    ld a,AMNESIA_NEW_EFFECT
-    ld [de],a
-    ret
+    ld hl,AmnesiaNewEffect_
+    ld b,BANK(AmnesiaNewEffect_)
+    jp Bankswitch
 
 CheckCustomSideEffect:
     push hl
@@ -139386,6 +139381,46 @@ _CheckCounterFail:
 .Fail
     xor a ; set z flag
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+AmnesiaNewEffect_:
+    ld hl,wPlayerMonSpecialMod ; $cd1d
+    ld de,W_PLAYERMOVEEFFECT ; $cfd3
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr z,.done
+    ld hl,wEnemyMonSpecialMod ; $cd31
+    ld de,W_ENEMYMOVEEFFECT ; $cfcd
+.done
+    ld a,[hl] ; SpcMod
+    push af
+    push hl
+    push de
+    ld a,SPECIAL_UP1_EFFECT
+    ld [de],a
+    ld hl,StatModifierUpEffect
+    call .BankswitchToF
+    pop de
+    pop hl
+    pop af
+    cp [hl]
+    jr z,.end ; end if "NothingHappened"
+    push de
+    ld a,SPECIAL_DOWN_SIDE_EFFECT
+    ld [de],a
+    ld hl,wFlagAmnesiaSideEffectBit0
+    set 0,[hl]
+    ld hl,StatModifierDownEffect
+    call .BankswitchToF
+    pop de
+.end
+    ld a,AMNESIA_NEW_EFFECT
+    ld [de],a
+    ret
+.BankswitchToF
+    ld b,$F
+    jp Bankswitch
 
 ; ──────────────────────────────────────────────────────────────────────
 
