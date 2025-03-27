@@ -52820,40 +52820,6 @@ EffectsArray2:
 	db SPECIAL_DAMAGE_EFFECT
     db $FF
 
-; ResidualEffects2
-EffectsArray3:
-; non-side effects not included in ResidualEffects1
-; stat-affecting moves, sleep-inflicting moves, and Bide
-; e.g., Meditate, Bide, Hypnosis
-	db $01
-	db ATTACK_UP1_EFFECT
-	db DEFENSE_UP1_EFFECT
-	db SPEED_UP1_EFFECT
-	db SPECIAL_UP1_EFFECT
-	db ACCURACY_UP1_EFFECT
-	db EVASION_UP1_EFFECT
-	db ATTACK_DOWN1_EFFECT
-	db DEFENSE_DOWN1_EFFECT
-	db SPEED_DOWN1_EFFECT
-	db SPECIAL_DOWN1_EFFECT
-	db ACCURACY_DOWN1_EFFECT
-	db EVASION_DOWN1_EFFECT
-	db BIDE_EFFECT
-	db SLEEP_EFFECT
-	db ATTACK_UP2_EFFECT
-	db DEFENSE_UP2_EFFECT
-	db SPEED_UP2_EFFECT
-	db SPECIAL_UP2_EFFECT
-	db ACCURACY_UP2_EFFECT
-	db EVASION_UP2_EFFECT
-	db ATTACK_DOWN2_EFFECT
-	db DEFENSE_DOWN2_EFFECT
-	db SPEED_DOWN2_EFFECT
-	db SPECIAL_DOWN2_EFFECT
-	db ACCURACY_DOWN2_EFFECT
-	db EVASION_DOWN2_EFFECT
-    db $FF
-
 ; AlwaysHappenSideEffects
 EffectsArray4:
 ; Attacks that aren't finished after they faint the opponent.
@@ -52895,6 +52861,8 @@ EffectsArray5B:
 	db THRASH_PETAL_DANCE_EFFECT
 	db TRAPPING_EFFECT
     db $FF
+
+; Free
 
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
@@ -59193,7 +59161,46 @@ FixItSelfDamage:
     pop hl
     ret
 
-; Free
+; ResidualEffects2
+EffectsArray3:
+; non-side effects not included in ResidualEffects1
+; stat-affecting moves, sleep-inflicting moves, and Bide
+; e.g., Meditate, Bide, Hypnosis
+	db $01
+	db ATTACK_UP1_EFFECT
+	db DEFENSE_UP1_EFFECT
+	db SPEED_UP1_EFFECT
+	db SPECIAL_UP1_EFFECT
+	db ACCURACY_UP1_EFFECT
+	db EVASION_UP1_EFFECT
+	db ATTACK_DOWN1_EFFECT
+	db DEFENSE_DOWN1_EFFECT
+	db SPEED_DOWN1_EFFECT
+	db SPECIAL_DOWN1_EFFECT
+	db ACCURACY_DOWN1_EFFECT
+	db EVASION_DOWN1_EFFECT
+	db BIDE_EFFECT
+	db SLEEP_EFFECT
+	db ATTACK_UP2_EFFECT
+	db DEFENSE_UP2_EFFECT
+	db SPEED_UP2_EFFECT
+	db SPECIAL_UP2_EFFECT
+	db ACCURACY_UP2_EFFECT
+	db EVASION_UP2_EFFECT
+	db ATTACK_DOWN2_EFFECT
+	db DEFENSE_DOWN2_EFFECT
+	db SPEED_DOWN2_EFFECT
+	db SPECIAL_DOWN2_EFFECT
+	db ACCURACY_DOWN2_EFFECT
+	db EVASION_DOWN2_EFFECT
+	db ATTACK_UP3_EFFECT
+	db DEFENSE_UP3_EFFECT
+	db SPEED_UP3_EFFECT
+	db SPECIAL_UP3_EFFECT
+	db ACCURACY_UP3_EFFECT
+	db EVASION_UP3_EFFECT
+    db AMNESIA_NEW_EFFECT
+    db $FF
 
 SECTION "GetCurrentMove",ROMX[$6abe],BANK[$f]
 
