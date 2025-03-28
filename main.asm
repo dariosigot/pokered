@@ -44634,6 +44634,8 @@ DecreaseFossilStep:
     ret nz
     ; RestorePartyEnergy
     ld a,[W_NUMINPARTY]
+    and a
+    ret z
     ld d,a
     ld e,0
 .loop
@@ -48128,7 +48130,7 @@ OneHitKOEffect_: ; 33f57 (c:7f57)
     ld [hli],a
     ld [hl],a
     dec a
-    ld [$d05e],a
+    ld [wCriticalHitOrOHKO],a
     ld hl,$d02a
     ld de,$cffb
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -48152,7 +48154,7 @@ OneHitKOEffect_: ; 33f57 (c:7f57)
     ld [hli],a
     ld [hl],a
     ld a,$2
-    ld [$d05e],a
+    ld [wCriticalHitOrOHKO],a
     ret
 .asm_33f8a
     ld a,$1
@@ -52820,40 +52822,6 @@ EffectsArray2:
 	db SPECIAL_DAMAGE_EFFECT
     db $FF
 
-; ResidualEffects2
-EffectsArray3:
-; non-side effects not included in ResidualEffects1
-; stat-affecting moves, sleep-inflicting moves, and Bide
-; e.g., Meditate, Bide, Hypnosis
-	db $01
-	db ATTACK_UP1_EFFECT
-	db DEFENSE_UP1_EFFECT
-	db SPEED_UP1_EFFECT
-	db SPECIAL_UP1_EFFECT
-	db ACCURACY_UP1_EFFECT
-	db EVASION_UP1_EFFECT
-	db ATTACK_DOWN1_EFFECT
-	db DEFENSE_DOWN1_EFFECT
-	db SPEED_DOWN1_EFFECT
-	db SPECIAL_DOWN1_EFFECT
-	db ACCURACY_DOWN1_EFFECT
-	db EVASION_DOWN1_EFFECT
-	db BIDE_EFFECT
-	db SLEEP_EFFECT
-	db ATTACK_UP2_EFFECT
-	db DEFENSE_UP2_EFFECT
-	db SPEED_UP2_EFFECT
-	db SPECIAL_UP2_EFFECT
-	db ACCURACY_UP2_EFFECT
-	db EVASION_UP2_EFFECT
-	db ATTACK_DOWN2_EFFECT
-	db DEFENSE_DOWN2_EFFECT
-	db SPEED_DOWN2_EFFECT
-	db SPECIAL_DOWN2_EFFECT
-	db ACCURACY_DOWN2_EFFECT
-	db EVASION_DOWN2_EFFECT
-    db $FF
-
 ; AlwaysHappenSideEffects
 EffectsArray4:
 ; Attacks that aren't finished after they faint the opponent.
@@ -52889,12 +52857,32 @@ EffectsArray5:
 	db RECOIL_EFFECT
     ; fallthru
 
-; SpecialEffectsCont
-EffectsArray5B:
-; damaging moves whose effect is executed prior to damage calculation
-	db THRASH_PETAL_DANCE_EFFECT
-	db TRAPPING_EFFECT
-    db $FF
+GetDamageVarsScaleStats:
+    ld a,[hli]  ;HL: when this was taken
+    ld l,[hl]
+    ld h,a      ;*HL = attacker attack
+    or b         ;is either attack or defense high byte nonzero?
+    ret z
+    srl b  ;[defense] BC /= 4 [this is just so it fits into a single byte,10bits max]
+    rr c
+    srl b
+    rr c
+    srl h  ;[attack] HL /= 4 [to apply equal scaling]
+    rr l
+    srl h
+    rr l
+    ld a,l
+    or h
+    jr nz,.next
+    inc l
+.next
+    ld a,c
+    or b
+    ret nz
+    inc c
+    ret
+
+; Free
 
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
@@ -53388,11 +53376,6 @@ MainInBattleLoop: ; 3c233 (f:4233)
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
 
-RunAmnesiaSideEffect:
-    ld hl,wFlagAmnesiaSideEffectBit0
-    set 0,[hl]
-    jp StatModifierDownEffect
-
 ; Free
 
 SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
@@ -53553,6 +53536,13 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
 InsertRealTypes:
     call GetMonHeader
     PREDEF_JUMP InsertRealTypesPredef
+
+; SpecialEffectsCont
+EffectsArray5B:
+; damaging moves whose effect is executed prior to damage calculation
+    db THRASH_PETAL_DANCE_EFFECT
+    db TRAPPING_EFFECT
+    db $FF
 
 SECTION "HandlePoisonBurnLeechSeed_IncreaseEnemyHP",ROMX[$44a3],BANK[$f]
 
@@ -56652,7 +56642,7 @@ PlayerHurtItself: ; 3daad (f:5aad)
     push af
     xor a
     ld [hli],a
-    call FixItSelfDamage ; ld [$d05e],a
+    call FixItSelfDamage ; ld [wCriticalHitOrOHKO],a
     ld a,$28
     ld [hli],a
     xor a
@@ -56810,7 +56800,7 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
 ;    and a
 ;    jr z,.gotTextToPrint
     ld hl,AttackMissedText ; $5c42
-    ld a,[$d05e] ; CriticalHitOrOHKO
+    ld a,[wCriticalHitOrOHKO] ; CriticalHitOrOHKO
     cp $ff
     jr nz,.gotTextToPrint
     ld hl,UnaffectedText ; $5c4c
@@ -56818,7 +56808,7 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     push de
     call Delay50AndPrintText
     xor a
-    ld [$d05e],a ; CriticalHitOrOHKO
+    ld [wCriticalHitOrOHKO],a ; CriticalHitOrOHKO
     pop de
     ld a,[de]
     cp JUMP_KICK_EFFECT
@@ -56882,7 +56872,7 @@ DoesntAffectMonText:
 SECTION "PrintCriticalOHKOText",ROMX[$5c5c],BANK[$f]
 
 PrintCriticalOHKOText: ; 3dc5c (f:5c5c)
-    ld a,[$d05e]
+    ld a,[wCriticalHitOrOHKO]
     and a
     jr z,.asm_3dc75
     dec a
@@ -56896,7 +56886,7 @@ PrintCriticalOHKOText: ; 3dc5c (f:5c5c)
     ld l,a
     call PrintText
     xor a
-    ld [$d05e],a
+    ld [wCriticalHitOrOHKO],a
 .asm_3dc75
     ld c,$14
     jp DelayFrames
@@ -57129,14 +57119,17 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     ld b,a
     ld c,[hl]
     ld a,[W_ENEMYBATTSTATUS3]  ;test for reflect
-    bit 2,a
+    bit 2,a ; reflect
     jr z,.next
 .doubleDefense
     sla c  ;x2 defense if bit2 of D069 is set
     rl b
+; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
+; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
+    PREDEF BC999capPredef
 .next
     ld hl,W_PLAYERMONATK  ;attack pointer
-    ld a,[$d05e]
+    ld a,[wCriticalHitOrOHKO]
     and a
     jr z,.next3
     ld c,3
@@ -57151,6 +57144,7 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     ld bc,$002c
     call AddNTimes
     pop bc
+    PREDEF CritHitStatsPlayerPhysicalPredef
     jr .next3
 .specialAttack
     ld hl,W_ENEMYMONSPECIAL    ;opponent special
@@ -57158,17 +57152,19 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     ld b,a
     ld c,[hl]
     ld a,[W_ENEMYBATTSTATUS3]  ;test for lightscreen
-    bit 1,a
+    bit 1,a ; light screen
     jr z,.next2
 .doubleSpecialDefense
     sla c           ;x2 special defense if bit1 of D069 set
     rl b
+; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
+; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
+    PREDEF BC999capPredef
 .next2
     ld hl,W_PLAYERMONSPECIAL
-    ld a,[$d05e]   ;XXX
+    ld a,[wCriticalHitOrOHKO]   ;XXX
     and a
     jr z,.next3  ;skip portion of code that pulls up inactive pokemon
-.loadOtherPoke
     ld c,5
     call GetEnemyMonStat
     ld a,[$ff00+$97]
@@ -57181,38 +57177,23 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     ld bc,$002c
     call AddNTimes
     pop bc
+    PREDEF CritHitStatsPlayerSpecialPredef
 .next3
-    ld a,[hli]  ;HL: when this was taken
-    ld l,[hl]
-    ld h,a      ;*HL = attacker attack
-    or b         ;is either attack or defense high byte nonzero?
-    jr z,.next4
-    srl b  ;[defense] BC /= 4 [this is just so it fits into a single byte,10bits max]
-    rr c
-    srl b
-    rr c
-    srl h  ;[attack] HL /= 4 [to apply equal scaling]
-    rr l
-    srl h
-    rr l
-    ld a,l
-    or h
-    jr nz,.next4  ;is HL result zero?
-    inc l            ;minimum HL = 1
+    call GetDamageVarsScaleStats
 .next4
     ld b,l        ;*B = attack [possibly scaled] [C contains defense]
     ld a,[$d022]  ;*E = level
     ld e,a
-    ld a,[$d05e]  ;critical hit?
-    and a
-    jr z,.next5
-    sla e    ;double level if it was a critical hit
-.next5
+;    ld a,[wCriticalHitOrOHKO] ; do this in damage calculation
+;    and a                     ; ...
+;    jr z,.next5               ; ...
+;    sla e                     ; ...
+;.next5                        ; ...
     ld a,1  ;return Z = 0
     and a
     ret
 
-CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
+CalculateDamageAfterEnemyAttack: ; Moved in the Bank
     ld hl,W_DAMAGE ; $d0d7
     xor a
     ld [hli],a
@@ -57225,21 +57206,24 @@ CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
     ;ld a,[hl]
     ;cp $14
     call TestPhysicalSpecialBattle
-    jr nz,.asm_3debc
+    jr nz,.specialAttack
     ld hl,W_PLAYERMONDEF
     ld a,[hli]
     ld b,a
     ld c,[hl]
     ld a,[W_PLAYERBATTSTATUS3] ; $d064
-    bit 2,a
-    jr z,.asm_3de98
+    bit 2,a ; reflect
+    jr z,.next
     sla c
     rl b
-.asm_3de98
+; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
+; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
+    PREDEF BC999capPredef
+.next
     ld hl,W_ENEMYMONATTACK
-    ld a,[$d05e]
+    ld a,[wCriticalHitOrOHKO]
     and a
-    jr z,.asm_3deef
+    jr z,.next3
     ld hl,W_PARTYMON1_DEFENSE ; $d191
     ld a,[wPlayerMonNumber] ; $cc2f
     ld bc,$2c
@@ -57252,22 +57236,26 @@ CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
     call GetEnemyMonStat
     ld hl,$ff97
     pop bc
-    jr .asm_3deef
-.asm_3debc
+    PREDEF CritHitStatsEnemyPhysicalPredef
+    jr .next3
+.specialAttack
     ld hl,W_PLAYERMONSPECIAL
     ld a,[hli]
     ld b,a
     ld c,[hl]
     ld a,[W_PLAYERBATTSTATUS3] ; $d064
-    bit 1,a
-    jr z,.asm_3decd
+    bit 1,a ; light screen
+    jr z,.next2
     sla c
     rl b
-.asm_3decd
+; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
+; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
+    PREDEF BC999capPredef
+.next2
     ld hl,W_ENEMYMONSPECIAL ; $cffc
-    ld a,[$d05e]
+    ld a,[wCriticalHitOrOHKO]
     and a
-    jr z,.asm_3deef
+    jr z,.next3
     ld hl,W_PARTYMON1_SPECIAL ; $d195
     ld a,[wPlayerMonNumber] ; $cc2f
     ld bc,$2c
@@ -57280,41 +57268,26 @@ CalculateDamageAfterEnemyAttack: ; 3de75 (f:5e75)
     call GetEnemyMonStat
     ld hl,$ff97
     pop bc
-.asm_3deef
-    ld a,[hli]
-    ld l,[hl]
-    ld h,a
-    or b
-    jr z,.asm_3df0a
-    srl b
-    rr c
-    srl b
-    rr c
-    srl h
-    rr l
-    srl h
-    rr l
-    ld a,l
-    or h
-    jr nz,.asm_3df0a
-    inc l
-.asm_3df0a
+    PREDEF CritHitStatsEnemySpecialPredef
+.next3
+    call GetDamageVarsScaleStats
+.next4
     ld b,l
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld e,a
-    ld a,[$d05e]
-    and a
-    jr z,.asm_3df17
-    sla e
-.asm_3df17
-    ld a,$1
+;    ld a,[wCriticalHitOrOHKO] ; do this in damage calculation
+;    and a                     ; ...
+;    jr z,.next5               ; ...
+;    sla e                     ; ...
+;.next5                        ; ...
+    ld a,1
     and a
     and a
     ret
 
 ; get stat c of enemy mon
 ; c: stat to get (HP=1,Attack=2,Defense=3,Speed=4,Special=5)
-GetEnemyMonStat: ; 3df1c (f:5f1c)
+GetEnemyMonStat: ; Moved in the Bank
     push de
     push bc
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -57355,7 +57328,7 @@ GetEnemyMonStat: ; 3df1c (f:5f1c)
     pop de
     ret
 
-MoreCalculateDamage: ; 3df65 (f:5f65)
+MoreCalculateDamage: ; Moved in the Bank
 ; input:
 ;    b: attack
 ;    c: opponent defense
@@ -57385,7 +57358,7 @@ MoreCalculateDamage: ; 3df65 (f:5f65)
 
 ; Calculate OHKO damage based on remaining HP.
     cp a,OHKO_EFFECT
-    jp z,Func_3e016
+    jp z,.Func_3e016
 
 ; Don't calculate damage for moves that don't do any.
     ld a,d ; base power
@@ -57400,14 +57373,31 @@ MoreCalculateDamage: ; 3df65 (f:5f65)
     ld [hl],a
 
 ; Multiply level by 2
+; made this more efficient by using shifts and rotates
     ld a,e ; level
-    add a
-    jr nc,.nc
-    push af
-    ld a,1
-    ld [hl],a
-    pop af
-.nc
+;    add a
+;    jr nc,.nc
+;    push af
+;    ld a,1
+;    ld [hl],a
+;    pop af
+;.nc
+;    inc hl
+;    ldi [hl],a
+    sla a
+    rl [hl]
+
+; double the effective level here if critical hit instead of GetDamageVars functions
+    push bc
+    ld b,a
+    ld a,[wCriticalHitOrOHKO]
+    cp 1
+    ld a,b
+    pop bc
+    jr c,.nocrit
+    sla a
+    rl [hl]
+.nocrit
     inc hl
     ldi [hl],a
 
@@ -57514,7 +57504,7 @@ MoreCalculateDamage: ; 3df65 (f:5f65)
     and a
     ret
 
-Func_3e016: ; 3e016 (f:6016)
+.Func_3e016
     call JumpMoveEffect
     ld a,[W_MOVEMISSED] ; $d05f
     dec a
@@ -57656,6 +57646,8 @@ HandleCounterMove: ; Moved in the Bank
 .specialAttackFail
     xor a
     ret
+
+; Free
 
 SECTION "ApplyAttackToEnemyPokemon",ROMX[$60df],BANK[$f]
 
@@ -58221,7 +58213,7 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
     jr nz,.skipTypeImmunity
 ;    inc a               ; if damage is 0,make the move miss
 ;    ld [W_MOVEMISSED],a ; ...
-    ld [$d05e],a ; if damage is 0,delete crit hit flag
+    ld [wCriticalHitOrOHKO],a ; if damage is 0,delete crit hit flag
 .skipTypeImmunity
     pop bc
     pop hl
@@ -59159,7 +59151,7 @@ EnemyHurtItself:
     push af
     xor a
     ld [hli],a
-    call FixItSelfDamage ; ld [$d05e],a
+    call FixItSelfDamage ; ld [wCriticalHitOrOHKO],a
     ld a,$28
     ld [hli],a
     xor a
@@ -59184,7 +59176,7 @@ EnemyHurtItself:
     jp ApplyDamageToEnemyPokemon
 
 FixItSelfDamage:
-    ld [$d05e],a
+    ld [wCriticalHitOrOHKO],a
     push hl
     push de
     call GetSelectedMovePointer
@@ -59193,7 +59185,46 @@ FixItSelfDamage:
     pop hl
     ret
 
-; Free
+; ResidualEffects2
+EffectsArray3:
+; non-side effects not included in ResidualEffects1
+; stat-affecting moves, sleep-inflicting moves, and Bide
+; e.g., Meditate, Bide, Hypnosis
+	db $01
+	db ATTACK_UP1_EFFECT
+	db DEFENSE_UP1_EFFECT
+	db SPEED_UP1_EFFECT
+	db SPECIAL_UP1_EFFECT
+	db ACCURACY_UP1_EFFECT
+	db EVASION_UP1_EFFECT
+	db ATTACK_DOWN1_EFFECT
+	db DEFENSE_DOWN1_EFFECT
+	db SPEED_DOWN1_EFFECT
+	db SPECIAL_DOWN1_EFFECT
+	db ACCURACY_DOWN1_EFFECT
+	db EVASION_DOWN1_EFFECT
+	db BIDE_EFFECT
+	db SLEEP_EFFECT
+	db ATTACK_UP2_EFFECT
+	db DEFENSE_UP2_EFFECT
+	db SPEED_UP2_EFFECT
+	db SPECIAL_UP2_EFFECT
+	db ACCURACY_UP2_EFFECT
+	db EVASION_UP2_EFFECT
+	db ATTACK_DOWN2_EFFECT
+	db DEFENSE_DOWN2_EFFECT
+	db SPEED_DOWN2_EFFECT
+	db SPECIAL_DOWN2_EFFECT
+	db ACCURACY_DOWN2_EFFECT
+	db EVASION_DOWN2_EFFECT
+	db ATTACK_UP3_EFFECT
+	db DEFENSE_UP3_EFFECT
+	db SPEED_UP3_EFFECT
+	db SPECIAL_UP3_EFFECT
+	db ACCURACY_UP3_EFFECT
+	db EVASION_UP3_EFFECT
+    db STAT_UP1_DOWN_SIDE_EFFECT
+    db $FF
 
 SECTION "GetCurrentMove",ROMX[$6abe],BANK[$f]
 
@@ -60265,7 +60296,7 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierDownEffect       ; unused effect
      dw ConfusionEffect              ; CONFUSION_SIDE_EFFECT
      dw TwoToFiveAttacksEffect       ; TWINEEDLE_EFFECT
-     dw AmnesiaNewEffect             ; AMNESIA_NEW_EFFECT
+     dw StatUp1DownSideEffect        ; STAT_UP1_DOWN_SIDE_EFFECT
      dw SubstituteEffect             ; SUBSTITUTE_EFFECT
      dw HyperBeamEffect              ; HYPER_BEAM_EFFECT
      dw RageEffect                   ; RAGE_EFFECT
@@ -62390,40 +62421,14 @@ GetAttackerType:
     ld a,WIND
     ret
 
-AmnesiaNewEffect:
-    ld hl,wPlayerMonSpecialMod ; $cd1d
-    ld de,W_PLAYERMOVEEFFECT ; $cfd3
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.done
-    ld hl,wEnemyMonSpecialMod ; $cd31
-    ld de,W_ENEMYMOVEEFFECT ; $cfcd
-.done
-    ld a,[hl] ; SpcMod
-    push af
-    push hl
-    push de
-    ld a,SPECIAL_UP1_EFFECT
-    ld [de],a
-    call StatModifierUpEffect
-    pop de
-    pop hl
-    pop af
-    cp [hl]
-    jr z,.end ; end if "NothingHappened"
-    push de
-    ld a,SPECIAL_DOWN_SIDE_EFFECT
-    ld [de],a
-    call RunAmnesiaSideEffect
-    pop de
-.end
-    ld a,AMNESIA_NEW_EFFECT
-    ld [de],a
-    ret
+StatUp1DownSideEffect:
+    ld hl,StatUp1DownSideEffect_
+    ld b,BANK(StatUp1DownSideEffect_)
+    jp Bankswitch
 
 CheckCustomSideEffect:
     push hl
-    ld hl,wFlagAmnesiaSideEffectBit0
+    ld hl,wFlagUpDownSideEffectBit0
     bit 0,[hl]
     res 0,[hl]
     pop hl
@@ -76034,6 +76039,16 @@ MovesMenuPredef:
     dbw BANK(MovesMenu),MovesMenu ; 65
 PrintMoveDetailsBoxPredef:
     dbw BANK(PrintMoveDetailsBox),PrintMoveDetailsBox ; 66
+BC999capPredef:
+    dbw BANK(BC999cap),BC999cap ; 67
+CritHitStatsPlayerPhysicalPredef:
+    dbw BANK(CritHitStatsPlayerPhysical),CritHitStatsPlayerPhysical ; 68
+CritHitStatsPlayerSpecialPredef:
+    dbw BANK(CritHitStatsPlayerSpecial),CritHitStatsPlayerSpecial ; 69
+CritHitStatsEnemyPhysicalPredef:
+    dbw BANK(CritHitStatsEnemyPhysical),CritHitStatsEnemyPhysical ; 6A
+CritHitStatsEnemySpecialPredef:
+    dbw BANK(CritHitStatsEnemySpecial),CritHitStatsEnemySpecial ; 6B
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -79510,7 +79525,7 @@ InitBattleVariables: ; 525af (14:65af)
     ld [hli],a
     ld [hl],a
     ld [wListScrollOffset],a ; $cc36
-    ld [$d05e],a
+    ld [wCriticalHitOrOHKO],a
     ld [W_PLAYERMONID],a
     ld [W_PLAYERMONSALIVEFLAGS],a
     ld [wPlayerMonNumber],a ; $cc2f
@@ -136412,7 +136427,7 @@ AdvanceRNGState::
 ; among the most popular) tend to CH about 20 to 25% of the time."
 ;_CriticalHitTest:
 ;    xor a
-;    ld [$d05e],a
+;    ld [wCriticalHitOrOHKO],a
 ;    ld a,[H_WHOSETURN] ; $FF00+$f3
 ;    and a
 ;    ld a,[$cfe5]
@@ -136473,7 +136488,7 @@ AdvanceRNGState::
 ;    cp b                         ; check a against calculated crit rate
 ;    ret nc                       ; no critical hit if no borrow
 ;    ld a,$1
-;    ld [$d05e],a                ; set critical hit flag
+;    ld [wCriticalHitOrOHKO],a                ; set critical hit flag
 ;    ret
 
 GenRandomInBattle_CH:
@@ -136495,7 +136510,7 @@ HighCriticalMoves:
 
 _CriticalHitTest_NoBug:
     xor a
-    ld [$d05e],a
+    ld [wCriticalHitOrOHKO],a
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_ENEMYMONPP+1] ; move2pp
@@ -136572,7 +136587,7 @@ _CriticalHitTest_NoBug:
     cp b                         ; check a against calculated crit rate
     ret nc                       ; no critical hit if no borrow
     ld a,$1
-    ld [$d05e],a                 ; set critical hit flag
+    ld [wCriticalHitOrOHKO],a                 ; set critical hit flag
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -139378,6 +139393,287 @@ _CheckCounterFail:
     ret
 .Fail
     xor a ; set z flag
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+StatUp1DownSideEffect_:
+    call .GetPlayerOrEnemyPointer
+    ld a,[de]
+    push af ; Backup Real Move Effect
+    call .GetPointerToCorrectStatMod
+    ld a,[hl] ; SpcMod
+    call .StatModifierUpEffect
+    cp [hl]
+    jr z,.end ; end if "NothingHappened"
+    ld hl,wFlagUpDownSideEffectBit0
+    set 0,[hl]
+    call .StatModifierDownEffect
+.end
+    pop af ; Restore Real Move Effect
+    ld [de],a
+    ret
+.GetPlayerOrEnemyPointer
+    ld hl,wPlayerMonStatMods
+    ld de,W_PLAYERMOVEEFFECT
+    ld bc,W_PLAYERMOVENUM
+    ld a,[H_WHOSETURN]
+    and a
+    ret z
+    ld hl,wEnemyMonStatMods
+    ld de,W_ENEMYMOVEEFFECT
+    ld bc,W_ENEMYMOVENUM
+    ret
+.BankswitchToF
+    ld b,$F
+    jp Bankswitch
+.GetPointerToCorrectStatMod
+    call .CheckAmnesiaOrSwordDance
+    ret nz
+    push bc
+    ld bc,wPlayerMonSpecialMod-wPlayerMonStatMods
+    add hl,bc
+    pop bc
+    ret
+.StatModifierUpEffect
+    push af
+    push bc
+    push hl
+    push de
+    call .CheckAmnesiaOrSwordDance
+    ld a,SPECIAL_UP1_EFFECT
+    jr z,.next1
+    ld a,ATTACK_UP1_EFFECT
+.next1
+    ld [de],a
+    ld hl,StatModifierUpEffect
+    call .BankswitchToF
+    pop de
+    pop hl
+    pop bc
+    pop af
+    ret
+.StatModifierDownEffect
+    push de
+    call .CheckAmnesiaOrSwordDance
+    ld a,SPECIAL_DOWN_SIDE_EFFECT
+    jr z,.next2
+    ld a,DEFENSE_DOWN_SIDE_EFFECT
+.next2
+    ld [de],a
+    ld hl,StatModifierDownEffect
+    call .BankswitchToF
+    pop de
+    ret
+.CheckAmnesiaOrSwordDance
+    ld a,[bc]
+    cp AMNESIA
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+;This function automatically adjusts the stat quantities for critical hits.
+;Normally,unmodified stats will be used.
+;But if this would cause less damage an a non-crit hit,then the modified stats are used instead.
+;BC is unmodified defensive stat. HL points to unmodified offensive stat.
+CritHitStatsPlayerPhysical:
+    ld a,1
+    jr CritHitStatsCommon
+CritHitStatsPlayerSpecial:
+    ld a,2
+    jr CritHitStatsCommon
+CritHitStatsEnemyPhysical:
+    ld a,3
+    jr CritHitStatsCommon
+CritHitStatsEnemySpecial:
+    ld a,4
+    ;fall through to CritHitStatsCommon
+CritHitStatsCommon:
+    ld [wCriticalHitOrOHKO],a
+    call Load16BitRegisters
+    push de
+    call .saveatk
+    
+    call .reset
+    ;get unmodified defensive stat,divide by 4,and place it as a multiplier
+    push bc
+    call .BCdiv4
+    ld [H_MULTIPLIER],a
+    pop bc
+    ;get modified offensive stat,divide by 4,and place it as a multiplicand
+    push hl
+    call .get_modified_offense
+    call .HLdiv4
+    ld [H_MULTIPLICAND + 2],a
+    pop hl
+    ;multiply the two together then divide by 2
+    call Multiply
+    ld a,[H_MULTIPLICAND + 2]
+    ld e,a
+    ld a,[H_MULTIPLICAND + 1]
+    ld d,a
+    srl d
+    rr e
+    ;save result by pushing de
+    push de
+
+    call .reset
+    ;get modified defensive stat,divide by 4,and place it as a multiplier
+    push bc
+    call .get_modified_defense
+    call .BCdiv4
+    ld [H_MULTIPLIER],a
+    pop bc
+    ;get unmodified offensive stat,divide by 4,and place it as a multiplicand
+    push hl
+    ld hl,hDivideBCDBuffer
+    call .HLdiv4
+    pop hl
+    ld [H_MULTIPLICAND + 2],a
+    ;multiply the two together and retrieve the previously saved product
+    call Multiply
+    pop de
+    
+    ;If the first product (in de) is >= the second product (in the hram product addresses),
+    ;then the critical hit would do less damage than a non-crit attack.
+    ;If so,restore the modified stats to prevent this.
+    push bc
+    ld a,[H_MULTIPLICAND + 1]
+    ld b,a
+    ld a,[H_MULTIPLICAND + 2]
+    ld c,a
+    ld a,e
+    sub c
+    ld a,d
+    sbc b
+    pop bc
+    call .restoreatk
+    call nc,.restoreStats
+    
+    pop de
+    ld a,1
+    ld [wCriticalHitOrOHKO],a
+    ret
+.reset
+    xor a
+    ld [H_PRODUCT],a
+    ld [H_MULTIPLICAND],a
+    ld [H_MULTIPLICAND + 1],a
+    ld [H_MULTIPLICAND + 2],a
+    ret
+.saveatk
+    ld a,[hli]
+    ld [hDivideBCDBuffer],a
+    ld a,[hld]
+    ld [hDivideBCDBuffer + 1],a
+    ret
+.restoreatk
+    ld a,[hDivideBCDBuffer]
+    ld [hli],a
+    ld a,[hDivideBCDBuffer + 1]
+    ld [hld],a
+    ret
+.HLdiv4
+    ld a,[hli]
+    ld d,a
+    ld a,[hld]
+    ld e,a
+    srl d
+    rr e
+    srl d
+    rr e
+    ld a,e
+    ret
+.BCdiv4
+    srl b
+    rr c
+    srl b
+    rr c
+    ld a,c
+    ret
+.get_modified_offense
+    ld a,[wCriticalHitOrOHKO]
+    ld hl,W_PLAYERMONATK
+    cp 1
+    ret z
+    ld hl,W_PLAYERMONSPECIAL
+    cp 2
+    ret z
+    ld hl,W_ENEMYMONATTACK
+    cp 3
+    ret z
+    ld hl,W_ENEMYMONSPECIAL
+    ret
+.restoreStats
+    call .get_modified_defense
+    jr .get_modified_offense
+.get_modified_defense
+    ld a,[wCriticalHitOrOHKO]
+    cp 1
+    jr z,.enemyDef
+    cp 2
+    jr z,.enemySpec
+    cp 3
+    jr z,.playerDef
+.playerSpec
+    ld a,[W_PLAYERMONSPECIAL]
+    ld b,a
+    ld a,[W_PLAYERMONSPECIAL + 1]
+    ld c,a
+    ld a,[W_PLAYERBATTSTATUS3]
+    bit HAS_LIGHT_SCREEN_UP,a
+    ret z
+    jr .adjust_and_finish
+.enemyDef
+    ld a,[W_ENEMYMONDEFENSE]
+    ld b,a
+    ld a,[W_ENEMYMONDEFENSE + 1]
+    ld c,a
+    ld a,[W_ENEMYBATTSTATUS3]
+    bit HAS_REFLECT_UP,a
+    ret z
+    jr .adjust_and_finish
+.enemySpec
+    ld a,[W_ENEMYMONSPECIAL]
+    ld b,a
+    ld a,[W_ENEMYMONSPECIAL + 1]
+    ld c,a
+    ld a,[W_ENEMYBATTSTATUS3]
+    bit HAS_LIGHT_SCREEN_UP,a
+    ret z
+    jr .adjust_and_finish
+.playerDef
+    ld a,[W_PLAYERMONDEF]
+    ld b,a
+    ld a,[W_PLAYERMONDEF + 1]
+    ld c,a
+    ld a,[W_PLAYERBATTSTATUS3]
+    bit HAS_REFLECT_UP,a
+    ret z
+.adjust_and_finish
+    sla c
+    rl b
+    jr BC999cap_
+
+BC999cap:
+    call Load16BitRegisters
+BC999cap_:
+    ;b register contains high byte & c register contains low byte
+    ld a,c ;let's work on low byte first. Note that decimal 999 is $03E7 in hex.
+    sub 999 % $100 ;a = a - ($03E7 % $100). Gives a = a - $E7. A byte % $100 always gives the lesser nibble.
+    ;Note that if a < $E7 then the carry bit 'c' in the flag register gets set due to overflowing with a negative result.
+    ld a,b ;now let's work on the high byte
+    sbc 999 / $100 ;a = a - ($03E7 / $100 + c_flag). Gives a = a - ($03 + c_flag). A byte / $100 always gives the greater nibble.
+    ;Note again that if a < $03 then the carry bit remains set. 
+    ;If the bit is already set from the lesser nibble, then its addition here can still make it remain set if a is low enough.
+    jr c,.donecapping ;jump to next marker if the c_flag is set. This only remains set if BC <  the cap of $03E7.
+    ;else let's continue and set the 999 cap
+    ld a,999 / $100 ; else load $03 into a
+    ld b,a ;and store it as the high byte
+    ld a,999 % $100 ; else load $E7 into a
+    ld c,a ;and store it as the low byte
+    ;now registers b & c together contain $03E7 for a capped stat value of 999
+.donecapping
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
