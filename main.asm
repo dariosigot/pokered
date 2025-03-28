@@ -59223,7 +59223,7 @@ EffectsArray3:
 	db SPECIAL_UP3_EFFECT
 	db ACCURACY_UP3_EFFECT
 	db EVASION_UP3_EFFECT
-    db AMNESIA_NEW_EFFECT
+    db STAT_UP1_DOWN_SIDE_EFFECT
     db $FF
 
 SECTION "GetCurrentMove",ROMX[$6abe],BANK[$f]
@@ -60296,7 +60296,7 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierDownEffect       ; unused effect
      dw ConfusionEffect              ; CONFUSION_SIDE_EFFECT
      dw TwoToFiveAttacksEffect       ; TWINEEDLE_EFFECT
-     dw AmnesiaNewEffect             ; AMNESIA_NEW_EFFECT
+     dw StatUp1DownSideEffect        ; STAT_UP1_DOWN_SIDE_EFFECT
      dw SubstituteEffect             ; SUBSTITUTE_EFFECT
      dw HyperBeamEffect              ; HYPER_BEAM_EFFECT
      dw RageEffect                   ; RAGE_EFFECT
@@ -62421,14 +62421,14 @@ GetAttackerType:
     ld a,WIND
     ret
 
-AmnesiaNewEffect:
-    ld hl,AmnesiaNewEffect_
-    ld b,BANK(AmnesiaNewEffect_)
+StatUp1DownSideEffect:
+    ld hl,StatUp1DownSideEffect_
+    ld b,BANK(StatUp1DownSideEffect_)
     jp Bankswitch
 
 CheckCustomSideEffect:
     push hl
-    ld hl,wFlagAmnesiaSideEffectBit0
+    ld hl,wFlagUpDownSideEffectBit0
     bit 0,[hl]
     res 0,[hl]
     pop hl
@@ -139397,43 +139397,78 @@ _CheckCounterFail:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-AmnesiaNewEffect_:
-    ld hl,wPlayerMonSpecialMod ; $cd1d
-    ld de,W_PLAYERMOVEEFFECT ; $cfd3
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.done
-    ld hl,wEnemyMonSpecialMod ; $cd31
-    ld de,W_ENEMYMOVEEFFECT ; $cfcd
-.done
+StatUp1DownSideEffect_:
+    call .GetPlayerOrEnemyPointer
+    ld a,[de]
+    push af ; Backup Real Move Effect
+    call .GetPointerToCorrectStatMod
     ld a,[hl] ; SpcMod
+    call .StatModifierUpEffect
+    cp [hl]
+    jr z,.end ; end if "NothingHappened"
+    ld hl,wFlagUpDownSideEffectBit0
+    set 0,[hl]
+    call .StatModifierDownEffect
+.end
+    pop af ; Restore Real Move Effect
+    ld [de],a
+    ret
+.GetPlayerOrEnemyPointer
+    ld hl,wPlayerMonStatMods
+    ld de,W_PLAYERMOVEEFFECT
+    ld bc,W_PLAYERMOVENUM
+    ld a,[H_WHOSETURN]
+    and a
+    ret z
+    ld hl,wEnemyMonStatMods
+    ld de,W_ENEMYMOVEEFFECT
+    ld bc,W_ENEMYMOVENUM
+    ret
+.BankswitchToF
+    ld b,$F
+    jp Bankswitch
+.GetPointerToCorrectStatMod
+    call .CheckAmnesiaOrSwordDance
+    ret nz
+    push bc
+    ld bc,wPlayerMonSpecialMod-wPlayerMonStatMods
+    add hl,bc
+    pop bc
+    ret
+.StatModifierUpEffect
     push af
+    push bc
     push hl
     push de
+    call .CheckAmnesiaOrSwordDance
     ld a,SPECIAL_UP1_EFFECT
+    jr z,.next1
+    ld a,ATTACK_UP1_EFFECT
+.next1
     ld [de],a
     ld hl,StatModifierUpEffect
     call .BankswitchToF
     pop de
     pop hl
+    pop bc
     pop af
-    cp [hl]
-    jr z,.end ; end if "NothingHappened"
+    ret
+.StatModifierDownEffect
     push de
+    call .CheckAmnesiaOrSwordDance
     ld a,SPECIAL_DOWN_SIDE_EFFECT
+    jr z,.next2
+    ld a,DEFENSE_DOWN_SIDE_EFFECT
+.next2
     ld [de],a
-    ld hl,wFlagAmnesiaSideEffectBit0
-    set 0,[hl]
     ld hl,StatModifierDownEffect
     call .BankswitchToF
     pop de
-.end
-    ld a,AMNESIA_NEW_EFFECT
-    ld [de],a
     ret
-.BankswitchToF
-    ld b,$F
-    jp Bankswitch
+.CheckAmnesiaOrSwordDance
+    ld a,[bc]
+    cp AMNESIA
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
