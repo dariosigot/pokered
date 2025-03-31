@@ -13054,8 +13054,7 @@ CableClub_DoBattleOrTradeAgain:
     res 7,[hl]
     ld a,$2c
     call Predef ; indirect jump to InitOpponent (3ef18 (f:6f18))
-    ld a,$7
-    call Predef ; indirect jump to HealParty (f6a5 (3:76a5))
+    PREDEF HealPartyPredef
     jp Func_577d
 .asm_5506
     ld c,BANK(Music_GameCorner)
@@ -38626,8 +38625,7 @@ OaksLabScript12: ; 1ce03 (7:4e03)
     xor a
     ld [$ff00+$8d],a
     call Func_34a6 ; face object
-    ld a,$7
-    call Predef
+    PREDEF HealPartyPredef
     ld hl,$d74b
     set 3,[hl]
 
@@ -88524,7 +88522,7 @@ Lance_h: ; 0x5a2a2 to 0x5a2ae (12 bytes) (id=113)
     dw LanceObject ; objects
 
 LanceScript: ; 5a2ae (16:62ae)
-    call LanceScript_5a2c4
+    call CustomContinuesScript ; call LanceScript_5a2c4
     call EnableAutoTextBoxDrawing
     ld hl,LanceTrainerHeaders
     ld de,LanceScriptPointers
@@ -88949,6 +88947,21 @@ GetLoadedMonHeader:
     ld a,[$cfb6] ; move2pp
     ld [wAlternateFormIndex],a
     jp GetMonHeader
+
+CustomContinuesScript:
+    call LanceScript_5a2c4
+    ; CheckHealAfterLance
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    ret z
+    ld a,[$d866]
+    bit 6,a
+    ret z
+    PREDEF HealPartyPredef
+    call GBFadeOut2
+    call Delay3
+    jp GBFadeIn2
 
 SECTION "bank17",ROMX,BANK[$17]
 
@@ -92164,8 +92177,7 @@ SilphCo9Text1: ; 5d8b8 (17:58b8)
     jr nz,.asm_a14c3 ; 0x5d8be
     ld hl,UnnamedText_5d8e5
     call PrintText
-    ld a,$7
-    call Predef
+    PREDEF HealPartyPredef
     call GBFadeOut2
     call Delay3
     call GBFadeIn2
@@ -93589,8 +93601,7 @@ PokemonTower5Script0: ; 6094b (18:494b)
     ld [wJoypadForbiddenButtonsMask],a
     ld hl,$d72e
     set 4,[hl]
-    ld a,$7
-    call Predef ; indirect jump to HealParty (f6a5 (3:76a5))
+    PREDEF HealPartyPredef
     call GBFadeOut2
     call Delay3
     call Delay3
@@ -107572,19 +107583,16 @@ LoreleiScript_76191: ; 76191 (1d:6191)
     bit 5,[hl]
     res 5,[hl]
     ret z
-    ds 5
     ld a,[$d863]
     bit 1,a
-    jr z,.asm_761a9
+    jr z,.skipOpenDoor
     ld a,$5
-    jr .asm_761ab
-.asm_761a9
+    jp HallOfFame_HealPartyAndOpenDoor
+.skipOpenDoor
     ld a,$24
-.asm_761ab
-    ld [$d09f],a
-    ld bc,$2
-    ld a,$17
-    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+    jp HallOfFame_ReplaceTileBlock
+
+SECTION "Func_761b6",ROMX[$61b6],BANK[$1d]
 
 Func_761b6: ; 761b6 (1d:61b6)
     xor a
@@ -107755,19 +107763,17 @@ BrunoScript_762ec: ; 762ec (1d:62ec)
     bit 5,[hl]
     res 5,[hl]
     ret z
-    call InitialilzeEliteFour ; ld a,[$d864]
+    call InitialilzeEliteFour
+    ld a,[$d864]
     bit 1,a
-    jr z,.asm_76300
+    jr z,.skipOpenDoor
     ld a,$5
-    jp Func_76302
-.asm_76300
+    jp HallOfFame_HealPartyAndOpenDoor
+.skipOpenDoor
     ld a,$24
+    jp HallOfFame_ReplaceTileBlock
 
-Func_76302: ; 76302 (1d:6302)
-    ld [$d09f],a
-    ld bc,$2
-    ld a,$17
-    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+SECTION "Func_7630d",ROMX[$630d],BANK[$1d]
 
 Func_7630d: ; 7630d (1d:630d)
     xor a
@@ -107942,17 +107948,14 @@ AgathaScript_76443: ; 76443 (1d:6443)
     ret z
     ld a,[$d865]
     bit 1,a
-    jr z,.asm_76457
+    jr z,.skipOpenDoor
     ld a,$e
-    jp Func_76459
-.asm_76457
+    jp HallOfFame_HealPartyAndOpenDoor
+.skipOpenDoor
     ld a,$3b
+    jp HallOfFame_ReplaceTileBlock
 
-Func_76459: ; 76459 (1d:6459)
-    ld [$d09f],a
-    ld bc,$2
-    ld a,$17
-    jp Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
+SECTION "Func_76464",ROMX[$6464],BANK[$1d]
 
 Func_76464: ; 76464 (1d:6464)
     xor a
@@ -108578,8 +108581,22 @@ GetObtainedHiddenCoinsFlags:
 InitialilzeEliteFour:
     ld hl,$d734
     set 1,[hl]
-    ld a,[$d864]
     ret
+
+HallOfFame_HealPartyAndOpenDoor:
+    push af
+    PREDEF HealPartyPredef
+    call GBFadeOut2
+    call Delay3
+    call GBFadeIn2
+    pop af
+    ; fall through
+
+HallOfFame_ReplaceTileBlock:
+    ld [$d09f],a
+    ld bc,$2
+    ld a,$17
+    jp Predef ; indirect jump to ReplaceTileBlock
 
 CreditsMons_HandleAlternative:
     xor a

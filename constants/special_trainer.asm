@@ -281,12 +281,12 @@ LanceMove:
     db HYDRO_PUMP
     db THUNDERBOLT
     db FLAMETHROWER
-    ; Dragonair (Level 56)
+    ; Dragonair (Level 54)
     db LIGHT_SCREEN
     db TSUNAMI
     db HYPER_BEAM
     db FLAMETHROWER
-    ; Dragonair (Level 56)
+    ; Dragonair (Level 54)
     db LIGHT_SCREEN
     db THUNDERBOLT
     db HYPER_BEAM
