@@ -11316,14 +11316,14 @@ ItemPrices: ; Moved in the Bank
     bcd3   1500 ; HYPER_POTION
     bcd3    700 ; SUPER_POTION
     bcd3    300 ; POTION
-    bcd3      0 ; BOULDERBADGE
-    bcd3      0 ; CASCADEBADGE
-    bcd3      0 ; THUNDERBADGE
-    bcd3      0 ; RAINBOWBADGE
-    bcd3      0 ; SOULBADGE
-    bcd3      0 ; MARSHBADGE
-    bcd3      0 ; VOLCANOBADGE
-    bcd3      0 ; EARTHBADGE
+    bcd3      0 ; ?
+    bcd3      0 ; ?
+    bcd3  40000 ; DUSK_STONE
+    bcd3      0 ; ?
+    bcd3      0 ; ?
+    bcd3      0 ; ?
+    bcd3      0 ; ?
+    bcd3      0 ; ?
     bcd3    550 ; ESCAPE_ROPE
     bcd3    350 ; REPEL
     bcd3      0 ; OLD_AMBER
@@ -11339,7 +11339,7 @@ ItemPrices: ; Moved in the Bank
     bcd3      0 ; DOME_FOSSIL
     bcd3      0 ; HELIX_FOSSIL
     bcd3      0 ; SECRET_KEY
-    bcd3      0 ; XXX
+    bcd3  40000 ; TRADE_STONE
     bcd3      0 ; BIKE_VOUCHER
     bcd3    950 ; X_ACCURACY
     bcd3   2100 ; LEAF_STONE
@@ -36028,42 +36028,27 @@ IndigoPlateauLobbyTextPointers: ; 19c7f (6:5c7f)
     dw IndigoPlateauLobbyText3
     dw IndigoPlateauLobbyText4
     dw IndigoPlateauLobbyText5
+    dw IndigoPlateauLobbyTextX ; Vending Machine
+    dw IndigoPlateauLobbyTextX ; Vending Machine
 
-IndigoPlateauLobbyText1: ; 19c89 (6:5c89)
+IndigoPlateauLobbyText1:
     db $ff
 
-IndigoPlateauLobbyText2: ; 19c8a (6:5c8a)
+IndigoPlateauLobbyText2:
     TX_FAR _IndigoPlateauLobbyText1
     db "@"
 
-IndigoPlateauLobbyText3: ; 19c8f (6:5c8f)
+IndigoPlateauLobbyText3:
     TX_FAR _IndigoPlateauLobbyText3
     db "@"
 
-IndigoPlateauLobbyText5: ; 19c94 (6:5c94)
+IndigoPlateauLobbyText5:
     db $f6
 
-IndigoPlateauLobbyObject: ; 0x19c95 (size=58)
-    db $0 ; border tile
+IndigoPlateauLobbyTextX: ; Vending Machine
+    db $f5
 
-    db $3 ; warps
-    db $b,$7,$0,$ff
-    db $b,$8,$1,$ff
-    db $0,$8,$0,BRUNOS_ROOM
-
-    db $0 ; signs
-
-    db $5 ; people
-    db SPRITE_NURSE,$5 + 4,$7 + 4,$ff,$d0,$1 ; person
-    db SPRITE_GYM_HELPER,$9 + 4,$4 + 4,$ff,$d3,$2 ; person
-    db SPRITE_LASS,$1 + 4,$5 + 4,$ff,$d0,$3 ; person
-    db SPRITE_MART_GUY,$5 + 4,$0 + 4,$ff,$d3,$4 ; person
-    db SPRITE_CABLE_CLUB_WOMAN,$6 + 4,$d + 4,$ff,$d0,$5 ; person
-
-    ; warp-to
-    EVENT_DISP $8,$b,$7
-    EVENT_DISP $8,$b,$8
-    EVENT_DISP $8,$0,$8 ; BRUNOS_ROOM
+SECTION "IndigoPlateauLobbyBlocks",ROMX[$5ccf],BANK[$6]
 
 IndigoPlateauLobbyBlocks: ; 19ccf (6:5ccf)
     INCBIN "maps/indigoplateaulobby.blk"
@@ -37517,11 +37502,11 @@ SetTempScriptFlag:
 
 ; Indigo
 IndigoPlateauLobbyText4:
-    db $FE,7,ULTRA_BALL
-    db REVIVE
-    db FULL_RESTORE,MAX_POTION,HYPER_POTION
+    db $FE,13
+    db FULL_RESTORE,MAX_POTION,HYPER_POTION,SUPER_POTION,POTION
     db FULL_HEAL
-    db MAX_REPEL,$FF
+    db X_ATTACK,X_DEFEND,X_SPEED,X_SPECIAL,X_ACCURACY,GUARD_SPEC_,DIRE_HIT
+    db $FF
 
 JumpTilesetHeader:
     dbw $00,CollissionRule_Tileset00
@@ -37808,6 +37793,30 @@ VermilionMachop:
 .VermilionCityText14_Dex
     TX_FAR _VermilionCityText14_Dex
     db "@"
+
+IndigoPlateauLobbyObject: ; Moved in the Bank
+    db $0 ; border tile
+
+    db $3 ; warps
+    db $b,$7,$0,$ff
+    db $b,$8,$1,$ff
+    db $0,$8,$0,BRUNOS_ROOM
+
+    db $2 ; signs
+    db 09,04,$6 ; IndigoPlateauLobbyTextX
+    db 09,05,$7 ; IndigoPlateauLobbyTextX
+
+    db $5 ; people
+    db SPRITE_NURSE,$5 + 4,$7 + 4,$ff,$d0,$1 ; person
+    db SPRITE_GYM_HELPER,$9 + 4,$6 + 4,$ff,$d3,$2 ; person
+    db SPRITE_LASS,$1 + 4,$5 + 4,$ff,$d0,$3 ; person
+    db SPRITE_MART_GUY,$5 + 4,$0 + 4,$ff,$d3,$4 ; person
+    db SPRITE_CABLE_CLUB_WOMAN,$6 + 4,$d + 4,$ff,$d0,$5 ; person
+
+    ; warp-to
+    EVENT_DISP $8,$b,$7
+    EVENT_DISP $8,$b,$8
+    EVENT_DISP $8,$0,$8 ; BRUNOS_ROOM
 
 SECTION "bank7",ROMX,BANK[$7]
 
@@ -75572,8 +75581,7 @@ CeladonMart4Text1:
 
 ; Celadon Dept. Store 5F (1)
 CeladonMart5Text3:
-    db $FE,7,X_ACCURACY,GUARD_SPEC_,DIRE_HIT,X_ATTACK,X_DEFEND,X_SPEED
-    db X_SPECIAL,$FF
+    db $FE,7,X_ATTACK,X_DEFEND,X_SPEED,X_SPECIAL,X_ACCURACY,GUARD_SPEC_,DIRE_HIT,$FF
 
 ; Celadon Dept. Store 5F (2)
 CeladonMart5Text4:
@@ -97142,8 +97150,6 @@ Tset17_Block:
     INCBIN "gfx/blocksets/17.bst"
 
 SECTION "bank1A",ROMX,BANK[$1A]
-
-SECTION "Version_GFX",ROMX[$402f],BANK[$1A]
 
 Version_GFX: ; 6802f (1a:402f)
 IF _RED
