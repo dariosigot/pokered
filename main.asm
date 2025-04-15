@@ -137066,11 +137066,11 @@ CheckSpecialWild_:
 ; UnknownDungeon3_Mewtwo
     db PSYCHIC_M
     db RECOVER
-    db SWIFT
-    db SUBSTITUTE
+    db EARTHQUAKE
+    db HAZE
 ; VermilionDock_Mew
     db SOFTBOILED
-    db MIMIC
+    db CONVERSION
     db MIRROR_MOVE
     db METRONOME
 
