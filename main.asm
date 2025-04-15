@@ -50264,52 +50264,52 @@ TrainerAIPointers:
 ; one entry per trainer class
 ; first byte,number of times (per Pokémon) it can occur
 ; next two bytes,pointer to AI subroutine for trainer class
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
     dbw 3,JugglerAI ; juggler_x
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
-    dbw 3,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
     dbw 3,JugglerAI ; juggler
-    dbw 3,GenericAI
-    dbw 3,GenericAI
+    dbw 1,GenericAI
+    dbw 1,GenericAI
     dbw 2,BlackbeltAI ; blackbelt
-    dbw 3,GenericAI
-    dbw 3,GenericAI
+    dbw 1,Sony1AI ; sony1
+    dbw 1,GenericAI
     dbw 1,GenericAI ; chief
-    dbw 3,GenericAI
+    dbw 1,GenericAI
     dbw 1,GiovanniAI ; giovanni
-    dbw 3,GenericAI
+    dbw 1,GenericAI
     dbw 2,CooltrainerMAI ; cooltrainerm
-    dbw 1,CooltrainerFAI ; cooltrainerf
+    dbw 2,CooltrainerFAI ; cooltrainerf
     dbw 2,BrunoAI ; bruno
     dbw 5,BrockAI ; brock
-    dbw 1,MistyAI ; misty
-    dbw 1,LtSurgeAI ; surge
+    dbw 2,MistyAI ; misty
+    dbw 2,LtSurgeAI ; surge
     dbw 1,ErikaAI ; erika
-    dbw 2,KogaAI ; koga
-    dbw 2,BlaineAI ; blaine
+    dbw 1,KogaAI ; koga
+    dbw 1,BlaineAI ; blaine
     dbw 1,SabrinaAI ; sabrina
-    dbw 3,GenericAI
+    dbw 1,GenericAI
     dbw 1,Sony2AI ; sony2
     dbw 1,Sony3AI ; sony3
-    dbw 2,LoreleiAI ; lorelei
-    dbw 3,GenericAI
-    dbw 2,AgathaAI ; agatha
+    dbw 1,LoreleiAI ; lorelei
+    dbw 1,GenericAI
+    dbw 1,AgathaAI ; agatha
     dbw 1,LanceAI ; lance
 
 Func_3af2e: ; Moved in the Bank
@@ -50349,29 +50349,6 @@ BugfixEvolutionStoneInBattle:
 .NoBattle
     ld a,[$cf91]
     cp b
-    ret
-
-;joenote - changed to hyper potion like other e4 members
-BrunoAI: ; Moved in the Bank
-;    cp $40
-;    jp c,AIUseXDefend
-    cp $80
-    jr nc,.brunoreturn
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-.brunoreturn
-    ret
-
-AgathaAI: ; Moved in the Bank
-;    cp $14
-;    jp c,AISwitchIfEnoughMons
-    cp $80
-    jr nc,.agathareturn
-    ld a,5    ;joenote - upped to 5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
-.agathareturn
     ret
 
 INCLUDE "constants/TrainerData.asm"
@@ -52195,7 +52172,7 @@ BlackbeltAI:
     jp c,AIUseXAttack
     ret
 
-GiovanniAI:    ;joenote - uses dire hit now,but only if it's not active
+GiovanniAI:
     cp $20
     ret nc
     ld a,[W_ENEMYBATTSTATUS2]
@@ -52203,7 +52180,7 @@ GiovanniAI:    ;joenote - uses dire hit now,but only if it's not active
     ret z
     jp AIUseDireHit
 
-CooltrainerMAI:    ;joenote - changed item to x-special and guard spec
+CooltrainerMAI:
     cp $20
     ret nc
     cp $10
@@ -52216,7 +52193,7 @@ CooltrainerMAI:    ;joenote - changed item to x-special and guard spec
 .gspec
     jp AIUseGuardSpec
 
-CooltrainerFAI: ;joenote - uses x-special and x-accuracy now
+CooltrainerFAI:
     cp $20
     ret nc
     cp $10
@@ -52230,7 +52207,6 @@ CooltrainerFAI: ;joenote - uses x-special and x-accuracy now
     jp AIUseXAccuracy
 
 BrockAI:
-; if his active monster has a status condition,use a full heal
     ld a,[W_ENEMYMONSTATUS]
     and a
     jp nz,AIUseFullHeal
@@ -52248,80 +52224,101 @@ LtSurgeAI:
 
 ErikaAI:
     cp $80
-    jr nc,.erikareturn
-    ld a,$A
+    ret nc
+    ld a,10
     call AICheckIfHPBelowFraction
     jp c,AIUseSuperPotion
-.erikareturn
     ret
 
 KogaAI:
     cp $20
-    jp c,AIUseXAttack
+    ret nc
+    ld a,10
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
     ret
 
-BlaineAI:    ;blaine needs to check HP. this was an oversight
+BlaineAI:
     cp $20
-    jr nc,.blainereturn
-    ld a,$A
+    ret nc
+    ld a,10
     call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
-.blainereturn
+    jp c,AIUseHyperPotion
     ret
 
 SabrinaAI:
     cp $20
-    jr nc,.sabrinareturn
-    ld a,$A
+    ret nc
+    ld a,10
     call AICheckIfHPBelowFraction
     jp c,AIUseHyperPotion
-.sabrinareturn
+    ret
+
+Sony1AI:
+    cp $20
+    ret nc
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jp c,AIUsePotion
     ret
 
 Sony2AI:
     cp $20
-    jr nc,.rival2return
+    ret nc
     ld a,5
     call AICheckIfHPBelowFraction
-    jp c,AIUsePotion
-.rival2return
+    jp c,AIUseSuperPotion
     ret
 
 Sony3AI:
-    cp $40    ;joenote - doubled the chance of use
-    jr nc,.rival3return
+    cp $40
+    ret nc
     ld a,5
     call AICheckIfHPBelowFraction
     jp c,AIUseFullRestore
-.rival3return
-    ret
+    jr AdvanceAIHealStatus
 
 LoreleiAI:
     cp $80
-    jr nc,.loreleireturn
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion    ;joenote - changed to hyper potion
-.loreleireturn
-    ret
-
-; BrunoAI   ; Moved in the Bank
-; AgathaAI  ; Moved in the Bank
-
-LanceAI:
-    cp $80
-    jr nc,.lancereturn
+    ret nc
     ld a,5
     call AICheckIfHPBelowFraction
     jp c,AIUseHyperPotion
-.lancereturn
+    jr AdvanceAIHealStatus
+
+BrunoAI:
+    cp $80
+    ret nc
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+    jr AdvanceAIHealStatus
+
+AgathaAI:
+    cp $80
+    ret nc
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+    jr AdvanceAIHealStatus
+
+LanceAI:
+    cp $80
+    ret nc
+    ld a,5
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+    ; fall through
+
+AdvanceAIHealStatus:
+    ld a,[W_ENEMYMONSTATUS]
+    and a
+    jp nz,AIUseFullHeal
     ret
 
 GenericAI:
     and a ; clear carry
     ret
-
-; end of individual trainer AI routines
 
 ; ─────────────────────────────────────────────────────────────
 
