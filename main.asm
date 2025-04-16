@@ -38084,6 +38084,25 @@ Route2HouseText4:
 .error
     jp TextScriptEnd
 
+CheckCinnabarGymTileJustCorrect:
+    push af ; Backup ID (Prospect)
+    ld a,[$FF00+$db] ; 6,5,4,3,2,1
+    ld d,a
+    ld a,6
+    sub d ; 0,1,2,3,4,5
+    ld hl,wChangedBlocksID
+    push bc
+    ld bc,3
+    call AddNTimes
+    pop bc
+    ld a,[hl] ; ID (Actual)
+    ld d,a
+    pop af ; Restore ID (Prospect)
+    cp d
+    ret
+
+; Free
+
 SECTION "Func_1c98a",ROMX[$498a],BANK[$7]
 
 Func_1c98a: ; 1c98a (7:498a)
@@ -42606,10 +42625,13 @@ Func_1eb0a: ; 1eb0a (7:6b0a)
     ld a,$e
 .asm_1eb38
     pop bc
+    call CheckCinnabarGymTileJustCorrect
     ld [$d09f],a
+    jr z,.next
     ld a,$17
     call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
-    ld hl,$ffdb
+.next
+    ld hl,$FF00+$db
     dec [hl]
     jr nz,.asm_1eb0e
     ret
@@ -42617,23 +42639,16 @@ Func_1eb0a: ; 1eb0a (7:6b0a)
 CinnabarGymGateCoords: ; 1eb48 (7:6b48)
     ; format: x-coord,y-coord,direction,padding
     ; direction: $54 = horizontal gate,$5f = vertical gate
-    db $09,$03,$54,$00
-    db $06,$03,$54,$00
-    db $06,$06,$54,$00
-    db $03,$08,$5f,$00
-    db $02,$06,$54,$00
-    db $02,$03,$54,$00
+    db $09,$03,$54,$00 ; $C74D
+    db $06,$03,$54,$00 ; $C77D
+    db $06,$06,$54,$00 ; $C79E
+    db $03,$08,$5f,$00 ; $C781
+    db $02,$06,$54,$00 ; $C751
+    db $02,$03,$54,$00 ; $C754
 
-PrintMagazinesText:
-    call EnableAutoTextBoxDrawing
-    ld a,$30
-    call Func_3ef5
-    ret
+SECTION "BillsHousePC",ROMX[$6b6e],BANK[$7]
 
-UnnamedText_1eb69: ; 1eb69 (7:6b69)
-    TX_FAR _UnnamedText_1eb69
-    db "@"
-
+BillsHousePC:
     call EnableAutoTextBoxDrawing
     ld a,[$c109]
     cp $4
@@ -44786,6 +44801,15 @@ AddStarterToParty:
     ld a,1
     ld [wTempAlternateFormIndex],a
     jp AddPokemonToParty
+
+PrintMagazinesText: ; Moved in the Bank
+    call EnableAutoTextBoxDrawing
+    ld a,$30
+    jp Func_3ef5
+
+UnnamedText_1eb69: ; Moved in the Bank
+    TX_FAR _UnnamedText_1eb69
+    db "@"
 
 SECTION "bank8",ROMX,BANK[$8]
 
@@ -71065,7 +71089,7 @@ Route4HiddenObjects: ; 470a4 (11:70a4)
     db $FF
 BillsHouseHiddenObjects:
     db $04,$01,$04 ; XXX,y,x
-    dbw $07,$6b6e
+    dbw BANK(BillsHousePC),BillsHousePC
     db 06,05,$d0 ; XXX,y,x
     dbw BANK(EnableBillsTeleport),EnableBillsTeleport
     db $FF
