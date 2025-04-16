@@ -41719,7 +41719,7 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
     db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,OPP_LVL_OFFSET+40 ; trainer
     db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
-    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,OPP_LVL_OFFSET+55 ; Entry Level (Over)
+    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,OPP_LVL_OFFSET+55 ; Entry Level
     db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
     db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,TM_41 ; item
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
@@ -68853,7 +68853,7 @@ SafariZoneNorthObject:
     db $3 ; people
     db SPRITE_BALL,$1 + 4,$19 + 4,$ff,$ff,$81,PROTEIN ; item
     db SPRITE_BALL,$7 + 4,$13 + 4,$ff,$ff,$82,TM_40 ; item
-    db SPRITE_LAPRAS,$f + 4,$19 + 4,$ff,$d0,$3 ; person ; Entry Level (Over)
+    db SPRITE_LAPRAS,$f + 4,$19 + 4,$ff,$d0,$3 ; person
 
     ; warp-to
     EVENT_DISP $14,$23,$2 ; SAFARI_ZONE_WEST
@@ -69206,7 +69206,7 @@ UnknownDungeon3Object: ; 0x45f36 (size=34)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_MEWTWO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,OPP_LVL_OFFSET+70 ; Entry Level (Over)
+    db SPRITE_MEWTWO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,OPP_LVL_OFFSET+70 ; Entry Level
     db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$82,ULTRA_BALL ; item
     db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
 
@@ -70060,7 +70060,7 @@ SeafoamIslands5Object: ; 0x468bc (size=62)
     db $3 ; people
     db SPRITE_BOULDER,$f + 4,$4 + 4,$ff,$ff,$1 ; person
     db SPRITE_BOULDER,$f + 4,$5 + 4,$ff,$ff,$2 ; person
-    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,OPP_LVL_OFFSET+55 ; Entry Level (Over)
+    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,OPP_LVL_OFFSET+55 ; Entry Level
 
     ; warp-to
     EVENT_DISP $f,$11,$14 ; SEAFOAM_ISLANDS_4
@@ -71091,7 +71091,7 @@ SafariZoneLapras:
     ld [W_GYMLEADERNO],a
     ld a,30
     ld [W_CURENEMYLVL],a
-    ld a,LAPRAS ; Entry Level (Over)
+    ld a,LAPRAS ; Entry Level
     ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
     call PlayTrainerMusic
@@ -78772,7 +78772,7 @@ SilphCo7Text1: ; 51d8e (14:5d8e)
 .asm_d7e17 ; 0x51da5
     ld hl,UnnamedText_51dd3
     call PrintText
-    ld bc,(PORYGON << 8) | 30 ; Entry Level (Over)
+    ld bc,(PORYGON << 8) | 30 ; Entry Level
     call GivePorygon ; call GivePokemon
     jr nc,.asm_b3069 ; 0x51db1
     ld a,[$ccd3]
@@ -79153,7 +79153,7 @@ Mansion2Object: ; Move in the Bank
     db $4 ; people
     db SPRITE_BLACK_HAIR_BOY_2,$11 + 4,$3 + 4,$fe,$2,$41,BURGLAR,$4 ; trainer
     ;db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
-    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$42,MOLTRES,OPP_LVL_OFFSET+55 ; Entry Level (Over)
+    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$42,MOLTRES,OPP_LVL_OFFSET+55 ; Entry Level
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
 
@@ -88901,7 +88901,7 @@ Route12Snorlax:
     ld [W_GYMLEADERNO],a
     ld a,30
     ld [W_CURENEMYLVL],a ; $d127
-    ld a,SNORLAX ; Entry Level (Over)
+    ld a,SNORLAX ; Entry Level
     ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
     call PlayTrainerMusic
@@ -91026,7 +91026,7 @@ FightingDojoText6: ; 5cf06 (17:4f06)
     ds 1 ; call PrintText
     jr .done
 .GetMon
-    ld a,HITMONLEE ; Entry Level (Over)
+    ld a,HITMONLEE ; Entry Level
     call DisplayPokedex
     ld hl,WantHitmonleeText
     call PrintText
@@ -91067,7 +91067,7 @@ FightingDojoText7: ; 5cf4e (17:4f4e)
     ds 1 ; call PrintText
     jr .done
 .GetMon
-    ld a,HITMONCHAN ; Entry Level (Over)
+    ld a,HITMONCHAN ; Entry Level
     call DisplayPokedex
     ld hl,WantHitmonchanText
     call PrintText
@@ -97066,7 +97066,7 @@ DiglettsCaveAerodactyl:
     ld [W_GYMLEADERNO],a
     ld a,30
     ld [W_CURENEMYLVL],a ; $d127
-    ld a,AERODACTYL ; Entry Level (Over)
+    ld a,AERODACTYL ; Entry Level
     ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
     call PlayTrainerMusic
@@ -133535,7 +133535,7 @@ Route22Mons:
     db  2,MANKEY    ;  5% ; Entry Level
     db  5,SPEAROW   ;  5%
     db  4,MANKEY    ;  4%
-    db  3,PSYDUCK   ;  1% ; Entry Level
+    db  9,PSYDUCK   ;  1% ; Entry Level
     db $00
 
 ForestMons:
@@ -133549,7 +133549,7 @@ ForestMons:
     db  5,WEEDLE   ;  5%
     db  4,VENONAT  ;  5%
     db  6,VENONAT  ;  4% ; Entry Level
-    db  6,PINSIR   ;  1% ; Entry Level
+    db  7,PINSIR   ;  1% ; Entry Level
     db $00
 
 Route3Mons:
@@ -133657,7 +133657,7 @@ Route24Mons:
     db 14,ODDISH     ;  5%
     db 14,BELLSPROUT ;  5%
     db 12,VENONAT    ;  4%
-    db  9,ABRA       ;  1%
+    db 11,ABRA       ;  1%
     db $05
     db 15,GOLDEEN   ; 20%
     db 21,GOLDEEN   ; 20%
@@ -133705,7 +133705,7 @@ Route5Mons:
     db 19,MEOWTH     ;  5%
     db 19,PIDGEOTTO  ;  5%
     db 16,PONYTA     ;  4%
-    db 10,TAUROS     ;  1% ; Entry Level
+    db 20,TAUROS     ;  1% ; Entry Level
     db $00
 
 Route6Mons:
@@ -133781,7 +133781,7 @@ Route11Mons:
     db 15,RATTATA   ;  5%
     db 16,SANDSHREW ;  5%
     db 11,DROWZEE   ;  4%
-    db 15,DROWZEE   ;  1%
+    db 16,DROWZEE   ;  1%
     db $05
     db 16,MAGIKARP  ; 20%
     db 13,GOLDEEN   ; 20%
@@ -133885,7 +133885,7 @@ Route8Mons:
     db 21,GLOOM      ;  5% ; Entry Level
     db 21,WEEPINBELL ;  5% ; Entry Level
     db 17,BUTTERFREE ;  4% ; Entry Level
-    db 12,SCYTHER    ;  1% ; Entry Level
+    db 23,SCYTHER    ;  1% ; Entry Level
     db $00
 
 Route7Mons:
@@ -133993,10 +133993,10 @@ TowerMons7:
     db 23,GASTLY  ; 15%
     db 24,GASTLY  ; 10%
     db 20,GASTLY  ; 10%
-    db 28,HAUNTER ; 10%
+    db 29,HAUNTER ; 10%
     db 16,CUBONE  ;  5%
     db 21,CUBONE  ;  5%
-    db 26,HAUNTER ;  4%
+    db 27,HAUNTER ;  4%
     db 28,MAROWAK ;  1% ; Entry Level
     db $00
 
@@ -134010,8 +134010,8 @@ Route12Mons:
     db 23,PIDGEOTTO ; 10%
     db 23,RATICATE  ;  5%
     db 25,RATICATE  ;  5%
-    db 14,SLOWPOKE  ;  4% ; Entry Level
-    db 18,SLOWPOKE  ;  1%
+    db 15,SLOWPOKE  ;  4% ; Entry Level
+    db 23,SLOWPOKE  ;  1%
     db $05
     db 21,MAGIKARP   ; 20%
     db 21,GOLDEEN    ; 20%
@@ -134034,7 +134034,7 @@ Route13Mons:
     db 24,VENONAT    ; 10%
     db 22,GLOOM      ;  5%
     db 22,WEEPINBELL ;  5%
-    db 13,TANGELA    ;  4% ; Entry level
+    db 18,TANGELA    ;  4% ; Entry level
     db 31,VENOMOTH   ;  1% ; Entry level
     db $05
     db 21,MAGIKARP   ; 20%
@@ -134073,7 +134073,7 @@ Route15Mons:
     db 26,MEOWTH   ;  5%
     db 28,PERSIAN  ;  5% ; Entry Level
     db 28,DITTO    ;  4%
-    db 31,PERSIAN  ;  1%
+    db 33,PERSIAN  ;  1%
     db $00
 
 Route17Mons:
@@ -134086,7 +134086,7 @@ Route17Mons:
     db 28,RATICATE ; 10%
     db 25,KOFFING  ;  5%
     db 25,GRIMER   ;  5%
-    db 31,RATICATE ;  4%
+    db 36,RATICATE ;  4%
     db 35,WEEZING  ;  1% ; Entry Level
     db $00
 
@@ -134135,7 +134135,7 @@ ZoneMons1:
     db 19,RHYHORN ; 15%
     db 20,PONYTA  ; 10%
     db 17,DODUO   ; 10% ; Entry Level
-    db 12,RHYHORN ; 10% ; Entry Level
+    db 18,RHYHORN ; 10% ; Entry Level
     db 22,DODUO   ;  5%
     db 26,TAUROS  ;  5%
     db 28,TAUROS  ;  4%
@@ -134179,14 +134179,14 @@ ZoneMons2:
 ZoneMons3:
     db $1E
     db 24,TANGELA   ; 20%
-    db 15,EXEGGCUTE ; 20%
+    db 19,EXEGGCUTE ; 20%
     db 22,TANGELA   ; 15%
-    db 19,EXEGGCUTE ; 10%
-    db 11,EXEGGCUTE ; 10% ; Entry Level
+    db 22,EXEGGCUTE ; 10%
+    db 17,EXEGGCUTE ; 10% ; Entry Level
     db 18,LICKITUNG ; 10%
     db 14,LICKITUNG ;  5% ; Entry Level
-    db 12,EEVEE     ;  5% ; Entry Level
-    db 15,EEVEE     ;  4%
+    db 18,EEVEE     ;  5% ; Entry Level
+    db 21,EEVEE     ;  4%
     db  7,CHANSEY   ;  1% ; Entry Level
     db $0E
     db 17,MAGIKARP  ; 20%
@@ -134224,7 +134224,7 @@ PowerPlantMons:
     db 18,MAGNEMITE  ; 10%
     db 30,MAGNETON   ;  5% ; Entry Level
     db 32,RAICHU     ;  5% ; Entry Level
-    db 22,ELECTABUZZ ;  4% ; Entry Level (Over)
+    db 26,ELECTABUZZ ;  4% ; Entry Level
     db 32,JOLTEON    ;  1% ; Entry Level
     db $00
 
@@ -134280,7 +134280,7 @@ IslandMonsB3:
     db 36,DEWGONG   ; 10%
     db 37,DEWGONG   ;  5%
     db  5,SQUIRTLE  ;  5% ; Entry Level
-    db 22,JYNX      ;  4% ; Entry Level (Over)
+    db 26,JYNX      ;  4% ; Entry Level
     db 32,VAPOREON  ;  1% ; Entry Level
     db $0A
     db 27,SEEL      ; 20%
@@ -134316,7 +134316,7 @@ IslandMonsB4:
     db  5,SQUIRTLE  ;  5%
     db 11,SQUIRTLE  ;  5%
     db 25,WARTORTLE ;  4%
-    db 38,LAPRAS    ;  1%
+    db 42,LAPRAS    ;  1%
 
 MansionMons1:
     db $0A
@@ -134368,9 +134368,9 @@ MansionMonsB1:
     db 28,GROWLITHE ; 10%
     db 28,VULPIX    ; 10%
     db 29,PONYTA    ; 10%
-    db 32,ARCANINE  ;  5% ; Entry Level
-    db 32,NINETALES ;  5% ; Entry Level
-    db 22,MAGMAR    ;  4% ; Entry Level (Over)
+    db 38,ARCANINE  ;  5% ; Entry Level
+    db 38,NINETALES ;  5% ; Entry Level
+    db 26,MAGMAR    ;  4% ; Entry Level
     db 32,FLAREON   ;  1% ; Entry Level
     db $00
 
@@ -134433,7 +134433,7 @@ PlateauMons1:
     db 43,GRAVELER ;  5%
     db 38,MACHOKE  ;  5% ; Entry Level
     db 45,GRAVELER ;  4%
-    db 42,MACHOKE  ;  1%
+    db 44,MACHOKE  ;  1%
     db $00
 
 PlateauMons2:
@@ -134457,7 +134457,7 @@ PlateauMons3:
     db 40,GOLBAT   ; 15%
     db 39,DUGTRIO  ; 10%
     db 38,MACHOKE  ; 10%
-    db 47,ONIX     ; 10%
+    db 48,ONIX     ; 10%
     db 43,GRAVELER ;  5%
     db 42,MACHOKE  ;  5%
     db 45,GRAVELER ;  4%
@@ -134930,10 +134930,10 @@ SuperRodGroupSafari:
     db 24,SEEL
     db  7,DRATINI ; Entry Level
     db 11,DRATINI
-    db 11,DRATINI
     db 15,DRATINI
-    db 13,OMANYTE ; Entry Level
-    db 13,KABUTO ; Entry Level
+    db 19,DRATINI
+    db 20,OMANYTE ; Entry Level
+    db 20,KABUTO ; Entry Level
     db 20,GYARADOS ; Entry Level
     db 24,GYARADOS
     db 25,POLIWHIRL
