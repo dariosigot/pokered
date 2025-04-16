@@ -42624,6 +42624,7 @@ CinnabarGymGateCoords: ; 1eb48 (7:6b48)
     db $02,$06,$54,$00
     db $02,$03,$54,$00
 
+PrintMagazinesText:
     call EnableAutoTextBoxDrawing
     ld a,$30
     call Func_3ef5
@@ -70955,11 +70956,14 @@ SwapMapObjects: ; 46fbb (11:6fbb)
     db $FF
 LavenderHouse1HiddenObjects: ; 46fc2 (11:6fc2)
     db $01,$00,$00 ; XXX,y,x
-    dbw $07,$6b60
+    db BANK(PrintMagazinesText)
+    dw PrintMagazinesText
     db $01,$01,$00 ; XXX,y,x
-    dbw $07,$6b60
+    db BANK(PrintMagazinesText)
+    dw PrintMagazinesText
     db $01,$07,$00 ; XXX,y,x
-    dbw $07,$6b60
+    db BANK(PrintMagazinesText)
+    dw PrintMagazinesText
     db $FF
 CeladonMansion5HiddenObjects: ; 46fd5 (11:6fd5)
     db $00,$03,$34 ; XXX,y,x
