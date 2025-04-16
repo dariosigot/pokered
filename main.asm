@@ -29257,6 +29257,66 @@ WildMonEncounterSlotChances: ; Moved in the Bank
     db $FC,$10 ; 11/256 =  4.3% chance of slot 8
     db $FF,$12 ;  3/256 =  1.2% chance of slot 9
 
+BabyMon:
+    db BULBASAUR
+    db CHARMANDER
+    db SQUIRTLE
+    db CATERPIE
+    db WEEDLE
+    db PIDGEY
+    db RATTATA
+    db SPEAROW
+    db EKANS
+    db PIKACHU
+    db SANDSHREW
+    db NIDORAN_F
+    db NIDORAN_M
+    db CLEFAIRY
+    db VULPIX
+    db JIGGLYPUFF
+    db ZUBAT
+    db ODDISH
+    db PARAS
+    db VENONAT
+    db DIGLETT
+    db MEOWTH
+    db PSYDUCK
+    db MANKEY
+    db GROWLITHE
+    db POLIWAG
+    db ABRA
+    db MACHOP
+    db BELLSPROUT
+    db TENTACOOL
+    db GEODUDE
+    db PONYTA
+    db SLOWPOKE
+    db MAGNEMITE
+    db DODUO
+    db SEEL
+    db GRIMER
+    db SHELLDER
+    db GASTLY
+    db DROWZEE
+    db KRABBY
+    db VOLTORB
+    db EXEGGCUTE
+    db CUBONE
+    db KOFFING
+    db RHYHORN
+    db HORSEA
+    db GOLDEEN
+    db STARYU
+    db MAGIKARP
+    db EEVEE
+    db OMANYTE
+    db KABUTO
+    db DRATINI
+    db LITWICK
+    db $FF
+
+; Free
+
 SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
 
 ; [$D07D] = menu type / message ID
@@ -31054,7 +31114,10 @@ GetWildEnemyLevel:
     call GenRandom
     and %01111111
     jr z,.Add3 ; (1-((1-1/8)/32))/128 = 0.76%
-.Add0 ; 1-(1/8)-((1-1/8)/32)-((1-((1-1/8)/32))/128) = 84.01%
+    call GenRandom
+    and %00111111
+    jr z,.BabyLevel2 ; (1-(1/8)-((1-1/8)/32)-((1-((1-1/8)/32))/128))/64 = 1.31%
+.Add0 ; 1-(1/8)-((1-1/8)/32)-((1-((1-1/8)/32))/128)-(1-(1/8)-((1-1/8)/32)-((1-((1-1/8)/32))/128))/64 = 82.70%
 .End
     pop af
     add b
@@ -31068,6 +31131,24 @@ GetWildEnemyLevel:
 .Add1
     inc b
     jr .End
+.BabyLevel2
+    push hl
+    push de
+    push bc
+    ld a,[hl] ; mon id
+    ld hl,BabyMon
+    ld de,$0001
+    call IsInArray
+    pop bc
+    pop de
+    pop hl
+    jr nc,.Add0
+.done2
+    pop af
+    pop bc
+    ld a,2
+    ld [W_CURENEMYLVL],a ; $d127
+    ret
 
 ; If Not Allowed Set z
 CheckIfTeleportNotAllowed:
@@ -31147,7 +31228,6 @@ GetEnemy:
     call Predef ; indirect jump to IndexToPokedex
     ld a,[$d11e]
     ld hl,UnknownDungeonPkmnMinLevel
-    dec a
     ld e,a
     ld d,0
     add hl,de
@@ -31598,6 +31678,7 @@ UnknownDungeonWaterPkmnList:
     db DRAGONAIR
 
 UnknownDungeonPkmnMinLevel:
+    db 30 ; MISSINGNO
     db 22 ; BULBASAUR
     db 33 ; IVYSAUR
     db 44 ; VENUSAUR
@@ -31749,6 +31830,14 @@ UnknownDungeonPkmnMinLevel:
     db 55 ; DRAGONITE
     db 44 ; MEWTWO
     db 44 ; MEW
+    db 22 ; LITWICK
+    db 33 ; LAMPENT
+    db 44 ; CHANDELURE
+    db 30 ; MON_155
+    db 30 ; MON_156
+    db 30 ; MON_157
+    db 30 ; MON_158
+    db 30 ; MON_159
 
 CheckIfInBattleItem:
     ld hl,PartyMenuMessagePointers
