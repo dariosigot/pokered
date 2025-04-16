@@ -104990,12 +104990,10 @@ UnknownDungeon1_h: ; 0x74d00 to 0x74d0c (12 bytes) (id=228)
     dw UnknownDungeon1Object ; objects
 
 UnknownDungeon1Script: ; 74d0c (1d:4d0c)
+    call TryToRemoveUnknownDungeonWaterBlocks
     jp EnableAutoTextBoxDrawing
 
-UnknownDungeon1TextPointers: ; 74d0f (1d:4d0f)
-    dw Predef5CText
-    dw Predef5CText
-    dw Predef5CText
+SECTION "UnknownDungeon1Object",ROMX[$4d15],BANK[$1d]
 
 UnknownDungeon1Object: ; 0x74d15 (size=97)
     db $7d ; border tile
@@ -108695,6 +108693,40 @@ CreditsMons_HandleAlternative:
     ld [wAlternateFormIndex],a
     jp GetMonHeader
 
+; ───────────────────────────────────────
+
+UnknownDungeon1TextPointers: ; Moved in the Bank
+    dw Predef5CText
+    dw Predef5CText
+    dw Predef5CText
+
+TryToRemoveUnknownDungeonWaterBlocks:
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    ret z
+    ld a,[$C760]
+    cp $76
+    ret z ; Don't Remove block if just removed
+    ld hl,$d85f ; Check Mewtwo
+    bit 1,[hl]  ; ...
+    ret z
+    ld hl,.ChangedBlocks
+    ld de,wChangedBlocksNum
+    ld bc,.ChangedBlocksEnd-.ChangedBlocks
+    call CopyData
+    call RestoreChangedBlocks
+    ld b,BANK(RedrawMapView)
+    ld hl,RedrawMapView
+    jp Bankswitch
+.ChangedBlocks
+    db 2
+    dw $60C7
+    db $76
+    dw $82C7
+    db $76
+.ChangedBlocksEnd
+    
 SECTION "bank1E",ROMX,BANK[$1E]
 
 ; Draws a "frame block". Frame blocks are blocks of tiles that are put
