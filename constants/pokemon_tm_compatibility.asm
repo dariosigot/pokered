@@ -1063,7 +1063,7 @@ MrMimeTMCompatibility:
     tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
 ; ──────────────────────────────────────────────────────────────────────
 ScytherTMCompatibility:
-    tmlearn 02,03,06                ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
+    tmlearn 02,03,05,06             ; |RAZOR_WIND|SWORDS_DANCE|MEGA_KICK|TOXIC|
     tmlearn 09,15                   ; |TAKE_DOWN|HYPER_BEAM|
     tmlearn 18                      ; |COUNTER|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|

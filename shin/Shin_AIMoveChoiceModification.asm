@@ -166,30 +166,67 @@ AIMoveChoiceModification1:
     jp nz,.nextMove    ;go to next move if the current move is not zero-power
 ;At this line onward all moves are assumed to be zero power
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - do not use haze if user has no status or neutral stat mods
     ld a,[W_ENEMYMOVEEFFECT]    ;load the move effect
     cp HAZE_EFFECT    ;see if it is haze
     jp nz,.hazekickout    ;move on if not haze
 ;using haze at this point
-    ld a,[W_ENEMYMONSTATUS]    ;get status
+    ld a,[W_ENEMYMONSTATUS] ; get status
     and a
-    jp z,.heavydiscourage    ;discourage if status is clear
+    jr z,.HazeCheckStatsMods
+    call GenRandom
+    cp $AA
+    jp c,.givepref ;(66% chance) encourage
+.HazeCheckStatsMods
     push hl
+    ld hl,wEnemyMonStatMods
+    call .HazeCalcSummedStatsMod
+    pop hl
+    cp 41
+    jr nc,.HazeCheckStatsModsPlayer ; continue if summed stat mods are >= 41
+    call GenRandom
+    cp $80
+    jp c,.givepref ;(50% chance) encourage
+.HazeCheckStatsModsPlayer
+    push hl
+    ld hl,wPlayerMonStatMods
+    call .HazeCalcSummedStatsMod
+    pop hl
+    cp 44
+    jr c,.HazeCheckLeechSeededEnemy ; continue if summed stat mods < 44
+    call GenRandom
+    cp $80
+    jp c,.givepref ;(50% chance) encourage
+.HazeCheckLeechSeededEnemy
+    ld a,[W_ENEMYBATTSTATUS2]
+    bit 7,a ; leech seeded
+    jr z,.HazeCheckConfusionEnemy
+    call GenRandom
+    cp $AA
+    jp c,.givepref ;(66% chance) encourage
+.HazeCheckConfusionEnemy
+    ld a,[W_ENEMYBATTSTATUS1]
+    bit 7,a ; confusion
+    jp z,.heavydiscourage
+    call GenRandom
+    cp $AA
+    jp c,.givepref ;(66% chance) encourage
+    jp .heavydiscourage
+.HazeCalcSummedStatsMod
     push bc
     xor a
     ld b,6
-    ld hl,wEnemyMonStatMods
 .hazeloop
-    add [hl]
+    add [hl] ; nautral is 6*7=42
     inc hl
     dec b
     jr nz,.hazeloop
     pop bc
-    pop hl
-    cp 42
-    jp nc,.heavydiscourage    ;discourage if summed stat mods are same or more than 42 (7 per mod is neutral)
+    ret
 .hazekickout
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - do not use disable on a pkmn that is already disabled

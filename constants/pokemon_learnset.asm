@@ -2549,8 +2549,9 @@ SCYTHER_Learnset: MACRO
     db 19,BLADE
     db 21,DOUBLE_TEAM
     db 23,WING_ATTACK
-    db 25,RAZOR_WIND
-    db 28,SLASH
+    db 25,LEECH_LIFE
+    db 27,SLASH
+    db 29,RAZOR_WIND
     db 31,FOCUS_ENERGY
     db 33,SWORDS_DANCE
     db 35,WHIRLWIND
@@ -2662,12 +2663,13 @@ PINSIR_Learnset: MACRO
     db 11,STRING_SHOT
     db 13,FURY_ATTACK
     db 15,LEER
-    db 17,PIN_MISSILE
+    db 17,LEECH_LIFE
     db 19,BONE_CLUB
     db 21,CLAMP
     db 23,SHARPEN
     db 25,SEISMIC_TOSS
-    db 28,STRIKE
+    db 27,STRIKE
+    db 29,PIN_MISSILE
     db 31,GUILLOTINE
     db 33,TRAPHOLE
     db 35,SLASH
