@@ -184,7 +184,7 @@ LoreleiMove:
     db ICE_BEAM
     ; Cloyster (Level 53)
     db ICE_BEAM
-    db BARRIER
+    db HAZE
     db CLAMP
     db SPIKE_CANNON
     ; Slowbro (Level 54)
@@ -257,7 +257,7 @@ AgathaMove:
     db TRAPHOLE
     db SUPER_FANG
     db SLUDGE
-    db TOXIC
+    db HAZE
     ; Venusaur (Level 55)
     db RAZOR_LEAF
     db SLEEP_POWDER
