@@ -10388,9 +10388,9 @@ Load16BitRegisters: ; 3e94 (0:3e94)
     ret
 
 Func_3ead: ; 3ead (0:3ead)
-    ld b,BANK(Func_1eb0a)
-    ld hl,Func_1eb0a
-    jp Bankswitch ; indirect jump to Func_1eb0a (1eb0a (7:6b0a))
+    ld b,BANK(CinnabarGymProcessAllGate)
+    ld hl,CinnabarGymProcessAllGate
+    jp Bankswitch ; indirect jump to CinnabarGymProcessAllGate (1eb0a (7:6b0a))
 
 Func_3eb5: ; 3eb5 (0:3eb5)
     ld a,[H_LOADEDROMBANK]
@@ -38090,22 +38090,90 @@ Route2HouseText4:
 .error
     jp TextScriptEnd
 
-CheckCinnabarGymTileJustCorrect:
-    push af ; Backup ID (Prospect)
-    ld a,[$FF00+$db] ; 6,5,4,3,2,1
-    ld d,a
-    ld a,6
-    sub d ; 0,1,2,3,4,5
-    ld hl,wChangedBlocksID
+CinnabarGymProcessAllGate: ; 1eb0a (7:6b0a)
     push bc
-    ld bc,3
-    call AddNTimes
+    xor a        ; Reset Redraw Flag
+    ld [$d12f],a ; ...
+    ld a,6
+    ld de,wChangedBlocksNum
+    ld [de],a
+    ld [$FF00+$db],a
+.loop
+    inc de ; go to wChangedBlocksH
+    ld a,[$FF00+$db]
+    dec a
+    add a
+    push de
+    ld d,$0
+    ld e,a
+    ld hl,.CinnabarGymGateCoords
+    add hl,de
+    pop de
+    ld a,$C7
+    ld [de],a
+    inc de
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[de]
+    ld b,a
+    ld a,[hl]
+    call .GetProspectTile
+    cp b
+    jr z,.skip
+    push af
+    ld a,1       ; Set Redraw Flag
+    ld [$d12f],a ; ...
+    pop af
+.skip
+    ld [de],a
+    ld hl,$FF00+$db
+    dec [hl]
+    jr nz,.loop
+    ld a,[$d12f] ; Check Redraw Flag
+    and a        ; ...
+    call nz,.RedrawMapView
     pop bc
-    ld a,[hl] ; ID (Actual)
-    ld d,a
-    pop af ; Restore ID (Prospect)
-    cp d
     ret
+
+.GetProspectTile
+    push de
+    push bc
+    push af
+    ld a,[$FF00+$db]
+    ld [$FF00+$e0],a
+    ld c,a
+    ld b,2
+    call CheckCinnabarCymGateFlag
+    ld a,c
+    and a
+    jr nz,.open
+    pop af
+    jr .done
+.open
+    pop af
+    ld a,$0E ; open
+.done
+    pop bc
+    pop de
+    ret
+
+.RedrawMapView:
+    call RestoreChangedBlocks
+    ld b,BANK(RedrawMapView)
+    ld hl,RedrawMapView
+    jp Bankswitch
+
+.CinnabarGymGateCoords ; 1eb48 (7:6b48)
+    ; format: LSB Changed Block Address,direction
+    ; direction: $54 = horizontal gate,$5f = vertical gate
+    ; Note : MSB is ever C7
+    db $54,$54
+    db $51,$54
+    db $81,$54
+    db $9E,$5f
+    db $7D,$54
+    db $4D,$54
 
 ; Free
 
@@ -42531,7 +42599,7 @@ CinnabarQuizQuestionsText6: ; 1ea85 (7:6a85)
     TX_FAR _CinnabarQuizQuestionsText6
     db "@"
 
-Func_1ea8a: ; 1ea8a (7:6a8a)
+CheckCinnabarCymGateFlag: ; 1ea8a (7:6a8a)
     ld hl,$d79c
     ld a,$10
     jp Predef ; indirect jump to HandleBitArray (f666 (3:7666))
@@ -42552,8 +42620,8 @@ Func_1ea92: ; 1ea92 (7:6a92)
     ld a,[$FF00+$e0]
     ld c,a
     ld b,$1
-    call Func_1ea8a
-    jp Func_1eb0a
+    call CheckCinnabarCymGateFlag
+    jp CinnabarGymProcessAllGate
 .asm_1eab8
     call WaitForSoundToFinish
     ld a,$a5
@@ -42584,7 +42652,7 @@ CinnabarGymQuizCorrectText: ; 1eae3 (7:6ae3)
     ld a,[$FF00+$e0]
     ld c,a
     ld b,$2
-    call Func_1ea8a
+    call CheckCinnabarCymGateFlag
     ld a,c
     and a
     jp nz,TextScriptEnd
@@ -42598,59 +42666,7 @@ CinnabarGymQuizIncorrectText: ; 1eb05 (7:6b05)
     TX_FAR _CinnabarGymQuizIncorrectText
     db "@"
 
-Func_1eb0a: ; 1eb0a (7:6b0a)
-    ld a,$6
-    ld [$FF00+$db],a
-.asm_1eb0e
-    ld a,[$FF00+$db]
-    dec a
-    add a
-    add a
-    ld d,$0
-    ld e,a
-    ld hl,CinnabarGymGateCoords ; $6b48
-    add hl,de
-    ld a,[hli]
-    ld b,[hl]
-    ld c,a
-    inc hl
-    ld a,[hl]
-    ld [$d12f],a
-    push bc
-    ld a,[$FF00+$db]
-    ld [$FF00+$e0],a
-    ld c,a
-    ld b,$2
-    call Func_1ea8a
-    ld a,c
-    and a
-    jr nz,.asm_1eb36
-    ld a,[$d12f]
-    jr .asm_1eb38
-.asm_1eb36
-    ld a,$e
-.asm_1eb38
-    pop bc
-    call CheckCinnabarGymTileJustCorrect
-    ld [$d09f],a
-    jr z,.next
-    ld a,$17
-    call Predef ; indirect jump to ReplaceTileBlock (ee9e (3:6e9e))
-.next
-    ld hl,$FF00+$db
-    dec [hl]
-    jr nz,.asm_1eb0e
-    ret
-
-CinnabarGymGateCoords: ; 1eb48 (7:6b48)
-    ; format: x-coord,y-coord,direction,padding
-    ; direction: $54 = horizontal gate,$5f = vertical gate
-    db $09,$03,$54,$00 ; $C74D
-    db $06,$03,$54,$00 ; $C77D
-    db $06,$06,$54,$00 ; $C79E
-    db $03,$08,$5f,$00 ; $C781
-    db $02,$06,$54,$00 ; $C751
-    db $02,$03,$54,$00 ; $C754
+; Free
 
 SECTION "BillsHousePC",ROMX[$6b6e],BANK[$7]
 
