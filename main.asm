@@ -53022,8 +53022,6 @@ GetDamageVarsScaleStats:
     inc c
     ret
 
-; Free
-
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
 Func_3c04c: ; 3c04c (f:404c)
@@ -56677,6 +56675,24 @@ DrawHudAndPrintText:
     call DrawHUDsAndHPBars
     pop hl
     jp PrintText
+
+GetSideEffectType_Player:
+    ld a,[W_PLAYERMOVETYPE]
+    jr GetSideEffectType_Common
+
+GetSideEffectType_Enemy:
+    ld a,[W_ENEMYMOVETYPE]
+    ; fall through
+
+GetSideEffectType_Common:
+    cp ELECTRIC
+    ret z
+    cp FIRE
+    ret z
+    cp ICE
+    ret z
+    ld a,TYPE_NA
+    ret
 
 ; Free
 
@@ -60620,7 +60636,7 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     and a
     jp nz,CheckDefrost
     ;opponent has no existing status
-    ld a,[W_PLAYERMOVETYPE]
+    call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
     ld b,a
     ld a,[W_ENEMYMONTYPE1]
     cp b
@@ -60672,7 +60688,7 @@ opponentAttacker: ; 3f382 (f:7382)
     ld a,[W_PLAYERMONSTATUS]  ;this appears to the same as above with addresses swapped for opponent
     and a
     jp nz,CheckDefrost
-    ld a,[W_ENEMYMOVETYPE]
+    call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
     ld b,a
     ld a,[W_PLAYERMONTYPE1]
     cp b

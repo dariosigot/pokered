@@ -122,7 +122,7 @@
     db MIRROR_MOVE  , MIRROR_MOVE_EFFECT         ,   0 , TYPE_NA  , 255 , 10 ; pp 20 ; - ; Typw Wind -> Normal
     db SELFDESTRUCT , EXPLODE_EFFECT             , 200 , NORMAL   , 255 , 50 ; pp  5 ; 0 ; Pwr 130 -> 200 ; Ene 40 -> 50
     db EGG_BOMB     , NO_ADDITIONAL_EFFECT       , 100 , RUBBER   , 191 , 20 ; pp 10 ; 0 ; Type Normal -> Rubber
-    db LICK         , PARALYZE_SIDE_EFFECT2      ,  30 , GHOST    , 255 , 07 ; pp 30 ; 0 ; Pwr 20 -> 30
+    db LICK         , PARALYZE_SIDE_EFFECT2      ,  30 , NORMAL   , 255 , 07 ; pp 30 ; 0 ; Pwr 20 -> 30
     db SMOG         , POISON_SIDE_EFFECT2        ,  45 , POISON   , 178 , 08 ; pp 20 ; 1 ; Pwr 20 -> 45 ; PP 20 -> 25
     db SLUDGE       , POISON_SIDE_EFFECT2        ,  75 , POISON   , 255 , 11 ; pp 20 ; 0 ; Pwr 65 -> 75 ; Phisical ; Ene 10 -> 11
     db BONE_CLUB    , FLINCH_SIDE_EFFECT1        ,  70 , IVORY    , 216 , 08 ; pp 25 ; 0 ; Type Ground -> Ivory ; Pwr 65 -> 70 ; PP 20 -> 25
