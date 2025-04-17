@@ -24638,7 +24638,10 @@ BackupChangedBlocks:
     cp e
     jr nz,.next2
 .found
+    ld a,[hl]
+    ld b,a
     ld a,[$d09f]
+    cp b
     ld [hl],a ; ID
     jr .done
 .next1
@@ -24656,6 +24659,8 @@ BackupChangedBlocks:
     ld [hl],a ; ID
     ld hl,wChangedBlocksNum
     inc [hl]
+    ld a,1
+    or a ; reset all flag
 .done
     ld a,[$d09f]
     pop hl
@@ -26208,6 +26213,7 @@ ReplaceTileBlock: ; ee9e (3:6e9e)
 .asm_eebb
     add hl,bc
     call BackupChangedBlocks ; ld a,[$d09f]
+    ret z ; kickout if same block ID
     ld [hl],a
     ld a,[$d35f]
     ld c,a
@@ -26228,7 +26234,7 @@ ReplaceTileBlock: ; ee9e (3:6e9e)
     call Func_ef4e
     ret c
 
-RedrawMapView: ; eedc (3:6edc)
+RedrawMapView: ; Moved in the Bank
     ld a,[W_ISINBATTLE] ; $d057
     inc a
     ret z
@@ -26299,7 +26305,7 @@ RedrawMapView: ; eedc (3:6edc)
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ret
 
-Func_ef4e: ; ef4e (3:6f4e)
+Func_ef4e: ; Moved in the Bank
     ld a,h
     sub b
     ret nz
@@ -26307,7 +26313,7 @@ Func_ef4e: ; ef4e (3:6f4e)
     sub c
     ret
 
-UsedCut: ; ef54 (3:6f54)
+UsedCut: ; Moved in the Bank
     xor a
     ld [$cd6a],a
     call CheckCutTile
