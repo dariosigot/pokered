@@ -905,7 +905,8 @@ VENONAT_Learnset: MACRO
     db 15,LEECH_LIFE
     db 17,HYPNOSIS
     db 19,SONICBOOM
-    db 23,STUN_SPORE
+    db 22,STUN_SPORE
+    db 24,ABSORB
     db 26,LIGHT_SCREEN
     db 28,SLEEP_POWDER
     ;  31,VENOMOTH
@@ -922,6 +923,7 @@ VENOMOTH_Learnset: MACRO
     db 44,PSYCHIC_M
     db 47,TWINEEDLE
     db 50,BARRIER
+    db 52,MEGA_DRAIN
     db 55,NIGHT_SHADE
     db 60,TOXIC
 ENDM
@@ -932,6 +934,7 @@ VENONAT_NoEvo_Learnset: MACRO
     db 45,SPORE
     db 50,PSYCHIC_M
     db 54,BARRIER
+    db 56,MEGA_DRAIN
     db 58,NIGHT_SHADE
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
@@ -1157,6 +1160,7 @@ POLIWHIRL_Learnset: MACRO
     db 32,DOUBLE_TEAM
     db 34,STRIKE
     db 36,HAZE
+    db 38,LEECH_LIFE
     db 40,TSUNAMI
     db 45,SUBMISSION
     db 47,CONFUSION ; Exclusive
@@ -1175,6 +1179,7 @@ POLIWRATH_Learnset: MACRO
     db 33,DOUBLE_TEAM
     db 34,SEISMIC_TOSS
     db 36,TSUNAMI
+    db 37,LEECH_LIFE
     db 39,SUBMISSION
     db 43,BODY_SLAM
     db 46,JUMP_KICK
@@ -1189,6 +1194,7 @@ POLIWAG_NoEvo_Learnset: MACRO
     db 28,AMNESIA ; Exclusive
     db 32,CONFUSION ; Exclusive
     db 36,HAZE
+    db 39,LEECH_LIFE
     db 41,WATERFALL
     db 46,DOUBLE_TEAM
     db 51,TSUNAMI
@@ -1684,8 +1690,9 @@ MUK_Learnset: MACRO
     GRIMER_Learnset
     db 38,ACID_ARMOR
     db 41,SWIFT
+    db 43,LEECH_LIFE
     db 44,THUNDERPUNCH
-    db 46,LEECH_LIFE
+    db 46,ABSORB
     db 48,MEGA_DRAIN
     db 51,TOXIC
     db 54,RECOVER
@@ -1696,6 +1703,7 @@ GRIMER_NoEvo_Learnset: MACRO
     db 39,LEECH_LIFE ; Exclusive
     db 42,ACID_ARMOR
     db 45,THUNDERPUNCH
+    db 47,ABSORB
     db 49,MEGA_DRAIN
     db 53,TOXIC
     db 57,RECOVER
@@ -1882,6 +1890,7 @@ KRABBY_Learnset: MACRO
     db 15,SAND_ATTACK
     db 18,BUBBLEBEAM
     db 20,STOMP
+    db 21,LEECH_LIFE
     db 22,BONE_CLUB
     db 24,HARDEN
     db 25,SHARPEN
@@ -2017,6 +2026,7 @@ EXEGGCUTE_Learnset: MACRO
     db 27,STUN_SPORE ; Exclusive
     db 29,POISONPOWDER ; Exclusive
     db 31,SLEEP_POWDER ; Exclusive
+    db 33,LEECH_LIFE
     db 35,EGG_BOMB
     db 37,STRING_SHOT
     db 39,PSYBEAM
@@ -2040,6 +2050,7 @@ EXEGGUTOR_Learnset: MACRO
     db 23,EGG_BOMB
     db 25,STRING_SHOT
     db 27,GROWTH
+    db 29,LEECH_LIFE
     db 32,PSYBEAM
     db 35,SELFDESTRUCT
     db 37,MEGA_DRAIN
@@ -2187,6 +2198,7 @@ LICKITUNG_Learnset: MACRO
     db 21,WRAP
     db 23,SONICBOOM
     db 25,STRIKE
+    db 26,LEECH_LIFE
     db 28,SCREECH
     db 31,REST
     db 34,BODY_SLAM
@@ -2226,6 +2238,7 @@ WEEZING_Learnset: MACRO
     db 41,SWIFT
     db 43,ABSORB
     db 44,PSYBEAM
+    db 46,DISABLE
     db 48,THUNDERBOLT
     db 51,TOXIC
     db 54,RECOVER
@@ -2236,6 +2249,7 @@ KOFFING_NoEvo_Learnset: MACRO
     db 39,ABSORB ; Exclusive
     db 42,EXPLOSION
     db 45,GLARE
+    db 47,DISABLE
     db 49,THUNDERBOLT
     db 53,TOXIC
     db 57,RECOVER
@@ -2493,6 +2507,7 @@ STARMIE_Learnset: MACRO
     db 18,RECOVER
     db 21,BUBBLEBEAM
     db 23,FLASH
+    db 25,LEECH_LIFE
     db 26,SWIFT
     db 28,PSYBEAM
     db 30,SONICBOOM
@@ -2583,6 +2598,7 @@ JYNX_Learnset: MACRO
     db 27,MEDITATE
     db 29,REFLECT
     db 31,LIGHT_SCREEN
+    db 33,LEECH_LIFE
     db 34,ICE_BEAM
     db 36,PSYBEAM
     db 38,BODY_SLAM
@@ -2613,6 +2629,7 @@ ELECTABUZZ_Learnset: MACRO
     db 27,MEDITATE
     db 29,STRIKE
     db 31,REFLECT
+    db 33,ROLLING_KICK
     db 34,THUNDERBOLT
     db 36,SEISMIC_TOSS
     db 38,BODY_SLAM
@@ -2643,11 +2660,12 @@ MAGMAR_Learnset: MACRO
     db 27,MEDITATE
     db 29,MEGA_PUNCH
     db 31,LIGHT_SCREEN
+    db 33,SCREECH
     db 34,FLAMETHROWER
     db 36,STRIKE
     db 38,BODY_SLAM
     db 40,CONFUSE_RAY
-    db 43,SCREECH
+    db 43,MIRROR_MOVE
     db 46,SLUDGE
     db 48,THRASH
     db 50,FIRE_BLAST
@@ -2929,6 +2947,7 @@ OMANYTE_Learnset: MACRO
     db 19,BIND
     db 19,VINE_WHIP
     db 20,BUBBLEBEAM
+    db 21,LEECH_LIFE
     db 22,AURORA_BEAM
     db 24,REST
     db 26,SCREECH
@@ -2975,6 +2994,7 @@ KABUTO_Learnset: MACRO
     db 19,BLADE
     db 19,SHARPEN
     db 20,PIN_MISSILE
+    db 21,CLAMP
     db 22,STRING_SHOT
     db 24,REST
     db 26,ABSORB
