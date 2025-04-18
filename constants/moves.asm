@@ -7,7 +7,7 @@
     db COMET_PUNCH  , TWO_TO_FIVE_ATTACKS_EFFECT ,  20 , FIGHTING , 216 , 12 ; pp 15 ; 0 ; Type Normal -> Fighting ; Pwr 18 -> 20 ; Ene 14 -> 12
     db MEGA_PUNCH   , NO_ADDITIONAL_EFFECT       ,  80 , FIGHTING , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Fighting
     db PAY_DAY      , PAY_DAY_EFFECT             ,  60 , NORMAL   , 255 , 10 ; pp 20 ; 0 ; Pwr 40 -> 60
-    db FIRE_PUNCH   , BURN_SIDE_EFFECT1          ,  75 , FIRE     , 255 , 14 ; pp 15 ; 0
+    db FIRE_PUNCH   , BURN_SIDE_EFFECT2          ,  75 , FIRE     , 255 , 14 ; pp 15 ; 0
     db ICE_PUNCH    , FREEZE_SIDE_EFFECT         ,  75 , ICE      , 255 , 14 ; pp 15 ; 0
     db THUNDERPUNCH , PARALYZE_SIDE_EFFECT1      ,  75 , ELECTRIC , 255 , 14 ; pp 15 ; 0
     db SCRATCH      , NO_ADDITIONAL_EFFECT       ,  40 , NORMAL   , 255 , 06 ; pp 35 ; 0
@@ -34,7 +34,7 @@
     db FURY_ATTACK  , TWO_TO_FIVE_ATTACKS_EFFECT ,  18 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Ivory ; Pwr 15 -> 18
     db HORN_DRILL   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 45 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 45
     db TACKLE       , NO_ADDITIONAL_EFFECT       ,  35 , NORMAL   , 255 , 05 ; pp 35 ; 0 ; Acr 242 -> 255 ; Ene 06 -> 05
-    db BODY_SLAM    , PARALYZE_SIDE_EFFECT2      ,  85 , RUBBER   , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Rubber
+    db BODY_SLAM    , PARALYZE_SIDE_EFFECT1      ,  85 , RUBBER   , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Rubber
     db WRAP         , TRAPPING_EFFECT            ,  10 , NORMAL   , 141 , 12 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Acr 216 -> 141 ; Ene 10 -> 12
     db TAKE_DOWN    , RECOIL_EFFECT              ,  90 , NORMAL   , 216 , 10 ; pp 20 ; 0
     db THRASH       , THRASH_PETAL_DANCE_EFFECT  , 120 , NORMAL   , 255 , 15 ; pp 15 ; 0 ; Pwr 90 -> 120 ; PP 20 -> 15 ; Ene 14 -> 15
@@ -52,8 +52,8 @@
     db SONICBOOM    , SPECIAL_DAMAGE_EFFECT      ,   1 , NORMAL   , 229 , 10 ; pp 20 ; -
     db DISABLE      , DISABLE_EFFECT             ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; Acr 140 -> 255
     db ACID         , DEFENSE_DOWN_SIDE_EFFECT   ,  40 , POISON   , 255 , 07 ; pp 30 ; 0 ; Phisical
-    db EMBER        , BURN_SIDE_EFFECT1          ,  40 , FIRE     , 255 , 08 ; pp 25 ; 1
-    db FLAMETHROWER , BURN_SIDE_EFFECT1          ,  90 , FIRE     , 255 , 14 ; pp 15 ; 1 ; Pwr 95 -> 90
+    db EMBER        , BURN_SIDE_EFFECT2          ,  40 , FIRE     , 255 , 08 ; pp 25 ; 1
+    db FLAMETHROWER , BURN_SIDE_EFFECT2          ,  90 , FIRE     , 255 , 14 ; pp 15 ; 1 ; Pwr 95 -> 90
     db MIST         , MIST_EFFECT                ,   0 , ICE      , 255 , 07 ; pp 30 ; -
     db WATER_GUN    , NO_ADDITIONAL_EFFECT       ,  40 , WATER    , 255 , 08 ; pp 25 ; 1
     db HYDRO_PUMP   , NO_ADDITIONAL_EFFECT       , 110 , WATER    , 204 , 36 ; pp  5 ; 1 ; Pwr 120 -> 110 ; Ene 40 -> 36
@@ -87,7 +87,7 @@
     db THUNDERSHOCK , PARALYZE_SIDE_EFFECT1      ,  40 , ELECTRIC , 255 , 07 ; pp 30 ; 1
     db THUNDERBOLT  , PARALYZE_SIDE_EFFECT1      ,  90 , ELECTRIC , 255 , 14 ; pp 15 ; 1 ; Pwr 95 -> 90
     db THUNDER_WAVE , PARALYZE_EFFECT            ,   0 , ELECTRIC , 255 , 14 ; pp 15 ; - ; PP 20 -> 15
-    db THUNDER      , PARALYZE_SIDE_EFFECT1      , 110 , ELECTRIC , 178 , 20 ; pp 10 ; 1 ; Pwr 120 -> 110
+    db THUNDER      , PARALYZE_SIDE_EFFECT2      , 110 , ELECTRIC , 178 , 20 ; pp 10 ; 1 ; Pwr 120 -> 110
     db ROCK_THROW   , NO_ADDITIONAL_EFFECT       ,  50 , ROCK     , 229 , 09 ; pp 15 ; 0 ; Acr 165 -> 229 ; PP 15 -> 25 ; Ene 08 -> 09 
     db EARTHQUAKE   , NO_ADDITIONAL_EFFECT       , 100 , GROUND   , 255 , 20 ; pp 10 ; 0
     db FISSURE      , OHKO_EFFECT                ,   1 , GROUND   ,  76 , 45 ; pp  5 ; - ; Ene 40 -> 45
