@@ -3,8 +3,8 @@
 
     db POUND        , NO_ADDITIONAL_EFFECT       ,  40 , RUBBER   , 255 , 06 ; pp 35 ; 0 ; Type Normal -> Rubber
     db KARATE_CHOP  , NO_ADDITIONAL_EFFECT       ,  50 , FIGHTING , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Fighting
-    db DOUBLESLAP   , TWO_TO_FIVE_ATTACKS_EFFECT ,  18 , RUBBER   , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber ; PP 10 -> 20 ; Pwr 15 -> 18
-    db COMET_PUNCH  , TWO_TO_FIVE_ATTACKS_EFFECT ,  20 , FIGHTING , 216 , 12 ; pp 15 ; 0 ; Type Normal -> Fighting ; Pwr 18 -> 20 ; Ene 14 -> 12
+    db DOUBLESLAP   , TWO_TO_FIVE_ATTACKS_EFFECT ,  19 , RUBBER   , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber ; PP 10 -> 20 ; Pwr 15 -> 18
+    db COMET_PUNCH  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , FIGHTING , 216 , 12 ; pp 15 ; 0 ; Type Normal -> Fighting ; Pwr 18 -> 20 ; Ene 14 -> 12
     db MEGA_PUNCH   , NO_ADDITIONAL_EFFECT       ,  80 , FIGHTING , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Fighting
     db PAY_DAY      , PAY_DAY_EFFECT             ,  60 , NORMAL   , 255 , 10 ; pp 20 ; 0 ; Pwr 40 -> 60
     db FIRE_PUNCH   , BURN_SIDE_EFFECT2          ,  75 , FIRE     , 255 , 14 ; pp 15 ; 0
@@ -31,7 +31,7 @@
     db SAND_ATTACK  , ACCURACY_DOWN1_EFFECT      ,   0 , GROUND   , 204 , 18 ; pp 15 ; - ; Type Normal -> Ground ; Acr 255 -> 204 ; PP 15 ; Ene 14 -> 18
     db HEADBUTT     , FLINCH_SIDE_EFFECT2        ,  70 , NORMAL   , 255 , 14 ; pp 15 ; 0
     db HORN_ATTACK  , NO_ADDITIONAL_EFFECT       ,  65 , IVORY    , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Ivory
-    db FURY_ATTACK  , TWO_TO_FIVE_ATTACKS_EFFECT ,  18 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Ivory ; Pwr 15 -> 18
+    db FURY_ATTACK  , TWO_TO_FIVE_ATTACKS_EFFECT ,  19 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Ivory ; Pwr 15 -> 18
     db HORN_DRILL   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 45 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 45
     db TACKLE       , NO_ADDITIONAL_EFFECT       ,  35 , NORMAL   , 255 , 05 ; pp 35 ; 0 ; Acr 242 -> 255 ; Ene 06 -> 05
     db BODY_SLAM    , PARALYZE_SIDE_EFFECT1      ,  85 , RUBBER   , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Rubber
@@ -42,7 +42,7 @@
     db TAIL_WHIP    , DEFENSE_DOWN1_EFFECT       ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
     db POISON_STING , POISON_SIDE_EFFECT1        ,  15 , POISON   , 255 , 04 ; pp 35 ; 0 ; Ene 06 -> 04
     db TWINEEDLE    , TWINEEDLE_EFFECT           ,  30 , BUG      , 255 , 10 ; pp 20 ; 0 ; Pwr 25 -> 30
-    db PIN_MISSILE  , TWO_TO_FIVE_ATTACKS_EFFECT ,  25 , BUG      , 242 , 14 ; pp 20 ; 1 ; Acr 216 -> 242 ; Pwr 14 -> 25 ; Special ; PP 20 -> 15
+    db PIN_MISSILE  , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , BUG      , 242 , 14 ; pp 20 ; 1 ; Acr 216 -> 242 ; Pwr 14 -> 25 ; Special ; PP 20 -> 15
     db LEER         , DEFENSE_DOWN1_EFFECT       ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
     db BITE         , FLINCH_SIDE_EFFECT1        ,  60 , NORMAL   , 255 , 08 ; pp 25 ; 0
     db GROWL        , ATTACK_DOWN1_EFFECT        ,   0 , NORMAL   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
@@ -131,7 +131,7 @@
     db CLAMP        , TRAPPING_EFFECT            ,  10 , IVORY    , 128 , 11 ; pp 20 ; 0 ; Pwr 35 -> 10 ; Acr 191 -> 128 ; Type Water -> Ivory ; PP 10 -> 20 ; Ene 10 -> 11
     db SWIFT        , SWIFT_EFFECT               ,  60 , NORMAL   , 255 , 10 ; pp 20 ; 1
     db SKULL_BASH   , CHARGE_EFFECT              , 130 , NORMAL   , 255 , 20 ; pp 10 ; 0 ; Pwr 100 -> 130 ; PP 15 -> 10
-    db SPIKE_CANNON , TWO_TO_FIVE_ATTACKS_EFFECT ,  25 , IVORY    , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Ivory ; Pwr 20 -> 25
+    db SPIKE_CANNON , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , IVORY    , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Ivory ; Pwr 20 -> 25
     db CONSTRICT    , SPEED_DOWN_SIDE_EFFECT     ,  10 , NORMAL   , 255 , 02 ; pp 35 ; 0 ; Ene 06 -> 02
     db AMNESIA      , STAT_UP1_DOWN_SIDE_EFFECT  ,   0 , PSYCHIC  , 255 , 20 ; pp  5 ; - ; PP 20 -> 10
     db KINESIS      , ACCURACY_DOWN1_EFFECT      ,   0 , PSYCHIC  , 204 , 18 ; pp 15 ; - ; PP 20 -> 15 ; Ene 14 -> 18
@@ -140,7 +140,7 @@
     db GLARE        , PARALYZE_EFFECT            ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Acr 191 -> 255 ; PP 30 -> 15
     db DREAM_EATER  , DREAM_EATER_EFFECT         , 100 , GHOST    , 255 , 17 ; pp 10 ; 1 ; Type Psychic -> Ghost ; PP 15 -> 10 ; Ene 20 -> 17
     db POISON_GAS   , POISON_EFFECT              ,   0 , POISON   , 229 , 07 ; pp 30 ; - ; Acr 140 -> 229 ; PP 40 -> 30
-    db BARRAGE      , TWO_TO_FIVE_ATTACKS_EFFECT ,  25 , GRASS    , 216 , 14 ; pp 15 ; 0 ; Type Normal -> Grass ; Pwr 15 -> 25 ; PP 20 -> 15
+    db BARRAGE      , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , GRASS    , 216 , 14 ; pp 15 ; 0 ; Type Normal -> Grass ; Pwr 15 -> 25 ; PP 20 -> 15
     db LEECH_LIFE   , DRAIN_HP_EFFECT            ,  30 , BUG      , 255 , 08 ; pp 25 ; 0 ; Pwr 20 -> 30 ; PP 15 -> 25
     db LOVELY_KISS  , SLEEP_EFFECT               ,   0 , NORMAL   , 191 , 22 ; pp 10 ; - ; Ene 20 -> 24
     db SKY_ATTACK   , CHARGE_EFFECT              , 140 , WIND     , 229 , 36 ; pp  5 ; 0 ; Ene 40 -> 36
@@ -154,7 +154,7 @@
     db ACID_ARMOR   , DEFENSE_UP3_EFFECT         ,   0 , POISON   , 255 , 10 ; pp 20 ; - ; PP 40 -> 20 ; Defense 3x
     db CRABHAMMER   , NO_ADDITIONAL_EFFECT       , 100 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Acr 216 -> 229 ; Pwr 90 -> 100
     db EXPLOSION    , EXPLODE_EFFECT             , 255 , NORMAL   , 255 , 60 ; pp  5 ; 0 ; Pwr 170 -> 255 ; Ene 40 -> 60
-    db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  20 , NORMAL   , 204 , 12 ; pp 15 ; 0 ; Pwr 18 -> 20 ; Ene 14 -> 12
+    db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , NORMAL   , 204 , 12 ; pp 15 ; 0 ; Pwr 18 -> 20 ; Ene 14 -> 12
     db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  50 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Ground -> Ivory
     db REST         , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 28 ; pp 10 ; - ; Type Psychic -> Normal ; Ene 20 -> 28
     db ROCK_SLIDE   , NO_ADDITIONAL_EFFECT       ,  85 , ROCK     , 229 , 14 ; pp 10 ; 0 ; Pwr 75 -> 85 ; PP 10 -> 15
