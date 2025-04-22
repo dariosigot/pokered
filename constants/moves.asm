@@ -97,11 +97,11 @@
     db PSYCHIC_M    , SPECIAL_DOWN_SIDE_EFFECT   ,  90 , PSYCHIC  , 255 , 20 ; pp 10 ; 1
     db HYPNOSIS     , SLEEP_EFFECT               ,   0 , PSYCHIC  , 153 , 18 ; pp 10 ; - ; PP 20 -> 10
     db MEDITATE     , ATTACK_UP1_EFFECT          ,   0 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
-    db AGILITY      , SPEED_UP2_EFFECT           ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Type Psychic -> Normal ; PP 30 -> 15
+    db AGILITY      , SPEED_UP3_EFFECT           ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Type Psychic -> Normal ; PP 30 -> 15
     db QUICK_ATTACK , NO_ADDITIONAL_EFFECT       ,  40 , NORMAL   , 255 , 07 ; pp 30 ; 0
     db RAGE         , RAGE_EFFECT                ,  20 , NORMAL   , 255 , 10 ; pp 20 ; 0
     db TELEPORT     , SWITCH_AND_TELEPORT_EFFECT ,   0 , PSYCHIC  , 255 , 04 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 04
-    db NIGHT_SHADE  , SPECIAL_DAMAGE_EFFECT      ,   0 , GHOST    , 255 , 14 ; pp 15 ; -
+    db NIGHT_SHADE  , SPECIAL_DAMAGE_EFFECT      ,   1 , GHOST    , 255 , 14 ; pp 15 ; -
     db MIMIC        , MIMIC_EFFECT               ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; PP 10 -> 20
     db SCREECH      , DEFENSE_DOWN2_EFFECT       ,   0 , NORMAL   , 216 , 08 ; pp 25 ; - ; PP 40 -> 25
     db DOUBLE_TEAM  , EVASION_UP1_EFFECT         ,   0 , NORMAL   , 255 , 24 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 24

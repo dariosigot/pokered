@@ -30960,6 +30960,9 @@ HazeEffect_: ; Moved in the Bank
     call .CureVolatileStatuses
     ld hl,W_ENEMYBATTSTATUS1
     call .CureVolatileStatuses
+    ld hl,ApplyBadgeStatBoostsFull
+    ld b,BANK(ApplyBadgeStatBoostsFull)
+    call Bankswitch
     ld hl,PlayCurrentMoveAnimation
     call Bankswitch4toF
     ld hl,.StatusChangesEliminatedText
@@ -31248,6 +31251,7 @@ GetEnemy:
     pop de
     pop hl
 .WillEncounter
+    call .DittoDebugInRoute15
     ld [$cf91],a
     ld [W_ENEMYMONID],a
     scf ; WillEncounter
@@ -31294,6 +31298,20 @@ GetEnemy:
     ld [W_CURENEMYLVL],a
     ld a,MEW ; Entry Level
     jr .WillEncounter
+.DittoDebugInRoute15
+    push bc
+    ld b,a
+    call GetCurrentOldAdventureMap
+    cp ROUTE_15
+    jr nz,.standard
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 2,a ; was the select button pressed?
+    jr z,.standard
+    ld b,DITTO
+.standard
+    ld a,b
+    pop bc
+    ret
 
 UnknownDungeonLandPkmnList:
     db BULBASAUR
@@ -52200,8 +52218,20 @@ TransformEffect_: ; Moved Upper in the Bank
     inc de
     inc de
     inc de
-    ld bc,$8
+
+    ; Copy Original 4 Stats
+    ld bc,8
+    add hl,bc
+    push hl
+    ld a,[H_WHOSETURN]
+    and a
+    ld hl,$cd26 ; EnemyMonUnmodifiedAttack
+    jr z,.ContinueCopy4Stats
+    ld hl,$cd12 ; PlayerMonUnmodifiedAttack
+.ContinueCopy4Stats
     call CopyData
+    pop hl
+
     ; Handle Alternate Form Index
     inc hl ; move to move2pp
     inc de ; ...
@@ -52211,12 +52241,40 @@ TransformEffect_: ; Moved Upper in the Bank
     ld a,[hl]
     ld [$d11e],a
     call GetMonName
-    ld hl,$cd26
-    ld de,$cd12
+    ld hl,$cd26 ; EnemyMonUnmodifiedAttack
+    ld de,$cd12 ; PlayerMonUnmodifiedAttack
     call Func_3bb7d
     ld hl,wEnemyMonStatMods ; $cd2e
     ld de,wPlayerMonStatMods ; $cd1a
     call Func_3bb7d
+
+    ; Calculate New Stats & Apply Boost/Penaties
+    ld a,[$d11e]
+    push af
+    ld a,[H_WHOSETURN]
+    ld [$d11e],a
+    ld hl,CalculateModifiedStats
+    ld b,BANK(CalculateModifiedStats)
+    call Bankswitch
+    pop af
+    ld [$d11e],a
+    ld a,[H_WHOSETURN]
+    and a
+    ld hl,ApplyBadgeStatBoostsFull
+    ld b,BANK(ApplyBadgeStatBoostsFull)
+    call z,Bankswitch
+    ld a,[H_WHOSETURN]
+    push af
+    and a
+    ld hl,ApplyBurnAndParalysisPenaltiesToPlayer
+    jr z,.ApplyBurnAndParalysisPenalties
+    ld hl,ApplyBurnAndParalysisPenaltiesToEnemy
+.ApplyBurnAndParalysisPenalties
+    ld b,BANK(ApplyBurnAndParalysisPenaltiesToPlayer) ; ApplyBurnAndParalysisPenaltiesToEnemy
+    call Bankswitch
+    pop af
+    ld [H_WHOSETURN],a
+
     call .TransformAnimation
     call Delay3
     call .RestoreSubstitute
@@ -54692,11 +54750,11 @@ LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
     ld de,W_PLAYERMONNAME
     ld bc,$b
     call CopyData
-    call ApplyBadgeStatBoostsFull
     ld hl,W_PLAYERMONLEVEL ; $d022
     ld de,$cd0f
     ld bc,$b
     call CopyData
+    call ApplyBadgeStatBoostsFull
     call ApplyBurnAndParalysisPenaltiesToPlayer
     ld a,$7
     ld b,$8
@@ -59774,28 +59832,28 @@ HalveAttackDueToBurn: ; 3ed64 (f:6d64)
     ld [hl],b
     ret
 
-Func_3ed99: ; 3ed99 (f:6d99)
+CalculateModifiedStats: ; 3ed99 (f:6d99)
     ld c,$0
-.asm_3ed9b
-    call Func_3eda5
+.loop
+    call .CalculateModifiedStat
     inc c
     ld a,c
     cp $4
-    jr nz,.asm_3ed9b
+    jr nz,.loop
     ret
 
-Func_3eda5: ; 3eda5 (f:6da5)
+.CalculateModifiedStat:
     push bc
     push bc
     ld a,[$d11e]
     and a
     ld a,c
     ld hl,W_PLAYERMONATK
-    ld de,$cd12
+    ld de,$cd12 ; PlayerMonUnmodifiedAttack
     ld bc,wPlayerMonAttackMod ; $cd1a
     jr z,.asm_3edc0
     ld hl,W_ENEMYMONATTACK
-    ld de,$cd26
+    ld de,$cd26 ; EnemyMonUnmodifiedAttack
     ld bc,wEnemyMonStatMods ; $cd2e
 .asm_3edc0
     add c
@@ -60795,8 +60853,8 @@ StatModifierUpEffect: ; Moved in the Bank
     cp $4
     jr nc,.UpdateStatDone ; jump if mod affected is evasion/accuracy
     push hl
-    ld hl,$d026
-    ld de,$cd12
+    ld hl,W_PLAYERMONATK+1
+    ld de,$cd12 ; PlayerMonUnmodifiedAttack
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.pointToStats
@@ -81238,9 +81296,9 @@ GainExperience: ; 5524f (15:524f)
 .asm_553c8
     xor a
     ld [$d11e],a
-    ld hl,Func_3ed99
-    ld b,BANK(Func_3ed99)
-    call Bankswitch ; indirect jump to Func_3ed99 (3ed99 (f:6d99))
+    ld hl,CalculateModifiedStats
+    ld b,BANK(CalculateModifiedStats)
+    call Bankswitch ; indirect jump to CalculateModifiedStats (3ed99 (f:6d99))
     ld hl,ApplyBadgeStatBoostsFull
     ld b,BANK(ApplyBadgeStatBoostsFull)
     call Bankswitch ; indirect jump to ApplyBadgeStatBoostsFull (3ee19 (f:6e19))
@@ -138964,9 +139022,13 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_:
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp ATTACK_UP2_EFFECT
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
+    cp ATTACK_UP3_EFFECT
+    jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp SPEED_UP1_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     cp SPEED_UP2_EFFECT
+    jr z,.skip_par                        ; speed effect. skip to par penalty.
+    cp SPEED_UP3_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     jr .skip_end                          ; no attack or speed effect if at this line. skip to end.
 .skip_brn
