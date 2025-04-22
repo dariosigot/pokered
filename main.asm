@@ -53060,6 +53060,14 @@ GetDamageVarsScaleStats:
     inc c
     ret
 
+; play burn/poison animation
+PlayPsnBrnAnimation:
+    jp z,PlayMoveAnimation ; poisoned
+    call FlipTurn
+    ld a,EMBER
+    call PlayMoveAnimation ; burned
+    jp FlipTurn
+
 ; Free
 
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
@@ -53596,17 +53604,19 @@ HandlePoisonBurnLeechSeed: ; 3c3bd (f:43bd)
     and BRN | PSN
     jr z,.notBurnedOrPoisoned
     push hl
-    ld hl,HurtByPoisonText
+    ld hl,.HurtByPoisonText
     ld a,[de]
     and BRN
+    push af
     jr z,.poisoned
-    ld hl,HurtByBurnText
+    ld hl,.HurtByBurnText
 .poisoned
     call PrintText
     xor a
     ld [$cc5b],a
+    pop af
     ld a,$ba
-    call PlayMoveAnimation   ; play burn/poison animation
+    call PlayPsnBrnAnimation ; PlayMoveAnimation   ; play burn/poison animation
     pop hl
     call HandlePoisonBurnLeechSeed_DecreaseOwnHP
 .notBurnedOrPoisoned
@@ -53634,7 +53644,7 @@ HandlePoisonBurnLeechSeed: ; 3c3bd (f:43bd)
     call HandlePoisonBurnLeechSeed_DecreaseOwnHP
     call HandlePoisonBurnLeechSeed_IncreaseEnemyHP
     push hl
-    ld hl,HurtByLeechSeedText
+    ld hl,.HurtByLeechSeedText
     call PrintText
     pop hl
 .notLeechSeeded
@@ -53646,16 +53656,13 @@ HandlePoisonBurnLeechSeed: ; 3c3bd (f:43bd)
     call DelayFrames
     xor a
     ret
-
-HurtByPoisonText: ; 3c42e (f:442e)
+.HurtByPoisonText
     TX_FAR _HurtByPoisonText
     db "@"
-
-HurtByBurnText: ; 3c433 (f:4433)
+.HurtByBurnText
     TX_FAR _HurtByBurnText
     db "@"
-
-HurtByLeechSeedText: ; 3c438 (f:4438)
+.HurtByLeechSeedText
     TX_FAR _HurtByLeechSeedText
     db "@"
 
@@ -53663,7 +53670,7 @@ HurtByLeechSeedText: ; 3c438 (f:4438)
 ; note that the toxic ticks are considered even if the damage is not poison (hence the Leech Seed glitch)
 ; hl: HP pointer
 ; bc (out): total damage
-HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
+HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; Moved in the Bank
     push hl
     push hl
     ld bc,$e      ; skip to max HP
