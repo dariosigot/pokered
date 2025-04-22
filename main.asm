@@ -52977,26 +52977,6 @@ EffectsArray4:
     db HYPER_BEAM_EFFECT
     db $FF
 
-; SpecialEffects
-EffectsArray5:
-; Effects from arrays 2, 4, and 5B, minus Twineedle and Rage.
-; Includes all effects that do not need to be called at the end of
-; ExecutePlayerMove (or ExecuteEnemyMove), because they have already been handled
-	db DRAIN_HP_EFFECT
-	db EXPLODE_EFFECT
-	db DREAM_EATER_EFFECT
-	db PAY_DAY_EFFECT
-	db SWIFT_EFFECT
-	db TWO_TO_FIVE_ATTACKS_EFFECT
-	db CHARGE_EFFECT
-	db SUPER_FANG_EFFECT
-	db SPECIAL_DAMAGE_EFFECT
-	db FLY_EFFECT
-	db ATTACK_TWICE_EFFECT
-	db JUMP_KICK_EFFECT
-	db RECOIL_EFFECT
-    ; fallthru
-
 GetDamageVarsScaleStats:
     ld a,[hli]  ;HL: when this was taken
     ld l,[hl]
@@ -53021,6 +53001,8 @@ GetDamageVarsScaleStats:
     ret nz
     inc c
     ret
+
+; Free
 
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
@@ -53514,7 +53496,32 @@ MainInBattleLoop: ; 3c233 (f:4233)
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
 
-; Free
+; SpecialEffects
+EffectsArray5:
+; Effects from arrays 2, 4, and 5B, minus Twineedle and Rage.
+; Includes all effects that do not need to be called at the end of
+; ExecutePlayerMove (or ExecuteEnemyMove), because they have already been handled
+	db DRAIN_HP_EFFECT
+	db EXPLODE_EFFECT
+	db DREAM_EATER_EFFECT
+	db PAY_DAY_EFFECT
+	db SWIFT_EFFECT
+	db TWO_TO_FIVE_ATTACKS_EFFECT
+	db CHARGE_EFFECT
+	db SUPER_FANG_EFFECT
+	db SPECIAL_DAMAGE_EFFECT
+	db FLY_EFFECT
+	db ATTACK_TWICE_EFFECT
+	db JUMP_KICK_EFFECT
+	db RECOIL_EFFECT
+    ; fallthru
+
+; SpecialEffectsCont
+EffectsArray5B:
+; damaging moves whose effect is executed prior to damage calculation
+    db THRASH_PETAL_DANCE_EFFECT
+    db TRAPPING_EFFECT
+    db $FF
 
 SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
 
@@ -53674,13 +53681,6 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
 InsertRealTypes:
     call GetMonHeader
     PREDEF_JUMP InsertRealTypesPredef
-
-; SpecialEffectsCont
-EffectsArray5B:
-; damaging moves whose effect is executed prior to damage calculation
-    db THRASH_PETAL_DANCE_EFFECT
-    db TRAPPING_EFFECT
-    db $FF
 
 SECTION "HandlePoisonBurnLeechSeed_IncreaseEnemyHP",ROMX[$44a3],BANK[$f]
 
