@@ -55991,13 +55991,13 @@ SelectEnemyMove: ; Moved in the Bank
     ld a,[hl]
     and $12     ; using multi-turn move or bide
     ret nz
-    ld a,[W_ENEMYMONSTATUS]
-    and SLP_NOMOVE | FRZ ; sleeping or frozen ; joedebug - sleep won't waste turn on wakeup
-                                              ; but it will if wakeup won't occur (prevents PP decrementing with AI)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    call nz,NoAttackAICall ;joenote - get ai routines. flag register is preserved
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ret nz
+;    ld a,[W_ENEMYMONSTATUS]
+;    and SLP_NOMOVE | FRZ ; sleeping or frozen ; joedebug - sleep won't waste turn on wakeup
+;                                              ; but it will if wakeup won't occur (prevents PP decrementing with AI)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;    call nz,NoAttackAICall ;joenote - get ai routines. flag register is preserved
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;    ret nz
     ld a,[W_ENEMYBATTSTATUS1]
     and $21      ; using fly/dig or thrash/petal dance
     ret nz
