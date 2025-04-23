@@ -60523,8 +60523,8 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierDownEffect       ; DEFENSE_DOWN_SIDE_EFFECT
      dw StatModifierDownEffect       ; SPEED_DOWN_SIDE_EFFECT
      dw StatModifierDownEffect       ; SPECIAL_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; unused effect
-     dw StatModifierDownEffect       ; unused effect
+     dw StatModifierDownEffect       ; ACCURACY_DOWN_SIDE_EFFECT
+     dw StatModifierDownEffect       ; EVASION_DOWN_SIDE_EFFECT
      dw StatModifierDownEffect       ; unused effect
      dw StatModifierDownEffect       ; unused effect
      dw ConfusionEffect              ; CONFUSION_SIDE_EFFECT

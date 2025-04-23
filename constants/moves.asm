@@ -28,7 +28,7 @@
     db MEGA_KICK    , NO_ADDITIONAL_EFFECT       , 120 , FIGHTING , 191 , 22 ; pp 10 ; 0 ; Type Normal -> Fighting ; PP 05 -> 10 ; Ene 20 -> 22
     db JUMP_KICK    , JUMP_KICK_EFFECT           , 100 , FIGHTING , 242 , 20 ; pp 10 ; 0 ; Pwr 70 -> 100 ; PP 25 -> 10
     db ROLLING_KICK , FLINCH_SIDE_EFFECT2        ,  60 , FIGHTING , 216 , 09 ; pp 20 ; 0 ; PP 15 -> 20 ; Ene 10 -> 9
-    db SAND_ATTACK  , ACCURACY_DOWN1_EFFECT      ,   0 , GROUND   , 204 , 18 ; pp 15 ; - ; Type Normal -> Ground ; Acr 255 -> 204 ; PP 15 ; Ene 14 -> 18
+    db SAND_ATTACK  , ACCURACY_DOWN_SIDE_EFFECT  ,  10 , GROUND   , 229 , 09 ; pp 15 ; 0 ; Type Normal -> Ground ; Acr 255 -> 229 ; PP 15 ; Ene 14 -> 09 ; Pwr 0 -> 10
     db HEADBUTT     , FLINCH_SIDE_EFFECT2        ,  70 , NORMAL   , 255 , 14 ; pp 15 ; 0
     db HORN_ATTACK  , NO_ADDITIONAL_EFFECT       ,  65 , IVORY    , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Ivory
     db FURY_ATTACK  , TWO_TO_FIVE_ATTACKS_EFFECT ,  19 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Ivory ; Pwr 15 -> 18

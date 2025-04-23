@@ -474,8 +474,8 @@ ENDM
 ; ──────────────────────────────────────────────────────────────────────
 SANDSHREW_Learnset: MACRO
     db  1,SCRATCH
-    db  1,SAND_ATTACK
-    db  6,DEFENSE_CURL
+    db  1,DEFENSE_CURL
+    db  6,SAND_ATTACK
     db  9,TRAPHOLE
     db 12,FURY_SWIPES
     db 14,POISON_STING
@@ -941,10 +941,10 @@ ENDM
 DIGLETT_Learnset: MACRO
     db  1,SCRATCH
     db  1,GROWL
-    db  6,AGILITY
+    db  6,SAND_ATTACK
     db  9,TRAPHOLE
-    db 13,FURY_SWIPES
-    db 17,SAND_ATTACK
+    db 13,AGILITY
+    db 17,FURY_SWIPES
     db 21,DOUBLE_TEAM
     db 23,QUICK_ATTACK
     db 25,SLASH
@@ -2070,11 +2070,12 @@ CUBONE_Learnset: MACRO
     db  1,GROWL
     db  5,TAIL_WHIP
     db  7,BONE_CLUB
+    db  8,SAND_ATTACK
     db 10,TRAPHOLE
     db 13,LEER
-    db 15,SKULL_BASH
-    db 17,FOCUS_ENERGY
-    db 19,SAND_ATTACK
+    db 15,REST
+    db 17,SKULL_BASH
+    db 19,FOCUS_ENERGY
     db 21,HEADBUTT
     db 23,BLADE
     db 25,BONEMERANG
