@@ -57040,9 +57040,7 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     ld hl,wUnusedC000
     set 7,[hl] ; setting this bit causes counter to miss
 
-    ld hl,W_DAMAGE ; since the move missed, wDamage will always contain 0 at this point.
-                   ; Thus, recoil damage will always be equal to 1
-                   ; even if it was intended to be potential damage/8.
+    ld hl,wBackupDamage
     ld a,[hli]
     ld b,[hl]
     srl a
@@ -57051,6 +57049,7 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     rr b
     srl a
     rr b
+    ld hl,W_DAMAGE+1
     ld [hl],b
     dec hl
     ld [hli],a
@@ -58750,11 +58749,18 @@ MoveHitTest: ; Moved in the Bank
 ; note that this means that even the highest accuracy is still just a 255/256 chance,not 100%
     call GenRandomInBattle ; random number
     cp b
-    jr nc,.moveMissed
-    ret
+    ret c
 .moveMissed
-    xor a
-    ld hl,W_DAMAGE ; zero the damage
+    ld hl,W_DAMAGE
+    push de
+    ld de,wBackupDamage
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hld]
+    ld [de],a
+    pop de
+    xor a ; zero the damage
     ld [hli],a
     ld [hl],a
     inc a
@@ -58764,10 +58770,10 @@ MoveHitTest: ; Moved in the Bank
     jr z,.playerTurn2
 .enemyTurn2
     ld hl,W_ENEMYBATTSTATUS1
-    res 5,[hl] ; end multi-turn attack e.g. wrap
-    ret
+    jr .end
 .playerTurn2
     ld hl,W_PLAYERBATTSTATUS1
+.end
     res 5,[hl] ; end multi-turn attack e.g. wrap
     ret
 
