@@ -58661,11 +58661,12 @@ MoveHitTest: ; Moved in the Bank
     ret z ; Swift never misses (interestingly,Azure Heights lists this is a myth,but it appears to be true)
     call CheckTargetSubstitute ; substitute check (note that this overwrites a)
     jr z,.checkForDigOrFlyStatus
-; this code is buggy. it's supposed to prevent HP draining moves from working on substitutes.
-; since $7b79 overwrites a with either $00 or $01,it never works.
-    cp a,DRAIN_HP_EFFECT ; $03
+    ld a,[de]
+    cp DRAIN_HP_EFFECT
     jr z,.moveMissed2
-    cp a,DREAM_EATER_EFFECT ; $08
+    cp DREAM_EATER_EFFECT
+    jr z,.moveMissed2
+    cp LEECH_SEED_EFFECT
     jr z,.moveMissed2
 .checkForDigOrFlyStatus
     bit 6,[hl]
@@ -58698,8 +58699,14 @@ MoveHitTest: ; Moved in the Bank
 .skipEnemyMistCheck
     ld a,[W_PLAYERBATTSTATUS2]
     bit 0,a ; USING_X_ACCURACY ; is the player using X Accuracy?
-    ret nz ; if so,always hit regardless of accuracy/evasion
-    jr .calcHitChance
+    jr z,.calcHitChance
+    ; if so, always hit regardless of accuracy/evasion
+.player_ohko_xacc    ;joenote - player ohko moves now ignore x accuracy 
+    ; this section is entered if the player is using x accuracy
+    ld a,[W_PLAYERMOVEEFFECT] ; load the move effect 
+    cp OHKO_EFFECT            ; check if it's an ohko move
+    ret nz                    ; if not, the x accuracy skips hit chance
+    jr .calcHitChance         ; else do normal accuracy checks
 .moveMissed2
     jr .moveMissed
 .enemyTurn
@@ -58721,7 +58728,14 @@ MoveHitTest: ; Moved in the Bank
 .skipPlayerMistCheck
     ld a,[W_ENEMYBATTSTATUS2]
     bit 0,a ; USING_X_ACCURACY ; is the enemy using X Accuracy?
-    ret nz ; if so,always hit regardless of accuracy/evasion
+    jr z,.calcHitChance
+    ; if so, always hit regardless of accuracy/evasion
+.enemy_ohko_xacc    ;joenote - enemy ohko moves now ignore x accuracy 
+    ; this section is entered if the enemy is using x accuracy
+    ld a,[W_ENEMYMOVEEFFECT] ; load the move effect 
+    cp OHKO_EFFECT           ; check if it's an ohko move
+    ret nz                   ; if not, the x accuracy skips hit chance
+    ;jr .calcHitChance       ; else do normal accuracy checks
 .calcHitChance
     call CalcHitChance ; scale the move accuracy according to attacker's accuracy and target's evasion
     ld a,[W_PLAYERMOVEACCURACY]
@@ -58757,10 +58771,8 @@ MoveHitTest: ; Moved in the Bank
     res 5,[hl] ; end multi-turn attack e.g. wrap
     ret
 
-SECTION "CalcHitChance",ROMX[$6624],BANK[$f]
-
 ; values for player turn
-CalcHitChance: ; 3e624 (f:6624)
+CalcHitChance: ; Moved in the Bank
     ld hl,W_PLAYERMOVEACCURACY
     ld a,[H_WHOSETURN]
     and a
@@ -58828,7 +58840,7 @@ CalcHitChance: ; 3e624 (f:6624)
     ld [hl],a ; store the hit chance in the move accuracy variable
     ret
 
-RandomizeDamage: ; 3e687 (f:6687)
+RandomizeDamage: ; Moved in the Bank
     ld hl,W_DAMAGE ; $d0d7
     ld a,[hli]
     and a
@@ -58866,7 +58878,7 @@ RandomizeDamage: ; 3e687 (f:6687)
 ; ExecuteEnemyMove
 ; ──────────────────────────────────────────
 
-ExecuteEnemyMove: ; 3e6bc (f:66bc)
+ExecuteEnemyMove: ; Moved in the Bank
     ld a,[wEnemySelectedMove] ; $ccdd
     inc a
     jp z,ExecuteEnemyMoveDone
@@ -59096,13 +59108,11 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up:
     ld b,BANK(QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_)
     jp Bankswitch
 
-SECTION "CheckEnemyStatusConditions",ROMX[$688f],BANK[$f]
-
 ; ──────────────────────────────────────────────────────────────────────
 ; CheckEnemyStatusConditions
 ; ──────────────────────────────────────────────────────────────────────
 
-CheckEnemyStatusConditions: ; 3e88f (f:688f)
+CheckEnemyStatusConditions: ; Moved in the Bank
     ld hl,W_ENEMYMONSTATUS ; $cfe9
     ld a,[hl]
     and SLP
@@ -59447,9 +59457,7 @@ EffectsArray3:
     db STAT_UP1_DOWN_SIDE_EFFECT
     db $FF
 
-SECTION "GetCurrentMove",ROMX[$6abe],BANK[$f]
-
-GetCurrentMove: ; 3eabe (f:6abe)
+GetCurrentMove: ; Moved in the Bank
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jp z,.player
@@ -59479,7 +59487,7 @@ GetCurrentMove: ; 3eabe (f:6abe)
     ld de,$cd6d
     jp CopyStringToCF4B
 
-LoadEnemyMonData: ; 3eb01 (f:6b01)
+LoadEnemyMonData: ; Moved in the Bank
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jp z,LoadEnemyMonFromParty
@@ -59626,9 +59634,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     jr nz,.statModLoop
     jp ApplyBurnAndParalysisPenaltiesToEnemy
 
-SECTION "DoBattleTransitionAndInitBatVar",ROMX[$6c32],BANK[$f]
-
-DoBattleTransitionAndInitBatVar: ; 3ec32 (f:6c32)
+DoBattleTransitionAndInitBatVar: ; Moved in the Bank
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jr nz,.asm_3ec4d
@@ -59667,7 +59673,7 @@ DoBattleTransitionAndInitBatVar: ; 3ec32 (f:6c32)
     ld [W_PLAYERDISABLEDMOVE],a ; $d06d
     ret
 
-SwapPlayerAndEnemyLevels: ; 3ec81 (f:6c81)
+SwapPlayerAndEnemyLevels: ; Moved in the Bank
     push bc
     ld a,[W_PLAYERMONLEVEL] ; $d022
     ld b,a
@@ -59678,7 +59684,7 @@ SwapPlayerAndEnemyLevels: ; 3ec81 (f:6c81)
     pop bc
     ret
 
-Func_3ec92: ; 3ec92 (f:6c92)
+Func_3ec92: ; Moved in the Bank
     ld a,[W_BATTLETYPE] ; $d05a
     dec a
     ld de,RedPicBack ; $7e0a
