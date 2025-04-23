@@ -2073,12 +2073,13 @@ CUBONE_Learnset: MACRO
     db  8,SAND_ATTACK
     db 10,TRAPHOLE
     db 13,LEER
-    db 15,REST
+    db 15,WITHDRAW
     db 17,SKULL_BASH
     db 19,FOCUS_ENERGY
     db 21,HEADBUTT
     db 23,BLADE
     db 25,BONEMERANG
+    db 27,REST
     ;  28,MAROWAK
 ENDM
 MAROWAK_Learnset: MACRO

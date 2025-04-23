@@ -155,7 +155,7 @@
     db CRABHAMMER   , NO_ADDITIONAL_EFFECT       , 100 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Acr 216 -> 229 ; Pwr 90 -> 100
     db EXPLOSION    , EXPLODE_EFFECT             , 255 , NORMAL   , 255 , 60 ; pp  5 ; 0 ; Pwr 170 -> 255 ; Ene 40 -> 60
     db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , NORMAL   , 204 , 12 ; pp 15 ; 0 ; Pwr 18 -> 20 ; Ene 14 -> 12
-    db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  50 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Ground -> Ivory
+    db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  55 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Ground -> Ivory
     db REST         , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 28 ; pp 10 ; - ; Type Psychic -> Normal ; Ene 20 -> 28
     db ROCK_SLIDE   , NO_ADDITIONAL_EFFECT       ,  85 , ROCK     , 229 , 14 ; pp 10 ; 0 ; Pwr 75 -> 85 ; PP 10 -> 15
     db HYPER_FANG   , FLINCH_SIDE_EFFECT1        ,  80 , NORMAL   , 229 , 14 ; pp 15 ; 0
