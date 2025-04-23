@@ -30960,6 +30960,9 @@ HazeEffect_: ; Moved in the Bank
     call .CureVolatileStatuses
     ld hl,W_ENEMYBATTSTATUS1
     call .CureVolatileStatuses
+    ld hl,ApplyBadgeStatBoostsFull
+    ld b,BANK(ApplyBadgeStatBoostsFull)
+    call Bankswitch
     ld hl,PlayCurrentMoveAnimation
     call Bankswitch4toF
     ld hl,.StatusChangesEliminatedText
@@ -31248,6 +31251,7 @@ GetEnemy:
     pop de
     pop hl
 .WillEncounter
+    call .DittoDebugInRoute15
     ld [$cf91],a
     ld [W_ENEMYMONID],a
     scf ; WillEncounter
@@ -31294,6 +31298,20 @@ GetEnemy:
     ld [W_CURENEMYLVL],a
     ld a,MEW ; Entry Level
     jr .WillEncounter
+.DittoDebugInRoute15
+    push bc
+    ld b,a
+    call GetCurrentOldAdventureMap
+    cp ROUTE_15
+    jr nz,.standard
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 2,a ; was the select button pressed?
+    jr z,.standard
+    ld b,DITTO
+.standard
+    ld a,b
+    pop bc
+    ret
 
 UnknownDungeonLandPkmnList:
     db BULBASAUR
@@ -52200,8 +52218,20 @@ TransformEffect_: ; Moved Upper in the Bank
     inc de
     inc de
     inc de
-    ld bc,$8
+
+    ; Copy Original 4 Stats
+    ld bc,8
+    add hl,bc
+    push hl
+    ld a,[H_WHOSETURN]
+    and a
+    ld hl,$cd26 ; EnemyMonUnmodifiedAttack
+    jr z,.ContinueCopy4Stats
+    ld hl,$cd12 ; PlayerMonUnmodifiedAttack
+.ContinueCopy4Stats
     call CopyData
+    pop hl
+
     ; Handle Alternate Form Index
     inc hl ; move to move2pp
     inc de ; ...
@@ -52211,12 +52241,40 @@ TransformEffect_: ; Moved Upper in the Bank
     ld a,[hl]
     ld [$d11e],a
     call GetMonName
-    ld hl,$cd26
-    ld de,$cd12
+    ld hl,$cd26 ; EnemyMonUnmodifiedAttack
+    ld de,$cd12 ; PlayerMonUnmodifiedAttack
     call Func_3bb7d
     ld hl,wEnemyMonStatMods ; $cd2e
     ld de,wPlayerMonStatMods ; $cd1a
     call Func_3bb7d
+
+    ; Calculate New Stats & Apply Boost/Penaties
+    ld a,[$d11e]
+    push af
+    ld a,[H_WHOSETURN]
+    ld [$d11e],a
+    ld hl,CalculateModifiedStats
+    ld b,BANK(CalculateModifiedStats)
+    call Bankswitch
+    pop af
+    ld [$d11e],a
+    ld a,[H_WHOSETURN]
+    and a
+    ld hl,ApplyBadgeStatBoostsFull
+    ld b,BANK(ApplyBadgeStatBoostsFull)
+    call z,Bankswitch
+    ld a,[H_WHOSETURN]
+    push af
+    and a
+    ld hl,ApplyBurnAndParalysisPenaltiesToPlayer
+    jr z,.ApplyBurnAndParalysisPenalties
+    ld hl,ApplyBurnAndParalysisPenaltiesToEnemy
+.ApplyBurnAndParalysisPenalties
+    ld b,BANK(ApplyBurnAndParalysisPenaltiesToPlayer) ; ApplyBurnAndParalysisPenaltiesToEnemy
+    call Bankswitch
+    pop af
+    ld [H_WHOSETURN],a
+
     call .TransformAnimation
     call Delay3
     call .RestoreSubstitute
@@ -52977,26 +53035,6 @@ EffectsArray4:
     db HYPER_BEAM_EFFECT
     db $FF
 
-; SpecialEffects
-EffectsArray5:
-; Effects from arrays 2, 4, and 5B, minus Twineedle and Rage.
-; Includes all effects that do not need to be called at the end of
-; ExecutePlayerMove (or ExecuteEnemyMove), because they have already been handled
-	db DRAIN_HP_EFFECT
-	db EXPLODE_EFFECT
-	db DREAM_EATER_EFFECT
-	db PAY_DAY_EFFECT
-	db SWIFT_EFFECT
-	db TWO_TO_FIVE_ATTACKS_EFFECT
-	db CHARGE_EFFECT
-	db SUPER_FANG_EFFECT
-	db SPECIAL_DAMAGE_EFFECT
-	db FLY_EFFECT
-	db ATTACK_TWICE_EFFECT
-	db JUMP_KICK_EFFECT
-	db RECOIL_EFFECT
-    ; fallthru
-
 GetDamageVarsScaleStats:
     ld a,[hli]  ;HL: when this was taken
     ld l,[hl]
@@ -53021,6 +53059,14 @@ GetDamageVarsScaleStats:
     ret nz
     inc c
     ret
+
+; play burn/poison animation
+PlayPsnBrnAnimation:
+    jp z,PlayMoveAnimation ; poisoned
+    call FlipTurn
+    ld a,EMBER
+    call PlayMoveAnimation ; burned
+    jp FlipTurn
 
 ; Free
 
@@ -53516,7 +53562,32 @@ MainInBattleLoop: ; 3c233 (f:4233)
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
 
-; Free
+; SpecialEffects
+EffectsArray5:
+; Effects from arrays 2, 4, and 5B, minus Twineedle and Rage.
+; Includes all effects that do not need to be called at the end of
+; ExecutePlayerMove (or ExecuteEnemyMove), because they have already been handled
+	db DRAIN_HP_EFFECT
+	db EXPLODE_EFFECT
+	db DREAM_EATER_EFFECT
+	db PAY_DAY_EFFECT
+	db SWIFT_EFFECT
+	db TWO_TO_FIVE_ATTACKS_EFFECT
+	db CHARGE_EFFECT
+	db SUPER_FANG_EFFECT
+	db SPECIAL_DAMAGE_EFFECT
+	db FLY_EFFECT
+	db ATTACK_TWICE_EFFECT
+	db JUMP_KICK_EFFECT
+	db RECOIL_EFFECT
+    ; fallthru
+
+; SpecialEffectsCont
+EffectsArray5B:
+; damaging moves whose effect is executed prior to damage calculation
+    db THRASH_PETAL_DANCE_EFFECT
+    db TRAPPING_EFFECT
+    db $FF
 
 SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
 
@@ -53533,17 +53604,19 @@ HandlePoisonBurnLeechSeed: ; 3c3bd (f:43bd)
     and BRN | PSN
     jr z,.notBurnedOrPoisoned
     push hl
-    ld hl,HurtByPoisonText
+    ld hl,.HurtByPoisonText
     ld a,[de]
     and BRN
+    push af
     jr z,.poisoned
-    ld hl,HurtByBurnText
+    ld hl,.HurtByBurnText
 .poisoned
     call PrintText
     xor a
     ld [$cc5b],a
+    pop af
     ld a,$ba
-    call PlayMoveAnimation   ; play burn/poison animation
+    call PlayPsnBrnAnimation ; PlayMoveAnimation   ; play burn/poison animation
     pop hl
     call HandlePoisonBurnLeechSeed_DecreaseOwnHP
 .notBurnedOrPoisoned
@@ -53571,7 +53644,7 @@ HandlePoisonBurnLeechSeed: ; 3c3bd (f:43bd)
     call HandlePoisonBurnLeechSeed_DecreaseOwnHP
     call HandlePoisonBurnLeechSeed_IncreaseEnemyHP
     push hl
-    ld hl,HurtByLeechSeedText
+    ld hl,.HurtByLeechSeedText
     call PrintText
     pop hl
 .notLeechSeeded
@@ -53583,16 +53656,13 @@ HandlePoisonBurnLeechSeed: ; 3c3bd (f:43bd)
     call DelayFrames
     xor a
     ret
-
-HurtByPoisonText: ; 3c42e (f:442e)
+.HurtByPoisonText
     TX_FAR _HurtByPoisonText
     db "@"
-
-HurtByBurnText: ; 3c433 (f:4433)
+.HurtByBurnText
     TX_FAR _HurtByBurnText
     db "@"
-
-HurtByLeechSeedText: ; 3c438 (f:4438)
+.HurtByLeechSeedText
     TX_FAR _HurtByLeechSeedText
     db "@"
 
@@ -53600,7 +53670,7 @@ HurtByLeechSeedText: ; 3c438 (f:4438)
 ; note that the toxic ticks are considered even if the damage is not poison (hence the Leech Seed glitch)
 ; hl: HP pointer
 ; bc (out): total damage
-HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
+HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; Moved in the Bank
     push hl
     push hl
     ld bc,$e      ; skip to max HP
@@ -53676,13 +53746,6 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; 3c43d (f:443d)
 InsertRealTypes:
     call GetMonHeader
     PREDEF_JUMP InsertRealTypesPredef
-
-; SpecialEffectsCont
-EffectsArray5B:
-; damaging moves whose effect is executed prior to damage calculation
-    db THRASH_PETAL_DANCE_EFFECT
-    db TRAPPING_EFFECT
-    db $FF
 
 SECTION "HandlePoisonBurnLeechSeed_IncreaseEnemyHP",ROMX[$44a3],BANK[$f]
 
@@ -54694,11 +54757,11 @@ LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
     ld de,W_PLAYERMONNAME
     ld bc,$b
     call CopyData
-    call ApplyBadgeStatBoostsFull
     ld hl,W_PLAYERMONLEVEL ; $d022
     ld de,$cd0f
     ld bc,$b
     call CopyData
+    call ApplyBadgeStatBoostsFull
     call ApplyBurnAndParalysisPenaltiesToPlayer
     ld a,$7
     ld b,$8
@@ -55993,13 +56056,13 @@ SelectEnemyMove: ; Moved in the Bank
     ld a,[hl]
     and $12     ; using multi-turn move or bide
     ret nz
-    ld a,[W_ENEMYMONSTATUS]
-    and SLP_NOMOVE | FRZ ; sleeping or frozen ; joedebug - sleep won't waste turn on wakeup
-                                              ; but it will if wakeup won't occur (prevents PP decrementing with AI)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    call nz,NoAttackAICall ;joenote - get ai routines. flag register is preserved
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ret nz
+;    ld a,[W_ENEMYMONSTATUS]
+;    and SLP_NOMOVE | FRZ ; sleeping or frozen ; joedebug - sleep won't waste turn on wakeup
+;                                              ; but it will if wakeup won't occur (prevents PP decrementing with AI)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;    call nz,NoAttackAICall ;joenote - get ai routines. flag register is preserved
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;    ret nz
     ld a,[W_ENEMYBATTSTATUS1]
     and $21      ; using fly/dig or thrash/petal dance
     ret nz
@@ -56678,6 +56741,24 @@ DrawHudAndPrintText:
     pop hl
     jp PrintText
 
+GetSideEffectType_Player:
+    ld a,[W_PLAYERMOVETYPE]
+    jr GetSideEffectType_Common
+
+GetSideEffectType_Enemy:
+    ld a,[W_ENEMYMOVETYPE]
+    ; fall through
+
+GetSideEffectType_Common:
+    cp ELECTRIC
+    ret z
+    cp FIRE
+    ret z
+    cp ICE
+    ret z
+    ld a,TYPE_NA
+    ret
+
 ; Free
 
 SECTION "FastAsleepText",ROMX[$5a3d],BANK[$f]
@@ -56959,9 +57040,7 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     ld hl,wUnusedC000
     set 7,[hl] ; setting this bit causes counter to miss
 
-    ld hl,W_DAMAGE ; since the move missed, wDamage will always contain 0 at this point.
-                   ; Thus, recoil damage will always be equal to 1
-                   ; even if it was intended to be potential damage/8.
+    ld hl,wBackupDamage
     ld a,[hli]
     ld b,[hl]
     srl a
@@ -56970,6 +57049,7 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     rr b
     srl a
     rr b
+    ld hl,W_DAMAGE+1
     ld [hl],b
     dec hl
     ld [hli],a
@@ -58580,11 +58660,12 @@ MoveHitTest: ; Moved in the Bank
     ret z ; Swift never misses (interestingly,Azure Heights lists this is a myth,but it appears to be true)
     call CheckTargetSubstitute ; substitute check (note that this overwrites a)
     jr z,.checkForDigOrFlyStatus
-; this code is buggy. it's supposed to prevent HP draining moves from working on substitutes.
-; since $7b79 overwrites a with either $00 or $01,it never works.
-    cp a,DRAIN_HP_EFFECT ; $03
+    ld a,[de]
+    cp DRAIN_HP_EFFECT
     jr z,.moveMissed2
-    cp a,DREAM_EATER_EFFECT ; $08
+    cp DREAM_EATER_EFFECT
+    jr z,.moveMissed2
+    cp LEECH_SEED_EFFECT
     jr z,.moveMissed2
 .checkForDigOrFlyStatus
     bit 6,[hl]
@@ -58617,8 +58698,14 @@ MoveHitTest: ; Moved in the Bank
 .skipEnemyMistCheck
     ld a,[W_PLAYERBATTSTATUS2]
     bit 0,a ; USING_X_ACCURACY ; is the player using X Accuracy?
-    ret nz ; if so,always hit regardless of accuracy/evasion
-    jr .calcHitChance
+    jr z,.calcHitChance
+    ; if so, always hit regardless of accuracy/evasion
+.player_ohko_xacc    ;joenote - player ohko moves now ignore x accuracy 
+    ; this section is entered if the player is using x accuracy
+    ld a,[W_PLAYERMOVEEFFECT] ; load the move effect 
+    cp OHKO_EFFECT            ; check if it's an ohko move
+    ret nz                    ; if not, the x accuracy skips hit chance
+    jr .calcHitChance         ; else do normal accuracy checks
 .moveMissed2
     jr .moveMissed
 .enemyTurn
@@ -58640,7 +58727,14 @@ MoveHitTest: ; Moved in the Bank
 .skipPlayerMistCheck
     ld a,[W_ENEMYBATTSTATUS2]
     bit 0,a ; USING_X_ACCURACY ; is the enemy using X Accuracy?
-    ret nz ; if so,always hit regardless of accuracy/evasion
+    jr z,.calcHitChance
+    ; if so, always hit regardless of accuracy/evasion
+.enemy_ohko_xacc    ;joenote - enemy ohko moves now ignore x accuracy 
+    ; this section is entered if the enemy is using x accuracy
+    ld a,[W_ENEMYMOVEEFFECT] ; load the move effect 
+    cp OHKO_EFFECT           ; check if it's an ohko move
+    ret nz                   ; if not, the x accuracy skips hit chance
+    ;jr .calcHitChance       ; else do normal accuracy checks
 .calcHitChance
     call CalcHitChance ; scale the move accuracy according to attacker's accuracy and target's evasion
     ld a,[W_PLAYERMOVEACCURACY]
@@ -58655,11 +58749,18 @@ MoveHitTest: ; Moved in the Bank
 ; note that this means that even the highest accuracy is still just a 255/256 chance,not 100%
     call GenRandomInBattle ; random number
     cp b
-    jr nc,.moveMissed
-    ret
+    ret c
 .moveMissed
-    xor a
-    ld hl,W_DAMAGE ; zero the damage
+    ld hl,W_DAMAGE
+    push de
+    ld de,wBackupDamage
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hld]
+    ld [de],a
+    pop de
+    xor a ; zero the damage
     ld [hli],a
     ld [hl],a
     inc a
@@ -58669,17 +58770,15 @@ MoveHitTest: ; Moved in the Bank
     jr z,.playerTurn2
 .enemyTurn2
     ld hl,W_ENEMYBATTSTATUS1
-    res 5,[hl] ; end multi-turn attack e.g. wrap
-    ret
+    jr .end
 .playerTurn2
     ld hl,W_PLAYERBATTSTATUS1
+.end
     res 5,[hl] ; end multi-turn attack e.g. wrap
     ret
 
-SECTION "CalcHitChance",ROMX[$6624],BANK[$f]
-
 ; values for player turn
-CalcHitChance: ; 3e624 (f:6624)
+CalcHitChance: ; Moved in the Bank
     ld hl,W_PLAYERMOVEACCURACY
     ld a,[H_WHOSETURN]
     and a
@@ -58747,7 +58846,7 @@ CalcHitChance: ; 3e624 (f:6624)
     ld [hl],a ; store the hit chance in the move accuracy variable
     ret
 
-RandomizeDamage: ; 3e687 (f:6687)
+RandomizeDamage: ; Moved in the Bank
     ld hl,W_DAMAGE ; $d0d7
     ld a,[hli]
     and a
@@ -58785,7 +58884,7 @@ RandomizeDamage: ; 3e687 (f:6687)
 ; ExecuteEnemyMove
 ; ──────────────────────────────────────────
 
-ExecuteEnemyMove: ; 3e6bc (f:66bc)
+ExecuteEnemyMove: ; Moved in the Bank
     ld a,[wEnemySelectedMove] ; $ccdd
     inc a
     jp z,ExecuteEnemyMoveDone
@@ -59015,13 +59114,11 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up:
     ld b,BANK(QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_)
     jp Bankswitch
 
-SECTION "CheckEnemyStatusConditions",ROMX[$688f],BANK[$f]
-
 ; ──────────────────────────────────────────────────────────────────────
 ; CheckEnemyStatusConditions
 ; ──────────────────────────────────────────────────────────────────────
 
-CheckEnemyStatusConditions: ; 3e88f (f:688f)
+CheckEnemyStatusConditions: ; Moved in the Bank
     ld hl,W_ENEMYMONSTATUS ; $cfe9
     ld a,[hl]
     and SLP
@@ -59366,9 +59463,7 @@ EffectsArray3:
     db STAT_UP1_DOWN_SIDE_EFFECT
     db $FF
 
-SECTION "GetCurrentMove",ROMX[$6abe],BANK[$f]
-
-GetCurrentMove: ; 3eabe (f:6abe)
+GetCurrentMove: ; Moved in the Bank
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jp z,.player
@@ -59398,7 +59493,7 @@ GetCurrentMove: ; 3eabe (f:6abe)
     ld de,$cd6d
     jp CopyStringToCF4B
 
-LoadEnemyMonData: ; 3eb01 (f:6b01)
+LoadEnemyMonData: ; Moved in the Bank
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jp z,LoadEnemyMonFromParty
@@ -59545,9 +59640,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
     jr nz,.statModLoop
     jp ApplyBurnAndParalysisPenaltiesToEnemy
 
-SECTION "DoBattleTransitionAndInitBatVar",ROMX[$6c32],BANK[$f]
-
-DoBattleTransitionAndInitBatVar: ; 3ec32 (f:6c32)
+DoBattleTransitionAndInitBatVar: ; Moved in the Bank
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jr nz,.asm_3ec4d
@@ -59586,7 +59679,7 @@ DoBattleTransitionAndInitBatVar: ; 3ec32 (f:6c32)
     ld [W_PLAYERDISABLEDMOVE],a ; $d06d
     ret
 
-SwapPlayerAndEnemyLevels: ; 3ec81 (f:6c81)
+SwapPlayerAndEnemyLevels: ; Moved in the Bank
     push bc
     ld a,[W_PLAYERMONLEVEL] ; $d022
     ld b,a
@@ -59597,7 +59690,7 @@ SwapPlayerAndEnemyLevels: ; 3ec81 (f:6c81)
     pop bc
     ret
 
-Func_3ec92: ; 3ec92 (f:6c92)
+Func_3ec92: ; Moved in the Bank
     ld a,[W_BATTLETYPE] ; $d05a
     dec a
     ld de,RedPicBack ; $7e0a
@@ -59758,28 +59851,28 @@ HalveAttackDueToBurn: ; 3ed64 (f:6d64)
     ld [hl],b
     ret
 
-Func_3ed99: ; 3ed99 (f:6d99)
+CalculateModifiedStats: ; 3ed99 (f:6d99)
     ld c,$0
-.asm_3ed9b
-    call Func_3eda5
+.loop
+    call .CalculateModifiedStat
     inc c
     ld a,c
     cp $4
-    jr nz,.asm_3ed9b
+    jr nz,.loop
     ret
 
-Func_3eda5: ; 3eda5 (f:6da5)
+.CalculateModifiedStat:
     push bc
     push bc
     ld a,[$d11e]
     and a
     ld a,c
     ld hl,W_PLAYERMONATK
-    ld de,$cd12
+    ld de,$cd12 ; PlayerMonUnmodifiedAttack
     ld bc,wPlayerMonAttackMod ; $cd1a
     jr z,.asm_3edc0
     ld hl,W_ENEMYMONATTACK
-    ld de,$cd26
+    ld de,$cd26 ; EnemyMonUnmodifiedAttack
     ld bc,wEnemyMonStatMods ; $cd2e
 .asm_3edc0
     add c
@@ -60430,8 +60523,8 @@ JumpMoveEffect_: ; Moved in the Bank
      dw StatModifierDownEffect       ; DEFENSE_DOWN_SIDE_EFFECT
      dw StatModifierDownEffect       ; SPEED_DOWN_SIDE_EFFECT
      dw StatModifierDownEffect       ; SPECIAL_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; unused effect
-     dw StatModifierDownEffect       ; unused effect
+     dw StatModifierDownEffect       ; ACCURACY_DOWN_SIDE_EFFECT
+     dw StatModifierDownEffect       ; EVASION_DOWN_SIDE_EFFECT
      dw StatModifierDownEffect       ; unused effect
      dw StatModifierDownEffect       ; unused effect
      dw ConfusionEffect              ; CONFUSION_SIDE_EFFECT
@@ -60620,7 +60713,7 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     and a
     jp nz,CheckDefrost
     ;opponent has no existing status
-    ld a,[W_PLAYERMOVETYPE]
+    call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
     ld b,a
     ld a,[W_ENEMYMONTYPE1]
     cp b
@@ -60672,7 +60765,7 @@ opponentAttacker: ; 3f382 (f:7382)
     ld a,[W_PLAYERMONSTATUS]  ;this appears to the same as above with addresses swapped for opponent
     and a
     jp nz,CheckDefrost
-    ld a,[W_ENEMYMOVETYPE]
+    call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
     ld b,a
     ld a,[W_PLAYERMONTYPE1]
     cp b
@@ -60779,8 +60872,8 @@ StatModifierUpEffect: ; Moved in the Bank
     cp $4
     jr nc,.UpdateStatDone ; jump if mod affected is evasion/accuracy
     push hl
-    ld hl,$d026
-    ld de,$cd12
+    ld hl,W_PLAYERMONATK+1
+    ld de,$cd12 ; PlayerMonUnmodifiedAttack
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.pointToStats
@@ -81222,9 +81315,9 @@ GainExperience: ; 5524f (15:524f)
 .asm_553c8
     xor a
     ld [$d11e],a
-    ld hl,Func_3ed99
-    ld b,BANK(Func_3ed99)
-    call Bankswitch ; indirect jump to Func_3ed99 (3ed99 (f:6d99))
+    ld hl,CalculateModifiedStats
+    ld b,BANK(CalculateModifiedStats)
+    call Bankswitch ; indirect jump to CalculateModifiedStats (3ed99 (f:6d99))
     ld hl,ApplyBadgeStatBoostsFull
     ld b,BANK(ApplyBadgeStatBoostsFull)
     call Bankswitch ; indirect jump to ApplyBadgeStatBoostsFull (3ee19 (f:6e19))
@@ -138948,9 +139041,13 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_:
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp ATTACK_UP2_EFFECT
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
+    cp ATTACK_UP3_EFFECT
+    jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp SPEED_UP1_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     cp SPEED_UP2_EFFECT
+    jr z,.skip_par                        ; speed effect. skip to par penalty.
+    cp SPEED_UP3_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     jr .skip_end                          ; no attack or speed effect if at this line. skip to end.
 .skip_brn

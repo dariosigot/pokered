@@ -1577,6 +1577,9 @@ SECTION "wUnusedD71F",WRAMX[$d71f],BANK[$1]
     ;6 = evasion
 wBackupStatRaisedLoweredType:: db ; d71f
 
+wBackupDamage:: ; d720
+    ds 2
+
 SECTION "wUnusedD722",WRAMX[$d722],BANK[$1]
 
 UNION
