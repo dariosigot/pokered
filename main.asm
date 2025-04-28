@@ -28681,11 +28681,6 @@ ItemUseReloadOverworldData: ; Moved in the Bank
     call LoadCurrentMapView
     jp UpdateSprites
 
-FindWildLocationsOfMon: ; Moved in the Bank
-    ld b,BANK(_FindWildLocationsOfMon)
-    ld hl,_FindWildLocationsOfMon
-    jp Bankswitch
-
 GetTMQty:
     ; a = TM ID
     push af
@@ -99507,10 +99502,10 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
     ld a,[hl]
 .enterLoop:
     ld de,$cee9
-    call Func_712f1
+    call LoadTownMapEntry
     ld a,[de]
     push hl
-    call Func_71258
+    call TownMapCoordsToOAMCoords
     ld a,$4
     ld [$cd5b],a
     ld hl,$c310
@@ -99802,9 +99797,9 @@ _LoadTownMap: ; Moved in the Bank
     call FarCopyData2
     ld hl,MonNestIcon ; $56be
     ld de,$8040
-    ld bc,$8
+    ld bc,32
     ld a,BANK(MonNestIcon)
-    call FarCopyDataDouble
+    call FarCopyData2
     ld hl,wTileMap
     call ChoiceCompressedMap ; ld de,CompressedMap ; $5100
 .asm_710d3
@@ -99857,10 +99852,10 @@ Func_711c4: ; Moved in the Bank
     ld [$cd5b],a
     pop af
     ld de,$cee9
-    call Func_712f1
+    call LoadTownMapEntry
     ld a,[de]
     push hl
-    call Func_71258
+    call TownMapCoordsToOAMCoords
     call Func_7126d
     pop hl
     ld de,$cd6d
@@ -99878,45 +99873,37 @@ Func_711c4: ; Moved in the Bank
 Func_711ef: ; Moved in the Bank
     ld b,BANK(FindWildLocationsOfMon)
     ld hl,FindWildLocationsOfMon
-    call Bankswitch ; indirect jump to FindWildLocationsOfMon (e9cb (3:69cb))
+    call Bankswitch
     call Func_712d9
     ld hl,wOAMBuffer
     ld de,$cee9
 .asm_71200
+    ld a,[W_CURMAP]
+    ld b,a
     ld a,[de]
     cp $ff
     jr z,.asm_7121d
-    ;and a            ; Include Also Pallet in Nest Pkmn
-    ;jr z,.asm_7121a  ; ...
+    cp b
+    ld b,$4 ; b = 4
+    jr nz,.done
+    inc b ; b = 5
+.done
+    push bc ; Backup Tile ID
     push hl
-    call Func_712f1
+    call LoadTownMapEntry
     pop hl
     ld a,[de]
-    cp $19
-    jr z,.asm_7121a
-    call Func_71258
-    ld a,$4
+    call TownMapCoordsToOAMCoords
+    pop af ; Restore Tile ID
     ld [hli],a
     xor a
     ld [hli],a
-.asm_7121a
     inc de
     jr .asm_71200
 .asm_7121d
     ld a,l
     and a
-    jr nz,.asm_71236
-    ;FuncCoord 1,7 ; $c42d
-    ;ld hl,Coord
-    ;ld b,$2
-    ;ld c,$f
-    ;call TextBoxBorder
-    ;FuncCoord 2,9 ; $c456
-    ;ld hl,Coord
-    ;ld de,AreaUnknownText ; $524a
-    ;call PlaceString
-    jr .asm_7123e
-.asm_71236
+    jr z,.asm_7123e
     ld a,[W_CURMAP] ; $d35e
     ld b,$0
     call Func_711c4
@@ -99925,9 +99912,6 @@ Func_711ef: ; Moved in the Bank
     ld de,wTileMapBackup
     ld bc,$a0
     jp CopyData
-
-;AreaUnknownText: ; 7124a (1c:524a)
-;    db " AREA UNKNOWN@"
 
 ShakeMiniSprite:
     ld a,[wFlagMoveRelearnEngagedBit7]
@@ -99940,9 +99924,9 @@ ShakeMiniSprite:
     ld [wCurrentMenuItem],a
     ret
 
-SECTION "Func_71258",ROMX[$5258],BANK[$1c]
+SECTION "TownMapCoordsToOAMCoords",ROMX[$5258],BANK[$1c]
 
-Func_71258: ; 71258 (1c:5258)
+TownMapCoordsToOAMCoords: ; 71258 (1c:5258)
     push af
     and $f0
     srl a
@@ -100064,7 +100048,7 @@ Func_712d9: ; 712d9 (1c:52d9)
     inc hl
     jr .asm_712e4
 
-Func_712f1: ; 712f1 (1c:52f1)
+LoadTownMapEntry: ; 712f1 (1c:52f1)
     call IsTownOrRoute ; cp REDS_HOUSE_1F
     jr c,.asm_71304
     ld bc,$4
@@ -103659,9 +103643,6 @@ PlaceStringAndGenderSymbol:
     db $EF,$50
 .FemaleIcon
     db $F5,$50
-
-MonNestIcon: ; xxxxx (1c:xxxx) ; Spostato a Fine Bank
-    INCBIN "gfx/mon_nest_icon.1bpp"
 
 PalPacketPartyMenuAllGreen:
     db $51,$10,$00,$1F,$00,$1F,$00,$1F,$00,$00,$00,$00,$00,$00,$00,$00
@@ -135290,7 +135271,7 @@ SuperRodGroupLake:
 
 ; creates a list at wBuffer of maps where the mon in [wd11e] can be found.
 ; this is used by the pokedex to display locations the mon can be found on the map.
-_FindWildLocationsOfMon:
+FindWildLocationsOfMon:
     call GetWildDataPointers ; ld hl,WildDataPointers
     ld de,$cee9
     ld c,$0
@@ -139965,6 +139946,12 @@ BC999cap_:
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
+
+MonNestIcon:
+    INCBIN "gfx/mon_nest_icon.2bpp"
+
+; ──────────────────────────────────────────────────────────────────────
+
 
 SECTION "Bank39",ROMX,BANK[$39]
 
