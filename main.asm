@@ -37469,13 +37469,17 @@ CheckTilePassable:
     cp a,$ff
     jr z,.tileNotPassable
     cp d
-    jr z,.end
+    jr z,.tilePassable
     jr .loop
 .tileNotPassable
+    call ResetFlags
     scf
 .end
     pop hl
     ret
+.tilePassable
+    call ResetFlags
+    jr .end
 
 CheckWaterTilePassable:
     ld a,d
@@ -37506,10 +37510,15 @@ CheckWaterTilePassable:
     call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic
     ; fall through
 .noCollision
-    and a
-    ret
+    jr ResetFlags
 .collision
+    call ResetFlags
     scf
+    ret
+
+ResetFlags:
+    ld a,1
+    or a ; reset all flag
     ret
 
 DoorTileIDPointers: ; Move to Bank's End
