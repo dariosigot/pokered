@@ -135315,7 +135315,26 @@ FindWildLocationsOfMon:
 .done
     ld a,$ff ; list terminator
     ld [de],a
+    ; Search Current Map to sort it forst in list
+    ld hl,$cee9
+    ld d,h
+    ld e,l
+    ld a,[W_CURMAP]
+    ld b,a
+.LoopSort
+    ld a,[hl]
+    cp $ff ; list terminator
+    ret z
+    cp b
+    jr nz,.NextSort
+    ld a,[de]
+    ld [hl],a
+    ld a,b
+    ld [de],a
     ret
+.NextSort
+    inc hl
+    jr .LoopSort
 
 FindFishingLocationsOfMon:
     push bc
