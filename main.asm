@@ -50457,18 +50457,18 @@ TrainerAIPointers:
     dbw 2,BrunoAI ; bruno
     dbw 5,BrockAI ; brock
     dbw 2,MistyAI ; misty
-    dbw 2,LtSurgeAI ; surge
-    dbw 1,ErikaAI ; erika
+    dbw 1,LtSurgeAI ; surge
+    dbw 2,ErikaAI ; erika
     dbw 1,KogaAI ; koga
     dbw 1,BlaineAI ; blaine
     dbw 1,SabrinaAI ; sabrina
     dbw 1,GenericAI
     dbw 1,Sony2AI ; sony2
-    dbw 1,Sony3AI ; sony3
-    dbw 1,LoreleiAI ; lorelei
+    dbw 2,Sony3AI ; sony3
+    dbw 2,LoreleiAI ; lorelei
     dbw 1,GenericAI
-    dbw 1,AgathaAI ; agatha
-    dbw 1,LanceAI ; lance
+    dbw 2,AgathaAI ; agatha
+    dbw 2,LanceAI ; lance
 
 Func_3af2e: ; Moved in the Bank
     ld hl,UnnamedText_3af48 ; $6f48
@@ -52360,6 +52360,8 @@ TransformEffect_: ; Moved Upper in the Bank
 ;joenote - reorganizing these AI routines to jump on carry instead of returning on not-carry
 ;also adding recognition of a switch-pkmn bit
 
+
+; ─────────────────────────────────────────────────────────────
 JugglerAI:
     cp $40
     jp c,AISwitchIfEnoughMons
@@ -52369,14 +52371,6 @@ BlackbeltAI:
     cp $20
     jp c,AIUseXAttack
     ret
-
-GiovanniAI:
-    cp $20
-    ret nc
-    ld a,[W_ENEMYBATTSTATUS2]
-    and %00000100
-    ret z
-    jp AIUseDireHit
 
 CooltrainerMAI:
     cp $20
@@ -52404,11 +52398,10 @@ CooltrainerFAI:
 .xaccy
     jp AIUseXAccuracy
 
+; ─────────────────────────────────────────────────────────────
+
 BrockAI:
-    ld a,[W_ENEMYMONSTATUS]
-    and a
-    jp nz,AIUseFullHeal
-    ret
+    jp AdvanceAIHealStatus
 
 MistyAI:
     cp $20
@@ -52436,6 +52429,14 @@ KogaAI:
     jp c,AIUseHyperPotion
     ret
 
+SabrinaAI:
+    cp $20
+    ret nc
+    ld a,10
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+    ret
+
 BlaineAI:
     cp $20
     ret nc
@@ -52444,13 +52445,15 @@ BlaineAI:
     jp c,AIUseHyperPotion
     ret
 
-SabrinaAI:
+GiovanniAI:
     cp $20
     ret nc
-    ld a,10
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    ret
+    ld a,[W_ENEMYBATTSTATUS2]
+    and %00000100
+    ret z
+    jp AIUseDireHit
+
+; ─────────────────────────────────────────────────────────────
 
 Sony1AI:
     cp $20
@@ -52465,34 +52468,32 @@ Sony2AI:
     ret nc
     ld a,5
     call AICheckIfHPBelowFraction
-    jp c,AIUseSuperPotion
-    ret
+    jp c,AIUseLemonade
+    jr AdvanceAIHealStatus
 
 Sony3AI:
-    cp $40
+    cp $80
     ret nc
     ld a,5
     call AICheckIfHPBelowFraction
     jp c,AIUseFullRestore
     jr AdvanceAIHealStatus
 
+; ─────────────────────────────────────────────────────────────
+
 LoreleiAI:
-    cp $80
-    ret nc
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    jr AdvanceAIHealStatus
+    jr EliteFourAI
 
 BrunoAI:
-    cp $80
-    ret nc
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    jr AdvanceAIHealStatus
+    jr EliteFourAI
 
 AgathaAI:
+    jr EliteFourAI
+
+LanceAI:
+    jr EliteFourAI
+
+EliteFourAI:
     cp $80
     ret nc
     ld a,5
@@ -52500,19 +52501,16 @@ AgathaAI:
     jp c,AIUseHyperPotion
     jr AdvanceAIHealStatus
 
-LanceAI:
-    cp $80
-    ret nc
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    ; fall through
+; ─────────────────────────────────────────────────────────────
 
 AdvanceAIHealStatus:
     ld a,[W_ENEMYMONSTATUS]
     and a
-    jp nz,AIUseFullHeal
-    ret
+    ret z
+    ld a,3
+    call AICheckIfHPBelowFraction
+    ret c
+    jp AIUseFullHeal
 
 GenericAI:
     and a ; clear carry
@@ -52990,6 +52988,12 @@ DrawHudAndPrintTextBankE:
     call BankswitchEtoF
     pop hl
     jp PrintText
+
+AIUseLemonade:
+; enemy trainer heals his monster with a lemonade
+    ld a,LEMONADE
+    ld b,80
+    jp AIRecoverHP
 
 SECTION "bankF",ROMX,BANK[$F]
 
