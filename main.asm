@@ -50457,18 +50457,18 @@ TrainerAIPointers:
     dbw 2,BrunoAI ; bruno
     dbw 5,BrockAI ; brock
     dbw 2,MistyAI ; misty
-    dbw 2,LtSurgeAI ; surge
-    dbw 1,ErikaAI ; erika
+    dbw 1,LtSurgeAI ; surge
+    dbw 2,ErikaAI ; erika
     dbw 1,KogaAI ; koga
     dbw 1,BlaineAI ; blaine
     dbw 1,SabrinaAI ; sabrina
     dbw 1,GenericAI
     dbw 1,Sony2AI ; sony2
-    dbw 1,Sony3AI ; sony3
-    dbw 1,LoreleiAI ; lorelei
+    dbw 2,Sony3AI ; sony3
+    dbw 2,LoreleiAI ; lorelei
     dbw 1,GenericAI
-    dbw 1,AgathaAI ; agatha
-    dbw 1,LanceAI ; lance
+    dbw 2,AgathaAI ; agatha
+    dbw 2,LanceAI ; lance
 
 Func_3af2e: ; Moved in the Bank
     ld hl,UnnamedText_3af48 ; $6f48
@@ -52360,6 +52360,8 @@ TransformEffect_: ; Moved Upper in the Bank
 ;joenote - reorganizing these AI routines to jump on carry instead of returning on not-carry
 ;also adding recognition of a switch-pkmn bit
 
+
+; ─────────────────────────────────────────────────────────────
 JugglerAI:
     cp $40
     jp c,AISwitchIfEnoughMons
@@ -52369,14 +52371,6 @@ BlackbeltAI:
     cp $20
     jp c,AIUseXAttack
     ret
-
-GiovanniAI:
-    cp $20
-    ret nc
-    ld a,[W_ENEMYBATTSTATUS2]
-    and %00000100
-    ret z
-    jp AIUseDireHit
 
 CooltrainerMAI:
     cp $20
@@ -52404,11 +52398,10 @@ CooltrainerFAI:
 .xaccy
     jp AIUseXAccuracy
 
+; ─────────────────────────────────────────────────────────────
+
 BrockAI:
-    ld a,[W_ENEMYMONSTATUS]
-    and a
-    jp nz,AIUseFullHeal
-    ret
+    jp AdvanceAIHealStatus
 
 MistyAI:
     cp $20
@@ -52436,6 +52429,14 @@ KogaAI:
     jp c,AIUseHyperPotion
     ret
 
+SabrinaAI:
+    cp $20
+    ret nc
+    ld a,10
+    call AICheckIfHPBelowFraction
+    jp c,AIUseHyperPotion
+    ret
+
 BlaineAI:
     cp $20
     ret nc
@@ -52444,13 +52445,15 @@ BlaineAI:
     jp c,AIUseHyperPotion
     ret
 
-SabrinaAI:
+GiovanniAI:
     cp $20
     ret nc
-    ld a,10
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    ret
+    ld a,[W_ENEMYBATTSTATUS2]
+    and %00000100
+    ret z
+    jp AIUseDireHit
+
+; ─────────────────────────────────────────────────────────────
 
 Sony1AI:
     cp $20
@@ -52465,34 +52468,32 @@ Sony2AI:
     ret nc
     ld a,5
     call AICheckIfHPBelowFraction
-    jp c,AIUseSuperPotion
-    ret
+    jp c,AIUseLemonade
+    jr AdvanceAIHealStatus
 
 Sony3AI:
-    cp $40
+    cp $80
     ret nc
     ld a,5
     call AICheckIfHPBelowFraction
     jp c,AIUseFullRestore
     jr AdvanceAIHealStatus
 
+; ─────────────────────────────────────────────────────────────
+
 LoreleiAI:
-    cp $80
-    ret nc
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    jr AdvanceAIHealStatus
+    jr EliteFourAI
 
 BrunoAI:
-    cp $80
-    ret nc
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    jr AdvanceAIHealStatus
+    jr EliteFourAI
 
 AgathaAI:
+    jr EliteFourAI
+
+LanceAI:
+    jr EliteFourAI
+
+EliteFourAI:
     cp $80
     ret nc
     ld a,5
@@ -52500,19 +52501,16 @@ AgathaAI:
     jp c,AIUseHyperPotion
     jr AdvanceAIHealStatus
 
-LanceAI:
-    cp $80
-    ret nc
-    ld a,5
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    ; fall through
+; ─────────────────────────────────────────────────────────────
 
 AdvanceAIHealStatus:
     ld a,[W_ENEMYMONSTATUS]
     and a
-    jp nz,AIUseFullHeal
-    ret
+    ret z
+    ld a,3
+    call AICheckIfHPBelowFraction
+    ret c
+    jp AIUseFullHeal
 
 GenericAI:
     and a ; clear carry
@@ -52990,6 +52988,12 @@ DrawHudAndPrintTextBankE:
     call BankswitchEtoF
     pop hl
     jp PrintText
+
+AIUseLemonade:
+; enemy trainer heals his monster with a lemonade
+    ld a,LEMONADE
+    ld b,80
+    jp AIRecoverHP
 
 SECTION "bankF",ROMX,BANK[$F]
 
@@ -53677,25 +53681,7 @@ HandlePoisonBurnLeechSeed: ; 3c3bd (f:43bd)
 HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; Moved in the Bank
     push hl
     push hl
-    ld bc,$e      ; skip to max HP
-    add hl,bc
-    ld a,[hli]    ; load max HP
-    ld [wHPBarMaxHP+1],a
-    ld b,a
-    ld a,[hl]
-    ld [wHPBarMaxHP],a
-    ld c,a
-    srl b
-    rr c
-    srl b
-    rr c
-    srl c
-    srl c         ; c = max HP/16 (assumption: HP < 1024)
-    ld a,c
-    and a
-    jr nz,.nonZeroDamage
-    inc c         ; damage is at least 1
-.nonZeroDamage
+    call HPDiv16
     ; ds 3 ; ld hl,W_PLAYERBATTSTATUS3 ; $d064
     ; ds 3 ; ld de,W_PLAYERTOXICCOUNTER ; $d06c
     ; ds 2 ; ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -53747,15 +53733,32 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP: ; Moved in the Bank
     pop hl
     ret
 
-InsertRealTypes:
-    call GetMonHeader
-    PREDEF_JUMP InsertRealTypesPredef
-
-SECTION "HandlePoisonBurnLeechSeed_IncreaseEnemyHP",ROMX[$44a3],BANK[$f]
+HPDiv16:
+    ld bc,$e ; skip to max HP
+    add hl,bc
+    ld a,[hli] ; load max HP
+    ld [wHPBarMaxHP+1],a
+    ld b,a
+    ld a,[hl]
+    ld [wHPBarMaxHP],a
+    ld c,a
+    srl b
+    rr c
+    srl b
+    rr c
+    srl c
+    srl c ; c = max HP/16 (assumption: HP < 1024)
+    ld a,c
+    and a
+    ret nz ; nonZeroDamage
+    inc c ; damage is at least 1
+    ret
 
 ; adds bc to enemy HP
-HandlePoisonBurnLeechSeed_IncreaseEnemyHP: ; 3c4a3 (f:44a3)
+HandlePoisonBurnLeechSeed_IncreaseEnemyHP: ; Moved in the Bank
     push hl
+    call HPDiv16
+    push bc
     ld hl,W_ENEMYMONMAXHP ; $cff4
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -53797,12 +53800,15 @@ HandlePoisonBurnLeechSeed_IncreaseEnemyHP: ; 3c4a3 (f:44a3)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     xor $1
     ld [H_WHOSETURN],a ; $FF00+$f3
+    pop bc
     call SetCureDuringLeechSeed ; call UpdateCurMonHPBar
     ld a,[H_WHOSETURN] ; $FF00+$f3
     xor $1
     ld [H_WHOSETURN],a ; $FF00+$f3
     pop hl
     ret
+
+SECTION "UpdateCurMonHPBar",ROMX[$44f6],BANK[$f]
 
 UpdateCurMonHPBar: ; 3c4f6 (f:44f6)
     FuncCoord 10,09 ; Player Bar in Battle
@@ -60273,11 +60279,6 @@ _RockDamage:
     jp DrawEnemyHUDAndHPBar
 
 _BaitHealth:
-    ld hl,W_DAMAGE
-    ld a,[hli]
-    ld b,a
-    ld a,[hl]
-    ld c,a
     ld hl,W_ENEMYMONCURHP ; $cfe6
     call HandlePoisonBurnLeechSeed_IncreaseEnemyHP
     jp DrawEnemyHUDAndHPBar
@@ -60293,6 +60294,10 @@ ConversionEffect: ; Moved in the Bank
     ld hl,ConversionEffect_
     ld b,BANK(ConversionEffect_)
     jp Bankswitch
+
+InsertRealTypes:
+    call GetMonHeader
+    PREDEF_JUMP InsertRealTypesPredef
 
 SECTION "_LoadTrainerPic",ROMX[$704b],BANK[$f]
 
@@ -62100,11 +62105,7 @@ SetDamageDirectToEnemy:
 
 SetDamageDuringPoisonBurnLeechSeed:
     push bc
-    ld hl,wBattleValueToPrint
-    ld a,b
-    ld [hli],a
-    ld a,c
-    ld [hl],a
+    call BCToValueToPrint
     ld hl,wPrintBattleValueBit0
     set 0,[hl]
     call CheckDamageToPlayer
@@ -62137,6 +62138,7 @@ SetCureDirect:
 
 SetCureDuringLeechSeed:
     push bc
+    call BCToValueToPrint
     ld hl,wPrintBattleValueBit0
     set 0,[hl]
     call CheckDamageToPlayer
@@ -62144,6 +62146,14 @@ SetCureDuringLeechSeed:
     pop bc
     call UpdateCurMonHPBar
     jp RemoveBattleValueBankF
+
+BCToValueToPrint:
+    ld hl,wBattleValueToPrint
+    ld a,b
+    ld [hli],a
+    ld a,c
+    ld [hl],a
+    ret
 
 SetCureDuringAbsorb_:
     push de
