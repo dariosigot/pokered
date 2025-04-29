@@ -29316,6 +29316,15 @@ BabyMon:
     db LITWICK
     db $FF
 
+StartMenu_Option_Init:
+    xor a
+    ld [H_AUTOBGTRANSFERENABLED],a
+    call ClearScreen
+    call UpdateSprites
+    ld hl,DisplayOptionMenu
+    ld b,BANK(DisplayOptionMenu)
+    jp Bankswitch
+
 ; Free
 
 SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
@@ -30388,17 +30397,16 @@ StartMenu_SaveReset: ; 135e3 (4:75e3)
                       ;and instead only hold for a single button press
 
 StartMenu_Option: ; 135f6 (4:75f6)
-    xor a
-    ld [H_AUTOBGTRANSFERENABLED],a
-    call ClearScreen
-    call UpdateSprites
-    ld hl,DisplayOptionMenu
-    ld b,BANK(DisplayOptionMenu)
-    call Bankswitch
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 2,a ; was the select button pressed?
+    jp nz,InitGame
+    call StartMenu_Option_Init
     call LoadScreenTilesFromBuffer2 ; restore saved screen
     call LoadTextBoxTilePatterns
     call UpdateSprites
     jp RedisplayStartMenu
+
+SECTION "Func_13613",ROMX[$7613],BANK[$4]
 
 Func_13613: ; 13613 (4:7613)
     call Func_13653
