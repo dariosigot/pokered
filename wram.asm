@@ -12,7 +12,7 @@ wUnusedC000:: ; c000
 ;bit 5 - if set, current ai trainer has ai routine 4 assigned
 ;bit 6 - if set, poison/burn damage algorithm is being called to handle leech seed
 ;bit 7 - if set, force Counter to miss (for an opponent hurting itself or its jump kick missing)
-	ds 1
+    ds 1
 
 SECTION "Sprite State Data", WRAM0[$c100]
 
@@ -169,7 +169,7 @@ wRLEByteCount: ; ccd2
 
 ;joenote - store the power of the enemy move used last turn for AI layer 3 use
 wAILastMovePower:: ;ccd6
-	ds 1
+    ds 1
 
 ; current HP of player and enemy substitutes
 wPlayerSubstituteHP: ; ccd7
@@ -278,10 +278,10 @@ SECTION "wAIPartyMonScores",WRAM0[$cd50]
 ;joenote - block of data that holds a score for the switch desireability of each AI trainer mon
 ;gets overwritten with zeroes at the end of battle 
 wAIPartyMonScores:: ;cd50
-	;8 bytes
-	;-->6 bytes for roster scores
-	;-->1 byte for storing the best score (wAIPartyMonScores + 6)
-	;-->1 byte for storing the zero-indexed position with the best score (wAIPartyMonScores + 7)
+    ;8 bytes
+    ;-->6 bytes for roster scores
+    ;-->1 byte for storing the best score (wAIPartyMonScores + 6)
+    ;-->1 byte for storing the zero-indexed position with the best score (wAIPartyMonScores + 7)
 
 SECTION "wFlags_0xcd60",WRAM0[$cd60]
 
@@ -1253,7 +1253,7 @@ W_MISSABLEOBJECTFLAGS: ; d5a6
 ; bit array of missable objects. set = removed
     ds 32
 
-	ds 7
+    ds 7
 
 ; temp copy of SPRITESTATEDATA1_IMAGEINDEX (used for sprite facing/anim)
 wd5cd:: db
