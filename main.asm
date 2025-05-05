@@ -53097,8 +53097,6 @@ PlayPsnBrnAnimation:
     call PlayMoveAnimation ; burned
     jp FlipTurn
 
-; Free
-
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
 Func_3c04c: ; 3c04c (f:404c)
@@ -55249,11 +55247,15 @@ RegularBattleMenu: ; 3cf1a (f:4f1a)
     inc hl
     ld a,$1
     ld [hli],a
-    ld [hl],$11
+    ld [hl],%00010011 ; ▼▲◄►StSeBA
     call HandleMenuInput
     bit 4,a
     jr nz,.rightcolumn
-    jr .selection
+    bit 1,a
+    jr z,.selection
+;B from left
+    ld a,1
+    ld [wCurrentMenuItem],a
 .rightcolumn
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
@@ -55286,11 +55288,19 @@ RegularBattleMenu: ; 3cf1a (f:4f1a)
     inc hl
     ld a,$1
     ld [hli],a
-    ld a,$21
+    ld a,%00100011 ; ▼▲◄►StSeBA
     ld [hli],a
+.HandleMenuFromRight
     call HandleMenuInput
     bit 5,a
-    jr nz,.leftcolumn
+    jp nz,.leftcolumn
+    bit 1,a
+    jr z,.selectionFromRight
+;B from right
+    ld a,1
+    ld [wCurrentMenuItem],a
+    jr .HandleMenuFromRight
+.selectionFromRight
     ld a,[wCurrentMenuItem] ; $cc26
     add $2 ; if we're in the right column,the actual id is +2
     ld [wCurrentMenuItem],a ; $cc26
@@ -55420,23 +55430,13 @@ asm_3d05f: ; 3d05f (f:505f)
 ;    ld [wCurrentMenuItem],a ; ...
 ;    ret
 
-HalvePlayerSpeedAfterRun:
-    srl a ; Player Speed divided by 2
-    ld [$FF00+$97],a
-    ld a,[hl]
-    rr a  ; Player Speed divided by 2
-    ret
-
-ReflectLightScreenEffect: ; Moved in the Bank
-    ld hl,ReflectLightScreenEffect_
-    ld b,BANK(ReflectLightScreenEffect_)
-    jp Bankswitch
-
 HackBackSpriteAccess:
     ld a,$66 ; BackSprite dimension
     ld de,$9310
     push de
     jp HackBackSprite
+
+; Free
 
 SECTION "Func_3d0ca",ROMX[$50ca],BANK[$f]
 
@@ -57898,7 +57898,17 @@ HandleCounterMove: ; Moved in the Bank
     xor a
     ret
 
-; Free
+HalvePlayerSpeedAfterRun:
+    srl a ; Player Speed divided by 2
+    ld [$FF00+$97],a
+    ld a,[hl]
+    rr a  ; Player Speed divided by 2
+    ret
+
+ReflectLightScreenEffect: ; Moved in the Bank
+    ld hl,ReflectLightScreenEffect_
+    ld b,BANK(ReflectLightScreenEffect_)
+    jp Bankswitch
 
 SECTION "ApplyAttackToEnemyPokemon",ROMX[$60df],BANK[$f]
 
