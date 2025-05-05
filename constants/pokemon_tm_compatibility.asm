@@ -1,8 +1,8 @@
 
 ; ──────────────────────────────────────────────────────────────────────
 MissingNoTMCompatibility:
-	db KOFFING,KOFFING,GRIMER,KOFFING,0
-	db 28,GRIMER
+    db KOFFING,KOFFING,GRIMER,KOFFING,0
+    db 28,GRIMER
 ; ──────────────────────────────────────────────────────────────────────
 BulbasaurTMCompatibility:
     tmlearn 02,03,06                ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
@@ -1307,7 +1307,7 @@ MewtwoTMCompatibility:
     tmlearn 49,50,54,55             ; |TRI_ATTACK|SUBSTITUTE|STRIKE|FLASH|
 ; ──────────────────────────────────────────────────────────────────────
 MewTMCompatibility:
-	db $ff,$ff,$ff,$ff,$ff,$ff,$ff
+    db $ff,$ff,$ff,$ff,$ff,$ff,$ff
 ; ──────────────────────────────────────────────────────────────────────
 LitwickTMCompatibility:
     tmlearn 06                      ; |TOXIC|

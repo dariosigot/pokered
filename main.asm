@@ -10760,22 +10760,32 @@ IsTryingToLearnPalFix_End:
     call LoadScreenTilesFromBuffer1
     jp GoPAL_SET_CF1C
 
-Func_4277: ; Moved in the Bank
+PrintSafariZoneBattleText: ; Moved in the Bank
     ld hl,$cce9
     ld a,[hl]
     and a
-    jr z,.asm_4284
+    jr z,.checkAngry
+.isEating
     dec [hl]
-    ld hl,.UnnamedText_42a7
-    jr .asm_429f
-.asm_4284
+    jr z,.resetCatchRate
+    ld hl,.EatingText
+    jr .PrintText
+.checkAngry
     dec hl
     ld a,[hl]
     and a
     ret z
+.isAngry
     dec [hl]
-    ld hl,.UnnamedText_42ac
-    jr nz,.asm_429f
+    jr z,.resetCatchRate
+    ld hl,.AngryText
+    ; fall through
+.PrintText
+    push hl
+    call LoadScreenTilesFromBuffer1
+    pop hl
+    jp PrintText
+.resetCatchRate
     push hl
     ld a,[$cfe5]
     ld [$d0b5],a
@@ -10785,15 +10795,12 @@ Func_4277: ; Moved in the Bank
     ld a,[W_MONHCATCHRATE]
     ld [$d007],a
     pop hl
-.asm_429f
-    push hl
-    call LoadScreenTilesFromBuffer1
-    pop hl
-    jp PrintText
-.UnnamedText_42a7
+    xor a
+    ret
+.EatingText
     TX_FAR SafariZoneEatingText
     db "@"
-.UnnamedText_42ac
+.AngryText
     TX_FAR SafariZoneAngryText
     db "@"
 
@@ -16248,7 +16255,7 @@ LearnMove: ; 6e43 (1:6e43)
     ; Check Transformed
     ld a,[W_PLAYERBATTSTATUS3]
     bit 3,a ; is the mon transformed?
-	jp nz,.LearnedMoveComplete
+    jp nz,.LearnedMoveComplete
     ; Update Active Mon Moves
     ld h,d
     ld l,e
@@ -23557,8 +23564,6 @@ ItemUseBall: ; d687 (3:5687)
     ld a,[W_BATTLETYPE]
     dec a
     jr z,.printText1
-    call StopAlarmAndLoadCaughtText ; ld hl,ItemUseBallText05
-    call PrintText
     ld a,$3a    ;convert order: Internal->Dex
     call Predef
     ld a,[$d11e]
@@ -23576,6 +23581,11 @@ ItemUseBall: ; d687 (3:5687)
     ld b,1
     ld a,$10    ;set Dex_own_flag?
     call Predef
+    ld b,BANK(DrawEnemyHUDAndHPBar)
+    ld hl,DrawEnemyHUDAndHPBar
+    call Bankswitch
+    call StopAlarmAndLoadCaughtText ; ld hl,ItemUseBallText05
+    call PrintText
     pop af
     and a
     jr nz,.checkParty
@@ -24494,9 +24504,7 @@ HandleBackupAfterBallCatch:
     ld [wBackupEnemyPP],a ; ...
     ret
 
-SECTION "ItemUseBait",ROMX[$5f52],BANK[$3]
-
-ItemUseBait: ; df52 (3:5f52)
+ItemUseBait: ; Moved in the Bank
     ld hl,ThrewBaitText
     call PrintText
     ld hl,$d007 ; catch rate
@@ -24506,7 +24514,7 @@ ItemUseBait: ; df52 (3:5f52)
     ld de,$cce8 ; escape factor
     jr BaitRockCommon
 
-ItemUseRock: ; df67 (3:5f67)
+ItemUseRock: ; Moved in the Bank
     ld hl,ThrewRockText
     call PrintText
     ld hl,$d007 ; catch rate
@@ -24520,7 +24528,7 @@ ItemUseRock: ; df67 (3:5f67)
     ld hl,$cce8 ; escape factor
     ld de,$cce9 ; bait factor
 
-BaitRockCommon: ; df7f (3:5f7f)
+BaitRockCommon: ; Moved in the Bank
     ld [W_ANIMATIONID],a
     xor a
     ld [$cc5b],a
@@ -24532,6 +24540,11 @@ BaitRockCommon: ; df7f (3:5f7f)
     cp a,5
     jr nc,.randomLoop
     inc a ; increment the random number,giving a range from 1 to 5 inclusive
+;joenote - There is a bug here. 
+; - The 1-to-5 number is always decremented when PrintSafariZoneBattleText runs.
+; - So getting a number of 1 will decrement immediately to zero and do nothing to the eating/angry state.
+; - To get an effective 1-to-5 turns, increment once more to bump the range to 2-to-6
+    inc a
     ld b,a
     ld a,[hl]
     add b ; increase bait factor (for bait),increase escape factor (for rock)
@@ -24541,16 +24554,16 @@ BaitRockCommon: ; df7f (3:5f7f)
     ld [hl],a
     ld a,$08
     jp RockDamageOrBaitHealth ; call Predef ; do animation
-    ds 2 ; ld c,70
-    ds 3 ; jp DelayFrames
 
-ThrewBaitText: ; dfa5 (3:5fa5)
+ThrewBaitText:
     TX_FAR _ThrewBaitText
     db "@"
 
-ThrewRockText: ; dfaa (3:5faa)
+ThrewRockText:
     TX_FAR _ThrewRockText
     db "@"
+
+SECTION "ItemUseEscapeRope",ROMX[$5faf],BANK[$3]
 
 ; also used for Dig out-of-battle effect
 ItemUseEscapeRope: ; dfaf (3:5faf)
@@ -30935,13 +30948,13 @@ HazeEffect_: ; Moved in the Bank
 ;    jr z,.cureStatuses
     xor a
     ld [hl],a ; joenote - added
-    ld [W_ENEMYTOXICCOUNTER],a	;joenote - clear toxic counter
+    ld [W_ENEMYTOXICCOUNTER],a ;joenote - clear toxic counter
     ld hl,W_PLAYERMONSTATUS
 ;    dec de ; wPlayerSelectedMove
 
 ;.cureStatuses
-	;joenote - making sure to clear statuses and toxic counter
-    ld [W_PLAYERTOXICCOUNTER],a	;clear toxic counter
+    ;joenote - making sure to clear statuses and toxic counter
+    ld [W_PLAYERTOXICCOUNTER],a ;clear toxic counter
     ld [hl],a ;clear status
 ;    ld a,[hl]
 ;    ld [hl],$0
@@ -30975,7 +30988,7 @@ HazeEffect_: ; Moved in the Bank
     res 7,[hl] ; confused
     inc hl ; BATTSTATUS2
     ld a,[hl]
-	; clear USING_X_ACCURACY, PROTECTED_BY_MIST, GETTING_PUMPED, and SEEDED statuses
+    ; clear USING_X_ACCURACY, PROTECTED_BY_MIST, GETTING_PUMPED, and SEEDED statuses
     and %01111000
     ld [hli],a ; BATTSTATUS3
     ld a,[hl]
@@ -52205,17 +52218,17 @@ TransformEffect_: ; Moved Upper in the Bank
     set 3,a ; Set Transformed
     ld [bc],a
 ; ───────────────────────── Conflict with Disable Start
-    pop af	;get the saved turn result
-	jr nz, .undo_enemy_disable
+    pop af ;get the saved turn result
+    jr nz, .undo_enemy_disable
 .undo_player_disable
-	xor a
-	ld [W_PLAYERDISABLEDMOVE], a
-	ld [$ccee], a
-	jr .undo_disable_end
+    xor a
+    ld [W_PLAYERDISABLEDMOVE], a
+    ld [$ccee], a
+    jr .undo_disable_end
 .undo_enemy_disable
-	xor a
-	ld [W_ENEMYDISABLEDMOVE], a
-	ld [$ccef], a
+    xor a
+    ld [W_ENEMYDISABLEDMOVE], a
+    ld [$ccef], a
 .undo_disable_end
 ; ───────────────────────── Conflict with Disable End
     ld a,[hli]
@@ -52979,7 +52992,7 @@ AICureStatus: ; Moved in the Bank
     ld [H_WHOSETURN],a
     xor a
     ld [W_ENEMYMONSTATUS],a ; clear status of active enemy
-	ld [W_ENEMYTOXICCOUNTER], a	;clear toxic counter
+    ld [W_ENEMYTOXICCOUNTER], a ;clear toxic counter
     ld hl,W_ENEMYBATTSTATUS3 ;clear toxic bit
     res 0,[hl]
     ; need to redraw the enemy trainer hud 
@@ -53010,44 +53023,44 @@ SECTION "bankF",ROMX,BANK[$F]
 ; ResidualEffects1
 EffectsArray1:
 ; most non-side effects
-	db CONVERSION_EFFECT
-	db HAZE_EFFECT
-	db SWITCH_AND_TELEPORT_EFFECT
-	db MIST_EFFECT
-	db FOCUS_ENERGY_EFFECT
-	db CONFUSION_EFFECT
-	db HEAL_EFFECT
-	db TRANSFORM_EFFECT
-	db LIGHT_SCREEN_EFFECT
-	db REFLECT_EFFECT
-	db POISON_EFFECT
-	db PARALYZE_EFFECT
-	db SUBSTITUTE_EFFECT
-	db MIMIC_EFFECT
-	db LEECH_SEED_EFFECT
-	db SPLASH_EFFECT
+    db CONVERSION_EFFECT
+    db HAZE_EFFECT
+    db SWITCH_AND_TELEPORT_EFFECT
+    db MIST_EFFECT
+    db FOCUS_ENERGY_EFFECT
+    db CONFUSION_EFFECT
+    db HEAL_EFFECT
+    db TRANSFORM_EFFECT
+    db LIGHT_SCREEN_EFFECT
+    db REFLECT_EFFECT
+    db POISON_EFFECT
+    db PARALYZE_EFFECT
+    db SUBSTITUTE_EFFECT
+    db MIMIC_EFFECT
+    db LEECH_SEED_EFFECT
+    db SPLASH_EFFECT
     db $FF
 
 ; SetDamageEffects
 EffectsArray2:
 ; moves that do damage but not through normal calculations
 ; e.g., Super Fang, Psywave
-	db SUPER_FANG_EFFECT
-	db SPECIAL_DAMAGE_EFFECT
+    db SUPER_FANG_EFFECT
+    db SPECIAL_DAMAGE_EFFECT
     db $FF
 
 ; AlwaysHappenSideEffects
 EffectsArray4:
 ; Attacks that aren't finished after they faint the opponent.
-	db DRAIN_HP_EFFECT
-	db EXPLODE_EFFECT
-	db DREAM_EATER_EFFECT
-	db PAY_DAY_EFFECT
-	db TWO_TO_FIVE_ATTACKS_EFFECT
-	db ATTACK_TWICE_EFFECT
-	db RECOIL_EFFECT
-	db TWINEEDLE_EFFECT
-	db RAGE_EFFECT
+    db DRAIN_HP_EFFECT
+    db EXPLODE_EFFECT
+    db DREAM_EATER_EFFECT
+    db PAY_DAY_EFFECT
+    db TWO_TO_FIVE_ATTACKS_EFFECT
+    db ATTACK_TWICE_EFFECT
+    db RECOIL_EFFECT
+    db TWINEEDLE_EFFECT
+    db RAGE_EFFECT
     db HYPER_BEAM_EFFECT
     db $FF
 
@@ -53083,8 +53096,6 @@ PlayPsnBrnAnimation:
     ld a,EMBER
     call PlayMoveAnimation ; burned
     jp FlipTurn
-
-; Free
 
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
@@ -53262,9 +53273,9 @@ StartBattle: ; 3c11e (f:411e)
     ld hl,UnnamedText_3c1a8 ; $41a8
     jp PrintText
 .asm_3c17a
-    ld hl,Func_4277
-    ld b,BANK(Func_4277)
-    call Bankswitch ; indirect jump to Func_4277 (4277 (1:4277))
+    ld hl,PrintSafariZoneBattleText
+    ld b,BANK(PrintSafariZoneBattleText)
+    call Bankswitch ; indirect jump to PrintSafariZoneBattleText (4277 (1:4277))
     ld a,[$cffb]
     add a
     ld b,a
@@ -53394,8 +53405,8 @@ MainInBattleLoop: ; 3c233 (f:4233)
     ret nz ; return if pokedoll was used to escape from battle
 
 ;joenote - This whole thing is problematic. Just comment it all out.
-;		-allow the player to select a move even if frozen in order to prevent PP underflow and link desyncs
-;		-also allow the player to select a move if you don't want sleep to waste a turn on wakeup
+;        -allow the player to select a move even if frozen in order to prevent PP underflow and link desyncs
+;        -also allow the player to select a move if you don't want sleep to waste a turn on wakeup
 ;    ld a,[W_PLAYERMONSTATUS]        ; joedebug - sleep won't waste turn
 ;    and $27                         ; ...
 ;    jr nz,.selectEnemyMove
@@ -53583,19 +53594,19 @@ EffectsArray5:
 ; Effects from arrays 2, 4, and 5B, minus Twineedle and Rage.
 ; Includes all effects that do not need to be called at the end of
 ; ExecutePlayerMove (or ExecuteEnemyMove), because they have already been handled
-	db DRAIN_HP_EFFECT
-	db EXPLODE_EFFECT
-	db DREAM_EATER_EFFECT
-	db PAY_DAY_EFFECT
-	db SWIFT_EFFECT
-	db TWO_TO_FIVE_ATTACKS_EFFECT
-	db CHARGE_EFFECT
-	db SUPER_FANG_EFFECT
-	db SPECIAL_DAMAGE_EFFECT
-	db FLY_EFFECT
-	db ATTACK_TWICE_EFFECT
-	db JUMP_KICK_EFFECT
-	db RECOIL_EFFECT
+    db DRAIN_HP_EFFECT
+    db EXPLODE_EFFECT
+    db DREAM_EATER_EFFECT
+    db PAY_DAY_EFFECT
+    db SWIFT_EFFECT
+    db TWO_TO_FIVE_ATTACKS_EFFECT
+    db CHARGE_EFFECT
+    db SUPER_FANG_EFFECT
+    db SPECIAL_DAMAGE_EFFECT
+    db FLY_EFFECT
+    db ATTACK_TWICE_EFFECT
+    db JUMP_KICK_EFFECT
+    db RECOIL_EFFECT
     ; fallthru
 
 ; SpecialEffectsCont
@@ -55236,11 +55247,15 @@ RegularBattleMenu: ; 3cf1a (f:4f1a)
     inc hl
     ld a,$1
     ld [hli],a
-    ld [hl],$11
+    ld [hl],%00010011 ; ▼▲◄►StSeBA
     call HandleMenuInput
     bit 4,a
     jr nz,.rightcolumn
-    jr .selection
+    bit 1,a
+    jr z,.selection
+;B from left
+    ld a,1
+    ld [wCurrentMenuItem],a
 .rightcolumn
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
@@ -55273,11 +55288,19 @@ RegularBattleMenu: ; 3cf1a (f:4f1a)
     inc hl
     ld a,$1
     ld [hli],a
-    ld a,$21
+    ld a,%00100011 ; ▼▲◄►StSeBA
     ld [hli],a
+.HandleMenuFromRight
     call HandleMenuInput
     bit 5,a
-    jr nz,.leftcolumn
+    jp nz,.leftcolumn
+    bit 1,a
+    jr z,.selectionFromRight
+;B from right
+    ld a,1
+    ld [wCurrentMenuItem],a
+    jr .HandleMenuFromRight
+.selectionFromRight
     ld a,[wCurrentMenuItem] ; $cc26
     add $2 ; if we're in the right column,the actual id is +2
     ld [wCurrentMenuItem],a ; $cc26
@@ -55407,23 +55430,13 @@ asm_3d05f: ; 3d05f (f:505f)
 ;    ld [wCurrentMenuItem],a ; ...
 ;    ret
 
-HalvePlayerSpeedAfterRun:
-    srl a ; Player Speed divided by 2
-    ld [$FF00+$97],a
-    ld a,[hl]
-    rr a  ; Player Speed divided by 2
-    ret
-
-ReflectLightScreenEffect: ; Moved in the Bank
-    ld hl,ReflectLightScreenEffect_
-    ld b,BANK(ReflectLightScreenEffect_)
-    jp Bankswitch
-
 HackBackSpriteAccess:
     ld a,$66 ; BackSprite dimension
     ld de,$9310
     push de
     jp HackBackSprite
+
+; Free
 
 SECTION "Func_3d0ca",ROMX[$50ca],BANK[$f]
 
@@ -57885,7 +57898,17 @@ HandleCounterMove: ; Moved in the Bank
     xor a
     ret
 
-; Free
+HalvePlayerSpeedAfterRun:
+    srl a ; Player Speed divided by 2
+    ld [$FF00+$97],a
+    ld a,[hl]
+    rr a  ; Player Speed divided by 2
+    ret
+
+ReflectLightScreenEffect: ; Moved in the Bank
+    ld hl,ReflectLightScreenEffect_
+    ld b,BANK(ReflectLightScreenEffect_)
+    jp Bankswitch
 
 SECTION "ApplyAttackToEnemyPokemon",ROMX[$60df],BANK[$f]
 
@@ -59445,39 +59468,39 @@ EffectsArray3:
 ; non-side effects not included in ResidualEffects1
 ; stat-affecting moves, sleep-inflicting moves, and Bide
 ; e.g., Meditate, Bide, Hypnosis
-	db $01
-	db ATTACK_UP1_EFFECT
-	db DEFENSE_UP1_EFFECT
-	db SPEED_UP1_EFFECT
-	db SPECIAL_UP1_EFFECT
-	db ACCURACY_UP1_EFFECT
-	db EVASION_UP1_EFFECT
-	db ATTACK_DOWN1_EFFECT
-	db DEFENSE_DOWN1_EFFECT
-	db SPEED_DOWN1_EFFECT
-	db SPECIAL_DOWN1_EFFECT
-	db ACCURACY_DOWN1_EFFECT
-	db EVASION_DOWN1_EFFECT
-	db BIDE_EFFECT
-	db SLEEP_EFFECT
-	db ATTACK_UP2_EFFECT
-	db DEFENSE_UP2_EFFECT
-	db SPEED_UP2_EFFECT
-	db SPECIAL_UP2_EFFECT
-	db ACCURACY_UP2_EFFECT
-	db EVASION_UP2_EFFECT
-	db ATTACK_DOWN2_EFFECT
-	db DEFENSE_DOWN2_EFFECT
-	db SPEED_DOWN2_EFFECT
-	db SPECIAL_DOWN2_EFFECT
-	db ACCURACY_DOWN2_EFFECT
-	db EVASION_DOWN2_EFFECT
-	db ATTACK_UP3_EFFECT
-	db DEFENSE_UP3_EFFECT
-	db SPEED_UP3_EFFECT
-	db SPECIAL_UP3_EFFECT
-	db ACCURACY_UP3_EFFECT
-	db EVASION_UP3_EFFECT
+    db $01
+    db ATTACK_UP1_EFFECT
+    db DEFENSE_UP1_EFFECT
+    db SPEED_UP1_EFFECT
+    db SPECIAL_UP1_EFFECT
+    db ACCURACY_UP1_EFFECT
+    db EVASION_UP1_EFFECT
+    db ATTACK_DOWN1_EFFECT
+    db DEFENSE_DOWN1_EFFECT
+    db SPEED_DOWN1_EFFECT
+    db SPECIAL_DOWN1_EFFECT
+    db ACCURACY_DOWN1_EFFECT
+    db EVASION_DOWN1_EFFECT
+    db BIDE_EFFECT
+    db SLEEP_EFFECT
+    db ATTACK_UP2_EFFECT
+    db DEFENSE_UP2_EFFECT
+    db SPEED_UP2_EFFECT
+    db SPECIAL_UP2_EFFECT
+    db ACCURACY_UP2_EFFECT
+    db EVASION_UP2_EFFECT
+    db ATTACK_DOWN2_EFFECT
+    db DEFENSE_DOWN2_EFFECT
+    db SPEED_DOWN2_EFFECT
+    db SPECIAL_DOWN2_EFFECT
+    db ACCURACY_DOWN2_EFFECT
+    db EVASION_DOWN2_EFFECT
+    db ATTACK_UP3_EFFECT
+    db DEFENSE_UP3_EFFECT
+    db SPEED_UP3_EFFECT
+    db SPECIAL_UP3_EFFECT
+    db ACCURACY_UP3_EFFECT
+    db EVASION_UP3_EFFECT
     db STAT_UP1_DOWN_SIDE_EFFECT
     db $FF
 
@@ -59972,7 +59995,7 @@ ApplyBadgeStatBoosts: ; Moved in the Bank
     ld a,[W_OBTAINEDBADGES] ; $d356
     ld b,a
     call SwapBit2And4 ; bugfix Thunder & Soul
-	call SelectiveBadgeBoost
+    call SelectiveBadgeBoost
     ld hl,W_PLAYERMONATK
     ld c,$4
 ; the boost is applied for badges whose bit position is even
@@ -60908,7 +60931,7 @@ StatModifierUpEffect: ; Moved in the Bank
     inc d ; de = unmodified (original) stat
 .checkIf999
     pop bc
-	; check if stat is already 999
+    ; check if stat is already 999
     ld a,[hld]
     sub $e7
     jr nz,.recalculateStat
@@ -61646,13 +61669,13 @@ UnnamedText_3f912: ; 3f912 (f:7912)
     db "@"
 
 CheckTrappingToResetPlayerHyperBeam:
-    cp TRAPPING_EFFECT	;joenote - clear hyper beam if target hit with trapping effect
+    cp TRAPPING_EFFECT ;joenote - clear hyper beam if target hit with trapping effect
     call z,ClearHyperBeam
     ld a,[W_PLAYERMOVEPOWER]
     ret
 
 CheckTrappingToResetEnemyHyperBeam:
-    cp TRAPPING_EFFECT	;joenote - clear hyper beam if target hit with trapping effect
+    cp TRAPPING_EFFECT ;joenote - clear hyper beam if target hit with trapping effect
     call z,ClearHyperBeam
     ld a,[W_ENEMYMOVEPOWER]
     ret
@@ -62212,13 +62235,13 @@ HybridSpriteInfo:
     db MEDIUM_PIC
     db BANK(GhostPic)
     dw GhostPic
-	dw MissingNoPicBack ; TODO
+    dw MissingNoPicBack ; TODO
 
     db CHARIZARD_M
-	db LARGE_PIC
-	db BANK(CharizardMPicFront)
-	dw CharizardMPicFront
-	dw CharizardMPicBack
+    db LARGE_PIC
+    db BANK(CharizardMPicFront)
+    dw CharizardMPicFront
+    dw CharizardMPicBack
 
 CheckSpecialHybridSprite: ; Denim
     ld a,[$cf91] ; Pkmn ID
@@ -81414,11 +81437,11 @@ BoostExpCurrentMon:
 
 TryToBoostUnderLevelled:
     ld a,[W_PLAYERMONLEVEL]
-	ld b,a
-	ld a,[W_ENEMYMONLEVEL]
-	cp b
-	ret z ; return if enemy lvl = player level
-	ret c ; return if enemy lvl < player level
+    ld b,a
+    ld a,[W_ENEMYMONLEVEL]
+    cp b
+    ret z ; return if enemy lvl = player level
+    ret c ; return if enemy lvl < player level
     jp BoostExp
 
 ; add 1/16 exp to exp
@@ -110748,7 +110771,7 @@ AnimationSlideMonDownAndHide: ; 795c9 (1e:55c9)
     ld c,30
     call DelayFrames
     call AnimationSlideMonUp
-	jp AnimationShowMonPic
+    jp AnimationShowMonPic
 
 SECTION "Func_795f8",ROMX[$55f8],BANK[$1e]
 
@@ -133993,16 +134016,16 @@ Route6Mons:
     db 13,POLIWAG    ;  4%
     db 13,PSYDUCK    ;  1%
     db $05
-	db 20,POLIWAG    ; 20%
-	db 19,FARFETCH_D ; 20%
-	db 24,PSYDUCK    ; 15%
-	db 16,POLIWAG    ; 10%
-	db 27,PSYDUCK    ; 10%
-	db 25,POLIWHIRL  ; 10%
-	db 28,POLIWHIRL  ;  5%
-	db 23,FARFETCH_D ;  5%
-	db 32,POLIWRATH  ;  4% ; Entry Level
-	db 33,GOLDUCK    ;  1% ; Entry Level
+    db 20,POLIWAG    ; 20%
+    db 19,FARFETCH_D ; 20%
+    db 24,PSYDUCK    ; 15%
+    db 16,POLIWAG    ; 10%
+    db 27,PSYDUCK    ; 10%
+    db 25,POLIWHIRL  ; 10%
+    db 28,POLIWHIRL  ;  5%
+    db 23,FARFETCH_D ;  5%
+    db 32,POLIWRATH  ;  4% ; Entry Level
+    db 33,GOLDUCK    ;  1% ; Entry Level
 
 VermilionMons:
     db $00
