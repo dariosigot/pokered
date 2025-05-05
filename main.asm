@@ -2353,7 +2353,7 @@ CollisionCheckOnWater: ; 0fb7 (0:0fb7)
     ld a,[$c10c] ; the player sprite's collision data (bit field) (set in the sprite movement code)
     and d ; check if a sprite is in the direction the player is trying to go
     jr nz,.collision
-    
+
     ld d,%00000010 ; TryStopSurfing
     call CheckExceptionTilePassable
     jr nc,.noCollision
@@ -10072,7 +10072,7 @@ PrintNumber: ; 3c5f (0:3c5f)
     call PrintNumber_PrintDigit
     jp PrintNumber_AdvancePointer
 
-SECTION "PrintNumber_PrintDigit",ROM0[$3d25] 
+SECTION "PrintNumber_PrintDigit",ROM0[$3d25]
 
 ; prints a decimal digit
 ; This works by repeatedely subtracting a power of ten until the number becomes negative.
@@ -10751,7 +10751,7 @@ IsTryingToLearnPalFix_PrintText:
     push hl
     call IsTryingToLearnPalFix
     pop hl
-    jp PrintText    
+    jp PrintText
 
 IsTryingToLearnPalFix_End:
     ld a,[W_ISINBATTLE]
@@ -14393,7 +14393,7 @@ SetOptionsFromCursorPositions:
 .battleStyleShift
     res 5,d
 .storeOptions
-    set 6,d ; Real Battle Style 
+    set 6,d ; Real Battle Style
     ld a,d
     ld [W_OPTIONS],a
     ret
@@ -14405,7 +14405,7 @@ SetCureDuringAbsorb:
 
 ; Free Space
 
-SECTION "SetCursorPositionsFromOptions",ROMX[$604c],BANK[$1] 
+SECTION "SetCursorPositionsFromOptions",ROMX[$604c],BANK[$1]
 
 ; reads the options variable and places menu cursors in the correct positions within the options menu
 SetCursorPositionsFromOptions: ; 604c (1:604c)
@@ -16273,7 +16273,7 @@ LearnMove: ; 6e43 (1:6e43)
     call IsTryingToLearnPalFix_End
     ld b,$0 ; 0 = No Learn
     ret
-    
+
 .LearnedMoveComplete
     pop bc
     ld b,c ; 1 = Learn directly | 2 = Learn by replacing Move
@@ -18296,7 +18296,7 @@ SwapItemNew:
     ld a,[hli] ; e = item 1 QTY | hl = 2 ► 3
     ld e,a     ; ...
     ld c,[hl]  ; c = item 2 ID  | hl = 3
-    ld a,d     ; item 2 ID = d 
+    ld a,d     ; item 2 ID = d
     ld [hli],a ; ...            | hl = 3 ► 4
     ld d,[hl]  ; d = item 2 QTY | hl = 4
     ld a,e     ; item 2 Qty = e
@@ -18596,7 +18596,7 @@ SetLastBlackoutMap:
 
 ; ───────────────────────────────────────
 
-DetectCollisionBetweenSprites: ; Restore Original Player Y (Not consider Jump) 
+DetectCollisionBetweenSprites: ; Restore Original Player Y (Not consider Jump)
     ld hl,$c104
     ld a,[hl]
     push af
@@ -18660,7 +18660,7 @@ Trade_BackupEnemyIVandAltForm:
 HandleIVAndLoadRenameScreenDuringNameRater_FromAnotherBank:
     ld h,d
     ld l,e
-    jp HandleIVAndLoadRenameScreenDuringNameRater 
+    jp HandleIVAndLoadRenameScreenDuringNameRater
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -23207,14 +23207,14 @@ UseItem_: ; Moved in the Bank
     dw ItemUseMedicine   ; HYPER_POTION
     dw ItemUseMedicine   ; SUPER_POTION
     dw ItemUseMedicine   ; POTION
-    dw ItemUseBait       ; 
-    dw ItemUseRock       ; 
+    dw ItemUseBait       ;
+    dw ItemUseRock       ;
     dw ItemUseEvoStone   ; DUSK_STONE
-    dw UnusableItem      ; 
-    dw UnusableItem      ; 
-    dw UnusableItem      ; 
-    dw UnusableItem      ; 
-    dw UnusableItem      ; 
+    dw UnusableItem      ;
+    dw UnusableItem      ;
+    dw UnusableItem      ;
+    dw UnusableItem      ;
+    dw UnusableItem      ;
     dw ItemUseEscapeRope ; ESCAPE_ROPE
     dw ItemUseRepel      ; REPEL
     dw UnusableItem      ; OLD_AMBER
@@ -24540,7 +24540,7 @@ BaitRockCommon: ; Moved in the Bank
     cp a,5
     jr nc,.randomLoop
     inc a ; increment the random number,giving a range from 1 to 5 inclusive
-;joenote - There is a bug here. 
+;joenote - There is a bug here.
 ; - The 1-to-5 number is always decremented when PrintSafariZoneBattleText runs.
 ; - So getting a number of 1 will decrement immediately to zero and do nothing to the eating/angry state.
 ; - To get an effective 1-to-5 turns, increment once more to bump the range to 2-to-6
@@ -24826,7 +24826,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     ld b,~SLP & $FF
     ld hl,W_PARTYMON1_STATUS
     call WakeUpEntireParty
-    
+
     ld a,[W_ISINBATTLE]
     and a
     jr z,.NotInBattle
@@ -29013,7 +29013,7 @@ GetAlternateForm:
 
     db $FF
 
-; Generate Random only if 
+; Generate Random only if
 ; • Pkmn Is Added ToParty with Rename Screen (Out Of Battle)
 ; • Pkmn Is Added ToParty without Rename Screen
 InsertIVDuringAddMonToParty:
@@ -29045,7 +29045,7 @@ InsertIVFromEnemyMonData:
     ld [hli],a
     ld a,[W_ENEMYMONSPDSPCIV]
     ld [hl],a
-    ret    
+    ret
 
 ; animates the HP bar going up or down for (a) ticks (two waiting frames each)
 ; stops prematurely if bar is filled up
@@ -30912,7 +30912,7 @@ RecoilEffect_: ; 1392c (4:792c)
     and a
     ld a,$1
     jr z,.asm_13990
-    FuncCoord 02,02 ; Enemy Bar in Battle 
+    FuncCoord 02,02 ; Enemy Bar in Battle
     ld hl,Coord
     xor a
 .asm_13990
@@ -41238,7 +41238,7 @@ Route2HouseText2: ; Moved in the Bank
 
 ; Free
 
-SECTION "Route5Gate_h",ROMX[$5f27],BANK[$7] 
+SECTION "Route5Gate_h",ROMX[$5f27],BANK[$7]
 
 Route5Gate_h: ; 0x1df27 to 0x1df33 (12 bytes) (bank=7) (id=70)
     db $0c ; tileset
@@ -44303,7 +44303,7 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     ld a,[hli]
     ld b,a
     call .Loop
-    
+
     ; Save Exclusive Move in Mon Internal Bytes from 4 Moves
     ld hl,W_PARTYMON1_MOVE1
     ld a,[wWhichPokemon]
@@ -44377,7 +44377,7 @@ SentNewMonToBox_TryToAddExclusiveMove:
     ld a,[hli]
     ld b,a
     call .Loop
-    
+
     ; Save Exclusive Move in Mon Internal Bytes from 4 Moves
     ld hl,W_BOXMON1DATA+(W_PARTYMON1_MOVE1-W_PARTYMON1DATA)
     ld b,4
@@ -47678,14 +47678,14 @@ TypeNamePointers:
     dw Type07Name ; $07 : Bug
     dw Type08Name ; $08 : Ghost
     dw Type09Name ; $09 : Metal
-    dw TypeNAName ; 
-    dw TypeNAName ; 
-    dw TypeNAName ; 
-    dw TypeNAName ; 
-    dw TypeNAName ; 
-    dw TypeNAName ; 
-    dw TypeNAName ; 
-    dw TypeNAName ; 
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
     dw Type12Name ; $12 : Ivory
     dw Type13Name ; $13 : Rubber
     dw Type14Name ; $14 : Fire
@@ -49743,7 +49743,7 @@ INCLUDE "constants/moves.asm"
 
 ;joenote - this function checks to see if a pkmn is paralyzed or burned
 ;then it doubles attack if burned or quadruples speed if paralyzed.
-;It's meant to be run right before healing paralysis or burn so as to 
+;It's meant to be run right before healing paralysis or burn so as to
 ;undo the stat changes.
 UndoBurnParStats:
     ld hl,W_PLAYERMONSTATUS
@@ -49808,7 +49808,7 @@ DoubleSelectedStats:
     ;Note that if a < $E7 then the carry bit 'c' in the flag register gets set due to overflowing with a negative result.
     ld a,b ;now let's work on the high byte
     sbc 999 / $100 ;a = a - ($03E7 / $100 + c_flag). Gives a = a - ($03 + c_flag). A byte / $100 always gives the greater nibble.
-    ;Note again that if a < $03 then the carry bit remains set. 
+    ;Note again that if a < $03 then the carry bit remains set.
     ;If the bit is already set from the lesser nibble,then its addition here can still make it remain set if a is low enough.
     jr c,.donecapping ;jump to next marker if the c_flag is set. This only remains set if BC <  the cap of $03E7.
     ;else let's continue and set the 999 cap
@@ -51031,7 +51031,7 @@ AfterEvolution_TryToAddExclusiveMove:
     ld a,[hli]
     ld b,a
     call .Loop
-    
+
     ; Save Exclusive Move in Mon Internal Bytes from 4 Moves
     ld hl,W_PARTYMON1_MOVE1
     ld a,[wWhichPokemon]
@@ -51914,7 +51914,7 @@ WriteMonMoves: ; Moved in the Bank
     ;rl b
     ;ld c,a
     ;add hl,bc
-    
+
     ld hl,W_MON_LEARNSET_POINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
@@ -52995,7 +52995,7 @@ AICureStatus: ; Moved in the Bank
     ld [W_ENEMYTOXICCOUNTER], a ;clear toxic counter
     ld hl,W_ENEMYBATTSTATUS3 ;clear toxic bit
     res 0,[hl]
-    ; need to redraw the enemy trainer hud 
+    ; need to redraw the enemy trainer hud
     push af
     ld hl,DrawEnemyHUDAndHPBar
     ld b,BANK(DrawEnemyHUDAndHPBar)
@@ -53836,7 +53836,7 @@ UpdateCurMonHPBar: ; 3c4f6 (f:44f6)
     and a
     ld a,$1
     jr z,.playersTurn
-    FuncCoord 02,02 ; Enemy Bar in Battle 
+    FuncCoord 02,02 ; Enemy Bar in Battle
     ld hl,Coord    ; tile pointer to enemy HP bar
     xor a
 .playersTurn
@@ -53983,7 +53983,7 @@ FaintEnemyPokemon ; 0x3c567
 
 HackGainExpAfterCatch:
     call IsFocusInBagOrAllFought
-    push af    
+    push af
     jr c,.focus
     ld hl,ModulateExpForMonsThatFought
     ld b,BANK(ModulateExpForMonsThatFought)
@@ -58741,9 +58741,9 @@ MoveHitTest: ; Moved in the Bank
     bit 0,a ; USING_X_ACCURACY ; is the player using X Accuracy?
     jr z,.calcHitChance
     ; if so, always hit regardless of accuracy/evasion
-.player_ohko_xacc    ;joenote - player ohko moves now ignore x accuracy 
+.player_ohko_xacc    ;joenote - player ohko moves now ignore x accuracy
     ; this section is entered if the player is using x accuracy
-    ld a,[W_PLAYERMOVEEFFECT] ; load the move effect 
+    ld a,[W_PLAYERMOVEEFFECT] ; load the move effect
     cp OHKO_EFFECT            ; check if it's an ohko move
     ret nz                    ; if not, the x accuracy skips hit chance
     jr .calcHitChance         ; else do normal accuracy checks
@@ -58770,9 +58770,9 @@ MoveHitTest: ; Moved in the Bank
     bit 0,a ; USING_X_ACCURACY ; is the enemy using X Accuracy?
     jr z,.calcHitChance
     ; if so, always hit regardless of accuracy/evasion
-.enemy_ohko_xacc    ;joenote - enemy ohko moves now ignore x accuracy 
+.enemy_ohko_xacc    ;joenote - enemy ohko moves now ignore x accuracy
     ; this section is entered if the enemy is using x accuracy
-    ld a,[W_ENEMYMOVEEFFECT] ; load the move effect 
+    ld a,[W_ENEMYMOVEEFFECT] ; load the move effect
     cp OHKO_EFFECT           ; check if it's an ohko move
     ret nz                   ; if not, the x accuracy skips hit chance
     ;jr .calcHitChance       ; else do normal accuracy checks
@@ -60878,7 +60878,7 @@ StatModifierUpEffect: ; Moved in the Bank
 .statupcheck
     ld c,a
     ld b,$0
-    inc a              ; joenote - backup the address offset for the stat mod 
+    inc a              ; joenote - backup the address offset for the stat mod
     ld [wBackupStatRaisedLoweredType],a ; ...
     add hl,bc
     ld b,[hl]
@@ -61128,7 +61128,7 @@ StatModifierDownEffect: ; Moved in the Bank
 .decrementStatMod
     ld c,a
     ld b,$0
-    inc a              ; joenote - backup the address offset for the stat mod 
+    inc a              ; joenote - backup the address offset for the stat mod
     ld [wBackupStatRaisedLoweredType],a ; ...
     add hl,bc
     ld b,[hl]
@@ -76412,7 +76412,7 @@ Route20Object: ; 0x50113 (size=106)
 Route20Blocks: ; 5017d (14:417d)
     INCBIN "maps/route20.blk"
 
-SECTION "Route24_h",ROMX[$4682],BANK[$14] 
+SECTION "Route24_h",ROMX[$4682],BANK[$14]
 
 Route24_h: ; 0x50682 to 0x506a4 (34 bytes) (id=35)
     db $00 ; tileset
@@ -77561,7 +77561,7 @@ Route23Script0: ; 51219 (14:5219)
     ld [H_CURRENTPRESSEDBUTTONS],a
     ret
 
-SECTION "YCoordsData_51255",ROMX[$5255],BANK[$14] 
+SECTION "YCoordsData_51255",ROMX[$5255],BANK[$14]
 
 YCoordsData_51255: ; 51255 (14:5255)
     db $35,$5F,$67,$6F,$77,$7F,$87,$FF
@@ -94831,7 +94831,7 @@ ViridianForestTextPointers: ; 61126 (18:5126)
     dw ViridianForestText13
     dw ViridianForestText14
 
-SECTION "ViridianForestTrainerHeaders",ROMX[$5142],BANK[$18] 
+SECTION "ViridianForestTrainerHeaders",ROMX[$5142],BANK[$18]
 
 ViridianForestTrainerHeaders: ; 61142 (18:5142)
 ViridianForestTrainerHeader0: ; 61142 (18:5142)
@@ -98099,7 +98099,7 @@ CheckBaloonRule:
     bit 3,[hl]
     res 3,[hl]
     ld hl,wLocationMonOvSprInstruction
-    ret    
+    ret
 
 SECTION "FlashingBallHealPokecenter",ROMX[$44f3],BANK[$1C]
 
@@ -108900,7 +108900,7 @@ TryToRemoveUnknownDungeonWaterBlocks:
     dw $82C7
     db $76
 .ChangedBlocksEnd
-    
+
 SECTION "bank1E",ROMX,BANK[$1E]
 
 ; Draws a "frame block". Frame blocks are blocks of tiles that are put
@@ -121200,7 +121200,7 @@ _MoveDisabledText:
     db $0,"The move is",$4f
     db "disabled!",$58
 
-SECTION "_MoveDisabledText",ROMX[$587b],BANK[$22] 
+SECTION "_MoveDisabledText",ROMX[$587b],BANK[$22]
 
 _MultiHitText: ; 898aa (22:58aa)
     db 0,"Hit the enemy",$4F,"@"
@@ -121400,7 +121400,7 @@ _UnnamedText_554b2: ; 89bc2 (22:5bc2)
 ;    db $0,"with EXP.ALL,",$55
 ;    db "@@"
 
-SECTION "_UnnamedText_554d4",ROMX[$5be1],BANK[$22] 
+SECTION "_UnnamedText_554d4",ROMX[$5be1],BANK[$22]
 
 _UnnamedText_554d4: ; 89be1 (22:5be1)
     db $0,"a boosted",$55
@@ -122448,7 +122448,7 @@ _UnnamedText_4968c: ; 8cbac (23:4bac)
     db "it,you should ",$55
     db "store it via PC.",$57
 
-SECTION "_UnnamedText_49698",ROMX[$4c65],BANK[$23] 
+SECTION "_UnnamedText_49698",ROMX[$4c65],BANK[$23]
 
 _UnnamedText_49698: ; 8cc65 (23:4c65)
     db $0,"Looked into the",$4f
@@ -130947,7 +130947,7 @@ _ItemUseBallText05: ; a67cf (29:67cf)
     dw W_ENEMYMONNAME
     db 0,$4f,"was caught!@@"
 
-SECTION "_ItemUseBallText08",ROMX[$6810],BANK[$29] 
+SECTION "_ItemUseBallText08",ROMX[$6810],BANK[$29]
 
 _ItemUseBallText08: ; a6810 (29:6810)
     db 1
@@ -132194,7 +132194,7 @@ SelectInOverWorld:
 .TryLight
     ; ──────────────────────────────────── Light
     ld a,[$d35d]
-    and a 
+    and a
     jr z,.noLight
     ld a,[W_OBTAINEDBADGES] ; badges obtained
     bit 0,a ; does the player have the Boulder Badge?
@@ -135916,7 +135916,7 @@ UndoDivisionExp:
     dec c               ; decrement participating pkmn
     jr nz, .exp_adder_loop
     ld [hl],a           ; stick the exp values, now multiplied by the number of participating pkmn, back into the stat address
-    inc hl              ; get next stat 
+    inc hl              ; get next stat
     dec b
     jr nz, .exp_stat_loop
     ret
@@ -136019,7 +136019,7 @@ LoadHpBarAndStatusTilePatterns_:
     jp GoodCopyVideoData
 
 ; INPUT
-; d = High Bit Return Pointer 
+; d = High Bit Return Pointer
 ; e = Low Bit Return Pointer
 _HackFromBank0:
     ld hl,.Table
@@ -136173,7 +136173,7 @@ ForceShinyOrRandom_:
 SetExplodeFlag_:
     xor a ; Reset Carry Flag
     ld a,[wPlayerMonNumber]
-    ld e,%00000001 ; 1 bit to rotate 
+    ld e,%00000001 ; 1 bit to rotate
 .Loop
     and a
     jr z,.EndLoop
@@ -138132,7 +138132,7 @@ HandleStatusScreen2:
     add hl,bc
     ld d,h
     ld e,l
-    
+
     push de
     push de
     push de
@@ -138690,7 +138690,7 @@ DisplayDepositWithdrawMenu_:
     ld hl,Coord
     call ClearScreenArea
     pop af
-    ret   
+    ret
 
 .DepositWithdrawMonTitle
     ; Clear Title Area
@@ -138861,7 +138861,7 @@ PrintBattleValueNearMon_:
     ld hl,wBattleValueCounter
     ld [hl],b
     ret
-    
+
 .ClearScreenArea
     ld bc,$0106 ; 01 | 06
     jp ClearScreenArea
@@ -139831,7 +139831,7 @@ CritHitStatsCommon:
     call Load16BitRegisters
     push de
     call .saveatk
-    
+
     call .reset
     ;get unmodified defensive stat,divide by 4,and place it as a multiplier
     push bc
@@ -139871,7 +139871,7 @@ CritHitStatsCommon:
     ;multiply the two together and retrieve the previously saved product
     call Multiply
     pop de
-    
+
     ;If the first product (in de) is >= the second product (in the hram product addresses),
     ;then the critical hit would do less damage than a non-crit attack.
     ;If so,restore the modified stats to prevent this.
@@ -139887,7 +139887,7 @@ CritHitStatsCommon:
     pop bc
     call .restoreatk
     call nc,.restoreStats
-    
+
     pop de
     ld a,1
     ld [wCriticalHitOrOHKO],a
@@ -140002,7 +140002,7 @@ BC999cap_:
     ;Note that if a < $E7 then the carry bit 'c' in the flag register gets set due to overflowing with a negative result.
     ld a,b ;now let's work on the high byte
     sbc 999 / $100 ;a = a - ($03E7 / $100 + c_flag). Gives a = a - ($03 + c_flag). A byte / $100 always gives the greater nibble.
-    ;Note again that if a < $03 then the carry bit remains set. 
+    ;Note again that if a < $03 then the carry bit remains set.
     ;If the bit is already set from the lesser nibble, then its addition here can still make it remain set if a is low enough.
     jr c,.donecapping ;jump to next marker if the c_flag is set. This only remains set if BC <  the cap of $03E7.
     ;else let's continue and set the 999 cap
