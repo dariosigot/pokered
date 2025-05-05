@@ -23564,8 +23564,6 @@ ItemUseBall: ; d687 (3:5687)
     ld a,[W_BATTLETYPE]
     dec a
     jr z,.printText1
-    call StopAlarmAndLoadCaughtText ; ld hl,ItemUseBallText05
-    call PrintText
     ld a,$3a    ;convert order: Internal->Dex
     call Predef
     ld a,[$d11e]
@@ -23583,6 +23581,11 @@ ItemUseBall: ; d687 (3:5687)
     ld b,1
     ld a,$10    ;set Dex_own_flag?
     call Predef
+    ld b,BANK(DrawEnemyHUDAndHPBar)
+    ld hl,DrawEnemyHUDAndHPBar
+    call Bankswitch
+    call StopAlarmAndLoadCaughtText ; ld hl,ItemUseBallText05
+    call PrintText
     pop af
     and a
     jr nz,.checkParty
