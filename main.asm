@@ -10760,22 +10760,32 @@ IsTryingToLearnPalFix_End:
     call LoadScreenTilesFromBuffer1
     jp GoPAL_SET_CF1C
 
-Func_4277: ; Moved in the Bank
+PrintSafariZoneBattleText: ; Moved in the Bank
     ld hl,$cce9
     ld a,[hl]
     and a
-    jr z,.asm_4284
+    jr z,.checkAngry
+.isEating
     dec [hl]
-    ld hl,.UnnamedText_42a7
-    jr .asm_429f
-.asm_4284
+    jr z,.resetCatchRate
+    ld hl,.EatingText
+    jr .PrintText
+.checkAngry
     dec hl
     ld a,[hl]
     and a
     ret z
+.isAngry
     dec [hl]
-    ld hl,.UnnamedText_42ac
-    jr nz,.asm_429f
+    jr z,.resetCatchRate
+    ld hl,.AngryText
+    ; fall through
+.PrintText
+    push hl
+    call LoadScreenTilesFromBuffer1
+    pop hl
+    jp PrintText
+.resetCatchRate
     push hl
     ld a,[$cfe5]
     ld [$d0b5],a
@@ -10785,15 +10795,12 @@ Func_4277: ; Moved in the Bank
     ld a,[W_MONHCATCHRATE]
     ld [$d007],a
     pop hl
-.asm_429f
-    push hl
-    call LoadScreenTilesFromBuffer1
-    pop hl
-    jp PrintText
-.UnnamedText_42a7
+    xor a
+    ret
+.EatingText
     TX_FAR SafariZoneEatingText
     db "@"
-.UnnamedText_42ac
+.AngryText
     TX_FAR SafariZoneAngryText
     db "@"
 
@@ -24494,9 +24501,7 @@ HandleBackupAfterBallCatch:
     ld [wBackupEnemyPP],a ; ...
     ret
 
-SECTION "ItemUseBait",ROMX[$5f52],BANK[$3]
-
-ItemUseBait: ; df52 (3:5f52)
+ItemUseBait: ; Moved in the Bank
     ld hl,ThrewBaitText
     call PrintText
     ld hl,$d007 ; catch rate
@@ -24506,7 +24511,7 @@ ItemUseBait: ; df52 (3:5f52)
     ld de,$cce8 ; escape factor
     jr BaitRockCommon
 
-ItemUseRock: ; df67 (3:5f67)
+ItemUseRock: ; Moved in the Bank
     ld hl,ThrewRockText
     call PrintText
     ld hl,$d007 ; catch rate
@@ -24520,7 +24525,7 @@ ItemUseRock: ; df67 (3:5f67)
     ld hl,$cce8 ; escape factor
     ld de,$cce9 ; bait factor
 
-BaitRockCommon: ; df7f (3:5f7f)
+BaitRockCommon: ; Moved in the Bank
     ld [W_ANIMATIONID],a
     xor a
     ld [$cc5b],a
@@ -24532,6 +24537,11 @@ BaitRockCommon: ; df7f (3:5f7f)
     cp a,5
     jr nc,.randomLoop
     inc a ; increment the random number,giving a range from 1 to 5 inclusive
+;joenote - There is a bug here. 
+; - The 1-to-5 number is always decremented when PrintSafariZoneBattleText runs.
+; - So getting a number of 1 will decrement immediately to zero and do nothing to the eating/angry state.
+; - To get an effective 1-to-5 turns, increment once more to bump the range to 2-to-6
+    inc a
     ld b,a
     ld a,[hl]
     add b ; increase bait factor (for bait),increase escape factor (for rock)
@@ -24541,16 +24551,16 @@ BaitRockCommon: ; df7f (3:5f7f)
     ld [hl],a
     ld a,$08
     jp RockDamageOrBaitHealth ; call Predef ; do animation
-    ds 2 ; ld c,70
-    ds 3 ; jp DelayFrames
 
-ThrewBaitText: ; dfa5 (3:5fa5)
+ThrewBaitText:
     TX_FAR _ThrewBaitText
     db "@"
 
-ThrewRockText: ; dfaa (3:5faa)
+ThrewRockText:
     TX_FAR _ThrewRockText
     db "@"
+
+SECTION "ItemUseEscapeRope",ROMX[$5faf],BANK[$3]
 
 ; also used for Dig out-of-battle effect
 ItemUseEscapeRope: ; dfaf (3:5faf)
@@ -53262,9 +53272,9 @@ StartBattle: ; 3c11e (f:411e)
     ld hl,UnnamedText_3c1a8 ; $41a8
     jp PrintText
 .asm_3c17a
-    ld hl,Func_4277
-    ld b,BANK(Func_4277)
-    call Bankswitch ; indirect jump to Func_4277 (4277 (1:4277))
+    ld hl,PrintSafariZoneBattleText
+    ld b,BANK(PrintSafariZoneBattleText)
+    call Bankswitch ; indirect jump to PrintSafariZoneBattleText (4277 (1:4277))
     ld a,[$cffb]
     add a
     ld b,a
