@@ -11418,14 +11418,15 @@ PrepareOAMData: ; 4b0f (1:4b0f)
     call Func_4bd1
     jr .asm_4bad
 .spriteVisible
-    cp $a0
-    jr c,.considerOrientation ; if >= $a0,ignore the sprite orientation and animation (by using a different conversion table)
-    and $f
-    add $10
-    jr .asm_4b48
-.considerOrientation
-    and $f                     ; the lower nybble contains orientation and animation info
-.asm_4b48
+    call Handle4TileSpriteOrMonSprite
+;    cp $a0
+;    jr c,.considerOrientation ; if >= $a0,ignore the sprite orientation and animation (by using a different conversion table)
+;    and $f
+;    add $10
+;    jr .asm_4b48
+;.considerOrientation
+;    and $f                     ; the lower nybble contains orientation and animation info
+;.asm_4b48
     ld l,a
     push de
     inc d
@@ -11522,6 +11523,8 @@ PrepareOAMData: ; 4b0f (1:4b0f)
     ld [hl],b
     add hl,de
     jr .clearUnusedOAMEntriesLoop
+
+SECTION "Func_4bd1",ROMX[$4bd1],BANK[1]
 
 Func_4bd1: ; 4bd1 (1:4bd1)
     inc e
@@ -18108,6 +18111,23 @@ SpriteAttributeHandler: ; Denim
     pop af
     ret
 
+Handle4TileSpriteOrMonSprite:
+    dec e
+    dec e
+    ld a,[de]
+    inc e
+    inc e
+    cp SPRITE_SEEL+1
+    ld a,[de]
+    jr c,.considerOrientation
+    and $f
+    add $10
+    jr .end
+.considerOrientation
+    and $f
+.end
+    ret
+
 HackForBackupDVDuringTradeIn:
 ;    push af
 ;    ld a,[wWhichPokemon] ; $cf92
@@ -20870,7 +20890,7 @@ MapSongBanks: ; c04d (3:404d)
     db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; UnknownDungeon1
     db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; NameRater
     db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; CeruleanHouse2
-    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; UnknownDungeon4
     db (Music_Dungeon3        -$4000)/3 , BANK(Music_Dungeon3)        ; RockTunnel2
     db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo9
     db (Music_SilphCo         -$4000)/3 , BANK(Music_SilphCo)         ; SilphCo10
@@ -21121,7 +21141,7 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(UnknownDungeon1_h)
     db BANK(NameRater_h)
     db BANK(CeruleanHouse2_h)
-    db BANK(EmptyMap_h) ; unused
+    db BANK(UnknownDungeon4_h)
     db BANK(RockTunnel2_h)
     db BANK(SilphCo9_h)
     db BANK(SilphCo10_h)
@@ -22180,7 +22200,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHSE4
     dw MapHSXX
     dw MapHSXX
-    dw MapHSXX
+    dw MapHSE7
     dw MapHSXX
     dw MapHSE9
     dw MapHSEA
@@ -22492,10 +22512,11 @@ MapHSE2: ; cd54 (3:4d54)
     db UNKNOWN_DUNGEON_2,$01,Show
     db UNKNOWN_DUNGEON_2,$02,Show
     db UNKNOWN_DUNGEON_2,$03,Show
-MapHSE3: ; cd5d (3:4d5d)
+; Unused
+    ds 3 ; ($D1)
+MapHSE3:
     db UNKNOWN_DUNGEON_3,$01,Show
     db UNKNOWN_DUNGEON_3,$02,Show
-    db UNKNOWN_DUNGEON_3,$03,Show
 MapHS6C: ; cd66 (3:4d66)
     db VICTORY_ROAD_1,$03,Show
     db VICTORY_ROAD_1,$04,Show
@@ -22537,34 +22558,14 @@ MapHSDB:
 MapHSDC:
     db SAFARI_ZONE_CENTER,$01,Show
     db SAFARI_ZONE_CENTER,$02,Hide ; $EF -> $F1 (Lapras)
+MapHSE7:
+    db UNKNOWN_DUNGEON_4,$01,Show ; $F2 (Mewtwo)
+    db UNKNOWN_DUNGEON_4,$02,Show ; $F3 (Alakazam)
+    db UNKNOWN_DUNGEON_4,$03,Show ; $F4 (Machamp)
+    db UNKNOWN_DUNGEON_4,$04,Show ; $F5 (Golem)
+    db UNKNOWN_DUNGEON_4,$05,Show ; $F6 (Gengar)
 
     db $FF,$01,Show
-
-IsSurfingAllowed:
-    ld hl,$d728
-    set 1,[hl]
-    ld a,[$d732]
-    bit 5,a
-    jr nz,.asm_cdec
-    call GetCurrentOldAdventureMap
-    cp SEAFOAM_ISLANDS_5
-    ret nz
-    ld a,[$d881]
-    and $3
-    cp $3
-    ret z
-    ld hl,CoordsData_cdf7 ; $4df7
-    call ArePlayerCoordsInArray
-    ret nc
-    ld hl,$d728
-    res 1,[hl]
-    ld hl,UnnamedText_cdfa ; $4dfa
-    jp PrintText
-.asm_cdec
-    ld hl,$d728
-    res 1,[hl]
-    ld hl,UnnamedText_cdff ; $4dff
-    jp PrintText
 
 SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
 
@@ -23275,6 +23276,32 @@ UseItem_: ; Moved in the Bank
     dw UnusableItem      ; HM_03 : WATER POWER
     dw UnusableItem      ; HM_04 : EARTH POWER
     dw UnusableItem      ; HM_05 : FIRE POWER
+
+IsSurfingAllowed:
+    ld hl,$d728
+    set 1,[hl]
+    ld a,[$d732]
+    bit 5,a
+    jr nz,.asm_cdec
+    call GetCurrentOldAdventureMap
+    cp SEAFOAM_ISLANDS_5
+    ret nz
+    ld a,[$d881]
+    and $3
+    cp $3
+    ret z
+    ld hl,CoordsData_cdf7 ; $4df7
+    call ArePlayerCoordsInArray
+    ret nc
+    ld hl,$d728
+    res 1,[hl]
+    ld hl,UnnamedText_cdfa ; $4dfa
+    jp PrintText
+.asm_cdec
+    ld hl,$d728
+    res 1,[hl]
+    ld hl,UnnamedText_cdff ; $4dff
+    jp PrintText
 
 SECTION "ItemUseBall",ROMX[$5687],BANK[$3]
 
@@ -32361,13 +32388,12 @@ LoadMapSpriteTilePatterns: ; 17871 (5:7871)
     ld a,b ; a = next VRAM tile pattern slot
     push af
     ld a,[hl] ; $C2XE (sprite picture ID)
-    ; ds 1 ; ld b,a ; b = current sprite picture ID
-    ; ds 2 ; cp a,SPRITE_BALL ; is it a 4-tile sprite?
-    call CheckSprite4Tile
+    ld b,a ; b = current sprite picture ID
+    cp SPRITE_BALL ; is it a 4-tile sprite?
     jr c,.notFourTileSprite
     pop af
     ld a,[$ff8e] ; 4-tile sprite counter
-    add a,11
+    add 11
     jr .storeVRAMSlot
 .notFourTileSprite
     pop af
@@ -32390,14 +32416,13 @@ LoadMapSpriteTilePatterns: ; 17871 (5:7871)
     inc h
 .noCarry2
     push hl
-    call ReadSpriteSheetData
-    push af
+    call .ReadSpriteSheetData
     push de
     push bc
     ld hl,$8000 ; VRAM base address
     ld bc,$c0 ; number of bytes per VRAM slot
     ld a,[$ff8d]
-    cp a,11 ; is it a 4-tile sprite?
+    cp 11 ; is it a 4-tile sprite?
     jr nc,.fourTileSpriteVRAMAddr
     ld d,a
     dec d
@@ -32420,56 +32445,34 @@ LoadMapSpriteTilePatterns: ; 17871 (5:7871)
 .loadStillTilePattern
     pop bc
     pop de
-    pop af
     push hl
-    push hl
-    ld h,d
-    ld l,e
-    pop de
-    ld b,a
     ld a,[$cfc4]
     bit 0,a ; reloading upper half of tile patterns after displaying text?
-    jr nz,.skipFirstLoad ; if so,skip loading data into the lower half
-    ld a,b
-    ld b,0
-    call FarCopyData2 ; load tile pattern data for sprite when standing still
-.skipFirstLoad
+    ; if so,skip loading data into the lower half
+    call z,.GoodCopyVideoData ; load tile pattern data for sprite when standing still
     pop de
     pop hl
     ld a,[$ff8d]
     cp a,11 ; is it a 4-tile sprite?
     jr nc,.skipSecondLoad ; if so,there is no second block
     push de
-    call ReadSpriteSheetData
-    push af
+    call .ReadSpriteSheetData
+    ld a,c
+    and a
+    jr nz,.Standard12Tiles
+    ld a,$40
+    jr .TilesCommon
+.Standard12Tiles
     ld a,$c0
+.TilesCommon
     add e
     ld e,a
     jr nc,.noCarry3
     inc d
 .noCarry3
-    ld a,[$cfc4]
-    bit 0,a ; reloading upper half of tile patterns after displaying text?
-    jr nz,.loadWhileLCDOn
-    pop af
     pop hl
     set 3,h ; add $800 to hl
-    push hl
-    ld h,d
-    ld l,e
-    pop de
-    call FarCopyData2 ; load tile pattern data for sprite when walking
-    jr .skipSecondLoad
-; When reloading the upper half of tile patterns after diplaying text,the LCD
-; will be on,so CopyVideoData (which writes to VRAM only during V-blank) must
-; be used instead of FarCopyData2.
-.loadWhileLCDOn
-    pop af
-    pop hl
-    set 3,h ; add $800 to hl
-    ld b,a
-    swap c
-    call CopyVideoData ; load tile pattern data for sprite when walking
+    call .GoodCopyVideoData ; load tile pattern data for sprite when walking
 .skipSecondLoad
     pop hl
     pop bc
@@ -32497,24 +32500,48 @@ LoadMapSpriteTilePatterns: ; 17871 (5:7871)
     jr nz,.zeroStoredPictureIDLoop
     ret
 
+.GoodCopyVideoData
+    ld a,c
+    and a
+    jp nz,GoodCopyVideoData
+    ld a,3
+.Loop4Tile3Times
+    push af
+    push bc
+    push de
+    push hl
+    ld c,4
+    call GoodCopyVideoData
+    pop hl
+    ld de,$40
+    add hl,de
+    pop de
+    pop bc
+    pop af
+    dec a
+    jr nz,.Loop4Tile3Times
+    ret
+
 ; reads data from SpriteSheetPointerTable
 ; INPUT:
 ; hl = address of sprite sheet entry
 ; OUTPUT:
 ; de = pointer to sprite sheet
-; bc = length in bytes
-; a = ROM bank
-ReadSpriteSheetData: ; 17971 (5:7971)
+; c = length in bytes
+; b = ROM bank
+.ReadSpriteSheetData
     ld a,[hli]
     ld e,a
     ld a,[hli]
     ld d,a
     ld a,[hli]
     ld c,a
-    xor a
-    ld b,a
+    swap c
     ld a,[hli]
+    ld b,a
     ret
+
+SECTION "InitOutsideMapSprites",ROMX[$797b],BANK[$5]
 
 ; Loads sprite set for outside maps (cities and routes) and sets VRAM slots.
 ; sets carry if the map is a city or route,unsets carry if not
@@ -33197,6 +33224,61 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $c0 ; byte count
     db BANK(SeelSprite)
 
+    ; SPRITE_ALAKAZAM
+    dw MonOverworldDataNew_emimonserrate+($80*((DEX_ALAKAZAM)%(128)))
+    db 0 ; byte count
+    db BANK(MonOverworldDataNew_emimonserrate)
+
+    ; SPRITE_MACHAMP
+    dw MonOverworldDataNew_emimonserrate+($80*((DEX_MACHAMP)%(128)))
+    db 0 ; byte count
+    db BANK(MonOverworldDataNew_emimonserrate)
+
+    ; SPRITE_GOLEM
+    dw MonOverworldDataNew_emimonserrate+($80*((DEX_GOLEM)%(128)))
+    db 0 ; byte count
+    db BANK(MonOverworldDataNew_emimonserrate)
+
+    ; SPRITE_GENGAR
+    dw MonOverworldDataNew_emimonserrate+($80*((DEX_GENGAR)%(128)))
+    db 0 ; byte count
+    db BANK(MonOverworldDataNew_emimonserrate)
+
+    ; SPRITE_LAPRAS
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_LAPRAS)%(128)))
+    db 0 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
+    ; SPRITE_AERODACTYL
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_AERODACTYL)%(128)))
+    db 0 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
+    ; SPRITE_ARTICUNO
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ARTICUNO)%(128)))
+    db 0 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
+    ; SPRITE_ZAPDOS
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ZAPDOS)%(128)))
+    db 0 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
+    ; SPRITE_MOLTRES
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MOLTRES)%(128)))
+    db 0 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
+    ; SPRITE_DRATINI
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_DRATINI)%(128)))
+    db 0 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
+    ; SPRITE_MEWTWO
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MEWTWO)%(128)))
+    db 0 ; byte count
+    db BANK(MonOverworldDataNew2_emimonserrate)
+
     ; SPRITE_BALL
     dw BallSprite
     db $40 ; byte count
@@ -33261,41 +33343,6 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     dw BasketSprite
     db $40 ; byte count
     db BANK(BasketSprite)
-
-    ; SPRITE_LAPRAS
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_LAPRAS)%(128)))
-    db $40 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
-
-    ; SPRITE_AERODACTYL
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_AERODACTYL)%(128)))
-    db $40 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
-
-    ; SPRITE_ARTICUNO
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ARTICUNO)%(128)))
-    db $40 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
-
-    ; SPRITE_ZAPDOS
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ZAPDOS)%(128)))
-    db $40 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
-
-    ; SPRITE_MOLTRES
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MOLTRES)%(128)))
-    db $40 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
-
-    ; SPRITE_DRATINI
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_DRATINI)%(128)))
-    db $40 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
-
-    ; SPRITE_MEWTWO
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MEWTWO)%(128)))
-    db $40 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
 
 Func_17c47: ; Move in the Bank
     ld a,[$cd50]
@@ -33602,19 +33649,6 @@ EmotionBubblesPointerTable: ; Move in the BANK
 EmotionBubblesOAM: ; Move in the BANK
     db $F8,$00,$F9,$00
     db $FA,$00,$FB,$00
-
-CheckSprite4Tile:
-    ld b,a ; b = current sprite picture ID
-    cp a,SPRITE_BALL ; is it a 4-tile sprite?
-    ; CP n | C - Set for no borrow. (Set if A < n.)
-    ret c
-    cp a,$FF;SPRITE_MEWTWO+1 ; TODO
-    jr c,.FourTileSprite
-    scf ; set carry flag
-    ret
-.FourTileSprite
-    xor a ; reset carry flag
-    ret
 
 Func_17d7d: ; Moved in the Bank
     ld a,[wPlayerMonAccuracyMod] ; $cd1e
@@ -69434,69 +69468,39 @@ UnknownDungeon3_h: ; 0x45ee4 to 0x45ef0 (12 bytes) (bank=11) (id=227)
     db $00 ; connections
     dw UnknownDungeon3Object ; objects
 
-UnknownDungeon3Script: ; 45ef0 (11:5ef0)
-    call EnableAutoTextBoxDrawing
-    ld hl,UnknownDungeon3TrainerHeaders
-    ld de,UnknownDungeon3ScriptPointers
-    ld a,[W_UNKNOWNDUNGEON3CURSCRIPT]
-    call ExecuteCurMapScriptInTable
-    ld [W_UNKNOWNDUNGEON3CURSCRIPT],a
-    ret
+UnknownDungeon3Script:
+    jp EnableAutoTextBoxDrawing
 
-UnknownDungeon3ScriptPointers: ; 45f03 (11:5f03)
+UnknownDungeon3ScriptPointers:
     dw CheckFightingMapTrainers
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
-UnknownDungeon3TextPointers: ; 45f09 (11:5f09)
-    dw UnknownDungeon3Text1
+UnknownDungeon3TextPointers:
     dw Predef5CText
     dw Predef5CText
 
-UnknownDungeon3TrainerHeaders: ; 45f0f (11:5f0f)
-UnknownDungeon3TrainerHeader0: ; 45f0f (11:5f0f)
-    db $1 ; flag's bit
-    db ($0 << 4) ; trainer's view range
-    dw $d85f ; flag's byte
-    dw UnknownDungeon3MewtwoText ; 0x5f26 TextBeforeBattle
-    dw UnknownDungeon3MewtwoText ; 0x5f26 TextAfterBattle
-    dw UnknownDungeon3MewtwoText ; 0x5f26 TextEndBattle
-    dw UnknownDungeon3MewtwoText ; 0x5f26 TextEndBattle
-
-    db $ff
-
-UnknownDungeon3Text1: ; 45f1c (11:5f1c)
-    db $08 ; asm
-    ld hl,UnknownDungeon3TrainerHeader0
-    call TalkToTrainer
-    jp TextScriptEnd
-
-UnknownDungeon3MewtwoText: ; 45f26 (11:5f26)
-    TX_FAR _UnknownDungeon3MewtwoText ; 0x85c72
-    db $8
-    ld a,MEWTWO
-    call PlayCry
-    call WaitForSoundToFinish
-    jp TextScriptEnd
-
-UnknownDungeon3Object: ; 0x45f36 (size=34)
+UnknownDungeon3Object:
     db $7d ; border tile
 
-    db $1 ; warps
+    db $2 ; warps
     db $6,$3,$8,UNKNOWN_DUNGEON_1
+    db 13,27,$0,UNKNOWN_DUNGEON_4
 
     db $0 ; signs
 
-    db $3 ; people
-    db SPRITE_MEWTWO,$d + 4,$1b + 4,$ff,$d0,$41,MEWTWO,OPP_LVL_OFFSET+70 ; Entry Level
+    db $2 ; people
     db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$82,ULTRA_BALL ; item
     db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
 
     ; warp-to
     EVENT_DISP $f,$6,$3 ; UNKNOWN_DUNGEON_1
+    EVENT_DISP $f,13,27 ; UNKNOWN_DUNGEON_4
 
-UnknownDungeon3Blocks: ; 45f58 (11:5f58)
+UnknownDungeon3Blocks:
     INCBIN "maps/unknowndungeon3.blk"
+
+SECTION "RockTunnel2_h",ROMX[$5fdf],BANK[$11]
 
 RockTunnel2_h: ; 0x45fdf to 0x45feb (12 bytes) (bank=11) (id=232)
     db $11 ; tileset
@@ -71524,6 +71528,172 @@ CheckJumpAndArePlayerCoordsInArray:
     jp z,ArePlayerCoordsInArray
     and a ; rcf
     ret
+
+; ───────────────────────────────────────
+
+UnknownDungeon4_h:
+    db $11 ; tileset
+    db UNKNOWN_DUNGEON_4_HEIGHT,UNKNOWN_DUNGEON_4_WIDTH ; dimensions (y,x)
+    dw UnknownDungeon4Blocks,UnknownDungeon4TextPointers,UnknownDungeon4Script ; blocks,texts,scripts
+    db $00 ; connections
+    dw UnknownDungeon4Object ; objects
+
+UnknownDungeon4Script:
+    call EnableAutoTextBoxDrawing
+    ld hl,UnknownDungeon4TrainerHeaders
+    ld de,UnknownDungeon4ScriptPointers
+    ld a,[W_UNKNOWNDUNGEON3CURSCRIPT]
+    call ExecuteCurMapScriptInTable
+    ld [W_UNKNOWNDUNGEON3CURSCRIPT],a
+    ret
+
+UnknownDungeon4ScriptPointers:
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+
+UnknownDungeon4TextPointers:
+    dw UnknownDungeon4Text1
+    dw UnknownDungeon4Text2
+    dw UnknownDungeon4Text3
+    dw UnknownDungeon4Text4
+    dw UnknownDungeon4Text5
+
+UnknownDungeon4TrainerHeaders:
+UnknownDungeon4TrainerHeader0:
+    db $1 ; flag's bit
+    db ($0 << 4) ; trainer's view range
+    dw $d85f ; flag's byte
+    dw UnknownDungeon4MewtwoText ; 0x5f26 TextBeforeBattle
+    dw UnknownDungeon4MewtwoText ; 0x5f26 TextAfterBattle
+    dw UnknownDungeon4MewtwoText ; 0x5f26 TextEndBattle
+    dw UnknownDungeon4MewtwoText ; 0x5f26 TextEndBattle
+
+UnknownDungeon4TrainerHeader1:
+    db $2 ; flag's bit
+    db ($0 << 4) ; trainer's view range
+    dw $d85f ; flag's byte
+    dw UnknownDungeon4AlakazamText ; TextBeforeBattle
+    dw UnknownDungeon4AlakazamText ; TextAfterBattle
+    dw UnknownDungeon4AlakazamText ; TextEndBattle
+    dw UnknownDungeon4AlakazamText ; TextEndBattle
+
+UnknownDungeon4TrainerHeader2:
+    db $3 ; flag's bit
+    db ($0 << 4) ; trainer's view range
+    dw $d85f ; flag's byte
+    dw UnknownDungeon4MachampText ; TextBeforeBattle
+    dw UnknownDungeon4MachampText ; TextAfterBattle
+    dw UnknownDungeon4MachampText ; TextEndBattle
+    dw UnknownDungeon4MachampText ; TextEndBattle
+
+UnknownDungeon4TrainerHeader3:
+    db $4 ; flag's bit
+    db ($0 << 4) ; trainer's view range
+    dw $d85f ; flag's byte
+    dw UnknownDungeon4GolemText ; TextBeforeBattle
+    dw UnknownDungeon4GolemText ; TextAfterBattle
+    dw UnknownDungeon4GolemText ; TextEndBattle
+    dw UnknownDungeon4GolemText ; TextEndBattle
+
+UnknownDungeon4TrainerHeader4:
+    db $5 ; flag's bit
+    db ($0 << 4) ; trainer's view range
+    dw $d85f ; flag's byte
+    dw UnknownDungeon4GengarText ; TextBeforeBattle
+    dw UnknownDungeon4GengarText ; TextAfterBattle
+    dw UnknownDungeon4GengarText ; TextEndBattle
+    dw UnknownDungeon4GengarText ; TextEndBattle
+
+    db $ff
+
+UnknownDungeon4Text1:
+    db $08 ; asm
+    ld hl,UnknownDungeon4TrainerHeader0
+    call TalkToTrainer
+    jp TextScriptEnd
+
+UnknownDungeon4Text2:
+    db $08 ; asm
+    ld hl,UnknownDungeon4TrainerHeader1
+    call TalkToTrainer
+    jp TextScriptEnd
+
+UnknownDungeon4Text3:
+    db $08 ; asm
+    ld hl,UnknownDungeon4TrainerHeader2
+    call TalkToTrainer
+    jp TextScriptEnd
+
+UnknownDungeon4Text4:
+    db $08 ; asm
+    ld hl,UnknownDungeon4TrainerHeader3
+    call TalkToTrainer
+    jp TextScriptEnd
+
+UnknownDungeon4Text5:
+    db $08 ; asm
+    ld hl,UnknownDungeon4TrainerHeader4
+    call TalkToTrainer
+    jp TextScriptEnd
+
+UnknownDungeon4MewtwoText:
+    TX_FAR _UnknownDungeon4MewtwoText
+    db $8
+    ld a,MEWTWO
+    jr UnknownDungeon4TextCommon
+
+UnknownDungeon4AlakazamText:
+    TX_FAR _UnknownDungeon4AlakazamText
+    db $8
+    ld a,ALAKAZAM
+    jr UnknownDungeon4TextCommon
+
+UnknownDungeon4MachampText:
+    TX_FAR _UnknownDungeon4MachampText
+    db $8
+    ld a,MACHAMP
+    jr UnknownDungeon4TextCommon
+
+UnknownDungeon4GolemText:
+    TX_FAR _UnknownDungeon4GolemText
+    db $8
+    ld a,GOLEM
+    jr UnknownDungeon4TextCommon
+
+UnknownDungeon4GengarText:
+    TX_FAR _UnknownDungeon4GengarText
+    db $8
+    ld a,GENGAR
+    ; fall through
+
+UnknownDungeon4TextCommon:
+    call PlayCry
+    call WaitForSoundToFinish
+    jp TextScriptEnd
+
+UnknownDungeon4Object:
+    db $7d ; border tile
+
+    db $1 ; warps
+    db 13,27,$1,UNKNOWN_DUNGEON_3
+
+    db $0 ; signs
+
+    db $5 ; people
+    db SPRITE_MEWTWO,01+4,03+4,$ff,$d0,$41,MEWTWO,OPP_LVL_OFFSET+70 ; Entry Level
+    db SPRITE_ALAKAZAM,01+4,25+4,$ff,$d0,$42,ALAKAZAM,OPP_LVL_OFFSET+65 ; Entry Level
+    db SPRITE_MACHAMP,08+4,20+4,$ff,$d0,$43,MACHAMP,OPP_LVL_OFFSET+65 ; Entry Level
+    db SPRITE_GOLEM,07+4,10+4,$ff,$d0,$44,GOLEM,OPP_LVL_OFFSET+65 ; Entry Level
+    db SPRITE_GENGAR,16+4,05+4,$ff,$d0,$45,GENGAR,OPP_LVL_OFFSET+65 ; Entry Level
+
+    ; warp-to
+    EVENT_DISP $f,13,27 ; UNKNOWN_DUNGEON_3
+
+UnknownDungeon4Blocks:
+    INCBIN "maps/unknowndungeon4.blk"
+
+; ───────────────────────────────────────
 
 SECTION "bank12",ROMX,BANK[$12]
 
@@ -103776,6 +103946,7 @@ MapIDList_70a3f: ; Moved in the BANK
     db VICTORY_ROAD_1
     db VICTORY_ROAD_2
     db VICTORY_ROAD_3
+    db UNKNOWN_DUNGEON_4
     db $FF
 
 ; Func_70a19 checks if W_CURMAP is in between or equal to each pair of maps
@@ -119994,7 +120165,7 @@ _SafariZoneRestHouse4Text3: ; 85c17 (21:5c17)
     db "a VAPOREON!",$55
     db "I wonder why?",$57
 
-_UnknownDungeon3MewtwoText: ; 85c72 (21:5c72)
+_UnknownDungeon4MewtwoText: ; 85c72 (21:5c72)
     db $0,"Mew!@@"
 
 _VictoryRoad1BattleText1: ; 85c79 (21:5c79)
@@ -120394,6 +120565,18 @@ _RockTunnel2BattleText8: ; 86c77 (21:6c77)
 _RockTunnel2EndBattleText8: ; 86c94 (21:6c94)
     db $0,"Fired",$4f
     db "away!",$58
+
+_UnknownDungeon4AlakazamText:
+    db $0,"Kazam!@@"
+
+_UnknownDungeon4MachampText:
+    db $0,"Champ!@@"
+
+_UnknownDungeon4GolemText:
+    db $0,"Gooooo!@@"
+
+_UnknownDungeon4GengarText:
+    db $0,"Geeeeeeeeeee!@@"
 
 SECTION "bank22",ROMX,BANK[$22]
 
@@ -133738,7 +133921,7 @@ WildDataPointers:
     dw DungeonMons1
     dw NoMons
     dw NoMons
-    dw NoMons
+    dw DungeonMonsB2
     dw TunnelMonsB2
     dw NoMons
     dw NoMons
@@ -134839,6 +135022,30 @@ DungeonMonsB1:
     db $02,$FF ;  4%
     db $02,$FF ;  1%
 
+DungeonMonsB2:
+    db $1A
+    db $01,$FF ; 20%
+    db $01,$FF ; 20%
+    db $01,$FF ; 15%
+    db $01,$FF ; 10%
+    db $01,$FF ; 10%
+    db $01,$FF ; 10%
+    db $01,$FF ;  5%
+    db $01,$FF ;  5%
+    db $01,$FF ;  4%
+    db $01,$FF ;  1%
+    db $0A
+    db $02,$FF ; 20%
+    db $02,$FF ; 20%
+    db $02,$FF ; 15%
+    db $02,$FF ; 10%
+    db $02,$FF ; 10%
+    db $02,$FF ; 10%
+    db $02,$FF ;  5%
+    db $02,$FF ;  5%
+    db $02,$FF ;  4%
+    db $02,$FF ;  1%
+
 _ReadRodData:
 ; return e = 2 if no fish on this map
 ; return e = 1 if a bite,bc = level,species
@@ -135662,6 +135869,9 @@ WildAI:
     db ABRA
     db KADABRA
     db ALAKAZAM
+    db MACHAMP
+    db GOLEM
+    db GENGAR
     db AERODACTYL
     db SNORLAX
     db ARTICUNO
@@ -136376,6 +136586,10 @@ _CheckNotEscapeWildPokemon:
 .NotEscapeWildPokemon
     db VOLTORB
     db ELECTRODE
+    db ALAKAZAM
+    db MACHAMP
+    db GOLEM
+    db GENGAR
     db AERODACTYL
     db SNORLAX
     db ARTICUNO
@@ -137322,7 +137536,11 @@ CheckSpecialWild_:
     db ZAPDOS,55,POWER_PLANT ; PowerPlant_Zapdos
     db MOLTRES,55,MANSION_2 ; Mansion2_Moltres
     db ONIX,60,VICTORY_ROAD_2 ; VictoryRoad2_ShinyOnix
-    db MEWTWO,70,UNKNOWN_DUNGEON_3 ; UnknownDungeon3_Mewtwo
+    db ALAKAZAM,65,UNKNOWN_DUNGEON_4 ; UnknownDungeon4_Alakazam
+    db MACHAMP,65,UNKNOWN_DUNGEON_4 ; UnknownDungeon4_Machamp
+    db GOLEM,65,UNKNOWN_DUNGEON_4 ; UnknownDungeon4_Golem
+    db GENGAR,65,UNKNOWN_DUNGEON_4 ; UnknownDungeon4_Gengar
+    db MEWTWO,70,UNKNOWN_DUNGEON_4 ; UnknownDungeon4_Mewtwo
     db MEW,70,VERMILION_DOCK ; VermilionDock_Mew
     db $FF
 
@@ -137382,7 +137600,27 @@ CheckSpecialWild_:
     db DRAGON_RAGE
     db EARTHQUAKE
     db HYPER_BEAM
-; UnknownDungeon3_Mewtwo
+; UnknownDungeon4_Alakazam
+    db PSYCHIC_M
+    db RECOVER
+    db REFLECT
+    db HYPER_BEAM
+; UnknownDungeon4_Machamp
+    db ROCK_SLIDE
+    db EARTHQUAKE
+    db HI_JUMP_KICK
+    db HYPER_BEAM
+; UnknownDungeon4_Golem
+    db EARTHQUAKE
+    db SUBSTITUTE
+    db REST
+    db HYPER_BEAM
+; UnknownDungeon4_Gengar
+    db MEGA_DRAIN
+    db AMNESIA
+    db NIGHT_SHADE
+    db HYPER_BEAM
+; UnknownDungeon4_Mewtwo
     db PSYCHIC_M
     db RECOVER
     db EARTHQUAKE
@@ -140471,7 +140709,7 @@ MapHeaderPointers:
     dw UnknownDungeon1_h
     dw NameRater_h
     dw CeruleanHouse2_h
-    dw EmptyMap_h ; unused
+    dw UnknownDungeon4_h
     dw RockTunnel2_h
     dw SilphCo9_h
     dw SilphCo10_h

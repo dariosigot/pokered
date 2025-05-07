@@ -71,26 +71,32 @@ SPRITE_AGATHA                    EQU $39
 SPRITE_BRUNO                     EQU $3a
 SPRITE_LORELEI                   EQU $3b
 SPRITE_SEEL                      EQU $3c
-SPRITE_BALL                      EQU $3d
-SPRITE_OMANYTE                   EQU $3e
-SPRITE_BOULDER                   EQU $3f
-SPRITE_PAPER_SHEET               EQU $40
-SPRITE_BOOK_MAP_DEX              EQU $41
-SPRITE_CLIPBOARD                 EQU $42
-SPRITE_SNORLAX                   EQU $43
-SPRITE_OLD_AMBER_COPY            EQU $44
-SPRITE_OLD_AMBER                 EQU $45
-SPRITE_LYING_OLD_MAN_UNUSED_1    EQU $46
-SPRITE_LYING_OLD_MAN_UNUSED_2    EQU $47
-SPRITE_LYING_OLD_MAN             EQU $48
-SPRITE_BASKET                    EQU $49
-SPRITE_LAPRAS                    EQU $4A
-SPRITE_AERODACTYL                EQU $4B
-SPRITE_ARTICUNO                  EQU $4C
-SPRITE_ZAPDOS                    EQU $4D
-SPRITE_MOLTRES                   EQU $4E
-SPRITE_DRATINI                   EQU $4F
-SPRITE_MEWTWO                    EQU $50
+
+SPRITE_ALAKAZAM                  EQU $3d
+SPRITE_MACHAMP                   EQU $3e
+SPRITE_GOLEM                     EQU $3f
+SPRITE_GENGAR                    EQU $40
+SPRITE_LAPRAS                    EQU $41
+SPRITE_AERODACTYL                EQU $42
+SPRITE_ARTICUNO                  EQU $43
+SPRITE_ZAPDOS                    EQU $44
+SPRITE_MOLTRES                   EQU $45
+SPRITE_DRATINI                   EQU $46
+SPRITE_MEWTWO                    EQU $47
+
+SPRITE_BALL                      EQU $48
+SPRITE_OMANYTE                   EQU $49
+SPRITE_BOULDER                   EQU $4a
+SPRITE_PAPER_SHEET               EQU $4b
+SPRITE_BOOK_MAP_DEX              EQU $4c
+SPRITE_CLIPBOARD                 EQU $4d
+SPRITE_SNORLAX                   EQU $4e
+SPRITE_OLD_AMBER_COPY            EQU $4f
+SPRITE_OLD_AMBER                 EQU $50
+SPRITE_LYING_OLD_MAN_UNUSED_1    EQU $51
+SPRITE_LYING_OLD_MAN_UNUSED_2    EQU $52
+SPRITE_LYING_OLD_MAN             EQU $53
+SPRITE_BASKET                    EQU $54
 
 ; different kinds of people events
 ITEM    EQU $80
