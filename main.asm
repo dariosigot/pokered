@@ -189,7 +189,7 @@ FakeGiveItem:
     ld [$d11e],a
     jp HackForGetItemName
 
-Tset0E_Coll: ; Move in the Bank 0
+Tset0E_Coll: ; Moved in the Bank 0
     INCBIN "gfx/tilesets/0e.tilecoll"
 
 SECTION "RoutineForRealGB",ROM0[$0F5] ; Denim
@@ -10616,6 +10616,7 @@ SpriteFacingAndAnimationTable: ; 4000 (1:4000)
     dw SpriteFacingLeftAndWalking,SpriteOAMParametersFlipped  ; facing right,walk animation frame 1
     dw SpriteFacingLeftAndStanding,SpriteOAMParametersFlipped ; facing right,walk animation frame 2
     dw SpriteFacingLeftAndWalking,SpriteOAMParametersFlipped  ; facing right,walk animation frame 3
+
     dw SpriteFacingDownAndStanding,SpriteOAMParameters        ; ---
     dw SpriteFacingDownAndStanding,SpriteOAMParameters        ; This table is used for sprites $a and $b.
     dw SpriteFacingDownAndStanding,SpriteOAMParameters        ; All orientation and animation parameters
@@ -10633,31 +10634,48 @@ SpriteFacingAndAnimationTable: ; 4000 (1:4000)
     dw SpriteFacingDownAndStanding,SpriteOAMParameters
     dw SpriteFacingDownAndStanding,SpriteOAMParameters
 
-SpriteFacingDownAndStanding: ; 4080 (1:4080)
+    dw SpriteFacingDownAndStanding,SpriteOAMParameters        ; ---
+    dw SpriteFacingDownAndWalking,SpriteOAMParameters         ; This table is used for mon sprites
+    dw SpriteFacingDownAndStanding,SpriteOAMParameters        ; Sprite can Only Face Down
+    dw SpriteFacingDownAndWalking,SpriteOAMParameters         ; (or UP = Jigglypuff Excetion)
+    dw SpriteFacingUpAndStanding,SpriteOAMParameters          ; ---
+    dw SpriteFacingUpAndWalking,SpriteOAMParameters
+    dw SpriteFacingUpAndStanding,SpriteOAMParameters
+    dw SpriteFacingUpAndWalking,SpriteOAMParameters
+    dw SpriteFacingDownAndStanding,SpriteOAMParameters
+    dw SpriteFacingDownAndWalking,SpriteOAMParameters
+    dw SpriteFacingDownAndStanding,SpriteOAMParameters
+    dw SpriteFacingDownAndWalking,SpriteOAMParameters
+    dw SpriteFacingDownAndStanding,SpriteOAMParameters
+    dw SpriteFacingDownAndWalking,SpriteOAMParameters
+    dw SpriteFacingDownAndStanding,SpriteOAMParameters
+    dw SpriteFacingDownAndWalking,SpriteOAMParameters
+
+SpriteFacingDownAndStanding:
     db $00,$01,$02,$03
-SpriteFacingDownAndWalking: ; 4084 (1:4084)
+SpriteFacingDownAndWalking:
     db $80,$81,$82,$83
-SpriteFacingUpAndStanding: ; 4088 (1:4088)
+SpriteFacingUpAndStanding:
     db $04,$05,$06,$07
-SpriteFacingUpAndWalking: ; 408c (1:408c)
+SpriteFacingUpAndWalking:
     db $84,$85,$86,$87
-SpriteFacingLeftAndStanding: ; 4090 (1:4090)
+SpriteFacingLeftAndStanding:
     db $08,$09,$0a,$0b
-SpriteFacingLeftAndWalking: ; 4094 (1:4094)
+SpriteFacingLeftAndWalking:
     db $88,$89,$8a,$8b
 
-SpriteOAMParameters: ; 4098 (1:4098)
+SpriteOAMParameters:
     db $00,$00,$00                                      ; top left
     db $00,$08,$00                                      ; top right
     db $08,$00,OAMFLAG_CANBEMASKED                      ; bottom left
     db $08,$08,OAMFLAG_CANBEMASKED | OAMFLAG_ENDOFDATA  ; bottom right
-SpriteOAMParametersFlipped: ; 40a4 (1:40a4)
+SpriteOAMParametersFlipped:
     db $00,$08,OAMFLAG_VFLIPPED
     db $00,$00,OAMFLAG_VFLIPPED
     db $08,$08,OAMFLAG_VFLIPPED | OAMFLAG_CANBEMASKED
     db $08,$00,OAMFLAG_VFLIPPED | OAMFLAG_CANBEMASKED | OAMFLAG_ENDOFDATA
 
-ResetStatusAndHalveMoneyOnBlackout: ; 40b0 (1:40b0)
+ResetStatusAndHalveMoneyOnBlackout:
     xor a
     ld [$cf0b],a
     ld [$d700],a
@@ -10667,31 +10685,6 @@ ResetStatusAndHalveMoneyOnBlackout: ; 40b0 (1:40b0)
     ld [H_CURRENTPRESSEDBUTTONS],a
     ld [$cc57],a
     ld [wFlags_0xcd60],a
-    ;ld [$FF00+$9f],a
-    ;ld [$FF00+$a0],a
-    ;ld [$FF00+$a1],a
-    ;call HasEnoughMoney
-    ;jr c,.asm_40ff
-    ;ld a,[wPlayerMoney] ; $d347
-    ;ld [$FF00+$9f],a
-    ;ld a,[wPlayerMoney + 1] ; $d348
-    ;ld [$FF00+$a0],a
-    ;ld a,[wPlayerMoney + 2] ; $d349
-    ;ld [$FF00+$a1],a
-    ;xor a
-    ;ld [$FF00+$a2],a
-    ;ld [$FF00+$a3],a
-    ;ld a,$2
-    ;ld [$FF00+$a4],a
-    ;ld a,$d
-    ;call Predef ; indirect jump to Func_f71e (f71e (3:771e))
-    ;ld a,[$FF00+$a2]
-    ;ld [wPlayerMoney],a ; $d347
-    ;ld a,[$FF00+$a3]
-    ;ld [wPlayerMoney + 1],a ; $d348
-    ;ld a,[$FF00+$a4]
-    ;ld [wPlayerMoney + 2],a ; $d349
-;.asm_40ff
     ld hl,$d732
     set 2,[hl]
     res 3,[hl]
@@ -18112,18 +18105,28 @@ SpriteAttributeHandler: ; Denim
     ret
 
 Handle4TileSpriteOrMonSprite:
+    ld l,a
     dec e
     dec e
     ld a,[de]
+    cp SPRITE_LORELEI+1 ; Last Standard Sprite ID
     inc e
     inc e
-    cp SPRITE_SEEL+1
-    ld a,[de]
-    jr c,.considerOrientation
+    jr c,.StandardSprite
+    cp SPRITE_BALL ; First Static Sprite ID
+    jr c,.MonSprite
+.StaticSprite
+    ld a,l
     and $f
     add $10
     jr .end
-.considerOrientation
+.MonSprite
+    ld a,l
+    and $f
+    add $20
+    jr .end
+.StandardSprite
+    ld a,l
     and $f
 .end
     ret
@@ -29142,8 +29145,8 @@ GuardSprite: ; 11080 (4:5080)
     INCBIN "gfx/sprites/guard.2bpp" ; was $11080
 BallSprite: ; 11140 (4:5140)
     INCBIN "gfx/sprites/ball.2bpp" ; was $11140
-OmanyteSprite: ; 11180 (4:5180)
-    INCBIN "gfx/sprites/omanyte.2bpp" ; was $11180
+FossilSprite: ; 11180 (4:5180)
+    INCBIN "gfx/sprites/fossil.2bpp" ; was $11180
 BoulderSprite: ; 111c0 (4:51c0)
     INCBIN "gfx/sprites/boulder.2bpp" ; was $111c0
 PaperSheetSprite: ; 11200 (4:5200)
@@ -32217,8 +32220,7 @@ BlackHairBoy1Sprite: ; 14a80 (5:4a80)
     INCBIN "gfx/sprites/black_hair_boy_1.2bpp" ; was $14a80
 LittleGirlSprite: ; 14c00 (5:4c00)
     INCBIN "gfx/sprites/little_girl.2bpp" ; was $14c00
-BirdSprite: ; 14d80 (5:4d80)
-    INCBIN "gfx/sprites/bird.2bpp" ; was $14d80
+SECTION "FatBaldGuySprite",ROMX[$4f00],BANK[$5]
 FatBaldGuySprite: ; 14f00 (5:4f00)
     INCBIN "gfx/sprites/fat_bald_guy.2bpp" ; was $14f00
 GamblerSprite: ; 15080 (5:5080)
@@ -32269,8 +32271,7 @@ YoungBoySprite: ; 16f40 (5:6f40)
     INCBIN "gfx/sprites/young_boy.2bpp" ; was $16f40
 GameboyKidSprite: ; 17000 (5:7000)
     INCBIN "gfx/sprites/gameboy_kid.2bpp" ; was $17000
-ClefairySprite: ; 170c0 (5:70c0)
-    INCBIN "gfx/sprites/clefairy.2bpp" ; was $170c0
+SECTION "AgathaSprite",ROMX[$7240],BANK[$5]
 AgathaSprite: ; 17240 (5:7240)
     INCBIN "gfx/sprites/agatha.2bpp" ; was $17240
 BrunoSprite: ; 173c0 (5:73c0)
@@ -32800,7 +32801,7 @@ SpriteSets: ; 17ab9 (5:7ab9)
     db SPRITE_FISHER2
     db SPRITE_BLACK_HAIR_BOY_1
     db SPRITE_GAMBLER
-    db SPRITE_SEEL
+    db SPRITE_SEEL ; TODO : Not Used
     db SPRITE_OAK
     db SPRITE_SWIMMER
     db SPRITE_BALL
@@ -32817,7 +32818,7 @@ SpriteSets: ; 17ab9 (5:7ab9)
     db SPRITE_LASS
     db SPRITE_BLACK_HAIR_BOY_1
     db SPRITE_BALL
-    db SPRITE_LYING_OLD_MAN_UNUSED_2
+    db SPRITE_LYING_OLD_MAN
 
 ; sprite set $03
     db SPRITE_LITTLE_GIRL
@@ -32830,20 +32831,20 @@ SpriteSets: ; 17ab9 (5:7ab9)
     db SPRITE_BLACK_HAIR_BOY_1
     db SPRITE_GUARD
     db SPRITE_BALL
-    db SPRITE_LYING_OLD_MAN_UNUSED_2
+    db SPRITE_LYING_OLD_MAN
 
 ; sprite set $04
     db SPRITE_FOULARD_WOMAN
     db SPRITE_BLACK_HAIR_BOY_2
     db SPRITE_BUG_CATCHER
     db SPRITE_GAMBLER
-    db SPRITE_SLOWBRO
+    db SPRITE_MACHOP
     db SPRITE_GUARD
     db SPRITE_SAILOR
     db SPRITE_LASS
     db SPRITE_BLACK_HAIR_BOY_1
     db SPRITE_BALL
-    db SPRITE_LYING_OLD_MAN_UNUSED_2
+    db SPRITE_LYING_OLD_MAN
 
 ; sprite set $05
     db SPRITE_LITTLE_GIRL
@@ -32852,7 +32853,7 @@ SpriteSets: ; 17ab9 (5:7ab9)
     db SPRITE_FISHER2
     db SPRITE_FAT_BALD_GUY
     db SPRITE_OLD_PERSON
-    db SPRITE_SLOWBRO
+    db SPRITE_POLIWRATH
     db SPRITE_GUARD
     db SPRITE_ROCKET
     db SPRITE_BALL
@@ -32869,7 +32870,7 @@ SpriteSets: ; 17ab9 (5:7ab9)
     db SPRITE_GUARD
     db SPRITE_GAMBLER
     db SPRITE_BALL
-    db SPRITE_LYING_OLD_MAN_UNUSED_2
+    db SPRITE_LYING_OLD_MAN
 
 ; sprite set $07
     db SPRITE_ROCKET
@@ -32877,12 +32878,12 @@ SpriteSets: ; 17ab9 (5:7ab9)
     db SPRITE_LAPRAS_GIVER
     db SPRITE_ERIKA
     db SPRITE_GENTLEMAN
-    db SPRITE_BIRD
+    db SPRITE_PIDGEOT
     db SPRITE_ROCKER
     db SPRITE_BLACK_HAIR_BOY_1
     db SPRITE_SLOWBRO
     db SPRITE_BALL
-    db SPRITE_LYING_OLD_MAN_UNUSED_2
+    db SPRITE_LYING_OLD_MAN
 
 ; sprite set $08
     db SPRITE_BIKER
@@ -32911,17 +32912,17 @@ SpriteSets: ; 17ab9 (5:7ab9)
     db SPRITE_SNORLAX
 
 ; sprite set $0a
-    db SPRITE_BIRD
+    db SPRITE_KANGASKHAN
     db SPRITE_BLACK_HAIR_BOY_1
-    db SPRITE_CLEFAIRY
+    db SPRITE_CHANSEY
     db SPRITE_FISHER2
     db SPRITE_GAMBLER
-    db SPRITE_SLOWBRO
-    db SPRITE_SEEL
+    db SPRITE_SLOWPOKE
+    db SPRITE_LAPRAS
     db SPRITE_SWIMMER
     db SPRITE_BUG_CATCHER
     db SPRITE_BALL
-    db SPRITE_OMANYTE
+    db SPRITE_FOSSIL
 
 SpriteSheetPointerTable: ; 17b27 (5:7b27)
     ; SPRITE_RED
@@ -32944,11 +32945,6 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $c0 ; byte count
     db BANK(BugCatcherSprite)
 
-    ; SPRITE_SLOWBRO
-    dw SlowbroSprite
-    db $c0 ; byte count
-    db BANK(SlowbroSprite)
-
     ; SPRITE_LASS
     dw LassSprite
     db $c0 ; byte count
@@ -32963,11 +32959,6 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     dw LittleGirlSprite
     db $c0 ; byte count
     db BANK(LittleGirlSprite)
-
-    ; SPRITE_BIRD
-    dw BirdSprite
-    db $c0 ; byte count
-    db BANK(BirdSprite)
 
     ; SPRITE_FAT_BALD_GUY
     dw FatBaldGuySprite
@@ -33169,11 +33160,6 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $c0 ; byte count
     db BANK(GuardSprite)
 
-    ; SPRITE_NOT_DEFINED
-    dw 0
-    db $c0 ; byte count
-    db 0
-
     ; SPRITE_MOM
     dw MomSprite
     db $c0 ; byte count
@@ -33199,11 +33185,6 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $c0 ; byte count
     db BANK(GameboyKidSprite)
 
-    ; SPRITE_CLEFAIRY
-    dw ClefairySprite
-    db $c0 ; byte count
-    db BANK(ClefairySprite)
-
     ; SPRITE_AGATHA
     dw AgathaSprite
     db $c0 ; byte count
@@ -33219,75 +33200,72 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $c0 ; byte count
     db BANK(LoreleiSprite)
 
-    ; SPRITE_SEEL
-    dw SeelSprite
-    db $c0 ; byte count
-    db BANK(SeelSprite)
+; ────────────────────────────────────────────────────────────────
 
-    ; SPRITE_ALAKAZAM
-    dw MonOverworldDataNew_emimonserrate+($80*((DEX_ALAKAZAM)%(128)))
-    db 0 ; byte count
+SPRITE_Bank_1: MACRO
+    dw MonOverworldDataNew_emimonserrate+($80*((DEX_\1)%(128)))
+    db 0
     db BANK(MonOverworldDataNew_emimonserrate)
+    ENDM
 
-    ; SPRITE_MACHAMP
-    dw MonOverworldDataNew_emimonserrate+($80*((DEX_MACHAMP)%(128)))
-    db 0 ; byte count
-    db BANK(MonOverworldDataNew_emimonserrate)
-
-    ; SPRITE_GOLEM
-    dw MonOverworldDataNew_emimonserrate+($80*((DEX_GOLEM)%(128)))
-    db 0 ; byte count
-    db BANK(MonOverworldDataNew_emimonserrate)
-
-    ; SPRITE_GENGAR
-    dw MonOverworldDataNew_emimonserrate+($80*((DEX_GENGAR)%(128)))
-    db 0 ; byte count
-    db BANK(MonOverworldDataNew_emimonserrate)
-
-    ; SPRITE_LAPRAS
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_LAPRAS)%(128)))
-    db 0 ; byte count
+SPRITE_Bank_2: MACRO
+    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_\1)%(128)))
+    db 0
     db BANK(MonOverworldDataNew2_emimonserrate)
+    ENDM
 
-    ; SPRITE_AERODACTYL
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_AERODACTYL)%(128)))
-    db 0 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
+; ────────────────────────────────────────────────────────────────
 
-    ; SPRITE_ARTICUNO
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ARTICUNO)%(128)))
-    db 0 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
+    SPRITE_Bank_1 PIDGEY     ; SPRITE_PIDGEY
+    SPRITE_Bank_1 PIDGEOT    ; SPRITE_PIDGEOT
+    SPRITE_Bank_1 SPEAROW    ; SPRITE_SPEAROW
+    SPRITE_Bank_1 FEAROW     ; SPRITE_FEAROW
+    SPRITE_Bank_1 PIKACHU    ; SPRITE_PIKACHU
+    SPRITE_Bank_1 NIDORAN_F  ; SPRITE_NIDORAN_F
+    SPRITE_Bank_1 NIDORAN_M  ; SPRITE_NIDORAN_M
+    SPRITE_Bank_1 NIDORINO   ; SPRITE_NIDORINO
+    SPRITE_Bank_1 CLEFAIRY   ; SPRITE_CLEFAIRY
+    SPRITE_Bank_1 CLEFABLE   ; SPRITE_CLEFABLE
+    SPRITE_Bank_1 JIGGLYPUFF ; SPRITE_JIGGLYPUFF
+    SPRITE_Bank_1 WIGGLYTUFF ; SPRITE_WIGGLYTUFF
+    SPRITE_Bank_1 MEOWTH     ; SPRITE_MEOWTH
+    SPRITE_Bank_1 PSYDUCK    ; SPRITE_PSYDUCK
+    SPRITE_Bank_1 POLIWRATH  ; SPRITE_POLIWRATH
+    SPRITE_Bank_1 ALAKAZAM   ; SPRITE_ALAKAZAM
+    SPRITE_Bank_1 MACHOP     ; SPRITE_MACHOP
+    SPRITE_Bank_1 MACHOKE    ; SPRITE_MACHOKE
+    SPRITE_Bank_1 MACHAMP    ; SPRITE_MACHAMP
+    SPRITE_Bank_1 GOLEM      ; SPRITE_GOLEM
+    SPRITE_Bank_1 SLOWPOKE   ; SPRITE_SLOWPOKE
+    SPRITE_Bank_1 SLOWBRO    ; SPRITE_SLOWBRO
+    SPRITE_Bank_1 DODUO      ; SPRITE_DODUO
+    SPRITE_Bank_1 SEEL       ; SPRITE_SEEL
+    SPRITE_Bank_1 GENGAR     ; SPRITE_GENGAR
+    SPRITE_Bank_1 CUBONE     ; SPRITE_CUBONE
+    SPRITE_Bank_1 RHYDON     ; SPRITE_RHYDON
+    SPRITE_Bank_1 CHANSEY    ; SPRITE_CHANSEY
+    SPRITE_Bank_1 KANGASKHAN ; SPRITE_KANGASKHAN
+    SPRITE_Bank_2 LAPRAS     ; SPRITE_LAPRAS
+    SPRITE_Bank_2 OMANYTE    ; SPRITE_OMANYTE
+    SPRITE_Bank_2 KABUTO     ; SPRITE_KABUTO
+    SPRITE_Bank_2 AERODACTYL ; SPRITE_AERODACTYL
+    SPRITE_Bank_2 ARTICUNO   ; SPRITE_ARTICUNO
+    SPRITE_Bank_2 ZAPDOS     ; SPRITE_ZAPDOS
+    SPRITE_Bank_2 MOLTRES    ; SPRITE_MOLTRES
+    SPRITE_Bank_2 DRATINI    ; SPRITE_DRATINI
+    SPRITE_Bank_2 MEWTWO     ; SPRITE_MEWTWO
 
-    ; SPRITE_ZAPDOS
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_ZAPDOS)%(128)))
-    db 0 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
-
-    ; SPRITE_MOLTRES
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MOLTRES)%(128)))
-    db 0 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
-
-    ; SPRITE_DRATINI
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_DRATINI)%(128)))
-    db 0 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
-
-    ; SPRITE_MEWTWO
-    dw MonOverworldDataNew2_emimonserrate+($80*((DEX_MEWTWO)%(128)))
-    db 0 ; byte count
-    db BANK(MonOverworldDataNew2_emimonserrate)
+; ────────────────────────────────────────────────────────────────
 
     ; SPRITE_BALL
     dw BallSprite
     db $40 ; byte count
     db BANK(BallSprite)
 
-    ; SPRITE_OMANYTE
-    dw OmanyteSprite
+    ; SPRITE_FOSSIL
+    dw FossilSprite
     db $40 ; byte count
-    db BANK(OmanyteSprite)
+    db BANK(FossilSprite)
 
     ; SPRITE_BOULDER
     dw BoulderSprite
@@ -33324,16 +33302,6 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $40 ; byte count
     db BANK(OldAmberSprite)
 
-    ; SPRITE_LYING_OLD_MAN_UNUSED_1
-    dw LyingOldManSprite
-    db $40 ; byte count
-    db BANK(LyingOldManSprite)
-
-    ; SPRITE_LYING_OLD_MAN_UNUSED_2
-    dw LyingOldManSprite
-    db $40 ; byte count
-    db BANK(LyingOldManSprite)
-
     ; SPRITE_LYING_OLD_MAN
     dw LyingOldManSprite
     db $40 ; byte count
@@ -33344,7 +33312,9 @@ SpriteSheetPointerTable: ; 17b27 (5:7b27)
     db $40 ; byte count
     db BANK(BasketSprite)
 
-Func_17c47: ; Move in the Bank
+; ────────────────────────────────────────────────────────────────
+
+Func_17c47: ; Moved in the Bank
     ld a,[$cd50]
     ld c,a
     ld b,$0
@@ -33401,90 +33371,8 @@ Func_17c47: ; Move in the Bank
     call DelayFrame
     jp UpdateSprites
 
-EmotionBubbles: ; 17cbd (5:7cbd)
+EmotionBubbles: ; Moved in the Bank
     INCBIN "gfx/emotion_bubbles.2bpp"
-
-SubstituteEffectHandler: ; Moved in the Bank
-    ld c,50
-    call DelayFrames
-    ld hl,W_PLAYERMONMAXHP
-    ld de,wPlayerSubstituteHP
-    ld bc,W_PLAYERBATTSTATUS2
-    ld a,[$ff00+$f3]  ;whose turn?
-    and a
-    jr z,.notEnemy
-    ld hl,W_ENEMYMONMAXHP
-    ld de,wEnemySubstituteHP
-    ld bc,W_ENEMYBATTSTATUS2
-.notEnemy
-    ld a,[bc]                    ;load flags
-    bit 4,a                      ;user already has substitute?
-    jr nz,.alreadyHasSubstitute  ;skip this code if so
-                                  ;user doesn't have a substitute [yet]
-    push bc
-    ld a,[hli]  ;load max hp
-    ld b,[hl]
-    srl a        ;max hp / 4,[quarter health to remove from user]
-    rr b
-    srl a
-    rr b
-    push de
-    ld de,$fff2  ;subtract 8 to point to [current hp] instead of [max hp]
-    add hl,de    ;HL -= 8
-    pop de
-    ld a,b
-    ld [de],a    ;save copy of HP to subtract in ccd7/ccd8 [how much HP substitute has]
-    ld a,[hld]   ;load current hp
-    sub b         ;subtract [max hp / 4]
-    ld d,a       ;save low byte result in D
-    ld a,[hl]
-    sbc a,0      ;borrow from high byte if needed
-    pop bc
-    jr c,.notEnoughHP  ;underflow means user would be left with negative health
-                        ;fixedbug: note since it only brances on carry,it will possibly leave user with 0HP
-;;;;joenote - fix the bug to also check for exactly 0 hp
-    inc d
-    dec d
-    jr z,.notEnoughHP
-.userHasZeroOrMoreHP
-    ldi [hl],a  ;store high byte HP
-    ld [hl],d   ;store low byte HP
-    ld h,b
-    ld l,c
-    set 4,[hl]    ;set bit 4 of flags,user now has substitute
-    ld a,[$d355]  ;load options
-    bit 7,a       ;battle animation is enabled?
-    ld hl,PlayCurrentMoveAnimation    ; $7ba8 ;animation enabled: 0F:7BA8
-    ld b,BANK(PlayCurrentMoveAnimation)
-    jr z,.animationEnabled
-    ld hl,AnimationSubstitute   ;animation disabled: 1E:56E0
-    ld b,BANK(AnimationSubstitute)
-.animationEnabled
-    call Bankswitch           ;jump to routine depending on animation setting
-    ld hl,UnnamedText_17e1d  ;"it created a substitute"
-    call PrintText
-    ld hl,DrawHUDsAndHPBars
-    ld b,BANK(DrawHUDsAndHPBars)
-    jp Bankswitch
-.alreadyHasSubstitute
-    ld hl,UnnamedText_17e22  ;"x has a substitute"
-    jr .printText
-.notEnoughHP
-    ld hl,UnnamedText_17e27  ;"too weak to make substitute"
-.printText
-    jp PrintText
-
-UnnamedText_17e1d: ; 17e1d (5:7e1d)
-    TX_FAR _UnnamedText_17e1d
-    db "@"
-
-UnnamedText_17e22: ; 17e22 (5:7e22)
-    TX_FAR _UnnamedText_17e22
-    db "@"
-
-UnnamedText_17e27: ; 17e27 (5:7e27)
-    TX_FAR _UnnamedText_17e27
-    db "@"
 
 SECTION "ActivatePC",ROMX[$7e2c],BANK[$5]
 
@@ -33641,12 +33529,12 @@ RemoveItemByID: ; 17f37 (5:7f37)
     ld hl,wNumBagItems ; $d31d
     jp RemoveItemFromInventory
 
-EmotionBubblesPointerTable: ; Move in the BANK
+EmotionBubblesPointerTable: ; Moved in the Bank
     dw EmotionBubbles
     dw EmotionBubbles + $40
     dw EmotionBubbles + $80
 
-EmotionBubblesOAM: ; Move in the BANK
+EmotionBubblesOAM: ; Moved in the Bank
     db $F8,$00,$F9,$00
     db $FA,$00,$FB,$00
 
@@ -33742,7 +33630,7 @@ CeladonCityObject: ; 0x18022 (size=189)
     db SPRITE_OLD_PERSON,$16 + 4,$19 + 4,$ff,$d0,$4 ; person
     db SPRITE_OLD_PERSON,$10 + 4,$16 + 4,$ff,$d0,$5 ; person
     db SPRITE_FISHER2,$c + 4,$20 + 4,$ff,$d2,$6 ; person
-    db SPRITE_SLOWBRO,$c + 4,$1e + 4,$ff,$d3,$7 ; person
+    db SPRITE_POLIWRATH,$c + 4,$1e + 4,$ff,$d3,$7 ; person
     db SPRITE_ROCKET,$1d + 4,$20 + 4,$fe,$2,$8 ; person
     db SPRITE_ROCKET,$e + 4,$2a + 4,$fe,$2,$9 ; person
 
@@ -33997,7 +33885,7 @@ VermilionCityObject: ; 0x189ba (size=133)
     db SPRITE_GAMBLER,$6 + 4,$e + 4,$ff,$ff,$2 ; person
     db SPRITE_SAILOR,$1e + 4,$13 + 4,$ff,$d1,$3 ; person
     db SPRITE_GAMBLER,$7 + 4,$1e + 4,$ff,$ff,$4 ; person
-    db SPRITE_SLOWBRO,$9 + 4,$1d + 4,$fe,$1,$5 ; person
+    db SPRITE_MACHOP,$9 + 4,$1d + 4,$fe,$1,$5 ; person
     db SPRITE_SAILOR,$1b + 4,$19 + 4,$fe,$2,$6 ; person
 
     ; warp-to
@@ -35829,7 +35717,7 @@ CeladonCityText18: ; 19a26 (6:5a26)
     db "@"
 
 FuchsiaCityScript: ; 19a2b (6:5a2b)
-    jp EnableAutoTextBoxDrawing
+    jp _FuchsiaCityScript
 
 FuchsiaCityTextPointers: ; 19a2e (6:5a2e)
     dw FuchsiaCityText1
@@ -36106,9 +35994,9 @@ BluesHouseObject: ; 19bce (6:5bce)
     db 0 ; signs
 
     db 3 ; people
-    db $11,4+3,4+2,$FF,$D3,1 ; Daisy,sitting by map
-    db $11,4+4,4+6,$FE,1,ITEM|2,0 ; map on table
-    db $41,4+3,4+3,$FF,$FF,ITEM|3,0 ; Daisy,walking around
+    db SPRITE_DAISY,4+3,4+2,$FF,$D3,1 ; Daisy,sitting by map
+    db SPRITE_DAISY,4+4,4+6,$FE,1,ITEM|2,0 ; Daisy,walking around
+    db SPRITE_BOOK_MAP_DEX,4+3,4+3,$FF,$FF,ITEM|3,0 ; map on table
 
     ; warp-to
     EVENT_DISP BLUES_HOUSE_WIDTH,7,2
@@ -37641,12 +37529,12 @@ FuchsiaCityObject: ; 0x18bd4 (size=178)
     db SPRITE_GAMBLER,$11 + 4,$1c + 4,$fe,$2,$2 ; person
     db SPRITE_FISHER2,$e + 4,$1e + 4,$ff,$d0,$3 ; person
     db SPRITE_BUG_CATCHER,$8 + 4,$18 + 4,$ff,$d1,$4 ; person
-    db SPRITE_CLEFAIRY,$5 + 4,$1f + 4,$fe,$0,$5 ; person
+    db SPRITE_CHANSEY,$5 + 4,$1f + 4,$fe,$0,$5 ; person
     db SPRITE_BALL,$6 + 4,$19 + 4,$ff,$ff,$6 ; person
-    db SPRITE_SLOWBRO,$6 + 4,$c + 4,$fe,$2,$7 ; person
-    db SPRITE_SLOWBRO,$c + 4,$1e + 4,$fe,$2,$8 ; person
-    db SPRITE_SEEL,$11 + 4,$8 + 4,$fe,$0,$9 ; person
-    db SPRITE_OMANYTE,$5 + 4,$6 + 4,$ff,$ff,$a ; person
+    db SPRITE_KANGASKHAN,$6 + 4,$c + 4,$fe,$2,$7 ; person
+    db SPRITE_SLOWPOKE,$c + 4,$1e + 4,$fe,$2,$8 ; person
+    db SPRITE_LAPRAS,$11 + 4,$8 + 4,$fe,$0,$9 ; person
+    db SPRITE_FOSSIL,$5 + 4,$6 + 4,$ff,$ff,$a ; person
     db SPRITE_GAMBLER,$1c + 4,$5 + 4,$ff,$d0,$b ; person
 
     ; warp-to
@@ -37663,9 +37551,6 @@ FuchsiaCityObject: ; 0x18bd4 (size=178)
 FuchsiaCityText12:
     TX_FAR _FuchsiaCityText12
     db "@"
-
-SeelSprite:
-    INCBIN "gfx/sprites/seel.2bpp"
 
 SetTempScriptFlag:
     ld hl,$d126
@@ -37989,6 +37874,25 @@ IndigoPlateauLobbyObject: ; Moved in the Bank
     EVENT_DISP $8,$b,$7
     EVENT_DISP $8,$b,$8
     EVENT_DISP $8,$0,$8 ; BRUNOS_ROOM
+
+_FuchsiaCityScript:
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    jr z,.end
+    ld a,[$d7f6]
+    bit 6,a
+    ld de,MonOverworldDataNew2_emimonserrate+($80*((DEX_OMANYTE)%(128)))
+    jr nz,.done
+    bit 7,a
+    ld de,MonOverworldDataNew2_emimonserrate+($80*((DEX_KABUTO)%(128)))
+    jr z,.end
+.done
+    ld hl,$87c0
+    ld bc,(BANK(MonOverworldDataNew2_emimonserrate) << 8) + $04
+    call GoodCopyVideoData
+.end
+    jp EnableAutoTextBoxDrawing
 
 SECTION "bank7",ROMX,BANK[$7]
 
@@ -39971,7 +39875,7 @@ ViridianHouseObject: ; 0x1d5bb (size=44)
     db $4 ; people
     db SPRITE_BALDING_GUY,$3 + 4,$5 + 4,$ff,$ff,$1 ; person
     db SPRITE_LITTLE_GIRL,$4 + 4,$1 + 4,$fe,$1,$2 ; person
-    db SPRITE_BIRD,$5 + 4,$5 + 4,$fe,$2,$3 ; person
+    db SPRITE_SPEAROW,$5 + 4,$5 + 4,$fe,$2,$3 ; person
     db SPRITE_CLIPBOARD,$0 + 4,$4 + 4,$ff,$ff,$4 ; person
 
     ; warp-to
@@ -40019,7 +39923,7 @@ PewterHouse1Object: ; 0x1d616 (size=38)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_SLOWBRO,$5 + 4,$4 + 4,$ff,$d2,$1 ; person
+    db SPRITE_NIDORAN_M,$5 + 4,$4 + 4,$ff,$d2,$1 ; person
     db SPRITE_YOUNG_BOY,$5 + 4,$3 + 4,$ff,$d3,$2 ; person
     db SPRITE_FAT_BALD_GUY,$2 + 4,$1 + 4,$ff,$ff,$3 ; person
 
@@ -40495,8 +40399,8 @@ LavenderHouse1Object: ; 0x1d96a (size=56)
     db $6 ; people
     db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$3 + 4,$ff,$ff,$1 ; person
     db SPRITE_LITTLE_GIRL,$3 + 4,$6 + 4,$ff,$d0,$2 ; person
-    db SPRITE_SLOWBRO,$4 + 4,$6 + 4,$ff,$d1,$3 ; person
-    db SPRITE_SLOWBRO,$3 + 4,$1 + 4,$ff,$ff,$4 ; person
+    db SPRITE_PSYDUCK,$4 + 4,$6 + 4,$ff,$d1,$3 ; person
+    db SPRITE_NIDORINO,$3 + 4,$1 + 4,$ff,$ff,$4 ; person
     db SPRITE_MR_FUJI,$1 + 4,$3 + 4,$ff,$ff,$5 ; person
     db SPRITE_BOOK_MAP_DEX,$3 + 4,$3 + 4,$ff,$ff,$6 ; person
 
@@ -40558,7 +40462,7 @@ LavenderHouse2Object: ; 0x1d9e6 (size=32)
     db $0 ; signs
 
     db $2 ; people
-    db SPRITE_SLOWBRO,$5 + 4,$3 + 4,$ff,$d1,$1 ; person
+    db SPRITE_CUBONE,$5 + 4,$3 + 4,$ff,$d1,$1 ; person
     db SPRITE_BRUNETTE_GIRL,$4 + 4,$2 + 4,$ff,$d3,$2 ; person
 
     ; warp-to
@@ -40737,7 +40641,7 @@ VermilionHouse1Object: ; 0x1db20 (size=38)
 
     db $3 ; people
     db SPRITE_BUG_CATCHER,$3 + 4,$5 + 4,$ff,$d2,$1 ; person
-    db SPRITE_BIRD,$5 + 4,$3 + 4,$fe,$2,$2 ; person
+    db SPRITE_PIDGEY,$5 + 4,$3 + 4,$fe,$2,$2 ; person
     db SPRITE_PAPER_SHEET,$3 + 4,$4 + 4,$ff,$ff,$3 ; person
 
     ; warp-to
@@ -41117,7 +41021,7 @@ SaffronHouse1Object: ; 0x1de04 (size=44)
 
     db $4 ; people
     db SPRITE_BRUNETTE_GIRL,$3 + 4,$2 + 4,$ff,$d3,$1 ; person
-    db SPRITE_BIRD,$4 + 4,$0 + 4,$fe,$1,$2 ; person
+    db SPRITE_PIDGEY,$4 + 4,$0 + 4,$fe,$1,$2 ; person
     db SPRITE_BUG_CATCHER,$1 + 4,$4 + 4,$ff,$d0,$3 ; person
     db SPRITE_PAPER_SHEET,$3 + 4,$3 + 4,$ff,$ff,$4 ; person
 
@@ -42106,7 +42010,7 @@ Route16HouseObject: ; 0x1e657 (size=32)
 
     db $2 ; people
     db SPRITE_BRUNETTE_GIRL,$3 + 4,$2 + 4,$ff,$d3,$1 ; person
-    db SPRITE_BIRD,$4 + 4,$6 + 4,$fe,$0,$2 ; person
+    db SPRITE_FEAROW,$4 + 4,$6 + 4,$fe,$0,$2 ; person
 
     ; warp-to
     EVENT_DISP $4,$7,$2
@@ -44887,7 +44791,7 @@ BillsHouseObject:
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_SLOWBRO,$5 + 4,$6 + 4,$ff,$ff,$1 ; person
+    db SPRITE_KABUTO,$5 + 4,$6 + 4,$ff,$ff,$1 ; person
     db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$4 + 4,$ff,$ff,$2 ; person
     db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$6 + 4,$ff,$ff,$3 ; person
 
@@ -71053,10 +70957,9 @@ SilphCo9FHiddenObjects: ; 46ef4 (11:6ef4)
     db $0f,$02,MAX_POTION
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-CopycatsHouse2FHiddenObjects: ; 46efb (11:6efb)
-    db $01,$01,TRADE_STONE
-    dbw BANK(HiddenItems),HiddenItems
-    db $FF
+
+SECTION "UnknownDungeon1HiddenObjects",ROMX[$6f02],BANK[$11]
+
 UnknownDungeon1HiddenObjects: ; 46f02 (11:6f02)
     db $0b,$0e,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
@@ -71286,6 +71189,13 @@ TradeCenterHiddenObjects:
     dbw BANK(CableClubRightGameboy),CableClubRightGameboy
     db $04,$04,$d0 ; XXX,y,x
     dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
+    db $FF
+
+CopycatsHouse2FHiddenObjects:
+    db $01,$01,TRADE_STONE
+    dbw BANK(HiddenItems),HiddenItems
+    db 01,02,$04 ; y,x,
+    dbw BANK(_CopycatsHouseF2Text4),_CopycatsHouseF2Text4
     db $FF
 
 FlagInstantAndPredefSilphCo: ; xxxxx (11:xxxx) ; Denim
@@ -71912,7 +71822,7 @@ RedsHouse1FObject: ; 481e4 (12:41e4)
     db 1,3,2 ; TV
 
     db 1 ; people
-    db $33,4+4,5+4,$FF,$D2,1 ; Mom
+    db SPRITE_MOM,4+4,5+4,$FF,$D2,1 ; Mom
 
     ; warp-to
     EVENT_DISP REDS_HOUSE_1F_WIDTH,7,2
@@ -72581,10 +72491,10 @@ CeladonMansion1Object: ; 0x486cf (size=71)
     db $9,$4,$5 ; CeladonMansion1Text5
 
     db $4 ; people
-    db SPRITE_SLOWBRO,$5 + 4,$0 + 4,$ff,$d3,$1 ; person
+    db SPRITE_MEOWTH,$5 + 4,$0 + 4,$ff,$d3,$1 ; person
     db SPRITE_OLD_MEDIUM_WOMAN,$5 + 4,$1 + 4,$ff,$d0,$2 ; person
     db SPRITE_CLEFAIRY,$8 + 4,$1 + 4,$fe,$2,$3 ; person
-    db SPRITE_SLOWBRO,$4 + 4,$4 + 4,$fe,$1,$4 ; person
+    db SPRITE_NIDORAN_F,$4 + 4,$4 + 4,$fe,$1,$4 ; person
 
     ; warp-to
     EVENT_DISP $4,$b,$4
@@ -75808,8 +75718,8 @@ MtMoon3Object: ; 0x49fdb (size=102)
     db SPRITE_ROCKET,$16 + 4,$f + 4,$ff,$d0,$43,ROCKET,$2 ; trainer
     db SPRITE_ROCKET,$b + 4,$1d + 4,$ff,$d1,$44,ROCKET,$3 ; trainer
     db SPRITE_ROCKET,$11 + 4,$1d + 4,$ff,$d2,$45,ROCKET,$4 ; trainer
-    db SPRITE_OMANYTE,$6 + 4,$c + 4,$ff,$ff,$6 ; person
-    db SPRITE_OMANYTE,$6 + 4,$d + 4,$ff,$ff,$7 ; person
+    db SPRITE_FOSSIL,$6 + 4,$c + 4,$ff,$ff,$6 ; person
+    db SPRITE_FOSSIL,$6 + 4,$d + 4,$ff,$ff,$7 ; person
     db SPRITE_BALL,$15 + 4,$19 + 4,$ff,$ff,$88,HP_UP ; item
     db SPRITE_BALL,$5 + 4,$1d + 4,$ff,$ff,$89,TM_01 ; item
 
@@ -76734,7 +76644,7 @@ SaffronCityObject: ; 0x509dc (size=188)
     db SPRITE_LAPRAS_GIVER,$17 + 4,$17 + 4,$ff,$ff,$9 ; person
     db SPRITE_ERIKA,$1e + 4,$11 + 4,$fe,$2,$a ; person
     db SPRITE_GENTLEMAN,$c + 4,$1e + 4,$ff,$d0,$b ; person
-    db SPRITE_BIRD,$c + 4,$1f + 4,$ff,$d0,$c ; person
+    db SPRITE_PIDGEOT,$c + 4,$1f + 4,$ff,$d0,$c ; person
     db SPRITE_ROCKER,$8 + 4,$12 + 4,$ff,$d1,$d ; person
     db SPRITE_ROCKET,$16 + 4,$12 + 4,$ff,$d0,$e ; person
     db SPRITE_ROCKET,$16 + 4,$13 + 4,$ff,$d0,$f ; person
@@ -79594,7 +79504,7 @@ Mansion2Text5: ; 52087 (14:6087)
 .asm_520bf
     jp TextScriptEnd
 
-Mansion2Object: ; Move in the Bank
+Mansion2Object: ; Moved in the Bank
     db $1 ; border tile
 
     db $4 ; warps
@@ -80764,8 +80674,8 @@ UnnamedText_520c7: ; Moved in the Bank
     TX_FAR _UnnamedText_520c7
     db "@"
 
-Mansion2TrainerHeaders: ; Move in the Bank
-Mansion2TrainerHeader0: ; Move in the Bank
+Mansion2TrainerHeaders: ; Moved in the Bank
+Mansion2TrainerHeader0: ; Moved in the Bank
     db $1 ; flag's bit
     db ($0 << 4) ; trainer's view range
     dw $d847 ; flag's byte
@@ -88322,7 +88232,7 @@ FanClubObject: ; 0x59c97 (size=62)
     db $6 ; people
     db SPRITE_FISHER2,$3 + 4,$6 + 4,$ff,$d2,$1 ; person
     db SPRITE_GIRL,$3 + 4,$1 + 4,$ff,$d3,$2 ; person
-    db SPRITE_CLEFAIRY,$4 + 4,$6 + 4,$ff,$d2,$3 ; person
+    db SPRITE_PIKACHU,$4 + 4,$6 + 4,$ff,$d2,$3 ; person
     db SPRITE_SEEL,$4 + 4,$1 + 4,$ff,$d3,$4 ; person
     db SPRITE_GENTLEMAN,$1 + 4,$3 + 4,$ff,$d0,$5 ; person
     db SPRITE_CABLE_CLUB_WOMAN,$1 + 4,$5 + 4,$ff,$d0,$6 ; person
@@ -90159,10 +90069,10 @@ PewterPokecenterText3: ; 5c59b (17:459b)
     ld a,$ff
     call PlaySound
     ld c,$20
-    call DelayFrames
-    ld hl,Unknown_5c608 ; $4608
+    call JigglypuffDanceHack ; call DelayFrames
+    ld hl,JigglypuffDance ; $4608
     ld de,$cd3f
-    ld bc,$0004
+    ld bc,6
     call CopyData
     ld a,[$c132]
     ld hl,$cd3f
@@ -90182,10 +90092,10 @@ PewterPokecenterText3: ; 5c59b (17:459b)
     push hl
     ld hl,$cd3f
     ld de,$cd3e
-    ld bc,$0004
+    ld bc,6
     call CopyData
     ld a,[$cd3e]
-    ld [$cd42],a
+    ld [$cd44],a
     pop hl
     ld c,$18
     call DelayFrames
@@ -90203,8 +90113,7 @@ PewterPokecenterText5: ; 5c603 (17:4603)
     TX_FAR _PewterPokecenterText5 ; 0x98744
     db "@"
 
-Unknown_5c608: ; 5c608 (17:4608)
-    db $30,$38,$34,$3c
+SECTION "PewterPokecenterText4",ROMX[$460c],BANK[$17]
 
 PewterPokecenterText4: ; 5c60c (17:460c)
     db $f6
@@ -90221,7 +90130,7 @@ PewterPokecenterObject: ; 0x5c60d (size=44)
     db $4 ; people
     db SPRITE_NURSE,$1 + 4,$3 + 4,$ff,$d0,$1 ; person
     db SPRITE_GENTLEMAN,$7 + 4,$b + 4,$ff,$d2,$2 ; person
-    db SPRITE_CLEFAIRY,$3 + 4,$1 + 4,$ff,$d0,$3 ; person
+    db SPRITE_JIGGLYPUFF,$3 + 4,$1 + 4,$ff,$d0,$3 ; person
     db SPRITE_CABLE_CLUB_WOMAN,$2 + 4,$b + 4,$ff,$d0,$4 ; person
 
     ; warp-to
@@ -91083,8 +90992,7 @@ CopycatsHouseF2_h: ; 0x5cc65 to 0x5cc71 (12 bytes) (id=176)
     db $00 ; connections
     dw CopycatsHouseF2Object ; objects
 
-CopycatsHouseF2Script: ; 5cc71 (17:4c71)
-    jp EnableAutoTextBoxDrawing
+SECTION "CopycatsHouseF2TextPointers",ROMX[$4c74],BANK[$17]
 
 CopycatsHouseF2TextPointers: ; 5cc74 (17:4c74)
     dw CopycatsHouseF2Text1
@@ -91155,13 +91063,7 @@ TM31NoRoomText: ; 5ccee (17:4cee)
     TX_FAR _TM31NoRoomText ; 0xa1733
     db $d,"@"
 
-SECTION "CopycatsHouseF2Text5",ROMX[$4cf9],BANK[$17]
-
-CopycatsHouseF2Text5: ; 5ccf9 (17:4cf9)
-CopycatsHouseF2Text4: ; 5ccf9 (17:4cf9)
-CopycatsHouseF2Text3: ; 5ccf9 (17:4cf9)
-    TX_FAR _CopycatsHouseF2Text3
-    db "@"
+SECTION "CopycatsHouseF2Text6",ROMX[$4cfe],BANK[$17]
 
 CopycatsHouseF2Text6: ; 5ccfe (17:4cfe)
     TX_FAR _CopycatsHouseF2Text6
@@ -91198,10 +91100,10 @@ CopycatsHouseF2Object: ; 0x5cd21 (size=48)
 
     db $5 ; people
     db SPRITE_BRUNETTE_GIRL,$3 + 4,$4 + 4,$fe,$0,$1 ; person
-    db SPRITE_BIRD,$6 + 4,$4 + 4,$fe,$2,$2 ; person
-    db SPRITE_SLOWBRO,$1 + 4,$5 + 4,$ff,$d0,$3 ; person
-    db SPRITE_BIRD,$0 + 4,$2 + 4,$ff,$d0,$4 ; person
-    db SPRITE_CLEFAIRY,$6 + 4,$1 + 4,$ff,$d3,$5 ; person
+    db SPRITE_DODUO,$6 + 4,$4 + 4,$fe,$2,$2 ; person
+    db SPRITE_RHYDON,$1 + 4,$5 + 4,$ff,$d0,$3 ; person
+    db SPRITE_ZAPDOS,$0 + 4,$2 + 4,$ff,$d0,$4 ; person
+    db SPRITE_CLEFABLE,$6 + 4,$1 + 4,$ff,$d3,$5 ; person
 
     ; warp-to
     EVENT_DISP $4,$1,$7 ; COPYCATS_HOUSE_1F
@@ -93408,10 +93310,26 @@ SaffronMartText1:
     db FULL_HEAL
     db MAX_REPEL,ESCAPE_ROPE,$FF
 
+JigglypuffDance:
+    ;db $30,$38,$34,$3c
+    db $30,$34,$38,$34,$3c,$34
+
 PewterJigglypuff:
+    ld de,MonOverworldDataNew_emimonserrate+($80*((DEX_JIGGLYPUFF)%(128)))
+    call JigglypuffDanceHackCommon
     ld a,JIGGLYPUFF
     call PlayCryAndDisplayPokedex
     jp TextScriptEnd
+
+JigglypuffDanceHack:
+    call DelayFrames
+    ld de,$40+MonOverworldDataNew_emimonserrate+($80*((DEX_JIGGLYPUFF)%(128)))
+    ; fall through
+
+JigglypuffDanceHackCommon:
+    ld hl,$8280
+    ld bc,(BANK(MonOverworldDataNew_emimonserrate) << 8) + $04
+    jp GoodCopyVideoData
 
 CopycatsHouseF2Text2: ; Moved in the Bank
     TX_FAR _CopycatsHouseF2Text2
@@ -93433,7 +93351,7 @@ CopycatsHouseF2Text2: ; Moved in the Bank
     TX_FAR _CopycatsHouseF2Text2_Part2_Dex
     db "@"
 
-DisplayMonFrontSpriteInBox: ; 5dbd9 (17:5bd9)
+DisplayMonFrontSpriteInBox:
 ; Displays a pokemon's front sprite in a pop-up window.
 ; [$cf91] = pokemon interal id number
     ld a,$1
@@ -93463,6 +93381,66 @@ DisplayMonFrontSpriteInBox: ; 5dbd9 (17:5bd9)
     ld a,$90
     ld [$FF00+$b0],a
     ret
+
+; ───────────────────────────────────────────
+
+CopycatsHouseF2Script:
+    call EnableAutoTextBoxDrawing
+    ld hl,CopycatsHouseF2ScriptPointers
+    ld a,[W_COPYCATSHOUSE2FCURSCRIPT]
+    jp CallFunctionInTable
+
+CopycatsHouseF2ScriptPointers:
+    dw CopycatsHouseF2Script0
+    dw CopycatsHouseF2Script1
+
+CopycatsHouseF2Script0:
+    ret
+
+CopycatsHouseF2Script1:
+    call DisplayMonFrontSpriteInBox
+    xor a
+    ld [W_COPYCATSHOUSE2FCURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+CopycatsHouseF2Text3:
+    db $08 ; asm
+    ld a,RHYDON
+    jr CopycatsHouseOnlyDollCommon
+
+CopycatsHouseF2Text4:
+    db $08 ; asm
+    ld a,ZAPDOS
+    jr CopycatsHouseOnlyDollCommon
+
+_CopycatsHouseF2Text4:
+    ld a,[$C109]
+    cp 4
+    ret nz
+    call EnableAutoTextBoxDrawing
+    ld a,4 ; text id CopycatsHouseF2Text4
+    ld [$FF8C],a
+    jp DisplayTextID
+
+CopycatsHouseF2Text5:
+    db $08 ; asm
+    ld a,CLEFABLE
+    ; fall through
+
+CopycatsHouseOnlyDollCommon:
+    ld [$cf91],a
+    ld hl,.CopycatsHouseOnlyDollText
+    call PrintText
+    ld a,1
+    ld [W_COPYCATSHOUSE2FCURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    jp TextScriptEnd
+.CopycatsHouseOnlyDollText
+    TX_FAR _CopycatsHouseOnlyDollText
+    db "@"
+
+; ───────────────────────────────────────────
 
 SECTION "bank18",ROMX,BANK[$18]
 
@@ -96119,7 +96097,7 @@ SSAnne8Object: ; 0x61a60 (size=127)
     db SPRITE_GIRL,$3 + 4,$16 + 4,$fe,$1,$5 ; person
     db SPRITE_FAT_BALD_GUY,$e + 4,$0 + 4,$ff,$ff,$6 ; person
     db SPRITE_LITTLE_GIRL,$b + 4,$2 + 4,$ff,$d0,$7 ; person
-    db SPRITE_CLEFAIRY,$b + 4,$3 + 4,$ff,$d0,$8 ; person
+    db SPRITE_WIGGLYTUFF,$b + 4,$3 + 4,$ff,$d0,$8 ; person
     db SPRITE_GIRL,$d + 4,$a + 4,$ff,$d3,$9 ; person
     db SPRITE_BALL,$f + 4,$c + 4,$ff,$ff,$8a,TM_08 ; item
     db SPRITE_GENTLEMAN,$d + 4,$15 + 4,$fe,$2,$b ; person
@@ -96154,10 +96132,7 @@ SSAnne9Script: ; 61b4b (18:5b4b)
     ld [W_SSANNE9CURSCRIPT],a
     ret
 
-SSAnne9ScriptPointers: ; 61b64 (18:5b64)
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+SECTION "SSAnne9TextPointers",ROMX[$5b6a],BANK[$18]
 
 SSAnne9TextPointers: ; 61b6a (18:5b6a)
     dw SSAnne9Text1
@@ -96237,19 +96212,7 @@ SSAnne9Text4: ; 61bd3 (18:5bd3)
     call TalkToTrainer
     jp TextScriptEnd
 
-SSAnne9Text5: ; 61bdd (18:5bdd)
-    db $08 ; asm
-    call SaveScreenTilesToBuffer1
-    ld hl,UnnamedText_61bf2
-    call PrintText
-    call LoadScreenTilesFromBuffer1
-    ld a,SNORLAX
-    call DisplayPokedex
-    jp TextScriptEnd
-
-UnnamedText_61bf2: ; 61bf2 (18:5bf2)
-    TX_FAR _UnnamedText_61bf2
-    db "@"
+SECTION "SSAnne9Text7",ROMX[$5bf7],BANK[$18]
 
 SSAnne9Text7: ; 61bf7 (18:5bf7)
     db $08 ; asm
@@ -96642,7 +96605,7 @@ SSAnne10Object: ; 0x61e75 (size=165)
     db SPRITE_SAILOR,$2 + 4,$0 + 4,$ff,$d3,$45,SAILOR,$7 ; trainer
     db SPRITE_FISHER2,$4 + 4,$0 + 4,$ff,$d3,$46,FISHER,$2 ; trainer
     db SPRITE_BLACK_HAIR_BOY_2,$d + 4,$a + 4,$ff,$d3,$7 ; person
-    db SPRITE_SLOWBRO,$c + 4,$b + 4,$ff,$ff,$8 ; person
+    db SPRITE_MACHOKE,$c + 4,$b + 4,$ff,$ff,$8 ; person
     db SPRITE_BALL,$2 + 4,$14 + 4,$ff,$ff,$89,ETHER ; item
     db SPRITE_BALL,$2 + 4,$a + 4,$ff,$ff,$8a,TM_44 ; item
     db SPRITE_BALL,$b + 4,$c + 4,$ff,$ff,$8b,MAX_POTION ; item
@@ -97325,7 +97288,7 @@ ResetFossilSteps:
     ld hl,$d7a3
     ret
 
-SSAnne4Blocks: ; Move in the BANK
+SSAnne4Blocks: ; Moved in the Bank
     INCBIN "maps/ssanne4.blk"
 
 ViridianForestObject: ; Moved in the Bank
@@ -97574,6 +97537,39 @@ DisplayTextIDAndForceGhostPal:
     set 3,[hl]
     ret
 
+; ────────────────────────────────────────
+
+SSAnne9ScriptPointers:
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+    dw SSAnneDisplaySnorlax
+
+SSAnneDisplaySnorlax:
+    ld a,SNORLAX
+    ld [$cf91],a
+    ld hl,DisplayMonFrontSpriteInBox
+    ld b,BANK(DisplayMonFrontSpriteInBox)
+    call Bankswitch
+    xor a
+    ld [W_SSANNE9CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+SSAnne9Text5:
+    db $08 ; asm
+    ld hl,.UnnamedText_61bf2
+    call PrintText
+    ld a,3
+    ld [W_SSANNE9CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    jp TextScriptEnd
+.UnnamedText_61bf2
+    TX_FAR _UnnamedText_61bf2
+    db "@"
+
+; ────────────────────────────────────────
+
 SECTION "bank19",ROMX,BANK[$19]
 
 Tset00_GFX:
@@ -97603,16 +97599,8 @@ Tset17_Block:
 
 SECTION "bank1A",ROMX,BANK[$1A]
 
-Version_GFX: ; 6802f (1a:402f)
-IF _RED
-    INCBIN "gfx/denim/denimversion.1bpp" ; INCBIN "gfx/red/redgreenversion.1bpp"
-    ; 80 bytes
-ENDC
-IF _BLUE
-    INCBIN "gfx/blue/blueversion.1bpp"
-    ; 64 bytes
-ENDC
-
+Version_GFX:
+    INCBIN "gfx/denim/denimversion.1bpp"
 Tset05_GFX:
     INCBIN "gfx/tilesets/05.2bpp"
 Tset05_Block:
@@ -98355,11 +98343,7 @@ Func_70510: ; 70510 (1c:4510)
     jr .asm_7055b
 .asm_70568
     pop hl
-    ;ld de,BirdSprite ; $4d80
-    ;ld hl,$8000
-    ;ld bc,(BANK(BirdSprite) << 8) + $0c
-    ;call CopyVideoData
-    call LoadFlyingMonSprite_Overworld ; call Func_706d7
+    call LoadFlyingMonSprite_Overworld
     ld a,$a4
     call PlaySound
     ld hl,wWhichTrade ; $cd3d
@@ -98434,7 +98418,7 @@ _DoFlyOrTeleportAwayGraphics: ; 705ba (1c:45ba)
     call Func_70730
     jr .asm_705c8
 .asm_70610
-    call LoadFlyingMonSprite_Overworld ; call Func_706d7
+    call LoadFlyingMonSprite_Overworld
     ld hl,wWhichTrade ; $cd3d
     ld a,$ff
     ld [hli],a
@@ -98512,16 +98496,6 @@ Func_706ae: ; 706ae (1c:46ae)
     ld [$cd3e],a
     jr nz,Func_706ae
     ret
-
-;Func_706d7: ; 706d7 (1c:46d7)
-;    ld de,BirdSprite ; $4d80
-;    ld hl,$8000
-;    ld bc,(BANK(BirdSprite) << 8) + $0c
-;    call CopyVideoData
-;    ld de,BirdSprite + $c0 ; $4e40 ; moving amination sprite
-;    ld hl,$8800
-;    ld bc,(BANK(BirdSprite) << 8) + $0c
-;    jp CopyVideoData
 
 LoadFlyingMonSprite_Overworld:
     ld hl,wFlagFlyingMonSpriteBit1
@@ -99848,10 +99822,6 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     call _LoadTownMap
     call LoadPlayerSpriteGraphics
     call LoadFontTilePatterns
-    ;ld de,BirdSprite ; $4d80
-    ;ld hl,$8000
-    ;ld bc,(BANK(BirdSprite) << 8) + $0c
-    ;call CopyVideoData
     call .LoadFlyingMonSprite
     ld de,TownMapUpArrow ; $5093
     ld hl,$8ed0
@@ -100658,7 +100628,6 @@ Func_71771: ; 71771 (1c:5771)
 Func_71791: ; 71791 (1c:5791)
     call DisableLCD
     call CreateMonOvWorldSprInstruction
-    ds 2 ; ld a,$1c
     ld bc,$0
 .asm_7179c
     push af
@@ -100690,146 +100659,9 @@ Func_71791: ; 71791 (1c:5791)
     jr nz,.asm_7179c
     jp EnableLCD
 
-MonOverworldSpritePointers: ; 717c0 (1c:57c0)
-    dw SlowbroSprite + $c0
-    db $40 / $10 ; 40 bytes
-    db BANK(SlowbroSprite)
-    dw $8000
+; Free
 
-    dw BallSprite
-    db $80 / $10 ; $80 bytes
-    db BANK(BallSprite)
-    dw $8040
-
-    dw ClefairySprite + $c0
-    db $40 / $10 ; $40 bytes
-    db BANK(ClefairySprite)
-    dw $80C0
-
-    dw BirdSprite + $c0
-    db $40 / $10 ; $40 bytes
-    db BANK(BirdSprite)
-    dw $8100
-
-    dw SeelSprite
-    db $40 / $10 ; $40 bytes
-    db BANK(SeelSprite)
-    dw $8140
-
-    dw MonOverworldSprites + $40
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $8180
-
-    dw MonOverworldSprites + $50
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $81A0
-
-    dw MonOverworldSprites + $60
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $81C0
-
-    dw MonOverworldSprites + $70
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $81E0
-
-    dw MonOverworldSprites + $80
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $8200
-
-    dw MonOverworldSprites + $90
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $8220
-
-    dw MonOverworldSprites + $A0
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $8240
-
-    dw MonOverworldSprites + $B0
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $8260
-
-    dw MonOverworldSprites + $100
-    db $40 / $10 ; $40 bytes
-    db BANK(MonOverworldSprites)
-    dw $8380
-
-    dw SlowbroSprite
-    db $40 / $10 ; $40 bytes
-    db BANK(SlowbroSprite)
-    dw $8400
-
-    dw BallSprite
-    db $80 / $10 ; $80 bytes
-    db BANK(BallSprite)
-    dw $8440
-
-    dw ClefairySprite
-    db $40 / $10 ; $40 bytes
-    db BANK(ClefairySprite)
-    dw $84C0
-
-    dw BirdSprite
-    db $40 / $10 ; $40 bytes
-    db BANK(BirdSprite)
-    dw $8500
-
-    dw SeelSprite + $C0
-    db $40 / $10 ; $40 bytes
-    db BANK(SeelSprite)
-    dw $8540
-
-    dw MonOverworldSprites
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $8580
-
-    dw MonOverworldSprites + $10
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $85A0
-
-    dw MonOverworldSprites + $20
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $85C0
-
-    dw MonOverworldSprites + $30
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $85E0
-
-    dw MonOverworldSprites + $C0
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $8600
-
-    dw MonOverworldSprites + $D0
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $8620
-
-    dw MonOverworldSprites + $E0
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $8640
-
-    dw MonOverworldSprites + $F0
-    db $10 / $10 ; $10 bytes
-    db BANK(MonOverworldSprites)
-    dw $8660
-
-    dw MonOverworldSprites + $140
-    db $40 / $10 ; $40 bytes
-    db BANK(MonOverworldSprites)
-    dw $8780
+SECTION "PlaceAppropriatePokemonIcon",ROMX[$5868],BANK[$1C]
 
 PlaceAppropriatePokemonIcon: ; 71868 (1c:5868)
     push hl
@@ -100973,10 +100805,12 @@ HackForInsertDVInHallOfFameDataSecondStep:
     ld [wTempAlternateFormIndex],a ; Alternate Form ID
     jp ResetTempIV
 
-SECTION "MonOverworldSprites",ROMX[$5959],BANK[$1C]
+BaloonSprites:
+    INCBIN "gfx/baloon.2bpp"
 
-MonOverworldSprites: ; 71959 (1c:5959)
-    INCBIN "gfx/mon_ow_sprites.2bpp"
+; Free
+
+SECTION "Predef54",ROMX[$5ad9],BANK[$1C]
 
 Predef54: ; 71ad9 (1c:5ad9)
 ; trigger the trade offer/action specified by wWhichTrade
@@ -103775,40 +103609,24 @@ CreateMonOvWorldSprInstruction:
 AddTradeBaloonRule:
     push af
     push hl
-    ;dw MonOverworldSprites + $100
-    ;db $40 / $10 ; $40 bytes
-    ;db BANK(MonOverworldSprites)
+    ;dw BaloonSprites
+    ;db $80 / $10 ; $40 bytes
+    ;db BANK(BaloonSprites)
     ;dw $8380
     ld bc,$06
     call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
-    ld a,(MonOverworldSprites + $100) % $100
+    ld a,(BaloonSprites) % $100
     ld [hli],a
-    ld a,(MonOverworldSprites + $100) / $100
+    ld a,(BaloonSprites) / $100
     ld [hli],a
-    ld a,$40 / $10 ; $40 bytes
+    ld a,$80 / $10 ; $80 bytes
     ld [hli],a
-    ld a,BANK(MonOverworldSprites)
+    ld a,BANK(BaloonSprites)
     ld [hli],a
     ld a,$80
     ld [hli],a
     ld a,$83
     ld [hli],a
-    ;dw MonOverworldSprites + $140
-    ;db $40 / $10 ; $40 bytes
-    ;db BANK(MonOverworldSprites)
-    ;dw $8780
-    ld a,(MonOverworldSprites + $140) % $100
-    ld [hli],a
-    ld a,(MonOverworldSprites + $140) / $100
-    ld [hli],a
-    ld a,$40 / $10 ; $40 bytes
-    ld [hli],a
-    ld a,BANK(MonOverworldSprites)
-    ld [hli],a
-    ld a,$c0
-    ld [hli],a
-    ld a,$83
-    ld [hl],a
     pop hl
     pop af
     inc a
@@ -107668,7 +107486,7 @@ CopycatsHouseF1Object: ; 0x75ee3 (size=46)
     db $3 ; people
     db SPRITE_MOM_GEISHA,$2 + 4,$2 + 4,$ff,$d0,$1 ; person
     db SPRITE_FAT_BALD_GUY,$4 + 4,$5 + 4,$ff,$d2,$2 ; person
-    db SPRITE_CLEFAIRY,$4 + 4,$1 + 4,$fe,$1,$3 ; person
+    db SPRITE_CHANSEY,$4 + 4,$1 + 4,$fe,$1,$3 ; person
 
     ; warp-to
     EVENT_DISP $4,$7,$2
@@ -118701,7 +118519,7 @@ _UnnamedText_61bf2: ; 81799 (20:5799)
     db "any #MON sleep",$55
     db "like this one!",$51
     db "It was something",$4f
-    db "like this!",$58
+    db "like this!",$57
 
 _UnnamedText_61c01: ; 817f5 (20:57f5)
     db $0,"Ah yes,I have",$4f
@@ -129442,9 +129260,9 @@ _TM31NoRoomText: ; a1733 (28:5733)
 _CopycatsHouseF2Text2: ; a1749 (28:5749)
     db $0,"DODUO: Giiih!@@"
 
-SECTION "_CopycatsHouseF2Text3",ROMX[$5792],BANK[$28]
+SECTION "_CopycatsHouseOnlyDollText",ROMX[$5792],BANK[$28]
 
-_CopycatsHouseF2Text3: ; a1792 (28:5792)
+_CopycatsHouseOnlyDollText: ; a1792 (28:5792)
     db $0,"This is a rare",$4f
     db "#MON! Huh?",$55
     db "It's only a doll!",$57
@@ -137194,8 +137012,6 @@ FontGraphicsGrayWall2bpp:
     INCBIN "gfx/denim/font.2bpp"
 Wall2bpp:
     INCBIN "gfx/denim/wall.2bpp"
-PTile: ; This is a single 1bpp "P" tile
-    INCBIN "gfx/p_tile.1bpp"
 
 LoadStatusScreenGenericTile:
     call LoadHpBarAndStatusTilePatterns
@@ -137210,11 +137026,7 @@ LoadStatusScreenGenericTile:
     ld de,BattleHudTiles3 ; $60b0
     ld hl,$9760
     ld bc,(BANK(BattleHudTiles3) << 8) + $02
-    call CopyVideoDataDouble ; ─┘
-    ld de,PTile
-    ld hl,$9720
-    ld bc,(BANK(PTile) << 8 | $01)
-    jp CopyVideoDataDouble ; P (for PP),inline
+    jp CopyVideoDataDouble ; ─┘
 
 LoadFontTilePatternsWithWall:
     ld de,FontGraphicsGrayWall2bpp
@@ -140267,6 +140079,86 @@ MonNestIcon:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+SubstituteEffectHandler:
+    ld c,50
+    call DelayFrames
+    ld hl,W_PLAYERMONMAXHP
+    ld de,wPlayerSubstituteHP
+    ld bc,W_PLAYERBATTSTATUS2
+    ld a,[$ff00+$f3]  ;whose turn?
+    and a
+    jr z,.notEnemy
+    ld hl,W_ENEMYMONMAXHP
+    ld de,wEnemySubstituteHP
+    ld bc,W_ENEMYBATTSTATUS2
+.notEnemy
+    ld a,[bc]                    ;load flags
+    bit 4,a                      ;user already has substitute?
+    jr nz,.alreadyHasSubstitute  ;skip this code if so
+                                  ;user doesn't have a substitute [yet]
+    push bc
+    ld a,[hli]  ;load max hp
+    ld b,[hl]
+    srl a        ;max hp / 4,[quarter health to remove from user]
+    rr b
+    srl a
+    rr b
+    push de
+    ld de,$fff2  ;subtract 8 to point to [current hp] instead of [max hp]
+    add hl,de    ;HL -= 8
+    pop de
+    ld a,b
+    ld [de],a    ;save copy of HP to subtract in ccd7/ccd8 [how much HP substitute has]
+    ld a,[hld]   ;load current hp
+    sub b         ;subtract [max hp / 4]
+    ld d,a       ;save low byte result in D
+    ld a,[hl]
+    sbc a,0      ;borrow from high byte if needed
+    pop bc
+    jr c,.notEnoughHP  ;underflow means user would be left with negative health
+                        ;fixedbug: note since it only brances on carry,it will possibly leave user with 0HP
+;;;;joenote - fix the bug to also check for exactly 0 hp
+    inc d
+    dec d
+    jr z,.notEnoughHP
+.userHasZeroOrMoreHP
+    ldi [hl],a  ;store high byte HP
+    ld [hl],d   ;store low byte HP
+    ld h,b
+    ld l,c
+    set 4,[hl]    ;set bit 4 of flags,user now has substitute
+    ld a,[$d355]  ;load options
+    bit 7,a       ;battle animation is enabled?
+    ld hl,PlayCurrentMoveAnimation    ; $7ba8 ;animation enabled: 0F:7BA8
+    ld b,BANK(PlayCurrentMoveAnimation)
+    jr z,.animationEnabled
+    ld hl,AnimationSubstitute   ;animation disabled: 1E:56E0
+    ld b,BANK(AnimationSubstitute)
+.animationEnabled
+    call Bankswitch           ;jump to routine depending on animation setting
+    ld hl,.UnnamedText_17e1d  ;"it created a substitute"
+    call PrintText
+    ld hl,DrawHUDsAndHPBars
+    ld b,BANK(DrawHUDsAndHPBars)
+    jp Bankswitch
+.alreadyHasSubstitute
+    ld hl,.UnnamedText_17e22  ;"x has a substitute"
+    jr .printText
+.notEnoughHP
+    ld hl,.UnnamedText_17e27  ;"too weak to make substitute"
+.printText
+    jp PrintText
+.UnnamedText_17e1d
+    TX_FAR _UnnamedText_17e1d
+    db "@"
+.UnnamedText_17e22
+    TX_FAR _UnnamedText_17e22
+    db "@"
+.UnnamedText_17e27
+    TX_FAR _UnnamedText_17e27
+    db "@"
+
+; ──────────────────────────────────────────────────────────────────────
 
 SECTION "Bank39",ROMX,BANK[$39]
 
