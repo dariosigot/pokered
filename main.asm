@@ -62805,7 +62805,6 @@ DisplayPokedexMenu_: ; 40000 (10:4000)
     ld [wLastMenuItem],a
     inc a
     ld [$d11e],a
-    ld [$ffb7],a
 .setUpGraphics
     ld b,$08
     call GoPAL_SET
@@ -62820,6 +62819,7 @@ DisplayPokedexMenu_: ; 40000 (10:4000)
     ld [hli],a ; top menu item X
     inc a
     ld [$cc37],a
+    ld [$ffb7],a ; Enable Quick Menu
     inc hl
     inc hl
     ld a,7
@@ -62832,7 +62832,7 @@ DisplayPokedexMenu_: ; 40000 (10:4000)
     ld [$cc37],a
     ld [wCurrentMenuItem],a
     ld [wLastMenuItem],a
-    ld [$ffb7],a
+    ld [$ffb7],a ; Disable Quick Menu
     ld [$cd3a],a
     ld [$cd3b],a
     pop af
@@ -62843,8 +62843,6 @@ DisplayPokedexMenu_: ; 40000 (10:4000)
 .goToSideMenu
     call HandlePokedexSideMenu
     dec b
-    jr z,.exitPokedex ; if the player chose Quit
-    dec b
     jr z,.doPokemonListMenu ; if pokemon not seen or player pressed B button
     jp .setUpGraphics ; if pokemon data or area was shown
 
@@ -62852,8 +62850,7 @@ DisplayPokedexMenu_: ; 40000 (10:4000)
 ; OUTPUT:
 ; b = reason for exiting menu
 ; 00: showed pokemon data or area
-; 01: the player chose Quit
-; 02: the pokemon has not been seen yet or the player pressed the B button
+; 01: the pokemon has not been seen yet or the player pressed the B button
 HandlePokedexSideMenu: ; 4006d (10:406d)
     call PlaceUnfilledArrowMenuCursor
     ld a,[wCurrentMenuItem]
@@ -62872,7 +62869,7 @@ HandlePokedexSideMenu: ; 4006d (10:406d)
     push af
     ld hl,wPokedexSeen
     call IsPokemonBitSet
-    ld b,2
+    ld b,1
     jr z,.exitSideMenu
     call PokedexToIndex
     ld hl,wTopMenuItemY
@@ -62882,27 +62879,36 @@ HandlePokedexSideMenu: ; 4006d (10:406d)
     ld [hli],a ; top menu item X
     xor a
     ld [hli],a ; current menu item ID
+    ld [$ffb7],a ; Disable Quick Menu
     inc hl
-    ld a,3
+    ld a,2
     ld [hli],a ; max menu item ID
+    inc a ; %00000011 ; ▼▲◄►StSeBA
     ld [hli],a ; menu watched keys (A button and B button)
     xor a
     ld [hli],a ; old menu item ID
     ld [$cc37],a
+    call EnableWrapping
 .handleMenuInput
     call HandleMenuInput
     bit 1,a ; was the B button pressed?
-    ld b,2
+    ld b,1
     jr nz,.buttonBPressed
     ld a,[wCurrentMenuItem]
     and a
     jr z,.choseData
     dec a
     jr z,.choseCry
-    dec a
-    jr z,.choseArea
-.choseQuit
-    ld b,1
+    ; fall through
+.choseArea
+    ld a,$4a
+    call Predef ; display pokemon areas
+    ld b,0
+    jr .exitSideMenu
+.choseData
+    call ShowPokedexDataInternal
+    ld b,0
+    ; fall through
 .exitSideMenu
     pop af
     ld [$cd3d],a
@@ -62931,21 +62937,12 @@ HandlePokedexSideMenu: ; 4006d (10:406d)
     call DrawTileLine ; cover up the menu cursor in the side menu
     pop bc
     jr .exitSideMenu
-.choseData
-    call ShowPokedexDataInternal
-    ld b,0
-    jr .exitSideMenu
 ; play pokemon cry
 .choseCry
     ld a,[$d11e]
     call GetCryData ; get cry data
     call PlaySound ; play sound
     jr .handleMenuInput
-.choseArea
-    ld a,$4a
-    call Predef ; display pokemon areas
-    ld b,0
-    jr .exitSideMenu
 
 SECTION "HandlePokedexListMenu",ROMX[$4111],BANK[$10]
 
@@ -63180,8 +63177,7 @@ PokedexOwnText:
 PokedexMenuItemsText:
     db "DATA",$4E
     db "CRY",$4E
-    db "AREA",$4E
-    db "QUIT@"
+    db "AREA@"
 
 ; tests if a pokemon's bit is set in the seen or owned pokemon bit fields
 ; INPUT:
@@ -63199,12 +63195,19 @@ IsPokemonBitSet:
     ret
 
 HandleColorlessGameBoyOrGoPAL_SET:
+    ld b,04
     ld a,[wRunningOnSGB]
     and a
     jp nz,GoPAL_SET
     ld a,[$cf91]
     ld [$d0b5],a
     jp GetMonHeader
+
+EnableWrapping:
+    ; a = 0
+    inc a
+    ld [wMenuWrappingEnabled],a
+    ret
 
 SECTION "ShowPokedexData",ROMX[$42d1],BANK[$10]
 
@@ -63219,68 +63222,104 @@ ShowPokedexData: ; 402d1 (10:42d1)
 
 ; function to display pokedex data from inside the pokedex
 ShowPokedexDataInternal: ; 402e2 (10:42e2)
+    ; Text without "\n"
+    ld hl,$fff6
+    set 2,[hl]
+    ; 3/7 Volume
+    ld a,$33
+    ld [$ff24],a
+    ; prevent audio fade out
     ld hl,$d72c
     set 1,[hl]
-    ld a,$33 ; 3/7 volume
-    ld [$ff24],a
-    call GBPalWhiteOut ; zero all palettes
-    call ClearScreen
-    ld a,[$d11e] ; pokemon ID
-    ld [$cf91],a
-    push af
-    ld b,04
-    call HandleColorlessGameBoyOrGoPAL_SET ; call GoPAL_SET
-    pop af
-    ld [$d11e],a
+    ; water/flower tile animation
     ld a,[$ffd7]
     push af
     xor a
     ld [$ffd7],a
-    FuncCoord 0,0
+    ; Clear Screen
+    call GBPalWhiteOut ; zero all palettes
+    call ClearScreen
+
+    call .ShowPokedexDataInternal
+
+.waitForButtonPress
+    call GetJoypadStateLowSensitivity
+    ld a,[$ffb5]
+    and a,%00000011 ; A button and B button
+    jr z,.waitForButtonPress
+
+    ; Restore Screen
+    call GBPalWhiteOut
+    call ClearScreen
+    call GoPAL_SET_CF1C
+    call LoadTextBoxTilePatterns
+    call GBPalNormal
+    ; water/flower tile animation
+    pop af
+    ld [$ffd7],a
+    ; prevent audio fade out
+    ld hl,$d72c
+    res 1,[hl]
+    ; Max Volume
+    ld a,$77
+    ld [$ff24],a
+    ; UNDO Text without "\n"
+    ld hl,$fff6
+    res 2,[hl]
+    ret
+
+.ShowPokedexDataInternal
+    ld a,[$d11e] ; pokemon ID
+    ld [$cf91],a
+    push af
+    call HandleColorlessGameBoyOrGoPAL_SET ; call GoPAL_SET
+    pop af
+    ld [$d11e],a
+    FuncCoord 00,00
     ld hl,Coord
     ld de,1
     ld bc,$6414
     call DrawTileLine ; draw top border
-    FuncCoord 0,17
+    FuncCoord 00,17
     ld hl,Coord
     ld b,$6f
     call DrawTileLine ; draw bottom border
-    FuncCoord 0,1
+    FuncCoord 00,01
     ld hl,Coord
     ld de,20
     ld bc,$6610
     call DrawTileLine ; draw left border
-    FuncCoord 19,1
+    FuncCoord 19,01
     ld hl,Coord
     ld b,$67
     call DrawTileLine ; draw right border
-    FuncCoord 0,0
+    FuncCoord 00,00
     ld a,$63 ; upper left corner tile
     ld [Coord],a
-    FuncCoord 19,0
+    FuncCoord 19,00
     ld a,$65 ; upper right corner tile
     ld [Coord],a
-    FuncCoord 0,17
+    FuncCoord 00,17
     ld a,$6c ; lower left corner tile
     ld [Coord],a
     FuncCoord 19,17
     ld a,$6e ; lower right corner tile
     ld [Coord],a
-    FuncCoord 0,9
+    FuncCoord 00,10
     ld hl,Coord
     ld de,PokedexDataDividerLine
     call PlaceString ; draw horizontal divider line
-    FuncCoord 9,6
+    FuncCoord 09,08
     ld hl,Coord
-    ld de,HeightWeightText
-    call PlaceString
+    ld de,.HeightWeightText
+    call PlaceString ; Draw Height/Weight Label
     call GetMonName
-    FuncCoord 9,2
+    FuncCoord 09,02
     ld hl,Coord
     call PlaceString
     ld hl,PokedexEntryPointers
     call IndexToPokedexAndRestoreD11E
-    ds 1 ; dec a ; 00MOD
+    ; dec a ; 00MOD
     ld e,a
     ld d,0
     add hl,de
@@ -63288,7 +63327,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld a,[hli]
     ld e,a
     ld d,[hl] ; de = address of pokedex entry
-    FuncCoord 9,4
+    FuncCoord 09,07
     ld hl,Coord
     call PlaceString ; print species name
     ld h,b
@@ -63297,7 +63336,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld a,[$d11e]
     push af
     call IndexToPokedex
-    FuncCoord 2,8
+    FuncCoord 02,09
     ld hl,Coord
     ld a,"№"
     ld [hli],a
@@ -63306,35 +63345,14 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld de,$d11e
     ld bc,$8103
     call PrintNumber ; print pokedex number
-    ld hl,wPokedexOwned
-    call IsPokemonBitSet
     pop af
     ld [$d11e],a
     ld a,[$cf91]
     ld [$d0b5],a
     pop de
-    push af
-    push bc
-    push de
-    push hl
-    call Delay3
-    call GBPalNormal
-    ; header just loaded in "GetPokedexPaletteID" ; call GetMonHeader ; load pokemon picture location
-    FuncCoord 1,1
-    ld hl,Coord
-    call LoadMonSpritePokedexWithDebug ; call LoadFlippedFrontSpriteByMonIndex ; draw pokemon picture
-    ld a,[$cf91]
-    call PlayCry ; play pokemon cry
-    pop hl
-    pop de
-    pop bc
-    pop af
-    ld a,c
-    and a
-    jp z,.waitForButtonPress ; if the pokemon has not been owned,don't print the height,weight,or description
     inc de ; de = address of feet (height)
     ld a,[de] ; reads feet,but a is overwritten without being used
-    FuncCoord 12,6
+    FuncCoord 12,08
     ld hl,Coord
     ld bc,$0102
     call PrintNumber ; print feet (height)
@@ -63342,7 +63360,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld [hl],a
     inc de
     inc de ; de = address of inches (height)
-    FuncCoord 15,6
+    FuncCoord 15,08
     ld hl,Coord
     ld bc,$8102
     call PrintNumber ; print inches (height)
@@ -63364,12 +63382,12 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     dec de
     ld a,[de] ; a = lower byte of weight
     ld [hl],a ; store lower byte of weight in [$ff8c]
-    FuncCoord 11,8
+    FuncCoord 11,09
     ld de,$ff8b
     ld hl,Coord
     ld bc,$0205 ; no leading zeroes,right-aligned,2 bytes,5 digits
     call PrintNumber ; print weight
-    FuncCoord 14,8
+    FuncCoord 14,09
     ld hl,Coord
     ld a,[$ff8c]
     sub a,10
@@ -63388,40 +63406,35 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld [$ff8b],a ; restore original value of [$ff8b]
     pop hl
     inc hl ; hl = address of pokedex description text
-    FuncCoord 1,11
+    FuncCoord 01,11
     ld bc,Coord
     ld a,2
     ld [$fff4],a
     call TextCommandProcessor ; print pokedex description text
     xor a
     ld [$fff4],a
-.waitForButtonPress
-    call GetJoypadStateLowSensitivity
-    ld a,[$ffb5]
-    and a,%00000011 ; A button and B button
-    jr z,.waitForButtonPress
-    pop af
-    ld [$ffd7],a
-    call GBPalWhiteOut
-    call ClearScreen
-    call GoPAL_SET_CF1C
-    call LoadTextBoxTilePatterns
+    FuncCoord 09,04
+    ld hl,Coord
+    ld a,$4b
+    call Predef ; Prints the type (?)
+    call Delay3
     call GBPalNormal
-    ld hl,$d72c
-    res 1,[hl]
-    ld a,$77 ; max volume
-    ld [$ff24],a
-    ret
-
-HeightWeightText: ; 40448 (10:4448)
-    db "HT  ?",$60,"??",$61,$4E,"WT   ???lb@"
+    ; header just loaded in "GetPokedexPaletteID" ; call GetMonHeader ; load pokemon picture location
+    FuncCoord 01,01
+    ld hl,Coord
+    call LoadMonSpritePokedexWithDebug ; call LoadFlippedFrontSpriteByMonIndex ; draw pokemon picture
+    ld a,[$cf91]
+    call GetCryData ; get cry data
+    jp PlaySound ; play sound
+.HeightWeightText
+    db "HT   ",$60,"  ",$61,$4E,"WT      lb@"
 
 ; XXX does anything point to this?
-Unknown_4045D: ; 4045d (10:445d)
+Unknown_4045D:
     db $54,$50
 
 ; horizontal line that divides the pokedex text description from the rest of the data
-PokedexDataDividerLine: ; 4045f (10:445f)
+PokedexDataDividerLine:
     db $68,$69,$6B,$69,$6B
     db $69,$6B,$69,$6B,$6B
     db $6B,$6B,$69,$6B,$69
@@ -63434,7 +63447,7 @@ PokedexDataDividerLine: ; 4045f (10:445f)
 ; c = number of tile ID's to write
 ; de = amount to destination address after each tile (1 for horizontal,20 for vertical)
 ; hl = destination address
-DrawTileLine: ; 40474 (10:4474)
+DrawTileLine:
     push bc
     push de
 .loop
