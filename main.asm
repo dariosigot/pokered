@@ -25024,6 +25024,10 @@ RodResponse: ; e28d (3:628d)
     call GetBiteLevel ; ld [W_CURENEMYLVL],a
     ld a,c ; species
     ld [W_CUROPPONENT],a ; $d059
+    ld [W_ENEMYMONID],a
+    ld hl,GetWildEnemyLevel
+    ld b,BANK(GetWildEnemyLevel)
+    call Bankswitch
 .next
     ld hl,$D700
     ld a,[hl] ; store the value in a
@@ -132336,15 +132340,23 @@ SelectInOverWorld:
     call CheckExceptionTilePassable
     jr c,.noFishing
     ;are rods in the bag?
-    ld b,SUPER_ROD
-    call .IsItemInBag
-    jr nz,.Fishing
-    ld b,GOOD_ROD
-    call .IsItemInBag
-    jr nz,.Fishing
-    ld b,OLD_ROD
-    call .IsItemInBag
+    ld hl,wNumBagItems
+    ld a,[hli]
+    ld c,a
+.SearchFishingLoop
+    ld a,[hli]
+    ld b,a
+    cp $ff
     jr z,.noFishing
+    cp SUPER_ROD
+    jr z,.Fishing
+    cp GOOD_ROD
+    jr z,.Fishing
+    cp OLD_ROD
+    jr z,.Fishing
+    dec c
+    jr nz,.SearchFishingLoop
+    jr .noFishing
 .Fishing
     call .StartCustomSelectFunction
     ld a,b
@@ -134960,10 +134972,11 @@ _ReadRodData:
     ld b,[hl] ; how many mons in group
     inc hl ; point to data
     ld e,$0 ; no bite yet
-.RandomLoop ; 0xe90c
     call GenRandom
     srl a
     ret c ; 50% chance of no battle
+.RandomLoop
+    call GenRandom
     and %11111 ; 5-bit random number
     cp b
     jr nc,.RandomLoop ; if a is greater than the number of mons,regenerate
@@ -134995,6 +135008,8 @@ GoodRodData:
     dbdw ROUTE_24            , GoodRodGroupNorth
     dbdw ROUTE_25            , GoodRodGroupNorth
     dbdw VERMILION_DOCK      , GoodRodGroupCenter
+    dbdw SEAFOAM_ISLANDS_4   , GoodRodGroupSeaform
+    dbdw SEAFOAM_ISLANDS_5   , GoodRodGroupSeaform
     dbdw SAFARI_ZONE_EAST    , GoodRodGroupSafari
     dbdw SAFARI_ZONE_NORTH   , GoodRodGroupSafari
     dbdw SAFARI_ZONE_WEST    , GoodRodGroupSafari
@@ -135302,11 +135317,39 @@ SuperRodGroupSwamp:
     db 26,POLIWAG
 
 GoodRodGroupSafari:
-    db  4
-    db  1,MAGIKARP
+    db  32
+    db  2,MAGIKARP
+    db  3,MAGIKARP
+    db  3,MAGIKARP
+    db  4,MAGIKARP
+    db  4,MAGIKARP
+    db  5,MAGIKARP
+    db  5,MAGIKARP
+    db  6,MAGIKARP
+    db  2,POLIWAG
     db  2,POLIWAG
     db  3,POLIWAG
+    db  3,POLIWAG
+    db  3,POLIWAG
+    db  3,POLIWAG
+    db  4,POLIWAG
+    db  4,POLIWAG
+    db  4,POLIWAG
+    db  5,POLIWAG
+    db  5,POLIWAG
+    db  5,POLIWAG
+    db  6,POLIWAG
+    db  6,POLIWAG
     db  2,SEEL ; Entry Level
+    db  3,SEEL
+    db  3,SEEL
+    db  4,SEEL
+    db  4,SEEL
+    db  5,SEEL
+    db  5,SEEL
+    db  6,SEEL
+    db  2,OMANYTE ; Entry Level
+    db  2,KABUTO ; Entry Level
 
 SuperRodGroupSafari:
     db 32
@@ -135322,11 +135365,13 @@ SuperRodGroupSafari:
     db  9,POLIWAG
     db 13,POLIWAG
     db 13,POLIWAG
+    db 13,POLIWAG
     db 17,POLIWAG
     db 21,POLIWAG
     db 24,POLIWAG
     db  8,SEEL
     db 12,SEEL
+    db 16,SEEL
     db 16,SEEL
     db 20,SEEL
     db 24,SEEL
@@ -135335,8 +135380,6 @@ SuperRodGroupSafari:
     db 15,DRATINI
     db 19,DRATINI
     db 23,DRATINI
-    db 20,OMANYTE ; Entry Level
-    db 20,KABUTO ; Entry Level
     db 25,POLIWHIRL
     db 27,POLIWHIRL
     db 28,POLIWHIRL
@@ -135378,6 +135421,41 @@ SuperRodGroupSouth:
     db 28,KINGLER
     db 30,KINGLER
 
+GoodRodGroupSeaform:
+    db 32
+    db  2,KRABBY
+    db  3,KRABBY
+    db  3,KRABBY
+    db  3,KRABBY
+    db  4,KRABBY
+    db  4,KRABBY
+    db  4,KRABBY
+    db  5,KRABBY
+    db  5,KRABBY
+    db  6,KRABBY
+    db  6,KRABBY
+    db  7,KRABBY
+    db  2,SHELLDER ; Entry Level
+    db  3,SHELLDER
+    db  3,SHELLDER
+    db  4,SHELLDER
+    db  4,SHELLDER
+    db  5,SHELLDER
+    db  5,SHELLDER
+    db  6,SHELLDER
+    db  7,SHELLDER
+    db  2,STARYU ; Entry Level
+    db  3,STARYU
+    db  3,STARYU
+    db  4,STARYU
+    db  4,STARYU
+    db  5,STARYU
+    db  5,STARYU
+    db  6,STARYU
+    db  7,STARYU
+    db  2,OMANYTE
+    db  2,KABUTO
+
 SuperRodGroupSeaform:
     db 32
     db  3,KRABBY
@@ -135388,7 +135466,7 @@ SuperRodGroupSeaform:
     db 23,KRABBY
     db 27,KRABBY
     db 31,KRABBY
-    db  3,SHELLDER ; Entry Level
+    db  3,SHELLDER
     db  8,SHELLDER
     db 11,SHELLDER
     db 15,SHELLDER
@@ -135396,7 +135474,8 @@ SuperRodGroupSeaform:
     db 23,SHELLDER
     db 23,SHELLDER
     db 27,SHELLDER
-    db  3,STARYU ; Entry Level
+    db 31,SHELLDER
+    db  3,STARYU
     db  8,STARYU
     db 11,STARYU
     db 15,STARYU
@@ -135404,14 +135483,13 @@ SuperRodGroupSeaform:
     db 23,STARYU
     db 23,STARYU
     db 27,STARYU
+    db 31,STARYU
     db 30,KINGLER
     db 32,KINGLER
     db 34,KINGLER
     db 36,KINGLER
     db 38,STARMIE
     db 38,CLOYSTER
-    db 21,OMANYTE
-    db 21,KABUTO
 
 SuperRodGroupLake:
     db  8
