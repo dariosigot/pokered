@@ -29932,8 +29932,9 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     dw .strength
     dw .flash
     dw .softboiled
+
 .fly
-    bit 2,a ; does the player have the Thunder Badge?
+;    bit 2,a ; does the player have the Thunder Badge?
     call CheckAirPower ; jp z,.newBadgeRequired
     call CheckIfInOutsideMapAndAtLeastOneFlyingMap
     jr z,.canFly
@@ -29955,8 +29956,9 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld hl,$d72e
     set 1,[hl]
     jp StartMenu_Pokemon
+
 .cut
-    bit 1,a ; does the player have the Cascade Badge?
+;    bit 1,a ; does the player have the Cascade Badge?
     call CheckNaturePower ; jp z,.newBadgeRequired
     ld b,BANK(CheckCutTile)
     ld hl,CheckCutTile
@@ -29968,8 +29970,9 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     and a
     jp z,.loop
     jp CloseTextDisplay
+
 .surf
-    bit 4,a ; does the player have the Soul Badge?
+;    bit 4,a ; does the player have the Soul Badge?
     call CheckWaterPower ; jp z,.newBadgeRequired
     ld b,BANK(IsSurfingAllowed)
     ld hl,IsSurfingAllowed
@@ -29988,14 +29991,16 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .WhiteScreenAndGotoMap
     call GBPalWhiteOutWithDelay3
     jp .goBackToMap
+
 .strength
-    bit 3,a ; does the player have the Rainbow Badge?
+;    bit 3,a ; does the player have the Rainbow Badge?
     call CheckEarthPower ; jp z,.newBadgeRequired
     ld a,$5b
     call Predef
     jr .WhiteScreenAndGotoMap
+
 .flash
-    bit 0,a ; does the player have the Boulder Badge?
+;    bit 0,a ; does the player have the Boulder Badge?
     call CheckFirePower ; jp z,.newBadgeRequired
     call PlayCryAndDecreaseFieldMoveEnergy
     xor a
@@ -30006,6 +30011,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .flashLightsAreaText
     TX_FAR _FlashLightsAreaText
     db "@"
+
 .dig
     ld a,ESCAPE_ROPE
     ld [$cf91],a
@@ -30015,6 +30021,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     and a
     jp z,.loop
     jr .WhiteScreenAndGotoMap
+
 .teleport
     call CheckIfTeleportNotAllowed
     jr nz,.canTeleport
@@ -30047,6 +30054,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .cannotFlyHereText
     TX_FAR _CannotFlyHereText
     db "@"
+
 .softboiled
     ld hl,W_PARTYMON1_MAXHP
     ld a,[$cf92]
@@ -31163,9 +31171,9 @@ SetDamageDuringRecoil:
     ld hl,SetDamageDuringRecoil_
     jp Bankswitch
 
-DontCheckElement:
-    pop af ; Delete Call Back Return
-    jp NewBadgeRequired
+;DontCheckElement:
+;    pop af ; Delete Call Back Return
+;    jp NewBadgeRequired
 
 ElementEnd:
     ret nz
@@ -31178,31 +31186,31 @@ ElementEnd:
     db "@"
 
 CheckNaturePower: ; CUT
-    jr z,DontCheckElement
+;    jr z,DontCheckElement
     ld hl,$d803
     bit 0,[hl]
     jr ElementEnd
 
 CheckAirPower: ; FLY
-    jr z,DontCheckElement
+;    jr z,DontCheckElement
     ld hl,$d7e0
     bit 6,[hl]
     jr ElementEnd
 
 CheckWaterPower: ; SURF
-    jr z,DontCheckElement
+;    jr z,DontCheckElement
     ld hl,$d857
     bit 0,[hl]
     jr ElementEnd
 
 CheckEarthPower: ; STRENGTH
-    jr z,DontCheckElement
+;    jr z,DontCheckElement
     ld hl,$d78e
     bit 0,[hl]
     jr ElementEnd
 
 CheckFirePower: ; FIRE
-    jr z,DontCheckElement
+;    jr z,DontCheckElement
     ld hl,$d7c2
     bit 0,[hl]
     jr ElementEnd
@@ -132216,9 +132224,9 @@ SelectInOverWorld:
     ld a,[W_CURMAPTILESET]
     cp 23 ; plateau
     jr z,.noCut
-    ld a,[W_OBTAINEDBADGES] ; badges obtained
-    bit 1,a ; does the player have the Cascade Badge?
-    jr z,.noCut
+;    ld a,[W_OBTAINEDBADGES] ; badges obtained
+;    bit 1,a ; does the player have the Cascade Badge?
+;    jr z,.noCut
     ld hl,$d803 ; NaturePower
     bit 0,[hl]  ; ...
     jr z,.noCut
@@ -132245,9 +132253,9 @@ SelectInOverWorld:
     ld a,[$d732] ; Force to Ride Bike
     bit 5,a      ; ...
     jr nz,.noFloat
-    ld a,[W_OBTAINEDBADGES] ; badges obtained
-    bit 4,a ; does the player have the Soul Badge?
-    jr z,.noFloat
+;    ld a,[W_OBTAINEDBADGES] ; badges obtained
+;    bit 4,a ; does the player have the Soul Badge?
+;    jr z,.noFloat
     ld hl,$d857 ; WaterPower
     bit 0,[hl]  ; ...
     jr z,.noFloat
@@ -132283,9 +132291,9 @@ SelectInOverWorld:
     ld a,[$d35d]
     and a
     jr z,.noLight
-    ld a,[W_OBTAINEDBADGES] ; badges obtained
-    bit 0,a ; does the player have the Boulder Badge?
-    jr z,.noLight
+;    ld a,[W_OBTAINEDBADGES] ; badges obtained
+;    bit 0,a ; does the player have the Boulder Badge?
+;    jr z,.noLight
     ld hl,$d7c2 ; FirePower
     bit 0,[hl]  ; ...
     jr z,.noLight
@@ -132310,9 +132318,9 @@ SelectInOverWorld:
     ld a,[$d700]
     cp a,2 ; is the player surfing?
     jp z,.noStrength
-    ld a,[W_OBTAINEDBADGES] ; badges obtained
-    bit 3,a ; does the player have the Rainbow Badge?
-    jr z,.noStrength
+;    ld a,[W_OBTAINEDBADGES] ; badges obtained
+;    bit 3,a ; does the player have the Rainbow Badge?
+;    jr z,.noStrength
     ld hl,$d78e ; EarthPower
     bit 0,[hl]  ; ...
     jr z,.noStrength
