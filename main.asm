@@ -31595,7 +31595,7 @@ UnknownDungeonLandPkmnList:
     db ELECTRODE
     db EXEGGCUTE
     db EXEGGCUTE
-    db EXEGGUTOR ; Entry Level
+    db EXEGGUTOR
     db CUBONE
     db CUBONE
     db MAROWAK
@@ -133913,7 +133913,7 @@ Route22Mons:
     db  2,MANKEY    ;  5% ; Entry Level
     db  5,SPEAROW   ;  5%
     db  4,MANKEY    ;  4%
-    db  6,PSYDUCK   ;  1%
+    db  6,POLIWAG   ;  1%
     db $00
 
 ForestMons:
@@ -134097,17 +134097,17 @@ Route6Mons:
     db 13,FARFETCH_D ;  5%
     db 11,FARFETCH_D ;  5%
     db 13,POLIWAG    ;  4%
-    db 13,PSYDUCK    ;  1%
+    db 13,PSYDUCK    ;  1% ; Entry Level
     db $05
     db 20,POLIWAG    ; 20%
     db 19,FARFETCH_D ; 20%
-    db 24,PSYDUCK    ; 15%
-    db 16,POLIWAG    ; 10%
-    db 27,PSYDUCK    ; 10%
+    db 16,POLIWAG    ; 15%
     db 25,POLIWHIRL  ; 10%
-    db 28,POLIWHIRL  ;  5%
+    db 28,POLIWHIRL  ; 10%
+    db 16,PSYDUCK    ; 10%
     db 23,FARFETCH_D ;  5%
-    db 32,POLIWRATH  ;  4% ; Entry Level
+    db 22,PSYDUCK    ;  5%
+    db 37,POLIWRATH  ;  4% ; Entry Level
     db 33,GOLDUCK    ;  1% ; Entry Level
 
 VermilionMons:
@@ -134502,9 +134502,9 @@ ZoneMonsCenter:
     db 25,SEEL      ; 10%
     db 22,DRATINI   ; 10%
     db 23,MAGIKARP  ;  5%
-    db 28,GYARADOS  ;  5%
-    db 32,GYARADOS  ;  4%
-    db 30,DRAGONAIR ;  1%
+    db 24,DRATINI   ;  5%
+    db 25,DRATINI   ;  4%
+    db 30,DRAGONAIR ;  1% ; Entry Level
 
 ZoneMons1:
     db $1E
@@ -134526,8 +134526,8 @@ ZoneMons1:
     db 25,SEEL      ; 10%
     db 22,DRATINI   ; 10%
     db 23,MAGIKARP  ;  5%
-    db 28,GYARADOS  ;  5%
-    db 32,GYARADOS  ;  4%
+    db 24,DRATINI   ;  5%
+    db 25,DRATINI   ;  4%
     db 30,DRAGONAIR ;  1%
 
 ZoneMons2:
@@ -134550,8 +134550,8 @@ ZoneMons2:
     db 25,SEEL      ; 10%
     db 22,DRATINI   ; 10%
     db 23,MAGIKARP  ;  5%
-    db 28,GYARADOS  ;  5%
-    db 32,GYARADOS  ;  4%
+    db 24,DRATINI   ;  5%
+    db 25,DRATINI   ;  4%
     db 30,DRAGONAIR ;  1%
 
 ZoneMons3:
@@ -134574,9 +134574,9 @@ ZoneMons3:
     db 25,SEEL      ; 10%
     db 22,DRATINI   ; 10%
     db 23,MAGIKARP  ;  5% ; Shiny If Level 26 in SAFARI_ZONE_WEST
-    db 28,GYARADOS  ;  5%
-    db 32,GYARADOS  ;  4%
-    db 30,DRAGONAIR ;  1% ; Entry Level
+    db 24,DRATINI   ;  5%
+    db 25,DRATINI   ;  4%
+    db 30,DRAGONAIR ;  1%
 
 WaterMons:
     db $00
@@ -134793,10 +134793,10 @@ Route23Mons:
     db 27,MAGIKARP   ; 20%
     db 30,MAGIKARP   ; 15%
     db 33,MAGIKARP   ; 10%
-    db 25,DRATINI    ; 10%
-    db 31,GYARADOS   ; 10%
+    db 28,DRATINI    ; 10%
+    db 43,GYARADOS   ; 10%
     db 30,DRAGONAIR  ;  5%
-    db 34,GYARADOS   ;  5%
+    db 48,GYARADOS   ;  5%
     db 45,DRAGONAIR  ;  4%
     db 55,DRAGONITE  ;  1% ; Entry Level
 
@@ -134984,7 +134984,7 @@ GoodRodData:
     dbdw CERULEAN_CITY       , GoodRodGroupNorth
     dbdw VERMILION_CITY      , GoodRodGroupCenter
     dbdw FUCHSIA_CITY        , GoodRodGroupFishGuru
-    dbdw ROUTE_6             , GoodRodGroupPsyduck
+    dbdw ROUTE_6             , GoodRodGroupSwamp
     dbdw ROUTE_10            , GoodRodGroupPowerPlant
     dbdw ROUTE_11            , GoodRodGroupCenter
     dbdw ROUTE_12            , GoodRodGroupEst
@@ -135007,7 +135007,7 @@ SuperRodData:
     dbdw VERMILION_CITY      , SuperRodGroupCenter
     dbdw FUCHSIA_CITY        , SuperRodGroupFishGuru
     dbdw CINNABAR_ISLAND     , SuperRodGroupSouth
-    dbdw ROUTE_6             , SuperRodGroupPsyduck
+    dbdw ROUTE_6             , SuperRodGroupSwamp
     dbdw ROUTE_10            , SuperRodGroupPowerPlant
     dbdw ROUTE_11            , SuperRodGroupCenter
     dbdw ROUTE_12            , SuperRodGroupEst
@@ -135252,14 +135252,14 @@ SuperRodGroupPowerPlant:
     db 17,MAGIKARP
     db 21,MAGIKARP
     db 25,MAGIKARP
-    db  2,TENTACOOL
     db  6,TENTACOOL
     db 10,TENTACOOL
     db 14,TENTACOOL
     db 14,TENTACOOL
     db 18,TENTACOOL
     db 22,TENTACOOL
-    db 30,TENTACRUEL
+    db 34,TENTACRUEL
+    db 38,TENTACRUEL
 
 GoodRodGroupFishGuru:
     db  2
@@ -135277,21 +135277,21 @@ SuperRodGroupFishGuru:
     db 21,MAGIKARP
     db 25,MAGIKARP
 
-GoodRodGroupPsyduck:
+GoodRodGroupSwamp:
     db  2
-    db  2,PSYDUCK ; Entry Level
+    db  2,GOLDEEN
     db  2,POLIWAG
 
-SuperRodGroupPsyduck:
+SuperRodGroupSwamp:
     db 16
-    db  2,PSYDUCK
-    db  6,PSYDUCK
-    db 10,PSYDUCK
-    db 14,PSYDUCK
-    db 14,PSYDUCK
-    db 18,PSYDUCK
-    db 22,PSYDUCK
-    db 26,PSYDUCK
+    db  2,GOLDEEN
+    db  6,GOLDEEN
+    db 10,GOLDEEN
+    db 14,GOLDEEN
+    db 14,GOLDEEN
+    db 18,GOLDEEN
+    db 22,GOLDEEN
+    db 26,GOLDEEN
     db  2,POLIWAG
     db  6,POLIWAG
     db 10,POLIWAG
@@ -135318,8 +135318,6 @@ SuperRodGroupSafari:
     db 14,MAGIKARP
     db 18,MAGIKARP
     db 22,MAGIKARP ; Shiny If Level 26 in SAFARI_ZONE_WEST
-    db 20,GYARADOS ; Entry Level
-    db 24,GYARADOS
     db  5,POLIWAG
     db  9,POLIWAG
     db 13,POLIWAG
@@ -135336,9 +135334,11 @@ SuperRodGroupSafari:
     db 11,DRATINI
     db 15,DRATINI
     db 19,DRATINI
+    db 23,DRATINI
     db 20,OMANYTE ; Entry Level
     db 20,KABUTO ; Entry Level
     db 25,POLIWHIRL
+    db 27,POLIWHIRL
     db 28,POLIWHIRL
     db 29,POLIWHIRL
     db 30,POLIWHIRL
@@ -135422,7 +135422,7 @@ SuperRodGroupLake:
     db 30,MAGIKARP
     db 30,MAGIKARP
     db 33,MAGIKARP
-    db 31,GYARADOS
+    db 43,GYARADOS ; Entry Level
 
 ;SuperRodGroupUnknown:
 
