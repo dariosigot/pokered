@@ -7015,7 +7015,7 @@ RedisplayStartMenu: ; 2adf (0:2adf)
 ; if the player pressed tried to go past the top item,wrap around to the bottom
     ld a,[$d74b]
     bit 5,a ; does the player have the pokedex?
-    ld a,6 ; there are 7 menu items with the pokedex,so the max index is 6
+    ld a,6-1 ; there are 7 menu items with the pokedex,so the max index is 6
     jr nz,.wrapMenuItemId
     dec a ; there are only 6 menu items without the pokedex
 .wrapMenuItemId
@@ -7029,7 +7029,7 @@ RedisplayStartMenu: ; 2adf (0:2adf)
     ld a,[$d74b]
     bit 5,a ; does the player have the pokedex?
     ld a,[wCurrentMenuItem]
-    ld c,7 ; there are 7 menu items with the pokedex
+    ld c,7-1 ; there are 7 menu items with the pokedex
     jr nz,.checkIfPastBottom
     dec c ; there are only 6 menu items without the pokedex
 .checkIfPastBottom
@@ -7166,7 +7166,7 @@ AddItemToInventory: ; 2bcf (0:2bcf)
 DisplayListMenuID: ; 2be6 (0:2be6)
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; disable auto-transfer
-    ld a,1
+    inc a ; a = 1
     ld [$ffb7],a ; joypad state update flag
     ld a,[W_BATTLETYPE]
     and a ; is it the Old Man battle?
@@ -7181,19 +7181,21 @@ DisplayListMenuID: ; 2be6 (0:2be6)
     set 6,[hl] ; turn off letter printing delay
     xor a
     ld [$cc35],a ; 0 means no item is currently being swapped
-    ld [$d12a],a
     ld a,[$cf8b]
     ld l,a
     ld a,[$cf8c]
     ld h,a ; hl = address of the list
     ld a,[hl]
+    and a
+    jp z,ExitListMenu
     ld [$d12a],a ; [$d12a] = number of list entries
+    push af ; Backup number of list entries
     ld a,$0d ; list menu text box ID
-    call HackItemInBattle ; ld [$d125],a ; $2c16
+    call HackItemInBattle ; ld [$d125],a ; $2c17
     call DisplayTextBoxID ; draw the menu text box
     call UpdateSprites ; move sprites
     FuncCoord 4,2 ; coordinates of upper left corner of menu text box
-    call HackItemInBattle ; ld hl,Coord ; $2c1f
+    call HackItemInBattle ; ld hl,Coord ; $2c20
     ld de,$090e ; height and width of menu text box
     ld a,[wListMenuID]
     and a ; is it a PC pokemon list?
@@ -7202,7 +7204,8 @@ DisplayListMenuID: ; 2be6 (0:2be6)
 .skipMovingSprites
     ld a,1 ; max menu item ID is 1 if the list has less than 2 entries
     ld [$cc37],a
-    ld a,[$d12a]
+    pop af ; Restore number of list entries
+    dec a
     cp a,2 ; does the list have less than 2 entries?
     jr c,.setMenuVariables
     ld a,2 ; max menu item ID is 2 if the list has at least 2 entries
@@ -7216,6 +7219,9 @@ DisplayListMenuID: ; 2be6 (0:2be6)
     ld [wMenuWatchedKeys],a
     ld c,10
     call DelayFrames
+    ; fall through
+
+SECTION "DisplayListMenuIDLoop",ROM0[$2c53]
 
 DisplayListMenuIDLoop: ; 2c53 (0:2c53)
     xor a
@@ -7338,7 +7344,7 @@ DisplayListMenuIDLoop: ; 2c53 (0:2c53)
     jr z,.upPressed
 .downPressed
     ld a,[hl]
-    add a,3
+    add a,4 ; 3
     ld b,a
     ld a,[$d12a] ; number of list entries
     cp b ; will going down scroll past the Cancel button?
@@ -7381,6 +7387,9 @@ DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
     ;ds 1 ; xor a
     ;ds 3 ; ld [$cf96],a ; initialize current quantity to 0
 
+    ld a,1
+    ld [$ffb7],a ; Set Quick Menu
+
     ld b,BANK(InitializeChooseQuantityMenu) ; 2 byte
     ld hl,InitializeChooseQuantityMenu ; 3 byte
     call Bankswitch ; 3 byte
@@ -7389,7 +7398,7 @@ DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
 
 .waitForKeyPressLoop
     call GetJoypadStateLowSensitivity
-    ld a,[H_NEWLYPRESSEDBUTTONS] ; newly pressed buttons
+    ld a,[$ffb5]
     bit 0,a ; was the A button pressed?
     jp nz,.buttonAPressed
     bit 1,a ; was the B button pressed?
@@ -7397,6 +7406,9 @@ DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
     ld b,a
     ld a,[$ff8e]
     and a ; should the price be halved (for selling items)?
+    jr nz,.CheckUpDown
+    ld a,[wListMenuID]
+    cp a,PRICEDITEMLISTMENU
     jr nz,.CheckUpDown
     ld a,[$cf91] ; selected item ID
     cp TM_01
@@ -7487,12 +7499,13 @@ DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
     call PrintNumber
     jp .waitForKeyPressLoop
 .buttonAPressed ; the player chose to make the transaction
+.buttonCommonPressed
     xor a
     ld [$cc35],a ; 0 means no item is currently being swapped
+    ld [$ffb7],a ; Reset Quick Menu
     ret
 .buttonBPressed ; the player chose to cancel the transaction
-    xor a
-    ld [$cc35],a ; 0 means no item is currently being swapped
+    call .buttonCommonPressed
     ld a,$ff
     ret
 
@@ -7723,11 +7736,14 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     ld [hl],a
     ret
 .printCancelMenuItem
-    ld de,ListMenuCancelText
-    jp PlaceString
+    ret
+;    ld de,ListMenuCancelText
+;    jp PlaceString
 
-ListMenuCancelText: ; 2f97 (0:2f97)
-    db "CANCEL@"
+;ListMenuCancelText: ; 2f97 (0:2f97)
+;    db "CANCEL@"
+
+SECTION "GetMonName",ROM0[$2f9e]
 
 GetMonName: ; 2f9e (0:2f9e)
     push hl
@@ -8399,8 +8415,8 @@ Func_3442: ; 3442 (0:3442)
 
 FuncTX_ItemStoragePC: ; 3460 (0:3460)
     call SaveScreenTilesToBuffer2
-    ld b,BANK(Func_78e6)
-    ld hl,Func_78e6
+    ld b,BANK(PlayerPC)
+    ld hl,PlayerPC
     jr bankswitchAndContinue
 
 FuncTX_BillsPC: ; 346a (0:346a)
@@ -11348,7 +11364,7 @@ ItemPrices: ; Moved in the Bank
     bcd3      0 ; TECH_MACHINE
     bcd3   1000 ; POKE_DOLL
     bcd3    600 ; FULL_HEAL
-    bcd3  15000 ; REVIVE
+    bcd3  10000 ; REVIVE
     bcd3  40000 ; MAX_REVIVE
     bcd3    700 ; GUARD_SPEC
     bcd3    500 ; SUPER_REPEL
@@ -14208,10 +14224,10 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     ld hl,Coord
     ld de,BattleStyleOptionText
     call PlaceString
-    FuncCoord 3,16
-    ld hl,Coord
-    ld de,OptionMenuCancelText
-    call PlaceString
+;    FuncCoord 3,16
+;    ld hl,Coord
+;    ld de,OptionMenuCancelText
+;    call PlaceString
     xor a
     ld [wCurrentMenuItem],a
     ld [wLastMenuItem],a
@@ -14233,17 +14249,18 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     call GetJoypadStateLowSensitivity
     ld a,[$ffb5]
     ld b,a
-    and a,%11111011 ; any key besides select pressed?
+    and a,%11111010 ; ▼▲◄►StSeBA
     jr z,.getJoypadStateLoop
     bit 1,b ; B button pressed?
     jr nz,.exitMenu
     bit 3,b ; Start button pressed?
     jr nz,.exitMenu
-    bit 0,b ; A button pressed?
-    jr z,.checkDirectionKeys
-    ld a,[wTopMenuItemY]
-    cp a,16 ; is the cursor on Cancel?
-    jr nz,.loop
+;    bit 0,b ; A button pressed?
+;    jr z,.checkDirectionKeys
+    jr .checkDirectionKeys
+;    ld a,[wTopMenuItemY]
+;    cp a,16 ; is the cursor on Cancel?
+;    jr nz,.loop
 .exitMenu
     ld a,$90
     call PlaySound ; play sound
@@ -14254,7 +14271,7 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
 .eraseOldMenuCursor
     ld [wTopMenuItemX],a
     call EraseMenuCursor
-    jp .loop
+    jr .loop
 .checkDirectionKeys
     ld a,[wTopMenuItemY]
     bit 7,b ; Down pressed?
@@ -14272,18 +14289,14 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     jp nz,.pressedLeftInTextSpeed
     jp .pressedRightInTextSpeed
 .downPressed
-    cp a,16
-    ld b,-13
+    cp a,11
+    ld b,-8
     ld hl,$cd3d
     jr z,.updateMenuVariables
     ld b,4
     cp a,3
     inc hl
     jr z,.updateMenuVariables
-    cp a,7
-    inc hl
-    jr z,.updateMenuVariables
-    ld b,5
     inc hl
     jr .updateMenuVariables
 .upPressed
@@ -14294,12 +14307,9 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     cp a,11
     inc hl
     jr z,.updateMenuVariables
-    cp a,16
-    ld b,-5
+    ld b,+8
     inc hl
-    jr z,.updateMenuVariables
-    ld b,13
-    inc hl
+    ; fall through
 .updateMenuVariables
     add b
     ld [wTopMenuItemY],a
@@ -14354,8 +14364,8 @@ BattleStyleOptionText:
     db "?",$4E
     db "  0       1@"
 
-OptionMenuCancelText:
-    db "CANCEL@"
+;OptionMenuCancelText:
+;    db "CANCEL@"
 
 ; sets the options variable according to the current placement of the menu cursors in the options menu
 SetOptionsFromCursorPositions:
@@ -14435,11 +14445,11 @@ SetCursorPositionsFromOptions: ; 604c (1:604c)
     ld [$cd3f],a ; battle style cursor X coordinate
     FuncCoord 0,11
     ld hl,Coord
-    call .placeUnfilledRightArrow
+;    call .placeUnfilledRightArrow
 ; cursor in front of Cancel
-    FuncCoord 0,16
-    ld hl,Coord
-    ld a,2
+;    FuncCoord 0,16
+;    ld hl,Coord
+;    ld a,2
 .placeUnfilledRightArrow
     ld e,a
     ld d,0
@@ -14447,7 +14457,7 @@ SetCursorPositionsFromOptions: ; 604c (1:604c)
     ld [hl],$ec ; unfilled right arrow menu cursor
     ret
 
-    ds 1
+SECTION "TextSpeedOptionData",ROMX[$6096],BANK[$1]
 
 ; table that indicates how the 3 text speed options affect frame delays
 ; Format:
@@ -15917,7 +15927,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     and a ; buying?
     jp z,.buyMenu
     dec a ; selling?
-    jp z,.sellMenu
+    jr z,.sellMenu
     dec a ; quitting?
     jp z,.done
 .sellMenu
@@ -15931,7 +15941,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld a,[wNumBagItems]
     and a
     jp z,.bagEmpty
-    ld hl,PokemonSellingGreetingText
+    ld hl,.PokemonSellingGreetingText
     call PrintText
     call SaveScreenTilesToBuffer1 ; save screen
 .sellMenuLoop
@@ -15946,7 +15956,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld [$cf8c],a
     xor a
     ld [$cf93],a
-    ds 3 ; ld [wCurrentMenuItem],a
+    ld [wCurrentMenuItem],a
     ld a,ITEMLISTMENU
     ld [wListMenuID],a
     call DisplayListMenuID
@@ -15957,15 +15967,13 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     and a
     jr nz,.unsellableItem
     ld a,[$cf91]
-    ds 3 ; call IsItemHM
-    ds 2 ; jr c,.unsellableItem
     ld a,PRICEDITEMLISTMENU
     ld [wListMenuID],a
     ld [$ff8e],a ; halve prices when selling
     call DisplayChooseQuantityMenu
     inc a
     jr z,.sellMenuLoop ; if the player closed the choose quantity menu with the B button
-    ld hl,PokemartTellSellPrice
+    ld hl,.PokemartTellSellPrice
     ld bc,$0e01
     call PrintText
     FuncCoord 14,7
@@ -15990,15 +15998,19 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     call AddAmountSoldToMoney
     ld hl,wNumBagItems
     call RemoveItemFromInventory
+    ld a,[wNumBagItems]
+    and a
+    jr z,.returnToMainPokemartMenu2
     jp .sellMenuLoop
 .unsellableItem
-    ld hl,PokemartUnsellableItemText
+    ld hl,.PokemartUnsellableItemText
     call PrintText
-    jp .returnToMainPokemartMenu
+    jr .returnToMainPokemartMenu2
 .bagEmpty
-    ld hl,PokemartItemBagEmptyText
+    ld hl,.PokemartItemBagEmptyText
     call PrintText
     call SaveScreenTilesToBuffer1 ; save screen
+.returnToMainPokemartMenu2
     jp .returnToMainPokemartMenu
 .buyMenu
     ld a,$01
@@ -16008,7 +16020,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld hl,Func_39bd5
     ld b,BANK(Func_39bd5)
     call Bankswitch
-    ld hl,PokemartBuyingGreetingText
+    ld hl,.PokemartBuyingGreetingText
     call PrintText
     call SaveScreenTilesToBuffer1 ; save screen
 .buyMenuLoop
@@ -16022,7 +16034,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld a,h
     ld [$cf8c],a
     xor a
-    ds 3 ; ld [wCurrentMenuItem],a
+    ld [wCurrentMenuItem],a
     inc a
     ld [$cf93],a
     inc a ; a = 2 (PRICEDITEMLISTMENU)
@@ -16040,7 +16052,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld [$d11e],a ; store item ID for GetItemName
     call GetItemName
     call CopyStringToCF4B ; copy name to $cf4b
-    ld hl,PokemartTellBuyPrice
+    ld hl,.PokemartTellBuyPrice
     call PrintText
     FuncCoord 14,7
     ld hl,Coord
@@ -16050,7 +16062,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     call DisplayTextBoxID ; yes/no menu
     ld a,[$d12e]
     cp a,$02
-    jp z,.buyMenuLoop ; if the player pressed the B button
+    jr z,.buyMenuLoop ; if the player pressed the B button
     ld a,[$d12d] ; ID of the chosen menu item
     dec a
     jr z,.buyMenuLoop ; if the player chose No
@@ -16070,7 +16082,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld a,$b2
     call PlaySoundWaitForCurrent ; play sound
     call WaitForSoundToFinish ; wait until sound is done playing
-    ld hl,PokemartBoughtItemText
+    ld hl,.PokemartBoughtItemText
     call PrintText
     jp .buyMenuLoop
 .returnToMainPokemartMenu
@@ -16078,7 +16090,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld a,$13
     ld [$d125],a
     call DisplayTextBoxID ; draw money text box
-    ld hl,PokemartAnythingElseText
+    ld hl,.PokemartAnythingElseText
     call PrintText
     jp .loop
 .isThereEnoughMoney
@@ -16087,15 +16099,15 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld c,3 ; length of money in bytes
     jp StringCmp
 .notEnoughMoney
-    ld hl,PokemartNotEnoughMoneyText
+    ld hl,.PokemartNotEnoughMoneyText
     call PrintText
     jr .returnToMainPokemartMenu
 .bagFull
-    ld hl,PokemartItemBagFullText
+    ld hl,.PokemartItemBagFullText
     call PrintText
     jr .returnToMainPokemartMenu
 .done
-    ld hl,PokemartThankYouText
+    ld hl,.PokemartThankYouText
     call PrintText
     ld a,$01
     ld [$cfcb],a
@@ -16103,52 +16115,43 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld a,[$d07e]
     ld [wListScrollOffset],a
     ret
-
-PokemartBuyingGreetingText: ; 6e0c (1:6e0c)
+.PokemartBuyingGreetingText
     TX_FAR _PokemartBuyingGreetingText
     db "@"
-
-PokemartTellBuyPrice: ; 6e11 (1:6e11)
+.PokemartTellBuyPrice
     TX_FAR _PokemartTellBuyPrice
     db "@"
-
-PokemartBoughtItemText: ; 6e16 (1:6e16)
+.PokemartBoughtItemText
     TX_FAR _PokemartBoughtItemText
     db "@"
-
-PokemartNotEnoughMoneyText: ; 6e1b (1:6e1b)
+.PokemartNotEnoughMoneyText
     TX_FAR _PokemartNotEnoughMoneyText
     db "@"
-
-PokemartItemBagFullText: ; 6e20 (1:6e20)
+.PokemartItemBagFullText
     TX_FAR _PokemartItemBagFullText
     db "@"
-
-PokemonSellingGreetingText: ; 6e25 (1:6e25)
+.PokemonSellingGreetingText
     TX_FAR _PokemonSellingGreetingText
     db "@"
-
-PokemartTellSellPrice: ; 6e2a (1:6e2a)
+.PokemartTellSellPrice
     TX_FAR _PokemartTellSellPrice
     db "@"
-
-PokemartItemBagEmptyText: ; 6e2f (1:6e2f)
+.PokemartItemBagEmptyText
     TX_FAR _PokemartItemBagEmptyText
     db "@"
-
-PokemartUnsellableItemText: ; 6e34 (1:6e34)
+.PokemartUnsellableItemText
     TX_FAR _PokemartUnsellableItemText
     db "@"
-
-PokemartThankYouText: ; 6e39 (1:6e39)
+.PokemartThankYouText
     TX_FAR _PokemartThankYouText
     db "@"
-
-PokemartAnythingElseText: ; 6e3e (1:6e3e)
+.PokemartAnythingElseText:
     TX_FAR _PokemartAnythingElseText
     db "@"
 
 ; ────────────────────────────────────────
+
+SECTION "LearnMove",ROMX[$6e43],BANK[$1]
 
 LearnMove: ; 6e43 (1:6e43)
     call CheckMoveRelearn
@@ -16520,13 +16523,13 @@ DisplayTextIDInit: ; 7096 (1:7096)
 ; start menu with pokedex
     FuncCoord 10,0 ; $c3aa
     ld hl,Coord
-    ld b,$0e
+    ld b,$0e-2
     ld c,$08
     jr nz,.drawTextBoxBorder
 ; start menu without pokedex
     FuncCoord 10,0 ; $c3aa
     ld hl,Coord
-    ld b,$0c
+    ld b,$0c-2
     ld c,$08
     jr .drawTextBoxBorder
 ; if text ID is not 0 (i.e. not the start menu) then do a standard dialogue text box
@@ -16592,13 +16595,13 @@ DrawStartMenu: ; 710b (1:710b)
 ; menu with pokedex
     FuncCoord 10,0 ; $c3aa
     ld hl,Coord
-    ld b,$0e
+    ld b,$0e-2
     ld c,$08
     jr nz,.drawTextBoxBorder
 ; shorter menu if the player doesn't have the pokedex
     FuncCoord 10,0 ; $c3aa
     ld hl,Coord
-    ld b,$0c
+    ld b,$0c-2
     ld c,$08
 .drawTextBoxBorder
     call TextBoxBorder
@@ -16620,12 +16623,12 @@ DrawStartMenu: ; 710b (1:710b)
     ld a,[$d74b]
     bit 5,a ; does the player have the pokedex?
 ; case for not having pokdex
-    ld a,$06
+    ld a,$06-1
     jr z,.storeMenuItemCount
 ; case for having pokedex
     ld de,StartMenuPokedexText
     call PrintStartMenuItem
-    ld a,$07
+    ld a,$07-1
 .storeMenuItemCount
     ld [$cc28],a ; number of menu items
     ld de,StartMenuPokemonText
@@ -16645,11 +16648,13 @@ DrawStartMenu: ; 710b (1:710b)
     call PrintStartMenuItem
     ld de,StartMenuOptionText
     call PrintStartMenuItem
-    ld de,StartMenuExitText
-    call PlaceString
+    ;ld de,StartMenuExitText
+    ;call PlaceString
     ld hl,$d730
     res 6,[hl] ; turn pauses between printing letters back on
     ret
+
+SECTION "StartMenuPokedexText",ROMX[$718f],BANK[$1]
 
 StartMenuPokedexText: ; 718f (1:718f)
     db "POKéDEX@"
@@ -16666,8 +16671,10 @@ StartMenuSaveText: ; 71a4 (1:71a4)
 StartMenuResetText: ; 71a9 (1:71a9)
     db "RESET@"
 
-StartMenuExitText: ; 71af (1:71af)
-    db "EXIT@"
+;StartMenuExitText: ; 71af (1:71af)
+;    db "EXIT@"
+
+SECTION "StartMenuOptionText",ROMX[$71b4],BANK[$1]
 
 StartMenuOptionText: ; 71b4 (1:71b4)
     db "OPTION@"
@@ -17031,7 +17038,7 @@ TextBoxTextAndCoordTable: ; 73b0 (1:73b0)
     db 13,14 ; text coordinates
 
     db $0e ; text box ID
-    db 0,0,10,6    ; text box coordinates
+    db 0,0,10,6-2    ; text box coordinates
     dw BuySellQuitText
     db 2,1   ; text coordinates
 
@@ -17054,8 +17061,8 @@ TextBoxTextAndCoordTable: ; 73b0 (1:73b0)
 
 BuySellQuitText: ; 7413 (1:7413)
     db "BUY",$4E
-    db "SELL",$4E
-    db "QUIT@@"
+    db "SELL","@";$4E
+;    db "QUIT@@"
 
 UseTossText: ; 7422 (1:7422)
     db "USE",$4E
@@ -17091,7 +17098,9 @@ SafariZoneBattleMenuText: ; 7468 (1:7468)
 SwitchStatsCancelText: ; 7489 (1:7489)
     db "SWITCH",$4E
     db "STATS","@" ; $4E ; Eliminato "CANCEL"
-    db "CANCEL@"
+;    db "CANCEL@"
+
+SECTION "JapaneseAhText",ROMX[$749d],BANK[$1]
 
 JapaneseAhText: ; 749d (1:749d)
     db "アッ!@"
@@ -17136,7 +17145,7 @@ Func_74ea: ; 74ea (1:74ea)
     call DisplayTextBoxID
     ld a,$3
     ld [wMenuWatchedKeys],a ; $cc29
-    ld a,$2
+    ld a,$2-1
     ld [wMaxMenuItem],a ; $cc28
     ld a,$1
     ld [wTopMenuItemY],a ; $cc24
@@ -17166,7 +17175,7 @@ Func_74ea: ; 74ea (1:74ea)
     ld b,a
     ld a,[wMaxMenuItem] ; $cc28
     cp b
-    jr z,.asm_754c
+;    jr z,.asm_754c
     ret
 .asm_754c
     ld a,$2
@@ -17175,6 +17184,8 @@ Func_74ea: ; 74ea (1:74ea)
     ld [$d12d],a
     scf
     ret
+
+SECTION "DisplayYesNoTextBox",ROMX[$7559],BANK[$1]
 
 DisplayYesNoTextBox: ; 7559 (1:7559)
     push hl
@@ -17622,9 +17633,9 @@ DrainHPEffect_: ; Moved in the Bank
 
 ; Free
 
-SECTION "Func_78e6",ROMX[$78e6],BANK[$1]
+SECTION "PlayerPC",ROMX[$78e6],BANK[$1]
 
-Func_78e6: ; 78e6 (1:78e6)
+PlayerPC: ; 78e6 (1:78e6)
     ld hl,$d730
     set 6,[hl]
     ld a,ITEM_NAME
@@ -17635,20 +17646,20 @@ Func_78e6: ; 78e6 (1:78e6)
     ld [$ccd3],a
     ld a,[wFlags_0xcd60]
     bit 3,a
-    jr nz,Func_790c
+    jr nz,PlayerPCMenu
     ld a,$99
     call PlaySound
     ld hl,UnnamedText_7b22 ; $7b22
     call PrintText
 
-Func_790c: ; 790c (1:790c)
+PlayerPCMenu:
     ld a,[$ccd3]
     ld [wCurrentMenuItem],a ; $cc26
     ld hl,wFlags_0xcd60
     set 5,[hl]
     call LoadScreenTilesFromBuffer2
     ld hl,wTileMap
-    ld b,$8
+    ld b,$8-2
     ld c,$e
     call TextBoxBorder
     call UpdateSprites
@@ -17663,7 +17674,7 @@ Func_790c: ; 790c (1:790c)
     ld [hli],a
     inc hl
     inc hl
-    ld a,$3
+    ld a,$3-1
     ld [hli],a
     ld a,$3
     ld [hli],a
@@ -17677,18 +17688,17 @@ Func_790c: ; 790c (1:790c)
     call PrintText
     call HandleMenuInput
     bit 1,a
-    jp nz,Func_796d
+    jr nz,.ExitPlayerPC
     call PlaceUnfilledArrowMenuCursor
     ld a,[wCurrentMenuItem] ; $cc26
     ld [$ccd3],a
     and a
-    jp z,Func_7a12
+    jp z,PlayerPCWithdraw
     dec a
-    jp z,Func_7995
+    jp z,PlayerPCDeposit
     dec a
-    jp z,Func_7a8f
-
-Func_796d: ; 796d (1:796d)
+    jp z,PlayerPCToss
+.ExitPlayerPC
     ld a,[wFlags_0xcd60]
     bit 3,a
     jr nz,.asm_797c
@@ -17708,18 +17718,18 @@ Func_796d: ; 796d (1:796d)
     ld [$cc3c],a
     ret
 
-Func_7995: ; 7995 (1:7995)
+PlayerPCDeposit:
     xor a
     ld [wCurrentMenuItem],a ; $cc26
     ld [wListScrollOffset],a ; $cc36
     ld a,[wNumBagItems] ; $d31d
     and a
-    jr nz,Func_79ab
+    jr nz,.loop
     ld hl,UnnamedText_7b3b ; $7b3b
     call PrintText
-    jp Func_790c
-
-Func_79ab: ; 79ab (1:79ab)
+.PlayerPCMenu
+    jp PlayerPCMenu
+.loop
     ld hl,UnnamedText_7b2c ; $7b2c
     call PrintText
     ld hl,wNumBagItems ; $d31d
@@ -17732,7 +17742,7 @@ Func_79ab: ; 79ab (1:79ab)
     ld a,$3
     ld [wListMenuID],a ; $cf94
     call DisplayListMenuID
-    jp c,Func_790c
+    jr c,.PlayerPCMenu
     call IsKeyItem
     ld a,$1
     ld [$cf96],a
@@ -17743,14 +17753,14 @@ Func_79ab: ; 79ab (1:79ab)
     call PrintText
     call DisplayChooseQuantityMenu
     cp $ff
-    jp z,Func_79ab
+    jr z,.loop
 .asm_79e7
     ld hl,wNumBoxItems ; $d53a
     call AddItemToInventory
     jr c,.asm_79f8
     ld hl,UnnamedText_7b40 ; $7b40
     call PrintText
-    jp Func_79ab
+    jr .loop
 .asm_79f8
     ld hl,wNumBagItems ; $d31d
     call RemoveItemFromInventory
@@ -17760,20 +17770,23 @@ Func_79ab: ; 79ab (1:79ab)
     call WaitForSoundToFinish
     ld hl,UnnamedText_7b36 ; $7b36
     call PrintText
-    jp Func_79ab
+    ld a,[wNumBagItems]
+    and a
+    jr z,.PlayerPCMenu
+    jr .loop
 
-Func_7a12: ; 7a12 (1:7a12)
+PlayerPCWithdraw:
     xor a
     ld [wCurrentMenuItem],a ; $cc26
     ld [wListScrollOffset],a ; $cc36
     ld a,[wNumBoxItems] ; $d53a
     and a
-    jr nz,Func_7a28
-    ld hl,UnnamedText_7b54 ; $7b54
+    jr nz,.loop
+    ld hl,NothingStoredText ; $7b54
     call PrintText
-    jp Func_790c
-
-Func_7a28: ; 7a28 (1:7a28)
+.PlayerPCMenu
+    jp PlayerPCMenu
+.loop
     ld hl,UnnamedText_7b45 ; $7b45
     call PrintText
     ld hl,wNumBoxItems ; $d53a
@@ -17786,7 +17799,7 @@ Func_7a28: ; 7a28 (1:7a28)
     ld a,$3
     ld [wListMenuID],a ; $cf94
     call DisplayListMenuID
-    jp c,Func_790c
+    jr c,.PlayerPCMenu
     call IsKeyItem
     ld a,$1
     ld [$cf96],a
@@ -17797,14 +17810,14 @@ Func_7a28: ; 7a28 (1:7a28)
     call PrintText
     call DisplayChooseQuantityMenu
     cp $ff
-    jp z,Func_7a28
+    jr z,.loop
 .asm_7a64
     ld hl,wNumBagItems ; $d31d
     call AddItemToInventory
     jr c,.asm_7a75
     ld hl,UnnamedText_7b59 ; $7b59
     call PrintText
-    jp Func_7a28
+    jr .loop
 .asm_7a75
     ld hl,wNumBoxItems ; $d53a
     call RemoveItemFromInventory
@@ -17814,20 +17827,23 @@ Func_7a28: ; 7a28 (1:7a28)
     call WaitForSoundToFinish
     ld hl,UnnamedText_7b4f ; $7b4f
     call PrintText
-    jp Func_7a28
+    ld a,[wNumBoxItems]
+    and a
+    jr z,.PlayerPCMenu
+    jr .loop
 
-Func_7a8f: ; 7a8f (1:7a8f)
+PlayerPCToss:
     xor a
     ld [wCurrentMenuItem],a ; $cc26
     ld [wListScrollOffset],a ; $cc36
     ld a,[wNumBoxItems] ; $d53a
     and a
-    jr nz,Func_7aa5
-    ld hl,UnnamedText_7b54 ; $7b54
+    jr nz,.loop
+    ld hl,NothingStoredText ; $7b54
     call PrintText
-    jp Func_790c
-
-Func_7aa5: ; 7aa5 (1:7aa5)
+.PlayerPCMenu
+    jp PlayerPCMenu
+.loop
     ld hl,UnnamedText_7b5e ; $7b5e
     call PrintText
     ld hl,wNumBoxItems ; $d53a
@@ -17842,7 +17858,7 @@ Func_7aa5: ; 7aa5 (1:7aa5)
     push hl
     call DisplayListMenuID
     pop hl
-    jp c,Func_790c
+    jr c,.PlayerPCMenu
     push hl
     call IsKeyItem
     pop hl
@@ -17852,80 +17868,71 @@ Func_7aa5: ; 7aa5 (1:7aa5)
     and a
     jr nz,.asm_7aef
     ld a,[$cf91]
-    ds 3 ; call IsItemHM
-    ds 2 ; jr c,.asm_7aef
     push hl
     ld hl,UnnamedText_7b63 ; $7b63
     call PrintText
     call DisplayChooseQuantityMenu
     pop hl
     cp $ff
-    jp z,Func_7aa5
+    jr z,.loop
 .asm_7aef
     call TossItem
-    jp Func_7aa5
+    ld a,[wNumBoxItems]
+    and a
+    jr z,.PlayerPCMenu
+    jr .loop
 
-PlayersPCMenuEntries: ; 7af5 (1:7af5)
+PlayersPCMenuEntries
     db "WITHDRAW ITEM",$4E
     db "DEPOSIT ITEM",$4E
-    db "TOSS ITEM",$4E
-    db "LOG OFF@"
-
-UnnamedText_7b22: ; 7b22 (1:7b22)
+    db "TOSS ITEM","@";$4E
+;    db "LOG OFF@"
+UnnamedText_7b22
     TX_FAR _UnnamedText_7b22
     db "@"
-
-UnnamedText_7b27: ; 7b27 (1:7b27)
+UnnamedText_7b27
     TX_FAR _UnnamedText_7b27
     db "@"
-
-UnnamedText_7b2c: ; 7b2c (1:7b2c)
+UnnamedText_7b2c
     TX_FAR _UnnamedText_7b2c
     db "@"
-
-UnnamedText_7b31: ; 7b31 (1:7b31)
+UnnamedText_7b31
     TX_FAR _UnnamedText_7b31
     db "@"
-
-UnnamedText_7b36: ; 7b36 (1:7b36)
+UnnamedText_7b36
     TX_FAR _UnnamedText_7b36
     db "@"
-
-UnnamedText_7b3b: ; 7b3b (1:7b3b)
+UnnamedText_7b3b
     TX_FAR _UnnamedText_7b3b
     db "@"
-
-UnnamedText_7b40: ; 7b40 (1:7b40)
+UnnamedText_7b40
     TX_FAR _UnnamedText_7b40
     db "@"
-
-UnnamedText_7b45: ; 7b45 (1:7b45)
+UnnamedText_7b45
     TX_FAR _UnnamedText_7b45
     db "@"
-
-UnnamedText_7b4a: ; 7b4a (1:7b4a)
+UnnamedText_7b4a
     TX_FAR _UnnamedText_7b4a
     db "@"
-
-UnnamedText_7b4f: ; 7b4f (1:7b4f)
+UnnamedText_7b4f
     TX_FAR _UnnamedText_7b4f
     db "@"
-
-UnnamedText_7b54: ; 7b54 (1:7b54)
-    TX_FAR _UnnamedText_7b54
+NothingStoredText
+    TX_FAR _NothingStoredText
     db "@"
-
-UnnamedText_7b59: ; 7b59 (1:7b59)
+UnnamedText_7b59
     TX_FAR _UnnamedText_7b59
     db "@"
-
-UnnamedText_7b5e: ; 7b5e (1:7b5e)
+UnnamedText_7b5e
     TX_FAR _UnnamedText_7b5e
     db "@"
-
-UnnamedText_7b63: ; 7b63 (1:7b63)
+UnnamedText_7b63
     TX_FAR _UnnamedText_7b63
     db "@"
+
+; Free
+
+SECTION "_RemovePokemon",ROMX[$7b68],BANK[$1]
 
 _RemovePokemon: ; 7b68 (1:7b68)
     ld hl,W_NUMINPARTY ; $d163
@@ -30045,10 +30052,13 @@ StartMenu_Item: ; 13302 (4:7302)
     ld a,[W_ISLINKBATTLE]
     dec a
     jr nz,.notInLinkBattle
-    ld hl,CannotUseItemsHereText
+    ld hl,.CannotUseItemsHereText
     call PrintText
     jr .exitMenu
 .notInLinkBattle
+    ld a,[wNumBagItems]
+    and a
+    jr z,.exitMenu
     ld bc,wNumBagItems
     ld hl,$cf8b
     ld a,c
@@ -30122,7 +30132,7 @@ StartMenu_Item: ; 13302 (4:7302)
     ld a,[$d732]
     bit 5,a
     jr z,.useItem_closeMenu
-    ld hl,CannotGetOffHereText
+    ld hl,.CannotGetOffHereText
     call PrintText
     jp ItemMenuLoop
 .notBicycle2
@@ -30189,12 +30199,10 @@ StartMenu_Item: ; 13302 (4:7302)
     call TossItem
 .tossZeroItems
     jp ItemMenuLoop
-
-CannotUseItemsHereText: ; 1342a (4:742a)
+.CannotUseItemsHereText
     TX_FAR _CannotUseItemsHereText
     db "@"
-
-CannotGetOffHereText: ; 1342f (4:742f)
+.CannotGetOffHereText
     TX_FAR _CannotGetOffHereText
     db "@"
 
@@ -33397,7 +33405,7 @@ PCMainMenu: ; 17e48 (5:7e48)
     bit 1,a              ;if player pressed B
     jp nz,LogOff
     ld a,[wMaxMenuItem]
-    cp a,2
+    cp a,2-1
     jr nz,.next ;if not 2 menu items (not counting log off) (2 occurs before you get the pokedex)
     ld a,[wCurrentMenuItem]
     and a
@@ -33406,7 +33414,7 @@ PCMainMenu: ; 17e48 (5:7e48)
     jr z,.playersPC ;if current menu item id is 1,it's players pc
     jp LogOff        ;otherwise,it's 2,and you're logging off
 .next
-    cp a,3
+    cp a,3-1
     jr nz,.next2 ;if not 3 menu items (not counting log off) (3 occurs after you get the pokedex,before you beat the pokemon league)
     ld a,[wCurrentMenuItem]
     and a
@@ -33436,8 +33444,8 @@ PCMainMenu: ; 17e48 (5:7e48)
     call WaitForSoundToFinish  ;XXX: wait for sound to be done
     ld hl,UnnamedText_17f32  ;accessed players pc
     call PrintText
-    ld b,BANK(Func_78e6)
-    ld hl,Func_78e6
+    ld b,BANK(PlayerPC)
+    ld hl,PlayerPC
     call Bankswitch
     jr ReloadMainMenu
 OaksPC: ; 17ec0 (5:7ec0)
@@ -40135,7 +40143,7 @@ BikeShopText1: ; 1d745 (7:5745)
     ld [$cc2a],a
     ld a,$3
     ld [$cc29],a
-    ld a,$1
+    ld a,$1-1
     ld [$cc28],a
     ld a,$2
     ld [$cc24],a
@@ -40144,7 +40152,7 @@ BikeShopText1: ; 1d745 (7:5745)
     ld hl,$d730
     set 6,[hl]
     ld hl,wTileMap
-    ld b,$4
+    ld b,$4-1
     ld c,$f
     call TextBoxBorder
     call UpdateSprites
@@ -40175,8 +40183,10 @@ BikeShopText1: ; 1d745 (7:5745)
     jp TextScriptEnd
 
 BikeShopMenuText: ; 1d7f8 (7:57f8)
-    db "BICYCLE",$4e
-    db "CANCEL@"
+    db "BICYCLE","@";$4e
+;    db "CANCEL@"
+
+SECTION "BikeShopMenuPrice",ROMX[$5807],BANK[$7]
 
 BikeShopMenuPrice: ; 1d807 (7:5807)
     db "¥1000000@"
@@ -42725,7 +42735,7 @@ BillsHouseInitiatedText: ; 1ebe2 (7:6be2)
 BillsHousePokemonList: ; 1ec05 (7:6c05)
     db $08 ; asm
     call SaveScreenTilesToBuffer1
-    ld hl,BillsHousePokemonListText1
+    ld hl,.BillsHousePokemonListText1
     call PrintText
     xor a
     ld [$d07c],a
@@ -42733,7 +42743,7 @@ BillsHousePokemonList: ; 1ec05 (7:6c05)
     ld [$cc2a],a
     ld a,$3
     ld [$cc29],a
-    ld a,$4
+    ld a,$4-1
     ld [$cc28],a
     ld a,$2
     ld [$cc24],a
@@ -42747,7 +42757,7 @@ BillsHousePokemonList: ; 1ec05 (7:6c05)
     ld c,$9
     call TextBoxBorder
     ld hl,$c3ca
-    ld de,BillsMonListText
+    ld de,.BillsMonListText
     call PlaceString
     ld hl,BillsHousePokemonListText2
     call PrintText
@@ -42775,13 +42785,13 @@ BillsHousePokemonList: ; 1ec05 (7:6c05)
     res 6,[hl]
     call LoadScreenTilesFromBuffer2
     jp TextScriptEnd
-
-BillsHousePokemonListText1: ; 1ec7f (7:6c7f)
+.BillsHousePokemonListText1
     TX_FAR _BillsHousePokemonListText1
     db "@"
+.BillsMonListText
+    db "EEVEE",$4e,"FLAREON",$4e,"JOLTEON",$4e,"VAPOREON","@";$4e,"CANCEL@"
 
-BillsMonListText: ; 1ec84 (7:6c84)
-    db "EEVEE",$4e,"FLAREON",$4e,"JOLTEON",$4e,"VAPOREON",$4e,"CANCEL@"
+SECTION "BillsHousePokemonListText2",ROMX[$6caa],BANK[$7]
 
 BillsHousePokemonListText2: ; 1ecaa (7:6caa)
     TX_FAR _BillsHousePokemonListText2
@@ -45042,34 +45052,34 @@ Func_213c8: ; 213c8 (8:53c8)
     and a
     jr nz,.asm_213f3
     ld hl,wTileMap
-    ld b,$8
+    ld b,$8-2
     ld c,$e
     jr .asm_213fa
 .asm_213ea
     ld hl,wTileMap
-    ld b,$6
+    ld b,$6-2
     ld c,$e
     jr .asm_213fa
 .asm_213f3
     ld hl,wTileMap
-    ld b,$a
+    ld b,$a-2
     ld c,$e
 .asm_213fa
     call TextBoxBorder
     call UpdateSprites
-    ld a,$3
+    ld a,$3-1
     ld [wMaxMenuItem],a ; $cc28
     ld a,[$d7f1]
     bit 0,a
     jr nz,.asm_21414
     FuncCoord 2,2 ; $c3ca
     ld hl,Coord
-    ld de,SomeonesPCText ; $548b
+    ld de,.SomeonesPCText ; $548b
     jr .asm_2141a
 .asm_21414
     FuncCoord 2,2 ; $c3ca
     ld hl,Coord
-    ld de,BillsPCText ; $5497
+    ld de,.BillsPCText ; $5497
 .asm_2141a
     call PlaceString
     FuncCoord 2,4 ; $c3f2
@@ -45078,41 +45088,41 @@ Func_213c8: ; 213c8 (8:53c8)
     call PlaceString
     ld l,c
     ld h,b
-    ld de,PlayersPCText ; $54a0
+    ld de,.PlayersPCText ; $54a0
     call PlaceString
     ld a,[$d74b]
     bit 5,a
     jr z,.asm_21462
     FuncCoord 2,6 ; $c41a
     ld hl,Coord
-    ld de,OaksPCText ; $54a5
+    ld de,.OaksPCText ; $54a5
     call PlaceString
     ld a,[$d5a2]
     and a
     jr z,.asm_2145a
-    ld a,$4
+    ld a,$4-1
     ld [wMaxMenuItem],a ; $cc28
     FuncCoord 2,8 ; $c442
     ld hl,Coord
-    ld de,PKMNLeaguePCText ; $54b2
+    ld de,.PKMNLeaguePCText ; $54b2
     call PlaceString
-    FuncCoord 2,10 ; $c46a
-    ld hl,Coord
-    ld de,LogOffPCText ; $54ba
+;    FuncCoord 2,10 ; $c46a
+;    ld hl,Coord
+;    ld de,.LogOffPCText ; $54ba
     jr .asm_2146d
 .asm_2145a
-    FuncCoord 2,8 ; $c442
-    ld hl,Coord
-    ld de,LogOffPCText ; $54ba
+;    FuncCoord 2,8 ; $c442
+;    ld hl,Coord
+;    ld de,.LogOffPCText ; $54ba
     jr .asm_2146d
 .asm_21462
-    ld a,$2
+    ld a,$2-1
     ld [wMaxMenuItem],a ; $cc28
-    FuncCoord 2,6 ; $c41a
-    ld hl,Coord
-    ld de,LogOffPCText ; $54ba
+;    FuncCoord 2,6 ; $c41a
+;    ld hl,Coord
+;    ld de,.LogOffPCText ; $54ba
 .asm_2146d
-    call PlaceString
+;    call PlaceString
     ld a,$3
     ld [wMenuWatchedKeys],a ; $cc29
     ld a,$2
@@ -45125,24 +45135,20 @@ Func_213c8: ; 213c8 (8:53c8)
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ret
-
-SomeonesPCText: ; 2148b (8:548b)
+.SomeonesPCText
     db "SOMEONE's PC@"
-
-BillsPCText: ; 21497 (8:5497)
+.BillsPCText
     db "BILL's PC@"
-
-PlayersPCText: ; 214a0 (8:54a0)
+.PlayersPCText
     db "'s PC@"
-
-OaksPCText: ; 214a5 (8:54a5)
+.OaksPCText
     db "PROF.OAK's PC@"
-
-PKMNLeaguePCText: ; 214b2 (8:54b2)
+.PKMNLeaguePCText
     db $4a,"LEAGUE@"
+;.LogOffPCText
+;    db "LOG OFF@"
 
-LogOffPCText: ; 214ba (8:54ba)
-    db "LOG OFF@"
+SECTION "Func_214c2",ROMX[$54c2],BANK[$8]
 
 Func_214c2: ; 214c2 (8:54c2)
 BillsPC_: ; 0x214c2
@@ -45172,7 +45178,7 @@ BillsPCMenu: ; 214e8 (8:54e8)
     call CopyVideoData
     call LoadScreenTilesFromBuffer2DisableBGTransfer
     ld hl,wTileMap
-    ld b,$a
+    ld b,$a-2
     ld c,$c
     call TextBoxBorder
     FuncCoord 2,2 ; $c3ca
@@ -45186,7 +45192,7 @@ BillsPCMenu: ; 214e8 (8:54e8)
     ld [hli],a
     inc hl
     inc hl
-    ld a,$4
+    ld a,$4-1
     ld [hli],a
     ld a,$3
     ld [hli],a
@@ -45396,7 +45402,9 @@ DisplayMonListMenu: ; 216be (8:56be)
     ret
 
 BillsPCMenuText: ; 216e1 (8:56e1)
-    db "WITHDRAW ",$4a,$4e,"DEPOSIT ",$4a,$4e,"RELEASE ",$4a,$4e,"CHANGE BOX",$4e,"SEE YA!@"
+    db "WITHDRAW ",$4a,$4e,"DEPOSIT ",$4a,$4e,"RELEASE ",$4a,$4e,"CHANGE BOX","@";$4e,"SEE YA!@"
+
+SECTION "BoxNoPCText",ROMX[$5713],BANK[$8]
 
 BoxNoPCText: ; 21713 (8:5713)
     db "BOX No.@"
@@ -55119,7 +55127,7 @@ InitBattleMenu: ; 3ceb3 (f:4eb3)
     call DisplayTextBoxID
     ld a,[W_BATTLETYPE] ; $d05a
     dec a
-    jp nz,RegularBattleMenu ; regular battle
+    jp nz,.RegularBattleMenu ; regular battle
     ; the following happens for the old man tutorial
     ld hl,W_PLAYERNAME ; $d158
     ld de,W_GRASSRATE ; $d887
@@ -55129,7 +55137,7 @@ InitBattleMenu: ; 3ceb3 (f:4eb3)
                    ; map with wild pokémon. due to an oversight,the data
                    ; may not get overwritten (cinnabar) and the infamous
                    ; missingno. glitch can show up.
-    ld hl,OldManName ; $4f12
+    ld hl,.OldManName ; $4f12
     ld de,W_PLAYERNAME ; $d158
     ld bc,$b
     call CopyData
@@ -55147,12 +55155,12 @@ InitBattleMenu: ; 3ceb3 (f:4eb3)
     call DelayFrames
     ld [hl],$ec
     ld a,$2
-    jp Func_3cfe8
+    jp .Func_3cfe8
 
-OldManName: ; 3cf12 (f:4f12)
+.OldManName:
     db "OLD MAN@"
 
-RegularBattleMenu: ; 3cf1a (f:4f1a)
+.RegularBattleMenu:
     ld a,[$cc2d]
     ld [wCurrentMenuItem],a ; $cc26
     ld [wLastMenuItem],a ; $cc2a
@@ -55267,7 +55275,7 @@ RegularBattleMenu: ; 3cf1a (f:4f1a)
     dec a
 .asm_3cfd0
     and a
-    jr nz,Func_3cfe8
+    jr nz,.Func_3cfe8
     ; first option was selected...
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
@@ -55280,7 +55288,7 @@ RegularBattleMenu: ; 3cf1a (f:4f1a)
     ld [$cf91],a
     jr asm_3d05f
 
-Func_3cfe8: ; 3cfe8 (f:4fe8)
+.Func_3cfe8
     cp $2
     jp nz,Func_3d0ca
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -55297,6 +55305,7 @@ Func_3cfe8: ; 3cfe8 (f:4fe8)
     ld a,BAIT_ITEM
     ld [$cf91],a
     jr asm_3d05f
+
 asm_3d00e: ; 3d00e (f:500e)
     call LoadScreenTilesFromBuffer1
     ld a,[W_BATTLETYPE] ; $d05a
@@ -55318,6 +55327,9 @@ asm_3d00e: ; 3d00e (f:500e)
     db $01,$04,$32,$ff
 
 .asm_3d031
+    ld a,[wNumBagItems]
+    and a
+    jp z,InitBattleMenu
     ld hl,wNumBagItems ; $d31d
     ld a,l
     ld [$cf8b],a
@@ -55337,6 +55349,7 @@ asm_3d00e: ; 3d00e (f:500e)
     ld [$cc37],a
     ld [$cc35],a
     jp c,ResetBattleMenuPaletteAndInitBattleMenu ; jp c,InitBattleMenu
+
 asm_3d05f: ; 3d05f (f:505f)
     ld a,[$cf91]
     ld [$d11e],a
@@ -80114,12 +80127,12 @@ CeladonPrizeMenu: ; 5271b (14:671b)
     ld b,COIN_CASE
     call IsItemInBag
     jr nz,.havingCoinCase
-    ld hl,RequireCoinCaseTextPtr
+    ld hl,.RequireCoinCaseTextPtr
     jp PrintText
 .havingCoinCase
     ld hl,$D730
     set 6,[hl]
-    ld hl,ExchangeCoinsForPrizesTextPtr
+    ld hl,.ExchangeCoinsForPrizesTextPtr
     call PrintText
 ; the following are the menu settings
     xor a
@@ -80127,7 +80140,7 @@ CeladonPrizeMenu: ; 5271b (14:671b)
     ld [$CC2A],a
     ld a,$03
     ld [$CC29],a
-    ld a,$03
+    ld a,$03-1
     ld [$CC28],a
     ld a,$04
     ld [$CC24],a
@@ -80136,37 +80149,33 @@ CeladonPrizeMenu: ; 5271b (14:671b)
     call PrintPrizePrice ; 687A
     FuncCoord 0,2
     ld hl,Coord
-    ld b,$08
+    ld b,$08-1
     ld c,$10
     call TextBoxBorder
     call GetPrizeMenuId ;678E
     call UpdateSprites
-    ld hl,WhichPrizeTextPtr
+    ld hl,.WhichPrizeTextPtr
     call PrintText
     call HandleMenuInput ; menu choice handler
     bit 1,a ; keypress = B (Cancel)
     jr nz,.NoChoice
-    ld a,[$CC26]
-    cp a,$03 ; "NO,THANKS" choice
-    jr z,.NoChoice
     call HandlePrizeChoice ; 14:68C6
 .NoChoice
     ld hl,$D730
     res 6,[hl]
     ret
-
-RequireCoinCaseTextPtr: ; 5277e (14:677e)
+.RequireCoinCaseTextPtr
     TX_FAR _RequireCoinCaseText ; 22:628E
     db $0D
     db "@"
-
-ExchangeCoinsForPrizesTextPtr: ; 52784 (14:6784)
+.ExchangeCoinsForPrizesTextPtr
     TX_FAR _ExchangeCoinsForPrizesText ; 22:62A9
     db "@"
-
-WhichPrizeTextPtr: ; 52789 (14:6789)
+.WhichPrizeTextPtr
     TX_FAR _WhichPrizeText ; 22:62CD
     db "@"
+
+SECTION "GetPrizeMenuId",ROMX[$678e],BANK[$14]
 
 GetPrizeMenuId: ; 5278e (14:678e)
 ; determine which one among the three
@@ -80184,7 +80193,7 @@ GetPrizeMenuId: ; 5278e (14:678e)
     add a
     ld d,$00
     ld e,a
-    ld hl,PrizeDifferentMenuPtrs
+    ld hl,.PrizeDifferentMenuPtrs
     add hl,de
     ld a,[hli]
     ld d,[hl]
@@ -80242,10 +80251,10 @@ GetPrizeMenuId: ; 5278e (14:678e)
     ld hl,Coord
     call PlaceString
 .putNoThanksText ; 14:6819
-    FuncCoord 2,10
-    ld hl,Coord
-    ld de,NoThanksText
-    call PlaceString
+;    FuncCoord 2,10
+;    ld hl,Coord
+;    ld de,NoThanksText
+;    call PlaceString
 ; put prices on the right side of the textbox
     ld de,$D141
     FuncCoord 13,5
@@ -80267,52 +80276,47 @@ GetPrizeMenuId: ; 5278e (14:678e)
     ld hl,Coord
     ld c,(1 << 7 | 2)
     jp PrintBCDNumber
-
-PrizeDifferentMenuPtrs: ; 52843 (14:6843)
-    dw PrizeMenuMon1Entries
-    dw PrizeMenuMon1Cost
-
-    dw PrizeMenuMon2Entries
-    dw PrizeMenuMon2Cost
-
-    dw PrizeMenuTMsEntries
-    dw PrizeMenuTMsCost
-
-NoThanksText: ; 5284f (14:684f)
-    db "NO THANKS@"
-
-PrizeMenuMon1Entries: ; 52859 (14:6859)
+.PrizeDifferentMenuPtrs
+    dw .PrizeMenuMon1Entries
+    dw .PrizeMenuMon1Cost
+    dw .PrizeMenuMon2Entries
+    dw .PrizeMenuMon2Cost
+    dw .PrizeMenuTMsEntries
+    dw .PrizeMenuTMsCost
+;.NoThanksText
+;    db "NO THANKS@"
+.PrizeMenuMon1Entries
     db ONIX
     db PIKACHU
     db STARYU
     db "@"
-PrizeMenuMon1Cost: ; 5285d (14:685d)
+.PrizeMenuMon1Cost
     db $08,$00
     db $10,$00
     db $25,$00
     db "@"
-
-PrizeMenuMon2Entries: ; 52864 (14:6864)
+.PrizeMenuMon2Entries
     db CHARMANDER
     db SQUIRTLE
     db BULBASAUR
     db "@"
-PrizeMenuMon2Cost: ; 52868 (14:6868)
+.PrizeMenuMon2Cost
     db $65,$00
     db $65,$00
     db $65,$00
     db "@"
-
-PrizeMenuTMsEntries: ; 5286f (14:686f)
+.PrizeMenuTMsEntries
     db RARE_CANDY
     db TM_15
     db TM_50
     db "@"
-PrizeMenuTMsCost: ; 52873 (14:6873)
+.PrizeMenuTMsCost
     db $33,$00 ; 3300 Coins
     db $55,$00 ; 5500 Coins
     db $77,$00 ; 7700 Coins
     db "@"
+
+SECTION "PrintPrizePrice",ROMX[$687a],BANK[$14]
 
 PrintPrizePrice: ; 5287a (14:687a)
     FuncCoord 11,0
@@ -80390,7 +80394,7 @@ HandlePrizeChoice: ; 528c6 (14:68c6)
     ld b,a
     ld a,1
     ld c,a
-    call GiveItem ; GiveItem
+    call PrizeGiveItem ; GiveItem
     jr nc,.BagFull
     jr .SubtractCoins
 .GiveMon ; 14:6912
@@ -80861,6 +80865,17 @@ CheckGoundOrRock:
     ret z
     cp ROCK
     ret
+
+PrizeGiveItem:
+    call GiveItem
+    push af
+    ld hl,.PrizeGiveItemText
+    call PrintText
+    pop af
+    ret
+.PrizeGiveItemText
+    TX_FAR _UnnamedText_1cae8
+    db $0b,"@"
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -92979,7 +92994,7 @@ LinkCableInfoText3: ; 5dce8 (17:5ce8)
 ViridianSchoolBlackboard: ; 5dced (17:5ced)
     db $08 ; asm
     call SaveScreenTilesToBuffer1
-    ld hl,ViridianSchoolBlackboardText1
+    ld hl,.ViridianSchoolBlackboardText1
     call PrintText
     xor a
     ld [W_ANIMATIONID],a
@@ -92993,6 +93008,9 @@ ViridianSchoolBlackboard: ; 5dced (17:5ced)
     ld [wTopMenuItemY],a
     ld a,$1
     ld [wTopMenuItemX],a
+.loop
+    ld hl,.ViridianSchoolBlackboardText2
+    call PrintText
 .asm_5dd15
     ld hl,$d730
     set 6,[hl]
@@ -93000,19 +93018,18 @@ ViridianSchoolBlackboard: ; 5dced (17:5ced)
     ld bc,$060a
     call TextBoxBorder
     ld hl,$c3c9
-    ld de,StatusAilmentText1
+    ld de,.StatusAilmentText1
     call PlaceString
     ld hl,$c3ce
-    ld de,StatusAilmentText2
+    ld de,.StatusAilmentText2
     call PlaceString
-    ld hl,ViridianSchoolBlackboardText2
-    call PrintText
     call HandleMenuInput
     bit 1,a
     jr nz,.exitBlackboard
     bit 4,a
     jr z,.asm_5dd5c
-    ld a,$2
+    call FixBlackboardQuitRemove
+    ld a,$2-1
     ld [wMaxMenuItem],a
     ld a,$2
     ld [wTopMenuItemY],a
@@ -93042,7 +93059,7 @@ ViridianSchoolBlackboard: ; 5dced (17:5ced)
     jr z,.exitBlackboard
     ld hl,$d730
     res 6,[hl]
-    ld hl,ViridianBlackboardStatusPointers
+    ld hl,.ViridianBlackboardStatusPointers
     add a
     ld d,$0
     ld e,a
@@ -93051,57 +93068,49 @@ ViridianSchoolBlackboard: ; 5dced (17:5ced)
     ld h,[hl]
     ld l,a
     call PrintText
-    jp .asm_5dd15
+    jp .loop
 .exitBlackboard
     ld hl,$d730
     res 6,[hl]
     call LoadScreenTilesFromBuffer1
     jp TextScriptEnd
-
-ViridianSchoolBlackboardText1: ; 5dda2 (17:5da2)
+.ViridianSchoolBlackboardText1
     TX_FAR _ViridianSchoolBlackboardText1
     db "@"
-
-ViridianSchoolBlackboardText2: ; 5dda7 (17:5da7)
+.ViridianSchoolBlackboardText2
     TX_FAR _ViridianSchoolBlackboardText2
     db "@"
-
-StatusAilmentText1: ; 5ddac (17:5dac)
+.StatusAilmentText1
     db " Slp",$4e
     db " Psn",$4e
     db " Par@"
-
-StatusAilmentText2: ; 5ddbb (17:5dbb)
+.StatusAilmentText2
     db " Brn",$4e
-    db " Frz",$4e
-    db " QUIT@@"
-
-ViridianBlackboardStatusPointers: ; 5ddcc (17:5ddc)
-    dw ViridianBlackboardSleepText
-    dw ViridianBlackboardPoisonText
-    dw ViridianBlackbaordPrlzText
-    dw ViridianBlackboardBurnText
-    dw ViridianBlackboardFrozenText
-
-ViridianBlackboardSleepText: ; 5ddd6 (17:5dd6)
+    db " Frz","@";$4e
+;    db " QUIT@@"
+.ViridianBlackboardStatusPointers
+    dw .ViridianBlackboardSleepText
+    dw .ViridianBlackboardPoisonText
+    dw .ViridianBlackboardPrlzText
+    dw .ViridianBlackboardBurnText
+    dw .ViridianBlackboardFrozenText
+.ViridianBlackboardSleepText
     TX_FAR _ViridianBlackboardSleepText
     db "@"
-
-ViridianBlackboardPoisonText: ; 5dddb (17:5ddb)
+.ViridianBlackboardPoisonText
     TX_FAR _ViridianBlackboardPoisonText
     db "@"
-
-ViridianBlackbaordPrlzText: ; 5dde0 (17:5de0)
-    TX_FAR _ViridianBlackbaordPrlzText
+.ViridianBlackboardPrlzText
+    TX_FAR _ViridianBlackboardPrlzText
     db "@"
-
-ViridianBlackboardBurnText: ; 5dde5 (17:5de5)
+.ViridianBlackboardBurnText
     TX_FAR _ViridianBlackboardBurnText
     db "@"
-
-ViridianBlackboardFrozenText: ; 5ddea (17:5dea)
+.ViridianBlackboardFrozenText
     TX_FAR _ViridianBlackboardFrozenText
     db "@"
+
+SECTION "Func_5ddef",ROMX[$5def],BANK[$17]
 
 Func_5ddef: ; 5ddef (17:5def)
     call EnableAutoTextBoxDrawing
@@ -93452,6 +93461,16 @@ CopycatsHouseOnlyDollCommon:
 .CopycatsHouseOnlyDollText
     TX_FAR _CopycatsHouseOnlyDollText
     db "@"
+
+; ───────────────────────────────────────────
+
+FixBlackboardQuitRemove:
+    ld a,[wCurrentMenuItem]
+    cp 2
+    ret nz
+    dec a
+    ld [wCurrentMenuItem],a
+    ret
 
 ; ───────────────────────────────────────────
 
@@ -105359,7 +105378,7 @@ CeruleanHouse2Object: ; 0x74ebe (size=34)
     EVENT_DISP $4,$7,$3
 
 VendingMachineMenu: ; 74ee0 (1d:4ee0)
-    ld hl,VendingMachineText1
+    ld hl,.VendingMachineText1
     call PrintText
     ld a,$13
     ld [$d125],a
@@ -105369,27 +105388,28 @@ VendingMachineMenu: ; 74ee0 (1d:4ee0)
     ld [wLastMenuItem],a ; $cc2a
     ld a,$3
     ld [wMenuWatchedKeys],a ; $cc29
-    ld a,$3
+    ld a,$3-1
     ld [wMaxMenuItem],a ; $cc28
     ld a,$5
     ld [wTopMenuItemY],a ; $cc24
     ld a,$1
     ld [wTopMenuItemX],a ; $cc25
+    ld [wMenuWrappingEnabled],a
     ld hl,$d730
     set 6,[hl]
     FuncCoord 0,3 ; $c3dc
     ld hl,Coord
-    ld b,$8
+    ld b,$8-1
     ld c,$c
     call TextBoxBorder
     call UpdateSprites
     FuncCoord 2,5 ; $c406
     ld hl,Coord
-    ld de,DrinkText
+    ld de,.DrinkText
     call PlaceString
     FuncCoord 9,6 ; $c421
     ld hl,Coord
-    ld de,DrinkPriceText
+    ld de,.DrinkPriceText
     call PlaceString
     ld hl,$d730
     res 6,[hl]
@@ -105406,7 +105426,7 @@ VendingMachineMenu: ; 74ee0 (1d:4ee0)
     ld [$FF00+$a0],a
     call HasEnoughMoney
     jr nc,.enoughMoney
-    ld hl,VendingMachineText4
+    ld hl,.VendingMachineText4
     jp PrintText
 .enoughMoney
     call Func_74fe7
@@ -105426,7 +105446,7 @@ VendingMachineMenu: ; 74ee0 (1d:4ee0)
     dec b
     jr nz,.playDeliverySound
 .asm_74f72
-    ld hl,VendingMachineText5
+    ld hl,.VendingMachineText5
     call PrintText
     ld hl,$ffde
     ld de,wPlayerMoney + 2 ; $d349
@@ -105437,42 +105457,37 @@ VendingMachineMenu: ; 74ee0 (1d:4ee0)
     ld [$d125],a
     jp DisplayTextBoxID
 .BagFull
-    ld hl,VendingMachineText6
+    ld hl,.VendingMachineText6
     jp PrintText
 .asm_74f93
-    ld hl,VendingMachineText7
+    ld hl,.VendingMachineText7
     jp PrintText
-
-VendingMachineText1: ; 74f99 (1d:4f99)
+.VendingMachineText1
     TX_FAR _VendingMachineText1
     db "@"
-
-DrinkText: ; 74f9e (1d:4f9e)
+.DrinkText
     db "FRESH WATER",$4E
     db "SODA POP",$4E
-    db "LEMONADE",$4E
-    db "CANCEL@"
-
-DrinkPriceText: ; 74fc3 (1d:4fc3)
+    db "LEMONADE","@";,$4E
+;    db "CANCEL@"
+.DrinkPriceText: ; 74fc3 (1d:4fc3)
     db "¥200",$4E
     db "¥300",$4E
     db "¥350",$4E,"@"
-
-VendingMachineText4: ; 74fd3 (1d:4fd3)
+.VendingMachineText4
     TX_FAR _VendingMachineText4
     db "@"
-
-VendingMachineText5: ; 74fd8 (1d:4fd8)
+.VendingMachineText5
     TX_FAR _VendingMachineText5
     db "@"
-
-VendingMachineText6: ; 74fdd (1d:4fdd)
+.VendingMachineText6
     TX_FAR _VendingMachineText6
     db "@"
-
-VendingMachineText7: ; 74fe2 (1d:4fe2)
+.VendingMachineText7
     TX_FAR _VendingMachineText7
     db "@"
+
+SECTION "Func_74fe7",ROMX[$4fe7],BANK[$1d]
 
 Func_74fe7: ; 74fe7 (1d:4fe7)
     ld hl,VendingPrices
@@ -120966,53 +120981,13 @@ _ViridianSchoolBlackboardText2: ; 8914e (22:514e)
     db $0,"Which heading do",$4f
     db "you want to read?",$57
 
-_ViridianBlackboardSleepText: ; 89172 (22:5172)
-    db $0,"A #MON can't",$4f
-    db "attack if it's",$55
-    db "asleep!",$51
-    db "#MON will stay",$4f
-    db "asleep even after",$55
-    db "battles.",$51
-    db "Use AWAKENING to",$4f
-    db "wake them up!",$58
+; ───────────────────────────────────
 
-_ViridianBlackboardPoisonText: ; 891de (22:51de)
-    db $0,"When poisoned,a",$4f
-    db "#MON's health",$55
-    db "steadily drops.",$51
-    db "Poison lingers",$4f
-    db "after battles.",$51
-    db "Use an ANTIDOTE",$4f
-    db "to cure poison!",$58
+; Free
 
-_ViridianBlackbaordPrlzText: ; 8924b (22:524b)
-    db $0,"Paralysis could",$4f
-    db "make #MON",$55
-    db "moves misfire!",$51
-    db "Paralysis remains",$4f
-    db "after battles.",$51
-    db "Use PARLYZ HEAL",$4f
-    db "for treatment!",$58
+; ───────────────────────────────────
 
-_ViridianBlackboardBurnText: ; 892b5 (22:52b5)
-    db $0,"A burn reduces",$4f
-    db "power and speed.",$55
-    db "It also causes",$55
-    db "ongoing damage.",$51
-    db "Burns remain",$4f
-    db "after battles.",$51
-    db "Use BURN HEAL to",$4f
-    db "cure a burn!",$58
-
-_ViridianBlackboardFrozenText: ; 8932f (22:532f)
-    db $0,"If frozen,a",$4f
-    db "#MON becomes",$55
-    db "totally immobile!",$51
-    db "It stays frozen",$4f
-    db "even after the",$55
-    db "battle ends.",$51
-    db "Use ICE HEAL to",$4f
-    db "thaw out #MON!",$58
+SECTION "_ViridianBlackboardFrozenText",ROMX[$532f],BANK[$22]
 
 _VermilionGymTrashText: ; 893a7 (22:53a7)
     db $0,"Nope,there's",$4f
@@ -121665,7 +121640,7 @@ _UnnamedText_7b4f: ; 8a07e (22:607e)
     TX_RAM $cd6d
     db $0,".",$58
 
-_UnnamedText_7b54: ; 8a08f (22:608f)
+_NothingStoredText: ; 8a08f (22:608f)
     db $0,"There is nothing",$4f
     db "stored.",$58
 
@@ -122136,6 +122111,58 @@ _Route2HouseText2:
     db "strange VOLTORB",$55
     db "in my bag after",$55
     db "the holidays!",$57
+
+; ───────────────────────────────────
+
+_ViridianBlackboardSleepText:
+    db $0,"A #MON can't",$4f
+    db "attack if it's",$55
+    db "asleep!",$51
+    db "#MON will stay",$4f
+    db "asleep even after",$55
+    db "battles.",$51
+    db "Use AWAKENING to",$4f
+    db "wake them up!",$58
+
+_ViridianBlackboardPoisonText:
+    db $0,"When poisoned,a",$4f
+    db "#MON's health",$55
+    db "steadily drops.",$51
+    db "Poison lingers",$4f
+    db "after battles.",$51
+    db "Use an ANTIDOTE",$4f
+    db "to cure poison!",$58
+
+_ViridianBlackboardPrlzText:
+    db $0,"Paralysis",$4f
+    db "reduces speed.",$55
+    db "It could",$55
+    db "make #MON",$55
+    db "moves misfire!",$51
+    db "Paralysis remains",$4f
+    db "after battles.",$51
+    db "Use PARLYZ HEAL",$4f
+    db "for treatment!",$58
+
+_ViridianBlackboardBurnText:
+    db $0,"A burn reduces",$4f
+    db "attack.",$55
+    db "It also causes",$55
+    db "ongoing damage.",$51
+    db "Burns remain",$4f
+    db "after battles.",$51
+    db "Use BURN HEAL to",$4f
+    db "cure a burn!",$58
+
+_ViridianBlackboardFrozenText:
+    db $0,"If frozen,a",$4f
+    db "#MON becomes",$55
+    db "totally immobile!",$51
+    db "It stays frozen",$4f
+    db "even after the",$55
+    db "battle ends.",$51
+    db "Use ICE HEAL to",$4f
+    db "thaw out #MON!",$58
 
 ; ───────────────────────────────────
 
@@ -132604,9 +132631,9 @@ _HackItemInBattle:
     ld de,Coord ; $2e82
     ret
 .Table
-    db $16 + 3
+    db $17 + 3
     dw .Step1
-    db $1f + 3
+    db $20 + 3
     dw .Step2
     db $41 + 3
     dw .Step3
@@ -136362,6 +136389,9 @@ InitializeChooseQuantityMenu:
     call PlaceString
     ld a,[$ff8e]
     and a ; should the price be halved (for selling items)?
+    jr nz,.QtyStandard
+    ld a,[wListMenuID]
+    cp a,PRICEDITEMLISTMENU
     jr nz,.QtyStandard
     ld a,[$cf91] ; selected item ID
     cp TM_01
