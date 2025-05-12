@@ -11351,7 +11351,7 @@ ItemPrices: ; Moved in the Bank
     bcd3   9800 ; IRON
     bcd3   9800 ; CARBOS
     bcd3   9800 ; CALCIUM
-    bcd3   9800 ; RARE_CANDY
+    bcd3  30000 ; RARE_CANDY
     bcd3      0 ; DOME_FOSSIL
     bcd3      0 ; HELIX_FOSSIL
     bcd3      0 ; SECRET_KEY
@@ -29375,6 +29375,50 @@ StartMenu_Option_Init:
     ld b,BANK(DisplayOptionMenu)
     jp Bankswitch
 
+GetWildEnemyLevel:
+    ld b,0
+    call GenRandom
+    ld c,a
+    and %00000111
+    jr z,.Add1 ; 1/8 = 12.50%
+    ld a,c
+    and %11111000
+    jr z,.Add2 ; (1-1/8)/32 = 2.73%
+    call GenRandom
+    and %01111111
+    jr z,.Add3 ; (1-((1-1/8)/32))/128 = 0.76%
+    call GenRandom
+    and %00111111
+    jr z,.BabyLevel2 ; (1-(1/8)-((1-1/8)/32)-((1-((1-1/8)/32))/128))/64 = 1.31%
+.Add0 ; 1-(1/8)-((1-1/8)/32)-((1-((1-1/8)/32))/128)-(1-(1/8)-((1-1/8)/32)-((1-((1-1/8)/32))/128))/64 = 82.70%
+.End
+    ld a,[W_CURENEMYLVL] ; $d127
+    add b
+    ld [W_CURENEMYLVL],a ; $d127
+    ret
+.Add3
+    inc b
+.Add2
+    inc b
+.Add1
+    inc b
+    jr .End
+.BabyLevel2
+    push bc
+    push hl
+    push de
+    ld a,[W_ENEMYMONID] ; mon id
+    ld hl,BabyMon
+    ld de,$0001
+    call IsInArray
+    pop de
+    pop hl
+    pop bc
+    jr nc,.Add0
+    ld a,2
+    ld [W_CURENEMYLVL],a ; $d127
+    jr GetWildEnemyLevel
+
 ; Free
 
 SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
@@ -30657,7 +30701,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db WATER_GUN    ; TM_12
     db ICE_BEAM     ; TM_13
     db BLIZZARD     ; TM_14
-    db HYPER_BEAM   ; TM_15
+    db HYPER_BEAM   ; TM_15 ; Game Corner
     db PAY_DAY      ; TM_16
     db SUBMISSION   ; TM_17 ; Market
     db COUNTER      ; TM_18
@@ -30692,7 +30736,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db EXPLOSION    ; TM_47
     db ROCK_SLIDE   ; TM_48
     db TRI_ATTACK   ; TM_49
-    db SUBSTITUTE   ; TM_50
+    db SUBSTITUTE   ; TM_50 ; Game Corner
     db BLADE        ; TM_51
     db SWOOP        ; TM_52
     db TSUNAMI      ; TM_53
@@ -30862,9 +30906,12 @@ TryDoWildEncounter: ; Moved in the Bank
     ld b,$0
     add hl,bc
     ld a,[hli]
-    call GetWildEnemyLevel ; ld [W_CURENEMYLVL],a ; $d127
-    ld a,[hld] ; Decrese hl to read Exception ID in GetEnemy Routine
-    call GetEnemy ; ld [W_ENEMYMONID],a
+    ld [W_CURENEMYLVL],a ; $d127
+    ld a,[hl]
+    ld [W_ENEMYMONID],a
+    cp $FF
+    call nz,GetWildEnemyLevel
+    call GetEnemy
     jr nc,.CantEncounter2
     ld a,[$d0db]
     and a
@@ -31163,56 +31210,6 @@ FixTMPalette:
     pop hl
     jp PlaceString
 
-GetWildEnemyLevel:
-    push bc
-    push af
-    ld b,0
-    call GenRandom
-    ld c,a
-    and %00000111
-    jr z,.Add1 ; 1/8 = 12.50%
-    ld a,c
-    and %11111000
-    jr z,.Add2 ; (1-1/8)/32 = 2.73%
-    call GenRandom
-    and %01111111
-    jr z,.Add3 ; (1-((1-1/8)/32))/128 = 0.76%
-    call GenRandom
-    and %00111111
-    jr z,.BabyLevel2 ; (1-(1/8)-((1-1/8)/32)-((1-((1-1/8)/32))/128))/64 = 1.31%
-.Add0 ; 1-(1/8)-((1-1/8)/32)-((1-((1-1/8)/32))/128)-(1-(1/8)-((1-1/8)/32)-((1-((1-1/8)/32))/128))/64 = 82.70%
-.End
-    pop af
-    add b
-    ld [W_CURENEMYLVL],a ; $d127
-    pop bc
-    ret
-.Add3
-    inc b
-.Add2
-    inc b
-.Add1
-    inc b
-    jr .End
-.BabyLevel2
-    push hl
-    push de
-    push bc
-    ld a,[hl] ; mon id
-    ld hl,BabyMon
-    ld de,$0001
-    call IsInArray
-    pop bc
-    pop de
-    pop hl
-    jr nc,.Add0
-.done2
-    pop af
-    pop bc
-    ld a,2
-    ld [W_CURENEMYLVL],a ; $d127
-    ret
-
 ; If Not Allowed Set z
 CheckIfTeleportNotAllowed:
     ld a,[W_CURMAPTILESET]
@@ -31257,10 +31254,11 @@ HackDockTilesetLikeSafari:
     db $FF
 
 GetEnemy:
+    ld a,[W_ENEMYMONID]
     cp $FF
     jr nz,.WillEncounter
 .Exception
-    ld a,[hl] ; Table Level = Exception ID
+    ld a,[W_CURENEMYLVL] ; Exception ID
     cp $03
     jr z,.CheckMew
     cp $04
@@ -31353,7 +31351,6 @@ GetEnemy:
     ld a,MEW ; Entry Level
     jr .WillEncounter
 .DittoDebugInRoute15
-    push bc
     ld b,a
     call GetCurrentOldAdventureMap
     cp ROUTE_15
@@ -31364,7 +31361,6 @@ GetEnemy:
     ld b,DITTO
 .standard
     ld a,b
-    pop bc
     ret
 
 UnknownDungeonLandPkmnList:
@@ -80134,28 +80130,29 @@ CeladonPrizeMenu: ; 5271b (14:671b)
     set 6,[hl]
     ld hl,.ExchangeCoinsForPrizesTextPtr
     call PrintText
+    ld hl,.WhichPrizeTextPtr
+    call PrintText
 ; the following are the menu settings
     xor a
-    ld [$CC26],a
-    ld [$CC2A],a
-    ld a,$03
-    ld [$CC29],a
-    ld a,$03-1
-    ld [$CC28],a
-    ld a,$04
-    ld [$CC24],a
-    ld a,$01
-    ld [$CC25],a
+    ld [wCurrentMenuItem],a
+    ld [wLastMenuItem],a
+    ld a,%00000011 ; ▼▲◄►StSeBA
+    ld [wMenuWatchedKeys],a
+    ld a,3
+    ld [wMaxMenuItem],a
+    ld a,4
+    ld [wTopMenuItemY],a
+    ld a,1
+    ld [wTopMenuItemX],a
+    ld [wMenuWrappingEnabled],a
     call PrintPrizePrice ; 687A
     FuncCoord 0,2
     ld hl,Coord
-    ld b,$08-1
+    ld b,$08+1
     ld c,$10
     call TextBoxBorder
     call GetPrizeMenuId ;678E
     call UpdateSprites
-    ld hl,.WhichPrizeTextPtr
-    call PrintText
     call HandleMenuInput ; menu choice handler
     bit 1,a ; keypress = B (Cancel)
     jr nz,.NoChoice
@@ -80181,9 +80178,9 @@ GetPrizeMenuId: ; 5278e (14:678e)
 ; determine which one among the three
 ; prize-texts has been selected
 ; using the text ID (stored in [$FF8C])
-; load the three prizes at $D13D-$D13F
-; load the three prices at $D141-$D146
-; display the three prizes' names
+; load the four prizes at $D13D-$D140
+; load the four prices at $D142-$D149
+; display the four prizes' names
 ; (distinguishing between Pokemon names
 ; and Items (specifically TMs) names)
     ld a,[$FF8C]
@@ -80206,8 +80203,8 @@ GetPrizeMenuId: ; 5278e (14:678e)
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    ld de,$D141
-    ld bc,$0006
+    ld de,W_PRICE1
+    ld bc,$0008
     call CopyData
     ld a,[$D12F]
     cp a,$02        ;is TM_menu?
@@ -80230,6 +80227,12 @@ GetPrizeMenuId: ; 5278e (14:678e)
     FuncCoord 2,8
     ld hl,Coord
     call PlaceString
+    ld a,[W_PRIZE4]
+    ld [$D11E],a
+    call GetItemName
+    FuncCoord 2,10
+    ld hl,Coord
+    call PlaceString
     jr .putNoThanksText
 .putMonName ; 14:67EC
     ld a,[W_PRIZE1]
@@ -80250,13 +80253,19 @@ GetPrizeMenuId: ; 5278e (14:678e)
     FuncCoord 2,8
     ld hl,Coord
     call PlaceString
+    ld a,[W_PRIZE4]
+    ld [$D11E],a
+    call GetMonName
+    FuncCoord 2,10
+    ld hl,Coord
+    call PlaceString
 .putNoThanksText ; 14:6819
 ;    FuncCoord 2,10
 ;    ld hl,Coord
 ;    ld de,NoThanksText
 ;    call PlaceString
 ; put prices on the right side of the textbox
-    ld de,$D141
+    ld de,W_PRICE1
     FuncCoord 13,5
     ld hl,Coord
 ; reg. c:
@@ -80266,13 +80275,18 @@ GetPrizeMenuId: ; 5278e (14:678e)
 ; Function $15CD displays BCD value (same routine
 ; used by text-command $02)
     call PrintBCDNumber ; Print_BCD
-    ld de,$D143
+    ld de,W_PRICE2
     FuncCoord 13,7
     ld hl,Coord
     ld c,(%1 << 7 | 2)
     call PrintBCDNumber
-    ld de,$D145
+    ld de,W_PRICE3
     FuncCoord 13,9
+    ld hl,Coord
+    ld c,(1 << 7 | 2)
+    call PrintBCDNumber
+    ld de,W_PRICE4
+    FuncCoord 13,11
     ld hl,Coord
     ld c,(1 << 7 | 2)
     jp PrintBCDNumber
@@ -80283,75 +80297,54 @@ GetPrizeMenuId: ; 5278e (14:678e)
     dw .PrizeMenuMon2Cost
     dw .PrizeMenuTMsEntries
     dw .PrizeMenuTMsCost
-;.NoThanksText
-;    db "NO THANKS@"
+
 .PrizeMenuMon1Entries
-    db ONIX
-    db PIKACHU
-    db STARYU
+    db MAGIKARP
+    db BUTTERFREE
+    db DODUO
+    db RHYHORN
     db "@"
 .PrizeMenuMon1Cost
-    db $08,$00
-    db $10,$00
-    db $25,$00
+    db $02,$00 ; MAGIKARP   =  4000 Yen
+    db $09,$00 ; BUTTERFREE = 18000 Yen
+    db $10,$00 ; DODUO      = 20000 Yen
+    db $25,$00 ; RHYHORN    = 50000 Yen
     db "@"
+
 .PrizeMenuMon2Entries
-    db CHARMANDER
-    db SQUIRTLE
-    db BULBASAUR
+    db STARMIE
+    db ARCANINE
+    db CLOYSTER
+    db EXEGGUTOR
     db "@"
 .PrizeMenuMon2Cost
-    db $65,$00
-    db $65,$00
-    db $65,$00
+    db $35,$00 ; STARMIE   = 70000 Yen
+    db $30,$00 ; ARCANINE  = 60000 Yen
+    db $35,$00 ; CLOYSTER  = 70000 Yen
+    db $45,$00 ; EXEGGUTOR = 90000 Yen
     db "@"
+
 .PrizeMenuTMsEntries
     db RARE_CANDY
-    db TM_15
-    db TM_50
+    db TM_16 ; PAY_DAY
+    db TM_15 ; HYPER_BEAM
+    db TM_50 ; SUBSTITUTE
     db "@"
 .PrizeMenuTMsCost
-    db $33,$00 ; 3300 Coins
-    db $55,$00 ; 5500 Coins
-    db $77,$00 ; 7700 Coins
+    db $15,$00 ; RARE_CANDY        =  30000 Yen
+    db $25,$00 ; TM16 (PAY_DAY)    =  50000 Yen
+    db $55,$00 ; TM15 (HYPER_BEAM) = 110000 Yen
+    db $77,$00 ; TM50 (SUBSTITUTE) = 154000 Yen
     db "@"
 
-SECTION "PrintPrizePrice",ROMX[$687a],BANK[$14]
-
-PrintPrizePrice: ; 5287a (14:687a)
-    FuncCoord 11,0
-    ld hl,Coord
-    ld b,$01
-    ld c,$07
-    call TextBoxBorder
-    call UpdateSprites      ; XXX save OAM?
-    FuncCoord 12,0
-    ld hl,Coord
-    ld de,.CoinText
-    call PlaceString
-    FuncCoord 13,1
-    ld hl,Coord
-    ld de,.SixSpacesText
-    call PlaceString
-    FuncCoord 13,1
-    ld hl,Coord
-    ld de,wPlayerCoins
-    ld c,%10000010
-    call PrintBCDNumber
-    ret
-
-.CoinText ; 14:68A5
-    db "COIN@"
-
-.SixSpacesText ; 14:68AA
-    db "      @"
+SECTION "LoadCoinsToSubtract",ROMX[$68b1],BANK[$14]
 
 LoadCoinsToSubtract: ; 528b1 (14:68b1)
     ld a,[$D139] ; backup of selected menu_entry
     add a
     ld d,$00
     ld e,a
-    ld hl,$D141 ; first prize's price
+    ld hl,W_PRICE1 ; first prize's price
     add hl,de ; get selected prize's price
     xor a
     ld [$FF9F],a
@@ -80458,28 +80451,7 @@ OhFineThenTextPtr: ; 52971 (14:6971)
     db $0D ; wait keypress (A/B) without blink
     db "@"
 
-GetPrizeMonLevel: ; 52977 (14:6977)
-    ld a,[$CF91]
-    ld b,a
-    ld hl,PrizeMonLevelDictionary
-.loop ; 14:697E
-    ld a,[hli]
-    cp b
-    jr z,.matchFound
-    inc hl
-    jr .loop
-.matchFound ; 14:6985
-    ld a,[hl]
-    ld [$D127],a
-    ret
-
-PrizeMonLevelDictionary: ; 5298a (14:698a)
-    db ONIX,10
-    db PIKACHU,10
-    db STARYU,18
-    db CHARMANDER,12
-    db SQUIRTLE,12
-    db BULBASAUR,12
+SECTION "Func_52996",ROMX[$6996],BANK[$14]
 
 Func_52996: ; 52996 (14:6996)
     call EnableAutoTextBoxDrawing
@@ -80876,6 +80848,68 @@ PrizeGiveItem:
 .PrizeGiveItemText
     TX_FAR _UnnamedText_1cae8
     db $0b,"@"
+
+PrintPrizePrice:
+    FuncCoord 11,0
+    ld hl,Coord
+    ld b,$01
+    ld c,$07
+    call TextBoxBorder
+    call UpdateSprites
+    FuncCoord 12,0
+    ld hl,Coord
+    ld de,.CoinText
+    call PlaceString
+    FuncCoord 13,1
+    ld hl,Coord
+    ld de,.SixSpacesText
+    call PlaceString
+    FuncCoord 13,1
+    ld hl,Coord
+    ld de,wPlayerCoins
+    ld c,%10000010
+    jp PrintBCDNumber
+.CoinText
+    db "COIN@"
+.SixSpacesText
+    db "      @"
+
+GetPrizeMonLevel:
+    ld a,[$CF91]
+    ld [W_ENEMYMONID],a ; $cfd8
+    ld b,a
+    ld hl,.PrizeMonLevelDictionary
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.ErrorNotFound
+    cp b
+    jr z,.matchFound
+    inc hl
+    jr .loop
+.matchFound
+    ld a,[hl]
+    ld [W_CURENEMYLVL],a ; $d127
+    ld hl,GetWildEnemyLevel
+    ld b,BANK(GetWildEnemyLevel)
+    call Bankswitch
+    ld a,[W_CURENEMYLVL] ; $d127
+.end
+    ld [W_CURENEMYLVL],a ; $d127
+    ret
+.ErrorNotFound
+    ld a,2
+    jr .end
+.PrizeMonLevelDictionary
+    db MAGIKARP,15
+    db BUTTERFREE,18
+    db DODUO,17
+    db RHYHORN,19
+    db STARMIE,31 ; Entry Level
+    db ARCANINE,31 ; Entry Level
+    db CLOYSTER,31 ; Entry Level
+    db EXEGGUTOR,31 ; Entry Level
+    db $FF
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -133439,7 +133473,7 @@ ItemNames:
     db "TM12:WTR GUN@" ; $D2 ; TM_12
     db "TM13:ICE BM.@" ; $D3 ; TM_13
     db "TM14:BLZZARD@" ; $D4 ; TM_14
-    db "TM15:HYP.B.@"  ; $D5 ; TM_15
+    db "TM15:HYPR.B.@" ; $D5 ; TM_15
     db "TM16:PAY DAY@" ; $D6 ; TM_16
     db "TM17:SUBMIS.@" ; $D7 ; TM_17 ; Market
     db "TM18:COUNTER@" ; $D8 ; TM_18
@@ -133838,7 +133872,7 @@ PalletMons:
     db 33,KINGLER  ;  5%
     db 33,KINGLER  ;  5%
     db 35,KINGLER  ;  4%
-    db 31,CLOYSTER ;  1% ; Entry Level
+    db 38,CLOYSTER ;  1%
 
 Route1Mons:
     db $19
@@ -133879,7 +133913,7 @@ Route22Mons:
     db  2,MANKEY    ;  5% ; Entry Level
     db  5,SPEAROW   ;  5%
     db  4,MANKEY    ;  4%
-    db  9,PSYDUCK   ;  1% ; Entry Level
+    db  6,PSYDUCK   ;  1%
     db $00
 
 ForestMons:
@@ -133974,7 +134008,7 @@ Route4Mons:
     db 33,SEAKING   ;  5%
     db 33,SEAKING   ;  5%
     db 35,SEAKING   ;  4%
-    db 31,STARMIE   ;  1% ; Entry Level
+    db 38,STARMIE   ;  1%
 
 CeruleanMons:
     db $00
@@ -134060,7 +134094,7 @@ Route6Mons:
     db 11,POLIWAG    ; 10%
     db 15,ODDISH     ; 10%
     db 15,BELLSPROUT ; 10%
-    db 11,PSYDUCK    ;  5%
+    db 13,FARFETCH_D ;  5%
     db 11,FARFETCH_D ;  5%
     db 13,POLIWAG    ;  4%
     db 13,PSYDUCK    ;  1%
@@ -134568,7 +134602,7 @@ PowerPlantMons:
     db 18,MAGNEMITE  ; 10%
     db 30,MAGNETON   ;  5% ; Entry Level
     db 32,RAICHU     ;  5% ; Entry Level
-    db 26,ELECTABUZZ ;  4% ; Entry Level
+    db 31,ELECTABUZZ ;  4% ; Entry Level
     db 32,JOLTEON    ;  1% ; Entry Level
     db $00
 
@@ -134624,7 +134658,7 @@ IslandMonsB3:
     db 36,DEWGONG   ; 10%
     db 37,DEWGONG   ;  5%
     db  5,SQUIRTLE  ;  5% ; Entry Level
-    db 26,JYNX      ;  4% ; Entry Level
+    db 31,JYNX      ;  4% ; Entry Level
     db 32,VAPOREON  ;  1% ; Entry Level
     db $0A
     db 27,SEEL      ; 20%
@@ -134712,9 +134746,9 @@ MansionMonsB1:
     db 28,GROWLITHE ; 10%
     db 28,VULPIX    ; 10%
     db 29,PONYTA    ; 10%
-    db 38,ARCANINE  ;  5% ; Entry Level
+    db 38,ARCANINE  ;  5%
     db 38,NINETALES ;  5% ; Entry Level
-    db 26,MAGMAR    ;  4% ; Entry Level
+    db 31,MAGMAR    ;  4% ; Entry Level
     db 32,FLAREON   ;  1% ; Entry Level
     db $00
 
@@ -135245,7 +135279,7 @@ SuperRodGroupFishGuru:
 
 GoodRodGroupPsyduck:
     db  2
-    db  2,PSYDUCK
+    db  2,PSYDUCK ; Entry Level
     db  2,POLIWAG
 
 SuperRodGroupPsyduck:
@@ -135284,6 +135318,8 @@ SuperRodGroupSafari:
     db 14,MAGIKARP
     db 18,MAGIKARP
     db 22,MAGIKARP ; Shiny If Level 26 in SAFARI_ZONE_WEST
+    db 20,GYARADOS ; Entry Level
+    db 24,GYARADOS
     db  5,POLIWAG
     db  9,POLIWAG
     db 13,POLIWAG
@@ -135302,8 +135338,6 @@ SuperRodGroupSafari:
     db 19,DRATINI
     db 20,OMANYTE ; Entry Level
     db 20,KABUTO ; Entry Level
-    db 20,GYARADOS ; Entry Level
-    db 24,GYARADOS
     db 25,POLIWHIRL
     db 28,POLIWHIRL
     db 29,POLIWHIRL
@@ -135374,8 +135408,8 @@ SuperRodGroupSeaform:
     db 32,KINGLER
     db 34,KINGLER
     db 36,KINGLER
-    db 31,STARMIE
-    db 31,CLOYSTER
+    db 38,STARMIE
+    db 38,CLOYSTER
     db 21,OMANYTE
     db 21,KABUTO
 

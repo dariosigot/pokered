@@ -875,8 +875,21 @@ W_PRIZE2: ; d13e
     ds 1
 W_PRIZE3: ; d13f
     ds 1
+W_PRIZE4: ; d140
+    ds 1
+W_PRIZE_END: ; d141
+    ds 1
 
-    ds 24 - 3
+W_PRICE1: ; d142
+    ds 2
+W_PRICE2: ; d144
+    ds 2
+W_PRICE3: ; d146
+    ds 2
+W_PRICE4: ; d148
+    ds 2
+
+    ds 24 - 3 - 2 - 8
 
 wBackupFlagGainingExp: ; d155
     ds 1
