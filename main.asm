@@ -26122,15 +26122,14 @@ GetTMChoiceItemID:
 SECTION "DrawBadges",ROMX[$6a03],BANK[$3]
 
 DrawBadges: ; ea03 (3:6a03)
-; Draw 4x2 gym leader faces,with the faces replaced by
-; badges if they are owned. Used in the player status screen.
-
+; Draw 4x2 gym leader badges
+; Used in the player status screen.
 ; In Japanese versions,names are displayed above faces.
 ; Instead of removing relevant code,the name graphics were erased.
 
-; Tile ids for face/badge graphics.
+; Tile ids for badge graphics.
     ld de,$cd3f
-    ld hl,.FaceBadgeTiles
+    ld hl,.BadgeTiles
     ld bc,8
     call CopyData
 
@@ -26142,16 +26141,12 @@ DrawBadges: ; ea03 (3:6a03)
 
 ; Alter these based on owned badges.
     ld de,$cd49
-    ld hl,$cd3f
     ld a,[W_OBTAINEDBADGES]
     ld b,a
     ld c,8
 .CheckBadge
     srl b
     jr nc,.NextBadge
-    ld a,[hl]
-    add 4 ; Badge graphics are after each face
-    ld [hl],a
     ld a,1
     ld [de],a
 .NextBadge
@@ -26160,58 +26155,38 @@ DrawBadges: ; ea03 (3:6a03)
     dec c
     jr nz,.CheckBadge
 
-; Draw two rows of badges.
-    ld hl,$cd3d
-    ld a,$7f ; Blank (No Badge Number) ; ld a,$d8 ; [1]
-    ld [hli],a
-    ld [hl],$60 ; First name
-
-    FuncCoord 2,11
+    FuncCoord 03,12
     ld hl,Coord
     ld de,$cd49
-    call .DrawBadgeRow
-
-    FuncCoord 2,14
-    ld hl,Coord
-    ld de,$cd49 + 4
-;    call .DrawBadgeRow
-;    ret
-
-.DrawBadgeRow ; ea4c (3:6a4c)
-; Draw 4 badges.
-
-    ld c,4
-.DrawBadge
+    ld c,8 ; Draw 8 badges.
+    ld b,0 ; num of Badge Printed
+.loop
     push de
     push hl
 
-; Badge no.
-    ld a,[$cd3d]
-    ld [hli],a
-    nop ; inc a ; Blank (No Badge Number)
-    ld [$cd3d],a
-
-; Names aren't printed if the badge is owned.
+; Badges are printed if the badge is owned.
     ld a,[de]
     and a
-    ld a,[$cd3e]
-    jr nz,.SkipName
-    call .PlaceTiles
-    jr .PlaceBadge
-
-.SkipName
-    inc a
-    inc a
-    inc hl
-
-.PlaceBadge
-    ld [$cd3e],a
-    ld de,20 - 1
-    add hl,de
+    jr z,.SkipBadge
     ld a,[$cd3f]
     call .PlaceTiles
+    ld de,20 - 1
     add hl,de
     call .PlaceTiles
+
+    inc b ; increase num of Badge Printed
+    ld a,b
+    cp 4
+
+    pop hl
+    ld de,4
+    jr nz,.skip
+    ld de,20*3-12
+.skip
+    add hl,de
+    push hl
+
+.SkipBadge
 
 ; Shift badge array back one byte.
     push bc
@@ -26222,13 +26197,10 @@ DrawBadges: ; ea03 (3:6a03)
     pop bc
 
     pop hl
-    ld de,4
-    add hl,de
-
     pop de
     inc de
     dec c
-    jr nz,.DrawBadge
+    jr nz,.loop
     ret
 
 .PlaceTiles
@@ -26238,11 +26210,13 @@ DrawBadges: ; ea03 (3:6a03)
     inc a
     ret
 
-.FaceBadgeTiles
-    db $20,$28,$30,$38,$40,$48,$50,$58
+.BadgeTiles
+    db $24,$2C,$34,$3C,$44,$4C,$54,$5C
 
-GymLeaderFaceAndBadgeTileGraphics: ; ea9e (3:6a9e)
+GymLeaderFaceAndBadgeTileGraphics
     INCBIN "gfx/badges.2bpp"
+
+SECTION "ReplaceTileBlock",ROMX[$6e9e],BANK[$3]
 
 ReplaceTileBlock: ; ee9e (3:6e9e)
     call Load16BitRegisters
@@ -29459,11 +29433,11 @@ StartMenu_TrainerInfo:
     ld a,$3b
     call Predef
     call DisableLCD
-    FuncCoord 0,2
+    FuncCoord 00,02
     ld hl,Coord
     ld a," "
     call .TrainerInfo_DrawVerticalLine
-    FuncCoord 1,2
+    FuncCoord 01,02
     ld hl,Coord
     call .TrainerInfo_DrawVerticalLine
     ld hl,$9070
@@ -29507,7 +29481,7 @@ StartMenu_TrainerInfo:
     dec a
     ld [hli],a
     ld [hl],1
-    FuncCoord 0,0
+    FuncCoord 00,00
     ld hl,Coord
     call .TrainerInfo_DrawTextBox
     ld hl,$cd3d
@@ -29516,38 +29490,24 @@ StartMenu_TrainerInfo:
     dec a
     ld [hli],a
     ld [hl],3
-    ;FuncCoord 1,10
-    ;ld hl,Coord
-    ;call .TrainerInfo_DrawTextBox
-    ;FuncCoord 0,10
-    ;ld hl,Coord
-    ;ld a,$d7
-    ;call .TrainerInfo_DrawVerticalLine
-    ;FuncCoord 19,10
-    ;ld hl,Coord
-    ;call .TrainerInfo_DrawVerticalLine
-    ;FuncCoord 6,9
-    ;ld hl,Coord
-    ;ld de,.TrainerInfo_BadgesText
-    ;call PlaceString
-    ld hl,$fff6
-    set 1,[hl]
-    FuncCoord 2,2
+    ld hl,$fff6 ; Text without "\n"
+    set 2,[hl]  ; ...
+    FuncCoord 02,02
     ld hl,Coord
     ld de,.TrainerInfo_NameMoneyTimeText
     call PlaceString
-    ld hl,$fff6
-    res 1,[hl]
-    FuncCoord 7,2
+    ld hl,$fff6 ; UNDO Text without "\n"
+    res 2,[hl]  ; ...
+    FuncCoord 07,02
     ld hl,Coord
     ld de,W_PLAYERNAME
     call PlaceString
-    FuncCoord 8,4
+    FuncCoord 08,04
     ld hl,Coord
     ld de,wPlayerMoney
     ld c,$e3
     call PrintBCDNumber
-    FuncCoord 9,6
+    FuncCoord 09,05
     ld hl,Coord
     ld de,$da41 ; hours
     ld bc,$4103
@@ -29557,39 +29517,80 @@ StartMenu_TrainerInfo:
     ld de,$da43 ; minutes
     ld bc,$8102
     call PrintNumber
-    ;##############################
-    ;Hall of FAME : TODO
-    ;FuncCoord 12,8
-    ;ld hl,Coord
-    ;ld de,$d5a2 ; hall of fame
-    ;ld c,3
-    ;ld b,%00000001
-    ;call PrintNumber
-    ;##############################
     call GetMaxLevelBank4
     ld a,d
     ld de,wMaxLevel
     ld [de],a
-    FuncCoord 12,8
+    FuncCoord 12,06
     ld hl,Coord
     ld c,3
     ld b,%00000001
-    jp PrintNumber
+    call PrintNumber
+    FuncCoord 12,07
+    ld hl,Coord
+    ld de,$d5a2 ; hall of fame
+    ld c,3
+    ld b,%00000001
+    call PrintNumber
+    jp .PrintPowers
 
 .TrainerInfo_FarCopyData
     ld a,$0b
     jp FarCopyData2
 
 .TrainerInfo_NameMoneyTimeText
-    db "NAME/",$4E
+    db "NAME/",$4E,$4E
     db "MONEY/",$4E
     db "TIME/",$4E
     db "MAX LEVEL/",$4E
+    db "H.OF FAME/",$4E,$4E
+    db "POWER/",$4E,$4E
     db "BADGES/@"
 
-; $76 is a circle tile
-;TrainerInfo_BadgesText: ; 13597 (4:7597)
-;    db $76,"BADGES",$76,"@"
+.PrintPowers
+    FuncCoord 09,09
+    ld de,Coord
+    ld hl,$d803 ; NaturePower
+    bit 0,[hl]  ; ...
+    jr z,.next1
+    ld a,$D8
+    ld [de],a
+    inc de
+    inc de
+.next1
+    ld hl,$d7e0 ; AirPower
+    bit 6,[hl]  ; 
+    jr z,.next2
+    ld a,$D9
+    ld [de],a
+    inc de
+    inc de
+.next2
+    ld hl,$d857 ; WaterPower
+    bit 0,[hl]  ; ...
+    jr z,.next3
+    ld a,$DA
+    ld [de],a
+    inc de
+    inc de
+.next3
+    ld hl,$d78e ; CheckEarthPower
+    bit 0,[hl]  ; ...
+    jr z,.next4
+    ld a,$DB
+    ld [de],a
+    inc de
+    inc de
+.next4
+    ld hl,$d7c2 ; CheckFirePower
+    bit 0,[hl]  ; ...
+    jr z,.next5
+    ld a,$DC
+    ld [de],a
+    inc de
+    inc de
+.next5
+    ret
 
 ; draws a text box on the trainer info screen
 ; height is always 16
@@ -100896,6 +100897,196 @@ HackForInsertDVInHallOfFameDataSecondStep:
 BaloonSprites:
     INCBIN "gfx/baloon.2bpp"
 
+; ─────────────────────────────────────────
+
+LoadTrainerCardBadgePalettes:
+    ld de,$030C ; Coordinate 03,12
+    ld hl,$cc5d
+    ld a,[W_OBTAINEDBADGES]
+    ld c,8
+    ld b,0
+.loop
+    srl a
+    push af
+    jr nc,.nextBadge
+.haveBadge
+    call .CheckRainbowException
+    jr z,.RainbowException
+    call .HandleRule
+    call .HandleColor
+    call .Handle1stCoord
+    call .Handle2ndCoord
+    jr .BadgeInsertDone
+.RainbowException
+    call .HandleRainbowBadge
+.BadgeInsertDone
+    inc b
+    call .NextBadgeCoord
+.nextBadge
+    pop af
+    dec c
+    jr nz,.loop
+    call .CheckAtLeastOneRule
+    call .GetCommandLenght
+    ld [$cc5b],a
+    ld a,b
+    ld [$cc5c],a
+    ld hl,PalPacket_72498
+    ld de,$cc5b
+    ret
+
+.CheckAtLeastOneRule
+    ld a,b
+    and a
+    ret nz
+    push bc
+    ld d,h
+    ld e,l
+    ld hl,.FakeRule
+    ld bc,6
+    call CopyData
+    pop bc
+    inc b
+    ret
+.FakeRule
+    db %00000100,%00000000
+    db $00,$00,$00,$00
+
+.NextBadgeCoord
+    ld a,[W_OBTAINEDBADGES]
+    bit 3,a ; Check Rainbow
+    ld a,b
+    jr z,.noRainbow
+    sub 2
+.noRainbow
+    cp 4
+    jr nz,.skip
+    push hl
+    ld hl,-$0C00+$0003
+    add hl,de
+    ld d,h
+    ld e,l
+    pop hl
+    ret
+.skip
+    inc d
+    inc d
+    inc d
+    inc d
+    ret
+
+.GetBadgeColor
+    push hl
+    push bc
+    ld hl,.BadgeColor
+    ld a,8
+    sub c
+    ld b,0
+    ld c,a
+    add hl,bc
+    ld a,[hl]
+    pop bc
+    pop hl
+    ret
+.BadgeColor
+    db %00000000 ; Boulder Badge
+    db %00000101 ; Cascade Badge
+    db %00001111 ; Thunder Badge
+    db %00000000 ; Rainbow Badge (Not Used)
+    db %00001010 ; Soul Badge
+    db %00001111 ; Marsh Badge
+    db %00001010 ; Volcano Badge
+    db %00000101 ; Earth Badge
+
+.HandleRainbowBadge
+    push bc
+    ld bc,.RainbowBadgeColorCoord
+    ld a,3
+.RainbowLoop
+    push af
+    ; Rule
+    ld a,%00000010
+    ld [hli],a
+    ; Color
+    ld a,[bc]
+    ld [hli],a
+    inc bc
+    ; Coord
+    ld a,[bc]
+    add d
+    ld [hli],a
+    inc hl
+    ld [hld],a
+    inc bc
+    ld a,[bc]
+    add e
+    ld [hli],a
+    inc hl
+    ld [hli],a
+    inc bc
+    pop af
+    dec a
+    jr nz,.RainbowLoop
+    pop bc
+    inc b
+    inc b
+    ret
+.RainbowBadgeColorCoord
+    db %00001010,01,00 ; Upper Right
+    db %00000101,00,01 ; Bottom Left
+    db %00001111,01,01 ; Bottom Right
+
+.GetCommandLenght ; ($4 << 3) + ((\1 * 6) / 16 + 1)
+    push bc
+    ld a,b
+    add b
+    add b
+    add b
+    add b
+    add b
+    srl a
+    srl a
+    srl a
+    srl a
+    inc a
+    ld b,$20
+    add b
+    pop bc
+    ret
+
+.HandleRule
+    ld a,%00000010 ; Rule
+    ld [hli],a
+    ret
+
+.HandleColor
+    call .GetBadgeColor
+    ld [hli],a
+    ret
+
+.Handle1stCoord
+    ld a,d
+    ld [hli],a
+    ld a,e
+    ld [hli],a
+    ret
+
+.Handle2ndCoord
+    ld a,d
+    inc a
+    ld [hli],a
+    ld a,e
+    inc a
+    ld [hli],a
+    ret
+
+.CheckRainbowException
+    ld a,c
+    cp 5
+    ret
+
+; ─────────────────────────────────────────
+
 ; Free
 
 SECTION "Predef54",ROMX[$5ad9],BANK[$1C]
@@ -101473,43 +101664,9 @@ GetHallOfFameLinkCableEvolutionPaletteID: ; 71f17 (1c:5f17)
     ld de,Unknown_7219e
     ret
 
-LoadTrainerCardBadgePalettes: ; 71f3b (1c:5f3b)
-    ld hl,Unknown_72360
-    ld de,$cc5b
-    ld bc,$40
-    call CopyData
-    ld de,LoopCounts_71f8f
-    ld hl,$cc5d
-    ld a,[W_OBTAINEDBADGES]
-    ld c,$8
-.asm_71f52
-    srl a
-    push af
-    jr c,.asm_71f62
-    push bc
-    ld a,[de]
-    ld c,a
-    xor a
-.asm_71f5b
-    ld [hli],a
-    dec c
-    jr nz,.asm_71f5b
-    pop bc
-    jr .asm_71f67
-.asm_71f62
-    ld a,[de]
-.asm_71f63
-    inc hl
-    dec a
-    jr nz,.asm_71f63
-.asm_71f67
-    pop af
-    inc de
-    dec c
-    jr nz,.asm_71f52
-    ld hl,PalPacket_72498
-    ld de,$cc5b
-    ret
+; Free
+
+SECTION "PointerTable_71f73",ROMX[$5f73],BANK[$1c]
 
 PointerTable_71f73: ; 71f73 (1c:5f73)
     dw Func_71dff
@@ -101528,10 +101685,6 @@ PointerTable_71f73: ; 71f73 (1c:5f73)
     dw LoadTrainerCardBadgePalettes
     dw GetPkmnStat2PaletteID ; Palette Pokemon Stat2
     dw GetMovesMenuPalatteID ; Palette Moves Menu
-
-; each byte is the number of loops to make in .asm_71f5b for each badge
-LoopCounts_71f8f: ; Moved in the Bank
-    db $06,$06,$06,$12,$06,$06,$06,$06
 
 CleanLCD_OAMAndResetForceGhostPal:
     call CleanLCD_OAM
@@ -102061,10 +102214,50 @@ TrainerPalettes:
     db PAL_PURPLEMON  ; AGATHA        ; $2E
     db PAL_VARIOUS    ; LANCE         ; $2F
 
-SECTION "Unknown_72360",ROMX[$6360],BANK[$1c]
+;SECTION "AttrBlk_TrainerCard",ROMX[$6360],BANK[$1c]
+;
+;AttrBlk_TrainerCard: ; 72360 (1c:6360)
+;
+;    db $24
+;    db $0A
+;
+;    db %00000010,%00000000
+;    db $03,$0C,$04,$0D ; Boulder Badge
+;
+;    db %00000010,%00000101
+;    db $07,$0C,$08,$0D ; Cascade Badge
+;
+;    db %00000010,%00001111
+;    db $0B,$0C,$0C,$0D ; Thunder Badge
+;
+;    db %00000010,%00001010
+;    db $10,$0C,$10,$0C ; Rainbow Badge
+;
+;    db %00000010,%00000101
+;    db $0F,$0D,$0F,$0D ; Rainbow Badge
+;
+;    db %00000010,%00001111
+;    db $10,$0D,$10,$0D ; Rainbow Badge
+;
+;    db %00000010,%00001010
+;    db $03,$0F,$04,$10 ; Soul Badge
+;
+;    db %00000010,%00001111
+;    db $07,$0F,$08,$10 ; Marsh Badge
+;
+;    db %00000010,%00001010
+;    db $0B,$0F,$0C,$10 ; Volcano Badge
+;
+;    db %00000010,%00000101
+;    db $0F,$0F,$10,$10 ; Earth Badge
+;
+;    db $00,$00,$03,$03,$0C,$04,$0D,$00,$03,$07,$0C,$08,$0D
+;    db $01,$03,$0B,$0C,$0C,$0D,$03,$03,$10,$0B,$11,$0C,$02,$03,$0E
+;    db $0D,$0F,$0E,$01,$03,$10,$0D,$11,$0E,$03,$03,$03,$0F,$04,$10
+;    db $02,$03,$07,$0F,$08,$10,$03,$03,$0B,$0F,$0C,$10,$02,$03,$0F
+;    db $0F,$10,$10,$01,$00
 
-Unknown_72360: ; 72360 (1c:6360)
-INCBIN "baserom.gbc",$72360,$723dd - $72360
+SECTION "Unknown_723dd",ROMX[$63dd],BANK[$1c]
 
 Unknown_723dd: ; 723dd (1c:63dd)
 INCBIN "baserom.gbc",$723dd,$72428 - $723dd
