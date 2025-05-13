@@ -15073,7 +15073,7 @@ DisplayNameRaterScreen: ; 655c (1:655c)
     ld [$cfcb],a
     ld a,$2
     ld [$d07d],a
-    call HandleIVAndLoadRenameScreenDuringNameRater
+    call HandleIVAndLevelAndLoadRenameScreenDuringNameRater
     call GBPalWhiteOutWithDelay3
     call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
@@ -15496,7 +15496,7 @@ Func_68f8: ; 68f8 (1:68f8)
     ld hl,Coord
     call PlaceString
     ld hl,$1
-    call PrintGenderInRenameScreen ; add hl,bc
+    call PrintGenderAndLevelInRenameScreen ; add hl,bc
     ;ld [hl],$c9
     FuncCoord 1,3 ; $c3dd
     ld hl,Coord
@@ -18164,21 +18164,32 @@ StoreCatchPkmnIdAndFlagBeforeRename: ; Denim
     pop hl
     jp LoadRenameScreen
 
-HandleIVAndLoadRenameScreenDuringNameRater:
+HandleIVAndLevelAndLoadRenameScreenDuringNameRater:
     push hl
     ld a,[wWhichPokemon] ; Pokemon Party Order
     ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
     call SetTempIV
+    ld bc,W_PARTYMON1_LEVEL-W_PARTYMON1_IV
+    add hl,bc
+    ld a,[hl]
+    ld [wTmpLevel],a
     pop hl
     call LoadRenameScreen
     jp ResetTempIV
 
-PrintGenderInRenameScreen:
+PrintGenderAndLevelInRenameScreen:
     add hl,bc
     push bc
+    ld a,[wTmpLevel]
+    ld [$cfb9],a
+    call PrintLevel
+    xor a
+    ld [wTmpLevel],a
     push hl ; Backup Coord
+    ld a,[$cf91] ; Pokemon ID
+    ld [$d11e],a
     ld b,BANK(GetGender)
     ld hl,GetGender
     call Bankswitch
@@ -18687,10 +18698,10 @@ Trade_BackupEnemyIVandAltForm:
     ld a,[$cd3d]
     ret
 
-HandleIVAndLoadRenameScreenDuringNameRater_FromAnotherBank:
+HandleIVAndLevelAndLoadRenameScreenDuringNameRater_FromAnotherBank:
     ld h,d
     ld l,e
-    jp HandleIVAndLoadRenameScreenDuringNameRater
+    jp HandleIVAndLevelAndLoadRenameScreenDuringNameRater
 
 SECTION "bank2",ROMX,BANK[$2]
 
@@ -29045,9 +29056,11 @@ InsertIVDuringAddMonToParty:
     jr nz,InsertIVFromEnemyMonData
 .random
     call GenRandom
-    ld [hli],a
+    ld [hli],a ; wDVForShinyAtkDef
     call GenRandom
-    ld [hl],a
+    ld [hli],a ; wDVForShinySpdSpc
+    ld a,[W_CURENEMYLVL]
+    ld [hl],a ; wTmpLevel
     ret
 
 CopyDataAndInsertIVDuringSendNewMonToBox:
@@ -29057,9 +29070,11 @@ CopyDataAndInsertIVDuringSendNewMonToBox:
 
 InsertIVFromEnemyMonData:
     ld a,[W_ENEMYMONATKDEFIV]
-    ld [hli],a
+    ld [hli],a ; wDVForShinyAtkDef
     ld a,[W_ENEMYMONSPDSPCIV]
-    ld [hl],a
+    ld [hli],a ; wDVForShinySpdSpc
+    ld a,[W_ENEMYMONLEVEL]
+    ld [hl],a ; wTmpLevel
     ret
 
 ; animates the HP bar going up or down for (a) ticks (two waiting frames each)
@@ -32198,8 +32213,8 @@ DisplayPartyRenameScreen:
     ld [$cfcb],a
     ld a,$2
     ld [$d07d],a
-    ld b,BANK(HandleIVAndLoadRenameScreenDuringNameRater_FromAnotherBank)
-    ld hl,HandleIVAndLoadRenameScreenDuringNameRater_FromAnotherBank
+    ld b,BANK(HandleIVAndLevelAndLoadRenameScreenDuringNameRater_FromAnotherBank)
+    ld hl,HandleIVAndLevelAndLoadRenameScreenDuringNameRater_FromAnotherBank
     call Bankswitch
     ld a,[$cf4b]
     cp $50

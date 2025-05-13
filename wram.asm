@@ -1199,6 +1199,10 @@ wTradedEnemyMonIV: ; d484
 wTradeEnemyMonAltForm: ; d486
     ds 1
 
+NEXTU
+
+wTmpLevel:: db ; d481
+
 ENDU
 
 ; some free bytes
