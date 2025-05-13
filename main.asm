@@ -29423,6 +29423,237 @@ GetWildEnemyLevel:
     ld [W_CURENEMYLVL],a ; $d127
     jr GetWildEnemyLevel
 
+; ───────────────────────────────────────────────────────
+; StartMenu_TrainerInfo
+; ───────────────────────────────────────────────────────
+
+StartMenu_TrainerInfo:
+    call GBPalWhiteOut
+    call ClearScreen
+    call UpdateSprites ; move sprites
+    ld a,[$ffd7]
+    push af
+    xor a
+    ld [$ffd7],a
+    call .DrawTrainerInfo
+    ld a,$2e
+    call Predef ; draw badges
+    ld b,$0d
+    call GoPAL_SET
+    call GBPalNormal
+    call WaitForTextScrollButtonPress ; wait for button press
+    call GBPalWhiteOut
+    call LoadFontTilePatterns
+    call LoadScreenTilesFromBuffer2 ; restore saved screen
+    call GoPAL_SET_CF1C
+    call ReloadMapData
+    call LoadGBPal
+    pop af
+    ld [$ffd7],a
+    jp RedisplayStartMenu
+
+; loads tile patterns and draws everything except for gym leader faces / badges
+.DrawTrainerInfo
+    ld de,RedPicFront
+    ld bc,$0401
+    ld a,$3b
+    call Predef
+    call DisableLCD
+    FuncCoord 0,2
+    ld hl,Coord
+    ld a," "
+    call .TrainerInfo_DrawVerticalLine
+    FuncCoord 1,2
+    ld hl,Coord
+    call .TrainerInfo_DrawVerticalLine
+    ld hl,$9070
+    ld de,$9000
+    ld bc,$01c0
+    call CopyData
+    ld hl,TrainerInfoTextBoxTileGraphics ; $7b98 ; trainer info text box tile patterns
+    ld de,$9770
+    ld bc,$0080
+    push bc
+    call .TrainerInfo_FarCopyData
+    ld hl,BlankLeaderNames ; $7c28
+    ld de,$9600
+    ld bc,$0170
+    call .TrainerInfo_FarCopyData
+    pop bc
+    ld hl,BadgeNumbersTileGraphics  ; $7d98 ; badge number tile patterns
+    ld de,$8d80
+    call .TrainerInfo_FarCopyData
+    ld hl,GymLeaderFaceAndBadgeTileGraphics  ; $6a9e ; gym leader face and badge tile patterns
+    ld de,$9200
+    ld bc,$0400
+    ld a,$03
+    call FarCopyData2
+    ld hl,TextBoxGraphics ; $6288
+    ld de,$00d0
+    add hl,de ; hl = colon tile pattern
+    ld de,$8d60
+    ld bc,$0010
+    ld a,$04
+    push bc
+    call FarCopyData2
+    pop bc
+    ld hl,TrainerInfoTextBoxTileGraphics + $80  ; $7c18 ; background tile pattern
+    ld de,$8d70
+    call .TrainerInfo_FarCopyData
+    call EnableLCD
+    ld hl,$cd3d
+    ld a,18 + 1
+    ld [hli],a
+    dec a
+    ld [hli],a
+    ld [hl],1
+    FuncCoord 0,0
+    ld hl,Coord
+    call .TrainerInfo_DrawTextBox
+    ld hl,$cd3d
+    ld a,16 + 1
+    ld [hli],a
+    dec a
+    ld [hli],a
+    ld [hl],3
+    ;FuncCoord 1,10
+    ;ld hl,Coord
+    ;call .TrainerInfo_DrawTextBox
+    ;FuncCoord 0,10
+    ;ld hl,Coord
+    ;ld a,$d7
+    ;call .TrainerInfo_DrawVerticalLine
+    ;FuncCoord 19,10
+    ;ld hl,Coord
+    ;call .TrainerInfo_DrawVerticalLine
+    ;FuncCoord 6,9
+    ;ld hl,Coord
+    ;ld de,.TrainerInfo_BadgesText
+    ;call PlaceString
+    ld hl,$fff6
+    set 1,[hl]
+    FuncCoord 2,2
+    ld hl,Coord
+    ld de,.TrainerInfo_NameMoneyTimeText
+    call PlaceString
+    ld hl,$fff6
+    res 1,[hl]
+    FuncCoord 7,2
+    ld hl,Coord
+    ld de,W_PLAYERNAME
+    call PlaceString
+    FuncCoord 8,4
+    ld hl,Coord
+    ld de,wPlayerMoney
+    ld c,$e3
+    call PrintBCDNumber
+    FuncCoord 9,6
+    ld hl,Coord
+    ld de,$da41 ; hours
+    ld bc,$4103
+    call PrintNumber
+    ld [hl],$d6 ; colon tile ID
+    inc hl
+    ld de,$da43 ; minutes
+    ld bc,$8102
+    call PrintNumber
+    ;##############################
+    ;Hall of FAME : TODO
+    ;FuncCoord 12,8
+    ;ld hl,Coord
+    ;ld de,$d5a2 ; hall of fame
+    ;ld c,3
+    ;ld b,%00000001
+    ;call PrintNumber
+    ;##############################
+    call GetMaxLevelBank4
+    ld a,d
+    ld de,wMaxLevel
+    ld [de],a
+    FuncCoord 12,8
+    ld hl,Coord
+    ld c,3
+    ld b,%00000001
+    jp PrintNumber
+
+.TrainerInfo_FarCopyData
+    ld a,$0b
+    jp FarCopyData2
+
+.TrainerInfo_NameMoneyTimeText
+    db "NAME/",$4E
+    db "MONEY/",$4E
+    db "TIME/",$4E
+    db "MAX LEVEL/",$4E
+    db "BADGES/@"
+
+; $76 is a circle tile
+;TrainerInfo_BadgesText: ; 13597 (4:7597)
+;    db $76,"BADGES",$76,"@"
+
+; draws a text box on the trainer info screen
+; height is always 16
+; INPUT:
+; hl = destination address
+; [$cd3d] = width + 1
+; [$cd3e] = width
+; [$cd3f] = distance from the end of a text box row to the start of the next
+.TrainerInfo_DrawTextBox
+    ld a,$79 ; upper left corner tile ID
+    ld de,$7a7b ; top edge and upper right corner tile ID's
+    call .TrainerInfo_DrawHorizontalEdge ; draw top edge
+    call .TrainerInfo_NextTextBoxRow
+    ld a,[$cd3d] ; width of the text box plus one
+    ld e,a
+    ld d,0
+    ld c,16 ; height of the text box
+.TrainerInfo_DrawTextBox_loop
+    ld [hl],$7c ; left edge tile ID
+    add hl,de
+    ld [hl],$78 ; right edge tile ID
+    call .TrainerInfo_NextTextBoxRow
+    dec c
+    jr nz,.TrainerInfo_DrawTextBox_loop
+    ld a,$7d ; lower left corner tile ID
+    ld de,$777e ; bottom edge and lower right corner tile ID's
+
+.TrainerInfo_DrawHorizontalEdge
+    ld [hli],a ; place left corner tile
+    ld a,[$cd3e] ; width of the text box
+    ld c,a
+    ld a,d
+.TrainerInfo_DrawHorizontalEdge_loop
+    ld [hli],a ; place edge tile
+    dec c
+    jr nz,.TrainerInfo_DrawHorizontalEdge_loop
+    ld a,e
+    ld [hl],a ; place right corner tile
+    ret
+
+.TrainerInfo_NextTextBoxRow
+    ld a,[$cd3f] ; distance to the start of the next row
+.TrainerInfo_NextTextBoxRow_loop
+    inc hl
+    dec a
+    jr nz,.TrainerInfo_NextTextBoxRow_loop
+    ret
+
+; draws a vertical line
+; INPUT:
+; hl = address of top tile in the line
+; a = tile ID
+.TrainerInfo_DrawVerticalLine
+    ld de,20
+    ld c,8
+.TrainerInfo_DrawVerticalLine_loop
+    ld [hl],a
+    add hl,de
+    dec c
+    jr nz,.TrainerInfo_DrawVerticalLine_loop
+    ret
+
+; ───────────────────────────────────────────────────────
+
 ; Free
 
 SECTION "DrawPartyMenu_",ROMX[$6cd2],BANK[$4]
@@ -30267,230 +30498,9 @@ GetMaxLevelBank4:
     ld b,BANK(GetMaxLevel)
     jp Bankswitch ; d = Max Level
 
-SECTION "StartMenu_TrainerInfo",ROMX[$7460],BANK[$4]
+; Free
 
-StartMenu_TrainerInfo: ; 13460 (4:7460)
-    call GBPalWhiteOut
-    call ClearScreen
-    call UpdateSprites ; move sprites
-    ld a,[$ffd7]
-    push af
-    xor a
-    ld [$ffd7],a
-    call DrawTrainerInfo
-    ld a,$2e
-    call Predef ; draw badges
-    ld b,$0d
-    call GoPAL_SET
-    call GBPalNormal
-    call WaitForTextScrollButtonPress ; wait for button press
-    call GBPalWhiteOut
-    call LoadFontTilePatterns
-    call LoadScreenTilesFromBuffer2 ; restore saved screen
-    call GoPAL_SET_CF1C
-    call ReloadMapData
-    call LoadGBPal
-    pop af
-    ld [$ffd7],a
-    jp RedisplayStartMenu
-
-; loads tile patterns and draws everything except for gym leader faces / badges
-DrawTrainerInfo: ; 1349a (4:749a)
-    ld de,RedPicFront
-    ld bc,$0401
-    ld a,$3b
-    call Predef
-    call DisableLCD
-    FuncCoord 0,2
-    ld hl,Coord
-    ld a," "
-    call TrainerInfo_DrawVerticalLine
-    FuncCoord 1,2
-    ld hl,Coord
-    call TrainerInfo_DrawVerticalLine
-    ld hl,$9070
-    ld de,$9000
-    ld bc,$01c0
-    call CopyData
-    ld hl,TrainerInfoTextBoxTileGraphics ; $7b98 ; trainer info text box tile patterns
-    ld de,$9770
-    ld bc,$0080
-    push bc
-    call TrainerInfo_FarCopyData
-    ld hl,BlankLeaderNames ; $7c28
-    ld de,$9600
-    ld bc,$0170
-    call TrainerInfo_FarCopyData
-    pop bc
-    ld hl,BadgeNumbersTileGraphics  ; $7d98 ; badge number tile patterns
-    ld de,$8d80
-    call TrainerInfo_FarCopyData
-    ld hl,GymLeaderFaceAndBadgeTileGraphics  ; $6a9e ; gym leader face and badge tile patterns
-    ld de,$9200
-    ld bc,$0400
-    ld a,$03
-    call FarCopyData2
-    ld hl,TextBoxGraphics ; $6288
-    ld de,$00d0
-    add hl,de ; hl = colon tile pattern
-    ld de,$8d60
-    ld bc,$0010
-    ld a,$04
-    push bc
-    call FarCopyData2
-    pop bc
-    ld hl,TrainerInfoTextBoxTileGraphics + $80  ; $7c18 ; background tile pattern
-    ld de,$8d70
-    call TrainerInfo_FarCopyData
-    call EnableLCD
-    ld hl,$cd3d
-    ld a,18 + 1
-    ld [hli],a
-    dec a
-    ld [hli],a
-    ld [hl],1
-    FuncCoord 0,0
-    ld hl,Coord
-    call TrainerInfo_DrawTextBox
-    ld hl,$cd3d
-    ld a,16 + 1
-    ld [hli],a
-    dec a
-    ld [hli],a
-    ld [hl],3
-    ;FuncCoord 1,10
-    ;ld hl,Coord
-    ;call TrainerInfo_DrawTextBox
-    ;FuncCoord 0,10
-    ;ld hl,Coord
-    ;ld a,$d7
-    ;call TrainerInfo_DrawVerticalLine
-    ;FuncCoord 19,10
-    ;ld hl,Coord
-    ;call TrainerInfo_DrawVerticalLine
-    ;FuncCoord 6,9
-    ;ld hl,Coord
-    ;ld de,TrainerInfo_BadgesText
-    ;call PlaceString
-    FuncCoord 2,2
-    ld hl,Coord
-    ld de,TrainerInfo_NameMoneyTimeText
-    call PlaceString
-    FuncCoord 7,2
-    ld hl,Coord
-    ld de,W_PLAYERNAME
-    call PlaceString
-    FuncCoord 8,4
-    ld hl,Coord
-    ld de,wPlayerMoney
-    ld c,$e3
-    call PrintBCDNumber
-    FuncCoord 9,6
-    ld hl,Coord
-    ld de,$da41 ; hours
-    ld bc,$4103
-    call PrintNumber
-    ld [hl],$d6 ; colon tile ID
-    inc hl
-    ld de,$da43 ; minutes
-    ld bc,$8102
-    call PrintNumber
-    ;##############################
-    ;Hall of FAME : TODO
-    ;FuncCoord 12,8
-    ;ld hl,Coord
-    ;ld de,$d5a2 ; hall of fame
-    ;ld c,3
-    ;ld b,%00000001
-    ;call PrintNumber
-    ;##############################
-    call GetMaxLevelBank4
-    ld a,d
-    ld de,wMaxLevel
-    ld [de],a
-    FuncCoord 12,8
-    ld hl,Coord
-    ld c,3
-    ld b,%00000001
-    jp PrintNumber
-
-TrainerInfo_FarCopyData: ; 1357f (4:757f)
-    ld a,$0b
-    jp FarCopyData2
-
-TrainerInfo_NameMoneyTimeText: ; 13584 (4:7584)
-    db "NAME/",$4E
-    db "MONEY/",$4E
-    db "TIME/",$4E
-    db "MAX LEVEL/",$4E
-    db "BADGES/@"
-
-; $76 is a circle tile
-;TrainerInfo_BadgesText: ; 13597 (4:7597)
-;    db $76,"BADGES",$76,"@"
-
-SECTION "TrainerInfo_DrawTextBox",ROMX[$75a0],BANK[$4]
-
-; draws a text box on the trainer info screen
-; height is always 16
-; INPUT:
-; hl = destination address
-; [$cd3d] = width + 1
-; [$cd3e] = width
-; [$cd3f] = distance from the end of a text box row to the start of the next
-TrainerInfo_DrawTextBox: ; 135a0 (4:75a0)
-    ld a,$79 ; upper left corner tile ID
-    ld de,$7a7b ; top edge and upper right corner tile ID's
-    call TrainerInfo_DrawHorizontalEdge ; draw top edge
-    call TrainerInfo_NextTextBoxRow
-    ld a,[$cd3d] ; width of the text box plus one
-    ld e,a
-    ld d,0
-    ld c,16 ; height of the text box
-.loop
-    ld [hl],$7c ; left edge tile ID
-    add hl,de
-    ld [hl],$78 ; right edge tile ID
-    call TrainerInfo_NextTextBoxRow
-    dec c
-    jr nz,.loop
-    ld a,$7d ; lower left corner tile ID
-    ld de,$777e ; bottom edge and lower right corner tile ID's
-
-TrainerInfo_DrawHorizontalEdge: ; 135c3 (4:75c3)
-    ld [hli],a ; place left corner tile
-    ld a,[$cd3e] ; width of the text box
-    ld c,a
-    ld a,d
-.loop
-    ld [hli],a ; place edge tile
-    dec c
-    jr nz,.loop
-    ld a,e
-    ld [hl],a ; place right corner tile
-    ret
-
-TrainerInfo_NextTextBoxRow: ; 135d0 (4:75d0)
-    ld a,[$cd3f] ; distance to the start of the next row
-.loop
-    inc hl
-    dec a
-    jr nz,.loop
-    ret
-
-; draws a vertical line
-; INPUT:
-; hl = address of top tile in the line
-; a = tile ID
-TrainerInfo_DrawVerticalLine: ; 135d8 (4:75d8)
-    ld de,20
-    ld c,8
-.loop
-    ld [hl],a
-    add hl,de
-    dec c
-    jr nz,.loop
-    ret
+SECTION "StartMenu_SaveReset",ROMX[$75e3],BANK[$4]
 
 StartMenu_SaveReset: ; 135e3 (4:75e3)
     ld a,[$d72e]
