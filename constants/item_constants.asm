@@ -77,11 +77,11 @@ FOCUS         EQU $4B
 OLD_ROD       EQU $4C
 GOOD_ROD      EQU $4D
 SUPER_ROD     EQU $4E
-PP_UP         EQU $4F
+;PP_UP        EQU $4F
 ETHER         EQU $50
-MAX_ETHER     EQU $51
+;MAX_ETHER    EQU $51
 ELIXER        EQU $52
-MAX_ELIXER    EQU $53
+;MAX_ELIXER   EQU $53
 
 HM_01         EQU $54 ; NATURE POWER
 HM_02         EQU $55 ; AIR POWER

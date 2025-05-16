@@ -11343,9 +11343,9 @@ ItemPrices: ; Moved in the Bank
     bcd3    550 ; ESCAPE_ROPE
     bcd3    350 ; REPEL
     bcd3      0 ; OLD_AMBER
-    bcd3   2100 ; FIRE_STONE
-    bcd3   2100 ; THUNDER_STONE
-    bcd3   2100 ; WATER_STONE
+    bcd3  40000 ; FIRE_STONE
+    bcd3  40000 ; THUNDER_STONE
+    bcd3  40000 ; WATER_STONE
     bcd3   9800 ; HP_UP
     bcd3   9800 ; PROTEIN
     bcd3   9800 ; IRON
@@ -11358,7 +11358,7 @@ ItemPrices: ; Moved in the Bank
     bcd3  40000 ; TRADE_STONE
     bcd3      0 ; BIKE_VOUCHER
     bcd3    950 ; X_ACCURACY
-    bcd3   2100 ; LEAF_STONE
+    bcd3  40000 ; LEAF_STONE
     bcd3      0 ; CARD_KEY
     bcd3  10000 ; NUGGET
     bcd3      0 ; TECH_MACHINE
@@ -11390,11 +11390,11 @@ ItemPrices: ; Moved in the Bank
     bcd3      0 ; OLD_ROD
     bcd3      0 ; GOOD_ROD
     bcd3      0 ; SUPER_ROD
-    bcd3   9800 ; PP_UP
+    bcd3      0 ; PP_UP
     bcd3    700 ; ETHER
-    bcd3   1200 ; MAX_ETHER
-    bcd3    900 ; ELIXER
-    bcd3   1500 ; MAX_ELIXER
+    bcd3      0 ; MAX_ETHER
+    bcd3   1600 ; ELIXER
+    bcd3      0 ; MAX_ELIXER
 
 SECTION "PrepareOAMData",ROMX[$4b0f],BANK[$1]
 
@@ -22011,7 +22011,7 @@ MapHSPointers: ; c8f5 (3:48f5)
     dw MapHSXX
     dw MapHSXX
     dw MapHS14
-    dw MapHSXX
+    dw MapHS15
     dw MapHSXX
     dw MapHS17
     dw MapHSXX
@@ -22533,8 +22533,8 @@ MapHSE2: ; cd54 (3:4d54)
     db UNKNOWN_DUNGEON_2,$01,Show
     db UNKNOWN_DUNGEON_2,$02,Show
     db UNKNOWN_DUNGEON_2,$03,Show
-; Unused
-    ds 3 ; ($D1)
+MapHS15:
+    db ROUTE_10,$07,Show ; $D1
 MapHSE3:
     db UNKNOWN_DUNGEON_3,$01,Show
     db UNKNOWN_DUNGEON_3,$02,Show
@@ -23287,11 +23287,11 @@ UseItem_: ; Moved in the Bank
     dw ItemUseOldRod     ; OLD_ROD
     dw ItemUseGoodRod    ; GOOD_ROD
     dw ItemUseSuperRod   ; SUPER_ROD
-    dw UnusableItem ; ItemUsePPUp       ; PP_UP (real one)
+    dw UnusableItem      ; ItemUsePPUp ; PP_UP
     dw ItemUsePPRestore  ; ETHER
-    dw ItemUsePPRestore  ; MAX_ETHER
+    dw UnusableItem      ; ItemUsePPRestore ; MAX_ETHER
     dw ItemUsePPRestore  ; ELIXER
-    dw ItemUsePPRestore  ; MAX_ELIXER
+    dw UnusableItem      ; ItemUsePPRestore ; MAX_ELIXER
     dw UnusableItem      ; HM_01 : NATURE POWER
     dw UnusableItem      ; HM_02 : AIR POWER
     dw UnusableItem      ; HM_03 : WATER POWER
@@ -25175,6 +25175,8 @@ ItemUsePPRestore: ; Moved in the Bank
     ld hl,.Table
 .next
     ld a,[hli]
+    cp $FF
+    jr z,.NoEffect
     cp b
     jr z,.found
     inc hl
@@ -25217,9 +25219,8 @@ ItemUsePPRestore: ; Moved in the Bank
     ret
 .Table
     db ETHER,100
-    db MAX_ETHER,200
-    db ELIXER,150
-    db MAX_ELIXER,255
+    db ELIXER,255
+    db $FF
 .NoEffect
     xor a
     ret
@@ -32007,6 +32008,7 @@ UsableItems_PartyMenu: ; Moved in the Bank
     db HYPER_POTION
     db SUPER_POTION
     db POTION
+    db DUSK_STONE
     db FIRE_STONE
     db THUNDER_STONE
     db WATER_STONE
@@ -32028,11 +32030,11 @@ UsableItems_PartyMenu: ; Moved in the Bank
     db X_DEFEND
     db X_SPEED
     db X_SPECIAL
-    db PP_UP
+;    db PP_UP
     db ETHER
-    db MAX_ETHER
+;    db MAX_ETHER
     db ELIXER
-    db MAX_ELIXER
+;    db MAX_ELIXER
     db $ff
 
 PrintLevelAndGender:
@@ -69410,7 +69412,7 @@ UnknownDungeon2Object: ; 0x45e14 (size=73)
     db $0 ; signs
 
     db $3 ; people
-    db SPRITE_BALL,$9 + 4,$1d + 4,$ff,$ff,$81,MAX_ELIXER ; item
+    db SPRITE_BALL,$9 + 4,$1d + 4,$ff,$ff,$81,NUGGET ; item
     db SPRITE_BALL,$f + 4,$4 + 4,$ff,$ff,$82,ULTRA_BALL ; item
     db SPRITE_BALL,$6 + 4,$d + 4,$ff,$ff,$83,FULL_RESTORE ; item
 
@@ -70936,7 +70938,7 @@ ViridianForestHiddenObjects: ; 46e47 (11:6e47)
 MtMoon3HiddenObjects: ; 46e54 (11:6e54)
     db $0c,$12,MOON_STONE
     dbw BANK(HiddenItems),HiddenItems
-    db $09,$21,ETHER
+    db $09,$21,MOON_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 IndigoPlateauHiddenObjects: ; 46e61 (11:6e61)
@@ -70970,11 +70972,11 @@ SSAnne10HiddenObjects: ; 46e95 (11:6e95)
 Route10HiddenObjects: ; 46e9c (11:6e9c)
     db $11,$09,SUPER_POTION
     dbw BANK(HiddenItems),HiddenItems
-    db $35,$10,MAX_ETHER
+    db $35,$10,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 RocketHideout1HiddenObjects: ; 46ea9 (11:6ea9)
-    db $0f,$15,MAX_ELIXER
+    db $0f,$15,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 RocketHideout3HiddenObjects: ; 46eb0 (11:6eb0)
@@ -70996,7 +70998,7 @@ PokemonTower5HiddenObjects: ; 46ecb (11:6ecb)
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 Route13HiddenObjects: ; 46ed2 (11:6ed2)
-    db $0e,$01,MAX_ELIXER
+    db $0e,$01,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $0d,$10,CALCIUM
     dbw BANK(HiddenItems),HiddenItems
@@ -71029,21 +71031,21 @@ UnknownDungeon3HiddenObjects: ; 46f09 (11:6f09)
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 PowerPlantHiddenObjects: ; 46f10 (11:6f10)
-    db $10,$11,MAX_ELIXER
+    db $10,$11,THUNDER_STONE
     dbw BANK(HiddenItems),HiddenItems
-    db $01,$0c,MAX_ELIXER
+    db $01,$0c,THUNDER_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 SeafoamIslands3HiddenObjects: ; 46f1d (11:6f1d)
-    db $0f,$0f,NUGGET
+    db $0f,$0f,WATER_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 SeafoamIslands5HiddenObjects: ; 46f24 (11:6f24)
-    db $11,$19,ULTRA_BALL
+    db $11,$19,WATER_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 Mansion1HiddenObjects: ; 46f2b (11:6f2b)
-    db $10,$08,MOON_STONE
+    db $10,$08,FIRE_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $05,$02,$04 ; XXX,y,x
     dbw BANK(Func_44316),Func_44316
@@ -71066,11 +71068,11 @@ Mansion4HiddenObjects: ; 46f4c (11:6f4c)
     dbw $14,$6420
     db $FF
 Route23HiddenObjects: ; 46f5f (11:6f5f)
-    db $2c,$09,FULL_RESTORE
+    db 45,06,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
-    db $46,$13,ULTRA_BALL
+    db 67,00,LEAF_STONE
     dbw BANK(HiddenItems),HiddenItems
-    db $5a,$08,MAX_ETHER
+    db 60,17,LEAF_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 VictoryRoad2HiddenObjects: ; 46f72 (11:6f72)
@@ -71171,7 +71173,7 @@ Route11HiddenObjects: ; 4703a (11:703a)
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 Route12HiddenObjects: ; 47041 (11:7041)
-    db $3f,$02,HYPER_POTION
+    db $3f,$02,LEAF_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 SilphCo11FHiddenObjects: ; 47048 (11:7048)
@@ -71183,11 +71185,11 @@ Route17HiddenObjects: ; 4704f (11:704f)
     dbw BANK(HiddenItems),HiddenItems
     db $2d,$08,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
-    db $48,$11,MAX_ELIXER
+    db $48,$11,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $5b,$04,MAX_REVIVE
     dbw BANK(HiddenItems),HiddenItems
-    db $79,$08,MAX_ELIXER
+    db $79,$08,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 UndergroundPathNsHiddenObjects: ; 4706e (11:706e)
@@ -71203,15 +71205,15 @@ UndergroundPathWeHiddenObjects: ; 4707b (11:707b)
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 CeladonCityHiddenObjects: ; 47088 (11:7088)
-    db $0f,$30,MAX_ELIXER
+    db $0f,$30,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 SeafoamIslands4HiddenObjects: ; 4708f (11:708f)
-    db $10,$09,MAX_ELIXER
+    db $10,$09,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 VermilionCityHiddenObjects: ; 47096 (11:7096)
-    db $0b,$0e,MAX_ETHER
+    db $0b,$0e,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 CeruleanCityHiddenObjects: ; 4709d (11:709d)
@@ -71231,7 +71233,7 @@ BillsHouseHiddenObjects:
 Mansion2HiddenObjects:
     db $0b,$02,$04 ; XXX,y,x
     dbw $14,$6037
-    db 07,28,CALCIUM
+    db 07,28,FIRE_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 B9HiddenObjects:
@@ -80976,7 +80978,7 @@ Route2Object: ; 0x54022 (size=72)
     db $b,$b,$4 ; Route2Text4
 
     db $2 ; people
-    db SPRITE_BALL,$36 + 4,$d + 4,$ff,$ff,$81,MOON_STONE ; item
+    db SPRITE_BALL,$36 + 4,$d + 4,$ff,$ff,$81,FIRE_STONE ; item
     db SPRITE_BALL,$2d + 4,$d + 4,$ff,$ff,$82,HP_UP ; item
 
     ; warp-to
@@ -85484,34 +85486,7 @@ Route10_h: ; 0x582d4 to 0x582f6 (34 bytes) (id=21)
     WEST_MAP_CONNECTION ROUTE_9,ROUTE_9_WIDTH,0,0,ROUTE_9_HEIGHT,Route9Blocks,ROUTE_10_WIDTH
     dw Route10Object ; objects
 
-Route10Object: ; 0x582f6 (size=96)
-    db $2c ; border tile
-
-    db $4 ; warps
-    db $13,$b,$0,ROCK_TUNNEL_POKECENTER
-    db $11,$8,$0,ROCK_TUNNEL_1
-    db $35,$8,$2,ROCK_TUNNEL_1
-    db $27,$6,$0,POWER_PLANT
-
-    db $4 ; signs
-    db $13,$7,$7 ; Route10Text7
-    db $13,$c,$8 ; PokeCenterSignText
-    db $37,$9,$9 ; Route10Text9
-    db $29,$5,$a ; Route10Text10
-
-    db $6 ; people
-    db SPRITE_BLACK_HAIR_BOY_2,$2c + 4,$a + 4,$ff,$d2,$41,POKEMANIAC,$1 ; trainer
-    db SPRITE_HIKER,$39 + 4,$3 + 4,$ff,$d1,$42,HIKER,$7 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_2,$40 + 4,$e + 4,$ff,$d2,$43,POKEMANIAC,$2 ; trainer
-    db SPRITE_LASS,$19 + 4,$7 + 4,$ff,$d2,$44,JR__TRAINER_F,$7 ; trainer
-    db SPRITE_HIKER,$3d + 4,$3 + 4,$ff,$d0,$45,HIKER,$8 ; trainer
-    db SPRITE_LASS,$36 + 4,$7 + 4,$ff,$d0,$46,JR__TRAINER_F,$8 ; trainer
-
-    ; warp-to
-    EVENT_DISP $a,$13,$b ; ROCK_TUNNEL_POKECENTER
-    EVENT_DISP $a,$11,$8 ; ROCK_TUNNEL_1
-    EVENT_DISP $a,$35,$8 ; ROCK_TUNNEL_1
-    EVENT_DISP $a,$27,$6 ; POWER_PLANT
+SECTION "Route10Blocks",ROMX[$4356],BANK[$16]
 
 Route10Blocks: ; 58356 (16:4356)
     INCBIN "maps/route10.blk"
@@ -85592,7 +85567,7 @@ Route12Object: ; 0x5869a (size=118)
     db SPRITE_FISHER2,$28 + 4,$c + 4,$ff,$d2,$46,FISHER,$5 ; trainer
     db SPRITE_FISHER2,$34 + 4,$9 + 4,$ff,$d3,$47,FISHER,$6 ; trainer
     db SPRITE_FISHER2,$57 + 4,$6 + 4,$ff,$d0,$48,FISHER,$b ; trainer
-    db SPRITE_BALL,$23 + 4,$e + 4,$ff,$ff,$89,TM_16 ; item
+    db SPRITE_BALL,$23 + 4,$e + 4,$ff,$ff,$89,WATER_STONE ; item
     db SPRITE_BALL,$59 + 4,$5 + 4,$ff,$ff,$8a,IRON ; item
 
     ; warp-to
@@ -85636,7 +85611,7 @@ Route15Object: ; 0x5894e (size=126)
     db SPRITE_BIKER,$a + 4,$2e + 4,$ff,$d0,$48,BIKER,$4 ; trainer
     db SPRITE_LASS,$5 + 4,$25 + 4,$ff,$d3,$49,JR__TRAINER_F,$16 ; trainer
     db SPRITE_LASS,$d + 4,$12 + 4,$ff,$d1,$4a,JR__TRAINER_F,$17 ; trainer
-    db SPRITE_BALL,$5 + 4,$12 + 4,$ff,$ff,$8b,MAX_ELIXER ; item
+    db SPRITE_BALL,$5 + 4,$12 + 4,$ff,$ff,$8b,LEAF_STONE ; item
 
     ; warp-to
     EVENT_DISP $1e,$8,$7 ; ROUTE_15_GATE_1F
@@ -86689,17 +86664,7 @@ Route10ScriptPointers: ; 59349 (16:5349)
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
-Route10TextPointers: ; 5934f (16:534f)
-    dw Route10Text1
-    dw Route10Text2
-    dw Route10Text3
-    dw Route10Text4
-    dw Route10Text5
-    dw Route10Text6
-    dw Route10Text7
-    dw PokeCenterSignText
-    dw Route10Text9
-    dw Route10Text10
+SECTION "Route10TrainerHeaders",ROMX[$5363],BANK[$16]
 
 Route10TrainerHeaders: ; 59363 (16:5363)
 Route10TrainerHeader0: ; 59363 (16:5363)
@@ -89432,6 +89397,49 @@ CustomContinuesScript:
     call GBFadeOut2
     call Delay3
     jp GBFadeIn2
+
+Route10Object:
+    db $2c ; border tile
+
+    db $4 ; warps
+    db $13,$b,$0,ROCK_TUNNEL_POKECENTER
+    db $11,$8,$0,ROCK_TUNNEL_1
+    db $35,$8,$2,ROCK_TUNNEL_1
+    db $27,$6,$0,POWER_PLANT
+
+    db $4 ; signs
+    db $13,$7,$8 ; Route10Text7
+    db $13,$c,$9 ; PokeCenterSignText
+    db $37,$9,$a ; Route10Text9
+    db $29,$5,$b ; Route10Text10
+
+    db $7 ; people
+    db SPRITE_BLACK_HAIR_BOY_2,$2c + 4,$a + 4,$ff,$d2,$41,POKEMANIAC,$1 ; trainer
+    db SPRITE_HIKER,$39 + 4,$3 + 4,$ff,$d1,$42,HIKER,$7 ; trainer
+    db SPRITE_BLACK_HAIR_BOY_2,$40 + 4,$e + 4,$ff,$d2,$43,POKEMANIAC,$2 ; trainer
+    db SPRITE_LASS,$19 + 4,$7 + 4,$ff,$d2,$44,JR__TRAINER_F,$7 ; trainer
+    db SPRITE_HIKER,$3d + 4,$3 + 4,$ff,$d0,$45,HIKER,$8 ; trainer
+    db SPRITE_LASS,$36 + 4,$7 + 4,$ff,$d0,$46,JR__TRAINER_F,$8 ; trainer
+    db SPRITE_BALL,29 + 4,02 + 4,$ff,$ff,$87,THUNDER_STONE ; item
+
+    ; warp-to
+    EVENT_DISP $a,$13,$b ; ROCK_TUNNEL_POKECENTER
+    EVENT_DISP $a,$11,$8 ; ROCK_TUNNEL_1
+    EVENT_DISP $a,$35,$8 ; ROCK_TUNNEL_1
+    EVENT_DISP $a,$27,$6 ; POWER_PLANT
+
+Route10TextPointers:
+    dw Route10Text1
+    dw Route10Text2
+    dw Route10Text3
+    dw Route10Text4
+    dw Route10Text5
+    dw Route10Text6
+    dw Predef5CText
+    dw Route10Text7
+    dw PokeCenterSignText
+    dw Route10Text9
+    dw Route10Text10
 
 SECTION "bank17",ROMX,BANK[$17]
 
@@ -93391,11 +93399,12 @@ VermilionMartText1:
 
 ; Lavender
 LavenderMartText1:
-    db $FE,10,GREAT_BALL
+    db $FE,10
+    db GREAT_BALL
+    db ETHER,ELIXER
     db SUPER_POTION
     db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
-    db SUPER_REPEL
-    db ETHER,ELIXER,$FF
+    db SUPER_REPEL,$FF
 
 ; Saffron
 SaffronMartText1:
@@ -96451,7 +96460,7 @@ SSAnne9Object: ; 0x61c8d (size=188)
     db SPRITE_GENTLEMAN,$e + 4,$0 + 4,$ff,$d3,$43,GENTLEMAN,$5 ; trainer
     db SPRITE_LASS,$b + 4,$2 + 4,$ff,$d0,$44,LASS,$c ; trainer
     db SPRITE_GENTLEMAN,$2 + 4,$1 + 4,$ff,$d0,$5 ; person
-    db SPRITE_BALL,$1 + 4,$c + 4,$ff,$ff,$86,MAX_ETHER ; item
+    db SPRITE_BALL,$1 + 4,$c + 4,$ff,$ff,$86,WATER_STONE ; item
     db SPRITE_GENTLEMAN,$2 + 4,$15 + 4,$ff,$d0,$7 ; person
     db SPRITE_OLD_PERSON,$1 + 4,$16 + 4,$ff,$d0,$8 ; person
     db SPRITE_BALL,$c + 4,$0 + 4,$ff,$ff,$89,RARE_CANDY ; item
@@ -105480,7 +105489,7 @@ UnknownDungeon1Object: ; 0x74d15 (size=97)
 
     db $3 ; people
     db SPRITE_BALL,$d + 4,$7 + 4,$ff,$ff,$81,FULL_RESTORE ; item
-    db SPRITE_BALL,$3 + 4,$13 + 4,$ff,$ff,$82,MAX_ELIXER ; item
+    db SPRITE_BALL,$3 + 4,$13 + 4,$ff,$ff,$82,MAX_REVIVE ; item
     db SPRITE_BALL,$0 + 4,$5 + 4,$ff,$ff,$83,NUGGET ; item
 
     ; warp-to
@@ -108842,9 +108851,9 @@ HiddenItemCoords: ; 766b8 (1d:66b8)
     db SEAFOAM_ISLANDS_5,$11,$19
     db MANSION_1,$10,$08
     db MANSION_3,$09,$01
-    db ROUTE_23,$2c,$09
-    db ROUTE_23,$46,$13
-    db ROUTE_23,$5a,$08
+    db ROUTE_23,45,06
+    db ROUTE_23,67,00
+    db ROUTE_23,60,17
     db VICTORY_ROAD_2,$02,$05
     db VICTORY_ROAD_2,$07,$1a
     db MANSION_2,07,28 ; db $6f,$0b,$0e
@@ -132837,7 +132846,7 @@ DratiniCaveObject:
 
     db $2 ; people
     db SPRITE_DRATINI,$d + 4,$1a + 4,$ff,$d0,$41,DRATINI,OPP_LVL_OFFSET+12
-    db SPRITE_BALL,$a + 4,$1b + 4,$ff,$ff,$82,TRADE_STONE ; item
+    db SPRITE_BALL,$a + 4,$1b + 4,$ff,$ff,$82,DUSK_STONE ; item
 
     ; warp-to
     EVENT_DISP $f,$09,$19 ; SS_ANNE_4
@@ -133577,11 +133586,11 @@ ItemNames:
     db "OLD ROD@"      ; $4C
     db "GOOD ROD@"     ; $4D
     db "SUPER ROD@"    ; $4E
-    db "PP UP@"        ; $4F
+    db "?@"            ; $4F ; PP_UP
     db "ETHER@"        ; $50
-    db "MAX ETHER@"    ; $51
+    db "?@"            ; $51 ; MAX_ETHER
     db "ELIXER@"       ; $52
-    db "MAX ELIXER@"   ; $53
+    db "?@"            ; $53 ; MAX_ELIXER
     db "NATURE POWER@" ; $54
     db "AIR POWER@"    ; $55
     db "WATER POWER@"  ; $56
