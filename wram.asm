@@ -889,7 +889,10 @@ W_PRICE3: ; d146
 W_PRICE4: ; d148
     ds 2
 
-    ds 24 - 3 - 2 - 8
+SECTION "wPewterEeveeIV",WRAMX[$d153],BANK[1]
+
+wPewterEeveeIV_AtkDef:: db ; $d153
+wPewterEeveeIV_SpdSpc:: db ; $d154
 
 wBackupFlagGainingExp: ; d155
     ds 1
@@ -1618,6 +1621,11 @@ ENDU
 
 wRivalStarterIV_AtkDef:: db ; $d726
 wRivalStarterIV_SpdSpc:: db ; $d727
+
+ds 1 ; $d728
+
+wPalletPikachuIV_AtkDef:: db ; $d729
+wPalletPikachuIV_SpdSpc:: db ; $d72a
 
 ; Some Free (see shinpokered)
 

@@ -27022,8 +27022,8 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld b,$2
     ld hl,wPokedexOwned ; $d2f7
     call _HandleBitArray
-    ld a,c
-    ld [$d153],a
+    ds 1 ; ld a,c
+    ds 3 ; ld [$d153],a
     ld a,[$d11e]
     ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
@@ -34451,7 +34451,7 @@ ViridianCityText1: ; 19102 (6:5102)
 
 ViridianCityText2: ; 19107 (6:5107)
     db $08 ; asm
-    ld a,[$d356]
+    ld a,[W_OBTAINEDBADGES] ; $d356
     cp $7f
     ld hl,UnnamedText_19127
     jr z,.asm_ae9fe ; 0x19110
@@ -42224,7 +42224,7 @@ Route22GateTextPointers: ; 1e6df (7:66df)
 
 Route22GateText1: ; 1e6e1 (7:66e1)
     db $8
-    ld a,[$d356]
+    ld a,[W_OBTAINEDBADGES] ; $d356
     bit 0,a
     jr nz,.asm_8a809 ; 0x1e6e7 $d
     ld hl,UnnamedText_1e704
@@ -72976,8 +72976,8 @@ Func_48963: ; 48963 (12:4963)
 .asm_4898c
     ld hl,W_OBTAINEDBADGES ; $d356
     set 3,[hl]
-    ld hl,$d72a
-    set 3,[hl]
+    ds 3 ; ld hl,$d72a
+    ds 2 ; set 3,[hl]
     ld a,[$d77c]
     or $fc
     ld [$d77c],a
@@ -90051,8 +90051,8 @@ Func_5c3df: ; 5c3df (17:43df)
 .asm_5c408
     ld hl,W_OBTAINEDBADGES ; $d356
     set 0,[hl]
-    ld hl,$d72a
-    set 0,[hl]
+    ds 3 ; ld hl,$d72a
+    ds 2 ; set 0,[hl]
     ld a,$4
     ld [$cc4d],a
     ld a,$11
@@ -90173,7 +90173,7 @@ PewterGymAfterBattleText1: ; 5c4da (17:44da)
 
 PewterGymText3: ; 5c4df (17:44df)
     db $08 ; asm
-    ld a,[$d72a]
+    ld a,[W_OBTAINEDBADGES]
     bit 0,a
     jr nz,.asm_71369 ; 0x5c4e5
     ld hl,UnnamedText_5c515
@@ -90466,8 +90466,8 @@ Func_5c70d: ; 5c70d (17:470d)
 .asm_5c736
     ld hl,W_OBTAINEDBADGES ; $d356
     set 1,[hl]
-    ld hl,$d72a
-    set 1,[hl]
+    ds 3 ; ld hl,$d72a
+    ds 2 ; set 1,[hl]
     ld hl,$d75e
     set 2,[hl]
     set 3,[hl]
@@ -90979,8 +90979,8 @@ Func_5caaa: ; 5caaa (17:4aaa)
 .asm_5cad3
     ld hl,W_OBTAINEDBADGES ; $d356
     set 2,[hl]
-    ld hl,$d72a
-    set 2,[hl]
+    ds 3 ; ld hl,$d72a
+    ds 2 ; set 2,[hl]
     ld a,[$d773]
     or $1c
     ld [$d773],a
@@ -91145,7 +91145,7 @@ VermilionGymAfterBattleText3: ; 5cbd6 (17:4bd6)
 
 VermilionGymText5: ; 5cbdb (17:4bdb)
     db $08 ; asm
-    ld a,[$d72a]
+    ld a,[W_OBTAINEDBADGES]
     bit 2,a
     jr nz,.asm_13b67 ; 0x5cbe1
     ld hl,UnnamedText_5cbf4
@@ -91758,8 +91758,8 @@ Func_5d068: ; 5d068 (17:5068)
 .asm_5d091
     ld hl,W_OBTAINEDBADGES ; $d356
     set 5,[hl]
-    ld hl,$d72a
-    set 5,[hl]
+    ds 3 ; ld hl,$d72a
+    ds 2 ; set 5,[hl]
     ld a,[$d7b3]
     or $fc
     ld [$d7b3],a
@@ -97314,7 +97314,7 @@ GymStatues: ; 62419 (18:6419)
     jr .asm_62429 ; 0x62431 $f6
 .asm_62433
     ld b,[hl]
-    ld a,[$d72a]
+    ld a,[W_OBTAINEDBADGES]
     and b
     cp b
     ld a,$d
@@ -105122,8 +105122,8 @@ ViridianGymScript3_74995: ; 74995 (1d:4995)
 .asm_749be
     ld hl,W_OBTAINEDBADGES ; $d356
     set 7,[hl]
-    ld hl,$d72a
-    set 7,[hl]
+    ds 3 ; ld hl,$d72a
+    ds 2 ; set 7,[hl]
     ld a,[$d751]
     or $fc
     ld [$d751],a
@@ -106530,8 +106530,8 @@ FuchsiaGymScript3_75497: ; 75497 (1d:5497)
 .asm_754c0
     ld hl,W_OBTAINEDBADGES ; $d356
     set 4,[hl]
-    ld hl,$d72a
-    set 4,[hl]
+    ds 3 ; ld hl,$d72a
+    ds 2 ; set 4,[hl]
     ld a,[$d792]
     or $fc
     ld [$d792],a
@@ -107037,10 +107037,10 @@ CinnabarGymScript3_75857: ; 75857 (1d:5857)
     ld [$ff00+$8c],a
     call DisplayTextID
 .asm_75880
-    ld hl,$d356
+    ld hl,W_OBTAINEDBADGES ; $d356
     set 6,[hl]
-    ld hl,$d72a
-    set 6,[hl]
+    ds 3 ; ld hl,$d72a
+    ds 2 ; set 6,[hl]
     ld a,[$d79a]
     or $fc
     ld [$d79a],a
@@ -136629,62 +136629,34 @@ BackupDarkMapState:
     ld [wBackupDarkMap],a
     ret
 
+; ─────────────────────────────────────────
+
 ForceShinyOrRandom_:
     ld a,[W_SAFARIZONECURSCRIPT]
     cp 1 ; Safari's Lapras
-    jr z,.Lapras
+    jp z,.Lapras
     ld a,[W_VICTORYROAD2CURSCRIPT]
     cp 3 ; Shiny Onix
-    jr z,.Onix
+    jp z,.Onix
     call CheckNewAdventureFlag
     jr nz,.NewAdventure
     ld a,[W_CURMAP]
     cp DRATINI_CAVE
     jr z,.ShinyRandom
     cp SAFARI_ZONE_WEST
-    jr z,.Safari
+    jp z,.Safari
     cp POKEMONTOWER_6
-    jr z,.Tower6
+    jp z,.Tower6
     cp PALLET_TOWN
-    jr z,.PalletTown
+    jp z,.PalletTown
+    cp PEWTER_CITY
+    jp z,.PewterCity
     ; fall through
 .Random
     call .GenRandomInBattle
     jr .End
 .NewAdventure
     jr .Random
-.PalletTown
-    ld a,[$cf91]
-    cp PIKACHU
-    jr nz,.Random
-    ld a,e
-    or $88 ; Speed > 7 ; Special > 7
-    ld e,a
-    call .GenRandomInBattle
-    or $98 ; Attack > 8 ; Defense > 7 ; HP > 7
-    jr .End
-.Lapras
-    call .GenRandomInBattle
-    or $81 ; Attack > 7 ; Defense ODD (NO Shiny)
-    jr .End
-.Onix
-    call .GenRandomInBattle
-    or $80 ; Attack > 7
-    jr .ShinyCommon
-.Tower6
-    ld a,[$cf91]
-    cp MAROWAK
-    jr nz,.Random
-    call .GenRandomInBattle
-    and $7F ; Attack < 8
-    jr .End
-.Safari
-    ld a,[W_CUROPPONENT] ; $d059
-    cp MAGIKARP
-    jr nz,.Random
-    ld a,[W_CURENEMYLVL]
-    cp 26 ; Shiny If Level 26 in SAFARI_ZONE_WEST
-    jr nz,.Random
 .ShinyRandom
     call .GenRandomInBattle
 .ShinyCommon
@@ -136701,6 +136673,77 @@ ForceShinyOrRandom_:
     call Bankswitch
     ld a,d
     ret
+
+.PalletTown
+    ld a,[$cf91]
+    cp PIKACHU
+    jr nz,.Random
+    ld a,[wPalletPikachuIV_AtkDef]
+    and a
+    jr nz,.GetPikachuStoredIV
+    ld a,e
+    or $88 ; Speed > 7 ; Special > 7
+    ld e,a
+    ld [wPalletPikachuIV_SpdSpc],a
+    call .GenRandomInBattle
+    or $18 ; Attack ODD ; Defense > 7 ; HP > 7
+    ld [wPalletPikachuIV_AtkDef],a
+    jr .End
+.GetPikachuStoredIV
+    ld a,[wPalletPikachuIV_SpdSpc]
+    ld e,a
+    ld a,[wPalletPikachuIV_AtkDef]
+    jr .End
+
+.PewterCity
+    ld a,[$cf91]
+    cp EEVEE
+    jr nz,.Random
+    ld a,[wPewterEeveeIV_AtkDef]
+    and a
+    jr nz,.GetEeveeStoredIV
+    ld a,e
+    or $88 ; Speed > 7 ; Special > 7
+    ld e,a
+    ld [wPewterEeveeIV_SpdSpc],a
+    call .GenRandomInBattle
+    or $18 ; Attack ODD ; Defense > 7 ; HP > 7
+    ld [wPewterEeveeIV_AtkDef],a
+    jr .End
+.GetEeveeStoredIV
+    ld a,[wPewterEeveeIV_SpdSpc]
+    ld e,a
+    ld a,[wPewterEeveeIV_AtkDef]
+    jr .End
+
+.Lapras
+    call .GenRandomInBattle
+    or $81 ; Attack > 7 ; Defense ODD (NO Shiny)
+    jr .End
+
+.Onix
+    call .GenRandomInBattle
+    or $80 ; Attack > 7
+    jr .ShinyCommon
+
+.Tower6
+    ld a,[$cf91]
+    cp MAROWAK
+    jp nz,.Random
+    call .GenRandomInBattle
+    and $7F ; Attack < 8
+    jr .End
+
+.Safari
+    ld a,[W_CUROPPONENT] ; $d059
+    cp MAGIKARP
+    jp nz,.Random
+    ld a,[W_CURENEMYLVL]
+    cp 26 ; Shiny If Level 26 in SAFARI_ZONE_WEST
+    jp nz,.Random
+    jp .ShinyRandom
+
+; ─────────────────────────────────────────
 
 SetExplodeFlag_:
     xor a ; Reset Carry Flag
@@ -140194,13 +140237,19 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     cp 2
     jr z,.TrainerBattle
 .WildBattle
-    call .CheckMarowak
-    jr nz,.noMarowak
-    ld a,1 ; Marowak Ghost
-    ld [wTempAlternateFormIndex],a
-    jr .end
-.noMarowak
+    call .CheckGhostMarowak
+    jr z,.AltForm1
+    call .CheckPalletPikachu
+    jr z,.AltForm1
+    call .CheckPewterEevee
+    jr z,.AltForm1
+    ; fall through
+.WildStandard
     xor a ; TODO
+    jr .end
+.AltForm1
+    ld a,1
+    ld [wTempAlternateFormIndex],a
     jr .end
 .outOfBattle
     ld a,[wTempAlternateFormIndex]
@@ -140214,12 +140263,26 @@ LoadEnemyMonData_GetAlternateMonHeader_:
 .end
     ld [wAlternateFormIndex],a
     ret
-.CheckMarowak
+.CheckGhostMarowak
     ld a,[W_CUROPPONENT]
     cp MAROWAK
     ret nz
     call GetCurrentOldAdventureMap
     cp POKEMONTOWER_6
+    ret
+.CheckPalletPikachu
+    ld a,[W_ENEMYMONID]
+    cp PIKACHU
+    ret nz
+    call GetCurrentOldAdventureMap
+    cp PALLET_TOWN
+    ret
+.CheckPewterEevee
+    ld a,[W_ENEMYMONID]
+    cp EEVEE
+    ret nz
+    call GetCurrentOldAdventureMap
+    cp PEWTER_CITY
     ret
 
 ; ──────────────────────────────────────────────────────────────────────

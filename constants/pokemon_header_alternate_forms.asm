@@ -621,3 +621,81 @@ MarowakAlolaBaseStats:
     ds 2
 
     db BANK(MarowakAlolaPicFront)
+
+PikachuStarterBaseStats:
+    db PIKACHU ; mon id
+    db 35+10 ; base hp
+    db 55+25 ; base attack
+    db 30+20 ; base defense
+    db 90+30 ; base speed
+    db 50+25 ; base special
+
+    db ELECTRIC ; species type 1
+    db ELECTRIC ; species type 2
+
+    db 45 ; catch rate
+    db 82 ; base exp yield
+    db $55 ; sprite dimensions
+
+    dw PikachuPicFront
+    dw PikachuPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Pikachu_EvosMoves
+
+    db 0 ; growth rate
+
+    ; learnset
+    dw PikachuTMCompatibility
+
+    ; palette
+    dw PAL_PIKACHU
+
+    ; field moves
+    db FM_LIGHT
+
+    ds 2
+
+    db BANK(PikachuPicFront)
+
+EeveeStarterBaseStats:
+    db EEVEE ; mon id
+    db 55+10 ; base hp
+    db 55+20 ; base attack
+    db 50+20 ; base defense
+    db 55+20 ; base speed
+    db 65+20 ; base special
+
+    db NORMAL ; species type 1
+    db NORMAL ; species type 2
+
+    db 45 ; catch rate
+    db 92 ; base exp yield
+    db $55 ; sprite dimensions
+
+    dw EeveePicFront
+    dw EeveePicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Eevee_EvosMoves
+
+    db 0 ; growth rate
+
+    ; learnset
+    dw EeveeTMCompatibility
+
+    ; palette
+    dw PAL_EEVEE
+
+    ; field moves
+    db 0
+
+    ds 2
+
+    db BANK(EeveePicFront)

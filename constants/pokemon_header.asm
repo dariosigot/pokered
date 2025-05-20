@@ -985,7 +985,7 @@ PikachuBaseStats:
     dw PikachuPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw PikachuStarterBaseStats
 
     ; pointer to evomoves
     dw Pikachu_EvosMoves
@@ -5197,7 +5197,7 @@ EeveeBaseStats:
     dw EeveePicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw EeveeStarterBaseStats
 
     ; pointer to evomoves
     dw Eevee_EvosMoves
