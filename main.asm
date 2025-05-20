@@ -25083,12 +25083,10 @@ FishingInit: ; Moved in the Bank
     scf ; can't fish when surfing
     ret
 
-SECTION "ItemUseOaksParcel",ROMX[$62de],BANK[$3]
-
-ItemUseOaksParcel: ; e2de (3:62de)
+ItemUseOaksParcel: ; Moved in the Bank
     jp ItemUseNotYoursToUse
 
-ItemUseItemfinder: ; e2e1 (3:62e1)
+ItemUseItemfinder: ; Moved in the Bank
     ld a,[W_ISINBATTLE]
     and a
     jp nz,ItemUseNotTime
@@ -25096,8 +25094,12 @@ ItemUseItemfinder: ; e2e1 (3:62e1)
     ld b,BANK(Func_7481f)
     ld hl,Func_7481f
     call Bankswitch ; check for hidden items
-    ld hl,ItemfinderFoundNothingText
-    jr nc,.printText ; if no hidden items
+    jr c,.found
+    ld a,$a5 ; Error
+    call PlaySoundWaitForCurrent ; play sound
+    ld hl,.PrintItemfinderFoundNothing
+    jr .printText ; if no hidden items
+.found
     ld c,4
 .loop
     ld a,$9e
@@ -25106,20 +25108,21 @@ ItemUseItemfinder: ; e2e1 (3:62e1)
     call PlaySoundWaitForCurrent ; play sound
     dec c
     jr nz,.loop
-    ld hl,ItemfinderFoundItemText
+    ld hl,.PrintItemfinderFoundItem
 .printText
+    jp RunOnlyIfNotSelectInOverworld
+.PrintItemfinderFoundNothing
+    ld hl,.ItemfinderFoundNothingText
     jp PrintText
-
-ItemfinderFoundItemText: ; e30d (3:630d)
+.PrintItemfinderFoundItem
+    ld hl,.ItemfinderFoundItemText
+    jp PrintText
+.ItemfinderFoundItemText
     TX_FAR _ItemfinderFoundItemText
     db "@"
-
-ItemfinderFoundNothingText: ; e312 (3:6312)
+.ItemfinderFoundNothingText
     TX_FAR _ItemfinderFoundNothingText
     db "@"
-
-ItemUsePPUp: ; e317 (3:6317)
-    ret
 
 ItemUsePPRestore: ; Moved in the Bank
     ld a,[W_ISINBATTLE]
@@ -132523,18 +132526,25 @@ SuperPalettes:
 SelectInOverWorld:
     ld a,$35
     call Predef ; Update Next Tile
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    bit 1,a ; B button
-    scf ; set carry flag (z not affected)
-    jr z,.NoFieldMove
+    scf ; set carry flag
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 0,a ; A button (carry flag not affected)
+    jr nz,.SelectPlusA
+    bit 1,a ; B button (carry flag not affected)
+    jr nz,.SelectPlusB
+    ; fall through
+.Select
+    call c,.TryFishing
+    call c,.TryBike
+    ret
+.SelectPlusA
+    call c,.TryItemFinder
+    ret
+.SelectPlusB
     call c,.TryCut
     call c,.TryFloat
     call c,.TryLight
     call c,.TryStrength
-    ret
-.NoFieldMove
-    call c,.TryFishing
-    call c,.TryBike
     ret
 
 .TryCut
@@ -132729,6 +132739,24 @@ SelectInOverWorld:
     ld [$d700],a ; change player state to bicycling
     jp .EndCustomSelectFunction
 .noBike
+    scf ; set carry flag
+    ret
+
+.TryItemFinder
+    ; ──────────────────────────────────── ItemFinder
+    ld b,ITEMFINDER
+    call .IsItemInBag
+    jr z,.noItemFinder
+.ItemFinder
+    call .StartCustomSelectFunction
+    ld a,b
+    ld [$cf91],a ; load item to be used
+    ld [$d11e],a ; load item so its name can be grabbed
+    call GetItemName ; get the item name into de register
+    call CopyStringToCF4B ; copy name from de to wcf4b so it shows up in text
+    call UseItem
+    jp .EndCustomSelectFunction
+.noItemFinder
     scf ; set carry flag
     ret
 
