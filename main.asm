@@ -23614,15 +23614,15 @@ ItemUseBall: ; d687 (3:5687)
     jr z,.printText1
     ld a,$3a    ;convert order: Internal->Dex
     call Predef
-    ld a,[$d11e]
-    ; ds 1 ; dec a ; POKEDEXMOD
-    ld c,a
-    ld b,2
+;    ld a,[$d11e]
+;    ; ds 1 ; dec a ; POKEDEXMOD
+;    ld c,a
+;    ld b,2
     ld hl,wPokedexOwned    ;Dex_own_flags (pokemon)
-    ld a,$10
-    call Predef    ;check Dex flag (own already or not)
-    ld a,c
-    push af
+;    ld a,$10
+;    call Predef    ;check Dex flag (own already or not)
+;    ld a,c
+;    push af
     ld a,[$d11e]
     ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
@@ -23634,17 +23634,17 @@ ItemUseBall: ; d687 (3:5687)
     call Bankswitch
     call StopAlarmAndLoadCaughtText ; ld hl,ItemUseBallText05
     call PrintText
-    pop af
-    and a
-    jr nz,.checkParty
-    ld hl,ItemUseBallText06
-    call PrintText
-    call CleanLCD_OAM
-    ld a,[$cfe5]    ;caught mon_ID
-    ld [$d11e],a
-    ld a,$3d
-    call Predef
-.checkParty    ;$58f4
+;    pop af
+;    and a
+;    jr nz,.checkParty
+;    ld hl,ItemUseBallText06
+;    call PrintText
+;    call CleanLCD_OAM
+;    ld a,[$cfe5]    ;caught mon_ID
+;    ld [$d11e],a
+;    ld a,$3d
+;    call Predef
+;.checkParty    ;$58f4
     ld a,[W_NUMINPARTY]
     cp a,6        ;is party full?
     jr z,.sendToBox
@@ -50937,8 +50937,7 @@ AIBattleUseItemText: ; 3a844 (e:6844)
     TX_FAR _AIBattleUseItemText
     db "@"
 
-Func_3a849: ; 3a849 (e:6849)
-DrawAllPokeballs: ; 0x3a849
+DrawAllPokeballs: ; 3a849 (e:6849)
     call LoadPartyPokeballGfx
     call SetupOwnPartyPokeballs
     ld a,[W_ISINBATTLE] ; $d057
@@ -62464,12 +62463,7 @@ GoPAL_SET_PlusFlagAndRedBall: ; xxxxx (f:xxxx) ; Denim,funzione per flaggare que
     ld [hli],a
     ld [hl],a
     pop hl
-    call GoPAL_SET
-    ld hl,$CF1D
-    xor a
-    ld [hli],a
-    ld [hl],a
-    ret
+    jp GoPAL_SET
 
 GetBattleHealthBarColor_PlusFlag: ; xxxxx (f:xxxx) ; Denim,funzione per deflaggare questo istante di chiamata
     push hl
@@ -85840,73 +85834,62 @@ Route18Blocks: ; 58c9c (16:4c9c)
 Func_58d99: ; 58d99 (16:4d99)
     ld a,[W_ISINBATTLE] ; $d057
     dec a
-    jr nz,.asm_58dbe
+    jr nz,.TrainerBattle
     call GetCurrentOldAdventureMap
     cp POKEMONTOWER_3
-    jr c,.asm_58daa
+    jr c,.NotGhostOrCommon
     cp LAVENDER_HOUSE_1
-    jr c,.asm_58dd8
-.asm_58daa
+    jr c,.Ghost
+.NotGhostOrCommon
     ld a,[W_ENEMYMONID]
     call PlayCry
-    ld hl,UnnamedText_58e3b ; $4e3b
+    ld hl,.UnnamedText_58e3b ; Wild xxx appeared....
     ld a,[W_MOVEMISSED] ; $d05f
     and a
-    jr z,.asm_58dbc
-    ld hl,UnnamedText_58e40 ; $4e40
-.asm_58dbc
-    jr .asm_58dc9
-.asm_58dbe
-    call Func_58e29
+    jr z,.skip1
+    ld hl,.UnnamedText_58e40 ; the hooked...
+.skip1
+    jr .common1
+.TrainerBattle
+    call .Func_58e29
     ld c,$14
     call DelayFrames
-    ld hl,UnnamedText_58e4a ; $4e4a
-.asm_58dc9
-    push hl
-    ld hl,Func_3a849
-    ld b,BANK(Func_3a849)
-    call Bankswitch ; indirect jump to Func_3a849 (3a849 (e:6849))
-    pop hl
+    ld hl,.UnnamedText_58e4a ; xxx wants to fight...
+.common1
+    call .DrawAllPokeballs
     call PrintText
-    jr asm_58e3a
-.asm_58dd8
+    jp ResetRedBall
+.Ghost
     ld b,SILPH_SCOPE
     call IsItemInBag
     ld a,[W_ENEMYMONID]
     call CheckMarowak ; ld [$cf91],a
-    ds 2 ; cp MAROWAK
     jr z,.isMarowak
     ld a,b
     and a
-    jr z,.asm_58df5
-    ld hl,LoadEnemyMonData
-    ld b,BANK(LoadEnemyMonData)
-    call Bankswitch ; indirect jump to LoadEnemyMonData (3eb01 (f:6b01))
-    jr .asm_58daa
-.asm_58df5
-    ld hl,UnnamedText_58e45 ; $4e45
+    jr z,.SilphScopeNotInBag
+    call .LoadEnemyMonData
+    jr .NotGhostOrCommon
+.SilphScopeNotInBag
+    ld hl,.UnnamedText_58e45 ; Ghost appeared....
     call PrintText
-    ld hl,UnnamedText_58e54 ; $4e54
-    call PrintText
-    jr asm_58e3a
+    ld hl,.UnnamedText_58e54 ; Damn....
+    jr .common1
 .isMarowak
     ld a,b
     and a
-    jr z,.asm_58df5
-    ld hl,UnnamedText_58e45 ; $4e45
+    jr z,.SilphScopeNotInBag
+    ld hl,.UnnamedText_58e45 ; Ghost appeared....
     call PrintText
-    ld hl,UnnamedText_58e4f ; $4e4f
+    ld hl,.UnnamedText_58e4f ; silph scope unveiled...
     call PrintText
-    ld hl,LoadEnemyMonData
-    ld b,BANK(LoadEnemyMonData)
-    call Bankswitch ; indirect jump to LoadEnemyMonData (3eb01 (f:6b01))
-    ld hl,Func_708ca
-    ld b,BANK(Func_708ca)
-    call Bankswitch ; indirect jump to Func_708ca (708ca (1c:48ca))
-    ld hl,UnnamedText_58e3b ; $4e3b
-    call PrintText
-
-Func_58e29: ; 58e29 (16:4e29)
+    call .LoadEnemyMonData
+    ld hl,MarowakGhostAnimation
+    ld b,BANK(MarowakGhostAnimation)
+    call Bankswitch
+    jr .NotGhostOrCommon
+    ; fall through
+.Func_58e29
     xor a
     ld [$c0f1],a
     ld a,$80
@@ -85914,32 +85897,37 @@ Func_58e29: ; 58e29 (16:4e29)
     ld a,$e9
     call PlaySound
     jp WaitForSoundToFinish
-asm_58e3a: ; 58e3a (16:4e3a)
+.DrawAllPokeballs
+    push hl
+    ld hl,DrawAllPokeballs
+    ld b,BANK(DrawAllPokeballs)
+    call Bankswitch
+    pop hl
     ret
-
-UnnamedText_58e3b: ; 58e3b (16:4e3b)
+.LoadEnemyMonData
+    ld hl,LoadEnemyMonData
+    ld b,BANK(LoadEnemyMonData)
+    jp Bankswitch
+.UnnamedText_58e3b
     TX_FAR _UnnamedText_58e3b
     db "@"
-
-UnnamedText_58e40: ; 58e40 (16:4e40)
+.UnnamedText_58e40
     TX_FAR _UnnamedText_58e40
     db "@"
-
-UnnamedText_58e45: ; 58e45 (16:4e45)
+.UnnamedText_58e45
     TX_FAR _UnnamedText_58e45
     db "@"
-
-UnnamedText_58e4a: ; 58e4a (16:4e4a)
+.UnnamedText_58e4a
     TX_FAR _UnnamedText_58e4a
     db "@"
-
-UnnamedText_58e4f: ; 58e4f (16:4e4f)
+.UnnamedText_58e4f
     TX_FAR _UnnamedText_58e4f
     db "@"
-
-UnnamedText_58e54: ; 58e54 (16:4e54)
+.UnnamedText_58e54
     TX_FAR _UnnamedText_58e54
     db "@"
+
+SECTION "Func_58e59",ROMX[$4e59],BANK[$16]
 
 Func_58e59: ; 58e59 (16:4e59)
     ld hl,W_ENEMYMONCURHP ; $cfe6
@@ -89567,6 +89555,13 @@ Route10TextPointers:
     dw PokeCenterSignText
     dw Route10Text9
     dw Route10Text10
+
+ResetRedBall:
+    ld hl,$CF1D
+    xor a
+    ld [hli],a
+    ld [hl],a
+    ret
 
 SECTION "bank17",ROMX,BANK[$17]
 
@@ -97773,8 +97768,8 @@ DiglettsCaveAerodactylRunAway:
 
 DisplayTextIDAndForceGhostPal:
     call DisplayTextID
-    ld hl,wFlagForceGhostPalBit3
-    set 3,[hl]
+    ld hl,wFlagForceGhostPalBit4
+    set 4,[hl]
     ret
 
 ; ────────────────────────────────────────
@@ -99002,9 +98997,9 @@ _HandleMidJump: ; 7087e (1c:487e)
     ld [wJoypadForbiddenButtonsMask],a
     ret
 
-SECTION "Func_708ca",ROMX[$48ca],BANK[$1c]
+SECTION "MarowakGhostAnimation",ROMX[$48ca],BANK[$1c]
 
-Func_708ca: ; 708ca (1c:48ca)
+MarowakGhostAnimation: ; 708ca (1c:48ca)
     ld a,$e4
     call UpdateSpriteDuringMarowakEvent ; ld [rOBP1],a ; $FF00+$49
     call Func_7092a
@@ -101839,8 +101834,8 @@ PointerTable_71f73: ; 71f73 (1c:5f73)
 
 CleanLCD_OAMAndResetForceGhostPal:
     call CleanLCD_OAM
-    ld hl,wFlagForceGhostPalBit3
-    res 3,[hl]
+    ld hl,wFlagForceGhostPalBit4
+    res 4,[hl]
     ld b,$1
     jp GoPAL_SET
 
@@ -103782,8 +103777,8 @@ CheckShinyFrontAndGetPAL:
     jr nz,.NoGhost
     call CheckMarowak_Bank1C
     jr nz,.SimpleGhost
-    ld hl,wFlagForceGhostPalBit3
-    bit 3,[hl]
+    ld hl,wFlagForceGhostPalBit4
+    bit 4,[hl]
     jr z,.NoGhost ; Ghost Marowak Real Palette after SILPH_SCOPE
 .SimpleGhost
     ld hl,W_MONH_PALETTE_ID

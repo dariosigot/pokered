@@ -633,7 +633,7 @@ PikachuStarterBaseStats:
     db ELECTRIC ; species type 1
     db ELECTRIC ; species type 2
 
-    db 45 ; catch rate
+    db 75 ; catch rate
     db 82 ; base exp yield
     db $55 ; sprite dimensions
 

@@ -1849,7 +1849,6 @@ wFlagFlyingMonSpriteBit1   ; df35 ; bit 1 = Force to Load Mon Sprite with $0080 
 wFlagShinyBit2             ; df35 ; bit 2
 wFlagFlyingMonSpriteBit2   ; df35 ; bit 2 = Force to Load Mon Sprite with $0880 offset
 wFlagBaloonSpriteBit3      ; df35 ; bit 3 = Enable Baloon Sprite durint Trade
-wFlagForceGhostPalBit3     ; df35 ; bit 3 = Force Ghost Palette during Ghost Marowak Encounter
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
 wFlagBackFrontSpriteBit56  ; df35 ; bit 5
                            ; df35 ; bit 6
@@ -1877,6 +1876,7 @@ wStatusScreen2OAMBit0       ; df38 ; bit 0 = Write OAM in Status Screen 2
 wDisableEncounterBit1       ; df38 ; bit 1 = Disable Pallet's Pikachu Encounter
 wFlagNoHpPalBit2            ; df38 ; bit 2
 wDisableEncounterBit3       ; df38 ; bit 3 = Disable Pewter's Eevee Encounter
+wFlagForceGhostPalBit4      ; df38 ; bit 4 = Force Ghost Palette during Ghost Marowak Encounter
 wFirstExpAllMessageBit6     ; df38 ; bit 6
 wSelectInOverworldOnBit6    ; df38 ; bit 6
 wStatusScreenJustLoadBit6   ; df38 ; bit 6 = Status Screen Picture Just Load
