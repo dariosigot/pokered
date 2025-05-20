@@ -27569,16 +27569,22 @@ HealParty: ; f6a5 (3:76a5)
     xor a
     ld [$cf92],a
     ld [$d11e],a
+    call .ResetPikachuEeveeEncounter
     ld a,[W_NUMINPARTY]
     ld b,a
 .restoreBonusPPLoop ; loop to restore bonus PP from PP Ups
-    push bc
+;    push bc
     ; call RestoreBonusPP ; Disable PP Restore
-    pop bc
+;    pop bc
     ld hl,$cf92
     inc [hl]
     dec b
     jr nz,.restoreBonusPPLoop
+    ret
+.ResetPikachuEeveeEncounter
+    ld hl,wDisableEncounterBit1 ; wDisableEncounterBit3
+    res 1,[hl]
+    res 3,[hl]
     ret
 
 ; Routine che inserisce 1 in d11c per assicurarsi l'uscita dalla battle quando un pokemon è stato catturato
@@ -27588,6 +27594,8 @@ FlagExitBattle:
     ld a,1
     ld [$d11c],a
     ret
+
+; Free
 
 SECTION "Func_f71e",ROMX[$771e],BANK[$3]
 
@@ -30902,6 +30910,8 @@ TryDoWildEncounter: ; Moved in the Bank
     jr z,.lastRepelStep
     ld [$d0db],a
 .next
+    call CheckMapEncounterException
+    jr z,.CanEncounter2
     FuncCoord 9,9 ; $c45d
     ld hl,Coord
     ld c,[hl]
@@ -30918,6 +30928,7 @@ TryDoWildEncounter: ; Moved in the Bank
     call HackDockTilesetLikeSafari ; ld a,[W_CURMAPTILESET] ; $d367
     cp $3 ; Viridian Forest/Safari Zone
     jr z,.CantEncounter2
+.CanEncounter2
     ld a,[W_GRASSRATE] ; $d887
 .CanEncounter
     ld b,a
@@ -31299,14 +31310,15 @@ GetEnemy:
 .Exception
     ld a,[W_CURENEMYLVL] ; Exception ID
     cp $03
-    jr z,.CheckMew
+    jp z,.CheckMew
     cp $04
-    jr z,.CheckPikachu
+    jr z,.CheckPikachuEevee
     jr c,.UnknownDungeon ; 0,1,2
     ; Default $FF = Charizard'M
     ld [W_CURENEMYLVL],a
     ld a,CHARIZARD_M
     jr .WillEncounter
+
 .UnknownDungeon
     push hl
     push de
@@ -31350,21 +31362,53 @@ GetEnemy:
 .NotEncounter
     and a ; Reset Carry Flag ; NotEncounter
     ret
-.CheckPikachu
+
+.CheckPikachuEevee
     ld a,[W_NUMINPARTY]
     and a
     jr z,.NotEncounter
-    call .OwnPikachu
+    call GetCurrentOldAdventureMap
+    cp PALLET_TOWN
+    ld hl,wDisableEncounterBit1 ; wDisableEncounterBit3
+    jr nz,.CheckEeveeKO
+.CheckPikachuKO
+    bit 1,[hl]
+    jr nz,.NotEncounter
+    jr .PikachuEeveeContinue
+.CheckEeveeKO
+    bit 3,[hl]
+    jr nz,.NotEncounter
+.PikachuEeveeContinue
+    call .OwnPikachuEevee
     jr nz,.NotEncounter
     ld a,1
     ld [W_CURENEMYLVL],a
+    call GetCurrentOldAdventureMap
+    cp PALLET_TOWN
+    jr z,.PikachuEncounter
+    cp PEWTER_CITY
+    jr z,.EeveeEncounter
+    jr .NotEncounter
+.PikachuEncounter
+    ld a,7
+    ld [W_PALLETTOWNCURSCRIPT],a
     ld a,PIKACHU ; Entry Level
     jr .WillEncounter
-.OwnPikachu
+.EeveeEncounter
+    ld a,7
+    ld [W_PEWTERCITYCURSCRIPT],a
+    ld a,EEVEE ; Entry Level
+    jr .WillEncounter
+.OwnPikachuEevee
     push hl
     push bc
     ld hl,wPokedexOwned
+    call GetCurrentOldAdventureMap
+    cp PALLET_TOWN
     ld bc,(2 << 8) + DEX_PIKACHU ; TODO : - 1 ; 2 = read bit ; POKEDEXMOD
+    jr z,.WildChoice2
+    ld bc,(2 << 8) + DEX_EEVEE ; TODO : - 1 ; 2 = read bit ; POKEDEXMOD
+.WildChoice2
     ld a,$10
     call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
     ld a,c
@@ -31372,6 +31416,7 @@ GetEnemy:
     pop bc
     pop hl
     ret
+
 .CheckMew
     push hl
     ld hl,$d728 ; Strength
@@ -31388,7 +31433,7 @@ GetEnemy:
     ld a,70
     ld [W_CURENEMYLVL],a
     ld a,MEW ; Entry Level
-    jr .WillEncounter
+    jp .WillEncounter
 .DittoDebugInRoute15
     ld b,a
     call GetCurrentOldAdventureMap
@@ -32242,6 +32287,13 @@ ErasePartyMenuCursors: ; Moved in the Bank
     add hl,bc
     dec a
     jr nz,.loop
+    ret
+
+CheckMapEncounterException:
+    call GetCurrentOldAdventureMap
+    cp PALLET_TOWN ; Pallet Town's Pikachu
+    ret z
+    cp PEWTER_CITY ; Pewter City's Eevee
     ret
 
 SECTION "bank5",ROMX,BANK[$5]
@@ -34029,20 +34081,15 @@ PalletTownScript: ; 18e5b (6:4e5b)
     jr z,.next
     ld hl,$D747
     set 6,[hl]
-.next
-    call SetTempScriptFlag ; call EnableAutoTextBoxDrawing
+.next    
+    ld hl,$d126
+    set 6,[hl] ; Set Temp Script Flag to potentially Lock Cinnabar from Pallet
+    call EnableAutoTextBoxDrawing
     ld hl,PalletTownScriptPointers
     ld a,[W_PALLETTOWNCURSCRIPT]
     jp CallFunctionInTable
 
-PalletTownScriptPointers: ; 18e73 (6:4e73)
-    dw PalletTownScript0
-    dw PalletTownScript1
-    dw PalletTownScript2
-    dw PalletTownScript3
-    dw PalletTownScript4
-    dw PalletTownScript5
-    dw PalletTownScript6
+SECTION "PalletTownScript0",ROMX[$4e81],BANK[$6]
 
 PalletTownScript0: ; 18e81 (6:4e81)
     ld a,[$D747]
@@ -34592,14 +34639,7 @@ PewterCityScript: ; 19237 (6:5237)
     ld a,[W_PEWTERCITYCURSCRIPT]
     jp CallFunctionInTable
 
-PewterCityScriptPointers: ; 19243 (6:5243)
-    dw PewterCityScript0
-    dw PewterCityScript1
-    dw PewterCityScript2
-    dw PewterCityScript3
-    dw PewterCityScript4
-    dw PewterCityScript5
-    dw PewterCityScript6
+SECTION "PewterCityScript0",ROMX[$5251],BANK[$6]
 
 PewterCityScript0: ; 19251 (6:5251)
     xor a
@@ -37596,11 +37636,6 @@ FuchsiaCityText12:
     TX_FAR _FuchsiaCityText12
     db "@"
 
-SetTempScriptFlag:
-    ld hl,$d126
-    set 6,[hl] ; Set Temp Script Flag to potentially Lock Cinnabar from Pallet
-    jp EnableAutoTextBoxDrawing
-
 ; Indigo
 IndigoPlateauLobbyText4:
     db $FE,13
@@ -37938,6 +37973,58 @@ _FuchsiaCityScript:
 .end
     jp EnableAutoTextBoxDrawing
 
+PalletTownScriptPointers:
+    dw PalletTownScript0
+    dw PalletTownScript1
+    dw PalletTownScript2
+    dw PalletTownScript3
+    dw PalletTownScript4
+    dw PalletTownScript5
+    dw PalletTownScript6
+    dw PalletTownScript7_AfterPikachu
+
+PewterCityScriptPointers:
+    dw PewterCityScript0
+    dw PewterCityScript1
+    dw PewterCityScript2
+    dw PewterCityScript3
+    dw PewterCityScript4
+    dw PewterCityScript5
+    dw PewterCityScript6
+    dw PewterCityScript7_AfterEevee
+
+PalletTownScript7_AfterPikachu:
+    ld a,[W_ISINBATTLE]
+    cp $ff
+    jr z,.end
+    ld a,[$cf0b]
+    cp $2
+    jr z,.end
+    ld hl,wDisableEncounterBit1
+    set 1,[hl] ; Set Flag to Disable Encounter
+.end
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a
+    ld [W_CURMAPSCRIPT],a
+    ld [W_PALLETTOWNCURSCRIPT],a
+    ret
+
+PewterCityScript7_AfterEevee:
+    ld a,[W_ISINBATTLE]
+    cp $ff
+    jr z,.end
+    ld a,[$cf0b]
+    cp $2
+    jr z,.end
+    ld hl,wDisableEncounterBit3
+    set 3,[hl] ; Set Flag to Disable Encounter
+.end
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a
+    ld [W_CURMAPSCRIPT],a
+    ld [W_PEWTERCITYCURSCRIPT],a
+    ret
+
 SECTION "bank7",ROMX,BANK[$7]
 
 CinnabarIsland_h: ; 0x1c000 to 0x1c022 (34 bytes) (bank=7) (id=8)
@@ -38199,6 +38286,12 @@ CinnabarGymProcessAllGate: ; 1eb0a (7:6b0a)
     db $9E,$5f
     db $7D,$54
     db $4D,$54
+
+OakLabHealParty:
+    PREDEF HealPartyPredef
+    call GBFadeOut2
+    call Delay3
+    jp GBFadeIn2
 
 ; Free
 
@@ -38841,13 +38934,15 @@ OaksLabScript12: ; 1ce03 (7:4e03)
     xor a
     ld [$ff00+$8d],a
     call Func_34a6 ; face object
-    PREDEF HealPartyPredef
+    call OakLabHealParty
     ld hl,$d74b
     set 3,[hl]
 
     ld a,$d
     ld [W_OAKSLABCURSCRIPT],a
     ret
+
+SECTION "OaksLabScript13",ROMX[$4e32],BANK[$7]
 
 OaksLabScript13: ; 1ce32 (7:4e32)
     ld c,$14
@@ -133831,7 +133926,7 @@ LoadWildData:
 WildDataPointers:
     dw PalletMons    ; PALLET_TOWN
     dw NoMons        ; VIRIDIAN_CITY
-    dw NoMons        ; PEWTER_CITY
+    dw PewterMons    ; PEWTER_CITY
     dw CeruleanMons  ; CERULEAN_CITY
     dw NoMons        ; LAVENDER_TOWN
     dw VermilionMons ; VERMILION_CITY
@@ -134098,7 +134193,7 @@ NoMons: ; d0dd (3:50dd)
     db $00
 
 PalletMons:
-    db $19
+    db $08
     db $04,$FF      ; 20%
     db $04,$FF      ; 20%
     db $04,$FF      ; 15%
@@ -134120,6 +134215,20 @@ PalletMons:
     db 33,KINGLER  ;  5%
     db 35,KINGLER  ;  4%
     db 38,CLOYSTER ;  1%
+
+PewterMons:
+    db $07
+    db $04,$FF      ; 20%
+    db $04,$FF      ; 20%
+    db $04,$FF      ; 15%
+    db $04,$FF      ; 10%
+    db $04,$FF      ; 10%
+    db $04,$FF      ; 10%
+    db $04,$FF      ;  5%
+    db $04,$FF      ;  5%
+    db $04,$FF      ;  4%
+    db $04,$FF      ;  1%
+    db $00
 
 Route1Mons:
     db $19
@@ -134810,7 +134919,7 @@ ZoneMons3:
     db 17,EXEGGCUTE ; 10% ; Entry Level
     db 18,LICKITUNG ; 10%
     db 14,LICKITUNG ;  5% ; Entry Level
-    db 18,EEVEE     ;  5% ; Entry Level
+    db 18,EEVEE     ;  5%
     db 21,EEVEE     ;  4%
     db  7,CHANSEY   ;  1% ; Entry Level
     db $0E

@@ -1866,7 +1866,9 @@ wTempEnemyMinMaxIV     ; df37 = Temp Min Enemy IV Value
     ds 1
 
 wStatusScreen2OAMBit0       ; df38 ; bit 0 = Write OAM in Status Screen 2
+wDisableEncounterBit1       ; df38 ; bit 1 = Disable Pallet's Pikachu Encounter
 wFlagNoHpPalBit2            ; df38 ; bit 2
+wDisableEncounterBit3       ; df38 ; bit 3 = Disable Pewter's Eevee Encounter
 wFirstExpAllMessageBit6     ; df38 ; bit 6
 wSelectInOverworldOnBit6    ; df38 ; bit 6
 wStatusScreenJustLoadBit6   ; df38 ; bit 6 = Status Screen Picture Just Load
