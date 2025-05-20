@@ -38296,6 +38296,34 @@ OakLabHealParty:
     call Delay3
     jp GBFadeIn2
 
+DisplayPokedexTextAndResetSeenOwn:
+    call DisplayTextID
+    call .GetStarter
+    ld hl,wPokedexSeen
+    call .FillMemory
+    call .SetStarter
+    ld hl,wPokedexOwned
+    call .FillMemory
+    jp .SetStarter
+.GetStarter
+    ld a,[W_PLAYERSTARTER]
+    ld [$d11e],a
+    call IndexToPokedexAndRestoreD11E
+    ld [$d11e],a
+    ret
+.FillMemory
+    push hl
+    xor a
+    ld bc,wPokedexOwnedEnd-wPokedexOwned ; same as Seen
+    call FillMemory
+    pop hl
+    ret
+.SetStarter
+    ld a,[$d11e]
+    ld b,1
+    ld c,a
+    PREDEF_JUMP HandleBitArrayPredef
+
 ; Free
 
 SECTION "Func_1c98a",ROMX[$498a],BANK[$7]
@@ -39108,7 +39136,7 @@ OaksLabScript16: ; 1cf12 (7:4f12)
     call Delay3
     ld a,$1b
     ld [$ff00+$8c],a
-    call DisplayTextID
+    call DisplayPokedexTextAndResetSeenOwn ; call DisplayTextID
     ld hl,$d74b
     set 5,[hl]
     ld hl,$d74e
@@ -76459,6 +76487,7 @@ MoveAnimationPredef: ; 4fe91 (13:7e91)
     dbw BANK(Func_f71e),Func_f71e
     db BANK(InitializePlayerData)
     dw InitializePlayerData
+HandleBitArrayPredef:
     dbw BANK(HandleBitArray),HandleBitArray
     db BANK(RemoveMissableObject)
     dw RemoveMissableObject
