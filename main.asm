@@ -32384,8 +32384,8 @@ FloatSprite: ; 176c0 (5:76c0)
 LoadPokedexTilePatterns: ; 17840 (5:7840)
     call LoadHpBarAndStatusTilePatterns
     ld de,PokedexTileGraphics ; $6488
-    ld hl,$9600
-    ld bc,(BANK(PokedexTileGraphics) << 8) + $12
+    ld hl,$9620
+    ld bc,(BANK(PokedexTileGraphics) << 8) + $10
     call CopyVideoData
     ld de,PokeballTileGraphics ; $697e
     ld hl,$9720
@@ -53365,7 +53365,7 @@ StartBattle: ; 3c11e (f:411e)
     call nz,Func_3c92a
     ld c,$28
     call DelayFrames
-    call SaveScreenTilesToBuffer1
+    call SaveScreenAndLoadBattlePokedex ; call SaveScreenTilesToBuffer1
 .asm_3c14f
     call AnyPokemonAliveCheck
     ld a,d
@@ -54396,51 +54396,28 @@ Func_3c7d8: ; 3c7d8 (f:47d8)
 ; called when player is out of usable mons.
 ; prints approriate lose message,sets carry flag if player blacked out (special case for initial rival fight)
 HandlePlayerBlackOut: ; 3c837 (f:4837)
-    ld a,[W_ISLINKBATTLE] ; $d12b
-    cp $4
-    jr z,.notSony1Battle
-    ld a,[W_CUROPPONENT] ; $d059
-    cp SONY1
-    jr nz,.notSony1Battle
-    ld hl,wTileMap  ; sony 1 battle
-    ld bc,$815
-    call ClearScreenArea
-    call Func_3ed12
-    ld c,$28
-    call DelayFrames
-    ld hl,Sony1WinText
-    call PrintText
-    call GetCurrentOldAdventureMap
-    cp OAKS_LAB
-    ret z            ; starter battle in oak's lab: don't black out
-.notSony1Battle
-    ld b,$0
-    call GoPAL_SET
-    ld hl,PlayerBlackedOutText2
-    ld a,[W_ISLINKBATTLE] ; $d12b
-    cp $4
-    jr nz,.noLinkBattle
-    ld hl,LinkBattleLostText
-.noLinkBattle
-    call PrintText
-    ld a,[$d732]
-    res 5,a
-    ld [$d732],a
-    call ClearScreen
-    scf
+    ld hl,HandlePlayerBlackOut_
+    ld b,BANK(HandlePlayerBlackOut_)
+    jp Bankswitch
+
+CheckShowPokedex:
+    push bc
+    push hl
+    ld b,2
+    PREDEF HandleBitArrayPredef
+    ld a,c
+    and a
+    jr nz,.end
+    ld hl,wForceShowPokedexBit5
+    set 5,[hl]
+.end
+    pop hl
+    pop bc
     ret
 
-Sony1WinText: ; 3c884 (f:4884)
-    TX_FAR _Sony1WinText
-    db "@"
+; Free
 
-PlayerBlackedOutText2: ; 3c889 (f:4889)
-    TX_FAR _PlayerBlackedOutText2
-    db "@"
-
-LinkBattleLostText: ; 3c88e (f:488e)
-    TX_FAR _LinkBattleLostText
-    db "@"
+SECTION "Func_3c893",ROMX[$4893],BANK[$f]
 
 Func_3c893: ; 3c893 (f:4893)
     ld a,[$d730]
@@ -54627,7 +54604,7 @@ Func_3c92a: ; 3c92a (f:492a)
     ld a,[$D355]
     bit 6,a
     jr nz,.next4
-    ld hl,TrainerAboutToUseText
+    ld hl,.TrainerAboutToUseText
     call PrintText
     FuncCoord 0,7 ; $c42c
     ld hl,Coord
@@ -54671,7 +54648,7 @@ Func_3c92a: ; 3c92a (f:492a)
     ld b,1
     call GoPAL_SET
     call GBPalNormal
-    ld hl,TrainerSentOutText
+    ld hl,.TrainerSentOutText
     call PrintText
     ld a,[W_ENEMYMONID]
     ld [$CF91],a
@@ -54690,6 +54667,7 @@ Func_3c92a: ; 3c92a (f:492a)
     ld a,[W_ENEMYMONID]
     call PlayCry
     call DrawEnemyHUDAndHPBar
+    call LoadBattlePokedex
     ld a,[$CC26]
     and a
     ret nz
@@ -54698,16 +54676,14 @@ Func_3c92a: ; 3c92a (f:492a)
     ld [$CCF5],a
     call SaveScreenTilesToBuffer1
     jp SwitchPlayerMon
-
-SECTION "TrainerAboutToUseText",ROMX[$4a79],BANK[$f]
-
-TrainerAboutToUseText: ; 3ca79 (f:4a79)
+.TrainerAboutToUseText
     TX_FAR _TrainerAboutToUseText
     db "@"
-
-TrainerSentOutText: ; 3ca7e (f:4a7e)
+.TrainerSentOutText
     TX_FAR _TrainerSentOutText
     db "@"
+
+SECTION "AnyPokemonAliveCheck",ROMX[$4a83],BANK[$f]
 
 ; tests if the player has any pokemon that are not fainted
 ; sets d = 0 if all fainted,d != 0 if some mons are still alive
@@ -55267,9 +55243,9 @@ GetSelectedMovePointer:
 
 ; Free
 
-SECTION "InitBattleMenu",ROMX[$4eb3],BANK[$f]
+SECTION "InitBattleMenu",ROMX[$4eb1],BANK[$f]
 
-InitBattleMenu: ; 3ceb3 (f:4eb3)
+InitBattleMenu: ; 3ceb1 (f:4eb1)
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     ld a,[W_BATTLETYPE] ; $d05a
     and a
@@ -55280,9 +55256,9 @@ InitBattleMenu: ; 3ceb3 (f:4eb3)
 .nonstandardbattle
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2 ; safari
-    ld a,$b ; safari menu id
+    ld a,$b ; regular menu id
     jr nz,.menuselected
-    ld a,$1b ; regular menu id
+    ld a,$1b ; safari menu id
 .menuselected
     ld [$d125],a
     call DisplayTextBoxID
@@ -55652,7 +55628,7 @@ Func_3d119: ; 3d119 (f:5119)
     call LoadMonFrontSpriteOrGhost ; call LoadMonFrontSprite
     jr .asm_3d187
 .asm_3d182
-    ld b,$1e
+    ld b,BANK(AnimationSubstitute)
     call Bankswitch
 .asm_3d187
     jp Func_3d0e0
@@ -55676,8 +55652,7 @@ Func_3d119: ; 3d119 (f:5119)
     call LoadScreenTilesFromBuffer1
     call GoPAL_SET_CF1C
     call GBPalNormal
-
-SECTION "SwitchPlayerMon",ROMX[$51ba],BANK[$f]
+    ; fall through
 
 SwitchPlayerMon: ; 3d1ba (f:51ba) ;joedebug - this is where the player switches
     call CheckTrappingMoveAndSetEnemyActedBitAndLoadHl ; ld hl,RetreatMon
@@ -55709,6 +55684,13 @@ SwitchPlayerMon: ; 3d1ba (f:51ba) ;joedebug - this is where the player switches
 UnnamedText_3d1f5: ; 3d1f5 (f:51f5)
     TX_FAR _UnnamedText_3d1f5
     db "@"
+
+LoadBattlePokedex:
+    ld hl,_LoadBattlePokedex
+    ld b,BANK(_LoadBattlePokedex)
+    jp Bankswitch
+
+SECTION "Func_3d1fa",ROMX[$51fa],BANK[$f]
 
 Func_3d1fa: ; 3d1fa (f:51fa)
     call LoadScreenTilesFromBuffer1
@@ -56910,7 +56892,9 @@ GetSideEffectType_Common:
     ld a,TYPE_NA
     ret
 
-; Free
+SaveScreenAndLoadBattlePokedex:
+    call SaveScreenTilesToBuffer1
+    jp LoadBattlePokedex
 
 SECTION "FastAsleepText",ROMX[$5a3d],BANK[$f]
 
@@ -59779,15 +59763,13 @@ LoadEnemyMonData: ; Moved in the Bank
     call CopyData
     ld a,[W_ENEMYMONID]
     ld [$d11e],a
-    ld a,$3a
-    call Predef ; indirect jump to IndexToPokedex (41010 (10:5010))
-    ld a,[$d11e]
+    call IndexToPokedexAndRestoreD11E
     ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
-    ld b,$1
     ld hl,wPokedexSeen
-    ld a,$10
-    call Predef ; indirect jump to HandleBitArray (f666 (3:7666))
+    call CheckShowPokedex
+    ld b,1
+    PREDEF HandleBitArrayPredef
     ld hl,W_ENEMYMONLEVEL ; $cff3
     ld de,$cd23
     ld bc,$b
@@ -63129,15 +63111,12 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld [hli],a
     ld [hli],a
     ld [hli],a
-    FuncCoord 14,0
-    ld hl,Coord
-    ld [hl],$71 ; vertical line tile
-    FuncCoord 14,1
+    FuncCoord 14,00
     ld hl,Coord
     call DrawPokedexVerticalLine
-    FuncCoord 14,9
+    FuncCoord 14,08
     ld hl,Coord
-    call DrawPokedexVerticalLine
+    ld [hl],$68 ; cross tile
     ld hl,wPokedexSeen
     ld b,wPokedexSeenEnd - wPokedexSeen
     call CountSetBits
@@ -63162,10 +63141,6 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld hl,Coord
     ld de,PokedexOwnText
     call PlaceString
-    ;FuncCoord 1,1
-    ;ld hl,Coord
-    ;ld de,PokedexContentsText
-    ;call PlaceString
     FuncCoord 16,10
     ld hl,Coord
     ld de,PokedexMenuItemsText
@@ -63323,13 +63298,13 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ret
 
 DrawPokedexVerticalLine:
-    ld c,9 ; height of line
+    ld c,18 ; height of line
     ld de,20 ; width of screen
-    ld a,$71 ; vertical line tile
+    ld a,$66 ; vertical line tile
 .loop
     ld [hl],a
     add hl,de
-    xor a,1 ; toggle between vertical line tile and box tile
+;    xor a,1 ; toggle between vertical line tile and box tile
     dec c
     jr nz,.loop
     ret
@@ -63339,9 +63314,6 @@ PokedexSeenText:
 
 PokedexOwnText:
     db "OWN@"
-
-;PokedexContentsText:
-;    db "CONTENTS@"
 
 PokedexMenuItemsText:
     db "DATA",$4E
@@ -63421,7 +63393,9 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     call GBPalWhiteOut
     call ClearScreen
     call GoPAL_SET_CF1C
-    call LoadTextBoxTilePatterns
+    ld hl,wForceShowPokedexBit5
+    bit 5,[hl]
+    call z,LoadTextBoxTilePatterns
     call GBPalNormal
     ; water/flower tile animation
     pop af
@@ -63525,7 +63499,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld hl,Coord
     ld bc,$0102
     call PrintNumber ; print feet (height)
-    ld a,$60 ; feet symbol tile (one tick)
+    ld a,$70 ; feet symbol tile (one tick)
     ld [hl],a
     inc de
     inc de ; de = address of inches (height)
@@ -63533,7 +63507,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld hl,Coord
     ld bc,$8102
     call PrintNumber ; print inches (height)
-    ld a,$61 ; inches symbol tile (two ticks)
+    ld a,$71 ; inches symbol tile (two ticks)
     ld [hl],a
 ; now print the weight (note that weight is stored in tenths of pounds internally)
     inc de
@@ -76538,6 +76512,7 @@ LearnMovePredef:
     dbw BANK(IndexToPokedex),IndexToPokedex
     dbw BANK(Predef3B),Predef3B; 3B display pic?
     dbw BANK(UsedCut),UsedCut
+ShowPokedexDataPredef:
     dbw BANK(ShowPokedexData),ShowPokedexData
     dbw BANK(WriteMonMoves),WriteMonMoves
     dbw BANK(SaveSAV),SaveSAV
@@ -140770,6 +140745,110 @@ SubstituteEffectHandler:
     db "@"
 .UnnamedText_17e27
     TX_FAR _UnnamedText_17e27
+    db "@"
+
+; ──────────────────────────────────────────────────────────────────────
+
+_LoadBattlePokedex:
+    ld hl,wForceShowPokedexBit5
+    bit 5,[hl]
+    jr z,.end
+    ld a,[$d74b]
+    bit 5,a ; does the player have the pokedex?
+    jr z,.end
+    ld hl,IsGhostBattle
+    ld b,BANK(IsGhostBattle)
+    call Bankswitch
+    jr z,.end
+    ld hl,.LoadPokedexText
+    call PrintText
+    ld hl,.EmptyText
+    call PrintText
+    call SaveScreenTilesToBuffer1
+    ld a,[W_ENEMYMONID]
+    ld [$d11e],a
+    PREDEF ShowPokedexDataPredef
+    call .LoadMonFrontSprite
+    call CleanLCD_OAM
+    call GBPalWhiteOut
+    ld hl,LoadHudAndHpBarAndStatusTilePatterns
+    ld b,BANK(LoadHudAndHpBarAndStatusTilePatterns)
+    call Bankswitch
+    call LoadScreenTilesFromBuffer1
+    call GoPAL_SET_CF1C
+    call GBPalNormal
+    ld c,25
+    call DelayFrames
+.end
+    ld hl,wForceShowPokedexBit5
+    res 5,[hl]
+    ret
+.LoadMonFrontSprite
+    ld a,[W_ENEMYBATTSTATUS2]
+    bit 4,a
+    ld hl,AnimationSubstitute
+    ld b,BANK(AnimationSubstitute)
+    jp nz,Bankswitch
+    ld a,[W_ENEMYMON_START]
+    ld [$d0b5],a
+    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld [wAlternateFormIndex],a ; Save AlternateFormIndex
+    call GetMonHeader
+    ld de,$9000
+    jp LoadMonFrontSprite
+.EmptyText
+    db "@"
+.LoadPokedexText
+    TX_FAR _ItemUseBallText06
+    db $13,$06
+    db "@"
+
+; ──────────────────────────────────────────────────────────────────────
+
+HandlePlayerBlackOut_:
+    ld a,[W_ISLINKBATTLE] ; $d12b
+    cp $4
+    jr z,.notSony1Battle
+    ld a,[W_CUROPPONENT] ; $d059
+    cp SONY1
+    jr nz,.notSony1Battle
+    ld hl,wTileMap  ; sony 1 battle
+    ld bc,$815
+    call ClearScreenArea
+    ld hl,Func_396d3
+    ld b,BANK(Func_396d3)
+    call Bankswitch
+    ld c,$28
+    call DelayFrames
+    ld hl,.Sony1WinText
+    call PrintText
+    call GetCurrentOldAdventureMap
+    cp OAKS_LAB
+    ret z            ; starter battle in oak's lab: don't black out
+.notSony1Battle
+    ld b,$0
+    call GoPAL_SET
+    ld hl,.PlayerBlackedOutText2
+    ld a,[W_ISLINKBATTLE] ; $d12b
+    cp $4
+    jr nz,.noLinkBattle
+    ld hl,.LinkBattleLostText
+.noLinkBattle
+    call PrintText
+    ld a,[$d732]
+    res 5,a
+    ld [$d732],a
+    call ClearScreen
+    scf
+    ret
+.Sony1WinText
+    TX_FAR _Sony1WinText
+    db "@"
+.PlayerBlackedOutText2
+    TX_FAR _PlayerBlackedOutText2
+    db "@"
+.LinkBattleLostText
+    TX_FAR _LinkBattleLostText
     db "@"
 
 ; ──────────────────────────────────────────────────────────────────────

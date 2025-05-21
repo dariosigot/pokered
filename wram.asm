@@ -1877,6 +1877,7 @@ wDisableEncounterBit1       ; df38 ; bit 1 = Disable Pallet's Pikachu Encounter
 wFlagNoHpPalBit2            ; df38 ; bit 2
 wDisableEncounterBit3       ; df38 ; bit 3 = Disable Pewter's Eevee Encounter
 wFlagForceGhostPalBit4      ; df38 ; bit 4 = Force Ghost Palette during Ghost Marowak Encounter
+wForceShowPokedexBit5       ; df38 ; bit 5 = Show Pokedex during first Seen in Battle
 wFirstExpAllMessageBit6     ; df38 ; bit 6
 wSelectInOverworldOnBit6    ; df38 ; bit 6
 wStatusScreenJustLoadBit6   ; df38 ; bit 6 = Status Screen Picture Just Load
