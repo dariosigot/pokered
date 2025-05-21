@@ -51560,6 +51560,7 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     xor a
     ld [$cc49],a
     call AfterEvolution_TryToAddExclusiveMove
+    call .ShowPokedex
     pop hl
     ; Don't Overwrite "Types"
     ; ld a,$42
@@ -51587,6 +51588,34 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     ld l,e
     ld h,d
     jp Evolution_PartyMonLoop ; jr nextEvoEntry2
+.ShowPokedex
+    ld a,[$d0b5]
+    ld [$d11e],a
+    call IndexToPokedexAndRestoreD11E
+    ld c,a
+    ld hl,wPokedexSeen
+    ld b,2
+    PREDEF HandleBitArrayPredef
+    ld a,c
+    and a
+    ret nz
+    call GetMonName
+    ld hl,$cd6d
+    ld de,W_ENEMYMONNAME
+    ld bc,$b
+    call CopyData
+    ld hl,.LoadPokedexText
+    call PrintText
+    ld a,[$d0b5]
+    ld [$d11e],a
+    PREDEF ShowPokedexDataPredef
+    ld a,[$d0b5]
+    ld [$d11e],a
+    ret
+.LoadPokedexText
+    TX_FAR _ItemUseBallText06
+    db $13,$06
+    db "@"
 
 nextEvoEntry1: ; Moved in the Bank
     inc hl
