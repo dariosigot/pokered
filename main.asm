@@ -38296,18 +38296,32 @@ OakLabHealParty:
     call Delay3
     jp GBFadeIn2
 
-DisplayPokedexTextAndResetSeenOwn:
-    call DisplayTextID
-    call .GetStarter
+DisplayStarterPokedexAndResetSeenOwn:
+    call .ShowPokedex
+    call .GetStarterDex
     ld hl,wPokedexSeen
     call .FillMemory
     call .SetStarter
     ld hl,wPokedexOwned
     call .FillMemory
     jp .SetStarter
+.ShowPokedex
+    call .GetStarter
+    call GetMonName
+    ld hl,$cd6d
+    ld de,W_ENEMYMONNAME
+    ld bc,$b
+    call CopyData
+    ld hl,.LoadPokedexText
+    call PrintText
+    ld a,[W_PLAYERSTARTER]
+    jp DisplayPokedex
 .GetStarter
     ld a,[W_PLAYERSTARTER]
     ld [$d11e],a
+    ret
+.GetStarterDex
+    call .GetStarter
     call IndexToPokedexAndRestoreD11E
     ld [$d11e],a
     ret
@@ -38323,6 +38337,20 @@ DisplayPokedexTextAndResetSeenOwn:
     ld b,1
     ld c,a
     PREDEF_JUMP HandleBitArrayPredef
+.LoadPokedexText
+    TX_FAR _ItemUseBallText06
+    db $13,$06
+    db "@"
+
+OaksLabText26:
+    db $08 ; asm
+    call DisplayStarterPokedexAndResetSeenOwn
+    ld hl,.OaksLabText26
+    call PrintText
+    jp TextScriptEnd
+.OaksLabText26
+    TX_FAR _OaksLabText26
+    db "@"
 
 ; Free
 
@@ -39136,7 +39164,7 @@ OaksLabScript16: ; 1cf12 (7:4f12)
     call Delay3
     ld a,$1b
     ld [$ff00+$8c],a
-    call DisplayPokedexTextAndResetSeenOwn ; call DisplayTextID
+    call DisplayTextID
     ld hl,$d74b
     set 5,[hl]
     ld hl,$d74e
@@ -39780,9 +39808,7 @@ OaksLabText25: ; 1d3eb (7:53eb)
     TX_FAR _OaksLabText25
     db $11,"@"
 
-OaksLabText26: ; 1d3f1 (7:53f1)
-    TX_FAR _OaksLabText26
-    db "@"
+SECTION "OaksLabText27",ROMX[$53f6],BANK[$7]
 
 OaksLabText27: ; 1d3f6 (7:53f6)
     TX_FAR _OaksLabText27
