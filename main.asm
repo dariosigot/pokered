@@ -54415,6 +54415,12 @@ CheckShowPokedex:
     pop bc
     ret
 
+HackBackSpriteAccess:
+    ld a,$66 ; BackSprite dimension
+    ld de,$9310
+    push de
+    jp HackBackSprite
+
 ; Free
 
 SECTION "Func_3c893",ROMX[$4893],BANK[$f]
@@ -55307,38 +55313,33 @@ InitBattleMenu: ; 3ceb1 (f:4eb1)
     ld [wLastMenuItem],a ; $cc2a
     jr .rightcolumn
 .leftcolumn
-    ld a,[W_BATTLETYPE] ; $d05a
-    cp $2
     ld a," "
-    jr z,.safaribattle
-    FuncCoord 13,14 ; $c4c7 ; FuncCoord 15,14 ; $c4c7 ; Denim
-    ld [Coord],a
-    FuncCoord 13,16 ; $c4ef ; FuncCoord 15,16 ; $c4ef ; ...
-    ld [Coord],a
-    ld b,1 ; ld b,9                                   ; ...
-    jr .notsafari
-.safaribattle
     FuncCoord 13,14 ; $c4c5
     ld [Coord],a
     FuncCoord 13,16 ; $c4ed
     ld [Coord],a
+    ld a,[W_BATTLETYPE] ; $d05a
+    cp $2
+    jr nz,.notsafari
+.safaribattle
     FuncCoord 7,14 ; $c4bf
     ld hl,Coord
     ld de,W_NUMSAFARIBALLS ; $da47
     ld bc,$102
     call PrintNumber
-    ld b,$1
 .notsafari
     ld hl,wTopMenuItemY ; $cc24
     ld a,$e
     ld [hli],a
-    ld a,b
+    ld a,1
     ld [hli],a
     inc hl
     inc hl
     ld a,$1
     ld [hli],a
-    ld [hl],%00010011 ; ▼▲◄►StSeBA
+    ld a,%00010011 ; ▼▲◄►StSeBA
+    call TrainerBattleNotB
+    ld [hl],a
     call HandleMenuInput
     bit 4,a
     jr nz,.rightcolumn
@@ -55380,6 +55381,7 @@ InitBattleMenu: ; 3ceb1 (f:4eb1)
     ld a,$1
     ld [hli],a
     ld a,%00100011 ; ▼▲◄►StSeBA
+    call TrainerBattleNotB
     ld [hli],a
 .HandleMenuFromRight
     call HandleMenuInput
@@ -55487,7 +55489,7 @@ asm_3d00e: ; 3d00e (f:500e)
     ld [$cc35],a
     jp c,ResetBattleMenuPaletteAndInitBattleMenu ; jp c,InitBattleMenu
 
-asm_3d05f: ; 3d05f (f:505f)
+asm_3d05f:
     ld a,[$cf91]
     ld [$d11e],a
     call GetItemName
@@ -55518,6 +55520,17 @@ asm_3d05f: ; 3d05f (f:505f)
     ld hl,ItemInBattleFinalCheck
     jp Bankswitch
 
+TrainerBattleNotB:
+    push bc
+    ld b,a
+    ld a,[W_ISINBATTLE]
+    cp 2
+    ld a,b
+    pop bc
+    ret nz
+    sub %00000010 ; ▼▲◄►StSeBA
+    ret
+
 ;BackupCurMenuItemAndSelectEnemyMove:
 ;    ld a,[wCurrentMenuItem] ; Backup Current Menu Item
 ;    push af                 ; ...
@@ -55525,12 +55538,6 @@ asm_3d05f: ; 3d05f (f:505f)
 ;    pop af                  ; Restore Current Menu Item
 ;    ld [wCurrentMenuItem],a ; ...
 ;    ret
-
-HackBackSpriteAccess:
-    ld a,$66 ; BackSprite dimension
-    ld de,$9310
-    push de
-    jp HackBackSprite
 
 ; Free
 
