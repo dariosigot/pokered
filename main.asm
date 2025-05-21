@@ -470,14 +470,15 @@ LoadFontTilePatterns: ; Moved in the Bank
     ld bc,(BANK(FontGraphics) << 8 | $80)
     jp GoodCopyVideoData
 
-PlayCryAndDisplayPokedex:
+PlayCryAndUpdatePokedex:
     ld [wMonIdCryAndDex],a
     call PlayCry
-    ld b,2 ; read
-    call .HandleBit
-    ld a,c
-    and a ; rcf
-    ret nz
+    ld a,[$d74b]
+    bit 5,a ; does the player have the pokedex?
+    ret z
+    ld a,[wMonIdCryAndDex]
+    call IsPokemonSeen
+    ret nz ; rcf
 .wait
     call GetJoypadStateLowSensitivity
     ld a,[$ffb5]
@@ -485,17 +486,48 @@ PlayCryAndDisplayPokedex:
     and a ; was a key pressed?
     jr z,.wait
     ld a,[wMonIdCryAndDex]
-    call DisplayPokedex
+    call UpdatePokedex
     scf
     ret
-.HandleBit
-    ld a,[wMonIdCryAndDex]
+
+; Input a = Pokemon ID
+; Output z flag set = Pokemon NOT Seed
+IsPokemonSeen:
+    push bc ; Backup bc
+    push af ; Backup a
+    push hl ; Backup hl
+    ld hl,$d11e
+    ld b,[hl]
+    push hl ; Backup $d11e
+    push bc ; ...
     ld [$d11e],a
     call IndexToPokedexAndRestoreD11E
-    ld hl,wPokedexSeen
     ld c,a
-    ld a,$10
-    jp Predef
+    ld b,2 ; read
+    ld hl,wPokedexSeen
+    PREDEF HandleBitArrayPredef
+    ld a,c
+    and a ; rcf
+    pop bc ; Restore $d11e
+    pop hl ; ...
+    ld [hl],b
+    pop hl ; Restore hl
+    pop bc ; Restore a
+    ld a,b ; ...
+    pop bc ; Restore bc
+    ret
+
+UpdatePokedex:
+    push af
+    call IsPokemonSeen
+    ld hl,.LoadPokedexText
+    call z,PrintText
+    pop af
+    jp DisplayPokedex
+.LoadPokedexText
+    TX_FAR _ItemUseBallText06
+    db $13,$06
+    db "@"
 
 BackupHeader:
     ld hl,W_MONHEADER
@@ -8460,8 +8492,8 @@ IsItemInBag: ; 3493 (0:3493)
 
 DisplayPokedex: ; 349b (0:349b)
     ld [$d11e],a
-    ld b,BANK(Func_7c18)
-    ld hl,Func_7c18
+    ld b,BANK(DisplayPokedex_)
+    ld hl,DisplayPokedex_
     jp Bankswitch
 
 Func_34a6: ; 34a6 (0:34a6)
@@ -18030,7 +18062,7 @@ _RemovePokemon: ; 7b68 (1:7b68)
 .asm_7c15
     jp CopyDataUntil
 
-Func_7c18: ; 7c18 (1:7c18)
+DisplayPokedex_: ; 7c18 (1:7c18)
     ld hl,$d730
     set 6,[hl]
     ld a,$3d
@@ -35633,7 +35665,7 @@ VermilionCityText5: ; 19922 (6:5922)
     TX_FAR _VermilionCityText5
     db $08 ; asm
     ld a,MACHOP
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp VermilionMachop
 
 SECTION "VermilionCityText14",ROMX[$5933],BANK[$6]
@@ -35760,7 +35792,7 @@ CeladonCityText7: ; 199ec (6:59ec)
     TX_FAR _CeladonCityText7
     db $08 ; asm
     ld a,POLIWRATH
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 CeladonCityText8: ; 199f9 (6:59f9)
@@ -35882,7 +35914,7 @@ FuchsiaCityText19: ; 19a90 (6:5a90)
     ld hl,FuchsiaCityChanseyText
     call PrintText
     ld a,CHANSEY
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 FuchsiaCityChanseyText: ; 19a9f (6:5a9f)
@@ -35894,7 +35926,7 @@ FuchsiaCityText20: ; 19aa4 (6:5aa4)
     ld hl,FuchsiaCityVoltorbText
     call PrintText
     ld a,VOLTORB
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 FuchsiaCityVoltorbText: ; 19ab3 (6:5ab3)
@@ -35906,7 +35938,7 @@ FuchsiaCityText21: ; 19ab8 (6:5ab8)
     ld hl,FuchsiaCityKangaskhanText
     call PrintText
     ld a,KANGASKHAN
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 FuchsiaCityKangaskhanText: ; 19ac7 (6:5ac7)
@@ -35918,7 +35950,7 @@ FuchsiaCityText22: ; 19acc (6:5acc)
     ld hl,FuchsiaCitySlowpokeText
     call PrintText
     ld a,SLOWPOKE
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 FuchsiaCitySlowpokeText: ; 19adb (6:5adb)
@@ -35930,7 +35962,7 @@ FuchsiaCityText23: ; 19ae0 (6:5ae0)
     ld hl,FuchsiaCityLaprasText
     call PrintText
     ld a,LAPRAS
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 FuchsiaCityLaprasText: ; 19aef (6:5aef)
@@ -35957,7 +35989,7 @@ FuchsiaCityText24: ; 19af4 (6:5af4)
     call PrintText
     ld a,KABUTO
 .asm_81556 ; 0x19b1a
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
 .asm_4343f ; 0x19b1d
     jp TextScriptEnd
 
@@ -37917,7 +37949,7 @@ LedgeHoppingShadowOAM: ; Moved in the Bank
 
 CeruleanSlowbro:
     ld a,SLOWBRO
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 VermilionMachop:
@@ -38177,7 +38209,7 @@ Route2HouseText3:
     ld hl,.VoltorbText1
     call PrintText
     ld a,VOLTORB
-    call DisplayPokedex
+    call UpdatePokedex
     ld hl,.VoltorbText2
     call PrintText
     ld a,1
@@ -38297,31 +38329,17 @@ OakLabHealParty:
     jp GBFadeIn2
 
 DisplayStarterPokedexAndResetSeenOwn:
-    call .ShowPokedex
-    call .GetStarterDex
+    call .GetStarter
     ld hl,wPokedexSeen
     call .FillMemory
-    call .SetStarter
     ld hl,wPokedexOwned
     call .FillMemory
-    jp .SetStarter
-.ShowPokedex
-    call .GetStarter
-    call GetMonName
-    ld hl,$cd6d
-    ld de,W_ENEMYMONNAME
-    ld bc,$b
-    call CopyData
-    ld hl,.LoadPokedexText
-    call PrintText
+    call .SetStarter
     ld a,[W_PLAYERSTARTER]
-    jp DisplayPokedex
+    jp UpdatePokedex
 .GetStarter
     ld a,[W_PLAYERSTARTER]
     ld [$d11e],a
-    ret
-.GetStarterDex
-    call .GetStarter
     call IndexToPokedexAndRestoreD11E
     ld [$d11e],a
     ret
@@ -38337,10 +38355,6 @@ DisplayStarterPokedexAndResetSeenOwn:
     ld b,1
     ld c,a
     PREDEF_JUMP HandleBitArrayPredef
-.LoadPokedexText
-    TX_FAR _ItemUseBallText06
-    db $13,$06
-    db "@"
 
 OaksLabText26:
     db $08 ; asm
@@ -40047,7 +40061,7 @@ ViridianHouseText3: ; 1d59f (7:559f)
     ld hl,UnnamedText_1d5b1
     call PrintText
     ld a,SPEAROW
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -40097,7 +40111,7 @@ PewterHouse1Text1: ; 1d5fc (7:55fc)
     TX_FAR _PewterHouse1Text1
     db $08 ; asm
     ld a,NIDORAN_M
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -40528,14 +40542,14 @@ LavenderHouse1Text3: ; 1d8fe (7:58fe)
     TX_FAR _LavenderHouse1Text3
     db $8
     ld a,PSYDUCK
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 LavenderHouse1Text4: ; 1d90b (7:590b)
     TX_FAR _LavenderHouse1Text4
     db $8
     ld a,NIDORINO
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 LavenderHouse1Text5: ; 1d918 (7:5918)
@@ -40625,7 +40639,7 @@ LavenderHouse2Text1: ; 1d9b6 (7:59b6)
     TX_FAR _LavenderHouse2Text1
     db $8
     ld a,CUBONE
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 LavenderHouse2Text2: ; 1d9c3 (7:59c3)
@@ -40820,7 +40834,7 @@ VermilionHouse1Text2: ; 1db0b (7:5b0b)
     TX_FAR _VermilionHouse1Text2
     db $08 ; asm
     ld a,PIDGEY
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -41197,7 +41211,7 @@ SaffronHouse1Text2: ; 1dded (7:5ded)
     TX_FAR _SaffronHouse1Text2
     db $8
     ld a,PIDGEY
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 SaffronHouse1Text3: ; 1ddfa (7:5dfa)
@@ -42189,7 +42203,7 @@ Route16HouseText2: ; 1e640 (7:6640)
     ld hl,UnnamedText_1e652
     call PrintText
     ld a,FEAROW
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -42954,7 +42968,7 @@ BillsHousePokemonList: ; 1ec05 (7:6c05)
     bit 1,a
     jr nz,.asm_1ec74
     ld a,[$cc26]
-    add $66
+    add EEVEE
     cp EEVEE
     jr z,.asm_1ec6c
     cp FLAREON
@@ -42965,7 +42979,7 @@ BillsHousePokemonList: ; 1ec05 (7:6c05)
     jr z,.asm_1ec6c
     jr .asm_1ec74
 .asm_1ec6c
-    call DisplayPokedex
+    call UpdatePokedex
     call LoadScreenTilesFromBuffer2
     jr .asm_1ec2d
 .asm_1ec74
@@ -44872,7 +44886,7 @@ GetOakLastPkmn:
 .Done
     push de
     push af
-    call DisplayPokedex
+    call UpdatePokedex
     pop af
     ld b,a
     ld c,5
@@ -44896,7 +44910,7 @@ GiveVoltorb:
     pop bc
     ld a,b
     push bc
-    call DisplayPokedex
+    call UpdatePokedex
     pop bc
     jp GivePokemon
 
@@ -51616,20 +51630,8 @@ TryEvolution: ; loop over evolution entries ; Moved in the Bank
     jp Evolution_PartyMonLoop ; jr nextEvoEntry2
 .ShowPokedex
     ld a,[$d0b5]
-    ld [$d11e],a
-    call IndexToPokedexAndRestoreD11E
-    ld c,a
-    ld hl,wPokedexSeen
-    ld b,2
-    PREDEF HandleBitArrayPredef
-    ld a,c
-    and a
+    call IsPokemonSeen
     ret nz
-    call GetMonName
-    ld hl,$cd6d
-    ld de,W_ENEMYMONNAME
-    ld bc,$b
-    call CopyData
     ld hl,.LoadPokedexText
     call PrintText
     ld a,[$d0b5]
@@ -54456,19 +54458,11 @@ HandlePlayerBlackOut: ; 3c837 (f:4837)
     jp Bankswitch
 
 CheckShowPokedex:
-    push bc
-    push hl
-    ld b,2
-    PREDEF HandleBitArrayPredef
-    ld a,c
-    and a
+    call IsPokemonSeen
     ld hl,wForceShowPokedexBit5
     res 5,[hl]
-    jr nz,.end
+    ret nz
     set 5,[hl]
-.end
-    pop hl
-    pop bc
     ret
 
 HackBackSpriteAccess:
@@ -59825,12 +59819,12 @@ LoadEnemyMonData: ; Moved in the Bank
     ld bc,$b
     call CopyData
     ld a,[W_ENEMYMONID]
+    call CheckShowPokedex
     ld [$d11e],a
     call IndexToPokedexAndRestoreD11E
     ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld hl,wPokedexSeen
-    call CheckShowPokedex
     ld b,1
     PREDEF HandleBitArrayPredef
     ld hl,W_ENEMYMONLEVEL ; $cff3
@@ -72667,7 +72661,7 @@ CeladonMansion1TextPointers: ; 48697 (12:4697)
     dw CeladonMansion1Text5
 
 Func_486a1: ; 486a1 (12:46a1)
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 CeladonMansion1Text1: ; 486a7 (12:46a7)
@@ -76111,7 +76105,7 @@ FlagInstantAndPredefCeladonMart: ; xxxxx (12:xxxx) ; Denim
 GiveMagikarp:
     ld a,b
     push bc
-    call DisplayPokedex
+    call UpdatePokedex
     pop bc
     jp GivePokemon
 
@@ -80568,7 +80562,7 @@ HandlePrizeChoice: ; 528c6 (14:68c6)
     call GetItemName
     jr .GivePrize
 .GetMonName ; 14:68E3
-    call DisplayPokedexAndGetMonName ;  call GetMonName
+    call UpdatePokedexAndGetMonName ;  call GetMonName
 .GivePrize ; 14:68E6
     ld hl,SoYouWantPrizeTextPtr
     call PrintText
@@ -80832,12 +80826,12 @@ GetSpecialListNameOrGetItemName_: ; xxxxx (14:6A4A) ; Denim
     db "B2F@"
     db "B4F@"
 
-DisplayPokedexAndGetMonName:
+UpdatePokedexAndGetMonName:
     ld hl,$d11e
     ld a,[hl]
     push af
     push hl
-    call DisplayPokedex
+    call UpdatePokedex
     pop hl
     pop af
     ld [hl],a
@@ -80846,7 +80840,7 @@ DisplayPokedexAndGetMonName:
 GivePorygon:
     ld a,b
     push bc
-    call DisplayPokedex
+    call UpdatePokedex
     pop bc
     jp GivePokemon
 
@@ -81027,7 +81021,7 @@ SaffronCityText12: ; Moved in the Bank
     TX_FAR _SaffronCityText12
     db $08 ; asm
     ld a,PIDGEOT
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 CheckGoundOrRock:
@@ -88343,7 +88337,7 @@ FanClubText3: ; 59bee (16:5bee)
     ld hl,UnnamedText_59c00
     call PrintText
     ld a,PIKACHU
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -88356,7 +88350,7 @@ FanClubText4: ; 59c05 (16:5c05)
     ld hl,UnnamedText_59c17
     call PrintText
     ld a,SEEL
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     call WaitForSoundToFinish
     jp TextScriptEnd
 
@@ -89521,14 +89515,14 @@ Route12Text1: ; Moved in the Bank
     TX_FAR _Route12Text1
     db $08 ; asm
     ld a,SNORLAX
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 Route16Text7: ; Moved in the Bank
     TX_FAR _Route16Text7
     db $08 ; asm
     ld a,SNORLAX
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 GetLoadedMonHeader:
@@ -91652,7 +91646,7 @@ FightingDojoText6: ; 5cf06 (17:4f06)
     jr .done
 .GetMon
     ld a,HITMONLEE ; Entry Level
-    call DisplayPokedex
+    call UpdatePokedex
     ld hl,WantHitmonleeText
     call PrintText
     call YesNoChoice
@@ -91693,7 +91687,7 @@ FightingDojoText7: ; 5cf4e (17:4f4e)
     jr .done
 .GetMon
     ld a,HITMONCHAN ; Entry Level
-    call DisplayPokedex
+    call UpdatePokedex
     ld hl,WantHitmonchanText
     call PrintText
     call YesNoChoice
@@ -93526,7 +93520,7 @@ GetLastFighter:
 .Done
     push de
     push af
-    call DisplayPokedex
+    call UpdatePokedex
     pop af
     ld b,a
     ld c,30
@@ -93581,7 +93575,7 @@ PewterJigglypuff:
     ld de,MonOverworldDataNew_emimonserrate+($80*((DEX_JIGGLYPUFF)%(128)))
     call JigglypuffDanceHackCommon
     ld a,JIGGLYPUFF
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 JigglypuffDanceHack:
@@ -93598,7 +93592,7 @@ CopycatsHouseF2Text2: ; Moved in the Bank
     TX_FAR _CopycatsHouseF2Text2
     db $08 ; asm
     ld a,DODUO
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     ld hl,.CopycatsHouseF2Text2_Part2_Dex
     jr c,.end
     call WaitForSoundToFinish
@@ -96278,7 +96272,7 @@ SSAnne8Text8: ; 619fe (18:59fe)
     TX_FAR _SSAnne8Text8
     db $08 ; asm
     ld a,WIGGLYTUFF
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 SSAnne8BattleText1: ; 61a0b (18:5a0b)
@@ -96774,7 +96768,7 @@ SSAnne10Text8: ; 61e09 (18:5e09)
     TX_FAR _SSAnne10Text8
     db $8 ; 0x61e0d
     ld a,MACHOKE
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 SSAnne10BattleText1: ; 61e16 (18:5e16)
@@ -97324,7 +97318,7 @@ UnnamedText_6236c: ; 6236c (18:636c)
     ld hl,UnnamedText_6237b
     call PrintText
     ld a,PORYGON
-    call DisplayPokedex
+    call UpdatePokedex
     jp TextScriptEnd
 
 UnnamedText_6237b: ; 6237b (18:637b)
@@ -107931,7 +107925,7 @@ CopycatsHouseF1Text3: ; 75ed6 (1d:5ed6)
     TX_FAR _CopycatsHouseF1Text3
     db $8
     ld a,CHANSEY
-    call PlayCryAndDisplayPokedex
+    call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
 CopycatsHouseF1Object: ; 0x75ee3 (size=46)
@@ -109225,7 +109219,7 @@ FlagInstantAndDisplayListMenuID: ; xxxxx (1d:xxxx) ; Denim
 GiveFossil:
     ld a,b
     push bc
-    call DisplayPokedex
+    call UpdatePokedex
     pop bc
     jp GivePokemon
 
@@ -131438,13 +131432,14 @@ _ItemUseBallText08: ; a6810 (29:6810)
     ;db "transferred to",$55
     db "someone's PC!",$58
 
-SECTION "_ItemUseBallText06",ROMX[$6835],BANK[$29]
+_ItemUseBallText06:
+;    db 0,"New #DEX data",$4F
+;    db "will be added for",$55,"@"
+;    TX_RAM W_ENEMYMONNAME
+;    db 0,"!@@"
 
-_ItemUseBallText06: ; a6835 (29:6835)
     db 0,"New #DEX data",$4F
-    db "will be added for",$55,"@"
-    TX_RAM W_ENEMYMONNAME
-    db 0,"!@@"
+    db "will be added!@@"
 
 SECTION "_SurfingNoPlaceToGetOffText",ROMX[$686f],BANK[$29]
 
