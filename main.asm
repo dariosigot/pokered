@@ -54436,8 +54436,9 @@ CheckShowPokedex:
     PREDEF HandleBitArrayPredef
     ld a,c
     and a
-    jr nz,.end
     ld hl,wForceShowPokedexBit5
+    res 5,[hl]
+    jr nz,.end
     set 5,[hl]
 .end
     pop hl
