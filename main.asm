@@ -23407,10 +23407,13 @@ ItemUseBall: ; d687 (3:5687)
     cp a,2        ;SafariBattle
     jr nz,.skipSafariZoneCode
 .safariZone
+    push af
     ; remove a Safari Ball from inventory
     ld hl,W_NUMSAFARIBALLS
     dec [hl]
+    pop af
 .skipSafariZoneCode    ;$56b6
+    jr z,.skipNotSafariZoneCode
     ld hl,$cf91 ; Backup BALL ID
     ld a,[hl]   ; ...
     push af     ; ...
@@ -23419,6 +23422,7 @@ ItemUseBall: ; d687 (3:5687)
     pop hl      ; Restore BALL ID
     pop af      ; ...
     ld [hl],a   ; ...
+.skipNotSafariZoneCode
     ld a,$43
     ld [$d11e],a
     ld hl,ItemUseText00
