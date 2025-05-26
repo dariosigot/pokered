@@ -548,6 +548,12 @@ GbPalComplete:
     ld a,%11100100
     jp GBPalCommon
 
+; Change Battle Screen Palette to Player's Pkmn Color
+GoPAL_SET_CF1C_NoHpPal:
+    ld hl,wFlagNoHpPalBit2
+    set 2,[hl]
+    jp GoPAL_SET_CF1C
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -8914,11 +8920,9 @@ HackFromBank0:
     pop bc
     ret
 
-SECTION "FillMemory",ROM0[$36e0]
-
 ;Fills memory range with the specified byte.
 ;input registers a = fill_byte,bc = length,hl = address
-FillMemory: ; 36e0 (0:36e0)
+FillMemory:
     push de
     ld d,a
 .loop
@@ -8932,52 +8936,65 @@ FillMemory: ; 36e0 (0:36e0)
     ret
 
 ; loads sprite that de points to
-UncompressSpriteFromDE: ; 36eb (0:36eb)
+UncompressSpriteFromDE:
     ld hl,W_SPRITEINPUTPTR
     ld [hl],e
     inc hl
     ld [hl],d
     jp UncompressSpriteData
 
-SaveScreenTilesToBuffer2: ; 36f4 (0:36f4)
-    ld hl,wTileMap
-    ld de,wTileMapBackup2
-    ld bc,$168
-    call CopyData
-    ret
+; ─────────────────────────────────────────────────────────
 
-LoadScreenTilesFromBuffer2: ; 3701 (0:3701)
-    call LoadScreenTilesFromBuffer2DisableBGTransfer
-    ld a,$1
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ret
-
-; loads screen tiles stored in wTileMapBackup2 but leaves H_AUTOBGTRANSFERENABLED disabled
-LoadScreenTilesFromBuffer2DisableBGTransfer: ; 3709 (0:3709)
-    xor a
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ld hl,wTileMapBackup2
-    ld de,wTileMap
-    ld bc,$168
-    call CopyData
-    ret
-
-SaveScreenTilesToBuffer1: ; 3719 (0:3719)
+SaveScreenTilesToBuffer1:
     ld hl,wTileMap
     ld de,wTileMapBackup
     ld bc,$168
-    jp CopyData
+    jr CopyData2
 
-LoadScreenTilesFromBuffer1: ; 3725 (0:3725)
-    xor a
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
+SaveScreenTilesToBuffer2:
+    ld hl,wTileMap
+    ld de,wTileMapBackup2
+    ld bc,$168
+    jr CopyData2
+
+LoadScreenTilesFromBuffer1:
+    call LoadScreenTilesFromBuffer1DisableBGTransfer
+    jr EnableAutoBgTransfer
+
+LoadScreenTilesFromBuffer2:
+    call LoadScreenTilesFromBuffer2DisableBGTransfer
+    ; fall through
+
+EnableAutoBgTransfer:
+    ld a,1
+    ld [H_AUTOBGTRANSFERENABLED],a
+    ret
+
+DisableAutoBgTransfer:
+    ld a,0
+    ld [H_AUTOBGTRANSFERENABLED],a
+    ret
+
+LoadScreenTilesFromBuffer2DisableBGTransfer:
+    call DisableAutoBgTransfer
+    ld hl,wTileMapBackup2
+    ld de,wTileMap
+    ld bc,$168
+    jr CopyData2
+
+LoadScreenTilesFromBuffer1DisableBGTransfer:
+    call DisableAutoBgTransfer
     ld hl,wTileMapBackup
     ld de,wTileMap
     ld bc,$168
-    call CopyData
-    ld a,$1
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ret
+    jr CopyData2
+
+CopyData2:
+    jp CopyData
+
+; ─────────────────────────────────────────────────────────
+
+SECTION "DelayFrames",ROM0[$3739]
 
 DelayFrames: ; 3739 (0:3739)
 ; wait n frames,where n is the value in c
@@ -10798,8 +10815,14 @@ IsTryingToLearnPalFix_End:
     ld a,[W_ISINBATTLE]
     and a
     ret z
-    call LoadScreenTilesFromBuffer1
-    jp GoPAL_SET_CF1C
+    ld hl,wFlagLearnAfterEvolutBit0
+    bit 0,[hl]
+    res 0,[hl]
+    ret nz
+    ld hl,HidePlayerBattleHudAndRestorePalette_
+    ld b,BANK(HidePlayerBattleHudAndRestorePalette_)
+    call Bankswitch
+    PREDEF_JUMP DrawPlayerHUDAndHPBarPredef
 
 PrintSafariZoneBattleText: ; Moved in the Bank
     ld hl,$cce9
@@ -23356,6 +23379,9 @@ IsSurfingAllowed:
     ld hl,UnnamedText_cdff ; $4dff
     jp PrintText
 
+ItemUseCardKey:
+    jp ItemUseNotTime
+
 SECTION "ItemUseBall",ROMX[$5687],BANK[$3]
 
 ItemUseBall: ; d687 (3:5687)
@@ -23385,8 +23411,14 @@ ItemUseBall: ; d687 (3:5687)
     ld hl,W_NUMSAFARIBALLS
     dec [hl]
 .skipSafariZoneCode    ;$56b6
-    call LoadScreenTilesFromBuffer1    ;restore screenBuffer from Backup
-    call GoPAL_SET_CF1C
+    ld hl,$cf91 ; Backup BALL ID
+    ld a,[hl]   ; ...
+    push af     ; ...
+    push hl     ; ...
+    call ReDrawBattleHudAfterItemUse
+    pop hl      ; Restore BALL ID
+    pop af      ; ...
+    ld [hl],a   ; ...
     ld a,$43
     ld [$d11e],a
     ld hl,ItemUseText00
@@ -24707,10 +24739,11 @@ ItemUseXAccuracy: ; e013 (3:6013)
     jp z,ItemUseNotTime
     ld hl,W_PLAYERBATTSTATUS2
     set 0,[hl] ; X Accuracy bit
-    jp PrintItemUseTextAndRemoveItem
+    ; fall through
 
-ItemUseCardKey: ; e022 (3:6022)
-    jp ItemUseNotTime
+SimpleBattleItemEnd:
+    call ReDrawBattleHudAfterItemUse
+    jp PrintItemUseTextAndRemoveItem
 
 BackupChangedBlocks:
     push hl
@@ -24814,41 +24847,34 @@ LoadFluteSprite:
 .UnknownFluteAnim
 INCBIN "baserom.gbc",$70866,$7087e - $70866
 
-SECTION "ItemUseGuardSpec",ROMX[$60dc],BANK[$3]
-
-ItemUseGuardSpec: ; e0dc (3:60dc)
+ItemUseGuardSpec:
     ld a,[W_ISINBATTLE]
     and a
     jp z,ItemUseNotTime
     ld hl,W_PLAYERBATTSTATUS2
     set 1,[hl] ; Mist bit
-    jp PrintItemUseTextAndRemoveItem
+    jp SimpleBattleItemEnd
 
-ItemUseSuperRepel: ; e0eb (3:60eb)
+ItemUseSuperRepel:
     ld b,200
     jp ItemUseRepelCommon
 
-ItemUseMaxRepel: ; e0f0 (3:60f0)
+ItemUseMaxRepel:
     ld b,250
     jp ItemUseRepelCommon
 
-ItemUseDireHit: ; e0f5 (3:60f5)
+ItemUseDireHit:
     ld a,[W_ISINBATTLE]
     and a
     jp z,ItemUseNotTime
     ld hl,W_PLAYERBATTSTATUS2
     set 2,[hl] ; Focus Energy bit
-    jp PrintItemUseTextAndRemoveItem
+    jp SimpleBattleItemEnd
 
-ItemUseXStat: ; e104 (3:6104)
+ItemUseXStat:
     ld a,[W_ISINBATTLE]
     and a
-    jr nz,.inBattle
-    call ItemUseNotTime
-    ld a,2
-    ld [$cd6a],a ; item not used
-    ret
-.inBattle
+    jp z,ItemUseNotTime
     ld hl,W_PLAYERMOVENUM
     ld a,[hli]
     push af ; save [W_PLAYERMOVENUM]
@@ -24858,11 +24884,9 @@ ItemUseXStat: ; e104 (3:6104)
     ld a,[$cf91]
     sub a,X_ATTACK - ATTACK_UP1_EFFECT
     ld [hl],a ; store player move effect
-    call PrintItemUseTextAndRemoveItem
+    call SimpleBattleItemEnd
     ld a,XSTATITEM_ANIM ; X stat item animation ID
     ld [W_PLAYERMOVENUM],a
-    call LoadScreenTilesFromBuffer1 ; restore saved screen
-    call GoPalSetAndDelay3Bank3 ; call Delay3
     xor a
     ld [H_WHOSETURN],a ; set turn to player's turn
     ld b,BANK(StatModifierUpEffect)
@@ -24874,6 +24898,8 @@ ItemUseXStat: ; e104 (3:6104)
     pop af
     ld [hl],a ; restore [W_PLAYERMOVENUM]
     ret
+
+SECTION "ItemUsePokeflute",ROMX[$6140],BANK[$3]
 
 ItemUsePokeflute: ; e140 (3:6140)
     ld a,[W_ISINBATTLE]
@@ -24893,7 +24919,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     call ItemUseReloadOverworldData
     jr .ContextDone
 .BattleContext
-    call LoadScreenBufferAndGoPalSet
+    call ReDrawBattleHudAfterItemUse
 .ContextDone
 
     ; Play Flute
@@ -28497,13 +28523,13 @@ Func_cd99: ; xxxx (3:xxxx) ; Spostato a Fine BANK
     ld hl,UnnamedText_cdbb ; $4dbb
     jp PrintText
 
-GoPalSetAndDelay3Bank3:
-    call GoPAL_SET_CF1C
-    jp Delay3
-
-LoadScreenBufferAndGoPalSet:
-    call LoadScreenTilesFromBuffer1 ; restore saved screen
-    jp GoPAL_SET_CF1C
+ReDrawBattleHudAfterItemUse:
+    ld hl,HidePlayerBattleHudAndRestorePalette_
+    ld b,BANK(HidePlayerBattleHudAndRestorePalette_)
+    call Bankswitch
+    ld b,BANK(DrawHUDsAndHPBars)
+    ld hl,DrawHUDsAndHPBars
+    jp Bankswitch
 
 PartyMenuHPAndStandarizePalette:
     call LoadMonData
@@ -28674,7 +28700,7 @@ ItemUsePokedoll:
 .Continue
     ld a,$01
     ld [$d078],a
-    jp PrintItemUseTextAndRemoveItem
+    jp SimpleBattleItemEnd
 
 UsedStrengthText: ; Moved in the Bank
     TX_FAR _UsedStrengthText
@@ -30876,8 +30902,7 @@ EndOfBattle: ; Moved in the Bank
 .asm_1380a
     xor a
     ld [$ccd4],a
-    ld a,$2a
-    call Predef ; indirect jump to EvolutionAfterBattle (3ad1c (e:6d1c))
+    call EvolutionAfterBattlePlus
 .Lose
     xor a
     ld [$d083],a
@@ -32106,10 +32131,10 @@ UsableItems_PartyMenu: ; Moved in the Bank
     db FRESH_WATER
     db SODA_POP
     db LEMONADE
-    db X_ATTACK
-    db X_DEFEND
-    db X_SPEED
-    db X_SPECIAL
+;    db X_ATTACK
+;    db X_DEFEND
+;    db X_SPEED
+;    db X_SPECIAL
 ;    db PP_UP
     db ETHER
 ;    db MAX_ETHER
@@ -32329,6 +32354,16 @@ CheckMapEncounterException:
     cp PALLET_TOWN ; Pallet Town's Pikachu
     ret z
     cp PEWTER_CITY ; Pewter City's Eevee
+    ret
+
+EvolutionAfterBattlePlus:
+    push hl
+    ld hl,wFlagLearnAfterEvolutBit0
+    set 0,[hl]
+    pop hl
+    PREDEF EvolutionAfterBattlePredef
+    ld hl,wFlagLearnAfterEvolutBit0
+    res 0,[hl]
     ret
 
 SECTION "bank5",ROMX,BANK[$5]
@@ -53604,7 +53639,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     call MoveSelectionMenu
     push af
     call LoadScreenTilesFromBuffer1
-    call DrawHUDsAndHPBars
+;    call DrawHUDsAndHPBars ; Useless and Slow in Super Game Boy Mode
     pop af
     jr nz,.InitBattleMenu
 
@@ -54470,6 +54505,17 @@ HackBackSpriteAccess:
     ld de,$9310
     push de
     jp HackBackSprite
+
+TrainerBattleNotB:
+    push bc
+    ld b,a
+    ld a,[W_ISINBATTLE]
+    cp 2
+    ld a,b
+    pop bc
+    ret nz
+    sub %00000010 ; ▼▲◄►StSeBA
+    ret
 
 ; Free
 
@@ -55475,7 +55521,7 @@ InitBattleMenu: ; 3ceb1 (f:4eb1)
 .safari1 ; safari first option??
     ld a,SAFARI_BALL
     ld [$cf91],a
-    jr asm_3d05f
+    jp asm_3d05f
 
 .Func_3cfe8
     cp $2
@@ -55525,19 +55571,22 @@ asm_3d00e: ; 3d00e (f:500e)
     ld a,h
     ld [$cf8c],a
 .asm_3d03c
+    call HidePlayerBattleHudAndStandarizePalette
+BattleItemRetry:
     xor a
     ld [$cf93],a
     ld a,$3
     ld [wListMenuID],a ; $cf94
     ld a,[$cc2c]
     ld [wCurrentMenuItem],a ; $cc26
-    call SetBattleMenuPaletteAndDisplayListMenuID ; call DisplayListMenuID
+    call DisplayListMenuID
     ld a,[wCurrentMenuItem] ; $cc26
     ld [$cc2c],a
     ld a,$0
     ld [$cc37],a
     ld [$cc35],a
-    jp c,ResetBattleMenuPaletteAndInitBattleMenu ; jp c,InitBattleMenu
+    call c,HidePlayerBattleHudAndRestorePalette
+    jp c,InitBattleMenu
 
 asm_3d05f:
     ld a,[$cf91]
@@ -55549,14 +55598,16 @@ asm_3d05f:
     call UseItem
     call LoadHudTilePatterns
     call CleanLCD_OAM
-    xor a
-    ld [wCurrentMenuItem],a ; $cc26
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
-    jr z,.FinalCheck
+    jr z,.FinalCheck2
     ld a,[$cd6a]
     and a
-    jp z,asm_3d00e
+    jr nz,.BattleItemOK
+    call LoadScreenTilesFromBuffer1DisableBGTransfer
+    call GoPAL_SET_CF1C_NoHpPal
+    jr BattleItemRetry ; asm_3d00e
+.BattleItemOK
     ld a,[W_PLAYERBATTSTATUS1] ; $d062
     bit 5,a
     jr z,.FinalCheck
@@ -55566,20 +55617,12 @@ asm_3d05f:
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
     res 5,[hl]
 .FinalCheck
+    xor a
+    ld [wCurrentMenuItem],a ; $cc26
+.FinalCheck2
     ld b,BANK(ItemInBattleFinalCheck)
     ld hl,ItemInBattleFinalCheck
     jp Bankswitch
-
-TrainerBattleNotB:
-    push bc
-    ld b,a
-    ld a,[W_ISINBATTLE]
-    cp 2
-    ld a,b
-    pop bc
-    ret nz
-    sub %00000010 ; ▼▲◄►StSeBA
-    ret
 
 ;BackupCurMenuItemAndSelectEnemyMove:
 ;    ld a,[wCurrentMenuItem] ; Backup Current Menu Item
@@ -62586,28 +62629,28 @@ GenRandomInBattleFromOtherBANK:
     ld d,a
     ret
 
+
+HidePlayerBattleHudAndRestorePalette:
+    push af
+    push bc
+    push de
+    push hl
+    ld hl,HidePlayerBattleHudAndRestorePalette_
+    jr HackBattleHud
 HidePlayerBattleHudAndStandarizePalette:
     push af
     push bc
     push de
     push hl
-    ld b,BANK(HidePlayerBattleHudAndStandarizePalette_)
     ld hl,HidePlayerBattleHudAndStandarizePalette_
+HackBattleHud:
+    ld b,BANK(HidePlayerBattleHudAndStandarizePalette_) ; same HidePlayerBattleHudAndRestorePalette_
     call Bankswitch
     pop hl
     pop de
     pop bc
     pop af
     ret
-
-SetBattleMenuPaletteAndDisplayListMenuID:
-    call HidePlayerBattleHudAndStandarizePalette
-    jp DisplayListMenuID
-
-ResetBattleMenuPaletteAndInitBattleMenu:
-    call LoadScreenTilesFromBuffer1 ; restore saved screen
-    call GoPAL_SET_CF1C
-    jp InitBattleMenu
 
 GoPalSetAndDelay3BankF:
     call GoPAL_SET_CF1C
@@ -76549,6 +76592,7 @@ LearnMovePredef:
     db 0,0,0 ; Unused
     db BANK(DisplayPokedexMenu_)
     dw DisplayPokedexMenu_
+EvolutionAfterBattlePredef:
     dbw BANK(EvolutionAfterBattle),EvolutionAfterBattle
     dbw BANK(SaveSAVtoSRAM0),SaveSAVtoSRAM0
     dbw BANK(InitOpponent),InitOpponent
@@ -136880,20 +136924,6 @@ InitExplodeFlag:
     ld [wExplodeFlag],a
     ret
 
-HidePlayerBattleHudAndStandarizePalette_:
-    ld a,[W_ISINBATTLE] ; $d057
-    and a
-    ret z
-    ; Remove Player Battle Stats Frame
-    FuncCoord 09,07
-    ld hl,Coord
-    ld bc,$050B ; 05 | 11
-    call ClearScreenArea
-    ; Change Battle Screen Palette to Player's Pkmn Color
-    ld hl,wFlagNoHpPalBit2
-    set 2,[hl]
-    jp GoPAL_SET_CF1C
-
 ; Set Carry Flag if Focus in Bag or All Pkmn Fought
 IsFocusInBagOrAllFought_:
     ld b,FOCUS
@@ -139062,12 +139092,11 @@ ItemInBattleFinalCheck:
     call .PrintMonBackAndPlayerHUDAndHPBarAndMoney
     jr .done1
 .NoCapture
-    call LoadScreenTilesFromBuffer1
+    call LoadScreenTilesFromBuffer1DisableBGTransfer
     call .DrawHUDsAndHPBars
 .done1
-    call GoPAL_SET_CF1C
-    call Delay3
     call GBPalNormal
+    call IfGBCDelay3
     pop af
     jr z,.EndNoCapture
     call .HackGainExpAfterCatch
@@ -139088,29 +139117,28 @@ ItemInBattleFinalCheck:
     and a
     ret
 .PrintMonBackAndPlayerHUDAndHPBarAndMoney
-    call LoadFontTilePatterns
-    xor a
-    ld [H_AUTOBGTRANSFERENABLED],a ; disable transfer
+    call DisableAutoBgTransfer
     ld a,[W_PLAYERMONID]
     ld [$d0b5],a
     ld a,[W_PLAYERMONPP+1] ; move2pp
     ld [wAlternateFormIndex],a
     call GetMonHeader
     PREDEF LoadMonBackSpritePredef
+    call LoadFontTilePatterns
     ld b,BANK(LoadHudAndHpBarAndStatusTilePatterns)
     ld hl,LoadHudAndHpBarAndStatusTilePatterns
     call Bankswitch
-    call LoadScreenTilesFromBuffer1
+    call LoadScreenTilesFromBuffer1DisableBGTransfer
+    call RemovePlayerBattleStatsFrameDisableBGTransfer
     ld hl,.EmptyText
     call PrintText
     ld a,$31
     ld [$FF00+$e1],a
+    call GoPAL_SET_CF1C
     FuncCoord 01,05
     ld hl,Coord
     PREDEF CopyUncompressedPicToTilemapPredef
     PREDEF DrawPlayerHUDAndHPBarPredef
-    ld a,1
-    ld [H_AUTOBGTRANSFERENABLED],a ; enable transfer
     jp SaveScreenTilesToBuffer1
 .DrawHUDsAndHPBars
     ld b,BANK(DrawHUDsAndHPBars)
@@ -139122,6 +139150,34 @@ ItemInBattleFinalCheck:
     jp Bankswitch
 .EmptyText
     db "@"
+
+HidePlayerBattleHudAndStandarizePalette_:
+    ld a,[W_ISINBATTLE] ; $d057
+    and a
+    ret z
+    call RemovePlayerBattleStatsFrame
+    jp GoPAL_SET_CF1C_NoHpPal
+
+HidePlayerBattleHudAndRestorePalette_:
+    ld a,[W_ISINBATTLE] ; $d057
+    and a
+    ret z
+    call LoadScreenTilesFromBuffer1DisableBGTransfer
+    call RemovePlayerBattleStatsFrame
+    ; Restore Battle Screen Palette to Default
+    jp GoPAL_SET_CF1C
+
+RemovePlayerBattleStatsFrame:
+    call RemovePlayerBattleStatsFrameDisableBGTransfer
+    call EnableAutoBgTransfer
+    jp Delay3
+
+RemovePlayerBattleStatsFrameDisableBGTransfer:
+    call DisableAutoBgTransfer
+    FuncCoord 09,07
+    ld hl,Coord
+    ld bc,$050B ; 05 | 11
+    jp ClearScreenArea
 
 ; ──────────────────────────────────────────────────────────────────────
 
