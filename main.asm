@@ -18038,7 +18038,6 @@ DisplayPokedex_: ; 7c18 (1:7c18)
     call DelayFrames
     PREDEF IndexToPokedex
     ld a,[$d11e]
-    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
     ld hl,wPokedexSeen
@@ -23619,7 +23618,6 @@ ItemUseBall: ; d687 (3:5687)
     jr z,.printText1
     PREDEF IndexToPokedex ; convert order: Internal->Dex
 ;    ld a,[$d11e]
-;    ; ds 1 ; dec a ; POKEDEXMOD
 ;    ld c,a
 ;    ld b,2
     ld hl,wPokedexOwned    ;Dex_own_flags (pokemon)
@@ -23627,7 +23625,6 @@ ItemUseBall: ; d687 (3:5687)
 ;    ld a,c
 ;    push af
     ld a,[$d11e]
-    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,1
     PREDEF HandleBitArray ; set Dex_own_flag?
@@ -27002,15 +26999,11 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     PREDEF IndexToPokedex
     pop de
     ld a,[$d11e]
-    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$2
     ld hl,wPokedexOwned ; $d2f7
     call _HandleBitArray
-    ds 1 ; ld a,c
-    ds 3 ; ld [$d153],a
     ld a,[$d11e]
-    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
     push bc
@@ -27177,8 +27170,6 @@ ResetEnemyHPStatusTypeAndPP:
     ld hl,W_ENEMYMON_START
     ret
 
-SECTION "_AddEnemyMonToPlayerParty",ROMX[$749d],BANK[$3]
-
 ; adds enemy mon [$cf91] (at position [$cf92] in enemy list) to own party
 ; no known uses in the game
 _AddEnemyMonToPlayerParty: ; f49d (3:749d)
@@ -27230,7 +27221,6 @@ _AddEnemyMonToPlayerParty: ; f49d (3:749d)
     ld [$d11e],a
     PREDEF IndexToPokedex
     ld a,[$d11e]
-    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
     ld hl,wPokedexOwned
@@ -27241,6 +27231,8 @@ _AddEnemyMonToPlayerParty: ; f49d (3:749d)
     call _HandleBitArray ; add to seen pokemon
     and a
     ret                  ; return success
+
+SECTION "Func_f51e",ROMX[$751e],BANK[$3]
 
 Func_f51e: ; f51e (3:751e)
     ld a,[$cf95]
@@ -31373,9 +31365,9 @@ GetEnemy:
     ld hl,wPokedexOwned
     call GetCurrentOldAdventureMap
     cp PALLET_TOWN
-    ld bc,(2 << 8) + DEX_PIKACHU ; TODO : - 1 ; 2 = read bit ; POKEDEXMOD
+    ld bc,(2 << 8) + DEX_PIKACHU ; 2 = read bit
     jr z,.WildChoice2
-    ld bc,(2 << 8) + DEX_EEVEE ; TODO : - 1 ; 2 = read bit ; POKEDEXMOD
+    ld bc,(2 << 8) + DEX_EEVEE ; 2 = read bit
 .WildChoice2
     PREDEF HandleBitArray
     ld a,c
@@ -51479,7 +51471,6 @@ TryEvolution: ; loop over evolution entries
     call z,Func_3af52
     PREDEF IndexToPokedex
     ld a,[$d11e]
-    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,$1
     ld hl,wPokedexOwned ; $d2f7
@@ -59673,7 +59664,6 @@ LoadEnemyMonData:
     call CheckShowPokedex
     ld [$d11e],a
     call IndexToPokedexAndRestoreD11E
-    ; ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld hl,wPokedexSeen
     ld b,1
@@ -62908,7 +62898,6 @@ HandlePokedexSideMenu: ; 4006d (10:406d)
     ld a,[wListScrollOffset]
     push af
     add b
-    ; ds 1 ; inc a ; POKEDEXMOD
     ld [$d11e],a
     ; ds 3 ; ld a,[$d11e]
     push af
@@ -63066,7 +63055,7 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     FuncCoord 1,2
     ld hl,Coord
     ld a,[wListScrollOffset]
-    dec a ; POKEDEXMOD
+    dec a
     ld [$d11e],a
     ld d,8
     ld a,[$cd3d]
@@ -63221,7 +63210,6 @@ PokedexMenuItemsText:
 ; hl = address of bit field
 IsPokemonBitSet:
     ld a,[$d11e]
-    ;ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,2
     PREDEF HandleBitArray
@@ -64593,7 +64581,7 @@ PokedexToIndex:
     push hl
     ld a,[$D11E]
     ld b,a
-    ld c,-1 ; ld c,0 ; POKEDEXMOD
+    ld c,-1
     ld hl,PokedexOrder
 
 .loop ; go through the list until we find an entry with a matching dex number
@@ -64613,7 +64601,6 @@ IndexToPokedex:
     push bc
     push hl
     ld a,[$D11E]
-    ds 1 ; dec a ; POKEDEXMOD
     ld hl,PokedexOrder
     ld b,0
     ld c,a
@@ -76157,7 +76144,7 @@ _GivePokemon: ; 4fda5 (13:7da5)
     ld a,[$cf91]
     ld [W_ENEMYMONID],a
     call GivePokemon_LoadEnemyMonData
-    call SetPokedexOwnedFlag
+    call .SetPokedexOwnedFlag
     ld hl,SendNewMonToBox
     ld b,BANK(SendNewMonToBox)
     call Bankswitch ; indirect jump to SendNewMonToBox (e7a4 (3:67a4))
@@ -76176,17 +76163,17 @@ _GivePokemon: ; 4fda5 (13:7da5)
 .asm_4fdee
     ld [hli],a
     ld [hl],$50
-    ld hl,UnnamedText_4fe3f ; $7e3f
+    ld hl,.UnnamedText_4fe3f
     call PrintText
     scf
     ret
 .asm_4fdf9
-    ld hl,UnnamedText_4fe44 ; $7e44
+    ld hl,.UnnamedText_4fe44
     call PrintText
     and a
     ret
 .asm_4fe01
-    call SetPokedexOwnedFlag
+    call .SetPokedexOwnedFlag
     call AddPokemonToParty
     ld a,$1
     ld [$cc3c],a
@@ -76194,15 +76181,12 @@ _GivePokemon: ; 4fda5 (13:7da5)
     scf
     ret
 
-SECTION "SetPokedexOwnedFlag",ROMX[$7e11],BANK[$13]
-
-SetPokedexOwnedFlag: ; 4fe11 (13:7e11)
+.SetPokedexOwnedFlag
     ld a,[$cf91]
     push af
     ld [$d11e],a
     PREDEF IndexToPokedex
     ld a,[$d11e]
-    ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld hl,wPokedexOwned ; $d2f7
     ld b,$1
@@ -76210,21 +76194,23 @@ SetPokedexOwnedFlag: ; 4fe11 (13:7e11)
     pop af
     ld [$d11e],a
     call GetMonName
-    ld hl,UnnamedText_4fe39 ; $7e39
+    ld hl,.UnnamedText_4fe39
     jp PrintText
 
-UnnamedText_4fe39: ; 4fe39 (13:7e39)
+.UnnamedText_4fe39
     TX_FAR _UnnamedText_4fe39
     db $0b
     db "@"
 
-UnnamedText_4fe3f: ; 4fe3f (13:7e3f)
+.UnnamedText_4fe3f
     TX_FAR _UnnamedText_4fe3f
     db "@"
 
-UnnamedText_4fe44: ; 4fe44 (13:7e44)
+.UnnamedText_4fe44
     TX_FAR _UnnamedText_4fe44
     db "@"
+
+SECTION "GetPredefPointer",ROMX[$7e49],BANK[$13]
 
 GetPredefPointer: ; 4fe49 (13:7e49)
 ; stores hl in $CC4F,$CC50
@@ -89395,7 +89381,7 @@ RedsHouse2FObject: ; 0x5c0d0 ?
     EVENT_DISP REDS_HOUSE_2F_WIDTH,1,7
 
 Func_5c0dc: ; 5c0dc (17:40dc)
-    ld a,%10010010 ; ld a,$4b ; POKEDEXMOD
+    ld a,%10010010
     ld [wPokedexOwned],a ; $d2f7
     PREDEF ShowPokedexData
     xor a
@@ -103751,7 +103737,6 @@ IndexToMiniSpriteOrder:
     PREDEF IndexToPokedex
     pop de
     ld a,[$d11e]
-    ;ds 1 ; dec a ; POKEDEXMOD
     ret
 
 PalPacketStatMenu: ; Denim
@@ -132737,7 +132722,6 @@ _DrawCatchGender: ; Denim
     PREDEF IndexToPokedex
     ld a,[$d11e]
     ld hl,wPokedexOwned
-    ;ds 1 ; dec a ; POKEDEXMOD
     ld c,a
     ld b,2
     PREDEF HandleBitArray ; IsPokemonBitSet_bankF
