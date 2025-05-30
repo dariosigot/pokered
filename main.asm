@@ -75754,6 +75754,7 @@ CritHitStatsPlayerPhysicalPredef:          NEW_PREDEF CritHitStatsPlayerPhysical
 CritHitStatsPlayerSpecialPredef:           NEW_PREDEF CritHitStatsPlayerSpecial           ; $69
 CritHitStatsEnemyPhysicalPredef:           NEW_PREDEF CritHitStatsEnemyPhysical           ; $6A
 CritHitStatsEnemySpecialPredef:            NEW_PREDEF CritHitStatsEnemySpecial            ; $6B
+CheckWildSubGroupPredef:                   NEW_PREDEF CheckWildSubGroup                   ; $6C
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -133491,16 +133492,16 @@ Route25Mons:
 
 Route5Mons:
     db $0F
-    db 13,MEOWTH     ; 20%
-    db 15,PIDGEY     ; 20%
-    db 13,PONYTA     ; 15%
-    db 11,PONYTA     ; 10% ; Entry Level
-    db 17,MEOWTH     ; 10%
-    db 17,PIDGEY     ; 10%
-    db 19,MEOWTH     ;  5%
-    db 19,PIDGEOTTO  ;  5%
-    db 16,PONYTA     ;  4%
-    db 20,TAUROS     ;  1% ; Entry Level
+    db W_SUB_GROUP,$FF ; 20% ; Rattata/Meowth (Level 13) ; .WildRoute5MouseCat0
+    db 15,PIDGEY       ; 20%
+    db 13,PONYTA       ; 15%
+    db 11,PONYTA       ; 10% ; Entry Level
+    db W_SUB_GROUP,$FF ; 10% ; Rattata/Meowth (Level 17) ; .WildRoute5MouseCat4
+    db 17,PIDGEY       ; 10%
+    db W_SUB_GROUP,$FF ;  5% ; Rattata/Meowth (Level 19) ; .WildRoute5MouseCat6
+    db 19,PIDGEOTTO    ;  5%
+    db 16,PONYTA       ;  4%
+    db 20,TAUROS       ;  1% ; Entry Level
     db $00
 
 Route6Mons:
@@ -133619,16 +133620,16 @@ Route9Mons:
 
 Route10Mons:
     db $0F
-    db 12,VOLTORB   ; 20% ; Entry Level
-    db 16,VOLTORB   ; 20%
-    db 13,VOLTORB   ; 15%
-    db 11,GRIMER    ; 10% ; Entry Level
-    db 18,VOLTORB   ; 10%
-    db 12,MAGNEMITE ; 10% ; Entry Level
-    db 13,KOFFING   ;  5% ; Entry Level
-    db 15,MAGNEMITE ;  5%
-    db 15,GRIMER    ;  4%
-    db 18,KOFFING   ;  1%
+    db 12,VOLTORB      ; 20% ; Entry Level
+    db 16,VOLTORB      ; 20%
+    db 13,VOLTORB      ; 15%
+    db 11,GRIMER       ; 10% ; Entry Level
+    db W_SUB_GROUP,$FF ; 10% ; Voltorb (Level 18)/Pikachu (Level 12) ; .WildRoute10PikachuVoltorb
+    db 12,MAGNEMITE    ; 10% ; Entry Level
+    db 13,KOFFING      ;  5% ; Entry Level
+    db 15,MAGNEMITE    ;  5%
+    db 15,GRIMER       ;  4%
+    db 18,KOFFING      ;  1%
     db $05
     db 11,MAGIKARP   ; 20%
     db 15,GRIMER     ; 20%
@@ -134937,6 +134938,8 @@ FindWildLocationsOfMon:
     jr c,.found
     call GetGoodRodData ; ld hl,GoodRodData
     call FindFishingLocationsOfMon ; fishing good rod
+    jr c,.found
+    PREDEF CheckWildSubGroup
 .found
     pop hl
     inc hl
@@ -136230,6 +136233,836 @@ DrawLineBox2:
     jr nz,.PrintHorizLine ; 0x12ad7 $fa
     ld [hl],$6f ; ← (halfarrow ending)
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+; Input
+; e = Encounter Slot
+WildSubGroup:
+    call GetCurrentOldAdventureMap
+    ld b,a
+    call GetWildSubGroupTable
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NotEncounter
+    cp b
+    jr nz,.next1
+    ld a,[hli]
+    cp e
+    jr nz,.next2
+.found
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    call GenRandom
+    ld c,a
+.loop2
+    ld a,[hli]
+    cp c
+    jr nc,.MonIdentified
+    inc hl
+    inc hl
+    jr .loop2
+.next1
+    inc hl
+.next2
+    inc hl
+    inc hl
+    jr .loop
+.MonIdentified
+    ld a,[hli]
+    ld [W_CURENEMYLVL],a
+    ld a,[hl]
+    ld [W_ENEMYMONID],a
+    ld hl,GetWildEnemyLevel
+    ld b,BANK(GetWildEnemyLevel)
+    call Bankswitch
+    scf ; WillEncounter
+    ret
+.NotEncounter
+    and a ; Reset Carry Flag ; NotEncounter
+    ret
+
+WildUnknownDungeon:
+    call GenRandom
+    ld e,a
+    dec d ; Exception ID (1 or 2)
+    ld hl,UnknownDungeonLandPkmnList
+    jr z,.Done
+    ld hl,UnknownDungeonWaterPkmnList
+    srl e
+.Done
+    ld d,0
+    add hl,de
+    ld a,[hl]
+    ld [W_ENEMYMONID],a
+    ld [$d11e],a
+    call IndexToPokedexAndRestoreD11E
+    ld hl,UnknownDungeonPkmnMinLevel
+    ld e,a
+    ld d,0
+    add hl,de
+    ld a,[hl]
+    ld d,a
+    call GenRandom
+    ld a,[H_RAND2]
+    and a,%00001111 ; 0-15
+    add d
+    ld [W_CURENEMYLVL],a
+    scf ; WillEncounter
+    ret
+
+WildDockMew:
+    ld hl,$d728 ; Strength
+    bit 0,[hl]
+    jr z,.NotEncounter
+    ld hl,wEventEncounterMewBit7
+    bit 7,[hl]
+    set 7,[hl]
+    jr nz,.NotEncounter
+.MewFirstEncounter
+    ld a,70
+    ld [W_CURENEMYLVL],a
+    ld a,MEW ; Entry Level
+    ld [W_ENEMYMONID],a
+    scf ; WillEncounter
+    ret
+.NotEncounter
+    and a ; Reset Carry Flag ; NotEncounter
+    ret
+
+WildPikachuEevee:
+    ld a,[W_NUMINPARTY]
+    and a
+    jr z,.NotEncounter
+    call GetCurrentOldAdventureMap
+    cp PALLET_TOWN
+    jr z,.CheckPikachuKO
+    cp PEWTER_CITY
+    jr z,.CheckEeveeKO
+    jr .NotEncounter
+.CheckPikachuKO
+    ld hl,wDisableEncounterBit1
+    bit 1,[hl]
+    jr nz,.NotEncounter
+    jr .PikachuEeveeContinue
+.CheckEeveeKO
+    ld hl,wDisableEncounterBit3
+    bit 3,[hl]
+    jr nz,.NotEncounter
+.PikachuEeveeContinue
+    call .OwnPikachuEevee
+    jr nz,.NotEncounter
+    call GetCurrentOldAdventureMap
+    cp PALLET_TOWN
+    jr z,.PikachuEncounter
+    cp PEWTER_CITY
+    jr z,.EeveeEncounter
+    jr .NotEncounter
+.PikachuEncounter
+    ld a,7
+    ld [W_PALLETTOWNCURSCRIPT],a
+    ld a,PIKACHU ; Entry Level
+    jr .WillEncounter
+.EeveeEncounter
+    ld a,7
+    ld [W_PEWTERCITYCURSCRIPT],a
+    ld a,EEVEE ; Entry Level
+    ; fall through
+.WillEncounter
+    ld [W_ENEMYMONID],a
+    ld a,1
+    ld [W_CURENEMYLVL],a
+    scf ; WillEncounter
+    ret
+.NotEncounter
+    and a ; Reset Carry Flag ; NotEncounter
+    ret
+.OwnPikachuEevee
+    push hl
+    push bc
+    ld hl,wPokedexOwned
+    call GetCurrentOldAdventureMap
+    cp PALLET_TOWN
+    ld bc,(2 << 8) + DEX_PIKACHU ; 2 = read bit
+    jr z,.WildChoice
+    ld bc,(2 << 8) + DEX_EEVEE ; 2 = read bit
+.WildChoice
+    PREDEF HandleBitArray
+    ld a,c
+    and a
+    pop bc
+    pop hl
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+WILDSUBGROUP: MACRO
+    db \1
+    db \2*2
+    dw \3
+    ENDM
+
+WildSubGroupTable:
+    WILDSUBGROUP VIRIDIAN_FOREST,6,.WildViridianForest6
+    WILDSUBGROUP VIRIDIAN_FOREST,9,.WildViridianForest9
+    WILDSUBGROUP SAFARI_ZONE_CENTER,8,.WildSafariScytherPinsir
+    WILDSUBGROUP SAFARI_ZONE_CENTER,9,.WildSafariScytherPinsir
+    WILDSUBGROUP ROUTE_5,0,.WildRoute5MouseCat0
+    WILDSUBGROUP ROUTE_5,4,.WildRoute5MouseCat4
+    WILDSUBGROUP ROUTE_5,6,.WildRoute5MouseCat6
+    WILDSUBGROUP ROUTE_10,4,.WildRoute10PikachuVoltorb
+    db $FF
+
+.WildViridianForest6
+    db $3F,06,WEEDLE   ; 25%
+    db $7F,06,CATERPIE ; 25%
+    db $BF,08,KAKUNA   ; 25%
+    db $FF,08,METAPOD  ; 25%
+
+.WildViridianForest9
+    db $3F,10,PINSIR     ; 25% ; Entry Level
+    db $7F,10,SCYTHER    ; 25% ; Entry Level
+    db $BF,10,BEEDRILL   ; 25% ; Entry Level
+    db $FF,10,BUTTERFREE ; 25% ; Entry Level
+
+.WildSafariScytherPinsir
+    db $7F,23,SCYTHER ; 50%
+    db $FF,23,PINSIR  ; 50%
+
+.WildRoute5MouseCat0
+    db $7F,13,RATTATA ; 50%
+    db $FF,13,MEOWTH  ; 50%
+
+.WildRoute5MouseCat4
+    db $7F,17,RATTATA ; 50%
+    db $FF,17,MEOWTH  ; 50%
+
+.WildRoute5MouseCat6
+    db $7F,19,RATTATA ; 50%
+    db $FF,19,MEOWTH  ; 50%
+
+.WildRoute10PikachuVoltorb
+    db $55,12,PIKACHU ; 33%
+    db $FF,18,VOLTORB ; 66%
+
+WildSubGroupTableNew:
+    db $FF
+
+GetWildSubGroupTable:
+    ld hl,WildSubGroupTable
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,WildSubGroupTableNew
+    ret
+
+; Input
+; c = Town ID
+; [d11e] = Mon ID
+; de = Pointer to Current Search Map Slot
+CheckWildSubGroup:
+    call Load16BitRegisters
+    call GetWildSubGroupTable
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFound
+    cp c
+    jr nz,.next1
+    inc hl
+    push hl
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+.loop2
+    ld a,[hli]
+    cp $FF
+    jr z,.LastRow
+    call .CompareMon
+    jr nz,.loop2
+    jr .Found
+.LastRow
+    call .CompareMon
+    jr nz,.NextEntry
+    jr .Found
+.NextEntry
+    pop hl
+    jr .next2
+.next1
+    inc hl
+.next2
+    inc hl
+    inc hl
+    jr .loop
+.NotFound
+    ret
+.CompareMon
+    inc hl
+    ld a,[$d11e]
+    cp [hl]
+    inc hl
+    ret
+.Found
+    pop hl
+    ld a,c
+    ld [de],a
+    inc de
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+UnknownDungeonLandPkmnList:
+    db BULBASAUR
+    db IVYSAUR
+    db VENUSAUR
+    db CHARMANDER
+    db CHARMELEON
+    db CHARIZARD
+    db SQUIRTLE
+    db WARTORTLE
+    db BLASTOISE
+    db CATERPIE
+    db CATERPIE
+    db CATERPIE
+    db CATERPIE
+    db METAPOD
+    db METAPOD
+    db BUTTERFREE
+    db WEEDLE
+    db WEEDLE
+    db WEEDLE
+    db WEEDLE
+    db KAKUNA
+    db KAKUNA
+    db BEEDRILL
+    db PIDGEY
+    db PIDGEY
+    db PIDGEY
+    db PIDGEY
+    db PIDGEY
+    db PIDGEY
+    db PIDGEOTTO
+    db PIDGEOTTO
+    db PIDGEOTTO
+    db PIDGEOTTO
+    db PIDGEOT
+    db RATTATA
+    db RATTATA
+    db RATTATA
+    db RATTATA
+    db RATTATA
+    db RATTATA
+    db RATTATA
+    db RATTATA
+    db RATICATE
+    db RATICATE
+    db RATICATE
+    db RATICATE
+    db SPEAROW
+    db SPEAROW
+    db SPEAROW
+    db SPEAROW
+    db FEAROW
+    db FEAROW
+    db EKANS
+    db EKANS
+    db EKANS
+    db EKANS
+    db ARBOK
+    db ARBOK
+    db PIKACHU
+    db PIKACHU
+    db RAICHU
+    db SANDSHREW
+    db SANDSHREW
+    db SANDSHREW
+    db SANDSHREW
+    db SANDSLASH
+    db NIDORAN_F
+    db NIDORAN_F
+    db NIDORAN_F
+    db NIDORAN_F
+    db NIDORINA
+    db NIDORINA
+    db NIDOQUEEN
+    db NIDORAN_M
+    db NIDORAN_M
+    db NIDORAN_M
+    db NIDORAN_M
+    db NIDORINO
+    db NIDORINO
+    db NIDOKING
+    db CLEFAIRY
+    db CLEFABLE ; Entry Level
+    db VULPIX
+    db VULPIX
+    db NINETALES
+    db JIGGLYPUFF
+    db JIGGLYPUFF
+    db WIGGLYTUFF ; Entry Level
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db ZUBAT
+    db GOLBAT
+    db GOLBAT
+    db GOLBAT
+    db GOLBAT
+    db GOLBAT
+    db GOLBAT
+    db GOLBAT
+    db GOLBAT
+    db ODDISH
+    db ODDISH
+    db GLOOM
+    db VILEPLUME
+    db PARAS
+    db PARAS
+    db PARASECT
+    db VENONAT
+    db VENONAT
+    db VENOMOTH
+    db DIGLETT
+    db DIGLETT
+    db DIGLETT
+    db DUGTRIO
+    db MEOWTH
+    db MEOWTH
+    db PERSIAN
+    db PSYDUCK
+    db PSYDUCK
+    db GOLDUCK
+    db MANKEY
+    db MANKEY
+    db MANKEY
+    db MANKEY
+    db PRIMEAPE
+    db GROWLITHE
+    db GROWLITHE
+    db ARCANINE
+    db POLIWAG
+    db POLIWAG
+    db POLIWAG
+    db POLIWHIRL
+    db POLIWHIRL
+    db POLIWRATH
+    db ABRA
+    db ABRA
+    db ABRA
+    db KADABRA
+    db MACHOP
+    db MACHOP
+    db MACHOP
+    db MACHOP
+    db MACHOKE
+    db MACHOKE
+    db BELLSPROUT
+    db BELLSPROUT
+    db WEEPINBELL
+    db VICTREEBEL
+    db GEODUDE
+    db GEODUDE
+    db GEODUDE
+    db GEODUDE
+    db GEODUDE
+    db GEODUDE
+    db GEODUDE
+    db GEODUDE
+    db GEODUDE
+    db GEODUDE
+    db GEODUDE
+    db GEODUDE
+    db GRAVELER
+    db GRAVELER
+    db GRAVELER
+    db GRAVELER
+    db PONYTA
+    db PONYTA
+    db RAPIDASH
+    db SLOWPOKE
+    db SLOWPOKE
+    db SLOWBRO
+    db MAGNEMITE
+    db MAGNEMITE
+    db MAGNETON
+    db FARFETCH_D
+    db FARFETCH_D
+    db DODUO
+    db DODUO
+    db DODRIO
+    db SEEL
+    db SEEL
+    db DEWGONG
+    db GRIMER
+    db GRIMER
+    db GRIMER
+    db MUK
+    db GASTLY
+    db GASTLY
+    db GASTLY
+    db GASTLY
+    db HAUNTER
+    db HAUNTER
+    db ONIX
+    db ONIX
+    db ONIX
+    db ONIX
+    db ONIX
+    db ONIX
+    db DROWZEE
+    db DROWZEE
+    db HYPNO
+    db KRABBY
+    db KRABBY
+    db KINGLER
+    db VOLTORB
+    db VOLTORB
+    db VOLTORB
+    db VOLTORB
+    db VOLTORB
+    db VOLTORB
+    db VOLTORB
+    db VOLTORB
+    db VOLTORB
+    db VOLTORB
+    db VOLTORB
+    db VOLTORB
+    db ELECTRODE
+    db ELECTRODE
+    db EXEGGCUTE
+    db EXEGGCUTE
+    db EXEGGUTOR
+    db CUBONE
+    db CUBONE
+    db MAROWAK
+    db LICKITUNG
+    db KOFFING
+    db KOFFING
+    db WEEZING
+    db RHYHORN
+    db RHYHORN
+    db RHYDON ; Entry Level
+    db TANGELA
+    db TANGELA
+    db MR_MIME
+    db SCYTHER
+    db PINSIR
+    db DITTO
+    db DITTO
+    db DITTO
+    db DITTO
+    db DITTO
+    db DITTO
+    db DITTO
+    db DITTO
+    db SNORLAX
+
+UnknownDungeonWaterPkmnList:
+    db SQUIRTLE
+    db WARTORTLE
+    db BLASTOISE
+    db PSYDUCK
+    db PSYDUCK
+    db PSYDUCK
+    db PSYDUCK
+    db PSYDUCK
+    db GOLDUCK
+    db POLIWAG
+    db POLIWAG
+    db POLIWAG
+    db POLIWAG
+    db POLIWAG
+    db POLIWAG
+    db POLIWAG
+    db POLIWAG
+    db POLIWHIRL
+    db POLIWHIRL
+    db POLIWHIRL
+    db POLIWHIRL
+    db POLIWRATH
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACOOL
+    db TENTACRUEL
+    db TENTACRUEL
+    db TENTACRUEL
+    db TENTACRUEL
+    db SLOWPOKE
+    db SLOWPOKE
+    db SLOWBRO
+    db FARFETCH_D
+    db FARFETCH_D
+    db FARFETCH_D
+    db FARFETCH_D
+    db SEEL
+    db SEEL
+    db SEEL
+    db SEEL
+    db DEWGONG
+    db GRIMER
+    db GRIMER
+    db GRIMER
+    db GRIMER
+    db GRIMER
+    db GRIMER
+    db GRIMER
+    db GRIMER
+    db MUK
+    db MUK
+    db SHELLDER
+    db SHELLDER
+    db SHELLDER
+    db CLOYSTER
+    db KRABBY
+    db KRABBY
+    db KRABBY
+    db KRABBY
+    db KRABBY
+    db KRABBY
+    db KRABBY
+    db KRABBY
+    db KINGLER
+    db KINGLER
+    db HORSEA
+    db HORSEA
+    db HORSEA
+    db HORSEA
+    db HORSEA
+    db HORSEA
+    db SEADRA
+    db SEADRA
+    db GOLDEEN
+    db GOLDEEN
+    db GOLDEEN
+    db GOLDEEN
+    db GOLDEEN
+    db GOLDEEN
+    db GOLDEEN
+    db GOLDEEN
+    db SEAKING
+    db SEAKING
+    db SEAKING
+    db SEAKING
+    db STARYU
+    db STARYU
+    db STARYU
+    db STARYU
+    db STARMIE
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db MAGIKARP
+    db GYARADOS
+    db GYARADOS
+    db GYARADOS
+    db GYARADOS
+    db GYARADOS
+    db LAPRAS
+    db DRATINI
+    db DRATINI
+    db DRATINI
+    db DRAGONAIR
+
+UnknownDungeonPkmnMinLevel:
+    db 30 ; MISSINGNO
+    db 22 ; BULBASAUR
+    db 33 ; IVYSAUR
+    db 44 ; VENUSAUR
+    db 22 ; CHARMANDER
+    db 33 ; CHARMELEON
+    db 44 ; CHARIZARD
+    db 22 ; SQUIRTLE
+    db 33 ; WARTORTLE
+    db 44 ; BLASTOISE
+    db 22 ; CATERPIE
+    db 33 ; METAPOD
+    db 44 ; BUTTERFREE
+    db 22 ; WEEDLE
+    db 33 ; KAKUNA
+    db 44 ; BEEDRILL
+    db 22 ; PIDGEY
+    db 33 ; PIDGEOTTO
+    db 44 ; PIDGEOT
+    db 27 ; RATTATA
+    db 44 ; RATICATE
+    db 27 ; SPEAROW
+    db 44 ; FEAROW
+    db 27 ; EKANS
+    db 44 ; ARBOK
+    db 27 ; PIKACHU
+    db 44 ; RAICHU
+    db 27 ; SANDSHREW
+    db 44 ; SANDSLASH
+    db 22 ; NIDORAN_F
+    db 33 ; NIDORINA
+    db 44 ; NIDOQUEEN
+    db 22 ; NIDORAN_M
+    db 33 ; NIDORINO
+    db 44 ; NIDOKING
+    db 27 ; CLEFAIRY
+    db 44 ; CLEFABLE
+    db 27 ; VULPIX
+    db 44 ; NINETALES
+    db 27 ; JIGGLYPUFF
+    db 44 ; WIGGLYTUFF
+    db 27 ; ZUBAT
+    db 44 ; GOLBAT
+    db 22 ; ODDISH
+    db 33 ; GLOOM
+    db 44 ; VILEPLUME
+    db 27 ; PARAS
+    db 44 ; PARASECT
+    db 27 ; VENONAT
+    db 44 ; VENOMOTH
+    db 27 ; DIGLETT
+    db 44 ; DUGTRIO
+    db 27 ; MEOWTH
+    db 44 ; PERSIAN
+    db 27 ; PSYDUCK
+    db 44 ; GOLDUCK
+    db 27 ; MANKEY
+    db 44 ; PRIMEAPE
+    db 27 ; GROWLITHE
+    db 44 ; ARCANINE
+    db 22 ; POLIWAG
+    db 33 ; POLIWHIRL
+    db 44 ; POLIWRATH
+    db 22 ; ABRA
+    db 33 ; KADABRA
+    db 44 ; ALAKAZAM
+    db 22 ; MACHOP
+    db 33 ; MACHOKE
+    db 44 ; MACHAMP
+    db 22 ; BELLSPROUT
+    db 33 ; WEEPINBELL
+    db 44 ; VICTREEBEL
+    db 27 ; TENTACOOL
+    db 44 ; TENTACRUEL
+    db 22 ; GEODUDE
+    db 33 ; GRAVELER
+    db 44 ; GOLEM
+    db 27 ; PONYTA
+    db 44 ; RAPIDASH
+    db 27 ; SLOWPOKE
+    db 44 ; SLOWBRO
+    db 27 ; MAGNEMITE
+    db 44 ; MAGNETON
+    db 44 ; FARFETCH_D
+    db 27 ; DODUO
+    db 44 ; DODRIO
+    db 27 ; SEEL
+    db 44 ; DEWGONG
+    db 27 ; GRIMER
+    db 44 ; MUK
+    db 27 ; SHELLDER
+    db 44 ; CLOYSTER
+    db 22 ; GASTLY
+    db 33 ; HAUNTER
+    db 44 ; GENGAR
+    db 44 ; ONIX
+    db 27 ; DROWZEE
+    db 44 ; HYPNO
+    db 27 ; KRABBY
+    db 44 ; KINGLER
+    db 27 ; VOLTORB
+    db 44 ; ELECTRODE
+    db 27 ; EXEGGCUTE
+    db 44 ; EXEGGUTOR
+    db 27 ; CUBONE
+    db 44 ; MAROWAK
+    db 44 ; HITMONLEE
+    db 44 ; HITMONCHAN
+    db 44 ; LICKITUNG
+    db 27 ; KOFFING
+    db 44 ; WEEZING
+    db 27 ; RHYHORN
+    db 44 ; RHYDON
+    db 44 ; CHANSEY
+    db 44 ; TANGELA
+    db 44 ; KANGASKHAN
+    db 27 ; HORSEA
+    db 44 ; SEADRA
+    db 27 ; GOLDEEN
+    db 44 ; SEAKING
+    db 27 ; STARYU
+    db 44 ; STARMIE
+    db 44 ; MR_MIME
+    db 44 ; SCYTHER
+    db 44 ; JYNX
+    db 44 ; ELECTABUZZ
+    db 44 ; MAGMAR
+    db 44 ; PINSIR
+    db 44 ; TAUROS
+    db 27 ; MAGIKARP
+    db 44 ; GYARADOS
+    db 44 ; LAPRAS
+    db 44 ; DITTO
+    db 27 ; EEVEE
+    db 44 ; VAPOREON
+    db 44 ; JOLTEON
+    db 44 ; FLAREON
+    db 44 ; PORYGON
+    db 27 ; OMANYTE
+    db 44 ; OMASTAR
+    db 27 ; KABUTO
+    db 44 ; KABUTOPS
+    db 44 ; AERODACTYL
+    db 44 ; SNORLAX
+    db 44 ; ARTICUNO
+    db 44 ; ZAPDOS
+    db 44 ; MOLTRES
+    db 27 ; DRATINI
+    db 44 ; DRAGONAIR
+    db 55 ; DRAGONITE
+    db 44 ; MEWTWO
+    db 44 ; MEW
+    db 22 ; LITWICK
+    db 33 ; LAMPENT
+    db 44 ; CHANDELURE
+    db 30 ; MON_155
+    db 30 ; MON_156
+    db 30 ; MON_157
+    db 30 ; MON_158
+    db 30 ; MON_159
+
+; ──────────────────────────────────────────────────────────────────────
 
 SECTION "Bank38",ROMX,BANK[$38]
 
@@ -139890,747 +140723,6 @@ HandlePlayerBlackOut_:
 .LinkBattleLostText
     TX_FAR _LinkBattleLostText
     db "@"
-
-; ──────────────────────────────────────────────────────────────────────
-
-; Input
-; e = Encounter Slot
-WildSubGroup:
-    call GetCurrentOldAdventureMap
-    ld b,a
-    ld hl,WildSubGroupTable
-.loop
-    ld a,[hli]
-    cp $FF
-    jr z,.NotEncounter
-    cp b
-    jr nz,.next1
-    ld a,[hli]
-    cp e
-    jr nz,.next2
-.found
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    call GenRandom
-    ld c,a
-.loop2
-    ld a,[hli]
-    cp c
-    jr nc,.MonIdentified
-    inc hl
-    inc hl
-    jr .loop2
-.next1
-    inc hl
-.next2
-    inc hl
-    inc hl
-    jr .loop
-.MonIdentified
-    ld a,[hli]
-    ld [W_CURENEMYLVL],a
-    ld a,[hl]
-    ld [W_ENEMYMONID],a
-    ld hl,GetWildEnemyLevel
-    ld b,BANK(GetWildEnemyLevel)
-    call Bankswitch
-    scf ; WillEncounter
-    ret
-.NotEncounter
-    and a ; Reset Carry Flag ; NotEncounter
-    ret
-
-WildUnknownDungeon:
-    call GenRandom
-    ld e,a
-    dec d ; Exception ID (1 or 2)
-    ld hl,UnknownDungeonLandPkmnList
-    jr z,.Done
-    ld hl,UnknownDungeonWaterPkmnList
-    srl e
-.Done
-    ld d,0
-    add hl,de
-    ld a,[hl]
-    ld [W_ENEMYMONID],a
-    ld [$d11e],a
-    call IndexToPokedexAndRestoreD11E
-    ld hl,UnknownDungeonPkmnMinLevel
-    ld e,a
-    ld d,0
-    add hl,de
-    ld a,[hl]
-    ld d,a
-    call GenRandom
-    ld a,[H_RAND2]
-    and a,%00001111 ; 0-15
-    add d
-    ld [W_CURENEMYLVL],a
-    scf ; WillEncounter
-    ret
-
-WildDockMew:
-    ld hl,$d728 ; Strength
-    bit 0,[hl]
-    jr z,.NotEncounter
-    ld hl,wEventEncounterMewBit7
-    bit 7,[hl]
-    set 7,[hl]
-    jr nz,.NotEncounter
-.MewFirstEncounter
-    ld a,70
-    ld [W_CURENEMYLVL],a
-    ld a,MEW ; Entry Level
-    ld [W_ENEMYMONID],a
-    scf ; WillEncounter
-    ret
-.NotEncounter
-    and a ; Reset Carry Flag ; NotEncounter
-    ret
-
-WildPikachuEevee:
-    ld a,[W_NUMINPARTY]
-    and a
-    jr z,.NotEncounter
-    call GetCurrentOldAdventureMap
-    cp PALLET_TOWN
-    jr z,.CheckPikachuKO
-    cp PEWTER_CITY
-    jr z,.CheckEeveeKO
-    jr .NotEncounter
-.CheckPikachuKO
-    ld hl,wDisableEncounterBit1
-    bit 1,[hl]
-    jr nz,.NotEncounter
-    jr .PikachuEeveeContinue
-.CheckEeveeKO
-    ld hl,wDisableEncounterBit3
-    bit 3,[hl]
-    jr nz,.NotEncounter
-.PikachuEeveeContinue
-    call .OwnPikachuEevee
-    jr nz,.NotEncounter
-    call GetCurrentOldAdventureMap
-    cp PALLET_TOWN
-    jr z,.PikachuEncounter
-    cp PEWTER_CITY
-    jr z,.EeveeEncounter
-    jr .NotEncounter
-.PikachuEncounter
-    ld a,7
-    ld [W_PALLETTOWNCURSCRIPT],a
-    ld a,PIKACHU ; Entry Level
-    jr .WillEncounter
-.EeveeEncounter
-    ld a,7
-    ld [W_PEWTERCITYCURSCRIPT],a
-    ld a,EEVEE ; Entry Level
-    ; fall through
-.WillEncounter
-    ld [W_ENEMYMONID],a
-    ld a,1
-    ld [W_CURENEMYLVL],a
-    scf ; WillEncounter
-    ret
-.NotEncounter
-    and a ; Reset Carry Flag ; NotEncounter
-    ret
-.OwnPikachuEevee
-    push hl
-    push bc
-    ld hl,wPokedexOwned
-    call GetCurrentOldAdventureMap
-    cp PALLET_TOWN
-    ld bc,(2 << 8) + DEX_PIKACHU ; 2 = read bit
-    jr z,.WildChoice
-    ld bc,(2 << 8) + DEX_EEVEE ; 2 = read bit
-.WildChoice
-    PREDEF HandleBitArray
-    ld a,c
-    and a
-    pop bc
-    pop hl
-    ret
-
-WILDSUBGROUP: MACRO
-    db \1
-    db \2*2
-    dw \3
-    ENDM
-
-WildSubGroupTable:
-    WILDSUBGROUP VIRIDIAN_FOREST,6,.WildViridianForest6
-    WILDSUBGROUP VIRIDIAN_FOREST,9,.WildViridianForest9
-    WILDSUBGROUP SAFARI_ZONE_CENTER,8,.WildSafariScytherPinsir
-    WILDSUBGROUP SAFARI_ZONE_CENTER,9,.WildSafariScytherPinsir
-    db $FF
-
-.WildViridianForest6
-    db $3F,06,WEEDLE
-    db $7F,06,CATERPIE
-    db $BF,08,KAKUNA
-    db $FF,08,METAPOD
-
-.WildViridianForest9
-    db $3F,10,PINSIR     ; Entry Level
-    db $7F,10,SCYTHER    ; Entry Level
-    db $BF,10,BEEDRILL   ; Entry Level
-    db $FF,10,BUTTERFREE ; Entry Level
-
-.WildSafariScytherPinsir
-    db $7F,23,SCYTHER
-    db $FF,23,PINSIR
-
-UnknownDungeonLandPkmnList:
-    db BULBASAUR
-    db IVYSAUR
-    db VENUSAUR
-    db CHARMANDER
-    db CHARMELEON
-    db CHARIZARD
-    db SQUIRTLE
-    db WARTORTLE
-    db BLASTOISE
-    db CATERPIE
-    db CATERPIE
-    db CATERPIE
-    db CATERPIE
-    db METAPOD
-    db METAPOD
-    db BUTTERFREE
-    db WEEDLE
-    db WEEDLE
-    db WEEDLE
-    db WEEDLE
-    db KAKUNA
-    db KAKUNA
-    db BEEDRILL
-    db PIDGEY
-    db PIDGEY
-    db PIDGEY
-    db PIDGEY
-    db PIDGEY
-    db PIDGEY
-    db PIDGEOTTO
-    db PIDGEOTTO
-    db PIDGEOTTO
-    db PIDGEOTTO
-    db PIDGEOT
-    db RATTATA
-    db RATTATA
-    db RATTATA
-    db RATTATA
-    db RATTATA
-    db RATTATA
-    db RATTATA
-    db RATTATA
-    db RATICATE
-    db RATICATE
-    db RATICATE
-    db RATICATE
-    db SPEAROW
-    db SPEAROW
-    db SPEAROW
-    db SPEAROW
-    db FEAROW
-    db FEAROW
-    db EKANS
-    db EKANS
-    db EKANS
-    db EKANS
-    db ARBOK
-    db ARBOK
-    db PIKACHU
-    db PIKACHU
-    db RAICHU
-    db SANDSHREW
-    db SANDSHREW
-    db SANDSHREW
-    db SANDSHREW
-    db SANDSLASH
-    db NIDORAN_F
-    db NIDORAN_F
-    db NIDORAN_F
-    db NIDORAN_F
-    db NIDORINA
-    db NIDORINA
-    db NIDOQUEEN
-    db NIDORAN_M
-    db NIDORAN_M
-    db NIDORAN_M
-    db NIDORAN_M
-    db NIDORINO
-    db NIDORINO
-    db NIDOKING
-    db CLEFAIRY
-    db CLEFABLE ; Entry Level
-    db VULPIX
-    db VULPIX
-    db NINETALES
-    db JIGGLYPUFF
-    db JIGGLYPUFF
-    db WIGGLYTUFF ; Entry Level
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db ZUBAT
-    db GOLBAT
-    db GOLBAT
-    db GOLBAT
-    db GOLBAT
-    db GOLBAT
-    db GOLBAT
-    db GOLBAT
-    db GOLBAT
-    db ODDISH
-    db ODDISH
-    db GLOOM
-    db VILEPLUME
-    db PARAS
-    db PARAS
-    db PARASECT
-    db VENONAT
-    db VENONAT
-    db VENOMOTH
-    db DIGLETT
-    db DIGLETT
-    db DIGLETT
-    db DUGTRIO
-    db MEOWTH
-    db MEOWTH
-    db PERSIAN
-    db PSYDUCK
-    db PSYDUCK
-    db GOLDUCK
-    db MANKEY
-    db MANKEY
-    db MANKEY
-    db MANKEY
-    db PRIMEAPE
-    db GROWLITHE
-    db GROWLITHE
-    db ARCANINE
-    db POLIWAG
-    db POLIWAG
-    db POLIWAG
-    db POLIWHIRL
-    db POLIWHIRL
-    db POLIWRATH
-    db ABRA
-    db ABRA
-    db ABRA
-    db KADABRA
-    db MACHOP
-    db MACHOP
-    db MACHOP
-    db MACHOP
-    db MACHOKE
-    db MACHOKE
-    db BELLSPROUT
-    db BELLSPROUT
-    db WEEPINBELL
-    db VICTREEBEL
-    db GEODUDE
-    db GEODUDE
-    db GEODUDE
-    db GEODUDE
-    db GEODUDE
-    db GEODUDE
-    db GEODUDE
-    db GEODUDE
-    db GEODUDE
-    db GEODUDE
-    db GEODUDE
-    db GEODUDE
-    db GRAVELER
-    db GRAVELER
-    db GRAVELER
-    db GRAVELER
-    db PONYTA
-    db PONYTA
-    db RAPIDASH
-    db SLOWPOKE
-    db SLOWPOKE
-    db SLOWBRO
-    db MAGNEMITE
-    db MAGNEMITE
-    db MAGNETON
-    db FARFETCH_D
-    db FARFETCH_D
-    db DODUO
-    db DODUO
-    db DODRIO
-    db SEEL
-    db SEEL
-    db DEWGONG
-    db GRIMER
-    db GRIMER
-    db GRIMER
-    db MUK
-    db GASTLY
-    db GASTLY
-    db GASTLY
-    db GASTLY
-    db HAUNTER
-    db HAUNTER
-    db ONIX
-    db ONIX
-    db ONIX
-    db ONIX
-    db ONIX
-    db ONIX
-    db DROWZEE
-    db DROWZEE
-    db HYPNO
-    db KRABBY
-    db KRABBY
-    db KINGLER
-    db VOLTORB
-    db VOLTORB
-    db VOLTORB
-    db VOLTORB
-    db VOLTORB
-    db VOLTORB
-    db VOLTORB
-    db VOLTORB
-    db VOLTORB
-    db VOLTORB
-    db VOLTORB
-    db VOLTORB
-    db ELECTRODE
-    db ELECTRODE
-    db EXEGGCUTE
-    db EXEGGCUTE
-    db EXEGGUTOR
-    db CUBONE
-    db CUBONE
-    db MAROWAK
-    db LICKITUNG
-    db KOFFING
-    db KOFFING
-    db WEEZING
-    db RHYHORN
-    db RHYHORN
-    db RHYDON ; Entry Level
-    db TANGELA
-    db TANGELA
-    db MR_MIME
-    db SCYTHER
-    db PINSIR
-    db DITTO
-    db DITTO
-    db DITTO
-    db DITTO
-    db DITTO
-    db DITTO
-    db DITTO
-    db DITTO
-    db SNORLAX
-
-UnknownDungeonWaterPkmnList:
-    db SQUIRTLE
-    db WARTORTLE
-    db BLASTOISE
-    db PSYDUCK
-    db PSYDUCK
-    db PSYDUCK
-    db PSYDUCK
-    db PSYDUCK
-    db GOLDUCK
-    db POLIWAG
-    db POLIWAG
-    db POLIWAG
-    db POLIWAG
-    db POLIWAG
-    db POLIWAG
-    db POLIWAG
-    db POLIWAG
-    db POLIWHIRL
-    db POLIWHIRL
-    db POLIWHIRL
-    db POLIWHIRL
-    db POLIWRATH
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACOOL
-    db TENTACRUEL
-    db TENTACRUEL
-    db TENTACRUEL
-    db TENTACRUEL
-    db SLOWPOKE
-    db SLOWPOKE
-    db SLOWBRO
-    db FARFETCH_D
-    db FARFETCH_D
-    db FARFETCH_D
-    db FARFETCH_D
-    db SEEL
-    db SEEL
-    db SEEL
-    db SEEL
-    db DEWGONG
-    db GRIMER
-    db GRIMER
-    db GRIMER
-    db GRIMER
-    db GRIMER
-    db GRIMER
-    db GRIMER
-    db GRIMER
-    db MUK
-    db MUK
-    db SHELLDER
-    db SHELLDER
-    db SHELLDER
-    db CLOYSTER
-    db KRABBY
-    db KRABBY
-    db KRABBY
-    db KRABBY
-    db KRABBY
-    db KRABBY
-    db KRABBY
-    db KRABBY
-    db KINGLER
-    db KINGLER
-    db HORSEA
-    db HORSEA
-    db HORSEA
-    db HORSEA
-    db HORSEA
-    db HORSEA
-    db SEADRA
-    db SEADRA
-    db GOLDEEN
-    db GOLDEEN
-    db GOLDEEN
-    db GOLDEEN
-    db GOLDEEN
-    db GOLDEEN
-    db GOLDEEN
-    db GOLDEEN
-    db SEAKING
-    db SEAKING
-    db SEAKING
-    db SEAKING
-    db STARYU
-    db STARYU
-    db STARYU
-    db STARYU
-    db STARMIE
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db MAGIKARP
-    db GYARADOS
-    db GYARADOS
-    db GYARADOS
-    db GYARADOS
-    db GYARADOS
-    db LAPRAS
-    db DRATINI
-    db DRATINI
-    db DRATINI
-    db DRAGONAIR
-
-UnknownDungeonPkmnMinLevel:
-    db 30 ; MISSINGNO
-    db 22 ; BULBASAUR
-    db 33 ; IVYSAUR
-    db 44 ; VENUSAUR
-    db 22 ; CHARMANDER
-    db 33 ; CHARMELEON
-    db 44 ; CHARIZARD
-    db 22 ; SQUIRTLE
-    db 33 ; WARTORTLE
-    db 44 ; BLASTOISE
-    db 22 ; CATERPIE
-    db 33 ; METAPOD
-    db 44 ; BUTTERFREE
-    db 22 ; WEEDLE
-    db 33 ; KAKUNA
-    db 44 ; BEEDRILL
-    db 22 ; PIDGEY
-    db 33 ; PIDGEOTTO
-    db 44 ; PIDGEOT
-    db 27 ; RATTATA
-    db 44 ; RATICATE
-    db 27 ; SPEAROW
-    db 44 ; FEAROW
-    db 27 ; EKANS
-    db 44 ; ARBOK
-    db 27 ; PIKACHU
-    db 44 ; RAICHU
-    db 27 ; SANDSHREW
-    db 44 ; SANDSLASH
-    db 22 ; NIDORAN_F
-    db 33 ; NIDORINA
-    db 44 ; NIDOQUEEN
-    db 22 ; NIDORAN_M
-    db 33 ; NIDORINO
-    db 44 ; NIDOKING
-    db 27 ; CLEFAIRY
-    db 44 ; CLEFABLE
-    db 27 ; VULPIX
-    db 44 ; NINETALES
-    db 27 ; JIGGLYPUFF
-    db 44 ; WIGGLYTUFF
-    db 27 ; ZUBAT
-    db 44 ; GOLBAT
-    db 22 ; ODDISH
-    db 33 ; GLOOM
-    db 44 ; VILEPLUME
-    db 27 ; PARAS
-    db 44 ; PARASECT
-    db 27 ; VENONAT
-    db 44 ; VENOMOTH
-    db 27 ; DIGLETT
-    db 44 ; DUGTRIO
-    db 27 ; MEOWTH
-    db 44 ; PERSIAN
-    db 27 ; PSYDUCK
-    db 44 ; GOLDUCK
-    db 27 ; MANKEY
-    db 44 ; PRIMEAPE
-    db 27 ; GROWLITHE
-    db 44 ; ARCANINE
-    db 22 ; POLIWAG
-    db 33 ; POLIWHIRL
-    db 44 ; POLIWRATH
-    db 22 ; ABRA
-    db 33 ; KADABRA
-    db 44 ; ALAKAZAM
-    db 22 ; MACHOP
-    db 33 ; MACHOKE
-    db 44 ; MACHAMP
-    db 22 ; BELLSPROUT
-    db 33 ; WEEPINBELL
-    db 44 ; VICTREEBEL
-    db 27 ; TENTACOOL
-    db 44 ; TENTACRUEL
-    db 22 ; GEODUDE
-    db 33 ; GRAVELER
-    db 44 ; GOLEM
-    db 27 ; PONYTA
-    db 44 ; RAPIDASH
-    db 27 ; SLOWPOKE
-    db 44 ; SLOWBRO
-    db 27 ; MAGNEMITE
-    db 44 ; MAGNETON
-    db 44 ; FARFETCH_D
-    db 27 ; DODUO
-    db 44 ; DODRIO
-    db 27 ; SEEL
-    db 44 ; DEWGONG
-    db 27 ; GRIMER
-    db 44 ; MUK
-    db 27 ; SHELLDER
-    db 44 ; CLOYSTER
-    db 22 ; GASTLY
-    db 33 ; HAUNTER
-    db 44 ; GENGAR
-    db 44 ; ONIX
-    db 27 ; DROWZEE
-    db 44 ; HYPNO
-    db 27 ; KRABBY
-    db 44 ; KINGLER
-    db 27 ; VOLTORB
-    db 44 ; ELECTRODE
-    db 27 ; EXEGGCUTE
-    db 44 ; EXEGGUTOR
-    db 27 ; CUBONE
-    db 44 ; MAROWAK
-    db 44 ; HITMONLEE
-    db 44 ; HITMONCHAN
-    db 44 ; LICKITUNG
-    db 27 ; KOFFING
-    db 44 ; WEEZING
-    db 27 ; RHYHORN
-    db 44 ; RHYDON
-    db 44 ; CHANSEY
-    db 44 ; TANGELA
-    db 44 ; KANGASKHAN
-    db 27 ; HORSEA
-    db 44 ; SEADRA
-    db 27 ; GOLDEEN
-    db 44 ; SEAKING
-    db 27 ; STARYU
-    db 44 ; STARMIE
-    db 44 ; MR_MIME
-    db 44 ; SCYTHER
-    db 44 ; JYNX
-    db 44 ; ELECTABUZZ
-    db 44 ; MAGMAR
-    db 44 ; PINSIR
-    db 44 ; TAUROS
-    db 27 ; MAGIKARP
-    db 44 ; GYARADOS
-    db 44 ; LAPRAS
-    db 44 ; DITTO
-    db 27 ; EEVEE
-    db 44 ; VAPOREON
-    db 44 ; JOLTEON
-    db 44 ; FLAREON
-    db 44 ; PORYGON
-    db 27 ; OMANYTE
-    db 44 ; OMASTAR
-    db 27 ; KABUTO
-    db 44 ; KABUTOPS
-    db 44 ; AERODACTYL
-    db 44 ; SNORLAX
-    db 44 ; ARTICUNO
-    db 44 ; ZAPDOS
-    db 44 ; MOLTRES
-    db 27 ; DRATINI
-    db 44 ; DRAGONAIR
-    db 55 ; DRAGONITE
-    db 44 ; MEWTWO
-    db 44 ; MEW
-    db 22 ; LITWICK
-    db 33 ; LAMPENT
-    db 44 ; CHANDELURE
-    db 30 ; MON_155
-    db 30 ; MON_156
-    db 30 ; MON_157
-    db 30 ; MON_158
-    db 30 ; MON_159
 
 ; ──────────────────────────────────────────────────────────────────────
 
