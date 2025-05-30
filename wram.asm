@@ -875,8 +875,24 @@ W_PRIZE2: ; d13e
     ds 1
 W_PRIZE3: ; d13f
     ds 1
+W_PRIZE4: ; d140
+    ds 1
+W_PRIZE_END: ; d141
+    ds 1
 
-    ds 24 - 3
+W_PRICE1: ; d142
+    ds 2
+W_PRICE2: ; d144
+    ds 2
+W_PRICE3: ; d146
+    ds 2
+W_PRICE4: ; d148
+    ds 2
+
+SECTION "wPewterEeveeIV",WRAMX[$d153],BANK[1]
+
+wPewterEeveeIV_AtkDef:: db ; $d153
+wPewterEeveeIV_SpdSpc:: db ; $d154
 
 wBackupFlagGainingExp: ; d155
     ds 1
@@ -1186,6 +1202,10 @@ wTradedEnemyMonIV: ; d484
 wTradeEnemyMonAltForm: ; d486
     ds 1
 
+NEXTU
+
+wTmpLevel:: db ; d481
+
 ENDU
 
 ; some free bytes
@@ -1285,6 +1305,7 @@ W_ROUTE3CURSCRIPT: ; d5f8
     ds 1
 W_ROUTE4CURSCRIPT: ; d5f9
     ds 1
+W_COPYCATSHOUSE2FCURSCRIPT ; d5fa
     ds 1
 W_VIRIDIANGYMCURSCRIPT: ; d5fb
     ds 1
@@ -1601,6 +1622,11 @@ ENDU
 wRivalStarterIV_AtkDef:: db ; $d726
 wRivalStarterIV_SpdSpc:: db ; $d727
 
+ds 1 ; $d728
+
+wPalletPikachuIV_AtkDef:: db ; $d729
+wPalletPikachuIV_SpdSpc:: db ; $d72a
+
 ; Some Free (see shinpokered)
 
 SECTION "W_FLAGS_D733",WRAMX[$d733],BANK[$1]
@@ -1817,13 +1843,13 @@ wPrintBattleValueBit0      ; df35 ; bit 0 = Trigger Print Battle Value
 wTownMapBeforeJoypadBit0   ; df35 ; bit 0 = Show Town Map Before Joypad Press
 wFlagFlyingMonSpriteBit0   ; df35 ; bit 0 = Force to Load Mon Sprite with $0040 offset
 wFlagUpDownSideEffectBit0  ; df35 ; bit 0 = Run Amnesia/SwordDance Side Effect
+wFlagLearnAfterEvolutBit0  ; df35 ; bit 0 = Learn Move after Evolution
 wFlagValueToPlayerBit1     ; df35 ; bit 1 = Print Battle Value to Player
 wFlagSortMoveBit1          ; df35 ; bit 1 = Sort Moves in Moves Menu (SELECT)
 wFlagFlyingMonSpriteBit1   ; df35 ; bit 1 = Force to Load Mon Sprite with $0080 offset
 wFlagShinyBit2             ; df35 ; bit 2
 wFlagFlyingMonSpriteBit2   ; df35 ; bit 2 = Force to Load Mon Sprite with $0880 offset
 wFlagBaloonSpriteBit3      ; df35 ; bit 3 = Enable Baloon Sprite durint Trade
-wFlagForceGhostPalBit3     ; df35 ; bit 3 = Force Ghost Palette during Ghost Marowak Encounter
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
 wFlagBackFrontSpriteBit56  ; df35 ; bit 5
                            ; df35 ; bit 6
@@ -1848,7 +1874,11 @@ wTempEnemyMinMaxIV     ; df37 = Temp Min Enemy IV Value
     ds 1
 
 wStatusScreen2OAMBit0       ; df38 ; bit 0 = Write OAM in Status Screen 2
+wDisableEncounterBit1       ; df38 ; bit 1 = Disable Pallet's Pikachu Encounter
 wFlagNoHpPalBit2            ; df38 ; bit 2
+wDisableEncounterBit3       ; df38 ; bit 3 = Disable Pewter's Eevee Encounter
+wFlagForceGhostPalBit4      ; df38 ; bit 4 = Force Ghost Palette during Ghost Marowak Encounter
+wForceShowPokedexBit5       ; df38 ; bit 5 = Show Pokedex during first Seen in Battle
 wFirstExpAllMessageBit6     ; df38 ; bit 6
 wSelectInOverworldOnBit6    ; df38 ; bit 6
 wStatusScreenJustLoadBit6   ; df38 ; bit 6 = Status Screen Picture Just Load

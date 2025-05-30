@@ -114,14 +114,20 @@ TX_RAM: MACRO
 	dw \1
 	ENDM
 
+; Predef Define
+NEW_PREDEF: MACRO
+    db BANK(\1)
+    dw \1
+    ENDM
+
 ; Predef macro.
 PREDEF: MACRO
-	ld a, (\1 - PredefPointers) / 3
+	ld a, (\1Predef - PredefPointers) / 3
 	call Predef
 	ENDM
 	
 PREDEF_JUMP: MACRO
-	ld a, (\1 - PredefPointers) / 3
+	ld a, (\1Predef - PredefPointers) / 3
 	jp Predef
 	ENDM
 
