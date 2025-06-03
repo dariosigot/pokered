@@ -28438,6 +28438,9 @@ Func_cd99: ; xxxx (3:xxxx) ; Spostato a Fine BANK
     jp PrintText
 
 ReDrawBattleHudAfterItemUse:
+    ld a,[W_BATTLETYPE] ; $d05a
+    and a
+    jp nz,LoadScreenTilesFromBuffer1 ; safariOrOldMan
     ld hl,HidePlayerBattleHudAndRestorePalette_
     ld b,BANK(HidePlayerBattleHudAndRestorePalette_)
     call Bankswitch
