@@ -138894,6 +138894,9 @@ ItemInBattleFinalCheck:
     call PrintText
     ld a,$31
     ld [$FF00+$e1],a
+    call EnableAutoBgTransfer
+    call Delay3
+    call DisableAutoBgTransfer
     call GoPAL_SET_CF1C
     FuncCoord 01,05
     ld hl,Coord
