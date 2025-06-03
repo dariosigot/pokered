@@ -11958,7 +11958,7 @@ UpdatePlayerSprite: ; 4e31 (1:4e31)
     ld [wSpriteStateData2],a
     jr .asm_4e4a
 .asm_4e41
-    FuncCoord 8,9 ; $c45c
+    FuncCoord 9,9
     ld a,[Coord]
     ld [$FF00+$93],a
     cp $60
@@ -30876,7 +30876,7 @@ TryDoWildEncounter:
 .next
     call CheckMapEncounterException
     jr z,.CanEncounter2
-    FuncCoord 9,9 ; $c45d
+    FuncCoord 9,9
     ld hl,Coord
     ld c,[hl]
     ld a,[W_GRASSTILE]
@@ -30911,7 +30911,7 @@ TryDoWildEncounter:
 .gotEncounterSlot
     ld c,[hl]
     ld hl,W_GRASSMONS ; $d888
-    FuncCoord 9,9 ; $c45c ; No Cinnabar Shore Bug
+    FuncCoord 9,9 ; No Cinnabar Shore Bug
     ld a,[Coord]
     cp $14
     jr nz,.gotWildEncounterType
