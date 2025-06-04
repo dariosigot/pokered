@@ -140885,16 +140885,19 @@ GetAttackerType:
     ret
 
 .TryToForceWind
-    call .GetType
-    ld b,a
-    call .GetType
-    ld c,a
-    ret
-.GetType
     ld a,[hli]
     cp DRAGON
-    ret nz
+    jr z,.ForceWind
+    ld a,[hl]
+    cp DRAGON
+    jr z,.ForceWind
+    ld a,b ; Mon ID
+    cp BEEDRILL
+    jr nz,.Standard
+.ForceWind
     ld a,WIND
+    ld b,a
+    ld c,a
     ret
 
 .TryToForceSlash
