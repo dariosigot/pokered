@@ -46886,7 +46886,7 @@ asm_27d9f: ; 27d9f (9:7d9f)
 Type00Name:
     db "NORMAL@"
 Type01Name:
-    db "FIGHTING@"
+    db "FIGHT@"
 Type02Name:
     db "WIND@"
 Type03Name:
@@ -46914,7 +46914,7 @@ Type15Name:
 Type16Name:
     db "GRASS@"
 Type17Name:
-    db "ELECTRIC@"
+    db "THUNDER@"
 Type18Name:
     db "PSYCHIC@"
 Type19Name:
@@ -57757,32 +57757,9 @@ HowManyMovesWithEnoughEnergy:
     ld [wCurrentMenuItem],a ; ...
     ret
 
-SECTION "AdjustDamageForMoveType",ROMX[$63a5],BANK[$f]
-
 ; function to adjust the base damage of an attack to account for type effectiveness
-AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
-; values for player turn
-    ld hl,W_PLAYERMONTYPES
-    call GetAttackerType ; b = type 1 | c = type 2
-    ld hl,W_ENEMYMONTYPES
-    ld a,[hli]
-    ld d,a    ; d = type 1 of defender
-    ld e,[hl] ; e = type 2 of defender
-    ld a,[W_PLAYERMOVETYPE]
-    ld [$d11e],a
-    ld a,[H_WHOSETURN]
-    and a
-    jr z,.next
-; values for enemy turn
-    ld hl,W_ENEMYMONTYPES
-    call GetAttackerType ; b = type 1 | c = type 2
-    ld hl,W_PLAYERMONTYPES
-    ld a,[hli]
-    ld d,a    ; d = type 1 of defender
-    ld e,[hl] ; e = type 2 of defender
-    ld a,[W_ENEMYMOVETYPE]
-    ld [$d11e],a
-.next
+AdjustDamageForMoveType:
+    PREDEF AdjustDamageForMoveType_GetInput
     ld a,[$d11e] ; move type
     cp b ; does the move type match type 1 of the attacker?
     jr z,.sameTypeAttackBonus
@@ -59168,6 +59145,8 @@ Func_3ec92:
     FuncCoord 1,5 ; $c405
     ld hl,Coord
     PREDEF_JUMP CopyUncompressedPicToTilemap
+
+; Free
 
 SECTION "Func_3ed12",ROMX[$6d12],BANK[$f]
 
@@ -62043,22 +62022,6 @@ Copy4Bytes:
 Copy4BytesDirect:
     ld bc,$4
     jp CopyData
-
-; b = type 1 of attacker
-; c = type 2 of attacker
-; Note = DRAGON Type gain WIND STAB
-GetAttackerType:
-    call .GetType
-    ld b,a
-    call .GetType
-    ld c,a
-    ret
-.GetType
-    ld a,[hli]
-    cp DRAGON
-    ret nz
-    ld a,WIND
-    ret
 
 StatUp1DownSideEffect:
     ld hl,StatUp1DownSideEffect_
@@ -75758,6 +75721,8 @@ CritHitStatsPlayerSpecialPredef:           NEW_PREDEF CritHitStatsPlayerSpecial 
 CritHitStatsEnemyPhysicalPredef:           NEW_PREDEF CritHitStatsEnemyPhysical           ; $6A
 CritHitStatsEnemySpecialPredef:            NEW_PREDEF CritHitStatsEnemySpecial            ; $6B
 CheckWildSubGroupPredef:                   NEW_PREDEF CheckWildSubGroup                   ; $6C
+GetAttackerType_Predef:                    NEW_PREDEF GetAttackerType_                    ; $6D
+AdjustDamageForMoveType_GetInputPredef:    NEW_PREDEF AdjustDamageForMoveType_GetInput    ; $6E
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -137566,9 +137531,32 @@ PrintMoveDetailsBox:
     jr z,.Power0
     dec a
     jr z,.Power1
-    ld de,W_PLAYERMOVEPOWER
-    ld b,%00000001
-    ld c,3
+    push hl
+    call CheckSTAB
+    ld a,10
+    jr nz,.NoSTAB
+    ld a,15
+.NoSTAB
+    ld [H_MULTIPLIER],a
+    xor a
+    ld [H_MULTIPLICAND],a
+    ld [H_MULTIPLICAND+1],a
+    ld a,[W_PLAYERMOVEPOWER]
+    ld [H_MULTIPLICAND+2],a
+    call Multiply
+    ld a,10
+    ld [H_DIVISOR],a
+    ld b,4 ; number of bytes in dividend
+    call Divide
+    ld hl,wTempMovePowerHI
+    ld a,[H_QUOTIENT+2]
+    ld [hli],a
+    ld a,[H_QUOTIENT+3]
+    ld [hld],a
+    ld d,h
+    ld e,l
+    pop hl
+    ld bc,$0203
     call PrintNumber
     jr .PowerDone
 .Power0
@@ -137619,8 +137607,21 @@ PrintMoveDetailsBox:
     add hl,de
     PREDEF PrintMoveType
 
+    ; Print STAB
+    ld de,20*(+0)+(+7)
+    add hl,de
+    ld a,[W_PLAYERMOVEPOWER]
+    cp 2 ; 0 or 1
+    jr c,.STABDone
+    push hl
+    call CheckSTAB
+    pop hl
+    jr nz,.STABDone
+    ld [hl],$D4 ; Up Arrow Symbol
+.STABDone
+
     ; Move_Energy
-    ld de,20*(+3)+(+0)
+    ld de,20*(+3)+(-7)
     add hl,de
     ld de,.EneText
     call PlaceString
@@ -137652,6 +137653,30 @@ PrintMoveDetailsBox:
     db $D8,"@"
 .HyperBeamExceptionText
     db "?@"
+
+; ──────────────────────────────────────────────────────────────────────
+
+CheckSTAB:
+    ld hl,$d11e ; Backup
+    ld a,[hl]   ; ...
+    push af     ; ...
+    push hl     ; ...
+    ld a,[W_PLAYERMOVETYPE]
+    ld [hl],a
+    ld a,[$cf91]
+    ld b,a
+    ld a,[W_PLAYERMOVENUM]
+    ld c,a
+    ld hl,W_MONHTYPES
+    PREDEF GetAttackerType_
+    pop hl    ; Restore
+    pop af    ; ...
+    ld [hl],a ; ...
+    ld a,[W_PLAYERMOVETYPE]
+    cp b
+    ret z
+    cp c
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -138620,6 +138645,7 @@ HandleStatusScreen2:
     push de
     push de
     push de
+    push de
 
     ld [$d0b5],a
     dec a
@@ -138700,8 +138726,32 @@ HandleStatusScreen2:
     jr z,.Power0
     dec a
     jr z,.Power1
-    ld de,W_PLAYERMOVEPOWER
-    ld bc,$0103
+    push hl
+    call CheckSTAB
+    ld a,10
+    jr nz,.NoSTAB
+    ld a,15
+.NoSTAB
+    ld [H_MULTIPLIER],a
+    xor a
+    ld [H_MULTIPLICAND],a
+    ld [H_MULTIPLICAND+1],a
+    ld a,[W_PLAYERMOVEPOWER]
+    ld [H_MULTIPLICAND+2],a
+    call Multiply
+    ld a,10
+    ld [H_DIVISOR],a
+    ld b,4 ; number of bytes in dividend
+    call Divide
+    ld hl,wTempMovePowerHI
+    ld a,[H_QUOTIENT+2]
+    ld [hli],a
+    ld a,[H_QUOTIENT+3]
+    ld [hld],a
+    ld d,h
+    ld e,l
+    pop hl
+    ld bc,$0203
     call PrintNumber
     ; Print Phi/Spc Symbols
     push hl
@@ -138736,6 +138786,21 @@ HandleStatusScreen2:
     add hl,bc
     ld bc,$0103
     call PrintNumber
+
+.PlaceMoveSTAB
+    ld a,[W_PLAYERMOVEPOWER]
+    cp 2 ; 0 or 1
+    jr c,.NoSTAB2
+    call CheckSTAB
+    ld d,$D4 ; Up Arrow Symbol
+    jr z,.PrintSTAB
+.NoSTAB2
+    ld d," "
+.PrintSTAB
+    pop hl
+    ld bc,00+17
+    add hl,bc
+    ld [hl],d
 
 .end
     pop de
@@ -140729,6 +140794,142 @@ HandlePlayerBlackOut_:
 .LinkBattleLostText
     TX_FAR _LinkBattleLostText
     db "@"
+
+; ──────────────────────────────────────────────────────────────────────
+
+AdjustDamageForMoveType_GetInput:
+; values for player turn
+    ld a,[W_PLAYERMOVETYPE]
+    ld [$d11e],a
+    ld a,[W_PLAYERMONID]
+    ld b,a
+    ld a,[W_PLAYERMOVENUM]
+    ld c,a
+    ld hl,W_PLAYERMONTYPES
+    call GetAttackerType ; b = type 1 | c = type 2
+    ld hl,W_ENEMYMONTYPES
+    ld a,[hli]
+    ld d,a    ; d = type 1 of defender
+    ld e,[hl] ; e = type 2 of defender
+    ld a,[H_WHOSETURN]
+    and a
+    ret z
+; values for enemy turn
+    ld a,[W_ENEMYMOVETYPE]
+    ld [$d11e],a
+    ld a,[W_ENEMYMON_START]
+    ld b,a
+    ld a,[W_ENEMYMOVENUM]
+    ld c,a
+    ld hl,W_ENEMYMONTYPES
+    call GetAttackerType ; b = type 1 | c = type 2
+    ld hl,W_PLAYERMONTYPES
+    ld a,[hli]
+    ld d,a    ; d = type 1 of defender
+    ld e,[hl] ; e = type 2 of defender
+    ret
+
+; Input
+; [$d11e] = move type
+; [hl/hl+1] = Mon Type
+; b = Mon ID
+; c = Move ID
+; Output
+; b = type 1 of attacker
+; c = type 2 of attacker
+; Note = DRAGON Type gain WIND STAB
+;        "Birds" gain IVORY STAB
+GetAttackerType_:
+    call Load16BitRegisters
+GetAttackerType:
+    ld a,[$d11e]
+    cp IVORY
+    jr z,.TryToForceIvory
+    cp WIND
+    jr z,.TryToForceWind
+    ld a,c ; Move ID
+    push hl
+    ld hl,.SlashMoveTable
+    call .IsInArray
+    pop hl
+    jr c,.TryToForceSlash
+    ; fall through
+
+.Standard
+    ld a,[hli]
+    ld b,a
+    ld c,[hl]
+    ret
+
+.TryToForceIvory
+    ld a,b ; Mon ID
+    push hl
+    ld hl,.ForceIvoryTable
+    call .IsInArray
+    pop hl
+    jr nc,.Standard
+    ld a,IVORY
+    ld b,a
+    ld c,a
+    ret
+.TryToForceWind
+    call .GetType
+    ld b,a
+    call .GetType
+    ld c,a
+    ret
+.GetType
+    ld a,[hli]
+    cp DRAGON
+    ret nz
+    ld a,WIND
+    ret
+
+.TryToForceSlash
+    ld a,b ; Mon ID
+    push hl
+    ld hl,.SlashMonTable
+    call .IsInArray
+    pop hl
+    jr nc,.Standard
+    ld a,NORMAL
+    ld b,a
+    ld c,a
+    ret
+
+.IsInArray
+    push bc
+    push de
+    ld de,1
+    call IsInArray
+    pop de
+    pop bc
+    ret
+
+.ForceIvoryTable
+    db PIDGEY
+    db PIDGEOTTO
+    db PIDGEOT
+    db SPEAROW
+    db FEAROW
+    db RAPIDASH
+    db FARFETCH_D
+    db SEAKING
+    db ARTICUNO
+    db ZAPDOS
+    db MOLTRES
+    db $FF
+
+.SlashMonTable
+    db SANDSHREW
+    db SANDSLASH
+    db $FF
+
+.SlashMoveTable
+    db SCRATCH
+    db SLASH
+    db FURY_SWIPES
+    db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
 

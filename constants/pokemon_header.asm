@@ -702,7 +702,7 @@ PidgeotBaseStats:
     db 70 ; base special
 
     db WIND ; species type 1
-    db IVORY ; species type 2
+    db WIND ; species type 2
 
     db 45 ; catch rate
     db 172 ; base exp yield
@@ -858,7 +858,7 @@ FearowBaseStats:
     db 61 ; base special
 
     db WIND ; species type 1
-    db IVORY ; species type 2
+    db WIND ; species type 2
 
     db 90 ; catch rate
     db 162 ; base exp yield
@@ -3042,7 +3042,7 @@ RapidashBaseStats:
     db 80 ; base special
 
     db FIRE ; species type 1
-    db IVORY ; species type 2
+    db FIRE ; species type 2
 
     db 60 ; catch rate
     db 192 ; base exp yield
@@ -4641,7 +4641,7 @@ SeakingBaseStats:
     db 80 ; base special
 
     db WATER ; species type 1
-    db IVORY ; species type 2
+    db WATER ; species type 2
 
     db 60 ; catch rate
     db 170 ; base exp yield
