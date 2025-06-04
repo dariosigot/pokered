@@ -140856,6 +140856,8 @@ GetAttackerType:
     jr z,.TryToForceIvory
     cp WIND
     jr z,.TryToForceWind
+    cp POISON
+    jr z,.TryToForcePoison
     ld a,c ; Move ID
     push hl
     ld hl,.SlashMoveTable
@@ -140881,6 +140883,7 @@ GetAttackerType:
     ld b,a
     ld c,a
     ret
+
 .TryToForceWind
     call .GetType
     ld b,a
@@ -140902,6 +140905,15 @@ GetAttackerType:
     pop hl
     jr nc,.Standard
     ld a,NORMAL
+    ld b,a
+    ld c,a
+    ret
+
+.TryToForcePoison
+    ld a,b ; Mon ID
+    cp KAKUNA
+    jr nz,.Standard
+    ld a,POISON
     ld b,a
     ld c,a
     ret
