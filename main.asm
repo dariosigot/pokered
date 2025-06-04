@@ -30724,7 +30724,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db SOLARBEAM    ; TM_22
     db DRAGON_RAGE  ; TM_23
     db THUNDERBOLT  ; TM_24
-    db THUNDER      ; TM_25
+    db THUNDER_M    ; TM_25
     db EARTHQUAKE   ; TM_26
     db FISSURE      ; TM_27
     db TRAPHOLE     ; TM_28
@@ -47066,7 +47066,7 @@ FocusEnergyEffect_: ; 27f86 (9:7f86)
 
 TypeNamePointers:
     dw Type00Name ; $00 : Normal
-    dw Type01Name ; $01 : Fighting
+    dw Type01Name ; $01 : Fight
     dw Type02Name ; $02 : Wind
     dw Type03Name ; $03 : Poison
     dw Type04Name ; $04 : Ground
@@ -47088,7 +47088,7 @@ TypeNamePointers:
     dw Type14Name ; $14 : Fire
     dw Type15Name ; $15 : Water
     dw Type16Name ; $16 : Grass
-    dw Type17Name ; $17 : Electric
+    dw Type17Name ; $17 : Thunder
     dw Type18Name ; $18 : Psychic
     dw Type19Name ; $19 : Ice
     dw Type1AName ; $1A : Dragon
@@ -56165,7 +56165,7 @@ GetSideEffectType_Enemy:
     ; fall through
 
 GetSideEffectType_Common:
-    cp ELECTRIC
+    cp THUNDER
     ret z
     cp FIRE
     ret z
@@ -79236,7 +79236,7 @@ ParalyzeEffect_:
     and a
     jr nz,.alreadyStatused ; miss if target is already statused
     ld a,[de]
-    cp ELECTRIC
+    cp THUNDER
     jr nz,.hitTest
     ld b,h
     ld c,l

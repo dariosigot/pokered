@@ -163,7 +163,7 @@ Giovanni3Move:
     db SLUDGE
     db EARTHQUAKE
     db DIZZY_PUNCH
-    db THUNDER
+    db THUNDER_M
     ; Rhydon (Level 56)
     db EARTHQUAKE
     db ROCK_SLIDE
@@ -302,7 +302,7 @@ LanceMove:
     db HYPER_BEAM
     db ROCK_SLIDE
     ; Dragonite (Level 62)
-    db THUNDER
+    db THUNDER_M
     db BLIZZARD
     db FIRE_BLAST
     db HYPER_BEAM
@@ -776,7 +776,7 @@ CooltrainerMMove4:
     db TRI_ATTACK
     db CONVERSION
     db THUNDER_WAVE
-    db THUNDER
+    db THUNDER_M
     ; Dugtrio (Level 41)
     db SLASH
     db EARTHQUAKE
@@ -801,7 +801,7 @@ CooltrainerMMove4:
     db DIZZY_PUNCH
     db SLUDGE
     db EARTHQUAKE
-    db THUNDER
+    db THUNDER_M
     db 0
 
 BlackBeltMove9:
@@ -851,7 +851,7 @@ JugglerMove2:
     ; Raichu (Level 42)
     db THUNDERBOLT
     db THUNDER_WAVE
-    db THUNDER
+    db THUNDER_M
     db HYPER_FANG
     ; Dodrio (Level 44)
     db DRILL_PECK
@@ -943,7 +943,7 @@ PokemaniacMove6:
     db LIGHT_SCREEN
     db PSYCHIC_M
     ; Lapras (Level 43)
-    db THUNDER
+    db THUNDER_M
     db REST
     db BODY_SLAM
     db ICE_BEAM

@@ -444,7 +444,7 @@ PIKACHU_Learnset: MACRO
     db 28,AGILITY ; Exclusive*
     db 32,THUNDERPUNCH
     db 36,SWIFT
-    db 41,THUNDER
+    db 41,THUNDER_M
     db 45,HYPER_FANG
     db 50,LIGHT_SCREEN
     db 55,LOVELY_KISS
@@ -463,7 +463,7 @@ RAICHU_Learnset: MACRO
     db 25,THUNDERPUNCH
     db 28,SWIFT
     db 30,SKULL_BASH
-    db 35,THUNDER
+    db 35,THUNDER_M
     db 40,HYPER_FANG
     db 45,LIGHT_SCREEN
     db 49,MEGA_PUNCH
@@ -1544,7 +1544,7 @@ MAGNETON_Learnset: MACRO
     db 41,DISABLE
     db 43,SELFDESTRUCT
     db 45,BARRIER
-    db 48,THUNDER
+    db 48,THUNDER_M
     db 51,RECOVER
     db 56,BODY_SLAM
     db 60,PSYBEAM
@@ -1555,7 +1555,7 @@ MAGNEMITE_NoEvo_Learnset: MACRO
     db 40,REFLECT
     db 44,SLAM
     db 48,BARRIER
-    db 53,THUNDER
+    db 53,THUNDER_M
     db 58,RECOVER
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
@@ -1951,7 +1951,7 @@ ELECTRODE_Learnset: MACRO
     db 43,CONVERSION
     db 45,REFLECT
     db 48,TELEPORT
-    db 51,THUNDER
+    db 51,THUNDER_M
     db 56,RECOVER
     db 60,PSYBEAM
 ENDM
@@ -1962,7 +1962,7 @@ VOLTORB_NoEvo_Learnset: MACRO
     db 44,AGILITY
     db 48,DOUBLE_TEAM
     db 53,REFLECT
-    db 58,THUNDER
+    db 58,THUNDER_M
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 VOLTORB_HUSUI_Learnset: MACRO
@@ -2010,7 +2010,7 @@ ELECTRODE_HUSUI_Learnset: MACRO
     db 48,TELEPORT
     db 51,SOLARBEAM
     db 56,RECOVER
-    db 60,THUNDER
+    db 60,THUNDER_M
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 EXEGGCUTE_Learnset: MACRO
@@ -2639,7 +2639,7 @@ ELECTABUZZ_Learnset: MACRO
     db 43,SUBMISSION
     db 46,JUMP_KICK
     db 48,THRASH
-    db 50,THUNDER
+    db 50,THUNDER_M
     db 55,MEGA_KICK
     db 60,HI_JUMP_KICK
 ENDM
@@ -2876,7 +2876,7 @@ JOLTEON_Learnset: MACRO
     db 39,FLASH
     db 42,HYPER_FANG
     db 45,TAKE_DOWN
-    db 48,THUNDER
+    db 48,THUNDER_M
     db 50,BODY_SLAM
     db 55,DOUBLE_EDGE
     db 60,SUPER_FANG
@@ -3134,7 +3134,7 @@ ZAPDOS_Learnset: MACRO
     db 51,AGILITY
     db 54,EGG_BOMB
     db 56,PIN_MISSILE
-    db 58,THUNDER
+    db 58,THUNDER_M
     db 60,REFLECT
     db 62,TWINEEDLE
     db 65,SKY_ATTACK
@@ -3213,7 +3213,7 @@ DRAGONITE_Learnset: MACRO
     db 55,SWOOP
     db 55,RAZOR_WIND
     db 56,HYDRO_PUMP
-    db 57,THUNDER
+    db 57,THUNDER_M
     db 58,BLIZZARD
     db 59,FIRE_BLAST
     db 60,HORN_DRILL

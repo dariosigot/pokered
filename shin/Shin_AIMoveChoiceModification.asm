@@ -67,8 +67,12 @@ AIMoveChoiceModification1:
     ld a,[W_PLAYERMOVETYPE]
     cp NORMAL
     jr z,.countercheck_end    ; continue on if countering a normal move
-    cp FIGHTING
-    jr z,.countercheck_end    ; continue on if countering a fighting move
+    cp FIGHT
+    jr z,.countercheck_end    ; continue on if countering a fight move
+    cp IVORY
+    jr z,.countercheck_end    ; continue on if countering a ivory move
+    cp RUBBER
+    jr z,.countercheck_end    ; continue on if countering a rubber move
     cp TYPE_NA
     jr z,.countercheck_end    ; continue on if countering STRUGGLE or other typeless move
     jp .heavydiscourage    ;else heavily discourage since the player move type is not applicable to counter

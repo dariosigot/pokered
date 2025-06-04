@@ -192,7 +192,7 @@ RaticateExclusiveMove:
     db HYPER_BEAM ; TM15
     db COUNTER ; TM18
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
@@ -261,7 +261,7 @@ RaichuExclusiveMove:
     db SUBMISSION ; TM17
     db SEISMIC_TOSS ; TM19
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
@@ -326,7 +326,7 @@ NidokingExclusiveMove:
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
@@ -365,7 +365,7 @@ WigglytuffExclusiveMove:
     db SEISMIC_TOSS ; TM19
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db REFLECT ; TM33
@@ -537,7 +537,7 @@ PersianExclusiveMove:
     db HYPER_BEAM ; TM15
     db PAY_DAY ; TM16
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
@@ -600,7 +600,7 @@ PrimeapeExclusiveMove:
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
@@ -861,7 +861,7 @@ ElectrodeExclusiveMove:
     db MEGA_DRAIN ; TM21
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db TELEPORT ; TM30
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
@@ -945,7 +945,7 @@ MukExclusiveMove:
     db HYPER_BEAM ; TM15
     db MEGA_DRAIN ; TM21
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db MIMIC ; TM31
     db BIDE ; TM34
     db SELFDESTRUCT ; TM36
@@ -990,7 +990,7 @@ GengarExclusiveMove:
     db HYPER_BEAM ; TM15
     db MEGA_DRAIN ; TM21
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db PSYCHIC_M ; TM29
     db TELEPORT ; TM30
     db MIMIC ; TM31
@@ -1189,7 +1189,7 @@ LickitungExclusiveMove:
     db SEISMIC_TOSS ; TM19
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db MIMIC ; TM31
@@ -1212,7 +1212,7 @@ WeezingExclusiveMove:
     db TOXIC ; TM06
     db HYPER_BEAM ; TM15
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db BIDE ; TM34
@@ -1247,7 +1247,7 @@ RhydonExclusiveMove:
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
@@ -1278,7 +1278,7 @@ ChanseyExclusiveMove:
     db SEISMIC_TOSS ; TM19
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db PSYCHIC_M ; TM29
     db MIMIC ; TM31
@@ -1335,7 +1335,7 @@ KangaskhanExclusiveMove:
     db SEISMIC_TOSS ; TM19
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
@@ -1404,7 +1404,7 @@ StarmieExclusiveMove:
     db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db PSYCHIC_M ; TM29
     db TELEPORT ; TM30
     db MIMIC ; TM31
@@ -1432,7 +1432,7 @@ MrMimeExclusiveMove:
     db SEISMIC_TOSS ; TM19
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db PSYCHIC_M ; TM29
     db TELEPORT ; TM30
     db MIMIC ; TM31
@@ -1510,7 +1510,7 @@ ElectabuzzExclusiveMove:
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
@@ -1587,7 +1587,7 @@ TaurosExclusiveMove:
     db HYPER_BEAM ; TM15
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db MIMIC ; TM31
@@ -1614,7 +1614,7 @@ GyaradosExclusiveMove:
     db HYPER_BEAM ; TM15
     db DRAGON_RAGE ; TM23
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db MIMIC ; TM31
     db REFLECT ; TM33
@@ -1643,7 +1643,7 @@ LaprasExclusiveMove:
     db SOLARBEAM ; TM22
     db DRAGON_RAGE ; TM23
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db PSYCHIC_M ; TM29
@@ -1681,7 +1681,7 @@ FlareonExclusiveMove:
     db HYPER_BEAM ; TM15
     db PAY_DAY ; TM16
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
@@ -1705,7 +1705,7 @@ PorygonExclusiveMove:
     db BLADE ; TM51
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db PSYCHIC_M ; TM29
     db TELEPORT ; TM30
     db MIMIC ; TM31
@@ -1824,7 +1824,7 @@ SnorlaxExclusiveMove:
     db SEISMIC_TOSS ; TM19
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db PSYCHIC_M ; TM29
@@ -1874,7 +1874,7 @@ ZapdosExclusiveMove:
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
@@ -1929,7 +1929,7 @@ DragoniteExclusiveMove:
     db SEISMIC_TOSS ; TM19
     db DRAGON_RAGE ; TM23
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
@@ -1970,7 +1970,7 @@ MewtwoExclusiveMove:
     db SEISMIC_TOSS ; TM19
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
-    db THUNDER ; TM25
+    db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db PSYCHIC_M ; TM29
     db TELEPORT ; TM30
