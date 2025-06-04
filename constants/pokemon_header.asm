@@ -702,7 +702,7 @@ PidgeotBaseStats:
     db 70 ; base special
 
     db WIND ; species type 1
-    db IVORY ; species type 2
+    db WIND ; species type 2
 
     db 45 ; catch rate
     db 172 ; base exp yield
@@ -858,7 +858,7 @@ FearowBaseStats:
     db 61 ; base special
 
     db WIND ; species type 1
-    db IVORY ; species type 2
+    db WIND ; species type 2
 
     db 90 ; catch rate
     db 162 ; base exp yield
@@ -974,8 +974,8 @@ PikachuBaseStats:
     db 90 ; base speed
     db 50 ; base special
 
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
+    db THUNDER ; species type 1
+    db THUNDER ; species type 2
 
     db 190 ; catch rate
     db 82 ; base exp yield
@@ -1013,8 +1013,8 @@ RaichuBaseStats:
     db 100 ; base speed
     db 90 ; base special
 
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
+    db THUNDER ; species type 1
+    db THUNDER ; species type 2
 
     db 75 ; catch rate
     db 122 ; base exp yield
@@ -2183,8 +2183,8 @@ MankeyBaseStats:
     db 70 ; base speed
     db 35 ; base special
 
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
+    db FIGHT ; species type 1
+    db FIGHT ; species type 2
 
     db 190 ; catch rate
     db 74 ; base exp yield
@@ -2222,8 +2222,8 @@ PrimeapeBaseStats:
     db 95 ; base speed
     db 60 ; base special
 
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
+    db FIGHT ; species type 1
+    db FIGHT ; species type 2
 
     db 75 ; catch rate
     db 149 ; base exp yield
@@ -2379,7 +2379,7 @@ PoliwhirlBaseStats:
     db 50 ; base special
 
     db WATER ; species type 1
-    db FIGHTING ; species type 2
+    db FIGHT ; species type 2
 
     db 120 ; catch rate
     db 131 ; base exp yield
@@ -2418,7 +2418,7 @@ PoliwrathBaseStats:
     db 70 ; base special
 
     db WATER ; species type 1
-    db FIGHTING ; species type 2
+    db FIGHT ; species type 2
 
     db 45 ; catch rate
     db 185 ; base exp yield
@@ -2573,8 +2573,8 @@ MachopBaseStats:
     db 35 ; base speed
     db 35 ; base special
 
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
+    db FIGHT ; species type 1
+    db FIGHT ; species type 2
 
     db 180 ; catch rate
     db 88 ; base exp yield
@@ -2612,8 +2612,8 @@ MachokeBaseStats:
     db 45 ; base speed
     db 50 ; base special
 
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
+    db FIGHT ; species type 1
+    db FIGHT ; species type 2
 
     db 90 ; catch rate
     db 146 ; base exp yield
@@ -2651,8 +2651,8 @@ MachampBaseStats:
     db 55 ; base speed
     db 65 ; base special
 
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
+    db FIGHT ; species type 1
+    db FIGHT ; species type 2
 
     db 45 ; catch rate
     db 193 ; base exp yield
@@ -3042,7 +3042,7 @@ RapidashBaseStats:
     db 80 ; base special
 
     db FIRE ; species type 1
-    db IVORY ; species type 2
+    db FIRE ; species type 2
 
     db 60 ; catch rate
     db 192 ; base exp yield
@@ -3158,7 +3158,7 @@ MagnemiteBaseStats:
     db 45 ; base speed
     db 95 ; base special
 
-    db ELECTRIC ; species type 1
+    db THUNDER ; species type 1
     db METAL ; species type 2
 
     db 190 ; catch rate
@@ -3197,7 +3197,7 @@ MagnetonBaseStats:
     db 70 ; base speed
     db 120 ; base special
 
-    db ELECTRIC ; species type 1
+    db THUNDER ; species type 1
     db METAL ; species type 2
 
     db 60 ; catch rate
@@ -3899,7 +3899,7 @@ VoltorbBaseStats:
     db 100 ; base speed
     db 55 ; base special
 
-    db ELECTRIC ; species type 1
+    db THUNDER ; species type 1
     db RUBBER ; species type 2
 
     db 190 ; catch rate
@@ -3938,7 +3938,7 @@ ElectrodeBaseStats:
     db 140 ; base speed
     db 80 ; base special
 
-    db ELECTRIC ; species type 1
+    db THUNDER ; species type 1
     db RUBBER ; species type 2
 
     db 60 ; catch rate
@@ -4133,8 +4133,8 @@ HitmonleeBaseStats:
     db 87 ; base speed
     db 35 ; base special
 
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
+    db FIGHT ; species type 1
+    db FIGHT ; species type 2
 
     db 45 ; catch rate
     db 139 ; base exp yield
@@ -4172,8 +4172,8 @@ HitmonchanBaseStats:
     db 76 ; base speed
     db 35 ; base special
 
-    db FIGHTING ; species type 1
-    db FIGHTING ; species type 2
+    db FIGHT ; species type 1
+    db FIGHT ; species type 2
 
     db 45 ; catch rate
     db 140 ; base exp yield
@@ -4641,7 +4641,7 @@ SeakingBaseStats:
     db 80 ; base special
 
     db WATER ; species type 1
-    db IVORY ; species type 2
+    db WATER ; species type 2
 
     db 60 ; catch rate
     db 170 ; base exp yield
@@ -4874,8 +4874,8 @@ ElectabuzzBaseStats:
     db 105 ; base speed
     db 85 ; base special
 
-    db ELECTRIC ; species type 1
-    db FIGHTING ; species type 2
+    db THUNDER ; species type 1
+    db FIGHT ; species type 2
 
     db 45 ; catch rate
     db 156 ; base exp yield
@@ -5264,8 +5264,8 @@ JolteonBaseStats:
     db 130 ; base speed
     db 110 ; base special
 
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
+    db THUNDER ; species type 1
+    db THUNDER ; species type 2
 
     db 45 ; catch rate
     db 197 ; base exp yield
@@ -5654,7 +5654,7 @@ ZapdosBaseStats:
     db 100 ; base speed
     db 125 ; base special
 
-    db ELECTRIC ; species type 1
+    db THUNDER ; species type 1
     db WIND ; species type 2
 
     db 3 ; catch rate

@@ -2,14 +2,14 @@
 ; animation,effect,power,type,accuracy,PP
 
     db POUND        , NO_ADDITIONAL_EFFECT       ,  40 , RUBBER   , 255 , 06 ; pp 35 ; 0 ; Type Normal -> Rubber
-    db KARATE_CHOP  , NO_ADDITIONAL_EFFECT       ,  50 , FIGHTING , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Fighting
+    db KARATE_CHOP  , NO_ADDITIONAL_EFFECT       ,  50 , FIGHT    , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Fight   
     db DOUBLESLAP   , TWO_TO_FIVE_ATTACKS_EFFECT ,  19 , RUBBER   , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber ; PP 10 -> 20 ; Pwr 15 -> 19
-    db COMET_PUNCH  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , FIGHTING , 216 , 12 ; pp 15 ; 0 ; Type Normal -> Fighting ; Pwr 18 -> 21 ; Ene 14 -> 12
-    db MEGA_PUNCH   , NO_ADDITIONAL_EFFECT       ,  80 , FIGHTING , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Fighting
+    db COMET_PUNCH  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , FIGHT    , 216 , 12 ; pp 15 ; 0 ; Type Normal -> Fight    ; Pwr 18 -> 21 ; Ene 14 -> 12
+    db MEGA_PUNCH   , NO_ADDITIONAL_EFFECT       ,  80 , FIGHT    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Fight   
     db PAY_DAY      , PAY_DAY_EFFECT             ,  60 , NORMAL   , 255 , 10 ; pp 20 ; 0 ; Pwr 40 -> 60
     db FIRE_PUNCH   , BURN_SIDE_EFFECT2          ,  75 , FIRE     , 255 , 14 ; pp 15 ; 0
     db ICE_PUNCH    , FREEZE_SIDE_EFFECT         ,  75 , ICE      , 255 , 14 ; pp 15 ; 0
-    db THUNDERPUNCH , PARALYZE_SIDE_EFFECT1      ,  75 , ELECTRIC , 255 , 14 ; pp 15 ; 0
+    db THUNDERPUNCH , PARALYZE_SIDE_EFFECT1      ,  75 , THUNDER  , 255 , 14 ; pp 15 ; 0
     db SCRATCH      , NO_ADDITIONAL_EFFECT       ,  40 , NORMAL   , 255 , 06 ; pp 35 ; 0
     db VICEGRIP     , NO_ADDITIONAL_EFFECT       ,  60 , IVORY    , 255 , 07 ; pp 30 ; 0 ; Pwr 55 -> 60 ; Type Normal -> Ivory
     db GUILLOTINE   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 45 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 45
@@ -24,10 +24,10 @@
     db SLAM         , NO_ADDITIONAL_EFFECT       ,  80 , RUBBER   , 191 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber
     db VINE_WHIP    , NO_ADDITIONAL_EFFECT       ,  45 , GRASS    , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 45 ; PP 10 -> 25
     db STOMP        , FLINCH_SIDE_EFFECT2        ,  65 , NORMAL   , 255 , 10 ; pp 20 ; 0
-    db DOUBLE_KICK  , ATTACK_TWICE_EFFECT        ,  30 , FIGHTING , 255 , 08 ; pp 25 ; 0 ; PP 30 -> 25
-    db MEGA_KICK    , NO_ADDITIONAL_EFFECT       , 120 , FIGHTING , 191 , 22 ; pp 10 ; 0 ; Type Normal -> Fighting ; PP 05 -> 10 ; Ene 20 -> 22
-    db JUMP_KICK    , JUMP_KICK_EFFECT           , 100 , FIGHTING , 242 , 20 ; pp 10 ; 0 ; Pwr 70 -> 100 ; PP 25 -> 10
-    db ROLLING_KICK , FLINCH_SIDE_EFFECT2        ,  60 , FIGHTING , 216 , 09 ; pp 20 ; 0 ; PP 15 -> 20 ; Ene 10 -> 9
+    db DOUBLE_KICK  , ATTACK_TWICE_EFFECT        ,  30 , FIGHT    , 255 , 08 ; pp 25 ; 0 ; PP 30 -> 25
+    db MEGA_KICK    , NO_ADDITIONAL_EFFECT       , 120 , FIGHT    , 191 , 22 ; pp 10 ; 0 ; Type Normal -> Fight    ; PP 05 -> 10 ; Ene 20 -> 22
+    db JUMP_KICK    , JUMP_KICK_EFFECT           , 100 , FIGHT    , 242 , 20 ; pp 10 ; 0 ; Pwr 70 -> 100 ; PP 25 -> 10
+    db ROLLING_KICK , FLINCH_SIDE_EFFECT2        ,  60 , FIGHT    , 216 , 09 ; pp 20 ; 0 ; PP 15 -> 20 ; Ene 10 -> 9
     db SAND_ATTACK  , ACCURACY_DOWN_SIDE_EFFECT  ,  10 , GROUND   , 229 , 09 ; pp 15 ; 0 ; Type Normal -> Ground ; Acr 255 -> 229 ; PP 15 ; Ene 14 -> 09 ; Pwr 0 -> 10
     db HEADBUTT     , FLINCH_SIDE_EFFECT2        ,  70 , NORMAL   , 255 , 14 ; pp 15 ; 0
     db HORN_ATTACK  , NO_ADDITIONAL_EFFECT       ,  65 , IVORY    , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Ivory
@@ -66,11 +66,11 @@
     db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , NORMAL   , 229 , 40 ; pp  5 ; ?
     db PECK         , NO_ADDITIONAL_EFFECT       ,  45 , IVORY    , 255 , 07 ; pp 35 ; 0 ; Type Wind -> Ivory ; Pwr 35 -> 45 ; Ene 06 -> 07
     db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
-    db SUBMISSION   , RECOIL_EFFECT              ,  95 , FIGHTING , 204 , 10 ; pp 20 ; 0 ; Pwr 80 -> 95 ; PP 25 -> 20
-    db LOW_KICK     , FLINCH_SIDE_EFFECT2        ,  50 , FIGHTING , 255 , 10 ; pp 20 ; 0 ; Acr 229 -> 255
-    db COUNTER      , NO_ADDITIONAL_EFFECT       ,   1 , FIGHTING , 255 , 10 ; pp 20 ; -
-    db SEISMIC_TOSS , SPECIAL_DAMAGE_EFFECT      ,   1 , FIGHTING , 255 , 10 ; pp 20 ; -
-    db STRIKE       , NO_ADDITIONAL_EFFECT       ,  80 , FIGHTING , 255 , 15 ; pp 15 ; 0 ; Type Normal -> Fighting ; Ene 14 -> 15
+    db SUBMISSION   , RECOIL_EFFECT              ,  95 , FIGHT    , 204 , 10 ; pp 20 ; 0 ; Pwr 80 -> 95 ; PP 25 -> 20
+    db LOW_KICK     , FLINCH_SIDE_EFFECT2        ,  50 , FIGHT    , 255 , 10 ; pp 20 ; 0 ; Acr 229 -> 255
+    db COUNTER      , NO_ADDITIONAL_EFFECT       ,   1 , FIGHT    , 255 , 10 ; pp 20 ; -
+    db SEISMIC_TOSS , SPECIAL_DAMAGE_EFFECT      ,   1 , FIGHT    , 255 , 10 ; pp 20 ; -
+    db STRIKE       , NO_ADDITIONAL_EFFECT       ,  80 , FIGHT    , 255 , 15 ; pp 15 ; 0 ; Type Normal -> Fight    ; Ene 14 -> 15
     db ABSORB       , DRAIN_HP_EFFECT            ,  20 , GRASS    , 255 , 08 ; pp 25 ; 1 ; PP 20 -> 25
     db MEGA_DRAIN   , DRAIN_HP_EFFECT            ,  40 , GRASS    , 255 , 13 ; pp 15 ; 1 ; PP 10 -> 15 ; Ene 14 -> 13
     db LEECH_SEED   , LEECH_SEED_EFFECT          ,   0 , GRASS    , 229 , 19 ; pp 10 ; - ; Ene 20 -> 19
@@ -84,10 +84,10 @@
     db STRING_SHOT  , SPEED_DOWN2_EFFECT         ,   0 , BUG      , 242 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Speed -2x
     db DRAGON_RAGE  , SPECIAL_DAMAGE_EFFECT      ,   1 , DRAGON   , 255 , 14 ; pp 15 ; - ; PP 10 -> 15
     db FIRE_SPIN    , TRAPPING_EFFECT            ,  10 , FIRE     , 141 , 15 ; pp 15 ; 1 ; Pwr 15 -> 10 ; Acr 178 -> 141 ; Ene 14 -> 15
-    db THUNDERSHOCK , PARALYZE_SIDE_EFFECT1      ,  40 , ELECTRIC , 255 , 07 ; pp 30 ; 1
-    db THUNDERBOLT  , PARALYZE_SIDE_EFFECT1      ,  90 , ELECTRIC , 255 , 14 ; pp 15 ; 1 ; Pwr 95 -> 90
-    db THUNDER_WAVE , PARALYZE_EFFECT            ,   0 , ELECTRIC , 255 , 14 ; pp 15 ; - ; PP 20 -> 15
-    db THUNDER      , PARALYZE_SIDE_EFFECT2      , 120 , ELECTRIC , 178 , 20 ; pp 10 ; 1
+    db THUNDERSHOCK , PARALYZE_SIDE_EFFECT1      ,  40 , THUNDER  , 255 , 07 ; pp 30 ; 1
+    db THUNDERBOLT  , PARALYZE_SIDE_EFFECT1      ,  90 , THUNDER  , 255 , 14 ; pp 15 ; 1 ; Pwr 95 -> 90
+    db THUNDER_WAVE , PARALYZE_EFFECT            ,   0 , THUNDER  , 255 , 14 ; pp 15 ; - ; PP 20 -> 15
+    db THUNDER_M    , PARALYZE_SIDE_EFFECT2      , 120 , THUNDER  , 178 , 20 ; pp 10 ; 1
     db ROCK_THROW   , NO_ADDITIONAL_EFFECT       ,  50 , ROCK     , 229 , 09 ; pp 15 ; 0 ; Acr 165 -> 229 ; PP 15 -> 25 ; Ene 08 -> 09 
     db EARTHQUAKE   , NO_ADDITIONAL_EFFECT       , 100 , GROUND   , 255 , 20 ; pp 10 ; 0
     db FISSURE      , OHKO_EFFECT                ,   1 , GROUND   ,  76 , 45 ; pp  5 ; - ; Ene 40 -> 45
@@ -113,10 +113,10 @@
     db WITHDRAW     , DEFENSE_UP2_EFFECT         ,   0 , IVORY    , 255 , 08 ; pp 30 ; - ; PP 40 -> 30 ; Defense 2x ; Type Water -> Ivory ; Ene 07 -> 08
     db DEFENSE_CURL , DEFENSE_UP1_EFFECT         ,   0 , RUBBER   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Type Normal -> Rubber
     db BARRIER      , DEFENSE_UP3_EFFECT         ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; - ; PP 30 -> 20 ; Defense 3x
-    db LIGHT_SCREEN , LIGHT_SCREEN_EFFECT        ,   0 , ELECTRIC , 255 , 10 ; pp 20 ; - ; PP 30 -> 20
+    db LIGHT_SCREEN , LIGHT_SCREEN_EFFECT        ,   0 , THUNDER  , 255 , 10 ; pp 20 ; - ; PP 30 -> 20
     db HAZE         , HAZE_EFFECT                ,   0 , ICE      , 255 , 07 ; pp 30 ; -
     db REFLECT      , REFLECT_EFFECT             ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; -
-    db FOCUS_ENERGY , FOCUS_ENERGY_EFFECT        ,   0 , FIGHTING , 255 , 07 ; pp 30 ; - ; Type Normal -> Fighting
+    db FOCUS_ENERGY , FOCUS_ENERGY_EFFECT        ,   0 , FIGHT    , 255 , 07 ; pp 30 ; - ; Type Normal -> Fight   
     db BIDE         , BIDE_EFFECT                ,   0 , TYPE_NA  , 255 , 20 ; pp 10 ; -
     db METRONOME    , METRONOME_EFFECT           ,   0 , TYPE_NA  , 255 , 20 ; pp 10 ; -
     db MIRROR_MOVE  , MIRROR_MOVE_EFFECT         ,   0 , TYPE_NA  , 255 , 10 ; pp 20 ; - ; Typw Wind -> Normal
@@ -136,7 +136,7 @@
     db AMNESIA      , STAT_UP1_DOWN_SIDE_EFFECT  ,   0 , PSYCHIC  , 255 , 20 ; pp  5 ; - ; PP 20 -> 10
     db KINESIS      , ACCURACY_DOWN1_EFFECT      ,   0 , PSYCHIC  , 204 , 18 ; pp 15 ; - ; PP 20 -> 15 ; Ene 14 -> 18
     db SOFTBOILED   , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 21 ; pp 10 ; - ; Ene 20 -> 21
-    db HI_JUMP_KICK , JUMP_KICK_EFFECT           , 130 , FIGHTING , 229 , 23 ; pp 10 ; 0 ; Pwr 85 -> 130 ; PP 20 -> 10 ; Ene 20 -> 23
+    db HI_JUMP_KICK , JUMP_KICK_EFFECT           , 130 , FIGHT    , 229 , 23 ; pp 10 ; 0 ; Pwr 85 -> 130 ; PP 20 -> 10 ; Ene 20 -> 23
     db GLARE        , PARALYZE_EFFECT            ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Acr 191 -> 255 ; PP 30 -> 15
     db DREAM_EATER  , DREAM_EATER_EFFECT         , 100 , GHOST    , 255 , 17 ; pp 10 ; 1 ; Type Psychic -> Ghost ; PP 15 -> 10 ; Ene 20 -> 17
     db POISON_GAS   , POISON_EFFECT              ,   0 , POISON   , 229 , 07 ; pp 30 ; - ; Acr 140 -> 229 ; PP 40 -> 30
@@ -148,7 +148,7 @@
     db BUBBLE       , SPEED_DOWN_SIDE_EFFECT     ,  30 , WATER    , 255 , 06 ; pp 35 ; 1 ; Pwr 20 -> 30 ; PP 30 -> 35
     db DIZZY_PUNCH  , CONFUSION_SIDE_EFFECT      ,  90 , IVORY    , 255 , 16 ; pp 10 ; 0 ; Type Normal -> Ivory ; Pwr 70 -> 90 ; PP 10 -> 15 ; Ene 14 -> 16
     db SPORE        , SLEEP_EFFECT               ,   0 , GRASS    , 216 , 24 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 28 ; Acr 255 -> 216
-    db FLASH        , ACCURACY_DOWN1_EFFECT      ,   0 , ELECTRIC , 204 , 18 ; pp 15 ; - ; Type Normal -> Electric ; Acr 178 -> 204 ; PP 20 -> 15 ; Ene 14 -> 18
+    db FLASH        , ACCURACY_DOWN1_EFFECT      ,   0 , THUNDER  , 204 , 18 ; pp 15 ; - ; Type Normal -> THUNDER  ; Acr 178 -> 204 ; PP 20 -> 15 ; Ene 14 -> 18
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; Acr 204 -> 255 ; PP 15 -> 30
     db SPLASH       , SPLASH_EFFECT              ,   0 , WATER    , 255 , 00 ; pp 40 ; - ; Type Normal -> Water
     db ACID_ARMOR   , DEFENSE_UP3_EFFECT         ,   0 , POISON   , 255 , 10 ; pp 20 ; - ; PP 40 -> 20 ; Defense 3x

@@ -6,7 +6,7 @@ VoltorbHisuiBaseStats:
     db 100 ; base speed
     db 55 ; base special
 
-    db ELECTRIC ; species type 1
+    db THUNDER ; species type 1
     db GRASS ; species type 2
 
     db 190 ; catch rate
@@ -45,7 +45,7 @@ ElectrodeHisuiBaseStats:
     db 140 ; base speed
     db 80 ; base special
 
-    db ELECTRIC ; species type 1
+    db THUNDER ; species type 1
     db GRASS ; species type 2
 
     db 60 ; catch rate
@@ -630,8 +630,8 @@ PikachuStarterBaseStats:
     db 90+30 ; base speed
     db 50+25 ; base special
 
-    db ELECTRIC ; species type 1
-    db ELECTRIC ; species type 2
+    db THUNDER ; species type 1
+    db THUNDER ; species type 2
 
     db 75 ; catch rate
     db 82 ; base exp yield
