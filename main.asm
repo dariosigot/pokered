@@ -57884,6 +57884,15 @@ CheckPoisonableMon:
     cp POISON ; can't poison a poison-type target
     ret z
     cp METAL ; can't poison a metal-type target
+    ret z
+    push hl
+    push bc
+    ld bc,W_PLAYERMONID-W_PLAYERMONTYPES
+    add hl,bc
+    ld a,[hl]
+    cp KAKUNA
+    pop bc
+    pop hl
     ret
 
 BackupMovesBeforeEnemyMimic:
