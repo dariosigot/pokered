@@ -140808,6 +140808,11 @@ HandlePlayerBlackOut_:
 
 AdjustDamageForMoveType_GetInput:
 ; values for player turn
+    ld a,[H_WHOSETURN]
+    and a
+    jr nz,.ValuesForEnemyTurn
+
+.ValuesForPlayerTurn
     ld a,[W_PLAYERMOVETYPE]
     ld [$d11e],a
     ld a,[W_PLAYERMONID]
@@ -140816,14 +140821,12 @@ AdjustDamageForMoveType_GetInput:
     ld c,a
     ld hl,W_PLAYERMONTYPES
     call GetAttackerType ; b = type 1 | c = type 2
+    ld a,[W_ENEMYMON_START]
+    ld d,a
     ld hl,W_ENEMYMONTYPES
-    ld a,[hli]
-    ld d,a    ; d = type 1 of defender
-    ld e,[hl] ; e = type 2 of defender
-    ld a,[H_WHOSETURN]
-    and a
-    ret z
-; values for enemy turn
+    jp GetDefenderType
+
+.ValuesForEnemyTurn
     ld a,[W_ENEMYMOVETYPE]
     ld [$d11e],a
     ld a,[W_ENEMYMON_START]
@@ -140832,22 +140835,71 @@ AdjustDamageForMoveType_GetInput:
     ld c,a
     ld hl,W_ENEMYMONTYPES
     call GetAttackerType ; b = type 1 | c = type 2
+    ld a,[W_PLAYERMONID]
+    ld d,a
     ld hl,W_PLAYERMONTYPES
+    jp GetDefenderType
+
+; Input
+; [$d11e] = Attacker Move Type
+; [hl/hl+1] = Defender Mon Type
+; b = type 1 of attacker
+; c = type 2 of attacker
+; d = Defender Mon ID
+; Output
+; d = type 1 of defender
+; e = type 2 of defender
+GetDefenderType:
+    ld a,[$d11e]
+    cp GROUND
+    jr z,.TryToLevitate
+    ; fall through
+
+.Standard
     ld a,[hli]
     ld d,a    ; d = type 1 of defender
     ld e,[hl] ; e = type 2 of defender
     ret
 
+.TryToLevitate
+    ld a,d ; Defender Mon ID
+    push hl
+    ld hl,.LevitateMonList
+    call .IsInArray
+    pop hl
+    jr nc,.Standard
+    ld a,WIND
+    ld d,a
+    ld e,a
+    ret
+
+.IsInArray
+    push bc
+    push de
+    ld de,1
+    call IsInArray
+    pop de
+    pop bc
+    ret
+    
+.LevitateMonList
+    db BEEDRILL
+    db KOFFING
+    db WEEZING
+    db $FF
+
 ; Input
-; [$d11e] = move type
-; [hl/hl+1] = Mon Type
-; b = Mon ID
-; c = Move ID
+; [$d11e] = Attacker Move Type
+; [hl/hl+1] = Attacker Mon Types
+; b = Attacker Mon ID
+; c = Attacker Move ID
 ; Output
 ; b = type 1 of attacker
 ; c = type 2 of attacker
-; Note = DRAGON Type gain WIND STAB
-;        "Birds" gain IVORY STAB
+; Note = DRAGON Type & Beedrill gain WIND STAB
+;        "Birds", Rapidash & Seaking gain IVORY STAB
+;        Kakuna gain POISON STAB
+;        Sandshrew/Sansdlash gain STAB with "Slash moves"
 GetAttackerType_:
     call Load16BitRegisters
 GetAttackerType:
