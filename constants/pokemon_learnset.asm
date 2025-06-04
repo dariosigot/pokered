@@ -2490,7 +2490,7 @@ STARYU_Learnset: MACRO
     db 36,PSYBEAM
     db 38,SONICBOOM
     db 40,REFLECT
-    db 43,GLARE
+    db 43,THUNDER_WAVE
     db 46,SCREECH
     db 49,LIGHT_SCREEN
     db 53,PSYCHIC_M
@@ -2514,7 +2514,7 @@ STARMIE_Learnset: MACRO
     db 28,PSYBEAM
     db 30,SONICBOOM
     db 32,REFLECT
-    db 34,GLARE
+    db 34,THUNDER_WAVE
     db 35,SUPERSONIC
     db 36,SCREECH
     db 38,WATERFALL
