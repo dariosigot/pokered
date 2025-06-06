@@ -260,8 +260,8 @@ ENDM
 PIDGEY_Learnset: MACRO
     db  1,GUST
     db  1,GROWL
-    db  5,SAND_ATTACK
-    db  7,TACKLE
+    db  5,TACKLE
+    db  7,SAND_ATTACK
     db 10,QUICK_ATTACK
     db 13,PECK
     db 16,LEER
@@ -475,7 +475,7 @@ ENDM
 SANDSHREW_Learnset: MACRO
     db  1,SCRATCH
     db  1,DEFENSE_CURL
-    db  6,SAND_ATTACK
+    db  5,SAND_ATTACK
     db  9,TRAPHOLE
     db 12,FURY_SWIPES
     db 14,POISON_STING
@@ -941,7 +941,7 @@ ENDM
 DIGLETT_Learnset: MACRO
     db  1,SCRATCH
     db  1,GROWL
-    db  6,SAND_ATTACK
+    db  5,SAND_ATTACK
     db  9,TRAPHOLE
     db 13,AGILITY
     db 17,FURY_SWIPES
@@ -1397,6 +1397,7 @@ GEODUDE_Learnset: MACRO
     db  1,DEFENSE_CURL
     db  6,POUND
     db  9,DOUBLESLAP
+    db 11,SAND_ATTACK
     db 13,ROCK_THROW
     db 14,HEADBUTT
     db 15,HARDEN
@@ -1823,6 +1824,7 @@ ONIX_Learnset: MACRO
     db 12,ROCK_THROW
     db 14,SLAM
     db 15,WRAP
+    db 17,SAND_ATTACK
     db 19,BLADE
     db 21,SHARPEN
     db 23,TRAPHOLE
@@ -2263,6 +2265,7 @@ RHYHORN_Learnset: MACRO
     db  1,TAIL_WHIP
     db  5,GROWL
     db  8,HARDEN
+    db 10,SAND_ATTACK
     db 11,FURY_ATTACK
     db 13,ROCK_THROW
     db 15,BONE_CLUB

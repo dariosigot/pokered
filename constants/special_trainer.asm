@@ -1,6 +1,6 @@
 BrockMoves:
     ; Geodude (Level 12)
-    db TACKLE
+    db SAND_ATTACK
     db DEFENSE_CURL
     db DOUBLESLAP
     db BIDE
