@@ -24995,7 +24995,7 @@ ItemUseOldRod:
     ld a,$2 ; $2 if no fishing groups found
     jr RodResponse
 .Magikarp
-    ld bc,(1 << 8) | MAGIKARP ; Entry Level
+    ld bc,(1 << 8) | MAGIKARP ; Entry Point
     ld a,$1 ; set bite
     jr RodResponse
 
@@ -41352,7 +41352,7 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
     db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,OPP_LVL_OFFSET+40 ; trainer
     db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
-    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,OPP_LVL_OFFSET+55 ; Entry Level
+    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,OPP_LVL_OFFSET+55 ; Entry Point
     db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
     db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,TM_41 ; item
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
@@ -69615,7 +69615,7 @@ SeafoamIslands5Object: ; 0x468bc (size=62)
     db $3 ; people
     db SPRITE_BOULDER,$f + 4,$4 + 4,$ff,$ff,$1 ; person
     db SPRITE_BOULDER,$f + 4,$5 + 4,$ff,$ff,$2 ; person
-    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,OPP_LVL_OFFSET+55 ; Entry Level
+    db SPRITE_ARTICUNO,$1 + 4,$6 + 4,$ff,$d0,$43,ARTICUNO,OPP_LVL_OFFSET+55 ; Entry Point
 
     ; warp-to
     EVENT_DISP $f,$11,$14 ; SEAFOAM_ISLANDS_4
@@ -70655,7 +70655,7 @@ SafariZoneLapras:
     ld [W_GYMLEADERNO],a
     ld a,30
     ld [W_CURENEMYLVL],a
-    ld a,LAPRAS ; Entry Level
+    ld a,LAPRAS ; Entry Point
     ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
     call PlayTrainerMusic
@@ -70954,11 +70954,11 @@ UnknownDungeon4Object:
     db $0 ; signs
 
     db $5 ; people
-    db SPRITE_MEWTWO,01+4,03+4,$ff,$d0,$41,MEWTWO,OPP_LVL_OFFSET+70 ; Entry Level
-    db SPRITE_ALAKAZAM,01+4,25+4,$ff,$d0,$42,ALAKAZAM,OPP_LVL_OFFSET+65 ; Entry Level
-    db SPRITE_MACHAMP,08+4,20+4,$ff,$d0,$43,MACHAMP,OPP_LVL_OFFSET+65 ; Entry Level
-    db SPRITE_GOLEM,07+4,10+4,$ff,$d0,$44,GOLEM,OPP_LVL_OFFSET+65 ; Entry Level
-    db SPRITE_GENGAR,16+4,05+4,$ff,$d0,$45,GENGAR,OPP_LVL_OFFSET+65 ; Entry Level
+    db SPRITE_MEWTWO,01+4,03+4,$ff,$d0,$41,MEWTWO,OPP_LVL_OFFSET+70 ; Entry Point
+    db SPRITE_ALAKAZAM,01+4,25+4,$ff,$d0,$42,ALAKAZAM,OPP_LVL_OFFSET+65 ; Entry Point
+    db SPRITE_MACHAMP,08+4,20+4,$ff,$d0,$43,MACHAMP,OPP_LVL_OFFSET+65 ; Entry Point
+    db SPRITE_GOLEM,07+4,10+4,$ff,$d0,$44,GOLEM,OPP_LVL_OFFSET+65 ; Entry Point
+    db SPRITE_GENGAR,16+4,05+4,$ff,$d0,$45,GENGAR,OPP_LVL_OFFSET+65 ; Entry Point
 
     ; warp-to
     EVENT_DISP $f,13,27 ; UNKNOWN_DUNGEON_3
@@ -78436,7 +78436,7 @@ SilphCo7Text1: ; 51d8e (14:5d8e)
 .asm_d7e17 ; 0x51da5
     ld hl,UnnamedText_51dd3
     call PrintText
-    ld bc,(PORYGON << 8) | 30 ; Entry Level
+    ld bc,(PORYGON << 8) | 30 ; Entry Point
     call GivePorygon ; call GivePokemon
     jr nc,.asm_b3069 ; 0x51db1
     ld a,[$ccd3]
@@ -78816,7 +78816,7 @@ Mansion2Object:
     db $4 ; people
     db SPRITE_BLACK_HAIR_BOY_2,$11 + 4,$3 + 4,$fe,$2,$41,BURGLAR,$4 ; trainer
     ;db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
-    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$42,MOLTRES,OPP_LVL_OFFSET+55 ; Entry Level
+    db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$42,MOLTRES,OPP_LVL_OFFSET+55 ; Entry Point
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
 
@@ -80175,12 +80175,12 @@ GetPrizeMonLevel:
 .PrizeMonLevelDictionary
     db MAGIKARP,15
     db BUTTERFREE,18
-    db DODUO,17
-    db RHYHORN,19
-    db STARMIE,31 ; Entry Level
-    db ARCANINE,31 ; Entry Level
-    db CLOYSTER,31 ; Entry Level
-    db EXEGGUTOR,31 ; Entry Level
+    db DODUO,17 ; Entry Point
+    db RHYHORN,19 ; Entry Point
+    db STARMIE,31 ; Entry Point
+    db ARCANINE,31 ; Entry Point
+    db CLOYSTER,31 ; Entry Point
+    db EXEGGUTOR,31 ; Entry Point
     db $FF
 
 SECTION "bank15",ROMX,BANK[$15]
@@ -88537,7 +88537,7 @@ Route12Snorlax:
     ld [W_GYMLEADERNO],a
     ld a,30
     ld [W_CURENEMYLVL],a ; $d127
-    ld a,SNORLAX ; Entry Level
+    ld a,SNORLAX ; Entry Point
     ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
     call PlayTrainerMusic
@@ -90698,7 +90698,7 @@ FightingDojoText6: ; 5cf06 (17:4f06)
     ds 1 ; call PrintText
     jr .done
 .GetMon
-    ld a,HITMONLEE ; Entry Level
+    ld a,HITMONLEE ; Entry Point
     call UpdatePokedex
     ld hl,WantHitmonleeText
     call PrintText
@@ -90738,7 +90738,7 @@ FightingDojoText7: ; 5cf4e (17:4f4e)
     ds 1 ; call PrintText
     jr .done
 .GetMon
-    ld a,HITMONCHAN ; Entry Level
+    ld a,HITMONCHAN ; Entry Point
     call UpdatePokedex
     ld hl,WantHitmonchanText
     call PrintText
@@ -94157,10 +94157,10 @@ GiveFossilToCinnabarLab: ; 61006 (18:5006)
     ld b,AERODACTYL
     jr .fossilSelected
 .choseHelixFossil
-    ld b,OMASTAR ; Entry Level
+    ld b,OMASTAR ; Entry Point
     jr .fossilSelected
 .choseDomeFossil
-    ld b,KABUTOPS ; Entry Level
+    ld b,KABUTOPS ; Entry Point
 .fossilSelected
     ld [W_FOSSILITEM],a
     ld a,b
@@ -96763,7 +96763,7 @@ DiglettsCaveAerodactyl:
     ld [W_GYMLEADERNO],a
     ld a,30
     ld [W_CURENEMYLVL],a ; $d127
-    ld a,AERODACTYL ; Entry Level
+    ld a,AERODACTYL ; Entry Point
     ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
     call PlayTrainerMusic
@@ -133271,15 +133271,15 @@ PewterMons:
 
 Route1Mons:
     db $19
-    db  3,PIDGEY  ; 20%
-    db  3,RATTATA ; 20%
+    db  3,PIDGEY  ; 20% ; Entry Point
+    db  3,RATTATA ; 20% ; Entry Point
     db  4,RATTATA ; 15%
     db  2,RATTATA ; 10%
-    db  2,PIDGEY  ; 10% ; Entry Level
+    db  2,PIDGEY  ; 10%
     db  3,PIDGEY  ; 10%
     db  4,PIDGEY  ;  5%
-    db  1,RATTATA ;  5% ; Entry Level
-    db  2,MEOWTH  ;  4% ; Entry Level
+    db  1,RATTATA ;  5%
+    db  2,MEOWTH  ;  4% ; Entry Point
     db  5,PIDGEY  ;  1%
     db $00
 
@@ -133290,7 +133290,7 @@ Route2Mons:
     db  4,PIDGEY  ; 15%
     db  4,RATTATA ; 10%
     db  3,MEOWTH  ; 10%
-    db  3,SPEAROW ; 10% ; Entry Level
+    db  3,SPEAROW ; 10% ; Entry Point
     db  4,MEOWTH  ;  5%
     db  4,SPEAROW ;  5%
     db  6,RATTATA ;  4%
@@ -133299,29 +133299,29 @@ Route2Mons:
 
 Route22Mons:
     db $19
-    db  3,NIDORAN_M ; 20% ; Entry Level
-    db  3,NIDORAN_F ; 20% ; Entry Level
-    db  3,MANKEY    ; 15%
+    db  3,NIDORAN_M ; 20% ; Entry Point
+    db  3,NIDORAN_F ; 20% ; Entry Point
+    db  3,MANKEY    ; 15% ; Entry Point
     db  4,NIDORAN_M ; 10%
     db  4,NIDORAN_F ; 10%
     db  3,SPEAROW   ; 10%
-    db  2,MANKEY    ;  5% ; Entry Level
+    db  2,MANKEY    ;  5%
     db  5,SPEAROW   ;  5%
     db  4,MANKEY    ;  4%
-    db  6,POLIWAG   ;  1%
+    db  6,POLIWAG   ;  1% ; Entry Point
     db $00
 
 ForestMons:
     db $08
-    db  3,WEEDLE        ; 20% ; Entry Level
-    db  3,CATERPIE      ; 20% ; Entry Level
+    db  3,WEEDLE        ; 20% ; Entry Point
+    db  3,CATERPIE      ; 20% ; Entry Point
     db  4,WEEDLE        ; 15%
-    db  7,KAKUNA        ; 10% ; Entry Level
-    db  7,METAPOD       ; 10% ; Entry Level
+    db  7,KAKUNA        ; 10% ; Entry Point
+    db  7,METAPOD       ; 10% ; Entry Point
     db  4,CATERPIE      ; 10%
     db  W_SUB_GROUP,$FF ;  5% ; ForestMons6
-    db  4,VENONAT       ;  5%
-    db  6,VENONAT       ;  4% ; Entry Level
+    db  4,VENONAT       ;  5% ; Entry Point
+    db  6,VENONAT       ;  4%
     db  W_SUB_GROUP,$FF ;  1% ; ForestMons9
     db $00
 ForestMons6:
@@ -133330,10 +133330,10 @@ ForestMons6:
     db $BF,08,METAPOD  ; 25%
     db $FF,08,KAKUNA   ; 25%
 ForestMons9:
-    db $3F,10,PINSIR     ; 25% ; Entry Level
-    db $7F,10,SCYTHER    ; 25% ; Entry Level
-    db $BF,10,BEEDRILL   ; 25% ; Entry Level
-    db $FF,10,BUTTERFREE ; 25% ; Entry Level
+    db $3F,10,PINSIR     ; 25% ; Entry Point
+    db $7F,10,SCYTHER    ; 25% ; Entry Point
+    db $BF,10,BEEDRILL   ; 25% ; Entry Point
+    db $FF,10,BUTTERFREE ; 25% ; Entry Point
 
 Route3Mons:
     db $14
@@ -133341,24 +133341,24 @@ Route3Mons:
     db  5,SPEAROW    ; 20%
     db  8,MANKEY     ; 15%
     db  6,SPEAROW    ; 10%
-    db  5,SANDSHREW  ; 10% ; Entry Level
+    db  5,SANDSHREW  ; 10% ; Entry Point
     db  9,MANKEY     ; 10%
     db  7,SANDSHREW  ;  5%
-    db  4,JIGGLYPUFF ;  5% ; Entry Level
+    db  4,JIGGLYPUFF ;  5% ; Entry Point
     db  8,JIGGLYPUFF ;  4%
-    db  4,CLEFAIRY   ;  1% ; Entry Level
+    db  4,CLEFAIRY   ;  1% ; Entry Point
     db $00
 
 MoonMons1:
     db $0A
-    db  8,ZUBAT    ; 20%
+    db  8,ZUBAT    ; 20% ; Entry Point
     db  7,ZUBAT    ; 20%
     db  9,ZUBAT    ; 15%
-    db  8,GEODUDE  ; 10% ; Entry Level
-    db  6,ZUBAT    ; 10% ; Entry Level
+    db  8,GEODUDE  ; 10% ; Entry Point
+    db  6,ZUBAT    ; 10%
     db 10,ZUBAT    ; 10%
     db 10,GEODUDE  ;  5%
-    db  8,PARAS    ;  5% ; Entry Level
+    db  8,PARAS    ;  5% ; Entry Point
     db 11,ZUBAT    ;  4%
     db  8,CLEFAIRY ;  1%
     db $00
@@ -133371,10 +133371,10 @@ MoonMonsB1:
     db  8,GEODUDE ; 10%
     db  9,ZUBAT   ; 10%
     db 10,PARAS   ; 10%
-    db  7,DIGLETT ;  5% ; Entry Level
+    db  7,DIGLETT ;  5% ; Entry Point
     db 12,ZUBAT   ;  5%
     db  9,DIGLETT ;  4%
-    db 11,ONIX    ;  1% ; Entry Level
+    db 11,ONIX    ;  1% ; Entry Point
     db $00
 
 MoonMonsB2:
@@ -133396,7 +133396,7 @@ Route4Mons:
     db 10,RATTATA   ; 20%
     db 10,MANKEY    ; 20%
     db  8,RATTATA   ; 15%
-    db  6,EKANS     ; 10% ; Entry Level
+    db  6,EKANS     ; 10% ; Entry Point
     db  8,MANKEY    ; 10%
     db  6,SANDSHREW ; 10%
     db 10,SANDSHREW ;  5%
@@ -133434,9 +133434,9 @@ Route24Mons:
     db 13,PIDGEY     ; 20%
     db  9,VENONAT    ; 20%
     db 12,PIDGEY     ; 15%
-    db 11,ODDISH     ; 10% ; Entry Level
-    db 11,BELLSPROUT ; 10% ; Entry Level
-    db  8,ABRA       ; 10% ; Entry Level
+    db 11,ODDISH     ; 10% ; Entry Point
+    db 11,BELLSPROUT ; 10% ; Entry Point
+    db  8,ABRA       ; 10% ; Entry Point
     db 14,ODDISH     ;  5%
     db 14,BELLSPROUT ;  5%
     db 12,VENONAT    ;  4%
@@ -133461,10 +133461,10 @@ Route25Mons:
     db 13,NIDORAN_M  ; 10%
     db 13,NIDORAN_F  ; 10%
     db 14,NIDORAN_F  ; 10%
-    db 16,NIDORINO   ;  5% ; Entry Level
-    db 16,NIDORINA   ;  5% ; Entry Level
+    db 16,NIDORINO   ;  5% ; Entry Point
+    db 16,NIDORINA   ;  5% ; Entry Point
     db 17,PIDGEY     ;  4%
-    db 18,PIDGEOTTO  ;  1% ; Entry Level
+    db 18,PIDGEOTTO  ;  1% ; Entry Point
     db $05
     db 21,HORSEA   ; 20%
     db 18,GOLDEEN  ; 20%
@@ -133481,14 +133481,14 @@ Route5Mons:
     db $0F
     db W_SUB_GROUP,$FF ; 20% ; Route5Mons0
     db 15,PIDGEY       ; 20%
-    db 13,PONYTA       ; 15%
-    db 11,PONYTA       ; 10% ; Entry Level
+    db 13,PONYTA       ; 15% ; Entry Point
+    db 11,PONYTA       ; 10%
     db W_SUB_GROUP,$FF ; 10% ; Route5Mons4
     db 17,PIDGEY       ; 10%
     db W_SUB_GROUP,$FF ;  5% ; Route5Mons6
     db 19,PIDGEOTTO    ;  5%
     db 16,PONYTA       ;  4%
-    db 20,TAUROS       ;  1% ; Entry Level
+    db 20,TAUROS       ;  1% ; Entry Point
     db $00
 Route5Mons0:
     db $7F,13,RATTATA ; 50%
@@ -133504,14 +133504,14 @@ Route6Mons:
     db $0F
     db 12,ODDISH     ; 20%
     db 12,BELLSPROUT ; 20%
-    db  9,FARFETCH_D ; 15% ; Entry Level
+    db  9,FARFETCH_D ; 15% ; Entry Point
     db 11,POLIWAG    ; 10%
     db 15,ODDISH     ; 10%
     db 15,BELLSPROUT ; 10%
     db 13,FARFETCH_D ;  5%
     db 11,FARFETCH_D ;  5%
     db 13,POLIWAG    ;  4%
-    db 13,PSYDUCK    ;  1% ; Entry Level
+    db 13,PSYDUCK    ;  1% ; Entry Point
     db $05
     db 20,POLIWAG    ; 20%
     db 19,FARFETCH_D ; 20%
@@ -133521,8 +133521,8 @@ Route6Mons:
     db 16,PSYDUCK    ; 10%
     db 23,FARFETCH_D ;  5%
     db 22,PSYDUCK    ;  5%
-    db 37,POLIWRATH  ;  4% ; Entry Level
-    db 33,GOLDUCK    ;  1% ; Entry Level
+    db 37,POLIWRATH  ;  4% ; Entry Point
+    db 33,GOLDUCK    ;  1% ; Entry Point
 
 VermilionMons:
     db $00
@@ -133567,7 +133567,7 @@ Route11Mons:
     db 12,RATTATA   ; 20%
     db 13,SANDSHREW ; 20%
     db 15,DIGLETT   ; 15%
-    db  9,DROWZEE   ; 10% ; Entry Level
+    db  9,DROWZEE   ; 10% ; Entry Point
     db 16,DIGLETT   ; 10%
     db 13,DROWZEE   ; 10%
     db 15,RATTATA   ;  5%
@@ -133593,11 +133593,11 @@ CaveMons:
     db 17,DIGLETT   ; 15%
     db 20,DIGLETT   ; 10%
     db 16,DIGLETT   ; 10%
-    db 20,RATICATE  ; 10% ; Entry Level
+    db 20,RATICATE  ; 10% ; Entry Point
     db 21,DIGLETT   ;  5%
     db 22,DIGLETT   ;  5%
-    db 22,SANDSLASH ;  4% ; Entry Level
-    db 31,DUGTRIO   ;  1% ; Entry Level
+    db 22,SANDSLASH ;  4% ; Entry Point
+    db 31,DUGTRIO   ;  1% ; Entry Point
     db $00
 
 Route9Mons:
@@ -133610,19 +133610,19 @@ Route9Mons:
     db 15,EKANS    ; 10%
     db 20,RATICATE ;  5%
     db 13,EKANS    ;  5%
-    db 20,FEAROW   ;  4% ; Entry Level
-    db 22,ARBOK    ;  1% ; Entry Level
+    db 20,FEAROW   ;  4% ; Entry Point
+    db 22,ARBOK    ;  1% ; Entry Point
     db $00
 
 Route10Mons:
     db $0F
-    db 12,VOLTORB      ; 20% ; Entry Level
+    db 12,VOLTORB      ; 20% ; Entry Point
     db 16,VOLTORB      ; 20%
     db 13,VOLTORB      ; 15%
-    db 11,GRIMER       ; 10% ; Entry Level
+    db 11,GRIMER       ; 10% ; Entry Point
     db W_SUB_GROUP,$FF ; 10% ; Route10Mons4
-    db 12,MAGNEMITE    ; 10% ; Entry Level
-    db 13,KOFFING      ;  5% ; Entry Level
+    db 12,MAGNEMITE    ; 10% ; Entry Point
+    db 13,KOFFING      ;  5% ; Entry Point
     db 15,MAGNEMITE    ;  5%
     db 15,GRIMER       ;  4%
     db 18,KOFFING      ;  1%
@@ -133646,13 +133646,13 @@ TunnelMonsB1:
     db 16,ZUBAT   ; 20%
     db 17,ZUBAT   ; 20%
     db 17,GEODUDE ; 15%
-    db 15,MACHOP  ; 10% ; Entry Level
+    db 15,MACHOP  ; 10% ; Entry Point
     db 16,GEODUDE ; 10%
     db 19,ZUBAT   ; 10%
     db 15,ZUBAT   ;  5%
     db 17,MACHOP  ;  5%
     db 19,ONIX    ;  4%
-    db 22,GOLBAT  ;  1% ; Entry Level
+    db 22,GOLBAT  ;  1% ; Entry Point
     db $00
 
 TunnelMonsB2:
@@ -133666,7 +133666,7 @@ TunnelMonsB2:
     db 18,MACHOP   ;  5%
     db 21,ONIX     ;  5%
     db 22,GOLBAT   ;  4%
-    db 25,GRAVELER ;  1% ; Entry Level
+    db 25,GRAVELER ;  1% ; Entry Point
     db $00
 
 Route8Mons:
@@ -133677,8 +133677,8 @@ Route8Mons:
     db 17,ODDISH       ; 10%
     db 17,BELLSPROUT   ; 10%
     db W_SUB_GROUP,$FF ; 10% ; Route8Mons5
-    db 21,GLOOM        ;  5% ; Entry Level
-    db 21,WEEPINBELL   ;  5% ; Entry Level
+    db 21,GLOOM        ;  5% ; Entry Point
+    db 21,WEEPINBELL   ;  5% ; Entry Point
     db W_SUB_GROUP,$FF ;  4% ; Route8Mons8
     db W_SUB_GROUP,$FF ;  1% ; Route8Mons9
     db $00
@@ -133709,10 +133709,10 @@ Route7Mons:
     db 21,GROWLITHE ; 10%
     db 21,VULPIX    ; 10%
     db 20,MANKEY    ; 10%
-    db 17,GROWLITHE ;  5% ; Entry Level
-    db 17,VULPIX    ;  5% ; Entry Level
+    db 17,GROWLITHE ;  5% ; Entry Point
+    db 17,VULPIX    ;  5% ; Entry Point
     db 23,MANKEY    ;  4%
-    db 28,PRIMEAPE  ;  1% ; Entry Level
+    db 28,PRIMEAPE  ;  1% ; Entry Point
     db $00
 
 CeladonMons:
@@ -133726,7 +133726,7 @@ CeladonMons:
     db 31,GRIMER ; 10%
     db 25,GRIMER ;  5%
     db 35,GRIMER ;  5%
-    db 38,MUK    ;  4% ; Entry Level
+    db 38,MUK    ;  4% ; Entry Point
     db 40,MUK    ;  1%
 
 Route16Mons:
@@ -133745,16 +133745,16 @@ Route16Mons:
 
 TowerMons3:
     db $0A
-    db 18,GASTLY  ; 20%
+    db 18,GASTLY  ; 20% ; Entry Point
     db 19,GASTLY  ; 20%
     db 20,GASTLY  ; 15%
     db 21,GASTLY  ; 10%
     db 17,GASTLY  ; 10%
-    db 16,GASTLY  ; 10% ; Entry Level
+    db 16,GASTLY  ; 10%
     db 23,GASTLY  ;  5%
-    db 12,CUBONE  ;  5% ; Entry Level
+    db 12,CUBONE  ;  5% ; Entry Point
     db 17,CUBONE  ;  4%
-    db 25,HAUNTER ;  1% ; Entry Level
+    db 25,HAUNTER ;  1% ; Entry Point
     db $00
 
 TowerMons4:
@@ -133810,7 +133810,7 @@ TowerMons7:
     db 16,CUBONE  ;  5%
     db 21,CUBONE  ;  5%
     db 27,HAUNTER ;  4%
-    db 28,MAROWAK ;  1% ; Entry Level
+    db 28,MAROWAK ;  1% ; Entry Point
     db $00
 
 Route12Mons:
@@ -133823,7 +133823,7 @@ Route12Mons:
     db 23,PIDGEOTTO ; 10%
     db 23,RATICATE  ;  5%
     db 25,RATICATE  ;  5%
-    db 15,SLOWPOKE  ;  4% ; Entry Level
+    db 15,SLOWPOKE  ;  4% ; Entry Point
     db 23,SLOWPOKE  ;  1%
     db $05
     db 21,MAGIKARP   ; 20%
@@ -133847,8 +133847,8 @@ Route13Mons:
     db 24,VENONAT    ; 10%
     db 22,GLOOM      ;  5%
     db 22,WEEPINBELL ;  5%
-    db 18,TANGELA    ;  4% ; Entry level
-    db 31,VENOMOTH   ;  1% ; Entry level
+    db 18,TANGELA    ;  4% ; Entry Point
+    db 31,VENOMOTH   ;  1% ; Entry Point
     db $05
     db 21,MAGIKARP   ; 20%
     db 21,GOLDEEN    ; 20%
@@ -133878,13 +133878,13 @@ Route14Mons:
 Route15Mons:
     db $0F
     db 24,MEOWTH   ; 20%
-    db 26,DITTO    ; 20% ; Entry Level
+    db 26,DITTO    ; 20% ; Entry Point
     db 23,DITTO    ; 15%
     db 27,RATICATE ; 10%
     db 22,MEOWTH   ; 10%
     db 24,RATICATE ; 10%
     db 26,MEOWTH   ;  5%
-    db 28,PERSIAN  ;  5% ; Entry Level
+    db 28,PERSIAN  ;  5% ; Entry Point
     db 28,DITTO    ;  4%
     db 33,PERSIAN  ;  1%
     db $00
@@ -133900,7 +133900,7 @@ Route17Mons:
     db 25,KOFFING  ;  5%
     db 25,GRIMER   ;  5%
     db 36,RATICATE ;  4%
-    db 35,WEEZING  ;  1% ; Entry Level
+    db 35,WEEZING  ;  1% ; Entry Point
     db $00
 
 Route18Mons:
@@ -133914,7 +133914,7 @@ Route18Mons:
     db 27,PIDGEY    ;  5%
     db 32,FEAROW    ;  5%
     db 31,PIDGEOTTO ;  4%
-    db 36,PIDGEOT   ;  1% ; Entry Level
+    db 36,PIDGEOT   ;  1% ; Entry Point
     db $00
 
 ZoneMonsCenter:
@@ -133923,7 +133923,7 @@ ZoneMonsCenter:
     db 19,PARAS        ; 20%
     db 20,VENONAT      ; 15%
     db 21,PARAS        ; 10%
-    db 27,PARASECT     ; 10% ; Entry Level
+    db 27,PARASECT     ; 10% ; Entry Point
     db W_SUB_GROUP,$FF ; 10% ; ZoneMonsCenter5
     db W_SUB_GROUP,$FF ;  5% ; ZoneMonsCenter6
     db 32,VENOMOTH     ;  5%
@@ -133939,7 +133939,7 @@ ZoneMonsCenter:
     db 23,MAGIKARP  ;  5%
     db 24,DRATINI   ;  5%
     db 25,DRATINI   ;  4%
-    db 30,DRAGONAIR ;  1% ; Entry Level
+    db 30,DRAGONAIR ;  1% ; Entry Point
 ZoneMonsCenter5:
     db $26,12,CATERPIE ; 15%
     db $4C,12,WEEDLE   ; 15%
@@ -133965,12 +133965,12 @@ ZoneMons1:
     db 20,DODUO   ; 20%
     db 19,RHYHORN ; 15%
     db 20,PONYTA  ; 10%
-    db 17,DODUO   ; 10% ; Entry Level
-    db 18,RHYHORN ; 10% ; Entry Level
+    db 17,DODUO   ; 10%
+    db 18,RHYHORN ; 10%
     db 22,DODUO   ;  5%
     db 26,TAUROS  ;  5%
     db 28,TAUROS  ;  4%
-    db 33,DODRIO  ;  1% ; Entry Level
+    db 33,DODRIO  ;  1% ; Entry Point
     db $0E
     db 17,MAGIKARP  ; 20%
     db 28,SEEL      ; 20%
@@ -133991,10 +133991,10 @@ ZoneMons2:
     db 27,NIDORINO   ; 10%
     db 27,NIDORINA   ; 10%
     db 26,RHYHORN    ; 10%
-    db 31,NIDOKING   ;  5% ; Entry Level
-    db 31,NIDOQUEEN  ;  5% ; Entry Level
-    db 29,KANGASKHAN ;  4%
-    db  7,KANGASKHAN ;  1% ; Entry Level
+    db 31,NIDOKING   ;  5% ; Entry Point
+    db 31,NIDOQUEEN  ;  5% ; Entry Point
+    db 29,KANGASKHAN ;  4% ; Entry Point
+    db  2,KANGASKHAN ;  1%
     db $0E
     db 17,MAGIKARP  ; 20%
     db 28,SEEL      ; 20%
@@ -134010,15 +134010,15 @@ ZoneMons2:
 ZoneMons3:
     db $1E
     db 24,TANGELA   ; 20%
-    db 19,EXEGGCUTE ; 20%
+    db 19,EXEGGCUTE ; 20% ; Entry Point
     db 22,TANGELA   ; 15%
     db 22,EXEGGCUTE ; 10%
-    db 17,EXEGGCUTE ; 10% ; Entry Level
-    db 18,LICKITUNG ; 10%
-    db 14,LICKITUNG ;  5% ; Entry Level
+    db 17,EXEGGCUTE ; 10%
+    db 18,LICKITUNG ; 10% ; Entry Point
+    db 14,LICKITUNG ;  5%
     db 18,EEVEE     ;  5%
     db 21,EEVEE     ;  4%
-    db  7,CHANSEY   ;  1% ; Entry Level
+    db  7,CHANSEY   ;  1% ; Entry Point
     db $0E
     db 17,MAGIKARP  ; 20%
     db 28,SEEL      ; 20%
@@ -134049,14 +134049,14 @@ PowerPlantMons:
     db $0A
     db 37,VOLTORB    ; 20%
     db 37,VOLTORB    ; 20%
-    db 40,ELECTRODE  ; 15% ; Entry Level
+    db 40,ELECTRODE  ; 15% ; Entry Point
     db  9,PIKACHU    ; 10%
     db 21,MAGNEMITE  ; 10%
     db 18,MAGNEMITE  ; 10%
-    db 30,MAGNETON   ;  5% ; Entry Level
-    db 32,RAICHU     ;  5% ; Entry Level
-    db 31,ELECTABUZZ ;  4% ; Entry Level
-    db 32,JOLTEON    ;  1% ; Entry Level
+    db 30,MAGNETON   ;  5% ; Entry Point
+    db 32,RAICHU     ;  5% ; Entry Point
+    db 31,ELECTABUZZ ;  4% ; Entry Point
+    db 32,JOLTEON    ;  1% ; Entry Point
     db $00
 
 IslandMons1:
@@ -134070,7 +134070,7 @@ IslandMons1:
     db 24,SEEL     ;  5%
     db 25,SLOWPOKE ;  5%
     db 28,KINGLER  ;  4%
-    db 34,DEWGONG  ;  1% ; Entry Level
+    db 34,DEWGONG  ;  1% ; Entry Point
     db $00
 
 IslandMonsB1:
@@ -134084,7 +134084,7 @@ IslandMonsB1:
     db 24,KRABBY   ;  5%
     db 30,KINGLER  ;  5%
     db 35,DEWGONG  ;  4%
-    db 38,SLOWBRO  ;  1% ; Entry Level
+    db 38,SLOWBRO  ;  1% ; Entry Point
     db $00
 
 IslandMonsB2:
@@ -134110,9 +134110,9 @@ IslandMonsB3:
     db 32,KINGLER   ; 10%
     db 36,DEWGONG   ; 10%
     db 37,DEWGONG   ;  5%
-    db  5,SQUIRTLE  ;  5% ; Entry Level
-    db 31,JYNX      ;  4% ; Entry Level
-    db 32,VAPOREON  ;  1% ; Entry Level
+    db  5,SQUIRTLE  ;  5% ; Entry Point
+    db 31,JYNX      ;  4% ; Entry Point
+    db 32,VAPOREON  ;  1% ; Entry Point
     db $0A
     db 27,SEEL      ; 20%
     db 26,KRABBY    ; 20%
@@ -134120,10 +134120,10 @@ IslandMonsB3:
     db 24,KRABBY    ; 10%
     db  5,SQUIRTLE  ; 10%
     db 11,SQUIRTLE  ; 10%
-    db 16,WARTORTLE ;  5% ; Entry Level
+    db 16,WARTORTLE ;  5% ; Entry Point
     db 25,WARTORTLE ;  5%
     db 21,WARTORTLE ;  4%
-    db 40,BLASTOISE ;  1% ; Entry Level
+    db 40,BLASTOISE ;  1% ; Entry Point
 
 IslandMonsB4:
     db $0A
@@ -134159,8 +134159,8 @@ MansionMons1:
     db 24,VULPIX     ; 10%
     db 27,GROWLITHE  ;  5%
     db 27,VULPIX     ;  5%
-    db  5,CHARMANDER ;  4% ; Entry Level
-    db 40,RAPIDASH   ;  1% ; Entry Level
+    db  5,CHARMANDER ;  4% ; Entry Point
+    db 40,RAPIDASH   ;  1% ; Entry Point
     db $00
 
 MansionMons2:
@@ -134173,7 +134173,7 @@ MansionMons2:
     db 31,KOFFING    ; 10%
     db  5,CHARMANDER ;  5%
     db 38,WEEZING    ;  5%
-    db 16,CHARMELEON ;  4% ; Entry Level
+    db 16,CHARMELEON ;  4% ; Entry Point
     db 40,WEEZING    ;  1%
     db $00
 
@@ -134188,7 +134188,7 @@ MansionMons3:
     db 16,CHARMELEON ;  5%
     db 25,CHARMELEON ;  5%
     db 21,CHARMELEON ;  4%
-    db 40,CHARIZARD  ;  1% ; Entry Level
+    db 40,CHARIZARD  ;  1% ; Entry Point
     db $00
 
 MansionMonsB1:
@@ -134200,23 +134200,23 @@ MansionMonsB1:
     db 28,VULPIX    ; 10%
     db 29,PONYTA    ; 10%
     db 38,ARCANINE  ;  5%
-    db 38,NINETALES ;  5% ; Entry Level
-    db 31,MAGMAR    ;  4% ; Entry Level
-    db 32,FLAREON   ;  1% ; Entry Level
+    db 38,NINETALES ;  5% ; Entry Point
+    db 31,MAGMAR    ;  4% ; Entry Point
+    db 32,FLAREON   ;  1% ; Entry Point
     db $00
 
 Route21Mons:
     db $19
     db 22,ABRA       ; 20%
     db 22,DROWZEE    ; 20%
-    db 25,KADABRA    ; 15% ; Entry Level
+    db 25,KADABRA    ; 15% ; Entry Point
     db 25,ABRA       ; 10%
     db 21,DROWZEE    ; 10%
     db 28,KADABRA    ; 10%
-    db 27,HYPNO      ;  5% ; Entry Level
-    db 25,MR_MIME    ;  5%
+    db 27,HYPNO      ;  5% ; Entry Point
+    db 25,MR_MIME    ;  5% ; Entry Point
     db 32,HYPNO      ;  4%
-    db 10,MR_MIME    ;  1% ; Entry Level
+    db 10,MR_MIME    ;  1%
     db $05
     db 11,TENTACOOL  ; 20%
     db 15,TENTACOOL  ; 20%
@@ -134233,14 +134233,14 @@ Route23Mons:
     db $1C
     db 25,GLOOM      ; 20%
     db 25,WEEPINBELL ; 20%
-    db 35,VILEPLUME  ; 15% ; Entry Level
-    db 35,VICTREEBEL ; 10% ; Entry Level
-    db  5,BULBASAUR  ; 10% ; Entry Level
+    db 35,VILEPLUME  ; 15% ; Entry Point
+    db 35,VICTREEBEL ; 10% ; Entry Point
+    db  5,BULBASAUR  ; 10% ; Entry Point
     db 11,BULBASAUR  ; 10%
-    db 16,IVYSAUR    ;  5% ; Entry Level
+    db 16,IVYSAUR    ;  5% ; Entry Point
     db 25,IVYSAUR    ;  5%
     db 21,IVYSAUR    ;  4%
-    db 40,VENUSAUR   ;  1% ; Entry Level
+    db 40,VENUSAUR   ;  1% ; Entry Point
     db $02
     db 24,MAGIKARP   ; 20%
     db 27,MAGIKARP   ; 20%
@@ -134251,7 +134251,7 @@ Route23Mons:
     db 30,DRAGONAIR  ;  5%
     db 48,GYARADOS   ;  5%
     db 45,DRAGONAIR  ;  4%
-    db 55,DRAGONITE  ;  1% ; Entry Level
+    db 55,DRAGONITE  ;  1% ; Entry Point
 
 PlateauMons1:
     db $0F
@@ -134262,7 +134262,7 @@ PlateauMons1:
     db 45,ONIX     ; 10%
     db 47,ONIX     ; 10%
     db 43,GRAVELER ;  5%
-    db 38,MACHOKE  ;  5% ; Entry Level
+    db 38,MACHOKE  ;  5% ; Entry Point
     db 45,GRAVELER ;  4%
     db 44,MACHOKE  ;  1%
     db $00
@@ -134487,13 +134487,13 @@ SuperRodData:
 
 GoodRodGroupBeach:
     db  8
-    db  2,KRABBY ; Entry Level
+    db  2,KRABBY
     db  2,KRABBY
     db  2,KRABBY
     db  3,KRABBY
-    db  2,GOLDEEN ; Entry Level
+    db  2,GOLDEEN
     db  3,GOLDEEN
-    db  2,TENTACOOL ; Entry Level
+    db  2,TENTACOOL
     db  3,TENTACOOL
 
 SuperRodGroupBeach:
@@ -134523,13 +134523,13 @@ SuperRodGroupBeach:
     db 13,TENTACOOL
     db 17,TENTACOOL
     db 21,TENTACOOL
-    db  9,SHELLDER
+    db  9,SHELLDER ; Entry Point
     db 13,SHELLDER
     db 13,SHELLDER
     db 17,SHELLDER
-    db 28,KINGLER ; Entry Level
-    db 30,TENTACRUEL ; Entry Level
-    db 33,SEAKING ; Entry Level
+    db 28,KINGLER ; Entry Point
+    db 30,TENTACRUEL ; Entry Point
+    db 33,SEAKING ; Entry Point
 
 GoodRodGroupNorth:
     db 16
@@ -134544,7 +134544,7 @@ GoodRodGroupNorth:
     db  2,GOLDEEN
     db  2,GOLDEEN
     db  3,GOLDEEN
-    db  2,HORSEA ; Entry Level
+    db  2,HORSEA
     db  2,HORSEA
     db  3,HORSEA
     db  2,TENTACOOL
@@ -134577,11 +134577,11 @@ SuperRodGroupNorth:
     db 13,TENTACOOL
     db 17,TENTACOOL
     db 21,TENTACOOL
-    db  9,STARYU
+    db  9,STARYU ; Entry Point
     db 13,STARYU
     db 13,STARYU
     db 17,STARYU
-    db 32,SEADRA ; Entry Level
+    db 32,SEADRA ; Entry Point
     db 30,TENTACRUEL
     db 33,SEAKING
 
@@ -134598,10 +134598,10 @@ GoodRodGroupCenter:
     db  2,GOLDEEN
     db  2,GOLDEEN
     db  3,GOLDEEN
-    db  2,POLIWAG ; Entry Level
+    db  2,POLIWAG
     db  2,POLIWAG
     db  3,POLIWAG
-    db  2,KRABBY
+    db  2,KRABBY ; Entry Point
     db  3,KRABBY
 
 SuperRodGroupCenter:
@@ -134635,7 +134635,7 @@ SuperRodGroupCenter:
     db 13,SHELLDER
     db 13,SHELLDER
     db 17,SHELLDER
-    db 25,POLIWHIRL ; Entry Level
+    db 25,POLIWHIRL
     db 28,KINGLER
     db 33,SEAKING
 
@@ -134648,14 +134648,14 @@ GoodRodGroupEst:
     db  2,MAGIKARP
     db  2,MAGIKARP
     db  3,MAGIKARP
-    db  2,GOLDEEN
+    db  2,GOLDEEN ; Entry Point
     db  2,GOLDEEN
     db  2,GOLDEEN
     db  3,GOLDEEN
-    db  2,TENTACOOL
+    db  2,TENTACOOL ; Entry Point
     db  2,TENTACOOL
     db  3,TENTACOOL
-    db  2,HORSEA
+    db  2,HORSEA ; Entry Point
     db  3,HORSEA
 
 SuperRodGroupEst:
@@ -134781,7 +134781,7 @@ GoodRodGroupSafari:
     db  5,POLIWAG
     db  6,POLIWAG
     db  6,POLIWAG
-    db  2,SEEL ; Entry Level
+    db  2,SEEL ; Entry Point
     db  3,SEEL
     db  3,SEEL
     db  4,SEEL
@@ -134789,8 +134789,8 @@ GoodRodGroupSafari:
     db  5,SEEL
     db  5,SEEL
     db  6,SEEL
-    db  2,OMANYTE ; Entry Level
-    db  2,KABUTO ; Entry Level
+    db  2,OMANYTE ; Entry Point
+    db  2,KABUTO ; Entry Point
 
 SuperRodGroupSafari:
     db 32
@@ -134816,12 +134816,12 @@ SuperRodGroupSafari:
     db 16,SEEL
     db 20,SEEL
     db 24,SEEL
-    db  7,DRATINI ; Entry Level
+    db  7,DRATINI ; Entry Point
     db 11,DRATINI
     db 15,DRATINI
     db 19,DRATINI
     db 23,DRATINI
-    db 25,POLIWHIRL
+    db 25,POLIWHIRL ; Entry Point
     db 27,POLIWHIRL
     db 28,POLIWHIRL
     db 29,POLIWHIRL
@@ -134876,7 +134876,7 @@ GoodRodGroupSeaform:
     db  6,KRABBY
     db  6,KRABBY
     db  7,KRABBY
-    db  2,SHELLDER ; Entry Level
+    db  2,SHELLDER
     db  3,SHELLDER
     db  3,SHELLDER
     db  4,SHELLDER
@@ -134885,7 +134885,7 @@ GoodRodGroupSeaform:
     db  5,SHELLDER
     db  6,SHELLDER
     db  7,SHELLDER
-    db  2,STARYU ; Entry Level
+    db  2,STARYU
     db  3,STARYU
     db  3,STARYU
     db  4,STARYU
@@ -134941,7 +134941,7 @@ SuperRodGroupLake:
     db 30,MAGIKARP
     db 30,MAGIKARP
     db 33,MAGIKARP
-    db 43,GYARADOS ; Entry Level
+    db 43,GYARADOS ; Entry Point
 
 ;SuperRodGroupUnknown:
 
@@ -135313,7 +135313,7 @@ WildDockMew:
 .MewFirstEncounter
     ld a,70
     ld [W_CURENEMYLVL],a
-    ld a,MEW ; Entry Level
+    ld a,MEW ; Entry Point
     ld [W_ENEMYMONID],a
     scf ; WillEncounter
     ret
@@ -135352,12 +135352,12 @@ WildPikachuEevee:
 .PikachuEncounter
     ld a,7
     ld [W_PALLETTOWNCURSCRIPT],a
-    ld a,PIKACHU ; Entry Level
+    ld a,PIKACHU ; Entry Point
     jr .WillEncounter
 .EeveeEncounter
     ld a,7
     ld [W_PEWTERCITYCURSCRIPT],a
-    ld a,EEVEE ; Entry Level
+    ld a,EEVEE ; Entry Point
     ; fall through
 .WillEncounter
     ld [W_ENEMYMONID],a
@@ -135557,13 +135557,13 @@ UnknownDungeonLandPkmnList:
     db NIDORINO
     db NIDOKING
     db CLEFAIRY
-    db CLEFABLE ; Entry Level
+    db CLEFABLE ; Entry Point
     db VULPIX
     db VULPIX
     db NINETALES
     db JIGGLYPUFF
     db JIGGLYPUFF
-    db WIGGLYTUFF ; Entry Level
+    db WIGGLYTUFF ; Entry Point
     db ZUBAT
     db ZUBAT
     db ZUBAT
@@ -135717,7 +135717,7 @@ UnknownDungeonLandPkmnList:
     db WEEZING
     db RHYHORN
     db RHYHORN
-    db RHYDON ; Entry Level
+    db RHYDON ; Entry Point
     db TANGELA
     db TANGELA
     db MR_MIME
