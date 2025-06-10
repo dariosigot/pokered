@@ -10662,7 +10662,7 @@ SpriteFacingAndAnimationTable: ; 4000 (1:4000)
     dw SpriteFacingDownAndStanding,SpriteOAMParameters        ; ---
     dw SpriteFacingDownAndWalking,SpriteOAMParameters         ; This table is used for mon sprites
     dw SpriteFacingDownAndStanding,SpriteOAMParameters        ; Sprite can Only Face Down
-    dw SpriteFacingDownAndWalking,SpriteOAMParameters         ; (or UP = Jigglypuff Excetion)
+    dw SpriteFacingDownAndWalking,SpriteOAMParameters         ; (or UP = Jigglypuff Exception)
     dw SpriteFacingUpAndStanding,SpriteOAMParameters          ; ---
     dw SpriteFacingUpAndWalking,SpriteOAMParameters
     dw SpriteFacingUpAndStanding,SpriteOAMParameters
@@ -97775,6 +97775,8 @@ Func_706ae: ; 706ae (1c:46ae)
     ret
 
 LoadFlyingMonSprite_Overworld:
+    ld a,0       ; Force Flying Sprite Foreground
+    ld [$c207],a ; ...
     ld hl,wFlagFlyingMonSpriteBit1
     set 1,[hl]
     set 2,[hl] ; wFlagFlyingMonSpriteBit2
