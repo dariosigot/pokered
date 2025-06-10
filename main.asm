@@ -31276,6 +31276,10 @@ W_DOCK_MEW              EQU $03 ; WildDockMew
 W_PIKACHU_EEVEE         EQU $04 ; WildPikachuEevee
 W_STANDARD              EQU $05
 
+WILDSUB: MACRO
+    db W_SUB_GROUP,$FF
+ENDM
+
 ; Input
 ; e = Encounter Slot
 ; [W_ENEMYMONID] = Actual Wild Mon ID
@@ -133313,16 +133317,16 @@ Route22Mons:
 
 ForestMons:
     db $08
-    db  3,WEEDLE        ; 20% ; Entry Point
-    db  3,CATERPIE      ; 20% ; Entry Point
-    db  4,WEEDLE        ; 15%
-    db  7,KAKUNA        ; 10% ; Entry Point
-    db  7,METAPOD       ; 10% ; Entry Point
-    db  4,CATERPIE      ; 10%
-    db  W_SUB_GROUP,$FF ;  5% ; ForestMons6
-    db  4,VENONAT       ;  5% ; Entry Point
-    db  6,VENONAT       ;  4%
-    db  W_SUB_GROUP,$FF ;  1% ; ForestMons9
+    db  3,WEEDLE   ; 20% ; Entry Point
+    db  3,CATERPIE ; 20% ; Entry Point
+    db  4,WEEDLE   ; 15%
+    db  7,KAKUNA   ; 10% ; Entry Point
+    db  7,METAPOD  ; 10% ; Entry Point
+    db  4,CATERPIE ; 10%
+    WILDSUB        ;  5% ; ForestMons6
+    db  4,VENONAT  ;  5% ; Entry Point
+    db  6,VENONAT  ;  4%
+    WILDSUB        ;  1% ; ForestMons9
     db $00
 ForestMons6:
     db $3F,06,CATERPIE ; 25%
@@ -133479,16 +133483,16 @@ Route25Mons:
 
 Route5Mons:
     db $0F
-    db W_SUB_GROUP,$FF ; 20% ; Route5Mons0
-    db 15,PIDGEY       ; 20%
-    db 13,PONYTA       ; 15% ; Entry Point
-    db 11,PONYTA       ; 10%
-    db W_SUB_GROUP,$FF ; 10% ; Route5Mons4
-    db 17,PIDGEY       ; 10%
-    db W_SUB_GROUP,$FF ;  5% ; Route5Mons6
-    db 19,PIDGEOTTO    ;  5%
-    db 16,PONYTA       ;  4%
-    db 20,TAUROS       ;  1% ; Entry Point
+    WILDSUB         ; 20% ; Route5Mons0
+    db 15,PIDGEY    ; 20%
+    db 13,PONYTA    ; 15% ; Entry Point
+    db 11,PONYTA    ; 10%
+    WILDSUB         ; 10% ; Route5Mons4
+    db 17,PIDGEY    ; 10%
+    WILDSUB         ;  5% ; Route5Mons6
+    db 19,PIDGEOTTO ;  5%
+    db 16,PONYTA    ;  4%
+    db 20,TAUROS    ;  1% ; Entry Point
     db $00
 Route5Mons0:
     db $7F,13,RATTATA ; 50%
@@ -133588,17 +133592,27 @@ Route11Mons:
 
 CaveMons:
     db $14
-    db 18,DIGLETT   ; 20%
-    db 19,DIGLETT   ; 20%
-    db 17,DIGLETT   ; 15%
-    db 20,DIGLETT   ; 10%
-    db 16,DIGLETT   ; 10%
-    db 20,RATICATE  ; 10% ; Entry Point
-    db 21,DIGLETT   ;  5%
-    db 22,DIGLETT   ;  5%
-    db 22,SANDSLASH ;  4% ; Entry Point
-    db 31,DUGTRIO   ;  1% ; Entry Point
+    db 18,DIGLETT ; 20%
+    db 19,DIGLETT ; 20%
+    db 17,DIGLETT ; 15%
+    db 20,DIGLETT ; 10%
+    db 16,DIGLETT ; 10%
+    WILDSUB       ; 10% ; CaveMons5
+    db 21,DIGLETT ;  5%
+    db 22,DIGLETT ;  5%
+    WILDSUB       ;  4% ; CaveMons8
+    db 31,DUGTRIO ;  1% ; Entry Point
     db $00
+CaveMons5:
+    db $20,10,RATTATA  ; 12%
+    db $40,12,RATTATA  ; 12%
+    db $60,15,RATTATA  ; 12%
+    db $FF,20,RATICATE ; 65% ; Entry Point
+CaveMons8:
+    db $20,09,SANDSHREW ; 12%
+    db $40,13,SANDSHREW ; 12%
+    db $60,18,SANDSHREW ; 12%
+    db $FF,22,SANDSLASH ; 65% ; Entry Point
 
 Route9Mons:
     db $0F
@@ -133616,16 +133630,16 @@ Route9Mons:
 
 Route10Mons:
     db $0F
-    db 12,VOLTORB      ; 20% ; Entry Point
-    db 16,VOLTORB      ; 20%
-    db 13,VOLTORB      ; 15%
-    db 11,GRIMER       ; 10% ; Entry Point
-    db W_SUB_GROUP,$FF ; 10% ; Route10Mons4
-    db 12,MAGNEMITE    ; 10% ; Entry Point
-    db 13,KOFFING      ;  5% ; Entry Point
-    db 15,MAGNEMITE    ;  5%
-    db 15,GRIMER       ;  4%
-    db 18,KOFFING      ;  1%
+    db 12,VOLTORB   ; 20% ; Entry Point
+    db 16,VOLTORB   ; 20%
+    db 13,VOLTORB   ; 15%
+    db 11,GRIMER    ; 10% ; Entry Point
+    WILDSUB         ; 10% ; Route10Mons4
+    db 12,MAGNEMITE ; 10% ; Entry Point
+    db 13,KOFFING   ;  5% ; Entry Point
+    db 15,MAGNEMITE ;  5%
+    db 15,GRIMER    ;  4%
+    db 18,KOFFING   ;  1%
     db $05
     db 11,MAGIKARP   ; 20%
     db 15,GRIMER     ; 20%
@@ -133671,16 +133685,16 @@ TunnelMonsB2:
 
 Route8Mons:
     db $0F
-    db 19,ODDISH       ; 20%
-    db 19,BELLSPROUT   ; 20%
-    db W_SUB_GROUP,$FF ; 15% ; Route8Mons2
-    db 17,ODDISH       ; 10%
-    db 17,BELLSPROUT   ; 10%
-    db W_SUB_GROUP,$FF ; 10% ; Route8Mons5
-    db 21,GLOOM        ;  5% ; Entry Point
-    db 21,WEEPINBELL   ;  5% ; Entry Point
-    db W_SUB_GROUP,$FF ;  4% ; Route8Mons8
-    db W_SUB_GROUP,$FF ;  1% ; Route8Mons9
+    db 19,ODDISH     ; 20%
+    db 19,BELLSPROUT ; 20%
+    WILDSUB          ; 15% ; Route8Mons2
+    db 17,ODDISH     ; 10%
+    db 17,BELLSPROUT ; 10%
+    WILDSUB          ; 10% ; Route8Mons5
+    db 21,GLOOM      ;  5% ; Entry Point
+    db 21,WEEPINBELL ;  5% ; Entry Point
+    WILDSUB          ;  4% ; Route8Mons8
+    WILDSUB          ;  1% ; Route8Mons9
     db $00
 Route8Mons2:
     db $26, 9,CATERPIE ; 15%
@@ -133703,9 +133717,9 @@ Route8Mons9:
 
 Route7Mons:
     db $0F
-    db 19,PIDGEOTTO ; 20%
+    WILDSUB         ; 20% ; Route7Mons0
     db 17,MANKEY    ; 20%
-    db 24,PIDGEOTTO ; 15%
+    WILDSUB         ; 15% ; Route7Mons2
     db 21,GROWLITHE ; 10%
     db 21,VULPIX    ; 10%
     db 20,MANKEY    ; 10%
@@ -133714,6 +133728,16 @@ Route7Mons:
     db 23,MANKEY    ;  4%
     db 28,PRIMEAPE  ;  1% ; Entry Point
     db $00
+Route7Mons0:
+    db $20,15,PIDGEY    ; 12%
+    db $40,17,PIDGEY    ; 12%
+    db $60,18,PIDGEOTTO ; 12%
+    db $FF,19,PIDGEOTTO ; 65%
+Route7Mons2:
+    db $20,16,PIDGEY    ; 12%
+    db $40,18,PIDGEY    ; 12%
+    db $60,23,PIDGEOTTO ; 12%
+    db $FF,24,PIDGEOTTO ; 65%
 
 CeladonMons:
     db $00
@@ -133863,24 +133887,39 @@ Route13Mons:
 
 Route14Mons:
     db $0F
-    db 22,NIDORINO  ; 20%
-    db 22,NIDORINA  ; 20%
-    db 17,EKANS     ; 15%
-    db 25,RATICATE  ; 10%
-    db 24,RATICATE  ; 10%
-    db 20,EKANS     ; 10%
-    db 26,NIDORINO  ;  5%
-    db 26,NIDORINA  ;  5%
-    db 28,ARBOK     ;  4%
-    db 31,ARBOK     ;  1%
+    WILDSUB        ; 20% ; Route14Mons0
+    WILDSUB        ; 20% ; Route14Mons1
+    db 17,EKANS    ; 15%
+    WILDSUB        ; 10% ; Route14Mons3
+    db 24,RATICATE ; 10%
+    db 20,EKANS    ; 10%
+    db 26,NIDORINO ;  5%
+    db 26,NIDORINA ;  5%
+    db 28,ARBOK    ;  4%
+    db 31,ARBOK    ;  1%
     db $00
+Route14Mons0:
+    db $20,16,NIDORAN_M ; 12%
+    db $40,18,NIDORAN_M ; 12%
+    db $60,21,NIDORINO  ; 12%
+    db $FF,22,NIDORINO  ; 65%
+Route14Mons1:
+    db $20,16,NIDORAN_F ; 12%
+    db $40,18,NIDORAN_F ; 12%
+    db $60,21,NIDORINA  ; 12%
+    db $FF,22,NIDORINA  ; 65%
+Route14Mons3:
+    db $20,18,RATTATA   ; 12%
+    db $40,21,RATTATA   ; 12%
+    db $60,24,RATICATE  ; 12%
+    db $FF,25,RATICATE  ; 65%
 
 Route15Mons:
     db $0F
     db 24,MEOWTH   ; 20%
     db 26,DITTO    ; 20% ; Entry Point
     db 23,DITTO    ; 15%
-    db 27,RATICATE ; 10%
+    WILDSUB        ; 10% ; Route15Mons3
     db 22,MEOWTH   ; 10%
     db 24,RATICATE ; 10%
     db 26,MEOWTH   ;  5%
@@ -133888,12 +133927,17 @@ Route15Mons:
     db 28,DITTO    ;  4%
     db 33,PERSIAN  ;  1%
     db $00
+Route15Mons3:
+    db $20,20,RATTATA   ; 12%
+    db $40,22,RATTATA   ; 12%
+    db $60,26,RATICATE  ; 12%
+    db $FF,27,RATICATE  ; 65%
 
 Route17Mons:
     db $19
     db 19,KOFFING  ; 20%
     db 19,GRIMER   ; 20%
-    db 26,RATICATE ; 15%
+    WILDSUB        ; 15% ; Route17Mons2
     db 22,KOFFING  ; 10%
     db 22,GRIMER   ; 10%
     db 28,RATICATE ; 10%
@@ -133902,6 +133946,11 @@ Route17Mons:
     db 36,RATICATE ;  4%
     db 35,WEEZING  ;  1% ; Entry Point
     db $00
+Route17Mons2:
+    db $20,19,RATTATA   ; 12%
+    db $40,21,RATTATA   ; 12%
+    db $60,23,RATICATE  ; 12%
+    db $FF,24,RATICATE  ; 65%
 
 Route18Mons:
     db $19
@@ -133919,16 +133968,16 @@ Route18Mons:
 
 ZoneMonsCenter:
     db $1E
-    db 18,VENONAT      ; 20%
-    db 19,PARAS        ; 20%
-    db 20,VENONAT      ; 15%
-    db 21,PARAS        ; 10%
-    db 27,PARASECT     ; 10% ; Entry Point
-    db W_SUB_GROUP,$FF ; 10% ; ZoneMonsCenter5
-    db W_SUB_GROUP,$FF ;  5% ; ZoneMonsCenter6
-    db 32,VENOMOTH     ;  5%
-    db W_SUB_GROUP,$FF ;  4% ; ZoneMonsCenter8
-    db W_SUB_GROUP,$FF ;  1% ; ZoneMonsCenter9
+    db 18,VENONAT  ; 20%
+    db 19,PARAS    ; 20%
+    db 20,VENONAT  ; 15%
+    db 21,PARAS    ; 10%
+    db 27,PARASECT ; 10% ; Entry Point
+    WILDSUB        ; 10% ; ZoneMonsCenter5
+    WILDSUB        ;  5% ; ZoneMonsCenter6
+    db 32,VENOMOTH ;  5%
+    WILDSUB        ;  4% ; ZoneMonsCenter8
+    WILDSUB        ;  1% ; ZoneMonsCenter9
     db $0E
     db 17,MAGIKARP  ; 20%
     db 28,SEEL      ; 20%
@@ -133985,8 +134034,8 @@ ZoneMons1:
 
 ZoneMons2:
     db $1E
-    db 24,NIDORINO   ; 20%
-    db 24,NIDORINA   ; 20%
+    WILDSUB          ; 20% ; ZoneMons20
+    WILDSUB          ; 20% ; ZoneMons21
     db 31,RHYHORN    ; 15%
     db 27,NIDORINO   ; 10%
     db 27,NIDORINA   ; 10%
@@ -134006,18 +134055,28 @@ ZoneMons2:
     db 24,DRATINI   ;  5%
     db 25,DRATINI   ;  4%
     db 30,DRAGONAIR ;  1%
+ZoneMons20:
+    db $20,19,NIDORAN_M ; 12%
+    db $40,20,NIDORAN_M ; 12%
+    db $60,23,NIDORINO  ; 12%
+    db $FF,24,NIDORINO  ; 65%
+ZoneMons21:
+    db $20,19,NIDORAN_F ; 12%
+    db $40,20,NIDORAN_F ; 12%
+    db $60,23,NIDORINA  ; 12%
+    db $FF,24,NIDORINA  ; 65%
 
 ZoneMons3:
     db $1E
-    db 24,TANGELA   ; 20%
+    db 26,TANGELA   ; 20%
     db 19,EXEGGCUTE ; 20% ; Entry Point
-    db 22,TANGELA   ; 15%
+    db 31,TANGELA   ; 15%
     db 22,EXEGGCUTE ; 10%
-    db 17,EXEGGCUTE ; 10%
-    db 18,LICKITUNG ; 10% ; Entry Point
-    db 14,LICKITUNG ;  5%
-    db 18,EEVEE     ;  5%
-    db 21,EEVEE     ;  4%
+    db 14,LICKITUNG ; 10% ; Entry Point
+    db 18,LICKITUNG ; 10%
+    WILDSUB         ;  5% ; ZoneMons36
+    WILDSUB         ;  5% ; ZoneMons37
+    WILDSUB         ;  4% ; ZoneMons38
     db  7,CHANSEY   ;  1% ; Entry Point
     db $0E
     db 17,MAGIKARP  ; 20%
@@ -134030,6 +134089,21 @@ ZoneMons3:
     db 24,DRATINI   ;  5%
     db 25,DRATINI   ;  4%
     db 30,DRAGONAIR ;  1%
+ZoneMons36:
+    db $20,12,ODDISH    ; 12%
+    db $40,14,ODDISH    ; 12%
+    db $60,21,GLOOM     ; 12%
+    db $DF,24,GLOOM     ; 52%
+    db $FF,29,VILEPLUME ; 12%
+ZoneMons37:
+    db $20,12,BELLSPROUT ; 12%
+    db $40,14,BELLSPROUT ; 12%
+    db $60,21,WEEPINBELL ; 12%
+    db $DF,24,WEEPINBELL ; 52%
+    db $FF,29,VICTREEBEL ; 12%
+ZoneMons38:
+    db $DF,24,EXEGGCUTE ; 88%
+    db $FF,24,EXEGGUTOR ; 12%
 
 WaterMons:
     db $00
@@ -134038,12 +134112,17 @@ WaterMons:
     db 15,TENTACOOL  ; 20%
     db 21,TENTACOOL  ; 15%
     db 24,TENTACOOL  ; 10%
-    db 35,SEAKING    ; 10%
+    WILDSUB          ; 10% ; WaterMonsW4
     db 16,SEEL       ; 10%
     db 37,SEAKING    ;  5%
     db 32,TENTACRUEL ;  5%
     db 36,TENTACRUEL ;  4%
     db 40,TENTACRUEL ;  1%
+WaterMonsW4:
+    db $20,21,GOLDEEN ; 12%
+    db $40,24,GOLDEEN ; 12%
+    db $60,34,SEAKING ; 12%
+    db $FF,35,SEAKING ; 65%
 
 PowerPlantMons:
     db $0A
@@ -134056,12 +134135,15 @@ PowerPlantMons:
     db 30,MAGNETON   ;  5% ; Entry Point
     db 32,RAICHU     ;  5% ; Entry Point
     db 31,ELECTABUZZ ;  4% ; Entry Point
-    db 32,JOLTEON    ;  1% ; Entry Point
+    WILDSUB          ;  1% ; PowerPlantMons9
     db $00
+PowerPlantMons9:
+    db $20,02,EEVEE   ; 12%
+    db $FF,32,JOLTEON ; 88% ; Entry Point
 
 IslandMons1:
     db $0F
-    db 25,GOLBAT   ; 20%
+    WILDSUB        ; 20% ; IslandMons10
     db 19,KRABBY   ; 20%
     db 21,SEEL     ; 15%
     db 28,GOLBAT   ; 10%
@@ -134072,10 +134154,13 @@ IslandMons1:
     db 28,KINGLER  ;  4%
     db 34,DEWGONG  ;  1% ; Entry Point
     db $00
+IslandMons10:
+    db $20,20,ZUBAT  ; 12%
+    db $FF,25,GOLBAT ; 88%
 
 IslandMonsB1:
     db $0A
-    db 28,GOLBAT   ; 20%
+    WILDSUB        ; 20% ; IslandMonsB10
     db 25,SEEL     ; 20%
     db 25,SLOWPOKE ; 15%
     db 31,GOLBAT   ; 10%
@@ -134086,10 +134171,13 @@ IslandMonsB1:
     db 35,DEWGONG  ;  4%
     db 38,SLOWBRO  ;  1% ; Entry Point
     db $00
+IslandMonsB10:
+    db $20,21,ZUBAT  ; 12%
+    db $FF,28,GOLBAT ; 88%
 
 IslandMonsB2:
     db $0A
-    db 28,GOLBAT   ; 20%
+    WILDSUB        ; 20% ; IslandMonsB20
     db 28,SLOWPOKE ; 20%
     db 31,GOLBAT   ; 15%
     db 34,GOLBAT   ; 10%
@@ -134100,6 +134188,9 @@ IslandMonsB2:
     db 39,SLOWBRO  ;  4%
     db 40,GOLBAT   ;  1%
     db $00
+IslandMonsB20:
+    db $20,21,ZUBAT  ; 12%
+    db $FF,28,GOLBAT ; 88%
 
 IslandMonsB3:
     db $0A
@@ -134112,7 +134203,7 @@ IslandMonsB3:
     db 37,DEWGONG   ;  5%
     db  5,SQUIRTLE  ;  5% ; Entry Point
     db 31,JYNX      ;  4% ; Entry Point
-    db 32,VAPOREON  ;  1% ; Entry Point
+    WILDSUB         ;  1% ; IslandMonsB39
     db $0A
     db 27,SEEL      ; 20%
     db 26,KRABBY    ; 20%
@@ -134124,6 +134215,9 @@ IslandMonsB3:
     db 25,WARTORTLE ;  5%
     db 21,WARTORTLE ;  4%
     db 40,BLASTOISE ;  1% ; Entry Point
+IslandMonsB39:
+    db $20,02,EEVEE    ; 12%
+    db $FF,32,VAPOREON ; 88% ; Entry Point
 
 IslandMonsB4:
     db $0A
@@ -134202,8 +134296,11 @@ MansionMonsB1:
     db 38,ARCANINE  ;  5%
     db 38,NINETALES ;  5% ; Entry Point
     db 31,MAGMAR    ;  4% ; Entry Point
-    db 32,FLAREON   ;  1% ; Entry Point
+    WILDSUB         ;  1% ; MansionMonsB19
     db $00
+MansionMonsB19:
+    db $20,02,EEVEE   ; 12%
+    db $FF,32,FLAREON ; 88% ; Entry Point
 
 Route21Mons:
     db $19
@@ -134222,17 +134319,22 @@ Route21Mons:
     db 15,TENTACOOL  ; 20%
     db 21,TENTACOOL  ; 15%
     db 24,TENTACOOL  ; 10%
-    db 35,SEAKING    ; 10%
+    WILDSUB          ; 10% ; Route21MonsW4
     db 16,SEEL       ; 10%
     db 37,SEAKING    ;  5%
     db 32,TENTACRUEL ;  5%
     db 36,TENTACRUEL ;  4%
     db 40,TENTACRUEL ;  1%
+Route21MonsW4:
+    db $20,21,GOLDEEN ; 12%
+    db $40,24,GOLDEEN ; 12%
+    db $60,34,SEAKING ; 12%
+    db $FF,35,SEAKING ; 65%
 
 Route23Mons:
     db $1C
-    db 25,GLOOM      ; 20%
-    db 25,WEEPINBELL ; 20%
+    WILDSUB          ; 20% ; Route23Mons0
+    WILDSUB          ; 20% ; Route23Mons1
     db 35,VILEPLUME  ; 15% ; Entry Point
     db 35,VICTREEBEL ; 10% ; Entry Point
     db  5,BULBASAUR  ; 10% ; Entry Point
@@ -134252,10 +134354,16 @@ Route23Mons:
     db 48,GYARADOS   ;  5%
     db 45,DRAGONAIR  ;  4%
     db 55,DRAGONITE  ;  1% ; Entry Point
+Route23Mons0:
+    db $20,20,ODDISH ; 12%
+    db $FF,25,GLOOM  ; 88%
+Route23Mons1:
+    db $20,20,BELLSPROUT ; 12%
+    db $FF,25,WEEPINBELL ; 88%
 
 PlateauMons1:
     db $0F
-    db 31,GOLBAT   ; 20%
+    WILDSUB        ; 20% ; PlateauMons10
     db 28,GEODUDE  ; 20%
     db 34,GOLBAT   ; 15%
     db 26,MACHOP   ; 10%
@@ -134266,10 +134374,13 @@ PlateauMons1:
     db 45,GRAVELER ;  4%
     db 44,MACHOKE  ;  1%
     db $00
+PlateauMons10:
+    db $20,26,ZUBAT  ; 12%
+    db $FF,31,GOLBAT ; 88%
 
 PlateauMons2:
     db $0A
-    db 34,GOLBAT    ; 20%
+    WILDSUB         ; 20% ; PlateauMons20
     db 26,SANDSHREW ; 20%
     db 37,GOLBAT    ; 15%
     db 26,DIGLETT   ; 10%
@@ -134280,10 +134391,13 @@ PlateauMons2:
     db 42,SANDSLASH ;  4%
     db 45,DUGTRIO   ;  1%
     db $00
+PlateauMons20:
+    db $20,27,ZUBAT  ; 12%
+    db $FF,34,GOLBAT ; 88%
 
 PlateauMons3:
     db $0F
-    db 37,GOLBAT   ; 20%
+    WILDSUB        ; 20% ; PlateauMons30
     db 44,ONIX     ; 20%
     db 40,GOLBAT   ; 15%
     db 39,DUGTRIO  ; 10%
@@ -134294,6 +134408,9 @@ PlateauMons3:
     db 45,GRAVELER ;  4%
     db 56,ONIX     ;  1%
     db $00
+PlateauMons30:
+    db $20,28,ZUBAT  ; 12%
+    db $FF,37,GOLBAT ; 88%
 
 DungeonMons1:
     db $0A
@@ -135399,15 +135516,43 @@ WildSubGroupTable:
     WILDSUBGROUP ROUTE_5,0,Route5Mons0
     WILDSUBGROUP ROUTE_5,4,Route5Mons4
     WILDSUBGROUP ROUTE_5,6,Route5Mons6
+    WILDSUBGROUP DIGLETTS_CAVE,5,CaveMons5
+    WILDSUBGROUP DIGLETTS_CAVE,8,CaveMons8
+    WILDSUBGROUP ROUTE_10,4,Route10Mons4
     WILDSUBGROUP ROUTE_8,2,Route8Mons2
     WILDSUBGROUP ROUTE_8,5,Route8Mons5
     WILDSUBGROUP ROUTE_8,8,Route8Mons8
     WILDSUBGROUP ROUTE_8,9,Route8Mons9
-    WILDSUBGROUP ROUTE_10,4,Route10Mons4
+    WILDSUBGROUP ROUTE_7,0,Route7Mons0
+    WILDSUBGROUP ROUTE_7,2,Route7Mons2
+    WILDSUBGROUP ROUTE_14,0,Route14Mons0
+    WILDSUBGROUP ROUTE_14,1,Route14Mons1
+    WILDSUBGROUP ROUTE_14,3,Route14Mons3
+    WILDSUBGROUP ROUTE_15,3,Route15Mons3
+    WILDSUBGROUP ROUTE_17,2,Route17Mons2
     WILDSUBGROUP SAFARI_ZONE_CENTER,5,ZoneMonsCenter5
     WILDSUBGROUP SAFARI_ZONE_CENTER,6,ZoneMonsCenter6
     WILDSUBGROUP SAFARI_ZONE_CENTER,8,ZoneMonsCenter8
     WILDSUBGROUP SAFARI_ZONE_CENTER,9,ZoneMonsCenter9
+    WILDSUBGROUP SAFARI_ZONE_NORTH,0,ZoneMons20
+    WILDSUBGROUP SAFARI_ZONE_NORTH,1,ZoneMons21
+    WILDSUBGROUP SAFARI_ZONE_WEST,6,ZoneMons36
+    WILDSUBGROUP SAFARI_ZONE_WEST,7,ZoneMons37
+    WILDSUBGROUP SAFARI_ZONE_WEST,8,ZoneMons38
+    WILDSUBGROUP ROUTE_19,4,WaterMonsW4
+    WILDSUBGROUP ROUTE_20,4,WaterMonsW4
+    WILDSUBGROUP POWER_PLANT,9,PowerPlantMons9
+    WILDSUBGROUP SEAFOAM_ISLANDS_1,0,IslandMons10
+    WILDSUBGROUP SEAFOAM_ISLANDS_2,0,IslandMonsB10
+    WILDSUBGROUP SEAFOAM_ISLANDS_3,0,IslandMonsB20
+    WILDSUBGROUP SEAFOAM_ISLANDS_4,9,IslandMonsB39
+    WILDSUBGROUP MANSION_4,9,MansionMonsB19
+    WILDSUBGROUP ROUTE_21,4,Route21MonsW4
+    WILDSUBGROUP ROUTE_23,0,Route23Mons0
+    WILDSUBGROUP ROUTE_23,1,Route23Mons1
+    WILDSUBGROUP VICTORY_ROAD_1,0,PlateauMons10
+    WILDSUBGROUP VICTORY_ROAD_2,0,PlateauMons20
+    WILDSUBGROUP VICTORY_ROAD_3,0,PlateauMons30
     db $FF
 
 WildSubGroupTableNew:
