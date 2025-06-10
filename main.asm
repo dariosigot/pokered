@@ -134946,7 +134946,6 @@ SuperRodGroupSafari:
 
 SuperRodGroupSouth:
     db 32
-    db  7,TENTACOOL
     db 11,TENTACOOL
     db 15,TENTACOOL
     db 19,TENTACOOL
@@ -134969,8 +134968,9 @@ SuperRodGroupSouth:
     db 19,STARYU
     db 23,STARYU
     db 27,STARYU
+    db 21,GOLDEEN
+    db 24,GOLDEEN
     db 33,SEAKING
-    db 35,SEAKING
     db 35,SEAKING
     db 35,SEAKING
     db 37,SEAKING
