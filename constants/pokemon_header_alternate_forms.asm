@@ -91,7 +91,7 @@ KabutoFossilBaseStats:
     db 119 ; base exp yield
     db $55 ; sprite dimensions
 
-    dw MissingNoPicFront ; TODO
+    dw MissingNoPicFront ; ~TODO
     dw MissingNoPicBack  ; ...
 
     ; pointer to alternate forms
@@ -170,7 +170,7 @@ AerodactylFossilBaseStats:
     db $77 ; sprite dimensions
 
     dw FossilAerodactylPicFront
-    dw MissingNoPicBack ; TODO
+    dw MissingNoPicBack ; ~TODO
 
     ; pointer to alternate forms
     dw 0

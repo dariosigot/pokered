@@ -35,7 +35,7 @@ COOLTRAINER_F EQU $20
 BRUNO         EQU $21
 BROCK         EQU $22
 MISTY         EQU $23
-LT__SURGE     EQU $24
+LT_SURGE      EQU $24
 ERIKA         EQU $25
 KOGA          EQU $26
 BLAINE        EQU $27

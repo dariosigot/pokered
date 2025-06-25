@@ -1210,6 +1210,10 @@ ENDU
 
 ; some free bytes
 
+SECTION "GymLeaderRematch",WRAMX[$d48f],BANK[1]
+
+wGymLeaderRematch:: ds 1 ; d48f
+
 SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]
 
 wPokedexSeen: ; d490

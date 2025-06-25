@@ -913,6 +913,7 @@ VENONAT_Learnset: MACRO
 ENDM
 VENOMOTH_Learnset: MACRO
     VENONAT_Learnset
+    db 31,GUST
     db 31,PIN_MISSILE
     db 32,STRING_SHOT
     db 33,WHIRLWIND
@@ -924,6 +925,7 @@ VENOMOTH_Learnset: MACRO
     db 47,TWINEEDLE
     db 50,BARRIER
     db 52,MEGA_DRAIN
+    db 53,SWOOP
     db 55,NIGHT_SHADE
     db 60,TOXIC
 ENDM
@@ -2109,26 +2111,32 @@ MAROWAK_Alola_Learnset: MACRO
     db 32,FIRE_PUNCH
     db 35,HAZE
     db 37,MEDITATE
+    db 39,STRIKE
     db 39,FLAMETHROWER
+    db 40,ROCK_THROW
     db 42,THRASH
     db 44,FIRE_SPIN
     db 47,DIZZY_PUNCH
+    db 48,EARTHQUAKE
     db 50,SUBSTITUTE
     db 55,SWORDS_DANCE
     db 57,FIRE_BLAST
     db 60,CRABHAMMER
+    db 61,ROCK_SLIDE
+    db 62,HARDEN
     db 65,HYPER_BEAM
+    db 65,FISSURE
 ENDM
 CUBONE_NoEvo_Learnset: MACRO
     db 30,MEDITATE ; Exclusive
-    db 34,ROCK_THROW
-    db 38,EARTHQUAKE
+    db 34,ROCK_THROW ; Exclusive (Alola)
+    db 38,EARTHQUAKE ; Exclusive (Alola)
     db 42,STRIKE
     db 46,THRASH
-    db 49,HARDEN
-    db 53,ROCK_SLIDE
+    db 49,HARDEN ; Exclusive (Alola)
+    db 53,ROCK_SLIDE ; Exclusive (Alola)
     db 58,SWORDS_DANCE
-    db 60,FISSURE
+    db 60,FISSURE ; Exclusive (Alola)
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 HITMONLEE_Learnset: MACRO
@@ -2405,7 +2413,7 @@ HORSEA_Learnset: MACRO
     db 25,AGILITY
     db 27,SLAM
     db 29,WATERFALL
-    db 31,AURORA_BEAM
+    db 31,SAND_ATTACK
     ;  32,SEADRA
 ENDM
 SEADRA_Learnset: MACRO
@@ -2519,6 +2527,7 @@ STARMIE_Learnset: MACRO
     db 32,REFLECT
     db 34,THUNDER_WAVE
     db 35,SUPERSONIC
+    db 35,CONFUSE_RAY
     db 36,SCREECH
     db 38,WATERFALL
     db 40,AURORA_BEAM

@@ -8307,7 +8307,7 @@ EngageMapTrainer: ; 336a (0:336a)
     ld [wEngagedTrainerClass],a
     ld a,[hl]     ; load trainer mon set
     ld [wEngagedTrainerSet],a ; $cd2e
-    jp PlayTrainerMusic
+    jp UpgradeTrainerSet ; jp PlayTrainerMusic
 
 Func_3381: ; 3381 (0:3381)
     push hl
@@ -8382,6 +8382,37 @@ PlayTrainerMusic: ; 33e8 (0:33e8)
     ret nz
     ld b,BANK(PlayTrainerMusic_)
     ld hl,PlayTrainerMusic_
+    jp Bankswitch
+
+UpgradeTrainerSet:
+    PREDEF_JUMP UpgradeTrainerSet_
+
+TryGymLeaderRematch:
+    push hl
+    ld hl,TryGymLeaderRematch_
+    ld b,BANK(TryGymLeaderRematch_)
+    call Bankswitch
+    pop hl
+    jr c,.end
+    call PrintText
+.end
+    jp TextScriptEnd
+
+GymLeaderRematchText1:
+    TX_FAR _GymLeaderRematchText1
+    db "@"
+
+GymLeaderRematchText2:
+    TX_FAR _GymLeaderRematchText2
+    db "@"
+
+GymLeaderRematchText3:
+    TX_FAR _GymLeaderRematchText3
+    db "@"
+
+GymLeaderAfterRematch:
+    ld hl,GymLeaderAfterRematch_
+    ld b,BANK(GymLeaderAfterRematch_)
     jp Bankswitch
 
 ; Free
@@ -26138,18 +26169,23 @@ DrawBadges: ; ea03 (3:6a03)
     call FillMemory
 
 ; Alter these based on owned badges.
-    ld de,$cd49
+    ld hl,$cd49
     ld a,[W_OBTAINEDBADGES]
     ld b,a
+    ld a,[wGymLeaderRematch]
     ld c,8
 .CheckBadge
     srl b
     jr nc,.NextBadge
-    ld a,1
-    ld [de],a
+    inc [hl]
+    srl a
+    jr nc,.NextBadge2
+    inc [hl]
+    jr .NextBadge2
 .NextBadge
+    srl a
+.NextBadge2
     inc hl
-    inc de
     dec c
     jr nz,.CheckBadge
 
@@ -26166,11 +26202,17 @@ DrawBadges: ; ea03 (3:6a03)
     ld a,[de]
     and a
     jr z,.SkipBadge
+    push af
     ld a,[$cd3f]
     call .PlaceTiles
     ld de,20 - 1
     add hl,de
     call .PlaceTiles
+    pop af
+    cp 2
+    jr c,.SkipRematchIcon
+    ld [hl],$D0 ; Mail Icon
+.SkipRematchIcon
 
     inc b ; increase num of Badge Printed
     ld a,b
@@ -29972,7 +30014,7 @@ RareCandyText: ; 12ec0 (4:6ec0)
     db $06
     db "@"
 
-Func_12ec7: ; 12ec7 (4:6ec7) ; TODO : viene richiamata 6 volte GoPAL_SET durante la visualizzazione del menù party. LENTO!
+Func_12ec7: ; 12ec7 (4:6ec7) ; ~TODO : viene richiamata 6 volte GoPAL_SET durante la visualizzazione del menù party. LENTO!
     ld hl,$cf1f
     ld a,[$cf2d]
     ld c,a
@@ -32248,7 +32290,7 @@ SpriteSets: ; 17ab9 (5:7ab9)
     db SPRITE_FISHER2
     db SPRITE_BLACK_HAIR_BOY_1
     db SPRITE_GAMBLER
-    db SPRITE_SEEL ; TODO : Not Used
+    db SPRITE_SEEL ; ~TODO : Not Used
     db SPRITE_OAK
     db SPRITE_SWIMMER
     db SPRITE_BALL
@@ -32676,7 +32718,7 @@ SPRITE_Bank_2: MACRO
     SPRITE_Bank_1 JIGGLYPUFF ; SPRITE_JIGGLYPUFF
     SPRITE_Bank_1 WIGGLYTUFF ; SPRITE_WIGGLYTUFF
     SPRITE_Bank_1 MEOWTH     ; SPRITE_MEOWTH
-    SPRITE_Bank_1 PSYDUCK    ; SPRITE_PSYDUCK
+    SPRITE_Bank_1 GROWLITHE  ; SPRITE_GROWLITHE
     SPRITE_Bank_1 POLIWRATH  ; SPRITE_POLIWRATH
     SPRITE_Bank_1 ALAKAZAM   ; SPRITE_ALAKAZAM
     SPRITE_Bank_1 MACHOP     ; SPRITE_MACHOP
@@ -34132,17 +34174,25 @@ PewterCityScript5: ; 19359 (6:5359)
     ret
 
 PewterCityScript6: ; 1936f (6:536f)
-    ld a,$5
-    ld [$cf13],a
-    call Func_32fe
-    ld a,$4
-    ld [$cc4d],a
-    PREDEF AddMissableObject
+;    ld a,$5
+;    ld [$cf13],a
+;    call Func_32fe
+;    ld a,$4
+;    ld [$cc4d],a
+;    PREDEF AddMissableObject
+
+    call DisableRoute22Rival1stBattle
+
+    ld hl,$d755
+    set 7,[hl]
+
     xor a
     ld [wJoypadForbiddenButtonsMask],a
     ld a,$0
     ld [W_PEWTERCITYCURSCRIPT],a
     ret
+
+SECTION "PewterCityTextPointers",ROMX[$538b],BANK[$6]
 
 PewterCityTextPointers: ; 1938b (6:538b)
     dw PewterCityText1
@@ -37349,6 +37399,15 @@ PewterCityScript7_AfterEevee:
     ld [W_PEWTERCITYCURSCRIPT],a
     ret
 
+DisableRoute22Rival1stBattle:
+    ld a,$22
+    ld [$cc4d],a
+    PREDEF RemoveMissableObject
+    ld hl,$d7eb
+    res 0,[hl]
+    res 7,[hl]
+    ret
+
 SECTION "bank7",ROMX,BANK[$7]
 
 CinnabarIsland_h: ; 0x1c000 to 0x1c022 (34 bytes) (bank=7) (id=8)
@@ -37649,9 +37708,18 @@ OaksLabText26:
     call DisplayStarterPokedexAndResetSeenOwn
     ld hl,.OaksLabText26
     call PrintText
+    ld bc,(TECH_MACHINE << 8) | 1
+    call GiveItem
+    ld hl,.OaksLabTextTM
+    call PrintText
     jp TextScriptEnd
 .OaksLabText26
     TX_FAR _OaksLabText26
+    db "@"
+.OaksLabTextTM
+    TX_FAR _OaksLabTextTM1
+    db $11
+    TX_FAR _OaksLabTextTM2
     db "@"
 
 ; Free
@@ -39810,7 +39878,7 @@ UnnamedText_1d8f9: ; 1d8f9 (7:58f9)
 LavenderHouse1Text3: ; 1d8fe (7:58fe)
     TX_FAR _LavenderHouse1Text3
     db $8
-    ld a,PSYDUCK
+    ld a,GROWLITHE
     call PlayCryAndUpdatePokedex
     jp TextScriptEnd
 
@@ -39880,7 +39948,7 @@ LavenderHouse1Object: ; 0x1d96a (size=56)
     db $6 ; people
     db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$3 + 4,$ff,$ff,$1 ; person
     db SPRITE_LITTLE_GIRL,$3 + 4,$6 + 4,$ff,$d0,$2 ; person
-    db SPRITE_PSYDUCK,$4 + 4,$6 + 4,$ff,$d1,$3 ; person
+    db SPRITE_GROWLITHE,$4 + 4,$6 + 4,$ff,$d1,$3 ; person
     db SPRITE_NIDORINO,$3 + 4,$1 + 4,$ff,$ff,$4 ; person
     db SPRITE_MR_FUJI,$1 + 4,$3 + 4,$ff,$ff,$5 ; person
     db SPRITE_BOOK_MAP_DEX,$3 + 4,$3 + 4,$ff,$ff,$6 ; person
@@ -49932,7 +50000,114 @@ BugfixEvolutionStoneInBattle:
     cp b
     ret
 
-INCLUDE "constants/TrainerData.asm"
+;joenote - if player using trapping move, then end their move
+CheckTrappingMoveAndLoadEnemyMonNumber:
+    ld hl,W_PLAYERBATTSTATUS1
+    bit USING_TRAPPING_MOVE,[hl]
+    res USING_TRAPPING_MOVE,[hl]
+    jr z,.end
+    xor a
+    ld [$d06a],a ; wPlayerNumAttacksLeft
+    ld a,$FF
+    ld [wPlayerSelectedMove],a
+.end
+    ld a,[W_ENEMYMONNUMBER]
+    ret
+
+ItemUseEvoStone_:
+    ld a,[$cf92]
+    push af
+    ld a,[$cf91]
+    ld [$d156],a
+    push af
+    ld a,$05 ; evolution stone party menu
+    ld [$d07d],a
+    ld a,$ff
+    ld [$cfcb],a
+    call DisplayPartyMenu
+    pop bc
+    jr c,.canceledItemUse
+    ld a,b
+    ld [$cf91],a
+    ld a,$01
+    ld [$ccd4],a
+    ld a,$8e
+    call PlaySoundWaitForCurrent ; play sound
+    call WaitForSoundToFinish ; wait for sound to end
+    call TryEvolvingMon ; try to evolve pokemon
+    ld a,[$d121]
+    and a
+    jr z,.noEffect
+    pop af
+    ld [$cf92],a
+    ld hl,wNumBagItems
+    ld a,1 ; remove 1 stone
+    ld [$cf96],a
+    jp RemoveItemFromInventory
+.noEffect
+    ld hl,ItemUseNoEffect
+    ld b,BANK(ItemUseNoEffect)
+    call Bankswitch
+.canceledItemUse
+    xor a
+    ld [$cd6a],a
+    pop af
+    ret
+
+DoEvolution_HandleAlternative:
+    ld hl,W_PARTYMON1_MOVE2PP
+    ld a,[wWhichPokemon]
+    ld bc,$2c
+    call AddNTimes
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    jp GetMonHeader
+
+AICureStatus:
+; cures the status of enemy's active pokemon
+    ld a,[W_ENEMYMONNUMBER]
+    ld hl,$D8A8
+    ld bc,$2C
+    call AddNTimes
+    xor a
+    ld [hl],a ; clear status in enemy team roster
+    ld a,[H_WHOSETURN]
+    push af
+    ld a,1 ; forcibly set it to the AI's turn
+    ld [H_WHOSETURN],a
+    ; undo brn/par stat changes
+    ld hl,UndoBurnParStats
+    ld b,BANK(UndoBurnParStats)
+    call Bankswitch
+    pop af
+    ld [H_WHOSETURN],a
+    xor a
+    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy
+    ld [W_ENEMYTOXICCOUNTER], a ;clear toxic counter
+    ld hl,W_ENEMYBATTSTATUS3 ;clear toxic bit
+    res 0,[hl]
+    ; need to redraw the enemy trainer hud
+    push af
+    ld hl,DrawEnemyHUDAndHPBar
+    ld b,BANK(DrawEnemyHUDAndHPBar)
+    call Bankswitch
+    pop af
+    ret
+
+DrawHudAndPrintTextBankE:
+    push hl
+    ld hl,DrawHUDsAndHPBars
+    call BankswitchEtoF
+    pop hl
+    jp PrintText
+
+AIUseLemonade:
+; enemy trainer heals his monster with a lemonade
+    ld a,LEMONADE
+    ld b,80
+    jp AIRecoverHP
+
+; Free
 
 SECTION "DecrementAICount",ROMX[$6695],BANK[$e]
 
@@ -50917,14 +51092,48 @@ SpecialTrainer: MACRO
     ENDM
 
 SpecialTrainerMoves:
-    SpecialTrainer BROCK,1,BrockMoves
-    SpecialTrainer MISTY,1,MistyMove
-    SpecialTrainer LT__SURGE,1,LtSurgeMove
-    SpecialTrainer ERIKA,1,ErikaMove
-    SpecialTrainer KOGA,1,KogaMove
-    SpecialTrainer BLAINE,1,BlaineMove
+    SpecialTrainer BROCK,1,BrockMoves1
+    SpecialTrainer BROCK,2,BrockMoves2
+    SpecialTrainer BROCK,3,BrockMoves3
+    SpecialTrainer BROCK,4,BrockMoves4
+    SpecialTrainer BROCK,5,BrockMoves5
+    SpecialTrainer BROCK,6,BrockMoves6
+    SpecialTrainer BROCK,7,BrockMoves7
+    SpecialTrainer BROCK,8,BrockMoves8
+    SpecialTrainer BROCK,9,BrockMoves9
+    SpecialTrainer MISTY,1,MistyMove2
+    SpecialTrainer MISTY,2,MistyMove3
+    SpecialTrainer MISTY,3,MistyMove4
+    SpecialTrainer MISTY,4,MistyMove5
+    SpecialTrainer MISTY,5,MistyMove6
+    SpecialTrainer MISTY,6,MistyMove7
+    SpecialTrainer MISTY,7,MistyMove8
+    SpecialTrainer MISTY,8,MistyMove9
+    SpecialTrainer LT_SURGE,1,LtSurgeMove3
+    SpecialTrainer LT_SURGE,2,LtSurgeMove4
+    SpecialTrainer LT_SURGE,3,LtSurgeMove5
+    SpecialTrainer LT_SURGE,4,LtSurgeMove6
+    SpecialTrainer LT_SURGE,5,LtSurgeMove7
+    SpecialTrainer LT_SURGE,6,LtSurgeMove8
+    SpecialTrainer LT_SURGE,7,LtSurgeMove9
+    SpecialTrainer ERIKA,1,ErikaMove4
+    SpecialTrainer ERIKA,2,ErikaMove5
+    SpecialTrainer ERIKA,3,ErikaMove6
+    SpecialTrainer ERIKA,4,ErikaMove7
+    SpecialTrainer ERIKA,5,ErikaMove8
+    SpecialTrainer ERIKA,6,ErikaMove9
+    SpecialTrainer KOGA,1,KogaMove6
+    SpecialTrainer KOGA,2,KogaMove7
+    SpecialTrainer KOGA,3,KogaMove8
+    SpecialTrainer KOGA,4,KogaMove9
+    SpecialTrainer SABRINA,1,SabrinaMove6
+    SpecialTrainer SABRINA,2,SabrinaMove7
+    SpecialTrainer SABRINA,3,SabrinaMove8
+    SpecialTrainer SABRINA,4,SabrinaMove9
+    SpecialTrainer BLAINE,1,BlaineMove7
+    SpecialTrainer BLAINE,2,BlaineMove8
+    SpecialTrainer BLAINE,3,BlaineMove9
     SpecialTrainer BLACKBELT,1,DojoLeader
-    SpecialTrainer SABRINA,1,SabrinaMove
     SpecialTrainer GIOVANNI,1,Giovanni1Move
     SpecialTrainer GIOVANNI,2,Giovanni2Move
     SpecialTrainer GIOVANNI,3,Giovanni3Move
@@ -51851,7 +52060,7 @@ ErikaAI:
     ret nc
     ld a,10
     call AICheckIfHPBelowFraction
-    jp c,AIUseSuperPotion
+    jp c,AIUseHyperPotion
     ret
 
 KogaAI:
@@ -52321,112 +52530,7 @@ CryData:
     db $18,$F7,$7E; 158 - MON_158
     db $18,$F7,$7E; 159 - MON_159
 
-;joenote - if player using trapping move, then end their move
-CheckTrappingMoveAndLoadEnemyMonNumber:
-    ld hl,W_PLAYERBATTSTATUS1
-    bit USING_TRAPPING_MOVE,[hl]
-    res USING_TRAPPING_MOVE,[hl]
-    jr z,.end
-    xor a
-    ld [$d06a],a ; wPlayerNumAttacksLeft
-    ld a,$FF
-    ld [wPlayerSelectedMove],a
-.end
-    ld a,[W_ENEMYMONNUMBER]
-    ret
-
-ItemUseEvoStone_:
-    ld a,[$cf92]
-    push af
-    ld a,[$cf91]
-    ld [$d156],a
-    push af
-    ld a,$05 ; evolution stone party menu
-    ld [$d07d],a
-    ld a,$ff
-    ld [$cfcb],a
-    call DisplayPartyMenu
-    pop bc
-    jr c,.canceledItemUse
-    ld a,b
-    ld [$cf91],a
-    ld a,$01
-    ld [$ccd4],a
-    ld a,$8e
-    call PlaySoundWaitForCurrent ; play sound
-    call WaitForSoundToFinish ; wait for sound to end
-    call TryEvolvingMon ; try to evolve pokemon
-    ld a,[$d121]
-    and a
-    jr z,.noEffect
-    pop af
-    ld [$cf92],a
-    ld hl,wNumBagItems
-    ld a,1 ; remove 1 stone
-    ld [$cf96],a
-    jp RemoveItemFromInventory
-.noEffect
-    ld hl,ItemUseNoEffect
-    ld b,BANK(ItemUseNoEffect)
-    call Bankswitch
-.canceledItemUse
-    xor a
-    ld [$cd6a],a
-    pop af
-    ret
-
-DoEvolution_HandleAlternative:
-    ld hl,W_PARTYMON1_MOVE2PP
-    ld a,[wWhichPokemon]
-    ld bc,$2c
-    call AddNTimes
-    ld a,[hl]
-    ld [wAlternateFormIndex],a
-    jp GetMonHeader
-
-AICureStatus:
-; cures the status of enemy's active pokemon
-    ld a,[W_ENEMYMONNUMBER]
-    ld hl,$D8A8
-    ld bc,$2C
-    call AddNTimes
-    xor a
-    ld [hl],a ; clear status in enemy team roster
-    ld a,[H_WHOSETURN]
-    push af
-    ld a,1 ; forcibly set it to the AI's turn
-    ld [H_WHOSETURN],a
-    ; undo brn/par stat changes
-    ld hl,UndoBurnParStats
-    ld b,BANK(UndoBurnParStats)
-    call Bankswitch
-    pop af
-    ld [H_WHOSETURN],a
-    xor a
-    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy
-    ld [W_ENEMYTOXICCOUNTER], a ;clear toxic counter
-    ld hl,W_ENEMYBATTSTATUS3 ;clear toxic bit
-    res 0,[hl]
-    ; need to redraw the enemy trainer hud
-    push af
-    ld hl,DrawEnemyHUDAndHPBar
-    ld b,BANK(DrawEnemyHUDAndHPBar)
-    call Bankswitch
-    pop af
-    ret
-
-DrawHudAndPrintTextBankE:
-    push hl
-    ld hl,DrawHUDsAndHPBars
-    call BankswitchEtoF
-    pop hl
-    jp PrintText
-
-AIUseLemonade:
-; enemy trainer heals his monster with a lemonade
-    ld a,LEMONADE
-    ld b,80
-    jp AIRecoverHP
+INCLUDE "constants/TrainerData.asm"
 
 SECTION "bankF",ROMX,BANK[$F]
 
@@ -61594,7 +61698,7 @@ HybridSpriteInfo:
     db MEDIUM_PIC
     db BANK(GhostPic)
     dw GhostPic
-    dw MissingNoPicBack ; TODO
+    dw MissingNoPicBack ; ~TODO
 
     db CHARIZARD_M
     db LARGE_PIC
@@ -72151,11 +72255,7 @@ Func_48943: ; 48943 (12:4943)
     ld [W_CURMAPSCRIPT],a
     ret
 
-CeladonGymScriptPointers: ; 4894e (12:494e)
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
-    dw CeladonGymScript3
+SECTION "CeladonGymScript3",ROMX[$4956],BANK[$12]
 
 CeladonGymScript3: ; 48956 (12:4956)
     ld a,[W_ISINBATTLE] ; $d057
@@ -72186,8 +72286,10 @@ Func_48963: ; 48963 (12:4963)
 .asm_4898c
     ld hl,W_OBTAINEDBADGES ; $d356
     set 3,[hl]
-    ds 3 ; ld hl,$d72a
-    ds 2 ; set 3,[hl]
+    ;ds 3 ; ld hl,$d72a
+    ;ds 2 ; set 3,[hl]
+    ld hl,wGymLeaderRematch
+    ld [hl],%01110111
     ld a,[$d77c]
     or $fc
     ld [$d77c],a
@@ -72286,8 +72388,8 @@ CeladonGymText1: ; 48a11 (12:4a11)
     jr .asm_96252 ; 0x48a23
 .asm_3b22c ; 0x48a25
     ld hl,UnnamedText_48a68
-    call PrintText
-    jr .asm_96252 ; 0x48a2b
+    ld d,4
+    jp TryGymLeaderRematch
 .asm_16064 ; 0x48a2d
     ld hl,UnnamedText_48a5e
     call PrintText
@@ -75300,6 +75402,13 @@ CeladonMart5Text3:
 CeladonMart5Text4:
     db $FE,5,HP_UP,PROTEIN,IRON,CARBOS,CALCIUM,$FF
 
+CeladonGymScriptPointers:
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+    dw CeladonGymScript3
+    dw GymLeaderAfterRematch
+
 SECTION "bank13",ROMX,BANK[$13]
 
 YoungsterPic: ; 4c000 (13:4000)
@@ -75736,6 +75845,7 @@ CritHitStatsEnemySpecialPredef:            NEW_PREDEF CritHitStatsEnemySpecial  
 CheckWildSubGroupPredef:                   NEW_PREDEF CheckWildSubGroup                   ; $6C
 GetAttackerType_Predef:                    NEW_PREDEF GetAttackerType_                    ; $6D
 AdjustDamageForMoveType_GetInputPredef:    NEW_PREDEF AdjustDamageForMoveType_GetInput    ; $6E
+UpgradeTrainerSet_Predef:                  NEW_PREDEF UpgradeTrainerSet_                  ; $6F
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -89135,11 +89245,7 @@ Func_5c3bf: ; 5c3bf (17:43bf)
     ld [W_CURMAPSCRIPT],a
     ret
 
-PewterGymScriptPointers: ; 5c3ca (17:43ca)
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
-    dw PewterGymScript3
+SECTION "PewterGymScript3",ROMX[$43d2],BANK[$17]
 
 PewterGymScript3: ; 5c3d2 (17:43d2)
     ld a,[W_ISINBATTLE] ; $d057
@@ -89170,8 +89276,10 @@ Func_5c3df: ; 5c3df (17:43df)
 .asm_5c408
     ld hl,W_OBTAINEDBADGES ; $d356
     set 0,[hl]
-    ds 3 ; ld hl,$d72a
-    ds 2 ; set 0,[hl]
+    ;ds 3 ; ld hl,$d72a
+    ;ds 2 ; set 0,[hl]
+    ld hl,wGymLeaderRematch
+    ld [hl],%01111110
     ld a,$4
     ld [$cc4d],a
     PREDEF RemoveMissableObject
@@ -89217,8 +89325,8 @@ PewterGymText1: ; 5c44e (17:444e)
     jr .asm_e0ffb ; 0x5c460
 .asm_ff7d0 ; 0x5c462
     ld hl,UnnamedText_5c4a3
-    call PrintText
-    jr .asm_e0ffb ; 0x5c468
+    ld d,1
+    jp TryGymLeaderRematch
 .asm_4a735 ; 0x5c46a
     ld hl,UnnamedText_5c49e
     call PrintText
@@ -89548,11 +89656,7 @@ Func_5c6ed: ; 5c6ed (17:46ed)
     ld [W_CURMAPSCRIPT],a
     ret
 
-CeruleanGymScriptPointers: ; 5c6f8 (17:46f8)
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
-    dw CeruleanGymScript3
+SECTION "CeruleanGymScript3",ROMX[$4700],BANK[$17]
 
 CeruleanGymScript3: ; 5c700 (17:4700)
     ld a,[W_ISINBATTLE] ; $d057
@@ -89583,8 +89687,10 @@ Func_5c70d: ; 5c70d (17:470d)
 .asm_5c736
     ld hl,W_OBTAINEDBADGES ; $d356
     set 1,[hl]
-    ds 3 ; ld hl,$d72a
-    ds 2 ; set 1,[hl]
+    ;ds 3 ; ld hl,$d72a
+    ;ds 2 ; set 1,[hl]
+    ld hl,wGymLeaderRematch
+    ld [hl],%01111101
     ld hl,$d75e
     set 2,[hl]
     set 3,[hl]
@@ -89632,8 +89738,8 @@ CeruleanGymText1: ; 5c771 (17:4771)
     jr .asm_95b04 ; 0x5c783
 .asm_37a1b ; 0x5c785
     ld hl,UnnamedText_5c7c3
-    call PrintText
-    jr .asm_95b04 ; 0x5c78b
+    ld d,2
+    jp TryGymLeaderRematch
 .asm_10854 ; 0x5c78d
     ld hl,UnnamedText_5c7be
     call PrintText
@@ -90060,11 +90166,7 @@ VermilionGymScript_5ca8a: ; 5ca8a (17:4a8a)
     ld [W_CURMAPSCRIPT],a
     ret
 
-VermilionGymScriptPointers: ; 5ca95 (17:4a95)
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
-    dw VermilionGymScript3
+SECTION "VermilionGymScript3",ROMX[$4a9d],BANK[$17]
 
 VermilionGymScript3: ; 5ca9d (17:4a9d)
     ld a,[W_ISINBATTLE] ; $d057
@@ -90095,8 +90197,10 @@ Func_5caaa: ; 5caaa (17:4aaa)
 .asm_5cad3
     ld hl,W_OBTAINEDBADGES ; $d356
     set 2,[hl]
-    ds 3 ; ld hl,$d72a
-    ds 2 ; set 2,[hl]
+    ;ds 3 ; ld hl,$d72a
+    ;ds 2 ; set 2,[hl]
+    ld hl,wGymLeaderRematch
+    ld [hl],%01111011
     ld a,[$d773]
     or $1c
     ld [$d773],a
@@ -90154,8 +90258,8 @@ VermilionGymText1: ; 5cb1d (17:4b1d)
     jr .asm_23621 ; 0x5cb2f
 .asm_41203 ; 0x5cb31
     ld hl,UnnamedText_5cb72
-    call PrintText
-    jr .asm_23621 ; 0x5cb37
+    ld d,3
+    jp TryGymLeaderRematch
 .asm_7cc29 ; 0x5cb39
     ld hl,UnnamedText_5cb6d
     call PrintText
@@ -90291,7 +90395,7 @@ VermilionGymObject: ; 0x5cbfe (size=58)
     db $0 ; signs
 
     db $5 ; people
-    db SPRITE_ROCKER,$1 + 4,$5 + 4,$ff,$d0,$41,LT__SURGE,$1 ; trainer
+    db SPRITE_ROCKER,$1 + 4,$5 + 4,$ff,$d0,$41,LT_SURGE,$1 ; trainer
     db SPRITE_GENTLEMAN,$6 + 4,$9 + 4,$ff,$d2,$42,GENTLEMAN,$4 ; trainer
     db SPRITE_BLACK_HAIR_BOY_2,$8 + 4,$3 + 4,$ff,$d2,$43,ROCKER,$1 ; trainer
     db SPRITE_SAILOR,$a + 4,$0 + 4,$ff,$d3,$44,SAILOR,$8 ; trainer
@@ -90837,11 +90941,7 @@ Func_5d048: ; 5d048 (17:5048)
     ld [W_CURMAPSCRIPT],a
     ret
 
-SaffronGymScriptPointers: ; 5d053 (17:5053)
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
-    dw SaffronGymScript3
+SECTION "SaffronGymScript3",ROMX[$505b],BANK[$17]
 
 SaffronGymScript3: ; 5d05b (17:505b)
     ld a,[W_ISINBATTLE] ; $d057
@@ -90872,8 +90972,10 @@ Func_5d068: ; 5d068 (17:5068)
 .asm_5d091
     ld hl,W_OBTAINEDBADGES ; $d356
     set 5,[hl]
-    ds 3 ; ld hl,$d72a
-    ds 2 ; set 5,[hl]
+    ;ds 3 ; ld hl,$d72a
+    ;ds 2 ; set 5,[hl]
+    ld hl,wGymLeaderRematch
+    ld [hl],%01011111
     ld a,[$d7b3]
     or $fc
     ld [$d7b3],a
@@ -90973,8 +91075,8 @@ SaffronGymText1: ; 5d118 (17:5118)
     jr .asm_34c2c ; 0x5d12a
 .asm_8d2f6 ; 0x5d12c
     ld hl,UnnamedText_5d16e
-    call PrintText
-    jr .asm_34c2c ; 0x5d132
+    ld d,6
+    jp TryGymLeaderRematch
 .asm_e3544 ; 0x5d134
     ld hl,UnnamedText_5d162
     call PrintText
@@ -92725,6 +92827,34 @@ CopycatsHouseOnlyDollCommon:
 .CopycatsHouseOnlyDollText
     TX_FAR _CopycatsHouseOnlyDollText
     db "@"
+
+PewterGymScriptPointers:
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+    dw PewterGymScript3
+    dw GymLeaderAfterRematch
+
+CeruleanGymScriptPointers:
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+    dw CeruleanGymScript3
+    dw GymLeaderAfterRematch
+
+VermilionGymScriptPointers:
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+    dw VermilionGymScript3
+    dw GymLeaderAfterRematch
+
+SaffronGymScriptPointers:
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+    dw SaffronGymScript3
+    dw GymLeaderAfterRematch
 
 ; ───────────────────────────────────────────
 
@@ -97181,7 +97311,7 @@ HallOfFameDisplayPkmn: ; 701a0 (1c:41a0)
     ld [$cd40],a
     inc a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ld hl,$d5a2
+    call ResetGymLeaderRematchAfterHallOfFame ; ld hl,$d5a2
     ld a,[hl]
     inc a
     jr z,.asm_701eb
@@ -97633,6 +97763,12 @@ Func_70510: ; 70510 (1c:4510)
     call Func_706ae
     call LoadPlayerSpriteGraphics
     jr .asm_70558
+
+ResetGymLeaderRematchAfterHallOfFame:
+    ld hl,wGymLeaderRematch
+    ld [hl],%01111111
+    ld hl,$d5a2
+    ret
 
 SECTION "Unknown_70592",ROMX[$4592],BANK[$1c]
 
@@ -101228,7 +101364,7 @@ Unknown_7219e: ; 7219e (1c:619e)
 
     db $00,$00,$00,$00,$00,$00,$00,$00,$03,$00,$00,$13,$11,$00,$00
 
-Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP nella battaglia e altre migliorie ; TODO
+Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP nella battaglia e altre migliorie ; ~TODO
 ;INCBIN "baserom.gbc",$721b5,$721fa - $721b5
     db $23
     db $06
@@ -101387,7 +101523,7 @@ TrainerPalettes:
     db PAL_BROWNMON   ; BRUNO         ; $21
     db PAL_BROWNMON   ; BROCK         ; $22
     db PAL_CYANMON    ; MISTY         ; $23
-    db PAL_YELLOWMON  ; LT__SURGE     ; $24
+    db PAL_YELLOWMON  ; LT_SURGE      ; $24
     db PAL_GREENMON   ; ERIKA         ; $25
     db PAL_PURPLEMON  ; KOGA          ; $26
     db PAL_REDMON     ; BLAINE        ; $27
@@ -103372,7 +103508,7 @@ InGameTrade_BackupPlayerIVandAltForm:
     ld de,wTradePlayerMonAltForm
     ld a,[hl]
     ld [de],a
-    ; TODO : Handle InGameTrade special mon
+    ; ~TODO : Handle InGameTrade special mon
     xor a
     ld hl,wTradedEnemyMonIV
     ld [hli],a
@@ -104170,8 +104306,10 @@ ViridianGymScript3_74995: ; 74995 (1d:4995)
 .asm_749be
     ld hl,W_OBTAINEDBADGES ; $d356
     set 7,[hl]
-    ds 3 ; ld hl,$d72a
-    ds 2 ; set 7,[hl]
+    ;ds 3 ; ld hl,$d72a
+    ;ds 2 ; set 7,[hl]
+    ld hl,wGymLeaderRematch
+    ld [hl],%01111111
     ld a,[$d751]
     or $fc
     ld [$d751],a
@@ -105540,11 +105678,7 @@ Func_75477: ; 75477 (1d:5477)
     ld [W_CURMAPSCRIPT],a
     ret
 
-FuchsiaGymScriptPointers: ; 75482 (1d:5482)
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
-    dw FuchsiaGymScript3
+SECTION "FuchsiaGymScript3",ROMX[$548a],BANK[$1d]
 
 FuchsiaGymScript3: ; 7548a (1d:548a)
     ld a,[W_ISINBATTLE] ; $d057
@@ -105574,8 +105708,10 @@ FuchsiaGymScript3_75497: ; 75497 (1d:5497)
 .asm_754c0
     ld hl,W_OBTAINEDBADGES ; $d356
     set 4,[hl]
-    ds 3 ; ld hl,$d72a
-    ds 2 ; set 4,[hl]
+    ;ds 3 ; ld hl,$d72a
+    ;ds 2 ; set 4,[hl]
+    ld hl,wGymLeaderRematch
+    ld [hl],%01101111
     ld a,[$d792]
     or $fc
     ld [$d792],a
@@ -105663,8 +105799,8 @@ FuchsiaGymText1: ; 75534 (1d:5534)
     jr .asm_e84c6 ; 0x75546
 .asm_adc3b ; 0x75548
     ld hl,UnnamedText_7558b
-    call PrintText
-    jr .asm_e84c6 ; 0x7554e
+    ld d,5
+    jp TryGymLeaderRematch
 .asm_181b6 ; 0x75550
     ld hl,UnnamedText_75581
     call PrintText
@@ -105967,11 +106103,7 @@ CinnabarGymScript_757a0: ; 757a0 (1d:57a0)
     ld [wTrainerHeaderFlagBit],a
     ret
 
-CinnabarGymScriptPointers: ; 757a6 (1d:57a6)
-    dw CinnabarGymScript0
-    dw CinnabarGymScript1
-    dw CinnabarGymScript2
-    dw CinnabarGymScript3
+SECTION "CinnabarGymScript0",ROMX[$57ae],BANK[$1d]
 
 CinnabarGymScript0: ; 757ae (1d:57ae)
     ld a,[$da38]
@@ -106082,8 +106214,10 @@ CinnabarGymScript3_75857: ; 75857 (1d:5857)
 .asm_75880
     ld hl,W_OBTAINEDBADGES ; $d356
     set 6,[hl]
-    ds 3 ; ld hl,$d72a
-    ds 2 ; set 6,[hl]
+    ;ds 3 ; ld hl,$d72a
+    ;ds 2 ; set 6,[hl]
+    ld hl,wGymLeaderRematch
+    ld [hl],%00111111
     ld a,[$d79a]
     or $fc
     ld [$d79a],a
@@ -106139,8 +106273,8 @@ CinnabarGymText1: ; 758df (1d:58df)
     jp TextScriptEnd
 .asm_3012f ; 0x758f4
     ld hl,UnnamedText_75920
-    call PrintText
-    jp TextScriptEnd
+    ld d,7
+    jp TryGymLeaderRematch
 .asm_d9332 ; 0x758fd
     ld hl,UnnamedText_75914
     call PrintText
@@ -106150,6 +106284,8 @@ CinnabarGymText1: ; 758df (1d:58df)
     ld a,$7
     ld [$d05c],a
     jp Func_758b7
+
+SECTION "UnnamedText_75914",ROMX[$5914],BANK[$1d]
 
 UnnamedText_75914: ; 75914 (1d:5914)
     TX_FAR _UnnamedText_75914
@@ -108324,6 +108460,20 @@ TryToRemoveUnknownDungeonWaterBlocks:
     dw $82C7
     db $76
 .ChangedBlocksEnd
+
+FuchsiaGymScriptPointers:
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+    dw FuchsiaGymScript3
+    dw GymLeaderAfterRematch
+
+CinnabarGymScriptPointers:
+    dw CinnabarGymScript0
+    dw CinnabarGymScript1
+    dw CinnabarGymScript2
+    dw CinnabarGymScript3
+    dw GymLeaderAfterRematch
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -125116,7 +125266,7 @@ _OaksLabText26: ; 95664 (25:5664)
     db "two!",$51
     db "This is a great",$4f
     db "undertaking in",$55
-    db "#MON history!",$57
+    db "#MON history!",$58
 
 _OaksLabText27: ; 95741 (25:5741)
     db $0,$53,": Alright",$4f
@@ -125678,6 +125828,25 @@ _AlreadyDisabledText:
     db "already",$55
     db "disabled!",$58
 
+_OaksLabTextTM1:
+    db $0
+    db "Finally, take",$4f
+    db "this with you!",$51
+    db $52," received",$4f
+    db "TECH.MACHINE!@@"
+
+_OaksLabTextTM2:
+    db $0,$51
+    db "T.M. contains",$4f
+    db "techniques that",$55
+    db "can be added to",$55
+    db "#MON!",$51
+    db "When you",$4f
+    db "use one to add",$55
+    db "a new technique,",$55
+    db "pick the #MON",$55
+    db "carefully!",$58
+
 SECTION "bank26",ROMX,BANK[$26]
 
 _UnnamedText_5c4a3: ; 98000 (26:4000)
@@ -125697,21 +125866,15 @@ _TM34PreReceiveText: ; 98092 (26:4092)
 
 _ReceivedTM34Text: ; 980ad (26:40ad)
     db $0,$52," received",$4f
-    db "TECH.MACHINE!@@"
+    db "TM:BIDE!@@"
 
 _TM34ExplanationText: ; 980c0 (26:40c0)
     db $0,$51
-    db "T.M. contains",$4f
-    db "techniques that",$55
-    db "can be added to",$55
-    db "#MON!",$51
-    db "When you",$4f
-    db "use one to add",$55
-    db "a new technique,",$55
-    db "pick the #MON",$55
-    db "carefully!",$51
     db "My Gift is",$4f
     db "3x BIDE!",$51
+    db "You can use",$4f
+    db "it with",$55
+    db "TECH.MACHINE!",$51
     db "Your #MON will",$4f
     db "absorb damage in",$55
     db "battle then pay",$55
@@ -126515,7 +126678,7 @@ _UnnamedText_1d8f9: ; 99f4b (26:5f4b)
     db "nice to hug!",$57
 
 _LavenderHouse1Text3: ; 99f72 (26:5f72)
-    db $0,"PSYDUCK: Gwappa!@@"
+    db $0,"GROWLITHE: Woof!@@"
 
 _LavenderHouse1Text4: ; 99f85 (26:5f85)
     db $0,"NIDORINO: Gaoo!@@"
@@ -126825,6 +126988,16 @@ _UnnamedText_5cb6d: ; 9aaa5 (26:6aa5)
     db "paralysis!",$51
     db "The same as I'll",$4f
     db "do to you!",$57
+
+_GymLeaderRematchText1:
+    db $0,"Rematch?",$57
+
+_GymLeaderRematchText2:
+    db $0,"Go!",$57
+
+_GymLeaderRematchText3:
+    db $0,"Wow!",$4f
+    db "Wonderfull!",$58
 
 SECTION "bank27",ROMX,BANK[$27]
 
@@ -127718,7 +127891,7 @@ _CeladonMart5Text5: ; 9ded6 (27:5ed6)
 
 _CeladonPrizeRoomText1: ; 9dee6 (27:5ee6)
     db $0,"I sure do fancy",$4f
-    db "that PORYGON!",$51
+    db "that PORYGON!",$51 ; ~TODO
     db "But,it's hard to",$4f
     db "win at slots!",$57
 
@@ -137220,6 +137393,160 @@ DrawLineBox2:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+UpgradeTrainerSet_:
+    ld a,[wEngagedTrainerClass]
+    ld b,a
+    ld hl,.Gym
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.end
+    cp b
+    jr nz,.next
+    ld b,[hl] ; Read Mask
+    ld a,[W_OBTAINEDBADGES]
+    and b ; Apply Mask
+    ld b,a
+    ld c,8
+    ld a,[wEngagedTrainerSet] ; Gym Leader Team
+.CheckBadge
+    srl b
+    jr nc,.NextBadge
+    inc a
+.NextBadge
+    dec c
+    jr nz,.CheckBadge
+    ld hl,wEngagedTrainerSet ; Gym Leader Team
+    ld [hl],a
+    ld a,[$d5a2] ; hall of fame
+    and a
+    jr z,.end
+    inc [hl] ; add 1 if after hall of fame
+    jr .end
+.next
+    inc hl
+    jr .loop
+.end
+    jp PlayTrainerMusic
+.Gym
+    db BROCK    , %11111110
+    db MISTY    , %11111100
+    db LT_SURGE , %11111000
+    db ERIKA    , %11110000
+    db KOGA     , %11000000
+    db SABRINA  , %11000000
+    db BLAINE   , %10000000
+    db $FF
+
+; ──────────────────────────────────────────────────────────────────────
+
+; Input d = Gym ID
+TryGymLeaderRematch_:
+    ld e,d
+    ld a,[wGymLeaderRematch]
+    ld c,a
+.loop
+    srl c
+    dec d ; C - Not affected.
+    jr nz,.loop
+    ret nc ; rcf
+    push de ; Backup Gym ID
+    ld hl,GymLeaderRematchText1
+    call PrintText
+    call YesNoChoice ; yes/no textbox
+    ld a,[$CC26] ; yes/no answer (Y=0,N=1)
+    and a
+    jr nz,.Fail
+    ld hl,GymLeaderRematchText2
+    call PrintText
+    ld hl,$d72d
+    set 6,[hl]
+    set 7,[hl]
+    ld hl,GymLeaderRematchText3
+    ld d,h
+    ld e,l
+    call PreBattleSaveRegisters
+    ldh a,[$8c]  ; Map Sprite ID
+    ld [$cf13],a ; ...
+    call EngageMapTrainer
+    call InitBattleEnemyParameters
+    pop de ; Restore Gym ID
+    ld a,e       ; Gym Leader ID
+    ld [$d05c],a ; ...
+    xor a       ; ??? hJoyHeld
+    ldh [$b4],a ; ...
+    call .SetNextScript
+    scf
+    ret
+.Fail
+    pop de ; Restore Gym ID
+    xor a ; rcf
+    ret
+.SetNextScript
+    ld hl,.MapScriptPointers
+    ld d,0
+    dec e
+    add hl,de
+    add hl,de
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld a,$4
+    ld [hl],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+.MapScriptPointers
+    dw W_PEWTERGYMCURSCRIPT
+    dw W_CERULEANGYMCURSCRIPT
+    dw W_VERMILIONGYMCURSCRIPT
+    dw W_CELADONGYMCURSCRIPT
+    dw W_FUCHSIAGYMCURSCRIPT
+    dw W_SAFFRONGYMCURSCRIPT
+    dw W_CINNABARGYMCURSCRIPT
+    dw W_VIRIDIANGYMCURSCRIPT
+
+; ──────────────────────────────────────────────────────────────────────
+
+GymLeaderAfterRematch_:
+    ld hl,.MapScriptPointers
+    call GetCurrentOldAdventureMap
+    ld b,a
+.loop
+    ld a,[hli]
+    cp $FF
+    ret z
+    cp b
+    jr z,.done
+    inc hl
+    inc hl
+    jr .loop
+.done
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $ff
+    ld a,0
+    jr z,.reset
+    ld [wGymLeaderRematch],a
+.reset
+    ld [hl],a
+    ld [wJoypadForbiddenButtonsMask],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+.MapScriptPointers
+    dbw PEWTER_GYM    , W_PEWTERGYMCURSCRIPT
+    dbw CERULEAN_GYM  , W_CERULEANGYMCURSCRIPT
+    dbw VERMILION_GYM , W_VERMILIONGYMCURSCRIPT
+    dbw CELADON_GYM   , W_CELADONGYMCURSCRIPT
+    dbw FUCHSIA_GYM   , W_FUCHSIAGYMCURSCRIPT
+    dbw SAFFRON_GYM   , W_SAFFRONGYMCURSCRIPT
+    dbw CINNABAR_GYM  , W_CINNABARGYMCURSCRIPT
+    dbw VIRIDIAN_GYM  , W_VIRIDIANGYMCURSCRIPT
+    db $FF
+
+; ──────────────────────────────────────────────────────────────────────
+
 SECTION "Bank38",ROMX,BANK[$38]
 
 Tset0D_GFX:
@@ -138080,59 +138407,6 @@ CheckSpecialWild_:
     db CONVERSION
     db MIRROR_MOVE
     db METRONOME
-
-; ──────────────────────────────────────────────────────────────────────
-
-LoadSpecialTrainerMoves:
-    ld h,d
-    ld l,e
-    ld b,0
-.writeAdditionalMoveDataLoop
-    ld a,[hl]
-    and a
-    jr z,.FinishUp
-    ld a,b
-    push bc
-    push hl
-    ld hl,W_ENEMYMON1MOVE3-2 ; W_ENEMYMON1MOVE1
-    ld bc,44
-    call AddNTimes
-    ld d,h
-    ld e,l
-    pop hl
-    ld bc,4
-    call CopyData ; copy bc bytes of data from hl to de
-;    call .WritePP
-    pop bc
-    inc b
-    jr .writeAdditionalMoveDataLoop
-.FinishUp
-    ret
-;.WritePP
-;    push hl
-;    call .HLToMove
-;    call .DEToPP
-;    PREDEF ResetMovePPs
-;    pop hl
-;    ret
-;.HLToMove
-;    ld h,d
-;    ld l,e
-;    ld bc,-4
-;    add hl,bc
-;    ret
-;.DEToPP
-;    push hl
-;    ld h,d
-;    ld l,e
-;    ld de,16
-;    add hl,de
-;    ld d,h
-;    ld e,l
-;    pop hl
-;    ret
-
-INCLUDE "constants/special_trainer.asm"
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -139734,7 +140008,7 @@ PlayTrainerMusic_:
     ld a,BANK(Music_MeetEvilTrainer)
     ld [$c0ef],a
     ld [$c0f0],a
-    ld a,[wEngagedTrainerSet] ; If Special Wild PLay "Male Music"
+    ld a,[wEngagedTrainerSet] ; If Special Wild Play "Male Music"
     cp OPP_LVL_OFFSET         ; ...
     jr nc,.maleTrainer        ; ...
     ld a,[wEngagedTrainerClass]
@@ -140213,7 +140487,7 @@ GenerateRandomEnemyTrainerIV_:
     db $BF,$FF,$AF,$9F ; dw $BFA9 ; BRUNO         ; $21 ;
     db $9F,$AF,$8F,$1F ; dw $9A81 ; BROCK         ; $22 ;
     db $9F,$8F,$AF,$9F ; dw $98A9 ; MISTY         ; $23 ;
-    db $9F,$8F,$0F,$BF ; dw $980B ; LT__SURGE     ; $24 ;
+    db $9F,$8F,$0F,$BF ; dw $980B ; LT_SURGE     ; $24 ;
     db $1F,$BF,$8F,$BF ; dw $1B8B ; ERIKA         ; $25 ;
     db $9F,$8F,$AF,$BF ; dw $98AB ; KOGA          ; $26 ;
     db $BF,$8F,$8F,$BF ; dw $B88B ; BLAINE        ; $27 ;
@@ -140317,42 +140591,92 @@ GenerateRandomEnemyTrainerIV_:
 
     ; Brock
     db BROCK,GEODUDE,$55,$55
+    db BROCK,GRAVELER,$55,$55
+    db BROCK,GOLEM,$55,$55
     db BROCK,ONIX,$0F,$F0
+    db BROCK,VULPIX,$E2,$EE
+    db BROCK,NINETALES,$E2,$EE
+    db BROCK,OMANYTE,$3D,$AF
+    db BROCK,OMASTAR,$3D,$AF
+    db BROCK,KABUTO,$EC,$94
+    db BROCK,KABUTOPS,$EC,$94
+    db BROCK,AERODACTYL,$D9,$F9
 
     ; Misty
     db MISTY,STARYU,$2A,$A9
     db MISTY,STARMIE,$B8,$F9
+    db MISTY,PSYDUCK,$00,$FF
+    db MISTY,GOLDUCK,$00,$FF
+    db MISTY,MAGIKARP,$A8,$7A
+    db MISTY,GYARADOS,$A8,$7A
+    db MISTY,HORSEA,$56,$FE
+    db MISTY,SEADRA,$56,$FE
+    db MISTY,GOLDEEN,$B8,$7B
+    db MISTY,SEAKING,$B8,$7B
+    db MISTY,LAPRAS,$CC,$AF
+    db MISTY,VAPOREON,$A7,$AA
 
     ; LtSurge
-    db LT__SURGE,RAICHU,$B8,$0E
+    db LT_SURGE,PIKACHU,$FF,$FF
+    db LT_SURGE,RAICHU,$B8,$0E
+    db LT_SURGE,MAGNEMITE,$6D,$7E
+    db LT_SURGE,MAGNETON,$6D,$7E
+    db LT_SURGE,VOLTORB,$F0,$F9
+    db LT_SURGE,ELECTRODE,$F0,$F9
+    db LT_SURGE,ELECTABUZZ,$EE,$EE
+    db LT_SURGE,JOLTEON,$A7,$AA
 
     ; Erika
     db ERIKA,TANGELA,$7D,$5A
     db ERIKA,WEEPINBELL,$E7,$BB
+    db ERIKA,VICTREEBEL,$E7,$BB
     db ERIKA,GLOOM,$7E,$9E
+    db ERIKA,VILEPLUME,$E7,$E9
+    db ERIKA,EXEGGCUTE,$66,$6C
+    db ERIKA,EXEGGUTOR,$66,$6C
+    db ERIKA,PARASECT,$79,$F8
 
     ; Koga
     db KOGA,VENOMOTH,$7C,$FD
     db KOGA,GOLBAT,$F4,$F4
+    db KOGA,MUK,$EF,$5C
+    db KOGA,WEEZING,$9F,$FC
+    db KOGA,ARBOK,$D8,$E9
+    db KOGA,SCYTHER,$F7,$F7
+    db KOGA,TENTACRUEL,$6A,$FC
+    db KOGA,ELECTRODE,$F0,$F0
+    db KOGA,GENGAR,$92,$DD
 
     ; Sabrina
     db SABRINA,HAUNTER,$29,$DD
+    db SABRINA,GENGAR,$29,$DD
     db SABRINA,KADABRA,$3F,$CD
+    db SABRINA,ALAKAZAM,$3F,$CD
+    db SABRINA,MR_MIME,$AA,$FD
+    db SABRINA,VENOMOTH,$C7,$FD
+    db SABRINA,SLOWBRO,$3F,$0F
+    db SABRINA,JYNX,$EE,$EE
+    db SABRINA,HYPNO,$DC,$AB
+    db SABRINA,EXEGGUTOR,$0A,$0F
 
     ; Blaine
     db BLAINE,NINETALES,$EB,$BA
     db BLAINE,RHYDON,$DD,$DD
-    db BLAINE,MAGMAR,$BE,$9E
+    db BLAINE,MAGMAR,$EE,$EE
+    db BLAINE,ARCANINE,$BE,$AB
+    db BLAINE,RAPIDASH,$6B,$FB
+    db BLAINE,FLAREON,$A7,$AA
 
     ; Giovanni
-    db GIOVANNI,GEODUDE,$FF,$0F
-    db GIOVANNI,GOLEM,$FF,$0F
+    db GIOVANNI,CUBONE,$FF,$0F
+    db GIOVANNI,MAROWAK,$FF,$0F
     db GIOVANNI,RHYHORN,$EE,$EE
     db GIOVANNI,RHYDON,$EE,$EE
     db GIOVANNI,PERSIAN,$CC,$FC
     db GIOVANNI,NIDORINO,$CB,$CB
     db GIOVANNI,NIDOKING,$CB,$CB
     db GIOVANNI,NIDOQUEEN,$BC,$BC
+    db GIOVANNI,KINGLER,$E6,$F5
 
     ; Bruno
     db BRUNO,PRIMEAPE,$C9,$F8
@@ -140404,7 +140728,7 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     jr z,.AltForm1
     ; fall through
 .WildStandard
-    xor a ; TODO
+    xor a ; ~TODO
     jr .end
 .AltForm1
     ld a,1
@@ -141192,6 +141516,8 @@ SECTION "Bank39",ROMX,BANK[$39]
 
 MonOverworldDataNew_emimonserrate:
     INCBIN "gfx/denim/party_mon_sprites1_emimonserrate.w32.2bpp"
+
+; ──────────────────────────────────────────────────────────────────────
 
 SECTION "Bank3a",ROMX,BANK[$3A]
 
@@ -142299,5 +142625,62 @@ TestMap2Script:
     ret
 TestMap2Blocks:
     INCBIN "maps/devmap2.blk"
+
+; ──────────────────────────────────────────────────────────────────────
+
+SECTION "Bank3d",ROMX,BANK[$3D]
+
+; ──────────────────────────────────────────────────────────────────────
+
+LoadSpecialTrainerMoves:
+    ld h,d
+    ld l,e
+    ld b,0
+.writeAdditionalMoveDataLoop
+    ld a,[hl]
+    and a
+    jr z,.FinishUp
+    ld a,b
+    push bc
+    push hl
+    ld hl,W_ENEMYMON1MOVE3-2 ; W_ENEMYMON1MOVE1
+    ld bc,44
+    call AddNTimes
+    ld d,h
+    ld e,l
+    pop hl
+    ld bc,4
+    call CopyData ; copy bc bytes of data from hl to de
+;    call .WritePP
+    pop bc
+    inc b
+    jr .writeAdditionalMoveDataLoop
+.FinishUp
+    ret
+;.WritePP
+;    push hl
+;    call .HLToMove
+;    call .DEToPP
+;    PREDEF ResetMovePPs
+;    pop hl
+;    ret
+;.HLToMove
+;    ld h,d
+;    ld l,e
+;    ld bc,-4
+;    add hl,bc
+;    ret
+;.DEToPP
+;    push hl
+;    ld h,d
+;    ld l,e
+;    ld de,16
+;    add hl,de
+;    ld d,h
+;    ld e,l
+;    pop hl
+;    ret
+
+INCLUDE "constants/special_trainer.asm"
 
 ; ──────────────────────────────────────────────────────────────────────
