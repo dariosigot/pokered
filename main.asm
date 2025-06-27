@@ -46912,38 +46912,34 @@ ShellderPicFront: ; 26cb6 (9:6cb6)
 ShellderPicBack: ; 26dc3 (9:6dc3)
     INCBIN "pic/monback/shellderb.pic"
 
-Func_27d6b:
+PrintTypes:
     call Load16BitRegisters
-    ;push hl
-    ;call GetMonHeader
-    ;pop hl
-    push hl
-    ld a,[W_MONHTYPE1] ; @TODO:4TYPE
-    call Func_27d89
-    ld a,[W_MONHTYPE1] ; @TODO:4TYPE
-    ld b,a
-    ld a,[W_MONHTYPE2] ; @TODO:4TYPE
-    cp b
-    pop hl
-    jr z,asm_27d8c
-    ld bc,$14 ; Denim ; ld bc,$28 ; Tipo2 a capo
-    add hl,bc
+    ld a,[W_MONHTYPE1]
+    call .PrintSingleType
+    ld a,[W_MONHTYPE2]
+ ;   call .PrintSingleType
+ ;   ld a,[W_MONHTYPE3]
+ ;   call .PrintSingleType
+ ;   ld a,[W_MONHTYPE4]
+    ; fall through
 
-Func_27d89:
+.PrintSingleType
     push hl
-    jr asm_27d9f
-asm_27d8c: ; 27d8c (9:7d8c)
-    ld a,$7f
-    ld bc,$13
+    call .PrintMoveType
+    pop hl
+    ld bc,20
     add hl,bc
-    ld bc,$6
-    jp FillMemory
+    ret
+.PrintMoveType
+    push hl
+    jr PrintMoveType_
 
 PrintMoveType:
     call Load16BitRegisters
     push hl
     ld a,[W_PLAYERMOVETYPE] ; $cfd5
-asm_27d9f: ; 27d9f (9:7d9f)
+
+PrintMoveType_:
     add a
     ld hl,TypeNamePointers ; $7dae
     ld e,a
@@ -46994,7 +46990,7 @@ Type19Name:
 Type1AName:
     db "DRAGON@"
 TypeNAName:
-    db "N.A.@"
+    db "-@"
 
 SECTION "SaveTrainerName",ROMX[$7E4A],BANK[$9]
 
@@ -62882,7 +62878,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld [$fff4],a
     FuncCoord 09,04
     ld hl,Coord
-    PREDEF Func_27d6b ; Prints the type (?)
+    PREDEF PrintTypes
     call Delay3
     call GBPalNormal
     ; header just loaded in "GetPokedexPaletteID" ; call GetMonHeader ; load pokemon picture location
@@ -75793,7 +75789,7 @@ _AddPokemonToPartyPredef:                  NEW_PREDEF _AddPokemonToParty        
 UpdateHPBar_2Predef:                       NEW_PREDEF UpdateHPBar                         ; $48
 DrawEnemyHUDAndHPBarPredef:                NEW_PREDEF DrawEnemyHUDAndHPBar                ; $49
 Func_70f60Predef:                          NEW_PREDEF Func_70f60                          ; $4A
-Func_27d6bPredef:                          NEW_PREDEF Func_27d6b                          ; $4B
+PrintTypesPredef:                          NEW_PREDEF PrintTypes                          ; $4B
 Func_17c47Predef:                          NEW_PREDEF Func_17c47                          ; $4C
 Func_5aafPredef:                           NEW_PREDEF Func_5aaf                           ; $4D
 AskForMonNicknamePredef:                   NEW_PREDEF AskForMonNickname                   ; $4E
@@ -97448,7 +97444,7 @@ Func_702f0: ; 702f0 (1c:42f0)
     ld [$d0b5],a
     FuncCoord 3,9 ; $c457
     ld hl,Coord
-    PREDEF Func_27d6b
+    PREDEF PrintTypes
     ld a,[wWhichTrade] ; $cd3d
     jp PlayCry
 
@@ -138780,7 +138776,7 @@ HandleStatusScreen1:
     call PrintLevel ; Pokémon level
     FuncCoord 1,8
     ld hl,Coord
-    PREDEF Func_27d6b ; Prints the type (?)
+    PREDEF PrintTypes ; Prints the type (?)
     ld hl,Unknown_12a9d ; $6a9d
     call unk_12a7e
     ld d,h

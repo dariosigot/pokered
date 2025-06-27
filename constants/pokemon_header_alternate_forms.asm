@@ -87,8 +87,8 @@ KabutoFossilBaseStats:
     db 45 ; base special
 
     db ROCK ; species type 1
-    db BUG ; species type 2
-    db 0 ; species type 3
+    db WATER ; species type 2
+    db BUG ; species type 3
     db 0 ; species type 4
 
     db $55 ; sprite dimensions
@@ -127,8 +127,8 @@ KabutopsFossilBaseStats:
     db 70 ; base special
 
     db ROCK ; species type 1
-    db BUG ; species type 2
-    db 0 ; species type 3
+    db WATER ; species type 2
+    db BUG ; species type 3
     db 0 ; species type 4
 
     db $66 ; sprite dimensions
@@ -167,8 +167,8 @@ AerodactylFossilBaseStats:
     db 60 ; base special
 
     db ROCK ; species type 1
-    db DRAGON ; species type 2
-    db 0 ; species type 3
+    db WIND ; species type 2
+    db DRAGON ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -567,8 +567,8 @@ OnixCrystalBaseStats:
     db 45 ; base special
 
     db CRYSTAL ; species type 1
-    db METAL ; species type 2
-    db 0 ; species type 3
+    db GROUND ; species type 2
+    db METAL ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -606,9 +606,9 @@ MarowakAlolaBaseStats:
     db 45 ; base speed
     db 50 ; base special
 
-    db FIRE ; species type 1
-    db GHOST ; species type 2
-    db 0 ; species type 3
+    db IVORY ; species type 1
+    db FIRE ; species type 2
+    db GHOST ; species type 3
     db 0 ; species type 4
 
     db $66 ; sprite dimensions

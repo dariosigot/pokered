@@ -247,8 +247,8 @@ CharizardBaseStats:
     db 85 ; base special
 
     db FIRE ; species type 1
-    db DRAGON ; species type 2
-    db 0 ; species type 3
+    db WIND ; species type 2
+    db DRAGON ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -567,8 +567,8 @@ KakunaBaseStats:
     db 25 ; base special
 
     db BUG ; species type 1
-    db IVORY ; species type 2
-    db 0 ; species type 3
+    db POISON ; species type 2
+    db IVORY ; species type 3
     db 0 ; species type 4
 
     db $55 ; sprite dimensions
@@ -608,7 +608,7 @@ BeedrillBaseStats:
 
     db BUG ; species type 1
     db POISON ; species type 2
-    db 0 ; species type 3
+    db WIND ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -1247,8 +1247,8 @@ NidoqueenBaseStats:
     db 75 ; base special
 
     db POISON ; species type 1
-    db IVORY ; species type 2
-    db 0 ; species type 3
+    db GROUND ; species type 2
+    db IVORY ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -1367,8 +1367,8 @@ NidokingBaseStats:
     db 75 ; base special
 
     db POISON ; species type 1
-    db IVORY ; species type 2
-    db 0 ; species type 3
+    db GROUND ; species type 2
+    db IVORY ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -1927,8 +1927,8 @@ VenonatBaseStats:
     db 40 ; base special
 
     db BUG ; species type 1
-    db PSYCHIC ; species type 2
-    db 0 ; species type 3
+    db POISON ; species type 2
+    db PSYCHIC ; species type 3
     db 0 ; species type 4
 
     db $55 ; sprite dimensions
@@ -1967,9 +1967,9 @@ VenomothBaseStats:
     db 90 ; base special
 
     db BUG ; species type 1
-    db PSYCHIC ; species type 2
-    db 0 ; species type 3
-    db 0 ; species type 4
+    db POISON ; species type 2
+    db PSYCHIC ; species type 3
+    db WIND ; species type 4
 
     db $77 ; sprite dimensions
 
@@ -3607,7 +3607,7 @@ ShellderBaseStats:
     db 45 ; base special
 
     db WATER ; species type 1
-    db 0 ; species type 2
+    db IVORY ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -3647,8 +3647,8 @@ CloysterBaseStats:
     db 85 ; base special
 
     db WATER ; species type 1
-    db ICE ; species type 2
-    db 0 ; species type 3
+    db IVORY ; species type 2
+    db ICE ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -3807,8 +3807,8 @@ OnixBaseStats:
     db 30 ; base special
 
     db ROCK ; species type 1
-    db METAL ; species type 2
-    db 0 ; species type 3
+    db GROUND ; species type 2
+    db METAL ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -4367,7 +4367,7 @@ KoffingBaseStats:
     db 60 ; base special
 
     db POISON ; species type 1
-    db 0 ; species type 2
+    db WIND ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -4407,7 +4407,7 @@ WeezingBaseStats:
     db 85 ; base special
 
     db POISON ; species type 1
-    db 0 ; species type 2
+    db WIND ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -5088,7 +5088,7 @@ PinsirBaseStats:
 
     db BUG ; species type 1
     db IVORY ; species type 2
-    db 0 ; species type 3
+    db FIGHT ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -5248,7 +5248,7 @@ LaprasBaseStats:
 
     db ICE ; species type 1
     db WATER ; species type 2
-    db 0 ; species type 3
+    db IVORY ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -5528,7 +5528,7 @@ OmanyteBaseStats:
 
     db ROCK ; species type 1
     db WATER ; species type 2
-    db 0 ; species type 3
+    db IVORY ; species type 3
     db 0 ; species type 4
 
     db $55 ; sprite dimensions
@@ -5568,7 +5568,7 @@ OmastarBaseStats:
 
     db ROCK ; species type 1
     db WATER ; species type 2
-    db 0 ; species type 3
+    db IVORY ; species type 3
     db 0 ; species type 4
 
     db $66 ; sprite dimensions
@@ -5607,8 +5607,8 @@ KabutoBaseStats:
     db 45 ; base special
 
     db ROCK ; species type 1
-    db BUG ; species type 2
-    db 0 ; species type 3
+    db WATER ; species type 2
+    db BUG ; species type 3
     db 0 ; species type 4
 
     db $55 ; sprite dimensions
@@ -5647,8 +5647,8 @@ KabutopsBaseStats:
     db 70 ; base special
 
     db ROCK ; species type 1
-    db BUG ; species type 2
-    db 0 ; species type 3
+    db WATER ; species type 2
+    db BUG ; species type 3
     db 0 ; species type 4
 
     db $66 ; sprite dimensions
@@ -5687,8 +5687,8 @@ AerodactylBaseStats:
     db 60 ; base special
 
     db ROCK ; species type 1
-    db DRAGON ; species type 2
-    db 0 ; species type 3
+    db WIND ; species type 2
+    db DRAGON ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -5927,7 +5927,7 @@ DragonairBaseStats:
     db 70 ; base special
 
     db DRAGON ; species type 1
-    db 0 ; species type 2
+    db WIND ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -5967,7 +5967,7 @@ DragoniteBaseStats:
     db 100 ; base special
 
     db DRAGON ; species type 1
-    db 0 ; species type 2
+    db WIND ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
