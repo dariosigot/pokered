@@ -46955,8 +46955,6 @@ asm_27d9f: ; 27d9f (9:7d9f)
     pop hl
     jp PlaceString
 
-Type00Name:
-    db "NORMAL@"
 Type01Name:
     db "FIGHT@"
 Type02Name:
@@ -46975,6 +46973,8 @@ Type08Name:
     db "GHOST@"
 Type09Name:
     db "METAL@"
+Type10Name:
+    db "NORMAL@"
 Type12Name:
     db "IVORY@"
 Type13Name:
@@ -47137,7 +47137,7 @@ FocusEnergyEffect_: ; 27f86 (9:7f86)
     db "@"
 
 TypeNamePointers:
-    dw Type00Name ; $00 : Normal
+    dw TypeNAName ; 
     dw Type01Name ; $01 : Fight
     dw Type02Name ; $02 : Wind
     dw Type03Name ; $03 : Poison
@@ -47147,7 +47147,7 @@ TypeNamePointers:
     dw Type07Name ; $07 : Bug
     dw Type08Name ; $08 : Ghost
     dw Type09Name ; $09 : Metal
-    dw TypeNAName ;
+    dw Type10Name ; $00 : Normal
     dw TypeNAName ;
     dw TypeNAName ;
     dw TypeNAName ;

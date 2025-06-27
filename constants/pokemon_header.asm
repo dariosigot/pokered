@@ -1,13 +1,20 @@
 MissingNoBaseStats:
-    db 0              ; mon id
-    db 33,MUK,0       ; Hp, Attack, Defense
-    db 29,VOLTORB     ; Speed, Special
-    db TYPE_NA,TYPE_NA ; db VOLTORB,0      ; Bird/Normal
-    db 29,WEEZING,MUK ; CatchRate, BaseExpYield, Sprite Dimension
+    db MISSINGNO ; mon id
+    db 33 ; base hp
+    db MUK ; base attack
+    db 0 ; base defense
+    db 29 ; base speed
+    db VOLTORB ; base special
 
-    dw MissingNoPicFront, MissingNoPicBack ;    db 0,25,KOFFING,WEEZING
+    db TYPE_NA ; species type 1
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    ;dw 0,0 ; db KOFFING,KOFFING,WEEZING,0 ; attacks known at lvl 0: WATER_GUN, WATER_GUN, SKY_ATTACK
+    db MUK ; sprite dimensions
+
+    dw MissingNoPicFront
+    dw MissingNoPicBack
 
     ; pointer to alternate forms
     dw 0
@@ -26,9 +33,10 @@ MissingNoBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 29 ; catch rate
+    db WEEZING ; base exp yield
 
-    db BANK(MissingNoPicFront) ;    db GRIMER
+    db BANK(MissingNoPicFront)
 
 BulbasaurBaseStats:
     db BULBASAUR ; mon id
@@ -39,10 +47,10 @@ BulbasaurBaseStats:
     db 65 ; base special
 
     db GRASS ; species type 1
-    db GRASS ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 64 ; base exp yield
     db $55 ; sprite dimensions
 
     dw BulbasaurPicFront
@@ -65,7 +73,8 @@ BulbasaurBaseStats:
     ; field moves
     db FM_CUT
 
-    ds 2
+    db 45 ; catch rate
+    db 64 ; base exp yield
 
     db BANK(BulbasaurPicFront)
 
@@ -79,9 +88,9 @@ IvysaurBaseStats:
 
     db GRASS ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 141 ; base exp yield
     db $66 ; sprite dimensions
 
     dw IvysaurPicFront
@@ -104,7 +113,8 @@ IvysaurBaseStats:
     ; field moves
     db FM_CUT
 
-    ds 2
+    db 45 ; catch rate
+    db 141 ; base exp yield
 
     db BANK(IvysaurPicFront)
 
@@ -118,9 +128,9 @@ VenusaurBaseStats:
 
     db GRASS ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 208 ; base exp yield
     db $77 ; sprite dimensions
 
     dw VenusaurPicFront
@@ -143,7 +153,8 @@ VenusaurBaseStats:
     ; field moves
     db FM_CUT+FM_STRENGTH+FM_HEAL
 
-    ds 2
+    db 45 ; catch rate
+    db 208 ; base exp yield
 
     db BANK(VenusaurPicFront)
 
@@ -156,10 +167,10 @@ CharmanderBaseStats:
     db 50 ; base special
 
     db FIRE ; species type 1
-    db FIRE ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 65 ; base exp yield
     db $55 ; sprite dimensions
 
     dw CharmanderPicFront
@@ -182,7 +193,8 @@ CharmanderBaseStats:
     ; field moves
     db FM_LIGHT
 
-    ds 2
+    db 45 ; catch rate
+    db 65 ; base exp yield
 
     db BANK(CharmanderPicFront)
 
@@ -196,9 +208,9 @@ CharmeleonBaseStats:
 
     db FIRE ; species type 1
     db DRAGON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 142 ; base exp yield
     db $66 ; sprite dimensions
 
     dw CharmeleonPicFront
@@ -221,7 +233,8 @@ CharmeleonBaseStats:
     ; field moves
     db FM_CUT+FM_LIGHT+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 142 ; base exp yield
 
     db BANK(CharmeleonPicFront)
 
@@ -235,9 +248,9 @@ CharizardBaseStats:
 
     db FIRE ; species type 1
     db DRAGON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 209 ; base exp yield
     db $77 ; sprite dimensions
 
     dw CharizardPicFront
@@ -260,7 +273,8 @@ CharizardBaseStats:
     ; field moves
     db FM_CUT+FM_FLY+FM_STRENGTH+FM_LIGHT+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 209 ; base exp yield
 
     db BANK(CharizardPicFront)
 
@@ -273,10 +287,10 @@ SquirtleBaseStats:
     db 50 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 66 ; base exp yield
     db $55 ; sprite dimensions
 
     dw SquirtlePicFront
@@ -299,7 +313,8 @@ SquirtleBaseStats:
     ; field moves
     db FM_FLOAT
 
-    ds 2
+    db 45 ; catch rate
+    db 66 ; base exp yield
 
     db BANK(SquirtlePicFront)
 
@@ -313,9 +328,9 @@ WartortleBaseStats:
 
     db WATER ; species type 1
     db IVORY ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 143 ; base exp yield
     db $66 ; sprite dimensions
 
     dw WartortlePicFront
@@ -338,7 +353,8 @@ WartortleBaseStats:
     ; field moves
     db FM_FLOAT+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 143 ; base exp yield
 
     db BANK(WartortlePicFront)
 
@@ -352,9 +368,9 @@ BlastoiseBaseStats:
 
     db WATER ; species type 1
     db IVORY ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 210 ; base exp yield
     db $77 ; sprite dimensions
 
     dw BlastoisePicFront
@@ -377,7 +393,8 @@ BlastoiseBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 210 ; base exp yield
 
     db BANK(BlastoisePicFront)
 
@@ -390,10 +407,10 @@ CaterpieBaseStats:
     db 20 ; base special
 
     db BUG ; species type 1
-    db BUG ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 53 ; base exp yield
     db $55 ; sprite dimensions
 
     dw CaterpiePicFront
@@ -416,7 +433,8 @@ CaterpieBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 255 ; catch rate
+    db 53 ; base exp yield
 
     db BANK(CaterpiePicFront)
 
@@ -430,9 +448,9 @@ MetapodBaseStats:
 
     db BUG ; species type 1
     db IVORY ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 120 ; catch rate
-    db 72 ; base exp yield
     db $55 ; sprite dimensions
 
     dw MetapodPicFront
@@ -455,7 +473,8 @@ MetapodBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 120 ; catch rate
+    db 72 ; base exp yield
 
     db BANK(MetapodPicFront)
 
@@ -469,9 +488,9 @@ ButterfreeBaseStats:
 
     db BUG ; species type 1
     db WIND ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 160 ; base exp yield
     db $77 ; sprite dimensions
 
     dw ButterfreePicFront
@@ -494,7 +513,8 @@ ButterfreeBaseStats:
     ; field moves
     db FM_FLY+FM_TELEPORT+FM_HEAL
 
-    ds 2
+    db 45 ; catch rate
+    db 160 ; base exp yield
 
     db BANK(ButterfreePicFront)
 
@@ -508,9 +528,9 @@ WeedleBaseStats:
 
     db BUG ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 52 ; base exp yield
     db $55 ; sprite dimensions
 
     dw WeedlePicFront
@@ -533,7 +553,8 @@ WeedleBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 255 ; catch rate
+    db 52 ; base exp yield
 
     db BANK(WeedlePicFront)
 
@@ -547,9 +568,9 @@ KakunaBaseStats:
 
     db BUG ; species type 1
     db IVORY ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 120 ; catch rate
-    db 71 ; base exp yield
     db $55 ; sprite dimensions
 
     dw KakunaPicFront
@@ -572,7 +593,8 @@ KakunaBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 120 ; catch rate
+    db 71 ; base exp yield
 
     db BANK(KakunaPicFront)
 
@@ -586,9 +608,9 @@ BeedrillBaseStats:
 
     db BUG ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 159 ; base exp yield
     db $77 ; sprite dimensions
 
     dw BeedrillPicFront
@@ -611,7 +633,8 @@ BeedrillBaseStats:
     ; field moves
     db FM_CUT+FM_FLY
 
-    ds 2
+    db 45 ; catch rate
+    db 159 ; base exp yield
 
     db BANK(BeedrillPicFront)
 
@@ -624,10 +647,10 @@ PidgeyBaseStats:
     db 35 ; base special
 
     db WIND ; species type 1
-    db WIND ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 55 ; base exp yield
     db $55 ; sprite dimensions
 
     dw PidgeyPicFront
@@ -650,7 +673,8 @@ PidgeyBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 255 ; catch rate
+    db 55 ; base exp yield
 
     db BANK(PidgeyPicFront)
 
@@ -663,10 +687,10 @@ PidgeottoBaseStats:
     db 50 ; base special
 
     db WIND ; species type 1
-    db WIND ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 120 ; catch rate
-    db 113 ; base exp yield
     db $66 ; sprite dimensions
 
     dw PidgeottoPicFront
@@ -689,7 +713,8 @@ PidgeottoBaseStats:
     ; field moves
     db FM_FLY
 
-    ds 2
+    db 120 ; catch rate
+    db 113 ; base exp yield
 
     db BANK(PidgeottoPicFront)
 
@@ -702,10 +727,10 @@ PidgeotBaseStats:
     db 70 ; base special
 
     db WIND ; species type 1
-    db WIND ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 172 ; base exp yield
     db $77 ; sprite dimensions
 
     dw PidgeotPicFront
@@ -728,7 +753,8 @@ PidgeotBaseStats:
     ; field moves
     db FM_CUT+FM_FLY
 
-    ds 2
+    db 45 ; catch rate
+    db 172 ; base exp yield
 
     db BANK(PidgeotPicFront)
 
@@ -741,10 +767,10 @@ RattataBaseStats:
     db 25 ; base special
 
     db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 57 ; base exp yield
     db $55 ; sprite dimensions
 
     dw RattataPicFront
@@ -767,7 +793,8 @@ RattataBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 255 ; catch rate
+    db 57 ; base exp yield
 
     db BANK(RattataPicFront)
 
@@ -780,10 +807,10 @@ RaticateBaseStats:
     db 50 ; base special
 
     db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 90 ; catch rate
-    db 116 ; base exp yield
     db $66 ; sprite dimensions
 
     dw RaticatePicFront
@@ -806,7 +833,8 @@ RaticateBaseStats:
     ; field moves
     db FM_DIG
 
-    ds 2
+    db 90 ; catch rate
+    db 116 ; base exp yield
 
     db BANK(RaticatePicFront)
 
@@ -819,10 +847,10 @@ SpearowBaseStats:
     db 31 ; base special
 
     db WIND ; species type 1
-    db WIND ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 58 ; base exp yield
     db $55 ; sprite dimensions
 
     dw SpearowPicFront
@@ -845,7 +873,8 @@ SpearowBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 255 ; catch rate
+    db 58 ; base exp yield
 
     db BANK(SpearowPicFront)
 
@@ -858,10 +887,10 @@ FearowBaseStats:
     db 61 ; base special
 
     db WIND ; species type 1
-    db WIND ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 90 ; catch rate
-    db 162 ; base exp yield
     db $77 ; sprite dimensions
 
     dw FearowPicFront
@@ -884,7 +913,8 @@ FearowBaseStats:
     ; field moves
     db FM_CUT+FM_FLY
 
-    ds 2
+    db 90 ; catch rate
+    db 162 ; base exp yield
 
     db BANK(FearowPicFront)
 
@@ -897,10 +927,10 @@ EkansBaseStats:
     db 40 ; base special
 
     db POISON ; species type 1
-    db POISON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 62 ; base exp yield
     db $55 ; sprite dimensions
 
     dw EkansPicFront
@@ -923,7 +953,8 @@ EkansBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 255 ; catch rate
+    db 62 ; base exp yield
 
     db BANK(EkansPicFront)
 
@@ -936,10 +967,10 @@ ArbokBaseStats:
     db 65 ; base special
 
     db POISON ; species type 1
-    db POISON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 90 ; catch rate
-    db 147 ; base exp yield
     db $77 ; sprite dimensions
 
     dw ArbokPicFront
@@ -962,7 +993,8 @@ ArbokBaseStats:
     ; field moves
     db FM_LIGHT+FM_DIG
 
-    ds 2
+    db 90 ; catch rate
+    db 147 ; base exp yield
 
     db BANK(ArbokPicFront)
 
@@ -975,10 +1007,10 @@ PikachuBaseStats:
     db 50 ; base special
 
     db THUNDER ; species type 1
-    db THUNDER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 82 ; base exp yield
     db $55 ; sprite dimensions
 
     dw PikachuPicFront
@@ -1001,7 +1033,8 @@ PikachuBaseStats:
     ; field moves
     db FM_LIGHT
 
-    ds 2
+    db 190 ; catch rate
+    db 82 ; base exp yield
 
     db BANK(PikachuPicFront)
 
@@ -1014,10 +1047,10 @@ RaichuBaseStats:
     db 90 ; base special
 
     db THUNDER ; species type 1
-    db THUNDER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 122 ; base exp yield
     db $77 ; sprite dimensions
 
     dw RaichuPicFront
@@ -1040,7 +1073,8 @@ RaichuBaseStats:
     ; field moves
     db FM_LIGHT+FM_DIG
 
-    ds 2
+    db 75 ; catch rate
+    db 122 ; base exp yield
 
     db BANK(RaichuPicFront)
 
@@ -1053,10 +1087,10 @@ SandshrewBaseStats:
     db 30 ; base special
 
     db GROUND ; species type 1
-    db GROUND ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 93 ; base exp yield
     db $55 ; sprite dimensions
 
     dw SandshrewPicFront
@@ -1079,7 +1113,8 @@ SandshrewBaseStats:
     ; field moves
     db FM_DIG
 
-    ds 2
+    db 255 ; catch rate
+    db 93 ; base exp yield
 
     db BANK(SandshrewPicFront)
 
@@ -1092,10 +1127,10 @@ SandslashBaseStats:
     db 55 ; base special
 
     db GROUND ; species type 1
-    db GROUND ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 90 ; catch rate
-    db 163 ; base exp yield
     db $66 ; sprite dimensions
 
     dw SandslashPicFront
@@ -1118,7 +1153,8 @@ SandslashBaseStats:
     ; field moves
     db FM_CUT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 90 ; catch rate
+    db 163 ; base exp yield
 
     db BANK(SandslashPicFront)
 
@@ -1131,10 +1167,10 @@ NidoranFBaseStats:
     db 40 ; base special
 
     db POISON ; species type 1
-    db POISON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 235 ; catch rate
-    db 59 ; base exp yield
     db $55 ; sprite dimensions
 
     dw NidoranFPicFront
@@ -1157,7 +1193,8 @@ NidoranFBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 235 ; catch rate
+    db 59 ; base exp yield
 
     db BANK(NidoranFPicFront)
 
@@ -1170,10 +1207,10 @@ NidorinaBaseStats:
     db 55 ; base special
 
     db POISON ; species type 1
-    db POISON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 120 ; catch rate
-    db 117 ; base exp yield
     db $66 ; sprite dimensions
 
     dw NidorinaPicFront
@@ -1196,7 +1233,8 @@ NidorinaBaseStats:
     ; field moves
     db FM_CUT+FM_DIG
 
-    ds 2
+    db 120 ; catch rate
+    db 117 ; base exp yield
 
     db BANK(NidorinaPicFront)
 
@@ -1210,9 +1248,9 @@ NidoqueenBaseStats:
 
     db POISON ; species type 1
     db IVORY ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 194 ; base exp yield
     db $77 ; sprite dimensions
 
     dw NidoqueenPicFront
@@ -1235,7 +1273,8 @@ NidoqueenBaseStats:
     ; field moves
     db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 194 ; base exp yield
 
     db BANK(NidoqueenPicFront)
 
@@ -1248,10 +1287,10 @@ NidoranMBaseStats:
     db 40 ; base special
 
     db POISON ; species type 1
-    db POISON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 235 ; catch rate
-    db 60 ; base exp yield
     db $55 ; sprite dimensions
 
     dw NidoranMPicFront
@@ -1274,7 +1313,8 @@ NidoranMBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 235 ; catch rate
+    db 60 ; base exp yield
 
     db BANK(NidoranMPicFront)
 
@@ -1287,10 +1327,10 @@ NidorinoBaseStats:
     db 55 ; base special
 
     db POISON ; species type 1
-    db POISON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 120 ; catch rate
-    db 118 ; base exp yield
     db $66 ; sprite dimensions
 
     dw NidorinoPicFront
@@ -1313,7 +1353,8 @@ NidorinoBaseStats:
     ; field moves
     db FM_CUT+FM_DIG
 
-    ds 2
+    db 120 ; catch rate
+    db 118 ; base exp yield
 
     db BANK(NidorinoPicFront)
 
@@ -1327,9 +1368,9 @@ NidokingBaseStats:
 
     db POISON ; species type 1
     db IVORY ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 195 ; base exp yield
     db $77 ; sprite dimensions
 
     dw NidokingPicFront
@@ -1352,7 +1393,8 @@ NidokingBaseStats:
     ; field moves
     db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 195 ; base exp yield
 
     db BANK(NidokingPicFront)
 
@@ -1365,10 +1407,10 @@ ClefairyBaseStats:
     db 60 ; base special
 
     db RUBBER ; species type 1
-    db RUBBER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 150 ; catch rate
-    db 68 ; base exp yield
     db $55 ; sprite dimensions
 
     dw ClefairyPicFront
@@ -1391,7 +1433,8 @@ ClefairyBaseStats:
     ; field moves
     db FM_HEAL
 
-    ds 2
+    db 150 ; catch rate
+    db 68 ; base exp yield
 
     db BANK(ClefairyPicFront)
 
@@ -1404,10 +1447,10 @@ ClefableBaseStats:
     db 85 ; base special
 
     db RUBBER ; species type 1
-    db RUBBER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 25 ; catch rate
-    db 129 ; base exp yield
     db $66 ; sprite dimensions
 
     dw ClefablePicFront
@@ -1430,7 +1473,8 @@ ClefableBaseStats:
     ; field moves
     db FM_FLOAT+FM_TELEPORT+FM_HEAL
 
-    ds 2
+    db 25 ; catch rate
+    db 129 ; base exp yield
 
     db BANK(ClefablePicFront)
 
@@ -1443,10 +1487,10 @@ VulpixBaseStats:
     db 65 ; base special
 
     db FIRE ; species type 1
-    db FIRE ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 63 ; base exp yield
     db $66 ; sprite dimensions
 
     dw VulpixPicFront
@@ -1469,7 +1513,8 @@ VulpixBaseStats:
     ; field moves
     db FM_LIGHT
 
-    ds 2
+    db 190 ; catch rate
+    db 63 ; base exp yield
 
     db BANK(VulpixPicFront)
 
@@ -1482,10 +1527,10 @@ NinetalesBaseStats:
     db 100 ; base special
 
     db FIRE ; species type 1
-    db FIRE ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 178 ; base exp yield
     db $77 ; sprite dimensions
 
     dw NinetalesPicFront
@@ -1508,7 +1553,8 @@ NinetalesBaseStats:
     ; field moves
     db FM_CUT+FM_LIGHT+FM_DIG
 
-    ds 2
+    db 75 ; catch rate
+    db 178 ; base exp yield
 
     db BANK(NinetalesPicFront)
 
@@ -1521,10 +1567,10 @@ JigglypuffBaseStats:
     db 25 ; base special
 
     db RUBBER ; species type 1
-    db RUBBER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 170 ; catch rate
-    db 76 ; base exp yield
     db $55 ; sprite dimensions
 
     dw JigglypuffPicFront
@@ -1547,7 +1593,8 @@ JigglypuffBaseStats:
     ; field moves
     db FM_HEAL
 
-    ds 2
+    db 170 ; catch rate
+    db 76 ; base exp yield
 
     db BANK(JigglypuffPicFront)
 
@@ -1560,10 +1607,10 @@ WigglytuffBaseStats:
     db 50 ; base special
 
     db RUBBER ; species type 1
-    db RUBBER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 50 ; catch rate
-    db 109 ; base exp yield
     db $66 ; sprite dimensions
 
     dw WigglytuffPicFront
@@ -1586,7 +1633,8 @@ WigglytuffBaseStats:
     ; field moves
     db FM_FLOAT+FM_TELEPORT+FM_HEAL
 
-    ds 2
+    db 50 ; catch rate
+    db 109 ; base exp yield
 
     db BANK(WigglytuffPicFront)
 
@@ -1600,9 +1648,9 @@ ZubatBaseStats:
 
     db POISON ; species type 1
     db WIND ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 54 ; base exp yield
     db $55 ; sprite dimensions
 
     dw ZubatPicFront
@@ -1625,7 +1673,8 @@ ZubatBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 255 ; catch rate
+    db 54 ; base exp yield
 
     db BANK(ZubatPicFront)
 
@@ -1639,9 +1688,9 @@ GolbatBaseStats:
 
     db POISON ; species type 1
     db WIND ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 90 ; catch rate
-    db 171 ; base exp yield
     db $77 ; sprite dimensions
 
     dw GolbatPicFront
@@ -1664,7 +1713,8 @@ GolbatBaseStats:
     ; field moves
     db FM_CUT+FM_FLY
 
-    ds 2
+    db 90 ; catch rate
+    db 171 ; base exp yield
 
     db BANK(GolbatPicFront)
 
@@ -1677,10 +1727,10 @@ OddishBaseStats:
     db 75 ; base special
 
     db GRASS ; species type 1
-    db GRASS ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 78 ; base exp yield
     db $55 ; sprite dimensions
 
     dw OddishPicFront
@@ -1703,7 +1753,8 @@ OddishBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 255 ; catch rate
+    db 78 ; base exp yield
 
     db BANK(OddishPicFront)
 
@@ -1717,9 +1768,9 @@ GloomBaseStats:
 
     db GRASS ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 120 ; catch rate
-    db 132 ; base exp yield
     db $66 ; sprite dimensions
 
     dw GloomPicFront
@@ -1742,7 +1793,8 @@ GloomBaseStats:
     ; field moves
     db FM_CUT
 
-    ds 2
+    db 120 ; catch rate
+    db 132 ; base exp yield
 
     db BANK(GloomPicFront)
 
@@ -1756,9 +1808,9 @@ VileplumeBaseStats:
 
     db GRASS ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 184 ; base exp yield
     db $77 ; sprite dimensions
 
     dw VileplumePicFront
@@ -1781,7 +1833,8 @@ VileplumeBaseStats:
     ; field moves
     db FM_CUT+FM_HEAL
 
-    ds 2
+    db 45 ; catch rate
+    db 184 ; base exp yield
 
     db BANK(VileplumePicFront)
 
@@ -1795,9 +1848,9 @@ ParasBaseStats:
 
     db BUG ; species type 1
     db GRASS ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 70 ; base exp yield
     db $55 ; sprite dimensions
 
     dw ParasPicFront
@@ -1820,7 +1873,8 @@ ParasBaseStats:
     ; field moves
     db FM_CUT
 
-    ds 2
+    db 190 ; catch rate
+    db 70 ; base exp yield
 
     db BANK(ParasPicFront)
 
@@ -1834,9 +1888,9 @@ ParasectBaseStats:
 
     db BUG ; species type 1
     db GRASS ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 128 ; base exp yield
     db $77 ; sprite dimensions
 
     dw ParasectPicFront
@@ -1859,7 +1913,8 @@ ParasectBaseStats:
     ; field moves
     db FM_CUT+FM_DIG+FM_HEAL
 
-    ds 2
+    db 75 ; catch rate
+    db 128 ; base exp yield
 
     db BANK(ParasectPicFront)
 
@@ -1873,9 +1928,9 @@ VenonatBaseStats:
 
     db BUG ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 75 ; base exp yield
     db $55 ; sprite dimensions
 
     dw VenonatPicFront
@@ -1898,7 +1953,8 @@ VenonatBaseStats:
     ; field moves
     db FM_LIGHT+FM_TELEPORT
 
-    ds 2
+    db 190 ; catch rate
+    db 75 ; base exp yield
 
     db BANK(VenonatPicFront)
 
@@ -1912,9 +1968,9 @@ VenomothBaseStats:
 
     db BUG ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 138 ; base exp yield
     db $77 ; sprite dimensions
 
     dw VenomothPicFront
@@ -1937,7 +1993,8 @@ VenomothBaseStats:
     ; field moves
     db FM_FLY+FM_LIGHT+FM_TELEPORT+FM_HEAL
 
-    ds 2
+    db 75 ; catch rate
+    db 138 ; base exp yield
 
     db BANK(VenomothPicFront)
 
@@ -1950,10 +2007,10 @@ DiglettBaseStats:
     db 45 ; base special
 
     db GROUND ; species type 1
-    db GROUND ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 81 ; base exp yield
     db $55 ; sprite dimensions
 
     dw DiglettPicFront
@@ -1976,7 +2033,8 @@ DiglettBaseStats:
     ; field moves
     db FM_DIG
 
-    ds 2
+    db 255 ; catch rate
+    db 81 ; base exp yield
 
     db BANK(DiglettPicFront)
 
@@ -1989,10 +2047,10 @@ DugtrioBaseStats:
     db 70 ; base special
 
     db GROUND ; species type 1
-    db GROUND ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 50 ; catch rate
-    db 153 ; base exp yield
     db $66 ; sprite dimensions
 
     dw DugtrioPicFront
@@ -2015,7 +2073,8 @@ DugtrioBaseStats:
     ; field moves
     db FM_CUT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 50 ; catch rate
+    db 153 ; base exp yield
 
     db BANK(DugtrioPicFront)
 
@@ -2028,10 +2087,10 @@ MeowthBaseStats:
     db 40 ; base special
 
     db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 69 ; base exp yield
     db $55 ; sprite dimensions
 
     dw MeowthPicFront
@@ -2054,7 +2113,8 @@ MeowthBaseStats:
     ; field moves
     db FM_LIGHT
 
-    ds 2
+    db 255 ; catch rate
+    db 69 ; base exp yield
 
     db BANK(MeowthPicFront)
 
@@ -2067,10 +2127,10 @@ PersianBaseStats:
     db 65 ; base special
 
     db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 90 ; catch rate
-    db 148 ; base exp yield
     db $77 ; sprite dimensions
 
     dw PersianPicFront
@@ -2093,7 +2153,8 @@ PersianBaseStats:
     ; field moves
     db FM_CUT+FM_LIGHT+FM_DIG
 
-    ds 2
+    db 90 ; catch rate
+    db 148 ; base exp yield
 
     db BANK(PersianPicFront)
 
@@ -2107,9 +2168,9 @@ PsyduckBaseStats:
 
     db WATER ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 80 ; base exp yield
     db $55 ; sprite dimensions
 
     dw PsyduckPicFront
@@ -2132,7 +2193,8 @@ PsyduckBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 190 ; catch rate
+    db 80 ; base exp yield
 
     db BANK(PsyduckPicFront)
 
@@ -2146,9 +2208,9 @@ GolduckBaseStats:
 
     db WATER ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 174 ; base exp yield
     db $77 ; sprite dimensions
 
     dw GolduckPicFront
@@ -2171,7 +2233,8 @@ GolduckBaseStats:
     ; field moves
     db FM_CUT+FM_FLOAT+FM_LIGHT+FM_TELEPORT+FM_DIG
 
-    ds 2
+    db 75 ; catch rate
+    db 174 ; base exp yield
 
     db BANK(GolduckPicFront)
 
@@ -2184,10 +2247,10 @@ MankeyBaseStats:
     db 35 ; base special
 
     db FIGHT ; species type 1
-    db FIGHT ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 74 ; base exp yield
     db $55 ; sprite dimensions
 
     dw MankeyPicFront
@@ -2210,7 +2273,8 @@ MankeyBaseStats:
     ; field moves
     db FM_STRENGTH
 
-    ds 2
+    db 190 ; catch rate
+    db 74 ; base exp yield
 
     db BANK(MankeyPicFront)
 
@@ -2223,10 +2287,10 @@ PrimeapeBaseStats:
     db 60 ; base special
 
     db FIGHT ; species type 1
-    db FIGHT ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 149 ; base exp yield
     db $77 ; sprite dimensions
 
     dw PrimeapePicFront
@@ -2249,7 +2313,8 @@ PrimeapeBaseStats:
     ; field moves
     db FM_CUT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 75 ; catch rate
+    db 149 ; base exp yield
 
     db BANK(PrimeapePicFront)
 
@@ -2262,10 +2327,10 @@ GrowlitheBaseStats:
     db 50 ; base special
 
     db FIRE ; species type 1
-    db FIRE ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 91 ; base exp yield
     db $55 ; sprite dimensions
 
     dw GrowlithePicFront
@@ -2288,7 +2353,8 @@ GrowlitheBaseStats:
     ; field moves
     db FM_LIGHT+FM_DIG
 
-    ds 2
+    db 190 ; catch rate
+    db 91 ; base exp yield
 
     db BANK(GrowlithePicFront)
 
@@ -2301,10 +2367,10 @@ ArcanineBaseStats:
     db 80 ; base special
 
     db FIRE ; species type 1
-    db FIRE ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 213 ; base exp yield
     db $77 ; sprite dimensions
 
     dw ArcaninePicFront
@@ -2327,7 +2393,8 @@ ArcanineBaseStats:
     ; field moves
     db FM_STRENGTH+FM_LIGHT+FM_DIG
 
-    ds 2
+    db 75 ; catch rate
+    db 213 ; base exp yield
 
     db BANK(ArcaninePicFront)
 
@@ -2340,10 +2407,10 @@ PoliwagBaseStats:
     db 40 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 77 ; base exp yield
     db $55 ; sprite dimensions
 
     dw PoliwagPicFront
@@ -2366,7 +2433,8 @@ PoliwagBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 255 ; catch rate
+    db 77 ; base exp yield
 
     db BANK(PoliwagPicFront)
 
@@ -2380,9 +2448,9 @@ PoliwhirlBaseStats:
 
     db WATER ; species type 1
     db FIGHT ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 120 ; catch rate
-    db 131 ; base exp yield
     db $66 ; sprite dimensions
 
     dw PoliwhirlPicFront
@@ -2405,7 +2473,8 @@ PoliwhirlBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH
 
-    ds 2
+    db 120 ; catch rate
+    db 131 ; base exp yield
 
     db BANK(PoliwhirlPicFront)
 
@@ -2419,9 +2488,9 @@ PoliwrathBaseStats:
 
     db WATER ; species type 1
     db FIGHT ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 185 ; base exp yield
     db $77 ; sprite dimensions
 
     dw PoliwrathPicFront
@@ -2444,7 +2513,8 @@ PoliwrathBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH
 
-    ds 2
+    db 45 ; catch rate
+    db 185 ; base exp yield
 
     db BANK(PoliwrathPicFront)
 
@@ -2457,10 +2527,10 @@ AbraBaseStats:
     db 105 ; base special
 
     db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 200 ; catch rate
-    db 73 ; base exp yield
     db $55 ; sprite dimensions
 
     dw AbraPicFront
@@ -2483,7 +2553,8 @@ AbraBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 200 ; catch rate
+    db 73 ; base exp yield
 
     db BANK(AbraPicFront)
 
@@ -2496,10 +2567,10 @@ KadabraBaseStats:
     db 120 ; base special
 
     db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 100 ; catch rate
-    db 145 ; base exp yield
     db $66 ; sprite dimensions
 
     dw KadabraPicFront
@@ -2522,7 +2593,8 @@ KadabraBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 100 ; catch rate
+    db 145 ; base exp yield
 
     db BANK(KadabraPicFront)
 
@@ -2535,10 +2607,10 @@ AlakazamBaseStats:
     db 135 ; base special
 
     db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 50 ; catch rate
-    db 186 ; base exp yield
     db $77 ; sprite dimensions
 
     dw AlakazamPicFront
@@ -2561,7 +2633,8 @@ AlakazamBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 50 ; catch rate
+    db 186 ; base exp yield
 
     db BANK(AlakazamPicFront)
 
@@ -2574,10 +2647,10 @@ MachopBaseStats:
     db 35 ; base special
 
     db FIGHT ; species type 1
-    db FIGHT ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 180 ; catch rate
-    db 88 ; base exp yield
     db $55 ; sprite dimensions
 
     dw MachopPicFront
@@ -2600,7 +2673,8 @@ MachopBaseStats:
     ; field moves
     db FM_STRENGTH
 
-    ds 2
+    db 180 ; catch rate
+    db 88 ; base exp yield
 
     db BANK(MachopPicFront)
 
@@ -2613,10 +2687,10 @@ MachokeBaseStats:
     db 50 ; base special
 
     db FIGHT ; species type 1
-    db FIGHT ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 90 ; catch rate
-    db 146 ; base exp yield
     db $77 ; sprite dimensions
 
     dw MachokePicFront
@@ -2639,7 +2713,8 @@ MachokeBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 90 ; catch rate
+    db 146 ; base exp yield
 
     db BANK(MachokePicFront)
 
@@ -2652,10 +2727,10 @@ MachampBaseStats:
     db 65 ; base special
 
     db FIGHT ; species type 1
-    db FIGHT ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 193 ; base exp yield
     db $77 ; sprite dimensions
 
     dw MachampPicFront
@@ -2678,7 +2753,8 @@ MachampBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 193 ; base exp yield
 
     db BANK(MachampPicFront)
 
@@ -2691,10 +2767,10 @@ BellsproutBaseStats:
     db 70 ; base special
 
     db GRASS ; species type 1
-    db GRASS ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 84 ; base exp yield
     db $55 ; sprite dimensions
 
     dw BellsproutPicFront
@@ -2717,7 +2793,8 @@ BellsproutBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 255 ; catch rate
+    db 84 ; base exp yield
 
     db BANK(BellsproutPicFront)
 
@@ -2731,9 +2808,9 @@ WeepinbellBaseStats:
 
     db GRASS ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 120 ; catch rate
-    db 151 ; base exp yield
     db $66 ; sprite dimensions
 
     dw WeepinbellPicFront
@@ -2756,7 +2833,8 @@ WeepinbellBaseStats:
     ; field moves
     db FM_CUT
 
-    ds 2
+    db 120 ; catch rate
+    db 151 ; base exp yield
 
     db BANK(WeepinbellPicFront)
 
@@ -2770,9 +2848,9 @@ VictreebelBaseStats:
 
     db GRASS ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 191 ; base exp yield
     db $77 ; sprite dimensions
 
     dw VictreebelPicFront
@@ -2795,7 +2873,8 @@ VictreebelBaseStats:
     ; field moves
     db FM_CUT+FM_HEAL
 
-    ds 2
+    db 45 ; catch rate
+    db 191 ; base exp yield
 
     db BANK(VictreebelPicFront)
 
@@ -2809,9 +2888,9 @@ TentacoolBaseStats:
 
     db WATER ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 105 ; base exp yield
     db $55 ; sprite dimensions
 
     dw TentacoolPicFront
@@ -2834,7 +2913,8 @@ TentacoolBaseStats:
     ; field moves
     db FM_FLOAT+FM_LIGHT
 
-    ds 2
+    db 190 ; catch rate
+    db 105 ; base exp yield
 
     db BANK(TentacoolPicFront)
 
@@ -2848,9 +2928,9 @@ TentacruelBaseStats:
 
     db WATER ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 60 ; catch rate
-    db 205 ; base exp yield
     db $66 ; sprite dimensions
 
     dw TentacruelPicFront
@@ -2873,7 +2953,8 @@ TentacruelBaseStats:
     ; field moves
     db FM_CUT+FM_FLOAT+FM_LIGHT
 
-    ds 2
+    db 60 ; catch rate
+    db 205 ; base exp yield
 
     db BANK(TentacruelPicFront)
 
@@ -2886,10 +2967,10 @@ GeodudeBaseStats:
     db 30 ; base special
 
     db ROCK ; species type 1
-    db ROCK ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 86 ; base exp yield
     db $55 ; sprite dimensions
 
     dw GeodudePicFront
@@ -2912,7 +2993,8 @@ GeodudeBaseStats:
     ; field moves
     db FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 255 ; catch rate
+    db 86 ; base exp yield
 
     db BANK(GeodudePicFront)
 
@@ -2925,10 +3007,10 @@ GravelerBaseStats:
     db 45 ; base special
 
     db ROCK ; species type 1
-    db ROCK ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 120 ; catch rate
-    db 134 ; base exp yield
     db $66 ; sprite dimensions
 
     dw GravelerPicFront
@@ -2951,7 +3033,8 @@ GravelerBaseStats:
     ; field moves
     db FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 120 ; catch rate
+    db 134 ; base exp yield
 
     db BANK(GravelerPicFront)
 
@@ -2964,10 +3047,10 @@ GolemBaseStats:
     db 55 ; base special
 
     db ROCK ; species type 1
-    db ROCK ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 177 ; base exp yield
     db $66 ; sprite dimensions
 
     dw GolemPicFront
@@ -2990,7 +3073,8 @@ GolemBaseStats:
     ; field moves
     db FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 177 ; base exp yield
 
     db BANK(GolemPicFront)
 
@@ -3003,10 +3087,10 @@ PonytaBaseStats:
     db 65 ; base special
 
     db FIRE ; species type 1
-    db FIRE ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 152 ; base exp yield
     db $66 ; sprite dimensions
 
     dw PonytaPicFront
@@ -3029,7 +3113,8 @@ PonytaBaseStats:
     ; field moves
     db FM_LIGHT
 
-    ds 2
+    db 190 ; catch rate
+    db 152 ; base exp yield
 
     db BANK(PonytaPicFront)
 
@@ -3042,10 +3127,10 @@ RapidashBaseStats:
     db 80 ; base special
 
     db FIRE ; species type 1
-    db FIRE ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 60 ; catch rate
-    db 192 ; base exp yield
     db $77 ; sprite dimensions
 
     dw RapidashPicFront
@@ -3068,7 +3153,8 @@ RapidashBaseStats:
     ; field moves
     db FM_STRENGTH+FM_LIGHT
 
-    ds 2
+    db 60 ; catch rate
+    db 192 ; base exp yield
 
     db BANK(RapidashPicFront)
 
@@ -3082,9 +3168,9 @@ SlowpokeBaseStats:
 
     db WATER ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 99 ; base exp yield
     db $55 ; sprite dimensions
 
     dw SlowpokePicFront
@@ -3107,7 +3193,8 @@ SlowpokeBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 190 ; catch rate
+    db 99 ; base exp yield
 
     db BANK(SlowpokePicFront)
 
@@ -3121,9 +3208,9 @@ SlowbroBaseStats:
 
     db WATER ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 164 ; base exp yield
     db $77 ; sprite dimensions
 
     dw SlowbroPicFront
@@ -3146,7 +3233,8 @@ SlowbroBaseStats:
     ; field moves
     db FM_FLOAT+FM_TELEPORT
 
-    ds 2
+    db 75 ; catch rate
+    db 164 ; base exp yield
 
     db BANK(SlowbroPicFront)
 
@@ -3160,9 +3248,9 @@ MagnemiteBaseStats:
 
     db THUNDER ; species type 1
     db METAL ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 89 ; base exp yield
     db $55 ; sprite dimensions
 
     dw MagnemitePicFront
@@ -3185,7 +3273,8 @@ MagnemiteBaseStats:
     ; field moves
     db FM_LIGHT
 
-    ds 2
+    db 190 ; catch rate
+    db 89 ; base exp yield
 
     db BANK(MagnemitePicFront)
 
@@ -3199,9 +3288,9 @@ MagnetonBaseStats:
 
     db THUNDER ; species type 1
     db METAL ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 60 ; catch rate
-    db 161 ; base exp yield
     db $66 ; sprite dimensions
 
     dw MagnetonPicFront
@@ -3224,7 +3313,8 @@ MagnetonBaseStats:
     ; field moves
     db FM_LIGHT+FM_TELEPORT
 
-    ds 2
+    db 60 ; catch rate
+    db 161 ; base exp yield
 
     db BANK(MagnetonPicFront)
 
@@ -3237,10 +3327,10 @@ FarfetchdBaseStats:
     db 58 ; base special
 
     db WIND ; species type 1
-    db WIND ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 94 ; base exp yield
     db $66 ; sprite dimensions
 
     dw FarfetchdPicFront
@@ -3263,7 +3353,8 @@ FarfetchdBaseStats:
     ; field moves
     db FM_CUT+FM_FLY
 
-    ds 2
+    db 45 ; catch rate
+    db 94 ; base exp yield
 
     db BANK(FarfetchdPicFront)
 
@@ -3276,10 +3367,10 @@ DoduoBaseStats:
     db 35 ; base special
 
     db IVORY ; species type 1
-    db IVORY ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 96 ; base exp yield
     db $55 ; sprite dimensions
 
     dw DoduoPicFront
@@ -3302,7 +3393,8 @@ DoduoBaseStats:
     ; field moves
     db FM_CUT
 
-    ds 2
+    db 190 ; catch rate
+    db 96 ; base exp yield
 
     db BANK(DoduoPicFront)
 
@@ -3315,10 +3407,10 @@ DodrioBaseStats:
     db 60 ; base special
 
     db IVORY ; species type 1
-    db IVORY ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 158 ; base exp yield
     db $77 ; sprite dimensions
 
     dw DodrioPicFront
@@ -3341,7 +3433,8 @@ DodrioBaseStats:
     ; field moves
     db FM_CUT
 
-    ds 2
+    db 45 ; catch rate
+    db 158 ; base exp yield
 
     db BANK(DodrioPicFront)
 
@@ -3355,9 +3448,9 @@ SeelBaseStats:
 
     db ICE ; species type 1
     db WATER ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 100 ; base exp yield
     db $66 ; sprite dimensions
 
     dw SeelPicFront
@@ -3380,7 +3473,8 @@ SeelBaseStats:
     ; field moves
     db FM_FLOAT
 
-    ds 2
+    db 190 ; catch rate
+    db 100 ; base exp yield
 
     db BANK(SeelPicFront)
 
@@ -3394,9 +3488,9 @@ DewgongBaseStats:
 
     db ICE ; species type 1
     db WATER ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 176 ; base exp yield
     db $66 ; sprite dimensions
 
     dw DewgongPicFront
@@ -3419,7 +3513,8 @@ DewgongBaseStats:
     ; field moves
     db FM_FLOAT
 
-    ds 2
+    db 75 ; catch rate
+    db 176 ; base exp yield
 
     db BANK(DewgongPicFront)
 
@@ -3432,10 +3527,10 @@ GrimerBaseStats:
     db 40 ; base special
 
     db POISON ; species type 1
-    db POISON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 90 ; base exp yield
     db $55 ; sprite dimensions
 
     dw GrimerPicFront
@@ -3458,7 +3553,8 @@ GrimerBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 190 ; catch rate
+    db 90 ; base exp yield
 
     db BANK(GrimerPicFront)
 
@@ -3471,10 +3567,10 @@ MukBaseStats:
     db 65 ; base special
 
     db POISON ; species type 1
-    db POISON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 157 ; base exp yield
     db $77 ; sprite dimensions
 
     dw MukPicFront
@@ -3497,7 +3593,8 @@ MukBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH
 
-    ds 2
+    db 75 ; catch rate
+    db 157 ; base exp yield
 
     db BANK(MukPicFront)
 
@@ -3510,10 +3607,10 @@ ShellderBaseStats:
     db 45 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 97 ; base exp yield
     db $55 ; sprite dimensions
 
     dw ShellderPicFront
@@ -3536,7 +3633,8 @@ ShellderBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 190 ; catch rate
+    db 97 ; base exp yield
 
     db BANK(ShellderPicFront)
 
@@ -3550,9 +3648,9 @@ CloysterBaseStats:
 
     db WATER ; species type 1
     db ICE ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 60 ; catch rate
-    db 203 ; base exp yield
     db $77 ; sprite dimensions
 
     dw CloysterPicFront
@@ -3575,7 +3673,8 @@ CloysterBaseStats:
     ; field moves
     db FM_FLOAT
 
-    ds 2
+    db 60 ; catch rate
+    db 203 ; base exp yield
 
     db BANK(CloysterPicFront)
 
@@ -3589,9 +3688,9 @@ GastlyBaseStats:
 
     db GHOST ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 95 ; base exp yield
     db $77 ; sprite dimensions
 
     dw GastlyPicFront
@@ -3614,7 +3713,8 @@ GastlyBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 190 ; catch rate
+    db 95 ; base exp yield
 
     db BANK(GastlyPicFront)
 
@@ -3628,9 +3728,9 @@ HaunterBaseStats:
 
     db GHOST ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 90 ; catch rate
-    db 126 ; base exp yield
     db $66 ; sprite dimensions
 
     dw HaunterPicFront
@@ -3653,7 +3753,8 @@ HaunterBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 90 ; catch rate
+    db 126 ; base exp yield
 
     db BANK(HaunterPicFront)
 
@@ -3667,9 +3768,9 @@ GengarBaseStats:
 
     db GHOST ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 190 ; base exp yield
     db $66 ; sprite dimensions
 
     dw GengarPicFront
@@ -3692,7 +3793,8 @@ GengarBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 45 ; catch rate
+    db 190 ; base exp yield
 
     db BANK(GengarPicFront)
 
@@ -3706,9 +3808,9 @@ OnixBaseStats:
 
     db ROCK ; species type 1
     db METAL ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 108 ; base exp yield
     db $77 ; sprite dimensions
 
     dw OnixPicFront
@@ -3731,7 +3833,8 @@ OnixBaseStats:
     ; field moves
     db FM_CUT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 108 ; base exp yield
 
     db BANK(OnixPicFront)
 
@@ -3744,10 +3847,10 @@ DrowzeeBaseStats:
     db 90 ; base special
 
     db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 102 ; base exp yield
     db $66 ; sprite dimensions
 
     dw DrowzeePicFront
@@ -3770,7 +3873,8 @@ DrowzeeBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 190 ; catch rate
+    db 102 ; base exp yield
 
     db BANK(DrowzeePicFront)
 
@@ -3783,10 +3887,10 @@ HypnoBaseStats:
     db 115 ; base special
 
     db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 165 ; base exp yield
     db $77 ; sprite dimensions
 
     dw HypnoPicFront
@@ -3809,7 +3913,8 @@ HypnoBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 75 ; catch rate
+    db 165 ; base exp yield
 
     db BANK(HypnoPicFront)
 
@@ -3822,10 +3927,10 @@ KrabbyBaseStats:
     db 25 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 225 ; catch rate
-    db 115 ; base exp yield
     db $55 ; sprite dimensions
 
     dw KrabbyPicFront
@@ -3848,7 +3953,8 @@ KrabbyBaseStats:
     ; field moves
     db FM_CUT+FM_DIG
 
-    ds 2
+    db 225 ; catch rate
+    db 115 ; base exp yield
 
     db BANK(KrabbyPicFront)
 
@@ -3862,9 +3968,9 @@ KinglerBaseStats:
 
     db WATER ; species type 1
     db IVORY ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 60 ; catch rate
-    db 206 ; base exp yield
     db $77 ; sprite dimensions
 
     dw KinglerPicFront
@@ -3887,7 +3993,8 @@ KinglerBaseStats:
     ; field moves
     db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 60 ; catch rate
+    db 206 ; base exp yield
 
     db BANK(KinglerPicFront)
 
@@ -3901,9 +4008,9 @@ VoltorbBaseStats:
 
     db THUNDER ; species type 1
     db RUBBER ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 103 ; base exp yield
     db $55 ; sprite dimensions
 
     dw VoltorbPicFront
@@ -3926,7 +4033,8 @@ VoltorbBaseStats:
     ; field moves
     db FM_LIGHT
 
-    ds 2
+    db 190 ; catch rate
+    db 103 ; base exp yield
 
     db BANK(VoltorbPicFront)
 
@@ -3940,9 +4048,9 @@ ElectrodeBaseStats:
 
     db THUNDER ; species type 1
     db RUBBER ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 60 ; catch rate
-    db 150 ; base exp yield
     db $55 ; sprite dimensions
 
     dw ElectrodePicFront
@@ -3965,7 +4073,8 @@ ElectrodeBaseStats:
     ; field moves
     db FM_LIGHT+FM_TELEPORT
 
-    ds 2
+    db 60 ; catch rate
+    db 150 ; base exp yield
 
     db BANK(ElectrodePicFront)
 
@@ -3979,9 +4088,9 @@ ExeggcuteBaseStats:
 
     db GRASS ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 90 ; catch rate
-    db 98 ; base exp yield
     db $77 ; sprite dimensions
 
     dw ExeggcutePicFront
@@ -4004,7 +4113,8 @@ ExeggcuteBaseStats:
     ; field moves
     db FM_TELEPORT+FM_HEAL
 
-    ds 2
+    db 90 ; catch rate
+    db 98 ; base exp yield
 
     db BANK(ExeggcutePicFront)
 
@@ -4018,9 +4128,9 @@ ExeggutorBaseStats:
 
     db GRASS ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 212 ; base exp yield
     db $77 ; sprite dimensions
 
     dw ExeggutorPicFront
@@ -4043,7 +4153,8 @@ ExeggutorBaseStats:
     ; field moves
     db FM_TELEPORT+FM_HEAL
 
-    ds 2
+    db 45 ; catch rate
+    db 212 ; base exp yield
 
     db BANK(ExeggutorPicFront)
 
@@ -4057,9 +4168,9 @@ CuboneBaseStats:
 
     db IVORY ; species type 1
     db GROUND ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 87 ; base exp yield
     db $55 ; sprite dimensions
 
     dw CubonePicFront
@@ -4082,7 +4193,8 @@ CuboneBaseStats:
     ; field moves
     db FM_CUT+FM_DIG
 
-    ds 2
+    db 190 ; catch rate
+    db 87 ; base exp yield
 
     db BANK(CubonePicFront)
 
@@ -4096,9 +4208,9 @@ MarowakBaseStats:
 
     db IVORY ; species type 1
     db GROUND ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 124 ; base exp yield
     db $66 ; sprite dimensions
 
     dw MarowakPicFront
@@ -4121,7 +4233,8 @@ MarowakBaseStats:
     ; field moves
     db FM_CUT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 75 ; catch rate
+    db 124 ; base exp yield
 
     db BANK(MarowakPicFront)
 
@@ -4134,10 +4247,10 @@ HitmonleeBaseStats:
     db 35 ; base special
 
     db FIGHT ; species type 1
-    db FIGHT ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 139 ; base exp yield
     db $77 ; sprite dimensions
 
     dw HitmonleePicFront
@@ -4160,7 +4273,8 @@ HitmonleeBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH
 
-    ds 2
+    db 45 ; catch rate
+    db 139 ; base exp yield
 
     db BANK(HitmonleePicFront)
 
@@ -4173,10 +4287,10 @@ HitmonchanBaseStats:
     db 35 ; base special
 
     db FIGHT ; species type 1
-    db FIGHT ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 140 ; base exp yield
     db $66 ; sprite dimensions
 
     dw HitmonchanPicFront
@@ -4199,7 +4313,8 @@ HitmonchanBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH
 
-    ds 2
+    db 45 ; catch rate
+    db 140 ; base exp yield
 
     db BANK(HitmonchanPicFront)
 
@@ -4212,10 +4327,10 @@ LickitungBaseStats:
     db 60 ; base special
 
     db RUBBER ; species type 1
-    db RUBBER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 127 ; base exp yield
     db $77 ; sprite dimensions
 
     dw LickitungPicFront
@@ -4238,7 +4353,8 @@ LickitungBaseStats:
     ; field moves
     db FM_CUT+FM_FLOAT+FM_HEAL
 
-    ds 2
+    db 45 ; catch rate
+    db 127 ; base exp yield
 
     db BANK(LickitungPicFront)
 
@@ -4251,10 +4367,10 @@ KoffingBaseStats:
     db 60 ; base special
 
     db POISON ; species type 1
-    db POISON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 114 ; base exp yield
     db $66 ; sprite dimensions
 
     dw KoffingPicFront
@@ -4277,7 +4393,8 @@ KoffingBaseStats:
     ; field moves
     db FM_LIGHT+FM_FLOAT
 
-    ds 2
+    db 190 ; catch rate
+    db 114 ; base exp yield
 
     db BANK(KoffingPicFront)
 
@@ -4290,10 +4407,10 @@ WeezingBaseStats:
     db 85 ; base special
 
     db POISON ; species type 1
-    db POISON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 60 ; catch rate
-    db 173 ; base exp yield
     db $77 ; sprite dimensions
 
     dw WeezingPicFront
@@ -4316,7 +4433,8 @@ WeezingBaseStats:
     ; field moves
     db FM_FLY+FM_LIGHT+FM_FLOAT
 
-    ds 2
+    db 60 ; catch rate
+    db 173 ; base exp yield
 
     db BANK(WeezingPicFront)
 
@@ -4330,9 +4448,9 @@ RhyhornBaseStats:
 
     db ROCK ; species type 1
     db IVORY ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 120 ; catch rate
-    db 135 ; base exp yield
     db $77 ; sprite dimensions
 
     dw RhyhornPicFront
@@ -4355,7 +4473,8 @@ RhyhornBaseStats:
     ; field moves
     db FM_CUT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 120 ; catch rate
+    db 135 ; base exp yield
 
     db BANK(RhyhornPicFront)
 
@@ -4369,9 +4488,9 @@ RhydonBaseStats:
 
     db ROCK ; species type 1
     db IVORY ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 60 ; catch rate
-    db 204 ; base exp yield
     db $77 ; sprite dimensions
 
     dw RhydonPicFront
@@ -4394,7 +4513,8 @@ RhydonBaseStats:
     ; field moves
     db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 60 ; catch rate
+    db 204 ; base exp yield
 
     db BANK(RhydonPicFront)
 
@@ -4407,10 +4527,10 @@ ChanseyBaseStats:
     db 105 ; base special
 
     db RUBBER ; species type 1
-    db RUBBER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 30 ; catch rate
-    db 255 ; base exp yield
     db $66 ; sprite dimensions
 
     dw ChanseyPicFront
@@ -4433,7 +4553,8 @@ ChanseyBaseStats:
     ; field moves
     db FM_HEAL+FM_FLOAT
 
-    ds 2
+    db 30 ; catch rate
+    db 255 ; base exp yield
 
     db BANK(ChanseyPicFront)
 
@@ -4446,10 +4567,10 @@ TangelaBaseStats:
     db 100 ; base special
 
     db GRASS ; species type 1
-    db GRASS ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 166 ; base exp yield
     db $66 ; sprite dimensions
 
     dw TangelaPicFront
@@ -4472,7 +4593,8 @@ TangelaBaseStats:
     ; field moves
     db FM_CUT+FM_HEAL
 
-    ds 2
+    db 45 ; catch rate
+    db 166 ; base exp yield
 
     db BANK(TangelaPicFront)
 
@@ -4485,10 +4607,10 @@ KangaskhanBaseStats:
     db 40 ; base special
 
     db IVORY ; species type 1
-    db IVORY ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 175 ; base exp yield
     db $77 ; sprite dimensions
 
     dw KangaskhanPicFront
@@ -4511,7 +4633,8 @@ KangaskhanBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH
 
-    ds 2
+    db 45 ; catch rate
+    db 175 ; base exp yield
 
     db BANK(KangaskhanPicFront)
 
@@ -4524,10 +4647,10 @@ HorseaBaseStats:
     db 70 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 225 ; catch rate
-    db 83 ; base exp yield
     db $55 ; sprite dimensions
 
     dw HorseaPicFront
@@ -4550,7 +4673,8 @@ HorseaBaseStats:
     ; field moves
     db FM_FLOAT
 
-    ds 2
+    db 225 ; catch rate
+    db 83 ; base exp yield
 
     db BANK(HorseaPicFront)
 
@@ -4564,9 +4688,9 @@ SeadraBaseStats:
 
     db WATER ; species type 1
     db DRAGON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 75 ; catch rate
-    db 155 ; base exp yield
     db $66 ; sprite dimensions
 
     dw SeadraPicFront
@@ -4589,7 +4713,8 @@ SeadraBaseStats:
     ; field moves
     db FM_FLOAT+FM_HEAL
 
-    ds 2
+    db 75 ; catch rate
+    db 155 ; base exp yield
 
     db BANK(SeadraPicFront)
 
@@ -4602,10 +4727,10 @@ GoldeenBaseStats:
     db 50 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 225 ; catch rate
-    db 111 ; base exp yield
     db $66 ; sprite dimensions
 
     dw GoldeenPicFront
@@ -4628,7 +4753,8 @@ GoldeenBaseStats:
     ; field moves
     db FM_FLOAT
 
-    ds 2
+    db 225 ; catch rate
+    db 111 ; base exp yield
 
     db BANK(GoldeenPicFront)
 
@@ -4641,10 +4767,10 @@ SeakingBaseStats:
     db 80 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 60 ; catch rate
-    db 170 ; base exp yield
     db $77 ; sprite dimensions
 
     dw SeakingPicFront
@@ -4667,7 +4793,8 @@ SeakingBaseStats:
     ; field moves
     db FM_FLOAT
 
-    ds 2
+    db 60 ; catch rate
+    db 170 ; base exp yield
 
     db BANK(SeakingPicFront)
 
@@ -4681,9 +4808,9 @@ StaryuBaseStats:
 
     db WATER ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 225 ; catch rate
-    db 106 ; base exp yield
     db $66 ; sprite dimensions
 
     dw StaryuPicFront
@@ -4706,7 +4833,8 @@ StaryuBaseStats:
     ; field moves
     db FM_LIGHT+FM_TELEPORT
 
-    ds 2
+    db 225 ; catch rate
+    db 106 ; base exp yield
 
     db BANK(StaryuPicFront)
 
@@ -4720,9 +4848,9 @@ StarmieBaseStats:
 
     db WATER ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 60 ; catch rate
-    db 207 ; base exp yield
     db $66 ; sprite dimensions
 
     dw StarmiePicFront
@@ -4745,7 +4873,8 @@ StarmieBaseStats:
     ; field moves
     db FM_FLOAT+FM_LIGHT+FM_TELEPORT
 
-    ds 2
+    db 60 ; catch rate
+    db 207 ; base exp yield
 
     db BANK(StarmiePicFront)
 
@@ -4758,10 +4887,10 @@ MrMimeBaseStats:
     db 100 ; base special
 
     db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 136 ; base exp yield
     db $66 ; sprite dimensions
 
     dw MrMimePicFront
@@ -4784,7 +4913,8 @@ MrMimeBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 45 ; catch rate
+    db 136 ; base exp yield
 
     db BANK(MrMimePicFront)
 
@@ -4798,9 +4928,9 @@ ScytherBaseStats:
 
     db BUG ; species type 1
     db WIND ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 187 ; base exp yield
     db $77 ; sprite dimensions
 
     dw ScytherPicFront
@@ -4823,7 +4953,8 @@ ScytherBaseStats:
     ; field moves
     db FM_CUT+FM_FLY
 
-    ds 2
+    db 45 ; catch rate
+    db 187 ; base exp yield
 
     db BANK(ScytherPicFront)
 
@@ -4837,9 +4968,9 @@ JynxBaseStats:
 
     db ICE ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 137 ; base exp yield
     db $66 ; sprite dimensions
 
     dw JynxPicFront
@@ -4862,7 +4993,8 @@ JynxBaseStats:
     ; field moves
     db FM_TELEPORT
 
-    ds 2
+    db 45 ; catch rate
+    db 137 ; base exp yield
 
     db BANK(JynxPicFront)
 
@@ -4876,9 +5008,9 @@ ElectabuzzBaseStats:
 
     db THUNDER ; species type 1
     db FIGHT ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 156 ; base exp yield
     db $66 ; sprite dimensions
 
     dw ElectabuzzPicFront
@@ -4901,7 +5033,8 @@ ElectabuzzBaseStats:
     ; field moves
     db FM_LIGHT
 
-    ds 2
+    db 45 ; catch rate
+    db 156 ; base exp yield
 
     db BANK(ElectabuzzPicFront)
 
@@ -4915,9 +5048,9 @@ MagmarBaseStats:
 
     db FIRE ; species type 1
     db POISON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 167 ; base exp yield
     db $66 ; sprite dimensions
 
     dw MagmarPicFront
@@ -4940,7 +5073,8 @@ MagmarBaseStats:
     ; field moves
     db FM_LIGHT
 
-    ds 2
+    db 45 ; catch rate
+    db 167 ; base exp yield
 
     db BANK(MagmarPicFront)
 
@@ -4954,9 +5088,9 @@ PinsirBaseStats:
 
     db BUG ; species type 1
     db IVORY ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 200 ; base exp yield
     db $77 ; sprite dimensions
 
     dw PinsirPicFront
@@ -4979,7 +5113,8 @@ PinsirBaseStats:
     ; field moves
     db FM_CUT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 200 ; base exp yield
 
     db BANK(PinsirPicFront)
 
@@ -4992,10 +5127,10 @@ TaurosBaseStats:
     db 70 ; base special
 
     db IVORY ; species type 1
-    db IVORY ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 211 ; base exp yield
     db $77 ; sprite dimensions
 
     dw TaurosPicFront
@@ -5018,7 +5153,8 @@ TaurosBaseStats:
     ; field moves
     db FM_STRENGTH
 
-    ds 2
+    db 45 ; catch rate
+    db 211 ; base exp yield
 
     db BANK(TaurosPicFront)
 
@@ -5031,10 +5167,10 @@ MagikarpBaseStats:
     db 20 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 20 ; base exp yield
     db $66 ; sprite dimensions
 
     dw MagikarpPicFront
@@ -5057,7 +5193,8 @@ MagikarpBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 255 ; catch rate
+    db 20 ; base exp yield
 
     db BANK(MagikarpPicFront)
 
@@ -5071,9 +5208,9 @@ GyaradosBaseStats:
 
     db WATER ; species type 1
     db DRAGON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 214 ; base exp yield
     db $77 ; sprite dimensions
 
     dw GyaradosPicFront
@@ -5096,7 +5233,8 @@ GyaradosBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH
 
-    ds 2
+    db 45 ; catch rate
+    db 214 ; base exp yield
 
     db BANK(GyaradosPicFront)
 
@@ -5110,9 +5248,9 @@ LaprasBaseStats:
 
     db ICE ; species type 1
     db WATER ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 219 ; base exp yield
     db $77 ; sprite dimensions
 
     dw LaprasPicFront
@@ -5135,7 +5273,8 @@ LaprasBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH
 
-    ds 2
+    db 45 ; catch rate
+    db 219 ; base exp yield
 
     db BANK(LaprasPicFront)
 
@@ -5148,10 +5287,10 @@ DittoBaseStats:
     db 48 ; base special
 
     db RUBBER ; species type 1
-    db RUBBER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 35 ; catch rate
-    db 61 ; base exp yield
     db $55 ; sprite dimensions
 
     dw DittoPicFront
@@ -5174,7 +5313,8 @@ DittoBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 35 ; catch rate
+    db 61 ; base exp yield
 
     db BANK(DittoPicFront)
 
@@ -5187,10 +5327,10 @@ EeveeBaseStats:
     db 65 ; base special
 
     db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 92 ; base exp yield
     db $55 ; sprite dimensions
 
     dw EeveePicFront
@@ -5213,7 +5353,8 @@ EeveeBaseStats:
     ; field moves
     db 0
 
-    ds 2
+    db 45 ; catch rate
+    db 92 ; base exp yield
 
     db BANK(EeveePicFront)
 
@@ -5226,10 +5367,10 @@ VaporeonBaseStats:
     db 110 ; base special
 
     db WATER ; species type 1
-    db WATER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 196 ; base exp yield
     db $66 ; sprite dimensions
 
     dw VaporeonPicFront
@@ -5252,7 +5393,8 @@ VaporeonBaseStats:
     ; field moves
     db FM_FLOAT+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 196 ; base exp yield
 
     db BANK(VaporeonPicFront)
 
@@ -5265,10 +5407,10 @@ JolteonBaseStats:
     db 110 ; base special
 
     db THUNDER ; species type 1
-    db THUNDER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 197 ; base exp yield
     db $66 ; sprite dimensions
 
     dw JolteonPicFront
@@ -5291,7 +5433,8 @@ JolteonBaseStats:
     ; field moves
     db FM_LIGHT+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 197 ; base exp yield
 
     db BANK(JolteonPicFront)
 
@@ -5304,10 +5447,10 @@ FlareonBaseStats:
     db 110 ; base special
 
     db FIRE ; species type 1
-    db FIRE ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 198 ; base exp yield
     db $66 ; sprite dimensions
 
     dw FlareonPicFront
@@ -5330,7 +5473,8 @@ FlareonBaseStats:
     ; field moves
     db FM_LIGHT+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 198 ; base exp yield
 
     db BANK(FlareonPicFront)
 
@@ -5344,9 +5488,9 @@ PorygonBaseStats:
 
     db METAL ; species type 1
     db PSYCHIC ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 130 ; base exp yield
     db $66 ; sprite dimensions
 
     dw PorygonPicFront
@@ -5369,7 +5513,8 @@ PorygonBaseStats:
     ; field moves
     db FM_CUT+FM_FLY+FM_LIGHT+FM_TELEPORT+FM_HEAL
 
-    ds 2
+    db 45 ; catch rate
+    db 130 ; base exp yield
 
     db BANK(PorygonPicFront)
 
@@ -5383,9 +5528,9 @@ OmanyteBaseStats:
 
     db ROCK ; species type 1
     db WATER ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 120 ; base exp yield
     db $55 ; sprite dimensions
 
     dw OmanytePicFront
@@ -5408,7 +5553,8 @@ OmanyteBaseStats:
     ; field moves
     db FM_FLOAT
 
-    ds 2
+    db 45 ; catch rate
+    db 120 ; base exp yield
 
     db BANK(OmanytePicFront)
 
@@ -5422,9 +5568,9 @@ OmastarBaseStats:
 
     db ROCK ; species type 1
     db WATER ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 199 ; base exp yield
     db $66 ; sprite dimensions
 
     dw OmastarPicFront
@@ -5447,7 +5593,8 @@ OmastarBaseStats:
     ; field moves
     db FM_CUT+FM_FLOAT+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 199 ; base exp yield
 
     db BANK(OmastarPicFront)
 
@@ -5461,9 +5608,9 @@ KabutoBaseStats:
 
     db ROCK ; species type 1
     db BUG ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 119 ; base exp yield
     db $55 ; sprite dimensions
 
     dw KabutoPicFront
@@ -5486,7 +5633,8 @@ KabutoBaseStats:
     ; field moves
     db FM_CUT
 
-    ds 2
+    db 45 ; catch rate
+    db 119 ; base exp yield
 
     db BANK(KabutoPicFront)
 
@@ -5500,9 +5648,9 @@ KabutopsBaseStats:
 
     db ROCK ; species type 1
     db BUG ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 201 ; base exp yield
     db $66 ; sprite dimensions
 
     dw KabutopsPicFront
@@ -5525,7 +5673,8 @@ KabutopsBaseStats:
     ; field moves
     db FM_CUT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 201 ; base exp yield
 
     db BANK(KabutopsPicFront)
 
@@ -5539,9 +5688,9 @@ AerodactylBaseStats:
 
     db ROCK ; species type 1
     db DRAGON ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 202 ; base exp yield
     db $77 ; sprite dimensions
 
     dw AerodactylPicFront
@@ -5564,7 +5713,8 @@ AerodactylBaseStats:
     ; field moves
     db FM_CUT+FM_FLY+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 202 ; base exp yield
 
     db BANK(AerodactylPicFront)
 
@@ -5577,10 +5727,10 @@ SnorlaxBaseStats:
     db 65 ; base special
 
     db RUBBER ; species type 1
-    db RUBBER ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 25 ; catch rate
-    db 154 ; base exp yield
     db $77 ; sprite dimensions
 
     dw SnorlaxPicFront
@@ -5603,7 +5753,8 @@ SnorlaxBaseStats:
     ; field moves
     db FM_FLOAT+FM_STRENGTH
 
-    ds 2
+    db 25 ; catch rate
+    db 154 ; base exp yield
 
     db BANK(SnorlaxPicFront)
 
@@ -5617,9 +5768,9 @@ ArticunoBaseStats:
 
     db ICE ; species type 1
     db WIND ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 3 ; catch rate
-    db 215 ; base exp yield
     db $77 ; sprite dimensions
 
     dw ArticunoPicFront
@@ -5642,7 +5793,8 @@ ArticunoBaseStats:
     ; field moves
     db FM_CUT+FM_FLY+FM_FLOAT
 
-    ds 2
+    db 3 ; catch rate
+    db 215 ; base exp yield
 
     db BANK(ArticunoPicFront)
 
@@ -5656,9 +5808,9 @@ ZapdosBaseStats:
 
     db THUNDER ; species type 1
     db WIND ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 3 ; catch rate
-    db 216 ; base exp yield
     db $77 ; sprite dimensions
 
     dw ZapdosPicFront
@@ -5681,7 +5833,8 @@ ZapdosBaseStats:
     ; field moves
     db FM_CUT+FM_FLY+FM_LIGHT
 
-    ds 2
+    db 3 ; catch rate
+    db 216 ; base exp yield
 
     db BANK(ZapdosPicFront)
 
@@ -5695,9 +5848,9 @@ MoltresBaseStats:
 
     db FIRE ; species type 1
     db WIND ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 3 ; catch rate
-    db 217 ; base exp yield
     db $77 ; sprite dimensions
 
     dw MoltresPicFront
@@ -5720,7 +5873,8 @@ MoltresBaseStats:
     ; field moves
     db FM_CUT+FM_FLY+FM_LIGHT
 
-    ds 2
+    db 3 ; catch rate
+    db 217 ; base exp yield
 
     db BANK(MoltresPicFront)
 
@@ -5733,10 +5887,10 @@ DratiniBaseStats:
     db 50 ; base special
 
     db DRAGON ; species type 1
-    db DRAGON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 67 ; base exp yield
     db $55 ; sprite dimensions
 
     dw DratiniPicFront
@@ -5759,7 +5913,8 @@ DratiniBaseStats:
     ; field moves
     db FM_FLOAT
 
-    ds 2
+    db 45 ; catch rate
+    db 67 ; base exp yield
 
     db BANK(DratiniPicFront)
 
@@ -5772,10 +5927,10 @@ DragonairBaseStats:
     db 70 ; base special
 
     db DRAGON ; species type 1
-    db DRAGON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 144 ; base exp yield
     db $66 ; sprite dimensions
 
     dw DragonairPicFront
@@ -5798,7 +5953,8 @@ DragonairBaseStats:
     ; field moves
     db FM_FLY+FM_FLOAT+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 144 ; base exp yield
 
     db BANK(DragonairPicFront)
 
@@ -5811,10 +5967,10 @@ DragoniteBaseStats:
     db 100 ; base special
 
     db DRAGON ; species type 1
-    db DRAGON ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 218 ; base exp yield
     db $77 ; sprite dimensions
 
     dw DragonitePicFront
@@ -5837,7 +5993,8 @@ DragoniteBaseStats:
     ; field moves
     db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_DIG
 
-    ds 2
+    db 45 ; catch rate
+    db 218 ; base exp yield
 
     db BANK(DragonitePicFront)
 
@@ -5850,10 +6007,10 @@ MewtwoBaseStats:
     db 154 ; base special
 
     db PSYCHIC ; species type 1
-    db PSYCHIC ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 3 ; catch rate
-    db 220 ; base exp yield
     db $77 ; sprite dimensions
 
     dw MewtwoPicFront
@@ -5876,7 +6033,8 @@ MewtwoBaseStats:
     ; field moves
     db FM_CUT+FM_FLY+FM_STRENGTH+FM_LIGHT+FM_TELEPORT
 
-    ds 2
+    db 3 ; catch rate
+    db 220 ; base exp yield
 
     db BANK(MewtwoPicFront)
 
@@ -5889,10 +6047,10 @@ MewBaseStats:
     db 100 ; base special
 
     db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 3 ; catch rate
-    db 64 ; base exp yield
     db $55 ; sprite dimensions
 
     dw MewPicFront
@@ -5915,7 +6073,8 @@ MewBaseStats:
     ; field moves
     db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_LIGHT+FM_TELEPORT+FM_DIG+FM_HEAL
 
-    ds 2
+    db 3 ; catch rate
+    db 64 ; base exp yield
 
     db BANK(MewPicFront)
 
@@ -5929,9 +6088,9 @@ LitwickBaseStats:
 
     db GHOST ; species type 1
     db FIRE ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 190 ; catch rate
-    db 55 ; base exp yield
     db $55 ; sprite dimensions
 
     dw LitwickPicFront
@@ -5954,7 +6113,8 @@ LitwickBaseStats:
     ; field moves
     db FM_LIGHT+FM_TELEPORT
 
-    ds 2
+    db 190 ; catch rate
+    db 55 ; base exp yield
 
     db BANK(LitwickPicFront)
 
@@ -5968,9 +6128,9 @@ LampentBaseStats:
 
     db GHOST ; species type 1
     db FIRE ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 90 ; catch rate
-    db 130 ; base exp yield
     db $66 ; sprite dimensions
 
     dw LampentPicFront
@@ -5993,7 +6153,8 @@ LampentBaseStats:
     ; field moves
     db FM_LIGHT+FM_TELEPORT
 
-    ds 2
+    db 90 ; catch rate
+    db 130 ; base exp yield
 
     db BANK(LampentPicFront)
 
@@ -6007,9 +6168,9 @@ ChandelureBaseStats:
 
     db GHOST ; species type 1
     db FIRE ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 45 ; catch rate
-    db 234 ; base exp yield
     db $77 ; sprite dimensions
 
     dw ChandelurePicFront
@@ -6032,7 +6193,8 @@ ChandelureBaseStats:
     ; field moves
     db FM_LIGHT+FM_TELEPORT
 
-    ds 2
+    db 45 ; catch rate
+    db 234 ; base exp yield
 
     db BANK(ChandelurePicFront)
 
@@ -6045,10 +6207,10 @@ Mon155BaseStats:
     db 00 ; base special
 
     db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 0 ; base exp yield
     db $88 ; sprite dimensions
 
     dw MissingNoPicFront
@@ -6071,7 +6233,8 @@ Mon155BaseStats:
     ; field moves
     db
 
-    ds 2
+    db 255 ; catch rate
+    db 0 ; base exp yield
 
     db BANK(MissingNoPicFront)
 
@@ -6084,10 +6247,10 @@ Mon156BaseStats:
     db 00 ; base special
 
     db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 0 ; base exp yield
     db $88 ; sprite dimensions
 
     dw MissingNoPicFront
@@ -6110,7 +6273,8 @@ Mon156BaseStats:
     ; field moves
     db
 
-    ds 2
+    db 255 ; catch rate
+    db 0 ; base exp yield
 
     db BANK(MissingNoPicFront)
 
@@ -6123,10 +6287,10 @@ Mon157BaseStats:
     db 00 ; base special
 
     db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 0 ; base exp yield
     db $88 ; sprite dimensions
 
     dw MissingNoPicFront
@@ -6149,7 +6313,8 @@ Mon157BaseStats:
     ; field moves
     db
 
-    ds 2
+    db 255 ; catch rate
+    db 0 ; base exp yield
 
     db BANK(MissingNoPicFront)
 
@@ -6162,10 +6327,10 @@ Mon158BaseStats:
     db 00 ; base special
 
     db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 0 ; base exp yield
     db $88 ; sprite dimensions
 
     dw MissingNoPicFront
@@ -6188,7 +6353,8 @@ Mon158BaseStats:
     ; field moves
     db
 
-    ds 2
+    db 255 ; catch rate
+    db 0 ; base exp yield
 
     db BANK(MissingNoPicFront)
 
@@ -6201,10 +6367,10 @@ Mon159BaseStats:
     db 00 ; base special
 
     db NORMAL ; species type 1
-    db NORMAL ; species type 2
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
 
-    db 255 ; catch rate
-    db 0 ; base exp yield
     db $88 ; sprite dimensions
 
     dw MissingNoPicFront
@@ -6227,6 +6393,7 @@ Mon159BaseStats:
     ; field moves
     db
 
-    ds 2
+    db 255 ; catch rate
+    db 0 ; base exp yield
 
     db BANK(MissingNoPicFront)
