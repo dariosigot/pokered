@@ -414,7 +414,7 @@ AIMoveChoiceModification1:
     ;first check to make sure leech seed isn't used on a grass pokemon
     push bc
     push hl
-    ld hl,W_PLAYERMONTYPES
+    ld hl,W_PLAYERMONTYPES ; @TODO:4TYPE
     ld b,[hl]                 ; b = type 1 of player's pokemon
     inc hl
     ld c,[hl]                 ; c = type 2 of player's pokemon
@@ -765,10 +765,10 @@ AIMoveChoiceModification3:
     ld a,[W_ENEMYMOVEEFFECT]
     cp POISON_EFFECT
     jr nz,.notpoisoneffect
-    ld a,[W_PLAYERMONTYPES]
+    ld a,[W_PLAYERMONTYPES] ; @TODO:4TYPE
     cp POISON
     jp z,.heavydiscourage2
-    ld a,[W_PLAYERMONTYPES + 1]
+    ld a,[W_PLAYERMONTYPES + 1] ; @TODO:4TYPE
     cp POISON
     jp z,.heavydiscourage2
 .notpoisoneffect
@@ -928,14 +928,14 @@ AIMoveChoiceModification3:
     push bc
     ld a,[W_ENEMYMOVETYPE]
     ld b,a
-    ld a,[W_ENEMYMONTYPE1]
+    ld a,[W_ENEMYMONTYPE1] ; @TODO:4TYPE
     cp b
     pop bc
     jp z,.givepref
     push bc
     ld a,[W_ENEMYMOVETYPE]
     ld b,a
-    ld a,[W_ENEMYMONTYPE2]
+    ld a,[W_ENEMYMONTYPE2] ; @TODO:4TYPE
     cp b
     pop bc
     jp z,.givepref
@@ -1538,7 +1538,7 @@ ScoreAIParty:
     ld a,[W_PLAYERMOVETYPE]
     push af
     ;check player type 1 effectiveness
-    ld a,[W_PLAYERMONTYPES]
+    ld a,[W_PLAYERMONTYPES] ; @TODO:4TYPE
     ld [W_PLAYERMOVETYPE],a
     call .get_effectiveness_to_enemy
     ld b,3    ;-3 for 2x effective or -6 if 4x effective
@@ -1551,8 +1551,8 @@ ScoreAIParty:
     call nc,.minus
     ;jump if there is no type 2
     push hl
-    ld hl,W_PLAYERMONTYPES
-    ld a,[W_PLAYERMONTYPES + 1]
+    ld hl,W_PLAYERMONTYPES ; @TODO:4TYPE
+    ld a,[W_PLAYERMONTYPES + 1] ; @TODO:4TYPE
     cp [hl]
     pop hl
     jr z,.next8
@@ -1609,18 +1609,18 @@ ScoreAIParty:
     set 3,a
     ld [wUnusedC000],a
     ;preserve the current enemy mon typing
-    ld a,[W_ENEMYMONTYPES]
+    ld a,[W_ENEMYMONTYPES] ; @TODO:4TYPE
     ld [wAIPartyMonScores + 6],a
-    ld a,[W_ENEMYMONTYPES + 1]
+    ld a,[W_ENEMYMONTYPES + 1] ; @TODO:4TYPE
     ld [wAIPartyMonScores + 7],a
     ;override the current enemy mon typing with that from the roster pointer
     push bc
     ld bc,$05
     call GetRosterStructData
-    ld [W_ENEMYMONTYPES],a
+    ld [W_ENEMYMONTYPES],a ; @TODO:4TYPE
     ld bc,$06
     call GetRosterStructData
-    ld [W_ENEMYMONTYPES + 1],a
+    ld [W_ENEMYMONTYPES + 1],a ; @TODO:4TYPE
     pop bc
     ;now get the typing effectiveness
     push bc
@@ -1634,9 +1634,9 @@ ScoreAIParty:
     pop bc
     ;now undo the current mon type override
     ld a,[wAIPartyMonScores + 6]
-    ld [W_ENEMYMONTYPES],a
+    ld [W_ENEMYMONTYPES],a ; @TODO:4TYPE
     ld a,[wAIPartyMonScores + 7]
-    ld [W_ENEMYMONTYPES + 1],a
+    ld [W_ENEMYMONTYPES + 1],a ; @TODO:4TYPE
     ret
 
 ; ─────────────────────────────────────────────────────────────────────────

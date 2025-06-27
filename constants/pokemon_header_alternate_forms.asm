@@ -24,7 +24,7 @@ VoltorbHisuiBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw VoltorbHisuiTMCompatibility
 
     ; palette
@@ -34,7 +34,7 @@ VoltorbHisuiBaseStats:
     db FM_LIGHT
 
     ds 2
- 
+
     db BANK(VoltorbHisuiPicFront)
 
 ElectrodeHisuiBaseStats:
@@ -63,7 +63,7 @@ ElectrodeHisuiBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ElectrodeHisuiTMCompatibility
 
     ; palette
@@ -102,7 +102,7 @@ KabutoFossilBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw KabutoTMCompatibility
 
     ; palette
@@ -141,7 +141,7 @@ KabutopsFossilBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw KabutopsTMCompatibility
 
     ; palette
@@ -180,9 +180,9 @@ AerodactylFossilBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw AerodactylTMCompatibility
-    
+
     ; palette
     dw PAL_AERODACTYL
 
@@ -219,7 +219,7 @@ BulbasaurStarterBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw BulbasaurTMCompatibility
 
     ; palette
@@ -258,7 +258,7 @@ IvysaurStarterBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw IvysaurTMCompatibility
 
     ; palette
@@ -297,7 +297,7 @@ VenusaurStarterBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw VenusaurTMCompatibility
 
     ; palette
@@ -336,7 +336,7 @@ CharmanderStarterBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw CharmanderTMCompatibility
 
     ; palette
@@ -375,7 +375,7 @@ CharmeleonStarterBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw CharmeleonTMCompatibility
 
     ; palette
@@ -414,7 +414,7 @@ CharizardStarterBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw CharizardTMCompatibility
 
     ; palette
@@ -453,7 +453,7 @@ SquirtleStarterBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw SquirtleTMCompatibility
 
     ; palette
@@ -492,7 +492,7 @@ WartortleStarterBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw WartortleTMCompatibility
 
     ; palette
@@ -531,7 +531,7 @@ BlastoiseStarterBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw BlastoiseTMCompatibility
 
     ; palette
@@ -570,7 +570,7 @@ OnixCrystalBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw OnixTMCompatibility
 
     ; palette
@@ -609,7 +609,7 @@ MarowakAlolaBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MarowakAlolaTMCompatibility
 
     ; palette
@@ -648,7 +648,7 @@ PikachuStarterBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PikachuTMCompatibility
 
     ; palette
@@ -687,7 +687,7 @@ EeveeStarterBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw EeveeTMCompatibility
 
     ; palette

@@ -3318,7 +3318,7 @@ GetMonHeader: ; 1537 (0:1537)
     jr z,.done
     dec a
     ld [hl],a
-    ld hl,W_MON_NEXT_ALTFORM ; Actual Pointer to Alternate Forms
+    ld hl,W_MONHNEXTALTFORM ; Actual Pointer to Alternate Forms
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -29854,7 +29854,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     ;call FarCopyData
     ;ld hl,$CD6D
 
-    ld hl,W_MON_LEARNSET_POINTER ; pointer to learnset
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -31593,7 +31593,7 @@ TestMonMoveCompatibility_HandleAlternative:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,W_MONHLEARNSET_POINTER
+    ld hl,W_MONHTMCOMPATIBILITY
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -31605,8 +31605,8 @@ TestMonMoveCompatibility_HandleAlternative:
 ConversionEffect_:
     ld hl,PlayCurrentMoveAnimation
     call Bankswitch4toF
-    ld hl,W_ENEMYMONTYPE1
-    ld de,W_PLAYERMONTYPE1
+    ld hl,W_ENEMYMONTYPE1 ; @TODO:4TYPE
+    ld de,W_PLAYERMONTYPE1 ; @TODO:4TYPE
     ld a,[H_WHOSETURN]
     and a
     ld a,[W_ENEMYBATTSTATUS1]
@@ -42638,7 +42638,7 @@ GetMonPotentialMoveList:
     ;call FarCopyData
     ;ld hl,GenericBuffer+1
 
-    ld hl,W_MON_LEARNSET_POINTER ; pointer to learnset
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
     ld l,a ; hl pointer to Correct EvosMoves
@@ -46918,11 +46918,11 @@ Func_27d6b:
     ;call GetMonHeader
     ;pop hl
     push hl
-    ld a,[W_MONHTYPE1]
+    ld a,[W_MONHTYPE1] ; @TODO:4TYPE
     call Func_27d89
-    ld a,[W_MONHTYPE1]
+    ld a,[W_MONHTYPE1] ; @TODO:4TYPE
     ld b,a
-    ld a,[W_MONHTYPE2]
+    ld a,[W_MONHTYPE2] ; @TODO:4TYPE
     cp b
     pop hl
     jr z,asm_27d8c
@@ -47265,12 +47265,12 @@ DiglettPicBack: ; 2ae10 (a:6e10)
 
 LeechSeedEffect_:
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
-    ld de,W_ENEMYMONTYPE1 ; $cfea (aliases: W_ENEMYMONTYPES)
+    ld de,W_ENEMYMONTYPE1 ; $cfea (aliases: W_ENEMYMONTYPES) ; @TODO:4TYPE
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.done
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
-    ld de,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES)
+    ld de,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES) ; @TODO:4TYPE
 .done
     push hl
     push de
@@ -50752,7 +50752,7 @@ LearnMoveCommon:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,W_MON_LEARNSET_POINTER ; pointer to learnset
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -50855,7 +50855,7 @@ Evolution_PartyMonLoop:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,W_MON_LEARNSET_POINTER ; pointer to learnset
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -51295,13 +51295,13 @@ LearnZeroDamageMove:
     ld a,d
     dec a
     jr z,.One
-    ld a,[W_MONHTYPE1]
+    ld a,[W_MONHTYPE1] ; @TODO:4TYPE
     cp e
     jr nz,.Stab1Done
     inc b ; ▼ stab
     jr .StabDone
 .Stab1Done
-    ld a,[W_MONHTYPE2]
+    ld a,[W_MONHTYPE2] ; @TODO:4TYPE
     cp e
     jr nz,.StabDone
     inc b ; ▼ stab
@@ -51338,13 +51338,13 @@ LearnDamageMove:
     jr c,.DifferentType ; c = damage old > damage new
     call EncourageForgot3 ; ▲ same type and new damage >= old damage
 .DifferentType
-    ld a,[W_MONHTYPE1]
+    ld a,[W_MONHTYPE1] ; @TODO:4TYPE
     cp e
     jr nz,.Stab1Done
     inc b ; ▼ stab
     jr .StabDone
 .Stab1Done
-    ld a,[W_MONHTYPE2]
+    ld a,[W_MONHTYPE2] ; @TODO:4TYPE
     cp e
     jr nz,.StabDone
     inc b ; ▼ stab
@@ -51537,7 +51537,7 @@ WriteMonMoves:
     ;ld c,a
     ;add hl,bc
 
-    ld hl,W_MON_LEARNSET_POINTER ; pointer to learnset
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -57866,12 +57866,12 @@ HowManyMovesWithEnoughEnergy:
     ret
 
 ; function to adjust the base damage of an attack to account for type effectiveness
-AdjustDamageForMoveType:
+AdjustDamageForMoveType: ; @TODO:4TYPE
     PREDEF AdjustDamageForMoveType_GetInput
     ld a,[$d11e] ; move type
-    cp b ; does the move type match type 1 of the attacker?
+    cp b ; does the move type match type 1 of the attacker? ; @TODO:4TYPE
     jr z,.sameTypeAttackBonus
-    cp c ; does the move type match type 2 of the attacker?
+    cp c ; does the move type match type 2 of the attacker? ; @TODO:4TYPE
     jr z,.sameTypeAttackBonus
     jr .skipSameTypeAttackBonus
 .sameTypeAttackBonus
@@ -57903,9 +57903,9 @@ AdjustDamageForMoveType:
     cp b ; does move type match "attacking type"?
     jr nz,.nextTypePair
     ld a,[hl] ; a = "defending type" of the current type pair
-    cp d ; does type 1 of defender match "defending type"?
+    cp d ; does type 1 of defender match "defending type"? ; @TODO:4TYPE
     jr z,.matchingPairFound
-    cp e ; does type 2 of defender match "defending type"?
+    cp e ; does type 2 of defender match "defending type"? ; @TODO:4TYPE
     jr z,.matchingPairFound
     jr .nextTypePair
 .matchingPairFound
@@ -57982,7 +57982,7 @@ GetTypeEffects:
     ld hl,wBufferTypeEffects
     ret
 
-CheckPoisonableMon:
+CheckPoisonableMon: ; @TODO:4TYPE
     ld a,[hli]
     cp POISON ; can't poison a poison-type target
     ret z
@@ -57995,10 +57995,10 @@ CheckPoisonableMon:
     ret z
     push hl
     push bc
-    ld bc,W_PLAYERMONID-W_PLAYERMONTYPES
+    ld bc,W_PLAYERMONID-W_PLAYERMONTYPES ; @TODO:4TYPE
     add hl,bc
     ld a,[hl]
-    cp KAKUNA
+    cp KAKUNA ; @TODO:4TYPE
     pop bc
     pop hl
     ret
@@ -59068,8 +59068,8 @@ LoadEnemyMonData:
     ld a,[hl]
     ld [W_ENEMYMONSTATUS],a ; $cfe9
 .copyTypes
-    ld hl,W_MONHTYPES
-    ld de,W_ENEMYMONTYPES ; $cfea
+    ld hl,W_MONHTYPES ; @TODO:4TYPE
+    ld de,W_ENEMYMONTYPES ; $cfea ; @TODO:4TYPE
     ld a,[hli]            ; copy type 1
     ld [de],a
     inc de
@@ -59581,12 +59581,8 @@ GenRandomInBattle: ; 3ee9b (f:6e9b)
 HandleExplodingAnimation: ; 3eed3 (f:6ed3)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ;ld hl,W_ENEMYMONTYPE1 ; $cfea (aliases: W_ENEMYMONTYPES)
-    ;ld de,W_ENEMYBATTSTATUS1 ; $d067
     ld a,[W_PLAYERMOVENUM] ; $cfd2
     jr z,.done
-    ;ld hl,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES)
-    ;ld de,W_ENEMYBATTSTATUS1 ; $d067
     ld a,[W_ENEMYMOVENUM] ; $cfcc
 .done
     cp SELFDESTRUCT
@@ -59594,18 +59590,6 @@ HandleExplodingAnimation: ; 3eed3 (f:6ed3)
     cp EXPLOSION
     ret nz
 .explodeMove
-    ;ld a,[de]
-    ;bit 6,a
-    ;ret nz
-    ;ld a,[hli]
-    ;cp GHOST
-    ;ret z
-    ;ld a,[hl]
-    ;cp GHOST
-    ;ret z
-    ;ld a,[W_MOVEMISSED] ; $d05f
-    ;and a
-    ;ret nz
     ld a,$5 ; MegaPunchAnim
     ld [$cc5b],a
     ; fall through
@@ -60221,10 +60205,10 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     ;opponent has no existing status
     call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
     ld b,a
-    ld a,[W_ENEMYMONTYPE1]
+    ld a,[W_ENEMYMONTYPE1] ; @TODO:4TYPE
     cp b
     ret z  ;return if they match [can't freeze an ice type etc.]
-    ld a,[W_ENEMYMONTYPE2]
+    ld a,[W_ENEMYMONTYPE2] ; @TODO:4TYPE
     cp b
     ret z  ;return..
     ld a,[W_PLAYERMOVEEFFECT]
@@ -60273,10 +60257,10 @@ opponentAttacker: ; 3f382 (f:7382)
     jp nz,CheckDefrost
     call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
     ld b,a
-    ld a,[W_PLAYERMONTYPE1]
+    ld a,[W_PLAYERMONTYPE1] ; @TODO:4TYPE
     cp b
     ret z
-    ld a,[W_PLAYERMONTYPE2]
+    ld a,[W_PLAYERMONTYPE2] ; @TODO:4TYPE
     cp b
     ret z
     ld a,[W_ENEMYMOVEEFFECT]
@@ -61975,12 +61959,12 @@ AIGetTypeEffectiveness:
     jr z,.EnemyMove
     ld a,[W_PLAYERMOVETYPE]
     ld d,a                       ; d = type of player move
-    ld hl,W_ENEMYMONTYPES
+    ld hl,W_ENEMYMONTYPES ; @TODO:4TYPE
     jr .common
 .EnemyMove
     ld a,[W_ENEMYMOVETYPE]
     ld d,a                       ; d = type of enemy move
-    ld hl,W_PLAYERMONTYPES
+    ld hl,W_PLAYERMONTYPES ; @TODO:4TYPE
 .common
     ld b,[hl]                    ; b = type 1 of player's pokemon
     inc hl
@@ -138182,7 +138166,7 @@ CheckSTAB:
     ld b,a
     ld a,[W_PLAYERMOVENUM]
     ld c,a
-    ld hl,W_MONHTYPES
+    ld hl,W_MONHTYPES ; @TODO:4TYPE
     PREDEF GetAttackerType_
     pop hl    ; Restore
     pop af    ; ...
@@ -139474,13 +139458,13 @@ RemovePlayerBattleStatsFrameDisableBGTransfer:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-InsertRealTypes_:
+InsertRealTypes_: ; @TODO:4TYPE
     call Load16BitRegisters
     ld h,d
     ld l,e
-    ld de,W_PLAYERMONTYPES-W_PLAYERMONPP
+    ld de,W_PLAYERMONTYPES-W_PLAYERMONPP ; @TODO:4TYPE
     add hl,de
-    ld de,W_MONHTYPES
+    ld de,W_MONHTYPES ; @TODO:4TYPE
     ld a,[de]
     ld [hli],a
     inc de
@@ -140819,13 +140803,13 @@ _CheckCounterFail:
     ; Check Target Ghost
     ld h,d
     ld l,e ; hl = Pointer to Mon ID
-    ld de,W_PLAYERMONTYPES-W_PLAYERMONID
+    ld de,W_PLAYERMONTYPES-W_PLAYERMONID ; @TODO:4TYPE
     add hl,de ; hl = Pointer to Type
     ld a,[hli]
-    cp GHOST
+    cp GHOST ; @TODO:4TYPE
     ret z
     ld a,[hl]
-    cp GHOST
+    cp GHOST ; @TODO:4TYPE
     ret z
     ; Check Previous Damage
     ld hl,W_DAMAGE
@@ -141322,11 +141306,11 @@ AdjustDamageForMoveType_GetInput:
     ld b,a
     ld a,[W_PLAYERMOVENUM]
     ld c,a
-    ld hl,W_PLAYERMONTYPES
+    ld hl,W_PLAYERMONTYPES ; @TODO:4TYPE
     call GetAttackerType ; b = type 1 | c = type 2
     ld a,[W_ENEMYMON_START]
     ld d,a
-    ld hl,W_ENEMYMONTYPES
+    ld hl,W_ENEMYMONTYPES ; @TODO:4TYPE
     jp GetDefenderType
 
 .ValuesForEnemyTurn
@@ -141336,11 +141320,11 @@ AdjustDamageForMoveType_GetInput:
     ld b,a
     ld a,[W_ENEMYMOVENUM]
     ld c,a
-    ld hl,W_ENEMYMONTYPES
+    ld hl,W_ENEMYMONTYPES ; @TODO:4TYPE
     call GetAttackerType ; b = type 1 | c = type 2
     ld a,[W_PLAYERMONID]
     ld d,a
-    ld hl,W_PLAYERMONTYPES
+    ld hl,W_PLAYERMONTYPES ; @TODO:4TYPE
     jp GetDefenderType
 
 ; Input
@@ -141387,6 +141371,7 @@ GetDefenderType:
     
 .LevitateMonList
     db BEEDRILL
+    db VENOMOTH
     db KOFFING
     db WEEZING
     db $FF

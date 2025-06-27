@@ -4,7 +4,7 @@ MissingNoBaseStats:
     db 29,VOLTORB     ; Speed, Special
     db TYPE_NA,TYPE_NA ; db VOLTORB,0      ; Bird/Normal
     db 29,WEEZING,MUK ; CatchRate, BaseExpYield, Sprite Dimension
-    
+
     dw MissingNoPicFront, MissingNoPicBack ;    db 0,25,KOFFING,WEEZING
 
     ;dw 0,0 ; db KOFFING,KOFFING,WEEZING,0 ; attacks known at lvl 0: WATER_GUN, WATER_GUN, SKY_ATTACK
@@ -17,7 +17,7 @@ MissingNoBaseStats:
 
     db 26 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MissingNoTMCompatibility
 
     ; palette
@@ -56,7 +56,7 @@ BulbasaurBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw BulbasaurTMCompatibility
 
     ; palette
@@ -95,7 +95,7 @@ IvysaurBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw IvysaurTMCompatibility
 
     ; palette
@@ -134,7 +134,7 @@ VenusaurBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw VenusaurTMCompatibility
 
     ; palette
@@ -173,7 +173,7 @@ CharmanderBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw CharmanderTMCompatibility
 
     ; palette
@@ -212,7 +212,7 @@ CharmeleonBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw CharmeleonTMCompatibility
 
     ; palette
@@ -251,7 +251,7 @@ CharizardBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw CharizardTMCompatibility
 
     ; palette
@@ -290,7 +290,7 @@ SquirtleBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw SquirtleTMCompatibility
 
     ; palette
@@ -329,7 +329,7 @@ WartortleBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw WartortleTMCompatibility
 
     ; palette
@@ -368,7 +368,7 @@ BlastoiseBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw BlastoiseTMCompatibility
 
     ; palette
@@ -407,7 +407,7 @@ CaterpieBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw CaterpieTMCompatibility
 
     ; palette
@@ -446,7 +446,7 @@ MetapodBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MetapodTMCompatibility
 
     ; palette
@@ -485,7 +485,7 @@ ButterfreeBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ButterfreeTMCompatibility
 
     ; palette
@@ -524,7 +524,7 @@ WeedleBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw WeedleTMCompatibility
 
     ; palette
@@ -563,7 +563,7 @@ KakunaBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw KakunaTMCompatibility
 
     ; palette
@@ -602,7 +602,7 @@ BeedrillBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw BeedrillTMCompatibility
 
     ; palette
@@ -641,7 +641,7 @@ PidgeyBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PidgeyTMCompatibility
 
     ; palette
@@ -680,7 +680,7 @@ PidgeottoBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PidgeottoTMCompatibility
 
     ; palette
@@ -719,7 +719,7 @@ PidgeotBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PidgeotTMCompatibility
 
     ; palette
@@ -758,7 +758,7 @@ RattataBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw RattataTMCompatibility
 
     ; palette
@@ -797,7 +797,7 @@ RaticateBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw RaticateTMCompatibility
 
     ; palette
@@ -836,7 +836,7 @@ SpearowBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw SpearowTMCompatibility
 
     ; palette
@@ -875,7 +875,7 @@ FearowBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw FearowTMCompatibility
 
     ; palette
@@ -914,7 +914,7 @@ EkansBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw EkansTMCompatibility
 
     ; palette
@@ -953,7 +953,7 @@ ArbokBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ArbokTMCompatibility
 
     ; palette
@@ -992,7 +992,7 @@ PikachuBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PikachuTMCompatibility
 
     ; palette
@@ -1031,7 +1031,7 @@ RaichuBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw RaichuTMCompatibility
 
     ; palette
@@ -1070,7 +1070,7 @@ SandshrewBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw SandshrewTMCompatibility
 
     ; palette
@@ -1109,7 +1109,7 @@ SandslashBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw SandslashTMCompatibility
 
     ; palette
@@ -1148,7 +1148,7 @@ NidoranFBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw NidoranFTMCompatibility
 
     ; palette
@@ -1187,7 +1187,7 @@ NidorinaBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw NidorinaTMCompatibility
 
     ; palette
@@ -1226,7 +1226,7 @@ NidoqueenBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw NidoqueenTMCompatibility
 
     ; palette
@@ -1265,7 +1265,7 @@ NidoranMBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw NidoranMTMCompatibility
 
     ; palette
@@ -1304,7 +1304,7 @@ NidorinoBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw NidorinoTMCompatibility
 
     ; palette
@@ -1343,7 +1343,7 @@ NidokingBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw NidokingTMCompatibility
 
     ; palette
@@ -1382,7 +1382,7 @@ ClefairyBaseStats:
 
     db 4 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ClefairyTMCompatibility
 
     ; palette
@@ -1421,7 +1421,7 @@ ClefableBaseStats:
 
     db 4 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ClefableTMCompatibility
 
     ; palette
@@ -1460,7 +1460,7 @@ VulpixBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw VulpixTMCompatibility
 
     ; palette
@@ -1499,7 +1499,7 @@ NinetalesBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw NinetalesTMCompatibility
 
     ; palette
@@ -1538,7 +1538,7 @@ JigglypuffBaseStats:
 
     db 4 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw JigglypuffTMCompatibility
 
     ; palette
@@ -1577,7 +1577,7 @@ WigglytuffBaseStats:
 
     db 4 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw WigglytuffTMCompatibility
 
     ; palette
@@ -1616,7 +1616,7 @@ ZubatBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ZubatTMCompatibility
 
     ; palette
@@ -1655,7 +1655,7 @@ GolbatBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GolbatTMCompatibility
 
     ; palette
@@ -1694,7 +1694,7 @@ OddishBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw OddishTMCompatibility
 
     ; palette
@@ -1733,7 +1733,7 @@ GloomBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GloomTMCompatibility
 
     ; palette
@@ -1772,7 +1772,7 @@ VileplumeBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw VileplumeTMCompatibility
 
     ; palette
@@ -1811,7 +1811,7 @@ ParasBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ParasTMCompatibility
 
     ; palette
@@ -1850,7 +1850,7 @@ ParasectBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ParasectTMCompatibility
 
     ; palette
@@ -1889,7 +1889,7 @@ VenonatBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw VenonatTMCompatibility
 
     ; palette
@@ -1928,7 +1928,7 @@ VenomothBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw VenomothTMCompatibility
 
     ; palette
@@ -1967,7 +1967,7 @@ DiglettBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw DiglettTMCompatibility
 
     ; palette
@@ -2006,7 +2006,7 @@ DugtrioBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw DugtrioTMCompatibility
 
     ; palette
@@ -2045,7 +2045,7 @@ MeowthBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MeowthTMCompatibility
 
     ; palette
@@ -2084,7 +2084,7 @@ PersianBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PersianTMCompatibility
 
     ; palette
@@ -2123,7 +2123,7 @@ PsyduckBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PsyduckTMCompatibility
 
     ; palette
@@ -2162,7 +2162,7 @@ GolduckBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GolduckTMCompatibility
 
     ; palette
@@ -2201,7 +2201,7 @@ MankeyBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MankeyTMCompatibility
 
     ; palette
@@ -2240,7 +2240,7 @@ PrimeapeBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PrimeapeTMCompatibility
 
     ; palette
@@ -2279,7 +2279,7 @@ GrowlitheBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GrowlitheTMCompatibility
 
     ; palette
@@ -2318,7 +2318,7 @@ ArcanineBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ArcanineTMCompatibility
 
     ; palette
@@ -2357,7 +2357,7 @@ PoliwagBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PoliwagTMCompatibility
 
     ; palette
@@ -2396,7 +2396,7 @@ PoliwhirlBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PoliwhirlTMCompatibility
 
     ; palette
@@ -2435,7 +2435,7 @@ PoliwrathBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PoliwrathTMCompatibility
 
     ; palette
@@ -2474,7 +2474,7 @@ AbraBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw AbraTMCompatibility
 
     ; palette
@@ -2513,7 +2513,7 @@ KadabraBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw KadabraTMCompatibility
 
     ; palette
@@ -2552,7 +2552,7 @@ AlakazamBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw AlakazamTMCompatibility
 
     ; palette
@@ -2591,7 +2591,7 @@ MachopBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MachopTMCompatibility
 
     ; palette
@@ -2630,7 +2630,7 @@ MachokeBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MachokeTMCompatibility
 
     ; palette
@@ -2669,7 +2669,7 @@ MachampBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MachampTMCompatibility
 
     ; palette
@@ -2708,7 +2708,7 @@ BellsproutBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw BellsproutTMCompatibility
 
     ; palette
@@ -2747,7 +2747,7 @@ WeepinbellBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw WeepinbellTMCompatibility
 
     ; palette
@@ -2786,7 +2786,7 @@ VictreebelBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw VictreebelTMCompatibility
 
     ; palette
@@ -2825,7 +2825,7 @@ TentacoolBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw TentacoolTMCompatibility
 
     ; palette
@@ -2864,7 +2864,7 @@ TentacruelBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw TentacruelTMCompatibility
 
     ; palette
@@ -2903,7 +2903,7 @@ GeodudeBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GeodudeTMCompatibility
 
     ; palette
@@ -2942,7 +2942,7 @@ GravelerBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GravelerTMCompatibility
 
     ; palette
@@ -2981,7 +2981,7 @@ GolemBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GolemTMCompatibility
 
     ; palette
@@ -3020,7 +3020,7 @@ PonytaBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PonytaTMCompatibility
 
     ; palette
@@ -3059,7 +3059,7 @@ RapidashBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw RapidashTMCompatibility
 
     ; palette
@@ -3098,7 +3098,7 @@ SlowpokeBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw SlowpokeTMCompatibility
 
     ; palette
@@ -3137,7 +3137,7 @@ SlowbroBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw SlowbroTMCompatibility
 
     ; palette
@@ -3176,7 +3176,7 @@ MagnemiteBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MagnemiteTMCompatibility
 
     ; palette
@@ -3215,7 +3215,7 @@ MagnetonBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MagnetonTMCompatibility
 
     ; palette
@@ -3254,7 +3254,7 @@ FarfetchdBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw FarfetchdTMCompatibility
 
     ; palette
@@ -3293,7 +3293,7 @@ DoduoBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw DoduoTMCompatibility
 
     ; palette
@@ -3332,7 +3332,7 @@ DodrioBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw DodrioTMCompatibility
 
     ; palette
@@ -3371,7 +3371,7 @@ SeelBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw SeelTMCompatibility
 
     ; palette
@@ -3410,7 +3410,7 @@ DewgongBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw DewgongTMCompatibility
 
     ; palette
@@ -3449,7 +3449,7 @@ GrimerBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GrimerTMCompatibility
 
     ; palette
@@ -3488,7 +3488,7 @@ MukBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MukTMCompatibility
 
     ; palette
@@ -3527,7 +3527,7 @@ ShellderBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ShellderTMCompatibility
 
     ; palette
@@ -3566,7 +3566,7 @@ CloysterBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw CloysterTMCompatibility
 
     ; palette
@@ -3605,7 +3605,7 @@ GastlyBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GastlyTMCompatibility
 
     ; palette
@@ -3644,7 +3644,7 @@ HaunterBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw HaunterTMCompatibility
 
     ; palette
@@ -3683,7 +3683,7 @@ GengarBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GengarTMCompatibility
 
     ; palette
@@ -3722,7 +3722,7 @@ OnixBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw OnixTMCompatibility
 
     ; palette
@@ -3761,7 +3761,7 @@ DrowzeeBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw DrowzeeTMCompatibility
 
     ; palette
@@ -3800,7 +3800,7 @@ HypnoBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw HypnoTMCompatibility
 
     ; palette
@@ -3839,7 +3839,7 @@ KrabbyBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw KrabbyTMCompatibility
 
     ; palette
@@ -3878,7 +3878,7 @@ KinglerBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw KinglerTMCompatibility
 
     ; palette
@@ -3917,7 +3917,7 @@ VoltorbBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw VoltorbTMCompatibility
 
     ; palette
@@ -3927,7 +3927,7 @@ VoltorbBaseStats:
     db FM_LIGHT
 
     ds 2
- 
+
     db BANK(VoltorbPicFront)
 
 ElectrodeBaseStats:
@@ -3956,7 +3956,7 @@ ElectrodeBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ElectrodeTMCompatibility
 
     ; palette
@@ -3995,7 +3995,7 @@ ExeggcuteBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ExeggcuteTMCompatibility
 
     ; palette
@@ -4034,7 +4034,7 @@ ExeggutorBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ExeggutorTMCompatibility
 
     ; palette
@@ -4073,7 +4073,7 @@ CuboneBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw CuboneTMCompatibility
 
     ; palette
@@ -4112,7 +4112,7 @@ MarowakBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MarowakTMCompatibility
 
     ; palette
@@ -4151,7 +4151,7 @@ HitmonleeBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw HitmonleeTMCompatibility
 
     ; palette
@@ -4190,7 +4190,7 @@ HitmonchanBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw HitmonchanTMCompatibility
 
     ; palette
@@ -4229,7 +4229,7 @@ LickitungBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw LickitungTMCompatibility
 
     ; palette
@@ -4268,7 +4268,7 @@ KoffingBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw KoffingTMCompatibility
 
     ; palette
@@ -4307,7 +4307,7 @@ WeezingBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw WeezingTMCompatibility
 
     ; palette
@@ -4346,7 +4346,7 @@ RhyhornBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw RhyhornTMCompatibility
 
     ; palette
@@ -4385,7 +4385,7 @@ RhydonBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw RhydonTMCompatibility
 
     ; palette
@@ -4424,7 +4424,7 @@ ChanseyBaseStats:
 
     db 4 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ChanseyTMCompatibility
 
     ; palette
@@ -4463,7 +4463,7 @@ TangelaBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw TangelaTMCompatibility
 
     ; palette
@@ -4502,7 +4502,7 @@ KangaskhanBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw KangaskhanTMCompatibility
 
     ; palette
@@ -4541,7 +4541,7 @@ HorseaBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw HorseaTMCompatibility
 
     ; palette
@@ -4580,7 +4580,7 @@ SeadraBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw SeadraTMCompatibility
 
     ; palette
@@ -4619,7 +4619,7 @@ GoldeenBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GoldeenTMCompatibility
 
     ; palette
@@ -4658,7 +4658,7 @@ SeakingBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw SeakingTMCompatibility
 
     ; palette
@@ -4697,7 +4697,7 @@ StaryuBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw StaryuTMCompatibility
 
     ; palette
@@ -4736,7 +4736,7 @@ StarmieBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw StarmieTMCompatibility
 
     ; palette
@@ -4775,7 +4775,7 @@ MrMimeBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MrMimeTMCompatibility
 
     ; palette
@@ -4814,7 +4814,7 @@ ScytherBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ScytherTMCompatibility
 
     ; palette
@@ -4853,7 +4853,7 @@ JynxBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw JynxTMCompatibility
 
     ; palette
@@ -4892,7 +4892,7 @@ ElectabuzzBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ElectabuzzTMCompatibility
 
     ; palette
@@ -4931,7 +4931,7 @@ MagmarBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MagmarTMCompatibility
 
     ; palette
@@ -4970,7 +4970,7 @@ PinsirBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PinsirTMCompatibility
 
     ; palette
@@ -5009,7 +5009,7 @@ TaurosBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw TaurosTMCompatibility
 
     ; palette
@@ -5048,7 +5048,7 @@ MagikarpBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MagikarpTMCompatibility
 
     ; palette
@@ -5087,7 +5087,7 @@ GyaradosBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw GyaradosTMCompatibility
 
     ; palette
@@ -5126,7 +5126,7 @@ LaprasBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw LaprasTMCompatibility
 
     ; palette
@@ -5165,7 +5165,7 @@ DittoBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw DittoTMCompatibility
 
     ; palette
@@ -5204,7 +5204,7 @@ EeveeBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw EeveeTMCompatibility
 
     ; palette
@@ -5243,7 +5243,7 @@ VaporeonBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw VaporeonTMCompatibility
 
     ; palette
@@ -5282,7 +5282,7 @@ JolteonBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw JolteonTMCompatibility
 
     ; palette
@@ -5321,7 +5321,7 @@ FlareonBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw FlareonTMCompatibility
 
     ; palette
@@ -5360,7 +5360,7 @@ PorygonBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw PorygonTMCompatibility
 
     ; palette
@@ -5399,7 +5399,7 @@ OmanyteBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw OmanyteTMCompatibility
 
     ; palette
@@ -5438,7 +5438,7 @@ OmastarBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw OmastarTMCompatibility
 
     ; palette
@@ -5477,7 +5477,7 @@ KabutoBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw KabutoTMCompatibility
 
     ; palette
@@ -5516,7 +5516,7 @@ KabutopsBaseStats:
 
     db 0 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw KabutopsTMCompatibility
 
     ; palette
@@ -5555,7 +5555,7 @@ AerodactylBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw AerodactylTMCompatibility
 
     ; palette
@@ -5594,7 +5594,7 @@ SnorlaxBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw SnorlaxTMCompatibility
 
     ; palette
@@ -5633,7 +5633,7 @@ ArticunoBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ArticunoTMCompatibility
 
     ; palette
@@ -5672,7 +5672,7 @@ ZapdosBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ZapdosTMCompatibility
 
     ; palette
@@ -5711,7 +5711,7 @@ MoltresBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MoltresTMCompatibility
 
     ; palette
@@ -5750,7 +5750,7 @@ DratiniBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw DratiniTMCompatibility
 
     ; palette
@@ -5789,7 +5789,7 @@ DragonairBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw DragonairTMCompatibility
 
     ; palette
@@ -5828,7 +5828,7 @@ DragoniteBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw DragoniteTMCompatibility
 
     ; palette
@@ -5867,7 +5867,7 @@ MewtwoBaseStats:
 
     db 5 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MewtwoTMCompatibility
 
     ; palette
@@ -5906,7 +5906,7 @@ MewBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw MewTMCompatibility
 
     ; palette
@@ -5945,7 +5945,7 @@ LitwickBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw LitwickTMCompatibility
 
     ; palette
@@ -5984,7 +5984,7 @@ LampentBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw LampentTMCompatibility
 
     ; palette
@@ -6023,7 +6023,7 @@ ChandelureBaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw ChandelureTMCompatibility
 
     ; palette
@@ -6062,14 +6062,14 @@ Mon155BaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw Mon155TMCompatibility
 
     ; palette
     dw PAL_MON_155
 
     ; field moves
-    db 
+    db
 
     ds 2
 
@@ -6101,14 +6101,14 @@ Mon156BaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw Mon156TMCompatibility
 
     ; palette
     dw PAL_MON_156
 
     ; field moves
-    db 
+    db
 
     ds 2
 
@@ -6140,14 +6140,14 @@ Mon157BaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw Mon157TMCompatibility
 
     ; palette
     dw PAL_MON_157
 
     ; field moves
-    db 
+    db
 
     ds 2
 
@@ -6179,14 +6179,14 @@ Mon158BaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw Mon158TMCompatibility
 
     ; palette
     dw PAL_MON_158
 
     ; field moves
-    db 
+    db
 
     ds 2
 
@@ -6218,14 +6218,14 @@ Mon159BaseStats:
 
     db 3 ; growth rate
 
-    ; learnset
+    ; tm compatibility
     dw Mon159TMCompatibility
 
     ; palette
     dw PAL_MON_159
 
     ; field moves
-    db 
+    db
 
     ds 2
 

@@ -434,10 +434,10 @@ W_ENEMYMONNUMBER: ; cfe8
 W_ENEMYMONSTATUS: ; cfe9
 ; active opponent's status condition
     ds 1
-W_ENEMYMONTYPES: ; cfea
-W_ENEMYMONTYPE1: ; cfea
+W_ENEMYMONTYPES: ; cfea ; @TODO:4TYPE
+W_ENEMYMONTYPE1: ; cfea ; @TODO:4TYPE
     ds 1
-W_ENEMYMONTYPE2: ; cfeb
+W_ENEMYMONTYPE2: ; cfeb ; @TODO:4TYPE
     ds 1
     ds 1
 W_ENEMYMONMOVES: ; cfed
@@ -482,10 +482,10 @@ W_PLAYERMONCURHP: ; d015
 W_PLAYERMONSTATUS: ; d018
 ; the status of the player’s current monster
     ds 1
-W_PLAYERMONTYPES: ; d019
-W_PLAYERMONTYPE1: ; d019
+W_PLAYERMONTYPES: ; d019 ; @TODO:4TYPE
+W_PLAYERMONTYPE1: ; d019 ; @TODO:4TYPE
     ds 1
-W_PLAYERMONTYPE2: ; d01a
+W_PLAYERMONTYPE2: ; d01a ; @TODO:4TYPE
     ds 1
     ds 1
 W_PLAYERMONMOVES: ; d01c
@@ -809,16 +809,16 @@ W_MONHBASESPEED: ; d0bc
 W_MONHBASESPECIAL: ; d0bd
     ds 1
 
-W_MONHTYPES: ; d0be
-W_MONHTYPE1: ; d0be
+W_MONHTYPES: ; d0be ; @TODO:4TYPE
+W_MONHTYPE1: ; d0be ; @TODO:4TYPE
     ds 1
-W_MONHTYPE2: ; d0bf
+W_MONHTYPE2: ; d0bf ; @TODO:4TYPE
+    ds 1
+W_MONHTYPE3: ; d0c0
+    ds 1
+W_MONHTYPE4: ; d0c1
     ds 1
 
-W_MONHCATCHRATE: ; d0c0
-    ds 1
-W_MONHBASEXP: ; d0c1
-    ds 1
 W_MONHSPRITEDIM: ; d0c2
     ds 1
 W_MONHFRONTSPRITE: ; d0c3
@@ -826,16 +826,16 @@ W_MONHFRONTSPRITE: ; d0c3
 W_MONHBACKSPRITE: ; d0c5
     ds 2
 
-W_MON_NEXT_ALTFORM: ; d0c7
+W_MONHNEXTALTFORM: ; d0c7
     ds 2
 
-W_MON_LEARNSET_POINTER: ; d0c9
+W_MONHLEARNSETPOINTER: ; d0c9
     ds 2
 
 W_MONHGROWTHRATE: ; d0cb
     ds 1
 
-W_MONHLEARNSET_POINTER: ; d0cc
+W_MONHTMCOMPATIBILITY: ; d0cc
     ds 2
 
 W_MONH_PALETTE_ID: ; d0ce
@@ -844,7 +844,10 @@ W_MONH_PALETTE_ID: ; d0ce
 W_MONH_FIELDMOVES: ; d0d0
     ds 1
 
-    ds 2
+W_MONHCATCHRATE: ; d0d1
+    ds 1
+W_MONHBASEXP: ; d0d2
+    ds 1
 
     ds 2
 
