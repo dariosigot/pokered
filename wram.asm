@@ -293,10 +293,12 @@ UNION
 
 wBackupEnemyMoves:
     ds 4
-wBackupEnemyPP:
-    ds 4
-
+wBackupEnemyEnergy:
     ds 1
+wBackupEnemyAltForm:
+    ds 1
+
+    ds 3
 
 ENDU
 
@@ -434,11 +436,14 @@ W_ENEMYMONNUMBER: ; cfe8
 W_ENEMYMONSTATUS: ; cfe9
 ; active opponent's status condition
     ds 1
-W_ENEMYMONTYPES: ; cfea ; @TODO:4TYPE
-W_ENEMYMONTYPE1: ; cfea ; @TODO:4TYPE
+;W_ENEMYMONTYPES: ; cfea ; @TODO:4TYPE
+;W_ENEMYMONTYPE1: ; cfea ; @TODO:4TYPE
+W_ENEMYMONENERGY: ; cfea
     ds 1
-W_ENEMYMONTYPE2: ; cfeb ; @TODO:4TYPE
+;W_ENEMYMONTYPE2: ; cfeb ; @TODO:4TYPE
+W_ENEMYMONALTFORM: ; cfeb
     ds 1
+W_ENEMYMONCATCHRATE: ; cfec
     ds 1
 W_ENEMYMONMOVES: ; cfed
     ds 4
@@ -458,15 +463,20 @@ W_ENEMYMONSPEED: ; cffa
     ds 2
 W_ENEMYMONSPECIAL: ; cffc
     ds 2
-
-W_ENEMYMONPP: ; cffe
-; four moves (extends past $cfff)
-    ds 2
-
+;W_ENEMYMONPP: ; cffe
+; four types (extends past $cfff)
+W_ENEMYMONTYPES: ; cffe
+W_ENEMYMONTYPE1: ; cffe
+    ds 1
+W_ENEMYMONTYPE2: ; cfff
+    ds 1
 
 SECTION "WRAM Bank 1", WRAMX, BANK[1]
 
-    ds 2 ; W_ENEMYMONPP
+W_ENEMYMONTYPE3: ; d000
+    ds 1
+W_ENEMYMONTYPE4: ; d001
+    ds 1
 
     ds 7
 
@@ -482,11 +492,14 @@ W_PLAYERMONCURHP: ; d015
 W_PLAYERMONSTATUS: ; d018
 ; the status of the player’s current monster
     ds 1
-W_PLAYERMONTYPES: ; d019 ; @TODO:4TYPE
-W_PLAYERMONTYPE1: ; d019 ; @TODO:4TYPE
+;W_PLAYERMONTYPES: ; d019 ; @TODO:4TYPE
+;W_PLAYERMONTYPE1: ; d019 ; @TODO:4TYPE
+W_PLAYERMONENERGY: ; d019
     ds 1
-W_PLAYERMONTYPE2: ; d01a ; @TODO:4TYPE
+;W_PLAYERMONTYPE2: ; d01a ; @TODO:4TYPE
+W_PLAYERMONALTFORM: ; d01a
     ds 1
+W_PLAYERMONCATCHRATE: ; d01b
     ds 1
 W_PLAYERMONMOVES: ; d01c
     ds 4
@@ -505,9 +518,16 @@ W_PLAYERMONSPEED: ; d029
     ds 2
 W_PLAYERMONSPECIAL: ; d02b
     ds 2
-W_PLAYERMONPP: ; d02d
-    ds 4
-
+;W_PLAYERMONPP: ; d02d
+W_PLAYERMONTYPES: ; d02d
+W_PLAYERMONTYPE1: ; d02d
+    ds 1
+W_PLAYERMONTYPE2: ; d02e
+    ds 1
+W_PLAYERMONTYPE3: ; d02f
+    ds 1
+W_PLAYERMONTYPE4: ; d030
+    ds 1
 
 
 W_TRAINERCLASS: ; d031
