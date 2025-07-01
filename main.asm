@@ -31607,8 +31607,8 @@ TestMonMoveCompatibility_HandleAlternative:
 ConversionEffect_:
     ld hl,PlayCurrentMoveAnimation
     call Bankswitch4toF
-    ld hl,W_ENEMYMONTYPE1 ; @TODO:4TYPE
-    ld de,W_PLAYERMONTYPE1 ; @TODO:4TYPE
+    ld hl,W_ENEMYMONTYPES
+    ld de,W_PLAYERMONTYPES
     ld a,[H_WHOSETURN]
     and a
     ld a,[W_ENEMYBATTSTATUS1]
@@ -31621,6 +31621,12 @@ ConversionEffect_:
 .done
     bit 6,a ; invulnerable
     jr nz,.attackMissed
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hli]
+    ld [de],a
+    inc de
     ld a,[hli]
     ld [de],a
     inc de
@@ -47263,12 +47269,12 @@ DiglettPicBack: ; 2ae10 (a:6e10)
 
 LeechSeedEffect_:
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
-    ld de,W_ENEMYMONTYPE1 ; $cfea (aliases: W_ENEMYMONTYPES) ; @TODO:4TYPE
+    ld de,W_ENEMYMONTYPES
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.done
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
-    ld de,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES) ; @TODO:4TYPE
+    ld de,W_PLAYERMONTYPES
 .done
     push hl
     push de
@@ -47278,6 +47284,14 @@ LeechSeedEffect_:
     pop de
     pop hl
     jr nz,.moveMissed
+    ld a,[de]
+    cp GRASS
+    jr z,.doesntAffect
+    inc de
+    ld a,[de]
+    cp GRASS
+    jr z,.doesntAffect
+    inc de
     ld a,[de]
     cp GRASS
     jr z,.doesntAffect
@@ -59066,14 +59080,21 @@ LoadEnemyMonData:
     ld a,[hl]
     ld [W_ENEMYMONSTATUS],a ; $cfe9
 .copyTypes
-    ld hl,W_MONHTYPES ; @TODO:4TYPE
-    ld de,W_ENEMYMONTYPES ; $cfea ; @TODO:4TYPE
+    ld hl,W_MONHTYPES
+    ld de,W_ENEMYMONTYPES
     ld a,[hli]            ; copy type 1
     ld [de],a
     inc de
     ld a,[hli]            ; copy type 2
     ld [de],a
     inc de
+    ld a,[hli]            ; copy type 3
+    ld [de],a
+    inc de
+    ld a,[hl]             ; copy type 4
+    ld [de],a
+    ld hl,W_MONHCATCHRATE
+    ld de,W_ENEMYMONCATCHRATE
     ld a,[hli]            ; copy catch rate
     ld [de],a
     inc de
