@@ -24743,8 +24743,8 @@ BackupChangedBlocks:
     ld [hl],a ; ID
     ld hl,wChangedBlocksNum
     inc [hl]
-    ld a,1
-    or a ; reset all flag
+    ld a,1 ; reset all flag
+    or a   ; ...
 .done
     ld a,[$d09f]
     pop hl
@@ -58003,25 +58003,18 @@ GetTypeEffects:
     ld hl,wBufferTypeEffects
     ret
 
-CheckPoisonableMon: ; @TODO:4TYPE
+CheckPoisonableMon:
+    ld b,4
+.loop
     ld a,[hli]
     cp POISON ; can't poison a poison-type target
     ret z
     cp METAL ; can't poison a metal-type target
     ret z
-    ld a,[hld]
-    cp POISON ; can't poison a poison-type target
-    ret z
-    cp METAL ; can't poison a metal-type target
-    ret z
-    push hl
-    push bc
-    ld bc,W_PLAYERMONID-W_PLAYERMONTYPES ; @TODO:4TYPE
-    add hl,bc
-    ld a,[hl]
-    cp KAKUNA ; @TODO:4TYPE
-    pop bc
-    pop hl
+    dec b
+    jr nz,.loop
+    ld a,1 ; reset all flag
+    or a   ; ...
     ret
 
 BackupMovesBeforeEnemyMimic:
@@ -60114,11 +60107,15 @@ PoisonEffect:
 .skipMoveHitTest
     call CheckTargetSubstitute
     jr nz,.didntAffect ; can't poison a substitute target
-    ld a,[hli] ; hl now point to type
+    ld a,[hl]
     ld b,a
     and a
     jr nz,.alreadyStatused ; miss if target is already statused
+    push hl
+    ld bc,W_PLAYERMONTYPES-W_PLAYERMONSTATUS
+    add hl,bc
     call CheckPoisonableMon
+    pop hl
     jr z,.doesntAffect
     ld a,[de]
     cp POISON_SIDE_EFFECT1
@@ -60132,7 +60129,6 @@ PoisonEffect:
     cp b
     ret nc
 .inflictPoison
-    dec hl
     set 3,[hl] ; mon is now poisoned
     push de
     dec de
@@ -138223,6 +138219,8 @@ CheckSTAB:
     inc hl
     dec b
     jr nz,.loop
+    ld a,1 ; reset all flag
+    or a   ; ...
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
