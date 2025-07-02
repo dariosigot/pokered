@@ -29600,7 +29600,7 @@ StartMenu_TrainerInfo:
     inc de
 .next1
     ld hl,$d7e0 ; AirPower
-    bit 6,[hl]  ; 
+    bit 6,[hl]  ; ...
     jr z,.next2
     ld a,$D9
     ld [de],a
@@ -33482,7 +33482,7 @@ PalletTownScript: ; 18e5b (6:4e5b)
     jr z,.next
     ld hl,$D747
     set 6,[hl]
-.next    
+.next
     ld hl,$d126
     set 6,[hl] ; Set Temp Script Flag to potentially Lock Cinnabar from Pallet
     call EnableAutoTextBoxDrawing
@@ -47141,7 +47141,7 @@ FocusEnergyEffect_: ; 27f86 (9:7f86)
     db "@"
 
 TypeNamePointers:
-    dw TypeNAName ; 
+    dw TypeNAName ;
     dw Type01Name ; $01 : Fight
     dw Type02Name ; $02 : Wind
     dw Type03Name ; $03 : Poison
@@ -57879,13 +57879,17 @@ HowManyMovesWithEnoughEnergy:
     ret
 
 ; function to adjust the base damage of an attack to account for type effectiveness
-AdjustDamageForMoveType: ; @TODO:4TYPE
+AdjustDamageForMoveType:
     PREDEF AdjustDamageForMoveType_GetInput
     ld a,[$d11e] ; move type
-    cp b ; does the move type match type 1 of the attacker? ; @TODO:4TYPE
+    ld hl,wTmpAttackerTypes
+    ld b,4
+.LoopAttackerTypes
+    cp [hl] ; does the move type match type of the attacker?
     jr z,.sameTypeAttackBonus
-    cp c ; does the move type match type 2 of the attacker? ; @TODO:4TYPE
-    jr z,.sameTypeAttackBonus
+    inc hl
+    dec b
+    jr nz,.LoopAttackerTypes
     jr .skipSameTypeAttackBonus
 .sameTypeAttackBonus
 ; if the move type matches one of the attacker's types
@@ -57916,10 +57920,16 @@ AdjustDamageForMoveType: ; @TODO:4TYPE
     cp b ; does move type match "attacking type"?
     jr nz,.nextTypePair
     ld a,[hl] ; a = "defending type" of the current type pair
-    cp d ; does type 1 of defender match "defending type"? ; @TODO:4TYPE
+    push hl
+    ld hl,wTmpDefenderTypes
+    ld d,4
+.LoopDefenderTypes
+    cp [hl] ; does type of defender match "defending type"?
     jr z,.matchingPairFound
-    cp e ; does type 2 of defender match "defending type"? ; @TODO:4TYPE
-    jr z,.matchingPairFound
+    inc hl
+    dec d
+    jr nz,.LoopDefenderTypes
+    pop hl
     jr .nextTypePair
 .matchingPairFound
 ; if the move type matches the "attacking type" and one of the defender's types matches the "defending type"
@@ -57953,8 +57963,6 @@ AdjustDamageForMoveType: ; @TODO:4TYPE
     ld [hl],a
     or b ; is damage 0?
     jr nz,.skipTypeImmunity
-;    inc a               ; if damage is 0,make the move miss
-;    ld [W_MOVEMISSED],a ; ...
     ld [wCriticalHitOrOHKO],a ; if damage is 0,delete crit hit flag
 .skipTypeImmunity
     pop bc
@@ -138201,15 +138209,20 @@ CheckSTAB:
     ld b,a
     ld a,[W_PLAYERMOVENUM]
     ld c,a
-    ld hl,W_MONHTYPES ; @TODO:4TYPE
+    ld hl,W_MONHTYPES
     PREDEF GetAttackerType_
     pop hl    ; Restore
     pop af    ; ...
     ld [hl],a ; ...
     ld a,[W_PLAYERMOVETYPE]
-    cp b
+    ld hl,wTmpAttackerTypes
+    ld b,4
+.loop
+    cp [hl] ; does the move type match type of the attacker?
     ret z
-    cp c
+    inc hl
+    dec b
+    jr nz,.loop
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -141365,19 +141378,16 @@ AdjustDamageForMoveType_GetInput:
     ld hl,W_ENEMYMONTYPES ; @TODO:4TYPE
     call GetAttackerType ; b = type 1 | c = type 2
     ld a,[W_PLAYERMONID]
-    ld d,a
+    ld b,a
     ld hl,W_PLAYERMONTYPES ; @TODO:4TYPE
     jp GetDefenderType
 
 ; Input
 ; [$d11e] = Attacker Move Type
 ; [hl/hl+1] = Defender Mon Type
-; b = type 1 of attacker
-; c = type 2 of attacker
-; d = Defender Mon ID
+; b = Defender Mon ID
 ; Output
-; d = type 1 of defender
-; e = type 2 of defender
+; [wTmpDefenderTypes] = types of defender
 GetDefenderType:
     ld a,[$d11e]
     cp GROUND
@@ -141385,35 +141395,36 @@ GetDefenderType:
     ; fall through
 
 .Standard
-    ld a,[hli]
-    ld d,a    ; d = type 1 of defender
-    ld e,[hl] ; e = type 2 of defender
+    ld de,wTmpDefenderTypes
+    ld bc,4
+    jp CopyData
+
+.Custom
+    ld hl,wTmpDefenderTypes
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
     ret
 
 .TryToLevitate
-    ld a,d ; Defender Mon ID
+    ld a,b ; Defender Mon ID
     push hl
     ld hl,.LevitateMonList
     call .IsInArray
     pop hl
     jr nc,.Standard
     ld a,WIND
-    ld d,a
-    ld e,a
-    ret
+    jr .Custom
 
 .IsInArray
     push bc
-    push de
     ld de,1
     call IsInArray
-    pop de
     pop bc
     ret
-    
+
 .LevitateMonList
-    db BEEDRILL
-    db VENOMOTH
     db KOFFING
     db WEEZING
     db $FF
@@ -141424,11 +141435,8 @@ GetDefenderType:
 ; b = Attacker Mon ID
 ; c = Attacker Move ID
 ; Output
-; b = type 1 of attacker
-; c = type 2 of attacker
-; Note = DRAGON Type & Beedrill gain WIND STAB
-;        "Birds", Rapidash & Seaking gain IVORY STAB
-;        Kakuna gain POISON STAB
+; [wTmpAttackerTypes] = types of attacker
+; Note = "Birds", Rapidash & Seaking gain IVORY STAB
 ;        Sandshrew/Sansdlash gain STAB with "Slash moves"
 GetAttackerType_:
     call Load16BitRegisters
@@ -141436,10 +141444,6 @@ GetAttackerType:
     ld a,[$d11e]
     cp IVORY
     jr z,.TryToForceIvory
-    cp WIND
-    jr z,.TryToForceWind
-    cp POISON
-    jr z,.TryToForcePoison
     ld a,c ; Move ID
     push hl
     ld hl,.SlashMoveTable
@@ -141449,9 +141453,16 @@ GetAttackerType:
     ; fall through
 
 .Standard
-    ld a,[hli]
-    ld b,a
-    ld c,[hl]
+    ld de,wTmpAttackerTypes
+    ld bc,4
+    jp CopyData
+
+.Custom
+    ld hl,wTmpAttackerTypes
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
     ret
 
 .TryToForceIvory
@@ -141462,25 +141473,7 @@ GetAttackerType:
     pop hl
     jr nc,.Standard
     ld a,IVORY
-    ld b,a
-    ld c,a
-    ret
-
-.TryToForceWind
-    ld a,[hli]
-    cp DRAGON
-    jr z,.ForceWind
-    ld a,[hl]
-    cp DRAGON
-    jr z,.ForceWind
-    ld a,b ; Mon ID
-    cp BEEDRILL
-    jr nz,.Standard
-.ForceWind
-    ld a,WIND
-    ld b,a
-    ld c,a
-    ret
+    jp .Custom
 
 .TryToForceSlash
     ld a,b ; Mon ID
@@ -141490,25 +141483,12 @@ GetAttackerType:
     pop hl
     jr nc,.Standard
     ld a,NORMAL
-    ld b,a
-    ld c,a
-    ret
-
-.TryToForcePoison
-    ld a,b ; Mon ID
-    cp KAKUNA
-    jr nz,.Standard
-    ld a,POISON
-    ld b,a
-    ld c,a
-    ret
+    jp .Custom
 
 .IsInArray
     push bc
-    push de
     ld de,1
     call IsInArray
-    pop de
     pop bc
     ret
 
