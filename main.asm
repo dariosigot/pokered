@@ -51307,22 +51307,33 @@ LearnZeroDamageMove:
     ld a,d
     dec a
     jr z,.One
-    ld a,[W_MONHTYPE1] ; @TODO:4TYPE
-    cp e
-    jr nz,.Stab1Done
-    inc b ; ▼ stab
-    jr .StabDone
-.Stab1Done
-    ld a,[W_MONHTYPE2] ; @TODO:4TYPE
-    cp e
-    jr nz,.StabDone
-    inc b ; ▼ stab
-.StabDone
+    call LearnStabMove
     ret
 .Zero
     jp EncourageForgot3 ; ▲ zero damage
 .One
     dec b ; ▲ special (1 damage)
+    ret
+
+LearnStabMove:
+    push hl
+    ld hl,W_MONHTYPES
+    ld a,[hli]
+    cp e
+    jr z,.StabFound
+    ld a,[hli]
+    cp e
+    jr z,.StabFound
+    ld a,[hli]
+    cp e
+    jr z,.StabFound
+    ld a,[hl]
+    cp e
+    jr nz,.StabDone
+.StabFound
+    inc b ; ▼ stab
+.StabDone
+    pop hl
     ret
 
 LearnDamageMove:
@@ -51350,17 +51361,7 @@ LearnDamageMove:
     jr c,.DifferentType ; c = damage old > damage new
     call EncourageForgot3 ; ▲ same type and new damage >= old damage
 .DifferentType
-    ld a,[W_MONHTYPE1] ; @TODO:4TYPE
-    cp e
-    jr nz,.Stab1Done
-    inc b ; ▼ stab
-    jr .StabDone
-.Stab1Done
-    ld a,[W_MONHTYPE2] ; @TODO:4TYPE
-    cp e
-    jr nz,.StabDone
-    inc b ; ▼ stab
-.StabDone
+    call LearnStabMove
     ld a,[wNewMoveDamage]
     cp d
     jr nc,.NewLessDamageThanOld ; c = damage old > damage new
