@@ -56292,7 +56292,7 @@ GetSideEffectType_Common:
     ret z
     cp ICE
     ret z
-    ld a,TYPE_NA
+    ld a,$FF
     ret
 
 SaveScreenAndLoadBattlePokedex:
@@ -57932,6 +57932,7 @@ AdjustDamageForMoveType:
     pop hl
     jr .nextTypePair
 .matchingPairFound
+    pop hl
 ; if the move type matches the "attacking type" and one of the defender's types matches the "defending type"
     push hl
     push bc
@@ -60227,13 +60228,14 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     jp nz,CheckDefrost
     ;opponent has no existing status
     call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
-    ld b,a
-    ld a,[W_ENEMYMONTYPE1] ; @TODO:4TYPE
-    cp b
-    ret z  ;return if they match [can't freeze an ice type etc.]
-    ld a,[W_ENEMYMONTYPE2] ; @TODO:4TYPE
-    cp b
-    ret z  ;return..
+    ld hl,W_ENEMYMONTYPES
+    ld b,4
+.LoopEnemyMoves
+    cp [hl]
+    ret z ; return if they match [can't freeze an ice type etc.]
+    inc hl
+    dec b
+    jr nz,.LoopEnemyMoves
     ld a,[W_PLAYERMOVEEFFECT]
     cp a,7         ;10% status effects are 04,05,06 so 07 will set carry for those
     ld b,$1a       ;[1A-1]/100 or [26-1]/256 = 9.8%~ chance
@@ -60279,13 +60281,14 @@ opponentAttacker: ; 3f382 (f:7382)
     and a
     jp nz,CheckDefrost
     call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
-    ld b,a
-    ld a,[W_PLAYERMONTYPE1] ; @TODO:4TYPE
-    cp b
-    ret z
-    ld a,[W_PLAYERMONTYPE2] ; @TODO:4TYPE
-    cp b
-    ret z
+    ld hl,W_PLAYERMONTYPES
+    ld b,4
+.LoopPlayerMoves
+    cp [hl]
+    ret z ; return if they match [can't freeze an ice type etc.]
+    inc hl
+    dec b
+    jr nz,.LoopPlayerMoves
     ld a,[W_ENEMYMOVEEFFECT]
     cp a,7
     ld b,$1a
