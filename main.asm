@@ -61984,55 +61984,37 @@ AIGetTypeEffectiveness:
     bit 3,a
     jr z,.EnemyMove
     ld a,[W_PLAYERMOVETYPE]
-    ld d,a                       ; d = type of player move
-    ld hl,W_ENEMYMONTYPES ; @TODO:4TYPE
+    ld de,W_ENEMYMONTYPES        ; [de] = types of enemy's pokemon
     jr .common
 .EnemyMove
     ld a,[W_ENEMYMOVETYPE]
-    ld d,a                       ; d = type of enemy move
-    ld hl,W_PLAYERMONTYPES ; @TODO:4TYPE
+    ld de,W_PLAYERMONTYPES       ; [de] = types of player's pokemon
 .common
-    ld b,[hl]                    ; b = type 1 of player's pokemon
-    inc hl
-    ld c,[hl]                    ; c = type 2 of player's pokemon
-    ld a,d
+    ld b,a                       ; b = type of attacker move
     ld [$d11e],a
     call GetTypeEffects
     ld a,$0A
     ld [$d11e],a                 ; initialize [$D11E] to neutral effectiveness
+; ──────────────────────────────────────────────────
 .loop
-    ld a,[hli]
+    ld a,[hli]                   ; Read Attacker Type from "TypeEffects"
     cp a,$ff
     ret z
-    cp d                         ; match the type of the move
+    cp b                         ; match the type of the attacker move
     jr nz,.nextTypePair1
-    ld a,[hli]
-    cp b                         ; match with type 1 of pokemon
+    ld a,[hli]                   ; Read Defender Type from "TypeEffects"
+    push hl
+    ld h,d
+    ld l,e
+    ld c,4
+.LoopMonTypes
+    cp [hl]                      ; match with types of defender pokemon
     jr z,.AImatchingPairFound
-    cp c                         ; or match with type 2 of pokemon
-    jr z,.AImatchingPairFound
+    inc hl
+    dec c
+    jr nz,.LoopMonTypes
+    pop hl
     jr .nextTypePair2
-; ──────────────────────────────────────────────────
-;.AImatchingPairFound
-;    ld a,[hl]                    ; get damage multiplier
-;    cp $05                       ; is it halved?
-;    jr nz,.AInothalf             ; jump down of not half
-;    ld a,[$d11e]                 ; else get the effectiveness multiplier
-;    srl a                        ; halve the multiplier
-;    ld [$d11e],a                 ; store damage multiplier
-;    jr .nextTypePair2            ; get next pair in list
-;.AInothalf
-;    cp $14                       ; is it double?
-;    jr nz,.AImustbezero          ; if not double either,it must be zero so skip ahead
-;    ld a,[$d11e]                 ; else get the effectiveness multiplier
-;    sla a                        ; double the multiplier
-;    ld [$d11e],a                 ; store damage multiplier
-;    jr .nextTypePair2            ; get next pair in list
-;.AImustbezero
-;    xor a                        ; clear a to 00
-;    ld [$d11e],a                 ; store damage multiplier
-;    ret
-; ──────────────────────────────────────────────────
 .nextTypePair1
     inc hl
 .nextTypePair2
@@ -62040,9 +62022,10 @@ AIGetTypeEffectiveness:
     jr .loop
 ; ──────────────────────────────────────────────────
 .AImatchingPairFound
+    pop hl
     push hl
     push bc
-    ld a,[hl] ; a = damage multiplier
+    ld a,[hl]                    ; a = damage multiplier from "TypeEffects"
     ld [H_MULTIPLIER],a
     xor a
     ld [H_MULTIPLICAND],a
@@ -62059,6 +62042,7 @@ AIGetTypeEffectiveness:
     pop bc
     pop hl
     jr .nextTypePair2
+; ──────────────────────────────────────────────────
 
 PlayBattleMusicAndDoBattleTransitionAndInitBatVar:
    ld hl,PlayBattleMusic
@@ -139507,14 +139491,11 @@ RemovePlayerBattleStatsFrameDisableBGTransfer:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-InsertRealTypes_: ; @TODO:4TYPE
+InsertRealTypes_:
     call Load16BitRegisters
     ld h,d
     ld l,e
-    ; hl points to mon types??? se si eliminare due righe seguenti!!!! ~TODO
-    ;ld de,W_PLAYERMONTYPES-W_PLAYERMONPP ; @TODO:4TYPE
-    ;add hl,de
-    ld de,W_MONHTYPES ; @TODO:4TYPE
+    ld de,W_MONHTYPES
     ld a,[de]
     ld [hli],a
     inc de
