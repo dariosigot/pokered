@@ -140840,13 +140840,19 @@ _CheckCounterFail:
     ; Check Target Ghost
     ld h,d
     ld l,e ; hl = Pointer to Mon ID
-    ld de,W_PLAYERMONTYPES-W_PLAYERMONID ; @TODO:4TYPE
-    add hl,de ; hl = Pointer to Type
+    ld de,W_PLAYERMONTYPES-W_PLAYERMONID
+    add hl,de ; hl = Pointer to Types
     ld a,[hli]
-    cp GHOST ; @TODO:4TYPE
+    cp GHOST
+    ret z
+    ld a,[hli]
+    cp GHOST
+    ret z
+    ld a,[hli]
+    cp GHOST
     ret z
     ld a,[hl]
-    cp GHOST ; @TODO:4TYPE
+    cp GHOST
     ret z
     ; Check Previous Damage
     ld hl,W_DAMAGE
@@ -141343,11 +141349,11 @@ AdjustDamageForMoveType_GetInput:
     ld b,a
     ld a,[W_PLAYERMOVENUM]
     ld c,a
-    ld hl,W_PLAYERMONTYPES ; @TODO:4TYPE
-    call GetAttackerType ; b = type 1 | c = type 2
+    ld hl,W_PLAYERMONTYPES
+    call GetAttackerType
     ld a,[W_ENEMYMON_START]
     ld d,a
-    ld hl,W_ENEMYMONTYPES ; @TODO:4TYPE
+    ld hl,W_ENEMYMONTYPES
     jp GetDefenderType
 
 .ValuesForEnemyTurn
@@ -141357,11 +141363,11 @@ AdjustDamageForMoveType_GetInput:
     ld b,a
     ld a,[W_ENEMYMOVENUM]
     ld c,a
-    ld hl,W_ENEMYMONTYPES ; @TODO:4TYPE
-    call GetAttackerType ; b = type 1 | c = type 2
+    ld hl,W_ENEMYMONTYPES
+    call GetAttackerType
     ld a,[W_PLAYERMONID]
     ld b,a
-    ld hl,W_PLAYERMONTYPES ; @TODO:4TYPE
+    ld hl,W_PLAYERMONTYPES
     jp GetDefenderType
 
 ; Input
