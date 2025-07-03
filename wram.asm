@@ -1229,6 +1229,11 @@ NEXTU
 
 wTmpLevel:: db ; d481
 
+NEXTU
+
+wBackupTypes: ; d481
+    ds 4
+
 ENDU
 
 ; some free bytes
