@@ -414,18 +414,20 @@ AIMoveChoiceModification1:
     ;first check to make sure leech seed isn't used on a grass pokemon
     push bc
     push hl
-    ld hl,W_PLAYERMONTYPES ; @TODO:4TYPE
-    ld b,[hl]                 ; b = type 1 of player's pokemon
+    ld hl,W_PLAYERMONTYPES
+    ld a,GRASS
+    ld b,4
+.LoopSearchGrassType
+    cp [hl]
+    jr z,.GrassFound
     inc hl
-    ld c,[hl]                 ; c = type 2 of player's pokemon
-    ld a,b        ;load type 1 into a
-    cp GRASS    ;is type 1 grass?
-    jr z,.seedgrasstest    ;skip ahead if type1 is grass
-    ld a,c        ;load type 2 into a
-.seedgrasstest
+    dec b
+    jr nz,.LoopSearchGrassType
+    ld a,1 ; reset all flag
+    or a   ; ...
+.GrassFound
     pop hl
     pop bc
-    cp GRASS    ;a is either type 1 grass or it is type 2 yet to be confirmed
     jp z,.heavydiscourage    ;heavily discourage if either of the types are grass
     ;else,not to make sure it isn't already used
     ;check status,and heavily discourage if bit is set
@@ -765,11 +767,22 @@ AIMoveChoiceModification3:
     ld a,[W_ENEMYMOVEEFFECT]
     cp POISON_EFFECT
     jr nz,.notpoisoneffect
-    ld a,[W_PLAYERMONTYPES] ; @TODO:4TYPE
+    push hl
+    push bc
+    ld b,4
+    ld hl,W_PLAYERMONTYPES
+.LoopPoisonableType
+    ld a,[hli]
     cp POISON
-    jp z,.heavydiscourage2
-    ld a,[W_PLAYERMONTYPES + 1] ; @TODO:4TYPE
-    cp POISON
+    jr z,.NotPoisonable
+    cp METAL
+    jr z,.NotPoisonable
+    dec b
+    jr nz,.LoopPoisonableType
+    dec b ; b = $FF : reset z flag
+.NotPoisonable
+    pop bc
+    pop hl
     jp z,.heavydiscourage2
 .notpoisoneffect
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
