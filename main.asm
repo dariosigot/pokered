@@ -51820,15 +51820,19 @@ TransformEffect_: ; Moved Upper in the Bank
 .SkipBackupMoves
     ld a,[hl]
     ld [de],a
-    ld bc,$5
+    ld bc,$6
     add hl,bc
     inc de
     inc de
     inc de
     inc de
     inc de
-    inc bc
-    inc bc
+    inc de
+    ; Handle Alternate Form Index
+    ld a,[hli]
+    ld [de],a
+    inc de
+    dec bc
     call CopyData
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -51891,11 +51895,10 @@ TransformEffect_: ; Moved Upper in the Bank
     call CopyData
     pop hl
 
-    ; Handle Alternate Form Index
-    inc hl ; move to move2pp
-    inc de ; ...
-    ld a,[hl]
-    ld [de],a
+    ; Copy Types
+    ld bc,4
+    call CopyData
+
     pop hl
     ld a,[hl]
     ld [$d11e],a
