@@ -436,11 +436,8 @@ W_ENEMYMONNUMBER: ; cfe8
 W_ENEMYMONSTATUS: ; cfe9
 ; active opponent's status condition
     ds 1
-;W_ENEMYMONTYPES: ; cfea ; @TODO:4TYPE
-;W_ENEMYMONTYPE1: ; cfea ; @TODO:4TYPE
 W_ENEMYMONENERGY: ; cfea
     ds 1
-;W_ENEMYMONTYPE2: ; cfeb ; @TODO:4TYPE
 W_ENEMYMONALTFORM: ; cfeb
     ds 1
 W_ENEMYMONCATCHRATE: ; cfec
@@ -463,7 +460,6 @@ W_ENEMYMONSPEED: ; cffa
     ds 2
 W_ENEMYMONSPECIAL: ; cffc
     ds 2
-;W_ENEMYMONPP: ; cffe
 ; four types (extends past $cfff)
 W_ENEMYMONTYPES: ; cffe
 W_ENEMYMONTYPE1: ; cffe
@@ -492,11 +488,8 @@ W_PLAYERMONCURHP: ; d015
 W_PLAYERMONSTATUS: ; d018
 ; the status of the player’s current monster
     ds 1
-;W_PLAYERMONTYPES: ; d019 ; @TODO:4TYPE
-;W_PLAYERMONTYPE1: ; d019 ; @TODO:4TYPE
 W_PLAYERMONENERGY: ; d019
     ds 1
-;W_PLAYERMONTYPE2: ; d01a ; @TODO:4TYPE
 W_PLAYERMONALTFORM: ; d01a
     ds 1
 W_PLAYERMONCATCHRATE: ; d01b
@@ -518,7 +511,6 @@ W_PLAYERMONSPEED: ; d029
     ds 2
 W_PLAYERMONSPECIAL: ; d02b
     ds 2
-;W_PLAYERMONPP: ; d02d
 W_PLAYERMONTYPES: ; d02d
 W_PLAYERMONTYPE1: ; d02d
     ds 1
@@ -829,10 +821,10 @@ W_MONHBASESPEED: ; d0bc
 W_MONHBASESPECIAL: ; d0bd
     ds 1
 
-W_MONHTYPES: ; d0be ; @TODO:4TYPE
-W_MONHTYPE1: ; d0be ; @TODO:4TYPE
+W_MONHTYPES: ; d0be
+W_MONHTYPE1: ; d0be
     ds 1
-W_MONHTYPE2: ; d0bf ; @TODO:4TYPE
+W_MONHTYPE2: ; d0bf
     ds 1
 W_MONHTYPE3: ; d0c0
     ds 1
