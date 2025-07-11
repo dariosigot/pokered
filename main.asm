@@ -138643,7 +138643,11 @@ TestPhysicalSpecial_:
     call Load16BitRegisters
     ld a,[hl] ; carico in a l'id dell'attacco
     cp HYPER_BEAM
-    jr z,.hyperbeam
+    jr z,.SpecialSplit
+    cp STRUGGLE
+    jr z,.SpecialSplit
+    cp TRI_ATTACK
+    jr z,.SpecialSplit
     srl a
     srl a
     srl a ; divido l'id dell'attacco per 8 per individuare il byte corretto nella tabella associativa (1 bit per attacco)
@@ -138666,7 +138670,7 @@ TestPhysicalSpecial_:
 .end
     ld b,a
     ret
-.hyperbeam
+.SpecialSplit
     ld a,[bc]
     ld [$D0B5],a
     ld a,[de]
