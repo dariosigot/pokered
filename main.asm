@@ -141547,49 +141547,73 @@ GetDefenderType:
 GetAttackerType_:
     call Load16BitRegisters
 GetAttackerType:
+    push hl ; Backup Attacker Mon Types
     ld a,[$d11e]
     cp IVORY
     jr z,.TryToForceIvory
-    ld a,c ; Move ID
+    ld hl,.CustomForceMoveTable
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.done
+    ld e,a
+    ld a,[hli]
+    ld d,a
     push hl
-    ld hl,.SlashMoveTable
+    ld h,d ; hl = Pointer to Move List
+    ld l,e ; ...
+    ld a,c ; a = Move ID
     call .IsInArray
     pop hl
-    jr c,.TryToForceSlash
+    jr nc,.next1
+    ld a,[hli]
+    ld e,a
+    ld a,[hli]
+    ld d,a
+    push hl
+    ld h,d ; hl = Pointer to Mon List
+    ld l,e ; ...
+    ld a,b ; a = Mon ID
+    call .IsInArray
+    pop hl
+    jr nc,.next2
     ; fall through
-
-.Standard
-    ld de,wTmpAttackerTypes
-    ld bc,4
-    jp CopyData
-
 .Custom
+    pop hl ; Restore Attacker Mon Types
+    ld a,[$d11e]
     ld hl,wTmpAttackerTypes
     ld [hli],a
     ld [hli],a
     ld [hli],a
     ld [hl],a
     ret
+.next1
+    inc hl
+    inc hl
+.next2
+    jr .loop
+.done
+    ; fall through
+.Standard
+    pop hl ; Restore Attacker Mon Types
+    ld de,wTmpAttackerTypes
+    ld bc,4
+    jp CopyData
+
+.CustomForceMoveTable
+    dw .SlashMoveTable     , .SlashMonTable
+    dw .ExplosionMoveTable , .ExplosionMonTable
+    dw .QuickMoveTable     , .QuickMonTable
+    dw .TriAttMoveTable    , .TriAttMonTable
+    dw .EggMoveTable       , .EggMonTable
+    db $FF
 
 .TryToForceIvory
-    ld a,b ; Mon ID
-    push hl
+    ld a,b ; a = Mon ID
     ld hl,.ForceIvoryTable
     call .IsInArray
-    pop hl
     jr nc,.Standard
-    ld a,IVORY
-    jp .Custom
-
-.TryToForceSlash
-    ld a,b ; Mon ID
-    push hl
-    ld hl,.SlashMonTable
-    call .IsInArray
-    pop hl
-    jr nc,.Standard
-    ld a,NORMAL
-    jp .Custom
+    jr .Custom
 
 .IsInArray
     push bc
@@ -141612,15 +141636,47 @@ GetAttackerType:
     db MOLTRES
     db $FF
 
+.SlashMoveTable
+    db SCRATCH
+    db SLASH
+    db FURY_SWIPES
+    db $FF
 .SlashMonTable
     db SANDSHREW
     db SANDSLASH
     db $FF
 
-.SlashMoveTable
-    db SCRATCH
-    db SLASH
-    db FURY_SWIPES
+.ExplosionMoveTable
+    db SELFDESTRUCT
+    db EXPLOSION
+    db $FF
+.ExplosionMonTable
+    db VOLTORB
+    db ELECTRODE
+    db $FF
+
+.QuickMoveTable
+    db QUICK_ATTACK
+    db $FF
+.QuickMonTable
+    db SCYTHER
+    db $FF
+
+.TriAttMoveTable
+    db TRI_ATTACK
+    db $FF
+.TriAttMonTable
+    db DUGTRIO
+    db MAGNETON
+    db DODRIO
+    db $FF
+
+.EggMoveTable
+    db EGG_BOMB
+    db $FF
+.EggMonTable
+    db EXEGGCUTE
+    db EXEGGUTOR
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
