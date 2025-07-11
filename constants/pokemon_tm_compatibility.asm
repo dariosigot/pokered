@@ -251,7 +251,7 @@ NidorinaTMCompatibility:
     tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
     tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
+    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50,51                   ; |SUBSTITUTE|BLADE|
@@ -276,7 +276,7 @@ NidorinoTMCompatibility:
     tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
     tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
+    tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|

@@ -512,8 +512,9 @@ ENDM
 NIDORAN_F_Learnset: MACRO
     db  1,TACKLE
     db  1,GROWL
-    db  6,SCRATCH
-    db  8,TAIL_WHIP
+    db  5,SCRATCH
+    db  7,TAIL_WHIP
+    db  9,SAND_ATTACK
     db 11,POISON_STING
     db 13,FURY_SWIPES
     db 15,LEER
@@ -523,6 +524,7 @@ ENDM
 NIDORINA_Learnset: MACRO
     NIDORAN_F_Learnset
     db 19,BITE
+    db 20,TRAPHOLE ; Exclusive
     db 22,FOCUS_ENERGY
     db 24,DOUBLE_TEAM ; Exclusive*
     db 26,SLAM
@@ -550,12 +552,14 @@ NIDOQUEEN_Learnset: MACRO
     db 43,EARTHQUAKE
     db 48,HORN_DRILL
     db 53,ROCK_SLIDE
+    db 55,TRAPHOLE
     db 57,TOXIC
     db 60,FISSURE
     db 65,HYPER_BEAM
 ENDM
 NIDORAN_F_NoEvo_Learnset: MACRO
     db 21,DOUBLE_TEAM ; Exclusive
+    db 23,TRAPHOLE ; Exclusive
     db 26,BITE
     db 28,AGILITY ; Exclusive
     db 31,SLAM
@@ -568,8 +572,9 @@ ENDM
 NIDORAN_M_Learnset: MACRO
     db  1,TACKLE
     db  1,GROWL
-    db  6,SCRATCH
-    db  8,HORN_ATTACK
+    db  5,SCRATCH
+    db  7,HORN_ATTACK
+    db  9,SAND_ATTACK
     db 11,POISON_STING
     db 13,FURY_ATTACK
     db 15,LEER
@@ -579,6 +584,7 @@ ENDM
 NIDORINO_Learnset: MACRO
     NIDORAN_M_Learnset
     db 19,BITE
+    db 20,TRAPHOLE ; Exclusive
     db 22,FOCUS_ENERGY
     db 24,DOUBLE_TEAM ; Exclusive*
     db 26,SLAM
@@ -606,12 +612,14 @@ NIDOKING_Learnset: MACRO
     db 43,EARTHQUAKE
     db 48,HORN_DRILL
     db 53,ROCK_SLIDE
+    db 55,TRAPHOLE
     db 57,TOXIC
     db 60,FISSURE
     db 65,HYPER_BEAM
 ENDM
 NIDORAN_M_NoEvo_Learnset: MACRO
     db 21,DOUBLE_TEAM ; Exclusive
+    db 23,TRAPHOLE ; Exclusive
     db 26,BITE
     db 28,AGILITY ; Exclusive
     db 31,SLAM
