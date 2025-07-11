@@ -1,6 +1,6 @@
 ; ──────────────────────────────────────────────────────────────────────
 MissingNoExclusiveMove:
-    db 0 ; TODO
+    db 0 ; ~TODO
 ; ──────────────────────────────────────────────────────────────────────
 BulbasaurExclusiveMove:
 IvysaurExclusiveMove:
@@ -584,7 +584,7 @@ GolduckExclusiveMove:
     db BLADE ; TM51
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db GLARE
+    db FLARE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MankeyExclusiveMove:
@@ -1142,6 +1142,8 @@ MarowakExclusiveMove:
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
     db MEDITATE
+    db ROCK_THROW
+    db HARDEN
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HitmonleeExclusiveMove:

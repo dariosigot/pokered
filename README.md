@@ -124,7 +124,7 @@ MAIN EDIT
 • Can't escape from Various Aggressive/Rapid Pkmn, more Challenge!
 • Victory Road and Elite Four more Challenge!
 • NEW Encounters in Unknown Dungeon, More Hard!
-• Disable TradeMons (Voltorb/Ditto) - TODO
+• Disable TradeMons (Voltorb/Ditto) - ~TODO
 • Real Random RNG Like Prism
 • Disable Shift Battle Style
 • Disable Revive & Max Revive in Battle

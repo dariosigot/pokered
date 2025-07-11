@@ -293,10 +293,12 @@ UNION
 
 wBackupEnemyMoves:
     ds 4
-wBackupEnemyPP:
-    ds 4
-
+wBackupEnemyEnergy:
     ds 1
+wBackupEnemyAltForm:
+    ds 1
+
+    ds 3
 
 ENDU
 
@@ -434,11 +436,11 @@ W_ENEMYMONNUMBER: ; cfe8
 W_ENEMYMONSTATUS: ; cfe9
 ; active opponent's status condition
     ds 1
-W_ENEMYMONTYPES: ; cfea
-W_ENEMYMONTYPE1: ; cfea
+W_ENEMYMONENERGY: ; cfea
     ds 1
-W_ENEMYMONTYPE2: ; cfeb
+W_ENEMYMONALTFORM: ; cfeb
     ds 1
+W_ENEMYMONCATCHRATE: ; cfec
     ds 1
 W_ENEMYMONMOVES: ; cfed
     ds 4
@@ -458,15 +460,19 @@ W_ENEMYMONSPEED: ; cffa
     ds 2
 W_ENEMYMONSPECIAL: ; cffc
     ds 2
-
-W_ENEMYMONPP: ; cffe
-; four moves (extends past $cfff)
-    ds 2
-
+; four types (extends past $cfff)
+W_ENEMYMONTYPES: ; cffe
+W_ENEMYMONTYPE1: ; cffe
+    ds 1
+W_ENEMYMONTYPE2: ; cfff
+    ds 1
 
 SECTION "WRAM Bank 1", WRAMX, BANK[1]
 
-    ds 2 ; W_ENEMYMONPP
+W_ENEMYMONTYPE3: ; d000
+    ds 1
+W_ENEMYMONTYPE4: ; d001
+    ds 1
 
     ds 7
 
@@ -482,11 +488,11 @@ W_PLAYERMONCURHP: ; d015
 W_PLAYERMONSTATUS: ; d018
 ; the status of the player’s current monster
     ds 1
-W_PLAYERMONTYPES: ; d019
-W_PLAYERMONTYPE1: ; d019
+W_PLAYERMONENERGY: ; d019
     ds 1
-W_PLAYERMONTYPE2: ; d01a
+W_PLAYERMONALTFORM: ; d01a
     ds 1
+W_PLAYERMONCATCHRATE: ; d01b
     ds 1
 W_PLAYERMONMOVES: ; d01c
     ds 4
@@ -505,9 +511,15 @@ W_PLAYERMONSPEED: ; d029
     ds 2
 W_PLAYERMONSPECIAL: ; d02b
     ds 2
-W_PLAYERMONPP: ; d02d
-    ds 4
-
+W_PLAYERMONTYPES: ; d02d
+W_PLAYERMONTYPE1: ; d02d
+    ds 1
+W_PLAYERMONTYPE2: ; d02e
+    ds 1
+W_PLAYERMONTYPE3: ; d02f
+    ds 1
+W_PLAYERMONTYPE4: ; d030
+    ds 1
 
 
 W_TRAINERCLASS: ; d031
@@ -814,11 +826,11 @@ W_MONHTYPE1: ; d0be
     ds 1
 W_MONHTYPE2: ; d0bf
     ds 1
+W_MONHTYPE3: ; d0c0
+    ds 1
+W_MONHTYPE4: ; d0c1
+    ds 1
 
-W_MONHCATCHRATE: ; d0c0
-    ds 1
-W_MONHBASEXP: ; d0c1
-    ds 1
 W_MONHSPRITEDIM: ; d0c2
     ds 1
 W_MONHFRONTSPRITE: ; d0c3
@@ -826,16 +838,16 @@ W_MONHFRONTSPRITE: ; d0c3
 W_MONHBACKSPRITE: ; d0c5
     ds 2
 
-W_MON_NEXT_ALTFORM: ; d0c7
+W_MONHNEXTALTFORM: ; d0c7
     ds 2
 
-W_MON_LEARNSET_POINTER: ; d0c9
+W_MONHLEARNSETPOINTER: ; d0c9
     ds 2
 
 W_MONHGROWTHRATE: ; d0cb
     ds 1
 
-W_MONHLEARNSET_POINTER: ; d0cc
+W_MONHTMCOMPATIBILITY: ; d0cc
     ds 2
 
 W_MONH_PALETTE_ID: ; d0ce
@@ -844,7 +856,10 @@ W_MONH_PALETTE_ID: ; d0ce
 W_MONH_FIELDMOVES: ; d0d0
     ds 1
 
-    ds 2
+W_MONHCATCHRATE: ; d0d1
+    ds 1
+W_MONHBASEXP: ; d0d2
+    ds 1
 
     ds 2
 
@@ -1206,9 +1221,18 @@ NEXTU
 
 wTmpLevel:: db ; d481
 
+NEXTU
+
+wBackupTypes: ; d481
+    ds 4
+
 ENDU
 
 ; some free bytes
+
+SECTION "GymLeaderRematch",WRAMX[$d48f],BANK[1]
+
+wGymLeaderRematch:: ds 1 ; d48f
 
 SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]
 
@@ -1821,9 +1845,13 @@ wBattleValueCounter: ; def2
 NEXTU
 
 wBufferTypeEffects: ; def0
-    ds 60
+    ds 52
 wBufferTypeEffectsEnd:
     db
+wTmpAttackerTypes:
+    ds 4
+wTmpDefenderTypes:
+    ds 4
 wTmpDmgMultiplier:
     ds 2
 
