@@ -1086,7 +1086,7 @@ SandshrewBaseStats:
     db 40 ; base speed
     db 30 ; base special
 
-    db GROUND ; species type 1
+    db EARTH ; species type 1
     db 0 ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
@@ -1126,7 +1126,7 @@ SandslashBaseStats:
     db 65 ; base speed
     db 55 ; base special
 
-    db GROUND ; species type 1
+    db EARTH ; species type 1
     db 0 ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
@@ -1207,7 +1207,7 @@ NidorinaBaseStats:
     db 55 ; base special
 
     db POISON ; species type 1
-    db GROUND ; species type 2
+    db EARTH ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -1247,7 +1247,7 @@ NidoqueenBaseStats:
     db 75 ; base special
 
     db POISON ; species type 1
-    db GROUND ; species type 2
+    db EARTH ; species type 2
     db IVORY ; species type 3
     db 0 ; species type 4
 
@@ -1327,7 +1327,7 @@ NidorinoBaseStats:
     db 55 ; base special
 
     db POISON ; species type 1
-    db GROUND ; species type 2
+    db EARTH ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -1367,7 +1367,7 @@ NidokingBaseStats:
     db 75 ; base special
 
     db POISON ; species type 1
-    db GROUND ; species type 2
+    db EARTH ; species type 2
     db IVORY ; species type 3
     db 0 ; species type 4
 
@@ -2006,7 +2006,7 @@ DiglettBaseStats:
     db 95 ; base speed
     db 45 ; base special
 
-    db GROUND ; species type 1
+    db EARTH ; species type 1
     db 0 ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
@@ -2046,7 +2046,7 @@ DugtrioBaseStats:
     db 120 ; base speed
     db 70 ; base special
 
-    db GROUND ; species type 1
+    db EARTH ; species type 1
     db 0 ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
@@ -3807,7 +3807,7 @@ OnixBaseStats:
     db 30 ; base special
 
     db ROCK ; species type 1
-    db GROUND ; species type 2
+    db EARTH ; species type 2
     db METAL ; species type 3
     db 0 ; species type 4
 
@@ -4167,7 +4167,7 @@ CuboneBaseStats:
     db 40 ; base special
 
     db IVORY ; species type 1
-    db GROUND ; species type 2
+    db EARTH ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -4207,7 +4207,7 @@ MarowakBaseStats:
     db 50 ; base special
 
     db IVORY ; species type 1
-    db GROUND ; species type 2
+    db EARTH ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 

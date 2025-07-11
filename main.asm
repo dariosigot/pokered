@@ -47013,7 +47013,7 @@ Type02Name:
 Type03Name:
     db "POISON@"
 Type04Name:
-    db "GROUND@"
+    db "EARTH@"
 Type05Name:
     db "ROCK@"
 Type06Name:
@@ -47054,7 +47054,7 @@ Type02NameShort:
 Type03NameShort:
     db "PSN"
 Type04NameShort:
-    db "GRN"
+    db "EAR"
 Type05NameShort:
     db "ROK"
 Type06NameShort:
@@ -47091,7 +47091,7 @@ TypeNamePointersShort:
     dw Type01NameShort ; $01 : Fight
     dw Type02NameShort ; $02 : Wind
     dw Type03NameShort ; $03 : Poison
-    dw Type04NameShort ; $04 : Ground
+    dw Type04NameShort ; $04 : Earth
     dw Type05NameShort ; $05 : Rock
     dw Type06NameShort ; $06 : Crystal
     dw Type07NameShort ; $07 : Bug
@@ -47260,7 +47260,7 @@ TypeNamePointers:
     dw Type01Name ; $01 : Fight
     dw Type02Name ; $02 : Wind
     dw Type03Name ; $03 : Poison
-    dw Type04Name ; $04 : Ground
+    dw Type04Name ; $04 : Earth
     dw Type05Name ; $05 : Rock
     dw Type06Name ; $06 : Crystal
     dw Type07Name ; $07 : Bug
@@ -80347,7 +80347,7 @@ SaffronCityText12:
 
 CheckGoundOrRock:
     ld a,[bc]
-    cp GROUND
+    cp EARTH
     ret z
     cp ROCK
     ret
@@ -141496,7 +141496,7 @@ AdjustDamageForMoveType_GetInput:
 ; [wTmpDefenderTypes] = types of defender
 GetDefenderType:
     ld a,[$d11e]
-    cp GROUND
+    cp EARTH
     jr z,.TryToLevitate
     ; fall through
 

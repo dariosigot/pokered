@@ -567,7 +567,7 @@ OnixCrystalBaseStats:
     db 45 ; base special
 
     db CRYSTAL ; species type 1
-    db GROUND ; species type 2
+    db EARTH ; species type 2
     db METAL ; species type 3
     db 0 ; species type 4
 
