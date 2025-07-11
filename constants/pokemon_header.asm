@@ -247,8 +247,8 @@ CharizardBaseStats:
     db 85 ; base special
 
     db FIRE ; species type 1
-    db WIND ; species type 2
-    db DRAGON ; species type 3
+    db DRAGON ; species type 2
+    db WIND ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -1207,7 +1207,7 @@ NidorinaBaseStats:
     db 55 ; base special
 
     db POISON ; species type 1
-    db 0 ; species type 2
+    db GROUND ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -1327,7 +1327,7 @@ NidorinoBaseStats:
     db 55 ; base special
 
     db POISON ; species type 1
-    db 0 ; species type 2
+    db GROUND ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -4367,7 +4367,7 @@ KoffingBaseStats:
     db 60 ; base special
 
     db POISON ; species type 1
-    db WIND ; species type 2
+    db 0 ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -4407,7 +4407,7 @@ WeezingBaseStats:
     db 85 ; base special
 
     db POISON ; species type 1
-    db WIND ; species type 2
+    db 0 ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -5488,7 +5488,7 @@ PorygonBaseStats:
 
     db METAL ; species type 1
     db PSYCHIC ; species type 2
-    db 0 ; species type 3
+    db CRYSTAL ; species type 3
     db 0 ; species type 4
 
     db $66 ; sprite dimensions
