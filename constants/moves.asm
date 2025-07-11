@@ -137,7 +137,7 @@
     db KINESIS      , ACCURACY_DOWN1_EFFECT      ,   0 , PSYCHIC  , 204 , 18 ; pp 15 ; - ; PP 20 -> 15 ; Ene 14 -> 18
     db SOFTBOILED   , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 21 ; pp 10 ; - ; Ene 20 -> 21
     db HI_JUMP_KICK , JUMP_KICK_EFFECT           , 130 , FIGHT    , 229 , 23 ; pp 10 ; 0 ; Pwr 85 -> 130 ; PP 20 -> 10 ; Ene 20 -> 23
-    db GLARE        , PARALYZE_EFFECT            ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Acr 191 -> 255 ; PP 30 -> 15
+    db FLARE        , PARALYZE_EFFECT            ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Acr 191 -> 255 ; PP 30 -> 15
     db DREAM_EATER  , DREAM_EATER_EFFECT         , 100 , GHOST    , 255 , 17 ; pp 10 ; 1 ; Type Psychic -> Ghost ; PP 15 -> 10 ; Ene 20 -> 17
     db POISON_GAS   , POISON_EFFECT              ,   0 , POISON   , 229 , 07 ; pp 30 ; - ; Acr 140 -> 229 ; PP 40 -> 30
     db BARRAGE      , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , GRASS    , 216 , 14 ; pp 15 ; 0 ; Type Normal -> Grass ; Pwr 15 -> 28 ; PP 20 -> 15

@@ -584,7 +584,7 @@ GolduckExclusiveMove:
     db BLADE ; TM51
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db GLARE
+    db FLARE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MankeyExclusiveMove:

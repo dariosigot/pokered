@@ -399,7 +399,7 @@ ENDM
 ARBOK_Learnset: MACRO
     EKANS_Learnset
     db 22,TRAPHOLE
-    db 25,GLARE
+    db 25,FLARE
     db 27,SONICBOOM
     db 29,ABSORB
     db 31,SCREECH
@@ -416,7 +416,7 @@ ENDM
 EKANS_NoEvo_Learnset: MACRO
     db 24,ABSORB ; Exclusive
     db 26,TRAPHOLE
-    db 29,GLARE
+    db 29,FLARE
     db 32,SONICBOOM
     db 34,SCREECH
     db 37,STRING_SHOT
@@ -994,7 +994,7 @@ MEOWTH_Learnset: MACRO
     db 18,FURY_SWIPES
     db 21,SLAM
     db 24,SCREECH
-    db 26,GLARE
+    db 26,FLARE
     ;  28,PERSIAN
 ENDM
 PERSIAN_Learnset: MACRO
@@ -1046,7 +1046,7 @@ GOLDUCK_Learnset: MACRO
     db 37,WATERFALL
     db 39,SONICBOOM
     db 42,TSUNAMI
-    db 44,GLARE
+    db 44,FLARE
     db 46,LIGHT_SCREEN
     db 48,ICE_PUNCH
     db 52,HYDRO_PUMP
@@ -1055,7 +1055,7 @@ GOLDUCK_Learnset: MACRO
     db 60,HYPER_BEAM
 ENDM
 PSYDUCK_NoEvo_Learnset: MACRO
-    db 36,GLARE ; Exclusive
+    db 36,FLARE ; Exclusive
     db 40,PAY_DAY
     db 43,SLASH
     db 48,SONICBOOM
@@ -1225,7 +1225,7 @@ KADABRA_ALAKAZAM_Learnset: MACRO
     db 24,SWIFT
     db 27,FLASH
     db 31,RECOVER
-    db 33,GLARE
+    db 33,FLARE
     db 35,AGILITY
     db 38,PSYCHIC_M
     db 41,HYPNOSIS
@@ -1371,7 +1371,7 @@ TENTACOOL_Learnset: MACRO
     db 20,BIND
     db 21,FLASH
     db 24,ABSORB
-    db 26,GLARE
+    db 26,FLARE
     db 28,BUBBLEBEAM
     ;  30,TENTACRUEL
 ENDM
@@ -1874,6 +1874,7 @@ HYPNO_Learnset: MACRO
     db 32,POISON_GAS
     db 35,REFLECT
     db 38,PSYCHIC_M
+    db 40,FLARE
     db 42,LIGHT_SCREEN
     db 45,REST
     db 49,NIGHT_SHADE
@@ -2256,7 +2257,7 @@ ENDM
 WEEZING_Learnset: MACRO
     KOFFING_Learnset
     db 35,EXPLOSION
-    db 38,GLARE
+    db 38,FLARE
     db 41,SWIFT
     db 43,ABSORB
     db 44,PSYBEAM
@@ -2270,7 +2271,7 @@ ENDM
 KOFFING_NoEvo_Learnset: MACRO
     db 39,ABSORB ; Exclusive
     db 42,EXPLOSION
-    db 45,GLARE
+    db 45,FLARE
     db 47,DISABLE
     db 49,THUNDERBOLT
     db 53,TOXIC
@@ -2511,7 +2512,7 @@ STARYU_Learnset: MACRO
     db 36,PSYBEAM
     db 38,SONICBOOM
     db 40,REFLECT
-    db 43,THUNDER_WAVE
+    db 43,FLARE
     db 46,SCREECH
     db 49,LIGHT_SCREEN
     db 53,PSYCHIC_M
@@ -2535,7 +2536,7 @@ STARMIE_Learnset: MACRO
     db 28,PSYBEAM
     db 30,SONICBOOM
     db 32,REFLECT
-    db 34,THUNDER_WAVE
+    db 34,FLARE
     db 35,SUPERSONIC
     db 35,CONFUSE_RAY
     db 36,SCREECH
@@ -2559,13 +2560,14 @@ MR_MIME_Learnset: MACRO
     db 17,TELEPORT
     db 19,DISABLE
     db 21,MEDITATE
-    db 23,LIGHT_SCREEN
+    db 23,MIMIC
+    db 24,LIGHT_SCREEN
     db 26,HEADBUTT
     db 28,CONFUSE_RAY
     db 30,SLAM
     db 32,PSYBEAM
     db 34,REST
-    db 36,MIMIC
+    db 36,FLARE
     db 39,REFLECT
     db 42,PSYCHIC_M
     db 45,MIRROR_MOVE

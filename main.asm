@@ -51633,7 +51633,7 @@ NotForgottableMoves:
     db BONE_CLUB
     db AMNESIA
     db SOFTBOILED
-    db GLARE
+    db FLARE
     db TRANSFORM
     db CRABHAMMER
     db EXPLOSION
@@ -111809,7 +111809,7 @@ AttackAnimationPointers: ; 7a07d (1e:607d)
     dw KinesisAnim
     dw SoftboiledAnim
     dw HiJumpKickAnim
-    dw GlareAnim
+    dw FlareAnim
     dw DreamEaterAnim
     dw PoisonGasAnim
     dw BarrageAnim
@@ -112642,7 +112642,7 @@ HiJumpKickAnim: ; 7a6 (1e:660c)
     db $46,$87,$04
     db $FF
 
-GlareAnim: ; 7a610 (1e:6610)
+FlareAnim: ; 7a610 (1e:6610)
     db SE_DARK_SCREEN_PALETTE,$48
     db SE_DARK_SCREEN_FLASH,$88
     db SE_DARK_SCREEN_FLASH,$FF
@@ -131208,7 +131208,7 @@ MoveNames: ; b0000 (2c:4000)
     db "KINESIS@"
     db "SOFTBOILED@"
     db "HI JUMP KICK@"
-    db "GLARE@"
+    db "FLARE@"
     db "DREAM EATER@"
     db "POISON GAS@"
     db "BARRAGE@"
@@ -138707,7 +138707,7 @@ db %00000000    ; Double Team,Recover,Harden,Minimize,Smokescreen,Confuse Ray,Wi
 db %00000000    ; Barrier,Light Screen,Haze,Reflect,Focus Energy,Bide,Metronome,Mirror Move
 db %00010010    ; Self-Destruct,Egg Bomb,Lick,Smog,Sludge,Bone Club,Fire Blast,Waterfall
 db %01000000    ; Clamp,Swift,Skull Bash,Spike Cannon,Constrict,Amnesia,Kinesis,Soft-Boiled
-db %00100000    ; High Jump Kick,Glare,Dream Eater,Poison Gas,Barrage,Leech Life,Lovely Kiss,Sky Attack
+db %00100000    ; High Jump Kick,Flare,Dream Eater,Poison Gas,Barrage,Leech Life,Lovely Kiss,Sky Attack
 db %01000100    ; Transform,Bubble,Dizzy Punch,Spore,Flash,Psywave,Splash,Acid Armor
 db %00000000    ; Crabhammer,Explosion,Fury Swipes,Bonemerang,Rest,Rock Slide,Hyper Fang,Sharpen
 db %01000000    ; Conversion,Tri Attack,Super Fang,Slash,Substitute,Struggle,???,???
