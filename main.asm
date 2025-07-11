@@ -34191,8 +34191,8 @@ PewterCityScript6: ; 1936f (6:536f)
 
     call DisableRoute22Rival1stBattle
 
-    ld hl,$d755
-    set 7,[hl]
+;    ld hl,$d755 ; Beat Brock. Why???
+;    set 7,[hl]  ; ...
 
     xor a
     ld [wJoypadForbiddenButtonsMask],a
