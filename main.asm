@@ -46922,13 +46922,12 @@ ShellderPicBack: ; 26dc3 (9:6dc3)
 
 PrintTypes:
     call Load16BitRegisters
+    ld a,[W_MONHTYPE3]
+    and a
+    jr nz,.MoreThan2Types
     ld a,[W_MONHTYPE1]
     call .PrintSingleType
     ld a,[W_MONHTYPE2]
- ;   call .PrintSingleType ; @TODO:4TYPE
- ;   ld a,[W_MONHTYPE3]
- ;   call .PrintSingleType
- ;   ld a,[W_MONHTYPE4]
     ; fall through
 
 .PrintSingleType
@@ -46942,14 +46941,40 @@ PrintTypes:
     push hl
     jr PrintMoveType_
 
+.MoreThan2Types
+    ld a,[W_MONHTYPE1]
+    call .PrintSingleTypeShort1
+    ld a,[W_MONHTYPE2]
+    call .PrintSingleTypeShort2
+    ld a,[W_MONHTYPE3]
+    call .PrintSingleTypeShort1
+    ld a,[W_MONHTYPE4]
+    ; fall through
+
+.PrintSingleTypeShort2
+    push hl
+    call PrintMoveTypeShort
+    pop hl
+    ld bc,-15
+    add hl,bc
+    ret
+    
+.PrintSingleTypeShort1
+    push hl
+    call PrintMoveTypeShort
+    pop hl
+    ld bc,20
+    add hl,bc
+    ret
+
 PrintMoveType:
     call Load16BitRegisters
     push hl
-    ld a,[W_PLAYERMOVETYPE] ; $cfd5
+    ld a,[W_PLAYERMOVETYPE]
 
 PrintMoveType_:
     add a
-    ld hl,TypeNamePointers ; $7dae
+    ld hl,TypeNamePointers
     ld e,a
     ld d,$0
     add hl,de
@@ -46958,6 +46983,28 @@ PrintMoveType_:
     ld d,[hl]
     pop hl
     jp PlaceString
+
+PrintMoveTypeShort:
+    push hl
+    add a
+    ld hl,TypeNamePointersShort
+    ld e,a
+    ld d,$0
+    add hl,de
+    ld a,[hli]
+    ld e,a
+    ld d,[hl]
+    pop hl
+    ld b,3
+.loop
+    ld a,[de]
+    cp "@"
+    ret z
+    ld [hli],a
+    inc de
+    dec b
+    jr nz,.loop
+    ret
 
 Type01Name:
     db "FIGHT@"
@@ -46999,6 +47046,74 @@ Type1AName:
     db "DRAGON@"
 TypeNAName:
     db "-@"
+
+Type01NameShort:
+    db "FGH"
+Type02NameShort:
+    db "WND"
+Type03NameShort:
+    db "PSN"
+Type04NameShort:
+    db "GRN"
+Type05NameShort:
+    db "ROK"
+Type06NameShort:
+    db "CRY"
+Type07NameShort:
+    db "BUG"
+Type08NameShort:
+    db "GST"
+Type09NameShort:
+    db "MET"
+Type10NameShort:
+    db "NOR"
+Type12NameShort:
+    db "IVR"
+Type13NameShort:
+    db "RUB"
+Type14NameShort:
+    db "FIR"
+Type15NameShort:
+    db "WAT"
+Type16NameShort:
+    db "GRA"
+Type17NameShort:
+    db "THU"
+Type18NameShort:
+    db "PSY"
+Type19NameShort:
+    db "ICE"
+Type1ANameShort:
+    db "DRA"
+
+TypeNamePointersShort:
+    dw TypeNAName ;
+    dw Type01NameShort ; $01 : Fight
+    dw Type02NameShort ; $02 : Wind
+    dw Type03NameShort ; $03 : Poison
+    dw Type04NameShort ; $04 : Ground
+    dw Type05NameShort ; $05 : Rock
+    dw Type06NameShort ; $06 : Crystal
+    dw Type07NameShort ; $07 : Bug
+    dw Type08NameShort ; $08 : Ghost
+    dw Type09NameShort ; $09 : Metal
+    dw Type10NameShort ; $00 : Normal
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw Type12NameShort ; $12 : Ivory
+    dw Type13NameShort ; $13 : Rubber
+    dw Type14NameShort ; $14 : Fire
+    dw Type15NameShort ; $15 : Water
+    dw Type16NameShort ; $16 : Grass
+    dw Type17NameShort ; $17 : Thunder
+    dw Type18NameShort ; $18 : Psychic
+    dw Type19NameShort ; $19 : Ice
+    dw Type1ANameShort ; $1A : Dragon
 
 SECTION "SaveTrainerName",ROMX[$7E4A],BANK[$9]
 

@@ -6206,7 +6206,7 @@ Mon155BaseStats:
     db 00 ; base speed
     db 00 ; base special
 
-    db NORMAL ; species type 1
+    db TYPE_NA ; species type 1
     db 0 ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
@@ -6246,7 +6246,7 @@ Mon156BaseStats:
     db 00 ; base speed
     db 00 ; base special
 
-    db NORMAL ; species type 1
+    db TYPE_NA ; species type 1
     db 0 ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
@@ -6286,7 +6286,7 @@ Mon157BaseStats:
     db 00 ; base speed
     db 00 ; base special
 
-    db NORMAL ; species type 1
+    db TYPE_NA ; species type 1
     db 0 ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
@@ -6326,7 +6326,7 @@ Mon158BaseStats:
     db 00 ; base speed
     db 00 ; base special
 
-    db NORMAL ; species type 1
+    db TYPE_NA ; species type 1
     db 0 ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
@@ -6366,7 +6366,7 @@ Mon159BaseStats:
     db 00 ; base speed
     db 00 ; base special
 
-    db NORMAL ; species type 1
+    db TYPE_NA ; species type 1
     db 0 ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
