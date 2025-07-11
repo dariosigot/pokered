@@ -415,17 +415,19 @@ AIMoveChoiceModification1:
     push bc
     push hl
     ld hl,W_PLAYERMONTYPES
-    ld b,[hl]                 ; b = type 1 of player's pokemon
+    ld a,GRASS
+    ld b,4
+.LoopSearchGrassType
+    cp [hl]
+    jr z,.GrassFound
     inc hl
-    ld c,[hl]                 ; c = type 2 of player's pokemon
-    ld a,b        ;load type 1 into a
-    cp GRASS    ;is type 1 grass?
-    jr z,.seedgrasstest    ;skip ahead if type1 is grass
-    ld a,c        ;load type 2 into a
-.seedgrasstest
+    dec b
+    jr nz,.LoopSearchGrassType
+    ld a,1 ; reset all flag
+    or a   ; ...
+.GrassFound
     pop hl
     pop bc
-    cp GRASS    ;a is either type 1 grass or it is type 2 yet to be confirmed
     jp z,.heavydiscourage    ;heavily discourage if either of the types are grass
     ;else,not to make sure it isn't already used
     ;check status,and heavily discourage if bit is set
@@ -765,11 +767,22 @@ AIMoveChoiceModification3:
     ld a,[W_ENEMYMOVEEFFECT]
     cp POISON_EFFECT
     jr nz,.notpoisoneffect
-    ld a,[W_PLAYERMONTYPES]
+    push hl
+    push bc
+    ld b,4
+    ld hl,W_PLAYERMONTYPES
+.LoopPoisonableType
+    ld a,[hli]
     cp POISON
-    jp z,.heavydiscourage2
-    ld a,[W_PLAYERMONTYPES + 1]
-    cp POISON
+    jr z,.NotPoisonable
+    cp METAL
+    jr z,.NotPoisonable
+    dec b
+    jr nz,.LoopPoisonableType
+    dec b ; b = $FF : reset z flag
+.NotPoisonable
+    pop bc
+    pop hl
     jp z,.heavydiscourage2
 .notpoisoneffect
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -925,19 +938,21 @@ AIMoveChoiceModification3:
     cp 192
     jp c,.nextMove
 
+    push hl
     push bc
     ld a,[W_ENEMYMOVETYPE]
-    ld b,a
-    ld a,[W_ENEMYMONTYPE1]
-    cp b
+    ld hl,W_ENEMYMONTYPES
+    ld b,4
+.LoopSearchSTAB
+    cp [hl]
+    jr z,.FoundSTAB
+    inc hl
+    dec b
+    jr nz,.LoopSearchSTAB
+    dec b ; b = $FF : reset z flag
+.FoundSTAB
     pop bc
-    jp z,.givepref
-    push bc
-    ld a,[W_ENEMYMOVETYPE]
-    ld b,a
-    ld a,[W_ENEMYMONTYPE2]
-    cp b
-    pop bc
+    pop hl
     jp z,.givepref
     jp .nextMove
 .notneutraleffective
@@ -1537,26 +1552,25 @@ ScoreAIParty:
     ;score penalty if opponent could have STAB against the pointed-to enemy mon
     ld a,[W_PLAYERMOVETYPE]
     push af
-    ;check player type 1 effectiveness
-    ld a,[W_PLAYERMONTYPES]
-    ld [W_PLAYERMOVETYPE],a
-    call .get_effectiveness_to_enemy
-    ld b,3    ;-3 for 2x effective or -6 if 4x effective
-    ld a,[$d11e]
-    push af
-    cp $10
-    call nc,.minus
-    pop af
-    cp $15
-    call nc,.minus
-    ;jump if there is no type 2
+    ;check player types effectiveness
+    push bc
+    push de
     push hl
+    ld c,4
+.LoopPlayerTypesForSTABPenalties
+    push hl
+    push de
     ld hl,W_PLAYERMONTYPES
-    ld a,[W_PLAYERMONTYPES + 1]
-    cp [hl]
+    ld a,4
+    sub c
+    ld e,a
+    ld d,0
+    add hl,de
+    ld a,[hli]
+    pop de
     pop hl
-    jr z,.next8
-    ;else do type 2 now
+    and a
+    jr z,.EndLoopPlayerTypesForSTABPenalties
     ld [W_PLAYERMOVETYPE],a
     call .get_effectiveness_to_enemy
     ld b,3    ;-3 for 2x effective or -6 if 4x effective
@@ -1567,7 +1581,12 @@ ScoreAIParty:
     pop af
     cp $15
     call nc,.minus
-.next8
+    dec c
+    jr nz,.LoopPlayerTypesForSTABPenalties
+.EndLoopPlayerTypesForSTABPenalties
+    pop hl
+    pop de
+    pop bc
     pop af
     ld [W_PLAYERMOVETYPE],a
 
@@ -1609,34 +1628,55 @@ ScoreAIParty:
     set 3,a
     ld [wUnusedC000],a
     ;preserve the current enemy mon typing
-    ld a,[W_ENEMYMONTYPES]
-    ld [wAIPartyMonScores + 6],a
-    ld a,[W_ENEMYMONTYPES + 1]
-    ld [wAIPartyMonScores + 7],a
-    ;override the current enemy mon typing with that from the roster pointer
-    push bc
-    ld bc,$05
-    call GetRosterStructData
-    ld [W_ENEMYMONTYPES],a
-    ld bc,$06
-    call GetRosterStructData
-    ld [W_ENEMYMONTYPES + 1],a
-    pop bc
-    ;now get the typing effectiveness
-    push bc
     push hl
     push de
+    push bc
+    ld hl,W_ENEMYMONTYPES
+    ld de,wBackupTypes
+    ld bc,4
+    call CopyData
+    pop bc
+    pop de
+    pop hl
+    ;override the current enemy mon typing with that from the roster pointer
+    push hl
+    push de
+    push bc
+    ld a,[hl]
+    ld [$D0B5],a
+    ld bc,W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
+    add hl,bc
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    call GetMonHeader
+    ld hl,W_MONHTYPES
+    ld de,W_ENEMYMONTYPES
+    ld bc,4
+    call CopyData
+    pop bc
+    pop de
+    pop hl
+    ;now get the typing effectiveness
+    push hl
+    push de
+    push bc
     ld b,BANK(AIGetTypeEffectiveness)
     ld hl,AIGetTypeEffectiveness
     call Bankswitch
+    pop bc
     pop de
     pop hl
-    pop bc
     ;now undo the current mon type override
-    ld a,[wAIPartyMonScores + 6]
-    ld [W_ENEMYMONTYPES],a
-    ld a,[wAIPartyMonScores + 7]
-    ld [W_ENEMYMONTYPES + 1],a
+    push hl
+    push de
+    push bc
+    ld hl,wBackupTypes
+    ld de,W_ENEMYMONTYPES
+    ld bc,4
+    call CopyData
+    pop bc
+    pop de
+    pop hl
     ret
 
 ; ─────────────────────────────────────────────────────────────────────────

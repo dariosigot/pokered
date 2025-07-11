@@ -3318,7 +3318,7 @@ GetMonHeader: ; 1537 (0:1537)
     jr z,.done
     dec a
     ld [hl],a
-    ld hl,W_MON_NEXT_ALTFORM ; Actual Pointer to Alternate Forms
+    ld hl,W_MONHNEXTALTFORM ; Actual Pointer to Alternate Forms
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -10843,7 +10843,7 @@ PrintSafariZoneBattleText:
     push hl
     ld a,[$cfe5]
     ld [$d0b5],a
-    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld a,[W_ENEMYMONALTFORM]
     ld [wAlternateFormIndex],a ; Save AlternateFormIndex
     call GetMonHeader
     ld a,[W_MONHCATCHRATE]
@@ -16289,11 +16289,6 @@ LearnMove: ; 6e43 (1:6e43)
     ld h,d
     ld l,e
     ld de,W_PLAYERMONMOVES
-    ld bc,$4
-    call CopyData
-    ld bc,$11
-    add hl,bc
-    ld de,W_PLAYERMONPP ; $d02d
     ld bc,$4
     call CopyData
     jr .LearnedMoveComplete
@@ -23115,7 +23110,7 @@ InitializeMissableObjectsFlagsNew:
     ld a,[$d048]
     ld c,a
     ld b,$1
-    call HandleBitArray2 ; set flag iff Item is hidden
+    call HandleBitArray2 ; set flag if Item is hidden
 .asm_f19d
     ld hl,$d048
     inc [hl]
@@ -23131,10 +23126,10 @@ BackupMoves:
     ld de,wBackupEnemyMoves
     jr BackupCommon
 BackupPP:
-    ld hl,W_ENEMYMONPP
-    ld de,wBackupEnemyPP
+    ld hl,W_ENEMYMONENERGY ; W_ENEMYMONALTFORM
+    ld de,wBackupEnemyEnergy ; wBackupEnemyAltForm
 BackupCommon:
-    ld bc,4
+    ld bc,2
     jp CopyData
 
 WriteMonMoves2:
@@ -23152,10 +23147,10 @@ WriteMovePP:
     dec a
     jp nz,ResetMovePPs_
     inc de
-    ld hl,wBackupEnemyPP
-    ld bc,$4
+    ld hl,wBackupEnemyEnergy ; wBackupEnemyAltForm
+    ld bc,2
     call CopyData
-    dec de
+    inc de
     xor a
     ld [wTempAlternateFormIndex],a
     ret
@@ -24575,8 +24570,8 @@ HandleBackupAfterBallCatch:
     ld a,[W_ENEMYMONSPDSPCIV]
     ld [hl],a
 .justTransformed
-    ld a,[W_ENEMYMONPP]   ; Backup Current Energy
-    ld [wBackupEnemyPP],a ; ...
+    ld a,[W_ENEMYMONENERGY]   ; Backup Current Energy
+    ld [wBackupEnemyEnergy],a ; ...
     ret
 
 ItemUseBait:
@@ -24748,8 +24743,8 @@ BackupChangedBlocks:
     ld [hl],a ; ID
     ld hl,wChangedBlocksNum
     inc [hl]
-    ld a,1
-    or a ; reset all flag
+    ld a,1 ; reset all flag
+    or a   ; ...
 .done
     ld a,[$d09f]
     pop hl
@@ -25524,42 +25519,42 @@ GotOffBicycleText: ; e5fc (3:65fc)
 ; 0: Pokemon Center healing
 ; 1: using a PP Up
 ; [wCurrentMenuItem] = index of move (when using a PP Up)
-RestoreBonusPP: ; e606 (3:6606)
-    ld hl,W_PARTYMON1_MOVE1
-    ld bc,44
-    ld a,[$cf92]
-    call AddNTimes
-    push hl
-    ld de,$cd78 - 1
-    PREDEF ResetMovePPs ; loads the normal max PP of each of the pokemon's moves to $cd78
-    pop hl
-    ld c,21
-    ld b,0
-    add hl,bc ; hl now points to move 1 PP
-    ld de,$cd78
-    ld b,0 ; initialize move counter to zero
-; loop through the pokemon's moves
-.loop
-    inc b
-    ld a,b
-    cp a,5 ; reached the end of the pokemon's moves?
-    ret z ; if so,return
-    ld a,[$d11e]
-    dec a ; using a PP Up?
-    jr nz,.skipMenuItemIDCheck
-; if using a PP Up,check if this is the move it's being used on
-    ld a,[wCurrentMenuItem]
-    inc a
-    cp b
-    jr nz,.nextMove
-.skipMenuItemIDCheck
-    ld a,[hl]
-    and a,%11000000 ; have any PP Ups been used?
-    call nz,AddBonusPP ; if so,add bonus PP
-.nextMove
-    inc hl
-    inc de
-    jr .loop
+;RestoreBonusPP: ; e606 (3:6606)
+;    ld hl,W_PARTYMON1_MOVE1
+;    ld bc,44
+;    ld a,[$cf92]
+;    call AddNTimes
+;    push hl
+;    ld de,$cd78 - 1
+;    PREDEF ResetMovePPs ; loads the normal max PP of each of the pokemon's moves to $cd78
+;    pop hl
+;    ld c,21
+;    ld b,0
+;    add hl,bc ; hl now points to move 1 PP
+;    ld de,$cd78
+;    ld b,0 ; initialize move counter to zero
+;; loop through the pokemon's moves
+;.loop
+;    inc b
+;    ld a,b
+;    cp a,5 ; reached the end of the pokemon's moves?
+;    ret z ; if so,return
+;    ld a,[$d11e]
+;    dec a ; using a PP Up?
+;    jr nz,.skipMenuItemIDCheck
+;; if using a PP Up,check if this is the move it's being used on
+;    ld a,[wCurrentMenuItem]
+;    inc a
+;    cp b
+;    jr nz,.nextMove
+;.skipMenuItemIDCheck
+;    ld a,[hl]
+;    and a,%11000000 ; have any PP Ups been used?
+;    call nz,AddBonusPP ; if so,add bonus PP
+;.nextMove
+;    inc hl
+;    inc de
+;    jr .loop
 
 ; adds bonus PP from PP Ups to current PP
 ; 1/5 of normal max PP (capped at 7) is added for each PP Up
@@ -25568,42 +25563,42 @@ RestoreBonusPP: ; e606 (3:6606)
 ; [hl] = move PP
 ; [$d11e] = max number of times to add bonus
 ; set to 1 when using a PP Up,set to 255 otherwise
-AddBonusPP: ; e642 (3:6642)
-    push bc
-    ld a,[de] ; normal max PP of move
-    ld [H_DIVIDEND + 3],a
-    xor a
-    ld [H_DIVIDEND],a
-    ld [H_DIVIDEND + 1],a
-    ld [H_DIVIDEND + 2],a
-    ld a,5
-    ld [H_DIVISOR],a
-    ld b,4
-    call Divide
-    ld a,[hl] ; move PP
-    ld b,a
-    swap a
-    and a,%00001111
-    srl a
-    srl a
-    ld c,a ; c = number of PP Ups used
-.loop
-    ld a,[H_QUOTIENT + 3]
-    cp a,8 ; is the amount greater than or equal to 8?
-    jr c,.addAmount
-    ld a,7 ; cap the amount at 7
-.addAmount
-    add b
-    ld b,a
-    ld a,[$d11e]
-    dec a
-    jr z,.done
-    dec c
-    jr nz,.loop
-.done
-    ld [hl],b
-    pop bc
-    ret
+;AddBonusPP: ; e642 (3:6642)
+;    push bc
+;    ld a,[de] ; normal max PP of move
+;    ld [H_DIVIDEND + 3],a
+;    xor a
+;    ld [H_DIVIDEND],a
+;    ld [H_DIVIDEND + 1],a
+;    ld [H_DIVIDEND + 2],a
+;    ld a,5
+;    ld [H_DIVISOR],a
+;    ld b,4
+;    call Divide
+;    ld a,[hl] ; move PP
+;    ld b,a
+;    swap a
+;    and a,%00001111
+;    srl a
+;    srl a
+;    ld c,a ; c = number of PP Ups used
+;.loop
+;    ld a,[H_QUOTIENT + 3]
+;    cp a,8 ; is the amount greater than or equal to 8?
+;    jr c,.addAmount
+;    ld a,7 ; cap the amount at 7
+;.addAmount
+;    add b
+;    ld b,a
+;    ld a,[$d11e]
+;    dec a
+;    jr z,.done
+;    dec c
+;    jr nz,.loop
+;.done
+;    ld [hl],b
+;    pop bc
+;    ret
 
 ; gets max PP of a pokemon's move (including PP from PP Ups)
 ; INPUT:
@@ -25617,65 +25612,69 @@ AddBonusPP: ; e642 (3:6642)
 ; [wCurrentMenuItem] = move index
 ; OUTPUT:
 ; [$d11e] = max PP
-GetMaxPP: ; e677 (3:6677)
-    ld a,[$cc49]
-    and a
-    ld hl,W_PARTYMON1_MOVE1
-    ld bc,44
-    jr z,.sourceWithMultipleMon
-    ld hl,$d8ac ; enemy party
-    dec a
-    jr z,.sourceWithMultipleMon
-    ld hl,$da9e ; current box
-    ld bc,33
-    dec a
-    jr z,.sourceWithMultipleMon
-    ld hl,$da67 ; daycare
-    dec a
-    jr z,.sourceWithOneMon
-    ld hl,W_PLAYERMONMOVES ; player's in-battle pokemon
-.sourceWithOneMon
-    call GetSelectedMoveOffset2
-    jr .next
-.sourceWithMultipleMon
-    call GetSelectedMoveOffset
-.next
-    ld a,[hl]
-    dec a
-    push hl
-    ld hl,Moves
-    ld bc,6
-    call AddNTimes
-    ld de,$cd6d
-    ld a,BANK(Moves)
-    call FarCopyData
-    ld de,$cd72
-    ld a,[de]
-    ld b,a ; b = normal max PP
-    pop hl
-    push bc
-    ld bc,21 ; PP offset if not player's in-battle pokemon data
-    ld a,[$cc49]
-    cp a,4 ; player's in-battle pokemon?
-    jr nz,.addPPOffset
-    ld bc,17 ; PP offset if player's in-battle pokemon data
-.addPPOffset
-    add hl,bc
-    ld a,[hl] ; a = current PP
-    and a,%11000000 ; get PP Up count
-    pop bc
-    or b ; place normal max PP in 6 lower bits of a
-    ld h,d
-    ld l,e
-    inc hl ; hl = $cd73
-    ld [hl],a
-    xor a
-    ld [$d11e],a ; no limit on PP Up amount
-    call AddBonusPP ; add bonus PP from PP Ups
-    ld a,[hl]
-    and a,%00111111 ; mask out the PP Up count
-    ld [$d11e],a ; store max PP
-    ret
+;GetMaxPP: ; e677 (3:6677)
+;    ld a,[$cc49]
+;    and a
+;    ld hl,W_PARTYMON1_MOVE1
+;    ld bc,44
+;    jr z,.sourceWithMultipleMon
+;    ld hl,$d8ac ; enemy party
+;    dec a
+;    jr z,.sourceWithMultipleMon
+;    ld hl,$da9e ; current box
+;    ld bc,33
+;    dec a
+;    jr z,.sourceWithMultipleMon
+;    ld hl,$da67 ; daycare
+;    dec a
+;    jr z,.sourceWithOneMon
+;    ld hl,W_PLAYERMONMOVES ; player's in-battle pokemon
+;.sourceWithOneMon
+;    call GetSelectedMoveOffset2
+;    jr .next
+;.sourceWithMultipleMon
+;    call GetSelectedMoveOffset
+;.next
+;    ld a,[hl]
+;    dec a
+;    push hl
+;    ld hl,Moves
+;    ld bc,6
+;    call AddNTimes
+;    ld de,$cd6d
+;    ld a,BANK(Moves)
+;    call FarCopyData
+;    ld de,$cd72
+;    ld a,[de]
+;    ld b,a ; b = normal max PP
+;    pop hl
+;    push bc
+;    ld bc,21 ; PP offset if not player's in-battle pokemon data
+;    ld a,[$cc49]
+;    cp a,4 ; player's in-battle pokemon?
+;    jr nz,.addPPOffset
+;    ld bc,17 ; PP offset if player's in-battle pokemon data
+;.addPPOffset
+;    add hl,bc
+;    ld a,[hl] ; a = current PP
+;    and a,%11000000 ; get PP Up count
+;    pop bc
+;    or b ; place normal max PP in 6 lower bits of a
+;    ld h,d
+;    ld l,e
+;    inc hl ; hl = $cd73
+;    ld [hl],a
+;    xor a
+;    ld [$d11e],a ; no limit on PP Up amount
+;    call AddBonusPP ; add bonus PP from PP Ups
+;    ld a,[hl]
+;    and a,%00111111 ; mask out the PP Up count
+;    ld [$d11e],a ; store max PP
+;    ret
+
+; Free
+
+SECTION "GetSelectedMoveOffset",ROMX[$66e3],BANK[$3]
 
 GetSelectedMoveOffset: ; e6e3 (3:66e3)
     ld a,[$cf92]
@@ -27111,8 +27110,8 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld h,d
     ld l,e
     xor a
-    ld [hli],a ; type 1
-    ld [hli],a ; type 2
+    ld [hli],a ; energy
+    ld [hli],a ; alt form
     ld [hli],a ; catch rate (held item in gen 2)
     ld [hli],a ; move 1
     ld [hli],a ; move 2
@@ -27190,31 +27189,34 @@ ResetMovePPs_:
     ld [de],a
     inc de
     xor a
-    ld [de],a
+    ;ld [de],a
     inc de
-    ld [de],a
+    ;ld [de],a
     ld [wTempAlternateFormIndex],a
     ret
 
 ResetEnemyHPStatusTypeAndPP:
     xor a
     ld hl,W_ENEMYMONSTATUS
-    ld [hli],a ; Status
+    ld [hl],a ; Status
+    ld hl,W_ENEMYMONTYPES
     ld [hli],a ; Type 1
-    ld [hl],a  ; Type 2
+    ld [hli],a ; Type 2
+    ld [hli],a ; Type 3
+    ld [hl],a  ; Type 4
     ld hl,W_ENEMYMONMAXHP
     ld a,[hli]
     ld [W_ENEMYMONCURHP],a
     ld a,[hl]
     ld [W_ENEMYMONCURHP+1],a
-    ld a,$FF
-    ld [W_ENEMYMONPP],a
+    ld a,255
+    ld [W_ENEMYMONENERGY],a
     ld hl,W_ENEMYMON_START
     ret
 
 ; adds enemy mon [$cf91] (at position [$cf92] in enemy list) to own party
 ; no known uses in the game
-_AddEnemyMonToPlayerParty: ; f49d (3:749d)
+_AddEnemyMonToPlayerParty:
     ld hl,W_NUMINPARTY
     ld a,[hl]
     cp $6
@@ -28996,9 +28998,9 @@ GetAlternateForm:
 .copyEnemyMonData
     ld a,[W_ENEMYBATTSTATUS3]
     bit 3,a
-    ld a,[wBackupEnemyPP+1] ; if transformed copy from backup
+    ld a,[wBackupEnemyAltForm] ; if transformed copy from backup
     jr nz,.end
-    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld a,[W_ENEMYMONALTFORM]
     ; fall through
 .end
     ld [wAlternateFormIndex],a ; Save AlternateFormIndex
@@ -29598,7 +29600,7 @@ StartMenu_TrainerInfo:
     inc de
 .next1
     ld hl,$d7e0 ; AirPower
-    bit 6,[hl]  ; 
+    bit 6,[hl]  ; ...
     jr z,.next2
     ld a,$D9
     ld [de],a
@@ -29854,7 +29856,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     ;call FarCopyData
     ;ld hl,$CD6D
 
-    ld hl,W_MON_LEARNSET_POINTER ; pointer to learnset
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -31593,7 +31595,7 @@ TestMonMoveCompatibility_HandleAlternative:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,W_MONHLEARNSET_POINTER
+    ld hl,W_MONHTMCOMPATIBILITY
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -31605,8 +31607,8 @@ TestMonMoveCompatibility_HandleAlternative:
 ConversionEffect_:
     ld hl,PlayCurrentMoveAnimation
     call Bankswitch4toF
-    ld hl,W_ENEMYMONTYPE1
-    ld de,W_PLAYERMONTYPE1
+    ld hl,W_ENEMYMONTYPES
+    ld de,W_PLAYERMONTYPES
     ld a,[H_WHOSETURN]
     and a
     ld a,[W_ENEMYBATTSTATUS1]
@@ -31619,6 +31621,12 @@ ConversionEffect_:
 .done
     bit 6,a ; invulnerable
     jr nz,.attackMissed
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hli]
+    ld [de],a
+    inc de
     ld a,[hli]
     ld [de],a
     inc de
@@ -33474,7 +33482,7 @@ PalletTownScript: ; 18e5b (6:4e5b)
     jr z,.next
     ld hl,$D747
     set 6,[hl]
-.next    
+.next
     ld hl,$d126
     set 6,[hl] ; Set Temp Script Flag to potentially Lock Cinnabar from Pallet
     call EnableAutoTextBoxDrawing
@@ -42638,7 +42646,7 @@ GetMonPotentialMoveList:
     ;call FarCopyData
     ;ld hl,GenericBuffer+1
 
-    ld hl,W_MON_LEARNSET_POINTER ; pointer to learnset
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
     ld l,a ; hl pointer to Correct EvosMoves
@@ -46912,40 +46920,61 @@ ShellderPicFront: ; 26cb6 (9:6cb6)
 ShellderPicBack: ; 26dc3 (9:6dc3)
     INCBIN "pic/monback/shellderb.pic"
 
-Func_27d6b:
+PrintTypes:
     call Load16BitRegisters
-    ;push hl
-    ;call GetMonHeader
-    ;pop hl
-    push hl
+    ld a,[W_MONHTYPE3]
+    and a
+    jr nz,.MoreThan2Types
     ld a,[W_MONHTYPE1]
-    call Func_27d89
-    ld a,[W_MONHTYPE1]
-    ld b,a
+    call .PrintSingleType
     ld a,[W_MONHTYPE2]
-    cp b
-    pop hl
-    jr z,asm_27d8c
-    ld bc,$14 ; Denim ; ld bc,$28 ; Tipo2 a capo
-    add hl,bc
+    ; fall through
 
-Func_27d89:
+.PrintSingleType
     push hl
-    jr asm_27d9f
-asm_27d8c: ; 27d8c (9:7d8c)
-    ld a,$7f
-    ld bc,$13
+    call .PrintMoveType
+    pop hl
+    ld bc,20
     add hl,bc
-    ld bc,$6
-    jp FillMemory
+    ret
+.PrintMoveType
+    push hl
+    jr PrintMoveType_
+
+.MoreThan2Types
+    ld a,[W_MONHTYPE1]
+    call .PrintSingleTypeShort1
+    ld a,[W_MONHTYPE2]
+    call .PrintSingleTypeShort2
+    ld a,[W_MONHTYPE3]
+    call .PrintSingleTypeShort1
+    ld a,[W_MONHTYPE4]
+    ; fall through
+
+.PrintSingleTypeShort2
+    push hl
+    call PrintMoveTypeShort
+    pop hl
+    ld bc,-15
+    add hl,bc
+    ret
+    
+.PrintSingleTypeShort1
+    push hl
+    call PrintMoveTypeShort
+    pop hl
+    ld bc,20
+    add hl,bc
+    ret
 
 PrintMoveType:
     call Load16BitRegisters
     push hl
-    ld a,[W_PLAYERMOVETYPE] ; $cfd5
-asm_27d9f: ; 27d9f (9:7d9f)
+    ld a,[W_PLAYERMOVETYPE]
+
+PrintMoveType_:
     add a
-    ld hl,TypeNamePointers ; $7dae
+    ld hl,TypeNamePointers
     ld e,a
     ld d,$0
     add hl,de
@@ -46955,8 +46984,28 @@ asm_27d9f: ; 27d9f (9:7d9f)
     pop hl
     jp PlaceString
 
-Type00Name:
-    db "NORMAL@"
+PrintMoveTypeShort:
+    push hl
+    add a
+    ld hl,TypeNamePointersShort
+    ld e,a
+    ld d,$0
+    add hl,de
+    ld a,[hli]
+    ld e,a
+    ld d,[hl]
+    pop hl
+    ld b,3
+.loop
+    ld a,[de]
+    cp "@"
+    ret z
+    ld [hli],a
+    inc de
+    dec b
+    jr nz,.loop
+    ret
+
 Type01Name:
     db "FIGHT@"
 Type02Name:
@@ -46975,6 +47024,8 @@ Type08Name:
     db "GHOST@"
 Type09Name:
     db "METAL@"
+Type10Name:
+    db "NORMAL@"
 Type12Name:
     db "IVORY@"
 Type13Name:
@@ -46994,7 +47045,75 @@ Type19Name:
 Type1AName:
     db "DRAGON@"
 TypeNAName:
-    db "N.A.@"
+    db "-@"
+
+Type01NameShort:
+    db "FGH"
+Type02NameShort:
+    db "WND"
+Type03NameShort:
+    db "PSN"
+Type04NameShort:
+    db "GRN"
+Type05NameShort:
+    db "ROK"
+Type06NameShort:
+    db "CRY"
+Type07NameShort:
+    db "BUG"
+Type08NameShort:
+    db "GST"
+Type09NameShort:
+    db "MET"
+Type10NameShort:
+    db "NOR"
+Type12NameShort:
+    db "IVR"
+Type13NameShort:
+    db "RUB"
+Type14NameShort:
+    db "FIR"
+Type15NameShort:
+    db "WAT"
+Type16NameShort:
+    db "GRA"
+Type17NameShort:
+    db "THU"
+Type18NameShort:
+    db "PSY"
+Type19NameShort:
+    db "ICE"
+Type1ANameShort:
+    db "DRA"
+
+TypeNamePointersShort:
+    dw TypeNAName ;
+    dw Type01NameShort ; $01 : Fight
+    dw Type02NameShort ; $02 : Wind
+    dw Type03NameShort ; $03 : Poison
+    dw Type04NameShort ; $04 : Ground
+    dw Type05NameShort ; $05 : Rock
+    dw Type06NameShort ; $06 : Crystal
+    dw Type07NameShort ; $07 : Bug
+    dw Type08NameShort ; $08 : Ghost
+    dw Type09NameShort ; $09 : Metal
+    dw Type10NameShort ; $00 : Normal
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw TypeNAName ;
+    dw Type12NameShort ; $12 : Ivory
+    dw Type13NameShort ; $13 : Rubber
+    dw Type14NameShort ; $14 : Fire
+    dw Type15NameShort ; $15 : Water
+    dw Type16NameShort ; $16 : Grass
+    dw Type17NameShort ; $17 : Thunder
+    dw Type18NameShort ; $18 : Psychic
+    dw Type19NameShort ; $19 : Ice
+    dw Type1ANameShort ; $1A : Dragon
 
 SECTION "SaveTrainerName",ROMX[$7E4A],BANK[$9]
 
@@ -47137,7 +47256,7 @@ FocusEnergyEffect_: ; 27f86 (9:7f86)
     db "@"
 
 TypeNamePointers:
-    dw Type00Name ; $00 : Normal
+    dw TypeNAName ;
     dw Type01Name ; $01 : Fight
     dw Type02Name ; $02 : Wind
     dw Type03Name ; $03 : Poison
@@ -47147,7 +47266,7 @@ TypeNamePointers:
     dw Type07Name ; $07 : Bug
     dw Type08Name ; $08 : Ghost
     dw Type09Name ; $09 : Metal
-    dw TypeNAName ;
+    dw Type10Name ; $00 : Normal
     dw TypeNAName ;
     dw TypeNAName ;
     dw TypeNAName ;
@@ -47265,12 +47384,12 @@ DiglettPicBack: ; 2ae10 (a:6e10)
 
 LeechSeedEffect_:
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
-    ld de,W_ENEMYMONTYPE1 ; $cfea (aliases: W_ENEMYMONTYPES)
+    ld de,W_ENEMYMONTYPES
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.done
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
-    ld de,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES)
+    ld de,W_PLAYERMONTYPES
 .done
     push hl
     push de
@@ -47280,6 +47399,14 @@ LeechSeedEffect_:
     pop de
     pop hl
     jr nz,.moveMissed
+    ld a,[de]
+    cp GRASS
+    jr z,.doesntAffect
+    inc de
+    ld a,[de]
+    cp GRASS
+    jr z,.doesntAffect
+    inc de
     ld a,[de]
     cp GRASS
     jr z,.doesntAffect
@@ -50752,7 +50879,7 @@ LearnMoveCommon:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,W_MON_LEARNSET_POINTER ; pointer to learnset
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -50855,7 +50982,7 @@ Evolution_PartyMonLoop:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,W_MON_LEARNSET_POINTER ; pointer to learnset
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -51295,22 +51422,33 @@ LearnZeroDamageMove:
     ld a,d
     dec a
     jr z,.One
-    ld a,[W_MONHTYPE1]
-    cp e
-    jr nz,.Stab1Done
-    inc b ; ▼ stab
-    jr .StabDone
-.Stab1Done
-    ld a,[W_MONHTYPE2]
-    cp e
-    jr nz,.StabDone
-    inc b ; ▼ stab
-.StabDone
+    call LearnStabMove
     ret
 .Zero
     jp EncourageForgot3 ; ▲ zero damage
 .One
     dec b ; ▲ special (1 damage)
+    ret
+
+LearnStabMove:
+    push hl
+    ld hl,W_MONHTYPES
+    ld a,[hli]
+    cp e
+    jr z,.StabFound
+    ld a,[hli]
+    cp e
+    jr z,.StabFound
+    ld a,[hli]
+    cp e
+    jr z,.StabFound
+    ld a,[hl]
+    cp e
+    jr nz,.StabDone
+.StabFound
+    inc b ; ▼ stab
+.StabDone
+    pop hl
     ret
 
 LearnDamageMove:
@@ -51338,17 +51476,7 @@ LearnDamageMove:
     jr c,.DifferentType ; c = damage old > damage new
     call EncourageForgot3 ; ▲ same type and new damage >= old damage
 .DifferentType
-    ld a,[W_MONHTYPE1]
-    cp e
-    jr nz,.Stab1Done
-    inc b ; ▼ stab
-    jr .StabDone
-.Stab1Done
-    ld a,[W_MONHTYPE2]
-    cp e
-    jr nz,.StabDone
-    inc b ; ▼ stab
-.StabDone
+    call LearnStabMove
     ld a,[wNewMoveDamage]
     cp d
     jr nc,.NewLessDamageThanOld ; c = damage old > damage new
@@ -51537,7 +51665,7 @@ WriteMonMoves:
     ;ld c,a
     ;add hl,bc
 
-    ld hl,W_MON_LEARNSET_POINTER ; pointer to learnset
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -51798,24 +51926,28 @@ TransformEffect_: ; Moved Upper in the Bank
     ld de,wBackupEnemyMoves
     ld bc,4
     call CopyData
-    ld hl,W_ENEMYMONPP
-    ld de,wBackupEnemyPP
-    ld bc,4
+    ld hl,W_ENEMYMONENERGY ; W_ENEMYMONALTFORM
+    ld de,wBackupEnemyEnergy ; wBackupEnemyAltForm
+    ld bc,2
     call CopyData
     pop de
     pop hl
 .SkipBackupMoves
     ld a,[hl]
     ld [de],a
-    ld bc,$5
+    ld bc,$6
     add hl,bc
     inc de
     inc de
     inc de
     inc de
     inc de
-    inc bc
-    inc bc
+    inc de
+    ; Handle Alternate Form Index
+    ld a,[hli]
+    ld [de],a
+    inc de
+    dec bc
     call CopyData
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -51878,11 +52010,10 @@ TransformEffect_: ; Moved Upper in the Bank
     call CopyData
     pop hl
 
-    ; Handle Alternate Form Index
-    inc hl ; move to move2pp
-    inc de ; ...
-    ld a,[hl]
-    ld [de],a
+    ; Copy Types
+    ld bc,4
+    call CopyData
+
     pop hl
     ld a,[hl]
     ld [$d11e],a
@@ -54054,7 +54185,7 @@ Func_3c92a: ; 3c92a (f:492a)
     ld a,[W_ENEMYMONID]
     ld [$CF91],a
     ld [$D0B5],a
-    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld a,[W_ENEMYMONALTFORM]
     ld [wAlternateFormIndex],a
     call GetMonHeader
     ld de,$9000
@@ -54247,9 +54378,7 @@ TryRunningFromBattle: ; 3cab9 (f:4ab9)
     TX_FAR _UnnamedText_3cba1
     db "@"
 
-SECTION "LoadBattleMonFromParty",ROMX[$4ba6],BANK[$f]
-
-LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
+LoadBattleMonFromParty:
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
     ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
@@ -54262,9 +54391,9 @@ LoadBattleMonFromParty: ; 3cba6 (f:4ba6)
     ld de,W_PLAYERMONIVS
     ld bc,$2
     call CopyData
-    ld de,W_PLAYERMONPP ; $d02d
-    ld bc,$4
-    call CopyData
+    ld de,W_PLAYERMONENERGY ; W_PLAYERMONALTFORM
+    ld bc,2
+    call CopyDataAndInc2HL
     ld de,W_PLAYERMONLEVEL ; $d022
     ld bc,$b
     call CopyData
@@ -54305,9 +54434,9 @@ LoadEnemyMonFromParty: ; 3cc13 (f:4c13)
     ld de,$cff1
     ld bc,$2
     call CopyData
-    ld de,W_ENEMYMONPP ; $cffe
-    ld bc,$4
-    call CopyData
+    ld de,W_ENEMYMONENERGY ; W_ENEMYMONALTFORM
+    ld bc,2
+    call CopyDataAndInc2HL
     ld de,W_ENEMYMONLEVEL ; $cff3
     ld bc,$b
     call CopyData
@@ -54344,6 +54473,8 @@ LoadEnemyMonFromParty: ; 3cc13 (f:4c13)
     ld a,[wWhichPokemon] ; $cf92
     ld [W_ENEMYMONNUMBER],a ; $cfe8
     ret
+
+SECTION "Func_3cc91",ROMX[$4c91],BANK[$f]
 
 Func_3cc91: ; 3cc91 (f:4c91)
     ld hl,Func_58e59
@@ -54482,8 +54613,8 @@ DrawPlayerHUDAndHPBar:
     ld de,$cfb9
     ld bc,11
     call CopyData
-    ld a,[W_PLAYERMONPP] ; Energy
-    ld [$cfb5],a         ; ...
+    ld a,[W_PLAYERMONENERGY]
+    ld [$cfb5],a
     FuncCoord 10,08 ; Player Battle Status
     ld hl,Coord
     ld de,$cf9c
@@ -54628,13 +54759,13 @@ GetBattleHealthBarColor:
 GetSelectedMovePointer:
     ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
     ld bc,W_PLAYERMONID
-    ld de,W_PLAYERMONPP+1 ; move2pp
+    ld de,W_PLAYERMONALTFORM
     ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
     and a
     ret z
     inc hl
     ld bc,W_ENEMYMON_START
-    ld de,W_ENEMYMONPP+1 ; move2pp
+    ld de,W_ENEMYMONALTFORM
     ret
 
 ; Free
@@ -55013,7 +55144,7 @@ Func_3d119: ; 3d119 (f:5119)
     ld a,[$cfe5]
     ld [$cf91],a
     ld [$d0b5],a
-    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld a,[W_ENEMYMONALTFORM]
     ld [wAlternateFormIndex],a ; Save AlternateFormIndex
     call GetMonHeader
     ld de,$9000
@@ -55501,14 +55632,14 @@ PrintMenuItem: ; 3d4b6 (f:54b6)
     ld [wWhichPokemon],a ; $cf92
     ld a,$4
     ld [$cc49],a
-    ld hl,GetMaxPP
-    ld b,BANK(GetMaxPP)
-    call Bankswitch ; indirect jump to GetMaxPP (e677 (3:6677))
+;    ld hl,GetMaxPP
+;    ld b,BANK(GetMaxPP)
+;    call Bankswitch ; indirect jump to GetMaxPP (e677 (3:6677))
     ld hl,wCurrentMenuItem ; $cc26
     ld c,[hl]
     inc [hl]
     ld b,$0
-    ld hl,W_PLAYERMONMOVES ; Disable Check PP, Only Check Moves (No Move ID = 0) ; ld hl,W_PLAYERMONPP ; $d02d
+    ld hl,W_PLAYERMONMOVES
     add hl,bc
     ld a,[hl]
     ld [$cd6d],a
@@ -56279,7 +56410,7 @@ GetSideEffectType_Common:
     ret z
     cp ICE
     ret z
-    ld a,TYPE_NA
+    ld a,$FF
     ret
 
 SaveScreenAndLoadBattlePokedex:
@@ -57362,7 +57493,7 @@ HandleCounterMove:
     and a
     ret z ; if the move the target used has 0 power,miss
     push bc ; Backup Target ID
-    ld hl,(W_PLAYERMONPP+1)-W_PLAYERMONID
+    ld hl,(W_PLAYERMONALTFORM)-W_PLAYERMONID
     add hl,bc
     ld d,h
     ld e,l ; de point to move2pp
@@ -57869,10 +58000,14 @@ HowManyMovesWithEnoughEnergy:
 AdjustDamageForMoveType:
     PREDEF AdjustDamageForMoveType_GetInput
     ld a,[$d11e] ; move type
-    cp b ; does the move type match type 1 of the attacker?
+    ld hl,wTmpAttackerTypes
+    ld b,4
+.LoopAttackerTypes
+    cp [hl] ; does the move type match type of the attacker?
     jr z,.sameTypeAttackBonus
-    cp c ; does the move type match type 2 of the attacker?
-    jr z,.sameTypeAttackBonus
+    inc hl
+    dec b
+    jr nz,.LoopAttackerTypes
     jr .skipSameTypeAttackBonus
 .sameTypeAttackBonus
 ; if the move type matches one of the attacker's types
@@ -57903,12 +58038,19 @@ AdjustDamageForMoveType:
     cp b ; does move type match "attacking type"?
     jr nz,.nextTypePair
     ld a,[hl] ; a = "defending type" of the current type pair
-    cp d ; does type 1 of defender match "defending type"?
+    push hl
+    ld hl,wTmpDefenderTypes
+    ld d,4
+.LoopDefenderTypes
+    cp [hl] ; does type of defender match "defending type"?
     jr z,.matchingPairFound
-    cp e ; does type 2 of defender match "defending type"?
-    jr z,.matchingPairFound
+    inc hl
+    dec d
+    jr nz,.LoopDefenderTypes
+    pop hl
     jr .nextTypePair
 .matchingPairFound
+    pop hl
 ; if the move type matches the "attacking type" and one of the defender's types matches the "defending type"
     push hl
     push bc
@@ -57940,8 +58082,6 @@ AdjustDamageForMoveType:
     ld [hl],a
     or b ; is damage 0?
     jr nz,.skipTypeImmunity
-;    inc a               ; if damage is 0,make the move miss
-;    ld [W_MOVEMISSED],a ; ...
     ld [wCriticalHitOrOHKO],a ; if damage is 0,delete crit hit flag
 .skipTypeImmunity
     pop bc
@@ -57983,24 +58123,17 @@ GetTypeEffects:
     ret
 
 CheckPoisonableMon:
+    ld b,4
+.loop
     ld a,[hli]
     cp POISON ; can't poison a poison-type target
     ret z
     cp METAL ; can't poison a metal-type target
     ret z
-    ld a,[hld]
-    cp POISON ; can't poison a poison-type target
-    ret z
-    cp METAL ; can't poison a metal-type target
-    ret z
-    push hl
-    push bc
-    ld bc,W_PLAYERMONID-W_PLAYERMONTYPES
-    add hl,bc
-    ld a,[hl]
-    cp KAKUNA
-    pop bc
-    pop hl
+    dec b
+    jr nz,.loop
+    ld a,1 ; reset all flag
+    or a   ; ...
     ret
 
 BackupMovesBeforeEnemyMimic:
@@ -59069,13 +59202,20 @@ LoadEnemyMonData:
     ld [W_ENEMYMONSTATUS],a ; $cfe9
 .copyTypes
     ld hl,W_MONHTYPES
-    ld de,W_ENEMYMONTYPES ; $cfea
+    ld de,W_ENEMYMONTYPES
     ld a,[hli]            ; copy type 1
     ld [de],a
     inc de
     ld a,[hli]            ; copy type 2
     ld [de],a
     inc de
+    ld a,[hli]            ; copy type 3
+    ld [de],a
+    inc de
+    ld a,[hl]             ; copy type 4
+    ld [de],a
+    ld hl,W_MONHCATCHRATE
+    ld de,W_ENEMYMONCATCHRATE
     ld a,[hli]            ; copy catch rate
     ld [de],a
     inc de
@@ -59084,9 +59224,9 @@ LoadEnemyMonData:
     jr nz,.copyStandardMoves
     ld hl,W_ENEMYMON1MOVE3-2 ; move
     call Copy4Bytes
-    ld de,W_ENEMYMONPP
-    ld hl,W_ENEMYMON1MOVE3+19 ; pp
-    call Copy4Bytes
+    ld de,W_ENEMYMONENERGY ; W_ENEMYMONALTFORM
+    ld hl,W_ENEMYMON1MOVE3+19 ; energy/alt form
+    call Copy2Bytes
     jr .continue
 .copyStandardMoves
     ld a,[W_ENEMYBATTSTATUS3] ; $d069
@@ -59094,9 +59234,9 @@ LoadEnemyMonData:
     jr z,.FreshMoves
     ld hl,wBackupEnemyMoves ; move
     call Copy4BytesDirect
-    ld hl,wBackupEnemyPP ; pp
-    ld de,W_ENEMYMONPP
-    call Copy4BytesDirect
+    ld hl,wBackupEnemyEnergy ; wBackupEnemyAltForm ; energy/alt form
+    ld de,W_ENEMYMONENERGY ; W_ENEMYMONALTFORM
+    call Copy2BytesDirect
     jr .continue
 .FreshMoves
     xor a
@@ -59106,8 +59246,7 @@ LoadEnemyMonData:
     ld bc,4
     call FillMemory
     call WriteMonMovesPlus
-.resetPP
-    ld de,W_ENEMYMONPP-1
+    ld de,W_ENEMYMONENERGY-1 ; W_ENEMYMONALTFORM
     PREDEF ResetMovePPs
 .continue
     ld hl,W_MONHBASESTATS
@@ -59581,12 +59720,8 @@ GenRandomInBattle: ; 3ee9b (f:6e9b)
 HandleExplodingAnimation: ; 3eed3 (f:6ed3)
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ;ld hl,W_ENEMYMONTYPE1 ; $cfea (aliases: W_ENEMYMONTYPES)
-    ;ld de,W_ENEMYBATTSTATUS1 ; $d067
     ld a,[W_PLAYERMOVENUM] ; $cfd2
     jr z,.done
-    ;ld hl,W_PLAYERMONTYPE1 ; $d019 (aliases: W_PLAYERMONTYPES)
-    ;ld de,W_ENEMYBATTSTATUS1 ; $d067
     ld a,[W_ENEMYMOVENUM] ; $cfcc
 .done
     cp SELFDESTRUCT
@@ -59594,18 +59729,6 @@ HandleExplodingAnimation: ; 3eed3 (f:6ed3)
     cp EXPLOSION
     ret nz
 .explodeMove
-    ;ld a,[de]
-    ;bit 6,a
-    ;ret nz
-    ;ld a,[hli]
-    ;cp GHOST
-    ;ret z
-    ;ld a,[hl]
-    ;cp GHOST
-    ;ret z
-    ;ld a,[W_MOVEMISSED] ; $d05f
-    ;and a
-    ;ret nz
     ld a,$5 ; MegaPunchAnim
     ld [$cc5b],a
     ; fall through
@@ -60103,11 +60226,15 @@ PoisonEffect:
 .skipMoveHitTest
     call CheckTargetSubstitute
     jr nz,.didntAffect ; can't poison a substitute target
-    ld a,[hli] ; hl now point to type
+    ld a,[hl]
     ld b,a
     and a
     jr nz,.alreadyStatused ; miss if target is already statused
+    push hl
+    ld bc,W_PLAYERMONTYPES-W_PLAYERMONSTATUS
+    add hl,bc
     call CheckPoisonableMon
+    pop hl
     jr z,.doesntAffect
     ld a,[de]
     cp POISON_SIDE_EFFECT1
@@ -60121,7 +60248,6 @@ PoisonEffect:
     cp b
     ret nc
 .inflictPoison
-    dec hl
     set 3,[hl] ; mon is now poisoned
     push de
     dec de
@@ -60220,13 +60346,14 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     jp nz,CheckDefrost
     ;opponent has no existing status
     call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
-    ld b,a
-    ld a,[W_ENEMYMONTYPE1]
-    cp b
-    ret z  ;return if they match [can't freeze an ice type etc.]
-    ld a,[W_ENEMYMONTYPE2]
-    cp b
-    ret z  ;return..
+    ld hl,W_ENEMYMONTYPES
+    ld b,4
+.LoopEnemyMoves
+    cp [hl]
+    ret z ; return if they match [can't freeze an ice type etc.]
+    inc hl
+    dec b
+    jr nz,.LoopEnemyMoves
     ld a,[W_PLAYERMOVEEFFECT]
     cp a,7         ;10% status effects are 04,05,06 so 07 will set carry for those
     ld b,$1a       ;[1A-1]/100 or [26-1]/256 = 9.8%~ chance
@@ -60272,13 +60399,14 @@ opponentAttacker: ; 3f382 (f:7382)
     and a
     jp nz,CheckDefrost
     call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
-    ld b,a
-    ld a,[W_PLAYERMONTYPE1]
-    cp b
-    ret z
-    ld a,[W_PLAYERMONTYPE2]
-    cp b
-    ret z
+    ld hl,W_PLAYERMONTYPES
+    ld b,4
+.LoopPlayerMoves
+    cp [hl]
+    ret z ; return if they match [can't freeze an ice type etc.]
+    inc hl
+    dec b
+    jr nz,.LoopPlayerMoves
     ld a,[W_ENEMYMOVEEFFECT]
     cp a,7
     ld b,$1a
@@ -61974,55 +62102,37 @@ AIGetTypeEffectiveness:
     bit 3,a
     jr z,.EnemyMove
     ld a,[W_PLAYERMOVETYPE]
-    ld d,a                       ; d = type of player move
-    ld hl,W_ENEMYMONTYPES
+    ld de,W_ENEMYMONTYPES        ; [de] = types of enemy's pokemon
     jr .common
 .EnemyMove
     ld a,[W_ENEMYMOVETYPE]
-    ld d,a                       ; d = type of enemy move
-    ld hl,W_PLAYERMONTYPES
+    ld de,W_PLAYERMONTYPES       ; [de] = types of player's pokemon
 .common
-    ld b,[hl]                    ; b = type 1 of player's pokemon
-    inc hl
-    ld c,[hl]                    ; c = type 2 of player's pokemon
-    ld a,d
+    ld b,a                       ; b = type of attacker move
     ld [$d11e],a
     call GetTypeEffects
     ld a,$0A
     ld [$d11e],a                 ; initialize [$D11E] to neutral effectiveness
+; ──────────────────────────────────────────────────
 .loop
-    ld a,[hli]
+    ld a,[hli]                   ; Read Attacker Type from "TypeEffects"
     cp a,$ff
     ret z
-    cp d                         ; match the type of the move
+    cp b                         ; match the type of the attacker move
     jr nz,.nextTypePair1
-    ld a,[hli]
-    cp b                         ; match with type 1 of pokemon
+    ld a,[hli]                   ; Read Defender Type from "TypeEffects"
+    push hl
+    ld h,d
+    ld l,e
+    ld c,4
+.LoopMonTypes
+    cp [hl]                      ; match with types of defender pokemon
     jr z,.AImatchingPairFound
-    cp c                         ; or match with type 2 of pokemon
-    jr z,.AImatchingPairFound
+    inc hl
+    dec c
+    jr nz,.LoopMonTypes
+    pop hl
     jr .nextTypePair2
-; ──────────────────────────────────────────────────
-;.AImatchingPairFound
-;    ld a,[hl]                    ; get damage multiplier
-;    cp $05                       ; is it halved?
-;    jr nz,.AInothalf             ; jump down of not half
-;    ld a,[$d11e]                 ; else get the effectiveness multiplier
-;    srl a                        ; halve the multiplier
-;    ld [$d11e],a                 ; store damage multiplier
-;    jr .nextTypePair2            ; get next pair in list
-;.AInothalf
-;    cp $14                       ; is it double?
-;    jr nz,.AImustbezero          ; if not double either,it must be zero so skip ahead
-;    ld a,[$d11e]                 ; else get the effectiveness multiplier
-;    sla a                        ; double the multiplier
-;    ld [$d11e],a                 ; store damage multiplier
-;    jr .nextTypePair2            ; get next pair in list
-;.AImustbezero
-;    xor a                        ; clear a to 00
-;    ld [$d11e],a                 ; store damage multiplier
-;    ret
-; ──────────────────────────────────────────────────
 .nextTypePair1
     inc hl
 .nextTypePair2
@@ -62030,9 +62140,10 @@ AIGetTypeEffectiveness:
     jr .loop
 ; ──────────────────────────────────────────────────
 .AImatchingPairFound
+    pop hl
     push hl
     push bc
-    ld a,[hl] ; a = damage multiplier
+    ld a,[hl]                    ; a = damage multiplier from "TypeEffects"
     ld [H_MULTIPLIER],a
     xor a
     ld [H_MULTIPLICAND],a
@@ -62049,6 +62160,7 @@ AIGetTypeEffectiveness:
     pop bc
     pop hl
     jr .nextTypePair2
+; ──────────────────────────────────────────────────
 
 PlayBattleMusicAndDoBattleTransitionAndInitBatVar:
    ld hl,PlayBattleMusic
@@ -62136,8 +62248,18 @@ Copy4Bytes:
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
     call AddNTimes
+    ; fall through
 Copy4BytesDirect:
-    ld bc,$4
+    ld bc,4
+    jp CopyData
+
+Copy2Bytes:
+    ld a,[wWhichPokemon] ; $cf92
+    ld bc,$2c
+    call AddNTimes
+    ; fall through
+Copy2BytesDirect:
+    ld bc,2
     jp CopyData
 
 StatUp1DownSideEffect:
@@ -62279,12 +62401,18 @@ LoadMonFromParty_HandleAlternative_Common:
     jp InsertRealTypes
 
 GetEnemyMonStat_HandleAlternative:
-    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld a,[W_ENEMYMONALTFORM]
     ld [wAlternateFormIndex],a
     jp GetMonHeader
 
 DisabledText:
     db "Disabled@"
+
+CopyDataAndInc2HL:
+    call CopyData
+    inc hl
+    inc hl
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -62898,7 +63026,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld [$fff4],a
     FuncCoord 09,04
     ld hl,Coord
-    PREDEF Func_27d6b ; Prints the type (?)
+    PREDEF PrintTypes
     call Delay3
     call GBPalNormal
     ; header just loaded in "GetPokedexPaletteID" ; call GetMonHeader ; load pokemon picture location
@@ -75809,7 +75937,7 @@ _AddPokemonToPartyPredef:                  NEW_PREDEF _AddPokemonToParty        
 UpdateHPBar_2Predef:                       NEW_PREDEF UpdateHPBar                         ; $48
 DrawEnemyHUDAndHPBarPredef:                NEW_PREDEF DrawEnemyHUDAndHPBar                ; $49
 Func_70f60Predef:                          NEW_PREDEF Func_70f60                          ; $4A
-Func_27d6bPredef:                          NEW_PREDEF Func_27d6b                          ; $4B
+PrintTypesPredef:                          NEW_PREDEF PrintTypes                          ; $4B
 Func_17c47Predef:                          NEW_PREDEF Func_17c47                          ; $4C
 Func_5aafPredef:                           NEW_PREDEF Func_5aaf                           ; $4D
 AskForMonNicknamePredef:                   NEW_PREDEF AskForMonNickname                   ; $4E
@@ -97464,7 +97592,7 @@ Func_702f0: ; 702f0 (1c:42f0)
     ld [$d0b5],a
     FuncCoord 3,9 ; $c457
     ld hl,Coord
-    PREDEF Func_27d6b
+    PREDEF PrintTypes
     ld a,[wWhichTrade] ; $cd3d
     jp PlayCry
 
@@ -115442,12 +115570,12 @@ CheckShinyDuringEvolution: ; DONE:Palette
     jp EvolutionSetWholeScreenPalette
 
 GetBattleFrontMonHeader:
-    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld a,[W_ENEMYMONALTFORM]
     ld [wAlternateFormIndex],a
     jp GetMonHeader
 
 GetBattleBackMonHeader:
-    ld a,[W_PLAYERMONPP+1] ; move2pp
+    ld a,[W_PLAYERMONALTFORM]
     ld [wAlternateFormIndex],a
     jp GetMonHeader
 
@@ -132413,7 +132541,7 @@ DebugStats:
     ld de,W_ENEMYMONCURHP
     call .PrintStat
     ; Print Energy & Alternate Form ID
-    ld de,W_ENEMYMONPP
+    ld de,W_ENEMYMONENERGY ; W_ENEMYMONALTFORM
     call .Print2Stat1Byte
     ; ──────────────────────────
     ; PLAYER
@@ -132446,7 +132574,7 @@ DebugStats:
     ld de,W_PLAYERMONCURHP
     call .PrintStat
     ; Print Energy & Alternate Form ID
-    ld de,W_PLAYERMONPP
+    ld de,W_PLAYERMONENERGY ; W_PLAYERMONALTFORM
     call .Print2Stat1Byte
     ; End
     scf
@@ -137792,11 +137920,11 @@ _CriticalHitTest_NoBug:
     ld [wCriticalHitOrOHKO],a
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld a,[W_ENEMYMONALTFORM]
     ld b,a
     ld a,[W_ENEMYMON_START]
     jr nz,.handleEnemy
-    ld a,[W_PLAYERMONPP+1] ; move2pp
+    ld a,[W_PLAYERMONALTFORM]
     ld b,a
     ld a,[W_PLAYERMONID]
 .handleEnemy
@@ -138188,9 +138316,16 @@ CheckSTAB:
     pop af    ; ...
     ld [hl],a ; ...
     ld a,[W_PLAYERMOVETYPE]
-    cp b
+    ld hl,wTmpAttackerTypes
+    ld b,4
+.loop
+    cp [hl] ; does the move type match type of the attacker?
     ret z
-    cp c
+    inc hl
+    dec b
+    jr nz,.loop
+    ld a,1 ; reset all flag
+    or a   ; ...
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -138450,7 +138585,7 @@ DecrementPP: ; 68000 (1a:4000)
     ret nz               ; if any of these statuses are true,don't decrement PP
     bit 6,[hl]          ; check 6th bit status flag on W_PLAYERBATTSTATUS2
     ret nz               ; and return if it is set
-    ld hl,W_PLAYERMONPP ; PP of first move (in battle)
+    ld hl,W_PLAYERMONENERGY ; Energy (in battle)
     call .DecrementPP
     ld hl,W_PARTYMON1_MOVE1PP ; PP of first move (in party)
     ld a,[wPlayerMonNumber] ; which mon in party is active
@@ -138460,7 +138595,7 @@ DecrementPP: ; 68000 (1a:4000)
     ld a,[W_PLAYERMOVEMAXPP] ; Energy
     ld b,a
     ld a,[hl]
-    sub b ; dec [hl]     ; Decrement PP
+    sub b ; dec [hl]     ; Decrement Energy
     ld [hl],a
     ret
 
@@ -138478,7 +138613,7 @@ DecrementEnemyPP_:
     ret nz               ; if any of these statuses are true,don't decrement PP
     bit 6,[hl]          ; check 6th bit status flag on W_ENEMYBATTSTATUS2
     ret nz               ; and return if it is set
-    ld hl,W_ENEMYMONPP  ; PP of first move (in battle)
+    ld hl,W_ENEMYMONENERGY ; Energy (in battle)
     call .DecrementPP
 
     ld a,[W_ISINBATTLE] ; $d057
@@ -138494,7 +138629,7 @@ DecrementEnemyPP_:
     ld a,[W_ENEMYMOVEMAXPP] ; Energy
     ld b,a
     ld a,[hl]
-    sub b ; dec [hl]     ; Decrement PP
+    sub b ; dec [hl]     ; Decrement Energy
     ld [hl],a
     ret
 
@@ -138796,7 +138931,7 @@ HandleStatusScreen1:
     call PrintLevel ; Pokémon level
     FuncCoord 1,8
     ld hl,Coord
-    PREDEF Func_27d6b ; Prints the type (?)
+    PREDEF PrintTypes ; Prints the type (?)
     ld hl,Unknown_12a9d ; $6a9d
     call unk_12a7e
     ld d,h
@@ -139410,7 +139545,7 @@ ItemInBattleFinalCheck:
     call DisableAutoBgTransfer
     ld a,[W_PLAYERMONID]
     ld [$d0b5],a
-    ld a,[W_PLAYERMONPP+1] ; move2pp
+    ld a,[W_PLAYERMONALTFORM]
     ld [wAlternateFormIndex],a
     call GetMonHeader
     PREDEF LoadMonBackSprite
@@ -139478,9 +139613,13 @@ InsertRealTypes_:
     call Load16BitRegisters
     ld h,d
     ld l,e
-    ld de,W_PLAYERMONTYPES-W_PLAYERMONPP
-    add hl,de
     ld de,W_MONHTYPES
+    ld a,[de]
+    ld [hli],a
+    inc de
+    ld a,[de]
+    ld [hli],a
+    inc de
     ld a,[de]
     ld [hli],a
     inc de
@@ -139511,7 +139650,7 @@ CheckEnoughEnergy:
     call GetMoveEnergy ; d = Move Selected Energy
     pop hl
     push hl
-    ld bc,W_PLAYERMONPP-W_PLAYERMONMOVES
+    ld bc,W_PLAYERMONENERGY-W_PLAYERMONMOVES
     add hl,bc
     ld a,[hl] ; Mon Energy
     sub d
@@ -140820,7 +140959,13 @@ _CheckCounterFail:
     ld h,d
     ld l,e ; hl = Pointer to Mon ID
     ld de,W_PLAYERMONTYPES-W_PLAYERMONID
-    add hl,de ; hl = Pointer to Type
+    add hl,de ; hl = Pointer to Types
+    ld a,[hli]
+    cp GHOST
+    ret z
+    ld a,[hli]
+    cp GHOST
+    ret z
     ld a,[hli]
     cp GHOST
     ret z
@@ -141247,7 +141392,7 @@ _LoadBattlePokedex:
     jp nz,Bankswitch
     ld a,[W_ENEMYMON_START]
     ld [$d0b5],a
-    ld a,[W_ENEMYMONPP+1] ; move2pp
+    ld a,[W_ENEMYMONALTFORM]
     ld [wAlternateFormIndex],a ; Save AlternateFormIndex
     call GetMonHeader
     ld de,$9000
@@ -141323,7 +141468,7 @@ AdjustDamageForMoveType_GetInput:
     ld a,[W_PLAYERMOVENUM]
     ld c,a
     ld hl,W_PLAYERMONTYPES
-    call GetAttackerType ; b = type 1 | c = type 2
+    call GetAttackerType
     ld a,[W_ENEMYMON_START]
     ld d,a
     ld hl,W_ENEMYMONTYPES
@@ -141337,21 +141482,18 @@ AdjustDamageForMoveType_GetInput:
     ld a,[W_ENEMYMOVENUM]
     ld c,a
     ld hl,W_ENEMYMONTYPES
-    call GetAttackerType ; b = type 1 | c = type 2
+    call GetAttackerType
     ld a,[W_PLAYERMONID]
-    ld d,a
+    ld b,a
     ld hl,W_PLAYERMONTYPES
     jp GetDefenderType
 
 ; Input
 ; [$d11e] = Attacker Move Type
 ; [hl/hl+1] = Defender Mon Type
-; b = type 1 of attacker
-; c = type 2 of attacker
-; d = Defender Mon ID
+; b = Defender Mon ID
 ; Output
-; d = type 1 of defender
-; e = type 2 of defender
+; [wTmpDefenderTypes] = types of defender
 GetDefenderType:
     ld a,[$d11e]
     cp GROUND
@@ -141359,34 +141501,36 @@ GetDefenderType:
     ; fall through
 
 .Standard
-    ld a,[hli]
-    ld d,a    ; d = type 1 of defender
-    ld e,[hl] ; e = type 2 of defender
+    ld de,wTmpDefenderTypes
+    ld bc,4
+    jp CopyData
+
+.Custom
+    ld hl,wTmpDefenderTypes
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
     ret
 
 .TryToLevitate
-    ld a,d ; Defender Mon ID
+    ld a,b ; Defender Mon ID
     push hl
     ld hl,.LevitateMonList
     call .IsInArray
     pop hl
     jr nc,.Standard
     ld a,WIND
-    ld d,a
-    ld e,a
-    ret
+    jr .Custom
 
 .IsInArray
     push bc
-    push de
     ld de,1
     call IsInArray
-    pop de
     pop bc
     ret
-    
+
 .LevitateMonList
-    db BEEDRILL
     db KOFFING
     db WEEZING
     db $FF
@@ -141397,11 +141541,8 @@ GetDefenderType:
 ; b = Attacker Mon ID
 ; c = Attacker Move ID
 ; Output
-; b = type 1 of attacker
-; c = type 2 of attacker
-; Note = DRAGON Type & Beedrill gain WIND STAB
-;        "Birds", Rapidash & Seaking gain IVORY STAB
-;        Kakuna gain POISON STAB
+; [wTmpAttackerTypes] = types of attacker
+; Note = "Birds", Rapidash & Seaking gain IVORY STAB
 ;        Sandshrew/Sansdlash gain STAB with "Slash moves"
 GetAttackerType_:
     call Load16BitRegisters
@@ -141409,10 +141550,6 @@ GetAttackerType:
     ld a,[$d11e]
     cp IVORY
     jr z,.TryToForceIvory
-    cp WIND
-    jr z,.TryToForceWind
-    cp POISON
-    jr z,.TryToForcePoison
     ld a,c ; Move ID
     push hl
     ld hl,.SlashMoveTable
@@ -141422,9 +141559,16 @@ GetAttackerType:
     ; fall through
 
 .Standard
-    ld a,[hli]
-    ld b,a
-    ld c,[hl]
+    ld de,wTmpAttackerTypes
+    ld bc,4
+    jp CopyData
+
+.Custom
+    ld hl,wTmpAttackerTypes
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
     ret
 
 .TryToForceIvory
@@ -141435,25 +141579,7 @@ GetAttackerType:
     pop hl
     jr nc,.Standard
     ld a,IVORY
-    ld b,a
-    ld c,a
-    ret
-
-.TryToForceWind
-    ld a,[hli]
-    cp DRAGON
-    jr z,.ForceWind
-    ld a,[hl]
-    cp DRAGON
-    jr z,.ForceWind
-    ld a,b ; Mon ID
-    cp BEEDRILL
-    jr nz,.Standard
-.ForceWind
-    ld a,WIND
-    ld b,a
-    ld c,a
-    ret
+    jp .Custom
 
 .TryToForceSlash
     ld a,b ; Mon ID
@@ -141463,25 +141589,12 @@ GetAttackerType:
     pop hl
     jr nc,.Standard
     ld a,NORMAL
-    ld b,a
-    ld c,a
-    ret
-
-.TryToForcePoison
-    ld a,b ; Mon ID
-    cp KAKUNA
-    jr nz,.Standard
-    ld a,POISON
-    ld b,a
-    ld c,a
-    ret
+    jp .Custom
 
 .IsInArray
     push bc
-    push de
     ld de,1
     call IsInArray
-    pop de
     pop bc
     ret
 
