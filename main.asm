@@ -469,7 +469,7 @@ PlayCryAndUpdatePokedex:
     ret
 
 ; Input a = Pokemon ID
-; Output z flag set = Pokemon NOT Seed
+; Output z flag set = Pokemon NOT Seen
 IsPokemonSeen:
     push bc ; Backup bc
     push af ; Backup a
@@ -51203,8 +51203,10 @@ TryEvolution: ; loop over evolution entries
     call PrintText
     ld a,[$d0b5]
     ld [$d11e],a
+    push af
     PREDEF ShowPokedexData
-    ld a,[$d0b5]
+    pop af
+    ld [$d0b5],a
     ld [$d11e],a
     ret
 .LoadPokedexText
