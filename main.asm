@@ -23124,11 +23124,12 @@ InitializeMissableObjectsFlagsNew:
 BackupMoves:
     ld hl,W_ENEMYMONMOVES
     ld de,wBackupEnemyMoves
-    jr BackupCommon
+    ld bc,4
+    jp CopyData
+
 BackupPP:
     ld hl,W_ENEMYMONENERGY ; W_ENEMYMONALTFORM
     ld de,wBackupEnemyEnergy ; wBackupEnemyAltForm
-BackupCommon:
     ld bc,2
     jp CopyData
 
@@ -25920,8 +25921,8 @@ SendNewMonToBox:
     ld [W_ENEMYMONNUMBER],a ; $cfe8
     call ResetEnemyHPStatusTypeAndPP ; ld hl,W_ENEMYMON_START
     ld de,W_BOXMON1DATA
-    ld bc,$c
-    call CopyData
+    ;ld bc,$c
+    call CopyDataSkipEnergyAltForm ; call CopyData
     ld hl,wPlayerID ; $d359
     ld a,[hli]
     ld [de],a
@@ -25960,7 +25961,7 @@ SendNewMonToBox:
     ld a,[hli]
     ld [de],a
     call ResetTempIV
-    call ResetMovePPs_
+    call SentNewMonToBox_ResetMovePPs
     ld b,BANK(SentNewMonToBox_TryToAddExclusiveMove)
     ld hl,SentNewMonToBox_TryToAddExclusiveMove
     jp Bankswitch
@@ -29134,6 +29135,29 @@ UpdateHPBar_AnimateHPBar:
     pop af
     pop hl
     ret
+
+SentNewMonToBox_ResetMovePPs:
+    call ResetMovePPs_
+    xor a     ; Reset Move 2/3 PP
+    ld [de],a ; ...
+    dec de    ; ...
+    ld [de],a ; ...
+    inc de    ; ...
+    ret
+
+CopyDataSkipEnergyAltForm:
+    ld bc,5
+    call CopyData
+    inc hl
+    inc hl
+    xor a     ; Reset EX Type 1
+    ld [de],a ; ...
+    inc de
+    ld [de],a ; ...
+    inc de
+    ld bc,5
+    jp CopyData
+
 
 SECTION "bank4",ROMX,BANK[$4]
 
