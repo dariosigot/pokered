@@ -79480,12 +79480,6 @@ ParalyzeEffect_:
     ld a,[de]
     cp THUNDER
     jr nz,.hitTest
-    ld b,h
-    ld c,l
-    inc bc
-    call CheckGoundOrRock
-    jr z,.doesntAffect
-    inc bc
     call CheckGoundOrRock
     jr z,.doesntAffect
 .hitTest
@@ -80346,6 +80340,23 @@ SaffronCityText12:
     jp TextScriptEnd
 
 CheckGoundOrRock:
+    push hl
+    ld bc,W_PLAYERMONTYPES-W_PLAYERMONSTATUS
+    add hl,bc
+    ld b,h
+    ld c,l
+    pop hl
+    call .CheckGoundOrRock
+    ret z
+    inc bc
+    call .CheckGoundOrRock
+    ret z
+    inc bc
+    call .CheckGoundOrRock
+    ret z
+    inc bc
+    ; fall through
+.CheckGoundOrRock
     ld a,[bc]
     cp EARTH
     ret z
