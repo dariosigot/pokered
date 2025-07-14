@@ -43471,7 +43471,7 @@ DebugNPC:
     ld a,[$cc49]
     push af
 
-    ld a,[H_CURRENTPRESSEDBUTTONS]
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
     bit 2,a ; was the select button pressed?
     jr nz,.select
     bit 3,a ; was the start button pressed?
@@ -43479,6 +43479,8 @@ DebugNPC:
     jp .standard
 
 .select
+    bit 6,a ; was the up button pressed?
+    jr nz,.selectUP
     ld hl,W_NUMINPARTY
     ld a,[hli]
     ld b,a
@@ -43507,51 +43509,53 @@ DebugNPC:
 .DoneTextSelect
     db 0,"Done! (Pokedex)",$57,"@"
 
+.selectUP
+    ld hl,W_PARTYMON1_MOVE2PP
+    inc [hl]
+    ld hl,.DoneTextSelectUP
+    jp .end
+.DoneTextSelectUP
+    db 0,"Done! (Alt.Form)",$57,"@"
+
 .start
-    ld a,[W_NUMINPARTY]
-    ld b,a
-    ld hl,W_PARTYMON1_TYPE1
-    ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
-.loop1
-    xor a
-    ld [hli],a ; Zero Type
-    ld [hld],a ; ...
-    push hl
-    push de
-    ld de,W_PARTYMON1_MOVE1PP-W_PARTYMON1_TYPE1
-    add hl,de
-    dec a
-    ld [hli],a ; 255 Energy
-    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
     bit 6,a ; was the up button pressed?
-    jr z,.skip1
+    jr nz,.startUP
+    ld hl,W_PARTYMON1_TYPE1
     xor a
-    ld [hli],a ; Zero PP
-    ld [hli],a ; ...
+    ld [hli],a ; Zero Type 1/2
     ld [hl],a  ; ...
-.skip1
-    pop de
-    pop hl
-    add hl,de
-    dec b
-    jr nz,.loop1
-    ld a,[W_NUMINPARTY]
-    ld b,a
     ld hl,W_PARTYMON1OT+8
-    ld de,11
     xor a
-.loop1b
     ld [hli],a ; Mon OT + 8
     ld [hli],a ; Mon OT + 9
-    ld [hld],a ; Mon OT + 10
-    dec hl
-    add hl,de
-    dec b
-    jr nz,.loop1b
+    ld [hl],a ; Mon OT + 10
     ld hl,.DoneTextStart
     jp .end
 .DoneTextStart
     db 0,"Done! (Reset TM)",$57,"@"
+
+.startUP
+    ld hl,W_PARTYMON1_MOVE4PP
+    call .LoopAndDestroyLastRecord
+    ld hl,W_PARTYMON1_MOVE4
+    call .LoopAndDestroyLastRecord
+    ld hl,.UPText
+    jr .end
+.LoopAndDestroyLastRecord
+    ld b,4
+.LoopUP
+    ld a,[hld]
+    and a
+    jr nz,.foundUP
+    dec b
+    jr nz,.LoopUP
+.foundUP
+    inc hl
+    xor a
+    ld [hl],a
+    ret
+.UPText
+    db 0,"Done! (0 PP Move)",$57,"@"
 
 .standard
     ld a,[W_NUMINPARTY]
@@ -43567,15 +43571,6 @@ DebugNPC:
     ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
     ld hl,AddPokemonToParty_TryToAddExclusiveMove_
     call Bankswitch
-    ld hl,W_PARTYMON1_MOVE1PP
-    ld a,[$FF00+$e4]
-    dec a
-    ld bc,$2c
-    call AddNTimes
-    ld [hl],255 ; 255 Energy
-    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
-    bit 6,a ; was the up button pressed?
-    call nz,.CopyPPToOT
     pop af
     ld [$FF00+$e4],a
     pop bc
@@ -43583,53 +43578,9 @@ DebugNPC:
     dec b
     jr nz,.loop2
     ld hl,.DoneText
-    jp .end
+    jr .end
 .DoneText
     db 0,"Done!",$57,"@"
-.CopyPPToOT
-    ld hl,W_PARTYMON1_MOVE2PP
-    ld a,[$FF00+$e4]
-    dec a
-    ld bc,$2c
-    call AddNTimes
-    push hl
-    ld hl,W_PARTYMON1OT+8
-    ld a,[$FF00+$e4]
-    dec a
-    ld bc,11
-    call AddNTimes
-    ld d,h
-    ld e,l
-    pop hl
-    ; hl = PP
-    ; de = OT
-    ld a,[de]
-    ld b,a
-    ld a,[hli]
-    or b
-    ld [de],a
-    inc de
-    ld a,[de]
-    ld b,a
-    ld a,[hli]
-    or b
-    ld [de],a
-    inc de
-    ld a,[de]
-    ld b,a
-    ld a,[hl]
-    or b
-    ld [de],a
-    ; hl = PP
-    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
-    bit 6,a ; was the up button pressed?
-    jr z,.skip
-    xor a
-    ld [hld],a
-    ld [hld],a
-    ld [hl],a
-.skip
-    ret
 
 .end
     call PrintText
