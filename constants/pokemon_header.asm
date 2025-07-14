@@ -487,8 +487,8 @@ ButterfreeBaseStats:
     db 80 ; base special
 
     db BUG ; species type 1
-    db WIND ; species type 2
-    db 0 ; species type 3
+    db PSYCHIC ; species type 2
+    db WIND ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
@@ -5687,8 +5687,8 @@ AerodactylBaseStats:
     db 60 ; base special
 
     db ROCK ; species type 1
-    db WIND ; species type 2
-    db DRAGON ; species type 3
+    db DRAGON ; species type 2
+    db WIND ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
