@@ -132053,6 +132053,7 @@ SelectInOverWorld:
     jr z,.Fishing
     cp OLD_ROD
     jr z,.Fishing
+    inc hl
     dec c
     jr nz,.SearchFishingLoop
     jr .noFishing
