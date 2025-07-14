@@ -60352,23 +60352,20 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     ld a,PAR
     ld [W_ENEMYMONSTATUS],a
     call QuarterSpeedDueToParalysis  ;quarter speed of affected monster
-    ld a,$a9
-    call PlayBattleAnimation  ;animation
+    call PlayA9BattleAnimation
     jp PrintMayNotAttackText    ;print paralysis text
 .burn
     ld a,BRN
     ld [W_ENEMYMONSTATUS],a
     call HalveAttackDueToBurn
-    ld a,$a9
-    call PlayBattleAnimation  ;animation
+    call PlayA9BattleAnimation
     ld hl,UnnamedText_3f3d8
     jp DrawHudAndPrintText
 .freeze
     call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
     ld a,FRZ
     ld [W_ENEMYMONSTATUS],a
-    ld a,$a9
-    call PlayBattleAnimation  ;animation
+    call PlayA9BattleAnimation
     ld hl,UnnamedText_3f3dd
     jp DrawHudAndPrintText
 opponentAttacker: ; 3f382 (f:7382)
@@ -60404,16 +60401,20 @@ opponentAttacker: ; 3f382 (f:7382)
     ld a,PAR
     ld [W_PLAYERMONSTATUS],a
     call QuarterSpeedDueToParalysis
+    call PlayC7BattleAnimation
     jp PrintMayNotAttackText
 .burn
     ld a,BRN
     ld [W_PLAYERMONSTATUS],a
     call HalveAttackDueToBurn
+    call PlayC7BattleAnimation
     ld hl,UnnamedText_3f3d8
     jp DrawHudAndPrintText
 .freeze
+    call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
     ld a,FRZ
     ld [W_PLAYERMONSTATUS],a
+    call PlayC7BattleAnimation
     ld hl,UnnamedText_3f3dd
     jp DrawHudAndPrintText
 
@@ -60826,11 +60827,6 @@ StatModifierDownEffect:
     db "@"
 
 ; ──────────────────────────────────────────────────────────────────────
-
-RecoilEffect:
-    ld hl,RecoilEffect_
-    ld b,BANK(RecoilEffect_)
-    jp Bankswitch
 
 GetPlayerOrEnemyTurnWithSubstitute:
     ld de,wEnemySubstituteHP
@@ -62390,6 +62386,19 @@ CopyDataAndInc2HL:
     inc hl
     inc hl
     ret
+
+PlayC7BattleAnimation:
+    ld a,$C7
+    jr PlayABattleAnimationCommon
+PlayA9BattleAnimation:
+    ld a,$A9
+PlayABattleAnimationCommon:
+    jp PlayBattleAnimation
+
+RecoilEffect:
+    ld hl,RecoilEffect_
+    ld b,BANK(RecoilEffect_)
+    jp Bankswitch
 
 SECTION "bank10",ROMX,BANK[$10]
 
