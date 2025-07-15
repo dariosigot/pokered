@@ -138639,6 +138639,12 @@ StatusScreen2:
 
 ; Predef 0x37
 StatusScreen:
+    ; Disable Quick Menu
+    ld hl,$ffb7
+    ld a,[hl]
+    push af ; Backup Quick Menu
+    xor a
+    ld [hl],a
     ; Disable Update Sprites Flag
     ld hl,$cfcb
     ld a,[hl]
@@ -138732,6 +138738,10 @@ StatusScreen:
     ; Restore Update Sprites Flag
     pop af
     ld [$cfcb],a
+    ; Restore Quick Menu
+    pop af
+    ld hl,$ffb7
+    ld [hl],a
     ; END
     ret
 
