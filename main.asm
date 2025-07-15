@@ -139058,10 +139058,10 @@ HandleStatusScreen2:
     call CopyNameToCF4B
     ld hl,Coord
     call PlaceString ; Pokémon name
-    ld h,b
-    ld l,c
-    ld de,.MovesText
-    call PlaceString
+    ;ld h,b
+    ;ld l,c
+    ;ld de,.MovesText
+    ;call PlaceString
 
     ; Mini Sprite
     call .StatusScreenMiniSpriteBackGround
@@ -139082,6 +139082,32 @@ HandleStatusScreen2:
     call Bankswitch
     ld hl,wStatusScreen2OAMBit0
     res 0,[hl]
+
+    ; Level
+    FuncCoord 13,00
+    ld hl,Coord
+    ld a,[$cfb9] ; .OutOfBattleLevel
+    cp 10
+    jr nc,.GreaterThen9
+    inc hl
+.GreaterThen9
+    call PrintLevel ; Pokémon level
+
+    ; Gender
+    push hl
+    ld hl,$cfb3 ; .OutOfBattle
+    call SetTempIV
+    ld b,BANK(GetGenderOutOfBattle)
+    ld hl,GetGenderOutOfBattle
+    call Bankswitch
+    pop hl
+    jr c,.Genderless
+    ld de,.MaleIcon
+    jr nz,.Male
+    ld de,.FemaleIcon
+.Male
+    call PlaceString
+.Genderless
 
     ; Energy
     ld de,$cfb5 ; PP/Energy
@@ -139122,6 +139148,10 @@ HandleStatusScreen2:
     jp GbPalComplete
 ;.Paging2:
 ;    db $d5,$ed,"@"
+.MaleIcon
+    db $EF,$50
+.FemaleIcon
+    db $F5,$50
 
 .StatusScreenMiniSpriteBackGround
     ld a,$E9 ; Empty Tile with Color0 (White) background
