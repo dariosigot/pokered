@@ -4,7 +4,7 @@ _YELLOW EQU 0
 
 
 VERSION: MACRO
-    db "0.87.010"
+    db "0.87.020"
     ENDM
 
 INCLUDE "macros.asm"
