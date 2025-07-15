@@ -532,6 +532,12 @@ GoPAL_SET_CF1C_NoHpPal:
     set 2,[hl]
     jp GoPAL_SET_CF1C
 
+_ReceivedText:
+    db $0,$52," received",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -33984,7 +33990,7 @@ UnnamedText_191ca: ; 191ca (6:51ca)
     db "@"
 
 ReceivedTM42Text: ; 191cf (6:51cf)
-    TX_FAR _ReceivedTM42Text ; 0xa469a
+    TX_FAR _ReceivedText
     db $10,"@"
 
 TM42Explanation: ; 191d5 (6:51d5)
@@ -35156,7 +35162,7 @@ TM41PreText: ; 199d2 (6:59d2)
     db "@"
 
 ReceivedTM41Text: ; 199d7 (6:59d7)
-    TX_FAR _ReceivedTM41Text ; 0xa5b5a
+    TX_FAR _ReceivedText
     db $0B,"@"
 
 TM41ExplanationText: ; 199dd (6:59dd)
@@ -40652,7 +40658,7 @@ TM29PreReceiveText: ; 1de75 (7:5e75)
     db "@"
 
 ReceivedTM29Text: ; 1de7a (7:5e7a)
-    TX_FAR _ReceivedTM29Text ; 0xa252a
+    TX_FAR _ReceivedText
     db $0B,"@"
 
 TM29ExplanationText: ; 1de80 (7:5e80)
@@ -71474,7 +71480,7 @@ TM18PreReceiveText: ; 48278 (12:4278)
     db "@"
 
 ReceivedTM18Text: ; 4827d (12:427d)
-    TX_FAR _ReceivedTM18Text ; 0x9c85a
+    TX_FAR _ReceivedText
     db $0B,"@"
 
 TM18ExplanationText: ; 48283 (12:4283)
@@ -71781,7 +71787,7 @@ UnnamedText_484f3: ; 484f3 (12:44f3)
     db "@"
 
 UnnamedText_484f9: ; 484f9 (12:44f9)
-    TX_FAR _UnnamedText_484f9
+    TX_FAR _ReceivedText
     db $0b
     TX_FAR _UnnamedText_484fe
     db $0d
@@ -71793,7 +71799,7 @@ UnnamedText_48504: ; 48504 (12:4504)
     db "@"
 
 UnnamedText_4850a: ; 4850a (12:450a)
-    TX_FAR _UnnamedText_4850a
+    TX_FAR _ReceivedText
     db $0b
     TX_FAR _UnnamedText_4850f
     db $0d
@@ -71805,7 +71811,7 @@ UnnamedText_48515: ; 48515 (12:4515)
     db "@"
 
 ReceivedTM49Text: ; 4851b (12:451b)
-    TX_FAR _ReceivedTM49Text
+    TX_FAR _ReceivedText
     db $0b
     TX_FAR _UnnamedText_48520
     db $0d
@@ -72543,7 +72549,7 @@ UnnamedText_48a6d: ; 48a6d (12:4a6d)
     db "@"
 
 TM21Text: ; 48a72 (12:4a72)
-    TX_FAR _ReceivedTM21Text ; 0x9d50c
+    TX_FAR _ReceivedText
     db $0B
     TX_FAR _TM21ExplanationText ; 0x9d520
     db "@"
@@ -73977,7 +73983,7 @@ TM39PreReceiveText: ; 4959c (12:559c)
     db "@"
 
 ReceivedTM39Text: ; 495a1 (12:55a1)
-    TX_FAR _ReceivedTM39Text ; 0x8c8c6
+    TX_FAR _ReceivedText
     db $0B,"@"
 
 TM39ExplanationText: ; 495a7 (12:55a7)
@@ -75416,7 +75422,7 @@ UnnamedText_4a350: ; 4a350 (12:6350)
     db "@"
 
 ReceivedHM03Text: ; 4a355 (12:6355)
-    TX_FAR _ReceivedHM03Text ; 0x85943
+    TX_FAR _ReceivedText
     db $0B,"@"
 
 HM03ExplanationText: ; 4a35b (12:635b)
@@ -89488,7 +89494,7 @@ PewterGymText4: ; 5c4a8 (17:44a8)
     db "@"
 
 PewterGymText5: ; 5c4ad (17:44ad)
-    TX_FAR _ReceivedTM34Text ; 0x980ad
+    TX_FAR _ReceivedText
     db $0B
     TX_FAR _TM34ExplanationText ; 0x980c0
     db "@"
@@ -89901,7 +89907,7 @@ CeruleanGymText5: ; 5c7c8 (17:47c8)
 
 CeruleanGymText6: ; 5c7cd (17:47cd)
 ReceivedTM11Text: ; 5c7cd (17:47cd)
-    TX_FAR _ReceivedTM11Text ; 0x98b7d
+    TX_FAR _ReceivedText
     db $0B,"@"
 
 CeruleanGymText7: ; 5c7d3 (17:47d3)
@@ -90421,7 +90427,7 @@ VermilionGymText6: ; 5cb77 (17:4b77)
     db "@"
 
 VermilionGymText7: ; 5cb7c (17:4b7c)
-    TX_FAR _ReceivedTM24Text ; 0x9c0e0
+    TX_FAR _ReceivedText
     db $11
     TX_FAR _TM24ExplanationText ; 0x9c0f5
     db "@"
@@ -90597,7 +90603,7 @@ TM31PreReceiveText: ; 5ccd9 (17:4cd9)
     db "@"
 
 ReceivedTM31Text: ; 5ccde (17:4cde)
-    TX_FAR _ReceivedTM31Text ; 0xa1675
+    TX_FAR _ReceivedText
     db $0B
 TM31ExplanationText1: ; 5cce3 (17:4ce3)
     TX_FAR _TM31ExplanationText1 ; 0xa1689
@@ -91241,7 +91247,7 @@ SaffronGymText10: ; 5d173 (17:5173)
     db "@"
 
 SaffronGymText11: ; 5d178 (17:5178)
-    TX_FAR ReceivedTM46Text
+    TX_FAR _ReceivedText
     db $b
     TX_FAR _TM46ExplanationText
     db "@"
@@ -104595,7 +104601,7 @@ ViridianGymText12: ; 74adf (1d:4adf)
     db "@"
 
 ViridianGymText13: ; 74ae4 (1d:4ae4)
-    TX_FAR _ReceivedTM27Text
+    TX_FAR _ReceivedText
     db $0b
 
 TM27ExplanationText: ; 74ae9 (1d:4ae9)
@@ -105374,7 +105380,7 @@ WardenThankYouText: ; 7514e (1d:514e)
     db "@"
 
 ReceivedHM04Text: ; 75153 (1d:5153)
-    TX_FAR _ReceivedHM04Text ; 0x9e5a2
+    TX_FAR _ReceivedText
     db $0B,"@"
 
 HM04ExplanationText: ; 75159 (1d:5159)
@@ -105960,7 +105966,7 @@ FuchsiaGymText9: ; 75590 (1d:5590)
     db "@"
 
 FuchsiaGymText10: ; 75595 (1d:5595)
-    TX_FAR _ReceivedTM06Text ; 0xa00eb
+    TX_FAR _ReceivedText
     db $11
 
 TM06ExplanationText: ; 7559a (1d:559a)
@@ -106426,7 +106432,7 @@ UnnamedText_75925: ; 75925 (1d:5925)
     db "@"
 
 ReceivedTM38Text: ; 7592a (1d:592a)
-    TX_FAR _ReceivedTM38Text ; 0xa09a8
+    TX_FAR _ReceivedText
     db $0B
     TX_FAR _TM38ExplanationText
     db "@"
@@ -106854,7 +106860,7 @@ TM35PreReceiveText: ; 75cc8 (1d:5cc8)
     db "@"
 
 ReceivedTM35Text: ; 75ccd (1d:5ccd)
-    TX_FAR _ReceivedTM35Text ; 0xa0f48
+    TX_FAR _ReceivedText
     db $0B,"@"
 
 TM35ExplanationText: ; 75cd3 (1d:5cd3)
@@ -119596,11 +119602,7 @@ _UnnamedText_4a350: ; 858a4 (21:58a4)
     db "Congratulations!",$4f
     db "You have won!",$58
 
-_ReceivedHM03Text: ; 85943 (21:5943)
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_HM03ExplanationText",ROMX[$5957],BANK[$21]
 
 _HM03ExplanationText: ; 85957 (21:5957)
     db $0,"This is FLOAT!",$51
@@ -123166,12 +123168,6 @@ _HM02ExplanationText: ; Moved to the End of the BANK
 _Mansion2BattleText2:
     db $0,"Gyaoo!@@"
 
-_ReceivedTM39Text:
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
-
 SECTION "bank24",ROMX,BANK[$24]
 
 _Route11EndBattleText9: ; 90000 (24:4000)
@@ -125969,12 +125965,6 @@ _OaksLabTextTM2:
     db "pick the #MON",$55
     db "carefully!",$58
 
-_ReceivedTM27Text:
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
-
 SECTION "bank26",ROMX,BANK[$26]
 
 _UnnamedText_5c4a3: ; 98000 (26:4000)
@@ -125992,13 +125982,7 @@ _TM34PreReceiveText: ; 98092 (26:4092)
     db $0,"Wait! Take this",$4f
     db "with you!",$57
 
-_ReceivedTM34Text: ; 980ad (26:40ad)
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
-
-_TM34ExplanationText: ; 980c0 (26:40c0)
+_TM34ExplanationText:
     db $0,$51
     db "My Gift is",$4f
     db "3x BIDE!",$51
@@ -127127,12 +127111,6 @@ _GymLeaderRematchText3:
     db $0,"Wow!",$4f
     db "Wonderfull!",$58
 
-_ReceivedTM11Text:
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
-
 SECTION "bank27",ROMX,BANK[$27]
 
 _UnnamedText_5cb72: ; 9c000 (27:4000)
@@ -127154,11 +127132,7 @@ _UnnamedText_5cb77: ; 9c069 (27:4069)
     db "You're special,",$4f
     db "kid! Take this!",$57
 
-_ReceivedTM24Text: ; 9c0e0 (27:40e0)
-    db $0,$52," received ",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_TM24ExplanationText",ROMX[$40f5],BANK[$27]
 
 _TM24ExplanationText: ; 9c0f5 (27:40f5)
     db $0,$51
@@ -127359,11 +127333,7 @@ _TM18PreReceiveText: ; 9c814 (27:4814)
     db "This might be",$55
     db "useful!",$58
 
-_ReceivedTM18Text: ; 9c85a (27:485a)
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_TM18ExplanationText",ROMX[$486e],BANK[$27]
 
 _TM18ExplanationText: ; 9c86e (27:486e)
     db $0,"TM18 is COUNTER!",$4f
@@ -127463,14 +127433,6 @@ _UnnamedText_484f3:
     db "Thank you!",$51
     db "You can have this",$4f
     db "from me!@@"
-
-_UnnamedText_484f9:
-_UnnamedText_4850a:
-_ReceivedTM49Text:
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
 
 _UnnamedText_484fe:
     db $0,$51
@@ -127710,11 +127672,7 @@ _UnnamedText_48a6d: ; 9d481 (27:5481)
     db "Please also take",$4f
     db "this with you.",$57
 
-_ReceivedTM21Text: ; 9d50c (27:550c)
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_TM21ExplanationText",ROMX[$5520],BANK[$27]
 
 _TM21ExplanationText: ; 9d520 (27:5520)
     db $0,$51
@@ -128188,11 +128146,7 @@ _WardenThankYouText: ; 9e51b (27:651b)
     db "something for",$55
     db "your trouble.",$58
 
-_ReceivedHM04Text: ; 9e5a2 (27:65a2)
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_HM04ExplanationText",ROMX[$65b6],BANK[$27]
 
 _HM04ExplanationText: ; 9e5b6 (27:65b6)
     db $0,"WARDEN: PWR ",$4f
@@ -128343,11 +128297,7 @@ _UnnamedText_75590: ; a0069 (28:4069)
     db "Ah! Take this",$4f
     db "too!",$57
 
-_ReceivedTM06Text: ; a00eb (28:40eb)
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_TM06ExplanationText",ROMX[$40ff],BANK[$28]
 
 _TM06ExplanationText: ; a00ff (28:40ff)
     db $0,$51
@@ -128589,11 +128539,7 @@ _UnnamedText_75925: ; a0946 (28:4946)
     db "Here,you can",$4f
     db "have this too!",$57
 
-_ReceivedTM38Text: ; a09a8 (28:49a8)
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_TM38ExplanationText",ROMX[$49bc],BANK[$28]
 
 _TM38ExplanationText: ; a09bc (28:49bc)
     db $0,$51
@@ -128762,11 +128708,7 @@ _TM35PreReceiveText: ; a0f09 (28:4f09)
     db "It can cause all",$4f
     db "kinds of fun!",$58
 
-_ReceivedTM35Text: ; a0f48 (28:4f48)
-    db $0,$52," received ",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_TM35ExplanationText",ROMX[$4f5d],BANK[$28]
 
 _TM35ExplanationText: ; a0f5d (28:4f5d)
     db $0,"Tch-tch-tch!",$4f
@@ -128957,11 +128899,7 @@ _TM31PreReceiveText: ; a1636 (28:5636)
     db "You can have",$4f
     db "this,then!",$58
 
-_ReceivedTM31Text: ; a1675 (28:5675)
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_TM31ExplanationText1",ROMX[$5689],BANK[$28]
 
 _TM31ExplanationText1: ; a1689 (28:5689)
     db $0,$51
@@ -129157,12 +129095,6 @@ _UnnamedText_5d173: ; a1d16 (28:5d16)
     db "much!",$51
     db "Wait,please take",$4f
     db "this TM with you!",$57
-
-ReceivedTM46Text:
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
 
 _TM46ExplanationText:
     db $0,$51
@@ -129365,13 +129297,7 @@ _TM29PreReceiveText: ; a24fe (28:64fe)
     db "say a word!",$51
     db "You wanted this!",$58
 
-_ReceivedTM29Text: ; a252a (28:652a)
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
-
-_TM29ExplanationText: ; a253e (28:653e)
+_TM29ExplanationText:
     db $0,"TM46 is PSYWAVE!",$51
     db "It uses random",$4f
     db "psychic waves to",$55
@@ -130319,13 +130245,7 @@ _TM41PreText: ; a5afd (29:5afd)
     db "Here's a gift for",$4f
     db "dropping by!",$58
 
-_ReceivedTM41Text: ; a5b5a (29:5b5a)
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
-
-_TM41ExplanationText: ; a5b6e (29:5b6e)
+_TM41ExplanationText:
     db $0,"TM53 teaches",$4f
     db "TSUNAMI!",$51
     db "Only strong",$4f
@@ -130878,12 +130798,6 @@ _EnableLastPkmnText:
     db "Why don't you take",$4f
     db "care of my last",$55
     db "#MON?",$57
-
-_ReceivedTM42Text:
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
 
 _ReceivedTM28Text:
     db $0,$52," recovered",$4f
