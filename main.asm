@@ -35830,7 +35830,7 @@ SilphCo4Object: ; 0x19e35 (size=111)
     db SPRITE_ROCKET,$e + 4,$9 + 4,$ff,$d3,$42,ROCKET,$1a ; trainer
     db SPRITE_OAK_AIDE,$6 + 4,$e + 4,$ff,$d2,$43,SCIENTIST,$5 ; trainer
     db SPRITE_ROCKET,$a + 4,$1a + 4,$ff,$d1,$44,ROCKET,$1b ; trainer
-    db SPRITE_BALL,$9 + 4,$3 + 4,$ff,$ff,$85,FULL_HEAL ; item
+    db SPRITE_BALL,$9 + 4,$3 + 4,$ff,$ff,$85,TM_07 ; item
     db SPRITE_BALL,$7 + 4,$4 + 4,$ff,$ff,$86,MAX_REVIVE ; item
     db SPRITE_BALL,$8 + 4,$5 + 4,$ff,$ff,$87,ESCAPE_ROPE ; item
 
@@ -85029,7 +85029,7 @@ Route12Object: ; 0x5869a (size=118)
     db SPRITE_FISHER2,$34 + 4,$9 + 4,$ff,$d3,$47,FISHER,$6 ; trainer
     db SPRITE_FISHER2,$57 + 4,$6 + 4,$ff,$d0,$48,FISHER,$b ; trainer
     db SPRITE_BALL,$23 + 4,$e + 4,$ff,$ff,$89,WATER_STONE ; item
-    db SPRITE_BALL,$59 + 4,$5 + 4,$ff,$ff,$8a,IRON ; item
+    db SPRITE_BALL,$59 + 4,$5 + 4,$ff,$ff,$8a,TM_04 ; item
 
     ; warp-to
     EVENT_DISP $a,$f,$a ; ROUTE_12_GATE
@@ -89386,7 +89386,7 @@ Func_5c3df: ; 5c3df (17:43df)
     ld hl,$d755
     set 7,[hl]
     ld bc,(TM_34 << 8) | 3
-    call GiveTechMachAndTM34 ; call GiveItem
+    call GiveItem
     jr nc,.BagFull
     ld a,$5
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
@@ -92788,11 +92788,6 @@ GetLastFighter:
     ld a,d
     ld [$cc4d],a
     PREDEF_JUMP RemoveMissableObject ; Hide Last Pokeball
-
-GiveTechMachAndTM34:
-    call GiveItem
-    ld bc,(TECH_MACHINE << 8) | 1
-    jp GiveItem
 
 ; Cerulean
 CeruleanMartText1:
@@ -118632,7 +118627,7 @@ _ReceivedTM36Text: ; 824ba (20:64ba)
     db $0,"!@@"
 
 _TM36ExplanationText: ; 824c9 (20:64c9)
-    db $0,"This is",$4f
+    db $0,"TM36 is",$4f
     db "SELFDESTRUCT!",$51
     db "It's powerful,but",$4f
     db "the #MON that",$55
@@ -122057,12 +122052,10 @@ _TM39PreReceiveText: ; 8c86b (23:486b)
     db "TM. I don't need",$55
     db "it any more...",$58
 
-_ReceivedTM39Text: ; 8c8c6 (23:48c6)
-    db $0,$52," received",$4f
-    db "a TM!@@"
+SECTION "_TM39ExplanationText",ROMX[$48d9],BANK[$23]
 
 _TM39ExplanationText: ; 8c8d9 (23:48d9)
-    db $0,"This is a move",$4f
+    db $0,"TM39 is a move",$4f
     db "called SWIFT.",$51
     db "It's very accurate,",$4f
     db "so use it during",$55
@@ -123172,6 +123165,12 @@ _HM02ExplanationText: ; Moved to the End of the BANK
 
 _Mansion2BattleText2:
     db $0,"Gyaoo!@@"
+
+_ReceivedTM39Text:
+    db $0,$52," received",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
 
 SECTION "bank24",ROMX,BANK[$24]
 
@@ -125634,13 +125633,11 @@ _ViridianGymText12: ; 95fcc (25:5fcc)
     db "your #MON",$55
     db "LEAGUE challenge!",$57
 
-_ReceivedTM27Text: ; 96082 (25:6082)
-    db $0,$52," received",$4f
-    db "a TM!@@"
+SECTION "_TM27ExplanationText",ROMX[$6095],BANK[$25]
 
 _TM27ExplanationText: ; 96095 (25:6095)
     db $0,$51
-    db "This is FISSURE!",$4f
+    db "TM27 is FISSURE!",$4f
     db "It will take out",$55
     db "#MON with just",$55
     db "one hit!",$51
@@ -125972,6 +125969,12 @@ _OaksLabTextTM2:
     db "pick the #MON",$55
     db "carefully!",$58
 
+_ReceivedTM27Text:
+    db $0,$52," received",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
+
 SECTION "bank26",ROMX,BANK[$26]
 
 _UnnamedText_5c4a3: ; 98000 (26:4000)
@@ -125991,7 +125994,9 @@ _TM34PreReceiveText: ; 98092 (26:4092)
 
 _ReceivedTM34Text: ; 980ad (26:40ad)
     db $0,$52," received",$4f
-    db "TM:BIDE!@@"
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
 
 _TM34ExplanationText: ; 980c0 (26:40c0)
     db $0,$51
@@ -126219,7 +126224,7 @@ _UnnamedText_5c7be: ; 989c1 (26:49c1)
     db "#MON!",$57
 
 _UnnamedText_5c7c3: ; 98a7b (26:4a7b)
-    db $0,"This teaches",$4f
+    db $0,"TM11 teaches",$4f
     db "BUBBLEBEAM!",$51
     db "Use it on an",$4f
     db "aquatic #MON!",$57
@@ -126239,9 +126244,7 @@ _UnnamedText_5c7c8: ; 98ab0 (26:4ab0)
     db "You can also have",$4f
     db "my favorite TM!",$57
 
-_ReceivedTM11Text: ; 98b7d (26:4b7d)
-    db $0,$52," received",$4f
-    db "a TM!@@"
+SECTION "_UnnamedText_5c7d3",ROMX[$4b90],BANK[$26]
 
 _UnnamedText_5c7d3: ; 98b90 (26:4b90)
     db $0,"You better make",$4f
@@ -127124,6 +127127,12 @@ _GymLeaderRematchText3:
     db $0,"Wow!",$4f
     db "Wonderfull!",$58
 
+_ReceivedTM11Text:
+    db $0,$52," received",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
+
 SECTION "bank27",ROMX,BANK[$27]
 
 _UnnamedText_5cb72: ; 9c000 (27:4000)
@@ -127153,7 +127162,7 @@ _ReceivedTM24Text: ; 9c0e0 (27:40e0)
 
 _TM24ExplanationText: ; 9c0f5 (27:40f5)
     db $0,$51
-    db "This contains",$4f
+    db "TM24 contains",$4f
     db "THUNDERBOLT!",$51
     db "Teach it to an",$4f
     db "electric #MON!",$57
@@ -127357,7 +127366,7 @@ _ReceivedTM18Text: ; 9c85a (27:485a)
     db $0,"!@@"
 
 _TM18ExplanationText: ; 9c86e (27:486e)
-    db $0,"This is COUNTER!",$4f
+    db $0,"TM18 is COUNTER!",$4f
     db "Not like the one",$55
     db "I'm leaning on,",$55
     db "mind you!",$57
@@ -127448,69 +127457,55 @@ _UnnamedText_484ee: ; 9cbb5 (27:4bb5)
     db $0,"Give her which",$4f
     db "drink?",$57
 
-_UnnamedText_484f3: ; 9cbcc (27:4bcc)
+_UnnamedText_484f3:
     db $0,"Yay!",$51
     db "FRESH WATER!",$51
     db "Thank you!",$51
     db "You can have this",$4f
     db "from me!@@"
 
-_UnnamedText_484f9: ; 9cc06 (27:4c06)
+_UnnamedText_484f9:
+_UnnamedText_4850a:
+_ReceivedTM49Text:
     db $0,$52," received",$4f
     db "@"
     TX_RAM $cf4b
     db $0,"!@@"
 
-_UnnamedText_484fe: ; 9cc1a (27:4c1a)
+_UnnamedText_484fe:
     db $0,$51
-    db "@"
-    TX_RAM $cf4b
-    db $0," is",$4f
+    db "TM13 is",$4f
     db "ICE BEAM!",$51
     db "It can freeze the",$4f
     db "target sometimes!@@"
 
-SECTION "_UnnamedText_48504",ROMX[$4c5a],BANK[$27]
-
-_UnnamedText_48504: ; 9cc5a (27:4c5a)
+_UnnamedText_48504:
     db $0,"Yay!",$51
     db "SODA POP!",$51
     db "Thank you!",$51
     db "You can have this",$4f
     db "from me!@@"
 
-_UnnamedText_4850a: ; 9cc91 (27:4c91)
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
-
-_UnnamedText_4850f: ; 9cca5 (27:4ca5)
+_UnnamedText_4850f:
     db $0,$51
-    db "@"
-    TX_RAM $cf4b
-    db $0," is",$4f
+    db "TM48 is",$4f
     db "ROCK SLIDE!",$51
     db "It can spook the",$4f
     db "target sometimes!@@"
 
-SECTION "_UnnamedText_48515",ROMX[$4ce6],BANK[$27]
-
-_UnnamedText_48515: ; 9cce6 (27:4ce6)
+_UnnamedText_48515:
     db $0,"Yay!",$51
     db "LEMONADE!",$51
     db "Thank you!",$51
     db "You can have this",$4f
     db "from me!@@"
 
-_ReceivedTM49Text: ; 9cd1d (27:4d1d)
-    db $0,$52," received",$4f
-    db "a TM!@@"
-
-_UnnamedText_48520: ; 9cd30 (27:4d30)
+_UnnamedText_48520:
     db $0,$51
-    db "This contains",$4f
+    db "TM49 contains",$4f
     db "TRI ATTACK!@@"
+
+SECTION "_UnnamedText_48526",ROMX[$4d4d],BANK[$27]
 
 _UnnamedText_48526: ; 9cd4d (27:4d4d)
     db $0,"You don't have",$4f
@@ -127723,7 +127718,7 @@ _ReceivedTM21Text: ; 9d50c (27:550c)
 
 _TM21ExplanationText: ; 9d520 (27:5520)
     db $0,$51
-    db "This contains",$4f
+    db "TM21 contains",$4f
     db "MEGA DRAIN.",$51
     db "Half the damage",$4f
     db "it inflicts is",$55
@@ -128356,7 +128351,7 @@ _ReceivedTM06Text: ; a00eb (28:40eb)
 
 _TM06ExplanationText: ; a00ff (28:40ff)
     db $0,$51
-    db "This contains",$4f
+    db "TM06 contains",$4f
     db "TOXIC!",$51
     db "It is a secret",$4f
     db "technique over",$55
@@ -128602,7 +128597,7 @@ _ReceivedTM38Text: ; a09a8 (28:49a8)
 
 _TM38ExplanationText: ; a09bc (28:49bc)
     db $0,$51
-    db "This contains",$4f
+    db "TM38 contains",$4f
     db "FIRE BLAST!",$51
     db "Teach it to fire-",$4f
     db "type #MON!",$51
@@ -128970,14 +128965,14 @@ _ReceivedTM31Text: ; a1675 (28:5675)
 
 _TM31ExplanationText1: ; a1689 (28:5689)
     db $0,$51
-    db "This contains my",$4f
+    db "TM31 contains my",$4f
     db "favorite,MIMIC!",$51
     db "Use it on a good",$4f
     db "#MON!@@"
 
 _TM31ExplanationText2: ; a16c5 (28:56c5)
     db $0,$52,": Hi!",$4f
-    db "Thanks for TM!  ",$51
+    db "Thanks for TM31!",$51
     db $52,": Pardon?",$51
     db $52,": Is it",$4f
     db "that fun to mimic",$55
@@ -129163,13 +129158,15 @@ _UnnamedText_5d173: ; a1d16 (28:5d16)
     db "Wait,please take",$4f
     db "this TM with you!",$57
 
-ReceivedTM46Text: ; a1dcd (28:5dcd)
+ReceivedTM46Text:
     db $0,$52," received",$4f
-    db "a TM!@@"
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
 
-_TM46ExplanationText: ; a1de0 (28:5de0)
+_TM46ExplanationText:
     db $0,$51
-    db "This is PSYCHIC!",$51
+    db "TM29 is PSYCHIC!",$51
     db "It can lower the",$4f
     db "target's SPECIAL",$55
     db "abilities.",$57
@@ -129375,7 +129372,7 @@ _ReceivedTM29Text: ; a252a (28:652a)
     db $0,"!@@"
 
 _TM29ExplanationText: ; a253e (28:653e)
-    db $0,"This is PSYWAVE!",$51
+    db $0,"TM46 is PSYWAVE!",$51
     db "It uses random",$4f
     db "psychic waves to",$55
     db "inflict damage!",$57
@@ -129782,12 +129779,10 @@ _UnnamedText_191ca: ; a45ea (29:45ea)
     db "Here,you can",$55
     db "have this TM.",$58
 
-_ReceivedTM42Text: ; a469a (29:469a)
-    db $0,$52," received",$4f
-    db "a TM!@@"
+SECTION "_TM42Explanation",ROMX[$46ad],BANK[$29]
 
 _TM42Explanation: ; a46ad (29:46ad)
-    db $0,"This contains",$4f
+    db $0,"TM42 contains",$4f
     db "DREAM EATER...",$55
     db "...Snore...",$57
 
@@ -130011,9 +130006,7 @@ _UnnamedText_196d9: ; a4f27 (29:4f27)
     db "bystander! Don't",$55
     db "you believe me?",$57
 
-_ReceivedTM28Text: ; a4f82 (29:4f82)
-    db $0,$52," recovered",$4f
-    db "a TM!@@"
+SECTION "_ReceivedTM28Text2",ROMX[$4f96],BANK[$29]
 
 _ReceivedTM28Text2: ; a4f96 (29:4f96)
     db $0,$51
@@ -130333,7 +130326,7 @@ _ReceivedTM41Text: ; a5b5a (29:5b5a)
     db $0,"!@@"
 
 _TM41ExplanationText: ; a5b6e (29:5b6e)
-    db $0,"This teaches",$4f
+    db $0,"TM53 teaches",$4f
     db "TSUNAMI!",$51
     db "Only strong",$4f
     db "#MON can use",$55
@@ -130885,6 +130878,18 @@ _EnableLastPkmnText:
     db "Why don't you take",$4f
     db "care of my last",$55
     db "#MON?",$57
+
+_ReceivedTM42Text:
+    db $0,$52," received",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
+
+_ReceivedTM28Text:
+    db $0,$52," recovered",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
 
 SECTION "bank2A",ROMX,BANK[$2A]
 
@@ -133148,15 +133153,15 @@ ItemNames:
     db "TM01:M.PNCH@"  ; $C7 ; TM_01 ; Market
     db "TM02:RAZ.WND@" ; $C8 ; TM_02 ; Market
     db "TM03:SW.DNCE@" ; $C9 ; TM_03
-    db "TM04:WHRLWND@" ; $CA ; TM_04
+    db "TM04:WHRLWND@" ; $CA ; TM_04 ; Market
     db "TM05:MEG.KCK@" ; $CB ; TM_05 ; Market
     db "TM06:TOXIC@"   ; $CC ; TM_06
     db "TM07:HRN DR.@" ; $CD ; TM_07 ; Market
     db "TM08:BDY SLM@" ; $CE ; TM_08
     db "TM09:TAK.DWN@" ; $CF ; TM_09 ; Market
-    db "TM10:DB.EDG@"  ; $D0 ; TM_10
+    db "TM10:DB.EDG@"  ; $D0 ; TM_10 ; Market
     db "TM11:BUB.B.@"  ; $D1 ; TM_11
-    db "TM12:WTR GUN@" ; $D2 ; TM_12
+    db "TM12:WTR GUN@" ; $D2 ; TM_12 ; Market
     db "TM13:ICE BM.@" ; $D3 ; TM_13
     db "TM14:BLZZARD@" ; $D4 ; TM_14
     db "TM15:HYPR.B.@" ; $D5 ; TM_15
@@ -133174,7 +133179,7 @@ ItemNames:
     db "TM27:FISSURE@" ; $E1 ; TM_27
     db "TM28:DIG@"     ; $E2 ; TM_28
     db "TM29:PSYCHIC@" ; $E3 ; TM_29
-    db "TM30:TELEPRT@" ; $E4 ; TM_30
+    db "TM30:TELEPRT@" ; $E4 ; TM_30 ; Market
     db "TM31:MIMIC@"   ; $E5 ; TM_31
     db "TM32:DB.TEAM@" ; $E6 ; TM_32 ; Market
     db "TM33:REFLECT@" ; $E7 ; TM_33 ; Market
@@ -133185,7 +133190,7 @@ ItemNames:
     db "TM38:FIR.BLS@" ; $EC ; TM_38
     db "TM39:SWIFT@"   ; $ED ; TM_39
     db "TM40:SKUL B.@" ; $EE ; TM_40
-    db "TM41:LGT SCR@" ; $EF ; TM_41
+    db "TM41:LGT SCR@" ; $EF ; TM_41 ; Market
     db "TM42:DRM EAT@" ; $F0 ; TM_42
     db "TM43:SKY ATK@" ; $F1 ; TM_43
     db "TM44:REST@"    ; $F2 ; TM_44
