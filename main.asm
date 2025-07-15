@@ -139778,8 +139778,8 @@ DisplayDepositWithdrawMenu_:
 
 .RemoveLevel
     push af
-    FuncCoord 06,09
-    ld bc,$0103 ; 01,03
+    FuncCoord 05,09
+    ld bc,$0104 ; 01,04
     ld hl,Coord
     call ClearScreenArea
     pop af
@@ -139821,9 +139821,27 @@ DisplayDepositWithdrawMenu_:
     ld a,[$cf9b] ; box level
     ld [$cfb9],a ; real level
 .skip
-    FuncCoord 06,09
+    FuncCoord 05,09
     ld hl,Coord
     call PrintLevel ; Pokémon level
+    ; Gender
+    push hl
+    ld a,[$cf91]
+    ld [$d11e],a
+    ld hl,$cfb3 ; .OutOfBattle
+    call SetTempIV
+    ld b,BANK(GetGender)
+    ld hl,GetGender
+    call Bankswitch
+    call ResetTempIV
+    pop hl
+    jr c,.Genderless
+    ld de,.MaleIcon
+    jr nz,.Male
+    ld de,.FemaleIcon
+.Male
+    call PlaceString
+.Genderless
     ; Name
     ld a,[$ccd3]
     and a
@@ -139857,6 +139875,10 @@ DisplayDepositWithdrawMenu_:
     ld hl,wStatusScreen2OAMBit0
     res 0,[hl]
     ret
+.MaleIcon
+    db $EF,$50
+.FemaleIcon
+    db $F5,$50
 
 .TryWithdraw
     ld a,[W_NUMINPARTY]
