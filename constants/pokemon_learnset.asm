@@ -192,20 +192,25 @@ ENDM
 BUTTERFREE_Learnset: MACRO
     METAPOD_Learnset
     db 10,CONFUSION
+    db 12,DISABLE
     db 13,POISONPOWDER
     db 14,STUN_SPORE
     db 15,SLEEP_POWDER
     db 18,GUST
     db 20,SONICBOOM
     db 23,SUPERSONIC
-    db 26,LEECH_LIFE
+    db 24,LEECH_LIFE
+    db 26,SCREECH
     db 27,WHIRLWIND
     db 31,PSYBEAM
+    db 33,PIN_MISSILE
     db 36,RAZOR_WIND
+    db 38,AGILITY
     db 41,SPORE
     db 45,MEGA_DRAIN
-    db 50,SWOOP
-    db 55,PSYCHIC_M
+    db 48,PSYCHIC_M
+    db 51,SWOOP
+    db 55,BARRIER
     db 60,SKY_ATTACK
 ENDM
 CATERPIE_NoEvo_Learnset: MACRO
@@ -231,21 +236,26 @@ ENDM
 BEEDRILL_Learnset: MACRO
     KAKUNA_Learnset
     db 10,TWINEEDLE
+    db 12,LEER
     db 13,BLADE
     db 15,FOCUS_ENERGY
     db 18,FURY_ATTACK
     db 21,LEECH_LIFE
     db 23,SONICBOOM
     db 24,ACID
+    db 26,GUST
     db 27,DOUBLE_TEAM
     db 30,PIN_MISSILE
+    db 32,POISONPOWDER
     db 34,AGILITY
     db 37,SLAM
+    db 39,RAZOR_WIND
     db 41,SLUDGE
-    db 45,RAZOR_WIND
-    db 50,SWOOP
+    db 45,SWOOP
+    db 48,SUPERSONIC
+    db 51,TOXIC
     db 55,SWORDS_DANCE
-    db 60,TOXIC
+    db 60,SKY_ATTACK
 ENDM
 WEEDLE_NoEvo_Learnset: MACRO
     db 10,LEECH_LIFE ; Exclusive
