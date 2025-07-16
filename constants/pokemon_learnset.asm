@@ -2882,22 +2882,25 @@ EEVEE_Learnset: MACRO
     db 53,BODY_SLAM
     db 57,DOUBLE_EDGE
     db 60,HYPER_BEAM ; Exclusive
+    db 60,LOVELY_KISS
 ENDM
 VAPOREON_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
-    db  1,WATER_GUN
+    db  1,GROWL
+    db  1,BUBBLE
     db  6,SAND_ATTACK
-    db  8,GROWL
+    db  8,WATER_GUN
     db 11,MIST
     db 14,QUICK_ATTACK
     db 16,DOUBLE_KICK
     db 19,BITE
     db 22,ACID_ARMOR
     db 25,DOUBLE_TEAM
-    db 26,SLAM
-    db 28,BUBBLEBEAM
+    db 26,BUBBLEBEAM
+    db 28,SLAM
     db 30,SKULL_BASH
+    db 31,WATERFALL
     db 32,AURORA_BEAM
     db 34,FOCUS_ENERGY
     db 37,TSUNAMI
@@ -2906,23 +2909,28 @@ VAPOREON_Learnset: MACRO
     db 45,TAKE_DOWN
     db 48,HYDRO_PUMP
     db 50,BODY_SLAM
+    db 52,LIGHT_SCREEN
     db 55,DOUBLE_EDGE
+    db 57,LOVELY_KISS
     db 60,SUPER_FANG
 ENDM
 JOLTEON_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
+    db  1,GROWL
     db  1,THUNDERSHOCK
     db  6,SAND_ATTACK
-    db  8,GROWL
+    db  8,SONICBOOM
     db 11,AGILITY
     db 14,QUICK_ATTACK
     db 16,DOUBLE_KICK
     db 19,BITE
     db 22,THUNDER_WAVE
     db 25,DOUBLE_TEAM
-    db 26,SLAM
-    db 28,SWIFT
+    db 26,SWIFT
+    db 28,SLAM
+    db 30,SKULL_BASH
+    db 31,SUPERSONIC
     db 32,PIN_MISSILE
     db 34,FOCUS_ENERGY
     db 37,THUNDERBOLT
@@ -2931,23 +2939,28 @@ JOLTEON_Learnset: MACRO
     db 45,TAKE_DOWN
     db 48,THUNDER_M
     db 50,BODY_SLAM
+    db 52,LIGHT_SCREEN
     db 55,DOUBLE_EDGE
+    db 57,LOVELY_KISS
     db 60,SUPER_FANG
 ENDM
 FLAREON_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
+    db  1,GROWL
     db  1,EMBER
     db  6,SAND_ATTACK
-    db  8,GROWL
+    db  8,ROAR
     db 11,LEER
     db 14,QUICK_ATTACK
     db 16,DOUBLE_KICK
     db 19,BITE
     db 22,SMOKESCREEN
     db 25,DOUBLE_TEAM
-    db 26,SLAM
-    db 28,SMOG
+    db 26,SMOG
+    db 28,SLAM
+    db 30,SKULL_BASH
+    db 31,CONFUSE_RAY
     db 32,FIRE_SPIN
     db 34,FOCUS_ENERGY
     db 37,FLAMETHROWER
@@ -2956,7 +2969,9 @@ FLAREON_Learnset: MACRO
     db 45,TAKE_DOWN
     db 48,FIRE_BLAST
     db 50,BODY_SLAM
+    db 52,LIGHT_SCREEN
     db 55,DOUBLE_EDGE
+    db 57,LOVELY_KISS
     db 60,SUPER_FANG
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
