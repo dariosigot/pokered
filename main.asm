@@ -36373,7 +36373,7 @@ SilphCo6Object: ; 0x1a2fb (size=112)
     db SPRITE_OAK_AIDE,$8 + 4,$7 + 4,$ff,$d0,$47,SCIENTIST,$7 ; trainer
     db SPRITE_ROCKET,$f + 4,$e + 4,$ff,$d2,$48,ROCKET,$1f ; trainer
     db SPRITE_BALL,$c + 4,$3 + 4,$ff,$ff,$89,HP_UP ; item
-    db SPRITE_BALL,$f + 4,$2 + 4,$ff,$ff,$8a,X_ACCURACY ; item
+    db SPRITE_BALL,$f + 4,$2 + 4,$ff,$ff,$8a,TM_33 ; item
 
     ; warp-to
     EVENT_DISP $d,$0,$10 ; SILPH_CO_7F
@@ -67296,7 +67296,7 @@ RocketHideout1Object: ; 0x44ce7 (size=98)
     db SPRITE_ROCKET,$19 + 4,$f + 4,$ff,$d3,$44,ROCKET,$b ; trainer
     db SPRITE_ROCKET,$12 + 4,$1c + 4,$ff,$d2,$45,ROCKET,$c ; trainer
     db SPRITE_BALL,$e + 4,$b + 4,$ff,$ff,$86,ESCAPE_ROPE ; item
-    db SPRITE_BALL,$11 + 4,$9 + 4,$ff,$ff,$87,HYPER_POTION ; item
+    db SPRITE_BALL,$11 + 4,$9 + 4,$ff,$ff,$87,TM_23 ; item
 
     ; warp-to
     EVENT_DISP $f,$2,$17 ; ROCKET_HIDEOUT_2

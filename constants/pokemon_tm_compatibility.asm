@@ -799,7 +799,7 @@ GengarTMCompatibility:
 OnixTMCompatibility:
     tmlearn 08                      ; |BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 0
+    tmlearn 23                      ; |DRAGON_RAGE|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,36,40                ; |BIDE|SELFDESTRUCT|SKULL_BASH|
     tmlearn 41,44,47,48             ; |LIGHT_SCREEN|REST|EXPLOSION|ROCK_SLIDE|
