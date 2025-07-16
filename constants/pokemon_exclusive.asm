@@ -26,6 +26,7 @@ VenusaurExclusiveMove:
     db LEECH_LIFE
     db BARRAGE
     db BIND
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CharmanderExclusiveMove:
@@ -66,6 +67,7 @@ CharizardExclusiveMove:
     db QUICK_ATTACK
     db AGILITY
     db SLAM
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SquirtleExclusiveMove:
@@ -100,6 +102,7 @@ BlastoiseExclusiveMove:
     db SONICBOOM
     db SUPERSONIC
     db HEADBUTT
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CaterpieExclusiveMove:
@@ -157,6 +160,7 @@ BeedrillExclusiveMove:
     db SWOOP ; TM52
     db LEECH_LIFE
     db TWINEEDLE
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PidgeyExclusiveMove:
@@ -344,6 +348,7 @@ NidokingExclusiveMove:
     db TSUNAMI ; TM53
     db STRIKE ; TM54
     db AGILITY
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ClefairyExclusiveMove:
@@ -411,6 +416,7 @@ NinetalesExclusiveMove:
     db EMBER
     db QUICK_ATTACK
     db AGILITY
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ZubatExclusiveMove:
@@ -616,6 +622,7 @@ PrimeapeExclusiveMove:
     db BLADE ; TM51
     db STRIKE ; TM54
     db BARRAGE
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GrowlitheExclusiveMove:
@@ -643,6 +650,7 @@ ArcanineExclusiveMove:
     db EMBER
     db AGILITY
     db QUICK_ATTACK
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PoliwagExclusiveMove:
@@ -810,6 +818,7 @@ RapidashExclusiveMove:
     db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db SUBSTITUTE ; TM50
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SlowpokeExclusiveMove:
@@ -914,6 +923,7 @@ DodrioExclusiveMove:
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SeelExclusiveMove:
@@ -1028,6 +1038,7 @@ OnixExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db STRIKE ; TM54
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DrowzeeExclusiveMove:
@@ -1080,6 +1091,7 @@ KinglerExclusiveMove:
     db BLADE ; TM51
     db TSUNAMI ; TM53
     db STRIKE ; TM54
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ExeggcuteExclusiveMove:
@@ -1144,6 +1156,7 @@ MarowakExclusiveMove:
     db MEDITATE
     db ROCK_THROW
     db HARDEN
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HitmonleeExclusiveMove:
@@ -1264,6 +1277,7 @@ RhydonExclusiveMove:
     db TSUNAMI ; TM53
     db STRIKE ; TM54
     db DOUBLE_KICK
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ChanseyExclusiveMove:
@@ -1352,6 +1366,7 @@ KangaskhanExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db STRIKE ; TM54
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HorseaExclusiveMove:
@@ -1372,6 +1387,7 @@ SeadraExclusiveMove:
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GoldeenExclusiveMove:
@@ -1470,6 +1486,7 @@ ScytherExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 JynxExclusiveMove:
@@ -1499,6 +1516,7 @@ JynxExclusiveMove:
     db REST ; TM44
     db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ElectabuzzExclusiveMove:
@@ -1528,6 +1546,7 @@ ElectabuzzExclusiveMove:
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
     db FLASH ; TM55
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MagmarExclusiveMove:
@@ -1554,6 +1573,7 @@ MagmarExclusiveMove:
     db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PinsirExclusiveMove:
@@ -1577,6 +1597,7 @@ PinsirExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db STRIKE ; TM54
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TaurosExclusiveMove:
@@ -1602,6 +1623,7 @@ TaurosExclusiveMove:
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MagikarpExclusiveMove:
@@ -1630,6 +1652,7 @@ GyaradosExclusiveMove:
     db TSUNAMI ; TM53
     db STRIKE ; TM54
     db AMNESIA
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LaprasExclusiveMove:
@@ -1698,6 +1721,7 @@ FlareonExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db FLASH ; TM55
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PorygonExclusiveMove:
@@ -1807,6 +1831,7 @@ AerodactylExclusiveMove:
     db BLADE ; TM51
     db SWOOP ; TM52
     db STRIKE ; TM54
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SnorlaxExclusiveMove:
@@ -1844,6 +1869,7 @@ SnorlaxExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db STRIKE ; TM54
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ArticunoExclusiveMove:
@@ -1953,6 +1979,7 @@ DragoniteExclusiveMove:
     db SWOOP ; TM52
     db TSUNAMI ; TM53
     db STRIKE ; TM54
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewtwoExclusiveMove:
@@ -1979,7 +2006,7 @@ MewtwoExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db BIDE ; TM34
+    db RAGE ; TM20
     db METRONOME ; TM35
     db SELFDESTRUCT ; TM36
     db FLAMETHROWER ; TM37

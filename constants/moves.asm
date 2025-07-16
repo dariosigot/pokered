@@ -28,7 +28,7 @@
     db MEGA_KICK    , NO_ADDITIONAL_EFFECT       , 120 , FIGHT    , 191 , 22 ; pp 10 ; 0 ; Type Normal -> Fight    ; PP 05 -> 10 ; Ene 20 -> 22
     db JUMP_KICK    , JUMP_KICK_EFFECT           , 100 , FIGHT    , 242 , 20 ; pp 10 ; 0 ; Pwr 70 -> 100 ; PP 25 -> 10
     db ROLLING_KICK , FLINCH_SIDE_EFFECT2        ,  60 , FIGHT    , 216 , 09 ; pp 20 ; 0 ; PP 15 -> 20 ; Ene 10 -> 9
-    db SAND_ATTACK  , ACCURACY_DOWN_SIDE_EFFECT  ,  10 , EARTH    , 229 , 09 ; pp 15 ; 0 ; Type Normal -> Earth ; Acr 255 -> 229 ; PP 15 ; Ene 14 -> 09 ; Pwr 0 -> 10
+    db SAND_ATTACK  , ACCURACY_DOWN_SIDE_EFFECT  ,  15 , EARTH    , 229 , 09 ; pp 15 ; 0 ; Type Normal -> Earth ; Acr 255 -> 229 ; PP 15 ; Ene 14 -> 09 ; Pwr 0 -> 15
     db HEADBUTT     , FLINCH_SIDE_EFFECT2        ,  70 , NORMAL   , 255 , 14 ; pp 15 ; 0
     db HORN_ATTACK  , NO_ADDITIONAL_EFFECT       ,  65 , IVORY    , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Ivory
     db FURY_ATTACK  , TWO_TO_FIVE_ATTACKS_EFFECT ,  19 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Ivory ; Pwr 15 -> 19
@@ -99,7 +99,7 @@
     db MEDITATE     , ATTACK_UP1_EFFECT          ,   0 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
     db AGILITY      , SPEED_UP3_EFFECT           ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Type Psychic -> Normal ; PP 30 -> 15
     db QUICK_ATTACK , NO_ADDITIONAL_EFFECT       ,  40 , NORMAL   , 255 , 07 ; pp 30 ; 0
-    db RAGE         , RAGE_EFFECT                ,  20 , NORMAL   , 255 , 10 ; pp 20 ; 0
+    db RAGE         , RAGE_EFFECT                ,  40 , NORMAL   , 255 , 10 ; pp 20 ; 0 ; Pwr 20 -> 40
     db TELEPORT     , SWITCH_AND_TELEPORT_EFFECT ,   0 , PSYCHIC  , 255 , 04 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 04
     db NIGHT_SHADE  , SPECIAL_DAMAGE_EFFECT      ,   1 , GHOST    , 255 , 14 ; pp 15 ; -
     db MIMIC        , MIMIC_EFFECT               ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; PP 10 -> 20
