@@ -60711,7 +60711,7 @@ StatModifierDownEffect:
     cp ATTACK_DOWN_SIDE_EFFECT
     jr c,.nonSideEffect
     call CheckCustomSideEffect ; GenRandomInBattle
-    cp $55 ; 33%
+    call CompareCustomValue ; cp $55 ; 33%
     ret nc ; don't apply side effect
     ld a,[de]
     sub ATTACK_DOWN_SIDE_EFFECT ; map each stat to 0-3
@@ -62295,7 +62295,7 @@ CheckCustomSideEffect:
     bit 0,[hl]
     res 0,[hl]
     pop hl
-    jp z,CheckZeroDamageOrSideEffectRandom
+    jr z,CheckZeroDamageOrSideEffectRandom
     xor a ; Force Success
     ret
 
@@ -62315,6 +62315,19 @@ CheckZeroDamageOrSideEffectRandom:
 .ZeroDamage
     dec a ; $FF = Force Fail
     jr .end
+
+CompareCustomValue:
+    push af
+    ld a,[de]
+    cp ACCURACY_DOWN_SIDE_EFFECT
+    jr nz,.standard
+    pop af
+    cp $AA ; 66%
+    ret
+.standard
+    pop af
+    cp $55 ; 33%
+    ret
 
 StatModifierRatiosAccuracyEvasion:
 ; first byte is numerator,second byte is denominator
