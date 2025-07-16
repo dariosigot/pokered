@@ -23,6 +23,7 @@ IVYSAUR_Learnset: MACRO
     db 23,RAZOR_LEAF
     db 25,SLAM
     db 27,ACID
+    db 28,STRING_SHOT
     db 29,STUN_SPORE
     ;  32,VENUSAUR
 ENDM
@@ -74,6 +75,7 @@ ENDM
 CHARMELEON_Learnset: MACRO
     CHARMANDER_Learnset
     db 16,FOCUS_ENERGY
+    db 18,RAGE
     db 19,SMOKESCREEN
     db 22,FIRE_PUNCH
     db 23,QUICK_ATTACK
@@ -133,6 +135,7 @@ WARTORTLE_Learnset: MACRO
     SQUIRTLE_Learnset
     db 16,WATER_GUN
     db 18,WITHDRAW
+    db 19,SAND_ATTACK
     db 21,BITE
     db 22,SONICBOOM
     db 23,WATERFALL
@@ -196,6 +199,7 @@ BUTTERFREE_Learnset: MACRO
     db 13,POISONPOWDER
     db 14,STUN_SPORE
     db 15,SLEEP_POWDER
+    db 17,PSYWAVE
     db 18,GUST
     db 20,SONICBOOM
     db 23,SUPERSONIC
@@ -238,6 +242,7 @@ BEEDRILL_Learnset: MACRO
     db 10,TWINEEDLE
     db 12,LEER
     db 13,BLADE
+    db 14,RAGE
     db 15,FOCUS_ENERGY
     db 18,FURY_ATTACK
     db 21,LEECH_LIFE
@@ -549,6 +554,7 @@ NIDOQUEEN_Learnset: MACRO
     NIDORAN_F_Learnset
     db 16,HORN_ATTACK
     db 16,FURY_ATTACK
+    db 17,RAGE
     db 18,BITE
     db 20,FOCUS_ENERGY
     db 21,SLAM
@@ -609,6 +615,7 @@ NIDOKING_Learnset: MACRO
     NIDORAN_M_Learnset
     db 16,TAIL_WHIP
     db 16,FURY_SWIPES
+    db 17,RAGE
     db 18,BITE
     db 20,FOCUS_ENERGY
     db 21,SLAM
@@ -1080,6 +1087,7 @@ MANKEY_Learnset: MACRO
     db 10,LOW_KICK
     db 12,FURY_SWIPES
     db 14,FOCUS_ENERGY
+    db 15,RAGE
     db 17,DOUBLE_TEAM
     db 19,DOUBLE_KICK
     db 21,COMET_PUNCH
@@ -1485,6 +1493,7 @@ RAPIDASH_Learnset: MACRO
     PONYTA_Learnset
     db 40,HORN_ATTACK
     db 40,FURY_ATTACK
+    db 42,RAGE
     db 42,THRASH
     db 44,HORN_DRILL
     db 46,DOUBLE_EDGE
@@ -1493,6 +1502,7 @@ RAPIDASH_Learnset: MACRO
     db 60,NIGHT_SHADE
 ENDM
 PONYTA_NoEvo_Learnset: MACRO
+    db 43,RAGE
     db 43,THRASH
     db 48,DOUBLE_EDGE
     db 53,FIRE_BLAST
@@ -1613,6 +1623,7 @@ DODUO_Learnset: MACRO
     db  1,LEER
     db  5,GROWL
     db  7,FURY_ATTACK
+    db  9,RAGE
     db 10,WING_ATTACK
     db 13,QUICK_ATTACK
     db 16,LOW_KICK
@@ -1843,6 +1854,7 @@ ONIX_Learnset: MACRO
     db  1,SCREECH
     db  5,CONSTRICT
     db  8,BIDE
+    db  8,RAGE
     db 12,ROCK_THROW
     db 14,SLAM
     db 15,WRAP
@@ -2097,6 +2109,7 @@ CUBONE_Learnset: MACRO
     db  7,BONE_CLUB
     db  8,SAND_ATTACK
     db 10,TRAPHOLE
+    db 12,RAGE
     db 13,LEER
     db 15,WITHDRAW
     db 17,SKULL_BASH
@@ -2299,6 +2312,7 @@ RHYHORN_Learnset: MACRO
     db 13,ROCK_THROW
     db 15,BONE_CLUB
     db 17,FOCUS_ENERGY
+    db 17,RAGE
     db 18,STOMP
     db 20,LEER
     db 22,TRAPHOLE
@@ -2398,6 +2412,7 @@ KANGASKHAN_Learnset: MACRO
     db 13,FURY_SWIPES
     db 15,FOCUS_ENERGY
     db 17,LOW_KICK
+    db 18,RAGE
     db 19,BONE_CLUB
     db 21,REST
     db 23,BITE
@@ -2596,6 +2611,7 @@ SCYTHER_Learnset: MACRO
     db 11,STRING_SHOT
     db 13,GUST
     db 15,FURY_SWIPES
+    db 16,RAGE
     db 17,PIN_MISSILE
     db 19,BLADE
     db 21,DOUBLE_TEAM
@@ -2717,6 +2733,7 @@ PINSIR_Learnset: MACRO
     db 11,STRING_SHOT
     db 13,FURY_ATTACK
     db 15,LEER
+    db 16,RAGE
     db 17,LEECH_LIFE
     db 19,BONE_CLUB
     db 21,CLAMP
@@ -2743,6 +2760,7 @@ TAUROS_Learnset: MACRO
     db  5,GROWL
     db  7,HORN_ATTACK
     db  9,LEER
+    db 10,RAGE
     db 11,STOMP
     db 13,FURY_ATTACK
     db 15,BONE_CLUB
@@ -2780,6 +2798,7 @@ GYARADOS_Learnset: MACRO
     db 20,ROAR
     db 20,HYPER_FANG
     db 21,FOCUS_ENERGY
+    db 21,RAGE
     db 22,SLAM
     db 24,WATERFALL
     db 25,WRAP
@@ -3088,6 +3107,8 @@ AERODACTYL_Learnset: MACRO
     db 25,DOUBLE_TEAM
     db 27,RAZOR_WIND
     db 29,ROCK_SLIDE
+    db 31,FOCUS_ENERGY
+    db 32,RAGE
     db 33,DRAGON_RAGE
     db 37,BODY_SLAM
     db 40,TAKE_DOWN
@@ -3116,6 +3137,7 @@ SNORLAX_Learnset: MACRO
     db 31,STRIKE
     db 32,TAKE_DOWN
     db 34,HARDEN
+    db 36,RAGE
     db 37,ROAR
     db 40,EARTHQUAKE
     db 43,TSUNAMI
@@ -3279,6 +3301,7 @@ ENDM
 MEWTWO_Learnset: MACRO
     db  1,CONFUSION
     db  1,DISABLE
+    db  4,RAGE
     db  7,REFLECT
     db  8,PSYWAVE
     db 10,TELEPORT

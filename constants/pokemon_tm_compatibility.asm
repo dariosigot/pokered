@@ -23,7 +23,7 @@ IvysaurTMCompatibility:
 VenusaurTMCompatibility:
     tmlearn 02,03,06,08             ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
+    tmlearn 20,21,22                ; |RAGE|MEGA_DRAIN|SOLARBEAM|
     tmlearn 26,27,31                ; |EARTHQUAKE|FISSURE|MIMIC|
     tmlearn 33,34                   ; |REFLECT|BIDE|
     tmlearn 41,44,48                ; |LIGHT_SCREEN|REST|ROCK_SLIDE|
@@ -32,7 +32,7 @@ VenusaurTMCompatibility:
 CharmanderTMCompatibility:
     tmlearn 01,03                   ; |MEGA_PUNCH|SWORDS_DANCE|
     tmlearn 0
-    tmlearn 0
+    tmlearn 20                      ; |RAGE|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
@@ -40,7 +40,7 @@ CharmanderTMCompatibility:
 CharmeleonTMCompatibility:
     tmlearn 01,03,05                ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|
     tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 19,23                   ; |SEISMIC_TOSS|DRAGON_RAGE|
+    tmlearn 19,20,23                ; |SEISMIC_TOSS|RAGE|DRAGON_RAGE|
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
@@ -48,7 +48,7 @@ CharmeleonTMCompatibility:
 CharizardTMCompatibility:
     tmlearn 01,02,03,05,08          ; |MEGA_PUNCH|RAZOR_WIND|SWORDS_DANCE|MEGA_KICK|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19,22,23          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|DRAGON_RAGE|
+    tmlearn 17,18,19,20,22,23       ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|SOLARBEAM|DRAGON_RAGE|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,43,44,48             ; |LIGHT_SCREEN|SKY_ATTACK|REST|ROCK_SLIDE|
@@ -73,7 +73,7 @@ WartortleTMCompatibility:
 BlastoiseTMCompatibility:
     tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
+    tmlearn 17,18,19,20             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
     tmlearn 41,44,48                ; |LIGHT_SCREEN|REST|ROCK_SLIDE|
@@ -123,7 +123,7 @@ KakunaTMCompatibility:
 BeedrillTMCompatibility:
     tmlearn 02,03,06                ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
+    tmlearn 20,21,22                ; |RAGE|MEGA_DRAIN|SOLARBEAM|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
     tmlearn 43,44                   ; |SKY_ATTACK|REST|
@@ -250,7 +250,7 @@ NidoranFTMCompatibility:
 NidorinaTMCompatibility:
     tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
     tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 24                      ; |THUNDERBOLT|
+    tmlearn 20,24                   ; |RAGE|THUNDERBOLT|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
     tmlearn 44                      ; |REST|
@@ -258,7 +258,7 @@ NidorinaTMCompatibility:
 NidoqueenTMCompatibility:
     tmlearn 01,05,06,07,08          ; |MEGA_PUNCH|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
+    tmlearn 17,18,19,20,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER_M|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
@@ -275,7 +275,7 @@ NidoranMTMCompatibility:
 NidorinoTMCompatibility:
     tmlearn 06,07,08                ; |TOXIC|HORN_DRILL|BODY_SLAM|
     tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 24                      ; |THUNDERBOLT|
+    tmlearn 20,24                   ; |RAGE|THUNDERBOLT|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,40             ; |REFLECT|BIDE|FLAMETHROWER|SKULL_BASH|
     tmlearn 44                      ; |REST|
@@ -283,7 +283,7 @@ NidorinoTMCompatibility:
 NidokingTMCompatibility:
     tmlearn 01,05,06,07,08          ; |MEGA_PUNCH|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
+    tmlearn 17,18,19,20,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER_M|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
@@ -317,7 +317,7 @@ VulpixTMCompatibility:
 NinetalesTMCompatibility:
     tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 22                      ; |SOLARBEAM|
+    tmlearn 20,22                   ; |RAGE|SOLARBEAM|
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,42,44                ; |LIGHT_SCREEN|DREAM_EATER|REST|
@@ -470,7 +470,7 @@ GolduckTMCompatibility:
 MankeyTMCompatibility:
     tmlearn 01,05                   ; |MEGA_PUNCH|MEGA_KICK|
     tmlearn 09,16                   ; |TAKE_DOWN|PAY_DAY|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
+    tmlearn 17,18,19,20,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|THUNDERBOLT|
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
@@ -478,7 +478,7 @@ MankeyTMCompatibility:
 PrimeapeTMCompatibility:
     tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
     tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
+    tmlearn 17,18,19,20,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|THUNDERBOLT|
     tmlearn 25,26,28,31,32          ; |THUNDER_M|EARTHQUAKE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,39,40             ; |BIDE|METRONOME|SWIFT|SKULL_BASH|
     tmlearn 44,45,48                ; |REST|THUNDER_WAVE|ROCK_SLIDE|
@@ -495,7 +495,7 @@ GrowlitheTMCompatibility:
 ArcanineTMCompatibility:
     tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 22,23                   ; |SOLARBEAM|DRAGON_RAGE|
+    tmlearn 20,22,23                ; |RAGE|SOLARBEAM|DRAGON_RAGE|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
@@ -646,7 +646,7 @@ GolemTMCompatibility:
 PonytaTMCompatibility:
     tmlearn 08                      ; |BODY_SLAM|
     tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 0
+    tmlearn 20                      ; |RAGE|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
@@ -654,7 +654,7 @@ PonytaTMCompatibility:
 RapidashTMCompatibility:
     tmlearn 03,07,08                ; |SWORDS_DANCE|HORN_DRILL|BODY_SLAM|
     tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
-    tmlearn 22                      ; |SOLARBEAM|
+    tmlearn 20,22                   ; |RAGE|SOLARBEAM|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
@@ -706,7 +706,7 @@ FarfetchdTMCompatibility:
 DoduoTMCompatibility:
     tmlearn 03,08                   ; |SWORDS_DANCE|BODY_SLAM|
     tmlearn 09                      ; |TAKE_DOWN|
-    tmlearn 0
+    tmlearn 20                      ; |RAGE|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
     tmlearn 44                      ; |REST|
@@ -714,7 +714,7 @@ DoduoTMCompatibility:
 DodrioTMCompatibility:
     tmlearn 03,08                   ; |SWORDS_DANCE|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 0
+    tmlearn 20                      ; |RAGE|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
@@ -799,7 +799,7 @@ GengarTMCompatibility:
 OnixTMCompatibility:
     tmlearn 08                      ; |BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 23                      ; |DRAGON_RAGE|
+    tmlearn 20,23                   ; |RAGE|DRAGON_RAGE|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,36,40                ; |BIDE|SELFDESTRUCT|SKULL_BASH|
     tmlearn 41,44,47,48             ; |LIGHT_SCREEN|REST|EXPLOSION|ROCK_SLIDE|
@@ -833,7 +833,7 @@ KrabbyTMCompatibility:
 KinglerTMCompatibility:
     tmlearn 03,08                   ; |SWORDS_DANCE|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 0
+    tmlearn 20                      ; |RAGE|
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34                      ; |BIDE|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
@@ -892,7 +892,7 @@ ExeggutorTMCompatibility:
 CuboneTMCompatibility:
     tmlearn 01,03                   ; |MEGA_PUNCH|SWORDS_DANCE|
     tmlearn 11,12,13                ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|
-    tmlearn 0
+    tmlearn 20                      ; |RAGE|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,37,40                ; |BIDE|FLAMETHROWER|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
@@ -900,7 +900,7 @@ CuboneTMCompatibility:
 MarowakTMCompatibility:
     tmlearn 01,03,05,08             ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
+    tmlearn 17,18,19,20             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,37,38,39,40          ; |BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
@@ -908,7 +908,7 @@ MarowakTMCompatibility:
 MarowakAlolaTMCompatibility:
     tmlearn 01,03,06                ; |MEGA_PUNCH|SWORDS_DANCE|TOXIC|
     tmlearn 10,11,12,13,15          ; |DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|HYPER_BEAM|
-    tmlearn 0
+    tmlearn 20                      ; |RAGE|
     tmlearn 26,27,28,29,30,31,32    ; |EARTHQUAKE|FISSURE|TRAPHOLE|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 34,37,38,39,40          ; |BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 44,46,48                ; |REST|PSYWAVE|ROCK_SLIDE|
@@ -961,7 +961,7 @@ WeezingTMCompatibility:
 RhyhornTMCompatibility:
     tmlearn 03,07,08                ; |SWORDS_DANCE|HORN_DRILL|BODY_SLAM|
     tmlearn 09,10                   ; |TAKE_DOWN|DOUBLE_EDGE|
-    tmlearn 24                      ; |THUNDERBOLT|
+    tmlearn 20,24                   ; |RAGE|THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER_M|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
@@ -969,7 +969,7 @@ RhyhornTMCompatibility:
 RhydonTMCompatibility:
     tmlearn 01,03,05,07,08          ; |MEGA_PUNCH|SWORDS_DANCE|MEGA_KICK|HORN_DRILL|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
+    tmlearn 17,18,19,20,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|THUNDERBOLT|
     tmlearn 25,26,27,28,31          ; |THUNDER_M|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
     tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
@@ -996,7 +996,7 @@ TangelaTMCompatibility:
 KangaskhanTMCompatibility:
     tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
+    tmlearn 17,18,19,20,22,24       ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,27,28,31,32       ; |THUNDER_M|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
@@ -1013,7 +1013,7 @@ HorseaTMCompatibility:
 SeadraTMCompatibility:
     tmlearn 02,06                   ; |RAZOR_WIND|TOXIC|
     tmlearn 11,12,13,14,15          ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 23                      ; |DRAGON_RAGE|
+    tmlearn 20,23                   ; |RAGE|DRAGON_RAGE|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
@@ -1065,7 +1065,7 @@ MrMimeTMCompatibility:
 ScytherTMCompatibility:
     tmlearn 02,03,05,06             ; |RAZOR_WIND|SWORDS_DANCE|MEGA_KICK|TOXIC|
     tmlearn 09,15                   ; |TAKE_DOWN|HYPER_BEAM|
-    tmlearn 18                      ; |COUNTER|
+    tmlearn 18,20                   ; |COUNTER|RAGE|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
     tmlearn 41,43,44                ; |LIGHT_SCREEN|SKY_ATTACK|REST|
@@ -1074,7 +1074,7 @@ ScytherTMCompatibility:
 JynxTMCompatibility:
     tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
+    tmlearn 17,18,19,20             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,35,40             ; |REFLECT|BIDE|METRONOME|SKULL_BASH|
     tmlearn 41,42,44,46             ; |LIGHT_SCREEN|DREAM_EATER|REST|PSYWAVE|
@@ -1083,7 +1083,7 @@ JynxTMCompatibility:
 ElectabuzzTMCompatibility:
     tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19,24             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|THUNDERBOLT|
+    tmlearn 17,18,19,20,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|THUNDERBOLT|
     tmlearn 25,29,31,32             ; |THUNDER_M|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,35,39,40          ; |REFLECT|BIDE|METRONOME|SWIFT|SKULL_BASH|
     tmlearn 41,44,45,46             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|PSYWAVE|
@@ -1092,7 +1092,7 @@ ElectabuzzTMCompatibility:
 MagmarTMCompatibility:
     tmlearn 01,05,06,08             ; |MEGA_PUNCH|MEGA_KICK|TOXIC|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
+    tmlearn 17,18,19,20             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|
     tmlearn 29,31,32                ; |PSYCHIC_M|MIMIC|DOUBLE_TEAM|
     tmlearn 34,35,37,38,40          ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 41,44,46                ; |LIGHT_SCREEN|REST|PSYWAVE|
@@ -1101,7 +1101,7 @@ MagmarTMCompatibility:
 PinsirTMCompatibility:
     tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
+    tmlearn 17,18,19,20             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34                      ; |BIDE|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
@@ -1110,7 +1110,7 @@ PinsirTMCompatibility:
 TaurosTMCompatibility:
     tmlearn 07,08                   ; |HORN_DRILL|BODY_SLAM|
     tmlearn 09,10,13,14,15          ; |TAKE_DOWN|DOUBLE_EDGE|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
+    tmlearn 20,22,24                ; |RAGE|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,27,31,32          ; |THUNDER_M|EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,37,38,40             ; |BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,48                   ; |REST|ROCK_SLIDE|
@@ -1127,7 +1127,7 @@ MagikarpTMCompatibility:
 GyaradosTMCompatibility:
     tmlearn 08                      ; |BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
+    tmlearn 20,23,24                ; |RAGE|DRAGON_RAGE|THUNDERBOLT|
     tmlearn 25,26,31                ; |THUNDER_M|EARTHQUAKE|MIMIC|
     tmlearn 33,34,37,38,40          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,45                   ; |REST|THUNDER_WAVE|
@@ -1178,7 +1178,7 @@ JolteonTMCompatibility:
 FlareonTMCompatibility:
     tmlearn 08                      ; |BODY_SLAM|
     tmlearn 09,10,15,16             ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|PAY_DAY|
-    tmlearn 0
+    tmlearn 20                      ; |RAGE|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
@@ -1230,7 +1230,7 @@ KabutopsTMCompatibility:
 AerodactylTMCompatibility:
     tmlearn 02,04,08                ; |RAZOR_WIND|WHIRLWIND|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
-    tmlearn 23                      ; |DRAGON_RAGE|
+    tmlearn 20,23                   ; |RAGE|DRAGON_RAGE|
     tmlearn 26,27,31,32             ; |EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39          ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|
     tmlearn 43,44,48                ; |SKY_ATTACK|REST|ROCK_SLIDE|
@@ -1239,7 +1239,7 @@ AerodactylTMCompatibility:
 SnorlaxTMCompatibility:
     tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
+    tmlearn 17,18,19,20,22,24       ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,27,29,31          ; |THUNDER_M|EARTHQUAKE|FISSURE|PSYCHIC_M|MIMIC|
     tmlearn 33,34,35,36,37,38,40    ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
     tmlearn 44,46,48                ; |REST|PSYWAVE|ROCK_SLIDE|
@@ -1275,7 +1275,7 @@ MoltresTMCompatibility:
 DratiniTMCompatibility:
     tmlearn 0
     tmlearn 11,12,13,14             ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|
-    tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
+    tmlearn 20,23,24                ; |RAGE|DRAGON_RAGE|THUNDERBOLT|
     tmlearn 25,31,32                ; |THUNDER_M|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,44,45                ; |LIGHT_SCREEN|REST|THUNDER_WAVE|
@@ -1283,7 +1283,7 @@ DratiniTMCompatibility:
 DragonairTMCompatibility:
     tmlearn 07,08                   ; |HORN_DRILL|BODY_SLAM|
     tmlearn 09,11,12,13,14,15       ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 23,24                   ; |DRAGON_RAGE|THUNDERBOLT|
+    tmlearn 20,23,24                ; |RAGE|DRAGON_RAGE|THUNDERBOLT|
     tmlearn 25,28,31,32             ; |THUNDER_M|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,44,45                ; |LIGHT_SCREEN|REST|THUNDER_WAVE|
@@ -1291,7 +1291,7 @@ DragonairTMCompatibility:
 DragoniteTMCompatibility:
     tmlearn 01,02,04,05,07,08       ; |MEGA_PUNCH|RAZOR_WIND|WHIRLWIND|MEGA_KICK|HORN_DRILL|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
-    tmlearn 19,23,24                ; |SEISMIC_TOSS|DRAGON_RAGE|THUNDERBOLT|
+    tmlearn 19,20,23,24             ; |SEISMIC_TOSS|RAGE|DRAGON_RAGE|THUNDERBOLT|
     tmlearn 25,26,27,28,31,32       ; |THUNDER_M|EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,43,44,45,48          ; |LIGHT_SCREEN|SKY_ATTACK|REST|THUNDER_WAVE|ROCK_SLIDE|
@@ -1300,9 +1300,9 @@ DragoniteTMCompatibility:
 MewtwoTMCompatibility:
     tmlearn 01,05,08                ; |MEGA_PUNCH|MEGA_KICK|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
-    tmlearn 17,18,19,22,24          ; |SUBMISSION|COUNTER|SEISMIC_TOSS|SOLARBEAM|THUNDERBOLT|
+    tmlearn 17,18,19,20,22,24       ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|SOLARBEAM|THUNDERBOLT|
     tmlearn 25,26,29,30,31,32       ; |THUNDER_M|EARTHQUAKE|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,36,37,38,39,40 ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,35,36,37,38,39,40    ; |REFLECT|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,42,44,45,46,48       ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|ROCK_SLIDE|
     tmlearn 49,50,54,55             ; |TRI_ATTACK|SUBSTITUTE|STRIKE|FLASH|
 ; ──────────────────────────────────────────────────────────────────────

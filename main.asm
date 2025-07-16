@@ -66489,7 +66489,7 @@ Mansion1Object: ; 0x443a4 (size=90)
 
     db $3 ; people
     db SPRITE_OAK_AIDE,$11 + 4,$11 + 4,$ff,$d2,$41,SCIENTIST,$1 ; trainer
-    db SPRITE_BALL,$3 + 4,$e + 4,$ff,$ff,$82,ESCAPE_ROPE ; item
+    db SPRITE_BALL,$3 + 4,$e + 4,$ff,$ff,$82,TM_20 ; item
     db SPRITE_BALL,$15 + 4,$12 + 4,$ff,$ff,$83,TRADE_STONE ; item
 
     ; warp-to
