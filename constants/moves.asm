@@ -99,7 +99,7 @@
     db MEDITATE     , ATTACK_UP1_EFFECT          ,   0 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
     db AGILITY      , SPEED_UP3_EFFECT           ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Type Psychic -> Normal ; PP 30 -> 15
     db QUICK_ATTACK , NO_ADDITIONAL_EFFECT       ,  40 , NORMAL   , 255 , 07 ; pp 30 ; 0
-    db RAGE         , RAGE_EFFECT                ,  20 , NORMAL   , 255 , 10 ; pp 20 ; 0
+    db RAGE         , RAGE_EFFECT                ,  40 , NORMAL   , 255 , 10 ; pp 20 ; 0 ; Pwr 20 -> 40
     db TELEPORT     , SWITCH_AND_TELEPORT_EFFECT ,   0 , PSYCHIC  , 255 , 04 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 04
     db NIGHT_SHADE  , SPECIAL_DAMAGE_EFFECT      ,   1 , GHOST    , 255 , 14 ; pp 15 ; -
     db MIMIC        , MIMIC_EFFECT               ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; PP 10 -> 20

@@ -53013,6 +53013,16 @@ MainInBattleLoop: ; 3c233 (f:4233)
 
     call SelectEnemyMove
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; decrement the rage counter
+    ld a,[W_PLAYERBATTSTATUS2]
+    bit 6,a ; USING_RAGE
+    jr z,.not_raging
+    call DecAttackPlayer
+    call DeactivateRageInA
+    ld [W_PLAYERBATTSTATUS2],a
+.not_raging
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld a,[W_PLAYERBATTSTATUS2]
     and %01100000 ; check if the player is using Rage or needs to recharge
     jr nz,.selectEnemyMove
@@ -53215,33 +53225,6 @@ MainInBattleLoop: ; 3c233 (f:4233)
     jp HandleEnemyMonFainted
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
-
-; SpecialEffects
-EffectsArray5:
-; Effects from arrays 2, 4, and 5B, minus Twineedle and Rage.
-; Includes all effects that do not need to be called at the end of
-; ExecutePlayerMove (or ExecuteEnemyMove), because they have already been handled
-    db DRAIN_HP_EFFECT
-    db EXPLODE_EFFECT
-    db DREAM_EATER_EFFECT
-    db PAY_DAY_EFFECT
-    db SWIFT_EFFECT
-    db TWO_TO_FIVE_ATTACKS_EFFECT
-    db CHARGE_EFFECT
-    db SUPER_FANG_EFFECT
-    db SPECIAL_DAMAGE_EFFECT
-    db FLY_EFFECT
-    db ATTACK_TWICE_EFFECT
-    db JUMP_KICK_EFFECT
-    db RECOIL_EFFECT
-    ; fallthru
-
-; SpecialEffectsCont
-EffectsArray5B:
-; damaging moves whose effect is executed prior to damage calculation
-    db THRASH_PETAL_DANCE_EFFECT
-    db TRAPPING_EFFECT
-    db $FF
 
 SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
 
@@ -53932,7 +53915,56 @@ TrainerBattleNotB:
     sub %00000010 ; ▼▲◄►StSeBA
     ret
 
-; Free
+RageEffect:
+    ld hl,W_PLAYERBATTSTATUS2
+    ld bc,$d06a ; PlayerNumAttacksLeft
+    ld a,[H_WHOSETURN]
+    and a
+    jr z,.player
+    ld hl,W_ENEMYBATTSTATUS2
+    ld bc,$d06f ; EnemyNumAttacksLeft
+.player
+    set 6,[hl] ; mon is now in "rage" mode
+    call GenRandomInBattle
+    and %00000001
+    inc a
+    inc a
+    ld [bc],a ; set Rage counter to 2 or 3 at random
+    ret
+
+;Battle status2 in "a"
+;resets the rage bit in "a" if zero flag is set
+DeactivateRageInA:
+    ret nz
+    res 6,a ; USING_RAGE
+    ret
+
+; SpecialEffects
+EffectsArray5:
+; Effects from arrays 2, 4, and 5B, minus Twineedle and Rage.
+; Includes all effects that do not need to be called at the end of
+; ExecutePlayerMove (or ExecuteEnemyMove), because they have already been handled
+    db DRAIN_HP_EFFECT
+    db EXPLODE_EFFECT
+    db DREAM_EATER_EFFECT
+    db PAY_DAY_EFFECT
+    db SWIFT_EFFECT
+    db TWO_TO_FIVE_ATTACKS_EFFECT
+    db CHARGE_EFFECT
+    db SUPER_FANG_EFFECT
+    db SPECIAL_DAMAGE_EFFECT
+    db FLY_EFFECT
+    db ATTACK_TWICE_EFFECT
+    db JUMP_KICK_EFFECT
+    db RECOIL_EFFECT
+    ; fallthru
+
+; SpecialEffectsCont
+EffectsArray5B:
+; damaging moves whose effect is executed prior to damage calculation
+    db THRASH_PETAL_DANCE_EFFECT
+    db TRAPPING_EFFECT
+    db $FF
 
 SECTION "Func_3c893",ROMX[$4893],BANK[$f]
 
@@ -54751,8 +54783,6 @@ GetSelectedMovePointer:
     ld de,W_ENEMYMONALTFORM
     ret
 
-; Free
-
 SECTION "InitBattleMenu",ROMX[$4eb1],BANK[$f]
 
 InitBattleMenu: ; 3ceb1 (f:4eb1)
@@ -55039,8 +55069,6 @@ asm_3d05f:
 ;    pop af                  ; Restore Current Menu Item
 ;    ld [wCurrentMenuItem],a ; ...
 ;    ret
-
-; Free
 
 SECTION "Func_3d0ca",ROMX[$50ca],BANK[$f]
 
@@ -55686,6 +55714,16 @@ SelectEnemyMove:
     ld a,[hl]
     jp .done
 .noLinkBattle
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; decrement the rage counter
+    ld a,[W_ENEMYBATTSTATUS2]
+    bit 6,a ; USING_RAGE
+    jr z,.not_raging
+    call DecAttackEnemy
+    call DeactivateRageInA
+    ld [W_ENEMYBATTSTATUS2],a
+.not_raging
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld a,[W_ENEMYBATTSTATUS2]
     and $60     ; need to recharge or using rage
     ret nz
@@ -61368,15 +61406,20 @@ ClearHyperBeam: ; 3f9cf (f:79cf)
     pop hl
     ret
 
-RageEffect: ; 3f9df (f:79df)
-    ld hl,W_PLAYERBATTSTATUS2
-    ld a,[H_WHOSETURN]
-    and a
-    jr z,.player
-    ld hl,W_ENEMYBATTSTATUS2
-.player
-    set 6,[hl]
+DecAttackPlayer:
+    push hl
+    ld hl,$d06a ; PlayerNumAttacksLeft
+    jr DecAttack
+DecAttackEnemy:
+    push hl
+    ld hl,$d06f ; EnemyNumAttacksLeft
+    ; fall through
+DecAttack:
+    dec [hl]
+    pop hl
     ret
+
+SECTION "MimicEffect",ROMX[$79ed],BANK[$f]
 
 MimicEffect: ; 3f9ed (f:79ed)
     ld c,50
