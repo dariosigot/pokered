@@ -1340,7 +1340,7 @@ HandleFlyOrTeleportAway: ; 0965 (0:0965)
     call UpdateSprites ; move sprites
     call Delay3
     xor a
-    ld [$cf0b],a
+    ld [wBattleResult],a
     ld [$d700],a
     ld [$d057],a
     ld [$d35d],a
@@ -1801,6 +1801,91 @@ CheckExceptionTilePassable:
     ld b,BANK(_CheckExceptionTilePassable)
     ld hl,_CheckExceptionTilePassable
     jp Bankswitch ; check if the player is trying to jump a ledge
+
+
+; ──────────────────────
+; Handle Ghost Battle
+; ──────────────────────
+
+CheckGhostType:
+    push bc
+    push af
+    ld b,4
+.loop
+    ld a,[hli]
+    cp GHOST
+    jr z,.end
+    dec b
+    jr nz,.loop
+    inc b ; rzf
+.end
+    pop bc
+    ld a,b
+    pop bc
+    ret
+
+CheckWildGhost:
+    push bc
+    push hl
+    push af
+    ld a,[W_ISINBATTLE]
+    dec a
+    jr nz,.end
+    ld hl,W_ENEMYMONTYPES
+    call CheckGhostType
+.end
+    pop bc
+    ld a,b
+    pop hl
+    pop bc
+    ret
+
+IsGhostBattle:
+    push bc
+    push hl
+    push af
+    ld a,[W_ISINBATTLE]
+    dec a
+    jr nz,.end
+    call CheckWildGhost
+    jr nz,.end
+    ld b,SILPH_SCOPE
+    call IsItemInBag
+    ; fall through
+.end
+    pop bc
+    ld a,b
+    pop hl
+    pop bc
+    ret
+
+IsGhostBattlePlus:
+    call IsGhostBattle
+    ret z
+    ; If No Standard Ghost Check Marowak Event
+    ; CheckBossGhost
+    push bc
+    push af
+    ld a,[W_CUROPPONENT]
+    cp MAROWAK
+    jr z,.marowak
+    cp HAUNTER
+    jr nz,.end
+.SafariGhost
+    call GetCurrentOldAdventureMap
+    cp SAFARI_ZONE_WEST
+    jr .end
+.marowak
+    call GetCurrentOldAdventureMap
+    cp POKEMONTOWER_6
+    ; fall through
+.end
+    pop bc
+    ld a,b
+    pop bc
+    ret
+
+; ──────────────────────
 
 ; Free
 
@@ -8343,7 +8428,7 @@ Func_3381: ; 3381 (0:3381)
     jp WaitForSoundToFinish
 
 Func_33b7: ; 33b7 (0:33b7)
-    ld a,[$cf0b]
+    ld a,[wBattleResult]
     and a
     jr nz,.asm_33c6
     ld a,[W_PBSTOREDREGISTERH]
@@ -8475,10 +8560,10 @@ FuncTX_PokemonCenterPC: ; 347f (0:347f)
     ld hl,ActivatePC
     jr bankswitchAndContinue
 
-Func_3486: ; 3486 (0:3486)
+StartSimulatingJoypadStates: ; 3486 (0:3486)
     xor a
-    ld [$cd3b],a
-    ld [$c206],a
+    ld [$cd3b],a ; OverrideSimulatedJoypadStatesMask
+    ld [$c206],a ; player's sprite movement byte 1
     ld hl,$d730
     set 7,[hl]
     ret
@@ -10739,7 +10824,7 @@ SpriteOAMParametersFlipped:
 
 ResetStatusAndHalveMoneyOnBlackout:
     xor a
-    ld [$cf0b],a
+    ld [wBattleResult],a
     ld [$d700],a
     ld [W_ISINBATTLE],a ; $d057
     ld [$d35d],a
@@ -23397,9 +23482,7 @@ ItemUseBall: ; d687 (3:5687)
     ld [$d11e],a
     ld hl,ItemUseText00
     call PrintText
-    ld hl,IsGhostBattle
-    ld b,BANK(IsGhostBattle)
-    call Bankswitch
+    call IsGhostBattle
     ld b,$10
     jp z,.next12
     ld a,[W_BATTLETYPE]
@@ -28661,9 +28744,7 @@ ItemUsePokedoll:
     ld a,[W_ISINBATTLE]
     dec a
     jp nz,ItemUseNotTime
-    ld b,BANK(IsGhostBattlePlus)
-    ld hl,IsGhostBattlePlus
-    call Bankswitch
+    call IsGhostBattlePlus
     jp z,ItemUseNotTime
 .Continue
     ld a,$01
@@ -30845,7 +30926,7 @@ EndOfBattle:
     ld hl,Func_372d6
     ld b,BANK(Func_372d6)
     call Bankswitch ; indirect jump to Func_372d6 (372d6 (d:72d6))
-    ld a,[$cf0b]
+    ld a,[wBattleResult]
     cp $1
     ld de,YouWinText ; $7853
     jr c,.asm_137de
@@ -30860,7 +30941,7 @@ EndOfBattle:
     call DelayFrames
     jr .asm_1380a
 .asm_137eb
-    ld a,[$cf0b]
+    ld a,[wBattleResult]
     cp 2
     jr z,.WinOrDraw
     and a
@@ -30898,6 +30979,8 @@ EndOfBattle:
     ld [hli],a
     ld [hl],a
     ld [wListScrollOffset],a ; $cc36
+    ld hl,wFlagForceGhostPalBit4
+    res 4,[hl]
     ld hl,$d060
     ld b,$18
 .asm_1383e
@@ -33843,7 +33926,7 @@ ViridianCityScript3: ; 190c1 (6:50c1)
     ret
 
 ViridianCityScript_190cf: ; 190cf (6:50cf)
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$1
     ld [$cd38],a
     ld a,$80
@@ -34891,7 +34974,7 @@ VermilionCityScript0: ; 197e6 (6:57e6)
     ld [$ccd3],a
     ld a,$1
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$1
     ld [W_VERMILIONCITYCURSCRIPT],a
     ret
@@ -34916,7 +34999,7 @@ VermilionCityScript2: ; 19833 (6:5833)
     ld [$ccd4],a
     ld a,$2
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$3
     ld [W_VERMILIONCITYCURSCRIPT],a
     ret
@@ -36400,7 +36483,7 @@ Func_1a3e0: ; 1a3e0 (6:63e0)
     ld [$ccd3],a
     xor a
     ld [$c102],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ret
 .asm_1a406
     xor a
@@ -36474,7 +36557,7 @@ Func_1a485: ; 1a485 (6:6485)
     ld [$cd38],a
     ld [$ff00+$95],a
     PREDEF Func_f9a0
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$2
     ld [$cf10],a
     ret
@@ -36552,7 +36635,7 @@ Func_1a514: ; 1a514 (6:6514)
     ld a,[$cf13]
     swap a
     ld [$cf17],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld hl,$ccd3
     ld de,RLEList_1a559
     call DecodeRLEList
@@ -36871,7 +36954,7 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     ld [wJoypadForbiddenButtonsMask],a
     ld hl,$d736
     set 6,[hl]
-    call Func_3486
+    call StartSimulatingJoypadStates
 
     call Func_1a6f0
     ld a,$a2
@@ -37409,7 +37492,7 @@ PalletTownScript7_AfterPikachu:
     ld a,[W_ISINBATTLE]
     cp $ff
     jr z,.end
-    ld a,[$cf0b]
+    ld a,[wBattleResult]
     cp $2
     jr z,.end
     ld hl,wDisableEncounterBit1
@@ -37425,7 +37508,7 @@ PewterCityScript7_AfterEevee:
     ld a,[W_ISINBATTLE]
     cp $ff
     jr z,.end
-    ld a,[$cf0b]
+    ld a,[wBattleResult]
     cp $2
     jr z,.end
     ld hl,wDisableEncounterBit3
@@ -37877,7 +37960,7 @@ CinnabarIslandScript0: ; 1ca38 (7:4a38)
     ld [$cd38],a
     ld a,$80
     ld [$ccd3],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     xor a
     ld [$c109],a
     ld [wJoypadForbiddenButtonsMask],a
@@ -38074,7 +38157,7 @@ OaksLabScript3: ; 1cba2 (7:4ba2)
     call DecodeRLEList
     dec a
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$1
     ld [$ff00+$8c],a
     xor a
@@ -38164,7 +38247,7 @@ OaksLabScript6: ; 1cc36 (7:4c36)
     ld [$cd38],a
     ld a,$40
     ld [$ccd3],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$8
     ld [$d528],a
 
@@ -39288,7 +39371,7 @@ ViridianMartScript0: ; 1d49b (7:549b)
     call DecodeRLEList
     dec a
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$1
     ld [W_VIRIDIANMARKETCURSCRIPT],a
     ret
@@ -40780,7 +40863,7 @@ Route5GateScript_1df43: ; 1df43 (7:5f43)
     ld [$ccd3],a
     ld a,$1
     ld [$cd38],a
-    jp Func_3486
+    jp StartSimulatingJoypadStates
 
 Route5GateScript0: ; 1df50 (7:5f50)
     ld a,[$d728]
@@ -41644,7 +41727,7 @@ Func_1e6ba: ; 1e6ba (7:66ba)
     ld [$ccd3],a
     ld [$c109],a
     ld [wJoypadForbiddenButtonsMask],a
-    jp Func_3486
+    jp StartSimulatingJoypadStates
 
 Route22GateScript1: ; 1e6cd (7:66cd)
     ld a,[$cd38]
@@ -52823,9 +52906,9 @@ Func_3c04c: ; 3c04c (f:404c)
     ld b,$1
     call GoPAL_SET_PlusFlagAndRedBall ; Denim,funzione per flaggare questo istante di chiamata ; call GoPAL_SET
     call ResetLCD_OAM
-    ld hl,Func_58d99
-    ld b,BANK(Func_58d99)
-    jp Bankswitch ; indirect jump to Func_58d99 (58d99 (16:4d99))
+    ld hl,PrintBeginningBattleText
+    ld b,BANK(PrintBeginningBattleText)
+    jp Bankswitch ; indirect jump to PrintBeginningBattleText (58d99 (16:4d99))
 
 Func_3c0ff: ; 3c0ff (f:40ff)
     push bc
@@ -52977,7 +53060,7 @@ EnemyRan: ; 3c202 (f:4202)
     ld hl,UnnamedText_3c229 ; $4229
     jr nz,.asm_3c216
     xor a
-    ld [$cf0b],a
+    ld [wBattleResult],a
     ld hl,UnnamedText_3c22e ; $422e
 .asm_3c216
     call PrintText
@@ -53588,7 +53671,7 @@ FaintEnemyPokemon ; 0x3c567
     call Func_3ee94
     call SaveScreenTilesToBuffer1
     xor a
-    ld [$cf0b],a
+    ld [wBattleResult],a
 
 HackGainExpAfterCatch:
     call IsFocusInBagOrAllFought
@@ -53621,9 +53704,6 @@ GainExperience_:
     jp Bankswitch ; indirect jump to GainExperience (5524f (15:524f))
 
 GetHealthBarColorWithGhostCheck:
-    ld a,l
-    cp $1e
-    jp nz,GetHealthBarColor ; don't check ghost if not front
     ld a,e
     ld [wBackupHealthBarWidth],a
     ld d,h
@@ -53793,7 +53873,7 @@ Func_3c741: ; 3c741 (f:4741)
     ld de,Coord
     call Func_3c893
     ld a,$1
-    ld [$cf0b],a
+    ld [wBattleResult],a
     ld a,[$ccf0]
     and a
     ret z
@@ -54373,7 +54453,7 @@ TryRunningFromBattle: ; 3cab9 (f:4ab9)
     jr z,.asm_3cb81
     dec a
 .asm_3cb81
-    ld [$cf0b],a
+    ld [wBattleResult],a
     ld a,$97
     call PlaySoundWaitForCurrent
     ld hl,.UnnamedText_3cba1
@@ -54761,6 +54841,7 @@ Func_3ce7f: ; 3ce7f (f:4e7f)
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld hl,$cf1e
+    ; fall through
 
 GetBattleHealthBarColor:
     ld b,[hl]
@@ -56124,22 +56205,9 @@ GetOutText: ; 3d835 (f:5835)
     TX_FAR _GetOutText
     db "@"
 
-IsGhostBattle: ; 3d83a (f:583a)
-    ld a,[W_ISINBATTLE]
-    dec a
-    ret nz
-    call GetCurrentOldAdventureMap
-    cp a,POKEMONTOWER_1
-    jr c,.next
-    cp a,LAVENDER_HOUSE_1
-    jr nc,.next
-    ld b,SILPH_SCOPE
-    call IsItemInBag ; $3493
-    ret z
-.next
-    ld a,1
-    and a
-    ret
+; Free
+
+SECTION "CheckPlayerStatusConditions",ROMX[$5854],BANK[$f]
 
 ; ──────────────────────────────────────────────────────────────────────
 ; CheckPlayerStatusConditions
@@ -59285,6 +59353,8 @@ LoadEnemyMonData:
     inc de
     ld a,[hl]     ; base exp
     ld [de],a
+    call IsGhostBattle
+    jr z,.GhostThenSkip
     ld a,[W_ENEMYMONID]
     ld [$d11e],a
     call GetMonName
@@ -59300,6 +59370,10 @@ LoadEnemyMonData:
     ld hl,wPokedexSeen
     ld b,1
     PREDEF HandleBitArray
+    jr .SkipGhost
+.GhostThenSkip
+    call HandleGhostBattleInSafari
+.SkipGhost
     ld hl,W_ENEMYMONLEVEL ; $cff3
     ld de,$cd23
     ld bc,$b
@@ -59422,8 +59496,6 @@ Func_3ec92:
     FuncCoord 1,5 ; $c405
     ld hl,Coord
     PREDEF_JUMP CopyUncompressedPicToTilemap
-
-; Free
 
 SECTION "Func_3ed12",ROMX[$6d12],BANK[$f]
 
@@ -59851,12 +59923,8 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     ld [W_ISINBATTLE],a ; $d057
     call LoadEnemyMonData
     call PlayBattleMusicAndDoBattleTransitionAndInitBatVar ; call DoBattleTransitionAndInitBatVar
-    ld a,[W_CUROPPONENT] ; $d059
-    cp MAROWAK
-    jr z,.isGhost
-    call IsGhostBattle
+    call CheckWildGhost
     jr nz,.isNoGhost
-.isGhost
     call LoadGhostPic
     jr .spriteLoaded
 .isNoGhost
@@ -62461,6 +62529,15 @@ RecoilEffect:
     ld hl,RecoilEffect_
     ld b,BANK(RecoilEffect_)
     jp Bankswitch
+
+HandleGhostBattleInSafari:
+    ld hl,W_BATTLETYPE
+    ld a,[hl]
+    cp 2
+    ret c ; end if 0/1
+    xor a
+    ld [hl],a
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -67397,7 +67474,7 @@ RocketHideout2Script0: ; 44e42 (11:4e42)
     jp z,CheckFightingMapTrainers
     ld hl,$d736
     set 7,[hl]
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$a7
     call PlaySound
     ld a,$ff
@@ -67929,7 +68006,7 @@ RocketHideout3Script0: ; 45240 (11:5240)
     jp z,CheckFightingMapTrainers
     ld hl,$d736
     set 7,[hl]
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$a7
     call PlaySound
     ld a,$ff
@@ -69589,7 +69666,7 @@ SeafoamIslands4Script0: ; 46603 (11:6603)
     call DecodeRLEList
     dec a
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld hl,W_FLAGS_D733
     set 2,[hl]
     ld a,$1
@@ -69753,7 +69830,7 @@ SeafoamIslands5Script0: ; 467c7 (11:67c7)
     ld [$cd38],a
     ld a,$40
     ld [$ccd3],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld hl,W_FLAGS_D733
     res 2,[hl]
     ld a,$1
@@ -69799,7 +69876,7 @@ SeafoamIslands5Script2: ; 46816 (11:6816)
     call DecodeRLEList
     dec a
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$3
 .asm_46849
     ld [W_SEAFOAMISLANDS5CURSCRIPT],a
@@ -70919,10 +70996,12 @@ SafariZoneScript:
     jp CallFunctionInTable
 
 SafariZoneScriptPointers:
-    dw SafariZoneScript0
+    dw SafariZoneEmptyScript
     dw SafariZonePostLapras
+    dw SafariZoneEmptyScript
+    dw SafariZoneEmptyScript
 
-SafariZoneScript0:
+SafariZoneEmptyScript:
     ret
 
 SafariZoneLapras:
@@ -70959,16 +71038,16 @@ SafariZoneLaprasText:
 SafariZonePostLapras:
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
-    ret z
+    jr z,.reset
     ld hl,.MissableIdList
     call GetCurrentMapLaprasInfo
     ld [$cc4d],a
     PREDEF RemoveMissableObject
     call UpdateSprites
     call Delay3
-    ld a,[$cf0b]
+    ld a,[wBattleResult]
     cp $2
-    jr z,.skip
+    jr z,.reset
     ld hl,.RunAwayTextIdList
     call GetCurrentMapLaprasInfo
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
@@ -70983,11 +71062,8 @@ SafariZonePostLapras:
     call GetCurrentMapLaprasInfo
     ld [$cc4d],a
     PREDEF AddMissableObject
-.skip
-    xor a
-    ld [W_SAFARIZONECURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
-    ret
+.reset
+    jr SafariZoneResetScript
 .MissableIdList
     db SAFARI_ZONE_EAST,$E8
     db SAFARI_ZONE_NORTH,$EB
@@ -71018,6 +71094,12 @@ GetCurrentMapLaprasInfo:
 SafariZoneLaprasRunAway:
     TX_FAR _SafariZoneLaprasRunAway
     db "@"
+
+SafariZoneResetScript:
+    xor a
+    ld [W_SAFARIZONECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $11)
@@ -74248,7 +74330,7 @@ Route16GateMapScript0: ; 496d7 (12:56d7)
     ld a,$40
     ld hl,$ccd3
     call FillMemory
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$1
     ld [W_ROUTE16GATECURSCRIPT],a
     ret
@@ -74282,7 +74364,7 @@ Route16GateMapScript2: ; 49727 (12:5727)
     ld [$cd38],a
     ld a,$10
     ld [$ccd3],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$3
     ld [W_ROUTE16GATECURSCRIPT],a
     ret
@@ -74485,7 +74567,7 @@ Route18GateScript0: ; 4988f (12:588f)
     ld a,$40
     ld hl,$ccd3
     call FillMemory
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$1
     ld [W_ROUTE18GATECURSCRIPT],a
     ret
@@ -74516,7 +74598,7 @@ Route18GateScript2: ; 498df (12:58df)
     ld [$cd38],a
     ld a,$10
     ld [$ccd3],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$3
     ld [W_ROUTE18GATECURSCRIPT],a
     ret
@@ -75368,8 +75450,7 @@ SafariZoneWest_h: ; 0x4a1a9 to 0x4a1b5 (12 bytes) (id=219)
     db $00 ; connections
     dw SafariZoneWestObject ; objects
 
-SafariZoneWestScript: ; 4a1b5 (12:61b5)
-    jp EnableAutoTextBoxDrawing
+SECTION "SafariZoneWestTextPointers",ROMX[$61b8],BANK[$12]
 
 SafariZoneWestTextPointers: ; 4a1b8 (12:61b8)
     dw PickupItemText
@@ -75584,6 +75665,74 @@ CeladonGymScriptPointers:
     dw EndTrainerBattle
     dw CeladonGymScript3
     dw GymLeaderAfterRematch
+
+; ──────────────────────
+; Safari Ghost
+; ──────────────────────
+
+SafariZoneWestScript:
+    call EnableAutoTextBoxDrawing
+    ld hl,SafariZoneWestScriptPointers
+    ld a,[W_SAFARIZONECURSCRIPT]
+    jp CallFunctionInTable
+
+SafariZoneWestScriptPointers:
+    dw SafariZoneWestCheckGhostCoord
+    dw SafariZoneWestEmptyScript
+    dw SafariZoneWestPostGhost
+
+SafariZoneWestEmptyScript:
+    ret
+
+SafariZoneWestCheckGhostCoord:
+    ld hl,wEventRevealSafariGhostBit0
+    bit 0,[hl]
+    ret nz
+    ld hl,.CoordSafariGhost
+    call ArePlayerCoordsInArray
+    ret nc
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,HAUNTER
+    ld [W_CUROPPONENT],a ; $d059
+    ld a,30
+    ld [W_CURENEMYLVL],a ; $d127
+    ld a,2 ; SafariZoneWestPostGhost
+    ld [W_SAFARIZONECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+.CoordSafariGhost
+    db 04,03,$FF
+
+SafariZoneWestResetScript:
+    xor a
+    ld [W_SAFARIZONECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+SafariZoneWestPostGhost:
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $ff
+    jr z,.reset
+    ld b,SILPH_SCOPE
+    call IsItemInBag
+    jr nz,.SetBitRevealSafariGhost
+    ld a,$ff
+    ld [wJoypadForbiddenButtonsMask],a
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,1
+    ld [$cd38],a
+    ld a,%10000000 ; Down ; ▼▲◄►StSeBA
+    ld [$ccd3],a
+    call StartSimulatingJoypadStates
+    jr .reset
+.SetBitRevealSafariGhost
+    ld hl,wEventRevealSafariGhostBit0
+    set 0,[hl]
+    ; fall through
+.reset
+    jr SafariZoneWestResetScript
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -77311,7 +77460,7 @@ Func_512d8: ; 512d8 (14:52d8)
     xor a
     ld [$c109],a
     ld [wJoypadForbiddenButtonsMask],a
-    jp Func_3486
+    jp StartSimulatingJoypadStates
 
 Route23Script1: ; 512ec (14:52ec)
     ld a,[$cd38]
@@ -77461,7 +77610,7 @@ Route24Script0: ; 513d5 (14:53d5)
     ld [$ccd3],a
     ld a,$1
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$4
     ld [W_ROUTE24CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -79474,7 +79623,7 @@ InitBattleVariables: ; 525af (14:65af)
     ld [$d0d4],a
     xor a
     ld [$cd6a],a
-    ld [$cf0b],a
+    ld [wBattleResult],a
     ld hl,$cc2b
     ld [hli],a
     ld [hli],a
@@ -85233,15 +85382,12 @@ Route18Blocks: ; 58c9c (16:4c9c)
 
     INCBIN "maps/unusedblocks58d7d.blk"
 
-Func_58d99: ; 58d99 (16:4d99)
+PrintBeginningBattleText: ; 58d99 (16:4d99)
     ld a,[W_ISINBATTLE] ; $d057
     dec a
     jr nz,.TrainerBattle
-    call GetCurrentOldAdventureMap
-    cp POKEMONTOWER_3
-    jr c,.NotGhostOrCommon
-    cp LAVENDER_HOUSE_1
-    jr c,.Ghost
+    call CheckWildGhost
+    jr z,.Ghost
 .NotGhostOrCommon
     ld a,[W_ENEMYMONID]
     call PlayCry
@@ -85264,33 +85410,21 @@ Func_58d99: ; 58d99 (16:4d99)
 .Ghost
     ld b,SILPH_SCOPE
     call IsItemInBag
-    ld a,[W_ENEMYMONID]
-    call CheckMarowak ; ld [$cf91],a
-    jr z,.isMarowak
-    ld a,b
-    and a
-    jr z,.SilphScopeNotInBag
-    call .LoadEnemyMonData
-    jr .NotGhostOrCommon
-.SilphScopeNotInBag
+    jr nz,.HandleGhost
     ld hl,.UnnamedText_58e45 ; Ghost appeared....
     call PrintText
     ld hl,.UnnamedText_58e54 ; Damn....
     jr .common1
-.isMarowak
-    ld a,b
-    and a
-    jr z,.SilphScopeNotInBag
+.HandleGhost
     ld hl,.UnnamedText_58e45 ; Ghost appeared....
     call PrintText
     ld hl,.UnnamedText_58e4f ; silph scope unveiled...
     call PrintText
-    call .LoadEnemyMonData
-    ld hl,MarowakGhostAnimation
-    ld b,BANK(MarowakGhostAnimation)
+    call .LoadEnemyMonRealName
+    ld hl,GhostAnimation
+    ld b,BANK(GhostAnimation)
     call Bankswitch
     jr .NotGhostOrCommon
-    ; fall through
 .Func_58e29
     xor a
     ld [$c0f1],a
@@ -85306,10 +85440,14 @@ Func_58d99: ; 58d99 (16:4d99)
     call Bankswitch
     pop hl
     ret
-.LoadEnemyMonData
-    ld hl,LoadEnemyMonData
-    ld b,BANK(LoadEnemyMonData)
-    jp Bankswitch
+.LoadEnemyMonRealName
+    ld a,[W_ENEMYMONID]
+    ld [$d11e],a
+    call GetMonName
+    ld hl,$cd6d
+    ld de,W_ENEMYMONNAME
+    ld bc,$b
+    jp CopyData
 .UnnamedText_58e3b
     TX_FAR _UnnamedText_58e3b
     db "@"
@@ -86702,7 +86840,7 @@ Route12Script3: ; 5964c (16:564c)
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
     jr z,Route12Script_59606
-    ld a,[$cf0b]
+    ld a,[wBattleResult]
     cp $2
     jr z,.asm_59664
     ld a,$e
@@ -87288,7 +87426,7 @@ Route16Script3: ; 5998f (16:598f)
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
     jp z,Func_59946
-    ld a,[$cf0b]
+    ld a,[wBattleResult]
     cp $2
     jr z,.asm_599a8
     ld a,$b
@@ -88572,7 +88710,7 @@ Func_5a35b: ; 5a35b (16:635b)
     call DecodeRLEList
     dec a
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$3
     ld [W_LANCECURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -88731,7 +88869,7 @@ HallofFameRoomScript0: ; 5a50d (16:650d)
     call DecodeRLEList
     dec a
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$1
     ld [W_HALLOFFAMEROOMCURSCRIPT],a
     ret
@@ -88818,15 +88956,6 @@ GiveItemNotPower:
     cp HM_05
     jp z,FakeGiveItem
     jp GiveItem
-
-CheckMarowak:
-    ld [$cf91],a
-    cp MAROWAK
-    ret nz
-    call GetCurrentOldAdventureMap
-    cp POKEMONTOWER_6
-    ld a,[$cf91]
-    ret
 
 Route12Snorlax:
     db $8
@@ -89169,7 +89298,7 @@ asm_de133: ; 5c1da (17:41da)
     ld [$cd38],a
     ld a,$80
     ld [$ccd3],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     call UpdateSprites
     jr asm_d1145 ; 0x5c1f0 $25
 asm_0b094: ; 5c1f2 (17:41f2)
@@ -93858,7 +93987,7 @@ PokemonTower6Script0: ; 60b17 (18:4b17)
     ld [H_CURRENTPRESSEDBUTTONS],a
     ld a,$6
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call DisplayTextIDAndForceGhostPal ; call DisplayTextID
+    call DisplayTextID
     ld a,MAROWAK
     ld [W_CUROPPONENT],a ; $d059
     ld a,40
@@ -93883,7 +94012,7 @@ PokemonTower6Script4: ; 60b48 (18:4b48)
     call UpdateSprites
     ld a,$f0
     ld [wJoypadForbiddenButtonsMask],a
-    ld a,[$cf0b]
+    ld a,[wBattleResult]
     and a
     jr nz,.asm_60b82
     ld hl,$d768
@@ -97096,7 +97225,7 @@ DiglettsCavePostAerodactyl:
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
     jr z,DiglettsCaveResetDefaultScript
-    ld a,[$cf0b]
+    ld a,[wBattleResult]
     cp $2
     jr z,.skip
     ld a,4 ; DiglettsCaveAerodactylRunAway
@@ -97124,12 +97253,6 @@ DiglettCaveWaitOne:
 DiglettsCaveAerodactylRunAway:
     TX_FAR _DiglettsCaveAerodactylRunAway
     db "@"
-
-DisplayTextIDAndForceGhostPal:
-    call DisplayTextID
-    ld hl,wFlagForceGhostPalBit4
-    set 4,[hl]
-    ret
 
 ; ────────────────────────────────────────
 
@@ -98358,9 +98481,7 @@ _HandleMidJump: ; 7087e (1c:487e)
     ld [wJoypadForbiddenButtonsMask],a
     ret
 
-SECTION "MarowakGhostAnimation",ROMX[$48ca],BANK[$1c]
-
-MarowakGhostAnimation: ; 708ca (1c:48ca)
+GhostAnimation:
     ld a,$e4
     call UpdateSpriteDuringMarowakEvent ; ld [rOBP1],a ; $FF00+$49
     call Func_7092a
@@ -98371,7 +98492,7 @@ MarowakGhostAnimation: ; 708ca (1c:48ca)
     call Delay3
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ld a,$91
+    ld a,[W_ENEMYMONID]
     ld [$cee9],a
     ld a,$1
     ld [H_WHOSETURN],a ; $FF00+$f3
@@ -98379,9 +98500,9 @@ MarowakGhostAnimation: ; 708ca (1c:48ca)
     ld b,BANK(Func_79793)
     call Bankswitch ; indirect jump to Func_79793 (79793 (1e:5793))
     ld d,$80
-    call FlashSprite8Times
+    call FlashSprite
 .asm_708f6
-    ld c,$a
+    ld c,6
     call DelayFrames
     ld a,[rOBP0] ; ld a,[rOBP1] ; $FF00+$49
     sla a
@@ -98392,20 +98513,20 @@ MarowakGhostAnimation: ; 708ca (1c:48ca)
     call Func_7092a
     ld b,$e4
 .asm_7090d
-    ld c,$a
+    ld c,6
     call DelayFrames
     ld a,[rOBP0] ; ld a,[rOBP1] ; $FF00+$49
     srl b
     rra
     srl b
     rra
-    call UpdateSpriteDuringMarowakEvent ; ld [rOBP1],a ; $FF00+$49
+    call UpdateSpriteDuringMarowakEventAndEnableBgTransfer ; ld [rOBP1],a ; $FF00+$49
     ld a,b
     and a
     jr nz,.asm_7090d
-    ld a,$1
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     jp Delay3AndCleanLCD_OAM
+
+SECTION "Func_7092a",ROMX[$492a],BANK[$1c]
 
 Func_7092a: ; 7092a (1c:492a)
     ld de,$9000
@@ -101130,20 +101251,7 @@ CheckFlyingMonSprite:
     pop hl
     ret
 
-IsGhostBattlePlus:
-    push bc
-    push de
-    push af
-    call IsGhostBattle_Bank1C
-    jr z,.End
-    ; If No Standard Ghost Check Marowak Event
-    call CheckMarowak_Bank1C
-.End
-    pop bc
-    ld a,b
-    pop de
-    pop bc
-    ret
+; Free
 
 SECTION "GetHallOfFameLinkCableEvolutionPaletteID",ROMX[$5f17],BANK[$1c]
 
@@ -103131,14 +103239,10 @@ ResetPreVRAM2:
 
 CheckShinyFrontAndGetPAL:
     push hl
-    call IsGhostBattlePlus
-    jr nz,.NoGhost
-    call CheckMarowak_Bank1C
-    jr nz,.SimpleGhost
     ld hl,wFlagForceGhostPalBit4
     bit 4,[hl]
-    jr z,.NoGhost ; Ghost Marowak Real Palette after SILPH_SCOPE
-.SimpleGhost
+    jr z,.NoGhost
+.Ghost
     ld hl,W_MONH_PALETTE_ID
     ld a,PAL_GASTLY ; Ghost Color is Gastly Color
     ld [hli],a
@@ -103161,35 +103265,6 @@ CheckShinyFrontAndGetPAL:
     call Bankswitch
     ld hl,W_ENEMYMONATKDEFIV
     jr GetPalCommon
-
-CheckMarowak_Bank1C:
-    push af
-    ld a,[W_ENEMYMONID]
-    cp MAROWAK
-    jr nz,.end
-    call GetCurrentOldAdventureMap
-    cp POKEMONTOWER_6
-.end
-    pop bc
-    ld a,b
-    ret
-
-IsGhostBattle_Bank1C:
-    ld a,[W_ISINBATTLE]
-    dec a
-    ret nz
-    call GetCurrentOldAdventureMap
-    cp a,POKEMONTOWER_1
-    jr c,.next
-    cp a,LAVENDER_HOUSE_1
-    jr nc,.next
-    ld b,SILPH_SCOPE
-    call IsItemInBag ; $3493
-    ret z
-.next
-    ld a,1
-    and a
-    ret
 
 CheckShinyBackAndGetPAL:
     push hl
@@ -103624,21 +103699,41 @@ UpdateSpriteDuringMarowakEvent:
     pop af
     ret
 
+UpdateSpriteDuringMarowakEventAndEnableBgTransfer:
+    ld [rOBP0],a ; $FF00+$49
+    push af
+    ld a,b
+    and a
+    jr nz,.end
+    ld a,$1
+    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
+    call Delay3
+.end
+    call IfGBCDelay3
+    pop af
+    ret
+
 ; d = value to xor with palette
-FlashSprite8Times:
-    ld b, 8
+FlashSprite:
+    ld b,6
 .loop
     ld a,[rOBP0]
     xor d
     ld [rOBP0],a
-    ld c,10
+    ld c,7
     call DelayFrames
     dec b
     jr nz,.loop
     ret
 
 GetHealthBarColorWithGhostCheck_:
-    call IsGhostBattlePlus
+    ld a,e
+    cp $1e
+    ld hl,W_PLAYERMONTYPES
+    jr nz,.front
+    ld hl,W_ENEMYMONTYPES
+.front
+    call CheckGhostType
     ld h,d
     ld l,e
     jr nz,.NoGhost
@@ -104362,7 +104457,7 @@ ViridianGymScript0: ; 748eb (1d:48eb)
     call Func_3442
     cp $ff
     jp z,CheckFightingMapTrainers
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld hl,$d736
     set 7,[hl]
     ld a,$a7
@@ -105624,7 +105719,7 @@ Func_752a3: ; 752a3 (1d:52a3)
     ld hl,$ccd3
     pop af
     call FillMemory
-    jp Func_3486
+    jp StartSimulatingJoypadStates
 
 Func_752b4: ; 752b4 (1d:52b4)
     ld a,[$cd38]
@@ -107290,7 +107385,7 @@ GaryScript1: ; 75f48 (1d:5f48)
     call DecodeRLEList
     dec a
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$2
     ld [W_GARYCURSCRIPT],a
     ret
@@ -107463,7 +107558,7 @@ GaryScript9: ; 76099 (1d:6099)
     call DecodeRLEList
     dec a
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$a
     ld [W_GARYCURSCRIPT],a
     ret
@@ -107632,7 +107727,7 @@ asm_761c6: ; 761c6 (1d:61c6)
     ld [hl],a
     ld a,$6
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$3
     ld [W_LORELEICURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -107661,7 +107756,7 @@ LoreleiScript0: ; 761e2 (1d:61e2)
     ld [$ccd3],a
     ld a,$1
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$3
     ld [W_LORELEICURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -107813,7 +107908,7 @@ asm_7631d: ; 7631d (1d:631d)
     ld [hl],a
     ld a,$6
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$3
     ld [W_BRUNOCURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -107843,7 +107938,7 @@ BrunoScript0: ; 76339 (1d:6339)
     ld [$ccd3],a
     ld a,$1
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$3
     ld [W_BRUNOCURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -107995,7 +108090,7 @@ asm_76474: ; 76474 (1d:6474)
     ld [hl],a
     ld a,$6
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$3
     ld [W_AGATHACURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -108025,7 +108120,7 @@ AgathaScript0: ; 76490 (1d:6490)
     ld [$ccd3],a
     ld a,$1
     ld [$cd38],a
-    call Func_3486
+    call StartSimulatingJoypadStates
     ld a,$3
     ld [W_AGATHACURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -121158,14 +121253,15 @@ _UnnamedText_58e4a: ; 89c5e (22:5c5e)
     db $0," wants",$4f
     db "to fight!",$58
 
-_UnnamedText_58e4f: ; 89c73 (22:5c73)
+_UnnamedText_58e4f:
     db $0,"SILPH SCOPE",$4f
-    db "unveiled the",$55
-    db "GHOST's identity!",$58
+    db "unveiled GHOST!",$58
 
-_UnnamedText_58e54: ; 89c9e (22:5c9e)
+_UnnamedText_58e54:
     db $0,"Darn! The GHOST",$4f
     db "can't be ID'd!",$58
+
+SECTION "_UnnamedText_58eae",ROMX[$5cbc],BANK[$22]
 
 _UnnamedText_58eae: ; 89cbc (22:5cbc)
     db $0,"Go! @@"
@@ -132346,9 +132442,7 @@ SECTION "bank33",ROMX,BANK[$33] ; Denim,GENDER
 
 _DrawCatchGender: ; Denim
 ; catch
-    ld hl,IsGhostBattle
-    ld b,BANK(IsGhostBattle)
-    call Bankswitch
+    call IsGhostBattle
     jp z,.Ghost ; No Gender,Pokedex or Debug If Ghost Battle
     ld a,[W_ENEMYMON_START]
     ld [$d11e],a
@@ -132386,14 +132480,8 @@ _DrawCatchGender: ; Denim
     jr nz,.PrintConfused
     ld a,[W_ENEMYMON_START]
     ld [$d11e],a
-    call .CheckMarowak
-    jr nz,.noMarowak
-    pop af ; Restore Pokedex Flag Test
-    jr .GetGender
-.noMarowak
     pop af ; Restore Pokedex Flag Test
     jr z,.Genderless
-.GetGender
     call GetGender
     jr c,.Genderless
     push af
@@ -132432,12 +132520,6 @@ _DrawCatchGender: ; Denim
     db $E6,$50
 .ShinyStarIcon
     db $D1,$50
-.CheckMarowak
-    cp MAROWAK
-    ret nz
-    call GetCurrentOldAdventureMap
-    cp POKEMONTOWER_6
-    ret
 
 _DrawCurrentMonGenderInBattle:
     ld hl,W_PLAYERBATTSTATUS1
@@ -135537,16 +135619,16 @@ WildDataPointersNew:
 
 RouteD1Mons:
     db $19
-    db 45,KADABRA  ; 20%
-    db 45,KADABRA  ; 20%
-    db 45,KADABRA  ; 15%
-    db 45,KADABRA  ; 10%
-    db 45,KADABRA  ; 10%
-    db 45,KADABRA  ; 10%
-    db 45,KADABRA  ;  5%
-    db 45,KADABRA  ;  5%
-    db 45,KADABRA  ;  4%
-    db 45,KADABRA  ;  1%
+    db 16,KADABRA  ; 20%
+    db 16,KADABRA  ; 20%
+    db 16,KADABRA  ; 15%
+    db 16,KADABRA  ; 10%
+    db 16,KADABRA  ; 10%
+    db 16,KADABRA  ; 10%
+    db 16,KADABRA  ;  5%
+    db 16,KADABRA  ;  5%
+    db 16,KADABRA  ;  4%
+    db 16,KADABRA  ;  1%
     db $05
     db  2,MAGIKARP ; 20%
     db  2,MAGIKARP ; 20%
@@ -138045,6 +138127,8 @@ LoadFontTilePatternsWithWall:
     jp GoodCopyVideoData
 
 _LoadGhostPic:
+    ld hl,wFlagForceGhostPalBit4
+    set 4,[hl]
     ld hl,W_MONHSPRITEDIM
     ld a,$66
     ld [hli],a   ; write sprite dimensions
@@ -139546,7 +139630,7 @@ ItemInBattleFinalCheck:
     xor a
     ld [$d11c],a
     ld a,$2
-    ld [$cf0b],a
+    ld [wBattleResult],a
     scf
     ret
 .safariOrOldMan
@@ -141396,9 +141480,7 @@ _LoadBattlePokedex:
     ld a,[$d74b]
     bit 5,a ; does the player have the pokedex?
     jr z,.end
-    ld hl,IsGhostBattle
-    ld b,BANK(IsGhostBattle)
-    call Bankswitch
+    call IsGhostBattle
     jr z,.end
     ld hl,.LoadPokedexText
     call PrintText

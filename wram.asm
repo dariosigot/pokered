@@ -337,7 +337,14 @@ wAnimSoundID: ; cf07
 ; sound ID during battle animations
     ds 1
 
-    ds 12
+    ds 3
+
+wBattleResult:: db ; cf0b
+; $00 - win
+; $01 - lose
+; $02 - draw
+
+    ds 8
 
 wCurSpriteMovement2: ; cf14
 ; movement byte 2 of current sprite
@@ -1673,6 +1680,7 @@ wEventEnableDojoLastPkmnBit6 ; d882 ; bit 6
 wEventEncounterMewBit7       ; d882 ; bit 7
     ds 1
 
+wEventRevealSafariGhostBit0  ; d883 ; bit 0
 wEventRouteD1Trainer0Bit1    ; d883 ; bit 1
     ds 1
 
