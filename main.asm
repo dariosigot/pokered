@@ -138288,8 +138288,12 @@ PrintMoveDetailsBox:
     pop hl
     jr z,.skipHyperBeamException
     ld a,[W_PLAYERMOVENUM]
-    cp HYPER_BEAM
     ld de,.HyperBeamExceptionText
+    cp HYPER_BEAM
+    jr z,.PhiSpcPrint
+    cp STRUGGLE
+    jr z,.PhiSpcPrint
+    cp TRI_ATTACK
     jr z,.PhiSpcPrint
 .skipHyperBeamException
     ld a,[W_PLAYERMOVEPOWER]
