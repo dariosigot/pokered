@@ -538,6 +538,26 @@ _ReceivedText:
     TX_RAM $cf4b
     db $0,"!@@"
 
+GoToTop:
+    ld a,[H_NEWLYPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 7,a
+    ret z
+    xor a
+    ld [hl],a
+    ld [wCurrentMenuItem],a
+    ret
+
+GoToBottom:
+    ld a,[H_NEWLYPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 6,a
+    ret z
+    ld a,[$d12a]
+    sub 3
+    ld [hl],a
+    ld a,2
+    ld [wCurrentMenuItem],a
+    ret
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -7437,6 +7457,8 @@ DisplayListMenuIDLoop: ; 2c53 (0:2c53)
     ld b,a
     bit 7,b ; was Down pressed?
     ld hl,wListScrollOffset
+    ld de,DisplayListMenuIDLoop
+    push de ; Return Pointer
     jr z,.upPressed
 .downPressed
     ld a,[hl]
@@ -7444,15 +7466,17 @@ DisplayListMenuIDLoop: ; 2c53 (0:2c53)
     ld b,a
     ld a,[$d12a] ; number of list entries
     cp b ; will going down scroll past the Cancel button?
-    jp c,DisplayListMenuIDLoop
+    jp c,GoToTop
     inc [hl] ; if not,go down
-    jp DisplayListMenuIDLoop
+    ret
 .upPressed
     ld a,[hl]
     and a
-    jp z,DisplayListMenuIDLoop
+    jp z,GoToBottom
     dec [hl]
-    jp DisplayListMenuIDLoop
+    ret
+
+SECTION "DisplayChooseQuantityMenu",ROM0[$2d57]
 
 DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
 ; text box dimensions/coordinates for just quantity
@@ -7622,8 +7646,6 @@ GetMapHeaderBanks:
 
 ; ───────────────────────────────────────
 
-; Free
-
 SECTION "ExitListMenu",ROM0[$2e3b]
 
 ExitListMenu: ; 2e3b (0:2e3b)
@@ -7678,7 +7700,7 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     ld a,[de]
     ld [$d11e],a
     cp a,$ff
-    jp z,.printCancelMenuItem
+    jp z,.end
     push bc
     push de
     push hl
@@ -7828,14 +7850,13 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     add hl,bc
     ld a,$ee ; down arrow
     ld [hl],a
-    ret
-.printCancelMenuItem
-    ret
-;    ld de,ListMenuCancelText
-;    jp PlaceString
-
-;ListMenuCancelText: ; 2f97 (0:2f97)
-;    db "CANCEL@"
+.end
+    ld a,[wListMenuID]
+    cp a,ITEMLISTMENU
+    ret nz
+    ld b,BANK(PrintMenuItemQty)
+    ld hl,PrintMenuItemQty
+    call Bankswitch
 
 SECTION "GetMonName",ROM0[$2f9e]
 
@@ -17853,7 +17874,7 @@ PlayerPCDeposit:
     ld [$cf8c],a
     xor a
     ld [$cf93],a
-    ld a,$3
+    ld a,ITEMLISTMENU
     ld [wListMenuID],a ; $cf94
     call DisplayListMenuID
     jr c,.PlayerPCMenu
@@ -17910,7 +17931,7 @@ PlayerPCWithdraw:
     ld [$cf8c],a
     xor a
     ld [$cf93],a
-    ld a,$3
+    ld a,ITEMLISTMENU
     ld [wListMenuID],a ; $cf94
     call DisplayListMenuID
     jr c,.PlayerPCMenu
@@ -22719,7 +22740,7 @@ AddItemToInventory_: ; ce04 (3:4e04)
     push de
     push hl
     push hl
-    ld d,40 ; PC box can hold 50 items
+    ld d,40 ; PC box can hold 40 items
     ld a,wNumBagItems & $FF
     cp l
     jr nz,.checkIfInventoryFull
@@ -141808,6 +141829,57 @@ GetAttackerType:
     db EXEGGCUTE
     db EXEGGUTOR
     db $FF
+
+; ──────────────────────────────────────────────────────────────────────
+
+PrintMenuItemQty:
+    ld hl,$cf8b
+    ld a,[hli]
+    cp wNumBagItems & $FF
+    jr nz,.NotBag
+    ld a,[hld]
+    cp wNumBagItems >> 8
+    jr nz,.NotBag
+    ld a,[wNumBagItems]
+    ld b,20 ; bag can hold 20 items
+    jr .found
+.NotBag
+    ld hl,$cf8b
+    ld a,[hli]
+    cp wNumBoxItems & $FF
+    jr nz,.NotBox
+    ld a,[hld]
+    cp wNumBoxItems >> 8
+    jr nz,.NotBox
+    ld a,[wNumBoxItems]
+    ld b,40 ; bag can hold 20 items
+    jr .found
+.NotBox
+    ret
+.found
+    ld de,$d11e
+    ld [de],a
+    ld a,[W_ISINBATTLE]
+    and a
+    FuncCoord 14,03
+    ld hl,Coord
+    jr z,.done
+    FuncCoord 14,08
+    ld hl,Coord
+.done
+    push bc
+    push de
+    call .PrintNumber
+    pop de
+    pop bc
+    ld [hl],"/"
+    inc hl
+    ld a,b
+    ld [de],a
+    ; fall through
+.PrintNumber
+    ld bc,((%10000000 + 1) << 8) + 2
+    jp PrintNumber
 
 ; ──────────────────────────────────────────────────────────────────────
 
