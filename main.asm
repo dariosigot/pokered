@@ -24490,12 +24490,12 @@ ItemUseMedicine:
     jr nc,.noCarry2
     inc h
 .noCarry2
-    ld a,10
+    ld a,30
     ld b,a
     ld a,[hl] ; a = MSB of stat experience of the appropriate stat
     cp a,247 ; is there already at least 63232 (256 * 253) stat experience?
     jr nc,.vitaminNoEffect ; if so,vitamins can't add any more
-    add b ; add 2560 (256 * 10) stat experience
+    add b ; add 7680 (256 * 30) stat experience
     jr nc,.noCarry3 ; a carry should be impossible here,so this will always jump
     ld a,255
 .noCarry3
