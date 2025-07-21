@@ -54863,7 +54863,9 @@ Func_3ce7f: ; 3ce7f (f:4e7f)
 
 GetBattleHealthBarColor:
     ld b,[hl]
+    push bc
     call GetHealthBarColorWithGhostCheck ; call GetHealthBarColor
+    pop bc
     ld a,[hl]
     cp b
     ret z
