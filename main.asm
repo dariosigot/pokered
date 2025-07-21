@@ -8468,7 +8468,7 @@ PlayTrainerMusic: ; 33e8 (0:33e8)
     ret z
     cp SONY3
     ret z
-    ld a,[W_GYMLEADERNO] ; $d05c
+    ld a,[W_GYMLEADERNO]
     and a
     ret nz
     ld b,BANK(PlayTrainerMusic_)
@@ -53762,7 +53762,7 @@ Func_3c664: ; 3c664 (f:4664)
 TrainerBattleVictory: ; 3c696 (f:4696)
     call Func_3c643
     ld b,(Music_DefeatedGymLeader - $4000) / 3
-    ld a,[W_GYMLEADERNO] ; $d05c
+    ld a,[W_GYMLEADERNO]
     and a
     jr nz,.gymleader
     ld b,(Music_DefeatedTrainer - $4000) / 3
@@ -72661,8 +72661,8 @@ CeladonGymText1: ; 48a11 (12:4a11)
     ld [$cf13],a
     call EngageMapTrainer
     call InitBattleEnemyParameters
-    ld a,$4
-    ld [$d05c],a
+    ld a,4
+    ld [W_GYMLEADERNO],a
     ld a,$3
     ld [W_CELADONGYMCURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -89656,8 +89656,8 @@ PewterGymText1: ; 5c44e (17:444e)
     ld [$cf13],a
     call EngageMapTrainer
     call InitBattleEnemyParameters
-    ld a,$1
-    ld [$d05c],a
+    ld a,1
+    ld [W_GYMLEADERNO],a
     xor a
     ldh [$b4],a
     ld a,$3
@@ -90069,8 +90069,8 @@ CeruleanGymText1: ; 5c771 (17:4771)
     ld [$cf13],a
     call EngageMapTrainer
     call InitBattleEnemyParameters
-    ld a,$2
-    ld [$d05c],a
+    ld a,2
+    ld [W_GYMLEADERNO],a
     xor a
     ldh [$b4],a
     ld a,$3
@@ -90589,8 +90589,8 @@ VermilionGymText1: ; 5cb1d (17:4b1d)
     ld [$cf13],a
     call EngageMapTrainer
     call InitBattleEnemyParameters
-    ld a,$3
-    ld [$d05c],a
+    ld a,3
+    ld [W_GYMLEADERNO],a
     xor a
     ldh [$b4],a
     ld a,$3
@@ -91007,7 +91007,7 @@ FightingDojoText1: ; 5ce44 (17:4e44)
     ldh a,[$8c]
     ld [$cf13],a
     call EngageMapTrainer
-    call InitBattleEnemyParameters
+    call InitBattleEnemyParametersDojo ; call InitBattleEnemyParameters
     ld a,$3
     ld [W_FIGHTINGDOJOCURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -91406,8 +91406,8 @@ SaffronGymText1: ; 5d118 (17:5118)
     ld [$cf13],a
     call EngageMapTrainer
     call InitBattleEnemyParameters
-    ld a,$6
-    ld [$d05c],a
+    ld a,6
+    ld [W_GYMLEADERNO],a
     ld a,$3
     ld [W_SAFFRONGYMCURSCRIPT],a
 .asm_34c2c ; 0x5d15f
@@ -93175,6 +93175,14 @@ FixBlackboardQuitRemove:
     ret nz
     dec a
     ld [wCurrentMenuItem],a
+    ret
+
+; ───────────────────────────────────────────
+
+InitBattleEnemyParametersDojo:
+    call InitBattleEnemyParameters
+    ld a,9
+    ld [W_GYMLEADERNO],a
     ret
 
 ; ───────────────────────────────────────────
@@ -104728,8 +104736,8 @@ ViridianGymText1: ; 74a69 (1d:4a69)
     ld [$cf13],a
     call EngageMapTrainer
     call InitBattleEnemyParameters
-    ld a,$8
-    ld [$d05c],a
+    ld a,8
+    ld [W_GYMLEADERNO],a
     ld a,$3
     ld [W_VIRIDIANGYMCURSCRIPT],a
 .asm_6dff7 ; 0x74acb
@@ -106091,8 +106099,8 @@ FuchsiaGymText1: ; 75534 (1d:5534)
     ld [$cf13],a
     call EngageMapTrainer
     call InitBattleEnemyParameters
-    ld a,$5
-    ld [$d05c],a
+    ld a,5
+    ld [W_GYMLEADERNO],a
     xor a
     ldh [$b4],a
     ld a,$3
@@ -106558,8 +106566,8 @@ CinnabarGymText1: ; 758df (1d:58df)
     ld hl,UnnamedText_75919
     ld de,UnnamedText_75919 ; $5919 XXX
     call PreBattleSaveRegisters
-    ld a,$7
-    ld [$d05c],a
+    ld a,7
+    ld [W_GYMLEADERNO],a
     jp Func_758b7
 
 SECTION "UnnamedText_75914",ROMX[$5914],BANK[$1d]
@@ -137654,8 +137662,8 @@ TryGymLeaderRematch_:
     call EngageMapTrainer
     call InitBattleEnemyParameters
     pop de ; Restore Gym ID
-    ld a,e       ; Gym Leader ID
-    ld [$d05c],a ; ...
+    ld a,e               ; Gym Leader ID
+    ld [W_GYMLEADERNO],a ; ...
     xor a       ; ??? hJoyHeld
     ldh [$b4],a ; ...
     call .SetNextScript
