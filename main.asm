@@ -40185,79 +40185,75 @@ Func_1da20: ; 1da20 (7:5a20)
     scf
     ret
 
-NameRaterTextPointers_OLD: ; 1da54 (7:5a54)
-
-SECTION "NameRaterText1",ROMX[$5a56],BANK[$7]
-
-NameRaterText1: ; 1da56 (7:5a56)
-    db $8
-    call SaveScreenTilesToBuffer2
-    ld hl,UnnamedText_1dab3
-    call Func_1da15
-    jr nz,.asm_1daae ; 0x1da60 $4c
-    ld hl,UnnamedText_1dab8
-    call PrintText
-    xor a
-    ld [$d07d],a
-    ld [$cfcb],a
-    ld [$cc35],a
-    call DisplayPartyMenu
-    push af
-    call GBPalWhiteOutWithDelay3
-    call RestoreScreenTilesAndReloadTilePatterns
-    call LoadGBPal
-    pop af
-    jr c,.asm_1daae ; 0x1da80 $2c
-    call GetPartyMonName2
-    call Func_1da20
-    ld hl,UnnamedText_1dad1
-    jr c,.asm_1daa8 ; 0x1da8b $1b
-    ld hl,UnnamedText_1dabd
-    call Func_1da15
-    jr nz,.asm_1daae ; 0x1da93 $19
-    ld hl,UnnamedText_1dac2
-    call PrintText
-    ld b,BANK(DisplayNameRaterScreen)
-    ld hl,DisplayNameRaterScreen
-    call Bankswitch
-    jr c,.asm_1daae ; 0x1daa3 $9
-    ld hl,UnnamedText_1dac7
-.asm_1daa8
-    call PrintText
-    jp TextScriptEnd
-.asm_1daae
-    ld hl,UnnamedText_1dacc
-    jr .asm_1daa8 ; 0x1dab1 $f5
-
-UnnamedText_1dab3: ; 1dab3 (7:5ab3)
-    TX_FAR _UnnamedText_1dab3
-    db "@"
-
-UnnamedText_1dab8: ; 1dab8 (7:5ab8)
-    TX_FAR _UnnamedText_1dab8
-    db "@"
-
-UnnamedText_1dabd: ; 1dabd (7:5abd)
-    TX_FAR _UnnamedText_1dabd
-    db "@"
-
-UnnamedText_1dac2: ; 1dac2 (7:5ac2)
-    TX_FAR _UnnamedText_1dac2
-    db "@"
-
-UnnamedText_1dac7: ; 1dac7 (7:5ac7)
-    TX_FAR _UnnamedText_1dac7
-    db "@"
-
-UnnamedText_1dacc: ; 1dacc (7:5acc)
-    TX_FAR _UnnamedText_1dacc
-    db "@"
-
-UnnamedText_1dad1: ; 1dad1 (7:5ad1)
-    TX_FAR _UnnamedText_1dad1
-    db "@"
-
-NameRaterObject_OLD: ; 0x1dad6 (size=26)
+;SECTION "NameRaterText1",ROMX[$5a56],BANK[$7]
+;
+;NameRaterText1: ; 1da56 (7:5a56)
+;    db $8
+;    call SaveScreenTilesToBuffer2
+;    ld hl,UnnamedText_1dab3
+;    call Func_1da15
+;    jr nz,.asm_1daae ; 0x1da60 $4c
+;    ld hl,UnnamedText_1dab8
+;    call PrintText
+;    xor a
+;    ld [$d07d],a
+;    ld [$cfcb],a
+;    ld [$cc35],a
+;    call DisplayPartyMenu
+;    push af
+;    call GBPalWhiteOutWithDelay3
+;    call RestoreScreenTilesAndReloadTilePatterns
+;    call LoadGBPal
+;    pop af
+;    jr c,.asm_1daae ; 0x1da80 $2c
+;    call GetPartyMonName2
+;    call Func_1da20
+;    ld hl,UnnamedText_1dad1
+;    jr c,.asm_1daa8 ; 0x1da8b $1b
+;    ld hl,UnnamedText_1dabd
+;    call Func_1da15
+;    jr nz,.asm_1daae ; 0x1da93 $19
+;    ld hl,UnnamedText_1dac2
+;    call PrintText
+;    ld b,BANK(DisplayNameRaterScreen)
+;    ld hl,DisplayNameRaterScreen
+;    call Bankswitch
+;    jr c,.asm_1daae ; 0x1daa3 $9
+;    ld hl,UnnamedText_1dac7
+;.asm_1daa8
+;    call PrintText
+;    jp TextScriptEnd
+;.asm_1daae
+;    ld hl,UnnamedText_1dacc
+;    jr .asm_1daa8 ; 0x1dab1 $f5
+;
+;UnnamedText_1dab3: ; 1dab3 (7:5ab3)
+;    TX_FAR _UnnamedText_1dab3
+;    db "@"
+;
+;UnnamedText_1dab8: ; 1dab8 (7:5ab8)
+;    TX_FAR _UnnamedText_1dab8
+;    db "@"
+;
+;UnnamedText_1dabd: ; 1dabd (7:5abd)
+;    TX_FAR _UnnamedText_1dabd
+;    db "@"
+;
+;UnnamedText_1dac2: ; 1dac2 (7:5ac2)
+;    TX_FAR _UnnamedText_1dac2
+;    db "@"
+;
+;UnnamedText_1dac7: ; 1dac7 (7:5ac7)
+;    TX_FAR _UnnamedText_1dac7
+;    db "@"
+;
+;UnnamedText_1dacc: ; 1dacc (7:5acc)
+;    TX_FAR _UnnamedText_1dacc
+;    db "@"
+;
+;UnnamedText_1dad1: ; 1dad1 (7:5ad1)
+;    TX_FAR _UnnamedText_1dad1
+;    db "@"
 
 GetRandomEnemyStarterIV:
     call GenRandom
@@ -40265,6 +40261,8 @@ GetRandomEnemyStarterIV:
     call GenRandom
     ld [wRivalStarterIV_SpdSpc],a
     jp TextScriptEnd
+
+; Free
 
 SECTION "VermilionHouse1_h",ROMX[$5AF0],BANK[$7]
 
@@ -42455,7 +42453,7 @@ OakLabEmailText: ; 1ecbd (7:6cbd)
     TX_FAR _OakLabEmailText
     db "@"
 
-NameRaterObject: ; ??? (size=26)
+NameRaterObject:
     db $a ; border tile
 
     db $2 ; warps
@@ -42464,9 +42462,9 @@ NameRaterObject: ; ??? (size=26)
 
     db $0 ; signs
 
-    db $2 ; people
-    db SPRITE_MR_MASTERBALL,$3 + 4,$5 + 4,$ff,$d2,$1 ; person
-    db SPRITE_GENTLEMAN,$3 + 4,$2 + 4,$ff,$d3,$2 ; person
+    db $1 ; people
+;    db SPRITE_MR_MASTERBALL,$3 + 4,$5 + 4,$ff,$d2,$1 ; person
+    db SPRITE_MR_MASTERBALL,$3 + 4,$2 + 4,$ff,$d3,$1 ; person
     ;db SPRITE_WHITE_PLAYER,$4 + 4,$5 + 4,$ff,$d2,$3 ; person
 
     ; warp-to
@@ -42474,9 +42472,8 @@ NameRaterObject: ; ??? (size=26)
     EVENT_DISP $4,$7,$3
 
 NameRaterTextPointers: ; ??? (7:????)
-    dw NameRaterText1
+;    dw NameRaterText1
     dw MoveDeleterText
-    ;dw MoveRelearnerText
 
 ; ────────────────────────────────────────────────────────────
 ; Move Deleter
