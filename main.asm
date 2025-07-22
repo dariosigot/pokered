@@ -259,6 +259,9 @@ GetJoypadState: ; 019a (0:019a)
     call RoutineForRealGB
     call _GetJoypadState
     pop af
+    ; fall through
+
+ChangeBank:
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ret
@@ -531,12 +534,6 @@ GoPAL_SET_CF1C_NoHpPal:
     ld hl,wFlagNoHpPalBit2
     set 2,[hl]
     jp GoPAL_SET_CF1C
-
-_ReceivedText:
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
 
 GoToTop:
     ld a,[H_NEWLYPRESSEDBUTTONS] ; ▼▲◄►StSeBA
@@ -10515,28 +10512,32 @@ Predef: ; 3e6d (0:3e6d)
 
     ld a,[H_LOADEDROMBANK]
     ld [$CF12],a
+    push af ; Backup Return Bank
 
-    ; save bank and call 13:7E49
-    push af
     ld a,BANK(GetPredefPointer)
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
+    call ChangeBank
     call GetPredefPointer
 
     ; call the predef function
-    ; ($D0B7 has the bank of the predef routine)
-    ld a,[$D0B7]
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
+    call ChangeBank
     ld de,.Return
     push de
     jp hl
     ; after the predefined function finishes it returns here
 .Return
-    pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+
+    push hl    ; ...
+    push af    ; ...
+    ld hl,sp+5 ; Restore Return Bank
+    pop af     ; (No Flags affected)
+    ld a,[hl]  ; ...
+    pop hl     ; ...
+    inc sp     ; "Fake Pop"
+    inc sp     ; ...
+
+    jp ChangeBank
+
+SECTION "Load16BitRegisters",ROM0[$3e94]
 
 ;loads hl from cc4f,de from cc51,and bc from cc53
 
@@ -10903,6 +10904,9 @@ IsTryingToLearnPalFix:
     ld a,[W_ISINBATTLE]
     and a
     ret z
+    ld hl,wFlagLearnAfterEvolutBit0
+    bit 0,[hl]
+    ret nz
     ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
     ld hl,HidePlayerBattleHudAndStandarizePalette
     jp Bankswitch
@@ -10919,7 +10923,6 @@ IsTryingToLearnPalFix_End:
     ret z
     ld hl,wFlagLearnAfterEvolutBit0
     bit 0,[hl]
-    res 0,[hl]
     ret nz
     ld hl,HidePlayerBattleHudAndRestorePalette_
     ld b,BANK(HidePlayerBattleHudAndRestorePalette_)
@@ -31912,17 +31915,7 @@ LoreleiSprite: ; 17540 (5:7540)
 FloatSprite: ; 176c0 (5:76c0)
     INCBIN "gfx/denim/float.2bpp"
 
-; Loads tile patterns for tiles used in the pokedex.
-LoadPokedexTilePatterns: ; 17840 (5:7840)
-    call LoadHpBarAndStatusTilePatterns
-    ld de,PokedexTileGraphics ; $6488
-    ld hl,$9620
-    ld bc,(BANK(PokedexTileGraphics) << 8) + $10
-    call CopyVideoData
-    ld de,PokeballTileGraphics ; $697e
-    ld hl,$9720
-    ld bc,(BANK(PokeballTileGraphics) << 8) + $01
-    jp CopyVideoData ; load pokeball tile for marking caught mons
+SECTION "InitMapSprites",ROMX[$785b],BANK[$5]
 
 ; Loads tile patterns for map's sprites.
 ; For outside maps,it loads one of several fixed sets of sprites.
@@ -33211,6 +33204,24 @@ GetMapSpriteSets:
     ret z
     ld hl,MapSpriteSetsNew
     ret
+
+; ───────────────────────────────────────
+
+; Loads tile patterns for tiles used in the pokedex.
+LoadPokedexTilePatterns:
+    call LoadHpBarAndStatusTilePatterns
+    ld de,PokedexTileGraphics ; $6488
+    ld hl,$9620
+    ld bc,(BANK(PokedexTileGraphics) << 8) + $10
+    call CopyVideoData
+    ld de,PokeballTileGraphics ; $697e
+    ld hl,$9720
+    ld bc,(BANK(PokeballTileGraphics) << 8) + $01
+    call CopyVideoData ; load pokeball tile for marking caught mons
+    ld de,MonNestIcon
+    ld hl,$9730
+    ld bc,(BANK(MonNestIcon) << 8 | $1)
+    jp GoodCopyVideoData
 
 ; ───────────────────────────────────────
 
@@ -38067,7 +38078,7 @@ Route1ViridianMartSampleText: ; 1cae3 (7:4ae3)
     db "@"
 
 UnnamedText_1cae8: ; 1cae8 (7:4ae8)
-    TX_FAR _UnnamedText_1cae8
+    TX_FAR _GotText
     db $0b,"@"
 
 UnnamedText_1caee: ; 1caee (7:4aee)
@@ -41657,7 +41668,7 @@ Route16HouseText3: ; 1e62b (7:662b)
     db "@"
 
 ReceivedHM02Text: ; 1e630 (7:6630)
-    TX_FAR _ReceivedHM02Text ; 0x8ce66
+    TX_FAR _GotText
     db $11,"@"
 
 HM02ExplanationText: ; 1e636 (7:6636)
@@ -47040,7 +47051,7 @@ PrintTypes:
     ld bc,-15
     add hl,bc
     ret
-    
+
 .PrintSingleTypeShort1
     push hl
     call PrintMoveTypeShort
@@ -62809,14 +62820,14 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld de,$d11e
     ld bc,$8103
     call PrintNumber ; print the pokedex number
-    ld de,20
+    ld de,18
     add hl,de
-    dec hl
     push hl
     ld hl,wPokedexOwned
     call IsPokemonBitSet
     pop hl
     ld a," "
+    ld [hli],a ; Write Empty "MonNestIcon"
     jr z,.writeTile
     ld a,$72 ; pokeball tile
 .writeTile
@@ -62824,6 +62835,9 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     push hl
     ld hl,wPokedexSeen
     call IsPokemonBitSet
+    pop hl
+    push hl
+    PREDEF_NZ IsMonInCurrentMap
     jr nz,.getPokemonName ; if the player has seen the pokemon
     ld de,.dashedLine ; print a dashed line in place of the name if the player hasn't seen the pokemon
     jr .skipGettingName
@@ -73043,7 +73057,7 @@ CeladonGameCornerText2: ; 48ca9 (12:4ca9)
     ld c,$2
     PREDEF Func_f81d
     call Func_48f1e
-    ld hl,UnnamedText_48d27
+    call PlayCoinSoundAndLoadText ; ld hl,UnnamedText_48d27
     jr .asm_e2afd ; 0x48d0d
 .asm_c650b ; 0x48d0f
     ld hl,UnnamedText_48d2c
@@ -75382,7 +75396,9 @@ UnnamedText_49f94: ; 49f94 (12:5f94)
 
 UnnamedText_49f99: ; 49f99 (12:5f99)
     TX_FAR _UnnamedText_49f99
-    db $11,"@"
+    db "@"
+
+SECTION "MtMoon3BattleText2",ROMX[$5f9f],BANK[$12]
 
 MtMoon3BattleText2: ; 49f9f (12:5f9f)
     TX_FAR _MtMoon3BattleText2
@@ -75579,8 +75595,8 @@ UnnamedText_4a350: ; 4a350 (12:6350)
     db "@"
 
 ReceivedHM03Text: ; 4a355 (12:6355)
-    TX_FAR _ReceivedText
-    db $0B,"@"
+    TX_FAR _GotText
+    db $11,"@"
 
 HM03ExplanationText: ; 4a35b (12:635b)
     TX_FAR _HM03ExplanationText
@@ -75753,6 +75769,13 @@ SafariZoneWestPostGhost:
     ; fall through
 .reset
     jr SafariZoneWestResetScript
+
+PlayCoinSoundAndLoadText:
+    ld a,$b2
+    call PlaySoundWaitForCurrent ; play sound
+    call WaitForSoundToFinish ; wait until sound is done playing
+    ld hl,UnnamedText_48d27
+    ret
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -76018,9 +76041,7 @@ _GivePokemon: ; 4fda5 (13:7da5)
     TX_FAR _UnnamedText_4fe44
     db "@"
 
-SECTION "GetPredefPointer",ROMX[$7e49],BANK[$13]
-
-GetPredefPointer: ; 4fe49 (13:7e49)
+GetPredefPointer:
 ; stores hl in $CC4F,$CC50
 ; stores de in $CC51,$CC52
 ; stores bc in $CC53,$CC54
@@ -76049,6 +76070,7 @@ GetPredefPointer: ; 4fe49 (13:7e49)
     ld hl,PredefPointers
     ld de,0
 
+    push af ; Backup F Flags
     ; de = 3 * [$CC4E]
     ld a,[$CC4E]
     ld e,a
@@ -76062,10 +76084,12 @@ GetPredefPointer: ; 4fe49 (13:7e49)
     add hl,de
     ld d,h
     ld e,l
+    pop af ; Restore F Flags
 
     ; get bank of predef routine
     ld a,[de]
     ld [$D0B7],a
+    push af
 
     ; get pointer
     inc de
@@ -76075,9 +76099,10 @@ GetPredefPointer: ; 4fe49 (13:7e49)
     ld a,[de]
     ld h,a
 
+    pop af
     ret
 
-PredefPointers: ; 4fe79 (13:7e79)
+PredefPointers:
 
 DrawPlayerHUDAndHPBarPredef:               NEW_PREDEF DrawPlayerHUDAndHPBar               ; $00
 CopyUncompressedPicToTilemapPredef:        NEW_PREDEF CopyUncompressedPicToTilemap        ; $01
@@ -76191,6 +76216,7 @@ CheckWildSubGroupPredef:                   NEW_PREDEF CheckWildSubGroup         
 GetAttackerType_Predef:                    NEW_PREDEF GetAttackerType_                    ; $6D
 AdjustDamageForMoveType_GetInputPredef:    NEW_PREDEF AdjustDamageForMoveType_GetInput    ; $6E
 UpgradeTrainerSet_Predef:                  NEW_PREDEF UpgradeTrainerSet_                  ; $6F
+IsMonInCurrentMapPredef:                   NEW_PREDEF IsMonInCurrentMap                   ; $70
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -80588,7 +80614,7 @@ PrizeGiveItem:
     pop af
     ret
 .PrizeGiveItemText
-    TX_FAR _UnnamedText_1cae8
+    TX_FAR _GotText
     db $0b,"@"
 
 PrintPrizePrice:
@@ -85789,7 +85815,7 @@ GrowthRateTable: ; 5901d (16:501d) ; Don't Move this Subroutine (MissingNo Growt
     db $54,$00,$00,$00 ; slow:        5/4 n^3
    ;db $08,$21,$9B,$50 ; missingno:   0/8 n^3 + 33 n^2 + 155 n - 80
 
-Func_59035 ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
+Func_59035: ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
     ld hl,UnnamedText_59091 ; $5091
     call PrintText
     call YesNoChoice
@@ -85814,7 +85840,7 @@ Func_59035 ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
     ld c,1
     call GiveItemNotPower ; call GiveItem
     jr nc,.BagFull
-    ld hl,UnnamedText_590a5 ; $50a5
+    call LoadTextItemOrPower ; ld hl,UnnamedText_590a5 ; $50a5
     call PrintText
     ld a,$1
     jr .asm_5908e ; 0x59071 $1b
@@ -88153,7 +88179,7 @@ UnnamedText_59ded: ; 59ded (16:5ded)
     db "@"
 
 ReceivedTM36Text: ; 59df2 (16:5df2)
-    TX_FAR _ReceivedTM36Text ; 0x824ba
+    TX_FAR _GotText
     db $0B,"@"
 
 TM36ExplanationText: ; 59df8 (16:5df8)
@@ -88976,6 +89002,17 @@ GiveItemNotPower:
     cp HM_05
     jp z,FakeGiveItem
     jp GiveItem
+
+LoadTextItemOrPower:
+    ld a,[$ff00+$dc]
+    cp HM_05
+    ld hl,UnnamedText_590a5 ; $50a5
+    ret nz
+    ld hl,.ReceivedHM05Text
+    ret
+.ReceivedHM05Text
+    TX_FAR _GotText
+    db $11,"@"
 
 Route12Snorlax:
     db $8
@@ -95624,7 +95661,7 @@ ReceivingHM01Text: ; 61927 (18:5927)
     db "@"
 
 ReceivedHM01Text: ; 6192c (18:592c)
-    TX_FAR _ReceivedHM01Text ; 0x8140d
+    TX_FAR _GotText
     db $11,"@"
 
 UnnamedText_61932: ; 61932 (18:5932)
@@ -105559,8 +105596,8 @@ WardenThankYouText: ; 7514e (1d:514e)
     db "@"
 
 ReceivedHM04Text: ; 75153 (1d:5153)
-    TX_FAR _ReceivedText
-    db $0B,"@"
+    TX_FAR _GotText
+    db $11,"@"
 
 HM04ExplanationText: ; 75159 (1d:5159)
     TX_FAR _HM04ExplanationText
@@ -118280,11 +118317,7 @@ _ReceivingHM01Text: ; 81347 (20:5347)
     db "can see it CUT",$55
     db "any time!",$58
 
-_ReceivedHM01Text: ; 8140d (20:540d)
-    db $0,$52," got",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_UnnamedText_61932",ROMX[$541c],BANK[$20]
 
 _UnnamedText_61932: ; 8141c (20:541c)
     db $0,"CAPTAIN: Whew!",$51
@@ -118805,11 +118838,7 @@ _UnnamedText_59ded: ; 82454 (20:6454)
     db "I'm sorry. Here,",$55
     db "please take this!",$58
 
-_ReceivedTM36Text: ; 824ba (20:64ba)
-    db $0,$52," got",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_TM36ExplanationText",ROMX[$64c9],BANK[$20]
 
 _TM36ExplanationText: ; 824c9 (20:64c9)
     db $0,"TM36 is",$4f
@@ -121848,8 +121877,6 @@ UnnamedText_8ac8f: ; 8ac8f (22:6c8f)
 _UnnamedText_5642d: ; 8acae (22:6cae)
     db $0,$52," got",$4f
     db "@"
-
-UnnamedText_8acb6: ; 8acb6 (22:6cb6)
     TX_RAM $da49
     db $0," back!",$57
 
@@ -122009,6 +122036,20 @@ _ViridianBlackboardFrozenText:
     db "battle ends.",$51
     db "Use ICE HEAL to",$4f
     db "thaw out #MON!",$58
+
+; ───────────────────────────────────
+
+_ReceivedText:
+    db $0,$52," received",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
+
+_GotText:
+    db $0,$52," got",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
 
 ; ───────────────────────────────────
 
@@ -122604,13 +122645,7 @@ _Route1ViridianMartSampleText: ; 8d5bf (23:55bf)
     db "you a sample!",$55
     db "Here you go!",$58
 
-_UnnamedText_1cae8: ; 8d643 (23:5643)
-    db $0,$52," got",$4f
-    db "@"
-
-UnnamedText_8d64b: ; 8d64b (23:564b)
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_UnnamedText_1caee",ROMX[$5652],BANK[$23]
 
 _UnnamedText_1caee: ; 8d652 (23:5652)
     db $0,"We also carry",$4f
@@ -123333,10 +123368,6 @@ _Route11AfterBattleText8: ; 8eb99 (23:6b99)
 _Route11BattleText9: ; 8ebee (23:6bee)
     db $0,"Watch out for",$4f
     db "live wires!",$57
-
-_ReceivedHM02Text: ; Moved to the End of the BANK
-    db $0,$52," received",$4f
-    db "AIR POWER!@@"
 
 _HM02ExplanationText: ; Moved to the End of the BANK
     db $0,"AIR POWER is FLY.",$4f
@@ -133321,7 +133352,7 @@ CheckDarkMap:
 
 SECTION "Wild Pkmn",ROMX,BANK[$36]
 
-LoadWildData:
+GetWildDataCurrentMap:
     call GetWildDataPointers ; ld hl,WildDataPointers
     ld a,[W_CURMAP]
     ; get wild data for current map
@@ -133331,7 +133362,11 @@ LoadWildData:
     add hl,bc
     ld a,[hli]
     ld h,[hl]
-    ld l,a       ; hl now points to wild data for current map
+    ld l,a ; hl now points to wild data for current map
+    ret
+
+LoadWildData:
+    call GetWildDataCurrentMap
     ld a,[hli]
     ld [W_GRASSRATE],a
     and a
@@ -135463,22 +135498,7 @@ FindWildLocationsOfMon:
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    ld a,[hli]
-    and a
-    call nz,CheckMapForMon ; land
-    jr c,.found
-    ld a,[hli]
-    and a
-    call nz,CheckMapForMon ; water
-    jr c,.found
-    call GetSuperRodData ; ld hl,SuperRodData
-    call FindFishingLocationsOfMon ; fishing super rod
-    jr c,.found
-    call GetGoodRodData ; ld hl,GoodRodData
-    call FindFishingLocationsOfMon ; fishing good rod
-    jr c,.found
-    PREDEF CheckWildSubGroup
-.found
+    call SearchWildMon
     pop hl
     inc hl
     inc hl
@@ -135487,7 +135507,7 @@ FindWildLocationsOfMon:
 .done
     ld a,$ff ; list terminator
     ld [de],a
-    ; Search Current Map to sort it forst in list
+    ; Search Current Map to sort it first in list
     ld hl,$cee9
     ld d,h
     ld e,l
@@ -135507,6 +135527,66 @@ FindWildLocationsOfMon:
 .NextSort
     inc hl
     jr .LoopSort
+
+; Input
+; • hl point to Map "WildDataPointers"
+; • de point to current "Map Slot"
+; • c = current map id
+; • [$d11e] = Mon ID
+SearchWildMon:
+    ld a,[hli]
+    and a
+    call nz,CheckMapForMon ; land
+    ret c ; found
+    ld a,[hli]
+    and a
+    call nz,CheckMapForMon ; water
+    ret c ; found
+    call GetSuperRodData ; ld hl,SuperRodData
+    call FindFishingLocationsOfMon ; fishing super rod
+    ret c ; found
+    call GetGoodRodData ; ld hl,GoodRodData
+    call FindFishingLocationsOfMon ; fishing good rod
+    ret c ; found
+    PREDEF CheckWildSubGroup
+    ret ; carry set = found
+
+; Input
+; • hl pointer to "Catch" Ball in Pokedex
+; • [$d11e] = Mon ID
+IsMonInCurrentMap:
+    call Load16BitRegisters
+    ; Start
+    push af
+    push hl
+    ; Backup
+    ld de,$d11e
+    ld a,[de]
+    push de
+    push af
+    ; Code
+    dec hl
+    push hl
+    ld b,BANK(PokedexToIndex)
+    ld hl,PokedexToIndex
+    call Bankswitch
+    call GetWildDataCurrentMap
+    ld de,$d11e
+    call SearchWildMon ; carry set = found
+    ld a," "
+    jr nc,.done
+    ld a,$73 ; MonNestIcon
+.done
+    pop hl
+    ld [hl],a
+    ; Restore
+    pop af
+    pop de
+    ld [de],a
+    ; End
+    pop hl
+    pop af
+    ret
 
 FindFishingLocationsOfMon:
     push bc
@@ -135990,6 +136070,7 @@ CheckWildSubGroup:
     inc hl
     jr .loop
 .NotFound
+    and a ; Reset Carry Flag
     ret
 .CompareMon
     inc hl
@@ -136002,6 +136083,7 @@ CheckWildSubGroup:
     ld a,c
     ld [de],a
     inc de
+    scf
     ret
 
 ; ──────────────────────────────────────────────────────────────────────

@@ -131,7 +131,15 @@ PREDEF_JUMP: MACRO
 	jp Predef
 	ENDM
 
+PREDEF_Z: MACRO
+	ld a, (\1Predef - PredefPointers) / 3
+	call z,Predef
+	ENDM
 
+PREDEF_NZ: MACRO
+	ld a, (\1Predef - PredefPointers) / 3
+	call nz,Predef
+	ENDM
 
 ;1_channel	EQU $00
 ;2_channels	EQU $40
