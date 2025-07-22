@@ -31919,17 +31919,7 @@ LoreleiSprite: ; 17540 (5:7540)
 FloatSprite: ; 176c0 (5:76c0)
     INCBIN "gfx/denim/float.2bpp"
 
-; Loads tile patterns for tiles used in the pokedex.
-LoadPokedexTilePatterns: ; 17840 (5:7840)
-    call LoadHpBarAndStatusTilePatterns
-    ld de,PokedexTileGraphics ; $6488
-    ld hl,$9620
-    ld bc,(BANK(PokedexTileGraphics) << 8) + $10
-    call CopyVideoData
-    ld de,PokeballTileGraphics ; $697e
-    ld hl,$9720
-    ld bc,(BANK(PokeballTileGraphics) << 8) + $01
-    jp CopyVideoData ; load pokeball tile for marking caught mons
+SECTION "InitMapSprites",ROMX[$785b],BANK[$5]
 
 ; Loads tile patterns for map's sprites.
 ; For outside maps,it loads one of several fixed sets of sprites.
@@ -33218,6 +33208,24 @@ GetMapSpriteSets:
     ret z
     ld hl,MapSpriteSetsNew
     ret
+
+; ───────────────────────────────────────
+
+; Loads tile patterns for tiles used in the pokedex.
+LoadPokedexTilePatterns:
+    call LoadHpBarAndStatusTilePatterns
+    ld de,PokedexTileGraphics ; $6488
+    ld hl,$9620
+    ld bc,(BANK(PokedexTileGraphics) << 8) + $10
+    call CopyVideoData
+    ld de,PokeballTileGraphics ; $697e
+    ld hl,$9720
+    ld bc,(BANK(PokeballTileGraphics) << 8) + $01
+    call CopyVideoData ; load pokeball tile for marking caught mons
+    ld de,MonNestIcon
+    ld hl,$9730
+    ld bc,(BANK(MonNestIcon) << 8 | $1)
+    jp GoodCopyVideoData
 
 ; ───────────────────────────────────────
 
@@ -47047,7 +47055,7 @@ PrintTypes:
     ld bc,-15
     add hl,bc
     ret
-    
+
 .PrintSingleTypeShort1
     push hl
     call PrintMoveTypeShort
@@ -62816,14 +62824,14 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld de,$d11e
     ld bc,$8103
     call PrintNumber ; print the pokedex number
-    ld de,20
+    ld de,18
     add hl,de
-    dec hl
     push hl
     ld hl,wPokedexOwned
     call IsPokemonBitSet
     pop hl
     ld a," "
+    ld [hli],a ; Write Empty "MonNestIcon"
     jr z,.writeTile
     ld a,$72 ; pokeball tile
 .writeTile
@@ -62831,6 +62839,9 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     push hl
     ld hl,wPokedexSeen
     call IsPokemonBitSet
+    pop hl
+    push hl
+    PREDEF_NZ IsMonInCurrentMap
     jr nz,.getPokemonName ; if the player has seen the pokemon
     ld de,.dashedLine ; print a dashed line in place of the name if the player hasn't seen the pokemon
     jr .skipGettingName
@@ -76200,6 +76211,7 @@ CheckWildSubGroupPredef:                   NEW_PREDEF CheckWildSubGroup         
 GetAttackerType_Predef:                    NEW_PREDEF GetAttackerType_                    ; $6D
 AdjustDamageForMoveType_GetInputPredef:    NEW_PREDEF AdjustDamageForMoveType_GetInput    ; $6E
 UpgradeTrainerSet_Predef:                  NEW_PREDEF UpgradeTrainerSet_                  ; $6F
+IsMonInCurrentMapPredef:                   NEW_PREDEF IsMonInCurrentMap                   ; $70
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -133330,7 +133342,7 @@ CheckDarkMap:
 
 SECTION "Wild Pkmn",ROMX,BANK[$36]
 
-LoadWildData:
+GetWildDataCurrentMap:
     call GetWildDataPointers ; ld hl,WildDataPointers
     ld a,[W_CURMAP]
     ; get wild data for current map
@@ -133340,7 +133352,11 @@ LoadWildData:
     add hl,bc
     ld a,[hli]
     ld h,[hl]
-    ld l,a       ; hl now points to wild data for current map
+    ld l,a ; hl now points to wild data for current map
+    ret
+
+LoadWildData:
+    call GetWildDataCurrentMap
     ld a,[hli]
     ld [W_GRASSRATE],a
     and a
@@ -135472,22 +135488,7 @@ FindWildLocationsOfMon:
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    ld a,[hli]
-    and a
-    call nz,CheckMapForMon ; land
-    jr c,.found
-    ld a,[hli]
-    and a
-    call nz,CheckMapForMon ; water
-    jr c,.found
-    call GetSuperRodData ; ld hl,SuperRodData
-    call FindFishingLocationsOfMon ; fishing super rod
-    jr c,.found
-    call GetGoodRodData ; ld hl,GoodRodData
-    call FindFishingLocationsOfMon ; fishing good rod
-    jr c,.found
-    PREDEF CheckWildSubGroup
-.found
+    call SearchWildMon
     pop hl
     inc hl
     inc hl
@@ -135496,7 +135497,7 @@ FindWildLocationsOfMon:
 .done
     ld a,$ff ; list terminator
     ld [de],a
-    ; Search Current Map to sort it forst in list
+    ; Search Current Map to sort it first in list
     ld hl,$cee9
     ld d,h
     ld e,l
@@ -135516,6 +135517,66 @@ FindWildLocationsOfMon:
 .NextSort
     inc hl
     jr .LoopSort
+
+; Input
+; • hl point to Map "WildDataPointers"
+; • de point to current "Map Slot"
+; • c = current map id
+; • [$d11e] = Mon ID
+SearchWildMon:
+    ld a,[hli]
+    and a
+    call nz,CheckMapForMon ; land
+    ret c ; found
+    ld a,[hli]
+    and a
+    call nz,CheckMapForMon ; water
+    ret c ; found
+    call GetSuperRodData ; ld hl,SuperRodData
+    call FindFishingLocationsOfMon ; fishing super rod
+    ret c ; found
+    call GetGoodRodData ; ld hl,GoodRodData
+    call FindFishingLocationsOfMon ; fishing good rod
+    ret c ; found
+    PREDEF CheckWildSubGroup
+    ret ; carry set = found
+
+; Input
+; • hl pointer to "Catch" Ball in Pokedex
+; • [$d11e] = Mon ID
+IsMonInCurrentMap:
+    call Load16BitRegisters
+    ; Start
+    push af
+    push hl
+    ; Backup
+    ld de,$d11e
+    ld a,[de]
+    push de
+    push af
+    ; Code
+    dec hl
+    push hl
+    ld b,BANK(PokedexToIndex)
+    ld hl,PokedexToIndex
+    call Bankswitch
+    call GetWildDataCurrentMap
+    ld de,$d11e
+    call SearchWildMon ; carry set = found
+    ld a," "
+    jr nc,.done
+    ld a,$73 ; MonNestIcon
+.done
+    pop hl
+    ld [hl],a
+    ; Restore
+    pop af
+    pop de
+    ld [de],a
+    ; End
+    pop hl
+    pop af
+    ret
 
 FindFishingLocationsOfMon:
     push bc
@@ -135999,6 +136060,7 @@ CheckWildSubGroup:
     inc hl
     jr .loop
 .NotFound
+    and a ; Reset Carry Flag
     ret
 .CompareMon
     inc hl
@@ -136011,6 +136073,7 @@ CheckWildSubGroup:
     ld a,c
     ld [de],a
     inc de
+    scf
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
