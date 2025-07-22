@@ -10910,6 +10910,9 @@ IsTryingToLearnPalFix:
     ld a,[W_ISINBATTLE]
     and a
     ret z
+    ld hl,wFlagLearnAfterEvolutBit0
+    bit 0,[hl]
+    ret nz
     ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
     ld hl,HidePlayerBattleHudAndStandarizePalette
     jp Bankswitch
@@ -10926,7 +10929,6 @@ IsTryingToLearnPalFix_End:
     ret z
     ld hl,wFlagLearnAfterEvolutBit0
     bit 0,[hl]
-    res 0,[hl]
     ret nz
     ld hl,HidePlayerBattleHudAndRestorePalette_
     ld b,BANK(HidePlayerBattleHudAndRestorePalette_)
