@@ -259,6 +259,9 @@ GetJoypadState: ; 019a (0:019a)
     call RoutineForRealGB
     call _GetJoypadState
     pop af
+    ; fall through
+
+ChangeBank:
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ret
@@ -10515,28 +10518,32 @@ Predef: ; 3e6d (0:3e6d)
 
     ld a,[H_LOADEDROMBANK]
     ld [$CF12],a
+    push af ; Backup Return Bank
 
-    ; save bank and call 13:7E49
-    push af
     ld a,BANK(GetPredefPointer)
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
+    call ChangeBank
     call GetPredefPointer
 
     ; call the predef function
-    ; ($D0B7 has the bank of the predef routine)
-    ld a,[$D0B7]
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
+    call ChangeBank
     ld de,.Return
     push de
     jp hl
     ; after the predefined function finishes it returns here
 .Return
-    pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+
+    push hl    ; ...
+    push af    ; ...
+    ld hl,sp+5 ; Restore Return Bank
+    pop af     ; (No Flags affected)
+    ld a,[hl]  ; ...
+    pop hl     ; ...
+    inc sp     ; "Fake Pop"
+    inc sp     ; ...
+
+    jp ChangeBank
+
+SECTION "Load16BitRegisters",ROM0[$3e94]
 
 ;loads hl from cc4f,de from cc51,and bc from cc53
 
@@ -76018,9 +76025,7 @@ _GivePokemon: ; 4fda5 (13:7da5)
     TX_FAR _UnnamedText_4fe44
     db "@"
 
-SECTION "GetPredefPointer",ROMX[$7e49],BANK[$13]
-
-GetPredefPointer: ; 4fe49 (13:7e49)
+GetPredefPointer:
 ; stores hl in $CC4F,$CC50
 ; stores de in $CC51,$CC52
 ; stores bc in $CC53,$CC54
@@ -76049,6 +76054,7 @@ GetPredefPointer: ; 4fe49 (13:7e49)
     ld hl,PredefPointers
     ld de,0
 
+    push af ; Backup F Flags
     ; de = 3 * [$CC4E]
     ld a,[$CC4E]
     ld e,a
@@ -76062,10 +76068,12 @@ GetPredefPointer: ; 4fe49 (13:7e49)
     add hl,de
     ld d,h
     ld e,l
+    pop af ; Restore F Flags
 
     ; get bank of predef routine
     ld a,[de]
     ld [$D0B7],a
+    push af
 
     ; get pointer
     inc de
@@ -76075,9 +76083,10 @@ GetPredefPointer: ; 4fe49 (13:7e49)
     ld a,[de]
     ld h,a
 
+    pop af
     ret
 
-PredefPointers: ; 4fe79 (13:7e79)
+PredefPointers:
 
 DrawPlayerHUDAndHPBarPredef:               NEW_PREDEF DrawPlayerHUDAndHPBar               ; $00
 CopyUncompressedPicToTilemapPredef:        NEW_PREDEF CopyUncompressedPicToTilemap        ; $01
