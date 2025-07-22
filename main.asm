@@ -535,12 +535,6 @@ GoPAL_SET_CF1C_NoHpPal:
     set 2,[hl]
     jp GoPAL_SET_CF1C
 
-_ReceivedText:
-    db $0,$52," received",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
-
 GoToTop:
     ld a,[H_NEWLYPRESSEDBUTTONS] ; ▼▲◄►StSeBA
     bit 7,a
@@ -38084,7 +38078,7 @@ Route1ViridianMartSampleText: ; 1cae3 (7:4ae3)
     db "@"
 
 UnnamedText_1cae8: ; 1cae8 (7:4ae8)
-    TX_FAR _UnnamedText_1cae8
+    TX_FAR _GotText
     db $0b,"@"
 
 UnnamedText_1caee: ; 1caee (7:4aee)
@@ -41674,7 +41668,7 @@ Route16HouseText3: ; 1e62b (7:662b)
     db "@"
 
 ReceivedHM02Text: ; 1e630 (7:6630)
-    TX_FAR _ReceivedHM02Text ; 0x8ce66
+    TX_FAR _GotText
     db $11,"@"
 
 HM02ExplanationText: ; 1e636 (7:6636)
@@ -75402,7 +75396,9 @@ UnnamedText_49f94: ; 49f94 (12:5f94)
 
 UnnamedText_49f99: ; 49f99 (12:5f99)
     TX_FAR _UnnamedText_49f99
-    db $11,"@"
+    db "@"
+
+SECTION "MtMoon3BattleText2",ROMX[$5f9f],BANK[$12]
 
 MtMoon3BattleText2: ; 49f9f (12:5f9f)
     TX_FAR _MtMoon3BattleText2
@@ -75599,8 +75595,8 @@ UnnamedText_4a350: ; 4a350 (12:6350)
     db "@"
 
 ReceivedHM03Text: ; 4a355 (12:6355)
-    TX_FAR _ReceivedText
-    db $0B,"@"
+    TX_FAR _GotText
+    db $11,"@"
 
 HM03ExplanationText: ; 4a35b (12:635b)
     TX_FAR _HM03ExplanationText
@@ -80618,7 +80614,7 @@ PrizeGiveItem:
     pop af
     ret
 .PrizeGiveItemText
-    TX_FAR _UnnamedText_1cae8
+    TX_FAR _GotText
     db $0b,"@"
 
 PrintPrizePrice:
@@ -85819,7 +85815,7 @@ GrowthRateTable: ; 5901d (16:501d) ; Don't Move this Subroutine (MissingNo Growt
     db $54,$00,$00,$00 ; slow:        5/4 n^3
    ;db $08,$21,$9B,$50 ; missingno:   0/8 n^3 + 33 n^2 + 155 n - 80
 
-Func_59035 ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
+Func_59035: ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
     ld hl,UnnamedText_59091 ; $5091
     call PrintText
     call YesNoChoice
@@ -85844,7 +85840,7 @@ Func_59035 ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
     ld c,1
     call GiveItemNotPower ; call GiveItem
     jr nc,.BagFull
-    ld hl,UnnamedText_590a5 ; $50a5
+    call LoadTextItemOrPower ; ld hl,UnnamedText_590a5 ; $50a5
     call PrintText
     ld a,$1
     jr .asm_5908e ; 0x59071 $1b
@@ -88183,7 +88179,7 @@ UnnamedText_59ded: ; 59ded (16:5ded)
     db "@"
 
 ReceivedTM36Text: ; 59df2 (16:5df2)
-    TX_FAR _ReceivedTM36Text ; 0x824ba
+    TX_FAR _GotText
     db $0B,"@"
 
 TM36ExplanationText: ; 59df8 (16:5df8)
@@ -89006,6 +89002,17 @@ GiveItemNotPower:
     cp HM_05
     jp z,FakeGiveItem
     jp GiveItem
+
+LoadTextItemOrPower:
+    ld a,[$ff00+$dc]
+    cp HM_05
+    ld hl,UnnamedText_590a5 ; $50a5
+    ret nz
+    ld hl,.ReceivedHM05Text
+    ret
+.ReceivedHM05Text
+    TX_FAR _GotText
+    db $11,"@"
 
 Route12Snorlax:
     db $8
@@ -95654,7 +95661,7 @@ ReceivingHM01Text: ; 61927 (18:5927)
     db "@"
 
 ReceivedHM01Text: ; 6192c (18:592c)
-    TX_FAR _ReceivedHM01Text ; 0x8140d
+    TX_FAR _GotText
     db $11,"@"
 
 UnnamedText_61932: ; 61932 (18:5932)
@@ -105589,8 +105596,8 @@ WardenThankYouText: ; 7514e (1d:514e)
     db "@"
 
 ReceivedHM04Text: ; 75153 (1d:5153)
-    TX_FAR _ReceivedText
-    db $0B,"@"
+    TX_FAR _GotText
+    db $11,"@"
 
 HM04ExplanationText: ; 75159 (1d:5159)
     TX_FAR _HM04ExplanationText
@@ -118310,11 +118317,7 @@ _ReceivingHM01Text: ; 81347 (20:5347)
     db "can see it CUT",$55
     db "any time!",$58
 
-_ReceivedHM01Text: ; 8140d (20:540d)
-    db $0,$52," got",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_UnnamedText_61932",ROMX[$541c],BANK[$20]
 
 _UnnamedText_61932: ; 8141c (20:541c)
     db $0,"CAPTAIN: Whew!",$51
@@ -118835,11 +118838,7 @@ _UnnamedText_59ded: ; 82454 (20:6454)
     db "I'm sorry. Here,",$55
     db "please take this!",$58
 
-_ReceivedTM36Text: ; 824ba (20:64ba)
-    db $0,$52," got",$4f
-    db "@"
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_TM36ExplanationText",ROMX[$64c9],BANK[$20]
 
 _TM36ExplanationText: ; 824c9 (20:64c9)
     db $0,"TM36 is",$4f
@@ -121878,8 +121877,6 @@ UnnamedText_8ac8f: ; 8ac8f (22:6c8f)
 _UnnamedText_5642d: ; 8acae (22:6cae)
     db $0,$52," got",$4f
     db "@"
-
-UnnamedText_8acb6: ; 8acb6 (22:6cb6)
     TX_RAM $da49
     db $0," back!",$57
 
@@ -122039,6 +122036,20 @@ _ViridianBlackboardFrozenText:
     db "battle ends.",$51
     db "Use ICE HEAL to",$4f
     db "thaw out #MON!",$58
+
+; ───────────────────────────────────
+
+_ReceivedText:
+    db $0,$52," received",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
+
+_GotText:
+    db $0,$52," got",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
 
 ; ───────────────────────────────────
 
@@ -122634,13 +122645,7 @@ _Route1ViridianMartSampleText: ; 8d5bf (23:55bf)
     db "you a sample!",$55
     db "Here you go!",$58
 
-_UnnamedText_1cae8: ; 8d643 (23:5643)
-    db $0,$52," got",$4f
-    db "@"
-
-UnnamedText_8d64b: ; 8d64b (23:564b)
-    TX_RAM $cf4b
-    db $0,"!@@"
+SECTION "_UnnamedText_1caee",ROMX[$5652],BANK[$23]
 
 _UnnamedText_1caee: ; 8d652 (23:5652)
     db $0,"We also carry",$4f
@@ -123363,10 +123368,6 @@ _Route11AfterBattleText8: ; 8eb99 (23:6b99)
 _Route11BattleText9: ; 8ebee (23:6bee)
     db $0,"Watch out for",$4f
     db "live wires!",$57
-
-_ReceivedHM02Text: ; Moved to the End of the BANK
-    db $0,$52," received",$4f
-    db "AIR POWER!@@"
 
 _HM02ExplanationText: ; Moved to the End of the BANK
     db $0,"AIR POWER is FLY.",$4f
