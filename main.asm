@@ -73063,7 +73063,7 @@ CeladonGameCornerText2: ; 48ca9 (12:4ca9)
     ld c,$2
     PREDEF Func_f81d
     call Func_48f1e
-    ld hl,UnnamedText_48d27
+    call PlayCoinSoundAndLoadText ; ld hl,UnnamedText_48d27
     jr .asm_e2afd ; 0x48d0d
 .asm_c650b ; 0x48d0f
     ld hl,UnnamedText_48d2c
@@ -75773,6 +75773,13 @@ SafariZoneWestPostGhost:
     ; fall through
 .reset
     jr SafariZoneWestResetScript
+
+PlayCoinSoundAndLoadText:
+    ld a,$b2
+    call PlaySoundWaitForCurrent ; play sound
+    call WaitForSoundToFinish ; wait until sound is done playing
+    ld hl,UnnamedText_48d27
+    ret
 
 SECTION "bank13",ROMX,BANK[$13]
 
