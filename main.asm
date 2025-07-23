@@ -10889,7 +10889,7 @@ NewMoveDetails:
     ; Print Move Details Box
     ld a,[$d0e0] ; New Move Learned
     ld [wPlayerSelectedMove],a
-    FuncCoord 04,08
+    FuncCoord 04,07
     ld de,Coord
     PREDEF PrintMoveDetailsBox
 
@@ -16445,26 +16445,26 @@ LearnMove: ; 6e43 (1:6e43)
     pop hl
 .ChoiceAnotherMoveToDelete
     push hl
-    call CheckMoveRelearn
-    ld hl,.WhichMoveShouldBeReplacedText ; $6fb4
-    call z,PrintText
-    FuncCoord 4,7 ; $c430
-    ld hl,Coord
-    ld bc,$040e
-    call CheckMoveRelearn
-    jr z,.skip1
+;    call CheckMoveRelearn
+;    ld hl,.WhichMoveShouldBeReplacedText ; $6fb4
+;    call z,PrintText
+;    FuncCoord 4,7 ; $c430
+;    ld hl,Coord
+;    ld bc,$040e
+;    call CheckMoveRelearn
+;    jr z,.skip1
     FuncCoord 00,12
     ld hl,Coord
     ld bc,$0412
-.skip1
+;.skip1
     call TextBoxBorder
-    FuncCoord 6,8 ; $c446
-    ld hl,Coord
-    call CheckMoveRelearn
-    jr z,.skip2
+;    FuncCoord 6,8 ; $c446
+;    ld hl,Coord
+;    call CheckMoveRelearn
+;    jr z,.skip2
     FuncCoord 02,13
     ld hl,Coord
-.skip2
+;.skip2
     ld de,$d0e1
     ld a,[$FF00+$f6]
     set 2,a
@@ -16474,19 +16474,19 @@ LearnMove: ; 6e43 (1:6e43)
     res 2,a
     ld [$FF00+$f6],a
     ld hl,wTopMenuItemY ; $cc24
-    call CheckMoveRelearn
-    jr nz,.skip3
-    ld a,$8
-    ld [hli],a
-    ld a,$5
-    ld [hli],a
-    jr .skip4
-.skip3
+;    call CheckMoveRelearn
+;    jr nz,.skip3
+;    ld a,$8
+;    ld [hli],a
+;    ld a,$5
+;    ld [hli],a
+;    jr .skip4
+;.skip3
     ld a,13
     ld [hli],a
     ld a,01
     ld [hli],a
-.skip4
+;.skip4
     xor a
     ld [hli],a
     inc hl
@@ -18652,9 +18652,8 @@ HandleMenuInput_PrintMoveBox:
     ld b,$0
     add hl,bc
     ld a,[hl]
-
-    ; Print Move Details Box
     ld [wPlayerSelectedMove],a
+    ; Print Move Details Box
     FuncCoord 10,12
     ld de,Coord
     call CheckMoveRelearn
@@ -18663,14 +18662,6 @@ HandleMenuInput_PrintMoveBox:
     ld hl,WriteEnergyAllMovesDuringMoveRelearn
     ld b,BANK(WriteEnergyAllMovesDuringMoveRelearn)
     call Bankswitch
-    ; Energy
-    ;ld de,$cfb5
-    ;FuncCoord 15,13
-    ;ld hl,Coord
-    ;ld bc,$0103
-    ;call PrintNumber
-    ;ld de,.EnergyIcon
-    ;call PlaceString
     ; Print Move Details Box (Move Relearner)
     FuncCoord 09,05
     ld de,Coord
@@ -18693,8 +18684,6 @@ HandleMenuInput_PrintMoveBox:
     ld a,b
     ret z
     jr HandleMenuInput_PrintMoveBox
-;.EnergyIcon
-;    db $DA,"@"
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $01)
@@ -21174,7 +21163,7 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(EmptyMap_h) ; unused
     db BANK(EmptyMap_h) ; unused
     db BANK(VictoryRoad1_h)
-    db BANK(VictoryCenter_h)
+    db BANK(VictoryPokecenter_h)
     db BANK(EmptyMap_h) ; unused
     db BANK(EmptyMap_h) ; unused
     db BANK(EmptyMap_h) ; unused
@@ -47514,7 +47503,7 @@ LeechSeedEffect_:
     ld b,BANK(PlayCurrentMoveAnimation2)
     call Bankswitch
     ld hl,.WasSeededText ; $7ef2
-    jp PrintText
+    jp .DrawHudAndPrintText
 .moveMissed
     call .PlayCurrentMoveAnimation
     ld b,BANK(PrintMoveFailureText)
@@ -47535,6 +47524,13 @@ LeechSeedEffect_:
     ld hl,PlayCurrentMoveAnimation
     ld b,BANK(PlayCurrentMoveAnimation)
     jp Bankswitch
+.DrawHudAndPrintText
+    push hl
+    ld b,BANK(DrawHUDsAndHPBars)
+    ld hl,DrawHUDsAndHPBars
+    call Bankswitch
+    pop hl
+    jp PrintText
 .WasSeededText
     TX_FAR _WasSeededText
     db "@"
@@ -53122,19 +53118,10 @@ MainInBattleLoop: ; 3c233 (f:4233)
     call SaveScreenTilesToBuffer1
     xor a
     ld [$d11d],a
-
     call SelectEnemyMove
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; decrement the rage counter
-    ld a,[W_PLAYERBATTSTATUS2]
-    bit 6,a ; USING_RAGE
-    jr z,.not_raging
-    call DecAttackPlayer
-    call DeactivateRageInA
-    ld [W_PLAYERBATTSTATUS2],a
-.not_raging
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ld b,BANK(HandlePlayerRageAndThrashing)
+    ld hl,HandlePlayerRageAndThrashing
+    call Bankswitch
     ld a,[W_PLAYERBATTSTATUS2]
     and %01100000 ; check if the player is using Rage or needs to recharge
     jr nz,.selectEnemyMove
@@ -53337,6 +53324,8 @@ MainInBattleLoop: ; 3c233 (f:4233)
     jp HandleEnemyMonFainted
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
+
+; Free
 
 SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
 
@@ -53741,9 +53730,10 @@ GetHealthBarColorWithGhostCheck:
     ld b,BANK(GetHealthBarColorWithGhostCheck_)
     jp Bankswitch
 
-SetDEAndLoadMonFrontSprite:
-    ld de,$9000
-    jp LoadMonFrontSprite
+Func_3ed12:
+    ld hl,Func_396d3
+    ld b,BANK(Func_396d3)
+    jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
 
 SECTION "Func_3c64f",ROMX[$464f],BANK[$f]
 
@@ -54039,13 +54029,6 @@ RageEffect:
     inc a
     inc a
     ld [bc],a ; set Rage counter to 2 or 3 at random
-    ret
-
-;Battle status2 in "a"
-;resets the rage bit in "a" if zero flag is set
-DeactivateRageInA:
-    ret nz
-    res 6,a ; USING_RAGE
     ret
 
 ; SpecialEffects
@@ -55826,16 +55809,9 @@ SelectEnemyMove:
     ld a,[hl]
     jp .done
 .noLinkBattle
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; decrement the rage counter
-    ld a,[W_ENEMYBATTSTATUS2]
-    bit 6,a ; USING_RAGE
-    jr z,.not_raging
-    call DecAttackEnemy
-    call DeactivateRageInA
-    ld [W_ENEMYBATTSTATUS2],a
-.not_raging
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ld b,BANK(HandleEnemyRageAndThrashing)
+    ld hl,HandleEnemyRageAndThrashing
+    call Bankswitch
     ld a,[W_ENEMYBATTSTATUS2]
     and $60     ; need to recharge or using rage
     ret nz
@@ -55931,6 +55907,8 @@ TransformEffect:
     ld hl,TransformEffect_
     ld b,BANK(TransformEffect_)
     jp Bankswitch
+
+; Free
 
 SECTION "Func_3d605",ROMX[$5605],BANK[$F]
 
@@ -56091,7 +56069,7 @@ playPlayerMoveAnimation:
     pop af
     ld [$CC5B],a ; AnimationType
     ld a,[W_PLAYERMOVENUM]
-    call PlayMoveAnimation
+    call PlayMoveAnimation_SeismicTossException
     call HandleExplodingAnimation
     call DrawPlayerHUDAndHPBar
     ld a,[W_PLAYERBATTSTATUS2]
@@ -56142,6 +56120,8 @@ MirrorMoveCheck:
     call PrintMoveFailureText
     ld a,[W_PLAYERMOVEEFFECT]
     cp EXPLODE_EFFECT ; even if Explosion or Selfdestruct missed, its effect still needs to be activated
+    jr z,.notDone
+    cp HYPER_BEAM_EFFECT
     jr z,.notDone
     jp ExecutePlayerMoveDone ; otherwise, we're done if the move missed
 .moveDidNotMiss
@@ -56194,10 +56174,6 @@ ExecutePlayerMoveDone:
     ld b,1
     ret
 
-MultiHitText:
-    TX_FAR _MultiHitText
-    db "@"
-
 ; ──────────────────────────────────────────
 
 SetCounterToMiss:
@@ -56236,7 +56212,21 @@ GetOutText: ; 3d835 (f:5835)
     TX_FAR _GetOutText
     db "@"
 
-; Free
+MultiHitText:
+    TX_FAR _MultiHitText
+    db "@"
+
+PlayMoveAnimation_SeismicTossException:
+    cp SEISMIC_TOSS
+    jr nz,.done
+    ld b,a
+    ld a,[W_MOVEMISSED]
+    and a
+    ld a,b
+    jr z,.done
+    ld a,TACKLE
+.done
+    jp PlayMoveAnimation
 
 SECTION "CheckPlayerStatusConditions",ROMX[$5854],BANK[$f]
 
@@ -57070,7 +57060,9 @@ ChooseRandomMove:
     and a
     ret
 
-; Free
+SetDEAndLoadMonFrontSprite:
+    ld de,$9000
+    jp LoadMonFrontSprite
 
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
@@ -58775,7 +58767,7 @@ playEnemyMoveAnimation:
     pop af
     ld [$CC5B],a ; AnimationType
     ld a,[W_ENEMYMOVENUM] ; $cfcc
-    call PlayMoveAnimation
+    call PlayMoveAnimation_SeismicTossException
     call HandleExplodingAnimation
     call DrawEnemyHUDAndHPBar
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
@@ -58825,6 +58817,8 @@ EnemyCheckIfMirrorMoveEffect:
     call PrintMoveFailureText
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     cp EXPLODE_EFFECT
+    jr z,.handleExplosionMiss
+    cp HYPER_BEAM_EFFECT
     jr z,.handleExplosionMiss
     jp ExecuteEnemyMoveDone
 .moveDidNotMiss
@@ -59528,12 +59522,7 @@ Func_3ec92:
     ld hl,Coord
     PREDEF_JUMP CopyUncompressedPicToTilemap
 
-SECTION "Func_3ed12",ROMX[$6d12],BANK[$f]
-
-Func_3ed12: ; 3ed12 (f:6d12)
-    ld hl,Func_396d3
-    ld b,BANK(Func_396d3)
-    jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
+SECTION "ApplyBurnAndParalysisPenaltiesToPlayer",ROMX[$6d1a],BANK[$f]
 
 ApplyBurnAndParalysisPenaltiesToPlayer: ; 3ed1a (f:6d1a)
     ld a,$1
@@ -61505,18 +61494,7 @@ ClearHyperBeam: ; 3f9cf (f:79cf)
     pop hl
     ret
 
-DecAttackPlayer:
-    push hl
-    ld hl,$d06a ; PlayerNumAttacksLeft
-    jr DecAttack
-DecAttackEnemy:
-    push hl
-    ld hl,$d06f ; EnemyNumAttacksLeft
-    ; fall through
-DecAttack:
-    dec [hl]
-    pop hl
-    ret
+; Free
 
 SECTION "MimicEffect",ROMX[$79ed],BANK[$f]
 
@@ -68391,7 +68369,7 @@ RocketHideout4Text1: ; 4553a (11:553a)
     ldh a,[$8c]
     ld [$cf13],a
     call EngageMapTrainer
-    call InitBattleEnemyParameters
+    call InitBattleEnemyParameters_Giovanni_Bank11
     xor a
     ldh [$b4],a
     ld a,$3
@@ -71368,6 +71346,14 @@ UnknownDungeon4Blocks:
 
 ; ───────────────────────────────────────
 
+InitBattleEnemyParameters_Giovanni_Bank11:
+    call InitBattleEnemyParameters
+    ld a,8
+    ld [W_GYMLEADERNO],a
+    ret
+
+; ───────────────────────────────────────
+
 SECTION "bank12",ROMX,BANK[$12]
 
 Route7_h: ; 0x48000 to 0x48022 (34 bytes) (bank=12) (id=18)
@@ -73757,9 +73743,7 @@ MtMoonPokecenter_h: ; 0x492c3 to 0x492cf (12 bytes) (bank=12) (id=68)
     db $00 ; connections
     dw MtMoonPokecenterObject ; objects
 
-MtMoonPokecenterScript: ; 492cf (12:52cf)
-    call Func_22fa
-    jp EnableAutoTextBoxDrawing
+SECTION "MtMoonPokecenterTextPointers",ROMX[$52d5],BANK[$12]
 
 MtMoonPokecenterTextPointers: ; 492d5 (12:52d5)
     dw MtMoonPokecenterText1
@@ -73882,9 +73866,7 @@ RockTunnelPokecenter_h: ; 0x493ae to 0x493ba (12 bytes) (id=81)
     db $00 ; connections
     dw RockTunnelPokecenterObject ; objects
 
-RockTunnelPokecenterScript: ; 493ba (12:53ba)
-    call Func_22fa
-    jp EnableAutoTextBoxDrawing
+SECTION "RockTunnelPokecenterTextPointers",ROMX[$53c0],BANK[$12]
 
 RockTunnelPokecenterTextPointers: ; 493c0 (12:53c0)
     dw RockTunnelPokecenterText1
@@ -75642,7 +75624,7 @@ GiveMagikarp:
     pop bc
     jp GivePokemon
 
-VictoryCenter_h:
+VictoryPokecenter_h:
     db $06 ; tileset
     db VICTORY_POKECENTER_HEIGHT,VICTORY_POKECENTER_WIDTH ; dimensions (y,x)
     dw VictoryPokecenterBlocks,VictoryPokecenterTextPointers,VictoryPokecenterScript ; blocks,texts,scripts
@@ -75651,6 +75633,8 @@ VictoryCenter_h:
 
 VictoryPokecenterScript:
     call Func_22fa
+    ld hl,W_TOWNVISITEDFLAG+1
+    set 5,[hl]
     jp EnableAutoTextBoxDrawing
 
 VictoryPokecenterTextPointers:
@@ -75776,6 +75760,18 @@ PlayCoinSoundAndLoadText:
     call WaitForSoundToFinish ; wait until sound is done playing
     ld hl,UnnamedText_48d27
     ret
+
+MtMoonPokecenterScript:
+    call Func_22fa
+    ld hl,W_TOWNVISITEDFLAG+1
+    set 3,[hl]
+    jp EnableAutoTextBoxDrawing
+
+RockTunnelPokecenterScript:
+    call Func_22fa
+    ld hl,W_TOWNVISITEDFLAG+1
+    set 4,[hl]
+    jp EnableAutoTextBoxDrawing
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -96710,7 +96706,7 @@ SilphCo11Script4: ; 62293 (18:6293)
     ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
     ld [$cf13],a
     call EngageMapTrainer
-    call InitBattleEnemyParameters
+    call InitBattleEnemyParameters_Giovanni_Bank18
     xor a
     ld [wJoypadForbiddenButtonsMask],a
     ld a,$5
@@ -97351,6 +97347,14 @@ SSAnne9Text5:
     db "@"
 
 ; ────────────────────────────────────────
+
+InitBattleEnemyParameters_Giovanni_Bank18:
+    call InitBattleEnemyParameters
+    ld a,8
+    ld [W_GYMLEADERNO],a
+    ret
+
+; ───────────────────────────────────────
 
 SECTION "bank19",ROMX,BANK[$19]
 
@@ -102175,6 +102179,9 @@ TownMapOrderNew:
     db ROUTE_D1
 TownMapOrderNewEnd:
 
+FlyingRouteMappingNew:
+    db $FF
+
 FlyingCitySortOrderNew:
     db PORT_ROYAL
 FlyingCitySortOrderNewEnd:
@@ -102259,6 +102266,13 @@ GetNumFlyingCity:
     call CheckNewAdventureFlag
     ret z
     ld bc,FlyingCitySortOrderNewEnd-FlyingCitySortOrderNew
+    ret
+
+GetFlyingRouteMapping:
+    ld hl,FlyingRouteMapping
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,FlyingRouteMappingNew
     ret
 
 GetFlyingCitySortOrder:
@@ -103714,6 +103728,7 @@ CalcFlyingEndPointer:
 InsertFlyingCitySorted:
     push bc
     push de
+    call .MapFlyingRoute
     push af
     call GetFlyingCitySortOrder ; ld hl,FlyingCitySortOrder
     ld c,-1
@@ -103730,18 +103745,51 @@ InsertFlyingCitySorted:
     pop de
     pop bc
     ret
+.MapFlyingRoute
+    ld d,a
+    ld e,b
+    call GetFlyingRouteMapping
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.standard
+    cp e
+    jr nz,.next
+    ld a,[hl]
+    ld b,a
+    ld a,d
+    cp $fe
+    ret z
+    ld a,b
+    ret
+.next
+    inc hl
+    jr .loop
+.standard
+    ld a,d
+    ld b,e
+    ret
+
+FlyingRouteMapping:
+    db SAFFRON_CITY + 1 , ROUTE_4
+    db SAFFRON_CITY + 2 , ROUTE_10
+    db SAFFRON_CITY + 3 , ROUTE_23
+    db $FF
 
 FlyingCitySortOrder:
     db PALLET_TOWN
     db VIRIDIAN_CITY
     db PEWTER_CITY
+    db ROUTE_4
     db CERULEAN_CITY
     db VERMILION_CITY
+    db ROUTE_10
     db LAVENDER_TOWN
     db CELADON_CITY
     db SAFFRON_CITY
     db FUCHSIA_CITY
     db CINNABAR_ISLAND
+    db ROUTE_23
     db INDIGO_PLATEAU
 FlyingCitySortOrderEnd:
 
@@ -132503,17 +132551,7 @@ _DrawCatchGender: ; Denim
 ; catch
     call IsGhostBattle
     jp z,.Ghost ; No Gender,Pokedex or Debug If Ghost Battle
-    ld a,[W_ENEMYMON_START]
-    ld [$d11e],a
-    PREDEF IndexToPokedex
-    ld a,[$d11e]
-    ld hl,wPokedexOwned
-    ld c,a
-    ld b,2
-    PREDEF HandleBitArray ; IsPokemonBitSet_bankF
-    ld a,c
-    and a
-    push af ; Backup Pokedex Flag Test
+    call .CheckEnemyOwned
     jr z,.SkipCatchFlagIcon
     ld a,[W_ISINBATTLE] ; trainer battle,this is 2
     dec a
@@ -132522,7 +132560,7 @@ _DrawCatchGender: ; Denim
     FuncCoord 1,1
     ld hl,Coord
     ld de,.PokeBallCatchFlagIcon
-    call PlaceString
+    call .PlaceIcon
 .SkipCatchFlagIcon
     ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
     call CheckShiny
@@ -132531,15 +132569,22 @@ _DrawCatchGender: ; Denim
     FuncCoord 1,1
     ld hl,Coord
     ld de,.ShinyStarIcon
-    call PlaceString
+    call .PlaceIcon
 .NoShiny
-    ld hl,W_ENEMYBATTSTATUS1
-    bit 7,[hl] ; confused?
-    ld de,.ConfusedIcon
-    jr nz,.PrintConfused
+    call .CheckConfused
+    call nz,.Print1stIcon
+    jr nz,.Check2ndIcon
+    call .CheckSeeded
+    call nz,.Print1stIcon
+    jr .Skip2ndIcon
+.Check2ndIcon
+    call .CheckSeeded
+    call nz,.Print2ndIcon
+.Skip2ndIcon
+    jr nz,.Genderless
+    call .CheckEnemyOwned
     ld a,[W_ENEMYMON_START]
     ld [$d11e],a
-    pop af ; Restore Pokedex Flag Test
     jr z,.Genderless
     call GetGender
     jr c,.Genderless
@@ -132553,10 +132598,10 @@ _DrawCatchGender: ; Denim
 .GreaterThen9
     pop af
     ld de,.MaleIcon
-    jr nz,.PrintGenderOrConfused
+    jr nz,.PrintGender
     ld de,.FemaleIcon
-.PrintGenderOrConfused
-    call PlaceString
+.PrintGender
+    call .PlaceIcon
 .Genderless
     call DebugStats
     jp ResetTempIV
@@ -132564,31 +132609,71 @@ _DrawCatchGender: ; Denim
     ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
     call SetTempIV
     jr .Genderless
-.PrintConfused
-    pop af ; Restore Pokedex Flag Test
-    FuncCoord 6,1
+.Print1stIcon
+    push af
+    FuncCoord 06,01
     ld hl,Coord
-    jr .PrintGenderOrConfused
+    call .PlaceIcon
+    pop af
+    ret
+.Print2ndIcon
+    push af
+    FuncCoord 07,01
+    ld hl,Coord
+    call .PlaceIcon
+    pop af
+    ret
+.CheckEnemyOwned
+    ld a,[W_ENEMYMON_START]
+    ld [$d11e],a
+    PREDEF IndexToPokedex
+    ld a,[$d11e]
+    ld hl,wPokedexOwned
+    ld c,a
+    ld b,2
+    PREDEF HandleBitArray ; IsPokemonBitSet_bankF
+    ld a,c
+    and a
+    ret
+.CheckConfused
+    ld hl,W_ENEMYBATTSTATUS1
+    bit 7,[hl] ; Confused?
+    ld de,.ConfusedIcon
+    ret
+.CheckSeeded
+    ld hl,W_ENEMYBATTSTATUS2
+    bit 7,[hl] ; Seeded?
+    ld de,.SeededIcon
+    ret
+.PlaceIcon
+    ld a,[de]
+    ld [hl],a
+    ret
 .PokeBallCatchFlagIcon:
-    db $c9,$50
+    db $C9
 .MaleIcon
-    db $EF,$50
+    db $EF
 .FemaleIcon
-    db $F5,$50
+    db $F5
 .ConfusedIcon
-    db $E6,$50
+    db $E6
+.SeededIcon
+    db $DC
 .ShinyStarIcon
-    db $D1,$50
+    db $D1
 
 _DrawCurrentMonGenderInBattle:
-    ld hl,W_PLAYERBATTSTATUS1
-    bit 7,[hl] ; confused?
-    jr z,.NotConfused
-    FuncCoord 17,08
-    ld hl,Coord
-    ld de,.ConfusedIcon
-    jp PlaceString
-.NotConfused
+    call .CheckConfused
+    call nz,.Print1stIcon
+    jr nz,.Check2ndIcon
+    call .CheckSeeded
+    call nz,.Print1stIcon
+    jr .Skip2ndIcon
+.Check2ndIcon
+    call .CheckSeeded
+    call nz,.Print2ndIcon
+.Skip2ndIcon
+    ret nz
     ld hl,W_PLAYERMONIVS ; .BackSpriteInBattle
     call SetTempIV
     ld a,[W_PLAYERMONID]
@@ -132608,16 +132693,46 @@ _DrawCurrentMonGenderInBattle:
     jr nz,.Male
     ld de,.FemaleIcon
 .Male
-    call PlaceString
+    call .PlaceIcon
 .Genderless
     call ResetTempIV
     ret
+.Print1stIcon
+    push af
+    FuncCoord 17,08
+    ld hl,Coord
+    call .PlaceIcon
+    pop af
+    ret
+.Print2ndIcon
+    push af
+    FuncCoord 18,08
+    ld hl,Coord
+    call .PlaceIcon
+    pop af
+    ret
+.CheckConfused
+    ld hl,W_PLAYERBATTSTATUS1
+    bit 7,[hl] ; Confused?
+    ld de,.ConfusedIcon
+    ret
+.CheckSeeded
+    ld hl,W_PLAYERBATTSTATUS2
+    bit 7,[hl] ; Seeded?
+    ld de,.SeededIcon
+    ret
+.PlaceIcon
+    ld a,[de]
+    ld [hl],a
+    ret
 .MaleIcon
-    db $EF,$50
+    db $EF
 .FemaleIcon
-    db $F5,$50
+    db $F5
 .ConfusedIcon
-    db $E6,$50
+    db $E6
+.SeededIcon
+    db $DC
 
 DebugStats:
     and a ; rcf
@@ -133349,6 +133464,72 @@ CheckDarkMap:
     ld a,$06
     ld [$d35d],a
     jp GBFadeIn1
+
+; ───────────────────────────────────────
+
+DecAttackPlayer:
+    push hl
+    ld hl,$d06a ; PlayerNumAttacksLeft
+    jr DecAttack
+DecAttackEnemy:
+    push hl
+    ld hl,$d06f ; EnemyNumAttacksLeft
+    ; fall through
+DecAttack:
+    dec [hl]
+    pop hl
+    ret
+
+;Battle status2 in "a"
+;resets the rage bit in "a" if zero flag is set
+DeactivateRageInA:
+    ret nz
+    res 6,a ; USING_RAGE
+    ret
+
+HandlePlayerRageAndThrashing:
+    ; decrement the rage counter
+    ld a,[W_PLAYERBATTSTATUS2]
+    bit 6,a ; USING_RAGE
+    jr z,.not_raging
+    call DecAttackPlayer
+    call DeactivateRageInA
+    ld [W_PLAYERBATTSTATUS2],a
+    ; if raging, reset rage's accuracy here to prevent degradation
+    ld a,$FF
+    ld [W_PLAYERMOVEACCURACY],a
+.not_raging
+    ; if thrashing, reset the move accuracy here to prevent degradation
+    ld a,[W_PLAYERBATTSTATUS1]
+    bit 1,a ; THRASHING_ABOUT
+    jr z,.not_thrashing
+    ld a,$FF
+    ld [W_PLAYERMOVEACCURACY],a
+.not_thrashing
+    ret
+
+HandleEnemyRageAndThrashing:
+    ; decrement the rage counter
+    ld a,[W_ENEMYBATTSTATUS2]
+    bit 6,a ; USING_RAGE
+    jr z,.not_raging
+    call DecAttackEnemy
+    call DeactivateRageInA
+    ld [W_ENEMYBATTSTATUS2],a
+    ; if raging, reset rage's accuracy here to prevent degradation
+    ld a,$FF
+    ld [W_ENEMYMOVEACCURACY],a
+.not_raging
+    ; if thrashing, reset the move accuracy here to prevent degradation
+    ld a,[W_ENEMYBATTSTATUS1]
+    bit 1,a ; THRASHING_ABOUT
+    jr z,.not_thrashing
+    ld a,$FF
+    ld [W_ENEMYMOVEACCURACY],a
+.not_thrashing
+    ret
+
+; ───────────────────────────────────────
 
 SECTION "Wild Pkmn",ROMX,BANK[$36]
 
@@ -134806,8 +134987,8 @@ PlateauMons2:
     db 37,GOLBAT    ; 15%
     db 26,DIGLETT   ; 10%
     db 46,ONIX      ; 10%
-    db 44,GRAVELER  ; 10%
-    db 40,MACHOKE   ;  5%
+    WILDSUB         ; 10% ; PlateauMons25
+    WILDSUB         ;  5% ; PlateauMons26
     db 38,DUGTRIO   ;  5%
     db 42,SANDSLASH ;  4%
     db 45,DUGTRIO   ;  1%
@@ -134815,23 +134996,38 @@ PlateauMons2:
 PlateauMons20:
     db $20,27,ZUBAT  ; 12%
     db $FF,34,GOLBAT ; 88%
+PlateauMons25:
+    db $20,27,GEODUDE  ; 12%
+    db $FF,44,GRAVELER ; 88%
+PlateauMons26:
+    db $20,27,MACHOP  ; 12%
+    db $FF,40,MACHOKE ; 88%
 
 PlateauMons3:
     db $0F
     WILDSUB        ; 20% ; PlateauMons30
     db 44,ONIX     ; 20%
     db 40,GOLBAT   ; 15%
-    db 39,DUGTRIO  ; 10%
-    db 38,MACHOKE  ; 10%
+    WILDSUB        ; 10% ; PlateauMons33
+    WILDSUB        ; 10% ; PlateauMons34
     db 48,ONIX     ; 10%
     db 43,GRAVELER ;  5%
     db 42,MACHOKE  ;  5%
-    db 45,GRAVELER ;  4%
+    WILDSUB        ;  4% ; PlateauMons38
     db 56,ONIX     ;  1%
     db $00
 PlateauMons30:
     db $20,28,ZUBAT  ; 12%
     db $FF,37,GOLBAT ; 88%
+PlateauMons33:
+    db $20,28,DIGLETT ; 12%
+    db $FF,39,DUGTRIO ; 88%
+PlateauMons34:
+    db $20,28,MACHOP  ; 12%
+    db $FF,38,MACHOKE ; 88%
+PlateauMons38:
+    db $20,28,GEODUDE  ; 12%
+    db $FF,45,GRAVELER ; 88%
 
 DungeonMons1:
     db $0A
@@ -136018,7 +136214,12 @@ WildSubGroupTable:
     WILDSUBGROUP ROUTE_23,1,Route23Mons1
     WILDSUBGROUP VICTORY_ROAD_1,0,PlateauMons10
     WILDSUBGROUP VICTORY_ROAD_2,0,PlateauMons20
+    WILDSUBGROUP VICTORY_ROAD_2,5,PlateauMons25
+    WILDSUBGROUP VICTORY_ROAD_2,6,PlateauMons26
     WILDSUBGROUP VICTORY_ROAD_3,0,PlateauMons30
+    WILDSUBGROUP VICTORY_ROAD_3,3,PlateauMons33
+    WILDSUBGROUP VICTORY_ROAD_3,4,PlateauMons34
+    WILDSUBGROUP VICTORY_ROAD_3,8,PlateauMons38
     db $FF
 
 WildSubGroupTableNew:
@@ -141052,6 +141253,7 @@ GenerateRandomEnemyTrainerIV_:
     db GIOVANNI,NIDORINO,$CB,$CB
     db GIOVANNI,NIDOKING,$CB,$CB
     db GIOVANNI,NIDOQUEEN,$BC,$BC
+    db GIOVANNI,KRABBY,$E6,$F5
     db GIOVANNI,KINGLER,$E6,$F5
 
     ; Bruno
@@ -142288,7 +142490,7 @@ MapHeaderPointers:
     dw EmptyMap_h ; unused
     dw EmptyMap_h ; unused
     dw VictoryRoad1_h
-    dw VictoryCenter_h
+    dw VictoryPokecenter_h
     dw EmptyMap_h ; unused ;id=110
     dw EmptyMap_h ; unused
     dw EmptyMap_h ; unused
