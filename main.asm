@@ -53118,19 +53118,10 @@ MainInBattleLoop: ; 3c233 (f:4233)
     call SaveScreenTilesToBuffer1
     xor a
     ld [$d11d],a
-
     call SelectEnemyMove
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; decrement the rage counter
-    ld a,[W_PLAYERBATTSTATUS2]
-    bit 6,a ; USING_RAGE
-    jr z,.not_raging
-    call DecAttackPlayer
-    call DeactivateRageInA
-    ld [W_PLAYERBATTSTATUS2],a
-.not_raging
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ld b,BANK(HandlePlayerRageAndThrashing)
+    ld hl,HandlePlayerRageAndThrashing
+    call Bankswitch
     ld a,[W_PLAYERBATTSTATUS2]
     and %01100000 ; check if the player is using Rage or needs to recharge
     jr nz,.selectEnemyMove
@@ -53333,6 +53324,8 @@ MainInBattleLoop: ; 3c233 (f:4233)
     jp HandleEnemyMonFainted
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
+
+; Free
 
 SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
 
@@ -54036,13 +54029,6 @@ RageEffect:
     inc a
     inc a
     ld [bc],a ; set Rage counter to 2 or 3 at random
-    ret
-
-;Battle status2 in "a"
-;resets the rage bit in "a" if zero flag is set
-DeactivateRageInA:
-    ret nz
-    res 6,a ; USING_RAGE
     ret
 
 ; SpecialEffects
@@ -55823,16 +55809,9 @@ SelectEnemyMove:
     ld a,[hl]
     jp .done
 .noLinkBattle
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; decrement the rage counter
-    ld a,[W_ENEMYBATTSTATUS2]
-    bit 6,a ; USING_RAGE
-    jr z,.not_raging
-    call DecAttackEnemy
-    call DeactivateRageInA
-    ld [W_ENEMYBATTSTATUS2],a
-.not_raging
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ld b,BANK(HandleEnemyRageAndThrashing)
+    ld hl,HandleEnemyRageAndThrashing
+    call Bankswitch
     ld a,[W_ENEMYBATTSTATUS2]
     and $60     ; need to recharge or using rage
     ret nz
@@ -55928,6 +55907,8 @@ TransformEffect:
     ld hl,TransformEffect_
     ld b,BANK(TransformEffect_)
     jp Bankswitch
+
+; Free
 
 SECTION "Func_3d605",ROMX[$5605],BANK[$F]
 
@@ -61513,18 +61494,7 @@ ClearHyperBeam: ; 3f9cf (f:79cf)
     pop hl
     ret
 
-DecAttackPlayer:
-    push hl
-    ld hl,$d06a ; PlayerNumAttacksLeft
-    jr DecAttack
-DecAttackEnemy:
-    push hl
-    ld hl,$d06f ; EnemyNumAttacksLeft
-    ; fall through
-DecAttack:
-    dec [hl]
-    pop hl
-    ret
+; Free
 
 SECTION "MimicEffect",ROMX[$79ed],BANK[$f]
 
@@ -133478,6 +133448,72 @@ CheckDarkMap:
     ld a,$06
     ld [$d35d],a
     jp GBFadeIn1
+
+; ───────────────────────────────────────
+
+DecAttackPlayer:
+    push hl
+    ld hl,$d06a ; PlayerNumAttacksLeft
+    jr DecAttack
+DecAttackEnemy:
+    push hl
+    ld hl,$d06f ; EnemyNumAttacksLeft
+    ; fall through
+DecAttack:
+    dec [hl]
+    pop hl
+    ret
+
+;Battle status2 in "a"
+;resets the rage bit in "a" if zero flag is set
+DeactivateRageInA:
+    ret nz
+    res 6,a ; USING_RAGE
+    ret
+
+HandlePlayerRageAndThrashing:
+    ; decrement the rage counter
+    ld a,[W_PLAYERBATTSTATUS2]
+    bit 6,a ; USING_RAGE
+    jr z,.not_raging
+    call DecAttackPlayer
+    call DeactivateRageInA
+    ld [W_PLAYERBATTSTATUS2],a
+    ; if raging, reset rage's accuracy here to prevent degradation
+    ld a,$FF
+    ld [W_PLAYERMOVEACCURACY],a
+.not_raging
+    ; if thrashing, reset the move accuracy here to prevent degradation
+    ld a,[W_PLAYERBATTSTATUS1]
+    bit 1,a ; THRASHING_ABOUT
+    jr z,.not_thrashing
+    ld a,$FF
+    ld [W_PLAYERMOVEACCURACY],a
+.not_thrashing
+    ret
+
+HandleEnemyRageAndThrashing:
+    ; decrement the rage counter
+    ld a,[W_ENEMYBATTSTATUS2]
+    bit 6,a ; USING_RAGE
+    jr z,.not_raging
+    call DecAttackEnemy
+    call DeactivateRageInA
+    ld [W_ENEMYBATTSTATUS2],a
+    ; if raging, reset rage's accuracy here to prevent degradation
+    ld a,$FF
+    ld [W_ENEMYMOVEACCURACY],a
+.not_raging
+    ; if thrashing, reset the move accuracy here to prevent degradation
+    ld a,[W_ENEMYBATTSTATUS1]
+    bit 1,a ; THRASHING_ABOUT
+    jr z,.not_thrashing
+    ld a,$FF
+    ld [W_ENEMYMOVEACCURACY],a
+.not_thrashing
+    ret
+
+; ───────────────────────────────────────
 
 SECTION "Wild Pkmn",ROMX,BANK[$36]
 
