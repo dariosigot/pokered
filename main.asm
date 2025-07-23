@@ -132587,6 +132587,9 @@ _DrawCatchGender: ; Denim
     call .CheckSeeded
     call nz,.Print2ndIcon
 .Skip2ndIcon
+    call .CheckConfused
+    jr nz,.Genderless
+    call .CheckSeeded
     jr nz,.Genderless
     call .CheckEnemyOwned
     ld a,[W_ENEMYMON_START]
@@ -132679,7 +132682,10 @@ _DrawCurrentMonGenderInBattle:
     call .CheckSeeded
     call nz,.Print2ndIcon
 .Skip2ndIcon
-    ret nz
+    call .CheckConfused
+    jr nz,.Genderless
+    call .CheckSeeded
+    jr nz,.Genderless
     ld hl,W_PLAYERMONIVS ; .BackSpriteInBattle
     call SetTempIV
     ld a,[W_PLAYERMONID]
