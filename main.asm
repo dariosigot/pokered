@@ -47635,12 +47635,18 @@ FlareonPicBack: ; 2e806 (b:6806)
 DisplayEffectiveness:
     ld a,[H_WHOSETURN]
     and a
-    ld a,[$d06a] ; PlayerNumAttacksLeft
+    ld hl,$d06a ; PlayerNumAttacksLeft
+    ld a,[W_PLAYERMOVEEFFECT]
     jr z,.continue
-    ld a,[$d06f] ; EnemyNumAttacksLeft
+    ld hl,$d06f ; EnemyNumAttacksLeft
+    ld a,[W_ENEMYMOVEEFFECT]
 .continue
+    cp THRASH_PETAL_DANCE_EFFECT
+    jr z,.ForceDisplayEffect
+    ld a,[hl]
     and a
     ret nz ; kickout if MultiAttack
+.ForceDisplayEffect
     xor a
     ld hl,H_MULTIPLICAND
     ld [hli],a
@@ -132571,6 +132577,13 @@ _DrawCatchGender: ; Denim
     ld de,.ShinyStarIcon
     call .PlaceIcon
 .NoShiny
+    ld hl,W_ENEMYBATTSTATUS3
+    bit 0,[hl] ; toxic
+    jr z,.SkipToxic
+    FuncCoord 10,01 ; Enemy Status Last Char
+    ld hl,Coord
+    ld [hl],$DD ; Skull Icon
+.SkipToxic
     call .CheckConfused
     call nz,.Print1stIcon
     jr nz,.Check2ndIcon
@@ -132581,6 +132594,9 @@ _DrawCatchGender: ; Denim
     call .CheckSeeded
     call nz,.Print2ndIcon
 .Skip2ndIcon
+    call .CheckConfused
+    jr nz,.Genderless
+    call .CheckSeeded
     jr nz,.Genderless
     call .CheckEnemyOwned
     ld a,[W_ENEMYMON_START]
@@ -132663,6 +132679,13 @@ _DrawCatchGender: ; Denim
     db $D1
 
 _DrawCurrentMonGenderInBattle:
+    ld hl,W_PLAYERBATTSTATUS3
+    bit 0,[hl] ; toxic
+    jr z,.SkipToxic
+    FuncCoord 12,08 ; Player Status Last Char
+    ld hl,Coord
+    ld [hl],$DD ; Skull Icon
+.SkipToxic
     call .CheckConfused
     call nz,.Print1stIcon
     jr nz,.Check2ndIcon
@@ -132673,7 +132696,10 @@ _DrawCurrentMonGenderInBattle:
     call .CheckSeeded
     call nz,.Print2ndIcon
 .Skip2ndIcon
-    ret nz
+    call .CheckConfused
+    jr nz,.Genderless
+    call .CheckSeeded
+    jr nz,.Genderless
     ld hl,W_PLAYERMONIVS ; .BackSpriteInBattle
     call SetTempIV
     ld a,[W_PLAYERMONID]
