@@ -132577,6 +132577,13 @@ _DrawCatchGender: ; Denim
     ld de,.ShinyStarIcon
     call .PlaceIcon
 .NoShiny
+    ld hl,W_ENEMYBATTSTATUS3
+    bit 0,[hl] ; toxic
+    jr z,.SkipToxic
+    FuncCoord 10,01 ; Enemy Status Last Char
+    ld hl,Coord
+    ld [hl],$DD ; Skull Icon
+.SkipToxic
     call .CheckConfused
     call nz,.Print1stIcon
     jr nz,.Check2ndIcon
@@ -132672,6 +132679,13 @@ _DrawCatchGender: ; Denim
     db $D1
 
 _DrawCurrentMonGenderInBattle:
+    ld hl,W_PLAYERBATTSTATUS3
+    bit 0,[hl] ; toxic
+    jr z,.SkipToxic
+    FuncCoord 12,08 ; Player Status Last Char
+    ld hl,Coord
+    ld [hl],$DD ; Skull Icon
+.SkipToxic
     call .CheckConfused
     call nz,.Print1stIcon
     jr nz,.Check2ndIcon
