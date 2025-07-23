@@ -56139,6 +56139,8 @@ MirrorMoveCheck:
     ld a,[W_PLAYERMOVEEFFECT]
     cp EXPLODE_EFFECT ; even if Explosion or Selfdestruct missed, its effect still needs to be activated
     jr z,.notDone
+    cp HYPER_BEAM_EFFECT
+    jr z,.notDone
     jp ExecutePlayerMoveDone ; otherwise, we're done if the move missed
 .moveDidNotMiss
     call ApplyAttackToEnemyPokemon
@@ -56190,10 +56192,6 @@ ExecutePlayerMoveDone:
     ld b,1
     ret
 
-MultiHitText:
-    TX_FAR _MultiHitText
-    db "@"
-
 ; ──────────────────────────────────────────
 
 SetCounterToMiss:
@@ -56231,6 +56229,15 @@ ScaredText: ; 3d830 (f:5830)
 GetOutText: ; 3d835 (f:5835)
     TX_FAR _GetOutText
     db "@"
+
+MultiHitText:
+    TX_FAR _MultiHitText
+    db "@"
+
+Func_3ed12:
+    ld hl,Func_396d3
+    ld b,BANK(Func_396d3)
+    jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
 
 ; Free
 
@@ -58822,6 +58829,8 @@ EnemyCheckIfMirrorMoveEffect:
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     cp EXPLODE_EFFECT
     jr z,.handleExplosionMiss
+    cp HYPER_BEAM_EFFECT
+    jr z,.handleExplosionMiss
     jp ExecuteEnemyMoveDone
 .moveDidNotMiss
     call ApplyAttackToPlayerPokemon
@@ -59524,12 +59533,7 @@ Func_3ec92:
     ld hl,Coord
     PREDEF_JUMP CopyUncompressedPicToTilemap
 
-SECTION "Func_3ed12",ROMX[$6d12],BANK[$f]
-
-Func_3ed12: ; 3ed12 (f:6d12)
-    ld hl,Func_396d3
-    ld b,BANK(Func_396d3)
-    jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
+SECTION "ApplyBurnAndParalysisPenaltiesToPlayer",ROMX[$6d1a],BANK[$f]
 
 ApplyBurnAndParalysisPenaltiesToPlayer: ; 3ed1a (f:6d1a)
     ld a,$1
