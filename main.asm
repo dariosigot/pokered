@@ -68369,7 +68369,7 @@ RocketHideout4Text1: ; 4553a (11:553a)
     ldh a,[$8c]
     ld [$cf13],a
     call EngageMapTrainer
-    call InitBattleEnemyParameters
+    call InitBattleEnemyParameters_Giovanni_Bank11
     xor a
     ldh [$b4],a
     ld a,$3
@@ -71343,6 +71343,14 @@ UnknownDungeon4Object:
 
 UnknownDungeon4Blocks:
     INCBIN "maps/unknowndungeon4.blk"
+
+; ───────────────────────────────────────
+
+InitBattleEnemyParameters_Giovanni_Bank11:
+    call InitBattleEnemyParameters
+    ld a,8
+    ld [W_GYMLEADERNO],a
+    ret
 
 ; ───────────────────────────────────────
 
@@ -96698,7 +96706,7 @@ SilphCo11Script4: ; 62293 (18:6293)
     ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
     ld [$cf13],a
     call EngageMapTrainer
-    call InitBattleEnemyParameters
+    call InitBattleEnemyParameters_Giovanni_Bank18
     xor a
     ld [wJoypadForbiddenButtonsMask],a
     ld a,$5
@@ -97339,6 +97347,14 @@ SSAnne9Text5:
     db "@"
 
 ; ────────────────────────────────────────
+
+InitBattleEnemyParameters_Giovanni_Bank18:
+    call InitBattleEnemyParameters
+    ld a,8
+    ld [W_GYMLEADERNO],a
+    ret
+
+; ───────────────────────────────────────
 
 SECTION "bank19",ROMX,BANK[$19]
 
@@ -141237,6 +141253,7 @@ GenerateRandomEnemyTrainerIV_:
     db GIOVANNI,NIDORINO,$CB,$CB
     db GIOVANNI,NIDOKING,$CB,$CB
     db GIOVANNI,NIDOQUEEN,$BC,$BC
+    db GIOVANNI,KRABBY,$E6,$F5
     db GIOVANNI,KINGLER,$E6,$F5
 
     ; Bruno
