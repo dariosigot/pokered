@@ -134860,8 +134860,8 @@ PlateauMons2:
     db 37,GOLBAT    ; 15%
     db 26,DIGLETT   ; 10%
     db 46,ONIX      ; 10%
-    db 44,GRAVELER  ; 10%
-    db 40,MACHOKE   ;  5%
+    WILDSUB         ; 10% ; PlateauMons25
+    WILDSUB         ;  5% ; PlateauMons26
     db 38,DUGTRIO   ;  5%
     db 42,SANDSLASH ;  4%
     db 45,DUGTRIO   ;  1%
@@ -134869,23 +134869,38 @@ PlateauMons2:
 PlateauMons20:
     db $20,27,ZUBAT  ; 12%
     db $FF,34,GOLBAT ; 88%
+PlateauMons25:
+    db $20,27,GEODUDE  ; 12%
+    db $FF,44,GRAVELER ; 88%
+PlateauMons26:
+    db $20,27,MACHOP  ; 12%
+    db $FF,40,MACHOKE ; 88%
 
 PlateauMons3:
     db $0F
     WILDSUB        ; 20% ; PlateauMons30
     db 44,ONIX     ; 20%
     db 40,GOLBAT   ; 15%
-    db 39,DUGTRIO  ; 10%
-    db 38,MACHOKE  ; 10%
+    WILDSUB        ; 10% ; PlateauMons33
+    WILDSUB        ; 10% ; PlateauMons34
     db 48,ONIX     ; 10%
     db 43,GRAVELER ;  5%
     db 42,MACHOKE  ;  5%
-    db 45,GRAVELER ;  4%
+    WILDSUB        ;  4% ; PlateauMons38
     db 56,ONIX     ;  1%
     db $00
 PlateauMons30:
     db $20,28,ZUBAT  ; 12%
     db $FF,37,GOLBAT ; 88%
+PlateauMons33:
+    db $20,28,DIGLETT ; 12%
+    db $FF,39,DUGTRIO ; 88%
+PlateauMons34:
+    db $20,28,MACHOP  ; 12%
+    db $FF,38,MACHOKE ; 88%
+PlateauMons38:
+    db $20,28,GEODUDE  ; 12%
+    db $FF,45,GRAVELER ; 88%
 
 DungeonMons1:
     db $0A
@@ -136072,7 +136087,12 @@ WildSubGroupTable:
     WILDSUBGROUP ROUTE_23,1,Route23Mons1
     WILDSUBGROUP VICTORY_ROAD_1,0,PlateauMons10
     WILDSUBGROUP VICTORY_ROAD_2,0,PlateauMons20
+    WILDSUBGROUP VICTORY_ROAD_2,5,PlateauMons25
+    WILDSUBGROUP VICTORY_ROAD_2,6,PlateauMons26
     WILDSUBGROUP VICTORY_ROAD_3,0,PlateauMons30
+    WILDSUBGROUP VICTORY_ROAD_3,3,PlateauMons33
+    WILDSUBGROUP VICTORY_ROAD_3,4,PlateauMons34
+    WILDSUBGROUP VICTORY_ROAD_3,8,PlateauMons38
     db $FF
 
 WildSubGroupTableNew:
