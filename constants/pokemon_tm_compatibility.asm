@@ -46,7 +46,7 @@ CharmeleonTMCompatibility:
     tmlearn 44                      ; |REST|
     tmlearn 50,51,54                ; |SUBSTITUTE|BLADE|STRIKE|
 CharizardTMCompatibility:
-    tmlearn 01,02,03,05,08          ; |MEGA_PUNCH|RAZOR_WIND|SWORDS_DANCE|MEGA_KICK|BODY_SLAM|
+    tmlearn 01,02,03,04,05,08       ; |MEGA_PUNCH|RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|MEGA_KICK|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19,20,22,23       ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|SOLARBEAM|DRAGON_RAGE|
     tmlearn 26,27,28,31,32          ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|DOUBLE_TEAM|

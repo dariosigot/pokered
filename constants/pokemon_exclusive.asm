@@ -68,6 +68,7 @@ CharizardExclusiveMove:
     db AGILITY
     db SLAM
     db RAGE ; TM20
+    db WHIRLWIND ; TM04
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SquirtleExclusiveMove:
