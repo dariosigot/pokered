@@ -21174,7 +21174,7 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(EmptyMap_h) ; unused
     db BANK(EmptyMap_h) ; unused
     db BANK(VictoryRoad1_h)
-    db BANK(VictoryCenter_h)
+    db BANK(VictoryPokecenter_h)
     db BANK(EmptyMap_h) ; unused
     db BANK(EmptyMap_h) ; unused
     db BANK(EmptyMap_h) ; unused
@@ -73757,9 +73757,7 @@ MtMoonPokecenter_h: ; 0x492c3 to 0x492cf (12 bytes) (bank=12) (id=68)
     db $00 ; connections
     dw MtMoonPokecenterObject ; objects
 
-MtMoonPokecenterScript: ; 492cf (12:52cf)
-    call Func_22fa
-    jp EnableAutoTextBoxDrawing
+SECTION "MtMoonPokecenterTextPointers",ROMX[$52d5],BANK[$12]
 
 MtMoonPokecenterTextPointers: ; 492d5 (12:52d5)
     dw MtMoonPokecenterText1
@@ -73882,9 +73880,7 @@ RockTunnelPokecenter_h: ; 0x493ae to 0x493ba (12 bytes) (id=81)
     db $00 ; connections
     dw RockTunnelPokecenterObject ; objects
 
-RockTunnelPokecenterScript: ; 493ba (12:53ba)
-    call Func_22fa
-    jp EnableAutoTextBoxDrawing
+SECTION "RockTunnelPokecenterTextPointers",ROMX[$53c0],BANK[$12]
 
 RockTunnelPokecenterTextPointers: ; 493c0 (12:53c0)
     dw RockTunnelPokecenterText1
@@ -75642,7 +75638,7 @@ GiveMagikarp:
     pop bc
     jp GivePokemon
 
-VictoryCenter_h:
+VictoryPokecenter_h:
     db $06 ; tileset
     db VICTORY_POKECENTER_HEIGHT,VICTORY_POKECENTER_WIDTH ; dimensions (y,x)
     dw VictoryPokecenterBlocks,VictoryPokecenterTextPointers,VictoryPokecenterScript ; blocks,texts,scripts
@@ -75651,6 +75647,8 @@ VictoryCenter_h:
 
 VictoryPokecenterScript:
     call Func_22fa
+    ld hl,W_TOWNVISITEDFLAG+1
+    set 5,[hl]
     jp EnableAutoTextBoxDrawing
 
 VictoryPokecenterTextPointers:
@@ -75776,6 +75774,18 @@ PlayCoinSoundAndLoadText:
     call WaitForSoundToFinish ; wait until sound is done playing
     ld hl,UnnamedText_48d27
     ret
+
+MtMoonPokecenterScript:
+    call Func_22fa
+    ld hl,W_TOWNVISITEDFLAG+1
+    set 3,[hl]
+    jp EnableAutoTextBoxDrawing
+
+RockTunnelPokecenterScript:
+    call Func_22fa
+    ld hl,W_TOWNVISITEDFLAG+1
+    set 4,[hl]
+    jp EnableAutoTextBoxDrawing
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -102175,6 +102185,9 @@ TownMapOrderNew:
     db ROUTE_D1
 TownMapOrderNewEnd:
 
+FlyingRouteMappingNew:
+    db $FF
+
 FlyingCitySortOrderNew:
     db PORT_ROYAL
 FlyingCitySortOrderNewEnd:
@@ -102259,6 +102272,13 @@ GetNumFlyingCity:
     call CheckNewAdventureFlag
     ret z
     ld bc,FlyingCitySortOrderNewEnd-FlyingCitySortOrderNew
+    ret
+
+GetFlyingRouteMapping:
+    ld hl,FlyingRouteMapping
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,FlyingRouteMappingNew
     ret
 
 GetFlyingCitySortOrder:
@@ -103714,6 +103734,7 @@ CalcFlyingEndPointer:
 InsertFlyingCitySorted:
     push bc
     push de
+    call .MapFlyingRoute
     push af
     call GetFlyingCitySortOrder ; ld hl,FlyingCitySortOrder
     ld c,-1
@@ -103730,18 +103751,51 @@ InsertFlyingCitySorted:
     pop de
     pop bc
     ret
+.MapFlyingRoute
+    ld d,a
+    ld e,b
+    call GetFlyingRouteMapping
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.standard
+    cp e
+    jr nz,.next
+    ld a,[hl]
+    ld b,a
+    ld a,d
+    cp $fe
+    ret z
+    ld a,b
+    ret
+.next
+    inc hl
+    jr .loop
+.standard
+    ld a,d
+    ld b,e
+    ret
+
+FlyingRouteMapping:
+    db SAFFRON_CITY + 1 , ROUTE_4
+    db SAFFRON_CITY + 2 , ROUTE_10
+    db SAFFRON_CITY + 3 , ROUTE_23
+    db $FF
 
 FlyingCitySortOrder:
     db PALLET_TOWN
     db VIRIDIAN_CITY
     db PEWTER_CITY
+    db ROUTE_4
     db CERULEAN_CITY
     db VERMILION_CITY
+    db ROUTE_10
     db LAVENDER_TOWN
     db CELADON_CITY
     db SAFFRON_CITY
     db FUCHSIA_CITY
     db CINNABAR_ISLAND
+    db ROUTE_23
     db INDIGO_PLATEAU
 FlyingCitySortOrderEnd:
 
@@ -142288,7 +142342,7 @@ MapHeaderPointers:
     dw EmptyMap_h ; unused
     dw EmptyMap_h ; unused
     dw VictoryRoad1_h
-    dw VictoryCenter_h
+    dw VictoryPokecenter_h
     dw EmptyMap_h ; unused ;id=110
     dw EmptyMap_h ; unused
     dw EmptyMap_h ; unused
