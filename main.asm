@@ -47514,7 +47514,7 @@ LeechSeedEffect_:
     ld b,BANK(PlayCurrentMoveAnimation2)
     call Bankswitch
     ld hl,.WasSeededText ; $7ef2
-    jp PrintText
+    jp .DrawHudAndPrintText
 .moveMissed
     call .PlayCurrentMoveAnimation
     ld b,BANK(PrintMoveFailureText)
@@ -47535,6 +47535,13 @@ LeechSeedEffect_:
     ld hl,PlayCurrentMoveAnimation
     ld b,BANK(PlayCurrentMoveAnimation)
     jp Bankswitch
+.DrawHudAndPrintText
+    push hl
+    ld b,BANK(DrawHUDsAndHPBars)
+    ld hl,DrawHUDsAndHPBars
+    call Bankswitch
+    pop hl
+    jp PrintText
 .WasSeededText
     TX_FAR _WasSeededText
     db "@"
@@ -132557,17 +132564,7 @@ _DrawCatchGender: ; Denim
 ; catch
     call IsGhostBattle
     jp z,.Ghost ; No Gender,Pokedex or Debug If Ghost Battle
-    ld a,[W_ENEMYMON_START]
-    ld [$d11e],a
-    PREDEF IndexToPokedex
-    ld a,[$d11e]
-    ld hl,wPokedexOwned
-    ld c,a
-    ld b,2
-    PREDEF HandleBitArray ; IsPokemonBitSet_bankF
-    ld a,c
-    and a
-    push af ; Backup Pokedex Flag Test
+    call .CheckEnemyOwned
     jr z,.SkipCatchFlagIcon
     ld a,[W_ISINBATTLE] ; trainer battle,this is 2
     dec a
@@ -132576,7 +132573,7 @@ _DrawCatchGender: ; Denim
     FuncCoord 1,1
     ld hl,Coord
     ld de,.PokeBallCatchFlagIcon
-    call PlaceString
+    call .PlaceIcon
 .SkipCatchFlagIcon
     ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
     call CheckShiny
@@ -132585,15 +132582,22 @@ _DrawCatchGender: ; Denim
     FuncCoord 1,1
     ld hl,Coord
     ld de,.ShinyStarIcon
-    call PlaceString
+    call .PlaceIcon
 .NoShiny
-    ld hl,W_ENEMYBATTSTATUS1
-    bit 7,[hl] ; confused?
-    ld de,.ConfusedIcon
-    jr nz,.PrintConfused
+    call .CheckConfused
+    call nz,.Print1stIcon
+    jr nz,.Check2ndIcon
+    call .CheckSeeded
+    call nz,.Print1stIcon
+    jr .Skip2ndIcon
+.Check2ndIcon
+    call .CheckSeeded
+    call nz,.Print2ndIcon
+.Skip2ndIcon
+    jr nz,.Genderless
+    call .CheckEnemyOwned
     ld a,[W_ENEMYMON_START]
     ld [$d11e],a
-    pop af ; Restore Pokedex Flag Test
     jr z,.Genderless
     call GetGender
     jr c,.Genderless
@@ -132607,10 +132611,10 @@ _DrawCatchGender: ; Denim
 .GreaterThen9
     pop af
     ld de,.MaleIcon
-    jr nz,.PrintGenderOrConfused
+    jr nz,.PrintGender
     ld de,.FemaleIcon
-.PrintGenderOrConfused
-    call PlaceString
+.PrintGender
+    call .PlaceIcon
 .Genderless
     call DebugStats
     jp ResetTempIV
@@ -132618,31 +132622,71 @@ _DrawCatchGender: ; Denim
     ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
     call SetTempIV
     jr .Genderless
-.PrintConfused
-    pop af ; Restore Pokedex Flag Test
-    FuncCoord 6,1
+.Print1stIcon
+    push af
+    FuncCoord 06,01
     ld hl,Coord
-    jr .PrintGenderOrConfused
+    call .PlaceIcon
+    pop af
+    ret
+.Print2ndIcon
+    push af
+    FuncCoord 07,01
+    ld hl,Coord
+    call .PlaceIcon
+    pop af
+    ret
+.CheckEnemyOwned
+    ld a,[W_ENEMYMON_START]
+    ld [$d11e],a
+    PREDEF IndexToPokedex
+    ld a,[$d11e]
+    ld hl,wPokedexOwned
+    ld c,a
+    ld b,2
+    PREDEF HandleBitArray ; IsPokemonBitSet_bankF
+    ld a,c
+    and a
+    ret
+.CheckConfused
+    ld hl,W_ENEMYBATTSTATUS1
+    bit 7,[hl] ; Confused?
+    ld de,.ConfusedIcon
+    ret
+.CheckSeeded
+    ld hl,W_ENEMYBATTSTATUS2
+    bit 7,[hl] ; Seeded?
+    ld de,.SeededIcon
+    ret
+.PlaceIcon
+    ld a,[de]
+    ld [hl],a
+    ret
 .PokeBallCatchFlagIcon:
-    db $c9,$50
+    db $C9
 .MaleIcon
-    db $EF,$50
+    db $EF
 .FemaleIcon
-    db $F5,$50
+    db $F5
 .ConfusedIcon
-    db $E6,$50
+    db $E6
+.SeededIcon
+    db $DC
 .ShinyStarIcon
-    db $D1,$50
+    db $D1
 
 _DrawCurrentMonGenderInBattle:
-    ld hl,W_PLAYERBATTSTATUS1
-    bit 7,[hl] ; confused?
-    jr z,.NotConfused
-    FuncCoord 17,08
-    ld hl,Coord
-    ld de,.ConfusedIcon
-    jp PlaceString
-.NotConfused
+    call .CheckConfused
+    call nz,.Print1stIcon
+    jr nz,.Check2ndIcon
+    call .CheckSeeded
+    call nz,.Print1stIcon
+    jr .Skip2ndIcon
+.Check2ndIcon
+    call .CheckSeeded
+    call nz,.Print2ndIcon
+.Skip2ndIcon
+    ret nz
     ld hl,W_PLAYERMONIVS ; .BackSpriteInBattle
     call SetTempIV
     ld a,[W_PLAYERMONID]
@@ -132662,16 +132706,46 @@ _DrawCurrentMonGenderInBattle:
     jr nz,.Male
     ld de,.FemaleIcon
 .Male
-    call PlaceString
+    call .PlaceIcon
 .Genderless
     call ResetTempIV
     ret
+.Print1stIcon
+    push af
+    FuncCoord 17,08
+    ld hl,Coord
+    call .PlaceIcon
+    pop af
+    ret
+.Print2ndIcon
+    push af
+    FuncCoord 18,08
+    ld hl,Coord
+    call .PlaceIcon
+    pop af
+    ret
+.CheckConfused
+    ld hl,W_PLAYERBATTSTATUS1
+    bit 7,[hl] ; Confused?
+    ld de,.ConfusedIcon
+    ret
+.CheckSeeded
+    ld hl,W_PLAYERBATTSTATUS2
+    bit 7,[hl] ; Seeded?
+    ld de,.SeededIcon
+    ret
+.PlaceIcon
+    ld a,[de]
+    ld [hl],a
+    ret
 .MaleIcon
-    db $EF,$50
+    db $EF
 .FemaleIcon
-    db $F5,$50
+    db $F5
 .ConfusedIcon
-    db $E6,$50
+    db $E6
+.SeededIcon
+    db $DC
 
 DebugStats:
     and a ; rcf
