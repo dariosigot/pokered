@@ -53737,9 +53737,10 @@ GetHealthBarColorWithGhostCheck:
     ld b,BANK(GetHealthBarColorWithGhostCheck_)
     jp Bankswitch
 
-SetDEAndLoadMonFrontSprite:
-    ld de,$9000
-    jp LoadMonFrontSprite
+Func_3ed12:
+    ld hl,Func_396d3
+    ld b,BANK(Func_396d3)
+    jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
 
 SECTION "Func_3c64f",ROMX[$464f],BANK[$f]
 
@@ -56087,7 +56088,7 @@ playPlayerMoveAnimation:
     pop af
     ld [$CC5B],a ; AnimationType
     ld a,[W_PLAYERMOVENUM]
-    call PlayMoveAnimation
+    call PlayMoveAnimation_SeismicTossException
     call HandleExplodingAnimation
     call DrawPlayerHUDAndHPBar
     ld a,[W_PLAYERBATTSTATUS2]
@@ -56234,12 +56235,17 @@ MultiHitText:
     TX_FAR _MultiHitText
     db "@"
 
-Func_3ed12:
-    ld hl,Func_396d3
-    ld b,BANK(Func_396d3)
-    jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
-
-; Free
+PlayMoveAnimation_SeismicTossException:
+    cp SEISMIC_TOSS
+    jr nz,.done
+    ld b,a
+    ld a,[W_MOVEMISSED]
+    and a
+    ld a,b
+    jr z,.done
+    ld a,TACKLE
+.done
+    jp PlayMoveAnimation
 
 SECTION "CheckPlayerStatusConditions",ROMX[$5854],BANK[$f]
 
@@ -57073,7 +57079,9 @@ ChooseRandomMove:
     and a
     ret
 
-; Free
+SetDEAndLoadMonFrontSprite:
+    ld de,$9000
+    jp LoadMonFrontSprite
 
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
@@ -58778,7 +58786,7 @@ playEnemyMoveAnimation:
     pop af
     ld [$CC5B],a ; AnimationType
     ld a,[W_ENEMYMOVENUM] ; $cfcc
-    call PlayMoveAnimation
+    call PlayMoveAnimation_SeismicTossException
     call HandleExplodingAnimation
     call DrawEnemyHUDAndHPBar
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
