@@ -47635,12 +47635,18 @@ FlareonPicBack: ; 2e806 (b:6806)
 DisplayEffectiveness:
     ld a,[H_WHOSETURN]
     and a
-    ld a,[$d06a] ; PlayerNumAttacksLeft
+    ld hl,$d06a ; PlayerNumAttacksLeft
+    ld a,[W_PLAYERMOVEEFFECT]
     jr z,.continue
-    ld a,[$d06f] ; EnemyNumAttacksLeft
+    ld hl,$d06f ; EnemyNumAttacksLeft
+    ld a,[W_ENEMYMOVEEFFECT]
 .continue
+    cp THRASH_PETAL_DANCE_EFFECT
+    jr z,.ForceDisplayEffect
+    ld a,[hl]
     and a
     ret nz ; kickout if MultiAttack
+.ForceDisplayEffect
     xor a
     ld hl,H_MULTIPLICAND
     ld [hli],a
