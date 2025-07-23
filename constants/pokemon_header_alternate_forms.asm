@@ -408,7 +408,7 @@ CharizardStarterBaseStats:
 
     db FIRE ; species type 1
     db DRAGON ; species type 2
-    db 0 ; species type 3
+    db WIND ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions
