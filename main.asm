@@ -10889,7 +10889,7 @@ NewMoveDetails:
     ; Print Move Details Box
     ld a,[$d0e0] ; New Move Learned
     ld [wPlayerSelectedMove],a
-    FuncCoord 04,08
+    FuncCoord 04,07
     ld de,Coord
     PREDEF PrintMoveDetailsBox
 
@@ -16445,26 +16445,26 @@ LearnMove: ; 6e43 (1:6e43)
     pop hl
 .ChoiceAnotherMoveToDelete
     push hl
-    call CheckMoveRelearn
-    ld hl,.WhichMoveShouldBeReplacedText ; $6fb4
-    call z,PrintText
-    FuncCoord 4,7 ; $c430
-    ld hl,Coord
-    ld bc,$040e
-    call CheckMoveRelearn
-    jr z,.skip1
+;    call CheckMoveRelearn
+;    ld hl,.WhichMoveShouldBeReplacedText ; $6fb4
+;    call z,PrintText
+;    FuncCoord 4,7 ; $c430
+;    ld hl,Coord
+;    ld bc,$040e
+;    call CheckMoveRelearn
+;    jr z,.skip1
     FuncCoord 00,12
     ld hl,Coord
     ld bc,$0412
-.skip1
+;.skip1
     call TextBoxBorder
-    FuncCoord 6,8 ; $c446
-    ld hl,Coord
-    call CheckMoveRelearn
-    jr z,.skip2
+;    FuncCoord 6,8 ; $c446
+;    ld hl,Coord
+;    call CheckMoveRelearn
+;    jr z,.skip2
     FuncCoord 02,13
     ld hl,Coord
-.skip2
+;.skip2
     ld de,$d0e1
     ld a,[$FF00+$f6]
     set 2,a
@@ -16474,19 +16474,19 @@ LearnMove: ; 6e43 (1:6e43)
     res 2,a
     ld [$FF00+$f6],a
     ld hl,wTopMenuItemY ; $cc24
-    call CheckMoveRelearn
-    jr nz,.skip3
-    ld a,$8
-    ld [hli],a
-    ld a,$5
-    ld [hli],a
-    jr .skip4
-.skip3
+;    call CheckMoveRelearn
+;    jr nz,.skip3
+;    ld a,$8
+;    ld [hli],a
+;    ld a,$5
+;    ld [hli],a
+;    jr .skip4
+;.skip3
     ld a,13
     ld [hli],a
     ld a,01
     ld [hli],a
-.skip4
+;.skip4
     xor a
     ld [hli],a
     inc hl
@@ -18652,9 +18652,8 @@ HandleMenuInput_PrintMoveBox:
     ld b,$0
     add hl,bc
     ld a,[hl]
-
-    ; Print Move Details Box
     ld [wPlayerSelectedMove],a
+    ; Print Move Details Box
     FuncCoord 10,12
     ld de,Coord
     call CheckMoveRelearn
@@ -18663,14 +18662,6 @@ HandleMenuInput_PrintMoveBox:
     ld hl,WriteEnergyAllMovesDuringMoveRelearn
     ld b,BANK(WriteEnergyAllMovesDuringMoveRelearn)
     call Bankswitch
-    ; Energy
-    ;ld de,$cfb5
-    ;FuncCoord 15,13
-    ;ld hl,Coord
-    ;ld bc,$0103
-    ;call PrintNumber
-    ;ld de,.EnergyIcon
-    ;call PlaceString
     ; Print Move Details Box (Move Relearner)
     FuncCoord 09,05
     ld de,Coord
@@ -18693,8 +18684,6 @@ HandleMenuInput_PrintMoveBox:
     ld a,b
     ret z
     jr HandleMenuInput_PrintMoveBox
-;.EnergyIcon
-;    db $DA,"@"
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $01)
