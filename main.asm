@@ -51894,17 +51894,20 @@ HealEffect_: ; Moved Upper in the Bank
     ld hl,UndoBurnParStats
     ld b,BANK(UndoBurnParStats)
     call Bankswitch
-    ld hl,W_PLAYERBATTSTATUS3     ;load in for toxic bit
-    ld de,W_PLAYERTOXICCOUNTER    ;load in for toxic counter
+    ld hl,W_PLAYERBATTSTATUS3     ; load in for toxic bit
+    ld de,W_PLAYERTOXICCOUNTER    ; load in for toxic counter
     ld a,[H_WHOSETURN]
     and a
     jr z,.undoToxic
-    ld hl,W_ENEMYBATTSTATUS3      ;load in for toxic bit
-    ld de,W_ENEMYTOXICCOUNTER     ;load in for toxic counter
+    ld hl,W_ENEMYBATTSTATUS3      ; load in for toxic bit
+    ld de,W_ENEMYTOXICCOUNTER     ; load in for toxic counter
 .undoToxic
-    res 0,[hl]                    ; heal Toxic status
-    xor a                         ;clear a
-    ld [de],a                     ;write a to toxic counter
+    res BADLY_POISONED,[hl]       ; heal Toxic status
+    dec hl
+    dec hl                        ; hl now point to "Status1"
+    res CONFUSED,[hl]             ; heal Confused status
+    xor a                         ; clear a
+    ld [de],a                     ; write a to toxic counter
     pop hl
     ld a,[hl]
     and a
