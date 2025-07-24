@@ -3208,7 +3208,7 @@ SlowbroBaseStats:
 
     db WATER ; species type 1
     db PSYCHIC ; species type 2
-    db 0 ; species type 3
+    db IVORY ; species type 3
     db 0 ; species type 4
 
     db $77 ; sprite dimensions

@@ -51894,17 +51894,20 @@ HealEffect_: ; Moved Upper in the Bank
     ld hl,UndoBurnParStats
     ld b,BANK(UndoBurnParStats)
     call Bankswitch
-    ld hl,W_PLAYERBATTSTATUS3     ;load in for toxic bit
-    ld de,W_PLAYERTOXICCOUNTER    ;load in for toxic counter
+    ld hl,W_PLAYERBATTSTATUS3     ; load in for toxic bit
+    ld de,W_PLAYERTOXICCOUNTER    ; load in for toxic counter
     ld a,[H_WHOSETURN]
     and a
     jr z,.undoToxic
-    ld hl,W_ENEMYBATTSTATUS3      ;load in for toxic bit
-    ld de,W_ENEMYTOXICCOUNTER     ;load in for toxic counter
+    ld hl,W_ENEMYBATTSTATUS3      ; load in for toxic bit
+    ld de,W_ENEMYTOXICCOUNTER     ; load in for toxic counter
 .undoToxic
-    res 0,[hl]                    ; heal Toxic status
-    xor a                         ;clear a
-    ld [de],a                     ;write a to toxic counter
+    res BADLY_POISONED,[hl]       ; heal Toxic status
+    dec hl
+    dec hl                        ; hl now point to "Status1"
+    res CONFUSED,[hl]             ; heal Confused status
+    xor a                         ; clear a
+    ld [de],a                     ; write a to toxic counter
     pop hl
     ld a,[hl]
     and a
@@ -56125,11 +56128,11 @@ MirrorMoveCheck:
     jr z,.moveDidNotMiss
     call PrintMoveFailureText
     ld a,[W_PLAYERMOVEEFFECT]
-    cp EXPLODE_EFFECT ; even if Explosion or Selfdestruct missed, its effect still needs to be activated
-    jr z,.notDone
-    cp HYPER_BEAM_EFFECT
-    jr z,.notDone
-    jp ExecutePlayerMoveDone ; otherwise, we're done if the move missed
+    ld hl,EffectsArray6
+    ld de,1
+    call IsInArray
+    jr c,.notDone
+    jr ExecutePlayerMoveDone ; otherwise, we're done if the move missed
 .moveDidNotMiss
     call ApplyAttackToEnemyPokemon
     call PrintCriticalOHKOText
@@ -56167,7 +56170,7 @@ MirrorMoveCheck:
 .executeOtherEffects
     ld a,[W_PLAYERMOVEEFFECT]
     and a
-    jp z,ExecutePlayerMoveDone
+    jr z,ExecutePlayerMoveDone
     ld hl,EffectsArray5
     ld de,1
     call IsInArray
@@ -58822,11 +58825,11 @@ EnemyCheckIfMirrorMoveEffect:
     jr z,.moveDidNotMiss
     call PrintMoveFailureText
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    cp EXPLODE_EFFECT
-    jr z,.handleExplosionMiss
-    cp HYPER_BEAM_EFFECT
-    jr z,.handleExplosionMiss
-    jp ExecuteEnemyMoveDone
+    ld hl,EffectsArray6
+    ld de,1
+    call IsInArray
+    jr c,.notDone
+    jr ExecuteEnemyMoveDone
 .moveDidNotMiss
     call ApplyAttackToPlayerPokemon
     call PrintCriticalOHKOText
@@ -58834,7 +58837,7 @@ EnemyCheckIfMirrorMoveEffect:
     ld b,BANK(DisplayEffectiveness)
     call Bankswitch ; indirect jump to DisplayEffectiveness (2fb7b (b:7b7b))
     call EnemyMoveDidntMissAndPlayerBideAccum
-.handleExplosionMiss
+.notDone
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     ld hl,EffectsArray4 ; $4030
     ld de,$1
@@ -59527,6 +59530,15 @@ Func_3ec92:
     FuncCoord 1,5 ; $c405
     ld hl,Coord
     PREDEF_JUMP CopyUncompressedPicToTilemap
+
+; MissedEffect
+EffectsArray6:
+; Move that must apply their side effect also if the attack missed
+; e.g., Explosion, Hyper Beam, Pay Day
+    db EXPLODE_EFFECT
+    db HYPER_BEAM_EFFECT
+    db PAY_DAY_EFFECT
+    db $FF
 
 SECTION "ApplyBurnAndParalysisPenaltiesToPlayer",ROMX[$6d1a],BANK[$f]
 
@@ -62122,7 +62134,6 @@ GenRandomInBattleFromOtherBANK:
     call GenRandomInBattle
     ld d,a
     ret
-
 
 HidePlayerBattleHudAndRestorePalette:
     push af
@@ -140682,9 +140693,13 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_:
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp ATTACK_DOWN2_EFFECT
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
+    cp ATTACK_DOWN_SIDE_EFFECT
+    jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp SPEED_DOWN1_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     cp SPEED_DOWN2_EFFECT
+    jr z,.skip_par                        ; speed effect. skip to par penalty.
+    cp SPEED_DOWN_SIDE_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     jr .skip_end                          ; no attack or speed effect if at this line. skip to end.
 .skip_brn

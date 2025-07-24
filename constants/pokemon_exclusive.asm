@@ -350,6 +350,7 @@ NidokingExclusiveMove:
     db STRIKE ; TM54
     db AGILITY
     db RAGE ; TM20
+    db QUICK_ATTACK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ClefairyExclusiveMove:
@@ -687,6 +688,7 @@ PoliwrathExclusiveMove:
     db TSUNAMI ; TM53
     db STRIKE ; TM54
     db AMNESIA
+    db CONFUSION
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 AbraExclusiveMove:

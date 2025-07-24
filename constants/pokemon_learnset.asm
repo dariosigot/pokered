@@ -543,6 +543,7 @@ NIDORINA_Learnset: MACRO
     db 22,FOCUS_ENERGY
     db 24,DOUBLE_TEAM ; Exclusive*
     db 26,SLAM
+    db 28,QUICK_ATTACK ; Exclusive*
     db 30,SLASH
     db 33,AGILITY ; Exclusive*
     db 37,SKULL_BASH
@@ -576,6 +577,7 @@ ENDM
 NIDORAN_F_NoEvo_Learnset: MACRO
     db 21,DOUBLE_TEAM ; Exclusive
     db 23,TRAPHOLE ; Exclusive
+    db 24,QUICK_ATTACK ; Exclusive
     db 26,BITE
     db 28,AGILITY ; Exclusive
     db 31,SLAM
@@ -604,6 +606,7 @@ NIDORINO_Learnset: MACRO
     db 22,FOCUS_ENERGY
     db 24,DOUBLE_TEAM ; Exclusive*
     db 26,SLAM
+    db 28,QUICK_ATTACK ; Exclusive*
     db 30,HYPER_FANG
     db 33,AGILITY ; Exclusive*
     db 37,SKULL_BASH
@@ -637,6 +640,7 @@ ENDM
 NIDORAN_M_NoEvo_Learnset: MACRO
     db 21,DOUBLE_TEAM ; Exclusive
     db 23,TRAPHOLE ; Exclusive
+    db 24,QUICK_ATTACK ; Exclusive
     db 26,BITE
     db 28,AGILITY ; Exclusive
     db 31,SLAM
@@ -776,6 +780,7 @@ ZUBAT_Learnset: MACRO
     db  1,LEECH_LIFE
     db  1,SUPERSONIC
     db  7,POISON_STING
+    db 10,QUICK_ATTACK
     db 11,BITE
     db 13,LEER
     db 15,ACID
@@ -1171,6 +1176,7 @@ POLIWAG_Learnset: MACRO
     db  7,HYPNOSIS
     db  9,TACKLE
     db 11,STRING_SHOT
+    db 12,QUICK_ATTACK
     db 13,WATER_GUN
     db 15,DOUBLESLAP
     db 17,AGILITY
@@ -1183,16 +1189,21 @@ POLIWHIRL_Learnset: MACRO
     POLIWAG_Learnset
     db 25,KARATE_CHOP
     db 27,WATERFALL
+    db 27,LOW_KICK
+    db 28,ROLLING_KICK
     db 29,MEGA_PUNCH
     db 32,AMNESIA ; Exclusive
-    db 32,DOUBLE_TEAM
+    db 32,DOUBLE_TEAM ; Exclusive
     db 34,STRIKE
     db 36,HAZE
     db 38,LEECH_LIFE
     db 40,TSUNAMI
+    db 43,SEISMIC_TOSS
     db 45,SUBMISSION
     db 47,CONFUSION ; Exclusive
+    db 49,JUMP_KICK
     db 50,HYDRO_PUMP
+    db 52,MEGA_KICK
     db 55,ICE_PUNCH
 ENDM
 POLIWRATH_Learnset: MACRO
@@ -1204,7 +1215,6 @@ POLIWRATH_Learnset: MACRO
     db 28,MEGA_PUNCH
     db 30,STRIKE
     db 32,HAZE
-    db 33,DOUBLE_TEAM
     db 34,SEISMIC_TOSS
     db 36,TSUNAMI
     db 37,LEECH_LIFE
@@ -1213,6 +1223,7 @@ POLIWRATH_Learnset: MACRO
     db 46,JUMP_KICK
     db 48,HYDRO_PUMP
     db 50,MEGA_KICK
+    db 53,DOUBLE_TEAM
     db 55,ICE_PUNCH
     db 58,AMNESIA
     db 58,CONFUSION
@@ -1220,11 +1231,12 @@ POLIWRATH_Learnset: MACRO
 ENDM
 POLIWAG_NoEvo_Learnset: MACRO
     db 28,AMNESIA ; Exclusive
+    db 28,DOUBLE_TEAM ; Exclusive
     db 32,CONFUSION ; Exclusive
     db 36,HAZE
     db 39,LEECH_LIFE
     db 41,WATERFALL
-    db 46,DOUBLE_TEAM
+    db 46,LOW_KICK
     db 51,TSUNAMI
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
@@ -2181,6 +2193,7 @@ HITMONLEE_Learnset: MACRO
     db 11,ROLLING_KICK
     db 13,KARATE_CHOP
     db 15,AGILITY
+    db 16,QUICK_ATTACK
     db 17,JUMP_KICK
     db 19,BIDE
     db 21,STRIKE
@@ -2210,6 +2223,7 @@ HITMONCHAN_Learnset: MACRO
     db 11,BIDE
     db 13,LOW_KICK
     db 15,MEDITATE
+    db 16,QUICK_ATTACK
     db 17,MEGA_PUNCH
     db 19,DOUBLE_KICK
     db 21,STRIKE
@@ -2533,6 +2547,7 @@ STARYU_Learnset: MACRO
     db 23,RECOVER
     db 25,FLASH
     db 27,SUPERSONIC ; Exclusive
+    db 29,QUICK_ATTACK
     db 32,SWIFT
     db 36,PSYBEAM
     db 38,SONICBOOM
@@ -2558,6 +2573,7 @@ STARMIE_Learnset: MACRO
     db 23,FLASH
     db 25,LEECH_LIFE
     db 26,SWIFT
+    db 27,QUICK_ATTACK
     db 28,PSYBEAM
     db 30,SONICBOOM
     db 32,REFLECT
@@ -2769,7 +2785,9 @@ TAUROS_Learnset: MACRO
     db 21,SLAM
     db 23,ROCK_THROW
     db 25,REST
+    db 26,QUICK_ATTACK
     db 28,DOUBLE_TEAM
+    db 30,AGILITY
     db 32,STRIKE
     db 35,TAKE_DOWN
     db 37,SKULL_BASH
@@ -3112,6 +3130,7 @@ AERODACTYL_Learnset: MACRO
     db  1,AGILITY
     db  6,WING_ATTACK
     db  8,WHIRLWIND
+    db 10,QUICK_ATTACK
     db 11,BITE
     db 13,ROCK_THROW
     db 15,SUPERSONIC
