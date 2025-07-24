@@ -62123,7 +62123,6 @@ GenRandomInBattleFromOtherBANK:
     ld d,a
     ret
 
-
 HidePlayerBattleHudAndRestorePalette:
     push af
     push bc
