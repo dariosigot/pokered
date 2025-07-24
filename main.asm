@@ -141948,7 +141948,7 @@ AdjustDamageForMoveType_GetInput:
     ld hl,W_PLAYERMONTYPES
     call GetAttackerType
     ld a,[W_ENEMYMON_START]
-    ld d,a
+    ld b,a
     ld hl,W_ENEMYMONTYPES
     jp GetDefenderType
 
