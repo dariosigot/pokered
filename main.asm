@@ -140682,9 +140682,13 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_:
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp ATTACK_DOWN2_EFFECT
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
+    cp ATTACK_DOWN_SIDE_EFFECT
+    jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp SPEED_DOWN1_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     cp SPEED_DOWN2_EFFECT
+    jr z,.skip_par                        ; speed effect. skip to par penalty.
+    cp SPEED_DOWN_SIDE_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     jr .skip_end                          ; no attack or speed effect if at this line. skip to end.
 .skip_brn
