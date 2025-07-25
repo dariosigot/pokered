@@ -5899,8 +5899,10 @@ PlayDefaultMusicFadeOutCurrent: ; 2312 (0:2312)
     ld [$cfca],a
     ld c,$8
     ld d,c
+    ; fall through
+
 PlayDefaultMusicCommon: ; 2324 (0:2324)
-    ld a,[$d700]
+    ld a,[$d700] ; WalkBikeSurfState
     cp $2
     call CheckSurfing
     jr c,.Continue
@@ -5909,30 +5911,36 @@ PlayDefaultMusicCommon: ; 2324 (0:2324)
     jr z,.walking
 .Continue
     ld b,a
-    ld a,d
-    and a
-    ld a,$1f
-    jr nz,.asm_233e
-    ld [$c0ef],a
-.asm_233e
-    ld [$c0f0],a
-    jr .asm_234c
+;    ld a,d
+;    and a ; should current music be faded out first?
+    ld a,BANK(Music_BikeRiding) ; BANK(Music_Surfing)
+;    jr nz,.next2
+; Only change the audio ROM bank if the current music isn't going to be faded
+; out before the default music begins.
+;    ld [$c0ef],a ; AudioROMBank
+;.next2
+; [wAudioSavedROMBank] will be copied to [wAudioROMBank] after fading out the
+; current music (if the current music is faded out).
+    ld [$c0f0],a ; AudioSavedROMBank
+    jr .next3
 .walking
-    ld a,[$d35b]
+    ld a,[$d35b] ; MapMusicSoundID
     ld b,a
-    call Func_2385
-    jr c,.asm_2351
-.asm_234c
-    ld a,[$cfca]
+    call CompareMapMusicBankWithCurrentBank
+    jr c,.next4
+.next3
+    ld a,[$cfca] ; LastMusicSoundID
     cp b
     ret z
-.asm_2351
+.next4
     ld a,c
-    ld [wMusicHeaderPointer],a
+    ld [wMusicHeaderPointer],a ; AudioFadeOutControl
     ld a,b
-    ld [$cfca],a
-    ld [$c0ee],a
+    ld [$cfca],a ; LastMusicSoundID
+    ld [$c0ee],a ; wNewSoundID
     jp PlaySound
+
+SECTION "Func_235f",ROM0[$235f]
 
 Func_235f: ; 235f (0:235f)
     ld a,[$c0ef]
@@ -5962,7 +5970,7 @@ Func_235f: ; 235f (0:235f)
     jr nz,.asm_237a
     ret
 
-Func_2385: ; 2385 (0:2385)
+CompareMapMusicBankWithCurrentBank: ; 2385 (0:2385)
     ld a,[$d35c]
     ld e,a
     ld a,[$c0ef]
