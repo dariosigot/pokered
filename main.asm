@@ -69695,34 +69695,7 @@ SeafoamIslands4ScriptPointers: ; 465fb (11:65fb)
     dw SeafoamIslands4Script2
     dw SeafoamIslands4Script3
 
-SeafoamIslands4Script0: ; 46603 (11:6603)
-    ld a,[$d880]
-    and $3
-    cp $3
-    ret z
-    ld a,[$d361]
-    cp $8
-    ret nz
-    ld a,[$d362]
-    cp $f
-    ret nz
-    ld hl,$ccd3
-    ld de,RLEMovement46632
-    call DecodeRLEList
-    dec a
-    ld [$cd38],a
-    call StartSimulatingJoypadStates
-    ld hl,W_FLAGS_D733
-    set 2,[hl]
-    ld a,$1
-    ld [W_SEAFOAMISLANDS4CURSCRIPT],a
-    ret
-
-RLEMovement46632: ; 46632 (11:6632)
-    db $80,6
-    db $10,5
-    db $80,3
-    db $ff
+SECTION "SeafoamIslands4Script1",ROMX[$6639],BANK[$11]
 
 SeafoamIslands4Script1: ; 46639 (11:6639)
     ld a,[$cd38]
@@ -69946,10 +69919,10 @@ RLEMovementData_46859: ; 46859 (11:6859)
 
 SeafoamIslands5Script3: ; 46860 (11:6860)
     ld a,[$cd38]
-    ld b,a
+    push af
     cp $1
     call z,SeaFoamIslands5Script_46872
-    ld a,b
+    pop af
     and a
     ret nz
     ld a,$0
@@ -71384,6 +71357,47 @@ InitBattleEnemyParameters_Giovanni_Bank11:
     ld a,8
     ld [W_GYMLEADERNO],a
     ret
+
+; ───────────────────────────────────────
+
+SeafoamIslands4Script0:
+    ld a,[$d880]
+    and $3
+    cp $3
+    ret z
+    ld hl,.CoordsData
+    call ArePlayerCoordsInArray
+    ret nc
+    ld a,[$cd3d]
+    cp $1
+    ld de,.RLEMovement0815
+    jr z,.done
+    ld de,.RLEMovement1023
+.done
+    ld hl,$ccd3
+    call DecodeRLEList
+    dec a
+    ld [$cd38],a
+    call StartSimulatingJoypadStates
+    ld hl,W_FLAGS_D733
+    set 2,[hl]
+    ld a,$1
+    ld [W_SEAFOAMISLANDS4CURSCRIPT],a
+    ret
+.CoordsData
+    db 08,15
+    db 10,23
+    db $FF
+.RLEMovement0815
+    db $80,6
+    db $10,5
+    db $80,3
+    db $ff
+.RLEMovement1023
+    db $80,6
+    db $20,2
+    db $80,1
+    db $ff
 
 ; ───────────────────────────────────────
 
@@ -76619,7 +76633,7 @@ Route20Script: ; 50ca9 (14:4ca9)
     ld hl,$d7e7
     bit 0,[hl]
     res 0,[hl]
-    call nz,Func_50cc6
+    call nz,ResetSeaFormEventsIfNotCompleted
     call EnableAutoTextBoxDrawing
     ld hl,Route20TrainerHeader0 ; $4d3a
     ld de,Route20ScriptPointers
@@ -76628,69 +76642,72 @@ Route20Script: ; 50ca9 (14:4ca9)
     ld [W_ROUTE20CURSCRIPT],a
     ret
 
-Func_50cc6: ; 50cc6 (14:4cc6)
-    ld a,[$d880]
-    and $3
-    cp $3
-    jr z,.asm_50cef
+; ──────────────────────────────────
+
+ResetSeaFormEventsIfNotCompleted:
+    ld hl,$d880
+    call .CheckBit01
+    jr z,.NextFlagsByte
+    call .ResetBit01
     ld a,$d7
-    call Func_50d0c
+    call .AddMissableObject
     ld a,$d8
-    call Func_50d0c
+    call .AddMissableObject
     ld hl,.MissableObjectIDs ; $4ce8
-.asm_50cdc
+.loop
     ld a,[hli]
     cp $ff
-    jr z,.asm_50cef
+    jr z,.NextFlagsByte
     push hl
-    call Func_50d14
+    call .RemoveMissableObject
     pop hl
-    jr .asm_50cdc
+    jr .loop
 
-.MissableObjectIDs: ; 50ce8 (14:4ce8)
+.MissableObjectIDs:
     db $D9,$DA,$DB,$DC,$DF,$E0,$FF
 
-.asm_50cef
-    ld a,[$d881]
-    and $3
-    cp $3
+.NextFlagsByte
+    ld hl,$d881
+    call .CheckBit01
     ret z
+    call .ResetBit01
     ld a,$dd
-    call Func_50d0c
+    call .AddMissableObject
     ld a,$de
-    call Func_50d0c
+    call .AddMissableObject
     ld a,$e1
-    call Func_50d14
+    call .RemoveMissableObject
     ld a,$e2
-    call Func_50d14
+    jr .RemoveMissableObject
+
+.CheckBit01
+    ld a,[hl]
+    and %00000011
+    cp %00000011
     ret
 
-Func_50d0c: ; 50d0c (14:4d0c)
+.ResetBit01
+    ld a,[hl]
+    and %11111100
+    ld [hl],a
+    ret
+
+.AddMissableObject
     ld [$cc4d],a
     PREDEF_JUMP AddMissableObject
 
-Func_50d14: ; 50d14 (14:4d14)
+.RemoveMissableObject
     ld [$cc4d],a
     PREDEF_JUMP RemoveMissableObject
 
-Route20ScriptPointers: ; 50d1c (14:4d1c)
+; ──────────────────────────────────
+
+Route20ScriptPointers:
     dw CheckFightingMapTrainers
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
-Route20TextPointers: ; 50d22 (14:4d22)
-    dw Route20Text1
-    dw Route20Text2
-    dw Route20Text3
-    dw Route20Text4
-    dw Route20Text5
-    dw Route20Text6
-    dw Route20Text7
-    dw Route20Text8
-    dw Route20Text9
-    dw Route20Text10
-    dw Route20Text11
-    dw Route20Text12
+SECTION "Route20TrainerHeaders",ROMX[$4d3a],BANK[$14]
 
 Route20TrainerHeaders: ; 50d3a (14:4d3a)
 Route20TrainerHeader0: ; 50d3a (14:4d3a)
@@ -80707,6 +80724,20 @@ GetPrizeMonLevel:
     db CLOYSTER,31 ; Entry Point
     db EXEGGUTOR,31 ; Entry Point
     db $FF
+
+Route20TextPointers:
+    dw Route20Text1
+    dw Route20Text2
+    dw Route20Text3
+    dw Route20Text4
+    dw Route20Text5
+    dw Route20Text6
+    dw Route20Text7
+    dw Route20Text8
+    dw Route20Text9
+    dw Route20Text10
+    dw Route20Text11
+    dw Route20Text12
 
 SECTION "bank15",ROMX,BANK[$15]
 
