@@ -5899,8 +5899,10 @@ PlayDefaultMusicFadeOutCurrent: ; 2312 (0:2312)
     ld [$cfca],a
     ld c,$8
     ld d,c
+    ; fall through
+
 PlayDefaultMusicCommon: ; 2324 (0:2324)
-    ld a,[$d700]
+    ld a,[$d700] ; WalkBikeSurfState
     cp $2
     call CheckSurfing
     jr c,.Continue
@@ -5909,30 +5911,36 @@ PlayDefaultMusicCommon: ; 2324 (0:2324)
     jr z,.walking
 .Continue
     ld b,a
-    ld a,d
-    and a
-    ld a,$1f
-    jr nz,.asm_233e
-    ld [$c0ef],a
-.asm_233e
-    ld [$c0f0],a
-    jr .asm_234c
+;    ld a,d
+;    and a ; should current music be faded out first?
+    ld a,BANK(Music_BikeRiding) ; BANK(Music_Surfing)
+;    jr nz,.next2
+; Only change the audio ROM bank if the current music isn't going to be faded
+; out before the default music begins.
+;    ld [$c0ef],a ; AudioROMBank
+;.next2
+; [wAudioSavedROMBank] will be copied to [wAudioROMBank] after fading out the
+; current music (if the current music is faded out).
+    ld [$c0f0],a ; AudioSavedROMBank
+    jr .next3
 .walking
-    ld a,[$d35b]
+    ld a,[$d35b] ; MapMusicSoundID
     ld b,a
-    call Func_2385
-    jr c,.asm_2351
-.asm_234c
-    ld a,[$cfca]
+    call CompareMapMusicBankWithCurrentBank
+    jr c,.next4
+.next3
+    ld a,[$cfca] ; LastMusicSoundID
     cp b
     ret z
-.asm_2351
+.next4
     ld a,c
-    ld [wMusicHeaderPointer],a
+    ld [wMusicHeaderPointer],a ; AudioFadeOutControl
     ld a,b
-    ld [$cfca],a
-    ld [$c0ee],a
+    ld [$cfca],a ; LastMusicSoundID
+    ld [$c0ee],a ; wNewSoundID
     jp PlaySound
+
+SECTION "Func_235f",ROM0[$235f]
 
 Func_235f: ; 235f (0:235f)
     ld a,[$c0ef]
@@ -5962,7 +5970,7 @@ Func_235f: ; 235f (0:235f)
     jr nz,.asm_237a
     ret
 
-Func_2385: ; 2385 (0:2385)
+CompareMapMusicBankWithCurrentBank: ; 2385 (0:2385)
     ld a,[$d35c]
     ld e,a
     ld a,[$c0ef]
@@ -14967,7 +14975,7 @@ Func_62ff: ; 62ff (1:62ff)
     res 4,[hl]
     ld a,[$d71d]
     ld b,a
-    call ChangeCurMap ; $d35e
+    call ChangeCurMap
     ld a,[$d71e]
     ld c,a
     call GetDungeonWarpList ; ld hl,DungeonWarpList ; $63bf
@@ -14997,7 +15005,7 @@ Func_62ff: ; 62ff (1:62ff)
     ld a,[$d71a]
 .asm_6391
     ld b,a
-    call ChangeCurMap ; $d35e
+    call ChangeCurMap
     call GetFlyWarpDataPtr ; ld hl,FlyWarpDataPtr ; $6448
 .asm_6398
     ld a,[hli]
@@ -21384,7 +21392,7 @@ CheckForceBikeOrSurf: ; c38b (3:438b)
     ld a,$2
     ld [W_SEAFOAMISLANDS4CURSCRIPT],a
     jr z,.forceSurfing
-    ld a,[$d35e]
+    call GetCurrentOldAdventureMap
     cp SEAFOAM_ISLANDS_5
     ld a,$2
     ld [W_SEAFOAMISLANDS5CURSCRIPT],a
@@ -23439,11 +23447,19 @@ IsSurfingAllowed:
     ret nc
     ld hl,$d728
     res 1,[hl]
-    ld hl,UnnamedText_cdfa ; $4dfa
-    jp PrintText
+    ld hl,.PrintText1
+    jr .printText
 .asm_cdec
     ld hl,$d728
     res 1,[hl]
+    ld hl,.PrintText2
+    jr .printText
+.printText
+    jp RunOnlyIfNotSelectInOverworld
+.PrintText1
+    ld hl,UnnamedText_cdfa ; $4dfa
+    jp PrintText
+.PrintText2
     ld hl,UnnamedText_cdff ; $4dff
     jp PrintText
 
@@ -35669,8 +35685,9 @@ IndigoPlateauLobbyScript: ; 19c5b (6:5c5b)
     bit 6,[hl]
     res 6,[hl]
     ret z
-    ld hl,$d869
-    res 7,[hl]
+; wispnote - This event was probably ment to be reset on Route 23.
+;    ld hl,$d869
+;    res 7,[hl] ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
     ld hl,$d734
     bit 1,[hl]
     res 1,[hl]
@@ -35682,6 +35699,8 @@ IndigoPlateauLobbyScript: ; 19c5b (6:5c5b)
     ld [hli],a
     ld [hl],a
     ret
+
+SECTION "IndigoPlateauLobbyTextPointers",ROMX[$5c7f],BANK[$6]
 
 IndigoPlateauLobbyTextPointers: ; 19c7f (6:5c7f)
     dw IndigoPlateauLobbyText1
@@ -45072,7 +45091,7 @@ CableClubLeftGameboy:
     ld a,[$c109]
     cp $c
     ret nz
-    ld a,[$d35e]
+    call GetCurrentOldAdventureMap
     cp $ef
     ld a,$2
     jr z,.asm_2183a
@@ -45090,7 +45109,7 @@ CableClubRightGameboy:
     ld a,[$c109]
     cp $8
     ret nz
-    ld a,[$d35e]
+    call GetCurrentOldAdventureMap
     cp $ef
     ld a,$2
     jr z,.asm_2185a
@@ -53334,6 +53353,14 @@ MainInBattleLoop: ; 3c233 (f:4233)
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
 
+MoveEffectToPercentage:
+    cp a,7    ; 10% status effects are 04,05,06 so 07 will set carry for those
+    ld b,$1a  ; [1A-1]/100 or [26-1]/256 = 9.8%~ chance
+    ret c     ; branch ahead if this is a 10% chance effect..
+    ld b,$4d  ; ..or use [4D-1]/100 or [76-1]/256 = 29.7%~ chance
+    sub a,$1e ; subtract $1E to map to equivalent 10% chance effects
+    ret
+
 ; Free
 
 SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
@@ -60467,33 +60494,23 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     ret nz             ;return if they have a substitute,can't effect them
     ld a,[$ff00+$f3]  ;whose turn?
     and a
-    jp nz,opponentAttacker
+    jp nz,OpponentAttacker
+
+PlayerAttacker:
     ld a,[W_ENEMYMONSTATUS]
     and a
-    jp nz,CheckDefrost
-    ;opponent has no existing status
+    jp nz,CheckDefrost ;opponent has existing status
     call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
     ld hl,W_ENEMYMONTYPES
-    ld b,4
-.LoopEnemyMoves
-    cp [hl]
-    ret z ; return if they match [can't freeze an ice type etc.]
-    inc hl
-    dec b
-    jr nz,.LoopEnemyMoves
+    call AttackerTypeMatchOneOfDefenderTypesPlusException
+    ret z
     ld a,[W_PLAYERMOVEEFFECT]
-    cp a,7         ;10% status effects are 04,05,06 so 07 will set carry for those
-    ld b,$1a       ;[1A-1]/100 or [26-1]/256 = 9.8%~ chance
-    jr c,.next1  ;branch ahead if this is a 10% chance effect..
-    ld b,$4d       ;..or use [4D-1]/100 or [76-1]/256 = 29.7%~ chance
-    sub a,$1e      ;subtract $1E to map to equivalent 10% chance effects
-.next1
+    call MoveEffectToPercentage
     push af     ;push effect...
     call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle  ;get random 8bit value for probability test
     cp b        ;success?
     pop bc      ;...pop effect into C
     ret nc      ;do nothing if random value is >= 1A or 4D [no status applied]
-                ;the test passed
     ld a,b     ;what type of effect is this?
     cp a,BURN_SIDE_EFFECT1
     jr z,.burn
@@ -60518,26 +60535,17 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     call PlayA9BattleAnimation
     ld hl,UnnamedText_3f3dd
     jp DrawHudAndPrintText
-opponentAttacker: ; 3f382 (f:7382)
+
+OpponentAttacker:
     ld a,[W_PLAYERMONSTATUS]  ;this appears to the same as above with addresses swapped for opponent
     and a
     jp nz,CheckDefrost
     call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
     ld hl,W_PLAYERMONTYPES
-    ld b,4
-.LoopPlayerMoves
-    cp [hl]
-    ret z ; return if they match [can't freeze an ice type etc.]
-    inc hl
-    dec b
-    jr nz,.LoopPlayerMoves
+    call AttackerTypeMatchOneOfDefenderTypesPlusException
+    ret z
     ld a,[W_ENEMYMOVEEFFECT]
-    cp a,7
-    ld b,$1a
-    jr c,.next1
-    ld b,$4d
-    sub a,$1e
-.next1
+    call MoveEffectToPercentage
     push af
     call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle
     cp b
@@ -60575,6 +60583,29 @@ UnnamedText_3f3d8: ; 3f3d8 (f:73d8)
 UnnamedText_3f3dd: ; 3f3dd (f:73dd)
     TX_FAR _UnnamedText_3f3dd
     db "@"
+
+AttackerTypeMatchOneOfDefenderTypesPlusException:
+    push hl
+    call .Loop4MovesInHLAndCompareWithA
+    pop hl
+    ret z
+    cp THUNDER
+    ret nz
+    ld a,ROCK
+    ; fall through
+.Loop4MovesInHLAndCompareWithA
+    ld b,4
+.loop
+    cp [hl]
+    ret z ; return if they match
+          ; can't freeze an ice type
+          ; can't paralyze a rock type
+          ; etc....
+    inc hl
+    dec b
+    jr nz,.loop
+    inc b ; rzf
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 ; StatModifierUpEffect
@@ -67020,17 +67051,15 @@ VictoryRoad3Script_44996: ; 44996 (11:4996)
     res 5,[hl]
     ret z
     ld hl,$d813
-    bit 0,[hl]
+    bit 0,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH1
     ret z
+    call BoulderOnSwitch4
     ld a,$1d
     ld [$d09f],a
     ld bc,$503
     PREDEF_JUMP ReplaceTileBlock
 
-VictoryRoad3ScriptPointers: ; 449b1 (11:49b1)
-    dw VictoryRoad3Script0
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+SECTION "VictoryRoad3Script0",ROMX[$49b7],BANK[$11]
 
 VictoryRoad3Script0: ; 449b7 (11:49b7)
     ld hl,wFlags_0xcd60
@@ -67046,12 +67075,14 @@ VictoryRoad3Script0: ; 449b7 (11:49b7)
     ld hl,$d126
     set 5,[hl]
     ld hl,$d813
-    set 0,[hl]
+    set 0,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH1
     ret
 .asm_449dc
+	; wispnote - This event signifies that a boulder was thrown through a hole;
+	; it is not realted to any switch.
     ld hl,$d813
-    bit 6,[hl]
-    set 6,[hl]
+    bit 6,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH2
+    set 6,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH2
     jr nz,.asm_449fe
     ld a,$7a
     ld [$cc4d],a
@@ -69679,34 +69710,7 @@ SeafoamIslands4ScriptPointers: ; 465fb (11:65fb)
     dw SeafoamIslands4Script2
     dw SeafoamIslands4Script3
 
-SeafoamIslands4Script0: ; 46603 (11:6603)
-    ld a,[$d880]
-    and $3
-    cp $3
-    ret z
-    ld a,[$d361]
-    cp $8
-    ret nz
-    ld a,[$d362]
-    cp $f
-    ret nz
-    ld hl,$ccd3
-    ld de,RLEMovement46632
-    call DecodeRLEList
-    dec a
-    ld [$cd38],a
-    call StartSimulatingJoypadStates
-    ld hl,W_FLAGS_D733
-    set 2,[hl]
-    ld a,$1
-    ld [W_SEAFOAMISLANDS4CURSCRIPT],a
-    ret
-
-RLEMovement46632: ; 46632 (11:6632)
-    db $80,6
-    db $10,5
-    db $80,3
-    db $ff
+SECTION "SeafoamIslands4Script1",ROMX[$6639],BANK[$11]
 
 SeafoamIslands4Script1: ; 46639 (11:6639)
     ld a,[$cd38]
@@ -69930,10 +69934,10 @@ RLEMovementData_46859: ; 46859 (11:6859)
 
 SeafoamIslands5Script3: ; 46860 (11:6860)
     ld a,[$cd38]
-    ld b,a
+    push af
     cp $1
     call z,SeaFoamIslands5Script_46872
-    ld a,b
+    pop af
     and a
     ret nz
     ld a,$0
@@ -70046,7 +70050,7 @@ Func_469a0: ; 469a0 (11:69a0)
     ld b,a
     cp $ff
     jr z,.asm_469fc
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     cp b
     jr z,.asm_469be
     inc de
@@ -71367,6 +71371,65 @@ InitBattleEnemyParameters_Giovanni_Bank11:
     call InitBattleEnemyParameters
     ld a,8
     ld [W_GYMLEADERNO],a
+    ret
+
+; ───────────────────────────────────────
+
+SeafoamIslands4Script0:
+    ld a,[$d880]
+    and $3
+    cp $3
+    ret z
+    ld hl,.CoordsData
+    call ArePlayerCoordsInArray
+    ret nc
+    ld a,[$cd3d]
+    cp $1
+    ld de,.RLEMovement0815
+    jr z,.done
+    ld de,.RLEMovement1023
+.done
+    ld hl,$ccd3
+    call DecodeRLEList
+    dec a
+    ld [$cd38],a
+    call StartSimulatingJoypadStates
+    ld hl,W_FLAGS_D733
+    set 2,[hl]
+    ld a,$1
+    ld [W_SEAFOAMISLANDS4CURSCRIPT],a
+    ret
+.CoordsData
+    db 08,15
+    db 10,23
+    db $FF
+.RLEMovement0815
+    db $80,6
+    db $10,5
+    db $80,3
+    db $ff
+.RLEMovement1023
+    db $80,6
+    db $20,2
+    db $80,1
+    db $ff
+
+; ───────────────────────────────────────
+
+VictoryRoad3ScriptPointers:
+    dw VictoryRoad3Script0
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+
+; wispnote - If the switch is activated place the boulder in switch's coordinates.
+; Sprite07 indexes the first boulder, and ($03, $05) are the first swtich's coordinates.
+BoulderOnSwitch4:
+    ld hl,$c274 ; Sprite07MapY
+    ld a,$05 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ld hl,$c275 ; Sprite07MapX
+    ld a,$03 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
     ret
 
 ; ───────────────────────────────────────
@@ -76603,7 +76666,7 @@ Route20Script: ; 50ca9 (14:4ca9)
     ld hl,$d7e7
     bit 0,[hl]
     res 0,[hl]
-    call nz,Func_50cc6
+    call nz,ResetSeaFormEventsIfNotCompleted
     call EnableAutoTextBoxDrawing
     ld hl,Route20TrainerHeader0 ; $4d3a
     ld de,Route20ScriptPointers
@@ -76612,69 +76675,72 @@ Route20Script: ; 50ca9 (14:4ca9)
     ld [W_ROUTE20CURSCRIPT],a
     ret
 
-Func_50cc6: ; 50cc6 (14:4cc6)
-    ld a,[$d880]
-    and $3
-    cp $3
-    jr z,.asm_50cef
+; ──────────────────────────────────
+
+ResetSeaFormEventsIfNotCompleted:
+    ld hl,$d880
+    call .CheckBit01
+    jr z,.NextFlagsByte
+    call .ResetBit01
     ld a,$d7
-    call Func_50d0c
+    call .AddMissableObject
     ld a,$d8
-    call Func_50d0c
+    call .AddMissableObject
     ld hl,.MissableObjectIDs ; $4ce8
-.asm_50cdc
+.loop
     ld a,[hli]
     cp $ff
-    jr z,.asm_50cef
+    jr z,.NextFlagsByte
     push hl
-    call Func_50d14
+    call .RemoveMissableObject
     pop hl
-    jr .asm_50cdc
+    jr .loop
 
-.MissableObjectIDs: ; 50ce8 (14:4ce8)
+.MissableObjectIDs:
     db $D9,$DA,$DB,$DC,$DF,$E0,$FF
 
-.asm_50cef
-    ld a,[$d881]
-    and $3
-    cp $3
+.NextFlagsByte
+    ld hl,$d881
+    call .CheckBit01
     ret z
+    call .ResetBit01
     ld a,$dd
-    call Func_50d0c
+    call .AddMissableObject
     ld a,$de
-    call Func_50d0c
+    call .AddMissableObject
     ld a,$e1
-    call Func_50d14
+    call .RemoveMissableObject
     ld a,$e2
-    call Func_50d14
+    jr .RemoveMissableObject
+
+.CheckBit01
+    ld a,[hl]
+    and %00000011
+    cp %00000011
     ret
 
-Func_50d0c: ; 50d0c (14:4d0c)
+.ResetBit01
+    ld a,[hl]
+    and %11111100
+    ld [hl],a
+    ret
+
+.AddMissableObject
     ld [$cc4d],a
     PREDEF_JUMP AddMissableObject
 
-Func_50d14: ; 50d14 (14:4d14)
+.RemoveMissableObject
     ld [$cc4d],a
     PREDEF_JUMP RemoveMissableObject
 
-Route20ScriptPointers: ; 50d1c (14:4d1c)
+; ──────────────────────────────────
+
+Route20ScriptPointers:
     dw CheckFightingMapTrainers
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
-Route20TextPointers: ; 50d22 (14:4d22)
-    dw Route20Text1
-    dw Route20Text2
-    dw Route20Text3
-    dw Route20Text4
-    dw Route20Text5
-    dw Route20Text6
-    dw Route20Text7
-    dw Route20Text8
-    dw Route20Text9
-    dw Route20Text10
-    dw Route20Text11
-    dw Route20Text12
+SECTION "Route20TrainerHeaders",ROMX[$4d3a],BANK[$14]
 
 Route20TrainerHeaders: ; 50d3a (14:4d3a)
 Route20TrainerHeader0: ; 50d3a (14:4d3a)
@@ -77403,12 +77469,17 @@ Func_511e9: ; 511e9 (14:51e9)
     bit 6,[hl]
     res 6,[hl]
     ret z
+; wispnote - Resetting Victory Road Puzzle
+; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH was probably mentto be reset here
+; along with the rest of the puzzle instead on Indigo Plateau Loby.
+    ld hl,$d869
+    res 7,[hl] ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
     ld hl,$d7ee
-    res 0,[hl]
-    res 7,[hl]
+    res 0,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
+    res 7,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH2
     ld hl,$d813
-    res 0,[hl]
-    res 6,[hl]
+    res 0,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH1
+    res 6,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH2
     ld a,$7a
     ld [$cc4d],a
     PREDEF AddMissableObject
@@ -77416,10 +77487,7 @@ Func_511e9: ; 511e9 (14:51e9)
     ld [$cc4d],a
     PREDEF_JUMP RemoveMissableObject
 
-Route23ScriptPointers: ; 51213 (14:5213)
-    dw Route23Script0
-    dw Route23Script1
-    dw Route23Script2
+SECTION "Route23Script0",ROMX[$5219],BANK[$14]
 
 Route23Script0: ; 51219 (14:5219)
     ld hl,YCoordsData_51255 ; $5255
@@ -78267,14 +78335,16 @@ VictoryRoad2_h: ; 0x51791 to 0x5179d (12 bytes) (id=194)
     dw VictoryRoad2Object ; objects
 
 VictoryRoad2Script: ; 5179d (14:579d)
-    ld hl,$d126
-    bit 6,[hl]
-    res 6,[hl]
-    call nz,VictoryRoad2Script_517c4
+; wispnote - Due to various evidence I suspect that the puzzle
+; wasn't ment to be reset and this instruction was left for debugging purposes.
+;    ld hl,$d126
+;    bit 6,[hl]
+;    res 6,[hl]
+;    call nz,VictoryRoad2Script_517c4
     ld hl,$d126
     bit 5,[hl]
     res 5,[hl]
-    call nz,Func_517c9
+    call nz,VictoryRoad2Script_517c9
     call EnableAutoTextBoxDrawing
     ld hl,VictoryRoad2TrainerHeaders
     ld de,VictoryRoad2ScriptPointers
@@ -78283,31 +78353,11 @@ VictoryRoad2Script: ; 5179d (14:579d)
     ld [W_VICTORYROAD2CURSCRIPT],a
     ret
 
-VictoryRoad2Script_517c4: ; 517c4 (14:57c4)
-    ld hl,$d869
-    res 7,[hl]
+;VictoryRoad2Script_517c4: ; 517c4 (14:57c4)
+;    ld hl,$d869
+;    res 7,[hl] ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
 
-Func_517c9: ; 517c9 (14:57c9)
-    ld a,[$d7ee]
-    bit 0,a
-    jr z,.asm_517da
-    push af
-    ld a,$15
-    ld bc,$403
-    call Func_517e2
-    pop af
-.asm_517da
-    bit 7,a
-    ret z
-    ld a,$1d
-    ld bc,$70b
-
-Func_517e2: ; 517e2 (14:57e2)
-    ld [$d09f],a
-    PREDEF ReplaceTileBlock
-    ret
-
-VictoryRoad2Script0: ; 517f1 (14:57f1)
+VictoryRoad2Script0:
     call CheckOnix
     ld hl,CoordsData_51816 ; $5816
     call CheckBoulderCoords
@@ -78316,13 +78366,13 @@ VictoryRoad2Script0: ; 517f1 (14:57f1)
     ld a,[wWhichTrade] ; $cd3d
     cp $2
     jr z,.asm_5180b
-    bit 0,[hl]
-    set 0,[hl]
+    bit 0,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
+    set 0,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
     ret nz
     jr .asm_51810
 .asm_5180b
-    bit 7,[hl]
-    set 7,[hl]
+    bit 7,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH2
+    set 7,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH2
     ret nz
 .asm_51810
     ld hl,$d126
@@ -80691,6 +80741,69 @@ GetPrizeMonLevel:
     db CLOYSTER,31 ; Entry Point
     db EXEGGUTOR,31 ; Entry Point
     db $FF
+
+Route20TextPointers:
+    dw Route20Text1
+    dw Route20Text2
+    dw Route20Text3
+    dw Route20Text4
+    dw Route20Text5
+    dw Route20Text6
+    dw Route20Text7
+    dw Route20Text8
+    dw Route20Text9
+    dw Route20Text10
+    dw Route20Text11
+    dw Route20Text12
+
+Route23ScriptPointers:
+    dw Route23Script0
+    dw Route23Script1
+    dw Route23Script2
+
+VictoryRoad2Script_517c9:
+    ld a,[$d7ee]
+    bit 0,a ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
+    jr z,.asm_517da
+    push af
+    call BoulderOnSwitch2
+    ld a,$15
+    ld bc,$403
+    call .Func_517e2
+    pop af
+.asm_517da
+    bit 7,a ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH2
+    ret z
+    call BoulderOnSwitch3
+    ld a,$1d
+    ld bc,$70b
+.Func_517e2
+    ld [$d09f],a
+    PREDEF_JUMP ReplaceTileBlock
+
+; wispnote - If the 1st switch is activated place the boulder in switch's coordinates.
+; Sprite11 indexes the 1st boulder, and ($01, $10) are the 1st swtich's coordinates.
+BoulderOnSwitch2:
+    ld hl,$c2b4 ; Sprite11MapY
+    ld a,$10 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ld hl,$c2b5 ; Sprite11MapX
+    ld a,$01 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ret
+
+; wispnote - If the 2nd switch is activated place the boulder in switch's coordinates.
+; Sprite13 indexes the 2nd boulder, and ($09, $10) are the 2nd swtich's coordinates.
+; Not it should be impossible for a boulder to arrive there if Sprite13 is hidden;
+; therefore, there is no need to check.
+BoulderOnSwitch3:
+    ld hl,$c2d4 ; Sprite13MapY
+    ld a,$10 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ld hl,$c2d5 ; Sprite13MapX
+    ld a,$09 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ret
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -92465,21 +92578,19 @@ VictoryRoad1Script: ; 5da0a (17:5a0a)
     ret
 .next
     ld a,[$d869]
-    bit 7,a
+    bit 7,a ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
     ret z
+    call BoulderOnSwitch1
     ld a,$1d
     ld [$d09f],a
     ld bc,$604
     PREDEF_JUMP ReplaceTileBlock
 
-VictoryRoad1ScriptPointers: ; 5da3a (17:5a3a)
-    dw VictoryRoad1Script0
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+SECTION "VictoryRoad1Script0",ROMX[$5a40],BANK[$17]
 
 VictoryRoad1Script0: ; 5da40 (17:5a40)
     ld a,[$d869]
-    bit 7,a
+    bit 7,a ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
     jp nz,CheckFightingMapTrainers
     ld hl,CoordsData_5da5c ; $5a5c
     call CheckBoulderCoords
@@ -92487,7 +92598,7 @@ VictoryRoad1Script0: ; 5da40 (17:5a40)
     ld hl,$d126
     set 5,[hl]
     ld hl,$d869
-    set 7,[hl]
+    set 7,[hl] ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
     ret
 
 CoordsData_5da5c: ; 5da5c (17:5a5c)
@@ -93253,6 +93364,24 @@ InitBattleEnemyParametersDojo:
     call InitBattleEnemyParameters
     ld a,9
     ld [W_GYMLEADERNO],a
+    ret
+
+; ───────────────────────────────────────────
+
+VictoryRoad1ScriptPointers:
+    dw VictoryRoad1Script0
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+
+; wispnote - If the switch is activated place the boulder in switch's coordinates.
+; Sprite05 indexes the boulder, and ($11, $0D) are the swtich's coordinates.
+BoulderOnSwitch1:
+    ld hl,$c254 ; Sprite05MapY
+    ld a,$0D + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ld hl,$c255 ; Sprite05MapX
+    ld a,$11 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
     ret
 
 ; ───────────────────────────────────────────
@@ -99468,7 +99597,7 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
     push hl
     ld a,$1
     ld [$FF00+$b7],a
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     push af
     ld b,$0
     call Func_711c4
@@ -99575,7 +99704,7 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
     ld [wWhichTrade],a ; $cd3d
     jp .townMapLoop
 .selectPressed
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     jp .RestartCurrentMap
 
 SetTownMapBeforeJoypad:
@@ -99642,7 +99771,7 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     ld hl,wTileMap
     ld de,.ToText ; $506d
     call PlaceString
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     ld b,$0
     call Func_711c4
     ld hl,$cd3e
@@ -99905,7 +100034,7 @@ Func_711ef:
     ld a,l
     and a
     jr z,.asm_7123e
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     ld b,$0
     call Func_711c4
 .asm_7123e
@@ -104477,7 +104606,7 @@ Func_7481f: ; 7481f (1d:481f)
     ld b,$0
 .asm_74824
     ld de,$0003
-    ld a,[$d35e]
+    ld a,[W_CURMAP]
     call IsInArrayCummulativeCount
     ret nc
     push bc
@@ -132041,6 +132170,8 @@ SuperPalettes:
     INCLUDE "constants/SuperPalettes.asm"
 
 SelectInOverWorld:
+    ld hl,wSelectInOverworldOnBit6
+    set 6,[hl]
     PREDEF Func_c586 ; Update Next Tile
     scf ; set carry flag
     ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
@@ -132052,15 +132183,19 @@ SelectInOverWorld:
 .Select
     call c,.TryFishing
     call c,.TryBike
-    ret
+    jr .end
 .SelectPlusA
     call c,.TryItemFinder
-    ret
+    jr .end
 .SelectPlusB
     call c,.TryCut
     call c,.TryFloat
     call c,.TryLight
     call c,.TryStrength
+    ; fall through
+.end
+    ld hl,wSelectInOverworldOnBit6
+    res 6,[hl]
     ret
 
 .TryCut
@@ -132285,16 +132420,12 @@ SelectInOverWorld:
 
 .StartCustomSelectFunction
     push bc
-    ld hl,wSelectInOverworldOnBit6
-    set 6,[hl]
     call .InitializeTextBox
     pop bc
     ret
 
 .EndCustomSelectFunction
     call .DisplayNothing
-    ld hl,wSelectInOverworldOnBit6
-    res 6,[hl]
     xor a ; reset carry flag
     ret
 
@@ -142020,8 +142151,6 @@ GetDefenderType:
 ; c = Attacker Move ID
 ; Output
 ; [wTmpAttackerTypes] = types of attacker
-; Note = "Birds", Rapidash & Seaking gain IVORY STAB
-;        Sandshrew/Sansdlash gain STAB with "Slash moves"
 GetAttackerType_:
     call Load16BitRegisters
 GetAttackerType:
@@ -142084,6 +142213,13 @@ GetAttackerType:
     dw .QuickMoveTable     , .QuickMonTable
     dw .TriAttMoveTable    , .TriAttMonTable
     dw .EggMoveTable       , .EggMonTable
+    dw .SkullMoveTable     , .SkullMonTable
+    dw .StompMoveTable     , .StompMonTable
+    dw .HeadButtMoveTable  , .HeadButtMonTable
+    dw .HyperBeamMoveTable , .HyperBeamMonTable
+    dw .RageMoveTable      , .RageMonTable
+    dw .LickMoveTable      , .LickMonTable
+    dw .SwiftMoveTable     , .SwiftMonTable
     db $FF
 
 .TryToForceIvory
@@ -142155,6 +142291,77 @@ GetAttackerType:
 .EggMonTable
     db EXEGGCUTE
     db EXEGGUTOR
+    db $FF
+
+.SkullMoveTable
+    db SKULL_BASH
+    db $FF
+.SkullMonTable
+    db CUBONE
+    db MAROWAK
+    db $FF
+
+.StompMoveTable
+    db STOMP
+    db $FF
+.StompMonTable
+    db VENUSAUR
+    db BLASTOISE
+    db GRAVELER
+    db GOLEM
+    db EXEGGUTOR
+    db RHYHORN
+    db RHYDON
+    db KANGASKHAN
+    db SNORLAX
+    db NIDOQUEEN
+    db NIDOKING
+    db $FF
+
+.HeadButtMoveTable
+    db HEADBUTT
+    db $FF
+.HeadButtMonTable
+    db CUBONE
+    db MAROWAK
+    db $FF
+
+.HyperBeamMoveTable
+    db HYPER_BEAM
+    db $FF
+.HyperBeamMonTable
+    db MEWTWO
+    db $FF
+
+.RageMoveTable
+    db RAGE
+    db $FF
+.RageMonTable
+    db MANKEY
+    db PRIMEAPE
+    db DODUO
+    db DODRIO
+    db MEWTWO
+    db $FF
+
+.LickMoveTable
+    db LICK
+    db $FF
+.LickMonTable
+    db LICKITUNG
+    db GASTLY
+    db HAUNTER
+    db GENGAR
+    db $FF
+
+.SwiftMoveTable
+    db SWIFT
+    db $FF
+.SwiftMonTable
+    db CLEFAIRY
+    db CLEFABLE
+    db JIGGLYPUFF
+    dw WIGGLYTUFF
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────

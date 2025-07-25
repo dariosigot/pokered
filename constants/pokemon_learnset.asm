@@ -564,6 +564,7 @@ NIDOQUEEN_Learnset: MACRO
     db 25,HYPER_FANG
     db 27,BODY_SLAM
     db 31,SKULL_BASH
+    db 33,STOMP
     db 35,SLUDGE
     db 39,DIZZY_PUNCH
     db 43,EARTHQUAKE
@@ -627,6 +628,7 @@ NIDOKING_Learnset: MACRO
     db 25,SLASH
     db 27,BODY_SLAM
     db 31,SLUDGE
+    db 33,STOMP
     db 35,SKULL_BASH
     db 39,DIZZY_PUNCH
     db 43,EARTHQUAKE
