@@ -142139,8 +142139,6 @@ GetDefenderType:
 ; c = Attacker Move ID
 ; Output
 ; [wTmpAttackerTypes] = types of attacker
-; Note = "Birds", Rapidash & Seaking gain IVORY STAB
-;        Sandshrew/Sansdlash gain STAB with "Slash moves"
 GetAttackerType_:
     call Load16BitRegisters
 GetAttackerType:
@@ -142203,6 +142201,13 @@ GetAttackerType:
     dw .QuickMoveTable     , .QuickMonTable
     dw .TriAttMoveTable    , .TriAttMonTable
     dw .EggMoveTable       , .EggMonTable
+    dw .SkullMoveTable     , .SkullMonTable
+    dw .StompMoveTable     , .StompMonTable
+    dw .HeadButtMoveTable  , .HeadButtMonTable
+    dw .HyperBeamMoveTable , .HyperBeamMonTable
+    dw .RageMoveTable      , .RageMonTable
+    dw .LickMoveTable      , .LickMonTable
+    dw .SwiftMoveTable     , .SwiftMonTable
     db $FF
 
 .TryToForceIvory
@@ -142274,6 +142279,77 @@ GetAttackerType:
 .EggMonTable
     db EXEGGCUTE
     db EXEGGUTOR
+    db $FF
+
+.SkullMoveTable
+    db SKULL_BASH
+    db $FF
+.SkullMonTable
+    db CUBONE
+    db MAROWAK
+    db $FF
+
+.StompMoveTable
+    db STOMP
+    db $FF
+.StompMonTable
+    db VENUSAUR
+    db BLASTOISE
+    db GRAVELER
+    db GOLEM
+    db EXEGGUTOR
+    db RHYHORN
+    db RHYDON
+    db KANGASKHAN
+    db SNORLAX
+    db NIDOQUEEN
+    db NIDOKING
+    db $FF
+
+.HeadButtMoveTable
+    db HEADBUTT
+    db $FF
+.HeadButtMonTable
+    db CUBONE
+    db MAROWAK
+    db $FF
+
+.HyperBeamMoveTable
+    db HYPER_BEAM
+    db $FF
+.HyperBeamMonTable
+    db MEWTWO
+    db $FF
+
+.RageMoveTable
+    db RAGE
+    db $FF
+.RageMonTable
+    db MANKEY
+    db PRIMEAPE
+    db DODUO
+    db DODRIO
+    db MEWTWO
+    db $FF
+
+.LickMoveTable
+    db LICK
+    db $FF
+.LickMonTable
+    db LICKITUNG
+    db GASTLY
+    db HAUNTER
+    db GENGAR
+    db $FF
+
+.SwiftMoveTable
+    db SWIFT
+    db $FF
+.SwiftMonTable
+    db CLEFAIRY
+    db CLEFABLE
+    db JIGGLYPUFF
+    dw WIGGLYTUFF
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
