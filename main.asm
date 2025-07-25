@@ -23447,11 +23447,19 @@ IsSurfingAllowed:
     ret nc
     ld hl,$d728
     res 1,[hl]
-    ld hl,UnnamedText_cdfa ; $4dfa
-    jp PrintText
+    ld hl,.PrintText1
+    jr .printText
 .asm_cdec
     ld hl,$d728
     res 1,[hl]
+    ld hl,.PrintText2
+    jr .printText
+.printText
+    jp RunOnlyIfNotSelectInOverworld
+.PrintText1
+    ld hl,UnnamedText_cdfa ; $4dfa
+    jp PrintText
+.PrintText2
     ld hl,UnnamedText_cdff ; $4dff
     jp PrintText
 
@@ -132049,6 +132057,8 @@ SuperPalettes:
     INCLUDE "constants/SuperPalettes.asm"
 
 SelectInOverWorld:
+    ld hl,wSelectInOverworldOnBit6
+    set 6,[hl]
     PREDEF Func_c586 ; Update Next Tile
     scf ; set carry flag
     ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
@@ -132060,15 +132070,19 @@ SelectInOverWorld:
 .Select
     call c,.TryFishing
     call c,.TryBike
-    ret
+    jr .end
 .SelectPlusA
     call c,.TryItemFinder
-    ret
+    jr .end
 .SelectPlusB
     call c,.TryCut
     call c,.TryFloat
     call c,.TryLight
     call c,.TryStrength
+    ; fall through
+.end
+    ld hl,wSelectInOverworldOnBit6
+    res 6,[hl]
     ret
 
 .TryCut
@@ -132293,16 +132307,12 @@ SelectInOverWorld:
 
 .StartCustomSelectFunction
     push bc
-    ld hl,wSelectInOverworldOnBit6
-    set 6,[hl]
     call .InitializeTextBox
     pop bc
     ret
 
 .EndCustomSelectFunction
     call .DisplayNothing
-    ld hl,wSelectInOverworldOnBit6
-    res 6,[hl]
     xor a ; reset carry flag
     ret
 
