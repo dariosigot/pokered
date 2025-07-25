@@ -576,7 +576,6 @@ MistBlockEffects:    ;joenote - added this table to track for things blocked by 
 SpecialZeroBPMoves:    ;joenote - added this table to tracks 0 bp moves that should not be treated as buffs
     db BIDE
     db METRONOME
-    db THUNDER_WAVE
     db $FF
 
 OtherZeroBPEffects:    ;joenote - added to keep track of some outliers
@@ -854,6 +853,30 @@ AIMoveChoiceModification3:
 .endflydigcheck
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Check Thunder Wave
+    ld a,[W_ENEMYMOVENUM]
+    cp THUNDER_WAVE
+    jr nz,.NotThunderWave
+    push hl
+    push bc
+    ld b,4
+    ld hl,W_PLAYERMONTYPES
+.LoopParalyzableType
+    ld a,[hli]
+    cp EARTH
+    jr z,.NotParalyzable
+    cp ROCK
+    jr z,.NotParalyzable
+    dec b
+    jr nz,.LoopParalyzableType
+    dec b ; b = $FF : reset z flag
+.NotParalyzable
+    pop bc
+    pop hl
+    jp z,.heavydiscourage2
+.NotThunderWave
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;check on certain moves with zero bp but are handled differently
     ld a,[W_ENEMYMOVENUM]
     push hl
@@ -890,7 +913,9 @@ AIMoveChoiceModification3:
 
     ld a,[$d11e]    ;get the effectiveness
     and a     ;check if it's zero
-    jr nz,.skipout2    ;skip if it's not immune
+    jr z,.heavydiscourage2
+
+    jr .skipout2    ;skip if it's not immune
 .heavydiscourage2    ;at this line the move has no effect due to immunity or other circumstance
     ld a,[hl]
     add $5 ; heavily discourage move
