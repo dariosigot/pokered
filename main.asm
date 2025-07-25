@@ -53353,6 +53353,14 @@ MainInBattleLoop: ; 3c233 (f:4233)
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
 
+MoveEffectToPercentage:
+    cp a,7    ; 10% status effects are 04,05,06 so 07 will set carry for those
+    ld b,$1a  ; [1A-1]/100 or [26-1]/256 = 9.8%~ chance
+    ret c     ; branch ahead if this is a 10% chance effect..
+    ld b,$4d  ; ..or use [4D-1]/100 or [76-1]/256 = 29.7%~ chance
+    sub a,$1e ; subtract $1E to map to equivalent 10% chance effects
+    ret
+
 ; Free
 
 SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
@@ -60486,33 +60494,23 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     ret nz             ;return if they have a substitute,can't effect them
     ld a,[$ff00+$f3]  ;whose turn?
     and a
-    jp nz,opponentAttacker
+    jp nz,OpponentAttacker
+
+PlayerAttacker:
     ld a,[W_ENEMYMONSTATUS]
     and a
-    jp nz,CheckDefrost
-    ;opponent has no existing status
+    jp nz,CheckDefrost ;opponent has existing status
     call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
     ld hl,W_ENEMYMONTYPES
-    ld b,4
-.LoopEnemyMoves
-    cp [hl]
-    ret z ; return if they match [can't freeze an ice type etc.]
-    inc hl
-    dec b
-    jr nz,.LoopEnemyMoves
+    call AttackerTypeMatchOneOfDefenderTypesPlusException
+    ret z
     ld a,[W_PLAYERMOVEEFFECT]
-    cp a,7         ;10% status effects are 04,05,06 so 07 will set carry for those
-    ld b,$1a       ;[1A-1]/100 or [26-1]/256 = 9.8%~ chance
-    jr c,.next1  ;branch ahead if this is a 10% chance effect..
-    ld b,$4d       ;..or use [4D-1]/100 or [76-1]/256 = 29.7%~ chance
-    sub a,$1e      ;subtract $1E to map to equivalent 10% chance effects
-.next1
+    call MoveEffectToPercentage
     push af     ;push effect...
     call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle  ;get random 8bit value for probability test
     cp b        ;success?
     pop bc      ;...pop effect into C
     ret nc      ;do nothing if random value is >= 1A or 4D [no status applied]
-                ;the test passed
     ld a,b     ;what type of effect is this?
     cp a,BURN_SIDE_EFFECT1
     jr z,.burn
@@ -60537,26 +60535,17 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
     call PlayA9BattleAnimation
     ld hl,UnnamedText_3f3dd
     jp DrawHudAndPrintText
-opponentAttacker: ; 3f382 (f:7382)
+
+OpponentAttacker:
     ld a,[W_PLAYERMONSTATUS]  ;this appears to the same as above with addresses swapped for opponent
     and a
     jp nz,CheckDefrost
     call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
     ld hl,W_PLAYERMONTYPES
-    ld b,4
-.LoopPlayerMoves
-    cp [hl]
-    ret z ; return if they match [can't freeze an ice type etc.]
-    inc hl
-    dec b
-    jr nz,.LoopPlayerMoves
+    call AttackerTypeMatchOneOfDefenderTypesPlusException
+    ret z
     ld a,[W_ENEMYMOVEEFFECT]
-    cp a,7
-    ld b,$1a
-    jr c,.next1
-    ld b,$4d
-    sub a,$1e
-.next1
+    call MoveEffectToPercentage
     push af
     call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle
     cp b
@@ -60594,6 +60583,29 @@ UnnamedText_3f3d8: ; 3f3d8 (f:73d8)
 UnnamedText_3f3dd: ; 3f3dd (f:73dd)
     TX_FAR _UnnamedText_3f3dd
     db "@"
+
+AttackerTypeMatchOneOfDefenderTypesPlusException:
+    push hl
+    call .Loop4MovesInHLAndCompareWithA
+    pop hl
+    ret z
+    cp THUNDER
+    ret nz
+    ld a,ROCK
+    ; fall through
+.Loop4MovesInHLAndCompareWithA
+    ld b,4
+.loop
+    cp [hl]
+    ret z ; return if they match
+          ; can't freeze an ice type
+          ; can't paralyze a rock type
+          ; etc....
+    inc hl
+    dec b
+    jr nz,.loop
+    inc b ; rzf
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 ; StatModifierUpEffect
