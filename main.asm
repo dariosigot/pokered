@@ -14975,7 +14975,7 @@ Func_62ff: ; 62ff (1:62ff)
     res 4,[hl]
     ld a,[$d71d]
     ld b,a
-    call ChangeCurMap ; $d35e
+    call ChangeCurMap
     ld a,[$d71e]
     ld c,a
     call GetDungeonWarpList ; ld hl,DungeonWarpList ; $63bf
@@ -15005,7 +15005,7 @@ Func_62ff: ; 62ff (1:62ff)
     ld a,[$d71a]
 .asm_6391
     ld b,a
-    call ChangeCurMap ; $d35e
+    call ChangeCurMap
     call GetFlyWarpDataPtr ; ld hl,FlyWarpDataPtr ; $6448
 .asm_6398
     ld a,[hli]
@@ -21392,7 +21392,7 @@ CheckForceBikeOrSurf: ; c38b (3:438b)
     ld a,$2
     ld [W_SEAFOAMISLANDS4CURSCRIPT],a
     jr z,.forceSurfing
-    ld a,[$d35e]
+    call GetCurrentOldAdventureMap
     cp SEAFOAM_ISLANDS_5
     ld a,$2
     ld [W_SEAFOAMISLANDS5CURSCRIPT],a
@@ -45091,7 +45091,7 @@ CableClubLeftGameboy:
     ld a,[$c109]
     cp $c
     ret nz
-    ld a,[$d35e]
+    call GetCurrentOldAdventureMap
     cp $ef
     ld a,$2
     jr z,.asm_2183a
@@ -45109,7 +45109,7 @@ CableClubRightGameboy:
     ld a,[$c109]
     cp $8
     ret nz
-    ld a,[$d35e]
+    call GetCurrentOldAdventureMap
     cp $ef
     ld a,$2
     jr z,.asm_2185a
@@ -70038,7 +70038,7 @@ Func_469a0: ; 469a0 (11:69a0)
     ld b,a
     cp $ff
     jr z,.asm_469fc
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     cp b
     jr z,.asm_469be
     inc de
@@ -99585,7 +99585,7 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
     push hl
     ld a,$1
     ld [$FF00+$b7],a
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     push af
     ld b,$0
     call Func_711c4
@@ -99692,7 +99692,7 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
     ld [wWhichTrade],a ; $cd3d
     jp .townMapLoop
 .selectPressed
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     jp .RestartCurrentMap
 
 SetTownMapBeforeJoypad:
@@ -99759,7 +99759,7 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     ld hl,wTileMap
     ld de,.ToText ; $506d
     call PlaceString
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     ld b,$0
     call Func_711c4
     ld hl,$cd3e
@@ -100022,7 +100022,7 @@ Func_711ef:
     ld a,l
     and a
     jr z,.asm_7123e
-    ld a,[W_CURMAP] ; $d35e
+    ld a,[W_CURMAP]
     ld b,$0
     call Func_711c4
 .asm_7123e
@@ -104594,7 +104594,7 @@ Func_7481f: ; 7481f (1d:481f)
     ld b,$0
 .asm_74824
     ld de,$0003
-    ld a,[$d35e]
+    ld a,[W_CURMAP]
     call IsInArrayCummulativeCount
     ret nc
     push bc
