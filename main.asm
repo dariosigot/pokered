@@ -35685,8 +35685,9 @@ IndigoPlateauLobbyScript: ; 19c5b (6:5c5b)
     bit 6,[hl]
     res 6,[hl]
     ret z
-    ld hl,$d869
-    res 7,[hl]
+; wispnote - This event was probably ment to be reset on Route 23.
+;    ld hl,$d869
+;    res 7,[hl] ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
     ld hl,$d734
     bit 1,[hl]
     res 1,[hl]
@@ -35698,6 +35699,8 @@ IndigoPlateauLobbyScript: ; 19c5b (6:5c5b)
     ld [hli],a
     ld [hl],a
     ret
+
+SECTION "IndigoPlateauLobbyTextPointers",ROMX[$5c7f],BANK[$6]
 
 IndigoPlateauLobbyTextPointers: ; 19c7f (6:5c7f)
     dw IndigoPlateauLobbyText1
@@ -67036,17 +67039,15 @@ VictoryRoad3Script_44996: ; 44996 (11:4996)
     res 5,[hl]
     ret z
     ld hl,$d813
-    bit 0,[hl]
+    bit 0,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH1
     ret z
+    call BoulderOnSwitch4
     ld a,$1d
     ld [$d09f],a
     ld bc,$503
     PREDEF_JUMP ReplaceTileBlock
 
-VictoryRoad3ScriptPointers: ; 449b1 (11:49b1)
-    dw VictoryRoad3Script0
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+SECTION "VictoryRoad3Script0",ROMX[$49b7],BANK[$11]
 
 VictoryRoad3Script0: ; 449b7 (11:49b7)
     ld hl,wFlags_0xcd60
@@ -67062,12 +67063,14 @@ VictoryRoad3Script0: ; 449b7 (11:49b7)
     ld hl,$d126
     set 5,[hl]
     ld hl,$d813
-    set 0,[hl]
+    set 0,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH1
     ret
 .asm_449dc
+	; wispnote - This event signifies that a boulder was thrown through a hole;
+	; it is not realted to any switch.
     ld hl,$d813
-    bit 6,[hl]
-    set 6,[hl]
+    bit 6,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH2
+    set 6,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH2
     jr nz,.asm_449fe
     ld a,$7a
     ld [$cc4d],a
@@ -71398,6 +71401,24 @@ SeafoamIslands4Script0:
     db $20,2
     db $80,1
     db $ff
+
+; ───────────────────────────────────────
+
+VictoryRoad3ScriptPointers:
+    dw VictoryRoad3Script0
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+
+; wispnote - If the switch is activated place the boulder in switch's coordinates.
+; Sprite07 indexes the first boulder, and ($03, $05) are the first swtich's coordinates.
+BoulderOnSwitch4:
+    ld hl,$c274 ; Sprite07MapY
+    ld a,$05 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ld hl,$c275 ; Sprite07MapX
+    ld a,$03 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ret
 
 ; ───────────────────────────────────────
 
@@ -77436,12 +77457,17 @@ Func_511e9: ; 511e9 (14:51e9)
     bit 6,[hl]
     res 6,[hl]
     ret z
+; wispnote - Resetting Victory Road Puzzle
+; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH was probably mentto be reset here
+; along with the rest of the puzzle instead on Indigo Plateau Loby.
+    ld hl,$d869
+    res 7,[hl] ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
     ld hl,$d7ee
-    res 0,[hl]
-    res 7,[hl]
+    res 0,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
+    res 7,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH2
     ld hl,$d813
-    res 0,[hl]
-    res 6,[hl]
+    res 0,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH1
+    res 6,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH2
     ld a,$7a
     ld [$cc4d],a
     PREDEF AddMissableObject
@@ -77449,10 +77475,7 @@ Func_511e9: ; 511e9 (14:51e9)
     ld [$cc4d],a
     PREDEF_JUMP RemoveMissableObject
 
-Route23ScriptPointers: ; 51213 (14:5213)
-    dw Route23Script0
-    dw Route23Script1
-    dw Route23Script2
+SECTION "Route23Script0",ROMX[$5219],BANK[$14]
 
 Route23Script0: ; 51219 (14:5219)
     ld hl,YCoordsData_51255 ; $5255
@@ -78300,14 +78323,16 @@ VictoryRoad2_h: ; 0x51791 to 0x5179d (12 bytes) (id=194)
     dw VictoryRoad2Object ; objects
 
 VictoryRoad2Script: ; 5179d (14:579d)
-    ld hl,$d126
-    bit 6,[hl]
-    res 6,[hl]
-    call nz,VictoryRoad2Script_517c4
+; wispnote - Due to various evidence I suspect that the puzzle
+; wasn't ment to be reset and this instruction was left for debugging purposes.
+;    ld hl,$d126
+;    bit 6,[hl]
+;    res 6,[hl]
+;    call nz,VictoryRoad2Script_517c4
     ld hl,$d126
     bit 5,[hl]
     res 5,[hl]
-    call nz,Func_517c9
+    call nz,VictoryRoad2Script_517c9
     call EnableAutoTextBoxDrawing
     ld hl,VictoryRoad2TrainerHeaders
     ld de,VictoryRoad2ScriptPointers
@@ -78316,31 +78341,11 @@ VictoryRoad2Script: ; 5179d (14:579d)
     ld [W_VICTORYROAD2CURSCRIPT],a
     ret
 
-VictoryRoad2Script_517c4: ; 517c4 (14:57c4)
-    ld hl,$d869
-    res 7,[hl]
+;VictoryRoad2Script_517c4: ; 517c4 (14:57c4)
+;    ld hl,$d869
+;    res 7,[hl] ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
 
-Func_517c9: ; 517c9 (14:57c9)
-    ld a,[$d7ee]
-    bit 0,a
-    jr z,.asm_517da
-    push af
-    ld a,$15
-    ld bc,$403
-    call Func_517e2
-    pop af
-.asm_517da
-    bit 7,a
-    ret z
-    ld a,$1d
-    ld bc,$70b
-
-Func_517e2: ; 517e2 (14:57e2)
-    ld [$d09f],a
-    PREDEF ReplaceTileBlock
-    ret
-
-VictoryRoad2Script0: ; 517f1 (14:57f1)
+VictoryRoad2Script0:
     call CheckOnix
     ld hl,CoordsData_51816 ; $5816
     call CheckBoulderCoords
@@ -78349,13 +78354,13 @@ VictoryRoad2Script0: ; 517f1 (14:57f1)
     ld a,[wWhichTrade] ; $cd3d
     cp $2
     jr z,.asm_5180b
-    bit 0,[hl]
-    set 0,[hl]
+    bit 0,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
+    set 0,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
     ret nz
     jr .asm_51810
 .asm_5180b
-    bit 7,[hl]
-    set 7,[hl]
+    bit 7,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH2
+    set 7,[hl] ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH2
     ret nz
 .asm_51810
     ld hl,$d126
@@ -80738,6 +80743,55 @@ Route20TextPointers:
     dw Route20Text10
     dw Route20Text11
     dw Route20Text12
+
+Route23ScriptPointers:
+    dw Route23Script0
+    dw Route23Script1
+    dw Route23Script2
+
+VictoryRoad2Script_517c9:
+    ld a,[$d7ee]
+    bit 0,a ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
+    jr z,.asm_517da
+    push af
+    call BoulderOnSwitch2
+    ld a,$15
+    ld bc,$403
+    call .Func_517e2
+    pop af
+.asm_517da
+    bit 7,a ; EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH2
+    ret z
+    call BoulderOnSwitch3
+    ld a,$1d
+    ld bc,$70b
+.Func_517e2
+    ld [$d09f],a
+    PREDEF_JUMP ReplaceTileBlock
+
+; wispnote - If the 1st switch is activated place the boulder in switch's coordinates.
+; Sprite11 indexes the 1st boulder, and ($01, $10) are the 1st swtich's coordinates.
+BoulderOnSwitch2:
+    ld hl,$c2b4 ; Sprite11MapY
+    ld a,$10 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ld hl,$c2b5 ; Sprite11MapX
+    ld a,$01 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ret
+
+; wispnote - If the 2nd switch is activated place the boulder in switch's coordinates.
+; Sprite13 indexes the 2nd boulder, and ($09, $10) are the 2nd swtich's coordinates.
+; Not it should be impossible for a boulder to arrive there if Sprite13 is hidden;
+; therefore, there is no need to check.
+BoulderOnSwitch3:
+    ld hl,$c2d4 ; Sprite13MapY
+    ld a,$10 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ld hl,$c2d5 ; Sprite13MapX
+    ld a,$09 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ret
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -92512,21 +92566,19 @@ VictoryRoad1Script: ; 5da0a (17:5a0a)
     ret
 .next
     ld a,[$d869]
-    bit 7,a
+    bit 7,a ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
     ret z
+    call BoulderOnSwitch1
     ld a,$1d
     ld [$d09f],a
     ld bc,$604
     PREDEF_JUMP ReplaceTileBlock
 
-VictoryRoad1ScriptPointers: ; 5da3a (17:5a3a)
-    dw VictoryRoad1Script0
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+SECTION "VictoryRoad1Script0",ROMX[$5a40],BANK[$17]
 
 VictoryRoad1Script0: ; 5da40 (17:5a40)
     ld a,[$d869]
-    bit 7,a
+    bit 7,a ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
     jp nz,CheckFightingMapTrainers
     ld hl,CoordsData_5da5c ; $5a5c
     call CheckBoulderCoords
@@ -92534,7 +92586,7 @@ VictoryRoad1Script0: ; 5da40 (17:5a40)
     ld hl,$d126
     set 5,[hl]
     ld hl,$d869
-    set 7,[hl]
+    set 7,[hl] ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
     ret
 
 CoordsData_5da5c: ; 5da5c (17:5a5c)
@@ -93300,6 +93352,24 @@ InitBattleEnemyParametersDojo:
     call InitBattleEnemyParameters
     ld a,9
     ld [W_GYMLEADERNO],a
+    ret
+
+; ───────────────────────────────────────────
+
+VictoryRoad1ScriptPointers:
+    dw VictoryRoad1Script0
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+
+; wispnote - If the switch is activated place the boulder in switch's coordinates.
+; Sprite05 indexes the boulder, and ($11, $0D) are the swtich's coordinates.
+BoulderOnSwitch1:
+    ld hl,$c254 ; Sprite05MapY
+    ld a,$0D + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
+    ld hl,$c255 ; Sprite05MapX
+    ld a,$11 + 4 ; wispnote - We need to offset coordinates by 4
+    ld [hl],a
     ret
 
 ; ───────────────────────────────────────────
