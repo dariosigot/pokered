@@ -3308,26 +3308,8 @@ DrawPartyMenuCommon: ; 14dc (0:14dc)
 ; INPUT:
 ; de = address of status condition
 ; hl = destination address
+; bc = battle status 1 address (if 0 Not Battle HUD)
 PrintStatusCondition: ; 14e1 (0:14e1) ; Don't Print "FNT"
-    ;push de
-    ;dec de
-    ;dec de ; de = address of current HP
-    ;ld a,[de]
-    ;ld b,a
-    ;dec de
-    ;ld a,[de]
-    ;or b ; is the pokemon's HP zero?
-    ;pop de
-    ;jr nz,PrintStatusConditionNotFainted
-; if the pokemon's HP is 0,print "FNT"
-    ;ld a,"F"
-    ;ld [hli],a
-    ;ld a,"N"
-    ;ld [hli],a
-    ;ld [hl],"T"
-    ;and a
-    ;ret
-PrintStatusConditionNotFainted: ; 14f6
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(PrintStatusAilment)
@@ -3337,8 +3319,7 @@ PrintStatusConditionNotFainted: ; 14f6
     pop bc
     ld a,b
     ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 CheckSurfing:
     ld b,a
@@ -29440,7 +29421,7 @@ asm_128fb:
     ld a,[$FF00+$f6]
     bit 0,a
     jr z,.skip2
-    ld bc,+11
+    ld bc,+12
     jr .done2
 .skip2
     ld bc,+01
@@ -29449,7 +29430,14 @@ asm_128fb:
     ld de,$cfb5 ; Energy
     ld bc,$0103
     call PrintNumber
+    ld a,[wListMenuID] ; Is Party Menu?
+    cp 2               ; ...
+    jr nz,.NotParty
+    ld [hl],$70 ; Energy Symbol in Party Menu
+    jr .done3
+.NotParty
     ld [hl],$DA ; Energy Symbol
+.done3
     pop hl
     pop de
     ret
@@ -29933,6 +29921,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     ld bc,20 ; Party Menu Status
     add hl,bc
     ld de,$CF9C
+    ld bc,0 ; not volatile status
     call PrintStatusCondition
     pop hl
     push hl
@@ -29941,7 +29930,6 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     set 0,a
     ld [$FFF6],a
     add hl,bc
-    ld a,$60
     PREDEF DrawPlayerHPBarParty ; draw HP bar and prints current / max HP
     ld a,[$FFF6]
     res 0,a
@@ -31618,7 +31606,7 @@ PrintLevelAndGender:
     call ResetTempIV
     pop hl
     push af
-    ld de,+09 ; Party Gender
+    ld de,+10 ; Party Gender
     add hl,de
     pop af
     jr c,.Genderless
@@ -54732,21 +54720,6 @@ DrawPlayerHUDAndHPBar:
     ld hl,Coord
     call PlaceString
 
-; Adaptive Player Name - Not Used
-;    FuncCoord 20,07
-;    ld hl,Coord
-;    ld de,W_PLAYERMONNAME
-;    push de
-;.LoopString
-;    dec hl
-;    ld a,[de]
-;    inc de
-;    cp "@"
-;    jr nz,.LoopString
-;.StringEnd
-;    pop de
-;    call PlaceString
-
     call PrintEXPBar ; Denim,ExpBar
     ld hl,W_PLAYERMONID
     ld de,$cf98
@@ -54758,11 +54731,11 @@ DrawPlayerHUDAndHPBar:
     call CopyData
     ld a,[W_PLAYERMONENERGY]
     ld [$cfb5],a
-    FuncCoord 10,08 ; Player Battle Status
+    FuncCoord 14,08 ; Player Battle Status
     ld hl,Coord
     ld de,$cf9c
-    call PrintStatusConditionNotFainted
-    FuncCoord 14,08 ; Player Battle Level
+    call PrintStatusConditionBattlePlayer
+    FuncCoord 10,08 ; Player Battle Level
     ld hl,Coord
     call PrintLevel
     ld a,[$cf98]
@@ -54800,6 +54773,7 @@ DrawPlayerHUDAndHPBar:
 
 DrawHUDsAndHPBars:
     call DrawPlayerHUDAndHPBar
+    ; fall through
 
 DrawEnemyHUDAndHPBar:
     xor a
@@ -54814,11 +54788,11 @@ DrawEnemyHUDAndHPBar:
     FuncCoord 1,0 ; $c3a1
     ld hl,Coord
     call PlaceString
-    FuncCoord 8,1
+    FuncCoord 06,01
     ld hl,Coord
     ld de,W_ENEMYMONSTATUS ; $cfe9
-    call PrintStatusConditionNotFainted
-    FuncCoord 3,1
+    call PrintStatusConditionBattleEnemy
+    FuncCoord 02,01
     ld hl,Coord
     ld a,[W_ENEMYMONLEVEL] ; $cff3
     ld [$cfb9],a
@@ -62595,6 +62569,14 @@ HandleGhostBattleInSafari:
     xor a
     ld [hl],a
     ret
+
+PrintStatusConditionBattlePlayer:
+    ld bc,W_PLAYERBATTSTATUS1
+    jp PrintStatusCondition
+
+PrintStatusConditionBattleEnemy:
+    ld bc,W_ENEMYBATTSTATUS1
+    jp PrintStatusCondition
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -100589,6 +100571,10 @@ Func_71791: ; 71791 (1c:5791)
     pop af
     dec a
     jr nz,.asm_7179c
+    ld de,PartyHPBorderAndEnergy
+    ld hl,$9700
+    ld bc,(BANK(PartyHPBorderAndEnergy) << 8 | $1)
+    call GoodCopyVideoData
     jp EnableLCD
 
 ; Free
@@ -101880,7 +101866,7 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
 
     ; opponent hp bar
     db $03,$0F ; $03,$05
-    db $00,$00,$0A,$03
+    db $00,$00,$0B,$03
 
     ; player hp bar
     db $03,$0A ; $03,$00
@@ -101888,11 +101874,11 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
 
     ; frontsprite opponent
     db $03,$05 ; $03,$0F
-    db $0B,$00,$13,$06
+    db $0C,$00,$13,$06
 
     ; Damage/Cure Line Opponent
     db $02,%00000101
-    db $00,$04,$0A,$04
+    db $00,$04,$0B,$04
 
     ; Catch Flag opponent
     db $02,$05 ; $03,$0F
@@ -104554,52 +104540,9 @@ CredPAAD: ; 74730 (1d:4730)
 TheEndGfx: ; 7473e (1d:473e) ; 473E (473F on blue)
     INCBIN "gfx/theend.2bpp"
 
-PrintStatusAilment: ; 747de (1d:47de)
-    ld a,[de]
-    bit 3,a
-    jr nz,.psn
-    bit 4,a
-    jr nz,.brn
-    bit 5,a
-    jr nz,.frz
-    bit 6,a
-    jr nz,.par
-    and $7 ; slp
-    ret z
-    ld a,"S"
-    ld [hli],a
-    ld a,"l"
-    ld [hli],a
-    ld [hl],"p"
-    ret
-.psn
-    ld a,"P"
-    ld [hli],a
-    ld a,"s"
-    ld [hli],a
-    ld [hl],"n"
-    ret
-.brn
-    ld a,"B"
-    ld [hli],a
-    ld a,"r"
-    ld [hli],a
-    ld [hl],"n"
-    ret
-.frz
-    ld a,"F"
-    ld [hli],a
-    ld a,"r"
-    ld [hli],a
-    ld [hl],"z"
-    ret
-.par
-    ld a,"P"
-    ld [hli],a
-    ld a,"a"
-    ld [hli],a
-    ld [hl],"r"
-    ret
+; Free
+
+SECTION "Func_7481f",ROMX[$481f],BANK[$1d]
 
 Func_7481f: ; 7481f (1d:481f)
     call GetHiddenItemCoords ; ld hl,HiddenItemCoords
@@ -109010,6 +108953,98 @@ CinnabarGymScriptPointers:
     dw CinnabarGymScript2
     dw CinnabarGymScript3
     dw GymLeaderAfterRematch
+
+; prints a pokemon's status condition
+; INPUT:
+; de = address of status condition
+; hl = destination address
+; bc = battle status 1 address (if 0 Not Battle HUD)
+PrintStatusAilment:
+    ld a,[de]
+    bit 5,a
+    call nz,.Frz
+    jr nz,.FrzThenSkipSlpBrn
+    and %00000111 ; slp
+    call nz,.Slp
+    ld a,[de]
+    bit 4,a
+    call nz,.Brn
+.FrzThenSkipSlpBrn
+    bit 3,a
+    call nz,.Psn
+    ld a,[de]
+    bit 6,a
+    call nz,.Par
+    call .CheckBattleHud
+    ret z  ; End If Not Battle Hud
+    ld a,[bc]
+    bit CONFUSED,a
+    call nz,.Confused
+    inc bc
+    ld a,[bc]
+    bit SEEDED,a
+    call nz,.Seeded
+    ret
+.Slp
+    ld [hl],$CA
+    inc hl ; jr .NextVideoSlot
+    ret
+.Psn
+    call .CheckBattleHud
+    jr z,.NormalPoison
+    inc bc
+    inc bc
+    ld a,[bc]
+    dec bc
+    dec bc
+    bit BADLY_POISONED,a
+    jr nz,.BadlyPoisoned
+.NormalPoison
+    ld [hl],$CB
+    inc hl ; jr .NextVideoSlot
+    ret
+.Brn
+    ld [hl],$CC
+    inc hl ; jr .NextVideoSlot
+    ret
+.Frz
+    ld [hl],$CD
+    inc hl ; jr .NextVideoSlot
+    ret
+.Par
+    ld [hl],$CE
+    inc hl ; jr .NextVideoSlot
+    ret
+.Confused
+    ld [hl],$DE
+    inc hl ; jr .NextVideoSlot
+    ret
+.Seeded
+    ld [hl],$DC
+    inc hl ; jr .NextVideoSlot
+    ret
+.BadlyPoisoned
+    ld [hl],$DD
+    inc hl ; jr .NextVideoSlot
+    ret
+.CheckBattleHud
+    push bc
+    push af
+    ld a,b ; Check Battle Hud
+    or c   ; ...
+    pop bc
+    ld a,b
+    pop bc
+    ret
+;.NextVideoSlot
+;    call .CheckBattleHud
+;    inc hl
+;    ret z
+;    ;push bc
+;    ;ld bc,-02
+;    ;add hl,bc
+;    ;pop bc
+;    ret
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -132719,27 +132754,6 @@ _DrawCatchGender: ; Denim
     ld de,.ShinyStarIcon
     call .PlaceIcon
 .NoShiny
-    ld hl,W_ENEMYBATTSTATUS3
-    bit 0,[hl] ; toxic
-    jr z,.SkipToxic
-    FuncCoord 10,01 ; Enemy Status Last Char
-    ld hl,Coord
-    ld [hl],$DD ; Skull Icon
-.SkipToxic
-    call .CheckConfused
-    call nz,.Print1stIcon
-    jr nz,.Check2ndIcon
-    call .CheckSeeded
-    call nz,.Print1stIcon
-    jr .Skip2ndIcon
-.Check2ndIcon
-    call .CheckSeeded
-    call nz,.Print2ndIcon
-.Skip2ndIcon
-    call .CheckConfused
-    jr nz,.Genderless
-    call .CheckSeeded
-    jr nz,.Genderless
     call .CheckEnemyOwned
     ld a,[W_ENEMYMON_START]
     ld [$d11e],a
@@ -132749,7 +132763,7 @@ _DrawCatchGender: ; Denim
     push af
     ld a,[W_ENEMYMONLEVEL]
     cp 10
-    FuncCoord 6,1
+    FuncCoord 05,01
     ld hl,Coord
     jr nc,.GreaterThen9
     dec hl
@@ -132767,20 +132781,6 @@ _DrawCatchGender: ; Denim
     ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
     call SetTempIV
     jr .Genderless
-.Print1stIcon
-    push af
-    FuncCoord 06,01
-    ld hl,Coord
-    call .PlaceIcon
-    pop af
-    ret
-.Print2ndIcon
-    push af
-    FuncCoord 07,01
-    ld hl,Coord
-    call .PlaceIcon
-    pop af
-    ret
 .CheckEnemyOwned
     ld a,[W_ENEMYMON_START]
     ld [$d11e],a
@@ -132793,16 +132793,6 @@ _DrawCatchGender: ; Denim
     ld a,c
     and a
     ret
-.CheckConfused
-    ld hl,W_ENEMYBATTSTATUS1
-    bit 7,[hl] ; Confused?
-    ld de,.ConfusedIcon
-    ret
-.CheckSeeded
-    ld hl,W_ENEMYBATTSTATUS2
-    bit 7,[hl] ; Seeded?
-    ld de,.SeededIcon
-    ret
 .PlaceIcon
     ld a,[de]
     ld [hl],a
@@ -132813,35 +132803,10 @@ _DrawCatchGender: ; Denim
     db $EF
 .FemaleIcon
     db $F5
-.ConfusedIcon
-    db $E6
-.SeededIcon
-    db $DC
 .ShinyStarIcon
     db $D1
 
 _DrawCurrentMonGenderInBattle:
-    ld hl,W_PLAYERBATTSTATUS3
-    bit 0,[hl] ; toxic
-    jr z,.SkipToxic
-    FuncCoord 12,08 ; Player Status Last Char
-    ld hl,Coord
-    ld [hl],$DD ; Skull Icon
-.SkipToxic
-    call .CheckConfused
-    call nz,.Print1stIcon
-    jr nz,.Check2ndIcon
-    call .CheckSeeded
-    call nz,.Print1stIcon
-    jr .Skip2ndIcon
-.Check2ndIcon
-    call .CheckSeeded
-    call nz,.Print2ndIcon
-.Skip2ndIcon
-    call .CheckConfused
-    jr nz,.Genderless
-    call .CheckSeeded
-    jr nz,.Genderless
     ld hl,W_PLAYERMONIVS ; .BackSpriteInBattle
     call SetTempIV
     ld a,[W_PLAYERMONID]
@@ -132851,7 +132816,7 @@ _DrawCurrentMonGenderInBattle:
     push af
     ld a,[W_PLAYERMONLEVEL]
     cp 10
-    FuncCoord 17,08 ; Player Gender in Battle
+    FuncCoord 13,08 ; Player Gender in Battle
     ld hl,Coord
     jr nc,.GreaterThen9
     dec hl
@@ -132865,30 +132830,6 @@ _DrawCurrentMonGenderInBattle:
 .Genderless
     call ResetTempIV
     ret
-.Print1stIcon
-    push af
-    FuncCoord 17,08
-    ld hl,Coord
-    call .PlaceIcon
-    pop af
-    ret
-.Print2ndIcon
-    push af
-    FuncCoord 18,08
-    ld hl,Coord
-    call .PlaceIcon
-    pop af
-    ret
-.CheckConfused
-    ld hl,W_PLAYERBATTSTATUS1
-    bit 7,[hl] ; Confused?
-    ld de,.ConfusedIcon
-    ret
-.CheckSeeded
-    ld hl,W_PLAYERBATTSTATUS2
-    bit 7,[hl] ; Seeded?
-    ld de,.SeededIcon
-    ret
 .PlaceIcon
     ld a,[de]
     ld [hl],a
@@ -132897,10 +132838,6 @@ _DrawCurrentMonGenderInBattle:
     db $EF
 .FemaleIcon
     db $F5
-.ConfusedIcon
-    db $E6
-.SeededIcon
-    db $DC
 
 DebugStats:
     and a ; rcf
@@ -138579,6 +138516,8 @@ FontGraphicsGrayWall2bpp:
     INCBIN "gfx/denim/font.2bpp"
 Wall2bpp:
     INCBIN "gfx/denim/wall.2bpp"
+PartyHPBorderAndEnergy:
+    INCBIN "gfx/party_hp_border_and_energy.2bpp"
 
 LoadStatusScreenGenericTile:
     call LoadHpBarAndStatusTilePatterns
@@ -139476,11 +139415,12 @@ HandleStatusScreen1:
     call GetHealthBarColor
     ld b,$3
     call GoPAL_SET ; SGB palette
-    FuncCoord 10,2
+    FuncCoord 14,02
     ld hl,Coord
     ld de,$cf9c
+    ld bc,0 ; not volatile status
     call PrintStatusCondition
-    FuncCoord 14,2
+    FuncCoord 10,02
     ld hl,Coord
     call PrintLevel ; Pokémon level
     FuncCoord 1,8
@@ -139555,7 +139495,7 @@ HandleStatusScreen1:
     push af
     ld a,[$cfb9] ; .OutOfBattleLevel
     cp 10
-    FuncCoord 17,2
+    FuncCoord 13,02
     ld hl,Coord
     jr nc,.GreaterThen9
     dec hl
