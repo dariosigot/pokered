@@ -142160,6 +142160,7 @@ GetAttackerType:
     dw .RageMoveTable      , .RageMonTable
     dw .LickMoveTable      , .LickMonTable
     dw .SwiftMoveTable     , .SwiftMonTable
+    dw .PinMissMoveTable   , .PinMissMonTable
     db $FF
 
 .TryToForceIvory
@@ -142302,6 +142303,14 @@ GetAttackerType:
     db CLEFABLE
     db JIGGLYPUFF
     dw WIGGLYTUFF
+    db $FF
+
+.PinMissMoveTable
+    db PIN_MISSILE
+    db $FF
+.PinMissMonTable
+    db JOLTEON
+    db ZAPDOS
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
