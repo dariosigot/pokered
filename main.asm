@@ -23460,6 +23460,18 @@ IsSurfingAllowed:
 ItemUseCardKey:
     jp ItemUseNotTime
 
+DrawHudAndPrintTextPokeFlute:
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.End
+    push hl
+    ld b,BANK(DrawHUDsAndHPBars)
+    ld hl,DrawHUDsAndHPBars
+    call Bankswitch
+    pop hl
+.End
+    jp PrintText
+
 SECTION "ItemUseBall",ROMX[$5687],BANK[$3]
 
 ItemUseBall: ; d687 (3:5687)
@@ -23799,6 +23811,40 @@ ItemUseBall: ; d687 (3:5687)
     ld [$cf96],a
     jp RemoveItemFromInventory    ;remove ITEM (XXX)
 
+;joenote - undo brn/par stat changes for Full Restore after restoring HP in battle
+UndoBurnParStats_FullRestore:
+    push hl
+    push de
+    ld a,[H_WHOSETURN]
+    push af
+    xor a    ;forcibly set it to the player's turn
+    ld [H_WHOSETURN],a
+    ;undo brn/par stat changes
+    ld d,%0000101 ; bit 0 = attack | bit 2 = speed
+    PREDEF UndoBurnParStats
+    pop af
+    ld [H_WHOSETURN],a
+    pop de
+    pop hl
+    ret
+
+HandleBackupAfterBallCatch:
+    ld hl,W_ENEMYBATTSTATUS3
+    bit 3,[hl]
+    jr nz,.justTransformed
+    set 3,[hl]
+    call BackupMoves
+    call BackupPP
+    ld hl,$cceb
+    ld a,[W_ENEMYMONATKDEFIV]
+    ld [hli],a
+    ld a,[W_ENEMYMONSPDSPCIV]
+    ld [hl],a
+.justTransformed
+    ld a,[W_ENEMYMONENERGY]   ; Backup Current Energy
+    ld [wBackupEnemyEnergy],a ; ...
+    ret
+
 ; Free
 
 SECTION "ItemUseBallText00",ROMX[$5937],BANK[$3]
@@ -24062,13 +24108,13 @@ ItemUseMedicine:
 .checkItemType
     ld a,[$cf91]
     cp a,REVIVE
-    jr nc,.healHP ; if it's a Revive or Max Revive
+    jp nc,.healHP ; if it's a Revive or Max Revive
     cp a,FULL_HEAL
     jr z,.cureStatusAilment ; if it's a Full Heal
     cp a,HP_UP
     jp nc,.useVitamin ; if it's a vitamin or Rare Candy
     cp a,FULL_RESTORE
-    jr nc,.healHP ; if it's a Full Restore or one of the potions
+    jp nc,.healHP ; if it's a Full Restore or one of the potions
 ; fall through if it's one of the status-specifc healing items
 .cureStatusAilment
     ld bc,4
@@ -24097,29 +24143,50 @@ ItemUseMedicine:
     and c ; does the pokemon have a status ailment the item can cure?
     jp z,.healingItemNoEffect
 ; if the pokemon has a status the item can heal
-    xor a
-    ld [hl],a ; remove the status ailment in the party data ; ~TODO:MultiStatus
+    ld a,c
+    cpl ; Complement A register. (Flip all bits.)
+    ld c,a
+    ld a,[hl] ; pokemon's status
+    and c ; reset only status ailment the item can cure?
+    ld [hl],a ; remove the status ailment in the party data ; ~DONE:MultiStatus
     ld a,b
     ld [$d07d],a ; the message to display for the item used
+    ld a,[W_ISINBATTLE]
+    and a
+    jp z,.doneHealing
     ld a,[wPlayerMonNumber]
     cp d ; is pokemon the item was used on active in battle?
     jp nz,.doneHealing
 ; if it is active in battle
-;joenote - this part is getting a bit of a rewrite to prevent resetting all stats when using a status healing item
+    push hl ; Backup status ailment in the party data
     ld a,[H_WHOSETURN] ; Backup Turn
     push af            ; ...
     xor a              ; Force player turn
     ld [H_WHOSETURN],a ; ...
-    ld hl,UndoBurnParStats ; ~TODO:MultiStatus
-    ld b,BANK(UndoBurnParStats)
-    call Bankswitch
+    push de
+    ld d,%00000000 ; initialize all Flags Zero
+    bit BRN_Bit,c
+    jr nz,.SkipBrnFlag
+    set 0,d ; bit 0 = attack
+.SkipBrnFlag
+    bit PAR_Bit,c
+    jr nz,.SkipParFlag
+    set 2,d ; bit 2 = speed
+.SkipParFlag
+    PREDEF UndoBurnParStats
+    pop de
     pop af             ; Restore Turn
     ld [H_WHOSETURN],a ; ...
+    pop hl ; Restore status ailment in the party data
+    ld a,[hl]
+    ld [W_PLAYERMONSTATUS],a ; remove the status ailment in the in-battle pokemon data ; ~DONE:MultiStatus
+    bit PSN_Bit,a
+    jr nz,.SkipRemoveToxic
     xor a
-    ld [W_PLAYERMONSTATUS],a ; remove the status ailment in the in-battle pokemon data ; ~TODO:MultiStatus
     ld [W_PLAYERTOXICCOUNTER],a ; clear toxic counter
     ld hl,W_PLAYERBATTSTATUS3
-    res 0,[hl] ; heal Toxic status
+    res BADLY_POISONED,[hl] ; heal Toxic status
+.SkipRemoveToxic
     jp .doneHealing
 .healHP
     inc hl ; hl = address of current HP
@@ -24347,31 +24414,11 @@ ItemUseMedicine:
     jr nz,.updateInBattleData
     ld bc,-31
     add hl,bc
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - undo brn/par stat changes for Full Restore after restoring HP in battle
     ld a,[W_ISINBATTLE]
     and a
-    jr z,.clearParBrn    ;do not adjust the stats if not currently in battle
-    push hl
-    push de
-    ld a,[H_WHOSETURN]
-    push af
-    xor a    ;forcibly set it to the player's turn
-    ld [H_WHOSETURN],a
-    ;undo brn/par stat changes
-    ld hl,UndoBurnParStats ; ~TODO:MultiStatus
-    ld b,BANK(UndoBurnParStats)
-    call Bankswitch
-    pop af
-    ld [H_WHOSETURN],a
-    pop de
-    pop hl
-.clearParBrn
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+    call nz,UndoBurnParStats_FullRestore
     xor a
-    ld [hl],a ; remove the status ailment in the party data ; ~TODO:MultiStatus
+    ld [hl],a ; remove the status ailment in the party data ; ~DONE:MultiStatus
 .updateInBattleData
     ld h,d
     ld l,e
@@ -24655,23 +24702,6 @@ ItemUseMedicine:
     db "DEFENSE@"
     db "SPEED@"
     db "SPECIAL@"
-
-HandleBackupAfterBallCatch:
-    ld hl,W_ENEMYBATTSTATUS3
-    bit 3,[hl]
-    jr nz,.justTransformed
-    set 3,[hl]
-    call BackupMoves
-    call BackupPP
-    ld hl,$cceb
-    ld a,[W_ENEMYMONATKDEFIV]
-    ld [hli],a
-    ld a,[W_ENEMYMONSPDSPCIV]
-    ld [hl],a
-.justTransformed
-    ld a,[W_ENEMYMONENERGY]   ; Backup Current Energy
-    ld [wBackupEnemyEnergy],a ; ...
-    ret
 
 ItemUseBait:
     ld hl,ThrewBaitText
@@ -25063,7 +25093,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     and a ; were any pokemon asleep before playing the flute?
     ret z
     ld hl,.FluteWokeUpText
-    jp PrintText
+    jp DrawHudAndPrintTextPokeFlute
 
 .FluteWokeUpText
     TX_FAR _FluteWokeUpText
@@ -29313,7 +29343,6 @@ CopyDataSkipEnergyAltForm:
     inc de
     ld bc,5
     jp CopyData
-
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -49501,48 +49530,47 @@ INCLUDE "constants/moves.asm"
 
 ; ──────────────────────────────────────────────────────────────────────────
 
-;joenote - this function checks to see if a pkmn is paralyzed or burned
-;then it doubles attack if burned or quadruples speed if paralyzed.
-;It's meant to be run right before healing paralysis or burn so as to
-;undo the stat changes.
-UndoBurnParStats: ; ~TODO:MultiStatus
+; Input ► d = bit mask to stats to consider (bit 0 attack, bit 2 speed)
+UndoBurnParStats: ; ~DONE:MultiStatus
+    call Load16BitRegisters
     ld hl,W_PLAYERMONSTATUS
-    ld de,wPlayerStatsToDouble
     ld a,[H_WHOSETURN]
     and a
     jr z,.checkburn
     ld hl,W_ENEMYMONSTATUS
-    ld de,wEnemyStatsToDouble
 .checkburn
-    ld a,[hl]        ;load statuses
-    bit 4,a          ;test for burn
+    ld a,[hl]             ;load statuses
+    bit BRN_Bit,a         ;test for burn
     jr z,.checkpar
-    ld a,%0000001
-    ld [de],a        ;set attack to be doubled to undo the stat change of BRN
+    push af
+    ld a,%0000001 ; bit 0 = attack
+    and d
+    jr z,.checkpar
+    ld [wStatsToDouble],a ;set attack to be doubled to undo the stat change of BRN
     call DoubleSelectedStats
-    jr .return
+    pop af
 .checkpar
-    bit 6,a          ;test for paralyze
+    bit PAR_Bit,a         ;test for paralyze
     jr z,.return
-    ld a,%00000100
-    ld [de],a        ;set speed to be doubled (done twice) to undo the stat change of PAR
+    ld a,%00000100 ; bit 2 = speed
+    and d
+    jr z,.return
+    ld [wStatsToDouble],a ;set speed to be doubled (done twice) to undo the stat change of PAR
     call DoubleSelectedStats
     call DoubleSelectedStats
 .return
     xor a
-    ld [de],a        ;reset the stat change bits
+    ld [wStatsToDouble],a ;reset the stat change bits
     ret
 
-;joenote - let's get this working again and put it to use
 DoubleSelectedStats:
     ld a,[H_WHOSETURN]
     and a
-    ld a,[wPlayerStatsToDouble]
     ld hl,W_PLAYERMONATK
     jr z,.notEnemyTurn
-    ld a,[wEnemyStatsToDouble]
     ld hl,W_ENEMYMONATTACK
 .notEnemyTurn
+    ld a,[wStatsToDouble]
     ld c,4
     ld b,a
 .loop
@@ -50364,9 +50392,8 @@ AICureStatus:
     ld a,1 ; forcibly set it to the AI's turn
     ld [H_WHOSETURN],a
     ; undo brn/par stat changes
-    ld hl,UndoBurnParStats ; ~TODO:MultiStatus
-    ld b,BANK(UndoBurnParStats)
-    call Bankswitch
+    ld d,%0000101 ; bit 0 = attack | bit 2 = speed
+    PREDEF UndoBurnParStats
     pop af
     ld [H_WHOSETURN],a
     xor a
@@ -51957,9 +51984,8 @@ HealEffect_: ; Moved Upper in the Bank
 .restEffect
     push hl
 ;undo the stat-changing effects of burn and paralyze and clear toxic info
-    ld hl,UndoBurnParStats ; ~TODO:MultiStatus
-    ld b,BANK(UndoBurnParStats)
-    call Bankswitch
+    ld d,%0000101 ; bit 0 = attack | bit 2 = speed
+    PREDEF UndoBurnParStats
     ld hl,W_PLAYERBATTSTATUS3     ; load in for toxic bit
     ld de,W_PLAYERTOXICCOUNTER    ; load in for toxic counter
     ld a,[H_WHOSETURN]
@@ -59610,7 +59636,7 @@ QuarterSpeedDueToParalysis: ; 3ed27 (f:6d27)
     and a
     jr z,.asm_3ed48
     ld a,[W_PLAYERMONSTATUS] ; $d018
-    and $40
+    and PAR
     ret z
     ld hl,$d02a
     ld a,[hld]
@@ -59629,7 +59655,7 @@ QuarterSpeedDueToParalysis: ; 3ed27 (f:6d27)
     ret
 .asm_3ed48
     ld a,[W_ENEMYMONSTATUS] ; $cfe9
-    and $40
+    and PAR
     ret z
     ld hl,$cffb
     ld a,[hld]
@@ -59652,7 +59678,7 @@ HalveAttackDueToBurn: ; 3ed64 (f:6d64)
     and a
     jr z,.asm_3ed81
     ld a,[W_PLAYERMONSTATUS] ; $d018
-    and $10
+    and BRN
     ret z
     ld hl,$d026
     ld a,[hld]
@@ -59669,7 +59695,7 @@ HalveAttackDueToBurn: ; 3ed64 (f:6d64)
     ret
 .asm_3ed81
     ld a,[W_ENEMYMONSTATUS] ; $cfe9
-    and $10
+    and BRN
     ret z
     ld hl,$cff7
     ld a,[hld]
@@ -76324,6 +76350,7 @@ GetAttackerType_Predef:                    NEW_PREDEF GetAttackerType_          
 AdjustDamageForMoveType_GetInputPredef:    NEW_PREDEF AdjustDamageForMoveType_GetInput    ; $6E
 UpgradeTrainerSet_Predef:                  NEW_PREDEF UpgradeTrainerSet_                  ; $6F
 IsMonInCurrentMapPredef:                   NEW_PREDEF IsMonInCurrentMap                   ; $70
+UndoBurnParStatsPredef:                    NEW_PREDEF UndoBurnParStats                    ; $71
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex

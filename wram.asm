@@ -578,9 +578,7 @@ wCriticalHitOrOHKO: ; d05e
 W_MOVEMISSED: ; d05f
     ds 1
 
-wPlayerStatsToDouble:: ; d060
-; always 0
-;joenote - putting this back into use
+wStatsToDouble:: ; d060
 ;set bit to flag the stat
 ;bit 0 - attack
 ;bit 1 - defence
@@ -618,14 +616,7 @@ W_PLAYERBATTSTATUS3: ; d064
 ; bit 3 - tranformed
     ds 1
 
-wEnemyStatsToDouble:: ; d065
-; always 0
-;joenote - putting this back into use
-;set bit to flag the stat
-;bit 0 - attack
-;bit 1 - defence
-;bit 2 - speed
-;bit 3 - special
+wUnused_d065:: ; d065
     ds 1
 
     ds 1
