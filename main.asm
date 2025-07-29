@@ -563,6 +563,11 @@ GetLeftTileOfHPBar:
     dec a ; $70 ; Energy Symbol in Party Menu
     ret
 
+HandleMenuInputWithWrap:
+    ld a,1
+    ld [wMenuWrappingEnabled],a
+    jp HandleMenuInput
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -33018,7 +33023,7 @@ PCMainMenu: ; 17e48 (5:7e48)
     call Bankswitch
     ld hl,wFlags_0xcd60
     set 5,[hl]
-    call HandleMenuInput
+    call HandleMenuInputWithWrap
     bit 1,a              ;if player pressed B
     jp nz,LogOff
     ld a,[wMaxMenuItem]
@@ -44860,7 +44865,7 @@ BillsPCMenu: ; 214e8 (8:54e8)
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     call Delay3
-    call HandleMenuInput
+    call HandleMenuInputWithWrap
     bit 1,a
     jp nz,Func_21588 ; b button
     call PlaceUnfilledArrowMenuCursor
