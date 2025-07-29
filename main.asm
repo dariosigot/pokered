@@ -23550,19 +23550,12 @@ ItemUseBall: ; d687 (3:5687)
 ; Frozen/Asleep pokemon are relatively even easier to catch
 ; for Frozen/Asleep pokemon,any random number from 0-24 ensures a catch.
 ; for the others,a random number from 0-11 ensures a catch.
-    ld a,[W_ENEMYMONSTATUS]    ;status ailments ; ~TODO:MultiStatus
-    and a
-    jr z,.noAilments
-    and a,(FRZ + SLP)    ;is frozen and/or asleep?
-    ld c,12
-    jr z,.notFrozenOrAsleep
-    ld c,25
-.notFrozenOrAsleep    ;$5728
-    ld a,b
-    sub c
-    jp c,.BallSuccess    ;$578b
+    push bc
+    call GetStatusFactor ; Get d
+    pop af
+    sub d
+    jp c,.BallSuccess
     ld b,a
-.noAilments    ;$572e
     push bc        ;save RANDOM number
     xor a
     ld [H_MULTIPLICAND],a
@@ -23659,19 +23652,10 @@ ItemUseBall: ; d687 (3:5687)
     ld [H_DIVISOR],a
     ld b,4
     call Divide
-    ld a,[W_ENEMYMONSTATUS]    ;status ailments ; ~TODO:MultiStatus
-    and a
-    jr z,.next13
-    and a,(FRZ + SLP)
-    ld b,5
-    jr z,.next14
-    ld b,10
-.next14    ;$57e6
+    call GetStatusFactor ; Get e
     ld a,[H_QUOTIENT + 3]
-    add b
+    add e
     ld [H_QUOTIENT + 3],a
-.next13    ;$57eb
-    ld a,[H_QUOTIENT + 3]
     cp a,10
     ld b,$20
     jr c,.next12
@@ -23814,6 +23798,8 @@ ItemUseBall: ; d687 (3:5687)
     inc a
     ld [$cf96],a
     jp RemoveItemFromInventory    ;remove ITEM (XXX)
+
+; Free
 
 SECTION "ItemUseBallText00",ROMX[$5937],BANK[$3]
 
@@ -25784,6 +25770,66 @@ GotOffBicycleText: ; e5fc (3:65fc)
 ;    and a,%00111111 ; mask out the PP Up count
 ;    ld [$d11e],a ; store max PP
 ;    ret
+
+; ────────────────────────────────────
+
+; Output ► d = Status Factor 1
+;        ► e = Status Factor 2
+GetStatusFactor:
+    ld de,0 ; Initialize Outputs to 0
+    ld a,[W_ENEMYMONSTATUS] ;status ailments ; ~DONE:MultiStatus
+    and a
+    jr z,.noAilments
+    bit FRZ_Bit,a
+    jr z,.NotFrz
+    ld b,+40
+    ld c,+16
+    call .IncreaseFactor
+    jr .FrzThenSkipSlpBrn
+.NotFrz
+    ld b,a
+    and a,SLP
+    ld a,b
+    jr z,.NotSlp
+    ld b,+25
+    ld c,+10
+    call .IncreaseFactor
+.NotSlp
+    bit BRN_Bit,a
+    jr z,.NotBrn
+    ld b,+12
+    ld c,+05
+    call .IncreaseFactor
+.NotBrn
+.FrzThenSkipSlpBrn
+    bit PAR_Bit,a
+    jr z,.NotPar
+    ld b,+12
+    ld c,+05
+    call .IncreaseFactor
+.NotPar
+    bit PSN_Bit,a
+    jr z,.NotPsn
+    ld b,+12
+    ld c,+05
+    call .IncreaseFactor
+.NotPsn
+.noAilments
+    ret
+.IncreaseFactor
+    push af
+    xor a
+    add d
+    add b
+    ld d,a
+    xor a
+    add e
+    add c
+    ld e,a
+    pop af
+    ret
+
+; ────────────────────────────────────
 
 ; Free
 

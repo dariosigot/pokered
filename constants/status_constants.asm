@@ -6,6 +6,12 @@ FRZ EQU %00100000
 PAR EQU %01000000
 SLP_NOMOVE EQU %00000110
 
+; statis ailmentes (bits)
+PSN_Bit EQU 3
+BRN_Bit EQU 4
+FRZ_Bit EQU 5
+PAR_Bit EQU 6
+
 ; volatile statuses 1
 STORING_ENERGY           EQU 0 ; Bide
 THRASHING_ABOUT          EQU 1 ; e.g. Thrash
