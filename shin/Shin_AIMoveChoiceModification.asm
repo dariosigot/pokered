@@ -459,7 +459,7 @@ AIMoveChoiceModification1:
     pop de
     pop hl
     jr nc,.nostatusconflict
-    ld a,[W_PLAYERMONSTATUS]
+    ld a,[W_PLAYERMONSTATUS] ; ~TODO:MultiStatus
     and a
     jr nz,.heavydiscourage
 .nostatusconflict
