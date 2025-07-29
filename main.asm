@@ -555,6 +555,19 @@ GoToBottom:
     ld [wCurrentMenuItem],a
     ret
 
+GetLeftTileOfHPBar:
+    ld a,[wListMenuID] ; Is Party Menu?
+    cp 2               ; ...
+    ld a,$71 ; left of HP bar tile 1
+    ret nz ; NotParty
+    dec a ; $70 ; Energy Symbol in Party Menu
+    ret
+
+HandleMenuInputWithWrap:
+    ld a,1
+    ld [wMenuWrappingEnabled],a
+    jp HandleMenuInput
+
 ; Free
 
 SECTION "HandleMidJump",ROM0[$039e]
@@ -3015,7 +3028,7 @@ DrawHPBar: ; 1336 (0:1336)
     push hl
     push de
     push bc
-    ld a,$71 ; left of HP bar tile 1
+    call GetLeftTileOfHPBar ; ld a,$71 ; left of HP bar tile 1
     ld [hli],a
     ld a,$62 ; left of HP bar tile 2
     ld [hli],a
@@ -33010,7 +33023,7 @@ PCMainMenu: ; 17e48 (5:7e48)
     call Bankswitch
     ld hl,wFlags_0xcd60
     set 5,[hl]
-    call HandleMenuInput
+    call HandleMenuInputWithWrap
     bit 1,a              ;if player pressed B
     jp nz,LogOff
     ld a,[wMaxMenuItem]
@@ -44852,7 +44865,7 @@ BillsPCMenu: ; 214e8 (8:54e8)
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     call Delay3
-    call HandleMenuInput
+    call HandleMenuInputWithWrap
     bit 1,a
     jp nz,Func_21588 ; b button
     call PlaceUnfilledArrowMenuCursor
@@ -100571,10 +100584,6 @@ Func_71791: ; 71791 (1c:5791)
     pop af
     dec a
     jr nz,.asm_7179c
-    ld de,PartyHPBorderAndEnergy
-    ld hl,$9700
-    ld bc,(BANK(PartyHPBorderAndEnergy) << 8 | $1)
-    call GoodCopyVideoData
     jp EnableLCD
 
 ; Free
@@ -138516,8 +138525,6 @@ FontGraphicsGrayWall2bpp:
     INCBIN "gfx/denim/font.2bpp"
 Wall2bpp:
     INCBIN "gfx/denim/wall.2bpp"
-PartyHPBorderAndEnergy:
-    INCBIN "gfx/party_hp_border_and_energy.2bpp"
 
 LoadStatusScreenGenericTile:
     call LoadHpBarAndStatusTilePatterns
