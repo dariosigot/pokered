@@ -53352,9 +53352,8 @@ MainInBattleLoop: ; 3c233 (f:4233)
     and a
     jr z,.HandlePlayerMonFainted
 .AIActionUsedEnemyFirst
-    call HandlePoisonBurnLeechSeed
+    call .HandlePoisonBurnLeechSeed
     jr z,.HandleEnemyMonFainted
-    call DrawHUDsAndHPBars
     call ExecutePlayerMove ; execute player move
     ld a,[$d078] ; was Teleport, Road, or Whirlwind used to escape from battle?
     and a
@@ -53362,7 +53361,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     ld a,b
     and a
     jr z,.HandleEnemyMonFainted
-    call HandlePoisonBurnLeechSeed
+    call .HandlePoisonBurnLeechSeed
     jr z,.HandlePlayerMonFainted
     jr .end
 
@@ -53379,9 +53378,8 @@ MainInBattleLoop: ; 3c233 (f:4233)
     call z,CheckandResetEnemyActedBit ;reset enemy acted bit if enemy pkmn fainted
     pop af
     jr z,.HandleEnemyMonFainted
-    call HandlePoisonBurnLeechSeed
+    call .HandlePoisonBurnLeechSeed
     jr z,.HandlePlayerMonFainted
-    call DrawHUDsAndHPBars
 ;#3 - handle enemy using move
     ld a,$1
     ld [H_WHOSETURN],a
@@ -53399,7 +53397,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     and a
     jr z,.HandlePlayerMonFainted
 .AIActionUsedPlayerFirst
-    call HandlePoisonBurnLeechSeed
+    call .HandlePoisonBurnLeechSeed
     jr z,.HandleEnemyMonFainted
 
 .end
@@ -53412,6 +53410,12 @@ MainInBattleLoop: ; 3c233 (f:4233)
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
 
+.HandlePoisonBurnLeechSeed
+    call DrawHUDsAndHPBars
+    ld b,BANK(HandlePoisonBurnLeechSeed_)
+    ld hl,HandlePoisonBurnLeechSeed_
+    jp Bankswitch
+
 MoveEffectToPercentage:
     cp a,7    ; 10% status effects are 04,05,06 so 07 will set carry for those
     ld b,$1a  ; [1A-1]/100 or [26-1]/256 = 9.8%~ chance
@@ -53419,11 +53423,6 @@ MoveEffectToPercentage:
     ld b,$4d  ; ..or use [4D-1]/100 or [76-1]/256 = 29.7%~ chance
     sub a,$1e ; subtract $1E to map to equivalent 10% chance effects
     ret
-
-HandlePoisonBurnLeechSeed:
-    ld b,BANK(HandlePoisonBurnLeechSeed_)
-    ld hl,HandlePoisonBurnLeechSeed_
-    jp Bankswitch
 
 ; Free
 
@@ -121011,15 +121010,15 @@ _UnnamedText_3c22e: ; 89677 (22:5677)
 
 _HurtByPoisonText: ; 89689 (22:5689)
     db $0,$5a,"'s",$4f
-    db "hurt by poison!",$58
+    db "hurt by poison!",$57
 
 _HurtByBurnText: ; 8969d (22:569d)
     db $0,$5a,"'s",$4f
-    db "hurt by the burn!",$58
+    db "hurt by the burn!",$57
 
 _HurtByLeechSeedText: ; 896b3 (22:56b3)
     db $0,"LEECH SEED saps",$4f
-    db $5a,"!",$58
+    db $5a,"!",$57
 
 _EnemyMonFainted: ; 0x896c7
     db $0,"Enemy @"
@@ -133449,73 +133448,106 @@ HandleEnemyRageAndThrashing:
 ; ───────────────────────────────────────
 
 HandlePoisonBurnLeechSeed_:
-    ld hl,W_PLAYERMONCURHP ; $d015
-    ld de,W_PLAYERMONSTATUS ; $d018 ; ~TODO:MultiStatus
-    ld a,[H_WHOSETURN] ; $FF00+$f3
+    ld hl,W_PLAYERMONCURHP
+    ld de,W_PLAYERBATTSTATUS2
+    ld bc,W_PLAYERMONSTATUS ; ~DONE:MultiStatus
+    ld a,[H_WHOSETURN]
     and a
     jr z,.playersTurn
-    ld hl,W_ENEMYMONCURHP ; $cfe6
-    ld de,W_ENEMYMONSTATUS ; $cfe9
+    ld hl,W_ENEMYMONCURHP
+    ld de,W_ENEMYBATTSTATUS2
+    ld bc,W_ENEMYMONSTATUS ; ~DONE:MultiStatus
 .playersTurn
     ld a,[de]
-    and BRN | PSN ; ~TODO:MultiStatus
-    jr z,.notBurnedOrPoisoned
+    bit SEEDED,a
+    jr z,.notLeechSeeded
+    push bc
     push hl
-    ld hl,.HurtByPoisonText ; ~TODO:MultiStatus
-    ld a,[de]
-    and BRN
-    push af
-    jr z,.poisoned
-    ld hl,.HurtByBurnText ; ~TODO:MultiStatus
-.poisoned
-    call PrintText
-    xor a
-    ld [$cc5b],a
-    pop af
-    ld a,$ba
-    call .PlayPsnBrnAnimation ; PlayMoveAnimation   ; play burn/poison animation
-    pop hl
-    call HandlePoisonBurnLeechSeed_DecreaseOwnHP
-.notBurnedOrPoisoned
-
-; ~TODO: Check Faintened ► Not Seeded Effect
-
-    ld de,W_PLAYERBATTSTATUS2 ; $d063
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.playersTurn2
-    ld de,W_ENEMYBATTSTATUS2 ; $d068
-.playersTurn2
-    ld a,[de]
-    add a
-    jr nc,.notLeechSeeded
-    push hl
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    push af
-    xor $1
-    ld [H_WHOSETURN],a ; $FF00+$f3
-    xor a
-    ld [$cc5b],a
-    ld a,[wUnusedC000]
-    set 6,a ; set the bit that indicates leech seed is being handled
-    ld [wUnusedC000],a
-    ld a,$47
-    call PlayMoveAnimationBank33 ; play leech seed animation (from opposing mon)
-    pop af
-    ld [H_WHOSETURN],a ; $FF00+$f3
-    pop hl
-    call HandlePoisonBurnLeechSeed_DecreaseOwnHP
-    call HandlePoisonBurnLeechSeed_IncreaseEnemyHP
     push hl
     ld hl,.HurtByLeechSeedText
     call PrintText
     pop hl
+    ld a,[H_WHOSETURN]
+    push af
+    xor $1
+    ld [H_WHOSETURN],a
+    xor a
+    ld [$cc5b],a
+    ld a,ABSORB
+    call .PlayMoveAnimation ; play leech seed animation (from opposing mon)
+    pop af
+    ld [H_WHOSETURN],a
+    pop hl
+    call PoisonBurnLeechSeed_DecreaseOwnHP
+    call LeechSeed_IncreaseEnemyHP
+    call .WaitForTextScrollButtonPress
+    ld a,[hli]      ; Test If Fainted
+    or [hl]         ; ...
+    dec hl          ; ...
+    pop bc          ; ...
+    jr z,.Faintened ; ...
 .notLeechSeeded
-    ld a,[hli]
-    or [hl]
-    ret nz          ; test if fainted
-    PREDEF DrawHUDsAndHPBars
-    ld c,$14
+    ld a,[bc]
+    bit PSN_Bit,a
+    jr z,.notPoisoned
+    push bc
+    push hl
+    push hl
+    ld hl,.HurtByPoisonText
+    call PrintText
+    pop hl
+    xor a
+    ld [$cc5b],a
+    ld a,$BA
+    call .PlayMoveAnimation ; play poison animation
+    pop hl
+    ld a,[wUnusedC000]
+    set 6,a ; set the bit that indicates poison is being handled
+    ld [wUnusedC000],a
+    call PoisonBurnLeechSeed_DecreaseOwnHP
+    ld a,[wUnusedC000]
+    res 6,a ; reset the bit that indicates poison is being handled
+    ld [wUnusedC000],a
+    call .WaitForTextScrollButtonPress
+    ld a,[hli]      ; Test If Fainted
+    or [hl]         ; ...
+    dec hl          ; ...
+    pop bc          ; ...
+    jr z,.Faintened ; ...
+.notPoisoned
+    ld a,[bc]
+    bit BRN_Bit,a
+    jr z,.notBurned
+    push bc
+    push hl
+    push hl
+    ld hl,.HurtByBurnText
+    call PrintText
+    pop hl
+    xor a
+    ld [$cc5b],a
+    ld a,[H_WHOSETURN]
+    push af
+    xor $1
+    ld [H_WHOSETURN],a
+    ld a,EMBER
+    call .PlayMoveAnimation ; play burn animation (from opposing mon)
+    pop af
+    ld [H_WHOSETURN],a
+    pop hl
+    call PoisonBurnLeechSeed_DecreaseOwnHP
+    call .WaitForTextScrollButtonPress
+    ld a,[hli]      ; Test If Fainted
+    or [hl]         ; ...
+    dec hl          ; ...
+    pop bc          ; ...
+    jr z,.Faintened ; ...
+.notBurned
+    ld a,1 ; rzf
+    and a  ; ...
+    ret
+.Faintened
+    ld c,20
     call DelayFrames
     xor a
     ret
@@ -133528,28 +133560,23 @@ HandlePoisonBurnLeechSeed_:
 .HurtByLeechSeedText
     TX_FAR _HurtByLeechSeedText
     db "@"
-
-; play burn/poison animation
-.PlayPsnBrnAnimation
-    jp z,PlayMoveAnimationBank33 ; poisoned
-    call .FlipTurn
-    ld a,EMBER
-    call PlayMoveAnimationBank33 ; burned
-    ; fall through
-.FlipTurn
-    ld a,[H_WHOSETURN]
-    xor a,$01
-    ld [H_WHOSETURN],a
-    ret
-
-PlayMoveAnimationBank33:
+.PlayMoveAnimation
     ld [$D07C],a
     call Delay3
     PREDEF_JUMP MoveAnimation
+.WaitForTextScrollButtonPress
+    push hl
+    PREDEF DrawHUDsAndHPBars
+    ld a,$EE
+    FuncCoord 18,16 ; $c4f2
+    ld [Coord],a
+    call WaitForTextScrollButtonPress
+    pop hl
+    ret
 
 ; decreases the mon's current HP by 1/16 of the Max HP (multiplied by number of toxic ticks if active)
 ; hl: HP pointer
-HandlePoisonBurnLeechSeed_DecreaseOwnHP:
+PoisonBurnLeechSeed_DecreaseOwnHP:
     push hl
     push hl
     call HPDiv16
@@ -133563,9 +133590,7 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP:
 .playersTurn
     ld a,[wUnusedC000]
     bit 6,a ; check if this is for leech seed
-    res 6,a ; (reset the bit without affecting flags)
-    ld [wUnusedC000],a
-    jr nz,.noToxic
+    jr z,.noToxic
     bit BADLY_POISONED,[hl]
     jr z,.noToxic
 .Toxic
@@ -133608,7 +133633,7 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP:
     ret
 
 ; adds HP/16 to enemy HP
-HandlePoisonBurnLeechSeed_IncreaseEnemyHP:
+LeechSeed_IncreaseEnemyHP:
     push hl
     call HPDiv16
     push bc
@@ -133688,12 +133713,12 @@ HPDiv16:
 
 _RockDamage:
     ld hl,W_ENEMYMONCURHP
-    call HandlePoisonBurnLeechSeed_DecreaseOwnHP
+    call PoisonBurnLeechSeed_DecreaseOwnHP ; ~TODO:HandleFaintened
     PREDEF_JUMP DrawEnemyHUDAndHPBar
 
 _BaitHealth:
     ld hl,W_ENEMYMONCURHP
-    call HandlePoisonBurnLeechSeed_IncreaseEnemyHP
+    call LeechSeed_IncreaseEnemyHP
     PREDEF_JUMP DrawEnemyHUDAndHPBar
 
 ; ───────────────────────────────────────
