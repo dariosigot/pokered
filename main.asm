@@ -56811,7 +56811,10 @@ CheckForDisobedience: ; 3dc88 (f:5c88)
     swap a
     and $7
     jr z,.asm_3dd0e
-    ld [W_PLAYERMONSTATUS],a ; $d018 ; ~TODO:MultiStatus (Obey)
+    ld hl,W_PLAYERMONSTATUS ; ~DONE:MultiStatus
+    ld b,[hl]
+    or b
+    ld [hl],a
     ld hl,UnnamedText_3ddbb ; $5dbb
     jr .asm_3dd3a
 .monDoesNothing
@@ -56881,18 +56884,6 @@ CheckForDisobedience: ; 3dc88 (f:5c88)
     xor a
     ret
 
-EnemyMonFainted: ; 0x3c63e
-    TX_FAR _EnemyMonFainted
-    db "@"
-
-Func_3c643: ; 3c643 (f:4643)
-    xor a
-    ld [$d083],a
-    ld [$c02a],a
-    inc a
-    ld [$ccf6],a
-    ret
-
 AlignIndexMenu:
     ld a,[wCurrentMenuItem] ; $cc26
     dec a
@@ -56933,6 +56924,8 @@ ChooseRandomMove:
 SetDEAndLoadMonFrontSprite:
     ld de,$9000
     jp LoadMonFrontSprite
+
+; Free
 
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
@@ -57482,6 +57475,18 @@ ReflectLightScreenEffect:
     ld hl,ReflectLightScreenEffect_
     ld b,BANK(ReflectLightScreenEffect_)
     jp Bankswitch
+
+EnemyMonFainted:
+    TX_FAR _EnemyMonFainted
+    db "@"
+
+Func_3c643:
+    xor a
+    ld [$d083],a
+    ld [$c02a],a
+    inc a
+    ld [$ccf6],a
+    ret
 
 ; Free
 
