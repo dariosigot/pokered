@@ -25025,11 +25025,11 @@ ItemUsePokeflute: ; e140 (3:6140)
     jr z,.NotInBattle
 
 .inBattle
-    ld hl,W_PLAYERMONSTATUS ; ~TODO:MultiStatus
+    ld hl,W_PLAYERMONSTATUS ; ~DONE:MultiStatus
     ld a,[hl]
     and b ; remove Sleep status
     ld [hl],a
-    ld hl,W_ENEMYMONSTATUS ; ~TODO:MultiStatus
+    ld hl,W_ENEMYMONSTATUS ; ~DONE:MultiStatus
     ld a,[hl]
     push af
     and a,SLP ; is pokemon asleep?
@@ -50397,7 +50397,7 @@ AICureStatus:
     pop af
     ld [H_WHOSETURN],a
     xor a
-    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy ; ~TODO:MultiStatus
+    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy ; ~DONE:MultiStatus
     ld [W_ENEMYTOXICCOUNTER], a ;clear toxic counter
     ld hl,W_ENEMYBATTSTATUS3 ;clear toxic bit
     res 0,[hl]
