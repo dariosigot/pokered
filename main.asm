@@ -23465,9 +23465,7 @@ DrawHudAndPrintTextPokeFlute:
     and a
     jr z,.End
     push hl
-    ld b,BANK(DrawHUDsAndHPBars)
-    ld hl,DrawHUDsAndHPBars
-    call Bankswitch
+    PREDEF DrawHUDsAndHPBars
     pop hl
 .End
     jp PrintText
@@ -28677,9 +28675,7 @@ ReDrawBattleHudAfterItemUse:
     ld hl,HidePlayerBattleHudAndRestorePalette_
     ld b,BANK(HidePlayerBattleHudAndRestorePalette_)
     call Bankswitch
-    ld b,BANK(DrawHUDsAndHPBars)
-    ld hl,DrawHUDsAndHPBars
-    jp Bankswitch
+    PREDEF_JUMP DrawHUDsAndHPBars
 
 PartyMenuHPAndStandarizePalette:
     call LoadMonData
@@ -31382,8 +31378,7 @@ HazeEffect_:
 
 DrawHudAndPrintTextBank4:
     push hl
-    ld hl,DrawHUDsAndHPBars
-    call Bankswitch4toF
+    PREDEF DrawHUDsAndHPBars
     pop hl
     jp PrintText
 
@@ -47621,9 +47616,7 @@ LeechSeedEffect_:
     jp Bankswitch
 .DrawHudAndPrintText
     push hl
-    ld b,BANK(DrawHUDsAndHPBars)
-    ld hl,DrawHUDsAndHPBars
-    call Bankswitch
+    PREDEF DrawHUDsAndHPBars
     pop hl
     jp PrintText
 .WasSeededText
@@ -50411,8 +50404,7 @@ AICureStatus:
 
 DrawHudAndPrintTextBankE:
     push hl
-    ld hl,DrawHUDsAndHPBars
-    call BankswitchEtoF
+    PREDEF DrawHUDsAndHPBars
     pop hl
     jp PrintText
 
@@ -76351,6 +76343,7 @@ AdjustDamageForMoveType_GetInputPredef:    NEW_PREDEF AdjustDamageForMoveType_Ge
 UpgradeTrainerSet_Predef:                  NEW_PREDEF UpgradeTrainerSet_                  ; $6F
 IsMonInCurrentMapPredef:                   NEW_PREDEF IsMonInCurrentMap                   ; $70
 UndoBurnParStatsPredef:                    NEW_PREDEF UndoBurnParStats                    ; $71
+DrawHUDsAndHPBarsPredef:                   NEW_PREDEF DrawHUDsAndHPBars                   ; $72
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -140163,9 +140156,7 @@ ItemInBattleFinalCheck:
     PREDEF DrawPlayerHUDAndHPBar
     jp SaveScreenTilesToBuffer1
 .DrawHUDsAndHPBars
-    ld b,BANK(DrawHUDsAndHPBars)
-    ld hl,DrawHUDsAndHPBars
-    jp Bankswitch
+    PREDEF_JUMP DrawHUDsAndHPBars
 .HackGainExpAfterCatch
     ld b,BANK(HackGainExpAfterCatch)
     ld hl,HackGainExpAfterCatch
@@ -141949,9 +141940,7 @@ SubstituteEffectHandler:
     call Bankswitch           ;jump to routine depending on animation setting
     ld hl,.UnnamedText_17e1d  ;"it created a substitute"
     call PrintText
-    ld hl,DrawHUDsAndHPBars
-    ld b,BANK(DrawHUDsAndHPBars)
-    jp Bankswitch
+    PREDEF_JUMP DrawHUDsAndHPBars
 .alreadyHasSubstitute
     ld hl,.UnnamedText_17e22  ;"x has a substitute"
     jr .printText
