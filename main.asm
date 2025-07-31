@@ -81257,6 +81257,8 @@ GainExperience: ; 5524f (15:524f)
     call AddNTimes
     jp .partyMonLoop
 .asm_55450
+    ld hl,wFirstExpAllMessageBit6
+    res 6,[hl]
     ld hl,W_PLAYERMONSALIVEFLAGS
     xor a
     ld [hl],a
