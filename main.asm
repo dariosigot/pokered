@@ -25279,7 +25279,7 @@ ItemUsePPRestore:
     push af
     push hl
     ld [hl],b
-    FuncCoord 07,01 ; Party Ether Update Energy
+    FuncCoord 08,01 ; Party Ether Update Energy
     ld hl,Coord
     ld a,[$cf92]
     ld bc,40
