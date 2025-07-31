@@ -53424,6 +53424,43 @@ MoveEffectToPercentage:
     sub a,$1e ; subtract $1E to map to equivalent 10% chance effects
     ret
 
+CheckDefrost:
+    and FRZ                        ;are they frozen?
+    ret z                          ;return if so
+;not frozen
+    ld a,[H_WHOSETURN]             ;whose turn?
+    and a
+    jr nz,.opponent
+;player [attacker]
+    ld a,[W_PLAYERMOVETYPE]
+    cp FIRE
+    ret nz                         ;return if it isn't fire
+    ld hl,W_ENEMYMONSTATUS
+    res FRZ_Bit,[hl]               ;"defrost" a frozen monster ; ~DONE:MultiStatus
+    ld hl,$d8a8                    ;status of first opponent monster in their roster
+    ld a,[W_ENEMYMONNUMBER]
+    ld bc,$002c                    ;$2C bytes per roster entry
+    call AddNTimes
+    res FRZ_Bit,[hl]               ;"defrost" in roster ; ~DONE:MultiStatus
+    jr .common
+.opponent
+    ld a,[W_ENEMYMOVETYPE]         ;same as above with addresses swapped
+    cp FIRE
+    ret nz
+    ld hl,W_PLAYERMONSTATUS
+    res FRZ_Bit,[hl] ; ~DONE:MultiStatus
+    ld hl,W_PARTYMON1_STATUS
+    ld a,[wPlayerMonNumber]
+    ld bc,$002c
+    call AddNTimes
+    res FRZ_Bit,[hl] ; ~DONE:MultiStatus
+.common
+    ld hl,.UnnamedText_3f423
+    jp DrawHudAndPrintText
+.UnnamedText_3f423
+    TX_FAR _UnnamedText_3f423
+    db "@"
+
 ; Free
 
 SECTION "UpdateCurMonHPBar",ROMX[$44f6],BANK[$f]
@@ -58124,45 +58161,6 @@ JumpMoveEffect:
     ld b,$1
     ret
 
-CheckDefrost:
-    and a,FRZ            ;are they frozen?
-    ret z                ;return if so
-                        ;not frozen
-    ld a,[$ff00+$f3]    ;whose turn?
-    and a
-    jr nz,.opponent
-    ;player [attacker]
-    ld a,[W_PLAYERMOVETYPE]
-    sub a,FIRE
-    ret nz        ;return if it isn't fire
-                ;type is fire
-    ld [W_ENEMYMONSTATUS],a        ;set opponent status to 00 ["defrost" a frozen monster] ; ~TODO:MultiStatus
-    ld hl,$d8a8                    ;status of first opponent monster in their roster
-    ld a,[W_ENEMYMONNUMBER]
-    ld bc,$002c        ;$2C bytes per roster entry
-    call AddNTimes
-    xor a
-    ld [hl],a            ;clear status in roster ; ~TODO:MultiStatus
-    ld hl,.UnnamedText_3f423
-    jr .common
-.opponent
-    ld a,[W_ENEMYMOVETYPE]        ;same as above with addresses swapped
-    sub a,FIRE
-    ret nz
-    ld [W_PLAYERMONSTATUS],a ; ~TODO:MultiStatus
-    ld hl,W_PARTYMON1_STATUS
-    ld a,[wPlayerMonNumber]
-    ld bc,$002c
-    call AddNTimes
-    xor a
-    ld [hl],a ; ~TODO:MultiStatus
-    ld hl,.UnnamedText_3f423
-.common
-    jp PrintText
-.UnnamedText_3f423
-    TX_FAR _UnnamedText_3f423
-    db "@"
-
 ;joenote - zero the damage from last round if not using a trapping move
 CheckTrappingToResetDamage:
     ld a,[W_ENEMYBATTSTATUS1]
@@ -59371,6 +59369,8 @@ EffectsArray6:
     db PAY_DAY_EFFECT
     db $FF
 
+; Free
+
 SECTION "ApplyBurnAndParalysisPenaltiesToPlayer",ROMX[$6d1a],BANK[$f]
 
 ApplyBurnAndParalysisPenaltiesToPlayer: ; 3ed1a (f:6d1a)
@@ -60279,9 +60279,7 @@ ExplodeEffect:
     ld [de],a
     ret
 
-SECTION "FreezeBurnParalyzeEffect",ROMX[$730c],BANK[$f]
-
-FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
+FreezeBurnParalyzeEffect:
     xor a
     ld [$cc5b],a
     call CheckTargetSubstitute         ;test bit 4 of d063/d068 flags [target has substitute flag]
@@ -60293,7 +60291,7 @@ FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
 PlayerAttacker:
     ld a,[W_ENEMYMONSTATUS] ; ~TODO:MultiStatus
     and a
-    jp nz,CheckDefrost ;opponent has existing status
+    call nz,CheckDefrost ;opponent has existing status
     call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
     ld hl,W_ENEMYMONTYPES
     call AttackerTypeMatchOneOfDefenderTypesPlusException
@@ -60333,7 +60331,7 @@ PlayerAttacker:
 OpponentAttacker:
     ld a,[W_PLAYERMONSTATUS]  ;this appears to the same as above with addresses swapped for opponent ; ~TODO:MultiStatus
     and a
-    jp nz,CheckDefrost
+    call nz,CheckDefrost
     call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
     ld hl,W_PLAYERMONTYPES
     call AttackerTypeMatchOneOfDefenderTypesPlusException
