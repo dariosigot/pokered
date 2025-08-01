@@ -60315,17 +60315,17 @@ FreezeBurnParalyzeEffect:
     ld [$cc5b],a
     call CheckTargetSubstitute         ;test bit 4 of d063/d068 flags [target has substitute flag]
     ret nz             ;return if they have a substitute,can't effect them
-    ld a,[H_WHOSETURN] ; $FF00+$f3  ;whose turn?
+    ld a,[H_WHOSETURN]
     and a
-    jp nz,OpponentAttacker
+    jp nz,.OpponentAttacker
 
-PlayerAttacker:
-    ld a,[W_ENEMYMONSTATUS] ; ~TODO:MultiStatus
+.PlayerAttacker
+    ld a,[W_ENEMYMONSTATUS] ; ~DONE:MultiStatus
     and a
     call nz,CheckDefrost ;opponent has existing status
     call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
     ld hl,W_ENEMYMONTYPES
-    call AttackerTypeMatchOneOfDefenderTypesPlusException
+    call .AttackerTypeMatchOneOfDefenderTypesPlusException
     ret z
     ld a,[W_PLAYERMOVEEFFECT]
     call MoveEffectToPercentage
@@ -60334,38 +60334,36 @@ PlayerAttacker:
     cp b        ;success?
     pop bc      ;...pop effect into B
     ret nc      ;do nothing if random value is >= 1A or 4D [no status applied]
+    ld hl,W_ENEMYMONSTATUS
     ld a,b     ;what type of effect is this?
     cp a,BURN_SIDE_EFFECT1
-    jr z,.burn
+    jr z,.burn1
     cp a,FREEZE_SIDE_EFFECT
-    jr z,.freeze
-    ld a,PAR
-    ld [W_ENEMYMONSTATUS],a ; ~TODO:MultiStatus
+    jr z,.freeze1
+    set PAR_Bit,[hl] ; ~DONE:MultiStatus
     call QuarterSpeedDueToParalysis  ;quarter speed of affected monster
     call PlayA9BattleAnimation
     jp PrintMayNotAttackText    ;print paralysis text
-.burn
-    ld a,BRN
-    ld [W_ENEMYMONSTATUS],a ; ~TODO:MultiStatus
+.burn1
+    set BRN_Bit,[hl] ; ~DONE:MultiStatus
     call HalveAttackDueToBurn
     call PlayA9BattleAnimation
-    ld hl,UnnamedText_3f3d8
+    ld hl,.UnnamedText_3f3d8
     jp DrawHudAndPrintText
-.freeze
+.freeze1
     call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
-    ld a,FRZ
-    ld [W_ENEMYMONSTATUS],a ; ~TODO:MultiStatus
+    set FRZ_Bit,[hl] ; ~DONE:MultiStatus
     call PlayA9BattleAnimation
-    ld hl,UnnamedText_3f3dd
+    ld hl,.UnnamedText_3f3dd
     jp DrawHudAndPrintText
 
-OpponentAttacker:
-    ld a,[W_PLAYERMONSTATUS]  ;this appears to the same as above with addresses swapped for opponent ; ~TODO:MultiStatus
+.OpponentAttacker
+    ld a,[W_PLAYERMONSTATUS] ; ~DONE:MultiStatus
     and a
     call nz,CheckDefrost
     call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
     ld hl,W_PLAYERMONTYPES
-    call AttackerTypeMatchOneOfDefenderTypesPlusException
+    call .AttackerTypeMatchOneOfDefenderTypesPlusException
     ret z
     ld a,[W_ENEMYMOVEEFFECT]
     call MoveEffectToPercentage
@@ -60374,40 +60372,37 @@ OpponentAttacker:
     cp b
     pop bc
     ret nc
+    ld hl,W_PLAYERMONSTATUS
     ld a,b
     cp a,BURN_SIDE_EFFECT1
-    jr z,.burn
+    jr z,.burn2
     cp a,FREEZE_SIDE_EFFECT
-    jr z,.freeze
-    ld a,PAR
-    ld [W_PLAYERMONSTATUS],a ; ~TODO:MultiStatus
+    jr z,.freeze2
+    set PAR_Bit,[hl] ; ~DONE:MultiStatus
     call QuarterSpeedDueToParalysis
     call PlayC7BattleAnimation
     jp PrintMayNotAttackText
-.burn
-    ld a,BRN
-    ld [W_PLAYERMONSTATUS],a ; ~TODO:MultiStatus
+.burn2
+    set BRN_Bit,[hl] ; ~DONE:MultiStatus
     call HalveAttackDueToBurn
     call PlayC7BattleAnimation
-    ld hl,UnnamedText_3f3d8
+    ld hl,.UnnamedText_3f3d8
     jp DrawHudAndPrintText
-.freeze
+.freeze2
     call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
-    ld a,FRZ
-    ld [W_PLAYERMONSTATUS],a ; ~TODO:MultiStatus
+    set FRZ_Bit,[hl] ; ~DONE:MultiStatus
     call PlayC7BattleAnimation
-    ld hl,UnnamedText_3f3dd
+    ld hl,.UnnamedText_3f3dd
     jp DrawHudAndPrintText
 
-UnnamedText_3f3d8: ; 3f3d8 (f:73d8)
+.UnnamedText_3f3d8
     TX_FAR _UnnamedText_3f3d8
     db "@"
-
-UnnamedText_3f3dd: ; 3f3dd (f:73dd)
+.UnnamedText_3f3dd
     TX_FAR _UnnamedText_3f3dd
     db "@"
 
-AttackerTypeMatchOneOfDefenderTypesPlusException:
+.AttackerTypeMatchOneOfDefenderTypesPlusException
     push hl
     call .Loop4MovesInHLAndCompareWithA
     pop hl
