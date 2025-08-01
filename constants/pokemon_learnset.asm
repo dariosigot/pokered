@@ -2409,6 +2409,7 @@ TANGELA_Learnset: MACRO
     db 31,BARRAGE
     db 33,CONFUSION
     db 35,RAZOR_LEAF
+    db 36,SPORE
     db 37,HAZE
     db 39,AMNESIA
     db 40,SOLARBEAM
@@ -2925,6 +2926,7 @@ VAPOREON_Learnset: MACRO
     db 34,FOCUS_ENERGY
     db 37,TSUNAMI
     db 39,HAZE
+    db 40,ICE_PUNCH
     db 42,HYPER_FANG
     db 45,TAKE_DOWN
     db 48,HYDRO_PUMP
@@ -2955,6 +2957,7 @@ JOLTEON_Learnset: MACRO
     db 34,FOCUS_ENERGY
     db 37,THUNDERBOLT
     db 39,FLASH
+    db 40,THUNDERPUNCH
     db 42,HYPER_FANG
     db 45,TAKE_DOWN
     db 48,THUNDER_M
@@ -2985,6 +2988,7 @@ FLAREON_Learnset: MACRO
     db 34,FOCUS_ENERGY
     db 37,FLAMETHROWER
     db 39,POISON_GAS
+    db 40,FIRE_PUNCH
     db 42,HYPER_FANG
     db 45,TAKE_DOWN
     db 48,FIRE_BLAST
@@ -3293,10 +3297,12 @@ DRAGONAIR_Learnset: MACRO
     DRATINI_Learnset
     db 30,HORN_ATTACK
     db 30,FURY_ATTACK
+    db 30,GUST
     db 32,HYPER_FANG
     db 34,LIGHT_SCREEN
     db 36,SKULL_BASH
     db 38,HAZE
+    db 40,RAZOR_WIND
     db 41,TRAPHOLE
     db 43,ICE_BEAM
     db 44,FLAMETHROWER
@@ -3309,9 +3315,7 @@ DRAGONAIR_Learnset: MACRO
 ENDM
 DRAGONITE_Learnset: MACRO
     DRAGONAIR_Learnset
-    db 55,GUST
     db 55,SWOOP
-    db 55,RAZOR_WIND
     db 56,HYDRO_PUMP
     db 57,THUNDER_M
     db 58,BLIZZARD

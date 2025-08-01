@@ -10,7 +10,7 @@ wUnusedC000:: ; c000
 ;bit 3 - used for AIGetTypeEffectiveness (0 = enemy move effectiveness | 1 = player move effectiveness)
 ;bit 4 - if set, current move being handled is a static damaging move 
 ;bit 5 - if set, current ai trainer has ai routine 4 assigned
-;bit 6 - if set, poison/burn damage algorithm is being called to handle leech seed
+;bit 6 - if set, poison damage algorithm is being called to handle toxic
 ;bit 7 - if set, force Counter to miss (for an opponent hurting itself or its jump kick missing)
     ds 1
 
@@ -578,9 +578,7 @@ wCriticalHitOrOHKO: ; d05e
 W_MOVEMISSED: ; d05f
     ds 1
 
-wPlayerStatsToDouble:: ; d060
-; always 0
-;joenote - putting this back into use
+wStatsToDouble:: ; d060
 ;set bit to flag the stat
 ;bit 0 - attack
 ;bit 1 - defence
@@ -618,14 +616,7 @@ W_PLAYERBATTSTATUS3: ; d064
 ; bit 3 - tranformed
     ds 1
 
-wEnemyStatsToDouble:: ; d065
-; always 0
-;joenote - putting this back into use
-;set bit to flag the stat
-;bit 0 - attack
-;bit 1 - defence
-;bit 2 - speed
-;bit 3 - special
+wUnused_d065:: ; d065
     ds 1
 
     ds 1

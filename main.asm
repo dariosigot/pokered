@@ -23460,6 +23460,16 @@ IsSurfingAllowed:
 ItemUseCardKey:
     jp ItemUseNotTime
 
+DrawHudAndPrintTextPokeFlute:
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.End
+    push hl
+    PREDEF DrawHUDsAndHPBars
+    pop hl
+.End
+    jp PrintText
+
 SECTION "ItemUseBall",ROMX[$5687],BANK[$3]
 
 ItemUseBall: ; d687 (3:5687)
@@ -23550,19 +23560,12 @@ ItemUseBall: ; d687 (3:5687)
 ; Frozen/Asleep pokemon are relatively even easier to catch
 ; for Frozen/Asleep pokemon,any random number from 0-24 ensures a catch.
 ; for the others,a random number from 0-11 ensures a catch.
-    ld a,[W_ENEMYMONSTATUS]    ;status ailments
-    and a
-    jr z,.noAilments
-    and a,(FRZ + SLP)    ;is frozen and/or asleep?
-    ld c,12
-    jr z,.notFrozenOrAsleep
-    ld c,25
-.notFrozenOrAsleep    ;$5728
-    ld a,b
-    sub c
-    jp c,.BallSuccess    ;$578b
+    push bc
+    call GetStatusFactor ; Get d
+    pop af
+    sub d
+    jp c,.BallSuccess
     ld b,a
-.noAilments    ;$572e
     push bc        ;save RANDOM number
     xor a
     ld [H_MULTIPLICAND],a
@@ -23659,19 +23662,10 @@ ItemUseBall: ; d687 (3:5687)
     ld [H_DIVISOR],a
     ld b,4
     call Divide
-    ld a,[W_ENEMYMONSTATUS]    ;status ailments
-    and a
-    jr z,.next13
-    and a,(FRZ + SLP)
-    ld b,5
-    jr z,.next14
-    ld b,10
-.next14    ;$57e6
+    call GetStatusFactor ; Get e
     ld a,[H_QUOTIENT + 3]
-    add b
+    add e
     ld [H_QUOTIENT + 3],a
-.next13    ;$57eb
-    ld a,[H_QUOTIENT + 3]
     cp a,10
     ld b,$20
     jr c,.next12
@@ -23814,6 +23808,42 @@ ItemUseBall: ; d687 (3:5687)
     inc a
     ld [$cf96],a
     jp RemoveItemFromInventory    ;remove ITEM (XXX)
+
+;joenote - undo brn/par stat changes for Full Restore after restoring HP in battle
+UndoBurnParStats_FullRestore:
+    push hl
+    push de
+    ld a,[H_WHOSETURN]
+    push af
+    xor a    ;forcibly set it to the player's turn
+    ld [H_WHOSETURN],a
+    ;undo brn/par stat changes
+    ld d,%0000101 ; bit 0 = attack | bit 2 = speed
+    PREDEF UndoBurnParStats
+    pop af
+    ld [H_WHOSETURN],a
+    pop de
+    pop hl
+    ret
+
+HandleBackupAfterBallCatch:
+    ld hl,W_ENEMYBATTSTATUS3
+    bit 3,[hl]
+    jr nz,.justTransformed
+    set 3,[hl]
+    call BackupMoves
+    call BackupPP
+    ld hl,$cceb
+    ld a,[W_ENEMYMONATKDEFIV]
+    ld [hli],a
+    ld a,[W_ENEMYMONSPDSPCIV]
+    ld [hl],a
+.justTransformed
+    ld a,[W_ENEMYMONENERGY]   ; Backup Current Energy
+    ld [wBackupEnemyEnergy],a ; ...
+    ret
+
+; Free
 
 SECTION "ItemUseBallText00",ROMX[$5937],BANK[$3]
 
@@ -24076,13 +24106,13 @@ ItemUseMedicine:
 .checkItemType
     ld a,[$cf91]
     cp a,REVIVE
-    jr nc,.healHP ; if it's a Revive or Max Revive
+    jp nc,.healHP ; if it's a Revive or Max Revive
     cp a,FULL_HEAL
     jr z,.cureStatusAilment ; if it's a Full Heal
     cp a,HP_UP
     jp nc,.useVitamin ; if it's a vitamin or Rare Candy
     cp a,FULL_RESTORE
-    jr nc,.healHP ; if it's a Full Restore or one of the potions
+    jp nc,.healHP ; if it's a Full Restore or one of the potions
 ; fall through if it's one of the status-specifc healing items
 .cureStatusAilment
     ld bc,4
@@ -24111,29 +24141,50 @@ ItemUseMedicine:
     and c ; does the pokemon have a status ailment the item can cure?
     jp z,.healingItemNoEffect
 ; if the pokemon has a status the item can heal
-    xor a
-    ld [hl],a ; remove the status ailment in the party data
+    ld a,c
+    cpl ; Complement A register. (Flip all bits.)
+    ld c,a
+    ld a,[hl] ; pokemon's status
+    and c ; reset only status ailment the item can cure?
+    ld [hl],a ; remove the status ailment in the party data ; ~DONE:MultiStatus
     ld a,b
     ld [$d07d],a ; the message to display for the item used
+    ld a,[W_ISINBATTLE]
+    and a
+    jp z,.doneHealing
     ld a,[wPlayerMonNumber]
     cp d ; is pokemon the item was used on active in battle?
     jp nz,.doneHealing
 ; if it is active in battle
-;joenote - this part is getting a bit of a rewrite to prevent resetting all stats when using a status healing item
+    push hl ; Backup status ailment in the party data
     ld a,[H_WHOSETURN] ; Backup Turn
     push af            ; ...
     xor a              ; Force player turn
     ld [H_WHOSETURN],a ; ...
-    ld hl,UndoBurnParStats
-    ld b,BANK(UndoBurnParStats)
-    call Bankswitch
+    push de
+    ld d,%00000000 ; initialize all Flags Zero
+    bit BRN_Bit,c
+    jr nz,.SkipBrnFlag
+    set 0,d ; bit 0 = attack
+.SkipBrnFlag
+    bit PAR_Bit,c
+    jr nz,.SkipParFlag
+    set 2,d ; bit 2 = speed
+.SkipParFlag
+    PREDEF UndoBurnParStats
+    pop de
     pop af             ; Restore Turn
     ld [H_WHOSETURN],a ; ...
+    pop hl ; Restore status ailment in the party data
+    ld a,[hl]
+    ld [W_PLAYERMONSTATUS],a ; remove the status ailment in the in-battle pokemon data ; ~DONE:MultiStatus
+    bit PSN_Bit,a
+    jr nz,.SkipRemoveToxic
     xor a
-    ld [W_PLAYERMONSTATUS],a ; remove the status ailment in the in-battle pokemon data
     ld [W_PLAYERTOXICCOUNTER],a ; clear toxic counter
     ld hl,W_PLAYERBATTSTATUS3
-    res 0,[hl] ; heal Toxic status
+    res BADLY_POISONED,[hl] ; heal Toxic status
+.SkipRemoveToxic
     jp .doneHealing
 .healHP
     inc hl ; hl = address of current HP
@@ -24361,31 +24412,11 @@ ItemUseMedicine:
     jr nz,.updateInBattleData
     ld bc,-31
     add hl,bc
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - undo brn/par stat changes for Full Restore after restoring HP in battle
     ld a,[W_ISINBATTLE]
     and a
-    jr z,.clearParBrn    ;do not adjust the stats if not currently in battle
-    push hl
-    push de
-    ld a,[H_WHOSETURN]
-    push af
-    xor a    ;forcibly set it to the player's turn
-    ld [H_WHOSETURN],a
-    ;undo brn/par stat changes
-    ld hl,UndoBurnParStats
-    ld b,BANK(UndoBurnParStats)
-    call Bankswitch
-    pop af
-    ld [H_WHOSETURN],a
-    pop de
-    pop hl
-.clearParBrn
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+    call nz,UndoBurnParStats_FullRestore
     xor a
-    ld [hl],a ; remove the status ailment in the party data
+    ld [hl],a ; remove the status ailment in the party data ; ~DONE:MultiStatus
 .updateInBattleData
     ld h,d
     ld l,e
@@ -24669,23 +24700,6 @@ ItemUseMedicine:
     db "DEFENSE@"
     db "SPEED@"
     db "SPECIAL@"
-
-HandleBackupAfterBallCatch:
-    ld hl,W_ENEMYBATTSTATUS3
-    bit 3,[hl]
-    jr nz,.justTransformed
-    set 3,[hl]
-    call BackupMoves
-    call BackupPP
-    ld hl,$cceb
-    ld a,[W_ENEMYMONATKDEFIV]
-    ld [hli],a
-    ld a,[W_ENEMYMONSPDSPCIV]
-    ld [hl],a
-.justTransformed
-    ld a,[W_ENEMYMONENERGY]   ; Backup Current Energy
-    ld [wBackupEnemyEnergy],a ; ...
-    ret
 
 ItemUseBait:
     ld hl,ThrewBaitText
@@ -25009,11 +25023,11 @@ ItemUsePokeflute: ; e140 (3:6140)
     jr z,.NotInBattle
 
 .inBattle
-    ld hl,W_PLAYERMONSTATUS
+    ld hl,W_PLAYERMONSTATUS ; ~DONE:MultiStatus
     ld a,[hl]
     and b ; remove Sleep status
     ld [hl],a
-    ld hl,W_ENEMYMONSTATUS
+    ld hl,W_ENEMYMONSTATUS ; ~DONE:MultiStatus
     ld a,[hl]
     push af
     and a,SLP ; is pokemon asleep?
@@ -25077,7 +25091,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     and a ; were any pokemon asleep before playing the flute?
     ret z
     ld hl,.FluteWokeUpText
-    jp PrintText
+    jp DrawHudAndPrintTextPokeFlute
 
 .FluteWokeUpText
     TX_FAR _FluteWokeUpText
@@ -25279,7 +25293,7 @@ ItemUsePPRestore:
     push af
     push hl
     ld [hl],b
-    FuncCoord 07,01 ; Party Ether Update Energy
+    FuncCoord 08,01 ; Party Ether Update Energy
     ld hl,Coord
     ld a,[$cf92]
     ld bc,40
@@ -25784,6 +25798,66 @@ GotOffBicycleText: ; e5fc (3:65fc)
 ;    and a,%00111111 ; mask out the PP Up count
 ;    ld [$d11e],a ; store max PP
 ;    ret
+
+; ────────────────────────────────────
+
+; Output ► d = Status Factor 1
+;        ► e = Status Factor 2
+GetStatusFactor:
+    ld de,0 ; Initialize Outputs to 0
+    ld a,[W_ENEMYMONSTATUS] ;status ailments ; ~DONE:MultiStatus
+    and a
+    jr z,.noAilments
+    bit FRZ_Bit,a
+    jr z,.NotFrz
+    ld b,+40
+    ld c,+16
+    call .IncreaseFactor
+    jr .FrzThenSkipSlpBrn
+.NotFrz
+    ld b,a
+    and a,SLP
+    ld a,b
+    jr z,.NotSlp
+    ld b,+25
+    ld c,+10
+    call .IncreaseFactor
+.NotSlp
+    bit BRN_Bit,a
+    jr z,.NotBrn
+    ld b,+12
+    ld c,+05
+    call .IncreaseFactor
+.NotBrn
+.FrzThenSkipSlpBrn
+    bit PAR_Bit,a
+    jr z,.NotPar
+    ld b,+12
+    ld c,+05
+    call .IncreaseFactor
+.NotPar
+    bit PSN_Bit,a
+    jr z,.NotPsn
+    ld b,+12
+    ld c,+05
+    call .IncreaseFactor
+.NotPsn
+.noAilments
+    ret
+.IncreaseFactor
+    push af
+    xor a
+    add d
+    add b
+    ld d,a
+    xor a
+    add e
+    add c
+    ld e,a
+    pop af
+    ret
+
+; ────────────────────────────────────
 
 ; Free
 
@@ -28601,9 +28675,7 @@ ReDrawBattleHudAfterItemUse:
     ld hl,HidePlayerBattleHudAndRestorePalette_
     ld b,BANK(HidePlayerBattleHudAndRestorePalette_)
     call Bankswitch
-    ld b,BANK(DrawHUDsAndHPBars)
-    ld hl,DrawHUDsAndHPBars
-    jp Bankswitch
+    PREDEF_JUMP DrawHUDsAndHPBars
 
 PartyMenuHPAndStandarizePalette:
     call LoadMonData
@@ -29267,7 +29339,6 @@ CopyDataSkipEnergyAltForm:
     inc de
     ld bc,5
     jp CopyData
-
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -31307,8 +31378,7 @@ HazeEffect_:
 
 DrawHudAndPrintTextBank4:
     push hl
-    ld hl,DrawHUDsAndHPBars
-    call Bankswitch4toF
+    PREDEF DrawHUDsAndHPBars
     pop hl
     jp PrintText
 
@@ -47546,9 +47616,7 @@ LeechSeedEffect_:
     jp Bankswitch
 .DrawHudAndPrintText
     push hl
-    ld b,BANK(DrawHUDsAndHPBars)
-    ld hl,DrawHUDsAndHPBars
-    call Bankswitch
+    PREDEF DrawHUDsAndHPBars
     pop hl
     jp PrintText
 .WasSeededText
@@ -47841,7 +47909,7 @@ DuplicateBitsTable: ; 2fea8 (b:7ea8)
     db $c0,$c3,$cc,$cf
     db $f0,$f3,$fc,$ff
 
-Func_2feb8 ; 2feb8 (b:7eb8)
+PayDayEffect_: ; 2feb8 (b:7eb8)
     xor a
     ld hl,$cd6d
     ld [hli],a
@@ -49455,48 +49523,47 @@ INCLUDE "constants/moves.asm"
 
 ; ──────────────────────────────────────────────────────────────────────────
 
-;joenote - this function checks to see if a pkmn is paralyzed or burned
-;then it doubles attack if burned or quadruples speed if paralyzed.
-;It's meant to be run right before healing paralysis or burn so as to
-;undo the stat changes.
-UndoBurnParStats:
+; Input ► d = bit mask to stats to consider (bit 0 attack, bit 2 speed)
+UndoBurnParStats: ; ~DONE:MultiStatus
+    call Load16BitRegisters
     ld hl,W_PLAYERMONSTATUS
-    ld de,wPlayerStatsToDouble
     ld a,[H_WHOSETURN]
     and a
     jr z,.checkburn
     ld hl,W_ENEMYMONSTATUS
-    ld de,wEnemyStatsToDouble
 .checkburn
-    ld a,[hl]        ;load statuses
-    bit 4,a          ;test for burn
+    ld a,[hl]             ;load statuses
+    bit BRN_Bit,a         ;test for burn
     jr z,.checkpar
-    ld a,%0000001
-    ld [de],a        ;set attack to be doubled to undo the stat change of BRN
+    push af
+    ld a,%0000001 ; bit 0 = attack
+    and d
+    jr z,.checkpar
+    ld [wStatsToDouble],a ;set attack to be doubled to undo the stat change of BRN
     call DoubleSelectedStats
-    jr .return
+    pop af
 .checkpar
-    bit 6,a          ;test for paralyze
+    bit PAR_Bit,a         ;test for paralyze
     jr z,.return
-    ld a,%00000100
-    ld [de],a        ;set speed to be doubled (done twice) to undo the stat change of PAR
+    ld a,%00000100 ; bit 2 = speed
+    and d
+    jr z,.return
+    ld [wStatsToDouble],a ;set speed to be doubled (done twice) to undo the stat change of PAR
     call DoubleSelectedStats
     call DoubleSelectedStats
 .return
     xor a
-    ld [de],a        ;reset the stat change bits
+    ld [wStatsToDouble],a ;reset the stat change bits
     ret
 
-;joenote - let's get this working again and put it to use
 DoubleSelectedStats:
     ld a,[H_WHOSETURN]
     and a
-    ld a,[wPlayerStatsToDouble]
     ld hl,W_PLAYERMONATK
     jr z,.notEnemyTurn
-    ld a,[wEnemyStatsToDouble]
     ld hl,W_ENEMYMONATTACK
 .notEnemyTurn
+    ld a,[wStatsToDouble]
     ld c,4
     ld b,a
 .loop
@@ -50318,13 +50385,12 @@ AICureStatus:
     ld a,1 ; forcibly set it to the AI's turn
     ld [H_WHOSETURN],a
     ; undo brn/par stat changes
-    ld hl,UndoBurnParStats
-    ld b,BANK(UndoBurnParStats)
-    call Bankswitch
+    ld d,%0000101 ; bit 0 = attack | bit 2 = speed
+    PREDEF UndoBurnParStats
     pop af
     ld [H_WHOSETURN],a
     xor a
-    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy
+    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy ; ~DONE:MultiStatus
     ld [W_ENEMYTOXICCOUNTER], a ;clear toxic counter
     ld hl,W_ENEMYBATTSTATUS3 ;clear toxic bit
     res 0,[hl]
@@ -50338,8 +50404,7 @@ AICureStatus:
 
 DrawHudAndPrintTextBankE:
     push hl
-    ld hl,DrawHUDsAndHPBars
-    call BankswitchEtoF
+    PREDEF DrawHUDsAndHPBars
     pop hl
     jp PrintText
 
@@ -51336,15 +51401,15 @@ SpecialTrainer: MACRO
     ENDM
 
 SpecialTrainerMoves:
-    SpecialTrainer BROCK,1,BrockMoves1
-    SpecialTrainer BROCK,2,BrockMoves2
-    SpecialTrainer BROCK,3,BrockMoves3
-    SpecialTrainer BROCK,4,BrockMoves4
-    SpecialTrainer BROCK,5,BrockMoves5
-    SpecialTrainer BROCK,6,BrockMoves6
-    SpecialTrainer BROCK,7,BrockMoves7
-    SpecialTrainer BROCK,8,BrockMoves8
-    SpecialTrainer BROCK,9,BrockMoves9
+    SpecialTrainer BROCK,1,BrockMove1
+    SpecialTrainer BROCK,2,BrockMove2
+    SpecialTrainer BROCK,3,BrockMove3
+    SpecialTrainer BROCK,4,BrockMove4
+    SpecialTrainer BROCK,5,BrockMove5
+    SpecialTrainer BROCK,6,BrockMove6
+    SpecialTrainer BROCK,7,BrockMove7
+    SpecialTrainer BROCK,8,BrockMove8
+    SpecialTrainer BROCK,9,BrockMove9
     SpecialTrainer MISTY,1,MistyMove2
     SpecialTrainer MISTY,2,MistyMove3
     SpecialTrainer MISTY,3,MistyMove4
@@ -51911,9 +51976,8 @@ HealEffect_: ; Moved Upper in the Bank
 .restEffect
     push hl
 ;undo the stat-changing effects of burn and paralyze and clear toxic info
-    ld hl,UndoBurnParStats
-    ld b,BANK(UndoBurnParStats)
-    call Bankswitch
+    ld d,%0000101 ; bit 0 = attack | bit 2 = speed
+    PREDEF UndoBurnParStats
     ld hl,W_PLAYERBATTSTATUS3     ; load in for toxic bit
     ld de,W_PLAYERTOXICCOUNTER    ; load in for toxic counter
     ld a,[H_WHOSETURN]
@@ -52856,13 +52920,7 @@ GetDamageVarsScaleStats:
     inc c
     ret
 
-; play burn/poison animation
-PlayPsnBrnAnimation:
-    jp z,PlayMoveAnimation ; poisoned
-    call FlipTurn
-    ld a,EMBER
-    call PlayMoveAnimation ; burned
-    jp FlipTurn
+; Free
 
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
@@ -53294,9 +53352,8 @@ MainInBattleLoop: ; 3c233 (f:4233)
     and a
     jr z,.HandlePlayerMonFainted
 .AIActionUsedEnemyFirst
-    call HandlePoisonBurnLeechSeed
+    call .HandlePoisonBurnLeechSeed
     jr z,.HandleEnemyMonFainted
-    call DrawHUDsAndHPBars
     call ExecutePlayerMove ; execute player move
     ld a,[$d078] ; was Teleport, Road, or Whirlwind used to escape from battle?
     and a
@@ -53304,7 +53361,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     ld a,b
     and a
     jr z,.HandleEnemyMonFainted
-    call HandlePoisonBurnLeechSeed
+    call .HandlePoisonBurnLeechSeed
     jr z,.HandlePlayerMonFainted
     jr .end
 
@@ -53321,9 +53378,8 @@ MainInBattleLoop: ; 3c233 (f:4233)
     call z,CheckandResetEnemyActedBit ;reset enemy acted bit if enemy pkmn fainted
     pop af
     jr z,.HandleEnemyMonFainted
-    call HandlePoisonBurnLeechSeed
+    call .HandlePoisonBurnLeechSeed
     jr z,.HandlePlayerMonFainted
-    call DrawHUDsAndHPBars
 ;#3 - handle enemy using move
     ld a,$1
     ld [H_WHOSETURN],a
@@ -53341,7 +53397,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     and a
     jr z,.HandlePlayerMonFainted
 .AIActionUsedPlayerFirst
-    call HandlePoisonBurnLeechSeed
+    call .HandlePoisonBurnLeechSeed
     jr z,.HandleEnemyMonFainted
 
 .end
@@ -53354,6 +53410,12 @@ MainInBattleLoop: ; 3c233 (f:4233)
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
 
+.HandlePoisonBurnLeechSeed
+    call DrawHUDsAndHPBars
+    ld b,BANK(HandlePoisonBurnLeechSeed_)
+    ld hl,HandlePoisonBurnLeechSeed_
+    jp Bankswitch
+
 MoveEffectToPercentage:
     cp a,7    ; 10% status effects are 04,05,06 so 07 will set carry for those
     ld b,$1a  ; [1A-1]/100 or [26-1]/256 = 9.8%~ chance
@@ -53362,218 +53424,65 @@ MoveEffectToPercentage:
     sub a,$1e ; subtract $1E to map to equivalent 10% chance effects
     ret
 
+CheckDefrost:
+    and FRZ                        ;are they frozen?
+    ret z                          ;return if so
+;not frozen
+    ld a,[H_WHOSETURN]             ;whose turn?
+    and a
+    jr nz,.opponent
+;player [attacker]
+    ld a,[W_PLAYERMOVETYPE]
+    cp FIRE
+    ret nz                         ;return if it isn't fire
+    ld hl,W_ENEMYMONSTATUS
+    res FRZ_Bit,[hl]               ;"defrost" a frozen monster ; ~DONE:MultiStatus
+    ld hl,$d8a8                    ;status of first opponent monster in their roster
+    ld a,[W_ENEMYMONNUMBER]
+    ld bc,$002c                    ;$2C bytes per roster entry
+    call AddNTimes
+    res FRZ_Bit,[hl]               ;"defrost" in roster ; ~DONE:MultiStatus
+    jr .common
+.opponent
+    ld a,[W_ENEMYMOVETYPE]         ;same as above with addresses swapped
+    cp FIRE
+    ret nz
+    ld hl,W_PLAYERMONSTATUS
+    res FRZ_Bit,[hl] ; ~DONE:MultiStatus
+    ld hl,W_PARTYMON1_STATUS
+    ld a,[wPlayerMonNumber]
+    ld bc,$002c
+    call AddNTimes
+    res FRZ_Bit,[hl] ; ~DONE:MultiStatus
+.common
+    ld hl,.UnnamedText_3f423
+    jp DrawHudAndPrintText
+.UnnamedText_3f423
+    TX_FAR _UnnamedText_3f423
+    db "@"
+
+PrintAlreadyAsleepText:
+    ld hl,.AlreadyAsleepText
+    jp Delay50AndPrintText
+.AlreadyAsleepText
+    TX_FAR _AlreadyAsleepText
+    db "@"
+
+PrintAlreadyPoisonedText:
+    ld hl,.AlreadyPoisonedText
+    jp Delay50AndPrintText
+.AlreadyPoisonedText
+    TX_FAR _AlreadyPoisonedText
+    db "@"
+
+PrintAlreadyParalyzedText:
+    ld hl,.AlreadyParalyzedText
+    jp Delay50AndPrintText
+.AlreadyParalyzedText
+    TX_FAR _AlreadyParalyzedText
+    db "@"
+
 ; Free
-
-SECTION "HandlePoisonBurnLeechSeed",ROMX[$43bd],BANK[$f]
-
-HandlePoisonBurnLeechSeed: ; 3c3bd (f:43bd)
-    ld hl,W_PLAYERMONCURHP ; $d015
-    ld de,W_PLAYERMONSTATUS ; $d018
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.playersTurn
-    ld hl,W_ENEMYMONCURHP ; $cfe6
-    ld de,W_ENEMYMONSTATUS ; $cfe9
-.playersTurn
-    ld a,[de]
-    and BRN | PSN
-    jr z,.notBurnedOrPoisoned
-    push hl
-    ld hl,.HurtByPoisonText
-    ld a,[de]
-    and BRN
-    push af
-    jr z,.poisoned
-    ld hl,.HurtByBurnText
-.poisoned
-    call PrintText
-    xor a
-    ld [$cc5b],a
-    pop af
-    ld a,$ba
-    call PlayPsnBrnAnimation ; PlayMoveAnimation   ; play burn/poison animation
-    pop hl
-    call HandlePoisonBurnLeechSeed_DecreaseOwnHP
-.notBurnedOrPoisoned
-    ld de,W_PLAYERBATTSTATUS2 ; $d063
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.playersTurn2
-    ld de,W_ENEMYBATTSTATUS2 ; $d068
-.playersTurn2
-    ld a,[de]
-    add a
-    jr nc,.notLeechSeeded
-    push hl
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    push af
-    xor $1
-    ld [H_WHOSETURN],a ; $FF00+$f3
-    xor a
-    ld [$cc5b],a
-    ld a,$47
-    call SetLeechSeedFlag ; call PlayMoveAnimation ; play leech seed animation (from opposing mon)
-    pop af
-    ld [H_WHOSETURN],a ; $FF00+$f3
-    pop hl
-    call HandlePoisonBurnLeechSeed_DecreaseOwnHP
-    call HandlePoisonBurnLeechSeed_IncreaseEnemyHP
-    push hl
-    ld hl,.HurtByLeechSeedText
-    call PrintText
-    pop hl
-.notLeechSeeded
-    ld a,[hli]
-    or [hl]
-    ret nz          ; test if fainted
-    call DrawHUDsAndHPBars
-    ld c,$14
-    call DelayFrames
-    xor a
-    ret
-.HurtByPoisonText
-    TX_FAR _HurtByPoisonText
-    db "@"
-.HurtByBurnText
-    TX_FAR _HurtByBurnText
-    db "@"
-.HurtByLeechSeedText
-    TX_FAR _HurtByLeechSeedText
-    db "@"
-
-; decreases the mon's current HP by 1/16 of the Max HP (multiplied by number of toxic ticks if active)
-; note that the toxic ticks are considered even if the damage is not poison (hence the Leech Seed glitch)
-; hl: HP pointer
-; bc (out): total damage
-HandlePoisonBurnLeechSeed_DecreaseOwnHP:
-    push hl
-    push hl
-    call HPDiv16
-    ; ds 3 ; ld hl,W_PLAYERBATTSTATUS3 ; $d064
-    ; ds 3 ; ld de,W_PLAYERTOXICCOUNTER ; $d06c
-    ; ds 2 ; ld a,[H_WHOSETURN] ; $FF00+$f3
-    ; ds 1 ; and a
-    ; ds 2 ; jr z,.playersTurn
-    ; ds 3 ; ld hl,W_ENEMYBATTSTATUS3 ; $d069
-    ; ds 3 ; ld de,W_ENEMYTOXICCOUNTER ; $d071
-    ;.playersTurn
-    ; ds 2 ; bit 0,[hl]
-    ; ds 2 ; jr z,.noToxic
-    call InitPointerAndCheckToxic
-    jr z,.noToxic
-    call CheckLeechSeedFlag
-    jr nz,.noToxic
-    ;jr .Toxic
-    ;ds 21 - 12
-.Toxic
-    ld a,[de]    ; increment toxic counter
-    inc a
-    ld [de],a
-    ld hl,$0000
-.toxicTicksLoop
-    add hl,bc
-    dec a
-    jr nz,.toxicTicksLoop
-    ld b,h       ; bc = damage * toxic counter
-    ld c,l
-.noToxic
-    pop hl
-    inc hl
-    ld a,[hl]    ; subtract total damage from current HP
-    ld [wHPBarOldHP],a
-    sub c
-    ld [hld],a
-    ld [wHPBarNewHP],a
-    ld a,[hl]
-    ld [wHPBarOldHP+1],a
-    sbc b
-    ld [hl],a
-    ld [wHPBarNewHP+1],a
-    jr nc,.noOverkill
-    xor a         ; overkill: zero HP
-    ld [hli],a
-    ld [hl],a
-    ld [wHPBarNewHP],a
-    ld [wHPBarNewHP+1],a
-.noOverkill
-    call SetDamageDuringPoisonBurnLeechSeed ; call UpdateCurMonHPBar
-    pop hl
-    ret
-
-HPDiv16:
-    ld bc,$e ; skip to max HP
-    add hl,bc
-    ld a,[hli] ; load max HP
-    ld [wHPBarMaxHP+1],a
-    ld b,a
-    ld a,[hl]
-    ld [wHPBarMaxHP],a
-    ld c,a
-    srl b
-    rr c
-    srl b
-    rr c
-    srl c
-    srl c ; c = max HP/16 (assumption: HP < 1024)
-    ld a,c
-    and a
-    ret nz ; nonZeroDamage
-    inc c ; damage is at least 1
-    ret
-
-; adds bc to enemy HP
-HandlePoisonBurnLeechSeed_IncreaseEnemyHP:
-    push hl
-    call HPDiv16
-    push bc
-    ld hl,W_ENEMYMONMAXHP ; $cff4
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.playersTurn
-    ld hl,W_PLAYERMONMAXHP ; $d023
-.playersTurn
-    ld a,[hli]
-    ld [wHPBarMaxHP+1],a
-    ld a,[hl]
-    ld [wHPBarMaxHP],a
-    ld de,$fff2
-    add hl,de           ; skip back fomr max hp to current hp
-    ld a,[hl]
-    ld [wHPBarOldHP],a ; add bc to current HP
-    add c
-    ld [hld],a
-    ld [wHPBarNewHP],a
-    ld a,[hl]
-    ld [wHPBarOldHP+1],a
-    adc b
-    ld [hli],a
-    ld [wHPBarNewHP+1],a
-    ld a,[wHPBarMaxHP]
-    ld c,a
-    ld a,[hld]
-    sub c
-    ld a,[wHPBarMaxHP+1]
-    ld b,a
-    ld a,[hl]
-    sbc b
-    jr c,.noOverfullHeal
-    ld a,b                ; overfull heal,set HP to max HP
-    ld [hli],a
-    ld [wHPBarNewHP+1],a
-    ld a,c
-    ld [hl],a
-    ld [wHPBarNewHP],a
-.noOverfullHeal
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    xor $1
-    ld [H_WHOSETURN],a ; $FF00+$f3
-    pop bc
-    call SetCureDuringLeechSeed ; call UpdateCurMonHPBar
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    xor $1
-    ld [H_WHOSETURN],a ; $FF00+$f3
-    pop hl
-    ret
 
 SECTION "UpdateCurMonHPBar",ROMX[$44f6],BANK[$f]
 
@@ -56251,17 +56160,24 @@ PlayMoveAnimation_SeismicTossException:
 .done
     jp PlayMoveAnimation
 
-SECTION "CheckPlayerStatusConditions",ROMX[$5854],BANK[$f]
-
 ; ──────────────────────────────────────────────────────────────────────
 ; CheckPlayerStatusConditions
 ; ──────────────────────────────────────────────────────────────────────
 
-CheckPlayerStatusConditions: ; 3d854 (f:5854)
+CheckPlayerStatusConditions:
     ld hl,W_PLAYERMONSTATUS
+
+.FrozenCheck
+    bit FRZ_Bit,[hl] ; frozen?
+    jr z,.SleepCheck
+    ld hl,FrozenText
+    jr .SleepFrozenDone
+
+.SleepCheck
     ld a,[hl]
     and SLP
-    jr z,.FrozenCheck
+    ld a,[hl]
+    jr z,.HeldInPlaceCheck
 
     dec a
     ld [W_PLAYERMONSTATUS],a ; decrement sleep count
@@ -56273,10 +56189,9 @@ CheckPlayerStatusConditions: ; 3d854 (f:5854)
     ld a,SLP_ANIM - 1
     call PlayMoveAnimation
     ld hl,FastAsleepText
-    call PrintText
-;    jr .sleepDone ; joedebug - sleep won't waste turn
 
-;.sleepDone
+.SleepFrozenDone
+    call PrintText
     xor a
     ld [$CCF1],a
     jr .ExecutePlayerMoveDone
@@ -56284,16 +56199,9 @@ CheckPlayerStatusConditions: ; 3d854 (f:5854)
 .WakeUp
     ld hl,WokeUpText
     call .DrawHudAndPrintText ; call PrintText
-    jr .HeldInPlaceCheck
-
-.FrozenCheck
-    bit 5,[hl] ; frozen?
-    jr z,.HeldInPlaceCheck ; to 5898
-    ld hl,FrozenText
-    call PrintText
-    xor a
-    ld [$CCF1],a
-    jr .ExecutePlayerMoveDone
+    call IsGhostBattle
+    jr z,.ExecutePlayerMoveDone
+    ; fall through
 
 .HeldInPlaceCheck
     ld a,[W_ENEMYBATTSTATUS1]
@@ -56964,7 +56872,10 @@ CheckForDisobedience: ; 3dc88 (f:5c88)
     swap a
     and $7
     jr z,.asm_3dd0e
-    ld [W_PLAYERMONSTATUS],a ; $d018
+    ld hl,W_PLAYERMONSTATUS ; ~DONE:MultiStatus
+    ld b,[hl]
+    or b
+    ld [hl],a
     ld hl,UnnamedText_3ddbb ; $5dbb
     jr .asm_3dd3a
 .monDoesNothing
@@ -57034,18 +56945,6 @@ CheckForDisobedience: ; 3dc88 (f:5c88)
     xor a
     ret
 
-EnemyMonFainted: ; 0x3c63e
-    TX_FAR _EnemyMonFainted
-    db "@"
-
-Func_3c643: ; 3c643 (f:4643)
-    xor a
-    ld [$d083],a
-    ld [$c02a],a
-    inc a
-    ld [$ccf6],a
-    ret
-
 AlignIndexMenu:
     ld a,[wCurrentMenuItem] ; $cc26
     dec a
@@ -57086,6 +56985,8 @@ ChooseRandomMove:
 SetDEAndLoadMonFrontSprite:
     ld de,$9000
     jp LoadMonFrontSprite
+
+; Free
 
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
@@ -57543,39 +57444,6 @@ ResetLeechSeedFlagAndReadPlayerMonCurHPAndStatus:
     ld [wUnusedC000],a
     jp ReadPlayerMonCurHPAndStatus
 
-SetLeechSeedFlag:
-    push af
-    ld a,[wUnusedC000]
-    set 6,a ; set the bit that indicates leech seed is being handled
-    ld [wUnusedC000],a
-    pop af
-    jp PlayMoveAnimation
-
-InitPointerAndCheckToxic:
-    ld hl,W_PLAYERBATTSTATUS3 ; $d064
-    ld de,W_PLAYERTOXICCOUNTER ; $d06c
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr z,.playersTurn
-    ld hl,W_ENEMYBATTSTATUS3 ; $d069
-    ld de,W_ENEMYTOXICCOUNTER ; $d071
-.playersTurn
-    bit 0,[hl]
-    ret
-
-CheckLeechSeedFlag:
-    ;ld a,[W_ISLINKBATTLE]
-    ;cp $4
-    ;ret z ; Return with BUG
-    ; joenote - If this bit is set, this function is being called for leech seed.
-    ; Do not do Toxic routines
-    ld a,[wUnusedC000]
-    bit 6,a ;check if this is for leech seed
-    res 6,a ;(reset the bit without affecting flags)
-    ld [wUnusedC000],a
-    ;if so, then do not increment the toxic counter or multiply the damage for toxic
-    ret
-
 CheckNotEscapeWildPokemon:
     push hl
     ld b,BANK(_CheckNotEscapeWildPokemon)
@@ -57668,6 +57536,20 @@ ReflectLightScreenEffect:
     ld hl,ReflectLightScreenEffect_
     ld b,BANK(ReflectLightScreenEffect_)
     jp Bankswitch
+
+EnemyMonFainted:
+    TX_FAR _EnemyMonFainted
+    db "@"
+
+Func_3c643:
+    xor a
+    ld [$d083],a
+    ld [$c02a],a
+    inc a
+    ld [$ccf6],a
+    ret
+
+; Free
 
 SECTION "ApplyAttackToEnemyPokemon",ROMX[$60df],BANK[$f]
 
@@ -58303,45 +58185,6 @@ JumpMoveEffect:
     ld b,$1
     ret
 
-CheckDefrost:
-    and a,FRZ            ;are they frozen?
-    ret z                ;return if so
-                        ;not frozen
-    ld a,[$ff00+$f3]    ;whose turn?
-    and a
-    jr nz,.opponent
-    ;player [attacker]
-    ld a,[W_PLAYERMOVETYPE]
-    sub a,FIRE
-    ret nz        ;return if it isn't fire
-                ;type is fire
-    ld [W_ENEMYMONSTATUS],a        ;set opponent status to 00 ["defrost" a frozen monster]
-    ld hl,$d8a8                    ;status of first opponent monster in their roster
-    ld a,[W_ENEMYMONNUMBER]
-    ld bc,$002c        ;$2C bytes per roster entry
-    call AddNTimes
-    xor a
-    ld [hl],a            ;clear status in roster
-    ld hl,.UnnamedText_3f423
-    jr .common
-.opponent
-    ld a,[W_ENEMYMOVETYPE]        ;same as above with addresses swapped
-    sub a,$14
-    ret nz
-    ld [W_PLAYERMONSTATUS],a
-    ld hl,$d16f
-    ld a,[wPlayerMonNumber]
-    ld bc,$002c
-    call AddNTimes
-    xor a
-    ld [hl],a
-    ld hl,.UnnamedText_3f423
-.common
-    jp PrintText
-.UnnamedText_3f423
-    TX_FAR _UnnamedText_3f423
-    db "@"
-
 ;joenote - zero the damage from last round if not using a trapping move
 CheckTrappingToResetDamage:
     ld a,[W_ENEMYBATTSTATUS1]
@@ -58908,24 +58751,32 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up:
 
 CheckEnemyStatusConditions:
     ld hl,W_ENEMYMONSTATUS ; $cfe9
+
+.FrozenCheck
+    bit FRZ_Bit,[hl]
+    jr z,.SleepCheck
+    ld hl,FrozenText ; $5a47
+    jr .SleepFrozenDone
+
+.SleepCheck
     ld a,[hl]
     and SLP
-    jr z,.FrozenCheck
+    ld a,[hl]
+    jr z,.HeldInPlaceCheck
 
     dec a
     ld [W_ENEMYMONSTATUS],a ; $cfe9
     and a
     jr z,.WakeUp
 
-    ld hl,FastAsleepText ; $5a3d
-    call PrintText
     xor a
     ld [$cc5b],a
     ld a,$bd
     call PlayMoveAnimation
-;    jr .sleepDone ; joedebug - sleep won't waste turn
+    ld hl,FastAsleepText ; $5a3d
 
-;.sleepDone
+.SleepFrozenDone
+    call PrintText
     xor a
     ld [$ccf2],a
     jr .ExecuteEnemyMoveDone
@@ -58933,16 +58784,7 @@ CheckEnemyStatusConditions:
 .WakeUp
     ld hl,WokeUpText ; $5a42
     call .DrawHudAndPrintText ; call PrintText
-    jr .HeldInPlaceCheck
-
-.FrozenCheck
-    bit 5,[hl]
-    jr z,.HeldInPlaceCheck
-    ld hl,FrozenText ; $5a47
-    call PrintText
-    xor a
-    ld [$ccf2],a
-    jr .ExecuteEnemyMoveDone
+    ; fall through
 
 .HeldInPlaceCheck
     ld a,[W_PLAYERBATTSTATUS1] ; $d062
@@ -59554,6 +59396,8 @@ EffectsArray6:
     db PAY_DAY_EFFECT
     db $FF
 
+; Free
+
 SECTION "ApplyBurnAndParalysisPenaltiesToPlayer",ROMX[$6d1a],BANK[$f]
 
 ApplyBurnAndParalysisPenaltiesToPlayer: ; 3ed1a (f:6d1a)
@@ -59572,7 +59416,7 @@ QuarterSpeedDueToParalysis: ; 3ed27 (f:6d27)
     and a
     jr z,.asm_3ed48
     ld a,[W_PLAYERMONSTATUS] ; $d018
-    and $40
+    and PAR
     ret z
     ld hl,$d02a
     ld a,[hld]
@@ -59591,7 +59435,7 @@ QuarterSpeedDueToParalysis: ; 3ed27 (f:6d27)
     ret
 .asm_3ed48
     ld a,[W_ENEMYMONSTATUS] ; $cfe9
-    and $40
+    and PAR
     ret z
     ld hl,$cffb
     ld a,[hld]
@@ -59614,7 +59458,7 @@ HalveAttackDueToBurn: ; 3ed64 (f:6d64)
     and a
     jr z,.asm_3ed81
     ld a,[W_PLAYERMONSTATUS] ; $d018
-    and $10
+    and BRN
     ret z
     ld hl,$d026
     ld a,[hld]
@@ -59631,7 +59475,7 @@ HalveAttackDueToBurn: ; 3ed64 (f:6d64)
     ret
 .asm_3ed81
     ld a,[W_ENEMYMONSTATUS] ; $cfe9
-    and $10
+    and BRN
     ret z
     ld hl,$cff7
     ld a,[hld]
@@ -60037,21 +59881,11 @@ LoadGhostPic:
     ld hl,_LoadGhostPic
     jp Bankswitch
 
-_RockDamage:
-    ld hl,W_ENEMYMONCURHP ; $cfe6
-    call HandlePoisonBurnLeechSeed_DecreaseOwnHP
-    jp DrawEnemyHUDAndHPBar
-
-_BaitHealth:
-    ld hl,W_ENEMYMONCURHP ; $cfe6
-    call HandlePoisonBurnLeechSeed_IncreaseEnemyHP
-    jp DrawEnemyHUDAndHPBar
-
 ItemsCantBeUsedHere:
     TX_FAR ItemsCantBeUsedHere_
     db "@"
 
-TerminatorText_3f04a: ; 3f04a (f:704a)
+TerminatorText_3f04a:
     db "@"
 
 ConversionEffect:
@@ -60062,6 +59896,8 @@ ConversionEffect:
 InsertRealTypes:
     call GetMonHeader
     PREDEF_JUMP InsertRealTypes_
+
+; Free
 
 SECTION "_LoadTrainerPic",ROMX[$704b],BANK[$f]
 
@@ -60327,25 +60163,28 @@ SleepEffect:
     call MoveHitTestPlus
     jr nz,.attackMissed
     ld a,[de]
-    and a
-    jr nz,.alreadyStatused
+    and SLP
+    jr nz,.alreadyAsleep ; ~DONE:MultiStatus
     ld a,[bc] ; target no longer needs to recharge (hyper beam)
-    res 5,a   ; ...
+    res NEEDS_TO_RECHARGE,a   ; ...
     ld [bc],a ; ...
+    ld a,[de]
+    ld b,a ; Current Status
 .setSleepCounter
     call GenRandomInBattle
-    and %00000111 ; SLEEP
+    and SLP
     jr z,.setSleepCounter
-    ld [de],a
+    or b ; Apply Sleep Mask to Current Status
+    ld [de],a ; ~DONE:MultiStatus
     ld hl,.FellAsleepText ; $7245
     call PlayCurrentMoveAnimation2
     jp DrawHudAndPrintText
 .attackMissed
     call PlayCurrentMoveAnimation
     jp PrintMoveFailureText
-.alreadyStatused
+.alreadyAsleep
     call PlayCurrentMoveAnimation
-    jp PrintAlreadyStatusedText
+    jp PrintAlreadyAsleepText
 .FellAsleepText
     TX_FAR _FellAsleepText
     db "@"
@@ -60369,8 +60208,8 @@ PoisonEffect:
     jr nz,.didntAffect ; can't poison a substitute target
     ld a,[hl]
     ld b,a
-    and a
-    jr nz,.alreadyStatused ; miss if target is already statused
+    bit PSN_Bit,a
+    jr nz,.alreadyPoisoned ; miss if target is already statused ; ~DONE:MultiStatus
     push hl
     ld bc,W_PLAYERMONTYPES-W_PLAYERMONSTATUS
     add hl,bc
@@ -60389,7 +60228,7 @@ PoisonEffect:
     cp b
     ret nc
 .inflictPoison
-    set 3,[hl] ; mon is now poisoned
+    set PSN_Bit,[hl] ; mon is now poisoned
     push de
     dec de
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -60405,7 +60244,7 @@ PoisonEffect:
 .ok
     cp TOXIC
     jr nz,.normalPoison ; done if move is not Toxic
-    set 0,[hl] ; BADLY_POISONED ; else set Toxic battstatus
+    set BADLY_POISONED,[hl] ; else set Toxic battstatus
     xor a
     ld [de],a
     ld hl,.BadlyPoisonedText ; $72e4
@@ -60432,8 +60271,8 @@ PoisonEffect:
 .didntAffect
     ld hl,PrintDidntAffectText
     jr .checkEnd
-.alreadyStatused
-    ld hl,PrintAlreadyStatusedText
+.alreadyPoisoned
+    ld hl,PrintAlreadyPoisonedText
     ; fall through
 .checkEnd
     ld a,[de]
@@ -60448,14 +60287,12 @@ PoisonEffect:
     TX_FAR _BadlyPoisonedText
     db "@"
 
-SECTION "DrainHPEffect",ROMX[$72e9],BANK[$f]
-
-DrainHPEffect: ; 3f2e9 (f:72e9)
+DrainHPEffect:
     ld hl,DrainHPEffect_
     ld b,BANK(DrainHPEffect_)
     jp Bankswitch ; indirect jump to DrainHPEffect_ (783f (1:783f))
 
-ExplodeEffect: ; 3f2f1 (f:72f1)
+ExplodeEffect:
     ld hl,W_ENEMYMONCURHP ; $cfe6
     ld de,W_ENEMYBATTSTATUS2 ; $d068
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -60466,70 +60303,69 @@ ExplodeEffect: ; 3f2f1 (f:72f1)
 .enemy
     xor a
     ld [hli],a
-    ld [hli],a
-    inc hl
     ld [hl],a
     ld a,[de]
     res 7,a
     ld [de],a
     ret
 
-FreezeBurnParalyzeEffect: ; 3f30c (f:730c)
+FreezeBurnParalyzeEffect:
     xor a
     ld [$cc5b],a
     call CheckTargetSubstitute         ;test bit 4 of d063/d068 flags [target has substitute flag]
     ret nz             ;return if they have a substitute,can't effect them
-    ld a,[$ff00+$f3]  ;whose turn?
+    ld a,[H_WHOSETURN]
     and a
-    jp nz,OpponentAttacker
+    jp nz,.OpponentAttacker
 
-PlayerAttacker:
-    ld a,[W_ENEMYMONSTATUS]
+.PlayerAttacker
+    ld a,[W_ENEMYMONSTATUS] ; ~DONE:MultiStatus
     and a
-    jp nz,CheckDefrost ;opponent has existing status
+    call nz,CheckDefrost ;opponent has existing status
     call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
     ld hl,W_ENEMYMONTYPES
-    call AttackerTypeMatchOneOfDefenderTypesPlusException
+    call .AttackerTypeMatchOneOfDefenderTypesPlusException
     ret z
     ld a,[W_PLAYERMOVEEFFECT]
     call MoveEffectToPercentage
     push af     ;push effect...
     call CheckZeroDamageOrSideEffectRandom ; call GenRandomInBattle  ;get random 8bit value for probability test
     cp b        ;success?
-    pop bc      ;...pop effect into C
+    pop bc      ;...pop effect into B
     ret nc      ;do nothing if random value is >= 1A or 4D [no status applied]
+    ld hl,W_ENEMYMONSTATUS
     ld a,b     ;what type of effect is this?
     cp a,BURN_SIDE_EFFECT1
-    jr z,.burn
+    jr z,.burn1
     cp a,FREEZE_SIDE_EFFECT
-    jr z,.freeze
-    ld a,PAR
-    ld [W_ENEMYMONSTATUS],a
+    jr z,.freeze1
+    set PAR_Bit,[hl] ; ~DONE:MultiStatus
     call QuarterSpeedDueToParalysis  ;quarter speed of affected monster
     call PlayA9BattleAnimation
     jp PrintMayNotAttackText    ;print paralysis text
-.burn
-    ld a,BRN
-    ld [W_ENEMYMONSTATUS],a
+.burn1
+    set BRN_Bit,[hl] ; ~DONE:MultiStatus
     call HalveAttackDueToBurn
     call PlayA9BattleAnimation
-    ld hl,UnnamedText_3f3d8
+    ld hl,.UnnamedText_3f3d8
     jp DrawHudAndPrintText
-.freeze
+.freeze1
     call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
-    ld a,FRZ
-    ld [W_ENEMYMONSTATUS],a
+    set FRZ_Bit,[hl] ; ~DONE:MultiStatus
+    ld a,[hl]
+    and ~SLP & ~BRN ; Remove Sleep & Burn
+    ld [hl],a
     call PlayA9BattleAnimation
-    ld hl,UnnamedText_3f3dd
+    ld hl,.UnnamedText_3f3dd
     jp DrawHudAndPrintText
 
-OpponentAttacker:
-    ld a,[W_PLAYERMONSTATUS]  ;this appears to the same as above with addresses swapped for opponent
+.OpponentAttacker
+    ld a,[W_PLAYERMONSTATUS] ; ~DONE:MultiStatus
     and a
-    jp nz,CheckDefrost
+    call nz,CheckDefrost
     call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
     ld hl,W_PLAYERMONTYPES
-    call AttackerTypeMatchOneOfDefenderTypesPlusException
+    call .AttackerTypeMatchOneOfDefenderTypesPlusException
     ret z
     ld a,[W_ENEMYMOVEEFFECT]
     call MoveEffectToPercentage
@@ -60538,40 +60374,40 @@ OpponentAttacker:
     cp b
     pop bc
     ret nc
+    ld hl,W_PLAYERMONSTATUS
     ld a,b
     cp a,BURN_SIDE_EFFECT1
-    jr z,.burn
+    jr z,.burn2
     cp a,FREEZE_SIDE_EFFECT
-    jr z,.freeze
-    ld a,PAR
-    ld [W_PLAYERMONSTATUS],a
+    jr z,.freeze2
+    set PAR_Bit,[hl] ; ~DONE:MultiStatus
     call QuarterSpeedDueToParalysis
     call PlayC7BattleAnimation
     jp PrintMayNotAttackText
-.burn
-    ld a,BRN
-    ld [W_PLAYERMONSTATUS],a
+.burn2
+    set BRN_Bit,[hl] ; ~DONE:MultiStatus
     call HalveAttackDueToBurn
     call PlayC7BattleAnimation
-    ld hl,UnnamedText_3f3d8
+    ld hl,.UnnamedText_3f3d8
     jp DrawHudAndPrintText
-.freeze
+.freeze2
     call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
-    ld a,FRZ
-    ld [W_PLAYERMONSTATUS],a
+    set FRZ_Bit,[hl] ; ~DONE:MultiStatus
+    ld a,[hl]
+    and ~SLP & ~BRN ; Remove Sleep & Burn
+    ld [hl],a
     call PlayC7BattleAnimation
-    ld hl,UnnamedText_3f3dd
+    ld hl,.UnnamedText_3f3dd
     jp DrawHudAndPrintText
 
-UnnamedText_3f3d8: ; 3f3d8 (f:73d8)
+.UnnamedText_3f3d8
     TX_FAR _UnnamedText_3f3d8
     db "@"
-
-UnnamedText_3f3dd: ; 3f3dd (f:73dd)
+.UnnamedText_3f3dd
     TX_FAR _UnnamedText_3f3dd
     db "@"
 
-AttackerTypeMatchOneOfDefenderTypesPlusException:
+.AttackerTypeMatchOneOfDefenderTypesPlusException
     push hl
     call .Loop4MovesInHLAndCompareWithA
     pop hl
@@ -61420,13 +61256,6 @@ Delay50AndPrintText:
     call DelayFrames
     jp PrintText
 
-PrintAlreadyStatusedText:
-    ld hl,.AlreadyStatusedText
-    jp Delay50AndPrintText
-.AlreadyStatusedText
-    TX_FAR _AlreadyStatusedText
-    db "@"
-
 ConfusionEffect:
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -61495,6 +61324,8 @@ PrintAlreadyConfusedText:
 PlayBattleAnimationFromAnotherBank:
    ld a,d
    jp PlayBattleAnimation
+
+; Free
 
 SECTION "ParalyzeEffect",ROMX[$79b1],BANK[$f]
 
@@ -61863,13 +61694,11 @@ SetDamageDirectToEnemy:
     jp CopyDamage
 
 SetDamageDuringPoisonBurnLeechSeed:
-    push bc
-    call BCToValueToPrint
+    call DEToValueToPrint
     ld hl,wPrintBattleValueBit0
     set 0,[hl]
     call CheckDamageToPlayer
     res 7,[hl] ; wFlagBattleCureBit7
-    pop bc
     jp UpdateCurMonHPBar
 
 SetDamageDuringRecoil_:
@@ -61895,21 +61724,19 @@ SetCureDirect:
     ret
 
 SetCureDuringLeechSeed:
-    push bc
-    call BCToValueToPrint
+    call DEToValueToPrint
     ld hl,wPrintBattleValueBit0
     set 0,[hl]
     call CheckDamageToPlayer
     set 7,[hl] ; wFlagBattleCureBit7
-    pop bc
     call UpdateCurMonHPBar
     jp RemoveBattleValueBankF
 
-BCToValueToPrint:
+DEToValueToPrint:
     ld hl,wBattleValueToPrint
-    ld a,b
+    ld a,d
     ld [hli],a
-    ld a,c
+    ld a,e
     ld [hl],a
     ret
 
@@ -62527,8 +62354,8 @@ SwapBit2And4:
     ret
 
 PayDayEffect:
-    ld hl,Func_2feb8
-    ld b,BANK(Func_2feb8)
+    ld hl,PayDayEffect_
+    ld b,BANK(PayDayEffect_)
     jp Bankswitch
 
 LoadBattleMonFromParty_HandleAlternative:
@@ -76288,6 +76115,8 @@ GetAttackerType_Predef:                    NEW_PREDEF GetAttackerType_          
 AdjustDamageForMoveType_GetInputPredef:    NEW_PREDEF AdjustDamageForMoveType_GetInput    ; $6E
 UpgradeTrainerSet_Predef:                  NEW_PREDEF UpgradeTrainerSet_                  ; $6F
 IsMonInCurrentMapPredef:                   NEW_PREDEF IsMonInCurrentMap                   ; $70
+UndoBurnParStatsPredef:                    NEW_PREDEF UndoBurnParStats                    ; $71
+DrawHUDsAndHPBarsPredef:                   NEW_PREDEF DrawHUDsAndHPBars                   ; $72
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -79775,9 +79604,8 @@ ParalyzeEffect_:
     ld hl,W_PLAYERMONSTATUS ; $d018
     ld de,W_ENEMYMOVETYPE ; $cfcf
 .next
-    ld a,[hl]
-    and a
-    jr nz,.alreadyStatused ; miss if target is already statused
+    bit PAR_Bit,[hl]
+    jr nz,.alreadyParalyzed ; miss if target is already paralyzed ; ~DONE:MultiStatus
     ld a,[de]
     cp THUNDER
     jr nz,.hitTest
@@ -79790,7 +79618,7 @@ ParalyzeEffect_:
     call Bankswitch
     pop hl
     jr nz,.didntAffect
-    set 6,[hl]
+    set PAR_Bit,[hl]
     ld hl,QuarterSpeedDueToParalysis
     ld b,BANK(QuarterSpeedDueToParalysis)
     call Bankswitch
@@ -79800,8 +79628,8 @@ ParalyzeEffect_:
     call .BankswitchToF
     ld hl,PrintMayNotAttackText
     jr .BankswitchToF
-.alreadyStatused
-    ld hl,PrintAlreadyStatusedText
+.alreadyParalyzed
+    ld hl,PrintAlreadyParalyzedText
     jr .PlayAnimationAndTextFail
 .didntAffect
     ld hl,PrintDidntAffectText
@@ -81452,6 +81280,8 @@ GainExperience: ; 5524f (15:524f)
     call AddNTimes
     jp .partyMonLoop
 .asm_55450
+    ld hl,wFirstExpAllMessageBit6
+    res 6,[hl]
     ld hl,W_PLAYERMONSALIVEFLAGS
     xor a
     ld [hl],a
@@ -108970,7 +108800,7 @@ CinnabarGymScriptPointers:
 ; bc = battle status 1 address (if 0 Not Battle HUD)
 PrintStatusAilment:
     ld a,[de]
-    bit 5,a
+    bit FRZ_Bit,a
     call nz,.Frz
     jr nz,.FrzThenSkipSlpBrn
     and %00000111 ; slp
@@ -121210,15 +121040,15 @@ _UnnamedText_3c22e: ; 89677 (22:5677)
 
 _HurtByPoisonText: ; 89689 (22:5689)
     db $0,$5a,"'s",$4f
-    db "hurt by poison!",$58
+    db "hurt by poison!",$57
 
 _HurtByBurnText: ; 8969d (22:569d)
     db $0,$5a,"'s",$4f
-    db "hurt by the burn!",$58
+    db "hurt by the burn!",$57
 
 _HurtByLeechSeedText: ; 896b3 (22:56b3)
     db $0,"LEECH SEED saps",$4f
-    db $5a,"!",$58
+    db $5a,"!",$57
 
 _EnemyMonFainted: ; 0x896c7
     db $0,"Enemy @"
@@ -126364,9 +126194,18 @@ _WasJustSeededText:
     db $0,$59,$4f
     db "was just seeded!",$58
 
-_AlreadyStatusedText:
+_AlreadyAsleepText:
     db $0,$59,$4f
-    db "already statused!",$58
+    db "already asleep!",$58
+
+_AlreadyPoisonedText:
+    db $0,$59,$4f
+    db "already poisoned!",$58
+
+_AlreadyParalyzedText:
+    db $0,$59,$4f
+    db "already",$55
+    db "paralyzed!",$58
 
 _AlreadyConfusedText:
     db $0,$59,$4f
@@ -133644,6 +133483,288 @@ HandleEnemyRageAndThrashing:
     ret
 
 ; ───────────────────────────────────────
+; HandlePoisonBurnLeechSeed_
+; ───────────────────────────────────────
+
+HandlePoisonBurnLeechSeed_:
+    ld hl,W_PLAYERMONCURHP
+    ld de,W_PLAYERBATTSTATUS2
+    ld bc,W_PLAYERMONSTATUS ; ~DONE:MultiStatus
+    ld a,[H_WHOSETURN]
+    and a
+    jr z,.playersTurn
+    ld hl,W_ENEMYMONCURHP
+    ld de,W_ENEMYBATTSTATUS2
+    ld bc,W_ENEMYMONSTATUS ; ~DONE:MultiStatus
+.playersTurn
+    ld a,[bc]
+    bit FRZ_Bit,a
+    jp nz,.Frozen
+    ld a,[de]
+    bit SEEDED,a
+    jr z,.notLeechSeeded
+    push bc
+    push hl
+    push hl
+    ld hl,.HurtByLeechSeedText
+    call PrintText
+    pop hl
+    ld a,[H_WHOSETURN]
+    push af
+    xor $1
+    ld [H_WHOSETURN],a
+    xor a
+    ld [$cc5b],a
+    ld a,ABSORB
+    call .PlayMoveAnimation ; play leech seed animation (from opposing mon)
+    pop af
+    ld [H_WHOSETURN],a
+    pop hl
+    call PoisonBurnLeechSeed_DecreaseOwnHP
+    call LeechSeed_IncreaseEnemyHP
+    call .WaitForTextScrollButtonPress
+    ld a,[hli]      ; Test If Fainted
+    or [hl]         ; ...
+    dec hl          ; ...
+    pop bc          ; ...
+    jr z,.Faintened ; ...
+.notLeechSeeded
+    ld a,[bc]
+    bit PSN_Bit,a
+    jr z,.notPoisoned
+    push bc
+    push hl
+    push hl
+    ld hl,.HurtByPoisonText
+    call PrintText
+    pop hl
+    xor a
+    ld [$cc5b],a
+    ld a,$BA
+    call .PlayMoveAnimation ; play poison animation
+    pop hl
+    ld a,[wUnusedC000]
+    set 6,a ; set the bit that indicates poison is being handled
+    ld [wUnusedC000],a
+    call PoisonBurnLeechSeed_DecreaseOwnHP
+    ld a,[wUnusedC000]
+    res 6,a ; reset the bit that indicates poison is being handled
+    ld [wUnusedC000],a
+    call .WaitForTextScrollButtonPress
+    ld a,[hli]      ; Test If Fainted
+    or [hl]         ; ...
+    dec hl          ; ...
+    pop bc          ; ...
+    jr z,.Faintened ; ...
+.notPoisoned
+    ld a,[bc]
+    bit BRN_Bit,a
+    jr z,.notBurned
+    push bc
+    push hl
+    push hl
+    ld hl,.HurtByBurnText
+    call PrintText
+    pop hl
+    xor a
+    ld [$cc5b],a
+    ld a,[H_WHOSETURN]
+    push af
+    xor $1
+    ld [H_WHOSETURN],a
+    ld a,EMBER
+    call .PlayMoveAnimation ; play burn animation (from opposing mon)
+    pop af
+    ld [H_WHOSETURN],a
+    pop hl
+    call PoisonBurnLeechSeed_DecreaseOwnHP
+    call .WaitForTextScrollButtonPress
+    ld a,[hli]      ; Test If Fainted
+    or [hl]         ; ...
+    dec hl          ; ...
+    pop bc          ; ...
+    jr z,.Faintened ; ...
+.notBurned
+.Frozen
+    ld a,1 ; rzf
+    and a  ; ...
+    ret
+.Faintened
+    ld c,20
+    call DelayFrames
+    xor a
+    ret
+.HurtByPoisonText
+    TX_FAR _HurtByPoisonText
+    db "@"
+.HurtByBurnText
+    TX_FAR _HurtByBurnText
+    db "@"
+.HurtByLeechSeedText
+    TX_FAR _HurtByLeechSeedText
+    db "@"
+.PlayMoveAnimation
+    ld [$D07C],a
+    call Delay3
+    PREDEF_JUMP MoveAnimation
+.WaitForTextScrollButtonPress
+    push hl
+    PREDEF DrawHUDsAndHPBars
+    ld a,$EE
+    FuncCoord 18,16 ; $c4f2
+    ld [Coord],a
+    call WaitForTextScrollButtonPress
+    pop hl
+    ret
+
+; decreases the mon's current HP by 1/16 of the Max HP (multiplied by number of toxic ticks if active)
+; hl: HP pointer
+PoisonBurnLeechSeed_DecreaseOwnHP:
+    push hl
+    push hl
+    call HPDiv16
+    ld hl,W_PLAYERBATTSTATUS3 ; $d064
+    ld de,W_PLAYERTOXICCOUNTER ; $d06c
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr z,.playersTurn
+    ld hl,W_ENEMYBATTSTATUS3 ; $d069
+    ld de,W_ENEMYTOXICCOUNTER ; $d071
+.playersTurn
+    ld a,[wUnusedC000]
+    bit 6,a ; check if this is for leech seed
+    jr z,.noToxic
+    bit BADLY_POISONED,[hl]
+    jr z,.noToxic
+.Toxic
+    ld a,[de]    ; increment toxic counter
+    inc a
+    ld [de],a
+    ld hl,$0000
+.toxicTicksLoop
+    add hl,bc
+    dec a
+    jr nz,.toxicTicksLoop
+    ld b,h       ; bc = damage * toxic counter
+    ld c,l
+.noToxic
+    pop hl
+    inc hl
+    ld a,[hl]    ; subtract total damage from current HP
+    ld [wHPBarOldHP],a
+    sub c
+    ld [hld],a
+    ld [wHPBarNewHP],a
+    ld a,[hl]
+    ld [wHPBarOldHP+1],a
+    sbc b
+    ld [hl],a
+    ld [wHPBarNewHP+1],a
+    jr nc,.noOverkill
+    xor a         ; overkill: zero HP
+    ld [hli],a
+    ld [hl],a
+    ld [wHPBarNewHP],a
+    ld [wHPBarNewHP+1],a
+.noOverkill
+    ld d,b
+    ld e,c
+    ld b,BANK(SetDamageDuringPoisonBurnLeechSeed)
+    ld hl,SetDamageDuringPoisonBurnLeechSeed
+    call Bankswitch
+    pop hl
+    ret
+
+; adds HP/16 to enemy HP
+LeechSeed_IncreaseEnemyHP:
+    push hl
+    call HPDiv16
+    push bc
+    ld hl,W_ENEMYMONMAXHP ; $cff4
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr z,.playersTurn
+    ld hl,W_PLAYERMONMAXHP ; $d023
+.playersTurn
+    ld a,[hli]
+    ld [wHPBarMaxHP+1],a
+    ld a,[hl]
+    ld [wHPBarMaxHP],a
+    ld de,$fff2
+    add hl,de           ; skip back fomr max hp to current hp
+    ld a,[hl]
+    ld [wHPBarOldHP],a ; add bc to current HP
+    add c
+    ld [hld],a
+    ld [wHPBarNewHP],a
+    ld a,[hl]
+    ld [wHPBarOldHP+1],a
+    adc b
+    ld [hli],a
+    ld [wHPBarNewHP+1],a
+    ld a,[wHPBarMaxHP]
+    ld c,a
+    ld a,[hld]
+    sub c
+    ld a,[wHPBarMaxHP+1]
+    ld b,a
+    ld a,[hl]
+    sbc b
+    jr c,.noOverfullHeal
+    ld a,b                ; overfull heal,set HP to max HP
+    ld [hli],a
+    ld [wHPBarNewHP+1],a
+    ld a,c
+    ld [hl],a
+    ld [wHPBarNewHP],a
+.noOverfullHeal
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    xor $1
+    ld [H_WHOSETURN],a ; $FF00+$f3
+    pop bc
+    ld d,b
+    ld e,c
+    ld b,BANK(SetCureDuringLeechSeed)
+    ld hl,SetCureDuringLeechSeed
+    call Bankswitch
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    xor $1
+    ld [H_WHOSETURN],a ; $FF00+$f3
+    pop hl
+    ret
+
+HPDiv16:
+    ld bc,$e ; skip to max HP
+    add hl,bc
+    ld a,[hli] ; load max HP
+    ld [wHPBarMaxHP+1],a
+    ld b,a
+    ld a,[hl]
+    ld [wHPBarMaxHP],a
+    ld c,a
+    srl b
+    rr c
+    srl b
+    rr c
+    srl c
+    srl c ; c = max HP/16 (assumption: HP < 1024)
+    ld a,c
+    and a
+    ret nz ; nonZeroDamage
+    inc c ; damage is at least 1
+    ret
+
+_RockDamage:
+    ld hl,W_ENEMYMONCURHP
+    call PoisonBurnLeechSeed_DecreaseOwnHP ; ~TODO:HandleFaintened
+    PREDEF_JUMP DrawEnemyHUDAndHPBar
+
+_BaitHealth:
+    ld hl,W_ENEMYMONCURHP
+    call LeechSeed_IncreaseEnemyHP
+    PREDEF_JUMP DrawEnemyHUDAndHPBar
+
+; ───────────────────────────────────────
 
 SECTION "Wild Pkmn",ROMX,BANK[$36]
 
@@ -140100,9 +140221,7 @@ ItemInBattleFinalCheck:
     PREDEF DrawPlayerHUDAndHPBar
     jp SaveScreenTilesToBuffer1
 .DrawHUDsAndHPBars
-    ld b,BANK(DrawHUDsAndHPBars)
-    ld hl,DrawHUDsAndHPBars
-    jp Bankswitch
+    PREDEF_JUMP DrawHUDsAndHPBars
 .HackGainExpAfterCatch
     ld b,BANK(HackGainExpAfterCatch)
     ld hl,HackGainExpAfterCatch
@@ -140747,7 +140866,7 @@ PlayTrainerMusic_:
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
-QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_:
+QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_: ; ~DONE:MultiStatus
 ; ──────────────────────────────────────────────────────────────────────
 
 ; These where probably added given that a stat-down move affecting speed or attack will override
@@ -140794,7 +140913,7 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_:
     ret                                   ; remember to return
 
 ; ──────────────────────────────────────────────────────────────────────
-QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_:
+QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_: ; ~DONE:MultiStatus
 ; ──────────────────────────────────────────────────────────────────────
 
 ; these shouldn't be here
@@ -141333,7 +141452,7 @@ GenerateRandomEnemyTrainerIV_:
     db ERIKA,PARASECT,$79,$F8
 
     ; Koga
-    db KOGA,VENOMOTH,$7C,$FD
+    db KOGA,VENOMOTH,$C7,$FD
     db KOGA,GOLBAT,$F4,$F4
     db KOGA,MUK,$EF,$5C
     db KOGA,WEEZING,$9F,$FC
@@ -141341,6 +141460,7 @@ GenerateRandomEnemyTrainerIV_:
     db KOGA,SCYTHER,$F7,$F7
     db KOGA,TENTACRUEL,$6A,$FC
     db KOGA,ELECTRODE,$F0,$F0
+    db KOGA,HAUNTER,$92,$DD
     db KOGA,GENGAR,$92,$DD
 
     ; Sabrina
@@ -141349,7 +141469,7 @@ GenerateRandomEnemyTrainerIV_:
     db SABRINA,KADABRA,$3F,$CD
     db SABRINA,ALAKAZAM,$3F,$CD
     db SABRINA,MR_MIME,$AA,$FD
-    db SABRINA,VENOMOTH,$C7,$FD
+    db SABRINA,VENOMOTH,$7C,$DF
     db SABRINA,SLOWBRO,$3F,$0F
     db SABRINA,JYNX,$EE,$EE
     db SABRINA,HYPNO,$DC,$AB
@@ -141886,9 +142006,7 @@ SubstituteEffectHandler:
     call Bankswitch           ;jump to routine depending on animation setting
     ld hl,.UnnamedText_17e1d  ;"it created a substitute"
     call PrintText
-    ld hl,DrawHUDsAndHPBars
-    ld b,BANK(DrawHUDsAndHPBars)
-    jp Bankswitch
+    PREDEF_JUMP DrawHUDsAndHPBars
 .alreadyHasSubstitute
     ld hl,.UnnamedText_17e22  ;"x has a substitute"
     jr .printText
