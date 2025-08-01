@@ -53461,6 +53461,34 @@ CheckDefrost:
     TX_FAR _UnnamedText_3f423
     db "@"
 
+PrintAlreadyStatusedText: ; ~TODO:MultiStatus
+    ld hl,.AlreadyStatusedText
+    jp Delay50AndPrintText
+.AlreadyStatusedText
+    TX_FAR _AlreadyStatusedText
+    db "@"
+
+PrintAlreadyAsleepText:
+    ld hl,.AlreadyAsleepText
+    jp Delay50AndPrintText
+.AlreadyAsleepText
+    TX_FAR _AlreadyAsleepText
+    db "@"
+
+PrintAlreadyPoisonedText:
+    ld hl,.AlreadyPoisonedText
+    jp Delay50AndPrintText
+.AlreadyPoisonedText
+    TX_FAR _AlreadyPoisonedText
+    db "@"
+
+PrintAlreadyParalyzedText:
+    ld hl,.AlreadyParalyzedText
+    jp Delay50AndPrintText
+.AlreadyParalyzedText
+    TX_FAR _AlreadyParalyzedText
+    db "@"
+
 ; Free
 
 SECTION "UpdateCurMonHPBar",ROMX[$44f6],BANK[$f]
@@ -60136,25 +60164,28 @@ SleepEffect:
     call MoveHitTestPlus
     jr nz,.attackMissed
     ld a,[de]
-    and a
-    jr nz,.alreadyStatused ; ~TODO:MultiStatus
+    and SLP
+    jr nz,.alreadyAsleep ; ~DONE:MultiStatus
     ld a,[bc] ; target no longer needs to recharge (hyper beam)
-    res 5,a   ; ...
+    res NEEDS_TO_RECHARGE,a   ; ...
     ld [bc],a ; ...
+    ld a,[de]
+    ld b,a ; Current Status
 .setSleepCounter
     call GenRandomInBattle
-    and %00000111 ; SLEEP
+    and SLP
     jr z,.setSleepCounter
-    ld [de],a ; ~TODO:MultiStatus
+    or b ; Apply Sleep Mask to Current Status
+    ld [de],a ; ~DONE:MultiStatus
     ld hl,.FellAsleepText ; $7245
     call PlayCurrentMoveAnimation2
     jp DrawHudAndPrintText
 .attackMissed
     call PlayCurrentMoveAnimation
     jp PrintMoveFailureText
-.alreadyStatused
+.alreadyAsleep
     call PlayCurrentMoveAnimation
-    jp PrintAlreadyStatusedText
+    jp PrintAlreadyAsleepText
 .FellAsleepText
     TX_FAR _FellAsleepText
     db "@"
@@ -61225,13 +61256,6 @@ Delay50AndPrintText:
     call DelayFrames
     jp PrintText
 
-PrintAlreadyStatusedText:
-    ld hl,.AlreadyStatusedText
-    jp Delay50AndPrintText
-.AlreadyStatusedText
-    TX_FAR _AlreadyStatusedText
-    db "@"
-
 ConfusionEffect:
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -61300,6 +61324,8 @@ PrintAlreadyConfusedText:
 PlayBattleAnimationFromAnotherBank:
    ld a,d
    jp PlayBattleAnimation
+
+; Free
 
 SECTION "ParalyzeEffect",ROMX[$79b1],BANK[$f]
 
@@ -126171,7 +126197,19 @@ _WasJustSeededText:
 
 _AlreadyStatusedText:
     db $0,$59,$4f
-    db "already statused!",$58
+    db "already statused!",$58 ; ~TODO:MultiStatus
+
+_AlreadyAsleepText:
+    db $0,$59,$4f
+    db "already asleep!",$58
+
+_AlreadyPoisonedText:
+    db $0,$59,$4f
+    db "already poisoned!",$58
+
+_AlreadyParalyzedText:
+    db $0,$59,$4f
+    db "already paralyzed!",$58
 
 _AlreadyConfusedText:
     db $0,$59,$4f
