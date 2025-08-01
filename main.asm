@@ -56166,9 +56166,18 @@ PlayMoveAnimation_SeismicTossException:
 
 CheckPlayerStatusConditions:
     ld hl,W_PLAYERMONSTATUS
+
+.FrozenCheck
+    bit FRZ_Bit,[hl] ; frozen?
+    jr z,.SleepCheck
+    ld hl,FrozenText
+    jr .SleepFrozenDone
+
+.SleepCheck
     ld a,[hl]
     and SLP
-    jr z,.FrozenCheck
+    ld a,[hl]
+    jr z,.HeldInPlaceCheck
 
     dec a
     ld [W_PLAYERMONSTATUS],a ; decrement sleep count
@@ -56186,12 +56195,6 @@ CheckPlayerStatusConditions:
     xor a
     ld [$CCF1],a
     jr .ExecutePlayerMoveDone
-
-.FrozenCheck
-    bit 5,[hl] ; frozen?
-    jr z,.HeldInPlaceCheck ; to 5898
-    ld hl,FrozenText
-    jr .SleepFrozenDone
 
 .WakeUp
     ld hl,WokeUpText
@@ -58748,9 +58751,18 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up:
 
 CheckEnemyStatusConditions:
     ld hl,W_ENEMYMONSTATUS ; $cfe9
+
+.FrozenCheck
+    bit FRZ_Bit,[hl]
+    jr z,.SleepCheck
+    ld hl,FrozenText ; $5a47
+    jr .SleepFrozenDone
+
+.SleepCheck
     ld a,[hl]
     and SLP
-    jr z,.FrozenCheck
+    ld a,[hl]
+    jr z,.HeldInPlaceCheck
 
     dec a
     ld [W_ENEMYMONSTATUS],a ; $cfe9
@@ -58768,12 +58780,6 @@ CheckEnemyStatusConditions:
     xor a
     ld [$ccf2],a
     jr .ExecuteEnemyMoveDone
-
-.FrozenCheck
-    bit 5,[hl]
-    jr z,.HeldInPlaceCheck
-    ld hl,FrozenText ; $5a47
-    jr .SleepFrozenDone
 
 .WakeUp
     ld hl,WokeUpText ; $5a42
@@ -60346,6 +60352,9 @@ FreezeBurnParalyzeEffect:
 .freeze1
     call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
     set FRZ_Bit,[hl] ; ~DONE:MultiStatus
+    ld a,[hl]
+    and ~SLP & ~BRN ; Remove Sleep & Burn
+    ld [hl],a
     call PlayA9BattleAnimation
     ld hl,.UnnamedText_3f3dd
     jp DrawHudAndPrintText
@@ -60384,6 +60393,9 @@ FreezeBurnParalyzeEffect:
 .freeze2
     call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
     set FRZ_Bit,[hl] ; ~DONE:MultiStatus
+    ld a,[hl]
+    and ~SLP & ~BRN ; Remove Sleep & Burn
+    ld [hl],a
     call PlayC7BattleAnimation
     ld hl,.UnnamedText_3f3dd
     jp DrawHudAndPrintText
@@ -108788,7 +108800,7 @@ CinnabarGymScriptPointers:
 ; bc = battle status 1 address (if 0 Not Battle HUD)
 PrintStatusAilment:
     ld a,[de]
-    bit 5,a
+    bit FRZ_Bit,a
     call nz,.Frz
     jr nz,.FrzThenSkipSlpBrn
     and %00000111 ; slp
@@ -133485,6 +133497,9 @@ HandlePoisonBurnLeechSeed_:
     ld de,W_ENEMYBATTSTATUS2
     ld bc,W_ENEMYMONSTATUS ; ~DONE:MultiStatus
 .playersTurn
+    ld a,[bc]
+    bit FRZ_Bit,a
+    jp nz,.Frozen
     ld a,[de]
     bit SEEDED,a
     jr z,.notLeechSeeded
@@ -133570,6 +133585,7 @@ HandlePoisonBurnLeechSeed_:
     pop bc          ; ...
     jr z,.Faintened ; ...
 .notBurned
+.Frozen
     ld a,1 ; rzf
     and a  ; ...
     ret
