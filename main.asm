@@ -141452,7 +141452,7 @@ GenerateRandomEnemyTrainerIV_:
     db ERIKA,PARASECT,$79,$F8
 
     ; Koga
-    db KOGA,VENOMOTH,$7C,$FD
+    db KOGA,VENOMOTH,$C7,$FD
     db KOGA,GOLBAT,$F4,$F4
     db KOGA,MUK,$EF,$5C
     db KOGA,WEEZING,$9F,$FC
@@ -141460,6 +141460,7 @@ GenerateRandomEnemyTrainerIV_:
     db KOGA,SCYTHER,$F7,$F7
     db KOGA,TENTACRUEL,$6A,$FC
     db KOGA,ELECTRODE,$F0,$F0
+    db KOGA,HAUNTER,$92,$DD
     db KOGA,GENGAR,$92,$DD
 
     ; Sabrina
@@ -141468,7 +141469,7 @@ GenerateRandomEnemyTrainerIV_:
     db SABRINA,KADABRA,$3F,$CD
     db SABRINA,ALAKAZAM,$3F,$CD
     db SABRINA,MR_MIME,$AA,$FD
-    db SABRINA,VENOMOTH,$C7,$FD
+    db SABRINA,VENOMOTH,$7C,$DF
     db SABRINA,SLOWBRO,$3F,$0F
     db SABRINA,JYNX,$EE,$EE
     db SABRINA,HYPNO,$DC,$AB
