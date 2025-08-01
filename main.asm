@@ -140850,7 +140850,7 @@ PlayTrainerMusic_:
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
-QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_: ; ~TODO:MultiStatus
+QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_: ; ~DONE:MultiStatus
 ; ──────────────────────────────────────────────────────────────────────
 
 ; These where probably added given that a stat-down move affecting speed or attack will override
@@ -140897,7 +140897,7 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_: ; ~TODO:MultiStatus
     ret                                   ; remember to return
 
 ; ──────────────────────────────────────────────────────────────────────
-QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_: ; ~TODO:MultiStatus
+QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_: ; ~DONE:MultiStatus
 ; ──────────────────────────────────────────────────────────────────────
 
 ; these shouldn't be here
