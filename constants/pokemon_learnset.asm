@@ -2409,6 +2409,7 @@ TANGELA_Learnset: MACRO
     db 31,BARRAGE
     db 33,CONFUSION
     db 35,RAZOR_LEAF
+    db 36,SPORE
     db 37,HAZE
     db 39,AMNESIA
     db 40,SOLARBEAM
