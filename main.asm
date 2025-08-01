@@ -60209,8 +60209,8 @@ PoisonEffect:
     jr nz,.didntAffect ; can't poison a substitute target
     ld a,[hl]
     ld b,a
-    and a
-    jr nz,.alreadyStatused ; miss if target is already statused ; ~TODO:MultiStatus
+    bit PSN_Bit,a
+    jr nz,.alreadyPoisoned ; miss if target is already statused ; ~DONE:MultiStatus
     push hl
     ld bc,W_PLAYERMONTYPES-W_PLAYERMONSTATUS
     add hl,bc
@@ -60229,7 +60229,7 @@ PoisonEffect:
     cp b
     ret nc
 .inflictPoison
-    set 3,[hl] ; mon is now poisoned
+    set PSN_Bit,[hl] ; mon is now poisoned
     push de
     dec de
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -60245,7 +60245,7 @@ PoisonEffect:
 .ok
     cp TOXIC
     jr nz,.normalPoison ; done if move is not Toxic
-    set 0,[hl] ; BADLY_POISONED ; else set Toxic battstatus
+    set BADLY_POISONED,[hl] ; else set Toxic battstatus
     xor a
     ld [de],a
     ld hl,.BadlyPoisonedText ; $72e4
@@ -60272,8 +60272,8 @@ PoisonEffect:
 .didntAffect
     ld hl,PrintDidntAffectText
     jr .checkEnd
-.alreadyStatused
-    ld hl,PrintAlreadyStatusedText
+.alreadyPoisoned
+    ld hl,PrintAlreadyPoisonedText
     ; fall through
 .checkEnd
     ld a,[de]
