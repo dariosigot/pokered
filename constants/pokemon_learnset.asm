@@ -3294,10 +3294,12 @@ DRAGONAIR_Learnset: MACRO
     DRATINI_Learnset
     db 30,HORN_ATTACK
     db 30,FURY_ATTACK
+    db 30,GUST
     db 32,HYPER_FANG
     db 34,LIGHT_SCREEN
     db 36,SKULL_BASH
     db 38,HAZE
+    db 40,RAZOR_WIND
     db 41,TRAPHOLE
     db 43,ICE_BEAM
     db 44,FLAMETHROWER
@@ -3310,9 +3312,7 @@ DRAGONAIR_Learnset: MACRO
 ENDM
 DRAGONITE_Learnset: MACRO
     DRAGONAIR_Learnset
-    db 55,GUST
     db 55,SWOOP
-    db 55,RAZOR_WIND
     db 56,HYDRO_PUMP
     db 57,THUNDER_M
     db 58,BLIZZARD
