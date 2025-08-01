@@ -53461,13 +53461,6 @@ CheckDefrost:
     TX_FAR _UnnamedText_3f423
     db "@"
 
-PrintAlreadyStatusedText: ; ~TODO:MultiStatus
-    ld hl,.AlreadyStatusedText
-    jp Delay50AndPrintText
-.AlreadyStatusedText
-    TX_FAR _AlreadyStatusedText
-    db "@"
-
 PrintAlreadyAsleepText:
     ld hl,.AlreadyAsleepText
     jp Delay50AndPrintText
@@ -79599,9 +79592,8 @@ ParalyzeEffect_:
     ld hl,W_PLAYERMONSTATUS ; $d018
     ld de,W_ENEMYMOVETYPE ; $cfcf
 .next
-    ld a,[hl]
-    and a
-    jr nz,.alreadyStatused ; miss if target is already statused ; ~TODO:MultiStatus
+    bit PAR_Bit,[hl]
+    jr nz,.alreadyParalyzed ; miss if target is already paralyzed ; ~DONE:MultiStatus
     ld a,[de]
     cp THUNDER
     jr nz,.hitTest
@@ -79614,7 +79606,7 @@ ParalyzeEffect_:
     call Bankswitch
     pop hl
     jr nz,.didntAffect
-    set 6,[hl]
+    set PAR_Bit,[hl]
     ld hl,QuarterSpeedDueToParalysis
     ld b,BANK(QuarterSpeedDueToParalysis)
     call Bankswitch
@@ -79624,8 +79616,8 @@ ParalyzeEffect_:
     call .BankswitchToF
     ld hl,PrintMayNotAttackText
     jr .BankswitchToF
-.alreadyStatused
-    ld hl,PrintAlreadyStatusedText
+.alreadyParalyzed
+    ld hl,PrintAlreadyParalyzedText
     jr .PlayAnimationAndTextFail
 .didntAffect
     ld hl,PrintDidntAffectText
@@ -126190,10 +126182,6 @@ _WasJustSeededText:
     db $0,$59,$4f
     db "was just seeded!",$58
 
-_AlreadyStatusedText:
-    db $0,$59,$4f
-    db "already statused!",$58 ; ~TODO:MultiStatus
-
 _AlreadyAsleepText:
     db $0,$59,$4f
     db "already asleep!",$58
@@ -126204,7 +126192,8 @@ _AlreadyPoisonedText:
 
 _AlreadyParalyzedText:
     db $0,$59,$4f
-    db "already paralyzed!",$58
+    db "already",$55
+    db "paralyzed!",$58
 
 _AlreadyConfusedText:
     db $0,$59,$4f
