@@ -449,19 +449,28 @@ AIMoveChoiceModification1:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;don't use a status move against a status'd target
     ld a,[W_ENEMYMOVEEFFECT]
-    push hl
-    push de
-    push bc
-    ld hl,StatusAilmentMoveEffects
-    ld de,$0001
-    call IsInArray
-    pop bc
-    pop de
-    pop hl
-    jr nc,.nostatusconflict
+    cp SLEEP_EFFECT
+    jr z,.SleepConflict
+    cp POISON_EFFECT
+    jr z,.PoisonConflict
+    cp PARALYZE_EFFECT
+    jr z,.ParalyzeConflict
+    jr .nostatusconflict
+.SleepConflict
     ld a,[W_PLAYERMONSTATUS]
-    and a
+    and SLP
     jr nz,.heavydiscourage
+    jr .nostatusconflict
+.PoisonConflict
+    ld a,[W_PLAYERMONSTATUS]
+    bit PSN_Bit,a
+    jr nz,.heavydiscourage
+    jr .nostatusconflict
+.ParalyzeConflict
+    ld a,[W_PLAYERMONSTATUS]
+    bit PAR_Bit,a
+    jr nz,.heavydiscourage
+    ; fall through
 .nostatusconflict
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
