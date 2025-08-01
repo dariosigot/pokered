@@ -1,21 +1,21 @@
 
 ; ────────────────────────────────────────────────
 
-BrockMoves1:
+BrockMove1:
     ; 12,GEODUDE
     db SAND_ATTACK,DEFENSE_CURL,DOUBLESLAP,BIDE 
     ; 14,ONIX
     db SCREECH,BIDE,ROCK_THROW,SLAM
     db 0
 
-BrockMoves2:
+BrockMove2:
     ; 18,GEODUDE
     db TRAPHOLE,HARDEN,ROCK_THROW,BIDE
     ; 21,ONIX
     db SHARPEN,BIDE,BLADE,SAND_ATTACK
     db 0
 
-BrockMoves3:
+BrockMove3:
     ; 25,GRAVELER
     db BODY_SLAM,HARDEN,ROCK_THROW,BIDE
     ; 21,VULPIX
@@ -24,7 +24,7 @@ BrockMoves3:
     db SHARPEN,BIDE,ROCK_SLIDE,TRAPHOLE
     db 0
 
-BrockMoves4:
+BrockMove4:
     ; 28,GRAVELER
     db BODY_SLAM,HARDEN,ROCK_THROW,BIDE
     ; 26,VULPIX
@@ -37,7 +37,7 @@ BrockMoves4:
     db SHARPEN,BIDE,ROCK_SLIDE,BODY_SLAM
     db 0
 
-BrockMoves5:
+BrockMove5:
     ; 32,GRAVELER
     db BODY_SLAM,HARDEN,ROCK_SLIDE,TRAPHOLE
     ; 31,VULPIX
@@ -50,7 +50,7 @@ BrockMoves5:
     db DRAGON_RAGE,SHARPEN,ROCK_SLIDE,BODY_SLAM
     db 0
 
-BrockMoves6:
+BrockMove6:
     ; 39,GRAVELER
     db EARTHQUAKE,HARDEN,ROCK_SLIDE,SAND_ATTACK
     ; 42,NINETALES
@@ -63,7 +63,7 @@ BrockMoves6:
     db DRAGON_RAGE,SHARPEN,ROCK_SLIDE,EARTHQUAKE
     db 0
 
-BrockMoves7:
+BrockMove7:
     ; 44,NINETALES
     db TRAPHOLE,FLAMETHROWER,CONFUSE_RAY,DOUBLE_TEAM
     ; 49,GOLEM
@@ -78,7 +78,7 @@ BrockMoves7:
     db SUBSTITUTE,EARTHQUAKE,ROCK_SLIDE,DRAGON_RAGE
     db 0
 
-BrockMoves8:
+BrockMove8:
     ; 56,NINETALES
     db SLASH,FIRE_BLAST,DREAM_EATER,LOVELY_KISS
     ; 57,GOLEM
@@ -93,7 +93,7 @@ BrockMoves8:
     db SUBSTITUTE,EARTHQUAKE,ROCK_SLIDE,HYPER_BEAM
     db 0
 
-BrockMoves9:
+BrockMove9:
     ; 61,NINETALES
     db NIGHT_SHADE,FIRE_BLAST,CONFUSE_RAY,LOVELY_KISS
     ; 62,GOLEM

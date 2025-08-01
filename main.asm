@@ -51401,15 +51401,15 @@ SpecialTrainer: MACRO
     ENDM
 
 SpecialTrainerMoves:
-    SpecialTrainer BROCK,1,BrockMoves1
-    SpecialTrainer BROCK,2,BrockMoves2
-    SpecialTrainer BROCK,3,BrockMoves3
-    SpecialTrainer BROCK,4,BrockMoves4
-    SpecialTrainer BROCK,5,BrockMoves5
-    SpecialTrainer BROCK,6,BrockMoves6
-    SpecialTrainer BROCK,7,BrockMoves7
-    SpecialTrainer BROCK,8,BrockMoves8
-    SpecialTrainer BROCK,9,BrockMoves9
+    SpecialTrainer BROCK,1,BrockMove1
+    SpecialTrainer BROCK,2,BrockMove2
+    SpecialTrainer BROCK,3,BrockMove3
+    SpecialTrainer BROCK,4,BrockMove4
+    SpecialTrainer BROCK,5,BrockMove5
+    SpecialTrainer BROCK,6,BrockMove6
+    SpecialTrainer BROCK,7,BrockMove7
+    SpecialTrainer BROCK,8,BrockMove8
+    SpecialTrainer BROCK,9,BrockMove9
     SpecialTrainer MISTY,1,MistyMove2
     SpecialTrainer MISTY,2,MistyMove3
     SpecialTrainer MISTY,3,MistyMove4
