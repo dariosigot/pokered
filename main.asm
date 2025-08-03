@@ -133497,6 +133497,8 @@ HandlePoisonBurnLeechSeed_:
     ld de,W_ENEMYBATTSTATUS2
     ld bc,W_ENEMYMONSTATUS
 .playersTurn
+    call .IsFainted
+    jp z,.Faintened
     ld a,[bc]
     bit FRZ_Bit,a
     jp nz,.Frozen
@@ -133523,11 +133525,9 @@ HandlePoisonBurnLeechSeed_:
     call PoisonBurnLeechSeed_DecreaseOwnHP
     call LeechSeed_IncreaseEnemyHP
     call .WaitForTextScrollButtonPress
-    ld a,[hli]      ; Test If Fainted
-    or [hl]         ; ...
-    dec hl          ; ...
-    pop bc          ; ...
-    jr z,.Faintened ; ...
+    pop bc
+    call .IsFainted
+    jr z,.Faintened
 .notLeechSeeded
     ld a,[bc]
     bit PSN_Bit,a
@@ -133551,11 +133551,9 @@ HandlePoisonBurnLeechSeed_:
     res 6,a ; reset the bit that indicates poison is being handled
     ld [wUnusedC000],a
     call .WaitForTextScrollButtonPress
-    ld a,[hli]      ; Test If Fainted
-    or [hl]         ; ...
-    dec hl          ; ...
-    pop bc          ; ...
-    jr z,.Faintened ; ...
+    pop bc
+    call .IsFainted
+    jr z,.Faintened
 .notPoisoned
     ld a,[bc]
     bit BRN_Bit,a
@@ -133579,20 +133577,21 @@ HandlePoisonBurnLeechSeed_:
     pop hl
     call PoisonBurnLeechSeed_DecreaseOwnHP
     call .WaitForTextScrollButtonPress
-    ld a,[hli]      ; Test If Fainted
-    or [hl]         ; ...
-    dec hl          ; ...
-    pop bc          ; ...
-    jr z,.Faintened ; ...
+    pop bc
+    call .IsFainted
+    jr z,.Faintened
 .notBurned
 .Frozen
+    call .IsFainted
+    jr z,.Faintened
+.NotFaintened
     ld a,1 ; rzf
     and a  ; ...
     ret
 .Faintened
     ld c,20
     call DelayFrames
-    xor a
+    xor a ; szf
     ret
 .HurtByPoisonText
     TX_FAR _HurtByPoisonText
@@ -133615,6 +133614,11 @@ HandlePoisonBurnLeechSeed_:
     ld [Coord],a
     call WaitForTextScrollButtonPress
     pop hl
+    ret
+.IsFainted
+    ld a,[hli]      ; Test If Fainted
+    or [hl]         ; ...
+    dec hl          ; ...
     ret
 
 ; decreases the mon's current HP by 1/16 of the Max HP (multiplied by number of toxic ticks if active)
