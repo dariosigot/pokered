@@ -61187,26 +61187,26 @@ ChargeEffect: ; 3f88c (f:788c)
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
-    ld b,$ae
-    jr z,.asm_3f8a1
+    ld b,XSTATITEM_ANIM
+    jr z,.done
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     ld de,W_ENEMYMOVEEFFECT ; $cfcd
     ld b,$af
-.asm_3f8a1
-    set 4,[hl]
+.done
+    set CHARGING_UP,[hl]
     ld a,[de]
     dec de
-    cp $2b
-    jr nz,.asm_3f8ad
-    set 6,[hl]
-    ld b,$64
-.asm_3f8ad
+    cp FLY_EFFECT
+    jr nz,.skip1
+    set INVULNERABLE,[hl]
+    ld b,TELEPORT
+.skip1
     ld a,[de]
-    cp $5b
-    jr nz,.asm_3f8b6
-    set 6,[hl]
+    cp TRAPHOLE
+    jr nz,.skip2
+    set INVULNERABLE,[hl]
     ld b,$c0
-.asm_3f8b6
+.skip2
     xor a
     ld [$cc5b],a
     ld a,b
