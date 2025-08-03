@@ -24146,7 +24146,7 @@ ItemUseMedicine:
     ld c,a
     ld a,[hl] ; pokemon's status
     and c ; reset only status ailment the item can cure?
-    ld [hl],a ; remove the status ailment in the party data ; ~DONE:MultiStatus
+    ld [hl],a ; remove the status ailment in the party data
     ld a,b
     ld [$d07d],a ; the message to display for the item used
     ld a,[W_ISINBATTLE]
@@ -24177,7 +24177,7 @@ ItemUseMedicine:
     ld [H_WHOSETURN],a ; ...
     pop hl ; Restore status ailment in the party data
     ld a,[hl]
-    ld [W_PLAYERMONSTATUS],a ; remove the status ailment in the in-battle pokemon data ; ~DONE:MultiStatus
+    ld [W_PLAYERMONSTATUS],a ; remove the status ailment in the in-battle pokemon data
     bit PSN_Bit,a
     jr nz,.SkipRemoveToxic
     xor a
@@ -24416,7 +24416,7 @@ ItemUseMedicine:
     and a
     call nz,UndoBurnParStats_FullRestore
     xor a
-    ld [hl],a ; remove the status ailment in the party data ; ~DONE:MultiStatus
+    ld [hl],a ; remove the status ailment in the party data
 .updateInBattleData
     ld h,d
     ld l,e
@@ -25023,11 +25023,11 @@ ItemUsePokeflute: ; e140 (3:6140)
     jr z,.NotInBattle
 
 .inBattle
-    ld hl,W_PLAYERMONSTATUS ; ~DONE:MultiStatus
+    ld hl,W_PLAYERMONSTATUS
     ld a,[hl]
     and b ; remove Sleep status
     ld [hl],a
-    ld hl,W_ENEMYMONSTATUS ; ~DONE:MultiStatus
+    ld hl,W_ENEMYMONSTATUS
     ld a,[hl]
     push af
     and a,SLP ; is pokemon asleep?
@@ -25805,7 +25805,7 @@ GotOffBicycleText: ; e5fc (3:65fc)
 ;        ► e = Status Factor 2
 GetStatusFactor:
     ld de,0 ; Initialize Outputs to 0
-    ld a,[W_ENEMYMONSTATUS] ;status ailments ; ~DONE:MultiStatus
+    ld a,[W_ENEMYMONSTATUS] ;status ailments
     and a
     jr z,.noAilments
     bit FRZ_Bit,a
@@ -49524,7 +49524,7 @@ INCLUDE "constants/moves.asm"
 ; ──────────────────────────────────────────────────────────────────────────
 
 ; Input ► d = bit mask to stats to consider (bit 0 attack, bit 2 speed)
-UndoBurnParStats: ; ~DONE:MultiStatus
+UndoBurnParStats:
     call Load16BitRegisters
     ld hl,W_PLAYERMONSTATUS
     ld a,[H_WHOSETURN]
@@ -50390,7 +50390,7 @@ AICureStatus:
     pop af
     ld [H_WHOSETURN],a
     xor a
-    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy ; ~DONE:MultiStatus
+    ld [W_ENEMYMONSTATUS],a ; clear status of active enemy
     ld [W_ENEMYTOXICCOUNTER], a ;clear toxic counter
     ld hl,W_ENEMYBATTSTATUS3 ;clear toxic bit
     res 0,[hl]
@@ -53436,24 +53436,24 @@ CheckDefrost:
     cp FIRE
     ret nz                         ;return if it isn't fire
     ld hl,W_ENEMYMONSTATUS
-    res FRZ_Bit,[hl]               ;"defrost" a frozen monster ; ~DONE:MultiStatus
+    res FRZ_Bit,[hl]               ;"defrost" a frozen monster
     ld hl,$d8a8                    ;status of first opponent monster in their roster
     ld a,[W_ENEMYMONNUMBER]
     ld bc,$002c                    ;$2C bytes per roster entry
     call AddNTimes
-    res FRZ_Bit,[hl]               ;"defrost" in roster ; ~DONE:MultiStatus
+    res FRZ_Bit,[hl]               ;"defrost" in roster
     jr .common
 .opponent
     ld a,[W_ENEMYMOVETYPE]         ;same as above with addresses swapped
     cp FIRE
     ret nz
     ld hl,W_PLAYERMONSTATUS
-    res FRZ_Bit,[hl] ; ~DONE:MultiStatus
+    res FRZ_Bit,[hl]
     ld hl,W_PARTYMON1_STATUS
     ld a,[wPlayerMonNumber]
     ld bc,$002c
     call AddNTimes
-    res FRZ_Bit,[hl] ; ~DONE:MultiStatus
+    res FRZ_Bit,[hl]
 .common
     ld hl,.UnnamedText_3f423
     jp DrawHudAndPrintText
@@ -56872,7 +56872,7 @@ CheckForDisobedience: ; 3dc88 (f:5c88)
     swap a
     and $7
     jr z,.asm_3dd0e
-    ld hl,W_PLAYERMONSTATUS ; ~DONE:MultiStatus
+    ld hl,W_PLAYERMONSTATUS
     ld b,[hl]
     or b
     ld [hl],a
@@ -60164,7 +60164,7 @@ SleepEffect:
     jr nz,.attackMissed
     ld a,[de]
     and SLP
-    jr nz,.alreadyAsleep ; ~DONE:MultiStatus
+    jr nz,.alreadyAsleep
     ld a,[bc] ; target no longer needs to recharge (hyper beam)
     res NEEDS_TO_RECHARGE,a   ; ...
     ld [bc],a ; ...
@@ -60175,7 +60175,7 @@ SleepEffect:
     and SLP
     jr z,.setSleepCounter
     or b ; Apply Sleep Mask to Current Status
-    ld [de],a ; ~DONE:MultiStatus
+    ld [de],a
     ld hl,.FellAsleepText ; $7245
     call PlayCurrentMoveAnimation2
     jp DrawHudAndPrintText
@@ -60209,7 +60209,7 @@ PoisonEffect:
     ld a,[hl]
     ld b,a
     bit PSN_Bit,a
-    jr nz,.alreadyPoisoned ; miss if target is already statused ; ~DONE:MultiStatus
+    jr nz,.alreadyPoisoned ; miss if target is already statused
     push hl
     ld bc,W_PLAYERMONTYPES-W_PLAYERMONSTATUS
     add hl,bc
@@ -60319,7 +60319,7 @@ FreezeBurnParalyzeEffect:
     jp nz,.OpponentAttacker
 
 .PlayerAttacker
-    ld a,[W_ENEMYMONSTATUS] ; ~DONE:MultiStatus
+    ld a,[W_ENEMYMONSTATUS]
     and a
     call nz,CheckDefrost ;opponent has existing status
     call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
@@ -60339,19 +60339,19 @@ FreezeBurnParalyzeEffect:
     jr z,.burn1
     cp a,FREEZE_SIDE_EFFECT
     jr z,.freeze1
-    set PAR_Bit,[hl] ; ~DONE:MultiStatus
+    set PAR_Bit,[hl]
     call QuarterSpeedDueToParalysis  ;quarter speed of affected monster
     call PlayA9BattleAnimation
     jp PrintMayNotAttackText    ;print paralysis text
 .burn1
-    set BRN_Bit,[hl] ; ~DONE:MultiStatus
+    set BRN_Bit,[hl]
     call HalveAttackDueToBurn
     call PlayA9BattleAnimation
     ld hl,.UnnamedText_3f3d8
     jp DrawHudAndPrintText
 .freeze1
     call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
-    set FRZ_Bit,[hl] ; ~DONE:MultiStatus
+    set FRZ_Bit,[hl]
     ld a,[hl]
     and ~SLP & ~BRN ; Remove Sleep & Burn
     ld [hl],a
@@ -60360,7 +60360,7 @@ FreezeBurnParalyzeEffect:
     jp DrawHudAndPrintText
 
 .OpponentAttacker
-    ld a,[W_PLAYERMONSTATUS] ; ~DONE:MultiStatus
+    ld a,[W_PLAYERMONSTATUS]
     and a
     call nz,CheckDefrost
     call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
@@ -60380,19 +60380,19 @@ FreezeBurnParalyzeEffect:
     jr z,.burn2
     cp a,FREEZE_SIDE_EFFECT
     jr z,.freeze2
-    set PAR_Bit,[hl] ; ~DONE:MultiStatus
+    set PAR_Bit,[hl]
     call QuarterSpeedDueToParalysis
     call PlayC7BattleAnimation
     jp PrintMayNotAttackText
 .burn2
-    set BRN_Bit,[hl] ; ~DONE:MultiStatus
+    set BRN_Bit,[hl]
     call HalveAttackDueToBurn
     call PlayC7BattleAnimation
     ld hl,.UnnamedText_3f3d8
     jp DrawHudAndPrintText
 .freeze2
     call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
-    set FRZ_Bit,[hl] ; ~DONE:MultiStatus
+    set FRZ_Bit,[hl]
     ld a,[hl]
     and ~SLP & ~BRN ; Remove Sleep & Burn
     ld [hl],a
@@ -79605,7 +79605,7 @@ ParalyzeEffect_:
     ld de,W_ENEMYMOVETYPE ; $cfcf
 .next
     bit PAR_Bit,[hl]
-    jr nz,.alreadyParalyzed ; miss if target is already paralyzed ; ~DONE:MultiStatus
+    jr nz,.alreadyParalyzed ; miss if target is already paralyzed
     ld a,[de]
     cp THUNDER
     jr nz,.hitTest
@@ -133489,13 +133489,13 @@ HandleEnemyRageAndThrashing:
 HandlePoisonBurnLeechSeed_:
     ld hl,W_PLAYERMONCURHP
     ld de,W_PLAYERBATTSTATUS2
-    ld bc,W_PLAYERMONSTATUS ; ~DONE:MultiStatus
+    ld bc,W_PLAYERMONSTATUS
     ld a,[H_WHOSETURN]
     and a
     jr z,.playersTurn
     ld hl,W_ENEMYMONCURHP
     ld de,W_ENEMYBATTSTATUS2
-    ld bc,W_ENEMYMONSTATUS ; ~DONE:MultiStatus
+    ld bc,W_ENEMYMONSTATUS
 .playersTurn
     ld a,[bc]
     bit FRZ_Bit,a
@@ -140866,7 +140866,7 @@ PlayTrainerMusic_:
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
-QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_: ; ~DONE:MultiStatus
+QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_:
 ; ──────────────────────────────────────────────────────────────────────
 
 ; These where probably added given that a stat-down move affecting speed or attack will override
@@ -140913,7 +140913,7 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_: ; ~DONE:MultiStatus
     ret                                   ; remember to return
 
 ; ──────────────────────────────────────────────────────────────────────
-QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_: ; ~DONE:MultiStatus
+QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_:
 ; ──────────────────────────────────────────────────────────────────────
 
 ; these shouldn't be here
