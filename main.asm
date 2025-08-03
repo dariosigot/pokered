@@ -1861,6 +1861,9 @@ CheckWildGhost:
     ld a,[W_ISINBATTLE]
     dec a
     jr nz,.end
+    ld hl,W_ENEMYBATTSTATUS3
+    bit TRANSFORMED,[hl]
+    jr nz,.end
     ld hl,W_ENEMYMONTYPES
     call CheckGhostType
 .end
@@ -58267,6 +58270,28 @@ MoveHitTest:
     ld de,W_ENEMYMOVEEFFECT
     ld bc,W_PLAYERMONSTATUS
 .done
+    dec de ; W_PLAYERMOVENUM / W_ENEMYMOVENUM
+    ld a,[de]
+    inc de
+    cp SEISMIC_TOSS
+    jr nz,.NotSeismicToss
+    push hl
+    push bc
+    ld hl,W_PLAYERMONTYPES-W_PLAYERMONSTATUS
+    add hl,bc
+    ld b,4
+.LoopTypesToFindGhost
+    ld a,[hli]
+    cp GHOST
+    jr z,.GhostFound
+    dec b
+    jr nz,.LoopTypesToFindGhost
+    inc b ; rzf
+.GhostFound
+    pop bc
+    pop hl
+    jr z,.moveMissed2
+.NotSeismicToss
     ld a,[de]
     cp JUMP_KICK_EFFECT
     jr nz,.dreamEaterCheck
