@@ -142173,9 +142173,9 @@ AdjustDamageForMoveType_GetInput:
 ; Output
 ; [wTmpDefenderTypes] = types of defender
 GetDefenderType:
-    ld a,[$d11e]
-    cp EARTH
-    jr z,.TryToLevitate
+;    ld a,[$d11e]
+;    cp EARTH
+;    jr z,.TryToLevitate
     ; fall through
 
 .Standard
@@ -142183,35 +142183,35 @@ GetDefenderType:
     ld bc,4
     jp CopyData
 
-.Custom
-    ld hl,wTmpDefenderTypes
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hl],a
-    ret
-
-.TryToLevitate
-    ld a,b ; Defender Mon ID
-    push hl
-    ld hl,.LevitateMonList
-    call .IsInArray
-    pop hl
-    jr nc,.Standard
-    ld a,WIND
-    jr .Custom
-
-.IsInArray
-    push bc
-    ld de,1
-    call IsInArray
-    pop bc
-    ret
-
-.LevitateMonList
-    db KOFFING
-    db WEEZING
-    db $FF
+;.Custom
+;    ld hl,wTmpDefenderTypes
+;    ld [hli],a
+;    ld [hli],a
+;    ld [hli],a
+;    ld [hl],a
+;    ret
+;
+;.TryToLevitate
+;    ld a,b ; Defender Mon ID
+;    push hl
+;    ld hl,.LevitateMonList
+;    call .IsInArray
+;    pop hl
+;    jr nc,.Standard
+;    ld a,WIND
+;    jr .Custom
+;
+;.IsInArray
+;    push bc
+;    ld de,1
+;    call IsInArray
+;    pop bc
+;    ret
+;
+;.LevitateMonList
+;    db KOFFING
+;    db WEEZING
+;    db $FF
 
 ; Input
 ; [$d11e] = Attacker Move Type
