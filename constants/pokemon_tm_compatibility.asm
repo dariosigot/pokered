@@ -952,8 +952,8 @@ KoffingTMCompatibility:
 WeezingTMCompatibility:
     tmlearn 06                      ; |TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
-    tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 21,25,31,32             ; |MEGA_DRAIN|THUNDER_M|MIMIC|DOUBLE_TEAM|
+    tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
+    tmlearn 25,31,32                ; |THUNDER_M|MIMIC|DOUBLE_TEAM|
     tmlearn 34,36,37,38             ; |BIDE|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|
     tmlearn 44,45,46,47             ; |REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
     tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
