@@ -26,7 +26,7 @@ CONFUSED                 EQU 7
 USING_X_ACCURACY    EQU 0
 PROTECTED_BY_MIST   EQU 1
 GETTING_PUMPED      EQU 2 ; Focus Energy
-;                   EQU 3 ; unused
+USING_FLY           EQU 3 ; using fly
 HAS_SUBSTITUTE_UP   EQU 4
 NEEDS_TO_RECHARGE   EQU 5 ; Hyper Beam
 USING_RAGE          EQU 6

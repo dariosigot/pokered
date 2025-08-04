@@ -49526,6 +49526,76 @@ INCLUDE "constants/moves.asm"
 
 ; ──────────────────────────────────────────────────────────────────────────
 
+WriteEnergyAllMoves_:
+    ld a,[wDebugEnemyMoveBit7]
+    bit 7,a
+    jr nz,.PrintAIChoice
+    ld d,4
+.Loop4Moves
+    push de
+    ld c,d
+    dec c
+    ld hl,W_PLAYERMONMOVES
+    ld b,0
+    add hl,bc
+    ld a,[hl]
+    and a
+    jr z,.SkipCurrentMove
+    push bc
+    ; Get Current Move
+    dec a
+    ld hl,Moves+5 ; Move Energy
+    ld bc,6
+    call AddNTimes
+    ld a,[hl]
+    ld [W_PLAYERMOVEMAXPP],a ; Energy
+    ; Print Current Energy
+    pop bc
+    ld a,c
+    FuncCoord 15,13
+    ld hl,Coord
+    ld bc,20
+    call AddNTimes
+    ld de,W_PLAYERMOVEMAXPP ; Energy
+    ld bc,$0103
+    call PrintNumber
+    ld de,.EnergyIcon
+    call PlaceString
+.SkipCurrentMove
+    pop de
+    dec d
+    jr nz,.Loop4Moves
+.end
+    FuncCoord 02,13
+    ld hl,Coord
+    ret
+.EnergyIcon
+    db $DA,"@"
+.PrintAIChoice
+    FuncCoord 16,13
+    ld hl,Coord
+    ld de,wBackupAIMoveChoice
+    ld bc,$0103
+    ld a,4
+.Loop4AI
+    push af
+    push de
+    push bc
+    push hl
+    call PrintNumber
+    pop hl
+    ld bc,20
+    add hl,bc
+    pop bc
+    pop de
+    inc de
+    pop af
+    dec a
+    jr nz,.Loop4AI
+    jr .end
+
+; ──────────────────────────────────────────────────────────────────────────
+
 ; Input ► d = bit mask to stats to consider (bit 0 attack, bit 2 speed)
 UndoBurnParStats:
     call Load16BitRegisters
@@ -52923,7 +52993,24 @@ GetDamageVarsScaleStats:
     inc c
     ret
 
-; Free
+DontMissDigMoves:
+    db EARTHQUAKE
+    db FISSURE
+    db $FF
+
+DontMissFlyMoves:
+    db THUNDER_M
+    db BLIZZARD
+    db TOXIC
+    db BONEMERANG
+    db RAZOR_WIND
+    db GUST
+    db WHIRLWIND
+    db $FF
+
+IsInArray1:
+    ld de,1
+    jp IsInArray
 
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
@@ -53484,6 +53571,31 @@ PrintAlreadyParalyzedText:
 .AlreadyParalyzedText
     TX_FAR _AlreadyParalyzedText
     db "@"
+
+PrintIsUnaffectedText:
+    ld hl,.IsUnaffectedText
+    jp Delay50AndPrintText
+.IsUnaffectedText
+    TX_FAR _IsUnaffectedText
+    db "@"
+
+MistEffect:
+    ld hl,MistEffect_
+    ld b,BANK(MistEffect_)
+    jr BankswitchFronBankF
+
+FocusEnergyEffect:
+    ld hl,FocusEnergyEffect_
+    ld b,BANK(FocusEnergyEffect_)
+    jr BankswitchFronBankF
+
+WaitButtonPressed:
+    ld b,BANK(WaitButtonPressed_)
+    ld hl,WaitButtonPressed_
+    ; fall through
+
+BankswitchFronBankF:
+    jp Bankswitch
 
 ; Free
 
@@ -55923,7 +56035,7 @@ ExecutePlayerMove: ; 3d65e (f:565e)
 .playerHasNoSpecialCondition
     call GetCurrentMove
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
-    bit 4,[hl] ; charging up for attack
+    bit CHARGING_UP,[hl] ; charging up for attack
     jr nz,PlayerCanExecuteChargingMove
     call CheckForDisobedience
     jp z,ExecutePlayerMoveDone
@@ -55941,8 +56053,11 @@ PlayerCanExecuteChargingMove:
     ld hl,W_PLAYERBATTSTATUS1 ; reset charging up and invulnerability statuses if mon was charging up for an attack
                               ; being fully paralyzed or hurting oneself in confusion removes charging up status
                               ; resulting in the Pokemon being invulnerable for the whole battle
-    res 4,[hl]
-    res 6,[hl]
+    res CHARGING_UP,[hl]
+    res INVULNERABLE,[hl]
+    inc hl
+    res USING_FLY,[hl]
+    dec hl
 
 PlayerCanExecuteMove:
     call PrintMonName1Text
@@ -56110,12 +56225,6 @@ ExecutePlayerMoveDone:
     ret
 
 ; ──────────────────────────────────────────
-
-SetCounterToMiss:
-    ld hl,wUnusedC000
-    set 7,[hl] ; setting this bit causes counter to miss
-    ld hl,HurtItselfText ; $5a65
-    ret
 
 SECTION "PrintGhostText",ROMX[$5811],BANK[$f]
 
@@ -56299,6 +56408,9 @@ CheckPlayerStatusConditions:
     ld a,[hl]
     and %10001100 ; Reset also invulnerablility
     ld [hl],a
+    inc hl
+    res USING_FLY,[hl]
+    dec hl
     ld a,[W_PLAYERMOVEEFFECT]
     cp FLY_EFFECT
     jr z,.next8 ; 5966
@@ -56989,7 +57101,11 @@ SetDEAndLoadMonFrontSprite:
     ld de,$9000
     jp LoadMonFrontSprite
 
-; Free
+SetCounterToMiss:
+    ld hl,wUnusedC000
+    set 7,[hl] ; setting this bit causes counter to miss
+    ld hl,HurtItselfText ; $5a65
+    ret
 
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
@@ -58322,8 +58438,27 @@ MoveHitTest:
     cp LEECH_SEED_EFFECT
     jr z,.moveMissed2
 .checkForDigOrFlyStatus
-    bit 6,[hl]
-    jr nz,.moveMissed2
+    bit INVULNERABLE,[hl]
+    jr z,.NotDigOrFly
+    inc hl
+    bit USING_FLY,[hl]
+    dec hl
+    jr z,.Dig
+.Fly
+    push hl
+    ld hl,DontMissFlyMoves
+    call CheckFlyDigDontMissMove
+    pop hl
+    jr c,.NotDigOrFly
+    jr .moveMissed2
+.Dig
+    push hl
+    ld hl,DontMissDigMoves
+    call CheckFlyDigDontMissMove
+    pop hl
+    jr c,.NotDigOrFly
+    jr .moveMissed2
+.NotDigOrFly
     ld a,[H_WHOSETURN]
     and a
     jr nz,.enemyTurn
@@ -58580,8 +58715,11 @@ CheckIfEnemyNeedsToChargeUp:
 
 EnemyCanExecuteChargingMove:
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    res 4,[hl] ; no longer charging up for attack
-    res 6,[hl] ; no longer invulnerable to typical attacks
+    res CHARGING_UP,[hl] ; no longer charging up for attack
+    res INVULNERABLE,[hl] ; no longer invulnerable to typical attacks
+    inc hl
+    res USING_FLY,[hl]
+    dec hl
     ld a,[W_ENEMYMOVENUM] ; $cfcc
     ld [$d0b5],a
     ld a,BANK(MoveNames)
@@ -58904,6 +59042,9 @@ CheckEnemyStatusConditions:
     ld a,[hl]
     and %10001100 ; Reset also invulnerablility
     ld [hl],a
+    inc hl
+    res USING_FLY,[hl]
+    dec hl
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     cp FLY_EFFECT
     jr z,.next8
@@ -59421,7 +59562,15 @@ EffectsArray6:
     db PAY_DAY_EFFECT
     db $FF
 
-; Free
+CheckFlyDigDontMissMove:
+    push de
+    push bc
+    dec de ; W_PLAYERMOVENUM / W_ENEMYMOVENUM
+    ld a,[de]
+    call IsInArray1
+    pop bc
+    pop de
+    ret
 
 SECTION "ApplyBurnAndParalysisPenaltiesToPlayer",ROMX[$6d1a],BANK[$f]
 
@@ -60981,6 +61130,12 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld a,[W_ISINBATTLE] ; $d057
     dec a
     jr nz,.notWildBattle1
+    ld a,[W_PLAYERMOVENUM]
+    cp WHIRLWIND
+    jr nz,.NotWhirlWind1
+    call MoveHitTestPlus
+    jr nz,.notWildBattle1
+.NotWhirlWind1
     ld a,[W_CURENEMYLVL] ; $d127
     ld b,a
     ld a,[W_PLAYERMONLEVEL] ; $d022
@@ -61013,6 +61168,12 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     ld a,[W_ISINBATTLE] ; $d057
     dec a
     jr nz,.notWildBattle2
+    ld a,[W_ENEMYMOVENUM]
+    cp WHIRLWIND
+    jr nz,.NotWhirlWind2
+    call MoveHitTestPlus
+    jr nz,.notWildBattle2
+.NotWhirlWind2
     ld a,[W_PLAYERMONLEVEL] ; $d022
     ld b,a
     ld a,[W_CURENEMYLVL] ; $d127
@@ -61082,30 +61243,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     TX_FAR _WasBlownAwayText
     db "@"
 
-PrintIsUnaffectedText:
-    ld hl,.IsUnaffectedText
-    jp Delay50AndPrintText
-.IsUnaffectedText
-    TX_FAR _IsUnaffectedText
-    db "@"
-
-MistEffect:
-    ld hl,MistEffect_
-    ld b,BANK(MistEffect_)
-    jr BankswitchFronBankF
-
-FocusEnergyEffect:
-    ld hl,FocusEnergyEffect_
-    ld b,BANK(FocusEnergyEffect_)
-    jr BankswitchFronBankF
-
-WaitButtonPressed:
-    ld b,BANK(WaitButtonPressed_)
-    ld hl,WaitButtonPressed_
-    ; fall through
-
-BankswitchFronBankF:
-    jp Bankswitch
+; Free
 
 SECTION "TwoToFiveAttacksEffect",ROMX[$7811],BANK[$f]
 
@@ -61199,6 +61337,9 @@ ChargeEffect: ; 3f88c (f:788c)
     cp FLY_EFFECT
     jr nz,.skip1
     set INVULNERABLE,[hl]
+    inc hl
+    set USING_FLY,[hl]
+    dec hl
     ld b,TELEPORT
 .skip1
     ld a,[de]
@@ -61866,50 +62007,6 @@ DrawCatchGenderAndLoadCoord: ; Denim
     pop de
     ret
 
-WriteEnergyAllMoves:
-    ld d,4
-.Loop4Moves
-    push de
-    ld c,d
-    dec c
-    call DebugMonOrEnemyMoves ; ld hl,W_PLAYERMONMOVES
-    ld b,0
-    add hl,bc
-    ld a,[hl]
-    and a
-    jr z,.SkipCurrentMove
-    push bc
-    ; Get Current Move
-    dec a
-    ld hl,Moves+5 ; Move Energy
-    ld bc,6
-    call AddNTimes
-    ld a,BANK(Moves)
-    ld de,W_PLAYERMOVEMAXPP ; Energy
-    ld bc,1
-    call FarCopyData
-    ; Print Current Energy
-    pop bc
-    ld a,c
-    FuncCoord 15,13
-    ld hl,Coord
-    ld bc,20
-    call AddNTimes
-    ld de,W_PLAYERMOVEMAXPP ; Energy
-    ld bc,$0103
-    call PrintNumber
-    ld de,.EnergyIcon
-    call PlaceString
-.SkipCurrentMove
-    pop de
-    dec d
-    jr nz,.Loop4Moves
-    FuncCoord 02,13
-    ld hl,Coord
-    ret
-.EnergyIcon
-    db $DA,"@"
-
 ; Le seguenti 2 funzioni servono a gestire il flag per la corretta palette del backsprite del player
 ; aggiunta gestione red ball in battle
 GoPAL_SET_PlusFlagAndRedBall: ; Denim,funzione per flaggare questo istante di chiamata
@@ -62260,7 +62357,12 @@ CheckCustomSideEffect:
     res 0,[hl]
     pop hl
     jr z,CheckZeroDamageOrSideEffectRandom
+    call MoveHitTestPlus
+    jr nz,.ForceFail
     xor a ; Force Success
+    ret
+.ForceFail
+    ld a,$FF ; Force Fail
     ret
 
 CheckZeroDamageOrSideEffectRandom:
@@ -62442,6 +62544,11 @@ PrintStatusConditionBattlePlayer:
 PrintStatusConditionBattleEnemy:
     ld bc,W_ENEMYBATTSTATUS1
     jp PrintStatusCondition
+
+WriteEnergyAllMoves:
+    ld b,BANK(WriteEnergyAllMoves_)
+    ld hl,WriteEnergyAllMoves_
+    jp Bankswitch
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -109318,7 +109425,7 @@ MoveAnimation: ; 78d5e (1e:4d5e)
     ld c,30
     call DelayFrames
 .next4
-    call Func_78dbd ; reload pic and flash the pic in and out (to show damage)
+    call PlayApplyingAttackAnimation ; reload pic and flash the pic in and out (to show damage)
 .AnimationFinished
     call WaitForSoundToFinish
     xor a
@@ -109356,7 +109463,9 @@ ShareMoveAnimations: ; 78da6 (1e:4da6)
     ld [W_ANIMATIONID],a
     ret
 
-Func_78dbd: ; 78dbd (1e:4dbd)
+PlayApplyingAttackAnimation: ; 78dbd (1e:4dbd)
+; Generic animation that shows after the move's individual animation
+; Different animation depending on whether the move has an additional effect and on whose turn it is
     ld a,[$CC5B]
     and a
     ret z
@@ -109364,48 +109473,52 @@ Func_78dbd: ; 78dbd (1e:4dbd)
     add a
     ld c,a
     ld b,0
-    ld hl,PointerTable_78dcf
+    ld hl,.AnimationTypePointerTable
     add hl,bc
     ld a,[hli]
     ld h,[hl]
     ld l,a
     jp hl
 
-PointerTable_78dcf: ; 78dcf (1e:4dcf)
-    dw Func_78ddb
-    dw Func_78de3
-    dw Func_78deb
-    dw Func_78df0
-    dw Func_78df6
-    dw Func_78dfe
+.AnimationTypePointerTable
+	dw .ShakeScreenVertically        ; enemy mon has used a damaging move without a side effect
+	dw .ShakeScreenHorizontallyHeavy ; enemy mon has used a damaging move with a side effect
+	dw .ShakeScreenHorizontallySlow  ; enemy mon has used a non-damaging move
+	dw .BlinkEnemyMonSprite          ; player mon has used a damaging move without a side effect
+	dw .ShakeScreenHorizontallyLight ; player mon has used a damaging move with a side effect
+	dw .ShakeScreenHorizontallySlow2 ; player mon has used a non-damaging move
 
-Func_78ddb: ; 78ddb (1e:4ddb)
-    call Func_79e6a
+.ShakeScreenVertically
+    call PlayApplyingAttackSound
     ld b,$8
-    jp Func_79209
+.AnimationShakeScreenVertically
+    jp AnimationShakeScreenVertically
 
-Func_78de3: ; 78de3 (1e:4de3)
-    call Func_79e6a
+.ShakeScreenHorizontallyHeavy
+    call PlayApplyingAttackSound
     ld b,$8
-    jp Func_79210
+    jr .AnimationShakeScreenHorizontallyFast
 
-Func_78deb: ; 78deb (1e:4deb)
+.ShakeScreenHorizontallySlow
     ld bc,$602
-    jr Func_78e01
+    jr .AnimationShakeScreenHorizontallySlow
 
-Func_78df0: ; 78df0 (1e:4df0)
-    call Func_79e6a
-    jp AnimationBlinkEnemyMon
-
-Func_78df6: ; 78df6 (1e:4df6)
-    call Func_79e6a
+.BlinkEnemyMonSprite
+    call PlayApplyingAttackSound
+    ;jp AnimationBlinkEnemyMon
     ld b,$2
-    jp Func_79210
+    jr .AnimationShakeScreenVertically
 
-Func_78dfe: ; 78dfe (1e:4dfe)
+.ShakeScreenHorizontallyLight
+    call PlayApplyingAttackSound
+    ld b,$2
+.AnimationShakeScreenHorizontallyFast
+    jp AnimationShakeScreenHorizontallyFast
+
+.ShakeScreenHorizontallySlow2
     ld bc,$302
 
-Func_78e01: ; 78e01 (1e:4e01)
+.AnimationShakeScreenHorizontallySlow
     push bc
     push bc
 .asm_78e03
@@ -109427,8 +109540,10 @@ Func_78e01: ; 78e01 (1e:4e01)
     jr nz,.asm_78e11
     pop bc
     dec c
-    jr nz,Func_78e01
+    jr nz,.AnimationShakeScreenHorizontallySlow
     ret
+
+SECTION "MoveAnimationPalette",ROMX[$4e23],BANK[$1e]
 
 MoveAnimationPalette: ; 78e23 (1e:4e23) ; Denim
     ld a,[wRunningOnSGB]
@@ -110144,14 +110259,14 @@ Func_791fc: ; 791fc (1e:51fc)
 
     ld b,$5
 
-Func_79209: ; 79209 (1e:5209)
+AnimationShakeScreenVertically: ; 79209 (1e:5209)
     PREDEF_JUMP Func_480ff
 
 AnimationShakeScreen: ; 7920e (1e:520e)
 ; Shakes the screen for a while. Used in Earthquake/Fissure/etc. animations.
     ld b,$8
 
-Func_79210: ; 79210 (1e:5210)
+AnimationShakeScreenHorizontallyFast: ; 79210 (1e:5210)
     PREDEF_JUMP ShakeScreenHorizontally
 
 AnimationWaterDropletsEverywhere: ; 79215 (1e:5215)
@@ -111775,7 +111890,7 @@ TossBallAnimation: ; 79e16 (1e:5e16)
     ld [W_ANIMATIONID],a
     jp PlayAnimation
 
-Func_79e6a: ; 79e6a (1e:5e6a)
+PlayApplyingAttackSound: ; 79e6a (1e:5e6a)
     call WaitForSoundToFinish
     ld a,[$d05b]
     and $7f
@@ -136187,16 +136302,16 @@ WildDataPointersNew:
 
 RouteD1Mons:
     db $19
-    db 16,KADABRA  ; 20%
-    db 16,KADABRA  ; 20%
-    db 16,KADABRA  ; 15%
-    db 16,KADABRA  ; 10%
-    db 16,KADABRA  ; 10%
-    db 16,KADABRA  ; 10%
-    db 16,KADABRA  ;  5%
-    db 16,KADABRA  ;  5%
-    db 16,KADABRA  ;  4%
-    db 16,KADABRA  ;  1%
+    db 26,DITTO  ; 20%
+    db 26,DITTO  ; 20%
+    db 26,DITTO  ; 15%
+    db 26,DITTO  ; 10%
+    db 26,DITTO  ; 10%
+    db 26,DITTO  ; 10%
+    db 26,DITTO  ;  5%
+    db 26,DITTO  ;  5%
+    db 26,DITTO  ;  4%
+    db 26,DITTO  ;  1%
     db $05
     db  2,MAGIKARP ; 20%
     db  2,MAGIKARP ; 20%
@@ -137178,6 +137293,10 @@ WildAI:
 ; creates a set of moves that may be used and returns its address in hl
 ; unused slots are filled with 0,all used slots may be chosen with equal probability
 AIEnemyTrainerChooseMoves:
+    ld a,$a
+    ld bc,4
+    ld hl,wBackupAIMoveChoice
+    call FillMemory
     ld a,[W_ISINBATTLE]
     dec a
     jr nz,.notwildbattle
@@ -137275,7 +137394,7 @@ AIEnemyTrainerChooseMoves:
     pop hl
     ld a,[hli]
     and a
-    jr z,.loopFindMinimumEntries
+    jr z,.BackupChoice
     push hl
     ld hl,AIMoveChoiceModificationFunctionPointers ; $57a3
     dec a
@@ -137289,6 +137408,11 @@ AIEnemyTrainerChooseMoves:
     ld de,.nextMoveChoiceModification  ; set return address
     push de
     jp hl       ; execute modification function
+.BackupChoice
+    ld hl,$cee9
+    ld de,wBackupAIMoveChoice
+    ld bc,4
+    call CopyData
 .loopFindMinimumEntries ; all entries will be decremented sequentially until one of them is zero
     ld hl,$cee9  ; temp move selection array
     ld de,W_ENEMYMONMOVES  ; enemy moves
