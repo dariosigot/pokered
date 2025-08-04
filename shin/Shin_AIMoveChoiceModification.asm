@@ -593,6 +593,21 @@ OtherZeroBPEffects:    ;joenote - added to keep track of some outliers
     db CONFUSION_EFFECT
     db $FF
 
+DontMissDigMoves2:
+    db EARTHQUAKE
+    db FISSURE
+    db $FF
+
+DontMissFlyMoves2:
+    db THUNDER_M
+    db BLIZZARD
+    db TOXIC
+    db BONEMERANG
+    db RAZOR_WIND
+    db GUST
+    db WHIRLWIND
+    db $FF
+
 StrCmpSpeed:    ;joenote - function for AI to compare pkmn speeds
     push bc
     push de
@@ -797,8 +812,8 @@ AIMoveChoiceModification3:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;slightly discourage using most offensive moves against fly/dig opponent if faster than opponent
     ld a,[W_PLAYERBATTSTATUS1]
-    bit 6,a
-    jr z,.endflydigcheck    ;proceed as normal if player is not in fly/dig
+    bit INVULNERABLE,a
+    jp z,.endflydigcheck    ;proceed as normal if player is not in fly/dig
 
     call StrCmpSpeed    ;do a speed compare
     jr c,.flydigcheck_faster    ;a set carry bit means the ai 'mon is faster
@@ -856,6 +871,33 @@ AIMoveChoiceModification3:
     jr z,.endflydigcheck
     cp CHARGE_EFFECT
     jr z,.endflydigcheck
+
+    ld a,[W_PLAYERBATTSTATUS2]
+    bit USING_FLY,a
+    ld a,[W_ENEMYMOVENUM]
+    jr z,.PlayerUseDig
+.PlayerUseFly
+    push hl
+    push de
+    push bc
+    ld hl,DontMissFlyMoves2
+    ld de,$0001
+    call IsInArray
+    pop bc
+    pop de
+    pop hl
+    jp c,.givepref
+.PlayerUseDig
+    push hl
+    push de
+    push bc
+    ld hl,DontMissDigMoves2
+    ld de,$0001
+    call IsInArray
+    pop bc
+    pop de
+    pop hl
+    jp c,.givepref
 
 .flydigcheck_discourage
     inc [hl]

@@ -1244,6 +1244,7 @@ WeezingExclusiveMove:
     db SUBSTITUTE ; TM50
     db FLASH ; TM55
     db ABSORB
+    db MEGA_DRAIN ; TM21
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RhyhornExclusiveMove:

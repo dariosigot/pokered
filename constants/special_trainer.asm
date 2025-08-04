@@ -960,8 +960,8 @@ PokemaniacMove6:
     db 0
 
 PokemaniacMove8:
-    ; 16,KADABRA
-    db PSYWAVE,CONFUSION,DISABLE,KINESIS
+    ; 26,DITTO
+    db TRANSFORM,0,0,0
     db 0
 
 ; ────────────────────────────────────────────────

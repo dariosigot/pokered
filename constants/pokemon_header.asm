@@ -4367,7 +4367,7 @@ KoffingBaseStats:
     db 60 ; base special
 
     db POISON ; species type 1
-    db 0 ; species type 2
+    db LEVITATE ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -4407,7 +4407,7 @@ WeezingBaseStats:
     db 85 ; base special
 
     db POISON ; species type 1
-    db 0 ; species type 2
+    db LEVITATE ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 

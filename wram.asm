@@ -603,6 +603,7 @@ W_PLAYERBATTSTATUS2: ; d063
 ; bit 0 - X Accuracy effect
 ; bit 1 - protected by "mist"
 ; bit 2 - focus energy effect
+; bit 3 - using fly
 ; bit 4 - has a substitute
 ; bit 5 - need to recharge
 ; bit 6 - rage
@@ -1222,6 +1223,9 @@ wTmpLevel:: db ; d481
 NEXTU
 
 wBackupTypes: ; d481
+    ds 4
+
+wBackupAIMoveChoice: ; d485
     ds 4
 
 ENDU
