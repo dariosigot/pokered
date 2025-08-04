@@ -53008,10 +53008,6 @@ DontMissFlyMoves:
     db WHIRLWIND
     db $FF
 
-IsInArray1:
-    ld de,1
-    jp IsInArray
-
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
 Func_3c04c: ; 3c04c (f:404c)
@@ -53596,6 +53592,17 @@ WaitButtonPressed:
 
 BankswitchFronBankF:
     jp Bankswitch
+
+CheckFlyDigDontMissMove:
+    push de
+    push bc
+    dec de ; W_PLAYERMOVENUM / W_ENEMYMOVENUM
+    ld a,[de]
+    ld de,1
+    call IsInArray
+    pop bc
+    pop de
+    ret
 
 ; Free
 
@@ -59560,16 +59567,6 @@ EffectsArray6:
     db HYPER_BEAM_EFFECT
     db PAY_DAY_EFFECT
     db $FF
-
-CheckFlyDigDontMissMove:
-    push de
-    push bc
-    dec de ; W_PLAYERMOVENUM / W_ENEMYMOVENUM
-    ld a,[de]
-    call IsInArray1
-    pop bc
-    pop de
-    ret
 
 SECTION "ApplyBurnAndParalysisPenaltiesToPlayer",ROMX[$6d1a],BANK[$f]
 
