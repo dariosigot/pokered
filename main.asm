@@ -14515,8 +14515,8 @@ BattleAnimationOptionText:
     db "  ON      OFF@"
 
 BattleStyleOptionText:
-    db "?",$4E
-    db "  0       1@"
+    db "BATTLE ALARM",$4E
+    db "  ON      OFF@"
 
 ;OptionMenuCancelText:
 ;    db "CANCEL@"
@@ -54805,8 +54805,7 @@ DrawPlayerHUDAndHPBar:
     ret
 .asm_3cde6
     ld hl,$d083
-    set 7,[hl]
-    ret
+    jp StartBattleAlarm
 
 DrawHUDsAndHPBars:
     call DrawPlayerHUDAndHPBar
@@ -62549,6 +62548,13 @@ WriteEnergyAllMoves:
     ld b,BANK(WriteEnergyAllMoves_)
     ld hl,WriteEnergyAllMoves_
     jp Bankswitch
+
+StartBattleAlarm:
+    ld a,[W_OPTIONS]
+    bit 5,a
+    ret nz
+    set 7,[hl]
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
