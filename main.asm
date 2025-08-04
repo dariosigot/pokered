@@ -53513,7 +53513,7 @@ MoveEffectToPercentage:
     ret
 
 CheckDefrost:
-    and FRZ                        ;are they frozen?
+    bit FRZ_Bit,a                  ;are they frozen?
     ret z                          ;return if so
 ;not frozen
     ld a,[H_WHOSETURN]             ;whose turn?
@@ -53604,6 +53604,35 @@ CheckFlyDigDontMissMove:
     call IsInArray
     pop bc
     pop de
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+GetPlayerOrEnemyTurnWithSubstitute:
+    ld de,wEnemySubstituteHP
+    ld bc,W_ENEMYBATTSTATUS2
+    ld a,[wFlagValueToPlayerBit1]
+    bit 1,a
+    jr z,.DamageToEnemy
+    ld de,wPlayerSubstituteHP
+    ld bc,W_PLAYERBATTSTATUS2
+;DamageToPlayer
+    call .CheckTurn
+    ret nz
+    jr FlipTurn
+.DamageToEnemy
+    call .CheckTurn
+    ret z
+    jr FlipTurn
+.CheckTurn
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    ret
+
+FlipTurn:
+    ld a,[H_WHOSETURN]
+    xor a,$01
+    ld [H_WHOSETURN],a
     ret
 
 ; Free
@@ -60495,8 +60524,7 @@ FreezeBurnParalyzeEffect:
 
 .PlayerAttacker
     ld a,[W_ENEMYMONSTATUS]
-    and a
-    call nz,CheckDefrost ;opponent has existing status
+    call CheckDefrost
     call GetSideEffectType_Player ; ld a,[W_PLAYERMOVETYPE]
     ld hl,W_ENEMYMONTYPES
     call .AttackerTypeMatchOneOfDefenderTypesPlusException
@@ -60514,30 +60542,36 @@ FreezeBurnParalyzeEffect:
     jr z,.burn1
     cp a,FREEZE_SIDE_EFFECT
     jr z,.freeze1
+.par1
+    bit PAR_Bit,[hl]
     set PAR_Bit,[hl]
+    ret nz
     call QuarterSpeedDueToParalysis  ;quarter speed of affected monster
     call PlayA9BattleAnimation
     jp PrintMayNotAttackText    ;print paralysis text
 .burn1
+    bit BRN_Bit,[hl]
     set BRN_Bit,[hl]
+    ret nz
     call HalveAttackDueToBurn
     call PlayA9BattleAnimation
     ld hl,.UnnamedText_3f3d8
-    jp DrawHudAndPrintText
+    jr .DrawHudAndPrintText
 .freeze1
-    call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
+    bit FRZ_Bit,[hl]
     set FRZ_Bit,[hl]
+    ret nz
+    call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
     ld a,[hl]
     and ~SLP & ~BRN ; Remove Sleep & Burn
     ld [hl],a
     call PlayA9BattleAnimation
     ld hl,.UnnamedText_3f3dd
-    jp DrawHudAndPrintText
+    jr .DrawHudAndPrintText
 
 .OpponentAttacker
     ld a,[W_PLAYERMONSTATUS]
-    and a
-    call nz,CheckDefrost
+    call CheckDefrost
     call GetSideEffectType_Enemy ; ld a,[W_ENEMYMOVETYPE]
     ld hl,W_PLAYERMONTYPES
     call .AttackerTypeMatchOneOfDefenderTypesPlusException
@@ -60555,25 +60589,32 @@ FreezeBurnParalyzeEffect:
     jr z,.burn2
     cp a,FREEZE_SIDE_EFFECT
     jr z,.freeze2
+.par2
+    bit PAR_Bit,[hl]
     set PAR_Bit,[hl]
+    ret nz
     call QuarterSpeedDueToParalysis
     call PlayC7BattleAnimation
     jp PrintMayNotAttackText
 .burn2
+    bit BRN_Bit,[hl]
     set BRN_Bit,[hl]
+    ret nz
     call HalveAttackDueToBurn
     call PlayC7BattleAnimation
     ld hl,.UnnamedText_3f3d8
-    jp DrawHudAndPrintText
+    jr .DrawHudAndPrintText
 .freeze2
-    call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
+    bit FRZ_Bit,[hl]
     set FRZ_Bit,[hl]
+    ret nz
+    call ClearHyperBeam  ;resets bit 5 of the D063/D068 flags
     ld a,[hl]
     and ~SLP & ~BRN ; Remove Sleep & Burn
     ld [hl],a
     call PlayC7BattleAnimation
     ld hl,.UnnamedText_3f3dd
-    jp DrawHudAndPrintText
+    jr .DrawHudAndPrintText
 
 .UnnamedText_3f3d8
     TX_FAR _UnnamedText_3f3d8
@@ -60581,6 +60622,9 @@ FreezeBurnParalyzeEffect:
 .UnnamedText_3f3dd
     TX_FAR _UnnamedText_3f3dd
     db "@"
+
+.DrawHudAndPrintText
+    jp DrawHudAndPrintText
 
 .AttackerTypeMatchOneOfDefenderTypesPlusException
     push hl
@@ -61007,32 +61051,8 @@ StatModifierDownEffect:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-GetPlayerOrEnemyTurnWithSubstitute:
-    ld de,wEnemySubstituteHP
-    ld bc,W_ENEMYBATTSTATUS2
-    ld a,[wFlagValueToPlayerBit1]
-    bit 1,a
-    jr z,.DamageToEnemy
-    ld de,wPlayerSubstituteHP
-    ld bc,W_PLAYERBATTSTATUS2
-;DamageToPlayer
-    call .CheckTurn
-    ret nz
-    jr FlipTurn
-.DamageToEnemy
-    call .CheckTurn
-    ret z
-    jr FlipTurn
-.CheckTurn
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    ret
+; Free
 
-FlipTurn:
-    ld a,[H_WHOSETURN]
-    xor a,$01
-    ld [H_WHOSETURN],a
-    ret
 
 SECTION "PrintStatText",ROMX[$7688],BANK[$f]
 
