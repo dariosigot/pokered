@@ -53980,31 +53980,33 @@ Func_3c79b: ; 3c79b (f:479b)
     and a
     dec a
     ret nz
-    ld hl,UnnamedText_3c7d3 ; $47d3
-    call PrintText
-.asm_3c7ad
-    FuncCoord 13,9 ; $c461
-    ld hl,Coord
-    ld bc,$a0e
-    ld a,$14
-    ld [$d125],a
-    call UseNextPkmnFixPalette ; call DisplayTextBoxID
-    ld a,[$d12e]
-    cp $2
-    jr z,.asm_3c7c4
+;    ld hl,.UnnamedText_3c7d3 ; $47d3
+;    call PrintText
+;.asm_3c7ad
+;    FuncCoord 13,9 ; $c461
+;    ld hl,Coord
+;    ld bc,$a0e
+;    ld a,$14
+;    ld [$d125],a
+;    call UseNextPkmnFixPalette ; call DisplayTextBoxID
+;    ld a,[$d12e]
+;    cp $2
+;    jr z,.asm_3c7c4
     and a
     ret
-.asm_3c7c4
-    ld a,[wCurrentMenuItem] ; $cc26
-    and a
-    jr z,.asm_3c7ad
-    ld hl,W_PARTYMON1_SPEED ; $d193
-    ld de,W_ENEMYMONSPEED
-    jp TryRunningFromBattle
+;.asm_3c7c4
+;    ld a,[wCurrentMenuItem] ; $cc26
+;    and a
+;    jr z,.asm_3c7ad
+;    ld hl,W_PARTYMON1_SPEED ; $d193
+;    ld de,W_ENEMYMONSPEED
+;    jp TryRunningFromBattle
 
-UnnamedText_3c7d3: ; 3c7d3 (f:47d3)
-    TX_FAR _UnnamedText_3c7d3
-    db "@"
+;.UnnamedText_3c7d3
+;    TX_FAR _UnnamedText_3c7d3
+;    db "@"
+
+SECTION "Func_3c7d8",ROMX[$47d8],BANK[$f]
 
 Func_3c7d8: ; 3c7d8 (f:47d8)
     ld a,$2
@@ -54443,17 +54445,11 @@ TryRunningFromBattle: ; 3cab9 (f:4ab9)
     jr nz,.trainerBattle
     call CheckNotEscapeWildPokemon
     jr c,.cantEscape
+    jp nz,.canEscape ; Enemy Sleep or Frozen
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
     jp z,.canEscape
-    ld a,[hli]
     call HalvePlayerSpeedAfterRun
-    ld [$FF00+$98],a
-    ld a,[de]
-    ld [$FF00+$8d],a
-    inc de
-    ld a,[de]
-    ld [$FF00+$8e],a
     call LoadScreenTilesFromBuffer1
     ld de,$ff97
     ld hl,$ff8d
@@ -57651,10 +57647,17 @@ HandleCounterMove:
     ret
 
 HalvePlayerSpeedAfterRun:
+    ld a,[hli]
     srl a ; Player Speed divided by 2
     ld [$FF00+$97],a
     ld a,[hl]
     rr a  ; Player Speed divided by 2
+    ld [$FF00+$98],a
+    ld a,[de]
+    ld [$FF00+$8d],a
+    inc de
+    ld a,[de]
+    ld [$FF00+$8e],a
     ret
 
 ReflectLightScreenEffect:
@@ -62124,9 +62127,9 @@ GoPalSetAndDelay3BankF:
     call GoPAL_SET_CF1C
     jp Delay3
 
-UseNextPkmnFixPalette:
-    call HidePlayerBattleHudAndStandarizePalette
-    jp DisplayTextBoxID
+;UseNextPkmnFixPalette:
+;    call HidePlayerBattleHudAndStandarizePalette
+;    jp DisplayTextBoxID
 
 GetEnemyIV:
     push af
@@ -121217,8 +121220,10 @@ _PlayerMonFaintedText: ; 8970c (22:570c)
     db $0,$4f
     db "fainted!",$58
 
-_UnnamedText_3c7d3: ; 8971a (22:571a)
-    db $0,"Use next #MON?",$57
+;_UnnamedText_3c7d3: ; 8971a (22:571a)
+;    db $0,"Use next #MON?",$57
+
+SECTION "_Sony1WinText",ROMX[$572a],BANK[$22]
 
 _Sony1WinText: ; 8972a (22:572a)
     db $0,$53,": Yeah! Am",$4f
@@ -137997,13 +138002,13 @@ InitializeChooseQuantityMenu:
     db "BAG ×@"
 
 _CheckNotEscapeWildPokemon:
-    ld a,[W_ISINBATTLE] ; wild = 1
-    dec a
-    jr nz,.End
     ld a,[W_BATTLETYPE]
     cp $2 ; is safari?
-    ld a,[W_ENEMYMONID]
     jr z,.Safari ; notSafariZone
+    ld a,[W_PLAYERMONSTATUS]
+    and FRZ | SLP
+    jr nz,.NotEscape
+    ld a,[W_ENEMYMONID]
     ld b,a
     ld hl,.NotEscapeWildPokemon
 .Loop
@@ -138017,7 +138022,12 @@ _CheckNotEscapeWildPokemon:
     ret
 .NotInList
 .CheckShiny
+    ld hl,W_ENEMYBATTSTATUS3
+    bit TRANSFORMED,[hl]
     ld hl,W_ENEMYMONATKDEFIV
+    jr z,.NotTransformed
+    ld hl,$cceb
+.NotTransformed
     call CheckShiny
     jr z,.NotEscape
 .End
@@ -138028,9 +138038,11 @@ _CheckNotEscapeWildPokemon:
     inc a
     ld [$d120],a
 .skip
-    and a ; reset carry flag
+    ld a,[W_ENEMYMONSTATUS]
+    and FRZ | SLP ; reset carry flag
     ret
 .Safari
+    ld a,[W_ENEMYMONID]
     cp LAPRAS
     jr z,.NotEscape
     jr .CheckShiny
