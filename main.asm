@@ -47289,6 +47289,7 @@ TypeNamePointersShort:
     dw Type18NameShort ; $18 : Psychic
     dw Type19NameShort ; $19 : Ice
     dw Type1ANameShort ; $1A : Dragon
+    dw TypeNAName      ; $1B : Levitate
 
 SECTION "SaveTrainerName",ROMX[$7E4A],BANK[$9]
 
@@ -47458,6 +47459,7 @@ TypeNamePointers:
     dw Type18Name ; $18 : Psychic
     dw Type19Name ; $19 : Ice
     dw Type1AName ; $1A : Dragon
+    dw TypeNAName ; $1B : Levitate
 
 SECTION "bankA",ROMX,BANK[$A]
 GrowlithePicFront: ; 28000 (a:4000)
