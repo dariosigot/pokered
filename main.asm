@@ -56313,7 +56313,7 @@ CheckPlayerStatusConditions:
     ld hl,W_PLAYERMONSTATUS
 
 .FrozenCheck
-    bit FRZ_Bit,[hl] ; frozen?
+    bit FRZ_Bit,[hl]
     jr z,.SleepCheck
     ld hl,FrozenText
     jr .SleepFrozenDone
@@ -56324,9 +56324,9 @@ CheckPlayerStatusConditions:
     ld a,[hl]
     jr z,.HeldInPlaceCheck
 
-    dec a
-    ld [W_PLAYERMONSTATUS],a ; decrement sleep count
-    and a
+    dec a ; decrement sleep count
+    ld [hl],a
+    and SLP
     jr z,.WakeUp
 
     xor a
@@ -58953,12 +58953,12 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up:
 ; ──────────────────────────────────────────────────────────────────────
 
 CheckEnemyStatusConditions:
-    ld hl,W_ENEMYMONSTATUS ; $cfe9
+    ld hl,W_ENEMYMONSTATUS
 
 .FrozenCheck
     bit FRZ_Bit,[hl]
     jr z,.SleepCheck
-    ld hl,FrozenText ; $5a47
+    ld hl,FrozenText
     jr .SleepFrozenDone
 
 .SleepCheck
@@ -58967,25 +58967,25 @@ CheckEnemyStatusConditions:
     ld a,[hl]
     jr z,.HeldInPlaceCheck
 
-    dec a
-    ld [W_ENEMYMONSTATUS],a ; $cfe9
-    and a
+    dec a ; decrement sleep count
+    ld [hl],a
+    and SLP
     jr z,.WakeUp
 
     xor a
-    ld [$cc5b],a
-    ld a,$bd
+    ld [$CC5B],a
+    ld a,SLP_ANIM
     call PlayMoveAnimation
-    ld hl,FastAsleepText ; $5a3d
+    ld hl,FastAsleepText
 
 .SleepFrozenDone
     call PrintText
     xor a
-    ld [$ccf2],a
+    ld [$CCF2],a
     jr .ExecuteEnemyMoveDone
 
 .WakeUp
-    ld hl,WokeUpText ; $5a42
+    ld hl,WokeUpText
     call .DrawHudAndPrintText ; call PrintText
     ; fall through
 
@@ -59601,6 +59601,8 @@ EffectsArray6:
     db HYPER_BEAM_EFFECT
     db PAY_DAY_EFFECT
     db $FF
+
+; Free
 
 SECTION "ApplyBurnAndParalysisPenaltiesToPlayer",ROMX[$6d1a],BANK[$f]
 
