@@ -3005,6 +3005,7 @@ PORYGON_Learnset: MACRO
     db  6,AGILITY
     db  9,PSYWAVE
     db 11,TELEPORT
+    db 12,THUNDERSHOCK
     db 13,SONICBOOM
     db 14,SUPERSONIC
     db 15,CONFUSION
@@ -3020,12 +3021,13 @@ PORYGON_Learnset: MACRO
     db 35,BARRIER
     db 38,HYPNOSIS
     db 39,DREAM_EATER
-    db 41,AMNESIA
-    db 40,TRI_ATTACK
-    db 44,SCREECH
+    db 40,AMNESIA
+    db 41,TRI_ATTACK
+    db 43,THUNDERBOLT
+    db 45,SCREECH
     db 47,PSYCHIC_M
     db 51,REFLECT
-    db 55,THUNDERBOLT
+    db 55,THUNDER_M
     db 60,HYPER_BEAM
 ENDM
 ; ──────────────────────────────────────────────────────────────────────

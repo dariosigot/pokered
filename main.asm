@@ -17827,6 +17827,8 @@ PlayerPCMenu:
     ld [hli],a
     ld [hl],a
     ld [wPlayerMonNumber],a ; $cc2f
+    inc a
+    ld [wMenuWrappingEnabled],a
     ld hl,UnnamedText_7b27 ; $7b27
     call PrintText
     call HandleMenuInput
@@ -56313,7 +56315,7 @@ CheckPlayerStatusConditions:
     ld hl,W_PLAYERMONSTATUS
 
 .FrozenCheck
-    bit FRZ_Bit,[hl] ; frozen?
+    bit FRZ_Bit,[hl]
     jr z,.SleepCheck
     ld hl,FrozenText
     jr .SleepFrozenDone
@@ -56324,9 +56326,9 @@ CheckPlayerStatusConditions:
     ld a,[hl]
     jr z,.HeldInPlaceCheck
 
-    dec a
-    ld [W_PLAYERMONSTATUS],a ; decrement sleep count
-    and a
+    dec a ; decrement sleep count
+    ld [hl],a
+    and SLP
     jr z,.WakeUp
 
     xor a
@@ -58953,12 +58955,12 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up:
 ; ──────────────────────────────────────────────────────────────────────
 
 CheckEnemyStatusConditions:
-    ld hl,W_ENEMYMONSTATUS ; $cfe9
+    ld hl,W_ENEMYMONSTATUS
 
 .FrozenCheck
     bit FRZ_Bit,[hl]
     jr z,.SleepCheck
-    ld hl,FrozenText ; $5a47
+    ld hl,FrozenText
     jr .SleepFrozenDone
 
 .SleepCheck
@@ -58967,25 +58969,25 @@ CheckEnemyStatusConditions:
     ld a,[hl]
     jr z,.HeldInPlaceCheck
 
-    dec a
-    ld [W_ENEMYMONSTATUS],a ; $cfe9
-    and a
+    dec a ; decrement sleep count
+    ld [hl],a
+    and SLP
     jr z,.WakeUp
 
     xor a
-    ld [$cc5b],a
-    ld a,$bd
+    ld [$CC5B],a
+    ld a,SLP_ANIM
     call PlayMoveAnimation
-    ld hl,FastAsleepText ; $5a3d
+    ld hl,FastAsleepText
 
 .SleepFrozenDone
     call PrintText
     xor a
-    ld [$ccf2],a
+    ld [$CCF2],a
     jr .ExecuteEnemyMoveDone
 
 .WakeUp
-    ld hl,WokeUpText ; $5a42
+    ld hl,WokeUpText
     call .DrawHudAndPrintText ; call PrintText
     ; fall through
 
@@ -59601,6 +59603,8 @@ EffectsArray6:
     db HYPER_BEAM_EFFECT
     db PAY_DAY_EFFECT
     db $FF
+
+; Free
 
 SECTION "ApplyBurnAndParalysisPenaltiesToPlayer",ROMX[$6d1a],BANK[$f]
 
@@ -69168,8 +69172,8 @@ UnknownDungeon3Object:
     db $0 ; signs
 
     db $2 ; people
-    db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$82,ULTRA_BALL ; item
-    db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
+    db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$81,ULTRA_BALL ; item
+    db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$82,MAX_REVIVE ; item
 
     ; warp-to
     EVENT_DISP $f,$6,$3 ; UNKNOWN_DUNGEON_1
@@ -105287,9 +105291,9 @@ CeruleanHouse2Text1: ; 74e15 (1d:4e15)
     xor a
     ld [wCurrentMenuItem],a
     ld [wListScrollOffset],a
-.asm_74e23
     ld hl,UnnamedText_74e7c
     call PrintText
+.asm_74e23
     ld hl,BadgeIdList
     call LoadItemList
     ld hl,$cf7b
@@ -120714,9 +120718,9 @@ _PewterCityPokecenterGuyText: ; 8830c (22:430c)
     db $0,"Yawn!",$51
     db "When JIGGLYPUFF",$4f
     db "sings,#MON",$55
-    db "get drowsy...",$51
+    db "get drowsy ",$CA,$CA,$51
     db "...Me too...",$4f
-    db "Snore...",$57
+    db "Snore ",$CA,$CA,$57
 
 _CeruleanPokecenterGuyText: ; 88353 (22:4353)
     db $0,"BILL has lots of",$4f
@@ -122288,6 +122292,16 @@ _GotText:
     db "@"
     TX_RAM $cf4b
     db $0,"!@@"
+
+; ───────────────────────────────────
+
+_ShipReturned:
+    db $0,"The ship has",$4f
+    db "returned!",$57
+
+_LikeShipText:
+    db $0,"I would like",$4f
+    db "to go on a ship!",$57
 
 ; ───────────────────────────────────
 
@@ -126064,11 +126078,9 @@ _UnnamedText_74ad9: ; 95f2b (25:5f2b)
     db "some day!",$55
     db "Farewell!@@"
 
-_ViridianGymText12: ; 95fcc (25:5fcc)
+_ViridianGymText12:
     db $0,"The EARTHBADGE",$4f
-    db "makes #MON of",$55
-    db "any level obey!",$51
-    db "It is evidence of",$4f
+    db "is evidence of",$55
     db "your mastery as a",$55
     db "#MON trainer!",$51
     db "With it,you can",$4f
@@ -126467,17 +126479,16 @@ _UnnamedText_5c4bc: ; 981c9 (26:41c9)
     db $52," received",$4f
     db "the BOULDERBADGE!@@"
 
-_UnnamedText_5c4c1: ; 98232 (26:4232)
+_UnnamedText_5c4c1:
     db $0,$51
     db "That's an official",$4f
     db "#MON LEAGUE",$55
     db "BADGE!",$51
     db "Its bearer's",$4f
     db "#MON become",$55
-    db "more powerful!",$51
-    db "The technique",$4f
-    db "LIGHT can now be",$55
-    db "used any time!",$58
+    db "more powerful!",$58
+
+SECTION "_PewterGymBattleText1",ROMX[$42ae],BANK[$26]
 
 _PewterGymBattleText1: ; 982ae (26:42ae)
     db $0,"Stop right there,",$4f
@@ -126671,19 +126682,8 @@ _UnnamedText_5c7c3: ; 98a7b (26:4a7b)
     db "Use it on an",$4f
     db "aquatic #MON!",$57
 
-_UnnamedText_5c7c8: ; 98ab0 (26:4ab0)
-    db $0,"The CASCADEBADGE",$4f
-    db "makes all #MON",$55
-    db "up to L30 obey!",$51
-    db "That includes",$4f
-    db "even outsiders!",$51
-    db "There's more,you",$4f
-    db "can now use CUT",$55
-    db "any time!",$51
-    db "You can CUT down",$4f
-    db "small bushes to",$55
-    db "open new paths!",$51
-    db "You can also have",$4f
+_UnnamedText_5c7c8:
+    db $0,"You can also have",$4f
     db "my favorite TM!",$57
 
 SECTION "_UnnamedText_5c7d3",ROMX[$4b90],BANK[$26]
@@ -126835,68 +126835,45 @@ _UnnamedText_74e7c: ; 9913a (26:513a)
     db $0,"Now then...",$51
     db "Which of the 8",$4f
     db "BADGEs should I",$55
-    db "describe?",$57
+    db "describe?",$51,$57
 
-_UnnamedText_74e81: ; 99170 (26:5170)
+_UnnamedText_74e81:
     db $0,"Come visit me any",$4f
     db "time you wish.",$57
 
-_UnnamedText_74e96: ; 99192 (26:5192)
+_UnnamedText_74e96:
     db $0,"The ATTACK of all",$4f
     db "#MON increases",$55
-    db "a little bit.",$51
-    db "It also lets you",$4f
-    db "use LIGHT any",$55
-    db "time you desire.",$58
+    db "a little bit.",$51,$57
 
-_UnnamedText_74e9b: ; 991f2 (26:51f2)
-    db $0,"#MON up to L30",$4f
-    db "will obey you.",$51
-    db "Any higher,they",$4f
-    db "become unruly!",$51
-    db "It also lets you",$4f
-    db "use CUT outside",$55
-    db "of battle.",$58
+_UnnamedText_74e9b:
+    db $0,"No Effects...",$51,$57
 
-_UnnamedText_74ea0: ; 9925d (26:525d)
+_UnnamedText_74ea0:
     db $0,"The SPEED of all",$4f
     db "#MON increases",$55
-    db "a little bit.",$51
-    db "It also lets you",$4f
-    db "use FLY outside",$55
-    db "of battle.",$58
+    db "a little bit.",$51,$57
 
-_UnnamedText_74ea5: ; 992b8 (26:52b8)
-    db $0,"#MON up to L50",$4f
-    db "will obey you.",$51
-    db "Any higher,they",$4f
-    db "become unruly!",$51
-    db "It also lets you",$4f
-    db "use STRENGTH out-",$55
-    db "side of battle.",$58
+_UnnamedText_74ea5:
+    db $0,"No Effects...",$51,$57
 
-_UnnamedText_74eaa: ; 9932a (26:532a)
+_UnnamedText_74eaa:
     db $0,"The DEFENSE of all",$4f
     db "#MON increases",$55
-    db "a little bit.",$51
-    db "It also lets you",$4f
-    db "to FLOAT outside",$55
-    db "of battle.",$58
+    db "a little bit.",$51,$57
 
-_UnnamedText_74eaf: ; 99388 (26:5388)
-    db $0,"#MON up to L70",$4f
-    db "will obey you.",$51
-    db "Any higher,they",$4f
-    db "become unruly!",$58
+_UnnamedText_74eaf:
+    db $0,"No Effects...",$51,$57
 
-_UnnamedText_74eb4: ; 993c7 (26:53c7)
+_UnnamedText_74eb4:
     db $0,"Your #MON's",$4f
     db "SPECIAL abilities",$55
-    db "increase a bit.",$58
+    db "increase a bit.",$51,$57
 
-_UnnamedText_74eb9: ; 993f5 (26:53f5)
-    db $0,"All #MON will",$4f
-    db "obey you!",$58
+_UnnamedText_74eb9:
+    db $0,"No Effects...",$51,$57
+
+SECTION "_LavenderPokecenterText4",ROMX[$540e],BANK[$26]
 
 _LavenderPokecenterText4: ; 9940e (26:540e)
 _LavenderPokecenterText2: ; 9940e (26:540e)
@@ -127580,13 +127557,20 @@ _UnnamedText_5cb72: ; 9c000 (27:4000)
     db "against ground-",$55
     db "type #MON!",$57
 
-_UnnamedText_5cb77: ; 9c069 (27:4069)
+;_UnnamedText_5cb77: ; 9c069 (27:4069)
+;    db $0,"The THUNDERBADGE",$4f
+;    db "cranks up your",$55
+;    db "#MON's SPEED!",$51
+;    db "It also lets your",$4f
+;    db "#MON FLY any",$55
+;    db "time,kid!",$51
+;    db "You're special,",$4f
+;    db "kid! Take this!",$57
+
+_UnnamedText_5cb77:
     db $0,"The THUNDERBADGE",$4f
     db "cranks up your",$55
     db "#MON's SPEED!",$51
-    db "It also lets your",$4f
-    db "#MON FLY any",$55
-    db "time,kid!",$51
     db "You're special,",$4f
     db "kid! Take this!",$57
 
@@ -128119,15 +128103,8 @@ _UnnamedText_48a68: ; 9d418 (27:5418)
     db "if they were",$55
     db "unattractive.",$57
 
-_UnnamedText_48a6d: ; 9d481 (27:5481)
-    db $0,"The RAINBOWBADGE",$4f
-    db "will make #MON",$55
-    db "up to L50 obey.",$51
-    db "It also allows",$4f
-    db "#MON to use",$55
-    db "STRENGTH in and",$55
-    db "out of battle.",$51
-    db "Please also take",$4f
+_UnnamedText_48a6d:
+    db $0,"Please also take",$4f
     db "this with you.",$57
 
 SECTION "_TM21ExplanationText",ROMX[$5520],BANK[$27]
@@ -128743,15 +128720,12 @@ _UnnamedText_7558b: ; a0000 (28:4000)
     db "It will surely",$4f
     db "terrorize foes!",$57
 
-_UnnamedText_75590: ; a0069 (28:4069)
+_UnnamedText_75590:
     db $0,"Now that you have",$4f
     db "the SOULBADGE,",$55
     db "the DEFENSE of",$55
     db "your #MON",$55
     db "increases!",$51
-    db "It also lets   ",$4f
-    db "FLOAT outside of",$55
-    db "battle!",$51
     db "Ah! Take this",$4f
     db "too!",$57
 
@@ -128988,7 +128962,7 @@ _UnnamedText_75920: ; a08fd (28:48fd)
     db "Don't waste it on",$4f
     db "water #MON!",$57
 
-_UnnamedText_75925: ; a0946 (28:4946)
+_UnnamedText_75925:
     db $0,"Hah!",$51
     db "The VOLCANOBADGE",$4f
     db "heightens the",$55
@@ -129540,18 +129514,8 @@ _UnnamedText_5d16e: ; a1cdc (28:5cdc)
     db "People just don't",$55
     db "realize it!",$57
 
-_UnnamedText_5d173: ; a1d16 (28:5d16)
-    db $0,"The MARSHBADGE",$4f
-    db "makes #MON up",$55
-    db "to L70 obey you!",$51
-    db "Stronger #MON",$4f
-    db "will become wild,",$55
-    db "ignoring your",$55
-    db "orders in battle!",$51
-    db "Just don't raise",$4f
-    db "your #MON too",$55
-    db "much!",$51
-    db "Wait,please take",$4f
+_UnnamedText_5d173:
+    db $0,"Wait,please take",$4f
     db "this TM with you!",$57
 
 _TM46ExplanationText:
@@ -130168,7 +130132,7 @@ SECTION "_TM42Explanation",ROMX[$46ad],BANK[$29]
 _TM42Explanation: ; a46ad (29:46ad)
     db $0,"TM42 contains",$4f
     db "DREAM EATER...",$55
-    db "...Snore...",$57
+    db "..Snore..",$CA,$CA,$57
 
 _TM42NoRoomText: ; a46d7 (29:46d7)
     db $0,"You have too much",$4f
@@ -130465,7 +130429,7 @@ _UnnamedText_1973a: ; a51ec (29:51ec)
 
 _UnnamedText_1976f: ; a526b (29:526b)
     db $0,"SLOWBRO took a",$4f
-    db "snooze...",$57
+    db "snooze ",$CA,$CA,$57
 
 _UnnamedText_19774: ; a5285 (29:5285)
     db $0,"SLOWBRO is",$4f
@@ -130981,7 +130945,7 @@ _SaffronCityText14: ; a6518 (29:6518)
 
 _SaffronCityText15: ; a654f (29:654f)
     db $0,"...",$4f
-    db "Snore...",$51
+    db "Snore ",$CA,$CA,$51
     db "Hah! He's taking",$4f
     db "a snooze!",$57
 
@@ -143314,7 +143278,22 @@ PortRoyalText1:
     db "@"
 
 _PortRoyalText1:
-    db $0,"!",$57
+    db $08 ; asm
+    ld hl,$d803
+    bit 2,[hl]
+    res 2,[hl]
+    ld hl,.ShipReturnedText
+    jr nz,.done
+    ld hl,.LikeShipText
+.done
+    call PrintText
+    jp TextScriptEnd
+.ShipReturnedText
+    TX_FAR _ShipReturned
+    db "@"
+.LikeShipText
+    TX_FAR _LikeShipText
+    db "@"
 
 PortRoyalScript:
     jp EnableAutoTextBoxDrawing

@@ -369,6 +369,42 @@ AIMoveChoiceModification1:
 .endstatmod
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; heavily discougage Conversion IF Enemy/Player Types Match
+    ld a,[W_ENEMYMOVEEFFECT]
+    cp CONVERSION_EFFECT
+    jr nz,.conversion_kickout
+    push hl
+    push de
+    push bc
+    ld hl,W_PLAYERMONTYPES
+    ld de,W_ENEMYMONTYPES
+    ld b,4
+.conversion_loop
+    ld a,[de]
+    cp [hl]
+    jr nz,.conversion_end
+    inc hl
+    inc de
+    dec b
+    jr nz,.conversion_loop
+.conversion_end
+    pop bc
+    pop de
+    pop hl
+    jp z,.heavydiscourage
+.conversion_kickout
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; heavily discourage Mirro Move IF Player doesn't use any move
+    ld a,[W_ENEMYMOVENUM]
+    cp MIRROR_MOVE
+    jr nz,.mirrormove_kickout
+    ld a,[W_PLAYERMOVENUM]
+    and a
+    jp z,.heavydiscourage
+.mirrormove_kickout
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - heavily discourage moves that do not stack
     ;check each of the stackabe effects one by one and jump to the corresponding section
     ld a,[W_ENEMYMOVEEFFECT]
@@ -549,6 +585,8 @@ EffectsToNotDissuade:
     db HEAL_EFFECT
     db FOCUS_ENERGY_EFFECT
     db SUBSTITUTE_EFFECT
+    db CONVERSION_EFFECT
+    db METRONOME_EFFECT
     ;fall through
 StatusAilmentMoveEffects:
     db $01 ; unused sleep effect

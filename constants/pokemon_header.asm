@@ -5488,7 +5488,7 @@ PorygonBaseStats:
 
     db METAL ; species type 1
     db PSYCHIC ; species type 2
-    db CRYSTAL ; species type 3
+    db THUNDER ; species type 3
     db 0 ; species type 4
 
     db $66 ; sprite dimensions
