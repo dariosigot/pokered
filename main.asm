@@ -122295,6 +122295,16 @@ _GotText:
 
 ; ───────────────────────────────────
 
+_ShipReturned:
+    db $0,"The ship has",$4f
+    db "returned!",$57
+
+_LikeShipText:
+    db $0,"I would like",$4f
+    db "to go on a ship!",$57
+
+; ───────────────────────────────────
+
 SECTION "bank23",ROMX,BANK[$23]
 
 _UnnamedText_56437: ; 8c000 (23:4000)
@@ -143318,7 +143328,22 @@ PortRoyalText1:
     db "@"
 
 _PortRoyalText1:
-    db $0,"!",$57
+    db $08 ; asm
+    ld hl,$d803
+    bit 2,[hl]
+    res 2,[hl]
+    ld hl,.ShipReturnedText
+    jr nz,.done
+    ld hl,.LikeShipText
+.done
+    call PrintText
+    jp TextScriptEnd
+.ShipReturnedText
+    TX_FAR _ShipReturned
+    db "@"
+.LikeShipText
+    TX_FAR _LikeShipText
+    db "@"
 
 PortRoyalScript:
     jp EnableAutoTextBoxDrawing
