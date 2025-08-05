@@ -17827,6 +17827,8 @@ PlayerPCMenu:
     ld [hli],a
     ld [hl],a
     ld [wPlayerMonNumber],a ; $cc2f
+    inc a
+    ld [wMenuWrappingEnabled],a
     ld hl,UnnamedText_7b27 ; $7b27
     call PrintText
     call HandleMenuInput
