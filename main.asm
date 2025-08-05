@@ -69172,8 +69172,8 @@ UnknownDungeon3Object:
     db $0 ; signs
 
     db $2 ; people
-    db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$82,ULTRA_BALL ; item
-    db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$83,MAX_REVIVE ; item
+    db SPRITE_BALL,$9 + 4,$10 + 4,$ff,$ff,$81,ULTRA_BALL ; item
+    db SPRITE_BALL,$1 + 4,$12 + 4,$ff,$ff,$82,MAX_REVIVE ; item
 
     ; warp-to
     EVENT_DISP $f,$6,$3 ; UNKNOWN_DUNGEON_1
