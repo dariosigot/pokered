@@ -120718,9 +120718,9 @@ _PewterCityPokecenterGuyText: ; 8830c (22:430c)
     db $0,"Yawn!",$51
     db "When JIGGLYPUFF",$4f
     db "sings,#MON",$55
-    db "get drowsy...",$51
+    db "get drowsy ",$CA,$CA,$51
     db "...Me too...",$4f
-    db "Snore...",$57
+    db "Snore ",$CA,$CA,$57
 
 _CeruleanPokecenterGuyText: ; 88353 (22:4353)
     db $0,"BILL has lots of",$4f
@@ -130172,7 +130172,7 @@ SECTION "_TM42Explanation",ROMX[$46ad],BANK[$29]
 _TM42Explanation: ; a46ad (29:46ad)
     db $0,"TM42 contains",$4f
     db "DREAM EATER...",$55
-    db "...Snore...",$57
+    db "..Snore..",$CA,$CA,$57
 
 _TM42NoRoomText: ; a46d7 (29:46d7)
     db $0,"You have too much",$4f
@@ -130469,7 +130469,7 @@ _UnnamedText_1973a: ; a51ec (29:51ec)
 
 _UnnamedText_1976f: ; a526b (29:526b)
     db $0,"SLOWBRO took a",$4f
-    db "snooze...",$57
+    db "snooze ",$CA,$CA,$57
 
 _UnnamedText_19774: ; a5285 (29:5285)
     db $0,"SLOWBRO is",$4f
@@ -130985,7 +130985,7 @@ _SaffronCityText14: ; a6518 (29:6518)
 
 _SaffronCityText15: ; a654f (29:654f)
     db $0,"...",$4f
-    db "Snore...",$51
+    db "Snore ",$CA,$CA,$51
     db "Hah! He's taking",$4f
     db "a snooze!",$57
 
