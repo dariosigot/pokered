@@ -25,7 +25,7 @@
     db VINE_WHIP    , NO_ADDITIONAL_EFFECT       ,  45 , GRASS    , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 45 ; PP 10 -> 25
     db STOMP        , FLINCH_SIDE_EFFECT2        ,  65 , NORMAL   , 255 , 10 ; pp 20 ; 0
     db DOUBLE_KICK  , ATTACK_TWICE_EFFECT        ,  30 , FIGHT    , 255 , 08 ; pp 25 ; 0 ; PP 30 -> 25
-    db MEGA_KICK    , NO_ADDITIONAL_EFFECT       , 120 , FIGHT    , 191 , 22 ; pp 10 ; 0 ; Type Normal -> Fight    ; PP 05 -> 10 ; Ene 20 -> 22
+    db MEGA_KICK    , JUMP_KICK_EFFECT           , 120 , FIGHT    , 191 , 22 ; pp 10 ; 0 ; Type Normal -> Fight    ; PP 05 -> 10 ; Ene 20 -> 22
     db JUMP_KICK    , JUMP_KICK_EFFECT           , 100 , FIGHT    , 242 , 20 ; pp 10 ; 0 ; Pwr 70 -> 100 ; PP 25 -> 10
     db ROLLING_KICK , FLINCH_SIDE_EFFECT2        ,  60 , FIGHT    , 216 , 09 ; pp 20 ; 0 ; PP 15 -> 20 ; Ene 10 -> 9
     db SAND_ATTACK  , ACCURACY_DOWN_SIDE_EFFECT  ,  15 , EARTH    , 229 , 09 ; pp 15 ; 0 ; Type Normal -> Earth ; Acr 255 -> 229 ; PP 15 ; Ene 14 -> 09 ; Pwr 0 -> 15
