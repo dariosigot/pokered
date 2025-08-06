@@ -920,8 +920,8 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     jp z,.noFaintCheck
     ld hl,AnyPokemonAliveCheck
     ld b,BANK(AnyPokemonAliveCheck)
-    call HackFromBank0 ; $0669 ; RestoreFaintenedWith1HP ; call Bankswitch ; check if all the player's pokemon fainted
-    nop                ; $066c ; ld a,d
+    call HackFromBank0 ; $0667 ; RestoreFaintenedWith1HP ; call Bankswitch ; check if all the player's pokemon fainted
+    ;nop               ; $066a ; ld a,d
     and a
     jr z,.allPokemonFainted
 .noFaintCheck
@@ -137759,7 +137759,7 @@ _HackFromBank0:
 .Table
     dw $0436
     dw BugFixLongRangeTrainer
-    dw $066c
+    dw $066a
     dw RestoreFaintenedWith1HP
     db $ff
 
