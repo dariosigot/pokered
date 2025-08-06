@@ -671,7 +671,7 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     ld a,[$d730]
     bit 2,a
     jp nz,.noDirectionButtonsPressed
-    call Func_30fd
+    call IsPlayerCharacterBeingControlledByGame
     jr nz,.checkForOpponent
     call Func_3eb5 ; check for hidden items,PC's,etc.
     ld a,[$ffeb]
@@ -765,6 +765,12 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     ld a,[$cc4b]
     and a
     jr z,.noDirectionChange
+    push hl
+    ld hl,wFlagFollowBoulderBit7
+    bit 7,[hl]
+    res 7,[hl]
+    pop hl
+    jr nz,.forceDirectionChange
     ld a,[$d52a] ; new direction
     ld b,a
     ld a,[$d529] ; old direction
@@ -805,6 +811,7 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     jr nz,.oddLoop
     ld a,[$d52a]
     ld [$d528],a
+.forceDirectionChange
     call NewBattle
     jp c,.battleOccurred
     jp OverworldLoop
@@ -847,14 +854,7 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
 .moveAhead2
     ld hl,wFlags_0xcd60
     res 2,[hl]
-    ld a,[$d736]
-    bit 6,a ; jumping a ledge?
-    jr nz,.SkipSpeedUp
-    ld a,[$cc57] ; simulation
-    and a
-    jr nz,.SkipSpeedUp
-    call SpeedUp ; if not jumping a ledge or simulation
-.SkipSpeedUp
+    call TrySpeedUp
     call AdvancePlayerSprite ; Speed 1x
     ld a,[wWalkCounter] ; $cfc5
     and a
@@ -934,13 +934,15 @@ OverworldLoopLessDelay: ; 0402 (0:0402)
     call RunMapScript
     jp HandleBlackOut
 
+SECTION "NewBattle",ROM0[$0683]
+
 ; function to determine if there will be a battle and execute it (either a trainer battle or wild battle)
 ; sets carry if a battle occurred and unsets carry if not
 NewBattle: ; 0683 (0:0683)
     ld a,[$d72d]
     bit 4,a
     jr nz,.noBattle
-    call Func_30fd
+    call IsPlayerCharacterBeingControlledByGame
     jr nz,.noBattle
     ld a,[$d72e]
     bit 4,a
@@ -1791,6 +1793,9 @@ IsSpriteInFrontOfPlayer2: ; 0b6d (0:0b6d)
 ; function to check if the player will jump down a ledge and check if the tile ahead is passable (when not surfing)
 ; sets the carry flag if there is a collision,and unsets it if there isn't a collision
 CollisionCheckOnLand: ; 0bd1 (0:0bd1)
+    ld a,[wFlagFollowBoulderBit7]
+    bit 7,a
+    jr nz,.TryJumping
     ld a,[$cd38]
     and a ; simulate?
     jr nz,NoCollision
@@ -1809,6 +1814,7 @@ CollisionCheckOnLand: ; 0bd1 (0:0bd1)
     jr nz,Collision
 ; if no sprite collision
 
+.TryJumping
     ld d,%00000001 ; TryJumping
     call CheckExceptionTilePassable
     jr nc,NoCollision
@@ -1919,6 +1925,25 @@ IsGhostBattlePlus:
     ret
 
 ; ──────────────────────
+
+ResetJoypadForbiddenButtonsMask:
+    ld hl,wFlagFollowBoulderBit7
+    bit 7,[hl]
+    ret nz
+    ld [wJoypadForbiddenButtonsMask],a
+    ret
+
+TrySpeedUp:
+    ld a,[$d736]
+    bit 6,a ; jumping a ledge?
+    ret nz
+    ld a,[wFlagFollowBoulderBit7]
+    bit 7,a
+    ret nz
+    ld a,[$cc57] ; simulation
+    and a
+    ret nz
+    jp SpeedUp
 
 ; Free
 
@@ -2459,7 +2484,7 @@ GetJoypadStateOverworld: ; 0f4d (0:0f4d)
     ld [$cd3a],a
     ld [$cd38],a
     ld [$ccd3],a
-    ld [wJoypadForbiddenButtonsMask],a
+    call ResetJoypadForbiddenButtonsMask ; ld [wJoypadForbiddenButtonsMask],a
     ld [H_CURRENTPRESSEDBUTTONS],a
     ld hl,$d736
     ld a,[hl]
@@ -2513,8 +2538,8 @@ RunMapScript: ; 101b (0:101b)
     ld a,[wFlags_0xcd60]
     bit 1,a ; is the player pushing a boulder?
     jr z,.afterBoulderEffect
-    ld b,BANK(Func_f2b5)
-    ld hl,Func_f2b5
+    ld b,BANK(DoBoulderDustAnimation)
+    ld hl,DoBoulderDustAnimation
     call Bankswitch ; displays dust effect when pushing a boulder
 .afterBoulderEffect
     pop bc
@@ -8044,7 +8069,7 @@ DisplayTextBoxID: ; 30e8 (0:30e8)
     call RoutineForRealGB
     ret
 
-Func_30fd: ; 30fd (0:30fd)
+IsPlayerCharacterBeingControlledByGame: ; 30fd (0:30fd)
     ld a,[$cc57]
     and a
     ret nz
@@ -21815,6 +21840,8 @@ GetStatExpByLevel:
     ld b,4 ; 4 bytes
     jp Divide
 
+; Free
+
 SECTION "CheckForBoulderCollisionWithSprites",ROMX[$4636],BANK[$3]
 
 CheckForBoulderCollisionWithSprites: ; c636 (3:4636)
@@ -23474,6 +23501,16 @@ DrawHudAndPrintTextPokeFlute:
     pop hl
 .End
     jp PrintText
+
+WaitRightJumpPosition:
+    ld a,[$d736]
+    bit 6,a ; jumping a ledge?
+    ret nz
+    ld a,[$c390] ; HoppingShadowSprite
+    cp $A0
+    ret ; z = success
+
+; Free
 
 SECTION "ItemUseBall",ROMX[$5687],BANK[$3]
 
@@ -25441,6 +25478,47 @@ RemoveBattleValue:
     ld hl,RemoveBattleValue_
     jp Bankswitch
 
+MoveSpriteAndForcePlayerToFollowBoulder:
+    call MoveSprite
+    push bc
+    push hl
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    ld b,a
+    ld a,$ff
+    ld [wJoypadForbiddenButtonsMask],a
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,11
+    ld [$cd38],a
+    ld hl,$ccd3
+    xor a
+    ld [hli],a
+    ld a,b ; old H_CURRENTPRESSEDBUTTONS
+    ld [hli],a
+    xor a
+    ld bc,11-2
+    call FillMemory
+    call StartSimulatingJoypadStates
+    ld hl,wFlagFollowBoulderBit7
+    set 7,[hl]
+    pop hl
+    pop bc
+    ret
+
+CheckFailPushingBoulder:
+    ld a,[$d728]
+    bit 0,a
+    jr z,.fail
+    ld a,[wFlags_0xcd60]
+    bit 1,a
+    jr nz,.fail
+    ld a,[$d700] ; if 0 -> walk,if 1 -> byke
+    dec a
+    ret nz ; Success
+.fail
+    pop hl ; Hack Remove Return Pointer
+    ret
+
 ; Free Space
 
 SECTION "UnusableItem",ROMX[$6476],BANK[$3]
@@ -26712,7 +26790,7 @@ Func_f068: ; f068 (3:7068)
     and a
     ld hl,CutTreeAnimationOffsets ; $708f
     jr z,.asm_f084
-    ld hl,CutTreeAnimationOffsets2 ; $7097
+    ld hl,BoulderDustAnimationOffsets ; $7097
 .asm_f084
     add hl,de
     ld e,[hl]
@@ -26733,14 +26811,13 @@ CutTreeAnimationOffsets: ; f08f (3:708f)
     db -8,20 ; player is facing left
     db 24,20 ; player is facing right
 
-CutTreeAnimationOffsets2: ; f097 (3:7097)
-; Not sure if these ever get used. CutTreeAnimationOffsets only seems to be used.
-; Each pair represents the x and y pixels offsets from the player of where the cut tree animation should be drawn
-; These offsets represent 2 blocks away from the player
-    db  8,52 ; player is facing down
-    db  8,-12 ; player is facing up
-    db -24,20 ; player is facing left
-    db 40,20 ; player is facing right
+BoulderDustAnimationOffsets: ; f097 (3:7097)
+; Each pair represents the x and y pixels offsets from the player of where the Dust animation should be drawn
+; These offsets represent 1 blocks away from the player
+    db  8,36 ; player is facing down
+    db  8,4 ; player is facing up
+    db -8,20 ; player is facing left
+    db 24,20 ; player is facing right
 
 Func_f09f: ; f09f (3:709f)
     push de
@@ -27037,19 +27114,14 @@ HandleBitArray2: ; f1e6 (3:71e6)
     ret
 
 TryPushingBoulder: ; f225 (3:7225)
-    ld a,[$d728]
-    bit 0,a
-    ret z
-    ld a,[wFlags_0xcd60]
-    bit 1,a
-    ret nz
+    call CheckFailPushingBoulder ; If Fail Hack Return
     xor a
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call IsSpriteInFrontOfPlayer
     ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
     ld [$d718],a
     and a
-    jp z,Func_f2dd
+    jr z,ResetBoulderPushFlags
     ld hl,$c101
     ld d,$0
     ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
@@ -27060,7 +27132,7 @@ TryPushingBoulder: ; f225 (3:7225)
     call GetSpriteMovementByte2Pointer
     ld a,[hl]
     cp $10
-    jp nz,Func_f2dd
+    jr nz,ResetBoulderPushFlags
     ld hl,wFlags_0xcd60
     bit 6,[hl]
     set 6,[hl]
@@ -27071,77 +27143,89 @@ TryPushingBoulder: ; f225 (3:7225)
     PREDEF CheckForCollisionWhenPushingBoulder
     ld a,[$d71c]
     and a
-    jp nz,Func_f2dd
+    jr nz,ResetBoulderPushFlags
     ld a,[H_CURRENTPRESSEDBUTTONS]
     ld b,a
-    ld a,[$c109]
-    cp $4
-    jr z,.asm_f289
-    cp $8
-    jr z,.asm_f291
-    cp $c
-    jr z,.asm_f299
-    bit 7,b
+    call GetMovementFromFacingDirection
     ret z
-    ld de,MovementData_f2af
-    jr .asm_f29f
-.asm_f289
-    bit 6,b
-    ret z
-    ld de,MovementData_f2ad
-    jr .asm_f29f
-.asm_f291
-    bit 5,b
-    ret z
-    ld de,MovementData_f2b1
-    jr .asm_f29f
-.asm_f299
-    bit 4,b
-    ret z
-    ld de,MovementData_f2b3
-.asm_f29f
-    call MoveSprite
+    call MoveSpriteAndForcePlayerToFollowBoulder ; call MoveSprite
     ld a,$a8
     call PlaySound
     ld hl,wFlags_0xcd60
     set 1,[hl]
     ret
 
-MovementData_f2ad: ; f2ad (3:72ad)
-    db $40,$FF
-
-MovementData_f2af: ; f2af (3:72af)
-    db $00,$FF
-
-MovementData_f2b1: ; f2b1 (3:72b1)
-    db $80,$FF
-
-MovementData_f2b3: ; f2b3 (3:72b3)
-    db $C0,$FF
-
-Func_f2b5: ; f2b5 (3:72b5)
+DoBoulderDustAnimation:
     ld a,[$d730]
     bit 0,a
+    ret nz
+    call WaitRightJumpPosition
     ret nz
     ld hl,Func_79f54
     ld b,BANK(Func_79f54)
     call Bankswitch ; indirect jump to Func_79f54 (79f54 (1e:5f54))
-    call DiscardButtonPresses
+    xor a
     ld [wJoypadForbiddenButtonsMask],a
-    call Func_f2dd
+    ld hl,wFlags_0xcd60
     set 7,[hl]
+    ; Force Button Pressed like Direction
+    ld b,%11111111
+    call GetMovementFromFacingDirection
+    ld a,[de]
+    ld [H_JOYPADSTATE],a
     ld a,[$d718]
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call GetSpriteMovementByte2Pointer
     ld [hl],$10
     ld a,$ac
-    jp PlaySound
+    call PlaySound
+    ; fall through
 
-Func_f2dd: ; f2dd (3:72dd)
+ResetBoulderPushFlags:
     ld hl,wFlags_0xcd60
     res 1,[hl]
     res 6,[hl]
     ret
+
+GetMovementFromFacingDirection:
+    ld a,[$c109]
+    cp $4 ; SPRITE_FACING_UP
+    jr z,.pushBoulderUp
+    cp $8 ; SPRITE_FACING_LEFT
+    jr z,.pushBoulderLeft
+    cp $c ; SPRITE_FACING_RIGHT
+    jr z,.pushBoulderRight
+.pushBoulderDown
+    bit 7,b
+    ret z
+    ld de,.PushBoulderDownMovementData
+    ret
+.pushBoulderUp
+    bit 6,b
+    ret z
+    ld de,.PushBoulderUpMovementData
+    ret
+.pushBoulderLeft
+    bit 5,b
+    ret z
+    ld de,.PushBoulderLeftMovementData
+    ret
+.pushBoulderRight
+    bit 4,b
+    ret z
+    ld de,.PushBoulderRightMovementData
+    ret
+
+.PushBoulderUpMovementData
+    db $40,$FF
+.PushBoulderDownMovementData
+    db $00,$FF
+.PushBoulderLeftMovementData
+    db $80,$FF
+.PushBoulderRightMovementData
+    db $C0,$FF
+
+SECTION "_AddPokemonToParty",ROMX[$72e5],BANK[$3]
 
 _AddPokemonToParty: ; f2e5 (3:72e5)
 ; Adds a new mon to the player's or enemy's party.
@@ -98650,12 +98734,12 @@ Unknown_70866: ; 70866 (1c:4866)
 INCBIN "baserom.gbc",$70866,$7087e - $70866
 
 _HandleMidJump: ; 7087e (1c:487e)
-    ld a,[$d714]
+    ld a,[wJumpingAnimationStep]
     ld c,a
     inc a
     cp $10
     jr nc,.asm_70895
-    ld [$d714],a
+    ld [wJumpingAnimationStep],a
     ld b,$0
     ld hl,MidJumpVerticalCoord
     add hl,bc
@@ -112060,7 +112144,7 @@ Func_79f54: ; 79f54 (1e:5f54)
     ld a,[rOBP1] ; $FF00+$49
     xor $64
     ld [rOBP1],a ; $FF00+$49
-    call Delay3
+    call DelayFrame
     pop bc
     dec c
     jr nz,.asm_79f73

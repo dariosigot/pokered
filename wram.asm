@@ -1591,7 +1591,7 @@ wFossilSteps: ; d711
 wEnergySteps: ; d713
     ds 1
 
-wNewUnused: ; d714
+wJumpingAnimationStep: ; d714
     ds 1
 
 W_RIVALSTARTER: ; d715
@@ -1917,6 +1917,7 @@ wSelectInOverworldOnBit6    ; df38 ; bit 6
 wStatusScreenJustLoadBit6   ; df38 ; bit 6 = Status Screen Picture Just Load
 wDebugEnemyMoveBit7         ; df38 ; bit 7
 wFlagMoveRelearnEngagedBit7 ; df38 ; bit 7
+wFlagFollowBoulderBit7      ; df38 ; bit 7 = Force player to follow Boulder
     ds 1
 
 wFlagListMenuSpc:           ; df39 ; bit 0 = BadgeName
