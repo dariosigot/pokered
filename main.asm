@@ -53787,9 +53787,7 @@ HandleEnemyMonFainted: ; 3c525 (f:4525)
     ld a,[hli]
     or [hl]
     jr nz,.asm_3c555
-    call Func_3c79b
-    ret c
-    call Func_3c7d8
+    call ChooseNextMon
 .asm_3c555
     ld a,$1
     ld [$cd6a],a
@@ -53798,6 +53796,8 @@ HandleEnemyMonFainted: ; 3c525 (f:4525)
     xor a
     ld [$cd6a],a
     jp MainInBattleLoop
+
+SECTION "FaintEnemyPokemon",ROMX[$4567],BANK[$f]
 
 FaintEnemyPokemon ; 0x3c567
     call ReadPlayerMonCurHPAndStatus
@@ -54045,9 +54045,7 @@ HandlePlayerMonFainted: ; 3c700 (f:4700)
     call Func_3c64f
     jp z,TrainerBattleVictory
 .enemyMonNotFainted
-    call Func_3c79b
-    ret c
-    call Func_3c7d8
+    call ChooseNextMon
     jp nz,MainInBattleLoop
     ld a,$1
     ld [$cd6a],a
@@ -54056,6 +54054,8 @@ HandlePlayerMonFainted: ; 3c700 (f:4700)
     xor a
     ld [$cd6a],a
     jp MainInBattleLoop
+
+SECTION "Func_3c741",ROMX[$4741],BANK[$f]
 
 Func_3c741: ; 3c741 (f:4741)
     ld a,[wPlayerMonNumber] ; $cc2f
@@ -54100,42 +54100,11 @@ PlayerMonFaintedText: ; 3c796 (f:4796)
     TX_FAR _PlayerMonFaintedText
     db "@"
 
-Func_3c79b: ; 3c79b (f:479b)
-    call Func_3ee94
-    call SaveScreenTilesToBuffer1
-    ld a,[W_ISINBATTLE] ; $d057
-    and a
-    dec a
-    ret nz
-;    ld hl,.UnnamedText_3c7d3 ; $47d3
-;    call PrintText
-;.asm_3c7ad
-;    FuncCoord 13,9 ; $c461
-;    ld hl,Coord
-;    ld bc,$a0e
-;    ld a,$14
-;    ld [$d125],a
-;    call UseNextPkmnFixPalette ; call DisplayTextBoxID
-;    ld a,[$d12e]
-;    cp $2
-;    jr z,.asm_3c7c4
-    and a
-    ret
-;.asm_3c7c4
-;    ld a,[wCurrentMenuItem] ; $cc26
-;    and a
-;    jr z,.asm_3c7ad
-;    ld hl,W_PARTYMON1_SPEED ; $d193
-;    ld de,W_ENEMYMONSPEED
-;    jp TryRunningFromBattle
+; Free
 
-;.UnnamedText_3c7d3
-;    TX_FAR _UnnamedText_3c7d3
-;    db "@"
+SECTION "ChooseNextMon",ROMX[$47d8],BANK[$f]
 
-SECTION "Func_3c7d8",ROMX[$47d8],BANK[$f]
-
-Func_3c7d8: ; 3c7d8 (f:47d8)
+ChooseNextMon: ; 3c7d8 (f:47d8)
     ld a,$2
     ld [$d07d],a
     call DisplayPartyMenu
@@ -121339,9 +121308,6 @@ _PlayerMonFaintedText: ; 8970c (22:570c)
     TX_RAM W_PLAYERMONNAME
     db $0,$4f
     db "fainted!",$58
-
-;_UnnamedText_3c7d3: ; 8971a (22:571a)
-;    db $0,"Use next #MON?",$57
 
 SECTION "_Sony1WinText",ROMX[$572a],BANK[$22]
 
