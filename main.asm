@@ -47305,6 +47305,8 @@ Type19Name:
     db "ICE@"
 Type1AName:
     db "DRAGON@"
+Type1CName:
+    db "SOUND@"
 TypeNAName:
     db "-@"
 
@@ -47346,6 +47348,8 @@ Type19NameShort:
     db "ICE"
 Type1ANameShort:
     db "DRA"
+Type1CNameShort:
+    db "SND"
 
 TypeNamePointersShort:
     dw TypeNAName ;
@@ -47376,6 +47380,7 @@ TypeNamePointersShort:
     dw Type19NameShort ; $19 : Ice
     dw Type1ANameShort ; $1A : Dragon
     dw TypeNAName      ; $1B : Levitate
+    dw Type1CNameShort ; $1C : Sound
 
 SECTION "SaveTrainerName",ROMX[$7E4A],BANK[$9]
 
@@ -47546,6 +47551,7 @@ TypeNamePointers:
     dw Type19Name ; $19 : Ice
     dw Type1AName ; $1A : Dragon
     dw TypeNAName ; $1B : Levitate
+    dw Type1CName ; $1C : Sound
 
 SECTION "bankA",ROMX,BANK[$A]
 GrowlithePicFront: ; 28000 (a:4000)

@@ -45,11 +45,11 @@
     db PIN_MISSILE  , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , BUG      , 242 , 14 ; pp 20 ; 1 ; Acr 216 -> 242 ; Pwr 14 -> 28 ; Special ; PP 20 -> 15
     db LEER         , DEFENSE_DOWN1_EFFECT       ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
     db BITE         , FLINCH_SIDE_EFFECT1        ,  60 , NORMAL   , 255 , 08 ; pp 25 ; 0
-    db GROWL        , ATTACK_DOWN1_EFFECT        ,   0 , NORMAL   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
-    db ROAR         , SWITCH_AND_TELEPORT_EFFECT ,   0 , NORMAL   , 255 , 04 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 04
-    db SING         , SLEEP_EFFECT               ,   0 , NORMAL   , 140 , 16 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 16
-    db SUPERSONIC   , CONFUSION_EFFECT           ,   0 , NORMAL   , 229 , 14 ; pp 15 ; - ; Acr 140 -> 229 ; PP 20 -> 15
-    db SONICBOOM    , SPECIAL_DAMAGE_EFFECT      ,   1 , NORMAL   , 229 , 10 ; pp 20 ; -
+    db GROWL        , ATTACK_DOWN1_EFFECT        ,   0 , SOUND    , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
+    db ROAR         , SWITCH_AND_TELEPORT_EFFECT ,   0 , SOUND    , 255 , 04 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 04
+    db SING         , SLEEP_EFFECT               ,   0 , SOUND    , 140 , 16 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 16
+    db SUPERSONIC   , CONFUSION_EFFECT           ,   0 , SOUND    , 229 , 14 ; pp 15 ; - ; Acr 140 -> 229 ; PP 20 -> 15
+    db SONICBOOM    , SPECIAL_DAMAGE_EFFECT      ,   1 , SOUND    , 229 , 10 ; pp 20 ; -
     db DISABLE      , DISABLE_EFFECT             ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; Acr 140 -> 255
     db ACID         , DEFENSE_DOWN_SIDE_EFFECT   ,  40 , POISON   , 255 , 07 ; pp 30 ; 0 ; Phisical
     db EMBER        , BURN_SIDE_EFFECT2          ,  40 , FIRE     , 255 , 08 ; pp 25 ; 1
