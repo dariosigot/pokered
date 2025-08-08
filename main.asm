@@ -101974,7 +101974,7 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
 
     ; opponent hp bar
     db $03,$0F ; $03,$05
-    db $00,$00,$0B,$03
+    db $00,$00,$0A,$03
 
     ; player hp bar
     db $03,$0A ; $03,$00
@@ -101982,11 +101982,11 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
 
     ; frontsprite opponent
     db $03,$05 ; $03,$0F
-    db $0C,$00,$13,$06
+    db $0B,$00,$13,$06
 
     ; Damage/Cure Line Opponent
     db $02,%00000101
-    db $00,$04,$0B,$04
+    db $00,$04,$0A,$04
 
     ; Catch Flag opponent
     db $02,$05 ; $03,$0F
