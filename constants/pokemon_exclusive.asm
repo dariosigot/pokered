@@ -182,6 +182,7 @@ PidgeotExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
+    db TRI_ATTACK ; TM49
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RattataExclusiveMove:
@@ -1897,6 +1898,7 @@ ArticunoExclusiveMove:
     db SUBSTITUTE ; TM50
     db SWOOP ; TM52
     db TSUNAMI ; TM53
+    db TRI_ATTACK ; TM49
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ZapdosExclusiveMove:
@@ -1919,6 +1921,7 @@ ZapdosExclusiveMove:
     db SUBSTITUTE ; TM50
     db SWOOP ; TM52
     db FLASH ; TM55
+    db TRI_ATTACK ; TM49
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MoltresExclusiveMove:
@@ -1940,6 +1943,7 @@ MoltresExclusiveMove:
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db SWOOP ; TM52
+    db TRI_ATTACK ; TM49
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DratiniExclusiveMove:
