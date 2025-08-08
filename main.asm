@@ -47285,8 +47285,10 @@ Type08Name:
     db "GHOST@"
 Type09Name:
     db "METAL@"
-Type10Name:
+Type0AName:
     db "NORMAL@"
+Type0BName:
+    db "ASTRAL@"
 Type12Name:
     db "IVORY@"
 Type13Name:
@@ -47328,8 +47330,10 @@ Type08NameShort:
     db "GST"
 Type09NameShort:
     db "MET"
-Type10NameShort:
+Type0ANameShort:
     db "NOR"
+Type0BNameShort:
+    db "AST"
 Type12NameShort:
     db "IVR"
 Type13NameShort:
@@ -47362,8 +47366,8 @@ TypeNamePointersShort:
     dw Type07NameShort ; $07 : Bug
     dw Type08NameShort ; $08 : Ghost
     dw Type09NameShort ; $09 : Metal
-    dw Type10NameShort ; $00 : Normal
-    dw TypeNAName ;
+    dw Type0ANameShort ; $0A : Normal
+    dw Type0BNameShort ; $0B : Astral
     dw TypeNAName ;
     dw TypeNAName ;
     dw TypeNAName ;
@@ -47533,8 +47537,8 @@ TypeNamePointers:
     dw Type07Name ; $07 : Bug
     dw Type08Name ; $08 : Ghost
     dw Type09Name ; $09 : Metal
-    dw Type10Name ; $00 : Normal
-    dw TypeNAName ;
+    dw Type0AName ; $0A : Normal
+    dw Type0BName ; $0B : Astral
     dw TypeNAName ;
     dw TypeNAName ;
     dw TypeNAName ;
@@ -139077,6 +139081,8 @@ PrintMoveDetailsBox:
     jr z,.PhiSpcPrint
     cp TRI_ATTACK
     jr z,.PhiSpcPrint
+    cp SWIFT
+    jr z,.PhiSpcPrint
 .skipHyperBeamException
     ld a,[W_PLAYERMOVEPOWER]
     and a
@@ -139498,6 +139504,8 @@ TestPhysicalSpecial_:
     cp STRUGGLE
     jr z,.SpecialSplit
     cp TRI_ATTACK
+    jr z,.SpecialSplit
+    cp SWIFT
     jr z,.SpecialSplit
     srl a
     srl a
@@ -142641,6 +142649,7 @@ GetAttackerType:
     db $FF
 .HyperBeamMonTable
     db MEWTWO
+    db MEW
     db $FF
 
 .RageMoveTable
