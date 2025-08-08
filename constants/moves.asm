@@ -20,7 +20,7 @@
     db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  60 , WIND     , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 60 ; PP 35 -> 25
     db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,   0 , WIND     , 255 , 04 ; pp 35 ; - ; Type Normal -> Wind ; Acr 216 -> 255 ; PP 20 -> 35 ; Ene 06 -> 04
     db SWOOP        , FLY_EFFECT                 ,  90 , WIND     , 242 , 14 ; pp 15 ; 0 ; Pwr 70 -> 90
-    db BIND         , TRAPPING_EFFECT            ,  10 , NORMAL   , 128 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Acr 191 -> 128
+    db BIND         , TRAPPING_EFFECT            ,  10 , NORMAL   , 191 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10
     db SLAM         , NO_ADDITIONAL_EFFECT       ,  80 , RUBBER   , 191 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber
     db VINE_WHIP    , NO_ADDITIONAL_EFFECT       ,  45 , GRASS    , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 45 ; PP 10 -> 25
     db STOMP        , FLINCH_SIDE_EFFECT2        ,  65 , NORMAL   , 255 , 10 ; pp 20 ; 0
@@ -35,7 +35,7 @@
     db HORN_DRILL   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 45 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 45
     db TACKLE       , NO_ADDITIONAL_EFFECT       ,  35 , NORMAL   , 255 , 05 ; pp 35 ; 0 ; Acr 242 -> 255 ; Ene 06 -> 05
     db BODY_SLAM    , PARALYZE_SIDE_EFFECT1      ,  85 , RUBBER   , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Rubber
-    db WRAP         , TRAPPING_EFFECT            ,  10 , NORMAL   , 141 , 12 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Acr 216 -> 141 ; Ene 10 -> 12
+    db WRAP         , TRAPPING_EFFECT            ,  10 , NORMAL   , 216 , 12 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Ene 10 -> 12
     db TAKE_DOWN    , RECOIL_EFFECT              ,  90 , NORMAL   , 216 , 10 ; pp 20 ; 0
     db THRASH       , THRASH_PETAL_DANCE_EFFECT  , 120 , NORMAL   , 255 , 15 ; pp 15 ; 0 ; Pwr 90 -> 120 ; PP 20 -> 15 ; Ene 14 -> 15
     db DOUBLE_EDGE  , RECOIL_EFFECT              , 120 , NORMAL   , 255 , 14 ; pp 15 ; 0 ; Pwr 100 -> 120
@@ -45,11 +45,11 @@
     db PIN_MISSILE  , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , BUG      , 242 , 14 ; pp 20 ; 1 ; Acr 216 -> 242 ; Pwr 14 -> 28 ; Special ; PP 20 -> 15
     db LEER         , DEFENSE_DOWN1_EFFECT       ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
     db BITE         , FLINCH_SIDE_EFFECT1        ,  60 , NORMAL   , 255 , 08 ; pp 25 ; 0
-    db GROWL        , ATTACK_DOWN1_EFFECT        ,   0 , NORMAL   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
-    db ROAR         , SWITCH_AND_TELEPORT_EFFECT ,   0 , NORMAL   , 255 , 04 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 04
-    db SING         , SLEEP_EFFECT               ,   0 , NORMAL   , 140 , 16 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 16
-    db SUPERSONIC   , CONFUSION_EFFECT           ,   0 , NORMAL   , 229 , 14 ; pp 15 ; - ; Acr 140 -> 229 ; PP 20 -> 15
-    db SONICBOOM    , SPECIAL_DAMAGE_EFFECT      ,   1 , NORMAL   , 229 , 10 ; pp 20 ; -
+    db GROWL        , ATTACK_DOWN1_EFFECT        ,   0 , SOUND    , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
+    db ROAR         , SWITCH_AND_TELEPORT_EFFECT ,   0 , SOUND    , 255 , 04 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 04
+    db SING         , SLEEP_EFFECT               ,   0 , SOUND    , 140 , 16 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 16
+    db SUPERSONIC   , CONFUSION_EFFECT           ,   0 , SOUND    , 229 , 14 ; pp 15 ; - ; Acr 140 -> 229 ; PP 20 -> 15
+    db SONICBOOM    , SPECIAL_DAMAGE_EFFECT      ,   1 , SOUND    , 229 , 10 ; pp 20 ; -
     db DISABLE      , DISABLE_EFFECT             ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; Acr 140 -> 255
     db ACID         , DEFENSE_DOWN_SIDE_EFFECT   ,  40 , POISON   , 255 , 07 ; pp 30 ; 0 ; Phisical
     db EMBER        , BURN_SIDE_EFFECT2          ,  40 , FIRE     , 255 , 08 ; pp 25 ; 1
@@ -63,7 +63,7 @@
     db PSYBEAM      , CONFUSION_SIDE_EFFECT      ,  65 , PSYCHIC  , 255 , 10 ; pp 20 ; 1
     db BUBBLEBEAM   , SPEED_DOWN_SIDE_EFFECT     ,  65 , WATER    , 255 , 10 ; pp 20 ; 1
     db AURORA_BEAM  , ATTACK_DOWN_SIDE_EFFECT    ,  65 , ICE      , 255 , 10 ; pp 20 ; 1
-    db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , NORMAL   , 229 , 40 ; pp  5 ; ? ; Phi/Spc Split depends by Mon
+    db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , ASTRAL   , 229 , 40 ; pp  5 ; ? ; Phi/Spc Split depends by Mon
     db PECK         , NO_ADDITIONAL_EFFECT       ,  45 , IVORY    , 255 , 07 ; pp 35 ; 0 ; Type Wind -> Ivory ; Pwr 35 -> 45 ; Ene 06 -> 07
     db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
     db SUBMISSION   , RECOIL_EFFECT              ,  95 , FIGHT    , 204 , 10 ; pp 20 ; 0 ; Pwr 80 -> 95 ; PP 25 -> 20
@@ -83,7 +83,7 @@
     db PETAL_DANCE  , THRASH_PETAL_DANCE_EFFECT  , 120 , GRASS    , 255 , 15 ; pp 15 ; 1 ; Pwr 70 -> 120 ; PP 20 -> 15 ; Ene 14 -> 15
     db STRING_SHOT  , SPEED_DOWN2_EFFECT         ,   0 , BUG      , 242 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Speed -2x
     db DRAGON_RAGE  , SPECIAL_DAMAGE_EFFECT      ,   1 , DRAGON   , 255 , 14 ; pp 15 ; - ; PP 10 -> 15
-    db FIRE_SPIN    , TRAPPING_EFFECT            ,  10 , FIRE     , 141 , 15 ; pp 15 ; 1 ; Pwr 15 -> 10 ; Acr 178 -> 141 ; Ene 14 -> 15
+    db FIRE_SPIN    , TRAPPING_EFFECT            ,  10 , FIRE     , 178 , 15 ; pp 15 ; 1 ; Pwr 15 -> 10 ; Ene 14 -> 15
     db THUNDERSHOCK , PARALYZE_SIDE_EFFECT1      ,  40 , THUNDER  , 255 , 07 ; pp 30 ; 1
     db THUNDERBOLT  , PARALYZE_SIDE_EFFECT1      ,  90 , THUNDER  , 255 , 14 ; pp 15 ; 1 ; Pwr 95 -> 90
     db THUNDER_WAVE , PARALYZE_EFFECT            ,   0 , THUNDER  , 255 , 14 ; pp 15 ; - ; PP 20 -> 15
@@ -128,8 +128,8 @@
     db BONE_CLUB    , FLINCH_SIDE_EFFECT1        ,  70 , IVORY    , 216 , 08 ; pp 25 ; 0 ; Type Earth -> Ivory ; Pwr 65 -> 70 ; PP 20 -> 25
     db FIRE_BLAST   , BURN_SIDE_EFFECT2          , 120 , FIRE     , 216 , 36 ; pp  5 ; 1 ; Ene 40 -> 36
     db WATERFALL    , NO_ADDITIONAL_EFFECT       ,  80 , WATER    , 255 , 14 ; pp 15 ; 0
-    db CLAMP        , TRAPPING_EFFECT            ,  10 , IVORY    , 128 , 11 ; pp 20 ; 0 ; Pwr 35 -> 10 ; Acr 191 -> 128 ; Type Water -> Ivory ; PP 10 -> 20 ; Ene 10 -> 11
-    db SWIFT        , SWIFT_EFFECT               ,  60 , NORMAL   , 255 , 10 ; pp 20 ; 1
+    db CLAMP        , TRAPPING_EFFECT            ,  10 , IVORY    , 191 , 11 ; pp 20 ; 0 ; Pwr 35 -> 10 ; Type Water -> Ivory ; PP 10 -> 20 ; Ene 10 -> 11
+    db SWIFT        , SWIFT_EFFECT               ,  60 , ASTRAL   , 255 , 10 ; pp 20 ; ? ; Phi/Spc Split depends by Mon
     db SKULL_BASH   , CHARGE_EFFECT              , 130 , NORMAL   , 255 , 20 ; pp 10 ; 0 ; Pwr 100 -> 130 ; PP 15 -> 10
     db SPIKE_CANNON , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , IVORY    , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Ivory ; Pwr 20 -> 28
     db CONSTRICT    , SPEED_DOWN_SIDE_EFFECT     ,  10 , NORMAL   , 255 , 02 ; pp 35 ; 0 ; Ene 06 -> 02
@@ -161,7 +161,7 @@
     db HYPER_FANG   , FLINCH_SIDE_EFFECT1        ,  80 , NORMAL   , 229 , 14 ; pp 15 ; 0
     db SHARPEN      , ATTACK_UP1_EFFECT          ,   0 , METAL    , 255 , 07 ; pp 30 ; - ; Type Normal -> Metal
     db CONVERSION   , CONVERSION_EFFECT          ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
-    db TRI_ATTACK   , NO_ADDITIONAL_EFFECT       , 100 , NORMAL   , 255 , 20 ; pp 10 ; ? ; Phi/Spc Split depends by Mon
+    db TRI_ATTACK   , NO_ADDITIONAL_EFFECT       , 100 , ASTRAL   , 255 , 20 ; pp 10 ; ? ; Phi/Spc Split depends by Mon
     db SUPER_FANG   , SUPER_FANG_EFFECT          ,   1 , NORMAL   , 229 , 20 ; pp 10 ; -
     db SLASH        , NO_ADDITIONAL_EFFECT       ,  70 , NORMAL   , 255 , 11 ; pp 20 ; 0 ; Ene 10 -> 11
     db SUBSTITUTE   , SUBSTITUTE_EFFECT          ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -

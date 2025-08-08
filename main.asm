@@ -47285,8 +47285,10 @@ Type08Name:
     db "GHOST@"
 Type09Name:
     db "METAL@"
-Type10Name:
+Type0AName:
     db "NORMAL@"
+Type0BName:
+    db "ASTRAL@"
 Type12Name:
     db "IVORY@"
 Type13Name:
@@ -47305,6 +47307,8 @@ Type19Name:
     db "ICE@"
 Type1AName:
     db "DRAGON@"
+Type1CName:
+    db "SOUND@"
 TypeNAName:
     db "-@"
 
@@ -47326,8 +47330,10 @@ Type08NameShort:
     db "GST"
 Type09NameShort:
     db "MET"
-Type10NameShort:
+Type0ANameShort:
     db "NOR"
+Type0BNameShort:
+    db "AST"
 Type12NameShort:
     db "IVR"
 Type13NameShort:
@@ -47346,6 +47352,8 @@ Type19NameShort:
     db "ICE"
 Type1ANameShort:
     db "DRA"
+Type1CNameShort:
+    db "SND"
 
 TypeNamePointersShort:
     dw TypeNAName ;
@@ -47358,8 +47366,8 @@ TypeNamePointersShort:
     dw Type07NameShort ; $07 : Bug
     dw Type08NameShort ; $08 : Ghost
     dw Type09NameShort ; $09 : Metal
-    dw Type10NameShort ; $00 : Normal
-    dw TypeNAName ;
+    dw Type0ANameShort ; $0A : Normal
+    dw Type0BNameShort ; $0B : Astral
     dw TypeNAName ;
     dw TypeNAName ;
     dw TypeNAName ;
@@ -47376,6 +47384,7 @@ TypeNamePointersShort:
     dw Type19NameShort ; $19 : Ice
     dw Type1ANameShort ; $1A : Dragon
     dw TypeNAName      ; $1B : Levitate
+    dw Type1CNameShort ; $1C : Sound
 
 SECTION "SaveTrainerName",ROMX[$7E4A],BANK[$9]
 
@@ -47528,8 +47537,8 @@ TypeNamePointers:
     dw Type07Name ; $07 : Bug
     dw Type08Name ; $08 : Ghost
     dw Type09Name ; $09 : Metal
-    dw Type10Name ; $00 : Normal
-    dw TypeNAName ;
+    dw Type0AName ; $0A : Normal
+    dw Type0BName ; $0B : Astral
     dw TypeNAName ;
     dw TypeNAName ;
     dw TypeNAName ;
@@ -47546,6 +47555,7 @@ TypeNamePointers:
     dw Type19Name ; $19 : Ice
     dw Type1AName ; $1A : Dragon
     dw TypeNAName ; $1B : Levitate
+    dw Type1CName ; $1C : Sound
 
 SECTION "bankA",ROMX,BANK[$A]
 GrowlithePicFront: ; 28000 (a:4000)
@@ -53526,7 +53536,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     and a
     jr z,.HandlePlayerMonFainted
 .AIActionUsedEnemyFirst
-    call .HandlePoisonBurnLeechSeed
+    call HandlePoisonBurnLeechSeed
     jr z,.HandleEnemyMonFainted
     call ExecutePlayerMove ; execute player move
     ld a,[$d078] ; was Teleport, Road, or Whirlwind used to escape from battle?
@@ -53535,7 +53545,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     ld a,b
     and a
     jr z,.HandleEnemyMonFainted
-    call .HandlePoisonBurnLeechSeed
+    call HandlePoisonBurnLeechSeed
     jr z,.HandlePlayerMonFainted
     jr .end
 
@@ -53552,7 +53562,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     call z,CheckandResetEnemyActedBit ;reset enemy acted bit if enemy pkmn fainted
     pop af
     jr z,.HandleEnemyMonFainted
-    call .HandlePoisonBurnLeechSeed
+    call HandlePoisonBurnLeechSeed
     jr z,.HandlePlayerMonFainted
 ;#3 - handle enemy using move
     ld a,$1
@@ -53571,7 +53581,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     and a
     jr z,.HandlePlayerMonFainted
 .AIActionUsedPlayerFirst
-    call .HandlePoisonBurnLeechSeed
+    call HandlePoisonBurnLeechSeed
     jr z,.HandleEnemyMonFainted
 
 .end
@@ -53584,8 +53594,9 @@ MainInBattleLoop: ; 3c233 (f:4233)
 .HandlePlayerMonFainted
     jp HandlePlayerMonFainted
 
-.HandlePoisonBurnLeechSeed
+HandlePoisonBurnLeechSeed:
     call DrawHUDsAndHPBars
+HandlePoisonBurnLeechSeed2:
     ld b,BANK(HandlePoisonBurnLeechSeed_)
     ld hl,HandlePoisonBurnLeechSeed_
     jp Bankswitch
@@ -53721,6 +53732,37 @@ FlipTurn:
     ld [H_WHOSETURN],a
     ret
 
+ReplaceFaintedEnemyMon_:
+    ld a,$1
+    ld [$cd6a],a
+    call ReplaceFaintedEnemyMon
+    jp z,EnemyRan
+    xor a
+    ld [$cd6a],a
+    jp MainInBattleLoop
+
+HandlePoisonBurnAfterPlayerMonFainted:
+    ld a,[H_WHOSETURN] ; 0 on player’s turn, 1 on enemy’s turn
+    and a
+    jr z,.end
+    call HandlePoisonBurnLeechSeed2
+.end
+    ld hl,W_ENEMYMONCURHP
+    ld a,[hli]
+    or [hl]
+    ret
+
+HandlePoisonBurnAfterEnemyMonFainted:
+    ld a,[H_WHOSETURN] ; 0 on player’s turn, 1 on enemy’s turn
+    and a
+    jr nz,.end
+    call z,HandlePoisonBurnLeechSeed2
+.end
+    ld hl,W_PLAYERMONCURHP
+    ld a,[hli]
+    or [hl]
+    ret
+
 ; Free
 
 SECTION "UpdateCurMonHPBar",ROMX[$44f6],BANK[$f]
@@ -53756,40 +53798,41 @@ CheckNumAttacksLeft: ; 3c50f (f:450f)
     res 5,[hl]
     ret
 
-HandleEnemyMonFainted: ; 3c525 (f:4525)
+HandleEnemyMonFainted:
     xor a
     ld [$ccf0],a
     call FaintEnemyPokemon
-    call AnyPokemonAliveCheck
+.AnyPokemonAliveCheck
+    call AnyPokemonAliveCheck ; test if any more mons are alive
     ld a,d
     and a
     jp z,HandlePlayerBlackOut
-    ld hl,W_PLAYERMONCURHP ; $d015
+    ld hl,W_PLAYERMONCURHP
     ld a,[hli]
     or [hl]
-    call nz,DrawPlayerHUDAndHPBar
-    ld a,[W_ISINBATTLE] ; $d057
+    jr z,.SkipPlayer
+    call DrawPlayerHUDAndHPBar
+    call HandlePoisonBurnAfterEnemyMonFainted
+    jr nz,.SkipPlayer
+    call RemoveFaintedPlayerMon2
+    jr .AnyPokemonAliveCheck
+.SkipPlayer
+    ld a,[W_ISINBATTLE]
     dec a
-    ret z
-    call Func_3c64f
+    ret z ; if wild encounter, battle is over
+    call AnyEnemyPokemonAliveCheck
     jp z,TrainerBattleVictory
-    ld hl,W_PLAYERMONCURHP ; $d015
+    call PrintEmptyString
+    call SaveScreenTilesToBuffer1
+    ld hl,W_PLAYERMONCURHP
     ld a,[hli]
     or [hl]
-    jr nz,.asm_3c555
-    call Func_3c79b
-    ret c
-    call Func_3c7d8
-.asm_3c555
-    ld a,$1
-    ld [$cd6a],a
-    call Func_3c664
-    jp z,EnemyRan
-    xor a
-    ld [$cd6a],a
-    jp MainInBattleLoop
+    jr nz,.skipReplacingBattleMon
+    call ChooseNextMon
+.skipReplacingBattleMon
+    jp ReplaceFaintedEnemyMon_
 
-FaintEnemyPokemon ; 0x3c567
+FaintEnemyPokemon:
     call ReadPlayerMonCurHPAndStatus
     ld a,[W_ISINBATTLE] ; $d057
     dec a
@@ -53835,6 +53878,10 @@ FaintEnemyPokemon ; 0x3c567
     ld hl,wTileMap
     ld bc,$40b
     call ClearScreenArea
+    call AnyPokemonAliveCheck ; move the check for alive party members up here
+    ld a,d
+    and a
+    push af ; save the results and flags of the check on the stack
     ld a,[W_ISINBATTLE] ; $d057
     dec a
     jr z,.wild_win
@@ -53853,9 +53900,13 @@ FaintEnemyPokemon ; 0x3c567
     jr .sfxplayed
 .wild_win
     call Func_3c643
+    pop af  ; get the saved party check off of the stack
+    push af ; save the results and flags of the check on the stack
     ld a,(Music_DefeatedWildMon - $4000) / 3
-    call Func_3c6ee
+    call nz,Func_3c6ee ; only play the victory music if at least 1 pokemon remains alive
 .sfxplayed
+    ld hl,EnemyMonFainted ; $463e
+    call PrintText
     ld hl,W_PLAYERMONCURHP ; $d015
     ld a,[hli]
     or [hl]
@@ -53863,15 +53914,14 @@ FaintEnemyPokemon ; 0x3c567
     ld a,[$ccf0]
     and a
     jr nz,.playermonnotfaint
-    call Func_3c741
+    call RemoveFaintedPlayerMon2
 .playermonnotfaint
-    call AnyPokemonAliveCheck
-    ld a,d
-    and a
+    ;call AnyPokemonAliveCheck ; moving this upwards
+    ;ld a,d
+    ;and a
+    pop af ; get the saved party check off of the stack
     ret z
-    ld hl,EnemyMonFainted ; $463e
-    call PrintText
-    call Func_3ee94
+    call PrintEmptyString
     call SaveScreenTilesToBuffer1
     xor a
     ld [wBattleResult],a
@@ -53920,9 +53970,9 @@ Func_3ed12:
     ld b,BANK(Func_396d3)
     jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
 
-SECTION "Func_3c64f",ROMX[$464f],BANK[$f]
+SECTION "AnyEnemyPokemonAliveCheck",ROMX[$464f],BANK[$f]
 
-Func_3c64f: ; 3c64f (f:464f)
+AnyEnemyPokemonAliveCheck: ; 3c64f (f:464f)
     ld a,[wEnemyPartyCount] ; $d89c
     ld b,a
     xor a
@@ -53939,7 +53989,7 @@ Func_3c64f: ; 3c64f (f:464f)
     and a
     ret
 
-Func_3c664: ; 3c664 (f:4664)
+ReplaceFaintedEnemyMon: ; 3c664 (f:4664)
     ld hl,$cf1e
     ld e,$30
     call GetBattleHealthBarColor
@@ -54016,38 +54066,41 @@ Func_3c6ee: ; 3c6ee (f:46ee)
     call PlayMusic
     jp Delay3
 
-HandlePlayerMonFainted: ; 3c700 (f:4700)
-    ld a,$1
-    ld [$ccf0],a
-    call Func_3c741
-    call AnyPokemonAliveCheck     ; test if any more mons are alive
+HandlePlayerMonFainted:
+    call RemoveFaintedPlayerMon2
+    call AnyPokemonAliveCheck ; test if any more mons are alive
     ld a,d
     and a
     jp z,HandlePlayerBlackOut
-    ld hl,W_ENEMYMONCURHP ; $cfe6
+    ld hl,W_ENEMYMONCURHP
     ld a,[hli]
     or [hl]
     jr nz,.enemyMonNotFainted
+.FaintEnemyPokemon
     call FaintEnemyPokemon
-    ld a,[W_ISINBATTLE] ; $d057
+    ld a,[W_ISINBATTLE]
     dec a
-    ret z            ; if wild encounter,battle is over
-    call Func_3c64f
+    ret z ; if wild encounter,battle is over
+    call AnyEnemyPokemonAliveCheck
     jp z,TrainerBattleVictory
+    jr .end
 .enemyMonNotFainted
-    call Func_3c79b
-    ret c
-    call Func_3c7d8
+    call DrawEnemyHUDAndHPBar
+    call HandlePoisonBurnAfterPlayerMonFainted
+    jr z,.FaintEnemyPokemon ; ~TODO
+.end
+    call PrintEmptyString
+    call SaveScreenTilesToBuffer1
+    call ChooseNextMon
     jp nz,MainInBattleLoop
-    ld a,$1
-    ld [$cd6a],a
-    call Func_3c664
-    jp z,EnemyRan
-    xor a
-    ld [$cd6a],a
-    jp MainInBattleLoop
+    jp ReplaceFaintedEnemyMon_
 
-Func_3c741: ; 3c741 (f:4741)
+RemoveFaintedPlayerMon2:
+    ld a,$1
+    ld [$ccf0],a
+    ; fall through
+
+RemoveFaintedPlayerMon:
     ld a,[wPlayerMonNumber] ; $cc2f
     ld c,a
     ld hl,W_PLAYERMONSALIVEFLAGS ; clear fainted mon's alive flag
@@ -54083,49 +54136,17 @@ Func_3c741: ; 3c741 (f:4741)
     ret z
     ld a,[W_PLAYERMONID]
     call PlayCry
-    ld hl,PlayerMonFaintedText
+    ld hl,.PlayerMonFaintedText
     jp PrintText
-
-PlayerMonFaintedText: ; 3c796 (f:4796)
+.PlayerMonFaintedText
     TX_FAR _PlayerMonFaintedText
     db "@"
 
-Func_3c79b: ; 3c79b (f:479b)
-    call Func_3ee94
-    call SaveScreenTilesToBuffer1
-    ld a,[W_ISINBATTLE] ; $d057
-    and a
-    dec a
-    ret nz
-;    ld hl,.UnnamedText_3c7d3 ; $47d3
-;    call PrintText
-;.asm_3c7ad
-;    FuncCoord 13,9 ; $c461
-;    ld hl,Coord
-;    ld bc,$a0e
-;    ld a,$14
-;    ld [$d125],a
-;    call UseNextPkmnFixPalette ; call DisplayTextBoxID
-;    ld a,[$d12e]
-;    cp $2
-;    jr z,.asm_3c7c4
-    and a
-    ret
-;.asm_3c7c4
-;    ld a,[wCurrentMenuItem] ; $cc26
-;    and a
-;    jr z,.asm_3c7ad
-;    ld hl,W_PARTYMON1_SPEED ; $d193
-;    ld de,W_ENEMYMONSPEED
-;    jp TryRunningFromBattle
+; Free
 
-;.UnnamedText_3c7d3
-;    TX_FAR _UnnamedText_3c7d3
-;    db "@"
+SECTION "ChooseNextMon",ROMX[$47d8],BANK[$f]
 
-SECTION "Func_3c7d8",ROMX[$47d8],BANK[$f]
-
-Func_3c7d8: ; 3c7d8 (f:47d8)
+ChooseNextMon: ; 3c7d8 (f:47d8)
     ld a,$2
     ld [$d07d],a
     call DisplayPartyMenu
@@ -54372,7 +54393,7 @@ Func_3c92a: ; 3c92a (f:492a)
     ld hl,Coord
     ld a,8
     call Func_3c8df
-    call Func_3ee94
+    call PrintEmptyString
     call SaveScreenTilesToBuffer1
     ld a,[$D12B]
     cp 4
@@ -54810,7 +54831,7 @@ Func_3cca4: ; 3cca4 (f:4ca4)
     PREDEF Func_3f073
     ld a,[$cf91]
     call PlayCry
-    call Func_3ee94
+    call PrintEmptyString
     jp SaveScreenTilesToBuffer1
 
 Func_3ccfa: ; 3ccfa (f:4cfa)
@@ -55052,7 +55073,7 @@ InitBattleMenu: ; 3ceb1 (f:4eb1)
     and a
     jr nz,.nonstandardbattle
     call DrawHUDsAndHPBars ; redraw names and HP bars?
-    call Func_3ee94
+    call PrintEmptyString
     call SaveScreenTilesToBuffer1
 .nonstandardbattle
     ld a,[W_BATTLETYPE] ; $d05a
@@ -59949,7 +59970,7 @@ LoadHudTilePatterns: ; 3ee5b (f:6e5b)
     ld bc,(BANK(BattleHudTiles2) << 8) + $06
     jp CopyVideoDataDouble
 
-Func_3ee94: ; 3ee94 (f:6e94)
+PrintEmptyString: ; 3ee94 (f:6e94)
     ld hl,TerminatorText_3ee9a ; $6e9a
     jp PrintText
 
@@ -67148,8 +67169,8 @@ VictoryRoad3Script0: ; 449b7 (11:49b7)
     set 0,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH1
     ret
 .asm_449dc
-	; wispnote - This event signifies that a boulder was thrown through a hole;
-	; it is not realted to any switch.
+    ; wispnote - This event signifies that a boulder was thrown through a hole;
+    ; it is not realted to any switch.
     ld hl,$d813
     bit 6,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH2
     set 6,[hl] ; EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH2
@@ -81486,9 +81507,9 @@ GainExperience: ; 5524f (15:524f)
     ld hl,DrawPlayerHUDAndHPBar
     ld b,BANK(DrawPlayerHUDAndHPBar)
     call Bankswitch
-    ld hl,Func_3ee94
-    ld b,BANK(Func_3ee94)
-    call Bankswitch ; indirect jump to Func_3ee94 (3ee94 (f:6e94))
+    ld hl,PrintEmptyString
+    ld b,BANK(PrintEmptyString)
+    call Bankswitch ; indirect jump to PrintEmptyString (3ee94 (f:6e94))
     call SaveScreenTilesToBuffer1
 .asm_553f7
     ld hl,UnnamedText_554dd ; $54dd
@@ -101953,7 +101974,7 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
 
     ; opponent hp bar
     db $03,$0F ; $03,$05
-    db $00,$00,$0B,$03
+    db $00,$00,$0A,$03
 
     ; player hp bar
     db $03,$0A ; $03,$00
@@ -101961,11 +101982,11 @@ Unknown_721b5: ; 721b5 (1c:61b5) ; Denim,spostata palette del colore barra HP ne
 
     ; frontsprite opponent
     db $03,$05 ; $03,$0F
-    db $0C,$00,$13,$06
+    db $0B,$00,$13,$06
 
     ; Damage/Cure Line Opponent
     db $02,%00000101
-    db $00,$04,$0B,$04
+    db $00,$04,$0A,$04
 
     ; Catch Flag opponent
     db $02,$05 ; $03,$0F
@@ -109597,12 +109618,12 @@ PlayApplyingAttackAnimation: ; 78dbd (1e:4dbd)
     jp hl
 
 .AnimationTypePointerTable
-	dw .ShakeScreenVertically        ; enemy mon has used a damaging move without a side effect
-	dw .ShakeScreenHorizontallyHeavy ; enemy mon has used a damaging move with a side effect
-	dw .ShakeScreenHorizontallySlow  ; enemy mon has used a non-damaging move
-	dw .BlinkEnemyMonSprite          ; player mon has used a damaging move without a side effect
-	dw .ShakeScreenHorizontallyLight ; player mon has used a damaging move with a side effect
-	dw .ShakeScreenHorizontallySlow2 ; player mon has used a non-damaging move
+    dw .ShakeScreenVertically        ; enemy mon has used a damaging move without a side effect
+    dw .ShakeScreenHorizontallyHeavy ; enemy mon has used a damaging move with a side effect
+    dw .ShakeScreenHorizontallySlow  ; enemy mon has used a non-damaging move
+    dw .BlinkEnemyMonSprite          ; player mon has used a damaging move without a side effect
+    dw .ShakeScreenHorizontallyLight ; player mon has used a damaging move with a side effect
+    dw .ShakeScreenHorizontallySlow2 ; player mon has used a non-damaging move
 
 .ShakeScreenVertically
     call PlayApplyingAttackSound
@@ -121329,9 +121350,6 @@ _PlayerMonFaintedText: ; 8970c (22:570c)
     TX_RAM W_PLAYERMONNAME
     db $0,$4f
     db "fainted!",$58
-
-;_UnnamedText_3c7d3: ; 8971a (22:571a)
-;    db $0,"Use next #MON?",$57
 
 SECTION "_Sony1WinText",ROMX[$572a],BANK[$22]
 
@@ -133720,6 +133738,16 @@ HandlePoisonBurnLeechSeed_:
     ld a,[bc]
     bit FRZ_Bit,a
     jp nz,.Frozen
+    push hl
+    ld a,[H_WHOSETURN]
+    and a
+    ld hl,W_ENEMYMONCURHP
+    jr z,.playersTurn2
+    ld hl,W_PLAYERMONCURHP
+.playersTurn2
+    call .IsFainted
+    pop hl
+    jr z,.notLeechSeeded
     ld a,[de]
     bit SEEDED,a
     jr z,.notLeechSeeded
@@ -133826,7 +133854,12 @@ HandlePoisonBurnLeechSeed_:
     PREDEF_JUMP MoveAnimation
 .WaitForTextScrollButtonPress
     push hl
-    PREDEF DrawHUDsAndHPBars
+    ld a,[H_WHOSETURN]
+    and a
+    push af
+    PREDEF_Z DrawPlayerHUDAndHPBar
+    pop af
+    PREDEF_NZ DrawEnemyHUDAndHPBar
     ld a,$EE
     FuncCoord 18,16 ; $c4f2
     ld [Coord],a
@@ -139071,6 +139104,8 @@ PrintMoveDetailsBox:
     jr z,.PhiSpcPrint
     cp TRI_ATTACK
     jr z,.PhiSpcPrint
+    cp SWIFT
+    jr z,.PhiSpcPrint
 .skipHyperBeamException
     ld a,[W_PLAYERMOVEPOWER]
     and a
@@ -139492,6 +139527,8 @@ TestPhysicalSpecial_:
     cp STRUGGLE
     jr z,.SpecialSplit
     cp TRI_ATTACK
+    jr z,.SpecialSplit
+    cp SWIFT
     jr z,.SpecialSplit
     srl a
     srl a
@@ -142635,6 +142672,7 @@ GetAttackerType:
     db $FF
 .HyperBeamMonTable
     db MEWTWO
+    db MEW
     db $FF
 
 .RageMoveTable
