@@ -43,7 +43,9 @@ ResetTempIV:
     pop hl
     ret
 
-; Free (5 Bytes)
+HandleLessThan2MenuElements:
+    add 2
+    jp GoToBottomLessThan2MenuElements
 
 ; interrupts
 SECTION "vblank",ROM0[$40]
@@ -550,8 +552,10 @@ GoToBottom:
     ret z
     ld a,[$d12a]
     sub 3
+    jp c,HandleLessThan2MenuElements
     ld [hl],a
     ld a,2
+GoToBottomLessThan2MenuElements:
     ld [wCurrentMenuItem],a
     ret
 
