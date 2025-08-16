@@ -43,7 +43,9 @@ ResetTempIV:
     pop hl
     ret
 
-; Free (5 Bytes)
+HandleLessThan2MenuElements:
+    add 2
+    jp GoToBottomLessThan2MenuElements
 
 ; interrupts
 SECTION "vblank",ROM0[$40]
@@ -550,8 +552,10 @@ GoToBottom:
     ret z
     ld a,[$d12a]
     sub 3
+    jp c,HandleLessThan2MenuElements
     ld [hl],a
     ld a,2
+GoToBottomLessThan2MenuElements:
     ld [wCurrentMenuItem],a
     ret
 
@@ -55055,15 +55059,15 @@ GetBattleHealthBarColor:
 
 GetSelectedMovePointer:
     ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
-    ld bc,W_PLAYERMONID
-    ld de,W_PLAYERMONALTFORM
+    ld de,W_PLAYERMONATK
     ld a,[H_WHOSETURN] ; 0 se player,1 se opponent
     and a
     ret z
     inc hl
-    ld bc,W_ENEMYMON_START
-    ld de,W_ENEMYMONALTFORM
+    ld de,W_ENEMYMONATTACK
     ret
+
+; Free
 
 SECTION "InitBattleMenu",ROMX[$4eb1],BANK[$f]
 
@@ -57755,10 +57759,10 @@ HandleCounterMove:
     and a
     ret z ; if the move the target used has 0 power,miss
     push bc ; Backup Target ID
-    ld hl,(W_PLAYERMONALTFORM)-W_PLAYERMONID
+    ld hl,(W_PLAYERMONATK)-W_PLAYERMONID
     add hl,bc
     ld d,h
-    ld e,l ; de point to move2pp
+    ld e,l ; de point to mon attack
     call TestPhysicalSpecial
     pop de ; Restore Target ID
     jr nz,.specialAttackFail
@@ -139113,9 +139117,8 @@ PrintMoveDetailsBox:
     dec a
     jr z,.PhiSpcDone
     push hl
-    call .GetAlternateForm
+    call .GetMonAtk
     ld hl,W_PLAYERMOVENUM
-    ld bc,$cf91
     call TestPhysicalSpecial
     pop hl
     ld de,.PhiText
@@ -139155,9 +139158,9 @@ PrintMoveDetailsBox:
     ld c,3
     jp PrintNumber
 
-.GetAlternateForm
+.GetMonAtk
     ld a,[wWhichPokemon]
-    ld hl,W_PARTYMON1_MOVE2PP ; move2pp
+    ld hl,W_PARTYMON1_ATTACK ; monatk
     ld bc,44
     call AddNTimes
     ld d,h
@@ -139516,8 +139519,7 @@ DecrementEnemyPP_:
 ; ──────────────────────────────────────────────────────────────────────
 
 ; input hl = pointer to move id
-; input bc = pointer to mon id
-; input de = pointer to alternate form
+; input de = pointer to mon attack
 ; output b = table byte with mask, need to test zero
 TestPhysicalSpecial_:
     call Load16BitRegisters
@@ -139553,16 +139555,33 @@ TestPhysicalSpecial_:
     ld b,a
     ret
 .SpecialSplit
-    ld a,[bc]
-    ld [$D0B5],a
-    ld a,[de]
-    ld [wAlternateFormIndex],a
-    call GetMonHeader
-    ld a,[W_MONHBASESPECIAL]
+    push hl
+    ld h,d
+    ld l,e
+    ld a,[hli]
     ld b,a
-    ld a,[W_MONHBASEATTACK] ; b = special | a = attack
-    cp b
-    jr c,.special
+    ld a,[hli]
+    ld c,a
+    inc hl
+    inc hl
+    inc hl
+    inc hl
+    ld a,[hli]
+    ld d,a
+    ld a,[hli]
+    ld e,a
+    pop hl
+    ; bc = attack
+    ; de = special
+    ld a,b
+    cp d
+    jr c,.special ; if d > b ► special
+    jr nz,.phisical ; if b > d ► phisical
+    ; if d = b
+    ld a,c
+    cp e
+    jr c,.special ; if e > c ► special
+    ; if c >= e ► phisical
 .phisical
     xor a
     jr .end
@@ -140279,9 +140298,8 @@ HandleStatusScreen2:
     call PrintNumber
     ; Print Phi/Spc Symbols
     push hl
-    call .GetAlternateForm
+    call .GetMonAtk
     ld hl,W_PLAYERMOVENUM
-    ld bc,$cf91
     call TestPhysicalSpecial
     pop hl
     ld de,.PhiText
@@ -140332,9 +140350,9 @@ HandleStatusScreen2:
     pop af
     ret
 
-.GetAlternateForm
+.GetMonAtk
     ld a,[wWhichPokemon]
-    ld hl,W_PARTYMON1_MOVE2PP ; move2pp
+    ld hl,W_PARTYMON1_ATTACK ; monatk
     ld bc,44
     call AddNTimes
     ld d,h

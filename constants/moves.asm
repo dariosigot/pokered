@@ -63,9 +63,9 @@
     db PSYBEAM      , CONFUSION_SIDE_EFFECT      ,  65 , PSYCHIC  , 255 , 10 ; pp 20 ; 1
     db BUBBLEBEAM   , SPEED_DOWN_SIDE_EFFECT     ,  65 , WATER    , 255 , 10 ; pp 20 ; 1
     db AURORA_BEAM  , ATTACK_DOWN_SIDE_EFFECT    ,  65 , ICE      , 255 , 10 ; pp 20 ; 1
-    db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , ASTRAL   , 229 , 40 ; pp  5 ; ? ; Phi/Spc Split depends by Mon
+    db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , ASTRAL   , 229 , 40 ; pp  5 ; ? ; Type Normal -> Astral ; Phi/Spc Split depends by Mon
     db PECK         , NO_ADDITIONAL_EFFECT       ,  45 , IVORY    , 255 , 07 ; pp 35 ; 0 ; Type Wind -> Ivory ; Pwr 35 -> 45 ; Ene 06 -> 07
-    db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
+    db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  85 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
     db SUBMISSION   , RECOIL_EFFECT              ,  95 , FIGHT    , 204 , 10 ; pp 20 ; 0 ; Pwr 80 -> 95 ; PP 25 -> 20
     db LOW_KICK     , FLINCH_SIDE_EFFECT2        ,  50 , FIGHT    , 255 , 10 ; pp 20 ; 0 ; Acr 229 -> 255
     db COUNTER      , NO_ADDITIONAL_EFFECT       ,   1 , FIGHT    , 255 , 10 ; pp 20 ; -
@@ -129,7 +129,7 @@
     db FIRE_BLAST   , BURN_SIDE_EFFECT2          , 120 , FIRE     , 216 , 36 ; pp  5 ; 1 ; Ene 40 -> 36
     db WATERFALL    , NO_ADDITIONAL_EFFECT       ,  80 , WATER    , 255 , 14 ; pp 15 ; 0
     db CLAMP        , TRAPPING_EFFECT            ,  10 , IVORY    , 191 , 11 ; pp 20 ; 0 ; Pwr 35 -> 10 ; Type Water -> Ivory ; PP 10 -> 20 ; Ene 10 -> 11
-    db SWIFT        , SWIFT_EFFECT               ,  60 , ASTRAL   , 255 , 10 ; pp 20 ; ? ; Phi/Spc Split depends by Mon
+    db SWIFT        , SWIFT_EFFECT               ,  60 , ASTRAL   , 255 , 10 ; pp 20 ; ? ; Type Normal -> Astral ; Phi/Spc Split depends by Mon
     db SKULL_BASH   , CHARGE_EFFECT              , 130 , NORMAL   , 255 , 20 ; pp 10 ; 0 ; Pwr 100 -> 130 ; PP 15 -> 10
     db SPIKE_CANNON , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , IVORY    , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Ivory ; Pwr 20 -> 28
     db CONSTRICT    , SPEED_DOWN_SIDE_EFFECT     ,  10 , NORMAL   , 255 , 02 ; pp 35 ; 0 ; Ene 06 -> 02
@@ -152,7 +152,7 @@
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; Acr 204 -> 255 ; PP 15 -> 30
     db SPLASH       , SPLASH_EFFECT              ,   0 , WATER    , 255 , 00 ; pp 40 ; - ; Type Normal -> Water
     db ACID_ARMOR   , DEFENSE_UP3_EFFECT         ,   0 , POISON   , 255 , 10 ; pp 20 ; - ; PP 40 -> 20 ; Defense 3x
-    db CRABHAMMER   , NO_ADDITIONAL_EFFECT       ,  90 , IVORY    , 216 , 20 ; pp 10 ; 0
+    db CRABHAMMER   , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 216 , 20 ; pp 10 ; 0
     db EXPLOSION    , EXPLODE_EFFECT             , 255 , NORMAL   , 255 , 60 ; pp  5 ; 0 ; Pwr 170 -> 255 ; Ene 40 -> 60
     db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , NORMAL   , 204 , 12 ; pp 15 ; 0 ; Pwr 18 -> 21 ; Ene 14 -> 12
     db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  55 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Earth -> Ivory ; Pwr 50 -> 55
@@ -161,7 +161,7 @@
     db HYPER_FANG   , FLINCH_SIDE_EFFECT1        ,  80 , NORMAL   , 229 , 14 ; pp 15 ; 0
     db SHARPEN      , ATTACK_UP1_EFFECT          ,   0 , METAL    , 255 , 07 ; pp 30 ; - ; Type Normal -> Metal
     db CONVERSION   , CONVERSION_EFFECT          ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
-    db TRI_ATTACK   , NO_ADDITIONAL_EFFECT       , 100 , ASTRAL   , 255 , 20 ; pp 10 ; ? ; Phi/Spc Split depends by Mon
+    db TRI_ATTACK   , NO_ADDITIONAL_EFFECT       ,  85 , ASTRAL   , 255 , 20 ; pp 10 ; ? ; Pwr 80 -> 85 ; Type Normal -> Astral ; Phi/Spc Split depends by Mon
     db SUPER_FANG   , SUPER_FANG_EFFECT          ,   1 , NORMAL   , 229 , 20 ; pp 10 ; -
     db SLASH        , NO_ADDITIONAL_EFFECT       ,  70 , NORMAL   , 255 , 11 ; pp 20 ; 0 ; Ene 10 -> 11
     db SUBSTITUTE   , SUBSTITUTE_EFFECT          ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
