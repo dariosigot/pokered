@@ -53767,6 +53767,11 @@ HandlePoisonBurnAfterEnemyMonFainted:
     or [hl]
     ret
 
+Func_3ed12:
+    ld hl,Func_396d3
+    ld b,BANK(Func_396d3)
+    jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
+
 ; Free
 
 SECTION "UpdateCurMonHPBar",ROMX[$44f6],BANK[$f]
@@ -53821,6 +53826,7 @@ HandleEnemyMonFainted:
     call RemoveFaintedPlayerMon2
     jr .AnyPokemonAliveCheck
 .SkipPlayer
+    call ReadPlayerMonCurHPAndStatus
     ld a,[W_ISINBATTLE]
     dec a
     ret z ; if wild encounter, battle is over
@@ -53968,11 +53974,6 @@ GetHealthBarColorWithGhostCheck:
     ld hl,GetHealthBarColorWithGhostCheck_
     ld b,BANK(GetHealthBarColorWithGhostCheck_)
     jp Bankswitch
-
-Func_3ed12:
-    ld hl,Func_396d3
-    ld b,BANK(Func_396d3)
-    jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
 
 SECTION "AnyEnemyPokemonAliveCheck",ROMX[$464f],BANK[$f]
 
