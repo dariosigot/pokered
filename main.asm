@@ -34359,8 +34359,8 @@ PewterCityScript0: ; 19251 (6:5251)
     ret
 
 PewterCityScript_1925e: ; 1925e (6:525e)
-    ld a,[$d755]
-    bit 7,a
+    ld a,[$d5a6] ; Sprite "Brock Looking..." Visible
+    bit 4,a
     ret nz
     ld hl,CoordsData_19277
     call ArePlayerCoordsInArray
@@ -134333,7 +134333,7 @@ NoMons: ; d0dd (3:50dd)
     db $00
 
 PalletMons:
-    db $08
+    db $06
     db W_PIKACHU_EEVEE,$FF ; 20%
     db W_PIKACHU_EEVEE,$FF ; 20%
     db W_PIKACHU_EEVEE,$FF ; 15%
@@ -134357,7 +134357,7 @@ PalletMons:
     db 38,CLOYSTER ;  1%
 
 PewterMons:
-    db $07
+    db $05
     db W_PIKACHU_EEVEE,$FF ; 20%
     db W_PIKACHU_EEVEE,$FF ; 20%
     db W_PIKACHU_EEVEE,$FF ; 15%
