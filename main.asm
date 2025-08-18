@@ -34359,8 +34359,8 @@ PewterCityScript0: ; 19251 (6:5251)
     ret
 
 PewterCityScript_1925e: ; 1925e (6:525e)
-    ld a,[$d755]
-    bit 7,a
+    ld a,[$d5a6] ; Sprite "Brock Looking..." Visible
+    bit 4,a
     ret nz
     ld hl,CoordsData_19277
     call ArePlayerCoordsInArray
