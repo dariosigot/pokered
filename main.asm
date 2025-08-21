@@ -66442,7 +66442,7 @@ DexRatingsTable: ; 441d1 (11:41d1)
     dw UnnamedText_44242
     db 150
     dw UnnamedText_44247
-    db 152
+    db 255
     dw UnnamedText_4424c
 
 UnnamedText_44201: ; 44201 (11:4201)
