@@ -35,7 +35,7 @@
     db HORN_DRILL   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 45 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 45
     db TACKLE       , NO_ADDITIONAL_EFFECT       ,  35 , NORMAL   , 255 , 05 ; pp 35 ; 0 ; Acr 242 -> 255 ; Ene 06 -> 05
     db BODY_SLAM    , PARALYZE_SIDE_EFFECT1      ,  85 , RUBBER   , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Rubber
-    db WRAP         , TRAPPING_EFFECT            ,  10 , NORMAL   , 216 , 12 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Ene 10 -> 12
+    db WRAP         , TRAPPING_EFFECT            ,  10 , NORMAL   , 204 , 12 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Ene 10 -> 12 ; Acr 216 -> 204
     db TAKE_DOWN    , RECOIL_EFFECT              ,  90 , NORMAL   , 216 , 10 ; pp 20 ; 0
     db THRASH       , THRASH_PETAL_DANCE_EFFECT  , 120 , NORMAL   , 255 , 15 ; pp 15 ; 0 ; Pwr 90 -> 120 ; PP 20 -> 15 ; Ene 14 -> 15
     db DOUBLE_EDGE  , RECOIL_EFFECT              , 120 , NORMAL   , 255 , 14 ; pp 15 ; 0 ; Pwr 100 -> 120
