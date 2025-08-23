@@ -484,7 +484,7 @@ ButterfreeBaseStats:
     db 45 ; base attack
     db 50 ; base defense
     db 70 ; base speed
-    db 80 ; base special
+    db 90 ; base special (+10)
 
     db BUG ; species type 1
     db PSYCHIC ; species type 2
@@ -601,7 +601,7 @@ KakunaBaseStats:
 BeedrillBaseStats:
     db BEEDRILL ; mon id
     db 65 ; base hp
-    db 80 ; base attack
+    db 90 ; base attack (+10)
     db 40 ; base defense
     db 75 ; base speed
     db 45 ; base special
@@ -723,7 +723,7 @@ PidgeotBaseStats:
     db 83 ; base hp
     db 80 ; base attack
     db 75 ; base defense
-    db 91 ; base speed
+    db 101 ; base speed (+10)
     db 70 ; base special
 
     db WIND ; species type 1
@@ -961,7 +961,7 @@ EkansBaseStats:
 ArbokBaseStats:
     db ARBOK ; mon id
     db 60 ; base hp
-    db 85 ; base attack
+    db 95 ; base attack (+10)
     db 69 ; base defense
     db 80 ; base speed
     db 65 ; base special
@@ -1002,7 +1002,7 @@ PikachuBaseStats:
     db PIKACHU ; mon id
     db 35 ; base hp
     db 55 ; base attack
-    db 30 ; base defense
+    db 40 ; base defense (+10)
     db 90 ; base speed
     db 50 ; base special
 
@@ -1043,7 +1043,7 @@ RaichuBaseStats:
     db 60 ; base hp
     db 90 ; base attack
     db 55 ; base defense
-    db 100 ; base speed
+    db 110 ; base speed (+10)
     db 90 ; base special
 
     db THUNDER ; species type 1
@@ -1241,7 +1241,7 @@ NidorinaBaseStats:
 NidoqueenBaseStats:
     db NIDOQUEEN ; mon id
     db 90 ; base hp
-    db 82 ; base attack
+    db 92 ; base attack (+10)
     db 87 ; base defense
     db 76 ; base speed
     db 75 ; base special
@@ -1361,7 +1361,7 @@ NidorinoBaseStats:
 NidokingBaseStats:
     db NIDOKING ; mon id
     db 81 ; base hp
-    db 92 ; base attack
+    db 102 ; base attack (+10)
     db 77 ; base defense
     db 85 ; base speed
     db 75 ; base special
@@ -1444,7 +1444,7 @@ ClefableBaseStats:
     db 70 ; base attack
     db 73 ; base defense
     db 60 ; base speed
-    db 85 ; base special
+    db 95 ; base special (+10)
 
     db RUBBER ; species type 1
     db 0 ; species type 2
@@ -1604,7 +1604,7 @@ WigglytuffBaseStats:
     db 70 ; base attack
     db 45 ; base defense
     db 45 ; base speed
-    db 50 ; base special
+    db 60 ; base special (+10)
 
     db RUBBER ; species type 1
     db 0 ; species type 2
@@ -1804,7 +1804,7 @@ VileplumeBaseStats:
     db 80 ; base attack
     db 85 ; base defense
     db 50 ; base speed
-    db 100 ; base special
+    db 110 ; base special (+10)
 
     db GRASS ; species type 1
     db POISON ; species type 2
@@ -2041,7 +2041,7 @@ DiglettBaseStats:
 DugtrioBaseStats:
     db DUGTRIO ; mon id
     db 35 ; base hp
-    db 80 ; base attack
+    db 100 ; base attack (+20)
     db 50 ; base defense
     db 120 ; base speed
     db 70 ; base special
@@ -2481,7 +2481,7 @@ PoliwhirlBaseStats:
 PoliwrathBaseStats:
     db POLIWRATH ; mon id
     db 90 ; base hp
-    db 85 ; base attack
+    db 95 ; base attack (+10)
     db 95 ; base defense
     db 70 ; base speed
     db 70 ; base special
@@ -3041,7 +3041,7 @@ GravelerBaseStats:
 GolemBaseStats:
     db GOLEM ; mon id
     db 80 ; base hp
-    db 110 ; base attack
+    db 120 ; base attack (+10)
     db 130 ; base defense
     db 45 ; base speed
     db 55 ; base special
@@ -3321,7 +3321,7 @@ MagnetonBaseStats:
 FarfetchdBaseStats:
     db FARFETCH_D ; mon id
     db 52 ; base hp
-    db 65 ; base attack
+    db 90 ; base attack (+25)
     db 55 ; base defense
     db 60 ; base speed
     db 58 ; base special
@@ -3403,7 +3403,7 @@ DodrioBaseStats:
     db 60 ; base hp
     db 110 ; base attack
     db 70 ; base defense
-    db 100 ; base speed
+    db 110 ; base speed (+10)
     db 60 ; base special
 
     db IVORY ; species type 1
@@ -4043,7 +4043,7 @@ ElectrodeBaseStats:
     db 60 ; base hp
     db 50 ; base attack
     db 70 ; base defense
-    db 140 ; base speed
+    db 150 ; base speed (+10)
     db 80 ; base special
 
     db THUNDER ; species type 1
