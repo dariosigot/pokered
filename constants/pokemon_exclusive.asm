@@ -908,6 +908,9 @@ FarfetchdExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
+    db TAKE_DOWN ; TM09
+    db DOUBLE_EDGE ; TM10
+    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DoduoExclusiveMove:

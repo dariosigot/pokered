@@ -47389,6 +47389,7 @@ TypeNamePointersShort:
     dw Type1ANameShort ; $1A : Dragon
     dw TypeNAName      ; $1B : Levitate
     dw Type1CNameShort ; $1C : Sound
+    dw TypeNAName      ; $1D : Wallow
 
 SECTION "SaveTrainerName",ROMX[$7E4A],BANK[$9]
 
@@ -47560,6 +47561,7 @@ TypeNamePointers:
     dw Type1AName ; $1A : Dragon
     dw TypeNAName ; $1B : Levitate
     dw Type1CName ; $1C : Sound
+    dw TypeNAName ; $1D : Wallow
 
 SECTION "bankA",ROMX,BANK[$A]
 GrowlithePicFront: ; 28000 (a:4000)
@@ -135279,8 +135281,8 @@ IslandMonsB2:
     db 31,GOLBAT   ; 15%
     db 34,GOLBAT   ; 10%
     db 31,SLOWPOKE ; 10%
-    db 30,KINGLER  ; 10%
-    db 36,DEWGONG  ;  5%
+    db 30,KINGLER  ; 10% ; IslandMonsB25
+    db 36,DEWGONG  ;  5% ; IslandMonsB26
     db 38,SLOWBRO  ;  5%
     db 39,SLOWBRO  ;  4%
     db 40,GOLBAT   ;  1%
@@ -135288,6 +135290,12 @@ IslandMonsB2:
 IslandMonsB20:
     db $20,21,ZUBAT  ; 12%
     db $FF,28,GOLBAT ; 88%
+IslandMonsB25:
+    db $20,21,KRABBY  ; 12%
+    db $FF,28,KINGLER ; 88%
+IslandMonsB26:
+    db $20,21,SEEL    ; 12%
+    db $FF,28,DEWGONG ; 88%
 
 IslandMonsB3:
     db $0A
@@ -136702,6 +136710,8 @@ WildSubGroupTable:
     WILDSUBGROUP SEAFOAM_ISLANDS_1,0,IslandMons10
     WILDSUBGROUP SEAFOAM_ISLANDS_2,0,IslandMonsB10
     WILDSUBGROUP SEAFOAM_ISLANDS_3,0,IslandMonsB20
+    WILDSUBGROUP SEAFOAM_ISLANDS_3,5,IslandMonsB25
+    WILDSUBGROUP SEAFOAM_ISLANDS_3,6,IslandMonsB26
     WILDSUBGROUP SEAFOAM_ISLANDS_4,9,IslandMonsB39
     WILDSUBGROUP MANSION_4,9,MansionMonsB19
     WILDSUBGROUP ROUTE_21,4,Route21MonsW4
@@ -142580,6 +142590,7 @@ GetAttackerType:
     dw .LickMoveTable      , .LickMonTable
     dw .SwiftMoveTable     , .SwiftMonTable
     dw .PinMissMoveTable   , .PinMissMonTable
+    dw .BladeMoveTable     , .BladeMonTable
     db $FF
 
 .TryToForceIvory
@@ -142618,6 +142629,7 @@ GetAttackerType:
 .SlashMonTable
     db SANDSHREW
     db SANDSLASH
+    db FARFETCH_D
     db $FF
 
 .ExplosionMoveTable
@@ -142731,6 +142743,13 @@ GetAttackerType:
 .PinMissMonTable
     db JOLTEON
     db ZAPDOS
+    db $FF
+
+.BladeMoveTable
+    db BLADE
+    db $FF
+.BladeMonTable
+    db FARFETCH_D
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────

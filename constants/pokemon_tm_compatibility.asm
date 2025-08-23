@@ -696,8 +696,8 @@ MagnetonTMCompatibility:
 ; ──────────────────────────────────────────────────────────────────────
 FarfetchdTMCompatibility:
     tmlearn 02,03,04                ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|
-    tmlearn 15                      ; |HYPER_BEAM|
-    tmlearn 0
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 20                      ; |RAGE|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
     tmlearn 43,44                   ; |SKY_ATTACK|REST|

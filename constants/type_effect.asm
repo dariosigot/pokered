@@ -124,6 +124,7 @@
     db WATER,RUBBER,07
     db WATER,METAL,13
     db WATER,ICE,07
+    db WATER,WALLOW,05
 
     db GRASS,GRASS,08
     db GRASS,WATER,20

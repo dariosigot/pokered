@@ -43,7 +43,7 @@ ElectrodeHisuiBaseStats:
     db 60 ; base hp
     db 50 ; base attack
     db 70 ; base defense
-    db 140 ; base speed
+    db 150 ; base speed (+10)
     db 80 ; base special
 
     db THUNDER ; species type 1
@@ -642,7 +642,7 @@ PikachuStarterBaseStats:
     db PIKACHU ; mon id
     db 35+10 ; base hp
     db 55+25 ; base attack
-    db 30+20 ; base defense
+    db 40+10 ; base defense
     db 90+30 ; base speed
     db 50+25 ; base special
 
