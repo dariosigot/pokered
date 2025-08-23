@@ -3351,7 +3351,7 @@ FarfetchdBaseStats:
     dw PAL_FARFETCH_D
 
     ; field moves
-    db FM_CUT+FM_FLY
+    db FM_CUT+FM_FLY+FM_FLOAT
 
     db 45 ; catch rate
     db 94 ; base exp yield
