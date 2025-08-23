@@ -3327,7 +3327,7 @@ FarfetchdBaseStats:
     db 58 ; base special
 
     db WIND ; species type 1
-    db 0 ; species type 2
+    db WALLOW ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -3527,7 +3527,7 @@ GrimerBaseStats:
     db 40 ; base special
 
     db POISON ; species type 1
-    db 0 ; species type 2
+    db WALLOW ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 
@@ -3567,7 +3567,7 @@ MukBaseStats:
     db 65 ; base special
 
     db POISON ; species type 1
-    db 0 ; species type 2
+    db WALLOW ; species type 2
     db 0 ; species type 3
     db 0 ; species type 4
 

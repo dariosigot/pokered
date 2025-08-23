@@ -47389,6 +47389,7 @@ TypeNamePointersShort:
     dw Type1ANameShort ; $1A : Dragon
     dw TypeNAName      ; $1B : Levitate
     dw Type1CNameShort ; $1C : Sound
+    dw TypeNAName      ; $1D : Wallow
 
 SECTION "SaveTrainerName",ROMX[$7E4A],BANK[$9]
 
@@ -47560,6 +47561,7 @@ TypeNamePointers:
     dw Type1AName ; $1A : Dragon
     dw TypeNAName ; $1B : Levitate
     dw Type1CName ; $1C : Sound
+    dw TypeNAName ; $1D : Wallow
 
 SECTION "bankA",ROMX,BANK[$A]
 GrowlithePicFront: ; 28000 (a:4000)
