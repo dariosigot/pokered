@@ -142582,6 +142582,7 @@ GetAttackerType:
     dw .LickMoveTable      , .LickMonTable
     dw .SwiftMoveTable     , .SwiftMonTable
     dw .PinMissMoveTable   , .PinMissMonTable
+    dw .BladeMoveTable     , .BladeMonTable
     db $FF
 
 .TryToForceIvory
@@ -142620,6 +142621,7 @@ GetAttackerType:
 .SlashMonTable
     db SANDSHREW
     db SANDSLASH
+    db FARFETCH_D
     db $FF
 
 .ExplosionMoveTable
@@ -142733,6 +142735,13 @@ GetAttackerType:
 .PinMissMonTable
     db JOLTEON
     db ZAPDOS
+    db $FF
+
+.BladeMoveTable
+    db BLADE
+    db $FF
+.BladeMonTable
+    db FARFETCH_D
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
