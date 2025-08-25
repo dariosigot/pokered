@@ -53785,11 +53785,7 @@ Func_3ed12:
     ld b,BANK(Func_396d3)
     jp Bankswitch ; indirect jump to Func_396d3 (396d3 (e:56d3))
 
-; Free
-
-SECTION "UpdateCurMonHPBar",ROMX[$44f6],BANK[$f]
-
-UpdateCurMonHPBar: ; 3c4f6 (f:44f6)
+UpdateCurMonHPBar:
     FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord    ; tile pointer to player HP bar
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -53806,7 +53802,7 @@ UpdateCurMonHPBar: ; 3c4f6 (f:44f6)
     pop bc
     ret
 
-CheckNumAttacksLeft: ; 3c50f (f:450f)
+CheckNumAttacksLeft:
     ld a,[$d06a]
     and a
     jr nz,.asm_3c51a
@@ -53820,15 +53816,12 @@ CheckNumAttacksLeft: ; 3c50f (f:450f)
     res 5,[hl]
     ret
 
-HandleEnemyMonFainted:
-    xor a
-    ld [$ccf0],a
-    call FaintEnemyPokemon
+HandlePlayerAliveAndApplyPoisonBurn:
 .AnyPokemonAliveCheck
     call AnyPokemonAliveCheck ; test if any more mons are alive
     ld a,d
     and a
-    jp z,HandlePlayerBlackOut
+    jr z,.HandlePlayerBlackOut
     ld hl,W_PLAYERMONCURHP
     ld a,[hli]
     or [hl]
@@ -53840,6 +53833,20 @@ HandleEnemyMonFainted:
     jr .AnyPokemonAliveCheck
 .SkipPlayer
     call ReadPlayerMonCurHPAndStatus
+    ld a,1 ; rzf
+    and a  ; ...
+    ret
+.HandlePlayerBlackOut
+    call HandlePlayerBlackOut
+    xor a ; szf
+    ret
+
+HandleEnemyMonFainted:
+    xor a
+    ld [$ccf0],a
+    call FaintEnemyPokemon
+    call HandlePlayerAliveAndApplyPoisonBurn
+    ret z
     ld a,[W_ISINBATTLE]
     dec a
     ret z ; if wild encounter, battle is over
@@ -53987,6 +53994,8 @@ GetHealthBarColorWithGhostCheck:
     ld hl,GetHealthBarColorWithGhostCheck_
     ld b,BANK(GetHealthBarColorWithGhostCheck_)
     jp Bankswitch
+
+; Free
 
 SECTION "AnyEnemyPokemonAliveCheck",ROMX[$464f],BANK[$f]
 
@@ -140492,6 +140501,7 @@ ItemInBattleFinalCheck:
     pop af
     jr z,.EndNoCapture
     call .HackGainExpAfterCatch
+    call .HandlePlayerAliveAndApplyPoisonBurn
 .EndCapture
     xor a
     ld [$d11c],a
@@ -140540,6 +140550,10 @@ ItemInBattleFinalCheck:
 .HackGainExpAfterCatch
     ld b,BANK(HackGainExpAfterCatch)
     ld hl,HackGainExpAfterCatch
+    jp Bankswitch
+.HandlePlayerAliveAndApplyPoisonBurn
+    ld b,BANK(HandlePlayerAliveAndApplyPoisonBurn)
+    ld hl,HandlePlayerAliveAndApplyPoisonBurn
     jp Bankswitch
 .EmptyText
     db "@"
