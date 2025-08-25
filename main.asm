@@ -31356,6 +31356,17 @@ RecoilEffect_: ; 1392c (4:792c)
     ld hl,wHPBarNewHP
     ld [hli],a
     ld [hl],a
+    ld a,[H_WHOSETURN]
+    and a
+    jr nz,.asm_13982
+    ld a,[W_PLAYERMOVENUM]
+    cp STRUGGLE
+    jr nz,.asm_13982
+    push bc
+    ld b,BANK(SetExplodeFlag_)
+    ld hl,SetExplodeFlag_
+    call Bankswitch
+    pop bc
 .asm_13982
     FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord
