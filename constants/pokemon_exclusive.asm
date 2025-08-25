@@ -393,6 +393,7 @@ WigglytuffExclusiveMove:
     db STRIKE ; TM54
     db FLASH ; TM55
     db DEFENSE_CURL
+    db TELEPORT ; TM30
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VulpixExclusiveMove:
