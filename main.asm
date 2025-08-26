@@ -53995,6 +53995,10 @@ GetHealthBarColorWithGhostCheck:
     ld b,BANK(GetHealthBarColorWithGhostCheck_)
     jp Bankswitch
 
+QuarterSpeedDueToParalysisAndHalveAttackDueToBurn:
+    call QuarterSpeedDueToParalysis
+    jp HalveAttackDueToBurn
+
 ; Free
 
 SECTION "AnyEnemyPokemonAliveCheck",ROMX[$464f],BANK[$f]
@@ -59736,20 +59740,30 @@ EffectsArray6:
     db PAY_DAY_EFFECT
     db $FF
 
-; Free
-
-SECTION "ApplyBurnAndParalysisPenaltiesToPlayer",ROMX[$6d1a],BANK[$f]
-
-ApplyBurnAndParalysisPenaltiesToPlayer: ; 3ed1a (f:6d1a)
-    ld a,$1
+ApplyBurnAndParalysisPenaltiesToPlayer:
+    ld hl,H_WHOSETURN
+    ld a,[hl]
+    push af
+    ld a,1
     jr ApplyBurnAndParalysisPenalties
 
-ApplyBurnAndParalysisPenaltiesToEnemy: ; 3ed1e (f:6d1e)
+ApplyBurnAndParalysisPenaltiesToEnemy:
+    ld hl,H_WHOSETURN
+    ld a,[hl]
+    push af
     xor a
-ApplyBurnAndParalysisPenalties: ; 3ed1f (f:6d1f)
-    ld [H_WHOSETURN],a ; $FF00+$f3
-    call QuarterSpeedDueToParalysis
-    jp HalveAttackDueToBurn
+    ; fall through
+
+ApplyBurnAndParalysisPenalties:
+    push hl
+    ld [hl],a
+    call QuarterSpeedDueToParalysisAndHalveAttackDueToBurn
+    pop hl
+    pop af
+    ld [hl],a
+    ret
+
+SECTION "QuarterSpeedDueToParalysis",ROMX[$6d27],BANK[$f]
 
 QuarterSpeedDueToParalysis: ; 3ed27 (f:6d27)
     ld a,[H_WHOSETURN] ; $FF00+$f3
