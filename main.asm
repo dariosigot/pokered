@@ -51240,6 +51240,7 @@ LearnMoveCommon:
 
     ld a,[wNewMonIdDuringLearnMove]
     ld [$d0b5],a
+    ld [$cf91],a
     ld hl,W_PARTYMON1_MOVE2PP ; move2pp
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
