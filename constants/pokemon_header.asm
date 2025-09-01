@@ -511,7 +511,7 @@ ButterfreeBaseStats:
     dw PAL_BUTTERFREE
 
     ; field moves
-    db FM_FLY+FM_TELEPORT+FM_HEAL
+    db FM_FLY+FM_HEAL
 
     db 45 ; catch rate
     db 160 ; base exp yield
@@ -1471,7 +1471,7 @@ ClefableBaseStats:
     dw PAL_CLEFABLE
 
     ; field moves
-    db FM_FLOAT+FM_TELEPORT+FM_HEAL
+    db FM_FLOAT+FM_HEAL
 
     db 25 ; catch rate
     db 129 ; base exp yield
@@ -1631,7 +1631,7 @@ WigglytuffBaseStats:
     dw PAL_WIGGLYTUFF
 
     ; field moves
-    db FM_FLOAT+FM_TELEPORT+FM_HEAL
+    db FM_FLOAT+FM_HEAL
 
     db 50 ; catch rate
     db 109 ; base exp yield
@@ -1951,7 +1951,7 @@ VenonatBaseStats:
     dw PAL_VENONAT
 
     ; field moves
-    db FM_LIGHT+FM_TELEPORT
+    db FM_LIGHT
 
     db 190 ; catch rate
     db 75 ; base exp yield
@@ -1991,7 +1991,7 @@ VenomothBaseStats:
     dw PAL_VENOMOTH
 
     ; field moves
-    db FM_FLY+FM_LIGHT+FM_TELEPORT+FM_HEAL
+    db FM_FLY+FM_LIGHT+FM_HEAL
 
     db 75 ; catch rate
     db 138 ; base exp yield
@@ -2191,7 +2191,7 @@ PsyduckBaseStats:
     dw PAL_PSYDUCK
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 190 ; catch rate
     db 80 ; base exp yield
@@ -2231,7 +2231,7 @@ GolduckBaseStats:
     dw PAL_GOLDUCK
 
     ; field moves
-    db FM_CUT+FM_FLOAT+FM_LIGHT+FM_TELEPORT+FM_DIG
+    db FM_CUT+FM_FLOAT+FM_LIGHT+FM_DIG
 
     db 75 ; catch rate
     db 174 ; base exp yield
@@ -2551,7 +2551,7 @@ AbraBaseStats:
     dw PAL_ABRA
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 200 ; catch rate
     db 73 ; base exp yield
@@ -2591,7 +2591,7 @@ KadabraBaseStats:
     dw PAL_KADABRA
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 100 ; catch rate
     db 145 ; base exp yield
@@ -2631,7 +2631,7 @@ AlakazamBaseStats:
     dw PAL_ALAKAZAM
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 50 ; catch rate
     db 186 ; base exp yield
@@ -3191,7 +3191,7 @@ SlowpokeBaseStats:
     dw PAL_SLOWPOKE
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 190 ; catch rate
     db 99 ; base exp yield
@@ -3231,7 +3231,7 @@ SlowbroBaseStats:
     dw PAL_SLOWBRO
 
     ; field moves
-    db FM_FLOAT+FM_TELEPORT
+    db FM_FLOAT
 
     db 75 ; catch rate
     db 164 ; base exp yield
@@ -3311,7 +3311,7 @@ MagnetonBaseStats:
     dw PAL_MAGNETON
 
     ; field moves
-    db FM_LIGHT+FM_TELEPORT
+    db FM_LIGHT
 
     db 60 ; catch rate
     db 161 ; base exp yield
@@ -3711,7 +3711,7 @@ GastlyBaseStats:
     dw PAL_GASTLY
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 190 ; catch rate
     db 95 ; base exp yield
@@ -3751,7 +3751,7 @@ HaunterBaseStats:
     dw PAL_HAUNTER
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 90 ; catch rate
     db 126 ; base exp yield
@@ -3791,7 +3791,7 @@ GengarBaseStats:
     dw PAL_GENGAR
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 45 ; catch rate
     db 190 ; base exp yield
@@ -3871,7 +3871,7 @@ DrowzeeBaseStats:
     dw PAL_DROWZEE
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 190 ; catch rate
     db 102 ; base exp yield
@@ -3911,7 +3911,7 @@ HypnoBaseStats:
     dw PAL_HYPNO
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 75 ; catch rate
     db 165 ; base exp yield
@@ -4071,7 +4071,7 @@ ElectrodeBaseStats:
     dw PAL_ELECTRODE
 
     ; field moves
-    db FM_LIGHT+FM_TELEPORT
+    db FM_LIGHT
 
     db 60 ; catch rate
     db 150 ; base exp yield
@@ -4111,7 +4111,7 @@ ExeggcuteBaseStats:
     dw PAL_EXEGGCUTE
 
     ; field moves
-    db FM_TELEPORT+FM_HEAL
+    db FM_HEAL
 
     db 90 ; catch rate
     db 98 ; base exp yield
@@ -4151,7 +4151,7 @@ ExeggutorBaseStats:
     dw PAL_EXEGGUTOR
 
     ; field moves
-    db FM_TELEPORT+FM_HEAL
+    db FM_HEAL
 
     db 45 ; catch rate
     db 212 ; base exp yield
@@ -4831,7 +4831,7 @@ StaryuBaseStats:
     dw PAL_STARYU
 
     ; field moves
-    db FM_LIGHT+FM_TELEPORT
+    db FM_LIGHT
 
     db 225 ; catch rate
     db 106 ; base exp yield
@@ -4871,7 +4871,7 @@ StarmieBaseStats:
     dw PAL_STARMIE
 
     ; field moves
-    db FM_FLOAT+FM_LIGHT+FM_TELEPORT
+    db FM_FLOAT+FM_LIGHT
 
     db 60 ; catch rate
     db 207 ; base exp yield
@@ -4911,7 +4911,7 @@ MrMimeBaseStats:
     dw PAL_MR_MIME
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 45 ; catch rate
     db 136 ; base exp yield
@@ -4991,7 +4991,7 @@ JynxBaseStats:
     dw PAL_JYNX
 
     ; field moves
-    db FM_TELEPORT
+    db 0
 
     db 45 ; catch rate
     db 137 ; base exp yield
@@ -5511,7 +5511,7 @@ PorygonBaseStats:
     dw PAL_PORYGON
 
     ; field moves
-    db FM_CUT+FM_FLY+FM_LIGHT+FM_TELEPORT+FM_HEAL
+    db FM_CUT+FM_FLY+FM_LIGHT+FM_HEAL
 
     db 45 ; catch rate
     db 130 ; base exp yield
@@ -6031,7 +6031,7 @@ MewtwoBaseStats:
     dw PAL_MEWTWO
 
     ; field moves
-    db FM_CUT+FM_FLY+FM_STRENGTH+FM_LIGHT+FM_TELEPORT
+    db FM_CUT+FM_FLY+FM_STRENGTH+FM_LIGHT
 
     db 3 ; catch rate
     db 220 ; base exp yield
@@ -6071,7 +6071,7 @@ MewBaseStats:
     dw PAL_MEW
 
     ; field moves
-    db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_LIGHT+FM_TELEPORT+FM_DIG+FM_HEAL
+    db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_LIGHT+FM_DIG+FM_HEAL
 
     db 3 ; catch rate
     db 64 ; base exp yield
@@ -6111,7 +6111,7 @@ LitwickBaseStats:
     dw PAL_LITWICK
 
     ; field moves
-    db FM_LIGHT+FM_TELEPORT
+    db FM_LIGHT
 
     db 190 ; catch rate
     db 55 ; base exp yield
@@ -6151,7 +6151,7 @@ LampentBaseStats:
     dw PAL_LAMPENT
 
     ; field moves
-    db FM_LIGHT+FM_TELEPORT
+    db FM_LIGHT
 
     db 90 ; catch rate
     db 130 ; base exp yield
@@ -6191,7 +6191,7 @@ ChandelureBaseStats:
     dw PAL_CHANDELURE
 
     ; field moves
-    db FM_LIGHT+FM_TELEPORT
+    db FM_LIGHT
 
     db 45 ; catch rate
     db 234 ; base exp yield

@@ -17648,12 +17648,11 @@ ChoiceMonSimpleMenu:
 
 GetMonFieldMoves:
 ; Totalmente Ristrutturato basato su Tabella "FieldMoves"
-    xor a
-    ld hl,wFieldMoves
-    ld bc,8+1
-    call FillMemory
-    call .GetMonHeader
+    call .CheckMonAlreadyKnowTeleportAndFillMemory ; this function call "GetMonHeader"
     ld a,[W_MONH_FIELDMOVES]
+    jr nc,.next
+    set 1,a ; FM_TELEPORT
+.next
     ld e,a
     ld c,8
     ld b,0
@@ -17676,18 +17675,32 @@ GetMonFieldMoves:
     ld a,b
     ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
     ret
-.GetMonHeader
-    ld hl,W_PARTYMON1_NUM
-    ld a,[wWhichPokemon]
-    ld bc,44
-    call AddNTimes
-    ld a,[hl]
-    ld [$d0b5],a
-    ld de,W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
-    add hl,de
-    ld a,[hl]
-    ld [wAlternateFormIndex],a
-    jp GetMonHeader
+.CheckMonAlreadyKnowTeleportAndFillMemory
+    call .BackupGenericBuffer
+    ld a,TELEPORT
+    ld [$d0e0],a
+    ld b,BANK(CheckMonAlreadyKnowMove)
+    ld hl,CheckMonAlreadyKnowMove
+    call Bankswitch
+    push af
+    call .RestoreGenericBuffer
+    xor a
+    ld hl,wFieldMoves
+    ld bc,8+1
+    call FillMemory
+    pop af
+    ret
+.BackupGenericBuffer
+    ld hl,GenericBuffer+00
+    ld de,GenericBuffer+96
+    jr .BackupGenericBufferCommon
+.RestoreGenericBuffer
+    ld hl,GenericBuffer+96
+    ld de,GenericBuffer+00
+    ; fall through
+.BackupGenericBufferCommon
+    ld bc,96
+    jp CopyData
 
 DrainHPEffect_:
     ld de,W_DAMAGE+1
@@ -30531,6 +30544,9 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld hl,$d72e
     set 1,[hl]
     jp StartMenu_Pokemon
+.cannotFlyHereText
+    TX_FAR _CannotFlyHereText
+    db "@"
 
 .cut
 ;    bit 1,a ; does the player have the Cascade Badge?
@@ -30624,9 +30640,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .cannotUseTeleportNowText
     TX_FAR _CannotUseTeleportNowText
     db "@"
-.cannotFlyHereText
-    TX_FAR _CannotFlyHereText
-    db "@"
 
 .softboiled
     ld hl,W_PARTYMON1_MAXHP
@@ -30667,6 +30680,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .notHealthyEnoughText
     TX_FAR _NotHealthyEnoughText
     db "@"
+
 .goBackToMap
     call RestoreScreenTilesAndReloadTilePatterns
     jp CloseTextDisplay
@@ -44412,8 +44426,6 @@ INCLUDE "constants/pokemon_exclusive.asm"
 ; $d0e0 = Move ID
 ; wWhichPokemon = Mon Party ID
 CheckMonAlreadyKnowMove:
-    ld a,[wWhichPokemon]
-    ld [$cf92],a
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
