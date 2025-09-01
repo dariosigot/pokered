@@ -81831,9 +81831,7 @@ Route3TrainerHeader8: ; 55579 (15:5579)
 
     db $ff
 
-Route3Text1: ; 55586 (15:5586)
-    TX_FAR _Route3Text1
-    db "@"
+SECTION "Route3Text2",ROMX[$558b],BANK[$15]
 
 Route3Text2: ; 5558b (15:558b)
     db $08 ; asm
@@ -85394,6 +85392,31 @@ CeladonMart2Text1:
     db SUPER_POTION,POTION
     db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
     db ESCAPE_ROPE,SUPER_REPEL,REPEL,$FF
+
+Route3Text1:
+    db $08 ; asm
+    ld hl,$d7bf
+    bit 1,[hl]
+    set 1,[hl]
+    ld hl,.Route3Text1
+    jr nz,.skip
+    ld hl,.Route3Text1_TM30
+    call PrintText
+    ld bc,(TM_30 << 8) | 3
+    call GiveItem
+    ld hl,.GotText
+.skip
+    call PrintText
+    jp TextScriptEnd
+.Route3Text1
+    TX_FAR _Route3Text1
+    db "@"
+.Route3Text1_TM30
+    TX_FAR _Route3Text1_TM30
+    db "@"
+.GotText
+    TX_FAR _GotText
+    db $0b,"@"
 
 SECTION "bank16",ROMX,BANK[$16]
 
@@ -123795,6 +123818,16 @@ _HM02ExplanationText: ; Moved to the End of the BANK
 
 _Mansion2BattleText2:
     db $0,"Gyaoo!@@"
+
+_Route3Text1_TM30:
+    db $0,"Whew... I better",$4f
+    db "take a rest...",$55
+    db "Groan...",$51
+    db "That tunnel from",$4f
+    db "CERULEAN takes a",$55
+    db "lot out of you!",$51
+    db "I recommend you",$4f
+    db "to use this TM!",$58
 
 SECTION "bank24",ROMX,BANK[$24]
 
