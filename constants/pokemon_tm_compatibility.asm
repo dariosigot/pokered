@@ -293,7 +293,7 @@ ClefairyTMCompatibility:
     tmlearn 01,08                   ; |MEGA_PUNCH|BODY_SLAM|
     tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 31                      ; |MIMIC|
+    tmlearn 30,31                   ; |TELEPORT|MIMIC|
     tmlearn 33,34,35,37,39,40       ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|SWIFT|SKULL_BASH|
     tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
     tmlearn 50,54,55                ; |SUBSTITUTE|STRIKE|FLASH|
@@ -327,7 +327,7 @@ JigglypuffTMCompatibility:
     tmlearn 01,08                   ; |MEGA_PUNCH|BODY_SLAM|
     tmlearn 09,11,12,13             ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 31                      ; |MIMIC|
+    tmlearn 30,31                   ; |TELEPORT|MIMIC|
     tmlearn 33,34,35,37,39,40       ; |REFLECT|BIDE|METRONOME|FLAMETHROWER|SWIFT|SKULL_BASH|
     tmlearn 41,42,44,45,46          ; |LIGHT_SCREEN|DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|
     tmlearn 50,54,55                ; |SUBSTITUTE|STRIKE|FLASH|
@@ -681,7 +681,7 @@ MagnemiteTMCompatibility:
     tmlearn 0
     tmlearn 0
     tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER_M|MIMIC|DOUBLE_TEAM|
+    tmlearn 25,30,31,32             ; |THUNDER_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
     tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
     tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
@@ -843,7 +843,7 @@ VoltorbTMCompatibility:
     tmlearn 0
     tmlearn 0
     tmlearn 24                      ; |THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER_M|MIMIC|DOUBLE_TEAM|
+    tmlearn 25,30,31,32             ; |THUNDER_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
     tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
     tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
@@ -851,7 +851,7 @@ VoltorbHisuiTMCompatibility:
     tmlearn 6                       ; |TOXIC|
     tmlearn 0
     tmlearn 21,22,24                ; |MEGA_DRAIN|SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER_M|MIMIC|DOUBLE_TEAM|
+    tmlearn 25,30,31,32             ; |THUNDER_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
     tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
     tmlearn 50,55                   ; |SUBSTITUTE|FLASH|

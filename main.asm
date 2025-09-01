@@ -10459,7 +10459,8 @@ GoPAL_SET: ; 3def (0:3def)
     ld a,[wRunningOnSGB]
     and a
     ret z
-    jp DelayAndProcessSGBPacket
+    call DelayAndProcessSGBPacket
+    ret ; (only for Debug)
 
 SECTION "GetHealthBarColor",ROM0[$3df9]
 
@@ -17648,12 +17649,11 @@ ChoiceMonSimpleMenu:
 
 GetMonFieldMoves:
 ; Totalmente Ristrutturato basato su Tabella "FieldMoves"
-    xor a
-    ld hl,wFieldMoves
-    ld bc,8+1
-    call FillMemory
-    call .GetMonHeader
+    call .CheckMonAlreadyKnowTeleportAndFillMemory ; this function call "GetMonHeader"
     ld a,[W_MONH_FIELDMOVES]
+    jr nc,.next
+    set 1,a ; FM_TELEPORT
+.next
     ld e,a
     ld c,8
     ld b,0
@@ -17676,18 +17676,32 @@ GetMonFieldMoves:
     ld a,b
     ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
     ret
-.GetMonHeader
-    ld hl,W_PARTYMON1_NUM
-    ld a,[wWhichPokemon]
-    ld bc,44
-    call AddNTimes
-    ld a,[hl]
-    ld [$d0b5],a
-    ld de,W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
-    add hl,de
-    ld a,[hl]
-    ld [wAlternateFormIndex],a
-    jp GetMonHeader
+.CheckMonAlreadyKnowTeleportAndFillMemory
+    call .BackupGenericBuffer
+    ld a,TELEPORT
+    ld [$d0e0],a
+    ld b,BANK(CheckMonAlreadyKnowMove)
+    ld hl,CheckMonAlreadyKnowMove
+    call Bankswitch
+    push af
+    call .RestoreGenericBuffer
+    xor a
+    ld hl,wFieldMoves
+    ld bc,8+1
+    call FillMemory
+    pop af
+    ret
+.BackupGenericBuffer
+    ld hl,GenericBuffer+00
+    ld de,GenericBuffer+96
+    jr .BackupGenericBufferCommon
+.RestoreGenericBuffer
+    ld hl,GenericBuffer+96
+    ld de,GenericBuffer+00
+    ; fall through
+.BackupGenericBufferCommon
+    ld bc,96
+    jp CopyData
 
 DrainHPEffect_:
     ld de,W_DAMAGE+1
@@ -30531,6 +30545,9 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld hl,$d72e
     set 1,[hl]
     jp StartMenu_Pokemon
+.cannotFlyHereText
+    TX_FAR _CannotFlyHereText
+    db "@"
 
 .cut
 ;    bit 1,a ; does the player have the Cascade Badge?
@@ -30624,9 +30641,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .cannotUseTeleportNowText
     TX_FAR _CannotUseTeleportNowText
     db "@"
-.cannotFlyHereText
-    TX_FAR _CannotFlyHereText
-    db "@"
 
 .softboiled
     ld hl,W_PARTYMON1_MAXHP
@@ -30667,6 +30681,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .notHealthyEnoughText
     TX_FAR _NotHealthyEnoughText
     db "@"
+
 .goBackToMap
     call RestoreScreenTilesAndReloadTilePatterns
     jp CloseTextDisplay
@@ -31064,7 +31079,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db ICE_BEAM     ; TM_13
     db BLIZZARD     ; TM_14
     db HYPER_BEAM   ; TM_15 ; Game Corner
-    db PAY_DAY      ; TM_16
+    db PAY_DAY      ; TM_16 ; Game Corner
     db SUBMISSION   ; TM_17 ; Market
     db COUNTER      ; TM_18
     db SEISMIC_TOSS ; TM_19
@@ -44412,8 +44427,6 @@ INCLUDE "constants/pokemon_exclusive.asm"
 ; $d0e0 = Move ID
 ; wWhichPokemon = Mon Party ID
 CheckMonAlreadyKnowMove:
-    ld a,[wWhichPokemon]
-    ld [$cf92],a
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
@@ -54037,7 +54050,7 @@ ReplaceFaintedEnemyMon: ; 3c664 (f:4664)
     ret z
     call LoadScreenTilesFromBuffer1
 .asm_3c687
-    call EnemySendOut
+    call EnemySendOutAfterDelay
     xor a
     ld [W_ENEMYMOVENUM],a ; $cfcc
     ld [$cd6a],a
@@ -55061,6 +55074,7 @@ DrawEnemyHUDAndHPBar:
     ld a,$6
     ld d,a
     ld c,a
+    ; fall through
 
 Func_3ce7f: ; 3ce7f (f:4e7f)
     xor a
@@ -55071,6 +55085,9 @@ Func_3ce7f: ; 3ce7f (f:4e7f)
     call nc,DrawHPBar
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
+    ; fall through
+
+GetEnemyBattleHealthBarColor:
     ld hl,$cf1e
     ; fall through
 
@@ -62211,10 +62228,13 @@ HackRemoveCancelFromBattle: ; Eliminato "CANCEL" da Party in Battle
 
 ClearScreenAreaAndGoPalSet: ; Reset Battle Standard Palette after red ball
     call ClearScreenArea
-    ld hl,wFlagBackSpritePlayerBit4 ; Force GoPal_SET only after red ball / player back sprite show
+    ld hl,wFlagBackSpritePlayerBit4 ; Force GoPAL_SET only after red ball / player back sprite show
     bit 4,[hl]
     ret z
-    ld b,1
+    ld hl,$cf1e
+    ld e,$30
+    call GetHealthBarColorWithGhostCheck
+    ld b,$1
     jp GoPAL_SET
 
 PrintEXPBar: ; Denim,ExpBar
@@ -62728,6 +62748,11 @@ StartBattleAlarm:
     ret nz
     set 7,[hl]
     ret
+
+EnemySendOutAfterDelay:
+    ld c,30
+    call DelayFrames
+    jp EnemySendOut
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -81114,7 +81139,7 @@ Route9Object: ; 0x546a8 (size=86)
     db SPRITE_BUG_CATCHER,$2 + 4,$16 + 4,$ff,$d0,$47,BUG_CATCHER,$c ; trainer
     db SPRITE_HIKER,$f + 4,$2d + 4,$ff,$d3,$48,HIKER,$5 ; trainer
     db SPRITE_BUG_CATCHER,$8 + 4,$28 + 4,$ff,$d3,$49,BUG_CATCHER,$d ; trainer
-    db SPRITE_BALL,$f + 4,$a + 4,$ff,$ff,$8a,TM_30 ; item
+    db SPRITE_BALL,$f + 4,$a + 4,$ff,$ff,$8a,GREAT_BALL ; item
 
 Route9Blocks: ; 546fe (15:46fe)
     INCBIN "maps/route9.blk"
@@ -81810,9 +81835,7 @@ Route3TrainerHeader8: ; 55579 (15:5579)
 
     db $ff
 
-Route3Text1: ; 55586 (15:5586)
-    TX_FAR _Route3Text1
-    db "@"
+SECTION "Route3Text2",ROMX[$558b],BANK[$15]
 
 Route3Text2: ; 5558b (15:558b)
     db $08 ; asm
@@ -85373,6 +85396,31 @@ CeladonMart2Text1:
     db SUPER_POTION,POTION
     db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
     db ESCAPE_ROPE,SUPER_REPEL,REPEL,$FF
+
+Route3Text1:
+    db $08 ; asm
+    ld hl,$d7bf
+    bit 1,[hl]
+    set 1,[hl]
+    ld hl,.Route3Text1
+    jr nz,.skip
+    ld hl,.Route3Text1_TM30
+    call PrintText
+    ld bc,(TM_30 << 8) | 3
+    call GiveItem
+    ld hl,.GotText
+.skip
+    call PrintText
+    jp TextScriptEnd
+.Route3Text1
+    TX_FAR _Route3Text1
+    db "@"
+.Route3Text1_TM30
+    TX_FAR _Route3Text1_TM30
+    db "@"
+.GotText
+    TX_FAR _GotText
+    db $0b,"@"
 
 SECTION "bank16",ROMX,BANK[$16]
 
@@ -123774,6 +123822,16 @@ _HM02ExplanationText: ; Moved to the End of the BANK
 
 _Mansion2BattleText2:
     db $0,"Gyaoo!@@"
+
+_Route3Text1_TM30:
+    db $0,"Whew... I better",$4f
+    db "take a rest...",$55
+    db "Groan...",$51
+    db "That tunnel from",$4f
+    db "CERULEAN takes a",$55
+    db "lot out of you!",$51
+    db "I recommend you",$4f
+    db "to use this TM!",$58
 
 SECTION "bank24",ROMX,BANK[$24]
 

@@ -1230,7 +1230,10 @@ wBackupAIMoveChoice: ; d485
 
 ENDU
 
-; some free bytes
+SECTION "wArrayMiniSpriteLoaded",WRAMX[$d489],BANK[1]
+
+wArrayMiniSpriteLoaded: ; d489
+    ds 6
 
 SECTION "GymLeaderRematch",WRAMX[$d48f],BANK[1]
 
@@ -1653,7 +1656,19 @@ ds 1 ; $d728
 wPalletPikachuIV_AtkDef:: db ; $d729
 wPalletPikachuIV_SpdSpc:: db ; $d72a
 
-; Some Free (see shinpokered)
+UNION ; 8 Bytes
+
+wTmpAttackerTypes:
+    ds 4
+wTmpDefenderTypes:
+    ds 4
+
+NEXTU
+
+wTmpDmgMultiplier:
+    ds 2
+
+ENDU
 
 SECTION "W_FLAGS_D733",WRAMX[$d733],BANK[$1]
 
@@ -1789,10 +1804,10 @@ W_BOXMON2DATA: ; dab7
 
 SECTION "DenimBuffer",WRAMX[$def0],BANK[$1]
 
-UNION ; 63 Byte
+UNION ; 69 Byte
 
 wMoveRelearnerMoveList: ; def0
-    ds 63
+    ds 69
 
 NEXTU
 
@@ -1848,24 +1863,13 @@ wBattleValueCounter: ; def2
 NEXTU
 
 wBufferTypeEffects: ; def0
-    ds 52
+    ds 68
 wBufferTypeEffectsEnd:
     db
-wTmpAttackerTypes:
-    ds 4
-wTmpDefenderTypes:
-    ds 4
-wTmpDmgMultiplier:
-    ds 2
 
 ENDU
 
 ; ────────────────────────────────────────────────────
-
-SECTION "wArrayMiniSpriteLoaded",WRAMX[$df2f],BANK[1]
-
-wArrayMiniSpriteLoaded: ; df2f
-    ds 6
 
 SECTION "DenimFlags",WRAMX[$df35],BANK[1]
 

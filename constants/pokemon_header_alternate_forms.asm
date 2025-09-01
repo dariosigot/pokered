@@ -71,7 +71,7 @@ ElectrodeHisuiBaseStats:
     dw PAL_ELECTRODE_HUSUI
 
     ; field moves
-    db FM_LIGHT+FM_TELEPORT+FM_HEAL
+    db FM_LIGHT+FM_HEAL
 
     db 60 ; catch rate
     db 150 ; base exp yield
@@ -631,7 +631,7 @@ MarowakAlolaBaseStats:
     dw PAL_MAROWAK_ALOLA
 
     ; field moves
-    db FM_CUT+FM_LIGHT+FM_TELEPORT+FM_DIG
+    db FM_CUT+FM_LIGHT+FM_DIG
 
     db 75 ; catch rate
     db 124 ; base exp yield
