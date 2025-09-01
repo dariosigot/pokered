@@ -10459,7 +10459,8 @@ GoPAL_SET: ; 3def (0:3def)
     ld a,[wRunningOnSGB]
     and a
     ret z
-    jp DelayAndProcessSGBPacket
+    call DelayAndProcessSGBPacket
+    ret ; (only for Debug)
 
 SECTION "GetHealthBarColor",ROM0[$3df9]
 
@@ -62227,11 +62228,14 @@ HackRemoveCancelFromBattle: ; Eliminato "CANCEL" da Party in Battle
 
 ClearScreenAreaAndGoPalSet: ; Reset Battle Standard Palette after red ball
     call ClearScreenArea
-    ld hl,wFlagBackSpritePlayerBit4 ; Force GetEnemyBattleHealthBarColor only after red ball / player back sprite show
+    ld hl,wFlagBackSpritePlayerBit4 ; Force GoPAL_SET only after red ball / player back sprite show
     bit 4,[hl]
     ret z
-    ld e,30
-    jp GetEnemyBattleHealthBarColor
+    ld hl,$cf1e
+    ld e,$30
+    call GetHealthBarColorWithGhostCheck
+    ld b,$1
+    jp GoPAL_SET
 
 PrintEXPBar: ; Denim,ExpBar
     call CalcEXPBarPixelLength
