@@ -62218,6 +62218,7 @@ ClearScreenAreaAndGoPalSet: ; Reset Battle Standard Palette after red ball
     ld hl,wFlagBackSpritePlayerBit4 ; Force GetEnemyBattleHealthBarColor only after red ball / player back sprite show
     bit 4,[hl]
     ret z
+    ld e,30
     jp GetEnemyBattleHealthBarColor
 
 PrintEXPBar: ; Denim,ExpBar
