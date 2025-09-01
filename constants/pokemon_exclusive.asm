@@ -1165,6 +1165,10 @@ MarowakExclusiveMove:
     db ROCK_THROW
     db HARDEN
     db RAGE ; TM20
+    db TOXIC ; TM06
+    db TELEPORT ; TM30
+    db PSYWAVE ; TM46
+    db FLASH ; TM55
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HitmonleeExclusiveMove:

@@ -39,6 +39,7 @@ VENUSAUR_Learnset: MACRO
     db 44,SLUDGE
     db 47,SLEEP_POWDER
     db 52,SOLARBEAM
+    db 54,SWORDS_DANCE
     db 57,EARTHQUAKE
     db 60,TOXIC
 ENDM
@@ -98,6 +99,7 @@ CHARIZARD_Learnset: MACRO
     db 48,BODY_SLAM
     db 51,LIGHT_SCREEN
     db 53,FIRE_BLAST
+    db 55,SKY_ATTACK
     db 57,SWORDS_DANCE
     db 60,EARTHQUAKE
 ENDM
@@ -157,6 +159,7 @@ BLASTOISE_Learnset: MACRO
     db 46,BODY_SLAM
     db 49,DIZZY_PUNCH
     db 51,HYDRO_PUMP
+    db 54,ICE_PUNCH
     db 56,CRABHAMMER
     db 59,EARTHQUAKE
 ENDM
@@ -195,6 +198,7 @@ ENDM
 BUTTERFREE_Learnset: MACRO
     METAPOD_Learnset
     db 10,CONFUSION
+    db 11,TELEPORT
     db 12,DISABLE
     db 13,POISONPOWDER
     db 14,STUN_SPORE
@@ -240,18 +244,19 @@ ENDM
 BEEDRILL_Learnset: MACRO
     KAKUNA_Learnset
     db 10,TWINEEDLE
-    db 12,LEER
+    db 11,LEER
+    db 12,RAGE
     db 13,BLADE
-    db 14,RAGE
-    db 15,FOCUS_ENERGY
-    db 18,FURY_ATTACK
+    db 14,FOCUS_ENERGY
+    db 15,FURY_ATTACK
+    db 18,POISONPOWDER
     db 21,LEECH_LIFE
     db 23,SONICBOOM
     db 24,ACID
     db 26,GUST
     db 27,DOUBLE_TEAM
     db 30,PIN_MISSILE
-    db 32,POISONPOWDER
+    db 32,WHIRLWIND
     db 34,AGILITY
     db 37,SLAM
     db 39,RAZOR_WIND
@@ -664,6 +669,7 @@ CLEFAIRY_Learnset: MACRO
     db 24,MINIMIZE
     db 26,BIDE
     db 28,METRONOME
+    db 30,TELEPORT
     db 32,REST
     db 37,BODY_SLAM
     db 42,SOFTBOILED
@@ -676,6 +682,7 @@ CLEFABLE_Learnset: MACRO
     db  1,GROWL
     db  1,SWIFT
     db  8,DISABLE
+    db 10,TELEPORT
     db 12,SING
     db 15,DOUBLESLAP
     db 17,BIDE
@@ -728,6 +735,7 @@ NINETALES_Learnset: MACRO
     db 36,SKULL_BASH
     db 38,TRAPHOLE
     db 40,AGILITY
+    db 40,FIRE_PUNCH
     db 43,FIRE_SPIN
     db 45,SLASH
     db 48,LOVELY_KISS
@@ -748,6 +756,7 @@ JIGGLYPUFF_Learnset: MACRO
     db 24,MINIMIZE
     db 26,BIDE
     db 28,REST
+    db 30,TELEPORT
     db 32,METRONOME
     db 37,BODY_SLAM
     db 42,SOFTBOILED
@@ -760,6 +769,7 @@ WIGGLYTUFF_Learnset: MACRO
     db  1,SING
     db  1,SWIFT
     db  8,GROWL
+    db 10,TELEPORT
     db 12,DISABLE
     db 15,DOUBLESLAP
     db 17,BIDE
@@ -930,7 +940,8 @@ ENDM
 VENONAT_Learnset: MACRO
     db  1,TACKLE
     db  1,DISABLE
-    db  5,SUPERSONIC
+    db  4,SUPERSONIC
+    db  5,TELEPORT
     db  8,PSYWAVE
     db 11,POISONPOWDER
     db 13,CONFUSION
@@ -1051,6 +1062,7 @@ PSYDUCK_Learnset: MACRO
     db  7,PSYWAVE
     db 10,DISABLE
     db 13,CONFUSION
+    db 15,TELEPORT
     db 17,PECK
     db 19,AMNESIA
     db 21,FURY_SWIPES
@@ -1164,6 +1176,7 @@ ARCANINE_Learnset: MACRO
     db 36,SKULL_BASH
     db 38,BODY_SLAM
     db 40,QUICK_ATTACK
+    db 40,FIRE_PUNCH
     db 43,FIRE_SPIN
     db 45,SUPER_FANG
     db 48,THRASH
@@ -1507,6 +1520,7 @@ RAPIDASH_Learnset: MACRO
     PONYTA_Learnset
     db 40,HORN_ATTACK
     db 40,FURY_ATTACK
+    db 40,FIRE_PUNCH
     db 42,RAGE
     db 42,THRASH
     db 44,HORN_DRILL
@@ -1532,6 +1546,7 @@ SLOWPOKE_Learnset: MACRO
     db 12,CONFUSION
     db 14,DISABLE
     db 16,WATER_GUN
+    db 17,TELEPORT
     db 18,BIDE
     db 20,MEDITATE
     db 22,KINESIS
@@ -1687,6 +1702,7 @@ SEEL_Learnset: MACRO
     db 28,DEFENSE_CURL
     db 29,AMNESIA
     db 30,REST
+    db 31,ICE_PUNCH
     db 33,MIST
     ;  34,DEWGONG
 ENDM
@@ -1821,6 +1837,7 @@ GASTLY_Learnset: MACRO
     db 21,SMOG
     db 23,HYPNOSIS
     db 24,DREAM_EATER
+    db 25,TELEPORT
     ;  25,HAUNTER
 ENDM
 HAUNTER_GENGAR_Learnset: MACRO
@@ -2155,6 +2172,7 @@ MAROWAK_Alola_Learnset: MACRO
     db 28,EMBER
     db 28,FLASH
     db 28,CONFUSE_RAY
+    db 28,TELEPORT
     db 28,NIGHT_SHADE
     db 32,FIRE_PUNCH
     db 35,HAZE
@@ -2547,6 +2565,7 @@ STARYU_Learnset: MACRO
     db 16,MINIMIZE
     db 19,CONFUSION
     db 21,CONVERSION
+    db 22,TELEPORT
     db 23,RECOVER
     db 25,FLASH
     db 27,SUPERSONIC ; Exclusive
@@ -2568,6 +2587,7 @@ STARMIE_Learnset: MACRO
     db  1,PSYWAVE
     db  7,AGILITY
     db 10,WATER_GUN
+    db 11,TELEPORT
     db 12,MINIMIZE
     db 14,CONFUSION
     db 16,CONVERSION
@@ -2598,10 +2618,11 @@ MR_MIME_Learnset: MACRO
     db  1,POUND
     db  1,BARRIER
     db  6,PSYWAVE
-    db 10,SUBSTITUTE
+    db  9,SUBSTITUTE
+    db 11,TELEPORT
     db 13,CONFUSION
     db 15,DOUBLESLAP
-    db 17,TELEPORT
+    db 17,KINESIS
     db 19,DISABLE
     db 21,MEDITATE
     db 23,MIMIC
@@ -2658,6 +2679,7 @@ JYNX_Learnset: MACRO
     db  8,DOUBLESLAP
     db 10,PSYWAVE
     db 12,AURORA_BEAM
+    db 13,TELEPORT
     db 14,CONFUSION
     db 16,BARRIER
     db 18,MIST
@@ -2689,6 +2711,7 @@ ELECTABUZZ_Learnset: MACRO
     db  8,THUNDERSHOCK
     db 10,QUICK_ATTACK
     db 12,THUNDER_WAVE
+    db 13,COMET_PUNCH
     db 14,LOW_KICK
     db 16,LIGHT_SCREEN
     db 18,DOUBLE_TEAM
@@ -2720,6 +2743,7 @@ MAGMAR_Learnset: MACRO
     db  8,EMBER
     db 10,SMOKESCREEN
     db 12,PECK
+    db 13,RAGE
     db 14,ACID
     db 16,POISON_GAS
     db 18,REFLECT
@@ -3319,8 +3343,11 @@ DRAGONITE_Learnset: MACRO
     DRAGONAIR_Learnset
     db 55,SWOOP
     db 56,HYDRO_PUMP
+    db 57,THUNDERPUNCH
     db 57,THUNDER_M
+    db 58,ICE_PUNCH
     db 58,BLIZZARD
+    db 59,FIRE_PUNCH
     db 59,FIRE_BLAST
     db 60,HORN_DRILL
     db 60,SKY_ATTACK
