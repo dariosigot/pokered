@@ -31078,7 +31078,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db ICE_BEAM     ; TM_13
     db BLIZZARD     ; TM_14
     db HYPER_BEAM   ; TM_15 ; Game Corner
-    db PAY_DAY      ; TM_16
+    db PAY_DAY      ; TM_16 ; Game Corner
     db SUBMISSION   ; TM_17 ; Market
     db COUNTER      ; TM_18
     db SEISMIC_TOSS ; TM_19
@@ -81135,7 +81135,7 @@ Route9Object: ; 0x546a8 (size=86)
     db SPRITE_BUG_CATCHER,$2 + 4,$16 + 4,$ff,$d0,$47,BUG_CATCHER,$c ; trainer
     db SPRITE_HIKER,$f + 4,$2d + 4,$ff,$d3,$48,HIKER,$5 ; trainer
     db SPRITE_BUG_CATCHER,$8 + 4,$28 + 4,$ff,$d3,$49,BUG_CATCHER,$d ; trainer
-    db SPRITE_BALL,$f + 4,$a + 4,$ff,$ff,$8a,TM_30 ; item
+    db SPRITE_BALL,$f + 4,$a + 4,$ff,$ff,$8a,GREAT_BALL ; item
 
 Route9Blocks: ; 546fe (15:46fe)
     INCBIN "maps/route9.blk"
