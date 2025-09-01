@@ -54037,7 +54037,7 @@ ReplaceFaintedEnemyMon: ; 3c664 (f:4664)
     ret z
     call LoadScreenTilesFromBuffer1
 .asm_3c687
-    call EnemySendOut
+    call EnemySendOutAfterDelay
     xor a
     ld [W_ENEMYMOVENUM],a ; $cfcc
     ld [$cd6a],a
@@ -62731,6 +62731,11 @@ StartBattleAlarm:
     ret nz
     set 7,[hl]
     ret
+
+EnemySendOutAfterDelay:
+    ld c,30
+    call DelayFrames
+    jp EnemySendOut
 
 SECTION "bank10",ROMX,BANK[$10]
 
