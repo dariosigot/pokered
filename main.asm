@@ -55061,6 +55061,7 @@ DrawEnemyHUDAndHPBar:
     ld a,$6
     ld d,a
     ld c,a
+    ; fall through
 
 Func_3ce7f: ; 3ce7f (f:4e7f)
     xor a
@@ -55071,6 +55072,9 @@ Func_3ce7f: ; 3ce7f (f:4e7f)
     call nc,DrawHPBar
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
+    ; fall through
+
+GetEnemyBattleHealthBarColor:
     ld hl,$cf1e
     ; fall through
 
@@ -62211,11 +62215,10 @@ HackRemoveCancelFromBattle: ; Eliminato "CANCEL" da Party in Battle
 
 ClearScreenAreaAndGoPalSet: ; Reset Battle Standard Palette after red ball
     call ClearScreenArea
-    ld hl,wFlagBackSpritePlayerBit4 ; Force GoPal_SET only after red ball / player back sprite show
+    ld hl,wFlagBackSpritePlayerBit4 ; Force GetEnemyBattleHealthBarColor only after red ball / player back sprite show
     bit 4,[hl]
     ret z
-    ld b,1
-    jp GoPAL_SET
+    jp GetEnemyBattleHealthBarColor
 
 PrintEXPBar: ; Denim,ExpBar
     call CalcEXPBarPixelLength
