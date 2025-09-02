@@ -1200,7 +1200,7 @@ wDVForShinyAtkDef ; d47f
 wDVForShinySpdSpc ; d480
     db
 
-UNION
+UNION ; 8 Bytes
 
 wTmpMonLearnset: ; d481
     ds 7
@@ -1227,6 +1227,18 @@ wBackupTypes: ; d481
 
 wBackupAIMoveChoice: ; d485
     ds 4
+
+NEXTU
+
+wTmpAttackerTypes: ; d481
+    ds 4
+wTmpDefenderTypes: ; d485
+    ds 4
+
+NEXTU
+
+wTmpDmgMultiplier: ; d481
+    ds 2
 
 ENDU
 
@@ -1655,20 +1667,6 @@ ds 1 ; $d728
 
 wPalletPikachuIV_AtkDef:: db ; $d729
 wPalletPikachuIV_SpdSpc:: db ; $d72a
-
-UNION ; 8 Bytes
-
-wTmpAttackerTypes:
-    ds 4
-wTmpDefenderTypes:
-    ds 4
-
-NEXTU
-
-wTmpDmgMultiplier:
-    ds 2
-
-ENDU
 
 SECTION "W_FLAGS_D733",WRAMX[$d733],BANK[$1]
 
