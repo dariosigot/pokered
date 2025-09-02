@@ -36,9 +36,9 @@
     db TACKLE       , NO_ADDITIONAL_EFFECT       ,  35 , NORMAL   , 255 , 05 ; pp 35 ; 0 ; Acr 242 -> 255 ; Ene 06 -> 05
     db BODY_SLAM    , PARALYZE_SIDE_EFFECT1      ,  85 , RUBBER   , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Rubber
     db WRAP         , TRAPPING_EFFECT            ,  10 , NORMAL   , 204 , 12 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Ene 10 -> 12 ; Acr 216 -> 204
-    db TAKE_DOWN    , RECOIL_EFFECT              ,  90 , NORMAL   , 216 , 10 ; pp 20 ; 0
+    db TAKE_DOWN    , RECOIL_EFFECT              , 100 , NORMAL   , 216 , 10 ; pp 20 ; 0 ; Pwr 90 -> 100
     db THRASH       , THRASH_PETAL_DANCE_EFFECT  , 120 , NORMAL   , 255 , 15 ; pp 15 ; 0 ; Pwr 90 -> 120 ; PP 20 -> 15 ; Ene 14 -> 15
-    db DOUBLE_EDGE  , RECOIL_EFFECT              , 120 , NORMAL   , 255 , 14 ; pp 15 ; 0 ; Pwr 100 -> 120
+    db DOUBLE_EDGE  , RECOIL_EFFECT              , 130 , NORMAL   , 255 , 14 ; pp 15 ; 0 ; Pwr 100 -> 130
     db TAIL_WHIP    , DEFENSE_DOWN1_EFFECT       ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
     db POISON_STING , POISON_SIDE_EFFECT1        ,  15 , POISON   , 255 , 04 ; pp 35 ; 0 ; Ene 06 -> 04
     db TWINEEDLE    , TWINEEDLE_EFFECT           ,  30 , BUG      , 255 , 10 ; pp 20 ; 0 ; Pwr 25 -> 30
@@ -66,7 +66,7 @@
     db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , ASTRAL   , 229 , 40 ; pp  5 ; ? ; Type Normal -> Astral ; Phi/Spc Split depends by Mon
     db PECK         , NO_ADDITIONAL_EFFECT       ,  45 , IVORY    , 255 , 07 ; pp 35 ; 0 ; Type Wind -> Ivory ; Pwr 35 -> 45 ; Ene 06 -> 07
     db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  85 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
-    db SUBMISSION   , RECOIL_EFFECT              ,  95 , FIGHT    , 204 , 10 ; pp 20 ; 0 ; Pwr 80 -> 95 ; PP 25 -> 20
+    db SUBMISSION   , RECOIL_EFFECT              , 105 , FIGHT    , 204 , 10 ; pp 20 ; 0 ; Pwr 80 -> 105 ; PP 25 -> 20
     db LOW_KICK     , FLINCH_SIDE_EFFECT2        ,  50 , FIGHT    , 255 , 10 ; pp 20 ; 0 ; Acr 229 -> 255
     db COUNTER      , NO_ADDITIONAL_EFFECT       ,   1 , FIGHT    , 255 , 10 ; pp 20 ; -
     db SEISMIC_TOSS , SPECIAL_DAMAGE_EFFECT      ,   1 , FIGHT    , 255 , 10 ; pp 20 ; -

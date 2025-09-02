@@ -31317,9 +31317,7 @@ TryDoWildEncounter:
     xor a
     ret
 
-SECTION "RecoilEffect_",ROMX[$792c],BANK[$4]
-
-RecoilEffect_: ; 1392c (4:792c)
+RecoilEffect_:
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVENUM] ; $cfd2
@@ -31333,13 +31331,15 @@ RecoilEffect_: ; 1392c (4:792c)
     ld b,a
     ld a,[$d0d8]
     ld c,a
-    srl b
-    rr c
+    srl b ; 1/2
+    rr c  ; ...
     ld a,d
     cp STRUGGLE
     jr z,.asm_13953
-    srl b
-    rr c
+    srl b ; 1/4
+    rr c  ; ...
+    srl b ; 1/8
+    rr c  ; ...
 .asm_13953
     ld a,b
     or c
