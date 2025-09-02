@@ -664,6 +664,7 @@ CLEFAIRY_Learnset: MACRO
     db 10,DISABLE
     db 13,SING
     db 16,DOUBLESLAP
+    db 18,SUPERSONIC
     db 20,SWIFT
     db 22,SLAM
     db 24,MINIMIZE
@@ -671,6 +672,7 @@ CLEFAIRY_Learnset: MACRO
     db 28,METRONOME
     db 30,TELEPORT
     db 32,REST
+    db 34,SONICBOOM
     db 37,BODY_SLAM
     db 42,SOFTBOILED
     db 47,LIGHT_SCREEN
@@ -685,16 +687,19 @@ CLEFABLE_Learnset: MACRO
     db 10,TELEPORT
     db 12,SING
     db 15,DOUBLESLAP
+    db 16,SUPERSONIC
     db 17,BIDE
     db 19,SLAM
     db 21,DEFENSE_CURL
     db 23,MINIMIZE
+    db 25,SONICBOOM
     db 27,METRONOME
     db 29,COUNTER
     db 31,REST
     db 34,BODY_SLAM
     db 39,SOFTBOILED
     db 44,LIGHT_SCREEN
+    db 46,ROAR
     db 48,REFLECT
     db 51,DOUBLE_EDGE
     db 56,LOVELY_KISS
@@ -751,6 +756,7 @@ JIGGLYPUFF_Learnset: MACRO
     db 10,GROWL
     db 13,DISABLE
     db 16,DOUBLESLAP
+    db 18,SONICBOOM
     db 20,SWIFT
     db 22,SLAM
     db 24,MINIMIZE
@@ -758,6 +764,7 @@ JIGGLYPUFF_Learnset: MACRO
     db 28,REST
     db 30,TELEPORT
     db 32,METRONOME
+    db 34,SUPERSONIC
     db 37,BODY_SLAM
     db 42,SOFTBOILED
     db 47,REFLECT
@@ -772,16 +779,19 @@ WIGGLYTUFF_Learnset: MACRO
     db 10,TELEPORT
     db 12,DISABLE
     db 15,DOUBLESLAP
+    db 16,SONICBOOM
     db 17,BIDE
     db 19,SLAM
     db 21,DEFENSE_CURL
     db 23,MINIMIZE
+    db 25,SUPERSONIC
     db 27,REST
     db 29,COUNTER
     db 31,METRONOME
     db 34,BODY_SLAM
     db 39,SOFTBOILED
     db 44,REFLECT
+    db 46,ROAR
     db 48,LIGHT_SCREEN
     db 51,DOUBLE_EDGE
     db 56,LOVELY_KISS
