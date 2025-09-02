@@ -156,7 +156,7 @@ PidgeotTMCompatibility:
 ; ──────────────────────────────────────────────────────────────────────
 RattataTMCompatibility:
     tmlearn 0
-    tmlearn 0
+    tmlearn 09,10                   ; |TAKE_DOWN|DOUBLE_EDGE|
     tmlearn 0
     tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
@@ -435,7 +435,7 @@ DugtrioTMCompatibility:
 ; ──────────────────────────────────────────────────────────────────────
 MeowthTMCompatibility:
     tmlearn 0
-    tmlearn 11,12,16                ; |BUBBLEBEAM|WATER_GUN|PAY_DAY|
+    tmlearn 09,10,11,12,16          ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|PAY_DAY|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|

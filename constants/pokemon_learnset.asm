@@ -347,6 +347,7 @@ RATICATE_Learnset: MACRO
     db 27,REST
     db 30,THRASH
     db 32,DOUBLE_TEAM
+    db 34,TAKE_DOWN
     db 37,SLASH
     db 40,AGILITY
     db 42,SUPER_FANG
@@ -363,6 +364,7 @@ RATTATA_NoEvo_Learnset: MACRO
     db 35,THRASH
     db 39,DOUBLE_TEAM
     db 44,SLASH
+    db 47,TAKE_DOWN
     db 49,SUPER_FANG
     db 54,DOUBLE_EDGE
 ENDM
@@ -1053,13 +1055,15 @@ PERSIAN_Learnset: MACRO
     db 46,BODY_SLAM
     db 50,LOVELY_KISS
     db 55,DOUBLE_EDGE
+    db 58,SUPER_FANG
     db 60,HYPER_BEAM
 ENDM
 MEOWTH_NoEvo_Learnset: MACRO
     db 29,HYPER_FANG
     db 34,REST
     db 39,SLASH
-    db 43,AGILITY
+    db 41,AGILITY
+    db 43,TAKE_DOWN
     db 45,KINESIS ; Exclusive*
     db 48,DOUBLE_TEAM
     db 52,LOVELY_KISS
