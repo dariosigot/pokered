@@ -22372,7 +22372,7 @@ MapHS:
     db CELADON_CITY,$09,Show ; $EB -> $CA
     db DIGLETTS_CAVE,$01,Show ; $EC -> $CB
     db MANSION_2,$05,Show ; $CC
-    db $FE,$01,Show ; $CD
+    db POWER_PLANT,$0F,Show ; $CD
     db UNKNOWN_DUNGEON_2,$01,Show
     db UNKNOWN_DUNGEON_2,$02,Show
     db UNKNOWN_DUNGEON_2,$03,Show
@@ -41250,12 +41250,7 @@ PowerPlantScript: ; 1e2c6 (7:62c6)
     ld [W_POWERPLANTCURSCRIPT],a
     ret
 
-PowerPlantScriptPointers: ; 1e2d9 (7:62d9)
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
-
-PowerPlantTextPointers: ; 1e2df (7:62df)
+PowerPlantTextPointers:
     dw PowerPlantText1
     dw PowerPlantText2
     dw PowerPlantText3
@@ -41270,6 +41265,9 @@ PowerPlantTextPointers: ; 1e2df (7:62df)
     dw PickupItemText
     dw PickupItemText
     dw PickupItemText
+    dw PickupItemText
+
+SECTION "PowerPlantTrainerHeaders",ROMX[$62fb],BANK[$7]
 
 PowerPlantTrainerHeaders: ; 1e2fb (7:62fb)
 PowerPlantTrainerHeader0: ; 1e2fb (7:62fb)
@@ -41410,15 +41408,7 @@ VoltorbBattleText: ; 1e3aa (7:63aa)
     TX_FAR _VoltorbBattleText ; 0x8c5e2
     db "@"
 
-ZapdosBattleText: ; 1e3af (7:63af)
-    TX_FAR _ZapdosBattleText ; 0x8c5ea
-    db $8
-    ld a,ZAPDOS
-    call PlayCry
-    call WaitForSoundToFinish
-    jp TextScriptEnd
-
-PowerPlantObject: ; 0x1e3bf (size=135)
+PowerPlantObject:
     db $2e ; border tile
 
     db $3 ; warps
@@ -41428,7 +41418,7 @@ PowerPlantObject: ; 0x1e3bf (size=135)
 
     db $0 ; signs
 
-    db $e ; people
+    db 15 ; people
     db SPRITE_BALL,$14 + 4,$9 + 4,$ff,$ff,$41,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
     db SPRITE_BALL,$12 + 4,$20 + 4,$ff,$ff,$42,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
     db SPRITE_BALL,$19 + 4,$15 + 4,$ff,$ff,$43,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
@@ -41443,11 +41433,14 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
     db SPRITE_BALL,$20 + 4,$1a + 4,$ff,$ff,$8d,TM_25 ; item
     db SPRITE_BALL,$20 + 4,$14 + 4,$ff,$ff,$8e,TM_55 ; item ; FLASH
+    db SPRITE_BALL,34 + 4,09 + 4,$ff,$ff,$8f,TM_59 ; item
 
     ; warp-to
     EVENT_DISP $14,$23,$4
     EVENT_DISP $14,$23,$5
     EVENT_DISP $14,$b,$0
+
+SECTION "PowerPlantBlocks",ROMX[$6446],BANK[$7]
 
 PowerPlantBlocks: ; 1e446 (7:6446)
     INCBIN "maps/powerplant.blk"
@@ -42194,6 +42187,19 @@ CinnabarGymQuizCorrectText: ; 1eae3 (7:6ae3)
 CinnabarGymQuizIncorrectText: ; 1eb05 (7:6b05)
     TX_FAR _CinnabarGymQuizIncorrectText
     db "@"
+
+ZapdosBattleText:
+    TX_FAR _ZapdosBattleText ; 0x8c5ea
+    db $8
+    ld a,ZAPDOS
+    call PlayCry
+    call WaitForSoundToFinish
+    jp TextScriptEnd
+
+PowerPlantScriptPointers:
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
 
 ; Free
 
