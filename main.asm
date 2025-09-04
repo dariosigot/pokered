@@ -22371,7 +22371,7 @@ MapHS:
     db CELADON_CITY,$08,Show ; $EA -> $C9
     db CELADON_CITY,$09,Show ; $EB -> $CA
     db DIGLETTS_CAVE,$01,Show ; $EC -> $CB
-    db $FE,$01,Show ; $CC
+    db MANSION_2,$05,Show ; $CC
     db $FE,$01,Show ; $CD
     db UNKNOWN_DUNGEON_2,$01,Show
     db UNKNOWN_DUNGEON_2,$02,Show
@@ -70650,7 +70650,7 @@ BillsHouseHiddenObjects:
     db $FF
 Mansion2HiddenObjects:
     db $0b,$02,$04 ; XXX,y,x
-    dbw $14,$6037
+    dbw BANK(Func_52037),Func_52037
     db 07,28,FIRE_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
@@ -78999,7 +78999,7 @@ Func_52037: ; 52037 (14:6037)
     ret nz
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,$5
+    ld a,6
     ld [H_SPRITEHEIGHT],a
     jp DisplayTextID
 
@@ -79010,10 +79010,10 @@ Mansion2ScriptPointers: ; 52047 (14:6047)
 
 Mansion2TextPointers: ; 5204d (14:604d)
     dw Mansion2Text1
-    ;dw PickupItemText
     dw Mansion2TextMoltres
     dw Mansion2Text3
     dw Mansion2Text4
+    dw PickupItemText
     dw Mansion2Text5
 
 SECTION "Mansion2Text1",ROMX[$6064],BANK[$14]
@@ -79084,12 +79084,12 @@ Mansion2Object:
 
     db $0 ; signs
 
-    db $4 ; people
+    db $5 ; people
     db SPRITE_BLACK_HAIR_BOY_2,$11 + 4,$3 + 4,$fe,$2,$41,BURGLAR,$4 ; trainer
-    ;db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
     db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$42,MOLTRES,OPP_LVL_OFFSET+55 ; Entry Point
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
+    db SPRITE_BALL,25 + 4,13 + 4,$ff,$ff,$85,TM_57 ; item
 
     ; warp-to
     EVENT_DISP $f,$a,$5 ; MANSION_1
