@@ -1203,7 +1203,7 @@ wDVForShinySpdSpc ; d480
 UNION ; 8 Bytes
 
 wTmpMonLearnset: ; d481
-    ds 7
+    ds 8
 
 NEXTU
 
@@ -1302,9 +1302,9 @@ wBoxItems: ; d53b
     ds 1 ; end
 
 wTM: ; d58c
-    ds 20
+    ds 16 ; TM_01 ► TM_64 (1 Byte every 4 Moves)
 
-    ds 4
+    ds 8
 
 ; coins are in decimal
 wPlayerCoins: ; d5a4

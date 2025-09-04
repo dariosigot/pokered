@@ -26289,7 +26289,7 @@ ItemUseTechMach:
 GetTMChoiceItemID:
     cp TM_01 ; less then TM01?
     jr c,.Init
-    cp TM_56+1 ; greater then TM56?
+    cp TM_64+1 ; greater then TM_64?
     jr nc,.Init
     call GetTMQty
     jr z,.Init
@@ -26299,7 +26299,7 @@ GetTMChoiceItemID:
     jr .start
 .Init
     ld hl,wTM
-    ld b,((TM_56-TM_01+1) >> 2)+1
+    ld b,((TM_64-TM_01+1) >> 2)+1
 .LoopSearchAtLeastOne
     ld a,[hli]
     and a
@@ -26313,7 +26313,7 @@ GetTMChoiceItemID:
     ld a,TM_01-1
 .TryNext
     inc a
-    cp TM_56+1
+    cp TM_64+1
     jr nz,.continue1
     ld a,TM_01
 .continue1
@@ -26324,7 +26324,7 @@ GetTMChoiceItemID:
     dec a
     cp TM_01-1
     jr nz,.continue2
-    ld a,TM_56
+    ld a,TM_64
 .continue2
     call GetTMQty ; input a = TM ID | output c = Qty | z if Qty=0
     jr z,.TryPrev
@@ -31119,7 +31119,15 @@ TechnicalMachines: ; 13773 (4:7773)
     db TSUNAMI      ; TM_53
     db STRIKE       ; TM_54
     db FLASH        ; TM_55
-    db STRUGGLE     ; TM_56
+    db STRUGGLE     ; TM_56 ; ~TODO
+    db FIRE_PUNCH   ; TM_57
+    db ICE_PUNCH    ; TM_58
+    db THUNDERPUNCH ; TM_59
+    db STRUGGLE     ; TM_60
+    db STRUGGLE     ; TM_61
+    db STRUGGLE     ; TM_62
+    db STRUGGLE     ; TM_63
+    db STRUGGLE     ; TM_64
 
 EndOfBattle:
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -31932,7 +31940,7 @@ TestMonMoveCompatibility_HandleAlternative:
     ld h,[hl]
     ld l,a
     ld de,wTmpMonLearnset
-    ld bc,7
+    ld bc,8
     ld a,BANK(PokemonBaseStats)
     jp FarCopyData ; copy bc bytes of data from a:hl to de
 
@@ -38073,6 +38081,114 @@ OaksLabText26:
     TX_FAR _OaksLabTextTM2
     db "@"
 
+DecreaseFossilStep:
+    ld hl,$d7a3
+    bit 1,[hl]
+    jr z,.Skip
+    ld a,[wFossilSteps]
+    ld b,a
+    ld a,[wFossilSteps+1]
+    ld c,a
+    or b
+    jr nz,.FossilStepNotZero
+    res 1,[hl] ; Fossil Live
+    ld a,$86
+    call PlaySound
+    jr .Skip
+.FossilStepNotZero
+    dec bc
+    ld a,b
+    ld [wFossilSteps],a ; $d70d
+    ld a,c
+    ld [wFossilSteps+1],a ; $d70e
+.Skip
+    call .HandleEnergySteps
+    ld a,[$d790]
+    bit 7,a ; in the safari zone?
+    ret z ; notSafariZone
+    ld a,[wSafariSteps] ; $d70d
+    jp ContinueSafariSteps
+
+.HandleEnergySteps
+    ld a,[wEnergySteps]
+    ld b,a
+    dec a
+    and %00001111
+    push af
+    ld c,a
+    ld a,b
+    and %11110000
+    or c
+    ld [wEnergySteps],a
+    pop af
+    ret nz
+    ; RestorePartyEnergy
+    ld a,[W_NUMINPARTY]
+    and a
+    ret z
+    ld d,a
+    ld e,0
+.loop
+    ld hl,W_PARTYMON1_MOVE1PP
+    ld bc,44
+    ld a,e
+    call AddNTimes ; hl now points to move's PP
+    ld a,[hl] ; Read Energy
+    inc a
+    jr z,.JustMax
+    ld [hl],a
+.JustMax
+    inc e
+    dec d
+    jr nz,.loop
+    ret
+
+; Viridian
+ViridianMartText6:
+    db $FE,4,POKE_BALL
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
+
+; Fuchsia
+FuchsiaMartText1:
+    db $FE,5,ULTRA_BALL,GREAT_BALL
+    db SUPER_POTION
+    db FULL_HEAL
+    db SUPER_REPEL,$FF
+
+BillsHouseObject:
+    db $d ; border tile
+
+    db 3 ; warps
+    db 07,02,0,$ff
+    db 07,03,0,$ff
+    db 06,05,1,SWAP_MAP
+
+    db $0 ; signs
+
+    db $3 ; people
+    db SPRITE_KABUTO,$5 + 4,$6 + 4,$ff,$ff,$1 ; person
+    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$4 + 4,$ff,$ff,$2 ; person
+    db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$6 + 4,$ff,$ff,$3 ; person
+
+    ; warp-to
+    EVENT_DISP BILLS_HOUSE_WIDTH,07,02
+    EVENT_DISP BILLS_HOUSE_WIDTH,07,03
+    EVENT_DISP BILLS_HOUSE_WIDTH,06,05
+
+AddStarterToParty:
+    ld a,1
+    ld [wTempAlternateFormIndex],a
+    jp AddPokemonToParty
+
+PrintMagazinesText:
+    call EnableAutoTextBoxDrawing
+    ld a,$30
+    jp Func_3ef5
+
+UnnamedText_1eb69:
+    TX_FAR _UnnamedText_1eb69
+    db "@"
+
 ; Free
 
 SECTION "Func_1c98a",ROMX[$498a],BANK[$7]
@@ -43927,6 +44043,9 @@ HandleExclusiveLearnMove:
     call .SearchSetBit
     ld hl,wTempExclusiveByte03
     ld c,4      ; Byte 4
+    call .SearchSetBit
+    ld hl,$cfb7 ; Ex Move 3 PP
+    ld c,5      ; Byte 5
     ; fall through
 
 .SearchSetBit
@@ -44219,6 +44338,8 @@ TryToAddExclusiveMove:
     ld a,c
     cp 8*2 ; check if the move is in the first 2 bytes
     jr c,.notInOTName
+    cp 8*5 ; check if the move is in the first 4 bytes
+    jr nc,.notInOTName
     ld hl,GenericBuffer+1
     ld a,[hli]
     ld d,[hl]
@@ -44258,6 +44379,7 @@ TryToAddExclusiveMove:
     db 0
     db 1
     db 2
+    db W_PARTYMON1_MOVE3PP-W_PARTYMON1_NUM
 
 ExclusiveMoveLearnTable:
     dw MissingNoExclusiveMove  ; 000 - MISSINGNO
@@ -44534,114 +44656,6 @@ GiveVoltorb:
 
 VoltorbText:
     TX_FAR _VoltorbText
-    db "@"
-
-DecreaseFossilStep:
-    ld hl,$d7a3
-    bit 1,[hl]
-    jr z,.Skip
-    ld a,[wFossilSteps]
-    ld b,a
-    ld a,[wFossilSteps+1]
-    ld c,a
-    or b
-    jr nz,.FossilStepNotZero
-    res 1,[hl] ; Fossil Live
-    ld a,$86
-    call PlaySound
-    jr .Skip
-.FossilStepNotZero
-    dec bc
-    ld a,b
-    ld [wFossilSteps],a ; $d70d
-    ld a,c
-    ld [wFossilSteps+1],a ; $d70e
-.Skip
-    call .HandleEnergySteps
-    ld a,[$d790]
-    bit 7,a ; in the safari zone?
-    ret z ; notSafariZone
-    ld a,[wSafariSteps] ; $d70d
-    jp ContinueSafariSteps
-
-.HandleEnergySteps
-    ld a,[wEnergySteps]
-    ld b,a
-    dec a
-    and %00001111
-    push af
-    ld c,a
-    ld a,b
-    and %11110000
-    or c
-    ld [wEnergySteps],a
-    pop af
-    ret nz
-    ; RestorePartyEnergy
-    ld a,[W_NUMINPARTY]
-    and a
-    ret z
-    ld d,a
-    ld e,0
-.loop
-    ld hl,W_PARTYMON1_MOVE1PP
-    ld bc,44
-    ld a,e
-    call AddNTimes ; hl now points to move's PP
-    ld a,[hl] ; Read Energy
-    inc a
-    jr z,.JustMax
-    ld [hl],a
-.JustMax
-    inc e
-    dec d
-    jr nz,.loop
-    ret
-
-; Viridian
-ViridianMartText6:
-    db $FE,4,POKE_BALL
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
-
-; Fuchsia
-FuchsiaMartText1:
-    db $FE,5,ULTRA_BALL,GREAT_BALL
-    db SUPER_POTION
-    db FULL_HEAL
-    db SUPER_REPEL,$FF
-
-BillsHouseObject:
-    db $d ; border tile
-
-    db 3 ; warps
-    db 07,02,0,$ff
-    db 07,03,0,$ff
-    db 06,05,1,SWAP_MAP
-
-    db $0 ; signs
-
-    db $3 ; people
-    db SPRITE_KABUTO,$5 + 4,$6 + 4,$ff,$ff,$1 ; person
-    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$4 + 4,$ff,$ff,$2 ; person
-    db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$6 + 4,$ff,$ff,$3 ; person
-
-    ; warp-to
-    EVENT_DISP BILLS_HOUSE_WIDTH,07,02
-    EVENT_DISP BILLS_HOUSE_WIDTH,07,03
-    EVENT_DISP BILLS_HOUSE_WIDTH,06,05
-
-AddStarterToParty:
-    ld a,1
-    ld [wTempAlternateFormIndex],a
-    jp AddPokemonToParty
-
-PrintMagazinesText:
-    call EnableAutoTextBoxDrawing
-    ld a,$30
-    jp Func_3ef5
-
-UnnamedText_1eb69:
-    TX_FAR _UnnamedText_1eb69
     db "@"
 
 SECTION "bank8",ROMX,BANK[$8]
@@ -58331,6 +58345,7 @@ HowManyMovesWithEnoughEnergy:
 ; function to adjust the base damage of an attack to account for type effectiveness
 AdjustDamageForMoveType:
     PREDEF AdjustDamageForMoveType_GetInput
+    jr z,.skipSameTypeAttackBonus ; TYPE_NA?
     ld a,[$d11e] ; move type
     ld hl,wTmpAttackerTypes
     ld b,4
@@ -133235,23 +133250,23 @@ _DebugPlayerStats:
     ld de,wTempExclusiveByte03
     ld bc,$0103
     call PrintNumber
+    FuncCoord 00,12
+    ld hl,Coord
+    ld de,$cfb7 ; ex pp 3
+    ld bc,$0103
+    call PrintNumber
     ; Print Ex PP
     FuncCoord 04,09
     ld hl,Coord
-    ld de,$cfb6 ; exp pp 2
+    ld de,$cfb6 ; ex pp 2
     ld bc,$0103
     call PrintNumber
     FuncCoord 04,10
     ld hl,Coord
-    ld de,$cfb7 ; exp pp 3
+    ld de,$cfb8 ; ex pp 4
     ld bc,$0103
     call PrintNumber
-    FuncCoord 04,11
-    ld hl,Coord
-    ld de,$cfb8 ; exp pp 4
-    ld bc,$0103
-    call PrintNumber
-    ret
+    ret ; (only for Debug)
 .PrintIV
     push af
     srl a
@@ -133657,70 +133672,70 @@ ItemNames:
     db "?@"            ; $BC
     db "?@"            ; $BD
     db "?@"            ; $BE
-    db "?@"            ; $BF
-    db "?@"            ; $C0
-    db "?@"            ; $C1
-    db "?@"            ; $C2
-    db "?@"            ; $C3
-    db "?@"            ; $C4
-    db "?@"            ; $C5
-    db "?@"            ; $C6
-    db "TM01:M.PNCH@"  ; $C7 ; TM_01 ; Market
-    db "TM02:RAZ.WND@" ; $C8 ; TM_02 ; Market
-    db "TM03:SW.DNCE@" ; $C9 ; TM_03
-    db "TM04:WHRLWND@" ; $CA ; TM_04 ; Market
-    db "TM05:MEG.KCK@" ; $CB ; TM_05 ; Market
-    db "TM06:TOXIC@"   ; $CC ; TM_06
-    db "TM07:HRN DR.@" ; $CD ; TM_07 ; Market
-    db "TM08:BDY SLM@" ; $CE ; TM_08
-    db "TM09:TAK.DWN@" ; $CF ; TM_09 ; Market
-    db "TM10:DB.EDG@"  ; $D0 ; TM_10 ; Market
-    db "TM11:BUB.B.@"  ; $D1 ; TM_11
-    db "TM12:WTR GUN@" ; $D2 ; TM_12 ; Market
-    db "TM13:ICE BM.@" ; $D3 ; TM_13
-    db "TM14:BLZZARD@" ; $D4 ; TM_14
-    db "TM15:HYPR.B.@" ; $D5 ; TM_15
-    db "TM16:PAY DAY@" ; $D6 ; TM_16
-    db "TM17:SUBMIS.@" ; $D7 ; TM_17 ; Market
-    db "TM18:COUNTER@" ; $D8 ; TM_18
-    db "TM19:SSM TOS@" ; $D9 ; TM_19
-    db "TM20:RAGE@"    ; $DA ; TM_20
-    db "TM21:M.DRAIN@" ; $DB ; TM_21
-    db "TM22:SOLRBM.@" ; $DC ; TM_22
-    db "TM23:DRG RGE@" ; $DD ; TM_23
-    db "TM24:THUNDRB@" ; $DE ; TM_24
-    db "TM25:THUNDER@" ; $DF ; TM_25
-    db "TM26:EARTHQ.@" ; $E0 ; TM_26
-    db "TM27:FISSURE@" ; $E1 ; TM_27
-    db "TM28:DIG@"     ; $E2 ; TM_28
-    db "TM29:PSYCHIC@" ; $E3 ; TM_29
-    db "TM30:TELEPRT@" ; $E4 ; TM_30 ; Market
-    db "TM31:MIMIC@"   ; $E5 ; TM_31
-    db "TM32:DB.TEAM@" ; $E6 ; TM_32 ; Market
-    db "TM33:REFLECT@" ; $E7 ; TM_33 ; Market
-    db "TM34:BIDE@"    ; $E8 ; TM_34
-    db "TM35:METRONM@" ; $E9 ; TM_35
-    db "TM36:SELFDST@" ; $EA ; TM_36
-    db "TM37:FLMTRWR@" ; $EB ; TM_37
-    db "TM38:FIR.BLS@" ; $EC ; TM_38
-    db "TM39:SWIFT@"   ; $ED ; TM_39
-    db "TM40:SKUL B.@" ; $EE ; TM_40
-    db "TM41:LGT SCR@" ; $EF ; TM_41 ; Market
-    db "TM42:DRM EAT@" ; $F0 ; TM_42
-    db "TM43:SKY ATK@" ; $F1 ; TM_43
-    db "TM44:REST@"    ; $F2 ; TM_44
-    db "TM45:THND WV@" ; $F3 ; TM_45
-    db "TM46:PSYWAVE@" ; $F4 ; TM_46
-    db "TM47:EXPLOS.@" ; $F5 ; TM_47
-    db "TM48:RCK SLD@" ; $F6 ; TM_48
-    db "TM49:TRI ATK@" ; $F7 ; TM_49
-    db "TM50:SUBSTIT@" ; $F8 ; TM_50
-    db "TM51:BLADE@"   ; $F9 ; TM_51
-    db "TM52:SWOOP@"   ; $FA ; TM_52
-    db "TM53:TSUNAMI@" ; $FB ; TM_53
-    db "TM54:STRIKE@"  ; $FC ; TM_54
-    db "TM55:FLASH@"   ; $FD ; TM_55
-    db "TM56:STRGGLE@" ; $FE ; TM_56
+    db "TM01:M.PNCH@"  ; $BF ; TM_01 ; Market
+    db "TM02:RAZ.WND@" ; $C0 ; TM_02 ; Market
+    db "TM03:SW.DNCE@" ; $C1 ; TM_03
+    db "TM04:WHRLWND@" ; $C2 ; TM_04 ; Market
+    db "TM05:MEG.KCK@" ; $C3 ; TM_05 ; Market
+    db "TM06:TOXIC@"   ; $C4 ; TM_06
+    db "TM07:HRN DR.@" ; $C5 ; TM_07 ; Market
+    db "TM08:BDY SLM@" ; $C6 ; TM_08
+    db "TM09:TAK.DWN@" ; $C7 ; TM_09 ; Market
+    db "TM10:DB.EDG@"  ; $C8 ; TM_10 ; Market
+    db "TM11:BUB.B.@"  ; $C9 ; TM_11
+    db "TM12:WTR GUN@" ; $CA ; TM_12 ; Market
+    db "TM13:ICE BM.@" ; $CB ; TM_13
+    db "TM14:BLZZARD@" ; $CC ; TM_14
+    db "TM15:HYPR.B.@" ; $CD ; TM_15
+    db "TM16:PAY DAY@" ; $CE ; TM_16
+    db "TM17:SUBMIS.@" ; $CF ; TM_17 ; Market
+    db "TM18:COUNTER@" ; $D0 ; TM_18
+    db "TM19:SSM TOS@" ; $D1 ; TM_19
+    db "TM20:RAGE@"    ; $D2 ; TM_20
+    db "TM21:M.DRAIN@" ; $D3 ; TM_21
+    db "TM22:SOLRBM.@" ; $D4 ; TM_22
+    db "TM23:DRG RGE@" ; $D5 ; TM_23
+    db "TM24:THUNDRB@" ; $D6 ; TM_24
+    db "TM25:THUNDER@" ; $D7 ; TM_25
+    db "TM26:EARTHQ.@" ; $D8 ; TM_26
+    db "TM27:FISSURE@" ; $D9 ; TM_27
+    db "TM28:DIG@"     ; $DA ; TM_28
+    db "TM29:PSYCHIC@" ; $DB ; TM_29
+    db "TM30:TELEPRT@" ; $DC ; TM_30 ; Market
+    db "TM31:MIMIC@"   ; $DD ; TM_31
+    db "TM32:DB.TEAM@" ; $DE ; TM_32 ; Market
+    db "TM33:REFLECT@" ; $DF ; TM_33 ; Market
+    db "TM34:BIDE@"    ; $E0 ; TM_34
+    db "TM35:METRONM@" ; $E1 ; TM_35
+    db "TM36:SELFDST@" ; $E2 ; TM_36
+    db "TM37:FLMTRWR@" ; $E3 ; TM_37
+    db "TM38:FIR.BLS@" ; $E4 ; TM_38
+    db "TM39:SWIFT@"   ; $E5 ; TM_39
+    db "TM40:SKUL B.@" ; $E6 ; TM_40
+    db "TM41:LGT SCR@" ; $E7 ; TM_41 ; Market
+    db "TM42:DRM EAT@" ; $E8 ; TM_42
+    db "TM43:SKY ATK@" ; $E9 ; TM_43
+    db "TM44:REST@"    ; $EA ; TM_44
+    db "TM45:THND WV@" ; $EB ; TM_45
+    db "TM46:PSYWAVE@" ; $EC ; TM_46
+    db "TM47:EXPLOS.@" ; $ED ; TM_47
+    db "TM48:RCK SLD@" ; $EE ; TM_48
+    db "TM49:TRI ATK@" ; $EF ; TM_49
+    db "TM50:SUBSTIT@" ; $F0 ; TM_50
+    db "TM51:BLADE@"   ; $F1 ; TM_51
+    db "TM52:SWOOP@"   ; $F2 ; TM_52
+    db "TM53:TSUNAMI@" ; $F3 ; TM_53
+    db "TM54:STRIKE@"  ; $F4 ; TM_54
+    db "TM55:FLASH@"   ; $F5 ; TM_55
+    db "TM56:STRGGLE@" ; $F9 ; TM_56 ; ~TODO
+    db "TM57:FIR PNC@" ; $F6 ; TM_57
+    db "TM58:ICE PNC@" ; $F7 ; TM_58
+    db "TM59:TND PNC@" ; $F8 ; TM_59
+    db "TM60:STRGGLE@" ; $FA ; TM_60
+    db "TM61:STRGGLE@" ; $FB ; TM_61
+    db "TM62:STRGGLE@" ; $FC ; TM_62
+    db "TM63:STRGGLE@" ; $FD ; TM_63
+    db "TM64:STRGGLE@" ; $FE ; TM_64
     db "CANCEL@"       ; $FF
     db "?@"            ; $00
 
@@ -139287,6 +139302,9 @@ PrintMoveDetailsBox:
 ; ──────────────────────────────────────────────────────────────────────
 
 CheckSTAB:
+    ld a,[W_PLAYERMOVETYPE]
+    and a ; TYPE_NA?
+    jr z,.NoStab
     ld hl,$d11e ; Backup
     ld a,[hl]   ; ...
     push af     ; ...
@@ -139311,6 +139329,7 @@ CheckSTAB:
     inc hl
     dec b
     jr nz,.loop
+.NoStab
     ld a,1 ; reset all flag
     or a   ; ...
     ret
@@ -142539,6 +142558,8 @@ AdjustDamageForMoveType_GetInput:
 .ValuesForPlayerTurn
     ld a,[W_PLAYERMOVETYPE]
     ld [$d11e],a
+    and a ; TYPE_NA?
+    push af
     ld a,[W_PLAYERMONID]
     ld b,a
     ld a,[W_PLAYERMOVENUM]
@@ -142548,11 +142569,15 @@ AdjustDamageForMoveType_GetInput:
     ld a,[W_ENEMYMON_START]
     ld b,a
     ld hl,W_ENEMYMONTYPES
-    jp GetDefenderType
+    call GetDefenderType
+    pop af
+    ret
 
 .ValuesForEnemyTurn
     ld a,[W_ENEMYMOVETYPE]
     ld [$d11e],a
+    and a ; TYPE_NA?
+    push af
     ld a,[W_ENEMYMON_START]
     ld b,a
     ld a,[W_ENEMYMOVENUM]
@@ -142562,7 +142587,9 @@ AdjustDamageForMoveType_GetInput:
     ld a,[W_PLAYERMONID]
     ld b,a
     ld hl,W_PLAYERMONTYPES
-    jp GetDefenderType
+    call GetDefenderType
+    pop af
+    ret
 
 ; Input
 ; [$d11e] = Attacker Move Type
