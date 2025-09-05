@@ -27,6 +27,7 @@ VenusaurExclusiveMove:
     db BARRAGE
     db BIND
     db RAGE ; TM20
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CharmanderExclusiveMove:
@@ -71,6 +72,7 @@ CharizardExclusiveMove:
     db WHIRLWIND ; TM04
     db FIRE_PUNCH ; TM_57
     db THUNDERPUNCH ; TM_59
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SquirtleExclusiveMove:
@@ -137,6 +139,7 @@ ButterfreeExclusiveMove:
     db FLASH ; TM55
     db LEECH_LIFE
     db CONFUSION
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 WeedleExclusiveMove:
@@ -165,6 +168,7 @@ BeedrillExclusiveMove:
     db LEECH_LIFE
     db TWINEEDLE
     db RAGE ; TM20
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PidgeyExclusiveMove:
@@ -213,6 +217,7 @@ RaticateExclusiveMove:
     db THUNDER_WAVE ; TM45
     db SUBSTITUTE ; TM50
     db AGILITY
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SpearowExclusiveMove:
@@ -256,6 +261,7 @@ ArbokExclusiveMove:
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
     db ABSORB
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PikachuExclusiveMove:
@@ -312,6 +318,7 @@ SandslashExclusiveMove:
     db BLADE ; TM51
     db STRIKE ; TM54
     db FIRE_PUNCH ; TM_57
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 NidoranFExclusiveMove:
@@ -360,6 +367,7 @@ NidokingExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ClefairyExclusiveMove:
@@ -454,6 +462,7 @@ GolbatExclusiveMove:
     db SWOOP ; TM52
     db ABSORB
     db LICK
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OddishExclusiveMove:
@@ -482,6 +491,7 @@ VictreebelExclusiveMove:
     db LEECH_LIFE
     db LEECH_SEED
     db RAZOR_LEAF
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ParasExclusiveMove:
@@ -503,6 +513,7 @@ ParasectExclusiveMove:
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VenonatExclusiveMove:
@@ -527,6 +538,7 @@ VenomothExclusiveMove:
     db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
     db FLASH ; TM55
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DiglettExclusiveMove:
@@ -547,6 +559,7 @@ DugtrioExclusiveMove:
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MeowthExclusiveMove:
@@ -711,6 +724,7 @@ PoliwrathExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 AbraExclusiveMove:
@@ -797,6 +811,7 @@ TentacruelExclusiveMove:
     db BLADE ; TM51
     db TSUNAMI ; TM53
     db VINE_WHIP
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GeodudeExclusiveMove:
@@ -1011,6 +1026,7 @@ MukExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ShellderExclusiveMove:
@@ -1060,6 +1076,7 @@ GengarExclusiveMove:
     db SUBSTITUTE ; TM50
     db ABSORB
     db AMNESIA
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OnixExclusiveMove:
@@ -1082,6 +1099,7 @@ OnixExclusiveMove:
     db BLADE ; TM51
     db STRIKE ; TM54
     db RAGE ; TM20
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DrowzeeExclusiveMove:
@@ -1138,6 +1156,7 @@ KinglerExclusiveMove:
     db TSUNAMI ; TM53
     db STRIKE ; TM54
     db RAGE ; TM20
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ExeggcuteExclusiveMove:
@@ -1167,6 +1186,7 @@ ExeggutorExclusiveMove:
     db STUN_SPORE
     db POISONPOWDER
     db SLEEP_POWDER
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CuboneExclusiveMove:
@@ -1210,6 +1230,7 @@ MarowakExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HitmonleeExclusiveMove:
@@ -1301,6 +1322,7 @@ WeezingExclusiveMove:
     db FLASH ; TM55
     db ABSORB
     db MEGA_DRAIN ; TM21
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RhyhornExclusiveMove:
@@ -1399,6 +1421,7 @@ TangelaExclusiveMove:
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KangaskhanExclusiveMove:
@@ -1457,6 +1480,7 @@ SeadraExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db RAGE ; TM20
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GoldeenExclusiveMove:
@@ -1652,6 +1676,7 @@ MagmarExclusiveMove:
     db RAGE ; TM20
     db FIRE_PUNCH ; TM_57
     db THUNDERPUNCH ; TM_59
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PinsirExclusiveMove:
@@ -2076,6 +2101,7 @@ DragoniteExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewtwoExclusiveMove:

@@ -22415,6 +22415,7 @@ MapHS:
     db UNKNOWN_DUNGEON_4,$04,Show ; $F5 (Golem)
     db UNKNOWN_DUNGEON_4,$05,Show ; $F6 (Gengar)
     db SEAFOAM_ISLANDS_3,$03,Show ; $F7
+    db ROUTE_17,$0B,Show ; $F8
     db $FF
 
 ; Free
@@ -30668,7 +30669,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db TSUNAMI      ; TM_53
     db STRIKE       ; TM_54
     db FLASH        ; TM_55
-    db STRUGGLE     ; TM_56 ; ~TODO
+    db SLUDGE       ; TM_56
     db FIRE_PUNCH   ; TM_57
     db ICE_PUNCH    ; TM_58
     db THUNDERPUNCH ; TM_59
@@ -80797,30 +80798,26 @@ Route17_h: ; 0x54b20 to 0x54b42 (34 bytes) (id=28)
     SOUTH_MAP_CONNECTION ROUTE_18,ROUTE_18_WIDTH,0,0,ROUTE_18_WIDTH - 12,Route18Blocks,ROUTE_17_WIDTH,ROUTE_17_HEIGHT
     dw Route17Object ; objects
 
-Route17Object: ; 0x54b42 (size=102)
-    db $43 ; border tile
+Route17TextPointers:
+    dw Route17Text1
+    dw Route17Text2
+    dw Route17Text3
+    dw Route17Text4
+    dw Route17Text5
+    dw Route17Text6
+    dw Route17Text7
+    dw Route17Text8
+    dw Route17Text9
+    dw Route17Text10
+    dw PickupItemText
+    dw Route17Text11
+    dw Route17Text12
+    dw Route17Text13
+    dw Route17Text14
+    dw Route17Text15
+    dw Route17Text16
 
-    db $0 ; warps
-
-    db $6 ; signs
-    db $33,$9,$b ; Route17Text11
-    db $3f,$9,$c ; Route17Text12
-    db $4b,$9,$d ; Route17Text13
-    db $57,$9,$e ; Route17Text14
-    db $6f,$9,$f ; Route17Text15
-    db $8d,$9,$10 ; Route17Text16
-
-    db $a ; people
-    db SPRITE_BIKER,$13 + 4,$c + 4,$ff,$d2,$41,CUE_BALL,$4 ; trainer
-    db SPRITE_BIKER,$10 + 4,$b + 4,$ff,$d3,$42,CUE_BALL,$5 ; trainer
-    db SPRITE_BIKER,$12 + 4,$4 + 4,$ff,$d1,$43,BIKER,$8 ; trainer
-    db SPRITE_BIKER,$20 + 4,$7 + 4,$ff,$d2,$44,BIKER,$9 ; trainer
-    db SPRITE_BIKER,$22 + 4,$e + 4,$ff,$d3,$45,BIKER,$a ; trainer
-    db SPRITE_BIKER,$3a + 4,$11 + 4,$ff,$d2,$46,CUE_BALL,$6 ; trainer
-    db SPRITE_BIKER,$44 + 4,$2 + 4,$ff,$d3,$47,CUE_BALL,$7 ; trainer
-    db SPRITE_BIKER,$62 + 4,$e + 4,$ff,$d3,$48,CUE_BALL,$8 ; trainer
-    db SPRITE_BIKER,$62 + 4,$5 + 4,$ff,$d2,$49,BIKER,$b ; trainer
-    db SPRITE_BIKER,$76 + 4,$a + 4,$ff,$d0,$4a,BIKER,$c ; trainer
+SECTION "Route17Blocks",ROMX[$4ba8],BANK[$15]
 
 Route17Blocks: ; 54ba8 (15:4ba8)
     INCBIN "maps/route17.blk"
@@ -82539,23 +82536,7 @@ Route17ScriptPointers: ; 55b8d (15:5b8d)
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
-Route17TextPointers: ; 55b93 (15:5b93)
-    dw Route17Text1
-    dw Route17Text2
-    dw Route17Text3
-    dw Route17Text4
-    dw Route17Text5
-    dw Route17Text6
-    dw Route17Text7
-    dw Route17Text8
-    dw Route17Text9
-    dw Route17Text10
-    dw Route17Text11
-    dw Route17Text12
-    dw Route17Text13
-    dw Route17Text14
-    dw Route17Text15
-    dw Route17Text16
+SECTION "Route17TrainerHeaders",ROMX[$5bb3],BANK[$15]
 
 Route17TrainerHeaders: ; 55bb3 (15:5bb3)
 Route17TrainerHeader0: ; 55bb3 (15:5bb3)
@@ -84999,6 +84980,32 @@ Route3Text1:
 .GotText
     TX_FAR _GotText
     db $0b,"@"
+
+Route17Object:
+    db $43 ; border tile
+
+    db $0 ; warps
+
+    db $6 ; signs
+    db $33,$9,$c ; Route17Text11
+    db $3f,$9,$d ; Route17Text12
+    db $4b,$9,$e ; Route17Text13
+    db $57,$9,$f ; Route17Text14
+    db $6f,$9,$10 ; Route17Text15
+    db $8d,$9,$11 ; Route17Text16
+
+    db $b ; people
+    db SPRITE_BIKER,$13 + 4,$c + 4,$ff,$d2,$41,CUE_BALL,$4 ; trainer
+    db SPRITE_BIKER,$10 + 4,$b + 4,$ff,$d3,$42,CUE_BALL,$5 ; trainer
+    db SPRITE_BIKER,$12 + 4,$4 + 4,$ff,$d1,$43,BIKER,$8 ; trainer
+    db SPRITE_BIKER,$20 + 4,$7 + 4,$ff,$d2,$44,BIKER,$9 ; trainer
+    db SPRITE_BIKER,$22 + 4,$e + 4,$ff,$d3,$45,BIKER,$a ; trainer
+    db SPRITE_BIKER,$3a + 4,$11 + 4,$ff,$d2,$46,CUE_BALL,$6 ; trainer
+    db SPRITE_BIKER,$44 + 4,$2 + 4,$ff,$d3,$47,CUE_BALL,$7 ; trainer
+    db SPRITE_BIKER,$62 + 4,$e + 4,$ff,$d3,$48,CUE_BALL,$8 ; trainer
+    db SPRITE_BIKER,$62 + 4,$5 + 4,$ff,$d2,$49,BIKER,$b ; trainer
+    db SPRITE_BIKER,$76 + 4,$a + 4,$ff,$d0,$4a,BIKER,$c ; trainer
+    db SPRITE_BALL,79 + 4,09 + 4,$ff,$ff,$8b,TM_56 ; item
 
 SECTION "bank16",ROMX,BANK[$16]
 
@@ -133290,7 +133297,7 @@ ItemNames:
     db "TM53:TSUNAMI@" ; $F3 ; TM_53
     db "TM54:STRIKE@"  ; $F4 ; TM_54
     db "TM55:FLASH@"   ; $F5 ; TM_55
-    db "TM56:STRGGLE@" ; $F9 ; TM_56 ; ~TODO
+    db "TM56:SLUDGE@"  ; $F9 ; TM_56
     db "TM57:FIR PNC@" ; $F6 ; TM_57
     db "TM58:ICE PNC@" ; $F7 ; TM_58
     db "TM59:TND PNC@" ; $F8 ; TM_59

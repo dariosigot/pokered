@@ -989,6 +989,7 @@ VENONAT_NoEvo_Learnset: MACRO
     db 36,PIN_MISSILE
     db 40,PSYBEAM
     db 45,SPORE
+    db 47,SLUDGE
     db 50,PSYCHIC_M
     db 54,BARRIER
     db 56,MEGA_DRAIN
@@ -1889,6 +1890,7 @@ GASTLY_NoEvo_Learnset: MACRO
     db 39,REFLECT
     db 43,PSYBEAM
     db 48,HAZE
+    db 50,SLUDGE
     db 53,PSYCHIC_M
     db 55,TRANSFORM
     db 60,SUBSTITUTE
