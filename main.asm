@@ -30673,7 +30673,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db FIRE_PUNCH   ; TM_57
     db ICE_PUNCH    ; TM_58
     db THUNDERPUNCH ; TM_59
-    db STRUGGLE     ; TM_60
+    db DIZZY_PUNCH  ; TM_60
     db STRUGGLE     ; TM_61
     db STRUGGLE     ; TM_62
     db STRUGGLE     ; TM_63
@@ -133301,7 +133301,7 @@ ItemNames:
     db "TM57:FIR PNC@" ; $F6 ; TM_57
     db "TM58:ICE PNC@" ; $F7 ; TM_58
     db "TM59:TND PNC@" ; $F8 ; TM_59
-    db "TM60:STRGGLE@" ; $FA ; TM_60
+    db "TM60:DZZ PNC@" ; $FA ; TM_60
     db "TM61:STRGGLE@" ; $FB ; TM_61
     db "TM62:STRGGLE@" ; $FC ; TM_62
     db "TM63:STRGGLE@" ; $FD ; TM_63

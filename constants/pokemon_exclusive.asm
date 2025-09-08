@@ -73,6 +73,7 @@ CharizardExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db THUNDERPUNCH ; TM_59
     db SLUDGE ; TM56
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SquirtleExclusiveMove:
@@ -109,6 +110,7 @@ BlastoiseExclusiveMove:
     db HEADBUTT
     db RAGE ; TM20
     db ICE_PUNCH ; TM_58
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CaterpieExclusiveMove:
@@ -218,6 +220,7 @@ RaticateExclusiveMove:
     db SUBSTITUTE ; TM50
     db AGILITY
     db SLUDGE ; TM56
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SpearowExclusiveMove:
@@ -292,6 +295,7 @@ RaichuExclusiveMove:
     db QUICK_ATTACK
     db AGILITY
     db THUNDERPUNCH ; TM_59
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SandshrewExclusiveMove:
@@ -319,6 +323,7 @@ SandslashExclusiveMove:
     db STRIKE ; TM54
     db FIRE_PUNCH ; TM_57
     db SLUDGE ; TM56
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 NidoranFExclusiveMove:
@@ -368,6 +373,7 @@ NidokingExclusiveMove:
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
     db SLUDGE ; TM56
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ClefairyExclusiveMove:
@@ -586,6 +592,7 @@ PersianExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db KINESIS
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PsyduckExclusiveMove:
@@ -621,6 +628,7 @@ GolduckExclusiveMove:
     db STRIKE ; TM54
     db FLARE
     db ICE_PUNCH ; TM_58
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MankeyExclusiveMove:
@@ -656,6 +664,7 @@ PrimeapeExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GrowlitheExclusiveMove:
@@ -725,6 +734,7 @@ PoliwrathExclusiveMove:
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
     db SLUDGE ; TM56
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 AbraExclusiveMove:
@@ -785,6 +795,7 @@ MachampExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TentacoolExclusiveMove:
@@ -843,6 +854,7 @@ GolemExclusiveMove:
     db LEER
     db FIRE_PUNCH ; TM_57
     db THUNDERPUNCH ; TM_59
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PonytaExclusiveMove:
@@ -909,6 +921,7 @@ SlowbroExclusiveMove:
     db FLASH ; TM55
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MagnemiteExclusiveMove:
@@ -978,6 +991,7 @@ DodrioExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db RAGE ; TM20
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SeelExclusiveMove:
@@ -1231,6 +1245,7 @@ MarowakExclusiveMove:
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
     db SLUDGE ; TM56
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HitmonleeExclusiveMove:
@@ -1261,6 +1276,7 @@ HitmonchanExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LickitungExclusiveMove:
@@ -1363,6 +1379,7 @@ RhydonExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ChanseyExclusiveMove:
@@ -1459,6 +1476,7 @@ KangaskhanExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HorseaExclusiveMove:
@@ -1614,6 +1632,7 @@ JynxExclusiveMove:
     db SUBSTITUTE ; TM50
     db RAGE ; TM20
     db ICE_PUNCH ; TM_58
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ElectabuzzExclusiveMove:
@@ -1647,6 +1666,7 @@ ElectabuzzExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MagmarExclusiveMove:
@@ -1677,6 +1697,7 @@ MagmarExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db THUNDERPUNCH ; TM_59
     db SLUDGE ; TM56
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PinsirExclusiveMove:
@@ -1704,6 +1725,7 @@ PinsirExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TaurosExclusiveMove:
@@ -1730,6 +1752,7 @@ TaurosExclusiveMove:
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
     db RAGE ; TM20
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MagikarpExclusiveMove:
@@ -1883,6 +1906,7 @@ OmastarExclusiveMove:
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KabutoExclusiveMove:
@@ -1982,6 +2006,7 @@ SnorlaxExclusiveMove:
     db FIRE_PUNCH ; TM_57
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ArticunoExclusiveMove:
@@ -2102,6 +2127,7 @@ DragoniteExclusiveMove:
     db ICE_PUNCH ; TM_58
     db THUNDERPUNCH ; TM_59
     db SLUDGE ; TM56
+    db DIZZY_PUNCH ; TM_60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MewtwoExclusiveMove:
