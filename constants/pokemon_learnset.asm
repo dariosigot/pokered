@@ -669,6 +669,7 @@ CLEFAIRY_Learnset: MACRO
     db 18,SUPERSONIC
     db 20,SWIFT
     db 22,SLAM
+    db 23,SCREECH
     db 24,MINIMIZE
     db 26,BIDE
     db 28,METRONOME
@@ -692,6 +693,7 @@ CLEFABLE_Learnset: MACRO
     db 16,SUPERSONIC
     db 17,BIDE
     db 19,SLAM
+    db 20,SCREECH
     db 21,DEFENSE_CURL
     db 23,MINIMIZE
     db 25,SONICBOOM
@@ -761,6 +763,7 @@ JIGGLYPUFF_Learnset: MACRO
     db 18,SONICBOOM
     db 20,SWIFT
     db 22,SLAM
+    db 23,SCREECH
     db 24,MINIMIZE
     db 26,BIDE
     db 28,REST
@@ -784,6 +787,7 @@ WIGGLYTUFF_Learnset: MACRO
     db 16,SONICBOOM
     db 17,BIDE
     db 19,SLAM
+    db 20,SCREECH
     db 21,DEFENSE_CURL
     db 23,MINIMIZE
     db 25,SUPERSONIC
