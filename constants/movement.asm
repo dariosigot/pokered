@@ -1,0 +1,4 @@
+DN EQU $00
+UP EQU $40
+LT EQU $80
+RT EQU $C0

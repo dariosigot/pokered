@@ -8272,7 +8272,7 @@ CheckFightingMapTrainers: ; 3219 (0:3219)
     ld [$cd4f],a
     xor a
     ld [$cd50],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     ld a,BTN_RIGHT | BTN_LEFT | BTN_UP | BTN_DOWN
     ld [wJoypadForbiddenButtonsMask],a
     xor a
@@ -22416,6 +22416,8 @@ MapHS:
     db UNKNOWN_DUNGEON_4,$05,Show ; $F6 (Gengar)
     db SEAFOAM_ISLANDS_3,$03,Show ; $F7
     db ROUTE_17,$0B,Show ; $F8
+    db FUCHSIA_CITY,$03,Show ; $F9 (Erik)
+    db SAFARI_ZONE_REST_HOUSE_1,$03,Hide ; $FA (Erik)
     db $FF
 
 ; Free
@@ -32691,8 +32693,8 @@ SPRITE_Bank_2: MACRO
 
 ; ────────────────────────────────────────────────────────────────
 
-Func_17c47:
-    ld a,[$cd50]
+EmotionBubble:
+    ld a,[$cd50] ; WhichEmotionBubble
     ld c,a
     ld b,$0
     ld hl,EmotionBubblesPointerTable ; $7caf
@@ -32702,7 +32704,7 @@ Func_17c47:
     inc hl
     ld d,[hl]
     ld hl,$8f80
-    ld bc,(BANK(EmotionBubblesPointerTable) << 8) + $04
+    ld bc,(BANK(EmotionBubbles) << 8) + $04
     call CopyVideoData
     ld a,[$cfcb]
     push af
@@ -32747,9 +32749,6 @@ Func_17c47:
     ld [$cfcb],a
     call DelayFrame
     jp UpdateSprites
-
-EmotionBubbles:
-    INCBIN "gfx/emotion_bubbles.2bpp"
 
 SECTION "ActivatePC",ROMX[$7e2c],BANK[$5]
 
@@ -32910,6 +32909,7 @@ EmotionBubblesPointerTable:
     dw EmotionBubbles
     dw EmotionBubbles + $40
     dw EmotionBubbles + $80
+    dw EmotionBubbles + $C0
 
 EmotionBubblesOAM:
     db $F8,$00,$F9,$00
@@ -33559,7 +33559,7 @@ OakAppearsText: ; 18fb0 (6:4fb0)
     xor a
     ld [$CD4F],a
     ld [$CD50],a
-    PREDEF Func_17c47 ; display ! over head
+    PREDEF EmotionBubble ; display ! over head
     ld a,4
     ld [$D528],a
     jp TextScriptEnd
@@ -35129,9 +35129,7 @@ FuchsiaCityText2: ; 19a63 (6:5a63)
     TX_FAR _FuchsiaCityText2
     db "@"
 
-FuchsiaCityText3: ; 19a68 (6:5a68)
-    TX_FAR _FuchsiaCityText3
-    db "@"
+SECTION "FuchsiaCityText4",ROMX[$5a6d],BANK[$6]
 
 FuchsiaCityText4: ; 19a6d (6:5a6d)
     TX_FAR _FuchsiaCityText4
@@ -37239,6 +37237,17 @@ IndigoPlateauLobbyObject:
 
 _FuchsiaCityScript:
     ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    jr z,.next
+    ld a,[wEventErikMeetSaraBit3]
+    bit 3,a
+    jr nz,.next
+    ld a,$FA ; SafariZoneRestHouse1ErikOAM
+    ld [$cc4d],a
+    PREDEF RemoveMissableObject
+.next
+    ld hl,$d126
     bit 6,[hl]
     res 6,[hl]
     jr z,.end
@@ -37254,7 +37263,71 @@ _FuchsiaCityScript:
     ld bc,(BANK(MonOverworldDataNew2_emimonserrate) << 8) + $04
     call GoodCopyVideoData
 .end
-    jp EnableAutoTextBoxDrawing
+    call EnableAutoTextBoxDrawing
+    ld hl,FuchsiaCityScriptPointers
+    ld a,[W_FUCHSIACITYCURSCRIPT]
+    jp CallFunctionInTable
+
+FuchsiaCityScriptPointers:
+    dw FuchsiaCityScript0
+    dw FuchsiaCityScript1
+    dw FuchsiaCityScript2
+
+FuchsiaCityScript0:
+    ret
+
+FuchsiaCityScript1:
+    ld a,[W_XCOORD]
+    ld b,a
+    ld a,[W_YCOORD]
+    ld c,a
+    ld hl,.ErikMovement
+.retry
+    ld a,[hli]
+    cp b
+    jr nz,.next
+    ld a,[hli]
+    cp c
+    jr nz,.next
+    ld d,h
+    ld e,l
+    ld a,3
+    ld [$ff00+$8c],a
+    call MoveSprite
+    ld a,2 ; FuchsiaCityScript2
+    ld [W_CURMAPSCRIPT],a
+    ld [W_FUCHSIACITYCURSCRIPT],a
+    ret
+.next
+    ld a,[hli]
+    cp $FF
+    jr z,.retry
+    jr .next
+.ErikMovement
+    db 30,15
+    db RT,RT,RT,RT,RT,UP,UP,UP,$FF
+    db 29,14
+    db RT,RT,RT,RT,$FF
+    db 31,14
+    db DN,RT,RT,RT,RT,RT,UP,UP,UP,UP,UP,$FF
+
+FuchsiaCityScript2:
+    ld a,[$d730]
+    bit 0,a
+    ret nz
+    ld a,$FA ; SafariZoneRestHouse1ErikOAM
+    ld [$cc4d],a
+    PREDEF AddMissableObject
+    ld a,$F9 ; FuchsiaCityErikOAM
+    ld [$cc4d],a
+    PREDEF RemoveMissableObject
+    ld hl,wEventErikMeetSaraBit3
+    set 3,[hl]
+    xor a ; FuchsiaCityScript0
+    ld [W_CURMAPSCRIPT],a
+    ld [W_FUCHSIACITYCURSCRIPT],a
+    ld [wJoypadForbiddenButtonsMask],a
+    ret
 
 PalletTownScriptPointers:
     dw PalletTownScript0
@@ -37316,6 +37389,38 @@ DisableRoute22Rival1stBattle:
     res 0,[hl]
     res 7,[hl]
     ret
+
+FuchsiaCityText3:
+    db $08 ; asm
+    ld a,[wEventEncounterSaraBit2]
+    bit 2,a
+    jr z,.BeforeSara
+    ld hl,.ErikWhatText
+    call PrintText
+    call .EmotionBubble
+    ld a,1 ; FuchsiaCityScript1
+    ld [W_CURMAPSCRIPT],a
+    ld [W_FUCHSIACITYCURSCRIPT],a
+    jr .done
+.BeforeSara
+    ld hl,.FuchsiaCityText3
+    call PrintText
+.done
+    jp TextScriptEnd
+.FuchsiaCityText3
+    TX_FAR _FuchsiaCityText3
+    db "@"
+.ErikWhatText
+    TX_FAR _ErikWhatText
+    db "@"
+.EmotionBubble
+    ld a,3
+    ld [$CD4F],a ; EmotionBubbleSpriteIndex
+    ld a,1
+    ld [$CD50],a ; WhichEmotionBubble (1 = QUESTION_BUBBLE)
+    PREDEF EmotionBubble ; display emotion over head
+    ld c,20
+    jp DelayFrames
 
 SECTION "bank7",ROMX,BANK[$7]
 
@@ -48046,7 +48151,7 @@ Func_3730e: ; 3730e (d:730e)
     xor a
     ld [hli],a
     ld [hl],$2
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     call GBPalWhiteOutWithDelay3
     call Func_378a8
     call LoadFontTilePatterns
@@ -68663,31 +68768,18 @@ SafariZoneCenterObject: ; 0x45bc5 (size=89)
 SafariZoneCenterBlocks: ; 45c1e (11:5c1e)
     INCBIN "maps/safarizonecenter.blk"
 
-SECTION "SafariZoneRestHouse1_h",ROMX[$5ce1],BANK[$11]
-
-SafariZoneRestHouse1_h: ; 0x45ce1 to 0x45ced (12 bytes) (bank=11) (id=221)
+SafariZoneRestHouse1_h:
     db $0c ; tileset
     db SAFARI_ZONE_REST_HOUSE_1_HEIGHT,SAFARI_ZONE_REST_HOUSE_1_WIDTH ; dimensions (y,x)
     dw SafariZoneRestHouse1Blocks,SafariZoneRestHouse1TextPointers,SafariZoneRestHouse1Script ; blocks,texts,scripts
     db $00 ; connections
     dw SafariZoneRestHouse1Object ; objects
 
-SafariZoneRestHouse1Script: ; 45ced (11:5ced)
-    jp EnableAutoTextBoxDrawing
-
-SafariZoneRestHouse1TextPointers: ; 45cf0 (11:5cf0)
-    dw SafariZoneRestHouse1Text1
-    dw SafariZoneRestHouse1Text2
-
-SafariZoneRestHouse1Text1: ; 45cf4 (11:5cf4)
-    TX_FAR _SafariZoneRestHouse1Text1
-    db "@"
-
-SafariZoneRestHouse1Text2: ; 45cf9 (11:5cf9)
+SafariZoneRestHouse1Text2:
     TX_FAR _SafariZoneRestHouse1Text2
     db "@"
 
-SafariZoneRestHouse1Object: ; 0x45cfe (size=32)
+SafariZoneRestHouse1Object:
     db $a ; border tile
 
     db $2 ; warps
@@ -68696,13 +68788,16 @@ SafariZoneRestHouse1Object: ; 0x45cfe (size=32)
 
     db $0 ; signs
 
-    db $2 ; people
+    db $3 ; people
     db SPRITE_GIRL,$2 + 4,$3 + 4,$ff,$d0,$1 ; person
     db SPRITE_OAK_AIDE,$4 + 4,$1 + 4,$fe,$1,$2 ; person
+    db SPRITE_FISHER2,02 + 4,04 + 4,$ff,$d2,$3 ; person
 
     ; warp-to
     EVENT_DISP $4,$7,$2 ; SAFARI_ZONE_CENTER
     EVENT_DISP $4,$7,$3 ; SAFARI_ZONE_CENTER
+
+SECTION "SafariZoneRestHouse2_h",ROMX[$5d1e],BANK[$11]
 
 SafariZoneRestHouse2_h: ; 0x45d1e to 0x45d2a (12 bytes) (bank=11) (id=223)
     db $0c ; tileset
@@ -71168,6 +71263,100 @@ SeafoamIslands3Object:
     EVENT_DISP $f,$3,$19 ; SEAFOAM_ISLANDS_4
     EVENT_DISP $f,$b,$19 ; SEAFOAM_ISLANDS_2
     EVENT_DISP $f,$e,$19 ; SEAFOAM_ISLANDS_4
+
+; ───────────────────────────────────────
+
+SafariZoneRestHouse1TextPointers:
+    dw SafariZoneRestHouse1Text1
+    dw SafariZoneRestHouse1Text2
+    dw SafariZoneRestHouse1Text3
+
+SafariZoneRestHouse1Text1:
+    db $08 ; asm
+    ld a,[wEventErikMeetSaraBit3]
+    bit 3,a
+    jr nz,.AfterMeetErik
+    ld hl,.SafariZoneRestHouse1Text1
+    call PrintText
+    ld hl,wEventEncounterSaraBit2
+    set 2,[hl]
+.end
+    jp TextScriptEnd
+.AfterMeetErik
+    ld hl,.SaraAndErikText
+    call PrintText
+    call .EmotionBubble
+    ;call WaitForButtonPress
+    jr .end
+.SafariZoneRestHouse1Text1
+    TX_FAR _SafariZoneRestHouse1Text1
+    db "@"
+.SaraAndErikText
+    TX_FAR _SaraAndErikText
+    db "@"
+.EmotionBubble
+    ld a,1
+    jr ErikAndSaraEmotionBubbleCommon
+
+SafariZoneRestHouse1Text3:
+    db $08 ; asm
+    ld a,[wEventNotTakeTM60Bit2]
+    bit 2,a
+    jr z,.AfterTM60
+    ld hl,.TM60PreText
+    call PrintText
+    ld bc,(TM_60 << 8) | 3 ; DIZZY_PUNCH
+    call GiveItem
+    ld hl,.ReceivedTM60Text
+    call PrintText
+    ld hl,.TM60ExplanationText
+    call PrintText
+    ld hl,wEventNotTakeTM60Bit2
+    res 2,[hl]
+    jr .end
+.AfterTM60
+    ld hl,.ErikAndSaraText
+    call PrintText
+    call .EmotionBubble
+.end
+    jp TextScriptEnd
+.TM60PreText
+    TX_FAR _TM60PreText
+    db "@"
+.ReceivedTM60Text
+    TX_FAR _ReceivedText
+    db $0B,"@"
+.TM60ExplanationText
+    TX_FAR _TM60ExplanationText
+    db "@"
+.ErikAndSaraText
+    TX_FAR _ErikAndSaraText
+    db "@"
+.EmotionBubble
+    ld a,3
+    ; fall through
+
+ErikAndSaraEmotionBubbleCommon:
+    ld [$CD4F],a ; EmotionBubbleSpriteIndex
+    ld a,3
+    ld [$CD50],a ; WhichEmotionBubble (3 = LOVE_BUBBLE)
+    PREDEF EmotionBubble ; display emotion over head
+    ld c,20
+    jp DelayFrames    
+
+SafariZoneRestHouse1Script:
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    jr z,.done
+    ld a,[wEventErikMeetSaraBit3]
+    bit 3,a
+    jr z,.done
+    ld a,$D3
+    ld [W_MAPSPRITEDATA],a
+.done
+    jp EnableAutoTextBoxDrawing
+    db $80,$FF
 
 ; ───────────────────────────────────────
 
@@ -75993,7 +76182,7 @@ UpdateHPBar_2Predef:                       NEW_PREDEF UpdateHPBar               
 DrawEnemyHUDAndHPBarPredef:                NEW_PREDEF DrawEnemyHUDAndHPBar                ; $49
 Func_70f60Predef:                          NEW_PREDEF Func_70f60                          ; $4A
 PrintTypesPredef:                          NEW_PREDEF PrintTypes                          ; $4B
-Func_17c47Predef:                          NEW_PREDEF Func_17c47                          ; $4C
+EmotionBubblePredef:                       NEW_PREDEF EmotionBubble                       ; $4C
 Func_5aafPredef:                           NEW_PREDEF Func_5aaf                           ; $4D
 AskForMonNicknamePredef:                   NEW_PREDEF AskForMonNickname                   ; $4E
 Func_37ca1Predef:                          NEW_PREDEF Func_37ca1                          ; $4F
@@ -76843,7 +77032,7 @@ Route22Script0: ; 50f00 (14:4f00)
     ld [$cd4f],a
     xor a
     ld [$cd50],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     ld a,[$d700]
     and a
     jr z,.asm_50f4e ; 0x50f44 $8
@@ -76983,7 +77172,7 @@ Func_5104e: ; 5104e (14:504e)
     ld [$cd4f],a
     xor a
     ld [$cd50],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     ld a,[$d700]
     and a
     jr z,.skipYVisibilityTesta
@@ -97159,7 +97348,7 @@ DiglettsCaveHole:
     xor a
     ld [hli],a
     ld [hl],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     call .Delay5
     ld hl,$d126 ; Trigger Check Warp Script 0
     res 6,[hl]  ; ...
@@ -98382,7 +98571,7 @@ Func_707b6: ; 707b6 (1c:47b6)
     xor a
     ld [hli],a
     ld [hl],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     ld a,[$c102]
     cp $4
     jr nz,.asm_70833
@@ -120317,6 +120506,32 @@ _UnknownDungeon4GolemText:
 
 _UnknownDungeon4GengarText:
     db $0,"Geeeeeeeeeee!@@"
+
+_ErikWhatText:
+    db 0,"What? SARA is",$4f
+    db "in SAFARI ZONE?@@"
+
+_TM60PreText:
+    db $0,"ERIK: Thanks",$4f
+    db "Man!! I want to",$55
+    db "give you this as",$55
+    db "a thank you!",$58
+
+_TM60ExplanationText:
+    db $0,"TM60 is",$4f
+    db "DIZZY PUNCH!",$51
+    db "Very Strong!",$4f
+    db "It can also",$55
+    db "confuse targeted",$55
+    db "#MON!",$57
+
+_SaraAndErikText
+    db 0,"SARA: ERIK!! "
+    db $DB,$DB,$DB,"@@" ; ❤️
+
+_ErikAndSaraText
+    db 0,"ERIK: SARA!! "
+    db $DB,$DB,$DB,"@@" ; ❤️
 
 SECTION "bank22",ROMX,BANK[$22]
 
@@ -143587,7 +143802,7 @@ RevealHoleCommon:
     xor a
     ld [hli],a
     ld [hl],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     jp Delay3
 .Table
    ;db YY,XX,$ID
@@ -143634,6 +143849,9 @@ TestMap2Blocks:
 SECTION "Bank3d",ROMX,BANK[$3D]
 
 ; ──────────────────────────────────────────────────────────────────────
+
+EmotionBubbles:
+    INCBIN "gfx/emotion_bubbles.2bpp"
 
 LoadSpecialTrainerMoves:
     ld h,d
