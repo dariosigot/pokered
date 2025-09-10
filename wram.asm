@@ -1203,7 +1203,7 @@ wDVForShinySpdSpc ; d480
 UNION ; 8 Bytes
 
 wTmpMonLearnset: ; d481
-    ds 7
+    ds 8
 
 NEXTU
 
@@ -1302,9 +1302,9 @@ wBoxItems: ; d53b
     ds 1 ; end
 
 wTM: ; d58c
-    ds 20
+    ds 16 ; TM_01 ► TM_64 (1 Byte every 4 Moves)
 
-    ds 4
+    ds 8
 
 ; coins are in decimal
 wPlayerCoins: ; d5a4
@@ -1334,6 +1334,7 @@ W_OAKSLABCURSCRIPT: ; d5f0
     ds 1
 W_PALLETTOWNCURSCRIPT: ; d5f1
     ds 1
+W_FUCHSIACITYCURSCRIPT: ; d5f2
     ds 1
 W_BLUESHOUSECURSCRIPT: ; d5f3
     ds 1
@@ -1678,7 +1679,12 @@ SECTION "wEventFlags",WRAMX[$d747],BANK[$1]
 
 wEventFlags: ; $d747
 
-SECTION "DenimEventFlags",WRAMX[$d882],BANK[$1]
+SECTION "DenimEventFlags",WRAMX[$d881],BANK[$1]
+
+wEventEncounterSaraBit2      ; d881 ; bit 2
+wEventNotTakeTM60Bit2        ; d881 ; bit 2
+wEventErikMeetSaraBit3       ; d881 ; bit 3
+    ds 1
 
 wEventBeatArticunoBit2       ; d882 ; bit 2
 wEventBeatDratiniBit3        ; d882 ; bit 3

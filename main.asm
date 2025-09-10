@@ -18,7 +18,7 @@ CheckSelect:
     bit 2,a ; was the select button pressed?
     jr nz,.SelectPressed
 .End
-    jp $0459 ; OverworldLoopLessDelay.startButtonNotPressed
+    jp $0459 ; OverworldLoop.startButtonNotPressed
 .SelectPressed
     ld b,BANK(SelectInOverWorld)
     ld hl,SelectInOverWorld
@@ -626,9 +626,10 @@ EnterMap: ; 03a6 (0:03a6)
     xor a
     ld [wJoypadForbiddenButtonsMask],a
 
+SECTION "OverworldLoop",ROM0[$03ff]
+
 OverworldLoop: ; 03ff (0:03ff)
     call DelayFrame
-OverworldLoopLessDelay: ; 0402 (0:0402)
     call DelayFrame
     call LoadGBPal
     ld a,[$d736]
@@ -1069,8 +1070,8 @@ WarpFound1: ; 0735 (0:0735)
     ld [$ff8b],a ; save target map
 
 WarpFound2: ; 073c (0:073c)
-    ld a,[$d3ae] ; number of warps
-    sub c
+    call HackFromBank0 ; $073c ; BugFixWarpDuringJump ; ld a,[$d3ae] ; number of warps
+    sub c              ; $073f
     ld [$d73b],a ; save ID of used warp
     ld a,[W_CURMAP]
     ld [$d73c],a
@@ -1271,7 +1272,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     ld hl,InitMapSprites
     call Bankswitch
     call LoadTileBlockMap
-    jp OverworldLoopLessDelay
+    jp OverworldLoop+3
 .didNotEnterConnectedMap
     jp OverworldLoop
 
@@ -1841,7 +1842,6 @@ CheckExceptionTilePassable:
     ld b,BANK(_CheckExceptionTilePassable)
     ld hl,_CheckExceptionTilePassable
     jp Bankswitch ; check if the player is trying to jump a ledge
-
 
 ; ──────────────────────
 ; Handle Ghost Battle
@@ -2595,8 +2595,8 @@ LoadPlayerSpriteGraphicsCommon: ; 1063 (0:1063)
 
 ; function to load data from the map header
 LoadMapHeader: ; 107c (0:107c)
-    ld b,BANK(Func_f113)
-    ld hl,Func_f113
+    ld b,BANK(SetVisitedAndLoadMissableObj)
+    ld hl,SetVisitedAndLoadMissableObj
     call Bankswitch
     ld a,[W_CURMAPTILESET]
     ld [$d119],a
@@ -8272,7 +8272,7 @@ CheckFightingMapTrainers: ; 3219 (0:3219)
     ld [$cd4f],a
     xor a
     ld [$cd50],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     ld a,BTN_RIGHT | BTN_LEFT | BTN_UP | BTN_DOWN
     ld [wJoypadForbiddenButtonsMask],a
     xor a
@@ -22156,270 +22156,9 @@ Func_c8de: ; c8de (3:48de)
     ld [hl],a
     ret
 
-; data for default hidden/shown
-; objects for each map ($00-$F8)
-
-; Table of 2-Byte pointers,one pointer per map,
-; goes up to Map_F7,ends with $FFFF.
-; points to table listing all missable object in the area
-MapHSPointers: ; c8f5 (3:48f5)
-    dw MapHS00
-    dw MapHS01
-    dw MapHS02
-    dw MapHS03
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS06
-    dw MapHS07
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS0A
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS0D
-    dw MapHSXX
-    dw MapHS0F
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS14
-    dw MapHS15
-    dw MapHSXX
-    dw MapHS17
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS1A
-    dw MapHS1B
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS21
-    dw MapHS22
-    dw MapHS23
-    dw MapHS24
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS27
-    dw MapHS28
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS2D
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS30
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS33
-    dw MapHS34
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS3B
-    dw MapHSXX
-    dw MapHS3D
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS53
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS58
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS60
-    dw MapHSXX
-    dw MapHS62
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS66
-    dw MapHS67
-    dw MapHS68
-    dw MapHS69
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS6C
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS78
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS84
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS87
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS8F
-    dw MapHS90
-    dw MapHS91
-    dw MapHS92
-    dw MapHS93
-    dw MapHS94
-    dw MapHS95
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS9B
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHS9F
-    dw MapHSA0
-    dw MapHSA1
-    dw MapHSA2
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSA5
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSB1
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSB5
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSC0
-    dw MapHSXX
-    dw MapHSC2
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSC5
-    dw MapHSC6
-    dw MapHSC7
-    dw MapHSC8
-    dw MapHSC9
-    dw MapHSCA
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSCF
-    dw MapHSD0
-    dw MapHSD1
-    dw MapHSD2
-    dw MapHSD3
-    dw MapHSD4
-    dw MapHSD5
-    dw MapHSD6
-    dw MapHSD7
-    dw MapHSD8
-    dw MapHSD9
-    dw MapHSDA
-    dw MapHSDB
-    dw MapHSDC
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSE2
-    dw MapHSE3
-    dw MapHSE4
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSE7
-    dw MapHSXX
-    dw MapHSE9
-    dw MapHSEA
-    dw MapHSEB
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw MapHSXX
-    dw $FFFF
-
 ; Structure:
 ; 3 bytes per object
 ; [Map_ID][Object_ID][H/S]
-;
-; Program stops reading when either:
-; a) Map_ID = $FF
-; b) Map_ID ≠ currentMapID
 ;
 ; This Data is loaded into RAM at $D5CE-$D5F?. (W_MISSABLEOBJECTLIST)
 
@@ -22427,23 +22166,17 @@ MapHSPointers: ; c8f5 (3:48f5)
 Hide    equ $11
 Show    equ $15
 
-MapHSXX: ; cae7 (3:4ae7)
-    db $FF,$FF,$FF
-MapHS00: ; caea (3:4aea)
+MapHS:
     db PALLET_TOWN,$01,Hide
-MapHS01: ; caed (3:4aed)
     db VIRIDIAN_CITY,$05,Show
     db VIRIDIAN_CITY,$07,Hide
-MapHS02: ; caf3 (3:4af3)
     db PEWTER_CITY,$03,Show
     db PEWTER_CITY,$05,Show
-MapHS03: ; caf9 (3:4af9)
     db CERULEAN_CITY,$01,Hide
     db CERULEAN_CITY,$02,Show
     db CERULEAN_CITY,$06,Hide
     db CERULEAN_CITY,$0A,Show
     db CERULEAN_CITY,$0B,Show
-MapHS0A: ; cb08 (3:4b08)
     db SAFFRON_CITY,$01,Show
     db SAFFRON_CITY,$02,Show
     db SAFFRON_CITY,$03,Show
@@ -22459,34 +22192,23 @@ MapHS0A: ; cb08 (3:4b08)
     db SAFFRON_CITY,$0D,Hide
     db SAFFRON_CITY,$0E,Show
     db SAFFRON_CITY,$0F,Hide
-MapHS0D: ; cb35 (3:4b35)
     db ROUTE_2,$01,Show
     db ROUTE_2,$02,Show
-MapHS0F: ; cb3b (3:4b3b)
     db ROUTE_4,$03,Show
-MapHS14: ; cb3e (3:4b3e)
     db ROUTE_9,$0A,Show
-MapHS17: ; cb41 (3:4b41)
     db ROUTE_12,$01,Show
     db ROUTE_12,$09,Show
     db ROUTE_12,$0A,Show
-MapHS1A: ; cb4a (3:4b4a)
     db ROUTE_15,$0B,Show
-MapHS1B: ; cb4d (3:4b4d)
     db ROUTE_16,$07,Show
-MapHS21: ; cb50 (3:4b50)
     db ROUTE_22,$01,Hide
     db ROUTE_22,$02,Hide
-MapHS23: ; cb56 (3:4b56)
     db ROUTE_24,$01,Show
     db ROUTE_24,$08,Show
-MapHS24: ; cb5c (3:4b5c)
     db ROUTE_25,$0A,Show
-MapHS27: ; cb5f (3:4b5f)
     db BLUES_HOUSE,$01,Show
     db BLUES_HOUSE,$02,Hide
     db BLUES_HOUSE,$03,Show
-MapHS28: ; cb68 (3:4b68)
     db OAKS_LAB,$01,Show
     db OAKS_LAB,$02,Show
     db OAKS_LAB,$03,Show
@@ -22495,50 +22217,33 @@ MapHS28: ; cb68 (3:4b68)
     db OAKS_LAB,$06,Show
     db OAKS_LAB,$07,Show
     db OAKS_LAB,$08,Hide
-MapHS2D: ; cb80 (3:4b80)
     db VIRIDIAN_GYM,$01,Show
     db VIRIDIAN_GYM,$0B,Show
-MapHS34: ; cb86 (3:4b86)
     db MUSEUM_1F,$05,Show
-MapHSE4: ; cb89 (3:4b89)
     db UNKNOWN_DUNGEON_1,$01,Show
     db UNKNOWN_DUNGEON_1,$02,Show
     db UNKNOWN_DUNGEON_1,$03,Show
-MapHS8F: ; cb92 (3:4b92)
     db POKEMONTOWER_2,$01,Show
-MapHS90: ; cb95 (3:4b95)
     db POKEMONTOWER_3,$04,Show
-MapHS91: ; cb98 (3:4b98)
     db POKEMONTOWER_4,$04,Show
     db POKEMONTOWER_4,$05,Show
     db POKEMONTOWER_4,$06,Show
-MapHS92: ; cba1 (3:4ba1)
     db POKEMONTOWER_5,$06,Show
-MapHS93: ; cba4 (3:4ba4)
     db POKEMONTOWER_6,$04,Show
     db POKEMONTOWER_6,$05,Show
-MapHS94: ; cbaa (3:4baa)
     db POKEMONTOWER_7,$01,Show
     db POKEMONTOWER_7,$02,Show
     db POKEMONTOWER_7,$03,Show
     db POKEMONTOWER_7,$04,Show
-MapHS95: ; cbb6 (3:4bb6)
     db LAVENDER_HOUSE_1,$05,Hide
-MapHS84: ; cbb9 (3:4bb9)
     db CELADON_MANSION_5,$02,Show
-MapHS87: ; cbbc (3:4bbc)
     db GAME_CORNER,$0B,Show
-MapHS9B: ; cbbf (3:4bbf)
     db FUCHSIA_HOUSE_2,$02,Show
-MapHSA5: ; cbc2 (3:4bc2)
     db MANSION_1,$02,Show
     db MANSION_1,$03,Show
-MapHSB1: ; cbc8 (3:4bc8)
     db FIGHTINGDOJO,$06,Show
     db FIGHTINGDOJO,$07,Show
-MapHSB5: ; cbce (3:4bce)
     db SILPH_CO_1F,$01,Hide
-MapHS53: ; cbd1 (3:4bd1)
     db POWER_PLANT,$01,Show
     db POWER_PLANT,$02,Show
     db POWER_PLANT,$03,Show
@@ -22553,84 +22258,66 @@ MapHS53: ; cbd1 (3:4bd1)
     db POWER_PLANT,$0C,Show
     db POWER_PLANT,$0D,Show
     db POWER_PLANT,$0E,Show
-MapHSC2: ; cbfb (3:4bfb)
     db VICTORY_ROAD_2,$06,Show ; Shiny Onix in Victory Road
     db VICTORY_ROAD_2,$07,Show
     db VICTORY_ROAD_2,$08,Show
     db VICTORY_ROAD_2,$09,Show
     db VICTORY_ROAD_2,$0A,Show
     db VICTORY_ROAD_2,$0D,Show
-MapHS58: ; cc0d (3:4c0d)
     db BILLS_HOUSE,$01,Show
     db BILLS_HOUSE,$02,Hide
     db BILLS_HOUSE,$03,Hide
-MapHS33: ; cc16 (3:4c16)
     db VIRIDIAN_FOREST,$08,Show
     db VIRIDIAN_FOREST,$09,Show
     db VIRIDIAN_FOREST,$0a,Show
-MapHS3B: ; cc1f (3:4c1f)
     db MT_MOON_1,$08,Show
     db MT_MOON_1,$09,Show
     db MT_MOON_1,$0A,Show
     db MT_MOON_1,$0B,Show
     db MT_MOON_1,$0C,Show
     db MT_MOON_1,$0D,Show
-MapHS3D: ; cc31 (3:4c31)
     db MT_MOON_3,$06,Show
     db MT_MOON_3,$07,Show
     db MT_MOON_3,$08,Show
     db MT_MOON_3,$09,Show
-MapHS60: ; cc3d (3:4c3d)
     db SS_ANNE_2,$02,Hide
-MapHS66: ; cc40 (3:4c40)
     db SS_ANNE_8,$0A,Show
-MapHS67: ; cc43 (3:4c43)
     db SS_ANNE_9,$06,Show
     db SS_ANNE_9,$09,Show
-MapHS68: ; cc49 (3:4c49)
     db SS_ANNE_10,$09,Show
     db SS_ANNE_10,$0A,Show
     db SS_ANNE_10,$0B,Show
-MapHSC6: ; cc52 (3:4c52)
     db VICTORY_ROAD_3,$05,Show
     db VICTORY_ROAD_3,$06,Show
     db VICTORY_ROAD_3,$0A,Show
-MapHSC7: ; cc5b (3:4c5b)
     db ROCKET_HIDEOUT_1,$06,Show
     db ROCKET_HIDEOUT_1,$07,Show
-MapHSC8: ; cc61 (3:4c61)
     db ROCKET_HIDEOUT_2,$02,Show
     db ROCKET_HIDEOUT_2,$03,Show
     db ROCKET_HIDEOUT_2,$04,Show
     db ROCKET_HIDEOUT_2,$05,Show
-MapHSC9: ; cc6d (3:4c6d)
     db ROCKET_HIDEOUT_3,$03,Show
     db ROCKET_HIDEOUT_3,$04,Show
-MapHSCA: ; cc73 (3:4c73)
     db ROCKET_HIDEOUT_4,$01,Show
     db ROCKET_HIDEOUT_4,$05,Show
     db ROCKET_HIDEOUT_4,$06,Show
     db ROCKET_HIDEOUT_4,$07,Show
     db ROCKET_HIDEOUT_4,$08,Hide
     db ROCKET_HIDEOUT_4,$09,Hide
-MapHSCF: ; cc85 (3:4c85)
     db SILPH_CO_2F,$01,Show
     db SILPH_CO_2F,$02,Show
     db SILPH_CO_2F,$03,Show
     db SILPH_CO_2F,$04,Show
     db SILPH_CO_2F,$05,Show
-MapHSD0: ; cc94 (3:4c94)
     db SILPH_CO_3F,$02,Show
     db SILPH_CO_3F,$03,Show
     db SILPH_CO_3F,$04,Show
-MapHSD1: ; cc9d (3:4c9d)
     db SILPH_CO_4F,$02,Show
     db SILPH_CO_4F,$03,Show
     db SILPH_CO_4F,$04,Show
     db SILPH_CO_4F,$05,Show
     db SILPH_CO_4F,$06,Show
     db SILPH_CO_4F,$07,Show
-MapHSD2: ; ccaf (3:4caf)
     db SILPH_CO_5F,$02,Show
     db SILPH_CO_5F,$03,Show
     db SILPH_CO_5F,$04,Show
@@ -22638,13 +22325,11 @@ MapHSD2: ; ccaf (3:4caf)
     db SILPH_CO_5F,$06,Show
     db SILPH_CO_5F,$07,Show
     db SILPH_CO_5F,$08,Show
-MapHSD3: ; ccc4 (3:4cc4)
     db SILPH_CO_6F,$06,Show
     db SILPH_CO_6F,$07,Show
     db SILPH_CO_6F,$08,Show
     db SILPH_CO_6F,$09,Show
     db SILPH_CO_6F,$0A,Show
-MapHSD4: ; ccd3 (3:4cd3)
     db SILPH_CO_7F,$05,Show
     db SILPH_CO_7F,$06,Show
     db SILPH_CO_7F,$07,Show
@@ -22653,113 +22338,89 @@ MapHSD4: ; ccd3 (3:4cd3)
     db SILPH_CO_7F,$0A,Show
     db SILPH_CO_7F,$0B,Show
     db SILPH_CO_7F,$0C,Show
-MapHSD5: ; cceb (3:4ceb)
     db SILPH_CO_8F,$02,Show
     db SILPH_CO_8F,$03,Show
     db SILPH_CO_8F,$04,Show
-MapHSE9: ; ccf4 (3:4cf4)
     db SILPH_CO_9F,$02,Show
     db SILPH_CO_9F,$03,Show
     db SILPH_CO_9F,$04,Show
-MapHSEA: ; ccfd (3:4cfd)
     db SILPH_CO_10F,$01,Show
     db SILPH_CO_10F,$02,Show
     db SILPH_CO_10F,$03,Show
     db SILPH_CO_10F,$04,Show
     db SILPH_CO_10F,$05,Show
     db SILPH_CO_10F,$06,Show
-MapHSEB: ; cd0f (3:4d0f)
     db SILPH_CO_11F,$03,Show
     db SILPH_CO_11F,$04,Show
     db SILPH_CO_11F,$05,Show
-MapHSD6: ; cd18 (3:4d18)
     db MANSION_2,$02,Show ; New Moltres
-MapHS30:
     db ROUTE_2_HOUSE,$03,Show ; $BB
-MapHSD7: ; cd1e (3:4d1e)
     db MANSION_3,$03,Show
     db MANSION_3,$04,Show
-MapHSD8: ; cd24 (3:4d24)
     db MANSION_4,$03,Show
     db MANSION_4,$04,Show
     db MANSION_4,$05,Show
     db MANSION_4,$06,Show
     db MANSION_4,$08,Show
-MapHS69:
     db DRATINI_CAVE,$01,Show ; $E4 -> $C3
     db DRATINI_CAVE,$02,Show ; $E5 -> $C4
-MapHS07:
     db FUCHSIA_CITY,$0b,Show ; $E6 -> $C5
-MapHS62:
     db SS_ANNE_4,$01,Show ; $E7 -> $C6
     db SS_ANNE_4,$02,Hide ; $E8 -> $C7
-MapHS22:
     db ROUTE_23,$08,Show ; $E9 -> $C8
-MapHS06:
     db CELADON_CITY,$08,Show ; $EA -> $C9
     db CELADON_CITY,$09,Show ; $EB -> $CA
-MapHSC5:
     db DIGLETTS_CAVE,$01,Show ; $EC -> $CB
-; Unused
-    ds 6 ; ($CC|$CD)
-MapHSE2: ; cd54 (3:4d54)
+    db MANSION_2,$05,Show ; $CC
+    db POWER_PLANT,$0F,Show ; $CD
     db UNKNOWN_DUNGEON_2,$01,Show
     db UNKNOWN_DUNGEON_2,$02,Show
     db UNKNOWN_DUNGEON_2,$03,Show
-MapHS15:
     db ROUTE_10,$07,Show ; $D1
-MapHSE3:
     db UNKNOWN_DUNGEON_3,$01,Show
     db UNKNOWN_DUNGEON_3,$02,Show
-MapHS6C: ; cd66 (3:4d66)
     db VICTORY_ROAD_1,$03,Show
     db VICTORY_ROAD_1,$04,Show
-MapHS78: ; cd6c (3:4d6c)
     db CHAMPIONS_ROOM,$02,Hide
-MapHSC0: ; cd6f (3:4d6f)
     db SEAFOAM_ISLANDS_1,$01,Show
     db SEAFOAM_ISLANDS_1,$02,Show
-MapHS9F: ; cd75 (3:4d75)
     db SEAFOAM_ISLANDS_2,$01,Hide
     db SEAFOAM_ISLANDS_2,$02,Hide
-MapHSA0: ; cd7b (3:4d7b)
     db SEAFOAM_ISLANDS_3,$01,Hide
     db SEAFOAM_ISLANDS_3,$02,Hide
-MapHSA1: ; cd81 (3:4d81)
     db SEAFOAM_ISLANDS_4,$02,Show
     db SEAFOAM_ISLANDS_4,$03,Show
     db SEAFOAM_ISLANDS_4,$05,Hide
     db SEAFOAM_ISLANDS_4,$06,Hide ; $E0
-MapHSA2: ; cd8d (3:4d8d)
     db SEAFOAM_ISLANDS_5,$01,Hide
     db SEAFOAM_ISLANDS_5,$02,Hide
     db SEAFOAM_ISLANDS_5,$03,Show
-MapHSD9:
     db SAFARI_ZONE_EAST,$01,Show
     db SAFARI_ZONE_EAST,$02,Show
     db SAFARI_ZONE_EAST,$03,Show
     db SAFARI_ZONE_EAST,$04,Show
     db SAFARI_ZONE_EAST,$05,Hide ; $E6 -> $E8 (Lapras)
-MapHSDA:
     db SAFARI_ZONE_NORTH,$01,Show
     db SAFARI_ZONE_NORTH,$02,Show
     db SAFARI_ZONE_NORTH,$03,Show ; $E9 -> $EB (Lapras)
-MapHSDB:
     db SAFARI_ZONE_WEST,$01,Show
     db SAFARI_ZONE_WEST,$02,Show
     db SAFARI_ZONE_WEST,$03,Show
     db SAFARI_ZONE_WEST,$04,Show
-MapHSDC:
     db SAFARI_ZONE_CENTER,$01,Show
     db SAFARI_ZONE_CENTER,$02,Hide ; $EF -> $F1 (Lapras)
-MapHSE7:
     db UNKNOWN_DUNGEON_4,$01,Show ; $F2 (Mewtwo)
     db UNKNOWN_DUNGEON_4,$02,Show ; $F3 (Alakazam)
     db UNKNOWN_DUNGEON_4,$03,Show ; $F4 (Machamp)
     db UNKNOWN_DUNGEON_4,$04,Show ; $F5 (Golem)
     db UNKNOWN_DUNGEON_4,$05,Show ; $F6 (Gengar)
+    db SEAFOAM_ISLANDS_3,$03,Show ; $F7
+    db ROUTE_17,$0B,Show ; $F8
+    db FUCHSIA_CITY,$03,Show ; $F9 (Erik)
+    db SAFARI_ZONE_REST_HOUSE_1,$03,Hide ; $FA (Erik)
+    db $FF
 
-    db $FF,$01,Show
+; Free
 
 SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
 
@@ -23103,90 +22764,15 @@ MapSongBanksNew:
     db (Music_PalletTown    -$4000)/3 , BANK(Music_PalletTown) ; $44
     db (Music_Cities2       -$4000)/3 , BANK(Music_Cities2)       ; SWAP_MAP
 
-MapHSPointersNew:
-    dw MapHS_PortRoyal ; PORT_ROYAL
-    dw MapHSXX         ; ROUTE_D1
-    dw MapHS_TestMap1  ; TEST_MAP_1
-    dw MapHSXX         ; TEST_MAP_2
-    dw MapHSXX         ; PORT_ROYAL_POKECENTER
-    dw MapHSXX         ; PORT_ROYAL_MART
-    dw MapHSXX ; $06
-    dw MapHSXX ; $07
-    dw MapHSXX ; $08
-    dw MapHSXX ; $09
-    dw MapHSXX ; $0A
-    dw MapHSXX ; $0B
-    dw MapHSXX ; $0C
-    dw MapHSXX ; $0D
-    dw MapHSXX ; $0E
-    dw MapHSXX ; $0F
-    dw MapHSXX ; $10
-    dw MapHSXX ; $11
-    dw MapHSXX ; $12
-    dw MapHSXX ; $13
-    dw MapHSXX ; $14
-    dw MapHSXX ; $15
-    dw MapHSXX ; $16
-    dw MapHSXX ; $17
-    dw MapHSXX ; $18
-    dw MapHSXX ; $19
-    dw MapHSXX ; $1A
-    dw MapHSXX ; $1B
-    dw MapHSXX ; $1C
-    dw MapHSXX ; $1D
-    dw MapHSXX ; $1E
-    dw MapHSXX ; $1F
-    dw MapHSXX ; $20
-    dw MapHSXX ; $21
-    dw MapHSXX ; $22
-    dw MapHSXX ; $23
-    dw MapHSXX ; $24
-    dw MapHSXX ; $25
-    dw MapHSXX ; $26
-    dw MapHSXX ; $27
-    dw MapHSXX ; $28
-    dw MapHSXX ; $29
-    dw MapHSXX ; $2A
-    dw MapHSXX ; $2B
-    dw MapHSXX ; $2C
-    dw MapHSXX ; $2D
-    dw MapHSXX ; $2E
-    dw MapHSXX ; $2F
-    dw MapHSXX ; $30
-    dw MapHSXX ; $31
-    dw MapHSXX ; $32
-    dw MapHSXX ; $33
-    dw MapHSXX ; $34
-    dw MapHSXX ; $35
-    dw MapHSXX ; $36
-    dw MapHSXX ; $37
-    dw MapHSXX ; $38
-    dw MapHSXX ; $39
-    dw MapHSXX ; $3A
-    dw MapHSXX ; $3B
-    dw MapHSXX ; $3C
-    dw MapHSXX ; $3D
-    dw MapHSXX ; $3E
-    dw MapHSXX ; $3F
-    dw MapHSXX ; $40
-    dw MapHSXX ; $41
-    dw MapHSXX ; $42
-    dw MapHSXX ; $43
-    dw MapHSXX ; $44
-    dw MapHSXX         ; SWAP_MAP
-    dw $FFFF
-
-MapHS_PortRoyal:
+MapHSNew:
     db PORT_ROYAL,2,Show
-MapHS_TestMap1:
     db TEST_MAP_1,1,Show
     db TEST_MAP_1,2,Show
     db TEST_MAP_1,3,Show
     db TEST_MAP_1,4,Show
     db TEST_MAP_1,5,Show
     db TEST_MAP_1,6,Show
-
-    db $FF,$01,Show
+    db $FF
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $03)
@@ -23220,18 +22806,11 @@ GetMapSongBanks:
     ld hl,MapSongBanksNew
     ret
 
-GetMapHSPointers:
-    ld hl,MapHSPointers
+GetMapHS:
+    ld hl,MapHS
     call CheckNewAdventureFlag
     ret z
-    ld hl,MapHSPointersNew
-    ret
-
-GetFirstMapHSPointer_DE:
-    ld de,MapHS00
-    call CheckNewAdventureFlag
-    ret z
-    ld de,MapHS_PortRoyal
+    ld hl,MapHSNew
     ret
 
 GetMissableObjectFlag:
@@ -23250,7 +22829,7 @@ InitializeMissableObjectsFlagsNew:
     ld bc,32
     xor a
     call FillMemory ; clear missable objects flags
-    ld hl,MapHS_PortRoyal
+    ld hl,MapHSNew
     xor a
     ld [$d048],a
 .missableObjectsLoop
@@ -26289,7 +25868,7 @@ ItemUseTechMach:
 GetTMChoiceItemID:
     cp TM_01 ; less then TM01?
     jr c,.Init
-    cp TM_56+1 ; greater then TM56?
+    cp TM_64+1 ; greater then TM_64?
     jr nc,.Init
     call GetTMQty
     jr z,.Init
@@ -26299,7 +25878,7 @@ GetTMChoiceItemID:
     jr .start
 .Init
     ld hl,wTM
-    ld b,((TM_56-TM_01+1) >> 2)+1
+    ld b,((TM_64-TM_01+1) >> 2)+1
 .LoopSearchAtLeastOne
     ld a,[hli]
     and a
@@ -26313,7 +25892,7 @@ GetTMChoiceItemID:
     ld a,TM_01-1
 .TryNext
     inc a
-    cp TM_56+1
+    cp TM_64+1
     jr nz,.continue1
     ld a,TM_01
 .continue1
@@ -26324,7 +25903,7 @@ GetTMChoiceItemID:
     dec a
     cp TM_01-1
     jr nz,.continue2
-    ld a,TM_56
+    ld a,TM_64
 .continue2
     call GetTMQty ; input a = TM ID | output c = Qty | z if Qty=0
     jr z,.TryPrev
@@ -26923,81 +26502,54 @@ CutTreeBlockSwaps: ; f100 (3:7100)
     db $3D,$36
     db $FF ; list terminator
 
-Func_f113: ; f113 (3:7113)
+SetVisitedAndLoadMissableObj:
     call IsCurrentMapTown
     jr nc,.notInTown
     ld c,a
     ld b,$1
-    call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG   ; mark town as visited (for flying)
+    call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG ; mark town as visited (for flying)
     PREDEF HandleBitArray
 .notInTown
-    call GetMapHSPointers ; ld hl,MapHSPointers
-    ld a,[W_CURMAP]
-    ld b,$0
-    ld c,a
-    add hl,bc
-    add hl,bc
-    ld a,[hli]                ; load missable objects pointer in hl
-    ld h,[hl]
-
-    ds 2
-
-Func_f132: ; f132 (3:7132)
-    ld l,a
-    push hl
-    call GetFirstMapHSPointer_DE ; ld de,MapHS00 ; calculate difference between out pointer and the base pointer
-    ld a,l
-    sub e
-    jr nc,.asm_f13c
-    dec h
-.asm_f13c
-    ld l,a
-    ld a,h
-    sub d
-    ld h,a
-    ld a,h
-    ld [H_DIVIDEND],a
-    ld a,l
-    ld [H_DIVIDEND+1],a
-    xor a
-    ld [H_DIVIDEND+2],a
-    ld [H_DIVIDEND+3],a
-    ld a,$3
-    ld [H_DIVISOR],a
-    ld b,$2
-    call Divide                ; divide difference by 3,resulting in the global offset (number of missable items before ours)
+    call GetMapHS ; ld de,MapHS
     ld a,[W_CURMAP]
     ld b,a
-    ld a,[H_DIVIDEND+3]
-    ld c,a                    ; store global offset in c
+    ld c,0
     ld de,W_MISSABLEOBJECTLIST
-    pop hl
-.writeMissableObjectsListLoop
+.loop
     ld a,[hli]
     cp $ff
-    jr z,.done     ; end of list
+    jr z,.done
     cp b
-    jr nz,.done    ; not for current map anymore
+    jr nz,.next
     ld a,[hli]
     inc hl
-    ld [de],a                 ; write (map-local) sprite ID
+    ld [de],a
     inc de
     ld a,c
     inc c
-    ld [de],a                 ; write (global) missable object index
+    ld [de],a
     inc de
-    jr .writeMissableObjectsListLoop
+    jr .loop
+.next
+    inc c
+    inc hl
+    inc hl
+    jr .loop
 .done
     ld a,$ff
-    ld [de],a                 ; write sentinel
+    ld [de],a
     ret
+
+; Free
+
+SECTION "InitializeMissableObjectsFlags",ROMX[$7175],BANK[$3]
 
 InitializeMissableObjectsFlags: ; f175 (3:7175)
     ld hl,W_MISSABLEOBJECTFLAGS
     ld bc,$20
     xor a
     call FillMemory ; clear missable objects flags
-    ld hl,MapHS00
+    ld hl,MapHS
     xor a
     ld [$d048],a
 .missableObjectsLoop
@@ -31119,7 +30671,15 @@ TechnicalMachines: ; 13773 (4:7773)
     db TSUNAMI      ; TM_53
     db STRIKE       ; TM_54
     db FLASH        ; TM_55
-    db STRUGGLE     ; TM_56
+    db SLUDGE       ; TM_56
+    db FIRE_PUNCH   ; TM_57
+    db ICE_PUNCH    ; TM_58
+    db THUNDERPUNCH ; TM_59
+    db DIZZY_PUNCH  ; TM_60
+    db STRUGGLE     ; TM_61
+    db STRUGGLE     ; TM_62
+    db STRUGGLE     ; TM_63
+    db STRUGGLE     ; TM_64
 
 EndOfBattle:
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -31317,9 +30877,7 @@ TryDoWildEncounter:
     xor a
     ret
 
-SECTION "RecoilEffect_",ROMX[$792c],BANK[$4]
-
-RecoilEffect_: ; 1392c (4:792c)
+RecoilEffect_:
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld a,[W_PLAYERMOVENUM] ; $cfd2
@@ -31333,13 +30891,15 @@ RecoilEffect_: ; 1392c (4:792c)
     ld b,a
     ld a,[$d0d8]
     ld c,a
-    srl b
-    rr c
+    srl b ; 1/2
+    rr c  ; ...
     ld a,d
     cp STRUGGLE
     jr z,.asm_13953
-    srl b
-    rr c
+    srl b ; 1/4
+    rr c  ; ...
+    srl b ; 1/8
+    rr c  ; ...
 .asm_13953
     ld a,b
     or c
@@ -31932,7 +31492,7 @@ TestMonMoveCompatibility_HandleAlternative:
     ld h,[hl]
     ld l,a
     ld de,wTmpMonLearnset
-    ld bc,7
+    ld bc,8
     ld a,BANK(PokemonBaseStats)
     jp FarCopyData ; copy bc bytes of data from a:hl to de
 
@@ -33133,8 +32693,8 @@ SPRITE_Bank_2: MACRO
 
 ; ────────────────────────────────────────────────────────────────
 
-Func_17c47:
-    ld a,[$cd50]
+EmotionBubble:
+    ld a,[$cd50] ; WhichEmotionBubble
     ld c,a
     ld b,$0
     ld hl,EmotionBubblesPointerTable ; $7caf
@@ -33144,7 +32704,7 @@ Func_17c47:
     inc hl
     ld d,[hl]
     ld hl,$8f80
-    ld bc,(BANK(EmotionBubblesPointerTable) << 8) + $04
+    ld bc,(BANK(EmotionBubbles) << 8) + $04
     call CopyVideoData
     ld a,[$cfcb]
     push af
@@ -33189,9 +32749,6 @@ Func_17c47:
     ld [$cfcb],a
     call DelayFrame
     jp UpdateSprites
-
-EmotionBubbles:
-    INCBIN "gfx/emotion_bubbles.2bpp"
 
 SECTION "ActivatePC",ROMX[$7e2c],BANK[$5]
 
@@ -33352,6 +32909,7 @@ EmotionBubblesPointerTable:
     dw EmotionBubbles
     dw EmotionBubbles + $40
     dw EmotionBubbles + $80
+    dw EmotionBubbles + $C0
 
 EmotionBubblesOAM:
     db $F8,$00,$F9,$00
@@ -34001,7 +33559,7 @@ OakAppearsText: ; 18fb0 (6:4fb0)
     xor a
     ld [$CD4F],a
     ld [$CD50],a
-    PREDEF Func_17c47 ; display ! over head
+    PREDEF EmotionBubble ; display ! over head
     ld a,4
     ld [$D528],a
     jp TextScriptEnd
@@ -35571,9 +35129,7 @@ FuchsiaCityText2: ; 19a63 (6:5a63)
     TX_FAR _FuchsiaCityText2
     db "@"
 
-FuchsiaCityText3: ; 19a68 (6:5a68)
-    TX_FAR _FuchsiaCityText3
-    db "@"
+SECTION "FuchsiaCityText4",ROMX[$5a6d],BANK[$6]
 
 FuchsiaCityText4: ; 19a6d (6:5a6d)
     TX_FAR _FuchsiaCityText4
@@ -37073,23 +36629,8 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     bit 6,a
     jp nz,.end
 
-    ; Search Collision Rule Tileset
-    ld a,[W_CURMAPTILESET]
-    ld d,a
-    ld hl,JumpTilesetHeader
-.RuleLoop
-    ld a,[hli]
-    cp $FF
-    jp z,.end
-    cp d
-    jr z,.RuleFound
-    inc hl
-    inc hl
-    jr .RuleLoop
-.RuleFound
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
+    ; Collision Rule
+    ld hl,CollissionRule
     push hl ; Backup Collision Rule Start Pointer
 
     ld bc,$00FF ; -1
@@ -37116,6 +36657,7 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     ld a,[hli]
     call GetTileOffset
     ld a,[hli]
+    call GetTilesetTile
     cp d
     jr nz,.loop
 
@@ -37130,6 +36672,7 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     ld a,[hli]
     and a
     jr z,.skipSimulation
+    call GetTilesetTile
     ld [$cfc6],a
 .skipSimulation
 
@@ -37273,6 +36816,69 @@ ResetFlags:
     or a ; reset all flag
     ret
 
+GetTilesetTile:
+    push hl
+    push bc
+    ld c,a
+    ld a,[W_CURMAPTILESET]
+    ld b,a
+    ld hl,.TilesetTileConvertionTable
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.end
+    cp b
+    jr nz,.next1
+    ld a,[hli]
+    cp c
+    jr nz,.next2
+    ld a,[hl]
+.end
+    pop bc
+    pop hl
+    ret
+.next1
+    inc hl
+.next2
+    inc hl
+    jr .loop
+.TilesetTileConvertionTable
+    ; Tileset
+    ; Tile Type ID
+    ; Tile ID
+    db $00,TILE_J_DOWN   , TILE_00_J_DOWN
+    db $00,TILE_J_UP     , TILE_00_J_UP
+    db $00,TILE_J_LEFT   , TILE_00_J_LEFT
+    db $00,TILE_J_RIGHT  , TILE_00_J_RIGHT
+    db $00,TILE_UPP_CTR  , TILE_00_UPP_CTR
+    db $00,TILE_UPP_RGT  , TILE_00_UPP_RGT
+    db $00,TILE_BTM_LFT  , TILE_00_BTM_LFT
+    db $00,TILE_BTM_RGT  , TILE_00_BTM_RGT
+    db $00,TILE_WALKING  , TILE_00_WALKING
+    db $11,TILE_J_DOWN   , TILE_11_J_DOWN
+    db $11,TILE_J_UP     , TILE_11_J_UP
+    db $11,TILE_J_LEFT   , TILE_11_J_LEFT
+    db $11,TILE_J_RIGHT  , TILE_11_J_RIGHT
+    db $11,TILE_UPP_CTR  , TILE_11_UPP_CTR
+    db $11,TILE_UPP_RGT  , TILE_11_UPP_RGT
+    db $11,TILE_BTM_LFT  , TILE_11_BTM_LFT
+    db $11,TILE_BTM_RGT  , TILE_11_BTM_RGT
+    db $11,TILE_WALKING  , TILE_11_WALKING
+    db $11,TILE_CAV_HOLE , TILE_11_CAV_HOLE
+    db $11,TILE_STRS_STD , TILE_11_STRS_STD
+    db $11,TILE_STRS_HRZ , TILE_11_STRS_HRZ
+    db $11,TILE_STRS_VRT , TILE_11_STRS_VRT
+    db $03,TILE_J_DOWN   , TILE_03_J_DOWN
+    db $03,TILE_J_UP     , TILE_03_J_UP
+    db $03,TILE_J_LEFT   , TILE_03_J_LEFT
+    db $03,TILE_J_RIGHT  , TILE_03_J_RIGHT
+    db $03,TILE_UPP_CTR  , TILE_03_UPP_CTR
+    db $03,TILE_UPP_RGT  , TILE_03_UPP_RGT
+    db $03,TILE_BTM_LFT  , TILE_03_BTM_LFT
+    db $03,TILE_BTM_RGT  , TILE_03_BTM_RGT
+    db $03,TILE_WALKING  , TILE_03_WALKING
+    db $FF
+
 DoorTileIDPointers: ; Move to Bank's End
     db $00
     dw Tileset00DoorTileIDs
@@ -37369,222 +36975,87 @@ IndigoPlateauLobbyText4:
     db X_ATTACK,X_DEFEND,X_SPEED,X_SPECIAL,X_ACCURACY,GUARD_SPEC_,DIRE_HIT
     db $FF
 
-JumpTilesetHeader:
-    dbw $00,CollissionRule_Tileset00
-    dbw $11,CollissionRule_Tileset11
-    dbw $03,CollissionRule_Tileset03
-    db $FF
+; Direction
+; Tile offset
+; Tile
+; Next Tile Simulation
+; Collision Tile After Jump to Check (0 = Skip Check)
+; Exception Flag
+; Simulation Jump Distance
+; Direction Output = ▼▲◄►StSeBA
 
-    ; Tileset
-    ; Direction
-    ; Tile offset
-    ; Tile
-    ; Next Tile Simulation
-    ; Collision Tile After Jump to Check (0 = Skip Check)
-    ; Exception Flag
-    ; Simulation Jump Distance
-    ; Direction Output = ▼▲◄►StSeBA
-
-CollissionRule_Tileset00:
+CollissionRule:
 
 ; MOUNTAIN BORDER
-    db D_UP    , Tile_D , TILE_00_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $00
-    db D_UP    , Tile_P , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $01
-    db D_DOWN  , Tile_T , TILE_00_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $02
-    db D_DOWN  , Tile_T , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $03
-    db D_LEFT  , Tile_H , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $04
-    db D_LEFT  , Tile_E , TILE_00_J_RIGHT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $05
-    db D_RIGHT , Tile_L , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $06
+    db D_UP    , Tile_D , TILE_UPP_CTR   , $FF            , 0          , EX_FAIL              , 0 , 0 ; $00
+    db D_UP    , Tile_P , TILE_J_DOWN    , $FF            , 0          , EX_FAIL              , 0 , 0 ; $01
+    db D_DOWN  , Tile_T , TILE_UPP_CTR   , $FF            , 0          , EX_FAIL              , 0 , 0 ; $02
+    db D_DOWN  , Tile_T , TILE_J_DOWN    , $FF            , 0          , EX_FAIL              , 0 , 0 ; $03
+    db D_LEFT  , Tile_H , TILE_J_LEFT    , $FF            , 0          , EX_FAIL              , 0 , 0 ; $04
+    db D_LEFT  , Tile_E , TILE_J_RIGHT   , $FF            , 0          , EX_FAIL              , 0 , 0 ; $05
+    db D_RIGHT , Tile_L , TILE_J_LEFT    , $FF            , 0          , EX_FAIL              , 0 , 0 ; $06
 
 ; MOUNTAIN STAIRS
-    db D_LEFT  , Tile_H , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $07
-    db D_RIGHT , Tile_K , TILE_00_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $08
-    db D_UP    , Tile_N , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $09
-    db D_DOWN  , Tile_T , TILE_00_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0A
+    db D_LEFT  , Tile_H , TILE_J_DOWN    , $FF            , 0          , EX_FAIL              , 0 , 0 ; $07
+    db D_RIGHT , Tile_K , TILE_J_DOWN    , $FF            , 0          , EX_FAIL              , 0 , 0 ; $08
+    db D_UP    , Tile_N , TILE_J_LEFT    , $FF            , 0          , EX_FAIL              , 0 , 0 ; $09
+    db D_DOWN  , Tile_T , TILE_J_LEFT    , $FF            , 0          , EX_FAIL              , 0 , 0 ; $0A
 
 ; MOUNTAIN BOTTOM CORNER
-    db D_RIGHT , Tile_L , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0B
-    db D_UP    , Tile_P , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0C
-    db D_LEFT  , Tile_H , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0D
-    db D_DOWN  , Tile_T , TILE_00_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0E
-    db D_UP    , Tile_O , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0F
-    db D_LEFT  , Tile_G , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $10
-    db D_RIGHT , Tile_K , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $11
-    db D_DOWN  , Tile_S , TILE_00_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $12
-
-; GO OUT
-    db D_DOWN  , Tile_A , TILE_00_J_DOWN    , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $13
-    db D_DOWN  , Tile_A , TILE_00_BTM_LFT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $14
-    db D_DOWN  , Tile_B , TILE_00_BTM_RGT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $15
-    db D_LEFT  , Tile_A , TILE_00_J_LEFT    , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $16
-    db D_LEFT  , Tile_A , TILE_00_BTM_LFT   , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $17
-    db D_RIGHT , Tile_B , TILE_00_BTM_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $18
-    db D_RIGHT , Tile_D , TILE_00_J_RIGHT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $19
-    db D_RIGHT , Tile_D , TILE_00_UPP_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $1A
-    db D_UP    , Tile_C , TILE_00_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1B
-    db D_UP    , Tile_D , TILE_00_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1C
+    db D_RIGHT , Tile_L , TILE_BTM_LFT   , $FF            , 0          , EX_FAIL              , 0 , 0 ; $0B
+    db D_UP    , Tile_P , TILE_BTM_LFT   , $FF            , 0          , EX_FAIL              , 0 , 0 ; $0C
+    db D_LEFT  , Tile_H , TILE_BTM_LFT   , $FF            , 0          , EX_FAIL              , 0 , 0 ; $0D
+    db D_DOWN  , Tile_T , TILE_BTM_LFT   , $FF            , 0          , EX_FAIL              , 0 , 0 ; $0E
+    db D_UP    , Tile_O , TILE_BTM_RGT   , $FF            , 0          , EX_FAIL              , 0 , 0 ; $0F
+    db D_LEFT  , Tile_G , TILE_BTM_RGT   , $FF            , 0          , EX_FAIL              , 0 , 0 ; $10
+    db D_RIGHT , Tile_K , TILE_BTM_RGT   , $FF            , 0          , EX_FAIL              , 0 , 0 ; $11
+    db D_DOWN  , Tile_S , TILE_BTM_RGT   , $FF            , 0          , EX_FAIL              , 0 , 0 ; $12
 
 ; GO IN
-    db D_UP    , Tile_M , TILE_00_J_DOWN    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1D
-    db D_UP    , Tile_M , TILE_00_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1E
-    db D_UP    , Tile_N , TILE_00_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1F
-    db D_RIGHT , Tile_I , TILE_00_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $20
-    db D_RIGHT , Tile_I , TILE_00_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
-    db D_LEFT  , Tile_F , TILE_00_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
-    db D_LEFT  , Tile_H , TILE_00_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
-    db D_LEFT  , Tile_H , TILE_00_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
-    db D_DOWN  , Tile_S , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
-    db D_DOWN  , Tile_T , TILE_00_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
-
-; WALK NEAR JUMP BORDER
-    db D_LEFT  , Tile_E , TILE_00_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
-    db D_DOWN  , Tile_Q , TILE_00_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
-    db D_UP    , Tile_M , TILE_00_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
-    db D_DOWN  , Tile_S , TILE_00_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
-    db D_LEFT  , Tile_F , TILE_00_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
-    db D_RIGHT , Tile_I , TILE_00_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
-
-; End
-    db $FF
-
-CollissionRule_Tileset11:
-
-; MOUNTAIN BORDER
-    db D_UP    , Tile_D , TILE_11_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $00
-    db D_UP    , Tile_P , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $01
-    db D_DOWN  , Tile_T , TILE_11_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $02
-    db D_DOWN  , Tile_T , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $03
-    db D_LEFT  , Tile_H , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $04
-    db D_LEFT  , Tile_E , TILE_11_J_RIGHT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $05
-    db D_RIGHT , Tile_L , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $06
-
-; MOUNTAIN STAIRS
-    db D_LEFT  , Tile_H , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $07
-    db D_RIGHT , Tile_K , TILE_11_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $08
-    db D_UP    , Tile_N , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $09
-    db D_DOWN  , Tile_T , TILE_11_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0A
-
-; MOUNTAIN BOTTOM CORNER
-    db D_RIGHT , Tile_L , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0B
-    db D_UP    , Tile_P , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0C
-    db D_LEFT  , Tile_H , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0D
-    db D_DOWN  , Tile_T , TILE_11_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0E
-    db D_UP    , Tile_O , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0F
-    db D_LEFT  , Tile_G , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $10
-    db D_RIGHT , Tile_K , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $11
-    db D_DOWN  , Tile_S , TILE_11_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $12
+    db D_UP    , Tile_M , TILE_J_DOWN    , $FF            , 0          , EX_B | EX_NOBIKE     , 0 , 0 ; $13
+    db D_UP    , Tile_M , TILE_BTM_LFT   , $FF            , 0          , EX_B | EX_NOBIKE     , 0 , 0 ; $14
+    db D_RIGHT , Tile_I , TILE_J_LEFT    , $FF            , 0          , EX_B | EX_NOBIKE     , 0 , 0 ; $15
+    db D_RIGHT , Tile_I , TILE_BTM_LFT   , $FF            , 0          , EX_B | EX_NOBIKE     , 0 , 0 ; $16
+    db D_LEFT  , Tile_H , TILE_J_RIGHT   , $FF            , 0          , EX_B | EX_NOBIKE     , 0 , 0 ; $17
+    db D_LEFT  , Tile_H , TILE_UPP_RGT   , $FF            , 0          , EX_B | EX_NOBIKE     , 0 , 0 ; $18
+    db D_DOWN  , Tile_T , TILE_J_UP      , $FF            , 0          , EX_B | EX_NOBIKE     , 0 , 0 ; $19
+    db D_DOWN  , Tile_T , TILE_UPP_RGT   , $FF            , 0          , EX_B | EX_NOBIKE     , 0 , 0 ; $1A
 
 ; GO OUT
-    db D_DOWN  , Tile_A , TILE_11_J_DOWN    , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $13
-    db D_DOWN  , Tile_A , TILE_11_BTM_LFT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $14
-    db D_DOWN  , Tile_B , TILE_11_BTM_RGT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $15
-    db D_LEFT  , Tile_A , TILE_11_J_LEFT    , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $16
-    db D_LEFT  , Tile_A , TILE_11_BTM_LFT   , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $17
-    db D_RIGHT , Tile_B , TILE_11_BTM_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $18
-    db D_RIGHT , Tile_D , TILE_11_J_RIGHT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $19
-    db D_RIGHT , Tile_D , TILE_11_UPP_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $1A
-    db D_UP    , Tile_C , TILE_11_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1B
-    db D_UP    , Tile_D , TILE_11_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1C
-
-; GO IN
-    db D_UP    , Tile_M , TILE_11_J_DOWN    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1D
-    db D_UP    , Tile_M , TILE_11_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1E
-    db D_UP    , Tile_N , TILE_11_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1F
-    db D_RIGHT , Tile_I , TILE_11_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $20
-    db D_RIGHT , Tile_I , TILE_11_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
-    db D_LEFT  , Tile_F , TILE_11_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
-    db D_LEFT  , Tile_H , TILE_11_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
-    db D_LEFT  , Tile_H , TILE_11_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
-    db D_DOWN  , Tile_S , TILE_11_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
-    db D_DOWN  , Tile_T , TILE_11_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
+    db D_DOWN  , Tile_A , TILE_J_DOWN    , 0              , COLL_DOWN  , 0                    , 0 , 0 ; $1B
+    db D_DOWN  , Tile_A , TILE_BTM_LFT   , 0              , COLL_DOWN  , 0                    , 0 , 0 ; $1C
+    db D_LEFT  , Tile_A , TILE_J_LEFT    , 0              , COLL_LEFT  , 0                    , 0 , 0 ; $1D
+    db D_LEFT  , Tile_A , TILE_BTM_LFT   , 0              , COLL_LEFT  , 0                    , 0 , 0 ; $1E
+    db D_RIGHT , Tile_D , TILE_J_RIGHT   , 0              , COLL_RIGHT , 0                    , 0 , 0 ; $1F
+    db D_RIGHT , Tile_D , TILE_UPP_RGT   , 0              , COLL_RIGHT , 0                    , 0 , 0 ; $20
+    db D_UP    , Tile_D , TILE_J_UP      , 0              , COLL_UP    , 0                    , 0 , 0 ; $21
+    db D_UP    , Tile_D , TILE_UPP_RGT   , 0              , COLL_UP    , 0                    , 0 , 0 ; $22
 
 ; WALK NEAR JUMP BORDER
-    db D_LEFT  , Tile_E , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
-    db D_DOWN  , Tile_Q , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
-    db D_UP    , Tile_M , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
-    db D_DOWN  , Tile_S , TILE_11_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
-    db D_LEFT  , Tile_F , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
-    db D_RIGHT , Tile_I , TILE_11_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
+    db D_LEFT  , Tile_E , TILE_J_LEFT    , TILE_WALKING   , 0          , EX_FAIL              , 0 , 0 ; $23
+    db D_DOWN  , Tile_Q , TILE_J_DOWN    , TILE_WALKING   , 0          , EX_FAIL              , 0 , 0 ; $24
+    db D_UP    , Tile_M , TILE_J_LEFT    , TILE_WALKING   , 0          , EX_FAIL              , 0 , 0 ; $25
+    db D_DOWN  , Tile_S , TILE_J_LEFT    , TILE_WALKING   , 0          , EX_FAIL              , 0 , 0 ; $26
+    db D_LEFT  , Tile_F , TILE_J_DOWN    , TILE_WALKING   , 0          , EX_FAIL              , 0 , 0 ; $27
+    db D_RIGHT , Tile_I , TILE_J_DOWN    , TILE_WALKING   , 0          , EX_FAIL              , 0 , 0 ; $28
 
 ; CAVE HOLE
-    db D_DOWN  , Tile_Q , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_DOWN  ; $2D
-    db D_UP    , Tile_M , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_UP    ; $2E
-    db D_LEFT  , Tile_E , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_LEFT  ; $2F
-    db D_RIGHT , Tile_I , TILE_11_CAV_HOLE  , 0                 , 0          , EX_B | EX_NOBIKE , 1 , BTN_RIGHT ; $30
+    db D_DOWN  , Tile_Q , TILE_CAV_HOLE  , 0              , 0          , EX_B | EX_NOBIKE     , 1 , BTN_DOWN  ; $29
+    db D_UP    , Tile_M , TILE_CAV_HOLE  , 0              , 0          , EX_B | EX_NOBIKE     , 1 , BTN_UP    ; $2A
+    db D_LEFT  , Tile_E , TILE_CAV_HOLE  , 0              , 0          , EX_B | EX_NOBIKE     , 1 , BTN_LEFT  ; $2B
+    db D_RIGHT , Tile_I , TILE_CAV_HOLE  , 0              , 0          , EX_B | EX_NOBIKE     , 1 , BTN_RIGHT ; $2C
 
 ; BOULDER
-    db D_DOWN  , Tile_S , TILE_11_UPP_CTR   , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $31
-    db D_UP    , Tile_M , TILE_11_STRS_HRZ  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $32
-    db D_LEFT  , Tile_F , TILE_11_STRS_VRT  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $33
-    db D_LEFT  , Tile_F , TILE_11_J_RIGHT   , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $34
-    db D_LEFT  , Tile_B , TILE_11_J_RIGHT   , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $35
-    db D_RIGHT , Tile_K , TILE_11_STRS_VRT  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $36
-    db D_RIGHT , Tile_K , TILE_11_J_LEFT    , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $37
-    db D_RIGHT , Tile_C , TILE_11_J_LEFT    , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $38
-    db D_UP    , Tile_M , TILE_11_STRS_STD  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $39
-    db D_UP    , Tile_A , TILE_11_STRS_STD  , 0                 , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $3A
-
-; End
-    db $FF
-
-CollissionRule_Tileset03:
-
-; MOUNTAIN BORDER
-    db D_UP    , Tile_D , TILE_03_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $00
-    db D_UP    , Tile_P , TILE_03_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $01
-    db D_DOWN  , Tile_T , TILE_03_UPP_CTR   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $02
-    db D_DOWN  , Tile_T , TILE_03_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $03
-    db D_LEFT  , Tile_H , TILE_03_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $04
-    db D_LEFT  , Tile_E , TILE_03_J_RIGHT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $05
-    db D_RIGHT , Tile_L , TILE_03_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $06
-
-; MOUNTAIN STAIRS
-    db D_LEFT  , Tile_H , TILE_03_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $07
-    db D_RIGHT , Tile_K , TILE_03_J_DOWN    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $08
-    db D_UP    , Tile_N , TILE_03_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $09
-    db D_DOWN  , Tile_T , TILE_03_J_LEFT    , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0A
-
-; MOUNTAIN BOTTOM CORNER
-    db D_RIGHT , Tile_L , TILE_03_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0B
-    db D_UP    , Tile_P , TILE_03_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0C
-    db D_LEFT  , Tile_H , TILE_03_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0D
-    db D_DOWN  , Tile_T , TILE_03_BTM_LFT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0E
-    db D_UP    , Tile_O , TILE_03_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $0F
-    db D_LEFT  , Tile_G , TILE_03_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $10
-    db D_RIGHT , Tile_K , TILE_03_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $11
-    db D_DOWN  , Tile_S , TILE_03_BTM_RGT   , $FF               , 0          , EX_FAIL          , 0 , 0 ; $12
-
-; GO OUT
-    db D_DOWN  , Tile_A , TILE_03_J_DOWN    , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $13
-    db D_DOWN  , Tile_A , TILE_03_BTM_LFT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $14
-    db D_DOWN  , Tile_B , TILE_03_BTM_RGT   , 0                 , COLL_DOWN  , 0                , 0 , 0 ; $15
-    db D_LEFT  , Tile_A , TILE_03_J_LEFT    , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $16
-    db D_LEFT  , Tile_A , TILE_03_BTM_LFT   , 0                 , COLL_LEFT  , 0                , 0 , 0 ; $17
-    db D_RIGHT , Tile_B , TILE_03_BTM_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $18
-    db D_RIGHT , Tile_D , TILE_03_J_RIGHT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $19
-    db D_RIGHT , Tile_D , TILE_03_UPP_RGT   , 0                 , COLL_RIGHT , 0                , 0 , 0 ; $1A
-    db D_UP    , Tile_C , TILE_03_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1B
-    db D_UP    , Tile_D , TILE_03_J_UP      , 0                 , COLL_UP    , 0                , 0 , 0 ; $1C
-
-; GO IN
-    db D_UP    , Tile_M , TILE_03_J_DOWN    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1D
-    db D_UP    , Tile_M , TILE_03_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1E
-    db D_UP    , Tile_N , TILE_03_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $1F
-    db D_RIGHT , Tile_I , TILE_03_J_LEFT    , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $20
-    db D_RIGHT , Tile_I , TILE_03_BTM_LFT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $21
-    db D_LEFT  , Tile_F , TILE_03_BTM_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $22
-    db D_LEFT  , Tile_H , TILE_03_J_RIGHT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $23
-    db D_LEFT  , Tile_H , TILE_03_UPP_RGT   , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $24
-    db D_DOWN  , Tile_S , TILE_03_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $25
-    db D_DOWN  , Tile_T , TILE_03_J_UP      , $FF               , 0          , EX_B | EX_NOBIKE , 0 , 0 ; $26
-
-; WALK NEAR JUMP BORDER
-    db D_LEFT  , Tile_E , TILE_03_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $27
-    db D_DOWN  , Tile_Q , TILE_03_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $28
-    db D_UP    , Tile_M , TILE_03_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $29
-    db D_DOWN  , Tile_S , TILE_03_J_LEFT    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2A
-    db D_LEFT  , Tile_F , TILE_03_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2B
-    db D_RIGHT , Tile_I , TILE_03_J_DOWN    , TILE_11_WALKING   , 0          , EX_FAIL          , 0 , 0 ; $2C
+    db D_DOWN  , Tile_S , TILE_UPP_CTR   , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $2D
+    db D_UP    , Tile_M , TILE_STRS_HRZ  , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $2E
+    db D_LEFT  , Tile_F , TILE_STRS_VRT  , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $2F
+    db D_LEFT  , Tile_F , TILE_J_RIGHT   , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $30
+    db D_LEFT  , Tile_B , TILE_J_RIGHT   , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $31
+    db D_RIGHT , Tile_K , TILE_STRS_VRT  , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $32
+    db D_RIGHT , Tile_K , TILE_J_LEFT    , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $33
+    db D_RIGHT , Tile_C , TILE_J_LEFT    , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $34
+    db D_UP    , Tile_M , TILE_STRS_STD  , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $35
+    db D_UP    , Tile_A , TILE_STRS_STD  , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $36
 
 ; End
     db $FF
@@ -37681,6 +37152,17 @@ IndigoPlateauLobbyObject:
 
 _FuchsiaCityScript:
     ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    jr z,.next
+    ld a,[wEventErikMeetSaraBit3]
+    bit 3,a
+    jr nz,.next
+    ld a,$FA ; SafariZoneRestHouse1ErikOAM
+    ld [$cc4d],a
+    PREDEF RemoveMissableObject
+.next
+    ld hl,$d126
     bit 6,[hl]
     res 6,[hl]
     jr z,.end
@@ -37696,7 +37178,71 @@ _FuchsiaCityScript:
     ld bc,(BANK(MonOverworldDataNew2_emimonserrate) << 8) + $04
     call GoodCopyVideoData
 .end
-    jp EnableAutoTextBoxDrawing
+    call EnableAutoTextBoxDrawing
+    ld hl,FuchsiaCityScriptPointers
+    ld a,[W_FUCHSIACITYCURSCRIPT]
+    jp CallFunctionInTable
+
+FuchsiaCityScriptPointers:
+    dw FuchsiaCityScript0
+    dw FuchsiaCityScript1
+    dw FuchsiaCityScript2
+
+FuchsiaCityScript0:
+    ret
+
+FuchsiaCityScript1:
+    ld a,[W_XCOORD]
+    ld b,a
+    ld a,[W_YCOORD]
+    ld c,a
+    ld hl,.ErikMovement
+.retry
+    ld a,[hli]
+    cp b
+    jr nz,.next
+    ld a,[hli]
+    cp c
+    jr nz,.next
+    ld d,h
+    ld e,l
+    ld a,3
+    ld [$ff00+$8c],a
+    call MoveSprite
+    ld a,2 ; FuchsiaCityScript2
+    ld [W_CURMAPSCRIPT],a
+    ld [W_FUCHSIACITYCURSCRIPT],a
+    ret
+.next
+    ld a,[hli]
+    cp $FF
+    jr z,.retry
+    jr .next
+.ErikMovement
+    db 30,15
+    db RT,RT,RT,RT,RT,UP,UP,UP,$FF
+    db 29,14
+    db RT,RT,RT,RT,$FF
+    db 31,14
+    db DN,RT,RT,RT,RT,RT,UP,UP,UP,UP,UP,$FF
+
+FuchsiaCityScript2:
+    ld a,[$d730]
+    bit 0,a
+    ret nz
+    ld a,$FA ; SafariZoneRestHouse1ErikOAM
+    ld [$cc4d],a
+    PREDEF AddMissableObject
+    ld a,$F9 ; FuchsiaCityErikOAM
+    ld [$cc4d],a
+    PREDEF RemoveMissableObject
+    ld hl,wEventErikMeetSaraBit3
+    set 3,[hl]
+    xor a ; FuchsiaCityScript0
+    ld [W_CURMAPSCRIPT],a
+    ld [W_FUCHSIACITYCURSCRIPT],a
+    ld [wJoypadForbiddenButtonsMask],a
+    ret
 
 PalletTownScriptPointers:
     dw PalletTownScript0
@@ -37758,6 +37304,38 @@ DisableRoute22Rival1stBattle:
     res 0,[hl]
     res 7,[hl]
     ret
+
+FuchsiaCityText3:
+    db $08 ; asm
+    ld a,[wEventEncounterSaraBit2]
+    bit 2,a
+    jr z,.BeforeSara
+    ld hl,.ErikWhatText
+    call PrintText
+    call .EmotionBubble
+    ld a,1 ; FuchsiaCityScript1
+    ld [W_CURMAPSCRIPT],a
+    ld [W_FUCHSIACITYCURSCRIPT],a
+    jr .done
+.BeforeSara
+    ld hl,.FuchsiaCityText3
+    call PrintText
+.done
+    jp TextScriptEnd
+.FuchsiaCityText3
+    TX_FAR _FuchsiaCityText3
+    db "@"
+.ErikWhatText
+    TX_FAR _ErikWhatText
+    db "@"
+.EmotionBubble
+    ld a,3
+    ld [$CD4F],a ; EmotionBubbleSpriteIndex
+    ld a,1
+    ld [$CD50],a ; WhichEmotionBubble (1 = QUESTION_BUBBLE)
+    PREDEF EmotionBubble ; display emotion over head
+    ld c,20
+    jp DelayFrames
 
 SECTION "bank7",ROMX,BANK[$7]
 
@@ -38071,6 +37649,114 @@ OaksLabText26:
     TX_FAR _OaksLabTextTM1
     db $11
     TX_FAR _OaksLabTextTM2
+    db "@"
+
+DecreaseFossilStep:
+    ld hl,$d7a3
+    bit 1,[hl]
+    jr z,.Skip
+    ld a,[wFossilSteps]
+    ld b,a
+    ld a,[wFossilSteps+1]
+    ld c,a
+    or b
+    jr nz,.FossilStepNotZero
+    res 1,[hl] ; Fossil Live
+    ld a,$86
+    call PlaySound
+    jr .Skip
+.FossilStepNotZero
+    dec bc
+    ld a,b
+    ld [wFossilSteps],a ; $d70d
+    ld a,c
+    ld [wFossilSteps+1],a ; $d70e
+.Skip
+    call .HandleEnergySteps
+    ld a,[$d790]
+    bit 7,a ; in the safari zone?
+    ret z ; notSafariZone
+    ld a,[wSafariSteps] ; $d70d
+    jp ContinueSafariSteps
+
+.HandleEnergySteps
+    ld a,[wEnergySteps]
+    ld b,a
+    dec a
+    and %00001111
+    push af
+    ld c,a
+    ld a,b
+    and %11110000
+    or c
+    ld [wEnergySteps],a
+    pop af
+    ret nz
+    ; RestorePartyEnergy
+    ld a,[W_NUMINPARTY]
+    and a
+    ret z
+    ld d,a
+    ld e,0
+.loop
+    ld hl,W_PARTYMON1_MOVE1PP
+    ld bc,44
+    ld a,e
+    call AddNTimes ; hl now points to move's PP
+    ld a,[hl] ; Read Energy
+    inc a
+    jr z,.JustMax
+    ld [hl],a
+.JustMax
+    inc e
+    dec d
+    jr nz,.loop
+    ret
+
+; Viridian
+ViridianMartText6:
+    db $FE,4,POKE_BALL
+    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
+
+; Fuchsia
+FuchsiaMartText1:
+    db $FE,5,ULTRA_BALL,GREAT_BALL
+    db SUPER_POTION
+    db FULL_HEAL
+    db SUPER_REPEL,$FF
+
+BillsHouseObject:
+    db $d ; border tile
+
+    db 3 ; warps
+    db 07,02,0,$ff
+    db 07,03,0,$ff
+    db 06,05,1,SWAP_MAP
+
+    db $0 ; signs
+
+    db $3 ; people
+    db SPRITE_KABUTO,$5 + 4,$6 + 4,$ff,$ff,$1 ; person
+    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$4 + 4,$ff,$ff,$2 ; person
+    db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$6 + 4,$ff,$ff,$3 ; person
+
+    ; warp-to
+    EVENT_DISP BILLS_HOUSE_WIDTH,07,02
+    EVENT_DISP BILLS_HOUSE_WIDTH,07,03
+    EVENT_DISP BILLS_HOUSE_WIDTH,06,05
+
+AddStarterToParty:
+    ld a,1
+    ld [wTempAlternateFormIndex],a
+    jp AddPokemonToParty
+
+PrintMagazinesText:
+    call EnableAutoTextBoxDrawing
+    ld a,$30
+    jp Func_3ef5
+
+UnnamedText_1eb69:
+    TX_FAR _UnnamedText_1eb69
     db "@"
 
 ; Free
@@ -41586,12 +41272,7 @@ PowerPlantScript: ; 1e2c6 (7:62c6)
     ld [W_POWERPLANTCURSCRIPT],a
     ret
 
-PowerPlantScriptPointers: ; 1e2d9 (7:62d9)
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
-
-PowerPlantTextPointers: ; 1e2df (7:62df)
+PowerPlantTextPointers:
     dw PowerPlantText1
     dw PowerPlantText2
     dw PowerPlantText3
@@ -41606,6 +41287,9 @@ PowerPlantTextPointers: ; 1e2df (7:62df)
     dw PickupItemText
     dw PickupItemText
     dw PickupItemText
+    dw PickupItemText
+
+SECTION "PowerPlantTrainerHeaders",ROMX[$62fb],BANK[$7]
 
 PowerPlantTrainerHeaders: ; 1e2fb (7:62fb)
 PowerPlantTrainerHeader0: ; 1e2fb (7:62fb)
@@ -41746,15 +41430,7 @@ VoltorbBattleText: ; 1e3aa (7:63aa)
     TX_FAR _VoltorbBattleText ; 0x8c5e2
     db "@"
 
-ZapdosBattleText: ; 1e3af (7:63af)
-    TX_FAR _ZapdosBattleText ; 0x8c5ea
-    db $8
-    ld a,ZAPDOS
-    call PlayCry
-    call WaitForSoundToFinish
-    jp TextScriptEnd
-
-PowerPlantObject: ; 0x1e3bf (size=135)
+PowerPlantObject:
     db $2e ; border tile
 
     db $3 ; warps
@@ -41764,7 +41440,7 @@ PowerPlantObject: ; 0x1e3bf (size=135)
 
     db $0 ; signs
 
-    db $e ; people
+    db 15 ; people
     db SPRITE_BALL,$14 + 4,$9 + 4,$ff,$ff,$41,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
     db SPRITE_BALL,$12 + 4,$20 + 4,$ff,$ff,$42,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
     db SPRITE_BALL,$19 + 4,$15 + 4,$ff,$ff,$43,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
@@ -41779,11 +41455,14 @@ PowerPlantObject: ; 0x1e3bf (size=135)
     db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
     db SPRITE_BALL,$20 + 4,$1a + 4,$ff,$ff,$8d,TM_25 ; item
     db SPRITE_BALL,$20 + 4,$14 + 4,$ff,$ff,$8e,TM_55 ; item ; FLASH
+    db SPRITE_BALL,34 + 4,09 + 4,$ff,$ff,$8f,TM_59 ; item
 
     ; warp-to
     EVENT_DISP $14,$23,$4
     EVENT_DISP $14,$23,$5
     EVENT_DISP $14,$b,$0
+
+SECTION "PowerPlantBlocks",ROMX[$6446],BANK[$7]
 
 PowerPlantBlocks: ; 1e446 (7:6446)
     INCBIN "maps/powerplant.blk"
@@ -42530,6 +42209,19 @@ CinnabarGymQuizCorrectText: ; 1eae3 (7:6ae3)
 CinnabarGymQuizIncorrectText: ; 1eb05 (7:6b05)
     TX_FAR _CinnabarGymQuizIncorrectText
     db "@"
+
+ZapdosBattleText:
+    TX_FAR _ZapdosBattleText ; 0x8c5ea
+    db $8
+    ld a,ZAPDOS
+    call PlayCry
+    call WaitForSoundToFinish
+    jp TextScriptEnd
+
+PowerPlantScriptPointers:
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
 
 ; Free
 
@@ -43927,6 +43619,9 @@ HandleExclusiveLearnMove:
     call .SearchSetBit
     ld hl,wTempExclusiveByte03
     ld c,4      ; Byte 4
+    call .SearchSetBit
+    ld hl,$cfb7 ; Ex Move 3 PP
+    ld c,5      ; Byte 5
     ; fall through
 
 .SearchSetBit
@@ -44219,6 +43914,8 @@ TryToAddExclusiveMove:
     ld a,c
     cp 8*2 ; check if the move is in the first 2 bytes
     jr c,.notInOTName
+    cp 8*5 ; check if the move is in the first 4 bytes
+    jr nc,.notInOTName
     ld hl,GenericBuffer+1
     ld a,[hli]
     ld d,[hl]
@@ -44258,6 +43955,7 @@ TryToAddExclusiveMove:
     db 0
     db 1
     db 2
+    db W_PARTYMON1_MOVE3PP-W_PARTYMON1_NUM
 
 ExclusiveMoveLearnTable:
     dw MissingNoExclusiveMove  ; 000 - MISSINGNO
@@ -44534,114 +44232,6 @@ GiveVoltorb:
 
 VoltorbText:
     TX_FAR _VoltorbText
-    db "@"
-
-DecreaseFossilStep:
-    ld hl,$d7a3
-    bit 1,[hl]
-    jr z,.Skip
-    ld a,[wFossilSteps]
-    ld b,a
-    ld a,[wFossilSteps+1]
-    ld c,a
-    or b
-    jr nz,.FossilStepNotZero
-    res 1,[hl] ; Fossil Live
-    ld a,$86
-    call PlaySound
-    jr .Skip
-.FossilStepNotZero
-    dec bc
-    ld a,b
-    ld [wFossilSteps],a ; $d70d
-    ld a,c
-    ld [wFossilSteps+1],a ; $d70e
-.Skip
-    call .HandleEnergySteps
-    ld a,[$d790]
-    bit 7,a ; in the safari zone?
-    ret z ; notSafariZone
-    ld a,[wSafariSteps] ; $d70d
-    jp ContinueSafariSteps
-
-.HandleEnergySteps
-    ld a,[wEnergySteps]
-    ld b,a
-    dec a
-    and %00001111
-    push af
-    ld c,a
-    ld a,b
-    and %11110000
-    or c
-    ld [wEnergySteps],a
-    pop af
-    ret nz
-    ; RestorePartyEnergy
-    ld a,[W_NUMINPARTY]
-    and a
-    ret z
-    ld d,a
-    ld e,0
-.loop
-    ld hl,W_PARTYMON1_MOVE1PP
-    ld bc,44
-    ld a,e
-    call AddNTimes ; hl now points to move's PP
-    ld a,[hl] ; Read Energy
-    inc a
-    jr z,.JustMax
-    ld [hl],a
-.JustMax
-    inc e
-    dec d
-    jr nz,.loop
-    ret
-
-; Viridian
-ViridianMartText6:
-    db $FE,4,POKE_BALL
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
-
-; Fuchsia
-FuchsiaMartText1:
-    db $FE,5,ULTRA_BALL,GREAT_BALL
-    db SUPER_POTION
-    db FULL_HEAL
-    db SUPER_REPEL,$FF
-
-BillsHouseObject:
-    db $d ; border tile
-
-    db 3 ; warps
-    db 07,02,0,$ff
-    db 07,03,0,$ff
-    db 06,05,1,SWAP_MAP
-
-    db $0 ; signs
-
-    db $3 ; people
-    db SPRITE_KABUTO,$5 + 4,$6 + 4,$ff,$ff,$1 ; person
-    db SPRITE_BLACK_HAIR_BOY_2,$4 + 4,$4 + 4,$ff,$ff,$2 ; person
-    db SPRITE_BLACK_HAIR_BOY_2,$5 + 4,$6 + 4,$ff,$ff,$3 ; person
-
-    ; warp-to
-    EVENT_DISP BILLS_HOUSE_WIDTH,07,02
-    EVENT_DISP BILLS_HOUSE_WIDTH,07,03
-    EVENT_DISP BILLS_HOUSE_WIDTH,06,05
-
-AddStarterToParty:
-    ld a,1
-    ld [wTempAlternateFormIndex],a
-    jp AddPokemonToParty
-
-PrintMagazinesText:
-    call EnableAutoTextBoxDrawing
-    ld a,$30
-    jp Func_3ef5
-
-UnnamedText_1eb69:
-    TX_FAR _UnnamedText_1eb69
     db "@"
 
 SECTION "bank8",ROMX,BANK[$8]
@@ -48476,7 +48066,7 @@ Func_3730e: ; 3730e (d:730e)
     xor a
     ld [hli],a
     ld [hl],$2
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     call GBPalWhiteOutWithDelay3
     call Func_378a8
     call LoadFontTilePatterns
@@ -58331,6 +57921,7 @@ HowManyMovesWithEnoughEnergy:
 ; function to adjust the base damage of an attack to account for type effectiveness
 AdjustDamageForMoveType:
     PREDEF AdjustDamageForMoveType_GetInput
+    jr z,.skipSameTypeAttackBonus ; TYPE_NA?
     ld a,[$d11e] ; move type
     ld hl,wTmpAttackerTypes
     ld b,4
@@ -69092,31 +68683,18 @@ SafariZoneCenterObject: ; 0x45bc5 (size=89)
 SafariZoneCenterBlocks: ; 45c1e (11:5c1e)
     INCBIN "maps/safarizonecenter.blk"
 
-SECTION "SafariZoneRestHouse1_h",ROMX[$5ce1],BANK[$11]
-
-SafariZoneRestHouse1_h: ; 0x45ce1 to 0x45ced (12 bytes) (bank=11) (id=221)
+SafariZoneRestHouse1_h:
     db $0c ; tileset
     db SAFARI_ZONE_REST_HOUSE_1_HEIGHT,SAFARI_ZONE_REST_HOUSE_1_WIDTH ; dimensions (y,x)
     dw SafariZoneRestHouse1Blocks,SafariZoneRestHouse1TextPointers,SafariZoneRestHouse1Script ; blocks,texts,scripts
     db $00 ; connections
     dw SafariZoneRestHouse1Object ; objects
 
-SafariZoneRestHouse1Script: ; 45ced (11:5ced)
-    jp EnableAutoTextBoxDrawing
-
-SafariZoneRestHouse1TextPointers: ; 45cf0 (11:5cf0)
-    dw SafariZoneRestHouse1Text1
-    dw SafariZoneRestHouse1Text2
-
-SafariZoneRestHouse1Text1: ; 45cf4 (11:5cf4)
-    TX_FAR _SafariZoneRestHouse1Text1
-    db "@"
-
-SafariZoneRestHouse1Text2: ; 45cf9 (11:5cf9)
+SafariZoneRestHouse1Text2:
     TX_FAR _SafariZoneRestHouse1Text2
     db "@"
 
-SafariZoneRestHouse1Object: ; 0x45cfe (size=32)
+SafariZoneRestHouse1Object:
     db $a ; border tile
 
     db $2 ; warps
@@ -69125,13 +68703,16 @@ SafariZoneRestHouse1Object: ; 0x45cfe (size=32)
 
     db $0 ; signs
 
-    db $2 ; people
+    db $3 ; people
     db SPRITE_GIRL,$2 + 4,$3 + 4,$ff,$d0,$1 ; person
     db SPRITE_OAK_AIDE,$4 + 4,$1 + 4,$fe,$1,$2 ; person
+    db SPRITE_FISHER2,02 + 4,04 + 4,$ff,$d2,$3 ; person
 
     ; warp-to
     EVENT_DISP $4,$7,$2 ; SAFARI_ZONE_CENTER
     EVENT_DISP $4,$7,$3 ; SAFARI_ZONE_CENTER
+
+SECTION "SafariZoneRestHouse2_h",ROMX[$5d1e],BANK[$11]
 
 SafariZoneRestHouse2_h: ; 0x45d1e to 0x45d2a (12 bytes) (bank=11) (id=223)
     db $0c ; tileset
@@ -69773,33 +69354,11 @@ Seafoam3HolesCoords: ; 464a9 (11:64a9)
 SeafoamIslands3TextPointers: ; 464ae (11:64ae)
     dw BoulderText
     dw BoulderText
+    dw PickupItemText
 
-SeafoamIslands3Object: ; 0x464b2 (size=72)
-    db $7d ; border tile
+; Free
 
-    db $7 ; warps
-    db $3,$5,$0,SEAFOAM_ISLANDS_2
-    db $d,$5,$0,SEAFOAM_ISLANDS_4
-    db $7,$d,$2,SEAFOAM_ISLANDS_2
-    db $f,$13,$3,SEAFOAM_ISLANDS_2
-    db $3,$19,$3,SEAFOAM_ISLANDS_4
-    db $b,$19,$5,SEAFOAM_ISLANDS_2
-    db $e,$19,$4,SEAFOAM_ISLANDS_4
-
-    db $0 ; signs
-
-    db $2 ; people
-    db SPRITE_BOULDER,$6 + 4,$12 + 4,$ff,$10,$1 ; person
-    db SPRITE_BOULDER,$6 + 4,$17 + 4,$ff,$10,$2 ; person
-
-    ; warp-to
-    EVENT_DISP $f,$3,$5 ; SEAFOAM_ISLANDS_2
-    EVENT_DISP $f,$d,$5 ; SEAFOAM_ISLANDS_4
-    EVENT_DISP $f,$7,$d ; SEAFOAM_ISLANDS_2
-    EVENT_DISP $f,$f,$13 ; SEAFOAM_ISLANDS_2
-    EVENT_DISP $f,$3,$19 ; SEAFOAM_ISLANDS_4
-    EVENT_DISP $f,$b,$19 ; SEAFOAM_ISLANDS_2
-    EVENT_DISP $f,$e,$19 ; SEAFOAM_ISLANDS_4
+SECTION "SeafoamIslands3Blocks",ROMX[$64fa],BANK[$11]
 
 SeafoamIslands3Blocks: ; 464fa (11:64fa)
     INCBIN "maps/seafoamislands3.blk"
@@ -71087,7 +70646,7 @@ BillsHouseHiddenObjects:
     db $FF
 Mansion2HiddenObjects:
     db $0b,$02,$04 ; XXX,y,x
-    dbw $14,$6037
+    dbw BANK(Func_52037),Func_52037
     db 07,28,FIRE_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
@@ -71589,6 +71148,130 @@ BoulderOnSwitch4:
     ld a,$03 + 4 ; wispnote - We need to offset coordinates by 4
     ld [hl],a
     ret
+
+; ───────────────────────────────────────
+
+SeafoamIslands3Object:
+    db $7d ; border tile
+
+    db $7 ; warps
+    db $3,$5,$0,SEAFOAM_ISLANDS_2
+    db $d,$5,$0,SEAFOAM_ISLANDS_4
+    db $7,$d,$2,SEAFOAM_ISLANDS_2
+    db $f,$13,$3,SEAFOAM_ISLANDS_2
+    db $3,$19,$3,SEAFOAM_ISLANDS_4
+    db $b,$19,$5,SEAFOAM_ISLANDS_2
+    db $e,$19,$4,SEAFOAM_ISLANDS_4
+
+    db $0 ; signs
+
+    db $3 ; people
+    db SPRITE_BOULDER,$6 + 4,$12 + 4,$ff,$10,$1 ; person
+    db SPRITE_BOULDER,$6 + 4,$17 + 4,$ff,$10,$2 ; person
+    db SPRITE_BALL,02 + 4,26 + 4,$ff,$ff,$83,TM_58 ; item
+
+    ; warp-to
+    EVENT_DISP $f,$3,$5 ; SEAFOAM_ISLANDS_2
+    EVENT_DISP $f,$d,$5 ; SEAFOAM_ISLANDS_4
+    EVENT_DISP $f,$7,$d ; SEAFOAM_ISLANDS_2
+    EVENT_DISP $f,$f,$13 ; SEAFOAM_ISLANDS_2
+    EVENT_DISP $f,$3,$19 ; SEAFOAM_ISLANDS_4
+    EVENT_DISP $f,$b,$19 ; SEAFOAM_ISLANDS_2
+    EVENT_DISP $f,$e,$19 ; SEAFOAM_ISLANDS_4
+
+; ───────────────────────────────────────
+
+SafariZoneRestHouse1TextPointers:
+    dw SafariZoneRestHouse1Text1
+    dw SafariZoneRestHouse1Text2
+    dw SafariZoneRestHouse1Text3
+
+SafariZoneRestHouse1Text1:
+    db $08 ; asm
+    ld a,[wEventErikMeetSaraBit3]
+    bit 3,a
+    jr nz,.AfterMeetErik
+    ld hl,.SafariZoneRestHouse1Text1
+    call PrintText
+    ld hl,wEventEncounterSaraBit2
+    set 2,[hl]
+.end
+    jp TextScriptEnd
+.AfterMeetErik
+    ld hl,.SaraAndErikText
+    call PrintText
+    call .EmotionBubble
+    ;call WaitForButtonPress
+    jr .end
+.SafariZoneRestHouse1Text1
+    TX_FAR _SafariZoneRestHouse1Text1
+    db "@"
+.SaraAndErikText
+    TX_FAR _SaraAndErikText
+    db "@"
+.EmotionBubble
+    ld a,1
+    jr ErikAndSaraEmotionBubbleCommon
+
+SafariZoneRestHouse1Text3:
+    db $08 ; asm
+    ld a,[wEventNotTakeTM60Bit2]
+    bit 2,a
+    jr z,.AfterTM60
+    ld hl,.TM60PreText
+    call PrintText
+    ld bc,(TM_60 << 8) | 3 ; DIZZY_PUNCH
+    call GiveItem
+    ld hl,.ReceivedTM60Text
+    call PrintText
+    ld hl,.TM60ExplanationText
+    call PrintText
+    ld hl,wEventNotTakeTM60Bit2
+    res 2,[hl]
+    jr .end
+.AfterTM60
+    ld hl,.ErikAndSaraText
+    call PrintText
+    call .EmotionBubble
+.end
+    jp TextScriptEnd
+.TM60PreText
+    TX_FAR _TM60PreText
+    db "@"
+.ReceivedTM60Text
+    TX_FAR _ReceivedText
+    db $0B,"@"
+.TM60ExplanationText
+    TX_FAR _TM60ExplanationText
+    db "@"
+.ErikAndSaraText
+    TX_FAR _ErikAndSaraText
+    db "@"
+.EmotionBubble
+    ld a,3
+    ; fall through
+
+ErikAndSaraEmotionBubbleCommon:
+    ld [$CD4F],a ; EmotionBubbleSpriteIndex
+    ld a,3
+    ld [$CD50],a ; WhichEmotionBubble (3 = LOVE_BUBBLE)
+    PREDEF EmotionBubble ; display emotion over head
+    ld c,20
+    jp DelayFrames    
+
+SafariZoneRestHouse1Script:
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    jr z,.done
+    ld a,[wEventErikMeetSaraBit3]
+    bit 3,a
+    jr z,.done
+    ld a,$D3
+    ld [W_MAPSPRITEDATA],a
+.done
+    jp EnableAutoTextBoxDrawing
+    db $80,$FF
 
 ; ───────────────────────────────────────
 
@@ -76344,7 +76027,7 @@ Func_3f073Predef:                          NEW_PREDEF Func_3f073                
 ScaleSpriteByTwoPredef:                    NEW_PREDEF ScaleSpriteByTwo                    ; $03
 LoadMonBackSpritePredef:                   NEW_PREDEF LoadMonBackSprite                   ; $04
 Func_79abaPredef:                          NEW_PREDEF Func_79aba                          ; $05
-Func_f132Predef:                           NEW_PREDEF Func_f132                           ; $06
+ds 3                                                                                      ; $06
 HealPartyPredef:                           NEW_PREDEF HealParty                           ; $07
 MoveAnimationPredef:                       NEW_PREDEF MoveAnimation                       ; $08
 Func_f71ePredef:                           NEW_PREDEF Func_f71e                           ; $09
@@ -76403,7 +76086,7 @@ ShowPokedexDataPredef:                     NEW_PREDEF ShowPokedexData           
 WriteMonMovesPredef:                       NEW_PREDEF WriteMonMoves                       ; $3E
 SaveSAVPredef:                             NEW_PREDEF SaveSAV                             ; $3F
 Func_7202bPredef:                          NEW_PREDEF Func_7202b                          ; $40
-Func_f113Predef:                           NEW_PREDEF Func_f113                           ; $41
+SetVisitedAndLoadMissableObjPredef:        NEW_PREDEF SetVisitedAndLoadMissableObj        ; $41
 Unused_2Predef:                            NEW_PREDEF Unused                              ; $42
 TestMonMoveCompatibilityPredef:            NEW_PREDEF TestMonMoveCompatibility            ; $43
 TMToMovePredef:                            NEW_PREDEF TMToMove                            ; $44
@@ -76414,7 +76097,7 @@ UpdateHPBar_2Predef:                       NEW_PREDEF UpdateHPBar               
 DrawEnemyHUDAndHPBarPredef:                NEW_PREDEF DrawEnemyHUDAndHPBar                ; $49
 Func_70f60Predef:                          NEW_PREDEF Func_70f60                          ; $4A
 PrintTypesPredef:                          NEW_PREDEF PrintTypes                          ; $4B
-Func_17c47Predef:                          NEW_PREDEF Func_17c47                          ; $4C
+EmotionBubblePredef:                       NEW_PREDEF EmotionBubble                       ; $4C
 Func_5aafPredef:                           NEW_PREDEF Func_5aaf                           ; $4D
 AskForMonNicknamePredef:                   NEW_PREDEF AskForMonNickname                   ; $4E
 Func_37ca1Predef:                          NEW_PREDEF Func_37ca1                          ; $4F
@@ -77264,7 +76947,7 @@ Route22Script0: ; 50f00 (14:4f00)
     ld [$cd4f],a
     xor a
     ld [$cd50],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     ld a,[$d700]
     and a
     jr z,.asm_50f4e ; 0x50f44 $8
@@ -77404,7 +77087,7 @@ Func_5104e: ; 5104e (14:504e)
     ld [$cd4f],a
     xor a
     ld [$cd50],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     ld a,[$d700]
     and a
     jr z,.skipYVisibilityTesta
@@ -79436,7 +79119,7 @@ Func_52037: ; 52037 (14:6037)
     ret nz
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,$5
+    ld a,6
     ld [H_SPRITEHEIGHT],a
     jp DisplayTextID
 
@@ -79447,10 +79130,10 @@ Mansion2ScriptPointers: ; 52047 (14:6047)
 
 Mansion2TextPointers: ; 5204d (14:604d)
     dw Mansion2Text1
-    ;dw PickupItemText
     dw Mansion2TextMoltres
     dw Mansion2Text3
     dw Mansion2Text4
+    dw PickupItemText
     dw Mansion2Text5
 
 SECTION "Mansion2Text1",ROMX[$6064],BANK[$14]
@@ -79521,12 +79204,12 @@ Mansion2Object:
 
     db $0 ; signs
 
-    db $4 ; people
+    db $5 ; people
     db SPRITE_BLACK_HAIR_BOY_2,$11 + 4,$3 + 4,$fe,$2,$41,BURGLAR,$4 ; trainer
-    ;db SPRITE_BALL,$7 + 4,$1c + 4,$ff,$ff,$82,CALCIUM ; item
     db SPRITE_MOLTRES,$c + 4,$1c + 4,$ff,$d1,$42,MOLTRES,OPP_LVL_OFFSET+55 ; Entry Point
     db SPRITE_BOOK_MAP_DEX,$2 + 4,$12 + 4,$ff,$ff,$3 ; person
     db SPRITE_BOOK_MAP_DEX,$16 + 4,$3 + 4,$ff,$ff,$4 ; person
+    db SPRITE_BALL,25 + 4,13 + 4,$ff,$ff,$85,TM_57 ; item
 
     ; warp-to
     EVENT_DISP $f,$a,$5 ; MANSION_1
@@ -80967,7 +80650,7 @@ BoulderOnSwitch3:
 SECTION "bank15",ROMX,BANK[$15]
 
 Route2_h: ; 54000 (15:4000)
-    db 00 ; Tileset
+    db $00 ; Tileset
     db ROUTE_2_HEIGHT,ROUTE_2_WIDTH ;Height,Width blocks (1 block = 4x4 tiles)
     dw Route2Blocks,Route2TextPointers,Route2Script
     db NORTH | SOUTH ;Connection Byte
@@ -81219,30 +80902,26 @@ Route17_h: ; 0x54b20 to 0x54b42 (34 bytes) (id=28)
     SOUTH_MAP_CONNECTION ROUTE_18,ROUTE_18_WIDTH,0,0,ROUTE_18_WIDTH - 12,Route18Blocks,ROUTE_17_WIDTH,ROUTE_17_HEIGHT
     dw Route17Object ; objects
 
-Route17Object: ; 0x54b42 (size=102)
-    db $43 ; border tile
+Route17TextPointers:
+    dw Route17Text1
+    dw Route17Text2
+    dw Route17Text3
+    dw Route17Text4
+    dw Route17Text5
+    dw Route17Text6
+    dw Route17Text7
+    dw Route17Text8
+    dw Route17Text9
+    dw Route17Text10
+    dw PickupItemText
+    dw Route17Text11
+    dw Route17Text12
+    dw Route17Text13
+    dw Route17Text14
+    dw Route17Text15
+    dw Route17Text16
 
-    db $0 ; warps
-
-    db $6 ; signs
-    db $33,$9,$b ; Route17Text11
-    db $3f,$9,$c ; Route17Text12
-    db $4b,$9,$d ; Route17Text13
-    db $57,$9,$e ; Route17Text14
-    db $6f,$9,$f ; Route17Text15
-    db $8d,$9,$10 ; Route17Text16
-
-    db $a ; people
-    db SPRITE_BIKER,$13 + 4,$c + 4,$ff,$d2,$41,CUE_BALL,$4 ; trainer
-    db SPRITE_BIKER,$10 + 4,$b + 4,$ff,$d3,$42,CUE_BALL,$5 ; trainer
-    db SPRITE_BIKER,$12 + 4,$4 + 4,$ff,$d1,$43,BIKER,$8 ; trainer
-    db SPRITE_BIKER,$20 + 4,$7 + 4,$ff,$d2,$44,BIKER,$9 ; trainer
-    db SPRITE_BIKER,$22 + 4,$e + 4,$ff,$d3,$45,BIKER,$a ; trainer
-    db SPRITE_BIKER,$3a + 4,$11 + 4,$ff,$d2,$46,CUE_BALL,$6 ; trainer
-    db SPRITE_BIKER,$44 + 4,$2 + 4,$ff,$d3,$47,CUE_BALL,$7 ; trainer
-    db SPRITE_BIKER,$62 + 4,$e + 4,$ff,$d3,$48,CUE_BALL,$8 ; trainer
-    db SPRITE_BIKER,$62 + 4,$5 + 4,$ff,$d2,$49,BIKER,$b ; trainer
-    db SPRITE_BIKER,$76 + 4,$a + 4,$ff,$d0,$4a,BIKER,$c ; trainer
+SECTION "Route17Blocks",ROMX[$4ba8],BANK[$15]
 
 Route17Blocks: ; 54ba8 (15:4ba8)
     INCBIN "maps/route17.blk"
@@ -82961,23 +82640,7 @@ Route17ScriptPointers: ; 55b8d (15:5b8d)
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
-Route17TextPointers: ; 55b93 (15:5b93)
-    dw Route17Text1
-    dw Route17Text2
-    dw Route17Text3
-    dw Route17Text4
-    dw Route17Text5
-    dw Route17Text6
-    dw Route17Text7
-    dw Route17Text8
-    dw Route17Text9
-    dw Route17Text10
-    dw Route17Text11
-    dw Route17Text12
-    dw Route17Text13
-    dw Route17Text14
-    dw Route17Text15
-    dw Route17Text16
+SECTION "Route17TrainerHeaders",ROMX[$5bb3],BANK[$15]
 
 Route17TrainerHeaders: ; 55bb3 (15:5bb3)
 Route17TrainerHeader0: ; 55bb3 (15:5bb3)
@@ -85421,6 +85084,32 @@ Route3Text1:
 .GotText
     TX_FAR _GotText
     db $0b,"@"
+
+Route17Object:
+    db $43 ; border tile
+
+    db $0 ; warps
+
+    db $6 ; signs
+    db $33,$9,$c ; Route17Text11
+    db $3f,$9,$d ; Route17Text12
+    db $4b,$9,$e ; Route17Text13
+    db $57,$9,$f ; Route17Text14
+    db $6f,$9,$10 ; Route17Text15
+    db $8d,$9,$11 ; Route17Text16
+
+    db $b ; people
+    db SPRITE_BIKER,$13 + 4,$c + 4,$ff,$d2,$41,CUE_BALL,$4 ; trainer
+    db SPRITE_BIKER,$10 + 4,$b + 4,$ff,$d3,$42,CUE_BALL,$5 ; trainer
+    db SPRITE_BIKER,$12 + 4,$4 + 4,$ff,$d1,$43,BIKER,$8 ; trainer
+    db SPRITE_BIKER,$20 + 4,$7 + 4,$ff,$d2,$44,BIKER,$9 ; trainer
+    db SPRITE_BIKER,$22 + 4,$e + 4,$ff,$d3,$45,BIKER,$a ; trainer
+    db SPRITE_BIKER,$3a + 4,$11 + 4,$ff,$d2,$46,CUE_BALL,$6 ; trainer
+    db SPRITE_BIKER,$44 + 4,$2 + 4,$ff,$d3,$47,CUE_BALL,$7 ; trainer
+    db SPRITE_BIKER,$62 + 4,$e + 4,$ff,$d3,$48,CUE_BALL,$8 ; trainer
+    db SPRITE_BIKER,$62 + 4,$5 + 4,$ff,$d2,$49,BIKER,$b ; trainer
+    db SPRITE_BIKER,$76 + 4,$a + 4,$ff,$d0,$4a,BIKER,$c ; trainer
+    db SPRITE_BALL,79 + 4,09 + 4,$ff,$ff,$8b,TM_56 ; item
 
 SECTION "bank16",ROMX,BANK[$16]
 
@@ -97574,7 +97263,7 @@ DiglettsCaveHole:
     xor a
     ld [hli],a
     ld [hl],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     call .Delay5
     ld hl,$d126 ; Trigger Check Warp Script 0
     res 6,[hl]  ; ...
@@ -98797,7 +98486,7 @@ Func_707b6: ; 707b6 (1c:47b6)
     xor a
     ld [hli],a
     ld [hl],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     ld a,[$c102]
     cp $4
     jr nz,.asm_70833
@@ -120733,6 +120422,32 @@ _UnknownDungeon4GolemText:
 _UnknownDungeon4GengarText:
     db $0,"Geeeeeeeeeee!@@"
 
+_ErikWhatText:
+    db 0,"What? SARA is",$4f
+    db "in SAFARI ZONE?@@"
+
+_TM60PreText:
+    db $0,"ERIK: Thanks",$4f
+    db "Man!! I want to",$55
+    db "give you this as",$55
+    db "a thank you!",$58
+
+_TM60ExplanationText:
+    db $0,"TM60 is",$4f
+    db "DIZZY PUNCH!",$51
+    db "Very Strong!",$4f
+    db "It can also",$55
+    db "confuse targeted",$55
+    db "#MON!",$57
+
+_SaraAndErikText
+    db 0,"SARA: ERIK!! "
+    db $DB,$DB,$DB,"@@" ; ❤️
+
+_ErikAndSaraText
+    db 0,"ERIK: SARA!! "
+    db $DB,$DB,$DB,"@@" ; ❤️
+
 SECTION "bank22",ROMX,BANK[$22]
 
 _RockTunnel2AfterBattleText8: ; 88000 (22:4000)
@@ -133235,23 +132950,23 @@ _DebugPlayerStats:
     ld de,wTempExclusiveByte03
     ld bc,$0103
     call PrintNumber
+    FuncCoord 00,12
+    ld hl,Coord
+    ld de,$cfb7 ; ex pp 3
+    ld bc,$0103
+    call PrintNumber
     ; Print Ex PP
     FuncCoord 04,09
     ld hl,Coord
-    ld de,$cfb6 ; exp pp 2
+    ld de,$cfb6 ; ex pp 2
     ld bc,$0103
     call PrintNumber
     FuncCoord 04,10
     ld hl,Coord
-    ld de,$cfb7 ; exp pp 3
+    ld de,$cfb8 ; ex pp 4
     ld bc,$0103
     call PrintNumber
-    FuncCoord 04,11
-    ld hl,Coord
-    ld de,$cfb8 ; exp pp 4
-    ld bc,$0103
-    call PrintNumber
-    ret
+    ret ; (only for Debug)
 .PrintIV
     push af
     srl a
@@ -133657,70 +133372,70 @@ ItemNames:
     db "?@"            ; $BC
     db "?@"            ; $BD
     db "?@"            ; $BE
-    db "?@"            ; $BF
-    db "?@"            ; $C0
-    db "?@"            ; $C1
-    db "?@"            ; $C2
-    db "?@"            ; $C3
-    db "?@"            ; $C4
-    db "?@"            ; $C5
-    db "?@"            ; $C6
-    db "TM01:M.PNCH@"  ; $C7 ; TM_01 ; Market
-    db "TM02:RAZ.WND@" ; $C8 ; TM_02 ; Market
-    db "TM03:SW.DNCE@" ; $C9 ; TM_03
-    db "TM04:WHRLWND@" ; $CA ; TM_04 ; Market
-    db "TM05:MEG.KCK@" ; $CB ; TM_05 ; Market
-    db "TM06:TOXIC@"   ; $CC ; TM_06
-    db "TM07:HRN DR.@" ; $CD ; TM_07 ; Market
-    db "TM08:BDY SLM@" ; $CE ; TM_08
-    db "TM09:TAK.DWN@" ; $CF ; TM_09 ; Market
-    db "TM10:DB.EDG@"  ; $D0 ; TM_10 ; Market
-    db "TM11:BUB.B.@"  ; $D1 ; TM_11
-    db "TM12:WTR GUN@" ; $D2 ; TM_12 ; Market
-    db "TM13:ICE BM.@" ; $D3 ; TM_13
-    db "TM14:BLZZARD@" ; $D4 ; TM_14
-    db "TM15:HYPR.B.@" ; $D5 ; TM_15
-    db "TM16:PAY DAY@" ; $D6 ; TM_16
-    db "TM17:SUBMIS.@" ; $D7 ; TM_17 ; Market
-    db "TM18:COUNTER@" ; $D8 ; TM_18
-    db "TM19:SSM TOS@" ; $D9 ; TM_19
-    db "TM20:RAGE@"    ; $DA ; TM_20
-    db "TM21:M.DRAIN@" ; $DB ; TM_21
-    db "TM22:SOLRBM.@" ; $DC ; TM_22
-    db "TM23:DRG RGE@" ; $DD ; TM_23
-    db "TM24:THUNDRB@" ; $DE ; TM_24
-    db "TM25:THUNDER@" ; $DF ; TM_25
-    db "TM26:EARTHQ.@" ; $E0 ; TM_26
-    db "TM27:FISSURE@" ; $E1 ; TM_27
-    db "TM28:DIG@"     ; $E2 ; TM_28
-    db "TM29:PSYCHIC@" ; $E3 ; TM_29
-    db "TM30:TELEPRT@" ; $E4 ; TM_30 ; Market
-    db "TM31:MIMIC@"   ; $E5 ; TM_31
-    db "TM32:DB.TEAM@" ; $E6 ; TM_32 ; Market
-    db "TM33:REFLECT@" ; $E7 ; TM_33 ; Market
-    db "TM34:BIDE@"    ; $E8 ; TM_34
-    db "TM35:METRONM@" ; $E9 ; TM_35
-    db "TM36:SELFDST@" ; $EA ; TM_36
-    db "TM37:FLMTRWR@" ; $EB ; TM_37
-    db "TM38:FIR.BLS@" ; $EC ; TM_38
-    db "TM39:SWIFT@"   ; $ED ; TM_39
-    db "TM40:SKUL B.@" ; $EE ; TM_40
-    db "TM41:LGT SCR@" ; $EF ; TM_41 ; Market
-    db "TM42:DRM EAT@" ; $F0 ; TM_42
-    db "TM43:SKY ATK@" ; $F1 ; TM_43
-    db "TM44:REST@"    ; $F2 ; TM_44
-    db "TM45:THND WV@" ; $F3 ; TM_45
-    db "TM46:PSYWAVE@" ; $F4 ; TM_46
-    db "TM47:EXPLOS.@" ; $F5 ; TM_47
-    db "TM48:RCK SLD@" ; $F6 ; TM_48
-    db "TM49:TRI ATK@" ; $F7 ; TM_49
-    db "TM50:SUBSTIT@" ; $F8 ; TM_50
-    db "TM51:BLADE@"   ; $F9 ; TM_51
-    db "TM52:SWOOP@"   ; $FA ; TM_52
-    db "TM53:TSUNAMI@" ; $FB ; TM_53
-    db "TM54:STRIKE@"  ; $FC ; TM_54
-    db "TM55:FLASH@"   ; $FD ; TM_55
-    db "TM56:STRGGLE@" ; $FE ; TM_56
+    db "TM01:M.PNCH@"  ; $BF ; TM_01 ; Market
+    db "TM02:RAZ.WND@" ; $C0 ; TM_02 ; Market
+    db "TM03:SW.DNCE@" ; $C1 ; TM_03
+    db "TM04:WHRLWND@" ; $C2 ; TM_04 ; Market
+    db "TM05:MEG.KCK@" ; $C3 ; TM_05 ; Market
+    db "TM06:TOXIC@"   ; $C4 ; TM_06
+    db "TM07:HRN DR.@" ; $C5 ; TM_07 ; Market
+    db "TM08:BDY SLM@" ; $C6 ; TM_08
+    db "TM09:TAK.DWN@" ; $C7 ; TM_09 ; Market
+    db "TM10:DB.EDG@"  ; $C8 ; TM_10 ; Market
+    db "TM11:BUB.B.@"  ; $C9 ; TM_11
+    db "TM12:WTR GUN@" ; $CA ; TM_12 ; Market
+    db "TM13:ICE BM.@" ; $CB ; TM_13
+    db "TM14:BLZZARD@" ; $CC ; TM_14
+    db "TM15:HYPR.B.@" ; $CD ; TM_15
+    db "TM16:PAY DAY@" ; $CE ; TM_16
+    db "TM17:SUBMIS.@" ; $CF ; TM_17 ; Market
+    db "TM18:COUNTER@" ; $D0 ; TM_18
+    db "TM19:SSM TOS@" ; $D1 ; TM_19
+    db "TM20:RAGE@"    ; $D2 ; TM_20
+    db "TM21:M.DRAIN@" ; $D3 ; TM_21
+    db "TM22:SOLRBM.@" ; $D4 ; TM_22
+    db "TM23:DRG RGE@" ; $D5 ; TM_23
+    db "TM24:THUNDRB@" ; $D6 ; TM_24
+    db "TM25:THUNDER@" ; $D7 ; TM_25
+    db "TM26:EARTHQ.@" ; $D8 ; TM_26
+    db "TM27:FISSURE@" ; $D9 ; TM_27
+    db "TM28:DIG@"     ; $DA ; TM_28
+    db "TM29:PSYCHIC@" ; $DB ; TM_29
+    db "TM30:TELEPRT@" ; $DC ; TM_30 ; Market
+    db "TM31:MIMIC@"   ; $DD ; TM_31
+    db "TM32:DB.TEAM@" ; $DE ; TM_32 ; Market
+    db "TM33:REFLECT@" ; $DF ; TM_33 ; Market
+    db "TM34:BIDE@"    ; $E0 ; TM_34
+    db "TM35:METRONM@" ; $E1 ; TM_35
+    db "TM36:SELFDST@" ; $E2 ; TM_36
+    db "TM37:FLMTRWR@" ; $E3 ; TM_37
+    db "TM38:FIR.BLS@" ; $E4 ; TM_38
+    db "TM39:SWIFT@"   ; $E5 ; TM_39
+    db "TM40:SKUL B.@" ; $E6 ; TM_40
+    db "TM41:LGT SCR@" ; $E7 ; TM_41 ; Market
+    db "TM42:DRM EAT@" ; $E8 ; TM_42
+    db "TM43:SKY ATK@" ; $E9 ; TM_43
+    db "TM44:REST@"    ; $EA ; TM_44
+    db "TM45:THND WV@" ; $EB ; TM_45
+    db "TM46:PSYWAVE@" ; $EC ; TM_46
+    db "TM47:EXPLOS.@" ; $ED ; TM_47
+    db "TM48:RCK SLD@" ; $EE ; TM_48
+    db "TM49:TRI ATK@" ; $EF ; TM_49
+    db "TM50:SUBSTIT@" ; $F0 ; TM_50
+    db "TM51:BLADE@"   ; $F1 ; TM_51
+    db "TM52:SWOOP@"   ; $F2 ; TM_52
+    db "TM53:TSUNAMI@" ; $F3 ; TM_53
+    db "TM54:STRIKE@"  ; $F4 ; TM_54
+    db "TM55:FLASH@"   ; $F5 ; TM_55
+    db "TM56:SLUDGE@"  ; $F9 ; TM_56
+    db "TM57:FIR PNC@" ; $F6 ; TM_57
+    db "TM58:ICE PNC@" ; $F7 ; TM_58
+    db "TM59:TND PNC@" ; $F8 ; TM_59
+    db "TM60:DZZ PNC@" ; $FA ; TM_60
+    db "TM61:STRGGLE@" ; $FB ; TM_61
+    db "TM62:STRGGLE@" ; $FC ; TM_62
+    db "TM63:STRGGLE@" ; $FD ; TM_63
+    db "TM64:STRGGLE@" ; $FE ; TM_64
     db "CANCEL@"       ; $FF
     db "?@"            ; $00
 
@@ -137902,6 +137617,8 @@ _HackFromBank0:
     dw BugFixLongRangeTrainer
     dw $066a
     dw RestoreFaintenedWith1HP
+    dw $073f
+    dw BugFixWarpDuringJump
     db $ff
 
 BugFixLongRangeTrainer:
@@ -137949,6 +137666,21 @@ RestoreFaintenedWith1HP:
 BackupDarkMapState:
     ld a,[$d35d]
     ld [wBackupDarkMap],a
+    ret
+
+BugFixWarpDuringJump:
+    ld hl,BugFixWarpDuringJump
+    push hl ; Set Return Pointer
+    call DelayFrame
+    call DelayFrame
+    call LoadGBPal
+    ld a,[$d736]
+    bit 6,a ; jumping down a ledge?
+    jp nz,HandleMidJump
+    pop hl ; Delete Useless Return Pointer
+    ; Handle original code
+    ld a,[$d3ae] ; number of warps
+    ld d,a
     ret
 
 ; ─────────────────────────────────────────
@@ -139287,6 +139019,9 @@ PrintMoveDetailsBox:
 ; ──────────────────────────────────────────────────────────────────────
 
 CheckSTAB:
+    ld a,[W_PLAYERMOVETYPE]
+    and a ; TYPE_NA?
+    jr z,.NoStab
     ld hl,$d11e ; Backup
     ld a,[hl]   ; ...
     push af     ; ...
@@ -139311,6 +139046,7 @@ CheckSTAB:
     inc hl
     dec b
     jr nz,.loop
+.NoStab
     ld a,1 ; reset all flag
     or a   ; ...
     ret
@@ -142539,6 +142275,8 @@ AdjustDamageForMoveType_GetInput:
 .ValuesForPlayerTurn
     ld a,[W_PLAYERMOVETYPE]
     ld [$d11e],a
+    and a ; TYPE_NA?
+    push af
     ld a,[W_PLAYERMONID]
     ld b,a
     ld a,[W_PLAYERMOVENUM]
@@ -142548,11 +142286,15 @@ AdjustDamageForMoveType_GetInput:
     ld a,[W_ENEMYMON_START]
     ld b,a
     ld hl,W_ENEMYMONTYPES
-    jp GetDefenderType
+    call GetDefenderType
+    pop af
+    ret
 
 .ValuesForEnemyTurn
     ld a,[W_ENEMYMOVETYPE]
     ld [$d11e],a
+    and a ; TYPE_NA?
+    push af
     ld a,[W_ENEMYMON_START]
     ld b,a
     ld a,[W_ENEMYMOVENUM]
@@ -142562,7 +142304,9 @@ AdjustDamageForMoveType_GetInput:
     ld a,[W_PLAYERMONID]
     ld b,a
     ld hl,W_PLAYERMONTYPES
-    jp GetDefenderType
+    call GetDefenderType
+    pop af
+    ret
 
 ; Input
 ; [$d11e] = Attacker Move Type
@@ -143990,7 +143734,7 @@ RevealHoleCommon:
     xor a
     ld [hli],a
     ld [hl],a
-    PREDEF Func_17c47
+    PREDEF EmotionBubble
     jp Delay3
 .Table
    ;db YY,XX,$ID
@@ -144037,6 +143781,9 @@ TestMap2Blocks:
 SECTION "Bank3d",ROMX,BANK[$3D]
 
 ; ──────────────────────────────────────────────────────────────────────
+
+EmotionBubbles:
+    INCBIN "gfx/emotion_bubbles.2bpp"
 
 LoadSpecialTrainerMoves:
     ld h,d

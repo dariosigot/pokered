@@ -347,6 +347,7 @@ RATICATE_Learnset: MACRO
     db 27,REST
     db 30,THRASH
     db 32,DOUBLE_TEAM
+    db 34,TAKE_DOWN
     db 37,SLASH
     db 40,AGILITY
     db 42,SUPER_FANG
@@ -363,6 +364,7 @@ RATTATA_NoEvo_Learnset: MACRO
     db 35,THRASH
     db 39,DOUBLE_TEAM
     db 44,SLASH
+    db 47,TAKE_DOWN
     db 49,SUPER_FANG
     db 54,DOUBLE_EDGE
 ENDM
@@ -664,13 +666,16 @@ CLEFAIRY_Learnset: MACRO
     db 10,DISABLE
     db 13,SING
     db 16,DOUBLESLAP
+    db 18,SUPERSONIC
     db 20,SWIFT
     db 22,SLAM
+    db 23,SCREECH
     db 24,MINIMIZE
     db 26,BIDE
     db 28,METRONOME
     db 30,TELEPORT
     db 32,REST
+    db 34,SONICBOOM
     db 37,BODY_SLAM
     db 42,SOFTBOILED
     db 47,LIGHT_SCREEN
@@ -685,16 +690,20 @@ CLEFABLE_Learnset: MACRO
     db 10,TELEPORT
     db 12,SING
     db 15,DOUBLESLAP
+    db 16,SUPERSONIC
     db 17,BIDE
     db 19,SLAM
+    db 20,SCREECH
     db 21,DEFENSE_CURL
     db 23,MINIMIZE
+    db 25,SONICBOOM
     db 27,METRONOME
     db 29,COUNTER
     db 31,REST
     db 34,BODY_SLAM
     db 39,SOFTBOILED
     db 44,LIGHT_SCREEN
+    db 46,ROAR
     db 48,REFLECT
     db 51,DOUBLE_EDGE
     db 56,LOVELY_KISS
@@ -751,13 +760,16 @@ JIGGLYPUFF_Learnset: MACRO
     db 10,GROWL
     db 13,DISABLE
     db 16,DOUBLESLAP
+    db 18,SONICBOOM
     db 20,SWIFT
     db 22,SLAM
+    db 23,SCREECH
     db 24,MINIMIZE
     db 26,BIDE
     db 28,REST
     db 30,TELEPORT
     db 32,METRONOME
+    db 34,SUPERSONIC
     db 37,BODY_SLAM
     db 42,SOFTBOILED
     db 47,REFLECT
@@ -772,16 +784,20 @@ WIGGLYTUFF_Learnset: MACRO
     db 10,TELEPORT
     db 12,DISABLE
     db 15,DOUBLESLAP
+    db 16,SONICBOOM
     db 17,BIDE
     db 19,SLAM
+    db 20,SCREECH
     db 21,DEFENSE_CURL
     db 23,MINIMIZE
+    db 25,SUPERSONIC
     db 27,REST
     db 29,COUNTER
     db 31,METRONOME
     db 34,BODY_SLAM
     db 39,SOFTBOILED
     db 44,REFLECT
+    db 46,ROAR
     db 48,LIGHT_SCREEN
     db 51,DOUBLE_EDGE
     db 56,LOVELY_KISS
@@ -977,6 +993,7 @@ VENONAT_NoEvo_Learnset: MACRO
     db 36,PIN_MISSILE
     db 40,PSYBEAM
     db 45,SPORE
+    db 47,SLUDGE
     db 50,PSYCHIC_M
     db 54,BARRIER
     db 56,MEGA_DRAIN
@@ -1043,13 +1060,15 @@ PERSIAN_Learnset: MACRO
     db 46,BODY_SLAM
     db 50,LOVELY_KISS
     db 55,DOUBLE_EDGE
+    db 58,SUPER_FANG
     db 60,HYPER_BEAM
 ENDM
 MEOWTH_NoEvo_Learnset: MACRO
     db 29,HYPER_FANG
     db 34,REST
     db 39,SLASH
-    db 43,AGILITY
+    db 41,AGILITY
+    db 43,TAKE_DOWN
     db 45,KINESIS ; Exclusive*
     db 48,DOUBLE_TEAM
     db 52,LOVELY_KISS
@@ -1875,6 +1894,7 @@ GASTLY_NoEvo_Learnset: MACRO
     db 39,REFLECT
     db 43,PSYBEAM
     db 48,HAZE
+    db 50,SLUDGE
     db 53,PSYCHIC_M
     db 55,TRANSFORM
     db 60,SUBSTITUTE
