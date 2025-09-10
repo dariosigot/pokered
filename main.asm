@@ -18,7 +18,7 @@ CheckSelect:
     bit 2,a ; was the select button pressed?
     jr nz,.SelectPressed
 .End
-    jp $0459 ; OverworldLoopLessDelay.startButtonNotPressed
+    jp $0459 ; OverworldLoop.startButtonNotPressed
 .SelectPressed
     ld b,BANK(SelectInOverWorld)
     ld hl,SelectInOverWorld
@@ -626,9 +626,10 @@ EnterMap: ; 03a6 (0:03a6)
     xor a
     ld [wJoypadForbiddenButtonsMask],a
 
+SECTION "OverworldLoop",ROM0[$03ff]
+
 OverworldLoop: ; 03ff (0:03ff)
     call DelayFrame
-OverworldLoopLessDelay: ; 0402 (0:0402)
     call DelayFrame
     call LoadGBPal
     ld a,[$d736]
@@ -1069,8 +1070,8 @@ WarpFound1: ; 0735 (0:0735)
     ld [$ff8b],a ; save target map
 
 WarpFound2: ; 073c (0:073c)
-    ld a,[$d3ae] ; number of warps
-    sub c
+    call HackFromBank0 ; $073c ; BugFixWarpDuringJump ; ld a,[$d3ae] ; number of warps
+    sub c              ; $073f
     ld [$d73b],a ; save ID of used warp
     ld a,[W_CURMAP]
     ld [$d73c],a
@@ -1271,7 +1272,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     ld hl,InitMapSprites
     call Bankswitch
     call LoadTileBlockMap
-    jp OverworldLoopLessDelay
+    jp OverworldLoop+3
 .didNotEnterConnectedMap
     jp OverworldLoop
 
@@ -137616,6 +137617,8 @@ _HackFromBank0:
     dw BugFixLongRangeTrainer
     dw $066a
     dw RestoreFaintenedWith1HP
+    dw $073f
+    dw BugFixWarpDuringJump
     db $ff
 
 BugFixLongRangeTrainer:
@@ -137663,6 +137666,21 @@ RestoreFaintenedWith1HP:
 BackupDarkMapState:
     ld a,[$d35d]
     ld [wBackupDarkMap],a
+    ret
+
+BugFixWarpDuringJump:
+    ld hl,BugFixWarpDuringJump
+    push hl ; Set Return Pointer
+    call DelayFrame
+    call DelayFrame
+    call LoadGBPal
+    ld a,[$d736]
+    bit 6,a ; jumping down a ledge?
+    jp nz,HandleMidJump
+    pop hl ; Delete Useless Return Pointer
+    ; Handle original code
+    ld a,[$d3ae] ; number of warps
+    ld d,a
     ret
 
 ; ─────────────────────────────────────────
