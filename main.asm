@@ -47444,18 +47444,25 @@ FlareonPicBack: ; 2e806 (b:6806)
 DisplayEffectiveness:
     ld a,[H_WHOSETURN]
     and a
-    ld hl,$d06a ; PlayerNumAttacksLeft
-    ld a,[W_PLAYERMOVEEFFECT]
-    jr z,.continue
-    ld hl,$d06f ; EnemyNumAttacksLeft
-    ld a,[W_ENEMYMOVEEFFECT]
-.continue
-    cp THRASH_PETAL_DANCE_EFFECT
-    jr z,.ForceDisplayEffect
+    ld hl,W_PLAYERMOVEEFFECT
+    ld de,$d06a ; PlayerNumAttacksLeft
+    jr z,.ok
+    ld hl,W_ENEMYMOVEEFFECT
+    ld de,$d06f ; EnemyNumAttacksLeft
+.ok
+    ld a,[hld] ; hl ► W_PLAYERMOVENUM/W_ENEMYMOVENUM
+    cp ATTACK_TWICE_EFFECT
+    jr z,.CheckMultiTurn
+    cp TWO_TO_FIVE_ATTACKS_EFFECT
+    jr z,.CheckMultiTurn
     ld a,[hl]
+    cp TWINEEDLE
+    jr nz,.continue
+.CheckMultiTurn
+    ld a,[de]
     and a
     ret nz ; kickout if MultiAttack
-.ForceDisplayEffect
+.continue
     xor a
     ld hl,H_MULTIPLICAND
     ld [hli],a
@@ -53603,6 +53610,26 @@ QuarterSpeedDueToParalysisAndHalveAttackDueToBurn:
     call QuarterSpeedDueToParalysis
     jp HalveAttackDueToBurn
 
+SwapPlayerAndEnemyLevels:
+    push bc
+    ld a,[W_PLAYERMONLEVEL] ; $d022
+    ld b,a
+    ld a,[W_ENEMYMONLEVEL] ; $cff3
+    ld [W_PLAYERMONLEVEL],a ; $d022
+    ld a,b
+    ld [W_ENEMYMONLEVEL],a ; $cff3
+    pop bc
+    ret
+
+; MissedEffect
+EffectsArray6:
+; Move that must apply their side effect also if the attack missed
+; e.g., Explosion, Hyper Beam, Pay Day
+    db EXPLODE_EFFECT
+    db HYPER_BEAM_EFFECT
+    db PAY_DAY_EFFECT
+    db $FF
+
 ; Free
 
 SECTION "AnyEnemyPokemonAliveCheck",ROMX[$464f],BANK[$f]
@@ -55812,6 +55839,8 @@ ExecutePlayerMove: ; 3d65e (f:565e)
     jr nz,.playerHasNoSpecialCondition
     jp hl
 .playerHasNoSpecialCondition
+    xor a        ; Reset
+    ld [$d06a],a ; PlayerNumAttacksLeft
     call GetCurrentMove
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
     bit CHARGING_UP,[hl] ; charging up for attack
@@ -55877,9 +55906,11 @@ PlayerCalcMoveDamage:
 handleIfPlayerMoveMissed:
     ld a,[W_MOVEMISSED]
     and a
-    jr z,getPlayerAnimationType
+    jr z,.moveDidNotMiss
     xor a
     jr playPlayerMoveAnimation
+.moveDidNotMiss
+    ; fall through
 
 getPlayerAnimationType:
     ld a,[W_PLAYERMOVEEFFECT]
@@ -58487,6 +58518,8 @@ ExecuteEnemyMove:
     jr nz,.enemyHasNoSpecialConditions
     jp hl
 .enemyHasNoSpecialConditions
+    xor a        ; Reset
+    ld [$d06f],a ; EnemyNumAttacksLeft
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     bit 4,[hl] ; is the enemy charging up for attack?
     jr nz,EnemyCanExecuteChargingMove
@@ -58560,6 +58593,7 @@ handleIfEnemyMoveMissed:
     jr handleExplosionMiss
 .moveDidNotMiss
     call SwapPlayerAndEnemyLevels
+    ; fall through
 
 GetEnemyAnimationType:
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
@@ -59268,17 +59302,6 @@ DoBattleTransitionAndInitBatVar:
     ld [W_PLAYERDISABLEDMOVE],a ; $d06d
     ret
 
-SwapPlayerAndEnemyLevels:
-    push bc
-    ld a,[W_PLAYERMONLEVEL] ; $d022
-    ld b,a
-    ld a,[W_ENEMYMONLEVEL] ; $cff3
-    ld [W_PLAYERMONLEVEL],a ; $d022
-    ld a,b
-    ld [W_ENEMYMONLEVEL],a ; $cff3
-    pop bc
-    ret
-
 Func_3ec92:
     ld a,[W_BATTLETYPE] ; $d05a
     dec a
@@ -59339,15 +59362,6 @@ Func_3ec92:
     FuncCoord 1,5 ; $c405
     ld hl,Coord
     PREDEF_JUMP CopyUncompressedPicToTilemap
-
-; MissedEffect
-EffectsArray6:
-; Move that must apply their side effect also if the attack missed
-; e.g., Explosion, Hyper Beam, Pay Day
-    db EXPLODE_EFFECT
-    db HYPER_BEAM_EFFECT
-    db PAY_DAY_EFFECT
-    db $FF
 
 ApplyBurnAndParalysisPenaltiesToPlayer:
     ld hl,H_WHOSETURN
@@ -61048,10 +61062,10 @@ TwoToFiveAttacksEffect: ; 3f811 (f:7811)
     ld hl,W_ENEMYMOVEEFFECT ; $cfcd
 .asm_3f838
     ld a,[hl]
-    cp $4d
+    cp TWINEEDLE_EFFECT
     jr z,.asm_3f856
-    cp $2c
-    ld a,$2
+    cp ATTACK_TWICE_EFFECT
+    ld a,2
     jr z,.asm_3f853
     call GenRandomInBattle
     and $3
@@ -61067,7 +61081,7 @@ TwoToFiveAttacksEffect: ; 3f811 (f:7811)
     ld [bc],a
     ret
 .asm_3f856
-    ld a,$2
+    ld a,POISON_SIDE_EFFECT1
     ld [hl],a
     jr .asm_3f853
 
