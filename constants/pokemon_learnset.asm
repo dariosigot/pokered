@@ -1651,7 +1651,8 @@ FARFETCH_D_Learnset: MACRO
     db 18,SAND_ATTACK
     db 20,QUICK_ATTACK
     db 23,SWORDS_DANCE
-    db 26,WING_ATTACK
+    db 25,WING_ATTACK
+    db 27,HEADBUTT
     db 29,SWOOP
     db 32,AGILITY
     db 35,RAZOR_WIND
@@ -3406,6 +3407,7 @@ MEWTWO_Learnset: MACRO
     db 34,HYPNOSIS
     db 38,DREAM_EATER
     db 40,MIST
+    db 42,HAZE
     db 44,SUBSTITUTE
     db 48,BARRIER
     db 50,NIGHT_SHADE
