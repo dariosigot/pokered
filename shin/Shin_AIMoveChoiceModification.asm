@@ -780,7 +780,7 @@ AIMoveChoiceModification2:
 
     cp ATTACK_DOWN2_EFFECT
     jr c,.nextMove
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     jr c,.preferMove
 
     cp SUBSTITUTE_EFFECT

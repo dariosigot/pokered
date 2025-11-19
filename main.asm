@@ -59077,7 +59077,7 @@ EffectsArray3:
     db SPECIAL_UP3_EFFECT
     db ACCURACY_UP3_EFFECT
     db EVASION_UP3_EFFECT
-    db STAT_UP1_DOWN_SIDE_EFFECT
+    db STAT_UP1_DOWN1_EFFECT
     db $FF
 
 GetCurrentMove:
@@ -60102,17 +60102,17 @@ JumpMoveEffect_:
      dw ReflectLightScreenEffect     ; REFLECT_EFFECT
      dw PoisonEffect                 ; POISON_EFFECT
      dw ParalyzeEffect               ; PARALYZE_EFFECT
-     dw StatModifierDownEffect       ; ATTACK_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; DEFENSE_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; SPEED_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; SPECIAL_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; ACCURACY_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; EVASION_DOWN_SIDE_EFFECT
+     dw StatModifierDownEffect       ; ATTACK_DOWN_SIDE1_EFFECT
+     dw StatModifierDownEffect       ; DEFENSE_DOWN_SIDE1_EFFECT
+     dw StatModifierDownEffect       ; SPEED_DOWN_SIDE1_EFFECT
+     dw StatModifierDownEffect       ; SPECIAL_DOWN_SIDE1_EFFECT
+     dw StatModifierDownEffect       ; ACCURACY_DOWN_SIDE1_EFFECT
+     dw StatModifierDownEffect       ; EVASION_DOWN_SIDE1_EFFECT
      dw StatModifierDownEffect       ; unused effect
      dw StatModifierDownEffect       ; unused effect
      dw ConfusionEffect              ; CONFUSION_SIDE_EFFECT
      dw TwoToFiveAttacksEffect       ; TWINEEDLE_EFFECT
-     dw StatUp1DownSideEffect        ; STAT_UP1_DOWN_SIDE_EFFECT
+     dw StatUpDownEffect             ; STAT_UP1_DOWN1_EFFECT
      dw SubstituteEffect             ; SUBSTITUTE_EFFECT
      dw HyperBeamEffect              ; HYPER_BEAM_EFFECT
      dw RageEffect                   ; RAGE_EFFECT
@@ -60127,6 +60127,12 @@ JumpMoveEffect_:
      dw StatModifierUpEffect         ; SPECIAL_UP3_EFFECT
      dw StatModifierUpEffect         ; ACCURACY_UP3_EFFECT
      dw StatModifierUpEffect         ; EVASION_UP3_EFFECT
+     dw StatModifierDownEffect       ; ATTACK_DOWN_SIDE2_EFFECT  
+     dw StatModifierDownEffect       ; DEFENSE_DOWN_SIDE2_EFFECT 
+     dw StatModifierDownEffect       ; SPEED_DOWN_SIDE2_EFFECT   
+     dw StatModifierDownEffect       ; SPECIAL_DOWN_SIDE2_EFFECT 
+     dw StatModifierDownEffect       ; ACCURACY_DOWN_SIDE2_EFFECT
+     dw StatModifierDownEffect       ; EVASION_DOWN_SIDE2_EFFECT 
 
 SleepEffect:
     ld de,W_ENEMYMONSTATUS ; $cfe9
@@ -60652,7 +60658,7 @@ StatModifierDownEffect:
     ld bc,W_PLAYERBATTSTATUS1 ; $d062
 .done
     ld a,[de]
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     jr nc,.skipMoveHitTest
     call MoveHitTestPlus
     jr nz,.attackMissed
@@ -60660,13 +60666,16 @@ StatModifierDownEffect:
     call CheckTargetSubstitute
     jr nz,.didntAffect
     ld a,[de]
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     jr c,.nonSideEffect
     call CheckCustomSideEffect ; GenRandomInBattle
     call CompareCustomValue ; cp $55 ; 33%
     ret nc ; don't apply side effect
     ld a,[de]
-    sub ATTACK_DOWN_SIDE_EFFECT ; map each stat to 0-3
+    sub ATTACK_DOWN_SIDE1_EFFECT ; map each stat to 0-3
+    cp EVASION_DOWN_SIDE1_EFFECT + $3 - ATTACK_DOWN_SIDE1_EFFECT ; covers all -1 effects
+    jr c,.decrementStatMod
+    sub ATTACK_DOWN_SIDE2_EFFECT - ATTACK_DOWN_SIDE1_EFFECT ; map -2 effects to corresponding -1 effect
     jr .decrementStatMod
 .CantLowerAnymore_Pop
     pop de
@@ -60683,7 +60692,7 @@ StatModifierDownEffect:
     ; fall through
 .checkEnd
     ld a,[de]
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     ret nc
     call PlayCurrentMoveAnimation
     jp hl
@@ -60789,7 +60798,7 @@ StatModifierDownEffect:
     call PrintStatText
     pop de
     ld a,[de]
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     jr nc,.ApplyBadgeBoostsAndStatusPenalties
     call PlayCurrentMoveAnimation2
 .ApplyBadgeBoostsAndStatusPenalties
@@ -60811,7 +60820,7 @@ StatModifierDownEffect:
 .done2
     cp BIDE_EFFECT
     ret c
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     ret nc
     ld hl,.GreatlyFellText
     ret
@@ -62142,9 +62151,9 @@ Copy2BytesDirect:
     ld bc,2
     jp CopyData
 
-StatUp1DownSideEffect:
-    ld hl,StatUp1DownSideEffect_
-    ld b,BANK(StatUp1DownSideEffect_)
+StatUpDownEffect:
+    ld hl,StatUpDownEffect_
+    ld b,BANK(StatUpDownEffect_)
     jp Bankswitch
 
 CheckCustomSideEffect:
@@ -62182,8 +62191,8 @@ CheckZeroDamageOrSideEffectRandom:
 CompareCustomValue:
     push af
     ld a,[de]
-    cp ACCURACY_DOWN_SIDE_EFFECT
-    jr nz,.standard
+    cp ATTACK_DOWN_SIDE2_EFFECT
+    jr c,.standard
     pop af
     cp $AA ; 66%
     ret
@@ -141042,13 +141051,13 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_:
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp ATTACK_DOWN2_EFFECT
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp SPEED_DOWN1_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     cp SPEED_DOWN2_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
-    cp SPEED_DOWN_SIDE_EFFECT
+    cp SPEED_DOWN_SIDE1_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     jr .skip_end                          ; no attack or speed effect if at this line. skip to end.
 .skip_brn
@@ -141813,7 +141822,7 @@ _CheckCounterFail:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-StatUp1DownSideEffect_:
+StatUpDownEffect_:
     call .GetPlayerOrEnemyPointer
     ld a,[de]
     push af ; Backup Real Move Effect
@@ -141872,9 +141881,9 @@ StatUp1DownSideEffect_:
 .StatModifierDownEffect
     push de
     call .CheckAmnesiaOrSwordDance
-    ld a,SPECIAL_DOWN_SIDE_EFFECT
+    ld a,SPECIAL_DOWN_SIDE1_EFFECT
     jr z,.next2
-    ld a,DEFENSE_DOWN_SIDE_EFFECT
+    ld a,DEFENSE_DOWN_SIDE1_EFFECT
 .next2
     ld [de],a
     ld hl,StatModifierDownEffect

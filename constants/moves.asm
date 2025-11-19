@@ -14,7 +14,7 @@
     db VICEGRIP     , NO_ADDITIONAL_EFFECT       ,  60 , IVORY    , 255 , 07 ; pp 30 ; 0 ; Pwr 55 -> 60 ; Type Normal -> Ivory
     db GUILLOTINE   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 45 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 45
     db RAZOR_WIND   , CHARGE_EFFECT              , 120 , WIND     , 255 , 20 ; pp 10 ; 1 ; Type Normal -> Wind ; Acr 191 -> 255 ; Pwr 80 -> 120
-    db SWORDS_DANCE , STAT_UP1_DOWN_SIDE_EFFECT  ,   0 , METAL    , 255 , 20 ; pp 10 ; - ; PP 30 -> 10 ; Type Normal -> Metal
+    db SWORDS_DANCE , STAT_UP1_DOWN1_EFFECT      ,   0 , METAL    , 255 , 20 ; pp 10 ; - ; PP 30 -> 10 ; Type Normal -> Metal
     db BLADE        , NO_ADDITIONAL_EFFECT       ,  65 , METAL    , 242 , 08 ; pp 30 ; 0 ; Pwr 50 -> 65 ; Type Normal -> Metal ; Ene 07 -> 08
     db GUST         , NO_ADDITIONAL_EFFECT       ,  40 , WIND     , 255 , 06 ; pp 35 ; 1 ; Type Normal -> Wind  
     db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  60 , WIND     , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 60 ; PP 35 -> 25
@@ -28,7 +28,7 @@
     db MEGA_KICK    , JUMP_KICK_EFFECT           , 120 , FIGHT    , 191 , 22 ; pp 10 ; 0 ; Type Normal -> Fight ; PP 05 -> 10 ; Ene 20 -> 22
     db JUMP_KICK    , JUMP_KICK_EFFECT           , 100 , FIGHT    , 242 , 20 ; pp 10 ; 0 ; Pwr 70 -> 100 ; PP 25 -> 10
     db ROLLING_KICK , FLINCH_SIDE_EFFECT2        ,  60 , FIGHT    , 216 , 09 ; pp 20 ; 0 ; PP 15 -> 20 ; Ene 10 -> 9
-    db SAND_ATTACK  , ACCURACY_DOWN_SIDE_EFFECT  ,  15 , EARTH    , 229 , 09 ; pp 15 ; 0 ; Type Normal -> Earth ; Acr 255 -> 229 ; PP 15 ; Ene 14 -> 09 ; Pwr 0 -> 15
+    db SAND_ATTACK  , ACCURACY_DOWN_SIDE2_EFFECT ,  15 , EARTH    , 229 , 09 ; pp 15 ; 0 ; Type Normal -> Earth ; Acr 255 -> 229 ; PP 15 ; Ene 14 -> 09 ; Pwr 0 -> 15
     db HEADBUTT     , FLINCH_SIDE_EFFECT2        ,  70 , NORMAL   , 255 , 14 ; pp 15 ; 0
     db HORN_ATTACK  , NO_ADDITIONAL_EFFECT       ,  65 , IVORY    , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Ivory
     db FURY_ATTACK  , TWO_TO_FIVE_ATTACKS_EFFECT ,  19 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Ivory ; Pwr 15 -> 19
@@ -51,7 +51,7 @@
     db SUPERSONIC   , CONFUSION_EFFECT           ,   0 , SOUND    , 229 , 14 ; pp 15 ; - ; Acr 140 -> 229 ; PP 20 -> 15 ; Type Normal -> Sound
     db SONICBOOM    , SPECIAL_DAMAGE_EFFECT      ,   1 , SOUND    , 229 , 10 ; pp 20 ; - ; Type Normal -> Sound
     db DISABLE      , DISABLE_EFFECT             ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; Acr 140 -> 255
-    db ACID         , DEFENSE_DOWN_SIDE_EFFECT   ,  40 , POISON   , 255 , 07 ; pp 30 ; 0 ; Phisical
+    db ACID         , DEFENSE_DOWN_SIDE1_EFFECT  ,  40 , POISON   , 255 , 07 ; pp 30 ; 0 ; Phisical
     db EMBER        , BURN_SIDE_EFFECT2          ,  40 , FIRE     , 255 , 08 ; pp 25 ; 1
     db FLAMETHROWER , BURN_SIDE_EFFECT2          ,  90 , FIRE     , 255 , 14 ; pp 15 ; 1 ; Pwr 95 -> 90
     db MIST         , MIST_EFFECT                ,   0 , ICE      , 255 , 07 ; pp 30 ; -
@@ -61,8 +61,8 @@
     db ICE_BEAM     , FREEZE_SIDE_EFFECT         ,  90 , ICE      , 255 , 15 ; pp 15 ; 1 ; Pwr 95 -> 90 ; PP 10 -> 15 ; Ene 14 -> 15
     db BLIZZARD     , FREEZE_SIDE_EFFECT         , 120 , ICE      , 229 , 36 ; pp  5 ; 1 ; Ene 40 -> 36
     db PSYBEAM      , CONFUSION_SIDE_EFFECT      ,  65 , PSYCHIC  , 255 , 10 ; pp 20 ; 1
-    db BUBBLEBEAM   , SPEED_DOWN_SIDE_EFFECT     ,  65 , WATER    , 255 , 10 ; pp 20 ; 1
-    db AURORA_BEAM  , ATTACK_DOWN_SIDE_EFFECT    ,  65 , ICE      , 255 , 10 ; pp 20 ; 1
+    db BUBBLEBEAM   , SPEED_DOWN_SIDE2_EFFECT    ,  65 , WATER    , 255 , 10 ; pp 20 ; 1
+    db AURORA_BEAM  , ATTACK_DOWN_SIDE1_EFFECT   ,  65 , ICE      , 255 , 10 ; pp 20 ; 1
     db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , ASTRAL   , 229 , 40 ; pp  5 ; ? ; Type Normal -> Astral ; Phi/Spc Split depends by Mon
     db PECK         , NO_ADDITIONAL_EFFECT       ,  45 , IVORY    , 255 , 07 ; pp 35 ; 0 ; Type Wind -> Ivory ; Pwr 35 -> 45 ; Ene 06 -> 07
     db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  85 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
@@ -94,7 +94,7 @@
     db TRAPHOLE     , CHARGE_EFFECT              ,  80 , EARTH    , 255 , 14 ; pp 15 ; 0 ; Pwr 100 -> 80 ; PP 10 -> 15
     db TOXIC        , POISON_EFFECT              ,   0 , POISON   , 229 , 20 ; pp 10 ; - ; Acr 216 -> 229
     db CONFUSION    , CONFUSION_SIDE_EFFECT      ,  50 , PSYCHIC  , 255 , 08 ; pp 25 ; 1
-    db PSYCHIC_M    , SPECIAL_DOWN_SIDE_EFFECT   ,  90 , PSYCHIC  , 255 , 20 ; pp 10 ; 1
+    db PSYCHIC_M    , SPECIAL_DOWN_SIDE1_EFFECT  ,  90 , PSYCHIC  , 255 , 20 ; pp 10 ; 1
     db HYPNOSIS     , SLEEP_EFFECT               ,   0 , PSYCHIC  , 153 , 18 ; pp 10 ; - ; PP 20 -> 10
     db MEDITATE     , ATTACK_UP1_EFFECT          ,   0 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; PP 40 -> 30
     db AGILITY      , SPEED_UP3_EFFECT           ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Type Psychic -> Normal ; PP 30 -> 15
@@ -132,8 +132,8 @@
     db SWIFT        , SWIFT_EFFECT               ,  60 , ASTRAL   , 255 , 10 ; pp 20 ; ? ; Type Normal -> Astral ; Phi/Spc Split depends by Mon
     db SKULL_BASH   , CHARGE_EFFECT              , 130 , NORMAL   , 255 , 20 ; pp 10 ; 0 ; Pwr 100 -> 130 ; PP 15 -> 10
     db SPIKE_CANNON , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , IVORY    , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Ivory ; Pwr 20 -> 28
-    db CONSTRICT    , SPEED_DOWN_SIDE_EFFECT     ,  10 , NORMAL   , 255 , 02 ; pp 35 ; 0 ; Ene 06 -> 02
-    db AMNESIA      , STAT_UP1_DOWN_SIDE_EFFECT  ,   0 , PSYCHIC  , 255 , 20 ; pp  5 ; - ; PP 20 -> 10
+    db CONSTRICT    , SPEED_DOWN_SIDE2_EFFECT    ,  10 , NORMAL   , 255 , 02 ; pp 35 ; 0 ; Ene 06 -> 02
+    db AMNESIA      , STAT_UP1_DOWN1_EFFECT      ,   0 , PSYCHIC  , 255 , 20 ; pp  5 ; - ; PP 20 -> 10
     db KINESIS      , ACCURACY_DOWN1_EFFECT      ,   0 , PSYCHIC  , 204 , 18 ; pp 15 ; - ; PP 20 -> 15 ; Ene 14 -> 18
     db SOFTBOILED   , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 21 ; pp 10 ; - ; Ene 20 -> 21
     db HI_JUMP_KICK , JUMP_KICK_EFFECT           , 130 , FIGHT    , 229 , 23 ; pp 10 ; 0 ; Pwr 85 -> 130 ; PP 20 -> 10 ; Ene 20 -> 23
@@ -145,7 +145,7 @@
     db LOVELY_KISS  , SLEEP_EFFECT               ,   0 , NORMAL   , 191 , 22 ; pp 10 ; - ; Ene 20 -> 24
     db SKY_ATTACK   , CHARGE_EFFECT              , 140 , WIND     , 229 , 36 ; pp  5 ; 0 ; Ene 40 -> 36
     db TRANSFORM    , TRANSFORM_EFFECT           ,   0 , RUBBER   , 255 , 20 ; pp 10 ; - ; Type Normal -> Rubber
-    db BUBBLE       , SPEED_DOWN_SIDE_EFFECT     ,  30 , WATER    , 255 , 06 ; pp 35 ; 1 ; Pwr 20 -> 30 ; PP 30 -> 35
+    db BUBBLE       , SPEED_DOWN_SIDE1_EFFECT    ,  30 , WATER    , 255 , 06 ; pp 35 ; 1 ; Pwr 20 -> 30 ; PP 30 -> 35
     db DIZZY_PUNCH  , CONFUSION_SIDE_EFFECT      ,  90 , IVORY    , 255 , 16 ; pp 10 ; 0 ; Type Normal -> Ivory ; Pwr 70 -> 90 ; PP 10 -> 15 ; Ene 14 -> 16
     db SPORE        , SLEEP_EFFECT               ,   0 , GRASS    , 216 , 24 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 28 ; Acr 255 -> 216
     db FLASH        , ACCURACY_DOWN1_EFFECT      ,   0 , THUNDER  , 178 , 14 ; pp 15 ; - ; Type Normal -> THUNDER ; PP 20 -> 15
