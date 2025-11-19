@@ -37494,10 +37494,10 @@ Route2HouseText3:
     ld [W_CURMAPSCRIPT],a
     jp TextScriptEnd
 .VoltorbText1
-    TX_FAR _VoltorbHusuiText
+    TX_FAR _VoltorbHisuiText
     db "@"
 .VoltorbText2
-    TX_FAR _VoltorbHusui2Text
+    TX_FAR _VoltorbHisui2Text
     db "@"
 
 Route2HouseText4:
@@ -131126,13 +131126,13 @@ _VoltorbText:
     db $0,"Wow!",$4f
     db "A VOLTORB...",$58
 
-_VoltorbHusuiText:
+_VoltorbHisuiText:
     db $0,"Wow! Is it",$4f
     db "a VOLTORB?",$51
     db "I must check",$4f
     db "the #DEX!",$58
 
-_VoltorbHusui2Text:
+_VoltorbHisui2Text:
     db $0,"It's different",$4f
     db "from the #DEX!",$58
 
@@ -132473,13 +132473,13 @@ MissingNoPicBack:
     INCBIN "pic/other/BackSpriteMissingNo.pic"
 
 VoltorbHisuiPicFront:
-    INCBIN "pic/bmon/voltorbhusui.pic"
+    INCBIN "pic/bmon/voltorbhisui.pic"
 VoltorbHisuiPicBack:
-    INCBIN "pic/monback/voltorbhusuib.pic"
+    INCBIN "pic/monback/voltorbhisuib.pic"
 ElectrodeHisuiPicFront:
-    INCBIN "pic/bmon/electrodehusui.pic"
+    INCBIN "pic/bmon/electrodehisui.pic"
 ElectrodeHisuiPicBack:
-    INCBIN "pic/monback/electrodehusuib.pic"
+    INCBIN "pic/monback/electrodehisuib.pic"
 MarowakAlolaPicFront:
     INCBIN "pic/bmon/marowakalola.pic"
 MarowakAlolaPicBack:
@@ -139246,7 +139246,7 @@ CheckSpecialWild_:
     db FLAMETHROWER
 ; VictoryRoad2_ShinyOnix
     db ROCK_SLIDE
-    db DRAGON_RAGE
+    db SWORDS_DANCE
     db EARTHQUAKE
     db HYPER_BEAM
 ; UnknownDungeon4_Alakazam
@@ -142552,6 +142552,7 @@ GetAttackerType:
 .HeadButtMonTable
     db CUBONE
     db MAROWAK
+    db FARFETCH_D
     db $FF
 
 .HyperBeamMoveTable

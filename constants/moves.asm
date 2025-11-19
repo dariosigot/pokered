@@ -18,14 +18,14 @@
     db BLADE        , NO_ADDITIONAL_EFFECT       ,  65 , METAL    , 242 , 08 ; pp 30 ; 0 ; Pwr 50 -> 65 ; Type Normal -> Metal ; Ene 07 -> 08
     db GUST         , NO_ADDITIONAL_EFFECT       ,  40 , WIND     , 255 , 06 ; pp 35 ; 1 ; Type Normal -> Wind  
     db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  60 , WIND     , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 60 ; PP 35 -> 25
-    db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,   0 , WIND     , 255 , 04 ; pp 35 ; - ; Type Normal -> Wind ; Acr 216 -> 255 ; PP 20 -> 35 ; Ene 06 -> 04
+    db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,   0 , WIND     , 216 , 04 ; pp 35 ; - ; Type Normal -> Wind ; PP 20 -> 35 ; Ene 06 -> 04
     db SWOOP        , FLY_EFFECT                 ,  90 , WIND     , 242 , 14 ; pp 15 ; 0 ; Pwr 70 -> 90
     db BIND         , TRAPPING_EFFECT            ,  10 , NORMAL   , 191 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10
     db SLAM         , NO_ADDITIONAL_EFFECT       ,  80 , RUBBER   , 191 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber
     db VINE_WHIP    , NO_ADDITIONAL_EFFECT       ,  45 , GRASS    , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 45 ; PP 10 -> 25
     db STOMP        , FLINCH_SIDE_EFFECT2        ,  65 , NORMAL   , 255 , 10 ; pp 20 ; 0
     db DOUBLE_KICK  , ATTACK_TWICE_EFFECT        ,  30 , FIGHT    , 255 , 08 ; pp 25 ; 0 ; PP 30 -> 25
-    db MEGA_KICK    , JUMP_KICK_EFFECT           , 120 , FIGHT    , 191 , 22 ; pp 10 ; 0 ; Type Normal -> Fight    ; PP 05 -> 10 ; Ene 20 -> 22
+    db MEGA_KICK    , JUMP_KICK_EFFECT           , 120 , FIGHT    , 191 , 22 ; pp 10 ; 0 ; Type Normal -> Fight ; PP 05 -> 10 ; Ene 20 -> 22
     db JUMP_KICK    , JUMP_KICK_EFFECT           , 100 , FIGHT    , 242 , 20 ; pp 10 ; 0 ; Pwr 70 -> 100 ; PP 25 -> 10
     db ROLLING_KICK , FLINCH_SIDE_EFFECT2        ,  60 , FIGHT    , 216 , 09 ; pp 20 ; 0 ; PP 15 -> 20 ; Ene 10 -> 9
     db SAND_ATTACK  , ACCURACY_DOWN_SIDE_EFFECT  ,  15 , EARTH    , 229 , 09 ; pp 15 ; 0 ; Type Normal -> Earth ; Acr 255 -> 229 ; PP 15 ; Ene 14 -> 09 ; Pwr 0 -> 15
@@ -39,7 +39,7 @@
     db TAKE_DOWN    , RECOIL_EFFECT              , 100 , NORMAL   , 216 , 10 ; pp 20 ; 0 ; Pwr 90 -> 100
     db THRASH       , THRASH_PETAL_DANCE_EFFECT  , 120 , NORMAL   , 255 , 15 ; pp 15 ; 0 ; Pwr 90 -> 120 ; PP 20 -> 15 ; Ene 14 -> 15
     db DOUBLE_EDGE  , RECOIL_EFFECT              , 130 , NORMAL   , 255 , 14 ; pp 15 ; 0 ; Pwr 100 -> 130
-    db TAIL_WHIP    , DEFENSE_DOWN1_EFFECT       ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
+    db TAIL_WHIP    , DEFENSE_DOWN1_EFFECT       ,   0 , NORMAL   , 242 , 05 ; pp 30 ; - ; Ene 07 -> 05 ; Acr 255 -> 242
     db POISON_STING , POISON_SIDE_EFFECT1        ,  15 , POISON   , 255 , 04 ; pp 35 ; 0 ; Ene 06 -> 04
     db TWINEEDLE    , TWINEEDLE_EFFECT           ,  30 , BUG      , 255 , 10 ; pp 20 ; 0 ; Pwr 25 -> 30
     db PIN_MISSILE  , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , BUG      , 242 , 14 ; pp 20 ; 1 ; Acr 216 -> 242 ; Pwr 14 -> 28 ; Special ; PP 20 -> 15
@@ -100,7 +100,7 @@
     db AGILITY      , SPEED_UP3_EFFECT           ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Type Psychic -> Normal ; PP 30 -> 15
     db QUICK_ATTACK , NO_ADDITIONAL_EFFECT       ,  40 , NORMAL   , 255 , 07 ; pp 30 ; 0
     db RAGE         , RAGE_EFFECT                ,  40 , NORMAL   , 255 , 10 ; pp 20 ; 0 ; Pwr 20 -> 40
-    db TELEPORT     , SWITCH_AND_TELEPORT_EFFECT ,   0 , PSYCHIC  , 255 , 04 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 04
+    db TELEPORT     , SWITCH_AND_TELEPORT_EFFECT ,   0 , PSYCHIC  , 255 , 05 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 05
     db NIGHT_SHADE  , SPECIAL_DAMAGE_EFFECT      ,   1 , GHOST    , 255 , 14 ; pp 15 ; -
     db MIMIC        , MIMIC_EFFECT               ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; PP 10 -> 20
     db SCREECH      , DEFENSE_DOWN2_EFFECT       ,   0 , SOUND    , 216 , 08 ; pp 25 ; - ; PP 40 -> 25 ; Type Normal -> Sound
@@ -112,7 +112,7 @@
     db CONFUSE_RAY  , CONFUSION_EFFECT           ,   0 , GHOST    , 255 , 16 ; pp 15 ; - ; PP 10 -> 15 ; Ene 14 -> 16
     db WITHDRAW     , DEFENSE_UP2_EFFECT         ,   0 , IVORY    , 255 , 08 ; pp 30 ; - ; PP 40 -> 30 ; Defense 2x ; Type Water -> Ivory ; Ene 07 -> 08
     db DEFENSE_CURL , DEFENSE_UP1_EFFECT         ,   0 , RUBBER   , 255 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Type Normal -> Rubber
-    db BARRIER      , DEFENSE_UP3_EFFECT         ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; - ; PP 30 -> 20 ; Defense 3x
+    db BARRIER      , DEFENSE_UP3_EFFECT         ,   0 , PSYCHIC  , 255 , 16 ; pp 20 ; - ; PP 30 -> 20 ; Defense 3x ; Ene 10 -> 16
     db LIGHT_SCREEN , LIGHT_SCREEN_EFFECT        ,   0 , THUNDER  , 255 , 10 ; pp 20 ; - ; PP 30 -> 20
     db HAZE         , HAZE_EFFECT                ,   0 , ICE      , 255 , 07 ; pp 30 ; -
     db REFLECT      , REFLECT_EFFECT             ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; -
@@ -148,7 +148,7 @@
     db BUBBLE       , SPEED_DOWN_SIDE_EFFECT     ,  30 , WATER    , 255 , 06 ; pp 35 ; 1 ; Pwr 20 -> 30 ; PP 30 -> 35
     db DIZZY_PUNCH  , CONFUSION_SIDE_EFFECT      ,  90 , IVORY    , 255 , 16 ; pp 10 ; 0 ; Type Normal -> Ivory ; Pwr 70 -> 90 ; PP 10 -> 15 ; Ene 14 -> 16
     db SPORE        , SLEEP_EFFECT               ,   0 , GRASS    , 216 , 24 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 28 ; Acr 255 -> 216
-    db FLASH        , ACCURACY_DOWN1_EFFECT      ,   0 , THUNDER  , 204 , 18 ; pp 15 ; - ; Type Normal -> THUNDER  ; Acr 178 -> 204 ; PP 20 -> 15 ; Ene 14 -> 18
+    db FLASH        , ACCURACY_DOWN1_EFFECT      ,   0 , THUNDER  , 178 , 14 ; pp 15 ; - ; Type Normal -> THUNDER ; PP 20 -> 15
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; Acr 204 -> 255 ; PP 15 -> 30
     db SPLASH       , SPLASH_EFFECT              ,   0 , WATER    , 255 , 00 ; pp 40 ; - ; Type Normal -> Water
     db ACID_ARMOR   , DEFENSE_UP3_EFFECT         ,   0 , POISON   , 255 , 10 ; pp 20 ; - ; PP 40 -> 20 ; Defense 3x

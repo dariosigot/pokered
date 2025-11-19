@@ -20,7 +20,7 @@ VoltorbHisuiBaseStats:
     dw 0
 
     ; pointer to evomoves
-    dw Voltorb_Husui_EvosMoves
+    dw Voltorb_Hisui_EvosMoves
 
     db 0 ; growth rate
 
@@ -28,7 +28,7 @@ VoltorbHisuiBaseStats:
     dw VoltorbHisuiTMCompatibility
 
     ; palette
-    dw PAL_VOLTORB_HUSUI
+    dw PAL_VOLTORB_HISUI
 
     ; field moves
     db FM_LIGHT
@@ -60,7 +60,7 @@ ElectrodeHisuiBaseStats:
     dw 0
 
     ; pointer to evomoves
-    dw Electrode_Husui_EvosMoves
+    dw Electrode_Hisui_EvosMoves
 
     db 0 ; growth rate
 
@@ -68,7 +68,7 @@ ElectrodeHisuiBaseStats:
     dw ElectrodeHisuiTMCompatibility
 
     ; palette
-    dw PAL_ELECTRODE_HUSUI
+    dw PAL_ELECTRODE_HISUI
 
     ; field moves
     db FM_LIGHT+FM_HEAL

@@ -509,7 +509,7 @@ PsyduckTMCompatibility:
     tmlearn 11,12,13,16             ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|PAY_DAY|
     tmlearn 0
     tmlearn 29,30,31                ; |PSYCHIC_M|TELEPORT|MIMIC|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
+    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
     tmlearn 41,44,46                ; |LIGHT_SCREEN|REST|PSYWAVE|
     tmlearn 50,53,54                ; |SUBSTITUTE|TSUNAMI|STRIKE|
     tmlearn 58                      ; |ICE_PUNCH|
@@ -518,7 +518,7 @@ GolduckTMCompatibility:
     tmlearn 09,11,12,13,14,15,16    ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
     tmlearn 17,18,19                ; |SUBMISSION|COUNTER|SEISMIC_TOSS|
     tmlearn 28,29,30,31,32          ; |TRAPHOLE|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
+    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
     tmlearn 41,44,46                ; |LIGHT_SCREEN|REST|PSYWAVE|
     tmlearn 49,50,51,53,54          ; |TRI_ATTACK|SUBSTITUTE|BLADE|TSUNAMI|STRIKE|
     tmlearn 58,60                   ; |ICE_PUNCH|DIZZY_PUNCH|
@@ -892,7 +892,7 @@ GengarTMCompatibility:
     tmlearn 0
 ; ──────────────────────────────────────────────────────────────────────
 OnixTMCompatibility:
-    tmlearn 08                      ; |BODY_SLAM|
+    tmlearn 03,08                   ; |SWORDS_DANCE|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 20,23                   ; |RAGE|DRAGON_RAGE|
     tmlearn 26,27,28,31             ; |EARTHQUAKE|FISSURE|TRAPHOLE|MIMIC|
@@ -1203,7 +1203,7 @@ JynxTMCompatibility:
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 17,18,19,20             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|
     tmlearn 29,30,31,32             ; |PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,35,40             ; |REFLECT|BIDE|METRONOME|SKULL_BASH|
+    tmlearn 33,34,35,39,40          ; |REFLECT|BIDE|METRONOME|SWIFT|SKULL_BASH|
     tmlearn 41,42,44,46             ; |LIGHT_SCREEN|DREAM_EATER|REST|PSYWAVE|
     tmlearn 50                      ; |SUBSTITUTE|
     tmlearn 58,60                   ; |ICE_PUNCH|DIZZY_PUNCH|
@@ -1223,7 +1223,7 @@ MagmarTMCompatibility:
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 17,18,19,20             ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|
     tmlearn 29,31,32                ; |PSYCHIC_M|MIMIC|DOUBLE_TEAM|
-    tmlearn 34,35,37,38,40          ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SKULL_BASH|
+    tmlearn 34,35,37,38,39,40       ; |BIDE|METRONOME|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
     tmlearn 41,44,46                ; |LIGHT_SCREEN|REST|PSYWAVE|
     tmlearn 50,54,56                ; |SUBSTITUTE|STRIKE|SLUDGE|
     tmlearn 57,59,60                ; |FIRE_PUNCH|THUNDERPUNCH|DIZZY_PUNCH|
