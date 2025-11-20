@@ -17,8 +17,8 @@
     db SWORDS_DANCE , STAT_UP1_DOWN1_EFFECT      ,   0 , METAL    , 255 , 20 ; pp 10 ; - ; PP 30 -> 10 ; Type Normal -> Metal
     db BLADE        , NO_ADDITIONAL_EFFECT       ,  65 , METAL    , 242 , 08 ; pp 30 ; 0 ; Pwr 50 -> 65 ; Type Normal -> Metal ; Ene 07 -> 08
     db GUST         , NO_ADDITIONAL_EFFECT       ,  40 , WIND     , 255 , 06 ; pp 35 ; 1 ; Type Normal -> Wind  
-    db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  60 , WIND     , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 60 ; PP 35 -> 25
-    db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,   0 , WIND     , 216 , 04 ; pp 35 ; - ; Type Normal -> Wind ; PP 20 -> 35 ; Ene 06 -> 04
+    db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  65 , WIND     , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 65 ; PP 35 -> 25
+    db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,  65 , WIND     , 216 , 10 ; pp 35 ; 1 ; Type Normal -> Wind ; PP 20 -> 35 ; Ene 06 -> 10 ; Pwr 0 -> 65 ; Special ; EditEffect
     db SWOOP        , FLY_EFFECT                 ,  90 , WIND     , 242 , 14 ; pp 15 ; 0 ; Pwr 70 -> 90
     db BIND         , TRAPPING_EFFECT            ,  10 , NORMAL   , 191 , 10 ; pp 20 ; 0 ; Pwr 15 -> 10
     db SLAM         , NO_ADDITIONAL_EFFECT       ,  80 , RUBBER   , 191 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber
@@ -46,7 +46,7 @@
     db LEER         , DEFENSE_DOWN1_EFFECT       ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
     db BITE         , FLINCH_SIDE_EFFECT1        ,  60 , NORMAL   , 255 , 08 ; pp 25 ; 0
     db GROWL        , ATTACK_DOWN1_EFFECT        ,   0 , SOUND    , 255 , 07 ; pp 30 ; - ; PP 40 -> 30 ; Type Normal -> Sound
-    db ROAR         , SWITCH_AND_TELEPORT_EFFECT ,   0 , SOUND    , 255 , 04 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 04 ; Type Normal -> Sound
+    db ROAR         , SWITCH_AND_TELEPORT_EFFECT ,   0 , SOUND    , 255 , 10 ; pp 35 ; - ; Ene 06 -> 10 ; Type Normal -> Sound ; EditEffect
     db SING         , SLEEP_EFFECT               ,   0 , SOUND    , 140 , 16 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 16 ; Type Normal -> Sound
     db SUPERSONIC   , CONFUSION_EFFECT           ,   0 , SOUND    , 229 , 14 ; pp 15 ; - ; Acr 140 -> 229 ; PP 20 -> 15 ; Type Normal -> Sound
     db SONICBOOM    , SPECIAL_DAMAGE_EFFECT      ,   1 , SOUND    , 229 , 10 ; pp 20 ; - ; Type Normal -> Sound
@@ -100,7 +100,7 @@
     db AGILITY      , SPEED_UP3_EFFECT           ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Type Psychic -> Normal ; PP 30 -> 15
     db QUICK_ATTACK , NO_ADDITIONAL_EFFECT       ,  40 , NORMAL   , 255 , 07 ; pp 30 ; 0
     db RAGE         , RAGE_EFFECT                ,  40 , NORMAL   , 255 , 10 ; pp 20 ; 0 ; Pwr 20 -> 40
-    db TELEPORT     , SWITCH_AND_TELEPORT_EFFECT ,   0 , PSYCHIC  , 255 , 05 ; pp 35 ; - ; PP 20 -> 35 ; Ene 06 -> 05
+    db TELEPORT     , SWITCH_AND_TELEPORT_EFFECT ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; - ; EditEffect
     db NIGHT_SHADE  , SPECIAL_DAMAGE_EFFECT      ,   1 , GHOST    , 255 , 14 ; pp 15 ; -
     db MIMIC        , MIMIC_EFFECT               ,   0 , NORMAL   , 255 , 10 ; pp 20 ; - ; PP 10 -> 20
     db SCREECH      , DEFENSE_DOWN2_EFFECT       ,   0 , SOUND    , 216 , 08 ; pp 25 ; - ; PP 40 -> 25 ; Type Normal -> Sound

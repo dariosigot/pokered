@@ -881,6 +881,7 @@ GOLBAT_Learnset: MACRO
     db 38,STRING_SHOT
     db 40,HAZE
     db 43,SLUDGE
+    db 45,WHIRLWIND
     db 47,DOUBLE_TEAM
     db 51,TOXIC
     db 55,SUPER_FANG

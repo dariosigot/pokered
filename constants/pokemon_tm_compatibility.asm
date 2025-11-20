@@ -136,7 +136,7 @@ KakunaTMCompatibility:
     tmlearn 50,56                   ; |SUBSTITUTE|SLUDGE|
     tmlearn 0
 BeedrillTMCompatibility:
-    tmlearn 02,03,06                ; |RAZOR_WIND|SWORDS_DANCE|TOXIC|
+    tmlearn 02,03,04,06             ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|TOXIC|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 20,21,22                ; |RAGE|MEGA_DRAIN|SOLARBEAM|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -1189,7 +1189,7 @@ MrMimeTMCompatibility:
     tmlearn 57,58,59                ; |FIRE_PUNCH|ICE_PUNCH|THUNDERPUNCH|
 ; ──────────────────────────────────────────────────────────────────────
 ScytherTMCompatibility:
-    tmlearn 02,03,05,06             ; |RAZOR_WIND|SWORDS_DANCE|MEGA_KICK|TOXIC|
+    tmlearn 02,03,04,05,06          ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|MEGA_KICK|TOXIC|
     tmlearn 09,15                   ; |TAKE_DOWN|HYPER_BEAM|
     tmlearn 18,20                   ; |COUNTER|RAGE|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|

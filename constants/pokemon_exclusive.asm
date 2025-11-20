@@ -176,6 +176,7 @@ BeedrillExclusiveMove:
     db SLUDGE ; TM56
     db LEER
     db SCREECH
+    db WHIRLWIND ; TM04
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PidgeyExclusiveMove:
@@ -1609,6 +1610,7 @@ ScytherExclusiveMove:
     db BLADE ; TM51
     db SWOOP ; TM52
     db RAGE ; TM20
+    db WHIRLWIND ; TM04
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 JynxExclusiveMove:
