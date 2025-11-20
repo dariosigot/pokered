@@ -555,14 +555,14 @@ Electrode_EvosMoves:
     ELECTRODE_Learnset
     db 0
 ; ──────────────────────────────────────────────────────────────────────
-Voltorb_Husui_EvosMoves:
+Voltorb_Hisui_EvosMoves:
     db EV_ITEM,LEAF_STONE,1,ELECTRODE
     db 0
-    VOLTORB_HUSUI_Learnset
+    VOLTORB_HISUI_Learnset
     db 0
-Electrode_Husui_EvosMoves:
+Electrode_Hisui_EvosMoves:
     db 0
-    ELECTRODE_HUSUI_Learnset
+    ELECTRODE_HISUI_Learnset
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 Exeggcute_EvosMoves:

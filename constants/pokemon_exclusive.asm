@@ -142,6 +142,9 @@ ButterfreeExclusiveMove:
     db LEECH_LIFE
     db CONFUSION
     db SLUDGE ; TM56
+    db DISABLE
+    db SUPERSONIC
+    db SCREECH
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 WeedleExclusiveMove:
@@ -171,6 +174,9 @@ BeedrillExclusiveMove:
     db TWINEEDLE
     db RAGE ; TM20
     db SLUDGE ; TM56
+    db LEER
+    db SCREECH
+    db WHIRLWIND ; TM04
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PidgeyExclusiveMove:
@@ -629,6 +635,8 @@ GolduckExclusiveMove:
     db FLARE
     db ICE_PUNCH ; TM_58
     db DIZZY_PUNCH ; TM_60
+    db REFLECT ; TM33
+    db BARRIER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MankeyExclusiveMove:
@@ -1114,6 +1122,7 @@ OnixExclusiveMove:
     db STRIKE ; TM54
     db RAGE ; TM20
     db SLUDGE ; TM56
+    db SWORDS_DANCE ; TM03
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DrowzeeExclusiveMove:
@@ -1235,7 +1244,7 @@ MarowakExclusiveMove:
     db STRIKE ; TM54
     db MEDITATE
     db ROCK_THROW
-    db HARDEN
+    db SPIKE_CANNON
     db RAGE ; TM20
     db TOXIC ; TM06
     db TELEPORT ; TM30
@@ -1601,6 +1610,7 @@ ScytherExclusiveMove:
     db BLADE ; TM51
     db SWOOP ; TM52
     db RAGE ; TM20
+    db WHIRLWIND ; TM04
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 JynxExclusiveMove:
@@ -1633,6 +1643,7 @@ JynxExclusiveMove:
     db RAGE ; TM20
     db ICE_PUNCH ; TM_58
     db DIZZY_PUNCH ; TM_60
+    db SWIFT ; TM39
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ElectabuzzExclusiveMove:
@@ -1698,6 +1709,7 @@ MagmarExclusiveMove:
     db THUNDERPUNCH ; TM_59
     db SLUDGE ; TM56
     db DIZZY_PUNCH ; TM_60
+    db SWIFT ; TM39
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PinsirExclusiveMove:

@@ -37494,10 +37494,10 @@ Route2HouseText3:
     ld [W_CURMAPSCRIPT],a
     jp TextScriptEnd
 .VoltorbText1
-    TX_FAR _VoltorbHusuiText
+    TX_FAR _VoltorbHisuiText
     db "@"
 .VoltorbText2
-    TX_FAR _VoltorbHusui2Text
+    TX_FAR _VoltorbHisui2Text
     db "@"
 
 Route2HouseText4:
@@ -52655,7 +52655,6 @@ EffectsArray1:
 ; most non-side effects
     db CONVERSION_EFFECT
     db HAZE_EFFECT
-    db SWITCH_AND_TELEPORT_EFFECT
     db MIST_EFFECT
     db FOCUS_ENERGY_EFFECT
     db CONFUSION_EFFECT
@@ -53295,13 +53294,6 @@ PrintAlreadyParalyzedText:
     TX_FAR _AlreadyParalyzedText
     db "@"
 
-PrintIsUnaffectedText:
-    ld hl,.IsUnaffectedText
-    jp Delay50AndPrintText
-.IsUnaffectedText
-    TX_FAR _IsUnaffectedText
-    db "@"
-
 MistEffect:
     ld hl,MistEffect_
     ld b,BANK(MistEffect_)
@@ -53804,6 +53796,41 @@ RemoveFaintedPlayerMon:
     TX_FAR _PlayerMonFaintedText
     db "@"
 
+PlayMoveAnimation_WithException:
+    cp WHIRLWIND
+    jr nz,.notWhirlWind
+    ld a,$CE ; WhirlwindAnimTrainerBattle
+    jr .done
+.notWhirlWind
+    cp SEISMIC_TOSS
+    jr nz,.done
+    push bc
+    ld b,a
+    ld a,[W_MOVEMISSED]
+    and a
+    ld a,b
+    pop bc
+    jr z,.done
+    ld a,TACKLE
+.done
+    jp PlayMoveAnimation
+
+RunMoveEffectInList:
+    ld de,1
+    call IsInArray
+    push af
+    call c,JumpMoveEffect
+    pop af
+    ret
+
+RunMoveEffectNotInList:
+    ld de,1
+    call IsInArray
+    push af
+    call nc,JumpMoveEffect
+    pop af
+    ret
+
 ; Free
 
 SECTION "ChooseNextMon",ROMX[$47d8],BANK[$f]
@@ -53926,6 +53953,7 @@ EffectsArray5B:
 ; damaging moves whose effect is executed prior to damage calculation
     db THRASH_PETAL_DANCE_EFFECT
     db TRAPPING_EFFECT
+    db SWITCH_AND_TELEPORT_EFFECT
     db $FF
 
 SECTION "Func_3c893",ROMX[$4893],BANK[$f]
@@ -55875,15 +55903,17 @@ PlayerCanExecuteMove:
     call Bankswitch
     ld a,[W_PLAYERMOVEEFFECT] ; effect of the move just used
     ld hl,EffectsArray1
-    ld de,1
-    call IsInArray
-    jp c,JumpMoveEffect ; ResidualEffects1 moves skip damage calculation and accuracy tests
+    call RunMoveEffectInList
+    ret c ; ResidualEffects1 moves skip damage calculation and accuracy tests
                         ; unless executed as part of their exclusive effect functions
     ld a,[W_PLAYERMOVEEFFECT]
     ld hl,EffectsArray5B
-    ld de,1
-    call IsInArray
-    call c,JumpMoveEffect ; execute the effects of SpecialEffectsCont moves (e.g. Wrap, Thrash) but don't skip anything
+    call RunMoveEffectInList ; execute the effects of SpecialEffectsCont moves (e.g. Wrap, Thrash) but don't skip anything
+    ld a,[$d078] ; EscapedFromBattle
+    and a
+    ret nz ; return if whirlwind success
+    xor a
+    ld [W_MOVEMISSED],a
 
 PlayerCalcMoveDamage:
     ld a,[W_PLAYERMOVEEFFECT]
@@ -55929,7 +55959,7 @@ playPlayerMoveAnimation:
     pop af
     ld [$CC5B],a ; AnimationType
     ld a,[W_PLAYERMOVENUM]
-    call PlayMoveAnimation_SeismicTossException
+    call PlayMoveAnimation_WithException
     call HandleExplodingAnimation
     call DrawPlayerHUDAndHPBar
     ld a,[W_PLAYERBATTSTATUS2]
@@ -55971,9 +56001,8 @@ MirrorMoveCheck:
 .next
     ld a,[W_PLAYERMOVEEFFECT]
     ld hl,EffectsArray3
-    ld de,1
-    call IsInArray
-    jp c,JumpMoveEffect ; done here after executing effects of EffectsArray3
+    call RunMoveEffectInList
+    ret c ; done here after executing effects of EffectsArray3
     ld a,[W_MOVEMISSED]
     and a
     jr z,.moveDidNotMiss
@@ -55994,9 +56023,7 @@ MirrorMoveCheck:
 .notDone
     ld a,[W_PLAYERMOVEEFFECT]
     ld hl,EffectsArray4
-    ld de,1
-    call IsInArray
-    call c,JumpMoveEffect ; not done after executing effects of EffectsArray4
+    call RunMoveEffectInList ; not done after executing effects of EffectsArray4
     ld hl,W_ENEMYMONCURHP
     ld a,[hli]
     ld b,[hl]
@@ -56023,9 +56050,7 @@ MirrorMoveCheck:
     and a
     jr z,ExecutePlayerMoveDone
     ld hl,EffectsArray5
-    ld de,1
-    call IsInArray
-    call nc,JumpMoveEffect
+    call RunMoveEffectNotInList
     ; fall through
 
 ExecutePlayerMoveDone:
@@ -56069,18 +56094,6 @@ GetOutText: ; 3d835 (f:5835)
 MultiHitText:
     TX_FAR _MultiHitText
     db "@"
-
-PlayMoveAnimation_SeismicTossException:
-    cp SEISMIC_TOSS
-    jr nz,.done
-    ld b,a
-    ld a,[W_MOVEMISSED]
-    and a
-    ld a,b
-    jr z,.done
-    ld a,TACKLE
-.done
-    jp PlayMoveAnimation
 
 ; ──────────────────────────────────────────────────────────────────────
 ; CheckPlayerStatusConditions
@@ -56382,6 +56395,8 @@ GetSideEffectType_Common:
 SaveScreenAndLoadBattlePokedex:
     call SaveScreenTilesToBuffer1
     jp LoadBattlePokedex
+
+; Free
 
 SECTION "FastAsleepText",ROMX[$5a3d],BANK[$f]
 
@@ -58555,15 +58570,17 @@ EnemyCanExecuteMove:
     ld [$cced],a
     call DecrementEnemyPP ; call PrintMonName1Text
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    ld hl,EffectsArray1 ; $4000
-    ld de,$1
-    call IsInArray
-    jp c,JumpMoveEffect
+    ld hl,EffectsArray1
+    call RunMoveEffectInList
+    ret c
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    ld hl,EffectsArray5B ; $4049
-    ld de,$1
-    call IsInArray
-    call c,JumpMoveEffect
+    ld hl,EffectsArray5B
+    call RunMoveEffectInList
+    ld a,[$d078] ; EscapedFromBattle
+    and a
+    ret nz ; return if whirlwind success
+    xor a
+    ld [W_MOVEMISSED],a
 
 EnemyCalcMoveDamage:
     call SwapPlayerAndEnemyLevels
@@ -58571,7 +58588,7 @@ EnemyCalcMoveDamage:
     ld hl,EffectsArray2 ; $4011
     ld de,$1
     call IsInArray
-    jp c,EnemyMoveHitTest
+    jr c,.EnemyMoveHitTest
     call CriticalHitTest
     call HandleCounterMove
     jr z,handleIfEnemyMoveMissed
@@ -58583,7 +58600,7 @@ EnemyCalcMoveDamage:
     call AdjustDamageForMoveType
     call RandomizeDamage
 
-EnemyMoveHitTest:
+.EnemyMoveHitTest:
     call MoveHitTest
 
 handleIfEnemyMoveMissed:
@@ -58617,7 +58634,7 @@ playEnemyMoveAnimation:
     pop af
     ld [$CC5B],a ; AnimationType
     ld a,[W_ENEMYMOVENUM] ; $cfcc
-    call PlayMoveAnimation_SeismicTossException
+    call PlayMoveAnimation_WithException
     call HandleExplodingAnimation
     call DrawEnemyHUDAndHPBar
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
@@ -58657,10 +58674,9 @@ EnemyCheckIfMirrorMoveEffect:
     jp CheckIfEnemyNeedsToChargeUp
 .notMetronomeEffect
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    ld hl,EffectsArray3 ; $4014
-    ld de,$1
-    call IsInArray
-    jp c,JumpMoveEffect
+    ld hl,EffectsArray3
+    call RunMoveEffectInList
+    ret c
     ld a,[W_MOVEMISSED] ; $d05f
     and a
     jr z,.moveDidNotMiss
@@ -58680,10 +58696,8 @@ EnemyCheckIfMirrorMoveEffect:
     call EnemyMoveDidntMissAndPlayerBideAccum
 .notDone
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
-    ld hl,EffectsArray4 ; $4030
-    ld de,$1
-    call IsInArray
-    call c,JumpMoveEffect
+    ld hl,EffectsArray4
+    call RunMoveEffectInList
     ld hl,W_PLAYERMONCURHP ; $d015
     ld a,[hli]
     ld b,[hl]
@@ -58707,10 +58721,8 @@ EnemyCheckIfMirrorMoveEffect:
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
     and a
     jr z,ExecuteEnemyMoveDone
-    ld hl,EffectsArray5 ; $403b
-    ld de,$1
-    call IsInArray
-    call nc,JumpMoveEffect
+    ld hl,EffectsArray5
+    call RunMoveEffectNotInList
     ; fall through
 
 ExecuteEnemyMoveDone:
@@ -59077,7 +59089,7 @@ EffectsArray3:
     db SPECIAL_UP3_EFFECT
     db ACCURACY_UP3_EFFECT
     db EVASION_UP3_EFFECT
-    db STAT_UP1_DOWN_SIDE_EFFECT
+    db STAT_UP1_DOWN1_EFFECT
     db $FF
 
 GetCurrentMove:
@@ -60102,17 +60114,17 @@ JumpMoveEffect_:
      dw ReflectLightScreenEffect     ; REFLECT_EFFECT
      dw PoisonEffect                 ; POISON_EFFECT
      dw ParalyzeEffect               ; PARALYZE_EFFECT
-     dw StatModifierDownEffect       ; ATTACK_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; DEFENSE_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; SPEED_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; SPECIAL_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; ACCURACY_DOWN_SIDE_EFFECT
-     dw StatModifierDownEffect       ; EVASION_DOWN_SIDE_EFFECT
+     dw StatModifierDownEffect       ; ATTACK_DOWN_SIDE1_EFFECT
+     dw StatModifierDownEffect       ; DEFENSE_DOWN_SIDE1_EFFECT
+     dw StatModifierDownEffect       ; SPEED_DOWN_SIDE1_EFFECT
+     dw StatModifierDownEffect       ; SPECIAL_DOWN_SIDE1_EFFECT
+     dw StatModifierDownEffect       ; ACCURACY_DOWN_SIDE1_EFFECT
+     dw StatModifierDownEffect       ; EVASION_DOWN_SIDE1_EFFECT
      dw StatModifierDownEffect       ; unused effect
      dw StatModifierDownEffect       ; unused effect
      dw ConfusionEffect              ; CONFUSION_SIDE_EFFECT
      dw TwoToFiveAttacksEffect       ; TWINEEDLE_EFFECT
-     dw StatUp1DownSideEffect        ; STAT_UP1_DOWN_SIDE_EFFECT
+     dw StatUpDownEffect             ; STAT_UP1_DOWN1_EFFECT
      dw SubstituteEffect             ; SUBSTITUTE_EFFECT
      dw HyperBeamEffect              ; HYPER_BEAM_EFFECT
      dw RageEffect                   ; RAGE_EFFECT
@@ -60127,6 +60139,12 @@ JumpMoveEffect_:
      dw StatModifierUpEffect         ; SPECIAL_UP3_EFFECT
      dw StatModifierUpEffect         ; ACCURACY_UP3_EFFECT
      dw StatModifierUpEffect         ; EVASION_UP3_EFFECT
+     dw StatModifierDownEffect       ; ATTACK_DOWN_SIDE2_EFFECT
+     dw StatModifierDownEffect       ; DEFENSE_DOWN_SIDE2_EFFECT
+     dw StatModifierDownEffect       ; SPEED_DOWN_SIDE2_EFFECT
+     dw StatModifierDownEffect       ; SPECIAL_DOWN_SIDE2_EFFECT
+     dw StatModifierDownEffect       ; ACCURACY_DOWN_SIDE2_EFFECT
+     dw StatModifierDownEffect       ; EVASION_DOWN_SIDE2_EFFECT
 
 SleepEffect:
     ld de,W_ENEMYMONSTATUS ; $cfe9
@@ -60573,7 +60591,7 @@ StatModifierUpEffect:
     call nz,Bankswitch
     pop de
 .notMinimize
-    call PlayCurrentMoveAnimation
+    call PlayCurrentMoveAnimation_WithException
     ld a,[de]
     cp MINIMIZE
     jr nz,.applyBadgeBoostsAndStatusPenalties
@@ -60593,7 +60611,7 @@ StatModifierUpEffect:
     ld hl,QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_
     jp QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up
 .NothingHappened
-    call PlayCurrentMoveAnimation
+    call PlayCurrentMoveAnimation_WithException
     jp PrintNothingHappenedText
 .MonsStatsRoseText
     TX_FAR _MonsStatsRoseText
@@ -60629,7 +60647,7 @@ StatModifierUpEffect:
 RestoreOriginalStatModifier:
     pop hl
     dec [hl]
-    call PlayCurrentMoveAnimation
+    call PlayCurrentMoveAnimation_WithException
     ; fall through
 
 PrintNothingHappenedText:
@@ -60652,7 +60670,7 @@ StatModifierDownEffect:
     ld bc,W_PLAYERBATTSTATUS1 ; $d062
 .done
     ld a,[de]
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     jr nc,.skipMoveHitTest
     call MoveHitTestPlus
     jr nz,.attackMissed
@@ -60660,13 +60678,16 @@ StatModifierDownEffect:
     call CheckTargetSubstitute
     jr nz,.didntAffect
     ld a,[de]
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     jr c,.nonSideEffect
     call CheckCustomSideEffect ; GenRandomInBattle
     call CompareCustomValue ; cp $55 ; 33%
     ret nc ; don't apply side effect
     ld a,[de]
-    sub ATTACK_DOWN_SIDE_EFFECT ; map each stat to 0-3
+    sub ATTACK_DOWN_SIDE1_EFFECT ; map each stat to 0-3
+    cp EVASION_DOWN_SIDE1_EFFECT + $3 - ATTACK_DOWN_SIDE1_EFFECT ; covers all -1 effects
+    jr c,.decrementStatMod
+    sub ATTACK_DOWN_SIDE2_EFFECT - ATTACK_DOWN_SIDE1_EFFECT ; map -2 effects to corresponding -1 effect
     jr .decrementStatMod
 .CantLowerAnymore_Pop
     pop de
@@ -60683,9 +60704,9 @@ StatModifierDownEffect:
     ; fall through
 .checkEnd
     ld a,[de]
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     ret nc
-    call PlayCurrentMoveAnimation
+    call PlayCurrentMoveAnimation_WithException
     jp hl
 .nonSideEffect
     ld a,[de]
@@ -60789,9 +60810,9 @@ StatModifierDownEffect:
     call PrintStatText
     pop de
     ld a,[de]
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     jr nc,.ApplyBadgeBoostsAndStatusPenalties
-    call PlayCurrentMoveAnimation2
+    call PlayCurrentMoveAnimation2_WithException
 .ApplyBadgeBoostsAndStatusPenalties
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -60811,7 +60832,7 @@ StatModifierDownEffect:
 .done2
     cp BIDE_EFFECT
     ret c
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     ret nc
     ld hl,.GreatlyFellText
     ret
@@ -60825,7 +60846,6 @@ StatModifierDownEffect:
 ; ──────────────────────────────────────────────────────────────────────
 
 ; Free
-
 
 SECTION "PrintStatText",ROMX[$7688],BANK[$f]
 
@@ -60948,6 +60968,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     jr nc,.playerMoveWasSuccessful ; if so, allow teleporting
 .notWildBattle1
     ld a,[W_PLAYERMOVENUM] ; $cfd2
+    ld hl,W_PLAYERMOVEEFFECT
     jr .handleFailed
 .playerMoveWasSuccessful
     call ReadPlayerMonCurHPAndStatus
@@ -60986,6 +61007,7 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     jr nc,.enemyMoveWasSuccessful
 .notWildBattle2
     ld a,[W_ENEMYMOVENUM] ; $cfcc
+    ld hl,W_ENEMYMOVEEFFECT
     jr .handleFailed
 .enemyMoveWasSuccessful
     call ReadPlayerMonCurHPAndStatus
@@ -60997,19 +61019,15 @@ SwitchAndTeleportEffect: ; 3f739 (f:7739)
     jr .playAnimAndPrintText
 
 .handleFailed
-    cp TELEPORT
-    jp z,PrintButItFailedText
     cp WHIRLWIND
-    jr nz,.notwhirlwind
-    xor a
-    ld [$cc5b],a
-    ld a,$CD ; WhirlwindFailAnim
-    call PlayBattleAnimation
-    jr .failDone
-.notwhirlwind
-    call PlayCurrentMoveAnimation
-.failDone
-    jp PrintIsUnaffectedText
+    ret z
+    cp TELEPORT
+    jr nz,.roar
+    ld [hl],SPEED_UP1_EFFECT
+    ret
+.roar
+    ld [hl],ATTACK_DOWN2_EFFECT
+    ret
 
 .playAnimAndPrintText
     push af
@@ -61501,13 +61519,6 @@ SplashEffect:
     jp PrintText
 .NoEffectText
     TX_FAR _NoEffectText
-    db "@"
-
-PrintButItFailedText:
-    ld hl,.ButItFailedText
-    jp Delay50AndPrintText
-.ButItFailedText
-    TX_FAR _ButItFailedText
     db "@"
 
 PrintDidntAffectText:
@@ -62142,9 +62153,9 @@ Copy2BytesDirect:
     ld bc,2
     jp CopyData
 
-StatUp1DownSideEffect:
-    ld hl,StatUp1DownSideEffect_
-    ld b,BANK(StatUp1DownSideEffect_)
+StatUpDownEffect:
+    ld hl,StatUpDownEffect_
+    ld b,BANK(StatUpDownEffect_)
     jp Bankswitch
 
 CheckCustomSideEffect:
@@ -62182,8 +62193,8 @@ CheckZeroDamageOrSideEffectRandom:
 CompareCustomValue:
     push af
     ld a,[de]
-    cp ACCURACY_DOWN_SIDE_EFFECT
-    jr nz,.standard
+    cp ATTACK_DOWN_SIDE2_EFFECT
+    jr c,.standard
     pop af
     cp $AA ; 66%
     ret
@@ -62358,6 +62369,49 @@ EnemySendOutAfterDelay:
     ld c,30
     call DelayFrames
     jp EnemySendOut
+
+PlayCurrentMoveAnimation2_WithException:
+    push de
+    ld de,PlayCurrentMoveAnimation2
+    jr PlayCurrentMoveAnimation_WithException_Common
+
+PlayCurrentMoveAnimation_WithException:
+    push de
+    ld de,PlayCurrentMoveAnimation
+    ;  fall through
+
+PlayCurrentMoveAnimation_WithException_Common:
+    push hl
+    ld a,[H_WHOSETURN]
+    and a
+    ld hl,W_PLAYERMOVENUM
+    jr z,.done
+    ld hl,W_ENEMYMOVENUM
+.done
+    ld a,[hl]
+    push af
+    cp TELEPORT
+    jr nz,.notTeleport
+    ld [hl],$CD ; TeleportAnimTrainerBattle
+    jr .play
+.notTeleport
+    cp ROAR
+    jr nz,.play
+    ld [hl],$CF ; RoarAnimTrainerBattle
+.play
+    push hl
+    ld h,d
+    ld l,e
+    ld de,.return
+    push de
+    jp hl
+.return
+    pop hl
+    pop af
+    ld [hl],a
+    pop hl
+    pop de
+    ret
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -76150,6 +76204,7 @@ UpgradeTrainerSet_Predef:                  NEW_PREDEF UpgradeTrainerSet_        
 IsMonInCurrentMapPredef:                   NEW_PREDEF IsMonInCurrentMap                   ; $70
 UndoBurnParStatsPredef:                    NEW_PREDEF UndoBurnParStats                    ; $71
 DrawHUDsAndHPBarsPredef:                   NEW_PREDEF DrawHUDsAndHPBars                   ; $72
+GetAttackAnimationPointers_Predef:         NEW_PREDEF GetAttackAnimationPointers_         ; $73
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -109123,9 +109178,10 @@ PlayAnimation: ; 780f1 (1e:40f1)
     add hl,hl
     ld de,AttackAnimationPointers  ; $607d ; animation command stream pointers
     add hl,de
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
+    call GetAttackAnimationPointers
+    ;ld a,[hli]
+    ;ld h,[hl]
+    ;ld l,a
 .animationLoop
     ld a,[hli]
     cp a,$FF
@@ -110784,16 +110840,6 @@ Evolution_LoadPic_HandleAlternateForm:
     call Evolution_GetMonHeader_HandleAlternateForm
     jp Evolution_LoadPic
 
-ZigZagScreenAnim:
-    db SE_WAVY_SCREEN,$FF
-    db $FF
-
-WhirlwindFailAnim:
-    db $46,$11,$10
-    db $FF
-
-; Free
-
 SECTION "AnimationSlideMonDownAndHide",ROMX[$55c9],BANK[$1e]
 
 AnimationMinimizeMon:
@@ -112024,212 +112070,51 @@ Func_79fd4: ; 79fd4 (1e:5fd4)
 RedFishingTiles: ; 79fdd (1e:5fdd)
     INCBIN "gfx/red_fishing.2bpp"
 
-AttackAnimationPointers: ; 7a07d (1e:607d)
-    dw PoundAnim
-    dw KarateChopAnim
-    dw DoubleSlapAnim
-    dw CometPunchAnim
-    dw MegaPunchAnim
-    dw PayDayAnim
-    dw FirePunchAnim
-    dw IcePunchAnim
-    dw ThunderPunchAnim
-    dw ScratchAnim
-    dw VicegripAnim
-    dw GuillotineAnim
-    dw RazorWindAnim
-    dw SwordsDanceAnim
-    dw CutAnim
-    dw GustAnim
-    dw WingAttackAnim
-    dw WhirlwindAnim
-    dw FlyAnim
-    dw BindAnim
-    dw SlamAnim
-    dw VineWhipAnim
-    dw StompAnim
-    dw DoubleKickAnim
-    dw MegaKickAnim
-    dw JumpKickAnim
-    dw RollingKickAnim
-    dw SandAttackAnim
-    dw HeatButtAnim
-    dw HornAttackAnim
-    dw FuryAttackAnim
-    dw HornDrillAnim
-    dw TackleAnim
-    dw BodySlamAnim
-    dw WrapAnim
-    dw TakeDownAnim
-    dw ThrashAnim
-    dw DoubleEdgeAnim
-    dw TailWhipAnim
-    dw PoisonStingAnim
-    dw TwineedleAnim
-    dw PinMissileAnim
-    dw LeerAnim
-    dw BiteAnim
-    dw GrowlAnim
-    dw RoarAnim
-    dw SingAnim
-    dw SupersonicAnim
-    dw SonicBoomAnim
-    dw DisableAnim
-    dw AcidAnim
-    dw EmberAnim
-    dw FlamethrowerAnim
-    dw MistAnim
-    dw WaterGunAnim
-    dw HydroPumpAnim
-    dw SurfAnim
-    dw IceBeamAnim
-    dw BlizzardAnim
-    dw PsyBeamAnim
-    dw BubbleBeamAnim
-    dw AuroraBeamAnim
-    dw HyperBeamAnim
-    dw PeckAnim
-    dw DrillPeckAnim
-    dw SubmissionAnim
-    dw LowKickAnim
-    dw CounterAnim
-    dw SeismicTossAnim
-    dw StrengthAnim
-    dw AbsorbAnim
-    dw MegaDrainAnim
-    dw LeechSeedAnim
-    dw GrowthAnim
-    dw RazorLeafAnim
-    dw SolarBeamAnim
-    dw PoisonPowderAnim
-    dw StunSporeAnim
-    dw SleepPowderAnim
-    dw PedalDanceAnim
-    dw StringShotAnim
-    dw DragonRageAnim
-    dw FireSpinAnim
-    dw ThunderShockAnim
-    dw ThunderBoldAnim
-    dw ThunderWaveAnim
-    dw ThunderAnim
-    dw RockThrowAnim
-    dw EarthquakeAnim
-    dw FissureAnim
-    dw DigAnim
-    dw ToxicAnim
-    dw ConfusionAnim
-    dw PsychicAnim
-    dw HypnosisAnim
-    dw MeditateAnim
-    dw AgilityAnim
-    dw QuickAttackAnim
-    dw RageAnim
-    dw TeleportAnim
-    dw NightShadeAnim
-    dw MimicAnim
-    dw ScreechAnim
-    dw DoubleTeamAnim
-    dw RecoverAnim
-    dw HardenAnim
-    dw MinimizeAnim
-    dw SmokeScreenAnim
-    dw ConfuseRayAnim
-    dw WithdrawAnim
-    dw DefenseCurlAnim
-    dw BarrierAnim
-    dw LightScreenAnim
-    dw HazeAnim
-    dw ReflectAnim
-    dw FocusEnergyAnim
-    dw BideAnim
-    dw MetronomeAnim
-    dw MirrorMoveAnim
-    dw SelfdestructAnim
-    dw EggBombAnim
-    dw LickAnim
-    dw SmogAnim
-    dw SludgeAnim
-    dw BoneClubAnim
-    dw FireBlastAnim
-    dw WaterfallAnim
-    dw ClampAnim
-    dw SwiftAnim
-    dw SkullBashAnim
-    dw SpikeCannonAnim
-    dw ConstrictAnim
-    dw AmnesiaAnim
-    dw KinesisAnim
-    dw SoftboiledAnim
-    dw HiJumpKickAnim
-    dw FlareAnim
-    dw DreamEaterAnim
-    dw PoisonGasAnim
-    dw BarrageAnim
-    dw LeechLifeAnim
-    dw LovelyKissAnim
-    dw SkyAttackAnim
-    dw TransformAnim
-    dw BubbleAnim
-    dw DizzyPunchAnim
-    dw SporeAnim
-    dw FlashAnim
-    dw PsywaveAnim
-    dw SplashAnim
-    dw AcidArmorAnim
-    dw CrabHammerAnim
-    dw ExplosionAnim
-    dw FurySwipesAnim
-    dw BonemerangAnim
-    dw RestAnim
-    dw RockSlideAnim
-    dw HyperFangAnim
-    dw SharpenAnim
-    dw ConversionAnim
-    dw TriAttackAnim
-    dw SuperFangAnim
-    dw SlashAnim
-    dw SubstituteAnim
-    dw StruggleAnim
-    dw ShowPicAnim
-    dw EnemyFlashAnim
-    dw PlayerFlashAnim
-    dw EnemyHUDShakeAnim
-    dw TradeBallDropAnim
-    dw TradeBallAppear1Anim
-    dw TradeBallAppear2Anim
-    dw TradeBallPoofAnim
-    dw XStatItemAnim
-    dw XStatItemAnim
-    dw ShrinkingSquareAnim
-    dw ShrinkingSquareAnim
-    dw XStatItemBlackAnim
-    dw XStatItemBlackAnim
-    dw ShrinkingSquareBlackAnim
-    dw ShrinkingSquareBlackAnim
-    dw UnusedAnim
-    dw UnusedAnim
-    dw ParalyzeAnim
-    dw ParalyzeAnim
-    dw PoisonAnim
-    dw PoisonAnim
-    dw SleepPlayerAnim
-    dw SleepEnemyAnim
-    dw ConfusedPlayerAnim
-    dw ConfusedEnemyAnim
-    dw FaintAnim
-    dw BallTossAnim
-    dw BallShakeAnim
-    dw BallPoofAnim
-    dw BallBlockAnim
-    dw GreatTossAnim
-    dw UltraTossAnim
-    dw ShakeScreenAnim
-    dw HidePicAnim
-    dw ThrowRockAnim
-    dw ThrowBaitAnim
-    dw ZigZagScreenAnim
-    dw TransformFailAnim ; $CC
-    dw WhirlwindFailAnim ; $CD
+AgilityAnim:
+    db SE_LIGHT_SCREEN_PALETTE,$60
+    db SE_DELAY_ANIMATION_10,$FF
+    db SE_DARK_SCREEN_FLASH,$FF
+    db SE_RESET_SCREEN_PALETTE,$FF
+    db $FF
+
+ZigZagScreenAnim:
+    db SE_WAVY_SCREEN,$FF
+    db $FF
+
+TransformFailAnim:
+    db $46,$8F,$21
+    db $44,$8F,$22
+    db $08,$FF,$47
+    db $FF
+
+TeleportAnimTrainerBattle:
+    db SE_SQUISH_MON_PIC,$63
+    db SE_SHOOT_BALLS_UPWARD,$FF
+    db SE_DELAY_ANIMATION_10,$FF
+    db SE_DELAY_ANIMATION_10,$FF
+    db SE_SHOW_MON_PIC,$FF
+    db $FF
+
+WhirlwindAnimTrainerBattle:
+    db $46,$11,$10
+    ;db SE_SLIDE_ENEMY_MON_OUT,$FF
+    ;db SE_DELAY_ANIMATION_10,$FF
+    ;db SE_SHOW_ENEMY_MON_PIC,$FF
+    db $06,$FF,$02
+    db $FF
+
+RoarAnim:
+    db $46,$2D,$15
+    db $46,$2D,$15
+    db $46,$2D,$15
+    db SE_DELAY_ANIMATION_10,$FF
+    db SE_SLIDE_ENEMY_MON_OUT,$FF
+    db $FF
+
+GetAttackAnimationPointers:
+    PREDEF_JUMP GetAttackAnimationPointers_
+
+; Free
 
 ; each animation is a list of subanimations and special effects
 ; if first byte < $56
@@ -112463,7 +112348,7 @@ GrowlAnim: ; 7a334 (1e:6334)
     db $46,$2C,$12
     db $FF
 
-RoarAnim: ; 7a338 (1e:6338)
+RoarAnimTrainerBattle: ; 7a338 (1e:6338)
     db $46,$2D,$15
     db $46,$2D,$15
     db $46,$2D,$15
@@ -112752,10 +112637,7 @@ MeditateAnim: ; 7a4b9 (1e:64b9)
     db SE_RESET_SCREEN_PALETTE,$FF
     db $FF
 
-AgilityAnim: ; 7a4c3 (1e:64c3)
-    db SE_LIGHT_SCREEN_PALETTE,$60
-    db SE_RESET_SCREEN_PALETTE,$FF
-    db $FF
+SECTION "QuickAttackAnim",ROMX[$64c8],BANK[$1e]
 
 QuickAttackAnim: ; 7a4c8 (1e:64c8)
     db SE_SLIDE_MON_OUT,$61
@@ -115930,12 +115812,6 @@ GetBattleBackMonHeader:
     ld a,[W_PLAYERMONALTFORM]
     ld [wAlternateFormIndex],a
     jp GetMonHeader
-
-TransformFailAnim:
-    db $46,$8F,$21
-    db $44,$8F,$22
-    db $08,$FF,$47
-    db $FF
 
 SECTION "bank1F",ROMX,BANK[$1F]
 
@@ -125397,16 +125273,15 @@ _NothingHappenedText: ; 948b6 (25:48b6)
 _NoEffectText: ; 948c9 (25:48c9)
     db $0,"No effect!",$58
 
-_ButItFailedText: ; 948d5 (25:48d5)
-    db $0,"But,it failed! ",$58
-
-_DidntAffectText: ; 948e7 (25:48e7)
+_DidntAffectText:
     db $0,"It didn't affect",$4f
     db $59,"!",$58
 
-_IsUnaffectedText: ; 948fb (25:48fb)
+_IsUnaffectedText:
     db $0,$59,$4f
     db "is unaffected!",$58
+
+SECTION "_UnnamedText_3fb74",ROMX[$490d],BANK[$25]
 
 _UnnamedText_3fb74: ; 9490d (25:490d)
     db $0,$59,"'s",$4f
@@ -131126,13 +131001,13 @@ _VoltorbText:
     db $0,"Wow!",$4f
     db "A VOLTORB...",$58
 
-_VoltorbHusuiText:
+_VoltorbHisuiText:
     db $0,"Wow! Is it",$4f
     db "a VOLTORB?",$51
     db "I must check",$4f
     db "the #DEX!",$58
 
-_VoltorbHusui2Text:
+_VoltorbHisui2Text:
     db $0,"It's different",$4f
     db "from the #DEX!",$58
 
@@ -132473,13 +132348,13 @@ MissingNoPicBack:
     INCBIN "pic/other/BackSpriteMissingNo.pic"
 
 VoltorbHisuiPicFront:
-    INCBIN "pic/bmon/voltorbhusui.pic"
+    INCBIN "pic/bmon/voltorbhisui.pic"
 VoltorbHisuiPicBack:
-    INCBIN "pic/monback/voltorbhusuib.pic"
+    INCBIN "pic/monback/voltorbhisuib.pic"
 ElectrodeHisuiPicFront:
-    INCBIN "pic/bmon/electrodehusui.pic"
+    INCBIN "pic/bmon/electrodehisui.pic"
 ElectrodeHisuiPicBack:
-    INCBIN "pic/monback/electrodehusuib.pic"
+    INCBIN "pic/monback/electrodehisuib.pic"
 MarowakAlolaPicFront:
     INCBIN "pic/bmon/marowakalola.pic"
 MarowakAlolaPicBack:
@@ -139246,7 +139121,7 @@ CheckSpecialWild_:
     db FLAMETHROWER
 ; VictoryRoad2_ShinyOnix
     db ROCK_SLIDE
-    db DRAGON_RAGE
+    db SWORDS_DANCE
     db EARTHQUAKE
     db HYPER_BEAM
 ; UnknownDungeon4_Alakazam
@@ -139447,7 +139322,7 @@ TestPhysicalSpecial_:
 .AttackTypeTable
 db %00000000    ; Zero,Pound,Karate Chop*,Double Slap,Comet Punch,Mega Punch,Pay Day,Fire Punch
 db %00000100    ; Ice Punch,Thunder Punch,Scratch,Vice Grip,Guillotine,Razor Wind,Swords Dance,Cut
-db %10000000    ; Gust*,Wing Attack,Whirlwind,Fly,Bind,Slam,Vine Whip,Stomp
+db %10100000    ; Gust*,Wing Attack,Whirlwind,Fly,Bind,Slam,Vine Whip,Stomp
 db %00000000    ; Double Kick,Mega Kick,Jump Kick,Rolling Kick,Sand Attack*,Headbutt,Horn Attack,Fury Attack
 db %00000000    ; Horn Drill,Tackle,Body Slam,Wrap,Take Down,Thrash,Double-Edge,Tail Whip
 db %00100000    ; Poison Sting,Twineedle,Pin Missile,Leer,Bite*,Growl,Roar,Sing
@@ -141042,13 +140917,13 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_:
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp ATTACK_DOWN2_EFFECT
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
-    cp ATTACK_DOWN_SIDE_EFFECT
+    cp ATTACK_DOWN_SIDE1_EFFECT
     jr z,.skip_brn                        ; attack effect. skip to brn penalty
     cp SPEED_DOWN1_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     cp SPEED_DOWN2_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
-    cp SPEED_DOWN_SIDE_EFFECT
+    cp SPEED_DOWN_SIDE1_EFFECT
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     jr .skip_end                          ; no attack or speed effect if at this line. skip to end.
 .skip_brn
@@ -141813,7 +141688,7 @@ _CheckCounterFail:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-StatUp1DownSideEffect_:
+StatUpDownEffect_:
     call .GetPlayerOrEnemyPointer
     ld a,[de]
     push af ; Backup Real Move Effect
@@ -141872,9 +141747,9 @@ StatUp1DownSideEffect_:
 .StatModifierDownEffect
     push de
     call .CheckAmnesiaOrSwordDance
-    ld a,SPECIAL_DOWN_SIDE_EFFECT
+    ld a,SPECIAL_DOWN_SIDE1_EFFECT
     jr z,.next2
-    ld a,DEFENSE_DOWN_SIDE_EFFECT
+    ld a,DEFENSE_DOWN_SIDE1_EFFECT
 .next2
     ld [de],a
     ld hl,StatModifierDownEffect
@@ -142552,6 +142427,7 @@ GetAttackerType:
 .HeadButtMonTable
     db CUBONE
     db MAROWAK
+    db FARFETCH_D
     db $FF
 
 .HyperBeamMoveTable
@@ -142658,6 +142534,224 @@ PrintMenuItemQty:
 .PrintNumber
     ld bc,((%10000000 + 1) << 8) + 2
     jp PrintNumber
+
+; ──────────────────────────────────────────────────────────────────────
+
+GetAttackAnimationPointers_:
+    call Load16BitRegisters
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ret
+
+AttackAnimationPointers:
+    dw PoundAnim
+    dw KarateChopAnim
+    dw DoubleSlapAnim
+    dw CometPunchAnim
+    dw MegaPunchAnim
+    dw PayDayAnim
+    dw FirePunchAnim
+    dw IcePunchAnim
+    dw ThunderPunchAnim
+    dw ScratchAnim
+    dw VicegripAnim
+    dw GuillotineAnim
+    dw RazorWindAnim
+    dw SwordsDanceAnim
+    dw CutAnim
+    dw GustAnim
+    dw WingAttackAnim
+    dw WhirlwindAnim
+    dw FlyAnim
+    dw BindAnim
+    dw SlamAnim
+    dw VineWhipAnim
+    dw StompAnim
+    dw DoubleKickAnim
+    dw MegaKickAnim
+    dw JumpKickAnim
+    dw RollingKickAnim
+    dw SandAttackAnim
+    dw HeatButtAnim
+    dw HornAttackAnim
+    dw FuryAttackAnim
+    dw HornDrillAnim
+    dw TackleAnim
+    dw BodySlamAnim
+    dw WrapAnim
+    dw TakeDownAnim
+    dw ThrashAnim
+    dw DoubleEdgeAnim
+    dw TailWhipAnim
+    dw PoisonStingAnim
+    dw TwineedleAnim
+    dw PinMissileAnim
+    dw LeerAnim
+    dw BiteAnim
+    dw GrowlAnim
+    dw RoarAnim
+    dw SingAnim
+    dw SupersonicAnim
+    dw SonicBoomAnim
+    dw DisableAnim
+    dw AcidAnim
+    dw EmberAnim
+    dw FlamethrowerAnim
+    dw MistAnim
+    dw WaterGunAnim
+    dw HydroPumpAnim
+    dw SurfAnim
+    dw IceBeamAnim
+    dw BlizzardAnim
+    dw PsyBeamAnim
+    dw BubbleBeamAnim
+    dw AuroraBeamAnim
+    dw HyperBeamAnim
+    dw PeckAnim
+    dw DrillPeckAnim
+    dw SubmissionAnim
+    dw LowKickAnim
+    dw CounterAnim
+    dw SeismicTossAnim
+    dw StrengthAnim
+    dw AbsorbAnim
+    dw MegaDrainAnim
+    dw LeechSeedAnim
+    dw GrowthAnim
+    dw RazorLeafAnim
+    dw SolarBeamAnim
+    dw PoisonPowderAnim
+    dw StunSporeAnim
+    dw SleepPowderAnim
+    dw PedalDanceAnim
+    dw StringShotAnim
+    dw DragonRageAnim
+    dw FireSpinAnim
+    dw ThunderShockAnim
+    dw ThunderBoldAnim
+    dw ThunderWaveAnim
+    dw ThunderAnim
+    dw RockThrowAnim
+    dw EarthquakeAnim
+    dw FissureAnim
+    dw DigAnim
+    dw ToxicAnim
+    dw ConfusionAnim
+    dw PsychicAnim
+    dw HypnosisAnim
+    dw MeditateAnim
+    dw AgilityAnim
+    dw QuickAttackAnim
+    dw RageAnim
+    dw TeleportAnim
+    dw NightShadeAnim
+    dw MimicAnim
+    dw ScreechAnim
+    dw DoubleTeamAnim
+    dw RecoverAnim
+    dw HardenAnim
+    dw MinimizeAnim
+    dw SmokeScreenAnim
+    dw ConfuseRayAnim
+    dw WithdrawAnim
+    dw DefenseCurlAnim
+    dw BarrierAnim
+    dw LightScreenAnim
+    dw HazeAnim
+    dw ReflectAnim
+    dw FocusEnergyAnim
+    dw BideAnim
+    dw MetronomeAnim
+    dw MirrorMoveAnim
+    dw SelfdestructAnim
+    dw EggBombAnim
+    dw LickAnim
+    dw SmogAnim
+    dw SludgeAnim
+    dw BoneClubAnim
+    dw FireBlastAnim
+    dw WaterfallAnim
+    dw ClampAnim
+    dw SwiftAnim
+    dw SkullBashAnim
+    dw SpikeCannonAnim
+    dw ConstrictAnim
+    dw AmnesiaAnim
+    dw KinesisAnim
+    dw SoftboiledAnim
+    dw HiJumpKickAnim
+    dw FlareAnim
+    dw DreamEaterAnim
+    dw PoisonGasAnim
+    dw BarrageAnim
+    dw LeechLifeAnim
+    dw LovelyKissAnim
+    dw SkyAttackAnim
+    dw TransformAnim
+    dw BubbleAnim
+    dw DizzyPunchAnim
+    dw SporeAnim
+    dw FlashAnim
+    dw PsywaveAnim
+    dw SplashAnim
+    dw AcidArmorAnim
+    dw CrabHammerAnim
+    dw ExplosionAnim
+    dw FurySwipesAnim
+    dw BonemerangAnim
+    dw RestAnim
+    dw RockSlideAnim
+    dw HyperFangAnim
+    dw SharpenAnim
+    dw ConversionAnim
+    dw TriAttackAnim
+    dw SuperFangAnim
+    dw SlashAnim
+    dw SubstituteAnim
+    dw StruggleAnim
+    dw ShowPicAnim
+    dw EnemyFlashAnim
+    dw PlayerFlashAnim
+    dw EnemyHUDShakeAnim
+    dw TradeBallDropAnim
+    dw TradeBallAppear1Anim
+    dw TradeBallAppear2Anim
+    dw TradeBallPoofAnim
+    dw XStatItemAnim
+    dw XStatItemAnim
+    dw ShrinkingSquareAnim
+    dw ShrinkingSquareAnim
+    dw XStatItemBlackAnim
+    dw XStatItemBlackAnim
+    dw ShrinkingSquareBlackAnim
+    dw ShrinkingSquareBlackAnim
+    dw UnusedAnim
+    dw UnusedAnim
+    dw ParalyzeAnim
+    dw ParalyzeAnim
+    dw PoisonAnim
+    dw PoisonAnim
+    dw SleepPlayerAnim
+    dw SleepEnemyAnim
+    dw ConfusedPlayerAnim
+    dw ConfusedEnemyAnim
+    dw FaintAnim
+    dw BallTossAnim
+    dw BallShakeAnim
+    dw BallPoofAnim
+    dw BallBlockAnim
+    dw GreatTossAnim
+    dw UltraTossAnim
+    dw ShakeScreenAnim
+    dw HidePicAnim
+    dw ThrowRockAnim
+    dw ThrowBaitAnim
+    dw ZigZagScreenAnim
+    dw TransformFailAnim ; $CC
+    dw TeleportAnimTrainerBattle ; $CD
+    dw WhirlwindAnimTrainerBattle ; $CE
+    dw RoarAnimTrainerBattle ; $CF
 
 ; ──────────────────────────────────────────────────────────────────────
 
