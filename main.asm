@@ -11535,7 +11535,7 @@ ItemPrices:
     bcd3      0 ; ?
     bcd3      0 ; ?
     bcd3      0 ; ?
-    bcd3    550 ; ESCAPE_ROPE
+    bcd3     50 ; ESCAPE_ROPE
     bcd3    350 ; REPEL
     bcd3      0 ; OLD_AMBER
     bcd3  40000 ; FIRE_STONE
@@ -37731,21 +37731,31 @@ DecreaseFossilStep:
 
 ; Viridian
 ViridianMartText6:
-    db $FE,4
+    db $FE,6
     db POKE_BALL
     db ANTIDOTE
     db PARLYZ_HEAL
     db BURN_HEAL
+    db AWAKENING
+    db ESCAPE_ROPE
     db $FF
 
 ; Fuchsia
 FuchsiaMartText1:
-    db $FE,5
+    db $FE,13
     db ULTRA_BALL
     db GREAT_BALL
+    db POKE_BALL
     db SUPER_POTION
-    db FULL_HEAL
+    db POTION
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db ICE_HEAL
     db SUPER_REPEL
+    db REPEL
+    db ESCAPE_ROPE
     db $FF
 
 ; ────────────────────────
@@ -85189,9 +85199,9 @@ CeladonMart2Text1:
     db BURN_HEAL
     db AWAKENING
     db ICE_HEAL
-    db ESCAPE_ROPE
     db SUPER_REPEL
     db REPEL
+    db ESCAPE_ROPE
     db $FF
 
 ; ────────────────────────
@@ -93174,7 +93184,7 @@ GetLastFighter:
 
 ; Cerulean
 CeruleanMartText1:
-    db $FE,7
+    db $FE,8
     db POKE_BALL
     db POTION
     db ANTIDOTE
@@ -93182,11 +93192,12 @@ CeruleanMartText1:
     db BURN_HEAL
     db AWAKENING
     db REPEL
+    db ESCAPE_ROPE
     db $FF
 
 ; Vermilion
 VermilionMartText1:
-    db $FE,8
+    db $FE,9
     db POKE_BALL
     db SUPER_POTION
     db POTION
@@ -93195,30 +93206,39 @@ VermilionMartText1:
     db BURN_HEAL
     db AWAKENING
     db REPEL
+    db ESCAPE_ROPE
     db $FF
 
 ; Lavender
 LavenderMartText1:
-    db $FE,10
+    db $FE,13
     db GREAT_BALL
+    db POKE_BALL
     db ETHER
     db ELIXER
     db SUPER_POTION
+    db POTION
     db ANTIDOTE
     db PARLYZ_HEAL
     db BURN_HEAL
     db AWAKENING
-    db ICE_HEAL
     db SUPER_REPEL
+    db REPEL
+    db ESCAPE_ROPE
     db $FF
 
 ; Saffron
 SaffronMartText1:
-    db $FE,5
+    db $FE,10
     db GREAT_BALL
+    db POKE_BALL
     db HYPER_POTION
+    db SUPER_POTION
+    db POTION
     db FULL_HEAL
     db MAX_REPEL
+    db SUPER_REPEL
+    db REPEL
     db ESCAPE_ROPE
     db $FF
 
@@ -108887,12 +108907,19 @@ PewterMartText1:
 
 ; Cinnabar
 CinnabarMartText1:
-    db $FE,6
+    db $FE,13
     db ULTRA_BALL
+    db GREAT_BALL
+    db POKE_BALL
+    db ETHER
+    db ELIXER
     db HYPER_POTION
     db SUPER_POTION
+    db POTION
     db FULL_HEAL
     db MAX_REPEL
+    db SUPER_REPEL
+    db REPEL
     db ESCAPE_ROPE
     db $FF
 
