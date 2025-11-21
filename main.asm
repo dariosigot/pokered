@@ -36967,13 +36967,27 @@ FuchsiaCityText12:
     TX_FAR _FuchsiaCityText12
     db "@"
 
+; ────────────────────────
+
 ; Indigo
 IndigoPlateauLobbyText4:
     db $FE,13
-    db FULL_RESTORE,MAX_POTION,HYPER_POTION,SUPER_POTION,POTION
+    db FULL_RESTORE
+    db MAX_POTION
+    db HYPER_POTION
+    db SUPER_POTION
+    db POTION
     db FULL_HEAL
-    db X_ATTACK,X_DEFEND,X_SPEED,X_SPECIAL,X_ACCURACY,GUARD_SPEC_,DIRE_HIT
+    db X_ATTACK
+    db X_DEFEND
+    db X_SPEED
+    db X_SPECIAL
+    db X_ACCURACY
+    db GUARD_SPEC_
+    db DIRE_HIT
     db $FF
+
+; ────────────────────────
 
 ; Direction
 ; Tile offset
@@ -37713,17 +37727,28 @@ DecreaseFossilStep:
     jr nz,.loop
     ret
 
+; ────────────────────────
+
 ; Viridian
 ViridianMartText6:
-    db $FE,4,POKE_BALL
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
+    db $FE,4
+    db POKE_BALL
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db $FF
 
 ; Fuchsia
 FuchsiaMartText1:
-    db $FE,5,ULTRA_BALL,GREAT_BALL
+    db $FE,5
+    db ULTRA_BALL
+    db GREAT_BALL
     db SUPER_POTION
     db FULL_HEAL
-    db SUPER_REPEL,$FF
+    db SUPER_REPEL
+    db $FF
+
+; ────────────────────────
 
 BillsHouseObject:
     db $d ; border tile
@@ -75656,17 +75681,41 @@ VictoryPokecenterObject:
 VictoryPokecenterBlocks: ; 480ab (12:40ab)
     INCBIN "maps/victorypokecenter.blk"
 
+; ────────────────────────
+
 ; Celadon Dept. Store 4F
 CeladonMart4Text1:
-    db $FE,5,POKE_DOLL,FIRE_STONE,THUNDER_STONE,WATER_STONE,LEAF_STONE,$FF
+    db $FE,5
+    db POKE_DOLL
+    db FIRE_STONE
+    db THUNDER_STONE
+    db WATER_STONE
+    db LEAF_STONE
+    db $FF
 
 ; Celadon Dept. Store 5F (1)
 CeladonMart5Text3:
-    db $FE,7,X_ATTACK,X_DEFEND,X_SPEED,X_SPECIAL,X_ACCURACY,GUARD_SPEC_,DIRE_HIT,$FF
+    db $FE,7
+    db X_ATTACK
+    db X_DEFEND
+    db X_SPEED
+    db X_SPECIAL
+    db X_ACCURACY
+    db GUARD_SPEC_
+    db DIRE_HIT
+    db $FF
 
 ; Celadon Dept. Store 5F (2)
 CeladonMart5Text4:
-    db $FE,5,HP_UP,PROTEIN,IRON,CARBOS,CALCIUM,$FF
+    db $FE,5
+    db HP_UP
+    db PROTEIN
+    db IRON
+    db CARBOS
+    db CALCIUM
+    db $FF
+
+; ────────────────────────
 
 CeladonGymScriptPointers:
     dw CheckFightingMapTrainers
@@ -85054,6 +85103,8 @@ CheckReachLevelLimit:
     scf ; Set Carry Flag
     ret
 
+; ────────────────────────
+
 ; Celadon Dept. Store 2F (2)
 CeladonMart2Text2:
     db $FE,13
@@ -85071,6 +85122,8 @@ CeladonMart2Text2:
     db TM_33 ; REFLECT
     db TM_41 ; LIGHT_SCREEN
     db $FF
+
+; ────────────────────────
 
 Route21ScriptPointers:
     dw CheckFightingMapTrainers
@@ -85121,13 +85174,27 @@ Route21ScriptBarrier:
     db ROUTE21_BARRIER_BLOCK
 .ChangedBlocksEnd
 
+; ────────────────────────
+
 ; Celadon Dept. Store 2F (1)
 CeladonMart2Text1:
-    db $FE,13,GREAT_BALL,POKE_BALL
+    db $FE,13
+    db GREAT_BALL
+    db POKE_BALL
     db REVIVE
-    db SUPER_POTION,POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
-    db ESCAPE_ROPE,SUPER_REPEL,REPEL,$FF
+    db SUPER_POTION
+    db POTION
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db ICE_HEAL
+    db ESCAPE_ROPE
+    db SUPER_REPEL
+    db REPEL
+    db $FF
+
+; ────────────────────────
 
 Route3Text1:
     db $08 ; asm
@@ -93103,35 +93170,59 @@ GetLastFighter:
     ld [$cc4d],a
     PREDEF_JUMP RemoveMissableObject ; Hide Last Pokeball
 
+; ────────────────────────
+
 ; Cerulean
 CeruleanMartText1:
-    db $FE,7,POKE_BALL
+    db $FE,7
+    db POKE_BALL
     db POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
-    db REPEL,$FF
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db REPEL
+    db $FF
 
 ; Vermilion
 VermilionMartText1:
-    db $FE,8,POKE_BALL
-    db SUPER_POTION,POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
-    db REPEL,$FF
+    db $FE,8
+    db POKE_BALL
+    db SUPER_POTION
+    db POTION
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db REPEL
+    db $FF
 
 ; Lavender
 LavenderMartText1:
     db $FE,10
     db GREAT_BALL
-    db ETHER,ELIXER
+    db ETHER
+    db ELIXER
     db SUPER_POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
-    db SUPER_REPEL,$FF
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db ICE_HEAL
+    db SUPER_REPEL
+    db $FF
 
 ; Saffron
 SaffronMartText1:
-    db $FE,5,GREAT_BALL
+    db $FE,5
+    db GREAT_BALL
     db HYPER_POTION
     db FULL_HEAL
-    db MAX_REPEL,ESCAPE_ROPE,$FF
+    db MAX_REPEL
+    db ESCAPE_ROPE
+    db $FF
+
+; ────────────────────────
 
 JigglypuffDance:
     ;db $30,$38,$34,$3c
@@ -108779,19 +108870,33 @@ CheckSafariStatusAndDelay3:
 .End
     jp Delay3
 
+; ────────────────────────
+
 ; Pewter
 PewterMartText1:
-    db $FE,7,POKE_BALL
+    db $FE,8
+    db POKE_BALL
     db POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
-    db ESCAPE_ROPE,$FF
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db REPEL
+    db ESCAPE_ROPE
+    db $FF
 
 ; Cinnabar
 CinnabarMartText1:
-    db $FE,6,ULTRA_BALL
-    db HYPER_POTION,SUPER_POTION
+    db $FE,6
+    db ULTRA_BALL
+    db HYPER_POTION
+    db SUPER_POTION
     db FULL_HEAL
-    db MAX_REPEL,ESCAPE_ROPE,$FF
+    db MAX_REPEL
+    db ESCAPE_ROPE
+    db $FF
+
+; ────────────────────────
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $1D)
