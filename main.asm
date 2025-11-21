@@ -11535,7 +11535,7 @@ ItemPrices:
     bcd3      0 ; ?
     bcd3      0 ; ?
     bcd3      0 ; ?
-    bcd3     50 ; ESCAPE_ROPE
+    bcd3      0 ; ESCAPE_ROPE
     bcd3    350 ; REPEL
     bcd3      0 ; OLD_AMBER
     bcd3  40000 ; FIRE_STONE
@@ -24436,8 +24436,7 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
     ret nz ; if so,return
     call ItemUseReloadOverworldData
     ld c,30
-    call DelayFrames
-    jp RemoveUsedItem
+    jp DelayFrames
 .notUsable
     jp DigNotUsable
 
@@ -25658,7 +25657,7 @@ IsKeyItem_: ; e764 (3:6764)
     db %11110000
     db %00000001
     db %00110000
-    db %01000000
+    db %01010000
     db %00000000
     db %10010111
     db %00000010
@@ -28581,8 +28580,7 @@ CheckDiglettsCaveHole:
     ld [$cd6a],a ; item used
     ret
 .NotEvent
-    call GetCurrentOldAdventureMap
-    ret
+    jp GetCurrentOldAdventureMap
 .coordsData
     db 18,13
     db $FF
@@ -35707,7 +35705,7 @@ SilphCo4Object: ; 0x19e35 (size=111)
     db SPRITE_ROCKET,$a + 4,$1a + 4,$ff,$d1,$44,ROCKET,$1b ; trainer
     db SPRITE_BALL,$9 + 4,$3 + 4,$ff,$ff,$85,TM_07 ; item
     db SPRITE_BALL,$7 + 4,$4 + 4,$ff,$ff,$86,MAX_REVIVE ; item
-    db SPRITE_BALL,$8 + 4,$5 + 4,$ff,$ff,$87,ESCAPE_ROPE ; item
+    db SPRITE_BALL,$8 + 4,$5 + 4,$ff,$ff,$87,FULL_HEAL ; item
 
     ; warp-to
     EVENT_DISP $f,$0,$18 ; SILPH_CO_3F
@@ -37731,18 +37729,17 @@ DecreaseFossilStep:
 
 ; Viridian
 ViridianMartText6:
-    db $FE,6
+    db $FE,5
     db POKE_BALL
     db ANTIDOTE
     db PARLYZ_HEAL
     db BURN_HEAL
     db AWAKENING
-    db ESCAPE_ROPE
     db $FF
 
 ; Fuchsia
 FuchsiaMartText1:
-    db $FE,13
+    db $FE,12
     db ULTRA_BALL
     db GREAT_BALL
     db POKE_BALL
@@ -37755,7 +37752,6 @@ FuchsiaMartText1:
     db ICE_HEAL
     db SUPER_REPEL
     db REPEL
-    db ESCAPE_ROPE
     db $FF
 
 ; ────────────────────────
@@ -67340,7 +67336,7 @@ RocketHideout1Object: ; 0x44ce7 (size=98)
     db SPRITE_ROCKET,$11 + 4,$12 + 4,$ff,$d0,$43,ROCKET,$a ; trainer
     db SPRITE_ROCKET,$19 + 4,$f + 4,$ff,$d3,$44,ROCKET,$b ; trainer
     db SPRITE_ROCKET,$12 + 4,$1c + 4,$ff,$d2,$45,ROCKET,$c ; trainer
-    db SPRITE_BALL,$e + 4,$b + 4,$ff,$ff,$86,ESCAPE_ROPE ; item
+    db SPRITE_BALL,$e + 4,$b + 4,$ff,$ff,$86,FULL_HEAL ; item
     db SPRITE_BALL,$11 + 4,$9 + 4,$ff,$ff,$87,TM_23 ; item
 
     ; warp-to
@@ -70686,7 +70682,7 @@ BikeShopHiddenObjects: ; 47015 (11:7015)
     dbw $07,$694b
     db $FF
 Route11HiddenObjects: ; 4703a (11:703a)
-    db $05,$30,ESCAPE_ROPE
+    db $05,$30,FULL_HEAL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 Route12HiddenObjects: ; 47041 (11:7041)
@@ -75019,7 +75015,7 @@ MtMoon1Object: ; 0x49b06 (size=145)
     db SPRITE_BALL,$14 + 4,$2 + 4,$ff,$ff,$88,POTION ; item
     db SPRITE_BALL,$2 + 4,$2 + 4,$ff,$ff,$89,MOON_STONE ; item
     db SPRITE_BALL,$1f + 4,$23 + 4,$ff,$ff,$8a,RARE_CANDY ; item
-    db SPRITE_BALL,$17 + 4,$24 + 4,$ff,$ff,$8b,ESCAPE_ROPE ; item
+    db SPRITE_BALL,$17 + 4,$24 + 4,$ff,$ff,$8b,REPEL ; item
     db SPRITE_BALL,$21 + 4,$14 + 4,$ff,$ff,$8c,POTION ; item
     db SPRITE_BALL,$20 + 4,$5 + 4,$ff,$ff,$8d,TM_12 ; item
 
@@ -85188,7 +85184,7 @@ Route21ScriptBarrier:
 
 ; Celadon Dept. Store 2F (1)
 CeladonMart2Text1:
-    db $FE,13
+    db $FE,12
     db GREAT_BALL
     db POKE_BALL
     db REVIVE
@@ -85201,7 +85197,6 @@ CeladonMart2Text1:
     db ICE_HEAL
     db SUPER_REPEL
     db REPEL
-    db ESCAPE_ROPE
     db $FF
 
 ; ────────────────────────
@@ -93184,7 +93179,7 @@ GetLastFighter:
 
 ; Cerulean
 CeruleanMartText1:
-    db $FE,8
+    db $FE,7
     db POKE_BALL
     db POTION
     db ANTIDOTE
@@ -93192,12 +93187,11 @@ CeruleanMartText1:
     db BURN_HEAL
     db AWAKENING
     db REPEL
-    db ESCAPE_ROPE
     db $FF
 
 ; Vermilion
 VermilionMartText1:
-    db $FE,9
+    db $FE,8
     db POKE_BALL
     db SUPER_POTION
     db POTION
@@ -93206,12 +93200,11 @@ VermilionMartText1:
     db BURN_HEAL
     db AWAKENING
     db REPEL
-    db ESCAPE_ROPE
     db $FF
 
 ; Lavender
 LavenderMartText1:
-    db $FE,13
+    db $FE,12
     db GREAT_BALL
     db POKE_BALL
     db ETHER
@@ -93224,12 +93217,11 @@ LavenderMartText1:
     db AWAKENING
     db SUPER_REPEL
     db REPEL
-    db ESCAPE_ROPE
     db $FF
 
 ; Saffron
 SaffronMartText1:
-    db $FE,10
+    db $FE,9
     db GREAT_BALL
     db POKE_BALL
     db HYPER_POTION
@@ -93239,7 +93231,6 @@ SaffronMartText1:
     db MAX_REPEL
     db SUPER_REPEL
     db REPEL
-    db ESCAPE_ROPE
     db $FF
 
 ; ────────────────────────
@@ -93848,7 +93839,7 @@ PokemonTower3Object: ; 0x6075d (size=51)
     db SPRITE_MEDIUM,$3 + 4,$c + 4,$ff,$d2,$41,CHANNELER,$1 ; trainer
     db SPRITE_MEDIUM,$8 + 4,$9 + 4,$ff,$d0,$42,CHANNELER,$2 ; trainer
     db SPRITE_MEDIUM,$d + 4,$a + 4,$ff,$d0,$43,CHANNELER,$3 ; trainer
-    db SPRITE_BALL,$1 + 4,$c + 4,$ff,$ff,$84,ESCAPE_ROPE ; item
+    db SPRITE_BALL,$1 + 4,$c + 4,$ff,$ff,$84,POKE_DOLL ; item
 
     ; warp-to
     EVENT_DISP $a,$9,$3 ; POKEMONTOWER_2
@@ -108894,7 +108885,7 @@ CheckSafariStatusAndDelay3:
 
 ; Pewter
 PewterMartText1:
-    db $FE,8
+    db $FE,7
     db POKE_BALL
     db POTION
     db ANTIDOTE
@@ -108902,12 +108893,11 @@ PewterMartText1:
     db BURN_HEAL
     db AWAKENING
     db REPEL
-    db ESCAPE_ROPE
     db $FF
 
 ; Cinnabar
 CinnabarMartText1:
-    db $FE,13
+    db $FE,12
     db ULTRA_BALL
     db GREAT_BALL
     db POKE_BALL
@@ -108920,7 +108910,6 @@ CinnabarMartText1:
     db MAX_REPEL
     db SUPER_REPEL
     db REPEL
-    db ESCAPE_ROPE
     db $FF
 
 ; ────────────────────────
