@@ -8625,7 +8625,7 @@ IsItemInBag: ; 3493 (0:3493)
 ; set zero flag if item isn't in player's bag
 ; else reset zero flag
 ; related to Pokémon Tower and ghosts
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     ld a,b
     and a
     ret
@@ -27717,22 +27717,9 @@ InitializeEmptyList: ; f8a0 (3:78a0)
     ld [hl],a
     ret
 
-Func_f8a5: ; f8a5 (3:78a5)
-    call Load16BitRegisters
-    ld hl,wNumBagItems ; $d31d
-.asm_f8ab
-    inc hl
-    ld a,[hli]
-    cp $ff
-    jr z,.asm_f8b7
-    cp b
-    jr nz,.asm_f8ab
-    ld a,[hl]
-    ld b,a
-    ret
-.asm_f8b7
-    ld b,$0
-    ret
+; Free
+
+SECTION "Func_f8ba",ROMX[$78ba],BANK[$3]
 
 Func_f8ba: ; f8ba (3:78ba)
     xor a
@@ -34748,7 +34735,7 @@ VermilionCityScript0: ; 197e6 (6:57e6)
     bit 2,a
     jr nz,.asm_19810 ; 0x19804 $a
     ld b,$3f
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     ld a,b
     and a
     ret nz
@@ -34868,7 +34855,7 @@ VermilionCityText3: ; 198b1 (6:58b1)
     ld hl,SSAnneWelcomeText9
     call PrintText
     ld b,$3f
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     ld a,b
     and a
     jr nz,.asm_0419b ; 0x198df
@@ -39606,7 +39593,7 @@ CeruleanHouseTrashedTextPointers: ; 1d689 (7:5689)
 CeruleanHouseTrashedText1: ; 1d68f (7:568f)
     db $08 ; asm
     ld b,$e4
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     and b
     jr z,.asm_f8734 ; 0x1d698
     ld hl,UnnamedText_1d6b0
@@ -47717,7 +47704,7 @@ Func_2ff09 ; 2ff09 (b:7f09)
     and $8
     jr z,.asm_2ff2e
     ld b,$45
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     ld a,b
     and a
     ld b,$33
@@ -71830,7 +71817,7 @@ CeladonMartRoofScript_483d8: ; 483d8 (12:43d8)
     push de
     ld [$d11e],a
     ld b,a
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     pop de
     pop hl
     ld a,b
@@ -76172,7 +76159,7 @@ InitializePlayerData_2Predef:              NEW_PREDEF InitializePlayerData      
 Func_c754Predef:                           NEW_PREDEF Func_c754                           ; $19
 LearnMoveFromLevelUpPredef:                NEW_PREDEF LearnMoveFromLevelUp                ; $1A
 LearnMovePredef:                           NEW_PREDEF LearnMove                           ; $1B
-Func_f8a5Predef:                           NEW_PREDEF Func_f8a5                           ; $1C
+_IsItemInBagPredef:                        NEW_PREDEF _IsItemInBag                        ; $1C
 Func_3eb5Predef:                           NEW_PREDEF Func_3eb5                           ; $1D
 GiveItemPredef:                            NEW_PREDEF GiveItem                            ; $1E
 Func_480ebPredef:                          NEW_PREDEF Func_480eb                          ; $1F
@@ -76260,6 +76247,7 @@ IsMonInCurrentMapPredef:                   NEW_PREDEF IsMonInCurrentMap         
 UndoBurnParStatsPredef:                    NEW_PREDEF UndoBurnParStats                    ; $71
 DrawHUDsAndHPBarsPredef:                   NEW_PREDEF DrawHUDsAndHPBars                   ; $72
 GetAttackAnimationPointers_Predef:         NEW_PREDEF GetAttackAnimationPointers_         ; $73
+_IsItemInBagOrBoxPredef:                   NEW_PREDEF _IsItemInBagOrBox                   ; $74
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -107345,7 +107333,7 @@ Func_75d38: ; 75d38 (1d:5d38)
     push de
     ld [$d11e],a
     ld b,a
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     pop de
     pop hl
     ld a,b
@@ -108715,7 +108703,7 @@ HiddenItemBagFullText: ; 76794 (1d:6794)
 
 HiddenCoins: ; 76799 (1d:6799)
     ld b,COIN_CASE
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     ld a,b
     and a
     ret z
@@ -142873,6 +142861,52 @@ AttackAnimationPointers:
     dw TeleportAnimTrainerBattle ; $CD
     dw WhirlwindAnimTrainerBattle ; $CE
     dw RoarAnimTrainerBattle ; $CF
+
+; ──────────────────────────────────────────────────────────────────────
+
+_IsItemInBagOrBox:
+    call Load16BitRegisters
+    push bc
+    call IsItemInBag2
+    pop bc
+    ret nz ; ret if item in bag
+    push de
+    push hl
+    ld hl,wNumBoxItems
+    jr SearchItemInList
+
+_IsItemInBag:
+    call Load16BitRegisters
+IsItemInBag2:
+    push de
+    push hl
+    ld hl,wNumBagItems
+SearchItemInList:
+    ld a,[hl]
+    and a
+    jr z,.NotFought
+    ld d,a
+.loop
+    inc hl
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFought
+    cp b
+    jr z,.Fought
+    dec d
+    jr nz,.loop
+.NotFought
+    ld b,0
+    jr .end
+.Fought
+    ld a,[hl]
+    ld b,a
+.end
+    ld a,b
+    and a
+    pop hl
+    pop de
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
