@@ -137705,6 +137705,18 @@ RestoreFaintenedWith1HP:
     ld a,[hld]
     or b
     jr nz,.Next
+    push hl
+    ld bc,W_PARTYMON1_MOVE1PP-W_PARTYMON1_HP
+    add hl,bc
+    ld a,[hl] ; Read stored Energy
+    cp 60 ; Check If Old stored Energy is at least 60
+    jr c,.NoEnergy
+    push af
+    srl [hl] ; Halve stored Energy
+    pop af
+.NoEnergy
+    pop hl
+    jr c,.Next
     inc hl
     inc [hl] ; 1 HP
     dec hl ; Restore Pointer to PARTYMON_HP
