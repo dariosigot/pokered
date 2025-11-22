@@ -85217,9 +85217,10 @@ Route21ScriptBarrier:
 
 ; Celadon Dept. Store 2F (1)
 CeladonMart2Text1:
-    db $FE,12
+    db $FE,13
     db GREAT_BALL
     db POKE_BALL
+    db MAX_REVIVE
     db REVIVE
     db SUPER_POTION
     db POTION
@@ -143784,11 +143785,20 @@ PortRoyalMartObject:
 PortRoyalMartBlocks:
     INCBIN "maps/portroyalmart.blk"
 
+; ────────────────────────
+
 PortRoyalMartText1:
-    db $FE,7,POKE_BALL
+    db $FE,7
+    db POKE_BALL
     db POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
-    db REPEL,$FF
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db REPEL
+    db $FF
+
+; ────────────────────────
 
 ; ──────────────────────────────────────────────────────────────────────
 ; SWAP_MAP
