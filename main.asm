@@ -4705,7 +4705,7 @@ TextCommandSounds: ; 1c64 (0:1c64)
     db $0B,$86
     db $12,$9A
     db $0E,$91
-    db $0F,$86
+    db $0F,$A5 ; error
     db $10,$89
     db $11,$94
     db $13,$98
@@ -74764,7 +74764,7 @@ MtMoon1Script: ; 499c8 (12:59c8)
 MtMoon1ScriptPointers: ; 499db (12:59db)
     dw CheckFightingMapTrainers
     dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+    dw MtMoon1Script2
 
 MtMoon1TextPointers: ; 499e1 (12:59e1)
     dw MtMoon1Text1
@@ -74898,9 +74898,7 @@ MtMoon1EndBattleText2: ; 49a9d (12:5a9d)
     TX_FAR _MtMoon1EndBattleText2
     db "@"
 
-MtMoon1AfterBattleText2: ; 49aa2 (12:5aa2)
-    TX_FAR _MtMoon1AfterBattleText2
-    db "@"
+SECTION "MtMoon1BattleText3",ROMX[$5aa7],BANK[$12]
 
 MtMoon1BattleText3: ; 49aa7 (12:5aa7)
     TX_FAR _MtMoon1BattleText3
@@ -75803,6 +75801,53 @@ RockTunnelPokecenterScript:
     ld hl,W_TOWNVISITEDFLAG+1
     set 4,[hl]
     jp EnableAutoTextBoxDrawing
+
+MtMoon1Script2:
+    call EndTrainerBattle
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $ff
+    jr z,.ResetScript
+    ld a,[$cf13]
+    cp $01 ; Is Hiker end Battle?
+    ret nz
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    jp DisplayTextID
+.ResetScript
+    xor a
+    ld [W_MTMOON1CURSCRIPT],a
+    ret
+
+MtMoon1AfterBattleText2:
+    db $08 ; asm
+    ld hl,.end
+    push hl
+    ld b,ESCAPE_ROPE
+    PREDEF _IsItemInBagOrBox
+    ld hl,.MtMoon1AfterBattleText2
+    ret nz
+    ld hl,.EscapeRopeReceiveText1
+    call PrintText
+    ld bc,(ESCAPE_ROPE << 8) | 1
+    call GiveItem
+    ld hl,.EscapeRopeNoRoomText
+    ret nc
+    ld hl,.EscapeRopeReceiveText2
+    ret
+.end
+    call PrintText
+    jp TextScriptEnd
+.EscapeRopeReceiveText1
+    TX_FAR _EscapeRopeReceiveText1
+    db "@"
+.EscapeRopeReceiveText2
+    TX_FAR _ReceivedText
+    db $11,"@"
+.EscapeRopeNoRoomText
+    TX_FAR _EscapeRopeNoRoomText
+    db $0F,"@"
+.MtMoon1AfterBattleText2
+    TX_FAR _MtMoon1AfterBattleText2
+    db "@"
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -119195,6 +119240,17 @@ _ViridianFrstAfterBattleText6:
     db "so weak...",$51
     db "I hope to ",$4f
     db "Evolve it!",$57
+
+_EscapeRopeReceiveText1:
+    db $0,"Kids like you",$4f
+    db "shouldn't be",$55
+    db "here!",$51
+    db "Take this and",$4f
+    db "good luck!",$58
+
+_EscapeRopeNoRoomText:
+    db $0,"You do not have",$4f
+    db "space for this!",$57
 
 SECTION "bank21",ROMX,BANK[$21]
 
