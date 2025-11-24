@@ -52323,10 +52323,10 @@ EliteFourAI:
 AdvanceAIHealStatus:
     ld a,[W_ENEMYMONSTATUS]
     and a
-    ret z
+    jr z,GenericAI
     ld a,3
     call AICheckIfHPBelowFraction
-    ret c
+    jr c,GenericAI
     jp AIUseFullHeal
 
 GenericAI:
