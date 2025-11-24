@@ -22420,6 +22420,47 @@ MapHS:
     db SAFARI_ZONE_REST_HOUSE_1,$03,Hide ; $FA (Erik)
     db $FF
 
+MoveSpriteAndForcePlayerToFollowBoulder:
+    call MoveSprite
+    push bc
+    push hl
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    ld b,a
+    ld a,$ff
+    ld [wJoypadForbiddenButtonsMask],a
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,11
+    ld [$cd38],a
+    ld hl,$ccd3
+    xor a
+    ld [hli],a
+    ld a,b ; old H_CURRENTPRESSEDBUTTONS
+    ld [hli],a
+    xor a
+    ld bc,11-2
+    call FillMemory
+    call StartSimulatingJoypadStates
+    ld hl,wFlagFollowBoulderBit7
+    set 7,[hl]
+    pop hl
+    pop bc
+    ret
+
+CheckFailPushingBoulder:
+    ld a,[$d728]
+    bit 0,a
+    jr z,.fail
+    ld a,[wFlags_0xcd60]
+    bit 1,a
+    jr nz,.fail
+    ld a,[$d700] ; if 0 -> walk,if 1 -> byke
+    dec a
+    ret nz ; Success
+.fail
+    pop hl ; Hack Remove Return Pointer
+    ret
+
 ; Free
 
 SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
@@ -23673,7 +23714,7 @@ ItemUseVitamin:
 ItemUseMedicine:
     ld a,[W_NUMINPARTY]
     and a
-    jp z,.emptyParty
+    jr z,.emptyParty
     ld a,[$cf92]
     push af
     ld a,[$cf91]
@@ -23689,13 +23730,13 @@ ItemUseMedicine:
     call GoBackToPartyMenu
     jr .getPartyMonDataAddress
 .emptyParty
-    ld hl,.emptyPartyText
+    ld hl,.EmptyPartyText
     xor a
     ld [$cd6a],a ; item use failed
     jp PrintText
-.emptyPartyText
-    db $0,"You don't have",$4F
-    db "any #MON!",$58
+.EmptyPartyText
+    TX_FAR _EmptyPartyText
+    db "@"
 .MustChoiceActiveText
     TX_FAR _MustChoiceActiveText
     db "@"
@@ -23703,15 +23744,8 @@ ItemUseMedicine:
     call DisplayPartyMenu
 .getPartyMonDataAddress
     jp c,.canceledItemUse
-    ; CheckMedicineActive
-    ld a,[W_ISINBATTLE]
-    and a
-    jr z,.continue ; continue if not in battle
-    ld a,[wPlayerMonNumber]
-    ld b,a
-    ld a,[$cf92]
-    cp b
-    jr z,.continue ; continue if active mon is choice in battle
+    call CheckItemOnActive
+    jr z,.continue ; continue if not in battle or if active mon is choice in battle
     pop af
     ld [$cf91],a
     pop af
@@ -24906,12 +24940,13 @@ ItemUseItemfinder:
     db "@"
 
 ItemUsePPRestore:
-    ld a,[W_ISINBATTLE]
+    ld a,[W_NUMINPARTY]
     and a
-    jp nz,ItemUseNotTime
+    jr z,.emptyParty
     ld a,[$cf92]
     push af
     ld a,[$cf91]
+    push af
     ld [$cd3d],a
 .chooseMon
     xor a
@@ -24921,6 +24956,17 @@ ItemUsePPRestore:
     call DisplayPartyMenu
     jr nc,.useEther
     jp .itemNotUsed
+.emptyParty
+    ld hl,.EmptyPartyText
+    xor a
+    ld [$cd6a],a ; item use failed
+    jp PrintText
+.EmptyPartyText
+    TX_FAR _EmptyPartyText
+    db "@"
+.MustChoiceActiveText
+    TX_FAR _MustChoiceActiveText
+    db "@"
 .afterRestoringPP ; after using a (Max) Ether/Elixir
     ld a,$8e
     call PlaySound
@@ -24945,11 +24991,23 @@ ItemUsePPRestore:
     ld hl,.PPRestoredText
     call PrintText
     pop af
+    ld [$cf91],a
+    pop af
     ld [$cf92],a
     call GBPalWhiteOut
     call GoPAL_SET_CF1C
     jp RemoveUsedItem
 .useEther
+    call CheckItemOnActive
+    jr z,.continue ; continue if not in battle or if active mon is choice in battle
+    pop af
+    ld [$cf91],a
+    pop af
+    ld [$cf92],a
+    ld hl,.MustChoiceActiveText
+    call PrintText
+    jp ItemUsePPRestore ; force another choice
+.continue
     call .restorePP
     jr nz,.afterRestoringPP
     jp .noEffect
@@ -24999,6 +25057,21 @@ ItemUsePPRestore:
     pop hl
 .storeNewAmount
     ld [hl],a
+    push af
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.NotInBattleOrNotActiveThanSkip
+    ld a,[wPlayerMonNumber]
+    ld b,a
+    ld a,[$cf92]
+    cp b
+    jr nz,.NotInBattleOrNotActiveThanSkip
+    pop af
+    ld [W_PLAYERMONENERGY],a
+    jr .end
+.NotInBattleOrNotActiveThanSkip
+    pop af
+.end
     and a
     ret
 .Table
@@ -25014,26 +25087,13 @@ ItemUsePPRestore:
     call GBPalWhiteOut
     call GoPAL_SET_CF1C
     pop af
+    pop af
     xor a
     ld [$cd6a],a ; item use failed
     ret
 .PPRestoredText
     TX_FAR _PPRestoredText
     db "@"
-
-UsingDigCry:
-    ld a,[$d152]
-    and a
-    ret z
-    push af
-    call PlayCryAndDecreaseFieldMoveEnergy
-    pop af
-    ret
-
-SurfingCry:
-    call PlayCryAndDecreaseFieldMoveEnergy
-    ld hl,SurfingGotOnText
-    ret
 
 DigNotUsable:
     ld a,[$d152]
@@ -25074,48 +25134,7 @@ RemoveBattleValue:
     ld hl,RemoveBattleValue_
     jp Bankswitch
 
-MoveSpriteAndForcePlayerToFollowBoulder:
-    call MoveSprite
-    push bc
-    push hl
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    ld b,a
-    ld a,$ff
-    ld [wJoypadForbiddenButtonsMask],a
-    xor a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,11
-    ld [$cd38],a
-    ld hl,$ccd3
-    xor a
-    ld [hli],a
-    ld a,b ; old H_CURRENTPRESSEDBUTTONS
-    ld [hli],a
-    xor a
-    ld bc,11-2
-    call FillMemory
-    call StartSimulatingJoypadStates
-    ld hl,wFlagFollowBoulderBit7
-    set 7,[hl]
-    pop hl
-    pop bc
-    ret
-
-CheckFailPushingBoulder:
-    ld a,[$d728]
-    bit 0,a
-    jr z,.fail
-    ld a,[wFlags_0xcd60]
-    bit 1,a
-    jr nz,.fail
-    ld a,[$d700] ; if 0 -> walk,if 1 -> byke
-    dec a
-    ret nz ; Success
-.fail
-    pop hl ; Hack Remove Return Pointer
-    ret
-
-; Free Space
+; Free
 
 SECTION "UnusableItem",ROMX[$6476],BANK[$3]
 
@@ -28050,6 +28069,20 @@ UpdateHPBar: ; fa1d (3:7a1d)
 .end
     jp RemoveBattleValue ; jp Delay3
 
+UsingDigCry:
+    ld a,[$d152]
+    and a
+    ret z
+    push af
+    call PlayCryAndDecreaseFieldMoveEnergy
+    pop af
+    ret
+
+SurfingCry:
+    call PlayCryAndDecreaseFieldMoveEnergy
+    ld hl,SurfingGotOnText
+    ret
+
 ; Free
 
 SECTION "UpdateHPBar_CompareNewHPToOldHP",ROMX[$7ad1],BANK[$3]
@@ -28983,6 +29016,16 @@ CopyDataSkipEnergyAltForm:
     inc de
     ld bc,5
     jp CopyData
+
+CheckItemOnActive:
+    ld a,[W_ISINBATTLE]
+    and a
+    ret z ; z if not in battle
+    ld a,[wPlayerMonNumber]
+    ld b,a
+    ld a,[$cf92]
+    cp b
+    ret ; z if active mon is choice in battle
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -122119,6 +122162,10 @@ _UnnamedText_3d430:
     TX_RAM W_PLAYERMONNAME
     db $0," has not",$4f
     db "Enough Energy!",$57
+
+_EmptyPartyText:
+    db $0,"You don't have",$4F
+    db "any #MON!",$58
 
 ; ───────────────────────────────────
 ; Display Effectiveness
