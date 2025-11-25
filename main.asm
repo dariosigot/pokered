@@ -50040,6 +50040,19 @@ TrainerAI:
     cp 4
     ret z
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ld a,[W_PLAYERBATTSTATUS1]
+    bit USING_TRAPPING_MOVE,a ; caught in player's trapping move (e.g. wrap)
+    jr z,.notbeingtrapped
+    call CheckandResetSwitchBit    
+    jp nz,AISwitchIfEnoughMons ; switch if switch bit is set and stuck in the player's trapping move
+.notbeingtrapped
+;    ...otherwise
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - AI should not use actions if the null move has been selected
+    ld a,[wEnemySelectedMove]
+    cp $FF
+    ret z
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - AI should not use actions if in a move that prevents such a thing
     ld a,[W_ENEMYBATTSTATUS2]
     and %01100000
@@ -50047,11 +50060,6 @@ TrainerAI:
     ld a,[W_ENEMYBATTSTATUS1]
     and %01110011
     ret nz
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - switch if the switch bit is set
-    call CheckandResetSwitchBit
-    jp nz,AISwitchIfEnoughMons    ;switch if bit was initially set
-    ;jp AISwitchIfEnoughMons    ;joedebug - use this to make trainer ai constantly switch
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld a,[W_TRAINERCLASS] ; what trainer class is this?
     dec a
@@ -50063,7 +50071,7 @@ TrainerAI:
     add hl,bc
     ld a,[wAICount]
     and a
-    ret z ; if no AI uses left,we're done here
+    jr z,.handleSwitch ; if no AI uses left,we're done here
     inc hl
     inc a
     jr nz,.getpointer
@@ -50075,7 +50083,29 @@ TrainerAI:
     ld h,[hl]
     ld l,a
     call GenRandom
+    ld bc,.CheckItemUse
+    push bc ; Return Pointer
     jp hl
+.CheckItemUse
+    jr nc,.handleSwitch
+    ld a,[wUnusedC000]
+    res 0,a ; resets the switch pkmn bit
+    ld [wUnusedC000],a
+    push de
+    ld de,W_ENEMYMONNUMBER
+    ld b,BANK(ClearAISwitched)
+    ld hl,ClearAISwitched
+    call Bankswitch
+    pop de
+    scf
+    ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.handleSwitch
+;joenote - switch if the switch bit is set
+    call CheckandResetSwitchBit
+    jp nz,AISwitchIfEnoughMons    ;switch if bit was initially set
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ret
 
 TrainerAIPointers:
 ; one entry per trainer class
@@ -50272,6 +50302,33 @@ AIUseLemonade:
     ld a,LEMONADE
     ld b,80
     jp AIRecoverHP
+
+; ─────────────────────────────────────────────────────────────
+
+CompareSpeedAndGetRandomEffort:
+    call CompareSpeed
+    jr z,.speedEqual
+    jr nc,.playerMovesFirst
+.enemyMovesFirst
+    ld b,$60 ; 37.5%
+    jr .end
+.speedEqual
+    ld b,$A0 ; 62.5%
+    jr .end
+.playerMovesFirst
+    ld b,$F0 ; 93.75%
+.end
+    call GenRandom
+    cp b
+    ret
+
+CompareSpeed:
+    ld de,W_PLAYERMONSPEED ; player speed value
+    ld hl,W_ENEMYMONSPEED ; enemy speed value
+    ld c,$2
+    jp StringCmp ; compare speed values
+
+; ─────────────────────────────────────────────────────────────
 
 ; Free
 
@@ -52180,18 +52237,30 @@ TransformEffect_: ; Moved Upper in the Bank
 
 ; ─────────────────────────────────────────────────────────────
 JugglerAI:
-    cp $40
-    jp c,AISwitchIfEnoughMons
-    ret
+    cp $40 ; 25%
+    ret nc
+    jp AISwitchIfEnoughMons
 
 BlackbeltAI:
-    cp $20
-    jp c,AIUseXAttack
-    ret
+    cp $20 ; 12.5%
+    ret nc
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jp c,GenericAI
+    jp AIUseXAttack
 
 CooltrainerMAI:
-    cp $20
+    cp $20 ; 12.5%
     ret nc
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    push af
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jr c,.GenericAI
+    pop af
     cp $10
     jr c,.xspec
     ld a,[W_ENEMYBATTSTATUS2]
@@ -52201,10 +52270,20 @@ CooltrainerMAI:
     jp AIUseXSpecial
 .gspec
     jp AIUseGuardSpec
+.GenericAI
+    pop af
+    jp GenericAI
 
 CooltrainerFAI:
-    cp $20
+    cp $20 ; 12.5%
     ret nc
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    push af
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jr c,.GenericAI
+    pop af
     cp $10
     jr c,.xspec
     ld a,[W_ENEMYBATTSTATUS2]
@@ -52214,6 +52293,9 @@ CooltrainerFAI:
     jp AIUseXSpecial
 .xaccy
     jp AIUseXAccuracy
+.GenericAI
+    pop af
+    jp GenericAI
 
 ; ─────────────────────────────────────────────────────────────
 
@@ -52221,59 +52303,76 @@ BrockAI:
     jp AdvanceAIHealStatus
 
 MistyAI:
-    cp $20
-    jp c,AIUseXDefend
-    ret
+    cp $40 ; 25%
+    ret nc
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jp c,GenericAI
+    jp AIUseXDefend
 
 LtSurgeAI:
-    cp $20
-    jp c,AIUseXSpeed
-    ret
+    cp $40 ; 25%
+    ret nc
+    ld a,[W_ENEMYMONSTATUS]
+    and PAR
+    ret nz
+    call CompareSpeed
+    jp c,GenericAI
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jp c,GenericAI
+    jp AIUseXSpeed
 
 ErikaAI:
-    cp $80
+    cp $80 ; 50%
     ret nc
-    ld a,10
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,2
     call AICheckIfHPBelowFraction
     jp c,AIUseHyperPotion
     ret
 
 KogaAI:
-    cp $20
-    ret nc
-    ld a,10
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    ret
+    jr KogaSabrinaBlaineAI
 
 SabrinaAI:
-    cp $20
-    ret nc
-    ld a,10
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    ret
+    jr KogaSabrinaBlaineAI
 
 BlaineAI:
-    cp $20
+    jr KogaSabrinaBlaineAI
+
+KogaSabrinaBlaineAI:
+    cp $40 ; 25%
     ret nc
-    ld a,10
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseHyperPotion
     ret
 
 GiovanniAI:
-    cp $20
+    cp $40 ; 25%
     ret nc
     ld a,[W_ENEMYBATTSTATUS2]
     and %00000100
     ret z
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jp c,GenericAI
     jp AIUseDireHit
 
 ; ─────────────────────────────────────────────────────────────
 
 Sony1AI:
-    cp $20
+    cp $20 ; 12.5%
+    ret nc
+    call CompareSpeedAndGetRandomEffort
     ret nc
     ld a,2
     call AICheckIfHPBelowFraction
@@ -52281,17 +52380,21 @@ Sony1AI:
     ret
 
 Sony2AI:
-    cp $20
+    cp $40 ; 25%
     ret nc
-    ld a,5
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseLemonade
     jr AdvanceAIHealStatus
 
 Sony3AI:
-    cp $80
+    cp $80 ; 50%
     ret nc
-    ld a,5
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseFullRestore
     jr AdvanceAIHealStatus
@@ -52311,9 +52414,11 @@ LanceAI:
     jr EliteFourAI
 
 EliteFourAI:
-    cp $80
+    cp $80 ; 50%
     ret nc
-    ld a,5
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseHyperPotion
     jr AdvanceAIHealStatus
@@ -52323,7 +52428,12 @@ EliteFourAI:
 AdvanceAIHealStatus:
     ld a,[W_ENEMYMONSTATUS]
     and a
-    jr z,GenericAI
+    ret z
+    and SLP
+    jr nz,.SkipSpeedCompare
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+.SkipSpeedCompare
     ld a,3
     call AICheckIfHPBelowFraction
     jr c,GenericAI
@@ -53683,6 +53793,23 @@ EffectsArray6:
     db PAY_DAY_EFFECT
     db $FF
 
+ExplodeEffect:
+    ld hl,W_ENEMYMONCURHP ; $cfe6
+    ld de,W_ENEMYBATTSTATUS2 ; $d068
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr nz,.enemy
+    call SetExplodeFlag ; ld hl,W_PLAYERMONCURHP ; $d015
+    ld de,W_PLAYERBATTSTATUS2 ; $d063
+.enemy
+    xor a
+    ld [hli],a
+    ld [hl],a
+    ld a,[de]
+    res 7,a
+    ld [de],a
+    ret
+
 ; Free
 
 SECTION "AnyEnemyPokemonAliveCheck",ROMX[$464f],BANK[$f]
@@ -54159,11 +54286,17 @@ Func_3c92a: ; 3c92a (f:492a)
     ld b,BANK(AISelectWhichMonSendOut)
     ld hl,AISelectWhichMonSendOut
     call Bankswitch
+    ;push de
+    ;ld de,wWhichPokemon
+    ;ld b,BANK(SetAISwitched)
+    ;ld hl,SetAISwitched
+    ;call Bankswitch ;joenote - flag the pokemon being sent out
+    ;pop de
     push de
     ld de,wWhichPokemon
-    ld b,BANK(SetAISwitched)
-    ld hl,SetAISwitched
-    call Bankswitch ;joenote - flag the pokemon being sent out
+    ld b,BANK(ClearAISwitched)
+    ld hl,ClearAISwitched
+    call Bankswitch
     pop de
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .next3
@@ -60266,6 +60399,7 @@ PoisonEffect:
     ld b,a
     bit PSN_Bit,a
     jr nz,.alreadyPoisoned ; miss if target is already statused
+.retry
     push hl
     ld bc,W_PLAYERMONTYPES-W_PLAYERMONSTATUS
     add hl,bc
@@ -60328,6 +60462,22 @@ PoisonEffect:
     ld hl,PrintDidntAffectText
     jr .checkEnd
 .alreadyPoisoned
+    dec de
+    ld a,[de]
+    inc de
+    cp TOXIC
+    jr nz,.alreadyPoisoned2
+    push hl
+    ld a,[H_WHOSETURN]
+    and a
+    ld hl,W_PLAYERBATTSTATUS3
+    jr nz,.ok2
+    ld hl,W_ENEMYBATTSTATUS3
+.ok2
+    bit BADLY_POISONED,[hl]
+    pop hl
+    jp z,.retry
+.alreadyPoisoned2
     ld hl,PrintAlreadyPoisonedText
     ; fall through
 .checkEnd
@@ -60347,23 +60497,6 @@ DrainHPEffect:
     ld hl,DrainHPEffect_
     ld b,BANK(DrainHPEffect_)
     jp Bankswitch ; indirect jump to DrainHPEffect_ (783f (1:783f))
-
-ExplodeEffect:
-    ld hl,W_ENEMYMONCURHP ; $cfe6
-    ld de,W_ENEMYBATTSTATUS2 ; $d068
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr nz,.enemy
-    call SetExplodeFlag ; ld hl,W_PLAYERMONCURHP ; $d015
-    ld de,W_PLAYERBATTSTATUS2 ; $d063
-.enemy
-    xor a
-    ld [hli],a
-    ld [hl],a
-    ld a,[de]
-    res 7,a
-    ld [de],a
-    ret
 
 FreezeBurnParalyzeEffect:
     xor a
@@ -120578,12 +120711,8 @@ _SeafoamIslands5Text5: ; 880a8 (22:40a8)
     db $0,"DANGER",$4f
     db "Fast current!",$57
 
-_AIBattleWithdrawText: ; 880be (22:40be)
-    db 1
-    dw W_TRAINERNAME
-    db 0," with-",$4F,"drew @",1
-    dw W_ENEMYMONNAME
-    db 0,"!",$58
+SECTION "_AIBattleUseItemText",ROMX[$40d5],BANK[$22]
+
 _AIBattleUseItemText: ; 880d5 (22:40d5)
     db 1
     dw W_TRAINERNAME
@@ -122312,6 +122441,19 @@ _ShipReturned:
 _LikeShipText:
     db $0,"I would like",$4f
     db "to go on a ship!",$57
+
+; ───────────────────────────────────
+
+_AIBattleWithdrawText:
+    db 1
+    dw W_TRAINERNAME
+    db 0," with- (@"
+    TX_RAM wTrainerAISwitchDebugReason ; TODO
+    db 0,")",$4F
+    db "drew @"
+    db 1
+    dw W_ENEMYMONNAME
+    db 0,"!",$58
 
 ; ───────────────────────────────────
 
