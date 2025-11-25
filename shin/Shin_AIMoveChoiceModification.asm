@@ -1130,12 +1130,27 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     pop hl
     jp nc,.skipSwitchEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; switch if afflicted with freeze
+    ld a,[W_ENEMYMONSTATUS]
+    bit FRZ_Bit,a           ; check freeze
+    jr z,.skipSwitchFreeze  ; no Freeze status if zero flag set
+    call GenRandom          ; put a random number in 'a' between 0 and 255
+    cp $E0                  ; set carry if rand num < $E0
+    ld a,"A"
+    call c,.SetReason
+    jp c,.setSwitch         ; 87.5% chance to switch
+.skipSwitchFreeze
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;better chance to switch if afflicted with toxic-style poison
     ld a,[W_ENEMYBATTSTATUS3]
     bit 0,a    ;check a for the toxic bit (sets or clears zero flag)
     jr z,.skipSwitchToxicEnd    ;not badly poisoned if zero flag set
     call GenRandom    ;put a random number in 'a' between 0 and 255
     cp $55    ;set carry if rand num < $55
+    ld a,"B"
+    call c,.SetReason
     jp c,.setSwitch    ;34% chance to switch
 .skipSwitchToxicEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1146,6 +1161,8 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     jr z,.skipSwitchTrapEnd    ;not trapped if zero flag set
     call GenRandom    ;put a random number in 'a' between 0 and 255
     cp $40    ;set carry if rand num < $40
+    ld a,"C"
+    call c,.SetReason
     jp c,.setSwitch    ;25% chance to switch
 .skipSwitchTrapEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1156,24 +1173,26 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     jr z,.skipSwitchConfuseEnd    ;not confused if zero flag set
     call GenRandom    ;put a random number in 'a' between 0 and 255
     cp $40    ;set carry if rand num < $40
+    ld a,"D"
+    call c,.SetReason
     jp c,.setSwitch    ;25% chance to switch
 .skipSwitchConfuseEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;12.5% chance to switch if afflicted with sleep counter > 3
-    ld a,[W_ENEMYMONSTATUS]
-    and %00000111    ;check for sleep counter
-    jr z,.skipSwitchNVSLEEPstatEnd    ;no NV status if zero flag set
-    push bc
-    srl a
-    srl a
-    ld b,a
-    call GenRandom
-    and %00000111
-    cp b
-    pop bc
-    jp c,.setSwitch
-.skipSwitchNVSLEEPstatEnd
+;    ld a,[W_ENEMYMONSTATUS]
+;    and %00000111    ;check for sleep counter
+;    jr z,.skipSwitchNVSLEEPstatEnd    ;no NV status if zero flag set
+;    push bc
+;    srl a
+;    srl a
+;    ld b,a
+;    call GenRandom
+;    and %00000111
+;    cp b
+;    pop bc
+;    jp c,.setSwitch
+;.skipSwitchNVSLEEPstatEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;slight chance to switch if afflicted with leech seed
@@ -1182,6 +1201,8 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     jr z,.skipSwitchSeedEnd    ;not seeded if zero flag set
     call GenRandom    ;put a random number in 'a' between 0 and 255
     cp $20    ;set carry if rand num < $20
+    ld a,"E"
+    call c,.SetReason
     jp c,.setSwitch    ;12.5% chance to switch
 .skipSwitchSeedEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1193,6 +1214,8 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     jr z,.skipSwitchDisableEnd    ;no disabled moves if zero flag set
     call GenRandom    ;put a random number in 'a' between 0 and 255
     cp $20    ;set carry if rand num < $20
+    ld a,"F"
+    call c,.SetReason
     jp c,.setSwitch    ;12.5% chance to switch
 .skipSwitchDisableEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1230,6 +1253,8 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     and $07    ;use only bits 0 to 2 for a random number of 0 to 7
     cp b
     pop bc
+    ld a,"G"
+    call c,.SetReason
     jp c,.setSwitch    ;switch if random number < mod 1 (-1 stage) to 6 (-6 stages)
 .skipSwitchModEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1270,28 +1295,30 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     ;Before switching,flag the mon being switched out.
     ;It will be used as a penalty in scoring since there
     ;is clearly something disfavorable about it.
-    push bc
-    push hl
-    push de
-    ld de,W_ENEMYMONNUMBER
-    call SetAISwitched
-    pop de
-    pop bc
-    pop hl
+    ;push bc
+    ;push hl
+    ;push de
+    ;ld de,W_ENEMYMONNUMBER
+    ;call SetAISwitched
+    ;pop de
+    ;pop bc
+    ;pop hl
+    ld a,"H"
+    call .SetReason
     jp .setSwitchKeepFlagged
 .skipSwitchEffectiveEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;do not switch if this pkmn was flagged
-    push hl
-    push bc
-    push de
-    ld de,W_ENEMYMONNUMBER
-    call CheckAISwitched
-    pop de
-    pop bc
-    pop hl
-    jp nz,.skipSwitchEnd
+;    push hl
+;    push bc
+;    push de
+;    ld de,W_ENEMYMONNUMBER
+;    call CheckAISwitched
+;    pop de
+;    pop bc
+;    pop hl
+;    jp nz,.skipSwitchEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;switch if HP is low.
@@ -1300,7 +1327,7 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     call AICheckIfHPBelowFractionFromA
     jr nc,.skipSwitchHPend    ;if hp not below 1/3 then skip to the end of this block
     call GenRandom    ;put a random number in 'a' between 0 and 255
-    cp $40    ;set carry if rand num < $40    /    ;25% chance to switch
+    cp $20    ;set carry if rand num < $40    /    ;12.5% chance to switch
     jr nc,.skipSwitchHPend
     ld a,[W_PLAYERMONSPEED]
     push bc
@@ -1317,32 +1344,80 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     cp b
     pop bc
 .next1
+    ld a,"I"
+    call c,.SetReason
     jp c,.setSwitch    ;if carry is set,then enemy mon has less speed --> switch out
 .skipSwitchHPend
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;chance to switch if afflicted with non-volatile status (except sleep)
+; change to switch if afflicted with non-volatile status
+; 25% * number of volatile status
     ld a,[W_ENEMYMONSTATUS]
-    and %11111000    ;check for any non-volatile status except sleep
-    jr z,.skipSwitchNVstatEnd    ;no NV status if zero flag set
-    call GenRandom    ;put a random number in 'a' between 0 and 255
-    cp $40    ;set carry if rand num < $40
-    jp c,.setSwitch    ;25% chance to switch
-.skipSwitchNVstatEnd
+    and PSN|BRN|PAR|SLP
+    jr z,.SkipSwitch_MultiStatusCheck
+    push bc
+    push de
+    push hl
+    ld b,a
+    ld c,0
+    and SLP
+    jr z,.NotSleep_MultiStatusCheck
+    inc c
+.NotSleep_MultiStatusCheck
+    ld a,b
+    and PSN|BRN|PAR
+    add c
+    ld hl,$d11e
+    ld [hl],a
+    ld b,1
+    call CountSetBits
+    ld a,[$d11e]
+    ld b,a
+    ld c,$40
+    xor a
+.Loop_MultiStatusCheck
+    add c
+    jr c,.SkipBecause100perc_MultiStatusCheck
+    dec b
+    jr nz,.Loop_MultiStatusCheck
+    ld b,a
+    call GenRandom
+    cp b
+.SkipBecause100perc_MultiStatusCheck
+    pop hl
+    pop de
+    pop bc
+    ld a,"J"
+    call c,.SetReason
+    jp c,.setSwitch
+.SkipSwitch_MultiStatusCheck
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     jr .skipSwitchEnd    ;jump to the end and get out of this line is reached.
 .setSwitch    ;this line will only be reached if a switch is confirmed.
+    ;push bc
+    ;push hl
+    ;push de
+    ;ld de,W_ENEMYMONNUMBER
+    ;call ClearAISwitched    ;clear any switch flags on the mon being switched out
+    ;pop de
+    ;pop bc
+    ;pop hl
     push bc
     push hl
     push de
     ld de,W_ENEMYMONNUMBER
-    call ClearAISwitched    ;clear any switch flags on the mon being switched out
+    call SetAISwitched
     pop de
     pop bc
     pop hl
 .setSwitchKeepFlagged
     call SetSwitchBit
 .skipSwitchEnd
+    ret
+.SetReason
+    ld [wTrainerAISwitchDebugReason],a
+    ld a,"@"
+    ld [wTrainerAISwitchDebugReason+1],a
     ret
 
 ;joenote - function for loading A into B so it can be called conditionally
@@ -1873,6 +1948,7 @@ ClearAISwitched:
     ld a,[wUnusedD366]
     res 1,a
 .partyret
+    ld [wUnusedD366],a
     ret
 
 SetAISwitched:
@@ -1891,33 +1967,28 @@ SetAISwitched:
 .party5
     ld a,[wUnusedD366]
     set 6,a
-    ld [wUnusedD366],a
     jr .partyret
 .party4
     ld a,[wUnusedD366]
     set 5,a
-    ld [wUnusedD366],a
     jr .partyret
 .party3
     ld a,[wUnusedD366]
     set 4,a
-    ld [wUnusedD366],a
     jr .partyret
 .party2
     ld a,[wUnusedD366]
     set 3,a
-    ld [wUnusedD366],a
     jr .partyret
 .party1
     ld a,[wUnusedD366]
     set 2,a
-    ld [wUnusedD366],a
     jr .partyret
 .party0
     ld a,[wUnusedD366]
     set 1,a
-    ld [wUnusedD366],a
 .partyret
+    ld [wUnusedD366],a
     ret
 
 ; ─────────────────────────────────────────────────────────────────────────

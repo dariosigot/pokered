@@ -4705,7 +4705,7 @@ TextCommandSounds: ; 1c64 (0:1c64)
     db $0B,$86
     db $12,$9A
     db $0E,$91
-    db $0F,$86
+    db $0F,$A5 ; error
     db $10,$89
     db $11,$94
     db $13,$98
@@ -8625,7 +8625,7 @@ IsItemInBag: ; 3493 (0:3493)
 ; set zero flag if item isn't in player's bag
 ; else reset zero flag
 ; related to Pokémon Tower and ghosts
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     ld a,b
     and a
     ret
@@ -11535,7 +11535,7 @@ ItemPrices:
     bcd3      0 ; ?
     bcd3      0 ; ?
     bcd3      0 ; ?
-    bcd3    550 ; ESCAPE_ROPE
+    bcd3      0 ; ESCAPE_ROPE
     bcd3    350 ; REPEL
     bcd3      0 ; OLD_AMBER
     bcd3  40000 ; FIRE_STONE
@@ -22420,6 +22420,47 @@ MapHS:
     db SAFARI_ZONE_REST_HOUSE_1,$03,Hide ; $FA (Erik)
     db $FF
 
+MoveSpriteAndForcePlayerToFollowBoulder:
+    call MoveSprite
+    push bc
+    push hl
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    ld b,a
+    ld a,$ff
+    ld [wJoypadForbiddenButtonsMask],a
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,11
+    ld [$cd38],a
+    ld hl,$ccd3
+    xor a
+    ld [hli],a
+    ld a,b ; old H_CURRENTPRESSEDBUTTONS
+    ld [hli],a
+    xor a
+    ld bc,11-2
+    call FillMemory
+    call StartSimulatingJoypadStates
+    ld hl,wFlagFollowBoulderBit7
+    set 7,[hl]
+    pop hl
+    pop bc
+    ret
+
+CheckFailPushingBoulder:
+    ld a,[$d728]
+    bit 0,a
+    jr z,.fail
+    ld a,[wFlags_0xcd60]
+    bit 1,a
+    jr nz,.fail
+    ld a,[$d700] ; if 0 -> walk,if 1 -> byke
+    dec a
+    ret nz ; Success
+.fail
+    pop hl ; Hack Remove Return Pointer
+    ret
+
 ; Free
 
 SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
@@ -23673,7 +23714,7 @@ ItemUseVitamin:
 ItemUseMedicine:
     ld a,[W_NUMINPARTY]
     and a
-    jp z,.emptyParty
+    jr z,.emptyParty
     ld a,[$cf92]
     push af
     ld a,[$cf91]
@@ -23689,13 +23730,13 @@ ItemUseMedicine:
     call GoBackToPartyMenu
     jr .getPartyMonDataAddress
 .emptyParty
-    ld hl,.emptyPartyText
+    ld hl,.EmptyPartyText
     xor a
     ld [$cd6a],a ; item use failed
     jp PrintText
-.emptyPartyText
-    db $0,"You don't have",$4F
-    db "any #MON!",$58
+.EmptyPartyText
+    TX_FAR _EmptyPartyText
+    db "@"
 .MustChoiceActiveText
     TX_FAR _MustChoiceActiveText
     db "@"
@@ -23703,15 +23744,8 @@ ItemUseMedicine:
     call DisplayPartyMenu
 .getPartyMonDataAddress
     jp c,.canceledItemUse
-    ; CheckMedicineActive
-    ld a,[W_ISINBATTLE]
-    and a
-    jr z,.continue ; continue if not in battle
-    ld a,[wPlayerMonNumber]
-    ld b,a
-    ld a,[$cf92]
-    cp b
-    jr z,.continue ; continue if active mon is choice in battle
+    call CheckItemOnActive
+    jr z,.continue ; continue if not in battle or if active mon is choice in battle
     pop af
     ld [$cf91],a
     pop af
@@ -24436,8 +24470,7 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
     ret nz ; if so,return
     call ItemUseReloadOverworldData
     ld c,30
-    call DelayFrames
-    jp RemoveUsedItem
+    jp DelayFrames
 .notUsable
     jp DigNotUsable
 
@@ -24907,12 +24940,13 @@ ItemUseItemfinder:
     db "@"
 
 ItemUsePPRestore:
-    ld a,[W_ISINBATTLE]
+    ld a,[W_NUMINPARTY]
     and a
-    jp nz,ItemUseNotTime
+    jr z,.emptyParty
     ld a,[$cf92]
     push af
     ld a,[$cf91]
+    push af
     ld [$cd3d],a
 .chooseMon
     xor a
@@ -24922,6 +24956,17 @@ ItemUsePPRestore:
     call DisplayPartyMenu
     jr nc,.useEther
     jp .itemNotUsed
+.emptyParty
+    ld hl,.EmptyPartyText
+    xor a
+    ld [$cd6a],a ; item use failed
+    jp PrintText
+.EmptyPartyText
+    TX_FAR _EmptyPartyText
+    db "@"
+.MustChoiceActiveText
+    TX_FAR _MustChoiceActiveText
+    db "@"
 .afterRestoringPP ; after using a (Max) Ether/Elixir
     ld a,$8e
     call PlaySound
@@ -24946,11 +24991,23 @@ ItemUsePPRestore:
     ld hl,.PPRestoredText
     call PrintText
     pop af
+    ld [$cf91],a
+    pop af
     ld [$cf92],a
     call GBPalWhiteOut
     call GoPAL_SET_CF1C
     jp RemoveUsedItem
 .useEther
+    call CheckItemOnActive
+    jr z,.continue ; continue if not in battle or if active mon is choice in battle
+    pop af
+    ld [$cf91],a
+    pop af
+    ld [$cf92],a
+    ld hl,.MustChoiceActiveText
+    call PrintText
+    jp ItemUsePPRestore ; force another choice
+.continue
     call .restorePP
     jr nz,.afterRestoringPP
     jp .noEffect
@@ -25000,6 +25057,21 @@ ItemUsePPRestore:
     pop hl
 .storeNewAmount
     ld [hl],a
+    push af
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.NotInBattleOrNotActiveThanSkip
+    ld a,[wPlayerMonNumber]
+    ld b,a
+    ld a,[$cf92]
+    cp b
+    jr nz,.NotInBattleOrNotActiveThanSkip
+    pop af
+    ld [W_PLAYERMONENERGY],a
+    jr .end
+.NotInBattleOrNotActiveThanSkip
+    pop af
+.end
     and a
     ret
 .Table
@@ -25015,26 +25087,13 @@ ItemUsePPRestore:
     call GBPalWhiteOut
     call GoPAL_SET_CF1C
     pop af
+    pop af
     xor a
     ld [$cd6a],a ; item use failed
     ret
 .PPRestoredText
     TX_FAR _PPRestoredText
     db "@"
-
-UsingDigCry:
-    ld a,[$d152]
-    and a
-    ret z
-    push af
-    call PlayCryAndDecreaseFieldMoveEnergy
-    pop af
-    ret
-
-SurfingCry:
-    call PlayCryAndDecreaseFieldMoveEnergy
-    ld hl,SurfingGotOnText
-    ret
 
 DigNotUsable:
     ld a,[$d152]
@@ -25075,48 +25134,7 @@ RemoveBattleValue:
     ld hl,RemoveBattleValue_
     jp Bankswitch
 
-MoveSpriteAndForcePlayerToFollowBoulder:
-    call MoveSprite
-    push bc
-    push hl
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    ld b,a
-    ld a,$ff
-    ld [wJoypadForbiddenButtonsMask],a
-    xor a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,11
-    ld [$cd38],a
-    ld hl,$ccd3
-    xor a
-    ld [hli],a
-    ld a,b ; old H_CURRENTPRESSEDBUTTONS
-    ld [hli],a
-    xor a
-    ld bc,11-2
-    call FillMemory
-    call StartSimulatingJoypadStates
-    ld hl,wFlagFollowBoulderBit7
-    set 7,[hl]
-    pop hl
-    pop bc
-    ret
-
-CheckFailPushingBoulder:
-    ld a,[$d728]
-    bit 0,a
-    jr z,.fail
-    ld a,[wFlags_0xcd60]
-    bit 1,a
-    jr nz,.fail
-    ld a,[$d700] ; if 0 -> walk,if 1 -> byke
-    dec a
-    ret nz ; Success
-.fail
-    pop hl ; Hack Remove Return Pointer
-    ret
-
-; Free Space
+; Free
 
 SECTION "UnusableItem",ROMX[$6476],BANK[$3]
 
@@ -25658,7 +25676,7 @@ IsKeyItem_: ; e764 (3:6764)
     db %11110000
     db %00000001
     db %00110000
-    db %01000000
+    db %01010000
     db %00000000
     db %10010111
     db %00000010
@@ -27718,22 +27736,9 @@ InitializeEmptyList: ; f8a0 (3:78a0)
     ld [hl],a
     ret
 
-Func_f8a5: ; f8a5 (3:78a5)
-    call Load16BitRegisters
-    ld hl,wNumBagItems ; $d31d
-.asm_f8ab
-    inc hl
-    ld a,[hli]
-    cp $ff
-    jr z,.asm_f8b7
-    cp b
-    jr nz,.asm_f8ab
-    ld a,[hl]
-    ld b,a
-    ret
-.asm_f8b7
-    ld b,$0
-    ret
+; Free
+
+SECTION "Func_f8ba",ROMX[$78ba],BANK[$3]
 
 Func_f8ba: ; f8ba (3:78ba)
     xor a
@@ -28063,6 +28068,20 @@ UpdateHPBar: ; fa1d (3:7a1d)
     call UpdateHPBar_AnimateHPBar
 .end
     jp RemoveBattleValue ; jp Delay3
+
+UsingDigCry:
+    ld a,[$d152]
+    and a
+    ret z
+    push af
+    call PlayCryAndDecreaseFieldMoveEnergy
+    pop af
+    ret
+
+SurfingCry:
+    call PlayCryAndDecreaseFieldMoveEnergy
+    ld hl,SurfingGotOnText
+    ret
 
 ; Free
 
@@ -28581,8 +28600,7 @@ CheckDiglettsCaveHole:
     ld [$cd6a],a ; item used
     ret
 .NotEvent
-    call GetCurrentOldAdventureMap
-    ret
+    jp GetCurrentOldAdventureMap
 .coordsData
     db 18,13
     db $FF
@@ -28998,6 +29016,16 @@ CopyDataSkipEnergyAltForm:
     inc de
     ld bc,5
     jp CopyData
+
+CheckItemOnActive:
+    ld a,[W_ISINBATTLE]
+    and a
+    ret z ; z if not in battle
+    ld a,[wPlayerMonNumber]
+    ld b,a
+    ld a,[$cf92]
+    cp b
+    ret ; z if active mon is choice in battle
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -34750,7 +34778,7 @@ VermilionCityScript0: ; 197e6 (6:57e6)
     bit 2,a
     jr nz,.asm_19810 ; 0x19804 $a
     ld b,$3f
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     ld a,b
     and a
     ret nz
@@ -34870,7 +34898,7 @@ VermilionCityText3: ; 198b1 (6:58b1)
     ld hl,SSAnneWelcomeText9
     call PrintText
     ld b,$3f
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     ld a,b
     and a
     jr nz,.asm_0419b ; 0x198df
@@ -35707,7 +35735,7 @@ SilphCo4Object: ; 0x19e35 (size=111)
     db SPRITE_ROCKET,$a + 4,$1a + 4,$ff,$d1,$44,ROCKET,$1b ; trainer
     db SPRITE_BALL,$9 + 4,$3 + 4,$ff,$ff,$85,TM_07 ; item
     db SPRITE_BALL,$7 + 4,$4 + 4,$ff,$ff,$86,MAX_REVIVE ; item
-    db SPRITE_BALL,$8 + 4,$5 + 4,$ff,$ff,$87,ESCAPE_ROPE ; item
+    db SPRITE_BALL,$8 + 4,$5 + 4,$ff,$ff,$87,FULL_HEAL ; item
 
     ; warp-to
     EVENT_DISP $f,$0,$18 ; SILPH_CO_3F
@@ -36967,13 +36995,27 @@ FuchsiaCityText12:
     TX_FAR _FuchsiaCityText12
     db "@"
 
+; ────────────────────────
+
 ; Indigo
 IndigoPlateauLobbyText4:
     db $FE,13
-    db FULL_RESTORE,MAX_POTION,HYPER_POTION,SUPER_POTION,POTION
+    db FULL_RESTORE
+    db MAX_POTION
+    db HYPER_POTION
+    db SUPER_POTION
+    db POTION
     db FULL_HEAL
-    db X_ATTACK,X_DEFEND,X_SPEED,X_SPECIAL,X_ACCURACY,GUARD_SPEC_,DIRE_HIT
+    db X_ATTACK
+    db X_DEFEND
+    db X_SPEED
+    db X_SPECIAL
+    db X_ACCURACY
+    db GUARD_SPEC_
+    db DIRE_HIT
     db $FF
+
+; ────────────────────────
 
 ; Direction
 ; Tile offset
@@ -37713,17 +37755,36 @@ DecreaseFossilStep:
     jr nz,.loop
     ret
 
+; ────────────────────────
+
 ; Viridian
 ViridianMartText6:
-    db $FE,4,POKE_BALL
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,$FF
+    db $FE,5
+    db POKE_BALL
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db $FF
 
 ; Fuchsia
 FuchsiaMartText1:
-    db $FE,5,ULTRA_BALL,GREAT_BALL
+    db $FE,12
+    db ULTRA_BALL
+    db GREAT_BALL
+    db POKE_BALL
     db SUPER_POTION
-    db FULL_HEAL
-    db SUPER_REPEL,$FF
+    db POTION
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db ICE_HEAL
+    db SUPER_REPEL
+    db REPEL
+    db $FF
+
+; ────────────────────────
 
 BillsHouseObject:
     db $d ; border tile
@@ -39575,7 +39636,7 @@ CeruleanHouseTrashedTextPointers: ; 1d689 (7:5689)
 CeruleanHouseTrashedText1: ; 1d68f (7:568f)
     db $08 ; asm
     ld b,$e4
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     and b
     jr z,.asm_f8734 ; 0x1d698
     ld hl,UnnamedText_1d6b0
@@ -47686,7 +47747,7 @@ Func_2ff09 ; 2ff09 (b:7f09)
     and $8
     jr z,.asm_2ff2e
     ld b,$45
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     ld a,b
     and a
     ld b,$33
@@ -49979,6 +50040,19 @@ TrainerAI:
     cp 4
     ret z
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ld a,[W_PLAYERBATTSTATUS1]
+    bit USING_TRAPPING_MOVE,a ; caught in player's trapping move (e.g. wrap)
+    jr z,.notbeingtrapped
+    call CheckandResetSwitchBit    
+    jp nz,AISwitchIfEnoughMons ; switch if switch bit is set and stuck in the player's trapping move
+.notbeingtrapped
+;    ...otherwise
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - AI should not use actions if the null move has been selected
+    ld a,[wEnemySelectedMove]
+    cp $FF
+    ret z
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - AI should not use actions if in a move that prevents such a thing
     ld a,[W_ENEMYBATTSTATUS2]
     and %01100000
@@ -49986,11 +50060,6 @@ TrainerAI:
     ld a,[W_ENEMYBATTSTATUS1]
     and %01110011
     ret nz
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - switch if the switch bit is set
-    call CheckandResetSwitchBit
-    jp nz,AISwitchIfEnoughMons    ;switch if bit was initially set
-    ;jp AISwitchIfEnoughMons    ;joedebug - use this to make trainer ai constantly switch
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld a,[W_TRAINERCLASS] ; what trainer class is this?
     dec a
@@ -50002,7 +50071,7 @@ TrainerAI:
     add hl,bc
     ld a,[wAICount]
     and a
-    ret z ; if no AI uses left,we're done here
+    jr z,.handleSwitch ; if no AI uses left,we're done here
     inc hl
     inc a
     jr nz,.getpointer
@@ -50014,7 +50083,29 @@ TrainerAI:
     ld h,[hl]
     ld l,a
     call GenRandom
+    ld bc,.CheckItemUse
+    push bc ; Return Pointer
     jp hl
+.CheckItemUse
+    jr nc,.handleSwitch
+    ld a,[wUnusedC000]
+    res 0,a ; resets the switch pkmn bit
+    ld [wUnusedC000],a
+    push de
+    ld de,W_ENEMYMONNUMBER
+    ld b,BANK(ClearAISwitched)
+    ld hl,ClearAISwitched
+    call Bankswitch
+    pop de
+    scf
+    ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.handleSwitch
+;joenote - switch if the switch bit is set
+    call CheckandResetSwitchBit
+    jp nz,AISwitchIfEnoughMons    ;switch if bit was initially set
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ret
 
 TrainerAIPointers:
 ; one entry per trainer class
@@ -50211,6 +50302,33 @@ AIUseLemonade:
     ld a,LEMONADE
     ld b,80
     jp AIRecoverHP
+
+; ─────────────────────────────────────────────────────────────
+
+CompareSpeedAndGetRandomEffort:
+    call CompareSpeed
+    jr z,.speedEqual
+    jr nc,.playerMovesFirst
+.enemyMovesFirst
+    ld b,$60 ; 37.5%
+    jr .end
+.speedEqual
+    ld b,$A0 ; 62.5%
+    jr .end
+.playerMovesFirst
+    ld b,$F0 ; 93.75%
+.end
+    call GenRandom
+    cp b
+    ret
+
+CompareSpeed:
+    ld de,W_PLAYERMONSPEED ; player speed value
+    ld hl,W_ENEMYMONSPEED ; enemy speed value
+    ld c,$2
+    jp StringCmp ; compare speed values
+
+; ─────────────────────────────────────────────────────────────
 
 ; Free
 
@@ -52119,18 +52237,30 @@ TransformEffect_: ; Moved Upper in the Bank
 
 ; ─────────────────────────────────────────────────────────────
 JugglerAI:
-    cp $40
-    jp c,AISwitchIfEnoughMons
-    ret
+    cp $40 ; 25%
+    ret nc
+    jp AISwitchIfEnoughMons
 
 BlackbeltAI:
-    cp $20
-    jp c,AIUseXAttack
-    ret
+    cp $20 ; 12.5%
+    ret nc
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jp c,GenericAI
+    jp AIUseXAttack
 
 CooltrainerMAI:
-    cp $20
+    cp $20 ; 12.5%
     ret nc
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    push af
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jr c,.GenericAI
+    pop af
     cp $10
     jr c,.xspec
     ld a,[W_ENEMYBATTSTATUS2]
@@ -52140,10 +52270,20 @@ CooltrainerMAI:
     jp AIUseXSpecial
 .gspec
     jp AIUseGuardSpec
+.GenericAI
+    pop af
+    jp GenericAI
 
 CooltrainerFAI:
-    cp $20
+    cp $20 ; 12.5%
     ret nc
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    push af
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jr c,.GenericAI
+    pop af
     cp $10
     jr c,.xspec
     ld a,[W_ENEMYBATTSTATUS2]
@@ -52153,6 +52293,9 @@ CooltrainerFAI:
     jp AIUseXSpecial
 .xaccy
     jp AIUseXAccuracy
+.GenericAI
+    pop af
+    jp GenericAI
 
 ; ─────────────────────────────────────────────────────────────
 
@@ -52160,59 +52303,76 @@ BrockAI:
     jp AdvanceAIHealStatus
 
 MistyAI:
-    cp $20
-    jp c,AIUseXDefend
-    ret
+    cp $40 ; 25%
+    ret nc
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jp c,GenericAI
+    jp AIUseXDefend
 
 LtSurgeAI:
-    cp $20
-    jp c,AIUseXSpeed
-    ret
+    cp $40 ; 25%
+    ret nc
+    ld a,[W_ENEMYMONSTATUS]
+    and PAR
+    ret nz
+    call CompareSpeed
+    jp c,GenericAI
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jp c,GenericAI
+    jp AIUseXSpeed
 
 ErikaAI:
-    cp $80
+    cp $80 ; 50%
     ret nc
-    ld a,10
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,2
     call AICheckIfHPBelowFraction
     jp c,AIUseHyperPotion
     ret
 
 KogaAI:
-    cp $20
-    ret nc
-    ld a,10
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    ret
+    jr KogaSabrinaBlaineAI
 
 SabrinaAI:
-    cp $20
-    ret nc
-    ld a,10
-    call AICheckIfHPBelowFraction
-    jp c,AIUseHyperPotion
-    ret
+    jr KogaSabrinaBlaineAI
 
 BlaineAI:
-    cp $20
+    jr KogaSabrinaBlaineAI
+
+KogaSabrinaBlaineAI:
+    cp $40 ; 25%
     ret nc
-    ld a,10
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseHyperPotion
     ret
 
 GiovanniAI:
-    cp $20
+    cp $40 ; 25%
     ret nc
     ld a,[W_ENEMYBATTSTATUS2]
     and %00000100
     ret z
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,2
+    call AICheckIfHPBelowFraction
+    jp c,GenericAI
     jp AIUseDireHit
 
 ; ─────────────────────────────────────────────────────────────
 
 Sony1AI:
-    cp $20
+    cp $20 ; 12.5%
+    ret nc
+    call CompareSpeedAndGetRandomEffort
     ret nc
     ld a,2
     call AICheckIfHPBelowFraction
@@ -52220,17 +52380,21 @@ Sony1AI:
     ret
 
 Sony2AI:
-    cp $20
+    cp $40 ; 25%
     ret nc
-    ld a,5
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseLemonade
     jr AdvanceAIHealStatus
 
 Sony3AI:
-    cp $80
+    cp $80 ; 50%
     ret nc
-    ld a,5
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseFullRestore
     jr AdvanceAIHealStatus
@@ -52250,9 +52414,11 @@ LanceAI:
     jr EliteFourAI
 
 EliteFourAI:
-    cp $80
+    cp $80 ; 50%
     ret nc
-    ld a,5
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+    ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseHyperPotion
     jr AdvanceAIHealStatus
@@ -52263,9 +52429,14 @@ AdvanceAIHealStatus:
     ld a,[W_ENEMYMONSTATUS]
     and a
     ret z
+    and SLP
+    jr nz,.SkipSpeedCompare
+    call CompareSpeedAndGetRandomEffort
+    ret nc
+.SkipSpeedCompare
     ld a,3
     call AICheckIfHPBelowFraction
-    ret c
+    jr c,GenericAI
     jp AIUseFullHeal
 
 GenericAI:
@@ -53622,6 +53793,23 @@ EffectsArray6:
     db PAY_DAY_EFFECT
     db $FF
 
+ExplodeEffect:
+    ld hl,W_ENEMYMONCURHP ; $cfe6
+    ld de,W_ENEMYBATTSTATUS2 ; $d068
+    ld a,[H_WHOSETURN] ; $FF00+$f3
+    and a
+    jr nz,.enemy
+    call SetExplodeFlag ; ld hl,W_PLAYERMONCURHP ; $d015
+    ld de,W_PLAYERBATTSTATUS2 ; $d063
+.enemy
+    xor a
+    ld [hli],a
+    ld [hl],a
+    ld a,[de]
+    res 7,a
+    ld [de],a
+    ret
+
 ; Free
 
 SECTION "AnyEnemyPokemonAliveCheck",ROMX[$464f],BANK[$f]
@@ -54098,11 +54286,17 @@ Func_3c92a: ; 3c92a (f:492a)
     ld b,BANK(AISelectWhichMonSendOut)
     ld hl,AISelectWhichMonSendOut
     call Bankswitch
+    ;push de
+    ;ld de,wWhichPokemon
+    ;ld b,BANK(SetAISwitched)
+    ;ld hl,SetAISwitched
+    ;call Bankswitch ;joenote - flag the pokemon being sent out
+    ;pop de
     push de
     ld de,wWhichPokemon
-    ld b,BANK(SetAISwitched)
-    ld hl,SetAISwitched
-    call Bankswitch ;joenote - flag the pokemon being sent out
+    ld b,BANK(ClearAISwitched)
+    ld hl,ClearAISwitched
+    call Bankswitch
     pop de
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .next3
@@ -60205,6 +60399,7 @@ PoisonEffect:
     ld b,a
     bit PSN_Bit,a
     jr nz,.alreadyPoisoned ; miss if target is already statused
+.retry
     push hl
     ld bc,W_PLAYERMONTYPES-W_PLAYERMONSTATUS
     add hl,bc
@@ -60267,6 +60462,22 @@ PoisonEffect:
     ld hl,PrintDidntAffectText
     jr .checkEnd
 .alreadyPoisoned
+    dec de
+    ld a,[de]
+    inc de
+    cp TOXIC
+    jr nz,.alreadyPoisoned2
+    push hl
+    ld a,[H_WHOSETURN]
+    and a
+    ld hl,W_PLAYERBATTSTATUS3
+    jr nz,.ok2
+    ld hl,W_ENEMYBATTSTATUS3
+.ok2
+    bit BADLY_POISONED,[hl]
+    pop hl
+    jp z,.retry
+.alreadyPoisoned2
     ld hl,PrintAlreadyPoisonedText
     ; fall through
 .checkEnd
@@ -60286,23 +60497,6 @@ DrainHPEffect:
     ld hl,DrainHPEffect_
     ld b,BANK(DrainHPEffect_)
     jp Bankswitch ; indirect jump to DrainHPEffect_ (783f (1:783f))
-
-ExplodeEffect:
-    ld hl,W_ENEMYMONCURHP ; $cfe6
-    ld de,W_ENEMYBATTSTATUS2 ; $d068
-    ld a,[H_WHOSETURN] ; $FF00+$f3
-    and a
-    jr nz,.enemy
-    call SetExplodeFlag ; ld hl,W_PLAYERMONCURHP ; $d015
-    ld de,W_PLAYERBATTSTATUS2 ; $d063
-.enemy
-    xor a
-    ld [hli],a
-    ld [hl],a
-    ld a,[de]
-    res 7,a
-    ld [de],a
-    ret
 
 FreezeBurnParalyzeEffect:
     xor a
@@ -67305,7 +67499,7 @@ RocketHideout1Object: ; 0x44ce7 (size=98)
     db SPRITE_ROCKET,$11 + 4,$12 + 4,$ff,$d0,$43,ROCKET,$a ; trainer
     db SPRITE_ROCKET,$19 + 4,$f + 4,$ff,$d3,$44,ROCKET,$b ; trainer
     db SPRITE_ROCKET,$12 + 4,$1c + 4,$ff,$d2,$45,ROCKET,$c ; trainer
-    db SPRITE_BALL,$e + 4,$b + 4,$ff,$ff,$86,ESCAPE_ROPE ; item
+    db SPRITE_BALL,$e + 4,$b + 4,$ff,$ff,$86,FULL_HEAL ; item
     db SPRITE_BALL,$11 + 4,$9 + 4,$ff,$ff,$87,TM_23 ; item
 
     ; warp-to
@@ -70651,7 +70845,7 @@ BikeShopHiddenObjects: ; 47015 (11:7015)
     dbw $07,$694b
     db $FF
 Route11HiddenObjects: ; 4703a (11:703a)
-    db $05,$30,ESCAPE_ROPE
+    db $05,$30,FULL_HEAL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 Route12HiddenObjects: ; 47041 (11:7041)
@@ -71799,7 +71993,7 @@ CeladonMartRoofScript_483d8: ; 483d8 (12:43d8)
     push de
     ld [$d11e],a
     ld b,a
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     pop de
     pop hl
     ld a,b
@@ -74746,7 +74940,7 @@ MtMoon1Script: ; 499c8 (12:59c8)
 MtMoon1ScriptPointers: ; 499db (12:59db)
     dw CheckFightingMapTrainers
     dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+    dw MtMoon1Script2
 
 MtMoon1TextPointers: ; 499e1 (12:59e1)
     dw MtMoon1Text1
@@ -74880,9 +75074,7 @@ MtMoon1EndBattleText2: ; 49a9d (12:5a9d)
     TX_FAR _MtMoon1EndBattleText2
     db "@"
 
-MtMoon1AfterBattleText2: ; 49aa2 (12:5aa2)
-    TX_FAR _MtMoon1AfterBattleText2
-    db "@"
+SECTION "MtMoon1BattleText3",ROMX[$5aa7],BANK[$12]
 
 MtMoon1BattleText3: ; 49aa7 (12:5aa7)
     TX_FAR _MtMoon1BattleText3
@@ -74984,7 +75176,7 @@ MtMoon1Object: ; 0x49b06 (size=145)
     db SPRITE_BALL,$14 + 4,$2 + 4,$ff,$ff,$88,POTION ; item
     db SPRITE_BALL,$2 + 4,$2 + 4,$ff,$ff,$89,MOON_STONE ; item
     db SPRITE_BALL,$1f + 4,$23 + 4,$ff,$ff,$8a,RARE_CANDY ; item
-    db SPRITE_BALL,$17 + 4,$24 + 4,$ff,$ff,$8b,ESCAPE_ROPE ; item
+    db SPRITE_BALL,$17 + 4,$24 + 4,$ff,$ff,$8b,REPEL ; item
     db SPRITE_BALL,$21 + 4,$14 + 4,$ff,$ff,$8c,POTION ; item
     db SPRITE_BALL,$20 + 4,$5 + 4,$ff,$ff,$8d,TM_12 ; item
 
@@ -75656,17 +75848,41 @@ VictoryPokecenterObject:
 VictoryPokecenterBlocks: ; 480ab (12:40ab)
     INCBIN "maps/victorypokecenter.blk"
 
+; ────────────────────────
+
 ; Celadon Dept. Store 4F
 CeladonMart4Text1:
-    db $FE,5,POKE_DOLL,FIRE_STONE,THUNDER_STONE,WATER_STONE,LEAF_STONE,$FF
+    db $FE,5
+    db POKE_DOLL
+    db FIRE_STONE
+    db THUNDER_STONE
+    db WATER_STONE
+    db LEAF_STONE
+    db $FF
 
 ; Celadon Dept. Store 5F (1)
 CeladonMart5Text3:
-    db $FE,7,X_ATTACK,X_DEFEND,X_SPEED,X_SPECIAL,X_ACCURACY,GUARD_SPEC_,DIRE_HIT,$FF
+    db $FE,7
+    db X_ATTACK
+    db X_DEFEND
+    db X_SPEED
+    db X_SPECIAL
+    db X_ACCURACY
+    db GUARD_SPEC_
+    db DIRE_HIT
+    db $FF
 
 ; Celadon Dept. Store 5F (2)
 CeladonMart5Text4:
-    db $FE,5,HP_UP,PROTEIN,IRON,CARBOS,CALCIUM,$FF
+    db $FE,5
+    db HP_UP
+    db PROTEIN
+    db IRON
+    db CARBOS
+    db CALCIUM
+    db $FF
+
+; ────────────────────────
 
 CeladonGymScriptPointers:
     dw CheckFightingMapTrainers
@@ -75761,6 +75977,53 @@ RockTunnelPokecenterScript:
     ld hl,W_TOWNVISITEDFLAG+1
     set 4,[hl]
     jp EnableAutoTextBoxDrawing
+
+MtMoon1Script2:
+    call EndTrainerBattle
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $ff
+    jr z,.ResetScript
+    ld a,[$cf13]
+    cp $01 ; Is Hiker end Battle?
+    ret nz
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    jp DisplayTextID
+.ResetScript
+    xor a
+    ld [W_MTMOON1CURSCRIPT],a
+    ret
+
+MtMoon1AfterBattleText2:
+    db $08 ; asm
+    ld hl,.end
+    push hl
+    ld b,ESCAPE_ROPE
+    PREDEF _IsItemInBagOrBox
+    ld hl,.MtMoon1AfterBattleText2
+    ret nz
+    ld hl,.EscapeRopeReceiveText1
+    call PrintText
+    ld bc,(ESCAPE_ROPE << 8) | 1
+    call GiveItem
+    ld hl,.EscapeRopeNoRoomText
+    ret nc
+    ld hl,.EscapeRopeReceiveText2
+    ret
+.end
+    call PrintText
+    jp TextScriptEnd
+.EscapeRopeReceiveText1
+    TX_FAR _EscapeRopeReceiveText1
+    db "@"
+.EscapeRopeReceiveText2
+    TX_FAR _ReceivedText
+    db $11,"@"
+.EscapeRopeNoRoomText
+    TX_FAR _EscapeRopeNoRoomText
+    db $0F,"@"
+.MtMoon1AfterBattleText2
+    TX_FAR _MtMoon1AfterBattleText2
+    db "@"
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -76117,7 +76380,7 @@ InitializePlayerData_2Predef:              NEW_PREDEF InitializePlayerData      
 Func_c754Predef:                           NEW_PREDEF Func_c754                           ; $19
 LearnMoveFromLevelUpPredef:                NEW_PREDEF LearnMoveFromLevelUp                ; $1A
 LearnMovePredef:                           NEW_PREDEF LearnMove                           ; $1B
-Func_f8a5Predef:                           NEW_PREDEF Func_f8a5                           ; $1C
+_IsItemInBagPredef:                        NEW_PREDEF _IsItemInBag                        ; $1C
 Func_3eb5Predef:                           NEW_PREDEF Func_3eb5                           ; $1D
 GiveItemPredef:                            NEW_PREDEF GiveItem                            ; $1E
 Func_480ebPredef:                          NEW_PREDEF Func_480eb                          ; $1F
@@ -76205,6 +76468,7 @@ IsMonInCurrentMapPredef:                   NEW_PREDEF IsMonInCurrentMap         
 UndoBurnParStatsPredef:                    NEW_PREDEF UndoBurnParStats                    ; $71
 DrawHUDsAndHPBarsPredef:                   NEW_PREDEF DrawHUDsAndHPBars                   ; $72
 GetAttackAnimationPointers_Predef:         NEW_PREDEF GetAttackAnimationPointers_         ; $73
+_IsItemInBagOrBoxPredef:                   NEW_PREDEF _IsItemInBagOrBox                   ; $74
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -85054,6 +85318,8 @@ CheckReachLevelLimit:
     scf ; Set Carry Flag
     ret
 
+; ────────────────────────
+
 ; Celadon Dept. Store 2F (2)
 CeladonMart2Text2:
     db $FE,13
@@ -85071,6 +85337,8 @@ CeladonMart2Text2:
     db TM_33 ; REFLECT
     db TM_41 ; LIGHT_SCREEN
     db $FF
+
+; ────────────────────────
 
 Route21ScriptPointers:
     dw CheckFightingMapTrainers
@@ -85121,13 +85389,27 @@ Route21ScriptBarrier:
     db ROUTE21_BARRIER_BLOCK
 .ChangedBlocksEnd
 
+; ────────────────────────
+
 ; Celadon Dept. Store 2F (1)
 CeladonMart2Text1:
-    db $FE,13,GREAT_BALL,POKE_BALL
+    db $FE,13
+    db GREAT_BALL
+    db POKE_BALL
+    db MAX_REVIVE
     db REVIVE
-    db SUPER_POTION,POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
-    db ESCAPE_ROPE,SUPER_REPEL,REPEL,$FF
+    db SUPER_POTION
+    db POTION
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db ICE_HEAL
+    db SUPER_REPEL
+    db REPEL
+    db $FF
+
+; ────────────────────────
 
 Route3Text1:
     db $08 ; asm
@@ -93103,35 +93385,65 @@ GetLastFighter:
     ld [$cc4d],a
     PREDEF_JUMP RemoveMissableObject ; Hide Last Pokeball
 
+; ────────────────────────
+
 ; Cerulean
 CeruleanMartText1:
-    db $FE,7,POKE_BALL
+    db $FE,7
+    db POKE_BALL
     db POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
-    db REPEL,$FF
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db REPEL
+    db $FF
 
 ; Vermilion
 VermilionMartText1:
-    db $FE,8,POKE_BALL
-    db SUPER_POTION,POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
-    db REPEL,$FF
+    db $FE,8
+    db POKE_BALL
+    db SUPER_POTION
+    db POTION
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db REPEL
+    db $FF
 
 ; Lavender
 LavenderMartText1:
-    db $FE,10
+    db $FE,12
     db GREAT_BALL
-    db ETHER,ELIXER
+    db POKE_BALL
+    db ETHER
+    db ELIXER
     db SUPER_POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING,ICE_HEAL
-    db SUPER_REPEL,$FF
+    db POTION
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db SUPER_REPEL
+    db REPEL
+    db $FF
 
 ; Saffron
 SaffronMartText1:
-    db $FE,5,GREAT_BALL
+    db $FE,9
+    db GREAT_BALL
+    db POKE_BALL
     db HYPER_POTION
+    db SUPER_POTION
+    db POTION
     db FULL_HEAL
-    db MAX_REPEL,ESCAPE_ROPE,$FF
+    db MAX_REPEL
+    db SUPER_REPEL
+    db REPEL
+    db $FF
+
+; ────────────────────────
 
 JigglypuffDance:
     ;db $30,$38,$34,$3c
@@ -93737,7 +94049,7 @@ PokemonTower3Object: ; 0x6075d (size=51)
     db SPRITE_MEDIUM,$3 + 4,$c + 4,$ff,$d2,$41,CHANNELER,$1 ; trainer
     db SPRITE_MEDIUM,$8 + 4,$9 + 4,$ff,$d0,$42,CHANNELER,$2 ; trainer
     db SPRITE_MEDIUM,$d + 4,$a + 4,$ff,$d0,$43,CHANNELER,$3 ; trainer
-    db SPRITE_BALL,$1 + 4,$c + 4,$ff,$ff,$84,ESCAPE_ROPE ; item
+    db SPRITE_BALL,$1 + 4,$c + 4,$ff,$ff,$84,POKE_DOLL ; item
 
     ; warp-to
     EVENT_DISP $a,$9,$3 ; POKEMONTOWER_2
@@ -107243,7 +107555,7 @@ Func_75d38: ; 75d38 (1d:5d38)
     push de
     ld [$d11e],a
     ld b,a
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     pop de
     pop hl
     ld a,b
@@ -108613,7 +108925,7 @@ HiddenItemBagFullText: ; 76794 (1d:6794)
 
 HiddenCoins: ; 76799 (1d:6799)
     ld b,COIN_CASE
-    PREDEF Func_f8a5
+    PREDEF _IsItemInBag
     ld a,b
     and a
     ret z
@@ -108779,19 +109091,38 @@ CheckSafariStatusAndDelay3:
 .End
     jp Delay3
 
+; ────────────────────────
+
 ; Pewter
 PewterMartText1:
-    db $FE,7,POKE_BALL
+    db $FE,7
+    db POKE_BALL
     db POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
-    db ESCAPE_ROPE,$FF
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db REPEL
+    db $FF
 
 ; Cinnabar
 CinnabarMartText1:
-    db $FE,6,ULTRA_BALL
-    db HYPER_POTION,SUPER_POTION
+    db $FE,12
+    db ULTRA_BALL
+    db GREAT_BALL
+    db POKE_BALL
+    db ETHER
+    db ELIXER
+    db HYPER_POTION
+    db SUPER_POTION
+    db POTION
     db FULL_HEAL
-    db MAX_REPEL,ESCAPE_ROPE,$FF
+    db MAX_REPEL
+    db SUPER_REPEL
+    db REPEL
+    db $FF
+
+; ────────────────────────
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $1D)
@@ -119087,6 +119418,17 @@ _ViridianFrstAfterBattleText6:
     db "I hope to ",$4f
     db "Evolve it!",$57
 
+_EscapeRopeReceiveText1:
+    db $0,"Kids like you",$4f
+    db "shouldn't be",$55
+    db "here!",$51
+    db "Take this and",$4f
+    db "good luck!",$58
+
+_EscapeRopeNoRoomText:
+    db $0,"You do not have",$4f
+    db "space for this!",$57
+
 SECTION "bank21",ROMX,BANK[$21]
 
 _SilphCo5EndBattleText4: ; 84000 (21:4000)
@@ -120369,12 +120711,8 @@ _SeafoamIslands5Text5: ; 880a8 (22:40a8)
     db $0,"DANGER",$4f
     db "Fast current!",$57
 
-_AIBattleWithdrawText: ; 880be (22:40be)
-    db 1
-    dw W_TRAINERNAME
-    db 0," with-",$4F,"drew @",1
-    dw W_ENEMYMONNAME
-    db 0,"!",$58
+SECTION "_AIBattleUseItemText",ROMX[$40d5],BANK[$22]
+
 _AIBattleUseItemText: ; 880d5 (22:40d5)
     db 1
     dw W_TRAINERNAME
@@ -121954,6 +122292,10 @@ _UnnamedText_3d430:
     db $0," has not",$4f
     db "Enough Energy!",$57
 
+_EmptyPartyText:
+    db $0,"You don't have",$4F
+    db "any #MON!",$58
+
 ; ───────────────────────────────────
 ; Display Effectiveness
 ; ───────────────────────────────────
@@ -122099,6 +122441,19 @@ _ShipReturned:
 _LikeShipText:
     db $0,"I would like",$4f
     db "to go on a ship!",$57
+
+; ───────────────────────────────────
+
+_AIBattleWithdrawText:
+    db 1
+    dw W_TRAINERNAME
+    db 0," with- (@"
+    TX_RAM wTrainerAISwitchDebugReason ; TODO
+    db 0,")",$4F
+    db "drew @"
+    db 1
+    dw W_ENEMYMONNAME
+    db 0,"!",$58
 
 ; ───────────────────────────────────
 
@@ -137539,6 +137894,18 @@ RestoreFaintenedWith1HP:
     ld a,[hld]
     or b
     jr nz,.Next
+    push hl
+    ld bc,W_PARTYMON1_MOVE1PP-W_PARTYMON1_HP
+    add hl,bc
+    ld a,[hl] ; Read stored Energy
+    cp 60 ; Check If Old stored Energy is at least 60
+    jr c,.NoEnergy
+    push af
+    srl [hl] ; Halve stored Energy
+    pop af
+.NoEnergy
+    pop hl
+    jr c,.Next
     inc hl
     inc [hl] ; 1 HP
     dec hl ; Restore Pointer to PARTYMON_HP
@@ -142755,6 +143122,52 @@ AttackAnimationPointers:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+_IsItemInBagOrBox:
+    call Load16BitRegisters
+    push bc
+    call IsItemInBag2
+    pop bc
+    ret nz ; ret if item in bag
+    push de
+    push hl
+    ld hl,wNumBoxItems
+    jr SearchItemInList
+
+_IsItemInBag:
+    call Load16BitRegisters
+IsItemInBag2:
+    push de
+    push hl
+    ld hl,wNumBagItems
+SearchItemInList:
+    ld a,[hl]
+    and a
+    jr z,.NotFought
+    ld d,a
+.loop
+    inc hl
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFought
+    cp b
+    jr z,.Fought
+    dec d
+    jr nz,.loop
+.NotFought
+    ld b,0
+    jr .end
+.Fought
+    ld a,[hl]
+    ld b,a
+.end
+    ld a,b
+    and a
+    pop hl
+    pop de
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
 SECTION "Bank39",ROMX,BANK[$39]
 
 MonOverworldDataNew_emimonserrate:
@@ -143573,11 +143986,20 @@ PortRoyalMartObject:
 PortRoyalMartBlocks:
     INCBIN "maps/portroyalmart.blk"
 
+; ────────────────────────
+
 PortRoyalMartText1:
-    db $FE,7,POKE_BALL
+    db $FE,7
+    db POKE_BALL
     db POTION
-    db ANTIDOTE,PARLYZ_HEAL,BURN_HEAL,AWAKENING
-    db REPEL,$FF
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db REPEL
+    db $FF
+
+; ────────────────────────
 
 ; ──────────────────────────────────────────────────────────────────────
 ; SWAP_MAP

@@ -298,7 +298,10 @@ wBackupEnemyEnergy:
 wBackupEnemyAltForm:
     ds 1
 
-    ds 3
+wTrainerAISwitchDebugReason:
+    ds 2
+
+    ds 1
 
 ENDU
 
