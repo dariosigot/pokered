@@ -1818,6 +1818,17 @@ wMoveRelearnerMoveList: ; def0
 
 NEXTU
 
+wTmpTrainerHeaderBank:
+    ds 1
+wTmpTrainerHeaderPointer:
+    ds 2
+wTmpPointerToMapCurrentScript:
+    ds 2
+wTmpTrainerHeader:
+    ds 4
+
+NEXTU
+
 wLocationMonOvSprInstruction: ; def0
     ds 6*6
     ds 2*6
