@@ -70366,9 +70366,9 @@ SECTION "RedsHouse2FHiddenObjects",ROMX[$6b5a],BANK[$11]
 
 RedsHouse2FHiddenObjects: ; 46b5a (11:6b5a)
     db $01,$00,$04 ; XXX,y,x
-    dbw $17,$5b86
+    dbw BANK(OpenRedsPC),OpenRedsPC
     db $05,$03,$d0 ; XXX,y,x
-    dbw $17,$5b79
+    dbw BANK(PrintRedSNESText),PrintRedSNESText
     db $FF
 BluesHouseHiddenObjects: ; 46b67 (11:6b67)
     db $01,$00,$04 ; XXX,y,x
@@ -93129,21 +93129,25 @@ VictoryRoad1Object: ; 0x5dab8 (size=76)
 VictoryRoad1Blocks: ; 5db04 (17:5b04)
     INCBIN "maps/victoryroad1.blk"
 
-SECTION "Func_5db79",ROMX[$5b79],BANK[$17]
-
-Func_5db79: ; 5db79 (17:5b79)
+PrintRedSNESText:
     call EnableAutoTextBoxDrawing
-    ld a,$4
+    ld a,$4 ; RedBedroomSNESText
     jp Func_3ef5
 
-RedBedroomSNESText: ; 5db81 (17:5b81)
+RedBedroomSNESText:
     TX_FAR _RedBedroomSNESText
     db "@"
 
-Func_5db86: ; 5db86 (17:5b86)
+OpenRedsPC:
+    call CheckHallOfFameWin
+    ld hl,PokeCenterPC
+    ld b,BANK(PokeCenterPC)
+    jp nz,Bankswitch
     call EnableAutoTextBoxDrawing
-    ld a,$3
+    ld a,$3 ; ItemStoragePCInRedHouse
     jp Func_3ef5
+
+SECTION "ItemStoragePCInRedHouse",ROMX[$5b8e],BANK[$17]
 
 ItemStoragePCInRedHouse: ; 5db8e (17:5b8e)
     db $fc ; Item Storage PC in DisplayTextID
