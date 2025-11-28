@@ -708,7 +708,7 @@ OverworldLoop: ; 03ff (0:03ff)
     PREDEF LoadSAV
     ld a,[W_CURMAP]
     ld [$d71a],a
-    call Func_62ce
+    call SpecialWarpIn
     ld a,[W_CURMAP]
     call SwitchToMapRomBank ; switch to the ROM bank of the current map
     ld hl,$d367
@@ -1358,9 +1358,9 @@ HandleBlackOut: ; 0931 (0:0931)
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call ResetStatusAndHalveMoneyOnBlackout
-    call Func_62ce
+    call SpecialWarpIn
     call PlayDefaultMusicFadeOutCurrent
-    jp Func_5d5f
+    jp SpecialEnterMap
 
 StopMusic: ; 0951 (0:0951)
     ld [wMusicHeaderPointer],a
@@ -1388,8 +1388,8 @@ HandleFlyOrTeleportAway: ; 0965 (0:0965)
     ld a,$01
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
-    call Func_62ce
-    jp Func_5d5f
+    call SpecialWarpIn
+    jp SpecialEnterMap
 
 ; function that calls a function to do fly away or teleport away graphics
 DoFlyOrTeleportAwayGraphics: ; 098f (0:098f)
@@ -1948,6 +1948,12 @@ TrySpeedUp:
     and a
     ret nz
     jp SpeedUp
+
+DisableDebugWtW_Hack:
+    ld a,[$d700]
+    ld hl,$cd38
+    res 0,[hl]
+    ret
 
 ; Free
 
@@ -2526,6 +2532,23 @@ CollisionCheckOnWater: ; 0fb7 (0:0fb7)
     jp Collision
 .noCollision
     jp NoCollision
+
+DelayFramesCredits:
+    call CheckHallOfFameWin
+    jr z,.delay
+    push bc
+    push de
+    call GetJoypadState
+    pop de
+    pop bc
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 1,a
+    ret nz
+.delay
+    call DelayFrame
+    dec c
+    jr nz,DelayFramesCredits
+    ret
 
 ; Free
 
@@ -7135,7 +7158,7 @@ DisplayStartMenu: ; 2acd (0:2acd)
     ld a,$04
     ld [H_LOADEDROMBANK],a
     call RoutineForRealGB ; ROM bank 4
-    ld a,[$d700] ; walking/biking/surfing
+    call DisableDebugWtW_Hack ; ld a,[$d700] ; walking/biking/surfing
     ld [$d11a],a
     ld a,(SFX_02_3f - $4000) / 3 ; Start menu sound
     call PlaySound
@@ -8558,7 +8581,21 @@ GymLeaderAfterRematch:
     ld b,BANK(GymLeaderAfterRematch_)
     jp Bankswitch
 
-; Free
+CheckHallOfFameWin:
+    ld a,[$d5a2] ; hall of fame
+    and a ; rcf
+    ret
+
+NoCommentText:
+    db 0,"...",$57
+
+ArePlayerCoordsInArrayBeforeHOFWin:
+    call CheckHallOfFameWin ; rcf
+    ret nz
+    jp ArePlayerCoordsInArray
+
+Nope:
+    ret
 
 SECTION "Func_3442",ROM0[$3442]
 
@@ -11359,13 +11396,13 @@ Func_4533: ; 4533 (1:4533)
     ld [$FF00+$bd],a
     jp Delay3
 
-Func_4538: ; 4538 (1:4538)
+LoadCopyrightAndTextBoxTiles: ; 4538 (1:4538)
     xor a
     ld [$FF00+$b0],a
     call ClearScreen
     call LoadTextBoxTilePatterns
 
-Func_4541: ; 4541 (1:4541)
+LoadCopyrightTiles: ; 4541 (1:4541)
     ld de,NintendoCopyrightLogoGraphics ; $60c8
     ld hl,$9600
     ld bc,(BANK(NintendoCopyrightLogoGraphics) << 8) + $1c
@@ -14070,24 +14107,27 @@ MainMenu: ; 5af2 (1:5af2)
     ld [$D52A],a
     ld c,10
     call DelayFrames
-    ld a,[$D5A2]
-    and a
-    jp z,Func_5d5f
-    call GetCurrentOldAdventureMap
-    cp a,HALL_OF_FAME
-    jp nz,Func_5d5f
-    xor a
-    ld [$D71A],a
-    ld hl,$D732
-    set 2,[hl]
-    call Func_62ce
-    jp Func_5d5f
+;    ld a,[$D5A2]
+;    and a
+;    jp z,SpecialEnterMap
+;    call GetCurrentOldAdventureMap
+;    cp a,HALL_OF_FAME
+;    jp nz,SpecialEnterMap
+;    xor a
+;    ld [$D71A],a
+;    ld hl,$D732
+;    set 2,[hl]
+;    call SpecialWarpIn
+    jp SpecialEnterMap
+
 Func_5bff: ; 5bff (1:5bff)
     ld a,1
     ld [$D358],a
     ld a,%01000000; ld a,3 ; Denim,sostituite opzioni default
     ld [W_OPTIONS],a
     ret
+
+SECTION "Func_5c0a",ROMX[$5c0a],BANK[$1]
 
 Func_5c0a: ; 5c0a (1:5c0a)
     xor a
@@ -14229,7 +14269,7 @@ Func_5c0a: ; 5c0a (1:5c0a)
     res 1,[hl]
     ld a,[W_ANIMATIONID] ; $d07c
     ld [$d71a],a
-    call Func_62ce
+    call SpecialWarpIn
     ld c,$14
     call DelayFrames
     xor a
@@ -14238,7 +14278,7 @@ Func_5c0a: ; 5c0a (1:5c0a)
     inc a
     ld [W_ISLINKBATTLE],a ; $d12b
     ld [$cc47],a
-    jr Func_5d5f
+    jr SpecialEnterMap
 .asm_5d2d
     xor a
     ld [wMenuJoypadPollCount],a ; $cc34
@@ -14269,7 +14309,7 @@ Func_5d52: ; 5d52 (1:5d52)
     ld c,$14
     call DelayFrames
 
-Func_5d5f: ; 5d5f (1:5d5f)
+SpecialEnterMap: ; 5d5f (1:5d5f)
     xor a
     ld [H_NEWLYPRESSEDBUTTONS],a
     ld [H_CURRENTPRESSEDBUTTONS],a
@@ -14737,7 +14777,7 @@ OakSpeech: ; 6115 (1:6115)
     call AddItemToInventory  ; give one potion
     ld a,[$D07C]
     ld [$D71A],a
-    call Func_62ce
+    call SpecialWarpIn
     xor a
     ld [$FFD7],a
     ld a,[$D732]
@@ -14920,7 +14960,7 @@ IntroPredef3B: ; 62a4 (1:62a4)
     ld [$FFE1],a
     PREDEF_JUMP CopyUncompressedPicToTilemap
 
-Func_62ce: ; 62ce (1:62ce)
+SpecialWarpIn: ; 62ce (1:62ce)
     call Func_62ff
     PREDEF Func_c754
     ld hl,$D732
@@ -18876,6 +18916,14 @@ HandleIVAndLevelAndLoadRenameScreenDuringNameRater_FromAnotherBank:
     ld l,e
     jp HandleIVAndLevelAndLoadRenameScreenDuringNameRater
 
+SpecialRestartAfterHallOfFame:
+    xor a
+    ld [wDestinationMap],a
+    inc a
+    ld [$D732],a
+    call SpecialWarpIn
+    jp SpecialEnterMap
+
 SECTION "bank2",ROMX,BANK[$2]
 
 INCLUDE "music/headers/sfxheaders02.asm"
@@ -22418,6 +22466,8 @@ MapHS:
     db ROUTE_17,$0B,Show ; $F8
     db FUCHSIA_CITY,$03,Show ; $F9 (Erik)
     db SAFARI_ZONE_REST_HOUSE_1,$03,Hide ; $FA (Erik)
+    db CHAMPIONS_ROOM,$01,Show ; $FB (Gary)
+    db HALL_OF_FAME,$01,Show ; $FC (Oak)
     db $FF
 
 MoveSpriteAndForcePlayerToFollowBoulder:
@@ -30435,6 +30485,27 @@ GetMaxLevelBank4:
     ld b,BANK(GetMaxLevel)
     jp Bankswitch ; d = Max Level
 
+StartMenu_Option:
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 2,a ; was the select button pressed?
+    jp nz,InitGame
+    bit 3,a ; was the start button pressed?
+    jr z,.skip
+    bit 4,a ; was the right button pressed?
+    jr z,.skip
+    ld a,$89       ; FoundHiddenItem
+    call PlaySound ; ...
+    ld hl,$cd38
+    set 0,[hl]
+    jr .restore
+.skip
+    call StartMenu_Option_Init
+.restore
+    call LoadScreenTilesFromBuffer2 ; restore saved screen
+    call LoadTextBoxTilePatterns
+    call UpdateSprites
+    jp RedisplayStartMenu
+
 ; Free
 
 SECTION "StartMenu_SaveReset",ROMX[$75e3],BANK[$4]
@@ -30448,16 +30519,6 @@ StartMenu_SaveReset: ; 135e3 (4:75e3)
     ;jp HoldTextDisplayOpen
     jp CloseStartMenu ;joenote - prevent menu from being held open with A button
                       ;and instead only hold for a single button press
-
-StartMenu_Option: ; 135f6 (4:75f6)
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    bit 2,a ; was the select button pressed?
-    jp nz,InitGame
-    call StartMenu_Option_Init
-    call LoadScreenTilesFromBuffer2 ; restore saved screen
-    call LoadTextBoxTilePatterns
-    call UpdateSprites
-    jp RedisplayStartMenu
 
 SECTION "Func_13613",ROMX[$7613],BANK[$4]
 
@@ -31190,12 +31251,26 @@ FixTMPalette:
 
 ; If Not Allowed Set z
 CheckIfTeleportNotAllowed:
+    call CheckHallOfFameWin
+    jr z,.skip
+    call GetCurrentOldAdventureMap
+    ld b,a
+    ld c,4
+    ld hl,.EliteFourMapAllowed
+.LoopEliteFour
+    ld a,[hli]
+    cp b
+    jr z,.Allowed
+    dec c
+    jr nz,.LoopEliteFour
+.skip
     ld a,[W_CURMAPTILESET]
     ld hl,.TilesetNotAllowed
     call .CheckList
     call GetCurrentOldAdventureMap
     ld hl,.MapNotAllowed
     call .CheckList
+.Allowed
     dec a ; Reset z ; Allowed
     ret
 .CheckList
@@ -31208,9 +31283,10 @@ CheckIfTeleportNotAllowed:
     jr nz,.Loop
     pop hl ; Delete Return Pointer
     ret ; Set z ; Not Allowed
+.EliteFourMapAllowed ; only first 4 maps
 .MapNotAllowed
-    db BATTLE_CENTER,TRADE_CENTER
     db LORELEIS_ROOM,BRUNOS_ROOM,AGATHAS_ROOM,LANCES_ROOM
+    db BATTLE_CENTER,TRADE_CENTER
     db SS_ANNE_1,SS_ANNE_2,SS_ANNE_3,SS_ANNE_4,SS_ANNE_5,SS_ANNE_6,SS_ANNE_7,SS_ANNE_8,SS_ANNE_9,SS_ANNE_10,DRATINI_CAVE
     db SAFARI_ZONE_REST_HOUSE_1,SAFARI_ZONE_REST_HOUSE_2,SAFARI_ZONE_REST_HOUSE_3,SAFARI_ZONE_REST_HOUSE_4,SAFARI_ZONE_SECRET_HOUSE
     db $ff ; terminator
@@ -32856,8 +32932,8 @@ PKMNLeague: ; 17ed2 (5:7ed2)
     ld a,$9B
     call PlaySound  ;XXX: play sound or stop music
     call WaitForSoundToFinish  ;XXX: wait for sound to be done
-    ld b,BANK(Func_7657e)
-    ld hl,Func_7657e
+    ld b,BANK(PKMNLeaguePC)
+    ld hl,PKMNLeaguePC
     call Bankswitch
     jr ReloadMainMenu
 BillsPC: ; 17ee4 (5:7ee4)
@@ -35462,6 +35538,8 @@ IndigoPlateauLobbyScript: ; 19c5b (6:5c5b)
 ; wispnote - This event was probably ment to be reset on Route 23.
 ;    ld hl,$d869
 ;    res 7,[hl] ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
+    call CheckHallOfFameWin
+    ret nz
     ld hl,$d734
     bit 1,[hl]
     res 1,[hl]
@@ -37119,8 +37197,7 @@ CheckJumpExceptionFlag:
     ; Check B pressed Flag
     bit 1,[hl] ; EX_B
     jr z,.skipBCheck
-    ld a,[$d5a2] ; hall of fame
-    and a
+    call CheckHallOfFameWin
     jr z,.fail
     ld a,[H_CURRENTPRESSEDBUTTONS]
     bit 1,a
@@ -65465,9 +65542,9 @@ Func_41852: ; 41852 (10:5852)
 Func_4188a: ; 4188a (10:588a)
     ld b,$c
     call GoPAL_SET
-    ld b,BANK(Func_4538)
-    ld hl,Func_4538
-    call Bankswitch ; indirect jump to Func_4538 (4538 (1:4538))
+    ld b,BANK(LoadCopyrightAndTextBoxTiles)
+    ld hl,LoadCopyrightAndTextBoxTiles
+    call Bankswitch ; indirect jump to LoadCopyrightAndTextBoxTiles (4538 (1:4538))
     ld a,$e4
     ld [rBGP],a ; $FF00+$47
     ld c,$b4
@@ -66264,6 +66341,8 @@ LavenderTownText9: ; 44164 (11:4164)
     TX_FAR _LavenderTownText9
     db "@"
 
+; ───────────────────────────────────────
+
 DisplayDexRating: ; 44169 (11:4169)
     ld hl,wPokedexSeen
     ld b,wPokedexSeenEnd - wPokedexSeen
@@ -66275,7 +66354,12 @@ DisplayDexRating: ; 44169 (11:4169)
     call CountSetBits
     ld a,[$D11E] ; result of CountSetBits (own count)
     ld [$FFDC],a
-    ld hl,DexRatingsTable
+    ld a,[$D747]
+    bit 3,a
+    res 3,a
+    ld [$D747],a
+    ret nz ; from hall of fame
+    ld hl,.DexRatingsTable
 .findRating
     ld a,[hli]
     ld b,a
@@ -66289,13 +66373,8 @@ DisplayDexRating: ; 44169 (11:4169)
     ld a,[hli]
     ld h,[hl]
     ld l,a ; load text pointer into hl
-    ld a,[$D747]
-    bit 3,a
-    res 3,a
-    ld [$D747],a
-    jr nz,.label3
     push hl
-    ld hl,UnnamedText_441cc
+    ld hl,.UnnamedText_441cc
     call PrintText
     pop hl
     call PrintText
@@ -66303,126 +66382,97 @@ DisplayDexRating: ; 44169 (11:4169)
     ld hl,Func_7d13b
     call Bankswitch
     jp WaitForTextScrollButtonPress ; wait for button press
-.label3
-    ld de,$CC5B
-    ld a,[$FFDB]
-    ld [de],a
-    inc de
-    ld a,[$FFDC]
-    ld [de],a
-    inc de
-.label4
-    ld a,[hli]
-    cp a,$50
-    jr z,.label5
-    ld [de],a
-    inc de
-    jr .label4
-.label5
-    ld [de],a
-    ret
 
-UnnamedText_441cc: ; 441cc (11:41cc)
+.UnnamedText_441cc
     TX_FAR _UnnamedText_441cc
     db "@"
 
-DexRatingsTable: ; 441d1 (11:41d1)
+.DexRatingsTable
     db 10
-    dw UnnamedText_44201
+    dw .UnnamedText_44201
     db 20
-    dw UnnamedText_44206
+    dw .UnnamedText_44206
     db 30
-    dw UnnamedText_4420b
+    dw .UnnamedText_4420b
     db 40
-    dw UnnamedText_44210
+    dw .UnnamedText_44210
     db 50
-    dw UnnamedText_44215
+    dw .UnnamedText_44215
     db 60
-    dw UnnamedText_4421a
+    dw .UnnamedText_4421a
     db 70
-    dw UnnamedText_4421f
+    dw .UnnamedText_4421f
     db 80
-    dw UnnamedText_44224
+    dw .UnnamedText_44224
     db 90
-    dw UnnamedText_44229
+    dw .UnnamedText_44229
     db 100
-    dw UnnamedText_4422e
+    dw .UnnamedText_4422e
     db 110
-    dw UnnamedText_44233
+    dw .UnnamedText_44233
     db 120
-    dw UnnamedText_44238
+    dw .UnnamedText_44238
     db 130
-    dw UnnamedText_4423d
+    dw .UnnamedText_4423d
     db 140
-    dw UnnamedText_44242
+    dw .UnnamedText_44242
     db 150
-    dw UnnamedText_44247
+    dw .UnnamedText_44247
     db 255
-    dw UnnamedText_4424c
+    dw .UnnamedText_4424c
 
-UnnamedText_44201: ; 44201 (11:4201)
+.UnnamedText_44201
     TX_FAR _UnnamedText_44201
     db "@"
-
-UnnamedText_44206: ; 44206 (11:4206)
+.UnnamedText_44206
     TX_FAR _UnnamedText_44206
     db "@"
-
-UnnamedText_4420b: ; 4420b (11:420b)
+.UnnamedText_4420b
     TX_FAR _UnnamedText_4420b
     db "@"
-
-UnnamedText_44210: ; 44210 (11:4210)
+.UnnamedText_44210
     TX_FAR _UnnamedText_44210
     db "@"
-
-UnnamedText_44215: ; 44215 (11:4215)
+.UnnamedText_44215
     TX_FAR _UnnamedText_44215
     db "@"
-
-UnnamedText_4421a: ; 4421a (11:421a)
+.UnnamedText_4421a
     TX_FAR _UnnamedText_4421a
     db "@"
-
-UnnamedText_4421f: ; 4421f (11:421f)
+.UnnamedText_4421f
     TX_FAR _UnnamedText_4421f
     db "@"
-
-UnnamedText_44224: ; 44224 (11:4224)
+.UnnamedText_44224
     TX_FAR _UnnamedText_44224
     db "@"
-
-UnnamedText_44229: ; 44229 (11:4229)
+.UnnamedText_44229
     TX_FAR _UnnamedText_44229
     db "@"
-
-UnnamedText_4422e: ; 4422e (11:422e)
+.UnnamedText_4422e
     TX_FAR _UnnamedText_4422e
     db "@"
-
-UnnamedText_44233: ; 44233 (11:4233)
+.UnnamedText_44233
     TX_FAR _UnnamedText_44233
     db "@"
-
-UnnamedText_44238: ; 44238 (11:4238)
+.UnnamedText_44238
     TX_FAR _UnnamedText_44238
     db "@"
-
-UnnamedText_4423d: ; 4423d (11:423d)
+.UnnamedText_4423d
     TX_FAR _UnnamedText_4423d
     db "@"
-
-UnnamedText_44242: ; 44242 (11:4242)
+.UnnamedText_44242
     TX_FAR _UnnamedText_44242
     db "@"
-
-UnnamedText_44247: ; 44247 (11:4247)
+.UnnamedText_44247
     TX_FAR _UnnamedText_44247
     db "@"
-
-UnnamedText_4424c: ; 4424c (11:424c)
+.UnnamedText_4424c
     TX_FAR _UnnamedText_4424c
     db "@"
+
+; ───────────────────────────────────────
+
+SECTION "ViridianPokecenter_h",ROMX[$4251],BANK[$11]
 
 ViridianPokecenter_h: ; 0x44251 to 0x4425d (12 bytes) (bank=11) (id=41)
     db $06 ; tileset
@@ -70127,7 +70177,7 @@ Func_46a01: ; 46a01 (11:6a01)
     ld [$FF00+$ea],a
     ret
 
-HiddenObjectMaps: ; 46a40 (11:6a40)
+HiddenObjectMaps:
     db REDS_HOUSE_2F
     db BLUES_HOUSE
     db OAKS_LAB
@@ -70214,9 +70264,10 @@ HiddenObjectMaps: ; 46a40 (11:6a40)
     db CERULEAN_CITY
     db ROUTE_4
     db ROUTE_15_GATE_2F
+    db HALL_OF_FAME
     db $FF
 
-HiddenObjectPointers: ; 46a96 (11:6a96)
+HiddenObjectPointers:
 ; each of these pointers is for the corresponding map in HiddenObjectMaps
     dw RedsHouse2FHiddenObjects
     dw BluesHouseHiddenObjects
@@ -70304,6 +70355,12 @@ HiddenObjectPointers: ; 46a96 (11:6a96)
     dw CeruleanCityHiddenObjects
     dw Route4HiddenObjects
     dw B9HiddenObjects
+    dw HallOfFameRoomHiddenObjects
+
+HallOfFameRoomHiddenObjects:
+    db 01,04,$04 ; Y,X,XXX
+    dbw BANK(UseHallOfFamePC),UseHallOfFamePC
+    db $FF
 
 SECTION "RedsHouse2FHiddenObjects",ROMX[$6b5a],BANK[$11]
 
@@ -76437,7 +76494,7 @@ LoadSAVCheckSum2Predef:                    NEW_PREDEF LoadSAVCheckSum2          
 LoadSAVPredef:                             NEW_PREDEF LoadSAV                             ; $52
 SaveSAVtoSRAM1Predef:                      NEW_PREDEF SaveSAVtoSRAM1                      ; $53
 Predef54Predef:                            NEW_PREDEF Predef54                            ; $54
-Func_7405cPredef:                          NEW_PREDEF Func_7405c                          ; $55
+HallOfFamePCPredef:                        NEW_PREDEF HallOfFamePC                        ; $55
 DisplayDexRatingPredef:                    NEW_PREDEF DisplayDexRating                    ; $56
 _DoFlyOrTeleportAwayGraphicsPredef:        NEW_PREDEF _DoFlyOrTeleportAwayGraphics        ; $57
 Func_70510Predef:                          NEW_PREDEF Func_70510                          ; $58
@@ -76469,6 +76526,7 @@ UndoBurnParStatsPredef:                    NEW_PREDEF UndoBurnParStats          
 DrawHUDsAndHPBarsPredef:                   NEW_PREDEF DrawHUDsAndHPBars                   ; $72
 GetAttackAnimationPointers_Predef:         NEW_PREDEF GetAttackAnimationPointers_         ; $73
 _IsItemInBagOrBoxPredef:                   NEW_PREDEF _IsItemInBagOrBox                   ; $74
+TryHallOfFameRematchPredef:                NEW_PREDEF TryHallOfFameRematch                ; $75
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -89001,7 +89059,7 @@ Lance_h: ; 0x5a2a2 to 0x5a2ae (12 bytes) (id=113)
     dw LanceObject ; objects
 
 LanceScript: ; 5a2ae (16:62ae)
-    call CustomContinuesScript ; call LanceScript_5a2c4
+    call LanceScript_5a2c4 ; call CustomContinuesScript ; call LanceScript_5a2c4
     call EnableAutoTextBoxDrawing
     ld hl,LanceTrainerHeaders
     ld de,LanceScriptPointers
@@ -89010,107 +89068,140 @@ LanceScript: ; 5a2ae (16:62ae)
     ld [W_LANCECURSCRIPT],a
     ret
 
-LanceScript_5a2c4: ; 5a2c4 (16:62c4)
+LanceScript_5a2c4:
     ld hl,$d126
     bit 5,[hl]
     res 5,[hl]
     ret z
     ld a,[$d866]
-    bit 7,a
-    jr nz,.asm_5a2da
-    ld a,$31
-    ld b,$32
-    jp Func_5a2de
-.asm_5a2da
-    ld a,$72
-    ld b,$73
+    bit 1,a
+    ld a,$24
+    jr z,.skip
+    ld a,$5
+.skip
+    jp HallOfFame_ReplaceTileBlock_Bank16
 
-Func_5a2de: ; 5a2de (16:62de)
-    push bc
-    ld [$d09f],a
-    ld bc,$602
-    call Func_5a2f0
-    pop bc
-    ld a,b
-    ld [$d09f],a
-    ld bc,$603
+;LanceScript_5a2c4: ; 5a2c4 (16:62c4)
+;    ld hl,$d126
+;    bit 5,[hl]
+;    res 5,[hl]
+;    ret z
+;    ld a,[$d866]
+;    bit 7,a
+;    jr nz,.asm_5a2da
+;    ld a,$31
+;    ld b,$32
+;    jp Func_5a2de
+;.asm_5a2da
+;    ld a,$72
+;    ld b,$73
 
-Func_5a2f0: ; 5a2f0 (16:62f0)
-    PREDEF_JUMP ReplaceTileBlock
+;Func_5a2de: ; 5a2de (16:62de)
+;    push bc
+;    ld [$d09f],a
+;    ld bc,$602
+;    call Func_5a2f0
+;    pop bc
+;    ld a,b
+;    ld [$d09f],a
+;    ld bc,$603
 
-Func_5a2f5: ; 5a2f5 (16:62f5)
+;Func_5a2f0: ; 5a2f0 (16:62f0)
+;    PREDEF_JUMP ReplaceTileBlock
+
+SECTION "Func_5a2f5",ROMX[$62f5],BANK[$16]
+
+Func_5a2f5:
     xor a
     ld [W_LANCECURSCRIPT],a
     ret
 
-LanceScriptPointers: ; 5a2fa (16:62fa)
+LanceScriptPointers:
     dw LanceScript0
     dw DisplayEnemyTrainerTextAndStartBattle
     dw LanceScript2
     dw LanceScript3
     dw LanceScript4
 
-LanceScript4: ; 5a304 (16:6304)
+LanceScript4:
     ret
 
-LanceScript0: ; 5a305 (16:6305)
-    ld a,[$d866]
-    bit 6,a
-    ret nz
-    ld hl,CoordsData_5a33e
-    call ArePlayerCoordsInArray
-    jp nc,CheckFightingMapTrainers
-    xor a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,[wWhichTrade] ; $cd3d
-    cp $3
-    jr nc,.asm_5a325
-    ld a,$1
-    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    jp DisplayTextID
-.asm_5a325
-    cp $5
-    jr z,Func_5a35b
-    ld hl,$d866
-    bit 7,[hl]
-    set 7,[hl]
-    ret nz
-    ld hl,$d126
-    set 5,[hl]
-    ld a,$ad
-    call PlaySound
-    jp LanceScript_5a2c4
+;LanceScript0: ; 5a305 (16:6305)
+;    ld a,[$d866]
+;    bit 1,a
+;    ret nz
+;    ld hl,CoordsData_5a33e
+;    call ArePlayerCoordsInArray
+;    jp nc,CheckFightingMapTrainers
+;    xor a
+;    ld [H_CURRENTPRESSEDBUTTONS],a
+;    ld a,[wWhichTrade] ; $cd3d
+;    cp $3
+;    jr nc,.asm_5a325
+;    ld a,$1
+;    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+;    jp DisplayTextID
+;.asm_5a325
+;    cp $5
+;    jr z,Func_5a35b
+;    ld hl,$d866
+;    bit 7,[hl]
+;    set 7,[hl]
+;    ret nz
+;    ld hl,$d126
+;    set 5,[hl]
+;    ld a,$ad
+;    call PlaySound
+;    jp LanceScript_5a2c4
+;
+;CoordsData_5a33e: ; 5a33e (16:633e)
+;    db $01,$05
+;    db $02,$06
+;    db $0B,$05
+;    db $0B,$06
+;    db $15,$05
+;    db $FF
 
-CoordsData_5a33e: ; 5a33e (16:633e)
-    db $01,$05
-    db $02,$06
-    db $0B,$05
-    db $0B,$06
-    db $15,$05
-    db $FF
-
-LanceScript2: ; 5a349 (16:6349)
+LanceScript2:
     call EndTrainerBattle
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
     jp z,Func_5a2f5
     ld a,$1
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    jp DisplayTextID
+    call DisplayTextID
+    call HallOfFame_HealParty_Bank16
+    call CheckHallOfFameWin
+    ret nz
+    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 0
+    inc a
+    ld [W_GARYCURSCRIPT],a ; 1
+    ld a,$D6 ; Oak in Champion Room
+    call .Hide
+    ld a,$FB ; Gary in Champion Room
+    call .Show
+    ld a,$FC ; Oak in Hall of Fame Room
+    ; fall through
+.Show
+    ld [$CC4D],a
+    PREDEF_JUMP AddMissableObject
+.Hide
+    ld [$CC4D],a
+    PREDEF_JUMP RemoveMissableObject
 
-Func_5a35b: ; 5a35b (16:635b)
-    ld a,$ff
-    ld [wJoypadForbiddenButtonsMask],a
-    ld hl,$ccd3
-    ld de,RLEList_5a379
-    call DecodeRLEList
-    dec a
-    ld [$cd38],a
-    call StartSimulatingJoypadStates
-    ld a,$3
-    ld [W_LANCECURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
-    ret
+;Func_5a35b: ; 5a35b (16:635b)
+;    ld a,$ff
+;    ld [wJoypadForbiddenButtonsMask],a
+;    ld hl,$ccd3
+;    ld de,RLEList_5a379
+;    call DecodeRLEList
+;    dec a
+;    ld [$cd38],a
+;    call StartSimulatingJoypadStates
+;    ld a,$3
+;    ld [W_LANCECURSCRIPT],a
+;    ld [W_CURMAPSCRIPT],a
+;    ret
 
 RLEList_5a379: ; 5a379 (16:6379)
     db $40,$0A
@@ -89130,11 +89221,12 @@ LanceScript3: ; 5a382 (16:6382)
     ld [W_CURMAPSCRIPT],a
     ret
 
-LanceTextPointers: ; 5a395 (16:6395)
+LanceTextPointers:
     dw LanceText1
+    dw LanceText2
 
-LanceTrainerHeaders: ; 5a397 (16:6397)
-LanceTrainerHeader0: ; 5a397 (16:6397)
+LanceTrainerHeaders:
+LanceTrainerHeader0:
     db $1 ; flag's bit
     db ($0 << 4) ; trainer's view range
     dw $d866 ; flag's byte
@@ -89145,47 +89237,37 @@ LanceTrainerHeader0: ; 5a397 (16:6397)
 
     db $ff
 
-LanceText1: ; 5a3a4 (16:63a4)
+LanceText1:
     db $08 ; asm
+    ld de,TextScriptEnd ; Return Pointer
+    push de             ; ...
+    ld b,BANK(LanceTrainerHeader0)
     ld hl,LanceTrainerHeader0
-    call TalkToTrainer
-    jp TextScriptEnd
+    ld de,W_LANCECURSCRIPT
+    PREDEF TryHallOfFameRematch
+    push de ; run return pointer
+    ret     ; ...
 
-LanceBeforeBattleText: ; 5a3ae (16:63ae)
+LanceText2:
+    TX_FAR _UnnamedText_763d2
+    db "@"
+
+LanceBeforeBattleText:
     TX_FAR _LanceBeforeBattleText
     db "@"
 
-LanceEndBattleText: ; 5a3b3 (16:63b3)
+LanceEndBattleText:
     TX_FAR _LanceEndBattleText
     db "@"
 
-LanceAfterBattleText: ; 5a3b8 (16:63b8)
+LanceAfterBattleText:
     TX_FAR _LanceAfterBattleText ; 0x85e9e
-    db $8
-    ld hl,$d866
-    set 6,[hl]
-    jp TextScriptEnd
+    db "@"
 
-LanceObject: ; 0x5a3c5 (size=36)
-    db $3 ; border tile
-
-    db $3 ; warps
-    db $15,$05,$2,LORELEIS_ROOM
-    db $0,$5,$0,CHAMPIONS_ROOM
-    db $0,$6,$0,CHAMPIONS_ROOM
-
-    db $0 ; signs
-
-    db $1 ; people
-    db SPRITE_LANCE,$1 + 4,$6 + 4,$ff,$d0,$41,LANCE,$1 ; trainer
-
-    ; warp-to
-    EVENT_DISP $d,$15,$05 ; LORELEIS_ROOM
-    EVENT_DISP $d,$0,$5 ; CHAMPIONS_ROOM
-    EVENT_DISP $d,$0,$6 ; CHAMPIONS_ROOM
-
-LanceBlocks: ; 5a3e9 (16:63e9)
+LanceBlocks:
     INCBIN "maps/lance.blk"
+
+SECTION "HallofFameRoom_h",ROMX[$6492],BANK[$16]
 
 HallofFameRoom_h: ; 0x5a492 to 0x5a49e (12 bytes) (id=118)
     db $07 ; tileset
@@ -89215,47 +89297,7 @@ HallofFameRoomScriptPointers: ; 5a4b2 (16:64b2)
 HallofFameRoomScript3: ; 5a4ba (16:64ba)
     ret
 
-HallofFameRoomScript2: ; 5a4bb (16:64bb)
-    call Delay3
-    ld a,[$d358]
-    push af
-    xor a
-    ld [wJoypadForbiddenButtonsMask],a
-    PREDEF Func_7405c
-    pop af
-    ld [$d358],a
-    ld hl,W_FLAGS_D733
-    res 1,[hl]
-    inc hl
-    set 0,[hl]
-    xor a
-    ld hl,W_LORELEICURSCRIPT
-    ld [hli],a
-    ld [hli],a
-    ld [hl],a
-    ld [W_LANCECURSCRIPT],a
-    ld [W_HALLOFFAMEROOMCURSCRIPT],a
-    ld hl,$d863
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hl],a
-    xor a
-    ld [W_HALLOFFAMEROOMCURSCRIPT],a
-    ld a,$0
-    call SetLastBlackoutMapAfterLeague ; ld [wLastBlackoutMap],a
-    ld b,BANK(SaveSAVtoSRAM)
-    ld hl,SaveSAVtoSRAM
-    call Bankswitch
-    ld b,$5
-.asm_5a4ff
-    ld c,$78
-    call DelayFrames
-    dec b
-    jr nz,.asm_5a4ff ; 0x5a505 $f8
-    call WaitForTextScrollButtonPress
-    jp InitGame
+SECTION "HallofFameRoomScript0",ROMX[$650d],BANK[$16]
 
 HallofFameRoomScript0: ; 5a50d (16:650d)
     ld a,$ff
@@ -89402,11 +89444,6 @@ Route16Snorlax:
     ld [W_CURMAPSCRIPT],a
     jp TextScriptEnd
 
-SetLastBlackoutMapAfterLeague:
-    ld [wLastBlackoutMap],a
-    ld [wLastBlackoutAdventureMap],a
-    ret
-
 Route12Text1:
     TX_FAR _Route12Text1
     db $08 ; asm
@@ -89426,20 +89463,22 @@ GetLoadedMonHeader:
     ld [wAlternateFormIndex],a
     jp GetMonHeader
 
-CustomContinuesScript:
-    call LanceScript_5a2c4
-    ; CheckHealAfterLance
-    ld hl,$d126
-    bit 6,[hl]
-    res 6,[hl]
-    ret z
-    ld a,[$d866]
-    bit 6,a
-    ret z
-    PREDEF HealParty
-    call GBFadeOut2
-    call Delay3
-    jp GBFadeIn2
+;CustomContinuesScript:
+;    call LanceScript_5a2c4
+;    ; CheckHealAfterLance
+;    ld hl,$d126
+;    bit 6,[hl]
+;    res 6,[hl]
+;    ret z
+;    ld a,[$d866]
+;    bit 1,a
+;    ret z
+;    call CheckHallOfFameWin
+;    ret nz
+;    PREDEF HealParty
+;    call GBFadeOut2
+;    call Delay3
+;    jp GBFadeIn2
 
 Route10Object:
     db $2c ; border tile
@@ -89490,6 +89529,175 @@ ResetRedBall:
     ld [hli],a
     ld [hl],a
     ret
+
+LanceObject:
+    db $3 ; border tile
+
+    db $4 ; warps
+    db $b,$4,$2,LORELEIS_ROOM
+    db $b,$5,$3,LORELEIS_ROOM
+    db $0,$4,$0,CHAMPIONS_ROOM
+    db $0,$5,$1,CHAMPIONS_ROOM
+
+    db $0 ; signs
+
+    db $1 ; people
+    db SPRITE_LANCE,$2 + 4,$5 + 4,$ff,$d0,$41,LANCE,$1 ; trainer
+
+    ; warp-to
+    EVENT_DISP LANCES_ROOM_WIDTH,$b,$4 ; LORELEIS_ROOM
+    EVENT_DISP LANCES_ROOM_WIDTH,$b,$5 ; LORELEIS_ROOM
+    EVENT_DISP LANCES_ROOM_WIDTH,$0,$4 ; CHAMPIONS_ROOM
+    EVENT_DISP LANCES_ROOM_WIDTH,$0,$5 ; CHAMPIONS_ROOM
+
+HallOfFame_HealParty_Bank16:
+    PREDEF HealParty
+    call GBFadeOut2
+    call Delay3
+    jp GBFadeIn2
+
+HallOfFame_ReplaceTileBlock_Bank16:
+    ld [$d09f],a
+    ld bc,$2
+    PREDEF_JUMP ReplaceTileBlock
+
+LanceScript0:
+    ld hl,.CoordsData_5a33e
+    call ArePlayerCoordsInArrayBeforeHOFWin
+    jp nc,CheckFightingMapTrainers
+    xor a
+    ld [H_NEWLYPRESSEDBUTTONS],a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld [$ccd3],a
+    ld [$cd38],a
+    ld a,[wWhichTrade] ; $cd3d
+    cp $3
+    jr c,.asm_7635d
+    ld hl,$d866
+    bit 7,[hl]
+    set 7,[hl]
+    jr z,asm_7631d_Lance
+.asm_7635d
+    ld a,$2
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    call DisplayTextID
+    ld a,$40
+    ld [$ccd3],a
+    ld a,$1
+    ld [$cd38],a
+    call StartSimulatingJoypadStates
+    ld a,$3
+    ld [W_LANCECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+.CoordsData_5a33e
+    db $0A,$04
+    db $0A,$05
+    db $0B,$04
+    db $0B,$05
+    db $FF
+
+asm_7631d_Lance:
+    ld hl,$ccd3
+    ld a,$40
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+    ld a,$6
+    ld [$cd38],a
+    call StartSimulatingJoypadStates
+    ld a,$3
+    ld [W_LANCECURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+; ───────────────────────────────────────────
+
+UseHallOfFamePC:
+    ld a,[$C109]
+    cp $04
+    ret nz
+    ld a,2
+    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; HallofFameRoomScript2
+    ret
+
+HallofFameRoomScript2:
+    call Delay3
+    ld a,[$d358]
+    push af
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a
+    PREDEF HealParty
+    PREDEF HallOfFamePC
+    pop af
+    ld [$d358],a
+    ld hl,W_FLAGS_D733
+    res 1,[hl]
+    inc hl
+    set 0,[hl]
+    xor a
+    ld hl,W_LORELEICURSCRIPT
+    ld [hli],a ; W_LORELEICURSCRIPT ; 0
+    ld [hli],a ; W_BRUNOCURSCRIPT ; 0
+    ld [hl],a  ; W_AGATHACURSCRIPT ; 0
+    ld [W_LANCECURSCRIPT],a ; 0
+    ld [W_GARYCURSCRIPT],a ; 0
+    ld hl,$d863
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+    ld a,$3
+    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 3
+    call CheckHallOfFameWin
+    call z,.HandleMissableSprite
+    call .HandleFlagRematchAndNewHallOfFameCounter
+    call .Wait
+    call WaitForTextScrollButtonPress
+    call GBFadeOut2
+    ld a,8
+    call StopMusic
+    ld c,50
+    call DelayFrames
+    ld b,BANK(SpecialRestartAfterHallOfFame)
+    ld hl,SpecialRestartAfterHallOfFame
+    jp Bankswitch
+
+.HandleMissableSprite
+    ld a,$D6 ; Oak in Champion Room
+    call .Hide
+    ld a,$FB ; Gary in Champion Room
+    call .Hide
+    ld a,$FC ; Oak in Hall of Fame Room
+    ; fall through
+.Hide
+    ld [$CC4D],a
+    PREDEF_JUMP RemoveMissableObject
+
+.HandleFlagRematchAndNewHallOfFameCounter
+    ld hl,wGymLeaderRematch
+    ld [hl],%01111111
+    ld hl,$d5a2
+    ld a,[hl]
+    inc a
+    ret z
+    inc [hl]
+    ret
+
+.Wait
+    ld b,$5
+.loop
+    ld c,$78
+    call DelayFramesCredits
+    dec b
+    jr nz,.loop
+    ret
+
+; ───────────────────────────────────────────
 
 SECTION "bank17",ROMX,BANK[$17]
 
@@ -98058,11 +98266,11 @@ GameFreakShootingStarOAMData: ; 70180 (1c:4180)
 FallingStar: ; 70190 (1c:4190)
     INCBIN "gfx/falling_star.2bpp"
 
-HallOfFameDisplayPkmn: ; 701a0 (1c:41a0)
-    call Func_70423
+AnimateHallOfFame: ; 701a0 (1c:41a0)
+    call HoFFadeOutScreenAndMusic
     call ClearScreen
     ld c,$64
-    call DelayFrames
+    call DelayFramesCredits
     call LoadFontTilePatterns
     call LoadTextBoxTilePatterns
     call DisableLCD
@@ -98085,12 +98293,6 @@ HallOfFameDisplayPkmn: ; 701a0 (1c:41a0)
     ld [$cd40],a
     inc a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    call ResetGymLeaderRematchAfterHallOfFame ; ld hl,$d5a2
-    ld a,[hl]
-    inc a
-    jr z,.asm_701eb
-    inc [hl]
-.asm_701eb
     ld a,$90
     ld [$FF00+$b0],a
     ld c,BANK(Music_HallOfFame)
@@ -98113,10 +98315,10 @@ HallOfFameDisplayPkmn: ; 701a0 (1c:41a0)
     call AddNTimes
     ld a,[hl]
     ld [$cd3f],a
-    call HackForInsertDVInHallOfFameDataFirstStep ; call Func_70278
-    call Func_702e1
+    call HackForInsertDVInHallOfFameDataFirstStep ; call HoFShowMonOrPlayer
+    call HoFDisplayAndRecordMonInfo
     ld c,$50
-    call DelayFrames
+    call DelayFramesCredits
     FuncCoord 2,13 ; $c4a6
     ld hl,Coord
     ld b,$3
@@ -98124,10 +98326,10 @@ HallOfFameDisplayPkmn: ; 701a0 (1c:41a0)
     call TextBoxBorder
     FuncCoord 4,15 ; $c4d0
     ld hl,Coord
-    ld de,HallOfFameText ; $426b
+    ld de,.HallOfFameText ; $426b
     call PlaceString
     ld c,$b4
-    call DelayFrames
+    call DelayFramesCredits
     call GBFadeOut2
     pop bc
     pop hl
@@ -98139,24 +98341,25 @@ HallOfFameDisplayPkmn: ; 701a0 (1c:41a0)
     ld bc,$10
     call AddNTimes
     ld [hl],$ff
-    call Func_73b0d
+    call SaveHallOfFameTeams
     xor a
     ld [wWhichTrade],a ; $cd3d
     inc a
     ld [$cd40],a
-    call Func_70278_PlusFlag ; Denim,funzione per flaggare questo istante di chiamata ; call Func_70278
-    call Func_70377
-    call Func_70423
+    call HoFShowMonOrPlayer_PlusFlag ; Denim,funzione per flaggare questo istante di chiamata ; call HoFShowMonOrPlayer
+    call HoFDisplayPlayerStats
+    call HoFFadeOutScreenAndMusic
     xor a
     ld [$FF00+$b0],a
     ld hl,rLCDC ; $ff40
     res 3,[hl]
     ret
-
-HallOfFameText: ; 7026b (1c:426b)
+.HallOfFameText
     db "HALL OF FAME@"
 
-Func_70278: ; 70278 (1c:4278)
+SECTION "HoFShowMonOrPlayer",ROMX[$4278],BANK[$1C]
+
+HoFShowMonOrPlayer: ; 70278 (1c:4278)
     call ClearScreen
     ld a,$d0
     ld [$FF00+$af],a
@@ -98209,7 +98412,7 @@ Func_70278: ; 70278 (1c:4278)
     jr nz,.asm_702d5
     ret
 
-Func_702e1: ; 702e1 (1c:42e1)
+HoFDisplayAndRecordMonInfo: ; 702e1 (1c:42e1)
     ld a,[$cd3e]
     ld hl,W_PARTYMON1NAME ; $d2b5
     call GetPartyMonName
@@ -98240,7 +98443,7 @@ Func_702f0: ; 702f0 (1c:42f0)
     ld hl,Coord
     PREDEF PrintTypes
     ld a,[wWhichTrade] ; $cd3d
-    jp PlayCry
+    jp PlayCryWithoutWaitForSoundToFinish
 
 HoFMonInfoText: ; 70329 (1c:4329)
 ;    db "LEVEL/",$4e,"TYPE1/",$4e,"TYPE2/@" ; Denim
@@ -98271,7 +98474,7 @@ Func_7036d: ; 7036d (1c:436d)
     ld hl,Coord
     PREDEF_JUMP Func_79dda
 
-Func_70377: ; 70377 (1c:4377)
+HoFDisplayPlayerStats: ; 70377 (1c:4377)
     ld hl,$d747
     set 3,[hl]
     PREDEF DisplayDexRating
@@ -98291,7 +98494,7 @@ Func_70377: ; 70377 (1c:4377)
     call PlaceString
     FuncCoord 1,6 ; $c419
     ld hl,Coord
-    ld de,HoFPlayTimeText ; $43ea
+    ld de,.HoFPlayTimeText ; $43ea
     call PlaceString
     FuncCoord 5,7 ; $c431
     ld hl,Coord
@@ -98305,37 +98508,25 @@ Func_70377: ; 70377 (1c:4377)
     call PrintNumber
     FuncCoord 1,9 ; $c455
     ld hl,Coord
-    ld de,HoFMoneyText ; $43f4
+    ld de,.HoFMoneyText ; $43f4
     call PlaceString
     FuncCoord 4,10 ; $c46c
     ld hl,Coord
     ld de,wPlayerMoney ; $d347
     ld c,$a3
     call PrintBCDNumber
-    ld hl,UnnamedText_703fa ; $43fa
-    call Func_703e2
-    ld hl,UnnamedText_703ff ; $43ff
-    call Func_703e2
-    ld hl,$cc5d
-
-Func_703e2: ; 703e2 (1c:43e2)
+    ld hl,.UnnamedText_703fa
     call PrintText
-    ld c,$78
-    jp DelayFrames
-
-HoFPlayTimeText: ; 703ea (1c:43ea)
+    jp WaitForTextScrollButtonPress
+.HoFPlayTimeText
     db "PLAY TIME@"
-
-HoFMoneyText: ; 703f4 (1c:43f4)
+.HoFMoneyText
     db "MONEY@"
-
-UnnamedText_703fa: ; 703fa (1c:43fa)
+.UnnamedText_703fa
     TX_FAR _UnnamedText_703fa
     db "@"
 
-UnnamedText_703ff: ; 703ff (1c:43ff)
-    TX_FAR _UnnamedText_703ff
-    db "@"
+SECTION "Func_70404",ROMX[$4404],BANK[$1c]
 
 Func_70404: ; 70404 (1c:4404)
     ld hl,$cc5b
@@ -98352,7 +98543,7 @@ Func_70404: ; 70404 (1c:4404)
     ld bc,$b
     jp HackForInsertDVInHallOfFameDataSecondStep ; jp CopyData
 
-Func_70423: ; 70423 (1c:4423)
+HoFFadeOutScreenAndMusic: ; 70423 (1c:4423)
     ld a,$a
     ld [$cfc8],a
     ld [$cfc9],a
@@ -98537,12 +98728,6 @@ Func_70510: ; 70510 (1c:4510)
     call Func_706ae
     call LoadPlayerSpriteGraphics
     jr .asm_70558
-
-ResetGymLeaderRematchAfterHallOfFame:
-    ld hl,wGymLeaderRematch
-    ld [hl],%01111111
-    ld hl,$d5a2
-    ret
 
 SECTION "Unknown_70592",ROMX[$4592],BANK[$1c]
 
@@ -100975,7 +101160,7 @@ HackForInsertDVInHallOfFameDataFirstStep:
     ld [wAlternateFormIndex],a
     ld [wTempAlternateFormIndex],a
     pop hl
-    jp Func_70278
+    jp HoFShowMonOrPlayer
 
 HackForInsertDVInHallOfFameDataSecondStep:
     call CopyData
@@ -103421,11 +103606,11 @@ SAVCheckRandomID: ;$7ad1
     ld [$0000],a
     ret
 
-Func_73b0d: ; 73b0d (1c:7b0d)
+SaveHallOfFameTeams: ; 73b0d (1c:7b0d)
     ld a,[$d5a2]
-    dec a
+    nop ; dec a ; Counter Updated at the End
     cp $32
-    jr nc,.asm_73b28
+    jr nc,.shiftHOFTeams
     ld hl,$a598
     ld bc,$60
     call AddNTimes
@@ -103433,18 +103618,21 @@ Func_73b0d: ; 73b0d (1c:7b0d)
     ld d,h
     ld hl,$cc5b
     ld bc,$60
-    jr CopyToSRAM0
-.asm_73b28
+    jr HallOfFame_Copy
+
+.shiftHOFTeams
+; if the space designated for HOF teams is full, then shift all HOF teams to the next slot, making space for the new HOF team
+; this deletes the last HOF team though
     ld hl,$a5f8
     ld de,$a598
     ld bc,$1260
-    call CopyToSRAM0
+    call HallOfFame_Copy
     ld hl,$cc5b
     ld de,$b7f8
     ld bc,$60
-    jr CopyToSRAM0
+    jr HallOfFame_Copy
 
-Func_73b3f: ; 73b3f (1c:7b3f)
+LoadHallOfFameTeams: ; 73b3f (1c:7b3f)
     ld hl,$a598
     ld bc,$60
     ld a,[wWhichTrade] ; $cd3d
@@ -103452,7 +103640,8 @@ Func_73b3f: ; 73b3f (1c:7b3f)
     ld de,$cc5b
     ld bc,$60
     ; fallthrough
-CopyToSRAM0: ; 73b51 (1c:7b51)
+
+HallOfFame_Copy: ; 73b51 (1c:7b51)
     ld a,$a
     ld [$0],a
     ld a,$1
@@ -103979,13 +104168,13 @@ PalPacketStatMenu: ; Denim
     ds 7
 
 ; La seguente funzione serve a gestire il flag per la corretta palette del backsprite del player durante la sala d'onore
-Func_70278_PlusFlag: ; Denim,funzione per flaggare questo istante di chiamata ; call Func_70278
+HoFShowMonOrPlayer_PlusFlag: ; Denim,funzione per flaggare questo istante di chiamata ; call HoFShowMonOrPlayer
     push hl
     ld hl,wFlagBackSpritePlayerBit4
     set 4,[hl]
     set 5,[hl] ; wFlagBackFrontSpriteBit56
     pop hl
-    call Func_70278
+    call HoFShowMonOrPlayer
     push hl
     ld hl,wFlagBackSpritePlayerBit4
     res 4,[hl]
@@ -104307,6 +104496,10 @@ InGameTrade_BackupPlayerIVandAltForm:
     ; endhack
     jp GenRandom
 
+PlayCryWithoutWaitForSoundToFinish:
+    call GetCryData
+    jp PlaySound
+
 SECTION "bank1D",ROMX,BANK[$1D]
 
 CopycatsHouseF1Blocks: ; 74000 (1d:4000)
@@ -104326,10 +104519,10 @@ FuchsiaPokecenterBlocks: ; 74030 (1d:4030)
 CeruleanHouse2Blocks: ; 7404c (1d:404c)
     INCBIN "maps/ceruleanhouse2.blk"
 
-Func_7405c: ; 7405c (1d:405c)
-    ld b,BANK(HallOfFameDisplayPkmn)
-    ld hl,HallOfFameDisplayPkmn
-    call Bankswitch ; indirect jump to HallOfFameDisplayPkmn (701a0 (1c:41a0))
+HallOfFamePC: ; 7405c (1d:405c)
+    ld b,BANK(AnimateHallOfFame)
+    ld hl,AnimateHallOfFame
+    call Bankswitch
     call ClearScreen
     ld c,$64
     call DelayFrames
@@ -104358,11 +104551,11 @@ Func_7405c: ; 7405c (1d:405c)
     ld a,(Music_Credits - $4000) / 3
     call PlayMusic
     ld c,$80
-    call DelayFrames
+    call DelayFramesCredits
     xor a
     ld [wWhichTrade],a ; $cd3d
     ld [$cd3e],a
-    jp Func_7418e
+    jp Credits
 
 Func_740ba: ; 740ba (1d:40ba)
     ld hl,DataTable_74160 ; $4160
@@ -104504,7 +104697,7 @@ Func_74183: ; 74183 (1d:4183)
     ld a,$7f
     jp FillMemory
 
-Func_7418e: ; 7418e (1d:418e)
+Credits: ; 7418e (1d:418e)
     ld de,Unknown_74243 ; $4243
     push de
 .asm_74192
@@ -104559,8 +104752,8 @@ Func_7418e: ; 7418e (1d:418e)
 .asm_741dc
     ld c,$6e
 .asm_741de
-    call DelayFrames
-    call Func_740cb
+    call DelayFramesCredits
+    call Func_740cb_Skip
     jr .asm_74192
 .asm_741e6
     call Func_740ba
@@ -104569,14 +104762,16 @@ Func_7418e: ; 7418e (1d:418e)
 .asm_741ed
     ld c,$8c
 .asm_741ef
-    call DelayFrames
+    call DelayFramesCredits
     jr .asm_74192
 .asm_741f4
-    push de
-    ld b,BANK(Func_4541)
-    ld hl,Func_4541
-    call Bankswitch ; indirect jump to Func_4541 (4541 (1:4541))
-    pop de
+    ld c,$5
+    call DelayFrames
+    ld b,BANK(LoadCopyrightTiles)
+    ld hl,LoadCopyrightTiles
+    call Bankswitch ; indirect jump to LoadCopyrightTiles (4541 (1:4541))
+    ld c,$20
+    call DelayFrames
     pop de
     jr .asm_7419b
 .asm_74201
@@ -104598,9 +104793,7 @@ Func_7418e: ; 7418e (1d:418e)
     call PlaceString
     jp Func_740ba
 
-UnnamedText_74229: ; 74229 (1d:4229)
-    db $60," ",$62," ",$64,"  ",$64," ",$66," ",$68,"@"
-    db $61," ",$63," ",$65,"  ",$65," ",$67," ",$69,"@"
+SECTION "Unknown_74243",ROMX[$4243],BANK[$1d]
 
 Unknown_74243: ; 74243 (1d:4243)
 INCBIN "baserom.gbc",$74243,$742c3 - $74243
@@ -107847,24 +108040,7 @@ GaryScriptPointers: ; 75f31 (1d:5f31)
 GaryScript0: ; 75f47 (1d:5f47)
     ret
 
-GaryScript1: ; 75f48 (1d:5f48)
-    ld a,$ff
-    ld [wJoypadForbiddenButtonsMask],a
-    ld hl,$ccd3
-    ld de,RLEMovement75f63
-    call DecodeRLEList
-    dec a
-    ld [$cd38],a
-    call StartSimulatingJoypadStates
-    ld a,$2
-    ld [W_GARYCURSCRIPT],a
-    ret
-
-RLEMovement75f63: ; 75f63 (1d:5f63)
-    db $40,1
-    db $10,1
-    db $40,3
-    db $ff
+SECTION "GaryScript2",ROMX[$5f6a],BANK[$1d]
 
 GaryScript2: ; 75f6a (1d:5f6a)
     ld a,[$cd38]
@@ -108115,29 +108291,10 @@ GaryText5: ; 7612a (1d:612a)
     TX_FAR _UnnamedText_7612a
     db "@"
 
-GaryObject: ; 0x7612f (size=48)
-    db $3 ; border tile
-
-    db $4 ; warps
-    db $7,$3,$1,LANCES_ROOM
-    db $7,$4,$2,LANCES_ROOM
-    db $0,$3,$0,HALL_OF_FAME
-    db $0,$4,$0,HALL_OF_FAME
-
-    db $0 ; signs
-
-    db $2 ; people
-    db SPRITE_BLUE,$2 + 4,$4 + 4,$ff,$d0,$1 ; person
-    db SPRITE_OAK,$7 + 4,$3 + 4,$ff,$d1,$2 ; person
-
-    ; warp-to
-    EVENT_DISP $4,$7,$3 ; LANCES_ROOM
-    EVENT_DISP $4,$7,$4 ; LANCES_ROOM
-    EVENT_DISP $4,$0,$3 ; HALL_OF_FAME
-    EVENT_DISP $4,$0,$4 ; HALL_OF_FAME
-
-GaryBlocks: ; 7615f (1d:615f)
+GaryBlocks:
     INCBIN "maps/gary.blk"
+
+SECTION "Lorelei_h",ROMX[$616f],BANK[$1d]
 
 Lorelei_h: ; 0x7616f to 0x7617b (12 bytes) (id=245)
     db $07 ; tileset
@@ -108163,11 +108320,10 @@ LoreleiScript_76191: ; 76191 (1d:6191)
     ret z
     ld a,[$d863]
     bit 1,a
-    jr z,.skipOpenDoor
-    ld a,$5
-    jp HallOfFame_HealPartyAndOpenDoor
-.skipOpenDoor
     ld a,$24
+    jr z,.skip
+    ld a,$5
+.skip
     jp HallOfFame_ReplaceTileBlock
 
 SECTION "Func_761b6",ROMX[$61b6],BANK[$1d]
@@ -108204,7 +108360,7 @@ asm_761c6: ; 761c6 (1d:61c6)
     ret
 LoreleiScript0: ; 761e2 (1d:61e2)
     ld hl,CoordsData_76223
-    call ArePlayerCoordsInArray
+    call ArePlayerCoordsInArrayBeforeHOFWin
     jp nc,CheckFightingMapTrainers
     xor a
     ld [H_NEWLYPRESSEDBUTTONS],a
@@ -108249,6 +108405,7 @@ LoreleiScript3: ; 7622c (1d:622c)
     ld [W_LORELEICURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
     ret
+
 LoreleiScript2: ; 7623f (1d:623f)
     call EndTrainerBattle
     ld a,[W_ISINBATTLE] ; $d057
@@ -108256,7 +108413,7 @@ LoreleiScript2: ; 7623f (1d:623f)
     jp z,Func_761b6
     ld a,$1
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    jp DisplayTextID
+    jp HallOfFame_DisplayTextID_HealParty
 
 LoreleiTextPointers: ; 76251 (1d:6251)
     dw LoreleiText1
@@ -108274,11 +108431,7 @@ LoreleiTrainerHeader0: ; 76255 (1d:6255)
 
     db $ff
 
-LoreleiText1: ; 76262 (1d:6262)
-    db $08 ; asm
-    ld hl,LoreleiTrainerHeader0
-    call TalkToTrainer
-    jp TextScriptEnd
+SECTION "LoreleiBeforeBattleText",ROMX[$626c],BANK[$1d]
 
 LoreleiBeforeBattleText: ; 7626c (1d:626c)
     TX_FAR _LoreleiBeforeBattleText
@@ -108303,7 +108456,7 @@ LoreleiObject: ; 0x76280 (size=44)
     db $b,$4,$2,AGATHAS_ROOM
     db $b,$5,$3,AGATHAS_ROOM
     db $0,$4,$0,LANCES_ROOM
-    db $0,$5,$0,LANCES_ROOM
+    db $0,$5,$1,LANCES_ROOM
 
     db $0 ; signs
 
@@ -108344,11 +108497,10 @@ BrunoScript_762ec: ; 762ec (1d:62ec)
     call InitialilzeEliteFour
     ld a,[$d864]
     bit 1,a
-    jr z,.skipOpenDoor
-    ld a,$5
-    jp HallOfFame_HealPartyAndOpenDoor
-.skipOpenDoor
     ld a,$24
+    jr z,.skip
+    ld a,$5
+.skip
     jp HallOfFame_ReplaceTileBlock
 
 SECTION "Func_7630d",ROMX[$630d],BANK[$1d]
@@ -108386,7 +108538,7 @@ asm_7631d: ; 7631d (1d:631d)
 
 BrunoScript0: ; 76339 (1d:6339)
     ld hl,CoordsData_7637a
-    call ArePlayerCoordsInArray
+    call ArePlayerCoordsInArrayBeforeHOFWin
     jp nc,CheckFightingMapTrainers
     xor a
     ld [H_NEWLYPRESSEDBUTTONS],a
@@ -108439,7 +108591,7 @@ BrunoScript2: ; 76396 (1d:6396)
     jp z,Func_7630d
     ld a,$1
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    jp DisplayTextID
+    jp HallOfFame_DisplayTextID_HealParty
 
 BrunoTextPointers: ; 763a8 (1d:63a8)
     dw BrunoText1
@@ -108457,11 +108609,7 @@ BrunoTrainerHeader0: ; 763ac (1d:63ac)
 
     db $ff
 
-BrunoText1: ; 763b9 (1d:63b9)
-    db $08 ; asm
-    ld hl,BrunoTrainerHeader0
-    call TalkToTrainer
-    jp TextScriptEnd
+SECTION "BrunoBeforeBattleText",ROMX[$63c3],BANK[$1d]
 
 BrunoBeforeBattleText: ; 763c3 (1d:63c3)
     TX_FAR _BrunoBeforeBattleText
@@ -108526,11 +108674,10 @@ AgathaScript_76443: ; 76443 (1d:6443)
     ret z
     ld a,[$d865]
     bit 1,a
-    jr z,.skipOpenDoor
-    ld a,$e
-    jp HallOfFame_HealPartyAndOpenDoor
-.skipOpenDoor
     ld a,$3b
+    jr z,.skip
+    ld a,$e
+.skip
     jp HallOfFame_ReplaceTileBlock
 
 SECTION "Func_76464",ROMX[$6464],BANK[$1d]
@@ -108568,7 +108715,7 @@ asm_76474: ; 76474 (1d:6474)
 
 AgathaScript0: ; 76490 (1d:6490)
     ld hl,CoordsData_764d1
-    call ArePlayerCoordsInArray
+    call ArePlayerCoordsInArrayBeforeHOFWin
     jp nc,CheckFightingMapTrainers
     xor a
     ld [H_NEWLYPRESSEDBUTTONS],a
@@ -108621,17 +108768,14 @@ AgathaScript2: ; 764ed (1d:64ed)
     jp z,Func_76464
     ld a,$1
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call DisplayTextID
-    ld a,$1
-    ld [W_GARYCURSCRIPT],a
-    ret
+    jp HallOfFame_DisplayTextID_HealParty
 
-AgathaTextPointers: ; 76505 (1d:6505)
+AgathaTextPointers:
     dw AgathaText1
     dw AgathaText2
 
-AgathaTrainerHeaders: ; 76509 (1d:6509)
-AgathaTrainerHeader0: ; 76509 (1d:6509)
+AgathaTrainerHeaders:
+AgathaTrainerHeader0:
     db $1 ; flag's bit
     db ($0 << 4) ; trainer's view range
     dw $d865 ; flag's byte
@@ -108642,29 +108786,23 @@ AgathaTrainerHeader0: ; 76509 (1d:6509)
 
     db $ff
 
-AgathaText1: ; 76516 (1d:6516)
-    db $08 ; asm
-    ld hl,AgathaTrainerHeader0
-    call TalkToTrainer
-    jp TextScriptEnd
-
-AgathaBeforeBattleText: ; 76520 (1d:6520)
+AgathaBeforeBattleText:
     TX_FAR _AgathaBeforeBattleText
     db "@"
 
-AgathaEndBattleText: ; 76525 (1d:6525)
+AgathaEndBattleText:
     TX_FAR _AgathaEndBattleText
     db "@"
 
-AgathaAfterBattleText: ; 7652a (1d:652a)
+AgathaAfterBattleText:
     TX_FAR _AgathaAfterBattleText
     db "@"
 
-AgathaText2: ; 7652f (1d:652f)
+AgathaText2:
     TX_FAR _AgathaText2
     db "@"
 
-AgathaObject: ; 0x76534 (size=44)
+AgathaObject:
     db $0 ; border tile
 
     db $4 ; warps
@@ -108684,11 +108822,13 @@ AgathaObject: ; 0x76534 (size=44)
     EVENT_DISP $5,$0,$4 ; LORELEIS_ROOM
     EVENT_DISP $5,$0,$5 ; LORELEIS_ROOM
 
-AgathaBlocks: ; 76560 (1d:6560)
+AgathaBlocks:
     INCBIN "maps/agatha.blk"
 
-Func_7657e: ; XXX: make better (has to do with the hall of fame on the PC) ; 0x7657e
-    ld hl,UnnamedText_76683
+; ─────────────────────────────────────────
+
+PKMNLeaguePC:
+    ld hl,.UnnamedText_76683
     call PrintText
     ld hl,$D730
     set 6,[hl]
@@ -108706,28 +108846,30 @@ Func_7657e: ; XXX: make better (has to do with the hall of fame on the PC) ; 0x7
     ld a,[$D5A2]
     ld b,a
     cp a,$33
-    jr c,.first
+    jr c,.loop1
+; If the total number of hall of fame teams is greater than the storage
+; capacity, then calculate the number of the first team that is still recorded.
     ld b,$32
     sub b
     ld [$CD42],a
-.first
+.loop1
     ld hl,$CD42
     inc [hl]
     push bc
     ld a,[$CD41]
     ld [$CD3D],a
-    ld b,BANK(Func_73b3f)
-    ld hl,Func_73b3f
+    ld b,BANK(LoadHallOfFameTeams)
+    ld hl,LoadHallOfFameTeams
     call Bankswitch
-    call Func_765e5
+    call .LeaguePCShowTeam
     pop bc
-    jr c,.second
+    jr c,.doneShowingTeams
     ld hl,$CD41
     inc [hl]
     ld a,[hl]
     cp b
-    jr nz,.first
-.second
+    jr nz,.loop1
+.doneShowingTeams
     pop af
     ld [$FF00+$D7],a
     pop af
@@ -108738,16 +108880,27 @@ Func_7657e: ; XXX: make better (has to do with the hall of fame on the PC) ; 0x7
     call ClearScreen
     call GoPAL_SET_CF1C
     jp GBPalNormal
+.UnnamedText_76683
+    TX_FAR _UnnamedText_76683
+    db "@"
 
-Func_765e5: ; 765e5 (1d:65e5)
+.LeaguePCShowTeam
     ld c,6
-.third
+.loop2
     push bc
-    call Func_76610
-    call WaitForTextScrollButtonPress
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    bit 1,a
-    jr nz,.fifth
+    call .LeaguePCShowMon
+;    call WaitForTextScrollButtonPress
+;    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+.wait
+    call GetJoypadStateLowSensitivity
+    ld a,[$ffb5]
+    and %00001011 ; ▼▲◄►StSeBA
+    and a ; was a key pressed?
+    jr z,.wait
+    bit 1,a ; B Pressed?
+    jr nz,.exit
+    bit 3,a ; Start Pressed?
+    jr nz,.NextTeam
     ld hl,$CC6B
     ld de,$CC5B
     ld bc,$0050
@@ -108755,18 +108908,22 @@ Func_765e5: ; 765e5 (1d:65e5)
     pop bc
     ld a,[$CC5B]
     cp a,$FF
-    jr z,.fourth
+    jr z,.done
     dec c
-    jr nz,.third
-.fourth
+    jr nz,.loop2
+.done
     and a
     ret
-.fifth
+.exit
     pop bc
     scf
     ret
+.NextTeam
+    pop bc
+    and a
+    ret
 
-Func_76610: ; 76610 (1d:6610)
+.LeaguePCShowMon
     call GBPalWhiteOutWithDelay3
     call ClearScreen
     ld hl,$CC5B
@@ -108796,7 +108953,7 @@ Func_76610: ; 76610 (1d:6610)
     call TextBoxBorder
     FuncCoord 1,15 ; $c4cd
     ld hl,Coord
-    ld de,HallOfFameNoText
+    ld de,.HallOfFameNoText
     call PlaceString
     FuncCoord 16,15 ; $c4dc
     ld hl,Coord
@@ -108806,13 +108963,12 @@ Func_76610: ; 76610 (1d:6610)
     ld b,BANK(Func_702f0)
     ld hl,Func_702f0
     jp BankswitchAndRemoveIVFromCheckShinyArea ; jp Bankswitch
-
-HallOfFameNoText: ; 76670 (1d:6670)
+.HallOfFameNoText
     db "HALL OF FAME No   @"
 
-UnnamedText_76683: ; 76683 (1d:6683)
-    TX_FAR _UnnamedText_76683
-    db "@"
+; ─────────────────────────────────────────
+
+SECTION "HiddenItems_romx",ROMX[$6688],BANK[$1d]
 
 HiddenItems: ; 76688 (1d:6688)
     call GetHiddenItemCoords ; ld hl,HiddenItemCoords
@@ -109170,18 +109326,21 @@ GetObtainedHiddenCoinsFlags:
 ; ───────────────────────────────────────
 
 InitialilzeEliteFour:
+    call CheckHallOfFameWin
+    ret nz
     ld hl,$d734
     set 1,[hl]
     ret
 
-HallOfFame_HealPartyAndOpenDoor:
-    push af
+HallOfFame_DisplayTextID_HealParty:
+    call DisplayTextID
+    ; fall through
+
+HallOfFame_HealParty:
     PREDEF HealParty
     call GBFadeOut2
     call Delay3
-    call GBFadeIn2
-    pop af
-    ; fall through
+    jp GBFadeIn2
 
 HallOfFame_ReplaceTileBlock:
     ld [$d09f],a
@@ -109332,6 +109491,109 @@ PrintStatusAilment:
 ;    ;add hl,bc
 ;    ;pop bc
 ;    ret
+
+BrunoText1:
+    db $08 ; asm
+    ld de,TextScriptEnd ; Return Pointer
+    push de             ; ...
+    ld b,BANK(BrunoTrainerHeader0)
+    ld hl,BrunoTrainerHeader0
+    ld de,W_BRUNOCURSCRIPT
+    PREDEF TryHallOfFameRematch
+    push de ; run return pointer
+    ret     ; ...
+
+AgathaText1:
+    db $08 ; asm
+    ld de,TextScriptEnd ; Return Pointer
+    push de             ; ...
+    ld b,BANK(AgathaTrainerHeader0)
+    ld hl,AgathaTrainerHeader0
+    ld de,W_AGATHACURSCRIPT
+    PREDEF TryHallOfFameRematch
+    push de ; run return pointer
+    ret     ; ...
+
+LoreleiText1:
+    db $08 ; asm
+    ld de,TextScriptEnd ; Return Pointer
+    push de             ; ...
+    ld b,BANK(LoreleiTrainerHeader0)
+    ld hl,LoreleiTrainerHeader0
+    ld de,W_LORELEICURSCRIPT
+    PREDEF TryHallOfFameRematch
+    push de ; run return pointer
+    ret     ; ...
+
+GaryObject:
+    db $3 ; border tile
+
+    db $4 ; warps
+    db $b,$4,$2,LANCES_ROOM
+    db $b,$5,$3,LANCES_ROOM
+    db $0,$4,$0,HALL_OF_FAME
+    db $0,$5,$1,HALL_OF_FAME
+
+    db $0 ; signs
+
+    db $2 ; people
+    db SPRITE_BLUE,$2 + 4,$5 + 4,$ff,$d0,$1 ; person
+    db SPRITE_OAK,$7 + 4,$4 + 4,$ff,$d1,$2 ; person
+
+    ; warp-to
+    EVENT_DISP CHAMPIONS_ROOM_WIDTH,$b,$4 ; LANCES_ROOM
+    EVENT_DISP CHAMPIONS_ROOM_WIDTH,$b,$5 ; LANCES_ROOM
+    EVENT_DISP CHAMPIONS_ROOM_WIDTH,$0,$4 ; HALL_OF_FAME
+    EVENT_DISP CHAMPIONS_ROOM_WIDTH,$0,$5 ; HALL_OF_FAME
+
+GaryScript1:
+    call CheckHallOfFameWin
+    ret nz
+    ld a,$ff
+    ld [wJoypadForbiddenButtonsMask],a
+    ld hl,.Coords
+    call ArePlayerCoordsInArray
+    ld de,.RLEMovement1
+    jr nc,.skip
+    ld de,.RLEMovement2
+.skip
+    ld hl,$ccd3
+    call DecodeRLEList
+    dec a
+    ld [$cd38],a
+    call StartSimulatingJoypadStates
+    ld a,$2
+    ld [W_GARYCURSCRIPT],a
+    ret
+.Coords
+    db 11,05 ; Y,X
+    db $FF
+.RLEMovement1
+    db $40,2
+    db $10,1
+    db $40,6
+    db $ff
+.RLEMovement2
+    db $40,8
+    db $ff
+
+Func_740cb_Skip:
+    call CheckHallOfFameWin
+    jr z,.run
+    push bc
+    push de
+    call GetJoypadState
+    pop de
+    pop bc
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 1,a
+    ret nz
+.run
+    jp Func_740cb
+
+UnnamedText_74229:
+    db $60," ",$62," ",$64,"  ",$64," ",$66," ",$68,"@"
+    db $61," ",$63," ",$65,"  ",$65," ",$67," ",$69,"@"
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -120814,16 +121076,13 @@ _UnnamedText_37722: ; 88236 (22:4236)
 
 _UnnamedText_703fa: ; 8823e (22:423e)
     db $0,"#DEX   Seen:@"
-
-UnnamedText_8824c: ; 8824c (22:424c)
     TX_NUM $cc5b,1,3
     db $0,$4f
     db "         Owned:@"
     TX_NUM $cc5c,1,3
     db "@"
 
-_UnnamedText_703ff: ; 88267 (22:4267)
-    db $0,"#DEX Rating",$6d,$57
+SECTION "_GymStatueText1",ROMX[$4275],BANK[$22]
 
 _GymStatueText1: ; 88275 (22:4275)
     TX_RAM wGymCityName
@@ -138514,8 +138773,7 @@ UpgradeTrainerSet_:
     jr nz,.CheckBadge
     ld hl,wEngagedTrainerSet ; Gym Leader Team
     ld [hl],a
-    ld a,[$d5a2] ; hall of fame
-    and a
+    call CheckHallOfFameWin
     jr z,.end
     inc [hl] ; add 1 if after hall of fame
     jr .end
@@ -138640,6 +138898,96 @@ GymLeaderAfterRematch_:
     dbw CINNABAR_GYM  , W_CINNABARGYMCURSCRIPT
     dbw VIRIDIAN_GYM  , W_VIRIDIANGYMCURSCRIPT
     db $FF
+
+; ──────────────────────────────────────────────────────────────────────
+
+TryHallOfFameRematch:
+    call Load16BitRegisters
+    call .StoreInput
+    call CheckHallOfFameWin
+    jr z,.End_TalkToTrainer
+    call StoreTrainerHeaderPointer ; Used in "EndTrainerBattle"
+    call .CheckFoughtFlag
+    ld hl,NoCommentText
+    jr nz,.End_PrintText
+    call .CheckRematchAnswer
+    jr nz,.End_Nope
+    ld hl,GymLeaderRematchText2
+    call PrintText
+    ld hl,GymLeaderRematchText3
+    ld d,h
+    ld e,l
+    call PreBattleSaveRegisters
+    ldh a,[$8c]  ; Map Sprite ID
+    ld [$cf13],a ; ...
+    call EngageMapTrainer
+    call InitBattleEnemyParameters
+    ld hl,$d72d
+    set 6,[hl]
+    set 7,[hl]
+    ld hl,wTmpPointerToMapCurrentScript
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld a,2
+    ld [W_CURMAPSCRIPT],a
+    ld [hl],a
+    ; fall through
+
+.End_Nope
+    ld de,Nope
+    ret
+
+.End_TalkToTrainer
+    ld de,TalkToTrainer
+    ret
+
+.End_PrintText
+    ld de,PrintText
+    ret
+
+.StoreInput
+    ld a,b
+    ld [wTmpTrainerHeaderBank],a
+    ld a,l
+    ld [wTmpTrainerHeaderPointer],a
+    ld a,h
+    ld [wTmpTrainerHeaderPointer+1],a
+    ld a,e
+    ld [wTmpPointerToMapCurrentScript],a
+    ld a,d
+    ld [wTmpPointerToMapCurrentScript+1],a
+    ret
+
+.CheckFoughtFlag
+    ld hl,wTmpTrainerHeaderPointer
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld de,wTmpTrainerHeader
+    ld bc,4
+    ld a,[wTmpTrainerHeaderBank]
+    push de
+    call FarCopyData
+    pop hl
+    ld a,[hli]
+    ld [wTrainerHeaderFlagBit],a ; Used in "EndTrainerBattle"
+    ld c,a
+    inc hl
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld b,$2
+    jp HandleBitArray_Bank0 ; read trainer's flag
+
+.CheckRematchAnswer
+    ld hl,GymLeaderRematchText1
+    call PrintText
+    call YesNoChoice ; yes/no textbox
+    ld a,[$CC26] ; yes/no answer (Y=0,N=1)
+    and a
+    call nz,DisableWaitingAfterTextDisplay
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
