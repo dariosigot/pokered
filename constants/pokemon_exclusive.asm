@@ -1099,6 +1099,9 @@ GengarExclusiveMove:
     db ABSORB
     db AMNESIA
     db SLUDGE ; TM56
+    db FIRE_PUNCH ; TM_57
+    db ICE_PUNCH ; TM_58
+    db THUNDERPUNCH ; TM_59
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OnixExclusiveMove:

@@ -880,7 +880,7 @@ HaunterTMCompatibility:
     tmlearn 33,34,35,36             ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|
     tmlearn 42,44,45,46,47          ; |DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
     tmlearn 50,56                   ; |SUBSTITUTE|SLUDGE|
-    tmlearn 0
+    tmlearn 57,58,59                ; |FIRE_PUNCH|ICE_PUNCH|THUNDERPUNCH|
 GengarTMCompatibility:
     tmlearn 06                      ; |TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
@@ -889,7 +889,7 @@ GengarTMCompatibility:
     tmlearn 33,34,35,36             ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|
     tmlearn 42,44,45,46,47          ; |DREAM_EATER|REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
     tmlearn 50,56                   ; |SUBSTITUTE|SLUDGE|
-    tmlearn 0
+    tmlearn 57,58,59                ; |FIRE_PUNCH|ICE_PUNCH|THUNDERPUNCH|
 ; ──────────────────────────────────────────────────────────────────────
 OnixTMCompatibility:
     tmlearn 03,08                   ; |SWORDS_DANCE|BODY_SLAM|
