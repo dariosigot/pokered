@@ -35535,22 +35535,7 @@ IndigoPlateauLobbyScript: ; 19c5b (6:5c5b)
     bit 6,[hl]
     res 6,[hl]
     ret z
-; wispnote - This event was probably ment to be reset on Route 23.
-;    ld hl,$d869
-;    res 7,[hl] ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
-    call CheckHallOfFameWin
-    ret nz
-    ld hl,$d734
-    bit 1,[hl]
-    res 1,[hl]
-    ret z
-    ld hl,$d863
-    xor a
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hl],a
-    ret
+    PREDEF_JUMP HoF_SetVariables
 
 SECTION "IndigoPlateauLobbyTextPointers",ROMX[$5c7f],BANK[$6]
 
@@ -76527,6 +76512,7 @@ DrawHUDsAndHPBarsPredef:                   NEW_PREDEF DrawHUDsAndHPBars         
 GetAttackAnimationPointers_Predef:         NEW_PREDEF GetAttackAnimationPointers_         ; $73
 _IsItemInBagOrBoxPredef:                   NEW_PREDEF _IsItemInBagOrBox                   ; $74
 TryHallOfFameRematchPredef:                NEW_PREDEF TryHallOfFameRematch                ; $75
+HoF_SetVariablesPredef:                    NEW_PREDEF HoF_SetVariables                    ; $76
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -89170,24 +89156,7 @@ LanceScript2:
     ld a,$1
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
-    call HallOfFame_HealParty_Bank16
-    call CheckHallOfFameWin
-    ret nz
-    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 0
-    inc a
-    ld [W_GARYCURSCRIPT],a ; 1
-    ld a,$D6 ; Oak in Champion Room
-    call .Hide
-    ld a,$FB ; Gary in Champion Room
-    call .Show
-    ld a,$FC ; Oak in Hall of Fame Room
-    ; fall through
-.Show
-    ld [$CC4D],a
-    PREDEF_JUMP AddMissableObject
-.Hide
-    ld [$CC4D],a
-    PREDEF_JUMP RemoveMissableObject
+    jp HallOfFame_HealParty_Bank16
 
 ;Func_5a35b: ; 5a35b (16:635b)
 ;    ld a,$ff
@@ -89638,26 +89607,17 @@ HallofFameRoomScript2:
     res 1,[hl]
     inc hl
     set 0,[hl]
-    xor a
-    ld hl,W_LORELEICURSCRIPT
-    ld [hli],a ; W_LORELEICURSCRIPT ; 0
-    ld [hli],a ; W_BRUNOCURSCRIPT ; 0
-    ld [hl],a  ; W_AGATHACURSCRIPT ; 0
-    ld [W_LANCECURSCRIPT],a ; 0
-    ld [W_GARYCURSCRIPT],a ; 0
-    ld hl,$d863
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hl],a
-    ld a,$3
-    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 3
-    call CheckHallOfFameWin
-    call z,.HandleMissableSprite
-    call .HandleFlagRematchAndNewHallOfFameCounter
     call .Wait
     call WaitForTextScrollButtonPress
+    ld hl,$d5a2
+    ld a,[hl]
+    inc a
+    jr z,.skip
+    inc [hl]
+.skip
+    PREDEF HoF_SetVariables
+    ld hl,wGymLeaderRematch
+    ld [hl],%01111111
     call GBFadeOut2
     ld a,8
     call StopMusic
@@ -89666,28 +89626,6 @@ HallofFameRoomScript2:
     ld b,BANK(SpecialRestartAfterHallOfFame)
     ld hl,SpecialRestartAfterHallOfFame
     jp Bankswitch
-
-.HandleMissableSprite
-    ld a,$D6 ; Oak in Champion Room
-    call .Hide
-    ld a,$FB ; Gary in Champion Room
-    call .Hide
-    ld a,$FC ; Oak in Hall of Fame Room
-    ; fall through
-.Hide
-    ld [$CC4D],a
-    PREDEF_JUMP RemoveMissableObject
-
-.HandleFlagRematchAndNewHallOfFameCounter
-    ld hl,wGymLeaderRematch
-    ld [hl],%01111111
-    ld hl,$d5a2
-    ld a,[hl]
-    inc a
-    ret z
-    inc [hl]
-    ret
-
 .Wait
     ld b,$5
 .loop
@@ -108498,7 +108436,6 @@ BrunoScript_762ec: ; 762ec (1d:62ec)
     bit 5,[hl]
     res 5,[hl]
     ret z
-    call InitialilzeEliteFour
     ld a,[$d864]
     bit 1,a
     ld a,$24
@@ -109328,13 +109265,6 @@ GetObtainedHiddenCoinsFlags:
     ret
 
 ; ───────────────────────────────────────
-
-InitialilzeEliteFour:
-    call CheckHallOfFameWin
-    ret nz
-    ld hl,$d734
-    set 1,[hl]
-    ret
 
 HallOfFame_DisplayTextID_HealParty:
     call DisplayTextID
@@ -143517,6 +143447,62 @@ SearchItemInList:
     pop hl
     pop de
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+HoF_SetVariables:
+    call CheckHallOfFameWin
+    jr nz,.HoF_AfterFirstWin
+    ; fall through
+
+.HoF_BeforeFirstWin
+    xor a
+    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 0
+    inc a
+    ld [W_GARYCURSCRIPT],a ; 1
+    ld a,$D6 ; Oak in Champion Room
+    call .HoF_Hide
+    ld a,$FB ; Gary in Champion Room
+    call .HoF_Show
+    ld a,$FC ; Oak in Hall of Fame Room
+    call .HoF_Show
+    jr .HoF_ResetRoomsScriptAndFlags
+
+.HoF_AfterFirstWin
+    xor a
+    ld [W_GARYCURSCRIPT],a ; 0
+    ld a,$3
+    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 3
+    ld a,$D6 ; Oak in Champion Room
+    call .HoF_Hide
+    ld a,$FB ; Gary in Champion Room
+    call .HoF_Hide
+    ld a,$FC ; Oak in Hall of Fame Room
+    call .HoF_Hide
+    ; fall through
+
+.HoF_ResetRoomsScriptAndFlags
+    xor a
+    ld hl,W_LORELEICURSCRIPT
+    ld [hli],a ; W_LORELEICURSCRIPT ; 0
+    ld [hli],a ; W_BRUNOCURSCRIPT ; 0
+    ld [hl],a  ; W_AGATHACURSCRIPT ; 0
+    ld [W_LANCECURSCRIPT],a ; 0
+    ld hl,$d863
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+    ret
+
+.HoF_Show
+    ld [$CC4D],a
+    PREDEF_JUMP AddMissableObject
+
+.HoF_Hide
+    ld [$CC4D],a
+    PREDEF_JUMP RemoveMissableObject
 
 ; ──────────────────────────────────────────────────────────────────────
 
