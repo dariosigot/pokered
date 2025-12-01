@@ -3454,10 +3454,13 @@ GetMonHeader: ; 1537 (0:1537)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(PokemonBaseStats)
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
+    call .ChangeBank
     push bc
     push de
+    push hl
+    ld hl,wAlternateFormIndex
+    ld a,[hl]
+    push af
     push hl
     ld a,[$d11e]
     push af
@@ -3468,7 +3471,9 @@ GetMonHeader: ; 1537 (0:1537)
     ld bc,28
     call AddNTimes
 .retry
-    call .CopyData
+    ld bc,28
+    ld de,W_MONHEADER
+    call CopyData
     ld hl,wAlternateFormIndex
     ld a,[hl]
     and a
@@ -3480,25 +3485,27 @@ GetMonHeader: ; 1537 (0:1537)
     ld h,[hl]
     ld l,a
     or h
-    jr z,.NoOthersAltForm
-    jr .retry
+    jr nz,.retry
+    ; fall through
 .done
     pop af
     ld [$d11e],a
     pop hl
+    pop af
+    ld de,W_MONHALTFORM
+    ld [de],a
+    dec de
+    xor a
+    ld [hl],a
+    ld [de],a ; W_MONH_UNUSED
+    pop hl
     pop de
     pop bc
     pop af
+    ; fall through
+.ChangeBank
     ld [H_LOADEDROMBANK],a
     jp RoutineForRealGB
-.CopyData
-    ld bc,28
-    ld de,W_MONHEADER
-    jp CopyData
-.NoOthersAltForm
-    xor a
-    ld [wAlternateFormIndex],a
-    jr .done
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $00)
@@ -141984,7 +141991,7 @@ GenerateRandomEnemyTrainerIV_:
     db $BF,$FF,$AF,$9F ; dw $BFA9 ; BRUNO         ; $21 ;
     db $9F,$AF,$8F,$1F ; dw $9A81 ; BROCK         ; $22 ;
     db $9F,$8F,$AF,$9F ; dw $98A9 ; MISTY         ; $23 ;
-    db $9F,$8F,$0F,$BF ; dw $980B ; LT_SURGE     ; $24 ;
+    db $9F,$8F,$0F,$BF ; dw $980B ; LT_SURGE      ; $24 ;
     db $1F,$BF,$8F,$BF ; dw $1B8B ; ERIKA         ; $25 ;
     db $9F,$8F,$AF,$BF ; dw $98AB ; KOGA          ; $26 ;
     db $BF,$8F,$8F,$BF ; dw $B88B ; BLAINE        ; $27 ;
