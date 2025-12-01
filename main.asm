@@ -11566,7 +11566,7 @@ ItemPrices:
     bcd3      0 ; ?
     bcd3      0 ; ?
     bcd3  40000 ; DUSK_STONE
-    bcd3      0 ; ?
+    bcd3  40000 ; ICE_STONE
     bcd3      0 ; ?
     bcd3      0 ; ?
     bcd3      0 ; ?
@@ -23076,7 +23076,7 @@ UseItem_:
     dw ItemUseBait       ;
     dw ItemUseRock       ;
     dw ItemUseEvoStone   ; DUSK_STONE
-    dw UnusableItem      ;
+    dw ItemUseEvoStone   ; ICE_STONE
     dw UnusableItem      ;
     dw UnusableItem      ;
     dw UnusableItem      ;
@@ -28915,68 +28915,14 @@ GetAlternateForm:
     ld [wAlternateFormIndex],a ; Save AlternateFormIndex
     ld [wTempAlternateFormIndex],a
     ret
-
 .enemy
-    ;SpecialTrainerAlternateForm
     push de
-    ld a,[W_CUROPPONENT]
-    cp SONY2
-    jr nz,.skip1
-    ld a,SONY1
-.skip1
-    cp SONY3
-    jr nz,.skip2
-    ld a,SONY1
-.skip2
-    ld b,a
-    ld a,[$cf91]
-    ld c,a
-    ld hl,.CustomTrainer
-    call .loop
-    ld a,0
-    jr nc,.enemyend
+    ld b,BANK(SpecialTrainerAlternateForm)
+    ld hl,SpecialTrainerAlternateForm
+    call Bankswitch
     ld a,d
-.enemyend
     pop de
     jr .end
-
-.loop
-    ld a,[hli]
-    cp $FF
-    jr z,.NotFound
-    cp b
-    jr nz,.next3
-    ld a,[hli]
-    cp c
-    jr nz,.next2
-.found
-    ld a,[hl]
-    ld d,a
-    scf ; scf = found
-    ret
-.next3
-    inc hl
-.next2
-    inc hl
-    jr .loop
-.NotFound
-    and a ; rcf = not found
-    ret
-
-.CustomTrainer
-
-    ; Green1
-    db SONY1,SQUIRTLE,$01
-    db SONY1,WARTORTLE,$01
-    db SONY1,BLASTOISE,$01
-    db SONY1,BULBASAUR,$01
-    db SONY1,IVYSAUR,$01
-    db SONY1,VENUSAUR,$01
-    db SONY1,CHARMANDER,$01
-    db SONY1,CHARMELEON,$01
-    db SONY1,CHARIZARD,$01
-
-    db $FF
 
 ; Generate Random only if
 ; • Pkmn Is Added ToParty with Rename Screen (Out Of Battle)
@@ -31434,6 +31380,7 @@ UsableItems_PartyMenu:
     db SUPER_POTION
     db POTION
     db DUSK_STONE
+    db ICE_STONE
     db FIRE_STONE
     db THUNDER_STONE
     db WATER_STONE
@@ -49947,141 +49894,6 @@ Func_39bd5: ; 39bd5 (e:5bd5)
     ld [$cf90],a
     ret
 
-; Free
-
-SECTION "ReadTrainer",ROMX[$5c53],BANK[$e]
-
-ReadTrainer: ; 39c53 (e:5c53)
-
-; don't change any moves in a link battle
-    ld a,[W_ISLINKBATTLE]
-    and a
-    ret nz
-
-; set [wEnemyPartyCount] to 0,[$D89D] to FF
-; XXX first is total enemy pokemon?
-; XXX second is species of first pokemon?
-    ld hl,wEnemyPartyCount
-    xor a
-    ld [hli],a
-    dec a
-    ld [hl],a
-
-; get the pointer to trainer data for this class
-    ld a,[W_TRAINERCLASS]
-    dec a
-    add a,a
-    ld hl,TrainerDataPointers
-    ld c,a
-    ld b,0
-    add hl,bc ; hl points to trainer class
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    ld a,[W_TRAINERNO]
-    ld b,a
-; At this point b contains the trainer number,
-; and hl points to the trainer class.
-; Our next task is to iterate through the trainers,
-; decrementing b each time,until we get to the right one.
-.outer
-    dec b
-    jr z,.IterateTrainer
-.inner
-    ld a,[hli]
-    and a
-    jr nz,.inner
-    jr .outer
-
-; if the first byte of trainer data is FF,
-; - each pokemon has a specific level
-;      (as opposed to the whole team being of the same level)
-; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move (not applicable to the Yellow method)
-; else the first byte is the level of every pokemon on the team
-.IterateTrainer
-    ld a,[hli]
-    cp $FF ; is the trainer special?
-    jr z,.SpecialTrainer ; if so,check for special moves
-    ld [W_CURENEMYLVL],a
-.LoopTrainerData
-    ld a,[hli]
-    and a ; have we reached the end of the trainer data?
-    jr z,.AddAdditionalMoveData ; jr z,.FinishUp
-    ld [$CF91],a ; write species somewhere (XXX why?)
-    ld a,1
-    ld [$CC49],a
-    push hl
-    call AddPokemonToParty
-    pop hl
-    jr .LoopTrainerData
-.SpecialTrainer
-; if this code is being run:
-; - each pokemon has a specific level
-;      (as opposed to the whole team being of the same level)
-; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move (not applicable to the Yellow method)
-    ld a,[hli]
-    and a ; have we reached the end of the trainer data?
-    jr z,.AddAdditionalMoveData ; jr z,.AddLoneMove
-    ld [W_CURENEMYLVL],a
-    ld a,[hli]
-    ld [$CF91],a
-    ld a,1
-    ld [$CC49],a
-    push hl
-    call AddPokemonToParty
-    pop hl
-    jr .SpecialTrainer
-.AddAdditionalMoveData
-; does the trainer have additional move data?
-    ld a,[W_TRAINERCLASS]
-    ld b,a
-    ld a,[W_TRAINERNO]
-    ld c,a
-    ld hl,SpecialTrainerMoves
-.loopAdditionalMoveData
-    ld a,[hli]
-    cp $ff
-    jr z,.FinishUp
-    cp b
-    jr nz,.NextSpecialTrainer1
-    ld a,[hli]
-    cp c
-    jr nz,.NextSpecialTrainer2
-    ld a,[hli]
-    ld d,[hl]
-    ld e,a
-    ld b,BANK(LoadSpecialTrainerMoves)
-    ld hl,LoadSpecialTrainerMoves
-    call Bankswitch
-    jr .FinishUp
-.NextSpecialTrainer1
-    inc hl
-.NextSpecialTrainer2
-    inc hl
-    inc hl
-    jr .loopAdditionalMoveData
-.FinishUp ; XXX this needs documenting
-    xor a       ; clear D079-D07B
-    ld de,$D079
-    ld [de],a
-    inc de
-    ld [de],a
-    inc de
-    ld [de],a
-    ld a,[W_CURENEMYLVL]
-    ld b,a
-.LastLoop
-    ld hl,$D047
-    ld c,2
-    push bc
-    PREDEF Func_f81d
-    pop bc
-    inc de
-    inc de
-    dec b
-    jr nz,.LastLoop
-    ret
-
 ;joenote - added these functions to check if the ai switching bit is set
 ;need to have 'a' accumulator and flag register freed up to use this function
 CheckandResetSwitchBit:
@@ -51372,87 +51184,6 @@ SetAttributeOamRedBall:
     ld a,3
     ld [hli],a
     ret
-
-SpecialTrainer: MACRO
-    db \1,\2
-    dw \3
-    ENDM
-
-SpecialTrainerMoves:
-    SpecialTrainer BROCK,1,BrockMove1
-    SpecialTrainer BROCK,2,BrockMove2
-    SpecialTrainer BROCK,3,BrockMove3
-    SpecialTrainer BROCK,4,BrockMove4
-    SpecialTrainer BROCK,5,BrockMove5
-    SpecialTrainer BROCK,6,BrockMove6
-    SpecialTrainer BROCK,7,BrockMove7
-    SpecialTrainer BROCK,8,BrockMove8
-    SpecialTrainer BROCK,9,BrockMove9
-    SpecialTrainer MISTY,1,MistyMove2
-    SpecialTrainer MISTY,2,MistyMove3
-    SpecialTrainer MISTY,3,MistyMove4
-    SpecialTrainer MISTY,4,MistyMove5
-    SpecialTrainer MISTY,5,MistyMove6
-    SpecialTrainer MISTY,6,MistyMove7
-    SpecialTrainer MISTY,7,MistyMove8
-    SpecialTrainer MISTY,8,MistyMove9
-    SpecialTrainer LT_SURGE,1,LtSurgeMove3
-    SpecialTrainer LT_SURGE,2,LtSurgeMove4
-    SpecialTrainer LT_SURGE,3,LtSurgeMove5
-    SpecialTrainer LT_SURGE,4,LtSurgeMove6
-    SpecialTrainer LT_SURGE,5,LtSurgeMove7
-    SpecialTrainer LT_SURGE,6,LtSurgeMove8
-    SpecialTrainer LT_SURGE,7,LtSurgeMove9
-    SpecialTrainer ERIKA,1,ErikaMove4
-    SpecialTrainer ERIKA,2,ErikaMove5
-    SpecialTrainer ERIKA,3,ErikaMove6
-    SpecialTrainer ERIKA,4,ErikaMove7
-    SpecialTrainer ERIKA,5,ErikaMove8
-    SpecialTrainer ERIKA,6,ErikaMove9
-    SpecialTrainer KOGA,1,KogaMove6
-    SpecialTrainer KOGA,2,KogaMove7
-    SpecialTrainer KOGA,3,KogaMove8
-    SpecialTrainer KOGA,4,KogaMove9
-    SpecialTrainer SABRINA,1,SabrinaMove6
-    SpecialTrainer SABRINA,2,SabrinaMove7
-    SpecialTrainer SABRINA,3,SabrinaMove8
-    SpecialTrainer SABRINA,4,SabrinaMove9
-    SpecialTrainer BLAINE,1,BlaineMove7
-    SpecialTrainer BLAINE,2,BlaineMove8
-    SpecialTrainer BLAINE,3,BlaineMove9
-    SpecialTrainer BLACKBELT,1,DojoLeader
-    SpecialTrainer GIOVANNI,1,Giovanni1Move
-    SpecialTrainer GIOVANNI,2,Giovanni2Move
-    SpecialTrainer GIOVANNI,3,Giovanni3Move
-    SpecialTrainer LORELEI,1,LoreleiMove
-    SpecialTrainer BRUNO,1,BrunoMove
-    SpecialTrainer AGATHA,1,AgathaMove
-    SpecialTrainer LANCE,1,LanceMove
-    SpecialTrainer SONY2,7,Sony2Move7
-    SpecialTrainer SONY2,8,Sony2Move8
-    SpecialTrainer SONY2,9,Sony2Move9
-    SpecialTrainer SONY2,10,Sony2MoveA
-    SpecialTrainer SONY2,11,Sony2MoveB
-    SpecialTrainer SONY2,12,Sony2MoveC
-    SpecialTrainer SONY3,1,Sony3Move1
-    SpecialTrainer SONY3,2,Sony3Move2
-    SpecialTrainer SONY3,3,Sony3Move3
-    SpecialTrainer COOLTRAINER_F,2,CooltrainerFMove2
-    SpecialTrainer COOLTRAINER_F,3,CooltrainerFMove3
-    SpecialTrainer COOLTRAINER_F,4,CooltrainerFMove4
-    SpecialTrainer COOLTRAINER_M,2,CooltrainerMMove2
-    SpecialTrainer COOLTRAINER_M,3,CooltrainerMMove3
-    SpecialTrainer COOLTRAINER_M,4,CooltrainerMMove4
-    SpecialTrainer BLACKBELT,9,BlackBeltMove9
-    SpecialTrainer JUGGLER,2,JugglerMove2
-    SpecialTrainer JUGGLER,5,JugglerMove5
-    SpecialTrainer TAMER,5,TamerMove5
-    SpecialTrainer POKEMANIAC,6,PokemaniacMove6
-    SpecialTrainer CHANNELER,14,ChannelerMove14
-    SpecialTrainer CHANNELER,15,ChannelerMove15
-    SpecialTrainer CHANNELER,16,ChannelerMove16
-    SpecialTrainer POKEMANIAC,8,PokemaniacMove8
-    db $ff
 
 ; ────────────────────────────────────────────────────────────
 
@@ -52875,8 +52606,6 @@ CryData:
     db $18,$F7,$7E; 157 - MON_157
     db $18,$F7,$7E; 158 - MON_158
     db $18,$F7,$7E; 159 - MON_159
-
-INCLUDE "constants/TrainerData.asm"
 
 SECTION "bankF",ROMX,BANK[$F]
 
@@ -132907,6 +132636,14 @@ MarowakAlolaPicFront:
     INCBIN "pic/bmon/marowakalola.pic"
 MarowakAlolaPicBack:
     INCBIN "pic/monback/marowakalolab.pic"
+VulpixAlolaPicFront:
+    INCBIN "pic/bmon/vulpixalola.pic"
+VulpixAlolaPicBack:
+    INCBIN "pic/monback/vulpixalolab.pic"
+NinetalesAlolaPicFront:
+    INCBIN "pic/bmon/ninetales.pic"
+NinetalesAlolaPicBack:
+    INCBIN "pic/monback/ninetalesb.pic"
 
 SECTION "bank32",ROMX,BANK[$32]
 
@@ -134359,6 +134096,321 @@ _InitBattleEnemyParameters:
 .e4
     ld a,$E4
     ld [W_GYMLEADERNO],a
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+PrintMenuItemQty:
+    ld hl,$cf8b
+    ld a,[hli]
+    cp wNumBagItems & $FF
+    jr nz,.NotBag
+    ld a,[hld]
+    cp wNumBagItems >> 8
+    jr nz,.NotBag
+    ld a,[wNumBagItems]
+    ld b,20 ; bag can hold 20 items
+    jr .found
+.NotBag
+    ld hl,$cf8b
+    ld a,[hli]
+    cp wNumBoxItems & $FF
+    jr nz,.NotBox
+    ld a,[hld]
+    cp wNumBoxItems >> 8
+    jr nz,.NotBox
+    ld a,[wNumBoxItems]
+    ld b,40 ; bag can hold 20 items
+    jr .found
+.NotBox
+    ret
+.found
+    ld de,$d11e
+    ld [de],a
+    ld a,[W_ISINBATTLE]
+    and a
+    FuncCoord 14,03
+    ld hl,Coord
+    jr z,.done
+    FuncCoord 14,08
+    ld hl,Coord
+.done
+    push bc
+    push de
+    call .PrintNumber
+    pop de
+    pop bc
+    ld [hl],"/"
+    inc hl
+    ld a,b
+    ld [de],a
+    ; fall through
+.PrintNumber
+    ld bc,((%10000000 + 1) << 8) + 2
+    jp PrintNumber
+
+; ──────────────────────────────────────────────────────────────────────
+
+GetAttackAnimationPointers_:
+    call Load16BitRegisters
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ret
+
+AttackAnimationPointers:
+    dw PoundAnim
+    dw KarateChopAnim
+    dw DoubleSlapAnim
+    dw CometPunchAnim
+    dw MegaPunchAnim
+    dw PayDayAnim
+    dw FirePunchAnim
+    dw IcePunchAnim
+    dw ThunderPunchAnim
+    dw ScratchAnim
+    dw VicegripAnim
+    dw GuillotineAnim
+    dw RazorWindAnim
+    dw SwordsDanceAnim
+    dw CutAnim
+    dw GustAnim
+    dw WingAttackAnim
+    dw WhirlwindAnim
+    dw FlyAnim
+    dw BindAnim
+    dw SlamAnim
+    dw VineWhipAnim
+    dw StompAnim
+    dw DoubleKickAnim
+    dw MegaKickAnim
+    dw JumpKickAnim
+    dw RollingKickAnim
+    dw SandAttackAnim
+    dw HeatButtAnim
+    dw HornAttackAnim
+    dw FuryAttackAnim
+    dw HornDrillAnim
+    dw TackleAnim
+    dw BodySlamAnim
+    dw WrapAnim
+    dw TakeDownAnim
+    dw ThrashAnim
+    dw DoubleEdgeAnim
+    dw TailWhipAnim
+    dw PoisonStingAnim
+    dw TwineedleAnim
+    dw PinMissileAnim
+    dw LeerAnim
+    dw BiteAnim
+    dw GrowlAnim
+    dw RoarAnim
+    dw SingAnim
+    dw SupersonicAnim
+    dw SonicBoomAnim
+    dw DisableAnim
+    dw AcidAnim
+    dw EmberAnim
+    dw FlamethrowerAnim
+    dw MistAnim
+    dw WaterGunAnim
+    dw HydroPumpAnim
+    dw SurfAnim
+    dw IceBeamAnim
+    dw BlizzardAnim
+    dw PsyBeamAnim
+    dw BubbleBeamAnim
+    dw AuroraBeamAnim
+    dw HyperBeamAnim
+    dw PeckAnim
+    dw DrillPeckAnim
+    dw SubmissionAnim
+    dw LowKickAnim
+    dw CounterAnim
+    dw SeismicTossAnim
+    dw StrengthAnim
+    dw AbsorbAnim
+    dw MegaDrainAnim
+    dw LeechSeedAnim
+    dw GrowthAnim
+    dw RazorLeafAnim
+    dw SolarBeamAnim
+    dw PoisonPowderAnim
+    dw StunSporeAnim
+    dw SleepPowderAnim
+    dw PedalDanceAnim
+    dw StringShotAnim
+    dw DragonRageAnim
+    dw FireSpinAnim
+    dw ThunderShockAnim
+    dw ThunderBoldAnim
+    dw ThunderWaveAnim
+    dw ThunderAnim
+    dw RockThrowAnim
+    dw EarthquakeAnim
+    dw FissureAnim
+    dw DigAnim
+    dw ToxicAnim
+    dw ConfusionAnim
+    dw PsychicAnim
+    dw HypnosisAnim
+    dw MeditateAnim
+    dw AgilityAnim
+    dw QuickAttackAnim
+    dw RageAnim
+    dw TeleportAnim
+    dw NightShadeAnim
+    dw MimicAnim
+    dw ScreechAnim
+    dw DoubleTeamAnim
+    dw RecoverAnim
+    dw HardenAnim
+    dw MinimizeAnim
+    dw SmokeScreenAnim
+    dw ConfuseRayAnim
+    dw WithdrawAnim
+    dw DefenseCurlAnim
+    dw BarrierAnim
+    dw LightScreenAnim
+    dw HazeAnim
+    dw ReflectAnim
+    dw FocusEnergyAnim
+    dw BideAnim
+    dw MetronomeAnim
+    dw MirrorMoveAnim
+    dw SelfdestructAnim
+    dw EggBombAnim
+    dw LickAnim
+    dw SmogAnim
+    dw SludgeAnim
+    dw BoneClubAnim
+    dw FireBlastAnim
+    dw WaterfallAnim
+    dw ClampAnim
+    dw SwiftAnim
+    dw SkullBashAnim
+    dw SpikeCannonAnim
+    dw ConstrictAnim
+    dw AmnesiaAnim
+    dw KinesisAnim
+    dw SoftboiledAnim
+    dw HiJumpKickAnim
+    dw FlareAnim
+    dw DreamEaterAnim
+    dw PoisonGasAnim
+    dw BarrageAnim
+    dw LeechLifeAnim
+    dw LovelyKissAnim
+    dw SkyAttackAnim
+    dw TransformAnim
+    dw BubbleAnim
+    dw DizzyPunchAnim
+    dw SporeAnim
+    dw FlashAnim
+    dw PsywaveAnim
+    dw SplashAnim
+    dw AcidArmorAnim
+    dw CrabHammerAnim
+    dw ExplosionAnim
+    dw FurySwipesAnim
+    dw BonemerangAnim
+    dw RestAnim
+    dw RockSlideAnim
+    dw HyperFangAnim
+    dw SharpenAnim
+    dw ConversionAnim
+    dw TriAttackAnim
+    dw SuperFangAnim
+    dw SlashAnim
+    dw SubstituteAnim
+    dw StruggleAnim
+    dw ShowPicAnim
+    dw EnemyFlashAnim
+    dw PlayerFlashAnim
+    dw EnemyHUDShakeAnim
+    dw TradeBallDropAnim
+    dw TradeBallAppear1Anim
+    dw TradeBallAppear2Anim
+    dw TradeBallPoofAnim
+    dw XStatItemAnim
+    dw XStatItemAnim
+    dw ShrinkingSquareAnim
+    dw ShrinkingSquareAnim
+    dw XStatItemBlackAnim
+    dw XStatItemBlackAnim
+    dw ShrinkingSquareBlackAnim
+    dw ShrinkingSquareBlackAnim
+    dw UnusedAnim
+    dw UnusedAnim
+    dw ParalyzeAnim
+    dw ParalyzeAnim
+    dw PoisonAnim
+    dw PoisonAnim
+    dw SleepPlayerAnim
+    dw SleepEnemyAnim
+    dw ConfusedPlayerAnim
+    dw ConfusedEnemyAnim
+    dw FaintAnim
+    dw BallTossAnim
+    dw BallShakeAnim
+    dw BallPoofAnim
+    dw BallBlockAnim
+    dw GreatTossAnim
+    dw UltraTossAnim
+    dw ShakeScreenAnim
+    dw HidePicAnim
+    dw ThrowRockAnim
+    dw ThrowBaitAnim
+    dw ZigZagScreenAnim
+    dw TransformFailAnim ; $CC
+    dw TeleportAnimTrainerBattle ; $CD
+    dw WhirlwindAnimTrainerBattle ; $CE
+    dw RoarAnimTrainerBattle ; $CF
+
+; ──────────────────────────────────────────────────────────────────────
+
+_IsItemInBagOrBox:
+    call Load16BitRegisters
+    push bc
+    call IsItemInBag2
+    pop bc
+    ret nz ; ret if item in bag
+    push de
+    push hl
+    ld hl,wNumBoxItems
+    jr SearchItemInList
+
+_IsItemInBag:
+    call Load16BitRegisters
+IsItemInBag2:
+    push de
+    push hl
+    ld hl,wNumBagItems
+SearchItemInList:
+    ld a,[hl]
+    and a
+    jr z,.NotFought
+    ld d,a
+.loop
+    inc hl
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFought
+    cp b
+    jr z,.Fought
+    dec d
+    jr nz,.loop
+.NotFought
+    ld b,0
+    jr .end
+.Fought
+    ld a,[hl]
+    ld b,a
+.end
+    ld a,b
+    and a
+    pop hl
+    pop de
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -141910,6 +141962,82 @@ BattleMonPartyAttr:
     jp AddNTimes
 
 ; ──────────────────────────────────────────────────────────────────────
+; SpecialTrainerAlternateForm
+; ──────────────────────────────────────────────────────────────────────
+
+SpecialTrainerAlternateForm:
+    ld a,[W_CUROPPONENT]
+    cp SONY2
+    jr nz,.skip1
+    ld a,SONY1
+.skip1
+    cp SONY3
+    jr nz,.skip2
+    ld a,SONY1
+.skip2
+    ld b,a
+    ld a,[$cf91]
+    ld c,a
+    ld a,[$FF00+$e4] ; NewPartyLength
+    ld e,a
+    ld hl,.CustomTrainer
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFound
+    cp b
+    jr nz,.next3
+    ld a,[hli]
+    cp c
+    jr nz,.next2
+    ld a,[hli]
+    and a
+    jr z,.found
+    cp e
+    jr nz,.next1
+.found
+    ld a,[hl]
+    ld d,a
+    ret
+.next3
+    inc hl
+.next2
+    inc hl
+.next1
+    inc hl
+    jr .loop
+.NotFound
+    ld d,0
+    ret
+
+.CustomTrainer
+
+    ; Green1
+    db SONY1,SQUIRTLE,0,$01
+    db SONY1,WARTORTLE,0,$01
+    db SONY1,BLASTOISE,0,$01
+    db SONY1,BULBASAUR,0,$01
+    db SONY1,IVYSAUR,0,$01
+    db SONY1,VENUSAUR,0,$01
+    db SONY1,CHARMANDER,0,$01
+    db SONY1,CHARMELEON,0,$01
+    db SONY1,CHARIZARD,0,$01
+
+    ; Bruno
+    db BRUNO,ONIX,6,$01
+
+    ; Agatha
+    db AGATHA,MAROWAK,6,$01
+
+    ; Lorelei
+    db LORELEI,NINETALES,6,$01
+
+    ; Lance
+    db LANCE,AERODACTYL,6,$01
+
+    db $FF
+
+; ──────────────────────────────────────────────────────────────────────
 ; GenerateRandomEnemyTrainerIV_
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -142294,17 +142422,22 @@ GenerateRandomEnemyTrainerIV_:
     db BRUNO,PRIMEAPE,0,0,$C9,$F8
     db BRUNO,HITMONCHAN,0,0,$8F,$BE
     db BRUNO,HITMONLEE,0,0,$F5,$E7
-    db BRUNO,ONIX,0,0,$FF,$F0
+    db BRUNO,ONIX,0,4,$FF,$F0
     db BRUNO,PINSIR,0,0,$DE,$CF
     db BRUNO,MACHAMP,0,0,$F9,$F9
+    db BRUNO,POLIWRATH,0,0,$FD,$5F
+    db BRUNO,ONIX,1,6,$FE,$FE
 
     ; Agatha
-    db AGATHA,HAUNTER,0,0,$9B,$EF
+    db AGATHA,HAUNTER,0,1,$9B,$EF
+    db AGATHA,GENGAR,0,1,$9B,$EF
     db AGATHA,GOLBAT,0,0,$F4,$FA
     db AGATHA,ARBOK,0,0,$DB,$C9
     db AGATHA,VENUSAUR,0,0,$AB,$9F
     db AGATHA,HYPNO,0,0,$DA,$AE
-    db AGATHA,GENGAR,0,0,$AA,$FF
+    db AGATHA,GENGAR,0,6,$AA,$FF
+    db AGATHA,GENGAR,0,5,$AA,$FF
+    db AGATHA,MAROWAK,1,6,$EF,$EF
 
     ; Lorelei
     db LORELEI,DEWGONG,0,0,$AA,$4A
@@ -142313,14 +142446,19 @@ GenerateRandomEnemyTrainerIV_:
     db LORELEI,BLASTOISE,0,0,$CF,$AB
     db LORELEI,JYNX,0,0,$E9,$DE
     db LORELEI,LAPRAS,0,0,$BF,$AE
+    db LORELEI,NINETALES,1,6,$EE,$FF
 
     ; Lance
     db LANCE,GYARADOS,0,0,$EA,$AA
-    db LANCE,DRAGONAIR,0,2,$DA,$DA
-    db LANCE,DRAGONAIR,0,3,$AD,$AD
+    db LANCE,DRAGONAIR,0,2,$AA,$DD
+    db LANCE,DRAGONITE,0,2,$AA,$DD
+    db LANCE,DRAGONAIR,0,3,$DD,$AA
+    db LANCE,DRAGONITE,0,3,$DD,$AA
     db LANCE,CHARIZARD,0,0,$DD,$EE
-    db LANCE,AERODACTYL,0,0,$F9,$F9
+    db LANCE,AERODACTYL,0,5,$F9,$F9
+    db LANCE,DRAGONITE,0,5,$FF,$FF
     db LANCE,DRAGONITE,0,6,$FF,$FF
+    db LANCE,AERODACTYL,1,6,$F9,$F9
 
     db $FF
 
@@ -143252,321 +143390,6 @@ GetAttackerType:
 .BladeMonTable
     db FARFETCH_D
     db $FF
-
-; ──────────────────────────────────────────────────────────────────────
-
-PrintMenuItemQty:
-    ld hl,$cf8b
-    ld a,[hli]
-    cp wNumBagItems & $FF
-    jr nz,.NotBag
-    ld a,[hld]
-    cp wNumBagItems >> 8
-    jr nz,.NotBag
-    ld a,[wNumBagItems]
-    ld b,20 ; bag can hold 20 items
-    jr .found
-.NotBag
-    ld hl,$cf8b
-    ld a,[hli]
-    cp wNumBoxItems & $FF
-    jr nz,.NotBox
-    ld a,[hld]
-    cp wNumBoxItems >> 8
-    jr nz,.NotBox
-    ld a,[wNumBoxItems]
-    ld b,40 ; bag can hold 20 items
-    jr .found
-.NotBox
-    ret
-.found
-    ld de,$d11e
-    ld [de],a
-    ld a,[W_ISINBATTLE]
-    and a
-    FuncCoord 14,03
-    ld hl,Coord
-    jr z,.done
-    FuncCoord 14,08
-    ld hl,Coord
-.done
-    push bc
-    push de
-    call .PrintNumber
-    pop de
-    pop bc
-    ld [hl],"/"
-    inc hl
-    ld a,b
-    ld [de],a
-    ; fall through
-.PrintNumber
-    ld bc,((%10000000 + 1) << 8) + 2
-    jp PrintNumber
-
-; ──────────────────────────────────────────────────────────────────────
-
-GetAttackAnimationPointers_:
-    call Load16BitRegisters
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    ret
-
-AttackAnimationPointers:
-    dw PoundAnim
-    dw KarateChopAnim
-    dw DoubleSlapAnim
-    dw CometPunchAnim
-    dw MegaPunchAnim
-    dw PayDayAnim
-    dw FirePunchAnim
-    dw IcePunchAnim
-    dw ThunderPunchAnim
-    dw ScratchAnim
-    dw VicegripAnim
-    dw GuillotineAnim
-    dw RazorWindAnim
-    dw SwordsDanceAnim
-    dw CutAnim
-    dw GustAnim
-    dw WingAttackAnim
-    dw WhirlwindAnim
-    dw FlyAnim
-    dw BindAnim
-    dw SlamAnim
-    dw VineWhipAnim
-    dw StompAnim
-    dw DoubleKickAnim
-    dw MegaKickAnim
-    dw JumpKickAnim
-    dw RollingKickAnim
-    dw SandAttackAnim
-    dw HeatButtAnim
-    dw HornAttackAnim
-    dw FuryAttackAnim
-    dw HornDrillAnim
-    dw TackleAnim
-    dw BodySlamAnim
-    dw WrapAnim
-    dw TakeDownAnim
-    dw ThrashAnim
-    dw DoubleEdgeAnim
-    dw TailWhipAnim
-    dw PoisonStingAnim
-    dw TwineedleAnim
-    dw PinMissileAnim
-    dw LeerAnim
-    dw BiteAnim
-    dw GrowlAnim
-    dw RoarAnim
-    dw SingAnim
-    dw SupersonicAnim
-    dw SonicBoomAnim
-    dw DisableAnim
-    dw AcidAnim
-    dw EmberAnim
-    dw FlamethrowerAnim
-    dw MistAnim
-    dw WaterGunAnim
-    dw HydroPumpAnim
-    dw SurfAnim
-    dw IceBeamAnim
-    dw BlizzardAnim
-    dw PsyBeamAnim
-    dw BubbleBeamAnim
-    dw AuroraBeamAnim
-    dw HyperBeamAnim
-    dw PeckAnim
-    dw DrillPeckAnim
-    dw SubmissionAnim
-    dw LowKickAnim
-    dw CounterAnim
-    dw SeismicTossAnim
-    dw StrengthAnim
-    dw AbsorbAnim
-    dw MegaDrainAnim
-    dw LeechSeedAnim
-    dw GrowthAnim
-    dw RazorLeafAnim
-    dw SolarBeamAnim
-    dw PoisonPowderAnim
-    dw StunSporeAnim
-    dw SleepPowderAnim
-    dw PedalDanceAnim
-    dw StringShotAnim
-    dw DragonRageAnim
-    dw FireSpinAnim
-    dw ThunderShockAnim
-    dw ThunderBoldAnim
-    dw ThunderWaveAnim
-    dw ThunderAnim
-    dw RockThrowAnim
-    dw EarthquakeAnim
-    dw FissureAnim
-    dw DigAnim
-    dw ToxicAnim
-    dw ConfusionAnim
-    dw PsychicAnim
-    dw HypnosisAnim
-    dw MeditateAnim
-    dw AgilityAnim
-    dw QuickAttackAnim
-    dw RageAnim
-    dw TeleportAnim
-    dw NightShadeAnim
-    dw MimicAnim
-    dw ScreechAnim
-    dw DoubleTeamAnim
-    dw RecoverAnim
-    dw HardenAnim
-    dw MinimizeAnim
-    dw SmokeScreenAnim
-    dw ConfuseRayAnim
-    dw WithdrawAnim
-    dw DefenseCurlAnim
-    dw BarrierAnim
-    dw LightScreenAnim
-    dw HazeAnim
-    dw ReflectAnim
-    dw FocusEnergyAnim
-    dw BideAnim
-    dw MetronomeAnim
-    dw MirrorMoveAnim
-    dw SelfdestructAnim
-    dw EggBombAnim
-    dw LickAnim
-    dw SmogAnim
-    dw SludgeAnim
-    dw BoneClubAnim
-    dw FireBlastAnim
-    dw WaterfallAnim
-    dw ClampAnim
-    dw SwiftAnim
-    dw SkullBashAnim
-    dw SpikeCannonAnim
-    dw ConstrictAnim
-    dw AmnesiaAnim
-    dw KinesisAnim
-    dw SoftboiledAnim
-    dw HiJumpKickAnim
-    dw FlareAnim
-    dw DreamEaterAnim
-    dw PoisonGasAnim
-    dw BarrageAnim
-    dw LeechLifeAnim
-    dw LovelyKissAnim
-    dw SkyAttackAnim
-    dw TransformAnim
-    dw BubbleAnim
-    dw DizzyPunchAnim
-    dw SporeAnim
-    dw FlashAnim
-    dw PsywaveAnim
-    dw SplashAnim
-    dw AcidArmorAnim
-    dw CrabHammerAnim
-    dw ExplosionAnim
-    dw FurySwipesAnim
-    dw BonemerangAnim
-    dw RestAnim
-    dw RockSlideAnim
-    dw HyperFangAnim
-    dw SharpenAnim
-    dw ConversionAnim
-    dw TriAttackAnim
-    dw SuperFangAnim
-    dw SlashAnim
-    dw SubstituteAnim
-    dw StruggleAnim
-    dw ShowPicAnim
-    dw EnemyFlashAnim
-    dw PlayerFlashAnim
-    dw EnemyHUDShakeAnim
-    dw TradeBallDropAnim
-    dw TradeBallAppear1Anim
-    dw TradeBallAppear2Anim
-    dw TradeBallPoofAnim
-    dw XStatItemAnim
-    dw XStatItemAnim
-    dw ShrinkingSquareAnim
-    dw ShrinkingSquareAnim
-    dw XStatItemBlackAnim
-    dw XStatItemBlackAnim
-    dw ShrinkingSquareBlackAnim
-    dw ShrinkingSquareBlackAnim
-    dw UnusedAnim
-    dw UnusedAnim
-    dw ParalyzeAnim
-    dw ParalyzeAnim
-    dw PoisonAnim
-    dw PoisonAnim
-    dw SleepPlayerAnim
-    dw SleepEnemyAnim
-    dw ConfusedPlayerAnim
-    dw ConfusedEnemyAnim
-    dw FaintAnim
-    dw BallTossAnim
-    dw BallShakeAnim
-    dw BallPoofAnim
-    dw BallBlockAnim
-    dw GreatTossAnim
-    dw UltraTossAnim
-    dw ShakeScreenAnim
-    dw HidePicAnim
-    dw ThrowRockAnim
-    dw ThrowBaitAnim
-    dw ZigZagScreenAnim
-    dw TransformFailAnim ; $CC
-    dw TeleportAnimTrainerBattle ; $CD
-    dw WhirlwindAnimTrainerBattle ; $CE
-    dw RoarAnimTrainerBattle ; $CF
-
-; ──────────────────────────────────────────────────────────────────────
-
-_IsItemInBagOrBox:
-    call Load16BitRegisters
-    push bc
-    call IsItemInBag2
-    pop bc
-    ret nz ; ret if item in bag
-    push de
-    push hl
-    ld hl,wNumBoxItems
-    jr SearchItemInList
-
-_IsItemInBag:
-    call Load16BitRegisters
-IsItemInBag2:
-    push de
-    push hl
-    ld hl,wNumBagItems
-SearchItemInList:
-    ld a,[hl]
-    and a
-    jr z,.NotFought
-    ld d,a
-.loop
-    inc hl
-    ld a,[hli]
-    cp $FF
-    jr z,.NotFought
-    cp b
-    jr z,.Fought
-    dec d
-    jr nz,.loop
-.NotFought
-    ld b,0
-    jr .end
-.Fought
-    ld a,[hl]
-    ld b,a
-.end
-    ld a,b
-    and a
-    pop hl
-    pop de
-    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -144717,6 +144540,139 @@ SECTION "Bank3d",ROMX,BANK[$3D]
 EmotionBubbles:
     INCBIN "gfx/emotion_bubbles.2bpp"
 
+; ──────────────────────────────────────────────────────────────────────
+
+ReadTrainer:
+
+; don't change any moves in a link battle
+    ld a,[W_ISLINKBATTLE]
+    and a
+    ret nz
+
+; set [wEnemyPartyCount] to 0,[$D89D] to FF
+; XXX first is total enemy pokemon?
+; XXX second is species of first pokemon?
+    ld hl,wEnemyPartyCount
+    xor a
+    ld [hli],a
+    dec a
+    ld [hl],a
+
+; get the pointer to trainer data for this class
+    ld a,[W_TRAINERCLASS]
+    dec a
+    add a,a
+    ld hl,TrainerDataPointers
+    ld c,a
+    ld b,0
+    add hl,bc ; hl points to trainer class
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld a,[W_TRAINERNO]
+    ld b,a
+; At this point b contains the trainer number,
+; and hl points to the trainer class.
+; Our next task is to iterate through the trainers,
+; decrementing b each time,until we get to the right one.
+.outer
+    dec b
+    jr z,.IterateTrainer
+.inner
+    ld a,[hli]
+    and a
+    jr nz,.inner
+    jr .outer
+
+; if the first byte of trainer data is FF,
+; - each pokemon has a specific level
+;      (as opposed to the whole team being of the same level)
+; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move (not applicable to the Yellow method)
+; else the first byte is the level of every pokemon on the team
+.IterateTrainer
+    ld a,[hli]
+    cp $FF ; is the trainer special?
+    jr z,.SpecialTrainer ; if so,check for special moves
+    ld [W_CURENEMYLVL],a
+.LoopTrainerData
+    ld a,[hli]
+    and a ; have we reached the end of the trainer data?
+    jr z,.AddAdditionalMoveData ; jr z,.FinishUp
+    ld [$CF91],a ; write species somewhere (XXX why?)
+    ld a,1
+    ld [$CC49],a
+    push hl
+    call AddPokemonToParty
+    pop hl
+    jr .LoopTrainerData
+.SpecialTrainer
+; if this code is being run:
+; - each pokemon has a specific level
+;      (as opposed to the whole team being of the same level)
+; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move (not applicable to the Yellow method)
+    ld a,[hli]
+    and a ; have we reached the end of the trainer data?
+    jr z,.AddAdditionalMoveData ; jr z,.AddLoneMove
+    ld [W_CURENEMYLVL],a
+    ld a,[hli]
+    ld [$CF91],a
+    ld a,1
+    ld [$CC49],a
+    push hl
+    call AddPokemonToParty
+    pop hl
+    jr .SpecialTrainer
+.AddAdditionalMoveData
+; does the trainer have additional move data?
+    ld a,[W_TRAINERCLASS]
+    ld b,a
+    ld a,[W_TRAINERNO]
+    ld c,a
+    ld hl,SpecialTrainerMoves
+.loopAdditionalMoveData
+    ld a,[hli]
+    cp $ff
+    jr z,.FinishUp
+    cp b
+    jr nz,.NextSpecialTrainer1
+    ld a,[hli]
+    cp c
+    jr nz,.NextSpecialTrainer2
+    ld a,[hli]
+    ld d,[hl]
+    ld e,a
+    call LoadSpecialTrainerMoves
+    jr .FinishUp
+.NextSpecialTrainer1
+    inc hl
+.NextSpecialTrainer2
+    inc hl
+    inc hl
+    jr .loopAdditionalMoveData
+.FinishUp ; XXX this needs documenting
+    xor a       ; clear D079-D07B
+    ld de,$D079
+    ld [de],a
+    inc de
+    ld [de],a
+    inc de
+    ld [de],a
+    ld a,[W_CURENEMYLVL]
+    ld b,a
+.LastLoop
+    ld hl,$D047
+    ld c,2
+    push bc
+    PREDEF Func_f81d
+    pop bc
+    inc de
+    inc de
+    dec b
+    jr nz,.LastLoop
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
 LoadSpecialTrainerMoves:
     ld h,d
     ld l,e
@@ -144766,6 +144722,7 @@ LoadSpecialTrainerMoves:
 ;    pop hl
 ;    ret
 
+INCLUDE "constants/TrainerData.asm"
 INCLUDE "constants/special_trainer.asm"
 
 ; ──────────────────────────────────────────────────────────────────────

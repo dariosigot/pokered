@@ -352,7 +352,25 @@ VulpixTMCompatibility:
     tmlearn 44                      ; |REST|
     tmlearn 50                      ; |SUBSTITUTE|
     tmlearn 57                      ; |FIRE_PUNCH|
+VulpixAlolaTMCompatibility:
+    tmlearn 06                      ; |TOXIC|
+    tmlearn 09                      ; |TAKE_DOWN|
+    tmlearn 0
+    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 44                      ; |REST|
+    tmlearn 50                      ; |SUBSTITUTE|
+    tmlearn 57                      ; |FIRE_PUNCH|
 NinetalesTMCompatibility:
+    tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
+    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 20,22                   ; |RAGE|SOLARBEAM|
+    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 41,42,44                ; |LIGHT_SCREEN|DREAM_EATER|REST|
+    tmlearn 50                      ; |SUBSTITUTE|
+    tmlearn 57                      ; |FIRE_PUNCH|
+NinetalesAlolaTMCompatibility:
     tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 20,22                   ; |RAGE|SOLARBEAM|

@@ -212,6 +212,16 @@ Ninetales_EvosMoves:
     NINETALES_Learnset
     db 0
 ; ──────────────────────────────────────────────────────────────────────
+Vulpix_Alola_EvosMoves:
+    db EV_ITEM,ICE_STONE,1,NINETALES
+    db 0
+    VULPIX_Alola_Learnset
+    db 0
+Ninetales_Alola_EvosMoves:
+    db 0
+    NINETALES_Alola_Learnset
+    db 0
+; ──────────────────────────────────────────────────────────────────────
 Jigglypuff_EvosMoves:
     db EV_ITEM,MOON_STONE,1,WIGGLYTUFF
     db 0
