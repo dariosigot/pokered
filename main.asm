@@ -134271,9 +134271,99 @@ _BaitHealth:
     call LeechSeed_IncreaseEnemyHP
     PREDEF_JUMP DrawEnemyHUDAndHPBar
 
-; ───────────────────────────────────────
+; ──────────────────────────────────────────────────────────────────────
 
-SECTION "Wild Pkmn",ROMX,BANK[$36]
+SECTION "bank35",ROMX,BANK[$35]
+
+; ──────────────────────────────────────────────────────────────────────
+
+HoF_SetVariables:
+    call CheckHallOfFameWin
+    jr nz,.HoF_AfterFirstWin
+    ; fall through
+
+.HoF_BeforeFirstWin
+    xor a
+    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 0
+    inc a
+    ld [W_GARYCURSCRIPT],a ; 1
+    ld a,$D6 ; Oak in Champion Room
+    call .HoF_Hide
+    ld a,$FB ; Gary in Champion Room
+    call .HoF_Show
+    ld a,$FC ; Oak in Hall of Fame Room
+    call .HoF_Show
+    jr .HoF_ResetRoomsScriptAndFlags
+
+.HoF_AfterFirstWin
+    xor a
+    ld [W_GARYCURSCRIPT],a ; 0
+    ld a,$3
+    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 3
+    ld a,$D6 ; Oak in Champion Room
+    call .HoF_Hide
+    ld a,$FB ; Gary in Champion Room
+    call .HoF_Hide
+    ld a,$FC ; Oak in Hall of Fame Room
+    call .HoF_Hide
+    ; fall through
+
+.HoF_ResetRoomsScriptAndFlags
+    xor a
+    ld hl,W_LORELEICURSCRIPT
+    ld [hli],a ; W_LORELEICURSCRIPT ; 0
+    ld [hli],a ; W_BRUNOCURSCRIPT ; 0
+    ld [hl],a  ; W_AGATHACURSCRIPT ; 0
+    ld [W_LANCECURSCRIPT],a ; 0
+    ld hl,$d863
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+    ret
+
+.HoF_Show
+    ld [$CC4D],a
+    PREDEF_JUMP AddMissableObject
+
+.HoF_Hide
+    ld [$CC4D],a
+    PREDEF_JUMP RemoveMissableObject
+
+; ──────────────────────────────────────────────────────────────────────
+
+; sets opponent type and mon set/lvl based on the engaging trainer data
+_InitBattleEnemyParameters:
+    ld a,[wEngagedTrainerClass]
+    ld [W_CUROPPONENT],a ; $d059
+    call .CheckElite4
+    ld a,[wEngagedTrainerSet] ; $cd2e
+    cp OPP_LVL_OFFSET
+    jr c,.Trainer
+    sub OPP_LVL_OFFSET
+    ld [W_CURENEMYLVL],a ; $d127
+    xor a
+.Trainer
+    ld [W_TRAINERNO],a ; $d05d
+    ret
+.CheckElite4
+    cp BRUNO
+    jr z,.e4
+    cp LORELEI
+    jr z,.e4
+    cp AGATHA
+    jr z,.e4
+    cp LANCE
+    ret nz
+.e4
+    ld a,$E4
+    ld [W_GYMLEADERNO],a
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+SECTION "bank36",ROMX,BANK[$36]
 
 GetWildDataCurrentMap:
     call GetWildDataPointers ; ld hl,WildDataPointers
@@ -142019,6 +142109,8 @@ GenerateRandomEnemyTrainerIV_:
     ld c,a
     ld a,[W_MONHALTFORM]
     ld d,a
+    ld a,[$FF00+$e4] ; NewPartyLength
+    ld e,a
     ld hl,.CustomTrainer
     call .loop
     ret nc
@@ -142039,12 +142131,17 @@ GenerateRandomEnemyTrainerIV_:
     cp $FF
     jr z,.NotFound
     cp b
-    jr nz,.next3
+    jr nz,.next4
     ld a,[hli]
     cp c
-    jr nz,.next2
+    jr nz,.next3
     ld a,[hli]
     cp d
+    jr nz,.next2
+    ld a,[hli]
+    and a
+    jr z,.found
+    cp e
     jr nz,.next1
 .found
     ld a,[hli]
@@ -142052,6 +142149,8 @@ GenerateRandomEnemyTrainerIV_:
     ld e,[hl]
     scf ; scf = found
     ret
+.next4
+    inc hl
 .next3
     inc hl
 .next2
@@ -142067,160 +142166,161 @@ GenerateRandomEnemyTrainerIV_:
 .CustomTrainer
 
     ; Pokemaniac
-    db POKEMANIAC,CHARMANDER,0,$2A,$AA
+    db POKEMANIAC,CHARMANDER,0,0,$2A,$AA
 
     ; Green1
-    db SONY1,SQUIRTLE,1,$00,$00
-    db SONY1,WARTORTLE,1,$00,$00
-    db SONY1,BLASTOISE,1,$00,$00
-    db SONY1,BULBASAUR,1,$00,$00
-    db SONY1,IVYSAUR,1,$00,$00
-    db SONY1,VENUSAUR,1,$00,$00
-    db SONY1,CHARMANDER,1,$00,$00
-    db SONY1,CHARMELEON,1,$00,$00
-    db SONY1,CHARIZARD,1,$00,$00
-    db SONY1,NIDORAN_F,0,$05,$54
-    db SONY1,NIDORINA,0,$05,$54
-    db SONY1,RATTATA,0,$62,$77
-    db SONY1,RATICATE,0,$62,$77
-    db SONY1,PIDGEY,0,$DC,$FA
-    db SONY1,PIDGEOTTO,0,$DC,$FA
-    db SONY1,PIDGEOT,0,$DC,$FA
-    db SONY1,ABRA,0,$88,$FF
-    db SONY1,KADABRA,0,$88,$FF
-    db SONY1,ALAKAZAM,0,$88,$FF
-    db SONY1,GEODUDE,0,$9B,$00
-    db SONY1,GRAVELER,0,$9B,$00
-    db SONY1,GROWLITHE,0,$F5,$EE
-    db SONY1,ARCANINE,0,$F5,$EE
-    db SONY1,EXEGGCUTE,0,$EE,$5F
-    db SONY1,EXEGGUTOR,0,$EE,$5F
-    db SONY1,SHELLDER,0,$5F,$EE
-    db SONY1,CLOYSTER,0,$5F,$EE
-    db SONY1,RHYHORN,0,$FF,$79
-    db SONY1,RHYDON,0,$FF,$79
+    db SONY1,SQUIRTLE,1,0,$00,$00
+    db SONY1,WARTORTLE,1,0,$00,$00
+    db SONY1,BLASTOISE,1,0,$00,$00
+    db SONY1,BULBASAUR,1,0,$00,$00
+    db SONY1,IVYSAUR,1,0,$00,$00
+    db SONY1,VENUSAUR,1,0,$00,$00
+    db SONY1,CHARMANDER,1,0,$00,$00
+    db SONY1,CHARMELEON,1,0,$00,$00
+    db SONY1,CHARIZARD,1,0,$00,$00
+    db SONY1,NIDORAN_F,0,0,$05,$54
+    db SONY1,NIDORINA,0,0,$05,$54
+    db SONY1,RATTATA,0,0,$62,$77
+    db SONY1,RATICATE,0,0,$62,$77
+    db SONY1,PIDGEY,0,0,$DC,$FA
+    db SONY1,PIDGEOTTO,0,0,$DC,$FA
+    db SONY1,PIDGEOT,0,0,$DC,$FA
+    db SONY1,ABRA,0,0,$88,$FF
+    db SONY1,KADABRA,0,0,$88,$FF
+    db SONY1,ALAKAZAM,0,0,$88,$FF
+    db SONY1,GEODUDE,0,0,$9B,$00
+    db SONY1,GRAVELER,0,0,$9B,$00
+    db SONY1,GROWLITHE,0,0,$F5,$EE
+    db SONY1,ARCANINE,0,0,$F5,$EE
+    db SONY1,EXEGGCUTE,0,0,$EE,$5F
+    db SONY1,EXEGGUTOR,0,0,$EE,$5F
+    db SONY1,SHELLDER,0,0,$5F,$EE
+    db SONY1,CLOYSTER,0,0,$5F,$EE
+    db SONY1,RHYHORN,0,0,$FF,$79
+    db SONY1,RHYDON,0,0,$FF,$79
 
     ; Brock
-    db BROCK,GEODUDE,0,$55,$55
-    db BROCK,GRAVELER,0,$55,$55
-    db BROCK,GOLEM,0,$55,$55
-    db BROCK,ONIX,0,$0F,$F0
-    db BROCK,VULPIX,0,$E2,$EE
-    db BROCK,NINETALES,0,$E2,$EE
-    db BROCK,OMANYTE,0,$3D,$AF
-    db BROCK,OMASTAR,0,$3D,$AF
-    db BROCK,KABUTO,0,$EC,$94
-    db BROCK,KABUTOPS,0,$EC,$94
-    db BROCK,AERODACTYL,0,$D9,$F9
+    db BROCK,GEODUDE,0,0,$55,$55
+    db BROCK,GRAVELER,0,0,$55,$55
+    db BROCK,GOLEM,0,0,$55,$55
+    db BROCK,ONIX,0,0,$0F,$F0
+    db BROCK,VULPIX,0,0,$E2,$EE
+    db BROCK,NINETALES,0,0,$E2,$EE
+    db BROCK,OMANYTE,0,0,$3D,$AF
+    db BROCK,OMASTAR,0,0,$3D,$AF
+    db BROCK,KABUTO,0,0,$EC,$94
+    db BROCK,KABUTOPS,0,0,$EC,$94
+    db BROCK,AERODACTYL,0,0,$D9,$F9
 
     ; Misty
-    db MISTY,STARYU,0,$2A,$A9
-    db MISTY,STARMIE,0,$B8,$F9
-    db MISTY,PSYDUCK,0,$00,$FF
-    db MISTY,GOLDUCK,0,$00,$FF
-    db MISTY,MAGIKARP,0,$A8,$7A
-    db MISTY,GYARADOS,0,$A8,$7A
-    db MISTY,HORSEA,0,$56,$FE
-    db MISTY,SEADRA,0,$56,$FE
-    db MISTY,GOLDEEN,0,$B8,$7B
-    db MISTY,SEAKING,0,$B8,$7B
-    db MISTY,LAPRAS,0,$CC,$AF
-    db MISTY,VAPOREON,0,$A7,$AA
+    db MISTY,STARYU,0,0,$2A,$A9
+    db MISTY,STARMIE,0,0,$B8,$F9
+    db MISTY,PSYDUCK,0,0,$00,$FF
+    db MISTY,GOLDUCK,0,0,$00,$FF
+    db MISTY,MAGIKARP,0,0,$A8,$7A
+    db MISTY,GYARADOS,0,0,$A8,$7A
+    db MISTY,HORSEA,0,0,$56,$FE
+    db MISTY,SEADRA,0,0,$56,$FE
+    db MISTY,GOLDEEN,0,0,$B8,$7B
+    db MISTY,SEAKING,0,0,$B8,$7B
+    db MISTY,LAPRAS,0,0,$CC,$AF
+    db MISTY,VAPOREON,0,0,$A7,$AA
 
     ; LtSurge
-    db LT_SURGE,PIKACHU,0,$FF,$FF
-    db LT_SURGE,RAICHU,0,$B8,$0E
-    db LT_SURGE,MAGNEMITE,0,$6D,$7E
-    db LT_SURGE,MAGNETON,0,$6D,$7E
-    db LT_SURGE,VOLTORB,0,$F0,$F9
-    db LT_SURGE,ELECTRODE,0,$F0,$F9
-    db LT_SURGE,ELECTABUZZ,0,$EE,$EE
-    db LT_SURGE,JOLTEON,0,$A7,$AA
+    db LT_SURGE,PIKACHU,0,0,$FF,$FF
+    db LT_SURGE,RAICHU,0,0,$B8,$0E
+    db LT_SURGE,MAGNEMITE,0,0,$6D,$7E
+    db LT_SURGE,MAGNETON,0,0,$6D,$7E
+    db LT_SURGE,VOLTORB,0,0,$F0,$F9
+    db LT_SURGE,ELECTRODE,0,0,$F0,$F9
+    db LT_SURGE,ELECTABUZZ,0,0,$EE,$EE
+    db LT_SURGE,JOLTEON,0,0,$A7,$AA
 
     ; Erika
-    db ERIKA,TANGELA,0,$7D,$5A
-    db ERIKA,WEEPINBELL,0,$E7,$BB
-    db ERIKA,VICTREEBEL,0,$E7,$BB
-    db ERIKA,GLOOM,0,$7E,$9E
-    db ERIKA,VILEPLUME,0,$E7,$E9
-    db ERIKA,EXEGGCUTE,0,$66,$6C
-    db ERIKA,EXEGGUTOR,0,$66,$6C
-    db ERIKA,PARASECT,0,$79,$F8
+    db ERIKA,TANGELA,0,0,$7D,$5A
+    db ERIKA,WEEPINBELL,0,0,$E7,$BB
+    db ERIKA,VICTREEBEL,0,0,$E7,$BB
+    db ERIKA,GLOOM,0,0,$7E,$9E
+    db ERIKA,VILEPLUME,0,0,$E7,$E9
+    db ERIKA,EXEGGCUTE,0,0,$66,$6C
+    db ERIKA,EXEGGUTOR,0,0,$66,$6C
+    db ERIKA,PARASECT,0,0,$79,$F8
 
     ; Koga
-    db KOGA,VENOMOTH,0,$C7,$FD
-    db KOGA,GOLBAT,0,$F4,$F4
-    db KOGA,MUK,0,$EF,$5C
-    db KOGA,WEEZING,0,$9F,$FC
-    db KOGA,ARBOK,0,$D8,$E9
-    db KOGA,SCYTHER,0,$F7,$F7
-    db KOGA,TENTACRUEL,0,$6A,$FC
-    db KOGA,ELECTRODE,0,$F0,$F0
-    db KOGA,HAUNTER,0,$92,$DD
-    db KOGA,GENGAR,0,$92,$DD
+    db KOGA,VENOMOTH,0,0,$C7,$FD
+    db KOGA,GOLBAT,0,0,$F4,$F4
+    db KOGA,MUK,0,0,$EF,$5C
+    db KOGA,WEEZING,0,0,$9F,$FC
+    db KOGA,ARBOK,0,0,$D8,$E9
+    db KOGA,SCYTHER,0,0,$F7,$F7
+    db KOGA,TENTACRUEL,0,0,$6A,$FC
+    db KOGA,ELECTRODE,0,0,$F0,$F0
+    db KOGA,HAUNTER,0,0,$92,$DD
+    db KOGA,GENGAR,0,0,$92,$DD
 
     ; Sabrina
-    db SABRINA,HAUNTER,0,$29,$DD
-    db SABRINA,GENGAR,0,$29,$DD
-    db SABRINA,KADABRA,0,$3F,$CD
-    db SABRINA,ALAKAZAM,0,$3F,$CD
-    db SABRINA,MR_MIME,0,$AA,$FD
-    db SABRINA,VENOMOTH,0,$7C,$DF
-    db SABRINA,SLOWBRO,0,$3F,$0F
-    db SABRINA,JYNX,0,$EE,$EE
-    db SABRINA,HYPNO,0,$DC,$AB
-    db SABRINA,EXEGGUTOR,0,$0A,$0F
+    db SABRINA,HAUNTER,0,0,$29,$DD
+    db SABRINA,GENGAR,0,0,$29,$DD
+    db SABRINA,KADABRA,0,0,$3F,$CD
+    db SABRINA,ALAKAZAM,0,0,$3F,$CD
+    db SABRINA,MR_MIME,0,0,$AA,$FD
+    db SABRINA,VENOMOTH,0,0,$7C,$DF
+    db SABRINA,SLOWBRO,0,0,$3F,$0F
+    db SABRINA,JYNX,0,0,$EE,$EE
+    db SABRINA,HYPNO,0,0,$DC,$AB
+    db SABRINA,EXEGGUTOR,0,0,$0A,$0F
 
     ; Blaine
-    db BLAINE,NINETALES,0,$EB,$BA
-    db BLAINE,RHYDON,0,$DD,$DD
-    db BLAINE,MAGMAR,0,$EE,$EE
-    db BLAINE,ARCANINE,0,$BE,$AB
-    db BLAINE,RAPIDASH,0,$6B,$FB
-    db BLAINE,FLAREON,0,$A7,$AA
+    db BLAINE,NINETALES,0,0,$EB,$BA
+    db BLAINE,RHYDON,0,0,$DD,$DD
+    db BLAINE,MAGMAR,0,0,$EE,$EE
+    db BLAINE,ARCANINE,0,0,$BE,$AB
+    db BLAINE,RAPIDASH,0,0,$6B,$FB
+    db BLAINE,FLAREON,0,0,$A7,$AA
 
     ; Giovanni
-    db GIOVANNI,CUBONE,0,$FF,$0F
-    db GIOVANNI,MAROWAK,0,$FF,$0F
-    db GIOVANNI,RHYHORN,0,$EE,$EE
-    db GIOVANNI,RHYDON,0,$EE,$EE
-    db GIOVANNI,PERSIAN,0,$CC,$FC
-    db GIOVANNI,NIDORINO,0,$CB,$CB
-    db GIOVANNI,NIDOKING,0,$CB,$CB
-    db GIOVANNI,NIDOQUEEN,0,$BC,$BC
-    db GIOVANNI,KRABBY,0,$E6,$F5
-    db GIOVANNI,KINGLER,0,$E6,$F5
+    db GIOVANNI,CUBONE,0,0,$FF,$0F
+    db GIOVANNI,MAROWAK,0,0,$FF,$0F
+    db GIOVANNI,RHYHORN,0,0,$EE,$EE
+    db GIOVANNI,RHYDON,0,0,$EE,$EE
+    db GIOVANNI,PERSIAN,0,0,$CC,$FC
+    db GIOVANNI,NIDORINO,0,0,$CB,$CB
+    db GIOVANNI,NIDOKING,0,0,$CB,$CB
+    db GIOVANNI,NIDOQUEEN,0,0,$BC,$BC
+    db GIOVANNI,KRABBY,0,0,$E6,$F5
+    db GIOVANNI,KINGLER,0,0,$E6,$F5
 
     ; Bruno
-    db BRUNO,PRIMEAPE,0,$C9,$F8
-    db BRUNO,HITMONCHAN,0,$8F,$BE
-    db BRUNO,HITMONLEE,0,$F5,$E7
-    db BRUNO,ONIX,0,$FF,$F0
-    db BRUNO,PINSIR,0,$DE,$CF
-    db BRUNO,MACHAMP,0,$F9,$F9
+    db BRUNO,PRIMEAPE,0,0,$C9,$F8
+    db BRUNO,HITMONCHAN,0,0,$8F,$BE
+    db BRUNO,HITMONLEE,0,0,$F5,$E7
+    db BRUNO,ONIX,0,0,$FF,$F0
+    db BRUNO,PINSIR,0,0,$DE,$CF
+    db BRUNO,MACHAMP,0,0,$F9,$F9
 
     ; Agatha
-    db AGATHA,HAUNTER,0,$9B,$EF
-    db AGATHA,GOLBAT,0,$F4,$FA
-    db AGATHA,ARBOK,0,$DB,$C9
-    db AGATHA,VENUSAUR,0,$AB,$9F
-    db AGATHA,HYPNO,0,$DA,$AE
-    db AGATHA,GENGAR,0,$AA,$FF
+    db AGATHA,HAUNTER,0,0,$9B,$EF
+    db AGATHA,GOLBAT,0,0,$F4,$FA
+    db AGATHA,ARBOK,0,0,$DB,$C9
+    db AGATHA,VENUSAUR,0,0,$AB,$9F
+    db AGATHA,HYPNO,0,0,$DA,$AE
+    db AGATHA,GENGAR,0,0,$AA,$FF
 
     ; Lorelei
-    db LORELEI,DEWGONG,0,$AA,$4A
-    db LORELEI,CLOYSTER,0,$BF,$8C
-    db LORELEI,SLOWBRO,0,$8C,$0F
-    db LORELEI,BLASTOISE,0,$CF,$AB
-    db LORELEI,JYNX,0,$E9,$DE
-    db LORELEI,LAPRAS,0,$BF,$AE
+    db LORELEI,DEWGONG,0,0,$AA,$4A
+    db LORELEI,CLOYSTER,0,0,$BF,$8C
+    db LORELEI,SLOWBRO,0,0,$8C,$0F
+    db LORELEI,BLASTOISE,0,0,$CF,$AB
+    db LORELEI,JYNX,0,0,$E9,$DE
+    db LORELEI,LAPRAS,0,0,$BF,$AE
 
     ; Lance
-    db LANCE,GYARADOS,0,$EA,$AA
-    db LANCE,DRAGONAIR,0,$DA,$DA
-    db LANCE,CHARIZARD,0,$DD,$EE
-    db LANCE,AERODACTYL,0,$F9,$F9
-    db LANCE,DRAGONITE,0,$FF,$FF
+    db LANCE,GYARADOS,0,0,$EA,$AA
+    db LANCE,DRAGONAIR,0,2,$DA,$DA
+    db LANCE,DRAGONAIR,0,3,$AD,$AD
+    db LANCE,CHARIZARD,0,0,$DD,$EE
+    db LANCE,AERODACTYL,0,0,$F9,$F9
+    db LANCE,DRAGONITE,0,6,$FF,$FF
 
     db $FF
 
@@ -143466,92 +143566,6 @@ SearchItemInList:
     and a
     pop hl
     pop de
-    ret
-
-; ──────────────────────────────────────────────────────────────────────
-
-HoF_SetVariables:
-    call CheckHallOfFameWin
-    jr nz,.HoF_AfterFirstWin
-    ; fall through
-
-.HoF_BeforeFirstWin
-    xor a
-    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 0
-    inc a
-    ld [W_GARYCURSCRIPT],a ; 1
-    ld a,$D6 ; Oak in Champion Room
-    call .HoF_Hide
-    ld a,$FB ; Gary in Champion Room
-    call .HoF_Show
-    ld a,$FC ; Oak in Hall of Fame Room
-    call .HoF_Show
-    jr .HoF_ResetRoomsScriptAndFlags
-
-.HoF_AfterFirstWin
-    xor a
-    ld [W_GARYCURSCRIPT],a ; 0
-    ld a,$3
-    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 3
-    ld a,$D6 ; Oak in Champion Room
-    call .HoF_Hide
-    ld a,$FB ; Gary in Champion Room
-    call .HoF_Hide
-    ld a,$FC ; Oak in Hall of Fame Room
-    call .HoF_Hide
-    ; fall through
-
-.HoF_ResetRoomsScriptAndFlags
-    xor a
-    ld hl,W_LORELEICURSCRIPT
-    ld [hli],a ; W_LORELEICURSCRIPT ; 0
-    ld [hli],a ; W_BRUNOCURSCRIPT ; 0
-    ld [hl],a  ; W_AGATHACURSCRIPT ; 0
-    ld [W_LANCECURSCRIPT],a ; 0
-    ld hl,$d863
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hl],a
-    ret
-
-.HoF_Show
-    ld [$CC4D],a
-    PREDEF_JUMP AddMissableObject
-
-.HoF_Hide
-    ld [$CC4D],a
-    PREDEF_JUMP RemoveMissableObject
-
-; ──────────────────────────────────────────────────────────────────────
-
-; sets opponent type and mon set/lvl based on the engaging trainer data
-_InitBattleEnemyParameters:
-    ld a,[wEngagedTrainerClass]
-    ld [W_CUROPPONENT],a ; $d059
-    call .CheckElite4
-    ld a,[wEngagedTrainerSet] ; $cd2e
-    cp OPP_LVL_OFFSET
-    jr c,.Trainer
-    sub OPP_LVL_OFFSET
-    ld [W_CURENEMYLVL],a ; $d127
-    xor a
-.Trainer
-    ld [W_TRAINERNO],a ; $d05d
-    ret
-.CheckElite4
-    cp BRUNO
-    jr z,.e4
-    cp LORELEI
-    jr z,.e4
-    cp AGATHA
-    jr z,.e4
-    cp LANCE
-    ret nz
-.e4
-    ld a,$E4
-    ld [W_GYMLEADERNO],a
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
