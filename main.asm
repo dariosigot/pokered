@@ -8367,17 +8367,9 @@ EndTrainerBattle: ; 3275 (0:3275)
 
 ; sets opponent type and mon set/lvl based on the engaging trainer data
 InitBattleEnemyParameters:
-    ld a,[wEngagedTrainerClass]
-    ld [W_CUROPPONENT],a ; $d059
-    ld a,[wEngagedTrainerSet] ; $cd2e
-    cp OPP_LVL_OFFSET
-    jr c,.Trainer
-    sub OPP_LVL_OFFSET
-    ld [W_CURENEMYLVL],a ; $d127
-    xor a
-.Trainer
-    ld [W_TRAINERNO],a ; $d05d
-    ret
+    PREDEF_JUMP _InitBattleEnemyParameters
+
+; Free
 
 SECTION "Func_32ef",ROM0[$32ef]
 
@@ -76513,6 +76505,7 @@ GetAttackAnimationPointers_Predef:         NEW_PREDEF GetAttackAnimationPointers
 _IsItemInBagOrBoxPredef:                   NEW_PREDEF _IsItemInBagOrBox                   ; $74
 TryHallOfFameRematchPredef:                NEW_PREDEF TryHallOfFameRematch                ; $75
 HoF_SetVariablesPredef:                    NEW_PREDEF HoF_SetVariables                    ; $76
+_InitBattleEnemyParametersPredef:          NEW_PREDEF _InitBattleEnemyParameters          ; $77
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -143516,6 +143509,36 @@ HoF_SetVariables:
 .HoF_Hide
     ld [$CC4D],a
     PREDEF_JUMP RemoveMissableObject
+
+; ──────────────────────────────────────────────────────────────────────
+
+; sets opponent type and mon set/lvl based on the engaging trainer data
+_InitBattleEnemyParameters:
+    ld a,[wEngagedTrainerClass]
+    ld [W_CUROPPONENT],a ; $d059
+    call .CheckElite4
+    ld a,[wEngagedTrainerSet] ; $cd2e
+    cp OPP_LVL_OFFSET
+    jr c,.Trainer
+    sub OPP_LVL_OFFSET
+    ld [W_CURENEMYLVL],a ; $d127
+    xor a
+.Trainer
+    ld [W_TRAINERNO],a ; $d05d
+    ret
+.CheckElite4
+    cp BRUNO
+    jr z,.e4
+    cp LORELEI
+    jr z,.e4
+    cp AGATHA
+    jr z,.e4
+    cp LANCE
+    ret nz
+.e4
+    ld a,$E4
+    ld [W_GYMLEADERNO],a
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
