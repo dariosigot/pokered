@@ -137683,6 +137683,14 @@ AIEnemyTrainerChooseMoves:
     ld [W_TRAINERCLASS],a
     ;should be fine to let AIEnemyTrainerChooseMoves run at this point
 .notwildbattle
+    call GetCurrentOldAdventureMap
+    ld hl,.VictoryRoadMapList
+    ld de,1
+    call IsInArray
+    jr nc,.NotVictoryRoad
+    ld a,BRUNO
+    ld [W_TRAINERCLASS],a
+.NotVictoryRoad
     ld a,$a
     ld hl,$cee9  ; init temporary move selection array. Only the moves with the lowest numbers are chosen in the end
     ld [hli],a   ; move 1
@@ -137834,6 +137842,11 @@ AIEnemyTrainerChooseMoves:
 .useOriginalMoveSet
     ld hl,W_ENEMYMONMOVES    ; use original move set
     ret
+.VictoryRoadMapList
+    db VICTORY_ROAD_1
+    db VICTORY_ROAD_2
+    db VICTORY_ROAD_3
+    db $FF
 
 AIMoveChoiceModificationFunctionPointers:
     dw AIMoveChoiceModification1
