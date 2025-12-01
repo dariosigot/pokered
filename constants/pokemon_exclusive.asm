@@ -526,6 +526,8 @@ ParasectExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SLUDGE ; TM56
+    db PSYCHIC_M ; TM29
+    db PSYWAVE ; TM46
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VenonatExclusiveMove:
@@ -958,6 +960,8 @@ ElectrodeExclusiveMove:
     db SUBSTITUTE ; TM50
     db FLASH ; TM55
     db DISABLE
+    db PSYCHIC_M ; TM29
+    db PSYWAVE ; TM46
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 FarfetchdExclusiveMove:
@@ -1351,6 +1355,7 @@ WeezingExclusiveMove:
     db ABSORB
     db MEGA_DRAIN ; TM21
     db SLUDGE ; TM56
+    db PSYCHIC_M ; TM29
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RhyhornExclusiveMove:
@@ -1451,6 +1456,7 @@ TangelaExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SLUDGE ; TM56
+    db PSYWAVE ; TM46
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KangaskhanExclusiveMove:
@@ -1511,6 +1517,8 @@ SeadraExclusiveMove:
     db TSUNAMI ; TM53
     db RAGE ; TM20
     db SLUDGE ; TM56
+    db PSYCHIC_M ; TM29
+    db PSYWAVE ; TM46
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GoldeenExclusiveMove:
@@ -1535,6 +1543,8 @@ SeakingExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db LOVELY_KISS
+    db PSYCHIC_M ; TM29
+    db PSYWAVE ; TM46
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 StaryuExclusiveMove:

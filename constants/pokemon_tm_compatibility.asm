@@ -441,9 +441,9 @@ ParasectTMCompatibility:
     tmlearn 03,06,08                ; |SWORDS_DANCE|TOXIC|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 18,21,22                ; |COUNTER|MEGA_DRAIN|SOLARBEAM|
-    tmlearn 28,31                   ; |TRAPHOLE|MIMIC|
+    tmlearn 28,29,31                ; |TRAPHOLE|PSYCHIC_M|MIMIC|
     tmlearn 33,34                   ; |REFLECT|BIDE|
-    tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
+    tmlearn 41,44,46                ; |LIGHT_SCREEN|REST|PSYWAVE|
     tmlearn 50,51,56                ; |SUBSTITUTE|BLADE|SLUDGE|
     tmlearn 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -771,9 +771,9 @@ MagnetonTMCompatibility:
     tmlearn 08                      ; |BODY_SLAM|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,30,31,32             ; |THUNDER_M|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 25,29,30,31,32          ; |THUNDER_M|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
-    tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
+    tmlearn 41,44,45,46,47          ; |LIGHT_SCREEN|REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
     tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
     tmlearn 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -961,9 +961,9 @@ ElectrodeTMCompatibility:
     tmlearn 08                      ; |BODY_SLAM|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 22,24                   ; |SOLARBEAM|THUNDERBOLT|
-    tmlearn 25,30,31,32             ; |THUNDER_M|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 25,29,30,31,32          ; |THUNDER_M|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
-    tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
+    tmlearn 41,44,45,46,47          ; |LIGHT_SCREEN|REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
     tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
     tmlearn 0
 ElectrodeHisuiTMCompatibility:
@@ -1066,7 +1066,7 @@ WeezingTMCompatibility:
     tmlearn 06                      ; |TOXIC|
     tmlearn 15                      ; |HYPER_BEAM|
     tmlearn 21,24                   ; |MEGA_DRAIN|THUNDERBOLT|
-    tmlearn 25,31,32                ; |THUNDER_M|MIMIC|DOUBLE_TEAM|
+    tmlearn 25,29,31,32             ; |THUNDER_M|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
     tmlearn 34,36,37,38             ; |BIDE|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|
     tmlearn 44,45,46,47             ; |REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
     tmlearn 50,55,56                ; |SUBSTITUTE|FLASH|SLUDGE|
@@ -1107,7 +1107,7 @@ TangelaTMCompatibility:
     tmlearn 21,22                   ; |MEGA_DRAIN|SOLARBEAM|
     tmlearn 29,31                   ; |PSYCHIC_M|MIMIC|
     tmlearn 33,34,40                ; |REFLECT|BIDE|SKULL_BASH|
-    tmlearn 41,44                   ; |LIGHT_SCREEN|REST|
+    tmlearn 41,44,46                ; |LIGHT_SCREEN|REST|PSYWAVE|
     tmlearn 50,51,56                ; |SUBSTITUTE|BLADE|SLUDGE|
     tmlearn 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -1134,9 +1134,9 @@ SeadraTMCompatibility:
     tmlearn 02,06                   ; |RAZOR_WIND|TOXIC|
     tmlearn 11,12,13,14,15          ; |BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 20,23                   ; |RAGE|DRAGON_RAGE|
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
+    tmlearn 29,31,32                ; |PSYCHIC_M|MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
+    tmlearn 44,46                   ; |REST|PSYWAVE|
     tmlearn 50,53,56                ; |SUBSTITUTE|TSUNAMI|SLUDGE|
     tmlearn 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -1153,9 +1153,9 @@ SeakingTMCompatibility:
     tmlearn 03,06,07,08             ; |SWORDS_DANCE|TOXIC|HORN_DRILL|BODY_SLAM|
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 0
-    tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
+    tmlearn 29,31,32                ; |PSYCHIC_M|MIMIC|DOUBLE_TEAM|
     tmlearn 34,39,40                ; |BIDE|SWIFT|SKULL_BASH|
-    tmlearn 44                      ; |REST|
+    tmlearn 44,46                   ; |REST|PSYWAVE|
     tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
     tmlearn 0
 ; ──────────────────────────────────────────────────────────────────────
