@@ -132641,9 +132641,9 @@ VulpixAlolaPicFront:
 VulpixAlolaPicBack:
     INCBIN "pic/monback/vulpixalolab.pic"
 NinetalesAlolaPicFront:
-    INCBIN "pic/bmon/ninetales.pic"
+    INCBIN "pic/bmon/ninetalesalola.pic"
 NinetalesAlolaPicBack:
-    INCBIN "pic/monback/ninetalesb.pic"
+    INCBIN "pic/monback/ninetalesalolab.pic"
 
 SECTION "bank32",ROMX,BANK[$32]
 
