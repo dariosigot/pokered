@@ -789,6 +789,7 @@ NINETALES_Learnset: MACRO
     db 32,SMOG
     db 33,FLAMETHROWER
     db 36,SKULL_BASH
+    db 37,CONFUSION
     db 38,TRAPHOLE
     db 40,AGILITY
     db 40,FIRE_PUNCH
@@ -804,48 +805,48 @@ ENDM
 VULPIX_Alola_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
-    db  8,EMBER ; Exclusive
+    db  8,AURORA_BEAM ; Exclusive
     db 13,ROAR
     db 17,BITE
-    db 19,SMOKESCREEN
+    db 19,MIST
     db 21,QUICK_ATTACK ; Exclusive
     db 25,DOUBLE_KICK
     db 28,CONFUSE_RAY
     db 30,AGILITY ; Exclusive
     db 32,DOUBLE_TEAM ; Exclusive
-    db 34,POISON_GAS
+    db 34,HAZE
     db 37,SLAM
-    db 40,SMOG
-    db 42,FLAMETHROWER
-    db 47,FIRE_SPIN
+    db 40,SCREECH
+    db 42,ICE_BEAM
+    db 47,TSUNAMI
     db 52,SLASH
     db 54,LOVELY_KISS
-    db 56,FIRE_BLAST
+    db 56,BLIZZARD
 ENDM
 NINETALES_Alola_Learnset: MACRO
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  1,BITE
     db  8,ROAR
-    db 13,SMOKESCREEN
-    db 17,EMBER
+    db 13,MIST
+    db 17,AURORA_BEAM
     db 20,HYPER_FANG
     db 22,DOUBLE_KICK
     db 25,CONFUSE_RAY
-    db 27,POISON_GAS
+    db 27,HAZE
     db 28,QUICK_ATTACK
     db 31,SLAM
-    db 32,SMOG
-    db 33,FLAMETHROWER
+    db 32,SCREECH
+    db 33,ICE_BEAM
     db 36,SKULL_BASH
     db 37,CONFUSION
     db 38,TRAPHOLE
     db 40,AGILITY
-    db 40,FIRE_PUNCH
-    db 43,FIRE_SPIN
+    db 40,ICE_PUNCH
+    db 43,TSUNAMI
     db 45,SLASH
     db 48,LOVELY_KISS
-    db 50,FIRE_BLAST
+    db 50,BLIZZARD
     db 55,BODY_SLAM
     db 60,NIGHT_SHADE
     db 60,SUPER_FANG
@@ -1314,7 +1315,7 @@ ARCANINE_Learnset: MACRO
     db 32,SMOG
     db 33,FLAMETHROWER
     db 36,SKULL_BASH
-    db 37,
+    db 37,FOCUS_ENERGY
     db 38,BODY_SLAM
     db 40,QUICK_ATTACK
     db 40,FIRE_PUNCH
@@ -3427,12 +3428,12 @@ ARTICUNO_Learnset: MACRO
     db 21,SWOOP
     db 23,HAZE
     db 25,SCREECH
-    db 26,BUBBLEBEAM
+    db 26,AURORA_BEAM
     db 28,REFLECT
     db 31,RAZOR_WIND
     db 33,MIRROR_MOVE
     db 35,ICE_BEAM
-    db 38,AURORA_BEAM
+    db 38,BUBBLEBEAM
     db 40,ICE_PUNCH
     db 43,SWIFT
     db 46,LIGHT_SCREEN

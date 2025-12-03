@@ -354,31 +354,31 @@ VulpixTMCompatibility:
     tmlearn 57                      ; |FIRE_PUNCH|
 VulpixAlolaTMCompatibility:
     tmlearn 06                      ; |TOXIC|
-    tmlearn 09                      ; |TAKE_DOWN|
+    tmlearn 09,11,12,13,14          ; |TAKE_DOWN|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
     tmlearn 44                      ; |REST|
-    tmlearn 50                      ; |SUBSTITUTE|
-    tmlearn 57                      ; |FIRE_PUNCH|
+    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    tmlearn 58                      ; |ICE_PUNCH|
 NinetalesTMCompatibility:
     tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 20,22                   ; |RAGE|SOLARBEAM|
-    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
+    tmlearn 28,29,31,32             ; |TRAPHOLE|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44                ; |LIGHT_SCREEN|DREAM_EATER|REST|
+    tmlearn 41,42,44,46             ; |LIGHT_SCREEN|DREAM_EATER|REST|PSYWAVE|
     tmlearn 50                      ; |SUBSTITUTE|
     tmlearn 57                      ; |FIRE_PUNCH|
 NinetalesAlolaTMCompatibility:
     tmlearn 06,08                   ; |TOXIC|BODY_SLAM|
-    tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
+    tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 20,22                   ; |RAGE|SOLARBEAM|
-    tmlearn 28,31,32                ; |TRAPHOLE|MIMIC|DOUBLE_TEAM|
-    tmlearn 33,34,37,38,39,40       ; |REFLECT|BIDE|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
-    tmlearn 41,42,44                ; |LIGHT_SCREEN|DREAM_EATER|REST|
-    tmlearn 50                      ; |SUBSTITUTE|
-    tmlearn 57                      ; |FIRE_PUNCH|
+    tmlearn 28,29,31,32             ; |TRAPHOLE|PSYCHIC_M|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,39,40             ; |REFLECT|BIDE|SWIFT|SKULL_BASH|
+    tmlearn 41,42,44,46             ; |LIGHT_SCREEN|DREAM_EATER|REST|PSYWAVE|
+    tmlearn 50,53                   ; |SUBSTITUTE|TSUNAMI|
+    tmlearn 58                      ; |ICE_PUNCH|
 ; ──────────────────────────────────────────────────────────────────────
 JigglypuffTMCompatibility:
     tmlearn 01,08                   ; |MEGA_PUNCH|BODY_SLAM|
