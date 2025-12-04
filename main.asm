@@ -26081,113 +26081,15 @@ GetTMChoiceItemID:
 .X
     db "×@"
 
-SECTION "DrawBadges",ROMX[$6a03],BANK[$3]
+DrawBadges:
+    ld b,BANK(_DrawBadges)
+    ld hl,_DrawBadges
+    jp Bankswitch
 
-DrawBadges: ; ea03 (3:6a03)
-; Draw 4x2 gym leader badges
-; Used in the player status screen.
-; In Japanese versions,names are displayed above faces.
-; Instead of removing relevant code,the name graphics were erased.
-
-; Tile ids for badge graphics.
-    ld de,$cd3f
-    ld hl,.BadgeTiles
-    ld bc,8
-    call CopyData
-
-; Booleans for each badge.
-    ld hl,$cd49
-    ld bc,8
-    xor a
-    call FillMemory
-
-; Alter these based on owned badges.
-    ld hl,$cd49
-    ld a,[W_OBTAINEDBADGES]
-    ld b,a
-    ld a,[wGymLeaderRematch]
-    ld c,8
-.CheckBadge
-    srl b
-    jr nc,.NextBadge
-    inc [hl]
-    srl a
-    jr nc,.NextBadge2
-    inc [hl]
-    jr .NextBadge2
-.NextBadge
-    srl a
-.NextBadge2
-    inc hl
-    dec c
-    jr nz,.CheckBadge
-
-    FuncCoord 03,12
-    ld hl,Coord
-    ld de,$cd49
-    ld c,8 ; Draw 8 badges.
-    ld b,0 ; num of Badge Printed
-.loop
-    push de
-    push hl
-
-; Badges are printed if the badge is owned.
-    ld a,[de]
-    and a
-    jr z,.SkipBadge
-    push af
-    ld a,[$cd3f]
-    call .PlaceTiles
-    ld de,20 - 1
-    add hl,de
-    call .PlaceTiles
-    pop af
-    cp 2
-    jr c,.SkipRematchIcon
-    ld [hl],$D0 ; Mail Icon
-.SkipRematchIcon
-
-    inc b ; increase num of Badge Printed
-    ld a,b
-    cp 4
-
-    pop hl
-    ld de,4
-    jr nz,.skip
-    ld de,20*3-12
-.skip
-    add hl,de
-    push hl
-
-.SkipBadge
-
-; Shift badge array back one byte.
-    push bc
-    ld hl,$cd3f + 1
-    ld de,$cd3f
-    ld bc,8
-    call CopyData
-    pop bc
-
-    pop hl
-    pop de
-    inc de
-    dec c
-    jr nz,.loop
-    ret
-
-.PlaceTiles
-    ld [hli],a
-    inc a
-    ld [hl],a
-    inc a
-    ret
-
-.BadgeTiles
-    db $24,$2C,$34,$3C,$44,$4C,$54,$5C
-
-GymLeaderFaceAndBadgeTileGraphics
+GymLeaderFaceAndBadgeTileGraphics:
     INCBIN "gfx/badges.2bpp"
+
+; Free
 
 SECTION "ReplaceTileBlock",ROMX[$6e9e],BANK[$3]
 
@@ -138954,6 +138856,7 @@ GymLeaderAfterRematch_:
     ld hl,.MapScriptPointers
     call GetCurrentOldAdventureMap
     ld b,a
+    ld c,1 ; First Gym
 .loop
     ld a,[hli]
     cp $FF
@@ -138962,6 +138865,7 @@ GymLeaderAfterRematch_:
     jr z,.done
     inc hl
     inc hl
+    inc c
     jr .loop
 .done
     ld a,[hli]
@@ -138969,10 +138873,12 @@ GymLeaderAfterRematch_:
     ld l,a
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
-    ld a,0
     jr z,.reset
+    call .CheckBeatGymAfterHoFWin
+    xor a
     ld [wGymLeaderRematch],a
 .reset
+    xor a
     ld [hl],a
     ld [wJoypadForbiddenButtonsMask],a
     ld [W_CURMAPSCRIPT],a
@@ -138987,6 +138893,29 @@ GymLeaderAfterRematch_:
     dbw CINNABAR_GYM  , W_CINNABARGYMCURSCRIPT
     dbw VIRIDIAN_GYM  , W_VIRIDIANGYMCURSCRIPT
     db $FF
+.CheckBeatGymAfterHoFWin
+    call CheckHallOfFameWin
+    ret z
+    push hl
+    ld hl,wFlagsGymLeaderAfterHoFWin
+    ld a,[hl] ; Read
+    ld b,c
+.loop1
+    rrc a
+    dec b
+    jr nz,.loop1
+    bit 7,a
+    jr nz,.end ; return if just set
+    set 7,a
+    ld b,c
+.loop2
+    rlc a
+    dec b
+    jr nz,.loop2
+    ld [hl],a ; Store
+.end
+    pop hl
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -139077,6 +139006,125 @@ TryHallOfFameRematch:
     and a
     call nz,DisableWaitingAfterTextDisplay
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+_DrawBadges:
+; Draw 4x2 gym leader badges
+; Used in the player status screen.
+; In Japanese versions,names are displayed above faces.
+; Instead of removing relevant code,the name graphics were erased.
+
+; Tile ids for badge graphics.
+    ld de,$cd3f
+    ld hl,.BadgeTiles
+    ld bc,8
+    call CopyData
+
+; Booleans for each badge.
+    ld hl,$cd49
+    ld bc,8
+    xor a
+    call FillMemory
+
+; Alter these based on owned badges.
+    ld hl,$cd49
+    ld a,[W_OBTAINEDBADGES]
+    ld b,a
+    ld a,[wGymLeaderRematch]
+    ld d,a
+    ld a,[wFlagsGymLeaderAfterHoFWin]
+    ld e,a
+    ld c,8
+.CheckBadge
+    srl b
+    jr nc,.NextBadge
+    set 0,[hl]
+    srl d
+    jr nc,.CheckFlagsGymLeaderAfterHoFWin
+    set 1,[hl]
+.CheckFlagsGymLeaderAfterHoFWin
+    srl e
+    jr nc,.NextBadge2
+    set 2,[hl]
+    jr .NextBadge2
+.NextBadge
+    srl d
+    srl e
+.NextBadge2
+    inc hl
+    dec c
+    jr nz,.CheckBadge
+
+    FuncCoord 03,12
+    ld hl,Coord
+    ld de,$cd49
+    ld c,8 ; Draw 8 badges.
+    ld b,0 ; num of Badge Printed
+.loop
+    push de
+    push hl
+
+; Badges are printed if the badge is owned.
+    ld a,[de]
+    bit 0,a
+    jr z,.SkipBadge
+    push af
+    ld a,[$cd3f]
+    call .PlaceTiles
+    ld de,20 - 1
+    add hl,de
+    call .PlaceTiles
+    pop af
+    bit 1,a
+    jr z,.skip1
+    ld [hl],$D0 ; Mail Icon
+.skip1
+    bit 2,a
+    jr z,.skip2
+    inc hl
+    ld [hl],$D1 ; Star Icon
+    dec hl
+.skip2
+
+    inc b ; increase num of Badge Printed
+    ld a,b
+    cp 4
+
+    pop hl
+    ld de,4
+    jr nz,.skip
+    ld de,20*3-12
+.skip
+    add hl,de
+    push hl
+
+.SkipBadge
+
+; Shift badge array back one byte.
+    push bc
+    ld hl,$cd3f + 1
+    ld de,$cd3f
+    ld bc,8
+    call CopyData
+    pop bc
+
+    pop hl
+    pop de
+    inc de
+    dec c
+    jr nz,.loop
+    ret
+
+.PlaceTiles
+    ld [hli],a
+    inc a
+    ld [hl],a
+    inc a
+    ret
+
+.BadgeTiles
+    db $24,$2C,$34,$3C,$44,$4C,$54,$5C
 
 ; ──────────────────────────────────────────────────────────────────────
 
