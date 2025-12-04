@@ -249,6 +249,10 @@ wEnemyMonEvasionMod: ; cd33
 
 ; At Least 5 free Bytes, Attention to cd38!
 
+SECTION "wFlagsGymLeaderAfterHoFWin",WRAM0[$cd37]
+
+wFlagsGymLeaderAfterHoFWin:: db ; $cd37
+
 SECTION "wFlyLocationList",WRAM0[$cd3d]
 
 wFlyLocationList: ; cd3d
@@ -840,8 +844,19 @@ W_MONHFRONTSPRITE: ; d0c3
 W_MONHBACKSPRITE: ; d0c5
     ds 2
 
+UNION
+
 W_MONHNEXTALTFORM: ; d0c7
     ds 2
+
+NEXTU
+
+;W_MONH_UNUSED ; d0c7
+    ds 1
+W_MONHALTFORM: ; d0c8
+    ds 1
+
+ENDU
 
 W_MONHLEARNSETPOINTER: ; d0c9
     ds 2

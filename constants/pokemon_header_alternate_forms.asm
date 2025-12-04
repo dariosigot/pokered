@@ -717,3 +717,83 @@ EeveeStarterBaseStats:
     db 92 ; base exp yield
 
     db BANK(EeveePicFront)
+
+VulpixAlolaBaseStats:
+    db VULPIX ; mon id
+    db 38 ; base hp
+    db 41 ; base attack
+    db 40 ; base defense
+    db 65 ; base speed
+    db 65 ; base special
+
+    db ICE ; species type 1
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
+
+    db $66 ; sprite dimensions
+
+    dw VulpixAlolaPicFront
+    dw VulpixAlolaPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Vulpix_Alola_EvosMoves
+
+    db 0 ; growth rate
+
+    ; tm compatibility
+    dw VulpixAlolaTMCompatibility
+
+    ; palette
+    dw PAL_VULPIX_ALOLA
+
+    ; field moves
+    db 0
+
+    db 190 ; catch rate
+    db 63 ; base exp yield
+
+    db BANK(VulpixAlolaPicFront)
+
+NinetalesAlolaBaseStats:
+    db NINETALES ; mon id
+    db 73 ; base hp
+    db 67 ; base attack
+    db 75 ; base defense
+    db 109 ; base speed
+    db 100 ; base special
+
+    db ICE ; species type 1
+    db 0 ; species type 2
+    db 0 ; species type 3
+    db 0 ; species type 4
+
+    db $77 ; sprite dimensions
+
+    dw NinetalesAlolaPicFront
+    dw NinetalesAlolaPicBack
+
+    ; pointer to alternate forms
+    dw 0
+
+    ; pointer to evomoves
+    dw Ninetales_Alola_EvosMoves
+
+    db 0 ; growth rate
+
+    ; tm compatibility
+    dw NinetalesAlolaTMCompatibility
+
+    ; palette
+    dw PAL_NINETALES_ALOLA
+
+    ; field moves
+    db FM_CUT+FM_FLOAT+FM_DIG
+
+    db 75 ; catch rate
+    db 178 ; base exp yield
+
+    db BANK(NinetalesAlolaPicFront)

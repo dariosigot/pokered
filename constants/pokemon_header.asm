@@ -1497,7 +1497,7 @@ VulpixBaseStats:
     dw VulpixPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw VulpixAlolaBaseStats
 
     ; pointer to evomoves
     dw Vulpix_EvosMoves
@@ -1537,7 +1537,7 @@ NinetalesBaseStats:
     dw NinetalesPicBack
 
     ; pointer to alternate forms
-    dw 0
+    dw NinetalesAlolaBaseStats
 
     ; pointer to evomoves
     dw Ninetales_EvosMoves
@@ -1551,7 +1551,7 @@ NinetalesBaseStats:
     dw PAL_NINETALES
 
     ; field moves
-    db FM_CUT+FM_LIGHT+FM_DIG
+    db FM_CUT+FM_FLOAT+FM_LIGHT+FM_DIG
 
     db 75 ; catch rate
     db 178 ; base exp yield

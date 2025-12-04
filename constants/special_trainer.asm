@@ -1,3 +1,91 @@
+; ────────────────────────────────────────────────
+
+SpecialTrainer: MACRO
+    db \1,\2
+    dw \3
+    ENDM
+
+; ────────────────────────────────────────────────
+
+SpecialTrainerMoves:
+    SpecialTrainer BROCK,1,BrockMove1
+    SpecialTrainer BROCK,2,BrockMove2
+    SpecialTrainer BROCK,3,BrockMove3
+    SpecialTrainer BROCK,4,BrockMove4
+    SpecialTrainer BROCK,5,BrockMove5
+    SpecialTrainer BROCK,6,BrockMove6
+    SpecialTrainer BROCK,7,BrockMove7
+    SpecialTrainer BROCK,8,BrockMove8
+    SpecialTrainer BROCK,9,BrockMove9
+    SpecialTrainer MISTY,1,MistyMove2
+    SpecialTrainer MISTY,2,MistyMove3
+    SpecialTrainer MISTY,3,MistyMove4
+    SpecialTrainer MISTY,4,MistyMove5
+    SpecialTrainer MISTY,5,MistyMove6
+    SpecialTrainer MISTY,6,MistyMove7
+    SpecialTrainer MISTY,7,MistyMove8
+    SpecialTrainer MISTY,8,MistyMove9
+    SpecialTrainer LT_SURGE,1,LtSurgeMove3
+    SpecialTrainer LT_SURGE,2,LtSurgeMove4
+    SpecialTrainer LT_SURGE,3,LtSurgeMove5
+    SpecialTrainer LT_SURGE,4,LtSurgeMove6
+    SpecialTrainer LT_SURGE,5,LtSurgeMove7
+    SpecialTrainer LT_SURGE,6,LtSurgeMove8
+    SpecialTrainer LT_SURGE,7,LtSurgeMove9
+    SpecialTrainer ERIKA,1,ErikaMove4
+    SpecialTrainer ERIKA,2,ErikaMove5
+    SpecialTrainer ERIKA,3,ErikaMove6
+    SpecialTrainer ERIKA,4,ErikaMove7
+    SpecialTrainer ERIKA,5,ErikaMove8
+    SpecialTrainer ERIKA,6,ErikaMove9
+    SpecialTrainer KOGA,1,KogaMove6
+    SpecialTrainer KOGA,2,KogaMove7
+    SpecialTrainer KOGA,3,KogaMove8
+    SpecialTrainer KOGA,4,KogaMove9
+    SpecialTrainer SABRINA,1,SabrinaMove6
+    SpecialTrainer SABRINA,2,SabrinaMove7
+    SpecialTrainer SABRINA,3,SabrinaMove8
+    SpecialTrainer SABRINA,4,SabrinaMove9
+    SpecialTrainer BLAINE,1,BlaineMove7
+    SpecialTrainer BLAINE,2,BlaineMove8
+    SpecialTrainer BLAINE,3,BlaineMove9
+    SpecialTrainer BLACKBELT,1,DojoLeader
+    SpecialTrainer GIOVANNI,1,Giovanni1Move
+    SpecialTrainer GIOVANNI,2,Giovanni2Move
+    SpecialTrainer GIOVANNI,3,Giovanni3Move
+    SpecialTrainer LORELEI,1,LoreleiMove1
+    SpecialTrainer LORELEI,2,LoreleiMove2
+    SpecialTrainer BRUNO,1,BrunoMove1
+    SpecialTrainer BRUNO,2,BrunoMove2
+    SpecialTrainer AGATHA,1,AgathaMove1
+    SpecialTrainer AGATHA,2,AgathaMove2
+    SpecialTrainer LANCE,1,LanceMove1
+    SpecialTrainer LANCE,2,LanceMove2
+    SpecialTrainer SONY2,7,Sony2Move7
+    SpecialTrainer SONY2,8,Sony2Move8
+    SpecialTrainer SONY2,9,Sony2Move9
+    SpecialTrainer SONY2,10,Sony2MoveA
+    SpecialTrainer SONY2,11,Sony2MoveB
+    SpecialTrainer SONY2,12,Sony2MoveC
+    SpecialTrainer SONY3,1,Sony3Move1
+    SpecialTrainer SONY3,2,Sony3Move2
+    SpecialTrainer SONY3,3,Sony3Move3
+    SpecialTrainer COOLTRAINER_F,2,CooltrainerFMove2
+    SpecialTrainer COOLTRAINER_F,3,CooltrainerFMove3
+    SpecialTrainer COOLTRAINER_F,4,CooltrainerFMove4
+    SpecialTrainer COOLTRAINER_M,2,CooltrainerMMove2
+    SpecialTrainer COOLTRAINER_M,3,CooltrainerMMove3
+    SpecialTrainer COOLTRAINER_M,4,CooltrainerMMove4
+    SpecialTrainer BLACKBELT,9,BlackBeltMove9
+    SpecialTrainer JUGGLER,2,JugglerMove2
+    SpecialTrainer JUGGLER,5,JugglerMove5
+    SpecialTrainer TAMER,5,TamerMove5
+    SpecialTrainer POKEMANIAC,6,PokemaniacMove6
+    SpecialTrainer CHANNELER,14,ChannelerMove14
+    SpecialTrainer CHANNELER,15,ChannelerMove15
+    SpecialTrainer CHANNELER,16,ChannelerMove16
+    SpecialTrainer POKEMANIAC,8,PokemaniacMove8
+    db $ff
 
 ; ────────────────────────────────────────────────
 
@@ -338,7 +426,7 @@ ErikaMove7:
     ; 47,EXEGGCUTE
     db STUN_SPORE,MEGA_DRAIN,SLEEP_POWDER,PSYBEAM
     ; 49,TANGELA
-    db MEGA_DRAIN,PSYBEAM,SPORE,AMNESIA
+    db MEGA_DRAIN,PSYCHIC_M,SPORE,AMNESIA
     ; 46,PARASECT
     db SOLARBEAM,LEECH_SEED,STUN_SPORE,SPORE
     ; 49,VICTREEBEL
@@ -405,7 +493,7 @@ KogaMove7:
 
 KogaMove8:
     ; 54,ELECTRODE
-    db EXPLOSION,THUNDERBOLT,QUICK_ATTACK,SUPERSONIC
+    db EXPLOSION,THUNDERBOLT,PSYCHIC_M,SUPERSONIC
     ; 54,VENOMOTH
     db TOXIC,PIN_MISSILE,SPORE,PSYCHIC_M
     ; 57,WEEZING
@@ -578,24 +666,7 @@ Giovanni3Move:
 
 ; ────────────────────────────────────────────────
 
-LoreleiMove:
-    ; 54,DEWGONG
-    db WATERFALL,BODY_SLAM,REST,ICE_BEAM
-    ; 53,CLOYSTER
-    db ICE_BEAM,HAZE,CLAMP,SPIKE_CANNON
-    ; 54,SLOWBRO
-    db TSUNAMI,ICE_BEAM,AMNESIA,PSYCHIC_M
-    ; 55,BLASTOISE
-    db COUNTER,HYDRO_PUMP,DIZZY_PUNCH,ICE_PUNCH
-    ; 56,JYNX
-    db REFLECT,LOVELY_KISS,BLIZZARD,PSYCHIC_M
-    ; 56,LAPRAS
-    db THUNDERBOLT,REST,CRABHAMMER,BLIZZARD
-    db 0
-
-; ────────────────────────────────────────────────
-
-BrunoMove:
+BrunoMove1:
     ; 53,PRIMEAPE
     db JUMP_KICK,SCREECH,SEISMIC_TOSS,ROCK_SLIDE
     ; 55,HITMONCHAN
@@ -610,9 +681,24 @@ BrunoMove:
     db HI_JUMP_KICK,EARTHQUAKE,BODY_SLAM,COUNTER
     db 0
 
+BrunoMove2:
+    ; 62,POLIWRATH
+    db HYPNOSIS,ICE_PUNCH,JUMP_KICK,WATERFALL
+    ; 63,HITMONCHAN
+    db MEGA_PUNCH,COUNTER,THUNDERPUNCH,ICE_PUNCH
+    ; 63,HITMONLEE
+    db HI_JUMP_KICK,SWORDS_DANCE,RAZOR_LEAF,SEISMIC_TOSS
+    ; 64,PINSIR
+    db JUMP_KICK,CRABHAMMER,SWORDS_DANCE,TWINEEDLE
+    ; 65,MACHAMP
+    db HI_JUMP_KICK,EARTHQUAKE,HYPER_BEAM,COUNTER
+    ; 65,ONIX
+    db BODY_SLAM,SUBSTITUTE,SLUDGE,EARTHQUAKE
+    db 0
+
 ; ────────────────────────────────────────────────
 
-AgathaMove:
+AgathaMove1:
     ; 55,HAUNTER
     db MEGA_DRAIN,NIGHT_SHADE,HYPNOSIS,DREAM_EATER
     ; 56,GOLBAT
@@ -627,9 +713,56 @@ AgathaMove:
     db SLUDGE,PSYCHIC_M,TOXIC,ACID_ARMOR
     db 0
 
+AgathaMove2:
+    ; 61,GENGAR
+    db MEGA_DRAIN,PSYCHIC_M,HYPNOSIS,AMNESIA
+    ; 64,GOLBAT
+    db SLUDGE,CONFUSE_RAY,SWOOP,TOXIC
+    ; 63,ARBOK
+    db EARTHQUAKE,SUPER_FANG,WRAP,FLARE
+    ; 64,HYPNO
+    db HYPNOSIS,RECOVER,PSYCHIC_M,NIGHT_SHADE
+    ; 65,GENGAR
+    db SLUDGE,NIGHT_SHADE,HYPER_BEAM,SUBSTITUTE
+    ; 65,MAROWAK
+    db NIGHT_SHADE,BONEMERANG,FIRE_PUNCH,SWORDS_DANCE
+    db 0
+
 ; ────────────────────────────────────────────────
 
-LanceMove:
+LoreleiMove1:
+    ; 54,DEWGONG
+    db WATERFALL,BODY_SLAM,REST,ICE_BEAM
+    ; 53,CLOYSTER
+    db ICE_BEAM,HAZE,CLAMP,SPIKE_CANNON
+    ; 54,SLOWBRO
+    db TSUNAMI,ICE_BEAM,AMNESIA,PSYCHIC_M
+    ; 55,BLASTOISE
+    db COUNTER,HYDRO_PUMP,DIZZY_PUNCH,ICE_PUNCH
+    ; 56,JYNX
+    db REFLECT,LOVELY_KISS,BLIZZARD,PSYCHIC_M
+    ; 56,LAPRAS
+    db THUNDERBOLT,REST,CRABHAMMER,BLIZZARD
+    db 0
+
+LoreleiMove2:
+    ; 63,DEWGONG
+    db WATERFALL,BODY_SLAM,REST,BLIZZARD
+    ; 62,CLOYSTER
+    db BLIZZARD,LOVELY_KISS,CRABHAMMER,TSUNAMI
+    ; 61,SLOWBRO
+    db TSUNAMI,BLIZZARD,AMNESIA,PSYCHIC_M
+    ; 63,JYNX
+    db REFLECT,LOVELY_KISS,BLIZZARD,PSYCHIC_M
+    ; 65,LAPRAS
+    db HYPER_BEAM,SUBSTITUTE,CRABHAMMER,BLIZZARD
+    ; 65,NINETALES
+    db BLIZZARD,NIGHT_SHADE,LOVELY_KISS,SUPER_FANG
+    db 0
+
+; ────────────────────────────────────────────────
+
+LanceMove1:
     ; 58,GYARADOS
     db HYPER_BEAM,HYDRO_PUMP,THUNDERBOLT,FLAMETHROWER
     ; 54,DRAGONAIR
@@ -642,6 +775,21 @@ LanceMove:
     db FLAMETHROWER,EARTHQUAKE,HYPER_BEAM,ROCK_SLIDE
     ; 62,DRAGONITE
     db THUNDERPUNCH,ICE_PUNCH,FIRE_PUNCH,HYPER_BEAM
+    db 0
+
+LanceMove2:
+    ; 68,GYARADOS
+    db SUPER_FANG,HYDRO_PUMP,THUNDERBOLT,EARTHQUAKE
+    ; 62,DRAGONITE
+    db REFLECT,WATERFALL,EARTHQUAKE,FIRE_PUNCH
+    ; 62,DRAGONITE
+    db LIGHT_SCREEN,THUNDERPUNCH,WING_ATTACK,ICE_PUNCH
+    ; 65,CHARIZARD
+    db SLASH,FIRE_BLAST,SUPER_FANG,EARTHQUAKE
+    ; 70,DRAGONITE
+    db THUNDERPUNCH,ICE_PUNCH,THUNDER_WAVE,HYPER_BEAM
+    ; 70,AERODACTYL
+    db SUPERSONIC,EARTHQUAKE,SKY_ATTACK,ROCK_SLIDE
     db 0
 
 ; ────────────────────────────────────────────────
@@ -806,7 +954,7 @@ CooltrainerFMove3:
     ; 45,BEEDRILL
     db TWINEEDLE,SLUDGE,SWORDS_DANCE,AGILITY
     ; 41,SEAKING
-    db AGILITY,WATERFALL,PSYBEAM,HYPER_BEAM
+    db AGILITY,WATERFALL,PSYCHIC_M,HYPER_BEAM
     ; 43,RAPIDASH
     db AGILITY,HORN_ATTACK,FIRE_PUNCH,HORN_DRILL
     ; 46,CHANSEY
@@ -842,7 +990,7 @@ CooltrainerMMove2:
     ; 43,CLEFABLE
     db SOFTBOILED,MINIMIZE,BODY_SLAM,METRONOME
     ; 45,WEEZING
-    db FLARE,SLUDGE,PSYBEAM,EXPLOSION
+    db FLARE,SLUDGE,PSYCHIC_M,EXPLOSION
     db 0
 
 CooltrainerMMove3:

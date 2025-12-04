@@ -3454,10 +3454,13 @@ GetMonHeader: ; 1537 (0:1537)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(PokemonBaseStats)
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
+    call .ChangeBank
     push bc
     push de
+    push hl
+    ld hl,wAlternateFormIndex
+    ld a,[hl]
+    push af
     push hl
     ld a,[$d11e]
     push af
@@ -3468,7 +3471,9 @@ GetMonHeader: ; 1537 (0:1537)
     ld bc,28
     call AddNTimes
 .retry
-    call .CopyData
+    ld bc,28
+    ld de,W_MONHEADER
+    call CopyData
     ld hl,wAlternateFormIndex
     ld a,[hl]
     and a
@@ -3480,25 +3485,27 @@ GetMonHeader: ; 1537 (0:1537)
     ld h,[hl]
     ld l,a
     or h
-    jr z,.NoOthersAltForm
-    jr .retry
+    jr nz,.retry
+    ; fall through
 .done
     pop af
     ld [$d11e],a
     pop hl
+    pop af
+    ld de,W_MONHALTFORM
+    ld [de],a
+    dec de
+    xor a
+    ld [hl],a
+    ld [de],a ; W_MONH_UNUSED
+    pop hl
     pop de
     pop bc
     pop af
+    ; fall through
+.ChangeBank
     ld [H_LOADEDROMBANK],a
     jp RoutineForRealGB
-.CopyData
-    ld bc,28
-    ld de,W_MONHEADER
-    jp CopyData
-.NoOthersAltForm
-    xor a
-    ld [wAlternateFormIndex],a
-    jr .done
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Pointer Conversion (BANK $00)
@@ -8367,17 +8374,9 @@ EndTrainerBattle: ; 3275 (0:3275)
 
 ; sets opponent type and mon set/lvl based on the engaging trainer data
 InitBattleEnemyParameters:
-    ld a,[wEngagedTrainerClass]
-    ld [W_CUROPPONENT],a ; $d059
-    ld a,[wEngagedTrainerSet] ; $cd2e
-    cp OPP_LVL_OFFSET
-    jr c,.Trainer
-    sub OPP_LVL_OFFSET
-    ld [W_CURENEMYLVL],a ; $d127
-    xor a
-.Trainer
-    ld [W_TRAINERNO],a ; $d05d
-    ret
+    PREDEF_JUMP _InitBattleEnemyParameters
+
+; Free
 
 SECTION "Func_32ef",ROM0[$32ef]
 
@@ -11567,7 +11566,7 @@ ItemPrices:
     bcd3      0 ; ?
     bcd3      0 ; ?
     bcd3  40000 ; DUSK_STONE
-    bcd3      0 ; ?
+    bcd3  40000 ; ICE_STONE
     bcd3      0 ; ?
     bcd3      0 ; ?
     bcd3      0 ; ?
@@ -23077,7 +23076,7 @@ UseItem_:
     dw ItemUseBait       ;
     dw ItemUseRock       ;
     dw ItemUseEvoStone   ; DUSK_STONE
-    dw UnusableItem      ;
+    dw ItemUseEvoStone   ; ICE_STONE
     dw UnusableItem      ;
     dw UnusableItem      ;
     dw UnusableItem      ;
@@ -26082,113 +26081,15 @@ GetTMChoiceItemID:
 .X
     db "×@"
 
-SECTION "DrawBadges",ROMX[$6a03],BANK[$3]
+DrawBadges:
+    ld b,BANK(_DrawBadges)
+    ld hl,_DrawBadges
+    jp Bankswitch
 
-DrawBadges: ; ea03 (3:6a03)
-; Draw 4x2 gym leader badges
-; Used in the player status screen.
-; In Japanese versions,names are displayed above faces.
-; Instead of removing relevant code,the name graphics were erased.
-
-; Tile ids for badge graphics.
-    ld de,$cd3f
-    ld hl,.BadgeTiles
-    ld bc,8
-    call CopyData
-
-; Booleans for each badge.
-    ld hl,$cd49
-    ld bc,8
-    xor a
-    call FillMemory
-
-; Alter these based on owned badges.
-    ld hl,$cd49
-    ld a,[W_OBTAINEDBADGES]
-    ld b,a
-    ld a,[wGymLeaderRematch]
-    ld c,8
-.CheckBadge
-    srl b
-    jr nc,.NextBadge
-    inc [hl]
-    srl a
-    jr nc,.NextBadge2
-    inc [hl]
-    jr .NextBadge2
-.NextBadge
-    srl a
-.NextBadge2
-    inc hl
-    dec c
-    jr nz,.CheckBadge
-
-    FuncCoord 03,12
-    ld hl,Coord
-    ld de,$cd49
-    ld c,8 ; Draw 8 badges.
-    ld b,0 ; num of Badge Printed
-.loop
-    push de
-    push hl
-
-; Badges are printed if the badge is owned.
-    ld a,[de]
-    and a
-    jr z,.SkipBadge
-    push af
-    ld a,[$cd3f]
-    call .PlaceTiles
-    ld de,20 - 1
-    add hl,de
-    call .PlaceTiles
-    pop af
-    cp 2
-    jr c,.SkipRematchIcon
-    ld [hl],$D0 ; Mail Icon
-.SkipRematchIcon
-
-    inc b ; increase num of Badge Printed
-    ld a,b
-    cp 4
-
-    pop hl
-    ld de,4
-    jr nz,.skip
-    ld de,20*3-12
-.skip
-    add hl,de
-    push hl
-
-.SkipBadge
-
-; Shift badge array back one byte.
-    push bc
-    ld hl,$cd3f + 1
-    ld de,$cd3f
-    ld bc,8
-    call CopyData
-    pop bc
-
-    pop hl
-    pop de
-    inc de
-    dec c
-    jr nz,.loop
-    ret
-
-.PlaceTiles
-    ld [hli],a
-    inc a
-    ld [hl],a
-    inc a
-    ret
-
-.BadgeTiles
-    db $24,$2C,$34,$3C,$44,$4C,$54,$5C
-
-GymLeaderFaceAndBadgeTileGraphics
+GymLeaderFaceAndBadgeTileGraphics:
     INCBIN "gfx/badges.2bpp"
+
+; Free
 
 SECTION "ReplaceTileBlock",ROMX[$6e9e],BANK[$3]
 
@@ -28916,68 +28817,14 @@ GetAlternateForm:
     ld [wAlternateFormIndex],a ; Save AlternateFormIndex
     ld [wTempAlternateFormIndex],a
     ret
-
 .enemy
-    ;SpecialTrainerAlternateForm
     push de
-    ld a,[W_CUROPPONENT]
-    cp SONY2
-    jr nz,.skip1
-    ld a,SONY1
-.skip1
-    cp SONY3
-    jr nz,.skip2
-    ld a,SONY1
-.skip2
-    ld b,a
-    ld a,[$cf91]
-    ld c,a
-    ld hl,.CustomTrainer
-    call .loop
-    ld a,0
-    jr nc,.enemyend
+    ld b,BANK(SpecialTrainerAlternateForm)
+    ld hl,SpecialTrainerAlternateForm
+    call Bankswitch
     ld a,d
-.enemyend
     pop de
     jr .end
-
-.loop
-    ld a,[hli]
-    cp $FF
-    jr z,.NotFound
-    cp b
-    jr nz,.next3
-    ld a,[hli]
-    cp c
-    jr nz,.next2
-.found
-    ld a,[hl]
-    ld d,a
-    scf ; scf = found
-    ret
-.next3
-    inc hl
-.next2
-    inc hl
-    jr .loop
-.NotFound
-    and a ; rcf = not found
-    ret
-
-.CustomTrainer
-
-    ; Green1
-    db SONY1,SQUIRTLE,$01
-    db SONY1,WARTORTLE,$01
-    db SONY1,BLASTOISE,$01
-    db SONY1,BULBASAUR,$01
-    db SONY1,IVYSAUR,$01
-    db SONY1,VENUSAUR,$01
-    db SONY1,CHARMANDER,$01
-    db SONY1,CHARMELEON,$01
-    db SONY1,CHARIZARD,$01
-
-    db $FF
 
 ; Generate Random only if
 ; • Pkmn Is Added ToParty with Rename Screen (Out Of Battle)
@@ -31435,6 +31282,7 @@ UsableItems_PartyMenu:
     db SUPER_POTION
     db POTION
     db DUSK_STONE
+    db ICE_STONE
     db FIRE_STONE
     db THUNDER_STONE
     db WATER_STONE
@@ -35535,22 +35383,7 @@ IndigoPlateauLobbyScript: ; 19c5b (6:5c5b)
     bit 6,[hl]
     res 6,[hl]
     ret z
-; wispnote - This event was probably ment to be reset on Route 23.
-;    ld hl,$d869
-;    res 7,[hl] ; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
-    call CheckHallOfFameWin
-    ret nz
-    ld hl,$d734
-    bit 1,[hl]
-    res 1,[hl]
-    ret z
-    ld hl,$d863
-    xor a
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hl],a
-    ret
+    PREDEF_JUMP HoF_SetVariables
 
 SECTION "IndigoPlateauLobbyTextPointers",ROMX[$5c7f],BANK[$6]
 
@@ -49963,141 +49796,6 @@ Func_39bd5: ; 39bd5 (e:5bd5)
     ld [$cf90],a
     ret
 
-; Free
-
-SECTION "ReadTrainer",ROMX[$5c53],BANK[$e]
-
-ReadTrainer: ; 39c53 (e:5c53)
-
-; don't change any moves in a link battle
-    ld a,[W_ISLINKBATTLE]
-    and a
-    ret nz
-
-; set [wEnemyPartyCount] to 0,[$D89D] to FF
-; XXX first is total enemy pokemon?
-; XXX second is species of first pokemon?
-    ld hl,wEnemyPartyCount
-    xor a
-    ld [hli],a
-    dec a
-    ld [hl],a
-
-; get the pointer to trainer data for this class
-    ld a,[W_TRAINERCLASS]
-    dec a
-    add a,a
-    ld hl,TrainerDataPointers
-    ld c,a
-    ld b,0
-    add hl,bc ; hl points to trainer class
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    ld a,[W_TRAINERNO]
-    ld b,a
-; At this point b contains the trainer number,
-; and hl points to the trainer class.
-; Our next task is to iterate through the trainers,
-; decrementing b each time,until we get to the right one.
-.outer
-    dec b
-    jr z,.IterateTrainer
-.inner
-    ld a,[hli]
-    and a
-    jr nz,.inner
-    jr .outer
-
-; if the first byte of trainer data is FF,
-; - each pokemon has a specific level
-;      (as opposed to the whole team being of the same level)
-; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move (not applicable to the Yellow method)
-; else the first byte is the level of every pokemon on the team
-.IterateTrainer
-    ld a,[hli]
-    cp $FF ; is the trainer special?
-    jr z,.SpecialTrainer ; if so,check for special moves
-    ld [W_CURENEMYLVL],a
-.LoopTrainerData
-    ld a,[hli]
-    and a ; have we reached the end of the trainer data?
-    jr z,.AddAdditionalMoveData ; jr z,.FinishUp
-    ld [$CF91],a ; write species somewhere (XXX why?)
-    ld a,1
-    ld [$CC49],a
-    push hl
-    call AddPokemonToParty
-    pop hl
-    jr .LoopTrainerData
-.SpecialTrainer
-; if this code is being run:
-; - each pokemon has a specific level
-;      (as opposed to the whole team being of the same level)
-; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move (not applicable to the Yellow method)
-    ld a,[hli]
-    and a ; have we reached the end of the trainer data?
-    jr z,.AddAdditionalMoveData ; jr z,.AddLoneMove
-    ld [W_CURENEMYLVL],a
-    ld a,[hli]
-    ld [$CF91],a
-    ld a,1
-    ld [$CC49],a
-    push hl
-    call AddPokemonToParty
-    pop hl
-    jr .SpecialTrainer
-.AddAdditionalMoveData
-; does the trainer have additional move data?
-    ld a,[W_TRAINERCLASS]
-    ld b,a
-    ld a,[W_TRAINERNO]
-    ld c,a
-    ld hl,SpecialTrainerMoves
-.loopAdditionalMoveData
-    ld a,[hli]
-    cp $ff
-    jr z,.FinishUp
-    cp b
-    jr nz,.NextSpecialTrainer1
-    ld a,[hli]
-    cp c
-    jr nz,.NextSpecialTrainer2
-    ld a,[hli]
-    ld d,[hl]
-    ld e,a
-    ld b,BANK(LoadSpecialTrainerMoves)
-    ld hl,LoadSpecialTrainerMoves
-    call Bankswitch
-    jr .FinishUp
-.NextSpecialTrainer1
-    inc hl
-.NextSpecialTrainer2
-    inc hl
-    inc hl
-    jr .loopAdditionalMoveData
-.FinishUp ; XXX this needs documenting
-    xor a       ; clear D079-D07B
-    ld de,$D079
-    ld [de],a
-    inc de
-    ld [de],a
-    inc de
-    ld [de],a
-    ld a,[W_CURENEMYLVL]
-    ld b,a
-.LastLoop
-    ld hl,$D047
-    ld c,2
-    push bc
-    PREDEF Func_f81d
-    pop bc
-    inc de
-    inc de
-    dec b
-    jr nz,.LastLoop
-    ret
-
 ;joenote - added these functions to check if the ai switching bit is set
 ;need to have 'a' accumulator and flag register freed up to use this function
 CheckandResetSwitchBit:
@@ -51388,87 +51086,6 @@ SetAttributeOamRedBall:
     ld a,3
     ld [hli],a
     ret
-
-SpecialTrainer: MACRO
-    db \1,\2
-    dw \3
-    ENDM
-
-SpecialTrainerMoves:
-    SpecialTrainer BROCK,1,BrockMove1
-    SpecialTrainer BROCK,2,BrockMove2
-    SpecialTrainer BROCK,3,BrockMove3
-    SpecialTrainer BROCK,4,BrockMove4
-    SpecialTrainer BROCK,5,BrockMove5
-    SpecialTrainer BROCK,6,BrockMove6
-    SpecialTrainer BROCK,7,BrockMove7
-    SpecialTrainer BROCK,8,BrockMove8
-    SpecialTrainer BROCK,9,BrockMove9
-    SpecialTrainer MISTY,1,MistyMove2
-    SpecialTrainer MISTY,2,MistyMove3
-    SpecialTrainer MISTY,3,MistyMove4
-    SpecialTrainer MISTY,4,MistyMove5
-    SpecialTrainer MISTY,5,MistyMove6
-    SpecialTrainer MISTY,6,MistyMove7
-    SpecialTrainer MISTY,7,MistyMove8
-    SpecialTrainer MISTY,8,MistyMove9
-    SpecialTrainer LT_SURGE,1,LtSurgeMove3
-    SpecialTrainer LT_SURGE,2,LtSurgeMove4
-    SpecialTrainer LT_SURGE,3,LtSurgeMove5
-    SpecialTrainer LT_SURGE,4,LtSurgeMove6
-    SpecialTrainer LT_SURGE,5,LtSurgeMove7
-    SpecialTrainer LT_SURGE,6,LtSurgeMove8
-    SpecialTrainer LT_SURGE,7,LtSurgeMove9
-    SpecialTrainer ERIKA,1,ErikaMove4
-    SpecialTrainer ERIKA,2,ErikaMove5
-    SpecialTrainer ERIKA,3,ErikaMove6
-    SpecialTrainer ERIKA,4,ErikaMove7
-    SpecialTrainer ERIKA,5,ErikaMove8
-    SpecialTrainer ERIKA,6,ErikaMove9
-    SpecialTrainer KOGA,1,KogaMove6
-    SpecialTrainer KOGA,2,KogaMove7
-    SpecialTrainer KOGA,3,KogaMove8
-    SpecialTrainer KOGA,4,KogaMove9
-    SpecialTrainer SABRINA,1,SabrinaMove6
-    SpecialTrainer SABRINA,2,SabrinaMove7
-    SpecialTrainer SABRINA,3,SabrinaMove8
-    SpecialTrainer SABRINA,4,SabrinaMove9
-    SpecialTrainer BLAINE,1,BlaineMove7
-    SpecialTrainer BLAINE,2,BlaineMove8
-    SpecialTrainer BLAINE,3,BlaineMove9
-    SpecialTrainer BLACKBELT,1,DojoLeader
-    SpecialTrainer GIOVANNI,1,Giovanni1Move
-    SpecialTrainer GIOVANNI,2,Giovanni2Move
-    SpecialTrainer GIOVANNI,3,Giovanni3Move
-    SpecialTrainer LORELEI,1,LoreleiMove
-    SpecialTrainer BRUNO,1,BrunoMove
-    SpecialTrainer AGATHA,1,AgathaMove
-    SpecialTrainer LANCE,1,LanceMove
-    SpecialTrainer SONY2,7,Sony2Move7
-    SpecialTrainer SONY2,8,Sony2Move8
-    SpecialTrainer SONY2,9,Sony2Move9
-    SpecialTrainer SONY2,10,Sony2MoveA
-    SpecialTrainer SONY2,11,Sony2MoveB
-    SpecialTrainer SONY2,12,Sony2MoveC
-    SpecialTrainer SONY3,1,Sony3Move1
-    SpecialTrainer SONY3,2,Sony3Move2
-    SpecialTrainer SONY3,3,Sony3Move3
-    SpecialTrainer COOLTRAINER_F,2,CooltrainerFMove2
-    SpecialTrainer COOLTRAINER_F,3,CooltrainerFMove3
-    SpecialTrainer COOLTRAINER_F,4,CooltrainerFMove4
-    SpecialTrainer COOLTRAINER_M,2,CooltrainerMMove2
-    SpecialTrainer COOLTRAINER_M,3,CooltrainerMMove3
-    SpecialTrainer COOLTRAINER_M,4,CooltrainerMMove4
-    SpecialTrainer BLACKBELT,9,BlackBeltMove9
-    SpecialTrainer JUGGLER,2,JugglerMove2
-    SpecialTrainer JUGGLER,5,JugglerMove5
-    SpecialTrainer TAMER,5,TamerMove5
-    SpecialTrainer POKEMANIAC,6,PokemaniacMove6
-    SpecialTrainer CHANNELER,14,ChannelerMove14
-    SpecialTrainer CHANNELER,15,ChannelerMove15
-    SpecialTrainer CHANNELER,16,ChannelerMove16
-    SpecialTrainer POKEMANIAC,8,PokemaniacMove8
-    db $ff
 
 ; ────────────────────────────────────────────────────────────
 
@@ -52891,8 +52508,6 @@ CryData:
     db $18,$F7,$7E; 157 - MON_157
     db $18,$F7,$7E; 158 - MON_158
     db $18,$F7,$7E; 159 - MON_159
-
-INCLUDE "constants/TrainerData.asm"
 
 SECTION "bankF",ROMX,BANK[$F]
 
@@ -76527,6 +76142,8 @@ DrawHUDsAndHPBarsPredef:                   NEW_PREDEF DrawHUDsAndHPBars         
 GetAttackAnimationPointers_Predef:         NEW_PREDEF GetAttackAnimationPointers_         ; $73
 _IsItemInBagOrBoxPredef:                   NEW_PREDEF _IsItemInBagOrBox                   ; $74
 TryHallOfFameRematchPredef:                NEW_PREDEF TryHallOfFameRematch                ; $75
+HoF_SetVariablesPredef:                    NEW_PREDEF HoF_SetVariables                    ; $76
+_InitBattleEnemyParametersPredef:          NEW_PREDEF _InitBattleEnemyParameters          ; $77
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -89170,24 +88787,7 @@ LanceScript2:
     ld a,$1
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
-    call HallOfFame_HealParty_Bank16
-    call CheckHallOfFameWin
-    ret nz
-    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 0
-    inc a
-    ld [W_GARYCURSCRIPT],a ; 1
-    ld a,$D6 ; Oak in Champion Room
-    call .Hide
-    ld a,$FB ; Gary in Champion Room
-    call .Show
-    ld a,$FC ; Oak in Hall of Fame Room
-    ; fall through
-.Show
-    ld [$CC4D],a
-    PREDEF_JUMP AddMissableObject
-.Hide
-    ld [$CC4D],a
-    PREDEF_JUMP RemoveMissableObject
+    jp HallOfFame_HealParty_Bank16
 
 ;Func_5a35b: ; 5a35b (16:635b)
 ;    ld a,$ff
@@ -89638,26 +89238,17 @@ HallofFameRoomScript2:
     res 1,[hl]
     inc hl
     set 0,[hl]
-    xor a
-    ld hl,W_LORELEICURSCRIPT
-    ld [hli],a ; W_LORELEICURSCRIPT ; 0
-    ld [hli],a ; W_BRUNOCURSCRIPT ; 0
-    ld [hl],a  ; W_AGATHACURSCRIPT ; 0
-    ld [W_LANCECURSCRIPT],a ; 0
-    ld [W_GARYCURSCRIPT],a ; 0
-    ld hl,$d863
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hl],a
-    ld a,$3
-    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 3
-    call CheckHallOfFameWin
-    call z,.HandleMissableSprite
-    call .HandleFlagRematchAndNewHallOfFameCounter
     call .Wait
     call WaitForTextScrollButtonPress
+    ld hl,$d5a2
+    ld a,[hl]
+    inc a
+    jr z,.skip
+    inc [hl]
+.skip
+    PREDEF HoF_SetVariables
+    ld hl,wGymLeaderRematch
+    ld [hl],%01111111
     call GBFadeOut2
     ld a,8
     call StopMusic
@@ -89666,28 +89257,6 @@ HallofFameRoomScript2:
     ld b,BANK(SpecialRestartAfterHallOfFame)
     ld hl,SpecialRestartAfterHallOfFame
     jp Bankswitch
-
-.HandleMissableSprite
-    ld a,$D6 ; Oak in Champion Room
-    call .Hide
-    ld a,$FB ; Gary in Champion Room
-    call .Hide
-    ld a,$FC ; Oak in Hall of Fame Room
-    ; fall through
-.Hide
-    ld [$CC4D],a
-    PREDEF_JUMP RemoveMissableObject
-
-.HandleFlagRematchAndNewHallOfFameCounter
-    ld hl,wGymLeaderRematch
-    ld [hl],%01111111
-    ld hl,$d5a2
-    ld a,[hl]
-    inc a
-    ret z
-    inc [hl]
-    ret
-
 .Wait
     ld b,$5
 .loop
@@ -108498,7 +108067,6 @@ BrunoScript_762ec: ; 762ec (1d:62ec)
     bit 5,[hl]
     res 5,[hl]
     ret z
-    call InitialilzeEliteFour
     ld a,[$d864]
     bit 1,a
     ld a,$24
@@ -109328,13 +108896,6 @@ GetObtainedHiddenCoinsFlags:
     ret
 
 ; ───────────────────────────────────────
-
-InitialilzeEliteFour:
-    call CheckHallOfFameWin
-    ret nz
-    ld hl,$d734
-    set 1,[hl]
-    ret
 
 HallOfFame_DisplayTextID_HealParty:
     call DisplayTextID
@@ -132977,6 +132538,14 @@ MarowakAlolaPicFront:
     INCBIN "pic/bmon/marowakalola.pic"
 MarowakAlolaPicBack:
     INCBIN "pic/monback/marowakalolab.pic"
+VulpixAlolaPicFront:
+    INCBIN "pic/bmon/vulpixalola.pic"
+VulpixAlolaPicBack:
+    INCBIN "pic/monback/vulpixalolab.pic"
+NinetalesAlolaPicFront:
+    INCBIN "pic/bmon/ninetalesalola.pic"
+NinetalesAlolaPicBack:
+    INCBIN "pic/monback/ninetalesalolab.pic"
 
 SECTION "bank32",ROMX,BANK[$32]
 
@@ -134341,9 +133910,414 @@ _BaitHealth:
     call LeechSeed_IncreaseEnemyHP
     PREDEF_JUMP DrawEnemyHUDAndHPBar
 
-; ───────────────────────────────────────
+; ──────────────────────────────────────────────────────────────────────
 
-SECTION "Wild Pkmn",ROMX,BANK[$36]
+SECTION "bank35",ROMX,BANK[$35]
+
+; ──────────────────────────────────────────────────────────────────────
+
+HoF_SetVariables:
+    call CheckHallOfFameWin
+    jr nz,.HoF_AfterFirstWin
+    ; fall through
+
+.HoF_BeforeFirstWin
+    xor a
+    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 0
+    inc a
+    ld [W_GARYCURSCRIPT],a ; 1
+    ld a,$D6 ; Oak in Champion Room
+    call .HoF_Hide
+    ld a,$FB ; Gary in Champion Room
+    call .HoF_Show
+    ld a,$FC ; Oak in Hall of Fame Room
+    call .HoF_Show
+    jr .HoF_ResetRoomsScriptAndFlags
+
+.HoF_AfterFirstWin
+    xor a
+    ld [W_GARYCURSCRIPT],a ; 0
+    ld a,$3
+    ld [W_HALLOFFAMEROOMCURSCRIPT],a ; 3
+    ld a,$D6 ; Oak in Champion Room
+    call .HoF_Hide
+    ld a,$FB ; Gary in Champion Room
+    call .HoF_Hide
+    ld a,$FC ; Oak in Hall of Fame Room
+    call .HoF_Hide
+    ; fall through
+
+.HoF_ResetRoomsScriptAndFlags
+    xor a
+    ld hl,W_LORELEICURSCRIPT
+    ld [hli],a ; W_LORELEICURSCRIPT ; 0
+    ld [hli],a ; W_BRUNOCURSCRIPT ; 0
+    ld [hl],a  ; W_AGATHACURSCRIPT ; 0
+    ld [W_LANCECURSCRIPT],a ; 0
+    ld hl,$d863
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+    ret
+
+.HoF_Show
+    ld [$CC4D],a
+    PREDEF_JUMP AddMissableObject
+
+.HoF_Hide
+    ld [$CC4D],a
+    PREDEF_JUMP RemoveMissableObject
+
+; ──────────────────────────────────────────────────────────────────────
+
+; sets opponent type and mon set/lvl based on the engaging trainer data
+_InitBattleEnemyParameters:
+    ld a,[wEngagedTrainerClass]
+    ld [W_CUROPPONENT],a ; $d059
+    call .CheckElite4
+    ld a,[wEngagedTrainerSet] ; $cd2e
+    cp OPP_LVL_OFFSET
+    jr c,.Trainer
+    sub OPP_LVL_OFFSET
+    ld [W_CURENEMYLVL],a ; $d127
+    xor a
+.Trainer
+    ld [W_TRAINERNO],a ; $d05d
+    ret
+.CheckElite4
+    cp BRUNO
+    jr z,.e4
+    cp LORELEI
+    jr z,.e4
+    cp AGATHA
+    jr z,.e4
+    cp LANCE
+    ret nz
+.e4
+    ld a,$E4
+    ld [W_GYMLEADERNO],a
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+PrintMenuItemQty:
+    ld hl,$cf8b
+    ld a,[hli]
+    cp wNumBagItems & $FF
+    jr nz,.NotBag
+    ld a,[hld]
+    cp wNumBagItems >> 8
+    jr nz,.NotBag
+    ld a,[wNumBagItems]
+    ld b,20 ; bag can hold 20 items
+    jr .found
+.NotBag
+    ld hl,$cf8b
+    ld a,[hli]
+    cp wNumBoxItems & $FF
+    jr nz,.NotBox
+    ld a,[hld]
+    cp wNumBoxItems >> 8
+    jr nz,.NotBox
+    ld a,[wNumBoxItems]
+    ld b,40 ; bag can hold 20 items
+    jr .found
+.NotBox
+    ret
+.found
+    ld de,$d11e
+    ld [de],a
+    ld a,[W_ISINBATTLE]
+    and a
+    FuncCoord 14,03
+    ld hl,Coord
+    jr z,.done
+    FuncCoord 14,08
+    ld hl,Coord
+.done
+    push bc
+    push de
+    call .PrintNumber
+    pop de
+    pop bc
+    ld [hl],"/"
+    inc hl
+    ld a,b
+    ld [de],a
+    ; fall through
+.PrintNumber
+    ld bc,((%10000000 + 1) << 8) + 2
+    jp PrintNumber
+
+; ──────────────────────────────────────────────────────────────────────
+
+GetAttackAnimationPointers_:
+    call Load16BitRegisters
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ret
+
+AttackAnimationPointers:
+    dw PoundAnim
+    dw KarateChopAnim
+    dw DoubleSlapAnim
+    dw CometPunchAnim
+    dw MegaPunchAnim
+    dw PayDayAnim
+    dw FirePunchAnim
+    dw IcePunchAnim
+    dw ThunderPunchAnim
+    dw ScratchAnim
+    dw VicegripAnim
+    dw GuillotineAnim
+    dw RazorWindAnim
+    dw SwordsDanceAnim
+    dw CutAnim
+    dw GustAnim
+    dw WingAttackAnim
+    dw WhirlwindAnim
+    dw FlyAnim
+    dw BindAnim
+    dw SlamAnim
+    dw VineWhipAnim
+    dw StompAnim
+    dw DoubleKickAnim
+    dw MegaKickAnim
+    dw JumpKickAnim
+    dw RollingKickAnim
+    dw SandAttackAnim
+    dw HeatButtAnim
+    dw HornAttackAnim
+    dw FuryAttackAnim
+    dw HornDrillAnim
+    dw TackleAnim
+    dw BodySlamAnim
+    dw WrapAnim
+    dw TakeDownAnim
+    dw ThrashAnim
+    dw DoubleEdgeAnim
+    dw TailWhipAnim
+    dw PoisonStingAnim
+    dw TwineedleAnim
+    dw PinMissileAnim
+    dw LeerAnim
+    dw BiteAnim
+    dw GrowlAnim
+    dw RoarAnim
+    dw SingAnim
+    dw SupersonicAnim
+    dw SonicBoomAnim
+    dw DisableAnim
+    dw AcidAnim
+    dw EmberAnim
+    dw FlamethrowerAnim
+    dw MistAnim
+    dw WaterGunAnim
+    dw HydroPumpAnim
+    dw SurfAnim
+    dw IceBeamAnim
+    dw BlizzardAnim
+    dw PsyBeamAnim
+    dw BubbleBeamAnim
+    dw AuroraBeamAnim
+    dw HyperBeamAnim
+    dw PeckAnim
+    dw DrillPeckAnim
+    dw SubmissionAnim
+    dw LowKickAnim
+    dw CounterAnim
+    dw SeismicTossAnim
+    dw StrengthAnim
+    dw AbsorbAnim
+    dw MegaDrainAnim
+    dw LeechSeedAnim
+    dw GrowthAnim
+    dw RazorLeafAnim
+    dw SolarBeamAnim
+    dw PoisonPowderAnim
+    dw StunSporeAnim
+    dw SleepPowderAnim
+    dw PedalDanceAnim
+    dw StringShotAnim
+    dw DragonRageAnim
+    dw FireSpinAnim
+    dw ThunderShockAnim
+    dw ThunderBoldAnim
+    dw ThunderWaveAnim
+    dw ThunderAnim
+    dw RockThrowAnim
+    dw EarthquakeAnim
+    dw FissureAnim
+    dw DigAnim
+    dw ToxicAnim
+    dw ConfusionAnim
+    dw PsychicAnim
+    dw HypnosisAnim
+    dw MeditateAnim
+    dw AgilityAnim
+    dw QuickAttackAnim
+    dw RageAnim
+    dw TeleportAnim
+    dw NightShadeAnim
+    dw MimicAnim
+    dw ScreechAnim
+    dw DoubleTeamAnim
+    dw RecoverAnim
+    dw HardenAnim
+    dw MinimizeAnim
+    dw SmokeScreenAnim
+    dw ConfuseRayAnim
+    dw WithdrawAnim
+    dw DefenseCurlAnim
+    dw BarrierAnim
+    dw LightScreenAnim
+    dw HazeAnim
+    dw ReflectAnim
+    dw FocusEnergyAnim
+    dw BideAnim
+    dw MetronomeAnim
+    dw MirrorMoveAnim
+    dw SelfdestructAnim
+    dw EggBombAnim
+    dw LickAnim
+    dw SmogAnim
+    dw SludgeAnim
+    dw BoneClubAnim
+    dw FireBlastAnim
+    dw WaterfallAnim
+    dw ClampAnim
+    dw SwiftAnim
+    dw SkullBashAnim
+    dw SpikeCannonAnim
+    dw ConstrictAnim
+    dw AmnesiaAnim
+    dw KinesisAnim
+    dw SoftboiledAnim
+    dw HiJumpKickAnim
+    dw FlareAnim
+    dw DreamEaterAnim
+    dw PoisonGasAnim
+    dw BarrageAnim
+    dw LeechLifeAnim
+    dw LovelyKissAnim
+    dw SkyAttackAnim
+    dw TransformAnim
+    dw BubbleAnim
+    dw DizzyPunchAnim
+    dw SporeAnim
+    dw FlashAnim
+    dw PsywaveAnim
+    dw SplashAnim
+    dw AcidArmorAnim
+    dw CrabHammerAnim
+    dw ExplosionAnim
+    dw FurySwipesAnim
+    dw BonemerangAnim
+    dw RestAnim
+    dw RockSlideAnim
+    dw HyperFangAnim
+    dw SharpenAnim
+    dw ConversionAnim
+    dw TriAttackAnim
+    dw SuperFangAnim
+    dw SlashAnim
+    dw SubstituteAnim
+    dw StruggleAnim
+    dw ShowPicAnim
+    dw EnemyFlashAnim
+    dw PlayerFlashAnim
+    dw EnemyHUDShakeAnim
+    dw TradeBallDropAnim
+    dw TradeBallAppear1Anim
+    dw TradeBallAppear2Anim
+    dw TradeBallPoofAnim
+    dw XStatItemAnim
+    dw XStatItemAnim
+    dw ShrinkingSquareAnim
+    dw ShrinkingSquareAnim
+    dw XStatItemBlackAnim
+    dw XStatItemBlackAnim
+    dw ShrinkingSquareBlackAnim
+    dw ShrinkingSquareBlackAnim
+    dw UnusedAnim
+    dw UnusedAnim
+    dw ParalyzeAnim
+    dw ParalyzeAnim
+    dw PoisonAnim
+    dw PoisonAnim
+    dw SleepPlayerAnim
+    dw SleepEnemyAnim
+    dw ConfusedPlayerAnim
+    dw ConfusedEnemyAnim
+    dw FaintAnim
+    dw BallTossAnim
+    dw BallShakeAnim
+    dw BallPoofAnim
+    dw BallBlockAnim
+    dw GreatTossAnim
+    dw UltraTossAnim
+    dw ShakeScreenAnim
+    dw HidePicAnim
+    dw ThrowRockAnim
+    dw ThrowBaitAnim
+    dw ZigZagScreenAnim
+    dw TransformFailAnim ; $CC
+    dw TeleportAnimTrainerBattle ; $CD
+    dw WhirlwindAnimTrainerBattle ; $CE
+    dw RoarAnimTrainerBattle ; $CF
+
+; ──────────────────────────────────────────────────────────────────────
+
+_IsItemInBagOrBox:
+    call Load16BitRegisters
+    push bc
+    call IsItemInBag2
+    pop bc
+    ret nz ; ret if item in bag
+    push de
+    push hl
+    ld hl,wNumBoxItems
+    jr SearchItemInList
+
+_IsItemInBag:
+    call Load16BitRegisters
+IsItemInBag2:
+    push de
+    push hl
+    ld hl,wNumBagItems
+SearchItemInList:
+    ld a,[hl]
+    and a
+    jr z,.NotFought
+    ld d,a
+.loop
+    inc hl
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFought
+    cp b
+    jr z,.Fought
+    dec d
+    jr nz,.loop
+.NotFought
+    ld b,0
+    jr .end
+.Fought
+    ld a,[hl]
+    ld b,a
+.end
+    ld a,b
+    and a
+    pop hl
+    pop de
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+SECTION "bank36",ROMX,BANK[$36]
 
 GetWildDataCurrentMap:
     call GetWildDataPointers ; ld hl,WildDataPointers
@@ -137753,6 +137727,14 @@ AIEnemyTrainerChooseMoves:
     ld [W_TRAINERCLASS],a
     ;should be fine to let AIEnemyTrainerChooseMoves run at this point
 .notwildbattle
+    call GetCurrentOldAdventureMap
+    ld hl,.VictoryRoadMapList
+    ld de,1
+    call IsInArray
+    jr nc,.NotVictoryRoad
+    ld a,BRUNO
+    ld [W_TRAINERCLASS],a
+.NotVictoryRoad
     ld a,$a
     ld hl,$cee9  ; init temporary move selection array. Only the moves with the lowest numbers are chosen in the end
     ld [hli],a   ; move 1
@@ -137904,6 +137886,11 @@ AIEnemyTrainerChooseMoves:
 .useOriginalMoveSet
     ld hl,W_ENEMYMONMOVES    ; use original move set
     ret
+.VictoryRoadMapList
+    db VICTORY_ROAD_1
+    db VICTORY_ROAD_2
+    db VICTORY_ROAD_3
+    db $FF
 
 AIMoveChoiceModificationFunctionPointers:
     dw AIMoveChoiceModification1
@@ -138754,6 +138741,11 @@ DrawLineBox2:
 
 UpgradeTrainerSet_:
     ld a,[wEngagedTrainerClass]
+    ld hl,.EliteFourList
+    ld de,1
+    call IsInArray
+    jr c,.EliteFour
+    ld a,[wEngagedTrainerClass]
     ld b,a
     ld hl,.Gym
 .loop
@@ -138779,11 +138771,20 @@ UpgradeTrainerSet_:
     ld [hl],a
     call CheckHallOfFameWin
     jr z,.end
+.add1
     inc [hl] ; add 1 if after hall of fame
     jr .end
 .next
     inc hl
     jr .loop
+.EliteFour
+    ld hl,wFlagsGymLeaderAfterHoFWin
+    ld b,1
+    call CountSetBits
+    ld a,[$D11E]
+    cp 7
+    ld hl,wEngagedTrainerSet ; Elite Four Team
+    jr nc,.add1
 .end
     jp PlayTrainerMusic
 .Gym
@@ -138794,6 +138795,12 @@ UpgradeTrainerSet_:
     db KOGA     , %11000000
     db SABRINA  , %11000000
     db BLAINE   , %10000000
+    db $FF
+.EliteFourList
+    db BRUNO
+    db AGATHA
+    db LORELEI
+    db LANCE
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -138869,6 +138876,7 @@ GymLeaderAfterRematch_:
     ld hl,.MapScriptPointers
     call GetCurrentOldAdventureMap
     ld b,a
+    ld c,1 ; First Gym
 .loop
     ld a,[hli]
     cp $FF
@@ -138877,6 +138885,7 @@ GymLeaderAfterRematch_:
     jr z,.done
     inc hl
     inc hl
+    inc c
     jr .loop
 .done
     ld a,[hli]
@@ -138884,10 +138893,12 @@ GymLeaderAfterRematch_:
     ld l,a
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
-    ld a,0
     jr z,.reset
+    call .CheckBeatGymAfterHoFWin
+    xor a
     ld [wGymLeaderRematch],a
 .reset
+    xor a
     ld [hl],a
     ld [wJoypadForbiddenButtonsMask],a
     ld [W_CURMAPSCRIPT],a
@@ -138902,6 +138913,29 @@ GymLeaderAfterRematch_:
     dbw CINNABAR_GYM  , W_CINNABARGYMCURSCRIPT
     dbw VIRIDIAN_GYM  , W_VIRIDIANGYMCURSCRIPT
     db $FF
+.CheckBeatGymAfterHoFWin
+    call CheckHallOfFameWin
+    ret z
+    push hl
+    ld hl,wFlagsGymLeaderAfterHoFWin
+    ld a,[hl] ; Read
+    ld b,c
+.loop1
+    rrc a
+    dec b
+    jr nz,.loop1
+    bit 7,a
+    jr nz,.end ; return if just set
+    set 7,a
+    ld b,c
+.loop2
+    rlc a
+    dec b
+    jr nz,.loop2
+    ld [hl],a ; Store
+.end
+    pop hl
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -138992,6 +139026,125 @@ TryHallOfFameRematch:
     and a
     call nz,DisableWaitingAfterTextDisplay
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+_DrawBadges:
+; Draw 4x2 gym leader badges
+; Used in the player status screen.
+; In Japanese versions,names are displayed above faces.
+; Instead of removing relevant code,the name graphics were erased.
+
+; Tile ids for badge graphics.
+    ld de,$cd3f
+    ld hl,.BadgeTiles
+    ld bc,8
+    call CopyData
+
+; Booleans for each badge.
+    ld hl,$cd49
+    ld bc,8
+    xor a
+    call FillMemory
+
+; Alter these based on owned badges.
+    ld hl,$cd49
+    ld a,[W_OBTAINEDBADGES]
+    ld b,a
+    ld a,[wGymLeaderRematch]
+    ld d,a
+    ld a,[wFlagsGymLeaderAfterHoFWin]
+    ld e,a
+    ld c,8
+.CheckBadge
+    srl b
+    jr nc,.NextBadge
+    set 0,[hl]
+    srl d
+    jr nc,.CheckFlagsGymLeaderAfterHoFWin
+    set 1,[hl]
+.CheckFlagsGymLeaderAfterHoFWin
+    srl e
+    jr nc,.NextBadge2
+    set 2,[hl]
+    jr .NextBadge2
+.NextBadge
+    srl d
+    srl e
+.NextBadge2
+    inc hl
+    dec c
+    jr nz,.CheckBadge
+
+    FuncCoord 03,12
+    ld hl,Coord
+    ld de,$cd49
+    ld c,8 ; Draw 8 badges.
+    ld b,0 ; num of Badge Printed
+.loop
+    push de
+    push hl
+
+; Badges are printed if the badge is owned.
+    ld a,[de]
+    bit 0,a
+    jr z,.SkipBadge
+    push af
+    ld a,[$cd3f]
+    call .PlaceTiles
+    ld de,20 - 1
+    add hl,de
+    call .PlaceTiles
+    pop af
+    bit 1,a
+    jr z,.skip1
+    ld [hl],$D0 ; Mail Icon
+.skip1
+    bit 2,a
+    jr z,.skip2
+    inc hl
+    ld [hl],$D1 ; Star Icon
+    dec hl
+.skip2
+
+    inc b ; increase num of Badge Printed
+    ld a,b
+    cp 4
+
+    pop hl
+    ld de,4
+    jr nz,.skip
+    ld de,20*3-12
+.skip
+    add hl,de
+    push hl
+
+.SkipBadge
+
+; Shift badge array back one byte.
+    push bc
+    ld hl,$cd3f + 1
+    ld de,$cd3f
+    ld bc,8
+    call CopyData
+    pop bc
+
+    pop hl
+    pop de
+    inc de
+    dec c
+    jr nz,.loop
+    ret
+
+.PlaceTiles
+    ld [hli],a
+    inc a
+    ld [hl],a
+    inc a
+    ret
+
+.BadgeTiles
+    db $24,$2C,$34,$3C,$44,$4C,$54,$5C
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -141877,6 +142030,82 @@ BattleMonPartyAttr:
     jp AddNTimes
 
 ; ──────────────────────────────────────────────────────────────────────
+; SpecialTrainerAlternateForm
+; ──────────────────────────────────────────────────────────────────────
+
+SpecialTrainerAlternateForm:
+    ld a,[W_CUROPPONENT]
+    cp SONY2
+    jr nz,.skip1
+    ld a,SONY1
+.skip1
+    cp SONY3
+    jr nz,.skip2
+    ld a,SONY1
+.skip2
+    ld b,a
+    ld a,[$cf91]
+    ld c,a
+    ld a,[$FF00+$e4] ; NewPartyLength
+    ld e,a
+    ld hl,.CustomTrainer
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFound
+    cp b
+    jr nz,.next3
+    ld a,[hli]
+    cp c
+    jr nz,.next2
+    ld a,[hli]
+    and a
+    jr z,.found
+    cp e
+    jr nz,.next1
+.found
+    ld a,[hl]
+    ld d,a
+    ret
+.next3
+    inc hl
+.next2
+    inc hl
+.next1
+    inc hl
+    jr .loop
+.NotFound
+    ld d,0
+    ret
+
+.CustomTrainer
+
+    ; Green1
+    db SONY1,SQUIRTLE,0,$01
+    db SONY1,WARTORTLE,0,$01
+    db SONY1,BLASTOISE,0,$01
+    db SONY1,BULBASAUR,0,$01
+    db SONY1,IVYSAUR,0,$01
+    db SONY1,VENUSAUR,0,$01
+    db SONY1,CHARMANDER,0,$01
+    db SONY1,CHARMELEON,0,$01
+    db SONY1,CHARIZARD,0,$01
+
+    ; Bruno
+    db BRUNO,ONIX,6,$01
+
+    ; Agatha
+    db AGATHA,MAROWAK,6,$01
+
+    ; Lorelei
+    db LORELEI,NINETALES,6,$01
+
+    ; Lance
+    db LANCE,AERODACTYL,6,$01
+
+    db $FF
+
+; ──────────────────────────────────────────────────────────────────────
 ; GenerateRandomEnemyTrainerIV_
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -142048,7 +142277,7 @@ GenerateRandomEnemyTrainerIV_:
     db $BF,$FF,$AF,$9F ; dw $BFA9 ; BRUNO         ; $21 ;
     db $9F,$AF,$8F,$1F ; dw $9A81 ; BROCK         ; $22 ;
     db $9F,$8F,$AF,$9F ; dw $98A9 ; MISTY         ; $23 ;
-    db $9F,$8F,$0F,$BF ; dw $980B ; LT_SURGE     ; $24 ;
+    db $9F,$8F,$0F,$BF ; dw $980B ; LT_SURGE      ; $24 ;
     db $1F,$BF,$8F,$BF ; dw $1B8B ; ERIKA         ; $25 ;
     db $9F,$8F,$AF,$BF ; dw $98AB ; KOGA          ; $26 ;
     db $BF,$8F,$8F,$BF ; dw $B88B ; BLAINE        ; $27 ;
@@ -142074,6 +142303,10 @@ GenerateRandomEnemyTrainerIV_:
     ld b,a
     ld a,[$cf91]
     ld c,a
+    ld a,[W_MONHALTFORM]
+    ld d,a
+    ld a,[$FF00+$e4] ; NewPartyLength
+    ld e,a
     ld hl,.CustomTrainer
     call .loop
     ret nc
@@ -142094,19 +142327,31 @@ GenerateRandomEnemyTrainerIV_:
     cp $FF
     jr z,.NotFound
     cp b
-    jr nz,.next3
+    jr nz,.next4
     ld a,[hli]
     cp c
+    jr nz,.next3
+    ld a,[hli]
+    cp d
     jr nz,.next2
+    ld a,[hli]
+    and a
+    jr z,.found
+    cp e
+    jr nz,.next1
 .found
     ld a,[hli]
     ld d,a
     ld e,[hl]
     scf ; scf = found
     ret
+.next4
+    inc hl
 .next3
     inc hl
 .next2
+    inc hl
+.next1
     inc hl
     inc hl
     jr .loop
@@ -142117,160 +142362,171 @@ GenerateRandomEnemyTrainerIV_:
 .CustomTrainer
 
     ; Pokemaniac
-    db POKEMANIAC,CHARMANDER,$2A,$AA
+    db POKEMANIAC,CHARMANDER,0,0,$2A,$AA
 
     ; Green1
-    db SONY1,SQUIRTLE,$00,$00
-    db SONY1,WARTORTLE,$00,$00
-    db SONY1,BLASTOISE,$00,$00
-    db SONY1,BULBASAUR,$00,$00
-    db SONY1,IVYSAUR,$00,$00
-    db SONY1,VENUSAUR,$00,$00
-    db SONY1,CHARMANDER,$00,$00
-    db SONY1,CHARMELEON,$00,$00
-    db SONY1,CHARIZARD,$00,$00
-    db SONY1,NIDORAN_F,$05,$54
-    db SONY1,NIDORINA,$05,$54
-    db SONY1,RATTATA,$62,$77
-    db SONY1,RATICATE,$62,$77
-    db SONY1,PIDGEY,$DC,$FA
-    db SONY1,PIDGEOTTO,$DC,$FA
-    db SONY1,PIDGEOT,$DC,$FA
-    db SONY1,ABRA,$88,$FF
-    db SONY1,KADABRA,$88,$FF
-    db SONY1,ALAKAZAM,$88,$FF
-    db SONY1,GEODUDE,$9B,$00
-    db SONY1,GRAVELER,$9B,$00
-    db SONY1,GROWLITHE,$F5,$EE
-    db SONY1,ARCANINE,$F5,$EE
-    db SONY1,EXEGGCUTE,$EE,$5F
-    db SONY1,EXEGGUTOR,$EE,$5F
-    db SONY1,SHELLDER,$5F,$EE
-    db SONY1,CLOYSTER,$5F,$EE
-    db SONY1,RHYHORN,$FF,$79
-    db SONY1,RHYDON,$FF,$79
+    db SONY1,SQUIRTLE,1,0,$00,$00
+    db SONY1,WARTORTLE,1,0,$00,$00
+    db SONY1,BLASTOISE,1,0,$00,$00
+    db SONY1,BULBASAUR,1,0,$00,$00
+    db SONY1,IVYSAUR,1,0,$00,$00
+    db SONY1,VENUSAUR,1,0,$00,$00
+    db SONY1,CHARMANDER,1,0,$00,$00
+    db SONY1,CHARMELEON,1,0,$00,$00
+    db SONY1,CHARIZARD,1,0,$00,$00
+    db SONY1,NIDORAN_F,0,0,$05,$54
+    db SONY1,NIDORINA,0,0,$05,$54
+    db SONY1,RATTATA,0,0,$62,$77
+    db SONY1,RATICATE,0,0,$62,$77
+    db SONY1,PIDGEY,0,0,$DC,$FA
+    db SONY1,PIDGEOTTO,0,0,$DC,$FA
+    db SONY1,PIDGEOT,0,0,$DC,$FA
+    db SONY1,ABRA,0,0,$88,$FF
+    db SONY1,KADABRA,0,0,$88,$FF
+    db SONY1,ALAKAZAM,0,0,$88,$FF
+    db SONY1,GEODUDE,0,0,$9B,$00
+    db SONY1,GRAVELER,0,0,$9B,$00
+    db SONY1,GROWLITHE,0,0,$F5,$EE
+    db SONY1,ARCANINE,0,0,$F5,$EE
+    db SONY1,EXEGGCUTE,0,0,$EE,$5F
+    db SONY1,EXEGGUTOR,0,0,$EE,$5F
+    db SONY1,SHELLDER,0,0,$5F,$EE
+    db SONY1,CLOYSTER,0,0,$5F,$EE
+    db SONY1,RHYHORN,0,0,$FF,$79
+    db SONY1,RHYDON,0,0,$FF,$79
 
     ; Brock
-    db BROCK,GEODUDE,$55,$55
-    db BROCK,GRAVELER,$55,$55
-    db BROCK,GOLEM,$55,$55
-    db BROCK,ONIX,$0F,$F0
-    db BROCK,VULPIX,$E2,$EE
-    db BROCK,NINETALES,$E2,$EE
-    db BROCK,OMANYTE,$3D,$AF
-    db BROCK,OMASTAR,$3D,$AF
-    db BROCK,KABUTO,$EC,$94
-    db BROCK,KABUTOPS,$EC,$94
-    db BROCK,AERODACTYL,$D9,$F9
+    db BROCK,GEODUDE,0,0,$55,$55
+    db BROCK,GRAVELER,0,0,$55,$55
+    db BROCK,GOLEM,0,0,$55,$55
+    db BROCK,ONIX,0,0,$0F,$F0
+    db BROCK,VULPIX,0,0,$E2,$EE
+    db BROCK,NINETALES,0,0,$E2,$EE
+    db BROCK,OMANYTE,0,0,$3D,$AF
+    db BROCK,OMASTAR,0,0,$3D,$AF
+    db BROCK,KABUTO,0,0,$EC,$94
+    db BROCK,KABUTOPS,0,0,$EC,$94
+    db BROCK,AERODACTYL,0,0,$D9,$F9
 
     ; Misty
-    db MISTY,STARYU,$2A,$A9
-    db MISTY,STARMIE,$B8,$F9
-    db MISTY,PSYDUCK,$00,$FF
-    db MISTY,GOLDUCK,$00,$FF
-    db MISTY,MAGIKARP,$A8,$7A
-    db MISTY,GYARADOS,$A8,$7A
-    db MISTY,HORSEA,$56,$FE
-    db MISTY,SEADRA,$56,$FE
-    db MISTY,GOLDEEN,$B8,$7B
-    db MISTY,SEAKING,$B8,$7B
-    db MISTY,LAPRAS,$CC,$AF
-    db MISTY,VAPOREON,$A7,$AA
+    db MISTY,STARYU,0,0,$2A,$A9
+    db MISTY,STARMIE,0,0,$B8,$F9
+    db MISTY,PSYDUCK,0,0,$00,$FF
+    db MISTY,GOLDUCK,0,0,$00,$FF
+    db MISTY,MAGIKARP,0,0,$A8,$7A
+    db MISTY,GYARADOS,0,0,$A8,$7A
+    db MISTY,HORSEA,0,0,$56,$FE
+    db MISTY,SEADRA,0,0,$56,$FE
+    db MISTY,GOLDEEN,0,0,$B8,$7B
+    db MISTY,SEAKING,0,0,$B8,$7B
+    db MISTY,LAPRAS,0,0,$CC,$AF
+    db MISTY,VAPOREON,0,0,$A7,$AA
 
     ; LtSurge
-    db LT_SURGE,PIKACHU,$FF,$FF
-    db LT_SURGE,RAICHU,$B8,$0E
-    db LT_SURGE,MAGNEMITE,$6D,$7E
-    db LT_SURGE,MAGNETON,$6D,$7E
-    db LT_SURGE,VOLTORB,$F0,$F9
-    db LT_SURGE,ELECTRODE,$F0,$F9
-    db LT_SURGE,ELECTABUZZ,$EE,$EE
-    db LT_SURGE,JOLTEON,$A7,$AA
+    db LT_SURGE,PIKACHU,0,0,$FF,$FF
+    db LT_SURGE,RAICHU,0,0,$B8,$0E
+    db LT_SURGE,MAGNEMITE,0,0,$6D,$7E
+    db LT_SURGE,MAGNETON,0,0,$6D,$7E
+    db LT_SURGE,VOLTORB,0,0,$F0,$F9
+    db LT_SURGE,ELECTRODE,0,0,$F0,$F9
+    db LT_SURGE,ELECTABUZZ,0,0,$EE,$EE
+    db LT_SURGE,JOLTEON,0,0,$A7,$AA
 
     ; Erika
-    db ERIKA,TANGELA,$7D,$5A
-    db ERIKA,WEEPINBELL,$E7,$BB
-    db ERIKA,VICTREEBEL,$E7,$BB
-    db ERIKA,GLOOM,$7E,$9E
-    db ERIKA,VILEPLUME,$E7,$E9
-    db ERIKA,EXEGGCUTE,$66,$6C
-    db ERIKA,EXEGGUTOR,$66,$6C
-    db ERIKA,PARASECT,$79,$F8
+    db ERIKA,TANGELA,0,0,$7D,$5A
+    db ERIKA,WEEPINBELL,0,0,$E7,$BB
+    db ERIKA,VICTREEBEL,0,0,$E7,$BB
+    db ERIKA,GLOOM,0,0,$7E,$9E
+    db ERIKA,VILEPLUME,0,0,$E7,$E9
+    db ERIKA,EXEGGCUTE,0,0,$66,$6C
+    db ERIKA,EXEGGUTOR,0,0,$66,$6C
+    db ERIKA,PARASECT,0,0,$79,$F8
 
     ; Koga
-    db KOGA,VENOMOTH,$C7,$FD
-    db KOGA,GOLBAT,$F4,$F4
-    db KOGA,MUK,$EF,$5C
-    db KOGA,WEEZING,$9F,$FC
-    db KOGA,ARBOK,$D8,$E9
-    db KOGA,SCYTHER,$F7,$F7
-    db KOGA,TENTACRUEL,$6A,$FC
-    db KOGA,ELECTRODE,$F0,$F0
-    db KOGA,HAUNTER,$92,$DD
-    db KOGA,GENGAR,$92,$DD
+    db KOGA,VENOMOTH,0,0,$C7,$FD
+    db KOGA,GOLBAT,0,0,$F4,$F4
+    db KOGA,MUK,0,0,$EF,$5C
+    db KOGA,WEEZING,0,0,$9F,$FC
+    db KOGA,ARBOK,0,0,$D8,$E9
+    db KOGA,SCYTHER,0,0,$F7,$F7
+    db KOGA,TENTACRUEL,0,0,$6A,$FC
+    db KOGA,ELECTRODE,0,0,$F0,$F0
+    db KOGA,HAUNTER,0,0,$92,$DD
+    db KOGA,GENGAR,0,0,$92,$DD
 
     ; Sabrina
-    db SABRINA,HAUNTER,$29,$DD
-    db SABRINA,GENGAR,$29,$DD
-    db SABRINA,KADABRA,$3F,$CD
-    db SABRINA,ALAKAZAM,$3F,$CD
-    db SABRINA,MR_MIME,$AA,$FD
-    db SABRINA,VENOMOTH,$7C,$DF
-    db SABRINA,SLOWBRO,$3F,$0F
-    db SABRINA,JYNX,$EE,$EE
-    db SABRINA,HYPNO,$DC,$AB
-    db SABRINA,EXEGGUTOR,$0A,$0F
+    db SABRINA,HAUNTER,0,0,$29,$DD
+    db SABRINA,GENGAR,0,0,$29,$DD
+    db SABRINA,KADABRA,0,0,$3F,$CD
+    db SABRINA,ALAKAZAM,0,0,$3F,$CD
+    db SABRINA,MR_MIME,0,0,$AA,$FD
+    db SABRINA,VENOMOTH,0,0,$7C,$DF
+    db SABRINA,SLOWBRO,0,0,$3F,$0F
+    db SABRINA,JYNX,0,0,$EE,$EE
+    db SABRINA,HYPNO,0,0,$DC,$AB
+    db SABRINA,EXEGGUTOR,0,0,$0A,$0F
 
     ; Blaine
-    db BLAINE,NINETALES,$EB,$BA
-    db BLAINE,RHYDON,$DD,$DD
-    db BLAINE,MAGMAR,$EE,$EE
-    db BLAINE,ARCANINE,$BE,$AB
-    db BLAINE,RAPIDASH,$6B,$FB
-    db BLAINE,FLAREON,$A7,$AA
+    db BLAINE,NINETALES,0,0,$EB,$BA
+    db BLAINE,RHYDON,0,0,$DD,$DD
+    db BLAINE,MAGMAR,0,0,$EE,$EE
+    db BLAINE,ARCANINE,0,0,$BE,$AB
+    db BLAINE,RAPIDASH,0,0,$6B,$FB
+    db BLAINE,FLAREON,0,0,$A7,$AA
 
     ; Giovanni
-    db GIOVANNI,CUBONE,$FF,$0F
-    db GIOVANNI,MAROWAK,$FF,$0F
-    db GIOVANNI,RHYHORN,$EE,$EE
-    db GIOVANNI,RHYDON,$EE,$EE
-    db GIOVANNI,PERSIAN,$CC,$FC
-    db GIOVANNI,NIDORINO,$CB,$CB
-    db GIOVANNI,NIDOKING,$CB,$CB
-    db GIOVANNI,NIDOQUEEN,$BC,$BC
-    db GIOVANNI,KRABBY,$E6,$F5
-    db GIOVANNI,KINGLER,$E6,$F5
+    db GIOVANNI,CUBONE,0,0,$FF,$0F
+    db GIOVANNI,MAROWAK,0,0,$FF,$0F
+    db GIOVANNI,RHYHORN,0,0,$EE,$EE
+    db GIOVANNI,RHYDON,0,0,$EE,$EE
+    db GIOVANNI,PERSIAN,0,0,$CC,$FC
+    db GIOVANNI,NIDORINO,0,0,$CB,$CB
+    db GIOVANNI,NIDOKING,0,0,$CB,$CB
+    db GIOVANNI,NIDOQUEEN,0,0,$BC,$BC
+    db GIOVANNI,KRABBY,0,0,$E6,$F5
+    db GIOVANNI,KINGLER,0,0,$E6,$F5
 
     ; Bruno
-    db BRUNO,PRIMEAPE,$C9,$F8
-    db BRUNO,HITMONCHAN,$8F,$BE
-    db BRUNO,HITMONLEE,$F5,$E7
-    db BRUNO,ONIX,$FF,$F0
-    db BRUNO,PINSIR,$DE,$CF
-    db BRUNO,MACHAMP,$F9,$F9
+    db BRUNO,PRIMEAPE,0,0,$C9,$F8
+    db BRUNO,HITMONCHAN,0,0,$8F,$BE
+    db BRUNO,HITMONLEE,0,0,$F5,$E7
+    db BRUNO,ONIX,0,4,$FF,$F0
+    db BRUNO,PINSIR,0,0,$DE,$CF
+    db BRUNO,MACHAMP,0,0,$F9,$F9
+    db BRUNO,POLIWRATH,0,0,$FD,$5F
+    db BRUNO,ONIX,1,6,$FE,$FE
 
     ; Agatha
-    db AGATHA,HAUNTER,$9B,$EF
-    db AGATHA,GOLBAT,$F4,$FA
-    db AGATHA,ARBOK,$DB,$C9
-    db AGATHA,VENUSAUR,$AB,$9F
-    db AGATHA,HYPNO,$DA,$AE
-    db AGATHA,GENGAR,$AA,$FF
+    db AGATHA,HAUNTER,0,1,$9B,$EF
+    db AGATHA,GENGAR,0,1,$9B,$EF
+    db AGATHA,GOLBAT,0,0,$F4,$FA
+    db AGATHA,ARBOK,0,0,$DB,$C9
+    db AGATHA,VENUSAUR,0,0,$AB,$9F
+    db AGATHA,HYPNO,0,0,$DA,$AE
+    db AGATHA,GENGAR,0,6,$AA,$FF
+    db AGATHA,GENGAR,0,5,$AA,$FF
+    db AGATHA,MAROWAK,1,6,$EF,$EF
 
     ; Lorelei
-    db LORELEI,DEWGONG,$AA,$4A
-    db LORELEI,CLOYSTER,$BF,$8C
-    db LORELEI,SLOWBRO,$8C,$0F
-    db LORELEI,BLASTOISE,$CF,$AB
-    db LORELEI,JYNX,$E9,$DE
-    db LORELEI,LAPRAS,$BF,$AE
+    db LORELEI,DEWGONG,0,0,$AA,$4A
+    db LORELEI,CLOYSTER,0,0,$BF,$8C
+    db LORELEI,SLOWBRO,0,0,$8C,$0F
+    db LORELEI,BLASTOISE,0,0,$CF,$AB
+    db LORELEI,JYNX,0,0,$E9,$DE
+    db LORELEI,LAPRAS,0,0,$BF,$AE
+    db LORELEI,NINETALES,1,6,$EE,$FF
 
     ; Lance
-    db LANCE,GYARADOS,$EA,$AA
-    db LANCE,DRAGONAIR,$DA,$DA
-    db LANCE,CHARIZARD,$DD,$EE
-    db LANCE,AERODACTYL,$F9,$F9
-    db LANCE,DRAGONITE,$FF,$FF
+    db LANCE,GYARADOS,0,0,$EA,$AA
+    db LANCE,DRAGONAIR,0,2,$AA,$DD
+    db LANCE,DRAGONITE,0,2,$AA,$DD
+    db LANCE,DRAGONAIR,0,3,$DD,$AA
+    db LANCE,DRAGONITE,0,3,$DD,$AA
+    db LANCE,CHARIZARD,0,0,$DD,$EE
+    db LANCE,AERODACTYL,0,5,$F9,$F9
+    db LANCE,DRAGONITE,0,5,$FF,$FF
+    db LANCE,DRAGONITE,0,6,$FF,$FF
+    db LANCE,AERODACTYL,1,6,$F9,$F9
 
     db $FF
 
@@ -143202,321 +143458,6 @@ GetAttackerType:
 .BladeMonTable
     db FARFETCH_D
     db $FF
-
-; ──────────────────────────────────────────────────────────────────────
-
-PrintMenuItemQty:
-    ld hl,$cf8b
-    ld a,[hli]
-    cp wNumBagItems & $FF
-    jr nz,.NotBag
-    ld a,[hld]
-    cp wNumBagItems >> 8
-    jr nz,.NotBag
-    ld a,[wNumBagItems]
-    ld b,20 ; bag can hold 20 items
-    jr .found
-.NotBag
-    ld hl,$cf8b
-    ld a,[hli]
-    cp wNumBoxItems & $FF
-    jr nz,.NotBox
-    ld a,[hld]
-    cp wNumBoxItems >> 8
-    jr nz,.NotBox
-    ld a,[wNumBoxItems]
-    ld b,40 ; bag can hold 20 items
-    jr .found
-.NotBox
-    ret
-.found
-    ld de,$d11e
-    ld [de],a
-    ld a,[W_ISINBATTLE]
-    and a
-    FuncCoord 14,03
-    ld hl,Coord
-    jr z,.done
-    FuncCoord 14,08
-    ld hl,Coord
-.done
-    push bc
-    push de
-    call .PrintNumber
-    pop de
-    pop bc
-    ld [hl],"/"
-    inc hl
-    ld a,b
-    ld [de],a
-    ; fall through
-.PrintNumber
-    ld bc,((%10000000 + 1) << 8) + 2
-    jp PrintNumber
-
-; ──────────────────────────────────────────────────────────────────────
-
-GetAttackAnimationPointers_:
-    call Load16BitRegisters
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    ret
-
-AttackAnimationPointers:
-    dw PoundAnim
-    dw KarateChopAnim
-    dw DoubleSlapAnim
-    dw CometPunchAnim
-    dw MegaPunchAnim
-    dw PayDayAnim
-    dw FirePunchAnim
-    dw IcePunchAnim
-    dw ThunderPunchAnim
-    dw ScratchAnim
-    dw VicegripAnim
-    dw GuillotineAnim
-    dw RazorWindAnim
-    dw SwordsDanceAnim
-    dw CutAnim
-    dw GustAnim
-    dw WingAttackAnim
-    dw WhirlwindAnim
-    dw FlyAnim
-    dw BindAnim
-    dw SlamAnim
-    dw VineWhipAnim
-    dw StompAnim
-    dw DoubleKickAnim
-    dw MegaKickAnim
-    dw JumpKickAnim
-    dw RollingKickAnim
-    dw SandAttackAnim
-    dw HeatButtAnim
-    dw HornAttackAnim
-    dw FuryAttackAnim
-    dw HornDrillAnim
-    dw TackleAnim
-    dw BodySlamAnim
-    dw WrapAnim
-    dw TakeDownAnim
-    dw ThrashAnim
-    dw DoubleEdgeAnim
-    dw TailWhipAnim
-    dw PoisonStingAnim
-    dw TwineedleAnim
-    dw PinMissileAnim
-    dw LeerAnim
-    dw BiteAnim
-    dw GrowlAnim
-    dw RoarAnim
-    dw SingAnim
-    dw SupersonicAnim
-    dw SonicBoomAnim
-    dw DisableAnim
-    dw AcidAnim
-    dw EmberAnim
-    dw FlamethrowerAnim
-    dw MistAnim
-    dw WaterGunAnim
-    dw HydroPumpAnim
-    dw SurfAnim
-    dw IceBeamAnim
-    dw BlizzardAnim
-    dw PsyBeamAnim
-    dw BubbleBeamAnim
-    dw AuroraBeamAnim
-    dw HyperBeamAnim
-    dw PeckAnim
-    dw DrillPeckAnim
-    dw SubmissionAnim
-    dw LowKickAnim
-    dw CounterAnim
-    dw SeismicTossAnim
-    dw StrengthAnim
-    dw AbsorbAnim
-    dw MegaDrainAnim
-    dw LeechSeedAnim
-    dw GrowthAnim
-    dw RazorLeafAnim
-    dw SolarBeamAnim
-    dw PoisonPowderAnim
-    dw StunSporeAnim
-    dw SleepPowderAnim
-    dw PedalDanceAnim
-    dw StringShotAnim
-    dw DragonRageAnim
-    dw FireSpinAnim
-    dw ThunderShockAnim
-    dw ThunderBoldAnim
-    dw ThunderWaveAnim
-    dw ThunderAnim
-    dw RockThrowAnim
-    dw EarthquakeAnim
-    dw FissureAnim
-    dw DigAnim
-    dw ToxicAnim
-    dw ConfusionAnim
-    dw PsychicAnim
-    dw HypnosisAnim
-    dw MeditateAnim
-    dw AgilityAnim
-    dw QuickAttackAnim
-    dw RageAnim
-    dw TeleportAnim
-    dw NightShadeAnim
-    dw MimicAnim
-    dw ScreechAnim
-    dw DoubleTeamAnim
-    dw RecoverAnim
-    dw HardenAnim
-    dw MinimizeAnim
-    dw SmokeScreenAnim
-    dw ConfuseRayAnim
-    dw WithdrawAnim
-    dw DefenseCurlAnim
-    dw BarrierAnim
-    dw LightScreenAnim
-    dw HazeAnim
-    dw ReflectAnim
-    dw FocusEnergyAnim
-    dw BideAnim
-    dw MetronomeAnim
-    dw MirrorMoveAnim
-    dw SelfdestructAnim
-    dw EggBombAnim
-    dw LickAnim
-    dw SmogAnim
-    dw SludgeAnim
-    dw BoneClubAnim
-    dw FireBlastAnim
-    dw WaterfallAnim
-    dw ClampAnim
-    dw SwiftAnim
-    dw SkullBashAnim
-    dw SpikeCannonAnim
-    dw ConstrictAnim
-    dw AmnesiaAnim
-    dw KinesisAnim
-    dw SoftboiledAnim
-    dw HiJumpKickAnim
-    dw FlareAnim
-    dw DreamEaterAnim
-    dw PoisonGasAnim
-    dw BarrageAnim
-    dw LeechLifeAnim
-    dw LovelyKissAnim
-    dw SkyAttackAnim
-    dw TransformAnim
-    dw BubbleAnim
-    dw DizzyPunchAnim
-    dw SporeAnim
-    dw FlashAnim
-    dw PsywaveAnim
-    dw SplashAnim
-    dw AcidArmorAnim
-    dw CrabHammerAnim
-    dw ExplosionAnim
-    dw FurySwipesAnim
-    dw BonemerangAnim
-    dw RestAnim
-    dw RockSlideAnim
-    dw HyperFangAnim
-    dw SharpenAnim
-    dw ConversionAnim
-    dw TriAttackAnim
-    dw SuperFangAnim
-    dw SlashAnim
-    dw SubstituteAnim
-    dw StruggleAnim
-    dw ShowPicAnim
-    dw EnemyFlashAnim
-    dw PlayerFlashAnim
-    dw EnemyHUDShakeAnim
-    dw TradeBallDropAnim
-    dw TradeBallAppear1Anim
-    dw TradeBallAppear2Anim
-    dw TradeBallPoofAnim
-    dw XStatItemAnim
-    dw XStatItemAnim
-    dw ShrinkingSquareAnim
-    dw ShrinkingSquareAnim
-    dw XStatItemBlackAnim
-    dw XStatItemBlackAnim
-    dw ShrinkingSquareBlackAnim
-    dw ShrinkingSquareBlackAnim
-    dw UnusedAnim
-    dw UnusedAnim
-    dw ParalyzeAnim
-    dw ParalyzeAnim
-    dw PoisonAnim
-    dw PoisonAnim
-    dw SleepPlayerAnim
-    dw SleepEnemyAnim
-    dw ConfusedPlayerAnim
-    dw ConfusedEnemyAnim
-    dw FaintAnim
-    dw BallTossAnim
-    dw BallShakeAnim
-    dw BallPoofAnim
-    dw BallBlockAnim
-    dw GreatTossAnim
-    dw UltraTossAnim
-    dw ShakeScreenAnim
-    dw HidePicAnim
-    dw ThrowRockAnim
-    dw ThrowBaitAnim
-    dw ZigZagScreenAnim
-    dw TransformFailAnim ; $CC
-    dw TeleportAnimTrainerBattle ; $CD
-    dw WhirlwindAnimTrainerBattle ; $CE
-    dw RoarAnimTrainerBattle ; $CF
-
-; ──────────────────────────────────────────────────────────────────────
-
-_IsItemInBagOrBox:
-    call Load16BitRegisters
-    push bc
-    call IsItemInBag2
-    pop bc
-    ret nz ; ret if item in bag
-    push de
-    push hl
-    ld hl,wNumBoxItems
-    jr SearchItemInList
-
-_IsItemInBag:
-    call Load16BitRegisters
-IsItemInBag2:
-    push de
-    push hl
-    ld hl,wNumBagItems
-SearchItemInList:
-    ld a,[hl]
-    and a
-    jr z,.NotFought
-    ld d,a
-.loop
-    inc hl
-    ld a,[hli]
-    cp $FF
-    jr z,.NotFought
-    cp b
-    jr z,.Fought
-    dec d
-    jr nz,.loop
-.NotFought
-    ld b,0
-    jr .end
-.Fought
-    ld a,[hl]
-    ld b,a
-.end
-    ld a,b
-    and a
-    pop hl
-    pop de
-    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -144667,6 +144608,139 @@ SECTION "Bank3d",ROMX,BANK[$3D]
 EmotionBubbles:
     INCBIN "gfx/emotion_bubbles.2bpp"
 
+; ──────────────────────────────────────────────────────────────────────
+
+ReadTrainer:
+
+; don't change any moves in a link battle
+    ld a,[W_ISLINKBATTLE]
+    and a
+    ret nz
+
+; set [wEnemyPartyCount] to 0,[$D89D] to FF
+; XXX first is total enemy pokemon?
+; XXX second is species of first pokemon?
+    ld hl,wEnemyPartyCount
+    xor a
+    ld [hli],a
+    dec a
+    ld [hl],a
+
+; get the pointer to trainer data for this class
+    ld a,[W_TRAINERCLASS]
+    dec a
+    add a,a
+    ld hl,TrainerDataPointers
+    ld c,a
+    ld b,0
+    add hl,bc ; hl points to trainer class
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld a,[W_TRAINERNO]
+    ld b,a
+; At this point b contains the trainer number,
+; and hl points to the trainer class.
+; Our next task is to iterate through the trainers,
+; decrementing b each time,until we get to the right one.
+.outer
+    dec b
+    jr z,.IterateTrainer
+.inner
+    ld a,[hli]
+    and a
+    jr nz,.inner
+    jr .outer
+
+; if the first byte of trainer data is FF,
+; - each pokemon has a specific level
+;      (as opposed to the whole team being of the same level)
+; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move (not applicable to the Yellow method)
+; else the first byte is the level of every pokemon on the team
+.IterateTrainer
+    ld a,[hli]
+    cp $FF ; is the trainer special?
+    jr z,.SpecialTrainer ; if so,check for special moves
+    ld [W_CURENEMYLVL],a
+.LoopTrainerData
+    ld a,[hli]
+    and a ; have we reached the end of the trainer data?
+    jr z,.AddAdditionalMoveData ; jr z,.FinishUp
+    ld [$CF91],a ; write species somewhere (XXX why?)
+    ld a,1
+    ld [$CC49],a
+    push hl
+    call AddPokemonToParty
+    pop hl
+    jr .LoopTrainerData
+.SpecialTrainer
+; if this code is being run:
+; - each pokemon has a specific level
+;      (as opposed to the whole team being of the same level)
+; - if [W_LONEATTACKNO] != 0,one pokemon on the team has a special move (not applicable to the Yellow method)
+    ld a,[hli]
+    and a ; have we reached the end of the trainer data?
+    jr z,.AddAdditionalMoveData ; jr z,.AddLoneMove
+    ld [W_CURENEMYLVL],a
+    ld a,[hli]
+    ld [$CF91],a
+    ld a,1
+    ld [$CC49],a
+    push hl
+    call AddPokemonToParty
+    pop hl
+    jr .SpecialTrainer
+.AddAdditionalMoveData
+; does the trainer have additional move data?
+    ld a,[W_TRAINERCLASS]
+    ld b,a
+    ld a,[W_TRAINERNO]
+    ld c,a
+    ld hl,SpecialTrainerMoves
+.loopAdditionalMoveData
+    ld a,[hli]
+    cp $ff
+    jr z,.FinishUp
+    cp b
+    jr nz,.NextSpecialTrainer1
+    ld a,[hli]
+    cp c
+    jr nz,.NextSpecialTrainer2
+    ld a,[hli]
+    ld d,[hl]
+    ld e,a
+    call LoadSpecialTrainerMoves
+    jr .FinishUp
+.NextSpecialTrainer1
+    inc hl
+.NextSpecialTrainer2
+    inc hl
+    inc hl
+    jr .loopAdditionalMoveData
+.FinishUp ; XXX this needs documenting
+    xor a       ; clear D079-D07B
+    ld de,$D079
+    ld [de],a
+    inc de
+    ld [de],a
+    inc de
+    ld [de],a
+    ld a,[W_CURENEMYLVL]
+    ld b,a
+.LastLoop
+    ld hl,$D047
+    ld c,2
+    push bc
+    PREDEF Func_f81d
+    pop bc
+    inc de
+    inc de
+    dec b
+    jr nz,.LastLoop
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
 LoadSpecialTrainerMoves:
     ld h,d
     ld l,e
@@ -144716,6 +144790,7 @@ LoadSpecialTrainerMoves:
 ;    pop hl
 ;    ret
 
+INCLUDE "constants/TrainerData.asm"
 INCLUDE "constants/special_trainer.asm"
 
 ; ──────────────────────────────────────────────────────────────────────
