@@ -138045,27 +138045,37 @@ DefinePartyFlag:
     jr nz,.LoopParty1
     ret
 
+; ─────────────────
+
 GetMaxLevel:
-    ld a,[$d5a2] ; hall of fame
-    ld d,100
-    and a
-    ret nz
+    ld d,17 ; initial Max Level
     ld a,[W_OBTAINEDBADGES]
-    ld d,20
-.LoopBit
+    ld c,6
+    call .AddCToDEveryBitSet
+    call CheckHallOfFameWin
+    ret z
+    ld c,11
+    call .AddCToD
+    ld a,[wFlagsGymLeaderAfterHoFWin]
+    ld c,3
+    jp .AddCToDEveryBitSet
+
+.AddCToDEveryBitSet
     and a
-    jr z,.End
+    ret z
     srl a ; Shift right into Carry. MSB set to 0. C - Contains old bit 0 data.
-    jr nc,.NotFlagged
-    ld c,5
-.LoopInc
+    call c,.AddCToD
+    jr .AddCToDEveryBitSet
+
+.AddCToD
+    ld e,c
+.loop
     inc d
-    dec c
-    jr nz,.LoopInc
-.NotFlagged
-    jr .LoopBit
-.End
+    dec e
+    jr nz,.loop
     ret
+
+; ─────────────────
 
 WaitButtonPressed_:
     call GetJoypadStateLowSensitivity
