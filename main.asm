@@ -138741,6 +138741,11 @@ DrawLineBox2:
 
 UpgradeTrainerSet_:
     ld a,[wEngagedTrainerClass]
+    ld hl,.EliteFourList
+    ld de,1
+    call IsInArray
+    jr c,.EliteFour
+    ld a,[wEngagedTrainerClass]
     ld b,a
     ld hl,.Gym
 .loop
@@ -138766,11 +138771,20 @@ UpgradeTrainerSet_:
     ld [hl],a
     call CheckHallOfFameWin
     jr z,.end
+.add1
     inc [hl] ; add 1 if after hall of fame
     jr .end
 .next
     inc hl
     jr .loop
+.EliteFour
+    ld hl,wFlagsGymLeaderAfterHoFWin
+    ld b,1
+    call CountSetBits
+    ld a,[$D11E]
+    cp 7
+    ld hl,wEngagedTrainerSet ; Elite Four Team
+    jr nc,.add1
 .end
     jp PlayTrainerMusic
 .Gym
@@ -138781,6 +138795,12 @@ UpgradeTrainerSet_:
     db KOGA     , %11000000
     db SABRINA  , %11000000
     db BLAINE   , %10000000
+    db $FF
+.EliteFourList
+    db BRUNO
+    db AGATHA
+    db LORELEI
+    db LANCE
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
