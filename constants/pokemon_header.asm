@@ -3800,11 +3800,11 @@ GengarBaseStats:
 
 OnixBaseStats:
     db ONIX ; mon id
-    db 35 ; base hp
-    db 45 ; base attack
+    db 90 ; = 90 ; base hp (+55)
+    db 90 ; = 90 ; base attack (+45)
     db 160 ; base defense
     db 70 ; base speed
-    db 30 ; base special
+    db 10 ; = 10 ; base special (-20)
 
     db ROCK ; species type 1
     db EARTH ; species type 2

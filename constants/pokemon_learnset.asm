@@ -2046,8 +2046,8 @@ ONIX_Learnset: MACRO
     db  8,BIDE
     db  8,RAGE
     db 12,ROCK_THROW
-    db 14,SLAM
-    db 15,WRAP
+    db 14,WRAP
+    db 16,SLAM
     db 17,SAND_ATTACK
     db 19,BLADE
     db 21,SHARPEN

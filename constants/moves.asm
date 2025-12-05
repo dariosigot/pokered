@@ -65,7 +65,7 @@
     db AURORA_BEAM  , ATTACK_DOWN_SIDE1_EFFECT   ,  65 , ICE      , 255 , 10 ; pp 20 ; 1
     db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , ASTRAL   , 229 , 40 ; pp  5 ; ? ; Type Normal -> Astral ; Phi/Spc Split depends by Mon
     db PECK         , NO_ADDITIONAL_EFFECT       ,  45 , IVORY    , 255 , 07 ; pp 35 ; 0 ; Type Wind -> Ivory ; Pwr 35 -> 45 ; Ene 06 -> 07
-    db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  85 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
+    db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  95 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
     db SUBMISSION   , RECOIL_EFFECT              , 105 , FIGHT    , 204 , 10 ; pp 20 ; 0 ; Pwr 80 -> 105 ; PP 25 -> 20
     db LOW_KICK     , FLINCH_SIDE_EFFECT2        ,  50 , FIGHT    , 255 , 10 ; pp 20 ; 0 ; Acr 229 -> 255
     db COUNTER      , NO_ADDITIONAL_EFFECT       ,   1 , FIGHT    , 255 , 10 ; pp 20 ; -
@@ -152,7 +152,7 @@
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; Acr 204 -> 255 ; PP 15 -> 30
     db SPLASH       , SPLASH_EFFECT              ,   0 , WATER    , 255 , 00 ; pp 40 ; - ; Type Normal -> Water
     db ACID_ARMOR   , DEFENSE_UP3_EFFECT         ,   0 , POISON   , 255 , 10 ; pp 20 ; - ; PP 40 -> 20 ; Defense 3x
-    db CRABHAMMER   , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 216 , 20 ; pp 10 ; 0
+    db CRABHAMMER   , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 191 , 20 ; pp 10 ; 0 ; Acr 216 -> 191
     db EXPLOSION    , EXPLODE_EFFECT             , 255 , NORMAL   , 255 , 60 ; pp  5 ; 0 ; Pwr 170 -> 255 ; Ene 40 -> 60
     db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , NORMAL   , 204 , 12 ; pp 15 ; 0 ; Pwr 18 -> 21 ; Ene 14 -> 12
     db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  55 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Earth -> Ivory ; Pwr 50 -> 55
