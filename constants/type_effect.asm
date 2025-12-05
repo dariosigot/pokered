@@ -18,11 +18,10 @@
 
     db WIND,FIGHT,20
     db WIND,GRASS,13
-    db WIND,ROCK,05
     db WIND,CRYSTAL,05
     db WIND,GHOST,20
     db WIND,IVORY,08
-    db WIND,METAL,04
+    db WIND,METAL,08
     db WIND,THUNDER,06
     db WIND,DRAGON,08
 
