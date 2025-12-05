@@ -18,6 +18,7 @@
 
     db WIND,FIGHT,20
     db WIND,GRASS,13
+    db WIND,ROCK,08
     db WIND,CRYSTAL,05
     db WIND,GHOST,20
     db WIND,IVORY,08
@@ -57,7 +58,7 @@
     db ROCK,ICE,12
     db ROCK,METAL,05
     db ROCK,GRASS,04
-    db ROCK,RUBBER,08
+    db ROCK,RUBBER,05
     db ROCK,POISON,12
 
     db BUG,FIRE,05
