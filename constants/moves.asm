@@ -65,7 +65,7 @@
     db AURORA_BEAM  , ATTACK_DOWN_SIDE1_EFFECT   ,  65 , ICE      , 255 , 10 ; pp 20 ; 1
     db HYPER_BEAM   , HYPER_BEAM_EFFECT          , 150 , ASTRAL   , 229 , 40 ; pp  5 ; ? ; Type Normal -> Astral ; Phi/Spc Split depends by Mon
     db PECK         , NO_ADDITIONAL_EFFECT       ,  45 , IVORY    , 255 , 07 ; pp 35 ; 0 ; Type Wind -> Ivory ; Pwr 35 -> 45 ; Ene 06 -> 07
-    db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  85 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
+    db DRILL_PECK   , NO_ADDITIONAL_EFFECT       ,  95 , IVORY    , 255 , 10 ; pp 20 ; 0 ; Type Wind -> Ivory
     db SUBMISSION   , RECOIL_EFFECT              , 105 , FIGHT    , 204 , 10 ; pp 20 ; 0 ; Pwr 80 -> 105 ; PP 25 -> 20
     db LOW_KICK     , FLINCH_SIDE_EFFECT2        ,  50 , FIGHT    , 255 , 10 ; pp 20 ; 0 ; Acr 229 -> 255
     db COUNTER      , NO_ADDITIONAL_EFFECT       ,   1 , FIGHT    , 255 , 10 ; pp 20 ; -
