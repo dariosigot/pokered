@@ -31547,6 +31547,8 @@ EvolutionAfterBattlePlus:
 
 GetAvgTeamLevel:
     ld a,[W_NUMINPARTY]
+    and a
+    jr z,.ZeroPartyOrEnd
     ld hl,W_PARTYMON1_LEVEL
     ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
     ld bc,0
@@ -31571,6 +31573,7 @@ GetAvgTeamLevel:
     ld b,2 ; 2 bytes
     call Divide
     ld a,[$FF00+$98]
+.ZeroPartyOrEnd
     ld d,a
     ret
 
