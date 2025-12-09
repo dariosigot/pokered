@@ -51427,7 +51427,7 @@ NotForgottableMoves:
     db SOFTBOILED
     db FLARE
     db TRANSFORM
-    db CRABHAMMER
+    db HAMMER
     db EXPLOSION
     db BONEMERANG
     db REST
@@ -113126,7 +113126,7 @@ AcidArmorAnim: ; 7a67d (1e:667d)
     db SE_SLIDE_MON_DOWN_AND_HIDE,$96
     db $FF
 
-CrabHammerAnim: ; 7a680 (1e:6680)
+HammerAnim: ; 7a680 (1e:6680)
     db $46,$97,$05
     db $06,$FF,$2A
     db $FF
@@ -131550,7 +131550,7 @@ MoveNames: ; b0000 (2c:4000)
     db "PSYWAVE@"
     db "SPLASH@"
     db "ACID ARMOR@"
-    db "CRABHAMMER@"
+    db "HAMMER@"
     db "EXPLOSION@"
     db "FURY SWIPES@"
     db "BONEMERANG@"
@@ -134216,7 +134216,7 @@ AttackAnimationPointers:
     dw PsywaveAnim
     dw SplashAnim
     dw AcidArmorAnim
-    dw CrabHammerAnim
+    dw HammerAnim
     dw ExplosionAnim
     dw FurySwipesAnim
     dw BonemerangAnim
@@ -139397,7 +139397,7 @@ GenRandomInBattle_CH:
 HighCriticalMoves:
     db KARATE_CHOP
     db RAZOR_LEAF
-    db CRABHAMMER
+    db HAMMER
     db SLASH
     db $FF
 
@@ -140224,7 +140224,7 @@ db %00010010    ; Self-Destruct,Egg Bomb,Lick,Smog,Sludge,Bone Club,Fire Blast,W
 db %01000000    ; Clamp,Swift,Skull Bash,Spike Cannon,Constrict,Amnesia,Kinesis,Soft-Boiled
 db %00100000    ; High Jump Kick,Flare,Dream Eater,Poison Gas,Barrage,Leech Life,Lovely Kiss,Sky Attack
 db %01000100    ; Transform,Bubble,Dizzy Punch,Spore,Flash,Psywave,Splash,Acid Armor
-db %00000000    ; Crabhammer,Explosion,Fury Swipes,Bonemerang,Rest,Rock Slide,Hyper Fang,Sharpen
+db %00000000    ; Hammer,Explosion,Fury Swipes,Bonemerang,Rest,Rock Slide,Hyper Fang,Sharpen
 db %01000000    ; Conversion,Tri Attack,Super Fang,Slash,Substitute,Struggle,???,???
 
 ; ──────────────────────────────────────────────────────────────────────

@@ -176,7 +176,7 @@ BLASTOISE_Learnset: MACRO
     db 49,DIZZY_PUNCH
     db 51,HYDRO_PUMP
     db 54,ICE_PUNCH
-    db 56,CRABHAMMER
+    db 56,HAMMER
     db 58,EARTHQUAKE
     db 60,SUBSTITUTE
 ENDM
@@ -1044,7 +1044,7 @@ PARASECT_Learnset: MACRO
     db 45,SOLARBEAM
     db 48,SWORDS_DANCE
     db 56,GUILLOTINE
-    db 60,CRABHAMMER
+    db 60,HAMMER
 ENDM
 PARAS_NoEvo_Learnset: MACRO
     db 25,GROWTH
@@ -1725,7 +1725,7 @@ SLOWBRO_Learnset: MACRO
     db 46,HYPNOSIS
     db 48,PSYCHIC_M
     db 52,ICE_PUNCH
-    db 56,CRABHAMMER
+    db 56,HAMMER
     db 59,HYDRO_PUMP
 ENDM
 SLOWPOKE_NoEvo_Learnset: MACRO
@@ -1801,7 +1801,7 @@ FARFETCH_D_Learnset: MACRO
     db 53,DOUBLE_EDGE
     db 56,EGG_BOMB
     db 60,SKY_ATTACK
-    db 60,CRABHAMMER
+    db 60,HAMMER
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 DODUO_Learnset: MACRO
@@ -1977,7 +1977,7 @@ CLOYSTER_Learnset: MACRO
     db 53,BLIZZARD
     db 57,EXPLOSION
     db 58,LOVELY_KISS
-    db 60,CRABHAMMER
+    db 60,HAMMER
 ENDM
 ; ──────────────────────────────────────────────────────────────────────
 GASTLY_Learnset: MACRO
@@ -2129,7 +2129,7 @@ KRABBY_Learnset: MACRO
 ENDM
 KINGLER_Learnset: MACRO
     KRABBY_Learnset
-    db 28,CRABHAMMER
+    db 28,HAMMER
     db 30,FOCUS_ENERGY
     db 32,WATERFALL
     db 34,SPIKE_CANNON
@@ -2144,7 +2144,7 @@ KINGLER_Learnset: MACRO
     db 60,HYDRO_PUMP
 ENDM
 KRABBY_NoEvo_Learnset: MACRO
-    db 32,CRABHAMMER
+    db 32,HAMMER
     db 35,WATERFALL
     db 38,SPIKE_CANNON
     db 42,ROCK_THROW
@@ -2330,7 +2330,7 @@ MAROWAK_Learnset: MACRO
     db 50,ROCK_SLIDE
     db 55,SWORDS_DANCE
     db 57,FISSURE
-    db 60,CRABHAMMER
+    db 60,HAMMER
     db 65,HYPER_BEAM
 ENDM
 MAROWAK_Alola_Learnset: MACRO
@@ -2354,7 +2354,7 @@ MAROWAK_Alola_Learnset: MACRO
     db 50,SUBSTITUTE
     db 55,SWORDS_DANCE
     db 57,FIRE_BLAST
-    db 60,CRABHAMMER
+    db 60,HAMMER
     db 61,ROCK_SLIDE
     db 62,SPIKE_CANNON
     db 65,HYPER_BEAM
@@ -2994,7 +2994,7 @@ PINSIR_Learnset: MACRO
     db 46,SWORDS_DANCE
     db 47,COUNTER
     db 49,MEGA_KICK
-    db 52,CRABHAMMER
+    db 52,HAMMER
     db 55,EARTHQUAKE
     db 60,HI_JUMP_KICK
 ENDM
@@ -3099,7 +3099,7 @@ LAPRAS_Learnset: MACRO
     db 46,HYDRO_PUMP
     db 49,THRASH
     db 54,BLIZZARD
-    db 56,CRABHAMMER
+    db 56,HAMMER
     db 58,HYPER_BEAM
     db 60,HORN_DRILL
 ENDM
@@ -3298,7 +3298,7 @@ OMASTAR_Learnset: MACRO
     db 54,BARRIER
     db 56,EARTHQUAKE
     db 58,EXPLOSION
-    db 60,CRABHAMMER
+    db 60,HAMMER
 ENDM
 OMANYTE_NoEvo_Learnset: MACRO
     db 43,ABSORB
@@ -3349,7 +3349,7 @@ KABUTOPS_Learnset: MACRO
     db 54,HYDRO_PUMP
     db 56,EARTHQUAKE
     db 58,COUNTER
-    db 60,CRABHAMMER
+    db 60,HAMMER
 ENDM
 KABUTO_NoEvo_Learnset: MACRO
     db 43,SLASH
