@@ -3,6 +3,7 @@
     db NORMAL,GHOST,00
     db NORMAL,METAL,02
     db NORMAL,ICE,09
+    db NORMAL,IVORY,09
 
     db FIGHT,POISON,05
     db FIGHT,WIND,05
@@ -18,13 +19,12 @@
 
     db WIND,FIGHT,20
     db WIND,GRASS,13
-    db WIND,ROCK,08
     db WIND,CRYSTAL,05
     db WIND,GHOST,20
-    db WIND,IVORY,08
+    db WIND,IVORY,07
     db WIND,METAL,08
     db WIND,THUNDER,06
-    db WIND,DRAGON,08
+    db WIND,DRAGON,09
 
     db POISON,GRASS,20
     db POISON,POISON,04
@@ -47,6 +47,7 @@
     db EARTH,DRAGON,02
     db EARTH,METAL,20
     db EARTH,LEVITATE,00
+    db EARTH,IVORY,09
 
     db ROCK,ROCK,05
     db ROCK,CRYSTAL,20
@@ -60,6 +61,7 @@
     db ROCK,GRASS,04
     db ROCK,RUBBER,05
     db ROCK,POISON,12
+    db ROCK,IVORY,09
 
     db BUG,FIRE,05
     db BUG,GRASS,20
@@ -69,6 +71,7 @@
     db BUG,METAL,02
     db BUG,EARTH,20
     db BUG,ICE,08
+    db BUG,ROCK,08
 
     db METAL,METAL,05
     db METAL,FIRE,09
@@ -78,6 +81,7 @@
     db METAL,GRASS,14
     db METAL,CRYSTAL,20
     db METAL,ICE,11
+    db METAL,IVORY,15
 
     db IVORY,ROCK,05
     db IVORY,CRYSTAL,15

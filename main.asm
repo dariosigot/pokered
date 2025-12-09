@@ -572,8 +572,6 @@ HandleMenuInputWithWrap:
     ld [wMenuWrappingEnabled],a
     jp HandleMenuInput
 
-; Free
-
 SECTION "HandleMidJump",ROM0[$039e]
 
 ; this function calls a function that takes necessary actions
@@ -1954,8 +1952,6 @@ DisableDebugWtW_Hack:
     ld hl,$cd38
     res 0,[hl]
     ret
-
-; Free
 
 SECTION "LoadCurrentMapView",ROM0[$0ca2]
 
@@ -7152,14 +7148,13 @@ PlayerBlackedOutText: ; 2aba (0:2aba)
     TX_FAR _PlayerBlackedOutText
     db "@"
 
-DisplayRepelWoreOffText: ; 2abf (0:2abf)
-    ld hl,RepelWoreOffText
-    call PrintText
-    jp AfterDisplayingTextID
+DisplayRepelWoreOffText:
+    ld b,BANK(TryUseAnotherRepel)
+    ld hl,TryUseAnotherRepel
+    call Bankswitch
+    jp CloseTextDisplay
 
-RepelWoreOffText: ; 2ac8 (0:2ac8)
-    TX_FAR _RepelWoreOffText
-    db "@"
+SECTION "DisplayStartMenu",ROM0[$2acd]
 
 DisplayStartMenu: ; 2acd (0:2acd)
     ld a,$04
@@ -8571,10 +8566,6 @@ GymLeaderRematchText2:
     TX_FAR _GymLeaderRematchText2
     db "@"
 
-GymLeaderRematchText3:
-    TX_FAR _GymLeaderRematchText3
-    db "@"
-
 GymLeaderAfterRematch:
     ld hl,GymLeaderAfterRematch_
     ld b,BANK(GymLeaderAfterRematch_)
@@ -8585,8 +8576,11 @@ CheckHallOfFameWin:
     and a ; rcf
     ret
 
-NoCommentText:
+NoCommentText57:
     db 0,"...",$57
+
+NoCommentText58:
+    db 0,"...",$58
 
 ArePlayerCoordsInArrayBeforeHOFWin:
     call CheckHallOfFameWin ; rcf
@@ -29363,7 +29357,16 @@ StartMenu_TrainerInfo:
     ld c,3
     ld b,%00000001
     call PrintNumber
+    call GetAvgTeamLevel
+    ld a,d
+    ld de,wAvgLevel
+    ld [de],a
     FuncCoord 12,07
+    ld hl,Coord
+    ld c,3
+    ld b,%00000001
+    call PrintNumber
+    FuncCoord 12,08
     ld hl,Coord
     ld de,$d5a2 ; hall of fame
     ld c,3
@@ -29376,13 +29379,14 @@ StartMenu_TrainerInfo:
     jp FarCopyData2
 
 .TrainerInfo_NameMoneyTimeText
-    db "NAME/",$4E,$4E
-    db "MONEY/",$4E
-    db "TIME/",$4E
-    db "MAX LEVEL/",$4E
-    db "H.OF FAME/",$4E,$4E
-    db "POWER/",$4E,$4E
-    db "BADGES/@"
+    db "NAME",$D3,$4E,$4E
+    db "MONEY",$D3,$4E
+    db "TIME",$D3,$4E
+    db "MAX LEVEL",$D3,$4E
+    db "AVG LEVEL",$D3,$4E
+    db "H.OF FAME",$D3,$4E
+    db "POWER",$D3,$4E,$4E
+    db "BADGES",$D3,"@"
 
 .PrintPowers
     FuncCoord 09,09
@@ -30793,7 +30797,7 @@ TryDoWildEncounter:
     ld a,[$d0db]
     and a
     jr z,.willEncounter
-    ld a,[W_PARTYMON1_LEVEL] ; $d18c
+    call GetAvgTeamLevel ; ld a,[W_PARTYMON1_LEVEL] ; $d18c
     ld b,a
     ld a,[W_CURENEMYLVL] ; $d127
     cp b
@@ -31540,6 +31544,98 @@ EvolutionAfterBattlePlus:
     ld hl,wFlagLearnAfterEvolutBit0
     res 0,[hl]
     ret
+
+GetAvgTeamLevel:
+    ld a,[W_NUMINPARTY]
+    and a
+    jr z,.ZeroPartyOrEnd
+    ld hl,W_PARTYMON1_LEVEL
+    ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
+    ld bc,0
+.loop
+    push af
+    ld a,[hl]
+    add c
+    ld c,a
+    jr nc,.NoCarry
+    inc b
+.NoCarry
+    add hl,de
+    pop af
+    dec a
+    jr nz,.loop
+    ld a,b
+    ld [H_DIVIDEND],a
+    ld a,c
+    ld [H_DIVIDEND+1],a
+    ld a,[W_NUMINPARTY]
+    ld [H_DIVISOR],a
+    ld b,2 ; 2 bytes
+    call Divide
+    ld a,[$FF00+$98]
+.ZeroPartyOrEnd
+    ld d,a
+    ret
+
+TryUseAnotherRepel:
+    ld hl,wNumBagItems
+    ld a,[hli]
+    and a
+    jr z,.NoOtherRepelInBag
+    ld b,a
+    ld c,0
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NoOtherRepelInBag
+    cp REPEL
+    jr z,.RepelFound
+    cp SUPER_REPEL
+    jr z,.RepelFound
+    cp MAX_REPEL
+    jr z,.RepelFound
+    inc hl
+    inc c
+    dec b
+    jr nz,.loop
+.NoOtherRepelInBag
+    ld hl,.RepelWoreOffText
+    jp PrintText
+.RepelFound
+    ld [$cf91],a ; Item ID
+    ld [$d11e],a ; load item so its name can be grabbed
+    ld a,c
+    ld [$cf92],a ; Item Index
+    ld a,[hl]
+    ld [wTmpRepelQty],a
+    push af
+    call GetItemName ; get the item name into de register
+    call CopyStringToCF4B ; copy name from de to wcf4b so it shows up in text
+    pop af
+    cp 10
+    ld hl,.TryUseAnotherRepelText
+    jr nc,.done
+    ld hl,.TryUseAnotherRepelText_LessThan10
+.done
+    call PrintText
+    call YesNoChoice ; yes/no textbox
+    ld a,[$CC26] ; yes/no answer (Y=0,N=1)
+    and a
+    jr nz,.end
+    xor a
+    ld [$d152],a
+    call UseItem
+.end
+    ret
+.RepelWoreOffText
+    TX_FAR _RepelWoreOffText
+    db "@"
+.TryUseAnotherRepelText
+    TX_FAR _TryUseAnotherRepelText
+    db "@"
+.TryUseAnotherRepelText_LessThan10
+    TX_FAR _TryUseAnotherRepelText_LessThan10
+    db "@"
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -51428,7 +51524,7 @@ NotForgottableMoves:
     db SOFTBOILED
     db FLARE
     db TRANSFORM
-    db CRABHAMMER
+    db HAMMER
     db EXPLOSION
     db BONEMERANG
     db REST
@@ -52088,6 +52184,7 @@ Sony3AI:
     ret nc
     call CompareSpeedAndGetRandomEffort
     ret nc
+Sony3AI_Common:
     ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseFullRestore
@@ -52112,10 +52209,18 @@ EliteFourAI:
     ret nc
     call CompareSpeedAndGetRandomEffort
     ret nc
+    call .CheckWinVsAllElite4AfterHoF
+    jr nc,Sony3AI_Common
     ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseHyperPotion
     jr AdvanceAIHealStatus
+.CheckWinVsAllElite4AfterHoF
+    ld hl,wFlagsGymLeaderAfterHoFWin
+    ld b,1
+    call CountSetBits
+    cp 7
+    ret
 
 ; ─────────────────────────────────────────────────────────────
 
@@ -89247,6 +89352,14 @@ HallofFameRoomScript2:
     inc [hl]
 .skip
     PREDEF HoF_SetVariables
+    ld hl,wFlagsGymLeaderAfterHoFWin
+    ld b,1
+    call CountSetBits
+    cp 7
+    jr c,.skip2
+    ld hl,wFlagsGymLeaderAfterHoFWin
+    set 7,[hl]
+.skip2
     ld hl,wGymLeaderRematch
     ld [hl],%01111111
     call GBFadeOut2
@@ -113118,7 +113231,7 @@ AcidArmorAnim: ; 7a67d (1e:667d)
     db SE_SLIDE_MON_DOWN_AND_HIDE,$96
     db $FF
 
-CrabHammerAnim: ; 7a680 (1e:6680)
+HammerAnim: ; 7a680 (1e:6680)
     db $46,$97,$05
     db $06,$FF,$2A
     db $FF
@@ -127527,10 +127640,6 @@ _GymLeaderRematchText1:
 _GymLeaderRematchText2:
     db $0,"Go!",$57
 
-_GymLeaderRematchText3:
-    db $0,"Wow!",$4f
-    db "Wonderfull!",$58
-
 SECTION "bank27",ROMX,BANK[$27]
 
 _UnnamedText_5cb72: ; 9c000 (27:4000)
@@ -129730,9 +129839,7 @@ _PlayerBlackedOutText: ; a25c5 (28:65c5)
     db $52," blacked",$4f
     db "out!",$58
 
-_RepelWoreOffText: ; a25ef (28:65ef)
-    db $0,"REPEL's effect",$4f
-    db "wore off.",$57
+SECTION "_PokemartBuyingGreetingText",ROMX[$6608],BANK[$28]
 
 _PokemartBuyingGreetingText: ; a2608 (28:6608)
     db $0,"Take your time.",$57
@@ -129953,6 +130060,28 @@ _CopycatsHouseF2Text2_Part2_Dex:
     db "THE WALL,WHO IS",$55
     db "THE FAIREST ONE",$55
     db "OF ALL?",$58
+
+_RepelWoreOffText:
+    db $0,"REPEL's effect",$4f
+    db "wore off.",$58
+
+_TryUseAnotherRepelText:
+    db $0,"REPEL's effect",$4f
+    db "wore off.",$51
+    db "Use another",$4f,"@"
+    TX_RAM $cf4b
+    db $0," (",$F1,"@"
+    TX_NUM wTmpRepelQty,1,2
+    db $0,")?",$57
+
+_TryUseAnotherRepelText_LessThan10:
+    db $0,"REPEL's effect",$4f
+    db "wore off.",$51
+    db "Use another",$4f,"@"
+    TX_RAM $cf4b
+    db $0," (",$F1," @"
+    TX_NUM wTmpRepelQty,1,2
+    db $0,")?",$57
 
 SECTION "bank29",ROMX,BANK[$29]
 
@@ -131546,7 +131675,7 @@ MoveNames: ; b0000 (2c:4000)
     db "PSYWAVE@"
     db "SPLASH@"
     db "ACID ARMOR@"
-    db "CRABHAMMER@"
+    db "HAMMER@"
     db "EXPLOSION@"
     db "FURY SWIPES@"
     db "BONEMERANG@"
@@ -134212,7 +134341,7 @@ AttackAnimationPointers:
     dw PsywaveAnim
     dw SplashAnim
     dw AcidArmorAnim
-    dw CrabHammerAnim
+    dw HammerAnim
     dw ExplosionAnim
     dw FurySwipesAnim
     dw BonemerangAnim
@@ -138791,7 +138920,6 @@ UpgradeTrainerSet_:
     ld hl,wFlagsGymLeaderAfterHoFWin
     ld b,1
     call CountSetBits
-    ld a,[$D11E]
     cp 7
     ld hl,wEngagedTrainerSet ; Elite Four Team
     jr nc,.add1
@@ -138837,7 +138965,7 @@ TryGymLeaderRematch_:
     ld hl,$d72d
     set 6,[hl]
     set 7,[hl]
-    ld hl,GymLeaderRematchText3
+    ld hl,NoCommentText58
     ld d,h
     ld e,l
     call PreBattleSaveRegisters
@@ -138956,13 +139084,13 @@ TryHallOfFameRematch:
     jr z,.End_TalkToTrainer
     call StoreTrainerHeaderPointer ; Used in "EndTrainerBattle"
     call .CheckFoughtFlag
-    ld hl,NoCommentText
+    ld hl,NoCommentText57
     jr nz,.End_PrintText
     call .CheckRematchAnswer
     jr nz,.End_Nope
     ld hl,GymLeaderRematchText2
     call PrintText
-    ld hl,GymLeaderRematchText3
+    ld hl,NoCommentText58
     ld d,h
     ld e,l
     call PreBattleSaveRegisters
@@ -139394,7 +139522,7 @@ GenRandomInBattle_CH:
 HighCriticalMoves:
     db KARATE_CHOP
     db RAZOR_LEAF
-    db CRABHAMMER
+    db HAMMER
     db SLASH
     db $FF
 
@@ -140221,7 +140349,7 @@ db %00010010    ; Self-Destruct,Egg Bomb,Lick,Smog,Sludge,Bone Club,Fire Blast,W
 db %01000000    ; Clamp,Swift,Skull Bash,Spike Cannon,Constrict,Amnesia,Kinesis,Soft-Boiled
 db %00100000    ; High Jump Kick,Flare,Dream Eater,Poison Gas,Barrage,Leech Life,Lovely Kiss,Sky Attack
 db %01000100    ; Transform,Bubble,Dizzy Punch,Spore,Flash,Psywave,Splash,Acid Armor
-db %00000000    ; Crabhammer,Explosion,Fury Swipes,Bonemerang,Rest,Rock Slide,Hyper Fang,Sharpen
+db %00000000    ; Hammer,Explosion,Fury Swipes,Bonemerang,Rest,Rock Slide,Hyper Fang,Sharpen
 db %01000000    ; Conversion,Tri Attack,Super Fang,Slash,Substitute,Struggle,???,???
 
 ; ──────────────────────────────────────────────────────────────────────

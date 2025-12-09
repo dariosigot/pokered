@@ -560,16 +560,16 @@ BlastoiseStarterBaseStats:
 
 OnixCrystalBaseStats:
     db ONIX ; mon id
-    db 35 ; base hp
-    db 30 ; base attack
-    db 160 ; base defense
+    db 90 ; base hp
+    db 80 ; base attack
+    db 140 ; base defense
     db 70 ; base speed
-    db 45 ; base special
+    db 60 ; base special
 
     db CRYSTAL ; species type 1
     db EARTH ; species type 2
     db METAL ; species type 3
-    db 0 ; species type 4
+    db DRAGON ; species type 4
 
     db $77 ; sprite dimensions
 
@@ -593,8 +593,8 @@ OnixCrystalBaseStats:
     ; field moves
     db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
 
-    db 45 ; catch rate
-    db 108 ; base exp yield
+    db 35 ; catch rate
+    db 188 ; base exp yield
 
     db BANK(OnixPicFront)
 

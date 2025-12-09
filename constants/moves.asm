@@ -152,7 +152,7 @@
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; Acr 204 -> 255 ; PP 15 -> 30
     db SPLASH       , SPLASH_EFFECT              ,   0 , WATER    , 255 , 00 ; pp 40 ; - ; Type Normal -> Water
     db ACID_ARMOR   , DEFENSE_UP3_EFFECT         ,   0 , POISON   , 255 , 10 ; pp 20 ; - ; PP 40 -> 20 ; Defense 3x
-    db CRABHAMMER   , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 191 , 20 ; pp 10 ; 0 ; Acr 216 -> 191
+    db HAMMER   , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 191 , 20 ; pp 10 ; 0 ; Acr 216 -> 191
     db EXPLOSION    , EXPLODE_EFFECT             , 255 , NORMAL   , 255 , 60 ; pp  5 ; 0 ; Pwr 170 -> 255 ; Ene 40 -> 60
     db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , NORMAL   , 204 , 12 ; pp 15 ; 0 ; Pwr 18 -> 21 ; Ene 14 -> 12
     db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  55 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Earth -> Ivory ; Pwr 50 -> 55
