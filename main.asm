@@ -89349,6 +89349,14 @@ HallofFameRoomScript2:
     inc [hl]
 .skip
     PREDEF HoF_SetVariables
+    ld hl,wFlagsGymLeaderAfterHoFWin
+    ld b,1
+    call CountSetBits
+    cp 7
+    jr c,.skip2
+    ld hl,wFlagsGymLeaderAfterHoFWin
+    set 7,[hl]
+.skip2
     ld hl,wGymLeaderRematch
     ld [hl],%01111111
     call GBFadeOut2
