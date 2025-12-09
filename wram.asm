@@ -1935,6 +1935,7 @@ wTempMovePowerHI      ; df36 ; Temp Move Power 1st Byte
 
 wMaxLevel              ; df37
 wAvgLevel              ; df37
+wTmpRepelQty           ; df37
 wChoicePkmnMoveDeleter ; df37
 wBackupDarkMap         ; df37
 wTempStatLO            ; df37

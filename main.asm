@@ -572,8 +572,6 @@ HandleMenuInputWithWrap:
     ld [wMenuWrappingEnabled],a
     jp HandleMenuInput
 
-; Free
-
 SECTION "HandleMidJump",ROM0[$039e]
 
 ; this function calls a function that takes necessary actions
@@ -1954,8 +1952,6 @@ DisableDebugWtW_Hack:
     ld hl,$cd38
     res 0,[hl]
     ret
-
-; Free
 
 SECTION "LoadCurrentMapView",ROM0[$0ca2]
 
@@ -7152,14 +7148,13 @@ PlayerBlackedOutText: ; 2aba (0:2aba)
     TX_FAR _PlayerBlackedOutText
     db "@"
 
-DisplayRepelWoreOffText: ; 2abf (0:2abf)
-    ld hl,RepelWoreOffText
-    call PrintText
-    jp AfterDisplayingTextID
+DisplayRepelWoreOffText:
+    ld b,BANK(TryUseAnotherRepel)
+    ld hl,TryUseAnotherRepel
+    call Bankswitch
+    jp CloseTextDisplay
 
-RepelWoreOffText: ; 2ac8 (0:2ac8)
-    TX_FAR _RepelWoreOffText
-    db "@"
+SECTION "DisplayStartMenu",ROM0[$2acd]
 
 DisplayStartMenu: ; 2acd (0:2acd)
     ld a,$04
@@ -31578,6 +31573,66 @@ GetAvgTeamLevel:
     ld a,[$FF00+$98]
     ld d,a
     ret
+
+TryUseAnotherRepel:
+    ld hl,wNumBagItems
+    ld a,[hli]
+    and a
+    jr z,.NoOtherRepelInBag
+    ld b,a
+    ld c,0
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NoOtherRepelInBag
+    cp REPEL
+    jr z,.RepelFound
+    cp SUPER_REPEL
+    jr z,.RepelFound
+    cp MAX_REPEL
+    jr z,.RepelFound
+    inc hl
+    inc c
+    dec b
+    jr nz,.loop
+.NoOtherRepelInBag
+    ld hl,.RepelWoreOffText
+    jp PrintText
+.RepelFound
+    ld [$cf91],a ; Item ID
+    ld [$d11e],a ; load item so its name can be grabbed
+    ld a,c
+    ld [$cf92],a ; Item Index
+    ld a,[hl]
+    ld [wTmpRepelQty],a
+    push af
+    call GetItemName ; get the item name into de register
+    call CopyStringToCF4B ; copy name from de to wcf4b so it shows up in text
+    pop af
+    cp 10
+    ld hl,.TryUseAnotherRepelText
+    jr nc,.done
+    ld hl,.TryUseAnotherRepelText_LessThan10
+.done
+    call PrintText
+    call YesNoChoice ; yes/no textbox
+    ld a,[$CC26] ; yes/no answer (Y=0,N=1)
+    and a
+    jr nz,.end
+    xor a
+    ld [$d152],a
+    call UseItem
+.end
+    ret
+.RepelWoreOffText
+    TX_FAR _RepelWoreOffText
+    db "@"
+.TryUseAnotherRepelText
+    TX_FAR _TryUseAnotherRepelText
+    db "@"
+.TryUseAnotherRepelText_LessThan10
+    TX_FAR _TryUseAnotherRepelText_LessThan10
+    db "@"
 
 SECTION "bank5",ROMX,BANK[$5]
 
@@ -129773,9 +129828,7 @@ _PlayerBlackedOutText: ; a25c5 (28:65c5)
     db $52," blacked",$4f
     db "out!",$58
 
-_RepelWoreOffText: ; a25ef (28:65ef)
-    db $0,"REPEL's effect",$4f
-    db "wore off.",$57
+SECTION "_PokemartBuyingGreetingText",ROMX[$6608],BANK[$28]
 
 _PokemartBuyingGreetingText: ; a2608 (28:6608)
     db $0,"Take your time.",$57
@@ -129996,6 +130049,28 @@ _CopycatsHouseF2Text2_Part2_Dex:
     db "THE WALL,WHO IS",$55
     db "THE FAIREST ONE",$55
     db "OF ALL?",$58
+
+_RepelWoreOffText:
+    db $0,"REPEL's effect",$4f
+    db "wore off.",$58
+
+_TryUseAnotherRepelText:
+    db $0,"REPEL's effect",$4f
+    db "wore off.",$51
+    db "Use another",$4f,"@"
+    TX_RAM $cf4b
+    db $0," (",$F1,"@"
+    TX_NUM wTmpRepelQty,1,2
+    db $0,")?",$57
+
+_TryUseAnotherRepelText_LessThan10:
+    db $0,"REPEL's effect",$4f
+    db "wore off.",$51
+    db "Use another",$4f,"@"
+    TX_RAM $cf4b
+    db $0," (",$F1," @"
+    TX_NUM wTmpRepelQty,1,2
+    db $0,")?",$57
 
 SECTION "bank29",ROMX,BANK[$29]
 
