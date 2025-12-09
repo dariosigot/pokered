@@ -3834,7 +3834,7 @@ OnixBaseStats:
     db FM_CUT+FM_STRENGTH+FM_DIG
 
     db 35 ; catch rate
-    db 108 ; base exp yield
+    db 188 ; base exp yield
 
     db BANK(OnixPicFront)
 
@@ -6074,7 +6074,7 @@ MewBaseStats:
     db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_LIGHT+FM_DIG+FM_HEAL
 
     db 3 ; catch rate
-    db 64 ; base exp yield
+    db 221 ; base exp yield
 
     db BANK(MewPicFront)
 
@@ -6114,7 +6114,7 @@ LitwickBaseStats:
     db FM_LIGHT
 
     db 190 ; catch rate
-    db 55 ; base exp yield
+    db 56 ; base exp yield
 
     db BANK(LitwickPicFront)
 
@@ -6154,7 +6154,7 @@ LampentBaseStats:
     db FM_LIGHT
 
     db 90 ; catch rate
-    db 130 ; base exp yield
+    db 133 ; base exp yield
 
     db BANK(LampentPicFront)
 
