@@ -29362,7 +29362,16 @@ StartMenu_TrainerInfo:
     ld c,3
     ld b,%00000001
     call PrintNumber
+    call GetAvgTeamLevel
+    ld a,d
+    ld de,wAvgLevel
+    ld [de],a
     FuncCoord 12,07
+    ld hl,Coord
+    ld c,3
+    ld b,%00000001
+    call PrintNumber
+    FuncCoord 12,08
     ld hl,Coord
     ld de,$d5a2 ; hall of fame
     ld c,3
@@ -29375,13 +29384,14 @@ StartMenu_TrainerInfo:
     jp FarCopyData2
 
 .TrainerInfo_NameMoneyTimeText
-    db "NAME/",$4E,$4E
-    db "MONEY/",$4E
-    db "TIME/",$4E
-    db "MAX LEVEL/",$4E
-    db "H.OF FAME/",$4E,$4E
-    db "POWER/",$4E,$4E
-    db "BADGES/@"
+    db "NAME",$D3,$4E,$4E
+    db "MONEY",$D3,$4E
+    db "TIME",$D3,$4E
+    db "MAX LEVEL",$D3,$4E
+    db "AVG LEVEL",$D3,$4E
+    db "H.OF FAME",$D3,$4E
+    db "POWER",$D3,$4E,$4E
+    db "BADGES",$D3,"@"
 
 .PrintPowers
     FuncCoord 09,09
@@ -30792,7 +30802,7 @@ TryDoWildEncounter:
     ld a,[$d0db]
     and a
     jr z,.willEncounter
-    ld a,[W_PARTYMON1_LEVEL] ; $d18c
+    call GetAvgTeamLevel ; ld a,[W_PARTYMON1_LEVEL] ; $d18c
     ld b,a
     ld a,[W_CURENEMYLVL] ; $d127
     cp b
@@ -31538,6 +31548,35 @@ EvolutionAfterBattlePlus:
     PREDEF EvolutionAfterBattle
     ld hl,wFlagLearnAfterEvolutBit0
     res 0,[hl]
+    ret
+
+GetAvgTeamLevel:
+    ld a,[W_NUMINPARTY]
+    ld hl,W_PARTYMON1_LEVEL
+    ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
+    ld bc,0
+.loop
+    push af
+    ld a,[hl]
+    add c
+    ld c,a
+    jr nc,.NoCarry
+    inc b
+.NoCarry
+    add hl,de
+    pop af
+    dec a
+    jr nz,.loop
+    ld a,b
+    ld [H_DIVIDEND],a
+    ld a,c
+    ld [H_DIVIDEND+1],a
+    ld a,[W_NUMINPARTY]
+    ld [H_DIVISOR],a
+    ld b,2 ; 2 bytes
+    call Divide
+    ld a,[$FF00+$98]
+    ld d,a
     ret
 
 SECTION "bank5",ROMX,BANK[$5]
