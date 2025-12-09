@@ -247,11 +247,7 @@ wEnemyMonAccuracyMod: ; cd32
 wEnemyMonEvasionMod: ; cd33
     ds 1
 
-; At Least 5 free Bytes, Attention to cd38!
-
-SECTION "wFlagsGymLeaderAfterHoFWin",WRAM0[$cd37]
-
-wFlagsGymLeaderAfterHoFWin:: db ; $cd37
+; At Least 5 free Bytes, Attention to cd38! (NOT SAVED in SRAM)
 
 SECTION "wFlyLocationList",WRAM0[$cd3d]
 
@@ -1057,7 +1053,10 @@ wPokedexOwned: ; d2f7
     ds (DEX_NUM_MON / 8)
 wPokedexOwnedEnd:
 
-; some free bytes
+SECTION "wArrayMiniSpriteLoaded", WRAMX[$d317], BANK[1]
+
+wArrayMiniSpriteLoaded: ; d317
+    ds 6
 
 SECTION "wNumBagItems", WRAMX[$d31d], BANK[1]
 
@@ -1260,10 +1259,11 @@ wTmpDmgMultiplier: ; d481
 
 ENDU
 
-SECTION "wArrayMiniSpriteLoaded",WRAMX[$d489],BANK[1]
+; Free
 
-wArrayMiniSpriteLoaded: ; d489
-    ds 6
+SECTION "wFlagsGymLeaderAfterHoFWin",WRAMX[$d48e],BANK[1]
+
+wFlagsGymLeaderAfterHoFWin:: ds 1 ; d48e
 
 SECTION "GymLeaderRematch",WRAMX[$d48f],BANK[1]
 

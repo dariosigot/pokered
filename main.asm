@@ -8571,10 +8571,6 @@ GymLeaderRematchText2:
     TX_FAR _GymLeaderRematchText2
     db "@"
 
-GymLeaderRematchText3:
-    TX_FAR _GymLeaderRematchText3
-    db "@"
-
 GymLeaderAfterRematch:
     ld hl,GymLeaderAfterRematch_
     ld b,BANK(GymLeaderAfterRematch_)
@@ -8585,8 +8581,11 @@ CheckHallOfFameWin:
     and a ; rcf
     ret
 
-NoCommentText:
+NoCommentText57:
     db 0,"...",$57
+
+NoCommentText58:
+    db 0,"...",$58
 
 ArePlayerCoordsInArrayBeforeHOFWin:
     call CheckHallOfFameWin ; rcf
@@ -52088,6 +52087,7 @@ Sony3AI:
     ret nc
     call CompareSpeedAndGetRandomEffort
     ret nc
+Sony3AI_Common:
     ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseFullRestore
@@ -52112,10 +52112,18 @@ EliteFourAI:
     ret nc
     call CompareSpeedAndGetRandomEffort
     ret nc
+    call .CheckWinVsAllElite4AfterHoF
+    jr nc,Sony3AI_Common
     ld a,4
     call AICheckIfHPBelowFraction
     jp c,AIUseHyperPotion
     jr AdvanceAIHealStatus
+.CheckWinVsAllElite4AfterHoF
+    ld hl,wFlagsGymLeaderAfterHoFWin
+    ld b,1
+    call CountSetBits
+    cp 7
+    ret
 
 ; ─────────────────────────────────────────────────────────────
 
@@ -127527,10 +127535,6 @@ _GymLeaderRematchText1:
 _GymLeaderRematchText2:
     db $0,"Go!",$57
 
-_GymLeaderRematchText3:
-    db $0,"Wow!",$4f
-    db "Wonderfull!",$58
-
 SECTION "bank27",ROMX,BANK[$27]
 
 _UnnamedText_5cb72: ; 9c000 (27:4000)
@@ -138791,7 +138795,6 @@ UpgradeTrainerSet_:
     ld hl,wFlagsGymLeaderAfterHoFWin
     ld b,1
     call CountSetBits
-    ld a,[$D11E]
     cp 7
     ld hl,wEngagedTrainerSet ; Elite Four Team
     jr nc,.add1
@@ -138837,7 +138840,7 @@ TryGymLeaderRematch_:
     ld hl,$d72d
     set 6,[hl]
     set 7,[hl]
-    ld hl,GymLeaderRematchText3
+    ld hl,NoCommentText58
     ld d,h
     ld e,l
     call PreBattleSaveRegisters
@@ -138956,13 +138959,13 @@ TryHallOfFameRematch:
     jr z,.End_TalkToTrainer
     call StoreTrainerHeaderPointer ; Used in "EndTrainerBattle"
     call .CheckFoughtFlag
-    ld hl,NoCommentText
+    ld hl,NoCommentText57
     jr nz,.End_PrintText
     call .CheckRematchAnswer
     jr nz,.End_Nope
     ld hl,GymLeaderRematchText2
     call PrintText
-    ld hl,GymLeaderRematchText3
+    ld hl,NoCommentText58
     ld d,h
     ld e,l
     call PreBattleSaveRegisters

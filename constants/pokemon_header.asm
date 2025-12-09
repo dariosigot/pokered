@@ -3800,16 +3800,16 @@ GengarBaseStats:
 
 OnixBaseStats:
     db ONIX ; mon id
-    db 90 ; = 90 ; base hp (+55)
-    db 90 ; = 90 ; base attack (+45)
+    db 90 ; base hp (+55)
+    db 90 ; base attack (+45)
     db 160 ; base defense
     db 70 ; base speed
-    db 10 ; = 10 ; base special (-20)
+    db 30 ; base special
 
     db ROCK ; species type 1
     db EARTH ; species type 2
     db METAL ; species type 3
-    db 0 ; species type 4
+    db DRAGON ; species type 4
 
     db $77 ; sprite dimensions
 
@@ -3833,7 +3833,7 @@ OnixBaseStats:
     ; field moves
     db FM_CUT+FM_STRENGTH+FM_DIG
 
-    db 45 ; catch rate
+    db 35 ; catch rate
     db 108 ; base exp yield
 
     db BANK(OnixPicFront)
