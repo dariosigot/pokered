@@ -2546,6 +2546,15 @@ DelayFramesCredits:
     jr nz,DelayFramesCredits
     ret
 
+StoreGymLeaderRematch:
+    push bc
+    ld hl,W_OBTAINEDBADGES
+    ld b,[hl]
+    and b
+    ld [wGymLeaderRematch],a
+    pop bc
+    ret
+
 ; Free
 
 SECTION "RunMapScript",ROM0[$101b]
@@ -72526,8 +72535,8 @@ Func_48963: ; 48963 (12:4963)
     set 3,[hl]
     ;ds 3 ; ld hl,$d72a
     ;ds 2 ; set 3,[hl]
-    ld hl,wGymLeaderRematch
-    ld [hl],%01110111
+    ld a,%01110111
+    call StoreGymLeaderRematch
     ld a,[$d77c]
     or $fc
     ld [$d77c],a
@@ -89360,8 +89369,8 @@ HallofFameRoomScript2:
     ld hl,wFlagsGymLeaderAfterHoFWin
     set 7,[hl]
 .skip2
-    ld hl,wGymLeaderRematch
-    ld [hl],%01111111
+    ld a,%01111111
+    call StoreGymLeaderRematch
     call GBFadeOut2
     ld a,8
     call StopMusic
@@ -89891,8 +89900,8 @@ Func_5c3df: ; 5c3df (17:43df)
     set 0,[hl]
     ;ds 3 ; ld hl,$d72a
     ;ds 2 ; set 0,[hl]
-    ld hl,wGymLeaderRematch
-    ld [hl],%01111110
+    ld a,%01111110
+    call StoreGymLeaderRematch
     ld a,$4
     ld [$cc4d],a
     PREDEF RemoveMissableObject
@@ -90302,8 +90311,8 @@ Func_5c70d: ; 5c70d (17:470d)
     set 1,[hl]
     ;ds 3 ; ld hl,$d72a
     ;ds 2 ; set 1,[hl]
-    ld hl,wGymLeaderRematch
-    ld [hl],%01111101
+    ld a,%01111101
+    call StoreGymLeaderRematch
     ld hl,$d75e
     set 2,[hl]
     set 3,[hl]
@@ -90812,8 +90821,8 @@ Func_5caaa: ; 5caaa (17:4aaa)
     set 2,[hl]
     ;ds 3 ; ld hl,$d72a
     ;ds 2 ; set 2,[hl]
-    ld hl,wGymLeaderRematch
-    ld [hl],%01111011
+    ld a,%01111011
+    call StoreGymLeaderRematch
     ld a,[$d773]
     or $1c
     ld [$d773],a
@@ -91587,8 +91596,8 @@ Func_5d068: ; 5d068 (17:5068)
     set 5,[hl]
     ;ds 3 ; ld hl,$d72a
     ;ds 2 ; set 5,[hl]
-    ld hl,wGymLeaderRematch
-    ld [hl],%01011111
+    ld a,%01011111
+    call StoreGymLeaderRematch
     ld a,[$d7b3]
     or $fc
     ld [$d7b3],a
@@ -104934,8 +104943,8 @@ ViridianGymScript3_74995: ; 74995 (1d:4995)
     set 7,[hl]
     ;ds 3 ; ld hl,$d72a
     ;ds 2 ; set 7,[hl]
-    ld hl,wGymLeaderRematch
-    ld [hl],%01111111
+    ld a,%01111111
+    call StoreGymLeaderRematch
     ld a,[$d751]
     or $fc
     ld [$d751],a
@@ -106336,8 +106345,8 @@ FuchsiaGymScript3_75497: ; 75497 (1d:5497)
     set 4,[hl]
     ;ds 3 ; ld hl,$d72a
     ;ds 2 ; set 4,[hl]
-    ld hl,wGymLeaderRematch
-    ld [hl],%01101111
+    ld a,%01101111
+    call StoreGymLeaderRematch
     ld a,[$d792]
     or $fc
     ld [$d792],a
@@ -106842,8 +106851,8 @@ CinnabarGymScript3_75857: ; 75857 (1d:5857)
     set 6,[hl]
     ;ds 3 ; ld hl,$d72a
     ;ds 2 ; set 6,[hl]
-    ld hl,wGymLeaderRematch
-    ld [hl],%00111111
+    ld a,%00111111
+    call StoreGymLeaderRematch
     ld a,[$d79a]
     or $fc
     ld [$d79a],a
@@ -139032,9 +139041,12 @@ GymLeaderAfterRematch_:
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
     jr z,.reset
-    call .CheckBeatGymAfterHoFWin
-    xor a
-    ld [wGymLeaderRematch],a
+    push hl
+    ; c = Gym ID (1...7)
+    call CheckHallOfFameWin
+    call nz,.SetBeatGymAfterHoFWin
+    call .ResetGymLeaderRematchFlag
+    pop hl
 .reset
     xor a
     ld [hl],a
@@ -139051,28 +139063,38 @@ GymLeaderAfterRematch_:
     dbw CINNABAR_GYM  , W_CINNABARGYMCURSCRIPT
     dbw VIRIDIAN_GYM  , W_VIRIDIANGYMCURSCRIPT
     db $FF
-.CheckBeatGymAfterHoFWin
-    call CheckHallOfFameWin
-    ret z
-    push hl
+.SetBeatGymAfterHoFWin
     ld hl,wFlagsGymLeaderAfterHoFWin
-    ld a,[hl] ; Read
+    call .Read
+    ret nz ; return if just set
+    set 7,a
+    jr .Store
+.ResetGymLeaderRematchFlag
+    ld hl,wGymLeaderRematch
+    call .Read
+    ret z ; return if just reset
+    res 7,a
+    ; fall through
+.Store
     ld b,c
+    call .loop2
+    ld [hl],a ; Store
+    ret
 .loop1
     rrc a
     dec b
     jr nz,.loop1
-    bit 7,a
-    jr nz,.end ; return if just set
-    set 7,a
-    ld b,c
+    ret
 .loop2
     rlc a
     dec b
     jr nz,.loop2
-    ld [hl],a ; Store
-.end
-    pop hl
+    ret
+.Read
+    ld a,[hl] ; Read
+    ld b,c
+    call .loop1
+    bit 7,a
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
