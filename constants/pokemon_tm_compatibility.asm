@@ -783,7 +783,7 @@ MagnemiteTMCompatibility:
     tmlearn 25,30,31,32             ; |THUNDER_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
     tmlearn 41,44,45,47             ; |LIGHT_SCREEN|REST|THUNDER_WAVE|EXPLOSION|
-    tmlearn 50,55                   ; |SUBSTITUTE|FLASH|
+    tmlearn 50,51,55                ; |SUBSTITUTE|BLADE|FLASH|
     tmlearn 0
 MagnetonTMCompatibility:
     tmlearn 08                      ; |BODY_SLAM|
@@ -792,7 +792,7 @@ MagnetonTMCompatibility:
     tmlearn 25,29,30,31,32          ; |THUNDER_M|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
     tmlearn 33,34,36,39             ; |REFLECT|BIDE|SELFDESTRUCT|SWIFT|
     tmlearn 41,44,45,46,47          ; |LIGHT_SCREEN|REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|
-    tmlearn 49,50,55                ; |TRI_ATTACK|SUBSTITUTE|FLASH|
+    tmlearn 49,50,51,55             ; |TRI_ATTACK|SUBSTITUTE|BLADE|FLASH|
     tmlearn 0
 ; ──────────────────────────────────────────────────────────────────────
 FarfetchdTMCompatibility:
@@ -1479,7 +1479,14 @@ MewtwoTMCompatibility:
     tmlearn 57,58,59                ; |FIRE_PUNCH|ICE_PUNCH|THUNDERPUNCH|
 ; ──────────────────────────────────────────────────────────────────────
 MewTMCompatibility:
-    db $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff
+    tmlearn 01,02,03,04,05,06,07,08 ; |MEGA_PUNCH|RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|MEGA_KICK|TOXIC|HORN_DRILL|BODY_SLAM|
+    tmlearn 09,10,11,12,13,14,15,16 ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|PAY_DAY|
+    tmlearn 17,18,19,20,21,22,23,24 ; |SUBMISSION|COUNTER|SEISMIC_TOSS|RAGE|MEGA_DRAIN|SOLARBEAM|DRAGON_RAGE|THUNDERBOLT|
+    tmlearn 25,26,27,28,29,30,31,32 ; |THUNDER_M|EARTHQUAKE|FISSURE|TRAPHOLE|PSYCHIC_M|TELEPORT|MIMIC|DOUBLE_TEAM|
+    tmlearn 33,34,35,36,37,38,39,40 ; |REFLECT|BIDE|METRONOME|SELFDESTRUCT|FLAMETHROWER|FIRE_BLAST|SWIFT|SKULL_BASH|
+    tmlearn 41,42,43,44,45,46,47,48 ; |LIGHT_SCREEN|DREAM_EATER|SKY_ATTACK|REST|THUNDER_WAVE|PSYWAVE|EXPLOSION|ROCK_SLIDE|
+    tmlearn 49,50,51,52,53,54,55,56 ; |TRI_ATTACK|SUBSTITUTE|BLADE|SWOOP|TSUNAMI|STRIKE|FLASH|SLUDGE|
+    tmlearn 57,58,59,60             ; |FIRE_PUNCH|ICE_PUNCH|THUNDERPUNCH|DIZZY_PUNCH|
 ; ──────────────────────────────────────────────────────────────────────
 LitwickTMCompatibility:
     tmlearn 06                      ; |TOXIC|
