@@ -142652,7 +142652,7 @@ GenerateRandomEnemyTrainerIV_:
     db LORELEI,BLASTOISE,0,0,$CF,$AB
     db LORELEI,JYNX,0,0,$E9,$DE
     db LORELEI,LAPRAS,0,0,$BF,$AE
-    db LORELEI,NINETALES,1,6,$EE,$FF
+    db LORELEI,NINETALES,1,6,$BE,$FF
 
     ; Lance
     db LANCE,GYARADOS,0,0,$EA,$AA
