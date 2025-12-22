@@ -23749,10 +23749,12 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     set 7,[hl]
     xor a
     ld [$d700],a ; change player state to walking
-    dec a
-    ld [wJoypadForbiddenButtonsMask],a
+;    dec a
+;    ld [wJoypadForbiddenButtonsMask],a
     call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play walking music
-    jp ClearScreenAndLoadWalkingPlayerSpriteGraphics ; jp LoadWalkingPlayerSpriteGraphics
+    ld hl,.EndSurfText
+    call PrintText
+    ret ; jp ClearScreenAndLoadWalkingPlayerSpriteGraphics ; jp LoadWalkingPlayerSpriteGraphics
 ; uses a simulated button press to make the player move forward
 .makePlayerMoveForward
     ld a,[$d52a] ; direction the player is going
@@ -23789,6 +23791,9 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     call SurfingCry ; ld hl,SurfingGotOnText
 .PrintText
     jp PrintText
+.EndSurfText
+    TX_FAR _EndSurfText
+    db "@"
 
 ItemUseEvoStone:
     ld a,[W_ISINBATTLE]
@@ -28074,7 +28079,9 @@ UsingDigCry:
     ret
 
 SurfingCry:
-    call PlayCryAndDecreaseFieldMoveEnergy
+    ld a,[$d152]
+    and a ; using surfboard?
+    call nz,PlayCryAndDecreaseFieldMoveEnergy
     ld hl,SurfingGotOnText
     ret
 
@@ -28485,10 +28492,14 @@ GetBiteLevel:
     pop bc
     ret
 
-ClearScreenAndLoadWalkingPlayerSpriteGraphics:
-    call GBPalWhiteOutWithDelay3
-    call ClearScreen
-    jp LoadWalkingPlayerSpriteGraphics
+;ClearScreenAndLoadWalkingPlayerSpriteGraphics:
+;    ld a,[$d152]
+;    and a ; using surfboard?
+;    jr z,.skip
+;    call GBPalWhiteOutWithDelay3
+;    call ClearScreen
+;.skip
+;    jp LoadWalkingPlayerSpriteGraphics
 
 PoisonedOnlyIfNotFaintened:
     ld a,[hl]
@@ -29785,6 +29796,7 @@ UsableItems_CloseMenu:
     db GOOD_ROD
     db SUPER_ROD
     db BENGAL
+    db SURFBOARD
     db $ff
 
 SECTION "PartyMenuNormalText",ROMX[$6e7f],BANK[$4]
@@ -131369,6 +131381,10 @@ _ReceivedTM28Text:
     TX_RAM $cf4b
     db $0,"!@@"
 
+_EndSurfText:
+    db $0,$52," retrieves",$4f
+    db "bag!",$58
+
 SECTION "bank2A",ROMX,BANK[$2A]
 
 _ItemUseText001: ; a8000 (2a:4000)
@@ -133425,7 +133441,7 @@ ItemNames:
     db "POKé BALL@"    ; $04
     db "TOWN MAP@"     ; $05
     db "BICYCLE@"      ; $06
-    db "?@"            ; $07
+    db "SURFBOARD@"    ; $07
     db "SAFARI BALL@"  ; $08
     db "POKéDEX@"      ; $09
     db "MOON STONE@"   ; $0A
