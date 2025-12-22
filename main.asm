@@ -132392,8 +132392,8 @@ SelectInOverWorld:
     call SearchFieldMoveInParty
     jr nc,.noCut
 .canCut
-    call .StartCustomSelectFunction
     call .PlayCry
+    call .StartCustomSelectFunction
     ld b,BANK(CanCut)
     ld hl,CanCut
     call Bankswitch
@@ -132429,12 +132429,16 @@ SelectInOverWorld:
     ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     jp c,.noFloat
+    ld b,SURFBOARD
+    call .IsItemInBag
+    jr nz,.canFloatNoCry
     ld b,5 ; FLOAT
     call SearchFieldMoveInParty
     jr nc,.noFloat
 .canFloat
-    call .StartCustomSelectFunction
     call .PlayCry
+.canFloatNoCry
+    call .StartCustomSelectFunction
     ld a,SURFBOARD
     ld [$cf91],a
     ld [$d152],a
@@ -132455,12 +132459,20 @@ SelectInOverWorld:
     ld hl,$d7c2 ; FirePower
     bit 0,[hl]  ; ...
     jr z,.noLight
+    ld b,BENGAL
+    call .IsItemInBag
+    jr nz,.canLightNoCry
     ld b,7 ; LIGHT
     call SearchFieldMoveInParty
     jr nc,.noLight
 .canLight
-    call .StartCustomSelectFunction
     call .PlayCry
+    jr .ContinueLight
+.canLightNoCry
+    ld hl,wOverworlLightSoundBit4
+    set 4,[hl]
+.ContinueLight
+    call .StartCustomSelectFunction
     ld hl,wOverworlLightNoTextBit2
     set 2,[hl]
     ld a,BENGAL
@@ -132490,8 +132502,8 @@ SelectInOverWorld:
     call SearchFieldMoveInParty
     jr nc,.noStrength
 .canStrength
-    call .StartCustomSelectFunction
     call .PlayCry
+    call .StartCustomSelectFunction
     ld hl,$d728
     set 0,[hl]
     jp .EndCustomSelectFunction
