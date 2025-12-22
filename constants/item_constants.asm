@@ -23,7 +23,7 @@ BAIT_ITEM     EQU $15
 ROCK_ITEM     EQU $16
 DUSK_STONE    EQU $17
 ICE_STONE     EQU $18
-; XXX ????? EQU $19
+BENGAL        EQU $19
 ; XXX ????? EQU $1A
 ; XXX ????? EQU $1B
 ; XXX ????? EQU $1C

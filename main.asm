@@ -25,13 +25,6 @@ CheckSelect:
     call Bankswitch
     jp OverworldLoop
 
-HackForCloseText:
-    ; close if $FF is the textID or sprite index
-    cp $ff
-    jp z,CloseTextDisplay
-    ld a,[$d4e1] ; number of sprites
-    jp ReturnInDisplayTextIDHack
-
 ResetTempIV:
     push hl
     push af
@@ -46,6 +39,15 @@ ResetTempIV:
 HandleLessThan2MenuElements:
     add 2
     jp GoToBottomLessThan2MenuElements
+
+StoreGymLeaderRematch:
+    push bc
+    ld hl,W_OBTAINEDBADGES
+    ld b,[hl]
+    and b
+    ld [wGymLeaderRematch],a
+    pop bc
+    ret
 
 ; interrupts
 SECTION "vblank",ROM0[$40]
@@ -2546,14 +2548,21 @@ DelayFramesCredits:
     jr nz,DelayFramesCredits
     ret
 
-StoreGymLeaderRematch:
-    push bc
-    ld hl,W_OBTAINEDBADGES
-    ld b,[hl]
-    and b
-    ld [wGymLeaderRematch],a
-    pop bc
-    ret
+HackForOtherText:
+    ; close if $FF is the textID or sprite index
+    cp $ff
+    jp z,CloseTextDisplay
+    cp $fe
+    jr z,.FlashLightText
+    ld a,[$d4e1] ; number of sprites
+    jp ReturnInDisplayTextIDHack
+.FlashLightText
+    ld hl,.flashLightsAreaText
+    call PrintText
+    jp AfterDisplayingTextID
+.flashLightsAreaText
+    TX_FAR _FlashLightsAreaText
+    db "@"
 
 ; Free
 
@@ -6953,7 +6962,7 @@ DisplayTextID: ; 2920 (0:2920)
     jp z,DisplayPlayerBlackedOutText
     cp a,$d2 ; repel wore off
     jp z,DisplayRepelWoreOffText
-    jp HackForCloseText ; ld a,[$d4e1] ; number of sprites
+    jp HackForOtherText ; ld a,[$d4e1] ; number of sprites
 ReturnInDisplayTextIDHack:
     ld e,a
     ld a,[$ff8c] ; sprite ID
@@ -11570,7 +11579,7 @@ ItemPrices:
     bcd3      0 ; ?
     bcd3  40000 ; DUSK_STONE
     bcd3  40000 ; ICE_STONE
-    bcd3      0 ; ?
+    bcd3      0 ; BENGAL
     bcd3      0 ; ?
     bcd3      0 ; ?
     bcd3      0 ; ?
@@ -22513,6 +22522,38 @@ CheckFailPushingBoulder:
     pop hl ; Hack Remove Return Pointer
     ret
 
+SentNewMonToBox_ResetMovePPs:
+    call ResetMovePPs_
+    xor a     ; Reset Move 2/3 PP
+    ld [de],a ; ...
+    dec de    ; ...
+    ld [de],a ; ...
+    inc de    ; ...
+    ret
+
+CopyDataSkipEnergyAltForm:
+    ld bc,5
+    call CopyData
+    inc hl
+    inc hl
+    xor a     ; Reset EX Type 1
+    ld [de],a ; ...
+    inc de
+    ld [de],a ; ...
+    inc de
+    ld bc,5
+    jp CopyData
+
+CheckItemOnActive:
+    ld a,[W_ISINBATTLE]
+    and a
+    ret z ; z if not in battle
+    ld a,[wPlayerMonNumber]
+    ld b,a
+    ld a,[$cf92]
+    cp b
+    ret ; z if active mon is choice in battle
+
 ; Free
 
 SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
@@ -23080,7 +23121,7 @@ UseItem_:
     dw ItemUseRock       ;
     dw ItemUseEvoStone   ; DUSK_STONE
     dw ItemUseEvoStone   ; ICE_STONE
-    dw UnusableItem      ;
+    dw ItemUseBengal     ; BENGAL
     dw UnusableItem      ;
     dw UnusableItem      ;
     dw UnusableItem      ;
@@ -25728,7 +25769,7 @@ IsKeyItem_: ; e764 (3:6764)
     db %11110000
     db %00000001
     db %00110000
-    db %01010000
+    db %01010001
     db %00000000
     db %10010111
     db %00000010
@@ -28895,37 +28936,17 @@ UpdateHPBar_AnimateHPBar:
     pop hl
     ret
 
-SentNewMonToBox_ResetMovePPs:
-    call ResetMovePPs_
-    xor a     ; Reset Move 2/3 PP
-    ld [de],a ; ...
-    dec de    ; ...
-    ld [de],a ; ...
-    inc de    ; ...
+ItemUseBengal:
+    ld a,[$d152]
+    and a ; is using mon's light
+    jr nz,.skip
+    call ItemUseReloadOverworldData
+    ld hl,wOverworlLightSoundBit4
+    set 4,[hl]
+.skip
+    ld hl,wOverworlLightAnimBit0
+    set 0,[hl]
     ret
-
-CopyDataSkipEnergyAltForm:
-    ld bc,5
-    call CopyData
-    inc hl
-    inc hl
-    xor a     ; Reset EX Type 1
-    ld [de],a ; ...
-    inc de
-    ld [de],a ; ...
-    inc de
-    ld bc,5
-    jp CopyData
-
-CheckItemOnActive:
-    ld a,[W_ISINBATTLE]
-    and a
-    ret z ; z if not in battle
-    ld a,[wPlayerMonNumber]
-    ld b,a
-    ld a,[$cf92]
-    cp b
-    ret ; z if active mon is choice in battle
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -29763,6 +29784,7 @@ UsableItems_CloseMenu:
     db OLD_ROD
     db GOOD_ROD
     db SUPER_ROD
+    db BENGAL
     db $ff
 
 SECTION "PartyMenuNormalText",ROMX[$6e7f],BANK[$4]
@@ -30083,14 +30105,11 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 ;    bit 0,a ; does the player have the Boulder Badge?
     call CheckFirePower ; jp z,.newBadgeRequired
     call PlayCryAndDecreaseFieldMoveEnergy
-    xor a
-    ld [$d35d],a
-    ld hl,.flashLightsAreaText
-    call PrintText
+    ld a,BENGAL
+    ld [$cf91],a
+    ld [$d152],a
+    call UseItem
     jr .WhiteScreenAndGotoMap
-.flashLightsAreaText
-    TX_FAR _FlashLightsAreaText
-    db "@"
 
 .dig
     ld a,ESCAPE_ROPE
@@ -130122,7 +130141,7 @@ _UnnamedText_cdff: ; a4088 (29:4088)
 
 _FlashLightsAreaText: ; a40a9 (29:40a9)
     db $0,"A blinding LIGHT",$4f
-    db "lights the area!",$58
+    db "lights the area!",$57
 
 _WarpToLastPokemonCenterText: ; a40cc (29:40cc)
     db $0,"Warp to the last",$4f
@@ -132426,8 +132445,12 @@ SelectInOverWorld:
 .canLight
     call .StartCustomSelectFunction
     call .PlayCry
-    xor a
-    ld [$d35d],a
+    ld hl,wOverworlLightNoTextBit2
+    set 2,[hl]
+    ld a,BENGAL
+    ld [$cf91],a
+    ld [$d152],a
+    call UseItem
     jp .EndCustomSelectFunction
 .noLight
     scf ; set carry flag
@@ -133419,8 +133442,8 @@ ItemNames:
     db "?@"            ; $15
     db "?@"            ; $16
     db "DUSK STONE@"   ; $17
-    db "?@"            ; $18
-    db "?@"            ; $19
+    db "ICE STONE@"    ; $18
+    db "BENGAL@"       ; $19
     db "?@"            ; $1A
     db "?@"            ; $1B
     db "?@"            ; $1C
@@ -138265,6 +138288,7 @@ _HackFromBank0:
 
 BugFixLongRangeTrainer:
     call BackupDarkMapState
+    call HandleLightAnimation
     ld hl,W_FLAGS_D733 ; check if trainer is wanting to battle
     bit 3,[hl]
     ld hl,$d732
@@ -138320,6 +138344,54 @@ RestoreFaintenedWith1HP:
 BackupDarkMapState:
     ld a,[$d35d]
     ld [wBackupDarkMap],a
+    ret
+
+HandleLightAnimation:
+    ld hl,wOverworlLightAnimBit0
+    bit 0,[hl]
+    res 0,[hl]
+    ret z
+    xor a
+    ld [$d35d],a
+    call LoadGBPal
+    ld hl,wOverworlLightSoundBit4
+    bit 4,[hl]
+    res 4,[hl]
+    jr z,.SkipSound
+    ld a,MAGNEMITE
+    call GetCryData
+    call PlaySound
+.SkipSound
+    ld b,5
+    call .FlashScreenBTimes
+    ld c,20
+    call DelayFrames
+    ld hl,wOverworlLightNoTextBit2
+    bit 2,[hl]
+    res 2,[hl]
+    ret nz
+    call EnableAutoTextBoxDrawing
+    ld a,$fe ; .FlashLightText
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    jp DisplayTextID
+.FlashScreenBTimes
+    call .FlashScreen
+    dec b
+    jr nz,.FlashScreenBTimes
+    ret
+.FlashScreen
+    ld a,[rBGP]
+    push af ; save initial palette
+    ld a,%00011011 ; 0,1,2,3 (inverted colors)
+    ld [rBGP],a
+    ld c,2
+    call DelayFrames
+    xor a ; white out background
+    ld [rBGP],a
+    ld c,2
+    call DelayFrames
+    pop af
+    ld [rBGP],a ; restore initial palette
     ret
 
 BugFixWarpDuringJump:
