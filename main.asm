@@ -94387,7 +94387,7 @@ Func_60b02: ; 60b02 (18:4b02)
 PokemonTower6ScriptPointers: ; 60b0d (18:4b0d)
     dw PokemonTower6Script0
     dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+    dw PokemonTower6Script2
     dw PokemonTower6Script3
     dw PokemonTower6Script4
 
@@ -94576,9 +94576,7 @@ PokemonTower6EndBattleText3: ; 60c4c (18:4c4c)
     TX_FAR _PokemonTower6EndBattleText3
     db "@"
 
-PokemonTower6AfterBattleText3: ; 60c51 (18:4c51)
-    TX_FAR _PokemonTower6AfterBattleText3
-    db "@"
+SECTION "PokemonTower6Text6",ROMX[$4c56],BANK[$18]
 
 PokemonTower6Text6: ; 60c56 (18:4c56)
     TX_FAR _UnnamedText_60c56
@@ -97797,6 +97795,55 @@ PokemonTower2Script2:
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a
     ld [H_NEWLYPRESSEDBUTTONS],a
+    ret
+
+; ───────────────────────────────────────
+
+PokemonTower6AfterBattleText3:
+    db $08 ; asm
+    ld hl,.end
+    push hl
+    ld b,BENGAL
+    PREDEF _IsItemInBagOrBox
+    ld hl,.PokemonTower6AfterBattleText3
+    ret nz
+    ld hl,.BengalReceiveText1
+    call PrintText
+    ld bc,(BENGAL << 8) | 1
+    call GiveItem
+    ld hl,.BengalNoRoomText
+    ret nc
+    ld hl,.BengalReceiveText2
+    ret
+.end
+    call PrintText
+    jp TextScriptEnd
+.BengalReceiveText1
+    TX_FAR _BengalReceiveText1
+    db "@"
+.BengalReceiveText2
+    TX_FAR _ReceivedText
+    db $11,"@"
+.BengalNoRoomText
+    TX_FAR _BengalNoRoomText
+    db $0F,"@"
+.PokemonTower6AfterBattleText3
+    TX_FAR _PokemonTower6AfterBattleText3
+    db "@"
+
+PokemonTower6Script2:
+    call EndTrainerBattle
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $ff
+    jr z,.ResetScript
+    ld a,[$cf13]
+    cp $03 ; Is Upper Right Channeler end Battle?
+    ret nz
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    jp DisplayTextID
+.ResetScript
+    xor a
+    ld [W_POKEMONTOWER6CURSCRIPT],a
     ret
 
 ; ───────────────────────────────────────
@@ -127808,6 +127855,17 @@ _GymLeaderRematchText1:
 
 _GymLeaderRematchText2:
     db $0,"Go!",$57
+
+_BengalReceiveText1:
+    db $0,"What's going on",$4f
+    db "here?",$51
+    db "And Why do I have",$4f
+    db "this tool in my",$55
+    db "pocket?",$58
+
+_BengalNoRoomText:
+    db $0,"You do not have",$4f
+    db "space for this!",$57
 
 SECTION "bank27",ROMX,BANK[$27]
 
