@@ -24984,8 +24984,8 @@ FishingInit:
     cp a,2 ; Surfing?
     jr z,.surfing
     call ItemUseReloadOverworldData
-    ld hl,ItemUseText00
-    call PrintText
+    ld hl,.PrintText
+    call RunOnlyIfNotSelectInOverworld
     ld a,$8e
     call PlaySound ; play sound
     ld c,80
@@ -24995,6 +24995,9 @@ FishingInit:
 .surfing
     scf ; can't fish when surfing
     ret
+.PrintText
+    ld hl,ItemUseText00
+    jp PrintText
 
 ItemUseOaksParcel:
     jp ItemUseNotYoursToUse
@@ -98787,7 +98790,7 @@ Func_707b6: ; 707b6 (1c:47b6)
 .asm_70833
     ld hl,UnnamedText_70851 ; $4851
 .asm_70836
-    call PrintText
+    call PrintRodText
     ld hl,$d736
     res 6,[hl]
     call LoadFontTilePatterns
@@ -104225,6 +104228,12 @@ InGameTrade_BackupPlayerIVandAltForm:
 PlayCryWithoutWaitForSoundToFinish:
     call GetCryData
     jp PlaySound
+
+PrintRodText:
+    ld a,[wSelectInOverworldOnBit6]
+    bit 6,a
+    ret nz
+    jp PrintText
 
 SECTION "bank1D",ROMX,BANK[$1D]
 
