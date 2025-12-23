@@ -132423,9 +132423,6 @@ SelectInOverWorld:
 ;    ld a,[W_OBTAINEDBADGES] ; badges obtained
 ;    bit 4,a ; does the player have the Soul Badge?
 ;    jr z,.noFloat
-    ld hl,$d857 ; WaterPower
-    bit 0,[hl]  ; ...
-    jr z,.noFloat
     ld b,BANK(IsSurfingAllowed)
     ld hl,IsSurfingAllowed
     call Bankswitch
@@ -132441,6 +132438,9 @@ SelectInOverWorld:
     ld b,SURFBOARD
     call .IsItemInBag
     jr nz,.canFloatNoCry
+    ld hl,$d857 ; WaterPower
+    bit 0,[hl]  ; ...
+    jr z,.noFloat
     ld b,5 ; FLOAT
     call SearchFieldMoveInParty
     jr nc,.noFloat
@@ -132465,12 +132465,12 @@ SelectInOverWorld:
 ;    ld a,[W_OBTAINEDBADGES] ; badges obtained
 ;    bit 0,a ; does the player have the Boulder Badge?
 ;    jr z,.noLight
-    ld hl,$d7c2 ; FirePower
-    bit 0,[hl]  ; ...
-    jr z,.noLight
     ld b,BENGAL
     call .IsItemInBag
     jr nz,.canLightNoCry
+    ld hl,$d7c2 ; FirePower
+    bit 0,[hl]  ; ...
+    jr z,.noLight
     ld b,7 ; LIGHT
     call SearchFieldMoveInParty
     jr nc,.noLight
