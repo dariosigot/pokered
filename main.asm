@@ -1084,15 +1084,8 @@ WarpFound2: ; 073c (0:073c)
     ld [$d366],a
     ld a,[$ff8b] ; destination map number
     call ChangeCurMap ; change current map to destination map
-    push bc ; 1
-    push af ; 1
-    ld b,BANK(CheckDarkMap) ; 2
-    ld hl,CheckDarkMap ; 3
-    call Bankswitch ; 3
-    pop af ; 1
-    pop bc ; 1
-.notRockTunnel
     call PlayMapChangeSound
+    call CheckDarkMap
     jr .done
 ; for maps that can have the 0xFF destination map,which means to return to the outside map; not all these maps are necessarily indoors,though
 .indoorMaps
@@ -1114,6 +1107,7 @@ WarpFound2: ; 073c (0:073c)
     jr .skipMapChangeSound
 .notTeleporter
     call PlayMapChangeSound
+    call CheckDarkMap
 .skipMapChangeSound
     ld hl,$d736
     res 0,[hl]
@@ -1123,13 +1117,16 @@ WarpFound2: ; 073c (0:073c)
     ld a,[wLastMap] ; previous map
     call ChangeCurMap
     call PlayMapChangeSound
-    xor a
-    ld [$d35d],a
+    call CheckDarkMap
 .done
     ld hl,$d736
     set 0,[hl]
     call Func_12da
     jp EnterMap
+
+; Free
+
+SECTION "ContinueCheckWarpsNoCollisionLoop",ROM0[$07b5]
 
 ContinueCheckWarpsNoCollisionLoop: ; 07b5 (0:07b5)
     inc b ; increment warp number
@@ -1287,11 +1284,11 @@ PlayMapChangeSound: ; 08c9 (0:08c9)
 .didNotGoThroughDoor
     ld a,$b5
 .playSound
-    call PlaySound
-    ld a,[$d35d]
-    and a
-    ret nz
-    jp GBFadeIn1
+    jp PlaySound
+
+; Free
+
+SECTION "CheckIfInOutsideMap",ROM0[$08e1]
 
 CheckIfInOutsideMap: ; 08e1 (0:08e1)
 ; If the player is in an outside map (a town or route),set the z flag
@@ -2563,6 +2560,12 @@ HackForOtherText:
 .flashLightsAreaText
     TX_FAR _FlashLightsAreaText
     db "@"
+
+CheckDarkMap:
+    push af
+    PREDEF _CheckDarkMap
+    pop af
+    ret
 
 ; Free
 
@@ -15131,7 +15134,7 @@ DungeonWarpList: ; 63bf (1:63bf)
     db DIGLETTS_CAVE,$01
     db $FF
 
-DungeonWarpData: ; 63d8 (1:63d8)
+DungeonWarpData:
     FLYWARP_DATA SEAFOAM_ISLANDS_2_WIDTH,7,18
     FLYWARP_DATA SEAFOAM_ISLANDS_2_WIDTH,7,23
     FLYWARP_DATA SEAFOAM_ISLANDS_3_WIDTH,7,19
@@ -15150,32 +15153,32 @@ DungeonWarpData: ; 63d8 (1:63d8)
 ;    db Map_id
 ;    FLYWARP_DATA [Map Width][Y-pos][X-pos]
 ;    db Tileset_id
-FirstMapSpec: ; 6420 (1:6420)
+FirstMapSpec:
     db REDS_HOUSE_2F
     FLYWARP_DATA REDS_HOUSE_2F_WIDTH,6,3
     db $04
 
-BattleCenterSpec1: ; 6428 (1:6428)
+BattleCenterSpec1:
     db BATTLE_CENTER
     FLYWARP_DATA BATTLE_CENTER_WIDTH,4,3
     db $15
 
-BattleCenterSpec2: ; 6430 (1:6430)
+BattleCenterSpec2:
     db BATTLE_CENTER
     FLYWARP_DATA BATTLE_CENTER_WIDTH,4,6
     db $15
 
-TradeCenterSpec1: ; 6438 (1:6438)
+TradeCenterSpec1:
     db TRADE_CENTER
     FLYWARP_DATA TRADE_CENTER_WIDTH,4,3
     db $15
 
-TradeCenterSpec2: ; 6440 (1:6440)
+TradeCenterSpec2:
     db TRADE_CENTER
     FLYWARP_DATA TRADE_CENTER_WIDTH,4,6
     db $15
 
-FlyWarpDataPtr: ; 6448 (1:6448)
+FlyWarpDataPtr:
     db $00,0
     dw Map00FlyWarp
     db $01,0
@@ -18663,7 +18666,10 @@ CheckDiglettsCave:
     jr nz,.done
     ld a,$06     ; Dark Map
     ld [$d35d],a ; ...
+    jr .end
 .done
+    call CheckDarkMap
+.end
     jp GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
 
 ;CheckImportantMove:
@@ -76292,6 +76298,7 @@ _IsItemInBagOrBoxPredef:                   NEW_PREDEF _IsItemInBagOrBox         
 TryHallOfFameRematchPredef:                NEW_PREDEF TryHallOfFameRematch                ; $75
 HoF_SetVariablesPredef:                    NEW_PREDEF HoF_SetVariables                    ; $76
 _InitBattleEnemyParametersPredef:          NEW_PREDEF _InitBattleEnemyParameters          ; $77
+_CheckDarkMapPredef:                       NEW_PREDEF _CheckDarkMap                       ; $78
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -94222,7 +94229,7 @@ PokemonTower5Script0: ; 6094b (18:494b)
     call GBFadeOut2
     call Delay3
     call Delay3
-    call GBFadeIn2
+    call GBFadeIn2AndLoadGBPal ; call GBFadeIn2
     ld a,$7
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
@@ -95222,61 +95229,61 @@ ViridianForestTrainerHeader5:
 
     db $ff
 
-ViridianForestText1: ; 61167 (18:5167)
+ViridianForestText1:
     TX_FAR _ViridianForestText1
     db "@"
 
-ViridianForestText2: ; 6116c (18:516c)
+ViridianForestText2:
     db $08 ; asm
     ld hl,ViridianForestTrainerHeader0
     call TalkToTrainer
     jp TextScriptEnd
 
-ViridianForestText3: ; 61176 (18:5176)
+ViridianForestText3:
     db $08 ; asm
     ld hl,ViridianForestTrainerHeader1
     call TalkToTrainer
     jp TextScriptEnd
 
-ViridianForestText4: ; 61180 (18:5180)
+ViridianForestText4:
     db $08 ; asm
     ld hl,ViridianForestTrainerHeader2
     call TalkToTrainer
     jp TextScriptEnd
 
-ViridianForestBattleText1: ; 6118a (18:518a)
+ViridianForestBattleText1:
     TX_FAR _ViridianForestBattleText1
     db "@"
 
-ViridianForestEndBattleText1: ; 6118f (18:518f)
+ViridianForestEndBattleText1:
     TX_FAR _ViridianForestEndBattleText1
     db "@"
 
-ViridianForestAfterBattleText1: ; 61194 (18:5194)
+ViridianForestAfterBattleText1:
     TX_FAR _ViridianFrstAfterBattleText1
     db "@"
 
-ViridianForestBattleText2: ; 61199 (18:5199)
+ViridianForestBattleText2:
     TX_FAR _ViridianForestBattleText2
     db "@"
 
-ViridianForestEndBattleText2: ; 6119e (18:519e)
+ViridianForestEndBattleText2:
     TX_FAR _ViridianForestEndBattleText2
     db "@"
 
-ViridianForestAfterBattleText2: ; 611a3 (18:51a3)
+ViridianForestAfterBattleText2:
     TX_FAR _ViridianFrstAfterBattleText2
     db "@"
 
-ViridianForestBattleText3: ; 611a8 (18:51a8)
+ViridianForestBattleText3:
     TX_FAR _ViridianForestBattleText3
     db "@"
 
-ViridianForestEndBattleText3: ; 611ad (18:51ad)
+ViridianForestEndBattleText3:
     TX_FAR _ViridianForestEndBattleText3
     db "@"
 
-ViridianForestAfterBattleText3: ; 611b2 (18:51b2)
+ViridianForestAfterBattleText3:
     TX_FAR _ViridianFrstAfterBattleText3
     db "@"
 
@@ -95316,35 +95323,35 @@ ViridianForestAfterBattleText6:
     TX_FAR _ViridianFrstAfterBattleText6
     db "@"
 
-ViridianForestText8: ; 611b7 (18:51b7)
+ViridianForestText8:
     TX_FAR _ViridianForestText8
     db "@"
 
-ViridianForestText9: ; 611bc (18:51bc)
+ViridianForestText9:
     TX_FAR _ViridianForestText9
     db "@"
 
-ViridianForestText10: ; 611c1 (18:51c1)
+ViridianForestText10:
     TX_FAR _ViridianForestText10
     db "@"
 
-ViridianForestText11: ; 611c6 (18:51c6)
+ViridianForestText11:
     TX_FAR _ViridianForestText11
     db "@"
 
-ViridianForestText12: ; 611cb (18:51cb)
+ViridianForestText12:
     TX_FAR _ViridianForestText12
     db "@"
 
-ViridianForestText13: ; 611d0 (18:51d0)
+ViridianForestText13:
     TX_FAR _ViridianForestText13
     db "@"
 
-ViridianForestText14: ; 611d5 (18:51d5)
+ViridianForestText14:
     TX_FAR _ViridianForestText14
     db "@"
 
-SECTION "SSAnne1_h",ROMX[$4265],BANK[$18]
+SECTION "SSAnne1_h",ROMX[$5265],BANK[$18]
 
 SSAnne1_h: ; 0x61259 to 0x61265 (12 bytes) (id=95)
     db $0d ; tileset
@@ -95697,33 +95704,6 @@ SSAnne4Script2:
 SSAnne4TextPointers:
     dw SSAnne4BasketText
     dw SSAnne4BasketText
-
-SSAnne4Object:
-    db $c ; border tile
-
-    db $7 ; warps
-    db $3,$17,$8,SS_ANNE_10
-    db $3,$13,$6,SS_ANNE_10
-    db $3,$f,$4,SS_ANNE_10
-    db $3,$b,$2,SS_ANNE_10
-    db $3,$7,$0,SS_ANNE_10
-    db $5,$1b,$9,SS_ANNE_1
-    db $5,$3,$0,DRATINI_CAVE
-
-    db $0 ; signs
-
-    db $2 ; people
-    db SPRITE_BASKET,$5 + 4,$3 + 4,$ff,$10,$1 ; person
-    db SPRITE_BASKET,$5 + 4,$2 + 4,$ff,$d0,$2 ; person
-
-    ; warp-to
-    EVENT_DISP $f,$3,$17 ; SS_ANNE_10
-    EVENT_DISP $f,$3,$13 ; SS_ANNE_10
-    EVENT_DISP $f,$3,$f ; SS_ANNE_10
-    EVENT_DISP $f,$3,$b ; SS_ANNE_10
-    EVENT_DISP $f,$3,$7 ; SS_ANNE_10
-    EVENT_DISP $f,$5,$1b ; SS_ANNE_1
-    EVENT_DISP $f,$5,$3 ; DRATINI_CAVE
 
 SSAnne4BasketText:
     TX_FAR _VermilionGymTrashText
@@ -97735,6 +97715,41 @@ InitBattleEnemyParameters_Giovanni_Bank18:
     ld a,8
     ld [W_GYMLEADERNO],a
     ret
+
+; ───────────────────────────────────────
+
+SSAnne4Object:
+    db $c ; border tile
+
+    db $7 ; warps
+    db $3,$17,$8,SS_ANNE_10
+    db $3,$13,$6,SS_ANNE_10
+    db $3,$f,$4,SS_ANNE_10
+    db $3,$b,$2,SS_ANNE_10
+    db $3,$7,$0,SS_ANNE_10
+    db $5,$1b,$9,SS_ANNE_1
+    db $5,$3,$0,DRATINI_CAVE
+
+    db $0 ; signs
+
+    db $2 ; people
+    db SPRITE_BASKET,$5 + 4,$3 + 4,$ff,$10,$1 ; person
+    db SPRITE_BASKET,$5 + 4,$2 + 4,$ff,$d0,$2 ; person
+
+    ; warp-to
+    EVENT_DISP $f,$3,$17 ; SS_ANNE_10
+    EVENT_DISP $f,$3,$13 ; SS_ANNE_10
+    EVENT_DISP $f,$3,$f ; SS_ANNE_10
+    EVENT_DISP $f,$3,$b ; SS_ANNE_10
+    EVENT_DISP $f,$3,$7 ; SS_ANNE_10
+    EVENT_DISP $f,$5,$1b ; SS_ANNE_1
+    EVENT_DISP $f,$5,$3 ; DRATINI_CAVE
+
+; ───────────────────────────────────────
+
+GBFadeIn2AndLoadGBPal:
+    call GBFadeIn2
+    jp LoadGBPal
 
 ; ───────────────────────────────────────
 
@@ -133782,23 +133797,60 @@ TradingAnimationGraphics:
 TradingAnimationGraphics2:
     INCBIN "gfx/trade2.2bpp"
 
-CheckDarkMap:
-    call GetCurrentOldAdventureMap
-    cp a,ROCK_TUNNEL_1
-    jr z,.Dark
-    cp a,VICTORY_ROAD_1
-    jr z,.Dark
-    cp a,VICTORY_ROAD_2
-    jr z,.Dark
-    cp a,SEAFOAM_ISLANDS_1
-    jr z,.Dark
-    cp a,UNKNOWN_DUNGEON_1
-    jr z,.Dark
+_CheckDarkMap:
+    call Load16BitRegisters
+    push bc
+    push de
+    push hl
+    call .Main
+    pop hl
+    pop de
+    pop bc
     ret
+.Main
+    call GetCurrentOldAdventureMap
+    ld hl,.DarkMapList
+    ld de,1
+    call IsInArray
+    ld hl,$d35d
+    jr c,.Dark
+.Light
+    xor a
+    cp [hl]
+    ld [hl],a
+    ret nz ; from dark to light
+    jr .TryGBFadeIn1
 .Dark
     ld a,$06
-    ld [$d35d],a
+    cp [hl]
+    ld [hl],a
+    ret z ; from dark to dark
+.TryGBFadeIn1
+    ld a,[$d732] ; fall in hole
+    bit 4,a      ; ...
+    ret nz
     jp GBFadeIn1
+.DarkMapList
+    db ROCK_TUNNEL_1
+    db ROCK_TUNNEL_2
+    db VICTORY_ROAD_1
+    db VICTORY_ROAD_2
+    db VICTORY_ROAD_3
+    db SEAFOAM_ISLANDS_1
+    db SEAFOAM_ISLANDS_2
+    db SEAFOAM_ISLANDS_3
+    db SEAFOAM_ISLANDS_4
+    db SEAFOAM_ISLANDS_5
+    db UNKNOWN_DUNGEON_1
+    db UNKNOWN_DUNGEON_2
+    db UNKNOWN_DUNGEON_3
+    db UNKNOWN_DUNGEON_4
+    db POKEMONTOWER_3
+    db POKEMONTOWER_4
+    db POKEMONTOWER_5
+    db POKEMONTOWER_6
+    db POKEMONTOWER_7
+    db $FF
 
 ; ───────────────────────────────────────
 
