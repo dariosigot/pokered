@@ -22399,7 +22399,7 @@ MapHS:
     db SILPH_CO_7F,$06,Show
     db SILPH_CO_7F,$07,Show
     db SILPH_CO_7F,$08,Show
-    db SILPH_CO_7F,$09,Show
+    db SILPH_CO_7F,$09,Hide ; $a7 ; Blue
     db SILPH_CO_7F,$0A,Show
     db SILPH_CO_7F,$0B,Show
     db SILPH_CO_7F,$0C,Show
@@ -78785,51 +78785,7 @@ SilphCo7ScriptPointers: ; 51c17 (14:5c17)
     dw SilphCo7Script4
     dw SilphCo7Script5
 
-SilphCo7Script0: ; 51c23 (14:5c23)
-    ld a,[$d82f]
-    bit 0,a
-    jp nz,CheckFightingMapTrainers
-    ld hl,CoordsData_51c78
-    call ArePlayerCoordsInArray
-    jp nc,CheckFightingMapTrainers
-    xor a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,$f0
-    ld [wJoypadForbiddenButtonsMask],a
-    ld a,$4
-    ld [$d528],a
-    ld a,$ff
-    ld [$c0ee],a
-    call PlaySound
-    ld c,BANK(Music_MeetRival)
-    ld a,(Music_MeetRival - $4000) / 3
-    call PlayMusic
-    ld a,$9
-    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call DisplayTextID
-    ld a,$9
-    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call SetSpriteMovementBytesToFF
-    ld de,MovementData_51c7d
-    ld a,[wWhichTrade] ; $cd3d
-    ld [$cf0d],a
-    cp $1
-    jr z,.asm_51c6c
-    inc de
-.asm_51c6c
-    ld a,$9
-    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call MoveSprite
-    ld a,$3
-    jp Func_51c10
-
-CoordsData_51c78: ; 51c78 (14:5c78)
-    db $02,$03
-    db $03,$03
-    db $FF
-
-MovementData_51c7d: ; 51c7d (14:5c7d)
-    db $40,$40,$40,$40,$FF
+SECTION "SilphCo7Script3",ROMX[$5c82],BANK[$14]
 
 SilphCo7Script3: ; 51c82 (14:5c82)
     ld a,[$d730]
@@ -80809,6 +80765,53 @@ BoulderOnSwitch3:
     ld a,$09 + 4 ; wispnote - We need to offset coordinates by 4
     ld [hl],a
     ret
+
+SilphCo7Script0:
+    ld a,[$d82f]
+    bit 0,a
+    jp nz,CheckFightingMapTrainers
+    ld hl,.CoordsData_51c78
+    call ArePlayerCoordsInArray
+    jp nc,CheckFightingMapTrainers
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,$f0
+    ld [wJoypadForbiddenButtonsMask],a
+    ld a,$a7
+    ld [$cc4d],a
+    PREDEF AddMissableObject
+    ld a,$4
+    ld [$d528],a
+    ld a,$ff
+    ld [$c0ee],a
+    call PlaySound
+    ld c,BANK(Music_MeetRival)
+    ld a,(Music_MeetRival - $4000) / 3
+    call PlayMusic
+    ld a,$9
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    call DisplayTextID
+    ld a,$9
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    call SetSpriteMovementBytesToFF
+    ld de,.MovementData_51c7d
+    ld a,[wWhichTrade] ; $cd3d
+    ld [$cf0d],a
+    cp $1
+    jr z,.asm_51c6c
+    inc de
+.asm_51c6c
+    ld a,$9
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    call MoveSprite
+    ld a,$3
+    jp Func_51c10
+.CoordsData_51c78
+    db $02,$03
+    db $03,$03
+    db $FF
+.MovementData_51c7d
+    db $40,$40,$40,$40,$FF
 
 SECTION "bank15",ROMX,BANK[$15]
 
