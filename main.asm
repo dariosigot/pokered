@@ -22288,7 +22288,7 @@ MapHS:
     db UNKNOWN_DUNGEON_1,$01,Show
     db UNKNOWN_DUNGEON_1,$02,Show
     db UNKNOWN_DUNGEON_1,$03,Show
-    db POKEMONTOWER_2,$01,Show
+    db POKEMONTOWER_2,$01,Hide
     db POKEMONTOWER_3,$04,Show
     db POKEMONTOWER_4,$04,Show
     db POKEMONTOWER_4,$05,Show
@@ -93732,52 +93732,14 @@ PokemonTower2ScriptPointers: ; 60509 (18:4509)
     dw PokemonTower2Script0
     dw PokemonTower2Script1
     dw PokemonTower2Script2
+    dw PokemonTower2Script3
+    dw PokemonTower2Script4
 
-PokemonTower2Script0: ; 6050f (18:450f)
-    ld a,[$d764]
-    bit 7,a
-    ret nz
-    ld hl,CoordsData_6055e ; $455e
-    call ArePlayerCoordsInArray
-    ret nc
-    ld a,$ff
-    ld [$c0ee],a
-    call PlaySound
-    ld c,BANK(Music_MeetRival)
-    ld a,(Music_MeetRival - $4000) / 3
-    call PlayMusic
-    ld hl,$d764
-    res 6,[hl]
-    ld a,[$cd3d]
-    cp $1
-    ld a,$8
-    ld b,$0
-    jr nz,.asm_60544 ; 0x60539 $9
-    ld hl,$d764
-    set 6,[hl]
-    ld a,$2
-    ld b,$c
-.asm_60544
-    ld [$d528],a
-    ld a,$1
-    ld [$ff00+$8c],a
-    ld a,b
-    ld [$ff00+$8d],a
-    call Func_34a6
-    ld a,$1
-    ld [$ff00+$8c],a
-    call DisplayTextID
-    xor a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld [H_NEWLYPRESSEDBUTTONS],a
-    ret
+; Free
 
-CoordsData_6055e: ; 6055e (18:455e)
-    db $05,$0F
-    db $06,$0E
-    db $0F ; isn't this supposed to end in $ff?
+SECTION "PokemonTower2Script3",ROMX[$4563],BANK[$18]
 
-PokemonTower2Script1: ; 60563 (18:4563)
+PokemonTower2Script3: ; 60563 (18:4563)
     ld a,[$d057]
     cp $ff
     jp z,Func_604fe
@@ -93803,7 +93765,7 @@ PokemonTower2Script1: ; 60563 (18:4563)
     ld b,BANK(Music_RivalAlternateStart)
     ld hl,Music_RivalAlternateStart
     call Bankswitch
-    ld a,$2
+    ld a,$4
     ld [W_POKEMONTOWER2CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
     ret
@@ -93814,7 +93776,7 @@ MovementData_605a9: ; 605a9 (18:45a9)
 MovementData_605b2: ; 605b2 (18:45b2)
     db $00,$00,$C0,$C0,$C0,$C0,$00,$00,$FF
 
-PokemonTower2Script2: ; 605bb (18:45bb)
+PokemonTower2Script4: ; 605bb (18:45bb)
     ld a,[$d730]
     bit 0,a
     ret nz
@@ -93869,7 +93831,7 @@ PokemonTower2Text1: ; 605df (18:45df)
 .done
     ld [W_TRAINERNO],a
 
-    ld a,$1
+    ld a,$3
     ld [W_POKEMONTOWER2CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
 .asm_41852 ; 0x6062a
@@ -93905,7 +93867,7 @@ PokemonTower2Object: ; 0x60646 (size=32)
     db $0 ; signs
 
     db $2 ; people
-    db SPRITE_BLUE,$5 + 4,$e + 4,$ff,$ff,$1 ; person
+    db SPRITE_BLUE,$5 + 4,$a + 4,$ff,$ff,$1 ; person
     db SPRITE_MEDIUM,$7 + 4,$3 + 4,$ff,$d3,$2 ; person
 
     ; warp-to
@@ -97750,6 +97712,89 @@ SSAnne4Object:
 GBFadeIn2AndLoadGBPal:
     call GBFadeIn2
     jp LoadGBPal
+
+; ───────────────────────────────────────
+
+PokemonTower2Script0:
+    ld a,[$d764]
+    bit 7,a
+    ret nz
+    ld hl,.CoordsData_6055e
+    call ArePlayerCoordsInArray
+    ret nc
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,$f0
+    ld [wJoypadForbiddenButtonsMask],a
+    ld a,$38
+    ld [$cc4d],a
+    PREDEF AddMissableObject
+    ld a,$ff
+    ld [$c0ee],a
+    call PlaySound
+    ld c,BANK(Music_MeetRival)
+    ld a,(Music_MeetRival - $4000) / 3
+    call PlayMusic
+    ld a,[$cd3d]
+    cp $1
+    ld hl,$d764
+    res 6,[hl]
+    ld de,.Movement1
+    jr nz,.done
+    set 6,[hl]
+    ld a,15
+    ld [$C215],a ; Blue X Coord
+    ld de,.Movement2
+.done
+    ld a,$1
+    ld [$ff00+$8c],a
+    call MoveSprite
+    ld a,$1
+    ld [W_POKEMONTOWER2CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+.CoordsData_6055e
+    db 05,15
+    db 06,14
+    db $FF
+.Movement1
+    db RT
+.Movement2
+    db RT,RT,RT,$FF
+
+PokemonTower2Script1:
+    ld a,[$d730]
+    bit 0,a
+    ret nz
+    ld a,$2
+    ld [W_POKEMONTOWER2CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+
+PokemonTower2Script2:
+    ld hl,$d764
+    bit 6,[hl]
+    ld a,$8
+    ld b,$0
+    jr z,.next
+    ld a,$2
+    ld b,$c
+.next
+    ld [$d528],a
+    ld a,$1
+    ld [$ff00+$8c],a
+    ld a,b
+    ld [$ff00+$8d],a
+    call Func_34a6
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a
+    ld a,$1
+    ld [$ff00+$8c],a
+    call DisplayTextID
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld [H_NEWLYPRESSEDBUTTONS],a
+    ret
 
 ; ───────────────────────────────────────
 
