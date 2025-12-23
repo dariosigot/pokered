@@ -83425,7 +83425,7 @@ Route21TextPointers: ; 55f04 (15:5f04)
 Route21TrainerHeaders: ; 55f16 (15:5f16)
 Route21TrainerHeader0: ; 55f16 (15:5f16)
     db $1 ; flag's bit
-    db ($0 << 4) ; trainer's view range
+    db ($1 << 4) ; trainer's view range
     dw $d7e9 ; flag's byte
     dw Route21BattleText1 ; 0x5fdd TextBeforeBattle
     dw Route21AfterBattleText1 ; 0x5fe7 TextAfterBattle
@@ -83434,7 +83434,7 @@ Route21TrainerHeader0: ; 55f16 (15:5f16)
 
 Route21TrainerHeader1: ; 55f22 (15:5f22)
     db $2 ; flag's bit
-    db ($0 << 4) ; trainer's view range
+    db ($1 << 4) ; trainer's view range
     dw $d7e9 ; flag's byte
     dw Route21BattleText2 ; 0x5fec TextBeforeBattle
     dw Route21AfterBattleText2 ; 0x5ff6 TextAfterBattle
@@ -83488,7 +83488,7 @@ Route21TrainerHeader6: ; 55f5e (15:5f5e)
 
 Route21TrainerHeader7: ; 55f6a (15:5f6a)
     db $8 ; flag's bit
-    db ($0 << 4) ; trainer's view range
+    db ($1 << 4) ; trainer's view range
     dw $d7e9 ; flag's byte
     dw Route21BattleText8 ; 0x6046 TextBeforeBattle
     dw Route21AfterBattleText8 ; 0x6050 TextAfterBattle
@@ -83497,7 +83497,7 @@ Route21TrainerHeader7: ; 55f6a (15:5f6a)
 
 Route21TrainerHeader8: ; 55f76 (15:5f76)
     db $9 ; flag's bit
-    db ($0 << 4) ; trainer's view range
+    db ($1 << 4) ; trainer's view range
     dw $d7e9 ; flag's byte
     dw Route21BattleText9 ; 0x6055 TextBeforeBattle
     dw Route21AfterBattleText9 ; 0x605f TextAfterBattle
@@ -83580,9 +83580,7 @@ Route21EndBattleText2: ; 55ff1 (15:5ff1)
     TX_FAR _Route21EndBattleText2
     db "@"
 
-Route21AfterBattleText2: ; 55ff6 (15:5ff6)
-    TX_FAR _Route21AfterBattleText2
-    db "@"
+SECTION "Route21BattleText3",ROMX[$5ffb],BANK[$15]
 
 Route21BattleText3: ; 55ffb (15:5ffb)
     TX_FAR _Route21BattleText3
@@ -85166,7 +85164,7 @@ CeladonMart2Text2:
 Route21ScriptPointers:
     dw CheckFightingMapTrainers
     dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+    dw Route21Script2
 
 ROUTE21_BARRIER_BLOCK EQU $6B
 
@@ -85284,6 +85282,53 @@ Route17Object:
     db SPRITE_BIKER,$62 + 4,$5 + 4,$ff,$d2,$49,BIKER,$b ; trainer
     db SPRITE_BIKER,$76 + 4,$a + 4,$ff,$d0,$4a,BIKER,$c ; trainer
     db SPRITE_BALL,79 + 4,09 + 4,$ff,$ff,$8b,TM_56 ; item
+
+Route21AfterBattleText2:
+    db $08 ; asm
+    ld hl,.end
+    push hl
+    ld b,SURFBOARD
+    PREDEF _IsItemInBagOrBox
+    ld hl,.Route21AfterBattleText2
+    ret nz
+    ld hl,.SurfBoardReceiveText1
+    call PrintText
+    ld bc,(SURFBOARD << 8) | 1
+    call GiveItem
+    ld hl,.SurfBoardNoRoomText
+    ret nc
+    ld hl,.SurfBoardReceiveText2
+    ret
+.end
+    call PrintText
+    jp TextScriptEnd
+.SurfBoardReceiveText1
+    TX_FAR _SurfBoardReceiveText1
+    db "@"
+.SurfBoardReceiveText2
+    TX_FAR _ReceivedText
+    db $11,"@"
+.SurfBoardNoRoomText
+    TX_FAR _SurfBoardNoRoomText
+    db $0F,"@"
+.Route21AfterBattleText2
+    TX_FAR _Route21AfterBattleText2
+    db "@"
+
+Route21Script2:
+    call EndTrainerBattle
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $ff
+    jr z,.ResetScript
+    ld a,[$cf13]
+    cp $02 ; Is "Multi Magikarp Fisher" end Battle?
+    ret nz
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    jp DisplayTextID
+.ResetScript
+    xor a
+    ld [W_ROUTE21CURSCRIPT],a
+    ret
 
 SECTION "bank16",ROMX,BANK[$16]
 
@@ -125222,6 +125267,18 @@ _Route15AfterBattleText1:
     db "Even if you aren't",$4f
     db "the Original",$55
     db "Trainer.",$57
+
+_SurfBoardReceiveText1:
+    db $0,"I seem to only",$4f
+    db "catch MAGIKARP!",$51
+    db "But NO PROBLEM!",$51
+    db "My grandfather",$4f
+    db "makes these,",$55
+    db "get one!!",$58
+
+_SurfBoardNoRoomText:
+    db $0,"You do not have",$4f
+    db "space for this!",$57
 
 SECTION "bank25",ROMX,BANK[$25]
 
