@@ -1896,9 +1896,12 @@ wBattleValueCounter: ; def2
 NEXTU
 
 wBufferTypeEffects: ; def0
-    ds 68
+    ds 68-12
 wBufferTypeEffectsEnd:
     db
+
+wBackupBattleDataDuringDex2ndPage: ; def0
+    ds 12
 
 ENDU
 
@@ -1957,6 +1960,7 @@ wForceShowPokedexBit5       ; df38 ; bit 5 = Show Pokedex during first Seen in B
 wFirstExpAllMessageBit6     ; df38 ; bit 6
 wSelectInOverworldOnBit6    ; df38 ; bit 6
 wStatusScreenJustLoadBit6   ; df38 ; bit 6 = Status Screen Picture Just Load
+wPokedexScreenJustLoadBit6  ; df38 ; bit 6 = Pokedex Screen Picture Just Load
 wDebugEnemyMoveBit7         ; df38 ; bit 7
 wFlagMoveRelearnEngagedBit7 ; df38 ; bit 7
 wFlagFollowBoulderBit7      ; df38 ; bit 7 = Force player to follow Boulder

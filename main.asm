@@ -23709,6 +23709,9 @@ ItemUseBicycle: ; d977 (3:5977)
 
 ; used for Surf out-of-battle effect
 ItemUseSurfboard: ; d9b4 (3:59b4)
+    ld a,[W_ISINBATTLE]
+    and a
+    jp nz,ItemUseNotTime
     ld hl,.HandleSurfboardCheck
     call RunOnlyIfNotSelectInOverworld
     jr z,.tryToStopSurfing
@@ -28957,6 +28960,9 @@ UpdateHPBar_AnimateHPBar:
     ret
 
 ItemUseBengal:
+    ld a,[W_ISINBATTLE]
+    and a
+    jp nz,ItemUseNotTime
     ld a,[$d152]
     and a ; is using mon's light
     jr nz,.skip
@@ -46915,6 +46921,24 @@ ShellderPicFront: ; 26cb6 (9:6cb6)
 ShellderPicBack: ; 26dc3 (9:6dc3)
     INCBIN "pic/monback/shellderb.pic"
 
+PrintTypesFull:
+    call Load16BitRegisters
+    ld a,[W_MONHTYPE1]
+    call .PrintSingleType
+    ld a,[W_MONHTYPE2]
+    call .PrintSingleType
+    ld a,[W_MONHTYPE3]
+    call .PrintSingleType
+    ld a,[W_MONHTYPE4]
+    ; fall through
+.PrintSingleType
+    push hl
+    call PrintMoveType_
+    pop hl
+    ld bc,20
+    add hl,bc
+    ret
+
 PrintTypes:
     call Load16BitRegisters
     ld a,[W_MONHTYPE3]
@@ -46924,17 +46948,13 @@ PrintTypes:
     call .PrintSingleType
     ld a,[W_MONHTYPE2]
     ; fall through
-
 .PrintSingleType
     push hl
-    call .PrintMoveType
+    call PrintMoveType_
     pop hl
     ld bc,20
     add hl,bc
     ret
-.PrintMoveType
-    push hl
-    jr PrintMoveType_
 
 .MoreThan2Types
     ld a,[W_MONHTYPE1]
@@ -46945,18 +46965,16 @@ PrintTypes:
     call .PrintSingleTypeShort1
     ld a,[W_MONHTYPE4]
     ; fall through
-
 .PrintSingleTypeShort2
     push hl
-    call PrintMoveTypeShort
+    call PrintMoveTypeShort_
     pop hl
     ld bc,-15
     add hl,bc
     ret
-
 .PrintSingleTypeShort1
     push hl
-    call PrintMoveTypeShort
+    call PrintMoveTypeShort_
     pop hl
     ld bc,20
     add hl,bc
@@ -46964,10 +46982,9 @@ PrintTypes:
 
 PrintMoveType:
     call Load16BitRegisters
-    push hl
     ld a,[W_PLAYERMOVETYPE]
-
 PrintMoveType_:
+    push hl
     add a
     ld hl,TypeNamePointers
     ld e,a
@@ -46980,6 +46997,9 @@ PrintMoveType_:
     jp PlaceString
 
 PrintMoveTypeShort:
+    call Load16BitRegisters
+    ld a,[W_PLAYERMOVETYPE]
+PrintMoveTypeShort_:
     push hl
     add a
     ld hl,TypeNamePointersShort
@@ -62860,6 +62880,8 @@ EnableWrapping:
     ld [wMenuWrappingEnabled],a
     ret
 
+; ───────────────────────────────────────
+
 SECTION "ShowPokedexData",ROMX[$42d1],BANK[$10]
 
 ; function to display pokedex data from outside the pokedex
@@ -62887,18 +62909,46 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     push af
     xor a
     ld [$ffd7],a
-    ; Clear Screen
+    ; reset mon picture "just load" flag 
+    ld hl,wPokedexScreenJustLoadBit6
+    res 6,[hl]
+
     call GBPalWhiteOut ; zero all palettes
     call ClearScreen
+    call .DrawPokedexBorder
+    call .CommonInitilization
+    jr .SkipFirstTime
 
-    call .ShowPokedexDataInternal
+.FirstPage
+    call .ClearCommonScreenArea
+.SkipFirstTime
+    call .ShowPokedexFirstPage
+    ld b,%00010011 ; ▼▲◄►StSeBA
+    ; fall through
 
 .waitForButtonPress
     call GetJoypadStateLowSensitivity
     ld a,[$ffb5]
-    and a,%00000011 ; A button and B button
+    and %00010011 ; ▼▲◄►StSeBA
     jr z,.waitForButtonPress
+    bit 1,a
+    jr nz,.end
+    ; fall through
 
+.SecondPage
+    call .ClearCommonScreenArea
+    call .ShowPokedexSecondPage
+
+.waitForButtonPress2
+    call GetJoypadStateLowSensitivity
+    ld a,[$ffb5]
+    and %00100011 ; ▼▲◄►StSeBA
+    jr z,.waitForButtonPress2
+    bit 5,a
+    jr nz,.FirstPage
+    ; fall through
+
+.end
     ; Restore Screen
     call GBPalWhiteOut
     call ClearScreen
@@ -62907,6 +62957,9 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     bit 5,[hl]
     call z,LoadTextBoxTilePatterns
     call GBPalNormal
+    ; reset mon picture "just load" flag 
+    ld hl,wPokedexScreenJustLoadBit6
+    res 6,[hl]
     ; water/flower tile animation
     pop af
     ld [$ffd7],a
@@ -62921,13 +62974,9 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     res 2,[hl]
     ret
 
-.ShowPokedexDataInternal
-    ld a,[$d11e] ; pokemon ID
-    ld [$cf91],a
-    push af
-    call HandleColorlessGameBoyOrGoPAL_SET ; call GoPAL_SET
-    pop af
-    ld [$d11e],a
+; ───────────────────────────────────────
+
+.DrawPokedexBorder
     FuncCoord 00,00
     ld hl,Coord
     ld de,1
@@ -62958,9 +63007,43 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     FuncCoord 19,17
     ld a,$6e ; lower right corner tile
     ld [Coord],a
+    ret
+.ClearCommonScreenArea
+    FuncCoord 08,03
+    ld hl,Coord
+    ld bc,((05 << 8) + 11)
+    call ClearScreenArea
+    FuncCoord 01,08
+    ld hl,Coord
+    ld bc,((09 << 8) + 18)
+    jp ClearScreenArea
+.DisableAutoBG
+    xor a
+    ld [$ff00+$ba],a ; AutoBGTransferEnabled
+    ret
+.EnableAutoBG
+    ld a,$1
+    ld [$ff00+$ba],a ; AutoBGTransferEnabled
+    ret
+
+; ───────────────────────────────────────
+
+.CommonInitilization
+    ld a,[$d11e] ; pokemon ID
+    ld [$cf91],a
+    push af
+    call HandleColorlessGameBoyOrGoPAL_SET ; call GoPAL_SET
+    pop af
+    ld [$d11e],a
+    ret
+
+; ───────────────────────────────────────
+
+.ShowPokedexFirstPage
+    call .DisableAutoBG
     FuncCoord 00,10
     ld hl,Coord
-    ld de,PokedexDataDividerLine
+    ld de,.PokedexDataDividerLine
     call PlaceString ; draw horizontal divider line
     FuncCoord 09,08
     ld hl,Coord
@@ -63069,54 +63152,209 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     FuncCoord 09,04
     ld hl,Coord
     PREDEF PrintTypes
+    call .EnableAutoBG
     call Delay3
     call GBPalNormal
     ; header just loaded in "GetPokedexPaletteID" ; call GetMonHeader ; load pokemon picture location
+    ld hl,wPokedexScreenJustLoadBit6
+    bit 6,[hl]
+    set 6,[hl]
+    jr nz,.PictureJustLoad
     FuncCoord 01,01
     ld hl,Coord
     call LoadMonSpritePokedexWithDebug ; call LoadFlippedFrontSpriteByMonIndex ; draw pokemon picture
     ld a,[$cf91]
     call GetCryData ; get cry data
-    jp PlaySound ; play sound
+    call PlaySound ; play sound
+.PictureJustLoad
+    ret
+
 .HeightWeightText
     db "HT   ",$60,"  ",$61,$4E,"WT      lb@"
 
-; XXX does anything point to this?
-Unknown_4045D:
-    db $54,$50
-
 ; horizontal line that divides the pokedex text description from the rest of the data
-PokedexDataDividerLine:
+.PokedexDataDividerLine
     db $68,$69,$6B,$69,$6B
     db $69,$6B,$69,$6B,$6B
     db $6B,$6B,$69,$6B,$69
     db $6B,$69,$6B,$69,$6A
     db $50
 
-; draws a line of tiles
-; INPUT:
-; b = tile ID
-; c = number of tile ID's to write
-; de = amount to destination address after each tile (1 for horizontal,20 for vertical)
-; hl = destination address
-DrawTileLine:
-    push bc
-    push de
-.loop
-    ld [hl],b
-    add hl,de
-    dec c
-    jr nz,.loop
-    pop de
-    pop bc
+; ───────────────────────────────────────
+
+.ShowPokedexSecondPage
+    ; Backup STACK
+    ld a,[$d11e]
+    push af
+
+    ; Backup
+    ld hl,wBackupBattleDataDuringDex2ndPage
+    ld a,[H_WHOSETURN]
+    ld [hli],a
+    ld a,[W_PLAYERMONID]
+    ld [hli],a
+    ld a,[W_PLAYERMOVENUM]
+    ld [hli],a
+    ld a,[W_ENEMYMON_START]
+    ld [hli],a
+    ld d,h
+    ld e,l
+    ld hl,W_PLAYERMONTYPES
+    ld bc,4
+    call CopyData ; copy bc bytes of data from hl to de
+    ld hl,W_ENEMYMONTYPES
+    ld bc,4
+    call CopyData ; copy bc bytes of data from hl to de
+
+    call .DisableAutoBG
+    FuncCoord 00,10
+    ld hl,Coord
+    ld [hl],$66 ; Border Left
+    FuncCoord 19,10
+    ld hl,Coord
+    ld [hl],$67 ; Border Right
+
+    FuncCoord 09,04
+    ld hl,Coord
+    PREDEF PrintTypesFull
+
+    FuncCoord 02,09
+    ld hl,Coord
+    ld de,.TypesAttack1
+    call .LoopTypesAttack
+    FuncCoord 11,09
+    ld hl,Coord
+    ld de,.TypesAttack2
+    call .LoopTypesAttack
+
+    call .EnableAutoBG
+    call Delay3
+    call GBPalNormal
+
+    ; Restore
+    ld hl,wBackupBattleDataDuringDex2ndPage
+    ld a,[hli]
+    ld [H_WHOSETURN],a
+    ld a,[hli]
+    ld [W_PLAYERMONID],a
+    ld a,[hli]
+    ld [W_PLAYERMOVENUM],a
+    ld a,[hli]
+    ld [W_ENEMYMON_START],a
+    ld de,W_PLAYERMONTYPES
+    ld bc,4
+    call CopyData ; copy bc bytes of data from hl to de
+    ld de,W_ENEMYMONTYPES
+    ld bc,4
+    call CopyData ; copy bc bytes of data from hl to de
+
+    ; Restore STACK
+    pop af
+    ld [$d11e],a
     ret
 
-MissingNoDexEntry:
-    db "GLITCH@"
-    db 23,0
-    dw 8806
-    TX_FAR _MissingNoDexEntry
-    db "@"
+.LoopTypesAttack
+    ld a,[de]
+    cp $FF
+    ret z
+    push de
+    push hl
+    ld [W_PLAYERMOVETYPE],a
+    PREDEF PrintMoveTypeShort
+    xor a
+    ld [H_WHOSETURN],a
+    ld [W_PLAYERMONID],a
+    ld [W_PLAYERMOVENUM],a
+    ld [W_ENEMYMON_START],a
+    ld hl,W_PLAYERMONTYPES
+    ld bc,4
+    call FillMemory
+    ld hl,W_ENEMYMONTYPES
+    ld de,W_MONHTYPES
+    ld b,4
+.Loop4Types
+    ld a,[de]
+    inc de
+    ld [hli],a
+    dec b
+    jr nz,.Loop4Types
+    ld a,10
+    ld [$d05b],a ; DamageMultipliers
+    ld b,BANK(AdjustDamageForMoveType)
+    ld hl,AdjustDamageForMoveType
+    call Bankswitch
+    call .ReadDamageMultiplier
+    pop hl
+    push hl
+    call .PrintDamageMultiplier
+    pop hl
+    ld bc,20
+    add hl,bc
+    pop de
+    inc de
+    jr .LoopTypesAttack
+
+.ReadDamageMultiplier
+    xor a
+    ld hl,H_MULTIPLICAND
+    ld [hli],a
+    ld [hli],a
+    ld a,[$D05B]
+    and a,%01111111 ; ignore STAB
+    cp 10
+    push af
+    ld [hli],a
+    ld [hl],10
+    call Multiply
+    ld a,[H_PRODUCT+2]
+    ld [wTmpDmgMultiplier],a
+    ld a,[H_PRODUCT+3]
+    ld [wTmpDmgMultiplier+1],a
+    pop af
+    ret
+
+.PrintDamageMultiplier
+    jr z,.skip
+    jr c,.skip
+    inc hl
+    inc hl
+    inc hl
+    ld [hl],$D4 ; Up Arrow Symbol
+    dec hl
+    dec hl
+    dec hl
+.skip
+    ld bc,4
+    add hl,bc
+    ld de,wTmpDmgMultiplier
+    ld bc,(%00000010 << 8) + 3 ; three digits
+    call PrintNumber
+    ld [hl],$D9 ; %
+    ret
+
+.TypesAttack1
+    db FIGHT
+    db WIND
+    db POISON
+    db EARTH
+    db ROCK
+    db BUG
+    db METAL
+    db NORMAL
+    db $FF
+
+.TypesAttack2
+    db IVORY
+    db RUBBER
+    db FIRE
+    db WATER
+    db GRASS
+    db THUNDER
+    db PSYCHIC
+    db ICE
+    db $FF
+
+; ───────────────────────────────────────
 
 SECTION "RhydonDexEntry",ROMX[$45fa],BANK[$10]
 
@@ -64238,6 +64476,31 @@ IndexToPokedex:
     pop hl
     pop bc
     ret
+
+; draws a line of tiles
+; INPUT:
+; b = tile ID
+; c = number of tile ID's to write
+; de = amount to destination address after each tile (1 for horizontal,20 for vertical)
+; hl = destination address
+DrawTileLine:
+    push bc
+    push de
+.loop
+    ld [hl],b
+    add hl,de
+    dec c
+    jr nz,.loop
+    pop de
+    pop bc
+    ret
+
+MissingNoDexEntry:
+    db "GLITCH@"
+    db 23,0
+    dw 8806
+    TX_FAR _MissingNoDexEntry
+    db "@"
 
 SECTION "Func_410e2",ROMX[$50e2],BANK[$10]
 
@@ -76299,6 +76562,8 @@ TryHallOfFameRematchPredef:                NEW_PREDEF TryHallOfFameRematch      
 HoF_SetVariablesPredef:                    NEW_PREDEF HoF_SetVariables                    ; $76
 _InitBattleEnemyParametersPredef:          NEW_PREDEF _InitBattleEnemyParameters          ; $77
 _CheckDarkMapPredef:                       NEW_PREDEF _CheckDarkMap                       ; $78
+PrintMoveTypeShortPredef:                  NEW_PREDEF PrintMoveTypeShort                  ; $79
+PrintTypesFullPredef:                      NEW_PREDEF PrintTypesFull                      ; $7A
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
