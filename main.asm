@@ -143111,7 +143111,7 @@ GenerateRandomEnemyTrainerIV_:
 .CustomTrainer
 
     ; Pokemaniac
-    db POKEMANIAC,CHARMANDER,0,0,$2A,$AA
+    db POKEMANIAC,SLOWPOKE,0,1,$2A,$AA
 
     ; Green1
     db SONY1,SQUIRTLE,1,0,$00,$00
