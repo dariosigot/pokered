@@ -3833,7 +3833,7 @@ OnixBaseStats:
     ; field moves
     db FM_CUT+FM_STRENGTH+FM_DIG
 
-    db 35 ; catch rate
+    db 20 ; catch rate
     db 188 ; base exp yield
 
     db BANK(OnixPicFront)
