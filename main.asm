@@ -44286,7 +44286,7 @@ CheckEnableLastPkmn:
     ld b,$1
     call CountSetBits
     ld a,[$d11e] ; Num of Badges
-    cp 3
+    cp 7
     pop hl
     jr c,.Ignore
     set 4,[hl]
@@ -136248,8 +136248,8 @@ IslandMonsB2:
     db 31,GOLBAT   ; 15%
     db 34,GOLBAT   ; 10%
     db 31,SLOWPOKE ; 10%
-    db 30,KINGLER  ; 10% ; IslandMonsB25
-    db 36,DEWGONG  ;  5% ; IslandMonsB26
+    WILDSUB        ; 10% ; IslandMonsB25
+    WILDSUB        ;  5% ; IslandMonsB26
     db 38,SLOWBRO  ;  5%
     db 39,SLOWBRO  ;  4%
     db 40,GOLBAT   ;  1%
@@ -136261,19 +136261,19 @@ IslandMonsB25:
     db $20,21,KRABBY  ; 12%
     db $FF,28,KINGLER ; 88%
 IslandMonsB26:
-    db $20,21,SEEL    ; 12%
-    db $FF,28,DEWGONG ; 88%
+    db $20,25,SEEL    ; 12%
+    db $FF,34,DEWGONG ; 88%
 
 IslandMonsB3:
     db $0A
-    db 25,SEEL      ; 20%
+    WILDSUB         ; 20% ; IslandMonsB30
     db 24,KRABBY    ; 20%
     db 28,SEEL      ; 15%
     db 30,KINGLER   ; 10%
     db 32,KINGLER   ; 10%
     db 36,DEWGONG   ; 10%
     db 37,DEWGONG   ;  5%
-    db  5,SQUIRTLE  ;  5% ; Entry Point
+    db 40,GOLBAT    ;  5%
     db 31,JYNX      ;  4% ; Entry Point
     WILDSUB         ;  1% ; IslandMonsB39
     db $0A
@@ -136281,19 +136281,25 @@ IslandMonsB3:
     db 26,KRABBY    ; 20%
     db 29,SEEL      ; 15%
     db 24,KRABBY    ; 10%
-    db  5,SQUIRTLE  ; 10%
-    db 11,SQUIRTLE  ; 10%
-    db 16,WARTORTLE ;  5% ; Entry Point
+    db 36,KINGLER   ; 10%
+    db 16,WARTORTLE ; 10% ; Entry Point
     db 25,WARTORTLE ;  5%
-    db 21,WARTORTLE ;  4%
-    db 40,BLASTOISE ;  1% ; Entry Point
+    db 21,WARTORTLE ;  5%
+    db 29,WARTORTLE ;  4%
+    WILDSUB         ;  1% ; IslandMonsB3W9
+IslandMonsB30:
+    db $20,24,ZUBAT  ; 12%
+    db $FF,36,GOLBAT ; 88%
 IslandMonsB39:
     db $20,02,EEVEE    ; 12%
     db $FF,32,VAPOREON ; 88% ; Entry Point
+IslandMonsB3W9:
+    db $7F,05,SQUIRTLE  ; 50% ; Entry Point
+    db $FF,40,BLASTOISE ; 50% ; Entry Point
 
 IslandMonsB4:
     db $0A
-    db 26,KRABBY    ; 20%
+    WILDSUB         ; 20% ; IslandMonsB40
     db 28,SEEL      ; 20%
     db 24,KRABBY    ; 15%
     db 25,SEEL      ; 10%
@@ -136301,8 +136307,8 @@ IslandMonsB4:
     db 34,KINGLER   ; 10%
     db 37,DEWGONG   ;  5%
     db 36,DEWGONG   ;  5%
-    db 11,SQUIRTLE  ;  4%
-    db  5,SQUIRTLE  ;  1%
+    db 40,GOLBAT    ;  4%
+    db 43,GOLBAT    ;  1%
     db $0A
     db 28,SEEL      ; 20%
     db 29,KRABBY    ; 20%
@@ -136310,10 +136316,13 @@ IslandMonsB4:
     db 27,KRABBY    ; 10%
     db 35,KINGLER   ; 10%
     db 38,DEWGONG   ; 10%
-    db  5,SQUIRTLE  ;  5%
-    db 11,SQUIRTLE  ;  5%
-    db 25,WARTORTLE ;  4%
+    db 36,KINGLER   ;  5%
+    db 40,KINGLER   ;  5%
+    db 42,DEWGONG   ;  4%
     db 42,LAPRAS    ;  1%
+IslandMonsB40:
+    db $20,25,ZUBAT  ; 12%
+    db $FF,37,GOLBAT ; 88%
 
 MansionMons1:
     db $0A
@@ -136325,7 +136334,7 @@ MansionMons1:
     db 24,VULPIX     ; 10%
     db 27,GROWLITHE  ;  5%
     db 27,VULPIX     ;  5%
-    db  5,CHARMANDER ;  4% ; Entry Point
+    db 35,WEEZING    ;  4%
     db 40,RAPIDASH   ;  1% ; Entry Point
     db $00
 
@@ -136335,13 +136344,16 @@ MansionMons2:
     db 25,PONYTA     ; 20%
     db 28,KOFFING    ; 15%
     db 29,PONYTA     ; 10%
-    db 11,CHARMANDER ; 10%
+    db 27,PONYTA     ; 10%
     db 31,KOFFING    ; 10%
-    db  5,CHARMANDER ;  5%
+    db 35,WEEZING    ;  5%
     db 38,WEEZING    ;  5%
-    db 16,CHARMELEON ;  4% ; Entry Point
-    db 40,WEEZING    ;  1%
+    db 37,KOFFING    ;  4%
+    WILDSUB          ;  1% ; MansionMons29
     db $00
+MansionMons29:
+    db $20,44,KOFFING ; 12%
+    db $FF,40,WEEZING ; 88%
 
 MansionMons3:
     db $0A
@@ -136349,13 +136361,16 @@ MansionMons3:
     db 34,KOFFING    ; 20%
     db 38,WEEZING    ; 15%
     db 37,WEEZING    ; 10%
-    db  5,CHARMANDER ; 10%
-    db 11,CHARMANDER ; 10%
-    db 16,CHARMELEON ;  5%
+    db 35,WEEZING    ; 10%
+    db 16,CHARMELEON ; 10% ; Entry Point
     db 25,CHARMELEON ;  5%
-    db 21,CHARMELEON ;  4%
-    db 40,CHARIZARD  ;  1% ; Entry Point
+    db 21,CHARMELEON ;  5%
+    db 29,CHARMELEON ;  4%
+    WILDSUB          ;  1% ; MansionMons39
     db $00
+MansionMons39:
+    db $7F,05,CHARMANDER ; 50% ; Entry Point
+    db $FF,40,CHARIZARD  ; 50% ; Entry Point
 
 MansionMonsB1:
     db $0A
@@ -136407,14 +136422,14 @@ Route23Mons:
     db $1C
     WILDSUB          ; 20% ; Route23Mons0
     WILDSUB          ; 20% ; Route23Mons1
-    db 35,VILEPLUME  ; 15% ; Entry Point
-    db 35,VICTREEBEL ; 10% ; Entry Point
-    db  5,BULBASAUR  ; 10% ; Entry Point
-    db 11,BULBASAUR  ; 10%
-    db 16,IVYSAUR    ;  5% ; Entry Point
+    db 38,VILEPLUME  ; 15% ; Entry Point
+    db 38,VICTREEBEL ; 10% ; Entry Point
+    WILDSUB          ; 10% ; Route23Mons4
+    db 16,IVYSAUR    ; 10% ; Entry Point
     db 25,IVYSAUR    ;  5%
-    db 21,IVYSAUR    ;  4%
-    db 40,VENUSAUR   ;  1% ; Entry Point
+    db 21,IVYSAUR    ;  5%
+    db 29,IVYSAUR    ;  4%
+    WILDSUB          ;  1% ; Route23Mons9
     db $02
     db 24,MAGIKARP   ; 20%
     db 27,MAGIKARP   ; 20%
@@ -136432,6 +136447,12 @@ Route23Mons0:
 Route23Mons1:
     db $20,20,BELLSPROUT ; 12%
     db $FF,25,WEEPINBELL ; 88%
+Route23Mons4:
+    db $20,22,PARAS    ; 12%
+    db $FF,38,PARASECT ; 88%
+Route23Mons9:
+    db $7F,05,BULBASAUR ; 50% ; Entry Point
+    db $FF,40,VENUSAUR  ; 50% ; Entry Point
 
 PlateauMons1:
     db $0F
@@ -137486,7 +137507,20 @@ WildSubGroup:
     jr z,.NotEncounter
     cp b
     jr nz,.next1
+    FuncCoord 9,9 ; Tile Near Player
+    ld a,[Coord]  ; ...
+    bit 7,[hl]
+    jr z,.CheckLand
+.CheckWatr
+    cp $14
+    jr nz,.next1
+    jr .done
+.CheckLand
+    cp $14
+    jr z,.next1
+.done
     ld a,[hli]
+    and %01111111 ; ignore bit land/watr
     cp e
     jr nz,.next2
 .found
@@ -137636,62 +137670,72 @@ WildPikachuEevee:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+LAND EQU 0
+WATR EQU 1
+
 WILDSUBGROUP: MACRO
     db \1
-    db \2*2
-    dw \3
+    db (\2 << 7 + ( \3 * 2 ))
+    dw \4
     ENDM
 
 WildSubGroupTable:
-    WILDSUBGROUP VIRIDIAN_FOREST,6,ForestMons6
-    WILDSUBGROUP VIRIDIAN_FOREST,9,ForestMons9
-    WILDSUBGROUP ROUTE_5,0,Route5Mons0
-    WILDSUBGROUP ROUTE_5,4,Route5Mons4
-    WILDSUBGROUP ROUTE_5,6,Route5Mons6
-    WILDSUBGROUP DIGLETTS_CAVE,5,CaveMons5
-    WILDSUBGROUP DIGLETTS_CAVE,8,CaveMons8
-    WILDSUBGROUP ROUTE_10,4,Route10Mons4
-    WILDSUBGROUP ROUTE_8,2,Route8Mons2
-    WILDSUBGROUP ROUTE_8,5,Route8Mons5
-    WILDSUBGROUP ROUTE_8,8,Route8Mons8
-    WILDSUBGROUP ROUTE_8,9,Route8Mons9
-    WILDSUBGROUP ROUTE_7,0,Route7Mons0
-    WILDSUBGROUP ROUTE_7,2,Route7Mons2
-    WILDSUBGROUP ROUTE_14,0,Route14Mons0
-    WILDSUBGROUP ROUTE_14,1,Route14Mons1
-    WILDSUBGROUP ROUTE_14,3,Route14Mons3
-    WILDSUBGROUP ROUTE_15,3,Route15Mons3
-    WILDSUBGROUP ROUTE_17,2,Route17Mons2
-    WILDSUBGROUP SAFARI_ZONE_CENTER,5,ZoneMonsCenter5
-    WILDSUBGROUP SAFARI_ZONE_CENTER,6,ZoneMonsCenter6
-    WILDSUBGROUP SAFARI_ZONE_CENTER,8,ZoneMonsCenter8
-    WILDSUBGROUP SAFARI_ZONE_CENTER,9,ZoneMonsCenter9
-    WILDSUBGROUP SAFARI_ZONE_NORTH,0,ZoneMons20
-    WILDSUBGROUP SAFARI_ZONE_NORTH,1,ZoneMons21
-    WILDSUBGROUP SAFARI_ZONE_WEST,6,ZoneMons36
-    WILDSUBGROUP SAFARI_ZONE_WEST,7,ZoneMons37
-    WILDSUBGROUP SAFARI_ZONE_WEST,8,ZoneMons38
-    WILDSUBGROUP ROUTE_19,4,WaterMonsW4
-    WILDSUBGROUP ROUTE_20,4,WaterMonsW4
-    WILDSUBGROUP POWER_PLANT,9,PowerPlantMons9
-    WILDSUBGROUP SEAFOAM_ISLANDS_1,0,IslandMons10
-    WILDSUBGROUP SEAFOAM_ISLANDS_2,0,IslandMonsB10
-    WILDSUBGROUP SEAFOAM_ISLANDS_3,0,IslandMonsB20
-    WILDSUBGROUP SEAFOAM_ISLANDS_3,5,IslandMonsB25
-    WILDSUBGROUP SEAFOAM_ISLANDS_3,6,IslandMonsB26
-    WILDSUBGROUP SEAFOAM_ISLANDS_4,9,IslandMonsB39
-    WILDSUBGROUP MANSION_4,9,MansionMonsB19
-    WILDSUBGROUP ROUTE_21,4,Route21MonsW4
-    WILDSUBGROUP ROUTE_23,0,Route23Mons0
-    WILDSUBGROUP ROUTE_23,1,Route23Mons1
-    WILDSUBGROUP VICTORY_ROAD_1,0,PlateauMons10
-    WILDSUBGROUP VICTORY_ROAD_2,0,PlateauMons20
-    WILDSUBGROUP VICTORY_ROAD_2,5,PlateauMons25
-    WILDSUBGROUP VICTORY_ROAD_2,6,PlateauMons26
-    WILDSUBGROUP VICTORY_ROAD_3,0,PlateauMons30
-    WILDSUBGROUP VICTORY_ROAD_3,3,PlateauMons33
-    WILDSUBGROUP VICTORY_ROAD_3,4,PlateauMons34
-    WILDSUBGROUP VICTORY_ROAD_3,8,PlateauMons38
+    WILDSUBGROUP VIRIDIAN_FOREST,LAND,6,ForestMons6
+    WILDSUBGROUP VIRIDIAN_FOREST,LAND,9,ForestMons9
+    WILDSUBGROUP ROUTE_5,LAND,0,Route5Mons0
+    WILDSUBGROUP ROUTE_5,LAND,4,Route5Mons4
+    WILDSUBGROUP ROUTE_5,LAND,6,Route5Mons6
+    WILDSUBGROUP DIGLETTS_CAVE,LAND,5,CaveMons5
+    WILDSUBGROUP DIGLETTS_CAVE,LAND,8,CaveMons8
+    WILDSUBGROUP ROUTE_10,LAND,4,Route10Mons4
+    WILDSUBGROUP ROUTE_8,LAND,2,Route8Mons2
+    WILDSUBGROUP ROUTE_8,LAND,5,Route8Mons5
+    WILDSUBGROUP ROUTE_8,LAND,8,Route8Mons8
+    WILDSUBGROUP ROUTE_8,LAND,9,Route8Mons9
+    WILDSUBGROUP ROUTE_7,LAND,0,Route7Mons0
+    WILDSUBGROUP ROUTE_7,LAND,2,Route7Mons2
+    WILDSUBGROUP ROUTE_14,LAND,0,Route14Mons0
+    WILDSUBGROUP ROUTE_14,LAND,1,Route14Mons1
+    WILDSUBGROUP ROUTE_14,LAND,3,Route14Mons3
+    WILDSUBGROUP ROUTE_15,LAND,3,Route15Mons3
+    WILDSUBGROUP ROUTE_17,LAND,2,Route17Mons2
+    WILDSUBGROUP SAFARI_ZONE_CENTER,LAND,5,ZoneMonsCenter5
+    WILDSUBGROUP SAFARI_ZONE_CENTER,LAND,6,ZoneMonsCenter6
+    WILDSUBGROUP SAFARI_ZONE_CENTER,LAND,8,ZoneMonsCenter8
+    WILDSUBGROUP SAFARI_ZONE_CENTER,LAND,9,ZoneMonsCenter9
+    WILDSUBGROUP SAFARI_ZONE_NORTH,LAND,0,ZoneMons20
+    WILDSUBGROUP SAFARI_ZONE_NORTH,LAND,1,ZoneMons21
+    WILDSUBGROUP SAFARI_ZONE_WEST,LAND,6,ZoneMons36
+    WILDSUBGROUP SAFARI_ZONE_WEST,LAND,7,ZoneMons37
+    WILDSUBGROUP SAFARI_ZONE_WEST,LAND,8,ZoneMons38
+    WILDSUBGROUP ROUTE_19,WATR,4,WaterMonsW4
+    WILDSUBGROUP ROUTE_20,WATR,4,WaterMonsW4
+    WILDSUBGROUP POWER_PLANT,LAND,9,PowerPlantMons9
+    WILDSUBGROUP SEAFOAM_ISLANDS_1,LAND,0,IslandMons10
+    WILDSUBGROUP SEAFOAM_ISLANDS_2,LAND,0,IslandMonsB10
+    WILDSUBGROUP SEAFOAM_ISLANDS_3,LAND,0,IslandMonsB20
+    WILDSUBGROUP SEAFOAM_ISLANDS_3,LAND,5,IslandMonsB25
+    WILDSUBGROUP SEAFOAM_ISLANDS_3,LAND,6,IslandMonsB26
+    WILDSUBGROUP SEAFOAM_ISLANDS_4,LAND,0,IslandMonsB30
+    WILDSUBGROUP SEAFOAM_ISLANDS_4,LAND,9,IslandMonsB39
+    WILDSUBGROUP SEAFOAM_ISLANDS_4,WATR,9,IslandMonsB3W9
+    WILDSUBGROUP SEAFOAM_ISLANDS_5,LAND,0,IslandMonsB40
+    WILDSUBGROUP MANSION_2,LAND,9,MansionMons29
+    WILDSUBGROUP MANSION_3,LAND,9,MansionMons39
+    WILDSUBGROUP MANSION_4,LAND,9,MansionMonsB19
+    WILDSUBGROUP ROUTE_21,WATR,4,Route21MonsW4
+    WILDSUBGROUP ROUTE_23,LAND,0,Route23Mons0
+    WILDSUBGROUP ROUTE_23,LAND,1,Route23Mons1
+    WILDSUBGROUP ROUTE_23,LAND,4,Route23Mons4
+    WILDSUBGROUP ROUTE_23,LAND,9,Route23Mons9
+    WILDSUBGROUP VICTORY_ROAD_1,LAND,0,PlateauMons10
+    WILDSUBGROUP VICTORY_ROAD_2,LAND,0,PlateauMons20
+    WILDSUBGROUP VICTORY_ROAD_2,LAND,5,PlateauMons25
+    WILDSUBGROUP VICTORY_ROAD_2,LAND,6,PlateauMons26
+    WILDSUBGROUP VICTORY_ROAD_3,LAND,0,PlateauMons30
+    WILDSUBGROUP VICTORY_ROAD_3,LAND,3,PlateauMons33
+    WILDSUBGROUP VICTORY_ROAD_3,LAND,4,PlateauMons34
+    WILDSUBGROUP VICTORY_ROAD_3,LAND,8,PlateauMons38
     db $FF
 
 WildSubGroupTableNew:
@@ -137762,13 +137806,10 @@ CheckWildSubGroup:
 ; ──────────────────────────────────────────────────────────────────────
 
 UnknownDungeonLandPkmnList:
-    db BULBASAUR
     db IVYSAUR
     db VENUSAUR
-    db CHARMANDER
     db CHARMELEON
     db CHARIZARD
-    db SQUIRTLE
     db WARTORTLE
     db BLASTOISE
     db CATERPIE
@@ -137866,6 +137907,8 @@ UnknownDungeonLandPkmnList:
     db ZUBAT
     db ZUBAT
     db ZUBAT
+    db ZUBAT
+    db ZUBAT
     db GOLBAT
     db GOLBAT
     db GOLBAT
@@ -137922,6 +137965,7 @@ UnknownDungeonLandPkmnList:
     db BELLSPROUT
     db WEEPINBELL
     db VICTREEBEL
+    db GEODUDE
     db GEODUDE
     db GEODUDE
     db GEODUDE
@@ -138020,7 +138064,6 @@ UnknownDungeonLandPkmnList:
     db SNORLAX
 
 UnknownDungeonWaterPkmnList:
-    db SQUIRTLE
     db WARTORTLE
     db BLASTOISE
     db PSYDUCK
@@ -138042,6 +138085,7 @@ UnknownDungeonWaterPkmnList:
     db POLIWHIRL
     db POLIWHIRL
     db POLIWRATH
+    db TENTACOOL
     db TENTACOOL
     db TENTACOOL
     db TENTACOOL
