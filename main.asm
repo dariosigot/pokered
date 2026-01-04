@@ -24540,11 +24540,17 @@ ThrewRockText:
     TX_FAR _ThrewRockText
     db "@"
 
-SECTION "ItemUseEscapeRope",ROMX[$5faf],BANK[$3]
-
 ; also used for Dig out-of-battle effect
-ItemUseEscapeRope: ; dfaf (3:5faf)
+ItemUseEscapeRope:
     ld a,[W_ISINBATTLE]
+    and a
+    jr nz,.notUsable
+    ; Check Surfing
+    ld a,[$d700]
+    cp a,2 ; Surfing?
+    jr z,.notUsable
+    ; Check Dark
+    ld a,[$d35d]
     and a
     jr nz,.notUsable
     call CheckDiglettsCaveHole
@@ -24552,7 +24558,7 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
     jr z,.notUsable
     ld a,[W_CURMAPTILESET]
     ld b,a
-    ld hl,EscapeRopeTilesets
+    ld hl,.EscapeRopeTilesets
 .loop
     ld a,[hli]
     cp a,$ff
@@ -24580,10 +24586,11 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
     jp DelayFrames
 .notUsable
     jp DigNotUsable
-
-EscapeRopeTilesets: ; dffd (3:5ffd)
+.EscapeRopeTilesets
     db $03,$0f,$11,$16,$10
     db $ff ; terminator
+
+SECTION "ItemUseRepel",ROMX[$6003],BANK[$3]
 
 ItemUseRepel: ; e003 (3:6003)
     ld b,100
@@ -30852,6 +30859,10 @@ TryDoWildEncounter:
     ld a,[$d0db]
     and a
     jr z,.willEncounter
+    ; Check Dark
+    ld a,[$d35d]
+    and a
+    jr nz,.willEncounter
     call GetAvgTeamLevel ; ld a,[W_PARTYMON1_LEVEL] ; $d18c
     ld b,a
     ld a,[W_CURENEMYLVL] ; $d127
