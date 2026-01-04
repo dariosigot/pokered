@@ -137343,17 +137343,24 @@ CheckMapForMon:
     inc hl
     ld b,10
 .loop
+    push bc
     ld a,[$d11e]
-    cp [hl]
+    ld b,a
+    ld a,[hl]
+    cp $FF
+    call z,SearchSpecialFF
+    cp b
     jr nz,.nextEntry
     ld a,c
     ld [de],a
     inc de
     scf
+    pop bc
     ret
 .nextEntry
     inc hl
     inc hl
+    pop bc
     dec b
     jr nz,.loop
     dec hl
@@ -137656,6 +137663,18 @@ WildDockMew:
     ret
 
 WildPikachu:
+    call WildPikachuConditions
+    ret nc ; NotEncounter
+    ld a,7
+    ld [W_PALLETTOWNCURSCRIPT],a
+    ld a,PIKACHU ; Entry Point
+    ld [W_ENEMYMONID],a
+    ld a,1
+    ld [W_CURENEMYLVL],a
+    scf ; WillEncounter
+    ret
+
+WildPikachuConditions:
     ld a,[W_NUMINPARTY]
     and a
     jr z,.NotEncounter
@@ -137664,12 +137683,6 @@ WildPikachu:
     jr nz,.NotEncounter
     call .Own
     jr nz,.NotEncounter
-    ld a,7
-    ld [W_PALLETTOWNCURSCRIPT],a
-    ld a,PIKACHU ; Entry Point
-    ld [W_ENEMYMONID],a
-    ld a,1
-    ld [W_CURENEMYLVL],a
     scf ; WillEncounter
     ret
 .NotEncounter
@@ -137688,6 +137701,18 @@ WildPikachu:
     ret
 
 WildEevee:
+    call WildEeveeConditions
+    ret nc ; NotEncounter
+    ld a,7
+    ld [W_PEWTERCITYCURSCRIPT],a
+    ld a,EEVEE ; Entry Point
+    ld [W_ENEMYMONID],a
+    ld a,1
+    ld [W_CURENEMYLVL],a
+    scf ; WillEncounter
+    ret
+
+WildEeveeConditions:
     ld a,[W_NUMINPARTY]
     and a
     jr z,.NotEncounter
@@ -137696,12 +137721,6 @@ WildEevee:
     jr nz,.NotEncounter
     call .Own
     jr nz,.NotEncounter
-    ld a,7
-    ld [W_PEWTERCITYCURSCRIPT],a
-    ld a,EEVEE ; Entry Point
-    ld [W_ENEMYMONID],a
-    ld a,1
-    ld [W_CURENEMYLVL],a
     scf ; WillEncounter
     ret
 .NotEncounter
@@ -137720,13 +137739,19 @@ WildEevee:
     ret
 
 WildArticuno:
-    ld hl,wEventBeatArticunoBit2
-    bit 2,[hl]
-    jr z,.NotEncounter
+    call WildArticunoConditions
+    ret nc ; NotEncounter
     ld a,ARTICUNO
     ld [W_ENEMYMONID],a
     ld a,40
     ld [W_CURENEMYLVL],a
+    scf ; WillEncounter
+    ret
+
+WildArticunoConditions:
+    ld hl,wEventBeatArticunoBit2
+    bit 2,[hl]
+    jr z,.NotEncounter
     scf ; WillEncounter
     ret
 .NotEncounter
@@ -137734,13 +137759,19 @@ WildArticuno:
     ret
 
 WildZapdos:
-    ld hl,$d7d3 + 1
-    bit 1,[hl]
-    jr z,.NotEncounter
+    call WildZapdosConditions
+    ret nc ; NotEncounter
     ld a,ZAPDOS
     ld [W_ENEMYMONID],a
     ld a,40
     ld [W_CURENEMYLVL],a
+    scf ; WillEncounter
+    ret
+
+WildZapdosConditions:
+    ld hl,$d7d3 + 1
+    bit 1,[hl]
+    jr z,.NotEncounter
     scf ; WillEncounter
     ret
 .NotEncounter
@@ -137748,13 +137779,19 @@ WildZapdos:
     ret
 
 WildMoltres:
-    ld hl,$d847
-    bit 2,[hl]
-    jr z,.NotEncounter
+    call WildMoltresConditions
+    ret nc ; NotEncounter
     ld a,MOLTRES
     ld [W_ENEMYMONID],a
     ld a,40
     ld [W_CURENEMYLVL],a
+    scf ; WillEncounter
+    ret
+
+WildMoltresConditions:
+    ld hl,$d847
+    bit 2,[hl]
+    jr z,.NotEncounter
     scf ; WillEncounter
     ret
 .NotEncounter
@@ -137896,7 +137933,11 @@ CheckWildSubGroup:
 .CompareMon
     inc hl
     ld a,[$d11e]
-    cp [hl]
+    ld b,a
+    ld a,[hl]
+    cp $FF
+    call z,SearchSpecialFF
+    cp b
     inc hl
     ret
 .Found
@@ -137905,6 +137946,81 @@ CheckWildSubGroup:
     ld [de],a
     inc de
     scf
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+SearchSpecialFF:
+    push hl
+    push bc
+    dec hl
+    ld a,[hl]
+    ld b,a
+    ld hl,.TableExceptionFF
+.Loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFound
+    cp b
+    jr z,.Found
+    inc hl
+    inc hl
+    jr .Loop
+.Found
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld bc,.End
+    push bc
+    jp hl
+.NotFound
+    ld a,$FF
+.End
+    pop bc
+    pop hl
+    ret
+
+.TableExceptionFF
+    dbw W_PIKACHU,.Pikachu
+    dbw W_EEVEE,.Eevee
+    dbw W_ARTICUNO,.Articuno
+    dbw W_ZAPDOS,.Zapdos
+    dbw W_MOLTRES,.Moltres
+    db $FF
+
+.Pikachu
+    call WildPikachuConditions
+    ld a,$FF
+    ret nc ; NotEncounter
+    ld a,PIKACHU
+    ret
+
+.Eevee
+    call WildEeveeConditions
+    ld a,$FF
+    ret nc ; NotEncounter
+    ld a,EEVEE
+    ret
+
+.Articuno
+    call WildArticunoConditions
+    ld a,$FF
+    ret nc ; NotEncounter
+    ld a,ARTICUNO
+    ret
+
+.Zapdos
+    call WildZapdosConditions
+    ld a,$FF
+    ret nc ; NotEncounter
+    ld a,ZAPDOS
+    ret
+
+.Moltres
+    call WildMoltresConditions
+    ld a,$FF
+    ret nc ; NotEncounter
+    ld a,MOLTRES
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
