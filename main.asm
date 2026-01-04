@@ -31603,7 +31603,7 @@ ErasePartyMenuCursors:
 
 CheckMapEncounterException:
     call GetCurrentOldAdventureMap
-    cp PALLET_TOWN ; Pallet Town's Pikachu
+    cp REDS_HOUSE_2F ; Pallet Town's Pikachu
     ret z
     cp PEWTER_CITY ; Pewter City's Eevee
     ret
@@ -37373,7 +37373,6 @@ PalletTownScriptPointers:
     dw PalletTownScript4
     dw PalletTownScript5
     dw PalletTownScript6
-    dw PalletTownScript7_AfterPikachu
 
 PewterCityScriptPointers:
     dw PewterCityScript0
@@ -37384,22 +37383,6 @@ PewterCityScriptPointers:
     dw PewterCityScript5
     dw PewterCityScript6
     dw PewterCityScript7_AfterEevee
-
-PalletTownScript7_AfterPikachu:
-    ld a,[W_ISINBATTLE]
-    cp $ff
-    jr z,.end
-    ld a,[wBattleResult]
-    cp $2
-    jr z,.end
-    ld hl,wDisableEncounterBit1
-    set 1,[hl] ; Set Flag to Disable Encounter
-.end
-    xor a
-    ld [wJoypadForbiddenButtonsMask],a
-    ld [W_CURMAPSCRIPT],a
-    ld [W_PALLETTOWNCURSCRIPT],a
-    ret
 
 PewterCityScript7_AfterEevee:
     ld a,[W_ISINBATTLE]
@@ -89809,9 +89792,7 @@ RedsHouse2FScript: ; 5c0b0 (17:40b0)
     ld a,[W_REDSHOUSE2CURSCRIPT]
     jp CallFunctionInTable
 
-RedsHouse2FScriptPointers: ; 5c0bc (17:40bc)
-    dw RedsHouse2FScript0
-    dw RedsHouse2FScript1
+SECTION "RedsHouse2FScript0",ROMX[$40c0],BANK[$17]
 
 RedsHouse2FScript0: ; 5c0c0 (17:40c0)
     xor a
@@ -93911,6 +93892,30 @@ BoulderOnSwitch1:
     ld hl,$c255 ; Sprite05MapX
     ld a,$11 + 4 ; wispnote - We need to offset coordinates by 4
     ld [hl],a
+    ret
+
+; ───────────────────────────────────────────
+
+RedsHouse2FScriptPointers:
+    dw RedsHouse2FScript0
+    dw RedsHouse2FScript1
+    dw RedsHouse2FScript2_AfterPikachu
+
+RedsHouse2FScript2_AfterPikachu:
+    ld a,[W_ISINBATTLE]
+    cp $ff
+    jr z,.end
+    ld a,[wBattleResult]
+    cp $2
+    jr z,.end
+    ld hl,wDisableEncounterBit1
+    set 1,[hl] ; Set Flag to Disable Encounter
+.end
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a
+    inc a
+    ld [W_CURMAPSCRIPT],a
+    ld [W_REDSHOUSE2CURSCRIPT],a
     ret
 
 ; ───────────────────────────────────────────
@@ -135088,8 +135093,8 @@ WildDataPointers:
     dw Route23Mons   ; ROUTE_23
     dw Route24Mons   ; ROUTE_24
     dw Route25Mons   ; ROUTE_25
-    dw NoMons        ; REDS_HOUSE_1F
     dw NoMons
+    dw RedsHouse2FMons ; REDS_HOUSE_2F
     dw NoMons
     dw NoMons
     dw NoMons
@@ -135319,7 +135324,7 @@ NoMons: ; d0dd (3:50dd)
     db $00
     db $00
 
-PalletMons:
+RedsHouse2FMons:
     db $06
     db W_PIKACHU,$FF ; 20%
     db W_PIKACHU,$FF ; 20%
@@ -135331,6 +135336,10 @@ PalletMons:
     db W_PIKACHU,$FF ;  5%
     db W_PIKACHU,$FF ;  4%
     db W_PIKACHU,$FF ;  1%
+    db $00
+
+PalletMons:
+    db $00
     db $05
     db 18,KRABBY   ; 20%
     db 24,KRABBY   ; 20%
@@ -137665,8 +137674,8 @@ WildDockMew:
 WildPikachu:
     call WildPikachuConditions
     ret nc ; NotEncounter
-    ld a,7
-    ld [W_PALLETTOWNCURSCRIPT],a
+    ld a,2 ; RedsHouse2FScript2_AfterPikachu
+    ld [W_REDSHOUSE2CURSCRIPT],a
     ld a,PIKACHU ; Entry Point
     ld [W_ENEMYMONID],a
     ld a,1
@@ -139208,7 +139217,7 @@ ForceShinyOrRandom_:
     jp z,.Safari
     cp POKEMONTOWER_6
     jp z,.Tower6
-    cp PALLET_TOWN
+    cp REDS_HOUSE_2F
     jp z,.PalletTown
     cp PEWTER_CITY
     jp z,.PewterCity
@@ -143590,7 +143599,7 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     cp PIKACHU
     ret nz
     call GetCurrentOldAdventureMap
-    cp PALLET_TOWN
+    cp REDS_HOUSE_2F
     ret
 .CheckPewterEevee
     ld a,[W_ENEMYMONID]
