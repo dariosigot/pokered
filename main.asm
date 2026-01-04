@@ -31219,8 +31219,9 @@ W_SUB_GROUP             EQU $00 ; WildSubGroup
 W_UNKNOWN_DUNGEON_LAND  EQU $01 ; WildUnknownDungeon
 W_UNKNOWN_DUNGEON_WATER EQU $02 ; WildUnknownDungeon
 W_DOCK_MEW              EQU $03 ; WildDockMew
-W_PIKACHU_EEVEE         EQU $04 ; WildPikachuEevee
-W_STANDARD              EQU $05
+W_PIKACHU               EQU $04 ; WildPikachu
+W_EEVEE                 EQU $05 ; WildEevee
+W_STANDARD              EQU $06
 
 WILDSUB: MACRO
     db W_SUB_GROUP,$FF
@@ -31260,7 +31261,8 @@ GetEnemy:
     dw WildUnknownDungeon
     dw WildUnknownDungeon
     dw WildDockMew
-    dw WildPikachuEevee
+    dw WildPikachu
+    dw WildEevee  
 .WillEncounter
     call .DittoDebugInRoute15
 .WillEncounter2
@@ -135303,16 +135305,16 @@ NoMons: ; d0dd (3:50dd)
 
 PalletMons:
     db $06
-    db W_PIKACHU_EEVEE,$FF ; 20%
-    db W_PIKACHU_EEVEE,$FF ; 20%
-    db W_PIKACHU_EEVEE,$FF ; 15%
-    db W_PIKACHU_EEVEE,$FF ; 10%
-    db W_PIKACHU_EEVEE,$FF ; 10%
-    db W_PIKACHU_EEVEE,$FF ; 10%
-    db W_PIKACHU_EEVEE,$FF ;  5%
-    db W_PIKACHU_EEVEE,$FF ;  5%
-    db W_PIKACHU_EEVEE,$FF ;  4%
-    db W_PIKACHU_EEVEE,$FF ;  1%
+    db W_PIKACHU,$FF ; 20%
+    db W_PIKACHU,$FF ; 20%
+    db W_PIKACHU,$FF ; 15%
+    db W_PIKACHU,$FF ; 10%
+    db W_PIKACHU,$FF ; 10%
+    db W_PIKACHU,$FF ; 10%
+    db W_PIKACHU,$FF ;  5%
+    db W_PIKACHU,$FF ;  5%
+    db W_PIKACHU,$FF ;  4%
+    db W_PIKACHU,$FF ;  1%
     db $05
     db 18,KRABBY   ; 20%
     db 24,KRABBY   ; 20%
@@ -135327,16 +135329,16 @@ PalletMons:
 
 PewterMons:
     db $05
-    db W_PIKACHU_EEVEE,$FF ; 20%
-    db W_PIKACHU_EEVEE,$FF ; 20%
-    db W_PIKACHU_EEVEE,$FF ; 15%
-    db W_PIKACHU_EEVEE,$FF ; 10%
-    db W_PIKACHU_EEVEE,$FF ; 10%
-    db W_PIKACHU_EEVEE,$FF ; 10%
-    db W_PIKACHU_EEVEE,$FF ;  5%
-    db W_PIKACHU_EEVEE,$FF ;  5%
-    db W_PIKACHU_EEVEE,$FF ;  4%
-    db W_PIKACHU_EEVEE,$FF ;  1%
+    db W_EEVEE,$FF ; 20%
+    db W_EEVEE,$FF ; 20%
+    db W_EEVEE,$FF ; 15%
+    db W_EEVEE,$FF ; 10%
+    db W_EEVEE,$FF ; 10%
+    db W_EEVEE,$FF ; 10%
+    db W_EEVEE,$FF ;  5%
+    db W_EEVEE,$FF ;  5%
+    db W_EEVEE,$FF ;  4%
+    db W_EEVEE,$FF ;  1%
     db $00
 
 Route1Mons:
@@ -137604,45 +137606,18 @@ WildDockMew:
     and a ; Reset Carry Flag ; NotEncounter
     ret
 
-WildPikachuEevee:
+WildPikachu:
     ld a,[W_NUMINPARTY]
     and a
     jr z,.NotEncounter
-    call GetCurrentOldAdventureMap
-    cp PALLET_TOWN
-    jr z,.CheckPikachuKO
-    cp PEWTER_CITY
-    jr z,.CheckEeveeKO
-    jr .NotEncounter
-.CheckPikachuKO
     ld hl,wDisableEncounterBit1
     bit 1,[hl]
     jr nz,.NotEncounter
-    jr .PikachuEeveeContinue
-.CheckEeveeKO
-    ld hl,wDisableEncounterBit3
-    bit 3,[hl]
+    call .Own
     jr nz,.NotEncounter
-.PikachuEeveeContinue
-    call .OwnPikachuEevee
-    jr nz,.NotEncounter
-    call GetCurrentOldAdventureMap
-    cp PALLET_TOWN
-    jr z,.PikachuEncounter
-    cp PEWTER_CITY
-    jr z,.EeveeEncounter
-    jr .NotEncounter
-.PikachuEncounter
     ld a,7
     ld [W_PALLETTOWNCURSCRIPT],a
     ld a,PIKACHU ; Entry Point
-    jr .WillEncounter
-.EeveeEncounter
-    ld a,7
-    ld [W_PEWTERCITYCURSCRIPT],a
-    ld a,EEVEE ; Entry Point
-    ; fall through
-.WillEncounter
     ld [W_ENEMYMONID],a
     ld a,1
     ld [W_CURENEMYLVL],a
@@ -137651,16 +137626,43 @@ WildPikachuEevee:
 .NotEncounter
     and a ; Reset Carry Flag ; NotEncounter
     ret
-.OwnPikachuEevee
+.Own
     push hl
     push bc
     ld hl,wPokedexOwned
-    call GetCurrentOldAdventureMap
-    cp PALLET_TOWN
     ld bc,(2 << 8) + DEX_PIKACHU ; 2 = read bit
-    jr z,.WildChoice
+    PREDEF HandleBitArray
+    ld a,c
+    and a
+    pop bc
+    pop hl
+    ret
+
+WildEevee:
+    ld a,[W_NUMINPARTY]
+    and a
+    jr z,.NotEncounter
+    ld hl,wDisableEncounterBit3
+    bit 3,[hl]
+    jr nz,.NotEncounter
+    call .Own
+    jr nz,.NotEncounter
+    ld a,7
+    ld [W_PEWTERCITYCURSCRIPT],a
+    ld a,EEVEE ; Entry Point
+    ld [W_ENEMYMONID],a
+    ld a,1
+    ld [W_CURENEMYLVL],a
+    scf ; WillEncounter
+    ret
+.NotEncounter
+    and a ; Reset Carry Flag ; NotEncounter
+    ret
+.Own
+    push hl
+    push bc
+    ld hl,wPokedexOwned
     ld bc,(2 << 8) + DEX_EEVEE ; 2 = read bit
-.WildChoice
     PREDEF HandleBitArray
     ld a,c
     and a
