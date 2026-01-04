@@ -31232,7 +31232,10 @@ W_UNKNOWN_DUNGEON_WATER EQU $02 ; WildUnknownDungeon
 W_DOCK_MEW              EQU $03 ; WildDockMew
 W_PIKACHU               EQU $04 ; WildPikachu
 W_EEVEE                 EQU $05 ; WildEevee
-W_STANDARD              EQU $06
+W_ARTICUNO              EQU $06 ; WildArticuno
+W_ZAPDOS                EQU $07 ; WildZapdos
+W_MOLTRES               EQU $08 ; WildMoltres
+W_STANDARD              EQU $09
 
 WILDSUB: MACRO
     db W_SUB_GROUP,$FF
@@ -31266,17 +31269,19 @@ GetEnemy:
     pop de
     pop hl
     ret nc ; NotEncounter
-    jr .WillEncounter2
+    jr GetEnemy
 .WildExceptionPointer
     dw WildSubGroup
     dw WildUnknownDungeon
     dw WildUnknownDungeon
     dw WildDockMew
     dw WildPikachu
-    dw WildEevee  
+    dw WildEevee
+    dw WildArticuno
+    dw WildZapdos
+    dw WildMoltres
 .WillEncounter
     call .DittoDebugInRoute15
-.WillEncounter2
     ld a,[W_ENEMYMONID]
     ld [$cf91],a
     scf ; WillEncounter
@@ -136212,10 +136217,13 @@ PowerPlantMons:
     db 21,MAGNEMITE  ; 10%
     db 18,MAGNEMITE  ; 10%
     db 30,MAGNETON   ;  5% ; Entry Point
-    db 32,RAICHU     ;  5% ; Entry Point
+    WILDSUB          ;  5% ; PowerPlantMons7
     db 31,ELECTABUZZ ;  4% ; Entry Point
     WILDSUB          ;  1% ; PowerPlantMons9
     db $00
+PowerPlantMons7:
+    db $FC,32,RAICHU    ; 99% ; Entry Point
+    db $FF,W_ZAPDOS,$FF ; 01%
 PowerPlantMons9:
     db $20,02,EEVEE   ; 12%
     db $FF,32,JOLTEON ; 88% ; Entry Point
@@ -136229,13 +136237,16 @@ IslandMons1:
     db 23,KRABBY   ; 10%
     db 22,SLOWPOKE ; 10%
     db 24,SEEL     ;  5%
-    db 25,SLOWPOKE ;  5%
+    WILDSUB        ;  5% ; IslandMons17
     db 28,KINGLER  ;  4%
     db 34,DEWGONG  ;  1% ; Entry Point
     db $00
 IslandMons10:
     db $20,20,ZUBAT  ; 12%
     db $FF,25,GOLBAT ; 88%
+IslandMons17:
+    db $FC,25,SLOWPOKE    ; 99%
+    db $FF,W_ARTICUNO,$FF ; 01%
 
 IslandMonsB1:
     db $0A
@@ -136246,13 +136257,16 @@ IslandMonsB1:
     db 28,SEEL     ; 10%
     db 28,SLOWPOKE ; 10%
     db 24,KRABBY   ;  5%
-    db 30,KINGLER  ;  5%
+    WILDSUB        ;  5% ; IslandMonsB17
     db 35,DEWGONG  ;  4%
     db 38,SLOWBRO  ;  1% ; Entry Point
     db $00
 IslandMonsB10:
     db $20,21,ZUBAT  ; 12%
     db $FF,28,GOLBAT ; 88%
+IslandMonsB17:
+    db $FC,30,KINGLER     ; 99%
+    db $FF,W_ARTICUNO,$FF ; 01%
 
 IslandMonsB2:
     db $0A
@@ -136263,7 +136277,7 @@ IslandMonsB2:
     db 31,SLOWPOKE ; 10%
     WILDSUB        ; 10% ; IslandMonsB25
     WILDSUB        ;  5% ; IslandMonsB26
-    db 38,SLOWBRO  ;  5%
+    WILDSUB        ;  5% ; IslandMonsB27
     db 39,SLOWBRO  ;  4%
     db 40,GOLBAT   ;  1%
     db $00
@@ -136276,6 +136290,9 @@ IslandMonsB25:
 IslandMonsB26:
     db $20,25,SEEL    ; 12%
     db $FF,34,DEWGONG ; 88%
+IslandMonsB27:
+    db $FC,38,SLOWBRO     ; 99%
+    db $FF,W_ARTICUNO,$FF ; 01%
 
 IslandMonsB3:
     db $0A
@@ -136286,7 +136303,7 @@ IslandMonsB3:
     db 32,KINGLER   ; 10%
     db 36,DEWGONG   ; 10%
     db 37,DEWGONG   ;  5%
-    db 40,GOLBAT    ;  5%
+    WILDSUB         ;  5% ; IslandMonsB37
     db 31,JYNX      ;  4% ; Entry Point
     WILDSUB         ;  1% ; IslandMonsB39
     db $0A
@@ -136297,12 +136314,15 @@ IslandMonsB3:
     db 36,KINGLER   ; 10%
     db 16,WARTORTLE ; 10% ; Entry Point
     db 25,WARTORTLE ;  5%
-    db 21,WARTORTLE ;  5%
+    db 40,KINGLER   ;  5%
     db 29,WARTORTLE ;  4%
     WILDSUB         ;  1% ; IslandMonsB3W9
 IslandMonsB30:
     db $20,24,ZUBAT  ; 12%
     db $FF,36,GOLBAT ; 88%
+IslandMonsB37:
+    db $FC,40,GOLBAT      ; 99%
+    db $FF,W_ARTICUNO,$FF ; 01%
 IslandMonsB39:
     db $20,02,EEVEE    ; 12%
     db $FF,32,VAPOREON ; 88% ; Entry Point
@@ -136319,7 +136339,7 @@ IslandMonsB4:
     db 32,KINGLER   ; 10%
     db 34,KINGLER   ; 10%
     db 37,DEWGONG   ;  5%
-    db 36,DEWGONG   ;  5%
+    WILDSUB         ;  5% ; IslandMonsB47
     db 40,GOLBAT    ;  4%
     db 43,GOLBAT    ;  1%
     db $0A
@@ -136336,20 +136356,26 @@ IslandMonsB4:
 IslandMonsB40:
     db $20,25,ZUBAT  ; 12%
     db $FF,37,GOLBAT ; 88%
+IslandMonsB47:
+    db $FC,36,DEWGONG     ; 99%
+    db $FF,W_ARTICUNO,$FF ; 01%
 
 MansionMons1:
     db $0A
-    db 29,PONYTA     ; 20%
-    db 25,KOFFING    ; 20%
-    db 32,PONYTA     ; 15%
-    db 28,KOFFING    ; 10%
+    db 27,GROWLITHE  ; 20%
+    db 27,VULPIX     ; 20%
+    db 29,PONYTA     ; 15%
+    db 25,KOFFING    ; 10%
     db 24,GROWLITHE  ; 10%
     db 24,VULPIX     ; 10%
-    db 27,GROWLITHE  ;  5%
-    db 27,VULPIX     ;  5%
+    db 32,PONYTA     ;  5%
+    WILDSUB          ;  5% ; MansionMons17
     db 35,WEEZING    ;  4%
     db 40,RAPIDASH   ;  1% ; Entry Point
     db $00
+MansionMons17:
+    db $FC,28,KOFFING    ; 99%
+    db $FF,W_MOLTRES,$FF ; 01%
 
 MansionMons2:
     db $0A
@@ -136360,10 +136386,13 @@ MansionMons2:
     db 27,PONYTA     ; 10%
     db 31,KOFFING    ; 10%
     db 35,WEEZING    ;  5%
-    db 38,WEEZING    ;  5%
+    WILDSUB          ;  5% ; MansionMons27
     db 37,KOFFING    ;  4%
     WILDSUB          ;  1% ; MansionMons29
     db $00
+MansionMons27:
+    db $FC,38,WEEZING    ; 99%
+    db $FF,W_MOLTRES,$FF ; 01%
 MansionMons29:
     db $20,44,KOFFING ; 12%
     db $FF,40,WEEZING ; 88%
@@ -136377,10 +136406,13 @@ MansionMons3:
     db 35,WEEZING    ; 10%
     db 16,CHARMELEON ; 10% ; Entry Point
     db 25,CHARMELEON ;  5%
-    db 21,CHARMELEON ;  5%
+    WILDSUB          ;  5% ; MansionMons37
     db 29,CHARMELEON ;  4%
     WILDSUB          ;  1% ; MansionMons39
     db $00
+MansionMons37:
+    db $FC,40,WEEZING ; 99%
+    db $FF,W_MOLTRES,$FF ; 01%
 MansionMons39:
     db $7F,05,CHARMANDER ; 50% ; Entry Point
     db $FF,40,CHARIZARD  ; 50% ; Entry Point
@@ -136392,12 +136424,18 @@ MansionMonsB1:
     db 25,PONYTA    ; 15%
     db 28,GROWLITHE ; 10%
     db 28,VULPIX    ; 10%
-    db 29,PONYTA    ; 10%
-    db 38,ARCANINE  ;  5%
-    db 38,NINETALES ;  5% ; Entry Point
+    WILDSUB         ; 10% ; MansionMonsB15
+    db 29,PONYTA    ;  5%
+    WILDSUB         ;  5% ; MansionMonsB17
     db 31,MAGMAR    ;  4% ; Entry Point
     WILDSUB         ;  1% ; MansionMonsB19
     db $00
+MansionMonsB15:
+    db $7F,38,NINETALES ; 50% ; Entry Point
+    db $FF,38,ARCANINE  ; 50%
+MansionMonsB17:
+    db $FC,35,PONYTA     ; 99%
+    db $FF,W_MOLTRES,$FF ; 01%
 MansionMonsB19:
     db $20,02,EEVEE   ; 12%
     db $FF,32,FLAREON ; 88% ; Entry Point
@@ -136440,7 +136478,7 @@ Route23Mons:
     WILDSUB          ; 10% ; Route23Mons4
     db 16,IVYSAUR    ; 10% ; Entry Point
     db 25,IVYSAUR    ;  5%
-    db 21,IVYSAUR    ;  5%
+    db 40,PARASECT   ;  5%
     db 29,IVYSAUR    ;  4%
     WILDSUB          ;  1% ; Route23Mons9
     db $02
@@ -137681,6 +137719,48 @@ WildEevee:
     pop hl
     ret
 
+WildArticuno:
+    ld hl,wEventBeatArticunoBit2
+    bit 2,[hl]
+    jr z,.NotEncounter
+    ld a,ARTICUNO
+    ld [W_ENEMYMONID],a
+    ld a,40
+    ld [W_CURENEMYLVL],a
+    scf ; WillEncounter
+    ret
+.NotEncounter
+    and a ; Reset Carry Flag ; NotEncounter
+    ret
+
+WildZapdos:
+    ld hl,$d7d3 + 1
+    bit 1,[hl]
+    jr z,.NotEncounter
+    ld a,ZAPDOS
+    ld [W_ENEMYMONID],a
+    ld a,40
+    ld [W_CURENEMYLVL],a
+    scf ; WillEncounter
+    ret
+.NotEncounter
+    and a ; Reset Carry Flag ; NotEncounter
+    ret
+
+WildMoltres:
+    ld hl,$d847
+    bit 2,[hl]
+    jr z,.NotEncounter
+    ld a,MOLTRES
+    ld [W_ENEMYMONID],a
+    ld a,40
+    ld [W_CURENEMYLVL],a
+    scf ; WillEncounter
+    ret
+.NotEncounter
+    and a ; Reset Carry Flag ; NotEncounter
+    ret
+
 ; ──────────────────────────────────────────────────────────────────────
 
 LAND EQU 0
@@ -137723,18 +137803,29 @@ WildSubGroupTable:
     WILDSUBGROUP SAFARI_ZONE_WEST,LAND,8,ZoneMons38
     WILDSUBGROUP ROUTE_19,WATR,4,WaterMonsW4
     WILDSUBGROUP ROUTE_20,WATR,4,WaterMonsW4
+    WILDSUBGROUP POWER_PLANT,LAND,7,PowerPlantMons7
     WILDSUBGROUP POWER_PLANT,LAND,9,PowerPlantMons9
     WILDSUBGROUP SEAFOAM_ISLANDS_1,LAND,0,IslandMons10
+    WILDSUBGROUP SEAFOAM_ISLANDS_1,LAND,7,IslandMons17
     WILDSUBGROUP SEAFOAM_ISLANDS_2,LAND,0,IslandMonsB10
+    WILDSUBGROUP SEAFOAM_ISLANDS_2,LAND,7,IslandMonsB17
     WILDSUBGROUP SEAFOAM_ISLANDS_3,LAND,0,IslandMonsB20
     WILDSUBGROUP SEAFOAM_ISLANDS_3,LAND,5,IslandMonsB25
     WILDSUBGROUP SEAFOAM_ISLANDS_3,LAND,6,IslandMonsB26
+    WILDSUBGROUP SEAFOAM_ISLANDS_3,LAND,7,IslandMonsB27
     WILDSUBGROUP SEAFOAM_ISLANDS_4,LAND,0,IslandMonsB30
+    WILDSUBGROUP SEAFOAM_ISLANDS_4,LAND,7,IslandMonsB37
     WILDSUBGROUP SEAFOAM_ISLANDS_4,LAND,9,IslandMonsB39
     WILDSUBGROUP SEAFOAM_ISLANDS_4,WATR,9,IslandMonsB3W9
     WILDSUBGROUP SEAFOAM_ISLANDS_5,LAND,0,IslandMonsB40
+    WILDSUBGROUP SEAFOAM_ISLANDS_5,LAND,7,IslandMonsB47
+    WILDSUBGROUP MANSION_1,LAND,1,MansionMons17
+    WILDSUBGROUP MANSION_2,LAND,7,MansionMons27
     WILDSUBGROUP MANSION_2,LAND,9,MansionMons29
+    WILDSUBGROUP MANSION_3,LAND,7,MansionMons37
     WILDSUBGROUP MANSION_3,LAND,9,MansionMons39
+    WILDSUBGROUP MANSION_4,LAND,5,MansionMonsB15
+    WILDSUBGROUP MANSION_4,LAND,7,MansionMonsB17
     WILDSUBGROUP MANSION_4,LAND,9,MansionMonsB19
     WILDSUBGROUP ROUTE_21,WATR,4,Route21MonsW4
     WILDSUBGROUP ROUTE_23,LAND,0,Route23Mons0
