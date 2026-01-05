@@ -136186,8 +136186,8 @@ PowerPlantMons:
     WILDSUB          ;  1% ; PowerPlantMons9
     db $00
 PowerPlantMons7:
-    db $FC,32,RAICHU    ; 99% ; Entry Point
-    db $FF,W_ZAPDOS,$FF ; 01%
+    db $E6,32,RAICHU    ; 90% ; Entry Point
+    db $FF,W_ZAPDOS,$FF ; 10%
 PowerPlantMons9:
     db $20,02,EEVEE   ; 12%
     db $FF,32,JOLTEON ; 88% ; Entry Point
@@ -136209,8 +136209,8 @@ IslandMons10:
     db $20,20,ZUBAT  ; 12%
     db $FF,25,GOLBAT ; 88%
 IslandMons17:
-    db $FC,25,SLOWPOKE    ; 99%
-    db $FF,W_ARTICUNO,$FF ; 01%
+    db $E6,25,SLOWPOKE    ; 90%
+    db $FF,W_ARTICUNO,$FF ; 10%
 
 IslandMonsB1:
     db $0A
@@ -136229,8 +136229,8 @@ IslandMonsB10:
     db $20,21,ZUBAT  ; 12%
     db $FF,28,GOLBAT ; 88%
 IslandMonsB17:
-    db $FC,30,KINGLER     ; 99%
-    db $FF,W_ARTICUNO,$FF ; 01%
+    db $E6,30,KINGLER     ; 90%
+    db $FF,W_ARTICUNO,$FF ; 10%
 
 IslandMonsB2:
     db $0A
@@ -136255,8 +136255,8 @@ IslandMonsB26:
     db $20,25,SEEL    ; 12%
     db $FF,34,DEWGONG ; 88%
 IslandMonsB27:
-    db $FC,38,SLOWBRO     ; 99%
-    db $FF,W_ARTICUNO,$FF ; 01%
+    db $E6,38,SLOWBRO     ; 90%
+    db $FF,W_ARTICUNO,$FF ; 10%
 
 IslandMonsB3:
     db $0A
@@ -136285,8 +136285,8 @@ IslandMonsB30:
     db $20,24,ZUBAT  ; 12%
     db $FF,36,GOLBAT ; 88%
 IslandMonsB37:
-    db $FC,40,GOLBAT      ; 99%
-    db $FF,W_ARTICUNO,$FF ; 01%
+    db $E6,40,GOLBAT      ; 90%
+    db $FF,W_ARTICUNO,$FF ; 10%
 IslandMonsB39:
     db $20,02,EEVEE    ; 12%
     db $FF,32,VAPOREON ; 88% ; Entry Point
@@ -136321,8 +136321,8 @@ IslandMonsB40:
     db $20,25,ZUBAT  ; 12%
     db $FF,37,GOLBAT ; 88%
 IslandMonsB47:
-    db $FC,36,DEWGONG     ; 99%
-    db $FF,W_ARTICUNO,$FF ; 01%
+    db $E6,36,DEWGONG     ; 90%
+    db $FF,W_ARTICUNO,$FF ; 10%
 
 MansionMons1:
     db $0A
@@ -136338,8 +136338,8 @@ MansionMons1:
     db 40,RAPIDASH   ;  1% ; Entry Point
     db $00
 MansionMons17:
-    db $FC,28,KOFFING    ; 99%
-    db $FF,W_MOLTRES,$FF ; 01%
+    db $E6,28,KOFFING    ; 90%
+    db $FF,W_MOLTRES,$FF ; 10%
 
 MansionMons2:
     db $0A
@@ -136355,8 +136355,8 @@ MansionMons2:
     WILDSUB          ;  1% ; MansionMons29
     db $00
 MansionMons27:
-    db $FC,38,WEEZING    ; 99%
-    db $FF,W_MOLTRES,$FF ; 01%
+    db $E6,38,WEEZING    ; 90%
+    db $FF,W_MOLTRES,$FF ; 10%
 MansionMons29:
     db $20,44,KOFFING ; 12%
     db $FF,40,WEEZING ; 88%
@@ -136375,8 +136375,8 @@ MansionMons3:
     WILDSUB          ;  1% ; MansionMons39
     db $00
 MansionMons37:
-    db $FC,40,WEEZING ; 99%
-    db $FF,W_MOLTRES,$FF ; 01%
+    db $E6,40,WEEZING    ; 90%
+    db $FF,W_MOLTRES,$FF ; 10%
 MansionMons39:
     db $7F,05,CHARMANDER ; 50% ; Entry Point
     db $FF,40,CHARIZARD  ; 50% ; Entry Point
@@ -136398,8 +136398,8 @@ MansionMonsB15:
     db $7F,38,NINETALES ; 50% ; Entry Point
     db $FF,38,ARCANINE  ; 50%
 MansionMonsB17:
-    db $FC,35,PONYTA     ; 99%
-    db $FF,W_MOLTRES,$FF ; 01%
+    db $E6,35,PONYTA     ; 90%
+    db $FF,W_MOLTRES,$FF ; 10%
 MansionMonsB19:
     db $20,02,EEVEE   ; 12%
     db $FF,32,FLAREON ; 88% ; Entry Point
@@ -137569,9 +137569,10 @@ WildSubGroup:
     ld [W_CURENEMYLVL],a
     ld a,[hl]
     ld [W_ENEMYMONID],a
+    cp $FF
     ld hl,GetWildEnemyLevel
     ld b,BANK(GetWildEnemyLevel)
-    call Bankswitch
+    call nz,Bankswitch
     scf ; WillEncounter
     ret
 .NotEncounter
@@ -137702,65 +137703,90 @@ WildEeveeConditions:
     pop hl
     ret
 
+GetLegendaryLevel:
+    ld hl,.WildLegendaryLevelTable
+    call GenRandom
+    ld c,a
+.loop
+    ld a,[hli]
+    cp c
+    jr nc,.found
+    inc hl
+    jr .loop
+.found
+    ld a,[hl]
+    ret
+.WildLegendaryLevelTable
+    db $32,15 ; 20%
+    db $65,20 ; 20%
+    db $8C,25 ; 15%
+    db $A5,30 ; 10%
+    db $BE,35 ; 10%
+    db $D7,10 ; 10%
+    db $E4,40 ;  5%
+    db $F1,45 ;  5%
+    db $FC,50 ;  4%
+    db $FF,55 ;  1%
+
 WildArticuno:
     call WildArticunoConditions
     ret nc ; NotEncounter
     ld a,ARTICUNO
     ld [W_ENEMYMONID],a
-    ld a,40
+    call GetLegendaryLevel
     ld [W_CURENEMYLVL],a
     scf ; WillEncounter
     ret
 
 WildArticunoConditions:
-    ld hl,wEventBeatArticunoBit2
-    bit 2,[hl]
-    jr z,.NotEncounter
+;    ld hl,wEventBeatArticunoBit2
+;    bit 2,[hl]
+;    jr z,.NotEncounter
     scf ; WillEncounter
     ret
-.NotEncounter
-    and a ; Reset Carry Flag ; NotEncounter
-    ret
+;.NotEncounter
+;    and a ; Reset Carry Flag ; NotEncounter
+;    ret
 
 WildZapdos:
     call WildZapdosConditions
     ret nc ; NotEncounter
     ld a,ZAPDOS
     ld [W_ENEMYMONID],a
-    ld a,40
+    call GetLegendaryLevel
     ld [W_CURENEMYLVL],a
     scf ; WillEncounter
     ret
 
 WildZapdosConditions:
-    ld hl,$d7d3 + 1
-    bit 1,[hl]
-    jr z,.NotEncounter
+;    ld hl,$d7d3 + 1
+;    bit 1,[hl]
+;    jr z,.NotEncounter
     scf ; WillEncounter
     ret
-.NotEncounter
-    and a ; Reset Carry Flag ; NotEncounter
-    ret
+;.NotEncounter
+;    and a ; Reset Carry Flag ; NotEncounter
+;    ret
 
 WildMoltres:
     call WildMoltresConditions
     ret nc ; NotEncounter
     ld a,MOLTRES
     ld [W_ENEMYMONID],a
-    ld a,40
+    call GetLegendaryLevel
     ld [W_CURENEMYLVL],a
     scf ; WillEncounter
     ret
 
 WildMoltresConditions:
-    ld hl,$d847
-    bit 2,[hl]
-    jr z,.NotEncounter
+;    ld hl,$d847
+;    bit 2,[hl]
+;    jr z,.NotEncounter
     scf ; WillEncounter
     ret
-.NotEncounter
-    and a ; Reset Carry Flag ; NotEncounter
-    ret
+;.NotEncounter
+;    and a ; Reset Carry Flag ; NotEncounter
+;    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -137820,7 +137846,7 @@ WildSubGroupTable:
     WILDSUBGROUP SEAFOAM_ISLANDS_4,WATR,9,IslandMonsB3W9
     WILDSUBGROUP SEAFOAM_ISLANDS_5,LAND,0,IslandMonsB40
     WILDSUBGROUP SEAFOAM_ISLANDS_5,LAND,7,IslandMonsB47
-    WILDSUBGROUP MANSION_1,LAND,1,MansionMons17
+    WILDSUBGROUP MANSION_1,LAND,7,MansionMons17
     WILDSUBGROUP MANSION_2,LAND,7,MansionMons27
     WILDSUBGROUP MANSION_2,LAND,9,MansionMons29
     WILDSUBGROUP MANSION_3,LAND,7,MansionMons37
