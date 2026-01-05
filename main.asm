@@ -8172,7 +8172,7 @@ Func_314e: ; 314e (0:314e)
     ld hl,Func_1a41d
     jp Bankswitch ; indirect jump to Func_1a41d (1a41d (6:641d))
 
-Func_3156: ; 3156 (0:3156)
+Useless: ; 3156 (0:3156)
     ret
 
 ; stores hl in [W_TRAINERHEADERPTR]
@@ -12100,8 +12100,7 @@ Func_4d72: ; 4d72 (1:4d72)
 DiagonalLines: ; 4d85 (1:4d85)
     INCBIN "gfx/diagonal_lines.2bpp"
 
-Func_4da5: ; 4da5 (1:4da5)
-    ret
+SECTION "Func_4da6",ROMX[$4da6],BANK[1]
 
 Func_4da6: ; 4da6 (1:4da6)
     call GBPalNormal
@@ -13928,7 +13927,7 @@ Func_5a5f: ; 5a5f (1:5a5f)
     jr z,.asm_5a75
     cp $5
     ret nz
-    PREDEF Func_5aaf
+    ds 5 ; ex debug
     jp InitGame
 .asm_5a75
     call Func_5317
@@ -13957,10 +13956,9 @@ Func_5a5f: ; 5a5f (1:5a5f)
     ld [$c0ee],a
     jp PlaySound
 
-Func_5aaf: ; 5aaf (1:5aaf)
-    ret
+SECTION "Func_5ab0",ROMX[$5ab0],BANK[$1]
 
-Func_5ab0:
+Func_5ab0: ; 5ab0 (1:5ab0)
     call Load16BitRegisters
 
 Func_5ab3: ; 5ab3 (1:5ab3)
@@ -14986,7 +14984,7 @@ SpecialWarpIn: ; 62ce (1:62ce)
 .next
     bit 1,[hl]
     jr z,.next3
-    call Func_64ea
+    ds 3 ; ex debug function?
 .next3
     ld a,0
 .next2
@@ -15241,10 +15239,7 @@ Map15FlyWarp:
 Map22FlyWarp:
     FLYWARP_DATA 10,48,12
 
-SECTION "Func_64ea",ROMX[$64ea],BANK[$1]
-
-Func_64ea: ; 64ea (1:64ea)
-    ret
+SECTION "AskForMonNickname",ROMX[$64eb],BANK[$1]
 
 AskForMonNickname: ; 64eb (1:64eb)
     call SaveScreenTilesToBuffer1
@@ -27950,8 +27945,7 @@ Func_f9bf: ; f9bf (3:79bf)
 DataTable_f9d2: ; f9d2 (3:79d2)
     db $40,$40,$00,$80,$80,$20,$c0,$10,$ff
 
-Func_f9db: ; f9db (3:79db)
-    ret
+SECTION "Func_f9dc",ROMX[$79dc],BANK[$3]
 
 Func_f9dc: ; f9dc (3:79dc)
     call Load16BitRegisters
@@ -33645,7 +33639,6 @@ PalletTownScript5: ; 18f56 (6:4f56)
     ret z
     ld hl,$D74B
     set 6,[hl]
-PalletTownScript6: ; 18f87 (6:4f87)
     ret
 
 PalletTownTextPointers: ; 18f88 (6:4f88)
@@ -35396,7 +35389,7 @@ BluesHouseScript: ; 19b3b (6:5b3b)
 
 BluesHouseScriptPointers: ; 19b47 (6:5b47)
     dw BluesHouseScript0
-    dw BluesHouseScript1
+    dw Nope
 
 BluesHouseScript0: ; 19b4b (6:5b4b)
     ld hl,$D74A
@@ -35407,8 +35400,7 @@ BluesHouseScript0: ; 19b4b (6:5b4b)
     ld [W_BLUESHOUSECURSCRIPT],a
     ret
 
-BluesHouseScript1: ; 19b56 (6:5b56)
-    ret
+SECTION "BluesHouseTextPointers",ROMX[$5b57],BANK[$6]
 
 BluesHouseTextPointers: ; 19b57 (6:5b57)
     dw BluesHouseText1
@@ -37305,12 +37297,9 @@ _FuchsiaCityScript:
     jp CallFunctionInTable
 
 FuchsiaCityScriptPointers:
-    dw FuchsiaCityScript0
+    dw Nope
     dw FuchsiaCityScript1
     dw FuchsiaCityScript2
-
-FuchsiaCityScript0:
-    ret
 
 FuchsiaCityScript1:
     ld a,[W_XCOORD]
@@ -37372,7 +37361,7 @@ PalletTownScriptPointers:
     dw PalletTownScript3
     dw PalletTownScript4
     dw PalletTownScript5
-    dw PalletTownScript6
+    dw Nope
 
 PewterCityScriptPointers:
     dw PewterCityScript0
@@ -37542,9 +37531,6 @@ Route2HouseObject:
     EVENT_DISP $4,$7,$2
     EVENT_DISP $4,$7,$3
 
-Route2HouseScript0:
-    ret
-
 Route2HouseScript1:
     ld a,VOLTORB
     ld [$cf91],a
@@ -37600,7 +37586,7 @@ Route2HouseText4:
 .error
     jp TextScriptEnd
 
-CinnabarGymProcessAllGate: ; 1eb0a (7:6b0a)
+CinnabarGymProcessAllGate:
     push bc
     xor a        ; Reset Redraw Flag
     ld [$d12f],a ; ...
@@ -37674,7 +37660,7 @@ CinnabarGymProcessAllGate: ; 1eb0a (7:6b0a)
     ld hl,RedrawMapView
     jp Bankswitch
 
-.CinnabarGymGateCoords ; 1eb48 (7:6b48)
+.CinnabarGymGateCoords
     ; format: LSB Changed Block Address,direction
     ; direction: $54 = horizontal gate,$5f = vertical gate
     ; Note : MSB is ever C7
@@ -38125,7 +38111,7 @@ OaksLabScriptPointers: ; 1cb28 (7:4b28)
     dw OaksLabScript15
     dw OaksLabScript16
     dw OaksLabScript17
-    dw OaksLabScript18
+    dw Nope
 
 OaksLabScript0: ; 1cb4e (7:4b4e)
     ld a,[$d74b]
@@ -38724,8 +38710,7 @@ OaksLabScript17: ; 1cfd4 (7:4fd4)
     ld [W_OAKSLABCURSCRIPT],a
     ret
 
-OaksLabScript18: ; 1d009 (7:5009)
-    ret
+SECTION "OaksLabScript_1d00a",ROMX[$500a],BANK[$7]
 
 OaksLabScript_1d00a: ; 1d00a (7:500a)
     ld hl,wBagItems
@@ -39381,7 +39366,7 @@ ViridianMartScript_1d47d: ; 1d47d (7:547d)
 ViridianMartScriptPointers: ; 1d495 (7:5495)
     dw ViridianMartScript0
     dw ViridianMartScript1
-    dw ViridianMartScript2
+    dw Nope
 
 ViridianMartScript0: ; 1d49b (7:549b)
     call UpdateSprites
@@ -39417,8 +39402,6 @@ ViridianMartScript1: ; 1d4c0 (7:54c0)
     set 1,[hl]
     ld a,$2
     ld [W_VIRIDIANMARKETCURSCRIPT],a
-    ; fallthrough
-ViridianMartScript2: ; 1d4df (7:54df)
     ret
 
 ViridianMartTextPointers: ; 1d4e0 (7:54e0)
@@ -40839,7 +40822,7 @@ Route2HouseScript: ; 1deed (7:5eed)
     jp CallFunctionInTable
 
 Route2HouseScriptPointers:
-    dw Route2HouseScript0
+    dw Nope
     dw Route2HouseScript1
     dw Route2HouseScript2
 
@@ -41716,7 +41699,7 @@ Route22GateScript: ; 1e683 (7:6683)
 Route22GateScriptPointers: ; 1e69e (7:669e)
     dw Route22GateScript0
     dw Route22GateScript1
-    dw Route22GateScript2
+    dw Nope
 
 Route22GateScript0: ; 1e6a4 (7:66a4)
     ld hl,Route22GateScriptCoords
@@ -41751,7 +41734,6 @@ Route22GateScript1: ; 1e6cd (7:66cd)
     call Delay3
     ld a,$0
     ld [W_ROUTE22GATECURSCRIPT],a
-Route22GateScript2: ; 1e6de (7:66de)
     ret
 
 Route22GateTextPointers: ; 1e6df (7:66df)
@@ -41829,15 +41811,14 @@ BillsHouseScript: ; 1e76a (7:676a)
     jp CallFunctionInTable
 
 BillsHouseScriptPointers: ; 1e776 (7:6776)
-    dw BillsHouseScript0
+    dw Nope
     dw BillsHouseScript1
     dw BillsHouseScript2
     dw BillsHouseScript3
     dw BillsHouseScript4
     dw BillsHouseScript5
 
-BillsHouseScript0: ; 1e782 (7:6782)
-    ret
+SECTION "BillsHouseScript1",ROMX[$6783],BANK[$7]
 
 BillsHouseScript1: ; 1e783 (7:6783)
     ld a,[$c109]
@@ -55163,7 +55144,7 @@ Func_3d119: ; 3d119 (f:5119)
     ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
     call CleanLCD_OAM
     PREDEF StatusScreen
-    ; ds 5 ; PREDEF StatusScreen2
+    ; ds 5 ; PREDEF StatusScreen2 (Dismiss)
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
     bit 4,a
     ld hl,AnimationSubstitute
@@ -71081,13 +71062,10 @@ SafariZoneScript:
     jp CallFunctionInTable
 
 SafariZoneScriptPointers:
-    dw SafariZoneEmptyScript
+    dw Nope
     dw SafariZonePostLapras
-    dw SafariZoneEmptyScript
-    dw SafariZoneEmptyScript
-
-SafariZoneEmptyScript:
-    ret
+    dw Nope
+    dw Nope
 
 SafariZoneLapras:
     db $8
@@ -73177,12 +73155,11 @@ CeladonGameCornerScript_48c07: ; 48c07 (12:4c07)
     ret
 
 CeladonGameCornerScriptPointers: ; 48c12 (12:4c12)
-    dw CeladonGameCornerScript0
+    dw Nope
     dw CeladonGameCornerScript1
     dw CeladonGameCornerScript2
 
-CeladonGameCornerScript0: ; 48c18 (12:4c18)
-    ret
+SECTION "CeladonGameCornerScript1",ROMX[$4c19],BANK[$12]
 
 CeladonGameCornerScript1: ; 48c19 (12:4c19)
     ld a,[W_ISINBATTLE]
@@ -75976,11 +75953,8 @@ SafariZoneWestScript:
 
 SafariZoneWestScriptPointers:
     dw SafariZoneWestCheckGhostCoord
-    dw SafariZoneWestEmptyScript
+    dw Nope
     dw SafariZoneWestPostGhost
-
-SafariZoneWestEmptyScript:
-    ret
 
 SafariZoneWestCheckGhostCoord:
     ld hl,wEventRevealSafariGhostBit0
@@ -76480,7 +76454,7 @@ Func_79869Predef:                          NEW_PREDEF Func_79869                
 Func_70b5dPredef:                          NEW_PREDEF Func_70b5d                          ; $34
 Func_c586Predef:                           NEW_PREDEF Func_c586                           ; $35
 StatusScreenPredef:                        NEW_PREDEF StatusScreen                        ; $36
-StatusScreen2Predef:                       NEW_PREDEF StatusScreen2                       ; $37
+ds 3                                                                                      ; $37
 Func_410e2Predef:                          NEW_PREDEF Func_410e2                          ; $38
 CheckEngagePlayerPredef:                   NEW_PREDEF CheckEngagePlayer                   ; $39
 IndexToPokedexPredef:                      NEW_PREDEF IndexToPokedex                      ; $3A
@@ -76502,7 +76476,7 @@ DrawEnemyHUDAndHPBarPredef:                NEW_PREDEF DrawEnemyHUDAndHPBar      
 Func_70f60Predef:                          NEW_PREDEF Func_70f60                          ; $4A
 PrintTypesPredef:                          NEW_PREDEF PrintTypes                          ; $4B
 EmotionBubblePredef:                       NEW_PREDEF EmotionBubble                       ; $4C
-Func_5aafPredef:                           NEW_PREDEF Func_5aaf                           ; $4D
+ds 3                                                                                      ; $4D
 AskForMonNicknamePredef:                   NEW_PREDEF AskForMonNickname                   ; $4E
 Func_37ca1Predef:                          NEW_PREDEF Func_37ca1                          ; $4F
 SaveSAVtoSRAM2Predef:                      NEW_PREDEF SaveSAVtoSRAM2                      ; $50
@@ -76704,13 +76678,12 @@ Route25Blocks: ; 50810 (14:4810)
 IndigoPlateau_h: ; 0x5091e to 0x50935 (23 bytes) (id=9)
     db $17 ; tileset
     db INDIGO_PLATEAU_HEIGHT,INDIGO_PLATEAU_WIDTH ; dimensions (y,x)
-    dw IndigoPlateauBlocks,IndigoPlateauTextPointers,IndigoPlateauScript ; blocks,texts,scripts
+    dw IndigoPlateauBlocks,IndigoPlateauTextPointers,Nope ; blocks,texts,scripts
     db SOUTH ; connections
     SOUTH_MAP_CONNECTION ROUTE_23,ROUTE_23_WIDTH,0,0,ROUTE_23_WIDTH,Route23Blocks,INDIGO_PLATEAU_WIDTH,INDIGO_PLATEAU_HEIGHT
     dw IndigoPlateauObject ; objects
 
-IndigoPlateauScript: ; 50935 (14:4935)
-    ret
+SECTION "IndigoPlateauTextPointers",ROMX[$4936],BANK[$14]
 
 IndigoPlateauTextPointers: ; 50936 (14:4936)
 IndigoPlateauObject: ; 0x50936 (size=20)
@@ -77289,13 +77262,12 @@ Route22ScriptPointers: ; 50ebe (14:4ebe)
     dw Route22Script4
     dw Route22Script5
     dw Route22Script6
-    dw Route22Script7
+    dw Nope
 
 Func_50ece: ; 50ece (14:4ece)
     xor a
     ld [wJoypadForbiddenButtonsMask],a
     ld [W_ROUTE22CURSCRIPT],a
-Route22Script7: ; 50ed5 (14:4ed5)
     ret
 
 Func_50ed6: ; 50ed6 (14:4ed6)
@@ -89190,10 +89162,7 @@ LanceScriptPointers:
     dw DisplayEnemyTrainerTextAndStartBattle
     dw LanceScript2
     dw LanceScript3
-    dw LanceScript4
-
-LanceScript4:
-    ret
+    dw Nope
 
 ;LanceScript0: ; 5a305 (16:6305)
 ;    ld a,[$d866]
@@ -89344,10 +89313,7 @@ HallofFameRoomScriptPointers: ; 5a4b2 (16:64b2)
     dw HallofFameRoomScript0
     dw HallofFameRoomScript1
     dw HallofFameRoomScript2
-    dw HallofFameRoomScript3
-
-HallofFameRoomScript3: ; 5a4ba (16:64ba)
-    ret
+    dw Nope
 
 SECTION "HallofFameRoomScript0",ROMX[$650d],BANK[$16]
 
@@ -89775,9 +89741,7 @@ RedsHouse2FScript: ; 5c0b0 (17:40b0)
     ld a,[W_REDSHOUSE2CURSCRIPT]
     jp CallFunctionInTable
 
-SECTION "RedsHouse2FScript0",ROMX[$40c0],BANK[$17]
-
-RedsHouse2FScript0: ; 5c0c0 (17:40c0)
+RedsHouse2FScript0:
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a
     ld a,8
@@ -89786,8 +89750,7 @@ RedsHouse2FScript0: ; 5c0c0 (17:40c0)
     ld [W_REDSHOUSE2CURSCRIPT],a
     ret
 
-RedsHouse2FScript1: ; 5c0ce (17:40ce)
-    ret
+SECTION "RedsHouse2FTextPointers",ROMX[$40cf],BANK[$17]
 
 RedsHouse2FTextPointers: ; 5c0cf (17:40cf)
     db "@"
@@ -89831,7 +89794,7 @@ MuseumF1Script: ; 5c0f7 (17:40f7)
 
 MuseumF1ScriptPointers: ; 5c109 (17:4109)
     dw MuseumF1Script0
-    dw MuseumF1Script1
+    dw Nope
 
 MuseumF1Script0: ; 5c10d (17:410d)
     ld a,[$d361]
@@ -89850,8 +89813,7 @@ MuseumF1Script0: ; 5c10d (17:410d)
     ld [$ff00+$8c],a
     jp DisplayTextID
 
-MuseumF1Script1: ; 5c12a (17:412a)
-    ret
+SECTION "MuseumF1TextPointers",ROMX[$412b],BANK[$17]
 
 MuseumF1TextPointers: ; 5c12b (17:412b)
     dw MuseumF1Text1
@@ -93763,11 +93725,8 @@ CopycatsHouseF2Script:
     jp CallFunctionInTable
 
 CopycatsHouseF2ScriptPointers:
-    dw CopycatsHouseF2Script0
+    dw Nope
     dw CopycatsHouseF2Script1
-
-CopycatsHouseF2Script0:
-    ret
 
 CopycatsHouseF2Script1:
     call DisplayMonFrontSpriteInBox
@@ -93880,7 +93839,7 @@ BoulderOnSwitch1:
 
 RedsHouse2FScriptPointers:
     dw RedsHouse2FScript0
-    dw RedsHouse2FScript1
+    dw Nope
     dw RedsHouse2FScript2_AfterPikachu
 
 RedsHouse2FScript2_AfterPikachu:
@@ -93907,11 +93866,8 @@ MuseumF2Script:
     jp CallFunctionInTable
 
 MuseumF2ScriptPointers:
-    dw MuseumF2Script0
+    dw Nope
     dw MuseumF2Script1_AfterEevee
-
-MuseumF2Script0:
-    ret
 
 MuseumF2Script1_AfterEevee:
     ld a,[W_ISINBATTLE]
@@ -95613,7 +95569,7 @@ ViridianForestText14:
     TX_FAR _ViridianForestText14
     db "@"
 
-SECTION "SSAnne1_h",ROMX[$5265],BANK[$18]
+SECTION "SSAnne1_h",ROMX[$5259],BANK[$18]
 
 SSAnne1_h: ; 0x61259 to 0x61265 (12 bytes) (id=95)
     db $0d ; tileset
@@ -95700,10 +95656,9 @@ SSAnne2ScriptPointers: ; 613b3 (18:53b3)
     dw SSAnne2Script1
     dw SSAnne2Script2
     dw SSAnne2Script3
-    dw SSAnne2Script4
+    dw Nope
 
-SSAnne2Script4: ; 613bd (18:53bd)
-    ret
+SECTION "SSAnne2Script0",ROMX[$53be],BANK[$18]
 
 SSAnne2Script0: ; 613be (18:53be)
     ld hl,CoordsData_61411 ; $5411
@@ -95942,7 +95897,7 @@ SSAnne4Script:
 SSAnne4ScriptPointers:
     dw SSAnne4Script0
     dw SSAnne4Script1
-    dw SSAnne4Script2
+    dw Nope
 
 SSAnne4Script0:
     ld a,$C7 ; old $e8          ; Hide Basket 2
@@ -95959,9 +95914,6 @@ SSAnne4Script1:
     ld a,$A0
     ld [$c225],a ; Force remove sprite 2 from display
     jp Delay3
-
-SSAnne4Script2:
-    ret
 
 SSAnne4TextPointers:
     dw SSAnne4BasketText
@@ -102426,8 +102378,8 @@ ProcessSGBPacket_: ; 72156 (1c:6156)
     push de
     call Func_7216d
     pop hl
-    call Func_72187
     ret
+    ds 3 ; ex useless call
 .asm_72165
     push de
     call SendSGBPacket
@@ -102456,8 +102408,7 @@ Func_7216d: ; 7216d (1c:616d)
     jr nz,.asm_72174
     ret
 
-Func_72187: ; 72187 (1c:6187)
-    ret
+SECTION "Func_72188",ROMX[$6188],BANK[$1c]
 
 Func_72188: ; 72188 (1c:6188)
     ld b,$80
@@ -108214,7 +108165,7 @@ GaryScript_75f29: ; 75f29 (1d:5f29)
     ret
 
 GaryScriptPointers: ; 75f31 (1d:5f31)
-    dw GaryScript0
+    dw Nope
     dw GaryScript1
     dw GaryScript2
     dw GaryScript3
@@ -108225,9 +108176,6 @@ GaryScriptPointers: ; 75f31 (1d:5f31)
     dw GaryScript8
     dw GaryScript9
     dw GaryScript10
-
-GaryScript0: ; 75f47 (1d:5f47)
-    ret
 
 SECTION "GaryScript2",ROMX[$5f6a],BANK[$1d]
 
@@ -108527,10 +108475,10 @@ LoreleiScriptPointers: ; 761bb (1d:61bb)
     dw DisplayEnemyTrainerTextAndStartBattle
     dw LoreleiScript2
     dw LoreleiScript3
-    dw LoreleiScript4
+    dw Nope
 
-LoreleiScript4: ; 761c5 (1d:61c5)
-    ret
+SECTION "asm_761c6",ROMX[$61c6],BANK[$1d]
+
 asm_761c6: ; 761c6 (1d:61c6)
     ld hl,$ccd3
     ld a,$40
@@ -108691,22 +108639,20 @@ BrunoScript_762ec: ; 762ec (1d:62ec)
 .skip
     jp HallOfFame_ReplaceTileBlock
 
-SECTION "Func_7630d",ROMX[$630d],BANK[$1d]
-
-Func_7630d: ; 7630d (1d:630d)
+Func_7630d:
     xor a
     ld [W_BRUNOCURSCRIPT],a
     ret
 
-BrunoScriptPointers: ; 76312 (1d:6312)
+BrunoScriptPointers:
     dw BrunoScript0
     dw DisplayEnemyTrainerTextAndStartBattle
     dw BrunoScript2
     dw BrunoScript3
-    dw BrunoScript4
+    dw Nope
 
-BrunoScript4: ; 7631c (1d:631c)
-    ret
+SECTION "asm_7631d",ROMX[$631d],BANK[$1d]
+
 asm_7631d: ; 7631d (1d:631d)
     ld hl,$ccd3
     ld a,$40
@@ -108868,22 +108814,20 @@ AgathaScript_76443: ; 76443 (1d:6443)
 .skip
     jp HallOfFame_ReplaceTileBlock
 
-SECTION "Func_76464",ROMX[$6464],BANK[$1d]
-
-Func_76464: ; 76464 (1d:6464)
+Func_76464:
     xor a
     ld [W_AGATHACURSCRIPT],a
     ret
 
-AgathaScriptPointers: ; 76469 (1d:6469)
+AgathaScriptPointers:
     dw AgathaScript0
     dw DisplayEnemyTrainerTextAndStartBattle
     dw AgathaScript2
     dw AgathaScript3
-    dw AgathaScript4
+    dw Nope
 
-AgathaScript4: ; 76473 (1d:6473)
-    ret
+SECTION "asm_76474",ROMX[$6474],BANK[$1d]
+
 asm_76474: ; 76474 (1d:6474)
     ld hl,$ccd3
     ld a,$40
@@ -141250,10 +141194,6 @@ db %01000000    ; Conversion,Tri Attack,Super Fang,Slash,Substitute,Struggle,???
 ; ──────────────────────────────────────────────────────────────────────
 ; STATUS SCREEN START
 ; ──────────────────────────────────────────────────────────────────────
-
-; Predef 0x38
-StatusScreen2:
-    ret
 
 ; Predef 0x37
 StatusScreen:
