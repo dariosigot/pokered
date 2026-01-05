@@ -957,6 +957,17 @@ NewBattle:
     and a
     ret
 
+;appears to be called twice inside function $C38B
+;if $d700,$d11a == $1 then biking
+;if $d700,$d11a == $2 then surfing
+ForceBikeOrSurf:
+    xor a
+    ld [wSurfingMonID],a
+    ld b,5 ;graphics bank 5
+    ld hl,LoadPlayerSpriteGraphics ;load player sprite graphics
+    call Bankswitch ;loads bank 5 and then calls LoadPlayerSpriteGraphics
+    jp PlayDefaultMusicFadeOutCurrent ; jp PlayDefaultMusic ;update map/player state?
+
 ; Free
 
 SECTION "CheckWarpsNoCollision",ROM0[$06b4]
@@ -3025,14 +3036,7 @@ Func_12e7: ; 12e7 (0:12e7)
     res 0,[hl]
     ret
 
-;appears to be called twice inside function $C38B
-;if $d700,$d11a == $1 then biking
-;if $d700,$d11a == $2 then surfing
-ForceBikeOrSurf: ; 12ed (0:12ed)
-    ld b,5 ;graphics bank 5
-    ld hl,LoadPlayerSpriteGraphics ;load player sprite graphics
-    call Bankswitch ;loads bank 5 and then calls LoadPlayerSpriteGraphics
-    jp PlayDefaultMusicFadeOutCurrent ; jp PlayDefaultMusic ;update map/player state?
+SECTION "CheckForUserInterruption",ROM0[$12f8]
 
 ; this is used to check if the player wants to interrupt the opening sequence at several points
 ; XXX is this used anywhere else?
