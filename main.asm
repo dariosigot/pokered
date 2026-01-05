@@ -939,11 +939,9 @@ OverworldLoop: ; 03ff (0:03ff)
     call RunMapScript
     jp HandleBlackOut
 
-SECTION "NewBattle",ROM0[$0682]
-
 ; function to determine if there will be a battle and execute it (either a trainer battle or wild battle)
 ; sets carry if a battle occurred and unsets carry if not
-NewBattle: ; 0682 (0:0682)
+NewBattle:
     ld a,[$d72d]
     bit 4,a
     jr nz,.noBattle
@@ -959,19 +957,7 @@ NewBattle: ; 0682 (0:0682)
     and a
     ret
 
-SpeedUp: ; 069f (0:069f) ; Denim,20 BYTE a disposizione
-    ld a,[$d700] ; if 0 -> walk,if 1 -> byke
-    and a
-    jr z,TrySpeedUpWithB ; if walk
-    dec a
-    jp z,SpeedUpByke
-    jp TrySpeedUpSurf ; if 2 -> surf
-
-TrySpeedUpWithB:
-    ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
-    and a,%00000010 ; bit mask for B
-    ret z
-    jp AdvancePlayerSprite ; Speed 2X
+; Free
 
 SECTION "CheckWarpsNoCollision",ROM0[$06b4]
 
@@ -1289,10 +1275,9 @@ PlayMapChangeSound: ; 08c9 (0:08c9)
 .playSound
     jp PlaySound
 
-TrySpeedUpSurf:
-    call IsSurfingOnLapras
-    ret nz
-    jp TrySpeedUpWithB
+; sets opponent type and mon set/lvl based on the engaging trainer data
+InitBattleEnemyParameters:
+    PREDEF_JUMP _InitBattleEnemyParameters
 
 SECTION "CheckIfInOutsideMap",ROM0[$08e1]
 
@@ -8428,9 +8413,33 @@ EndTrainerBattle: ; 3275 (0:3275)
     ret nz
     jp ResetButtonPressedAndMapScript
 
-; sets opponent type and mon set/lvl based on the engaging trainer data
-InitBattleEnemyParameters:
-    PREDEF_JUMP _InitBattleEnemyParameters
+SpeedUp:
+    ld a,[$d700] ; if 0 -> walk,if 1 -> byke
+    and a
+    jr z,TrySpeedUpWithB ; if walk
+    dec a
+    jp z,SpeedUpByke
+;SpeedUpSurf
+    call IsSurfingOnLapras
+    ret nz
+    call TrySpeedUpWithB
+    ret z
+    call TrySpeedUpWithA
+    ; fall through
+
+TrySpeedUpWithA:
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
+    and a,%00000001 ; bit mask for A
+    jr TrySpeedUpCommon
+TrySpeedUpWithB:
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
+    and a,%00000010 ; bit mask for B
+TrySpeedUpCommon:
+    ret z
+    push af
+    call AdvancePlayerSprite ; Speed 2X
+    pop af
+    ret
 
 ; Free
 
@@ -9099,7 +9108,20 @@ Func_366b: ; 366b (0:366b)
     pop hl
     ret
 
-; Free Space
+SpeedUpByke: ; Denim,Speed Walk and Byke
+    call GetCurrentOldAdventureMap
+    cp a,ROUTE_17 ; Cycling Road
+    jr nz,.normalByke
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
+    and a,%01110000 ; bit mask for up,left,right buttons
+    jr nz,.TrySpeedUpWithB
+.normalByke
+    call AdvancePlayerSprite ; Speed 2X
+    call TrySpeedUpWithB     ; Speed 3X
+.TrySpeedUpWithB
+    jp TrySpeedUpWithB       ; Speed 4X
+
+; Free
 
 SECTION "LoadTextBoxTilePatterns",ROM0[$36a0]
 
@@ -10818,18 +10840,6 @@ PointerTable_3f22: ; 3f22 (0:3f22)
     dw UnnamedText_fbe8                     ; id = 40
     dw UnnamedText_fc0d                     ; id = 41
     dw UnnamedText_fc45                     ; id = 42
-
-SpeedUpByke: ; Denim,Speed Walk and Byke
-    call GetCurrentOldAdventureMap
-    cp a,ROUTE_17 ; Cycling Road
-    jr nz,.normalByke
-    ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
-    and a,%01110000 ; bit mask for up,left,right buttons
-    jp nz,TrySpeedUpWithB
-.normalByke
-    call AdvancePlayerSprite ; Speed 2X
-    call TrySpeedUpWithB     ; Speed 3X
-    jp TrySpeedUpWithB       ; Speed 4X
 
 ; INPUT hl = giusto indirizzo degli IV del pokemon interessato
 ; W_ENEMYMONATKDEFIV ; .Front
