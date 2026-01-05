@@ -939,11 +939,11 @@ OverworldLoop: ; 03ff (0:03ff)
     call RunMapScript
     jp HandleBlackOut
 
-SECTION "NewBattle",ROM0[$0683]
+SECTION "NewBattle",ROM0[$0682]
 
 ; function to determine if there will be a battle and execute it (either a trainer battle or wild battle)
 ; sets carry if a battle occurred and unsets carry if not
-NewBattle: ; 0683 (0:0683)
+NewBattle: ; 0682 (0:0682)
     ld a,[$d72d]
     bit 4,a
     jr nz,.noBattle
@@ -959,13 +959,13 @@ NewBattle: ; 0683 (0:0683)
     and a
     ret
 
-SpeedUp: ; 06a0 (0:06a0) ; Denim,20 BYTE a disposizione
+SpeedUp: ; 069f (0:069f) ; Denim,20 BYTE a disposizione
     ld a,[$d700] ; if 0 -> walk,if 1 -> byke
     and a
     jr z,TrySpeedUpWithB ; if walk
     dec a
     jp z,SpeedUpByke
-    ret ; if 2 -> surf
+    jp TrySpeedUpSurf ; if 2 -> surf
 
 TrySpeedUpWithB:
     ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
@@ -1124,7 +1124,10 @@ WarpFound2: ; 073c (0:073c)
     call Func_12da
     jp EnterMap
 
-; Free
+IsSurfingOnLapras:
+    ld a,[wSurfingMonID]
+    cp LAPRAS
+    ret
 
 SECTION "ContinueCheckWarpsNoCollisionLoop",ROM0[$07b5]
 
@@ -1286,7 +1289,10 @@ PlayMapChangeSound: ; 08c9 (0:08c9)
 .playSound
     jp PlaySound
 
-; Free
+TrySpeedUpSurf:
+    call IsSurfingOnLapras
+    ret nz
+    jp TrySpeedUpWithB
 
 SECTION "CheckIfInOutsideMap",ROM0[$08e1]
 
@@ -1410,20 +1416,19 @@ LoadPlayerSpriteGraphics: ; 0997 (0:0997)
     xor a
     ld [$d700],a
     ld [$d11a],a
-    jp LoadWalkingPlayerSpriteGraphics
 .determineGraphics
     ld a,[$d700]
     and a
     jp z,LoadWalkingPlayerSpriteGraphics
     dec a
     jp z,LoadBikePlayerSpriteGraphics
-    dec a
-    jp z,LoadSurfingPlayerSpriteGraphics
-    jp LoadWalkingPlayerSpriteGraphics
+    call IsSurfingOnLapras
+    jp z,LoadSurfingLaprasSpriteGraphics
+    jp LoadSurfingPlayerSpriteGraphics
 
 ; function to check if bike riding is allowed on the current map
 ; sets carry if bike is allowed,clears carry otherwise
-IsBikeRidingAllowed: ; 09c5 (0:09c5)
+IsBikeRidingAllowed:
     call GetCurrentOldAdventureMap
     cp a,ROUTE_23
     jr z,.allowed
@@ -1431,7 +1436,7 @@ IsBikeRidingAllowed: ; 09c5 (0:09c5)
     jr z,.allowed
     ld a,[W_CURMAPTILESET]
     ld b,a
-    ld hl,BikeRidingTilesets
+    ld hl,.BikeRidingTilesets
 .loop
     ld a,[hli]
     cp b
@@ -1443,10 +1448,10 @@ IsBikeRidingAllowed: ; 09c5 (0:09c5)
 .allowed
     scf
     ret
-
-BikeRidingTilesets: ; 09e2 (0:09e2)
+.BikeRidingTilesets
     db $00,$03,$0B,$11,$FF
-    ds 1
+
+SECTION "LoadTilesetTilePatternData",ROM0[$09e8]
 
 ; load the tile pattern data of the current tileset into VRAM
 LoadTilesetTilePatternData: ; 09e8 (0:09e8)
@@ -2602,26 +2607,27 @@ RunMapScript: ; 101b (0:101b)
 .return
     ret
 
-LoadWalkingPlayerSpriteGraphics: ; 104d (0:104d)
-    ld de,RedSprite ; $4180
-    ld hl,$8000
-    jr LoadPlayerSpriteGraphicsCommon
-
-LoadSurfingPlayerSpriteGraphics: ; 1055 (0:1055)
-    ld de,FloatSprite
-    ld hl,$8000
-    jr LoadPlayerSpriteGraphicsCommon
-
-LoadBikePlayerSpriteGraphics: ; 105d (0:105d)
-    ld de,RedCyclingSprite
-    ld hl,$8000
-
-LoadPlayerSpriteGraphicsCommon: ; 1063 (0:1063)
-    push de
-    push hl
+LoadWalkingPlayerSpriteGraphics:
+    ld de,RedSprite
     ld bc,(BANK(RedSprite) << 8) + $0c
+    jr LoadPlayerSpriteGraphicsCommon
+
+LoadSurfingPlayerSpriteGraphics:
+    ld de,FloatSprite
+    ld bc,(BANK(FloatSprite) << 8) + $0c
+    jr LoadPlayerSpriteGraphicsCommon
+
+LoadBikePlayerSpriteGraphics:
+    ld de,RedCyclingSprite
+    ld bc,(BANK(RedCyclingSprite) << 8) + $0c
+    ; fall through
+
+LoadPlayerSpriteGraphicsCommon:
+    ld hl,$8000
+    push de
+    push bc
     call CopyVideoData
-    pop hl
+    pop bc
     pop de
     ld a,$c0
     add e
@@ -2629,9 +2635,10 @@ LoadPlayerSpriteGraphicsCommon: ; 1063 (0:1063)
     jr nc,.noCarry
     inc d
 .noCarry
-    set 3,h
-    ld bc,$050c
+    ld hl,$8800
     jp CopyVideoData
+
+SECTION "LoadMapHeader",ROM0[$107c]
 
 ; function to load data from the map header
 LoadMapHeader: ; 107c (0:107c)
@@ -6231,6 +6238,39 @@ GetTileOffset:
     pop de
     pop hl
     ld d,a
+    ret
+
+LoadSurfingLaprasSpriteGraphics:
+    ld de,MonOverworldDataNew2_emimonserrate+($80*((DEX_LAPRAS)%(128)))
+    ld bc,(BANK(MonOverworldDataNew2_emimonserrate) << 8) + $0c
+    ld hl,$8000
+    call .CopyVideoDataFromEmimom
+    ld a,$40
+    add e
+    ld e,a
+    jr nc,.noCarry
+    inc d
+.noCarry
+    ld hl,$8800
+    ; fall through
+
+.CopyVideoDataFromEmimom
+    ld a,3
+.Loop4Tile3Times
+    push af
+    push bc
+    push de
+    push hl
+    ld c,4
+    call GoodCopyVideoData
+    pop hl
+    ld de,$40
+    add hl,de
+    pop de
+    pop bc
+    pop af
+    dec a
+    jr nz,.Loop4Tile3Times
     ret
 
 ; Free
@@ -17636,7 +17676,13 @@ FieldMovesMenu: ; 76e1 (1:36e1)
 .LoopFieldMoves
     push hl
     ld hl,.FieldMoveNames
+    call .GetMonID
+    CP LAPRAS
     ld a,[de]
+    jr nz,.NotLapras
+    cp $05 ; Lapras' SURF
+    jr z,.LaprasSurf
+.NotLapras
     and a
     jr z,.LoopFieldMovesEnd
     inc de
@@ -17664,6 +17710,22 @@ FieldMovesMenu: ; 76e1 (1:36e1)
 .LoopFieldMovesEnd
     pop hl
     ret
+.LaprasSurf
+    ld hl,.FieldMoveSurfException
+    inc de
+    jr .LoopMoveNamesEnd
+.GetMonID
+    push hl
+    push bc
+    ld a,[$cf92]
+    ld hl,W_PARTYMON1
+    ld c,a
+    ld b,0
+    add hl,bc
+    ld a,[hl]
+    pop bc
+    pop hl
+    ret
 
 .FieldMoveNames
     db "FLY@"    ; Move : SWOOP
@@ -17674,6 +17736,9 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     db "STR.TH@" ; Move : STRIKE
     db "LIGHT@"  ; Move : FLASH
     db "HEAL@"   ; Move : SOFTBOILED
+
+.FieldMoveSurfException
+    db "SURF@"
 
 ChoiceMonSimpleMenu:
     call GetMonFieldMoves
@@ -28094,7 +28159,11 @@ UsingDigCry:
 SurfingCry:
     ld a,[$d152]
     and a ; using surfboard?
-    call nz,PlayCryAndDecreaseFieldMoveEnergy
+    jr z,.skip
+    ld a,[wFieldMoveMonID]
+    ld [wSurfingMonID],a
+    call PlayCryAndDecreaseFieldMoveEnergy
+.skip
     ld hl,SurfingGotOnText
     ret
 
@@ -132858,6 +132927,7 @@ SelectInOverWorld:
     jp c,.noFloat
     ld b,SURFBOARD
     call .IsItemInBag
+    ld a,0 ; wSurfingMonID
     jr nz,.canFloatNoCry
     ld hl,$d857 ; WaterPower
     bit 0,[hl]  ; ...
@@ -132867,7 +132937,14 @@ SelectInOverWorld:
     jr nc,.noFloat
 .canFloat
     call .PlayCry
+    ld a,[wWhichPokemon]
+    ld hl,W_PARTYMON1
+    ld b,0
+    ld c,a
+    add hl,bc
+    ld a,[hl]
 .canFloatNoCry
+    ld [wSurfingMonID],a
     call .StartCustomSelectFunction
     ld a,SURFBOARD
     ld [$cf91],a

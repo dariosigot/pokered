@@ -1689,6 +1689,8 @@ ds 1 ; $d728
 wPalletPikachuIV_AtkDef:: db ; $d729
 wPalletPikachuIV_SpdSpc:: db ; $d72a
 
+wSurfingMonID:: db ; $d72b
+
 SECTION "W_FLAGS_D733",WRAMX[$d733],BANK[$1]
 
 W_FLAGS_D733: ; d733
