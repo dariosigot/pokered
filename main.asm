@@ -136483,11 +136483,15 @@ PlateauMons1:
     db 43,GRAVELER ;  5%
     db 38,MACHOKE  ;  5%
     db 45,GRAVELER ;  4%
-    db 44,MACHOKE  ;  1%
+    WILDSUB        ;  1% ; PlateauMons19
     db $00
 PlateauMons10:
     db $20,26,ZUBAT  ; 12%
     db $FF,31,GOLBAT ; 88%
+PlateauMons19:
+    db $55,44,MACHOKE    ; 33%
+    db $AA,39,HITMONLEE  ; 33%
+    db $FF,39,HITMONCHAN ; 33%
 
 PlateauMons2:
     db $0A
@@ -137864,6 +137868,7 @@ WildSubGroupTable:
     WILDSUBGROUP ROUTE_23,LAND,4,Route23Mons4
     WILDSUBGROUP ROUTE_23,LAND,9,Route23Mons9
     WILDSUBGROUP VICTORY_ROAD_1,LAND,0,PlateauMons10
+    WILDSUBGROUP VICTORY_ROAD_1,LAND,9,PlateauMons19
     WILDSUBGROUP VICTORY_ROAD_2,LAND,0,PlateauMons20
     WILDSUBGROUP VICTORY_ROAD_2,LAND,5,PlateauMons25
     WILDSUBGROUP VICTORY_ROAD_2,LAND,6,PlateauMons26
