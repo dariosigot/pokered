@@ -135728,8 +135728,11 @@ TunnelMonsB2:
     db 18,MACHOP   ;  5%
     db 21,ONIX     ;  5%
     db 22,GOLBAT   ;  4%
-    db 25,GRAVELER ;  1% ; Entry Point
+    WILDSUB        ;  1% ; TunnelMonsB29
     db $00
+TunnelMonsB29:
+    db $AA,25,GRAVELER ; 66% ; Entry Point
+    db $FF,28,MACHOKE  ; 33% ; Entry Point
 
 Route8Mons:
     db $0F
@@ -136478,7 +136481,7 @@ PlateauMons1:
     db 45,ONIX     ; 10%
     db 47,ONIX     ; 10%
     db 43,GRAVELER ;  5%
-    db 38,MACHOKE  ;  5% ; Entry Point
+    db 38,MACHOKE  ;  5%
     db 45,GRAVELER ;  4%
     db 44,MACHOKE  ;  1%
     db $00
@@ -137808,6 +137811,7 @@ WildSubGroupTable:
     WILDSUBGROUP DIGLETTS_CAVE,LAND,5,CaveMons5
     WILDSUBGROUP DIGLETTS_CAVE,LAND,8,CaveMons8
     WILDSUBGROUP ROUTE_10,LAND,4,Route10Mons4
+    WILDSUBGROUP ROCK_TUNNEL_2,LAND,9,TunnelMonsB29
     WILDSUBGROUP ROUTE_8,LAND,2,Route8Mons2
     WILDSUBGROUP ROUTE_8,LAND,5,Route8Mons5
     WILDSUBGROUP ROUTE_8,LAND,8,Route8Mons8
