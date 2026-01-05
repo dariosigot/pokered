@@ -31605,7 +31605,7 @@ CheckMapEncounterException:
     call GetCurrentOldAdventureMap
     cp REDS_HOUSE_2F ; Pallet Town's Pikachu
     ret z
-    cp PEWTER_CITY ; Pewter City's Eevee
+    cp MUSEUM_2F ; Pewter City's Eevee
     ret
 
 EvolutionAfterBattlePlus:
@@ -37382,23 +37382,6 @@ PewterCityScriptPointers:
     dw PewterCityScript4
     dw PewterCityScript5
     dw PewterCityScript6
-    dw PewterCityScript7_AfterEevee
-
-PewterCityScript7_AfterEevee:
-    ld a,[W_ISINBATTLE]
-    cp $ff
-    jr z,.end
-    ld a,[wBattleResult]
-    cp $2
-    jr z,.end
-    ld hl,wDisableEncounterBit3
-    set 3,[hl] ; Set Flag to Disable Encounter
-.end
-    xor a
-    ld [wJoypadForbiddenButtonsMask],a
-    ld [W_CURMAPSCRIPT],a
-    ld [W_PEWTERCITYCURSCRIPT],a
-    ret
 
 DisableRoute22Rival1stBattle:
     ld a,$22
@@ -90122,8 +90105,7 @@ MuseumF2_h: ; 0x5c30b to 0x5c317 (12 bytes) (id=53)
     db $00 ; connections
     dw MuseumF2Object ; objects
 
-MuseumF2Script: ; 5c317 (17:4317)
-    jp EnableAutoTextBoxDrawing
+SECTION "MuseumF2TextPointers",ROMX[$431a],BANK[$17]
 
 MuseumF2TextPointers: ; 5c31a (17:431a)
     dw MuseumF2Text1
@@ -93916,6 +93898,35 @@ RedsHouse2FScript2_AfterPikachu:
     inc a
     ld [W_CURMAPSCRIPT],a
     ld [W_REDSHOUSE2CURSCRIPT],a
+    ret
+
+MuseumF2Script:
+    call EnableAutoTextBoxDrawing
+    ld hl,MuseumF2ScriptPointers
+    ld a,[W_MUSEUM2FCURSCRIPT]
+    jp CallFunctionInTable
+
+MuseumF2ScriptPointers:
+    dw MuseumF2Script0
+    dw MuseumF2Script1_AfterEevee
+
+MuseumF2Script0:
+    ret
+
+MuseumF2Script1_AfterEevee:
+    ld a,[W_ISINBATTLE]
+    cp $ff
+    jr z,.end
+    ld a,[wBattleResult]
+    cp $2
+    jr z,.end
+    ld hl,wDisableEncounterBit3
+    set 3,[hl] ; Set Flag to Disable Encounter
+.end
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a
+    ld [W_CURMAPSCRIPT],a
+    ld [W_MUSEUM2FCURSCRIPT],a
     ret
 
 ; ───────────────────────────────────────────
@@ -135058,7 +135069,7 @@ LoadWildData:
 WildDataPointers:
     dw PalletMons    ; PALLET_TOWN
     dw NoMons        ; VIRIDIAN_CITY
-    dw PewterMons    ; PEWTER_CITY
+    dw NoMons        ; PEWTER_CITY
     dw CeruleanMons  ; CERULEAN_CITY
     dw NoMons        ; LAVENDER_TOWN
     dw VermilionMons ; VERMILION_CITY
@@ -135109,7 +135120,7 @@ WildDataPointers:
     dw NoMons
     dw ForestMons ; ViridianForest
     dw NoMons
-    dw NoMons
+    dw Museum2FMons ; MUSEUM_2F
     dw NoMons
     dw NoMons
     dw NoMons
@@ -135352,7 +135363,7 @@ PalletMons:
     db 35,KINGLER  ;  4%
     db 38,CLOYSTER ;  1%
 
-PewterMons:
+Museum2FMons:
     db $05
     db W_EEVEE,$FF ; 20%
     db W_EEVEE,$FF ; 20%
@@ -137712,8 +137723,8 @@ WildPikachuConditions:
 WildEevee:
     call WildEeveeConditions
     ret nc ; NotEncounter
-    ld a,7
-    ld [W_PEWTERCITYCURSCRIPT],a
+    ld a,1 ; MuseumF2Script1_AfterEevee
+    ld [W_MUSEUM2FCURSCRIPT],a
     ld a,EEVEE ; Entry Point
     ld [W_ENEMYMONID],a
     ld a,1
@@ -139219,7 +139230,7 @@ ForceShinyOrRandom_:
     jp z,.Tower6
     cp REDS_HOUSE_2F
     jp z,.PalletTown
-    cp PEWTER_CITY
+    cp MUSEUM_2F
     jp z,.PewterCity
     ; fall through
 .Random
@@ -143606,7 +143617,7 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     cp EEVEE
     ret nz
     call GetCurrentOldAdventureMap
-    cp PEWTER_CITY
+    cp MUSEUM_2F
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
