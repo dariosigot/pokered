@@ -6230,37 +6230,41 @@ GetTileOffset:
     ret
 
 LoadSurfingLaprasSpriteGraphics:
-    ld de,MonOverworldDataNew2_emimonserrate+($80*((DEX_LAPRAS)%(128)))
-    ld bc,(BANK(MonOverworldDataNew2_emimonserrate) << 8) + $0c
-    ld hl,$8000
-    call .CopyVideoDataFromEmimom
-    ld a,$40
-    add e
-    ld e,a
-    jr nc,.noCarry
-    inc d
-.noCarry
-    ld hl,$8800
-    ; fall through
+    ld de,LaprasSprite
+    ld bc,(BANK(LaprasSprite) << 8) + $0c
+    jp LoadPlayerSpriteGraphicsCommon
 
-.CopyVideoDataFromEmimom
-    ld a,3
-.Loop4Tile3Times
-    push af
-    push bc
-    push de
-    push hl
-    ld c,4
-    call GoodCopyVideoData
-    pop hl
-    ld de,$40
-    add hl,de
-    pop de
-    pop bc
-    pop af
-    dec a
-    jr nz,.Loop4Tile3Times
-    ret
+;    ld de,MonOverworldDataNew2_emimonserrate+($80*((DEX_LAPRAS)%(128)))
+;    ld bc,(BANK(MonOverworldDataNew2_emimonserrate) << 8) + $0c
+;    ld hl,$8000
+;    call .CopyVideoDataFromEmimom
+;    ld a,$40
+;    add e
+;    ld e,a
+;    jr nc,.noCarry
+;    inc d
+;.noCarry
+;    ld hl,$8800
+;    ; fall through
+;
+;.CopyVideoDataFromEmimom
+;    ld a,3
+;.Loop4Tile3Times
+;    push af
+;    push bc
+;    push de
+;    push hl
+;    ld c,4
+;    call GoodCopyVideoData
+;    pop hl
+;    ld de,$40
+;    add hl,de
+;    pop de
+;    pop bc
+;    pop af
+;    dec a
+;    jr nz,.Loop4Tile3Times
+;    ret
 
 ; Free
 
@@ -31858,6 +31862,8 @@ YoungBoySprite: ; 16f40 (5:6f40)
     INCBIN "gfx/sprites/young_boy.2bpp" ; was $16f40
 GameboyKidSprite: ; 17000 (5:7000)
     INCBIN "gfx/sprites/gameboy_kid.2bpp" ; was $17000
+LaprasSprite:
+    INCBIN "gfx/denim/lapras.2bpp"
 SECTION "AgathaSprite",ROMX[$7240],BANK[$5]
 AgathaSprite: ; 17240 (5:7240)
     INCBIN "gfx/sprites/agatha.2bpp" ; was $17240
