@@ -22638,6 +22638,36 @@ CheckItemOnActive:
     cp b
     ret ; z if active mon is choice in battle
 
+SurfingCry:
+    ld a,[$d152]
+    and a ; using surfboard?
+    jr z,.skip
+    ld a,[wFieldMoveMonID]
+    ld [wSurfingMonID],a
+    call PlayCryAndDecreaseFieldMoveEnergy
+.skip
+    call IsSurfingOnLapras
+    ld hl,SurfingGotOnText
+    ret nz
+    ld hl,.SurfingOnLaprasText
+    ret
+.SurfingOnLaprasText:
+    TX_FAR _SurfingOnLaprasText
+    db "@"
+
+SurfingAttemptFailed:
+    ld hl,ItemUseFailed
+    push hl ; return pointer
+    ld a,[wFieldMoveMonID]
+    cp LAPRAS
+    ld hl,NoSurfingHereText
+    ret nz
+    ld hl,.NoSurfingOnLaprasHereText
+    ret
+.NoSurfingOnLaprasHereText
+    TX_FAR _NoSurfingOnLaprasHereText
+    db "@"
+
 ; Free
 
 SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
@@ -25471,15 +25501,14 @@ NoCyclingAllowedHere: ; e5ac (3:65ac)
 
 BoxFullCannotThrowBall: ; e5b1 (3:65b1)
     ld hl,BoxFullCannotThrowBallText
-    jr ItemUseFailed
+    ; fall through
 
-SurfingAttemptFailed: ; e5b6 (3:65b6)
-    ld hl,NoSurfingHereText
-
-ItemUseFailed: ; e5b9 (3:65b9)
+ItemUseFailed:
     xor a
     ld [$cd6a],a ; item use failed
     jp PrintText
+
+SECTION "ItemUseNotTimeText",ROMX[$65c0],BANK[$3]
 
 ItemUseNotTimeText: ; e5c0 (3:65c0)
     TX_FAR _ItemUseNotTimeText
@@ -28172,17 +28201,6 @@ UsingDigCry:
     push af
     call PlayCryAndDecreaseFieldMoveEnergy
     pop af
-    ret
-
-SurfingCry:
-    ld a,[$d152]
-    and a ; using surfboard?
-    jr z,.skip
-    ld a,[wFieldMoveMonID]
-    ld [wSurfingMonID],a
-    call PlayCryAndDecreaseFieldMoveEnergy
-.skip
-    ld hl,SurfingGotOnText
     ret
 
 ; Free
@@ -131903,6 +131921,18 @@ _ReceivedTM28Text:
 _EndSurfText:
     db $0,$52," retrieves",$4f
     db "bag!",$58
+
+_SurfingOnLaprasText:
+    db $0,$52," got on",$4f
+    db "@"
+    TX_RAM $cd6d
+    db $0,"!",$58
+
+_NoSurfingOnLaprasHereText:
+    db $0,"No SURFing on",$4f
+    db "@"
+    TX_RAM $cd6d
+    db $0," here!",$58
 
 SECTION "bank2A",ROMX,BANK[$2A]
 
