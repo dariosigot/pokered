@@ -56,12 +56,12 @@ MAIN EDIT
                                         | CUT        | BLADE       | CUT          |
                                         | FLY        | SWOOP       | FLY          |
                                         | SURF       | TSUNAMI     | FLOAT        |
-                                        | STRENGHT   | STRIKE      | STRENGHT     |
+                                        | STRENGTH   | STRIKE      | STRENGTH     |
                                         | FLASH      | LIGHT       | FLASH        |
                                         | DIG        | TRAPHOLE    | DIG          |
                                         | TELEPORT   | TELEPORT    | TELEPORT     |
                                         | SOFTBOILED | SOFTBOILED  | HEAL         |
-• Handle Field Move (CUT, FLY, ...) by Pkmn Type (ex. Charizard can Cut,Fly,Strenght,Light and Dig every time) and delete move dependence.
+• Handle Field Move (CUT, FLY, ...) by Pkmn Type (ex. Charizard can Cut,Fly,Strength,Light and Dig every time) and delete move dependence.
   Now a Pkmn can use its internal field move only with correct badge and after the player obtains a specific POWER.
   POWER location is the same of old HM (totally removed)
 • Custom TM Name with short Move Text 
@@ -69,7 +69,7 @@ MAIN EDIT
 • Red Ball Icon in Battle
 • Dinamic Exp Bar in Battle and Status Screen (like Gen II)
 • Smart Item Function with SELECT in Overworld (ROD + Bike)
-• Smart Field Move Function with B+SELECT in Overworld (CUT/FLOAT/LIGHT/STRENGHT)
+• Smart Field Move Function with B+SELECT in Overworld (CUT/FLOAT/LIGHT/STRENGTH)
 • Restyle Lance's Room
 • Handle Party's Mini Sprite for Every Pkmn
 • Disable Bike and Float Sound (exception for Bike Road and Sea Route)
@@ -81,7 +81,7 @@ MAIN EDIT
 • Totally Change Gym Leader and Bosses Team and Moves
 • Totally Rewrite WildData
 • Trainer's Pkmn now have random Internal Value (IV) - Trainer Class Low Limit
-• Improve Trainer Strenght by IV and stat exp
+• Improve Trainer Strength by IV and stat exp
   (Set Stat Experience to Max(0,L-5)*Max(0,L-5)*7 to Trainer Pkmn)
 • Adjust Some Trainer Level to Evolution Logic
 • Exchange TM29 and TM46 (Psychic and Psywave)

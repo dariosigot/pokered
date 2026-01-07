@@ -2552,21 +2552,24 @@ HackForOtherText:
     jp z,CloseTextDisplay
     cp $fe
     jr z,.FlashLightText
+    cp $fd
+    jr z,.StrengthText
     ld a,[$d4e1] ; number of sprites
     jp ReturnInDisplayTextIDHack
 .FlashLightText
     ld hl,.flashLightsAreaText
+.TextEnd
     call PrintText
     jp AfterDisplayingTextID
 .flashLightsAreaText
     TX_FAR _FlashLightsAreaText
     db "@"
-
-CheckDarkMap:
-    push af
-    PREDEF _CheckDarkMap
-    pop af
-    ret
+.StrengthText
+    ld hl,.UnnamedText_cdbb
+    jr .TextEnd
+.UnnamedText_cdbb:
+    TX_FAR _UnnamedText_cdbb
+    db "@"
 
 ; Free
 
@@ -6265,6 +6268,12 @@ LoadSurfingLaprasSpriteGraphics:
 ;    dec a
 ;    jr nz,.Loop4Tile3Times
 ;    ret
+
+CheckDarkMap:
+    push af
+    PREDEF _CheckDarkMap
+    pop af
+    ret
 
 ; Free
 
@@ -23830,6 +23839,8 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     set 7,[hl]
     ld a,2
     ld [$d700],a ; change player state to surfing
+    ld hl,$d728 ; Disable Strength
+    res 0,[hl]  ; ...
     call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play surfing music
     ld hl,.HandleSurfboardTextMessage
     jp RunOnlyIfNotSelectInOverworld
@@ -28458,13 +28469,36 @@ ResetIVAndCheckIsInBattle:
     ld a,[W_ISINBATTLE] ; $d057
     jp ResetTempIV
 
-Func_cd99: ; xxxx (3:xxxx) ; Spostato a Fine BANK
+UseStrength:
+    ld hl,$d728
+    bit 0,[hl]
+    jr nz,.AlreadyStrength
+    ld a,[$d700]
+    cp a,2 ; is the player surfing?
+    jp z,.Surfing
     ld hl,$d728
     set 0,[hl]
-    ld hl,UsedStrengthText ; $4daa
+    ld hl,wOverworlStrengthAnimBit1
+    set 1,[hl]
+    call PlayCryAndDecreaseFieldMoveEnergy
+    scf ; success
+    ret
+.AlreadyStrength
+    ld hl,.AlreadyStrengthText
+    jr .fail
+.Surfing
+    ld hl,.SurfingText
+    ; fall through
+.fail
     call PrintText
-    ld hl,UnnamedText_cdbb ; $4dbb
-    jp PrintText
+    and a ; rcf
+    ret
+.AlreadyStrengthText
+    TX_FAR _AlreadyStrengthText
+    db "@"
+.SurfingText
+    TX_FAR _SurfingText
+    db "@"
 
 ReDrawBattleHudAfterItemUse:
     ld a,[W_BATTLETYPE] ; $d05a
@@ -28647,14 +28681,6 @@ ItemUsePokedoll:
     ld a,$01
     ld [$d078],a
     jp SimpleBattleItemEnd
-
-UsedStrengthText:
-    TX_FAR _UsedStrengthText
-    db $08 ; asm
-    call PlayCryAndDecreaseFieldMoveEnergy
-    call WaitForSoundToFinish
-    call Delay3
-    jp TextScriptEnd
 
 ; wakes up all party pokemon
 ; INPUT:
@@ -30231,7 +30257,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .strength
 ;    bit 3,a ; does the player have the Rainbow Badge?
     call CheckEarthPower ; jp z,.newBadgeRequired
-    PREDEF Func_cd99
+    PREDEF UseStrength
+    jp nc,.loop
     jr .WhiteScreenAndGotoMap
 
 .flash
@@ -76597,7 +76624,7 @@ _DoFlyOrTeleportAwayGraphicsPredef:        NEW_PREDEF _DoFlyOrTeleportAwayGraphi
 Func_70510Predef:                          NEW_PREDEF Func_70510                          ; $58
 GetTileTwoStepsInFrontOfPlayerPredef:      NEW_PREDEF GetTileTwoStepsInFrontOfPlayer      ; $59
 CheckForCollisionWhenPushingBoulderPredef: NEW_PREDEF CheckForCollisionWhenPushingBoulder ; $5A
-Func_cd99Predef:                           NEW_PREDEF Func_cd99                           ; $5B
+UseStrengthPredef:                         NEW_PREDEF UseStrength                         ; $5B
 PickupItemPredef:                          NEW_PREDEF PickupItem                          ; $5C
 PrintMoveTypePredef:                       NEW_PREDEF PrintMoveType                       ; $5D
 ResetMovePPsPredef:                        NEW_PREDEF ResetMovePPs                        ; $5E
@@ -130670,15 +130697,12 @@ _CableClubNPCText6: ; a4014 (29:4014)
     db "preparations.",$55
     db "Please wait.",$57
 
-_UsedStrengthText: ; a403c (29:403c)
-    TX_RAM $cd6d
-    db $0," used",$4f
-    db "STRENGTH.@@"
+SECTION "_UnnamedText_cdbb",ROMX[$4051],BANK[$29]
 
 _UnnamedText_cdbb: ; a4051 (29:4051)
     TX_RAM $cd6d
     db $0," can",$4f
-    db "move boulders.",$58
+    db "move boulders.",$57
 
 _UnnamedText_cdfa: ; a4069 (29:4069)
     db $0,"The current is",$4f
@@ -131934,6 +131958,16 @@ _NoSurfingOnLaprasHereText:
     TX_RAM $cd6d
     db $0," here!",$58
 
+_AlreadyStrengthText:
+    db $0,"STRENGTH Already",$4f
+    db "in use!",$58
+
+_SurfingText:
+    TX_RAM $cd6d
+    db $0," can't",$4f
+    db "apply STRENGTH",$55
+    db "in water!",$58
+
 SECTION "bank2A",ROMX,BANK[$2A]
 
 _ItemUseText001: ; a8000 (2a:4000)
@@ -133030,7 +133064,7 @@ SelectInOverWorld:
     set 4,[hl]
 .ContinueLight
     call .StartCustomSelectFunction
-    ld hl,wOverworlLightNoTextBit2
+    ld hl,wOverworlNoTextBit2
     set 2,[hl]
     ld a,BENGAL
     ld [$cf91],a
@@ -133063,6 +133097,10 @@ SelectInOverWorld:
     call .StartCustomSelectFunction
     ld hl,$d728
     set 0,[hl]
+    ld hl,wOverworlStrengthAnimBit1
+    set 1,[hl]
+    ld hl,wOverworlNoTextBit2
+    set 2,[hl]
     jp .EndCustomSelectFunction
 .noStrength
     scf ; set carry flag
@@ -139196,6 +139234,7 @@ _HackFromBank0:
 BugFixLongRangeTrainer:
     call BackupDarkMapState
     call HandleLightAnimation
+    call HandleStrengthAnimation
     ld hl,W_FLAGS_D733 ; check if trainer is wanting to battle
     bit 3,[hl]
     ld hl,$d732
@@ -139273,7 +139312,7 @@ HandleLightAnimation:
     call .FlashScreenBTimes
     ld c,20
     call DelayFrames
-    ld hl,wOverworlLightNoTextBit2
+    ld hl,wOverworlNoTextBit2
     bit 2,[hl]
     res 2,[hl]
     ret nz
@@ -139300,6 +139339,49 @@ HandleLightAnimation:
     pop af
     ld [rBGP],a ; restore initial palette
     ret
+
+HandleStrengthAnimation:
+    ld hl,wOverworlStrengthAnimBit1
+    bit 1,[hl]
+    res 1,[hl]
+    ret z
+    call .Animation
+    ld c,20
+    call DelayFrames
+    ld hl,wOverworlNoTextBit2
+    bit 2,[hl]
+    res 2,[hl]
+    ret nz
+    call EnableAutoTextBoxDrawing
+    ld a,$fd ; .StrengthText
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    jp DisplayTextID
+.Animation
+    ld b,5
+.loop
+    push bc
+    ld a,-01
+    call .SlideScreen
+    ld a,+01
+    call .SlideScreen
+    ld a,+01
+    call .SlideScreen
+    ld a,-01
+    call .SlideScreen
+    pop bc
+    dec b
+    jr nz,.loop
+    xor a
+    ld [$c105],a ; delta X
+    ld [wWalkCounter],a
+    ret
+.SlideScreen
+    ld [$c105],a ; delta X
+    ld a,8
+    ld [wWalkCounter],a
+    call AdvancePlayerSprite
+    call AdvancePlayerSprite
+    jp DelayFrame
 
 BugFixWarpDuringJump:
     ld hl,BugFixWarpDuringJump
