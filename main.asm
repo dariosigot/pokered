@@ -602,7 +602,7 @@ EnterMap: ; 03a6 (0:03a6)
     ld hl,$d72e
     bit 5,[hl] ; did a battle happen immediately before this?
     res 5,[hl] ; unset the "battle just happened" flag
-    call z,Func_12e7
+    call z,ResetStrength
     call nz,MapEntryAfterBattle
     ld hl,$d732
     ld a,[hl]
@@ -3034,7 +3034,9 @@ Func_12da: ; 12da (0:12da)
     ld [hl],a
     ret
 
-Func_12e7: ; 12e7 (0:12e7)
+ResetStrength:
+    ld hl,wFlags_0xcd60 ; Reset Boulder Movement
+    res 1,[hl]          ; (No Bug with Stairs)
     ld hl,$d728
     res 0,[hl]
     ret
