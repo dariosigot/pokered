@@ -37104,6 +37104,8 @@ GetTilesetTile:
     db $11,TILE_STRS_STD , TILE_11_STRS_STD
     db $11,TILE_STRS_HRZ , TILE_11_STRS_HRZ
     db $11,TILE_STRS_VRT , TILE_11_STRS_VRT
+    db $11,TILE_STRS_UP  , TILE_11_STRS_UP
+    db $11,TILE_STRS_DW  , TILE_11_STRS_DW
     db $03,TILE_J_DOWN   , TILE_03_J_DOWN
     db $03,TILE_J_UP     , TILE_03_J_UP
     db $03,TILE_J_LEFT   , TILE_03_J_LEFT
@@ -37113,6 +37115,7 @@ GetTilesetTile:
     db $03,TILE_BTM_LFT  , TILE_03_BTM_LFT
     db $03,TILE_BTM_RGT  , TILE_03_BTM_RGT
     db $03,TILE_WALKING  , TILE_03_WALKING
+    db $04,TILE_STRS_DW  , TILE_04_STRS_DW
     db $FF
 
 DoorTileIDPointers: ; Move to Bank's End
@@ -37306,6 +37309,16 @@ CollissionRule:
     db D_RIGHT , Tile_C , TILE_J_LEFT    , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $34
     db D_UP    , Tile_M , TILE_STRS_STD  , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $35
     db D_UP    , Tile_A , TILE_STRS_STD  , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $36
+
+; BOULDER STAIRS UP/DOWN
+    db D_DOWN  , Tile_Q , TILE_STRS_UP   , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $37
+    db D_UP    , Tile_M , TILE_STRS_UP   , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $38
+    db D_LEFT  , Tile_E , TILE_STRS_UP   , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $39
+    db D_RIGHT , Tile_I , TILE_STRS_UP   , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $3A
+    db D_DOWN  , Tile_Q , TILE_STRS_DW   , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $3B
+    db D_UP    , Tile_M , TILE_STRS_DW   , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $3C
+    db D_LEFT  , Tile_E , TILE_STRS_DW   , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $3D
+    db D_RIGHT , Tile_I , TILE_STRS_DW   , 0              , 0          , EX_FAIL | EX_BOULDER , 0 , 0 ; $3E
 
 ; End
     db $FF
