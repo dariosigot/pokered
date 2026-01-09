@@ -22016,33 +22016,7 @@ GetTileTwoStepsInFrontOfPlayer: ; c5be (3:45be)
     ld [$cfc6],a
     ret
 
-; Input a = Level
-; Output ac = stat exp
-GetStatExpByLevel:
-    cp 6 ; C - Set for no borrow. (Set if A < n.)
-    jr nc,.LevelGreaterThen5
-    xor a
-.LevelGreaterThen5
-    push af
-    ld [H_MULTIPLIER],a
-    ld [H_MULTIPLICAND+2],a
-    xor a
-    ld [H_MULTIPLICAND+1],a
-    ld [H_MULTIPLICAND],a
-    call Multiply
-    pop af
-    ld [H_MULTIPLIER],a
-    call Multiply
-    ld a,16
-    ld [H_DIVISOR],a
-    ld b,4 ; 4 bytes
-    jp Divide
-
-; Free
-
-SECTION "CheckForBoulderCollisionWithSprites",ROMX[$4636],BANK[$3]
-
-CheckForBoulderCollisionWithSprites: ; c636 (3:4636)
+CheckForBoulderCollisionWithSprites:
     ld a,[$d718]
     dec a
     swap a
@@ -22060,62 +22034,67 @@ CheckForBoulderCollisionWithSprites: ; c636 (3:4636)
     ld hl,$c214
     ld a,[$FF00+$db]
     and $3
-    jr z,.asm_c678
-.asm_c659
+    jr z,.pushingHorizontallyLoop
+.pushingVerticallyLoop
     inc hl
     ld a,[$FF00+$dd]
     cp [hl]
-    jr nz,.asm_c672
+    jr nz,.nextSprite1
     dec hl
     ld a,[hli]
     ld b,a
     ld a,[$FF00+$db]
     rrca
-    jr c,.asm_c66c
+    jr c,.pushingDown
+; pushing up
     ld a,[$FF00+$dc]
     dec a
-    jr .asm_c66f
-.asm_c66c
+    jr .compareYCoords
+.pushingDown
     ld a,[$FF00+$dc]
     inc a
-.asm_c66f
+.compareYCoords
     cp b
-    jr z,.asm_c697
-.asm_c672
+    jr z,.failure
+.nextSprite1
     dec c
-    jr z,.asm_c69a
+    jr z,.success
     add hl,de
-    jr .asm_c659
-.asm_c678
+    jr .pushingVerticallyLoop
+.pushingHorizontallyLoop
     ld a,[hli]
     ld b,a
     ld a,[$FF00+$dc]
     cp b
-    jr nz,.asm_c691
+    jr nz,.nextSprite2
     ld b,[hl]
     ld a,[$FF00+$db]
     bit 2,a
-    jr nz,.asm_c68b
+    jr nz,.pushingLeft
     ld a,[$FF00+$dd]
     inc a
-    jr .asm_c68e
-.asm_c68b
+    jr .compareXCoords
+.pushingLeft
     ld a,[$FF00+$dd]
     dec a
-.asm_c68e
+.compareXCoords
     cp b
-    jr z,.asm_c697
-.asm_c691
+    jr z,.failure
+.nextSprite2
     dec c
-    jr z,.asm_c69a
+    jr z,.success
     add hl,de
-    jr .asm_c678
-.asm_c697
+    jr .pushingHorizontallyLoop
+.failure
     ld a,$ff
     ret
-.asm_c69a
+.success
     xor a
     ret
+
+; Free
+
+SECTION "Func_c69c",ROMX[$469c],BANK[$3]
 
 Func_c69c: ; c69c (3:469c)
     ld a,[$d730]
@@ -22704,6 +22683,28 @@ SurfingAttemptFailed:
 .NoSurfingOnLaprasHereText
     TX_FAR _NoSurfingOnLaprasHereText
     db "@"
+
+; Input a = Level
+; Output ac = stat exp
+GetStatExpByLevel:
+    cp 6 ; C - Set for no borrow. (Set if A < n.)
+    jr nc,.LevelGreaterThen5
+    xor a
+.LevelGreaterThen5
+    push af
+    ld [H_MULTIPLIER],a
+    ld [H_MULTIPLICAND+2],a
+    xor a
+    ld [H_MULTIPLICAND+1],a
+    ld [H_MULTIPLICAND],a
+    call Multiply
+    pop af
+    ld [H_MULTIPLIER],a
+    call Multiply
+    ld a,16
+    ld [H_DIVISOR],a
+    ld b,4 ; 4 bytes
+    jp Divide
 
 ; Free
 
