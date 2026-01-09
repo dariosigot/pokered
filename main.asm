@@ -25001,8 +25001,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     ld a,[$d35d]
     and a ; if it's not dark
     ret nz
-    ld hl,DiglettsCaveAerodactylFluteCoords
-    call ArePlayerCoordsInArray
+    call ArePlayerNearAerodactyl
     ret nc
     ld hl,wDigCaveAerodactylTrigBit0
     set 0,[hl] ; trigger Aerodactyl fight (handled by map script)
@@ -28741,15 +28740,6 @@ Route16SnorlaxFluteCoords:
     db 10,25 ; one space West of Snorlax
     db $ff ; terminator
 
-; Format:
-; 00: Y
-; 01: X
-DiglettsCaveAerodactylFluteCoords:
-    db 4,33 ; one space East of Aerodactyl
-    db 4,31 ; one space West of Aerodactyl
-    db 5,32 ; one space Sud of Aerodactyl
-    db $ff ; terminator
-
 CheckDiglettsCaveHole:
     call GetCurrentOldAdventureMap
     cp DIGLETTS_CAVE
@@ -29124,6 +29114,19 @@ ItemUseBengal:
     ld hl,wOverworlLightAnimBit0
     set 0,[hl]
     ret
+
+ArePlayerNearAerodactyl:
+    ld a,[$c11a] ; Aerodactyl Delta Y from Player?
+    ld b,a
+    ld a,[$c11b] ; Aerodactyl Delta X from Player?
+    ld c,a
+    ld hl,.DiglettsCaveAerodactylDeltaCoords
+    jp CheckCoords
+.DiglettsCaveAerodactylDeltaCoords
+    db $40,$30 ; one space East of Aerodactyl
+    db $40,$50 ; one space West of Aerodactyl
+    db $30,$40 ; one space Sud of Aerodactyl
+    db $ff ; terminator
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -97908,7 +97911,7 @@ DiglettsCaveObject: ; 0x61f72 (size=20)
     db $0 ; signs
 
     db $2 ; people
-    db SPRITE_AERODACTYL,$4 + 4,$20 + 4,$ff,$d0,$1 ; person
+    db SPRITE_AERODACTYL,$4 + 4,$20 + 4,$ff,$10,$1 ; person
     db SPRITE_HIKER,$1c + 4,$d + 4,$ff,$d1,$2 ; person
 
     ; warp-to
@@ -97944,7 +97947,7 @@ DiglettsCaveScript0:
     ld hl,$d126
     bit 6,[hl] ; Trigger Check Warp Script 0
     set 6,[hl] ; ...
-    jr nz,.CheckAerodatyl
+    jr nz,.CheckAerodactyl
     ; Start Warp
     ld a,1 ; Warp ID
     ld [$d71e],a
@@ -97959,7 +97962,7 @@ DiglettsCaveScript0:
     xor a
     ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
     ret
-.CheckAerodatyl
+.CheckAerodactyl
     ld hl,wEventBeatAerodactylBit5
     bit 5,[hl]
     ret nz
@@ -141135,7 +141138,6 @@ GetMapPaletteID_:
 CheckSpecialWild_:
     push de
     ld hl,.SpecialWild
-    ld c,0
 .LoopMon
     ld a,[$cf91]
     ld b,a
@@ -141145,9 +141147,13 @@ CheckSpecialWild_:
     cp b
     jr z,.MonFound
     inc hl
-    inc hl
 .next
-    inc c
+    inc hl
+    inc hl
+    inc hl
+.next2
+    inc hl
+    inc hl
     jr .LoopMon
 .NormalWild
     pop de
@@ -141159,21 +141165,29 @@ CheckSpecialWild_:
     ld a,[hli] ; Table Level
     inc b
     cp b ; Enemy's Level +1
-    jr c,.LevelFound ; if Enemy's Level >= Table Level
-    inc hl
-    jr .next
-.LevelFound
+    jr nc,.next
+    ; LevelFound ; if Enemy's Level >= Table Level
     call GetCurrentOldAdventureMap
-    ld b,a
+    cp [hl]
+    jr nz,.next
+    ; MapFound
+    inc hl
     ld a,[hli]
+    ld b,a ; b = Y
+    ld a,[hli]
+    ld c,a ; c = X
+    or b ; both 0?
+    jr z,.SkipCheckPosition
+    ld a,[$c214]
     cp b
-    jr z,.MapFound
-    jr .next
-.MapFound
-    ld hl,.SpecialWildMoves
-    ld a,c
-    ld bc,4
-    call AddNTimes ; add bc to hl a times
+    jr nz,.next2
+    ld a,[$c215]
+    cp c
+    jr nz,.next2
+.SkipCheckPosition
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
     ld b,4
     pop de
 .Loop4Moves
@@ -141185,108 +141199,120 @@ CheckSpecialWild_:
     scf
     ret
 
+SPECIALWILD: MACRO
+    db \1,\2,\3
+    db \4,\5
+    dw \6
+ENDM
+
 .SpecialWild
-    db DRATINI,12,DRATINI_CAVE ; DratiniCave_ShinyDratini
-    db MAROWAK,40,POKEMONTOWER_6 ; PokemonTower6_Marowak
-    db SNORLAX,30,ROUTE_12 ; Route12_Snorlax
-    db SNORLAX,30,ROUTE_16 ; Route16_Snorlax
-    db AERODACTYL,30,DIGLETTS_CAVE ; DiglettsCave_Aerodactyl
-    db VOLTORB,37,POWER_PLANT ; PowerPlant_Voltorb
-    db ELECTRODE,40,POWER_PLANT ; PowerPlant_Electrode
-    db ARTICUNO,55,SEAFOAM_ISLANDS_5 ; SeafoamIslands5_Articuno
-    db ZAPDOS,55,POWER_PLANT ; PowerPlant_Zapdos
-    db MOLTRES,55,MANSION_2 ; Mansion2_Moltres
-    db ONIX,60,VICTORY_ROAD_2 ; VictoryRoad2_ShinyOnix
-    db ALAKAZAM,65,UNKNOWN_DUNGEON_4 ; UnknownDungeon4_Alakazam
-    db MACHAMP,65,UNKNOWN_DUNGEON_4 ; UnknownDungeon4_Machamp
-    db GOLEM,65,UNKNOWN_DUNGEON_4 ; UnknownDungeon4_Golem
-    db GENGAR,65,UNKNOWN_DUNGEON_4 ; UnknownDungeon4_Gengar
-    db MEWTWO,70,UNKNOWN_DUNGEON_4 ; UnknownDungeon4_Mewtwo
-    db MEW,70,VERMILION_DOCK ; VermilionDock_Mew
+    SPECIALWILD DRATINI,12,DRATINI_CAVE,$00,$00,.DratiniCave_ShinyDratini
+    SPECIALWILD MAROWAK,40,POKEMONTOWER_6,$00,$00,.PokemonTower6_Marowak
+    SPECIALWILD SNORLAX,30,ROUTE_12,$00,$00,.Route12_Snorlax
+    SPECIALWILD SNORLAX,30,ROUTE_16,$00,$00,.Route16_Snorlax
+    SPECIALWILD AERODACTYL,30,DIGLETTS_CAVE,$08,$20,.DiglettsCave_Aerodactyl_Corner
+    SPECIALWILD AERODACTYL,30,DIGLETTS_CAVE,$08,$27,.DiglettsCave_Aerodactyl_Corner
+    SPECIALWILD AERODACTYL,30,DIGLETTS_CAVE,$00,$00,.DiglettsCave_Aerodactyl
+    SPECIALWILD VOLTORB,37,POWER_PLANT,$00,$00,.PowerPlant_Voltorb
+    SPECIALWILD ELECTRODE,40,POWER_PLANT,$00,$00,.PowerPlant_Electrode
+    SPECIALWILD ARTICUNO,55,SEAFOAM_ISLANDS_5,$00,$00,.SeafoamIslands5_Articuno
+    SPECIALWILD ZAPDOS,55,POWER_PLANT,$00,$00,.PowerPlant_Zapdos
+    SPECIALWILD MOLTRES,55,MANSION_2,$00,$00,.Mansion2_Moltres
+    SPECIALWILD ONIX,60,VICTORY_ROAD_2,$00,$00,.VictoryRoad2_ShinyOnix
+    SPECIALWILD ALAKAZAM,65,UNKNOWN_DUNGEON_4,$00,$00,.UnknownDungeon4_Alakazam
+    SPECIALWILD MACHAMP,65,UNKNOWN_DUNGEON_4,$00,$00,.UnknownDungeon4_Machamp
+    SPECIALWILD GOLEM,65,UNKNOWN_DUNGEON_4,$00,$00,.UnknownDungeon4_Golem
+    SPECIALWILD GENGAR,65,UNKNOWN_DUNGEON_4,$00,$00,.UnknownDungeon4_Gengar
+    SPECIALWILD MEWTWO,70,UNKNOWN_DUNGEON_4,$00,$00,.UnknownDungeon4_Mewtwo
+    SPECIALWILD MEW,70,VERMILION_DOCK,$00,$00,.VermilionDock_Mew
     db $FF
 
-.SpecialWildMoves
-; DratiniCave_ShinyDratini
+.DratiniCave_ShinyDratini
     db SUPERSONIC
     db THUNDER_WAVE
     db WRAP
     db DRAGON_RAGE
-; PokemonTower6_Marowak
+.PokemonTower6_Marowak
     db BONEMERANG
     db FOCUS_ENERGY
     db NIGHT_SHADE
     db FLAMETHROWER
-; Route12_Snorlax
+.Route12_Snorlax
     db REST
     db ROCK_THROW
     db AMNESIA
     db BODY_SLAM
-; Route16_Snorlax
+.Route16_Snorlax
     db REST
     db LICK
     db ROCK_THROW
     db BODY_SLAM
-; DiglettsCave_Aerodactyl
+.DiglettsCave_Aerodactyl
     db WHIRLWIND
     db SWOOP
     db DOUBLE_TEAM
     db ROCK_SLIDE
-; PowerPlant_Voltorb
+.DiglettsCave_Aerodactyl_Corner
+    db HYPER_FANG
+    db RAZOR_WIND
+    db SCREECH
+    db ROCK_SLIDE
+.PowerPlant_Voltorb
     db THUNDERSHOCK
     db SELFDESTRUCT
     db SWIFT
     db EXPLOSION
-; PowerPlant_Electrode
+.PowerPlant_Electrode
     db SELFDESTRUCT
     db SWIFT
     db EXPLOSION
     db THUNDERBOLT
-; SeafoamIslands5_Articuno
+.SeafoamIslands5_Articuno
     db HAZE
     db AURORA_BEAM
     db SWIFT
     db ICE_BEAM
-; PowerPlant_Zapdos
+.PowerPlant_Zapdos
     db THUNDER_WAVE
     db DRILL_PECK
     db SWIFT
     db THUNDERBOLT
-; Mansion2_Moltres
+.Mansion2_Moltres
     db POISON_GAS
     db FIRE_SPIN
     db SWIFT
     db FLAMETHROWER
-; VictoryRoad2_ShinyOnix
+.VictoryRoad2_ShinyOnix
     db ROCK_SLIDE
     db SWORDS_DANCE
     db EARTHQUAKE
     db HYPER_BEAM
-; UnknownDungeon4_Alakazam
+.UnknownDungeon4_Alakazam
     db PSYCHIC_M
     db RECOVER
     db REFLECT
     db HYPER_BEAM
-; UnknownDungeon4_Machamp
+.UnknownDungeon4_Machamp
     db ROCK_SLIDE
     db EARTHQUAKE
     db HI_JUMP_KICK
     db HYPER_BEAM
-; UnknownDungeon4_Golem
+.UnknownDungeon4_Golem
     db EARTHQUAKE
     db SUBSTITUTE
     db REST
     db HYPER_BEAM
-; UnknownDungeon4_Gengar
+.UnknownDungeon4_Gengar
     db MEGA_DRAIN
     db AMNESIA
     db NIGHT_SHADE
     db HYPER_BEAM
-; UnknownDungeon4_Mewtwo
+.UnknownDungeon4_Mewtwo
     db PSYCHIC_M
     db RECOVER
     db EARTHQUAKE
     db HAZE
-; VermilionDock_Mew
+.VermilionDock_Mew
     db SOFTBOILED
     db CONVERSION
     db MIRROR_MOVE
