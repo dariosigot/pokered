@@ -18456,12 +18456,15 @@ SpriteAttributeHandler: ; Denim
 
 Handle4TileSpriteOrMonSprite:
     ld l,a
-    dec e
-    dec e
-    ld a,[de]
+    call .ReadSpriteID
+    cp SPRITE_AERODACTYL
+    jr nz,.continue
+    call GetCurrentOldAdventureMap
+    cp DIGLETTS_CAVE
+    jr z,.StaticSprite
+    call .ReadSpriteID
+.continue
     cp SPRITE_LORELEI+1 ; Last Standard Sprite ID
-    inc e
-    inc e
     jr c,.StandardSprite
     cp SPRITE_BALL ; First Static Sprite ID
     jr c,.MonSprite
@@ -18479,6 +18482,13 @@ Handle4TileSpriteOrMonSprite:
     ld a,l
     and $f
 .end
+    ret
+.ReadSpriteID
+    dec e
+    dec e
+    ld a,[de]
+    inc e
+    inc e
     ret
 
 HackForBackupDVDuringTradeIn:
@@ -125760,8 +125770,8 @@ _Route24BattleText1: ; 928e2 (24:68e2)
 
 _DiglettsCave1:
     db $0,"It looks like a",$4f
-    db "huge stone",$55
-    db "statue!",$57
+    db "huge ROCK stone",$55
+    db "Statue!",$57
 
 _DiglettsCaveHiker:
     db $0,"It seems that",$4f
@@ -125774,7 +125784,7 @@ _DiglettsCaveHiker:
 
 _DiglettsCaveAerodactylText:
     db $0,"Oops...",$51
-    db "It wasn't a statue!",$57
+    db "It wasn't a Statue!",$57
 
 _DiglettsCaveAerodactylRunAway:
     db $0,"The gigantic",$4f
