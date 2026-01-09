@@ -22036,6 +22036,8 @@ CheckForBoulderCollisionWithSprites:
     and $3
     jr z,.pushingHorizontallyLoop
 .pushingVerticallyLoop
+    call .IsSpriteVisible
+    jr z,.nextSprite1
     inc hl
     ld a,[$FF00+$dd]
     cp [hl]
@@ -22062,6 +22064,8 @@ CheckForBoulderCollisionWithSprites:
     add hl,de
     jr .pushingVerticallyLoop
 .pushingHorizontallyLoop
+    call .IsSpriteVisible
+    jr z,.nextSprite2
     ld a,[hli]
     ld b,a
     ld a,[$FF00+$dc]
@@ -22090,6 +22094,16 @@ CheckForBoulderCollisionWithSprites:
     ret
 .success
     xor a
+    ret
+.IsSpriteVisible
+    push hl
+    push de
+    ld de,-$0102 ; Go from $c214 to $c112
+    add hl,de
+    ld a,[hl]
+    inc a ; Is $FF = Not Visible?
+    pop de
+    pop hl
     ret
 
 ; Free
