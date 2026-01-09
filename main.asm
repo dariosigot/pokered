@@ -24682,12 +24682,15 @@ ItemUseEscapeRope:
     ld a,[$d700]
     cp a,2 ; Surfing?
     jr z,.notUsable
+    call CheckDiglettsCaveHole
+    jr z,.SkipCheckDark
     ; Check Dark
     ld a,[$d35d]
     and a
     jr nz,.notUsable
-    call CheckDiglettsCaveHole
-    cp a,AGATHAS_ROOM
+.SkipCheckDark
+    call GetCurrentOldAdventureMap
+    cp AGATHAS_ROOM
     jr z,.notUsable
     ld a,[W_CURMAPTILESET]
     ld b,a
@@ -28764,7 +28767,9 @@ CheckDiglettsCaveHole:
     ld [$cd6a],a ; item used
     ret
 .NotEvent
-    jp GetCurrentOldAdventureMap
+    call GetCurrentOldAdventureMap
+    cp DIGLETTS_CAVE
+    ret
 .coordsData
     db 18,13
     db $FF
