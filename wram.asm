@@ -1945,7 +1945,6 @@ wMaxLevel              ; df37
 wAvgLevel              ; df37
 wTmpRepelQty           ; df37
 wChoicePkmnMoveDeleter ; df37
-wBackupDarkMap         ; df37
 wTempStatLO            ; df37
 wFieldMoveMonID        ; df37 = Mon ID used for Cry
 wMonIdCryAndDex        ; df37 = Mon ID used for PlayCryAndDisplayPokedex
@@ -1978,12 +1977,11 @@ wFlagListMenuSpc:           ; df39 ; bit 0 = BadgeName
 wHyperBeamUnknownTypeBit4   ; df39 ; bit 4 = Set Hyper Beam to Unknown Type
     ds 1
 
-wFishingLevel:       ; df3a
 wLastTechMachIdUsed: ; df3a
     ds 1
 
-wFishingSpecies: ; df3b
 wNewMonIdDuringLearnMove: ; df3b
+wBackupDarkMap            ; df3b
     ds 1
 
 wUnusedDF3C:: db

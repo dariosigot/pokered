@@ -1890,8 +1890,7 @@ IsGhostBattle:
     jr nz,.end
     call CheckWildGhost
     jr nz,.end
-    ld b,SILPH_SCOPE
-    call IsItemInBag
+    call IsSilphScopeInBagNotDark
     ; fall through
 .end
     pop bc
@@ -1899,6 +1898,23 @@ IsGhostBattle:
     pop hl
     pop bc
     ret
+
+IsSilphScopeInBagNotDark:
+    call IsSilphScopeInBag
+    ret z ; z = not in bag
+    ld a,[wBackupDarkMap] ; [$d35d]
+    and a
+    jr nz,.Dark
+    ld a,1 ; rzf
+    and a  ; ...
+    ret
+.Dark
+    xor a ; szf
+    ret
+
+IsSilphScopeInBag:
+    ld b,SILPH_SCOPE
+    jp IsItemInBag ; z = not in bag
 
 IsGhostBattlePlus:
     call IsGhostBattle
@@ -1928,13 +1944,6 @@ IsGhostBattlePlus:
 
 ; ──────────────────────
 
-ResetJoypadForbiddenButtonsMask:
-    ld hl,wFlagFollowBoulderBit7
-    bit 7,[hl]
-    ret nz
-    ld [wJoypadForbiddenButtonsMask],a
-    ret
-
 TrySpeedUp:
     ld a,[$d736]
     bit 6,a ; jumping a ledge?
@@ -1946,12 +1955,6 @@ TrySpeedUp:
     and a
     ret nz
     jp SpeedUp
-
-DisableDebugWtW_Hack:
-    ld a,[$d700]
-    ld hl,$cd38
-    res 0,[hl]
-    ret
 
 SECTION "LoadCurrentMapView",ROM0[$0ca2]
 
@@ -6275,6 +6278,19 @@ CheckDarkMap:
     push af
     PREDEF _CheckDarkMap
     pop af
+    ret
+
+DisableDebugWtW_Hack:
+    ld a,[$d700]
+    ld hl,$cd38
+    res 0,[hl]
+    ret
+
+ResetJoypadForbiddenButtonsMask:
+    ld hl,wFlagFollowBoulderBit7
+    bit 7,[hl]
+    ret nz
+    ld [wJoypadForbiddenButtonsMask],a
     ret
 
 ; Free
@@ -22843,13 +22859,9 @@ RemoveItemFromInventory_: ; ce74 (3:4e74)
     ret
 
 ReadRodData:
-    ld b,BANK(_ReadRodData)
-    ld hl,_ReadRodData
-    call Bankswitch
-    ld a,[wFishingLevel]
-    ld b,a
-    ld a,[wFishingSpecies]
-    ld c,a
+    PREDEF _ReadRodData
+    ; b = FishingLevel
+    ; c = FishingSpecies
     ret
 
 OldRodData:
@@ -76135,8 +76147,7 @@ SafariZoneWestPostGhost:
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
     jr z,.reset
-    ld b,SILPH_SCOPE
-    call IsItemInBag
+    call IsSilphScopeInBagNotDark
     jr nz,.SetBitRevealSafariGhost
     ld a,$ff
     ld [wJoypadForbiddenButtonsMask],a
@@ -76603,7 +76614,7 @@ Func_79869Predef:                          NEW_PREDEF Func_79869                
 Func_70b5dPredef:                          NEW_PREDEF Func_70b5d                          ; $34
 Func_c586Predef:                           NEW_PREDEF Func_c586                           ; $35
 StatusScreenPredef:                        NEW_PREDEF StatusScreen                        ; $36
-ds 3                                                                                      ; $37
+_ReadRodDataPredef:                        NEW_PREDEF _ReadRodData                        ; $37
 Func_410e2Predef:                          NEW_PREDEF Func_410e2                          ; $38
 CheckEngagePlayerPredef:                   NEW_PREDEF CheckEngagePlayer                   ; $39
 IndexToPokedexPredef:                      NEW_PREDEF IndexToPokedex                      ; $3A
@@ -86052,12 +86063,14 @@ PrintBeginningBattleText: ; 58d99 (16:4d99)
     call PrintText
     jp ResetRedBall
 .Ghost
-    ld b,SILPH_SCOPE
-    call IsItemInBag
+    call IsSilphScopeInBagNotDark
     jr nz,.HandleGhost
     ld hl,.UnnamedText_58e45 ; Ghost appeared....
     call PrintText
+    call IsSilphScopeInBag
     ld hl,.UnnamedText_58e54 ; Damn....
+    jr z,.common1
+    ld hl,.SilphScopeDoesntWorkInTheDark ; ....in the Dark
     jr .common1
 .HandleGhost
     ld hl,.UnnamedText_58e45 ; Ghost appeared....
@@ -86109,6 +86122,9 @@ PrintBeginningBattleText: ; 58d99 (16:4d99)
     db "@"
 .UnnamedText_58e54
     TX_FAR _UnnamedText_58e54
+    db "@"
+.SilphScopeDoesntWorkInTheDark
+    TX_FAR _SilphScopeDoesntWorkInTheDark
     db "@"
 
 SECTION "Func_58e59",ROMX[$4e59],BANK[$16]
@@ -122990,6 +123006,13 @@ _AIBattleWithdrawText:
 
 ; ───────────────────────────────────
 
+_SilphScopeDoesntWorkInTheDark
+    db $0,"Darn!",$51
+    db "SILPH SCOPE doesn't",$4f
+    db "work in the dark!",$58
+
+; ───────────────────────────────────
+
 SECTION "bank23",ROMX,BANK[$23]
 
 _UnnamedText_56437: ; 8c000 (23:4000)
@@ -136822,6 +136845,7 @@ _ReadRodData:
 ; return e = 2 if no fish on this map
 ; return e = 1 if a bite,bc = level,species
 ; return e = 0 if no bite
+    call Load16BitRegisters
     ld h,d
     ld l,e
     ld a,[W_CURMAP]
@@ -136854,9 +136878,9 @@ _ReadRodData:
     ld b,$0
     add hl,bc
     ld a,[hli] ; level
-    ld [wFishingLevel],a
+    ld b,a    ; ...
     ld a,[hl] ; species
-    ld [wFishingSpecies],a
+    ld c,a    ; ...
     ld e,$1 ; $1 if there's a bite
     ret
 
