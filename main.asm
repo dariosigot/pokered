@@ -71633,7 +71633,19 @@ UnknownDungeon4Script0:
     ld [H_CURRENTPRESSEDBUTTONS],a
     ld a,$f0
     ld [wJoypadForbiddenButtonsMask],a
-    ld de,.Movement
+    ld a,[$c109] ; direction the player is facing
+    cp $04 ; up
+    ld de,.MovementDown
+    jr z,.continue
+    and a ; down
+    ld de,.MovementUp
+    jr z,.continue
+    cp $0C ; right
+    ld de,.MovementLeft
+    jr z,.continue
+    ; left
+    ld de,.MovementRight
+.continue
     ld a,$5
     ld [$ff00+$8c],a
     call MoveSprite
@@ -71643,7 +71655,13 @@ UnknownDungeon4Script0:
     ret
 .end
     jp CheckFightingMapTrainers
-.Movement
+.MovementDown
+    db DN,$FF
+.MovementUp
+    db UP,$FF
+.MovementLeft
+    db LT,$FF
+.MovementRight
     db RT,$FF
 
 WaitGengarMoving:
