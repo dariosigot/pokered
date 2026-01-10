@@ -2574,8 +2574,6 @@ HackForOtherText:
     TX_FAR _UnnamedText_cdbb
     db "@"
 
-; Free
-
 SECTION "RunMapScript",ROM0[$101b]
 
 ; function to run the current map's script
@@ -6293,6 +6291,14 @@ ResetJoypadForbiddenButtonsMask:
     ld [wJoypadForbiddenButtonsMask],a
     ret
 
+CheckForEngagingTrainers_NoDuringPushingBounder:
+    ld hl,wFlagFollowBoulderBit7
+    bit 7,[hl]
+    jp z,CheckForEngagingTrainers
+    ld a,$FF
+    ld [$cf13],a
+    ret
+
 ; Free
 
 SECTION "TextScriptEndingChar",ROM0[$24d6]
@@ -8364,7 +8370,7 @@ TalkToTrainer: ; 31cc (0:31cc)
 
 ; checks if any trainers are seeing the player and wanting to fight
 CheckFightingMapTrainers: ; 3219 (0:3219)
-    call CheckForEngagingTrainers
+    call CheckForEngagingTrainers_NoDuringPushingBounder
     ld a,[$cf13]
     cp $ff
     jr nz,.trainerEngaging
