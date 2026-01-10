@@ -1706,6 +1706,9 @@ IsSpriteOrSignInFrontOfPlayer: ; 0b23 (0:0b23)
     jr z,IsSpriteInFrontOfPlayer2 ; jumps if the tile in front of the player is a counter tile
     dec b
     jr nz,.counterTilesLoop
+    ld hl,wTalkToInvisibleSpriteBit2
+    set 2,[hl]
+    ; fall through
 
 ; part of the above function,but sometimes its called on its own,when signs are irrelevant
 ; the caller must zero [$FF8C]
@@ -1761,6 +1764,14 @@ IsSpriteInFrontOfPlayer2: ; 0b6d (0:0b6d)
     ld a,[hli] ; image (0 if no sprite)
     and a
     jr z,.nextSprite
+    push hl
+    ld hl,wTalkToInvisibleSpriteBit2
+    bit 2,[hl]
+    pop hl
+    jr nz,.SkipCheckGhost ; Talk
+    cp SPRITE_GHOST
+    jr z,.nextSprite
+.SkipCheckGhost
     inc l
     ld a,[hli] ; sprite visibility
     inc a
@@ -1781,7 +1792,7 @@ IsSpriteInFrontOfPlayer2: ; 0b6d (0:0b6d)
     inc e
     dec d
     jr nz,.spriteLoop
-    ret
+    jr .end
 .foundSpriteInFrontOfPlayer
     pop hl
     ld a,l
@@ -1791,11 +1802,14 @@ IsSpriteInFrontOfPlayer2: ; 0b6d (0:0b6d)
     set 7,[hl]
     ld a,e
     ld [$ff8c],a ; store sprite ID
+.end
+    ld hl,wTalkToInvisibleSpriteBit2
+    res 2,[hl]
     ret
 
 ; function to check if the player will jump down a ledge and check if the tile ahead is passable (when not surfing)
 ; sets the carry flag if there is a collision,and unsets it if there isn't a collision
-CollisionCheckOnLand: ; 0bd1 (0:0bd1)
+CollisionCheckOnLand:
     ld a,[wFlagFollowBoulderBit7]
     bit 7,a
     jr nz,.TryJumping
@@ -1944,17 +1958,7 @@ IsGhostBattlePlus:
 
 ; ──────────────────────
 
-TrySpeedUp:
-    ld a,[$d736]
-    bit 6,a ; jumping a ledge?
-    ret nz
-    ld a,[wFlagFollowBoulderBit7]
-    bit 7,a
-    ret nz
-    ld a,[$cc57] ; simulation
-    and a
-    ret nz
-    jp SpeedUp
+; Free
 
 SECTION "LoadCurrentMapView",ROM0[$0ca2]
 
@@ -6299,7 +6303,17 @@ CheckForEngagingTrainers_NoDuringPushingBounder:
     ld [$cf13],a
     ret
 
-; Free
+TrySpeedUp:
+    ld a,[$d736]
+    bit 6,a ; jumping a ledge?
+    ret nz
+    ld a,[wFlagFollowBoulderBit7]
+    bit 7,a
+    ret nz
+    ld a,[$cc57] ; simulation
+    and a
+    ret nz
+    jp SpeedUp
 
 SECTION "TextScriptEndingChar",ROM0[$24d6]
 
@@ -11992,6 +12006,8 @@ _DetectCollisionBetweenSprites: ; 4c70 (1:4c70)
     ld a,[hl]
     and a
     ret z
+    cp SPRITE_GHOST
+    ret z
     ld a,l
     add $3
     ld l,a
@@ -12032,6 +12048,8 @@ Func_4ca5: ; 4ca5 (1:4ca5)
     ld d,h
     ld a,[de]
     and a
+    jp z,.asm_4d69
+    cp SPRITE_GHOST
     jp z,.asm_4d69
     inc e
     inc e
@@ -12187,9 +12205,6 @@ Func_4d72: ; 4d72 (1:4d72)
     ld b,a
 .asm_4d84
     ret
-
-DiagonalLines: ; 4d85 (1:4d85)
-    INCBIN "gfx/diagonal_lines.2bpp"
 
 SECTION "Func_4da6",ROMX[$4da6],BANK[1]
 
@@ -16038,6 +16053,9 @@ GetDefaultName:
     ld de,$cd6d
     ld bc,$b
     jp CopyData
+
+DiagonalLines: ; 4d85 (1:4d85)
+    INCBIN "gfx/diagonal_lines.2bpp"
 
 ; Free
 
@@ -71457,9 +71475,10 @@ UnknownDungeon4Script:
     ret
 
 UnknownDungeon4ScriptPointers:
-    dw CheckFightingMapTrainers
+    dw UnknownDungeon4Script0
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
+    dw WaitGengarMoving
 
 UnknownDungeon4TextPointers:
     dw UnknownDungeon4Text1
@@ -71601,6 +71620,43 @@ UnknownDungeon4Object:
 
 UnknownDungeon4Blocks:
     INCBIN "maps/unknowndungeon4.blk"
+
+UnknownDungeon4Script0:
+    ld a,[$c15a] ; Gengar Y Delta
+    cp $40
+    jr nz,.end
+    ld a,[$c15b] ; Gengar X Delta
+    cp $40
+    jr nz,.end
+    ; Over Gengar
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,$f0
+    ld [wJoypadForbiddenButtonsMask],a
+    ld de,.Movement
+    ld a,$5
+    ld [$ff00+$8c],a
+    call MoveSprite
+    ld a,$3 ; WaitGengarMoving
+    ld [W_UNKNOWNDUNGEON3CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+.end
+    jp CheckFightingMapTrainers
+.Movement
+    db RT,$FF
+
+WaitGengarMoving:
+    ld a,[$d730]
+    bit 0,a
+    ret nz
+    xor a
+    ld [W_UNKNOWNDUNGEON3CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ld [wJoypadForbiddenButtonsMask],a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld [H_NEWLYPRESSEDBUTTONS],a
+    ret
 
 ; ───────────────────────────────────────
 
