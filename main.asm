@@ -31909,6 +31909,8 @@ BlackHairBoy1Sprite: ; 14a80 (5:4a80)
     INCBIN "gfx/sprites/black_hair_boy_1.2bpp" ; was $14a80
 LittleGirlSprite: ; 14c00 (5:4c00)
     INCBIN "gfx/sprites/little_girl.2bpp" ; was $14c00
+SpriteMiniGhost:
+INCBIN "gfx/denim/ghost.2bpp"
 SECTION "FatBaldGuySprite",ROMX[$4f00],BANK[$5]
 FatBaldGuySprite: ; 14f00 (5:4f00)
     INCBIN "gfx/sprites/fat_bald_guy.2bpp" ; was $14f00
@@ -32935,6 +32937,11 @@ SPRITE_Bank_2: MACRO
     SPRITE_Bank_2 MOLTRES    ; SPRITE_MOLTRES
     SPRITE_Bank_2 DRATINI    ; SPRITE_DRATINI
     SPRITE_Bank_2 MEWTWO     ; SPRITE_MEWTWO
+
+    ; SPRITE_GHOST
+    dw SpriteMiniGhost
+    db 0
+    db BANK(SpriteMiniGhost)
 
 ; ────────────────────────────────────────────────────────────────
 
@@ -71587,7 +71594,7 @@ UnknownDungeon4Object:
     db SPRITE_ALAKAZAM,01+4,25+4,$ff,$d0,$42,ALAKAZAM,OPP_LVL_OFFSET+65 ; Entry Point
     db SPRITE_MACHAMP,08+4,20+4,$ff,$d0,$43,MACHAMP,OPP_LVL_OFFSET+65 ; Entry Point
     db SPRITE_GOLEM,07+4,10+4,$ff,$d0,$44,GOLEM,OPP_LVL_OFFSET+65 ; Entry Point
-    db SPRITE_GENGAR,16+4,05+4,$ff,$d0,$45,GENGAR,OPP_LVL_OFFSET+65 ; Entry Point
+    db SPRITE_GHOST,16+4,05+4,$ff,$d0,$45,GENGAR,OPP_LVL_OFFSET+65 ; Entry Point
 
     ; warp-to
     EVENT_DISP $f,13,27 ; UNKNOWN_DUNGEON_3
