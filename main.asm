@@ -71490,7 +71490,7 @@ UnknownDungeon4TextPointers:
 UnknownDungeon4TrainerHeaders:
 UnknownDungeon4TrainerHeader0:
     db $1 ; flag's bit
-    db ($0 << 4) ; trainer's view range
+    db ($2 << 4) ; trainer's view range
     dw $d85f ; flag's byte
     dw UnknownDungeon4MewtwoText ; 0x5f26 TextBeforeBattle
     dw UnknownDungeon4MewtwoText ; 0x5f26 TextAfterBattle
