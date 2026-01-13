@@ -1923,6 +1923,7 @@ wFlagValueToPlayerBit1     ; df35 ; bit 1 = Print Battle Value to Player
 wFlagSortMoveBit1          ; df35 ; bit 1 = Sort Moves in Moves Menu (SELECT)
 wFlagFlyingMonSpriteBit1   ; df35 ; bit 1 = Force to Load Mon Sprite with $0080 offset
 wOverworlStrengthAnimBit1  ; df35 ; bit 1 = Force Overworld Strength Animation
+wNoExpToLastPartyMonBit1   ; df35 ; bit 1 = Negate Gain Exp to Last Party Mon (Just Caught)
 wFlagShinyBit2             ; df35 ; bit 2
 wFlagFlyingMonSpriteBit2   ; df35 ; bit 2 = Force to Load Mon Sprite with $0880 offset
 wTalkToInvisibleSpriteBit2 ; df35 ; bit 2 = Admit to talk with invisible sprite (Unknown Dungeon Gengar)

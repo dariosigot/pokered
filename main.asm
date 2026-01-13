@@ -23720,6 +23720,8 @@ ItemUseBall: ; d687 (3:5687)
     ld [$cc49],a
     call CleanLCD_OAM
     call AddPokemonToParty    ;add mon to Party
+    ld hl,wNoExpToLastPartyMonBit1
+    set 1,[hl]
     jr .End
 .sendToBox    ;$5907
     call CleanLCD_OAM
@@ -139271,7 +139273,28 @@ DefineMonsThatNotFoughtFlag:
     ld a,[wBackupFlagGainingExp]   ; ► a = flag has just gain experience
     xor e ; If a mon has just gain experience xor turn into 0
     and d ; If a mon is faintened turn into 0
+    ld hl,wNoExpToLastPartyMonBit1
+    bit 1,[hl]
+    jr z,.Skip
+    ld hl,W_NUMINPARTY
+    ld b,[hl]
+    ld c,b ; Backup b
+    call .loop1
+    res 7,a ; remove last caught party mon
+    ld b,c ; Restore b
+    call .loop2
+.Skip
     ld [W_PLAYERMONSALIVEFLAGS],a
+    ret
+.loop1
+    rrc a
+    dec b
+    jr nz,.loop1
+    ret
+.loop2
+    rlc a
+    dec b
+    jr nz,.loop2
     ret
 
 DefineMonLiveFlag:
@@ -142582,6 +142605,8 @@ ItemInBattleFinalCheck:
     pop af
     jr z,.EndNoCapture
     call .HackGainExpAfterCatch
+    ld hl,wNoExpToLastPartyMonBit1
+    res 1,[hl]
     call .HandlePlayerAliveAndApplyPoisonBurn
 .EndCapture
     xor a
