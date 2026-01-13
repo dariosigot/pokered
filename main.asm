@@ -22722,28 +22722,6 @@ SurfingAttemptFailed:
     TX_FAR _NoSurfingOnLaprasHereText
     db "@"
 
-; Input a = Level
-; Output ac = stat exp
-GetStatExpByLevel:
-    cp 6 ; C - Set for no borrow. (Set if A < n.)
-    jr nc,.LevelGreaterThen5
-    xor a
-.LevelGreaterThen5
-    push af
-    ld [H_MULTIPLIER],a
-    ld [H_MULTIPLICAND+2],a
-    xor a
-    ld [H_MULTIPLICAND+1],a
-    ld [H_MULTIPLICAND],a
-    call Multiply
-    pop af
-    ld [H_MULTIPLIER],a
-    call Multiply
-    ld a,16
-    ld [H_DIVISOR],a
-    ld b,4 ; 4 bytes
-    jp Divide
-
 ; Free
 
 SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
@@ -26130,14 +26108,8 @@ SendNewMonToBox:
     inc de
     ld a,[$FF00+$98]
     ld [de],a
+    call WriteStatExpPreLoaded
     inc de
-    xor a
-    ld b,$a
-.loop5
-    ld [de],a
-    inc de
-    dec b
-    jr nz,.loop5
     ld hl,W_ENEMYMONATKDEFIV
     ld a,[hli]
     ld [de],a
@@ -27213,7 +27185,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld [hl],a
     ld d,h
     ld e,l
-    call SetStatExp
+    call AddPokemonToParty_SetStatExp
     inc de
     inc de
     call WriteMovePP
@@ -28638,12 +28610,34 @@ CalcStatsAndSetCurrentHpToMax:
     ld [hl],d
     ret
 
-SetStatExp:
+AddPokemonToParty_SetStatExp:
     ld a,[$cc49]
     and $f
-    jr z,.NotEnemyBattle
-    ld a,[W_CURENEMYLVL] ; $d127
-    call GetStatExpByLevel
+    jr nz,WriteMaxStatExpByLevel
+    ; NotEnemyBattle
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,WriteMaxStatExpByLevel
+    dec a
+    jr z,WriteStatExpPreLoaded
+    dec a
+    jr z,WriteMaxStatExpByLevel
+    ; error
+    ; fall through
+
+WriteStatExpPreLoaded:
+    ld b,10
+    ld hl,W_ENEMYMON1MOVE3+$6+1 ; TempStatExp
+.writeEVsLoop2
+    ld a,[hli]
+    inc de
+    ld [de],a
+    dec b
+    jr nz,.writeEVsLoop2
+    ret
+
+WriteMaxStatExpByLevel:
+    call .GetMaxStatExpByLevel
     ld b,5
 .writeEVsLoopByLevel ; set all EVs depending by Level
     ld a,[H_MULTIPLICAND+1]
@@ -28655,29 +28649,41 @@ SetStatExp:
     dec b
     jr nz,.writeEVsLoopByLevel
     ret
-.NotEnemyBattle
-    xor a
-    ld b,10
-.writeEVsLoop ; set all EVs to 0
-    inc de
-    ld [de],a
-    dec b
-    jr nz,.writeEVsLoop
-    ret
 
-BootedUpTMText: ; e54f (3:654f)
+.GetMaxStatExpByLevel
+    ld a,[W_CURENEMYLVL] ; $d127
+    cp 6 ; C - Set for no borrow. (Set if A < n.)
+    jr nc,.LevelGreaterThen5
+    xor a
+.LevelGreaterThen5
+    push af
+    ld [H_MULTIPLIER],a
+    ld [H_MULTIPLICAND+2],a
+    xor a
+    ld [H_MULTIPLICAND+1],a
+    ld [H_MULTIPLICAND],a
+    call Multiply
+    pop af
+    ld [H_MULTIPLIER],a
+    call Multiply
+    ld a,16 ; Min Divisor = Max Result
+    ld [H_DIVISOR],a
+    ld b,4 ; 4 bytes
+    jp Divide
+
+BootedUpTMText:
     TX_FAR _BootedUpTMText
     db "@"
 
-BootedUpHMText: ; e554 (3:6554)
+BootedUpHMText:
     TX_FAR _BootedUpHMText
     db "@"
 
-TeachMachineMoveText: ; e559 (3:6559)
+TeachMachineMoveText:
     TX_FAR _TeachMachineMoveText
     db "@"
 
-MonCannotLearnMachineMoveText: ; e55e (3:655e)
+MonCannotLearnMachineMoveText:
     TX_FAR _MonCannotLearnMachineMoveText
     db "@"
 
@@ -59398,14 +59404,14 @@ LoadEnemyMonData:
     ld a,[W_CURENEMYLVL] ; $d127
     ld [de],a
     inc de
-    call CalcStatsAndLoadEnemyMonHp ; call CalcStats
-    ld hl,W_ENEMYMONCURHP ; $cfe6
+    call LoadEnemyMonData_CalcStats ; call CalcStats
     ld a,[W_ISINBATTLE] ; $d057
     cp $2
     jr z,.copyHPAndStatusFromPartyData
     ld a,[W_ENEMYBATTSTATUS3] ; $d069
     bit 3,a
     jr nz,.copyTypes
+    ld hl,W_ENEMYMONCURHP ; $cfe6
     ld a,[W_ENEMYMONMAXHP] ; $cff4
     ld [hli],a
     ld a,[W_ENEMYMONMAXHP+1]
@@ -60135,6 +60141,19 @@ ConversionEffect:
 InsertRealTypes:
     call GetMonHeader
     PREDEF_JUMP InsertRealTypes_
+
+DebugMonOrEnemyMoves:
+    push af
+    ld hl,W_PLAYERMONMOVES
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 3,a ; was the start button pressed?
+    jr z,.Done
+    ld hl,wDebugEnemyMoveBit7
+    set 7,[hl] ; Set during a Debug Enemy Move Menu Open
+    ld hl,W_ENEMYMONMOVES
+.Done
+    pop af
+    ret
 
 ; Free
 
@@ -62201,32 +62220,10 @@ GetEnemyIV:
     ld b,[hl]
     ret
 
-CalcStatsAndLoadEnemyMonHp:
-    ld a,[W_ISINBATTLE] ; $d057
-    cp $2
-    ld hl,W_ENEMYMONCURHP ; $cfe6
-    ld b,0
-    jr nz,.Done
-    ld hl,W_ENEMYMON1MOVE3+$6
-    ld a,[wWhichPokemon] ; $cf92
-    ld bc,$2c
-    call AddNTimes
-    ld b,$1
-.Done
-    jp CalcStats
-
-DebugMonOrEnemyMoves:
-    push af
-    ld hl,W_PLAYERMONMOVES
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    bit 3,a ; was the start button pressed?
-    jr z,.Done
-    ld hl,wDebugEnemyMoveBit7
-    set 7,[hl] ; Set during a Debug Enemy Move Menu Open
-    ld hl,W_ENEMYMONMOVES
-.Done
-    pop af
-    ret
+LoadEnemyMonData_CalcStats:
+    ld b,BANK(_LoadEnemyMonData_CalcStats)
+    ld hl,_LoadEnemyMonData_CalcStats
+    jp Bankswitch
 
 ; function to tell how effective the type of an enemy attack is on the player's current pokemon
 ; this doesn't take into account the effects that dual types can have
@@ -140525,6 +140522,121 @@ _DrawBadges:
 
 .BadgeTiles
     db $24,$2C,$34,$3C,$44,$4C,$54,$5C
+
+; ──────────────────────────────────────────────────────────────────────
+
+_LoadEnemyMonData_CalcStats:
+    ld a,[W_ISINBATTLE] ; $d057
+    and a
+    jr z,.NoBattle
+    dec a
+    jr z,.WildBattle
+    dec a
+    jr z,.FromEnemyTeam
+    ; error
+    ; fall through
+
+.NoBattle
+    push de
+    ld de,W_ENEMYMON1MOVE3+$6 ; TempStatExp - 1
+    push de ; Store Stat Exp -1 Pointer
+    ld b,BANK(WriteMaxStatExpByLevel)
+    ld hl,WriteMaxStatExpByLevel
+    call Bankswitch
+    call .CopyDV
+    pop hl ; Restore Stat Exp -1 Pointer
+    pop de
+    jr .Done
+
+.WildBattle
+    push de
+    ld de,W_ENEMYMON1MOVE3+$6 ; TempStatExp - 1
+    push de ; Store Stat Exp -1 Pointer
+    ld a,[W_ENEMYBATTSTATUS3] ; $d069
+    bit 3,a
+    jr nz,.SkipCalculation
+    call WriteRandomStatExpByLevel
+    call .CopyDV
+.SkipCalculation
+    pop hl ; Restore Stat Exp -1 Pointer
+    pop de
+    jr .Done
+
+.FromEnemyTeam
+    ld hl,W_ENEMYMON1MOVE3+$6 ; StatExp - 1
+    ld a,[wWhichPokemon] ; $cf92
+    ld bc,$2c
+    call AddNTimes
+    ; fall through
+
+.Done
+    ld b,$1
+    jp CalcStats
+.CopyDV
+    inc de
+    ld hl,W_ENEMYMONATKDEFIV
+    ld a,[hli] ; W_ENEMYMONATKDEFIV
+    ld [de],a  ; ...
+    inc de
+    ld a,[hl]  ; W_ENEMYMONSPDSPCIV
+    ld [de],a  ; ...
+    ret
+
+WriteRandomStatExpByLevel:
+    call .GetRandomStatExpByLevel
+    ld b,5
+.writeEVsLoopByLevel ; set all EVs depending by Level
+    ld a,[H_MULTIPLICAND+1]
+    inc de
+    ld [de],a
+    ld a,[H_MULTIPLICAND+2]
+    inc de
+    ld [de],a
+    dec b
+    jr nz,.writeEVsLoopByLevel
+    ret
+
+.GetRandomStatExpByLevel
+    ld a,[W_CURENEMYLVL] ; $d127
+    cp 6 ; C - Set for no borrow. (Set if A < n.)
+    jr nc,.LevelGreaterThen5
+    xor a
+.LevelGreaterThen5
+    push af
+    ld [H_MULTIPLIER],a
+    ld [H_MULTIPLICAND+2],a
+    xor a
+    ld [H_MULTIPLICAND+1],a
+    ld [H_MULTIPLICAND],a
+    call Multiply
+    pop af
+    ld [H_MULTIPLIER],a
+    call Multiply
+    call .GetDivisor ; RAND Divisor = RAND Result
+    ld [H_DIVISOR],a
+    ld b,4 ; 4 bytes
+    jp Divide
+
+.GetDivisor
+    call GenRandom
+    ld b,a
+    ld hl,.Table
+.loop
+    ld a,[hli]
+    cp b
+    jr nc,.done
+    inc hl
+    jr .loop
+.done
+    ld a,[hl]
+    ret
+.Table
+    db $32,255 ; 51/256 = 19.9%
+    db $65,128 ; 51/256 = 19.9%
+    db $BE,64  ; 89/256 = 34.8%
+    db $E4,32  ; 38/256 = 14.9%
+    db $F1,32  ; 13/256 =  5.1%
+    db $FF,16  ; 14/256 =  5.4%
 
 ; ──────────────────────────────────────────────────────────────────────
 
