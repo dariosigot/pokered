@@ -37927,6 +37927,9 @@ PowerPlantExplosion:
     ld hl,wFlagFollowBoulderBit7
     bit 7,[hl]
     ret nz
+    call GenRandom
+    cp $CC ; (204+1)/256 = 80% Explode
+    jr nc,.FailExplosionOrResetScript
     ld c,10
     call DelayFrames
     ld a,[$ff00+$8c]
@@ -37938,6 +37941,7 @@ PowerPlantExplosion:
     call GetCryData
     call PlaySound
     call .Animation
+.FailExplosionOrResetScript
     xor a ; PowerPlantScript0
     ld [W_POWERPLANTCURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
