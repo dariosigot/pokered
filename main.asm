@@ -722,7 +722,6 @@ OverworldLoop: ; 03ff (0:03ff)
     jp OverworldLoop
 .noDirectionButtonsPressed
     ld hl,wFlags_0xcd60
-.noDirectionButtonsPressedContinue:
     res 2,[hl]
     call UpdateSprites ; move sprites
     ld a,$01
@@ -773,7 +772,6 @@ OverworldLoop: ; 03ff (0:03ff)
     push hl
     ld hl,wFlagFollowBoulderBit7
     bit 7,[hl]
-    res 7,[hl]
     pop hl
     jr nz,.forceDirectionChange
     ld a,[$d52a] ; new direction
@@ -784,30 +782,30 @@ OverworldLoop: ; 03ff (0:03ff)
 ; the code below is strange
 ; it computes whether or not the player did a 180 degree turn,but then overwrites the result
 ; also,it does a seemingly pointless loop afterwards
-    swap a ; put old direction in upper half
-    or b ; put new direction in lower half
-    cp a,$48 ; change dir from down to up
-    jr nz,.notDownToUp
-    ld a,$02
-    ld [$d528],a
-    jr .oddLoop
-.notDownToUp
-    cp a,$84 ; change dir from up to down
-    jr nz,.notUpToDown
-    ld a,$01
-    ld [$d528],a
-    jr .oddLoop
-.notUpToDown
-    cp a,$12 ; change dir from right to left
-    jr nz,.notRightToLeft
-    ld a,$04
-    ld [$d528],a
-    jr .oddLoop
-.notRightToLeft
-    cp a,$21 ; change dir from left to right
-    jr nz,.oddLoop
-    ld a,$08
-    ld [$d528],a
+;    swap a ; put old direction in upper half
+;    or b ; put new direction in lower half
+;    cp a,$48 ; change dir from down to up
+;    jr nz,.notDownToUp
+;    ld a,$02
+;    ld [$d528],a
+;    jr .oddLoop
+;.notDownToUp
+;    cp a,$84 ; change dir from up to down
+;    jr nz,.notUpToDown
+;    ld a,$01
+;    ld [$d528],a
+;    jr .oddLoop
+;.notUpToDown
+;    cp a,$12 ; change dir from right to left
+;    jr nz,.notRightToLeft
+;    ld a,$04
+;    ld [$d528],a
+;    jr .oddLoop
+;.notRightToLeft
+;    cp a,$21 ; change dir from left to right
+;    jr nz,.oddLoop
+;    ld a,$08
+;    ld [$d528],a
 .oddLoop
     ld hl,wFlags_0xcd60
     set 2,[hl]
@@ -1958,8 +1956,6 @@ IsGhostBattlePlus:
 
 ; ──────────────────────
 
-; Free
-
 SECTION "LoadCurrentMapView",ROM0[$0ca2]
 
 ; this builds a tile map from the tile block map based on the current X/Y coordinates of the player's character
@@ -2932,6 +2928,8 @@ LoadMapHeader: ; 107c (0:107c)
     call RoutineForRealGB
     ret
 
+; Free
+
 SECTION "CopyMapConnectionHeader",ROM0[$1238]
 
 ; function to copy map connection data from ROM to WRAM
@@ -3262,6 +3260,8 @@ GetCryData:
     add b ; a = cryID * 3
     add c ; a = $14 + cryID * 3
     ret
+
+; Free
 
 SECTION "DisplayPartyMenu",ROM0[$13fc]
 
@@ -3695,8 +3695,6 @@ BackupHlAndGetSpecialListNameOrGetItemName:  ; xxxx (0:xxxx) ; Denim ; spazio ri
     ld de,$CD6D
     ret
 
-; ds X ; Denim ; 4 free Bytes
-
 SECTION "LoadMonFrontSprite",ROM0[$1665] ; Denim
 
 ; de: destination location
@@ -3884,6 +3882,8 @@ Tset16_Coll:
     INCBIN "gfx/tilesets/16.tilecoll"
 Tset17_Coll:
     INCBIN "gfx/tilesets/17.tilecoll"
+
+; Free
 
 SECTION "FarCopyData2",ROM0[$17f7] ; Denim
 
@@ -8083,6 +8083,8 @@ GetMoveName:
     pop hl
     ret
 
+; Free
+
 SECTION "ReloadMapData",ROM0[$3071]
 
 ; reloads text box tile patterns,current map view,and tileset tile patterns
@@ -8495,8 +8497,6 @@ TrySpeedUpCommon:
     call AdvancePlayerSprite ; Speed 2X
     pop af
     ret
-
-; Free
 
 SECTION "Func_32ef",ROM0[$32ef]
 
@@ -9175,8 +9175,6 @@ SpeedUpByke: ; Denim,Speed Walk and Byke
     call TrySpeedUpWithB     ; Speed 3X
 .TrySpeedUpWithB
     jp TrySpeedUpWithB       ; Speed 4X
-
-; Free
 
 SECTION "LoadTextBoxTilePatterns",ROM0[$36a0]
 
@@ -26734,6 +26732,14 @@ SetVisitedAndLoadMissableObj:
     ld [de],a
     ret
 
+ResetFollowBoulderFlag:    
+    ld hl,wFlagFollowBoulderBit7
+    res 7,[hl]
+    ld hl,wFlags_0xcd60
+    res 1,[hl]
+    res 6,[hl]
+    ret
+
 ; Free
 
 SECTION "InitializeMissableObjectsFlags",ROMX[$7175],BANK[$3]
@@ -26932,11 +26938,11 @@ DoBoulderDustAnimation:
     ld [wJoypadForbiddenButtonsMask],a
     ld hl,wFlags_0xcd60
     set 7,[hl]
-    ; Force Button Pressed like Direction
-    ld b,%11111111
-    call GetMovementFromFacingDirection
-    ld a,[de]
-    ld [H_JOYPADSTATE],a
+;    ; Force Button Pressed like Direction
+;    ld b,%11111111
+;    call GetMovementFromFacingDirection
+;    ld a,[de]
+;    ld [H_JOYPADSTATE],a
     ld a,[$d718]
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call GetSpriteMovementByte2Pointer
@@ -26946,10 +26952,7 @@ DoBoulderDustAnimation:
     ; fall through
 
 ResetBoulderPushFlags:
-    ld hl,wFlags_0xcd60
-    res 1,[hl]
-    res 6,[hl]
-    ret
+    jp ResetFollowBoulderFlag
 
 GetMovementFromFacingDirection:
     ld a,[$c109]
@@ -38084,6 +38087,85 @@ UnnamedText_1eb69:
     TX_FAR _UnnamedText_1eb69
     db "@"
 
+PowerPlantExplosion:
+    ld hl,wFlagFollowBoulderBit7
+    bit 7,[hl]
+    ret nz
+    ld c,10
+    call DelayFrames
+    ld a,[$ff00+$8c]
+    dec a
+    ld hl,PowerPlantVoltorbElectrode+6
+    ld bc,08
+    call AddNTimes
+    ld a,[hl]
+    call GetCryData
+    call PlaySound
+    call .Animation
+    xor a ; PowerPlantScript0
+    ld [W_POWERPLANTCURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+.Animation
+    ld a,[rBGP]
+    ld [wTempInitialPalette],a
+    ld b,10
+.loop
+    push bc
+    call .SlideLeft
+    call .InvertColor
+    call .SlideRight
+    call .WhiteColor
+    call .SlideRight
+    call .InvertColor
+    call .SlideLeft
+    call .RestoreColor
+    pop bc
+    ld a,b
+    cp 5
+    call z,.RemoveSprite
+    dec b
+    jr nz,.loop
+    xor a
+    ld [$c105],a ; delta X
+    ld [wWalkCounter],a
+    ret
+.SlideLeft
+    ld a,-01
+    jr .SlideScreen
+.SlideRight
+    ld a,+01
+    ; fall through
+.SlideScreen
+    ld [$c105],a ; delta X
+    ld a,8
+    ld [wWalkCounter],a
+    call AdvancePlayerSprite
+    call AdvancePlayerSprite
+    call AdvancePlayerSprite
+    jp AdvancePlayerSprite
+.RemoveSprite
+    ld a,[$ff00+$8c]
+    dec a
+    add $4D ; First Voltorb Missable ID
+    ld [$cc4d],a
+    PREDEF_JUMP RemoveMissableObject
+.InvertColor
+    ld a,%00011011 ; 0,1,2,3 (inverted colors)
+    ld [rBGP],a
+    ld c,2
+    jp DelayFrames
+.WhiteColor
+    ld a,%00000001 ; 0,0,0,1 (light colors)
+    ld [rBGP],a
+    ld c,2
+    jp DelayFrames
+.RestoreColor
+    ld a,[wTempInitialPalette] ; restore initial palette
+    ld [rBGP],a
+    ld c,2
+    jp DelayFrames
+
 ; Free
 
 SECTION "Func_1c98a",ROMX[$498a],BANK[$7]
@@ -41763,21 +41845,22 @@ PowerPlantObject:
     db $0 ; signs
 
     db 15 ; people
-    db SPRITE_BALL,$14 + 4,$9 + 4,$ff,$ff,$41,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
-    db SPRITE_BALL,$12 + 4,$20 + 4,$ff,$ff,$42,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
-    db SPRITE_BALL,$19 + 4,$15 + 4,$ff,$ff,$43,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
-    db SPRITE_BALL,$12 + 4,$19 + 4,$ff,$ff,$44,ELECTRODE,OPP_LVL_OFFSET+40 ; trainer
-    db SPRITE_BALL,$22 + 4,$17 + 4,$ff,$ff,$45,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
-    db SPRITE_BALL,$1c + 4,$1a + 4,$ff,$ff,$46,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
-    db SPRITE_BALL,$e + 4,$15 + 4,$ff,$ff,$47,ELECTRODE,OPP_LVL_OFFSET+40 ; trainer
-    db SPRITE_BALL,$20 + 4,$25 + 4,$ff,$ff,$48,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
-    db SPRITE_ZAPDOS,$9 + 4,$4 + 4,$ff,$d1,$49,ZAPDOS,OPP_LVL_OFFSET+55 ; Entry Point
-    db SPRITE_BALL,$19 + 4,$7 + 4,$ff,$ff,$8a,CARBOS ; item
-    db SPRITE_BALL,$3 + 4,$1c + 4,$ff,$ff,$8b,TM_41 ; item
-    db SPRITE_BALL,$3 + 4,$22 + 4,$ff,$ff,$8c,RARE_CANDY ; item
-    db SPRITE_BALL,$20 + 4,$1a + 4,$ff,$ff,$8d,TM_25 ; item
-    db SPRITE_BALL,$20 + 4,$14 + 4,$ff,$ff,$8e,TM_55 ; item ; FLASH
-    db SPRITE_BALL,34 + 4,09 + 4,$ff,$ff,$8f,TM_59 ; item
+PowerPlantVoltorbElectrode:
+    db SPRITE_BALL,21 + 4,09 + 4,$ff,$10,$41,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_BALL,18 + 4,33 + 4,$ff,$10,$42,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_BALL,25 + 4,21 + 4,$ff,$10,$43,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_BALL,17 + 4,25 + 4,$ff,$10,$44,ELECTRODE,OPP_LVL_OFFSET+40 ; trainer
+    db SPRITE_BALL,34 + 4,22 + 4,$ff,$10,$45,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_BALL,28 + 4,26 + 4,$ff,$10,$46,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_BALL,14 + 4,20 + 4,$ff,$10,$47,ELECTRODE,OPP_LVL_OFFSET+40 ; trainer
+    db SPRITE_BALL,33 + 4,38 + 4,$ff,$10,$48,VOLTORB,OPP_LVL_OFFSET+37 ; trainer
+    db SPRITE_ZAPDOS,09 + 4,04 + 4,$ff,$d1,$49,ZAPDOS,OPP_LVL_OFFSET+55 ; Entry Point
+    db SPRITE_BALL,25 + 4,06 + 4,$ff,$10,$8a,CARBOS ; item
+    db SPRITE_BALL,04 + 4,28 + 4,$ff,$10,$8b,TM_41 ; item
+    db SPRITE_BALL,04 + 4,36 + 4,$ff,$10,$8c,RARE_CANDY ; item
+    db SPRITE_BALL,31 + 4,26 + 4,$ff,$10,$8d,TM_25 ; item
+    db SPRITE_BALL,32 + 4,20 + 4,$ff,$10,$8e,TM_55 ; item ; FLASH
+    db SPRITE_BALL,34 + 4,11 + 4,$ff,$10,$8f,TM_59 ; item
 
     ; warp-to
     EVENT_DISP $14,$23,$4
@@ -42539,9 +42622,24 @@ ZapdosBattleText:
     jp TextScriptEnd
 
 PowerPlantScriptPointers:
-    dw CheckFightingMapTrainers
+    dw PowerPlantScript0
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
+    dw PowerPlantExplosion
+
+PowerPlantScript0:
+    ld hl,wFlagFollowBoulderBit7
+    bit 7,[hl]
+    jr z,.end
+    ld a,[$ff00+$8c]
+    cp 8 + 1 ; #8 Voltorb/Electrode
+    jr nc,.end
+    ld a,$3 ; PowerPlantExplosion
+    ld [W_POWERPLANTCURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    ret
+.end
+    jp CheckFightingMapTrainers
 
 ; Free
 

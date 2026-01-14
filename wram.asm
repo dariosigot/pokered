@@ -1941,6 +1941,7 @@ wTempStatHI           ; df36
 wSpriteOAMBySpeciesId ; df36
 wTempMoveEnergy       ; df36 ; Temp Buffer for Move Energy
 wTempMovePowerHI      ; df36 ; Temp Move Power 1st Byte
+wTempInitialPalette   ; df36 ; Initial Background Palette (rBGP) during Power Plant Explosion
     ds 1
 
 wMaxLevel              ; df37
