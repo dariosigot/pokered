@@ -22617,47 +22617,6 @@ MapHS:
     db HALL_OF_FAME,$01,Show ; $FC (Oak)
     db $FF
 
-MoveSpriteAndForcePlayerToFollowBoulder:
-    call MoveSprite
-    push bc
-    push hl
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    ld b,a
-    ld a,$ff
-    ld [wJoypadForbiddenButtonsMask],a
-    xor a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,11
-    ld [$cd38],a
-    ld hl,$ccd3
-    xor a
-    ld [hli],a
-    ld a,b ; old H_CURRENTPRESSEDBUTTONS
-    ld [hli],a
-    xor a
-    ld bc,11-2
-    call FillMemory
-    call StartSimulatingJoypadStates
-    ld hl,wFlagFollowBoulderBit7
-    set 7,[hl]
-    pop hl
-    pop bc
-    ret
-
-CheckFailPushingBoulder:
-    ld a,[$d728]
-    bit 0,a
-    jr z,.fail
-    ld a,[wFlags_0xcd60]
-    bit 1,a
-    jr nz,.fail
-    ld a,[$d700] ; if 0 -> walk,if 1 -> byke
-    dec a
-    ret nz ; Success
-.fail
-    pop hl ; Hack Remove Return Pointer
-    ret
-
 SentNewMonToBox_ResetMovePPs:
     call ResetMovePPs_
     xor a     ; Reset Move 2/3 PP
@@ -23394,14 +23353,6 @@ DrawHudAndPrintTextPokeFlute:
     pop hl
 .End
     jp PrintText
-
-WaitRightJumpPosition:
-    ld a,[$d736]
-    bit 6,a ; jumping a ledge?
-    ret nz
-    ld a,[$c390] ; HoppingShadowSprite
-    cp $A0
-    ret ; z = success
 
 ; Free
 
@@ -26732,14 +26683,6 @@ SetVisitedAndLoadMissableObj:
     ld [de],a
     ret
 
-ResetFollowBoulderFlag:    
-    ld hl,wFlagFollowBoulderBit7
-    res 7,[hl]
-    ld hl,wFlags_0xcd60
-    res 1,[hl]
-    res 6,[hl]
-    ret
-
 ; Free
 
 SECTION "InitializeMissableObjectsFlags",ROMX[$7175],BANK[$3]
@@ -26883,114 +26826,7 @@ HandleBitArray2: ; f1e6 (3:71e6)
     ld c,a
     ret
 
-TryPushingBoulder: ; f225 (3:7225)
-    call CheckFailPushingBoulder ; If Fail Hack Return
-    xor a
-    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call IsSpriteInFrontOfPlayer
-    ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
-    ld [$d718],a
-    and a
-    jr z,ResetBoulderPushFlags
-    ld hl,$c101
-    ld d,$0
-    ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
-    swap a
-    ld e,a
-    add hl,de
-    res 7,[hl]
-    call GetSpriteMovementByte2Pointer
-    ld a,[hl]
-    cp $10
-    jr nz,ResetBoulderPushFlags
-    ld hl,wFlags_0xcd60
-    bit 6,[hl]
-    set 6,[hl]
-    ret z
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    and $f0
-    ret z
-    PREDEF CheckForCollisionWhenPushingBoulder
-    ld a,[$d71c]
-    and a
-    jr nz,ResetBoulderPushFlags
-    ld a,[H_CURRENTPRESSEDBUTTONS]
-    ld b,a
-    call GetMovementFromFacingDirection
-    ret z
-    call MoveSpriteAndForcePlayerToFollowBoulder ; call MoveSprite
-    ld a,$a8
-    call PlaySound
-    ld hl,wFlags_0xcd60
-    set 1,[hl]
-    ret
-
-DoBoulderDustAnimation:
-    ld a,[$d730]
-    bit 0,a
-    ret nz
-    call WaitRightJumpPosition
-    ret nz
-    ld hl,Func_79f54
-    ld b,BANK(Func_79f54)
-    call Bankswitch ; indirect jump to Func_79f54 (79f54 (1e:5f54))
-    xor a
-    ld [wJoypadForbiddenButtonsMask],a
-    ld hl,wFlags_0xcd60
-    set 7,[hl]
-;    ; Force Button Pressed like Direction
-;    ld b,%11111111
-;    call GetMovementFromFacingDirection
-;    ld a,[de]
-;    ld [H_JOYPADSTATE],a
-    ld a,[$d718]
-    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call GetSpriteMovementByte2Pointer
-    ld [hl],$10
-    ld a,$ac
-    call PlaySound
-    ; fall through
-
-ResetBoulderPushFlags:
-    jp ResetFollowBoulderFlag
-
-GetMovementFromFacingDirection:
-    ld a,[$c109]
-    cp $4 ; SPRITE_FACING_UP
-    jr z,.pushBoulderUp
-    cp $8 ; SPRITE_FACING_LEFT
-    jr z,.pushBoulderLeft
-    cp $c ; SPRITE_FACING_RIGHT
-    jr z,.pushBoulderRight
-.pushBoulderDown
-    bit 7,b
-    ret z
-    ld de,.PushBoulderDownMovementData
-    ret
-.pushBoulderUp
-    bit 6,b
-    ret z
-    ld de,.PushBoulderUpMovementData
-    ret
-.pushBoulderLeft
-    bit 5,b
-    ret z
-    ld de,.PushBoulderLeftMovementData
-    ret
-.pushBoulderRight
-    bit 4,b
-    ret z
-    ld de,.PushBoulderRightMovementData
-    ret
-
-.PushBoulderUpMovementData
-    db $40,$FF
-.PushBoulderDownMovementData
-    db $00,$FF
-.PushBoulderLeftMovementData
-    db $80,$FF
-.PushBoulderRightMovementData
-    db $C0,$FF
+; Free
 
 SECTION "_AddPokemonToParty",ROMX[$72e5],BANK[$3]
 
@@ -113080,7 +112916,7 @@ Func_79f30: ; 79f30 (1e:5f30)
     ld bc,$8
     jp CopyData
 
-Func_79f54: ; 79f54 (1e:5f54)
+AnimateBoulderDust: ; 79f54 (1e:5f54)
     ld a,$1
     ld [$cd50],a
     ld a,[$cfcb]
@@ -140758,6 +140594,181 @@ WriteRandomStatExpByLevel:
     db $E4,32  ; 38/256 = 14.9%
     db $F1,32  ; 13/256 =  5.1%
     db $FF,16  ; 14/256 =  5.4%
+
+; ──────────────────────────────────────────────────────────────────────
+
+TryPushingBoulder:
+    call CheckFailPushingBoulder ; If Fail Hack Return
+    xor a
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    call IsSpriteInFrontOfPlayer
+    ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
+    ld [$d718],a
+    and a
+    jr z,ResetBoulderPushFlags
+    ld hl,$c101
+    ld d,$0
+    ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
+    swap a
+    ld e,a
+    add hl,de
+    res 7,[hl]
+    call GetSpriteMovementByte2Pointer
+    ld a,[hl]
+    cp $10
+    jr nz,ResetBoulderPushFlags
+    ld hl,wFlags_0xcd60
+    bit 6,[hl]
+    set 6,[hl]
+    ret z
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    and $f0
+    ret z
+    PREDEF CheckForCollisionWhenPushingBoulder
+    ld a,[$d71c]
+    and a
+    jr nz,ResetBoulderPushFlags
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    ld b,a
+    call GetMovementFromFacingDirection
+    ret z
+    call MoveSpriteAndForcePlayerToFollowBoulder ; call MoveSprite
+    ld a,$a8
+    call PlaySound
+    ld hl,wFlags_0xcd60
+    set 1,[hl]
+    ret
+
+ResetBoulderPushFlags: 
+    ld hl,wFlagFollowBoulderBit7
+    res 7,[hl]
+    ld hl,wFlags_0xcd60
+    res 1,[hl]
+    res 6,[hl]
+    ret
+
+DoBoulderDustAnimation:
+    ld a,[$d730]
+    bit 0,a
+    ret nz
+    call WaitRightJumpPosition
+    ret nz
+    call .GetSpritePictureID
+    ld hl,.SpriteNoDustList
+    ld de,1
+    call IsInArray
+    ld hl,AnimateBoulderDust
+    ld b,BANK(AnimateBoulderDust)
+    call nc,Bankswitch
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a
+    ld hl,wFlags_0xcd60
+    set 7,[hl]
+    ld a,[$d718]
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    call GetSpriteMovementByte2Pointer
+    ld [hl],$10
+    ld a,$ac
+    call PlaySound
+    jr ResetBoulderPushFlags
+.GetSpritePictureID
+    ld a,[$FF8C] ; the sprite to move
+    ld h,$C1
+    swap a
+    ld l,a
+    ld a,[hl]
+    ret
+.SpriteNoDustList
+    db SPRITE_BALL
+    db SPRITE_BASKET
+    db $FF
+
+GetMovementFromFacingDirection:
+    ld a,[$c109]
+    cp $4 ; SPRITE_FACING_UP
+    jr z,.pushBoulderUp
+    cp $8 ; SPRITE_FACING_LEFT
+    jr z,.pushBoulderLeft
+    cp $c ; SPRITE_FACING_RIGHT
+    jr z,.pushBoulderRight
+.pushBoulderDown
+    bit 7,b
+    ret z
+    ld de,.PushBoulderDownMovementData
+    ret
+.pushBoulderUp
+    bit 6,b
+    ret z
+    ld de,.PushBoulderUpMovementData
+    ret
+.pushBoulderLeft
+    bit 5,b
+    ret z
+    ld de,.PushBoulderLeftMovementData
+    ret
+.pushBoulderRight
+    bit 4,b
+    ret z
+    ld de,.PushBoulderRightMovementData
+    ret
+
+.PushBoulderUpMovementData
+    db $40,$FF
+.PushBoulderDownMovementData
+    db $00,$FF
+.PushBoulderLeftMovementData
+    db $80,$FF
+.PushBoulderRightMovementData
+    db $C0,$FF
+
+CheckFailPushingBoulder:
+    ld a,[$d728]
+    bit 0,a
+    jr z,.fail
+    ld a,[wFlags_0xcd60]
+    bit 1,a
+    jr nz,.fail
+    ld a,[$d700] ; if 0 -> walk,if 1 -> byke
+    dec a
+    ret nz ; Success
+.fail
+    pop hl ; Hack Remove Return Pointer
+    ret
+
+MoveSpriteAndForcePlayerToFollowBoulder:
+    call MoveSprite
+    push bc
+    push hl
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    ld b,a
+    ld a,$ff
+    ld [wJoypadForbiddenButtonsMask],a
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,11
+    ld [$cd38],a
+    ld hl,$ccd3
+    xor a
+    ld [hli],a
+    ld a,b ; old H_CURRENTPRESSEDBUTTONS
+    ld [hli],a
+    xor a
+    ld bc,11-2
+    call FillMemory
+    call StartSimulatingJoypadStates
+    ld hl,wFlagFollowBoulderBit7
+    set 7,[hl]
+    pop hl
+    pop bc
+    ret
+
+WaitRightJumpPosition:
+    ld a,[$d736]
+    bit 6,a ; jumping a ledge?
+    ret nz
+    ld a,[$c390] ; HoppingShadowSprite
+    cp $A0
+    ret ; z = success
 
 ; ──────────────────────────────────────────────────────────────────────
 
