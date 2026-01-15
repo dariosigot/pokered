@@ -16579,11 +16579,6 @@ LearnMove: ; 6e43 (1:6e43)
     push hl
     push de
     call IsTryingToLearnPalFix_End
-;    call CheckMoveRelearn
-;    jr nz,.DoLearn2
-;    ld hl,.ForgotAndLearnText
-;    call PrintText
-;.DoLearn2
     pop de
     pop hl
     ld c,2 ; result
@@ -16591,21 +16586,6 @@ LearnMove: ; 6e43 (1:6e43)
     push bc
     ld a,[$d0e0]
     ld [hl],a
-    ;ld bc,$15           ; Don't Overwrite PP during NEW Move Learn
-    ;add hl,bc           ; ...
-    ;push hl             ; ...
-    ;push de             ; ...
-    ;dec a               ; ...
-    ;ld hl,Moves ; $4000 ; ...
-    ;ld bc,$6            ; ...
-    ;call AddNTimes      ; ...
-    ;ld de,$cee9         ; ...
-    ;ld a,BANK(Moves)    ; ...
-    ;call FarCopyData    ; ...
-    ;ld a,[$ceee]        ; ...
-    ;pop de              ; ...
-    ;pop hl              ; ...
-    ;nop ; ld [hl],a     ; ...
     ld a,[W_ISINBATTLE] ; $d057
     and a
     jr z,.LearnedMoveComplete
@@ -16663,26 +16643,12 @@ LearnMove: ; 6e43 (1:6e43)
     pop hl
 .ChoiceAnotherMoveToDelete
     push hl
-;    call CheckMoveRelearn
-;    ld hl,.WhichMoveShouldBeReplacedText ; $6fb4
-;    call z,PrintText
-;    FuncCoord 4,7 ; $c430
-;    ld hl,Coord
-;    ld bc,$040e
-;    call CheckMoveRelearn
-;    jr z,.skip1
     FuncCoord 00,12
     ld hl,Coord
     ld bc,$0412
-;.skip1
     call TextBoxBorder
-;    FuncCoord 6,8 ; $c446
-;    ld hl,Coord
-;    call CheckMoveRelearn
-;    jr z,.skip2
     FuncCoord 02,13
     ld hl,Coord
-;.skip2
     ld de,$d0e1
     ld a,[$FF00+$f6]
     set 2,a
@@ -16692,19 +16658,10 @@ LearnMove: ; 6e43 (1:6e43)
     res 2,a
     ld [$FF00+$f6],a
     ld hl,wTopMenuItemY ; $cc24
-;    call CheckMoveRelearn
-;    jr nz,.skip3
-;    ld a,$8
-;    ld [hli],a
-;    ld a,$5
-;    ld [hli],a
-;    jr .skip4
-;.skip3
     ld a,13
     ld [hli],a
     ld a,01
     ld [hli],a
-;.skip4
     xor a
     ld [hli],a
     inc hl
@@ -16727,10 +16684,6 @@ LearnMove: ; 6e43 (1:6e43)
     pop hl
     bit 1,a
     jr nz,.asm_6fab_B_Pressed
-    ;push hl
-    ;call CheckImportantMove
-    ;pop hl
-    ;jp c,.ChoiceAnotherMoveToDelete
 
     ld a,[wCurrentMenuItem] ; $cc26
     ld c,a
@@ -16747,20 +16700,8 @@ LearnMove: ; 6e43 (1:6e43)
     TX_FAR _LearnedText
     db $b,6,"@"
 
-.WhichMoveShouldBeReplacedText
-    TX_FAR _WhichMoveShouldBeReplacedText
-    db "@"
-
-;.AbandonLearningText
-;    TX_FAR _AbandonLearningText
-;    db "@"
-
 .ReplaceAMoveForText
     TX_FAR _ReplaceAMoveForText
-    db "@"
-
-.ForgotAndLearnText
-    TX_FAR _ForgotAndLearnText
     db "@"
 
 ; ────────────────────────────────────────
@@ -18834,85 +18775,6 @@ CheckDiglettsCave:
     call CheckDarkMap
 .end
     jp GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
-
-;CheckImportantMove:
-;
-;    ; Get Move to Delete
-;    ld a,[wCurrentMenuItem] ; $cc26
-;    ld c,a
-;    ld b,$0
-;    add hl,bc
-;    ld a,[hl]
-;
-;    push af ; Backup Move to Delete
-;    push bc ; Backup Move Offset
-;
-;    push af ; Backup Move
-;
-;    ; Get Move Name
-;    ld [$d11e],a
-;    call GetMoveName
-;
-;    ; Get Potential Move List
-;    call CheckMoveRelearn
-;    jr nz,.skip
-;    ld a,[wWhichPokemon]
-;    ld [$cf92],a
-;    xor a ; player party
-;    ld [$cc49],a
-;    call LoadMonData
-;    ld b,BANK(GetMonPotentialMoveList)
-;    ld hl,GetMonPotentialMoveList
-;    call Bankswitch
-;.skip
-;
-;    pop bc ; Restore Move
-;    ld a,[$cf98]
-;    cp MEW
-;    jr z,.ConfirmDelete
-;
-;    ; Search Move to Delete in Potential Move List
-;    ld hl,wMoveRelearnerMoveList
-;    ld a,[hli]
-;    and a
-;    jr z,.NotFindThenImportant
-;    ld c,a
-;.Loop
-;    ld a,[hli]
-;    cp $FF
-;    jr z,.NotFindThenImportant
-;    cp b
-;    jr z,.FindThenNotImportant
-;    dec c
-;    jr nz,.Loop
-;.NotFindThenImportant
-;
-;    ld hl,.ImportantText
-;    call IsTryingToLearnPalFix_PrintText
-;
-;    FuncCoord 14,7 ; $c43a
-;    ld hl,Coord
-;    ld bc,$80f
-;    ld a,$14
-;    ld [$d125],a
-;    call DisplayTextBoxID
-;    ld a,[wCurrentMenuItem] ; $cc26
-;    and a
-;    jr z,.ConfirmDelete
-;
-;    pop bc ; Restore Move Offset
-;    pop af ; Backup Move to Delete
-;    scf
-;    ret
-;.FindThenNotImportant
-;.ConfirmDelete
-;    pop bc ; Restore Move Offset
-;    pop af ; Backup Move to Delete
-;    and a ; rcf
-;    ret
-;.ImportantText
-;    TX_FAR _ImportantText
-;    db "@"
 
 HandleMenuInput_PrintMoveBox:
     push hl
@@ -130604,52 +130466,18 @@ _PokemartAnythingElseText: ; a2719 (28:6719)
     db $0,"Is there anything",$4f
     db "else I can do?",$57
 
-_LearnedText: ; a273b (28:673b)
+_LearnedText:
     TX_RAM $d036
     db $0," learned",$4f
     db "@"
     TX_RAM $cf4b
     db $0,"!@@"
 
-_WhichMoveShouldBeReplacedText: ; a2750 (28:6750)
-    ;db $0,"Which move should",$4e,"be replaced?",$57
-    db 0,"Which",$4f
-    db "Replace?",$57
-
-;_AbandonLearningText:
-;    db $0,"Are you sure?",$57
-
 _ReplaceAMoveForText:
     db 0,"Replace a move for",$4f
     db "@"
     TX_RAM $cf4b
     db $0,"?",$57
-
-;_ImportantText:
-;    TX_RAM $cd6d
-;    db $0," is a",$4f,"@"
-;    TX_RAM $d036
-;    db 0,"'s",$55
-;    db "Exclusive Move!",$51
-;    db "If replaced,",$4f,"@"
-;    TX_RAM $d036
-;    db 0," can't",$55
-;    db "relearn it again!",$51
-;    db "Permanently forget",$4f,"@"
-;    TX_RAM $cd6d
-;    db 0,"?",$57
-
-_ForgotAndLearnText:
-    ;db 0,"Ok! Replaced",$4f,"@"
-    ;TX_RAM $cd6d
-    ;db $0,$55
-    ;db "with @"
-    ;TX_RAM $cf4b
-    ;db $0,$55,"in @"
-    ;TX_RAM $d036
-    ;db 0,"'s",$55
-    ;db "Moveset!",$58
-    db 0,"Move Replaced!",$58
 
 SECTION "_PokemonCenterWelcomeText",ROMX[$686d],BANK[$28]
 
