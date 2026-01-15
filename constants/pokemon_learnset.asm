@@ -2978,6 +2978,7 @@ TAUROS_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MAGIKARP_Learnset:
+    db  1,FieldMove__FLOAT
     db  1,SPLASH
     db 15,TACKLE
     db 20,TAIL_WHIP
@@ -3022,6 +3023,7 @@ MAGIKARP_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LAPRAS_Learnset:
+    db  1,FieldMove__FLOAT
     db  1,BUBBLE
     db  1,GROWL
     db  7,BIDE

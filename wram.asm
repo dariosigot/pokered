@@ -1979,6 +1979,7 @@ wFlagListMenuSpc:           ; df39 ; bit 0 = BadgeName
                             ; df39 ; bit 3 = Rocket Hideout Elevator
 wHyperBeamUnknownTypeBit4   ; df39 ; bit 4 = Set Hyper Beam to Unknown Type
 wCollisionWithSpriteBit5    ; df39 ; bit 5 = Set during start menu if there is a sprite in front of player
+wNoFieldMovesInListBit6     ; df39 ; bit 6 = Don't Load Field Moves in List
     ds 1
 
 wLastTechMachIdUsed: ; df3a

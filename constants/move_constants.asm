@@ -163,6 +163,18 @@ SUPER_FANG   EQU $A2
 SLASH        EQU $A3
 SUBSTITUTE   EQU $A4
 STRUGGLE     EQU $A5
+
+; ─────────────────────────────
+; Field Moves
+; ─────────────────────────────
+FieldMove__FLY      EQU $A6
+FieldMove__DIG      EQU $A7
+FieldMove__CUT      EQU $A8
+FieldMove__FLOAT    EQU $A9
+FieldMove__STRENGTH EQU $AA
+FieldMove__LIGHT    EQU $AB
+FieldMove__HEAL     EQU $AC
+
 ; these do double duty as animation identifiers
 SHOWPIC_ANIM EQU $A6 ; redraw monster pic
 XSTATITEM_ANIM EQU $AE ; use X Attack/Defense/Speed/Special

@@ -38,7 +38,12 @@ StoreGymLeaderRematch:
     pop bc
     ret
 
-; Free
+CheckFieldMovesInList:
+    push hl
+    ld hl,wNoFieldMovesInListBit6
+    bit 6,[hl]
+    pop hl
+    ret
 
 ; interrupts
 SECTION "vblank",ROM0[$40]
@@ -2923,7 +2928,12 @@ LoadMapHeader: ; 107c (0:107c)
     call RoutineForRealGB
     ret
 
-; Free
+CheckMoveRelearn:
+    push hl
+    ld hl,wFlagMoveRelearnEngagedBit7
+    bit 7,[hl]
+    pop hl
+    ret
 
 SECTION "CopyMapConnectionHeader",ROM0[$1238]
 
@@ -11072,13 +11082,6 @@ ResetStatusAndHalveMoneyOnBlackout:
     ld [wJoypadForbiddenButtonsMask],a
     PREDEF_JUMP HealParty
 
-CheckMoveRelearn:
-    push hl
-    ld hl,wFlagMoveRelearnEngagedBit7
-    bit 7,[hl]
-    pop hl
-    ret
-
 NewMoveDetails:
     call .PrintNewLearnMoveDetail
     call DisplayTextBoxID
@@ -17770,7 +17773,9 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     db "SURF@"
 
 ChoiceMonSimpleMenu:
-    call GetMonFieldMoves
+    ld b,BANK(GetMonFieldMoves)
+    ld hl,GetMonFieldMoves
+    call Bankswitch
     FuncCoord 11,06
     ld hl,Coord
     ld b,10
@@ -17789,61 +17794,6 @@ ChoiceMonSimpleMenu:
     db "MOVES",$4E
     db "RENAME",$4E
     db "SWITCH","@"
-
-GetMonFieldMoves:
-    call .CheckMonAlreadyKnowTeleportAndFillMemory ; this function call "GetMonHeader"
-    ld a,[W_MONH_FIELDMOVES]
-    jr nc,.next
-    set 1,a ; FM_TELEPORT
-.next
-    ld e,a
-    ld c,8
-    ld b,0
-    ld hl,wFieldMoves
-.Loop8BitRule
-    ld a,8+1
-    sub c ; a=a-c ; Move id
-    srl e
-    jr nc,.FieldMoveNotFound
-.FieldMoveFound
-    inc b ; num of founded moves
-    ld [hli],a ; store field move id in wFieldMoves vector
-    ld a,b
-    cp 8 ; Max Possible Number of Field Moves
-    jr z,.End
-.FieldMoveNotFound
-    dec c
-    jr nz,.Loop8BitRule
-.End
-    ld a,b
-    ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
-    ret
-.CheckMonAlreadyKnowTeleportAndFillMemory
-    call .BackupGenericBuffer
-    ld a,TELEPORT
-    ld [$d0e0],a
-    ld b,BANK(CheckMonAlreadyKnowMove)
-    ld hl,CheckMonAlreadyKnowMove
-    call Bankswitch
-    push af
-    call .RestoreGenericBuffer
-    xor a
-    ld hl,wFieldMoves
-    ld bc,8+1
-    call FillMemory
-    pop af
-    ret
-.BackupGenericBuffer
-    ld hl,GenericBuffer+00
-    ld de,GenericBuffer+96
-    jr .BackupGenericBufferCommon
-.RestoreGenericBuffer
-    ld hl,GenericBuffer+96
-    ld de,GenericBuffer+00
-    ; fall through
-.BackupGenericBufferCommon
-    ld bc,96
-    jp CopyData
 
 DrainHPEffect_:
     ld de,W_DAMAGE+1
@@ -31069,7 +31019,7 @@ CheckEarthPower: ; STRENGTH
     bit 0,[hl]
     jr ElementEnd
 
-CheckFirePower: ; FIRE
+CheckFirePower: ; FLASH
 ;    jr z,DontCheckElement
     ld hl,$d7c2
     bit 0,[hl]
@@ -37878,6 +37828,37 @@ PowerPlantExplosion:
     ld c,2
     jp DelayFrames
 
+IsFieldMove_Bank7:
+    push bc
+    push af
+    push de
+    push hl
+    ld hl,.FieldMoveTable
+    ld de,1
+    call IsInArray
+    jr c,.Found
+.NotFound
+    xor a ; rcf
+    jr .IsFieldMove_End
+.Found
+    scf
+.IsFieldMove_End
+    pop hl
+    pop de
+    pop bc
+    ld a,b
+    pop bc
+    ret
+.FieldMoveTable
+    db FieldMove__FLY
+    db FieldMove__DIG
+    db FieldMove__CUT
+    db FieldMove__FLOAT
+    db FieldMove__STRENGTH
+    db FieldMove__LIGHT
+    db FieldMove__HEAL
+    db $FF
+
 ; Free
 
 SECTION "Func_1c98a",ROMX[$498a],BANK[$7]
@@ -42845,6 +42826,8 @@ MovesMenu:
     call SaveScreenTilesToBuffer1
     ld hl,wFlagMoveRelearnEngagedBit7
     set 7,[hl]
+    ld hl,wNoFieldMovesInListBit6
+    set 6,[hl]
     ; Backup Screen "Offset"
     ld a,[wListScrollOffset]
     push af
@@ -42989,6 +42972,8 @@ MovesMenu:
 
     pop af
     ld [wListScrollOffset],a ; Restore Screen "Offset"
+    ld hl,wNoFieldMovesInListBit6
+    res 6,[hl]
     ld hl,wFlagMoveRelearnEngagedBit7
     res 7,[hl]
     jp LoadScreenTilesFromBuffer1
@@ -43796,6 +43781,9 @@ HandleExclusiveLearnMove:
     ld a,[hl] ; Exclusive Move
     and a
     jr z,.OutOfRange
+    call CheckFieldMovesInList
+    call nz,IsFieldMove_Bank7
+    jr c,.OutOfRange
     pop de ; Restore Pointer to Move List Current Elements
     ld b,a
     inc a
@@ -51565,7 +51553,13 @@ WriteMonMoves:
     push hl
     push de
     push bc
+    ld hl,wNoFieldMovesInListBit6
+    set 6,[hl]
     call GetMoves
+    push hl
+    ld hl,wNoFieldMovesInListBit6
+    res 6,[hl]
+    pop hl
     jr .firstMove
 .nextMove
     pop de
@@ -100462,8 +100456,7 @@ Func_711ef:
     jp CopyData
 
 ShakeMiniSprite:
-    ld a,[wFlagMoveRelearnEngagedBit7]
-    bit 7,a
+    call CheckMoveRelearn
     jp z,Func_716ff
     ld a,[wCurrentMenuItem]
     push af
@@ -131998,8 +131991,14 @@ MoveNames: ; b0000 (2c:4000)
     db "SUPER FANG@"
     db "SLASH@"
     db "SUBSTITUTE@"
-    db "STRUGGLE@"
-
+    db "STRUGGLE@" ; $A5
+    db "FLY@"      ; $A6
+    db "DIG@"      ; $A7
+    db "CUT@"      ; $A8
+    db "FLOAT@"    ; $A9
+    db "STR.TH@"   ; $AA
+    db "LIGHT@"    ; $AB
+    db "HEAL@"     ; $AC
 
 SECTION "bank2D",ROMX,BANK[$2D]
 
@@ -144747,6 +144746,7 @@ _GetEvos:
     ret
 
 _GetMoves:
+    call Load16BitRegisters
     push de
     ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
@@ -144770,9 +144770,16 @@ _GetMoves:
     ld a,[hli]
     and a
     jr z,.EndLoop2
+    ld b,a ; B = Level
+    ld a,[hli]
+    ld c,a ; c = Move
+    call CheckFieldMovesInList
+    call nz,.IsFieldMove
+    jr c,.Loop2
+    ld a,b
     ld [de],a
     inc de
-    ld a,[hli]
+    ld a,c
     ld [de],a
     inc de
     jr .Loop2
@@ -144782,9 +144789,171 @@ _GetMoves:
     inc hl
     jr .Loop1
 .EndLoop1
+    xor a     ; 0 = end learnset
+    ld [de],a ; ...
     pop hl
     pop de
     ret
+
+.IsFieldMove
+    push bc
+    push af
+    push de
+    push hl
+    ld hl,.FieldMoveTable
+    ld de,1
+    call IsInArray
+    jr c,.Found
+.NotFound
+    xor a ; rcf
+    jr .IsFieldMove_End
+.Found
+    scf
+.IsFieldMove_End
+    pop hl
+    pop de
+    pop bc
+    ld a,b
+    pop bc
+    ret
+.FieldMoveTable
+    db FieldMove__FLY
+    db FieldMove__DIG
+    db FieldMove__CUT
+    db FieldMove__FLOAT
+    db FieldMove__STRENGTH
+    db FieldMove__LIGHT
+    db FieldMove__HEAL
+    db $FF
+
+; ──────────────────────────────────────────────────────────────────────
+
+GetMonFieldMoves:
+    call .BackupGenericBuffer
+    xor a ; player party
+    ld [$cc49],a
+    call LoadMonData
+    ld b,BANK(GetMonPotentialMoveList)
+    ld hl,GetMonPotentialMoveList
+    call Bankswitch
+    ld e,0 ; Initialize 8 bits "FieldMoveByte"
+    ld d,8
+    ld hl,.FieldMoveConfigTable
+.loop
+    ld a,[hli]
+    ld b,a ; b = Move to Search
+    ld a,[hli]
+    ld c,a ; c = FM_XXX bit value added to e
+    push hl
+    call .CheckPower
+    call nz,.CheckMonAlreadyKnowFieldMove
+    pop hl
+    inc hl
+    inc hl
+    inc hl
+    dec d
+    jr nz,.loop
+    push de
+    call .RestoreGenericBuffer
+    call .FillMemory
+    pop de
+    ld c,8
+    ld b,0
+    ld hl,wFieldMoves
+.Loop8BitRule
+    ld a,8+1
+    sub c ; a=a-c ; Move id
+    srl e
+    jr nc,.FieldMoveNotFound
+.FieldMoveFound
+    inc b ; num of founded moves
+    ld [hli],a ; store field move id in wFieldMoves vector
+    ld a,b
+    cp 8 ; Max Possible Number of Field Moves
+    jr z,.End
+.FieldMoveNotFound
+    dec c
+    jr nz,.Loop8BitRule
+.End
+    ld a,b
+    ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
+    ret
+
+.CheckPower
+    push de
+    push bc
+    ld a,[hli]
+    ld e,a
+    ld a,[hli]
+    ld d,a
+    or e
+    jr z,.CheckPower_Success ; Both pointer Byte zero
+    ld c,[hl] ; c = Power Bit
+    ld h,d
+    ld l,e ; [hl] = Power Byte
+    ld b,2
+    PREDEF HandleBitArray
+    ld a,c
+    and a
+.CheckPower_End
+    pop bc
+    pop de
+    ret
+.CheckPower_Success
+    ld a,1
+    or a ; reset all flag
+    jr .CheckPower_End
+
+FMCT: MACRO
+    db \1,\2
+    dw \3
+    db \4
+ENDM
+
+.FieldMoveConfigTable
+    FMCT FieldMove__FLY,FM_FLY,$d7e0,6
+    FMCT TELEPORT,FM_TELEPORT,$0000,0
+    FMCT FieldMove__DIG,FM_DIG,$0000,0
+    FMCT FieldMove__CUT,FM_CUT,$d803,0
+    FMCT FieldMove__FLOAT,FM_FLOAT,$d857,0
+    FMCT FieldMove__STRENGTH,FM_STRENGTH,$d78e,0
+    FMCT FieldMove__LIGHT,FM_LIGHT,$d7c2,0
+    FMCT FieldMove__HEAL,FM_HEAL,$0000,0
+
+.FillMemory
+    xor a
+    ld [wNumFieldMoves],a
+    ld hl,wFieldMoves
+    ld bc,8+1
+    jp FillMemory
+
+.CheckMonAlreadyKnowFieldMove
+    push de
+    push bc
+    ld a,b
+    ld [$d0e0],a
+    ld b,BANK(CheckMonAlreadyKnowMoveQuick)
+    ld hl,CheckMonAlreadyKnowMoveQuick
+    call Bankswitch
+    pop bc
+    pop de
+    ret nc
+    ld a,e
+    add c
+    ld e,a
+    ret
+
+.BackupGenericBuffer
+    ld hl,GenericBuffer+00
+    ld de,GenericBuffer+96
+    jr .BackupGenericBufferCommon
+.RestoreGenericBuffer
+    ld hl,GenericBuffer+96
+    ld de,GenericBuffer+00
+    ; fall through
+.BackupGenericBufferCommon
+    ld bc,96
+    jp CopyData
 
 ; ──────────────────────────────────────────────────────────────────────
 
