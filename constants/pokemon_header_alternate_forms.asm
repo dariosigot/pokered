@@ -30,8 +30,8 @@ VoltorbHisuiBaseStats:
     ; palette
     dw PAL_VOLTORB_HISUI
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 103 ; base exp yield
@@ -70,8 +70,8 @@ ElectrodeHisuiBaseStats:
     ; palette
     dw PAL_ELECTRODE_HISUI
 
-    ; field moves
-    db FM_LIGHT+FM_HEAL
+    ; not used
+    db 0
 
     db 60 ; catch rate
     db 150 ; base exp yield
@@ -110,7 +110,7 @@ KabutoFossilBaseStats:
     ; palette
     dw PAL_KABUTO
 
-    ; field moves
+    ; not used
     db 0
 
     db 45 ; catch rate
@@ -150,8 +150,8 @@ KabutopsFossilBaseStats:
     ; palette
     dw PAL_KABUTOPS
 
-    ; field moves
-    db FM_CUT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 201 ; base exp yield
@@ -190,8 +190,8 @@ AerodactylFossilBaseStats:
     ; palette
     dw PAL_AERODACTYL
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 202 ; base exp yield
@@ -230,8 +230,8 @@ BulbasaurStarterBaseStats:
     ; palette
     dw PAL_BULBASAUR
 
-    ; field moves
-    db FM_CUT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 64 ; base exp yield
@@ -270,8 +270,8 @@ IvysaurStarterBaseStats:
     ; palette
     dw PAL_IVYSAUR
 
-    ; field moves
-    db FM_CUT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 141 ; base exp yield
@@ -310,8 +310,8 @@ VenusaurStarterBaseStats:
     ; palette
     dw PAL_VENUSAUR
 
-    ; field moves
-    db FM_CUT+FM_STRENGTH+FM_HEAL
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 208 ; base exp yield
@@ -350,8 +350,8 @@ CharmanderStarterBaseStats:
     ; palette
     dw PAL_CHARMANDER
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 65 ; base exp yield
@@ -390,8 +390,8 @@ CharmeleonStarterBaseStats:
     ; palette
     dw PAL_CHARMELEON
 
-    ; field moves
-    db FM_CUT+FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 142 ; base exp yield
@@ -430,8 +430,8 @@ CharizardStarterBaseStats:
     ; palette
     dw PAL_CHARIZARD
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_STRENGTH+FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 209 ; base exp yield
@@ -470,8 +470,8 @@ SquirtleStarterBaseStats:
     ; palette
     dw PAL_SQUIRTLE
 
-    ; field moves
-    db FM_FLOAT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 66 ; base exp yield
@@ -510,8 +510,8 @@ WartortleStarterBaseStats:
     ; palette
     dw PAL_WARTORTLE
 
-    ; field moves
-    db FM_FLOAT+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 143 ; base exp yield
@@ -550,8 +550,8 @@ BlastoiseStarterBaseStats:
     ; palette
     dw PAL_BLASTOISE
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 210 ; base exp yield
@@ -580,7 +580,7 @@ OnixCrystalBaseStats:
     dw 0
 
     ; pointer to evomoves
-    dw Onix_EvosMoves
+    dw Onix_Crystal_EvosMoves
 
     db 0 ; growth rate
 
@@ -590,8 +590,8 @@ OnixCrystalBaseStats:
     ; palette
     dw PAL_ONIX_CRYSTAL
 
-    ; field moves
-    db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 20 ; catch rate
     db 188 ; base exp yield
@@ -630,8 +630,8 @@ MarowakAlolaBaseStats:
     ; palette
     dw PAL_MAROWAK_ALOLA
 
-    ; field moves
-    db FM_CUT+FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 124 ; base exp yield
@@ -670,8 +670,8 @@ PikachuStarterBaseStats:
     ; palette
     dw PAL_PIKACHU
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 82 ; base exp yield
@@ -710,7 +710,7 @@ EeveeStarterBaseStats:
     ; palette
     dw PAL_EEVEE
 
-    ; field moves
+    ; not used
     db 0
 
     db 45 ; catch rate
@@ -750,7 +750,7 @@ VulpixAlolaBaseStats:
     ; palette
     dw PAL_VULPIX_ALOLA
 
-    ; field moves
+    ; not used
     db 0
 
     db 190 ; catch rate
@@ -790,8 +790,8 @@ NinetalesAlolaBaseStats:
     ; palette
     dw PAL_NINETALES_ALOLA
 
-    ; field moves
-    db FM_CUT+FM_FLOAT+FM_DIG
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 178 ; base exp yield

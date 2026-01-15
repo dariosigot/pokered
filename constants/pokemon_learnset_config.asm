@@ -594,6 +594,11 @@ Onix_EvosMoves:
     dl ONIX_Learnset
     db 0
 ; ──────────────────────────────────────────────────────────────────────
+Onix_Crystal_EvosMoves:
+    db 0
+    dl ONIX_Crystal_Learnset
+    db 0
+; ──────────────────────────────────────────────────────────────────────
 Drowzee_EvosMoves:
     db EV_LEVEL,26,HYPNO
     db 0
