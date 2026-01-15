@@ -42800,24 +42800,16 @@ GetMonPotentialMoveList:
     ld [$cfb9],a
 .skipCopyingLevel
 
+    ; Get Copy of Level UP EvosMoves in GenericBuffer+1
     ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
     ld l,a ; hl pointer to Correct EvosMoves
-
-    ld a,BANK(MissingNo_EvosMoves)
-    ld de,GenericBuffer+1
-    ld bc,96-1
-    call FarCopyData ; copy bc bytes of data from a:hl to de
+    PREDEF _GetEvosMovesSkipEvolution ; hl = GenericBuffer+1 (skip evolution)
 
     ld de,wMoveRelearnerMoveList+1 ; Final List Pointer
 
     ; Get Mon Move List from Level UP EvosMoves (GenericBuffer+1)
-    ld hl,GenericBuffer+1
-.skipEvolutionDataLoop
-    ld a,[hli]
-    and a
-    jr nz,.skipEvolutionDataLoop
 .LearnSetLoop
     ld a,[hli] ; Move Level
     and a
@@ -50860,11 +50852,7 @@ LearnMoveFromLevelUp:
     ret
 
 LearnMoveCommon:
-    call .GetEvosMoves
-.skipEvolutionDataLoop
-    ld a,[hli]
-    and a
-    jr nz,.skipEvolutionDataLoop
+    call .GetMoves
 .learnSetLoop
     ld a,[hli]
     and a
@@ -50887,7 +50875,7 @@ LearnMoveCommon:
     call CopyStringToCF4B
     PREDEF LearnMove
     call GetMoveList
-    call .GetEvosMoves
+    call .GetMoves
 .LearnEndOrJustKnow
     pop hl ; Restore Pointer to Current Learn Move's Level
     jr .learnSetLoop
@@ -50896,7 +50884,7 @@ LearnMoveCommon:
     ld [$cf91],a
     ld [$d11e],a
     ret
-.GetEvosMoves
+.GetMoves
     ld a,[wNewMonIdDuringLearnMove]
     ld [$d0b5],a
     ld [$cf91],a
@@ -50911,7 +50899,7 @@ LearnMoveCommon:
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    jp GetEvosMoves
+    jp GetEvosMovesSkipEvolution
 
 UnnamedText_3bb92:
     TX_FAR _UnnamedText_3bb92
@@ -51600,11 +51588,7 @@ WriteMonMoves:
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    call GetEvosMoves
-.skipEvoEntriesLoop
-    ld a,[hli]
-    and a
-    jr nz,.skipEvoEntriesLoop
+    call GetEvosMovesSkipEvolution
     jr .firstMove
 .nextMove
     pop de
@@ -52329,6 +52313,16 @@ GetEvosMoves:
     ld [$CEE9],a ; Restore
     ld hl,GenericBuffer+1
     pop de
+    ret
+
+_GetEvosMovesSkipEvolution:
+    call Load16BitRegisters
+GetEvosMovesSkipEvolution:
+    call GetEvosMoves
+.skipEvoEntriesLoop
+    ld a,[hli]
+    and a
+    jr nz,.skipEvoEntriesLoop
     ret
 
 CryData:
@@ -76299,7 +76293,7 @@ Func_3f073Predef:                          NEW_PREDEF Func_3f073                
 ScaleSpriteByTwoPredef:                    NEW_PREDEF ScaleSpriteByTwo                    ; $03
 LoadMonBackSpritePredef:                   NEW_PREDEF LoadMonBackSprite                   ; $04
 Func_79abaPredef:                          NEW_PREDEF Func_79aba                          ; $05
-ds 3                                                                                      ; $06
+_GetEvosMovesSkipEvolutionPredef:          NEW_PREDEF _GetEvosMovesSkipEvolution          ; $06
 HealPartyPredef:                           NEW_PREDEF HealParty                           ; $07
 MoveAnimationPredef:                       NEW_PREDEF MoveAnimation                       ; $08
 Func_f71ePredef:                           NEW_PREDEF Func_f71e                           ; $09
