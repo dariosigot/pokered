@@ -29642,7 +29642,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
 .evolutionStoneMenu
     push hl
     ld de,$CD6D
-    PREDEF GetEvos
+    PREDEF _GetEvos
     ld de,.notAbleToEvolveText
 ; loop through the pokemon's evolution entries
 .checkEvolutionsLoop
@@ -42793,12 +42793,8 @@ GetMonPotentialMoveList:
     ld [$cfb9],a
 .skipCopyingLevel
 
-    ; Get Copy of Level UP EvosMoves in GenericBuffer+1
-    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a ; hl pointer to Correct EvosMoves
-    PREDEF _GetEvosMovesSkipEvolution ; hl = GenericBuffer+1 (skip evolution)
+    ; Get Copy of Level UP Moves in GenericBuffer+1
+    PREDEF _GetMoves ; hl = GenericBuffer+1 (skip evolution)
 
     ld de,wMoveRelearnerMoveList+1 ; Final List Pointer
 
@@ -50888,11 +50884,7 @@ LearnMoveCommon:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    jp GetEvosMovesSkipEvolution
+    jp GetMoves
 
 UnnamedText_3bb92:
     TX_FAR _UnnamedText_3bb92
@@ -50982,11 +50974,7 @@ Evolution_PartyMonLoop:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    call GetEvosMoves
+    call GetEvos
     push hl
     ld a,[$cf91]
     push af
@@ -51577,11 +51565,7 @@ WriteMonMoves:
     push hl
     push de
     push bc
-    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    call GetEvosMovesSkipEvolution
+    call GetMoves
     jr .firstMove
 .nextMove
     pop de
@@ -52293,30 +52277,12 @@ RenameEvolvedMon:
     pop de
     jp CopyData
 
-; Get Copy of Level UP EvosMoves in GenericBuffer+1
-GetEvosMoves:
-    push de
-    ld a,[$CEE9] ; Backup
-    push af
-    ld a,BANK(MissingNo_EvosMoves)
+GetEvos:
     ld de,GenericBuffer+1
-    ld bc,96-1
-    call FarCopyData ; copy bc bytes of data from a:hl to de
-    pop af
-    ld [$CEE9],a ; Restore
-    ld hl,GenericBuffer+1
-    pop de
-    ret
+    PREDEF_JUMP _GetEvos
 
-_GetEvosMovesSkipEvolution:
-    call Load16BitRegisters
-GetEvosMovesSkipEvolution:
-    call GetEvosMoves
-.skipEvoEntriesLoop
-    ld a,[hli]
-    and a
-    jr nz,.skipEvoEntriesLoop
-    ret
+GetMoves:
+    PREDEF_JUMP _GetMoves
 
 CryData:
     ;$BaseCry,$Pitch,$Length
@@ -76286,7 +76252,7 @@ Func_3f073Predef:                          NEW_PREDEF Func_3f073                
 ScaleSpriteByTwoPredef:                    NEW_PREDEF ScaleSpriteByTwo                    ; $03
 LoadMonBackSpritePredef:                   NEW_PREDEF LoadMonBackSprite                   ; $04
 Func_79abaPredef:                          NEW_PREDEF Func_79aba                          ; $05
-_GetEvosMovesSkipEvolutionPredef:          NEW_PREDEF _GetEvosMovesSkipEvolution          ; $06
+_GetMovesPredef:                           NEW_PREDEF _GetMoves                           ; $06
 HealPartyPredef:                           NEW_PREDEF HealParty                           ; $07
 MoveAnimationPredef:                       NEW_PREDEF MoveAnimation                       ; $08
 Func_f71ePredef:                           NEW_PREDEF Func_f71e                           ; $09
@@ -76357,7 +76323,7 @@ DrawEnemyHUDAndHPBarPredef:                NEW_PREDEF DrawEnemyHUDAndHPBar      
 Func_70f60Predef:                          NEW_PREDEF Func_70f60                          ; $4A
 PrintTypesPredef:                          NEW_PREDEF PrintTypes                          ; $4B
 EmotionBubblePredef:                       NEW_PREDEF EmotionBubble                       ; $4C
-GetEvosPredef:                             NEW_PREDEF GetEvos                             ; $4D
+_GetEvosPredef:                            NEW_PREDEF _GetEvos                            ; $4D
 AskForMonNicknamePredef:                   NEW_PREDEF AskForMonNickname                   ; $4E
 Func_37ca1Predef:                          NEW_PREDEF Func_37ca1                          ; $4F
 SaveSAVtoSRAM2Predef:                      NEW_PREDEF SaveSAVtoSRAM2                      ; $50
@@ -144756,8 +144722,8 @@ INCLUDE "constants/pokemon_tm_compatibility.asm"
 
 ; ──────────────────────────────────────────────────────────────────────
 
-GetEvos:
-    call Load16BitRegisters
+_GetEvos:
+    call Load16BitRegisters ; Input de
     push de
     ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
@@ -144773,6 +144739,24 @@ GetEvos:
 .end
     ld [de],a
     pop hl
+    ret
+
+_GetMoves:
+    push de
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+.skipEvoEntriesLoop
+    ld a,[hli]
+    and a
+    jr nz,.skipEvoEntriesLoop
+    ld de,GenericBuffer+1
+    push de
+    ld bc,96-1
+    call CopyData
+    pop hl
+    pop de
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
