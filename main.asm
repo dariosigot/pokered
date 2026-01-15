@@ -14,17 +14,6 @@ IfGBCDelay3:
     ret nz ; NotGBC
     jp Delay3
 
-CheckSelect:
-    bit 2,a ; was the select button pressed?
-    jr nz,.SelectPressed
-.End
-    jp $0459 ; OverworldLoop.startButtonNotPressed
-.SelectPressed
-    ld b,BANK(SelectInOverWorld)
-    ld hl,SelectInOverWorld
-    call Bankswitch
-    jp OverworldLoop
-
 ResetTempIV:
     push hl
     push af
@@ -48,6 +37,8 @@ StoreGymLeaderRematch:
     ld [wGymLeaderRematch],a
     pop bc
     ret
+
+; Free
 
 ; interrupts
 SECTION "vblank",ROM0[$40]
@@ -649,12 +640,19 @@ OverworldLoop: ; 03ff (0:03ff)
     bit 3,[hl]
     res 3,[hl]
     jp nz,WarpFound2
-    call HackFromBank0 ; $0433 ; BugFixLongRangeTrainer ; ld a,[$d732]
-    and a,$18          ; $0436
+    call OverworldHackRoutine
+    ld a,[$d732]
+    and a,$18
     jp nz,HandleFlyOrTeleportAway
     ld a,[W_CUROPPONENT] ; $d059
     and a
     jp nz,.newBattle
+    call IsSpriteInFrontOfPlayer4
+    ld hl,wCollisionWithSpriteBit5
+    res 5,[hl]
+    jr z,.NoSpriteCollision
+    set 5,[hl]
+.NoSpriteCollision
     ld a,[$d730]
     bit 7,a ; are we simulating button presses?
     jr z,.notSimulating
@@ -664,12 +662,20 @@ OverworldLoop: ; 03ff (0:03ff)
     ld a,[H_NEWLYPRESSEDBUTTONS]
 .checkIfStartIsPressed
     bit 3,a ; start button
-    jp z,CheckSelect ; jr z,.startButtonNotPressed
+    jr z,.startButtonNotPressed
 ; if START is pressed
     xor a
     ld [$ff8c],a ; the $2920 ID for the start menu is 0
     jr .displayDialogue
 .startButtonNotPressed
+    bit 2,a ; was the select button pressed?
+    jr z,.selectButtonNotPressed
+; if SELECT is pressed
+    ld b,BANK(SelectInOverWorld)
+    ld hl,SelectInOverWorld
+    call Bankswitch
+    jr OverworldLoop
+.selectButtonNotPressed
     bit 0,a ; A button
     jp z,.checkIfDownButtonIsPressed
 ; if A is pressed
@@ -682,7 +688,11 @@ OverworldLoop: ; 03ff (0:03ff)
     ld a,[$ffeb]
     and a
     jp z,OverworldLoop
+    ld hl,wOverworldPressABit2
+    set 2,[hl]
     call IsSpriteOrSignInFrontOfPlayer ; check for sign or sprite in front of the player
+    ld hl,wOverworldPressABit2
+    res 2,[hl]
     ld a,[$ff8c] ; $2920 ID for NPC/sign text,if any
     and a
     jp z,OverworldLoop
@@ -923,8 +933,9 @@ OverworldLoop: ; 03ff (0:03ff)
     jp z,.noFaintCheck
     ld hl,AnyPokemonAliveCheck
     ld b,BANK(AnyPokemonAliveCheck)
-    call HackFromBank0 ; $0667 ; RestoreFaintenedWith1HP ; call Bankswitch ; check if all the player's pokemon fainted
-    ;nop               ; $066a ; ld a,d
+    call Bankswitch ; check if all the player's pokemon fainted
+    call RestoreFaintenedWith1HP
+    ld a,d
     and a
     jr z,.allPokemonFainted
 .noFaintCheck
@@ -948,6 +959,9 @@ NewBattle:
     ld a,[$d72e]
     bit 4,a
     jr nz,.noBattle
+    ld a,[W_UNKNOWNDUNGEON3CURSCRIPT]
+    cp $03 ; WaitGengarMoving
+    jr z,.noBattle
     ld b,BANK(InitBattle)
     ld hl,InitBattle
     jp Bankswitch ; determines if a battle will occurr and runs the battle if so
@@ -965,10 +979,6 @@ ForceBikeOrSurf:
     ld hl,LoadPlayerSpriteGraphics ;load player sprite graphics
     call Bankswitch ;loads bank 5 and then calls LoadPlayerSpriteGraphics
     jp PlayDefaultMusicFadeOutCurrent ; jp PlayDefaultMusic ;update map/player state?
-
-; Free
-
-SECTION "CheckWarpsNoCollision",ROM0[$06b4]
 
 ; check if the player has stepped onto a warp after having not collided
 CheckWarpsNoCollision: ; 06b4 (0:06b4)
@@ -1065,8 +1075,8 @@ WarpFound1: ; 0735 (0:0735)
     ld [$ff8b],a ; save target map
 
 WarpFound2: ; 073c (0:073c)
-    call HackFromBank0 ; $073c ; BugFixWarpDuringJump ; ld a,[$d3ae] ; number of warps
-    sub c              ; $073f
+    call BugFixWarpDuringJump ; ld a,[$d3ae] ; number of warps
+    sub c
     ld [$d73b],a ; save ID of used warp
     ld a,[W_CURMAP]
     ld [$d73c],a
@@ -1704,8 +1714,6 @@ IsSpriteOrSignInFrontOfPlayer: ; 0b23 (0:0b23)
     jr z,IsSpriteInFrontOfPlayer2 ; jumps if the tile in front of the player is a counter tile
     dec b
     jr nz,.counterTilesLoop
-    ld hl,wTalkToInvisibleSpriteBit2
-    set 2,[hl]
     ; fall through
 
 ; part of the above function,but sometimes its called on its own,when signs are irrelevant
@@ -1762,10 +1770,7 @@ IsSpriteInFrontOfPlayer2: ; 0b6d (0:0b6d)
     ld a,[hli] ; image (0 if no sprite)
     and a
     jr z,.nextSprite
-    push hl
-    ld hl,wTalkToInvisibleSpriteBit2
-    bit 2,[hl]
-    pop hl
+    call .CheckOverworldPressA
     jr nz,.SkipCheckGhost ; Talk
     cp SPRITE_GHOST
     jr z,.nextSprite
@@ -1790,19 +1795,25 @@ IsSpriteInFrontOfPlayer2: ; 0b6d (0:0b6d)
     inc e
     dec d
     jr nz,.spriteLoop
-    jr .end
+    ret
 .foundSpriteInFrontOfPlayer
     pop hl
     ld a,l
     and a,$f0
     inc a
     ld l,a
-    set 7,[hl]
+    call .CheckOverworldPressA
+    jr z,.SkipChangeSpriteDirection
+    set 7,[hl] ; Talk = Turn Sprite direction to Player
+.SkipChangeSpriteDirection
     ld a,e
     ld [$ff8c],a ; store sprite ID
-.end
-    ld hl,wTalkToInvisibleSpriteBit2
-    res 2,[hl]
+    ret
+.CheckOverworldPressA
+    push hl
+    ld hl,wOverworldPressABit2
+    bit 2,[hl]
+    pop hl
     ret
 
 ; function to check if the player will jump down a ledge and check if the tile ahead is passable (when not surfing)
@@ -1814,21 +1825,9 @@ CollisionCheckOnLand:
     ld a,[$cd38]
     and a ; simulate?
     jr nz,NoCollision
-
-    ld a,[$d52a] ; the direction that the player is trying to go in
-    ld d,a
-    ld a,[$c10c] ; the player sprite's collision data (bit field) (set in the sprite movement code)
-    and d ; check if a sprite is in the direction the player is trying to go
-    jr nz,Collision
-
-    xor a
-    ld [$ff8c],a
-    call IsSpriteInFrontOfPlayer ; check for sprite collisions again? when does the above check fail to detect a sprite collision?
-    ld a,[$ff8c]
-    and a ; was there a sprite collision?
+    call IsSpriteInFrontOfPlayer3
     jr nz,Collision
 ; if no sprite collision
-
 .TryJumping
     ld d,%00000001 ; TryJumping
     call CheckExceptionTilePassable
@@ -2497,7 +2496,7 @@ GetJoypadStateOverworld: ; 0f4d (0:0f4d)
     ld [H_CURRENTPRESSEDBUTTONS],a
     ld hl,$d736
     ld a,[hl]
-    and a,$f8
+    and a,%11111100 ; add bit 2 to handle warp after simulation
     ld [hl],a
     ld hl,$d730
     res 7,[hl]
@@ -2512,17 +2511,13 @@ GetJoypadStateOverworld: ; 0f4d (0:0f4d)
 ; so the old value of c is used. 2429 is always called before this function,
 ; and 2429 always sets c to 0xF0. There is no 0xF0 background tile,so it
 ; is considered impassable and it is detected as a collision.
-CollisionCheckOnWater: ; 0fb7 (0:0fb7)
+CollisionCheckOnWater:
     ld a,[$d730]
     bit 7,a
     jr nz,.noCollision ; return and clear carry if button presses are being simulated
-
-    ld a,[$d52a] ; the direction that the player is trying to go in
-    ld d,a
-    ld a,[$c10c] ; the player sprite's collision data (bit field) (set in the sprite movement code)
-    and d ; check if a sprite is in the direction the player is trying to go
+    call IsSpriteInFrontOfPlayer3
     jr nz,.collision
-
+; if no sprite collision
     ld d,%00000010 ; TryStopSurfing
     call CheckExceptionTilePassable
     jr nc,.noCollision
@@ -8082,6 +8077,38 @@ GetMoveName:
     ld de,$cd6d ; pointer to where move name is stored in RAM
     pop hl
     ret
+
+IsSpriteInFrontOfPlayer3:
+    ld a,[$d52a] ; the direction that the player is trying to go in
+    ld d,a
+    ld a,[$c10c] ; the player sprite's collision data (bit field) (set in the sprite movement code)
+    and d ; check if a sprite is in the direction the player is trying to go
+    ret nz ; nz = collison
+    ; fall through
+
+IsSpriteInFrontOfPlayer4:
+    xor a
+    ld [$ff8c],a
+    call IsSpriteInFrontOfPlayer ; check for sprite collisions again? when does the above check fail to detect a sprite collision?
+    ld a,[$ff8c]
+    and a ; was there a sprite collision?
+    ret ; nz = collison
+
+; Free
+
+SECTION "OverworldHackRoutine",ROM0[$3040]
+
+OverworldHackRoutine:
+    call HackFromBank0 ; $3040 ; _OverworldHackRoutine
+    ret                ; $3043
+
+RestoreFaintenedWith1HP:
+    call HackFromBank0 ; $3044 ; _RestoreFaintenedWith1HP
+    ret                ; $3047
+
+BugFixWarpDuringJump:
+    call HackFromBank0 ; $3048 ; _BugFixWarpDuringJump
+    ret                ; $304b
 
 ; Free
 
@@ -23906,7 +23933,18 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ret c ; jp c,SurfingAttemptFailed
     ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
-    ret ; jp c,SurfingAttemptFailed
+    ret c ; jp c,SurfingAttemptFailed
+    ld hl,wCollisionWithSpriteBit5
+    bit 5,[hl]
+    jr nz,.NoFloat
+    ld a,1
+    or a ; reset all flag
+    ret
+.NoFloat
+    ld a,1
+    or a ; reset all flag
+    scf
+    ret
 .HandleSurfboardTextMessage
     call SurfingCry ; ld hl,SurfingGotOnText
 .PrintText
@@ -71549,7 +71587,7 @@ UnknownDungeon4Object:
     db SPRITE_MEWTWO,01+4,03+4,$ff,$d0,$41,MEWTWO,OPP_LVL_OFFSET+70 ; Entry Point
     db SPRITE_ALAKAZAM,01+4,25+4,$ff,$d0,$42,ALAKAZAM,OPP_LVL_OFFSET+65 ; Entry Point
     db SPRITE_MACHAMP,08+4,20+4,$ff,$d0,$43,MACHAMP,OPP_LVL_OFFSET+65 ; Entry Point
-    db SPRITE_GOLEM,07+4,10+4,$ff,$d0,$44,GOLEM,OPP_LVL_OFFSET+65 ; Entry Point
+    db SPRITE_GOLEM,07+4,10+4,$ff,$10,$44,GOLEM,OPP_LVL_OFFSET+65 ; Entry Point
     db SPRITE_GHOST,16+4,05+4,$ff,$d0,$45,GENGAR,OPP_LVL_OFFSET+65 ; Entry Point
 
     ; warp-to
@@ -71559,6 +71597,9 @@ UnknownDungeon4Blocks:
     INCBIN "maps/unknowndungeon4.blk"
 
 UnknownDungeon4Script0:
+    ld a,[$c152] ; Gengar Visibility
+    inc a
+    jr z,.end
     ld a,[$c15a] ; Gengar Y Delta
     cp $40
     jr nz,.end
@@ -71566,10 +71607,6 @@ UnknownDungeon4Script0:
     cp $40
     jr nz,.end
     ; Over Gengar
-    xor a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,$f0
-    ld [wJoypadForbiddenButtonsMask],a
     ld a,[$c109] ; direction the player is facing
     cp $04 ; up
     ld de,.MovementDown
@@ -71586,6 +71623,11 @@ UnknownDungeon4Script0:
     ld a,$5
     ld [$ff00+$8c],a
     call MoveSprite
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    and %11110010 ; ▼▲◄►StSeBA
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,%00001101 ; ▼▲◄►StSeBA
+    ld [wJoypadForbiddenButtonsMask],a
     ld a,$3 ; WaitGengarMoving
     ld [W_UNKNOWNDUNGEON3CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -71605,12 +71647,10 @@ WaitGengarMoving:
     ld a,[$d730]
     bit 0,a
     ret nz
-    xor a
+    xor a ; UnknownDungeon4Script0
+    ld [wJoypadForbiddenButtonsMask],a
     ld [W_UNKNOWNDUNGEON3CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
-    ld [wJoypadForbiddenButtonsMask],a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld [H_NEWLYPRESSEDBUTTONS],a
     ret
 
 ; ───────────────────────────────────────
@@ -96118,24 +96158,16 @@ SSAnne4Script:
 
 SSAnne4ScriptPointers:
     dw SSAnne4Script0
-    dw SSAnne4Script1
     dw Nope
 
 SSAnne4Script0:
-    ld a,$C7 ; old $e8          ; Hide Basket 2
-    ld [$cc4d],a                ; ...
-    PREDEF RemoveMissableObject ; ...
-    ld a,1
-    ld [W_SSANNE4CURSCRIPT],a
-    ret
-
-SSAnne4Script1:
-    ld a,[$c225] ; Check if sprite 2 is removed From display
-    cp $A0       ; ...
-    ret z ; Continue only if Basket 2 is not removed
-    ld a,$A0
-    ld [$c225],a ; Force remove sprite 2 from display
-    jp Delay3
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    ret z
+    ld a,$C7 ; old $e8               ; Hide Basket 2
+    ld [$cc4d],a                     ; ...
+    PREDEF_JUMP RemoveMissableObject ; ...
 
 SSAnne4TextPointers:
     dw SSAnne4BasketText
@@ -133086,9 +133118,6 @@ SelectInOverWorld:
     ld [$d11a],a
     cp a,2 ; is the player surfing?
     jp z,.noFloat
-    ld a,[$d732] ; Force to Ride Bike
-    bit 5,a      ; ...
-    jr nz,.noFloat
 ;    ld a,[W_OBTAINEDBADGES] ; badges obtained
 ;    bit 4,a ; does the player have the Soul Badge?
 ;    jr z,.noFloat
@@ -133104,6 +133133,9 @@ SelectInOverWorld:
     ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     jp c,.noFloat
+    ld hl,wCollisionWithSpriteBit5
+    bit 5,[hl]
+    jr nz,.noFloat
     ld b,SURFBOARD
     call .IsItemInBag
     ld a,0 ; wSurfingMonID
@@ -133438,7 +133470,7 @@ DratiniCave_h:
 DratiniCaveScript:
     call EnableAutoTextBoxDrawing
     ld a,[W_SSANNE4CURSCRIPT]
-    cp 2
+    cp 1
     jr z,.Skip
     ld a,$C6 ; old $e7
     ld [$cc4d],a
@@ -133446,7 +133478,7 @@ DratiniCaveScript:
     ld a,$C7 ; old $e8
     ld [$cc4d],a
     PREDEF AddMissableObject ; Show Basket 2
-    ld a,2
+    ld a,1
     ld [W_SSANNE4CURSCRIPT],a
 .Skip
     ld hl,DratiniCaveTrainerHeaders
@@ -134459,6 +134491,7 @@ _CheckDarkMap:
     db POKEMONTOWER_5
     db POKEMONTOWER_6
     db POKEMONTOWER_7
+    db DRATINI_CAVE
     db $FF
 
 ; ───────────────────────────────────────
@@ -139340,18 +139373,21 @@ _HackFromBank0:
     ld l,a
     jp hl
 .Table
-    dw $0436
-    dw BugFixLongRangeTrainer
-    dw $066a
-    dw RestoreFaintenedWith1HP
-    dw $073f
-    dw BugFixWarpDuringJump
+    dw $3043
+    dw _OverworldHackRoutine
+    dw $3047
+    dw _RestoreFaintenedWith1HP
+    dw $304b
+    dw _BugFixWarpDuringJump
     db $ff
 
-BugFixLongRangeTrainer:
+_OverworldHackRoutine:
     call BackupDarkMapState
     call HandleLightAnimation
     call HandleStrengthAnimation
+    ; fall through
+
+BugFixLongRangeTrainer:
     ld hl,W_FLAGS_D733 ; check if trainer is wanting to battle
     bit 3,[hl]
     ld hl,$d732
@@ -139361,11 +139397,7 @@ BugFixLongRangeTrainer:
     ld d,[hl] ; Output d -> a
     ret
 
-RestoreFaintenedWith1HP:
-    ld hl,AnyPokemonAliveCheck
-    ld b,BANK(AnyPokemonAliveCheck)
-    call Bankswitch ; check if all the player's pokemon fainted
-    push de ; output in d
+_RestoreFaintenedWith1HP:
     ld hl,W_PARTYMON1_HP ; $d173
     ld a,[W_NUMINPARTY]
     ld e,a
@@ -139401,7 +139433,6 @@ RestoreFaintenedWith1HP:
     jr nz,.Loop
     xor a
     ld [wExplodeFlag],a
-    pop de ; Output d -> a
     ret
 
 BackupDarkMapState:
@@ -139500,8 +139531,8 @@ HandleStrengthAnimation:
     call AdvancePlayerSprite
     jp DelayFrame
 
-BugFixWarpDuringJump:
-    ld hl,BugFixWarpDuringJump
+_BugFixWarpDuringJump:
+    ld hl,_BugFixWarpDuringJump
     push hl ; Set Return Pointer
     call DelayFrame
     call DelayFrame

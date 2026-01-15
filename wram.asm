@@ -1926,7 +1926,7 @@ wOverworlStrengthAnimBit1  ; df35 ; bit 1 = Force Overworld Strength Animation
 wNoExpToLastPartyMonBit1   ; df35 ; bit 1 = Negate Gain Exp to Last Party Mon (Just Caught)
 wFlagShinyBit2             ; df35 ; bit 2
 wFlagFlyingMonSpriteBit2   ; df35 ; bit 2 = Force to Load Mon Sprite with $0880 offset
-wTalkToInvisibleSpriteBit2 ; df35 ; bit 2 = Admit to talk with invisible sprite (Unknown Dungeon Gengar)
+wOverworldPressABit2       ; df35 ; bit 2 = Press A in Overworld (talk with invisible sprite in Unknown Dungeon Gengar)
 wFlagBaloonSpriteBit3      ; df35 ; bit 3 = Enable Baloon Sprite durint Trade
 wFlagBackSpritePlayerBit4  ; df35 ; bit 4
 wFlagBackFrontSpriteBit56  ; df35 ; bit 5
@@ -1978,6 +1978,7 @@ wFlagListMenuSpc:           ; df39 ; bit 0 = BadgeName
                             ; df39 ; bit 2 = Silph Co Elevator
                             ; df39 ; bit 3 = Rocket Hideout Elevator
 wHyperBeamUnknownTypeBit4   ; df39 ; bit 4 = Set Hyper Beam to Unknown Type
+wCollisionWithSpriteBit5    ; df39 ; bit 5 = Set during start menu if there is a sprite in front of player
     ds 1
 
 wLastTechMachIdUsed: ; df3a
