@@ -29641,15 +29641,8 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     db "NOT ABLE@"
 .evolutionStoneMenu
     push hl
-    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
     ld de,$CD6D
-    ld a,BANK(MissingNo_EvosMoves)
-    ld bc,13 ; Eevee's Evolution Bytes
-    call FarCopyData
-    ld hl,$CD6D
+    PREDEF GetEvos
     ld de,.notAbleToEvolveText
 ; loop through the pokemon's evolution entries
 .checkEvolutionsLoop
@@ -76364,7 +76357,7 @@ DrawEnemyHUDAndHPBarPredef:                NEW_PREDEF DrawEnemyHUDAndHPBar      
 Func_70f60Predef:                          NEW_PREDEF Func_70f60                          ; $4A
 PrintTypesPredef:                          NEW_PREDEF PrintTypes                          ; $4B
 EmotionBubblePredef:                       NEW_PREDEF EmotionBubble                       ; $4C
-ds 3                                                                                      ; $4D
+GetEvosPredef:                             NEW_PREDEF GetEvos                             ; $4D
 AskForMonNicknamePredef:                   NEW_PREDEF AskForMonNickname                   ; $4E
 Func_37ca1Predef:                          NEW_PREDEF Func_37ca1                          ; $4F
 SaveSAVtoSRAM2Predef:                      NEW_PREDEF SaveSAVtoSRAM2                      ; $50
@@ -144760,6 +144753,27 @@ INCLUDE "constants/pokemon_header_alternate_forms.asm"
 INCLUDE "constants/pokemon_learnset.asm"
 INCLUDE "constants/pokemon_learnset_config.asm"
 INCLUDE "constants/pokemon_tm_compatibility.asm"
+
+; ──────────────────────────────────────────────────────────────────────
+
+GetEvos:
+    call Load16BitRegisters
+    push de
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+.loop
+    ld a,[hli]
+    and a
+    jr z,.end
+    ld [de],a
+    inc de
+    jr .loop
+.end
+    ld [de],a
+    pop hl
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
