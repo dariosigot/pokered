@@ -144713,6 +144713,11 @@ MonOverworldDataNew2_emimonserrate:
 
 SECTION "Bank3b",ROMX,BANK[$3B]
 
+; Swap pointer bytes, than first byte cannot be 0
+dl: MACRO
+    dw ((\1 % $100) << 8) | (\1 / $100)
+ENDM
+
 PokemonBaseStats:
 INCLUDE "constants/pokemon_header.asm"
 INCLUDE "constants/pokemon_header_alternate_forms.asm"
@@ -144753,8 +144758,30 @@ _GetMoves:
     jr nz,.skipEvoEntriesLoop
     ld de,GenericBuffer+1
     push de
-    ld bc,96-1
-    call CopyData
+.Loop1
+    ld a,[hl]
+    and a
+    jr z,.EndLoop1
+    push hl
+    ld a,[hli]
+    ld l,[hl]
+    ld h,a
+.Loop2
+    ld a,[hli]
+    and a
+    jr z,.EndLoop2
+    ld [de],a
+    inc de
+    ld a,[hli]
+    ld [de],a
+    inc de
+    jr .Loop2
+.EndLoop2
+    pop hl
+    inc hl
+    inc hl
+    jr .Loop1
+.EndLoop1
     pop hl
     pop de
     ret
