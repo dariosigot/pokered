@@ -17856,7 +17856,6 @@ ChoiceMonSimpleMenu:
     db "SWITCH","@"
 
 GetMonFieldMoves:
-; Totalmente Ristrutturato basato su Tabella "FieldMoves"
     call .CheckMonAlreadyKnowTeleportAndFillMemory ; this function call "GetMonHeader"
     ld a,[W_MONH_FIELDMOVES]
     jr nc,.next
