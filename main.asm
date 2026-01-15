@@ -8098,7 +8098,36 @@ IsSpriteInFrontOfPlayer4:
     and a ; was there a sprite collision?
     ret ; nz = collison
 
-; Free
+IsFieldMove:
+    push bc
+    push af
+    push de
+    push hl
+    ld hl,.FieldMoveTable
+    ld de,1
+    call IsInArray
+    jr c,.Found
+.NotFound
+    xor a ; rcf
+    jr .IsFieldMove_End
+.Found
+    scf
+.IsFieldMove_End
+    pop hl
+    pop de
+    pop bc
+    ld a,b
+    pop bc
+    ret
+.FieldMoveTable
+    db FieldMove__FLY
+    db FieldMove__DIG
+    db FieldMove__CUT
+    db FieldMove__FLOAT
+    db FieldMove__STRENGTH
+    db FieldMove__LIGHT
+    db FieldMove__HEAL
+    db $FF
 
 SECTION "OverworldHackRoutine",ROM0[$3040]
 
@@ -16079,6 +16108,41 @@ GetDefaultName:
 DiagonalLines: ; 4d85 (1:4d85)
     INCBIN "gfx/diagonal_lines.2bpp"
 
+LearnMove_CheckPower:
+    jr nc,.continue
+    ld hl,LearnMove_FieldMoveConfigTable
+    ld de,4
+    push hl
+    call IsInArray
+    pop hl
+    jr nc,.continue
+    ld a,b ; a = 4b + 1
+    add a  ; ...
+    add a  ; ...
+    inc a  ; ...
+    ld c,a
+    ld b,0
+    add hl,bc
+    ld a,[hli]
+    ld e,a
+    ld a,[hli]
+    ld d,a
+    or e
+    jr z,.continue ; Both pointer Byte zero
+    ld c,[hl] ; c = Power Bit
+    ld h,d
+    ld l,e ; [hl] = Power Byte
+    ld b,2
+    PREDEF HandleBitArray
+    ld a,c
+    and a
+    jr nz,.continue
+    scf
+    ret
+.continue
+    xor a ; rcf
+    ret
+
 ; Free
 
 SECTION "TextTerminator_6b20",ROMX[$6b20],BANK[$1]
@@ -16511,11 +16575,15 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
 
 ; ────────────────────────────────────────
 
-SECTION "LearnMove",ROMX[$6e43],BANK[$1]
-
-LearnMove: ; 6e43 (1:6e43)
+LearnMove:
+    call .IsFieldMove
+    call LearnMove_CheckPower
+    jr nc,.continue
+    ld b,$0 ; 0 = No Learn
+    ret
+.continue
     call CheckMoveRelearn
-    call z,SaveScreenTilesToBuffer1
+    call z,.SaveScreenTilesToBuffer1
     ld a,[wWhichPokemon] ; $cf92
     ld hl,W_PARTYMON1NAME ; $d2b5
     call GetPartyMonName
@@ -16526,7 +16594,13 @@ LearnMove: ; 6e43 (1:6e43)
     call CheckMoveRelearn
     jr nz,.skip
     ; XX learned YY! ♫♪
+    call .IsFieldMove
+    ld hl,.LearnedTextPlusSoundFieldMove
+    jr c,.FieldMove
+    cp TELEPORT
+    jr z,.FieldMove
     ld hl,.LearnedTextPlusSound
+.FieldMove
     call PrintText
     ; Get Mon OT Name to Try Add Exclusive Move
     ld hl,W_PARTYMON1OT+8
@@ -16550,6 +16624,8 @@ LearnMove: ; 6e43 (1:6e43)
     ld hl,TryToAddExclusiveMove
     call Bankswitch
 .skip
+    call .IsFieldMove
+    jp c,.FieldMoveDontInsertInMonMoves
     ld hl,W_PARTYMON1_MOVE1 ; $d173
     ld bc,$2c
     ld a,[wWhichPokemon] ; $cf92
@@ -16602,6 +16678,23 @@ LearnMove: ; 6e43 (1:6e43)
     ld bc,$4
     call CopyData
     jr .LearnedMoveComplete
+
+.SaveScreenTilesToBuffer1
+    ld hl,.EmptyText
+    call PrintText
+    jp SaveScreenTilesToBuffer1
+
+.IsFieldMove
+    ld a,[$d0e0]
+    jp IsFieldMove
+
+.EmptyText
+    db "@"
+
+.FieldMoveDontInsertInMonMoves
+    call IsTryingToLearnPalFix_End
+    ld b,$1 ; 1 = Learn directly
+    ret
 
 .AbandonLearningConfirm
     call IsTryingToLearnPalFix_End
@@ -16696,6 +16789,12 @@ LearnMove: ; 6e43 (1:6e43)
 .LearnedTextPlusSound
     TX_FAR _LearnedText
     db $b,6,"@"
+
+.LearnedTextPlusSoundFieldMove
+    TX_FAR _LearnedTextFieldMove1
+    db $11
+    TX_FAR _LearnedTextFieldMove2
+    db "@"
 
 .ReplaceAMoveForText
     TX_FAR _ReplaceAMoveForText
@@ -17909,6 +18008,22 @@ DrainHPEffect_:
     TX_FAR _DreamWasEatenText
     db "@"
 
+FMCT_LM: MACRO
+    db \1
+    dw \2
+    db \3
+ENDM
+
+LearnMove_FieldMoveConfigTable:
+    FMCT_LM FieldMove__FLY      , $d7e0,6
+    FMCT_LM FieldMove__DIG      , $0000,0
+    FMCT_LM FieldMove__CUT      , $d803,0
+    FMCT_LM FieldMove__FLOAT    , $d857,0
+    FMCT_LM FieldMove__STRENGTH , $d78e,0
+    FMCT_LM FieldMove__LIGHT    , $d7c2,0
+    FMCT_LM FieldMove__HEAL     , $0000,0
+    db $FF
+
 ; Free
 
 SECTION "PlayerPC",ROMX[$78e6],BANK[$1]
@@ -18209,8 +18324,6 @@ UnnamedText_7b5e
 UnnamedText_7b63
     TX_FAR _UnnamedText_7b63
     db "@"
-
-; Free
 
 SECTION "_RemovePokemon",ROMX[$7b68],BANK[$1]
 
@@ -37828,37 +37941,6 @@ PowerPlantExplosion:
     ld c,2
     jp DelayFrames
 
-IsFieldMove_Bank7:
-    push bc
-    push af
-    push de
-    push hl
-    ld hl,.FieldMoveTable
-    ld de,1
-    call IsInArray
-    jr c,.Found
-.NotFound
-    xor a ; rcf
-    jr .IsFieldMove_End
-.Found
-    scf
-.IsFieldMove_End
-    pop hl
-    pop de
-    pop bc
-    ld a,b
-    pop bc
-    ret
-.FieldMoveTable
-    db FieldMove__FLY
-    db FieldMove__DIG
-    db FieldMove__CUT
-    db FieldMove__FLOAT
-    db FieldMove__STRENGTH
-    db FieldMove__LIGHT
-    db FieldMove__HEAL
-    db $FF
-
 ; Free
 
 SECTION "Func_1c98a",ROMX[$498a],BANK[$7]
@@ -43782,7 +43864,7 @@ HandleExclusiveLearnMove:
     and a
     jr z,.OutOfRange
     call CheckFieldMovesInList
-    call nz,IsFieldMove_Bank7
+    call nz,IsFieldMove
     jr c,.OutOfRange
     pop de ; Restore Pointer to Move List Current Elements
     ld b,a
@@ -130210,6 +130292,19 @@ _LearnedText:
     TX_RAM $cf4b
     db $0,"!@@"
 
+_LearnedTextFieldMove1:
+    TX_RAM $d036
+    db $0," learned",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0,"!@@"
+
+_LearnedTextFieldMove2:
+    db $0,$51,"@"
+    TX_RAM $cf4b
+    db $0," can be",$4f
+    db "used in the map!",$58
+
 _ReplaceAMoveForText:
     db 0,"Replace a move for",$4f
     db "@"
@@ -131996,7 +132091,7 @@ MoveNames: ; b0000 (2c:4000)
     db "DIG@"      ; $A7
     db "CUT@"      ; $A8
     db "FLOAT@"    ; $A9
-    db "STR.TH@"   ; $AA
+    db "STRENGTH@" ; $AA
     db "LIGHT@"    ; $AB
     db "HEAL@"     ; $AC
 
@@ -144774,7 +144869,7 @@ _GetMoves:
     ld a,[hli]
     ld c,a ; c = Move
     call CheckFieldMovesInList
-    call nz,.IsFieldMove
+    call nz,IsFieldMove
     jr c,.Loop2
     ld a,b
     ld [de],a
@@ -144794,37 +144889,6 @@ _GetMoves:
     pop hl
     pop de
     ret
-
-.IsFieldMove
-    push bc
-    push af
-    push de
-    push hl
-    ld hl,.FieldMoveTable
-    ld de,1
-    call IsInArray
-    jr c,.Found
-.NotFound
-    xor a ; rcf
-    jr .IsFieldMove_End
-.Found
-    scf
-.IsFieldMove_End
-    pop hl
-    pop de
-    pop bc
-    ld a,b
-    pop bc
-    ret
-.FieldMoveTable
-    db FieldMove__FLY
-    db FieldMove__DIG
-    db FieldMove__CUT
-    db FieldMove__FLOAT
-    db FieldMove__STRENGTH
-    db FieldMove__LIGHT
-    db FieldMove__HEAL
-    db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -144911,14 +144975,14 @@ FMCT: MACRO
 ENDM
 
 .FieldMoveConfigTable
-    FMCT FieldMove__FLY,FM_FLY,$d7e0,6
-    FMCT TELEPORT,FM_TELEPORT,$0000,0
-    FMCT FieldMove__DIG,FM_DIG,$0000,0
-    FMCT FieldMove__CUT,FM_CUT,$d803,0
-    FMCT FieldMove__FLOAT,FM_FLOAT,$d857,0
-    FMCT FieldMove__STRENGTH,FM_STRENGTH,$d78e,0
-    FMCT FieldMove__LIGHT,FM_LIGHT,$d7c2,0
-    FMCT FieldMove__HEAL,FM_HEAL,$0000,0
+    FMCT FieldMove__FLY      , FM_FLY      , $d7e0,6
+    FMCT TELEPORT            , FM_TELEPORT , $0000,0
+    FMCT FieldMove__DIG      , FM_DIG      , $0000,0
+    FMCT FieldMove__CUT      , FM_CUT      , $d803,0
+    FMCT FieldMove__FLOAT    , FM_FLOAT    , $d857,0
+    FMCT FieldMove__STRENGTH , FM_STRENGTH , $d78e,0
+    FMCT FieldMove__LIGHT    , FM_LIGHT    , $d7c2,0
+    FMCT FieldMove__HEAL     , FM_HEAL     , $0000,0
 
 .FillMemory
     xor a
