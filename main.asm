@@ -42958,21 +42958,6 @@ GetMonPotentialMoveList:
     ld [$cfb9],a
 .skipCopyingLevel
 
-    ; Get Copy of Level UP EvosMoves in GenericBuffer+1
-    ;ld d,0
-    ;ld a,[W_MONHEADER]
-    ;call LoadEvosMovesPointerTableByPokedex
-    ;; ds 1 ; dec a ; 00MOD
-    ;add a
-    ;rl d
-    ;ld e,a
-    ;add hl,de
-    ;ld de,GenericBuffer+1
-    ;ld a,BANK(EvosMovesPointerTable)
-    ;ld bc,2
-    ;call FarCopyData
-    ;ld hl,GenericBuffer+1
-
     ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
