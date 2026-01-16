@@ -41699,42 +41699,33 @@ Route16HouseTextPointers: ; 1e5fb (7:65fb)
     dw Route16HouseText1
     dw Route16HouseText2
 
-Route16HouseText1: ; 1e5ff (7:65ff)
+Route16HouseText1:
     db $08 ; asm
     ld a,[$d7e0]
     bit 6,a
-    ld hl,HM02ExplanationText
-    jr nz,.asm_13616 ; 0x1e608
-    ld hl,Route16HouseText3
+    ld hl,.HM02ExplanationText
+    jr nz,.done
+    ld hl,.Route16HouseText3
     call PrintText
     ld bc,(HM_02 << 8) | 1
     call FakeGiveItem
-    jr nc,.BagFull
     ld hl,$d7e0
     set 6,[hl]
-    ld hl,ReceivedHM02Text
-    jr .asm_13616 ; 0x1e620
-.BagFull
-    ld hl,HM02NoRoomText
-.asm_13616 ; 0x1e625
+    ld hl,.ReceivedHM02Text
+.done
     call PrintText
     jp TextScriptEnd
-
-Route16HouseText3: ; 1e62b (7:662b)
+.Route16HouseText3
     TX_FAR _Route16HouseText3
     db "@"
-
-ReceivedHM02Text: ; 1e630 (7:6630)
+.ReceivedHM02Text
     TX_FAR _GotText
-    db $11,"@"
-
-HM02ExplanationText: ; 1e636 (7:6636)
+    db $10,"@"
+.HM02ExplanationText
     TX_FAR _HM02ExplanationText
     db "@"
 
-HM02NoRoomText: ; 1e63b (7:663b)
-    TX_FAR _HM02NoRoomText
-    db "@"
+SECTION "Route16HouseText2",ROMX[$6640],BANK[$7]
 
 Route16HouseText2: ; 1e640 (7:6640)
     db $08 ; asm
@@ -74132,9 +74123,9 @@ Route11GateUpstairsText2: ; 4946c (12:546c)
     ld a,[$d7d6]
     add a
     jr c,.asm_4949b ; 0x49471 $28
-    ld a,$1e
+    ld a,30
     ld [$ff00+$db],a
-    ld a,$47
+    ld a,ITEMFINDER
     ld [$ff00+$dc],a
     ld [$d11e],a
     call GetItemName
@@ -74143,7 +74134,7 @@ Route11GateUpstairsText2: ; 4946c (12:546c)
     ld de,$cc5b
     ld bc,$000d
     call CopyData
-    PREDEF Func_59035
+    PREDEF OakAideNDexToGiftItem
     ld a,[$ff00+$db]
     dec a
     jr nz,.asm_494a1 ; 0x49494 $b
@@ -74420,7 +74411,7 @@ Route15GateUpstairsText1: ; 49651 (12:5651)
     ld de,$cc5b
     ld bc,$000d
     call CopyData
-    PREDEF Func_59035
+    PREDEF OakAideNDexToGiftItem
     ld a,[$ff00+$db]
     cp $1
     jr nz,.asm_49689 ; 0x4967c $b
@@ -75702,46 +75693,33 @@ SafariZoneSecretHouseScript: ; 4a317 (12:6317)
 SafariZoneSecretHouseTextPointers: ; 4a31a (12:631a)
     dw SafariZoneSecretHouseText1
 
-SafariZoneSecretHouseText1: ; 4a31c (12:631c)
+SafariZoneSecretHouseText1:
     db $08 ; asm
     ld a,[$d857]
     bit 0,a
-    jr nz,.asm_20a9b ; 0x4a322
-    ld hl,UnnamedText_4a350
+    ld hl,.HM03ExplanationText
+    jr nz,.done
+    ld hl,.UnnamedText_4a350
     call PrintText
     ld bc,(HM_03 << 8) | 1
     call FakeGiveItem
-    jr nc,.BagFull
-    ld hl,ReceivedHM03Text
-    call PrintText
     ld hl,$d857
     set 0,[hl]
-    jr .asm_8f1fc ; 0x4a33d
-.BagFull
-    ld hl,HM03NoRoomText
+    ld hl,.ReceivedHM03Text
+.done
     call PrintText
-    jr .asm_8f1fc ; 0x4a345
-.asm_20a9b ; 0x4a347
-    ld hl,HM03ExplanationText
-    call PrintText
-.asm_8f1fc ; 0x4a34d
     jp TextScriptEnd
-
-UnnamedText_4a350: ; 4a350 (12:6350)
+.UnnamedText_4a350
     TX_FAR _UnnamedText_4a350
     db "@"
-
-ReceivedHM03Text: ; 4a355 (12:6355)
+.ReceivedHM03Text
     TX_FAR _GotText
-    db $11,"@"
-
-HM03ExplanationText: ; 4a35b (12:635b)
+    db $10,"@"
+.HM03ExplanationText
     TX_FAR _HM03ExplanationText
     db "@"
 
-HM03NoRoomText: ; 4a360 (12:6360)
-    TX_FAR _HM03NoRoomText
-    db "@"
+SECTION "SafariZoneSecretHouseObject",ROMX[$6365],BANK[$12]
 
 SafariZoneSecretHouseObject: ; 0x4a365 (size=26)
     db $17 ; border tile
@@ -76420,7 +76398,7 @@ ResetMovePPsPredef:                        NEW_PREDEF ResetMovePPs              
 DrawPlayerHPBarStatusBattlePredef:         NEW_PREDEF DrawPlayerHPBarStatusBattle         ; $5F
 DrawPlayerHPBarPartyPredef:                NEW_PREDEF DrawPlayerHPBarParty                ; $60
 Func_1c9c6Predef:                          NEW_PREDEF Func_1c9c6                          ; $61
-Func_59035Predef:                          NEW_PREDEF Func_59035                          ; $62
+OakAideNDexToGiftItemPredef:               NEW_PREDEF OakAideNDexToGiftItem               ; $62
 TestPhysicalSpecial_Predef:                NEW_PREDEF TestPhysicalSpecial_                ; $63
 InsertRealTypes_Predef:                    NEW_PREDEF InsertRealTypes_                    ; $64
 MovesMenuPredef:                           NEW_PREDEF MovesMenu                           ; $65
@@ -86178,6 +86156,8 @@ CalcDSquared: ; 59010 (16:5010)
     ld [H_MULTIPLIER],a ; $FF00+$99 (aliases: H_DIVISOR,H_REMAINDER,H_POWEROFTEN)
     jp Multiply
 
+SECTION "GrowthRateTable",ROMX[$501d],BANK[$16]
+
 ; each entry has the following scheme:
 ; %AAAABBBB %SCCCCCCC %DDDDDDDD %EEEEEEEE
 ; resulting in
@@ -86192,7 +86172,9 @@ GrowthRateTable: ; 5901d (16:501d) ; Don't Move this Subroutine (MissingNo Growt
     db $54,$00,$00,$00 ; slow:        5/4 n^3
    ;db $08,$21,$9B,$50 ; missingno:   0/8 n^3 + 33 n^2 + 155 n - 80
 
-Func_59035: ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
+SECTION "OakAideNDexToGiftItem",ROMX[$5035],BANK[$16]
+
+OakAideNDexToGiftItem: ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
     ld hl,UnnamedText_59091 ; $5091
     call PrintText
     call YesNoChoice
@@ -86215,9 +86197,9 @@ Func_59035: ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
     ld a,[$ff00+$dc]
     ld b,a
     ld c,1
-    call GiveItemNotPower ; call GiveItem
+    call GiveItem
     jr nc,.BagFull
-    call LoadTextItemOrPower ; ld hl,UnnamedText_590a5 ; $50a5
+    ld hl,UnnamedText_590a5 ; $50a5
     call PrintText
     ld a,$1
     jr .asm_5908e ; 0x59071 $1b
@@ -86263,6 +86245,8 @@ UnnamedText_590a5: ; 590a5 (16:50a5)
 UnnamedText_590ab: ; 590ab (16:50ab)
     TX_FAR _UnnamedText_590ab
     db "@"
+
+SECTION "Route6Script",ROMX[$50b0],BANK[$16]
 
 Route6Script: ; 590b0 (16:50b0)
     call EnableAutoTextBoxDrawing
@@ -89336,22 +89320,6 @@ RemoveGuardDrink: ; 5a59f (16:659f)
 GuardDrinksList: ; 5a5b7 (16:65b7)
     db FRESH_WATER,SODA_POP,LEMONADE,$00
 
-GiveItemNotPower: ; ♠TODO:►Ability
-    cp HM_05
-    jp z,FakeGiveItem
-    jp GiveItem
-
-LoadTextItemOrPower: ; ♠TODO:►Ability
-    ld a,[$ff00+$dc]
-    cp HM_05
-    ld hl,UnnamedText_590a5 ; $50a5
-    ret nz
-    ld hl,.ReceivedHM05Text
-    ret
-.ReceivedHM05Text
-    TX_FAR _GotText
-    db $11,"@"
-
 Route12Snorlax:
     db $8
     ld hl,Route12SnorlaxText
@@ -92407,36 +92375,9 @@ Route2GateTextPointers: ; 5d5d7 (17:55d7)
     dw Route2GateText1
     dw Route2GateText2
 
-Route2GateText1: ; 5d5db (17:55db)
-    db $08 ; asm
-    ld a,[$d7c2]
-    bit 0,a
-    jr nz,.asm_6592c ; 0x5d5e1
-    ld a,$a
-    ldh [$db],a
-    ld a,HM_05
-    ldh [$dc],a
-    ld [$d11e],a
-    call GetItemName ; $2fcf
-    ld hl,$cd6d
-    ld de,$cc5b
-    ld bc,$000d
-    call CopyData
-    PREDEF Func_59035
-    ldh a,[$db]
-    cp $1
-    jr nz,.asm_ad646 ; 0x5d606
-    ld hl,$d7c2
-    set 0,[hl]
-.asm_6592c ; 0x5d60d
-    ld hl,UnnamedText_5d616
-    call PrintText
-.asm_ad646 ; 0x5d613
-    jp TextScriptEnd
+; Free
 
-UnnamedText_5d616: ; 5d616 (17:5616)
-    TX_FAR _UnnamedText_5d616
-    db "@"
+SECTION "Route2GateText2",ROMX[$561b],BANK[$17]
 
 Route2GateText2: ; 5d61b (17:561b)
     TX_FAR _Route2GateText2
@@ -93812,6 +93753,34 @@ MuseumF2Script1_AfterEevee:
     ld [W_CURMAPSCRIPT],a
     ld [W_MUSEUM2FCURSCRIPT],a
     ret
+
+; ───────────────────────────────────────────
+
+Route2GateText1:
+    db $08 ; asm
+    ld a,[$d7c2]
+    bit 0,a
+    ld hl,.HM05ExplanationText
+    jr nz,.done
+    ld hl,.PreHM05Text
+    call PrintText
+    ld bc,(HM_05 << 8) | 1
+    call FakeGiveItem
+    ld hl,$d7c2
+    set 0,[hl]
+    ld hl,.ReceivedHM05Text
+.done
+    call PrintText
+    jp TextScriptEnd
+.PreHM05Text
+    TX_FAR _PreHM05Text
+    db "@"
+.ReceivedHM05Text
+    TX_FAR _GotText
+    db $10,"@"
+.HM05ExplanationText
+    TX_FAR _HM05ExplanationText
+    db "@"
 
 ; ───────────────────────────────────────────
 
@@ -96092,55 +96061,45 @@ SSAnne7TextPointers: ; 618a7 (18:58a7)
     dw SSAnne7Text2
     dw SSAnne7Text3
 
-SSAnne7Text1: ; 618ad (18:58ad)
+SSAnne7Text1:
     db $08 ; asm
     ld a,[$d803]
     bit 0,a
-    jr nz,.asm_797c4 ; 0x618b3
-    ld hl,SSAnne7RubText
+    ld hl,.UnnamedText_61932
+    jr nz,.done
+    ld hl,.SSAnne7RubText
     call PrintText
-    ld hl,ReceivingHM01Text
+    ld hl,.ReceivingHM01Text
     call PrintText
     ld bc,(HM_01 << 8) | 1
     call FakeGiveItem
-    jr nc,.BagFull
-    ld hl,ReceivedHM01Text
-    call PrintText
     ld hl,$d803
     set 0,[hl]
-    jr .asm_0faf5 ; 0x618d4
-.BagFull
-    ld hl,HM01NoRoomText
+    ld hl,.ReceivedHM01Text
+.done
     call PrintText
-    ld hl,$d72d
-    set 5,[hl]
-    jr .asm_0faf5 ; 0x618e1
-.asm_797c4 ; 0x618e3
-    ld hl,UnnamedText_61932
-    call PrintText
-.asm_0faf5 ; 0x618e9
     jp TextScriptEnd
 
-SSAnne7RubText: ; 618ec (18:58ec)
-    TX_FAR _SSAnne7RubText ; 0x812dd
+.SSAnne7RubText
+    TX_FAR _SSAnne7RubText
     db $8
     ld a,[$c0ef]
     cp $1f
     ld [$c0f0],a
-    jr nz,.asm_61908 ; 0x618f9 $d
+    jr nz,.skip
     ld a,$ff
     ld [$c0ee],a
     call PlaySound
     ld a,$2
     ld [$c0ef],a
-.asm_61908
+.skip
     ld a,$e8
     ld [$c0ee],a
     call PlaySound
-.asm_61910
+.WaitLoop
     ld a,[$c026]
     cp $e8
-    jr z,.asm_61910 ; 0x61915 $f9
+    jr z,.WaitLoop
     call PlayDefaultMusic
     ld hl,$d803
     set 1,[hl]
@@ -96148,21 +96107,17 @@ SSAnne7RubText: ; 618ec (18:58ec)
     res 5,[hl]
     jp TextScriptEnd
 
-ReceivingHM01Text: ; 61927 (18:5927)
+.ReceivingHM01Text
     TX_FAR _ReceivingHM01Text
     db "@"
-
-ReceivedHM01Text: ; 6192c (18:592c)
+.ReceivedHM01Text
     TX_FAR _GotText
-    db $11,"@"
-
-UnnamedText_61932: ; 61932 (18:5932)
+    db $10,"@"
+.UnnamedText_61932
     TX_FAR _UnnamedText_61932
     db "@"
 
-HM01NoRoomText: ; 61937 (18:5937)
-    TX_FAR _HM01NoRoomText
-    db "@"
+SECTION "SSAnne7Text2",ROMX[$593c],BANK[$18]
 
 SSAnne7Text2: ; 6193c (18:593c)
     TX_FAR _SSAnne7Text2
@@ -106175,94 +106130,66 @@ FuchsiaHouse2TextPointers: ; 750b8 (1d:50b8)
     dw FuchsiaHouse2Text4
     dw FuchsiaHouse2Text5
 
-FuchsiaHouse2Text1: ; 750c2 (1d:50c2)
+FuchsiaHouse2Text1:
     db $08 ; asm
     ld a,[$d78e]
     bit 0,a
-    jr nz,.subtract ; 0x750c8
+    ld hl,.HM04ExplanationText
+    jr nz,.done
     ld b,GOLD_TEETH
     call IsItemInBag
-    jr nz,.asm_3f30f ; 0x750cf
-    ld a,[$d78e]
-    bit 1,a
-    jr nz,.asm_60cba ; 0x750d6
-    ld hl,WardenGibberishText1
+    jr nz,.InBag
+    ld hl,.WardenGibberishText1
     call PrintText
     call YesNoChoice
     ld a,[$cc26]
     and a
-    ld hl,WardenGibberishText3
-    jr nz,.asm_61238 ; 0x750e8
-    ld hl,WardenGibberishText2
-.asm_61238 ; 0x750ed
-    call PrintText
-    jr .asm_52039 ; 0x750f0
-.asm_3f30f ; 0x750f2
-    ld hl,WardenTeethText1
+    ld hl,.WardenGibberishText3
+    jr nz,.done
+    ld hl,.WardenGibberishText2
+    jr .done
+.InBag
+    ld hl,.WardenTeethText1
     call PrintText
     ld a,$40
     ldh [$db],a
     ld b,BANK(RemoveItemByID)
     ld hl,RemoveItemByID
     call Bankswitch
-    ld hl,$d78e
-    set 1,[hl]
-.asm_60cba ; 0x75109
-    ld hl,WardenThankYouText
+    ld hl,.WardenThankYouText
     call PrintText
     ld bc,(HM_04 << 8) | 1
     call FakeGiveItem
-    jr nc,.BagFull
-    ld hl,ReceivedHM04Text
-    call PrintText
     ld hl,$d78e
     set 0,[hl]
-    jr .asm_52039 ; 0x75122
-.subtract ; 0x75124
-    ld hl,HM04ExplanationText
+    ld hl,.ReceivedHM04Text
+.done
     call PrintText
-    jr .asm_52039 ; 0x7512a
-.BagFull
-    ld hl,HM04NoRoomText
-    call PrintText
-.asm_52039 ; 0x75132
     jp TextScriptEnd
 
-WardenGibberishText1: ; 75135 (1d:5135)
+.WardenGibberishText1
     TX_FAR _WardenGibberishText1
     db "@"
-
-WardenGibberishText2: ; 7513a (1d:513a)
+.WardenGibberishText2
     TX_FAR _WardenGibberishText2
     db "@"
-
-WardenGibberishText3: ; 7513f (1d:513f)
+.WardenGibberishText3
     TX_FAR _WardenGibberishText3
     db "@"
-
-WardenTeethText1: ; 75144 (1d:5144)
+.WardenTeethText1
     TX_FAR _WardenTeethText1
     db $0b
-
-WardenTeethText2: ; 75149 (1d:5149)
-    TX_FAR _WardenTeethText2
-    db "@"
-
-WardenThankYouText: ; 7514e (1d:514e)
+.WardenThankYouText
     TX_FAR _WardenThankYouText
     db "@"
-
-ReceivedHM04Text: ; 75153 (1d:5153)
+.ReceivedHM04Text
     TX_FAR _GotText
-    db $11,"@"
-
-HM04ExplanationText: ; 75159 (1d:5159)
+    db $10,"@"
+.HM04ExplanationText
     TX_FAR _HM04ExplanationText
     db "@"
 
-HM04NoRoomText: ; 7515e (1d:515e)
-    TX_FAR _HM04NoRoomText
-    db "@"
+SECTION "FuchsiaHouse2Text5",ROMX[$5163],BANK[$1d]
 
 FuchsiaHouse2Text5: ; 75163 (1d:5163)
 FuchsiaHouse2Text4: ; 75163 (1d:5163)
@@ -118968,17 +118895,13 @@ _ReceivingHM01Text: ; 81347 (20:5347)
     db "can see it CUT",$55
     db "any time!",$58
 
-SECTION "_UnnamedText_61932",ROMX[$541c],BANK[$20]
-
-_UnnamedText_61932: ; 8141c (20:541c)
+_UnnamedText_61932:
     db $0,"CAPTAIN: Whew!",$51
     db "Now that I'm not",$4f
     db "sick any more,I",$55
     db "guess it's time.",$57
 
-_HM01NoRoomText: ; 8145d (20:545d)
-    db $0,"Oh no! You have",$4f
-    db "no room for this!",$57
+SECTION "_SSAnne7Text2",ROMX[$5480],BANK[$20]
 
 _SSAnne7Text2: ; 81480 (20:5480)
     db $0,"Yuck! Shouldn't",$4f
@@ -120472,8 +120395,6 @@ _UnnamedText_4a350: ; 858a4 (21:58a4)
     db "Congratulations!",$4f
     db "You have won!",$58
 
-SECTION "_HM03ExplanationText",ROMX[$5957],BANK[$21]
-
 _HM03ExplanationText: ; 85957 (21:5957)
     db $0,"This is FLOAT!",$51
     db "#MON will be",$4f
@@ -120487,10 +120408,7 @@ _HM03ExplanationText: ; 85957 (21:5957)
     db "for winning this",$55
     db "fabulous prize!",$57
 
-_HM03NoRoomText: ; 85a02 (21:5a02)
-    db $0,"You don't have",$4f
-    db "room for this",$55
-    db "fabulous prize!",$57
+SECTION "_SafariZoneRestHouse2Text1",ROMX[$5a2f],BANK[$21]
 
 _SafariZoneRestHouse2Text1: ; 85a2f (21:5a2f)
     db $0,"Tossing ROCKs at",$4f
@@ -122410,7 +122328,7 @@ _Route2HouseText1: ; 8a7b8 (22:67b8)
     db "it can still use ",$55
     db "moves like CUT!",$57
 
-_UnnamedText_5d616: ; 8a7fc (22:67fc)
+_HM05ExplanationText: ; 8a7fc (22:67fc)
     db $0,"The FIRE PWR ",$4f
     db "lights even the",$55
     db "darkest dungeons.",$57
@@ -122764,6 +122682,11 @@ _SilphScopeDoesntWorkInTheDark
     db $0,"Darn!",$51
     db "SILPH SCOPE doesn't",$4f
     db "work in the dark!",$58
+
+; ───────────────────────────────────
+
+_PreHM05Text:
+    db $0,"I give you this!",$58
 
 ; ───────────────────────────────────
 
@@ -123152,11 +123075,7 @@ _Route16HouseText3: ; 8ce02 (23:4e02)
     db "I'll make it up",$55
     db "to you with this!",$58
 
-SECTION "_HM02NoRoomText",ROMX[$4ebe],BANK[$23]
-
-_HM02NoRoomText: ; 8cebe (23:4ebe)
-    db $0,"You don't have any",$4f
-    db "room for this.",$57
+SECTION "_UnnamedText_1e652",ROMX[$4ee0],BANK[$23]
 
 _UnnamedText_1e652: ; 8cee0 (23:4ee0)
     db $0,"FEAROW: Kyueen!",$57
@@ -129035,32 +128954,27 @@ _FuchsiaPokecenterText3: ; 9e3de (27:63de)
     db "The HQ governs",$55
     db "all trainers.",$57
 
-_WardenGibberishText1: ; 9e444 (27:6444)
+_WardenGibberishText1:
     db $0,"WARDEN: Hif fuff",$4f
     db "hefifoo!",$51
     db "Ha lof ha feef ee",$4f
     db "hafahi ho. Heff",$55
     db "hee fwee!",$57
 
-_WardenGibberishText2: ; 9e48b (27:648b)
+_WardenGibberishText2:
     db $0,"Ah howhee ho hoo!",$4f
     db "Eef ee hafahi ho!",$57
 
-_WardenGibberishText3: ; 9e4b0 (27:64b0)
+_WardenGibberishText3:
     db $0,"Ha? He ohay heh",$4f
     db "ha hoo ee haheh!",$57
 
-_WardenTeethText1: ; 9e4d2 (27:64d2)
+_WardenTeethText1:
     db $0,$52," gave the",$4f
     db "GOLD TEETH to the",$55
     db "WARDEN!@@"
 
-_WardenTeethText2: ; 9e4f9 (27:64f9)
-    db $0,$51
-    db "The WARDEN popped",$4f
-    db "in his teeth!",$58
-
-_WardenThankYouText: ; 9e51b (27:651b)
+_WardenThankYouText:
     db $0,"WARDEN: Thanks,",$4f
     db "kid! No one could",$55
     db "understand a word",$55
@@ -129071,9 +128985,7 @@ _WardenThankYouText: ; 9e51b (27:651b)
     db "something for",$55
     db "your trouble.",$58
 
-SECTION "_HM04ExplanationText",ROMX[$65b6],BANK[$27]
-
-_HM04ExplanationText: ; 9e5b6 (27:65b6)
+_HM04ExplanationText:
     db $0,"WARDEN: PWR ",$4f
     db "teaches STRENGTH!",$51
     db "It lets #MON",$4f
@@ -129088,9 +129000,7 @@ _HM04ExplanationText: ; 9e5b6 (27:65b6)
     db "I hear it's the",$4f
     db "rare FLOAT PW",$57
 
-_HM04NoRoomText: ; 9e67a (27:667a)
-    db $0,"Your pack is",$4f
-    db "stuffed full!",$57
+SECTION "_UnnamedText_75176",ROMX[$6696],BANK[$27]
 
 _UnnamedText_75176: ; 9e696 (27:6696)
     db $0,"#MON photos",$4f
