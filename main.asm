@@ -16108,7 +16108,7 @@ GetDefaultName:
 DiagonalLines: ; 4d85 (1:4d85)
     INCBIN "gfx/diagonal_lines.2bpp"
 
-LearnMove_CheckPower:
+LearnMove_CheckPower: ; ♠TODO:►Ability
     jr nc,.continue
     ld hl,LearnMove_FieldMoveConfigTable
     ld de,4
@@ -16129,9 +16129,9 @@ LearnMove_CheckPower:
     ld d,a
     or e
     jr z,.continue ; Both pointer Byte zero
-    ld c,[hl] ; c = Power Bit
+    ld c,[hl] ; c = Power Bit ; ♠TODO:►Ability
     ld h,d
-    ld l,e ; [hl] = Power Byte
+    ld l,e ; [hl] = Power Byte ; ♠TODO:►Ability
     ld b,2
     PREDEF HandleBitArray
     ld a,c
@@ -16577,7 +16577,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
 
 LearnMove:
     call .IsFieldMove
-    call LearnMove_CheckPower
+    call LearnMove_CheckPower ; ♠TODO:►Ability
     jr nc,.continue
     ld b,$0 ; 0 = No Learn
     ret
@@ -23246,11 +23246,11 @@ UseItem_:
     dw UnusableItem      ; ItemUsePPRestore ; MAX_ETHER
     dw ItemUsePPRestore  ; ELIXER
     dw UnusableItem      ; ItemUsePPRestore ; MAX_ELIXER
-    dw UnusableItem      ; HM_01 : NATURE POWER
-    dw UnusableItem      ; HM_02 : AIR POWER
-    dw UnusableItem      ; HM_03 : WATER POWER
-    dw UnusableItem      ; HM_04 : EARTH POWER
-    dw UnusableItem      ; HM_05 : FIRE POWER
+    dw UnusableItem      ; HM_01 : NATURE POWER ; ♠TODO:►Ability
+    dw UnusableItem      ; HM_02 : AIR POWER ; ♠TODO:►Ability
+    dw UnusableItem      ; HM_03 : WATER POWER ; ♠TODO:►Ability
+    dw UnusableItem      ; HM_04 : EARTH POWER ; ♠TODO:►Ability
+    dw UnusableItem      ; HM_05 : FIRE POWER ; ♠TODO:►Ability
 
 IsSurfingAllowed:
     ld hl,$d728
@@ -29434,7 +29434,7 @@ StartMenu_TrainerInfo:
     ld c,3
     ld b,%00000001
     call PrintNumber
-    jp .PrintPowers
+    jp .PrintPowers ; ♠TODO:►Ability
 
 .TrainerInfo_FarCopyData
     ld a,$0b
@@ -29447,13 +29447,13 @@ StartMenu_TrainerInfo:
     db "MAX LEVEL",$D3,$4E
     db "AVG LEVEL",$D3,$4E
     db "H.OF FAME",$D3,$4E
-    db "POWER",$D3,$4E,$4E
+    db "POWER",$D3,$4E,$4E ; ♠TODO:►Ability
     db "BADGES",$D3,"@"
 
-.PrintPowers
+.PrintPowers ; ♠TODO:►Ability
     FuncCoord 09,09
     ld de,Coord
-    ld hl,$d803 ; NaturePower
+    ld hl,$d803 ; NaturePower ; ♠TODO:►Ability
     bit 0,[hl]  ; ...
     jr z,.next1
     ld a,$D8
@@ -29461,7 +29461,7 @@ StartMenu_TrainerInfo:
     inc de
     inc de
 .next1
-    ld hl,$d7e0 ; AirPower
+    ld hl,$d7e0 ; AirPower ; ♠TODO:►Ability
     bit 6,[hl]  ; ...
     jr z,.next2
     ld a,$D9
@@ -29469,7 +29469,7 @@ StartMenu_TrainerInfo:
     inc de
     inc de
 .next2
-    ld hl,$d857 ; WaterPower
+    ld hl,$d857 ; WaterPower ; ♠TODO:►Ability
     bit 0,[hl]  ; ...
     jr z,.next3
     ld a,$DA
@@ -29477,7 +29477,7 @@ StartMenu_TrainerInfo:
     inc de
     inc de
 .next3
-    ld hl,$d78e ; CheckEarthPower
+    ld hl,$d78e ; CheckEarthPower ; ♠TODO:►Ability
     bit 0,[hl]  ; ...
     jr z,.next4
     ld a,$DB
@@ -29485,7 +29485,7 @@ StartMenu_TrainerInfo:
     inc de
     inc de
 .next4
-    ld hl,$d7c2 ; CheckFirePower
+    ld hl,$d7c2 ; CheckFirePower ; ♠TODO:►Ability
     bit 0,[hl]  ; ...
     jr z,.next5
     ld a,$DC
@@ -30048,7 +30048,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 
 .fly
 ;    bit 2,a ; does the player have the Thunder Badge?
-    call CheckAirPower ; jp z,.newBadgeRequired
+    call CheckAirPower ; jp z,.newBadgeRequired ; ♠TODO:►Ability
     call CheckIfInOutsideMapAndAtLeastOneFlyingMap
     jr z,.canFly
     ld a,[$cf92]
@@ -30075,7 +30075,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 
 .cut
 ;    bit 1,a ; does the player have the Cascade Badge?
-    call CheckNaturePower ; jp z,.newBadgeRequired
+    call CheckNaturePower ; jp z,.newBadgeRequired ; ♠TODO:►Ability
     ld b,BANK(CheckCutTile)
     ld hl,CheckCutTile
     call Bankswitch
@@ -30088,7 +30088,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 
 .surf
 ;    bit 4,a ; does the player have the Soul Badge?
-    call CheckWaterPower ; jp z,.newBadgeRequired
+    call CheckWaterPower ; jp z,.newBadgeRequired ; ♠TODO:►Ability
     ld b,BANK(IsSurfingAllowed)
     ld hl,IsSurfingAllowed
     call Bankswitch
@@ -30109,14 +30109,14 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 
 .strength
 ;    bit 3,a ; does the player have the Rainbow Badge?
-    call CheckEarthPower ; jp z,.newBadgeRequired
+    call CheckEarthPower ; jp z,.newBadgeRequired ; ♠TODO:►Ability
     PREDEF UseStrength
     jp nc,.loop
     jr .WhiteScreenAndGotoMap
 
 .flash
 ;    bit 0,a ; does the player have the Boulder Badge?
-    call CheckFirePower ; jp z,.newBadgeRequired
+    call CheckFirePower ; jp z,.newBadgeRequired ; ♠TODO:►Ability
     call PlayCryAndDecreaseFieldMoveEnergy
     ld a,BENGAL
     ld [$cf91],a
@@ -31108,31 +31108,31 @@ ElementEnd:
     TX_FAR _ElementMissedText
     db "@"
 
-CheckNaturePower: ; CUT
+CheckNaturePower: ; CUT ; ♠TODO:►Ability
 ;    jr z,DontCheckElement
     ld hl,$d803
     bit 0,[hl]
     jr ElementEnd
 
-CheckAirPower: ; FLY
+CheckAirPower: ; FLY ; ♠TODO:►Ability
 ;    jr z,DontCheckElement
     ld hl,$d7e0
     bit 6,[hl]
     jr ElementEnd
 
-CheckWaterPower: ; SURF
+CheckWaterPower: ; SURF ; ♠TODO:►Ability
 ;    jr z,DontCheckElement
     ld hl,$d857
     bit 0,[hl]
     jr ElementEnd
 
-CheckEarthPower: ; STRENGTH
+CheckEarthPower: ; STRENGTH ; ♠TODO:►Ability
 ;    jr z,DontCheckElement
     ld hl,$d78e
     bit 0,[hl]
     jr ElementEnd
 
-CheckFirePower: ; FLASH
+CheckFirePower: ; FLASH ; ♠TODO:►Ability
 ;    jr z,DontCheckElement
     ld hl,$d7c2
     bit 0,[hl]
@@ -89336,12 +89336,12 @@ RemoveGuardDrink: ; 5a59f (16:659f)
 GuardDrinksList: ; 5a5b7 (16:65b7)
     db FRESH_WATER,SODA_POP,LEMONADE,$00
 
-GiveItemNotPower:
+GiveItemNotPower: ; ♠TODO:►Ability
     cp HM_05
     jp z,FakeGiveItem
     jp GiveItem
 
-LoadTextItemOrPower:
+LoadTextItemOrPower: ; ♠TODO:►Ability
     ld a,[$ff00+$dc]
     cp HM_05
     ld hl,UnnamedText_590a5 ; $50a5
@@ -120413,7 +120413,7 @@ _SafariZoneNorthText6: ; 85689 (21:5689)
 
 _SafariZoneNorthText7: ; 856df (21:56df)
     db $0,"TRAINER TIPS",$51
-    db "Win a POWER for ",$4f
+    db "Win a POWER for ",$4f ; ♠TODO:►Ability
     db "finding the",$55
     db "SECRET HOUSE!",$57
 
@@ -120479,7 +120479,7 @@ _HM03ExplanationText: ; 85957 (21:5957)
     db "#MON will be",$4f
     db "able to ferry you",$55
     db "across water!",$51
-    db "And,Power isn't ",$4f
+    db "And,Power isn't ",$4f ; ♠TODO:►Ability
     db "disposable! You",$55
     db "can use it over",$55
     db "and over!",$51
@@ -122385,7 +122385,7 @@ _DiglettsCaveRoute2Text1: ; 8a6a7 (22:66a7)
     db "TUNNEL,but it's",$55
     db "dark and scary.",$51
     db "If a #MON's",$4f
-    db "POWER could light",$55
+    db "POWER could light",$55 ; ♠TODO:►Ability
     db "it up...",$57
 
 _ViridianForestexitText1: ; 8a6fd (22:66fd)
@@ -124084,7 +124084,7 @@ _Route11BattleText9: ; 8ebee (23:6bee)
     db "live wires!",$57
 
 _HM02ExplanationText: ; Moved to the End of the BANK
-    db $0,"AIR POWER is FLY.",$4f
+    db $0,"AIR POWER is FLY.",$4f ; ♠TODO:►Ability
     db "It will take you",$55
     db "back to any town.",$51
     db "Put it to good",$4f
@@ -126377,7 +126377,7 @@ _UnnamedText_44201: ; 95858 (25:5858)
 _UnnamedText_44206: ; 95893 (25:5893)
     db $0,"You're on the",$4f
     db "right track! ",$55
-    db "Get a POWER   ",$55
+    db "Get a POWER   ",$55 ; ♠TODO:►Ability
     db "from my AIDE!",$57
 
 _UnnamedText_4420b: ; 958cc (25:58cc)
@@ -130419,7 +130419,7 @@ _NoPartyText:
 ; ───────────────────────────────
 
 _ElementMissedText:
-    db $0,"No! A new POWER",$4f
+    db $0,"No! A new POWER",$4f ; ♠TODO:►Ability
     db "is required.",$58
 
 _CopycatsHouseF2Text2_Part2:
@@ -132745,7 +132745,7 @@ SelectInOverWorld:
 ;    ld a,[W_OBTAINEDBADGES] ; badges obtained
 ;    bit 1,a ; does the player have the Cascade Badge?
 ;    jr z,.noCut
-    ld hl,$d803 ; NaturePower
+    ld hl,$d803 ; NaturePower ; ♠TODO:►Ability
     bit 0,[hl]  ; ...
     jr z,.noCut
     ld b,4 ; CUT
@@ -132790,7 +132790,7 @@ SelectInOverWorld:
     call .IsItemInBag
     ld a,0 ; wSurfingMonID
     jr nz,.canFloatNoCry
-    ld hl,$d857 ; WaterPower
+    ld hl,$d857 ; WaterPower ; ♠TODO:►Ability
     bit 0,[hl]  ; ...
     jr z,.noFloat
     ld b,5 ; FLOAT
@@ -132827,7 +132827,7 @@ SelectInOverWorld:
     ld b,BENGAL
     call .IsItemInBag
     jr nz,.canLightNoCry
-    ld hl,$d7c2 ; FirePower
+    ld hl,$d7c2 ; FirePower ; ♠TODO:►Ability
     bit 0,[hl]  ; ...
     jr z,.noLight
     ld b,7 ; LIGHT
@@ -132863,7 +132863,7 @@ SelectInOverWorld:
 ;    ld a,[W_OBTAINEDBADGES] ; badges obtained
 ;    bit 3,a ; does the player have the Rainbow Badge?
 ;    jr z,.noStrength
-    ld hl,$d78e ; EarthPower
+    ld hl,$d78e ; EarthPower ; ♠TODO:►Ability
     bit 0,[hl]  ; ...
     jr z,.noStrength
     ld b,6 ; STRENGTH
@@ -133902,11 +133902,11 @@ ItemNames:
     db "?@"            ; $51 ; MAX_ETHER
     db "ELIXER@"       ; $52
     db "?@"            ; $53 ; MAX_ELIXER
-    db "NATURE POWER@" ; $54
-    db "AIR POWER@"    ; $55
-    db "WATER POWER@"  ; $56
-    db "EARTH POWER@"  ; $57
-    db "FIRE POWER@"   ; $58
+    db "NATURE POWER@" ; $54 ; ♠TODO:►Ability
+    db "AIR POWER@"    ; $55 ; ♠TODO:►Ability
+    db "WATER POWER@"  ; $56 ; ♠TODO:►Ability
+    db "EARTH POWER@"  ; $57 ; ♠TODO:►Ability
+    db "FIRE POWER@"   ; $58 ; ♠TODO:►Ability
     db "?@"            ; $59
     db "?@"            ; $5A
     db "?@"            ; $5B
@@ -144909,7 +144909,7 @@ GetMonFieldMoves:
     ld a,[hli]
     ld c,a ; c = FM_XXX bit value added to e
     push hl
-    call .CheckPower
+    call .CheckPower ; ♠TODO:►Ability
     call nz,.CheckMonAlreadyKnowFieldMove
     pop hl
     inc hl
@@ -144943,7 +144943,7 @@ GetMonFieldMoves:
     ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
     ret
 
-.CheckPower
+.CheckPower ; ♠TODO:►Ability
     push de
     push bc
     ld a,[hli]
@@ -144951,22 +144951,22 @@ GetMonFieldMoves:
     ld a,[hli]
     ld d,a
     or e
-    jr z,.CheckPower_Success ; Both pointer Byte zero
-    ld c,[hl] ; c = Power Bit
+    jr z,.CheckPower_Success ; Both pointer Byte zero ; ♠TODO:►Ability
+    ld c,[hl] ; c = Power Bit ; ♠TODO:►Ability
     ld h,d
-    ld l,e ; [hl] = Power Byte
+    ld l,e ; [hl] = Power Byte ; ♠TODO:►Ability
     ld b,2
     PREDEF HandleBitArray
     ld a,c
     and a
-.CheckPower_End
+.CheckPower_End ; ♠TODO:►Ability
     pop bc
     pop de
     ret
-.CheckPower_Success
+.CheckPower_Success ; ♠TODO:►Ability
     ld a,1
     or a ; reset all flag
-    jr .CheckPower_End
+    jr .CheckPower_End ; ♠TODO:►Ability
 
 FMCT: MACRO
     db \1,\2
