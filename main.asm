@@ -37941,6 +37941,40 @@ PowerPlantExplosion:
     ld c,2
     jp DelayFrames
 
+Route16HouseText1:
+    db $08 ; asm
+    ld a,[$d7e0]
+    bit 6,a
+    ld hl,.HM02AfterText
+    jr nz,.done
+    ld hl,.PreHM02Text
+    call PrintText
+    ld bc,(HM_02 << 8) | 1
+    call FakeGiveItem
+    ld hl,$d7e0
+    set 6,[hl]
+    ld b,2 ; FLY
+    PREDEF LearnSkill
+    ld hl,.HM02SkillFoundText
+    jr c,.done
+    ld hl,.HM02SkillNotFoundText
+.done
+    call PrintText
+    jp TextScriptEnd
+
+.PreHM02Text
+    TX_FAR _PreHM02Text
+    db "@"
+.HM02SkillFoundText
+    TX_FAR _HM02SkillFoundText
+    db "@"
+.HM02SkillNotFoundText
+    TX_FAR _HM02SkillNotFoundText
+    db "@"
+.HM02AfterText
+    TX_FAR _HM02AfterText
+    db "@"
+
 ; Free
 
 SECTION "Func_1c98a",ROMX[$498a],BANK[$7]
@@ -41699,31 +41733,7 @@ Route16HouseTextPointers: ; 1e5fb (7:65fb)
     dw Route16HouseText1
     dw Route16HouseText2
 
-Route16HouseText1:
-    db $08 ; asm
-    ld a,[$d7e0]
-    bit 6,a
-    ld hl,.HM02ExplanationText
-    jr nz,.done
-    ld hl,.Route16HouseText3
-    call PrintText
-    ld bc,(HM_02 << 8) | 1
-    call FakeGiveItem
-    ld hl,$d7e0
-    set 6,[hl]
-    ld hl,.ReceivedHM02Text
-.done
-    call PrintText
-    jp TextScriptEnd
-.Route16HouseText3
-    TX_FAR _Route16HouseText3
-    db "@"
-.ReceivedHM02Text
-    TX_FAR _GotText
-    db $10,"@"
-.HM02ExplanationText
-    TX_FAR _HM02ExplanationText
-    db "@"
+; Free
 
 SECTION "Route16HouseText2",ROMX[$6640],BANK[$7]
 
@@ -75697,26 +75707,34 @@ SafariZoneSecretHouseText1:
     db $08 ; asm
     ld a,[$d857]
     bit 0,a
-    ld hl,.HM03ExplanationText
+    ld hl,.HM03AfterText
     jr nz,.done
-    ld hl,.UnnamedText_4a350
+    ld hl,.PreHM03Text
     call PrintText
     ld bc,(HM_03 << 8) | 1
     call FakeGiveItem
     ld hl,$d857
     set 0,[hl]
-    ld hl,.ReceivedHM03Text
+    ld b,5 ; FLOAT
+    PREDEF LearnSkill
+    ld hl,.HM03SkillFoundText
+    jr c,.done
+    ld hl,.HM03SkillNotFoundText
 .done
     call PrintText
     jp TextScriptEnd
-.UnnamedText_4a350
-    TX_FAR _UnnamedText_4a350
+
+.PreHM03Text
+    TX_FAR _PreHM03Text
     db "@"
-.ReceivedHM03Text
-    TX_FAR _GotText
-    db $10,"@"
-.HM03ExplanationText
-    TX_FAR _HM03ExplanationText
+.HM03SkillFoundText
+    TX_FAR _HM03SkillFoundText
+    db "@"
+.HM03SkillNotFoundText
+    TX_FAR _HM03SkillNotFoundText
+    db "@"
+.HM03AfterText
+    TX_FAR _HM03AfterText
     db "@"
 
 SECTION "SafariZoneSecretHouseObject",ROMX[$6365],BANK[$12]
@@ -76423,6 +76441,7 @@ _InitBattleEnemyParametersPredef:          NEW_PREDEF _InitBattleEnemyParameters
 _CheckDarkMapPredef:                       NEW_PREDEF _CheckDarkMap                       ; $78
 PrintMoveTypeShortPredef:                  NEW_PREDEF PrintMoveTypeShort                  ; $79
 PrintTypesFullPredef:                      NEW_PREDEF PrintTypesFull                      ; $7A
+LearnSkillPredef:                          NEW_PREDEF LearnSkill                          ; $7B
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -93760,7 +93779,7 @@ Route2GateText1:
     db $08 ; asm
     ld a,[$d7c2]
     bit 0,a
-    ld hl,.HM05ExplanationText
+    ld hl,.HM05AfterText
     jr nz,.done
     ld hl,.PreHM05Text
     call PrintText
@@ -93768,18 +93787,26 @@ Route2GateText1:
     call FakeGiveItem
     ld hl,$d7c2
     set 0,[hl]
-    ld hl,.ReceivedHM05Text
+    ld b,7 ; LIGHT
+    PREDEF LearnSkill
+    ld hl,.HM05SkillFoundText
+    jr c,.done
+    ld hl,.HM05SkillNotFoundText
 .done
     call PrintText
     jp TextScriptEnd
+
 .PreHM05Text
     TX_FAR _PreHM05Text
     db "@"
-.ReceivedHM05Text
-    TX_FAR _GotText
-    db $10,"@"
-.HM05ExplanationText
-    TX_FAR _HM05ExplanationText
+.HM05SkillFoundText
+    TX_FAR _HM05SkillFoundText
+    db "@"
+.HM05SkillNotFoundText
+    TX_FAR _HM05SkillNotFoundText
+    db "@"
+.HM05AfterText
+    TX_FAR _HM05AfterText
     db "@"
 
 ; ───────────────────────────────────────────
@@ -96065,17 +96092,21 @@ SSAnne7Text1:
     db $08 ; asm
     ld a,[$d803]
     bit 0,a
-    ld hl,.UnnamedText_61932
+    ld hl,.HM01AfterText
     jr nz,.done
     ld hl,.SSAnne7RubText
     call PrintText
-    ld hl,.ReceivingHM01Text
+    ld hl,.PreHM01Text
     call PrintText
     ld bc,(HM_01 << 8) | 1
     call FakeGiveItem
     ld hl,$d803
     set 0,[hl]
-    ld hl,.ReceivedHM01Text
+    ld b,4 ; CUT
+    PREDEF LearnSkill
+    ld hl,.HM01SkillFoundText
+    jr c,.done
+    ld hl,.HM01SkillNotFoundText
 .done
     call PrintText
     jp TextScriptEnd
@@ -96107,14 +96138,17 @@ SSAnne7Text1:
     res 5,[hl]
     jp TextScriptEnd
 
-.ReceivingHM01Text
-    TX_FAR _ReceivingHM01Text
+.PreHM01Text
+    TX_FAR _PreHM01Text
     db "@"
-.ReceivedHM01Text
-    TX_FAR _GotText
-    db $10,"@"
-.UnnamedText_61932
-    TX_FAR _UnnamedText_61932
+.HM01SkillFoundText
+    TX_FAR _HM01SkillFoundText
+    db "@"
+.HM01SkillNotFoundText
+    TX_FAR _HM01SkillNotFoundText
+    db "@"
+.HM01AfterText
+    TX_FAR _HM01AfterText
     db "@"
 
 SECTION "SSAnne7Text2",ROMX[$593c],BANK[$18]
@@ -106134,7 +106168,7 @@ FuchsiaHouse2Text1:
     db $08 ; asm
     ld a,[$d78e]
     bit 0,a
-    ld hl,.HM04ExplanationText
+    ld hl,.HM04AfterText
     jr nz,.done
     ld b,GOLD_TEETH
     call IsItemInBag
@@ -106149,20 +106183,24 @@ FuchsiaHouse2Text1:
     ld hl,.WardenGibberishText2
     jr .done
 .InBag
-    ld hl,.WardenTeethText1
+    ld hl,.WardenTeethText
     call PrintText
-    ld a,$40
+    ld a,GOLD_TEETH
     ldh [$db],a
     ld b,BANK(RemoveItemByID)
     ld hl,RemoveItemByID
     call Bankswitch
-    ld hl,.WardenThankYouText
+    ld hl,.PreHM04Text
     call PrintText
     ld bc,(HM_04 << 8) | 1
     call FakeGiveItem
     ld hl,$d78e
     set 0,[hl]
-    ld hl,.ReceivedHM04Text
+    ld b,6 ; STRENGTH
+    PREDEF LearnSkill
+    ld hl,.HM04SkillFoundText
+    jr c,.done
+    ld hl,.HM04SkillNotFoundText
 .done
     call PrintText
     jp TextScriptEnd
@@ -106176,17 +106214,23 @@ FuchsiaHouse2Text1:
 .WardenGibberishText3
     TX_FAR _WardenGibberishText3
     db "@"
-.WardenTeethText1
+.WardenTeethText
     TX_FAR _WardenTeethText1
     db $0b
-.WardenThankYouText
-    TX_FAR _WardenThankYouText
+    TX_FAR _WardenTeethText2
     db "@"
-.ReceivedHM04Text
-    TX_FAR _GotText
-    db $10,"@"
-.HM04ExplanationText
-    TX_FAR _HM04ExplanationText
+
+.PreHM04Text
+    TX_FAR _PreHM04Text
+    db "@"
+.HM04SkillFoundText
+    TX_FAR _HM04SkillFoundText
+    db "@"
+.HM04SkillNotFoundText
+    TX_FAR _HM04SkillNotFoundText
+    db "@"
+.HM04AfterText
+    TX_FAR _HM04AfterText
     db "@"
 
 SECTION "FuchsiaHouse2Text5",ROMX[$5163],BANK[$1d]
@@ -118880,7 +118924,7 @@ _SSAnne7RubText: ; 812dd (20:52dd)
     db "Rub-rub...",$4f
     db "Rub-rub...@@"
 
-_ReceivingHM01Text: ; 81347 (20:5347)
+_PreHM01Text: ; 81347 (20:5347)
     db $0,"CAPTAIN: Whew!",$4f
     db "Thank you! I",$55
     db "feel much better!",$51
@@ -118895,7 +118939,7 @@ _ReceivingHM01Text: ; 81347 (20:5347)
     db "can see it CUT",$55
     db "any time!",$58
 
-_UnnamedText_61932:
+_HM01AfterText:
     db $0,"CAPTAIN: Whew!",$51
     db "Now that I'm not",$4f
     db "sick any more,I",$55
@@ -120383,7 +120427,7 @@ _SafariZoneRestHouse1Text2: ; 8587b (21:587b)
     db "#MON to take",$55
     db "home as gifts!",$57
 
-_UnnamedText_4a350: ; 858a4 (21:58a4)
+_PreHM03Text: ; 858a4 (21:58a4)
     db $0,"Ah! Finally!",$51
     db "You're the first",$4f
     db "person to reach",$55
@@ -120395,7 +120439,7 @@ _UnnamedText_4a350: ; 858a4 (21:58a4)
     db "Congratulations!",$4f
     db "You have won!",$58
 
-_HM03ExplanationText: ; 85957 (21:5957)
+_HM03AfterText: ; 85957 (21:5957)
     db $0,"This is FLOAT!",$51
     db "#MON will be",$4f
     db "able to ferry you",$55
@@ -122328,7 +122372,7 @@ _Route2HouseText1: ; 8a7b8 (22:67b8)
     db "it can still use ",$55
     db "moves like CUT!",$57
 
-_HM05ExplanationText: ; 8a7fc (22:67fc)
+_HM05AfterText: ; 8a7fc (22:67fc)
     db $0,"The FIRE PWR ",$4f
     db "lights even the",$55
     db "darkest dungeons.",$57
@@ -122687,6 +122731,43 @@ _SilphScopeDoesntWorkInTheDark
 
 _PreHM05Text:
     db $0,"I give you this!",$58
+
+_LearnSkill:
+    db $0,$52," learns all",$4f
+    db "secrets about",$55
+    db "@"
+    TX_RAM $cf4b
+    db $0," Skill!@@"
+
+_HM01SkillFoundText:
+    db $0,"Found!@@"
+
+_HM01SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM02SkillFoundText:
+    db $0,"Found!@@"
+
+_HM02SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM03SkillFoundText:
+    db $0,"Found!@@"
+
+_HM03SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM04SkillFoundText:
+    db $0,"Found!@@"
+
+_HM04SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM05SkillFoundText:
+    db $0,"Found!@@"
+
+_HM05SkillNotFoundText:
+    db $0,"NOT Found!@@"
 
 ; ───────────────────────────────────
 
@@ -123067,7 +123148,7 @@ _UnnamedText_49847: ; 8cdc6 (23:4dc6)
     db "There's a long",$4f
     db "path over water!",$57
 
-_Route16HouseText3: ; 8ce02 (23:4e02)
+_PreHM02Text: ; 8ce02 (23:4e02)
     db $0,"Oh,you found my",$4f
     db "secret retreat!",$51
     db "Please don't tell",$4f
@@ -124002,7 +124083,7 @@ _Route11BattleText9: ; 8ebee (23:6bee)
     db $0,"Watch out for",$4f
     db "live wires!",$57
 
-_HM02ExplanationText: ; Moved to the End of the BANK
+_HM02AfterText: ; Moved to the End of the BANK
     db $0,"AIR POWER is FLY.",$4f ; ♠TODO:►Ability
     db "It will take you",$55
     db "back to any town.",$51
@@ -128974,7 +129055,12 @@ _WardenTeethText1:
     db "GOLD TEETH to the",$55
     db "WARDEN!@@"
 
-_WardenThankYouText:
+_WardenTeethText2:
+    db $0,$51
+    db "The WARDEN popped",$4f
+    db "in his teeth!",$58
+
+_PreHM04Text:
     db $0,"WARDEN: Thanks,",$4f
     db "kid! No one could",$55
     db "understand a word",$55
@@ -128985,7 +129071,7 @@ _WardenThankYouText:
     db "something for",$55
     db "your trouble.",$58
 
-_HM04ExplanationText:
+_HM04AfterText:
     db $0,"WARDEN: PWR ",$4f
     db "teaches STRENGTH!",$51
     db "It lets #MON",$4f
@@ -132980,6 +133066,44 @@ SearchFieldMoveInParty:
     pop bc
     ret
 
+; ──────────────────────────────────────────────────────────────────────
+
+; Input 
+; b
+; 1 = FLY
+; 4 = CUT
+; 5 = FLOAT
+; 7 = LIGHT
+; 6 = STRENGTH
+LearnSkill:
+    call Load16BitRegisters
+    push bc
+    call .Animation
+    ld hl,.LearnSkill
+    call PrintText
+    pop bc
+    jp SearchFieldMoveInParty
+.LearnSkill
+    TX_FAR _LearnSkill
+    db $10,"@"
+
+.Animation
+    call GBFadeOut2
+    call ReloadMapData
+    ld a,$E8
+    ld [$C0EE],a
+    call PlaySound ; play sound?
+.WaitLoop
+    ld a,[$C026]
+    cp $E8
+    jr z,.WaitLoop
+    ld a,[$D35B]
+    ld [$C0EE],a
+    call PlaySound
+    jp GBFadeIn2
+
+; ──────────────────────────────────────────────────────────────────────
+
 FossilKabutopsPicFront:
     INCBIN "pic/bmon/fossilkabutops.pic"
 FossilKabutopsPicBack:
@@ -133812,11 +133936,11 @@ ItemNames:
     db "?@"            ; $51 ; MAX_ETHER
     db "ELIXER@"       ; $52
     db "?@"            ; $53 ; MAX_ELIXER
-    db "NATURE POWER@" ; $54 ; ♠TODO:►Ability
-    db "AIR POWER@"    ; $55 ; ♠TODO:►Ability
-    db "WATER POWER@"  ; $56 ; ♠TODO:►Ability
-    db "EARTH POWER@"  ; $57 ; ♠TODO:►Ability
-    db "FIRE POWER@"   ; $58 ; ♠TODO:►Ability
+    db "CUT@"          ; $54 ; Ex NATURE POWER
+    db "FLY@"          ; $55 ; Ex AIR POWER
+    db "FLOAT@"        ; $56 ; Ex WATER POWER
+    db "STRENGTH@"     ; $57 ; Ex EARTH POWER
+    db "LIGHT@"        ; $58 ; Ex FIRE POWER
     db "?@"            ; $59
     db "?@"            ; $5A
     db "?@"            ; $5B
