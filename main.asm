@@ -38,9 +38,9 @@ StoreGymLeaderRematch:
     pop bc
     ret
 
-CheckFieldMovesInList:
+CheckSkillInList:
     push hl
-    ld hl,wNoFieldMovesInListBit6
+    ld hl,wNoSkillInListBit6
     bit 6,[hl]
     pop hl
     ret
@@ -419,16 +419,16 @@ GoodCopyVideoDataDouble:
     pop de
     jp FarCopyDataDouble ; if LCD is off,transfer all at once
 
-PlayCryAndDecreaseFieldMoveEnergy:
-    call CheckAndDecreaseFieldMoveEnergy
-    ld a,[wFieldMoveMonID]
+PlayCryAndDecreaseSkillEnergy:
+    call CheckAndDecreaseSkillEnergy
+    ld a,[wSkillMonID]
     call GetCryData ; get cry data
     call PlaySound ; play sound
     xor a
-    ld [wFieldMoveMonID],a
+    ld [wSkillMonID],a
     ret
 
-CheckFieldMoveEnergy:
+CheckSkillEnergy:
     ld a,[wWhichPokemon]
     ld hl,W_PARTYMON1_MOVE1PP
     ld bc,44
@@ -437,8 +437,8 @@ CheckFieldMoveEnergy:
     sub 10
     ret
 
-CheckAndDecreaseFieldMoveEnergy:
-    call CheckFieldMoveEnergy
+CheckAndDecreaseSkillEnergy:
+    call CheckSkillEnergy
     jr c,.noEnergy
     ld [hl],a ; New Energy Value
 .noEnergy
@@ -8098,35 +8098,35 @@ IsSpriteInFrontOfPlayer4:
     and a ; was there a sprite collision?
     ret ; nz = collison
 
-IsFieldMove:
+IsSkill:
     push bc
     push af
     push de
     push hl
-    ld hl,.FieldMoveTable
+    ld hl,.SkillTable
     ld de,1
     call IsInArray
     jr c,.Found
 .NotFound
     xor a ; rcf
-    jr .IsFieldMove_End
+    jr .IsSkill_End
 .Found
     scf
-.IsFieldMove_End
+.IsSkill_End
     pop hl
     pop de
     pop bc
     ld a,b
     pop bc
     ret
-.FieldMoveTable
-    db FieldMove__FLY
-    db FieldMove__DIG
-    db FieldMove__CUT
-    db FieldMove__FLOAT
-    db FieldMove__STRENGTH
-    db FieldMove__LIGHT
-    db FieldMove__HEAL
+.SkillTable
+    db Skill__FLY
+    db Skill__DIG
+    db Skill__CUT
+    db Skill__FLOAT
+    db Skill__STRENGTH
+    db Skill__LIGHT
+    db Skill__HEAL
     db $FF
 
 SECTION "OverworldHackRoutine",ROM0[$3040]
@@ -16108,9 +16108,9 @@ GetDefaultName:
 DiagonalLines: ; 4d85 (1:4d85)
     INCBIN "gfx/diagonal_lines.2bpp"
 
-LearnMove_CheckPower: ; ♠TODO:►Ability
+LearnMove_CheckSkill:
     jr nc,.continue
-    ld hl,LearnMove_FieldMoveConfigTable
+    ld hl,LearnMove_SkillConfigTable
     ld de,4
     push hl
     call IsInArray
@@ -16129,9 +16129,9 @@ LearnMove_CheckPower: ; ♠TODO:►Ability
     ld d,a
     or e
     jr z,.continue ; Both pointer Byte zero
-    ld c,[hl] ; c = Power Bit ; ♠TODO:►Ability
+    ld c,[hl] ; c = Skill Bit
     ld h,d
-    ld l,e ; [hl] = Power Byte ; ♠TODO:►Ability
+    ld l,e ; [hl] = Skill Byte
     ld b,2
     PREDEF HandleBitArray
     ld a,c
@@ -16576,8 +16576,8 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
 ; ────────────────────────────────────────
 
 LearnMove:
-    call .IsFieldMove
-    call LearnMove_CheckPower ; ♠TODO:►Ability
+    call .IsSkill
+    call LearnMove_CheckSkill
     jr nc,.continue
     ld b,$0 ; 0 = No Learn
     ret
@@ -16594,13 +16594,13 @@ LearnMove:
     call CheckMoveRelearn
     jr nz,.skip
     ; XX learned YY! ♫♪
-    call .IsFieldMove
-    ld hl,.LearnedTextPlusSoundFieldMove
-    jr c,.FieldMove
+    call .IsSkill
+    ld hl,.LearnedSkillTextPlusSound
+    jr c,.Skill
     cp TELEPORT
-    jr z,.FieldMove
+    jr z,.Skill
     ld hl,.LearnedTextPlusSound
-.FieldMove
+.Skill
     call PrintText
     ; Get Mon OT Name to Try Add Exclusive Move
     ld hl,W_PARTYMON1OT+8
@@ -16624,8 +16624,8 @@ LearnMove:
     ld hl,TryToAddExclusiveMove
     call Bankswitch
 .skip
-    call .IsFieldMove
-    jp c,.FieldMoveDontInsertInMonMoves
+    call .IsSkill
+    jp c,.SkillDontInsertInMonMoves
     ld hl,W_PARTYMON1_MOVE1 ; $d173
     ld bc,$2c
     ld a,[wWhichPokemon] ; $cf92
@@ -16684,14 +16684,14 @@ LearnMove:
     call PrintText
     jp SaveScreenTilesToBuffer1
 
-.IsFieldMove
+.IsSkill
     ld a,[$d0e0]
-    jp IsFieldMove
+    jp IsSkill
 
 .EmptyText
     db "@"
 
-.FieldMoveDontInsertInMonMoves
+.SkillDontInsertInMonMoves
     call IsTryingToLearnPalFix_End
     ld b,$1 ; 1 = Learn directly
     ret
@@ -16790,10 +16790,10 @@ LearnMove:
     TX_FAR _LearnedText
     db $b,6,"@"
 
-.LearnedTextPlusSoundFieldMove
-    TX_FAR _LearnedTextFieldMove1
+.LearnedSkillTextPlusSound
+    TX_FAR _LearnedSkillText1
     db $11
-    TX_FAR _LearnedTextFieldMove2
+    TX_FAR _LearnedSkillText2
     db "@"
 
 .ReplaceAMoveForText
@@ -17376,7 +17376,7 @@ GetAddressOfScreenCoords: ; 7375 (1:7375)
 TextBoxFunctionTable: ; 7387 (1:7387)
     dbw $13,Func_74ba
     dbw $15,Func_74ea
-    dbw $04,FieldMovesMenu
+    dbw $04,SkillMenu
     dbw $03,ChoiceMonSimpleMenu
     db $ff ; terminator
 
@@ -17778,11 +17778,11 @@ MenuStrings: ; 7671 (1:7671)
 .HealCancelMenu ; 76d5 (1:36d5)
     db "HEAL",$4E,"CANCEL@"
 
-FieldMovesMenu: ; 76e1 (1:36e1)
+SkillMenu: ; 76e1 (1:36e1)
     FuncCoord 03,16
     ld hl,Coord
     ld b,0
-    ld a,[wNumFieldMoves]
+    ld a,[wNumSkill]
     ld de,-40
 .loop1
     add hl,de
@@ -17795,18 +17795,18 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     call UpdateSprites
     FuncCoord 05,18
     ld hl,Coord
-    ld a,[wNumFieldMoves]
+    ld a,[wNumSkill]
     ld de,-40
 .loop2
     add hl,de
     dec a
     jr nz,.loop2
     xor a
-    ld [wNumFieldMoves],a
-    ld de,wFieldMoves
-.LoopFieldMoves
+    ld [wNumSkill],a
+    ld de,wSkill
+.LoopSkill
     push hl
-    ld hl,.FieldMoveNames
+    ld hl,.SkillNames
     call .GetMonID
     CP LAPRAS
     ld a,[de]
@@ -17815,7 +17815,7 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     jr z,.LaprasSurf
 .NotLapras
     and a
-    jr z,.LoopFieldMovesEnd
+    jr z,.LoopSkillEnd
     inc de
     ld b,a
 .LoopMoveNames
@@ -17837,12 +17837,12 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     ld bc,40
     add hl,bc
     pop de
-    jr .LoopFieldMoves
-.LoopFieldMovesEnd
+    jr .LoopSkill
+.LoopSkillEnd
     pop hl
     ret
 .LaprasSurf
-    ld hl,.FieldMoveSurfException
+    ld hl,.SkillSurfException
     inc de
     jr .LoopMoveNamesEnd
 .GetMonID
@@ -17858,22 +17858,22 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     pop hl
     ret
 
-.FieldMoveNames
-    db "FLY@"    ; Move : SWOOP
-    db "TELEP.@" ; Move : TELEPORT
-    db "DIG@"    ; Move : TRAPHOLE
-    db "CUT@"    ; Move : BLADE
-    db "FLOAT@"  ; Move : TSUNAMI (SURF)
-    db "STR.TH@" ; Move : STRIKE
-    db "LIGHT@"  ; Move : FLASH
-    db "HEAL@"   ; Move : SOFTBOILED
+.SkillNames
+    db "FLY@"    ; Ex Move : SWOOP
+    db "TELEP.@" ; Ex Move : TELEPORT
+    db "DIG@"    ; Ex Move : TRAPHOLE
+    db "CUT@"    ; Ex Move : BLADE
+    db "FLOAT@"  ; Ex Move : TSUNAMI (SURF)
+    db "STR.TH@" ; Ex Move : STRIKE
+    db "LIGHT@"  ; Ex Move : FLASH
+    db "HEAL@"   ; Ex Move : SOFTBOILED
 
-.FieldMoveSurfException
+.SkillSurfException
     db "SURF@"
 
 ChoiceMonSimpleMenu:
-    ld b,BANK(GetMonFieldMoves)
-    ld hl,GetMonFieldMoves
+    ld b,BANK(GetMonSkill)
+    ld hl,GetMonSkill
     call Bankswitch
     FuncCoord 11,06
     ld hl,Coord
@@ -17882,13 +17882,13 @@ ChoiceMonSimpleMenu:
     call TextBoxBorder
     call UpdateSprites
     ld a,$c
-    ld [$FF00+$f7],a ; hFieldMoveMonMenuTopMenuItemX
+    ld [$FF00+$f7],a ; hSkillMonMenuTopMenuItemX
     FuncCoord 13,08
     ld hl,Coord
     ld de,.PokemonMenuEntries
     jp PlaceString
 .PokemonMenuEntries
-    db "FIELD",$4E
+    db "SKILL",$4E
     db "STATS",$4E
     db "MOVES",$4E
     db "RENAME",$4E
@@ -18008,20 +18008,20 @@ DrainHPEffect_:
     TX_FAR _DreamWasEatenText
     db "@"
 
-FMCT_LM: MACRO
+SCT_LM: MACRO
     db \1
     dw \2
     db \3
 ENDM
 
-LearnMove_FieldMoveConfigTable:
-    FMCT_LM FieldMove__FLY      , $d7e0,6
-    FMCT_LM FieldMove__DIG      , $0000,0
-    FMCT_LM FieldMove__CUT      , $d803,0
-    FMCT_LM FieldMove__FLOAT    , $d857,0
-    FMCT_LM FieldMove__STRENGTH , $d78e,0
-    FMCT_LM FieldMove__LIGHT    , $d7c2,0
-    FMCT_LM FieldMove__HEAL     , $0000,0
+LearnMove_SkillConfigTable:
+    SCT_LM Skill__FLY      , $d7e0,6
+    SCT_LM Skill__DIG      , $0000,0
+    SCT_LM Skill__CUT      , $d803,0
+    SCT_LM Skill__FLOAT    , $d857,0
+    SCT_LM Skill__STRENGTH , $d78e,0
+    SCT_LM Skill__LIGHT    , $d7c2,0
+    SCT_LM Skill__HEAL     , $0000,0
     db $FF
 
 ; Free
@@ -22598,9 +22598,9 @@ SurfingCry:
     ld a,[$d152]
     and a ; using surfboard?
     jr z,.skip
-    ld a,[wFieldMoveMonID]
+    ld a,[wSkillMonID]
     ld [wSurfingMonID],a
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
 .skip
     call IsSurfingOnLapras
     ld hl,SurfingGotOnText
@@ -22614,7 +22614,7 @@ SurfingCry:
 SurfingAttemptFailed:
     ld hl,ItemUseFailed
     push hl ; return pointer
-    ld a,[wFieldMoveMonID]
+    ld a,[wSkillMonID]
     cp LAPRAS
     ld hl,NoSurfingHereText
     ret nz
@@ -23246,11 +23246,11 @@ UseItem_:
     dw UnusableItem      ; ItemUsePPRestore ; MAX_ETHER
     dw ItemUsePPRestore  ; ELIXER
     dw UnusableItem      ; ItemUsePPRestore ; MAX_ELIXER
-    dw UnusableItem      ; HM_01 : NATURE POWER ; ♠TODO:►Ability
-    dw UnusableItem      ; HM_02 : AIR POWER ; ♠TODO:►Ability
-    dw UnusableItem      ; HM_03 : WATER POWER ; ♠TODO:►Ability
-    dw UnusableItem      ; HM_04 : EARTH POWER ; ♠TODO:►Ability
-    dw UnusableItem      ; HM_05 : FIRE POWER ; ♠TODO:►Ability
+    dw UnusableItem      ; CUT      ; Ex HM_01 ; Ex NATURE POWER
+    dw UnusableItem      ; FLY      ; Ex HM_02 ; Ex AIR POWER
+    dw UnusableItem      ; FLOAT    ; Ex HM_03 ; Ex WATER POWER
+    dw UnusableItem      ; STRENGTH ; Ex HM_04 ; Ex EARTH POWER
+    dw UnusableItem      ; LIGHT    ; Ex HM_05 ; Ex FIRE POWER
 
 IsSurfingAllowed:
     ld hl,$d728
@@ -24106,7 +24106,7 @@ ItemUseMedicine:
     and a ; using Softboiled?
     jp z,.notUsingSoftboiled2
 ; if using softboiled
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     ld hl,wHPBarMaxHP
     ld a,[hli]
     push af
@@ -28044,7 +28044,7 @@ UsingDigCry:
     and a
     ret z
     push af
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     pop af
     ret
 
@@ -28314,7 +28314,7 @@ UseStrength:
     set 0,[hl]
     ld hl,wOverworlStrengthAnimBit1
     set 1,[hl]
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     scf ; success
     ret
 .AlreadyStrength
@@ -29434,7 +29434,7 @@ StartMenu_TrainerInfo:
     ld c,3
     ld b,%00000001
     call PrintNumber
-    jp .PrintPowers ; ♠TODO:►Ability
+    jr .PrintSkill
 
 .TrainerInfo_FarCopyData
     ld a,$0b
@@ -29447,13 +29447,13 @@ StartMenu_TrainerInfo:
     db "MAX LEVEL",$D3,$4E
     db "AVG LEVEL",$D3,$4E
     db "H.OF FAME",$D3,$4E
-    db "POWER",$D3,$4E,$4E ; ♠TODO:►Ability
-    db "BADGES",$D3,"@"
+    db "SKILL",$D3,$4E,$4E
+    db "BADGE",$D3,"@"
 
-.PrintPowers ; ♠TODO:►Ability
+.PrintSkill
     FuncCoord 09,09
     ld de,Coord
-    ld hl,$d803 ; NaturePower ; ♠TODO:►Ability
+    ld hl,$d803 ; Cut ; Ex NaturePower
     bit 0,[hl]  ; ...
     jr z,.next1
     ld a,$D8
@@ -29461,7 +29461,7 @@ StartMenu_TrainerInfo:
     inc de
     inc de
 .next1
-    ld hl,$d7e0 ; AirPower ; ♠TODO:►Ability
+    ld hl,$d7e0 ; Fly ; Ex AirPower
     bit 6,[hl]  ; ...
     jr z,.next2
     ld a,$D9
@@ -29469,7 +29469,7 @@ StartMenu_TrainerInfo:
     inc de
     inc de
 .next2
-    ld hl,$d857 ; WaterPower ; ♠TODO:►Ability
+    ld hl,$d857 ; Float ; Ex WaterPower
     bit 0,[hl]  ; ...
     jr z,.next3
     ld a,$DA
@@ -29477,7 +29477,7 @@ StartMenu_TrainerInfo:
     inc de
     inc de
 .next3
-    ld hl,$d78e ; CheckEarthPower ; ♠TODO:►Ability
+    ld hl,$d78e ; Strength ; Ex EarthPower
     bit 0,[hl]  ; ...
     jr z,.next4
     ld a,$DB
@@ -29485,7 +29485,7 @@ StartMenu_TrainerInfo:
     inc de
     inc de
 .next4
-    ld hl,$d7c2 ; CheckFirePower ; ♠TODO:►Ability
+    ld hl,$d7c2 ; Light ; Ex FirePower
     bit 0,[hl]  ; ...
     jr z,.next5
     ld a,$DC
@@ -29925,7 +29925,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld [$cfcb],a
     call DisplayPartyMenu
     jr .checkIfPokemonChosen
-.loop ; $70BF ► Don't Move this Pointer!!!
+.loop
     xor a
     ld [$cc35],a
     ld [$d07d],a
@@ -29933,7 +29933,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call GoBackToPartyMenu
 .checkIfPokemonChosen
     ld a,0
-    ld [wFieldMoveMonID],a
+    ld [wSkillMonID],a
     jr nc,.chosePokemon
 .exitMenu
     call GBPalWhiteOutWithDelay3
@@ -29953,7 +29953,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jr nz,.ReloadScreenAndLoop
     ld a,[wCurrentMenuItem]
     and a
-    jr z,.choseFieldMove
+    jr z,.choseSkill
     push af
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     pop af
@@ -29996,29 +29996,29 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .MiddleJumpToLoop
     jr .loop
 
-.NoFieldMoves
+.NoSkill
     ld a,$a5 ; Error
     call PlaySoundWaitForCurrent ; play sound
     jr .RedrawMenu
 
-.choseFieldMove
-    ld a,[wNumFieldMoves]
+.choseSkill
+    ld a,[wNumSkill]
     and a
-    jr z,.NoFieldMoves
-    call CheckFieldMoveEnergy
-    jr c,.NoFieldMoves
-    ld a,4 ; FieldMovesMenu
+    jr z,.NoSkill
+    call CheckSkillEnergy
+    jr c,.NoSkill
+    ld a,4 ; SkillMenu
     ld [$d125],a
-    call DisplayTextBoxID ; display pokemon field moves
+    call DisplayTextBoxID ; display pokemon skill
     ld bc,$ff12 ; max menu item ID,top menu item Y
     ld d,04 ; top menu item X
-    call HandlePkmnSubMenuFieldMoves
+    call HandlePkmnSubMenuSkill
     push af
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     pop af
     bit 1,a ; was the B button pressed?
     jr nz,.MiddleJumpToLoop
-    ld hl,wFieldMoves
+    ld hl,wSkill
     ld b,0
     ld a,[wCurrentMenuItem]
     ld c,a
@@ -30047,8 +30047,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     dw .softboiled
 
 .fly
-;    bit 2,a ; does the player have the Thunder Badge?
-    call CheckAirPower ; jp z,.newBadgeRequired ; ♠TODO:►Ability
     call CheckIfInOutsideMapAndAtLeastOneFlyingMap
     jr z,.canFly
     ld a,[$cf92]
@@ -30062,7 +30060,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[$d732]
     bit 3,a ; did the player decide to fly?
     jr z,.undoFly
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     jp .goBackToMap
 .undoFly
     call LoadFontTilePatterns
@@ -30074,12 +30072,10 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     db "@"
 
 .cut
-;    bit 1,a ; does the player have the Cascade Badge?
-    call CheckNaturePower ; jp z,.newBadgeRequired ; ♠TODO:►Ability
     ld b,BANK(CheckCutTile)
     ld hl,CheckCutTile
     call Bankswitch
-    call z,PlayCryAndDecreaseFieldMoveEnergy
+    call z,PlayCryAndDecreaseSkillEnergy
     PREDEF UsedCut
     ld a,[$cd6a]
     and a
@@ -30087,8 +30083,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jp CloseTextDisplay
 
 .surf
-;    bit 4,a ; does the player have the Soul Badge?
-    call CheckWaterPower ; jp z,.newBadgeRequired ; ♠TODO:►Ability
     ld b,BANK(IsSurfingAllowed)
     ld hl,IsSurfingAllowed
     call Bankswitch
@@ -30108,16 +30102,12 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jp .goBackToMap
 
 .strength
-;    bit 3,a ; does the player have the Rainbow Badge?
-    call CheckEarthPower ; jp z,.newBadgeRequired ; ♠TODO:►Ability
     PREDEF UseStrength
     jp nc,.loop
     jr .WhiteScreenAndGotoMap
 
 .flash
-;    bit 0,a ; does the player have the Boulder Badge?
-    call CheckFirePower ; jp z,.newBadgeRequired ; ♠TODO:►Ability
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     ld a,BENGAL
     ld [$cf91],a
     ld [$d152],a
@@ -30144,7 +30134,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call PrintText
     jp .loop
 .canTeleport
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     ld hl,.warpToLastPokemonCenterText
     call PrintText
     ld hl,$d732
@@ -30207,6 +30197,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .goBackToMap
     call RestoreScreenTilesAndReloadTilePatterns
     jp CloseTextDisplay
+
+; Free
 
 SECTION "ItemMenuLoop",ROMX[$72fc],BANK[$4]
 
@@ -31094,50 +31086,6 @@ SetDamageDuringRecoil:
     ld hl,SetDamageDuringRecoil_
     jp Bankswitch
 
-;DontCheckElement:
-;    pop af ; Delete Call Back Return
-;    jp NewBadgeRequired
-
-ElementEnd:
-    ret nz
-    pop af ; Delete Call Back Return
-    ld hl,.ElementMissedText
-    call PrintText
-    jp $70BF ; StartMenu_Pokemon.loop
-.ElementMissedText
-    TX_FAR _ElementMissedText
-    db "@"
-
-CheckNaturePower: ; CUT ; ♠TODO:►Ability
-;    jr z,DontCheckElement
-    ld hl,$d803
-    bit 0,[hl]
-    jr ElementEnd
-
-CheckAirPower: ; FLY ; ♠TODO:►Ability
-;    jr z,DontCheckElement
-    ld hl,$d7e0
-    bit 6,[hl]
-    jr ElementEnd
-
-CheckWaterPower: ; SURF ; ♠TODO:►Ability
-;    jr z,DontCheckElement
-    ld hl,$d857
-    bit 0,[hl]
-    jr ElementEnd
-
-CheckEarthPower: ; STRENGTH ; ♠TODO:►Ability
-;    jr z,DontCheckElement
-    ld hl,$d78e
-    bit 0,[hl]
-    jr ElementEnd
-
-CheckFirePower: ; FLASH ; ♠TODO:►Ability
-;    jr z,DontCheckElement
-    ld hl,$d7c2
-    bit 0,[hl]
-    jr ElementEnd
-
 FixTMPalette:
     push hl
     ld hl,wFlagNoHpPalBit2
@@ -31428,17 +31376,9 @@ CheckIfInOutsideMapAndAtLeastOneFlyingMap:
     dec a
     ret
 
-NewBadgeRequired:
-    ld hl,.newBadgeRequiredText
-    call PrintText
-    jp $70BF ; StartMenu_Pokemon.loop
-.newBadgeRequiredText
-    TX_FAR _NewBadgeRequiredText
-    db "@"
-
-HandlePkmnSubMenuFieldMoves:
-    ld hl,wFieldMoves
-    ld e,8+1 ; Max Number of Field Moves + 1
+HandlePkmnSubMenuSkill:
+    ld hl,wSkill
+    ld e,8+1 ; Max Number of Skill + 1
 .adjustMenuVariablesLoop
     dec e
     jr z,.storeMenuVariables
@@ -31480,7 +31420,7 @@ GetPartyMonIDAndName:
     ld b,0
     add hl,bc
     ld b,[hl]
-    ld hl,wFieldMoveMonID
+    ld hl,wSkillMonID
     ld [hl],b
     ld hl,W_PARTYMON1NAME
     call GetPartyMonName
@@ -42909,7 +42849,7 @@ MovesMenu:
     call SaveScreenTilesToBuffer1
     ld hl,wFlagMoveRelearnEngagedBit7
     set 7,[hl]
-    ld hl,wNoFieldMovesInListBit6
+    ld hl,wNoSkillInListBit6
     set 6,[hl]
     ; Backup Screen "Offset"
     ld a,[wListScrollOffset]
@@ -43055,7 +42995,7 @@ MovesMenu:
 
     pop af
     ld [wListScrollOffset],a ; Restore Screen "Offset"
-    ld hl,wNoFieldMovesInListBit6
+    ld hl,wNoSkillInListBit6
     res 6,[hl]
     ld hl,wFlagMoveRelearnEngagedBit7
     res 7,[hl]
@@ -43864,8 +43804,8 @@ HandleExclusiveLearnMove:
     ld a,[hl] ; Exclusive Move
     and a
     jr z,.OutOfRange
-    call CheckFieldMovesInList
-    call nz,IsFieldMove
+    call CheckSkillInList
+    call nz,IsSkill
     jr c,.OutOfRange
     pop de ; Restore Pointer to Move List Current Elements
     ld b,a
@@ -51636,11 +51576,11 @@ WriteMonMoves:
     push hl
     push de
     push bc
-    ld hl,wNoFieldMovesInListBit6
+    ld hl,wNoSkillInListBit6
     set 6,[hl]
     call GetMoves
     push hl
-    ld hl,wNoFieldMovesInListBit6
+    ld hl,wNoSkillInListBit6
     res 6,[hl]
     pop hl
     jr .firstMove
@@ -120378,11 +120318,7 @@ _SafariZoneNorthText6: ; 85689 (21:5689)
     db "grassy areas to",$55
     db "flush them out.",$57
 
-_SafariZoneNorthText7: ; 856df (21:56df)
-    db $0,"TRAINER TIPS",$51
-    db "Win a POWER for ",$4f ; ♠TODO:►Ability
-    db "finding the",$55
-    db "SECRET HOUSE!",$57
+SECTION "_SafariZoneWestText5",ROMX[$5719],BANK[$21]
 
 _SafariZoneWestText5: ; 85719 (21:5719)
     db $0,"REST HOUSE",$57
@@ -120442,9 +120378,9 @@ _PreHM03Text: ; 858a4 (21:58a4)
 _HM03AfterText: ; 85957 (21:5957)
     db $0,"This is FLOAT!",$51
     db "#MON will be",$4f
-    db "able to ferry you",$55
-    db "across water!",$51
-    db "And,Power isn't ",$4f ; ♠TODO:►Ability
+    db "able to support",$55
+    db "you across water!",$51
+    db "And,Skill isn't ",$4f
     db "disposable! You",$55
     db "can use it over",$55
     db "and over!",$51
@@ -120947,6 +120883,12 @@ _SaraAndErikText
 _ErikAndSaraText
     db 0,"ERIK: SARA!! "
     db $DB,$DB,$DB,"@@" ; ❤️
+
+_SafariZoneNorthText7:
+    db $0,"TRAINER TIPS",$51
+    db "Win a New SKILL",$4f
+    db "for finding the",$55
+    db "SECRET HOUSE!",$57
 
 SECTION "bank22",ROMX,BANK[$22]
 
@@ -122347,7 +122289,7 @@ _DiglettsCaveRoute2Text1: ; 8a6a7 (22:66a7)
     db "TUNNEL,but it's",$55
     db "dark and scary.",$51
     db "If a #MON's",$4f
-    db "POWER could light",$55 ; ♠TODO:►Ability
+    db "SKILL could light",$55
     db "it up...",$57
 
 _ViridianForestexitText1: ; 8a6fd (22:66fd)
@@ -122732,7 +122674,7 @@ _SilphScopeDoesntWorkInTheDark
 _PreHM05Text:
     db $0,"I give you this!",$58
 
-_LearnSkill:
+_LearnSkillText:
     db $0,$52," learns all",$4f
     db "secrets about",$55
     db "@"
@@ -124083,9 +124025,9 @@ _Route11BattleText9: ; 8ebee (23:6bee)
     db $0,"Watch out for",$4f
     db "live wires!",$57
 
-_HM02AfterText: ; Moved to the End of the BANK
-    db $0,"AIR POWER is FLY.",$4f ; ♠TODO:►Ability
-    db "It will take you",$55
+_HM02AfterText:
+    db $0,"This is FLY!",$51
+    db "It will take you",$4f
     db "back to any town.",$51
     db "Put it to good",$4f
     db "use!",$57
@@ -126376,9 +126318,9 @@ _UnnamedText_44201: ; 95858 (25:5858)
 
 _UnnamedText_44206: ; 95893 (25:5893)
     db $0,"You're on the",$4f
-    db "right track! ",$55
-    db "Get a POWER   ",$55 ; ♠TODO:►Ability
-    db "from my AIDE!",$57
+    db "right track!",$57
+
+SECTION "_UnnamedText_4420b",ROMX[$58cc],BANK[$25]
 
 _UnnamedText_4420b: ; 958cc (25:58cc)
     db $0,"You still need",$4f
@@ -130288,14 +130230,14 @@ _LearnedText:
     TX_RAM $cf4b
     db $0,"!@@"
 
-_LearnedTextFieldMove1:
+_LearnedSkillText1:
     TX_RAM $d036
     db $0," learned",$4f
     db "@"
     TX_RAM $cf4b
-    db $0,"!@@"
+    db $0," Skill!@@"
 
-_LearnedTextFieldMove2:
+_LearnedSkillText2:
     db $0,$51,"@"
     TX_RAM $cf4b
     db $0," can be",$4f
@@ -130414,10 +130356,6 @@ _NoPartyText:
 
 ; ───────────────────────────────
 
-_ElementMissedText:
-    db $0,"No! A new POWER",$4f ; ♠TODO:►Ability
-    db "is required.",$58
-
 _CopycatsHouseF2Text2_Part2:
     db $0,$51
     db "MIRROR MIRROR ON",$4f
@@ -130501,9 +130439,7 @@ _NotHealthyEnoughText: ; a411b (29:411b)
     db $0,"Not healthy",$4f
     db "enough.",$58
 
-_NewBadgeRequiredText: ; a4130 (29:4130)
-    db $0,"No! A new BADGE",$4f
-    db "is required.",$58
+SECTION "_CannotUseItemsHereText",ROMX[$414e],BANK[$29]
 
 _CannotUseItemsHereText: ; a414e (29:414e)
     db $0,"You can't use items",$4f
@@ -132738,14 +132674,11 @@ SelectInOverWorld:
     ld a,[W_CURMAPTILESET]
     cp 23 ; plateau
     jr z,.noCut
-;    ld a,[W_OBTAINEDBADGES] ; badges obtained
-;    bit 1,a ; does the player have the Cascade Badge?
-;    jr z,.noCut
-    ld hl,$d803 ; NaturePower ; ♠TODO:►Ability
+    ld hl,$d803 ; Cut ; Ex NaturePower
     bit 0,[hl]  ; ...
     jr z,.noCut
     ld b,4 ; CUT
-    call SearchFieldMoveInParty
+    call SearchSkillInParty
     jr nc,.noCut
 .canCut
     call .PlayCry
@@ -132764,9 +132697,6 @@ SelectInOverWorld:
     ld [$d11a],a
     cp a,2 ; is the player surfing?
     jp z,.noFloat
-;    ld a,[W_OBTAINEDBADGES] ; badges obtained
-;    bit 4,a ; does the player have the Soul Badge?
-;    jr z,.noFloat
     ld b,BANK(IsSurfingAllowed)
     ld hl,IsSurfingAllowed
     call Bankswitch
@@ -132786,11 +132716,11 @@ SelectInOverWorld:
     call .IsItemInBag
     ld a,0 ; wSurfingMonID
     jr nz,.canFloatNoCry
-    ld hl,$d857 ; WaterPower ; ♠TODO:►Ability
+    ld hl,$d857 ; Float ; Ex WaterPower
     bit 0,[hl]  ; ...
     jr z,.noFloat
     ld b,5 ; FLOAT
-    call SearchFieldMoveInParty
+    call SearchSkillInParty
     jr nc,.noFloat
 .canFloat
     call .PlayCry
@@ -132817,17 +132747,14 @@ SelectInOverWorld:
     ld a,[$d35d]
     and a
     jr z,.noLight
-;    ld a,[W_OBTAINEDBADGES] ; badges obtained
-;    bit 0,a ; does the player have the Boulder Badge?
-;    jr z,.noLight
     ld b,BENGAL
     call .IsItemInBag
     jr nz,.canLightNoCry
-    ld hl,$d7c2 ; FirePower ; ♠TODO:►Ability
+    ld hl,$d7c2 ; Light ; Ex FirePower
     bit 0,[hl]  ; ...
     jr z,.noLight
     ld b,7 ; LIGHT
-    call SearchFieldMoveInParty
+    call SearchSkillInParty
     jr nc,.noLight
 .canLight
     call .PlayCry
@@ -132856,14 +132783,11 @@ SelectInOverWorld:
     ld a,[$d700]
     cp a,2 ; is the player surfing?
     jp z,.noStrength
-;    ld a,[W_OBTAINEDBADGES] ; badges obtained
-;    bit 3,a ; does the player have the Rainbow Badge?
-;    jr z,.noStrength
-    ld hl,$d78e ; EarthPower ; ♠TODO:►Ability
+    ld hl,$d78e ; Strength ; Ex EarthPower
     bit 0,[hl]  ; ...
     jr z,.noStrength
     ld b,6 ; STRENGTH
-    call SearchFieldMoveInParty
+    call SearchSkillInParty
     jr nc,.noStrength
 .canStrength
     call .PlayCry
@@ -133016,27 +132940,27 @@ SelectInOverWorld:
     ld [$FF8C],a
     jp DisplayTextID
 
-; INPUT  : b = Field Move
+; INPUT  : b = Skill
 ; OUTPUT : carry flag -> set found | reset not found
-SearchFieldMoveInParty:
+SearchSkillInParty:
     ld a,[W_NUMINPARTY]
     ld d,a
     ld c,0
 .LoopMon
     ld a,c
     ld [wWhichPokemon],a
-    call .GetMonFieldMoves
-    ld a,[wNumFieldMoves]
+    call .GetMonSkill
+    ld a,[wNumSkill]
     and a
     jr z,.NextMon
-    ld e,a ; NumFieldMoves
-    ld hl,wFieldMoves
-.LoopFieldMove
+    ld e,a ; NumSkill
+    ld hl,wSkill
+.LoopSkill
     ld a,[hli]
-    cp b ; Field Move
+    cp b ; Skill
     jr z,.found
     dec e
-    jr nz,.LoopFieldMove
+    jr nz,.LoopSkill
 .NextMon
     inc c
     dec d
@@ -133045,23 +132969,23 @@ SearchFieldMoveInParty:
     xor a ; rcf
     ret
 .found
-    call .CheckAndDecreaseFieldMoveEnergy
+    call .CheckAndDecreaseSkillEnergy
     jr c,.NextMon
     scf
     ret
-.GetMonFieldMoves
+.GetMonSkill
     push bc
     push de
-    ld b,BANK(GetMonFieldMoves)
-    ld hl,GetMonFieldMoves
+    ld b,BANK(GetMonSkill)
+    ld hl,GetMonSkill
     call Bankswitch
     pop de
     pop bc
     ret
-.CheckAndDecreaseFieldMoveEnergy
+.CheckAndDecreaseSkillEnergy
     push bc
-    ld hl,CheckAndDecreaseFieldMoveEnergy
-    ld b,BANK(CheckAndDecreaseFieldMoveEnergy)
+    ld hl,CheckAndDecreaseSkillEnergy
+    ld b,BANK(CheckAndDecreaseSkillEnergy)
     call Bankswitch
     pop bc
     ret
@@ -133082,9 +133006,9 @@ LearnSkill:
     ld hl,.LearnSkill
     call PrintText
     pop bc
-    jp SearchFieldMoveInParty
+    jp SearchSkillInParty
 .LearnSkill
-    TX_FAR _LearnSkill
+    TX_FAR _LearnSkillText
     db $10,"@"
 
 .Animation
@@ -144902,8 +144826,8 @@ _GetMoves:
     ld b,a ; B = Level
     ld a,[hli]
     ld c,a ; c = Move
-    call CheckFieldMovesInList
-    call nz,IsFieldMove
+    call CheckSkillInList
+    call nz,IsSkill
     jr c,.Loop2
     ld a,b
     ld [de],a
@@ -144926,7 +144850,7 @@ _GetMoves:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-GetMonFieldMoves:
+GetMonSkill:
     call .BackupGenericBuffer
     xor a ; player party
     ld [$cc49],a
@@ -144934,17 +144858,17 @@ GetMonFieldMoves:
     ld b,BANK(GetMonPotentialMoveList)
     ld hl,GetMonPotentialMoveList
     call Bankswitch
-    ld e,0 ; Initialize 8 bits "FieldMoveByte"
+    ld e,0 ; Initialize 8 bits "SkillByte"
     ld d,8
-    ld hl,.FieldMoveConfigTable
+    ld hl,.SkillConfigTable
 .loop
     ld a,[hli]
     ld b,a ; b = Move to Search
     ld a,[hli]
-    ld c,a ; c = FM_XXX bit value added to e
+    ld c,a ; c = SK_XXX bit value added to e
     push hl
-    call .CheckPower ; ♠TODO:►Ability
-    call nz,.CheckMonAlreadyKnowFieldMove
+    call .CheckSkill
+    call nz,.CheckMonAlreadyKnowSkill
     pop hl
     inc hl
     inc hl
@@ -144957,27 +144881,27 @@ GetMonFieldMoves:
     pop de
     ld c,8
     ld b,0
-    ld hl,wFieldMoves
+    ld hl,wSkill
 .Loop8BitRule
     ld a,8+1
     sub c ; a=a-c ; Move id
     srl e
-    jr nc,.FieldMoveNotFound
-.FieldMoveFound
+    jr nc,.SkillNotFound
+.SkillFound
     inc b ; num of founded moves
-    ld [hli],a ; store field move id in wFieldMoves vector
+    ld [hli],a ; store skill id in wSkill vector
     ld a,b
-    cp 8 ; Max Possible Number of Field Moves
+    cp 8 ; Max Possible Number of Skill
     jr z,.End
-.FieldMoveNotFound
+.SkillNotFound
     dec c
     jr nz,.Loop8BitRule
 .End
     ld a,b
-    ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
+    ld [wNumSkill],a ; store num of founded skill in wNumSkill
     ret
 
-.CheckPower ; ♠TODO:►Ability
+.CheckSkill
     push de
     push bc
     ld a,[hli]
@@ -144985,47 +144909,47 @@ GetMonFieldMoves:
     ld a,[hli]
     ld d,a
     or e
-    jr z,.CheckPower_Success ; Both pointer Byte zero ; ♠TODO:►Ability
-    ld c,[hl] ; c = Power Bit ; ♠TODO:►Ability
+    jr z,.CheckSkill_Success ; Both pointer Byte zero
+    ld c,[hl] ; c = Skill Bit
     ld h,d
-    ld l,e ; [hl] = Power Byte ; ♠TODO:►Ability
+    ld l,e ; [hl] = Skill Byte
     ld b,2
     PREDEF HandleBitArray
     ld a,c
     and a
-.CheckPower_End ; ♠TODO:►Ability
+.CheckSkill_End
     pop bc
     pop de
     ret
-.CheckPower_Success ; ♠TODO:►Ability
+.CheckSkill_Success
     ld a,1
     or a ; reset all flag
-    jr .CheckPower_End ; ♠TODO:►Ability
+    jr .CheckSkill_End
 
-FMCT: MACRO
+SCT: MACRO
     db \1,\2
     dw \3
     db \4
 ENDM
 
-.FieldMoveConfigTable
-    FMCT FieldMove__FLY      , FM_FLY      , $d7e0,6
-    FMCT TELEPORT            , FM_TELEPORT , $0000,0
-    FMCT FieldMove__DIG      , FM_DIG      , $0000,0
-    FMCT FieldMove__CUT      , FM_CUT      , $d803,0
-    FMCT FieldMove__FLOAT    , FM_FLOAT    , $d857,0
-    FMCT FieldMove__STRENGTH , FM_STRENGTH , $d78e,0
-    FMCT FieldMove__LIGHT    , FM_LIGHT    , $d7c2,0
-    FMCT FieldMove__HEAL     , FM_HEAL     , $0000,0
+.SkillConfigTable
+    SCT Skill__FLY      , SK_FLY      , $d7e0,6
+    SCT TELEPORT        , SK_TELEPORT , $0000,0
+    SCT Skill__DIG      , SK_DIG      , $0000,0
+    SCT Skill__CUT      , SK_CUT      , $d803,0
+    SCT Skill__FLOAT    , SK_FLOAT    , $d857,0
+    SCT Skill__STRENGTH , SK_STRENGTH , $d78e,0
+    SCT Skill__LIGHT    , SK_LIGHT    , $d7c2,0
+    SCT Skill__HEAL     , SK_HEAL     , $0000,0
 
 .FillMemory
     xor a
-    ld [wNumFieldMoves],a
-    ld hl,wFieldMoves
+    ld [wNumSkill],a
+    ld hl,wSkill
     ld bc,8+1
     jp FillMemory
 
-.CheckMonAlreadyKnowFieldMove
+.CheckMonAlreadyKnowSkill
     push de
     push bc
     ld a,b

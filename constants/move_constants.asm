@@ -165,15 +165,15 @@ SUBSTITUTE   EQU $A4
 STRUGGLE     EQU $A5
 
 ; ─────────────────────────────
-; Field Moves
+; Skill
 ; ─────────────────────────────
-FieldMove__FLY      EQU $A6
-FieldMove__DIG      EQU $A7
-FieldMove__CUT      EQU $A8
-FieldMove__FLOAT    EQU $A9
-FieldMove__STRENGTH EQU $AA
-FieldMove__LIGHT    EQU $AB
-FieldMove__HEAL     EQU $AC
+Skill__FLY      EQU $A6
+Skill__DIG      EQU $A7
+Skill__CUT      EQU $A8
+Skill__FLOAT    EQU $A9
+Skill__STRENGTH EQU $AA
+Skill__LIGHT    EQU $AB
+Skill__HEAL     EQU $AC
 
 ; these do double duty as animation identifiers
 SHOWPIC_ANIM EQU $A6 ; redraw monster pic

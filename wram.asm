@@ -265,12 +265,10 @@ wTrainerFacingDirection: ; cd3f
 wTrainerScreenY: ; cd40
     ds 1
 wTrainerScreenX: ; cd41
-wNumFieldMoves:  ; cd41
+wNumSkill:  ; cd41
     ds 1
 
-wFieldMovesLeftmostXCoord:; cd42
-    ds 1
-wLastFieldMoveID:; cd43
+wSkillLeftmostXCoord:; cd42
     ds 1
 
 SECTION "wAIPartyMonScores",WRAM0[$cd50]
@@ -1887,7 +1885,7 @@ wBlkCoordinateY2Lower: ; def4
 
 NEXTU
 
-wFieldMoves: ; def0
+wSkill: ; def0
     ds 9
 
 NEXTU
@@ -1949,7 +1947,7 @@ wAvgLevel              ; df37
 wTmpRepelQty           ; df37
 wChoicePkmnMoveDeleter ; df37
 wTempStatLO            ; df37
-wFieldMoveMonID        ; df37 = Mon ID used for Cry
+wSkillMonID            ; df37 = Mon ID used for Cry
 wMonIdCryAndDex        ; df37 = Mon ID used for PlayCryAndDisplayPokedex
 wTempEnemyMinMaxIV     ; df37 = Temp Min Enemy IV Value
 wTempMovePowerLO       ; df37 ; Temp Move Power 2nd Byte
@@ -1979,7 +1977,7 @@ wFlagListMenuSpc:           ; df39 ; bit 0 = BadgeName
                             ; df39 ; bit 3 = Rocket Hideout Elevator
 wHyperBeamUnknownTypeBit4   ; df39 ; bit 4 = Set Hyper Beam to Unknown Type
 wCollisionWithSpriteBit5    ; df39 ; bit 5 = Set during start menu if there is a sprite in front of player
-wNoFieldMovesInListBit6     ; df39 ; bit 6 = Don't Load Field Moves in List
+wNoSkillInListBit6          ; df39 ; bit 6 = Don't Load Skill in List
     ds 1
 
 wLastTechMachIdUsed: ; df3a

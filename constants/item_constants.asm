@@ -83,11 +83,11 @@ ETHER         EQU $50
 ELIXER        EQU $52
 ;MAX_ELIXER   EQU $53
 
-HM_01         EQU $54 ; NATURE POWER ; ♠TODO:►Ability
-HM_02         EQU $55 ; AIR POWER ; ♠TODO:►Ability
-HM_03         EQU $56 ; WATER POWER ; ♠TODO:►Ability
-HM_04         EQU $57 ; EARTH POWER ; ♠TODO:►Ability
-HM_05         EQU $58 ; FIRE POWER ; ♠TODO:►Ability
+HM_01         EQU $54 ; CUT      ; Ex NATURE POWER
+HM_02         EQU $55 ; FLY      ; Ex AIR POWER
+HM_03         EQU $56 ; FLOAT    ; Ex WATER POWER
+HM_04         EQU $57 ; STRENGTH ; Ex EARTH POWER
+HM_05         EQU $58 ; LIGHT    ; Ex FIRE POWER
 
 ITEM_END_LIST EQU $59 ; End of List
 
