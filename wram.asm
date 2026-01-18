@@ -249,7 +249,16 @@ wEnemyMonEvasionMod: ; cd33
 
 ; At Least 5 free Bytes, Attention to cd38! (NOT SAVED in SRAM)
 
-SECTION "wFlyLocationList",WRAM0[$cd3d]
+SECTION "Skill_FlyLocationList",WRAM0[$cd3d]
+
+UNION
+
+wNumSkill:: db ; cd3d
+
+wSkill: ; cd3e
+    ds 9
+
+NEXTU
 
 wFlyLocationList: ; cd3d
 wWhichTrade: ; cd3d
@@ -265,11 +274,9 @@ wTrainerFacingDirection: ; cd3f
 wTrainerScreenY: ; cd40
     ds 1
 wTrainerScreenX: ; cd41
-wNumSkill:  ; cd41
     ds 1
 
-wSkillLeftmostXCoord:; cd42
-    ds 1
+ENDU
 
 SECTION "wAIPartyMonScores",WRAM0[$cd50]
 
@@ -1882,11 +1889,6 @@ wBlkCoordinateX2Right: ; def3
     ds 1
 wBlkCoordinateY2Lower: ; def4
     ds 1
-
-NEXTU
-
-wSkill: ; def0
-    ds 9
 
 NEXTU
 

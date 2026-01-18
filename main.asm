@@ -18008,20 +18008,20 @@ DrainHPEffect_:
     TX_FAR _DreamWasEatenText
     db "@"
 
-SCT_LM: MACRO
+SCT: MACRO
     db \1
     dw \2
     db \3
 ENDM
 
 LearnMove_SkillConfigTable:
-    SCT_LM Skill__FLY      , FLY_FLAG_BYTE      , FLY_FLAG_BIT
-    SCT_LM Skill__DIG      , $0000              , 0
-    SCT_LM Skill__CUT      , CUT_FLAG_BYTE      , CUT_FLAG_BIT
-    SCT_LM Skill__FLOAT    , FLOAT_FLAG_BYTE    , FLOAT_FLAG_BIT
-    SCT_LM Skill__STRENGTH , STRENGTH_FLAG_BYTE , STRENGTH_FLAG_BIT
-    SCT_LM Skill__LIGHT    , LIGHT_FLAG_BYTE    , LIGHT_FLAG_BIT
-    SCT_LM Skill__HEAL     , $0000              , 0
+    SCT Skill__FLY      , FLY_FLAG_BYTE      , FLY_FLAG_BIT
+    SCT Skill__DIG      , $0000              , 0
+    SCT Skill__CUT      , CUT_FLAG_BYTE      , CUT_FLAG_BIT
+    SCT Skill__FLOAT    , FLOAT_FLAG_BYTE    , FLOAT_FLAG_BIT
+    SCT Skill__STRENGTH , STRENGTH_FLAG_BYTE , STRENGTH_FLAG_BIT
+    SCT Skill__LIGHT    , LIGHT_FLAG_BYTE    , LIGHT_FLAG_BIT
+    SCT Skill__HEAL     , $0000              , 0
     db $FF
 
 ; Free
@@ -37893,7 +37893,7 @@ Route16HouseText1:
     call FakeGiveItem
     ld hl,FLY_FLAG_BYTE
     set FLY_FLAG_BIT,[hl]
-    ld b,2 ; FLY
+    ld b,FLY_SKILL_SORT
     PREDEF LearnSkill
     ld hl,.HM02SkillFoundText
     jr c,.done
@@ -75655,7 +75655,7 @@ SafariZoneSecretHouseText1:
     call FakeGiveItem
     ld hl,FLOAT_FLAG_BYTE
     set FLOAT_FLAG_BIT,[hl]
-    ld b,5 ; FLOAT
+    ld b,FLOAT_SKILL_SORT
     PREDEF LearnSkill
     ld hl,.HM03SkillFoundText
     jr c,.done
@@ -93727,7 +93727,7 @@ Route2GateText1:
     call FakeGiveItem
     ld hl,LIGHT_FLAG_BYTE
     set LIGHT_FLAG_BIT,[hl]
-    ld b,7 ; LIGHT
+    ld b,LIGHT_SKILL_SORT
     PREDEF LearnSkill
     ld hl,.HM05SkillFoundText
     jr c,.done
@@ -96042,7 +96042,7 @@ SSAnne7Text1:
     call FakeGiveItem
     ld hl,CUT_FLAG_BYTE
     set CUT_FLAG_BIT,[hl]
-    ld b,4 ; CUT
+    ld b,CUT_SKILL_SORT
     PREDEF LearnSkill
     ld hl,.HM01SkillFoundText
     jr c,.done
@@ -106136,7 +106136,7 @@ FuchsiaHouse2Text1:
     call FakeGiveItem
     ld hl,STRENGTH_FLAG_BYTE
     set STRENGTH_FLAG_BIT,[hl]
-    ld b,6 ; STRENGTH
+    ld b,STRENGTH_SKILL_SORT
     PREDEF LearnSkill
     ld hl,.HM04SkillFoundText
     jr c,.done
@@ -132677,7 +132677,7 @@ SelectInOverWorld:
     ld hl,CUT_FLAG_BYTE
     bit CUT_FLAG_BIT,[hl]
     jr z,.noCut
-    ld b,4 ; CUT
+    ld b,CUT_SKILL_SORT
     call SearchSkillInParty
     jr nc,.noCut
 .canCut
@@ -132719,7 +132719,7 @@ SelectInOverWorld:
     ld hl,FLOAT_FLAG_BYTE
     bit FLOAT_FLAG_BIT,[hl]
     jr z,.noFloat
-    ld b,5 ; FLOAT
+    ld b,FLOAT_SKILL_SORT
     call SearchSkillInParty
     jr nc,.noFloat
 .canFloat
@@ -132753,7 +132753,7 @@ SelectInOverWorld:
     ld hl,LIGHT_FLAG_BYTE
     bit LIGHT_FLAG_BIT,[hl]
     jr z,.noLight
-    ld b,7 ; LIGHT
+    ld b,LIGHT_SKILL_SORT
     call SearchSkillInParty
     jr nc,.noLight
 .canLight
@@ -132786,7 +132786,7 @@ SelectInOverWorld:
     ld hl,STRENGTH_FLAG_BYTE
     bit STRENGTH_FLAG_BIT,[hl]
     jr z,.noStrength
-    ld b,6 ; STRENGTH
+    ld b,STRENGTH_SKILL_SORT
     call SearchSkillInParty
     jr nc,.noStrength
 .canStrength
@@ -132993,12 +132993,7 @@ SearchSkillInParty:
 ; ──────────────────────────────────────────────────────────────────────
 
 ; Input 
-; b
-; 1 = FLY
-; 4 = CUT
-; 5 = FLOAT
-; 7 = LIGHT
-; 6 = STRENGTH
+; b = XXX_SKILL_SORT
 LearnSkill:
     call Load16BitRegisters
     push bc
@@ -144858,14 +144853,17 @@ GetMonSkill:
     ld b,BANK(GetMonPotentialMoveList)
     ld hl,GetMonPotentialMoveList
     call Bankswitch
-    ld e,0 ; Initialize 8 bits "SkillByte"
-    ld d,8
+    call .RestoreGenericBuffer
+    call .FillMemory
+    ld de,wSkill
+    ld c,1 ; skill sort
+    ld b,0
     ld hl,.SkillConfigTable
 .loop
     ld a,[hli]
-    ld b,a ; b = Move to Search
-    ld a,[hli]
-    ld c,a ; c = SK_XXX bit value added to e
+    cp $FF
+    jr z,.EndLoop
+    ld [$d0e0],a ; Move to Search
     push hl
     call .CheckSkill
     call nz,.CheckMonAlreadyKnowSkill
@@ -144873,31 +144871,10 @@ GetMonSkill:
     inc hl
     inc hl
     inc hl
-    dec d
-    jr nz,.loop
-    push de
-    call .RestoreGenericBuffer
-    call .FillMemory
-    pop de
-    ld c,8
-    ld b,0
-    ld hl,wSkill
-.Loop8BitRule
-    ld a,8+1
-    sub c ; a=a-c ; Move id
-    srl e
-    jr nc,.SkillNotFound
-.SkillFound
-    inc b ; num of founded moves
-    ld [hli],a ; store skill id in wSkill vector
-    ld a,b
-    cp 8 ; Max Possible Number of Skill
-    jr z,.End
-.SkillNotFound
-    dec c
-    jr nz,.Loop8BitRule
-.End
-    ld a,b
+    inc c
+    jr .loop
+.EndLoop
+    ld a,b ; num of founded skill
     ld [wNumSkill],a ; store num of founded skill in wNumSkill
     ret
 
@@ -144926,21 +144903,16 @@ GetMonSkill:
     or a ; reset all flag
     jr .CheckSkill_End
 
-SCT: MACRO
-    db \1,\2
-    dw \3
-    db \4
-ENDM
-
 .SkillConfigTable
-    SCT Skill__FLY      , SK_FLY      , FLY_FLAG_BYTE      , FLY_FLAG_BIT
-    SCT TELEPORT        , SK_TELEPORT , $0000              , 0
-    SCT Skill__DIG      , SK_DIG      , $0000              , 0
-    SCT Skill__CUT      , SK_CUT      , CUT_FLAG_BYTE      , CUT_FLAG_BIT
-    SCT Skill__FLOAT    , SK_FLOAT    , FLOAT_FLAG_BYTE    , FLOAT_FLAG_BIT
-    SCT Skill__STRENGTH , SK_STRENGTH , STRENGTH_FLAG_BYTE , STRENGTH_FLAG_BIT
-    SCT Skill__LIGHT    , SK_LIGHT    , LIGHT_FLAG_BYTE    , LIGHT_FLAG_BIT
-    SCT Skill__HEAL     , SK_HEAL     , $0000              , 0
+    SCT Skill__FLY      , FLY_FLAG_BYTE      , FLY_FLAG_BIT
+    SCT TELEPORT        , $0000              , 0
+    SCT Skill__DIG      , $0000              , 0
+    SCT Skill__CUT      , CUT_FLAG_BYTE      , CUT_FLAG_BIT
+    SCT Skill__FLOAT    , FLOAT_FLAG_BYTE    , FLOAT_FLAG_BIT
+    SCT Skill__STRENGTH , STRENGTH_FLAG_BYTE , STRENGTH_FLAG_BIT
+    SCT Skill__LIGHT    , LIGHT_FLAG_BYTE    , LIGHT_FLAG_BIT
+    SCT Skill__HEAL     , $0000              , 0
+    db $FF
 
 .FillMemory
     xor a
@@ -144952,17 +144924,16 @@ ENDM
 .CheckMonAlreadyKnowSkill
     push de
     push bc
-    ld a,b
-    ld [$d0e0],a
     ld b,BANK(CheckMonAlreadyKnowMoveQuick)
     ld hl,CheckMonAlreadyKnowMoveQuick
     call Bankswitch
     pop bc
     pop de
     ret nc
-    ld a,e
-    add c
-    ld e,a
+    inc b ; num of founded skill
+    ld a,c ; skill sort
+    ld [de],a ; store skill id in wSkill vector
+    inc de
     ret
 
 .BackupGenericBuffer
