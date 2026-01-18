@@ -18015,13 +18015,13 @@ SCT_LM: MACRO
 ENDM
 
 LearnMove_SkillConfigTable:
-    SCT_LM Skill__FLY      , $d7e0,6
-    SCT_LM Skill__DIG      , $0000,0
-    SCT_LM Skill__CUT      , $d803,0
-    SCT_LM Skill__FLOAT    , $d857,0
-    SCT_LM Skill__STRENGTH , $d78e,0
-    SCT_LM Skill__LIGHT    , $d7c2,0
-    SCT_LM Skill__HEAL     , $0000,0
+    SCT_LM Skill__FLY      , FLY_FLAG_BYTE      , FLY_FLAG_BIT
+    SCT_LM Skill__DIG      , $0000              , 0
+    SCT_LM Skill__CUT      , CUT_FLAG_BYTE      , CUT_FLAG_BIT
+    SCT_LM Skill__FLOAT    , FLOAT_FLAG_BYTE    , FLOAT_FLAG_BIT
+    SCT_LM Skill__STRENGTH , STRENGTH_FLAG_BYTE , STRENGTH_FLAG_BIT
+    SCT_LM Skill__LIGHT    , LIGHT_FLAG_BYTE    , LIGHT_FLAG_BIT
+    SCT_LM Skill__HEAL     , $0000              , 0
     db $FF
 
 ; Free
@@ -29453,40 +29453,40 @@ StartMenu_TrainerInfo:
 .PrintSkill
     FuncCoord 09,09
     ld de,Coord
-    ld hl,$d803 ; Cut ; Ex NaturePower
-    bit 0,[hl]  ; ...
+    ld hl,CUT_FLAG_BYTE
+    bit CUT_FLAG_BIT,[hl]
     jr z,.next1
     ld a,$D8
     ld [de],a
     inc de
     inc de
 .next1
-    ld hl,$d7e0 ; Fly ; Ex AirPower
-    bit 6,[hl]  ; ...
+    ld hl,FLY_FLAG_BYTE
+    bit FLY_FLAG_BIT,[hl]
     jr z,.next2
     ld a,$D9
     ld [de],a
     inc de
     inc de
 .next2
-    ld hl,$d857 ; Float ; Ex WaterPower
-    bit 0,[hl]  ; ...
+    ld hl,FLOAT_FLAG_BYTE
+    bit FLOAT_FLAG_BIT,[hl]
     jr z,.next3
     ld a,$DA
     ld [de],a
     inc de
     inc de
 .next3
-    ld hl,$d78e ; Strength ; Ex EarthPower
-    bit 0,[hl]  ; ...
+    ld hl,STRENGTH_FLAG_BYTE
+    bit STRENGTH_FLAG_BIT,[hl]
     jr z,.next4
     ld a,$DB
     ld [de],a
     inc de
     inc de
 .next4
-    ld hl,$d7c2 ; Light ; Ex FirePower
-    bit 0,[hl]  ; ...
+    ld hl,LIGHT_FLAG_BYTE
+    bit LIGHT_FLAG_BIT,[hl]
     jr z,.next5
     ld a,$DC
     ld [de],a
@@ -37883,16 +37883,16 @@ PowerPlantExplosion:
 
 Route16HouseText1:
     db $08 ; asm
-    ld a,[$d7e0]
-    bit 6,a
+    ld a,[FLY_FLAG_BYTE]
+    bit FLY_FLAG_BIT,a
     ld hl,.HM02AfterText
     jr nz,.done
     ld hl,.PreHM02Text
     call PrintText
     ld bc,(HM_02 << 8) | 1
     call FakeGiveItem
-    ld hl,$d7e0
-    set 6,[hl]
+    ld hl,FLY_FLAG_BYTE
+    set FLY_FLAG_BIT,[hl]
     ld b,2 ; FLY
     PREDEF LearnSkill
     ld hl,.HM02SkillFoundText
@@ -75645,16 +75645,16 @@ SafariZoneSecretHouseTextPointers: ; 4a31a (12:631a)
 
 SafariZoneSecretHouseText1:
     db $08 ; asm
-    ld a,[$d857]
-    bit 0,a
+    ld a,[FLOAT_FLAG_BYTE]
+    bit FLOAT_FLAG_BIT,a
     ld hl,.HM03AfterText
     jr nz,.done
     ld hl,.PreHM03Text
     call PrintText
     ld bc,(HM_03 << 8) | 1
     call FakeGiveItem
-    ld hl,$d857
-    set 0,[hl]
+    ld hl,FLOAT_FLAG_BYTE
+    set FLOAT_FLAG_BIT,[hl]
     ld b,5 ; FLOAT
     PREDEF LearnSkill
     ld hl,.HM03SkillFoundText
@@ -93717,16 +93717,16 @@ MuseumF2Script1_AfterEevee:
 
 Route2GateText1:
     db $08 ; asm
-    ld a,[$d7c2]
-    bit 0,a
+    ld a,[LIGHT_FLAG_BYTE]
+    bit LIGHT_FLAG_BIT,a
     ld hl,.HM05AfterText
     jr nz,.done
     ld hl,.PreHM05Text
     call PrintText
     ld bc,(HM_05 << 8) | 1
     call FakeGiveItem
-    ld hl,$d7c2
-    set 0,[hl]
+    ld hl,LIGHT_FLAG_BYTE
+    set LIGHT_FLAG_BIT,[hl]
     ld b,7 ; LIGHT
     PREDEF LearnSkill
     ld hl,.HM05SkillFoundText
@@ -96030,8 +96030,8 @@ SSAnne7TextPointers: ; 618a7 (18:58a7)
 
 SSAnne7Text1:
     db $08 ; asm
-    ld a,[$d803]
-    bit 0,a
+    ld a,[CUT_FLAG_BYTE]
+    bit CUT_FLAG_BIT,a
     ld hl,.HM01AfterText
     jr nz,.done
     ld hl,.SSAnne7RubText
@@ -96040,8 +96040,8 @@ SSAnne7Text1:
     call PrintText
     ld bc,(HM_01 << 8) | 1
     call FakeGiveItem
-    ld hl,$d803
-    set 0,[hl]
+    ld hl,CUT_FLAG_BYTE
+    set CUT_FLAG_BIT,[hl]
     ld b,4 ; CUT
     PREDEF LearnSkill
     ld hl,.HM01SkillFoundText
@@ -106106,8 +106106,8 @@ FuchsiaHouse2TextPointers: ; 750b8 (1d:50b8)
 
 FuchsiaHouse2Text1:
     db $08 ; asm
-    ld a,[$d78e]
-    bit 0,a
+    ld a,[STRENGTH_FLAG_BYTE]
+    bit STRENGTH_FLAG_BIT,a
     ld hl,.HM04AfterText
     jr nz,.done
     ld b,GOLD_TEETH
@@ -106134,8 +106134,8 @@ FuchsiaHouse2Text1:
     call PrintText
     ld bc,(HM_04 << 8) | 1
     call FakeGiveItem
-    ld hl,$d78e
-    set 0,[hl]
+    ld hl,STRENGTH_FLAG_BYTE
+    set STRENGTH_FLAG_BIT,[hl]
     ld b,6 ; STRENGTH
     PREDEF LearnSkill
     ld hl,.HM04SkillFoundText
@@ -132674,8 +132674,8 @@ SelectInOverWorld:
     ld a,[W_CURMAPTILESET]
     cp 23 ; plateau
     jr z,.noCut
-    ld hl,$d803 ; Cut ; Ex NaturePower
-    bit 0,[hl]  ; ...
+    ld hl,CUT_FLAG_BYTE
+    bit CUT_FLAG_BIT,[hl]
     jr z,.noCut
     ld b,4 ; CUT
     call SearchSkillInParty
@@ -132716,8 +132716,8 @@ SelectInOverWorld:
     call .IsItemInBag
     ld a,0 ; wSurfingMonID
     jr nz,.canFloatNoCry
-    ld hl,$d857 ; Float ; Ex WaterPower
-    bit 0,[hl]  ; ...
+    ld hl,FLOAT_FLAG_BYTE
+    bit FLOAT_FLAG_BIT,[hl]
     jr z,.noFloat
     ld b,5 ; FLOAT
     call SearchSkillInParty
@@ -132750,8 +132750,8 @@ SelectInOverWorld:
     ld b,BENGAL
     call .IsItemInBag
     jr nz,.canLightNoCry
-    ld hl,$d7c2 ; Light ; Ex FirePower
-    bit 0,[hl]  ; ...
+    ld hl,LIGHT_FLAG_BYTE
+    bit LIGHT_FLAG_BIT,[hl]
     jr z,.noLight
     ld b,7 ; LIGHT
     call SearchSkillInParty
@@ -132783,8 +132783,8 @@ SelectInOverWorld:
     ld a,[$d700]
     cp a,2 ; is the player surfing?
     jp z,.noStrength
-    ld hl,$d78e ; Strength ; Ex EarthPower
-    bit 0,[hl]  ; ...
+    ld hl,STRENGTH_FLAG_BYTE
+    bit STRENGTH_FLAG_BIT,[hl]
     jr z,.noStrength
     ld b,6 ; STRENGTH
     call SearchSkillInParty
@@ -144933,14 +144933,14 @@ SCT: MACRO
 ENDM
 
 .SkillConfigTable
-    SCT Skill__FLY      , SK_FLY      , $d7e0,6
-    SCT TELEPORT        , SK_TELEPORT , $0000,0
-    SCT Skill__DIG      , SK_DIG      , $0000,0
-    SCT Skill__CUT      , SK_CUT      , $d803,0
-    SCT Skill__FLOAT    , SK_FLOAT    , $d857,0
-    SCT Skill__STRENGTH , SK_STRENGTH , $d78e,0
-    SCT Skill__LIGHT    , SK_LIGHT    , $d7c2,0
-    SCT Skill__HEAL     , SK_HEAL     , $0000,0
+    SCT Skill__FLY      , SK_FLY      , FLY_FLAG_BYTE      , FLY_FLAG_BIT
+    SCT TELEPORT        , SK_TELEPORT , $0000              , 0
+    SCT Skill__DIG      , SK_DIG      , $0000              , 0
+    SCT Skill__CUT      , SK_CUT      , CUT_FLAG_BYTE      , CUT_FLAG_BIT
+    SCT Skill__FLOAT    , SK_FLOAT    , FLOAT_FLAG_BYTE    , FLOAT_FLAG_BIT
+    SCT Skill__STRENGTH , SK_STRENGTH , STRENGTH_FLAG_BYTE , STRENGTH_FLAG_BIT
+    SCT Skill__LIGHT    , SK_LIGHT    , LIGHT_FLAG_BYTE    , LIGHT_FLAG_BIT
+    SCT Skill__HEAL     , SK_HEAL     , $0000              , 0
 
 .FillMemory
     xor a
