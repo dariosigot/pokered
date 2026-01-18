@@ -158,10 +158,16 @@ wTrainerHeaderFlagBit: ; cc55
 
 SECTION "GenericBuffer", WRAM0[$cc5b]
 
-GenericBuffer:
-    ds 96
+UNION ; 219 Bytes
 
-SECTION "RLE", WRAM0[$ccd2]
+GenericBuffer:
+    ds 180+39
+
+NEXTU
+
+ds $ccd2 - $cc5b
+
+;SECTION "RLE", WRAM0[$ccd2]
 wRLEByteCount: ; ccd2
     ds 1
 
@@ -201,8 +207,11 @@ wEnemyMoveListIndex: ; cce2
 
 ; cce3
 
+NEXTU
 
-SECTION "Stat Modifiers", WRAM0[$cd1a]
+ds $cd1a - $cc5b
+
+;SECTION "Stat Modifiers", WRAM0[$cd1a]
 
 ; stat modifiers for the player's current pokemon
 ; value can range from 1 - 13 ($1 to $D)
@@ -247,7 +256,21 @@ wEnemyMonAccuracyMod: ; cd32
 wEnemyMonEvasionMod: ; cd33
     ds 1
 
-; At Least 5 free Bytes, Attention to cd38! (NOT SAVED in SRAM)
+ENDU
+
+wEndOfGenericBuffer: ; $cd36 = End of "GenericBuffer" (219 Bytes)
+
+wcd37:: db
+
+wSimulatedJoypadStatesIndex:: db ; $cd38
+
+wcd39:: db ; written to but nothing ever reads it
+
+wcd3a:: db ; written to but nothing ever reads it
+
+wcd3b:: db
+
+wcd3c:: db ; Unused
 
 SECTION "Skill_FlyLocationList",WRAM0[$cd3d]
 

@@ -17872,9 +17872,6 @@ SkillMenu: ; 76e1 (1:36e1)
     db "SURF@"
 
 ChoiceMonSimpleMenu:
-    ld b,BANK(GetMonSkill)
-    ld hl,GetMonSkill
-    call Bankswitch
     FuncCoord 11,06
     ld hl,Coord
     ld b,10
@@ -30002,6 +29999,9 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jr .RedrawMenu
 
 .choseSkill
+    ld b,BANK(GetMonSkill)
+    ld hl,GetMonSkill
+    call Bankswitch
     ld a,[wNumSkill]
     and a
     jr z,.NoSkill
@@ -144937,15 +144937,15 @@ GetMonSkill:
     ret
 
 .BackupGenericBuffer
-    ld hl,GenericBuffer+00
-    ld de,GenericBuffer+96
+    ld hl,GenericBuffer+000
+    ld de,GenericBuffer+109
     jr .BackupGenericBufferCommon
 .RestoreGenericBuffer
-    ld hl,GenericBuffer+96
-    ld de,GenericBuffer+00
+    ld hl,GenericBuffer+109
+    ld de,GenericBuffer+000
     ; fall through
 .BackupGenericBufferCommon
-    ld bc,96
+    ld bc,109
     jp CopyData
 
 ; ──────────────────────────────────────────────────────────────────────
