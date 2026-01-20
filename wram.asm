@@ -348,6 +348,8 @@ wTileMapBackup2: ; cd81
 wBuffer: ; cee9
 ; used for temporary things
 
+wLearningMovesFromDayCare: ; cee9
+
 wHPBarMaxHP: ; cee9
     ds 2
 wHPBarOldHP: ; ceeb
@@ -1965,6 +1967,7 @@ wSpriteOAMBySpeciesId ; df36
 wTempMoveEnergy       ; df36 ; Temp Buffer for Move Energy
 wTempMovePowerHI      ; df36 ; Temp Move Power 1st Byte
 wTempInitialPalette   ; df36 ; Initial Background Palette (rBGP) during Power Plant Explosion
+wBufferPointerByte1   ; df36 ; Buffer Pointer Byte 01
     ds 1
 
 wMaxLevel              ; df37
@@ -1976,6 +1979,7 @@ wSkillMonID            ; df37 = Mon ID used for Cry
 wMonIdCryAndDex        ; df37 = Mon ID used for PlayCryAndDisplayPokedex
 wTempEnemyMinMaxIV     ; df37 = Temp Min Enemy IV Value
 wTempMovePowerLO       ; df37 ; Temp Move Power 2nd Byte
+wBufferPointerByte2    ; df37 ; Buffer Pointer Byte 02
     ds 1
 
 wStatusScreen2OAMBit0       ; df38 ; bit 0 = Write OAM in Status Screen 2
@@ -2001,8 +2005,10 @@ wFlagListMenuSpc:           ; df39 ; bit 0 = BadgeName
                             ; df39 ; bit 2 = Silph Co Elevator
                             ; df39 ; bit 3 = Rocket Hideout Elevator
 wHyperBeamUnknownTypeBit4   ; df39 ; bit 4 = Set Hyper Beam to Unknown Type
+wWriteInGenericBufferBit4   ; df39 ; bit 4 = Force to Save Moves List in GenericBuffer+1
 wCollisionWithSpriteBit5    ; df39 ; bit 5 = Set during start menu if there is a sprite in front of player
 wNoSkillInListBit6          ; df39 ; bit 6 = Don't Load Skill in List
+wNoExclusiveInListBit7      ; df39 ; bit 7 = Don't Load Exclusive in List
     ds 1
 
 wLastTechMachIdUsed: ; df3a

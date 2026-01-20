@@ -26955,7 +26955,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     dec hl
     dec hl ; go to move 1
     xor a
-    ld [$cee9],a ; LearningMovesFromDayCare
+    ld [wLearningMovesFromDayCare],a
     ld d,h
     ld e,l
     call WriteMonMoves2
@@ -42774,67 +42774,80 @@ OnlyOneMoveText:
 ; Get Mon Potential Move List
 ; ────────────────────────────────────────────────────────────
 
+; Input : b = Level
+;       : wWriteInGenericBufferBit4
+;         Use "GenericBuffer+1" instead of "wMoveRelearnerMoveList+1"
+;       : wNoSkillInListBit6
+;         ByPass Skill in "Get Moves"
+;       : wNoExclusiveInListBit7
+;         ByPass "Handle Exclusive Learn Move"
+;
+; Output : hl/de     = First Output Move
+;        : hl-1/de-1 = Move Counter (Only in "wMoveRelearnerMoveList")
+
 GetMonPotentialMoveList:
 
     ; Reset Output
+    call .GetPointer
+    jr nz,.DontOverwriteFirstByte
     xor a
-    ld hl,wMoveRelearnerMoveList
-    ld [hli],a
-    dec a ; a = $FF
-    ld [hl],a
-
-    ; Check Not MEW
-    ld a,[$cf98]
-    cp MEW
-    ret z
-
-    ; Standarize Level
-    ld a,[$cc49]
-    and a ; is it a list of party pokemon or box pokemon?
-    jr z,.skipCopyingLevel
-.copyLevel
-    ld a,[$cf9b]
-    ld [$cfb9],a
-.skipCopyingLevel
-
-    ; Get Copy of Level UP Moves in GenericBuffer+1
-    PREDEF _GetMoves ; hl = GenericBuffer+1 (skip evolution)
-
-    ld de,wMoveRelearnerMoveList+1 ; Final List Pointer
-
-    ; Get Mon Move List from Level UP EvosMoves (GenericBuffer+1)
-.LearnSetLoop
-    ld a,[hli] ; Move Level
-    and a
-    jr z,.EndLearnSetLoop
-    ld c,a
-    ld a,[$cfb9] ; Mon Level
-    cp c
-    jr c,.EndLearnSetLoop ; Mon Level < Move Level
-    ld a,[hli]
+    dec de
     ld [de],a
     inc de
-    inc b
-    jr .LearnSetLoop
-.EndLearnSetLoop
+.DontOverwriteFirstByte
+    xor a
+    ld [de],a
+
+    ; Check Not MEW
+    ld a,[W_MONHEADER]
+    cp MEW
+    ret z
+    
+    ; Get Moves
+    PREDEF GetMoves
 
     ; Handle Exlusive Learn Move
+    ld hl,wNoExclusiveInListBit7
+    bit 7,[hl]
+    jr nz,.SkipExclusive
     ld b,BANK(HandleExclusiveLearnMove)
     ld hl,HandleExclusiveLearnMove
     call Bankswitch
+.SkipExclusive
 
-    ; Insert End List & Counter
-    ld a,$FF
+    ; Insert End List
+    xor a
     ld [de],a
+
+    ; Check End (Write in GenericBuffer)
+    call .GetPointer
+    ret nz
+
+    ; Insert Counter
     ld b,-1
     ld hl,wMoveRelearnerMoveList+1
 .CountLoop
     inc b
     ld a,[hli]
-    cp $FF
+    and a
     jr nz,.CountLoop
     ld a,b
-    ld [wMoveRelearnerMoveList],a ; Insert Counter
+    ld hl,wMoveRelearnerMoveList
+    ld [hli],a ; Insert Counter
+    ; hl = wMoveRelearnerMoveList+1
+    ld d,h
+    ld e,l
+    ret
+
+.GetPointer
+    ld hl,wWriteInGenericBufferBit4
+    bit 4,[hl]
+    ld de,wMoveRelearnerMoveList+1
+    jr z,.GetPointer_End
+    ld de,GenericBuffer+1
+.GetPointer_End
+    ld h,d
+    ld l,e
     ret
 
 ; ────────────────────────────────────────────────────────────
@@ -42897,11 +42910,19 @@ MovesMenu:
     ; Get Actual Moves and Mon Potential Move List in wMoveRelearnerMoveList
     call LoadMonDataAndPrintActualMoves
     call WriteEnergyAllMovesDuringMoveRelearn
+    ld a,[$cfb9] ; Level
+    ld b,a       ; ...
     call GetMonPotentialMoveList
 
-    ; Check at least one move
+    ; Check at least one move or MEW Exception
+    ld a,[W_MONHEADER]
+    cp MEW
+    jr z,.continue
+    dec hl
+    ld a,[hli]
     and a
     jp z,.return ; No Move to Learn
+.continue
 
     ; Mini Sprite
     ld a,[$cf98]
@@ -43316,13 +43337,13 @@ ChoiceRelearnMove:
     ld hl,Coord
     ld b,RELEARN_MOVE_SCREEN_LENGHT
 .LoopMove
-    ld a,[$cf98]
+    ld a,[W_MONHEADER]
     cp MEW
     ld a,e
     jr z,.SkipReadMoveDE
     ld a,[de] ; Read Move Id
 .SkipReadMoveDE
-    cp $FF
+    and a
     jr z,.end ; EndOfList
     cp STRUGGLE
     jr z,.end ; EndOfList
@@ -43349,7 +43370,7 @@ ChoiceRelearnMove:
     ret
 
 .ListLenghtAndPointerToFirst
-    ld a,[$cf98]
+    ld a,[W_MONHEADER]
     cp MEW
     ld a,STRUGGLE-1
     ld hl,1
@@ -43575,143 +43596,14 @@ SortMoves:
 .skip
     PREDEF_JUMP PrintMoveDetailsBox
 
-DebugNPC:
-
-    ; Standard CableClubNPC
-    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
-    bit 1,a
-    ld hl,CableClubNPC
-    ld b,BANK(CableClubNPC)
-    jp nz,Bankswitch
-
-    ; Backup
-    ld a,[$cf92]
-    push af
-    ld a,[$cc49]
-    push af
-
-    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
-    bit 2,a ; was the select button pressed?
-    jr nz,.select
-    bit 3,a ; was the start button pressed?
-    jr nz,.start
-    jp .standard
-
-.select
-    bit 6,a ; was the up button pressed?
-    jr nz,.selectUP
-    ld hl,W_NUMINPARTY
-    ld a,[hli]
-    ld b,a
-.loop0
-    ld a,[hli]
-    push bc
-    push hl
-    ld [$d11e],a
-    call IndexToPokedexAndRestoreD11E
-    ld b,1 ; set
-    ld c,a
-    push bc
-    ld hl,wPokedexSeen
-    call .HandleBit
-    pop bc
-    ld hl,wPokedexOwned
-    call .HandleBit
-    pop hl
-    pop bc
-    dec b
-    jr nz,.loop0
-    ld hl,.DoneTextSelect
-    jp .end
-.HandleBit
-    PREDEF_JUMP HandleBitArray
-.DoneTextSelect
-    db 0,"Done! (Pokedex)",$57,"@"
-
-.selectUP
-    ld hl,W_PARTYMON1_MOVE2PP
-    inc [hl]
-    ld hl,.DoneTextSelectUP
-    jp .end
-.DoneTextSelectUP
-    db 0,"Done! (Alt.Form)",$57,"@"
-
-.start
-    bit 6,a ; was the up button pressed?
-    jr nz,.startUP
-    ld hl,W_PARTYMON1_TYPE1
-    xor a
-    ld [hli],a ; Zero Type 1/2
-    ld [hl],a  ; ...
-    ld hl,W_PARTYMON1OT+8
-    xor a
-    ld [hli],a ; Mon OT + 8
-    ld [hli],a ; Mon OT + 9
-    ld [hl],a ; Mon OT + 10
-    ld hl,.DoneTextStart
-    jp .end
-.DoneTextStart
-    db 0,"Done! (Reset TM)",$57,"@"
-
-.startUP
-    ld hl,W_PARTYMON1_MOVE4PP
-    call .LoopAndDestroyLastRecord
-    ld hl,W_PARTYMON1_MOVE4
-    call .LoopAndDestroyLastRecord
-    ld hl,.UPText
-    jr .end
-.LoopAndDestroyLastRecord
-    ld b,4
-.LoopUP
-    ld a,[hld]
-    and a
-    jr nz,.foundUP
-    dec b
-    jr nz,.LoopUP
-.foundUP
-    inc hl
-    xor a
-    ld [hl],a
-    ret
-.UPText
-    db 0,"Done! (0 PP Move)",$57,"@"
-
-.standard
-    ld a,[W_NUMINPARTY]
-    ld b,a
-    ld c,0
-.loop2
-    push bc
-    ld a,[$FF00+$e4]
-    push af
-    ld a,c
-    inc a
-    ld [$FF00+$e4],a ; Mon Id +1
-    ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
-    ld hl,AddPokemonToParty_TryToAddExclusiveMove_
-    call Bankswitch
-    pop af
-    ld [$FF00+$e4],a
-    pop bc
-    inc c
-    dec b
-    jr nz,.loop2
-    ld hl,.DoneText
-    jr .end
-.DoneText
-    db 0,"Done!",$57,"@"
-
-.end
-    call PrintText
-    ; Restore
-    pop af
-    ld [$cc49],a
-    pop af
-    ld [$cf92],a
-    jp TextScriptEnd
-
 HandleExclusiveLearnMove:
     ; de = Pointer to next Potential Move
+
+    ; Backup
+    ld a,[wBufferPointerByte1]
+    push af
+    ld a,[wBufferPointerByte2]
+    push af
 
     call .GetBufferPointerToCorrectExlusiveLearnMoveList
 
@@ -43733,7 +43625,14 @@ HandleExclusiveLearnMove:
     call .SearchSetBit
     ld hl,$cfb7 ; Ex Move 3 PP
     ld c,5      ; Byte 5
-    ; fall through
+    call .SearchSetBit
+
+    ; Restore
+    pop af
+    ld [wBufferPointerByte2],a
+    pop af
+    ld [wBufferPointerByte1],a
+    ret
 
 .SearchSetBit
     ld a,[hl]
@@ -43758,7 +43657,7 @@ HandleExclusiveLearnMove:
     rl b
     ld c,a
     add hl,bc
-    ld de,GenericBuffer+1
+    ld de,wBufferPointerByte1
     ld bc,2
     call CopyData
     pop de
@@ -43826,7 +43725,7 @@ HandleExclusiveLearnMove:
     jr .end
 
 .GetPointerToCorrectExlusiveLearnMoveList
-    ld hl,GenericBuffer+1
+    ld hl,wBufferPointerByte1
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -43838,7 +43737,7 @@ HandleExclusiveLearnMove:
     cp MEW
     ld hl,1
     jr z,.Loop
-    ld hl,wMoveRelearnerMoveList+1
+    call .GetPointer
 .Loop
     ld a,h
     cp d ; Actual Position MSB
@@ -43859,6 +43758,14 @@ HandleExclusiveLearnMove:
     pop hl
     ret
 
+.GetPointer
+    ld hl,wWriteInGenericBufferBit4
+    bit 4,[hl]
+    ld hl,wMoveRelearnerMoveList+1
+    ret z
+    ld hl,GenericBuffer+1
+    ret
+
 AddPokemonToParty_TryToAddExclusiveMove_:
     ; Backup
     ld a,[wWhichPokemon]
@@ -43873,9 +43780,11 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
-    ld a,[$cf98]
+    ld a,[W_MONHEADER]
     cp MEW
     jr z,.end
+    ld a,[$cfb9] ; Level
+    ld b,a       ; ...
     call GetMonPotentialMoveList
 
     ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
@@ -43901,10 +43810,8 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     ret
 .Loop
     ld a,[hli]
-    cp $FF
-    ret z
     and a
-    jr z,.next
+    ret z
     ld [$d0e0],a
     push bc
     push hl
@@ -43929,7 +43836,6 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     call TryToAddExclusiveMove
     pop hl
     pop bc
-.next
     dec b
     jr nz,.Loop
     ret
@@ -43947,9 +43853,11 @@ SentNewMonToBox_TryToAddExclusiveMove:
     ld a,2 ; current box
     ld [$cc49],a
     call LoadMonData
-    ld a,[$cf98]
+    ld a,[W_MONHEADER]
     cp MEW
     jr z,.end
+    ld a,[$cf9b] ; Level
+    ld b,a       ; ...
     call GetMonPotentialMoveList
 
     ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
@@ -43972,10 +43880,8 @@ SentNewMonToBox_TryToAddExclusiveMove:
     ret
 .Loop
     ld a,[hli]
-    cp $FF
-    ret z
     and a
-    jr z,.next
+    ret z
     ld [$d0e0],a
     push bc
     push hl
@@ -43990,7 +43896,6 @@ SentNewMonToBox_TryToAddExclusiveMove:
     call TryToAddExclusiveMove
     pop hl
     pop bc
-.next
     dec b
     jr nz,.Loop
     ret
@@ -44242,9 +44147,13 @@ CheckMonAlreadyKnowMove:
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
+    ld a,[$cfb9] ; Level
+    ld b,a       ; ...
     call GetMonPotentialMoveList
+    ; fall through
+
 CheckMonAlreadyKnowMoveQuick:
-    ld a,[$cf98]
+    ld a,[W_MONHEADER]
     cp MEW
     jr z,.Find
     ld a,[$d0e0]
@@ -44254,7 +44163,7 @@ CheckMonAlreadyKnowMoveQuick:
     ld c,a
 .Loop
     ld a,[hli]
-    cp $FF
+    and a
     jr z,.NotFind
     cp b
     jr z,.Find
@@ -49609,7 +49518,7 @@ Func_3bb7d:
     jp CopyData
 
 ; shifts all move data one up (freeing 4th move slot)
-WriteMonMoves_ShiftMoveData:
+ShiftMoveData:
     ld c,$3
 .asm_3b050
     inc de
@@ -50756,7 +50665,7 @@ AfterEvolution_TryToAddExclusiveMove:
     push af
 
     ; Get Pre Evolution Form Move List
-    call GetMoveList
+    call GetUpdatedActualMoveList
 
     ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
     ld hl,wMoveRelearnerMoveList
@@ -50784,7 +50693,7 @@ AfterEvolution_TryToAddExclusiveMove:
     jr LearnMoveCommon
 .Loop
     ld a,[hli]
-    cp $FF
+    and a
     ret z
     and a
     jr z,.next
@@ -50819,13 +50728,13 @@ AfterEvolution_TryToAddExclusiveMove:
     jr nz,.Loop
     ret
 
-GetMoveList:
+GetUpdatedActualMoveList:
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
-    ld b,BANK(GetMonPotentialMoveList)
-    ld hl,GetMonPotentialMoveList
-    jp Bankswitch
+    ld a,[$cfb9] ; Level
+    ld b,a       ; ...
+    PREDEF_JUMP GetMonPotentialMoveList
 
 LearnMoveFromLevelUp:
     ld a,[$d11e]
@@ -50844,7 +50753,7 @@ LearnMoveFromLevelUp:
     ld [hl],a ; Old Level because "CheckMonAlreadyKnowMove" fail 100% if not
     xor a
     ld [$cd46],a
-    call GetMoveList
+    call GetUpdatedActualMoveList
     call LearnMoveCommon
     pop af    ; Restore Level
     pop hl    ; ...
@@ -50852,16 +50761,11 @@ LearnMoveFromLevelUp:
     ret
 
 LearnMoveCommon:
-    call .GetMoves
+    call .GetPotentialNewMoves
 .learnSetLoop
     ld a,[hli]
     and a
     jr z,.done
-    ld b,a
-    ld a,[W_CURENEMYLVL] ; $d127
-    cp b
-    ld a,[hli]
-    jr c,.done ; end if next move level is too high
 .learnmove
     ld [$d0e0],a
     push hl ; Backup Pointer to Current Learn Move's Level
@@ -50874,8 +50778,7 @@ LearnMoveCommon:
     call GetMoveName
     call CopyStringToCF4B
     PREDEF LearnMove
-    call GetMoveList
-    call .GetMoves
+    call GetUpdatedActualMoveList
 .LearnEndOrJustKnow
     pop hl ; Restore Pointer to Current Learn Move's Level
     jr .learnSetLoop
@@ -50884,7 +50787,8 @@ LearnMoveCommon:
     ld [$cf91],a
     ld [$d11e],a
     ret
-.GetMoves
+
+.GetPotentialNewMoves
     ld a,[wNewMonIdDuringLearnMove]
     ld [$d0b5],a
     ld [$cf91],a
@@ -50895,7 +50799,16 @@ LearnMoveCommon:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    jp GetMoves
+    ld hl,wWriteInGenericBufferBit4
+    set 4,[hl] ; wWriteInGenericBufferBit4
+    set 7,[hl] ; wNoExclusiveInListBit7
+    ld a,[$cfb9] ; Level
+    ld b,a       ; ...
+    PREDEF GetMonPotentialMoveList
+    ld hl,wWriteInGenericBufferBit4
+    res 4,[hl] ; wWriteInGenericBufferBit4
+    res 7,[hl] ; wNoExclusiveInListBit7
+    ret
 
 UnnamedText_3bb92:
     TX_FAR _UnnamedText_3bb92
@@ -50985,7 +50898,8 @@ Evolution_PartyMonLoop:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    call GetEvos
+    ld de,GenericBuffer+1
+    PREDEF _GetEvos
     push hl
     ld a,[$cf91]
     push af
@@ -51269,8 +51183,7 @@ SearchMoveToReplace:
 .end
     pop hl
     pop de
-    call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
-    ld a,[$cee9]
+    call ShiftMoveData ; shift all moves one up (deleting move 1)
     scf
     ret
 .fail
@@ -51318,37 +51231,8 @@ DefinePriorityMoveToReplace:
     ret
 
 LearnZeroDamageMove:
-    ld hl,W_ISINBATTLE
-    ld d,[hl]
-    dec d
-    jr nz,.notWildBattle
-    ld hl,EscapeMoves
-    call CheckList
-    jr nc,.notWildBattle
-    call DiscourageForgot6 ; ▼ Escape
-.notWildBattle
-    ld hl,DreamEaterMoves
-    call CheckList
-    jr nc,.notDreamEater
-    call DiscourageForgot6 ; ▼ DreamEater
-.notDreamEater
-    ld hl,NotForgottableMoves
-    call CheckList
-    jr nc,.notForgottable
-    call DiscourageForgot3 ; ▼ Unforgottable
-.notForgottable
-    call GetMoveDamageAndType
-    jr z,.Zero
-    ld a,d
-    dec a
-    jr z,.One
-    call LearnStabMove
-    ret
-.Zero
+    call LearnDamageAndZeroDamageMoveCommon
     jp EncourageForgot3 ; ▲ zero damage
-.One
-    dec b ; ▲ special (1 damage)
-    ret
 
 LearnStabMove:
     push hl
@@ -51371,7 +51255,16 @@ LearnStabMove:
     pop hl
     ret
 
-LearnDamageMove:
+LearnDamageAndZeroDamageMoveCommon:
+    ld hl,W_ISINBATTLE
+    ld d,[hl]
+    dec d
+    jr nz,.notWildBattle
+    ld hl,EscapeMoves
+    call CheckList
+    jr nc,.notWildBattle
+    call DiscourageForgot6 ; ▼ Escape
+.notWildBattle
     ld hl,DreamEaterMoves
     call CheckList
     jr nc,.notDreamEater
@@ -51382,8 +51275,11 @@ LearnDamageMove:
     jr nc,.notForgottable
     call DiscourageForgot3 ; ▼ Unforgottable
 .notForgottable
+    ret
+
+LearnDamageMove:
+    call LearnDamageAndZeroDamageMoveCommon
     call GetMoveDamageAndType
-    jr z,.Zero
     ld a,d
     dec a
     jr z,.One
@@ -51418,8 +51314,6 @@ LearnDamageMove:
     jr nc,.LoopDeltaDamage2
 .done
     ret
-.Zero
-    jp DiscourageForgot3 ; ▼ zero damage
 .One
     dec b ; ▲ special (1 damage)
     ret
@@ -51570,44 +51464,41 @@ NotForgottableMoves:
 
 ; writes the moves a mon has at level [W_CURENEMYLVL] to [de]
 ; move slots are being filled up sequentially and shifted if all slots are full
-; [$cee9]: Day Care
+; [wLearningMovesFromDayCare]: Day Care
 WriteMonMoves:
     call Load16BitRegisters
     push hl
     push de
     push bc
-    ld hl,wNoSkillInListBit6
-    set 6,[hl]
-    call GetMoves
+    push de
+    ld hl,wWriteInGenericBufferBit4
+    set 4,[hl] ; wWriteInGenericBufferBit4
+    set 6,[hl] ; wNoSkillInListBit6
+    set 7,[hl] ; wNoExclusiveInListBit7
+    ld a,[wLearningMovesFromDayCare]
+    and a
+    jr z,.skip
+    res 7,[hl] ; wNoExclusiveInListBit7
+.skip
+    ld a,[W_CURENEMYLVL] ; Level
+    ld b,a               ; ...
+    PREDEF GetMonPotentialMoveList
     push hl
-    ld hl,wNoSkillInListBit6
-    res 6,[hl]
+    ld hl,wWriteInGenericBufferBit4
+    res 4,[hl] ; wWriteInGenericBufferBit4
+    res 6,[hl] ; wNoSkillInListBit6
+    res 7,[hl] ; wNoExclusiveInListBit7
     pop hl
-    jr .firstMove
+    dec hl ; because "inc" in next instructions
 .nextMove
     pop de
 .nextMove2
     inc hl
-.firstMove
-    ld a,[hli]       ; read level of next move in learnset
+    ld a,[hl]        ; read next move in learnset
     and a
     jp z,.done       ; end of list
-    ld b,a
-    ld a,[W_CURENEMYLVL] ; $d127
-    cp b
-    jp c,.done       ; mon level < move level (assumption: learnset is sorted by level)
-    ld a,[$cee9]
-    and a
-    jr z,.skipMinLevelCheck
-    ld a,[wWhichTrade] ; $cd3d (min move level)
-    cp b
-    jr nc,.nextMove2 ; min level >= move level
-.skipMinLevelCheck
     push de
-    ld a,b
-    dec a
-    jr z,.SkipMoveAlreadyLearnedCheck ; Level 1 Moves
-    ld c,$4
+    ld c,4
 .moveAlreadyLearnedCheckLoop
     ld a,[de]
     inc de
@@ -51615,14 +51506,13 @@ WriteMonMoves:
     jr z,.nextMove
     dec c
     jr nz,.moveAlreadyLearnedCheckLoop
-.SkipMoveAlreadyLearnedCheck
     pop de
     push de
-    ld c,$4
+    ld c,4
 .findEmptySlotLoop
     ld a,[de]
     and a
-    jr z,.writeMoveToSlot2
+    jr z,.writeMoveToSlot
     inc de
     dec c
     jr nz,.findEmptySlotLoop
@@ -51632,42 +51522,12 @@ WriteMonMoves:
     ld a,[hl] ; read new move
     ld h,d
     ld l,e
-    call SearchMoveToReplace ; call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
-    jr nc,.HackNext ; ld a,[$cee9]
-    and a
-    jr z,.writeMoveToSlot
-    push de
-    ld bc,$12
-    add hl,bc
-    ld d,h
-    ld e,l
-    call WriteMonMoves_ShiftMoveData ; shift all move PP data one up
-    pop de
-.writeMoveToSlot
+    call SearchMoveToReplace
     pop hl
-.writeMoveToSlot2
+    jr nc,.nextMove
+.writeMoveToSlot
     ld a,[hl]
     ld [de],a
-    ld a,[$cee9]
-    and a
-    jr z,.nextMove
-    push hl            ; write move PP value
-    ld a,[hl]
-    ld hl,$15
-    add hl,de
-    push hl
-    dec a
-    ld hl,Moves
-    ld bc,$6
-    call AddNTimes
-    ld de,$cee9
-    ld a,BANK(Moves)
-    call FarCopyData
-    ld a,[$ceee]
-    pop hl
-    ld [hl],a
-.HackNext
-    pop hl
     jr .nextMove
 .done
     pop bc
@@ -51675,7 +51535,7 @@ WriteMonMoves:
     pop hl
     ret
 
-HealEffect_: ; Moved Upper in the Bank
+HealEffect_:
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld de,W_PLAYERMONCURHP+1 ; $d015
@@ -52293,13 +52153,6 @@ RenameEvolvedMon:
     ld hl,$cd6d
     pop de
     jp CopyData
-
-GetEvos:
-    ld de,GenericBuffer+1
-    PREDEF_JUMP _GetEvos
-
-GetMoves:
-    PREDEF_JUMP _GetMoves
 
 CryData:
     ;$BaseCry,$Pitch,$Length
@@ -59059,7 +58912,7 @@ LoadEnemyMonData:
     jr .continue
 .FreshMoves
     xor a
-    ld [$cee9],a
+    ld [wLearningMovesFromDayCare],a
     ld h,d
     ld l,e
     ld bc,4
@@ -76264,7 +76117,7 @@ Func_3f073Predef:                          NEW_PREDEF Func_3f073                
 ScaleSpriteByTwoPredef:                    NEW_PREDEF ScaleSpriteByTwo                    ; $03
 LoadMonBackSpritePredef:                   NEW_PREDEF LoadMonBackSprite                   ; $04
 Func_79abaPredef:                          NEW_PREDEF Func_79aba                          ; $05
-_GetMovesPredef:                           NEW_PREDEF _GetMoves                           ; $06
+GetMovesPredef:                            NEW_PREDEF GetMoves                            ; $06
 HealPartyPredef:                           NEW_PREDEF HealParty                           ; $07
 MoveAnimationPredef:                       NEW_PREDEF MoveAnimation                       ; $08
 Func_f71ePredef:                           NEW_PREDEF Func_f71e                           ; $09
@@ -76382,6 +76235,7 @@ _CheckDarkMapPredef:                       NEW_PREDEF _CheckDarkMap             
 PrintMoveTypeShortPredef:                  NEW_PREDEF PrintMoveTypeShort                  ; $79
 PrintTypesFullPredef:                      NEW_PREDEF PrintTypesFull                      ; $7A
 LearnSkillPredef:                          NEW_PREDEF LearnSkill                          ; $7B
+GetMonPotentialMoveListPredef:             NEW_PREDEF GetMonPotentialMoveList             ; $7C
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -84168,7 +84022,7 @@ Func_562e1: ; 562e1 (15:62e1)
     ld d,h
     ld e,l
     ld a,$1
-    ld [wHPBarMaxHP],a
+    ld [wLearningMovesFromDayCare],a
     PREDEF WriteMonMoves
     pop bc
     pop af
@@ -140410,6 +140264,143 @@ WaitRightJumpPosition:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+DebugNPC:
+
+    ; Standard CableClubNPC
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 1,a
+    ld hl,CableClubNPC
+    ld b,BANK(CableClubNPC)
+    jp nz,Bankswitch
+
+    ; Backup
+    ld a,[$cf92]
+    push af
+    ld a,[$cc49]
+    push af
+
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 2,a ; was the select button pressed?
+    jr nz,.select
+    bit 3,a ; was the start button pressed?
+    jr nz,.start
+    jp .standard
+
+.select
+    bit 6,a ; was the up button pressed?
+    jr nz,.selectUP
+    ld hl,W_NUMINPARTY
+    ld a,[hli]
+    ld b,a
+.loop0
+    ld a,[hli]
+    push bc
+    push hl
+    ld [$d11e],a
+    call IndexToPokedexAndRestoreD11E
+    ld b,1 ; set
+    ld c,a
+    push bc
+    ld hl,wPokedexSeen
+    call .HandleBit
+    pop bc
+    ld hl,wPokedexOwned
+    call .HandleBit
+    pop hl
+    pop bc
+    dec b
+    jr nz,.loop0
+    ld hl,.DoneTextSelect
+    jp .end
+.HandleBit
+    PREDEF_JUMP HandleBitArray
+.DoneTextSelect
+    db 0,"Done! (Pokedex)",$57,"@"
+
+.selectUP
+    ld hl,W_PARTYMON1_MOVE2PP
+    inc [hl]
+    ld hl,.DoneTextSelectUP
+    jp .end
+.DoneTextSelectUP
+    db 0,"Done! (Alt.Form)",$57,"@"
+
+.start
+    bit 6,a ; was the up button pressed?
+    jr nz,.startUP
+    ld hl,W_PARTYMON1_TYPE1
+    xor a
+    ld [hli],a ; Zero Type 1/2
+    ld [hl],a  ; ...
+    ld hl,W_PARTYMON1OT+8
+    xor a
+    ld [hli],a ; Mon OT + 8
+    ld [hli],a ; Mon OT + 9
+    ld [hl],a ; Mon OT + 10
+    ld hl,.DoneTextStart
+    jp .end
+.DoneTextStart
+    db 0,"Done! (Reset TM)",$57,"@"
+
+.startUP
+    ld hl,W_PARTYMON1_MOVE4PP
+    call .LoopAndDestroyLastRecord
+    ld hl,W_PARTYMON1_MOVE4
+    call .LoopAndDestroyLastRecord
+    ld hl,.UPText
+    jr .end
+.LoopAndDestroyLastRecord
+    ld b,4
+.LoopUP
+    ld a,[hld]
+    and a
+    jr nz,.foundUP
+    dec b
+    jr nz,.LoopUP
+.foundUP
+    inc hl
+    xor a
+    ld [hl],a
+    ret
+.UPText
+    db 0,"Done! (0 PP Move)",$57,"@"
+
+.standard
+    ld a,[W_NUMINPARTY]
+    ld b,a
+    ld c,0
+.loop2
+    push bc
+    ld a,[$FF00+$e4]
+    push af
+    ld a,c
+    inc a
+    ld [$FF00+$e4],a ; Mon Id +1
+    ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
+    ld hl,AddPokemonToParty_TryToAddExclusiveMove_
+    call Bankswitch
+    pop af
+    ld [$FF00+$e4],a
+    pop bc
+    inc c
+    dec b
+    jr nz,.loop2
+    ld hl,.DoneText
+    jr .end
+.DoneText
+    db 0,"Done!",$57,"@"
+
+.end
+    call PrintText
+    ; Restore
+    pop af
+    ld [$cc49],a
+    pop af
+    ld [$cf92],a
+    jp TextScriptEnd
+
+; ──────────────────────────────────────────────────────────────────────
+
 SECTION "Bank38",ROMX,BANK[$38]
 
 Tset0D_GFX:
@@ -144793,9 +144784,14 @@ _GetEvos:
     pop hl
     ret
 
-_GetMoves:
+; Input de = Buffer Pointer
+;       b  = Mon Level
+GetMoves:
     call Load16BitRegisters
-    push de
+    ld a,[$d11e] ; Backup
+    push af      ; ...
+    ld a,b ; Mon Level
+    ld [$d11e],a
     ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
     ld a,[hli]
     ld h,[hl]
@@ -144804,8 +144800,6 @@ _GetMoves:
     ld a,[hli]
     and a
     jr nz,.skipEvoEntriesLoop
-    ld de,GenericBuffer+1
-    push de
 .Loop1
     ld a,[hl]
     and a
@@ -144818,15 +144812,15 @@ _GetMoves:
     ld a,[hli]
     and a
     jr z,.EndLoop2
-    ld b,a ; B = Level
+    ld b,a ; b = Move Level
     ld a,[hli]
-    ld c,a ; c = Move
+    ld c,a ; c = Move ID
     call CheckSkillInList
     call nz,IsSkill
     jr c,.Loop2
-    ld a,b
-    ld [de],a
-    inc de
+    ld a,[$d11e] ; Mon Level
+    cp b
+    jr c,.EndAllLoop ; end if next move level is too high
     ld a,c
     ld [de],a
     inc de
@@ -144839,21 +144833,22 @@ _GetMoves:
 .EndLoop1
     xor a     ; 0 = end learnset
     ld [de],a ; ...
-    pop hl
-    pop de
+    pop af       ; Restore
+    ld [$d11e],a ; ...
     ret
+.EndAllLoop
+    pop hl
+    jr .EndLoop1
 
 ; ──────────────────────────────────────────────────────────────────────
 
 GetMonSkill:
-    call .BackupGenericBuffer
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
-    ld b,BANK(GetMonPotentialMoveList)
-    ld hl,GetMonPotentialMoveList
-    call Bankswitch
-    call .RestoreGenericBuffer
+    ld a,[$cfb9] ; Level
+    ld b,a       ; ...
+    PREDEF GetMonPotentialMoveList
     call .FillMemory
     ld de,wSkill
     ld c,1 ; skill sort
@@ -144935,18 +144930,6 @@ GetMonSkill:
     ld [de],a ; store skill id in wSkill vector
     inc de
     ret
-
-.BackupGenericBuffer
-    ld hl,GenericBuffer+000
-    ld de,GenericBuffer+109
-    jr .BackupGenericBufferCommon
-.RestoreGenericBuffer
-    ld hl,GenericBuffer+109
-    ld de,GenericBuffer+000
-    ; fall through
-.BackupGenericBufferCommon
-    ld bc,109
-    jp CopyData
 
 ; ──────────────────────────────────────────────────────────────────────
 
