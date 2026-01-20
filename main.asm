@@ -16802,8 +16802,7 @@ LearnMove:
 .LearnedSkillTextPlusSound
     TX_FAR _LearnedSkillText1
     db $11
-    TX_FAR _LearnedSkillText2
-    db "@"
+    db $0,$58
 
 .ReplaceAMoveForText
     TX_FAR _ReplaceAMoveForText
@@ -122620,7 +122619,7 @@ _LearnSkillText:
     db "secrets about",$55
     db "@"
     TX_RAM $cf4b
-    db $0," Skill!@@"
+    db $0," SKILL!@@"
 
 _HM01SkillFoundText:
     db $0,"Found!@@"
@@ -130176,13 +130175,7 @@ _LearnedSkillText1:
     db $0," learned",$4f
     db "@"
     TX_RAM $cf4b
-    db $0," Skill!@@"
-
-_LearnedSkillText2:
-    db $0,$51,"@"
-    TX_RAM $cf4b
-    db $0," can be",$4f
-    db "used in the map!",$58
+    db $0," SKILL!@@"
 
 _ReplaceAMoveForText:
     db 0,"Replace a move for",$4f
