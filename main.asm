@@ -42952,7 +42952,7 @@ MovesMenu:
     ld [hli],a ; wCurrentMenuItem
     inc hl
     inc hl
-    ld a,%11110111 ; ▼▲◄►StSeBA
+    ld a,%11111111 ; ▼▲◄►StSeBA
     ld [hli],a ; wMenuWatchedKeys
     xor a
     ld [hl],a ; wLastMenuItem
@@ -43153,6 +43153,8 @@ ChoiceRelearnMove:
 
 .MenuLoop
     call .HandleMenuInput
+    bit 0,a ; was the A button pressed? 
+    jr nz,.APressed
     bit 1,a ; was the B button pressed?
     ret nz
     bit 5,a ; was left button pressed?
@@ -43161,10 +43163,17 @@ ChoiceRelearnMove:
     jr nz,.RightPressed
     bit 2,a ; was select button pressed?
     jp nz,.SelectPressed
-    and %11000000 ; was up or down button pressed?
-    jr nz,.UpOrDownPressedOrSelectUsed
-    jp PlaceUnfilledArrowMenuCursor ; A pressed then return (z flag set)
+    bit 3,a ; was start button pressed?
+    jr nz,.start
+    jr .UpOrDownPressedOrSelectUsed
 
+.APressed
+    ld hl,H_CURRENTPRESSEDBUTTONS ; ▼▲◄►StSeBA
+    res 3,[hl] ; Disable Start Pressed
+    call .ResetScreen
+    call PlaceUnfilledArrowMenuCursor
+    xor a ; szf
+    ret
 .LeftPressed
     FuncCoord 04,01
     ld hl,Coord
@@ -43204,18 +43213,22 @@ ChoiceRelearnMove:
     jr nc,.start
     ld [wCurrentMenuItem],a
 .start
+    call .ResetScreen
+    jr .MenuLoop
+
+.ResetScreen
     call .ClearScreenArea
     call .PrintMovesAndArrows
     call .GetCurrentMove
     call .GetMaxCurrentScreenMenuLenght
     ld [wMaxMenuItem],a
-    jr .MenuLoop
+    ret
 
 .UpOrDownPressedOrSelectUsed
     call .ClearScreenArea
     call .PrintMoves
     call .GetCurrentMove
-    jr .MenuLoop
+    jp .MenuLoop
 
 .GetCurrentMove
     call .ListLenghtAndPointerToFirst
@@ -43252,17 +43265,21 @@ ChoiceRelearnMove:
 
     ; Print Move Details Box
     ld [wPlayerSelectedMove],a
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    and %00001100                  ; skip if start/select pressed
+    jr nz,.SkipMoveDetails         ; ...
     FuncCoord 10,06
     ld hl,Coord
     ld a,[wCurrentMenuItem]
     cp 3
-    jr c,.SkipMoveDetails
+    jr c,.MoveDetailsBox
     ld de,-120 ; 6 Rows
     add hl,de
-.SkipMoveDetails
+.MoveDetailsBox
     ld d,h
     ld e,l
     PREDEF PrintMoveDetailsBox
+.SkipMoveDetails
 
     ; Enable Transfer
     ld a,1
@@ -43501,7 +43518,11 @@ ChoiceRelearnMove:
     ret
 
 .SelectPressed
-    call PlaceUnfilledArrowMenuCursor
+    call .ResetScreen
+    FuncCoord 01,03
+    ld hl,Coord
+    ld bc,09 << 8 | 18
+    call ClearScreenArea
     ; Backup Menu
     ld hl,wTopMenuItemY
     ld c,7
@@ -43643,13 +43664,7 @@ SortMoves:
     ld [$d11e],a
     ; Print Move Details Box
     ld [wPlayerSelectedMove],a
-    FuncCoord 09,05
-    ld de,Coord
-    FuncCoord 19,02
-    ld a,[Coord]
-    cp $7B ; Upper Right Corner
-    jr nz,.skip
-    FuncCoord 09,01
+    FuncCoord 01,06
     ld de,Coord
 .skip
     PREDEF_JUMP PrintMoveDetailsBox
