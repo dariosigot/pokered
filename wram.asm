@@ -1940,11 +1940,12 @@ wLastTechMachIdUsed: ; dee7
 
 wNewMonIdDuringLearnMove: ; dee8
 wBackupDarkMap            ; dee8
+wMaxNotExclMoveSlotId:    ; dee8
     ds 1
 
 wUnusedDEE9:: db
 
-wExplodeFlag: ; deea
+wExplodeFlag:          ; deea
 wBackupItemCurrentQty: ; deea
     ds 1
 

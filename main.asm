@@ -42806,6 +42806,8 @@ GetMonPotentialMoveList:
 .DontOverwriteFirstByte
     xor a
     ld [de],a
+    dec a ; a = $FF
+    ld [wMaxNotExclMoveSlotId],a
 
     ; Check Not MEW
     ld a,[W_MONHEADER]
@@ -43371,11 +43373,44 @@ ChoiceRelearnMove:
     push hl
     push de
     ld [$d11e],a
+    call .HandleExclusiveSymbol
     call GetMoveName
     ld de,$cd6d
     call PlaceString
     pop de
     pop hl
+    ret
+
+.HandleExclusiveSymbol
+    push de
+    push hl
+    call .ListLenghtAndPointerToFirst
+    ; de = Pointer to Move to Write
+    ; hl = Pointer to First Move
+    ld a,e ; c = e - l
+    sub l  ; ...
+    ld c,a ; ...
+    ld a,d          ; b = d - h - carry
+    jr nc,.NotCarry ; ...
+    dec a           ; ...
+.NotCarry           ; ...
+    sub h           ; ...
+    ld b,a          ; ...
+    ld a,b
+    and a
+    jr nz,.HandleExclusiveSymbol_End
+    ; c = {0,1,...}
+    ld a,[wMaxNotExclMoveSlotId]
+    cp c
+    jr nc,.HandleExclusiveSymbol_End
+    pop hl
+    ld [hl],$D2 ; Plus Symbol
+    inc hl
+    jr .HandleExclusiveSymbol_End2
+.HandleExclusiveSymbol_End
+    pop hl
+.HandleExclusiveSymbol_End2
+    pop de
     ret
 
 .ListLenghtAndPointerToFirst
@@ -144848,6 +144883,10 @@ GetMoves:
     ld a,c
     ld [de],a
     inc de
+    push hl
+    ld hl,wMaxNotExclMoveSlotId
+    inc [hl]
+    pop hl
     jr .Loop2
 .EndLoop2
     pop hl
