@@ -50802,12 +50802,14 @@ LearnMoveCommon:
     ld hl,wWriteInGenericBufferBit4
     set 4,[hl] ; wWriteInGenericBufferBit4
     set 7,[hl] ; wNoExclusiveInListBit7
-    ld a,[$cfb9] ; Level
-    ld b,a       ; ...
+    ld a,[W_CURENEMYLVL] ; Level
+    ld b,a               ; ...
     PREDEF GetMonPotentialMoveList
+    push hl
     ld hl,wWriteInGenericBufferBit4
     res 4,[hl] ; wWriteInGenericBufferBit4
     res 7,[hl] ; wNoExclusiveInListBit7
+    pop hl
     ret
 
 UnnamedText_3bb92:
