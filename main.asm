@@ -43179,7 +43179,21 @@ ChoiceRelearnMove:
 .LeftRightCommon
     call .GetNumberOfScreenMenu
     cp b
-    jr nc,.MenuLoop
+    jr c,.MenuContinue
+    jr z,.RightToStart
+.LeftToEnd
+    ld a,b
+    dec a
+    jr .CheckNoInfiniteLoop
+.RightToStart
+    xor a
+.CheckNoInfiniteLoop
+    ld b,a
+    ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
+    and a                        ; ...
+    jr z,.MenuLoop               ; ...
+    ld a,b
+.MenuContinue
     ld [hl]," "
     ld [wListScrollOffset],a
     call Delay3
