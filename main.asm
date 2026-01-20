@@ -84033,7 +84033,7 @@ Func_562e1: ; 562e1 (15:62e1)
     ld e,l
     ld a,$1
     ld [wLearningMovesFromDayCare],a
-    PREDEF WriteMonMoves
+    call HandleMovesAfterDayCare
     pop bc
     pop af
     ld hl,W_PARTYMON1_HP
@@ -85283,6 +85283,19 @@ Route21Script2:
 .ResetScript
     xor a
     ld [W_ROUTE21CURSCRIPT],a
+    ret
+
+HandleMovesAfterDayCare:
+    PREDEF WriteMonMoves
+    ld a,[$FF00+$e4]
+    push af
+    ld a,[W_NUMINPARTY]
+    ld [$FF00+$e4],a ; Last Mon Added Id + 1
+    ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
+    ld hl,AddPokemonToParty_TryToAddExclusiveMove_
+    call Bankswitch
+    pop af
+    ld [$FF00+$e4],a
     ret
 
 SECTION "bank16",ROMX,BANK[$16]
