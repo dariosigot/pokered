@@ -11665,7 +11665,6 @@ LoadMonData_: ; 45b6 (1:45b6)
     add hl,de
     ld a,[hl]
     ld [$cf91],a
-
 .done
     ld a,[$cf91]
     ld [$d0b5],a ; input for GetMonHeader
@@ -11689,28 +11688,38 @@ LoadMonData_: ; 45b6 (1:45b6)
     ld de,$cf98
     ld bc,44
     call CopyData
-
     ; Copy Exclusive
-    ld hl,W_PARTYMON1OT+8
     ld a,[$cc49]
-    cp a,$01
-    ret z ; Enemy Exclusive doesn't exists
-    jr c,.getExclusive
-    cp a,$02
+    and a
+    ld hl,W_PARTYMON1OT+8
+    jr z,.getExclusive
+    dec a
+    jr z,.resetExclusive ; Enemy Exclusive doesn't exists
+    dec a
     ld hl,$dd2a+8 ; BOXMON1OT
-    ret nz ; day care Exclusive doesn't exists
+    jr z,.getExclusive
+    dec a
+    ld hl,$da54+8 ; DayCare
+    jr z,.CopyExclusive
+.resetExclusive
+    xor a
+    ld hl,wTempExclusive
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+    jr .end
 .getExclusive
     ld a,[$cf92]
     ld bc,11
     call AddNTimes
+.CopyExclusive
     ld de,wTempExclusive
     ld bc,3
     call CopyData ; copy bc bytes of data from hl to de
-
+.end
     ; Save AlternateFormIndex
     ld a,[$cfb6] ; move2pp
     ld [wAlternateFormIndex],a
-
     jp GetMonHeader ; load base stats to $d0b8
 
 ItemPrices:
@@ -50778,7 +50787,6 @@ LearnMoveCommon:
     call GetMoveName
     call CopyStringToCF4B
     PREDEF LearnMove
-    call GetUpdatedActualMoveList
 .LearnEndOrJustKnow
     pop hl ; Restore Pointer to Current Learn Move's Level
     jr .learnSetLoop
@@ -140335,10 +140343,11 @@ DebugNPC:
     ld [hli],a ; Zero Type 1/2
     ld [hl],a  ; ...
     ld hl,W_PARTYMON1OT+8
-    xor a
     ld [hli],a ; Mon OT + 8
     ld [hli],a ; Mon OT + 9
-    ld [hl],a ; Mon OT + 10
+    ld [hl],a  ; Mon OT + 10
+    ld hl,W_PARTYMON1_MOVE3PP
+    ld [hl],a  ; Ex Move 3 PP
     ld hl,.DoneTextStart
     jp .end
 .DoneTextStart

@@ -569,7 +569,6 @@ SANDSLASH_Learnset:
 SANDSHREW_NoEvo_Learnset:
     db 25,PIN_MISSILE
     db 29,ROCK_THROW
-    db 30,Skill__CUT ; TODO TEST
     db 33,BLADE
     db 37,FOCUS_ENERGY
     db 42,EARTHQUAKE
