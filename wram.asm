@@ -1856,83 +1856,7 @@ W_BOXMON2DATA: ; dab7
 
 ; dd2a
 
-; ────────────────────────────────────────────────────
-
-SECTION "DenimBuffer",WRAMX[$def0],BANK[$1]
-
-UNION ; 69 Byte
-
-wMoveRelearnerMoveList: ; def0
-    ds 69
-
-NEXTU
-
-wTmpTrainerHeaderBank:
-    ds 1
-wTmpTrainerHeaderPointer:
-    ds 2
-wTmpPointerToMapCurrentScript:
-    ds 2
-wTmpTrainerHeader:
-    ds 4
-
-NEXTU
-
-wLocationMonOvSprInstruction: ; def0
-    ds 6*6
-    ds 2*6
-
-NEXTU
-
-wCollisionRule:: db ; def0
-; Debug Collision Rule
-
-wCollisionFlag:: db ; def1
-; bit 0 = Try Jumping
-; bit 1 = Try Stop Surfing
-; bit 2 = Can Surfing
-; bit 3 = Try Pushing Boulder
-
-NEXTU
-
-wMoveForgotPriority:: ; def0
-    ds 4
-wNewMoveDamage:: ; $def4
-    db
-wNewMoveType:: ; $def5
-    db
-
-NEXTU
-
-wBlkCurrentPaletteColor: ; def0
-    ds 1
-wBlkCoordinateX1Left: ; def1
-    ds 1
-wBlkCoordinateY1Upper: ; def2
-    ds 1
-wBlkCoordinateX2Right: ; def3
-    ds 1
-wBlkCoordinateY2Lower: ; def4
-    ds 1
-
-NEXTU
-
-wBattleValueToPrint: ; def0
-    ds 2
-wBattleValueCounter: ; def2
-    ds 1
-
-NEXTU
-
-wBufferTypeEffects: ; def0
-    ds 68-12
-wBufferTypeEffectsEnd:
-    db
-
-wBackupBattleDataDuringDex2ndPage: ; def0
-    ds 12
-
-ENDU
+; dee1
 
 ; ────────────────────────────────────────────────────
 
@@ -2028,6 +1952,90 @@ wBackupHealthBarWidth: ; deeb
     ds 1
 
     ds 4 ; Free
+
+; ────────────────────────────────────────────────────
+
+SECTION "DenimBuffer",WRAMX[$def0],BANK[$1]
+
+DENIM_BUFFER_LENGHT EQU 80 ; Number of Byte
+
+BUFFER_TYPE_EFFECTS_LENGHT EQU 68 ; DENIM_BUFFER_LENGHT - 12
+
+UNION 
+
+wMoveRelearnerMoveList: ; def0
+    ds DENIM_BUFFER_LENGHT
+
+NEXTU
+
+wTmpTrainerHeaderBank:
+    ds 1
+wTmpTrainerHeaderPointer:
+    ds 2
+wTmpPointerToMapCurrentScript:
+    ds 2
+wTmpTrainerHeader:
+    ds 4
+
+NEXTU
+
+wLocationMonOvSprInstruction: ; def0
+    ds 6*6
+    ds 2*6
+
+NEXTU
+
+wCollisionRule:: db ; def0
+; Debug Collision Rule
+
+wCollisionFlag:: db ; def1
+; bit 0 = Try Jumping
+; bit 1 = Try Stop Surfing
+; bit 2 = Can Surfing
+; bit 3 = Try Pushing Boulder
+
+NEXTU
+
+wMoveForgotPriority:: ; def0
+    ds 4
+wNewMoveDamage:: ; $def4
+    db
+wNewMoveType:: ; $def5
+    db
+
+NEXTU
+
+wBlkCurrentPaletteColor: ; def0
+    ds 1
+wBlkCoordinateX1Left: ; def1
+    ds 1
+wBlkCoordinateY1Upper: ; def2
+    ds 1
+wBlkCoordinateX2Right: ; def3
+    ds 1
+wBlkCoordinateY2Lower: ; def4
+    ds 1
+
+NEXTU
+
+wBattleValueToPrint: ; def0
+    ds 2
+wBattleValueCounter: ; def2
+    ds 1
+
+NEXTU
+
+wBufferTypeEffects: ; def0
+    ds BUFFER_TYPE_EFFECTS_LENGHT
+wBufferTypeEffectsEnd:
+    db
+
+wBackupBattleDataDuringDex2ndPage: ; def0
+    ds 12
+
+ENDU
+
+; ────────────────────────────────────────────────────
 
 SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
 
