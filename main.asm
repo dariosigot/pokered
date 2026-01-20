@@ -42806,7 +42806,7 @@ GetMonPotentialMoveList:
     ; Get Moves
     PREDEF GetMoves
 
-    ; Handle Exlusive Learn Move
+    ; Handle Exclusive Learn Move
     ld hl,wNoExclusiveInListBit7
     bit 7,[hl]
     jr nz,.SkipExclusive
@@ -43605,7 +43605,7 @@ HandleExclusiveLearnMove:
     ld a,[wBufferPointerByte2]
     push af
 
-    call .GetBufferPointerToCorrectExlusiveLearnMoveList
+    call .GetBufferPointerToCorrectExclusiveLearnMoveList
 
     ; Process Potential Store Byte
     ld hl,$cf9d ; Ex Type1
@@ -43646,7 +43646,7 @@ HandleExclusiveLearnMove:
     jr nz,.LoopBit
     ret
 
-.GetBufferPointerToCorrectExlusiveLearnMoveList
+.GetBufferPointerToCorrectExclusiveLearnMoveList
     push de
     ld hl,ExclusiveMoveLearnTable
     ld a,[$cf98] ; Pokemon ID
@@ -43672,7 +43672,7 @@ HandleExclusiveLearnMove:
     ld a,8
     sub b
     ld b,a ; b = Bit (0,1,...,7)
-    call .GetPointerToCorrectExlusiveLearnMoveList
+    call .GetPointerToCorrectExclusiveLearnMoveList
     push de ; Backup Pointer to Move List Current Elements
     ld a,c
     and a
@@ -43724,7 +43724,7 @@ HandleExclusiveLearnMove:
     pop de ; Restore Pointer to Move List Current Elements
     jr .end
 
-.GetPointerToCorrectExlusiveLearnMoveList
+.GetPointerToCorrectExclusiveLearnMoveList
     ld hl,wBufferPointerByte1
     ld a,[hli]
     ld h,[hl]
