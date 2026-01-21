@@ -29470,64 +29470,74 @@ StartMenu_TrainerInfo:
     db "BADGE",$D3,"@"
 
 .PrintSkill
-    FuncCoord 09,09
+    FuncCoord 10,09
     ld de,Coord
+    ld bc,-19
+
+.next0
     ld hl,CUT_FLAG_BYTE
     bit CUT_FLAG_BIT,[hl]
     jr z,.next1
     ld a,$D8
-    ld [de],a
-    inc de
+    call .WriteAndGoToNext
 .next1
     ld hl,FLY_FLAG_BYTE
     bit FLY_FLAG_BIT,[hl]
     jr z,.next2
     ld a,$D9
-    ld [de],a
-    inc de
+    call .WriteAndGoToNext
 .next2
     ld hl,FLOAT_FLAG_BYTE
     bit FLOAT_FLAG_BIT,[hl]
     jr z,.next3
     ld a,$DA
-    ld [de],a
-    inc de
+    call .WriteAndGoToNext
 .next3
     ld hl,STRENGTH_FLAG_BYTE
     bit STRENGTH_FLAG_BIT,[hl]
     jr z,.next4
     ld a,$DB
-    ld [de],a
-    inc de
+    call .WriteAndGoToNext
 .next4
     ld hl,LIGHT_FLAG_BYTE
     bit LIGHT_FLAG_BIT,[hl]
     jr z,.next5
     ld a,$DC
-    ld [de],a
-    inc de
+    call .WriteAndGoToNext
 .next5
     ld hl,TELEPORT_FLAG_BYTE
     bit TELEPORT_FLAG_BIT,[hl]
     jr z,.next6
     ld a,$DD
-    ld [de],a
-    inc de
+    call .WriteAndGoToNext
 .next6
     ld hl,DIG_FLAG_BYTE
     bit DIG_FLAG_BIT,[hl]
     jr z,.next7
     ld a,$DE
-    ld [de],a
-    inc de
+    call .WriteAndGoToNext
 .next7
     ld hl,HEAL_FLAG_BYTE
     bit HEAL_FLAG_BIT,[hl]
     jr z,.next8
     ld a,$DF
-    ld [de],a
-    inc de
+    call .WriteAndGoToNext
 .next8
+    ret
+
+.WriteAndGoToNext
+    ld [de],a
+    ld a,b
+    and a
+    ld bc,-19
+    jr z,.CalcNewDE
+    ld bc,+21
+.CalcNewDE
+    ld h,d
+    ld l,e
+    add hl,bc
+    ld d,h
+    ld e,l
     ret
 
 ; draws a text box on the trainer info screen
