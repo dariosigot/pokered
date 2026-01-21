@@ -58,6 +58,11 @@ SetTempIV:
     pop af
     ret
 
+SECTION "SkillTestByte",ROM0[$4f]
+
+SkillTestByte: ; $004f
+    db %00000001
+
 SECTION "timer",ROM0[$50]
     jp TimerHandler
 SECTION "serial",ROM0[$58]
@@ -16605,11 +16610,20 @@ LearnMove:
     ; XX learned YY! ♫♪
     call .IsSkill
     ld hl,.LearnedSkillTextPlusSound
-    jr c,.Skill
+    jr c,.PrintLearned
     cp TELEPORT
-    jr z,.Skill
     ld hl,.LearnedTextPlusSound
-.Skill
+    jr nz,.PrintLearned
+    ld hl,TELEPORT_FLAG_BYTE
+    bit TELEPORT_FLAG_BIT,[hl]
+    jr nz,.TeleportFullMessage
+    ld hl,.LearnedTextPlusSound
+    jr .PrintLearned
+.TeleportFullMessage
+    ld hl,.LearnedSkillTextPlusSound
+    call PrintText
+    ld hl,.LearnedTextPlusSound
+.PrintLearned
     call PrintText
     ; Get Mon OT Name to Try Add Exclusive Move
     ld hl,W_PARTYMON1OT+8
@@ -18021,12 +18035,12 @@ ENDM
 
 LearnMove_SkillConfigTable:
     SCT Skill__FLY      , FLY_FLAG_BYTE      , FLY_FLAG_BIT
-    SCT Skill__DIG      , $0000              , 0
+    SCT Skill__DIG      , DIG_FLAG_BYTE      , DIG_FLAG_BIT
     SCT Skill__CUT      , CUT_FLAG_BYTE      , CUT_FLAG_BIT
     SCT Skill__FLOAT    , FLOAT_FLAG_BYTE    , FLOAT_FLAG_BIT
     SCT Skill__STRENGTH , STRENGTH_FLAG_BYTE , STRENGTH_FLAG_BIT
     SCT Skill__LIGHT    , LIGHT_FLAG_BYTE    , LIGHT_FLAG_BIT
-    SCT Skill__HEAL     , $0000              , 0
+    SCT Skill__HEAL     , HEAL_FLAG_BYTE     , HEAL_FLAG_BIT
     db $FF
 
 ; Free
@@ -29464,14 +29478,12 @@ StartMenu_TrainerInfo:
     ld a,$D8
     ld [de],a
     inc de
-    inc de
 .next1
     ld hl,FLY_FLAG_BYTE
     bit FLY_FLAG_BIT,[hl]
     jr z,.next2
     ld a,$D9
     ld [de],a
-    inc de
     inc de
 .next2
     ld hl,FLOAT_FLAG_BYTE
@@ -29480,14 +29492,12 @@ StartMenu_TrainerInfo:
     ld a,$DA
     ld [de],a
     inc de
-    inc de
 .next3
     ld hl,STRENGTH_FLAG_BYTE
     bit STRENGTH_FLAG_BIT,[hl]
     jr z,.next4
     ld a,$DB
     ld [de],a
-    inc de
     inc de
 .next4
     ld hl,LIGHT_FLAG_BYTE
@@ -29496,8 +29506,28 @@ StartMenu_TrainerInfo:
     ld a,$DC
     ld [de],a
     inc de
-    inc de
 .next5
+    ld hl,TELEPORT_FLAG_BYTE
+    bit TELEPORT_FLAG_BIT,[hl]
+    jr z,.next6
+    ld a,$DD
+    ld [de],a
+    inc de
+.next6
+    ld hl,DIG_FLAG_BYTE
+    bit DIG_FLAG_BIT,[hl]
+    jr z,.next7
+    ld a,$DE
+    ld [de],a
+    inc de
+.next7
+    ld hl,HEAL_FLAG_BYTE
+    bit HEAL_FLAG_BIT,[hl]
+    jr z,.next8
+    ld a,$DF
+    ld [de],a
+    inc de
+.next8
     ret
 
 ; draws a text box on the trainer info screen
@@ -144985,13 +145015,13 @@ GetMonSkill:
 
 .SkillConfigTable
     SCT Skill__FLY      , FLY_FLAG_BYTE      , FLY_FLAG_BIT
-    SCT TELEPORT        , $0000              , 0
-    SCT Skill__DIG      , $0000              , 0
+    SCT TELEPORT        , TELEPORT_FLAG_BYTE , TELEPORT_FLAG_BIT
+    SCT Skill__DIG      , DIG_FLAG_BYTE      , DIG_FLAG_BIT
     SCT Skill__CUT      , CUT_FLAG_BYTE      , CUT_FLAG_BIT
     SCT Skill__FLOAT    , FLOAT_FLAG_BYTE    , FLOAT_FLAG_BIT
     SCT Skill__STRENGTH , STRENGTH_FLAG_BYTE , STRENGTH_FLAG_BIT
     SCT Skill__LIGHT    , LIGHT_FLAG_BYTE    , LIGHT_FLAG_BIT
-    SCT Skill__HEAL     , $0000              , 0
+    SCT Skill__HEAL     , HEAL_FLAG_BYTE     , HEAL_FLAG_BIT
     db $FF
 
 .FillMemory
