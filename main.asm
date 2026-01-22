@@ -40890,9 +40890,7 @@ DiglettsCaveRoute2Script: ; 1deb0 (7:5eb0)
 DiglettsCaveRoute2TextPointers: ; 1deb8 (7:5eb8)
     dw DiglettsCaveRoute2Text1
 
-DiglettsCaveRoute2Text1: ; 1deba (7:5eba)
-    TX_FAR _DiglettsCaveRoute2Text1
-    db "@"
+SECTION "DiglettsCaveRoute2Object",ROMX[$5ebf],BANK[$7]
 
 DiglettsCaveRoute2Object: ; 0x1debf (size=34)
     db $7d ; border tile
@@ -44359,6 +44357,38 @@ GiveVoltorb:
 
 VoltorbText:
     TX_FAR _VoltorbText
+    db "@"
+
+DiglettsCaveRoute2Text1:
+    db $08 ; asm
+    ld hl,.end
+    push hl
+    ld b,ESCAPE_ROPE
+    PREDEF _IsItemInBagOrBox
+    ld hl,.DiglettsCaveRoute2Text1
+    ret nz
+    ld hl,.EscapeRopeReceiveText1
+    call PrintText
+    ld bc,(ESCAPE_ROPE << 8) | 1
+    call GiveItem
+    ld hl,.EscapeRopeNoRoomText
+    ret nc
+    ld hl,.EscapeRopeReceiveText2
+    ret
+.end
+    call PrintText
+    jp TextScriptEnd
+.EscapeRopeReceiveText1
+    TX_FAR _EscapeRopeReceiveText1
+    db "@"
+.EscapeRopeReceiveText2
+    TX_FAR _ReceivedText
+    db $11,"@"
+.EscapeRopeNoRoomText
+    TX_FAR _EscapeRopeNoRoomText
+    db $0F,"@"
+.DiglettsCaveRoute2Text1
+    TX_FAR _DiglettsCaveRoute2Text1
     db "@"
 
 SECTION "bank8",ROMX,BANK[$8]
@@ -75856,38 +75886,6 @@ MtMoon1Script2:
     xor a
     ld [W_MTMOON1CURSCRIPT],a
     ret
-
-;EscapeRopeGiver: ; TODO
-;    db $08 ; asm
-;    ld hl,.end
-;    push hl
-;    ld b,ESCAPE_ROPE
-;    PREDEF _IsItemInBagOrBox
-;    ld hl,.MtMoon1AfterBattleText2
-;    ret nz
-;    ld hl,.EscapeRopeReceiveText1
-;    call PrintText
-;    ld bc,(ESCAPE_ROPE << 8) | 1
-;    call GiveItem
-;    ld hl,.EscapeRopeNoRoomText
-;    ret nc
-;    ld hl,.EscapeRopeReceiveText2
-;    ret
-;.end
-;    call PrintText
-;    jp TextScriptEnd
-;.EscapeRopeReceiveText1
-;    TX_FAR _EscapeRopeReceiveText1
-;    db "@"
-;.EscapeRopeReceiveText2
-;    TX_FAR _ReceivedText
-;    db $11,"@"
-;.EscapeRopeNoRoomText
-;    TX_FAR _EscapeRopeNoRoomText
-;    db $0F,"@"
-;.MtMoon1AfterBattleText2
-;    TX_FAR _MtMoon1AfterBattleText2
-;    db "@"
 
 MtMoon1AfterBattleText2:
     db $08 ; asm
@@ -122746,6 +122744,21 @@ _HM08SkillNotFoundText:
     db $0,"NOT Found!@@"
 
 ; ───────────────────────────────────
+
+_EscapeRopeReceiveText1:
+    db $0,"I went to ROCK",$4f
+    db "TUNNEL,but it's",$55
+    db "dark and scary.",$51
+    db "If a #MON's",$4f
+    db "SKILL could light",$55
+    db "it up...",$51
+    db "I don't need this",$4f
+    db "tool at the",$55
+    db "moment, take it!",$58
+
+_EscapeRopeNoRoomText:
+    db $0,"You do not have",$4f
+    db "space for this!",$57
 
 SECTION "bank23",ROMX,BANK[$23]
 
