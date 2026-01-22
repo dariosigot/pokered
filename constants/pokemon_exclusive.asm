@@ -448,7 +448,7 @@ NinetalesExclusiveMove:
     db DREAM_EATER ; TM42
     db REST ; TM44
     db SUBSTITUTE ; TM50
-    db EMBER
+    db $FF
     db QUICK_ATTACK
     db AGILITY
     db RAGE ; TM20
@@ -703,7 +703,7 @@ ArcanineExclusiveMove:
     db SKULL_BASH ; TM40
     db REST ; TM44
     db SUBSTITUTE ; TM50
-    db EMBER
+    db $FF
     db AGILITY
     db QUICK_ATTACK
     db RAGE ; TM20

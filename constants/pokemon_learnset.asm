@@ -467,17 +467,17 @@ EKANS_Learnset:
     db 13,BITE
     db 15,POISON_GAS
     db 18,ACID
+    db 20,Skill__DIG
     db 21,HYPER_FANG
     ;  22,ARBOK
     db 0
 ARBOK_Learnset:
-    db 22,Skill__LIGHT
-    db 22,Skill__DIG
     db 22,TRAPHOLE
     db 25,FLARE
     db 27,SONICBOOM
     db 29,ABSORB
     db 31,SCREECH
+    db 32,Skill__LIGHT
     db 33,STRING_SHOT
     db 36,SLUDGE
     db 39,SUPERSONIC
@@ -485,6 +485,7 @@ ARBOK_Learnset:
     db 46,HAZE
     db 49,HYPNOSIS
     db 52,SUPER_FANG
+    db 52,Skill__CUT
     db 57,TOXIC
     db 60,EARTHQUAKE
     db 0
@@ -494,6 +495,7 @@ EKANS_NoEvo_Learnset:
     db 29,FLARE
     db 32,SONICBOOM
     db 34,SCREECH
+    db 35,Skill__LIGHT
     db 37,STRING_SHOT
     db 39,SLUDGE
     db 43,SUPERSONIC
@@ -504,7 +506,6 @@ EKANS_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PIKACHU_Learnset:
-    db  1,Skill__LIGHT
     db  1,THUNDERSHOCK
     db  1,GROWL
     db  6,TAIL_WHIP
@@ -515,6 +516,7 @@ PIKACHU_Learnset:
     db 15,DOUBLE_TEAM ; Exclusive*
     db 17,FURY_SWIPES
     db 19,FLASH
+    db 19,Skill__LIGHT
     db 22,SLAM
     db 26,THUNDERBOLT
     db 28,AGILITY ; Exclusive*
@@ -526,8 +528,6 @@ PIKACHU_Learnset:
     db 55,LOVELY_KISS
     db 0
 RAICHU_Learnset:
-    db  1,Skill__LIGHT
-    db  1,Skill__DIG
     db  1,THUNDERSHOCK
     db  1,GROWL
     db  1,THUNDERBOLT
@@ -537,12 +537,14 @@ RAICHU_Learnset:
     db 11,BITE
     db 13,FURY_SWIPES
     db 15,FLASH
+    db 15,Skill__LIGHT
     db 20,SLAM
     db 25,THUNDERPUNCH
     db 28,SWIFT
     db 30,SKULL_BASH
     db 35,THUNDER_M
     db 40,HYPER_FANG
+    db 40,Skill__DIG
     db 45,LIGHT_SCREEN
     db 49,MEGA_PUNCH
     db 53,BODY_SLAM
@@ -551,22 +553,22 @@ RAICHU_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SANDSHREW_Learnset:
-    db  1,Skill__DIG
     db  1,SCRATCH
     db  1,DEFENSE_CURL
     db  5,SAND_ATTACK
+    db  7,Skill__DIG
     db  9,TRAPHOLE
     db 12,FURY_SWIPES
     db 14,POISON_STING
     db 17,SLASH
+    db 17,Skill__CUT
     db 20,HARDEN
     ;  22,SANDSLASH
     db 0
 SANDSLASH_Learnset:
-    db 22,Skill__CUT
-    db 22,Skill__STRENGTH
     db 22,PIN_MISSILE
     db 26,ROCK_THROW
+    db 28,Skill__STRENGTH
     db 29,BLADE
     db 31,FOCUS_ENERGY
     db 33,EARTHQUAKE
@@ -583,6 +585,7 @@ SANDSHREW_NoEvo_Learnset:
     db 29,ROCK_THROW
     db 33,BLADE
     db 37,FOCUS_ENERGY
+    db 39,Skill__STRENGTH
     db 42,EARTHQUAKE
     db 47,REST
     db 52,SWIFT
@@ -597,14 +600,13 @@ NIDORAN_F_Learnset:
     db  9,SAND_ATTACK
     db 11,POISON_STING
     db 13,FURY_SWIPES
+    db 14,Skill__DIG
     db 15,LEER
     db 16,DOUBLE_KICK
     db 16,POISONPOWDER
     ;  16,NIDORINA
     db 0
 NIDORINA_Learnset:
-    db 16,Skill__CUT
-    db 16,Skill__DIG
     db 19,BITE
     db 20,TRAPHOLE ; Exclusive
     db 22,FOCUS_ENERGY
@@ -612,25 +614,28 @@ NIDORINA_Learnset:
     db 26,SLAM
     db 28,QUICK_ATTACK ; Exclusive*
     db 30,SLASH
+    db 30,Skill__CUT
     db 33,AGILITY ; Exclusive*
     db 37,SKULL_BASH
     db 40,ROCK_THROW
     db 42,SLUDGE
     db 47,BODY_SLAM
+    db 49,Skill__STRENGTH
     db 52,EARTHQUAKE
     db 60,TOXIC
     db 0
 NIDOQUEEN_Learnset:
-    db 16,Skill__FLOAT
-    db 16,Skill__STRENGTH
     db 16,HORN_ATTACK
     db 16,FURY_ATTACK
     db 17,RAGE
     db 18,BITE
     db 20,FOCUS_ENERGY
+    db 20,Skill__FLOAT
     db 21,SLAM
     db 22,THRASH
+    db 22,Skill__STRENGTH
     db 25,SLASH
+    db 25,Skill__CUT
     db 25,HYPER_FANG
     db 27,BODY_SLAM
     db 29,ROCK_THROW
@@ -655,6 +660,7 @@ NIDORAN_F_NoEvo_Learnset:
     db 31,SLAM
     db 36,FOCUS_ENERGY
     db 41,SLASH
+    db 41,Skill__CUT
     db 46,SKULL_BASH
     db 51,SLUDGE
     db 0
@@ -667,14 +673,13 @@ NIDORAN_M_Learnset:
     db  9,SAND_ATTACK
     db 11,POISON_STING
     db 13,FURY_ATTACK
+    db 14,Skill__DIG
     db 15,LEER
     db 16,DOUBLE_KICK
     db 16,POISONPOWDER
     ;  16,NIDORINO
     db 0
 NIDORINO_Learnset:
-    db 16,Skill__CUT
-    db 16,Skill__DIG
     db 19,BITE
     db 20,TRAPHOLE ; Exclusive
     db 22,FOCUS_ENERGY
@@ -682,25 +687,28 @@ NIDORINO_Learnset:
     db 26,SLAM
     db 28,QUICK_ATTACK ; Exclusive*
     db 30,HYPER_FANG
+    db 30,Skill__CUT
     db 33,AGILITY ; Exclusive*
     db 37,SKULL_BASH
     db 40,ROCK_THROW
     db 42,SLUDGE
     db 47,BODY_SLAM
+    db 49,Skill__STRENGTH
     db 52,EARTHQUAKE
     db 60,TOXIC
     db 0
 NIDOKING_Learnset:
-    db 16,Skill__FLOAT
-    db 16,Skill__STRENGTH
     db 16,TAIL_WHIP
     db 16,FURY_SWIPES
     db 17,RAGE
     db 18,BITE
     db 20,FOCUS_ENERGY
+    db 20,Skill__FLOAT
     db 21,SLAM
     db 22,THRASH
+    db 22,Skill__STRENGTH
     db 25,HYPER_FANG
+    db 25,Skill__CUT
     db 25,SLASH
     db 27,BODY_SLAM
     db 29,ROCK_THROW
@@ -725,12 +733,12 @@ NIDORAN_M_NoEvo_Learnset:
     db 31,SLAM
     db 36,FOCUS_ENERGY
     db 41,HYPER_FANG
+    db 41,Skill__CUT
     db 46,SKULL_BASH
     db 51,SLUDGE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CLEFAIRY_Learnset:
-    db  1,Skill__HEAL
     db  1,POUND
     db  1,GROWL
     db  7,DEFENSE_CURL ; Exclusive
@@ -748,14 +756,14 @@ CLEFAIRY_Learnset:
     db 32,REST
     db 34,SONICBOOM
     db 37,BODY_SLAM
+    db 40,Skill__FLOAT
     db 42,SOFTBOILED
+    db 42,Skill__HEAL
     db 47,LIGHT_SCREEN
     db 52,REFLECT
     db 57,DOUBLE_EDGE
     db 0
 CLEFABLE_Learnset:
-    db  1,Skill__FLOAT
-    db  1,Skill__HEAL
     db  1,POUND
     db  1,GROWL
     db  1,SWIFT
@@ -774,7 +782,9 @@ CLEFABLE_Learnset:
     db 29,COUNTER
     db 31,REST
     db 34,BODY_SLAM
+    db 36,Skill__FLOAT
     db 39,SOFTBOILED
+    db 39,Skill__HEAL
     db 44,LIGHT_SCREEN
     db 46,ROAR
     db 48,REFLECT
@@ -784,14 +794,15 @@ CLEFABLE_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VULPIX_Learnset:
-    db  1,Skill__LIGHT
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  8,EMBER ; Exclusive
+    db  9,Skill__LIGHT
     db 13,ROAR
     db 17,BITE
     db 19,SMOKESCREEN
     db 21,QUICK_ATTACK ; Exclusive
+    db 23,Skill__DIG
     db 25,DOUBLE_KICK
     db 28,CONFUSE_RAY
     db 30,AGILITY ; Exclusive
@@ -799,6 +810,7 @@ VULPIX_Learnset:
     db 34,POISON_GAS
     db 37,SLAM
     db 40,SMOG
+    db 41,Skill__CUT
     db 42,FLAMETHROWER
     db 47,FIRE_SPIN
     db 52,SLASH
@@ -806,21 +818,21 @@ VULPIX_Learnset:
     db 56,FIRE_BLAST
     db 0
 NINETALES_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__LIGHT
-    db  1,Skill__DIG
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  1,BITE
-    db  8,ROAR
-    db 13,SMOKESCREEN
-    db 17,EMBER
+    db  5,EMBER
+    db  6,Skill__LIGHT
+    db 10,ROAR
+    db 15,SMOKESCREEN
+    db 18,Skill__DIG
     db 20,HYPER_FANG
     db 22,DOUBLE_KICK
     db 25,CONFUSE_RAY
     db 27,POISON_GAS
     db 28,QUICK_ATTACK
     db 31,SLAM
+    db 31,Skill__CUT
     db 32,SMOG
     db 33,FLAMETHROWER
     db 36,SKULL_BASH
@@ -831,6 +843,7 @@ NINETALES_Learnset:
     db 43,FIRE_SPIN
     db 45,SLASH
     db 48,LOVELY_KISS
+    db 48,Skill__HEAL
     db 50,FIRE_BLAST
     db 55,BODY_SLAM
     db 60,NIGHT_SHADE
@@ -844,7 +857,9 @@ VULPIX_Alola_Learnset:
     db 13,ROAR
     db 17,BITE
     db 19,MIST
+    db 20,Skill__FLOAT
     db 21,QUICK_ATTACK ; Exclusive
+    db 23,Skill__DIG
     db 25,DOUBLE_KICK
     db 28,CONFUSE_RAY
     db 30,AGILITY ; Exclusive
@@ -852,6 +867,7 @@ VULPIX_Alola_Learnset:
     db 34,HAZE
     db 37,SLAM
     db 40,SCREECH
+    db 41,Skill__CUT
     db 42,ICE_BEAM
     db 47,TSUNAMI
     db 52,SLASH
@@ -859,21 +875,21 @@ VULPIX_Alola_Learnset:
     db 56,BLIZZARD
     db 0
 NINETALES_Alola_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__FLOAT
-    db  1,Skill__DIG
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  1,BITE
     db  8,ROAR
     db 13,MIST
+    db 16,Skill__FLOAT
     db 17,AURORA_BEAM
+    db 18,Skill__DIG
     db 20,HYPER_FANG
     db 22,DOUBLE_KICK
     db 25,CONFUSE_RAY
     db 27,HAZE
     db 28,QUICK_ATTACK
     db 31,SLAM
+    db 31,Skill__CUT
     db 32,SCREECH
     db 33,ICE_BEAM
     db 36,SKULL_BASH
@@ -884,6 +900,7 @@ NINETALES_Alola_Learnset:
     db 43,TSUNAMI
     db 45,SLASH
     db 48,LOVELY_KISS
+    db 48,Skill__HEAL
     db 50,BLIZZARD
     db 55,BODY_SLAM
     db 60,NIGHT_SHADE
@@ -891,7 +908,6 @@ NINETALES_Alola_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 JIGGLYPUFF_Learnset:
-    db  1,Skill__HEAL
     db  1,POUND
     db  1,SING
     db  7,DEFENSE_CURL ; Exclusive
@@ -909,14 +925,14 @@ JIGGLYPUFF_Learnset:
     db 32,METRONOME
     db 34,SUPERSONIC
     db 37,BODY_SLAM
+    db 40,Skill__FLOAT
     db 42,SOFTBOILED
+    db 42,Skill__HEAL
     db 47,REFLECT
     db 52,LIGHT_SCREEN
     db 57,DOUBLE_EDGE
     db 0
 WIGGLYTUFF_Learnset:
-    db  1,Skill__FLOAT
-    db  1,Skill__HEAL
     db  1,POUND
     db  1,SING
     db  1,SWIFT
@@ -935,7 +951,9 @@ WIGGLYTUFF_Learnset:
     db 29,COUNTER
     db 31,METRONOME
     db 34,BODY_SLAM
+    db 36,Skill__FLOAT
     db 39,SOFTBOILED
+    db 39,Skill__HEAL
     db 44,REFLECT
     db 46,ROAR
     db 48,LIGHT_SCREEN
@@ -959,11 +977,11 @@ ZUBAT_Learnset:
     ;  22,GOLBAT
     db 0
 GOLBAT_Learnset:
-    db 22,Skill__CUT
     db 22,Skill__FLY
     db 22,WING_ATTACK
     db 24,AGILITY
     db 26,RAZOR_WIND
+    db 26,Skill__CUT
     db 27,ABSORB
     db 28,MEGA_DRAIN
     db 30,SONICBOOM
@@ -995,6 +1013,7 @@ ZUBAT_NoEvo_Learnset:
     db 46,HAZE
     db 49,SLUDGE
     db 53,DOUBLE_TEAM
+    db 55,Skill__FLY
     db 57,TOXIC
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -1014,6 +1033,7 @@ GLOOM_Learnset:
     db 21,ACID
     db 25,MEGA_DRAIN
     db 28,SLUDGE
+    db 28,Skill__HEAL
     db 30,LEECH_LIFE ; Exclusive
     db 32,PETAL_DANCE
     db 34,STRING_SHOT
@@ -1029,11 +1049,11 @@ GLOOM_Learnset:
     db 0
 VILEPLUME_Learnset:
     db 21,Skill__CUT
-    db 21,Skill__HEAL
     db 21,ACID
     db 21,MEGA_DRAIN
     db 25,PETAL_DANCE
     db 28,SLUDGE
+    db 28,Skill__HEAL
     db 30,STRING_SHOT
     db 32,SLAM
     db 34,VINE_WHIP
@@ -1043,6 +1063,7 @@ VILEPLUME_Learnset:
     db 41,BIND
     db 42,HAZE
     db 44,SPORE
+    db 46,Skill__LIGHT
     db 49,SOLARBEAM
     db 52,TOXIC
     db 58,NIGHT_SHADE
@@ -1052,14 +1073,15 @@ VILEPLUME_Learnset:
 ODDISH_NoEvo_Learnset:
     db 23,LEECH_LIFE ; Exclusive
     db 27,MEGA_DRAIN
+    db 28,Skill__HEAL
     db 31,RAZOR_LEAF ; Exclusive
     db 35,VINE_WHIP
+    db 36,Skill__CUT
     db 39,SLAM
     db 44,BARRAGE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PARAS_Learnset:
-    db  1,Skill__CUT
     db  1,SCRATCH
     db  1,STUN_SPORE
     db  9,LEECH_SEED
@@ -1069,18 +1091,19 @@ PARAS_Learnset:
     db 15,FURY_SWIPES
     db 17,ABSORB
     db 19,BLADE
+    db 19,Skill__CUT
     db 22,VICEGRIP
     ;  24,PARASECT
     db 0
 PARASECT_Learnset:
-    db 24,Skill__DIG
-    db 24,Skill__HEAL
     db 24,GROWTH
     db 25,PIN_MISSILE
     db 26,CONFUSION
     db 27,SPORE
+    db 27,Skill__HEAL
     db 30,MEGA_DRAIN
     db 32,SLASH
+    db 32,Skill__DIG
     db 33,STRING_SHOT
     db 35,LIGHT_SCREEN
     db 37,BARRAGE
@@ -1096,8 +1119,10 @@ PARAS_NoEvo_Learnset:
     db 27,CONFUSION
     db 29,PIN_MISSILE
     db 33,SPORE
+    db 33,Skill__HEAL
     db 37,MEGA_DRAIN
     db 39,SLASH
+    db 39,Skill__DIG
     db 41,STRING_SHOT
     db 43,LIGHT_SCREEN
     db 47,BARRAGE
@@ -1106,7 +1131,6 @@ PARAS_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VENONAT_Learnset:
-    db  1,Skill__LIGHT
     db  1,TACKLE
     db  1,DISABLE
     db  4,SUPERSONIC
@@ -1117,18 +1141,19 @@ VENONAT_Learnset:
     db 15,LEECH_LIFE
     db 17,HYPNOSIS
     db 19,SONICBOOM
+    db 21,Skill__LIGHT
     db 22,STUN_SPORE
     db 24,ABSORB
     db 26,LIGHT_SCREEN
     db 28,SLEEP_POWDER
+    db 29,Skill__HEAL
     ;  31,VENOMOTH
     db 0
 VENOMOTH_Learnset:
-    db 31,Skill__FLY
-    db 31,Skill__HEAL
     db 31,GUST
     db 31,PIN_MISSILE
     db 31,KINESIS
+    db 31,Skill__FLY
     db 32,STRING_SHOT
     db 33,WHIRLWIND
     db 35,PSYBEAM
@@ -1160,9 +1185,9 @@ VENONAT_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DIGLETT_Learnset:
-    db  1,Skill__DIG
     db  1,SCRATCH
     db  1,GROWL
+    db  3,Skill__DIG
     db  5,SAND_ATTACK
     db  9,TRAPHOLE
     db 13,AGILITY
@@ -1170,13 +1195,13 @@ DIGLETT_Learnset:
     db 21,DOUBLE_TEAM
     db 23,QUICK_ATTACK
     db 25,SLASH
+    db 26,Skill__CUT
     ;  26,DUGTRIO
     db 0
 DUGTRIO_Learnset:
-    db 26,Skill__CUT
-    db 26,Skill__STRENGTH
     db 26,TRI_ATTACK
     db 28,ROCK_THROW
+    db 30,Skill__STRENGTH
     db 31,EARTHQUAKE
     db 36,SCREECH
     db 38,REST
@@ -1252,22 +1277,22 @@ PSYDUCK_Learnset:
     db 21,FURY_SWIPES
     db 23,BUBBLE
     db 25,MEDITATE
+    db 26,Skill__LIGHT
     db 27,SCREECH
     db 29,SUPERSONIC
     db 31,PSYBEAM
     ;  33,GOLDUCK
     db 0
 GOLDUCK_Learnset:
-    db 33,Skill__CUT
     db 33,Skill__FLOAT
-    db 33,Skill__LIGHT
-    db 33,Skill__DIG
     db 33,WATER_GUN
     db 33,BUBBLEBEAM
     db 33,PAY_DAY
     db 35,SLASH
+    db 35,Skill__CUT
     db 37,WATERFALL
     db 39,SONICBOOM
+    db 39,Skill__DIG
     db 42,TSUNAMI
     db 44,FLARE
     db 46,LIGHT_SCREEN
@@ -1291,34 +1316,36 @@ PSYDUCK_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MANKEY_Learnset:
-    db  1,Skill__STRENGTH
     db  1,SCRATCH
     db  1,LEER
     db  8,KARATE_CHOP
     db 10,LOW_KICK
     db 12,FURY_SWIPES
     db 14,FOCUS_ENERGY
+    db 14,Skill__STRENGTH
     db 15,RAGE
     db 17,DOUBLE_TEAM
     db 19,DOUBLE_KICK
     db 21,COMET_PUNCH
+    db 22,Skill__DIG
     db 23,ROLLING_KICK
     db 25,MEGA_PUNCH
     ;  28,PRIMEAPE
     db 0
 PRIMEAPE_Learnset:
-    db 28,Skill__CUT
-    db 28,Skill__DIG
     db 28,STRIKE
     db 30,TRAPHOLE
     db 32,ROCK_THROW
     db 34,SUBMISSION
+    db 36,SLASH
+    db 36,Skill__CUT
     db 37,SEISMIC_TOSS
     db 39,BARRAGE
     db 41,JUMP_KICK
     db 45,THRASH
     db 46,SCREECH
     db 49,COUNTER
+    db 50,Skill__FLOAT
     db 51,MEGA_KICK
     db 55,EARTHQUAKE
     db 58,HI_JUMP_KICK
@@ -1330,21 +1357,23 @@ MANKEY_NoEvo_Learnset:
     db 38,SUBMISSION
     db 42,SEISMIC_TOSS
     db 46,JUMP_KICK
+    db 48,SLASH
+    db 48,Skill__CUT
     db 50,THRASH
     db 54,SCREECH
     db 58,MEGA_KICK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GROWLITHE_Learnset:
-    db  1,Skill__LIGHT
-    db  1,Skill__DIG
     db  1,BITE
     db  1,ROAR
     db  8,EMBER ; Exclusive
+    db  9,Skill__LIGHT
     db 13,LEER
     db 17,HYPER_FANG
     db 19,SMOKESCREEN
     db 21,AGILITY ; Exclusive
+    db 23,Skill__DIG
     db 25,DOUBLE_KICK
     db 28,TAKE_DOWN
     db 30,QUICK_ATTACK ; Exclusive
@@ -1352,6 +1381,7 @@ GROWLITHE_Learnset:
     db 34,POISON_GAS
     db 37,SLAM
     db 40,SMOG
+    db 41,Skill__CUT
     db 42,FLAMETHROWER
     db 47,FIRE_SPIN
     db 52,SUPER_FANG
@@ -1359,21 +1389,21 @@ GROWLITHE_Learnset:
     db 56,FIRE_BLAST
     db 0
 ARCANINE_Learnset:
-    db  1,Skill__STRENGTH
-    db  1,Skill__LIGHT
-    db  1,Skill__DIG
     db  1,BITE
     db  1,ROAR
     db  1,HYPER_FANG
-    db  8,LEER
-    db 13,SMOKESCREEN
-    db 17,EMBER
+    db  5,EMBER
+    db  6,Skill__LIGHT
+    db 10,LEER
+    db 15,SMOKESCREEN
+    db 18,Skill__DIG
     db 20,TAKE_DOWN
     db 22,DOUBLE_KICK
     db 25,TRAPHOLE
     db 27,POISON_GAS
     db 28,AGILITY
     db 31,SLAM
+    db 31,Skill__CUT
     db 32,SMOG
     db 33,FLAMETHROWER
     db 36,SKULL_BASH
@@ -1384,6 +1414,7 @@ ARCANINE_Learnset:
     db 43,FIRE_SPIN
     db 45,SUPER_FANG
     db 48,THRASH
+    db 48,Skill__STRENGTH
     db 50,FIRE_BLAST
     db 55,EARTHQUAKE
     db 60,SOLARBEAM
@@ -1403,10 +1434,10 @@ POLIWAG_Learnset:
     db 19,SLAM
     db 21,BUBBLEBEAM
     db 23,FOCUS_ENERGY
+    db 23,Skill__FLOAT
     ;  25,POLIWHIRL
     db 0
 POLIWHIRL_Learnset:
-    db 25,Skill__FLOAT
     db 25,Skill__STRENGTH
     db 25,KARATE_CHOP
     db 26,DOUBLE_KICK
@@ -1430,7 +1461,6 @@ POLIWHIRL_Learnset:
     db 55,ICE_PUNCH
     db 0
 POLIWRATH_Learnset:
-    db 25,Skill__FLOAT
     db 25,Skill__STRENGTH
     db 25,KARATE_CHOP
     db 25,DOUBLE_KICK
@@ -1512,12 +1542,12 @@ ABRA_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MACHOP_Learnset:
-    db  1,Skill__STRENGTH
     db  1,KARATE_CHOP
     db  1,LEER
     db  9,LOW_KICK
     db 11,COMET_PUNCH
     db 13,FOCUS_ENERGY
+    db 13,Skill__STRENGTH
     db 16,DOUBLE_KICK
     db 18,DOUBLE_TEAM
     db 21,ROLLING_KICK
@@ -1526,25 +1556,23 @@ MACHOP_Learnset:
     ;  28,MACHOKE
     db 0
 MACHOKE_Learnset:
-    db 28,Skill__FLOAT
-    db 28,Skill__DIG
     db 28,STRIKE
     db 31,SUBMISSION
     db 0
 MACHAMP_Learnset:
-    db 28,Skill__FLOAT
-    db 28,Skill__DIG
     db 28,STRIKE
     db 28,SUBMISSION
     db 0
 MACHOKE_MACHAMP_Learnset:
     db 33,SEISMIC_TOSS
     db 35,AGILITY
+    db 36,Skill__DIG
     db 37,JUMP_KICK
     db 40,TRAPHOLE
     db 42,THRASH
     db 44,ROCK_SLIDE
     db 46,COUNTER
+    db 48,Skill__FLOAT
     db 51,MEGA_KICK
     db 55,EARTHQUAKE
     db 58,HI_JUMP_KICK
@@ -1577,6 +1605,7 @@ WEEPINBELL_Learnset:
     db 21,ACID
     db 25,STRING_SHOT
     db 28,SLUDGE
+    db 28,Skill__HEAL
     db 30,ABSORB ; Exclusive
     db 32,RAZOR_LEAF
     db 34,BIND
@@ -1592,11 +1621,11 @@ WEEPINBELL_Learnset:
     db 0
 VICTREEBEL_Learnset:
     db 21,Skill__CUT
-    db 21,Skill__HEAL
     db 21,ACID
     db 21,STRING_SHOT
     db 25,RAZOR_LEAF
     db 28,SLUDGE
+    db 28,Skill__HEAL
     db 30,BIND
     db 32,SLAM
     db 34,ABSORB
@@ -1606,6 +1635,7 @@ VICTREEBEL_Learnset:
     db 41,HYPER_FANG
     db 42,HAZE
     db 44,SPORE
+    db 46,Skill__LIGHT
     db 49,SOLARBEAM
     db 52,TOXIC
     db 58,SUPER_FANG
@@ -1615,15 +1645,15 @@ VICTREEBEL_Learnset:
 BELLSPROUT_NoEvo_Learnset:
     db 23,ABSORB ; Exclusive
     db 27,BIND
+    db 28,Skill__HEAL
     db 31,LEECH_SEED ; Exclusive
     db 35,RAZOR_LEAF
+    db 36,Skill__CUT
     db 39,SLAM
     db 44,PIN_MISSILE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TENTACOOL_Learnset:
-    db  1,Skill__FLOAT
-    db  1,Skill__LIGHT
     db  1,CONSTRICT
     db  1,SUPERSONIC
     db  6,POISON_STING
@@ -1633,17 +1663,19 @@ TENTACOOL_Learnset:
     db 12,DISABLE
     db 14,LEER
     db 15,WATER_GUN
+    db 15,Skill__FLOAT
     db 16,SONICBOOM
     db 18,POISONPOWDER
     db 20,BIND
     db 21,FLASH
+    db 21,Skill__LIGHT
     db 24,ABSORB
     db 26,FLARE
+    db  1,Skill__LIGHT
     db 28,BUBBLEBEAM
     ;  30,TENTACRUEL
     db 0
 TENTACRUEL_Learnset:
-    db 30,Skill__CUT
     db 30,SLUDGE
     db 32,WATERFALL
     db 34,BARRIER
@@ -1653,6 +1685,7 @@ TENTACRUEL_Learnset:
     db 42,MEGA_DRAIN
     db 43,HAZE
     db 45,VINE_WHIP
+    db 45,Skill__CUT
     db 47,HYDRO_PUMP
     db 51,AURORA_BEAM
     db 53,ACID_ARMOR
@@ -1674,19 +1707,19 @@ TENTACOOL_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GEODUDE_Learnset:
-    db  1,Skill__STRENGTH
-    db  1,Skill__DIG
     db  1,TACKLE
     db  1,DEFENSE_CURL
     db  6,POUND
     db  9,DOUBLESLAP
     db 11,SAND_ATTACK
+    db 12,Skill__DIG
     db 13,ROCK_THROW
     db 14,HEADBUTT
     db 15,HARDEN
     db 17,TRAPHOLE
     db 19,MEGA_PUNCH
     db 21,SELFDESTRUCT
+    db 24,Skill__STRENGTH
     ;  25,GRAVELER
     db 0
 GRAVELER_Learnset:
@@ -1723,10 +1756,10 @@ GEODUDE_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PONYTA_Learnset:
-    db  1,Skill__LIGHT
     db  1,TACKLE
     db  1,GROWL
     db  5,TAIL_WHIP
+    db  8,Skill__LIGHT
     db 12,QUICK_ATTACK
     db 10,AGILITY
     db 12,EMBER
@@ -1745,12 +1778,12 @@ PONYTA_Learnset:
     ;  40,RAPIDASH
     db 0
 RAPIDASH_Learnset:
-    db 40,Skill__STRENGTH
     db 40,HORN_ATTACK
     db 40,FURY_ATTACK
     db 40,FIRE_PUNCH
     db 42,RAGE
     db 42,THRASH
+    db 43,Skill__STRENGTH
     db 44,HORN_DRILL
     db 46,DOUBLE_EDGE
     db 50,FIRE_BLAST
@@ -1789,9 +1822,9 @@ SLOWPOKE_Learnset:
     ;  37,SLOWBRO
     db 0
 SLOWBRO_Learnset:
-    db 37,Skill__FLOAT
     db 37,MEGA_PUNCH
     db 37,WITHDRAW
+    db 37,Skill__FLOAT
     db 40,TSUNAMI
     db 42,MIST
     db 46,HYPNOSIS
@@ -1809,9 +1842,9 @@ SLOWPOKE_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MAGNEMITE_Learnset:
-    db  1,Skill__LIGHT
     db  1,TACKLE
     db  1,FLASH
+    db  3,Skill__LIGHT
     db  6,THUNDERSHOCK
     db  8,HARDEN
     db 10,SUPERSONIC
@@ -1821,6 +1854,7 @@ MAGNEMITE_Learnset:
     db 18,SCREECH
     db 21,THUNDERBOLT
     db 24,BLADE
+    db 24,Skill__CUT
     db 26,SWIFT
     db 28,TELEPORT
     ;  30,MAGNETON
@@ -1850,9 +1884,9 @@ MAGNEMITE_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 FARFETCH_D_Learnset:
-    db  1,Skill__CUT
     db  1,BLADE
     db  1,LEER
+    db  3,Skill__CUT
     db  7,PECK
     db  9,WHIRLWIND
     db 11,GUST
@@ -1919,13 +1953,13 @@ DODUO_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SEEL_Learnset:
-    db  1,Skill__FLOAT
     db  1,HEADBUTT
     db  1,GROWL
     db  6,LICK
     db  9,BUBBLE
     db 11,TAIL_WHIP
     db 13,WATER_GUN
+    db 13,Skill__FLOAT
     db 15,DISABLE
     db 17,AURORA_BEAM
     db 19,TAKE_DOWN
@@ -1983,9 +2017,8 @@ GRIMER_Learnset:
     ;  38,MUK
     db 0
 MUK_Learnset:
-    db 38,Skill__FLOAT
-    db 38,Skill__STRENGTH
     db 38,ACID_ARMOR
+    db 38,Skill__FLOAT
     db 41,SWIFT
     db 43,LEECH_LIFE
     db 44,THUNDERPUNCH
@@ -1994,11 +2027,13 @@ MUK_Learnset:
     db 51,TOXIC
     db 54,RECOVER
     db 57,BODY_SLAM
+    db 57,Skill__STRENGTH
     db 60,SUBSTITUTE
     db 0
 GRIMER_NoEvo_Learnset:
     db 39,LEECH_LIFE ; Exclusive
     db 42,ACID_ARMOR
+    db 42,Skill__FLOAT
     db 45,THUNDERPUNCH
     db 47,ABSORB
     db 49,MEGA_DRAIN
@@ -2028,7 +2063,6 @@ SHELLDER_Learnset:
     db 52,SELFDESTRUCT
     db 0
 CLOYSTER_Learnset:
-    db  1,Skill__FLOAT
     db  1,TACKLE
     db  1,WITHDRAW
     db  1,SPIKE_CANNON
@@ -2040,6 +2074,7 @@ CLOYSTER_Learnset:
     db 16,AURORA_BEAM
     db 19,LEER
     db 21,WATER_GUN
+    db 21,Skill__FLOAT
     db 23,MIST
     db 25,SCREECH
     db 27,WATERFALL
@@ -2116,19 +2151,19 @@ GASTLY_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ONIX_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__STRENGTH
-    db  1,Skill__DIG
     db  1,TACKLE
     db  1,SCREECH
+    db  4,Skill__DIG
     db  5,CONSTRICT
     db  8,BIDE
     db  8,RAGE
     db 12,ROCK_THROW
+    db 12,Skill__STRENGTH
     db 14,WRAP
     db 16,SLAM
     db 17,SAND_ATTACK
     db 19,BLADE
+    db 19,Skill__CUT
     db 21,SHARPEN
     db 23,TRAPHOLE
     db 26,HARDEN
@@ -2146,25 +2181,25 @@ ONIX_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ONIX_Crystal_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__FLOAT
-    db  1,Skill__STRENGTH
-    db  1,Skill__DIG
     db  1,TACKLE
     db  1,SCREECH
+    db  4,Skill__DIG
     db  5,CONSTRICT
     db  8,BIDE
     db  8,RAGE
     db 12,ROCK_THROW
+    db 12,Skill__STRENGTH
     db 14,WRAP
     db 16,SLAM
     db 17,SAND_ATTACK
     db 19,BLADE
+    db 19,Skill__CUT
     db 21,SHARPEN
     db 23,TRAPHOLE
     db 26,HARDEN
     db 29,ROCK_SLIDE
     db 31,STRIKE
+    db 33,Skill__FLOAT
     db 34,BODY_SLAM
     db 36,SELFDESTRUCT
     db 39,THRASH
@@ -2219,13 +2254,12 @@ DROWZEE_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KRABBY_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__DIG
     db  1,BUBBLE
     db  1,LEER
     db  6,VICEGRIP
     db  8,SPLASH
     db  9,BLADE
+    db  9,Skill__CUT
     db 11,WATER_GUN
     db 13,CLAMP
     db 15,SAND_ATTACK
@@ -2239,13 +2273,14 @@ KRABBY_Learnset:
     ;  28,KINGLER
     db 0
 KINGLER_Learnset:
-    db 28,Skill__FLOAT
-    db 28,Skill__STRENGTH
     db 28,HAMMER
+    db 28,Skill__DIG
     db 30,FOCUS_ENERGY
     db 32,WATERFALL
+    db 32,Skill__FLOAT
     db 34,SPIKE_CANNON
     db 36,ROCK_THROW
+    db 36,Skill__STRENGTH
     db 38,TRAPHOLE
     db 40,GUILLOTINE
     db 44,HAZE
@@ -2257,9 +2292,12 @@ KINGLER_Learnset:
     db 0
 KRABBY_NoEvo_Learnset:
     db 32,HAMMER
+    db 32,Skill__DIG
     db 35,WATERFALL
+    db 35,Skill__FLOAT
     db 38,SPIKE_CANNON
     db 42,ROCK_THROW
+    db 42,Skill__STRENGTH
     db 46,TRAPHOLE
     db 51,GUILLOTINE
     db 56,HAZE
@@ -2267,11 +2305,11 @@ KRABBY_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VOLTORB_Learnset:
-    db  1,Skill__LIGHT
     db  1,TACKLE
     db  1,SCREECH
     db  6,FLASH
     db  8,DEFENSE_CURL
+    db  9,Skill__LIGHT
     db 10,SONICBOOM
     db 12,LIGHT_SCREEN
     db 14,SUPERSONIC
@@ -2308,12 +2346,12 @@ VOLTORB_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VOLTORB_HISUI_Learnset:
-    db  1,Skill__LIGHT
     db  1,TACKLE
     db  1,GROWTH
     db  7,LEECH_SEED
     db 10,FLASH
     db 12,STUN_SPORE
+    db 12,Skill__LIGHT
     db 14,ABSORB
     db 16,THUNDERSHOCK
     db 17,SELFDESTRUCT
@@ -2330,19 +2368,19 @@ VOLTORB_HISUI_Learnset:
     db 58,SOLARBEAM
     db 0
 ELECTRODE_HISUI_Learnset:
-    db  1,Skill__LIGHT
-    db  1,Skill__HEAL
     db  1,TACKLE
     db  1,GROWTH
     db  6,LEECH_SEED
     db  9,FLASH
     db 11,STUN_SPORE
+    db 11,Skill__LIGHT
     db 13,ABSORB
     db 15,THUNDERSHOCK
     db 16,SELFDESTRUCT
     db 18,QUICK_ATTACK
     db 21,SLEEP_POWDER
     db 24,MEGA_DRAIN
+    db 25,Skill__HEAL
     db 27,SWIFT
     db 30,EXPLOSION
     db 33,THUNDERBOLT
@@ -2359,7 +2397,6 @@ ELECTRODE_HISUI_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 EXEGGCUTE_Learnset:
-    db  1,Skill__HEAL
     db  1,BARRAGE
     db  1,HYPNOSIS
     db  7,PSYWAVE
@@ -2372,6 +2409,7 @@ EXEGGCUTE_Learnset:
     db 27,STUN_SPORE ; Exclusive
     db 29,POISONPOWDER ; Exclusive
     db 31,SLEEP_POWDER ; Exclusive
+    db 32,Skill__HEAL
     db 33,LEECH_LIFE
     db 35,EGG_BOMB
     db 37,STRING_SHOT
@@ -2399,6 +2437,7 @@ EXEGGUTOR_Learnset:
     db 23,EGG_BOMB
     db 25,STRING_SHOT
     db 26,KINESIS
+    db 26,Skill__HEAL
     db 27,GROWTH
     db 29,LEECH_LIFE
     db 32,PSYBEAM
@@ -2417,12 +2456,11 @@ EXEGGUTOR_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CUBONE_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__DIG
     db  1,TACKLE
     db  1,GROWL
     db  5,TAIL_WHIP
     db  7,BONE_CLUB
+    db  7,Skill__DIG
     db  8,SAND_ATTACK
     db 10,TRAPHOLE
     db 12,RAGE
@@ -2432,13 +2470,14 @@ CUBONE_Learnset:
     db 19,FOCUS_ENERGY
     db 21,HEADBUTT
     db 23,BLADE
+    db 23,Skill__CUT
     db 25,BONEMERANG
     db 27,REST
     ;  28,MAROWAK
     db 0
 MAROWAK_Learnset:
-    db 28,Skill__STRENGTH
     db 28,NIGHT_SHADE
+    db 28,Skill__STRENGTH
     db 32,ROCK_THROW
     db 35,EARTHQUAKE
     db 37,MEDITATE
@@ -2453,12 +2492,12 @@ MAROWAK_Learnset:
     db 65,HYPER_BEAM
     db 0
 MAROWAK_Alola_Learnset:
-    db 28,Skill__LIGHT
     db 28,EMBER
     db 28,FLASH
     db 28,CONFUSE_RAY
     db 28,TELEPORT
     db 28,NIGHT_SHADE
+    db 28,Skill__LIGHT
     db 32,FIRE_PUNCH
     db 33,SCREECH
     db 35,HAZE
@@ -2492,12 +2531,11 @@ CUBONE_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HITMONLEE_Learnset:
-    db  1,Skill__FLOAT
-    db  1,Skill__STRENGTH
     db  1,LOW_KICK
     db  1,MEDITATE
     db  6,DOUBLE_KICK
     db  9,FOCUS_ENERGY
+    db  9,Skill__STRENGTH
     db 11,ROLLING_KICK
     db 13,KARATE_CHOP
     db 15,AGILITY
@@ -2516,6 +2554,7 @@ HITMONLEE_Learnset:
     db 37,SUBMISSION
     db 39,HI_JUMP_KICK
     db 42,SEISMIC_TOSS
+    db 44,Skill__FLOAT
     db 47,REST
     db 49,ROCK_SLIDE
     db 52,COUNTER
@@ -2525,12 +2564,11 @@ HITMONLEE_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HITMONCHAN_Learnset:
-    db  1,Skill__FLOAT
-    db  1,Skill__STRENGTH
     db  1,KARATE_CHOP
     db  1,AGILITY
     db  6,COMET_PUNCH
     db  9,FOCUS_ENERGY
+    db  9,Skill__STRENGTH
     db 11,BIDE
     db 13,LOW_KICK
     db 15,MEDITATE
@@ -2549,6 +2587,7 @@ HITMONCHAN_Learnset:
     db 37,SUBMISSION
     db 39,JUMP_KICK
     db 42,SEISMIC_TOSS
+    db 44,Skill__FLOAT
     db 47,ROCK_SLIDE
     db 49,MEGA_KICK
     db 52,COUNTER
@@ -2558,9 +2597,6 @@ HITMONCHAN_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LICKITUNG_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__FLOAT
-    db  1,Skill__HEAL
     db  1,LICK
     db  1,STRING_SHOT
     db  5,SUPERSONIC
@@ -2573,14 +2609,18 @@ LICKITUNG_Learnset:
     db 21,WRAP
     db 23,SONICBOOM
     db 25,STRIKE
+    db 25,Skill__CUT
     db 26,LEECH_LIFE
     db 28,SCREECH
     db 31,REST
     db 34,BODY_SLAM
+    db 34,Skill__FLOAT
     db 37,TSUNAMI
     db 40,MINIMIZE
     db 42,DOUBLE_EDGE
     db 44,SOFTBOILED
+    db 44,Skill__HEAL
+    db 46,Skill__STRENGTH
     db 47,EARTHQUAKE
     db 49,LIGHT_SCREEN
     db 51,LOVELY_KISS
@@ -2589,8 +2629,6 @@ LICKITUNG_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KOFFING_Learnset:
-    db  1,Skill__LIGHT
-    db  1,Skill__FLOAT
     db  1,TACKLE
     db  1,POISON_GAS
     db  9,SMOG
@@ -2601,18 +2639,20 @@ KOFFING_Learnset:
     db 19,SELFDESTRUCT
     db 21,SLUDGE
     db 23,FOCUS_ENERGY
+    db 23,Skill__FLOAT
     db 25,SONICBOOM
     db 27,THUNDERSHOCK
+    db 27,Skill__LIGHT
     db 30,HARDEN
     db 32,SUPERSONIC
     db 34,HAZE
     ;  35,WEEZING
     db 0
 WEEZING_Learnset:
-    db 35,Skill__FLY
     db 35,EXPLOSION
     db 38,FLARE
     db 41,SWIFT
+    db 42,Skill__FLY
     db 43,ABSORB
     db 44,PSYBEAM
     db 46,DISABLE
@@ -2634,20 +2674,20 @@ KOFFING_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RHYHORN_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__STRENGTH
-    db  1,Skill__DIG
     db  1,HORN_ATTACK
     db  1,TAIL_WHIP
     db  5,GROWL
     db  8,HARDEN
     db 10,SAND_ATTACK
     db 11,FURY_ATTACK
+    db 11,Skill__CUT
     db 13,ROCK_THROW
+    db 13,Skill__STRENGTH
     db 15,BONE_CLUB
     db 17,FOCUS_ENERGY
     db 17,RAGE
     db 18,STOMP
+    db 18,Skill__DIG
     db 20,LEER
     db 22,TRAPHOLE
     db 24,SLAM
@@ -2663,11 +2703,11 @@ RHYHORN_Learnset:
     ;  42,RHYDON
     db 0
 RHYDON_Learnset:
-    db 42,Skill__FLOAT
     db 42,MEGA_PUNCH
     db 42,HEADBUTT
     db 42,DIZZY_PUNCH
     db 45,SHARPEN
+    db 45,Skill__FLOAT
     db 49,FISSURE
     db 52,SEISMIC_TOSS
     db 54,HYPER_BEAM
@@ -2685,17 +2725,17 @@ RHYHORN_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CHANSEY_Learnset:
-    db  1,Skill__HEAL
-    db  1,Skill__FLOAT
     db  1,POUND
     db  1,TAIL_WHIP
     db  5,GROWL
     db  8,SOFTBOILED
+    db  8,Skill__HEAL
     db 12,DEFENSE_CURL
     db 14,BIDE
     db 16,DOUBLESLAP
     db 18,DISABLE
     db 20,MINIMIZE
+    db 20,Skill__FLOAT
     db 23,SING
     db 25,SLAM
     db 27,COUNTER
@@ -2712,8 +2752,6 @@ CHANSEY_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TANGELA_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__HEAL
     db  1,CONSTRICT
     db  1,SLEEP_POWDER
     db  8,VINE_WHIP
@@ -2722,7 +2760,9 @@ TANGELA_Learnset:
     db 14,ABSORB
     db 16,POISONPOWDER
     db 17,STUN_SPORE
+    db 17,Skill__HEAL
     db 19,BLADE
+    db 19,Skill__CUT
     db 21,GROWTH
     db 23,LEECH_LIFE
     db 25,MEGA_DRAIN
@@ -2743,8 +2783,6 @@ TANGELA_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KANGASKHAN_Learnset:
-    db  1,Skill__FLOAT
-    db  1,Skill__STRENGTH
     db  1,SCRATCH
     db  1,TAIL_WHIP
     db  7,COMET_PUNCH
@@ -2758,6 +2796,7 @@ KANGASKHAN_Learnset:
     db 21,REST
     db 23,BITE
     db 25,ROCK_THROW
+    db 25,Skill__STRENGTH
     db 27,STOMP
     db 29,MEGA_PUNCH
     db 31,SLAM
@@ -2767,8 +2806,10 @@ KANGASKHAN_Learnset:
     db 39,THRASH
     db 41,SKULL_BASH
     db 43,SLASH
+    db 25,Skill__CUT
     db 45,TAKE_DOWN
     db 47,BODY_SLAM
+    db 47,Skill__FLOAT
     db 49,DOUBLE_EDGE
     db 52,ROCK_SLIDE
     db 56,EARTHQUAKE
@@ -2776,13 +2817,13 @@ KANGASKHAN_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HORSEA_Learnset:
-    db  1,Skill__FLOAT
     db  1,BUBBLE
     db  1,SMOKESCREEN
     db  8,LEER
     db 11,DISABLE
     db 13,SMOG
     db 15,WATER_GUN
+    db 15,Skill__FLOAT
     db 17,MIST
     db 19,LEECH_LIFE
     db 21,SCREECH
@@ -2795,14 +2836,15 @@ HORSEA_Learnset:
     ;  32,SEADRA
     db 0
 SEADRA_Learnset:
-    db 32,Skill__HEAL
     db 32,DRAGON_RAGE
     db 32,SUPERSONIC
     db 34,CONFUSION
     db 36,HAZE
+    db 36,Skill__HEAL
     db 37,AURORA_BEAM
     db 39,POISON_GAS
     db 41,RAZOR_WIND
+    db 41,Skill__CUT
     db 43,TSUNAMI
     db 47,ICE_BEAM
     db 49,STRING_SHOT
@@ -2823,7 +2865,6 @@ HORSEA_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GOLDEEN_Learnset:
-    db  1,Skill__FLOAT
     db  1,SPLASH
     db  1,TAIL_WHIP
     db  7,PECK
@@ -2832,6 +2873,7 @@ GOLDEEN_Learnset:
     db 13,POISON_STING
     db 15,HORN_ATTACK
     db 18,WATERFALL
+    db 18,Skill__FLOAT
     db 20,AGILITY
     db 23,WATER_GUN
     db 26,FURY_ATTACK
@@ -2863,7 +2905,6 @@ GOLDEEN_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 STARYU_Learnset:
-    db  1,Skill__LIGHT
     db  1,TACKLE
     db  1,HARDEN
     db  7,BUBBLE
@@ -2876,6 +2917,7 @@ STARYU_Learnset:
     db 22,TELEPORT
     db 23,RECOVER
     db 25,FLASH
+    db 25,Skill__LIGHT
     db 27,SUPERSONIC ; Exclusive
     db 29,QUICK_ATTACK
     db 32,SWIFT
@@ -2891,8 +2933,6 @@ STARYU_Learnset:
     db 58,BARRIER
     db 0
 STARMIE_Learnset:
-    db  1,Skill__FLOAT
-    db  1,Skill__LIGHT
     db  1,TACKLE
     db  1,HARDEN
     db  1,BUBBLE
@@ -2906,6 +2946,7 @@ STARMIE_Learnset:
     db 18,RECOVER
     db 21,BUBBLEBEAM
     db 23,FLASH
+    db 23,Skill__LIGHT
     db 25,LEECH_LIFE
     db 26,SWIFT
     db 27,QUICK_ATTACK
@@ -2918,6 +2959,7 @@ STARMIE_Learnset:
     db 35,CONFUSE_RAY
     db 36,SCREECH
     db 38,WATERFALL
+    db 38,Skill__FLOAT
     db 40,AURORA_BEAM
     db 42,LIGHT_SCREEN
     db 44,HYPNOSIS
@@ -2936,6 +2978,7 @@ MR_MIME_Learnset:
     db 13,CONFUSION
     db 15,DOUBLESLAP
     db 17,KINESIS
+    db 17,Skill__LIGHT
     db 19,DISABLE
     db 21,MEDITATE
     db 23,MIMIC
@@ -2957,8 +3000,6 @@ MR_MIME_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SCYTHER_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__FLY
     db  1,SCRATCH
     db  1,LEER
     db  7,AGILITY
@@ -2966,12 +3007,14 @@ SCYTHER_Learnset:
     db 11,STRING_SHOT
     db 13,GUST
     db 15,FURY_SWIPES
+    db 15,Skill__CUT
     db 16,RAGE
     db 17,PIN_MISSILE
     db 18,SAND_ATTACK
     db 19,BLADE
     db 20,SHARPEN
     db 21,DOUBLE_TEAM
+    db 22,Skill__FLY
     db 23,WING_ATTACK
     db 25,LEECH_LIFE
     db 26,CONFUSE_RAY
@@ -3033,10 +3076,10 @@ JYNX_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ELECTABUZZ_Learnset:
-    db  1,Skill__LIGHT
     db  1,KARATE_CHOP
     db  1,LEER
     db  5,FLASH
+    db  5,Skill__LIGHT
     db  8,THUNDERSHOCK
     db 10,QUICK_ATTACK
     db 12,THUNDER_WAVE
@@ -3070,11 +3113,11 @@ ELECTABUZZ_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MAGMAR_Learnset:
-    db  1,Skill__LIGHT
     db  1,SCRATCH
     db  1,LEER
     db  5,SMOG
     db  8,EMBER
+    db  8,Skill__LIGHT
     db 10,SMOKESCREEN
     db 12,PECK
     db 13,RAGE
@@ -3107,11 +3150,9 @@ MAGMAR_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PINSIR_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__STRENGTH
-    db  1,Skill__DIG
     db  1,BLADE
     db  1,FOCUS_ENERGY
+    db  3,Skill__CUT
     db  7,VICEGRIP
     db  9,HARDEN
     db 11,STRING_SHOT
@@ -3121,9 +3162,11 @@ PINSIR_Learnset:
     db 17,LEECH_LIFE
     db 18,KARATE_CHOP
     db 19,BONE_CLUB
+    db 19,Skill__DIG
     db 20,COMET_PUNCH
     db 21,CLAMP
     db 23,SHARPEN
+    db 23,Skill__STRENGTH
     db 25,SEISMIC_TOSS
     db 26,LOW_KICK
     db 27,DOUBLE_KICK
@@ -3148,7 +3191,6 @@ PINSIR_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TAUROS_Learnset:
-    db  1,Skill__STRENGTH
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  5,GROWL
@@ -3162,6 +3204,7 @@ TAUROS_Learnset:
     db 19,FOCUS_ENERGY
     db 21,SLAM
     db 23,ROCK_THROW
+    db 23,Skill__STRENGTH
     db 25,REST
     db 26,QUICK_ATTACK
     db 28,DOUBLE_TEAM
@@ -3186,16 +3229,16 @@ MAGIKARP_Learnset:
     ;  20,GYARADOS
     db 0
 GYARADOS_Learnset:
-    db 20,Skill__FLOAT
-    db 20,Skill__STRENGTH
     db 20,BITE
     db 20,GROWL
     db 20,LEER
     db 20,WATER_GUN
     db 20,ROAR
     db 20,HYPER_FANG
+    db 20,Skill__FLOAT
     db 21,FOCUS_ENERGY
     db 21,RAGE
+    db 21,Skill__STRENGTH
     db 22,SLAM
     db 24,WATERFALL
     db 25,WRAP
@@ -3226,10 +3269,9 @@ MAGIKARP_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LAPRAS_Learnset:
-    db  1,Skill__FLOAT
-    db  1,Skill__STRENGTH
     db  1,BUBBLE
     db  1,GROWL
+    db  3,Skill__FLOAT
     db  7,BIDE
     db  9,WATER_GUN
     db 11,SING
@@ -3242,6 +3284,7 @@ LAPRAS_Learnset:
     db 25,WATERFALL
     db 27,SCREECH
     db 29,SKULL_BASH
+    db 29,Skill__STRENGTH
     db 31,BODY_SLAM
     db 33,TSUNAMI
     db 35,THUNDERSHOCK
@@ -3284,14 +3327,13 @@ EEVEE_Learnset:
     db 60,LOVELY_KISS
     db 0
 VAPOREON_Learnset:
-    db  1,Skill__FLOAT
-    db  1,Skill__DIG
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  1,GROWL
     db  1,BUBBLE
     db  6,SAND_ATTACK
     db  8,WATER_GUN
+    db  8,Skill__FLOAT
     db 11,MIST
     db 14,QUICK_ATTACK
     db 16,DOUBLE_KICK
@@ -3304,6 +3346,7 @@ VAPOREON_Learnset:
     db 31,WATERFALL
     db 32,AURORA_BEAM
     db 34,FOCUS_ENERGY
+    db 34,Skill__DIG
     db 37,TSUNAMI
     db 39,HAZE
     db 40,ICE_PUNCH
@@ -3317,14 +3360,13 @@ VAPOREON_Learnset:
     db 60,SUPER_FANG
     db 0
 JOLTEON_Learnset:
-    db  1,Skill__LIGHT
-    db  1,Skill__DIG
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  1,GROWL
     db  1,THUNDERSHOCK
     db  6,SAND_ATTACK
     db  8,SONICBOOM
+    db  8,Skill__LIGHT
     db 11,AGILITY
     db 14,QUICK_ATTACK
     db 16,DOUBLE_KICK
@@ -3337,6 +3379,7 @@ JOLTEON_Learnset:
     db 31,SUPERSONIC
     db 32,PIN_MISSILE
     db 34,FOCUS_ENERGY
+    db 34,Skill__DIG
     db 37,THUNDERBOLT
     db 39,FLASH
     db 40,THUNDERPUNCH
@@ -3350,14 +3393,13 @@ JOLTEON_Learnset:
     db 60,SUPER_FANG
     db 0
 FLAREON_Learnset:
-    db  1,Skill__LIGHT
-    db  1,Skill__DIG
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  1,GROWL
     db  1,EMBER
     db  6,SAND_ATTACK
     db  8,ROAR
+    db  8,Skill__LIGHT
     db 11,LEER
     db 14,QUICK_ATTACK
     db 16,DOUBLE_KICK
@@ -3370,6 +3412,7 @@ FLAREON_Learnset:
     db 31,CONFUSE_RAY
     db 32,FIRE_SPIN
     db 34,FOCUS_ENERGY
+    db 34,Skill__DIG
     db 37,FLAMETHROWER
     db 39,POISON_GAS
     db 40,FIRE_PUNCH
@@ -3384,10 +3427,6 @@ FLAREON_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PORYGON_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__FLY
-    db  1,Skill__LIGHT
-    db  1,Skill__HEAL
     db  1,TACKLE
     db  1,CONVERSION
     db  6,AGILITY
@@ -3398,15 +3437,19 @@ PORYGON_Learnset:
     db 14,SUPERSONIC
     db 15,CONFUSION
     db 17,BLADE
+    db 17,Skill__CUT
     db 19,FLASH
+    db 19,Skill__LIGHT
     db 21,SHARPEN
     db 23,SWIFT
     db 25,RECOVER
+    db 25,Skill__HEAL
     db 27,PSYBEAM
     db 29,DISABLE
     db 30,KINESIS
     db 31,LIGHT_SCREEN
     db 33,THUNDER_WAVE
+    db 34,Skill__FLY
     db 35,BARRIER
     db 38,HYPNOSIS
     db 39,DREAM_EATER
@@ -3421,13 +3464,13 @@ PORYGON_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OMANYTE_Learnset:
-    db  1,Skill__FLOAT
     db  1,CONSTRICT
     db  1,WITHDRAW
     db  8,BUBBLE
     db 11,BITE
     db 13,ROCK_THROW
     db 15,WATER_GUN
+    db 15,Skill__FLOAT
     db 16,DISABLE
     db 17,LEER
     db 18,SONICBOOM
@@ -3448,14 +3491,15 @@ OMANYTE_Learnset:
     ;  40,OMASTAR
     db 0
 OMASTAR_Learnset:
-    db 40,Skill__CUT
-    db 40,Skill__DIG
     db 40,HORN_ATTACK
     db 40,FURY_ATTACK
     db 40,SPIKE_CANNON
+    db 40,Skill__CUT
+    db 40,Skill__DIG
     db 42,ABSORB
     db 43,TRAPHOLE
     db 45,SELFDESTRUCT
+    db 46,Skill__STRENGTH
     db 47,HYDRO_PUMP
     db 49,BODY_SLAM
     db 52,HORN_DRILL
@@ -3466,6 +3510,7 @@ OMASTAR_Learnset:
     db 0
 OMANYTE_NoEvo_Learnset:
     db 43,ABSORB
+    db 44,Skill__DIG
     db 46,TRAPHOLE
     db 49,SELFDESTRUCT
     db 56,HYDRO_PUMP
@@ -3474,7 +3519,6 @@ OMANYTE_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KABUTO_Learnset:
-    db  1,Skill__CUT
     db  1,SCRATCH
     db  1,HARDEN
     db  8,BUBBLE
@@ -3486,6 +3530,7 @@ KABUTO_Learnset:
     db 18,SAND_ATTACK
     db 19,BLADE
     db 19,SHARPEN
+    db 19,Skill__CUT
     db 20,PIN_MISSILE
     db 21,CLAMP
     db 22,STRING_SHOT
@@ -3501,14 +3546,15 @@ KABUTO_Learnset:
     ;  40,KABUTOPS
     db 0
 KABUTOPS_Learnset:
-    db 40,Skill__STRENGTH
-    db 40,Skill__DIG
     db 40,FURY_SWIPES
     db 40,SLASH
     db 40,GUILLOTINE
+    db 40,Skill__DIG
+    db 40,Skill__STRENGTH
     db 42,TSUNAMI
     db 43,TRAPHOLE
     db 45,SWORDS_DANCE
+    db 46,Skill__FLOAT
     db 47,WATERFALL
     db 49,BODY_SLAM
     db 52,CONFUSE_RAY
@@ -3519,6 +3565,7 @@ KABUTOPS_Learnset:
     db 0
 KABUTO_NoEvo_Learnset:
     db 43,SLASH
+    db 44,Skill__DIG
     db 46,TRAPHOLE
     db 49,SWORDS_DANCE
     db 56,WATERFALL
@@ -3527,17 +3574,15 @@ KABUTO_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 AERODACTYL_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__FLY
-    db  1,Skill__STRENGTH
-    db  1,Skill__DIG
     db  1,GUST
     db  1,AGILITY
+    db  3,Skill__FLY
     db  6,WING_ATTACK
     db  8,WHIRLWIND
     db 10,QUICK_ATTACK
     db 11,BITE
     db 13,ROCK_THROW
+    db 13,Skill__STRENGTH
     db 15,SUPERSONIC
     db 17,HYPER_FANG
     db 19,SCREECH
@@ -3545,12 +3590,14 @@ AERODACTYL_Learnset:
     db 23,REST
     db 25,DOUBLE_TEAM
     db 27,RAZOR_WIND
+    db 27,Skill__CUT
     db 29,ROCK_SLIDE
     db 31,FOCUS_ENERGY
     db 32,RAGE
     db 33,DRAGON_RAGE
     db 37,BODY_SLAM
     db 40,TAKE_DOWN
+    db 42,Skill__DIG
     db 44,THRASH
     db 48,FLAMETHROWER
     db 52,EARTHQUAKE
@@ -3560,8 +3607,6 @@ AERODACTYL_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SNORLAX_Learnset:
-    db  1,Skill__FLOAT
-    db  1,Skill__STRENGTH
     db  1,LICK
     db  1,DEFENSE_CURL
     db  6,POUND
@@ -3571,6 +3616,7 @@ SNORLAX_Learnset:
     db 16,REST
     db 18,SLAM
     db 20,ROCK_THROW
+    db 20,Skill__STRENGTH
     db 21,HEADBUTT
     db 22,MEGA_PUNCH
     db 24,BODY_SLAM
@@ -3579,6 +3625,7 @@ SNORLAX_Learnset:
     db 31,STRIKE
     db 32,TAKE_DOWN
     db 34,HARDEN
+    db 34,Skill__FLOAT
     db 36,RAGE
     db 37,ROAR
     db 40,EARTHQUAKE
@@ -3590,16 +3637,16 @@ SNORLAX_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ARTICUNO_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__FLY
-    db  1,Skill__FLOAT
     db  1,GUST
     db  1,MIST
+    db  3,Skill__FLY
+    db  3,Skill__FLOAT
     db  9,PECK
     db 11,BUBBLE
     db 13,WATER_GUN
     db 16,WING_ATTACK
     db 18,WHIRLWIND
+    db 18,Skill__CUT
     db 21,SWOOP
     db 23,HAZE
     db 25,SCREECH
@@ -3624,16 +3671,16 @@ ARTICUNO_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ZAPDOS_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__FLY
-    db  1,Skill__LIGHT
     db  1,GUST
     db  1,FLASH
+    db  3,Skill__FLY
+    db  3,Skill__LIGHT
     db  9,PECK
     db 11,LEER
     db 13,THUNDERSHOCK
     db 16,WING_ATTACK
     db 18,WHIRLWIND
+    db 18,Skill__CUT
     db 21,SWOOP
     db 23,THUNDER_WAVE
     db 25,SCREECH
@@ -3658,16 +3705,16 @@ ZAPDOS_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MOLTRES_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__FLY
-    db  1,Skill__LIGHT
     db  1,GUST
     db  1,LEER
+    db  3,Skill__FLY
+    db  3,Skill__LIGHT
     db  9,PECK
     db 11,SMOKESCREEN
     db 13,EMBER
     db 16,WING_ATTACK
     db 18,WHIRLWIND
+    db 18,Skill__CUT
     db 21,SWOOP
     db 23,POISON_GAS
     db 25,SCREECH
@@ -3692,12 +3739,12 @@ MOLTRES_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DRATINI_Learnset:
-    db  1,Skill__FLOAT
     db  1,CONSTRICT
     db  1,LEER
     db  6,WRAP
     db  8,SUPERSONIC
     db  9,WATER_GUN
+    db  9,Skill__FLOAT
     db 10,THUNDER_WAVE
     db 13,BUBBLEBEAM
     db 15,BITE
@@ -3712,16 +3759,17 @@ DRATINI_Learnset:
     ;  30,DRAGONAIR
     db 0
 DRAGONAIR_Learnset:
-    db 30,Skill__FLY
-    db 30,Skill__DIG
     db 30,HORN_ATTACK
     db 30,FURY_ATTACK
     db 30,GUST
     db 32,HYPER_FANG
     db 34,LIGHT_SCREEN
     db 36,SKULL_BASH
+    db 37,Skill__DIG
     db 38,HAZE
     db 40,RAZOR_WIND
+    db 40,Skill__CUT
+    db 40,Skill__FLY
     db 41,TRAPHOLE
     db 43,ICE_BEAM
     db 44,FLAMETHROWER
@@ -3733,7 +3781,6 @@ DRAGONAIR_Learnset:
     ;  55,DRAGONITE
     db 0
 DRAGONITE_Learnset:
-    db 55,Skill__CUT
     db 55,Skill__STRENGTH
     db 55,SWOOP
     db 56,HYDRO_PUMP
@@ -3762,24 +3809,23 @@ DRAGONAIR_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MEWTWO_Learnset:
-    db  1,Skill__CUT
-    db  1,Skill__FLY
-    db  1,Skill__STRENGTH
-    db  1,Skill__LIGHT
     db  1,CONFUSION
     db  1,DISABLE
     db  4,RAGE
     db  7,REFLECT
+    db  7,Skill__LIGHT
     db  8,PSYWAVE
     db 10,TELEPORT
     db 14,KINESIS
     db 16,PSYBEAM
     db 18,AMNESIA
     db 20,MEDITATE
+    db 20,Skill__FLY
     db 22,LIGHT_SCREEN
     db 25,SUPERSONIC
     db 28,PSYCHIC_M
     db 30,SWIFT
+    db 30,Skill__CUT
     db 33,RECOVER
     db 34,HYPNOSIS
     db 38,DREAM_EATER
@@ -3787,6 +3833,7 @@ MEWTWO_Learnset:
     db 42,HAZE
     db 44,SUBSTITUTE
     db 46,ROCK_THROW
+    db 46,Skill__STRENGTH
     db 48,BARRIER
     db 50,NIGHT_SHADE
     db 53,THUNDERBOLT
@@ -3805,6 +3852,7 @@ MEW_Learnset:
     db  1,Skill__FLOAT
     db  1,Skill__STRENGTH
     db  1,Skill__LIGHT
+    db  1,TELEPORT
     db  1,Skill__DIG
     db  1,Skill__HEAL
     db  1,TRANSFORM
@@ -3817,13 +3865,13 @@ MEW_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LITWICK_Learnset:
-    db  1,Skill__LIGHT
     db  1,SMOG
     db  1,MINIMIZE
     db  5,TELEPORT
     db  7,DEFENSE_CURL
     db  9,EMBER
     db 11,FLASH
+    db 11,Skill__LIGHT
     db 13,CONFUSE_RAY
     db 15,SMOKESCREEN
     db 17,NIGHT_SHADE
