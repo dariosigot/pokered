@@ -58,11 +58,6 @@ SetTempIV:
     pop af
     ret
 
-SECTION "SkillTestByte",ROM0[$4f]
-
-SkillTestByte: ; $004f
-    db %00000001
-
 SECTION "timer",ROM0[$50]
     jp TimerHandler
 SECTION "serial",ROM0[$58]
@@ -92242,9 +92237,7 @@ SilphCo1Script: ; 5d44e (17:544e)
 SilphCo1TextPointers: ; 5d469 (17:5469)
     dw SilphCo1Text1
 
-SilphCo1Text1: ; 5d46b (17:546b)
-    TX_FAR _SilphCo1Text1
-    db "@"
+SECTION "SilphCo1Object",ROMX[$5470],BANK[$17]
 
 SilphCo1Object: ; 0x5d470 (size=50)
     db $2e ; border tile
@@ -93791,6 +93784,42 @@ Route2GateText1:
     db "@"
 .HM05AfterText
     TX_FAR _HM05AfterText
+    db "@"
+
+; ───────────────────────────────────────────
+
+SilphCo1Text1:
+    db $08 ; asm
+    ld a,[HEAL_FLAG_BYTE]
+    bit HEAL_FLAG_BIT,a
+    ld hl,.HM08AfterText
+    jr nz,.done
+    ld hl,.PreHM08Text
+    call PrintText
+    ld bc,(HM_08 << 8) | 1
+    call FakeGiveItem
+    ld hl,HEAL_FLAG_BYTE
+    set HEAL_FLAG_BIT,[hl]
+    ld b,HEAL_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM08SkillFoundText
+    jr c,.done
+    ld hl,.HM08SkillNotFoundText
+.done
+    call PrintText
+    jp TextScriptEnd
+
+.PreHM08Text
+    TX_FAR _PreHM08Text
+    db "@"
+.HM08SkillFoundText
+    TX_FAR _HM08SkillFoundText
+    db "@"
+.HM08SkillNotFoundText
+    TX_FAR _HM08SkillNotFoundText
+    db "@"
+.HM08AfterText
+    TX_FAR _SilphCo1Text1
     db "@"
 
 ; ───────────────────────────────────────────
@@ -130491,6 +130520,24 @@ _TryUseAnotherRepelText_LessThan10:
     db $0," (",$F1," @"
     TX_NUM wTmpRepelQty,1,2
     db $0,")?",$57
+
+_PreHM08Text:
+    db $0
+    db "Thank you so much",$4f
+    db "for your help!",$51
+    db "My dream was to",$4f
+    db "work in a #MON",$55
+    db "CENTER!",$51
+    db "I'm good at",$4f
+    db "healing #MON.",$51
+    db "But...",$51
+    db "C'est la vie... ",$51
+    db "You are a",$4f
+    db "special trainer!",$51
+    db "If I taught you",$4f
+    db "my SKILL you",$55
+    db "wouldn't need any",$55
+    db "support anymore!",$58
 
 SECTION "bank29",ROMX,BANK[$29]
 
