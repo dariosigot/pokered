@@ -6,7 +6,6 @@ MissingNo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 BULBASAUR_Learnset:
-    db  1,Skill__CUT
     db  1,TACKLE
     db  1,GROWL
     db  8,LEECH_SEED
@@ -21,6 +20,7 @@ IVYSAUR_Learnset:
     db 20,LEECH_LIFE
     db 21,SMOG
     db 23,RAZOR_LEAF
+    db 23,Skill__CUT
     db 25,SLAM
     db 27,ACID
     db 28,STRING_SHOT
@@ -29,14 +29,14 @@ IVYSAUR_Learnset:
     ;  32,VENUSAUR
     db 0
 VENUSAUR_Learnset:
-    db 32,Skill__STRENGTH
-    db 32,Skill__HEAL
     db 32,ABSORB
     db 32,PETAL_DANCE
     db 36,STOMP
+    db 36,Skill__STRENGTH
     db 37,BARRAGE
     db 38,GROWTH
     db 39,HAZE
+    db 39,Skill__HEAL
     db 40,SLEEP_POWDER
     db 42,BODY_SLAM
     db 44,SLUDGE
@@ -51,6 +51,7 @@ BULBASAUR_NoEvo_Learnset:
     db 17,LEECH_LIFE ; Exclusive
     db 22,DOUBLE_KICK
     db 25,RAZOR_LEAF
+    db 25,Skill__CUT
     db 29,SLAM
     db 31,BARRAGE ; Exclusive
     db 35,STUN_SPORE
@@ -59,6 +60,7 @@ BULBASAUR_NoEvo_Learnset:
     db 44,GROWTH
     db 49,SLEEP_POWDER
     db 52,HAZE
+    db 52,Skill__HEAL
     db 54,SOLARBEAM
     db 0
 IVYSAUR_NoEvo_Learnset:
@@ -67,6 +69,7 @@ IVYSAUR_NoEvo_Learnset:
     db 38,ABSORB
     db 42,GROWTH
     db 44,HAZE
+    db 44,Skill__HEAL
     db 46,SLEEP_POWDER
     db 49,SLUDGE
     db 54,SOLARBEAM
@@ -74,38 +77,38 @@ IVYSAUR_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CHARMANDER_Learnset:
-    db  1,Skill__LIGHT
     db  1,SCRATCH
     db  1,GROWL
     db  8,EMBER
+    db  9,Skill__LIGHT
     db 10,LEER
     db 13,FURY_SWIPES
     ;  16,CHARMELEON
     db 0
 CHARMELEON_Learnset:
-    db 16,Skill__CUT
-    db 16,Skill__DIG
     db 16,FOCUS_ENERGY
     db 18,RAGE
     db 19,SMOKESCREEN
     db 22,FIRE_PUNCH
     db 23,QUICK_ATTACK
     db 24,POISON_GAS
+    db 25,Skill__DIG
     db 26,TRAPHOLE
     db 28,MEGA_PUNCH
     db 30,SMOG
     db 32,SLASH
+    db 32,Skill__CUT
     db 34,FLAMETHROWER
     ;  36,CHARIZARD
     db 0
 CHARIZARD_Learnset:
     db 36,Skill__FLY
-    db 36,Skill__STRENGTH
     db 36,WING_ATTACK
     db 36,SWOOP
     db 39,DRAGON_RAGE
     db 40,AGILITY
     db 41,SEISMIC_TOSS
+    db 41,Skill__STRENGTH
     db 42,HYPER_FANG
     db 44,FIRE_SPIN
     db 46,SLAM
@@ -123,7 +126,9 @@ CHARMANDER_NoEvo_Learnset:
     db 24,SMOKESCREEN
     db 26,FIRE_PUNCH
     db 30,AGILITY ; Exclusive
+    db 30,Skill__DIG
     db 35,SLASH
+    db 38,Skill__CUT
     db 40,FLAMETHROWER
     db 43,POISON_GAS
     db 45,SLAM ; Exclusive
@@ -136,6 +141,7 @@ CHARMELEON_NoEvo_Learnset:
     db 38,SLAM ; Exclusive
     db 41,DRAGON_RAGE
     db 44,SEISMIC_TOSS
+    db 44,Skill__STRENGTH
     db 46,FIRE_SPIN
     db 48,HYPER_FANG
     db 51,LIGHT_SCREEN
@@ -144,16 +150,15 @@ CHARMELEON_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SQUIRTLE_Learnset:
-    db  1,Skill__FLOAT
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  8,BUBBLE
     db 10,PECK
     db 13,DOUBLESLAP
+    db 15,Skill__FLOAT
     ;  16,WARTORTLE
     db 0
 WARTORTLE_Learnset:
-    db 16,Skill__DIG
     db 16,WATER_GUN
     db 18,WITHDRAW
     db 19,SAND_ATTACK
@@ -161,6 +166,7 @@ WARTORTLE_Learnset:
     db 22,SONICBOOM
     db 23,WATERFALL
     db 25,SCREECH
+    db 26,Skill__DIG
     db 28,TRAPHOLE
     db 31,BUBBLEBEAM
     db 33,HAZE
@@ -191,6 +197,7 @@ SQUIRTLE_NoEvo_Learnset:
     db 22,WITHDRAW
     db 24,BITE
     db 29,SUPERSONIC ; Exclusive
+    db 31,Skill__DIG
     db 34,TRAPHOLE
     db 39,BUBBLEBEAM
     db 41,WATERFALL
@@ -203,6 +210,7 @@ WARTORTLE_NoEvo_Learnset:
     db 37,SUPERSONIC ; Exclusive
     db 38,HEADBUTT ; Exclusive
     db 42,TSUNAMI
+    db 44,Skill__STRENGTH
     db 46,MIST
     db 48,REST
     db 50,SKULL_BASH
@@ -221,14 +229,13 @@ METAPOD_Learnset:
     ;  10,BUTTERFREE
     db 0
 BUTTERFREE_Learnset:
-    db 10,Skill__FLY
-    db 10,Skill__HEAL
     db 10,CONFUSION
     db 11,TELEPORT
     db 12,DISABLE
     db 13,POISONPOWDER
     db 14,STUN_SPORE
     db 15,SLEEP_POWDER
+    db 16,Skill__HEAL
     db 17,PSYWAVE
     db 18,GUST
     db 19,ABSORB
@@ -239,6 +246,7 @@ BUTTERFREE_Learnset:
     db 26,SCREECH
     db 27,WHIRLWIND
     db 31,PSYBEAM
+    db 32,Skill__FLY
     db 33,PIN_MISSILE
     db 36,RAZOR_WIND
     db 38,AGILITY
@@ -246,6 +254,7 @@ BUTTERFREE_Learnset:
     db 43,REFLECT
     db 45,MEGA_DRAIN
     db 48,PSYCHIC_M
+    db 49,Skill__LIGHT
     db 51,SWOOP
     db 55,BARRIER
     db 60,SKY_ATTACK
@@ -273,12 +282,11 @@ KAKUNA_Learnset:
     ;  10,BEEDRILL
     db 0
 BEEDRILL_Learnset:
-    db 10,Skill__CUT
-    db 10,Skill__FLY
     db 10,TWINEEDLE
     db 11,LEER
     db 12,RAGE
     db 13,BLADE
+    db 13,Skill__CUT
     db 14,FOCUS_ENERGY
     db 15,FURY_ATTACK
     db 18,POISONPOWDER
@@ -290,6 +298,7 @@ BEEDRILL_Learnset:
     db 26,GUST
     db 27,DOUBLE_TEAM
     db 30,PIN_MISSILE
+    db 31,Skill__FLY
     db 32,WHIRLWIND
     db 34,AGILITY
     db 37,SLAM
@@ -331,11 +340,11 @@ PIDGEOTTO_Learnset:
     db 21,WHIRLWIND
     db 24,SWOOP
     db 28,RAZOR_WIND
+    db 30,Skill__CUT
     db 33,FURY_ATTACK
     ;  36,PIDGEOT
     db 0
 PIDGEOT_Learnset:
-    db 36,Skill__CUT
     db 36,DOUBLE_TEAM
     db 40,AGILITY
     db 43,DRILL_PECK
@@ -351,6 +360,7 @@ PIDGEY_NoEvo_Learnset:
     db 28,SWOOP
     db 32,RAZOR_WIND
     db 35,FURY_ATTACK
+    db 38,Skill__FLY
     db 40,DOUBLE_TEAM
     db 45,AGILITY
     db 50,MIRROR_MOVE
@@ -374,12 +384,12 @@ RATTATA_Learnset:
     db  8,FURY_SWIPES
     db 10,QUICK_ATTACK
     db 13,BITE
+    db 14,Skill__DIG
     db 15,HYPER_FANG
     db 17,DEFENSE_CURL
     ;  20,RATICATE
     db 0
 RATICATE_Learnset:
-    db 20,Skill__DIG
     db 20,TRAPHOLE
     db 24,FOCUS_ENERGY
     db 27,REST
@@ -390,6 +400,7 @@ RATICATE_Learnset:
     db 40,AGILITY
     db 42,SUPER_FANG
     db 47,BODY_SLAM
+    db 49,Skill__STRENGTH
     db 51,DOUBLE_EDGE
     db 56,EARTHQUAKE
     db 60,HYPER_BEAM
@@ -418,11 +429,11 @@ SPEAROW_Learnset:
     ;  20,FEAROW
     db 0
 FEAROW_Learnset:
-    db 20,Skill__CUT
     db 20,Skill__FLY
     db 20,SWOOP
     db 25,MIRROR_MOVE
     db 28,RAZOR_WIND
+    db 28,Skill__CUT
     db 31,SCREECH
     db 34,DRILL_PECK
     db 36,AGILITY
@@ -438,6 +449,7 @@ SPEAROW_NoEvo_Learnset:
     db 26,SWOOP
     db 31,MIRROR_MOVE
     db 34,RAZOR_WIND
+    db 35,Skill__FLY
     db 36,AGILITY
     db 41,SCREECH
     db 46,DRILL_PECK
@@ -1185,7 +1197,6 @@ DIGLETT_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MEOWTH_Learnset:
-    db  1,Skill__LIGHT
     db  1,SCRATCH
     db  1,GROWL
     db  5,TAIL_WHIP
@@ -1197,14 +1208,15 @@ MEOWTH_Learnset:
     db 21,SLAM
     db 24,SCREECH
     db 26,FLARE
+    db 26,Skill__LIGHT
     ;  28,PERSIAN
     db 0
 PERSIAN_Learnset:
-    db 28,Skill__CUT
     db 28,Skill__DIG
     db 28,HYPER_FANG
     db 29,REST
     db 32,SLASH
+    db 32,Skill__CUT
     db 34,AGILITY
     db 36,TAKE_DOWN
     db 41,DOUBLE_TEAM
@@ -1219,6 +1231,7 @@ MEOWTH_NoEvo_Learnset:
     db 34,REST
     db 39,SLASH
     db 41,AGILITY
+    db 41,Skill__CUT
     db 43,TAKE_DOWN
     db 45,KINESIS ; Exclusive*
     db 48,DOUBLE_TEAM
@@ -1838,17 +1851,17 @@ MAGNEMITE_NoEvo_Learnset:
 ; ──────────────────────────────────────────────────────────────────────
 FARFETCH_D_Learnset:
     db  1,Skill__CUT
-    db  1,Skill__FLY
-    db  1,Skill__FLOAT
     db  1,BLADE
     db  1,LEER
     db  7,PECK
     db  9,WHIRLWIND
     db 11,GUST
     db 13,SHARPEN
+    db 14,Skill__FLOAT
     db 15,FURY_ATTACK
     db 18,SAND_ATTACK
     db 20,QUICK_ATTACK
+    db 21,Skill__FLY
     db 23,SWORDS_DANCE
     db 25,WING_ATTACK
     db 27,HEADBUTT
@@ -1867,7 +1880,6 @@ FARFETCH_D_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DODUO_Learnset:
-    db  1,Skill__CUT
     db  1,PECK
     db  1,LEER
     db  5,GROWL
@@ -1877,6 +1889,7 @@ DODUO_Learnset:
     db 13,QUICK_ATTACK
     db 16,LOW_KICK
     db 18,STOMP
+    db 19,Skill__CUT
     db 21,SCREECH
     db 25,SLAM
     db 27,DOUBLE_KICK
