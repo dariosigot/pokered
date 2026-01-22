@@ -76480,7 +76480,7 @@ Route24Object: ; 0x506a4 (size=67)
 
     db $8 ; people
     db SPRITE_BLACK_HAIR_BOY_1,$f + 4,$b + 4,$ff,$d2,$41,ROCKET,$6 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$14 + 4,$5 + 4,$ff,$d1,$42,JR__TRAINER_M,$2 ; trainer
+    db SPRITE_BUG_CATCHER,$14 + 4,$5 + 4,$ff,$d1,$42,PSYCHIC_TR,$5 ; trainer
     db SPRITE_BLACK_HAIR_BOY_1,$13 + 4,$b + 4,$ff,$d2,$43,JR__TRAINER_M,$3 ; trainer
     db SPRITE_LASS,$16 + 4,$b + 4,$ff,$d2,$44,LASS,$7 ; trainer
     db SPRITE_BUG_CATCHER,$19 + 4,$b + 4,$ff,$d2,$45,YOUNGSTER,$4 ; trainer
@@ -77791,7 +77791,7 @@ Func_513c0: ; 513c0 (14:53c0)
 Route24ScriptPointers: ; 513cb (14:53cb)
     dw Route24Script0
     dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+    dw Route24Script2
     dw Route24Script3
     dw Route24Script4
 
@@ -78035,9 +78035,7 @@ Route24EndBattleText1: ; 51576 (14:5576)
     TX_FAR _Route24EndBattleText1
     db "@"
 
-Route24AfterBattleText1: ; 5157b (14:557b)
-    TX_FAR _Route24AfterBattleText1
-    db "@"
+SECTION "Route24BattleText2",ROMX[$5580],BANK[$14]
 
 Route24BattleText2: ; 51580 (14:5580)
     TX_FAR _Route24BattleText2
@@ -80884,6 +80882,55 @@ SilphCo7Script0:
     db $FF
 .MovementData_51c7d
     db $40,$40,$40,$40,$FF
+
+Route24Script2:
+    call EndTrainerBattle
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $ff
+    jr z,.ResetScript
+    ld a,[$cf13]
+    cp $02 ; Is Psychic end Battle?
+    ret nz
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    jp DisplayTextID
+.ResetScript
+    xor a
+    ld [W_MTMOON1CURSCRIPT],a
+    ret
+
+Route24AfterBattleText1:
+    db $08 ; asm
+    ld a,[TELEPORT_FLAG_BYTE]
+    bit TELEPORT_FLAG_BIT,a
+    ld hl,.HM06AfterText
+    jr nz,.done
+    ld hl,.PreHM06Text
+    call PrintText
+    ld bc,(HM_06 << 8) | 1
+    call FakeGiveItem
+    ld hl,TELEPORT_FLAG_BYTE
+    set TELEPORT_FLAG_BIT,[hl]
+    ld b,TELEPORT_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM06SkillFoundText
+    jr c,.done
+    ld hl,.HM06SkillNotFoundText
+.done
+    call PrintText
+    jp TextScriptEnd
+
+.PreHM06Text
+    TX_FAR _PreHM06Text
+    db "@"
+.HM06SkillFoundText
+    TX_FAR _HM06SkillFoundText
+    db "@"
+.HM06SkillNotFoundText
+    TX_FAR _HM06SkillNotFoundText
+    db "@"
+.HM06AfterText
+    TX_FAR _Route24AfterBattleText1
+    db "@"
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -126911,6 +126958,15 @@ _OaksLabTextTM2:
     db "a new technique,",$55
     db "pick the #MON",$55
     db "carefully!",$58
+
+_PreHM06Text:
+    db $0,"I hid because the",$4f
+    db "people on the",$55
+    db "bridge scared me!",$51
+    db "My special ability",$4f
+    db "is fast retreat!",$55
+    db "I can teach it to",$55
+    db "you if you want!",$58
 
 SECTION "bank26",ROMX,BANK[$26]
 

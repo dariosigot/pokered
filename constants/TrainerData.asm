@@ -109,7 +109,7 @@ SailorData:
 JrTrainerMData:
 ; Pewter Gym
     db 11,DIGLETT,SANDSHREW,0
-; Route 24/Route 25
+; Route 25
     db 14,RATTATA,EKANS,0
 ; Route 24
     db 18,MANKEY,0
@@ -343,6 +343,7 @@ PsychicData:
     db 34,MR_MIME,KADABRA,0
     db $FF,33,SLOWPOKE,33,SLOWPOKE,37,SLOWBRO,0
     db 38,SLOWBRO,0
+    db 15,ABRA,0
 
 RockerData:
 ; Vermilion Gym
