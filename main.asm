@@ -97888,7 +97888,7 @@ SSAnne7Text1:
     ld a,$2
     ld [$c0ef],a
 .skip
-    ld b,3
+    ld b,2
 .loop
     ld a,$9c ; $e8
     ld [$c0ee],a
@@ -97901,7 +97901,9 @@ SSAnne7Text1:
     call DelayFrames
     dec b
     jr nz,.loop
-    call PlayDefaultMusic
+    ld c,$60
+    call DelayFrames
+    ;call PlayDefaultMusic
     ld hl,$d803
     set 1,[hl]
     ld hl,$d72d
@@ -118843,16 +118845,10 @@ _PreHM01Text: ; 81347 (20:5347)
     db $0,"CAPTAIN: Whew!",$4f
     db "Thank you! I",$55
     db "feel much better!",$51
-    db "You want to see",$4f
-    db "my CUT technique?",$51
-    db "I could show you",$4f
-    db "if I wasn't ill...",$51
-    db "I know! You can",$4f
-    db "have this!",$51
-    db "Teach it to your",$4f
-    db "#MON and you",$55
-    db "can see it CUT",$55
-    db "any time!",$58
+    db "To thank you I",$4f
+    db "want to teach you",$55
+    db "and your #MON",$55
+    db "my CUT SKILL!",$58
 
 _HM01AfterText:
     db $0,"CAPTAIN: Whew!",$51
@@ -122659,10 +122655,21 @@ _LearnSkillText:
     db $0," SKILL!@@"
 
 _HM01SkillFoundText:
-    db $0,"Found!@@"
+    db $0,"Now #MON and",$4f
+    db "you can see it",$55
+    db "CUT any time!",$51
+    db "You're Ready!@@"
 
 _HM01SkillNotFoundText:
-    db $0,"NOT Found!@@"
+    db $0,"Hmmm... I think",$4f
+    db "your team is",$55
+    db "missing a #MON",$55
+    db "with this SKILL!",$51
+    db "..But I'm sure",$4f
+    db "you'll be able to",$55
+    db "figure out who",$55
+    db "can learn it.",$51
+    db "Make good use!@@"
 
 _HM02SkillFoundText:
     db $0,"Found!@@"
@@ -132970,7 +132977,7 @@ LearnSkill:
     jp SearchSkillInParty
 .LearnSkill
     TX_FAR _LearnSkillText
-    db $10,"@"
+    db $10,$0,$58,"@"
 
 .Animation
     call GBFadeOut2
