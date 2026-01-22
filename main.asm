@@ -95993,68 +95993,7 @@ SSAnne7TextPointers: ; 618a7 (18:58a7)
     dw SSAnne7Text2
     dw SSAnne7Text3
 
-SSAnne7Text1:
-    db $08 ; asm
-    ld a,[CUT_FLAG_BYTE]
-    bit CUT_FLAG_BIT,a
-    ld hl,.HM01AfterText
-    jr nz,.done
-    ld hl,.SSAnne7RubText
-    call PrintText
-    ld hl,.PreHM01Text
-    call PrintText
-    ld bc,(HM_01 << 8) | 1
-    call FakeGiveItem
-    ld hl,CUT_FLAG_BYTE
-    set CUT_FLAG_BIT,[hl]
-    ld b,CUT_SKILL_SORT
-    PREDEF LearnSkill
-    ld hl,.HM01SkillFoundText
-    jr c,.done
-    ld hl,.HM01SkillNotFoundText
-.done
-    call PrintText
-    jp TextScriptEnd
-
-.SSAnne7RubText
-    TX_FAR _SSAnne7RubText
-    db $8
-    ld a,[$c0ef]
-    cp $1f
-    ld [$c0f0],a
-    jr nz,.skip
-    ld a,$ff
-    ld [$c0ee],a
-    call PlaySound
-    ld a,$2
-    ld [$c0ef],a
-.skip
-    ld a,$e8
-    ld [$c0ee],a
-    call PlaySound
-.WaitLoop
-    ld a,[$c026]
-    cp $e8
-    jr z,.WaitLoop
-    call PlayDefaultMusic
-    ld hl,$d803
-    set 1,[hl]
-    ld hl,$d72d
-    res 5,[hl]
-    jp TextScriptEnd
-
-.PreHM01Text
-    TX_FAR _PreHM01Text
-    db "@"
-.HM01SkillFoundText
-    TX_FAR _HM01SkillFoundText
-    db "@"
-.HM01SkillNotFoundText
-    TX_FAR _HM01SkillNotFoundText
-    db "@"
-.HM01AfterText
-    TX_FAR _HM01AfterText
-    db "@"
+; Free
 
 SECTION "SSAnne7Text2",ROMX[$593c],BANK[$18]
 
@@ -97910,6 +97849,77 @@ PokemonTower6Script2:
     xor a
     ld [W_POKEMONTOWER6CURSCRIPT],a
     ret
+
+; ───────────────────────────────────────
+
+SSAnne7Text1:
+    db $08 ; asm
+    ld a,[CUT_FLAG_BYTE]
+    bit CUT_FLAG_BIT,a
+    ld hl,.HM01AfterText
+    jr nz,.done
+    ld hl,.SSAnne7RubText
+    call PrintText
+    ld hl,.PreHM01Text
+    call PrintText
+    ld bc,(HM_01 << 8) | 1
+    call FakeGiveItem
+    ld hl,CUT_FLAG_BYTE
+    set CUT_FLAG_BIT,[hl]
+    ld b,CUT_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM01SkillFoundText
+    jr c,.done
+    ld hl,.HM01SkillNotFoundText
+.done
+    call PrintText
+    jp TextScriptEnd
+
+.SSAnne7RubText
+    TX_FAR _SSAnne7RubText
+    db $8
+    ld a,[$c0ef]
+    cp $1f
+    ld [$c0f0],a
+    jr nz,.skip
+    ld a,$ff
+    ld [$c0ee],a
+    call PlaySound
+    ld a,$2
+    ld [$c0ef],a
+.skip
+    ld b,3
+.loop
+    ld a,$9c ; $e8
+    ld [$c0ee],a
+    call PlaySound
+.WaitLoop
+    ld a,[$c026]
+    cp $9c ; $e8
+    jr z,.WaitLoop
+    ld c,$30
+    call DelayFrames
+    dec b
+    jr nz,.loop
+    call PlayDefaultMusic
+    ld hl,$d803
+    set 1,[hl]
+    ld hl,$d72d
+    res 5,[hl]
+    jp TextScriptEnd
+
+.PreHM01Text
+    TX_FAR _PreHM01Text
+    db "@"
+.HM01SkillFoundText
+    TX_FAR _HM01SkillFoundText
+    db "@"
+.HM01SkillNotFoundText
+    TX_FAR _HM01SkillNotFoundText
+    db "@"
+.HM01AfterText
+    TX_FAR _HM01AfterText
+    db "@"
 
 ; ───────────────────────────────────────
 
