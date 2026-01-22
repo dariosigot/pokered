@@ -88,8 +88,11 @@ HM_02         EQU $55 ; FLY      ; Ex AIR POWER
 HM_03         EQU $56 ; FLOAT    ; Ex WATER POWER
 HM_04         EQU $57 ; STRENGTH ; Ex EARTH POWER
 HM_05         EQU $58 ; LIGHT    ; Ex FIRE POWER
+HM_06         EQU $59 ; TELEPORT
+HM_07         EQU $5A ; DIG
+HM_08         EQU $5B ; HEAL
 
-ITEM_END_LIST EQU $59 ; End of List
+ITEM_END_LIST EQU $5C ; End of List
 
 TM_01         EQU $BF
 TM_02         EQU $C0

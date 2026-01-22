@@ -75857,36 +75857,70 @@ MtMoon1Script2:
     ld [W_MTMOON1CURSCRIPT],a
     ret
 
+;EscapeRopeGiver: ; TODO
+;    db $08 ; asm
+;    ld hl,.end
+;    push hl
+;    ld b,ESCAPE_ROPE
+;    PREDEF _IsItemInBagOrBox
+;    ld hl,.MtMoon1AfterBattleText2
+;    ret nz
+;    ld hl,.EscapeRopeReceiveText1
+;    call PrintText
+;    ld bc,(ESCAPE_ROPE << 8) | 1
+;    call GiveItem
+;    ld hl,.EscapeRopeNoRoomText
+;    ret nc
+;    ld hl,.EscapeRopeReceiveText2
+;    ret
+;.end
+;    call PrintText
+;    jp TextScriptEnd
+;.EscapeRopeReceiveText1
+;    TX_FAR _EscapeRopeReceiveText1
+;    db "@"
+;.EscapeRopeReceiveText2
+;    TX_FAR _ReceivedText
+;    db $11,"@"
+;.EscapeRopeNoRoomText
+;    TX_FAR _EscapeRopeNoRoomText
+;    db $0F,"@"
+;.MtMoon1AfterBattleText2
+;    TX_FAR _MtMoon1AfterBattleText2
+;    db "@"
+
 MtMoon1AfterBattleText2:
     db $08 ; asm
-    ld hl,.end
-    push hl
-    ld b,ESCAPE_ROPE
-    PREDEF _IsItemInBagOrBox
-    ld hl,.MtMoon1AfterBattleText2
-    ret nz
-    ld hl,.EscapeRopeReceiveText1
+    ld a,[DIG_FLAG_BYTE]
+    bit DIG_FLAG_BIT,a
+    ld hl,.HM07AfterText
+    jr nz,.done
+    ld hl,.PreHM07Text
     call PrintText
-    ld bc,(ESCAPE_ROPE << 8) | 1
-    call GiveItem
-    ld hl,.EscapeRopeNoRoomText
-    ret nc
-    ld hl,.EscapeRopeReceiveText2
-    ret
-.end
+    ld bc,(HM_07 << 8) | 1
+    call FakeGiveItem
+    ld hl,DIG_FLAG_BYTE
+    set DIG_FLAG_BIT,[hl]
+    ld b,DIG_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM07SkillFoundText
+    jr c,.done
+    ld hl,.HM07SkillNotFoundText
+.done
     call PrintText
     jp TextScriptEnd
-.EscapeRopeReceiveText1
-    TX_FAR _EscapeRopeReceiveText1
+
+.PreHM07Text
+    TX_FAR _PreHM07Text
     db "@"
-.EscapeRopeReceiveText2
-    TX_FAR _ReceivedText
-    db $11,"@"
-.EscapeRopeNoRoomText
-    TX_FAR _EscapeRopeNoRoomText
-    db $0F,"@"
-.MtMoon1AfterBattleText2
-    TX_FAR _MtMoon1AfterBattleText2
+.HM07SkillFoundText
+    TX_FAR _HM07SkillFoundText
+    db "@"
+.HM07SkillNotFoundText
+    TX_FAR _HM07SkillNotFoundText
+    db "@"
+.HM07AfterText
+    TX_FAR _HM07AfterText
     db "@"
 
 SECTION "bank13",ROMX,BANK[$13]
@@ -118471,7 +118505,7 @@ _MtMoon1EndBattleText2: ; 806bf (20:46bf)
     db $0,"Wow!",$4f
     db "Shocked again!",$58
 
-_MtMoon1AfterBattleText2: ; 806d4 (20:46d4)
+_HM07AfterText: ; 806d4 (20:46d4)
     db $0,"Kids like you",$4f
     db "shouldn't be",$55
     db "here!",$57
@@ -119602,16 +119636,14 @@ _ViridianFrstAfterBattleText6:
     db "I hope to ",$4f
     db "Evolve it!",$57
 
-_EscapeRopeReceiveText1:
+_PreHM07Text:
     db $0,"Kids like you",$4f
     db "shouldn't be",$55
     db "here!",$51
-    db "Take this and",$4f
-    db "good luck!",$58
-
-_EscapeRopeNoRoomText:
-    db $0,"You do not have",$4f
-    db "space for this!",$57
+    db "This intensive",$4f
+    db "course could be",$55
+    db "very useful",$55
+    db "to you!",$58
 
 SECTION "bank21",ROMX,BANK[$21]
 
@@ -122693,6 +122725,24 @@ _HM05SkillFoundText:
     db $0,"Found!@@"
 
 _HM05SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM06SkillFoundText:
+    db $0,"Found!@@"
+
+_HM06SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM07SkillFoundText:
+    db $0,"Found!@@"
+
+_HM07SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM08SkillFoundText:
+    db $0,"Found!@@"
+
+_HM08SkillNotFoundText:
     db $0,"NOT Found!@@"
 
 ; ───────────────────────────────────
@@ -132989,6 +133039,16 @@ LearnSkill:
 .Animation
     call GBFadeOut2
     call ReloadMapData
+    ld a,[$C0EF]
+    cp BANK(Music_PkmnHealed)
+    ld [$C0F0],a
+    jr z,.skip
+    ld a,$ff
+    ld [$C0EE],a
+    call PlaySound
+    ld a,BANK(Music_PkmnHealed)
+    ld [$C0EF],a
+.skip
     ld a,$E8
     ld [$C0EE],a
     call PlaySound ; play sound?
@@ -132996,6 +133056,8 @@ LearnSkill:
     ld a,[$C026]
     cp $E8
     jr z,.WaitLoop
+    ld a,[$C0F0]
+    ld [$C0EF],a
     ld a,[$D35B]
     ld [$C0EE],a
     call PlaySound
@@ -133840,9 +133902,9 @@ ItemNames:
     db "FLOAT@"        ; $56 ; Ex WATER POWER
     db "STRENGTH@"     ; $57 ; Ex EARTH POWER
     db "LIGHT@"        ; $58 ; Ex FIRE POWER
-    db "?@"            ; $59
-    db "?@"            ; $5A
-    db "?@"            ; $5B
+    db "TELEPORT@"     ; $59 ; 
+    db "DIG@"          ; $5A ; 
+    db "HEAL@"         ; $5B ; 
     db "?@"            ; $5C
     db "?@"            ; $5D
     db "?@"            ; $5E
