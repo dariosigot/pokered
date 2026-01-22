@@ -28487,14 +28487,6 @@ WriteMaxStatExpByLevel:
     ld b,4 ; 4 bytes
     jp Divide
 
-BootedUpTMText:
-    TX_FAR _BootedUpTMText
-    db "@"
-
-BootedUpHMText:
-    TX_FAR _BootedUpHMText
-    db "@"
-
 TeachMachineMoveText:
     TX_FAR _TeachMachineMoveText
     db "@"
@@ -83955,24 +83947,24 @@ DayCareMScript: ; 5624f (15:624f)
 DayCareMTextPointers: ; 56252 (15:6252)
     dw DayCareMText1
 
-DayCareMText1: ; 56254 (15:6254)
+DayCareMText1:
     db $8
     call SaveScreenTilesToBuffer2
     ld a,[$da48]
     and a
-    jp nz,Func_562e1
-    ld hl,UnnamedText_5640f
+    jp nz,.Func_562e1
+    ld hl,.UnnamedText_5640f
     call PrintText
     call YesNoChoice
     ld a,[$cc26]
     and a
-    ld hl,UnnamedText_5643b
-    jp nz,Func_56409
+    ld hl,.UnnamedText_5643b
+    jp nz,.Func_56409
     ld a,[$d163]
     dec a
-    ld hl,UnnamedText_56445
-    jp z,Func_56409
-    ld hl,UnnamedText_56414
+    ld hl,.UnnamedText_56445
+    jp z,.Func_56409
+    ld hl,.UnnamedText_56414
     call PrintText
     xor a
     ld [$cfcb],a
@@ -83984,19 +83976,14 @@ DayCareMText1: ; 56254 (15:6254)
     call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     pop af
-    ld hl,UnnamedText_56437
-    jp c,Func_56409
-    ds 3 ; ld hl,DayCareCheckHM
-    ds 2 ; ld b,BANK(DayCareCheckHM)
-    ds 3 ; call Bankswitch
-    ds 3 ; ld hl,UnnamedText_5644a
-    ds 3 ; jp c,Func_56409
+    ld hl,.UnnamedText_56437
+    jp c,.Func_56409
     xor a
     ld [$cc2b],a
     ld a,[$cf92]
     ld hl,$d2b5
     call GetPartyMonName
-    ld hl,UnnamedText_56419
+    ld hl,.UnnamedText_56419
     call PrintText
     ld a,$1
     ld [$da48],a
@@ -84008,10 +83995,10 @@ DayCareMText1: ; 56254 (15:6254)
     call RemovePokemon
     ld a,[$cf91]
     call PlayCry
-    ld hl,UnnamedText_5641e
-    jp Func_56409
+    ld hl,.UnnamedText_5641e
+    jp .Func_56409
 
-Func_562e1: ; 562e1 (15:62e1)
+.Func_562e1
     xor a
     ld hl,$da49
     call GetPartyMonName
@@ -84045,20 +84032,20 @@ Func_562e1: ; 562e1 (15:62e1)
     ld [wTrainerSpriteOffset],a
     cp d
     ld [hl],d
-    ld hl,UnnamedText_56432
+    ld hl,.UnnamedText_56432
     jr z,.asm_56333
     ld a,[wTrainerSpriteOffset]
     ld b,a
     ld a,d
     sub b
     ld [wTrainerEngageDistance],a
-    ld hl,UnnamedText_56423
+    ld hl,.UnnamedText_56423
 
 .asm_56333
     call PrintText
     ld a,[W_NUMINPARTY]
     cp $6
-    ld hl,UnnamedText_56440
+    ld hl,.UnnamedText_56440
     jp z,.asm_56403
     ld de,wTrainerFacingDirection
     xor a
@@ -84083,13 +84070,13 @@ Func_562e1: ; 562e1 (15:62e1)
     pop hl
     dec b
     jr nz,.asm_56357
-    ld hl,UnnamedText_56428
+    ld hl,.UnnamedText_56428
     call PrintText
     ld a,$13
     ld [$d125],a
     call DisplayTextBoxID
     call YesNoChoice
-    ld hl,UnnamedText_56437
+    ld hl,.UnnamedText_56437
     ld a,[wCurrentMenuItem]
     and a
     jp nz,.asm_56403
@@ -84101,7 +84088,7 @@ Func_562e1: ; 562e1 (15:62e1)
     ld [$ffa1],a
     call HasEnoughMoney
     jr nc,.asm_56396
-    ld hl,UnnamedText_56454
+    ld hl,.UnnamedText_56454
     jp .asm_56403
 
 .asm_56396
@@ -84118,7 +84105,7 @@ Func_562e1: ; 562e1 (15:62e1)
     ld a,$13
     ld [$d125],a
     call DisplayTextBoxID
-    ld hl,UnnamedText_5644f
+    ld hl,.UnnamedText_5644f
     call PrintText
     ld a,$2
     ld [$cf95],a
@@ -84152,74 +84139,72 @@ Func_562e1: ; 562e1 (15:62e1)
     ld [de],a
     ld a,[$cf91]
     call PlayCry
-    ld hl,UnnamedText_5642d
-    jr Func_56409
+    ld hl,.UnnamedText_5642d
+    jr .Func_56409
 
 .asm_56403
     ld a,[wTrainerSpriteOffset]
     ld [$da62],a
 
-Func_56409: ; 56409 (15:6409)
+.Func_56409
     call PrintText
     jp TextScriptEnd
 
-UnnamedText_5640f: ; 5640f (15:640f)
+.UnnamedText_5640f
     TX_FAR _UnnamedText_5640f
     db "@"
 
-UnnamedText_56414: ; 56414 (15:6414)
+.UnnamedText_56414
     TX_FAR _UnnamedText_56414
     db "@"
 
-UnnamedText_56419: ; 56419 (15:6419)
+.UnnamedText_56419
     TX_FAR _UnnamedText_56419
     db "@"
 
-UnnamedText_5641e: ; 5641e (15:641e)
+.UnnamedText_5641e
     TX_FAR _UnnamedText_5641e
     db "@"
 
-UnnamedText_56423: ; 56423 (15:6423)
+.UnnamedText_56423
     TX_FAR _UnnamedText_56423
     db "@"
 
-UnnamedText_56428: ; 56428 (15:6428)
+.UnnamedText_56428
     TX_FAR _UnnamedText_56428
     db "@"
 
-UnnamedText_5642d: ; 5642d (15:642d)
+.UnnamedText_5642d
     TX_FAR _UnnamedText_5642d
     db "@"
 
-UnnamedText_56432: ; 56432 (15:6432)
+.UnnamedText_56432
     TX_FAR _UnnamedText_56432
     db "@"
 
-UnnamedText_56437: ; 56437 (15:6437)
-    TX_FAR _UnnamedText_56437 ; 0x8c000
-UnnamedText_5643b: ; 5643b (15:643b)
-    TX_FAR _UnnamedText_5643b ; 0x8c013
+.UnnamedText_56437
+    TX_FAR _UnnamedText_56437
+.UnnamedText_5643b
+    TX_FAR _UnnamedText_5643b
     db "@"
 
-UnnamedText_56440: ; 56440 (15:6440)
+.UnnamedText_56440
     TX_FAR _UnnamedText_56440
     db "@"
 
-UnnamedText_56445: ; 56445 (15:6445)
+.UnnamedText_56445
     TX_FAR _UnnamedText_56445
     db "@"
 
-UnnamedText_5644a: ; 5644a (15:644a)
-    TX_FAR _UnnamedText_5644a
-    db "@"
-
-UnnamedText_5644f: ; 5644f (15:644f)
+.UnnamedText_5644f
     TX_FAR _UnnamedText_5644f
     db "@"
 
-UnnamedText_56454: ; 56454 (15:6454)
+.UnnamedText_56454
     TX_FAR _UnnamedText_56454
     db "@"
+
+SECTION "DayCareMObject",ROMX[$6459],BANK[$15]
 
 DayCareMObject: ; 0x56459 (size=26)
     db $a ; border tile
@@ -122295,9 +122280,11 @@ _Route2HouseText1: ; 8a7b8 (22:67b8)
     db "moves like CUT!",$57
 
 _HM05AfterText: ; 8a7fc (22:67fc)
-    db $0,"The FIRE PWR ",$4f
+    db $0,"This SKILL",$4f
     db "lights even the",$55
     db "darkest dungeons.",$57
+
+SECTION "_Route2GateText2",ROMX[$682c],BANK[$22]
 
 _Route2GateText2: ; 8a82c (22:682c)
     db $0,"Once a #MON",$4f
@@ -122710,10 +122697,7 @@ _UnnamedText_56445: ; 8c041 (23:4041)
     db $0,"You only have one",$4f
     db "#MON with you.",$57
 
-_UnnamedText_5644a: ; 8c063 (23:4063)
-    db $0,"I can't accept a",$4f
-    db "#MON that",$55
-    db "knows a PWR move.",$57
+SECTION "_UnnamedText_5644f",ROMX[$4090],BANK[$23]
 
 _UnnamedText_5644f: ; 8c090 (23:4090)
     db $0,"Thank you! Here's",$4f
@@ -124317,11 +124301,7 @@ _Route14EndBattleText1: ; 9083f (24:483f)
     db $0,"Not",$4f
     db "good enough!",$58
 
-_Route14AfterBattleText1: ; 90851 (24:4851)
-    db $0,"You have some PWR",$4f
-    db "right? #MON",$55
-    db "can't ever forget",$55
-    db "those moves.",$57
+SECTION "_Route14BattleText2",ROMX[$488e],BANK[$24]
 
 _Route14BattleText2: ; 9088e (24:488e)
     db $0,"My bird #MON",$4f
@@ -124336,11 +124316,7 @@ _Route14AfterBattleText2: ; 908c8 (24:48c8)
     db $0,"They need to learn",$4f
     db "better moves.",$57
 
-_Route14BattleText3: ; 908ea (24:48ea)
-    db $0,"TMs are on sale",$4f
-    db "in CELADON!",$55
-    db "But,only a few",$55
-    db "people have PWR!",$57
+SECTION "_Route14EndBattleText3",ROMX[$4928],BANK[$24]
 
 _Route14EndBattleText3: ; 90928 (24:4928)
     db $0,"Aww,",$4f
@@ -124956,10 +124932,7 @@ _Route19AfterBattleText6: ; 91a9e (24:5a9e)
     db $0,"I'm looking at the",$4f
     db "sea to forget!",$57
 
-_Route19BattleText7: ; 91ac0 (24:5ac0)
-    db $0,"Oh,I just love",$4f
-    db "your ride! Can I",$55
-    db "have it if I win?",$57
+SECTION "_Route19EndBattleText7",ROMX[$5af4],BANK[$24]
 
 _Route19EndBattleText7: ; 91af4 (24:5af4)
     db $0,"Oh!",$4f
@@ -125480,6 +125453,25 @@ _SurfBoardReceiveText1:
 _SurfBoardNoRoomText:
     db $0,"You do not have",$4f
     db "space for this!",$57
+
+_Route14AfterBattleText1
+    db $0,"You have some",$4f
+    db "SKILL right?",$51
+    db "#MON can use",$4f
+    db "it with 10",$DA,$55
+    db "every time!",$57
+
+_Route14BattleText3:
+    db $0,"TMs are on sale",$4f
+    db "in CELADON!",$55
+    db "But,only a few",$55
+    db "people know",$55
+    db "SKILL!",$57
+
+_Route19BattleText7:
+    db $0,"Oh,I just love",$4f
+    db "your SKILL! Can I",$55
+    db "have it if I win?",$57
 
 SECTION "bank25",ROMX,BANK[$25]
 
@@ -128994,8 +128986,8 @@ _PreHM04Text:
     db "your trouble.",$58
 
 _HM04AfterText:
-    db $0,"WARDEN: PWR ",$4f
-    db "teaches STRENGTH!",$51
+    db $0,"WARDEN: Now you",$4f
+    db "know STRENGTH!",$51
     db "It lets #MON",$4f
     db "move boulders",$55
     db "when you're out-",$55
@@ -129003,10 +128995,8 @@ _HM04AfterText:
     db "Oh yes,did you",$4f
     db "find SECRET HOUSE",$55
     db "in SAFARI ZONE?",$51
-    db "If you do,you",$4f
-    db "win a PWR!",$51
-    db "I hear it's the",$4f
-    db "rare FLOAT PW",$57
+    db "If you do,you win",$4f
+    db "a special Gift!",$57
 
 SECTION "_UnnamedText_75176",ROMX[$6696],BANK[$27]
 
@@ -131487,14 +131477,6 @@ _PPRestoredText: ; a6a0d (29:6a0d)
     TX_NUM $d11e,1,3
     db $0,$DA," ENERGY",$4f
     db "Restored!",$58
-
-SECTION "_BootedUpTMText",ROMX[$6a1f],BANK[$29]
-
-_BootedUpTMText: ; a6a1f (29:6a1f)
-    db $0,"Booted up a TM!",$58
-
-_BootedUpHMText: ; a6a30 (29:6a30)
-    db $0,"Booted up a PWR!",$58
 
 _TeachMachineMoveText:
     db $0,"Teach @"
