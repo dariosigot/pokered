@@ -1908,6 +1908,7 @@ wBufferPointerByte2    ; dee4 ; Buffer Pointer Byte 02
 
 wStatusScreen2OAMBit0       ; dee5 ; bit 0 = Write OAM in Status Screen 2
 wOverworlLightAnimBit0      ; dee5 ; bit 0 = Force Overworld Light Animation
+wDontCheckEnergySkillBit0   ; dee5 ; bit 0 = Skip Energy Check during first time Learn Skill
 wDisableEncounterBit1       ; dee5 ; bit 1 = Disable Pallet's Pikachu Encounter
 wFlagNoHpPalBit2            ; dee5 ; bit 2
 wOverworlNoTextBit2         ; dee5 ; bit 2 = Disable Overworld Text

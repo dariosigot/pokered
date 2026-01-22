@@ -132942,8 +132942,13 @@ SearchSkillInParty:
     xor a ; rcf
     ret
 .found
+    ld hl,wDontCheckEnergySkillBit0
+    bit 0,[hl]
+    res 0,[hl]
+    jr nz,.SkipCheckEnergy
     call .CheckAndDecreaseSkillEnergy
     jr c,.NextMon
+.SkipCheckEnergy
     scf
     ret
 .GetMonSkill
@@ -132974,6 +132979,8 @@ LearnSkill:
     ld hl,.LearnSkill
     call PrintText
     pop bc
+    ld hl,wDontCheckEnergySkillBit0
+    set 0,[hl]
     jp SearchSkillInParty
 .LearnSkill
     TX_FAR _LearnSkillText
