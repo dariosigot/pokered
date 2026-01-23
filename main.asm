@@ -3852,13 +3852,10 @@ FarCopyData2: ; 17f7 (0:17f7)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[$ff8b]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call CopyData
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; does a far copy but the source is de and the destination is hl
 ; copy bc bytes of data from a:de to hl
@@ -3867,7 +3864,6 @@ FarCopyData3: ; 180d (0:180d)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[$ff8b]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     push hl
     push de
@@ -3879,9 +3875,7 @@ FarCopyData3: ; 180d (0:180d)
     pop de
     pop hl
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; copies each source byte to the destination twice (next to each other)
 ; copy bc source bytes from a:hl to de
@@ -3890,7 +3884,6 @@ FarCopyDataDouble: ; 182b (0:182b)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[$ff8b]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
 .loop
     ld a,[hli]
@@ -3903,9 +3896,7 @@ FarCopyDataDouble: ; 182b (0:182b)
     or b
     jr nz,.loop
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; copy (c * 16) bytes from b:de to hl during V-blank
 ; transfers up to 128 bytes per V-blank
@@ -3917,7 +3908,6 @@ CopyVideoData: ; 1848 (0:1848)
     ld a,[H_LOADEDROMBANK]
     ld [$ff8b],a
     ld a,b
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ld a,e
     ld [H_VBCOPYSRC],a
@@ -3935,7 +3925,6 @@ CopyVideoData: ; 1848 (0:1848)
     ld [H_VBCOPYSIZE],a
     call DelayFrame ; wait for V-blank handler to perform the copy
     ld a,[$ff8b]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     pop af
     ld [H_AUTOBGTRANSFERENABLED],a ; restore original auto-transfer enabled flag
@@ -3960,7 +3949,6 @@ CopyVideoDataDouble: ; 1886 (0:1886)
     ld a,[H_LOADEDROMBANK]
     ld [$ff8b],a
     ld a,b
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ld a,e
     ld [H_VBCOPYDOUBLESRC],a
@@ -3978,7 +3966,6 @@ CopyVideoDataDouble: ; 1886 (0:1886)
     ld [H_VBCOPYDOUBLESIZE],a
     call DelayFrame ; wait for V-blank handler to perform the copy
     ld a,[$ff8b]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     pop af
     ld [H_AUTOBGTRANSFERENABLED],a ; restore original auto-transfer enabled flag
@@ -3991,6 +3978,8 @@ CopyVideoDataDouble: ; 1886 (0:1886)
     sub a,8
     ld c,a
     jr .loop
+
+SECTION "ClearScreenArea",ROM0[$18c4]
 
 ; clears an area of the screen
 ; INPUT:
