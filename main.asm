@@ -8941,6 +8941,8 @@ HasEnoughCoins: ; 35b1 (0:35b1)
     ld c,$2
     jp StringCmp
 
+SECTION "BankswitchHome",ROM0[$35bc]
+
 BankswitchHome: ; 35bc (0:35bc)
 ; switches to bank # in a
 ; Only use this when in the home bank!
@@ -8948,24 +8950,19 @@ BankswitchHome: ; 35bc (0:35bc)
     ld a,[H_LOADEDROMBANK]
     ld [$CF08],a
     ld a,[$CF09]
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
-BankswitchBack: ; 35cd (0:35cd)
+BankswitchBack:
 ; returns from BankswitchHome
     ld a,[$CF08]
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
-Bankswitch: ; 35d6 (0:35d6)
+Bankswitch:
 ; self-contained bankswitch,use this when not in the home bank
 ; switches to the bank in b
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,b
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ld bc,.Return
     push bc
@@ -8973,24 +8970,15 @@ Bankswitch: ; 35d6 (0:35d6)
 .Return
     pop bc
     ld a,b
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; displays yes/no choice
 ; yes -> set carry
-YesNoChoice: ; 35ec (0:35ec)
+YesNoChoice:
     call SaveScreenTilesToBuffer1
-    call InitYesNoTextBoxParameters
+    call .InitYesNoTextBoxParameters
     jr DisplayYesNoChoice
-
-Func_35f4: ; 35f4 (0:35f4)
-    ld a,$14
-    ld [$d125],a
-    call InitYesNoTextBoxParameters
-    jp DisplayTextBoxID
-
-InitYesNoTextBoxParameters: ; 35ff (0:35ff)
+.InitYesNoTextBoxParameters
     xor a
     ld [$d12c],a
     FuncCoord 14,7 ; $c43a
@@ -8998,30 +8986,23 @@ InitYesNoTextBoxParameters: ; 35ff (0:35ff)
     ld bc,$80f
     ret
 
-YesNoChoicePokeCenter: ; 360a (0:360a)
+YesNoChoicePokeCenter:
     call SaveScreenTilesToBuffer1
     ld a,$6
     ld [$d12c],a
     FuncCoord 11,6 ; $c423
     ld hl,Coord
     ld bc,$80c
-    jr DisplayYesNoChoice
+    ; fall through
 
-Func_361a: ; 361a (0:361a)
-    call SaveScreenTilesToBuffer1
-    ld a,$3
-    ld [$d12c],a
-    FuncCoord 12,7 ; $c438
-    ld hl,Coord
-    ld bc,$080d
-DisplayYesNoChoice: ; 3628 (0:3628)
+DisplayYesNoChoice:
     ld a,$14
     ld [$d125],a
     call DisplayTextBoxID
     jp LoadScreenTilesFromBuffer1
 
 ; calculates the difference |a-b|,setting carry flag if a<b
-CalcDifference: ; 3633 (0:3633)
+CalcDifference:
     sub b
     ret nc
     cpl
@@ -9029,11 +9010,13 @@ CalcDifference: ; 3633 (0:3633)
     scf
     ret
 
-MoveSprite: ; 363a (0:363a)
+MoveSprite:
 ; move the sprite [$FF8C] with the movement pointed to by de
 ; actually only copies the movement data to $CC5B for later
     call SetSpriteMovementBytesToFF
-MoveSprite_: ; 363d (0:363d)
+    ; fall through
+
+MoveSprite_:
     push hl
     push bc
     call GetSpriteMovementByte1Pointer
@@ -9065,27 +9048,28 @@ MoveSprite_: ; 363d (0:363d)
     ld [$CD3A],a
     ret
 
-Func_366b: ; 366b (0:366b)
+; divides [hDividend2] by [hDivisor2] and stores the quotient in [hQuotient2]
+DivideBytes:
     push hl
-    ld hl,$ffe7
+    ld hl,$ffe7 ; hQuotient2
     xor a
     ld [hld],a
     ld a,[hld]
     and a
-    jr z,.asm_367e
+    jr z,.done
     ld a,[hli]
-.asm_3676
+.loop
     sub [hl]
-    jr c,.asm_367e
+    jr c,.done
     inc hl
     inc [hl]
     dec hl
-    jr .asm_3676
-.asm_367e
+    jr .loop
+.done
     pop hl
     ret
 
-SpeedUpByke: ; Denim,Speed Walk and Byke
+SpeedUpByke:
     call GetCurrentOldAdventureMap
     cp a,ROUTE_17 ; Cycling Road
     jr nz,.normalByke
@@ -9097,6 +9081,8 @@ SpeedUpByke: ; Denim,Speed Walk and Byke
     call TrySpeedUpWithB     ; Speed 3X
 .TrySpeedUpWithB
     jp TrySpeedUpWithB       ; Speed 4X
+
+; Free
 
 SECTION "LoadTextBoxTilePatterns",ROM0[$36a0]
 
@@ -27694,7 +27680,7 @@ Func_f929: ; f929 (3:7929)
     ld [hli],a
     ld a,$10
     ld [hli],a
-    call Func_366b
+    call DivideBytes
     ld a,[hl]
     ld [H_DIVIDEND],a ; $FF00+$95 (aliases: H_PRODUCT,H_PASTLEADINGZEROES,H_QUOTIENT)
     pop hl
@@ -27719,7 +27705,7 @@ Func_f929: ; f929 (3:7929)
     ld [$FF00+$e5],a
     ld a,$10
     ld [$FF00+$e6],a
-    call Func_366b
+    call DivideBytes
     ld a,[$FF00+$e7]
     ld [H_NUMTOPRINT],a ; $FF00+$96 (aliases: H_MULTIPLICAND)
     ld a,[$FF00+$9b]
