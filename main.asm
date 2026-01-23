@@ -2897,7 +2897,6 @@ LoadMapHeader: ; 107c (0:107c)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(MapSongBanks) ; same as MapSongBanksNew
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call GetMapSongBanks ; ld hl,MapSongBanks
     add hl,bc
@@ -2907,9 +2906,7 @@ LoadMapHeader: ; 107c (0:107c)
     ld a,[hl]
     ld [$d35c],a ; music 2
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 CheckMoveRelearn:
     push hl
@@ -2933,7 +2930,7 @@ CopyMapConnectionHeader: ; 1238 (0:1238)
     ret
 
 ; function to load map data
-LoadMapData: ; 1241 (0:1241)
+LoadMapData:
     ld a,[H_LOADEDROMBANK]
     push af
     call DisableLCD
@@ -2991,13 +2988,11 @@ LoadMapData: ; 1241 (0:1241)
     call PlayDefaultMusicFadeOutCurrent ; music related
 .restoreRomBank
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; function to switch to the ROM bank that a map is stored in
 ; Input: a = map number
-SwitchToMapRomBank: ; 12bc (0:12bc)
+SwitchToMapRomBank:
     push hl
     push bc
     ld c,a
@@ -3010,13 +3005,12 @@ SwitchToMapRomBank: ; 12bc (0:12bc)
     ld [$ffe8],a ; save map ROM bank
     call BankswitchBack
     ld a,[$ffe8]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB ; switch to map ROM bank
     pop bc
     pop hl
     ret
 
-Func_12da: ; 12da (0:12da)
+Func_12da:
     ld a,$1e
     ld [$d13a],a
     ld hl,$d730
