@@ -101,9 +101,9 @@ CHARMELEON_Learnset:
     ;  36,CHARIZARD
     db 0
 CHARIZARD_Learnset:
-    db 36,Skill__FLY
     db 36,WING_ATTACK
     db 36,SWOOP
+    db 36,Skill__FLY
     db 39,DRAGON_RAGE
     db 40,AGILITY
     db 41,SEISMIC_TOSS
@@ -173,9 +173,9 @@ WARTORTLE_Learnset:
     ;  36,BLASTOISE
     db 0
 BLASTOISE_Learnset:
-    db 36,Skill__STRENGTH
     db 36,SPIKE_CANNON
     db 36,TSUNAMI
+    db 36,Skill__STRENGTH
     db 38,MIST
     db 39,SUPERSONIC
     db 40,STOMP
@@ -335,8 +335,8 @@ PIDGEY_Learnset:
     ;  18,PIDGEOTTO
     db 0
 PIDGEOTTO_Learnset:
-    db 18,Skill__FLY
     db 18,WING_ATTACK
+    db 18,Skill__FLY
     db 21,WHIRLWIND
     db 21,Skill__CUT
     db 24,SWOOP
@@ -433,8 +433,8 @@ SPEAROW_Learnset:
     ;  20,FEAROW
     db 0
 FEAROW_Learnset:
-    db 20,Skill__FLY
     db 20,SWOOP
+    db 20,Skill__FLY
     db 25,MIRROR_MOVE
     db 28,RAZOR_WIND
     db 31,SCREECH
@@ -638,8 +638,8 @@ NIDOQUEEN_Learnset:
     db 22,THRASH
     db 22,Skill__STRENGTH
     db 25,SLASH
-    db 25,Skill__CUT
     db 25,HYPER_FANG
+    db 25,Skill__CUT
     db 27,BODY_SLAM
     db 29,ROCK_THROW
     db 31,SKULL_BASH
@@ -711,8 +711,8 @@ NIDOKING_Learnset:
     db 22,THRASH
     db 22,Skill__STRENGTH
     db 25,HYPER_FANG
-    db 25,Skill__CUT
     db 25,SLASH
+    db 25,Skill__CUT
     db 27,BODY_SLAM
     db 29,ROCK_THROW
     db 31,SLUDGE
@@ -980,8 +980,8 @@ ZUBAT_Learnset:
     ;  22,GOLBAT
     db 0
 GOLBAT_Learnset:
-    db 22,Skill__FLY
     db 22,WING_ATTACK
+    db 22,Skill__FLY
     db 24,AGILITY
     db 26,RAZOR_WIND
     db 26,Skill__CUT
@@ -1239,8 +1239,8 @@ MEOWTH_Learnset:
     ;  28,PERSIAN
     db 0
 PERSIAN_Learnset:
-    db 28,Skill__DIG
     db 28,HYPER_FANG
+    db 28,Skill__DIG
     db 29,REST
     db 32,SLASH
     db 32,Skill__CUT
@@ -1286,10 +1286,10 @@ PSYDUCK_Learnset:
     ;  33,GOLDUCK
     db 0
 GOLDUCK_Learnset:
-    db 33,Skill__FLOAT
     db 33,WATER_GUN
     db 33,BUBBLEBEAM
     db 33,PAY_DAY
+    db 33,Skill__FLOAT
     db 35,SLASH
     db 35,Skill__CUT
     db 37,WATERFALL
@@ -1441,8 +1441,8 @@ POLIWAG_Learnset:
     ;  25,POLIWHIRL
     db 0
 POLIWHIRL_Learnset:
-    db 25,Skill__STRENGTH
     db 25,KARATE_CHOP
+    db 25,Skill__STRENGTH
     db 26,DOUBLE_KICK
     db 27,WATERFALL
     db 27,LOW_KICK
@@ -1464,10 +1464,10 @@ POLIWHIRL_Learnset:
     db 55,ICE_PUNCH
     db 0
 POLIWRATH_Learnset:
-    db 25,Skill__STRENGTH
     db 25,KARATE_CHOP
     db 25,DOUBLE_KICK
     db 25,LOW_KICK
+    db 25,Skill__STRENGTH
     db 26,COMET_PUNCH
     db 26,ROLLING_KICK
     db 27,WATERFALL
@@ -1585,10 +1585,12 @@ MACHOKE_MACHAMP_Learnset:
 MACHOP_NoEvo_Learnset:
     db 31,AGILITY ; Exclusive
     db 34,STRIKE
+    db 36,Skill__DIG
     db 37,SUBMISSION
     db 41,SEISMIC_TOSS
     db 45,JUMP_KICK
     db 50,COUNTER
+    db 52,Skill__FLOAT
     db 55,MEGA_KICK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -2807,7 +2809,7 @@ KANGASKHAN_Learnset:
     db 39,THRASH
     db 41,SKULL_BASH
     db 43,SLASH
-    db 25,Skill__CUT
+    db 43,Skill__CUT
     db 45,TAKE_DOWN
     db 47,BODY_SLAM
     db 47,Skill__FLOAT
@@ -2858,6 +2860,7 @@ HORSEA_NoEvo_Learnset:
     db 36,DOUBLE_TEAM ; Exclusive
     db 39,SUPERSONIC
     db 42,HAZE
+    db 42,Skill__HEAL
     db 46,AURORA_BEAM
     db 50,POISON_GAS
     db 55,TSUNAMI
@@ -3785,8 +3788,8 @@ DRAGONAIR_Learnset:
     ;  55,DRAGONITE
     db 0
 DRAGONITE_Learnset:
-    db 55,Skill__STRENGTH
     db 55,SWOOP
+    db 55,Skill__STRENGTH
     db 56,HYDRO_PUMP
     db 57,THUNDERPUNCH
     db 57,THUNDER_M
