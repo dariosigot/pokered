@@ -9202,23 +9202,21 @@ CopyData2:
 
 ; ─────────────────────────────────────────────────────────
 
-SECTION "DelayFrames",ROM0[$3739]
-
-DelayFrames: ; 3739 (0:3739)
+DelayFrames:
 ; wait n frames,where n is the value in c
     call DelayFrame
     dec c
     jr nz,DelayFrames
     ret
 
-PlaySoundWaitForCurrent: ; 3740 (0:3740)
+PlaySoundWaitForCurrent:
     push af
     call WaitForSoundToFinish
     pop af
     jp PlaySound
 
 ; Wait for sound to finish playing
-WaitForSoundToFinish: ; 3748 (0:3748)
+WaitForSoundToFinish:
     ld a,[$d083]
     and $80
     ret nz
@@ -9236,7 +9234,7 @@ WaitForSoundToFinish: ; 3748 (0:3748)
     pop hl
     ret
 
-NamePointers: ; 375d (0:375d)
+NamePointers:
     dw MonsterNames
     dw MoveNames
     dw 0 ; UnusedNames
@@ -9272,7 +9270,6 @@ GetName: ; 376b (0:376b)
 .otherEntries ; $378d
     ;2-7 = OTHER ENTRIES
     ld a,[$d0b7]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ld a,[W_LISTTYPE]    ;VariousNames' entryID
     dec a
@@ -9320,13 +9317,9 @@ GetName: ; 376b (0:376b)
     pop bc
     pop hl
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
-SECTION "GetItemPrice",ROM0[$37df]
-
-GetItemPrice: ; 37df (0:37df)
+GetItemPrice:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[wListMenuID] ; $cf94
@@ -9335,7 +9328,6 @@ GetItemPrice: ; 37df (0:37df)
     jr nz,.asm_37ed
     ld a,$f
 .asm_37ed
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ld hl,$cf8f
     ld a,[hli]
@@ -9358,24 +9350,21 @@ GetItemPrice: ; 37df (0:37df)
     ld [H_DOWNARROWBLINKCNT1],a ; $FF00+$8b
     jr .asm_381c
 .asm_3812
-    ld a,$1e
-    ld [H_LOADEDROMBANK],a
+    ld a,BANK(GetMachinePrice)
     call RoutineForRealGB
     call GetMachinePrice
 .asm_381c
     ld de,H_DOWNARROWBLINKCNT1 ; $ff8b
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; copies a string from [de] to [$cf4b]
-CopyStringToCF4B: ; 3826 (0:3826)
+CopyStringToCF4B:
     ld hl,$cf4b
     ; fall through
 
 ; copies a string from [de] to [hl]
-CopyString: ; 3829 (0:3829)
+CopyString:
     ld a,[de]
     inc de
     ld [hli],a
@@ -9398,7 +9387,7 @@ CopyString: ; 3829 (0:3829)
 ;    report only one button press.
 ; 3. Same as 2,but report no buttons as pressed if A or B is held down.
 ;    ([$ffb7] == 1,[$ffb6] == 0)
-GetJoypadStateLowSensitivity: ; 3831 (0:3831)
+GetJoypadStateLowSensitivity:
     call GetJoypadState
     ld a,[$ffb7] ; flag
     and a ; get all currently pressed buttons or only newly pressed buttons?
@@ -9437,7 +9426,7 @@ GetJoypadStateLowSensitivity: ; 3831 (0:3831)
     ld [H_FRAMECOUNTER],a
     ret
 
-WaitForTextScrollButtonPress: ; 3865 (0:3865)
+WaitForTextScrollButtonPress:
     ld a,[H_DOWNARROWBLINKCNT1] ; $FF00+$8b
     push af
     ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
@@ -9469,7 +9458,7 @@ WaitForTextScrollButtonPress: ; 3865 (0:3865)
     ret
 
 ; (unlass in link battle) waits for A or B being pressed and outputs the scrolling sound effect
-ManualTextScroll: ; 3898 (0:3898)
+ManualTextScroll:
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jr z,.inLinkBattle
@@ -9487,7 +9476,7 @@ ManualTextScroll: ; 3898 (0:3898)
 ; FF99 = multiplier
 ; OUTPUT
 ; FF95-FF98 = product
-Multiply: ; 38ac (0:38ac)
+Multiply:
     push hl
     push bc
     ld hl,_Multiply
@@ -9506,23 +9495,25 @@ Multiply: ; 38ac (0:38ac)
 ; OUTPUT
 ; FF95-FF98 = quotient
 ; FF99 = remainder
-Divide: ; 38b9 (0:38b9)
+Divide:
     push hl
     push de
     push bc
     ld a,[H_LOADEDROMBANK]
     push af
-    ld a,$0d
-    ld [H_LOADEDROMBANK],a
+    ld a,BANK(_Divide)
     call RoutineForRealGB
     call _Divide
     pop af
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     pop bc
     pop de
     pop hl
     ret
+
+; Free
+
+SECTION "PrintLetterDelay",ROM0[$38d3]
 
 ; This function is used to wait a short period after printing a letter to the
 ; screen unless the player presses the A/B button or the delay is turned off
