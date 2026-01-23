@@ -38,7 +38,12 @@ StoreGymLeaderRematch:
     pop bc
     ret
 
-; Free
+CheckSkillInList:
+    push hl
+    ld hl,wNoSkillInListBit6
+    bit 6,[hl]
+    pop hl
+    ret
 
 ; interrupts
 SECTION "vblank",ROM0[$40]
@@ -414,16 +419,16 @@ GoodCopyVideoDataDouble:
     pop de
     jp FarCopyDataDouble ; if LCD is off,transfer all at once
 
-PlayCryAndDecreaseFieldMoveEnergy:
-    call CheckAndDecreaseFieldMoveEnergy
-    ld a,[wFieldMoveMonID]
+PlayCryAndDecreaseSkillEnergy:
+    call CheckAndDecreaseSkillEnergy
+    ld a,[wSkillMonID]
     call GetCryData ; get cry data
     call PlaySound ; play sound
     xor a
-    ld [wFieldMoveMonID],a
+    ld [wSkillMonID],a
     ret
 
-CheckFieldMoveEnergy:
+CheckSkillEnergy:
     ld a,[wWhichPokemon]
     ld hl,W_PARTYMON1_MOVE1PP
     ld bc,44
@@ -432,8 +437,8 @@ CheckFieldMoveEnergy:
     sub 10
     ret
 
-CheckAndDecreaseFieldMoveEnergy:
-    call CheckFieldMoveEnergy
+CheckAndDecreaseSkillEnergy:
+    call CheckSkillEnergy
     jr c,.noEnergy
     ld [hl],a ; New Energy Value
 .noEnergy
@@ -2923,7 +2928,12 @@ LoadMapHeader: ; 107c (0:107c)
     call RoutineForRealGB
     ret
 
-; Free
+CheckMoveRelearn:
+    push hl
+    ld hl,wFlagMoveRelearnEngagedBit7
+    bit 7,[hl]
+    pop hl
+    ret
 
 SECTION "CopyMapConnectionHeader",ROM0[$1238]
 
@@ -6211,12 +6221,6 @@ TrainerWalkUpToPlayer_Bank0:
     ld hl,TrainerWalkUpToPlayer
     jp Bankswitch ; indirect jump to TrainerWalkUpToPlayer (56881 (15:6881))
 
-;LoadEvosMovesPointerTableByPokedex:
-;    ld [$d11e],a
-;    call IndexToPokedexAndRestoreD11E
-;    ld hl,EvosMovesPointerTable
-;    ret
-
 GetTileOffset:
     push hl
     push de
@@ -8094,7 +8098,36 @@ IsSpriteInFrontOfPlayer4:
     and a ; was there a sprite collision?
     ret ; nz = collison
 
-; Free
+IsSkill:
+    push bc
+    push af
+    push de
+    push hl
+    ld hl,.SkillTable
+    ld de,1
+    call IsInArray
+    jr c,.Found
+.NotFound
+    xor a ; rcf
+    jr .IsSkill_End
+.Found
+    scf
+.IsSkill_End
+    pop hl
+    pop de
+    pop bc
+    ld a,b
+    pop bc
+    ret
+.SkillTable
+    db Skill__FLY
+    db Skill__DIG
+    db Skill__CUT
+    db Skill__FLOAT
+    db Skill__STRENGTH
+    db Skill__LIGHT
+    db Skill__HEAL
+    db $FF
 
 SECTION "OverworldHackRoutine",ROM0[$3040]
 
@@ -11078,13 +11111,6 @@ ResetStatusAndHalveMoneyOnBlackout:
     ld [wJoypadForbiddenButtonsMask],a
     PREDEF_JUMP HealParty
 
-CheckMoveRelearn:
-    push hl
-    ld hl,wFlagMoveRelearnEngagedBit7
-    bit 7,[hl]
-    pop hl
-    ret
-
 NewMoveDetails:
     call .PrintNewLearnMoveDetail
     call DisplayTextBoxID
@@ -11639,7 +11665,6 @@ LoadMonData_: ; 45b6 (1:45b6)
     add hl,de
     ld a,[hl]
     ld [$cf91],a
-
 .done
     ld a,[$cf91]
     ld [$d0b5],a ; input for GetMonHeader
@@ -11663,28 +11688,38 @@ LoadMonData_: ; 45b6 (1:45b6)
     ld de,$cf98
     ld bc,44
     call CopyData
-
     ; Copy Exclusive
-    ld hl,W_PARTYMON1OT+8
     ld a,[$cc49]
-    cp a,$01
-    ret z ; Enemy Exclusive doesn't exists
-    jr c,.getExclusive
-    cp a,$02
+    and a
+    ld hl,W_PARTYMON1OT+8
+    jr z,.getExclusive
+    dec a
+    jr z,.resetExclusive ; Enemy Exclusive doesn't exists
+    dec a
     ld hl,$dd2a+8 ; BOXMON1OT
-    ret nz ; day care Exclusive doesn't exists
+    jr z,.getExclusive
+    dec a
+    ld hl,$da54+8 ; DayCare
+    jr z,.CopyExclusive
+.resetExclusive
+    xor a
+    ld hl,wTempExclusive
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+    jr .end
 .getExclusive
     ld a,[$cf92]
     ld bc,11
     call AddNTimes
+.CopyExclusive
     ld de,wTempExclusive
     ld bc,3
     call CopyData ; copy bc bytes of data from hl to de
-
+.end
     ; Save AlternateFormIndex
     ld a,[$cfb6] ; move2pp
     ld [wAlternateFormIndex],a
-
     jp GetMonHeader ; load base stats to $d0b8
 
 ItemPrices:
@@ -16082,6 +16117,41 @@ GetDefaultName:
 DiagonalLines: ; 4d85 (1:4d85)
     INCBIN "gfx/diagonal_lines.2bpp"
 
+LearnMove_CheckSkill:
+    jr nc,.continue
+    ld hl,LearnMove_SkillConfigTable
+    ld de,4
+    push hl
+    call IsInArray
+    pop hl
+    jr nc,.continue
+    ld a,b ; a = 4b + 1
+    add a  ; ...
+    add a  ; ...
+    inc a  ; ...
+    ld c,a
+    ld b,0
+    add hl,bc
+    ld a,[hli]
+    ld e,a
+    ld a,[hli]
+    ld d,a
+    or e
+    jr z,.continue ; Both pointer Byte zero
+    ld c,[hl] ; c = Skill Bit
+    ld h,d
+    ld l,e ; [hl] = Skill Byte
+    ld b,2
+    PREDEF HandleBitArray
+    ld a,c
+    and a
+    jr nz,.continue
+    scf
+    ret
+.continue
+    xor a ; rcf
+    ret
+
 ; Free
 
 SECTION "TextTerminator_6b20",ROMX[$6b20],BANK[$1]
@@ -16514,11 +16584,15 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
 
 ; ────────────────────────────────────────
 
-SECTION "LearnMove",ROMX[$6e43],BANK[$1]
-
-LearnMove: ; 6e43 (1:6e43)
+LearnMove:
+    call .IsSkill
+    call LearnMove_CheckSkill
+    jr nc,.continue
+    ld b,$0 ; 0 = No Learn
+    ret
+.continue
     call CheckMoveRelearn
-    call z,SaveScreenTilesToBuffer1
+    call z,.SaveScreenTilesToBuffer1
     ld a,[wWhichPokemon] ; $cf92
     ld hl,W_PARTYMON1NAME ; $d2b5
     call GetPartyMonName
@@ -16529,7 +16603,22 @@ LearnMove: ; 6e43 (1:6e43)
     call CheckMoveRelearn
     jr nz,.skip
     ; XX learned YY! ♫♪
+    call .IsSkill
+    ld hl,.LearnedSkillTextPlusSound
+    jr c,.PrintLearned
+    cp TELEPORT
     ld hl,.LearnedTextPlusSound
+    jr nz,.PrintLearned
+    ld hl,TELEPORT_FLAG_BYTE
+    bit TELEPORT_FLAG_BIT,[hl]
+    jr nz,.TeleportFullMessage
+    ld hl,.LearnedTextPlusSound
+    jr .PrintLearned
+.TeleportFullMessage
+    ld hl,.LearnedSkillTextPlusSound
+    call PrintText
+    ld hl,.LearnedTextPlusSound
+.PrintLearned
     call PrintText
     ; Get Mon OT Name to Try Add Exclusive Move
     ld hl,W_PARTYMON1OT+8
@@ -16553,6 +16642,8 @@ LearnMove: ; 6e43 (1:6e43)
     ld hl,TryToAddExclusiveMove
     call Bankswitch
 .skip
+    call .IsSkill
+    jp c,.SkillDontInsertInMonMoves
     ld hl,W_PARTYMON1_MOVE1 ; $d173
     ld bc,$2c
     ld a,[wWhichPokemon] ; $cf92
@@ -16579,11 +16670,6 @@ LearnMove: ; 6e43 (1:6e43)
     push hl
     push de
     call IsTryingToLearnPalFix_End
-;    call CheckMoveRelearn
-;    jr nz,.DoLearn2
-;    ld hl,.ForgotAndLearnText
-;    call PrintText
-;.DoLearn2
     pop de
     pop hl
     ld c,2 ; result
@@ -16591,21 +16677,6 @@ LearnMove: ; 6e43 (1:6e43)
     push bc
     ld a,[$d0e0]
     ld [hl],a
-    ;ld bc,$15           ; Don't Overwrite PP during NEW Move Learn
-    ;add hl,bc           ; ...
-    ;push hl             ; ...
-    ;push de             ; ...
-    ;dec a               ; ...
-    ;ld hl,Moves ; $4000 ; ...
-    ;ld bc,$6            ; ...
-    ;call AddNTimes      ; ...
-    ;ld de,$cee9         ; ...
-    ;ld a,BANK(Moves)    ; ...
-    ;call FarCopyData    ; ...
-    ;ld a,[$ceee]        ; ...
-    ;pop de              ; ...
-    ;pop hl              ; ...
-    ;nop ; ld [hl],a     ; ...
     ld a,[W_ISINBATTLE] ; $d057
     and a
     jr z,.LearnedMoveComplete
@@ -16625,6 +16696,23 @@ LearnMove: ; 6e43 (1:6e43)
     ld bc,$4
     call CopyData
     jr .LearnedMoveComplete
+
+.SaveScreenTilesToBuffer1
+    ld hl,.EmptyText
+    call PrintText
+    jp SaveScreenTilesToBuffer1
+
+.IsSkill
+    ld a,[$d0e0]
+    jp IsSkill
+
+.EmptyText
+    db "@"
+
+.SkillDontInsertInMonMoves
+    call IsTryingToLearnPalFix_End
+    ld b,$1 ; 1 = Learn directly
+    ret
 
 .AbandonLearningConfirm
     call IsTryingToLearnPalFix_End
@@ -16663,26 +16751,12 @@ LearnMove: ; 6e43 (1:6e43)
     pop hl
 .ChoiceAnotherMoveToDelete
     push hl
-;    call CheckMoveRelearn
-;    ld hl,.WhichMoveShouldBeReplacedText ; $6fb4
-;    call z,PrintText
-;    FuncCoord 4,7 ; $c430
-;    ld hl,Coord
-;    ld bc,$040e
-;    call CheckMoveRelearn
-;    jr z,.skip1
     FuncCoord 00,12
     ld hl,Coord
     ld bc,$0412
-;.skip1
     call TextBoxBorder
-;    FuncCoord 6,8 ; $c446
-;    ld hl,Coord
-;    call CheckMoveRelearn
-;    jr z,.skip2
     FuncCoord 02,13
     ld hl,Coord
-;.skip2
     ld de,$d0e1
     ld a,[$FF00+$f6]
     set 2,a
@@ -16692,19 +16766,10 @@ LearnMove: ; 6e43 (1:6e43)
     res 2,a
     ld [$FF00+$f6],a
     ld hl,wTopMenuItemY ; $cc24
-;    call CheckMoveRelearn
-;    jr nz,.skip3
-;    ld a,$8
-;    ld [hli],a
-;    ld a,$5
-;    ld [hli],a
-;    jr .skip4
-;.skip3
     ld a,13
     ld [hli],a
     ld a,01
     ld [hli],a
-;.skip4
     xor a
     ld [hli],a
     inc hl
@@ -16727,10 +16792,6 @@ LearnMove: ; 6e43 (1:6e43)
     pop hl
     bit 1,a
     jr nz,.asm_6fab_B_Pressed
-    ;push hl
-    ;call CheckImportantMove
-    ;pop hl
-    ;jp c,.ChoiceAnotherMoveToDelete
 
     ld a,[wCurrentMenuItem] ; $cc26
     ld c,a
@@ -16747,20 +16808,13 @@ LearnMove: ; 6e43 (1:6e43)
     TX_FAR _LearnedText
     db $b,6,"@"
 
-.WhichMoveShouldBeReplacedText
-    TX_FAR _WhichMoveShouldBeReplacedText
-    db "@"
-
-;.AbandonLearningText
-;    TX_FAR _AbandonLearningText
-;    db "@"
+.LearnedSkillTextPlusSound
+    TX_FAR _LearnedSkillText1
+    db $11
+    db $0,$58
 
 .ReplaceAMoveForText
     TX_FAR _ReplaceAMoveForText
-    db "@"
-
-.ForgotAndLearnText
-    TX_FAR _ForgotAndLearnText
     db "@"
 
 ; ────────────────────────────────────────
@@ -17339,7 +17393,7 @@ GetAddressOfScreenCoords: ; 7375 (1:7375)
 TextBoxFunctionTable: ; 7387 (1:7387)
     dbw $13,Func_74ba
     dbw $15,Func_74ea
-    dbw $04,FieldMovesMenu
+    dbw $04,SkillMenu
     dbw $03,ChoiceMonSimpleMenu
     db $ff ; terminator
 
@@ -17741,11 +17795,11 @@ MenuStrings: ; 7671 (1:7671)
 .HealCancelMenu ; 76d5 (1:36d5)
     db "HEAL",$4E,"CANCEL@"
 
-FieldMovesMenu: ; 76e1 (1:36e1)
+SkillMenu: ; 76e1 (1:36e1)
     FuncCoord 03,16
     ld hl,Coord
     ld b,0
-    ld a,[wNumFieldMoves]
+    ld a,[wNumSkill]
     ld de,-40
 .loop1
     add hl,de
@@ -17758,18 +17812,18 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     call UpdateSprites
     FuncCoord 05,18
     ld hl,Coord
-    ld a,[wNumFieldMoves]
+    ld a,[wNumSkill]
     ld de,-40
 .loop2
     add hl,de
     dec a
     jr nz,.loop2
     xor a
-    ld [wNumFieldMoves],a
-    ld de,wFieldMoves
-.LoopFieldMoves
+    ld [wNumSkill],a
+    ld de,wSkill
+.LoopSkill
     push hl
-    ld hl,.FieldMoveNames
+    ld hl,.SkillNames
     call .GetMonID
     CP LAPRAS
     ld a,[de]
@@ -17778,7 +17832,7 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     jr z,.LaprasSurf
 .NotLapras
     and a
-    jr z,.LoopFieldMovesEnd
+    jr z,.LoopSkillEnd
     inc de
     ld b,a
 .LoopMoveNames
@@ -17800,12 +17854,12 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     ld bc,40
     add hl,bc
     pop de
-    jr .LoopFieldMoves
-.LoopFieldMovesEnd
+    jr .LoopSkill
+.LoopSkillEnd
     pop hl
     ret
 .LaprasSurf
-    ld hl,.FieldMoveSurfException
+    ld hl,.SkillSurfException
     inc de
     jr .LoopMoveNamesEnd
 .GetMonID
@@ -17821,21 +17875,20 @@ FieldMovesMenu: ; 76e1 (1:36e1)
     pop hl
     ret
 
-.FieldMoveNames
-    db "FLY@"    ; Move : SWOOP
-    db "TELEP.@" ; Move : TELEPORT
-    db "DIG@"    ; Move : TRAPHOLE
-    db "CUT@"    ; Move : BLADE
-    db "FLOAT@"  ; Move : TSUNAMI (SURF)
-    db "STR.TH@" ; Move : STRIKE
-    db "LIGHT@"  ; Move : FLASH
-    db "HEAL@"   ; Move : SOFTBOILED
+.SkillNames
+    db "FLY@"    ; Ex Move : SWOOP
+    db "TELEP.@" ; Ex Move : TELEPORT
+    db "DIG@"    ; Ex Move : TRAPHOLE
+    db "CUT@"    ; Ex Move : BLADE
+    db "FLOAT@"  ; Ex Move : TSUNAMI (SURF)
+    db "STR.TH@" ; Ex Move : STRIKE
+    db "LIGHT@"  ; Ex Move : FLASH
+    db "HEAL@"   ; Ex Move : SOFTBOILED
 
-.FieldMoveSurfException
+.SkillSurfException
     db "SURF@"
 
 ChoiceMonSimpleMenu:
-    call GetMonFieldMoves
     FuncCoord 11,06
     ld hl,Coord
     ld b,10
@@ -17843,73 +17896,17 @@ ChoiceMonSimpleMenu:
     call TextBoxBorder
     call UpdateSprites
     ld a,$c
-    ld [$FF00+$f7],a ; hFieldMoveMonMenuTopMenuItemX
+    ld [$FF00+$f7],a ; hSkillMonMenuTopMenuItemX
     FuncCoord 13,08
     ld hl,Coord
     ld de,.PokemonMenuEntries
     jp PlaceString
 .PokemonMenuEntries
-    db "FIELD",$4E
+    db "SKILL",$4E
     db "STATS",$4E
     db "MOVES",$4E
     db "RENAME",$4E
     db "SWITCH","@"
-
-GetMonFieldMoves:
-; Totalmente Ristrutturato basato su Tabella "FieldMoves"
-    call .CheckMonAlreadyKnowTeleportAndFillMemory ; this function call "GetMonHeader"
-    ld a,[W_MONH_FIELDMOVES]
-    jr nc,.next
-    set 1,a ; FM_TELEPORT
-.next
-    ld e,a
-    ld c,8
-    ld b,0
-    ld hl,wFieldMoves
-.Loop8BitRule
-    ld a,8+1
-    sub c ; a=a-c ; Move id
-    srl e
-    jr nc,.FieldMoveNotFound
-.FieldMoveFound
-    inc b ; num of founded moves
-    ld [hli],a ; store field move id in wFieldMoves vector
-    ld a,b
-    cp 8 ; Max Possible Number of Field Moves
-    jr z,.End
-.FieldMoveNotFound
-    dec c
-    jr nz,.Loop8BitRule
-.End
-    ld a,b
-    ld [wNumFieldMoves],a ; store num of founded moves in wNumFieldMoves
-    ret
-.CheckMonAlreadyKnowTeleportAndFillMemory
-    call .BackupGenericBuffer
-    ld a,TELEPORT
-    ld [$d0e0],a
-    ld b,BANK(CheckMonAlreadyKnowMove)
-    ld hl,CheckMonAlreadyKnowMove
-    call Bankswitch
-    push af
-    call .RestoreGenericBuffer
-    xor a
-    ld hl,wFieldMoves
-    ld bc,8+1
-    call FillMemory
-    pop af
-    ret
-.BackupGenericBuffer
-    ld hl,GenericBuffer+00
-    ld de,GenericBuffer+96
-    jr .BackupGenericBufferCommon
-.RestoreGenericBuffer
-    ld hl,GenericBuffer+96
-    ld de,GenericBuffer+00
-    ; fall through
-.BackupGenericBufferCommon
-    ld bc,96
-    jp CopyData
 
 DrainHPEffect_:
     ld de,W_DAMAGE+1
@@ -18024,6 +18021,22 @@ DrainHPEffect_:
 .DreamWasEatenText
     TX_FAR _DreamWasEatenText
     db "@"
+
+SCT: MACRO
+    db \1
+    dw \2
+    db \3
+ENDM
+
+LearnMove_SkillConfigTable:
+    SCT Skill__FLY      , FLY_FLAG_BYTE      , FLY_FLAG_BIT
+    SCT Skill__DIG      , DIG_FLAG_BYTE      , DIG_FLAG_BIT
+    SCT Skill__CUT      , CUT_FLAG_BYTE      , CUT_FLAG_BIT
+    SCT Skill__FLOAT    , FLOAT_FLAG_BYTE    , FLOAT_FLAG_BIT
+    SCT Skill__STRENGTH , STRENGTH_FLAG_BYTE , STRENGTH_FLAG_BIT
+    SCT Skill__LIGHT    , LIGHT_FLAG_BYTE    , LIGHT_FLAG_BIT
+    SCT Skill__HEAL     , HEAL_FLAG_BYTE     , HEAL_FLAG_BIT
+    db $FF
 
 ; Free
 
@@ -18325,8 +18338,6 @@ UnnamedText_7b5e
 UnnamedText_7b63
     TX_FAR _UnnamedText_7b63
     db "@"
-
-; Free
 
 SECTION "_RemovePokemon",ROMX[$7b68],BANK[$1]
 
@@ -18835,85 +18846,6 @@ CheckDiglettsCave:
     call CheckDarkMap
 .end
     jp GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
-
-;CheckImportantMove:
-;
-;    ; Get Move to Delete
-;    ld a,[wCurrentMenuItem] ; $cc26
-;    ld c,a
-;    ld b,$0
-;    add hl,bc
-;    ld a,[hl]
-;
-;    push af ; Backup Move to Delete
-;    push bc ; Backup Move Offset
-;
-;    push af ; Backup Move
-;
-;    ; Get Move Name
-;    ld [$d11e],a
-;    call GetMoveName
-;
-;    ; Get Potential Move List
-;    call CheckMoveRelearn
-;    jr nz,.skip
-;    ld a,[wWhichPokemon]
-;    ld [$cf92],a
-;    xor a ; player party
-;    ld [$cc49],a
-;    call LoadMonData
-;    ld b,BANK(GetMonPotentialMoveList)
-;    ld hl,GetMonPotentialMoveList
-;    call Bankswitch
-;.skip
-;
-;    pop bc ; Restore Move
-;    ld a,[$cf98]
-;    cp MEW
-;    jr z,.ConfirmDelete
-;
-;    ; Search Move to Delete in Potential Move List
-;    ld hl,wMoveRelearnerMoveList
-;    ld a,[hli]
-;    and a
-;    jr z,.NotFindThenImportant
-;    ld c,a
-;.Loop
-;    ld a,[hli]
-;    cp $FF
-;    jr z,.NotFindThenImportant
-;    cp b
-;    jr z,.FindThenNotImportant
-;    dec c
-;    jr nz,.Loop
-;.NotFindThenImportant
-;
-;    ld hl,.ImportantText
-;    call IsTryingToLearnPalFix_PrintText
-;
-;    FuncCoord 14,7 ; $c43a
-;    ld hl,Coord
-;    ld bc,$80f
-;    ld a,$14
-;    ld [$d125],a
-;    call DisplayTextBoxID
-;    ld a,[wCurrentMenuItem] ; $cc26
-;    and a
-;    jr z,.ConfirmDelete
-;
-;    pop bc ; Restore Move Offset
-;    pop af ; Backup Move to Delete
-;    scf
-;    ret
-;.FindThenNotImportant
-;.ConfirmDelete
-;    pop bc ; Restore Move Offset
-;    pop af ; Backup Move to Delete
-;    and a ; rcf
-;    ret
-;.ImportantText
-;    TX_FAR _ImportantText
-;    db "@"
 
 HandleMenuInput_PrintMoveBox:
     push hl
@@ -22680,9 +22612,9 @@ SurfingCry:
     ld a,[$d152]
     and a ; using surfboard?
     jr z,.skip
-    ld a,[wFieldMoveMonID]
+    ld a,[wSkillMonID]
     ld [wSurfingMonID],a
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
 .skip
     call IsSurfingOnLapras
     ld hl,SurfingGotOnText
@@ -22696,7 +22628,7 @@ SurfingCry:
 SurfingAttemptFailed:
     ld hl,ItemUseFailed
     push hl ; return pointer
-    ld a,[wFieldMoveMonID]
+    ld a,[wSkillMonID]
     cp LAPRAS
     ld hl,NoSurfingHereText
     ret nz
@@ -23328,11 +23260,11 @@ UseItem_:
     dw UnusableItem      ; ItemUsePPRestore ; MAX_ETHER
     dw ItemUsePPRestore  ; ELIXER
     dw UnusableItem      ; ItemUsePPRestore ; MAX_ELIXER
-    dw UnusableItem      ; HM_01 : NATURE POWER
-    dw UnusableItem      ; HM_02 : AIR POWER
-    dw UnusableItem      ; HM_03 : WATER POWER
-    dw UnusableItem      ; HM_04 : EARTH POWER
-    dw UnusableItem      ; HM_05 : FIRE POWER
+    dw UnusableItem      ; CUT      ; Ex HM_01 ; Ex NATURE POWER
+    dw UnusableItem      ; FLY      ; Ex HM_02 ; Ex AIR POWER
+    dw UnusableItem      ; FLOAT    ; Ex HM_03 ; Ex WATER POWER
+    dw UnusableItem      ; STRENGTH ; Ex HM_04 ; Ex EARTH POWER
+    dw UnusableItem      ; LIGHT    ; Ex HM_05 ; Ex FIRE POWER
 
 IsSurfingAllowed:
     ld hl,$d728
@@ -24188,7 +24120,7 @@ ItemUseMedicine:
     and a ; using Softboiled?
     jp z,.notUsingSoftboiled2
 ; if using softboiled
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     ld hl,wHPBarMaxHP
     ld a,[hli]
     push af
@@ -27040,7 +26972,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     dec hl
     dec hl ; go to move 1
     xor a
-    ld [$cee9],a ; LearningMovesFromDayCare
+    ld [wLearningMovesFromDayCare],a
     ld d,h
     ld e,l
     call WriteMonMoves2
@@ -28126,7 +28058,7 @@ UsingDigCry:
     and a
     ret z
     push af
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     pop af
     ret
 
@@ -28396,7 +28328,7 @@ UseStrength:
     set 0,[hl]
     ld hl,wOverworlStrengthAnimBit1
     set 1,[hl]
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     scf ; success
     ret
 .AlreadyStrength
@@ -28549,14 +28481,6 @@ WriteMaxStatExpByLevel:
     ld [H_DIVISOR],a
     ld b,4 ; 4 bytes
     jp Divide
-
-BootedUpTMText:
-    TX_FAR _BootedUpTMText
-    db "@"
-
-BootedUpHMText:
-    TX_FAR _BootedUpHMText
-    db "@"
 
 TeachMachineMoveText:
     TX_FAR _TeachMachineMoveText
@@ -29516,7 +29440,7 @@ StartMenu_TrainerInfo:
     ld c,3
     ld b,%00000001
     call PrintNumber
-    jp .PrintPowers
+    jr .PrintSkill
 
 .TrainerInfo_FarCopyData
     ld a,$0b
@@ -29529,52 +29453,78 @@ StartMenu_TrainerInfo:
     db "MAX LEVEL",$D3,$4E
     db "AVG LEVEL",$D3,$4E
     db "H.OF FAME",$D3,$4E
-    db "POWER",$D3,$4E,$4E
-    db "BADGES",$D3,"@"
+    db "SKILL",$D3,$4E,$4E
+    db "BADGE",$D3,"@"
 
-.PrintPowers
-    FuncCoord 09,09
+.PrintSkill
+    FuncCoord 10,09
     ld de,Coord
-    ld hl,$d803 ; NaturePower
-    bit 0,[hl]  ; ...
+    ld bc,-19
+
+.next0
+    ld hl,CUT_FLAG_BYTE
+    bit CUT_FLAG_BIT,[hl]
     jr z,.next1
     ld a,$D8
-    ld [de],a
-    inc de
-    inc de
+    call .WriteAndGoToNext
 .next1
-    ld hl,$d7e0 ; AirPower
-    bit 6,[hl]  ; ...
+    ld hl,FLY_FLAG_BYTE
+    bit FLY_FLAG_BIT,[hl]
     jr z,.next2
     ld a,$D9
-    ld [de],a
-    inc de
-    inc de
+    call .WriteAndGoToNext
 .next2
-    ld hl,$d857 ; WaterPower
-    bit 0,[hl]  ; ...
+    ld hl,FLOAT_FLAG_BYTE
+    bit FLOAT_FLAG_BIT,[hl]
     jr z,.next3
     ld a,$DA
-    ld [de],a
-    inc de
-    inc de
+    call .WriteAndGoToNext
 .next3
-    ld hl,$d78e ; CheckEarthPower
-    bit 0,[hl]  ; ...
+    ld hl,STRENGTH_FLAG_BYTE
+    bit STRENGTH_FLAG_BIT,[hl]
     jr z,.next4
     ld a,$DB
-    ld [de],a
-    inc de
-    inc de
+    call .WriteAndGoToNext
 .next4
-    ld hl,$d7c2 ; CheckFirePower
-    bit 0,[hl]  ; ...
+    ld hl,LIGHT_FLAG_BYTE
+    bit LIGHT_FLAG_BIT,[hl]
     jr z,.next5
     ld a,$DC
-    ld [de],a
-    inc de
-    inc de
+    call .WriteAndGoToNext
 .next5
+    ld hl,TELEPORT_FLAG_BYTE
+    bit TELEPORT_FLAG_BIT,[hl]
+    jr z,.next6
+    ld a,$DD
+    call .WriteAndGoToNext
+.next6
+    ld hl,DIG_FLAG_BYTE
+    bit DIG_FLAG_BIT,[hl]
+    jr z,.next7
+    ld a,$DE
+    call .WriteAndGoToNext
+.next7
+    ld hl,HEAL_FLAG_BYTE
+    bit HEAL_FLAG_BIT,[hl]
+    jr z,.next8
+    ld a,$DF
+    call .WriteAndGoToNext
+.next8
+    ret
+
+.WriteAndGoToNext
+    ld [de],a
+    ld a,b
+    and a
+    ld bc,-19
+    jr z,.CalcNewDE
+    ld bc,+21
+.CalcNewDE
+    ld h,d
+    ld l,e
+    add hl,bc
+    ld d,h
+    ld e,l
     ret
 
 ; draws a text box on the trainer info screen
@@ -29786,29 +29736,8 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     db "NOT ABLE@"
 .evolutionStoneMenu
     push hl
-    ;ld b,0
-    ;ld a,[$CF98] ; pokemon ID
-    ;ds 1 ; dec a ; 00MOD
-    ;call LoadEvosMovesPointerTableByPokedex
-    ;add a
-    ;rl b
-    ;ld c,a
-    ;add hl,bc
-    ;ld de,$CD6D
-    ;ld a,BANK(EvosMovesPointerTable)
-    ;ld bc,2
-    ;call FarCopyData
-    ;ld hl,$CD6D
-
-    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
     ld de,$CD6D
-    ld a,BANK(MissingNo_EvosMoves)
-    ld bc,13 ; Eevee's Evolution Bytes
-    call FarCopyData
-    ld hl,$CD6D
+    PREDEF _GetEvos
     ld de,.notAbleToEvolveText
 ; loop through the pokemon's evolution entries
 .checkEvolutionsLoop
@@ -30028,7 +29957,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld [$cfcb],a
     call DisplayPartyMenu
     jr .checkIfPokemonChosen
-.loop ; $70BF ► Don't Move this Pointer!!!
+.loop
     xor a
     ld [$cc35],a
     ld [$d07d],a
@@ -30036,7 +29965,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call GoBackToPartyMenu
 .checkIfPokemonChosen
     ld a,0
-    ld [wFieldMoveMonID],a
+    ld [wSkillMonID],a
     jr nc,.chosePokemon
 .exitMenu
     call GBPalWhiteOutWithDelay3
@@ -30056,7 +29985,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jr nz,.ReloadScreenAndLoop
     ld a,[wCurrentMenuItem]
     and a
-    jr z,.choseFieldMove
+    jr z,.choseSkill
     push af
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     pop af
@@ -30099,29 +30028,32 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .MiddleJumpToLoop
     jr .loop
 
-.NoFieldMoves
+.NoSkill
     ld a,$a5 ; Error
     call PlaySoundWaitForCurrent ; play sound
     jr .RedrawMenu
 
-.choseFieldMove
-    ld a,[wNumFieldMoves]
+.choseSkill
+    ld b,BANK(GetMonSkill)
+    ld hl,GetMonSkill
+    call Bankswitch
+    ld a,[wNumSkill]
     and a
-    jr z,.NoFieldMoves
-    call CheckFieldMoveEnergy
-    jr c,.NoFieldMoves
-    ld a,4 ; FieldMovesMenu
+    jr z,.NoSkill
+    call CheckSkillEnergy
+    jr c,.NoSkill
+    ld a,4 ; SkillMenu
     ld [$d125],a
-    call DisplayTextBoxID ; display pokemon field moves
+    call DisplayTextBoxID ; display pokemon skill
     ld bc,$ff12 ; max menu item ID,top menu item Y
     ld d,04 ; top menu item X
-    call HandlePkmnSubMenuFieldMoves
+    call HandlePkmnSubMenuSkill
     push af
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     pop af
     bit 1,a ; was the B button pressed?
     jr nz,.MiddleJumpToLoop
-    ld hl,wFieldMoves
+    ld hl,wSkill
     ld b,0
     ld a,[wCurrentMenuItem]
     ld c,a
@@ -30150,8 +30082,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     dw .softboiled
 
 .fly
-;    bit 2,a ; does the player have the Thunder Badge?
-    call CheckAirPower ; jp z,.newBadgeRequired
     call CheckIfInOutsideMapAndAtLeastOneFlyingMap
     jr z,.canFly
     ld a,[$cf92]
@@ -30165,7 +30095,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld a,[$d732]
     bit 3,a ; did the player decide to fly?
     jr z,.undoFly
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     jp .goBackToMap
 .undoFly
     call LoadFontTilePatterns
@@ -30177,12 +30107,10 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     db "@"
 
 .cut
-;    bit 1,a ; does the player have the Cascade Badge?
-    call CheckNaturePower ; jp z,.newBadgeRequired
     ld b,BANK(CheckCutTile)
     ld hl,CheckCutTile
     call Bankswitch
-    call z,PlayCryAndDecreaseFieldMoveEnergy
+    call z,PlayCryAndDecreaseSkillEnergy
     PREDEF UsedCut
     ld a,[$cd6a]
     and a
@@ -30190,8 +30118,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jp CloseTextDisplay
 
 .surf
-;    bit 4,a ; does the player have the Soul Badge?
-    call CheckWaterPower ; jp z,.newBadgeRequired
     ld b,BANK(IsSurfingAllowed)
     ld hl,IsSurfingAllowed
     call Bankswitch
@@ -30211,16 +30137,12 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jp .goBackToMap
 
 .strength
-;    bit 3,a ; does the player have the Rainbow Badge?
-    call CheckEarthPower ; jp z,.newBadgeRequired
     PREDEF UseStrength
     jp nc,.loop
     jr .WhiteScreenAndGotoMap
 
 .flash
-;    bit 0,a ; does the player have the Boulder Badge?
-    call CheckFirePower ; jp z,.newBadgeRequired
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     ld a,BENGAL
     ld [$cf91],a
     ld [$d152],a
@@ -30247,7 +30169,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     call PrintText
     jp .loop
 .canTeleport
-    call PlayCryAndDecreaseFieldMoveEnergy
+    call PlayCryAndDecreaseSkillEnergy
     ld hl,.warpToLastPokemonCenterText
     call PrintText
     ld hl,$d732
@@ -30310,6 +30232,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .goBackToMap
     call RestoreScreenTilesAndReloadTilePatterns
     jp CloseTextDisplay
+
+; Free
 
 SECTION "ItemMenuLoop",ROMX[$72fc],BANK[$4]
 
@@ -31197,50 +31121,6 @@ SetDamageDuringRecoil:
     ld hl,SetDamageDuringRecoil_
     jp Bankswitch
 
-;DontCheckElement:
-;    pop af ; Delete Call Back Return
-;    jp NewBadgeRequired
-
-ElementEnd:
-    ret nz
-    pop af ; Delete Call Back Return
-    ld hl,.ElementMissedText
-    call PrintText
-    jp $70BF ; StartMenu_Pokemon.loop
-.ElementMissedText
-    TX_FAR _ElementMissedText
-    db "@"
-
-CheckNaturePower: ; CUT
-;    jr z,DontCheckElement
-    ld hl,$d803
-    bit 0,[hl]
-    jr ElementEnd
-
-CheckAirPower: ; FLY
-;    jr z,DontCheckElement
-    ld hl,$d7e0
-    bit 6,[hl]
-    jr ElementEnd
-
-CheckWaterPower: ; SURF
-;    jr z,DontCheckElement
-    ld hl,$d857
-    bit 0,[hl]
-    jr ElementEnd
-
-CheckEarthPower: ; STRENGTH
-;    jr z,DontCheckElement
-    ld hl,$d78e
-    bit 0,[hl]
-    jr ElementEnd
-
-CheckFirePower: ; FIRE
-;    jr z,DontCheckElement
-    ld hl,$d7c2
-    bit 0,[hl]
-    jr ElementEnd
-
 FixTMPalette:
     push hl
     ld hl,wFlagNoHpPalBit2
@@ -31531,17 +31411,9 @@ CheckIfInOutsideMapAndAtLeastOneFlyingMap:
     dec a
     ret
 
-NewBadgeRequired:
-    ld hl,.newBadgeRequiredText
-    call PrintText
-    jp $70BF ; StartMenu_Pokemon.loop
-.newBadgeRequiredText
-    TX_FAR _NewBadgeRequiredText
-    db "@"
-
-HandlePkmnSubMenuFieldMoves:
-    ld hl,wFieldMoves
-    ld e,8+1 ; Max Number of Field Moves + 1
+HandlePkmnSubMenuSkill:
+    ld hl,wSkill
+    ld e,8+1 ; Max Number of Skill + 1
 .adjustMenuVariablesLoop
     dec e
     jr z,.storeMenuVariables
@@ -31583,7 +31455,7 @@ GetPartyMonIDAndName:
     ld b,0
     add hl,bc
     ld b,[hl]
-    ld hl,wFieldMoveMonID
+    ld hl,wSkillMonID
     ld [hl],b
     ld hl,W_PARTYMON1NAME
     call GetPartyMonName
@@ -38044,6 +37916,40 @@ PowerPlantExplosion:
     ld c,2
     jp DelayFrames
 
+Route16HouseText1:
+    db $08 ; asm
+    ld a,[FLY_FLAG_BYTE]
+    bit FLY_FLAG_BIT,a
+    ld hl,.HM02AfterText
+    jr nz,.done
+    ld hl,.PreHM02Text
+    call PrintText
+    ld bc,(HM_02 << 8) | 1
+    call FakeGiveItem
+    ld hl,FLY_FLAG_BYTE
+    set FLY_FLAG_BIT,[hl]
+    ld b,FLY_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM02SkillFoundText
+    jr c,.done
+    ld hl,.HM02SkillNotFoundText
+.done
+    call PrintText
+    jp TextScriptEnd
+
+.PreHM02Text
+    TX_FAR _PreHM02Text
+    db "@"
+.HM02SkillFoundText
+    TX_FAR _HM02SkillFoundText
+    db "@"
+.HM02SkillNotFoundText
+    TX_FAR _HM02SkillNotFoundText
+    db "@"
+.HM02AfterText
+    TX_FAR _HM02AfterText
+    db "@"
+
 ; Free
 
 SECTION "Func_1c98a",ROMX[$498a],BANK[$7]
@@ -40979,9 +40885,7 @@ DiglettsCaveRoute2Script: ; 1deb0 (7:5eb0)
 DiglettsCaveRoute2TextPointers: ; 1deb8 (7:5eb8)
     dw DiglettsCaveRoute2Text1
 
-DiglettsCaveRoute2Text1: ; 1deba (7:5eba)
-    TX_FAR _DiglettsCaveRoute2Text1
-    db "@"
+SECTION "DiglettsCaveRoute2Object",ROMX[$5ebf],BANK[$7]
 
 DiglettsCaveRoute2Object: ; 0x1debf (size=34)
     db $7d ; border tile
@@ -41802,42 +41706,9 @@ Route16HouseTextPointers: ; 1e5fb (7:65fb)
     dw Route16HouseText1
     dw Route16HouseText2
 
-Route16HouseText1: ; 1e5ff (7:65ff)
-    db $08 ; asm
-    ld a,[$d7e0]
-    bit 6,a
-    ld hl,HM02ExplanationText
-    jr nz,.asm_13616 ; 0x1e608
-    ld hl,Route16HouseText3
-    call PrintText
-    ld bc,(HM_02 << 8) | 1
-    call FakeGiveItem
-    jr nc,.BagFull
-    ld hl,$d7e0
-    set 6,[hl]
-    ld hl,ReceivedHM02Text
-    jr .asm_13616 ; 0x1e620
-.BagFull
-    ld hl,HM02NoRoomText
-.asm_13616 ; 0x1e625
-    call PrintText
-    jp TextScriptEnd
+; Free
 
-Route16HouseText3: ; 1e62b (7:662b)
-    TX_FAR _Route16HouseText3
-    db "@"
-
-ReceivedHM02Text: ; 1e630 (7:6630)
-    TX_FAR _GotText
-    db $11,"@"
-
-HM02ExplanationText: ; 1e636 (7:6636)
-    TX_FAR _HM02ExplanationText
-    db "@"
-
-HM02NoRoomText: ; 1e63b (7:663b)
-    TX_FAR _HM02NoRoomText
-    db "@"
+SECTION "Route16HouseText2",ROMX[$6640],BANK[$7]
 
 Route16HouseText2: ; 1e640 (7:6640)
     db $08 ; asm
@@ -42936,94 +42807,82 @@ OnlyOneMoveText:
 ; Get Mon Potential Move List
 ; ────────────────────────────────────────────────────────────
 
+; Input : b = Level
+;       : wWriteInGenericBufferBit4
+;         Use "GenericBuffer+1" instead of "wMoveRelearnerMoveList+1"
+;       : wNoSkillInListBit6
+;         ByPass Skill in "Get Moves"
+;       : wNoExclusiveInListBit7
+;         ByPass "Handle Exclusive Learn Move"
+;
+; Output : hl/de     = First Output Move
+;        : hl-1/de-1 = Move Counter (Only in "wMoveRelearnerMoveList")
+
 GetMonPotentialMoveList:
 
     ; Reset Output
+    call .GetPointer
+    jr nz,.DontOverwriteFirstByte
     xor a
-    ld hl,wMoveRelearnerMoveList
-    ld [hli],a
-    dec a ; a = $FF
-    ld [hl],a
-
-    ; Check Not MEW
-    ld a,[$cf98]
-    cp MEW
-    ret z
-
-    ; Standarize Level
-    ld a,[$cc49]
-    and a ; is it a list of party pokemon or box pokemon?
-    jr z,.skipCopyingLevel
-.copyLevel
-    ld a,[$cf9b]
-    ld [$cfb9],a
-.skipCopyingLevel
-
-    ; Get Copy of Level UP EvosMoves in GenericBuffer+1
-    ;ld d,0
-    ;ld a,[W_MONHEADER]
-    ;call LoadEvosMovesPointerTableByPokedex
-    ;; ds 1 ; dec a ; 00MOD
-    ;add a
-    ;rl d
-    ;ld e,a
-    ;add hl,de
-    ;ld de,GenericBuffer+1
-    ;ld a,BANK(EvosMovesPointerTable)
-    ;ld bc,2
-    ;call FarCopyData
-    ;ld hl,GenericBuffer+1
-
-    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a ; hl pointer to Correct EvosMoves
-
-    ld a,BANK(MissingNo_EvosMoves)
-    ld de,GenericBuffer+1
-    ld bc,96-1
-    call FarCopyData ; copy bc bytes of data from a:hl to de
-
-    ld de,wMoveRelearnerMoveList+1 ; Final List Pointer
-
-    ; Get Mon Move List from Level UP EvosMoves (GenericBuffer+1)
-    ld hl,GenericBuffer+1
-.skipEvolutionDataLoop
-    ld a,[hli]
-    and a
-    jr nz,.skipEvolutionDataLoop
-.LearnSetLoop
-    ld a,[hli] ; Move Level
-    and a
-    jr z,.EndLearnSetLoop
-    ld c,a
-    ld a,[$cfb9] ; Mon Level
-    cp c
-    jr c,.EndLearnSetLoop ; Mon Level < Move Level
-    ld a,[hli]
+    dec de
     ld [de],a
     inc de
-    inc b
-    jr .LearnSetLoop
-.EndLearnSetLoop
+.DontOverwriteFirstByte
+    xor a
+    ld [de],a
+    dec a ; a = $FF
+    ld [wMaxNotExclMoveSlotId],a
 
-    ; Handle Exlusive Learn Move
+    ; Check Not MEW
+    ld a,[W_MONHEADER]
+    cp MEW
+    ret z
+    
+    ; Get Moves
+    PREDEF GetMoves
+
+    ; Handle Exclusive Learn Move
+    ld hl,wNoExclusiveInListBit7
+    bit 7,[hl]
+    jr nz,.SkipExclusive
     ld b,BANK(HandleExclusiveLearnMove)
     ld hl,HandleExclusiveLearnMove
     call Bankswitch
+.SkipExclusive
 
-    ; Insert End List & Counter
-    ld a,$FF
+    ; Insert End List
+    xor a
     ld [de],a
+
+    ; Check End (Write in GenericBuffer)
+    call .GetPointer
+    ret nz
+
+    ; Insert Counter
     ld b,-1
     ld hl,wMoveRelearnerMoveList+1
 .CountLoop
     inc b
     ld a,[hli]
-    cp $FF
+    and a
     jr nz,.CountLoop
     ld a,b
-    ld [wMoveRelearnerMoveList],a ; Insert Counter
+    ld hl,wMoveRelearnerMoveList
+    ld [hli],a ; Insert Counter
+    ; hl = wMoveRelearnerMoveList+1
+    ld d,h
+    ld e,l
+    ret
+
+.GetPointer
+    ld hl,wWriteInGenericBufferBit4
+    bit 4,[hl]
+    ld de,wMoveRelearnerMoveList+1
+    jr z,.GetPointer_End
+    ld de,GenericBuffer+1
+.GetPointer_End
+    ld h,d
+    ld l,e
     ret
 
 ; ────────────────────────────────────────────────────────────
@@ -43038,6 +42897,8 @@ MovesMenu:
     call SaveScreenTilesToBuffer1
     ld hl,wFlagMoveRelearnEngagedBit7
     set 7,[hl]
+    ld hl,wNoSkillInListBit6
+    set 6,[hl]
     ; Backup Screen "Offset"
     ld a,[wListScrollOffset]
     push af
@@ -43084,11 +42945,19 @@ MovesMenu:
     ; Get Actual Moves and Mon Potential Move List in wMoveRelearnerMoveList
     call LoadMonDataAndPrintActualMoves
     call WriteEnergyAllMovesDuringMoveRelearn
+    ld a,[$cfb9] ; Level
+    ld b,a       ; ...
     call GetMonPotentialMoveList
 
-    ; Check at least one move
+    ; Check at least one move or MEW Exception
+    ld a,[W_MONHEADER]
+    cp MEW
+    jr z,.continue
+    dec hl
+    ld a,[hli]
     and a
     jp z,.return ; No Move to Learn
+.continue
 
     ; Mini Sprite
     ld a,[$cf98]
@@ -43107,7 +42976,7 @@ MovesMenu:
     ld [hli],a ; wCurrentMenuItem
     inc hl
     inc hl
-    ld a,%11110111 ; ▼▲◄►StSeBA
+    ld a,%11111111 ; ▼▲◄►StSeBA
     ld [hli],a ; wMenuWatchedKeys
     xor a
     ld [hl],a ; wLastMenuItem
@@ -43182,6 +43051,8 @@ MovesMenu:
 
     pop af
     ld [wListScrollOffset],a ; Restore Screen "Offset"
+    ld hl,wNoSkillInListBit6
+    res 6,[hl]
     ld hl,wFlagMoveRelearnEngagedBit7
     res 7,[hl]
     jp LoadScreenTilesFromBuffer1
@@ -43306,6 +43177,8 @@ ChoiceRelearnMove:
 
 .MenuLoop
     call .HandleMenuInput
+    bit 0,a ; was the A button pressed? 
+    jr nz,.APressed
     bit 1,a ; was the B button pressed?
     ret nz
     bit 5,a ; was left button pressed?
@@ -43314,10 +43187,17 @@ ChoiceRelearnMove:
     jr nz,.RightPressed
     bit 2,a ; was select button pressed?
     jp nz,.SelectPressed
-    and %11000000 ; was up or down button pressed?
-    jr nz,.UpOrDownPressedOrSelectUsed
-    jp PlaceUnfilledArrowMenuCursor ; A pressed then return (z flag set)
+    bit 3,a ; was start button pressed?
+    jr nz,.start
+    jr .UpOrDownPressedOrSelectUsed
 
+.APressed
+    ld hl,H_CURRENTPRESSEDBUTTONS ; ▼▲◄►StSeBA
+    res 3,[hl] ; Disable Start Pressed
+    call .ResetScreen
+    call PlaceUnfilledArrowMenuCursor
+    xor a ; szf
+    ret
 .LeftPressed
     FuncCoord 04,01
     ld hl,Coord
@@ -43332,7 +43212,21 @@ ChoiceRelearnMove:
 .LeftRightCommon
     call .GetNumberOfScreenMenu
     cp b
-    jr nc,.MenuLoop
+    jr c,.MenuContinue
+    jr z,.RightToStart
+.LeftToEnd
+    ld a,b
+    dec a
+    jr .CheckNoInfiniteLoop
+.RightToStart
+    xor a
+.CheckNoInfiniteLoop
+    ld b,a
+    ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
+    and a                        ; ...
+    jr z,.MenuLoop               ; ...
+    ld a,b
+.MenuContinue
     ld [hl]," "
     ld [wListScrollOffset],a
     call Delay3
@@ -43343,18 +43237,22 @@ ChoiceRelearnMove:
     jr nc,.start
     ld [wCurrentMenuItem],a
 .start
+    call .ResetScreen
+    jr .MenuLoop
+
+.ResetScreen
     call .ClearScreenArea
     call .PrintMovesAndArrows
     call .GetCurrentMove
     call .GetMaxCurrentScreenMenuLenght
     ld [wMaxMenuItem],a
-    jr .MenuLoop
+    ret
 
 .UpOrDownPressedOrSelectUsed
     call .ClearScreenArea
     call .PrintMoves
     call .GetCurrentMove
-    jr .MenuLoop
+    jp .MenuLoop
 
 .GetCurrentMove
     call .ListLenghtAndPointerToFirst
@@ -43391,17 +43289,21 @@ ChoiceRelearnMove:
 
     ; Print Move Details Box
     ld [wPlayerSelectedMove],a
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    and %00001100                  ; skip if start/select pressed
+    jr nz,.SkipMoveDetails         ; ...
     FuncCoord 10,06
     ld hl,Coord
     ld a,[wCurrentMenuItem]
     cp 3
-    jr c,.SkipMoveDetails
+    jr c,.MoveDetailsBox
     ld de,-120 ; 6 Rows
     add hl,de
-.SkipMoveDetails
+.MoveDetailsBox
     ld d,h
     ld e,l
     PREDEF PrintMoveDetailsBox
+.SkipMoveDetails
 
     ; Enable Transfer
     ld a,1
@@ -43501,13 +43403,13 @@ ChoiceRelearnMove:
     ld hl,Coord
     ld b,RELEARN_MOVE_SCREEN_LENGHT
 .LoopMove
-    ld a,[$cf98]
+    ld a,[W_MONHEADER]
     cp MEW
     ld a,e
     jr z,.SkipReadMoveDE
     ld a,[de] ; Read Move Id
 .SkipReadMoveDE
-    cp $FF
+    and a
     jr z,.end ; EndOfList
     cp STRUGGLE
     jr z,.end ; EndOfList
@@ -43526,6 +43428,7 @@ ChoiceRelearnMove:
     push hl
     push de
     ld [$d11e],a
+    call .HandleExclusiveSymbol
     call GetMoveName
     ld de,$cd6d
     call PlaceString
@@ -43533,8 +43436,40 @@ ChoiceRelearnMove:
     pop hl
     ret
 
+.HandleExclusiveSymbol
+    push de
+    push hl
+    call .ListLenghtAndPointerToFirst
+    ; de = Pointer to Move to Write
+    ; hl = Pointer to First Move
+    ld a,e ; c = e - l
+    sub l  ; ...
+    ld c,a ; ...
+    ld a,d          ; b = d - h - carry
+    jr nc,.NotCarry ; ...
+    dec a           ; ...
+.NotCarry           ; ...
+    sub h           ; ...
+    ld b,a          ; ...
+    ld a,b
+    and a
+    jr nz,.HandleExclusiveSymbol_End
+    ; c = {0,1,...}
+    ld a,[wMaxNotExclMoveSlotId]
+    cp c
+    jr nc,.HandleExclusiveSymbol_End
+    pop hl
+    ld [hl],$D2 ; Plus Symbol
+    inc hl
+    jr .HandleExclusiveSymbol_End2
+.HandleExclusiveSymbol_End
+    pop hl
+.HandleExclusiveSymbol_End2
+    pop de
+    ret
+
 .ListLenghtAndPointerToFirst
-    ld a,[$cf98]
+    ld a,[W_MONHEADER]
     cp MEW
     ld a,STRUGGLE-1
     ld hl,1
@@ -43607,7 +43542,11 @@ ChoiceRelearnMove:
     ret
 
 .SelectPressed
-    call PlaceUnfilledArrowMenuCursor
+    call .ResetScreen
+    FuncCoord 01,03
+    ld hl,Coord
+    ld bc,09 << 8 | 18
+    call ClearScreenArea
     ; Backup Menu
     ld hl,wTopMenuItemY
     ld c,7
@@ -43749,156 +43688,21 @@ SortMoves:
     ld [$d11e],a
     ; Print Move Details Box
     ld [wPlayerSelectedMove],a
-    FuncCoord 09,05
-    ld de,Coord
-    FuncCoord 19,02
-    ld a,[Coord]
-    cp $7B ; Upper Right Corner
-    jr nz,.skip
-    FuncCoord 09,01
+    FuncCoord 01,06
     ld de,Coord
 .skip
     PREDEF_JUMP PrintMoveDetailsBox
 
-DebugNPC:
-
-    ; Standard CableClubNPC
-    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
-    bit 1,a
-    ld hl,CableClubNPC
-    ld b,BANK(CableClubNPC)
-    jp nz,Bankswitch
-
-    ; Backup
-    ld a,[$cf92]
-    push af
-    ld a,[$cc49]
-    push af
-
-    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
-    bit 2,a ; was the select button pressed?
-    jr nz,.select
-    bit 3,a ; was the start button pressed?
-    jr nz,.start
-    jp .standard
-
-.select
-    bit 6,a ; was the up button pressed?
-    jr nz,.selectUP
-    ld hl,W_NUMINPARTY
-    ld a,[hli]
-    ld b,a
-.loop0
-    ld a,[hli]
-    push bc
-    push hl
-    ld [$d11e],a
-    call IndexToPokedexAndRestoreD11E
-    ld b,1 ; set
-    ld c,a
-    push bc
-    ld hl,wPokedexSeen
-    call .HandleBit
-    pop bc
-    ld hl,wPokedexOwned
-    call .HandleBit
-    pop hl
-    pop bc
-    dec b
-    jr nz,.loop0
-    ld hl,.DoneTextSelect
-    jp .end
-.HandleBit
-    PREDEF_JUMP HandleBitArray
-.DoneTextSelect
-    db 0,"Done! (Pokedex)",$57,"@"
-
-.selectUP
-    ld hl,W_PARTYMON1_MOVE2PP
-    inc [hl]
-    ld hl,.DoneTextSelectUP
-    jp .end
-.DoneTextSelectUP
-    db 0,"Done! (Alt.Form)",$57,"@"
-
-.start
-    bit 6,a ; was the up button pressed?
-    jr nz,.startUP
-    ld hl,W_PARTYMON1_TYPE1
-    xor a
-    ld [hli],a ; Zero Type 1/2
-    ld [hl],a  ; ...
-    ld hl,W_PARTYMON1OT+8
-    xor a
-    ld [hli],a ; Mon OT + 8
-    ld [hli],a ; Mon OT + 9
-    ld [hl],a ; Mon OT + 10
-    ld hl,.DoneTextStart
-    jp .end
-.DoneTextStart
-    db 0,"Done! (Reset TM)",$57,"@"
-
-.startUP
-    ld hl,W_PARTYMON1_MOVE4PP
-    call .LoopAndDestroyLastRecord
-    ld hl,W_PARTYMON1_MOVE4
-    call .LoopAndDestroyLastRecord
-    ld hl,.UPText
-    jr .end
-.LoopAndDestroyLastRecord
-    ld b,4
-.LoopUP
-    ld a,[hld]
-    and a
-    jr nz,.foundUP
-    dec b
-    jr nz,.LoopUP
-.foundUP
-    inc hl
-    xor a
-    ld [hl],a
-    ret
-.UPText
-    db 0,"Done! (0 PP Move)",$57,"@"
-
-.standard
-    ld a,[W_NUMINPARTY]
-    ld b,a
-    ld c,0
-.loop2
-    push bc
-    ld a,[$FF00+$e4]
-    push af
-    ld a,c
-    inc a
-    ld [$FF00+$e4],a ; Mon Id +1
-    ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
-    ld hl,AddPokemonToParty_TryToAddExclusiveMove_
-    call Bankswitch
-    pop af
-    ld [$FF00+$e4],a
-    pop bc
-    inc c
-    dec b
-    jr nz,.loop2
-    ld hl,.DoneText
-    jr .end
-.DoneText
-    db 0,"Done!",$57,"@"
-
-.end
-    call PrintText
-    ; Restore
-    pop af
-    ld [$cc49],a
-    pop af
-    ld [$cf92],a
-    jp TextScriptEnd
-
 HandleExclusiveLearnMove:
     ; de = Pointer to next Potential Move
 
-    call .GetBufferPointerToCorrectExlusiveLearnMoveList
+    ; Backup
+    ld a,[wBufferPointerByte1]
+    push af
+    ld a,[wBufferPointerByte2]
+    push af
+
+    call .GetBufferPointerToCorrectExclusiveLearnMoveList
 
     ; Process Potential Store Byte
     ld hl,$cf9d ; Ex Type1
@@ -43918,7 +43722,14 @@ HandleExclusiveLearnMove:
     call .SearchSetBit
     ld hl,$cfb7 ; Ex Move 3 PP
     ld c,5      ; Byte 5
-    ; fall through
+    call .SearchSetBit
+
+    ; Restore
+    pop af
+    ld [wBufferPointerByte2],a
+    pop af
+    ld [wBufferPointerByte1],a
+    ret
 
 .SearchSetBit
     ld a,[hl]
@@ -43932,7 +43743,7 @@ HandleExclusiveLearnMove:
     jr nz,.LoopBit
     ret
 
-.GetBufferPointerToCorrectExlusiveLearnMoveList
+.GetBufferPointerToCorrectExclusiveLearnMoveList
     push de
     ld hl,ExclusiveMoveLearnTable
     ld a,[$cf98] ; Pokemon ID
@@ -43943,7 +43754,7 @@ HandleExclusiveLearnMove:
     rl b
     ld c,a
     add hl,bc
-    ld de,GenericBuffer+1
+    ld de,wBufferPointerByte1
     ld bc,2
     call CopyData
     pop de
@@ -43958,7 +43769,7 @@ HandleExclusiveLearnMove:
     ld a,8
     sub b
     ld b,a ; b = Bit (0,1,...,7)
-    call .GetPointerToCorrectExlusiveLearnMoveList
+    call .GetPointerToCorrectExclusiveLearnMoveList
     push de ; Backup Pointer to Move List Current Elements
     ld a,c
     and a
@@ -43989,6 +43800,9 @@ HandleExclusiveLearnMove:
     ld a,[hl] ; Exclusive Move
     and a
     jr z,.OutOfRange
+    call CheckSkillInList
+    call nz,IsSkill
+    jr c,.OutOfRange
     pop de ; Restore Pointer to Move List Current Elements
     ld b,a
     inc a
@@ -44007,8 +43821,8 @@ HandleExclusiveLearnMove:
     pop de ; Restore Pointer to Move List Current Elements
     jr .end
 
-.GetPointerToCorrectExlusiveLearnMoveList
-    ld hl,GenericBuffer+1
+.GetPointerToCorrectExclusiveLearnMoveList
+    ld hl,wBufferPointerByte1
     ld a,[hli]
     ld h,[hl]
     ld l,a
@@ -44020,7 +43834,7 @@ HandleExclusiveLearnMove:
     cp MEW
     ld hl,1
     jr z,.Loop
-    ld hl,wMoveRelearnerMoveList+1
+    call .GetPointer
 .Loop
     ld a,h
     cp d ; Actual Position MSB
@@ -44041,6 +43855,14 @@ HandleExclusiveLearnMove:
     pop hl
     ret
 
+.GetPointer
+    ld hl,wWriteInGenericBufferBit4
+    bit 4,[hl]
+    ld hl,wMoveRelearnerMoveList+1
+    ret z
+    ld hl,GenericBuffer+1
+    ret
+
 AddPokemonToParty_TryToAddExclusiveMove_:
     ; Backup
     ld a,[wWhichPokemon]
@@ -44055,9 +43877,11 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
-    ld a,[$cf98]
+    ld a,[W_MONHEADER]
     cp MEW
     jr z,.end
+    ld a,[$cfb9] ; Level
+    ld b,a       ; ...
     call GetMonPotentialMoveList
 
     ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
@@ -44083,10 +43907,8 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     ret
 .Loop
     ld a,[hli]
-    cp $FF
-    ret z
     and a
-    jr z,.next
+    ret z
     ld [$d0e0],a
     push bc
     push hl
@@ -44111,7 +43933,6 @@ AddPokemonToParty_TryToAddExclusiveMove_:
     call TryToAddExclusiveMove
     pop hl
     pop bc
-.next
     dec b
     jr nz,.Loop
     ret
@@ -44129,9 +43950,11 @@ SentNewMonToBox_TryToAddExclusiveMove:
     ld a,2 ; current box
     ld [$cc49],a
     call LoadMonData
-    ld a,[$cf98]
+    ld a,[W_MONHEADER]
     cp MEW
     jr z,.end
+    ld a,[$cf9b] ; Level
+    ld b,a       ; ...
     call GetMonPotentialMoveList
 
     ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
@@ -44154,10 +43977,8 @@ SentNewMonToBox_TryToAddExclusiveMove:
     ret
 .Loop
     ld a,[hli]
-    cp $FF
-    ret z
     and a
-    jr z,.next
+    ret z
     ld [$d0e0],a
     push bc
     push hl
@@ -44172,7 +43993,6 @@ SentNewMonToBox_TryToAddExclusiveMove:
     call TryToAddExclusiveMove
     pop hl
     pop bc
-.next
     dec b
     jr nz,.Loop
     ret
@@ -44424,9 +44244,13 @@ CheckMonAlreadyKnowMove:
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
+    ld a,[$cfb9] ; Level
+    ld b,a       ; ...
     call GetMonPotentialMoveList
+    ; fall through
+
 CheckMonAlreadyKnowMoveQuick:
-    ld a,[$cf98]
+    ld a,[W_MONHEADER]
     cp MEW
     jr z,.Find
     ld a,[$d0e0]
@@ -44436,7 +44260,7 @@ CheckMonAlreadyKnowMoveQuick:
     ld c,a
 .Loop
     ld a,[hli]
-    cp $FF
+    and a
     jr z,.NotFind
     cp b
     jr z,.Find
@@ -44528,6 +44352,38 @@ GiveVoltorb:
 
 VoltorbText:
     TX_FAR _VoltorbText
+    db "@"
+
+DiglettsCaveRoute2Text1:
+    db $08 ; asm
+    ld hl,.end
+    push hl
+    ld b,ESCAPE_ROPE
+    PREDEF _IsItemInBagOrBox
+    ld hl,.DiglettsCaveRoute2Text1
+    ret nz
+    ld hl,.EscapeRopeReceiveText1
+    call PrintText
+    ld bc,(ESCAPE_ROPE << 8) | 1
+    call GiveItem
+    ld hl,.EscapeRopeNoRoomText
+    ret nc
+    ld hl,.EscapeRopeReceiveText2
+    ret
+.end
+    call PrintText
+    jp TextScriptEnd
+.EscapeRopeReceiveText1
+    TX_FAR _EscapeRopeReceiveText1
+    db "@"
+.EscapeRopeReceiveText2
+    TX_FAR _ReceivedText
+    db $11,"@"
+.EscapeRopeNoRoomText
+    TX_FAR _EscapeRopeNoRoomText
+    db $0F,"@"
+.DiglettsCaveRoute2Text1
+    TX_FAR _DiglettsCaveRoute2Text1
     db "@"
 
 SECTION "bank8",ROMX,BANK[$8]
@@ -49791,7 +49647,7 @@ Func_3bb7d:
     jp CopyData
 
 ; shifts all move data one up (freeing 4th move slot)
-WriteMonMoves_ShiftMoveData:
+ShiftMoveData:
     ld c,$3
 .asm_3b050
     inc de
@@ -50938,7 +50794,7 @@ AfterEvolution_TryToAddExclusiveMove:
     push af
 
     ; Get Pre Evolution Form Move List
-    call GetMoveList
+    call GetUpdatedActualMoveList
 
     ; Save Exclusive Move in Mon Internal Bytes from MonPotentialMoveList
     ld hl,wMoveRelearnerMoveList
@@ -50966,7 +50822,7 @@ AfterEvolution_TryToAddExclusiveMove:
     jr LearnMoveCommon
 .Loop
     ld a,[hli]
-    cp $FF
+    and a
     ret z
     and a
     jr z,.next
@@ -51001,13 +50857,13 @@ AfterEvolution_TryToAddExclusiveMove:
     jr nz,.Loop
     ret
 
-GetMoveList:
+GetUpdatedActualMoveList:
     xor a ; player party
     ld [$cc49],a
     call LoadMonData
-    ld b,BANK(GetMonPotentialMoveList)
-    ld hl,GetMonPotentialMoveList
-    jp Bankswitch
+    ld a,[$cfb9] ; Level
+    ld b,a       ; ...
+    PREDEF_JUMP GetMonPotentialMoveList
 
 LearnMoveFromLevelUp:
     ld a,[$d11e]
@@ -51026,7 +50882,7 @@ LearnMoveFromLevelUp:
     ld [hl],a ; Old Level because "CheckMonAlreadyKnowMove" fail 100% if not
     xor a
     ld [$cd46],a
-    call GetMoveList
+    call GetUpdatedActualMoveList
     call LearnMoveCommon
     pop af    ; Restore Level
     pop hl    ; ...
@@ -51034,20 +50890,11 @@ LearnMoveFromLevelUp:
     ret
 
 LearnMoveCommon:
-    call .GetEvosMoves
-.skipEvolutionDataLoop
-    ld a,[hli]
-    and a
-    jr nz,.skipEvolutionDataLoop
+    call .GetPotentialNewMoves
 .learnSetLoop
     ld a,[hli]
     and a
     jr z,.done
-    ld b,a
-    ld a,[W_CURENEMYLVL] ; $d127
-    cp b
-    ld a,[hli]
-    jr c,.done ; end if next move level is too high
 .learnmove
     ld [$d0e0],a
     push hl ; Backup Pointer to Current Learn Move's Level
@@ -51060,8 +50907,6 @@ LearnMoveCommon:
     call GetMoveName
     call CopyStringToCF4B
     PREDEF LearnMove
-    call GetMoveList
-    call .GetEvosMoves
 .LearnEndOrJustKnow
     pop hl ; Restore Pointer to Current Learn Move's Level
     jr .learnSetLoop
@@ -51070,16 +50915,8 @@ LearnMoveCommon:
     ld [$cf91],a
     ld [$d11e],a
     ret
-.GetEvosMoves
-    ;ld a,[wNewMonIdDuringLearnMove]
-    ; ds 1 ; dec a ; 00MOD
-    ;ld bc,$0
-    ;call LoadEvosMovesPointerTableByPokedex
-    ;add a
-    ;rl b
-    ;ld c,a
-    ;add hl,bc
 
+.GetPotentialNewMoves
     ld a,[wNewMonIdDuringLearnMove]
     ld [$d0b5],a
     ld [$cf91],a
@@ -51090,11 +50927,18 @@ LearnMoveCommon:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    jp GetEvosMoves
+    ld hl,wWriteInGenericBufferBit4
+    set 4,[hl] ; wWriteInGenericBufferBit4
+    set 7,[hl] ; wNoExclusiveInListBit7
+    ld a,[W_CURENEMYLVL] ; Level
+    ld b,a               ; ...
+    PREDEF GetMonPotentialMoveList
+    push hl
+    ld hl,wWriteInGenericBufferBit4
+    res 4,[hl] ; wWriteInGenericBufferBit4
+    res 7,[hl] ; wNoExclusiveInListBit7
+    pop hl
+    ret
 
 UnnamedText_3bb92:
     TX_FAR _UnnamedText_3bb92
@@ -51175,15 +51019,6 @@ Evolution_PartyMonLoop:
     ld a,c
     and a
     jp z,Evolution_PartyMonLoop
-    ;ld a,[$cee9]
-    ;ds 1 ; dec a ; 00MOD
-    ;ld b,$0
-    ;call LoadEvosMovesPointerTableByPokedex
-    ;add a
-    ;rl b
-    ;ld c,a
-    ;add hl,bc
-
     ld a,[$cee9]
     ld [$d0b5],a
     ld hl,W_PARTYMON1_MOVE2PP ; move2pp
@@ -51193,11 +51028,8 @@ Evolution_PartyMonLoop:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    call GetEvosMoves
+    ld de,GenericBuffer+1
+    PREDEF _GetEvos
     push hl
     ld a,[$cf91]
     push af
@@ -51481,8 +51313,7 @@ SearchMoveToReplace:
 .end
     pop hl
     pop de
-    call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
-    ld a,[$cee9]
+    call ShiftMoveData ; shift all moves one up (deleting move 1)
     scf
     ret
 .fail
@@ -51530,37 +51361,8 @@ DefinePriorityMoveToReplace:
     ret
 
 LearnZeroDamageMove:
-    ld hl,W_ISINBATTLE
-    ld d,[hl]
-    dec d
-    jr nz,.notWildBattle
-    ld hl,EscapeMoves
-    call CheckList
-    jr nc,.notWildBattle
-    call DiscourageForgot6 ; ▼ Escape
-.notWildBattle
-    ld hl,DreamEaterMoves
-    call CheckList
-    jr nc,.notDreamEater
-    call DiscourageForgot6 ; ▼ DreamEater
-.notDreamEater
-    ld hl,NotForgottableMoves
-    call CheckList
-    jr nc,.notForgottable
-    call DiscourageForgot3 ; ▼ Unforgottable
-.notForgottable
-    call GetMoveDamageAndType
-    jr z,.Zero
-    ld a,d
-    dec a
-    jr z,.One
-    call LearnStabMove
-    ret
-.Zero
+    call LearnDamageAndZeroDamageMoveCommon
     jp EncourageForgot3 ; ▲ zero damage
-.One
-    dec b ; ▲ special (1 damage)
-    ret
 
 LearnStabMove:
     push hl
@@ -51583,7 +51385,16 @@ LearnStabMove:
     pop hl
     ret
 
-LearnDamageMove:
+LearnDamageAndZeroDamageMoveCommon:
+    ld hl,W_ISINBATTLE
+    ld d,[hl]
+    dec d
+    jr nz,.notWildBattle
+    ld hl,EscapeMoves
+    call CheckList
+    jr nc,.notWildBattle
+    call DiscourageForgot6 ; ▼ Escape
+.notWildBattle
     ld hl,DreamEaterMoves
     call CheckList
     jr nc,.notDreamEater
@@ -51594,8 +51405,11 @@ LearnDamageMove:
     jr nc,.notForgottable
     call DiscourageForgot3 ; ▼ Unforgottable
 .notForgottable
+    ret
+
+LearnDamageMove:
+    call LearnDamageAndZeroDamageMoveCommon
     call GetMoveDamageAndType
-    jr z,.Zero
     ld a,d
     dec a
     jr z,.One
@@ -51630,8 +51444,6 @@ LearnDamageMove:
     jr nc,.LoopDeltaDamage2
 .done
     ret
-.Zero
-    jp DiscourageForgot3 ; ▼ zero damage
 .One
     dec b ; ▲ special (1 damage)
     ret
@@ -51782,55 +51594,41 @@ NotForgottableMoves:
 
 ; writes the moves a mon has at level [W_CURENEMYLVL] to [de]
 ; move slots are being filled up sequentially and shifted if all slots are full
-; [$cee9]: Day Care
+; [wLearningMovesFromDayCare]: Day Care
 WriteMonMoves:
     call Load16BitRegisters
     push hl
     push de
     push bc
-    ;ld b,$0
-    ;ld a,[$cf91]  ; cur mon ID
-    ;call LoadEvosMovesPointerTableByPokedex
-    ;ds 1 ; dec a ; 00MOD
-    ;add a
-    ;rl b
-    ;ld c,a
-    ;add hl,bc
-
-    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
-    ld a,[hli]
-    ld h,[hl]
-    ld l,a
-    call GetEvosMoves
-.skipEvoEntriesLoop
-    ld a,[hli]
+    push de
+    ld hl,wWriteInGenericBufferBit4
+    set 4,[hl] ; wWriteInGenericBufferBit4
+    set 6,[hl] ; wNoSkillInListBit6
+    set 7,[hl] ; wNoExclusiveInListBit7
+    ld a,[wLearningMovesFromDayCare]
     and a
-    jr nz,.skipEvoEntriesLoop
-    jr .firstMove
+    jr z,.skip
+    res 7,[hl] ; wNoExclusiveInListBit7
+.skip
+    ld a,[W_CURENEMYLVL] ; Level
+    ld b,a               ; ...
+    PREDEF GetMonPotentialMoveList
+    push hl
+    ld hl,wWriteInGenericBufferBit4
+    res 4,[hl] ; wWriteInGenericBufferBit4
+    res 6,[hl] ; wNoSkillInListBit6
+    res 7,[hl] ; wNoExclusiveInListBit7
+    pop hl
+    dec hl ; because "inc" in next instructions
 .nextMove
     pop de
 .nextMove2
     inc hl
-.firstMove
-    ld a,[hli]       ; read level of next move in learnset
+    ld a,[hl]        ; read next move in learnset
     and a
     jp z,.done       ; end of list
-    ld b,a
-    ld a,[W_CURENEMYLVL] ; $d127
-    cp b
-    jp c,.done       ; mon level < move level (assumption: learnset is sorted by level)
-    ld a,[$cee9]
-    and a
-    jr z,.skipMinLevelCheck
-    ld a,[wWhichTrade] ; $cd3d (min move level)
-    cp b
-    jr nc,.nextMove2 ; min level >= move level
-.skipMinLevelCheck
     push de
-    ld a,b
-    dec a
-    jr z,.SkipMoveAlreadyLearnedCheck ; Level 1 Moves
-    ld c,$4
+    ld c,4
 .moveAlreadyLearnedCheckLoop
     ld a,[de]
     inc de
@@ -51838,14 +51636,13 @@ WriteMonMoves:
     jr z,.nextMove
     dec c
     jr nz,.moveAlreadyLearnedCheckLoop
-.SkipMoveAlreadyLearnedCheck
     pop de
     push de
-    ld c,$4
+    ld c,4
 .findEmptySlotLoop
     ld a,[de]
     and a
-    jr z,.writeMoveToSlot2
+    jr z,.writeMoveToSlot
     inc de
     dec c
     jr nz,.findEmptySlotLoop
@@ -51855,42 +51652,12 @@ WriteMonMoves:
     ld a,[hl] ; read new move
     ld h,d
     ld l,e
-    call SearchMoveToReplace ; call WriteMonMoves_ShiftMoveData ; shift all moves one up (deleting move 1)
-    jr nc,.HackNext ; ld a,[$cee9]
-    and a
-    jr z,.writeMoveToSlot
-    push de
-    ld bc,$12
-    add hl,bc
-    ld d,h
-    ld e,l
-    call WriteMonMoves_ShiftMoveData ; shift all move PP data one up
-    pop de
-.writeMoveToSlot
+    call SearchMoveToReplace
     pop hl
-.writeMoveToSlot2
+    jr nc,.nextMove
+.writeMoveToSlot
     ld a,[hl]
     ld [de],a
-    ld a,[$cee9]
-    and a
-    jr z,.nextMove
-    push hl            ; write move PP value
-    ld a,[hl]
-    ld hl,$15
-    add hl,de
-    push hl
-    dec a
-    ld hl,Moves
-    ld bc,$6
-    call AddNTimes
-    ld de,$cee9
-    ld a,BANK(Moves)
-    call FarCopyData
-    ld a,[$ceee]
-    pop hl
-    ld [hl],a
-.HackNext
-    pop hl
     jr .nextMove
 .done
     pop bc
@@ -51898,7 +51665,7 @@ WriteMonMoves:
     pop hl
     ret
 
-HealEffect_: ; Moved Upper in the Bank
+HealEffect_:
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     ld de,W_PLAYERMONCURHP+1 ; $d015
@@ -52516,183 +52283,6 @@ RenameEvolvedMon:
     ld hl,$cd6d
     pop de
     jp CopyData
-
-; Get Copy of Level UP EvosMoves in GenericBuffer+1
-GetEvosMoves:
-    push de
-    ld a,[$CEE9] ; Backup
-    push af
-    ld a,BANK(MissingNo_EvosMoves)
-    ld de,GenericBuffer+1
-    ld bc,96-1
-    call FarCopyData ; copy bc bytes of data from a:hl to de
-    pop af
-    ld [$CEE9],a ; Restore
-    ld hl,GenericBuffer+1
-    pop de
-    ret
-
-;EvosMovesPointerTable:
-;    dw MissingNo_EvosMoves
-;    dw Mon001_EvosMoves
-;    dw Mon002_EvosMoves
-;    dw Mon003_EvosMoves
-;    dw Mon004_EvosMoves
-;    dw Mon005_EvosMoves
-;    dw Mon006_EvosMoves
-;    dw Mon007_EvosMoves
-;    dw Mon008_EvosMoves
-;    dw Mon009_EvosMoves
-;    dw Mon010_EvosMoves
-;    dw Mon011_EvosMoves
-;    dw Mon012_EvosMoves
-;    dw Mon013_EvosMoves
-;    dw Mon014_EvosMoves
-;    dw Mon015_EvosMoves
-;    dw Mon016_EvosMoves
-;    dw Mon017_EvosMoves
-;    dw Mon018_EvosMoves
-;    dw Mon019_EvosMoves
-;    dw Mon020_EvosMoves
-;    dw Mon021_EvosMoves
-;    dw Mon022_EvosMoves
-;    dw Mon023_EvosMoves
-;    dw Mon024_EvosMoves
-;    dw Mon025_EvosMoves
-;    dw Mon026_EvosMoves
-;    dw Mon027_EvosMoves
-;    dw Mon028_EvosMoves
-;    dw Mon029_EvosMoves
-;    dw Mon030_EvosMoves
-;    dw Mon031_EvosMoves
-;    dw Mon032_EvosMoves
-;    dw Mon033_EvosMoves
-;    dw Mon034_EvosMoves
-;    dw Mon035_EvosMoves
-;    dw Mon036_EvosMoves
-;    dw Mon037_EvosMoves
-;    dw Mon038_EvosMoves
-;    dw Mon039_EvosMoves
-;    dw Mon040_EvosMoves
-;    dw Mon041_EvosMoves
-;    dw Mon042_EvosMoves
-;    dw Mon043_EvosMoves
-;    dw Mon044_EvosMoves
-;    dw Mon045_EvosMoves
-;    dw Mon046_EvosMoves
-;    dw Mon047_EvosMoves
-;    dw Mon048_EvosMoves
-;    dw Mon049_EvosMoves
-;    dw Mon050_EvosMoves
-;    dw Mon051_EvosMoves
-;    dw Mon052_EvosMoves
-;    dw Mon053_EvosMoves
-;    dw Mon054_EvosMoves
-;    dw Mon055_EvosMoves
-;    dw Mon056_EvosMoves
-;    dw Mon057_EvosMoves
-;    dw Mon058_EvosMoves
-;    dw Mon059_EvosMoves
-;    dw Mon060_EvosMoves
-;    dw Mon061_EvosMoves
-;    dw Mon062_EvosMoves
-;    dw Mon063_EvosMoves
-;    dw Mon064_EvosMoves
-;    dw Mon065_EvosMoves
-;    dw Mon066_EvosMoves
-;    dw Mon067_EvosMoves
-;    dw Mon068_EvosMoves
-;    dw Mon069_EvosMoves
-;    dw Mon070_EvosMoves
-;    dw Mon071_EvosMoves
-;    dw Mon072_EvosMoves
-;    dw Mon073_EvosMoves
-;    dw Mon074_EvosMoves
-;    dw Mon075_EvosMoves
-;    dw Mon076_EvosMoves
-;    dw Mon077_EvosMoves
-;    dw Mon078_EvosMoves
-;    dw Mon079_EvosMoves
-;    dw Mon080_EvosMoves
-;    dw Mon081_EvosMoves
-;    dw Mon082_EvosMoves
-;    dw Mon083_EvosMoves
-;    dw Mon084_EvosMoves
-;    dw Mon085_EvosMoves
-;    dw Mon086_EvosMoves
-;    dw Mon087_EvosMoves
-;    dw Mon088_EvosMoves
-;    dw Mon089_EvosMoves
-;    dw Mon090_EvosMoves
-;    dw Mon091_EvosMoves
-;    dw Mon092_EvosMoves
-;    dw Mon093_EvosMoves
-;    dw Mon094_EvosMoves
-;    dw Mon095_EvosMoves
-;    dw Mon096_EvosMoves
-;    dw Mon097_EvosMoves
-;    dw Mon098_EvosMoves
-;    dw Mon099_EvosMoves
-;    dw Mon100_EvosMoves
-;    dw Mon101_EvosMoves
-;    dw Mon102_EvosMoves
-;    dw Mon103_EvosMoves
-;    dw Mon104_EvosMoves
-;    dw Mon105_EvosMoves
-;    dw Mon106_EvosMoves
-;    dw Mon107_EvosMoves
-;    dw Mon108_EvosMoves
-;    dw Mon109_EvosMoves
-;    dw Mon110_EvosMoves
-;    dw Mon111_EvosMoves
-;    dw Mon112_EvosMoves
-;    dw Mon113_EvosMoves
-;    dw Mon114_EvosMoves
-;    dw Mon115_EvosMoves
-;    dw Mon116_EvosMoves
-;    dw Mon117_EvosMoves
-;    dw Mon118_EvosMoves
-;    dw Mon119_EvosMoves
-;    dw Mon120_EvosMoves
-;    dw Mon121_EvosMoves
-;    dw Mon122_EvosMoves
-;    dw Mon123_EvosMoves
-;    dw Mon124_EvosMoves
-;    dw Mon125_EvosMoves
-;    dw Mon126_EvosMoves
-;    dw Mon127_EvosMoves
-;    dw Mon128_EvosMoves
-;    dw Mon129_EvosMoves
-;    dw Mon130_EvosMoves
-;    dw Mon131_EvosMoves
-;    dw Mon132_EvosMoves
-;    dw Mon133_EvosMoves
-;    dw Mon134_EvosMoves
-;    dw Mon135_EvosMoves
-;    dw Mon136_EvosMoves
-;    dw Mon137_EvosMoves
-;    dw Mon138_EvosMoves
-;    dw Mon139_EvosMoves
-;    dw Mon140_EvosMoves
-;    dw Mon141_EvosMoves
-;    dw Mon142_EvosMoves
-;    dw Mon143_EvosMoves
-;    dw Mon144_EvosMoves
-;    dw Mon145_EvosMoves
-;    dw Mon146_EvosMoves
-;    dw Mon147_EvosMoves
-;    dw Mon148_EvosMoves
-;    dw Mon149_EvosMoves
-;    dw Mon150_EvosMoves
-;    dw Mon151_EvosMoves
-;    dw Mon152_EvosMoves
-;    dw Mon153_EvosMoves
-;    dw Mon154_EvosMoves
-;    dw MissingNo_EvosMoves ; 155
-;    dw MissingNo_EvosMoves ; 156
-;    dw MissingNo_EvosMoves ; 157
-;    dw MissingNo_EvosMoves ; 158
-;    dw MissingNo_EvosMoves ; 159
 
 CryData:
     ;$BaseCry,$Pitch,$Length
@@ -59452,7 +59042,7 @@ LoadEnemyMonData:
     jr .continue
 .FreshMoves
     xor a
-    ld [$cee9],a
+    ld [wLearningMovesFromDayCare],a
     ld h,d
     ld l,e
     ld bc,4
@@ -74466,9 +74056,9 @@ Route11GateUpstairsText2: ; 4946c (12:546c)
     ld a,[$d7d6]
     add a
     jr c,.asm_4949b ; 0x49471 $28
-    ld a,$1e
+    ld a,30
     ld [$ff00+$db],a
-    ld a,$47
+    ld a,ITEMFINDER
     ld [$ff00+$dc],a
     ld [$d11e],a
     call GetItemName
@@ -74477,7 +74067,7 @@ Route11GateUpstairsText2: ; 4946c (12:546c)
     ld de,$cc5b
     ld bc,$000d
     call CopyData
-    PREDEF Func_59035
+    PREDEF OakAideNDexToGiftItem
     ld a,[$ff00+$db]
     dec a
     jr nz,.asm_494a1 ; 0x49494 $b
@@ -74754,7 +74344,7 @@ Route15GateUpstairsText1: ; 49651 (12:5651)
     ld de,$cc5b
     ld bc,$000d
     call CopyData
-    PREDEF Func_59035
+    PREDEF OakAideNDexToGiftItem
     ld a,[$ff00+$db]
     cp $1
     jr nz,.asm_49689 ; 0x4967c $b
@@ -76036,46 +75626,41 @@ SafariZoneSecretHouseScript: ; 4a317 (12:6317)
 SafariZoneSecretHouseTextPointers: ; 4a31a (12:631a)
     dw SafariZoneSecretHouseText1
 
-SafariZoneSecretHouseText1: ; 4a31c (12:631c)
+SafariZoneSecretHouseText1:
     db $08 ; asm
-    ld a,[$d857]
-    bit 0,a
-    jr nz,.asm_20a9b ; 0x4a322
-    ld hl,UnnamedText_4a350
+    ld a,[FLOAT_FLAG_BYTE]
+    bit FLOAT_FLAG_BIT,a
+    ld hl,.HM03AfterText
+    jr nz,.done
+    ld hl,.PreHM03Text
     call PrintText
     ld bc,(HM_03 << 8) | 1
     call FakeGiveItem
-    jr nc,.BagFull
-    ld hl,ReceivedHM03Text
+    ld hl,FLOAT_FLAG_BYTE
+    set FLOAT_FLAG_BIT,[hl]
+    ld b,FLOAT_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM03SkillFoundText
+    jr c,.done
+    ld hl,.HM03SkillNotFoundText
+.done
     call PrintText
-    ld hl,$d857
-    set 0,[hl]
-    jr .asm_8f1fc ; 0x4a33d
-.BagFull
-    ld hl,HM03NoRoomText
-    call PrintText
-    jr .asm_8f1fc ; 0x4a345
-.asm_20a9b ; 0x4a347
-    ld hl,HM03ExplanationText
-    call PrintText
-.asm_8f1fc ; 0x4a34d
     jp TextScriptEnd
 
-UnnamedText_4a350: ; 4a350 (12:6350)
-    TX_FAR _UnnamedText_4a350
+.PreHM03Text
+    TX_FAR _PreHM03Text
+    db "@"
+.HM03SkillFoundText
+    TX_FAR _HM03SkillFoundText
+    db "@"
+.HM03SkillNotFoundText
+    TX_FAR _HM03SkillNotFoundText
+    db "@"
+.HM03AfterText
+    TX_FAR _HM03AfterText
     db "@"
 
-ReceivedHM03Text: ; 4a355 (12:6355)
-    TX_FAR _GotText
-    db $11,"@"
-
-HM03ExplanationText: ; 4a35b (12:635b)
-    TX_FAR _HM03ExplanationText
-    db "@"
-
-HM03NoRoomText: ; 4a360 (12:6360)
-    TX_FAR _HM03NoRoomText
-    db "@"
+SECTION "SafariZoneSecretHouseObject",ROMX[$6365],BANK[$12]
 
 SafariZoneSecretHouseObject: ; 0x4a365 (size=26)
     db $17 ; border tile
@@ -76299,34 +75884,36 @@ MtMoon1Script2:
 
 MtMoon1AfterBattleText2:
     db $08 ; asm
-    ld hl,.end
-    push hl
-    ld b,ESCAPE_ROPE
-    PREDEF _IsItemInBagOrBox
-    ld hl,.MtMoon1AfterBattleText2
-    ret nz
-    ld hl,.EscapeRopeReceiveText1
+    ld a,[DIG_FLAG_BYTE]
+    bit DIG_FLAG_BIT,a
+    ld hl,.HM07AfterText
+    jr nz,.done
+    ld hl,.PreHM07Text
     call PrintText
-    ld bc,(ESCAPE_ROPE << 8) | 1
-    call GiveItem
-    ld hl,.EscapeRopeNoRoomText
-    ret nc
-    ld hl,.EscapeRopeReceiveText2
-    ret
-.end
+    ld bc,(HM_07 << 8) | 1
+    call FakeGiveItem
+    ld hl,DIG_FLAG_BYTE
+    set DIG_FLAG_BIT,[hl]
+    ld b,DIG_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM07SkillFoundText
+    jr c,.done
+    ld hl,.HM07SkillNotFoundText
+.done
     call PrintText
     jp TextScriptEnd
-.EscapeRopeReceiveText1
-    TX_FAR _EscapeRopeReceiveText1
+
+.PreHM07Text
+    TX_FAR _PreHM07Text
     db "@"
-.EscapeRopeReceiveText2
-    TX_FAR _ReceivedText
-    db $11,"@"
-.EscapeRopeNoRoomText
-    TX_FAR _EscapeRopeNoRoomText
-    db $0F,"@"
-.MtMoon1AfterBattleText2
-    TX_FAR _MtMoon1AfterBattleText2
+.HM07SkillFoundText
+    TX_FAR _HM07SkillFoundText
+    db "@"
+.HM07SkillNotFoundText
+    TX_FAR _HM07SkillNotFoundText
+    db "@"
+.HM07AfterText
+    TX_FAR _HM07AfterText
     db "@"
 
 SECTION "bank13",ROMX,BANK[$13]
@@ -76662,7 +76249,7 @@ Func_3f073Predef:                          NEW_PREDEF Func_3f073                
 ScaleSpriteByTwoPredef:                    NEW_PREDEF ScaleSpriteByTwo                    ; $03
 LoadMonBackSpritePredef:                   NEW_PREDEF LoadMonBackSprite                   ; $04
 Func_79abaPredef:                          NEW_PREDEF Func_79aba                          ; $05
-ds 3                                                                                      ; $06
+GetMovesPredef:                            NEW_PREDEF GetMoves                            ; $06
 HealPartyPredef:                           NEW_PREDEF HealParty                           ; $07
 MoveAnimationPredef:                       NEW_PREDEF MoveAnimation                       ; $08
 Func_f71ePredef:                           NEW_PREDEF Func_f71e                           ; $09
@@ -76733,7 +76320,7 @@ DrawEnemyHUDAndHPBarPredef:                NEW_PREDEF DrawEnemyHUDAndHPBar      
 Func_70f60Predef:                          NEW_PREDEF Func_70f60                          ; $4A
 PrintTypesPredef:                          NEW_PREDEF PrintTypes                          ; $4B
 EmotionBubblePredef:                       NEW_PREDEF EmotionBubble                       ; $4C
-ds 3                                                                                      ; $4D
+_GetEvosPredef:                            NEW_PREDEF _GetEvos                            ; $4D
 AskForMonNicknamePredef:                   NEW_PREDEF AskForMonNickname                   ; $4E
 Func_37ca1Predef:                          NEW_PREDEF Func_37ca1                          ; $4F
 SaveSAVtoSRAM2Predef:                      NEW_PREDEF SaveSAVtoSRAM2                      ; $50
@@ -76754,7 +76341,7 @@ ResetMovePPsPredef:                        NEW_PREDEF ResetMovePPs              
 DrawPlayerHPBarStatusBattlePredef:         NEW_PREDEF DrawPlayerHPBarStatusBattle         ; $5F
 DrawPlayerHPBarPartyPredef:                NEW_PREDEF DrawPlayerHPBarParty                ; $60
 Func_1c9c6Predef:                          NEW_PREDEF Func_1c9c6                          ; $61
-Func_59035Predef:                          NEW_PREDEF Func_59035                          ; $62
+OakAideNDexToGiftItemPredef:               NEW_PREDEF OakAideNDexToGiftItem               ; $62
 TestPhysicalSpecial_Predef:                NEW_PREDEF TestPhysicalSpecial_                ; $63
 InsertRealTypes_Predef:                    NEW_PREDEF InsertRealTypes_                    ; $64
 MovesMenuPredef:                           NEW_PREDEF MovesMenu                           ; $65
@@ -76779,6 +76366,8 @@ _InitBattleEnemyParametersPredef:          NEW_PREDEF _InitBattleEnemyParameters
 _CheckDarkMapPredef:                       NEW_PREDEF _CheckDarkMap                       ; $78
 PrintMoveTypeShortPredef:                  NEW_PREDEF PrintMoveTypeShort                  ; $79
 PrintTypesFullPredef:                      NEW_PREDEF PrintTypesFull                      ; $7A
+LearnSkillPredef:                          NEW_PREDEF LearnSkill                          ; $7B
+GetMonPotentialMoveListPredef:             NEW_PREDEF GetMonPotentialMoveList             ; $7C
 
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
@@ -76886,7 +76475,7 @@ Route24Object: ; 0x506a4 (size=67)
 
     db $8 ; people
     db SPRITE_BLACK_HAIR_BOY_1,$f + 4,$b + 4,$ff,$d2,$41,ROCKET,$6 ; trainer
-    db SPRITE_BLACK_HAIR_BOY_1,$14 + 4,$5 + 4,$ff,$d1,$42,JR__TRAINER_M,$2 ; trainer
+    db SPRITE_BUG_CATCHER,$14 + 4,$5 + 4,$ff,$d1,$42,PSYCHIC_TR,$5 ; trainer
     db SPRITE_BLACK_HAIR_BOY_1,$13 + 4,$b + 4,$ff,$d2,$43,JR__TRAINER_M,$3 ; trainer
     db SPRITE_LASS,$16 + 4,$b + 4,$ff,$d2,$44,LASS,$7 ; trainer
     db SPRITE_BUG_CATCHER,$19 + 4,$b + 4,$ff,$d2,$45,YOUNGSTER,$4 ; trainer
@@ -78197,7 +77786,7 @@ Func_513c0: ; 513c0 (14:53c0)
 Route24ScriptPointers: ; 513cb (14:53cb)
     dw Route24Script0
     dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+    dw Route24Script2
     dw Route24Script3
     dw Route24Script4
 
@@ -78441,9 +78030,7 @@ Route24EndBattleText1: ; 51576 (14:5576)
     TX_FAR _Route24EndBattleText1
     db "@"
 
-Route24AfterBattleText1: ; 5157b (14:557b)
-    TX_FAR _Route24AfterBattleText1
-    db "@"
+SECTION "Route24BattleText2",ROMX[$5580],BANK[$14]
 
 Route24BattleText2: ; 51580 (14:5580)
     TX_FAR _Route24BattleText2
@@ -81290,6 +80877,55 @@ SilphCo7Script0:
     db $FF
 .MovementData_51c7d
     db $40,$40,$40,$40,$FF
+
+Route24Script2:
+    call EndTrainerBattle
+    ld a,[W_ISINBATTLE] ; $d057
+    cp $ff
+    jr z,.ResetScript
+    ld a,[$cf13]
+    cp $02 ; Is Psychic end Battle?
+    ret nz
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    jp DisplayTextID
+.ResetScript
+    xor a
+    ld [W_MTMOON1CURSCRIPT],a
+    ret
+
+Route24AfterBattleText1:
+    db $08 ; asm
+    ld a,[TELEPORT_FLAG_BYTE]
+    bit TELEPORT_FLAG_BIT,a
+    ld hl,.HM06AfterText
+    jr nz,.done
+    ld hl,.PreHM06Text
+    call PrintText
+    ld bc,(HM_06 << 8) | 1
+    call FakeGiveItem
+    ld hl,TELEPORT_FLAG_BYTE
+    set TELEPORT_FLAG_BIT,[hl]
+    ld b,TELEPORT_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM06SkillFoundText
+    jr c,.done
+    ld hl,.HM06SkillNotFoundText
+.done
+    call PrintText
+    jp TextScriptEnd
+
+.PreHM06Text
+    TX_FAR _PreHM06Text
+    db "@"
+.HM06SkillFoundText
+    TX_FAR _HM06SkillFoundText
+    db "@"
+.HM06SkillNotFoundText
+    TX_FAR _HM06SkillNotFoundText
+    db "@"
+.HM06AfterText
+    TX_FAR _Route24AfterBattleText1
+    db "@"
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -84385,24 +84021,24 @@ DayCareMScript: ; 5624f (15:624f)
 DayCareMTextPointers: ; 56252 (15:6252)
     dw DayCareMText1
 
-DayCareMText1: ; 56254 (15:6254)
+DayCareMText1:
     db $8
     call SaveScreenTilesToBuffer2
     ld a,[$da48]
     and a
-    jp nz,Func_562e1
-    ld hl,UnnamedText_5640f
+    jp nz,.Func_562e1
+    ld hl,.UnnamedText_5640f
     call PrintText
     call YesNoChoice
     ld a,[$cc26]
     and a
-    ld hl,UnnamedText_5643b
-    jp nz,Func_56409
+    ld hl,.UnnamedText_5643b
+    jp nz,.Func_56409
     ld a,[$d163]
     dec a
-    ld hl,UnnamedText_56445
-    jp z,Func_56409
-    ld hl,UnnamedText_56414
+    ld hl,.UnnamedText_56445
+    jp z,.Func_56409
+    ld hl,.UnnamedText_56414
     call PrintText
     xor a
     ld [$cfcb],a
@@ -84414,19 +84050,14 @@ DayCareMText1: ; 56254 (15:6254)
     call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     pop af
-    ld hl,UnnamedText_56437
-    jp c,Func_56409
-    ds 3 ; ld hl,DayCareCheckHM
-    ds 2 ; ld b,BANK(DayCareCheckHM)
-    ds 3 ; call Bankswitch
-    ds 3 ; ld hl,UnnamedText_5644a
-    ds 3 ; jp c,Func_56409
+    ld hl,.UnnamedText_56437
+    jp c,.Func_56409
     xor a
     ld [$cc2b],a
     ld a,[$cf92]
     ld hl,$d2b5
     call GetPartyMonName
-    ld hl,UnnamedText_56419
+    ld hl,.UnnamedText_56419
     call PrintText
     ld a,$1
     ld [$da48],a
@@ -84438,10 +84069,10 @@ DayCareMText1: ; 56254 (15:6254)
     call RemovePokemon
     ld a,[$cf91]
     call PlayCry
-    ld hl,UnnamedText_5641e
-    jp Func_56409
+    ld hl,.UnnamedText_5641e
+    jp .Func_56409
 
-Func_562e1: ; 562e1 (15:62e1)
+.Func_562e1
     xor a
     ld hl,$da49
     call GetPartyMonName
@@ -84475,20 +84106,20 @@ Func_562e1: ; 562e1 (15:62e1)
     ld [wTrainerSpriteOffset],a
     cp d
     ld [hl],d
-    ld hl,UnnamedText_56432
+    ld hl,.UnnamedText_56432
     jr z,.asm_56333
     ld a,[wTrainerSpriteOffset]
     ld b,a
     ld a,d
     sub b
     ld [wTrainerEngageDistance],a
-    ld hl,UnnamedText_56423
+    ld hl,.UnnamedText_56423
 
 .asm_56333
     call PrintText
     ld a,[W_NUMINPARTY]
     cp $6
-    ld hl,UnnamedText_56440
+    ld hl,.UnnamedText_56440
     jp z,.asm_56403
     ld de,wTrainerFacingDirection
     xor a
@@ -84513,13 +84144,13 @@ Func_562e1: ; 562e1 (15:62e1)
     pop hl
     dec b
     jr nz,.asm_56357
-    ld hl,UnnamedText_56428
+    ld hl,.UnnamedText_56428
     call PrintText
     ld a,$13
     ld [$d125],a
     call DisplayTextBoxID
     call YesNoChoice
-    ld hl,UnnamedText_56437
+    ld hl,.UnnamedText_56437
     ld a,[wCurrentMenuItem]
     and a
     jp nz,.asm_56403
@@ -84531,7 +84162,7 @@ Func_562e1: ; 562e1 (15:62e1)
     ld [$ffa1],a
     call HasEnoughMoney
     jr nc,.asm_56396
-    ld hl,UnnamedText_56454
+    ld hl,.UnnamedText_56454
     jp .asm_56403
 
 .asm_56396
@@ -84548,7 +84179,7 @@ Func_562e1: ; 562e1 (15:62e1)
     ld a,$13
     ld [$d125],a
     call DisplayTextBoxID
-    ld hl,UnnamedText_5644f
+    ld hl,.UnnamedText_5644f
     call PrintText
     ld a,$2
     ld [$cf95],a
@@ -84565,8 +84196,8 @@ Func_562e1: ; 562e1 (15:62e1)
     ld d,h
     ld e,l
     ld a,$1
-    ld [wHPBarMaxHP],a
-    PREDEF WriteMonMoves
+    ld [wLearningMovesFromDayCare],a
+    call HandleMovesAfterDayCare
     pop bc
     pop af
     ld hl,W_PARTYMON1_HP
@@ -84582,74 +84213,72 @@ Func_562e1: ; 562e1 (15:62e1)
     ld [de],a
     ld a,[$cf91]
     call PlayCry
-    ld hl,UnnamedText_5642d
-    jr Func_56409
+    ld hl,.UnnamedText_5642d
+    jr .Func_56409
 
 .asm_56403
     ld a,[wTrainerSpriteOffset]
     ld [$da62],a
 
-Func_56409: ; 56409 (15:6409)
+.Func_56409
     call PrintText
     jp TextScriptEnd
 
-UnnamedText_5640f: ; 5640f (15:640f)
+.UnnamedText_5640f
     TX_FAR _UnnamedText_5640f
     db "@"
 
-UnnamedText_56414: ; 56414 (15:6414)
+.UnnamedText_56414
     TX_FAR _UnnamedText_56414
     db "@"
 
-UnnamedText_56419: ; 56419 (15:6419)
+.UnnamedText_56419
     TX_FAR _UnnamedText_56419
     db "@"
 
-UnnamedText_5641e: ; 5641e (15:641e)
+.UnnamedText_5641e
     TX_FAR _UnnamedText_5641e
     db "@"
 
-UnnamedText_56423: ; 56423 (15:6423)
+.UnnamedText_56423
     TX_FAR _UnnamedText_56423
     db "@"
 
-UnnamedText_56428: ; 56428 (15:6428)
+.UnnamedText_56428
     TX_FAR _UnnamedText_56428
     db "@"
 
-UnnamedText_5642d: ; 5642d (15:642d)
+.UnnamedText_5642d
     TX_FAR _UnnamedText_5642d
     db "@"
 
-UnnamedText_56432: ; 56432 (15:6432)
+.UnnamedText_56432
     TX_FAR _UnnamedText_56432
     db "@"
 
-UnnamedText_56437: ; 56437 (15:6437)
-    TX_FAR _UnnamedText_56437 ; 0x8c000
-UnnamedText_5643b: ; 5643b (15:643b)
-    TX_FAR _UnnamedText_5643b ; 0x8c013
+.UnnamedText_56437
+    TX_FAR _UnnamedText_56437
+.UnnamedText_5643b
+    TX_FAR _UnnamedText_5643b
     db "@"
 
-UnnamedText_56440: ; 56440 (15:6440)
+.UnnamedText_56440
     TX_FAR _UnnamedText_56440
     db "@"
 
-UnnamedText_56445: ; 56445 (15:6445)
+.UnnamedText_56445
     TX_FAR _UnnamedText_56445
     db "@"
 
-UnnamedText_5644a: ; 5644a (15:644a)
-    TX_FAR _UnnamedText_5644a
-    db "@"
-
-UnnamedText_5644f: ; 5644f (15:644f)
+.UnnamedText_5644f
     TX_FAR _UnnamedText_5644f
     db "@"
 
-UnnamedText_56454: ; 56454 (15:6454)
+.UnnamedText_56454
     TX_FAR _UnnamedText_56454
     db "@"
+
+SECTION "DayCareMObject",ROMX[$6459],BANK[$15]
 
 DayCareMObject: ; 0x56459 (size=26)
     db $a ; border tile
@@ -85818,6 +85447,19 @@ Route21Script2:
     ld [W_ROUTE21CURSCRIPT],a
     ret
 
+HandleMovesAfterDayCare:
+    PREDEF WriteMonMoves
+    ld a,[$FF00+$e4]
+    push af
+    ld a,[W_NUMINPARTY]
+    ld [$FF00+$e4],a ; Last Mon Added Id + 1
+    ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
+    ld hl,AddPokemonToParty_TryToAddExclusiveMove_
+    call Bankswitch
+    pop af
+    ld [$FF00+$e4],a
+    ret
+
 SECTION "bank16",ROMX,BANK[$16]
 
 Route6_h: ; 0x58000 to 0x58022 (34 bytes) (id=17)
@@ -86512,6 +86154,8 @@ CalcDSquared: ; 59010 (16:5010)
     ld [H_MULTIPLIER],a ; $FF00+$99 (aliases: H_DIVISOR,H_REMAINDER,H_POWEROFTEN)
     jp Multiply
 
+SECTION "GrowthRateTable",ROMX[$501d],BANK[$16]
+
 ; each entry has the following scheme:
 ; %AAAABBBB %SCCCCCCC %DDDDDDDD %EEEEEEEE
 ; resulting in
@@ -86526,7 +86170,9 @@ GrowthRateTable: ; 5901d (16:501d) ; Don't Move this Subroutine (MissingNo Growt
     db $54,$00,$00,$00 ; slow:        5/4 n^3
    ;db $08,$21,$9B,$50 ; missingno:   0/8 n^3 + 33 n^2 + 155 n - 80
 
-Func_59035: ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
+SECTION "OakAideNDexToGiftItem",ROMX[$5035],BANK[$16]
+
+OakAideNDexToGiftItem: ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
     ld hl,UnnamedText_59091 ; $5091
     call PrintText
     call YesNoChoice
@@ -86549,9 +86195,9 @@ Func_59035: ; 0x59035 ; Don't Move this Subroutine (MissingNo Growth Rate)
     ld a,[$ff00+$dc]
     ld b,a
     ld c,1
-    call GiveItemNotPower ; call GiveItem
+    call GiveItem
     jr nc,.BagFull
-    call LoadTextItemOrPower ; ld hl,UnnamedText_590a5 ; $50a5
+    ld hl,UnnamedText_590a5 ; $50a5
     call PrintText
     ld a,$1
     jr .asm_5908e ; 0x59071 $1b
@@ -86597,6 +86243,8 @@ UnnamedText_590a5: ; 590a5 (16:50a5)
 UnnamedText_590ab: ; 590ab (16:50ab)
     TX_FAR _UnnamedText_590ab
     db "@"
+
+SECTION "Route6Script",ROMX[$50b0],BANK[$16]
 
 Route6Script: ; 590b0 (16:50b0)
     call EnableAutoTextBoxDrawing
@@ -89670,22 +89318,6 @@ RemoveGuardDrink: ; 5a59f (16:659f)
 GuardDrinksList: ; 5a5b7 (16:65b7)
     db FRESH_WATER,SODA_POP,LEMONADE,$00
 
-GiveItemNotPower:
-    cp HM_05
-    jp z,FakeGiveItem
-    jp GiveItem
-
-LoadTextItemOrPower:
-    ld a,[$ff00+$dc]
-    cp HM_05
-    ld hl,UnnamedText_590a5 ; $50a5
-    ret nz
-    ld hl,.ReceivedHM05Text
-    ret
-.ReceivedHM05Text
-    TX_FAR _GotText
-    db $11,"@"
-
 Route12Snorlax:
     db $8
     ld hl,Route12SnorlaxText
@@ -92605,9 +92237,7 @@ SilphCo1Script: ; 5d44e (17:544e)
 SilphCo1TextPointers: ; 5d469 (17:5469)
     dw SilphCo1Text1
 
-SilphCo1Text1: ; 5d46b (17:546b)
-    TX_FAR _SilphCo1Text1
-    db "@"
+SECTION "SilphCo1Object",ROMX[$5470],BANK[$17]
 
 SilphCo1Object: ; 0x5d470 (size=50)
     db $2e ; border tile
@@ -92741,36 +92371,9 @@ Route2GateTextPointers: ; 5d5d7 (17:55d7)
     dw Route2GateText1
     dw Route2GateText2
 
-Route2GateText1: ; 5d5db (17:55db)
-    db $08 ; asm
-    ld a,[$d7c2]
-    bit 0,a
-    jr nz,.asm_6592c ; 0x5d5e1
-    ld a,$a
-    ldh [$db],a
-    ld a,HM_05
-    ldh [$dc],a
-    ld [$d11e],a
-    call GetItemName ; $2fcf
-    ld hl,$cd6d
-    ld de,$cc5b
-    ld bc,$000d
-    call CopyData
-    PREDEF Func_59035
-    ldh a,[$db]
-    cp $1
-    jr nz,.asm_ad646 ; 0x5d606
-    ld hl,$d7c2
-    set 0,[hl]
-.asm_6592c ; 0x5d60d
-    ld hl,UnnamedText_5d616
-    call PrintText
-.asm_ad646 ; 0x5d613
-    jp TextScriptEnd
+; Free
 
-UnnamedText_5d616: ; 5d616 (17:5616)
-    TX_FAR _UnnamedText_5d616
-    db "@"
+SECTION "Route2GateText2",ROMX[$561b],BANK[$17]
 
 Route2GateText2: ; 5d61b (17:561b)
     TX_FAR _Route2GateText2
@@ -94146,6 +93749,78 @@ MuseumF2Script1_AfterEevee:
     ld [W_CURMAPSCRIPT],a
     ld [W_MUSEUM2FCURSCRIPT],a
     ret
+
+; ───────────────────────────────────────────
+
+Route2GateText1:
+    db $08 ; asm
+    ld a,[LIGHT_FLAG_BYTE]
+    bit LIGHT_FLAG_BIT,a
+    ld hl,.HM05AfterText
+    jr nz,.done
+    ld hl,.PreHM05Text
+    call PrintText
+    ld bc,(HM_05 << 8) | 1
+    call FakeGiveItem
+    ld hl,LIGHT_FLAG_BYTE
+    set LIGHT_FLAG_BIT,[hl]
+    ld b,LIGHT_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM05SkillFoundText
+    jr c,.done
+    ld hl,.HM05SkillNotFoundText
+.done
+    call PrintText
+    jp TextScriptEnd
+
+.PreHM05Text
+    TX_FAR _PreHM05Text
+    db "@"
+.HM05SkillFoundText
+    TX_FAR _HM05SkillFoundText
+    db "@"
+.HM05SkillNotFoundText
+    TX_FAR _HM05SkillNotFoundText
+    db "@"
+.HM05AfterText
+    TX_FAR _HM05AfterText
+    db "@"
+
+; ───────────────────────────────────────────
+
+SilphCo1Text1:
+    db $08 ; asm
+    ld a,[HEAL_FLAG_BYTE]
+    bit HEAL_FLAG_BIT,a
+    ld hl,.HM08AfterText
+    jr nz,.done
+    ld hl,.PreHM08Text
+    call PrintText
+    ld bc,(HM_08 << 8) | 1
+    call FakeGiveItem
+    ld hl,HEAL_FLAG_BYTE
+    set HEAL_FLAG_BIT,[hl]
+    ld b,HEAL_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM08SkillFoundText
+    jr c,.done
+    ld hl,.HM08SkillNotFoundText
+.done
+    call PrintText
+    jp TextScriptEnd
+
+.PreHM08Text
+    TX_FAR _PreHM08Text
+    db "@"
+.HM08SkillFoundText
+    TX_FAR _HM08SkillFoundText
+    db "@"
+.HM08SkillNotFoundText
+    TX_FAR _HM08SkillNotFoundText
+    db "@"
+.HM08AfterText
+    TX_FAR _SilphCo1Text1
+    db "@"
 
 ; ───────────────────────────────────────────
 
@@ -96426,77 +96101,9 @@ SSAnne7TextPointers: ; 618a7 (18:58a7)
     dw SSAnne7Text2
     dw SSAnne7Text3
 
-SSAnne7Text1: ; 618ad (18:58ad)
-    db $08 ; asm
-    ld a,[$d803]
-    bit 0,a
-    jr nz,.asm_797c4 ; 0x618b3
-    ld hl,SSAnne7RubText
-    call PrintText
-    ld hl,ReceivingHM01Text
-    call PrintText
-    ld bc,(HM_01 << 8) | 1
-    call FakeGiveItem
-    jr nc,.BagFull
-    ld hl,ReceivedHM01Text
-    call PrintText
-    ld hl,$d803
-    set 0,[hl]
-    jr .asm_0faf5 ; 0x618d4
-.BagFull
-    ld hl,HM01NoRoomText
-    call PrintText
-    ld hl,$d72d
-    set 5,[hl]
-    jr .asm_0faf5 ; 0x618e1
-.asm_797c4 ; 0x618e3
-    ld hl,UnnamedText_61932
-    call PrintText
-.asm_0faf5 ; 0x618e9
-    jp TextScriptEnd
+; Free
 
-SSAnne7RubText: ; 618ec (18:58ec)
-    TX_FAR _SSAnne7RubText ; 0x812dd
-    db $8
-    ld a,[$c0ef]
-    cp $1f
-    ld [$c0f0],a
-    jr nz,.asm_61908 ; 0x618f9 $d
-    ld a,$ff
-    ld [$c0ee],a
-    call PlaySound
-    ld a,$2
-    ld [$c0ef],a
-.asm_61908
-    ld a,$e8
-    ld [$c0ee],a
-    call PlaySound
-.asm_61910
-    ld a,[$c026]
-    cp $e8
-    jr z,.asm_61910 ; 0x61915 $f9
-    call PlayDefaultMusic
-    ld hl,$d803
-    set 1,[hl]
-    ld hl,$d72d
-    res 5,[hl]
-    jp TextScriptEnd
-
-ReceivingHM01Text: ; 61927 (18:5927)
-    TX_FAR _ReceivingHM01Text
-    db "@"
-
-ReceivedHM01Text: ; 6192c (18:592c)
-    TX_FAR _GotText
-    db $11,"@"
-
-UnnamedText_61932: ; 61932 (18:5932)
-    TX_FAR _UnnamedText_61932
-    db "@"
-
-HM01NoRoomText: ; 61937 (18:5937)
-    TX_FAR _HM01NoRoomText
-    db "@"
+SECTION "SSAnne7Text2",ROMX[$593c],BANK[$18]
 
 SSAnne7Text2: ; 6193c (18:593c)
     TX_FAR _SSAnne7Text2
@@ -98350,6 +97957,79 @@ PokemonTower6Script2:
     xor a
     ld [W_POKEMONTOWER6CURSCRIPT],a
     ret
+
+; ───────────────────────────────────────
+
+SSAnne7Text1:
+    db $08 ; asm
+    ld a,[CUT_FLAG_BYTE]
+    bit CUT_FLAG_BIT,a
+    ld hl,.HM01AfterText
+    jr nz,.done
+    ld hl,.SSAnne7RubText
+    call PrintText
+    ld hl,.PreHM01Text
+    call PrintText
+    ld bc,(HM_01 << 8) | 1
+    call FakeGiveItem
+    ld hl,CUT_FLAG_BYTE
+    set CUT_FLAG_BIT,[hl]
+    ld b,CUT_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM01SkillFoundText
+    jr c,.done
+    ld hl,.HM01SkillNotFoundText
+.done
+    call PrintText
+    jp TextScriptEnd
+
+.SSAnne7RubText
+    TX_FAR _SSAnne7RubText
+    db $8
+    ld a,[$c0ef]
+    cp $1f
+    ld [$c0f0],a
+    jr nz,.skip
+    ld a,$ff
+    ld [$c0ee],a
+    call PlaySound
+    ld a,$2
+    ld [$c0ef],a
+.skip
+    ld b,2
+.loop
+    ld a,$9c ; $e8
+    ld [$c0ee],a
+    call PlaySound
+.WaitLoop
+    ld a,[$c026]
+    cp $9c ; $e8
+    jr z,.WaitLoop
+    ld c,$30
+    call DelayFrames
+    dec b
+    jr nz,.loop
+    ld c,$60
+    call DelayFrames
+    ;call PlayDefaultMusic
+    ld hl,$d803
+    set 1,[hl]
+    ld hl,$d72d
+    res 5,[hl]
+    jp TextScriptEnd
+
+.PreHM01Text
+    TX_FAR _PreHM01Text
+    db "@"
+.HM01SkillFoundText
+    TX_FAR _HM01SkillFoundText
+    db "@"
+.HM01SkillNotFoundText
+    TX_FAR _HM01SkillNotFoundText
+    db "@"
+.HM01AfterText
+    TX_FAR _HM01AfterText
+    db "@"
 
 ; ───────────────────────────────────────
 
@@ -100872,8 +100552,7 @@ Func_711ef:
     jp CopyData
 
 ShakeMiniSprite:
-    ld a,[wFlagMoveRelearnEngagedBit7]
-    bit 7,a
+    call CheckMoveRelearn
     jp z,Func_716ff
     ld a,[wCurrentMenuItem]
     push af
@@ -106510,94 +106189,76 @@ FuchsiaHouse2TextPointers: ; 750b8 (1d:50b8)
     dw FuchsiaHouse2Text4
     dw FuchsiaHouse2Text5
 
-FuchsiaHouse2Text1: ; 750c2 (1d:50c2)
+FuchsiaHouse2Text1:
     db $08 ; asm
-    ld a,[$d78e]
-    bit 0,a
-    jr nz,.subtract ; 0x750c8
+    ld a,[STRENGTH_FLAG_BYTE]
+    bit STRENGTH_FLAG_BIT,a
+    ld hl,.HM04AfterText
+    jr nz,.done
     ld b,GOLD_TEETH
     call IsItemInBag
-    jr nz,.asm_3f30f ; 0x750cf
-    ld a,[$d78e]
-    bit 1,a
-    jr nz,.asm_60cba ; 0x750d6
-    ld hl,WardenGibberishText1
+    jr nz,.InBag
+    ld hl,.WardenGibberishText1
     call PrintText
     call YesNoChoice
     ld a,[$cc26]
     and a
-    ld hl,WardenGibberishText3
-    jr nz,.asm_61238 ; 0x750e8
-    ld hl,WardenGibberishText2
-.asm_61238 ; 0x750ed
+    ld hl,.WardenGibberishText3
+    jr nz,.done
+    ld hl,.WardenGibberishText2
+    jr .done
+.InBag
+    ld hl,.WardenTeethText
     call PrintText
-    jr .asm_52039 ; 0x750f0
-.asm_3f30f ; 0x750f2
-    ld hl,WardenTeethText1
-    call PrintText
-    ld a,$40
+    ld a,GOLD_TEETH
     ldh [$db],a
     ld b,BANK(RemoveItemByID)
     ld hl,RemoveItemByID
     call Bankswitch
-    ld hl,$d78e
-    set 1,[hl]
-.asm_60cba ; 0x75109
-    ld hl,WardenThankYouText
+    ld hl,.PreHM04Text
     call PrintText
     ld bc,(HM_04 << 8) | 1
     call FakeGiveItem
-    jr nc,.BagFull
-    ld hl,ReceivedHM04Text
+    ld hl,STRENGTH_FLAG_BYTE
+    set STRENGTH_FLAG_BIT,[hl]
+    ld b,STRENGTH_SKILL_SORT
+    PREDEF LearnSkill
+    ld hl,.HM04SkillFoundText
+    jr c,.done
+    ld hl,.HM04SkillNotFoundText
+.done
     call PrintText
-    ld hl,$d78e
-    set 0,[hl]
-    jr .asm_52039 ; 0x75122
-.subtract ; 0x75124
-    ld hl,HM04ExplanationText
-    call PrintText
-    jr .asm_52039 ; 0x7512a
-.BagFull
-    ld hl,HM04NoRoomText
-    call PrintText
-.asm_52039 ; 0x75132
     jp TextScriptEnd
 
-WardenGibberishText1: ; 75135 (1d:5135)
+.WardenGibberishText1
     TX_FAR _WardenGibberishText1
     db "@"
-
-WardenGibberishText2: ; 7513a (1d:513a)
+.WardenGibberishText2
     TX_FAR _WardenGibberishText2
     db "@"
-
-WardenGibberishText3: ; 7513f (1d:513f)
+.WardenGibberishText3
     TX_FAR _WardenGibberishText3
     db "@"
-
-WardenTeethText1: ; 75144 (1d:5144)
+.WardenTeethText
     TX_FAR _WardenTeethText1
     db $0b
-
-WardenTeethText2: ; 75149 (1d:5149)
     TX_FAR _WardenTeethText2
     db "@"
 
-WardenThankYouText: ; 7514e (1d:514e)
-    TX_FAR _WardenThankYouText
+.PreHM04Text
+    TX_FAR _PreHM04Text
+    db "@"
+.HM04SkillFoundText
+    TX_FAR _HM04SkillFoundText
+    db "@"
+.HM04SkillNotFoundText
+    TX_FAR _HM04SkillNotFoundText
+    db "@"
+.HM04AfterText
+    TX_FAR _HM04AfterText
     db "@"
 
-ReceivedHM04Text: ; 75153 (1d:5153)
-    TX_FAR _GotText
-    db $11,"@"
-
-HM04ExplanationText: ; 75159 (1d:5159)
-    TX_FAR _HM04ExplanationText
-    db "@"
-
-HM04NoRoomText: ; 7515e (1d:515e)
-    TX_FAR _HM04NoRoomText
-    db "@"
+SECTION "FuchsiaHouse2Text5",ROMX[$5163],BANK[$1d]
 
 FuchsiaHouse2Text5: ; 75163 (1d:5163)
 FuchsiaHouse2Text4: ; 75163 (1d:5163)
@@ -118918,7 +118579,7 @@ _MtMoon1EndBattleText2: ; 806bf (20:46bf)
     db $0,"Wow!",$4f
     db "Shocked again!",$58
 
-_MtMoon1AfterBattleText2: ; 806d4 (20:46d4)
+_HM07AfterText: ; 806d4 (20:46d4)
     db $0,"Kids like you",$4f
     db "shouldn't be",$55
     db "here!",$57
@@ -119288,32 +118949,22 @@ _SSAnne7RubText: ; 812dd (20:52dd)
     db "Rub-rub...",$4f
     db "Rub-rub...@@"
 
-_ReceivingHM01Text: ; 81347 (20:5347)
+_PreHM01Text: ; 81347 (20:5347)
     db $0,"CAPTAIN: Whew!",$4f
     db "Thank you! I",$55
     db "feel much better!",$51
-    db "You want to see",$4f
-    db "my CUT technique?",$51
-    db "I could show you",$4f
-    db "if I wasn't ill...",$51
-    db "I know! You can",$4f
-    db "have this!",$51
-    db "Teach it to your",$4f
-    db "#MON and you",$55
-    db "can see it CUT",$55
-    db "any time!",$58
+    db "To thank you I",$4f
+    db "want to teach you",$55
+    db "and your #MON",$55
+    db "my CUT SKILL!",$58
 
-SECTION "_UnnamedText_61932",ROMX[$541c],BANK[$20]
-
-_UnnamedText_61932: ; 8141c (20:541c)
+_HM01AfterText:
     db $0,"CAPTAIN: Whew!",$51
     db "Now that I'm not",$4f
     db "sick any more,I",$55
     db "guess it's time.",$57
 
-_HM01NoRoomText: ; 8145d (20:545d)
-    db $0,"Oh no! You have",$4f
-    db "no room for this!",$57
+SECTION "_SSAnne7Text2",ROMX[$5480],BANK[$20]
 
 _SSAnne7Text2: ; 81480 (20:5480)
     db $0,"Yuck! Shouldn't",$4f
@@ -120059,16 +119710,14 @@ _ViridianFrstAfterBattleText6:
     db "I hope to ",$4f
     db "Evolve it!",$57
 
-_EscapeRopeReceiveText1:
+_PreHM07Text:
     db $0,"Kids like you",$4f
     db "shouldn't be",$55
     db "here!",$51
-    db "Take this and",$4f
-    db "good luck!",$58
-
-_EscapeRopeNoRoomText:
-    db $0,"You do not have",$4f
-    db "space for this!",$57
+    db "This intensive",$4f
+    db "course could be",$55
+    db "very useful",$55
+    db "to you!",$58
 
 SECTION "bank21",ROMX,BANK[$21]
 
@@ -120746,11 +120395,7 @@ _SafariZoneNorthText6: ; 85689 (21:5689)
     db "grassy areas to",$55
     db "flush them out.",$57
 
-_SafariZoneNorthText7: ; 856df (21:56df)
-    db $0,"TRAINER TIPS",$51
-    db "Win a POWER for ",$4f
-    db "finding the",$55
-    db "SECRET HOUSE!",$57
+SECTION "_SafariZoneWestText5",ROMX[$5719],BANK[$21]
 
 _SafariZoneWestText5: ; 85719 (21:5719)
     db $0,"REST HOUSE",$57
@@ -120795,7 +120440,7 @@ _SafariZoneRestHouse1Text2: ; 8587b (21:587b)
     db "#MON to take",$55
     db "home as gifts!",$57
 
-_UnnamedText_4a350: ; 858a4 (21:58a4)
+_PreHM03Text: ; 858a4 (21:58a4)
     db $0,"Ah! Finally!",$51
     db "You're the first",$4f
     db "person to reach",$55
@@ -120807,14 +120452,12 @@ _UnnamedText_4a350: ; 858a4 (21:58a4)
     db "Congratulations!",$4f
     db "You have won!",$58
 
-SECTION "_HM03ExplanationText",ROMX[$5957],BANK[$21]
-
-_HM03ExplanationText: ; 85957 (21:5957)
+_HM03AfterText: ; 85957 (21:5957)
     db $0,"This is FLOAT!",$51
     db "#MON will be",$4f
-    db "able to ferry you",$55
-    db "across water!",$51
-    db "And,Power isn't ",$4f
+    db "able to support",$55
+    db "you across water!",$51
+    db "And,Skill isn't ",$4f
     db "disposable! You",$55
     db "can use it over",$55
     db "and over!",$51
@@ -120822,10 +120465,7 @@ _HM03ExplanationText: ; 85957 (21:5957)
     db "for winning this",$55
     db "fabulous prize!",$57
 
-_HM03NoRoomText: ; 85a02 (21:5a02)
-    db $0,"You don't have",$4f
-    db "room for this",$55
-    db "fabulous prize!",$57
+SECTION "_SafariZoneRestHouse2Text1",ROMX[$5a2f],BANK[$21]
 
 _SafariZoneRestHouse2Text1: ; 85a2f (21:5a2f)
     db $0,"Tossing ROCKs at",$4f
@@ -121320,6 +120960,12 @@ _SaraAndErikText
 _ErikAndSaraText
     db 0,"ERIK: SARA!! "
     db $DB,$DB,$DB,"@@" ; ❤️
+
+_SafariZoneNorthText7:
+    db $0,"TRAINER TIPS",$51
+    db "Win a New SKILL",$4f
+    db "for finding the",$55
+    db "SECRET HOUSE!",$57
 
 SECTION "bank22",ROMX,BANK[$22]
 
@@ -122720,7 +122366,7 @@ _DiglettsCaveRoute2Text1: ; 8a6a7 (22:66a7)
     db "TUNNEL,but it's",$55
     db "dark and scary.",$51
     db "If a #MON's",$4f
-    db "POWER could light",$55
+    db "SKILL could light",$55
     db "it up...",$57
 
 _ViridianForestexitText1: ; 8a6fd (22:66fd)
@@ -122745,10 +122391,12 @@ _Route2HouseText1: ; 8a7b8 (22:67b8)
     db "it can still use ",$55
     db "moves like CUT!",$57
 
-_UnnamedText_5d616: ; 8a7fc (22:67fc)
-    db $0,"The FIRE PWR ",$4f
+_HM05AfterText: ; 8a7fc (22:67fc)
+    db $0,"This SKILL",$4f
     db "lights even the",$55
     db "darkest dungeons.",$57
+
+SECTION "_Route2GateText2",ROMX[$682c],BANK[$22]
 
 _Route2GateText2: ; 8a82c (22:682c)
     db $0,"Once a #MON",$4f
@@ -123102,6 +122750,92 @@ _SilphScopeDoesntWorkInTheDark
 
 ; ───────────────────────────────────
 
+_PreHM05Text:
+    db $0,"I give you this!",$58
+
+_LearnSkillText:
+    db $0,$52," learns all",$4f
+    db "secrets about",$55
+    db "@"
+    TX_RAM $cf4b
+    db $0," SKILL!@@"
+
+_HM01SkillFoundText:
+    db $0,"Now #MON and",$4f
+    db "you can see it",$55
+    db "CUT any time!",$51
+    db "You're Ready!@@"
+
+_HM01SkillNotFoundText:
+    db $0,"Hmmm... I think",$4f
+    db "your team is",$55
+    db "missing a #MON",$55
+    db "with this SKILL!",$51
+    db "..But I'm sure",$4f
+    db "you'll be able to",$55
+    db "figure out who",$55
+    db "can learn it.",$51
+    db "Make good use!@@"
+
+_HM02SkillFoundText:
+    db $0,"Found!@@"
+
+_HM02SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM03SkillFoundText:
+    db $0,"Found!@@"
+
+_HM03SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM04SkillFoundText:
+    db $0,"Found!@@"
+
+_HM04SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM05SkillFoundText:
+    db $0,"Found!@@"
+
+_HM05SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM06SkillFoundText:
+    db $0,"Found!@@"
+
+_HM06SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM07SkillFoundText:
+    db $0,"Found!@@"
+
+_HM07SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+_HM08SkillFoundText:
+    db $0,"Found!@@"
+
+_HM08SkillNotFoundText:
+    db $0,"NOT Found!@@"
+
+; ───────────────────────────────────
+
+_EscapeRopeReceiveText1:
+    db $0,"I went to ROCK",$4f
+    db "TUNNEL,but it's",$55
+    db "dark and scary.",$51
+    db "If a #MON's",$4f
+    db "SKILL could light",$55
+    db "it up...",$51
+    db "I don't need this",$4f
+    db "tool at the",$55
+    db "moment, take it!",$58
+
+_EscapeRopeNoRoomText:
+    db $0,"You do not have",$4f
+    db "space for this!",$57
+
 SECTION "bank23",ROMX,BANK[$23]
 
 _UnnamedText_56437: ; 8c000 (23:4000)
@@ -123119,10 +122853,7 @@ _UnnamedText_56445: ; 8c041 (23:4041)
     db $0,"You only have one",$4f
     db "#MON with you.",$57
 
-_UnnamedText_5644a: ; 8c063 (23:4063)
-    db $0,"I can't accept a",$4f
-    db "#MON that",$55
-    db "knows a PWR move.",$57
+SECTION "_UnnamedText_5644f",ROMX[$4090],BANK[$23]
 
 _UnnamedText_5644f: ; 8c090 (23:4090)
     db $0,"Thank you! Here's",$4f
@@ -123479,7 +123210,7 @@ _UnnamedText_49847: ; 8cdc6 (23:4dc6)
     db "There's a long",$4f
     db "path over water!",$57
 
-_Route16HouseText3: ; 8ce02 (23:4e02)
+_PreHM02Text: ; 8ce02 (23:4e02)
     db $0,"Oh,you found my",$4f
     db "secret retreat!",$51
     db "Please don't tell",$4f
@@ -123487,11 +123218,7 @@ _Route16HouseText3: ; 8ce02 (23:4e02)
     db "I'll make it up",$55
     db "to you with this!",$58
 
-SECTION "_HM02NoRoomText",ROMX[$4ebe],BANK[$23]
-
-_HM02NoRoomText: ; 8cebe (23:4ebe)
-    db $0,"You don't have any",$4f
-    db "room for this.",$57
+SECTION "_UnnamedText_1e652",ROMX[$4ee0],BANK[$23]
 
 _UnnamedText_1e652: ; 8cee0 (23:4ee0)
     db $0,"FEAROW: Kyueen!",$57
@@ -124418,9 +124145,9 @@ _Route11BattleText9: ; 8ebee (23:6bee)
     db $0,"Watch out for",$4f
     db "live wires!",$57
 
-_HM02ExplanationText: ; Moved to the End of the BANK
-    db $0,"AIR POWER is FLY.",$4f
-    db "It will take you",$55
+_HM02AfterText:
+    db $0,"This is FLY!",$51
+    db "It will take you",$4f
     db "back to any town.",$51
     db "Put it to good",$4f
     db "use!",$57
@@ -124730,11 +124457,7 @@ _Route14EndBattleText1: ; 9083f (24:483f)
     db $0,"Not",$4f
     db "good enough!",$58
 
-_Route14AfterBattleText1: ; 90851 (24:4851)
-    db $0,"You have some PWR",$4f
-    db "right? #MON",$55
-    db "can't ever forget",$55
-    db "those moves.",$57
+SECTION "_Route14BattleText2",ROMX[$488e],BANK[$24]
 
 _Route14BattleText2: ; 9088e (24:488e)
     db $0,"My bird #MON",$4f
@@ -124749,11 +124472,7 @@ _Route14AfterBattleText2: ; 908c8 (24:48c8)
     db $0,"They need to learn",$4f
     db "better moves.",$57
 
-_Route14BattleText3: ; 908ea (24:48ea)
-    db $0,"TMs are on sale",$4f
-    db "in CELADON!",$55
-    db "But,only a few",$55
-    db "people have PWR!",$57
+SECTION "_Route14EndBattleText3",ROMX[$4928],BANK[$24]
 
 _Route14EndBattleText3: ; 90928 (24:4928)
     db $0,"Aww,",$4f
@@ -125369,10 +125088,7 @@ _Route19AfterBattleText6: ; 91a9e (24:5a9e)
     db $0,"I'm looking at the",$4f
     db "sea to forget!",$57
 
-_Route19BattleText7: ; 91ac0 (24:5ac0)
-    db $0,"Oh,I just love",$4f
-    db "your ride! Can I",$55
-    db "have it if I win?",$57
+SECTION "_Route19EndBattleText7",ROMX[$5af4],BANK[$24]
 
 _Route19EndBattleText7: ; 91af4 (24:5af4)
     db $0,"Oh!",$4f
@@ -125893,6 +125609,25 @@ _SurfBoardReceiveText1:
 _SurfBoardNoRoomText:
     db $0,"You do not have",$4f
     db "space for this!",$57
+
+_Route14AfterBattleText1
+    db $0,"You have some",$4f
+    db "SKILL right?",$51
+    db "#MON can use",$4f
+    db "it with 10",$DA,$55
+    db "every time!",$57
+
+_Route14BattleText3:
+    db $0,"TMs are on sale",$4f
+    db "in CELADON!",$55
+    db "But,only a few",$55
+    db "people know",$55
+    db "SKILL!",$57
+
+_Route19BattleText7:
+    db $0,"Oh,I just love",$4f
+    db "your SKILL! Can I",$55
+    db "have it if I win?",$57
 
 SECTION "bank25",ROMX,BANK[$25]
 
@@ -126711,9 +126446,9 @@ _UnnamedText_44201: ; 95858 (25:5858)
 
 _UnnamedText_44206: ; 95893 (25:5893)
     db $0,"You're on the",$4f
-    db "right track! ",$55
-    db "Get a POWER   ",$55
-    db "from my AIDE!",$57
+    db "right track!",$57
+
+SECTION "_UnnamedText_4420b",ROMX[$58cc],BANK[$25]
 
 _UnnamedText_4420b: ; 958cc (25:58cc)
     db $0,"You still need",$4f
@@ -127252,6 +126987,15 @@ _OaksLabTextTM2:
     db "a new technique,",$55
     db "pick the #MON",$55
     db "carefully!",$58
+
+_PreHM06Text:
+    db $0,"I hid because the",$4f
+    db "people on the",$55
+    db "bridge scared me!",$51
+    db "My special ability",$4f
+    db "is fast retreat!",$55
+    db "I can teach it to",$55
+    db "you if you want!",$58
 
 SECTION "bank26",ROMX,BANK[$26]
 
@@ -129370,32 +129114,32 @@ _FuchsiaPokecenterText3: ; 9e3de (27:63de)
     db "The HQ governs",$55
     db "all trainers.",$57
 
-_WardenGibberishText1: ; 9e444 (27:6444)
+_WardenGibberishText1:
     db $0,"WARDEN: Hif fuff",$4f
     db "hefifoo!",$51
     db "Ha lof ha feef ee",$4f
     db "hafahi ho. Heff",$55
     db "hee fwee!",$57
 
-_WardenGibberishText2: ; 9e48b (27:648b)
+_WardenGibberishText2:
     db $0,"Ah howhee ho hoo!",$4f
     db "Eef ee hafahi ho!",$57
 
-_WardenGibberishText3: ; 9e4b0 (27:64b0)
+_WardenGibberishText3:
     db $0,"Ha? He ohay heh",$4f
     db "ha hoo ee haheh!",$57
 
-_WardenTeethText1: ; 9e4d2 (27:64d2)
+_WardenTeethText1:
     db $0,$52," gave the",$4f
     db "GOLD TEETH to the",$55
     db "WARDEN!@@"
 
-_WardenTeethText2: ; 9e4f9 (27:64f9)
+_WardenTeethText2:
     db $0,$51
     db "The WARDEN popped",$4f
     db "in his teeth!",$58
 
-_WardenThankYouText: ; 9e51b (27:651b)
+_PreHM04Text:
     db $0,"WARDEN: Thanks,",$4f
     db "kid! No one could",$55
     db "understand a word",$55
@@ -129406,11 +129150,9 @@ _WardenThankYouText: ; 9e51b (27:651b)
     db "something for",$55
     db "your trouble.",$58
 
-SECTION "_HM04ExplanationText",ROMX[$65b6],BANK[$27]
-
-_HM04ExplanationText: ; 9e5b6 (27:65b6)
-    db $0,"WARDEN: PWR ",$4f
-    db "teaches STRENGTH!",$51
+_HM04AfterText:
+    db $0,"WARDEN: Now you",$4f
+    db "know STRENGTH!",$51
     db "It lets #MON",$4f
     db "move boulders",$55
     db "when you're out-",$55
@@ -129418,14 +129160,10 @@ _HM04ExplanationText: ; 9e5b6 (27:65b6)
     db "Oh yes,did you",$4f
     db "find SECRET HOUSE",$55
     db "in SAFARI ZONE?",$51
-    db "If you do,you",$4f
-    db "win a PWR!",$51
-    db "I hear it's the",$4f
-    db "rare FLOAT PW",$57
+    db "If you do,you win",$4f
+    db "a special Gift!",$57
 
-_HM04NoRoomText: ; 9e67a (27:667a)
-    db $0,"Your pack is",$4f
-    db "stuffed full!",$57
+SECTION "_UnnamedText_75176",ROMX[$6696],BANK[$27]
 
 _UnnamedText_75176: ; 9e696 (27:6696)
     db $0,"#MON photos",$4f
@@ -130620,52 +130358,25 @@ _PokemartAnythingElseText: ; a2719 (28:6719)
     db $0,"Is there anything",$4f
     db "else I can do?",$57
 
-_LearnedText: ; a273b (28:673b)
+_LearnedText:
     TX_RAM $d036
     db $0," learned",$4f
     db "@"
     TX_RAM $cf4b
     db $0,"!@@"
 
-_WhichMoveShouldBeReplacedText: ; a2750 (28:6750)
-    ;db $0,"Which move should",$4e,"be replaced?",$57
-    db 0,"Which",$4f
-    db "Replace?",$57
-
-;_AbandonLearningText:
-;    db $0,"Are you sure?",$57
+_LearnedSkillText1:
+    TX_RAM $d036
+    db $0," learned",$4f
+    db "@"
+    TX_RAM $cf4b
+    db $0," SKILL!@@"
 
 _ReplaceAMoveForText:
     db 0,"Replace a move for",$4f
     db "@"
     TX_RAM $cf4b
     db $0,"?",$57
-
-;_ImportantText:
-;    TX_RAM $cd6d
-;    db $0," is a",$4f,"@"
-;    TX_RAM $d036
-;    db 0,"'s",$55
-;    db "Exclusive Move!",$51
-;    db "If replaced,",$4f,"@"
-;    TX_RAM $d036
-;    db 0," can't",$55
-;    db "relearn it again!",$51
-;    db "Permanently forget",$4f,"@"
-;    TX_RAM $cd6d
-;    db 0,"?",$57
-
-_ForgotAndLearnText:
-    ;db 0,"Ok! Replaced",$4f,"@"
-    ;TX_RAM $cd6d
-    ;db $0,$55
-    ;db "with @"
-    ;TX_RAM $cf4b
-    ;db $0,$55,"in @"
-    ;TX_RAM $d036
-    ;db 0,"'s",$55
-    ;db "Moveset!",$58
-    db 0,"Move Replaced!",$58
 
 SECTION "_PokemonCenterWelcomeText",ROMX[$686d],BANK[$28]
 
@@ -130774,10 +130485,6 @@ _NoPartyText:
 
 ; ───────────────────────────────
 
-_ElementMissedText:
-    db $0,"No! A new POWER",$4f
-    db "is required.",$58
-
 _CopycatsHouseF2Text2_Part2:
     db $0,$51
     db "MIRROR MIRROR ON",$4f
@@ -130813,6 +130520,24 @@ _TryUseAnotherRepelText_LessThan10:
     db $0," (",$F1," @"
     TX_NUM wTmpRepelQty,1,2
     db $0,")?",$57
+
+_PreHM08Text:
+    db $0
+    db "Thank you so much",$4f
+    db "for your help!",$51
+    db "My dream was to",$4f
+    db "work in a #MON",$55
+    db "CENTER!",$51
+    db "I'm good at",$4f
+    db "healing #MON.",$51
+    db "But...",$51
+    db "C'est la vie... ",$51
+    db "You are a",$4f
+    db "special trainer!",$51
+    db "If I taught you",$4f
+    db "my SKILL you",$55
+    db "wouldn't need any",$55
+    db "support anymore!",$58
 
 SECTION "bank29",ROMX,BANK[$29]
 
@@ -130861,9 +130586,7 @@ _NotHealthyEnoughText: ; a411b (29:411b)
     db $0,"Not healthy",$4f
     db "enough.",$58
 
-_NewBadgeRequiredText: ; a4130 (29:4130)
-    db $0,"No! A new BADGE",$4f
-    db "is required.",$58
+SECTION "_CannotUseItemsHereText",ROMX[$414e],BANK[$29]
 
 _CannotUseItemsHereText: ; a414e (29:414e)
     db $0,"You can't use items",$4f
@@ -131938,14 +131661,6 @@ _PPRestoredText: ; a6a0d (29:6a0d)
     db $0,$DA," ENERGY",$4f
     db "Restored!",$58
 
-SECTION "_BootedUpTMText",ROMX[$6a1f],BANK[$29]
-
-_BootedUpTMText: ; a6a1f (29:6a1f)
-    db $0,"Booted up a TM!",$58
-
-_BootedUpHMText: ; a6a30 (29:6a30)
-    db $0,"Booted up a PWR!",$58
-
 _TeachMachineMoveText:
     db $0,"Teach @"
     TX_RAM $cf4b
@@ -132442,8 +132157,14 @@ MoveNames: ; b0000 (2c:4000)
     db "SUPER FANG@"
     db "SLASH@"
     db "SUBSTITUTE@"
-    db "STRUGGLE@"
-
+    db "STRUGGLE@" ; $A5
+    db "FLY@"      ; $A6
+    db "DIG@"      ; $A7
+    db "CUT@"      ; $A8
+    db "FLOAT@"    ; $A9
+    db "STRENGTH@" ; $AA
+    db "LIGHT@"    ; $AB
+    db "HEAL@"     ; $AC
 
 SECTION "bank2D",ROMX,BANK[$2D]
 
@@ -133092,14 +132813,11 @@ SelectInOverWorld:
     ld a,[W_CURMAPTILESET]
     cp 23 ; plateau
     jr z,.noCut
-;    ld a,[W_OBTAINEDBADGES] ; badges obtained
-;    bit 1,a ; does the player have the Cascade Badge?
-;    jr z,.noCut
-    ld hl,$d803 ; NaturePower
-    bit 0,[hl]  ; ...
+    ld hl,CUT_FLAG_BYTE
+    bit CUT_FLAG_BIT,[hl]
     jr z,.noCut
-    ld b,4 ; CUT
-    call SearchFieldMoveInParty
+    ld b,CUT_SKILL_SORT
+    call SearchSkillInParty
     jr nc,.noCut
 .canCut
     call .PlayCry
@@ -133118,9 +132836,6 @@ SelectInOverWorld:
     ld [$d11a],a
     cp a,2 ; is the player surfing?
     jp z,.noFloat
-;    ld a,[W_OBTAINEDBADGES] ; badges obtained
-;    bit 4,a ; does the player have the Soul Badge?
-;    jr z,.noFloat
     ld b,BANK(IsSurfingAllowed)
     ld hl,IsSurfingAllowed
     call Bankswitch
@@ -133140,11 +132855,11 @@ SelectInOverWorld:
     call .IsItemInBag
     ld a,0 ; wSurfingMonID
     jr nz,.canFloatNoCry
-    ld hl,$d857 ; WaterPower
-    bit 0,[hl]  ; ...
+    ld hl,FLOAT_FLAG_BYTE
+    bit FLOAT_FLAG_BIT,[hl]
     jr z,.noFloat
-    ld b,5 ; FLOAT
-    call SearchFieldMoveInParty
+    ld b,FLOAT_SKILL_SORT
+    call SearchSkillInParty
     jr nc,.noFloat
 .canFloat
     call .PlayCry
@@ -133171,17 +132886,14 @@ SelectInOverWorld:
     ld a,[$d35d]
     and a
     jr z,.noLight
-;    ld a,[W_OBTAINEDBADGES] ; badges obtained
-;    bit 0,a ; does the player have the Boulder Badge?
-;    jr z,.noLight
     ld b,BENGAL
     call .IsItemInBag
     jr nz,.canLightNoCry
-    ld hl,$d7c2 ; FirePower
-    bit 0,[hl]  ; ...
+    ld hl,LIGHT_FLAG_BYTE
+    bit LIGHT_FLAG_BIT,[hl]
     jr z,.noLight
-    ld b,7 ; LIGHT
-    call SearchFieldMoveInParty
+    ld b,LIGHT_SKILL_SORT
+    call SearchSkillInParty
     jr nc,.noLight
 .canLight
     call .PlayCry
@@ -133210,14 +132922,11 @@ SelectInOverWorld:
     ld a,[$d700]
     cp a,2 ; is the player surfing?
     jp z,.noStrength
-;    ld a,[W_OBTAINEDBADGES] ; badges obtained
-;    bit 3,a ; does the player have the Rainbow Badge?
-;    jr z,.noStrength
-    ld hl,$d78e ; EarthPower
-    bit 0,[hl]  ; ...
+    ld hl,STRENGTH_FLAG_BYTE
+    bit STRENGTH_FLAG_BIT,[hl]
     jr z,.noStrength
-    ld b,6 ; STRENGTH
-    call SearchFieldMoveInParty
+    ld b,STRENGTH_SKILL_SORT
+    call SearchSkillInParty
     jr nc,.noStrength
 .canStrength
     call .PlayCry
@@ -133370,27 +133079,27 @@ SelectInOverWorld:
     ld [$FF8C],a
     jp DisplayTextID
 
-; INPUT  : b = Field Move
+; INPUT  : b = Skill
 ; OUTPUT : carry flag -> set found | reset not found
-SearchFieldMoveInParty:
+SearchSkillInParty:
     ld a,[W_NUMINPARTY]
     ld d,a
     ld c,0
 .LoopMon
     ld a,c
     ld [wWhichPokemon],a
-    call .GetMonFieldMoves
-    ld a,[wNumFieldMoves]
+    call .GetMonSkill
+    ld a,[wNumSkill]
     and a
     jr z,.NextMon
-    ld e,a ; NumFieldMoves
-    ld hl,wFieldMoves
-.LoopFieldMove
+    ld e,a ; NumSkill
+    ld hl,wSkill
+.LoopSkill
     ld a,[hli]
-    cp b ; Field Move
+    cp b ; Skill
     jr z,.found
     dec e
-    jr nz,.LoopFieldMove
+    jr nz,.LoopSkill
 .NextMon
     inc c
     dec d
@@ -133399,26 +133108,78 @@ SearchFieldMoveInParty:
     xor a ; rcf
     ret
 .found
-    call .CheckAndDecreaseFieldMoveEnergy
+    ld hl,wDontCheckEnergySkillBit0
+    bit 0,[hl]
+    res 0,[hl]
+    jr nz,.SkipCheckEnergy
+    call .CheckAndDecreaseSkillEnergy
     jr c,.NextMon
+.SkipCheckEnergy
     scf
     ret
-.GetMonFieldMoves
+.GetMonSkill
     push bc
     push de
-    ld b,BANK(GetMonFieldMoves)
-    ld hl,GetMonFieldMoves
+    ld b,BANK(GetMonSkill)
+    ld hl,GetMonSkill
     call Bankswitch
     pop de
     pop bc
     ret
-.CheckAndDecreaseFieldMoveEnergy
+.CheckAndDecreaseSkillEnergy
     push bc
-    ld hl,CheckAndDecreaseFieldMoveEnergy
-    ld b,BANK(CheckAndDecreaseFieldMoveEnergy)
+    ld hl,CheckAndDecreaseSkillEnergy
+    ld b,BANK(CheckAndDecreaseSkillEnergy)
     call Bankswitch
     pop bc
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+; Input 
+; b = XXX_SKILL_SORT
+LearnSkill:
+    call Load16BitRegisters
+    push bc
+    call .Animation
+    ld hl,.LearnSkill
+    call PrintText
+    pop bc
+    ld hl,wDontCheckEnergySkillBit0
+    set 0,[hl]
+    jp SearchSkillInParty
+.LearnSkill
+    TX_FAR _LearnSkillText
+    db $10,$0,$58,"@"
+
+.Animation
+    call GBFadeOut2
+    call ReloadMapData
+    ld a,[$C0EF]
+    cp BANK(Music_PkmnHealed)
+    ld [$C0F0],a
+    jr z,.skip
+    ld a,$ff
+    ld [$C0EE],a
+    call PlaySound
+    ld a,BANK(Music_PkmnHealed)
+    ld [$C0EF],a
+.skip
+    ld a,$E8
+    ld [$C0EE],a
+    call PlaySound ; play sound?
+.WaitLoop
+    ld a,[$C026]
+    cp $E8
+    jr z,.WaitLoop
+    ld a,[$C0F0]
+    ld [$C0EF],a
+    ld a,[$D35B]
+    ld [$C0EE],a
+    call PlaySound
+    jp GBFadeIn2
+
+; ──────────────────────────────────────────────────────────────────────
 
 FossilKabutopsPicFront:
     INCBIN "pic/bmon/fossilkabutops.pic"
@@ -134252,14 +134013,14 @@ ItemNames:
     db "?@"            ; $51 ; MAX_ETHER
     db "ELIXER@"       ; $52
     db "?@"            ; $53 ; MAX_ELIXER
-    db "NATURE POWER@" ; $54
-    db "AIR POWER@"    ; $55
-    db "WATER POWER@"  ; $56
-    db "EARTH POWER@"  ; $57
-    db "FIRE POWER@"   ; $58
-    db "?@"            ; $59
-    db "?@"            ; $5A
-    db "?@"            ; $5B
+    db "CUT@"          ; $54 ; Ex NATURE POWER
+    db "FLY@"          ; $55 ; Ex AIR POWER
+    db "FLOAT@"        ; $56 ; Ex WATER POWER
+    db "STRENGTH@"     ; $57 ; Ex EARTH POWER
+    db "LIGHT@"        ; $58 ; Ex FIRE POWER
+    db "TELEPORT@"     ; $59 ; 
+    db "DIG@"          ; $5A ; 
+    db "HEAL@"         ; $5B ; 
     db "?@"            ; $5C
     db "?@"            ; $5D
     db "?@"            ; $5E
@@ -140807,6 +140568,144 @@ WaitRightJumpPosition:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+DebugNPC:
+
+    ; Standard CableClubNPC
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 1,a
+    ld hl,CableClubNPC
+    ld b,BANK(CableClubNPC)
+    jp nz,Bankswitch
+
+    ; Backup
+    ld a,[$cf92]
+    push af
+    ld a,[$cc49]
+    push af
+
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
+    bit 2,a ; was the select button pressed?
+    jr nz,.select
+    bit 3,a ; was the start button pressed?
+    jr nz,.start
+    jp .standard
+
+.select
+    bit 6,a ; was the up button pressed?
+    jr nz,.selectUP
+    ld hl,W_NUMINPARTY
+    ld a,[hli]
+    ld b,a
+.loop0
+    ld a,[hli]
+    push bc
+    push hl
+    ld [$d11e],a
+    call IndexToPokedexAndRestoreD11E
+    ld b,1 ; set
+    ld c,a
+    push bc
+    ld hl,wPokedexSeen
+    call .HandleBit
+    pop bc
+    ld hl,wPokedexOwned
+    call .HandleBit
+    pop hl
+    pop bc
+    dec b
+    jr nz,.loop0
+    ld hl,.DoneTextSelect
+    jp .end
+.HandleBit
+    PREDEF_JUMP HandleBitArray
+.DoneTextSelect
+    db 0,"Done! (Pokedex)",$57,"@"
+
+.selectUP
+    ld hl,W_PARTYMON1_MOVE2PP
+    inc [hl]
+    ld hl,.DoneTextSelectUP
+    jp .end
+.DoneTextSelectUP
+    db 0,"Done! (Alt.Form)",$57,"@"
+
+.start
+    bit 6,a ; was the up button pressed?
+    jr nz,.startUP
+    ld hl,W_PARTYMON1_TYPE1
+    xor a
+    ld [hli],a ; Zero Type 1/2
+    ld [hl],a  ; ...
+    ld hl,W_PARTYMON1OT+8
+    ld [hli],a ; Mon OT + 8
+    ld [hli],a ; Mon OT + 9
+    ld [hl],a  ; Mon OT + 10
+    ld hl,W_PARTYMON1_MOVE3PP
+    ld [hl],a  ; Ex Move 3 PP
+    ld hl,.DoneTextStart
+    jp .end
+.DoneTextStart
+    db 0,"Done! (Reset TM)",$57,"@"
+
+.startUP
+    ld hl,W_PARTYMON1_MOVE4PP
+    call .LoopAndDestroyLastRecord
+    ld hl,W_PARTYMON1_MOVE4
+    call .LoopAndDestroyLastRecord
+    ld hl,.UPText
+    jr .end
+.LoopAndDestroyLastRecord
+    ld b,4
+.LoopUP
+    ld a,[hld]
+    and a
+    jr nz,.foundUP
+    dec b
+    jr nz,.LoopUP
+.foundUP
+    inc hl
+    xor a
+    ld [hl],a
+    ret
+.UPText
+    db 0,"Done! (0 PP Move)",$57,"@"
+
+.standard
+    ld a,[W_NUMINPARTY]
+    ld b,a
+    ld c,0
+.loop2
+    push bc
+    ld a,[$FF00+$e4]
+    push af
+    ld a,c
+    inc a
+    ld [$FF00+$e4],a ; Mon Id +1
+    ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
+    ld hl,AddPokemonToParty_TryToAddExclusiveMove_
+    call Bankswitch
+    pop af
+    ld [$FF00+$e4],a
+    pop bc
+    inc c
+    dec b
+    jr nz,.loop2
+    ld hl,.DoneText
+    jr .end
+.DoneText
+    db 0,"Done!",$57,"@"
+
+.end
+    call PrintText
+    ; Restore
+    pop af
+    ld [$cc49],a
+    pop af
+    ld [$cf92],a
+    jp TextScriptEnd
+
+; ──────────────────────────────────────────────────────────────────────
+
 SECTION "Bank38",ROMX,BANK[$38]
 
 Tset0D_GFX:
@@ -145157,12 +145056,189 @@ MonOverworldDataNew2_emimonserrate:
 
 SECTION "Bank3b",ROMX,BANK[$3B]
 
+; Swap pointer bytes, than first byte cannot be 0
+dl: MACRO
+    dw ((\1 % $100) << 8) | (\1 / $100)
+ENDM
+
 PokemonBaseStats:
 INCLUDE "constants/pokemon_header.asm"
 INCLUDE "constants/pokemon_header_alternate_forms.asm"
 INCLUDE "constants/pokemon_learnset.asm"
 INCLUDE "constants/pokemon_learnset_config.asm"
 INCLUDE "constants/pokemon_tm_compatibility.asm"
+
+; ──────────────────────────────────────────────────────────────────────
+
+_GetEvos:
+    call Load16BitRegisters ; Input de
+    push de
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+.loop
+    ld a,[hli]
+    and a
+    jr z,.end
+    ld [de],a
+    inc de
+    jr .loop
+.end
+    ld [de],a
+    pop hl
+    ret
+
+; Input de = Buffer Pointer
+;       b  = Mon Level
+GetMoves:
+    call Load16BitRegisters
+    ld a,[$d11e] ; Backup
+    push af      ; ...
+    ld a,b ; Mon Level
+    ld [$d11e],a
+    ld hl,W_MONHLEARNSETPOINTER ; pointer to learnset
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+.skipEvoEntriesLoop
+    ld a,[hli]
+    and a
+    jr nz,.skipEvoEntriesLoop
+.Loop1
+    ld a,[hl]
+    and a
+    jr z,.EndLoop1
+    push hl
+    ld a,[hli]
+    ld l,[hl]
+    ld h,a
+.Loop2
+    ld a,[hli]
+    and a
+    jr z,.EndLoop2
+    ld b,a ; b = Move Level
+    ld a,[hli]
+    ld c,a ; c = Move ID
+    call CheckSkillInList
+    call nz,IsSkill
+    jr c,.Loop2
+    ld a,[$d11e] ; Mon Level
+    cp b
+    jr c,.EndAllLoop ; end if next move level is too high
+    ld a,c
+    ld [de],a
+    inc de
+    push hl
+    ld hl,wMaxNotExclMoveSlotId
+    inc [hl]
+    pop hl
+    jr .Loop2
+.EndLoop2
+    pop hl
+    inc hl
+    inc hl
+    jr .Loop1
+.EndLoop1
+    xor a     ; 0 = end learnset
+    ld [de],a ; ...
+    pop af       ; Restore
+    ld [$d11e],a ; ...
+    ret
+.EndAllLoop
+    pop hl
+    jr .EndLoop1
+
+; ──────────────────────────────────────────────────────────────────────
+
+GetMonSkill:
+    xor a ; player party
+    ld [$cc49],a
+    call LoadMonData
+    ld a,[$cfb9] ; Level
+    ld b,a       ; ...
+    PREDEF GetMonPotentialMoveList
+    call .FillMemory
+    ld de,wSkill
+    ld c,1 ; skill sort
+    ld b,0
+    ld hl,.SkillConfigTable
+.loop
+    ld a,[hli]
+    cp $FF
+    jr z,.EndLoop
+    ld [$d0e0],a ; Move to Search
+    push hl
+    call .CheckSkill
+    call nz,.CheckMonAlreadyKnowSkill
+    pop hl
+    inc hl
+    inc hl
+    inc hl
+    inc c
+    jr .loop
+.EndLoop
+    ld a,b ; num of founded skill
+    ld [wNumSkill],a ; store num of founded skill in wNumSkill
+    ret
+
+.CheckSkill
+    push de
+    push bc
+    ld a,[hli]
+    ld e,a
+    ld a,[hli]
+    ld d,a
+    or e
+    jr z,.CheckSkill_Success ; Both pointer Byte zero
+    ld c,[hl] ; c = Skill Bit
+    ld h,d
+    ld l,e ; [hl] = Skill Byte
+    ld b,2
+    PREDEF HandleBitArray
+    ld a,c
+    and a
+.CheckSkill_End
+    pop bc
+    pop de
+    ret
+.CheckSkill_Success
+    ld a,1
+    or a ; reset all flag
+    jr .CheckSkill_End
+
+.SkillConfigTable
+    SCT Skill__FLY      , FLY_FLAG_BYTE      , FLY_FLAG_BIT
+    SCT TELEPORT        , TELEPORT_FLAG_BYTE , TELEPORT_FLAG_BIT
+    SCT Skill__DIG      , DIG_FLAG_BYTE      , DIG_FLAG_BIT
+    SCT Skill__CUT      , CUT_FLAG_BYTE      , CUT_FLAG_BIT
+    SCT Skill__FLOAT    , FLOAT_FLAG_BYTE    , FLOAT_FLAG_BIT
+    SCT Skill__STRENGTH , STRENGTH_FLAG_BYTE , STRENGTH_FLAG_BIT
+    SCT Skill__LIGHT    , LIGHT_FLAG_BYTE    , LIGHT_FLAG_BIT
+    SCT Skill__HEAL     , HEAL_FLAG_BYTE     , HEAL_FLAG_BIT
+    db $FF
+
+.FillMemory
+    xor a
+    ld [wNumSkill],a
+    ld hl,wSkill
+    ld bc,8+1
+    jp FillMemory
+
+.CheckMonAlreadyKnowSkill
+    push de
+    push bc
+    ld b,BANK(CheckMonAlreadyKnowMoveQuick)
+    ld hl,CheckMonAlreadyKnowMoveQuick
+    call Bankswitch
+    pop bc
+    pop de
+    ret nc
+    inc b ; num of founded skill
+    ld a,c ; skill sort
+    ld [de],a ; store skill id in wSkill vector
+    inc de
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 

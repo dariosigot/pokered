@@ -30,7 +30,7 @@ MissingNoBaseStats:
     ; palette
     dw PAL_MISSINGNO
 
-    ; field moves
+    ; not used
     db 0
 
     db 29 ; catch rate
@@ -70,8 +70,8 @@ BulbasaurBaseStats:
     ; palette
     dw PAL_BULBASAUR
 
-    ; field moves
-    db FM_CUT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 64 ; base exp yield
@@ -110,8 +110,8 @@ IvysaurBaseStats:
     ; palette
     dw PAL_IVYSAUR
 
-    ; field moves
-    db FM_CUT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 141 ; base exp yield
@@ -150,8 +150,8 @@ VenusaurBaseStats:
     ; palette
     dw PAL_VENUSAUR
 
-    ; field moves
-    db FM_CUT+FM_STRENGTH+FM_HEAL
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 208 ; base exp yield
@@ -190,8 +190,8 @@ CharmanderBaseStats:
     ; palette
     dw PAL_CHARMANDER
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 65 ; base exp yield
@@ -230,8 +230,8 @@ CharmeleonBaseStats:
     ; palette
     dw PAL_CHARMELEON
 
-    ; field moves
-    db FM_CUT+FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 142 ; base exp yield
@@ -270,8 +270,8 @@ CharizardBaseStats:
     ; palette
     dw PAL_CHARIZARD
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_STRENGTH+FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 209 ; base exp yield
@@ -310,8 +310,8 @@ SquirtleBaseStats:
     ; palette
     dw PAL_SQUIRTLE
 
-    ; field moves
-    db FM_FLOAT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 66 ; base exp yield
@@ -350,8 +350,8 @@ WartortleBaseStats:
     ; palette
     dw PAL_WARTORTLE
 
-    ; field moves
-    db FM_FLOAT+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 143 ; base exp yield
@@ -390,8 +390,8 @@ BlastoiseBaseStats:
     ; palette
     dw PAL_BLASTOISE
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 210 ; base exp yield
@@ -430,7 +430,7 @@ CaterpieBaseStats:
     ; palette
     dw PAL_CATERPIE
 
-    ; field moves
+    ; not used
     db 0
 
     db 255 ; catch rate
@@ -470,7 +470,7 @@ MetapodBaseStats:
     ; palette
     dw PAL_METAPOD
 
-    ; field moves
+    ; not used
     db 0
 
     db 120 ; catch rate
@@ -510,8 +510,8 @@ ButterfreeBaseStats:
     ; palette
     dw PAL_BUTTERFREE
 
-    ; field moves
-    db FM_FLY+FM_HEAL
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 160 ; base exp yield
@@ -550,7 +550,7 @@ WeedleBaseStats:
     ; palette
     dw PAL_WEEDLE
 
-    ; field moves
+    ; not used
     db 0
 
     db 255 ; catch rate
@@ -590,7 +590,7 @@ KakunaBaseStats:
     ; palette
     dw PAL_KAKUNA
 
-    ; field moves
+    ; not used
     db 0
 
     db 120 ; catch rate
@@ -630,8 +630,8 @@ BeedrillBaseStats:
     ; palette
     dw PAL_BEEDRILL
 
-    ; field moves
-    db FM_CUT+FM_FLY
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 159 ; base exp yield
@@ -670,7 +670,7 @@ PidgeyBaseStats:
     ; palette
     dw PAL_PIDGEY
 
-    ; field moves
+    ; not used
     db 0
 
     db 255 ; catch rate
@@ -710,8 +710,8 @@ PidgeottoBaseStats:
     ; palette
     dw PAL_PIDGEOTTO
 
-    ; field moves
-    db FM_FLY
+    ; not used
+    db 0
 
     db 120 ; catch rate
     db 113 ; base exp yield
@@ -750,8 +750,8 @@ PidgeotBaseStats:
     ; palette
     dw PAL_PIDGEOT
 
-    ; field moves
-    db FM_CUT+FM_FLY
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 172 ; base exp yield
@@ -790,7 +790,7 @@ RattataBaseStats:
     ; palette
     dw PAL_RATTATA
 
-    ; field moves
+    ; not used
     db 0
 
     db 255 ; catch rate
@@ -830,8 +830,8 @@ RaticateBaseStats:
     ; palette
     dw PAL_RATICATE
 
-    ; field moves
-    db FM_DIG
+    ; not used
+    db 0
 
     db 90 ; catch rate
     db 116 ; base exp yield
@@ -870,7 +870,7 @@ SpearowBaseStats:
     ; palette
     dw PAL_SPEAROW
 
-    ; field moves
+    ; not used
     db 0
 
     db 255 ; catch rate
@@ -910,8 +910,8 @@ FearowBaseStats:
     ; palette
     dw PAL_FEAROW
 
-    ; field moves
-    db FM_CUT+FM_FLY
+    ; not used
+    db 0
 
     db 90 ; catch rate
     db 162 ; base exp yield
@@ -950,7 +950,7 @@ EkansBaseStats:
     ; palette
     dw PAL_EKANS
 
-    ; field moves
+    ; not used
     db 0
 
     db 255 ; catch rate
@@ -990,8 +990,8 @@ ArbokBaseStats:
     ; palette
     dw PAL_ARBOK
 
-    ; field moves
-    db FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 90 ; catch rate
     db 147 ; base exp yield
@@ -1030,8 +1030,8 @@ PikachuBaseStats:
     ; palette
     dw PAL_PIKACHU
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 82 ; base exp yield
@@ -1070,8 +1070,8 @@ RaichuBaseStats:
     ; palette
     dw PAL_RAICHU
 
-    ; field moves
-    db FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 122 ; base exp yield
@@ -1110,8 +1110,8 @@ SandshrewBaseStats:
     ; palette
     dw PAL_SANDSHREW
 
-    ; field moves
-    db FM_DIG
+    ; not used
+    db 0
 
     db 255 ; catch rate
     db 93 ; base exp yield
@@ -1150,8 +1150,8 @@ SandslashBaseStats:
     ; palette
     dw PAL_SANDSLASH
 
-    ; field moves
-    db FM_CUT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 90 ; catch rate
     db 163 ; base exp yield
@@ -1190,7 +1190,7 @@ NidoranFBaseStats:
     ; palette
     dw PAL_NIDORAN_F
 
-    ; field moves
+    ; not used
     db 0
 
     db 235 ; catch rate
@@ -1230,8 +1230,8 @@ NidorinaBaseStats:
     ; palette
     dw PAL_NIDORINA
 
-    ; field moves
-    db FM_CUT+FM_DIG
+    ; not used
+    db 0
 
     db 120 ; catch rate
     db 117 ; base exp yield
@@ -1270,8 +1270,8 @@ NidoqueenBaseStats:
     ; palette
     dw PAL_NIDOQUEEN
 
-    ; field moves
-    db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 194 ; base exp yield
@@ -1310,7 +1310,7 @@ NidoranMBaseStats:
     ; palette
     dw PAL_NIDORAN_M
 
-    ; field moves
+    ; not used
     db 0
 
     db 235 ; catch rate
@@ -1350,8 +1350,8 @@ NidorinoBaseStats:
     ; palette
     dw PAL_NIDORINO
 
-    ; field moves
-    db FM_CUT+FM_DIG
+    ; not used
+    db 0
 
     db 120 ; catch rate
     db 118 ; base exp yield
@@ -1390,8 +1390,8 @@ NidokingBaseStats:
     ; palette
     dw PAL_NIDOKING
 
-    ; field moves
-    db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 195 ; base exp yield
@@ -1430,8 +1430,8 @@ ClefairyBaseStats:
     ; palette
     dw PAL_CLEFAIRY
 
-    ; field moves
-    db FM_HEAL
+    ; not used
+    db 0
 
     db 150 ; catch rate
     db 68 ; base exp yield
@@ -1470,8 +1470,8 @@ ClefableBaseStats:
     ; palette
     dw PAL_CLEFABLE
 
-    ; field moves
-    db FM_FLOAT+FM_HEAL
+    ; not used
+    db 0
 
     db 25 ; catch rate
     db 129 ; base exp yield
@@ -1510,8 +1510,8 @@ VulpixBaseStats:
     ; palette
     dw PAL_VULPIX
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 63 ; base exp yield
@@ -1550,8 +1550,8 @@ NinetalesBaseStats:
     ; palette
     dw PAL_NINETALES
 
-    ; field moves
-    db FM_CUT+FM_FLOAT+FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 178 ; base exp yield
@@ -1590,8 +1590,8 @@ JigglypuffBaseStats:
     ; palette
     dw PAL_JIGGLYPUFF
 
-    ; field moves
-    db FM_HEAL
+    ; not used
+    db 0
 
     db 170 ; catch rate
     db 76 ; base exp yield
@@ -1630,8 +1630,8 @@ WigglytuffBaseStats:
     ; palette
     dw PAL_WIGGLYTUFF
 
-    ; field moves
-    db FM_FLOAT+FM_HEAL
+    ; not used
+    db 0
 
     db 50 ; catch rate
     db 109 ; base exp yield
@@ -1670,7 +1670,7 @@ ZubatBaseStats:
     ; palette
     dw PAL_ZUBAT
 
-    ; field moves
+    ; not used
     db 0
 
     db 255 ; catch rate
@@ -1710,8 +1710,8 @@ GolbatBaseStats:
     ; palette
     dw PAL_GOLBAT
 
-    ; field moves
-    db FM_CUT+FM_FLY
+    ; not used
+    db 0
 
     db 90 ; catch rate
     db 171 ; base exp yield
@@ -1750,7 +1750,7 @@ OddishBaseStats:
     ; palette
     dw PAL_ODDISH
 
-    ; field moves
+    ; not used
     db 0
 
     db 255 ; catch rate
@@ -1790,8 +1790,8 @@ GloomBaseStats:
     ; palette
     dw PAL_GLOOM
 
-    ; field moves
-    db FM_CUT
+    ; not used
+    db 0
 
     db 120 ; catch rate
     db 132 ; base exp yield
@@ -1830,8 +1830,8 @@ VileplumeBaseStats:
     ; palette
     dw PAL_VILEPLUME
 
-    ; field moves
-    db FM_CUT+FM_HEAL
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 184 ; base exp yield
@@ -1870,8 +1870,8 @@ ParasBaseStats:
     ; palette
     dw PAL_PARAS
 
-    ; field moves
-    db FM_CUT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 70 ; base exp yield
@@ -1910,8 +1910,8 @@ ParasectBaseStats:
     ; palette
     dw PAL_PARASECT
 
-    ; field moves
-    db FM_CUT+FM_DIG+FM_HEAL
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 128 ; base exp yield
@@ -1950,8 +1950,8 @@ VenonatBaseStats:
     ; palette
     dw PAL_VENONAT
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 75 ; base exp yield
@@ -1990,8 +1990,8 @@ VenomothBaseStats:
     ; palette
     dw PAL_VENOMOTH
 
-    ; field moves
-    db FM_FLY+FM_LIGHT+FM_HEAL
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 138 ; base exp yield
@@ -2030,8 +2030,8 @@ DiglettBaseStats:
     ; palette
     dw PAL_DIGLETT
 
-    ; field moves
-    db FM_DIG
+    ; not used
+    db 0
 
     db 255 ; catch rate
     db 81 ; base exp yield
@@ -2070,8 +2070,8 @@ DugtrioBaseStats:
     ; palette
     dw PAL_DUGTRIO
 
-    ; field moves
-    db FM_CUT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 50 ; catch rate
     db 153 ; base exp yield
@@ -2110,8 +2110,8 @@ MeowthBaseStats:
     ; palette
     dw PAL_MEOWTH
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 255 ; catch rate
     db 69 ; base exp yield
@@ -2150,8 +2150,8 @@ PersianBaseStats:
     ; palette
     dw PAL_PERSIAN
 
-    ; field moves
-    db FM_CUT+FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 90 ; catch rate
     db 148 ; base exp yield
@@ -2190,7 +2190,7 @@ PsyduckBaseStats:
     ; palette
     dw PAL_PSYDUCK
 
-    ; field moves
+    ; not used
     db 0
 
     db 190 ; catch rate
@@ -2230,8 +2230,8 @@ GolduckBaseStats:
     ; palette
     dw PAL_GOLDUCK
 
-    ; field moves
-    db FM_CUT+FM_FLOAT+FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 174 ; base exp yield
@@ -2270,8 +2270,8 @@ MankeyBaseStats:
     ; palette
     dw PAL_MANKEY
 
-    ; field moves
-    db FM_STRENGTH
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 74 ; base exp yield
@@ -2310,8 +2310,8 @@ PrimeapeBaseStats:
     ; palette
     dw PAL_PRIMEAPE
 
-    ; field moves
-    db FM_CUT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 149 ; base exp yield
@@ -2350,8 +2350,8 @@ GrowlitheBaseStats:
     ; palette
     dw PAL_GROWLITHE
 
-    ; field moves
-    db FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 91 ; base exp yield
@@ -2390,8 +2390,8 @@ ArcanineBaseStats:
     ; palette
     dw PAL_ARCANINE
 
-    ; field moves
-    db FM_STRENGTH+FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 213 ; base exp yield
@@ -2430,7 +2430,7 @@ PoliwagBaseStats:
     ; palette
     dw PAL_POLIWAG
 
-    ; field moves
+    ; not used
     db 0
 
     db 255 ; catch rate
@@ -2470,8 +2470,8 @@ PoliwhirlBaseStats:
     ; palette
     dw PAL_POLIWHIRL
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH
+    ; not used
+    db 0
 
     db 120 ; catch rate
     db 131 ; base exp yield
@@ -2510,8 +2510,8 @@ PoliwrathBaseStats:
     ; palette
     dw PAL_POLIWRATH
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 185 ; base exp yield
@@ -2550,7 +2550,7 @@ AbraBaseStats:
     ; palette
     dw PAL_ABRA
 
-    ; field moves
+    ; not used
     db 0
 
     db 200 ; catch rate
@@ -2590,7 +2590,7 @@ KadabraBaseStats:
     ; palette
     dw PAL_KADABRA
 
-    ; field moves
+    ; not used
     db 0
 
     db 100 ; catch rate
@@ -2630,7 +2630,7 @@ AlakazamBaseStats:
     ; palette
     dw PAL_ALAKAZAM
 
-    ; field moves
+    ; not used
     db 0
 
     db 50 ; catch rate
@@ -2670,8 +2670,8 @@ MachopBaseStats:
     ; palette
     dw PAL_MACHOP
 
-    ; field moves
-    db FM_STRENGTH
+    ; not used
+    db 0
 
     db 180 ; catch rate
     db 88 ; base exp yield
@@ -2710,8 +2710,8 @@ MachokeBaseStats:
     ; palette
     dw PAL_MACHOKE
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 90 ; catch rate
     db 146 ; base exp yield
@@ -2750,8 +2750,8 @@ MachampBaseStats:
     ; palette
     dw PAL_MACHAMP
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 193 ; base exp yield
@@ -2790,7 +2790,7 @@ BellsproutBaseStats:
     ; palette
     dw PAL_BELLSPROUT
 
-    ; field moves
+    ; not used
     db 0
 
     db 255 ; catch rate
@@ -2830,8 +2830,8 @@ WeepinbellBaseStats:
     ; palette
     dw PAL_WEEPINBELL
 
-    ; field moves
-    db FM_CUT
+    ; not used
+    db 0
 
     db 120 ; catch rate
     db 151 ; base exp yield
@@ -2870,8 +2870,8 @@ VictreebelBaseStats:
     ; palette
     dw PAL_VICTREEBEL
 
-    ; field moves
-    db FM_CUT+FM_HEAL
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 191 ; base exp yield
@@ -2910,8 +2910,8 @@ TentacoolBaseStats:
     ; palette
     dw PAL_TENTACOOL
 
-    ; field moves
-    db FM_FLOAT+FM_LIGHT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 105 ; base exp yield
@@ -2950,8 +2950,8 @@ TentacruelBaseStats:
     ; palette
     dw PAL_TENTACRUEL
 
-    ; field moves
-    db FM_CUT+FM_FLOAT+FM_LIGHT
+    ; not used
+    db 0
 
     db 60 ; catch rate
     db 205 ; base exp yield
@@ -2990,8 +2990,8 @@ GeodudeBaseStats:
     ; palette
     dw PAL_GEODUDE
 
-    ; field moves
-    db FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 255 ; catch rate
     db 86 ; base exp yield
@@ -3030,8 +3030,8 @@ GravelerBaseStats:
     ; palette
     dw PAL_GRAVELER
 
-    ; field moves
-    db FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 120 ; catch rate
     db 134 ; base exp yield
@@ -3070,8 +3070,8 @@ GolemBaseStats:
     ; palette
     dw PAL_GOLEM
 
-    ; field moves
-    db FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 177 ; base exp yield
@@ -3110,8 +3110,8 @@ PonytaBaseStats:
     ; palette
     dw PAL_PONYTA
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 152 ; base exp yield
@@ -3150,8 +3150,8 @@ RapidashBaseStats:
     ; palette
     dw PAL_RAPIDASH
 
-    ; field moves
-    db FM_STRENGTH+FM_LIGHT
+    ; not used
+    db 0
 
     db 60 ; catch rate
     db 192 ; base exp yield
@@ -3190,7 +3190,7 @@ SlowpokeBaseStats:
     ; palette
     dw PAL_SLOWPOKE
 
-    ; field moves
+    ; not used
     db 0
 
     db 190 ; catch rate
@@ -3230,8 +3230,8 @@ SlowbroBaseStats:
     ; palette
     dw PAL_SLOWBRO
 
-    ; field moves
-    db FM_FLOAT
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 164 ; base exp yield
@@ -3270,8 +3270,8 @@ MagnemiteBaseStats:
     ; palette
     dw PAL_MAGNEMITE
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 89 ; base exp yield
@@ -3310,8 +3310,8 @@ MagnetonBaseStats:
     ; palette
     dw PAL_MAGNETON
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 60 ; catch rate
     db 161 ; base exp yield
@@ -3350,8 +3350,8 @@ FarfetchdBaseStats:
     ; palette
     dw PAL_FARFETCH_D
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_FLOAT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 94 ; base exp yield
@@ -3390,8 +3390,8 @@ DoduoBaseStats:
     ; palette
     dw PAL_DODUO
 
-    ; field moves
-    db FM_CUT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 96 ; base exp yield
@@ -3430,8 +3430,8 @@ DodrioBaseStats:
     ; palette
     dw PAL_DODRIO
 
-    ; field moves
-    db FM_CUT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 158 ; base exp yield
@@ -3470,8 +3470,8 @@ SeelBaseStats:
     ; palette
     dw PAL_SEEL
 
-    ; field moves
-    db FM_FLOAT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 100 ; base exp yield
@@ -3510,8 +3510,8 @@ DewgongBaseStats:
     ; palette
     dw PAL_DEWGONG
 
-    ; field moves
-    db FM_FLOAT
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 176 ; base exp yield
@@ -3550,7 +3550,7 @@ GrimerBaseStats:
     ; palette
     dw PAL_GRIMER
 
-    ; field moves
+    ; not used
     db 0
 
     db 190 ; catch rate
@@ -3590,8 +3590,8 @@ MukBaseStats:
     ; palette
     dw PAL_MUK
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 157 ; base exp yield
@@ -3630,7 +3630,7 @@ ShellderBaseStats:
     ; palette
     dw PAL_SHELLDER
 
-    ; field moves
+    ; not used
     db 0
 
     db 190 ; catch rate
@@ -3670,8 +3670,8 @@ CloysterBaseStats:
     ; palette
     dw PAL_CLOYSTER
 
-    ; field moves
-    db FM_FLOAT
+    ; not used
+    db 0
 
     db 60 ; catch rate
     db 203 ; base exp yield
@@ -3710,7 +3710,7 @@ GastlyBaseStats:
     ; palette
     dw PAL_GASTLY
 
-    ; field moves
+    ; not used
     db 0
 
     db 190 ; catch rate
@@ -3750,7 +3750,7 @@ HaunterBaseStats:
     ; palette
     dw PAL_HAUNTER
 
-    ; field moves
+    ; not used
     db 0
 
     db 90 ; catch rate
@@ -3790,7 +3790,7 @@ GengarBaseStats:
     ; palette
     dw PAL_GENGAR
 
-    ; field moves
+    ; not used
     db 0
 
     db 45 ; catch rate
@@ -3830,8 +3830,8 @@ OnixBaseStats:
     ; palette
     dw PAL_ONIX
 
-    ; field moves
-    db FM_CUT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 20 ; catch rate
     db 188 ; base exp yield
@@ -3870,7 +3870,7 @@ DrowzeeBaseStats:
     ; palette
     dw PAL_DROWZEE
 
-    ; field moves
+    ; not used
     db 0
 
     db 190 ; catch rate
@@ -3910,7 +3910,7 @@ HypnoBaseStats:
     ; palette
     dw PAL_HYPNO
 
-    ; field moves
+    ; not used
     db 0
 
     db 75 ; catch rate
@@ -3950,8 +3950,8 @@ KrabbyBaseStats:
     ; palette
     dw PAL_KRABBY
 
-    ; field moves
-    db FM_CUT+FM_DIG
+    ; not used
+    db 0
 
     db 225 ; catch rate
     db 115 ; base exp yield
@@ -3990,8 +3990,8 @@ KinglerBaseStats:
     ; palette
     dw PAL_KINGLER
 
-    ; field moves
-    db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 60 ; catch rate
     db 206 ; base exp yield
@@ -4030,8 +4030,8 @@ VoltorbBaseStats:
     ; palette
     dw PAL_VOLTORB
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 103 ; base exp yield
@@ -4070,8 +4070,8 @@ ElectrodeBaseStats:
     ; palette
     dw PAL_ELECTRODE
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 60 ; catch rate
     db 150 ; base exp yield
@@ -4110,8 +4110,8 @@ ExeggcuteBaseStats:
     ; palette
     dw PAL_EXEGGCUTE
 
-    ; field moves
-    db FM_HEAL
+    ; not used
+    db 0
 
     db 90 ; catch rate
     db 98 ; base exp yield
@@ -4150,8 +4150,8 @@ ExeggutorBaseStats:
     ; palette
     dw PAL_EXEGGUTOR
 
-    ; field moves
-    db FM_HEAL
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 212 ; base exp yield
@@ -4190,8 +4190,8 @@ CuboneBaseStats:
     ; palette
     dw PAL_CUBONE
 
-    ; field moves
-    db FM_CUT+FM_DIG
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 87 ; base exp yield
@@ -4230,8 +4230,8 @@ MarowakBaseStats:
     ; palette
     dw PAL_MAROWAK
 
-    ; field moves
-    db FM_CUT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 124 ; base exp yield
@@ -4270,8 +4270,8 @@ HitmonleeBaseStats:
     ; palette
     dw PAL_HITMONLEE
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 139 ; base exp yield
@@ -4310,8 +4310,8 @@ HitmonchanBaseStats:
     ; palette
     dw PAL_HITMONCHAN
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 140 ; base exp yield
@@ -4350,8 +4350,8 @@ LickitungBaseStats:
     ; palette
     dw PAL_LICKITUNG
 
-    ; field moves
-    db FM_CUT+FM_FLOAT+FM_HEAL
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 127 ; base exp yield
@@ -4390,8 +4390,8 @@ KoffingBaseStats:
     ; palette
     dw PAL_KOFFING
 
-    ; field moves
-    db FM_LIGHT+FM_FLOAT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 114 ; base exp yield
@@ -4430,8 +4430,8 @@ WeezingBaseStats:
     ; palette
     dw PAL_WEEZING
 
-    ; field moves
-    db FM_FLY+FM_LIGHT+FM_FLOAT
+    ; not used
+    db 0
 
     db 60 ; catch rate
     db 173 ; base exp yield
@@ -4470,8 +4470,8 @@ RhyhornBaseStats:
     ; palette
     dw PAL_RHYHORN
 
-    ; field moves
-    db FM_CUT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 120 ; catch rate
     db 135 ; base exp yield
@@ -4510,8 +4510,8 @@ RhydonBaseStats:
     ; palette
     dw PAL_RHYDON
 
-    ; field moves
-    db FM_CUT+FM_FLOAT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 60 ; catch rate
     db 204 ; base exp yield
@@ -4550,8 +4550,8 @@ ChanseyBaseStats:
     ; palette
     dw PAL_CHANSEY
 
-    ; field moves
-    db FM_HEAL+FM_FLOAT
+    ; not used
+    db 0
 
     db 30 ; catch rate
     db 255 ; base exp yield
@@ -4590,8 +4590,8 @@ TangelaBaseStats:
     ; palette
     dw PAL_TANGELA
 
-    ; field moves
-    db FM_CUT+FM_HEAL
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 166 ; base exp yield
@@ -4630,8 +4630,8 @@ KangaskhanBaseStats:
     ; palette
     dw PAL_KANGASKHAN
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 175 ; base exp yield
@@ -4670,8 +4670,8 @@ HorseaBaseStats:
     ; palette
     dw PAL_HORSEA
 
-    ; field moves
-    db FM_FLOAT
+    ; not used
+    db 0
 
     db 225 ; catch rate
     db 83 ; base exp yield
@@ -4710,8 +4710,8 @@ SeadraBaseStats:
     ; palette
     dw PAL_SEADRA
 
-    ; field moves
-    db FM_FLOAT+FM_HEAL
+    ; not used
+    db 0
 
     db 75 ; catch rate
     db 155 ; base exp yield
@@ -4750,8 +4750,8 @@ GoldeenBaseStats:
     ; palette
     dw PAL_GOLDEEN
 
-    ; field moves
-    db FM_FLOAT
+    ; not used
+    db 0
 
     db 225 ; catch rate
     db 111 ; base exp yield
@@ -4790,8 +4790,8 @@ SeakingBaseStats:
     ; palette
     dw PAL_SEAKING
 
-    ; field moves
-    db FM_FLOAT
+    ; not used
+    db 0
 
     db 60 ; catch rate
     db 170 ; base exp yield
@@ -4830,8 +4830,8 @@ StaryuBaseStats:
     ; palette
     dw PAL_STARYU
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 225 ; catch rate
     db 106 ; base exp yield
@@ -4870,8 +4870,8 @@ StarmieBaseStats:
     ; palette
     dw PAL_STARMIE
 
-    ; field moves
-    db FM_FLOAT+FM_LIGHT
+    ; not used
+    db 0
 
     db 60 ; catch rate
     db 207 ; base exp yield
@@ -4910,7 +4910,7 @@ MrMimeBaseStats:
     ; palette
     dw PAL_MR_MIME
 
-    ; field moves
+    ; not used
     db 0
 
     db 45 ; catch rate
@@ -4950,8 +4950,8 @@ ScytherBaseStats:
     ; palette
     dw PAL_SCYTHER
 
-    ; field moves
-    db FM_CUT+FM_FLY
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 187 ; base exp yield
@@ -4990,7 +4990,7 @@ JynxBaseStats:
     ; palette
     dw PAL_JYNX
 
-    ; field moves
+    ; not used
     db 0
 
     db 45 ; catch rate
@@ -5030,8 +5030,8 @@ ElectabuzzBaseStats:
     ; palette
     dw PAL_ELECTABUZZ
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 156 ; base exp yield
@@ -5070,8 +5070,8 @@ MagmarBaseStats:
     ; palette
     dw PAL_MAGMAR
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 167 ; base exp yield
@@ -5110,8 +5110,8 @@ PinsirBaseStats:
     ; palette
     dw PAL_PINSIR
 
-    ; field moves
-    db FM_CUT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 200 ; base exp yield
@@ -5150,8 +5150,8 @@ TaurosBaseStats:
     ; palette
     dw PAL_TAUROS
 
-    ; field moves
-    db FM_STRENGTH
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 211 ; base exp yield
@@ -5190,7 +5190,7 @@ MagikarpBaseStats:
     ; palette
     dw PAL_MAGIKARP
 
-    ; field moves
+    ; not used
     db 0
 
     db 255 ; catch rate
@@ -5230,8 +5230,8 @@ GyaradosBaseStats:
     ; palette
     dw PAL_GYARADOS
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 214 ; base exp yield
@@ -5270,8 +5270,8 @@ LaprasBaseStats:
     ; palette
     dw PAL_LAPRAS
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 219 ; base exp yield
@@ -5310,7 +5310,7 @@ DittoBaseStats:
     ; palette
     dw PAL_DITTO
 
-    ; field moves
+    ; not used
     db 0
 
     db 35 ; catch rate
@@ -5350,7 +5350,7 @@ EeveeBaseStats:
     ; palette
     dw PAL_EEVEE
 
-    ; field moves
+    ; not used
     db 0
 
     db 45 ; catch rate
@@ -5390,8 +5390,8 @@ VaporeonBaseStats:
     ; palette
     dw PAL_VAPOREON
 
-    ; field moves
-    db FM_FLOAT+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 196 ; base exp yield
@@ -5430,8 +5430,8 @@ JolteonBaseStats:
     ; palette
     dw PAL_JOLTEON
 
-    ; field moves
-    db FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 197 ; base exp yield
@@ -5470,8 +5470,8 @@ FlareonBaseStats:
     ; palette
     dw PAL_FLAREON
 
-    ; field moves
-    db FM_LIGHT+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 198 ; base exp yield
@@ -5510,8 +5510,8 @@ PorygonBaseStats:
     ; palette
     dw PAL_PORYGON
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_LIGHT+FM_HEAL
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 130 ; base exp yield
@@ -5550,8 +5550,8 @@ OmanyteBaseStats:
     ; palette
     dw PAL_OMANYTE
 
-    ; field moves
-    db FM_FLOAT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 120 ; base exp yield
@@ -5590,8 +5590,8 @@ OmastarBaseStats:
     ; palette
     dw PAL_OMASTAR
 
-    ; field moves
-    db FM_CUT+FM_FLOAT+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 199 ; base exp yield
@@ -5630,8 +5630,8 @@ KabutoBaseStats:
     ; palette
     dw PAL_KABUTO
 
-    ; field moves
-    db FM_CUT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 119 ; base exp yield
@@ -5670,8 +5670,8 @@ KabutopsBaseStats:
     ; palette
     dw PAL_KABUTOPS
 
-    ; field moves
-    db FM_CUT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 201 ; base exp yield
@@ -5710,8 +5710,8 @@ AerodactylBaseStats:
     ; palette
     dw PAL_AERODACTYL
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 202 ; base exp yield
@@ -5750,8 +5750,8 @@ SnorlaxBaseStats:
     ; palette
     dw PAL_SNORLAX
 
-    ; field moves
-    db FM_FLOAT+FM_STRENGTH
+    ; not used
+    db 0
 
     db 25 ; catch rate
     db 154 ; base exp yield
@@ -5790,8 +5790,8 @@ ArticunoBaseStats:
     ; palette
     dw PAL_ARTICUNO
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_FLOAT
+    ; not used
+    db 0
 
     db 3 ; catch rate
     db 215 ; base exp yield
@@ -5830,8 +5830,8 @@ ZapdosBaseStats:
     ; palette
     dw PAL_ZAPDOS
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_LIGHT
+    ; not used
+    db 0
 
     db 3 ; catch rate
     db 216 ; base exp yield
@@ -5870,8 +5870,8 @@ MoltresBaseStats:
     ; palette
     dw PAL_MOLTRES
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_LIGHT
+    ; not used
+    db 0
 
     db 3 ; catch rate
     db 217 ; base exp yield
@@ -5910,8 +5910,8 @@ DratiniBaseStats:
     ; palette
     dw PAL_DRATINI
 
-    ; field moves
-    db FM_FLOAT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 67 ; base exp yield
@@ -5950,8 +5950,8 @@ DragonairBaseStats:
     ; palette
     dw PAL_DRAGONAIR
 
-    ; field moves
-    db FM_FLY+FM_FLOAT+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 144 ; base exp yield
@@ -5990,8 +5990,8 @@ DragoniteBaseStats:
     ; palette
     dw PAL_DRAGONITE
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_DIG
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 218 ; base exp yield
@@ -6030,8 +6030,8 @@ MewtwoBaseStats:
     ; palette
     dw PAL_MEWTWO
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_STRENGTH+FM_LIGHT
+    ; not used
+    db 0
 
     db 3 ; catch rate
     db 220 ; base exp yield
@@ -6070,8 +6070,8 @@ MewBaseStats:
     ; palette
     dw PAL_MEW
 
-    ; field moves
-    db FM_CUT+FM_FLY+FM_FLOAT+FM_STRENGTH+FM_LIGHT+FM_DIG+FM_HEAL
+    ; not used
+    db 0
 
     db 3 ; catch rate
     db 221 ; base exp yield
@@ -6110,8 +6110,8 @@ LitwickBaseStats:
     ; palette
     dw PAL_LITWICK
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 190 ; catch rate
     db 56 ; base exp yield
@@ -6150,8 +6150,8 @@ LampentBaseStats:
     ; palette
     dw PAL_LAMPENT
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 90 ; catch rate
     db 133 ; base exp yield
@@ -6190,8 +6190,8 @@ ChandelureBaseStats:
     ; palette
     dw PAL_CHANDELURE
 
-    ; field moves
-    db FM_LIGHT
+    ; not used
+    db 0
 
     db 45 ; catch rate
     db 234 ; base exp yield
@@ -6230,9 +6230,9 @@ Mon155BaseStats:
     ; palette
     dw PAL_MON_155
 
-    ; field moves
-    db
-
+    ; not used
+    db 0
+    
     db 255 ; catch rate
     db 0 ; base exp yield
 
@@ -6270,9 +6270,9 @@ Mon156BaseStats:
     ; palette
     dw PAL_MON_156
 
-    ; field moves
-    db
-
+    ; not used
+    db 0
+    
     db 255 ; catch rate
     db 0 ; base exp yield
 
@@ -6310,9 +6310,9 @@ Mon157BaseStats:
     ; palette
     dw PAL_MON_157
 
-    ; field moves
-    db
-
+    ; not used
+    db 0
+    
     db 255 ; catch rate
     db 0 ; base exp yield
 
@@ -6350,9 +6350,9 @@ Mon158BaseStats:
     ; palette
     dw PAL_MON_158
 
-    ; field moves
-    db
-
+    ; not used
+    db 0
+    
     db 255 ; catch rate
     db 0 ; base exp yield
 
@@ -6390,9 +6390,9 @@ Mon159BaseStats:
     ; palette
     dw PAL_MON_159
 
-    ; field moves
-    db
-
+    ; not used
+    db 0
+    
     db 255 ; catch rate
     db 0 ; base exp yield
 

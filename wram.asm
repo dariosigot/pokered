@@ -158,10 +158,16 @@ wTrainerHeaderFlagBit: ; cc55
 
 SECTION "GenericBuffer", WRAM0[$cc5b]
 
-GenericBuffer:
-    ds 96
+UNION ; 219 Bytes
 
-SECTION "RLE", WRAM0[$ccd2]
+GenericBuffer:
+    ds 180+39
+
+NEXTU
+
+ds $ccd2 - $cc5b
+
+;SECTION "RLE", WRAM0[$ccd2]
 wRLEByteCount: ; ccd2
     ds 1
 
@@ -201,8 +207,11 @@ wEnemyMoveListIndex: ; cce2
 
 ; cce3
 
+NEXTU
 
-SECTION "Stat Modifiers", WRAM0[$cd1a]
+ds $cd1a - $cc5b
+
+;SECTION "Stat Modifiers", WRAM0[$cd1a]
 
 ; stat modifiers for the player's current pokemon
 ; value can range from 1 - 13 ($1 to $D)
@@ -247,9 +256,32 @@ wEnemyMonAccuracyMod: ; cd32
 wEnemyMonEvasionMod: ; cd33
     ds 1
 
-; At Least 5 free Bytes, Attention to cd38! (NOT SAVED in SRAM)
+ENDU
 
-SECTION "wFlyLocationList",WRAM0[$cd3d]
+wEndOfGenericBuffer: ; $cd36 = End of "GenericBuffer" (219 Bytes)
+
+wcd37:: db
+
+wSimulatedJoypadStatesIndex:: db ; $cd38
+
+wcd39:: db ; written to but nothing ever reads it
+
+wcd3a:: db ; written to but nothing ever reads it
+
+wcd3b:: db
+
+wcd3c:: db ; Unused
+
+SECTION "Skill_FlyLocationList",WRAM0[$cd3d]
+
+UNION
+
+wNumSkill:: db ; cd3d
+
+wSkill: ; cd3e
+    ds 9
+
+NEXTU
 
 wFlyLocationList: ; cd3d
 wWhichTrade: ; cd3d
@@ -265,13 +297,9 @@ wTrainerFacingDirection: ; cd3f
 wTrainerScreenY: ; cd40
     ds 1
 wTrainerScreenX: ; cd41
-wNumFieldMoves:  ; cd41
     ds 1
 
-wFieldMovesLeftmostXCoord:; cd42
-    ds 1
-wLastFieldMoveID:; cd43
-    ds 1
+ENDU
 
 SECTION "wAIPartyMonScores",WRAM0[$cd50]
 
@@ -319,6 +347,8 @@ wTileMapBackup2: ; cd81
 
 wBuffer: ; cee9
 ; used for temporary things
+
+wLearningMovesFromDayCare: ; cee9
 
 wHPBarMaxHP: ; cee9
     ds 2
@@ -866,7 +896,7 @@ W_MONHTMCOMPATIBILITY: ; d0cc
 W_MONH_PALETTE_ID: ; d0ce
     ds 2
 
-W_MONH_FIELDMOVES: ; d0d0
+W_MONH_NOTUSED: ; d0d0
     ds 1
 
 W_MONHCATCHRATE: ; d0d1
@@ -1826,14 +1856,117 @@ W_BOXMON2DATA: ; dab7
 
 ; dd2a
 
+; dee1
+
+; ────────────────────────────────────────────────────
+
+SECTION "DenimFlags",WRAMX[$dee2],BANK[1]
+
+wDigCaveAerodactylTrigBit0 ; dee2 ; bit 0
+wPrintBattleValueBit0      ; dee2 ; bit 0 = Trigger Print Battle Value
+wTownMapBeforeJoypadBit0   ; dee2 ; bit 0 = Show Town Map Before Joypad Press
+wFlagFlyingMonSpriteBit0   ; dee2 ; bit 0 = Force to Load Mon Sprite with $0040 offset
+wFlagUpDownSideEffectBit0  ; dee2 ; bit 0 = Run Amnesia/SwordDance Side Effect
+wFlagLearnAfterEvolutBit0  ; dee2 ; bit 0 = Learn Move after Evolution
+wFlagValueToPlayerBit1     ; dee2 ; bit 1 = Print Battle Value to Player
+wFlagSortMoveBit1          ; dee2 ; bit 1 = Sort Moves in Moves Menu (SELECT)
+wFlagFlyingMonSpriteBit1   ; dee2 ; bit 1 = Force to Load Mon Sprite with $0080 offset
+wOverworlStrengthAnimBit1  ; dee2 ; bit 1 = Force Overworld Strength Animation
+wNoExpToLastPartyMonBit1   ; dee2 ; bit 1 = Negate Gain Exp to Last Party Mon (Just Caught)
+wFlagShinyBit2             ; dee2 ; bit 2
+wFlagFlyingMonSpriteBit2   ; dee2 ; bit 2 = Force to Load Mon Sprite with $0880 offset
+wOverworldPressABit2       ; dee2 ; bit 2 = Press A in Overworld (talk with invisible sprite in Unknown Dungeon Gengar)
+wFlagBaloonSpriteBit3      ; dee2 ; bit 3 = Enable Baloon Sprite durint Trade
+wFlagBackSpritePlayerBit4  ; dee2 ; bit 4
+wFlagBackFrontSpriteBit56  ; dee2 ; bit 5
+                           ; dee2 ; bit 6
+wFlagFlashingHealBallBit7  ; dee2 ; bit 7
+wSpriteOAMBySpeciesBit7    ; dee2 ; bit 7 = Flag Single Mon ID Sprite
+wFlagBattleCureBit7        ; dee2 ; bit 7 = Print "Cure" intead of damage
+    ds 1
+
+wFlagPlaceTitleScreen ; dee3 ; counter for title screen
+wTempStatHI           ; dee3
+wSpriteOAMBySpeciesId ; dee3
+wTempMoveEnergy       ; dee3 ; Temp Buffer for Move Energy
+wTempMovePowerHI      ; dee3 ; Temp Move Power 1st Byte
+wTempInitialPalette   ; dee3 ; Initial Background Palette (rBGP) during Power Plant Explosion
+wBufferPointerByte1   ; dee3 ; Buffer Pointer Byte 01
+    ds 1
+
+wMaxLevel              ; dee4
+wAvgLevel              ; dee4
+wTmpRepelQty           ; dee4
+wChoicePkmnMoveDeleter ; dee4
+wTempStatLO            ; dee4
+wSkillMonID            ; dee4 = Mon ID used for Cry
+wMonIdCryAndDex        ; dee4 = Mon ID used for PlayCryAndDisplayPokedex
+wTempEnemyMinMaxIV     ; dee4 = Temp Min Enemy IV Value
+wTempMovePowerLO       ; dee4 ; Temp Move Power 2nd Byte
+wBufferPointerByte2    ; dee4 ; Buffer Pointer Byte 02
+    ds 1
+
+wStatusScreen2OAMBit0       ; dee5 ; bit 0 = Write OAM in Status Screen 2
+wOverworlLightAnimBit0      ; dee5 ; bit 0 = Force Overworld Light Animation
+wDontCheckEnergySkillBit0   ; dee5 ; bit 0 = Skip Energy Check during first time Learn Skill
+wDisableEncounterBit1       ; dee5 ; bit 1 = Disable Pallet's Pikachu Encounter
+wFlagNoHpPalBit2            ; dee5 ; bit 2
+wOverworlNoTextBit2         ; dee5 ; bit 2 = Disable Overworld Text
+wDisableEncounterBit3       ; dee5 ; bit 3 = Disable Pewter's Eevee Encounter
+wFlagForceGhostPalBit4      ; dee5 ; bit 4 = Force Ghost Palette during Ghost Marowak Encounter
+wOverworlLightSoundBit4     ; dee5 ; bit 4 = Force Overworld Light Sound
+wForceShowPokedexBit5       ; dee5 ; bit 5 = Show Pokedex during first Seen in Battle
+wFirstExpAllMessageBit6     ; dee5 ; bit 6
+wSelectInOverworldOnBit6    ; dee5 ; bit 6
+wStatusScreenJustLoadBit6   ; dee5 ; bit 6 = Status Screen Picture Just Load
+wPokedexScreenJustLoadBit6  ; dee5 ; bit 6 = Pokedex Screen Picture Just Load
+wDebugEnemyMoveBit7         ; dee5 ; bit 7
+wFlagMoveRelearnEngagedBit7 ; dee5 ; bit 7
+wFlagFollowBoulderBit7      ; dee5 ; bit 7 = Force player to follow Boulder
+    ds 1
+
+wFlagListMenuSpc:           ; dee6 ; bit 0 = BadgeName
+                            ; dee6 ; bit 1 = Celadon Mart Elevator
+                            ; dee6 ; bit 2 = Silph Co Elevator
+                            ; dee6 ; bit 3 = Rocket Hideout Elevator
+wHyperBeamUnknownTypeBit4   ; dee6 ; bit 4 = Set Hyper Beam to Unknown Type
+wWriteInGenericBufferBit4   ; dee6 ; bit 4 = Force to Save Moves List in GenericBuffer+1
+wCollisionWithSpriteBit5    ; dee6 ; bit 5 = Set during start menu if there is a sprite in front of player
+wNoSkillInListBit6          ; dee6 ; bit 6 = Don't Load Skill in List
+wNoExclusiveInListBit7      ; dee6 ; bit 7 = Don't Load Exclusive in List
+    ds 1
+
+wLastTechMachIdUsed: ; dee7
+    ds 1
+
+wNewMonIdDuringLearnMove: ; dee8
+wBackupDarkMap            ; dee8
+    ds 1
+
+wUnusedDEE9:: db
+
+wExplodeFlag:          ; deea
+wBackupItemCurrentQty: ; deea
+wMaxNotExclMoveSlotId: ; deea
+    ds 1
+
+wBackupHealthBarWidth: ; deeb
+    ds 1
+
+    ds 4 ; Free
+
 ; ────────────────────────────────────────────────────
 
 SECTION "DenimBuffer",WRAMX[$def0],BANK[$1]
 
-UNION ; 69 Byte
+DENIM_BUFFER_LENGHT EQU 80 ; Number of Byte
+
+BUFFER_TYPE_EFFECTS_LENGHT EQU 68 ; DENIM_BUFFER_LENGHT - 12
+
+UNION 
 
 wMoveRelearnerMoveList: ; def0
-    ds 69
+    ds DENIM_BUFFER_LENGHT
 
 NEXTU
 
@@ -1887,11 +2020,6 @@ wBlkCoordinateY2Lower: ; def4
 
 NEXTU
 
-wFieldMoves: ; def0
-    ds 9
-
-NEXTU
-
 wBattleValueToPrint: ; def0
     ds 2
 wBattleValueCounter: ; def2
@@ -1900,7 +2028,7 @@ wBattleValueCounter: ; def2
 NEXTU
 
 wBufferTypeEffects: ; def0
-    ds 68-12
+    ds BUFFER_TYPE_EFFECTS_LENGHT
 wBufferTypeEffectsEnd:
     db
 
@@ -1910,92 +2038,6 @@ wBackupBattleDataDuringDex2ndPage: ; def0
 ENDU
 
 ; ────────────────────────────────────────────────────
-
-SECTION "DenimFlags",WRAMX[$df35],BANK[1]
-
-wDigCaveAerodactylTrigBit0 ; df35 ; bit 0
-wPrintBattleValueBit0      ; df35 ; bit 0 = Trigger Print Battle Value
-wTownMapBeforeJoypadBit0   ; df35 ; bit 0 = Show Town Map Before Joypad Press
-wFlagFlyingMonSpriteBit0   ; df35 ; bit 0 = Force to Load Mon Sprite with $0040 offset
-wFlagUpDownSideEffectBit0  ; df35 ; bit 0 = Run Amnesia/SwordDance Side Effect
-wFlagLearnAfterEvolutBit0  ; df35 ; bit 0 = Learn Move after Evolution
-wFlagValueToPlayerBit1     ; df35 ; bit 1 = Print Battle Value to Player
-wFlagSortMoveBit1          ; df35 ; bit 1 = Sort Moves in Moves Menu (SELECT)
-wFlagFlyingMonSpriteBit1   ; df35 ; bit 1 = Force to Load Mon Sprite with $0080 offset
-wOverworlStrengthAnimBit1  ; df35 ; bit 1 = Force Overworld Strength Animation
-wNoExpToLastPartyMonBit1   ; df35 ; bit 1 = Negate Gain Exp to Last Party Mon (Just Caught)
-wFlagShinyBit2             ; df35 ; bit 2
-wFlagFlyingMonSpriteBit2   ; df35 ; bit 2 = Force to Load Mon Sprite with $0880 offset
-wOverworldPressABit2       ; df35 ; bit 2 = Press A in Overworld (talk with invisible sprite in Unknown Dungeon Gengar)
-wFlagBaloonSpriteBit3      ; df35 ; bit 3 = Enable Baloon Sprite durint Trade
-wFlagBackSpritePlayerBit4  ; df35 ; bit 4
-wFlagBackFrontSpriteBit56  ; df35 ; bit 5
-                           ; df35 ; bit 6
-wFlagFlashingHealBallBit7  ; df35 ; bit 7
-wSpriteOAMBySpeciesBit7    ; df35 ; bit 7 = Flag Single Mon ID Sprite
-wFlagBattleCureBit7        ; df35 ; bit 7 = Print "Cure" intead of damage
-    ds 1
-
-wFlagPlaceTitleScreen ; df36 ; counter for title screen
-wTempStatHI           ; df36
-wSpriteOAMBySpeciesId ; df36
-wTempMoveEnergy       ; df36 ; Temp Buffer for Move Energy
-wTempMovePowerHI      ; df36 ; Temp Move Power 1st Byte
-wTempInitialPalette   ; df36 ; Initial Background Palette (rBGP) during Power Plant Explosion
-    ds 1
-
-wMaxLevel              ; df37
-wAvgLevel              ; df37
-wTmpRepelQty           ; df37
-wChoicePkmnMoveDeleter ; df37
-wTempStatLO            ; df37
-wFieldMoveMonID        ; df37 = Mon ID used for Cry
-wMonIdCryAndDex        ; df37 = Mon ID used for PlayCryAndDisplayPokedex
-wTempEnemyMinMaxIV     ; df37 = Temp Min Enemy IV Value
-wTempMovePowerLO       ; df37 ; Temp Move Power 2nd Byte
-    ds 1
-
-wStatusScreen2OAMBit0       ; df38 ; bit 0 = Write OAM in Status Screen 2
-wOverworlLightAnimBit0      ; df38 ; bit 0 = Force Overworld Light Animation
-wDisableEncounterBit1       ; df38 ; bit 1 = Disable Pallet's Pikachu Encounter
-wFlagNoHpPalBit2            ; df38 ; bit 2
-wOverworlNoTextBit2         ; df38 ; bit 2 = Disable Overworld Text
-wDisableEncounterBit3       ; df38 ; bit 3 = Disable Pewter's Eevee Encounter
-wFlagForceGhostPalBit4      ; df38 ; bit 4 = Force Ghost Palette during Ghost Marowak Encounter
-wOverworlLightSoundBit4     ; df38 ; bit 4 = Force Overworld Light Sound
-wForceShowPokedexBit5       ; df38 ; bit 5 = Show Pokedex during first Seen in Battle
-wFirstExpAllMessageBit6     ; df38 ; bit 6
-wSelectInOverworldOnBit6    ; df38 ; bit 6
-wStatusScreenJustLoadBit6   ; df38 ; bit 6 = Status Screen Picture Just Load
-wPokedexScreenJustLoadBit6  ; df38 ; bit 6 = Pokedex Screen Picture Just Load
-wDebugEnemyMoveBit7         ; df38 ; bit 7
-wFlagMoveRelearnEngagedBit7 ; df38 ; bit 7
-wFlagFollowBoulderBit7      ; df38 ; bit 7 = Force player to follow Boulder
-    ds 1
-
-wFlagListMenuSpc:           ; df39 ; bit 0 = BadgeName
-                            ; df39 ; bit 1 = Celadon Mart Elevator
-                            ; df39 ; bit 2 = Silph Co Elevator
-                            ; df39 ; bit 3 = Rocket Hideout Elevator
-wHyperBeamUnknownTypeBit4   ; df39 ; bit 4 = Set Hyper Beam to Unknown Type
-wCollisionWithSpriteBit5    ; df39 ; bit 5 = Set during start menu if there is a sprite in front of player
-    ds 1
-
-wLastTechMachIdUsed: ; df3a
-    ds 1
-
-wNewMonIdDuringLearnMove: ; df3b
-wBackupDarkMap            ; df3b
-    ds 1
-
-wUnusedDF3C:: db
-
-wExplodeFlag: ; df3d
-wBackupItemCurrentQty: ; df3d
-    ds 1
-
-wBackupHealthBarWidth: ; df3e
-    ds 1
 
 SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
 
