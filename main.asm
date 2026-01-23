@@ -9615,6 +9615,8 @@ CalcStats: ; 3936 (0:3936)
     jr nz,.statsLoop
     ret
 
+SECTION "CalcStat",ROM0[$394a]
+
 ; calculates stat c of current mon
 ; c: stat to calc (HP=1,Atk=2,Def=3,Spd=4,Spc=5)
 ; b: consider stat exp?
@@ -9798,35 +9800,29 @@ CalcStat: ; 394a (0:394a)
     pop hl
     ret
 
-AddEnemyMonToPlayerParty: ; 3a53 (0:3a53)
+AddEnemyMonToPlayerParty:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(_AddEnemyMonToPlayerParty)
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call _AddEnemyMonToPlayerParty
     pop bc
     ld a,b
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
-MoveMon: ; 3a68 (0:3a68)
+MoveMon:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(Func_f51e)
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call Func_f51e
     pop bc
     ld a,b
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; skips a text entries,each of size $b (like trainer name,OT name,rival name,...)
 ; hl: base pointer,will be incremented by $b * a
-SkipFixedLengthTextEntries: ; 3a7d (0:3a7d)
+SkipFixedLengthTextEntries:
     and a
     ret z
     ld bc,$b
@@ -9836,7 +9832,7 @@ SkipFixedLengthTextEntries: ; 3a7d (0:3a7d)
     jr nz,.skipLoop
     ret
 
-AddNTimes: ; 3a87 (0:3a87)
+AddNTimes:
 ; add bc to hl a times
     and a
     ret z
@@ -9848,7 +9844,7 @@ AddNTimes: ; 3a87 (0:3a87)
 
 ; Compare strings,c bytes in length,at de and hl.
 ; Often used to compare big endian numbers in battle calculations.
-StringCmp: ; 3a8e (0:3a8e)
+StringCmp:
     ld a,[de]
     cp [hl]
     ret nz
@@ -9857,6 +9853,8 @@ StringCmp: ; 3a8e (0:3a8e)
     dec c
     jr nz,StringCmp
     ret
+
+SECTION "WriteOAMBlock",ROM0[$3a97]
 
 ; INPUT:
 ; a = oam block index (each block is 4 oam entries)
@@ -10656,12 +10654,12 @@ Load16BitRegisters: ; 3e94 (0:3e94)
     ld c,a
     ret
 
-Func_3ead: ; 3ead (0:3ead)
+Func_3ead:
     ld b,BANK(CinnabarGymProcessAllGate)
     ld hl,CinnabarGymProcessAllGate
     jp Bankswitch ; indirect jump to CinnabarGymProcessAllGate (1eb0a (7:6b0a))
 
-Func_3eb5: ; 3eb5 (0:3eb5)
+Func_3eb5:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[H_CURRENTPRESSEDBUTTONS]
@@ -10669,14 +10667,12 @@ Func_3eb5: ; 3eb5 (0:3eb5)
     jr z,.asm_3eea
     ld a,$11
     call RoutineForRealGB
-    ld [H_LOADEDROMBANK],a
     call Func_469a0
     ld a,[$FF00+$ee]
     and a
     jr nz,.asm_3edd
     ld a,[$cd3e]
     call RoutineForRealGB
-    ld [H_LOADEDROMBANK],a
     ld de,$3eda
     push de
     jp hl
@@ -10694,11 +10690,9 @@ Func_3eb5: ; 3eb5 (0:3eb5)
 .asm_3eec
     ld [$FF00+$eb],a
     pop af
-    call RoutineForRealGB
-    ld [H_LOADEDROMBANK],a
-    ret
+    jp RoutineForRealGB
 
-Func_3ef5: ; 3ef5 (0:3ef5)
+Func_3ef5:
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     ld hl,PointerTable_3f22
     call Func_3f0f
@@ -10706,7 +10700,7 @@ Func_3ef5: ; 3ef5 (0:3ef5)
     set 0,[hl]
     call DisplayTextID
 
-Func_3f05: ; 3f05 (0:3f05)
+Func_3f05:
     ld hl,W_MAPTEXTPTR ; $d36c
     ld a,[$FF00+$ec]
     ld [hli],a
@@ -10714,7 +10708,7 @@ Func_3f05: ; 3f05 (0:3f05)
     ld [hl],a
     ret
 
-Func_3f0f: ; 3f0f (0:3f0f)
+Func_3f0f:
     ld a,[W_MAPTEXTPTR] ; $d36c
     ld [$FF00+$ec],a
     ld a,[$d36d]
@@ -10725,7 +10719,7 @@ Func_3f0f: ; 3f0f (0:3f0f)
     ld [$d36d],a
     ret
 
-PointerTable_3f22: ; 3f22 (0:3f22)
+PointerTable_3f22:
     dw CardKeySuccessText                   ; id = 01
     dw CardKeyFailText                      ; id = 02
     dw ItemStoragePCInRedHouse              ; id = 03
@@ -10755,7 +10749,7 @@ PointerTable_3f22: ; 3f22 (0:3f22)
     dw UnnamedText_624c1                    ; id = 1B
     dw UnnamedText_624c6                    ; id = 1C
     dw UnnamedText_624cb                    ; id = 1D
-    dw $6508
+    dw $0000 ; Unused
     dw PokeCenterPCCode                     ; id = 1F
     dw ViridianSchoolNotebook               ; id = 20
     dw ViridianSchoolBlackboard             ; id = 21
@@ -97307,16 +97301,16 @@ CeladonCityHotelText: ; 62502 (18:6502)
     TX_FAR _CeladonCityHotelText
     db "@"
 
-    ret
-    db "@"
-
+PrintBookcaseText: ; TODO find link
     call EnableAutoTextBoxDrawing
     ld a,$e
     jp Func_3ef5
 
-BookcaseText: ; 62511 (18:6511)
+BookcaseText:
     TX_FAR _BookcaseText
     db "@"
+
+SECTION "PokeCenterPC",ROMX[$6516],BANK[$18]
 
 PokeCenterPC: ; 62516 (18:6516)
     ld a,[$c109]
