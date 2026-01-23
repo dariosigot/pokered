@@ -7911,7 +7911,6 @@ GetMonName: ; 2f9e (0:2f9e)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(MonsterNames) ; 07
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call IndexToPokedexAndRestoreD11E
     ld hl,MonsterNames ; 421E
@@ -7926,7 +7925,6 @@ GetMonName: ; 2f9e (0:2f9e)
     ld [hl],"@"
     pop de
     pop af
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     pop hl
     ret
@@ -8033,12 +8031,8 @@ BugFixWarpDuringJump:
     call HackFromBank0 ; $3048 ; _BugFixWarpDuringJump
     ret                ; $304b
 
-; Free
-
-SECTION "ReloadMapData",ROM0[$3071]
-
 ; reloads text box tile patterns,current map view,and tileset tile patterns
-ReloadMapData: ; 3071 (0:3071)
+ReloadMapData:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[W_CURMAP]
@@ -8049,12 +8043,10 @@ ReloadMapData: ; 3071 (0:3071)
     call LoadTilesetTilePatternData
     call EnableLCD
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; reloads tileset tile patterns
-ReloadTilesetTilePatterns: ; 3090 (0:3090)
+ReloadTilesetTilePatterns:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[W_CURMAP]
@@ -8063,12 +8055,10 @@ ReloadTilesetTilePatterns: ; 3090 (0:3090)
     call LoadTilesetTilePatternData
     call EnableLCD
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; shows the town map and lets the player choose a destination to fly to
-ChooseFlyDestination: ; 30a9 (0:30a9)
+ChooseFlyDestination:
     ld hl,$d72e
     res 4,[hl]
     ld b,BANK(_ChooseFlyDestination)
@@ -8076,7 +8066,7 @@ ChooseFlyDestination: ; 30a9 (0:30a9)
     jp Bankswitch
 
 ; causes the text box to close waithout waiting for a button press after displaying text
-DisableWaitingAfterTextDisplay: ; 30b6 (0:30b6)
+DisableWaitingAfterTextDisplay:
     ld a,$01
     ld [$cc3c],a
     ret
@@ -8090,7 +8080,7 @@ DisableWaitingAfterTextDisplay: ; 30b6 (0:30b6)
 ; 00: unsucessful
 ; 01: successful
 ; 02: not able to be used right now,no extra menu displayed (only certain items use this)
-UseItem: ; 30bc (0:30bc)
+UseItem:
     ld b,BANK(UseItem_)
     ld hl,UseItem_
     jp Bankswitch
@@ -8103,18 +8093,15 @@ UseItem: ; 30bc (0:30bc)
 ; [$cf96] = quantity to toss
 ; OUTPUT:
 ; clears carry flag if the item is tossed,sets carry flag if not
-TossItem: ; 30c4 (0:30c4)
+TossItem:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(TossItem_)
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call TossItem_
     pop de
     ld a,d
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; checks if an item is a key item
 ; INPUT:
@@ -8123,7 +8110,7 @@ TossItem: ; 30c4 (0:30c4)
 ; [$d124] = result
 ; 00: item is not key item
 ; 01: item is key item
-IsKeyItem: ; 30d9 (0:30d9)
+IsKeyItem:
     push hl
     push de
     push bc
@@ -8138,20 +8125,17 @@ IsKeyItem: ; 30d9 (0:30d9)
 ; function to draw various text boxes
 ; INPUT:
 ; [$D125] = text box ID
-DisplayTextBoxID: ; 30e8 (0:30e8)
+DisplayTextBoxID:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(DisplayTextBoxID_)
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call DisplayTextBoxID_
     pop bc
     ld a,b
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
-IsPlayerCharacterBeingControlledByGame: ; 30fd (0:30fd)
+IsPlayerCharacterBeingControlledByGame:
     ld a,[$cc57]
     and a
     ret nz
@@ -8162,7 +8146,7 @@ IsPlayerCharacterBeingControlledByGame: ; 30fd (0:30fd)
     and $80
     ret
 
-Func_310e: ; 310e (0:310e)
+Func_310e:
     ld hl,$d736
     bit 0,[hl]
     res 0,[hl]
@@ -8182,14 +8166,11 @@ Func_310e: ; 310e (0:310e)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[$cc58]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ld a,[$cf10]
     call CallFunctionInTable
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 .pointerTable_3140
     dw PointerTable_1a442
     dw PointerTable_1a510
@@ -8199,13 +8180,14 @@ Func_310e: ; 310e (0:310e)
     ld hl,Func_1a3e0
     jp Bankswitch ; indirect jump to Func_1a3e0 (1a3e0 (6:63e0))
 
-Func_314e: ; 314e (0:314e)
+Func_314e:
     ld b,BANK(Func_1a41d)
     ld hl,Func_1a41d
     jp Bankswitch ; indirect jump to Func_1a41d (1a41d (6:641d))
 
-Useless: ; 3156 (0:3156)
-    ret
+; Free
+
+SECTION "StoreTrainerHeaderPointer",ROM0[$3157]
 
 ; stores hl in [W_TRAINERHEADERPTR]
 StoreTrainerHeaderPointer: ; 3157 (0:3157)
@@ -8530,7 +8512,7 @@ PreBattleSaveRegisters: ; 3354 (0:3354)
 
 ; loads data of some trainer on the current map and plays pre-battle music
 ; [$cf13]: sprite ID of trainer who is engaged
-EngageMapTrainer: ; 336a (0:336a)
+EngageMapTrainer:
     ld hl,W_MAPSPRITEEXTRADATA
     ld d,$0
     ld a,[$cf13]
@@ -8544,7 +8526,7 @@ EngageMapTrainer: ; 336a (0:336a)
     ld [wEngagedTrainerSet],a ; $cd2e
     jp UpgradeTrainerSet ; jp PlayTrainerMusic
 
-Func_3381: ; 3381 (0:3381)
+Func_3381:
     push hl
     ld hl,$d72d
     bit 7,[hl]
@@ -8554,24 +8536,22 @@ Func_3381: ; 3381 (0:3381)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[W_PBSTOREDROMBANK]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     push hl
     ld b,BANK(SaveTrainerName)
     ld hl,SaveTrainerName
     call Bankswitch ; indirect jump to SaveTrainerName (27e4a (9:7e4a))
-    ld hl,UnnamedText_33cf
+    ld hl,.UnnamedText_33cf
     call PrintText
     pop hl
     pop af
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ld b,BANK(Func_1a5e7)
     ld hl,Func_1a5e7
     call Bankswitch ; indirect jump to Func_1a5e7 (1a5e7 (6:65e7))
     jp WaitForSoundToFinish
 
-Func_33b7: ; 33b7 (0:33b7)
+.Func_33b7
     ld a,[wBattleResult]
     and a
     jr nz,.asm_33c6
@@ -8587,24 +8567,14 @@ Func_33b7: ; 33b7 (0:33b7)
     ld l,a
     ret
 
-UnnamedText_33cf: ; 33cf (0:33cf)
+.UnnamedText_33cf
     TX_FAR _UnnamedText_33cf
-    db $08
-
-Func_33d4: ; 33d4 (0:33d4)
-    call Func_33b7
+    db $08 ; asm
+    call .Func_33b7
     call TextCommandProcessor
     jp TextScriptEnd
 
-Func_33dd: ; 33dd (0:33dd)
-    ld a,[wFlags_0xcd60]
-    bit 0,a
-    ret nz
-    call EngageMapTrainer
-    xor a
-    ret
-
-PlayTrainerMusic: ; 33e8 (0:33e8)
+PlayTrainerMusic:
     ld a,[wEngagedTrainerClass]
     cp SONY1
     ret z
@@ -8664,6 +8634,8 @@ ArePlayerCoordsInArrayBeforeHOFWin:
 
 Nope:
     ret
+
+; Free
 
 SECTION "Func_3442",ROM0[$3442]
 
