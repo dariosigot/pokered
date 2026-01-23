@@ -5288,6 +5288,8 @@ FlowerTilePattern2: ; 1f29 (0:1f29)
 FlowerTilePattern3: ; 1f39 (0:1f39)
     INCBIN "gfx/tilesets/flower/flower3.2bpp"
 
+SECTION "SoftReset",ROM0[$1f49]
+
 SoftReset: ; 1f49 (0:1f49)
     call StopAllSounds
     call GBPalWhiteOut
@@ -5340,8 +5342,7 @@ InitGame: ; 1f54 (0:1f54)
     ld bc,$007f
     call FillMemory ; zero HRAM
     call CleanLCD_OAM ; this is unnecessary since it was already cleared above
-    ld a,$01
-    ld [H_LOADEDROMBANK],a
+    ld a,BANK(WriteDMACodeToHRAMAndInitializeRNGState)
     call RoutineForRealGB
     call WriteDMACodeToHRAMAndInitializeRNGState ; copy DMA code to HRAM and Initialize RNG State
     xor a
@@ -5389,14 +5390,14 @@ InitGame: ; 1f54 (0:1f54)
     jp Func_42b7
 
 ; zeroes all VRAM
-ZeroVram: ; 2004 (0:2004)
+ZeroVram:
     ld hl,$8000
     ld bc,$2000
     xor a
     jp FillMemory
 
 ; immediately stops all sounds
-StopAllSounds: ; 200e (0:200e)
+StopAllSounds:
     ld a,$2
     ld [$c0ef],a
     ld [$c0f0],a
@@ -5473,7 +5474,6 @@ VBlankHandler:
     call z,ReadJoypadRegister
     call PostVBlankHandler
     ld a,[$d122]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     pop hl
     pop de
@@ -5995,7 +5995,7 @@ Func_235f: ; 235f (0:235f)
     jr nz,.asm_237a
     ret
 
-CompareMapMusicBankWithCurrentBank: ; 2385 (0:2385)
+CompareMapMusicBankWithCurrentBank:
     ld a,[$d35c]
     ld e,a
     ld a,[$c0ef]
@@ -6015,7 +6015,7 @@ CompareMapMusicBankWithCurrentBank: ; 2385 (0:2385)
     scf
     ret
 
-PlayMusic: ; 23a1 (0:23a1)
+PlayMusic:
     ld b,a
     ld [$c0ee],a
     xor a
@@ -6026,7 +6026,7 @@ PlayMusic: ; 23a1 (0:23a1)
     ld a,b
 
 ; plays music specified by a. If value is $ff,music is stopped
-PlaySound: ; 23b1 (0:23b1)
+PlaySound:
     push hl
     push de
     push bc
@@ -6059,7 +6059,6 @@ PlaySound: ; 23b1 (0:23b1)
     ld a,[H_LOADEDROMBANK]
     ld [$FF00+$b9],a
     ld a,[$c0ef]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     cp $2
     jr nz,.checkForBank08
@@ -6079,7 +6078,6 @@ PlaySound: ; 23b1 (0:23b1)
     call Func_7d8ea
 .asm_240b
     ld a,[$FF00+$b9]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     jr .asm_2425
 .asm_2414
@@ -6096,20 +6094,17 @@ PlaySound: ; 23b1 (0:23b1)
     pop hl
     ret
 
-UpdateSprites: ; 2429 (0:2429)
+UpdateSprites:
     ld a,[$cfcb]
     dec a
     ret nz
     ld a,[H_LOADEDROMBANK]
     push af
-    ld a,$1
-    ld [H_LOADEDROMBANK],a
+    ld a,BANK(_UpdateSprites)
     call RoutineForRealGB
     call _UpdateSprites
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $00)
@@ -6184,38 +6179,6 @@ LoadSurfingLaprasSpriteGraphics:
     ld bc,(BANK(LaprasSprite) << 8) + $0c
     jp LoadPlayerSpriteGraphicsCommon
 
-;    ld de,MonOverworldDataNew2_emimonserrate+($80*((DEX_LAPRAS)%(128)))
-;    ld bc,(BANK(MonOverworldDataNew2_emimonserrate) << 8) + $0c
-;    ld hl,$8000
-;    call .CopyVideoDataFromEmimom
-;    ld a,$40
-;    add e
-;    ld e,a
-;    jr nc,.noCarry
-;    inc d
-;.noCarry
-;    ld hl,$8800
-;    ; fall through
-;
-;.CopyVideoDataFromEmimom
-;    ld a,3
-;.Loop4Tile3Times
-;    push af
-;    push bc
-;    push de
-;    push hl
-;    ld c,4
-;    call GoodCopyVideoData
-;    pop hl
-;    ld de,$40
-;    add hl,de
-;    pop de
-;    pop bc
-;    pop af
-;    dec a
-;    jr nz,.Loop4Tile3Times
-;    ret
-
 CheckDarkMap:
     push af
     PREDEF _CheckDarkMap
@@ -6283,7 +6246,7 @@ PokeCenterSignText: ; 24ef (0:24ef)
     TX_FAR _PokeCenterSignText
     db "@"
 
-PickupItemText: ; 24f4 (0:24f4)
+PickupItemText:
 ; XXX better label (what does predef $5C do?)
     db $08 ; asm
     PREDEF PickupItem
@@ -6291,12 +6254,11 @@ PickupItemText: ; 24f4 (0:24f4)
 
 ; bankswitches and runs _UncompressSpriteData
 ; bank is given in a,sprite input stream is pointed to in W_SPRITEINPUTPTR
-UncompressSpriteData: ; 24fd (0:24fd)
+UncompressSpriteData:
     ld b,a
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,b
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ld a,$a
     ld [$0],a
@@ -6304,9 +6266,9 @@ UncompressSpriteData: ; 24fd (0:24fd)
     ld [$4000],a
     call _UncompressSpriteData
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
+
+SECTION "_UncompressSpriteData",ROM0[$251a]
 
 ; initializes necessary data to load a sprite and runs UncompressSpriteDataLoop
 _UncompressSpriteData: ; 251a (0:251a)
@@ -7069,6 +7031,8 @@ HoldTextDisplayOpen: ; 29df (0:29df)
     bit 0,a ; is the A button being pressed?
     jr nz,HoldTextDisplayOpen
 
+SECTION "CloseTextDisplay",ROM0[$29e8]
+
 CloseTextDisplay: ; 29e8 (0:29e8)
     ld a,[W_CURMAP]
     call SwitchToMapRomBank
@@ -7091,7 +7055,6 @@ CloseTextDisplay: ; 29e8 (0:29e8)
     dec c
     jr nz,.restoreSpriteFacingDirectionLoop
     ld a,BANK(InitMapSprites)
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call InitMapSprites ; reload sprite tile pattern data (since it was partially overwritten by text tile patterns)
     ld hl,$cfc4
@@ -7101,13 +7064,12 @@ CloseTextDisplay: ; 29e8 (0:29e8)
     call z,LoadPlayerSpriteGraphics
     call LoadCurrentMapView
     pop af
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     jp UpdateSprites ; move sprites
 
-DisplayPokemartDialogue: ; 2a2e (0:2a2e)
+DisplayPokemartDialogue:
     push hl
-    ld hl,PokemartGreetingText
+    ld hl,.PokemartGreetingText
     call PrintText
     pop hl
     inc hl
@@ -7116,20 +7078,18 @@ DisplayPokemartDialogue: ; 2a2e (0:2a2e)
     ld [$cf94],a ; selects between subtypes of menus
     ld a,[H_LOADEDROMBANK]
     push af
-    ld a,$01
-    ld [H_LOADEDROMBANK],a
+    ld a,BANK(DisplayPokemartDialogue_)
     call RoutineForRealGB
     call DisplayPokemartDialogue_
     pop af
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     jp AfterDisplayingTextID
 
-PokemartGreetingText: ; 2a55 (0:2a55)
+.PokemartGreetingText
     TX_FAR _PokemartGreetingText
     db "@"
 
-LoadItemList: ; 2a5a (0:2a5a)
+LoadItemList:
     ld a,$01
     ld [$cfcb],a
     ld a,h
@@ -7145,7 +7105,7 @@ LoadItemList: ; 2a5a (0:2a5a)
     jr nz,.loop
     ret
 
-DisplayPokemonCenterDialogue: ; 2a72 (0:2a72)
+DisplayPokemonCenterDialogue:
     xor a
     ld [$ff8b],a
     ld [$ff8c],a
@@ -7153,31 +7113,29 @@ DisplayPokemonCenterDialogue: ; 2a72 (0:2a72)
     inc hl
     ld a,[H_LOADEDROMBANK]
     push af
-    ld a,$01
-    ld [H_LOADEDROMBANK],a
+    ld a,BANK(DisplayPokemonCenterDialogue_)
     call RoutineForRealGB
     call DisplayPokemonCenterDialogue_
     pop af
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     jp AfterDisplayingTextID
 
-DisplaySafariGameOverText: ; 2a90 (0:2a90)
+DisplaySafariGameOverText:
     ld hl,Func_1e9ed
     ld b,BANK(Func_1e9ed)
     call Bankswitch
     jp AfterDisplayingTextID
 
-DisplayPokemonFaintedText: ; 2a9b (0:2a9b)
+DisplayPokemonFaintedText:
     ld hl,PokemonFaintedText
     call PrintText
     jp AfterDisplayingTextID
 
-PokemonFaintedText: ; 2aa4 (0:2aa4)
+PokemonFaintedText:
     TX_FAR _PokemonFaintedText
     db "@"
 
-DisplayPlayerBlackedOutText: ; 2aa9 (0:2aa9)
+DisplayPlayerBlackedOutText:
     ld hl,PlayerBlackedOutText
     call PrintText
     ld a,[$d732]
@@ -7185,7 +7143,7 @@ DisplayPlayerBlackedOutText: ; 2aa9 (0:2aa9)
     ld [$d732],a
     jp HoldTextDisplayOpen
 
-PlayerBlackedOutText: ; 2aba (0:2aba)
+PlayerBlackedOutText:
     TX_FAR _PlayerBlackedOutText
     db "@"
 
