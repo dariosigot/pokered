@@ -6185,12 +6185,6 @@ CheckDarkMap:
     pop af
     ret
 
-DisableDebugWtW_Hack:
-    ld a,[$d700]
-    ld hl,$cd38
-    res 0,[hl]
-    ret
-
 ResetJoypadForbiddenButtonsMask:
     ld hl,wFlagFollowBoulderBit7
     bit 7,[hl]
@@ -7153,18 +7147,18 @@ DisplayRepelWoreOffText:
     call Bankswitch
     jp CloseTextDisplay
 
-SECTION "DisplayStartMenu",ROM0[$2acd]
-
-DisplayStartMenu: ; 2acd (0:2acd)
-    ld a,$04
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB ; ROM bank 4
-    call DisableDebugWtW_Hack ; ld a,[$d700] ; walking/biking/surfing
+DisplayStartMenu:
+    ld a,BANK(StartMenu_Pokedex)
+    call RoutineForRealGB ; ROM bank 4 
+    ld hl,$cd38 ; DisableDebugWtW_Hack
+    res 0,[hl]  ; ...
+    ld a,[$d700] ; walking/biking/surfing
     ld [$d11a],a
     ld a,(SFX_02_3f - $4000) / 3 ; Start menu sound
     call PlaySound
+    ; fall through
 
-RedisplayStartMenu: ; 2adf (0:2adf)
+RedisplayStartMenu:
     ld b,BANK(DrawStartMenu)
     ld hl,DrawStartMenu
     call Bankswitch
@@ -7240,7 +7234,7 @@ RedisplayStartMenu: ; 2adf (0:2adf)
     jp z,StartMenu_Option
 
 ; EXIT falls through to here
-CloseStartMenu: ; 2b70 (0:2b70)
+CloseStartMenu:
     call GetJoypadState
     ld a,[H_NEWLYPRESSEDBUTTONS]
     bit 0,a ; was A button newly pressed?
@@ -7254,7 +7248,7 @@ CloseStartMenu: ; 2b70 (0:2b70)
 ; b = length of string of bytes
 ; OUTPUT:
 ; [$D11E] = number of set bits
-CountSetBits: ; 2b7f (0:2b7f)
+CountSetBits:
     ld c,0
 .loop
     ld a,[hli]
@@ -7275,13 +7269,13 @@ CountSetBits: ; 2b7f (0:2b7f)
 
 ; subtracts the amount the player paid from their money
 ; sets carry flag if there is enough money and unsets carry flag if not
-SubtractAmountPaidFromMoney: ; 2b96 (0:2b96)
+SubtractAmountPaidFromMoney:
     ld b,BANK(SubtractAmountPaidFromMoney_)
     ld hl,SubtractAmountPaidFromMoney_
     jp Bankswitch
 
 ; adds the amount the player sold to their money
-AddAmountSoldToMoney: ; 2b9e (0:2b9e)
+AddAmountSoldToMoney:
     ld de,wPlayerMoney + 2
     ld hl,$ffa1 ; total price of items
     ld c,3 ; length of money in bytes
@@ -7298,17 +7292,14 @@ AddAmountSoldToMoney: ; 2b9e (0:2b9e)
 ; HL = address of inventory (either wNumBagItems or wNumBoxItems)
 ; [$CF92] = index (within the inventory) of the item to remove
 ; [$CF96] = quantity to remove
-RemoveItemFromInventory: ; 2bbb (0:2bbb)
+RemoveItemFromInventory:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(RemoveItemFromInventory_)
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call RemoveItemFromInventory_
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; function to add an item (in varying quantities) to the player's bag or PC box
 ; INPUT:
@@ -7316,20 +7307,22 @@ RemoveItemFromInventory: ; 2bbb (0:2bbb)
 ; [$CF91] = item ID
 ; [$CF96] = item quantity
 ; sets carry flag if successful,unsets carry flag if unsuccessful
-AddItemToInventory: ; 2bcf (0:2bcf)
+AddItemToInventory:
     push bc
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(AddItemToInventory_)
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call AddItemToInventory_
     pop bc
     ld a,b
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     pop bc
     ret
+
+; Free
+
+SECTION "DisplayListMenuID",ROM0[$2be6]
 
 ; INPUT:
 ; [wListMenuID] = list menu ID
@@ -7391,8 +7384,6 @@ DisplayListMenuID: ; 2be6 (0:2be6)
     ld c,10
     call DelayFrames
     ; fall through
-
-SECTION "DisplayListMenuIDLoop",ROM0[$2c53]
 
 DisplayListMenuIDLoop: ; 2c53 (0:2c53)
     xor a
