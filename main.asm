@@ -3057,12 +3057,11 @@ CheckForUserInterruption: ; 12f8 (0:12f8)
 ; function to load position data for destination warp when switching maps
 ; INPUT:
 ; a = ID of destination warp within destination map
-LoadDestinationWarpPosition: ; 1313 (0:1313)
+LoadDestinationWarpPosition:
     ld b,a
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[$cf12]
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     ld a,b
     add a
@@ -3074,15 +3073,13 @@ LoadDestinationWarpPosition: ; 1313 (0:1313)
     ld de,$d35f
     call CopyData
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; INPUT:
 ; c: if nonzero,show at least a sliver of health
 ; d = number of HP bar sections (normally 6)
 ; e = health (in eighths of bar sections) (normally out of 48)
-DrawHPBar: ; 1336 (0:1336)
+DrawHPBar:
     push hl
     push de
     push bc
@@ -3166,7 +3163,7 @@ LoadFlippedFrontSpriteByMonIndex: ; 1384 (0:1384)
     ld a,$1
     ld [W_SPRITEFLIPPED],a
 
-LoadFrontSpriteByMonIndex: ; 1389 (0:1389)
+LoadFrontSpriteByMonIndex:
     push hl
     ld a,[$d11e]
     push af
@@ -3179,14 +3176,6 @@ LoadFrontSpriteByMonIndex: ; 1389 (0:1389)
     ld [hl],b
     and a
     pop hl
-;    jr z,.invalidDexNumber  ; dex #0 invalid
-;    cp $98
-;    jr c,.validDexNumber    ; dex >#151 invalid
-;.invalidDexNumber
-;    ld a,RHYDON ; $1
-;    ld [$cf91],a
-;    ret
-;.validDexNumber
     push hl
     ld de,$9000
     call LoadMonFrontSprite
@@ -3195,7 +3184,6 @@ HackLoadUncompressedPicToHLFromStatusScreen:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(CopyUncompressedPicToHL)
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     xor a
     ld [$FF00+$e1],a
@@ -3203,9 +3191,7 @@ HackLoadUncompressedPicToHLFromStatusScreen:
     xor a
     ld [W_SPRITEFLIPPED],a
     pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ; plays the cry of a pokemon
 ; INPUT:
@@ -3258,7 +3244,7 @@ DisplayPartyMenu: ; 13fc (0:13fc)
     call DrawPartyMenu
     jp HandlePartyMenuInput
 
-GoBackToPartyMenu: ; 1411 (0:1411)
+GoBackToPartyMenu:
     ld a,[$ffd7]
     push af
     xor a
@@ -3267,7 +3253,7 @@ GoBackToPartyMenu: ; 1411 (0:1411)
     call RedrawPartyMenu
     jp HandlePartyMenuInput
 
-PartyMenuInit: ; 1420 (0:1420)
+PartyMenuInit:
     ld a,$01
     call BankswitchHome
     call LoadHpBarAndStatusTilePatterns
@@ -3306,7 +3292,7 @@ PartyMenuInit: ; 1420 (0:1420)
     ld [hl],a ; old menu item ID
     ret
 
-HandlePartyMenuInput: ; 145a (0:145a)
+HandlePartyMenuInput:
     ld a,1
     ld [wMenuWrappingEnabled],a ; $cc4a
     ld a,$40
@@ -3366,14 +3352,15 @@ HandlePartyMenuInput: ; 145a (0:145a)
     call Bankswitch
     jr HandlePartyMenuInput
 
-DrawPartyMenu: ; 14d4 (0:14d4)
+DrawPartyMenu:
     ld hl,DrawPartyMenu_
     jr DrawPartyMenuCommon
 
-RedrawPartyMenu: ; 14d9 (0:14d9)
+RedrawPartyMenu:
     ld hl,RedrawPartyMenu_
+    ; fall through
 
-DrawPartyMenuCommon: ; 14dc (0:14dc)
+DrawPartyMenuCommon:
     ld b,BANK(RedrawPartyMenu_)
     jp Bankswitch
 
@@ -3382,16 +3369,14 @@ DrawPartyMenuCommon: ; 14dc (0:14dc)
 ; de = address of status condition
 ; hl = destination address
 ; bc = battle status 1 address (if 0 Not Battle HUD)
-PrintStatusCondition: ; 14e1 (0:14e1) ; Don't Print "FNT"
+PrintStatusCondition: ; Don't Print "FNT"
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(PrintStatusAilment)
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call PrintStatusAilment ; print status condition
     pop bc
     ld a,b
-    ld [H_LOADEDROMBANK],a
     jp RoutineForRealGB
 
 CheckSurfing:
@@ -3415,7 +3400,7 @@ CheckSurfing:
 ; INPUT:
 ; hl = destination address
 ; [$cfb9] = level
-PrintLevel: ; 150b (0:150b)
+PrintLevel:
     ld a,$6e ; ":L" tile ID
     ld [hli],a
     ld c,2 ; number of digits
@@ -3431,35 +3416,28 @@ PrintLevel: ; 150b (0:150b)
 ; INPUT:
 ; hl = destination address
 ; [$cfb9] = level
-PrintLevelFull: ; 151b (0:151b)
+PrintLevelFull:
     ld a,$6e ; ":L" tile ID
     ld [hli],a
     ld c,3 ; number of digits
     ld a,[$cfb9] ; level
+    ; fall through
 
-PrintLevelCommon: ; 1523 (0:1523)
+PrintLevelCommon:
     ld [$d11e],a
     ld de,$d11e
     ld b,$41 ; no leading zeroes,left-aligned,one byte
     jp PrintNumber
 
-Func_152e: ; 152e (0:152e)
-    ld hl,$d0dc
-    ld c,a
-    ld b,0
-    add hl,bc
-    ld a,[hl]
-    ret
-
 ; copies the base stat data of a pokemon to $D0B8 (W_MONHEADER)
 ; INPUT:
 ; [$D0B5] = pokemon ID
 ; [wAlternateFormIndex] = Alternate Form Index
-GetMonHeader: ; 1537 (0:1537)
+GetMonHeader:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(PokemonBaseStats)
-    call .ChangeBank
+    call RoutineForRealGB
     push bc
     push de
     push hl
@@ -3507,9 +3485,6 @@ GetMonHeader: ; 1537 (0:1537)
     pop de
     pop bc
     pop af
-    ; fall through
-.ChangeBank
-    ld [H_LOADEDROMBANK],a
     jp RoutineForRealGB
 
 ; ───────────────────────────────────────
