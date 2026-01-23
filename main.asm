@@ -14960,12 +14960,12 @@ OakSpeech: ; 6115 (1:6115)
     ld [$FFD7],a
     ld a,[$D732]
     bit 1,a ; XXX when is bit 1 set?
-    jp nz,Func_61bc ; easter egg: skip the intro
+    jp nz,.Func_61bc ; easter egg: skip the intro
     ld de,ProfOakPic
     ld bc,$1300
     call IntroPredef3B   ; displays Oak pic?
-    call FadeInIntroPic
-    ld hl,OakSpeechText1
+    call .FadeInIntroPic
+    ld hl,.OakSpeechText1
     call PrintText      ; prints text box
     call GBFadeOut2
     call ClearScreen
@@ -14976,16 +14976,16 @@ OakSpeech: ; 6115 (1:6115)
     FuncCoord 6,4 ; $c3f6
     ld hl,Coord     ; position on tilemap the pic is displayed
     call LoadFlippedFrontSpriteByMonIndex      ; displays pic?
-    call MovePicLeft
-    ld hl,OakSpeechText2
+    call .MovePicLeft
+    ld hl,.OakSpeechText2
     call PrintText      ; Prints text box
     call GBFadeOut2
     call ClearScreen
     ld de,RedPicFront
     ld bc,$0400     ; affects the position of the player pic
     call IntroPredef3B      ; displays player pic?
-    call MovePicLeft
-    ld hl,IntroducePlayerText
+    call .MovePicLeft
+    ld hl,.IntroducePlayerText
     call PrintText
     call Func_695d ; brings up NewName/Red/etc menu
     call GBFadeOut2
@@ -14993,12 +14993,12 @@ OakSpeech: ; 6115 (1:6115)
     ld de,Rival1Pic
     ld bc,$1300
     call IntroPredef3B ; displays rival pic
-    call FadeInIntroPic
-    ld hl,IntroduceRivalText
+    call .FadeInIntroPic
+    ld hl,.IntroduceRivalText
     call PrintText
     call Func_69a4
 
-Func_61bc: ; 61bc (1:61bc)
+.Func_61bc
     call GBFadeOut2
     call ClearScreen
     ld de,RedPicFront
@@ -15007,16 +15007,12 @@ Func_61bc: ; 61bc (1:61bc)
     call GBFadeIn2
     ld a,[$D72D]
     and a
-    jr nz,.next
-    ld hl,OakSpeechText3
+    jr nz,.next1
+    ld hl,.OakSpeechText3
     call PrintText
-.next    ld a,[H_LOADEDROMBANK]
-    push af
+.next1
     ld a,$9C
     call PlaySound
-    pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
     ld c,4
     call DelayFrames
     ld de,RedSprite ; $4180
@@ -15032,8 +15028,6 @@ Func_61bc: ; 61bc (1:61bc)
     ld bc,$0400
     call IntroPredef3B
     call ResetPlayerSpriteData
-    ld a,[H_LOADEDROMBANK]
-    push af
     ld a,2
     ld [$C0EF],a
     ld [$C0F0],a
@@ -15042,9 +15036,6 @@ Func_61bc: ; 61bc (1:61bc)
     ld a,$FF
     ld [$C0EE],a
     call PlaySound ; stop music
-    pop af
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
     ld c,$14
     call DelayFrames
     FuncCoord 6,5 ; $c40a
@@ -15059,37 +15050,38 @@ Func_61bc: ; 61bc (1:61bc)
     call DelayFrames
     call GBFadeOut2
     jp ClearScreen
-OakSpeechText1: ; 6253 (1:6253)
+
+.OakSpeechText1
     TX_FAR _OakSpeechText1
     db "@"
-OakSpeechText2: ; 6258 (1:6258)
+.OakSpeechText2
     TX_FAR _OakSpeechText2A
     db $14
     TX_FAR _OakSpeechText2B
     db "@"
-IntroducePlayerText: ; 6262 (1:6262)
+.IntroducePlayerText
     TX_FAR _IntroducePlayerText
     db "@"
-IntroduceRivalText: ; 6267 (1:6267)
+.IntroduceRivalText
     TX_FAR _IntroduceRivalText
     db "@"
-OakSpeechText3: ; 626c (1:626c)
+.OakSpeechText3
     TX_FAR _OakSpeechText3
     db "@"
 
-FadeInIntroPic: ; 6271 (1:6271)
-    ld hl,IntroFadePalettes
+.FadeInIntroPic
+    ld hl,.IntroFadePalettes
     ld b,6
-.next
+.next2
     ld a,[hli]
     ld [rBGP],a
     ld c,10
     call DelayFrames
     dec b
-    jr nz,.next
+    jr nz,.next2
     ret
 
-IntroFadePalettes: ; 6282 (1:6282)
+.IntroFadePalettes
     db %01010100
     db %10101000
     db %11111100
@@ -15097,21 +15089,24 @@ IntroFadePalettes: ; 6282 (1:6282)
     db %11110100
     db %11100100
 
-MovePicLeft: ; 6288 (1:6288)
+.MovePicLeft
     ld a,119
     ld [$FF4B],a
     call DelayFrame
-
     ld a,$E4
     ld [rBGP],a
-.next
+.next3
     call DelayFrame
     ld a,[$FF4B]
     sub 8
     cp $FF
     ret z
     ld [$FF4B],a
-    jr .next
+    jr .next3
+
+; Free
+
+SECTION "Predef3B",ROMX[$62a1],BANK[$1]
 
 Predef3B: ; 62a1 (1:62a1)
     call Load16BitRegisters
