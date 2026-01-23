@@ -67,7 +67,7 @@ SECTION "joypad",ROM0[$60]
 
 SECTION "bank0",ROM0[$61]
 
-DisableLCD: ; 0061 (0:0061)
+DisableLCD:
     xor a
     ld [$ff0f],a
     ld a,[$ffff]
@@ -85,13 +85,13 @@ DisableLCD: ; 0061 (0:0061)
     ld [$ffff],a
     ret
 
-EnableLCD: ; 007b (0:007b)
+EnableLCD:
     ld a,[$ff40]
     set 7,a
     ld [$ff40],a
     ret
 
-CleanLCD_OAM: ; 0082 (0:0082)
+CleanLCD_OAM:
     xor a
     ld hl,wOAMBuffer
     ld b,$a0
@@ -101,7 +101,7 @@ CleanLCD_OAM: ; 0082 (0:0082)
     jr nz,.loop
     ret
 
-ResetLCD_OAM: ; 008d (0:008d)
+ResetLCD_OAM:
     ld a,$a0
     ld hl,wOAMBuffer
     ld de,$0004
@@ -113,20 +113,18 @@ ResetLCD_OAM: ; 008d (0:008d)
     jr nz,.loop
     ret
 
-FarCopyData: ; 009d (0:009d)
+FarCopyData:
 ; copy bc bytes of data from a:hl to de
     ld [$CEE9],a ; save future bank # for later
     ld a,[H_LOADEDROMBANK] ; get current bank #
     push af
     ld a,[$CEE9] ; get future bank #,switch
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call CopyData
     pop af       ; okay,done,time to switch back
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
-CopyData: ; 00b5 (0:00b5)
+    jr RoutineForRealGB
+
+CopyData:
 ; copy bc bytes of data from hl to de
     ld a,[hli]
     ld [de],a
@@ -136,8 +134,6 @@ CopyData: ; 00b5 (0:00b5)
     or b
     jr nz,CopyData
     ret
-
-SECTION "gameboycolor",ROM0[$0BE] ; Denim ; gameboycolor
 
 CheckIfThisIsInAGBC:
     ld [wFlagGameBoyColor],a
@@ -161,22 +157,17 @@ PostVBlankHandler:
     call FF47toColor
 .NotGBC
     pop af
-    call RoutineForRealGB
-    ret
+    jr RoutineForRealGB
 
 FakeGiveItem:
     ld a,b
     ld [$d11e],a
     jp HackForGetItemName
 
-Tset0E_Coll:
-    INCBIN "gfx/tilesets/0e.tilecoll"
-
-SECTION "RoutineForRealGB",ROM0[$0F5] ; Denim
-
 RoutineForRealGB:
+    ld [H_LOADEDROMBANK],a
     push af
-    cp a,0
+    and a
     jr nz,.NotZero
     inc a
 .NotZero
@@ -188,17 +179,11 @@ SECTION "romheader",ROM0[$100]
     jp CheckIfThisIsInAGBC
 
 SECTION "start",ROM0[$150]
-Start: ; 0150 (0:0150)
+
+Start:
     xor a
     ld [$cf1a],a ; same value ($00) either way
     jp InitGame
-
-GetSpecialListNameOrGetItemName: ; xxxx (0:xxxx) ; Denim
-    ld b,BANK(GetSpecialListNameOrGetItemName_)
-    ld hl,GetSpecialListNameOrGetItemName_
-    jp Bankswitch
-
-SECTION "ReadJoypadRegister",ROM0[$015f]
 
 ; this function directly reads the joypad I/O register
 ; it reads many times in order to give the joypad a chance to stabilize
@@ -212,7 +197,7 @@ SECTION "ReadJoypadRegister",ROM0[$015f]
 ; bit 5 - Left
 ; bit 6 - Up
 ; bit 7 - Down
-ReadJoypadRegister: ; 015f (0:015f)
+ReadJoypadRegister:
     ld a,%00100000 ; select direction keys
     ld c,$00
     ld [rJOYP],a
@@ -251,20 +236,14 @@ ReadJoypadRegister: ; 015f (0:015f)
 ; [H_NEWLYRELEASEDBUTTONS] = keys released since last time
 ; [H_NEWLYPRESSEDBUTTONS] = keys pressed since last time
 ; [H_CURRENTPRESSEDBUTTONS] = currently pressed keys
-GetJoypadState: ; 019a (0:019a)
+GetJoypadState:
     ld a,[H_LOADEDROMBANK]
     push af
-    ld a,$3
-    ld [H_LOADEDROMBANK],a
+    ld a,BANK(_GetJoypadState)
     call RoutineForRealGB
     call _GetJoypadState
     pop af
-    ; fall through
-
-ChangeBank:
-    ld [H_LOADEDROMBANK],a
-    call RoutineForRealGB
-    ret
+    jp RoutineForRealGB
 
 ChangeCurMap:
     push hl
@@ -569,6 +548,11 @@ HandleMenuInputWithWrap:
     ld a,1
     ld [wMenuWrappingEnabled],a
     jp HandleMenuInput
+
+GetSpecialListNameOrGetItemName:
+    ld b,BANK(GetSpecialListNameOrGetItemName_)
+    ld hl,GetSpecialListNameOrGetItemName_
+    jp Bankswitch
 
 SECTION "HandleMidJump",ROM0[$039e]
 
@@ -1139,6 +1123,9 @@ IsSurfingOnLapras:
     cp LAPRAS
     ret
 
+Tset0E_Coll:
+    INCBIN "gfx/tilesets/0e.tilecoll"
+
 SECTION "ContinueCheckWarpsNoCollisionLoop",ROM0[$07b5]
 
 ContinueCheckWarpsNoCollisionLoop: ; 07b5 (0:07b5)
@@ -1319,7 +1306,7 @@ CheckIfInOutsideMap: ; 08e1 (0:08e1)
 ; "function 1" passes when the player is at the edge of the map and is facing towards the outside of the map
 ; "function 2" passes when the the tile in front of the player is among a certain set
 ; sets carry if the check passes,otherwise clears carry
-ExtraWarpCheck: ; 08e9 (0:08e9)
+ExtraWarpCheck:
     call GetCurrentOldAdventureMap
     cp a,SS_ANNE_3
     jr z,.useFunction1
@@ -1349,7 +1336,7 @@ ExtraWarpCheck: ; 08e9 (0:08e9)
     ld b,BANK(Func_c44e)
     jp Bankswitch
 
-MapEntryAfterBattle: ; 091f (0:091f)
+MapEntryAfterBattle:
     ld b,BANK(Func_c35f)
     ld hl,Func_c35f
     call Bankswitch ; function that appears to disable warp testing after collisions if the player is standing on a warp
@@ -1360,21 +1347,20 @@ MapEntryAfterBattle: ; 091f (0:091f)
 
 ; for when all the player's pokemon faint
 ; other code prints the "you blacked out" message before this is called
-HandleBlackOut: ; 0931 (0:0931)
+HandleBlackOut:
     call GBFadeIn1
     ld a,$08
     call StopMusic
     ld hl,$d72e
     res 5,[hl]
     ld a,$01
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call ResetStatusAndHalveMoneyOnBlackout
     call SpecialWarpIn
     call PlayDefaultMusicFadeOutCurrent
     jp SpecialEnterMap
 
-StopMusic: ; 0951 (0:0951)
+StopMusic:
     ld [wMusicHeaderPointer],a
     ld a,$ff
     ld [$c0ee],a
@@ -1385,7 +1371,7 @@ StopMusic: ; 0951 (0:0951)
     jr nz,.waitLoop
     jp StopAllSounds
 
-HandleFlyOrTeleportAway: ; 0965 (0:0965)
+HandleFlyOrTeleportAway:
     call UpdateSprites ; move sprites
     call Delay3
     xor a
@@ -1398,19 +1384,18 @@ HandleFlyOrTeleportAway: ; 0965 (0:0965)
     res 5,[hl]
     call DoFlyOrTeleportAwayGraphics
     ld a,$01
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB
     call SpecialWarpIn
     jp SpecialEnterMap
 
 ; function that calls a function to do fly away or teleport away graphics
-DoFlyOrTeleportAwayGraphics: ; 098f (0:098f)
+DoFlyOrTeleportAwayGraphics:
     ld b,BANK(_DoFlyOrTeleportAwayGraphics)
     ld hl,_DoFlyOrTeleportAwayGraphics
     jp Bankswitch
 
 ; load sprite graphics based on whether the player is standing,biking,or surfing
-LoadPlayerSpriteGraphics: ; 0997 (0:0997)
+LoadPlayerSpriteGraphics:
     ld a,[$d700]
     dec a
     jr z,.ridingBike
@@ -1967,7 +1952,6 @@ LoadCurrentMapView: ; 0ca2 (0:0ca2)
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[$d52b] ; tile data ROM bank
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB ; switch to ROM bank that contains tile data
     ld a,[$d35f] ; address of upper left corner of current map view
     ld e,a
@@ -2049,7 +2033,6 @@ LoadCurrentMapView: ; 0ca2 (0:0ca2)
     dec b
     jr nz,.rowLoop2
     pop af
-    ld [H_LOADEDROMBANK],a
     call RoutineForRealGB ; restore previous ROM bank
 
     ld de,wBackupNearPlayerTiles
@@ -10776,11 +10759,11 @@ Predef: ; 3e6d (0:3e6d)
     push af ; Backup Return Bank
 
     ld a,BANK(GetPredefPointer)
-    call ChangeBank
+    call RoutineForRealGB
     call GetPredefPointer
 
     ; call the predef function
-    call ChangeBank
+    call RoutineForRealGB
     ld de,.Return
     push de
     jp hl
@@ -10796,7 +10779,7 @@ Predef: ; 3e6d (0:3e6d)
     inc sp     ; "Fake Pop"
     inc sp     ; ...
 
-    jp ChangeBank
+    jp RoutineForRealGB
 
 SECTION "Load16BitRegisters",ROM0[$3e94]
 
