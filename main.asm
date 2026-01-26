@@ -69006,16 +69006,13 @@ HiddenObjectMaps:
     db BLUES_HOUSE
     db OAKS_LAB
     db VIRIDIAN_POKECENTER
-    db VIRIDIAN_MART
     db VIRIDIAN_SCHOOL
     db VIRIDIAN_GYM
     db MUSEUM_1F
     db PEWTER_GYM
-    db PEWTER_MART
     db PEWTER_POKECENTER
     db CERULEAN_POKECENTER
     db CERULEAN_GYM
-    db CERULEAN_MART
     db LAVENDER_POKECENTER
     db VERMILION_POKECENTER
     db VERMILION_GYM
@@ -69097,16 +69094,13 @@ HiddenObjectPointers:
     dw BluesHouseHiddenObjects
     dw OaksLabHiddenObjects
     dw ViridianPokecenterHiddenObjects
-    dw ViridianMartHiddenObjects
     dw ViridianSchoolHiddenObjects
     dw ViridianGymHiddenObjects
     dw Museum1FHiddenObjects
     dw PewterGymHiddenObjects
-    dw PewterMartHiddenObjects
     dw PewterPokecenterHiddenObjects
     dw CeruleanPokecenterHiddenObjects
     dw CeruleanGymHiddenObjects
-    dw CeruleanMartHiddenObjects
     dw LavenderPokecenterHiddenObjects
     dw VermilionPokecenterHiddenObjects
     dw VermilionGymHiddenObjects
@@ -69178,13 +69172,8 @@ HiddenObjectPointers:
     dw VermilionCityHiddenObjects
     dw CeruleanCityHiddenObjects
     dw Route4HiddenObjects
-    dw B9HiddenObjects
+    dw Route15GateUpstairsHiddenObjects
     dw HallOfFameRoomHiddenObjects
-
-HallOfFameRoomHiddenObjects:
-    db 01,04,$04 ; Y,X,XXX
-    dbw BANK(UseHallOfFamePC),UseHallOfFamePC
-    db $FF
 
 RedsHouse2FHiddenObjects:
     db $01,$00,$04
@@ -69212,14 +69201,12 @@ OaksLabHiddenObjects:
     db $01,$01,$04
     dbw $07,$6caf
     db $FF
+
 ViridianPokecenterHiddenObjects:
     db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
     db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
-    db $FF
-
-ViridianMartHiddenObjects:
     db $FF
 
 ViridianSchoolHiddenObjects:
@@ -69250,9 +69237,6 @@ PewterGymHiddenObjects:
     dbw BANK(GymStatues),GymStatues
     db $FF
 
-PewterMartHiddenObjects: ; 46bd5 (11:6bd5)
-    db $FF
-
 PewterPokecenterHiddenObjects:
     db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
@@ -69272,9 +69256,6 @@ CeruleanGymHiddenObjects:
     dbw BANK(GymStatues),GymStatues
     db $0b,$06,$04
     dbw BANK(GymStatues),GymStatues
-    db $FF
-
-CeruleanMartHiddenObjects:
     db $FF
 
 LavenderPokecenterHiddenObjects:
@@ -69512,6 +69493,20 @@ RockTunnelPokecenterHiddenObjects:
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
+BattleCenterHiddenObjects:
+    db $04,$05,$d0
+    dbw BANK(CableClubRightGameboy),CableClubRightGameboy
+    db $04,$04,$d0
+    dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
+    db $FF
+
+TradeCenterHiddenObjects:
+    db $04,$05,$d0
+    dbw BANK(CableClubRightGameboy),CableClubRightGameboy
+    db $04,$04,$d0
+    dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
+    db $FF
+
 ViridianForestHiddenObjects:
     db $12,$01,POTION
     dbw BANK(HiddenItems),HiddenItems
@@ -69556,13 +69551,6 @@ SSAnne6HiddenObjects:
 
 SSAnne10HiddenObjects:
     db $01,$03,HYPER_POTION
-    dbw BANK(HiddenItems),HiddenItems
-    db $FF
-
-Route10HiddenObjects:
-    db $11,$09,SUPER_POTION
-    dbw BANK(HiddenItems),HiddenItems
-    db $35,$10,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
@@ -69620,6 +69608,13 @@ SilphCo9FHiddenObjects:
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
+CopycatsHouse2FHiddenObjects:
+    db $01,$01,TRADE_STONE
+    dbw BANK(HiddenItems),HiddenItems
+    db 01,02,$04 ; y,x,
+    dbw BANK(_CopycatsHouseF2Text4),_CopycatsHouseF2Text4
+    db $FF
+
 UnknownDungeon1HiddenObjects:
     db $0b,$0e,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
@@ -69661,15 +69656,6 @@ Mansion3HiddenObjects:
     dbw $14,$627a
     db $FF
 
-Mansion4HiddenObjects:
-    db $09,$01,RARE_CANDY
-    dbw BANK(HiddenItems),HiddenItems
-    db $03,$14,$04
-    dbw $14,$6420
-    db $19,$12,$04
-    dbw $14,$6420
-    db $FF
-
 Route23HiddenObjects:
     db 45,06,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
@@ -69691,9 +69677,11 @@ VictoryPokecenterHiddenObjects:
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
-BillsHouseHiddenObjects_Old:
+BillsHouseHiddenObjects:
     db $04,$01,$04
-    dbw $07,$6b6e
+    dbw BANK(BillsHousePC),BillsHousePC
+    db 06,05,$d0
+    dbw BANK(EnableBillsTeleport),EnableBillsTeleport
     db $FF
 
 ViridianCityHiddenObjects:
@@ -69759,6 +69747,13 @@ FightingDojoHiddenObjects:
     dbw $14,$6a15
     db $FF
 
+Route10HiddenObjects:
+    db $11,$09,SUPER_POTION
+    dbw BANK(HiddenItems),HiddenItems
+    db $35,$10,ELIXER
+    dbw BANK(HiddenItems),HiddenItems
+    db $FF
+
 IndigoPlateauLobbyHiddenObjects:
     db $07,$0f,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
@@ -69794,6 +69789,22 @@ Route11HiddenObjects:
 Route12HiddenObjects:
     db $3f,$02,LEAF_STONE
     dbw BANK(HiddenItems),HiddenItems
+    db $FF
+
+Mansion2HiddenObjects:
+    db $0b,$02,$04
+    dbw BANK(Func_52037),Func_52037
+    db 07,28,FIRE_STONE
+    dbw BANK(HiddenItems),HiddenItems
+    db $FF
+
+Mansion4HiddenObjects:
+    db $09,$01,RARE_CANDY
+    dbw BANK(HiddenItems),HiddenItems
+    db $03,$14,$04
+    dbw $14,$6420
+    db $19,$12,$04
+    dbw $14,$6420
     db $FF
 
 SilphCo11FHiddenObjects:
@@ -69853,44 +69864,14 @@ Route4HiddenObjects:
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
-BillsHouseHiddenObjects:
-    db $04,$01,$04
-    dbw BANK(BillsHousePC),BillsHousePC
-    db 06,05,$d0
-    dbw BANK(EnableBillsTeleport),EnableBillsTeleport
-    db $FF
-
-Mansion2HiddenObjects:
-    db $0b,$02,$04
-    dbw BANK(Func_52037),Func_52037
-    db 07,28,FIRE_STONE
-    dbw BANK(HiddenItems),HiddenItems
-    db $FF
-
-B9HiddenObjects:
+Route15GateUpstairsHiddenObjects:
     db $02,$01,$04
     dbw BANK(Route15UpstairsLeftBinoculars),Route15UpstairsLeftBinoculars
     db $FF
 
-BattleCenterHiddenObjects:
-    db $04,$05,$d0
-    dbw BANK(CableClubRightGameboy),CableClubRightGameboy
-    db $04,$04,$d0
-    dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
-    db $FF
-
-TradeCenterHiddenObjects:
-    db $04,$05,$d0
-    dbw BANK(CableClubRightGameboy),CableClubRightGameboy
-    db $04,$04,$d0
-    dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
-    db $FF
-
-CopycatsHouse2FHiddenObjects:
-    db $01,$01,TRADE_STONE
-    dbw BANK(HiddenItems),HiddenItems
-    db 01,02,$04 ; y,x,
-    dbw BANK(_CopycatsHouseF2Text4),_CopycatsHouseF2Text4
+HallOfFameRoomHiddenObjects:
+    db 01,04,$04 ; Y,X,XXX
+    dbw BANK(UseHallOfFamePC),UseHallOfFamePC
     db $FF
 
 ; ────────────────────────────────────────────────────────
