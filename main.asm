@@ -546,9 +546,7 @@ HandleMenuInputWithWrap:
     jp HandleMenuInput
 
 GetSpecialListNameOrGetItemName:
-    ld b,BANK(GetSpecialListNameOrGetItemName_)
-    ld hl,GetSpecialListNameOrGetItemName_
-    jp Bankswitch
+    BANKSWITCH_JUMP GetSpecialListNameOrGetItemName_
 
 SECTION "HandleMidJump",ROM0[$039e]
 
@@ -557,18 +555,14 @@ SECTION "HandleMidJump",ROM0[$039e]
 ; down a ledge
 ; it also ends the jump when it's completed
 HandleMidJump: ; 039e (0:039e)
-    ld b,BANK(_HandleMidJump)
-    ld hl,_HandleMidJump
-    jp Bankswitch
+    BANKSWITCH_JUMP _HandleMidJump
 
 ; this is jumped to immediately after loading a save / starting a new game / loading a new map
 EnterMap: ; 03a6 (0:03a6)
     ld a,$ff
     ld [wJoypadForbiddenButtonsMask],a
     call LoadMapData ; load map data
-    ld b,BANK(Func_c335)
-    ld hl,Func_c335
-    call Bankswitch ; initialize some variables
+    BANKSWITCH Func_c335 ; initialize some variables
     ld hl,$d72c
     bit 0,[hl]
     jr z,.doNotCountSteps
@@ -585,14 +579,10 @@ EnterMap: ; 03a6 (0:03a6)
     and a,$18
     jr z,.didNotFlyOrTeleportIn
     res 3,[hl]
-    ld b,BANK(Func_70510)
-    ld hl,Func_70510
-    call Bankswitch ; display fly/teleport in graphical effect
+    BANKSWITCH Func_70510 ; display fly/teleport in graphical effect
     call UpdateSprites ; move sprites
 .didNotFlyOrTeleportIn
-    ld b,BANK(CheckForceBikeOrSurf)
-    ld hl,CheckForceBikeOrSurf
-    call Bankswitch ; handle currents in SF islands and forced bike riding in cycling road
+    BANKSWITCH CheckForceBikeOrSurf ; handle currents in SF islands and forced bike riding in cycling road
     ld hl,$d72d
     res 5,[hl]
     call UpdateSprites ; move sprites
@@ -615,9 +605,7 @@ OverworldLoop: ; 03ff (0:03ff)
     and a
     jp nz,.moveAhead ; if the player sprite has not yet completed the walking animation
     call GetJoypadStateOverworld ; get joypad state (which is possibly simulated)
-    ld b,BANK(Func_1e988)
-    ld hl,Func_1e988
-    call Bankswitch
+    BANKSWITCH Func_1e988
     ld a,[$da46]
     and a
     jp nz,WarpFound2
@@ -656,9 +644,7 @@ OverworldLoop: ; 03ff (0:03ff)
     bit 2,a ; was the select button pressed?
     jr z,.selectButtonNotPressed
 ; if SELECT is pressed
-    ld b,BANK(SelectInOverWorld)
-    ld hl,SelectInOverWorld
-    call Bankswitch
+    BANKSWITCH SelectInOverWorld
     jr OverworldLoop
 .selectButtonNotPressed
     bit 0,a ; A button
@@ -844,9 +830,7 @@ OverworldLoop: ; 03ff (0:03ff)
     ld a,[$d736]
     bit 7,a
     jr z,.noSpinning
-    ld b,BANK(Func_44fd7)
-    ld hl,Func_44fd7
-    call Bankswitch ; spin while moving
+    BANKSWITCH Func_44fd7 ; spin while moving
 .noSpinning
     call UpdateSprites ; move sprites
 .moveAhead2
@@ -873,9 +857,7 @@ OverworldLoop: ; 03ff (0:03ff)
     ld hl,$d72c
     res 0,[hl]
 .doneStepCounting
-    ld b,BANK(Func_1e997) ; Forced also in "not safari" because Count FossilSteps
-    ld hl,Func_1e997
-    call Bankswitch
+    BANKSWITCH Func_1e997 ; Forced also in "not safari" because Count FossilSteps
     ld a,[$d790]
     bit 7,a ; in the safari zone?
     jr z,.notSafariZone
@@ -916,9 +898,7 @@ OverworldLoop: ; 03ff (0:03ff)
     call GetCurrentOldAdventureMap
     cp a,OAKS_LAB
     jp z,.noFaintCheck
-    ld hl,AnyPokemonAliveCheck
-    ld b,BANK(AnyPokemonAliveCheck)
-    call Bankswitch ; check if all the player's pokemon fainted
+    BANKSWITCH AnyPokemonAliveCheck ; check if all the player's pokemon fainted
     call RestoreFaintenedWith1HP
     ld a,d
     and a
@@ -947,9 +927,7 @@ NewBattle:
     ld a,[W_UNKNOWNDUNGEON3CURSCRIPT]
     cp $03 ; WaitGengarMoving
     jr z,.noBattle
-    ld b,BANK(InitBattle)
-    ld hl,InitBattle
-    jp Bankswitch ; determines if a battle will occurr and runs the battle if so
+    BANKSWITCH_JUMP InitBattle ; determines if a battle will occurr and runs the battle if so
 .noBattle
     and a
     ret
@@ -990,9 +968,7 @@ CheckWarpsNoCollisionLoop: ; 06cc (0:06cc)
     push bc
     ld hl,$d736
     set 2,[hl]
-    ld b,BANK(Func_c49d)
-    ld hl,Func_c49d
-    call Bankswitch ; check if the player sprite is standing on a "door" tile
+    BANKSWITCH Func_c49d ; check if the player sprite is standing on a "door" tile
     pop bc
     pop hl
     jr c,WarpFound1 ; if it is,go to 0735
@@ -1084,9 +1060,7 @@ WarpFound2: ; 073c (0:073c)
     jr z,.goBackOutside
 ; if not going back to the previous map
     call ChangeCurMap ; current map number
-    ld b,BANK(Func_70787)
-    ld hl,Func_70787
-    call Bankswitch ; check if the warp was a Silph Co. teleporter
+    BANKSWITCH Func_70787 ; check if the warp was a Silph Co. teleporter
     ld a,[$cd5b]
     dec a
     jr nz,.notTeleporter
@@ -1261,9 +1235,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     call GoPAL_SET
 ; Since the sprite set shouldn't change,this will just update VRAM slots at
 ; $C2XE without loading any tile patterns.
-    ld b,BANK(InitMapSprites)
-    ld hl,InitMapSprites
-    call Bankswitch
+    BANKSWITCH InitMapSprites
     call LoadTileBlockMap
     jp OverworldLoop+3
 .didNotEnterConnectedMap
@@ -1333,9 +1305,7 @@ ExtraWarpCheck:
     jp Bankswitch
 
 MapEntryAfterBattle:
-    ld b,BANK(Func_c35f)
-    ld hl,Func_c35f
-    call Bankswitch ; function that appears to disable warp testing after collisions if the player is standing on a warp
+    BANKSWITCH Func_c35f ; function that appears to disable warp testing after collisions if the player is standing on a warp
     ld a,[$d35d]
     and a
     jp z,GBFadeIn2
@@ -1386,9 +1356,7 @@ HandleFlyOrTeleportAway:
 
 ; function that calls a function to do fly away or teleport away graphics
 DoFlyOrTeleportAwayGraphics:
-    ld b,BANK(_DoFlyOrTeleportAwayGraphics)
-    ld hl,_DoFlyOrTeleportAwayGraphics
-    jp Bankswitch
+    BANKSWITCH_JUMP _DoFlyOrTeleportAwayGraphics
 
 ; load sprite graphics based on whether the player is standing,biking,or surfing
 LoadPlayerSpriteGraphics:
@@ -1834,9 +1802,7 @@ NoCollision::
     ret
 
 CheckExceptionTilePassable:
-    ld b,BANK(_CheckExceptionTilePassable)
-    ld hl,_CheckExceptionTilePassable
-    jp Bankswitch ; check if the player is trying to jump a ledge
+    BANKSWITCH_JUMP _CheckExceptionTilePassable ; check if the player is trying to jump a ledge
 
 ; ──────────────────────
 ; Handle Ghost Battle
@@ -2560,15 +2526,11 @@ RunMapScript: ; 101b (0:101b)
     push hl
     push de
     push bc
-    ld b,BANK(TryPushingBoulder)
-    ld hl,TryPushingBoulder
-    call Bankswitch ; check if the player is pushing a boulder
+    BANKSWITCH TryPushingBoulder ; check if the player is pushing a boulder
     ld a,[wFlags_0xcd60]
     bit 1,a ; is the player pushing a boulder?
     jr z,.afterBoulderEffect
-    ld b,BANK(DoBoulderDustAnimation)
-    ld hl,DoBoulderDustAnimation
-    call Bankswitch ; displays dust effect when pushing a boulder
+    BANKSWITCH DoBoulderDustAnimation ; displays dust effect when pushing a boulder
 .afterBoulderEffect
     pop bc
     pop de
@@ -2621,9 +2583,7 @@ SECTION "LoadMapHeader",ROM0[$107c]
 
 ; function to load data from the map header
 LoadMapHeader: ; 107c (0:107c)
-    ld b,BANK(SetVisitedAndLoadMissableObj)
-    ld hl,SetVisitedAndLoadMissableObj
-    call Bankswitch
+    BANKSWITCH SetVisitedAndLoadMissableObj
     ld a,[W_CURMAPTILESET]
     ld [$d119],a
     ld a,[W_CURMAP]
@@ -2636,9 +2596,7 @@ LoadMapHeader: ; 107c (0:107c)
     bit 7,b
     ret nz
 
-    ld b,BANK(GetPointerToBaseOfMapHeader)
-    ld hl,GetPointerToBaseOfMapHeader
-    call Bankswitch ; hl = base of map header
+    BANKSWITCH GetPointerToBaseOfMapHeader ; hl = base of map header
 
 ;    call GetMapHeaderPointers ; ld hl,MapHeaderPointers
 ;    ld a,[W_CURMAP]
@@ -2877,9 +2835,7 @@ LoadMapHeader: ; 107c (0:107c)
     jp nz,.loadSpriteLoop
 .finishUp
     PREDEF Func_c754 ; load tileset data
-    ld hl,LoadWildData
-    ld b,BANK(LoadWildData)
-    call Bankswitch ; load wild pokemon data
+    BANKSWITCH LoadWildData ; load wild pokemon data
     pop hl ; restore hl from before going to the warp/sign/sprite data (this value was saved for seemingly no purpose)
     ld a,[W_CURMAPHEIGHT] ; map height in 4x4 tile blocks
     add a ; double it
@@ -2942,9 +2898,7 @@ LoadMapData:
     ld [$d3a8],a
     call LoadTextBoxTilePatterns
     call LoadMapHeader
-    ld b,BANK(InitMapSprites)
-    ld hl,InitMapSprites
-    call Bankswitch ; load tile pattern data for sprites
+    BANKSWITCH InitMapSprites ; load tile pattern data for sprites
     call LoadTileBlockMap
     call LoadTilesetTilePatternData
     call LoadCurrentMapView
@@ -3142,9 +3096,7 @@ DrawHPBar:
 ; $cf98 = base address of pokemon data
 ; $d0b8 = base address of base stats
 LoadMonData:
-    ld hl,LoadMonData_
-    ld b,BANK(LoadMonData_)
-    jp Bankswitch
+    BANKSWITCH_JUMP LoadMonData_
 
 CheckNewAdventureFlag:
     push hl
@@ -3332,9 +3284,7 @@ HandlePartyMenuInput:
     bit 1,b ; was the B button pressed?
     jr z,.handleSwap ; if not,handle swapping the pokemon
 .cancelSwap ; if the B button was pressed
-    ld b,BANK(ErasePartyMenuCursors)
-    ld hl,ErasePartyMenuCursors
-    call Bankswitch
+    BANKSWITCH ErasePartyMenuCursors
     xor a
     ld [$cc35],a
     ld [$d07d],a
@@ -3343,9 +3293,7 @@ HandlePartyMenuInput:
 .handleSwap
     ld a,[wCurrentMenuItem]
     ld [$cf92],a
-    ld b,BANK(Func_13613)
-    ld hl,Func_13613
-    call Bankswitch
+    BANKSWITCH Func_13613
     jr HandlePartyMenuInput
 
 DrawPartyMenu:
@@ -3611,9 +3559,7 @@ PrintBCDDigit: ; 1604 (0:1604)
 UncompressMonSprite: ; 1627 (0:1627) ; Denim,completamente ristrutturato
     push hl
     ld e,l
-    ld b,BANK(CheckSpecialHybridSprite)
-    ld hl,CheckSpecialHybridSprite
-    call Bankswitch
+    BANKSWITCH CheckSpecialHybridSprite
     pop hl
     jr c,.NormalId
     ld hl,W_SPRITEINPUTPTR
@@ -5466,9 +5412,7 @@ VBlankHandler:
 .bank1F
     call Func_7d177
 .afterMusic
-    ld b,BANK(Func_18dee)
-    ld hl,Func_18dee
-    call Bankswitch ; keep track of time played
+    BANKSWITCH Func_18dee ; keep track of time played
     ld a,[$fff9]
     and a
     call z,ReadJoypadRegister
@@ -5814,9 +5758,7 @@ Func_2247: ; 2247 (0:2247)
 
 Func_226e: ; 226e (0:226e)
     call SaveScreenTilesToBuffer1
-    ld hl,Func_4c05
-    ld b,BANK(Func_4c05)
-    call Bankswitch
+    BANKSWITCH Func_4c05
     call Func_227f
     jp LoadScreenTilesFromBuffer1
 
@@ -6138,9 +6080,7 @@ IsTown:
 
 ; unsets carry if player is facing water or shore
 IsNextTileShoreOrWater:
-    ld b,BANK(_IsNextTileShoreOrWater)
-    ld hl,_IsNextTileShoreOrWater
-    jp Bankswitch
+    BANKSWITCH_JUMP _IsNextTileShoreOrWater
 
 ResetButtonPressedAndMapScript:
     xor a
@@ -6153,9 +6093,7 @@ ResetButtonPressedAndMapScript:
 
 ; calls TrainerWalkUpToPlayer
 TrainerWalkUpToPlayer_Bank0:
-    ld b,BANK(TrainerWalkUpToPlayer)
-    ld hl,TrainerWalkUpToPlayer
-    jp Bankswitch
+    BANKSWITCH_JUMP TrainerWalkUpToPlayer
 
 GetTileOffset:
     push hl
@@ -6912,9 +6850,7 @@ Func_28cb: ; 28cb (0:28cb)
 DisplayTextID: ; 2920 (0:2920)
     ld a,[H_LOADEDROMBANK]
     push af
-    ld b,BANK(DisplayTextIDInit)
-    ld hl,DisplayTextIDInit ; initialization
-    call Bankswitch
+    BANKSWITCH DisplayTextIDInit ; initialization
     ld hl,$cf11
     bit 0,[hl]
     res 0,[hl]
@@ -6953,9 +6889,7 @@ ReturnInDisplayTextIDHack:
     push hl
     push de
     push bc
-    ld b,BANK(Func_13074)
-    ld hl,Func_13074
-    call Bankswitch ; update the graphics of the sprite the player is talking to (to face the right direction)
+    BANKSWITCH Func_13074 ; update the graphics of the sprite the player is talking to (to face the right direction)
     pop bc
     pop de
     ld hl,W_MAPSPRITEDATA ; NPC text entries
@@ -6993,18 +6927,14 @@ ReturnInDisplayTextIDHack:
     jp z,FuncTX_PokemonCenterPC
     cp a,$f5   ; Vending Machine
     jr nz,.notVendingMachine
-    ld b,BANK(VendingMachineMenu)
-    ld hl,VendingMachineMenu
-    call Bankswitch     ; jump banks to vending machine routine
+    BANKSWITCH VendingMachineMenu ; jump banks to vending machine routine
     jr AfterDisplayingTextID
 .notVendingMachine
     cp a,$f7   ; slot machine
     jp z,FuncTX_SlotMachine
     cp a,$f6   ; cable connection NPC in Pokemon Center
     jr nz,.notSpecialCase
-    ld hl,DebugNPC ; CableClubNPC
-    ld b,BANK(DebugNPC) ; BANK(CableClubNPC)
-    call Bankswitch
+    BANKSWITCH DebugNPC ; BANKSWITCH CableClubNPC
     jr AfterDisplayingTextID
 .notSpecialCase
     call Func_3c59 ; display the text
@@ -7115,9 +7045,7 @@ DisplayPokemonCenterDialogue:
     jp AfterDisplayingTextID
 
 DisplaySafariGameOverText:
-    ld hl,Func_1e9ed
-    ld b,BANK(Func_1e9ed)
-    call Bankswitch
+    BANKSWITCH Func_1e9ed
     jp AfterDisplayingTextID
 
 DisplayPokemonFaintedText:
@@ -7142,9 +7070,7 @@ PlayerBlackedOutText:
     db "@"
 
 DisplayRepelWoreOffText:
-    ld b,BANK(TryUseAnotherRepel)
-    ld hl,TryUseAnotherRepel
-    call Bankswitch
+    BANKSWITCH TryUseAnotherRepel
     jp CloseTextDisplay
 
 DisplayStartMenu:
@@ -7159,12 +7085,8 @@ DisplayStartMenu:
     ; fall through
 
 RedisplayStartMenu:
-    ld b,BANK(DrawStartMenu)
-    ld hl,DrawStartMenu
-    call Bankswitch
-    ld b,BANK(Func_c52f)
-    ld hl,Func_c52f
-    call Bankswitch ; print Safari Zone info,if in Safari Zone
+    BANKSWITCH DrawStartMenu
+    BANKSWITCH Func_c52f ; print Safari Zone info,if in Safari Zone
     call UpdateSprites ; move sprites
 .loop
     call HandleMenuInput
@@ -7270,9 +7192,7 @@ CountSetBits:
 ; subtracts the amount the player paid from their money
 ; sets carry flag if there is enough money and unsets carry flag if not
 SubtractAmountPaidFromMoney:
-    ld b,BANK(SubtractAmountPaidFromMoney_)
-    ld hl,SubtractAmountPaidFromMoney_
-    jp Bankswitch
+    BANKSWITCH_JUMP SubtractAmountPaidFromMoney_
 
 ; adds the amount the player sold to their money
 AddAmountSoldToMoney:
@@ -7526,39 +7446,11 @@ SECTION "DisplayChooseQuantityMenu",ROM0[$2d57]
 
 DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
 ; text box dimensions/coordinates for just quantity
-          ; FuncCoord 15,9
-    ;ds 3 ; ld hl,Coord
-    ;ds 2 ; ld b,1 ; height
-    ;ds 2 ; ld c,3 ; width
-    ;ds 3 ; ld a,[wListMenuID]
-    ;ds 2 ; cp a,PRICEDITEMLISTMENU
-    ;ds 2 ; jr nz,.drawTextBox
-; text box dimensions/coordinates for quantity and price
-          ; FuncCoord 7,9
-    ;ds 3 ; ld hl,Coord
-    ;ds 2 ; ld b,3  ; height
-    ;ds 2 ; ld c,11 ; width
-;.drawTextBox
-    ;ds 3 ; call TextBoxBorder
-          ; FuncCoord 16,10
-    ;ds 3 ; ld hl,Coord
-    ;ds 3 ; ld a,[wListMenuID]
-    ;ds 2 ; cp a,PRICEDITEMLISTMENU
-    ;ds 2 ; jr nz,.printInitialQuantity
-          ; FuncCoord 8,10
-    ;ds 3 ; ld hl,Coord
-;.printInitialQuantity
-    ;ds 3 ; ld de,InitialQuantityText
-    ;ds 3 ; call PlaceString
-    ;ds 1 ; xor a
-    ;ds 3 ; ld [$cf96],a ; initialize current quantity to 0
 
     ld a,1
     ld [$ffb7],a ; Set Quick Menu
 
-    ld b,BANK(InitializeChooseQuantityMenu) ; 2 byte
-    ld hl,InitializeChooseQuantityMenu ; 3 byte
-    call Bankswitch ; 3 byte
+    BANKSWITCH InitializeChooseQuantityMenu
 
     jr .incrementQuantity
 
@@ -7650,7 +7542,7 @@ DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
 .skipHalvingPrice
     FuncCoord 12,10
     ld hl,Coord
-    ld de,SpacesBetweenQuantityAndPriceText
+    ld de,.SpacesBetweenQuantityAndPriceText
     call PlaceString
     ld de,$ff9f ; total price
     ld c,$a3
@@ -7672,11 +7564,7 @@ DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
     call .buttonCommonPressed
     ld a,$ff
     ret
-
-InitialQuantityText: ; 2e30 (0:2e30)
-    db "×01@"
-
-SpacesBetweenQuantityAndPriceText: ; 2e34 (0:2e34)
+.SpacesBetweenQuantityAndPriceText
     db "      @"
 
 ; ───────────────────────────────────────
@@ -7900,13 +7788,10 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     ld a,[wListMenuID]
     cp a,ITEMLISTMENU
     ret nz
-    ld b,BANK(PrintMenuItemQty)
-    ld hl,PrintMenuItemQty
-    call Bankswitch
+    BANKSWITCH PrintMenuItemQty
+    ; fall through
 
-SECTION "GetMonName",ROM0[$2f9e]
-
-GetMonName: ; 2f9e (0:2f9e)
+GetMonName:
     push hl
     ld a,[H_LOADEDROMBANK]
     push af
@@ -8061,9 +7946,7 @@ ReloadTilesetTilePatterns:
 ChooseFlyDestination:
     ld hl,$d72e
     res 4,[hl]
-    ld b,BANK(_ChooseFlyDestination)
-    ld hl,_ChooseFlyDestination
-    jp Bankswitch
+    BANKSWITCH_JUMP _ChooseFlyDestination
 
 ; causes the text box to close waithout waiting for a button press after displaying text
 DisableWaitingAfterTextDisplay:
@@ -8081,9 +7964,7 @@ DisableWaitingAfterTextDisplay:
 ; 01: successful
 ; 02: not able to be used right now,no extra menu displayed (only certain items use this)
 UseItem:
-    ld b,BANK(UseItem_)
-    ld hl,UseItem_
-    jp Bankswitch
+    BANKSWITCH_JUMP UseItem_
 
 ; confirms the item toss and then tosses the item
 ; INPUT:
@@ -8114,9 +7995,7 @@ IsKeyItem:
     push hl
     push de
     push bc
-    ld b,BANK(IsKeyItem_)
-    ld hl,IsKeyItem_
-    call Bankswitch
+    BANKSWITCH IsKeyItem_
     pop bc
     pop de
     pop hl
@@ -8176,14 +8055,10 @@ Func_310e:
     dw PointerTable_1a510
     dw PointerTable_1a57d
 .asm_3146
-    ld b,BANK(Func_1a3e0)
-    ld hl,Func_1a3e0
-    jp Bankswitch
+    BANKSWITCH_JUMP Func_1a3e0
 
 Func_314e:
-    ld b,BANK(Func_1a41d)
-    ld hl,Func_1a41d
-    jp Bankswitch
+    BANKSWITCH_JUMP Func_1a41d
 
 ; Free
 
@@ -8447,7 +8322,7 @@ Func_32f9: ; 32f9 (0:32f9)
 Func_32fe: ; 32fe (0:32fe)
     ld hl,Func_5685d
 asm_3301: ; 3301 (0:3301)
-    ld b,$15
+    ld b,BANK(Func_5685d) ; also Func_567f9,Func_56819,Func_5683d
     jp Bankswitch
 
 CheckForEngagingTrainers: ; 3306 (0:3306)
@@ -8538,17 +8413,13 @@ Func_3381:
     ld a,[W_PBSTOREDROMBANK]
     call RoutineForRealGB
     push hl
-    ld b,BANK(SaveTrainerName)
-    ld hl,SaveTrainerName
-    call Bankswitch
+    BANKSWITCH SaveTrainerName
     ld hl,.UnnamedText_33cf
     call PrintText
     pop hl
     pop af
     call RoutineForRealGB
-    ld b,BANK(Func_1a5e7)
-    ld hl,Func_1a5e7
-    call Bankswitch
+    BANKSWITCH Func_1a5e7
     jp WaitForSoundToFinish
 
 .Func_33b7
@@ -8585,18 +8456,14 @@ PlayTrainerMusic:
     ld a,[W_GYMLEADERNO]
     and a
     ret nz
-    ld b,BANK(PlayTrainerMusic_)
-    ld hl,PlayTrainerMusic_
-    jp Bankswitch
+    BANKSWITCH_JUMP PlayTrainerMusic_
 
 UpgradeTrainerSet:
     PREDEF_JUMP UpgradeTrainerSet_
 
 TryGymLeaderRematch:
     push hl
-    ld hl,TryGymLeaderRematch_
-    ld b,BANK(TryGymLeaderRematch_)
-    call Bankswitch
+    BANKSWITCH TryGymLeaderRematch_
     pop hl
     jr c,.end
     call PrintText
@@ -8612,9 +8479,7 @@ GymLeaderRematchText2:
     db "@"
 
 GymLeaderAfterRematch:
-    ld hl,GymLeaderAfterRematch_
-    ld b,BANK(GymLeaderAfterRematch_)
-    jp Bankswitch
+    BANKSWITCH_JUMP GymLeaderAfterRematch_
 
 CheckHallOfFameWin:
     ld a,[$d5a2] ; hall of fame
@@ -8709,9 +8574,7 @@ IsItemInBag: ; 3493 (0:3493)
 
 DisplayPokedex: ; 349b (0:349b)
     ld [$d11e],a
-    ld b,BANK(DisplayPokedex_)
-    ld hl,DisplayPokedex_
-    jp Bankswitch
+    BANKSWITCH_JUMP DisplayPokedex_
 
 Func_34a6: ; 34a6 (0:34a6)
     call Func_34ae
@@ -8919,9 +8782,7 @@ Func_3566: ; 3566 (0:3566)
     ret
 
 Func_359e: ; 359e (0:359e)
-    ld b,BANK(Func_13a58)
-    ld hl,Func_13a58
-    jp Bankswitch
+    BANKSWITCH_JUMP Func_13a58
 
 ; tests if player's money are at least as much as [$ff9f]
 ; sets carry flag if not enough money
@@ -9105,9 +8966,7 @@ LoadTextBoxTilePatterns: ; 36a0 (0:36a0)
 
 ; copies HP bar and status display tile patterns into VRAM
 LoadHpBarAndStatusTilePatterns: ; 36c0 (0:36c0)
-    ld b,BANK(LoadHpBarAndStatusTilePatterns_)
-    ld hl,LoadHpBarAndStatusTilePatterns_
-    jp Bankswitch
+    BANKSWITCH_JUMP LoadHpBarAndStatusTilePatterns_
 
 ; Output -> a
 HackFromBank0:
@@ -9119,9 +8978,7 @@ HackFromBank0:
     ld d,a ; Input
     ld a,[hl]
     ld e,a ; Input
-    ld hl,_HackFromBank0
-    ld b,BANK(_HackFromBank0)
-    call Bankswitch
+    BANKSWITCH _HackFromBank0
     ld a,d ; Output
     pop hl
     pop de
@@ -9479,9 +9336,7 @@ ManualTextScroll:
 Multiply:
     push hl
     push bc
-    ld hl,_Multiply
-    ld b,BANK(_Multiply)
-    call Bankswitch
+    BANKSWITCH _Multiply
     pop bc
     pop hl
     ret
@@ -9582,17 +9437,13 @@ CopyDataUntil: ; 3913 (0:3913)
 ; [$cf95] == 0 specifies the party.
 ; [$cf95] != 0 specifies the current box.
 RemovePokemon: ; 391f (0:391f)
-    ld hl,_RemovePokemon
-    ld b,BANK(_RemovePokemon)
-    jp Bankswitch
+    BANKSWITCH_JUMP _RemovePokemon
 
 AddPokemonToParty: ; 3927 (0:3927)
     push hl
     push de
     push bc
-    ld b,BANK(_AddPokemonToParty)
-    ld hl,_AddPokemonToParty
-    call Bankswitch
+    BANKSWITCH _AddPokemonToParty
     pop bc
     pop de
     pop hl
@@ -9916,9 +9767,7 @@ HandleMenuInputPokemonSelection: ; 3ac2 (0:3ac2)
     ld a,[$d09b]
     and a ; is it a pokemon selection menu?
     jr z,.getJoypadState
-    ld b,BANK(ShakeMiniSprite)
-    ld hl,ShakeMiniSprite ; shake mini sprite of selected pokemon
-    call Bankswitch
+    BANKSWITCH ShakeMiniSprite ; shake mini sprite of selected pokemon
 .getJoypadState
     pop hl
     call GetJoypadStateLowSensitivity
@@ -10549,9 +10398,7 @@ ReloadMapSpriteTilePatterns: ; 3e08 (0:3e08)
     xor a
     ld [W_SPRITESETID],a ; $d3a8
     call DisableLCD
-    ld b,BANK(InitMapSprites)
-    ld hl,InitMapSprites
-    call Bankswitch
+    BANKSWITCH InitMapSprites
     call EnableLCD
     pop hl
     pop af
@@ -10584,18 +10431,14 @@ GivePokemon: ; 3e48 (0:3e48)
     ld [$d127],a
     xor a
     ld [$cc49],a
-    ld b,BANK(_GivePokemon)
-    ld hl,_GivePokemon
-    jp Bankswitch
+    BANKSWITCH_JUMP _GivePokemon
 
 GenRandom: ; 3e5c (0:3e5c)
 ; store a random 8-bit value in a
     push hl
     push de
     push bc
-    ld b,BANK(GenRandom_)
-    ld hl,GenRandom_
-    call Bankswitch
+    BANKSWITCH GenRandom_
     ld a,[H_RAND1]
     pop bc
     pop de
@@ -10655,9 +10498,7 @@ Load16BitRegisters: ; 3e94 (0:3e94)
     ret
 
 Func_3ead:
-    ld b,BANK(CinnabarGymProcessAllGate)
-    ld hl,CinnabarGymProcessAllGate
-    jp Bankswitch
+    BANKSWITCH_JUMP CinnabarGymProcessAllGate
 
 Func_3eb5:
     ld a,[H_LOADEDROMBANK]
@@ -10679,9 +10520,7 @@ Func_3eb5:
     xor a
     jr .asm_3eec
 .asm_3edd
-    ld b,BANK(Func_fb50)
-    ld hl,Func_fb50
-    call Bankswitch
+    BANKSWITCH Func_fb50
     ld a,[$FF00+$db]
     and a
     jr z,.asm_3eec
@@ -10839,9 +10678,7 @@ HackItemInBattle:
     push bc
     push de
     ld e,l
-    ld hl,_HackItemInBattle
-    ld b,BANK(_HackItemInBattle)
-    call Bankswitch
+    BANKSWITCH _HackItemInBattle
     ld h,d
     ld l,e
     pop de
@@ -10982,9 +10819,7 @@ IsTryingToLearnPalFix:
     ld hl,wFlagLearnAfterEvolutBit0
     bit 0,[hl]
     ret nz
-    ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
-    ld hl,HidePlayerBattleHudAndStandarizePalette
-    jp Bankswitch
+    BANKSWITCH_JUMP HidePlayerBattleHudAndStandarizePalette
 
 IsTryingToLearnPalFix_PrintText:
     push hl
@@ -10999,9 +10834,7 @@ IsTryingToLearnPalFix_End:
     ld hl,wFlagLearnAfterEvolutBit0
     bit 0,[hl]
     ret nz
-    ld hl,HidePlayerBattleHudAndRestorePalette_
-    ld b,BANK(HidePlayerBattleHudAndRestorePalette_)
-    call Bankswitch
+    BANKSWITCH HidePlayerBattleHudAndRestorePalette_
     PREDEF_JUMP DrawPlayerHUDAndHPBar
 
 PrintSafariZoneBattleText:
@@ -11265,9 +11098,7 @@ ENDC
     ld c,$1
     call CheckForUserInterruption
     jr c,.asm_4459
-    ld b,BANK(Func_372ac)
-    ld hl,Func_372ac
-    call Bankswitch
+    BANKSWITCH Func_372ac
     call Func_4496
     jr .asm_443b
 .asm_4459
@@ -11295,9 +11126,7 @@ ENDC
     jp MainMenu
 
 Func_448e: ; 448e (1:448e)
-    ld b,BANK(Func_1c98a)
-    ld hl,Func_1c98a
-    jp Bankswitch
+    BANKSWITCH_JUMP Func_1c98a
 
 Func_4496: ; 4496 (1:4496)
     ld a,$98
@@ -11318,17 +11147,13 @@ Func_4496: ; 4496 (1:4496)
     ld a,$90
     ld [$FF00+$b0],a
     ld d,$1
-    ld b,BANK(LoadScreenTilesFromBuffer18)
-    ld hl,LoadScreenTilesFromBuffer18
-    jp Bankswitch
+    BANKSWITCH_JUMP LoadScreenTilesFromBuffer18
 
 SECTION "Func_44c1",ROMX[$44c1],BANK[$1]
 
 Func_44c1: ; 44c1 (1:44c1)
     ld d,$0
-    ld b,BANK(LoadScreenTilesFromBuffer18)
-    ld hl,LoadScreenTilesFromBuffer18
-    call Bankswitch
+    BANKSWITCH LoadScreenTilesFromBuffer18
     xor a
     ld [$FF00+$b0],a
     ret
@@ -13391,9 +13216,7 @@ Func_5530
 .asm_559a
     ld a,$1
     ld [$d11b],a
-    ld hl,Func_39bd5
-    ld b,$e
-    call Bankswitch
+    BANKSWITCH Func_39bd5
     ld hl,wEnemyMons
     call Func_57d6
     jp .asm_565b
@@ -13450,9 +13273,7 @@ Func_5530
     jp .asm_5665
     ld a,$4
     ld [$d11b],a
-    ld hl,Func_39bd5
-    ld b,$e
-    call Bankswitch
+    BANKSWITCH Func_39bd5
     call Func_57d6
     jp .asm_565b
 .asm_562e
@@ -13545,9 +13366,7 @@ Func_5530
     ld [$cc26],a
     ld a,$4
     ld [$d11b],a
-    ld hl,Func_39bd5
-    ld b,$e
-    call Bankswitch
+    BANKSWITCH Func_39bd5
     call Func_57d6
     call LoadScreenTilesFromBuffer1
     jp .asm_55dc
@@ -13620,9 +13439,7 @@ Func_577d: ; 577d (1:577d)
     dec a
     ld [$d42f],a
     call LoadMapData
-    ld b,BANK(Func_c335)
-    ld hl,Func_c335
-    call Bankswitch
+    BANKSWITCH Func_c335
     pop hl
     pop af
     ld [hl],a
@@ -13876,9 +13693,7 @@ TradeCenter_Trade:
 .asm_59d9
     PREDEF Func_410f3
 .asm_59de
-    ld hl,TryEvolvingMon
-    ld b,BANK(TryEvolvingMon)
-    call Bankswitch
+    BANKSWITCH TryEvolvingMon
     call ClearScreen
     call Func_5ae6
     call Func_226e
@@ -14641,9 +14456,7 @@ SetOptionsFromCursorPositions:
     ret
 
 SetCureDuringAbsorb:
-    ld b,BANK(SetCureDuringAbsorb_)
-    ld hl,SetCureDuringAbsorb_
-    jp Bankswitch
+    BANKSWITCH_JUMP SetCureDuringAbsorb_
 
 ; Free Space
 
@@ -15331,9 +15144,7 @@ LoadRenameScreen: ; 6596 (1:6596)
     call GoPAL_SET
     call LoadHpBarAndStatusTilePatterns
     call Func_675b
-    ld b,BANK(LoadMonPartySpriteGfx)
-    ld hl,LoadMonPartySpriteGfx
-    call Bankswitch
+    BANKSWITCH LoadMonPartySpriteGfx
     FuncCoord 0,4 ; $c3f0
     ld hl,Coord
     ld b,$9
@@ -15370,9 +15181,7 @@ LoadRenameScreen: ; 6596 (1:6596)
 .asm_65ff
     ld a,[wCurrentMenuItem] ; $cc26
     push af
-    ld b,BANK(Func_716f7)
-    ld hl,Func_716f7
-    call Bankswitch
+    BANKSWITCH Func_716f7
     pop af
     ld [wCurrentMenuItem],a ; $cc26
     call GetJoypadStateLowSensitivity
@@ -15415,9 +15224,7 @@ LoadRenameScreen: ; 6596 (1:6596)
     ld a,[W_ISINBATTLE] ; $d057
     and a
     jp z,LoadTextBoxTilePatterns
-    ld hl,LoadHudTilePatterns
-    ld b,BANK(LoadHudTilePatterns)
-    jp Bankswitch
+    BANKSWITCH_JUMP LoadHudTilePatterns
 
 .unknownPointerTable_665e: ; 665e (1:665e)
     dw .asm_65fc
@@ -15711,9 +15518,7 @@ Func_68f8: ; 68f8 (1:68f8)
     ld a,[$cf91]
     ld [$cd5d],a
     push af
-    ld b,BANK(WriteMonPartySpriteOAMBySpecies)
-    ld hl,WriteMonPartySpriteOAMBySpecies
-    call Bankswitch
+    BANKSWITCH WriteMonPartySpriteOAMBySpecies
     pop af
     ld [$d11e],a
     call GetMonName
@@ -16197,9 +16002,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld [$cf93],a
     ld a,$02
     ld [$d11b],a
-    ld hl,Func_39bd5
-    ld b,BANK(Func_39bd5)
-    call Bankswitch
+    BANKSWITCH Func_39bd5
     ld a,[wNumBagItems]
     and a
     jp z,.bagEmpty
@@ -16279,9 +16082,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld [$cf93],a
     ld a,$03
     ld [$d11b],a
-    ld hl,Func_39bd5
-    ld b,BANK(Func_39bd5)
-    call Bankswitch
+    BANKSWITCH Func_39bd5
     ld hl,.PokemartBuyingGreetingText
     call PrintText
     call SaveScreenTilesToBuffer1 ; save screen
@@ -16467,9 +16268,7 @@ LearnMove:
     call AddNTimes
     ld d,h
     ld e,l
-    ld b,BANK(TryToAddExclusiveMove)
-    ld hl,TryToAddExclusiveMove
-    call Bankswitch
+    BANKSWITCH TryToAddExclusiveMove
 .skip
     call .IsSkill
     jp c,.SkillDontInsertInMonMoves
@@ -16574,9 +16373,7 @@ LearnMove:
     ld de,$d0dc
     ld bc,$4
     call CopyData
-    ld hl,FormatMovesString
-    ld b,BANK(FormatMovesString)
-    call Bankswitch
+    BANKSWITCH FormatMovesString
     pop hl
 .ChoiceAnotherMoveToDelete
     push hl
@@ -16674,9 +16471,7 @@ DisplayPokemonCenterDialogue_: ; 6fe6 (1:6fe6)
     ld [$c112],a ; make the nurse turn to face the machine
     call Delay3
     PREDEF HealParty
-    ld b,BANK(Func_70433)
-    ld hl,Func_70433
-    call Bankswitch ; do the healing machine animation
+    BANKSWITCH Func_70433 ; do the healing machine animation
     xor a
     ld [wMusicHeaderPointer],a
     ld a,[$c0f0]
@@ -16985,9 +16780,7 @@ Func_71e1: ; 71e1 (1:71e1)
     ld a,[$cc26]
     and a
     jr nz,.asm_728f ; 0x723e $4f
-    ld hl,SaveSAVtoSRAM
-    ld b,BANK(SaveSAVtoSRAM)
-    call Bankswitch
+    BANKSWITCH SaveSAVtoSRAM
     call WaitForSoundToFinish
     ld a,$b6
     call PlaySoundWaitForCurrent
@@ -17043,9 +16836,7 @@ Func_72a8: ; 72a8 (1:72a8)
     xor a
     ld [hld],a
     ld [hl],a
-    ld hl,Func_5c0a
-    ld b,BANK(Func_5c0a)
-    jp Bankswitch
+    BANKSWITCH_JUMP Func_5c0a
 
 CableClubNPCText7: ; 72b3 (1:72b3)
     TX_FAR _CableClubNPCText7
@@ -17829,9 +17620,7 @@ DrainHPEffect_:
     call SetCureDuringAbsorb
     PREDEF DrawPlayerHUDAndHPBar
     PREDEF DrawEnemyHUDAndHPBar
-    ld hl,ReadPlayerMonCurHPAndStatus
-    ld b,BANK(ReadPlayerMonCurHPAndStatus)
-    call Bankswitch
+    BANKSWITCH ReadPlayerMonCurHPAndStatus
     ld hl,.SuckedHealthText
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -18432,9 +18221,7 @@ PrintGenderAndLevelInRenameScreen:
     push hl ; Backup Coord
     ld a,[$cf91] ; Pokemon ID
     ld [$d11e],a
-    ld b,BANK(GetGender)
-    ld hl,GetGender
-    call Bankswitch
+    BANKSWITCH GetGender
     ld a,$7F ; Blank
     jr c,.End ; Genderless
     ld a,$EF ; Male
@@ -18451,9 +18238,7 @@ HidePlayerBattleHudAndStandarizePaletteBeforeRenameInBattle:
     ld a,[W_ISINBATTLE] ; $d057
     and a
     jr z,.Done
-    ld b,BANK(HidePlayerBattleHudAndStandarizePalette)
-    ld hl,HidePlayerBattleHudAndStandarizePalette
-    call Bankswitch
+    BANKSWITCH HidePlayerBattleHudAndStandarizePalette
     ; Backup Graphics
     call SaveScreenTilesToBuffer1
 .Done
@@ -18545,9 +18330,7 @@ GenRandomAndAdvanceRNGState:
     push hl
     push de
     push bc
-    ld b,BANK(AdvanceRNGState)
-    ld hl,AdvanceRNGState
-    call Bankswitch
+    BANKSWITCH AdvanceRNGState
     pop bc
     pop de
     pop hl
@@ -18691,9 +18474,7 @@ HandleMenuInput_PrintMoveBox:
     call CheckMoveRelearn
     jr z,.skip
     ; Energy
-    ld hl,WriteEnergyAllMovesDuringMoveRelearn
-    ld b,BANK(WriteEnergyAllMovesDuringMoveRelearn)
-    call Bankswitch
+    BANKSWITCH WriteEnergyAllMovesDuringMoveRelearn
     ; Print Move Details Box (Move Relearner)
     FuncCoord 09,05
     ld de,Coord
@@ -21583,9 +21364,7 @@ Func_c49d: ; c49d (3:449d)
     push hl
     push de
     push bc
-    ld b,BANK(Func_1a609)
-    ld hl,Func_1a609
-    call Bankswitch
+    BANKSWITCH Func_1a609
     jr c,.asm_c4c8
     ld a,[W_CURMAPTILESET] ; $d367
     add a
@@ -23403,9 +23182,7 @@ ItemUseBall: ; d687 (3:5687)
     ld [$cf91],a
     ld a,[$cff3]
     ld [$d127],a
-    ld hl,LoadEnemyMonData
-    ld b,BANK(LoadEnemyMonData)
-    call Bankswitch
+    BANKSWITCH LoadEnemyMonData
     pop af
     ld [$cf91],a
     pop hl
@@ -23435,9 +23212,7 @@ ItemUseBall: ; d687 (3:5687)
     ld c,a
     ld b,1
     PREDEF HandleBitArray ; set Dex_own_flag?
-    ld b,BANK(DrawEnemyHUDAndHPBar)
-    ld hl,DrawEnemyHUDAndHPBar
-    call Bankswitch
+    BANKSWITCH DrawEnemyHUDAndHPBar
     call StopAlarmAndLoadCaughtText ; ld hl,ItemUseBallText05
     call PrintText
 ;    pop af
@@ -23570,9 +23345,7 @@ ItemUseTownMap: ; d968 (3:5968)
     ld a,[W_ISINBATTLE]
     and a
     jp nz,ItemUseNotTime
-    ld b,BANK(DisplayTownMap)
-    ld hl,DisplayTownMap
-    jp Bankswitch ; display Town Map
+    BANKSWITCH_JUMP DisplayTownMap ; display Town Map
 
 ItemUseBicycle: ; d977 (3:5977)
     ld a,[W_ISINBATTLE]
@@ -23718,9 +23491,7 @@ ItemUseEvoStone:
     ld a,[W_ISINBATTLE]
     and a
     jp nz,ItemUseNotTime
-    ld hl,ItemUseEvoStone_
-    ld b,BANK(ItemUseEvoStone_)
-    jp Bankswitch
+    BANKSWITCH_JUMP ItemUseEvoStone_
 
 ItemUseVitamin:
     ld a,[W_ISINBATTLE]
@@ -24298,9 +24069,7 @@ ItemUseMedicine:
     push hl
     push de
     ld d,a
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch ; calculate experience for next level and store it at $ff96
+    BANKSWITCH CalcExperience ; calculate experience for next level and store it at $ff96
     pop de
     pop hl
     ld bc,-19
@@ -24359,18 +24128,14 @@ ItemUseMedicine:
     ld [$cc49],a ; load from player's party
     call PartyMenuHPAndStandarizePalette ; call LoadMonData
     ld d,$01
-    ld hl,PrintStatsBox
-    ld b,BANK(PrintStatsBox)
-    call Bankswitch ; display new stats text box
+    BANKSWITCH PrintStatsBox ; display new stats text box
     call WaitForTextScrollButtonPress ; wait for button press
     xor a
     ld [$cc49],a
     PREDEF LearnMoveFromLevelUp
     xor a
     ld [$ccd4],a
-    ld hl,TryEvolvingMon
-    ld b,BANK(TryEvolvingMon)
-    call Bankswitch ; evolve pokemon,if appropriate
+    BANKSWITCH TryEvolvingMon ; evolve pokemon,if appropriate
     ld a,$01
     ld [$cfcb],a
     pop af
@@ -24673,9 +24438,7 @@ ItemUseXStat:
     ld [W_PLAYERMOVENUM],a
     xor a
     ld [H_WHOSETURN],a ; set turn to player's turn
-    ld b,BANK(StatModifierUpEffect)
-    ld hl,StatModifierUpEffect
-    call Bankswitch ; do stat increase move
+    BANKSWITCH StatModifierUpEffect ; do stat increase move
     pop hl
     pop af
     ld [hld],a ; restore [W_PLAYERMOVEEFFECT]
@@ -24819,9 +24582,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     and a,$80
     jr nz,.BattleAlarm
     call WaitForSoundToFinish ; wait for sound to end
-    ld b,BANK(Music_PokeFluteInBattle)
-    ld hl,Music_PokeFluteInBattle
-    call Bankswitch ; play in-battle pokeflute music
+    BANKSWITCH Music_PokeFluteInBattle ; play in-battle pokeflute music
 .musicWaitLoop2 ; wait for music to finish playing
     ld a,[$c02c]
     and a ; music off?
@@ -24877,18 +24638,14 @@ RodResponse: ; e28d (3:628d)
     ld a,c ; species
     ld [W_CUROPPONENT],a ; $d059
     ld [W_ENEMYMONID],a
-    ld hl,GetWildEnemyLevel
-    ld b,BANK(GetWildEnemyLevel)
-    call Bankswitch
+    BANKSWITCH GetWildEnemyLevel
 .next
     ld hl,$D700
     ld a,[hl] ; store the value in a
     push af
     push hl
     ld [hl],0
-    ld b,BANK(Func_707b6)
-    ld hl,Func_707b6
-    call Bankswitch
+    BANKSWITCH Func_707b6
     pop hl
     pop af
     ld [hl],a
@@ -24935,9 +24692,7 @@ ItemUseItemfinder:
     and a
     jp nz,ItemUseNotTime
     call ItemUseReloadOverworldData
-    ld b,BANK(Func_7481f)
-    ld hl,Func_7481f
-    call Bankswitch ; check for hidden items
+    BANKSWITCH Func_7481f ; check for hidden items
     jr c,.found
     ld a,$a5 ; Error
     call PlaySoundWaitForCurrent ; play sound
@@ -25135,9 +24890,7 @@ DigNotUsable:
     db "@"
 
 PrintBattleValueNearMon:
-    ld b,BANK(PrintBattleValueNearMon_)
-    ld hl,PrintBattleValueNearMon_
-    call Bankswitch
+    BANKSWITCH PrintBattleValueNearMon_
     ld hl,wHPBarOldHP
     ret
 
@@ -25159,9 +24912,7 @@ DecreaseValCounterAndPrintHPNumber:
     ret
 
 RemoveBattleValue:
-    ld b,BANK(RemoveBattleValue_)
-    ld hl,RemoveBattleValue_
-    jp Bankswitch
+    BANKSWITCH_JUMP RemoveBattleValue_
 
 ; Free
 
@@ -25233,9 +24984,7 @@ ItemUseTMHM: ; e479 (3:6479)
     call PrintText
     jr .chooseMon
 .checkIfAlreadyLearnedMove
-    ld hl,CheckMonAlreadyKnowMove
-    ld b,BANK(CheckMonAlreadyKnowMove)
-    call Bankswitch ; check if the pokemon already knows the move
+    BANKSWITCH CheckMonAlreadyKnowMove ; check if the pokemon already knows the move
     jr nc,.continue
     ld hl,.UnnamedText_2fe3b
     call PrintText
@@ -25846,9 +25595,7 @@ SendNewMonToBox:
     call .GetMonHeader
     ld a,[W_CURENEMYLVL] ; $d127
     ld d,a
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
+    BANKSWITCH CalcExperience
     pop de
     ld a,[H_NUMTOPRINT] ; $FF00+$96 (aliases: H_MULTIPLICAND)
     ld [de],a
@@ -25868,9 +25615,7 @@ SendNewMonToBox:
     ld [de],a
     call ResetTempIV
     call SentNewMonToBox_ResetMovePPs
-    ld b,BANK(SentNewMonToBox_TryToAddExclusiveMove)
-    ld hl,SentNewMonToBox_TryToAddExclusiveMove
-    jp Bankswitch
+    BANKSWITCH_JUMP SentNewMonToBox_TryToAddExclusiveMove
 .GetMonHeader
     ld a,[$cf91]
     ld [$d0b5],a
@@ -26055,9 +25800,7 @@ GetTMChoiceItemID:
     db "×@"
 
 DrawBadges:
-    ld b,BANK(_DrawBadges)
-    ld hl,_DrawBadges
-    jp Bankswitch
+    BANKSWITCH_JUMP _DrawBadges
 
 GymLeaderFaceAndBadgeTileGraphics:
     INCBIN "gfx/badges.2bpp"
@@ -26213,9 +25956,7 @@ CanCut:
     ld de,CutTreeBlockSwaps ; $7100
     call Func_f09f
     call RedrawMapView
-    ld b,BANK(Func_79e96)
-    ld hl,Func_79e96
-    call Bankswitch
+    BANKSWITCH Func_79e96
     ld a,$1
     ld [$cfcb],a
     ld a,$ac
@@ -26813,9 +26554,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     push hl
     ld a,[W_CURENEMYLVL]
     ld d,a
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
+    BANKSWITCH CalcExperience
     pop hl
     ld a,[H_MULTIPLICAND] ; write experience
     ld [hli],a
@@ -27112,9 +26851,7 @@ Func_f51e: ; f51e (3:751e)
     add $2
     ld [$cc49],a
     call LoadMonData
-    ld b,BANK(CalcLevelFromExperience)
-    ld hl,CalcLevelFromExperience
-    call Bankswitch
+    BANKSWITCH CalcLevelFromExperience
     ld a,d
     ld [W_CURENEMYLVL],a ; $d127
     pop hl
@@ -28037,9 +27774,7 @@ Func_fb50: ; fb50 (3:7b50)
 .asm_fb7f
     ld a,$ff
     ld [$FF00+$db],a
-    ld b,BANK(Func_52673)
-    ld hl,Func_52673
-    jp Bankswitch
+    BANKSWITCH_JUMP Func_52673
 
 ; format: db tileset id,bookshelf tile id,unknown
 BookshelfTileIDs: ; fb8b (3:7b8b)
@@ -28127,9 +27862,7 @@ TownMapText: ; fc12 (3:7c12)
     inc a
     ld [H_AUTOBGTRANSFERENABLED],a
     call LoadFontTilePatterns
-    ld b,BANK(DisplayTownMap)
-    ld hl,DisplayTownMap
-    call Bankswitch
+    BANKSWITCH DisplayTownMap
     ld hl,$d730
     res 6,[hl]
     ld de,TextScriptEnd
@@ -28181,9 +27914,7 @@ ReDrawBattleHudAfterItemUse:
     ld a,[W_BATTLETYPE] ; $d05a
     and a
     jp nz,LoadScreenTilesFromBuffer1 ; safariOrOldMan
-    ld hl,HidePlayerBattleHudAndRestorePalette_
-    ld b,BANK(HidePlayerBattleHudAndRestorePalette_)
-    call Bankswitch
+    BANKSWITCH HidePlayerBattleHudAndRestorePalette_
     PREDEF_JUMP DrawHUDsAndHPBars
 
 PartyMenuHPAndStandarizePalette:
@@ -28227,9 +27958,7 @@ GenerateRandomEnemyTrainerIV:
     push hl
     push af
     push de
-    ld hl,GenerateRandomEnemyTrainerIV_
-    ld b,BANK(GenerateRandomEnemyTrainerIV_)
-    call Bankswitch
+    BANKSWITCH GenerateRandomEnemyTrainerIV_
     ld c,d
     ld b,e
     pop de
@@ -28591,16 +28320,12 @@ RockDamageOrBaitHealth:
     cp ROCK_ANIM
     jr z,.Rock
 .Bait
-    ld b,BANK(_BaitHealth)
-    ld hl,_BaitHealth
-    call Bankswitch
+    BANKSWITCH _BaitHealth
     jr .end
 .Rock
     ld a,1
     ld [H_WHOSETURN],a ; force enemy turn
-    ld b,BANK(_RockDamage)
-    ld hl,_RockDamage
-    call Bankswitch
+    BANKSWITCH _RockDamage
     xor a
     ld [H_WHOSETURN],a ; restore player turn
 .end
@@ -28686,9 +28411,7 @@ AddPokemonToParty_TryToAddExclusiveMove:
     ld a,[$cc49]
     and $f
     ret nz
-    ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
-    ld hl,AddPokemonToParty_TryToAddExclusiveMove_
-    jp Bankswitch
+    BANKSWITCH_JUMP AddPokemonToParty_TryToAddExclusiveMove_
 
 GetAlternateForm:
     ld a,[$cc49]
@@ -28714,9 +28437,7 @@ GetAlternateForm:
     ret
 .enemy
     push de
-    ld b,BANK(SpecialTrainerAlternateForm)
-    ld hl,SpecialTrainerAlternateForm
-    call Bankswitch
+    BANKSWITCH SpecialTrainerAlternateForm
     ld a,d
     pop de
     jr .end
@@ -29080,9 +28801,7 @@ StartMenu_Option_Init:
     ld [H_AUTOBGTRANSFERENABLED],a
     call ClearScreen
     call UpdateSprites
-    ld hl,DisplayOptionMenu
-    ld b,BANK(DisplayOptionMenu)
-    jp Bankswitch
+    BANKSWITCH_JUMP DisplayOptionMenu
 
 GetWildEnemyLevel:
     push de
@@ -29447,18 +29166,14 @@ DrawPartyMenu_: ; 12cd2 (4:6cd2)
     ld [H_AUTOBGTRANSFERENABLED],a
     call ClearScreen
     call UpdateSprites ; move sprites
-    ld b,BANK(Func_71791)
-    ld hl,Func_71791
-    call Bankswitch ; load pokemon icon graphics
+    BANKSWITCH Func_71791 ; load pokemon icon graphics
 
 RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     ld a,[$D07D]
     cp a,$04
     jp z,.printMessage
     call ErasePartyMenuCursors
-    ld b,BANK(Func_71fb6)
-    ld hl,Func_71fb6
-    call Bankswitch ; loads some data to $cf2e
+    BANKSWITCH Func_71fb6 ; loads some data to $cf2e
     FuncCoord 3,0
     ld hl,Coord
     ld de,W_PARTYMON1
@@ -29479,9 +29194,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     call GetPartyMonName
     pop hl
     call PlaceString ; print the pokemon's name
-    ld b,BANK(PlaceAppropriatePokemonIcon)
-    ld hl,PlaceAppropriatePokemonIcon
-    call Bankswitch ; place the appropriate pokemon icon
+    BANKSWITCH PlaceAppropriatePokemonIcon ; place the appropriate pokemon icon
     ld a,[$FF8C] ; loop counter
     ld [$CF92],a
     inc a
@@ -29863,9 +29576,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jr .RedrawMenu
 
 .choseSkill
-    ld b,BANK(GetMonSkill)
-    ld hl,GetMonSkill
-    call Bankswitch
+    BANKSWITCH GetMonSkill
     ld a,[wNumSkill]
     and a
     jr z,.NoSkill
@@ -29936,9 +29647,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     db "@"
 
 .cut
-    ld b,BANK(CheckCutTile)
-    ld hl,CheckCutTile
-    call Bankswitch
+    BANKSWITCH CheckCutTile
     call z,PlayCryAndDecreaseSkillEnergy
     PREDEF UsedCut
     ld a,[$cd6a]
@@ -29947,9 +29656,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jp CloseTextDisplay
 
 .surf
-    ld b,BANK(IsSurfingAllowed)
-    ld hl,IsSurfingAllowed
-    call Bankswitch
+    BANKSWITCH IsSurfingAllowed
     ld hl,$d728
     bit 1,[hl]
     res 1,[hl]
@@ -30229,9 +29936,7 @@ StartMenu_Item: ; 13302 (4:7302)
     db "@"
 
 GetMaxLevelBank4:
-    ld hl,GetMaxLevel
-    ld b,BANK(GetMaxLevel)
-    jp Bankswitch ; d = Max Level
+    BANKSWITCH_JUMP GetMaxLevel ; d = Max Level
 
 StartMenu_Option:
     ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
@@ -30529,9 +30234,7 @@ EndOfBattle:
     ld a,[W_ENEMYMONSTATUS] ; $cfe9
     ld [hl],a
     call ClearScreen
-    ld hl,Func_372d6
-    ld b,BANK(Func_372d6)
-    call Bankswitch
+    BANKSWITCH Func_372d6
     ld a,[wBattleResult]
     cp $1
     ld de,YouWinText ; $7853
@@ -30617,18 +30320,14 @@ TryDoWildEncounter:
     ld a,[$d736]
     and a
     ret nz
-    ld hl,Func_c49d
-    ld b,BANK(Func_c49d)
-    call Bankswitch
+    BANKSWITCH Func_c49d
     jr nc,.notStandingOnDoorOrWarpTile
 .CantEncounter
     ld a,$1
     and a
     ret
 .notStandingOnDoorOrWarpTile
-    ld hl,Func_128d8
-    ld b,BANK(Func_128d8)
-    call Bankswitch
+    BANKSWITCH Func_128d8
     jr z,.CantEncounter
     ld a,[$d0db]
     and a
@@ -30779,9 +30478,7 @@ RecoilEffect_:
     cp STRUGGLE
     jr nz,.asm_13982
     push bc
-    ld b,BANK(SetExplodeFlag_)
-    ld hl,SetExplodeFlag_
-    call Bankswitch
+    BANKSWITCH SetExplodeFlag_
     pop bc
 .asm_13982
     FuncCoord 10,09 ; Player Bar in Battle
@@ -30853,11 +30550,8 @@ HazeEffect_:
     call .CureVolatileStatuses
     ld hl,W_ENEMYBATTSTATUS1
     call .CureVolatileStatuses
-    ld hl,ApplyBadgeStatBoostsFull
-    ld b,BANK(ApplyBadgeStatBoostsFull)
-    call Bankswitch
-    ld hl,PlayCurrentMoveAnimation
-    call Bankswitch4toF
+    BANKSWITCH ApplyBadgeStatBoostsFull
+    BANKSWITCH PlayCurrentMoveAnimation
     ld hl,.StatusChangesEliminatedText
     jp DrawHudAndPrintTextBank4
 
@@ -30934,9 +30628,7 @@ Func_13a58: ; 13a58 (4:7a58)
 GetGenderOutOfBattle:
     ld a,[$cf98] ; Pokemon ID
     ld [$d11e],a
-    ld hl,GetGender
-    ld b,BANK(GetGender)
-    jp Bankswitch
+    BANKSWITCH_JUMP GetGender
 
 SetDamageDuringRecoil:
     ld d,h
@@ -30946,9 +30638,7 @@ SetDamageDuringRecoil:
     ld [hli],a
     ld a,c
     ld [hl],a
-    ld b,BANK(SetDamageDuringRecoil_)
-    ld hl,SetDamageDuringRecoil_
-    jp Bankswitch
+    BANKSWITCH_JUMP SetDamageDuringRecoil_
 
 FixTMPalette:
     push hl
@@ -31309,8 +30999,7 @@ TestMonMoveCompatibility_HandleAlternative:
     jp FarCopyData ; copy bc bytes of data from a:hl to de
 
 ConversionEffect_:
-    ld hl,PlayCurrentMoveAnimation
-    call Bankswitch4toF
+    BANKSWITCH PlayCurrentMoveAnimation
     ld hl,W_ENEMYMONTYPES
     ld de,W_PLAYERMONTYPES
     ld a,[H_WHOSETURN]
@@ -31342,12 +31031,7 @@ ConversionEffect_:
     TX_FAR _ConvertedTypeToText
     db "@"
 .attackMissed
-    ld hl,PrintMoveFailureText
-    ; fall through
-
-Bankswitch4toF:
-    ld b,$f
-    jp Bankswitch
+    BANKSWITCH_JUMP PrintMoveFailureText
 
 DisplayPartyRenameScreen:
     ld de,$cee9
@@ -31355,9 +31039,7 @@ DisplayPartyRenameScreen:
     ld [$cfcb],a
     ld a,$2
     ld [$d07d],a
-    ld b,BANK(HandleIVAndLevelAndLoadRenameScreenDuringNameRater_FromAnotherBank)
-    ld hl,HandleIVAndLevelAndLoadRenameScreenDuringNameRater_FromAnotherBank
-    call Bankswitch
+    BANKSWITCH HandleIVAndLevelAndLoadRenameScreenDuringNameRater_FromAnotherBank
     ld a,[$cf4b]
     cp $50
     ret z
@@ -32677,9 +32359,7 @@ ActivatePC: ; 17e2c (5:7e2c)
     call LoadScreenTilesFromBuffer2  ;XXX: restore saved screen
     call Delay3
 PCMainMenu: ; 17e48 (5:7e48)
-    ld b,BANK(Func_213c8)
-    ld hl,Func_213c8
-    call Bankswitch
+    BANKSWITCH Func_213c8
     ld hl,wFlags_0xcd60
     set 5,[hl]
     call HandleMenuInputWithWrap
@@ -32725,25 +32405,19 @@ PCMainMenu: ; 17e48 (5:7e48)
     call WaitForSoundToFinish  ;XXX: wait for sound to be done
     ld hl,UnnamedText_17f32  ;accessed players pc
     call PrintText
-    ld b,BANK(PlayerPC)
-    ld hl,PlayerPC
-    call Bankswitch
+    BANKSWITCH PlayerPC
     jr ReloadMainMenu
 OaksPC: ; 17ec0 (5:7ec0)
     ld a,$9B
     call PlaySound  ;XXX: play sound or stop music
     call WaitForSoundToFinish  ;XXX: wait for sound to be done
-    ld b,BANK(Func_1e915)
-    ld hl,Func_1e915
-    call Bankswitch
+    BANKSWITCH Func_1e915
     jr ReloadMainMenu
 PKMNLeague: ; 17ed2 (5:7ed2)
     ld a,$9B
     call PlaySound  ;XXX: play sound or stop music
     call WaitForSoundToFinish  ;XXX: wait for sound to be done
-    ld b,BANK(PKMNLeaguePC)
-    ld hl,PKMNLeaguePC
-    call Bankswitch
+    BANKSWITCH PKMNLeaguePC
     jr ReloadMainMenu
 BillsPC: ; 17ee4 (5:7ee4)
     ld a,$9B
@@ -32758,9 +32432,7 @@ BillsPC: ; 17ee4 (5:7ee4)
     ld hl,UnnamedText_17f28 ;accessed bill's pc
 .printText
     call PrintText
-    ld b,BANK(BillsPC_)
-    ld hl,BillsPC_
-    call Bankswitch
+    BANKSWITCH BillsPC_
 ReloadMainMenu: ; 17f06 (5:7f06)
     xor a
     ld [$CC3C],a
@@ -32845,9 +32517,7 @@ Func_17d7d:
     ld [$ccd4],a
     ld a,$32
     ld [W_ISLINKBATTLE],a ; $d12b
-    ld hl,TryEvolvingMon
-    ld b,BANK(TryEvolvingMon)
-    call Bankswitch
+    BANKSWITCH TryEvolvingMon
     xor a
     ld [W_ISLINKBATTLE],a ; $d12b
     jp PlayDefaultMusic
@@ -34336,9 +34006,7 @@ CeruleanCityScript2: ; 195b1 (6:55b1)
     ld a,$ff
     ld [$c0ee],a
     call PlaySound
-    ld b,BANK(Music_RivalAlternateStart)
-    ld hl,Music_RivalAlternateStart
-    call Bankswitch
+    BANKSWITCH Music_RivalAlternateStart
     ld a,$1
     ld [$ff00+$8c],a
     call SetSpriteMovementBytesToFF
@@ -34462,9 +34130,7 @@ CeruleanCityText2: ; 1967c (6:567c)
     ld [$cc3c],a
     ld hl,ReceivedTM28Text
     call PrintText
-    ld b,BANK(Func_74872)
-    ld hl,Func_74872
-    call Bankswitch
+    BANKSWITCH Func_74872
 .Done
     jp TextScriptEnd
 
@@ -37348,9 +37014,7 @@ Route2HouseScript1:
     call PlayCry
     ld a,1
     ld [wAlternateFormIndex],a
-    ld hl,DisplayMonFrontSpriteInBox
-    ld b,BANK(DisplayMonFrontSpriteInBox)
-    call Bankswitch
+    BANKSWITCH DisplayMonFrontSpriteInBox
     ld a,2
     ld [W_ROUTE2HOUSECURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -37467,9 +37131,7 @@ CinnabarGymProcessAllGate:
 
 .RedrawMapView:
     call RestoreChangedBlocks
-    ld b,BANK(RedrawMapView)
-    ld hl,RedrawMapView
-    jp Bankswitch
+    BANKSWITCH_JUMP RedrawMapView
 
 .CinnabarGymGateCoords
     ; format: LSB Changed Block Address,direction
@@ -37801,9 +37463,7 @@ Func_1c98a: ; 1c98a (7:498a)
     ld a,[wCurrentMenuItem] ; $cc26
     and a
     jp z,InitGame
-    ld b,BANK(Func_73b6a)
-    ld hl,Func_73b6a
-    call Bankswitch
+    BANKSWITCH Func_73b6a
     jp InitGame
 
 UnnamedText_1c9c1: ; 1c9c1 (7:49c1)
@@ -38430,9 +38090,7 @@ OaksLabScript13: ; 1ce32 (7:4e32)
     ld a,$10
     ld [$ff00+$8c],a
     call DisplayTextID
-    ld b,BANK(Music_RivalAlternateStart)
-    ld hl,Music_RivalAlternateStart
-    call Bankswitch
+    BANKSWITCH Music_RivalAlternateStart
     ld a,$1
     ld [$ff00+$8c],a
     ld de,.RivalExitMovement
@@ -38497,9 +38155,7 @@ OaksLabScript15: ; 1ceb0 (7:4eb0)
     ld a,$ff
     ld [$c0ee],a
     call PlaySound
-    ld b,BANK(Music_RivalAlternateStart)
-    ld hl,Music_RivalAlternateStart
-    call Bankswitch
+    BANKSWITCH Music_RivalAlternateStart
     ld a,$15
     ld [$ff00+$8c],a
     call DisplayTextID
@@ -38602,9 +38258,7 @@ OaksLabScript16: ; 1cf12 (7:4f12)
     ld a,$ff
     ld [$c0ee],a
     call PlaySound
-    ld b,BANK(Music_RivalAlternateStart)
-    ld hl,Music_RivalAlternateStart
-    call Bankswitch
+    BANKSWITCH Music_RivalAlternateStart
     ld a,$1
     ld [$ff00+$8c],a
     ld de,$cc97
@@ -39716,9 +39370,7 @@ BikeShopText1: ; 1d745 (7:5745)
     jr nc,.BagFull
     ld a,BIKE_VOUCHER
     ldh [$db],a
-    ld b,BANK(RemoveItemByID)
-    ld hl,RemoveItemByID
-    call Bankswitch
+    BANKSWITCH RemoveItemByID
     ld hl,$d75f
     set 0,[hl]
     ld hl,UnnamedText_1d824
@@ -40148,9 +39800,7 @@ Func_1da20: ; 1da20 (7:5a20)
 ;    jr nz,.asm_1daae ; 0x1da93 $19
 ;    ld hl,UnnamedText_1dac2
 ;    call PrintText
-;    ld b,BANK(DisplayNameRaterScreen)
-;    ld hl,DisplayNameRaterScreen
-;    call Bankswitch
+;    BANKSWITCH DisplayNameRaterScreen
 ;    jr c,.asm_1daae ; 0x1daa3 $9
 ;    ld hl,UnnamedText_1dac7
 ;.asm_1daa8
@@ -40304,9 +39954,7 @@ VermilionDock_1db9b: ; 1db9b (7:5b9b)
     ld c,BANK(Music_Surfing)
     ld a,(Music_Surfing - $4000) / 3
     call PlayMusic
-    ld b,BANK(Func_79fc0)
-    ld hl,Func_79fc0
-    call Bankswitch
+    BANKSWITCH Func_79fc0
     xor a
     ld [$c102],a
     ld c,$78
@@ -40805,9 +40453,7 @@ Route5GateScript0: ; 1df50 (7:5f50)
     ld [$d528],a
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a
-    ld b,BANK(RemoveGuardDrink)
-    ld hl,RemoveGuardDrink
-    call Bankswitch
+    BANKSWITCH RemoveGuardDrink
     ld a,[$ff00+$db]
     and a
     jr nz,.asm_1df82 ; 0x1df70 $10
@@ -40854,9 +40500,7 @@ Route5GateText1: ; 1dfaa (7:5faa)
     ld a,[$d728]
     bit 6,a
     jr nz,.asm_88856 ; 0x1dfb0 $2c
-    ld b,BANK(RemoveGuardDrink)
-    ld hl,RemoveGuardDrink
-    call Bankswitch
+    BANKSWITCH RemoveGuardDrink
     ld a,[$ff00+$db]
     and a
     jr nz,.asm_768a2 ; 0x1dfbd $11
@@ -40951,9 +40595,7 @@ Route6GateScript0: ; 1e04e (7:604e)
     ld [$d528],a
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a
-    ld b,BANK(RemoveGuardDrink)
-    ld hl,RemoveGuardDrink
-    call Bankswitch
+    BANKSWITCH RemoveGuardDrink
     ld a,[$ff00+$db]
     and a
     jr nz,.asm_1e080 ; 0x1e06e $10
@@ -41066,9 +40708,7 @@ Route7GateScript0: ; 1e128 (7:6128)
     ld [$d528],a
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a
-    ld b,BANK(RemoveGuardDrink)
-    ld hl,RemoveGuardDrink
-    call Bankswitch
+    BANKSWITCH RemoveGuardDrink
     ld a,[$ff00+$db]
     and a
     jr nz,.asm_1e15a ; 0x1e148 $10
@@ -41171,9 +40811,7 @@ Route8GateScript0: ; 1e1ee (7:61ee)
     ld [$d528],a
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a
-    ld b,BANK(RemoveGuardDrink)
-    ld hl,RemoveGuardDrink
-    call Bankswitch
+    BANKSWITCH RemoveGuardDrink
     ld a,[$ff00+$db]
     and a
     jr nz,.asm_1e220 ; 0x1e20e $10
@@ -42551,9 +42189,7 @@ ChoiceMove:
     ld de,$d0dc
     ld bc,$4
     call CopyData
-    ld hl,FormatMovesString
-    ld b,BANK(FormatMovesString)
-    call Bankswitch
+    BANKSWITCH FormatMovesString
     FuncCoord 4,8 ; $c430
     ld hl,Coord
     ld bc,$040e
@@ -42674,9 +42310,7 @@ GetMonPotentialMoveList:
     ld hl,wNoExclusiveInListBit7
     bit 7,[hl]
     jr nz,.SkipExclusive
-    ld b,BANK(HandleExclusiveLearnMove)
-    ld hl,HandleExclusiveLearnMove
-    call Bankswitch
+    BANKSWITCH HandleExclusiveLearnMove
 .SkipExclusive
 
     ; Insert End List
@@ -42791,9 +42425,7 @@ MovesMenu:
     ; Mini Sprite
     ld a,[$cf98]
     ld [$cd5d],a
-    ld b,BANK(WriteMonPartySpriteOAMBySpecies)
-    ld hl,WriteMonPartySpriteOAMBySpecies
-    call Bankswitch
+    BANKSWITCH WriteMonPartySpriteOAMBySpecies
 
     ; Initialize Menù Config
     ld hl,wTopMenuItemY ; $cc24
@@ -42937,9 +42569,7 @@ LoadMonDataAndPrintActualMoves:
     ld de,$d0dc
     ld bc,$4
     call CopyData
-    ld hl,FormatMovesString
-    ld b,BANK(FormatMovesString)
-    call Bankswitch ; FormatMovesString
+    BANKSWITCH FormatMovesString
     FuncCoord 00,12
     ld hl,Coord
     ld bc,$0412
@@ -44770,9 +44400,7 @@ BillsPCRelease: ; 21673 (8:5673)
     jp BillsPCMenu
 
 BillsPCChangeBox: ; 216b3 (8:56b3)
-    ld b,BANK(Func_738a1)
-    ld hl,Func_738a1
-    call Bankswitch
+    BANKSWITCH Func_738a1
     jp BillsPCMenu
 
 DisplayMonListMenu: ; 216be (8:56be)
@@ -44801,9 +44429,7 @@ BoxNoPCText: ; 21713 (8:5713)
     db "BOX No.@"
 
 DisplayDepositWithdrawMenu:
-    ld b,BANK(DisplayDepositWithdrawMenu_)
-    ld hl,DisplayDepositWithdrawMenu_
-    jp Bankswitch
+    BANKSWITCH_JUMP DisplayDepositWithdrawMenu_
 
 SwitchOnText: ; 0x217e9
     TX_FAR _SwitchOnText
@@ -47116,9 +46742,7 @@ CooltrainerFName: ; 27f79 (9:7f79)
     db "COOLTRAINER♀@"
 
 FocusEnergyEffect_: ; 27f86 (9:7f86)
-    ld hl,PlayCurrentMoveAnimation
-    ld b,BANK(PlayCurrentMoveAnimation)
-    call Bankswitch
+    BANKSWITCH PlayCurrentMoveAnimation
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -47281,9 +46905,7 @@ LeechSeedEffect_:
 .done
     push hl
     push de
-    ld hl,MoveHitTestPlus
-    ld b,BANK(MoveHitTestPlus)
-    call Bankswitch
+    BANKSWITCH MoveHitTestPlus
     pop de
     pop hl
     jr nz,.moveMissed
@@ -47305,21 +46927,15 @@ LeechSeedEffect_:
     bit 7,[hl] ; SEEDED
     jr nz,.justSeeded
     set 7,[hl] ; SEEDED
-    ld hl,PlayCurrentMoveAnimation2
-    ld b,BANK(PlayCurrentMoveAnimation2)
-    call Bankswitch
+    BANKSWITCH PlayCurrentMoveAnimation2
     ld hl,.WasSeededText ; $7ef2
     jp .DrawHudAndPrintText
 .moveMissed
     call .PlayCurrentMoveAnimation
-    ld b,BANK(PrintMoveFailureText)
-    ld hl,PrintMoveFailureText
-    jp Bankswitch
+    BANKSWITCH_JUMP PrintMoveFailureText
 .doesntAffect
     call .PlayCurrentMoveAnimation
-    ld b,BANK(PrintDoesntAffectMonText)
-    ld hl,PrintDoesntAffectMonText
-    jp Bankswitch
+    BANKSWITCH_JUMP PrintDoesntAffectMonText
 .justSeeded
     call .PlayCurrentMoveAnimation
     ld c,50
@@ -47327,9 +46943,7 @@ LeechSeedEffect_:
     ld hl,.WasJustSeededText
     jp PrintText
 .PlayCurrentMoveAnimation
-    ld hl,PlayCurrentMoveAnimation
-    ld b,BANK(PlayCurrentMoveAnimation)
-    jp Bankswitch
+    BANKSWITCH_JUMP PlayCurrentMoveAnimation
 .DrawHudAndPrintText
     push hl
     PREDEF DrawHUDsAndHPBars
@@ -47793,9 +47407,7 @@ ClefablePicBack: ; 329b8 (c:69b8)
 SECTION "MistEffect_",ROMX[$7f2b],BANK[$C]
 
 MistEffect_: ; 33f2b (c:7f2b)
-    ld hl,PlayCurrentMoveAnimation
-    ld b,BANK(PlayCurrentMoveAnimation)
-    call Bankswitch
+    BANKSWITCH PlayCurrentMoveAnimation
     ld hl,W_PLAYERBATTSTATUS2
     ld a,[H_WHOSETURN]
     and a
@@ -48043,9 +47655,7 @@ Func_372d6: ; 372d6 (d:72d6)
     ld [hl],$6a
     xor a
     ld [$cfcb],a
-    ld hl,Func_3a948
-    ld b,BANK(Func_3a948)
-    call Bankswitch
+    BANKSWITCH Func_3a948
     ld c,$96
     jp DelayFrames
 
@@ -49189,9 +48799,7 @@ Func_37e2d: ; 37e2d (d:7e2d)
     jr z,.asm_37e6a
     cp $ff
     jr z,.asm_37e6e
-    ld b,BANK(Func_2ff09)
-    ld hl,Func_2ff09
-    call Bankswitch
+    BANKSWITCH Func_2ff09
     ld a,[wTrainerSpriteOffset]
     and a
     ret z
@@ -49405,9 +49013,7 @@ Func_396d3:
     ld [W_ENEMYMONID],a
     ld b,$1
     call GoPAL_SET
-    ld hl,_LoadTrainerPic
-    ld b,BANK(_LoadTrainerPic)
-    call Bankswitch
+    BANKSWITCH _LoadTrainerPic
     FuncCoord 19,0 ; $c3b3
     ld hl,Coord
     ld c,$0
@@ -49518,9 +49124,7 @@ Func_3aede:
 
 GoPalSetAfterAIItemUser: ; to avoid bad color after enemy item use
     PREDEF UpdateHPBar
-    ld b,BANK(DrawEnemyHUDAndHPBar)
-    ld hl,DrawEnemyHUDAndHPBar
-    jp Bankswitch
+    BANKSWITCH_JUMP DrawEnemyHUDAndHPBar
 
 SECTION "TrainerPicAndMoneyPointers",ROMX[$5914],BANK[$e]
 
@@ -49892,9 +49496,7 @@ TrainerAI:
     ld [wUnusedC000],a
     push de
     ld de,W_ENEMYMONNUMBER
-    ld b,BANK(ClearAISwitched)
-    ld hl,ClearAISwitched
-    call Bankswitch
+    BANKSWITCH ClearAISwitched
     pop de
     scf
     ret
@@ -50042,9 +49644,7 @@ ItemUseEvoStone_:
     ld [$cf96],a
     jp RemoveItemFromInventory
 .noEffect
-    ld hl,ItemUseNoEffect
-    ld b,BANK(ItemUseNoEffect)
-    call Bankswitch
+    BANKSWITCH ItemUseNoEffect
 .canceledItemUse
     xor a
     ld [$cd6a],a
@@ -50084,9 +49684,7 @@ AICureStatus:
     res 0,[hl]
     ; need to redraw the enemy trainer hud
     push af
-    ld hl,DrawEnemyHUDAndHPBar
-    ld b,BANK(DrawEnemyHUDAndHPBar)
-    call Bankswitch
+    BANKSWITCH DrawEnemyHUDAndHPBar
     pop af
     ret
 
@@ -50285,9 +49883,7 @@ SwitchEnemyMon: ; 3a74b (e:674b)
 
     ld a,1
     ld [$D11D],a
-    ld hl,EnemySendOut
-    ld b,BANK(EnemySendOut)
-    call Bankswitch
+    BANKSWITCH EnemySendOut
     xor a
     ld [$D11D],a
 
@@ -50335,9 +49931,7 @@ AICheckIfHPBelowFraction: ; 3a7cf (e:67cf)
     push bc
     push de
     ld e,a
-    ld b,BANK(_AICheckIfHPBelowFraction)
-    ld hl,_AICheckIfHPBelowFraction
-    call Bankswitch
+    BANKSWITCH _AICheckIfHPBelowFraction
     pop de
     pop bc
     pop hl
@@ -50394,9 +49988,7 @@ AIIncreaseStat: ; 3a808 (e:6808)
     ld a,$AF
     ld [hli],a
     ld [hl],b
-    ld hl,StatModifierUpEffect
-    ld b,BANK(StatModifierUpEffect)
-    call Bankswitch
+    BANKSWITCH StatModifierUpEffect
     pop hl
     pop af
     ld [hli],a
@@ -50676,9 +50268,7 @@ AfterEvolution_TryToAddExclusiveMove:
     call AddNTimes
     ld d,h
     ld e,l
-    ld b,BANK(TryToAddExclusiveMove)
-    ld hl,TryToAddExclusiveMove
-    call Bankswitch
+    BANKSWITCH TryToAddExclusiveMove
     pop hl
     pop bc
 .next
@@ -50727,9 +50317,7 @@ LearnMoveCommon:
 .learnmove
     ld [$d0e0],a
     push hl ; Backup Pointer to Current Learn Move's Level
-    ld b,BANK(CheckMonAlreadyKnowMoveQuick)
-    ld hl,CheckMonAlreadyKnowMoveQuick
-    call Bankswitch
+    BANKSWITCH CheckMonAlreadyKnowMoveQuick
     jr c,.LearnEndOrJustKnow
     ld a,[$d0e0]
     ld [$d11e],a
@@ -50774,8 +50362,7 @@ UnnamedText_3bb92:
     db "@"
 
 ReflectLightScreenEffect_:
-    ld hl,PlayCurrentMoveAnimation ; $7ba8
-    call BankswitchEtoF
+    BANKSWITCH PlayCurrentMoveAnimation
     ld hl,W_PLAYERBATTSTATUS3 ; $d064
     ld de,W_PLAYERMOVEEFFECT ; $cfd3
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -50935,9 +50522,7 @@ TryEvolution: ; loop over evolution entries
     ld a,$ff
     ld [$cfcb],a
     call CleanLCD_OAM
-    ld hl,EvolveMon
-    ld b,BANK(EvolveMon)
-    call Bankswitch
+    BANKSWITCH EvolveMon
     jp c,Func_3af2e
     ld hl,UnnamedText_3af3e ; $6f3e
     call PrintText
@@ -51076,10 +50661,6 @@ LightScreenProtectedText:
 ReflectGainedArmorText:
     TX_FAR _ReflectGainedArmorText
     db "@"
-
-BankswitchEtoF:
-    ld b,$f
-    jp Bankswitch
 
 SetAttributeOamRedBall:
     ld [hli],a
@@ -51571,8 +51152,7 @@ HealEffect_:
     push bc
     ld d,b
     ld e,c
-    ld hl,SetCureDirect
-    call BankswitchEtoF
+    BANKSWITCH SetCureDirect
     pop bc
     pop de
     pop hl
@@ -51605,8 +51185,7 @@ HealEffect_:
     ld [de],a
     ld [wHPBarNewHP],a
 .playAnim
-    ld hl,PlayCurrentMoveAnimation ; $7ba8
-    call BankswitchEtoF
+    BANKSWITCH PlayCurrentMoveAnimation
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     FuncCoord 10,09 ; Player Bar in Battle
@@ -51622,7 +51201,7 @@ HealEffect_:
     ld hl,RegainedHealthText ; $7aac
     jp DrawHudAndPrintTextBankE
 
-TransformEffect_: ; Moved Upper in the Bank
+TransformEffect_:
     call .HideSubstitute
     ld hl,W_PLAYERMONID
     ld de,W_ENEMYMON_START
@@ -51760,16 +51339,12 @@ TransformEffect_: ; Moved Upper in the Bank
     push af
     ld a,[H_WHOSETURN]
     ld [$d11e],a
-    ld hl,CalculateModifiedStats
-    ld b,BANK(CalculateModifiedStats)
-    call Bankswitch
+    BANKSWITCH CalculateModifiedStats
     pop af
     ld [$d11e],a
     ld a,[H_WHOSETURN]
     and a
-    ld hl,ApplyBadgeStatBoostsFull
-    ld b,BANK(ApplyBadgeStatBoostsFull)
-    call z,Bankswitch
+    BANKSWITCH_Z ApplyBadgeStatBoostsFull
     ld a,[H_WHOSETURN]
     push af
     and a
@@ -51792,15 +51367,12 @@ TransformEffect_: ; Moved Upper in the Bank
     ld [W_MOVEMISSED],a
     call .TransformAnimation
     call .RestoreSubstitute
-    ld hl,PrintMoveFailureText
-    jp BankswitchEtoF
+    BANKSWITCH_JUMP PrintMoveFailureText
 .HideSubstitute
     push hl
     push de
     call .GetSubstituteFlag
-    ld hl,HideSubstituteShowMonAnim
-    ld b,BANK(HideSubstituteShowMonAnim)
-    call nz,Bankswitch
+    BANKSWITCH_NZ HideSubstituteShowMonAnim
     pop de
     pop hl
     ret
@@ -51808,9 +51380,7 @@ TransformEffect_: ; Moved Upper in the Bank
     push hl
     push de
     call .GetSubstituteFlag
-    ld hl,ReshowSubstituteAnim
-    ld b,BANK(ReshowSubstituteAnim)
-    call nz,Bankswitch
+    BANKSWITCH_NZ ReshowSubstituteAnim
     pop de
     pop hl
     ret
@@ -51854,9 +51424,7 @@ TransformEffect_: ; Moved Upper in the Bank
     xor a
     ld [$cc5b],a
     ld d,$CC ; TransformFailAnim
-    ld hl,PlayBattleAnimationFromAnotherBank ; (2)
-    ld b,BANK(PlayBattleAnimationFromAnotherBank)
-    jp Bankswitch
+    BANKSWITCH_JUMP PlayBattleAnimationFromAnotherBank ; (2)
 
 ; ─────────────────────────────────────────────────────────────
 
@@ -52459,9 +52027,7 @@ Func_3c04c: ; 3c04c (f:404c)
     ld b,$1
     call GoPAL_SET_PlusFlagAndRedBall ; Denim,funzione per flaggare questo istante di chiamata ; call GoPAL_SET
     call ResetLCD_OAM
-    ld hl,PrintBeginningBattleText
-    ld b,BANK(PrintBeginningBattleText)
-    jp Bankswitch
+    BANKSWITCH_JUMP PrintBeginningBattleText
 
 Func_3c0ff: ; 3c0ff (f:40ff)
     push bc
@@ -52538,9 +52104,7 @@ StartBattle: ; 3c11e (f:411e)
     ld hl,UnnamedText_3c1a8 ; $41a8
     jp PrintText
 .asm_3c17a
-    ld hl,PrintSafariZoneBattleText
-    ld b,BANK(PrintSafariZoneBattleText)
-    call Bankswitch
+    BANKSWITCH PrintSafariZoneBattleText
     ld a,[$cffb]
     add a
     ld b,a
@@ -52621,9 +52185,7 @@ EnemyRan: ; 3c202 (f:4202)
     call PlaySoundWaitForCurrent
     xor a
     ld [H_WHOSETURN],a ; $FF00+$f3
-    ld hl,AnimationSlideEnemyMonOut
-    ld b,BANK(AnimationSlideEnemyMonOut)
-    jp Bankswitch
+    BANKSWITCH_JUMP AnimationSlideEnemyMonOut
 
 UnnamedText_3c229: ; 3c229 (f:4229)
     TX_FAR _UnnamedText_3c229
@@ -52647,9 +52209,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     xor a
     ld [$d11d],a
     call SelectEnemyMove
-    ld b,BANK(HandlePlayerRageAndThrashing)
-    ld hl,HandlePlayerRageAndThrashing
-    call Bankswitch
+    BANKSWITCH HandlePlayerRageAndThrashing
     ld a,[W_PLAYERBATTSTATUS2]
     and %01100000 ; check if the player is using Rage or needs to recharge
     jr nz,.selectEnemyMove
@@ -52729,9 +52289,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     jr nz,.specialMoveNotUsed
     ld [wPlayerSelectedMove],a
 .specialMoveNotUsed
-    ld hl,SwitchEnemyMon
-    ld b,BANK(SwitchEnemyMon)
-    call Bankswitch
+    BANKSWITCH SwitchEnemyMon
 
 .noLinkBattle
     ld a,[wPlayerSelectedMove]
@@ -52781,9 +52339,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
 .enemyMovesFirst
     ld a,$1
     ld [H_WHOSETURN],a
-    ld hl,TrainerAI
-    ld b,BANK(TrainerAI)
-    call Bankswitch
+    BANKSWITCH TrainerAI
     jr c,.AIActionUsedEnemyFirst
     call ExecuteEnemyMove ; execute enemy move
     ld a,[$d078]
@@ -52824,9 +52380,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
 ;#3 - handle enemy using move
     ld a,$1
     ld [H_WHOSETURN],a
-    ;ld hl,TrainerAI
-    ;ld b,BANK(TrainerAI)
-    ;call Bankswitch
+    ;BANKSWITCH TrainerAI
     call CheckandResetEnemyActedBit ;check to see if ai trainer already acted this turn
     jr nz,.AIActionUsedPlayerFirst
     ;else execute the enemy move
@@ -52854,9 +52408,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
 HandlePoisonBurnLeechSeed:
     call DrawHUDsAndHPBars
 HandlePoisonBurnLeechSeed2:
-    ld b,BANK(HandlePoisonBurnLeechSeed_)
-    ld hl,HandlePoisonBurnLeechSeed_
-    jp Bankswitch
+    BANKSWITCH_JUMP HandlePoisonBurnLeechSeed_
 
 MoveEffectToPercentage:
     cp a,7    ; 10% status effects are 04,05,06 so 07 will set carry for those
@@ -52925,22 +52477,13 @@ PrintAlreadyParalyzedText:
     db "@"
 
 MistEffect:
-    ld hl,MistEffect_
-    ld b,BANK(MistEffect_)
-    jr BankswitchFronBankF
+    BANKSWITCH_JUMP MistEffect_
 
 FocusEnergyEffect:
-    ld hl,FocusEnergyEffect_
-    ld b,BANK(FocusEnergyEffect_)
-    jr BankswitchFronBankF
+    BANKSWITCH_JUMP FocusEnergyEffect_
 
 WaitButtonPressed:
-    ld b,BANK(WaitButtonPressed_)
-    ld hl,WaitButtonPressed_
-    ; fall through
-
-BankswitchFronBankF:
-    jp Bankswitch
+    BANKSWITCH_JUMP WaitButtonPressed_
 
 CheckFlyDigDontMissMove:
     push de
@@ -53014,9 +52557,7 @@ HandlePoisonBurnAfterEnemyMonFainted:
     ret
 
 Func_3ed12:
-    ld hl,Func_396d3
-    ld b,BANK(Func_396d3)
-    jp Bankswitch
+    BANKSWITCH_JUMP Func_396d3
 
 UpdateCurMonHPBar:
     FuncCoord 10,09 ; Player Bar in Battle
@@ -53193,40 +52734,30 @@ HackGainExpAfterCatch:
     call IsFocusInBagOrAllFought
     push af
     jr c,.focus
-    ld hl,ModulateExpForMonsThatFought
-    ld b,BANK(ModulateExpForMonsThatFought)
-    call Bankswitch
+    BANKSWITCH ModulateExpForMonsThatFought
 .focus
     xor a
     call GainExperience_
     pop af
     ret c ; end if focus
-    ld hl,ModulateExpForMonsThatNotFought
-    ld b,BANK(ModulateExpForMonsThatNotFought)
-    call Bankswitch
+    BANKSWITCH ModulateExpForMonsThatNotFought
     ld a,$1
     jp GainExperience_
 
 ; Set Carry Flag if Focus in Bag or All Pkmn Fought
 IsFocusInBagOrAllFought:
-    ld hl,IsFocusInBagOrAllFought_
-    ld b,BANK(IsFocusInBagOrAllFought_)
-    jp Bankswitch
+    BANKSWITCH_JUMP IsFocusInBagOrAllFought_
 
 GainExperience_:
     ld [$cc5b],a
-    ld hl,GainExperience
-    ld b,BANK(GainExperience)
-    jp Bankswitch
+    BANKSWITCH_JUMP GainExperience
 
 GetHealthBarColorWithGhostCheck:
     ld a,e
     ld [wBackupHealthBarWidth],a
     ld d,h
     ld e,l
-    ld hl,GetHealthBarColorWithGhostCheck_
-    ld b,BANK(GetHealthBarColorWithGhostCheck_)
-    jp Bankswitch
+    BANKSWITCH_JUMP GetHealthBarColorWithGhostCheck_
 
 QuarterSpeedDueToParalysisAndHalveAttackDueToBurn:
     call QuarterSpeedDueToParalysis
@@ -53294,9 +52825,7 @@ ReplaceFaintedEnemyMon: ; 3c664 (f:4664)
     ld hl,$cf1e
     ld e,$30
     call GetBattleHealthBarColor
-    ld hl,DrawEnemyPokeballs
-    ld b,BANK(DrawEnemyPokeballs)
-    call Bankswitch
+    BANKSWITCH DrawEnemyPokeballs
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jr nz,.asm_3c687
@@ -53529,9 +53058,7 @@ ChooseNextMon: ; 3c7d8 (f:47d8)
 ; called when player is out of usable mons.
 ; prints approriate lose message,sets carry flag if player blacked out (special case for initial rival fight)
 HandlePlayerBlackOut: ; 3c837 (f:4837)
-    ld hl,HandlePlayerBlackOut_
-    ld b,BANK(HandlePlayerBlackOut_)
-    jp Bankswitch
+    BANKSWITCH_JUMP HandlePlayerBlackOut_
 
 CheckShowPokedex:
     call IsPokemonSeen
@@ -53742,20 +53269,14 @@ Func_3c92a: ; 3c92a (f:492a)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;AI trainer switching & sendout is handled in this block
 .next
-    ld b,BANK(AISelectWhichMonSendOut)
-    ld hl,AISelectWhichMonSendOut
-    call Bankswitch
+    BANKSWITCH AISelectWhichMonSendOut
     ;push de
     ;ld de,wWhichPokemon
-    ;ld b,BANK(SetAISwitched)
-    ;ld hl,SetAISwitched
-    ;call Bankswitch ;joenote - flag the pokemon being sent out
+    ;BANKSWITCH SetAISwitched ; joenote - flag the pokemon being sent out
     ;pop de
     push de
     ld de,wWhichPokemon
-    ld b,BANK(ClearAISwitched)
-    ld hl,ClearAISwitched
-    call Bankswitch
+    BANKSWITCH ClearAISwitched
     pop de
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .next3
@@ -54129,9 +53650,7 @@ LoadEnemyMonFromParty: ; 3cc13 (f:4c13)
 SECTION "Func_3cc91",ROMX[$4c91],BANK[$f]
 
 Func_3cc91: ; 3cc91 (f:4c91)
-    ld hl,Func_58e59
-    ld b,BANK(Func_58e59)
-    call Bankswitch
+    BANKSWITCH Func_58e59
     ld hl,W_ENEMYMONCURHP ; $cfe6
     ld a,[hli]
     or [hl]
@@ -54231,9 +53750,7 @@ DrawPlayerHUDAndHPBar:
     ld hl,Coord
     ld bc,$50b ; 05 | 11
     call ClearScreenArea
-    ld hl,Func_3a902
-    ld b,BANK(Func_3a902)
-    call Bankswitch
+    BANKSWITCH Func_3a902
 
 ; Standard Player Name
     ld de,W_PLAYERMONNAME
@@ -54301,9 +53818,7 @@ DrawEnemyHUDAndHPBar:
     ld hl,wTileMap
     ld bc,$40c
     call ClearScreenAreaAndGoPalSet ; Reset Battle Standard Palette after red ball
-    ld hl,Func_3a919
-    ld b,BANK(Func_3a919)
-    call Bankswitch
+    BANKSWITCH Func_3a919
     ld de,W_ENEMYMONNAME
     FuncCoord 1,0 ; $c3a1
     ld hl,Coord
@@ -54687,9 +54202,7 @@ asm_3d05f:
     xor a
     ld [wCurrentMenuItem],a ; $cc26
 .FinalCheck2
-    ld b,BANK(ItemInBattleFinalCheck)
-    ld hl,ItemInBattleFinalCheck
-    jp Bankswitch
+    BANKSWITCH_JUMP ItemInBattleFinalCheck
 
 ;BackupCurMenuItemAndSelectEnemyMove:
 ;    ld a,[wCurrentMenuItem] ; Backup Current Menu Item
@@ -54775,12 +54288,7 @@ Func_3d119: ; 3d119 (f:5119)
     ; ds 5 ; PREDEF StatusScreen2 (Dismiss)
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
     bit 4,a
-    ld hl,AnimationSubstitute
     jr nz,.asm_3d182
-    ; ds 3 ; ld a,[$ccf3]
-    ; ds 1 ; and a
-    ; ds 3 ; ld hl,AnimationMinimizeMon
-    ; ds 2 ; jr nz,.asm_3d182
     ld a,[$cfe5]
     ld [$cf91],a
     ld [$d0b5],a
@@ -54791,8 +54299,7 @@ Func_3d119: ; 3d119 (f:5119)
     call LoadMonFrontSpriteOrGhost ; call LoadMonFrontSprite
     jr .asm_3d187
 .asm_3d182
-    ld b,BANK(AnimationSubstitute)
-    call Bankswitch
+    BANKSWITCH AnimationSubstitute
 .asm_3d187
     jp Func_3d0e0
 .asm_3d18a
@@ -54817,10 +54324,8 @@ Func_3d119: ; 3d119 (f:5119)
     call GBPalNormal
     ; fall through
 
-SwitchPlayerMon: ; 3d1ba (f:51ba) ;joedebug - this is where the player switches
+SwitchPlayerMon: ; joedebug - this is where the player switches
     call CheckTrappingMoveAndSetEnemyActedBitAndLoadHl ; ld hl,RetreatMon
-    ld b,BANK(RetreatMon)
-    call Bankswitch
     ld c,$32
     call DelayFrames
     call Func_3ccfa
@@ -54842,14 +54347,12 @@ SwitchPlayerMon: ; 3d1ba (f:51ba) ;joedebug - this is where the player switches
     and a
     ret
 
-UnnamedText_3d1f5: ; 3d1f5 (f:51f5)
+UnnamedText_3d1f5:
     TX_FAR _UnnamedText_3d1f5
     db "@"
 
 LoadBattlePokedex:
-    ld hl,_LoadBattlePokedex
-    ld b,BANK(_LoadBattlePokedex)
-    jp Bankswitch
+    BANKSWITCH_JUMP _LoadBattlePokedex
 
 SECTION "Func_3d1fa",ROMX[$51fa],BANK[$f]
 
@@ -54880,9 +54383,7 @@ MoveSelectionMenu:
     ld de,$d0dc
     ld bc,$4
     call CopyData
-    ld hl,FormatMovesString
-    ld b,BANK(FormatMovesString)
-    jp Bankswitch
+    BANKSWITCH_JUMP FormatMovesString
 
 .writemoves
     ld de,$d0e1
@@ -55050,9 +54551,7 @@ SelectMenuItem:
     ret nz
 ; PP ► ENERGY - DONE
     ld de,W_PLAYERMONMOVES
-    ld b,BANK(CheckEnoughEnergy)
-    ld hl,CheckEnoughEnergy
-    call Bankswitch
+    BANKSWITCH CheckEnoughEnergy
     jr c,.nopp
     ld a,[wCurrentMenuItem]
     ld c,a
@@ -55129,9 +54628,7 @@ AnyMoveToSelect:
     ld [wCurrentMenuItem],a
     push bc
     ld de,W_PLAYERMONMOVES
-    ld b,BANK(CheckEnoughEnergy)
-    ld hl,CheckEnoughEnergy
-    call Bankswitch
+    BANKSWITCH CheckEnoughEnergy
     pop bc
     jr c,.Next
     ld a,[W_PLAYERDISABLEDMOVE] ; $d06d
@@ -55271,9 +54768,7 @@ PrintMenuItem: ; 3d4b6 (f:54b6)
     ld [wWhichPokemon],a ; $cf92
     ld a,$4
     ld [$cc49],a
-;    ld hl,GetMaxPP
-;    ld b,BANK(GetMaxPP)
-;    call Bankswitch
+;    BANKSWITCH GetMaxPP
     ld hl,wCurrentMenuItem ; $cc26
     ld c,[hl]
     inc [hl]
@@ -55342,9 +54837,7 @@ SelectEnemyMove:
     ld a,[hl]
     jp .done
 .noLinkBattle
-    ld b,BANK(HandleEnemyRageAndThrashing)
-    ld hl,HandleEnemyRageAndThrashing
-    call Bankswitch
+    BANKSWITCH HandleEnemyRageAndThrashing
     ld a,[W_ENEMYBATTSTATUS2]
     and $60     ; need to recharge or using rage
     ret nz
@@ -55384,9 +54877,7 @@ SelectEnemyMove:
     ld [wCurrentMenuItem],a
     push bc
     ld de,W_ENEMYMONMOVES
-    ld b,BANK(CheckEnoughEnergy)
-    ld hl,CheckEnoughEnergy
-    call Bankswitch
+    BANKSWITCH CheckEnoughEnergy
     pop bc
     jr c,.searchNext
     ld a,[W_ENEMYDISABLEDMOVE]
@@ -55398,9 +54889,7 @@ SelectEnemyMove:
 
 ; PP ► ENERGY - DONE
 .AtLeastOneValidMove
-    ld hl,AIEnemyTrainerChooseMoves
-    ld b,BANK(AIEnemyTrainerChooseMoves)
-    call Bankswitch
+    BANKSWITCH AIEnemyTrainerChooseMoves
     ld d,h
     ld e,l
 .chooseRandomMove
@@ -55410,9 +54899,7 @@ SelectEnemyMove:
     push bc
     push de
     ld de,W_ENEMYMONMOVES
-    ld b,BANK(CheckEnoughEnergy)
-    ld hl,CheckEnoughEnergy
-    call Bankswitch
+    BANKSWITCH CheckEnoughEnergy
     pop de
     pop bc
     pop hl ; Restore h=Move
@@ -55432,14 +54919,10 @@ SelectEnemyMove:
     jr .done
 
 HealEffect:
-    ld hl,HealEffect_
-    ld b,BANK(HealEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP HealEffect_
 
 TransformEffect:
-    ld hl,TransformEffect_
-    ld b,BANK(TransformEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP TransformEffect_
 
 ; Free
 
@@ -55471,9 +54954,7 @@ Func_3d605: ; 3d605 (f:5605)
     ld a,b
 .asm_3d630
     ld [$cc42],a
-    ld hl,Func_4c05
-    ld b,BANK(Func_4c05)
-    call Bankswitch
+    BANKSWITCH Func_4c05
 .asm_3d63b
     call Func_22c3
     call DelayFrame
@@ -55549,10 +55030,8 @@ PlayerCanExecuteChargingMove:
 
 PlayerCanExecuteMove:
     call PrintMonName1Text
-    ld hl,DecrementPP
     ld de,wPlayerSelectedMove ; pointer to the move just used
-    ld b,BANK(DecrementPP)
-    call Bankswitch
+    BANKSWITCH DecrementPP
     ld a,[W_PLAYERMOVEEFFECT] ; effect of the move just used
     ld hl,EffectsArray1
     call RunMoveEffectInList
@@ -55605,9 +55084,7 @@ playPlayerMoveAnimation:
     push af
     ld a,[W_PLAYERBATTSTATUS2]
     bit 4,a ; HAS_SUBSTITUTE_UP
-    ld hl,HideSubstituteShowMonAnim
-    ld b,BANK(HideSubstituteShowMonAnim)
-    call nz,Bankswitch
+    BANKSWITCH_NZ HideSubstituteShowMonAnim
     pop af
     ld [$CC5B],a ; AnimationType
     ld a,[W_PLAYERMOVENUM]
@@ -55616,9 +55093,7 @@ playPlayerMoveAnimation:
     call DrawPlayerHUDAndHPBar
     ld a,[W_PLAYERBATTSTATUS2]
     bit 4,a ; HAS_SUBSTITUTE_UP
-    ld hl,ReshowSubstituteAnim
-    ld b,BANK(ReshowSubstituteAnim)
-    call nz,Bankswitch
+    BANKSWITCH_NZ ReshowSubstituteAnim
     jr MirrorMoveCheck
 
 playerCheckIfFlyOrChargeEffect:
@@ -55668,9 +55143,7 @@ MirrorMoveCheck:
 .moveDidNotMiss
     call ApplyAttackToEnemyPokemon
     call PrintCriticalOHKOText
-    ld hl,DisplayEffectiveness
-    ld b,BANK(DisplayEffectiveness)
-    call Bankswitch
+    BANKSWITCH DisplayEffectiveness
     call PlayerMoveDidntMissAndEnemyBideAccum
 .notDone
     ld a,[W_PLAYERMOVEEFFECT]
@@ -56417,9 +55890,7 @@ CheckForDisobedience: ; 3dc88 (f:5c88)
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
     jp z,.Obey
-    ld b,BANK(GetMaxLevel)
-    ld hl,GetMaxLevel
-    call Bankswitch
+    BANKSWITCH GetMaxLevel
     ld b,d
     ld c,d
     ld a,[W_PLAYERMONLEVEL] ; $d022
@@ -56517,9 +55988,7 @@ CheckForDisobedience: ; 3dc88 (f:5c88)
 ; PP ► ENERGY - DONE
     ld [wCurrentMenuItem],a ; $cc26
     ld hl,W_PLAYERMONMOVES
-    ld b,BANK(CheckEnoughEnergy)
-    ld hl,CheckEnoughEnergy
-    call Bankswitch
+    BANKSWITCH CheckEnoughEnergy
     jr c,.chooseMove
     ld a,[wCurrentMenuItem] ; $cc26
     ld c,a
@@ -57021,14 +56490,7 @@ INCBIN "baserom.gbc",$3e01e,$3e023 - $3e01e
 
 ; determines if attack is a critical hit
 CriticalHitTest:
-    ld b,BANK(_CriticalHitTest_NoBug) ; same as _CriticalHitTest
-    ;ld hl,_CriticalHitTest
-    ;ld a,[W_ISLINKBATTLE]
-    ;cp $4
-    ;jr z,.RunWithBUG
-    ld hl,_CriticalHitTest_NoBug
-;.RunWithBUG
-    jp Bankswitch
+    BANKSWITCH_JUMP _CriticalHitTest_NoBug
 
 ResetLeechSeedFlagAndReadPlayerMonCurHPAndStatus:
     ;joenote - zero the damage from last round if not using a trapping move
@@ -57042,18 +56504,14 @@ ResetLeechSeedFlagAndReadPlayerMonCurHPAndStatus:
 
 CheckNotEscapeWildPokemon:
     push hl
-    ld b,BANK(_CheckNotEscapeWildPokemon)
-    ld hl,_CheckNotEscapeWildPokemon
-    call Bankswitch
+    BANKSWITCH _CheckNotEscapeWildPokemon
     pop hl
     ret
 
 DrawCurrentMonGenderInBattle:
     push de
     push bc
-    ld hl,_DrawCurrentMonGenderInBattle
-    ld b,BANK(_DrawCurrentMonGenderInBattle)
-    call Bankswitch
+    BANKSWITCH _DrawCurrentMonGenderInBattle
     pop bc
     pop de
     ret
@@ -57136,9 +56594,7 @@ HalvePlayerSpeedAfterRun:
     ret
 
 ReflectLightScreenEffect:
-    ld hl,ReflectLightScreenEffect_
-    ld b,BANK(ReflectLightScreenEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP ReflectLightScreenEffect_
 
 EnemyMonFainted:
     TX_FAR _EnemyMonFainted
@@ -57401,9 +56857,7 @@ AttackSubstitute: ; 3e25e (f:625e)
     call GetPlayerOrEnemyTurnWithSubstitute
     push de
     push bc
-    ld b,BANK(PrintBattleValueNearMon_)
-    ld hl,PrintBattleValueNearMon_
-    call Bankswitch
+    BANKSWITCH PrintBattleValueNearMon_
     call RemoveBattleValueBankF
     ld hl,.SubstituteTookDamageText
     call PrintText
@@ -57426,9 +56880,7 @@ AttackSubstitute: ; 3e25e (f:625e)
     call PrintText
 ; flip whose turn it is for the next function call
     call FlipTurn
-    ld hl,HideSubstituteShowMonAnim
-    ld b,BANK(HideSubstituteShowMonAnim) ; animate the substitute breaking
-    call Bankswitch ; substitute
+    BANKSWITCH HideSubstituteShowMonAnim ; animate the substitute breaking
 ; flip the turn back to the way it was
     call FlipTurn
     ld hl,W_PLAYERMOVEEFFECT ; value for player's turn
@@ -57602,9 +57054,7 @@ HowManyMovesWithEnoughEnergy:
     jr z,.End
     ld [wCurrentMenuItem],a
     push bc
-    ld b,BANK(CheckEnoughEnergy)
-    ld hl,CheckEnoughEnergy
-    call Bankswitch
+    BANKSWITCH CheckEnoughEnergy
     pop bc
     jr c,.Next
     inc c
@@ -57717,9 +57167,7 @@ AdjustDamageForMoveType:
 HandleEnemySwitchingOrUsingAnItemAndThenExecutePlayerMove:
     ld a,$1
     ld [H_WHOSETURN],a
-    ld hl,TrainerAI
-    ld b,BANK(TrainerAI)
-    call Bankswitch
+    BANKSWITCH TrainerAI
     call c,SetEnemyActedBit ;if carry was set from TrainerAI, set the bit indicating the ai trainer switched or used an item
     jp ExecutePlayerMove ; execute player move ;note: this function writes zero to H_WHOSETURN
 
@@ -57735,9 +57183,7 @@ HandleMenuInputLockedDuringDebugEnemyMove:
 GetTypeEffects:
     push bc
     push de
-    ld b,BANK(GetTypeEffects_)
-    ld hl,GetTypeEffects_
-    call Bankswitch
+    BANKSWITCH GetTypeEffects_
     pop de
     pop bc
     ld hl,wBufferTypeEffects
@@ -57780,9 +57226,7 @@ BackupMovesBeforeEnemyMimic:
     ret
 
 HazeEffect:
-    ld hl,HazeEffect_
-    ld b,BANK(HazeEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP HazeEffect_
 
 JumpMoveEffect:
     call JumpMoveEffect_
@@ -57853,9 +57297,7 @@ TrappingEffect:
     ret
 
 LoadEnemyMonData_GetAlternateMonHeader:
-    ld hl,LoadEnemyMonData_GetAlternateMonHeader_
-    ld b,BANK(LoadEnemyMonData_GetAlternateMonHeader_)
-    call Bankswitch
+    BANKSWITCH LoadEnemyMonData_GetAlternateMonHeader_
     jp GetMonHeader
 
 ; some tests that need to pass for a move to hit
@@ -58280,9 +57722,7 @@ playEnemyMoveAnimation:
     push af
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
     bit 4,a ; does mon have a substitute?
-    ld hl,HideSubstituteShowMonAnim
-    ld b,BANK(HideSubstituteShowMonAnim)
-    call nz,Bankswitch
+    BANKSWITCH_NZ HideSubstituteShowMonAnim
     pop af
     ld [$CC5B],a ; AnimationType
     ld a,[W_ENEMYMOVENUM] ; $cfcc
@@ -58291,9 +57731,7 @@ playEnemyMoveAnimation:
     call DrawEnemyHUDAndHPBar
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
     bit 4,a ; does mon have a substitute?
-    ld hl,ReshowSubstituteAnim
-    ld b,BANK(ReshowSubstituteAnim)
-    call nz,Bankswitch
+    BANKSWITCH_NZ ReshowSubstituteAnim
     jr EnemyCheckIfMirrorMoveEffect
 
 EnemyCheckIfFlyOrChargeEffect:
@@ -58342,9 +57780,7 @@ EnemyCheckIfMirrorMoveEffect:
 .moveDidNotMiss
     call ApplyAttackToPlayerPokemon
     call PrintCriticalOHKOText
-    ld hl,DisplayEffectiveness
-    ld b,BANK(DisplayEffectiveness)
-    call Bankswitch
+    BANKSWITCH DisplayEffectiveness
     call EnemyMoveDidntMissAndPlayerBideAccum
 .notDone
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
@@ -58934,18 +58370,14 @@ DoBattleTransitionAndInitBatVar:
     jr nz,.asm_3ec4d
     xor a
     ld [wMenuJoypadPollCount],a ; $cc34
-    ld hl,Func_372d6
-    ld b,BANK(Func_372d6)
-    call Bankswitch
+    BANKSWITCH Func_372d6
     ld a,$1
     ld [$cfcb],a
     call ClearScreen
 .asm_3ec4d
     call DelayFrame
     PREDEF Func_7096d
-    ld hl,LoadHudAndHpBarAndStatusTilePatterns
-    ld b,BANK(LoadHudAndHpBarAndStatusTilePatterns)
-    call Bankswitch
+    BANKSWITCH LoadHudAndHpBarAndStatusTilePatterns
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld a,$ff
@@ -59378,9 +58810,7 @@ CheckNotNullifyEffectWithSubstitute:
     ret
 
 CheckCounterFail:
-    ld hl,_CheckCounterFail
-    ld b,BANK(_CheckCounterFail)
-    call Bankswitch
+    BANKSWITCH _CheckCounterFail
     ld hl,W_DAMAGE+1
     ret
 
@@ -59414,9 +58844,7 @@ DetermineWildOpponent: ; 3ef23 (f:6f23)
     ld a,[$d13c]
     and a
     ret nz
-    ld hl,TryDoWildEncounter
-    ld b,BANK(TryDoWildEncounter)
-    call Bankswitch
+    BANKSWITCH TryDoWildEncounter
     ret nz
 InitBattleCommon: ; 3ef3d (f:6f3d)
     ld a,[$d35d]
@@ -59425,9 +58853,7 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     ld a,[hl]
     push af
     res 1,[hl]
-    ld hl,InitBattleVariables
-    ld b,BANK(InitBattleVariables)
-    call Bankswitch
+    BANKSWITCH InitBattleVariables
     ld a,[W_TRAINERNO]
     and a
     jr z,.InitWildBattle
@@ -59436,9 +58862,7 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     ld a,[W_CUROPPONENT] ; $d059
     ld [W_TRAINERCLASS],a ; $d031
     call Func_3566
-    ld hl,ReadTrainer
-    ld b,BANK(ReadTrainer)
-    call Bankswitch
+    BANKSWITCH ReadTrainer
     call PlayBattleMusicAndDoBattleTransitionAndInitBatVar ; call DoBattleTransitionAndInitBatVar
     call _LoadTrainerPic
     xor a
@@ -59505,9 +58929,7 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     dec a
     call z,DrawEnemyHUDAndHPBar
     call StartBattle
-    ld hl,EndOfBattle
-    ld b,BANK(EndOfBattle)
-    call Bankswitch
+    BANKSWITCH EndOfBattle
     pop af
     ld [$d358],a
     pop af
@@ -59518,9 +58940,7 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
     ret
 
 LoadGhostPic:
-    ld b,BANK(_LoadGhostPic)
-    ld hl,_LoadGhostPic
-    jp Bankswitch
+    BANKSWITCH_JUMP _LoadGhostPic
 
 ItemsCantBeUsedHere:
     TX_FAR ItemsCantBeUsedHere_
@@ -59530,9 +58950,7 @@ TerminatorText_3f04a:
     db "@"
 
 ConversionEffect:
-    ld hl,ConversionEffect_
-    ld b,BANK(ConversionEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP ConversionEffect_
 
 InsertRealTypes:
     call GetMonHeader
@@ -59965,9 +59383,7 @@ PoisonEffect:
     db "@"
 
 DrainHPEffect:
-    ld hl,DrainHPEffect_
-    ld b,BANK(DrainHPEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP DrainHPEffect_
 
 FreezeBurnParalyzeEffect:
     xor a
@@ -60250,10 +59666,8 @@ StatModifierUpEffect:
     bit 4,[hl] ; HAS_SUBSTITUTE_UP
     push af
     push bc
-    ld hl,HideSubstituteShowMonAnim
-    ld b,BANK(HideSubstituteShowMonAnim)
     push de
-    call nz,Bankswitch
+    BANKSWITCH_NZ HideSubstituteShowMonAnim
     pop de
 .notMinimize
     call PlayCurrentMoveAnimation_WithException
@@ -60263,10 +59677,8 @@ StatModifierUpEffect:
     pop bc
     ld a,$1
     ld [bc],a
-    ld hl,ReshowSubstituteAnim
-    ld b,BANK(ReshowSubstituteAnim)
     pop af
-    call nz,Bankswitch
+    BANKSWITCH_NZ ReshowSubstituteAnim
 .applyBadgeBoostsAndStatusPenalties
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
@@ -60793,9 +60205,7 @@ FlinchSideEffect: ; 3f85b (f:785b)
     ret
 
 OneHitKOEffect: ; 3f884 (f:7884)
-    ld hl,OneHitKOEffect_
-    ld b,BANK(OneHitKOEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP OneHitKOEffect_
 
 ChargeEffect: ; 3f88c (f:788c)
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
@@ -60973,14 +60383,10 @@ PlayBattleAnimationFromAnotherBank:
 SECTION "ParalyzeEffect",ROMX[$79b1],BANK[$f]
 
 ParalyzeEffect: ; 3f9b1 (f:79b1)
-    ld hl,ParalyzeEffect_
-    ld b,BANK(ParalyzeEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP ParalyzeEffect_
 
 SubstituteEffect: ; 3f9b9 (f:79b9)
-    ld hl,SubstituteEffectHandler
-    ld b,BANK(SubstituteEffectHandler)
-    jp Bankswitch
+    BANKSWITCH_JUMP SubstituteEffectHandler
 
 HyperBeamEffect: ; 3f9c1 (f:79c1)
     ld hl,W_PLAYERBATTSTATUS2 ; $d063
@@ -61077,9 +60483,7 @@ MimicEffect: ; 3f9ed (f:79ed)
     db "@"
 
 LeechSeedEffect:
-    ld hl,LeechSeedEffect_
-    ld b,BANK(LeechSeedEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP LeechSeedEffect_
 
 DisableEffect:
     call MoveHitTestPlus
@@ -61121,9 +60525,7 @@ DisableEffect:
     ld a,c
     ld [wCurrentMenuItem],a
     push bc
-    ld b,BANK(CheckEnoughEnergy)
-    ld hl,CheckEnoughEnergy
-    call Bankswitch
+    BANKSWITCH CheckEnoughEnergy
     pop bc
     jr c,.pickMoveToDisable
     pop af                  ; Restore Current Menu Item
@@ -61311,9 +60713,7 @@ CopyDamage:
     ret
 
 RemoveBattleValueBankF:
-    ld b,BANK(RemoveBattleValue_)
-    ld hl,RemoveBattleValue_
-    jp Bankswitch
+    BANKSWITCH_JUMP RemoveBattleValue_
 
 SetDamageDirectToPlayer:
     ld hl,wPrintBattleValueBit0
@@ -61470,9 +60870,7 @@ CheckSpecialHybridSprite: ; Denim
 DrawCatchGenderAndLoadCoord: ; Denim
     push de
     push bc
-    ld hl,_DrawCatchGender
-    ld b,BANK(_DrawCatchGender)
-    call Bankswitch
+    BANKSWITCH _DrawCatchGender
     pop bc
     pop de
     ret
@@ -61556,16 +60954,12 @@ CalcEXPBarPixelLength:
     ld [H_QUOTIENT + 3],a
     ret
 .start
-    ld hl,CalcEXPBarPixelLength_
-    ld b,BANK(CalcEXPBarPixelLength_)
-    jp Bankswitch
+    BANKSWITCH_JUMP CalcEXPBarPixelLength_
 
 ForceShinyOrRandom:
     call GenRandomInBattle
     ld e,a
-    ld b,BANK(ForceShinyOrRandom_)
-    ld hl,ForceShinyOrRandom_
-    call Bankswitch
+    BANKSWITCH ForceShinyOrRandom_
     ld a,d
     ld b,e
     ret
@@ -61617,9 +61011,7 @@ GetEnemyIV:
     ret
 
 LoadEnemyMonData_CalcStats:
-    ld b,BANK(_LoadEnemyMonData_CalcStats)
-    ld hl,_LoadEnemyMonData_CalcStats
-    jp Bankswitch
+    BANKSWITCH_JUMP _LoadEnemyMonData_CalcStats
 
 ; function to tell how effective the type of an enemy attack is on the player's current pokemon
 ; this doesn't take into account the effects that dual types can have
@@ -61697,9 +61089,7 @@ AIGetTypeEffectiveness:
 ; ──────────────────────────────────────────────────
 
 PlayBattleMusicAndDoBattleTransitionAndInitBatVar:
-   ld hl,PlayBattleMusic
-   ld b,BANK(PlayBattleMusic)
-   call Bankswitch
+   BANKSWITCH PlayBattleMusic
    jp DoBattleTransitionAndInitBatVar
 
 ;calls out to trainer ai routines with no-attack bit set
@@ -61715,9 +61105,7 @@ NoAttackAICall:
     set 2,a
     ld [wUnusedC000],a
     ;call ai routines
-    ld b,BANK(AIEnemyTrainerChooseMoves)
-    ld hl,AIEnemyTrainerChooseMoves
-    call Bankswitch
+    BANKSWITCH AIEnemyTrainerChooseMoves
     ;joenote - reset the no-attack bit
     ld a,[wUnusedC000]
     res 2,a
@@ -61738,20 +61126,15 @@ CheckTrappingMoveAndSetEnemyActedBitAndLoadHl:
     ld [wEnemySelectedMove],a
     call SetEnemyActedBit
 .end
-    ld hl,RetreatMon
-    ret
+    BANKSWITCH_JUMP RetreatMon
 
 SetExplodeFlag:
-    ld b,BANK(SetExplodeFlag_)
-    ld hl,SetExplodeFlag_
-    call Bankswitch
+    BANKSWITCH SetExplodeFlag_
     ld hl,W_PLAYERMONCURHP
     ret
 
 SetExplodeFlagBecauseStatusAfterFainted:
-    ld b,BANK(SetExplodeFlagBecauseStatusAfterFainted_)
-    ld hl,SetExplodeFlagBecauseStatusAfterFainted_
-    jp Bankswitch
+    BANKSWITCH_JUMP SetExplodeFlagBecauseStatusAfterFainted_
 
 LoadMonFrontSpriteOrGhost:
     call IsGhostBattle
@@ -61765,18 +61148,14 @@ WriteMonMovesPlus:
 .NormalWild
     PREDEF_JUMP WriteMonMoves
 .CheckSpecialWild
-    ld b,BANK(CheckSpecialWild_)
-    ld hl,CheckSpecialWild_
-    call Bankswitch
+    BANKSWITCH CheckSpecialWild_
     jr nc,.NormalWild
     ret
 
 DecrementEnemyPP:
     call PrintMonName1Text
     ld de,wEnemySelectedMove ; pointer to the move just used
-    ld b,BANK(DecrementEnemyPP_)
-    ld hl,DecrementEnemyPP_
-    jp Bankswitch
+    BANKSWITCH_JUMP DecrementEnemyPP_
 
 Copy4Bytes:
     ld a,[wWhichPokemon] ; $cf92
@@ -61797,9 +61176,7 @@ Copy2BytesDirect:
     jp CopyData
 
 StatUpDownEffect:
-    ld hl,StatUpDownEffect_
-    ld b,BANK(StatUpDownEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP StatUpDownEffect_
 
 CheckCustomSideEffect:
     push hl
@@ -61932,9 +61309,7 @@ SwapBit2And4:
     ret
 
 PayDayEffect:
-    ld hl,PayDayEffect_
-    ld b,BANK(PayDayEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP PayDayEffect_
 
 LoadBattleMonFromParty_HandleAlternative:
     ld hl,W_PARTYMON1_MOVE2PP
@@ -61975,9 +61350,7 @@ PlayABattleAnimationCommon:
     jp PlayBattleAnimation
 
 RecoilEffect:
-    ld hl,RecoilEffect_
-    ld b,BANK(RecoilEffect_)
-    jp Bankswitch
+    BANKSWITCH_JUMP RecoilEffect_
 
 HandleGhostBattleInSafari:
     ld hl,W_BATTLETYPE
@@ -61997,9 +61370,7 @@ PrintStatusConditionBattleEnemy:
     jp PrintStatusCondition
 
 WriteEnergyAllMoves:
-    ld b,BANK(WriteEnergyAllMoves_)
-    ld hl,WriteEnergyAllMoves_
-    jp Bankswitch
+    BANKSWITCH_JUMP WriteEnergyAllMoves_
 
 StartBattleAlarm:
     ld a,[W_OPTIONS]
@@ -62073,9 +61444,7 @@ DisplayPokedexMenu_: ; 40000 (10:4000)
 .setUpGraphics
     ld b,$08
     call GoPAL_SET
-    ld hl,LoadPokedexTilePatterns
-    ld b,BANK(LoadPokedexTilePatterns)
-    call Bankswitch
+    BANKSWITCH LoadPokedexTilePatterns
 .doPokemonListMenu
     ld hl,wTopMenuItemY
     ld a,2
@@ -62472,9 +61841,8 @@ ShowPokedexData: ; 402d1 (10:42d1)
     call GBPalWhiteOutWithDelay3
     call ClearScreen
     call UpdateSprites
-    ld hl,LoadPokedexTilePatterns
-    ld b,BANK(LoadPokedexTilePatterns)
-    call Bankswitch ; load pokedex tiles
+    BANKSWITCH LoadPokedexTilePatterns ; load pokedex tiles
+    ; fall through
 
 ; function to display pokedex data from inside the pokedex
 ShowPokedexDataInternal: ; 402e2 (10:42e2)
@@ -62863,9 +62231,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     jr nz,.Loop4Types
     ld a,10
     ld [$d05b],a ; DamageMultipliers
-    ld b,BANK(AdjustDamageForMoveType)
-    ld hl,AdjustDamageForMoveType
-    call Bankswitch
+    BANKSWITCH AdjustDamageForMoveType
     call .ReadDamageMultiplier
     pop hl
     push hl
@@ -64235,9 +63601,7 @@ Func_411a1: ; 411a1 (10:51a1)
 Trade_LoadMonPartySpriteGfx: ; 4120b (10:520b)
     ld a,$d0
     ld [rOBP1],a ; $FF00+$49
-    ld b,BANK(LoadMonPartySpriteGfx)
-    ld hl,LoadMonPartySpriteGfx
-    jp Bankswitch
+    BANKSWITCH_JUMP LoadMonPartySpriteGfx
 
 Func_41217: ; 41217 (10:5217)
     ld hl,W_PLAYERNAME
@@ -64636,9 +64000,7 @@ Func_414e8: ; 414e8 (10:54e8)
     ret
 
 Func_41505: ; 41505 (10:5505)
-    ld b,BANK(WriteMonPartySpriteOAMBySpecies)
-    ld hl,WriteMonPartySpriteOAMBySpecies
-    call Bankswitch
+    BANKSWITCH WriteMonPartySpriteOAMBySpecies
     call Func_41558
 
 Func_41510: ; 41510 (10:5510)
@@ -65157,9 +64519,7 @@ Func_41852: ; 41852 (10:5852)
 Func_4188a: ; 4188a (10:588a)
     ld b,$c
     call GoPAL_SET
-    ld b,BANK(LoadCopyrightAndTextBoxTiles)
-    ld hl,LoadCopyrightAndTextBoxTiles
-    call Bankswitch
+    BANKSWITCH LoadCopyrightAndTextBoxTiles
     ld a,$e4
     ld [rBGP],a ; $FF00+$47
     ld c,$b4
@@ -65176,9 +64536,7 @@ Func_4188a: ; 4188a (10:588a)
     set 3,[hl]
     ld c,$40
     call DelayFrames
-    ld b,BANK(Func_70044)
-    ld hl,Func_70044
-    call Bankswitch
+    BANKSWITCH Func_70044
     push af
     pop af
     jr c,.asm_418d0
@@ -65993,9 +65351,7 @@ DisplayDexRating: ; 44169 (11:4169)
     call PrintText
     pop hl
     call PrintText
-    ld b,BANK(Func_7d13b)
-    ld hl,Func_7d13b
-    call Bankswitch
+    BANKSWITCH Func_7d13b
     jp WaitForTextScrollButtonPress ; wait for button press
 
 .UnnamedText_441cc
@@ -68280,9 +67636,7 @@ RocketHideoutElevatorWarpMaps: ; 45759 (11:5759)
 
 Func_4575f: ; 4575f (11:575f)
     call Delay3
-    ld b,BANK(Func_7bf15)
-    ld hl,Func_7bf15
-    jp Bankswitch
+    BANKSWITCH_JUMP Func_7bf15
 
 RocketHideoutElevatorTextPointers:
     dw RocketHideoutElevatorText1
@@ -68400,9 +67754,7 @@ SilphCoElevatorWarpMaps: ; 45811 (11:5811)
 
 Func_45827: ; 45827 (11:5827)
     call Delay3
-    ld b,BANK(Func_7bf15)
-    ld hl,Func_7bf15
-    jp Bankswitch
+    BANKSWITCH_JUMP Func_7bf15
 
 SilphCoElevatorTextPointers:
     dw SilphCoElevatorText1
@@ -71839,9 +71191,7 @@ CeladonMartRoofScript_4840c: ; 4840c (12:440c)
     jp PrintText
 
 RemoveItemByIDBank12: ; 484e6 (12:44e6)
-    ld b,BANK(RemoveItemByID)
-    ld hl,RemoveItemByID
-    jp Bankswitch
+    BANKSWITCH_JUMP RemoveItemByID
 
 UnnamedText_484ee: ; 484ee (12:44ee)
     TX_FAR _UnnamedText_484ee
@@ -72052,9 +71402,7 @@ CeldaonMartElevatorWarpMaps: ; 4864a (12:464a)
     db $02,CELADON_MART_5
 
 Func_48654: ; 48654 (12:4654)
-    ld b,BANK(Func_7bf15)
-    ld hl,Func_7bf15
-    jp Bankswitch
+    BANKSWITCH_JUMP Func_7bf15
 
 CeladonMartElevatorTextPointers: ; 4865c (12:465c)
     dw CeladonMartElevatorText1
@@ -72262,9 +71610,7 @@ DirectorText: ; 487b2 (12:47b2)
     TX_FAR _CompletedDexText ; 0x9d0ad
     db $6
     db $8 ; asm
-    ld hl,DisplayDiploma
-    ld b,BANK(DisplayDiploma)
-    call Bankswitch
+    BANKSWITCH DisplayDiploma
     ld a,$1
     ld [$cc3c],a
     jp TextScriptEnd
@@ -75941,9 +75287,7 @@ _GivePokemon: ; 4fda5 (13:7da5)
     ld [W_ENEMYMONID],a
     call GivePokemon_LoadEnemyMonData
     call .SetPokedexOwnedFlag
-    ld hl,SendNewMonToBox
-    ld b,BANK(SendNewMonToBox)
-    call Bankswitch
+    BANKSWITCH SendNewMonToBox
     ld hl,$cf4b
     ld a,[$d5a0]
     and $7f
@@ -76200,9 +75544,7 @@ GivePokemon_LoadEnemyMonData:
     ld a,[hl]
     push af
     push hl
-    ld hl,LoadEnemyMonData
-    ld b,BANK(LoadEnemyMonData)
-    call Bankswitch
+    BANKSWITCH LoadEnemyMonData
     pop hl
     pop af
     ld [hl],a
@@ -77089,9 +76431,7 @@ Route22Script2: ; 50fb5 (14:4fb5)
     ld a,$ff
     ld [$c0ee],a
     call PlaySound
-    ld b,BANK(Music_RivalAlternateStart)
-    ld hl,Music_RivalAlternateStart
-    call Bankswitch
+    BANKSWITCH Music_RivalAlternateStart
     ld a,[$cf0d]
     cp $1
     jr nz,.asm_50fff ; 0x50ff8 $5
@@ -77154,9 +76494,7 @@ Func_5104e: ; 5104e (14:504e)
     ld a,$ff
     ld [$c0ee],a
     call PlaySound
-    ld b,BANK(Music_RivalAlternateTempo)
-    ld hl,Music_RivalAlternateTempo
-    call Bankswitch
+    BANKSWITCH Music_RivalAlternateTempo
     ld a,$2
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call Func_50ee6
@@ -77238,9 +76576,7 @@ Route22Script5: ; 510df (14:50df)
     ld a,$ff
     ld [$c0ee],a
     call PlaySound
-    ld b,BANK(Music_RivalAlternateStartAndTempo)
-    ld hl,Music_RivalAlternateStartAndTempo
-    call Bankswitch
+    BANKSWITCH Music_RivalAlternateStartAndTempo
     ld a,[$cf0d]
     cp $1
     jr nz,.asm_51134
@@ -78734,9 +78070,7 @@ SilphCo7Script4: ; 51cc8 (14:5cc8)
     ld a,$ff
     ld [$c0ee],a
     call PlaySound
-    ld b,BANK(Music_RivalAlternateStart)
-    ld hl,Music_RivalAlternateStart
-    call Bankswitch
+    BANKSWITCH Music_RivalAlternateStart
     ld de,MovementData_51d1d
     ld a,[$cf0d]
     cp $1
@@ -79617,12 +78951,8 @@ InitBattleVariables: ; 525af (14:65af)
     ld a,$2
     ld [W_BATTLETYPE],a ; $d05a
 .asm_525f9
-    ;ld hl,PlayBattleMusic
-    ;ld b,BANK(PlayBattleMusic)
-    ;jp Bankswitch
-    ld b,BANK(InitExplodeFlag)
-    ld hl,InitExplodeFlag
-    jp Bankswitch
+    ;BANKSWITCH_JUMP PlayBattleMusic
+    BANKSWITCH_JUMP InitExplodeFlag
 
 ParalyzeEffect_:
     ld hl,W_ENEMYMONSTATUS ; $cfe9
@@ -79642,21 +78972,15 @@ ParalyzeEffect_:
     jr z,.doesntAffect
 .hitTest
     push hl
-    ld hl,MoveHitTestPlus
-    ld b,BANK(MoveHitTestPlus)
-    call Bankswitch
+    BANKSWITCH MoveHitTestPlus
     pop hl
     jr nz,.didntAffect
     set PAR_Bit,[hl]
-    ld hl,QuarterSpeedDueToParalysis
-    ld b,BANK(QuarterSpeedDueToParalysis)
-    call Bankswitch
+    BANKSWITCH QuarterSpeedDueToParalysis
     ld c,30
     call DelayFrames
-    ld hl,PlayCurrentMoveAnimation2
-    call .BankswitchToF
-    ld hl,PrintMayNotAttackText
-    jr .BankswitchToF
+    BANKSWITCH PlayCurrentMoveAnimation2
+    BANKSWITCH_JUMP PrintMayNotAttackText
 .alreadyParalyzed
     ld hl,PrintAlreadyParalyzedText
     jr .PlayAnimationAndTextFail
@@ -79675,7 +78999,7 @@ ParalyzeEffect_:
     ld hl,PlayCurrentMoveAnimation
     ; fall through
 .BankswitchToF
-    ld b,$F
+    ld b,BANK(PlayCurrentMoveAnimation) ; same PrintAlreadyParalyzedText,PrintDidntAffectText
     jp Bankswitch
 
 SECTION "Func_52673",ROMX[$6673],BANK[$14]
@@ -80573,9 +79897,7 @@ GetPrizeMonLevel:
 .matchFound
     ld a,[hl]
     ld [W_CURENEMYLVL],a ; $d127
-    ld hl,GetWildEnemyLevel
-    ld b,BANK(GetWildEnemyLevel)
-    call Bankswitch
+    BANKSWITCH GetWildEnemyLevel
     ld a,[W_CURENEMYLVL] ; $d127
 .end
     ld [W_CURENEMYLVL],a ; $d127
@@ -81224,9 +80546,7 @@ GainExperience: ; 5524f (15:524f)
     ld [$d0b5],a
     call GetMonHeaderAndMaxLevel ; call GetMonHeader
     ; ds 2 ; ld d,100
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
+    BANKSWITCH CalcExperience
 ; compare max exp with current exp
     ld a,[H_NUMTOPRINT] ; $FF00+$96 (aliases: H_MULTIPLICAND)
     ld b,a
@@ -81264,9 +80584,7 @@ GainExperience: ; 5524f (15:524f)
     ld bc,$13
     add hl,bc
     push hl
-    ld b,BANK(CalcLevelFromExperience)
-    ld hl,CalcLevelFromExperience
-    call Bankswitch
+    BANKSWITCH CalcLevelFromExperience
     pop hl
     ld a,[hl] ; current level
     ld [$cd46],a ; ($cd46 = wTempCoins1) - fixing skip move-learn glitch: need to store the current level in wram
@@ -81347,21 +80665,11 @@ GainExperience: ; 5524f (15:524f)
 .asm_553c8
     xor a
     ld [$d11e],a
-    ld hl,CalculateModifiedStats
-    ld b,BANK(CalculateModifiedStats)
-    call Bankswitch
-    ld hl,ApplyBadgeStatBoostsFull
-    ld b,BANK(ApplyBadgeStatBoostsFull)
-    call Bankswitch
-    ld hl,ApplyBurnAndParalysisPenaltiesToPlayer
-    ld b,BANK(ApplyBurnAndParalysisPenaltiesToPlayer)
-    call Bankswitch
-    ld hl,DrawPlayerHUDAndHPBar
-    ld b,BANK(DrawPlayerHUDAndHPBar)
-    call Bankswitch
-    ld hl,PrintEmptyString
-    ld b,BANK(PrintEmptyString)
-    call Bankswitch
+    BANKSWITCH CalculateModifiedStats
+    BANKSWITCH ApplyBadgeStatBoostsFull
+    BANKSWITCH ApplyBurnAndParalysisPenaltiesToPlayer
+    BANKSWITCH DrawPlayerHUDAndHPBar
+    BANKSWITCH PrintEmptyString
     call SaveScreenTilesToBuffer1
 .asm_553f7
     ld hl,UnnamedText_554dd ; $54dd
@@ -81370,9 +80678,7 @@ GainExperience: ; 5524f (15:524f)
     ld [$cc49],a
     call AnimateEXPBarAgain ; call LoadMonData ; Denim,ExpBar ;
     ld d,$1
-    ld hl,PrintStatsBox
-    ld b,BANK(PrintStatsBox)
-    call Bankswitch
+    BANKSWITCH PrintStatsBox
     call WaitForTextScrollButtonPress
     call LoadScreenTilesFromBuffer1
     xor a
@@ -83905,16 +83211,12 @@ DayCareMText1:
     ld a,$3
     ld [$cc49],a
     call LoadMonData
-    ld hl,CalcLevelFromExperience
-    ld b,BANK(CalcLevelFromExperience)
-    call Bankswitch
+    BANKSWITCH CalcLevelFromExperience
     ld a,d
     cp $64
     jr c,.asm_56315
     ld d,$64
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
+    BANKSWITCH CalcExperience
     ld hl,$da6d
     ld a,[H_NUMTOPRINT]
     ld [hli],a
@@ -84468,9 +83770,7 @@ DisplayDiploma: ; 566e2 (15:66e2)
     ld hl,Coord
     ld de,$d158
     call PlaceString
-    ld b,BANK(Func_44dd)
-    ld hl,Func_44dd
-    call Bankswitch
+    BANKSWITCH Func_44dd
     ld hl,$c301
     ld bc,$8028
 .asm_5673e
@@ -84484,9 +83784,7 @@ DisplayDiploma: ; 566e2 (15:66e2)
     dec c
     jr nz,.asm_5673e ; 0x56747 $f5
     call EnableLCD
-    ld b,BANK(Func_5ae6)
-    ld hl,Func_5ae6
-    call Bankswitch
+    BANKSWITCH Func_5ae6
     ld b,$8
     call GoPAL_SET
     call Delay3
@@ -84906,9 +84204,7 @@ AnimateEXPBar:
     ret nz
     ld a,(SFX_08_3d - $4000) / 3
     call PlaySoundWaitForCurrent
-    ld hl,CalcEXPBarPixelLength
-    ld b,BANK(CalcEXPBarPixelLength)
-    call Bankswitch
+    BANKSWITCH CalcEXPBarPixelLength
     ld a,[wEXPBarPixelLength]
     ld b,a
     ld a,[H_QUOTIENT + 3]
@@ -85037,9 +84333,7 @@ GetMonHeaderAndMaxLevel:
     ld a,[hl]
     ld [wAlternateFormIndex],a
     call GetMonHeader
-    ld hl,GetMaxLevel
-    ld b,BANK(GetMaxLevel)
-    jp Bankswitch
+    BANKSWITCH_JUMP GetMaxLevel
 
 CheckReachLevelLimit:
     push de
@@ -85055,9 +84349,7 @@ CheckReachLevelLimit:
     ld a,[hl]
     ld [$d0b5],a
     call GetMonHeaderAndMaxLevel
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
+    BANKSWITCH CalcExperience
 ; compare max exp with current exp
     ld a,[H_NUMTOPRINT] ; $FF00+$96 (aliases: H_MULTIPLICAND)
     ld b,a
@@ -85126,9 +84418,7 @@ Route21ScriptBarrier:
     ld bc,.ChangedBlocksEnd-.ChangedBlocks
     call CopyData
     call RestoreChangedBlocks
-    ld b,BANK(RedrawMapView)
-    ld hl,RedrawMapView
-    jp Bankswitch
+    BANKSWITCH_JUMP RedrawMapView
 .CheckCinnabarVisited
     call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG
     ld c,CINNABAR_ISLAND ; bit n
@@ -85279,9 +84569,7 @@ HandleMovesAfterDayCare:
     push af
     ld a,[W_NUMINPARTY]
     ld [$FF00+$e4],a ; Last Mon Added Id + 1
-    ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
-    ld hl,AddPokemonToParty_TryToAddExclusiveMove_
-    call Bankswitch
+    BANKSWITCH AddPokemonToParty_TryToAddExclusiveMove_
     pop af
     ld [$FF00+$e4],a
     ret
@@ -85643,9 +84931,7 @@ PrintBeginningBattleText: ; 58d99 (16:4d99)
     ld hl,.UnnamedText_58e4f ; silph scope unveiled...
     call PrintText
     call .LoadEnemyMonRealName
-    ld hl,GhostAnimation
-    ld b,BANK(GhostAnimation)
-    call Bankswitch
+    BANKSWITCH GhostAnimation
     jr .NotGhostOrCommon
 .Func_58e29
     xor a
@@ -85657,9 +84943,7 @@ PrintBeginningBattleText: ; 58d99 (16:4d99)
     jp WaitForSoundToFinish
 .DrawAllPokeballs
     push hl
-    ld hl,DrawAllPokeballs
-    ld b,BANK(DrawAllPokeballs)
-    call Bankswitch
+    BANKSWITCH DrawAllPokeballs
     pop hl
     ret
 .LoadEnemyMonRealName
@@ -89137,9 +88421,7 @@ RemoveGuardDrink: ; 5a59f (16:659f)
     call IsItemInBag
     pop hl
     jr z,.drinkLoop
-    ld b,BANK(RemoveItemByID)
-    ld hl,RemoveItemByID
-    jp Bankswitch
+    BANKSWITCH_JUMP RemoveItemByID
 
 GuardDrinksList: ; 5a5b7 (16:65b7)
     db FRESH_WATER,SODA_POP,LEMONADE,$00
@@ -89400,9 +88682,7 @@ HallofFameRoomScript2:
     call StopMusic
     ld c,50
     call DelayFrames
-    ld b,BANK(SpecialRestartAfterHallOfFame)
-    ld hl,SpecialRestartAfterHallOfFame
-    jp Bankswitch
+    BANKSWITCH_JUMP SpecialRestartAfterHallOfFame
 .Wait
     ld b,$5
 .loop
@@ -91086,9 +90366,7 @@ CopycatsHouseF2Text1: ; 5cc82 (17:4c82)
     call PrintText
     ld a,$33
     ldh [$db],a
-    ld b,BANK(RemoveItemByID)
-    ld hl,RemoveItemByID
-    call Bankswitch
+    BANKSWITCH RemoveItemByID
     ld hl,$d7af
     set 0,[hl]
     jr .asm_62ecd ; 0x5ccc1
@@ -92819,9 +92097,7 @@ RedBedroomSNESText:
 
 OpenRedsPC:
     call CheckHallOfFameWin
-    ld hl,PokeCenterPC
-    ld b,BANK(PokeCenterPC)
-    jp nz,Bankswitch
+    BANKSWITCH_JUMP_NZ PokeCenterPC
     call EnableAutoTextBoxDrawing
     ld a,$3 ; ItemStoragePCInRedHouse
     jp Func_3ef5
@@ -93783,9 +93059,7 @@ PokemonTower2Script3: ; 60563 (18:4563)
     ld a,$ff
     ld [$c0ee],a
     call PlaySound
-    ld b,BANK(Music_RivalAlternateStart)
-    ld hl,Music_RivalAlternateStart
-    call Bankswitch
+    BANKSWITCH Music_RivalAlternateStart
     ld a,$4
     ld [W_POKEMONTOWER2CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -95052,9 +94326,7 @@ GiveFossilToCinnabarLab: ; 61006 (18:5006)
     call PrintText
     ld a,[W_FOSSILITEM]
     ld [$FF00+$db],a
-    ld b,BANK(RemoveItemByID)
-    ld hl,RemoveItemByID
-    call Bankswitch
+    BANKSWITCH RemoveItemByID
     ld hl,UnnamedText_610b8
     call PrintText
     call ResetFossilSteps ; ld hl,$d7a3
@@ -95546,9 +94818,7 @@ SSAnne2Script2: ; 6146d (18:546d)
     ld a,$ff
     ld [$c0ee],a
     call PlaySound
-    ld b,BANK(Music_RivalAlternateStart)
-    ld hl,Music_RivalAlternateStart
-    call Bankswitch
+    BANKSWITCH Music_RivalAlternateStart
     ld a,$3
     ld [W_SSANNE2CURSCRIPT],a
     ret
@@ -97589,9 +96859,7 @@ SSAnne9ScriptPointers:
 SSAnneDisplaySnorlax:
     ld a,SNORLAX
     ld [$cf91],a
-    ld hl,DisplayMonFrontSpriteInBox
-    ld b,BANK(DisplayMonFrontSpriteInBox)
-    call Bankswitch
+    BANKSWITCH DisplayMonFrontSpriteInBox
     xor a
     ld [W_SSANNE9CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
@@ -99045,9 +98313,7 @@ GhostAnimation:
     ld [$cee9],a
     ld a,$1
     ld [H_WHOSETURN],a ; $FF00+$f3
-    ld hl,Func_79793
-    ld b,BANK(Func_79793)
-    call Bankswitch
+    BANKSWITCH Func_79793
     ld d,$80
     call FlashSprite
 .asm_708f6
@@ -100335,9 +99601,7 @@ Func_711c4:
     jp CopyData
 
 Func_711ef:
-    ld b,BANK(FindWildLocationsOfMon)
-    ld hl,FindWildLocationsOfMon
-    call Bankswitch
+    BANKSWITCH FindWildLocationsOfMon
     call Func_712d9
     ld hl,wOAMBuffer
     ld de,$cee9
@@ -101417,14 +100681,10 @@ Func_71c07: ; 71c07 (1c:5c07)
     ld [$cc49],a
     call AddPokemonToParty
     call InGameTrade_CopyDataToReceivedMon
-    ld hl,Func_17d7d
-    ld b,BANK(Func_17d7d)
-    call Bankswitch
+    BANKSWITCH Func_17d7d
     call ClearScreen
     call Func_71ca2
-    ld b,BANK(RedrawMapView)
-    ld hl,RedrawMapView
-    call Bankswitch
+    BANKSWITCH RedrawMapView
     and a
     ld a,$3
     jr .asm_ee803 ; 0x71c9b $1
@@ -101443,9 +100703,7 @@ Func_71ca2: ; 71ca2 (1c:5ca2)
     call LoadGBPal
     ld c,$a
     call DelayFrames
-    ld b,BANK(LoadWildData)
-    ld hl,LoadWildData
-    jp Bankswitch
+    BANKSWITCH_JUMP LoadWildData
 
 InGameTrade_PrepareTradeData: ; 71cc1 (1c:5cc1)
     ld hl,wWhichTrade ; $cd3d
@@ -101768,9 +101026,7 @@ Func_71ebb:
     ret
 
 GetMapPaletteID:
-    ld b,BANK(GetMapPaletteID_)
-    ld hl,GetMapPaletteID_
-    jp Bankswitch
+    BANKSWITCH_JUMP GetMapPaletteID_
 
 CheckFlyingMonSprite:
     push hl
@@ -103004,9 +102260,7 @@ Func_73701: ; 0x73701
     jp LoadSAVCheckSum2
 
 SaveSAV: ;$770a
-    ld b,1
-    ld hl,$5def ; LoadGameMenuInGame
-    call Bankswitch
+    BANKSWITCH Func_5def ; LoadGameMenuInGame
     ld hl,WouldYouLikeToSaveText
     call SaveSAVConfirm
     and a   ;|0 = Yes|1 = No|
@@ -103653,9 +102907,7 @@ CheckIfGameBoyColorModeAndSetPalette:
     ld a,$90
     ld [$d08f],a
 
-    ld b,BANK(DebugStoreColour)
-    ld hl,DebugStoreColour
-    call Bankswitch
+    BANKSWITCH DebugStoreColour
 
     ld a,1
     ld [H_LOADEDWRAMBANK],a ; WRAM Bank 1
@@ -103821,9 +103073,7 @@ CheckShinyFrontAndGetPAL:
 .NoTransform
     push af
     ld [$d0b5],a
-    ld hl,GetBattleFrontMonHeader
-    ld b,BANK(GetBattleFrontMonHeader)
-    call Bankswitch
+    BANKSWITCH GetBattleFrontMonHeader
     ld hl,W_ENEMYMONATKDEFIV
     jr GetPalCommon
 
@@ -103831,9 +103081,7 @@ CheckShinyBackAndGetPAL:
     push hl
     push af
     ld [$d0b5],a
-    ld hl,GetBattleBackMonHeader
-    ld b,BANK(GetBattleBackMonHeader)
-    call Bankswitch
+    BANKSWITCH GetBattleBackMonHeader
     ld hl,wFlagBackFrontSpriteBit56
     set 5,[hl]
     ld hl,W_PLAYERMONIVS
@@ -103843,9 +103091,7 @@ CheckShinyAndGetPAL:
     push hl
     push af
     ld [$d0b5],a
-    ld hl,GetLoadedMonHeader
-    ld b,BANK(GetLoadedMonHeader)
-    call Bankswitch
+    BANKSWITCH GetLoadedMonHeader
     ld hl,$cfb3
     ; fall through
 
@@ -104078,9 +103324,7 @@ PlaceStringAndGenderSymbol:
     call PlaceString
     ld a,[wWhichTrade]
     ld [$d11e],a
-    ld b,BANK(GetGender)
-    ld hl,GetGender
-    call Bankswitch
+    BANKSWITCH GetGender
     jr c,.Genderless
     FuncCoord 10,11
     ld hl,Coord
@@ -104419,9 +103663,7 @@ CeruleanHouse2Blocks: ; 7404c (1d:404c)
     INCBIN "maps/ceruleanhouse2.blk"
 
 HallOfFamePC: ; 7405c (1d:405c)
-    ld b,BANK(AnimateHallOfFame)
-    ld hl,AnimateHallOfFame
-    call Bankswitch
+    BANKSWITCH AnimateHallOfFame
     call ClearScreen
     ld c,$64
     call DelayFrames
@@ -104666,9 +103908,7 @@ Credits: ; 7418e (1d:418e)
 .asm_741f4
     ld c,$5
     call DelayFrames
-    ld b,BANK(LoadCopyrightTiles)
-    ld hl,LoadCopyrightTiles
-    call Bankswitch
+    BANKSWITCH LoadCopyrightTiles
     ld c,$20
     call DelayFrames
     pop de
@@ -105113,9 +104353,7 @@ ViridianGymScript4: ; 7496b (1d:496b)
     ld [W_CURMAPSCRIPT],a
     ret
 .asm_74980
-    ld b,BANK(Func_44fd7)
-    ld hl,Func_44fd7
-    jp Bankswitch
+    BANKSWITCH_JUMP Func_44fd7
 
 ViridianGymScript3: ; 74988 (1d:4988)
     ld a,[W_ISINBATTLE] ; $d057
@@ -106038,9 +105276,7 @@ FuchsiaHouse2Text1:
     call PrintText
     ld a,GOLD_TEETH
     ldh [$db],a
-    ld b,BANK(RemoveItemByID)
-    ld hl,RemoveItemByID
-    call Bankswitch
+    BANKSWITCH RemoveItemByID
     ld hl,.PreHM04Text
     call PrintText
     ld bc,(HM_04 << 8) | 1
@@ -107665,9 +106901,7 @@ Lab4Text1: ; 75d6c (1d:5d6c)
     ld a,[$cd37]
     and a
     jr z,.asm_75d8d ; 0x75d81 $a
-    ld b,BANK(GiveFossilToCinnabarLab)
-    ld hl,GiveFossilToCinnabarLab
-    call Bankswitch
+    BANKSWITCH GiveFossilToCinnabarLab
     jr .asm_75d93 ; 0x75d8b $6
 .asm_75d8d
     ld hl,UnnamedText_75dcb
@@ -107721,9 +106955,7 @@ Lab4Text2: ; 75dda (1d:5dda)
     jp TextScriptEnd
 
 LoadFossilItemAndMonNameBank1D: ; 75de8 (1d:5de8)
-    ld b,BANK(LoadFossilItemAndMonName)
-    ld hl,LoadFossilItemAndMonName
-    jp Bankswitch
+    BANKSWITCH_JUMP LoadFossilItemAndMonName
 
 Lab4Object: ; 0x75df0 (size=32)
     db $17 ; border tile
@@ -107984,9 +107216,7 @@ GaryScript3: ; 75fbb (1d:5fbb)
     ret
 
 GaryScript4: ; 75fe4 (1d:5fe4)
-    ld b,BANK(Music_Cities1AlternateTempo)
-    ld hl,Music_Cities1AlternateTempo
-    call Bankswitch
+    BANKSWITCH Music_Cities1AlternateTempo
     ld a,$2
     ld [$ff00+$8c],a
     call GaryScript_760c8
@@ -108731,9 +107961,7 @@ PKMNLeaguePC:
     push bc
     ld a,[$CD41]
     ld [$CD3D],a
-    ld b,BANK(LoadHallOfFameTeams)
-    ld hl,LoadHallOfFameTeams
-    call Bankswitch
+    BANKSWITCH LoadHallOfFameTeams
     call .LeaguePCShowTeam
     pop bc
     jr c,.doneShowingTeams
@@ -108833,9 +108061,7 @@ PKMNLeaguePC:
     ld de,$CD42
     ld bc,$0103
     call PrintNumber
-    ld b,BANK(Func_702f0)
-    ld hl,Func_702f0
-    jp BankswitchAndRemoveIVFromCheckShinyArea ; jp Bankswitch
+    jp Func_702f0AndRemoveIVFromCheckShinyArea
 .HallOfFameNoText
     db "HALL OF FAME No   @"
 
@@ -109087,8 +108313,8 @@ CheckShinyAndAlternativeFromHallOfFameData:
     pop hl
     ret
 
-BankswitchAndRemoveIVFromCheckShinyArea:
-    call Bankswitch
+Func_702f0AndRemoveIVFromCheckShinyArea:
+    BANKSWITCH Func_702f0
     jp ResetTempIV
 
 FlagInstantAndDisplayListMenuID:
@@ -109241,9 +108467,7 @@ TryToRemoveUnknownDungeonWaterBlocks:
     ld bc,.ChangedBlocksEnd-.ChangedBlocks
     call CopyData
     call RestoreChangedBlocks
-    ld b,BANK(RedrawMapView)
-    ld hl,RedrawMapView
-    jp Bankswitch
+    BANKSWITCH_JUMP RedrawMapView
 .ChangedBlocks
     db 2
     dw $60C7
@@ -112449,9 +111673,7 @@ AnimateBoulderDust: ; 79f54 (1e:5f54)
     ld a,$e4
     ld [rOBP1],a ; $FF00+$49
     call Func_79fc0
-    ld b,BANK(asm_f055)
-    ld hl,asm_f055
-    call Bankswitch
+    BANKSWITCH asm_f055
     ld c,$8
 .asm_79f73
     push bc
@@ -132632,9 +131854,7 @@ SelectInOverWorld:
 
 .TryCut
     ; ──────────────────────────────────── Cut
-    ld b,BANK(CheckCutTile)
-    ld hl,CheckCutTile
-    call Bankswitch
+    BANKSWITCH CheckCutTile
     jr nz,.noCut
     ld a,[W_CURMAPTILESET]
     cp 23 ; plateau
@@ -132648,9 +131868,7 @@ SelectInOverWorld:
 .canCut
     call .PlayCry
     call .StartCustomSelectFunction
-    ld b,BANK(CanCut)
-    ld hl,CanCut
-    call Bankswitch
+    BANKSWITCH CanCut
     jp .EndCustomSelectFunction
 .noCut
     scf ; set carry flag
@@ -132662,9 +131880,7 @@ SelectInOverWorld:
     ld [$d11a],a
     cp a,2 ; is the player surfing?
     jp z,.noFloat
-    ld b,BANK(IsSurfingAllowed)
-    ld hl,IsSurfingAllowed
-    call Bankswitch
+    BANKSWITCH IsSurfingAllowed
     ld hl,$d728
     bit 1,[hl]
     res 1,[hl]
@@ -132895,9 +132111,7 @@ SelectInOverWorld:
     ; initialize a text box without drawing anything special
     ld a,1
     ld [$cf0c],a
-    ld b,BANK(DisplayTextIDInit)
-    ld hl,DisplayTextIDInit ; initialization
-    jp Bankswitch
+    BANKSWITCH_JUMP DisplayTextIDInit ; initialization
 
 .DisplayNothing
     ;use $ff value loaded into $FF8C to make DisplayTextID display nothing and close any text
@@ -132946,17 +132160,13 @@ SearchSkillInParty:
 .GetMonSkill
     push bc
     push de
-    ld b,BANK(GetMonSkill)
-    ld hl,GetMonSkill
-    call Bankswitch
+    BANKSWITCH GetMonSkill
     pop de
     pop bc
     ret
 .CheckAndDecreaseSkillEnergy
     push bc
-    ld hl,CheckAndDecreaseSkillEnergy
-    ld b,BANK(CheckAndDecreaseSkillEnergy)
-    call Bankswitch
+    BANKSWITCH CheckAndDecreaseSkillEnergy
     pop bc
     ret
 
@@ -134351,9 +133561,7 @@ PoisonBurnLeechSeed_DecreaseOwnHP:
 .noOverkill
     ld d,b
     ld e,c
-    ld b,BANK(SetDamageDuringPoisonBurnLeechSeed)
-    ld hl,SetDamageDuringPoisonBurnLeechSeed
-    call Bankswitch
+    BANKSWITCH SetDamageDuringPoisonBurnLeechSeed
     pop hl
     ret
 
@@ -134406,9 +133614,7 @@ LeechSeed_IncreaseEnemyHP:
     pop bc
     ld d,b
     ld e,c
-    ld b,BANK(SetCureDuringLeechSeed)
-    ld hl,SetCureDuringLeechSeed
-    call Bankswitch
+    BANKSWITCH SetCureDuringLeechSeed
     ld a,[H_WHOSETURN] ; $FF00+$f3
     xor $1
     ld [H_WHOSETURN],a ; $FF00+$f3
@@ -137157,9 +136363,7 @@ IsMonInCurrentMap:
     ; Code
     dec hl
     push hl
-    ld b,BANK(PokedexToIndex)
-    ld hl,PokedexToIndex
-    call Bankswitch
+    BANKSWITCH PokedexToIndex
     call GetWildDataCurrentMap
     ld de,$d11e
     call SearchWildMon ; carry set = found
@@ -137458,9 +136662,7 @@ WildSubGroup:
     ld a,[hl]
     ld [W_ENEMYMONID],a
     cp $FF
-    ld hl,GetWildEnemyLevel
-    ld b,BANK(GetWildEnemyLevel)
-    call nz,Bankswitch
+    BANKSWITCH_NZ GetWildEnemyLevel
     scf ; WillEncounter
     ret
 .NotEncounter
@@ -138592,9 +137794,7 @@ AIEnemyTrainerChooseMoves:
     jr z,.searchNext
     push hl
     push bc
-    ld b,BANK(CheckEnoughEnergy)
-    ld hl,CheckEnoughEnergy
-    call Bankswitch
+    BANKSWITCH CheckEnoughEnergy
     pop bc
     pop hl
     jr nc,.searchNext
@@ -139172,9 +138372,7 @@ ForceShinyOrRandom_:
     ld d,a
     ret
 .GenRandomInBattle
-    ld b,BANK(GenRandomInBattleFromOtherBANK)
-    ld hl,GenRandomInBattleFromOtherBANK
-    call Bankswitch
+    BANKSWITCH GenRandomInBattleFromOtherBANK
     ld a,d
     ret
 
@@ -139374,7 +138572,7 @@ InitializeChooseQuantityMenu:
     FuncCoord 8,10
     ld hl,Coord
 .printInitialQuantity
-    ld de,InitialQuantityText
+    ld de,.InitialQuantityText
     call PlaceString
     ld a,[$ff8e]
     and a ; should the price be halved (for selling items)?
@@ -139393,6 +138591,8 @@ InitializeChooseQuantityMenu:
     ret
 .PackText
     db "BAG ×@"
+.InitialQuantityText
+    db "×01@"
 
 _CheckNotEscapeWildPokemon:
     ld a,[W_BATTLETYPE]
@@ -140119,9 +139319,7 @@ _LoadEnemyMonData_CalcStats:
     push de
     ld de,W_ENEMYMON1MOVE3+$6 ; TempStatExp - 1
     push de ; Store Stat Exp -1 Pointer
-    ld b,BANK(WriteMaxStatExpByLevel)
-    ld hl,WriteMaxStatExpByLevel
-    call Bankswitch
+    BANKSWITCH WriteMaxStatExpByLevel
     call .CopyDV
     pop hl ; Restore Stat Exp -1 Pointer
     pop de
@@ -140279,9 +139477,7 @@ DoBoulderDustAnimation:
     ld hl,.SpriteNoDustList
     ld de,1
     call IsInArray
-    ld hl,AnimateBoulderDust
-    ld b,BANK(AnimateBoulderDust)
-    call nc,Bankswitch
+    BANKSWITCH_NC AnimateBoulderDust
     xor a
     ld [wJoypadForbiddenButtonsMask],a
     ld hl,wFlags_0xcd60
@@ -140399,9 +139595,7 @@ DebugNPC:
     ; Standard CableClubNPC
     ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
     bit 1,a
-    ld hl,CableClubNPC
-    ld b,BANK(CableClubNPC)
-    jp nz,Bankswitch
+    BANKSWITCH_JUMP_NZ CableClubNPC
 
     ; Backup
     ld a,[$cf92]
@@ -140507,9 +139701,7 @@ DebugNPC:
     ld a,c
     inc a
     ld [$FF00+$e4],a ; Mon Id +1
-    ld b,BANK(AddPokemonToParty_TryToAddExclusiveMove_)
-    ld hl,AddPokemonToParty_TryToAddExclusiveMove_
-    call Bankswitch
+    BANKSWITCH AddPokemonToParty_TryToAddExclusiveMove_
     pop af
     ld [$FF00+$e4],a
     pop bc
@@ -140686,80 +139878,9 @@ AdvanceRNGState::
     ld [hl],e
     ret
 
-; determines if attack is a critical hit
-; azure heights claims "the fastest pokémon (who are,not coincidentally,
-; among the most popular) tend to CH about 20 to 25% of the time."
-;_CriticalHitTest:
-;    xor a
-;    ld [wCriticalHitOrOHKO],a
-;    ld a,[H_WHOSETURN] ; $FF00+$f3
-;    and a
-;    ld a,[$cfe5]
-;    jr nz,.asm_3e032
-;    ld a,[W_PLAYERMONID]
-;.asm_3e032
-;    ld [$d0b5],a
-;    call GetMonHeader
-;    ld a,[W_MONHBASESPEED]
-;    ld b,a
-;    srl b                        ; (effective (base speed/2))
-;    ld a,[H_WHOSETURN] ; $FF00+$f3
-;    and a
-;    ld hl,W_PLAYERMOVEPOWER ; $cfd4
-;    ld de,W_PLAYERBATTSTATUS2 ; $d063
-;    jr z,.calcCriticalHitProbability
-;    ld hl,W_ENEMYMOVEPOWER ; $cfce
-;    ld de,W_ENEMYBATTSTATUS2 ; $d068
-;.calcCriticalHitProbability      ; 0x3e04f
-;    ld a,[hld]                  ; read base power from RAM
-;    and a
-;    ret z                        ; do nothing if zero
-;    dec hl
-;    ld c,[hl]                   ; read move id
-;    ld a,[de]
-;    bit 2,a                     ; test for focus energy
-;    jr nz,.focusEnergyUsed      ; bug: using focus energy causes a shift to the right instead of left,
-;                                 ; resulting in 1/4 the usual crit chance
-;    sla b                        ; (effective (base speed/2)*2)
-;    jr nc,.noFocusEnergyUsed
-;    ld b,$ff                    ; cap at 255/256
-;    jr .noFocusEnergyUsed
-;.focusEnergyUsed
-;    srl b ; Restore Original
-;.noFocusEnergyUsed
-;    ld hl,HighCriticalMoves      ; table of high critical hit moves
-;.Loop
-;    ld a,[hli]                  ; read move from move table
-;    cp c                         ; does it match the move about to be used?
-;    jr z,.HighCritical          ; if so,the move about to be used is a high critical hit ratio move
-;    inc a                        ; move on to the next move,FF terminates loop
-;    jr nz,.Loop                 ; check the next move in HighCriticalMoves
-;    srl b                        ; /2 for regular move (effective (base speed / 2))
-;    jr .SkipHighCritical         ; continue as a normal move
-;.HighCritical
-;    sla b                        ; *2 for high critical hit moves
-;    jr nc,.noCarry
-;    ld b,$ff                    ; cap at 255/256
-;.noCarry
-;    sla b                        ; *4 for high critical move (effective (base speed/2)*8))
-;    jr nc,.SkipHighCritical
-;    ld b,$ff
-;.SkipHighCritical
-;    call GenRandomInBattle_CH       ; generates a random value,in "a"
-;    rlc a
-;    rlc a
-;    rlc a
-;    cp b                         ; check a against calculated crit rate
-;    ret nc                       ; no critical hit if no borrow
-;    ld a,$1
-;    ld [wCriticalHitOrOHKO],a                ; set critical hit flag
-;    ret
-
 GenRandomInBattle_CH:
     push bc
-    ld b,BANK(GenRandomInBattleFromOtherBANK)
-    ld hl,GenRandomInBattleFromOtherBANK
-    call Bankswitch
+    BANKSWITCH GenRandomInBattleFromOtherBANK
     ld a,d
     pop bc
     ret
@@ -140963,9 +140084,7 @@ _LoadGhostPic:
     ret
 .SetDEAndLoadMonFrontSprite
     ld de,$9000
-    ld b,BANK(LoadMonFrontSprite)
-    ld hl,LoadMonFrontSprite
-    jp Bankswitch
+    BANKSWITCH_JUMP LoadMonFrontSprite
 
 ; Print a box with selected/current move details
 ; input : [wPlayerSelectedMove] = Move ID
@@ -141788,9 +140907,7 @@ StatusScreen:
 .HandleMiniSprite
     ld a,[wCurrentMenuItem]
     push af
-    ld b,BANK(Func_716f7)
-    ld hl,Func_716f7
-    call Bankswitch
+    BANKSWITCH Func_716f7
     pop af
     ld [wCurrentMenuItem],a
     ret
@@ -141905,18 +141022,12 @@ HandleStatusScreen1:
 ;    db $d6,$ec,"@"
 
 .PlaceStatusScreenShinyGenderEtc
-    ld b,BANK(PrintEXPBar_StatusScreen)
-    ld hl,PrintEXPBar_StatusScreen
-    call Bankswitch
-    ld b,BANK(PrintStatsBox)
-    ld hl,PrintStatsBox
-    call Bankswitch
+    BANKSWITCH PrintEXPBar_StatusScreen
+    BANKSWITCH PrintStatsBox
     ld hl,$cfb3 ; .OutOfBattle
     call SetTempIV
     ; ────────────────────────────────── Gender
-    ld b,BANK(GetGenderOutOfBattle)
-    ld hl,GetGenderOutOfBattle
-    call Bankswitch
+    BANKSWITCH GetGenderOutOfBattle
     jr c,.Genderless
     push af
     ld a,[$cfb9] ; .OutOfBattleLevel
@@ -141961,9 +141072,7 @@ HandleStatusScreen1:
     ld a,[H_CURRENTPRESSEDBUTTONS]
     bit 2,a ; was the select button pressed?
     ret z
-    ld b,BANK(_DebugPlayerStats)
-    ld hl,_DebugPlayerStats
-    jp Bankswitch
+    BANKSWITCH_JUMP _DebugPlayerStats
 
 .ExperienceSection
     FuncCoord 0,14
@@ -142001,9 +141110,7 @@ HandleStatusScreen1:
     jr z,.asm_12ca7 ; 0x12c8b $1a ; If 100
     inc a
     ld d,a
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
+    BANKSWITCH CalcExperience
     ld hl,$cfa8
     ld a,[$ff00+$98]
     sub [hl]
@@ -142070,15 +141177,11 @@ HandleStatusScreen2:
     ld a,[$cf91]
     ld [$cd5d],a
     ld [hl],a ; wSpriteOAMBySpeciesId
-    ld b,BANK(LoadMonPartySpriteGfx)
-    ld hl,LoadMonPartySpriteGfx
-    call Bankswitch
+    BANKSWITCH LoadMonPartySpriteGfx
     ld hl,wStatusScreen2OAMBit0
     set 0,[hl]
     ld de,$9810
-    ld b,BANK(WriteMonPartySpriteOAMBySpecies)
-    ld hl,WriteMonPartySpriteOAMBySpecies
-    call Bankswitch
+    BANKSWITCH WriteMonPartySpriteOAMBySpecies
     ld hl,wStatusScreen2OAMBit0
     res 0,[hl]
 
@@ -142096,9 +141199,7 @@ HandleStatusScreen2:
     push hl
     ld hl,$cfb3 ; .OutOfBattle
     call SetTempIV
-    ld b,BANK(GetGenderOutOfBattle)
-    ld hl,GetGenderOutOfBattle
-    call Bankswitch
+    BANKSWITCH GetGenderOutOfBattle
     pop hl
     jr c,.Genderless
     ld de,.MaleIcon
@@ -142502,9 +141603,7 @@ ItemInBattleFinalCheck:
     call GetMonHeader
     PREDEF LoadMonBackSprite
     call LoadFontTilePatterns
-    ld b,BANK(LoadHudAndHpBarAndStatusTilePatterns)
-    ld hl,LoadHudAndHpBarAndStatusTilePatterns
-    call Bankswitch
+    BANKSWITCH LoadHudAndHpBarAndStatusTilePatterns
     call LoadScreenTilesFromBuffer1DisableBGTransfer
     call RemovePlayerBattleStatsFrameDisableBGTransfer
     ld hl,.EmptyText
@@ -142523,13 +141622,9 @@ ItemInBattleFinalCheck:
 .DrawHUDsAndHPBars
     PREDEF_JUMP DrawHUDsAndHPBars
 .HackGainExpAfterCatch
-    ld b,BANK(HackGainExpAfterCatch)
-    ld hl,HackGainExpAfterCatch
-    jp Bankswitch
+    BANKSWITCH_JUMP HackGainExpAfterCatch
 .HandlePlayerAliveAndApplyPoisonBurn
-    ld b,BANK(HandlePlayerAliveAndApplyPoisonBurn)
-    ld hl,HandlePlayerAliveAndApplyPoisonBurn
-    jp Bankswitch
+    BANKSWITCH_JUMP HandlePlayerAliveAndApplyPoisonBurn
 .EmptyText
     db "@"
 
@@ -142863,9 +141958,7 @@ DisplayDepositWithdrawMenu_:
     ld [$d11e],a
     ld hl,$cfb3 ; .OutOfBattle
     call SetTempIV
-    ld b,BANK(GetGender)
-    ld hl,GetGender
-    call Bankswitch
+    BANKSWITCH GetGender
     call ResetTempIV
     pop hl
     jr c,.Genderless
@@ -142896,15 +141989,11 @@ DisplayDepositWithdrawMenu_:
     ld a,[$cf91]
     ld [$cd5d],a
     ld [hl],a ; wSpriteOAMBySpeciesId
-    ld b,BANK(LoadMonPartySpriteGfx)
-    ld hl,LoadMonPartySpriteGfx
-    call Bankswitch
+    BANKSWITCH LoadMonPartySpriteGfx
     ld hl,wStatusScreen2OAMBit0
     set 0,[hl]
     ld de,$3E44
-    ld b,BANK(WriteMonPartySpriteOAMBySpecies)
-    ld hl,WriteMonPartySpriteOAMBySpecies
-    call Bankswitch
+    BANKSWITCH WriteMonPartySpriteOAMBySpecies
     ld hl,wStatusScreen2OAMBit0
     res 0,[hl]
     ret
@@ -143204,14 +142293,10 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down_:
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     jr .skip_end                          ; no attack or speed effect if at this line. skip to end.
 .skip_brn
-    ld hl,HalveAttackDueToBurn            ; the non-active pkmn has a new recalculated attack. the active pkmn applies brn penalty to its opponent.
-    ld b,BANK(HalveAttackDueToBurn)       ; ...
-    call Bankswitch                       ; ...
+    BANKSWITCH HalveAttackDueToBurn       ; the non-active pkmn has a new recalculated attack. the active pkmn applies brn penalty to its opponent.
     jr .skip_end
 .skip_par
-    ld hl,QuarterSpeedDueToParalysis      ; the non-active pkmn has a new recalculated speed. the active pkmn applies par penalty to its opponent.
-    ld b,BANK(QuarterSpeedDueToParalysis) ; ...
-    call Bankswitch                       ; ...
+    BANKSWITCH QuarterSpeedDueToParalysis ; the non-active pkmn has a new recalculated speed. the active pkmn applies par penalty to its opponent.
 .skip_end
     pop de                                ; restore de from the stack
     ret                                   ; remember to return
@@ -143253,14 +142338,10 @@ QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Up_:
     jr z,.skip_par                        ; speed effect. skip to par penalty.
     jr .skip_end                          ; no attack or speed effect if at this line. skip to end.
 .skip_brn
-    ld hl,HalveAttackDueToBurn            ; the active pkmn has a new recalculated attack. the non-active pkmn applies brn penalty to its opponent.
-    ld b,BANK(HalveAttackDueToBurn)       ; ...
-    call Bankswitch                       ; ...
+    BANKSWITCH HalveAttackDueToBurn       ; the active pkmn has a new recalculated attack. the non-active pkmn applies brn penalty to its opponent.
     jr .skip_end
 .skip_par
-    ld hl,QuarterSpeedDueToParalysis      ; the active pkmn has a new recalculated speed. the non-active pkmn applies par penalty to its opponent.
-    ld b,BANK(QuarterSpeedDueToParalysis) ; ...
-    call Bankswitch                       ; ...
+    BANKSWITCH QuarterSpeedDueToParalysis ; the active pkmn has a new recalculated speed. the non-active pkmn applies par penalty to its opponent.
 .skip_end
     ld a,[H_WHOSETURN]                    ; load the inverted turn
     xor $1                                ; revert the turn back to normal
@@ -143382,9 +142463,7 @@ CalcEXPBarPixelLength_.Common:
 
 CalcEXPBarPixelLength_.Start:
     ld d,a
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    call Bankswitch
+    BANKSWITCH CalcExperience
     ld hl,H_MULTIPLICAND
     ld de,wEXPBarBaseEXP
     ld a,[hli]
@@ -143401,9 +142480,7 @@ GetTheExpNeededToGainALevel:
     ; get the exp needed to gain a level
     ld d,a
     inc d
-    ld hl,CalcExperience
-    ld b,BANK(CalcExperience)
-    jp Bankswitch
+    BANKSWITCH_JUMP CalcExperience
 
 ; calculates the three byte number starting at [bc]
 ; minus the three byte number starting at [hl]
@@ -144095,9 +143172,6 @@ StatUpDownEffect_:
     ld de,W_ENEMYMOVEEFFECT
     ld bc,W_ENEMYMOVENUM
     ret
-.BankswitchToF
-    ld b,$F
-    jp Bankswitch
 .GetPointerToCorrectStatMod
     call .CheckAmnesiaOrSwordDance
     ret nz
@@ -144117,8 +143191,7 @@ StatUpDownEffect_:
     ld a,ATTACK_UP1_EFFECT
 .next1
     ld [de],a
-    ld hl,StatModifierUpEffect
-    call .BankswitchToF
+    BANKSWITCH StatModifierUpEffect
     pop de
     pop hl
     pop bc
@@ -144132,8 +143205,7 @@ StatUpDownEffect_:
     ld a,DEFENSE_DOWN_SIDE1_EFFECT
 .next2
     ld [de],a
-    ld hl,StatModifierDownEffect
-    call .BankswitchToF
+    BANKSWITCH StatModifierDownEffect
     pop de
     ret
 .CheckAmnesiaOrSwordDance
@@ -144453,9 +143525,7 @@ _LoadBattlePokedex:
     call .LoadMonFrontSprite
     call CleanLCD_OAM
     call GBPalWhiteOut
-    ld hl,LoadHudAndHpBarAndStatusTilePatterns
-    ld b,BANK(LoadHudAndHpBarAndStatusTilePatterns)
-    call Bankswitch
+    BANKSWITCH LoadHudAndHpBarAndStatusTilePatterns
     call LoadScreenTilesFromBuffer1
     call GoPAL_SET_CF1C
     call GBPalNormal
@@ -144468,9 +143538,7 @@ _LoadBattlePokedex:
 .LoadMonFrontSprite
     ld a,[W_ENEMYBATTSTATUS2]
     bit 4,a
-    ld hl,AnimationSubstitute
-    ld b,BANK(AnimationSubstitute)
-    jp nz,Bankswitch
+    BANKSWITCH_JUMP_NZ AnimationSubstitute
     ld a,[W_ENEMYMON_START]
     ld [$d0b5],a
     ld a,[W_ENEMYMONALTFORM]
@@ -144497,9 +143565,7 @@ HandlePlayerBlackOut_:
     ld hl,wTileMap  ; sony 1 battle
     ld bc,$815
     call ClearScreenArea
-    ld hl,Func_396d3
-    ld b,BANK(Func_396d3)
-    call Bankswitch
+    BANKSWITCH Func_396d3
     ld c,$28
     call DelayFrames
     ld hl,.Sony1WinText
@@ -145054,9 +144120,7 @@ GetMonSkill:
 .CheckMonAlreadyKnowSkill
     push de
     push bc
-    ld b,BANK(CheckMonAlreadyKnowMoveQuick)
-    ld hl,CheckMonAlreadyKnowMoveQuick
-    call Bankswitch
+    BANKSWITCH CheckMonAlreadyKnowMoveQuick
     pop bc
     pop de
     ret nc

@@ -993,9 +993,7 @@ AIMoveChoiceModification3:
     ;reset type-effectiveness bit before calling function
     ld hl,wUnusedC000
     res 3,[hl]
-    ld b,BANK(AIGetTypeEffectiveness)
-    ld hl,AIGetTypeEffectiveness
-    call Bankswitch
+    BANKSWITCH AIGetTypeEffectiveness
     pop de
     pop bc
     pop hl
@@ -1270,9 +1268,7 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     ld a,[wUnusedC000]
     set 3,a
     ld [wUnusedC000],a
-    ld b,BANK(AIGetTypeEffectiveness)
-    ld hl,AIGetTypeEffectiveness
-    call Bankswitch
+    BANKSWITCH AIGetTypeEffectiveness
     pop de
     pop bc
     pop hl
@@ -1587,9 +1583,7 @@ ScoreAIParty:
     push de
     push hl
     ld d,a
-    ld b,BANK(ReadMoveForAIscoring)
-    ld hl,ReadMoveForAIscoring
-    call Bankswitch ;takes move in d,returns its power in d and type in e
+    BANKSWITCH ReadMoveForAIscoring ; takes move in d,returns its power in d and type in e
     ld a,e
     ld [W_PLAYERMOVETYPE],a
     ld a,d
@@ -1667,9 +1661,7 @@ ScoreAIParty:
     push hl
     push de
     ld d,a
-    ld b,BANK(ReadMoveForAIscoring)
-    ld hl,ReadMoveForAIscoring
-    call Bankswitch ;takes move in d,returns its power in d and type in e
+    BANKSWITCH ReadMoveForAIscoring ; takes move in d,returns its power in d and type in e
     ld a,d    ;get the power of the move
     cp $02    ;regular damaging moves have power > 1
     jr c,.next5
@@ -1678,9 +1670,7 @@ ScoreAIParty:
     ld [wAIPartyMonScores + 7],a
     ld a,e    ;get the type of the move
     ld [W_ENEMYMOVETYPE],a
-    ld b,BANK(AIGetTypeEffectiveness)
-    ld hl,AIGetTypeEffectiveness
-    call Bankswitch
+    BANKSWITCH AIGetTypeEffectiveness
     ld a,[wAIPartyMonScores + 7]
     ld [W_ENEMYMOVETYPE],a
     pop af    ;get the power back in a
@@ -1849,9 +1839,7 @@ ScoreAIParty:
     push hl
     push de
     push bc
-    ld b,BANK(AIGetTypeEffectiveness)
-    ld hl,AIGetTypeEffectiveness
-    call Bankswitch
+    BANKSWITCH AIGetTypeEffectiveness
     pop bc
     pop de
     pop hl
