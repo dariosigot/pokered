@@ -69186,224 +69186,241 @@ HallOfFameRoomHiddenObjects:
     dbw BANK(UseHallOfFamePC),UseHallOfFamePC
     db $FF
 
-SECTION "RedsHouse2FHiddenObjects",ROMX[$6b5a],BANK[$11]
-
-RedsHouse2FHiddenObjects: ; 46b5a (11:6b5a)
-    db $01,$00,$04 ; XXX,y,x
+RedsHouse2FHiddenObjects:
+    db $01,$00,$04
     dbw BANK(OpenRedsPC),OpenRedsPC
-    db $05,$03,$d0 ; XXX,y,x
+    db $05,$03,$d0
     dbw BANK(PrintRedSNESText),PrintRedSNESText
     db $FF
-BluesHouseHiddenObjects: ; 46b67 (11:6b67)
-    db $01,$00,$04 ; XXX,y,x
+
+BluesHouseHiddenObjects:
+    db $01,$00,$04
     dbw $18,$6509
-    db $01,$01,$04 ; XXX,y,x
+    db $01,$01,$04
     dbw $18,$6509
-    db $01,$07,$04 ; XXX,y,x
+    db $01,$07,$04
     dbw $18,$6509
     db $FF
-OaksLabHiddenObjects: ; 46b7a (11:6b7a)
-    db $00,$04,$04 ; XXX,y,x
+
+OaksLabHiddenObjects:
+    db $00,$04,$04
     dbw $07,$6958
-    db $00,$05,$04 ; XXX,y,x
+    db $00,$05,$04
     dbw $07,$6965
-    db $01,$00,$04 ; XXX,y,x
+    db $01,$00,$04
     dbw $07,$6caf
-    db $01,$01,$04 ; XXX,y,x
+    db $01,$01,$04
     dbw $07,$6caf
     db $FF
-ViridianPokecenterHiddenObjects: ; 46b93 (11:6b93)
-    db $04,$00,$08 ; XXX,y,x
+ViridianPokecenterHiddenObjects:
+    db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-ViridianMartHiddenObjects: ; 46ba0 (11:6ba0)
+
+ViridianMartHiddenObjects:
     db $FF
-ViridianSchoolHiddenObjects: ; 46ba1 (11:6ba1)
-    db $04,$03,$20 ; XXX,y,x
+
+ViridianSchoolHiddenObjects:
+    db $04,$03,$20
     dbw $14,$6996
-    db $00,$03,$21 ; XXX,y,x
+    db $00,$03,$21
     dbw $17,$5c1a
     db $FF
-ViridianGymHiddenObjects: ; 46bae (11:6bae)
-    db $0f,$0f,$04 ; XXX,y,x
+
+ViridianGymHiddenObjects:
+    db $0f,$0f,$04
     dbw BANK(GymStatues),GymStatues
-    db $0f,$12,$04 ; XXX,y,x
+    db $0f,$12,$04
     dbw BANK(GymStatues),GymStatues
     db $FF
-Museum1FHiddenObjects: ; 46bbb (11:6bbb)
-    db $03,$02,$04 ; XXX,y,x
+
+Museum1FHiddenObjects:
+    db $03,$02,$04
     dbw BANK(AerodactylFossil),AerodactylFossil
-    db $06,$02,$04 ; XXX,y,x
+    db $06,$02,$04
     dbw BANK(KabutopsFossil),KabutopsFossil
     db $FF
-PewterGymHiddenObjects: ; 46bc8 (11:6bc8)
-    db $0a,$03,$04 ; XXX,y,x
+
+PewterGymHiddenObjects:
+    db $0a,$03,$04
     dbw BANK(GymStatues),GymStatues
-    db $0a,$06,$04 ; XXX,y,x
+    db $0a,$06,$04
     dbw BANK(GymStatues),GymStatues
     db $FF
+
 PewterMartHiddenObjects: ; 46bd5 (11:6bd5)
     db $FF
-PewterPokecenterHiddenObjects: ; 46bd6 (11:6bd6)
-    db $04,$00,$08 ; XXX,y,x
+
+PewterPokecenterHiddenObjects:
+    db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-CeruleanPokecenterHiddenObjects: ; 46be3 (11:6be3)
-    db $04,$00,$08 ; XXX,y,x
+
+CeruleanPokecenterHiddenObjects:
+    db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-CeruleanGymHiddenObjects: ; 46bf0 (11:6bf0)
-    db $0b,$03,$04 ; XXX,y,x
+
+CeruleanGymHiddenObjects:
+    db $0b,$03,$04
     dbw BANK(GymStatues),GymStatues
-    db $0b,$06,$04 ; XXX,y,x
+    db $0b,$06,$04
     dbw BANK(GymStatues),GymStatues
     db $FF
-CeruleanMartHiddenObjects: ; 46bfd (11:6bfd)
+
+CeruleanMartHiddenObjects:
     db $FF
-LavenderPokecenterHiddenObjects: ; 46bfe (11:6bfe)
-    db $04,$00,$08 ; XXX,y,x
+
+LavenderPokecenterHiddenObjects:
+    db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-VermilionPokecenterHiddenObjects: ; 46c0b (11:6c0b)
-    db $03,$0d,$04 ; XXX,y,x
+
+VermilionPokecenterHiddenObjects:
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
-    db $04,$00,$04 ; XXX,y,x
+    db $04,$00,$04
     dbw BANK(Func_6245d),Func_6245d
     db $FF
-VermilionGymHiddenObjects: ; 46c18 (11:6c18)
-    db $0e,$03,$04 ; XXX,y,x
+
+VermilionGymHiddenObjects:
+    db $0e,$03,$04
     dbw BANK(GymStatues),GymStatues
-    db $0e,$06,$04 ; XXX,y,x
+    db $0e,$06,$04
     dbw BANK(GymStatues),GymStatues
-    db $01,$06,$00 ; XXX,y,x
+    db $01,$06,$00
     dbw $17,$5def
-    db $07,$01,$00 ; XXX,y,x
+    db $07,$01,$00
     dbw $17,$5dfc
-    db $09,$01,$01 ; XXX,y,x
+    db $09,$01,$01
     dbw $17,$5dfc
-    db $0b,$01,$02 ; XXX,y,x
+    db $0b,$01,$02
     dbw $17,$5dfc
-    db $07,$03,$03 ; XXX,y,x
+    db $07,$03,$03
     dbw $17,$5dfc
-    db $09,$03,$04 ; XXX,y,x
+    db $09,$03,$04
     dbw $17,$5dfc
-    db $0b,$03,$05 ; XXX,y,x
+    db $0b,$03,$05
     dbw $17,$5dfc
-    db $07,$05,$06 ; XXX,y,x
+    db $07,$05,$06
     dbw $17,$5dfc
-    db $09,$05,$07 ; XXX,y,x
+    db $09,$05,$07
     dbw $17,$5dfc
-    db $0b,$05,$08 ; XXX,y,x
+    db $0b,$05,$08
     dbw $17,$5dfc
-    db $07,$07,$09 ; XXX,y,x
+    db $07,$07,$09
     dbw $17,$5dfc
-    db $09,$07,$0a ; XXX,y,x
+    db $09,$07,$0a
     dbw $17,$5dfc
-    db $0b,$07,$0b ; XXX,y,x
+    db $0b,$07,$0b
     dbw $17,$5dfc
-    db $07,$09,$0c ; XXX,y,x
+    db $07,$09,$0c
     dbw $17,$5dfc
-    db $09,$09,$0d ; XXX,y,x
+    db $09,$09,$0d
     dbw $17,$5dfc
-    db $0b,$09,$0e ; XXX,y,x
+    db $0b,$09,$0e
     dbw $17,$5dfc
     db $FF
-CeladonMansion2HiddenObjects: ; 46c85 (11:6c85)
-    db $05,$00,$04 ; XXX,y,x
+
+CeladonMansion2HiddenObjects:
+    db $05,$00,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-CeladonPokecenterHiddenObjects: ; 46c8c (11:6c8c)
-    db $04,$00,$08 ; XXX,y,x
+
+CeladonPokecenterHiddenObjects:
+    db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-CeladonGymHiddenObjects: ; 46c99 (11:6c99)
-    db $0f,$03,$04 ; XXX,y,x
+
+CeladonGymHiddenObjects:
+    db $0f,$03,$04
     dbw BANK(GymStatues),GymStatues
-    db $0f,$06,$04 ; XXX,y,x
+    db $0f,$06,$04
     dbw BANK(GymStatues),GymStatues
     db $FF
-GameCornerHiddenObjects: ; 46ca6 (11:6ca6)
-    db $0f,$12,$d0 ; XXX,y,x
+
+GameCornerHiddenObjects:
+    db $0f,$12,$d0
     dbw $0d,$7e2d
-    db $0e,$12,$d0 ; XXX,y,x
+    db $0e,$12,$d0
     dbw $0d,$7e2d
-    db $0d,$12,$d0 ; XXX,y,x
+    db $0d,$12,$d0
     dbw $0d,$7e2d
-    db $0c,$12,$d0 ; XXX,y,x
+    db $0c,$12,$d0
     dbw $0d,$7e2d
-    db $0b,$12,$d0 ; XXX,y,x
+    db $0b,$12,$d0
     dbw $0d,$7e2d
-    db $0a,$12,$ff ; XXX,y,x
+    db $0a,$12,$ff
     dbw $0d,$7e2d
-    db $0a,$0d,$d0 ; XXX,y,x
+    db $0a,$0d,$d0
     dbw $0d,$7e2d
-    db $0b,$0d,$d0 ; XXX,y,x
+    db $0b,$0d,$d0
     dbw $0d,$7e2d
-    db $0c,$0d,$fe ; XXX,y,x
+    db $0c,$0d,$fe
     dbw $0d,$7e2d
-    db $0d,$0d,$d0 ; XXX,y,x
+    db $0d,$0d,$d0
     dbw $0d,$7e2d
-    db $0e,$0d,$d0 ; XXX,y,x
+    db $0e,$0d,$d0
     dbw $0d,$7e2d
-    db $0f,$0d,$d0 ; XXX,y,x
+    db $0f,$0d,$d0
     dbw $0d,$7e2d
-    db $0f,$0c,$d0 ; XXX,y,x
+    db $0f,$0c,$d0
     dbw $0d,$7e2d
-    db $0e,$0c,$d0 ; XXX,y,x
+    db $0e,$0c,$d0
     dbw $0d,$7e2d
-    db $0d,$0c,$d0 ; XXX,y,x
+    db $0d,$0c,$d0
     dbw $0d,$7e2d
-    db $0c,$0c,$d0 ; XXX,y,x
+    db $0c,$0c,$d0
     dbw $0d,$7e2d
-    db $0b,$0c,$d0 ; XXX,y,x
+    db $0b,$0c,$d0
     dbw $0d,$7e2d
-    db $0a,$0c,$d0 ; XXX,y,x
+    db $0a,$0c,$d0
     dbw $0d,$7e2d
-    db $0a,$07,$d0 ; XXX,y,x
+    db $0a,$07,$d0
     dbw $0d,$7e2d
-    db $0b,$07,$d0 ; XXX,y,x
+    db $0b,$07,$d0
     dbw $0d,$7e2d
-    db $0c,$07,$d0 ; XXX,y,x
+    db $0c,$07,$d0
     dbw $0d,$7e2d
-    db $0d,$07,$d0 ; XXX,y,x
+    db $0d,$07,$d0
     dbw $0d,$7e2d
-    db $0e,$07,$d0 ; XXX,y,x
+    db $0e,$07,$d0
     dbw $0d,$7e2d
-    db $0f,$07,$d0 ; XXX,y,x
+    db $0f,$07,$d0
     dbw $0d,$7e2d
-    db $0f,$06,$d0 ; XXX,y,x
+    db $0f,$06,$d0
     dbw $0d,$7e2d
-    db $0e,$06,$d0 ; XXX,y,x
+    db $0e,$06,$d0
     dbw $0d,$7e2d
-    db $0d,$06,$d0 ; XXX,y,x
+    db $0d,$06,$d0
     dbw $0d,$7e2d
-    db $0c,$06,$fd ; XXX,y,x
+    db $0c,$06,$fd
     dbw $0d,$7e2d
-    db $0b,$06,$d0 ; XXX,y,x
+    db $0b,$06,$d0
     dbw $0d,$7e2d
-    db $0a,$06,$d0 ; XXX,y,x
+    db $0a,$06,$d0
     dbw $0d,$7e2d
-    db $0a,$01,$d0 ; XXX,y,x
+    db $0a,$01,$d0
     dbw $0d,$7e2d
-    db $0b,$01,$d0 ; XXX,y,x
+    db $0b,$01,$d0
     dbw $0d,$7e2d
-    db $0c,$01,$d0 ; XXX,y,x
+    db $0c,$01,$d0
     dbw $0d,$7e2d
-    db $0d,$01,$d0 ; XXX,y,x
+    db $0d,$01,$d0
     dbw $0d,$7e2d
-    db $0e,$01,$d0 ; XXX,y,x
+    db $0e,$01,$d0
     dbw $0d,$7e2d
-    db $0f,$01,$d0 ; XXX,y,x
+    db $0f,$01,$d0
     dbw $0d,$7e2d
     db $08,$00,COIN+10
     dbw BANK(HiddenCoins),HiddenCoins
@@ -69430,201 +69447,230 @@ GameCornerHiddenObjects: ; 46ca6 (11:6ca6)
     db $0f,$0c,COIN+10
     dbw BANK(HiddenCoins),HiddenCoins
     db $FF
-CeladonHotelHiddenObjects: ; 46dc7 (11:6dc7)
-    db $03,$0d,$04 ; XXX,y,x
+
+CeladonHotelHiddenObjects:
+    db $03,$0d,$04
     dbw BANK(BillPC),BillPC
-    db $04,$00,$08 ; XXX,y,x
+    db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
     db $FF
-FuchsiaPokecenterHiddenObjects: ; 46dd4 (11:6dd4)
-    db $03,$0d,$04 ; XXX,y,x
+
+FuchsiaPokecenterHiddenObjects:
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
-    db $04,$00,$04 ; XXX,y,x
+    db $04,$00,$04
     dbw BANK(Func_6245d),Func_6245d
     db $FF
-FuchsiaGymHiddenObjects: ; 46de1 (11:6de1)
-    db $0f,$03,$04 ; XXX,y,x
+
+FuchsiaGymHiddenObjects:
+    db $0f,$03,$04
     dbw BANK(GymStatues),GymStatues
-    db $0f,$06,$04 ; XXX,y,x
-    dbw BANK(GymStatues),GymStatues
-    db $FF
-CinnabarGymHiddenObjects: ; 46dee (11:6dee)
-    db $0d,$11,$04 ; XXX,y,x
-    dbw BANK(GymStatues),GymStatues
-    db $07,$0f,$01 ; XXX,y,x
-    dbw $07,$6a17
-    db $01,$0a,$12 ; XXX,y,x
-    dbw $07,$6a17
-    db $07,$09,$13 ; XXX,y,x
-    dbw $07,$6a17
-    db $0d,$09,$14 ; XXX,y,x
-    dbw $07,$6a17
-    db $0d,$01,$05 ; XXX,y,x
-    dbw $07,$6a17
-    db $07,$01,$16 ; XXX,y,x
-    dbw $07,$6a17
-    db $FF
-CinnabarPokecenterHiddenObjects: ; 46e19 (11:6e19)
-    db $04,$00,$04 ; XXX,y,x
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
-    dbw BANK(PokeCenterPC),PokeCenterPC
-    db $FF
-SaffronGymHiddenObjects: ; 46e26 (11:6e26)
-    db $0f,$09,$04 ; XXX,y,x
+    db $0f,$06,$04
     dbw BANK(GymStatues),GymStatues
     db $FF
-MtMoonPokecenterHiddenObjects: ; 46e2d (11:6e2d)
-    db $04,$00,$08 ; XXX,y,x
+
+CinnabarGymHiddenObjects:
+    db $0d,$11,$04
+    dbw BANK(GymStatues),GymStatues
+    db $07,$0f,$01
+    dbw $07,$6a17
+    db $01,$0a,$12
+    dbw $07,$6a17
+    db $07,$09,$13
+    dbw $07,$6a17
+    db $0d,$09,$14
+    dbw $07,$6a17
+    db $0d,$01,$05
+    dbw $07,$6a17
+    db $07,$01,$16
+    dbw $07,$6a17
+    db $FF
+
+CinnabarPokecenterHiddenObjects:
+    db $04,$00,$04
     dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-RockTunnelPokecenterHiddenObjects: ; 46e3a (11:6e3a)
-    db $04,$00,$08 ; XXX,y,x
+
+SaffronGymHiddenObjects:
+    db $0f,$09,$04
+    dbw BANK(GymStatues),GymStatues
+    db $FF
+
+MtMoonPokecenterHiddenObjects:
+    db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-ViridianForestHiddenObjects: ; 46e47 (11:6e47)
+
+RockTunnelPokecenterHiddenObjects:
+    db $04,$00,$08
+    dbw BANK(Func_6245d),Func_6245d
+    db $03,$0d,$04
+    dbw BANK(PokeCenterPC),PokeCenterPC
+    db $FF
+
+ViridianForestHiddenObjects:
     db $12,$01,POTION
     dbw BANK(HiddenItems),HiddenItems
     db $2a,$10,ANTIDOTE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-MtMoon3HiddenObjects: ; 46e54 (11:6e54)
+
+MtMoon3HiddenObjects:
     db $0c,$12,MOON_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $09,$21,MOON_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-IndigoPlateauHiddenObjects: ; 46e61 (11:6e61)
-    db $0d,$08,$ff ; XXX,y,x
+
+IndigoPlateauHiddenObjects:
+    db $0d,$08,$ff
     dbw $14,$6a2f
-    db $0d,$0b,$00 ; XXX,y,x
+    db $0d,$0b,$00
     dbw $14,$6a2f
     db $FF
-Route25HiddenObjects: ; 46e6e (11:6e6e)
+
+Route25HiddenObjects:
     db $03,$26,ETHER
     dbw BANK(HiddenItems),HiddenItems
     db $01,$0a,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-Route9HiddenObjects: ; 46e7b (11:6e7b)
+
+Route9HiddenObjects:
     db $07,$0e,ETHER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SSAnne6HiddenObjects: ; 46e82 (11:6e82)
-    db $05,$0d,$00 ; XXX,y,x
+
+SSAnne6HiddenObjects:
+    db $05,$0d,$00
     dbw $17,$5def
-    db $07,$0d,$00 ; XXX,y,x
+    db $07,$0d,$00
     dbw $17,$5def
     db $09,$0d,GREAT_BALL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SSAnne10HiddenObjects: ; 46e95 (11:6e95)
+
+SSAnne10HiddenObjects:
     db $01,$03,HYPER_POTION
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-Route10HiddenObjects: ; 46e9c (11:6e9c)
+
+Route10HiddenObjects:
     db $11,$09,SUPER_POTION
     dbw BANK(HiddenItems),HiddenItems
     db $35,$10,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-RocketHideout1HiddenObjects: ; 46ea9 (11:6ea9)
+
+RocketHideout1HiddenObjects:
     db $0f,$15,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-RocketHideout3HiddenObjects: ; 46eb0 (11:6eb0)
+
+RocketHideout3HiddenObjects:
     db $11,$1b,NUGGET
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-RocketHideout4HiddenObjects: ; 46eb7 (11:6eb7)
+
+RocketHideout4HiddenObjects:
     db $01,$19,SUPER_POTION
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SaffronPokecenterHiddenObjects: ; 46ebe (11:6ebe)
-    db $04,$00,$04 ; XXX,y,x
+
+SaffronPokecenterHiddenObjects:
+    db $04,$00,$04
     dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-PokemonTower5HiddenObjects: ; 46ecb (11:6ecb)
+
+PokemonTower5HiddenObjects:
     db $0c,$04,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-Route13HiddenObjects: ; 46ed2 (11:6ed2)
+
+Route13HiddenObjects:
     db $0e,$01,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $0d,$10,CALCIUM
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SafariZoneEntranceHiddenObjects: ; 46edf (11:6edf)
+
+SafariZoneEntranceHiddenObjects:
     db $01,$0a,NUGGET
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SafariZoneWestHiddenObjects: ; 46ee6 (11:6ee6)
+
+SafariZoneWestHiddenObjects:
     db $05,$06,REVIVE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SilphCo5FHiddenObjects: ; 46eed (11:6eed)
+
+SilphCo5FHiddenObjects:
     db $03,$0c,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SilphCo9FHiddenObjects: ; 46ef4 (11:6ef4)
+
+SilphCo9FHiddenObjects:
     db $0f,$02,MAX_POTION
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
-SECTION "UnknownDungeon1HiddenObjects",ROMX[$6f02],BANK[$11]
-
-UnknownDungeon1HiddenObjects: ; 46f02 (11:6f02)
+UnknownDungeon1HiddenObjects:
     db $0b,$0e,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-UnknownDungeon3HiddenObjects: ; 46f09 (11:6f09)
+
+UnknownDungeon3HiddenObjects:
     db $03,$1b,ULTRA_BALL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-PowerPlantHiddenObjects: ; 46f10 (11:6f10)
+
+PowerPlantHiddenObjects:
     db $10,$11,THUNDER_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $01,$0c,THUNDER_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SeafoamIslands3HiddenObjects: ; 46f1d (11:6f1d)
+
+SeafoamIslands3HiddenObjects:
     db $0f,$0f,WATER_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SeafoamIslands5HiddenObjects: ; 46f24 (11:6f24)
+
+SeafoamIslands5HiddenObjects:
     db $11,$19,WATER_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-Mansion1HiddenObjects: ; 46f2b (11:6f2b)
+
+Mansion1HiddenObjects:
     db $10,$08,FIRE_STONE
     dbw BANK(HiddenItems),HiddenItems
-    db $05,$02,$04 ; XXX,y,x
+    db $05,$02,$04
     dbw BANK(Func_44316),Func_44316
     db $FF
 
-SECTION "Mansion3HiddenObjects",ROMX[$6f3f],BANK[$11]
-
-Mansion3HiddenObjects: ; 46f3f (11:6f3f)
+Mansion3HiddenObjects:
     db $09,$01,MAX_REVIVE
     dbw BANK(HiddenItems),HiddenItems
-    db $05,$0a,$04 ; XXX,y,x
+    db $05,$0a,$04
     dbw $14,$627a
     db $FF
-Mansion4HiddenObjects: ; 46f4c (11:6f4c)
+
+Mansion4HiddenObjects:
     db $09,$01,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
-    db $03,$14,$04 ; XXX,y,x
+    db $03,$14,$04
     dbw $14,$6420
-    db $19,$12,$04 ; XXX,y,x
+    db $19,$12,$04
     dbw $14,$6420
     db $FF
-Route23HiddenObjects: ; 46f5f (11:6f5f)
+
+Route23HiddenObjects:
     db 45,06,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
     db 67,00,LEAF_STONE
@@ -69632,112 +69678,130 @@ Route23HiddenObjects: ; 46f5f (11:6f5f)
     db 60,17,LEAF_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-VictoryRoad2HiddenObjects: ; 46f72 (11:6f72)
+
+VictoryRoad2HiddenObjects:
     db $02,$05,ULTRA_BALL
     dbw BANK(HiddenItems),HiddenItems
     db $07,$1a,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-VictoryPokecenterHiddenObjects: ; 46e3a (11:6e3a)
-    db $03,$0d,$04 ; XXX,y,x
+
+VictoryPokecenterHiddenObjects:
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-BillsHouseHiddenObjects_Old: ; 46f86 (11:6f86)
-    db $04,$01,$04 ; XXX,y,x
+
+BillsHouseHiddenObjects_Old:
+    db $04,$01,$04
     dbw $07,$6b6e
     db $FF
-ViridianCityHiddenObjects: ; 46f8d (11:6f8d)
+
+ViridianCityHiddenObjects:
     db $04,$0e,POTION
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SafariZoneRestHouse2HiddenObjects: ; 46f94 (11:6f94)
-    db $04,$00,$08 ; XXX,y,x
+
+SafariZoneRestHouse2HiddenObjects:
+    db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-SafariZoneRestHouse3HiddenObjects: ; 46fa1 (11:6fa1)
-    db $04,$00,$08 ; XXX,y,x
+
+SafariZoneRestHouse3HiddenObjects:
+    db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-SafariZoneRestHouse4HiddenObjects: ; 46fae (11:6fae)
-    db $04,$00,$08 ; XXX,y,x
+
+SafariZoneRestHouse4HiddenObjects:
+    db $04,$00,$08
     dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04 ; XXX,y,x
+    db $03,$0d,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-SwapMapObjects: ; 46fbb (11:6fbb)
-    db 08,09,$d0 ; XXX,y,x
+
+SwapMapObjects:
+    db 08,09,$d0
     dbw BANK(EnableBillsTeleport2),EnableBillsTeleport2
     db $FF
-LavenderHouse1HiddenObjects: ; 46fc2 (11:6fc2)
-    db $01,$00,$00 ; XXX,y,x
+
+LavenderHouse1HiddenObjects:
+    db $01,$00,$00
     db BANK(PrintMagazinesText)
     dw PrintMagazinesText
-    db $01,$01,$00 ; XXX,y,x
+    db $01,$01,$00
     db BANK(PrintMagazinesText)
     dw PrintMagazinesText
-    db $01,$07,$00 ; XXX,y,x
+    db $01,$07,$00
     db BANK(PrintMagazinesText)
     dw PrintMagazinesText
     db $FF
-CeladonMansion5HiddenObjects: ; 46fd5 (11:6fd5)
-    db $00,$03,$34 ; XXX,y,x
+
+CeladonMansion5HiddenObjects:
+    db $00,$03,$34
     dbw $17,$5c1a
-    db $00,$04,$34 ; XXX,y,x
+    db $00,$04,$34
     dbw $17,$5c1a
-    db $04,$03,$35 ; XXX,y,x
+    db $04,$03,$35
     dbw $14,$6996
     db $FF
-FightingDojoHiddenObjects: ; 46fe8 (11:6fe8)
-    db $09,$03,$04 ; XXX,y,x
+
+FightingDojoHiddenObjects:
+    db $09,$03,$04
     dbw $14,$6a22
-    db $09,$06,$04 ; XXX,y,x
+    db $09,$06,$04
     dbw $14,$6a22
-    db $00,$04,$04 ; XXX,y,x
+    db $00,$04,$04
     dbw $14,$6a08
-    db $00,$05,$04 ; XXX,y,x
+    db $00,$05,$04
     dbw $14,$6a15
     db $FF
-IndigoPlateauLobbyHiddenObjects: ; 47001 (11:7001)
-    db $07,$0f,$04 ; XXX,y,x
+
+IndigoPlateauLobbyHiddenObjects:
+    db $07,$0f,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-CinnabarLab4HiddenObjects: ; 47008 (11:7008)
-    db $04,$00,$04 ; XXX,y,x
+
+CinnabarLab4HiddenObjects:
+    db $04,$00,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
-    db $04,$02,$04 ; XXX,y,x
+    db $04,$02,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-BikeShopHiddenObjects: ; 47015 (11:7015)
-    db $00,$01,$d0 ; XXX,y,x
+
+BikeShopHiddenObjects:
+    db $00,$01,$d0
     dbw $07,$694b
-    db $01,$02,$d0 ; XXX,y,x
+    db $01,$02,$d0
     dbw $07,$694b
-    db $02,$01,$d0 ; XXX,y,x
+    db $02,$01,$d0
     dbw $07,$694b
-    db $02,$03,$d0 ; XXX,y,x
+    db $02,$03,$d0
     dbw $07,$694b
-    db $04,$00,$d0 ; XXX,y,x
+    db $04,$00,$d0
     dbw $07,$694b
-    db $05,$01,$d0 ; XXX,y,x
+    db $05,$01,$d0
     dbw $07,$694b
     db $FF
-Route11HiddenObjects: ; 4703a (11:703a)
+
+Route11HiddenObjects:
     db $05,$30,FULL_HEAL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-Route12HiddenObjects: ; 47041 (11:7041)
+
+Route12HiddenObjects:
     db $3f,$02,LEAF_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SilphCo11FHiddenObjects: ; 47048 (11:7048)
-    db $0c,$0a,$04 ; XXX,y,x
+
+SilphCo11FHiddenObjects:
+    db $0c,$0a,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
-Route17HiddenObjects: ; 4704f (11:704f)
+
+Route17HiddenObjects:
     db $0e,$0f,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $2d,$08,FULL_RESTORE
@@ -69749,64 +69813,76 @@ Route17HiddenObjects: ; 4704f (11:704f)
     db $79,$08,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-UndergroundPathNsHiddenObjects: ; 4706e (11:706e)
+
+UndergroundPathNsHiddenObjects:
     db $04,$03,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
     db $22,$04,X_SPECIAL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-UndergroundPathWeHiddenObjects: ; 4707b (11:707b)
+
+UndergroundPathWeHiddenObjects:
     db $02,$0c,NUGGET
     dbw BANK(HiddenItems),HiddenItems
     db $05,$15,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-CeladonCityHiddenObjects: ; 47088 (11:7088)
+
+CeladonCityHiddenObjects:
     db $0f,$30,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-SeafoamIslands4HiddenObjects: ; 4708f (11:708f)
+
+SeafoamIslands4HiddenObjects:
     db $10,$09,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-VermilionCityHiddenObjects: ; 47096 (11:7096)
+
+VermilionCityHiddenObjects:
     db $0b,$0e,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-CeruleanCityHiddenObjects: ; 4709d (11:709d)
+
+CeruleanCityHiddenObjects:
     db $08,$0f,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
-Route4HiddenObjects: ; 470a4 (11:70a4)
+
+Route4HiddenObjects:
     db $03,$28,GREAT_BALL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
+
 BillsHouseHiddenObjects:
-    db $04,$01,$04 ; XXX,y,x
+    db $04,$01,$04
     dbw BANK(BillsHousePC),BillsHousePC
-    db 06,05,$d0 ; XXX,y,x
+    db 06,05,$d0
     dbw BANK(EnableBillsTeleport),EnableBillsTeleport
     db $FF
+
 Mansion2HiddenObjects:
-    db $0b,$02,$04 ; XXX,y,x
+    db $0b,$02,$04
     dbw BANK(Func_52037),Func_52037
     db 07,28,FIRE_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
+
 B9HiddenObjects:
-    db $02,$01,$04 ; XXX,y,x
+    db $02,$01,$04
     dbw BANK(Route15UpstairsLeftBinoculars),Route15UpstairsLeftBinoculars
     db $FF
+
 BattleCenterHiddenObjects:
-    db $04,$05,$d0 ; XXX,y,x
+    db $04,$05,$d0
     dbw BANK(CableClubRightGameboy),CableClubRightGameboy
-    db $04,$04,$d0 ; XXX,y,x
+    db $04,$04,$d0
     dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
     db $FF
+
 TradeCenterHiddenObjects:
-    db $04,$05,$d0 ; XXX,y,x
+    db $04,$05,$d0
     dbw BANK(CableClubRightGameboy),CableClubRightGameboy
-    db $04,$04,$d0 ; XXX,y,x
+    db $04,$04,$d0
     dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
     db $FF
 
@@ -69816,6 +69892,8 @@ CopycatsHouse2FHiddenObjects:
     db 01,02,$04 ; y,x,
     dbw BANK(_CopycatsHouseF2Text4),_CopycatsHouseF2Text4
     db $FF
+
+; ────────────────────────────────────────────────────────
 
 FlagInstantAndPredefSilphCo:
     push hl
@@ -70012,22 +70090,25 @@ RouteD1HiddenObjects:
     db 13,26,ULTRA_BALL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
+
 PortRoyalCenterObjects:
     db 03,13,$04
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
+
 SwapMapObjects2:
-    db 08,09,$d0 ; XXX,y,x
+    db 08,09,$d0
     dbw BANK(EnableBillsTeleport2),EnableBillsTeleport2
     db $FF
+
 TestMap1Objects:
-    db 28,01,$d0 ; XXX,y,x
+    db 28,01,$d0
     dbw BANK(RevealHoleA),RevealHoleA
-    db 28,02,$d0 ; XXX,y,x
+    db 28,02,$d0
     dbw BANK(RevealHoleA),RevealHoleA
-    db 21,04,$d0 ; XXX,y,x
+    db 21,04,$d0
     dbw BANK(RevealHoleA),RevealHoleA
-    db 02,29,$d0 ; XXX,y,x
+    db 02,29,$d0
     dbw BANK(RevealHoleA),RevealHoleA
     db $FF
 
