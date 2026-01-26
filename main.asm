@@ -10528,9 +10528,9 @@ Func_3eb5:
     pop af
     jp RoutineForRealGB
 
-Func_3ef5:
+PrintPredefTextID:
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    ld hl,PointerTable_3f22
+    ld hl,TextPredefs
     call Func_3f0f
     ld hl,$cf11
     set 0,[hl]
@@ -10555,7 +10555,7 @@ Func_3f0f:
     ld [$d36d],a
     ret
 
-PointerTable_3f22:
+TextPredefs:
     dw CardKeySuccessText                   ; id = 01
     dw CardKeyFailText                      ; id = 02
     dw ItemStoragePCInRedHouse              ; id = 03
@@ -10582,9 +10582,9 @@ PointerTable_3f22:
     dw SaffronCityPokecenterBenchGuyText    ; id = 18
     dw MtMoonPokecenterBenchGuyText         ; id = 19
     dw RockTunnelPokecenterBenchGuyText     ; id = 1A
-    dw UnnamedText_624c1                    ; id = 1B
-    dw UnnamedText_624c6                    ; id = 1C
-    dw UnnamedText_624cb                    ; id = 1D
+    dw $0000 ; Unused
+    dw $0000 ; Unused
+    dw $0000 ; Unused
     dw $0000 ; Unused
     dw PokeCenterPCCode                     ; id = 1F
     dw ViridianSchoolNotebook               ; id = 20
@@ -27728,7 +27728,7 @@ Func_fb50: ; fb50 (3:7b50)
     push af
     call EnableAutoTextBoxDrawing
     pop af
-    call Func_3ef5
+    call PrintPredefTextID
     xor a
     ld [$FF00+$db],a
     ret
@@ -27744,23 +27744,23 @@ Func_fb50: ; fb50 (3:7b50)
 
 ; format: db tileset id,bookshelf tile id,unknown
 BookshelfTileIDs: ; fb8b (3:7b8b)
-    db $17,$30,$3A
-    db $08,$3D,$3F
-    db $08,$1E,$40
-    db $13,$32,$40
-    db $01,$32,$40
-    db $14,$28,$40
-    db $12,$16,$41
-    db $07,$1D,$40
-    db $05,$1D,$40
-    db $0C,$22,$40
-    db $02,$54,$42
-    db $02,$55,$42
-    db $06,$54,$42
-    db $06,$55,$42
-    db $12,$50,$42
-    db $12,$52,$42
-    db $0D,$36,$40
+    db $17,$30,$3A ; IndigoPlateauStatues
+    db $08,$3D,$3F ; TownMapText
+    db $08,$1E,$40 ; UnnamedText_fbe8
+    db $13,$32,$40 ; UnnamedText_fbe8
+    db $01,$32,$40 ; UnnamedText_fbe8
+    db $14,$28,$40 ; UnnamedText_fbe8
+    db $12,$16,$41 ; UnnamedText_fc0d
+    db $07,$1D,$40 ; UnnamedText_fbe8
+    db $05,$1D,$40 ; UnnamedText_fbe8
+    db $0C,$22,$40 ; UnnamedText_fbe8
+    db $02,$54,$42 ; UnnamedText_fc45
+    db $02,$55,$42 ; UnnamedText_fc45
+    db $06,$54,$42 ; UnnamedText_fc45
+    db $06,$55,$42 ; UnnamedText_fc45
+    db $12,$50,$42 ; UnnamedText_fc45
+    db $12,$52,$42 ; UnnamedText_fc45
+    db $0D,$36,$40 ; UnnamedText_fbe8
     db $FF
 
 IndigoPlateauStatues: ; fbbf (3:7bbf)
@@ -32377,7 +32377,7 @@ OaksPC: ; 17ec0 (5:7ec0)
     ld a,$9B
     call PlaySound  ;XXX: play sound or stop music
     call WaitForSoundToFinish  ;XXX: wait for sound to be done
-    BANKSWITCH Func_1e915
+    BANKSWITCH OpenOaksPC
     jr ReloadMainMenu
 PKMNLeague: ; 17ed2 (5:7ed2)
     ld a,$9B
@@ -37284,7 +37284,7 @@ AddStarterToParty:
 PrintMagazinesText:
     call EnableAutoTextBoxDrawing
     ld a,$30
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 UnnamedText_1eb69:
     TX_FAR _UnnamedText_1eb69
@@ -41407,50 +41407,50 @@ SECTION "BillsHouseBlocks",ROMX[$6905],BANK[$7]
 BillsHouseBlocks: ; 1e905 (7:6905)
     INCBIN "maps/billshouse.blk"
 
-Func_1e915: ; 1e915 (7:6915)
+OpenOaksPC: ; 1e915 (7:6915)
     call SaveScreenTilesToBuffer2
-    ld hl,UnnamedText_1e946 ; $6946
+    ld hl,.AccessedOaksPCText
     call PrintText
-    ld hl,UnnamedText_1e93b ; $693b
+    ld hl,.GetDexRatedText
     call PrintText
     call YesNoChoice
-    ld a,[wCurrentMenuItem] ; $cc26
+    ld a,[wCurrentMenuItem]
     and a
     jr nz,.asm_1e932
     PREDEF DisplayDexRating
 .asm_1e932
-    ld hl,UnnamedText_1e940 ; $6940
+    ld hl,.ClosedOaksPCText
     call PrintText
     jp LoadScreenTilesFromBuffer2
-
-UnnamedText_1e93b: ; 1e93b (7:693b)
-    TX_FAR _UnnamedText_1e93b
+.GetDexRatedText
+    TX_FAR _GetDexRatedText
     db "@"
-
-UnnamedText_1e940: ; 1e940 (7:6940)
-    TX_FAR _UnnamedText_1e940
+.ClosedOaksPCText
+    TX_FAR _ClosedOaksPCText
     db $0d,"@"
-
-UnnamedText_1e946: ; 1e946 (7:6946)
-    TX_FAR _UnnamedText_1e946
+.AccessedOaksPCText
+    TX_FAR _AccessedOaksPCText
     db "@"
 
+PrintNewBikeText: ; 1e94b (7:694b)
     call EnableAutoTextBoxDrawing
     ld a,$39
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 NewBicycleText: ; 1e953 (7:6953)
     TX_FAR _NewBicycleText
     db "@"
 
+DisplayOakLabLeftPoster: ; 1e960 (7:6958)
     call EnableAutoTextBoxDrawing
     ld a,$05
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 UnnamedText_1e960: ; 1e960 (7:6960)
     TX_FAR _UnnamedText_1e960
     db "@"
 
+DisplayOakLabRightPoster: ; 1e965 (7:6965)
     call EnableAutoTextBoxDrawing
     ld hl,wPokedexOwned ; $d2f7
     ld b,wPokedexOwnedEnd - wPokedexOwned
@@ -41461,7 +41461,7 @@ UnnamedText_1e960: ; 1e960 (7:6960)
     jr c,.asm_1e97b
     ld a,$7
 .asm_1e97b
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 UnnamedText_1e97e: ; 1e97e (7:697e)
     TX_FAR _UnnamedText_1e97e
@@ -41553,12 +41553,13 @@ UnnamedText_1ea12: ; 1ea12 (7:6a12)
     TX_FAR _UnnamedText_1ea12
     db "@"
 
+PrintCinnabarQuiz: ; 1ea17 (7:6a17)
     ld a,[$c109]
     cp $4
     ret nz
     call EnableAutoTextBoxDrawing
     ld a,$31
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 CinnabarGymQuiz: ; 1ea25 (7:6a25)
     db $08 ; asm
@@ -41737,12 +41738,12 @@ BillsHousePC:
     jr nz,.asm_1eb8b
 .asm_1eb86
     ld a,$2d
-    jp Func_3ef5
+    jp PrintPredefTextID
 .asm_1eb8b
     ld a,$1
     ld [$cc3c],a
     ld a,$2e
-    call Func_3ef5
+    call PrintPredefTextID
     ld c,$20
     call DelayFrames
     ld a,$8c
@@ -41771,7 +41772,7 @@ BillsHousePC:
     ld a,$1
     ld [$cc3c],a
     ld a,$2f
-    call Func_3ef5
+    call PrintPredefTextID
     ret
 
 BillsHouseMonitorText: ; 1ebdd (7:6bdd)
@@ -41859,13 +41860,13 @@ BillsHousePokemonListText2: ; 1ecaa (7:6caa)
     TX_FAR _BillsHousePokemonListText2
     db "@"
 
-Func_1ecaf: ; 1ecaf (7:6caf)
+DisplayOakLabEmailText: ; 1ecaf (7:6caf)
     ld a,[$c109]
     cp $4
     ret nz
     call EnableAutoTextBoxDrawing
     ld a,$8
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 OakLabEmailText: ; 1ecbd (7:6cbd)
     TX_FAR _OakLabEmailText
@@ -44344,7 +44345,7 @@ CableClubLeftGameboy:
     ld [$d12b],a
     call EnableAutoTextBoxDrawing
     ld a,$22
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 CableClubRightGameboy:
     ld a,[$ff00+$aa]
@@ -44362,7 +44363,7 @@ CableClubRightGameboy:
     ld [$d12b],a
     call EnableAutoTextBoxDrawing
     ld a,$22
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 UnnamedText_21865: ; 21865 (8:5865)
     TX_FAR _UnnamedText_21865
@@ -44376,7 +44377,7 @@ BillPC: ; 2186A (8:586A)
     ret nz
     call EnableAutoTextBoxDrawing
     ld a,$23
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 BillPCCode: ; 21878 (8:5878)
     db $fd ; Bill's PC in DisplayTextID
@@ -47167,7 +47168,7 @@ Func_2ff09 ; 2ff09 (b:7f09)
 .asm_2ff26
     call EnableAutoTextBoxDrawing
     ld a,b
-    call Func_3ef5
+    call PrintPredefTextID
     xor a
 .asm_2ff2e
     ld [$cd3d],a
@@ -48650,13 +48651,13 @@ _Divide: ; 37da5 (d:7da5)
     ld [H_DIVIDEND],a ; $FF00+$95 (aliases: H_PRODUCT,H_PASTLEADINGZEROES,H_QUOTIENT)
     ret
 
-Func_37e2d: ; 37e2d (d:7e2d)
+StartSlotMachine: ; 37e2d (d:7e2d)
     ld a,[wTrainerSpriteOffset]
-    cp $fd
+    cp $fd ; SLOTS_OUTOFORDER
     jr z,.asm_37e66
-    cp $fe
+    cp $fe ; SLOTS_OUTTOLUNCH
     jr z,.asm_37e6a
-    cp $ff
+    cp $ff ; SLOTS_SOMEONESKEYS
     jr z,.asm_37e6e
     BANKSWITCH Func_2ff09
     ld a,[wTrainerSpriteOffset]
@@ -48690,7 +48691,7 @@ Func_37e2d: ; 37e2d (d:7e2d)
     push af
     call EnableAutoTextBoxDrawing
     pop af
-    call Func_3ef5
+    call PrintPredefTextID
     ret
 
 GameCornerOutOfOrderText: ; 37e79 (d:7e79)
@@ -69060,9 +69061,6 @@ HiddenObjectMaps:
     db VICTORY_POKECENTER
     db BILLS_HOUSE
     db VIRIDIAN_CITY
-    db SAFARI_ZONE_REST_HOUSE_2
-    db SAFARI_ZONE_REST_HOUSE_3
-    db SAFARI_ZONE_REST_HOUSE_4
     db SWAP_MAP
     db LAVENDER_HOUSE_1
     db CELADON_MANSION_5
@@ -69148,9 +69146,6 @@ HiddenObjectPointers:
     dw VictoryPokecenterHiddenObjects
     dw BillsHouseHiddenObjects
     dw ViridianCityHiddenObjects
-    dw SafariZoneRestHouse2HiddenObjects
-    dw SafariZoneRestHouse3HiddenObjects
-    dw SafariZoneRestHouse4HiddenObjects
     dw SwapMapObjects
     dw LavenderHouse1HiddenObjects
     dw CeladonMansion5HiddenObjects
@@ -69175,357 +69170,367 @@ HiddenObjectPointers:
     dw Route15GateUpstairsHiddenObjects
     dw HallOfFameRoomHiddenObjects
 
+; Some hidden objects use SPRITE_FACING_* values,
+; but these do not actually prevent the player
+; from interacting with them in any direction.
+
+ANY_FACING          EQU $D0
+SPRITE_FACING_DOWN  EQU $00
+SPRITE_FACING_UP    EQU $04
+SPRITE_FACING_LEFT  EQU $08
+SPRITE_FACING_RIGHT EQU $0C
+
 RedsHouse2FHiddenObjects:
-    db $01,$00,$04
+    db 01,00,SPRITE_FACING_UP
     dbw BANK(OpenRedsPC),OpenRedsPC
-    db $05,$03,$d0
+    db 05,03,ANY_FACING
     dbw BANK(PrintRedSNESText),PrintRedSNESText
     db $FF
 
 BluesHouseHiddenObjects:
-    db $01,$00,$04
-    dbw $18,$6509
-    db $01,$01,$04
-    dbw $18,$6509
-    db $01,$07,$04
-    dbw $18,$6509
+    db 01,00,SPRITE_FACING_UP
+    dbw BANK(PrintBookcaseText),PrintBookcaseText
+    db 01,01,SPRITE_FACING_UP
+    dbw BANK(PrintBookcaseText),PrintBookcaseText
+    db 01,07,SPRITE_FACING_UP
+    dbw BANK(PrintBookcaseText),PrintBookcaseText
     db $FF
 
 OaksLabHiddenObjects:
-    db $00,$04,$04
-    dbw $07,$6958
-    db $00,$05,$04
-    dbw $07,$6965
-    db $01,$00,$04
-    dbw $07,$6caf
-    db $01,$01,$04
-    dbw $07,$6caf
+    db 00,04,SPRITE_FACING_UP
+    dbw BANK(DisplayOakLabLeftPoster),DisplayOakLabLeftPoster
+    db 00,05,SPRITE_FACING_UP
+    dbw BANK(DisplayOakLabRightPoster),DisplayOakLabRightPoster
+    db 01,00,SPRITE_FACING_UP
+    dbw BANK(DisplayOakLabEmailText),DisplayOakLabEmailText
+    db 01,01,SPRITE_FACING_UP
+    dbw BANK(DisplayOakLabEmailText),DisplayOakLabEmailText
     db $FF
 
 ViridianPokecenterHiddenObjects:
-    db $04,$00,$08
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 ViridianSchoolHiddenObjects:
-    db $04,$03,$20
-    dbw $14,$6996
-    db $00,$03,$21
-    dbw $17,$5c1a
+    db 04,03,$20 ; ViridianSchoolNotebook
+    dbw BANK(Func_52996),Func_52996
+    db 00,03,$21 ; ViridianSchoolBlackboard
+    dbw BANK(Func_5dc1a),Func_5dc1a
     db $FF
 
 ViridianGymHiddenObjects:
-    db $0f,$0f,$04
+    db 15,15,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
-    db $0f,$12,$04
+    db 15,18,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
     db $FF
 
 Museum1FHiddenObjects:
-    db $03,$02,$04
+    db 03,02,SPRITE_FACING_UP
     dbw BANK(AerodactylFossil),AerodactylFossil
-    db $06,$02,$04
+    db 06,02,SPRITE_FACING_UP
     dbw BANK(KabutopsFossil),KabutopsFossil
     db $FF
 
 PewterGymHiddenObjects:
-    db $0a,$03,$04
+    db 10,03,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
-    db $0a,$06,$04
+    db 10,06,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
     db $FF
 
 PewterPokecenterHiddenObjects:
-    db $04,$00,$08
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 CeruleanPokecenterHiddenObjects:
-    db $04,$00,$08
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 CeruleanGymHiddenObjects:
-    db $0b,$03,$04
+    db 11,03,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
-    db $0b,$06,$04
+    db 11,06,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
     db $FF
 
 LavenderPokecenterHiddenObjects:
-    db $04,$00,$08
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 VermilionPokecenterHiddenObjects:
-    db $03,$0d,$04
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
-    db $04,$00,$04
-    dbw BANK(Func_6245d),Func_6245d
     db $FF
 
 VermilionGymHiddenObjects:
-    db $0e,$03,$04
+    db 14,03,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
-    db $0e,$06,$04
+    db 14,06,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
-    db $01,$06,$00
-    dbw $17,$5def
-    db $07,$01,$00
-    dbw $17,$5dfc
-    db $09,$01,$01
-    dbw $17,$5dfc
-    db $0b,$01,$02
-    dbw $17,$5dfc
-    db $07,$03,$03
-    dbw $17,$5dfc
-    db $09,$03,$04
-    dbw $17,$5dfc
-    db $0b,$03,$05
-    dbw $17,$5dfc
-    db $07,$05,$06
-    dbw $17,$5dfc
-    db $09,$05,$07
-    dbw $17,$5dfc
-    db $0b,$05,$08
-    dbw $17,$5dfc
-    db $07,$07,$09
-    dbw $17,$5dfc
-    db $09,$07,$0a
-    dbw $17,$5dfc
-    db $0b,$07,$0b
-    dbw $17,$5dfc
-    db $07,$09,$0c
-    dbw $17,$5dfc
-    db $09,$09,$0d
-    dbw $17,$5dfc
-    db $0b,$09,$0e
-    dbw $17,$5dfc
+    db 01,06,SPRITE_FACING_DOWN
+    dbw BANK(PrintTrashText),PrintTrashText
+    db 07,01,$00
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 09,01,$01
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 11,01,$02
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 07,03,$03
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 09,03,$04
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 11,03,$05
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 07,05,$06
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 09,05,$07
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 11,05,$08
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 07,07,$09
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 09,07,$0a
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 11,07,$0b
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 07,09,$0c
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 09,09,$0d
+    dbw BANK(GymTrashScript),GymTrashScript
+    db 11,09,$0e
+    dbw BANK(GymTrashScript),GymTrashScript
     db $FF
 
 CeladonMansion2HiddenObjects:
-    db $05,$00,$04
+    db 05,00,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 CeladonPokecenterHiddenObjects:
-    db $04,$00,$08
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 CeladonGymHiddenObjects:
-    db $0f,$03,$04
+    db 15,03,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
-    db $0f,$06,$04
+    db 15,06,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
     db $FF
 
 GameCornerHiddenObjects:
-    db $0f,$12,$d0
-    dbw $0d,$7e2d
-    db $0e,$12,$d0
-    dbw $0d,$7e2d
-    db $0d,$12,$d0
-    dbw $0d,$7e2d
-    db $0c,$12,$d0
-    dbw $0d,$7e2d
-    db $0b,$12,$d0
-    dbw $0d,$7e2d
-    db $0a,$12,$ff
-    dbw $0d,$7e2d
-    db $0a,$0d,$d0
-    dbw $0d,$7e2d
-    db $0b,$0d,$d0
-    dbw $0d,$7e2d
-    db $0c,$0d,$fe
-    dbw $0d,$7e2d
-    db $0d,$0d,$d0
-    dbw $0d,$7e2d
-    db $0e,$0d,$d0
-    dbw $0d,$7e2d
-    db $0f,$0d,$d0
-    dbw $0d,$7e2d
-    db $0f,$0c,$d0
-    dbw $0d,$7e2d
-    db $0e,$0c,$d0
-    dbw $0d,$7e2d
-    db $0d,$0c,$d0
-    dbw $0d,$7e2d
-    db $0c,$0c,$d0
-    dbw $0d,$7e2d
-    db $0b,$0c,$d0
-    dbw $0d,$7e2d
-    db $0a,$0c,$d0
-    dbw $0d,$7e2d
-    db $0a,$07,$d0
-    dbw $0d,$7e2d
-    db $0b,$07,$d0
-    dbw $0d,$7e2d
-    db $0c,$07,$d0
-    dbw $0d,$7e2d
-    db $0d,$07,$d0
-    dbw $0d,$7e2d
-    db $0e,$07,$d0
-    dbw $0d,$7e2d
-    db $0f,$07,$d0
-    dbw $0d,$7e2d
-    db $0f,$06,$d0
-    dbw $0d,$7e2d
-    db $0e,$06,$d0
-    dbw $0d,$7e2d
-    db $0d,$06,$d0
-    dbw $0d,$7e2d
-    db $0c,$06,$fd
-    dbw $0d,$7e2d
-    db $0b,$06,$d0
-    dbw $0d,$7e2d
-    db $0a,$06,$d0
-    dbw $0d,$7e2d
-    db $0a,$01,$d0
-    dbw $0d,$7e2d
-    db $0b,$01,$d0
-    dbw $0d,$7e2d
-    db $0c,$01,$d0
-    dbw $0d,$7e2d
-    db $0d,$01,$d0
-    dbw $0d,$7e2d
-    db $0e,$01,$d0
-    dbw $0d,$7e2d
-    db $0f,$01,$d0
-    dbw $0d,$7e2d
-    db $08,$00,COIN+10
+    db 15,18,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 14,18,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 13,18,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 12,18,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 11,18,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 10,18,$ff ; SLOTS_SOMEONESKEYS
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 10,13,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 11,13,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 12,13,$fe ; SLOTS_OUTTOLUNCH
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 13,13,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 14,13,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 15,13,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 15,12,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 14,12,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 13,12,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 12,12,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 11,12,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 10,12,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 10,07,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 11,07,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 12,$07,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 13,07,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 14,07,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 15,07,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 15,06,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 14,06,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 13,06,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 12,06,$fd ; SLOTS_OUTOFORDER
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 11,06,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 10,06,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 10,01,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 11,01,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 12,01,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 13,01,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 14,01,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 15,01,ANY_FACING
+    dbw BANK(StartSlotMachine),StartSlotMachine
+    db 08,00,COIN+10
     dbw BANK(HiddenCoins),HiddenCoins
-    db $10,$01,COIN+10
+    db 16,01,COIN+10
     dbw BANK(HiddenCoins),HiddenCoins
-    db $0b,$03,COIN+20
+    db 11,03,COIN+20
     dbw BANK(HiddenCoins),HiddenCoins
-    db $0e,$03,COIN+10
+    db 14,03,COIN+10
     dbw BANK(HiddenCoins),HiddenCoins
-    db $0c,$04,COIN+10
+    db 12,04,COIN+10
     dbw BANK(HiddenCoins),HiddenCoins
-    db $0c,$09,COIN+20
+    db 12,09,COIN+20
     dbw BANK(HiddenCoins),HiddenCoins
-    db $0f,$09,COIN+10
+    db 15,09,COIN+10
     dbw BANK(HiddenCoins),HiddenCoins
-    db $0e,$10,COIN+10
+    db 14,16,COIN+10
     dbw BANK(HiddenCoins),HiddenCoins
-    db $10,$0a,COIN+10
+    db 16,10,COIN+10
     dbw BANK(HiddenCoins),HiddenCoins
-    db $07,$0b,COIN+40
+    db 07,11,COIN+40
     dbw BANK(HiddenCoins),HiddenCoins
-    db $08,$0f,COIN+100
+    db 08,15,COIN+100
     dbw BANK(HiddenCoins),HiddenCoins
-    db $0f,$0c,COIN+10
+    db 15,12,COIN+10
     dbw BANK(HiddenCoins),HiddenCoins
     db $FF
 
 CeladonHotelHiddenObjects:
-    db $03,$0d,$04
-    dbw BANK(BillPC),BillPC
-    db $04,$00,$08
-    dbw BANK(Func_6245d),Func_6245d
+    db 03,13,SPRITE_FACING_UP
+    dbw BANK(BillPC),BillPC ; Invisible PC
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
     db $FF
 
 FuchsiaPokecenterHiddenObjects:
-    db $03,$0d,$04
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
-    db $04,$00,$04
-    dbw BANK(Func_6245d),Func_6245d
     db $FF
 
 FuchsiaGymHiddenObjects:
-    db $0f,$03,$04
+    db 15,03,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
-    db $0f,$06,$04
+    db 15,06,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
     db $FF
 
 CinnabarGymHiddenObjects:
-    db $0d,$11,$04
+    db 13,17,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
-    db $07,$0f,$01
-    dbw $07,$6a17
-    db $01,$0a,$12
-    dbw $07,$6a17
-    db $07,$09,$13
-    dbw $07,$6a17
-    db $0d,$09,$14
-    dbw $07,$6a17
-    db $0d,$01,$05
-    dbw $07,$6a17
-    db $07,$01,$16
-    dbw $07,$6a17
+    db 07,15,(0 << 4) | 1 ; FALSE
+    dbw BANK(PrintCinnabarQuiz),PrintCinnabarQuiz
+    db 01,10,(1  << 4) | 2 ; TRUE
+    dbw BANK(PrintCinnabarQuiz),PrintCinnabarQuiz
+    db 07,09,(1  << 4) | 3 ; TRUE
+    dbw BANK(PrintCinnabarQuiz),PrintCinnabarQuiz
+    db 13,09,(1  << 4) | 4 ; TRUE
+    dbw BANK(PrintCinnabarQuiz),PrintCinnabarQuiz
+    db 13,01,(0 << 4) | 5 ; FALSE
+    dbw BANK(PrintCinnabarQuiz),PrintCinnabarQuiz
+    db 07,01,(1  << 4) | 6 ; TRUE
+    dbw BANK(PrintCinnabarQuiz),PrintCinnabarQuiz
     db $FF
 
 CinnabarPokecenterHiddenObjects:
-    db $04,$00,$04
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 SaffronGymHiddenObjects:
-    db $0f,$09,$04
+    db 15,09,SPRITE_FACING_UP
     dbw BANK(GymStatues),GymStatues
     db $FF
 
 MtMoonPokecenterHiddenObjects:
-    db $04,$00,$08
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 RockTunnelPokecenterHiddenObjects:
-    db $04,$00,$08
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 BattleCenterHiddenObjects:
-    db $04,$05,$d0
+    db 04,05,ANY_FACING
     dbw BANK(CableClubRightGameboy),CableClubRightGameboy
-    db $04,$04,$d0
+    db 04,04,ANY_FACING
     dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
     db $FF
 
 TradeCenterHiddenObjects:
-    db $04,$05,$d0
+    db 04,05,ANY_FACING
     dbw BANK(CableClubRightGameboy),CableClubRightGameboy
-    db $04,$04,$d0
+    db 04,04,ANY_FACING
     dbw BANK(CableClubLeftGameboy),CableClubLeftGameboy
     db $FF
 
 ViridianForestHiddenObjects:
-    db $12,$01,POTION
+    db 18,01,POTION
     dbw BANK(HiddenItems),HiddenItems
-    db $2a,$10,ANTIDOTE
+    db 42,16,ANTIDOTE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 MtMoon3HiddenObjects:
-    db $0c,$12,MOON_STONE
+    db 12,18,MOON_STONE
     dbw BANK(HiddenItems),HiddenItems
-    db $09,$21,MOON_STONE
+    db 09,33,MOON_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 IndigoPlateauHiddenObjects:
-    db $0d,$08,$ff
-    dbw $14,$6a2f
-    db $0d,$0b,$00
-    dbw $14,$6a2f
+    db 13,08,$ff
+    dbw BANK(PrintIndigoPlateauHQText),PrintIndigoPlateauHQText
+    db 13,11,SPRITE_FACING_DOWN
+    dbw BANK(PrintIndigoPlateauHQText),PrintIndigoPlateauHQText
     db $FF
 
 Route25HiddenObjects:
@@ -69541,9 +69546,9 @@ Route9HiddenObjects:
     db $FF
 
 SSAnne6HiddenObjects:
-    db $05,$0d,$00
+    db $05,$0d,SPRITE_FACING_DOWN
     dbw $17,$5def
-    db $07,$0d,$00
+    db $07,$0d,SPRITE_FACING_DOWN
     dbw $17,$5def
     db $09,$0d,GREAT_BALL
     dbw BANK(HiddenItems),HiddenItems
@@ -69570,9 +69575,9 @@ RocketHideout4HiddenObjects:
     db $FF
 
 SaffronPokecenterHiddenObjects:
-    db $04,$00,$04
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
+    db 04,00,SPRITE_FACING_LEFT
+    dbw BANK(PrintBenchGuyText),PrintBenchGuyText
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
@@ -69645,14 +69650,14 @@ SeafoamIslands5HiddenObjects:
 Mansion1HiddenObjects:
     db $10,$08,FIRE_STONE
     dbw BANK(HiddenItems),HiddenItems
-    db $05,$02,$04
+    db $05,$02,SPRITE_FACING_UP
     dbw BANK(Func_44316),Func_44316
     db $FF
 
 Mansion3HiddenObjects:
     db $09,$01,MAX_REVIVE
     dbw BANK(HiddenItems),HiddenItems
-    db $05,$0a,$04
+    db $05,$0a,SPRITE_FACING_UP
     dbw $14,$627a
     db $FF
 
@@ -69673,14 +69678,14 @@ VictoryRoad2HiddenObjects:
     db $FF
 
 VictoryPokecenterHiddenObjects:
-    db $03,$0d,$04
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 BillsHouseHiddenObjects:
-    db $04,$01,$04
+    db $04,$01,SPRITE_FACING_UP
     dbw BANK(BillsHousePC),BillsHousePC
-    db 06,05,$d0
+    db 06,05,ANY_FACING
     dbw BANK(EnableBillsTeleport),EnableBillsTeleport
     db $FF
 
@@ -69689,40 +69694,19 @@ ViridianCityHiddenObjects:
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
-SafariZoneRestHouse2HiddenObjects:
-    db $04,$00,$08
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
-    dbw BANK(PokeCenterPC),PokeCenterPC
-    db $FF
-
-SafariZoneRestHouse3HiddenObjects:
-    db $04,$00,$08
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
-    dbw BANK(PokeCenterPC),PokeCenterPC
-    db $FF
-
-SafariZoneRestHouse4HiddenObjects:
-    db $04,$00,$08
-    dbw BANK(Func_6245d),Func_6245d
-    db $03,$0d,$04
-    dbw BANK(PokeCenterPC),PokeCenterPC
-    db $FF
-
 SwapMapObjects:
-    db 08,09,$d0
+    db 08,09,ANY_FACING
     dbw BANK(EnableBillsTeleport2),EnableBillsTeleport2
     db $FF
 
 LavenderHouse1HiddenObjects:
-    db $01,$00,$00
+    db $01,$00,SPRITE_FACING_DOWN
     db BANK(PrintMagazinesText)
     dw PrintMagazinesText
-    db $01,$01,$00
+    db $01,$01,SPRITE_FACING_DOWN
     db BANK(PrintMagazinesText)
     dw PrintMagazinesText
-    db $01,$07,$00
+    db $01,$07,SPRITE_FACING_DOWN
     db BANK(PrintMagazinesText)
     dw PrintMagazinesText
     db $FF
@@ -69737,13 +69721,13 @@ CeladonMansion5HiddenObjects:
     db $FF
 
 FightingDojoHiddenObjects:
-    db $09,$03,$04
+    db $09,$03,SPRITE_FACING_UP
     dbw $14,$6a22
-    db $09,$06,$04
+    db $09,$06,SPRITE_FACING_UP
     dbw $14,$6a22
-    db $00,$04,$04
+    db $00,$04,SPRITE_FACING_UP
     dbw $14,$6a08
-    db $00,$05,$04
+    db $00,$05,SPRITE_FACING_UP
     dbw $14,$6a15
     db $FF
 
@@ -69755,30 +69739,32 @@ Route10HiddenObjects:
     db $FF
 
 IndigoPlateauLobbyHiddenObjects:
-    db $07,$0f,$04
+    db 07,15,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 CinnabarLab4HiddenObjects:
-    db $04,$00,$04
+    db 04,00,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
-    db $04,$02,$04
+    db 04,02,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 BikeShopHiddenObjects:
-    db $00,$01,$d0
-    dbw $07,$694b
-    db $01,$02,$d0
-    dbw $07,$694b
-    db $02,$01,$d0
-    dbw $07,$694b
-    db $02,$03,$d0
-    dbw $07,$694b
-    db $04,$00,$d0
-    dbw $07,$694b
-    db $05,$01,$d0
-    dbw $07,$694b
+    db 00,04,ANY_FACING
+    dbw BANK(PrintNewBikeText),PrintNewBikeText
+    db 01,03,ANY_FACING
+    dbw BANK(PrintNewBikeText),PrintNewBikeText
+    db 02,03,ANY_FACING
+    dbw BANK(PrintNewBikeText),PrintNewBikeText
+    db 02,02,ANY_FACING
+    dbw BANK(PrintNewBikeText),PrintNewBikeText
+    db 04,01,ANY_FACING
+    dbw BANK(PrintNewBikeText),PrintNewBikeText
+    db 05,01,ANY_FACING
+    dbw BANK(PrintNewBikeText),PrintNewBikeText
+    db 05,00,ANY_FACING
+    dbw BANK(PrintNewBikeText),PrintNewBikeText
     db $FF
 
 Route11HiddenObjects:
@@ -69792,7 +69778,7 @@ Route12HiddenObjects:
     db $FF
 
 Mansion2HiddenObjects:
-    db $0b,$02,$04
+    db $0b,$02,SPRITE_FACING_UP
     dbw BANK(Func_52037),Func_52037
     db 07,28,FIRE_STONE
     dbw BANK(HiddenItems),HiddenItems
@@ -69801,14 +69787,14 @@ Mansion2HiddenObjects:
 Mansion4HiddenObjects:
     db $09,$01,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
-    db $03,$14,$04
+    db $03,$14,SPRITE_FACING_UP
     dbw $14,$6420
-    db $19,$12,$04
+    db $19,$12,SPRITE_FACING_UP
     dbw $14,$6420
     db $FF
 
 SilphCo11FHiddenObjects:
-    db $0c,$0a,$04
+    db 12,10,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
@@ -69865,7 +69851,7 @@ Route4HiddenObjects:
     db $FF
 
 Route15GateUpstairsHiddenObjects:
-    db $02,$01,$04
+    db $02,$01,SPRITE_FACING_UP
     dbw BANK(Route15UpstairsLeftBinoculars),Route15UpstairsLeftBinoculars
     db $FF
 
@@ -70073,23 +70059,23 @@ RouteD1HiddenObjects:
     db $FF
 
 PortRoyalCenterObjects:
-    db 03,13,$04
+    db 03,13,SPRITE_FACING_UP
     dbw BANK(PokeCenterPC),PokeCenterPC
     db $FF
 
 SwapMapObjects2:
-    db 08,09,$d0
+    db 08,09,ANY_FACING
     dbw BANK(EnableBillsTeleport2),EnableBillsTeleport2
     db $FF
 
 TestMap1Objects:
-    db 28,01,$d0
+    db 28,01,ANY_FACING
     dbw BANK(RevealHoleA),RevealHoleA
-    db 28,02,$d0
+    db 28,02,ANY_FACING
     dbw BANK(RevealHoleA),RevealHoleA
-    db 21,04,$d0
+    db 21,04,ANY_FACING
     dbw BANK(RevealHoleA),RevealHoleA
-    db 02,29,$d0
+    db 02,29,ANY_FACING
     dbw BANK(RevealHoleA),RevealHoleA
     db $FF
 
@@ -78956,7 +78942,7 @@ Func_52673: ; 52673 (14:6673)
     push de
     ld a,$1
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call Func_3ef5
+    call PrintPredefTextID
     pop de
     srl d
     ld a,d
@@ -78983,7 +78969,7 @@ Func_52673: ; 52673 (14:6673)
 .asm_526dc
     ld a,$2
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 SilphCoMapList: ; 526e3 (14:66e3)
     db SILPH_CO_2F
@@ -79370,7 +79356,7 @@ Func_52996: ; 52996 (14:6996)
     ld a,$1
     ld [$cc3c],a
     ld a,[wTrainerSpriteOffset]
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 TMNotebook: ; 529a4 (14:69a4)
     TX_FAR TMNotebookText
@@ -79434,7 +79420,7 @@ ViridianSchoolNotebookText4: ; 52a03 (14:6a03)
 Func_52a08: ; 52a08 (14:6a08)
     call EnableAutoTextBoxDrawing
     ld a,$37
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 UnnamedText_52a10: ; 52a10 (14:6a10)
     TX_FAR _UnnamedText_52a10
@@ -79443,7 +79429,7 @@ UnnamedText_52a10: ; 52a10 (14:6a10)
 Func_52a15: ; 52a15 (14:6a15)
     call EnableAutoTextBoxDrawing
     ld a,$38
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 UnnamedText_52a1d: ; 52a1d (14:6a1d)
     TX_FAR _UnnamedText_52a1d
@@ -79452,19 +79438,19 @@ UnnamedText_52a1d: ; 52a1d (14:6a1d)
 Func_52a22: ; 52a22 (14:6a22)
     call EnableAutoTextBoxDrawing
     ld a,$36
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 FightingDojoText: ; 52a2a (14:6a2a)
     TX_FAR _FightingDojoText
     db "@"
 
-Func_52a2f: ; 52a2f (14:6a2f)
+PrintIndigoPlateauHQText: ; 52a2f (14:6a2f)
     ld a,[$c109]
     cp $4
     ret nz
     call EnableAutoTextBoxDrawing
     ld a,$27
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 IndigoPlateauHQText: ; 52a3d (14:6a3d)
     TX_FAR _IndigoPlateauHQText
@@ -92010,7 +91996,7 @@ VictoryRoad1Blocks: ; 5db04 (17:5b04)
 PrintRedSNESText:
     call EnableAutoTextBoxDrawing
     ld a,$4 ; RedBedroomSNESText
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 RedBedroomSNESText:
     TX_FAR _RedBedroomSNESText
@@ -92021,7 +92007,7 @@ OpenRedsPC:
     BANKSWITCH_JUMP_NZ PokeCenterPC
     call EnableAutoTextBoxDrawing
     ld a,$3 ; ItemStoragePCInRedHouse
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 SECTION "ItemStoragePCInRedHouse",ROMX[$5b8e],BANK[$17]
 
@@ -92034,7 +92020,7 @@ Route15UpstairsLeftBinoculars: ; 5db8f (17:5b8f)
     ret nz
     call EnableAutoTextBoxDrawing
     ld a,$a ; text id Route15UpstairsBinocularsText
-    call Func_3ef5
+    call PrintPredefTextID
     ld a,ARTICUNO
     ld [$cf91],a
     call PlayCry
@@ -92052,10 +92038,9 @@ AerodactylFossil:
     call DisplayMonFrontSpriteInBox
     call EnableAutoTextBoxDrawing
     ld a,$9
-    call Func_3ef5
-    ret
+    jp PrintPredefTextID
 
-AerodactylFossilText: ; 5dbbe (17:5bbe)
+AerodactylFossilText:
     TX_FAR _AerodactylFossilText
     db "@"
 
@@ -92067,10 +92052,9 @@ KabutopsFossil:
     call DisplayMonFrontSpriteInBox
     call EnableAutoTextBoxDrawing
     ld a,$b
-    call Func_3ef5
-    ret
+    jp PrintPredefTextID
 
-KabutopsFossilText: ; 5dbd4 (17:5bd4)
+KabutopsFossilText:
     TX_FAR _KabutopsFossilText
     db "@"
 
@@ -92083,7 +92067,7 @@ Func_5dc1a: ; 5dc1a (17:5c1a)
     ld a,$1
     ld [$cc3c],a
     ld a,[$cd3d]
-    call Func_3ef5
+    call PrintPredefTextID
     ret
 
 LinkCableHelp: ; 5dc29 (17:5c29)
@@ -92286,17 +92270,18 @@ ViridianSchoolBlackboard: ; 5dced (17:5ced)
     TX_FAR _ViridianBlackboardFrozenText
     db "@"
 
-SECTION "Func_5ddef",ROMX[$5def],BANK[$17]
+SECTION "PrintTrashText",ROMX[$5def],BANK[$17]
 
-Func_5ddef: ; 5ddef (17:5def)
+PrintTrashText: ; 5ddef (17:5def)
     call EnableAutoTextBoxDrawing
     ld a,$26
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 VermilionGymTrashText: ; 5ddf7 (17:5df7)
     TX_FAR _VermilionGymTrashText
     db "@"
 
+GymTrashScript: ; 5ddfc (17:5dfc)
     call EnableAutoTextBoxDrawing
     ld a,[wWhichTrade] ; $cd3d
     ld [$cd5b],a
@@ -92304,7 +92289,7 @@ VermilionGymTrashText: ; 5ddf7 (17:5df7)
     bit 0,a
     jr z,.asm_5de11
     ld a,$26
-    jp Func_3ef5
+    jp PrintPredefTextID
 .asm_5de11
     bit 1,a
     jr nz,.asm_5de53
@@ -92365,7 +92350,7 @@ VermilionGymTrashText: ; 5ddf7 (17:5df7)
     set 6,[hl]
     ld a,$3d
 .asm_5de7a
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 Unknown_5de7d: ; 5de7d (17:5e7d)
 INCBIN "baserom.gbc",$5de7d,$5dec8 - $5de7d
@@ -96328,8 +96313,8 @@ SilphCo11Blocks: ; 623c8 (18:63c8)
     INCBIN "maps/silphco11.blk"
 
 GymStatues: ; 62419 (18:6419)
-; if in a gym and have the corresponding badge,a = $D and jp Func_3ef5
-; if in a gym and don’t have the corresponding badge,a = $C and jp Func_3ef5
+; if in a gym and have the corresponding badge,a = $D and jp PrintPredefTextID
+; if in a gym and don’t have the corresponding badge,a = $C and jp PrintPredefTextID
 ; else ret
     call EnableAutoTextBoxDrawing
     ld a,[$c109]
@@ -96338,15 +96323,15 @@ GymStatues: ; 62419 (18:6419)
     ld hl,.BadgeFlags
     call GetCurrentOldAdventureMap
     ld b,a
-.asm_62429
+.loop
     ld a,[hli]
     cp $ff
     ret z
     cp b
-    jr z,.asm_62433 ; 0x6242e $3
+    jr z,.found
     inc hl
-    jr .asm_62429 ; 0x62431 $f6
-.asm_62433
+    jr .loop
+.found
     ld b,[hl]
     ld a,[W_OBTAINEDBADGES]
     and b
@@ -96355,7 +96340,7 @@ GymStatues: ; 62419 (18:6419)
     jr z,.asm_6243f ; 0x6243b $2
     ld a,$c
 .asm_6243f
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 .BadgeFlags: ; 62442 (18:6442)
     db PEWTER_GYM,%00000001
@@ -96376,43 +96361,43 @@ GymStatueText2: ; 62458 (18:6458)
     TX_FAR _GymStatueText2
     db "@"
 
-Func_6245d: ; 6245d (18:645d)
+PrintBenchGuyText: ; 6245d (18:645d)
     call EnableAutoTextBoxDrawing
     ld hl,PokeCenterMapIDList
     call GetCurrentOldAdventureMap
     ld b,a
-.asm_62467
+.loop
     ld a,[hli]
     cp $ff
     ret z
     cp b
-    jr z,.asm_62472
+    jr z,.match
     inc hl
     inc hl
-    jr .asm_62467
-.asm_62472
+    jr .loop
+.match
     ld a,[hli]
     ld b,a
     ld a,[$c109]
     cp b
-    jr nz,.asm_62467
+    jr nz,.loop
     ld a,[hl]
-    jp Func_3ef5
+    jp PrintPredefTextID
 
-; format: db map id,08,text id of PointerTable_3f22
+; format: db map id,SPRITE_FACING_X,text id of TextPredefs
 PokeCenterMapIDList: ; 6247e (18:647e)
-    db VIRIDIAN_POKECENTER,$08,$0F
-    db PEWTER_POKECENTER,$08,$10
-    db CERULEAN_POKECENTER,$08,$11
-    db LAVENDER_POKECENTER,$08,$12
-    db VERMILION_POKECENTER,$08,$13
-    db CELADON_POKECENTER,$08,$14
-    db CELADON_HOTEL,$08,$15
-    db FUCHSIA_POKECENTER,$08,$16
-    db CINNABAR_POKECENTER,$08,$17
-    db SAFFRON_POKECENTER,$08,$18
-    db MT_MOON_POKECENTER,$08,$19
-    db ROCK_TUNNEL_POKECENTER,$08,$1A
+    db VIRIDIAN_POKECENTER,SPRITE_FACING_LEFT,$0F
+    db PEWTER_POKECENTER,SPRITE_FACING_LEFT,$10
+    db CERULEAN_POKECENTER,SPRITE_FACING_LEFT,$11
+    db LAVENDER_POKECENTER,SPRITE_FACING_LEFT,$12
+    db VERMILION_POKECENTER,SPRITE_FACING_LEFT,$13
+    db CELADON_POKECENTER,SPRITE_FACING_LEFT,$14
+    db CELADON_HOTEL,SPRITE_FACING_LEFT,$15
+    db FUCHSIA_POKECENTER,SPRITE_FACING_LEFT,$16
+    db CINNABAR_POKECENTER,SPRITE_FACING_LEFT,$17
+    db SAFFRON_POKECENTER,SPRITE_FACING_LEFT,$18
+    db MT_MOON_POKECENTER,SPRITE_FACING_LEFT,$19
+    db ROCK_TUNNEL_POKECENTER,SPRITE_FACING_LEFT,$1A
     db $FF
 
 ViridianCityPokecenterBenchGuyText: ; 624a3 (18:64a3)
@@ -96439,17 +96424,7 @@ RockTunnelPokecenterBenchGuyText: ; 624bc (18:64bc)
     TX_FAR _RockTunnelPokecenterGuyText
     db "@"
 
-UnnamedText_624c1: ; 624c1 (18:64c1)
-    TX_FAR _UnnamedText_624c1
-    db "@"
-
-UnnamedText_624c6: ; 624c6 (18:64c6)
-    TX_FAR _UnnamedText_624c6
-    db "@"
-
-UnnamedText_624cb: ; 624cb (18:64cb)
-    TX_FAR _UnnamedText_624cb
-    db "@"
+SECTION "VermilionCityPokecenterBenchGuyText",ROMX[$64d0],BANK[$18]
 
 VermilionCityPokecenterBenchGuyText: ; 624d0 (18:64d0)
     TX_FAR _VermilionPokecenterGuyText
@@ -96490,10 +96465,10 @@ CeladonCityHotelText: ; 62502 (18:6502)
     TX_FAR _CeladonCityHotelText
     db "@"
 
-PrintBookcaseText: ; TODO find link
+PrintBookcaseText:
     call EnableAutoTextBoxDrawing
     ld a,$e
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 BookcaseText:
     TX_FAR _BookcaseText
@@ -96509,7 +96484,7 @@ PokeCenterPC: ; 62516 (18:6516)
     ld a,$1
     ld [$cf0c],a
     ld a,$1f
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 PokeCenterPCCode: ; 62529 (18:6529)
     db $f9 ; Pokemon Center PC in DisplayTextID
@@ -108009,7 +107984,7 @@ HiddenItems: ; 76688 (1d:6688)
     ld [$d11e],a
     call GetItemName
     ld a,$24
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 HiddenItemCoords: ; 766b8 (1d:66b8)
 ; map ID,then coords
@@ -108166,7 +108141,7 @@ HiddenCoins: ; 76799 (1d:6799)
 .RoomInCoinCase
     ld a,$2b
 .done
-    jp Func_3ef5
+    jp PrintPredefTextID
 
 HiddenCoinCoords: ; 76822 (1d:6822)
     db GAME_CORNER,$08,$00
@@ -120137,18 +120112,7 @@ _RockTunnelPokecenterGuyText: ; 883fc (22:43fc)
     db "GHOSTs haunt",$55
     db "LAVENDER TOWN!",$57
 
-_UnnamedText_624c1: ; 88426 (22:4426)
-    db $0,"I wish I could",$4f
-    db "catch #MON.",$57
-
-_UnnamedText_624c6: ; 88442 (22:4442)
-    db $0,"I'm tired from",$4f
-    db "all the fun...",$57
-
-_UnnamedText_624cb: ; 88460 (22:4460)
-    db $0,"SILPH's manager",$4f
-    db "is hiding in the",$55
-    db "SAFARI ZONE.",$57
+SECTION "_VermilionPokecenterGuyText",ROMX[$448e],BANK[$22]
 
 _VermilionPokecenterGuyText: ; 8848e (22:448e)
     db $0,"It is true that a",$4f
@@ -121267,15 +121231,15 @@ _OopsYouDontHaveEnoughRoomText: ; 8a329 (22:6329)
 _OhFineThenText: ; 8a34c (22:634c)
     db 0,"Oh,fine then.@@"
 
-_UnnamedText_1e93b: ; 8a35d (22:635d)
+_GetDexRatedText: ; 8a35d (22:635d)
     db $0,"Want to get your",$4f
     db "#DEX rated?",$57
 
-_UnnamedText_1e940: ; 8a37b (22:637b)
+_ClosedOaksPCText: ; 8a37b (22:637b)
     db $0,"Closed link to",$4f
     db "PROF.OAK's PC.@@"
 
-_UnnamedText_1e946: ; 8a39a (22:639a)
+_AccessedOaksPCText: ; 8a39a (22:639a)
     db $0,"Accessed PROF.",$4f
     db "OAK's PC.",$51
     db "Accessed #DEX",$4f
