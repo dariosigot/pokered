@@ -2542,11 +2542,7 @@ RunMapScript: ; 101b (0:101b)
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    ld de,.return
-    push de
     jp hl ; jump to script
-.return
-    ret
 
 LoadWalkingPlayerSpriteGraphics:
     ld de,RedSprite
@@ -10506,7 +10502,7 @@ Func_3eb5:
     ld a,[H_CURRENTPRESSEDBUTTONS]
     bit 0,a
     jr z,.asm_3eea
-    ld a,$11
+    ld a,BANK(Func_469a0)
     call RoutineForRealGB
     call Func_469a0
     ld a,[$FF00+$ee]
@@ -10514,9 +10510,10 @@ Func_3eb5:
     jr nz,.asm_3edd
     ld a,[$cd3e]
     call RoutineForRealGB
-    ld de,$3eda
+    ld de,.return
     push de
     jp hl
+.return
     xor a
     jr .asm_3eec
 .asm_3edd
@@ -15105,33 +15102,9 @@ DoYouWantToNicknameText: ; 0x6557
     TX_FAR _DoYouWantToNicknameText
     db "@"
 
-DisplayNameRaterScreen: ; 655c (1:655c)
-    ld hl,$cee9
-    xor a
-    ld [$cfcb],a
-    ld a,$2
-    ld [$d07d],a
-    call HandleIVAndLevelAndLoadRenameScreenDuringNameRater
-    call GBPalWhiteOutWithDelay3
-    call RestoreScreenTilesAndReloadTilePatterns
-    call LoadGBPal
-    ld a,[$cf4b]
-    cp $50
-    jr z,.asm_6594
-    ld hl,W_PARTYMON1NAME ; $d2b5
-    ld bc,$b
-    ld a,[wWhichPokemon] ; $cf92
-    call AddNTimes
-    ld e,l
-    ld d,h
-    ld hl,$cee9
-    ld bc,$b
-    call CopyData
-    and a
-    ret
-.asm_6594
-    scf
-    ret
+; Free
+
+SECTION "LoadRenameScreen",ROMX[$6596],BANK[$1]
 
 LoadRenameScreen: ; 6596 (1:6596)
     push hl
@@ -16898,14 +16871,11 @@ DisplayTextBoxID_: ; 72ea (1:72ea)
     ld de,9
     call SearchTextBoxTable
     jr c,.textAndCoordTableMatch
-.done
     ret
 .functionTableMatch
     ld a,[hli]
     ld h,[hl]
     ld l,a ; hl = address of function
-    ld de,.done
-    push de
     jp hl ; jump to the function
 .coordTableMatch
     call GetTextBoxIDCoords
@@ -16927,8 +16897,9 @@ DisplayTextBoxID_: ; 72ea (1:72ea)
     call PlaceString
     pop af
     ld [$d730],a
-    call UpdateSprites ; move sprites
-    ret
+    jp UpdateSprites ; move sprites
+
+SECTION "SearchTextBoxTable",ROMX[$734c],BANK[$1]
 
 ; function to search a table terminated with $ff for a byte matching c in increments of de
 ; sets carry flag if a match is found and clears carry flag if not
@@ -18195,8 +18166,8 @@ StoreCatchPkmnIdAndFlagBeforeRename: ; Denim
     pop hl
     jp LoadRenameScreen
 
-HandleIVAndLevelAndLoadRenameScreenDuringNameRater:
-    push hl
+HandleIVAndLevelAndLoadRenameScreenDuringPartyRenameScreen:
+    push de
     ld a,[wWhichPokemon] ; Pokemon Party Order
     ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
@@ -18633,11 +18604,6 @@ Trade_BackupEnemyIVandAltForm:
     ; endhack
     ld a,[$cd3d]
     ret
-
-HandleIVAndLevelAndLoadRenameScreenDuringNameRater_FromAnotherBank:
-    ld h,d
-    ld l,e
-    jp HandleIVAndLevelAndLoadRenameScreenDuringNameRater
 
 SpecialRestartAfterHallOfFame:
     xor a
@@ -20853,7 +20819,7 @@ MapSongBanks: ; c04d (3:404d)
     db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; UnknownDungeon2
     db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; UnknownDungeon3
     db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; UnknownDungeon1
-    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; NameRater
+    db (Music_Cities2         -$4000)/3 , BANK(Music_Cities2)         ; MoveDeleter
     db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; CeruleanHouse2
     db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; UnknownDungeon4
     db (Music_Dungeon3        -$4000)/3 , BANK(Music_Dungeon3)        ; RockTunnel2
@@ -21104,7 +21070,7 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(UnknownDungeon2_h)
     db BANK(UnknownDungeon3_h)
     db BANK(UnknownDungeon1_h)
-    db BANK(NameRater_h)
+    db BANK(MoveDeleter_h)
     db BANK(CeruleanHouse2_h)
     db BANK(UnknownDungeon4_h)
     db BANK(RockTunnel2_h)
@@ -31039,7 +31005,7 @@ DisplayPartyRenameScreen:
     ld [$cfcb],a
     ld a,$2
     ld [$d07d],a
-    BANKSWITCH HandleIVAndLevelAndLoadRenameScreenDuringNameRater_FromAnotherBank
+    BANKSWITCH HandleIVAndLevelAndLoadRenameScreenDuringPartyRenameScreen
     ld a,[$cf4b]
     cp $50
     ret z
@@ -36970,7 +36936,7 @@ Route2HouseBlocks: ; 1c1de (7:41de)
 SaffronHouse1Blocks: ; 1c1de (7:41de)
 SaffronHouse2Blocks: ; 1c1de (7:41de)
 VermilionHouse1Blocks: ; 1c1de (7:41de)
-NameRaterBlocks: ; 1c1de (7:41de)
+MoveDeleterBlocks: ; 1c1de (7:41de)
 LavenderHouse1Blocks: ; 1c1de (7:41de)
 LavenderHouse2Blocks: ; 1c1de (7:41de)
 CeruleanHouseBlocks: ; 1c1de (7:41de)
@@ -39724,119 +39690,15 @@ LavenderHouse2Object: ; 0x1d9e6 (size=32)
     EVENT_DISP $4,$7,$2
     EVENT_DISP $4,$7,$3
 
-NameRater_h: ; 0x1da06 to 0x1da12 (12 bytes) (bank=7) (id=229)
+MoveDeleter_h:
     db $08 ; tileset
-    db NAME_RATERS_HOUSE_HEIGHT,NAME_RATERS_HOUSE_WIDTH ; dimensions (y,x)
-    dw NameRaterBlocks,NameRaterTextPointers,NameRaterScript ; blocks,texts,scripts
+    db MOVE_DELETER_HOUSE_HEIGHT,MOVE_DELETER_HOUSE_WIDTH ; dimensions (y,x)
+    dw MoveDeleterBlocks,MoveDeleterTextPointers,MoveDeleterScript ; blocks,texts,scripts
     db $00 ; connections
-    dw NameRaterObject ; objects
+    dw MoveDeleterObject ; objects
 
-NameRaterScript: ; 1da12 (7:5a12)
+MoveDeleterScript: ; 1da12 (7:5a12)
     jp EnableAutoTextBoxDrawing
-
-Func_1da15: ; 1da15 (7:5a15)
-    call PrintText
-    call YesNoChoice
-    ld a,[$cc26]
-    and a
-    ret
-
-Func_1da20: ; 1da20 (7:5a20)
-    ld hl,W_PARTYMON1OT
-    ld bc,$000b
-    ld a,[$cf92]
-    call AddNTimes
-    ld de,$d158
-    ld c,$b
-    call .asm_1da47
-    jr c,.asm_1da52 ; 0x1da34 $1c
-    ld hl,$d177
-    ld bc,$002c
-    ld a,[$cf92]
-    call AddNTimes
-    ld de,$d359
-    ld c,$2
-.asm_1da47
-    ld a,[de]
-    cp [hl]
-    jr nz,.asm_1da52 ; 0x1da49 $7
-    inc hl
-    inc de
-    dec c
-    jr nz,.asm_1da47 ; 0x1da4e $f7
-    and a
-    ret
-.asm_1da52
-    scf
-    ret
-
-;SECTION "NameRaterText1",ROMX[$5a56],BANK[$7]
-;
-;NameRaterText1: ; 1da56 (7:5a56)
-;    db $8
-;    call SaveScreenTilesToBuffer2
-;    ld hl,UnnamedText_1dab3
-;    call Func_1da15
-;    jr nz,.asm_1daae ; 0x1da60 $4c
-;    ld hl,UnnamedText_1dab8
-;    call PrintText
-;    xor a
-;    ld [$d07d],a
-;    ld [$cfcb],a
-;    ld [$cc35],a
-;    call DisplayPartyMenu
-;    push af
-;    call GBPalWhiteOutWithDelay3
-;    call RestoreScreenTilesAndReloadTilePatterns
-;    call LoadGBPal
-;    pop af
-;    jr c,.asm_1daae ; 0x1da80 $2c
-;    call GetPartyMonName2
-;    call Func_1da20
-;    ld hl,UnnamedText_1dad1
-;    jr c,.asm_1daa8 ; 0x1da8b $1b
-;    ld hl,UnnamedText_1dabd
-;    call Func_1da15
-;    jr nz,.asm_1daae ; 0x1da93 $19
-;    ld hl,UnnamedText_1dac2
-;    call PrintText
-;    BANKSWITCH DisplayNameRaterScreen
-;    jr c,.asm_1daae ; 0x1daa3 $9
-;    ld hl,UnnamedText_1dac7
-;.asm_1daa8
-;    call PrintText
-;    jp TextScriptEnd
-;.asm_1daae
-;    ld hl,UnnamedText_1dacc
-;    jr .asm_1daa8 ; 0x1dab1 $f5
-;
-;UnnamedText_1dab3: ; 1dab3 (7:5ab3)
-;    TX_FAR _UnnamedText_1dab3
-;    db "@"
-;
-;UnnamedText_1dab8: ; 1dab8 (7:5ab8)
-;    TX_FAR _UnnamedText_1dab8
-;    db "@"
-;
-;UnnamedText_1dabd: ; 1dabd (7:5abd)
-;    TX_FAR _UnnamedText_1dabd
-;    db "@"
-;
-;UnnamedText_1dac2: ; 1dac2 (7:5ac2)
-;    TX_FAR _UnnamedText_1dac2
-;    db "@"
-;
-;UnnamedText_1dac7: ; 1dac7 (7:5ac7)
-;    TX_FAR _UnnamedText_1dac7
-;    db "@"
-;
-;UnnamedText_1dacc: ; 1dacc (7:5acc)
-;    TX_FAR _UnnamedText_1dacc
-;    db "@"
-;
-;UnnamedText_1dad1: ; 1dad1 (7:5ad1)
-;    TX_FAR _UnnamedText_1dad1
-;    db "@"
 
 GetRandomEnemyStarterIV:
     call GenRandom
@@ -42009,7 +41871,7 @@ OakLabEmailText: ; 1ecbd (7:6cbd)
     TX_FAR _OakLabEmailText
     db "@"
 
-NameRaterObject:
+MoveDeleterObject:
     db $a ; border tile
 
     db $2 ; warps
@@ -42019,16 +41881,13 @@ NameRaterObject:
     db $0 ; signs
 
     db $1 ; people
-;    db SPRITE_MR_MASTERBALL,$3 + 4,$5 + 4,$ff,$d2,$1 ; person
     db SPRITE_MR_MASTERBALL,$3 + 4,$2 + 4,$ff,$d3,$1 ; person
-    ;db SPRITE_WHITE_PLAYER,$4 + 4,$5 + 4,$ff,$d2,$3 ; person
 
     ; warp-to
     EVENT_DISP $4,$7,$2
     EVENT_DISP $4,$7,$3
 
-NameRaterTextPointers: ; ??? (7:????)
-;    dw NameRaterText1
+MoveDeleterTextPointers:
     dw MoveDeleterText
 
 ; ────────────────────────────────────────────────────────────
@@ -65215,7 +65074,7 @@ LavenderTownObject: ; 0x4402d (size=88)
     db $9,$7,$0,LAVENDER_HOUSE_1
     db $d,$f,$0,LAVENDER_MART
     db $d,$3,$0,LAVENDER_HOUSE_2
-    db $d,$7,$0,NAME_RATERS_HOUSE
+    db $d,$7,$0,MOVE_DELETER_HOUSE
 
     db $6 ; signs
     db $9,$b,$4 ; LavenderTownText4
@@ -65236,7 +65095,7 @@ LavenderTownObject: ; 0x4402d (size=88)
     EVENT_DISP $a,$9,$7 ; LAVENDER_HOUSE_1
     EVENT_DISP $a,$d,$f ; LAVENDER_MART
     EVENT_DISP $a,$d,$3 ; LAVENDER_HOUSE_2
-    EVENT_DISP $a,$d,$7 ; NAME_RATERS_HOUSE
+    EVENT_DISP $a,$d,$7 ; MOVE_DELETER_HOUSE
 
 LavenderTownBlocks: ; 44085 (11:4085)
     INCBIN "maps/lavendertown.blk"
@@ -111678,10 +111537,11 @@ AnimateBoulderDust: ; 79f54 (1e:5f54)
 .asm_79f73
     push bc
     call Func_79f92
-    ld bc,$5f7e
+    ld bc,.return
     push bc
     ld c,$4
     jp hl
+.return
     ld a,[rOBP1] ; $FF00+$49
     xor $64
     ld [rOBP1],a ; $FF00+$49
@@ -126926,56 +126786,7 @@ _UnnamedText_1d9e1: ; 9a2b9 (26:62b9)
     db "soothed its",$55
     db "restless soul!",$57
 
-_UnnamedText_1dab3: ; 9a308 (26:6308)
-    db $0,"Hello,hello!",$4f
-    db "I am the official",$55
-    db "NAME RATER!",$51
-    db "Want me to rate",$4f
-    db "the nicknames of",$55
-    db "your #MON?",$57
-
-_UnnamedText_1dab8: ; 9a361 (26:6361)
-    db $0,"Which #MON",$4f
-    db "should I look at?",$58
-
-_UnnamedText_1dabd: ; 9a37f (26:637f)
-    TX_RAM $cd6d
-    db $0,",is it?",$4f
-    db "That is a decent",$55
-    db "nickname!",$51
-    db "But,would you",$4f
-    db "like me to give",$55
-    db "it a nicer name?",$51
-    db "How about it?",$57
-
-_UnnamedText_1dac2: ; 9a3e5 (26:63e5)
-    db $0,"Fine! What should",$4f
-    db "we name it?",$58
-
-_UnnamedText_1dac7: ; 9a404 (26:6404)
-    db $0,"OK! This #MON",$4f
-    db "has been renamed",$55
-    db "@"
-
-UnnamedText_9a425: ; 9a425 (26:6425)
-    TX_RAM $cee9
-    db $0,"!",$51
-    db "That's a better",$4f
-    db "name than before!",$57
-
-_UnnamedText_1dacc: ; 9a44c (26:644c)
-    db $0,"Fine! Come any",$4f
-    db "time you like!",$57
-
-_UnnamedText_1dad1: ; 9a46b (26:646b)
-    TX_RAM $cd6d
-    db $0,",is it?",$4f
-    db "That is a truly",$55
-    db "impeccable name!",$51
-    db "Take good care of",$4f
-    db "@"
-    TX_RAM $cd6d
-    db $0,"!",$57
+SECTION "_VermilionPokecenterText2",ROMX[$64b2],BANK[$26]
 
 _VermilionPokecenterText2: ; 9a4b2 (26:64b2)
 _VermilionPokecenterText1: ; 9a4b2 (26:64b2)
@@ -140332,7 +140143,7 @@ GetMapPaletteID_:
     call GetCurrentOldAdventureMap
     cp UNKNOWN_DUNGEON_2
     jr c,.normalDungeonOrBuilding
-    cp NAME_RATERS_HOUSE
+    cp MOVE_DELETER_HOUSE
     jr c,.caveOrBruno
     cp LORELEIS_ROOM
     jr z,.Lorelei
@@ -144548,7 +144359,7 @@ MapHeaderPointers:
     dw UnknownDungeon2_h
     dw UnknownDungeon3_h
     dw UnknownDungeon1_h
-    dw NameRater_h
+    dw MoveDeleter_h
     dw CeruleanHouse2_h
     dw UnknownDungeon4_h
     dw RockTunnel2_h
