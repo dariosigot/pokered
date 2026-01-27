@@ -655,7 +655,7 @@ OverworldLoop: ; 03ff (0:03ff)
     jp nz,.noDirectionButtonsPressed
     call IsPlayerCharacterBeingControlledByGame
     jr nz,.checkForOpponent
-    call Func_3eb5 ; check for hidden items,PC's,etc.
+    call CheckForHiddenObjectOrBookshelfOrCardKeyDoor ; check for hidden items,PC's,etc.
     ld a,[$ffeb]
     and a
     jp z,OverworldLoop
@@ -10496,18 +10496,18 @@ Load16BitRegisters: ; 3e94 (0:3e94)
 Func_3ead:
     BANKSWITCH_JUMP CinnabarGymProcessAllGate
 
-Func_3eb5:
+CheckForHiddenObjectOrBookshelfOrCardKeyDoor:
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,[H_CURRENTPRESSEDBUTTONS]
     bit 0,a
-    jr z,.asm_3eea
-    ld a,BANK(Func_469a0)
+    jr z,.nothingFound
+    ld a,BANK(CheckForHiddenObject)
     call RoutineForRealGB
-    call Func_469a0
+    call CheckForHiddenObject
     ld a,[$FF00+$ee]
     and a
-    jr nz,.asm_3edd
+    jr nz,.hiddenObjectNotFound
     ld a,[$cd3e]
     call RoutineForRealGB
     ld de,.return
@@ -10515,15 +10515,15 @@ Func_3eb5:
     jp hl
 .return
     xor a
-    jr .asm_3eec
-.asm_3edd
-    BANKSWITCH Func_fb50
+    jr .done
+.hiddenObjectNotFound
+    BANKSWITCH PrintBookshelfText
     ld a,[$FF00+$db]
     and a
-    jr z,.asm_3eec
-.asm_3eea
+    jr z,.done
+.nothingFound
     ld a,$ff
-.asm_3eec
+.done
     ld [$FF00+$eb],a
     pop af
     jp RoutineForRealGB
@@ -27705,7 +27705,7 @@ UpdateHPBar_CalcOldNewHPBarPixels: ; fb30 (3:7b30)
     ret
 
 ; prints text for bookshelves in buildings without sign events
-Func_fb50: ; fb50 (3:7b50)
+PrintBookshelfText: ; fb50 (3:7b50)
     ld a,[$c109]
     cp $4
     jr nz,.asm_fb7f
@@ -27740,7 +27740,7 @@ Func_fb50: ; fb50 (3:7b50)
 .asm_fb7f
     ld a,$ff
     ld [$FF00+$db],a
-    BANKSWITCH_JUMP Func_52673
+    BANKSWITCH_JUMP PrintCardKeyText
 
 ; format: db tileset id,bookshelf tile id,unknown
 BookshelfTileIDs: ; fb8b (3:7b8b)
@@ -68890,13 +68890,14 @@ Func_46981: ; 46981 (11:6981)
     set 4,[hl]
     ret
 
-Func_469a0: ; 469a0 (11:69a0)
+; if a hidden object was found, stores $00 in [hDidntFindAnyHiddenObject], else stores $ff
+CheckForHiddenObject: ; 469a0 (11:69a0)
     ld hl,$ffeb
     xor a
-    ld [hli],a
-    ld [hli],a
-    ld [hli],a
-    ld [hl],a
+    ld [hli],a ; [hItemAlreadyFound]
+    ld [hli],a ; [hSavedMapTextPtr]
+    ld [hli],a ; [hSavedMapTextPtr + 1]
+    ld [hl],a  ; [hDidntFindAnyHiddenObject]
     ld de,$0
     call GetHiddenObjectMaps ; ld hl,HiddenObjectMaps ; $6a40
 .asm_469ae
@@ -75342,7 +75343,7 @@ Func_c754Predef:                           NEW_PREDEF Func_c754                 
 LearnMoveFromLevelUpPredef:                NEW_PREDEF LearnMoveFromLevelUp                ; $1A
 LearnMovePredef:                           NEW_PREDEF LearnMove                           ; $1B
 _IsItemInBagPredef:                        NEW_PREDEF _IsItemInBag                        ; $1C
-Func_3eb5Predef:                           NEW_PREDEF Func_3eb5                           ; $1D
+ds 3                                                                                      ; $1D
 GiveItemPredef:                            NEW_PREDEF GiveItem                            ; $1E
 Func_480ebPredef:                          NEW_PREDEF Func_480eb                          ; $1F
 Func_f8baPredef:                           NEW_PREDEF Func_f8ba                           ; $20
@@ -78904,9 +78905,9 @@ ParalyzeEffect_:
     ld b,BANK(PlayCurrentMoveAnimation) ; same PrintAlreadyParalyzedText,PrintDidntAffectText
     jp Bankswitch
 
-SECTION "Func_52673",ROMX[$6673],BANK[$14]
+SECTION "PrintCardKeyText",ROMX[$6673],BANK[$14]
 
-Func_52673: ; 52673 (14:6673)
+PrintCardKeyText: ; 52673 (14:6673)
     ld hl,SilphCoMapList
     call GetCurrentOldAdventureMap
     ld b,a
