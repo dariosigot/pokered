@@ -39966,11 +39966,9 @@ VermilionDock_1dc94: ; 1dc94 (7:5c94)
     ret
 
 VermilionDockTextPointers: ; 1dcbf (7:5cbf)
-    dw VermilionDockText1
-
-VermilionDockText1: ; 1dcc1 (7:5cc1)
-    TX_FAR _VermilionDockText1
     db "@"
+
+SECTION "VermilionDockObject",ROMX[$5cc6],BANK[$7]
 
 VermilionDockObject: ; 0x1dcc6 (size=20)
     db $f ; border tile
@@ -77743,15 +77741,12 @@ MtMoon2_h: ; 0x51a36 to 0x51a42 (12 bytes) (id=60)
     dw MtMoon2Object ; objects
 
 MtMoon2Script: ; 51a42 (14:5a42)
-    call EnableAutoTextBoxDrawing
-    ret
+    jp EnableAutoTextBoxDrawing
 
-MtMoon2TextPointers: ; 51a46 (14:5a46)
-    dw MtMoonText1
-
-MtMoonText1: ; 51a48 (14:5a48)
-    TX_FAR _UnnamedText_51a48
+MtMoon2TextPointers:
     db "@"
+
+SECTION "MtMoon2Object",ROMX[$5a4d],BANK[$14]
 
 MtMoon2Object: ; 0x51a4d (size=68)
     db $3 ; border tile
@@ -117687,10 +117682,6 @@ _MtMoon1Text14:
     text_line , "a blood sucker!"
     text_done
 
-_UnnamedText_51a48:
-    text_init
-    text_done
-
 _UnnamedText_49f24:
     text_init , "You want the"
     text_line , "DOME FOSSIL?"
@@ -128870,10 +128861,6 @@ _VermilionHouse1Text3:
     text_line , "to be safe."
     text_done
 
-_VermilionDockText1:
-    text_init
-    text_done
-
 _UnnamedText_560b1:
     text_init , "I'm the FISHING"
     text_line , "GURU!"
@@ -129712,7 +129699,7 @@ _CeladonMart5Text5:
 
 _CeladonPrizeRoomText1:
     text_init , "I sure do fancy"
-    text_line , "that PORYGON!"
+    text_line , "that EXEGGUTOR!"
     text_para , "But,it's hard to"
     text_line , "win at slots!"
     text_done
