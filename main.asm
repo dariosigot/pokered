@@ -80675,22 +80675,12 @@ SECTION "UnnamedText_554b2",ROMX[$54b2],BANK[$15]
 UnnamedText_554b2: ; 554b2 (15:54b2)
     TX_FAR _UnnamedText_554b2
     db $08 ; asm
-    ;ld a,[$cc5b]
-    ;ld hl,UnnamedText_554cb
-    ;and a
-    ;ret nz
     ld hl,UnnamedText_554d8
     ld a,[$cf4d]
     and a
     ret z
     ld hl,UnnamedText_554d4
     ret
-
-;UnnamedText_554cb: ; 554cb (15:54cb)
-;    TX_FAR _UnnamedText_554cb
-;    db $08 ; asm
-;    ld hl,UnnamedText_554d8
-;    ret
 
 SECTION "UnnamedText_554d4",ROMX[$54d4],BANK[$15]
 
@@ -120444,12 +120434,6 @@ _ViridianSchoolBlackboardText2:
     db $0,"Which heading do",$4f
     db "you want to read?",$57
 
-; ───────────────────────────────────
-
-; Free
-
-; ───────────────────────────────────
-
 _VermilionGymTrashText:
     db $0,"Nope,there's",$4f
     db "only trash here.",$57
@@ -120500,7 +120484,7 @@ _FoundHiddenCoinsText:
 _FoundHiddenCoins2Text:
     db $0,$52," found",$4f
     db "@"
-    db $2,$a0,$ff,$c2 ; XXX $2 probably coins
+    db $2,$a0,$ff,$c2 ; XXX $2
     db $0," coins!@@"
 
 _DroppedHiddenCoinsText:
@@ -120577,8 +120561,7 @@ _EnemyMonFainted:
 
 _MoneyForWinningText:
     db $0,$52," got ¥@"
-    ;XXX $2
-    db $2,$79,$d0,$c3
+    db $2,$79,$d0,$c3 ; XXX $2
     db $0,$4f
     db "for winning!",$58
 
@@ -120849,10 +120832,6 @@ _UnnamedText_554b2:
     db $0," gained",$4f
     db "@@"
 
-;_UnnamedText_554cb:
-;    db $0,"with EXP.ALL,",$55
-;    db "@@"
-
 _UnnamedText_554d4:
     db $0,"a boosted",$55
     db "@@"
@@ -120944,13 +120923,10 @@ SafariZoneAngryText:
     db $0,$4f
     db "is angry!",$58
 
-; money related
-; XXX $2 BCD macro
-; $2,pointer,byte
 _UnnamedText_1386b:
     db $0,$52," picked up",$4f
     db "¥@"
-    db $2,$e5,$cc,$c3
+    db $2,$e5,$cc,$c3 ; XXX $2
     db $0,"!",$58
 
 _UnnamedText_1c9c1:
@@ -121439,11 +121415,7 @@ UnnamedText_8ac67:
 
 _UnnamedText_56428:
     db $0,"You owe me ¥@"
-
-;XXX
-    db $2,$3f,$cd,$c2
-
-UnnamedText_8ac8f:
+    db $2,$3f,$cd,$c2 ; XXX $2
     db $0,$4f
     db "for the return",$55
     db "of this #MON.",$57
@@ -121563,8 +121535,6 @@ _Route2HouseText2:
     db "in my bag after",$55
     db "the holidays!",$57
 
-; ───────────────────────────────────
-
 _ViridianBlackboardSleepText:
     db $0,"A #MON can't",$4f
     db "attack if it's",$55
@@ -121615,8 +121585,6 @@ _ViridianBlackboardFrozenText:
     db "Use ICE HEAL to",$4f
     db "thaw out #MON!",$58
 
-; ───────────────────────────────────
-
 _ReceivedText:
     db $0,$52," received",$4f
     db "@"
@@ -121629,8 +121597,6 @@ _GotText:
     TX_RAM $cf4b
     db $0,"!@@"
 
-; ───────────────────────────────────
-
 _ShipReturned:
     db $0,"The ship has",$4f
     db "returned!",$57
@@ -121638,8 +121604,6 @@ _ShipReturned:
 _LikeShipText:
     db $0,"I would like",$4f
     db "to go on a ship!",$57
-
-; ───────────────────────────────────
 
 _AIBattleWithdrawText:
     db 1
@@ -121651,8 +121615,6 @@ _AIBattleWithdrawText:
     db 1
     dw W_ENEMYMONNAME
     db 0,"!",$58
-
-; ───────────────────────────────────
 
 _SilphScopeDoesntWorkInTheDark
     db $0,"Darn!",$51
@@ -122039,20 +122001,6 @@ _Route15GateText1:
     db "on a #DEX?",$51
     db "PROF.OAK's AIDE",$4f
     db "came by here.",$57
-
-;_UnnamedText_4968c:
-;    db $0,"EXP.ALL gives",$4f
-;    db "EXP points to all",$55
-;    db "the #MON with",$55
-;    db "you,even if they",$55
-;    db "don't fight.",$51
-;    db "It does,however,",$4f
-;    db "reduce the amount",$55
-;    db "of EXP for each",$55
-;    db "#MON.",$51
-;    db "If you don't need",$4f
-;    db "it,you should ",$55
-;    db "store it via PC.",$57
 
 _UnnamedText_4968c:
     db $0,"FOCUS gives EXP",$4f
@@ -124781,10 +124729,6 @@ _FellAsleepText:
     db $0,$59,$4f
     db "fell asleep!",$58
 
-;_AlreadyAsleepText:
-;    db $0,$59,"'s",$4f
-;    db "already asleep!",$58
-
 _PoisonedText:
     db $0,$59,$4f
     db "was poisoned!",$58
@@ -124936,10 +124880,6 @@ _GettingPumpedText:
 _WasSeededText:
     db $0,$59,$4f
     db "was seeded!",$58
-
-;_EvadedAttackText:
-;    db $0,$59,$4f
-;    db "evaded attack!",$58
 
 _UnnamedText_1399e:
     db $0,$5a,"'s",$4f
@@ -126938,16 +126878,6 @@ _UnnamedText_5cb72:
     db "But,it's useless",$4f
     db "against ground-",$55
     db "type #MON!",$57
-
-;_UnnamedText_5cb77:
-;    db $0,"The THUNDERBADGE",$4f
-;    db "cranks up your",$55
-;    db "#MON's SPEED!",$51
-;    db "It also lets your",$4f
-;    db "#MON FLY any",$55
-;    db "time,kid!",$51
-;    db "You're special,",$4f
-;    db "kid! Take this!",$57
 
 _UnnamedText_5cb77:
     db $0,"The THUNDERBADGE",$4f
@@ -129125,7 +129055,7 @@ _PokemonSellingGreetingText:
 _PokemartTellSellPrice:
     db $0,"I can pay you",$4f
     db "¥@"
-    db $2,$9f,$ff,$c3 ; XXX
+    db $2,$9f,$ff,$c3 ; XXX $2
     db $0," for that.",$57
 
 _PokemartItemBagEmptyText:
@@ -129265,8 +129195,6 @@ _NoPartyText:
     db $0
     db "Your party is" ,$4f
     db "Empty!"        ,$57
-
-; ───────────────────────────────
 
 _CopycatsHouseF2Text2_Part2:
     db $0,$51
@@ -130363,15 +130291,9 @@ _ItemUseBallText08:
     db 1
     dw $DE06
     db 0," sent to",$4F
-    ;db "transferred to",$55
     db "someone's PC!",$58
 
 _ItemUseBallText06:
-;    db 0,"New #DEX data",$4F
-;    db "will be added for",$55,"@"
-;    TX_RAM W_ENEMYMONNAME
-;    db 0,"!@@"
-
     db 0,"New #DEX data",$4F
     db "will be added!@@"
 
@@ -130495,7 +130417,6 @@ _ItemUseBallText07:
     db 1
     dw $DE06
     db 0," sent to",$4F
-    ;db "transferred to",$55
     db "BILL's PC! (@"
     TX_NUM W_NUMINBOX,1,2
     db 0,"/20)",$58
