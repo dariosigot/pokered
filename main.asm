@@ -10619,9 +10619,9 @@ TextPredefs:
     dw VermilionGymTrashSuccesText3         ; id = 3D
     dw VermilionGymTrashFailText            ; id = 3E
     dw TownMapText                          ; id = 3F
-    dw UnnamedText_fbe8                     ; id = 40
-    dw UnnamedText_fc0d                     ; id = 41
-    dw UnnamedText_fc45                     ; id = 42
+    dw BookOrSculptureText                  ; id = 40
+    dw ElevatorText                         ; id = 41
+    dw PokemonStuffText                     ; id = 42
 
 ; INPUT hl = giusto indirizzo degli IV del pokemon interessato
 ; W_ENEMYMONATKDEFIV ; .Front
@@ -27746,21 +27746,21 @@ Func_fb50: ; fb50 (3:7b50)
 BookshelfTileIDs: ; fb8b (3:7b8b)
     db $17,$30,$3A ; IndigoPlateauStatues
     db $08,$3D,$3F ; TownMapText
-    db $08,$1E,$40 ; UnnamedText_fbe8
-    db $13,$32,$40 ; UnnamedText_fbe8
-    db $01,$32,$40 ; UnnamedText_fbe8
-    db $14,$28,$40 ; UnnamedText_fbe8
-    db $12,$16,$41 ; UnnamedText_fc0d
-    db $07,$1D,$40 ; UnnamedText_fbe8
-    db $05,$1D,$40 ; UnnamedText_fbe8
-    db $0C,$22,$40 ; UnnamedText_fbe8
-    db $02,$54,$42 ; UnnamedText_fc45
-    db $02,$55,$42 ; UnnamedText_fc45
-    db $06,$54,$42 ; UnnamedText_fc45
-    db $06,$55,$42 ; UnnamedText_fc45
-    db $12,$50,$42 ; UnnamedText_fc45
-    db $12,$52,$42 ; UnnamedText_fc45
-    db $0D,$36,$40 ; UnnamedText_fbe8
+    db $08,$1E,$40 ; BookOrSculptureText
+    db $13,$32,$40 ; BookOrSculptureText
+    db $01,$32,$40 ; BookOrSculptureText
+    db $14,$28,$40 ; BookOrSculptureText
+    db $12,$16,$41 ; ElevatorText
+    db $07,$1D,$40 ; BookOrSculptureText
+    db $05,$1D,$40 ; BookOrSculptureText
+    db $0C,$22,$40 ; BookOrSculptureText
+    db $02,$54,$42 ; PokemonStuffText
+    db $02,$55,$42 ; PokemonStuffText
+    db $06,$54,$42 ; PokemonStuffText
+    db $06,$55,$42 ; PokemonStuffText
+    db $12,$50,$42 ; PokemonStuffText
+    db $12,$52,$42 ; PokemonStuffText
+    db $0D,$36,$40 ; BookOrSculptureText
     db $FF
 
 IndigoPlateauStatues: ; fbbf (3:7bbf)
@@ -27788,30 +27788,30 @@ IndigoPlateauStatuesText3: ; fbe3 (3:7be3)
     TX_FAR _IndigoPlateauStatuesText3
     db "@"
 
-UnnamedText_fbe8: ; fbe8 (3:7be8)
+BookOrSculptureText: ; fbe8 (3:7be8)
     db $08 ; asm
-    ld hl,UnnamedText_fc03
+    ld hl,PokemonBooksText
     ld a,[W_CURMAPTILESET]
     cp $13 ; Celadon Mansion tileset
     jr nz,.asm_fbfd
     ld a,[$c420]
     cp $38
     jr nz,.asm_fbfd
-    ld hl,UnnamedText_fc08
+    ld hl,DiglettSculptureText
 .asm_fbfd
     call PrintText
     jp TextScriptEnd
 
-UnnamedText_fc03: ; fc03 (3:7c03)
-    TX_FAR _UnnamedText_fc03
+PokemonBooksText: ; fc03 (3:7c03)
+    TX_FAR _PokemonBooksText
     db "@"
 
-UnnamedText_fc08: ; fc08 (3:7c08)
-    TX_FAR _UnnamedText_fc08
+DiglettSculptureText: ; fc08 (3:7c08)
+    TX_FAR _DiglettSculptureText
     db "@"
 
-UnnamedText_fc0d: ; fc0d (3:7c0d)
-    TX_FAR _UnnamedText_fc0d
+ElevatorText: ; fc0d (3:7c0d)
+    TX_FAR _ElevatorText
     db "@"
 
 TownMapText: ; fc12 (3:7c12)
@@ -27837,8 +27837,8 @@ TownMapText: ; fc12 (3:7c12)
     push af
     jp CloseTextDisplay
 
-UnnamedText_fc45: ; fc45 (3:7c45)
-    TX_FAR _UnnamedText_fc45
+PokemonStuffText: ; fc45 (3:7c45)
+    TX_FAR _PokemonStuffText
     db "@"
 
 ResetIVAndCheckIsInBattle:
@@ -65410,7 +65410,7 @@ asm_44310: ; 44310 (11:4310)
     PREDEF ReplaceTileBlock
     ret
 
-Func_44316: ; 44316 (11:4316)
+Mansion1Script_Switches: ; 44316 (11:4316)
     ld a,[$c109]
     cp $4
     ret nz
@@ -69044,7 +69044,6 @@ HiddenObjectMaps:
     db SAFFRON_POKECENTER
     db POKEMONTOWER_5
     db ROUTE_13
-    db SAFARIZONEENTRANCE
     db SAFARI_ZONE_WEST
     db SILPH_CO_5F
     db SILPH_CO_9F
@@ -69129,7 +69128,6 @@ HiddenObjectPointers:
     dw SaffronPokecenterHiddenObjects
     dw PokemonTower5HiddenObjects
     dw Route13HiddenObjects
-    dw SafariZoneEntranceHiddenObjects
     dw SafariZoneWestHiddenObjects
     dw SilphCo5FHiddenObjects
     dw SilphCo9FHiddenObjects
@@ -69216,9 +69214,9 @@ ViridianPokecenterHiddenObjects:
 
 ViridianSchoolHiddenObjects:
     db 04,03,$20 ; ViridianSchoolNotebook
-    dbw BANK(Func_52996),Func_52996
+    dbw BANK(PrintNotebookText),PrintNotebookText
     db 00,03,$21 ; ViridianSchoolBlackboard
-    dbw BANK(Func_5dc1a),Func_5dc1a
+    dbw BANK(PrintBlackboardLinkCableText),PrintBlackboardLinkCableText
     db $FF
 
 ViridianGymHiddenObjects:
@@ -69527,50 +69525,50 @@ MtMoon3HiddenObjects:
     db $FF
 
 IndigoPlateauHiddenObjects:
-    db 13,08,$ff
+    db 07,08,$ff
     dbw BANK(PrintIndigoPlateauHQText),PrintIndigoPlateauHQText
-    db 13,11,SPRITE_FACING_DOWN
+    db 07,11,SPRITE_FACING_DOWN
     dbw BANK(PrintIndigoPlateauHQText),PrintIndigoPlateauHQText
     db $FF
 
 Route25HiddenObjects:
-    db $03,$26,ETHER
+    db 03,38,ETHER
     dbw BANK(HiddenItems),HiddenItems
-    db $01,$0a,ELIXER
+    db 01,10,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 Route9HiddenObjects:
-    db $07,$0e,ETHER
+    db 07,14,ETHER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 SSAnne6HiddenObjects:
-    db $05,$0d,SPRITE_FACING_DOWN
-    dbw $17,$5def
-    db $07,$0d,SPRITE_FACING_DOWN
-    dbw $17,$5def
-    db $09,$0d,GREAT_BALL
-    dbw BANK(HiddenItems),HiddenItems
+    db 05,13,SPRITE_FACING_DOWN
+    dbw BANK(PrintTrashText),PrintTrashText
+    db 07,13,SPRITE_FACING_DOWN
+    dbw BANK(PrintTrashText),PrintTrashText
+    db 09,13,GREAT_BALL
+    dbw BANK(SSAnneHiddenGreatBall),SSAnneHiddenGreatBall
     db $FF
 
 SSAnne10HiddenObjects:
-    db $01,$03,HYPER_POTION
+    db 01,03,HYPER_POTION
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 RocketHideout1HiddenObjects:
-    db $0f,$15,ELIXER
+    db 15,21,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 RocketHideout3HiddenObjects:
-    db $11,$1b,NUGGET
+    db 17,27,NUGGET
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 RocketHideout4HiddenObjects:
-    db $01,$19,SUPER_POTION
+    db 01,25,SUPER_POTION
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
@@ -69582,83 +69580,78 @@ SaffronPokecenterHiddenObjects:
     db $FF
 
 PokemonTower5HiddenObjects:
-    db $0c,$04,ELIXER
+    db 12,04,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 Route13HiddenObjects:
-    db $0e,$01,ELIXER
+    db 14,01,ELIXER
     dbw BANK(HiddenItems),HiddenItems
-    db $0d,$10,CALCIUM
-    dbw BANK(HiddenItems),HiddenItems
-    db $FF
-
-SafariZoneEntranceHiddenObjects:
-    db $01,$0a,NUGGET
+    db 13,16,CALCIUM
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 SafariZoneWestHiddenObjects:
-    db $05,$06,REVIVE
+    db 05,06,REVIVE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 SilphCo5FHiddenObjects:
-    db $03,$0c,ELIXER
+    db 03,12,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 SilphCo9FHiddenObjects:
-    db $0f,$02,MAX_POTION
+    db 15,02,MAX_POTION
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 CopycatsHouse2FHiddenObjects:
-    db $01,$01,TRADE_STONE
+    db 01,01,TRADE_STONE
     dbw BANK(HiddenItems),HiddenItems
-    db 01,02,$04 ; y,x,
+    db 01,02,SPRITE_FACING_UP
     dbw BANK(_CopycatsHouseF2Text4),_CopycatsHouseF2Text4
     db $FF
 
 UnknownDungeon1HiddenObjects:
-    db $0b,$0e,RARE_CANDY
+    db 11,14,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 UnknownDungeon3HiddenObjects:
-    db $03,$1b,ULTRA_BALL
+    db 03,27,ULTRA_BALL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 PowerPlantHiddenObjects:
-    db $10,$11,THUNDER_STONE
+    db 16,17,THUNDER_STONE
     dbw BANK(HiddenItems),HiddenItems
-    db $01,$0c,THUNDER_STONE
+    db 01,12,THUNDER_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 SeafoamIslands3HiddenObjects:
-    db $0f,$0f,WATER_STONE
+    db 15,15,WATER_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 SeafoamIslands5HiddenObjects:
-    db $11,$19,WATER_STONE
+    db 17,25,WATER_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 Mansion1HiddenObjects:
-    db $10,$08,FIRE_STONE
+    db 16,08,FIRE_STONE
     dbw BANK(HiddenItems),HiddenItems
-    db $05,$02,SPRITE_FACING_UP
-    dbw BANK(Func_44316),Func_44316
+    db 05,02,SPRITE_FACING_UP
+    dbw BANK(Mansion1Script_Switches),Mansion1Script_Switches
     db $FF
 
 Mansion3HiddenObjects:
-    db $09,$01,MAX_REVIVE
+    db 09,01,MAX_REVIVE
     dbw BANK(HiddenItems),HiddenItems
-    db $05,$0a,SPRITE_FACING_UP
-    dbw $14,$627a
+    db 05,10,SPRITE_FACING_UP
+    dbw BANK(Mansion3Script_Switches),Mansion3Script_Switches
     db $FF
 
 Route23HiddenObjects:
@@ -69671,9 +69664,9 @@ Route23HiddenObjects:
     db $FF
 
 VictoryRoad2HiddenObjects:
-    db $02,$05,ULTRA_BALL
+    db 02,05,ULTRA_BALL
     dbw BANK(HiddenItems),HiddenItems
-    db $07,$1a,FULL_RESTORE
+    db 07,26,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
@@ -69683,14 +69676,14 @@ VictoryPokecenterHiddenObjects:
     db $FF
 
 BillsHouseHiddenObjects:
-    db $04,$01,SPRITE_FACING_UP
+    db 04,01,SPRITE_FACING_UP
     dbw BANK(BillsHousePC),BillsHousePC
     db 06,05,ANY_FACING
     dbw BANK(EnableBillsTeleport),EnableBillsTeleport
     db $FF
 
 ViridianCityHiddenObjects:
-    db $04,$0e,POTION
+    db 04,14,POTION
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
@@ -69700,24 +69693,24 @@ SwapMapObjects:
     db $FF
 
 LavenderHouse1HiddenObjects:
-    db $01,$00,SPRITE_FACING_DOWN
+    db 01,00,SPRITE_FACING_DOWN
     db BANK(PrintMagazinesText)
     dw PrintMagazinesText
-    db $01,$01,SPRITE_FACING_DOWN
+    db 01,01,SPRITE_FACING_DOWN
     db BANK(PrintMagazinesText)
     dw PrintMagazinesText
-    db $01,$07,SPRITE_FACING_DOWN
+    db 01,07,SPRITE_FACING_DOWN
     db BANK(PrintMagazinesText)
     dw PrintMagazinesText
     db $FF
 
 CeladonMansion5HiddenObjects:
-    db $00,$03,$34
-    dbw $17,$5c1a
-    db $00,$04,$34
-    dbw $17,$5c1a
-    db $04,$03,$35
-    dbw $14,$6996
+    db 00,03,$34 ; LinkCableHelp
+    dbw BANK(PrintBlackboardLinkCableText),PrintBlackboardLinkCableText
+    db 00,04,$34 ; LinkCableHelp
+    dbw BANK(PrintBlackboardLinkCableText),PrintBlackboardLinkCableText
+    db 04,03,$35 ; TMNotebook
+    dbw BANK(PrintNotebookText),PrintNotebookText
     db $FF
 
 FightingDojoHiddenObjects:
@@ -78555,7 +78548,7 @@ Func_5225b: ; 5225b (14:625b)
     set 4,[hl]
     ret
 
-;???:
+Mansion3Script_Switches: ; 5227a (14:627a)
     ld a,[$c109]
     cp $4
     ret nz
@@ -79349,9 +79342,9 @@ OhFineThenTextPtr: ; 52971 (14:6971)
     db $0D ; wait keypress (A/B) without blink
     db "@"
 
-SECTION "Func_52996",ROMX[$6996],BANK[$14]
+SECTION "PrintNotebookText",ROMX[$6996],BANK[$14]
 
-Func_52996: ; 52996 (14:6996)
+PrintNotebookText: ; 52996 (14:6996)
     call EnableAutoTextBoxDrawing
     ld a,$1
     ld [$cc3c],a
@@ -92060,9 +92053,9 @@ KabutopsFossilText:
 
 ; Free
 
-SECTION "Func_5dc1a",ROMX[$5c1a],BANK[$17]
+SECTION "PrintBlackboardLinkCableText",ROMX[$5c1a],BANK[$17]
 
-Func_5dc1a: ; 5dc1a (17:5c1a)
+PrintBlackboardLinkCableText: ; 5dc1a (17:5c1a)
     call EnableAutoTextBoxDrawing
     ld a,$1
     ld [$cc3c],a
@@ -107967,7 +107960,7 @@ SECTION "HiddenItems_romx",ROMX[$6688],BANK[$1d]
 
 HiddenItems: ; 76688 (1d:6688)
     call GetHiddenItemCoords ; ld hl,HiddenItemCoords
-    call Func_76857
+    call FindHiddenItemOrCoinsIndex
     ld [$cd41],a
     call GetObtainedHiddenItemsFlags ; ld hl,wObtainedHiddenItemsFlags
     ld a,[$cd41]
@@ -107977,6 +107970,9 @@ HiddenItems: ; 76688 (1d:6688)
     ld a,c
     and a
     ret nz
+    ; fall through
+
+GiveHiddenItems:
     call EnableAutoTextBoxDrawing
     ld a,$1
     ld [$cc3c],a
@@ -107988,64 +107984,63 @@ HiddenItems: ; 76688 (1d:6688)
 
 HiddenItemCoords: ; 766b8 (1d:66b8)
 ; map ID,then coords
-    db VIRIDIAN_FOREST,$12,$01
-    db VIRIDIAN_FOREST,$2a,$10
-    db MT_MOON_3,$0c,$12
-    db ROUTE_25,$03,$26
-    db ROUTE_9,$07,$0e
-    db SS_ANNE_6,$09,$0d
-    db SS_ANNE_10,$01,$03
-    db ROUTE_10,$11,$09
-    db ROUTE_10,$35,$10
-    db ROCKET_HIDEOUT_1,$0f,$15
-    db ROCKET_HIDEOUT_3,$11,$1b
-    db ROCKET_HIDEOUT_4,$01,$19
-    db POKEMONTOWER_5,$0c,$04
-    db ROUTE_13,$0e,$01
-    db ROUTE_13,$0d,$10
-    db MANSION_4,$09,$01
-    db SAFARIZONEENTRANCE,$01,$0a
-    db SAFARI_ZONE_WEST,$05,$06
-    db SILPH_CO_5F,$03,$0c
-    db SILPH_CO_9F,$0f,$02
-    db COPYCATS_HOUSE_2F,$01,$01
-    db UNKNOWN_DUNGEON_1,$0b,$0e
-    db UNKNOWN_DUNGEON_3,$03,$1b
-    db POWER_PLANT,$10,$11
-    db POWER_PLANT,$01,$0c
-    db SEAFOAM_ISLANDS_3,$0f,$0f
-    db SEAFOAM_ISLANDS_5,$11,$19
-    db MANSION_1,$10,$08
-    db MANSION_3,$09,$01
-    db ROUTE_23,45,06
-    db ROUTE_23,67,00
-    db ROUTE_23,60,17
-    db VICTORY_ROAD_2,$02,$05
-    db VICTORY_ROAD_2,$07,$1a
-    db MANSION_2,07,28 ; db $6f,$0b,$0e
-    db VIRIDIAN_CITY,$04,$0e
-    db ROUTE_11,$05,$30
-    db ROUTE_12,$3f,$02
-    db ROUTE_17,$0e,$0f
-    db ROUTE_17,$2d,$08
-    db ROUTE_17,$48,$11
-    db ROUTE_17,$5b,$04
-    db ROUTE_17,$79,$08
-    db UNDERGROUND_PATH_NS,$04,$03
-    db UNDERGROUND_PATH_NS,$22,$04
-    db UNDERGROUND_PATH_WE,$02,$0c
-    db UNDERGROUND_PATH_WE,$05,$15
-    db CELADON_CITY,$0f,$30
-    db ROUTE_25,$01,$0a
-    db MT_MOON_3,$09,$21
-    db SEAFOAM_ISLANDS_4,$10,$09
-    db VERMILION_CITY,$0b,$0e
-    db CERULEAN_CITY,$08,$0f
-    db ROUTE_4,$03,$28
+    db VIRIDIAN_FOREST     , 18,01
+    db VIRIDIAN_FOREST     , 42,16
+    db MT_MOON_3           , 12,18
+    db ROUTE_25            , 03,38
+    db ROUTE_9             , 07,14
+    db SS_ANNE_6           , 09,13
+    db SS_ANNE_10          , 01,03
+    db ROUTE_10            , 17,09
+    db ROUTE_10            , 53,16
+    db ROCKET_HIDEOUT_1    , 15,21
+    db ROCKET_HIDEOUT_3    , 17,27
+    db ROCKET_HIDEOUT_4    , 01,25
+    db POKEMONTOWER_5      , 12,04
+    db ROUTE_13            , 14,01
+    db ROUTE_13            , 13,16
+    db MANSION_4           , 09,01
+    db $FF                 , 00,00 ; Not Used
+    db SAFARI_ZONE_WEST    , 05,06
+    db SILPH_CO_5F         , 03,12
+    db SILPH_CO_9F         , 15,02
+    db COPYCATS_HOUSE_2F   , 01,01
+    db UNKNOWN_DUNGEON_1   , 11,14
+    db UNKNOWN_DUNGEON_3   , 03,27
+    db POWER_PLANT         , 16,17
+    db POWER_PLANT         , 01,12
+    db SEAFOAM_ISLANDS_3   , 15,15
+    db SEAFOAM_ISLANDS_5   , 17,25
+    db MANSION_1           , 16,08
+    db MANSION_3           , 09,01
+    db ROUTE_23            , 45,06
+    db ROUTE_23            , 67,00
+    db ROUTE_23            , 60,17
+    db VICTORY_ROAD_2      , 02,05
+    db VICTORY_ROAD_2      , 07,26
+    db MANSION_2           , 07,28
+    db VIRIDIAN_CITY       , 04,14
+    db ROUTE_11            , 05,48
+    db ROUTE_12            , 63,02
+    db ROUTE_17            , 14,15
+    db ROUTE_17            , 45,08
+    db ROUTE_17            , 72,17
+    db ROUTE_17            , 91,04
+    db ROUTE_17            ,121,08
+    db UNDERGROUND_PATH_NS , 04,03
+    db UNDERGROUND_PATH_NS , 34,04
+    db UNDERGROUND_PATH_WE , 02,12
+    db UNDERGROUND_PATH_WE , 05,21
+    db CELADON_CITY        , 15,48
+    db ROUTE_25            , 01,10
+    db MT_MOON_3           , 09,33
+    db SEAFOAM_ISLANDS_4   , 16,09
+    db VERMILION_CITY      , 11,14
+    db CERULEAN_CITY       , 08,15
+    db ROUTE_4             , 03,40
     db $ff
 
 FoundHiddenItemText: ; 7675b (1d:675b)
-; XXX where is the pointer to this?
     TX_FAR UnnamedText_894d0
     db $8
     ld a,[$cd3d] ; item ID
@@ -108081,7 +108076,7 @@ HiddenCoins: ; 76799 (1d:6799)
     and a
     ret z
     call GetHiddenCoinCoords ; ld hl,HiddenCoinCoords
-    call Func_76857
+    call FindHiddenItemOrCoinsIndex
     ld [$cd41],a
     call GetObtainedHiddenCoinsFlags ; ld hl,wObtainedHiddenCoinsFlags
     ld a,[$cd41]
@@ -108144,18 +108139,18 @@ HiddenCoins: ; 76799 (1d:6799)
     jp PrintPredefTextID
 
 HiddenCoinCoords: ; 76822 (1d:6822)
-    db GAME_CORNER,$08,$00
-    db GAME_CORNER,$10,$01
-    db GAME_CORNER,$0b,$03
-    db GAME_CORNER,$0e,$03
-    db GAME_CORNER,$0c,$04
-    db GAME_CORNER,$0c,$09
-    db GAME_CORNER,$0f,$09
-    db GAME_CORNER,$0e,$10
-    db GAME_CORNER,$10,$0a
-    db GAME_CORNER,$07,$0b
-    db GAME_CORNER,$08,$0f
-    db GAME_CORNER,$0f,$0c
+    db GAME_CORNER,08,00
+    db GAME_CORNER,16,01
+    db GAME_CORNER,11,03
+    db GAME_CORNER,14,03
+    db GAME_CORNER,12,04
+    db GAME_CORNER,12,09
+    db GAME_CORNER,15,09
+    db GAME_CORNER,14,16
+    db GAME_CORNER,16,10
+    db GAME_CORNER,07,11
+    db GAME_CORNER,08,15
+    db GAME_CORNER,15,12
     db $ff
 
 FoundHiddenCoinsText: ; 76847 (1d:6847)
@@ -108168,7 +108163,7 @@ DroppedHiddenCoinsText: ; 7684d (1d:684d)
     TX_FAR _DroppedHiddenCoinsText
     db "@"
 
-Func_76857: ; 76857 (1d:6857)
+FindHiddenItemOrCoinsIndex: ; 76857 (1d:6857)
     ld a,[$cd40]
     ld d,a
     ld a,[$cd41]
@@ -108580,6 +108575,24 @@ Func_740cb_Skip:
 UnnamedText_74229:
     db $60," ",$62," ",$64,"  ",$64," ",$66," ",$68,"@"
     db $61," ",$63," ",$65,"  ",$65," ",$67," ",$69,"@"
+
+; ───────────────────────────────────────────
+
+SSAnneHiddenGreatBall:
+    call GetHiddenItemCoords ; ld hl,HiddenItemCoords
+    call FindHiddenItemOrCoinsIndex
+    ld [$cd41],a
+    call GetObtainedHiddenItemsFlags ; ld hl,wObtainedHiddenItemsFlags
+    ld a,[$cd41]
+    ld c,a
+    ld b,$2
+    PREDEF HandleBitArray
+    ld a,c
+    and a
+    BANKSWITCH_JUMP_NZ PrintTrashText
+    jp GiveHiddenItems
+
+; ───────────────────────────────────────────
 
 SECTION "bank1E",ROMX,BANK[$1E]
 
@@ -120530,22 +120543,22 @@ _IndigoPlateauStatuesText3: ; 89596 (22:5596)
     db "#MON authority",$55
     db "#MON LEAGUE HQ",$57
 
-_UnnamedText_fc03: ; 895c1 (22:55c1)
+_PokemonBooksText: ; 895c1 (22:55c1)
     db $0,"Crammed full of",$4f
     db "#MON books!",$57
 
-_UnnamedText_fc08: ; 895de (22:55de)
+_DiglettSculptureText: ; 895de (22:55de)
     db $0,"It's a sculpture",$4f
     db "of DIGLETT.",$57
 
-_UnnamedText_fc0d: ; 895fb (22:55fb)
+_ElevatorText: ; 895fb (22:55fb)
     db $0,"This is an",$4f
     db "elevator.",$57
 
 _TownMapText: ; 89611 (22:5611)
     db $0,"A TOWN MAP.@@"
 
-_UnnamedText_fc45: ; 8961f (22:561f)
+_PokemonStuffText: ; 8961f (22:561f)
     db $0,"Wow! Tons of",$4f
     db "#MON stuff!",$57
 
