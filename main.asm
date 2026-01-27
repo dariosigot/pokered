@@ -122492,11 +122492,22 @@ _HM01SkillNotFoundText:
     text_past
 
 _HM02SkillFoundText:
-    text_init , "Found!"
+    text_init , "Now, You and your"
+    text_line , "#MON will be"
+    text_cont , "able to return to"
+    text_cont , "any known town!"
     text_past
 
 _HM02SkillNotFoundText:
-    text_init , "NOT Found!"
+    text_init , "Even if you don't"
+    text_line , "currently have"
+    text_cont , "any #MON that"
+    text_cont , "can use this"
+    text_cont , "SKILL, you now"
+    text_cont , "have all the"
+    text_cont , "instructions you"
+    text_cont , "need to teach it"
+    text_cont , "to them!"
     text_past
 
 _HM03SkillFoundText:
@@ -122986,8 +122997,9 @@ _PreHM02Text:
     text_line , "secret retreat!"
     text_para , "Please don't tell"
     text_line , "anyone I'm here."
-    text_cont , "I'll make it up"
-    text_cont , "to you with this!"
+    text_cont , "I'll make it up to"
+    text_cont , "you by teaching"
+    text_cont , "an useful SKILL!"
     text_wait
 
 _UnnamedText_1e652:
@@ -124108,10 +124120,7 @@ _Route11BattleText9:
     text_done
 
 _HM02AfterText:
-    text_init , "This is FLY!"
-    text_para , "It will take you"
-    text_line , "back to any town."
-    text_para , "Put it to good"
+    text_init , "Put it to good"
     text_line , "use!"
     text_done
 
@@ -134310,7 +134319,6 @@ SearchSkillInParty:
 .found
     ld hl,wDontCheckEnergySkillBit0
     bit 0,[hl]
-    res 0,[hl]
     jr nz,.SkipCheckEnergy
     call .CheckAndDecreaseSkillEnergy
     jr c,.NextMon
@@ -134343,7 +134351,10 @@ LearnSkill:
     pop bc
     ld hl,wDontCheckEnergySkillBit0
     set 0,[hl]
-    jp SearchSkillInParty
+    call SearchSkillInParty
+    ld hl,wDontCheckEnergySkillBit0
+    res 0,[hl]
+    ret
 .LearnSkill
     TX_FAR _LearnSkillText
     db $10,$0,$58,"@"
