@@ -69533,9 +69533,9 @@ IndigoPlateauHiddenObjects:
     db $FF
 
 Route25HiddenObjects:
-    db 03,38,ETHER
+    db 03,38,POKE_BALL
     dbw BANK(HiddenItems),HiddenItems
-    db 01,10,ELIXER
+    db 01,10,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
@@ -69559,7 +69559,7 @@ SSAnne10HiddenObjects:
     db $FF
 
 RocketHideout1HiddenObjects:
-    db 15,21,ELIXER
+    db 15,21,HP_UP
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
@@ -69581,12 +69581,12 @@ SaffronPokecenterHiddenObjects:
     db $FF
 
 PokemonTower5HiddenObjects:
-    db 12,04,ELIXER
+    db 12,04,CALCIUM
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 Route13HiddenObjects:
-    db 14,01,ELIXER
+    db 14,01,CARBOS
     dbw BANK(HiddenItems),HiddenItems
     db 13,16,CALCIUM
     dbw BANK(HiddenItems),HiddenItems
@@ -69598,7 +69598,7 @@ SafariZoneWestHiddenObjects:
     db $FF
 
 SilphCo5FHiddenObjects:
-    db 03,12,ELIXER
+    db 03,12,IRON
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
@@ -69728,7 +69728,7 @@ FightingDojoHiddenObjects:
 Route10HiddenObjects:
     db 17,09,SUPER_POTION
     dbw BANK(HiddenItems),HiddenItems
-    db 53,16,ELIXER
+    db 53,16,HP_UP
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
@@ -69801,7 +69801,7 @@ Route17HiddenObjects:
     dbw BANK(HiddenItems),HiddenItems
     db 91,04,MAX_REVIVE
     dbw BANK(HiddenItems),HiddenItems
-    db 121,08,ELIXER
+    db 121,08,PROTEIN
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
@@ -69815,7 +69815,7 @@ UndergroundPathNsHiddenObjects:
 UndergroundPathWeHiddenObjects:
     db 02,12,NUGGET
     dbw BANK(HiddenItems),HiddenItems
-    db 05,21,ELIXER
+    db 05,21,DIRE_HIT
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
@@ -93332,7 +93332,7 @@ PokemonTower4Object: ; 0x6088b (size=65)
     db SPRITE_MEDIUM,$a + 4,$5 + 4,$ff,$d3,$41,CHANNELER,$4 ; trainer
     db SPRITE_MEDIUM,$7 + 4,$f + 4,$ff,$d0,$42,CHANNELER,$5 ; trainer
     db SPRITE_MEDIUM,$c + 4,$e + 4,$ff,$d2,$43,CHANNELER,$6 ; trainer
-    db SPRITE_BALL,$a + 4,$c + 4,$ff,$ff,$84,ELIXER ; item
+    db SPRITE_BALL,$a + 4,$c + 4,$ff,$ff,$84,CALCIUM ; item
     db SPRITE_BALL,$a + 4,$9 + 4,$ff,$ff,$85,AWAKENING ; item
     db SPRITE_BALL,$10 + 4,$c + 4,$ff,$ff,$86,HP_UP ; item
 
