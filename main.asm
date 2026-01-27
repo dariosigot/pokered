@@ -10610,8 +10610,8 @@ TextPredefs:
     dw LinkCableHelp                        ; id = 34
     dw TMNotebook                           ; id = 35
     dw FightingDojoText                     ; id = 36
-    dw UnnamedText_52a10                    ; id = 37
-    dw UnnamedText_52a1d                    ; id = 38
+    dw EnemiesOnEverySideText               ; id = 37
+    dw WhatGoesAroundComesAroundText        ; id = 38
     dw NewBicycleText                       ; id = 39
     dw IndigoPlateauStatues                 ; id = 3A
     dw VermilionGymTrashSuccesText1         ; id = 3B
@@ -69714,20 +69714,20 @@ CeladonMansion5HiddenObjects:
     db $FF
 
 FightingDojoHiddenObjects:
-    db $09,$03,SPRITE_FACING_UP
-    dbw $14,$6a22
-    db $09,$06,SPRITE_FACING_UP
-    dbw $14,$6a22
-    db $00,$04,SPRITE_FACING_UP
-    dbw $14,$6a08
-    db $00,$05,SPRITE_FACING_UP
-    dbw $14,$6a15
+    db 09,03,SPRITE_FACING_UP
+    dbw BANK(PrintFightingDojoText),PrintFightingDojoText
+    db 09,06,SPRITE_FACING_UP
+    dbw BANK(PrintFightingDojoText),PrintFightingDojoText
+    db 00,04,SPRITE_FACING_UP
+    dbw BANK(PrintFightingDojoText2),PrintFightingDojoText2
+    db 00,05,SPRITE_FACING_UP
+    dbw BANK(PrintFightingDojoText3),PrintFightingDojoText3
     db $FF
 
 Route10HiddenObjects:
-    db $11,$09,SUPER_POTION
+    db 17,09,SUPER_POTION
     dbw BANK(HiddenItems),HiddenItems
-    db $35,$10,ELIXER
+    db 53,16,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
@@ -69761,18 +69761,18 @@ BikeShopHiddenObjects:
     db $FF
 
 Route11HiddenObjects:
-    db $05,$30,FULL_HEAL
+    db 05,48,FULL_HEAL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 Route12HiddenObjects:
-    db $3f,$02,LEAF_STONE
+    db 63,02,LEAF_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 Mansion2HiddenObjects:
-    db $0b,$02,SPRITE_FACING_UP
-    dbw BANK(Func_52037),Func_52037
+    db 11,02,SPRITE_FACING_UP
+    dbw BANK(Mansion2Script_Switches),Mansion2Script_Switches
     db 07,28,FIRE_STONE
     dbw BANK(HiddenItems),HiddenItems
     db $FF
@@ -69781,9 +69781,9 @@ Mansion4HiddenObjects:
     db $09,$01,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $03,$14,SPRITE_FACING_UP
-    dbw $14,$6420
+    dbw BANK(Mansion4Script_Switches),Mansion4Script_Switches
     db $19,$12,SPRITE_FACING_UP
-    dbw $14,$6420
+    dbw BANK(Mansion4Script_Switches),Mansion4Script_Switches
     db $FF
 
 SilphCo11FHiddenObjects:
@@ -69792,64 +69792,64 @@ SilphCo11FHiddenObjects:
     db $FF
 
 Route17HiddenObjects:
-    db $0e,$0f,RARE_CANDY
+    db 14,15,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
-    db $2d,$08,FULL_RESTORE
+    db 45,08,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
-    db $48,$11,RARE_CANDY
+    db 72,17,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
-    db $5b,$04,MAX_REVIVE
+    db 91,04,MAX_REVIVE
     dbw BANK(HiddenItems),HiddenItems
-    db $79,$08,ELIXER
+    db 121,08,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 UndergroundPathNsHiddenObjects:
-    db $04,$03,FULL_RESTORE
+    db 04,03,FULL_RESTORE
     dbw BANK(HiddenItems),HiddenItems
-    db $22,$04,X_SPECIAL
+    db 34,04,X_SPECIAL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 UndergroundPathWeHiddenObjects:
-    db $02,$0c,NUGGET
+    db 02,12,NUGGET
     dbw BANK(HiddenItems),HiddenItems
-    db $05,$15,ELIXER
+    db 05,21,ELIXER
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 CeladonCityHiddenObjects:
-    db $0f,$30,RARE_CANDY
+    db 15,48,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 SeafoamIslands4HiddenObjects:
-    db $10,$09,RARE_CANDY
+    db 16,09,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 VermilionCityHiddenObjects:
-    db $0b,$0e,RARE_CANDY
+    db 11,14,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 CeruleanCityHiddenObjects:
-    db $08,$0f,RARE_CANDY
+    db 08,15,RARE_CANDY
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 Route4HiddenObjects:
-    db $03,$28,GREAT_BALL
+    db 03,40,GREAT_BALL
     dbw BANK(HiddenItems),HiddenItems
     db $FF
 
 Route15GateUpstairsHiddenObjects:
-    db $02,$01,SPRITE_FACING_UP
+    db 02,01,SPRITE_FACING_UP
     dbw BANK(Route15UpstairsLeftBinoculars),Route15UpstairsLeftBinoculars
     db $FF
 
 HallOfFameRoomHiddenObjects:
-    db 01,04,$04 ; Y,X,XXX
+    db 01,04,SPRITE_FACING_UP
     dbw BANK(UseHallOfFamePC),UseHallOfFamePC
     db $FF
 
@@ -78357,7 +78357,7 @@ Func_5202f: ; 5202f (14:602f)
     ld [$d09f],a
     PREDEF_JUMP ReplaceTileBlock
 
-Func_52037: ; 52037 (14:6037)
+Mansion2Script_Switches: ; 52037 (14:6037)
     ld a,[$c109]
     cp $4
     ret nz
@@ -78704,6 +78704,8 @@ Mansion4Script_523cf: ; 523cf (14:63cf)
     ld bc,$808
     call Func_5202f
     ret
+
+Mansion4Script_Switches: ; 52420 (14:6420)
     ld a,[$c109]
     cp $4
     ret nz
@@ -79410,25 +79412,25 @@ ViridianSchoolNotebookText4: ; 52a03 (14:6a03)
     TX_FAR _ViridianSchoolNotebookText4
     db "@"
 
-Func_52a08: ; 52a08 (14:6a08)
+PrintFightingDojoText2: ; 52a08 (14:6a08)
     call EnableAutoTextBoxDrawing
     ld a,$37
     jp PrintPredefTextID
 
-UnnamedText_52a10: ; 52a10 (14:6a10)
-    TX_FAR _UnnamedText_52a10
+EnemiesOnEverySideText: ; 52a10 (14:6a10)
+    TX_FAR _EnemiesOnEverySideText
     db "@"
 
-Func_52a15: ; 52a15 (14:6a15)
+PrintFightingDojoText3: ; 52a15 (14:6a15)
     call EnableAutoTextBoxDrawing
     ld a,$38
     jp PrintPredefTextID
 
-UnnamedText_52a1d: ; 52a1d (14:6a1d)
-    TX_FAR _UnnamedText_52a1d
+WhatGoesAroundComesAroundText: ; 52a1d (14:6a1d)
+    TX_FAR _WhatGoesAroundComesAroundText
     db "@"
 
-Func_52a22: ; 52a22 (14:6a22)
+PrintFightingDojoText: ; 52a22 (14:6a22)
     call EnableAutoTextBoxDrawing
     ld a,$36
     jp PrintPredefTextID
@@ -120388,11 +120390,11 @@ _ViridianSchoolNotebookText4: ; 88e2c (22:4e2c)
     db "The ELITE FOUR of",$4f
     db "#MON LEAGUE!",$58
 
-_UnnamedText_52a10: ; 88ec1 (22:4ec1)
+_EnemiesOnEverySideText: ; 88ec1 (22:4ec1)
     db $0,"Enemies on every",$4f
     db "side!",$57
 
-_UnnamedText_52a1d: ; 88ed9 (22:4ed9)
+_WhatGoesAroundComesAroundText: ; 88ed9 (22:4ed9)
     db $0,"What goes around",$4f
     db "comes around!",$57
 
