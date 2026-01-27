@@ -117294,70 +117294,70 @@ INCLUDE "music/credits.asm"
 
 SECTION "bank20",ROMX,BANK[$20]
 
-_CardKeySuccessText1: ; 80000 (20:4000)
+_CardKeySuccessText1:
     db $0,"Bingo!@@"
 
-_CardKeySuccessText2: ; 80009 (20:4009)
+_CardKeySuccessText2:
     db $0,$4f
     db "The CARD KEY",$55
     db "opened the door!",$57
 
-_CardKeyFailText: ; 80029 (20:4029)
+_CardKeyFailText:
     db $0,"Darn! It needs a",$4f
     db "CARD KEY!",$57
 
-_UnnamedText_33cf: ; 80045 (20:4045)
+_UnnamedText_33cf:
     TX_RAM $cd6d
     db $0,": @@"
 
-_UnnamedText_70847: ; 8004d (20:404d)
+_UnnamedText_70847:
     db $0,"Not even a nibble!",$58
 
-_UnnamedText_7084c: ; 80061 (20:4061)
+_UnnamedText_7084c:
     db $0,"Looks like there's",$4f
     db "nothing here.",$58
 
-_UnnamedText_70851: ; 80082 (20:4082)
+_UnnamedText_70851:
     db $0,"Oh!",$4f
     db "It's a bite!",$58
 
-_UnnamedText_24db: ; 80093 (20:4093)
+_UnnamedText_24db:
     db $0,"!",$57
 
-_UnnamedText_24e0: ; 80096 (20:4096)
+_UnnamedText_24e0:
     db $0,"Ground rose up",$4f
     db "somewhere!",$57
 
-_BoulderText: ; 800b1 (20:40b1)
+_BoulderText:
     db $0,"This requires",$4f
     db "STRENGTH to move!",$57
 
-_MartSignText: ; 800d2 (20:40d2)
+_MartSignText:
     db $0,"All your item",$4f
     db "needs fulfilled!",$55
     db "#MON MART",$57
 
-_PokeCenterSignText: ; 800fc (20:40fc)
+_PokeCenterSignText:
     db $0,"Heal Your #MON!",$4f
     db "#MON CENTER",$57
 
-_FoundItemText: ; 80119 (20:4119)
+_FoundItemText:
     db $0,$52," found",$4f
     db "@"
     TX_RAM $cf4b
     db $0,"!@@"
 
-_NoMoreRoomForItemText: ; 8012a (20:412a)
+_NoMoreRoomForItemText:
     db $0,"No more room for",$4f
     db "items!",$57
 
-_UnnamedText_59091: ; 80143 (20:4143)
+_UnnamedText_59091:
     db $0,"Hi! Remember me?",$4f
     db "I'm PROF.OAK's",$55
     db "AIDE!",$51
     db "If you caught @"
 
-UnnamedText_80177: ; 80177 (20:4177)
+UnnamedText_80177:
     TX_NUM $ffdb,1,3
     db $0,$4f
     db "kinds of #MON,",$55
@@ -117373,12 +117373,12 @@ UnnamedText_80177: ; 80177 (20:4177)
     db $0," kinds of",$55
     db "#MON?",$57
 
-_UnnamedText_59096: ; 801e4 (20:41e4)
+_UnnamedText_59096:
     db $0,"Let's see...",$4f
     db "Uh-oh! You have",$55
     db "caught only @"
 
-UnnamedText_8020e: ; 8020e (20:420e)
+UnnamedText_8020e:
     TX_NUM $ffdd,1,3
     db $0,$55
     db "kinds of #MON!",$51
@@ -117390,7 +117390,7 @@ UnnamedText_8020e: ; 8020e (20:420e)
     TX_RAM $cc5b
     db $0,".",$57
 
-_UnnamedText_5909b: ; 80250 (20:4250)
+_UnnamedText_5909b:
     db $0,"Oh. I see.",$51
     db "When you get @"
     TX_NUM $ffdb,1,3
@@ -117400,78 +117400,78 @@ _UnnamedText_5909b: ; 80250 (20:4250)
     TX_RAM $cc5b
     db $0,".",$57
 
-_UnnamedText_590a0: ; 8028c (20:428c)
+_UnnamedText_590a0:
     db $0,"Great! You have",$4f
     db "caught @"
 
-UnnamedText_802a5: ; 802a5 (20:42a5)
+UnnamedText_802a5:
     TX_NUM $ffdd,1,3
     db $0," kinds ",$55
     db "of #MON!",$55
     db "Congratulations!",$51
     db "Here you go!",$58
 
-_UnnamedText_590a5: ; 802d9 (20:42d9)
+_UnnamedText_590a5:
     db $0,$52," got the",$4f
     db "@"
     TX_RAM $cc5b
     db $0,"!@@"
 
-_UnnamedText_590ab: ; 802ec (20:42ec)
+_UnnamedText_590ab:
     db $0,"Oh! I see you",$4f
     db "don't have any",$55
     db "room for the",$55
     db "@"
 
-UnnamedText_80317: ; 80317 (20:4317)
+UnnamedText_80317:
     TX_RAM $cc5b
     db $0,".",$57
 
-_ViridianForestText1: ; 8031d (20:431d)
+_ViridianForestText1:
     db $0,"I came here with",$4f
     db "some friends!",$51
     db "They're out for",$4f
     db "#MON fights!",$57
 
-_ViridianForestBattleText1: ; 80359 (20:4359)
+_ViridianForestBattleText1:
     db $0,"Hey! You have",$4f
     db "#MON! Come on!",$55
     db "Let's battle'em!",$57
 
-_ViridianForestEndBattleText1: ; 80387 (20:4387)
+_ViridianForestEndBattleText1:
     db $0,"No!",$4f
     db "CATERPIE can't",$55
     db "cut it!",$58
 
-_ViridianFrstAfterBattleText1: ; 803a2 (20:43a2)
+_ViridianFrstAfterBattleText1:
     db $0,"Ssh! You'll scare",$4f
     db "the bugs away!",$57
 
-_ViridianForestBattleText2: ; 803c3 (20:43c3)
+_ViridianForestBattleText2:
     db $0,"Yo! You can't jam",$4f
     db "out if you're a",$55
     db "#MON trainer!",$57
 
-_ViridianForestEndBattleText2: ; 803f2 (20:43f2)
+_ViridianForestEndBattleText2:
     db $0,"Huh?",$4f
     db "I ran out of",$55
     db "#MON!",$58
 
-_ViridianFrstAfterBattleText2: ; 8040b (20:440b)
+_ViridianFrstAfterBattleText2:
     db $0,"Darn! I'm going",$4f
     db "to catch some",$55
     db "stronger ones!",$57
 
-_ViridianForestBattleText3: ; 80438 (20:4438)
+_ViridianForestBattleText3:
     db $0,"Hey,wait up!",$4f
     db "What's the hurry?",$57
 
-_ViridianForestEndBattleText3: ; 80458 (20:4458)
+_ViridianForestEndBattleText3:
     db $0,"I",$4f
     db "give! You're good",$55
     db "at this!",$58
 
-_ViridianFrstAfterBattleText3: ; 80475 (20:4475)
+_ViridianFrstAfterBattleText3:
     db $0,"Sometimes,you",$4f
     db "can find stuff on",$55
     db "the ground!",$51
@@ -117479,33 +117479,33 @@ _ViridianFrstAfterBattleText3: ; 80475 (20:4475)
     db "the stuff I",$55
     db "dropped!",$57
 
-_ViridianForestText8: ; 804c7 (20:44c7)
+_ViridianForestText8:
     db $0,"I ran out of #",$4f
     db "BALLs to catch",$55
     db "#MON with!",$51
     db "You should carry",$4f
     db "extras!",$57
 
-_ViridianForestText9: ; 8050a (20:450a)
+_ViridianForestText9:
     db $0,"TRAINER TIPS",$51
     db "If you want to",$4f
     db "avoid battles,",$55
     db "stay away from",$55
     db "grassy areas!",$57
 
-_ViridianForestText10: ; 80553 (20:4553)
+_ViridianForestText10:
     db $0,"For poison,use",$4f
     db "ANTIDOTE! Get it",$55
     db "at #MON MARTs!",$57
 
-_ViridianForestText11: ; 80584 (20:4584)
+_ViridianForestText11:
     db $0,"TRAINER TIPS",$51
     db "Contact PROF.OAK",$4f
     db "via PC to get",$55
     db "your #DEX",$55
     db "evaluated!",$57
 
-_ViridianForestText12: ; 805c6 (20:45c6)
+_ViridianForestText12:
     db $0,"TRAINER TIPS",$51
     db "No stealing of",$4f
     db "#MON from",$55
@@ -117513,7 +117513,7 @@ _ViridianForestText12: ; 805c6 (20:45c6)
     db "Catch only wild",$55
     db "#MON!",$57
 
-_ViridianForestText13: ; 80613 (20:4613)
+_ViridianForestText13:
     db $0,"TRAINER TIPS",$51
     db "Weaken #MON",$4f
     db "before attempting",$55
@@ -117521,146 +117521,146 @@ _ViridianForestText13: ; 80613 (20:4613)
     db "When healthy,",$4f
     db "they may escape!",$57
 
-_ViridianForestText14: ; 80667 (20:4667)
+_ViridianForestText14:
     db $0,"LEAVING",$4f
     db "VIRIDIAN FOREST",$55
     db "PEWTER CITY AHEAD",$57
 
-_MtMoon1BattleText2: ; 80692 (20:4692)
+_MtMoon1BattleText2:
     db $0,"WHOA! You shocked",$4f
     db "me! Oh,you're",$55
     db "just a kid!",$57
 
-_MtMoon1EndBattleText2: ; 806bf (20:46bf)
+_MtMoon1EndBattleText2:
     db $0,"Wow!",$4f
     db "Shocked again!",$58
 
-_HM07AfterText: ; 806d4 (20:46d4)
+_HM07AfterText:
     db $0,"Kids like you",$4f
     db "shouldn't be",$55
     db "here!",$57
 
-_MtMoon1BattleText3: ; 806f5 (20:46f5)
+_MtMoon1BattleText3:
     db $0,"Did you come to",$4f
     db "explore too?",$57
 
-_MtMoon1EndBattleText3: ; 80713 (20:4713)
+_MtMoon1EndBattleText3:
     db $0,"Losing",$4f
     db "stinks!",$58
 
-_MtMoon1AfterBattleText3: ; 80723 (20:4723)
+_MtMoon1AfterBattleText3:
     db $0,"I came down here",$4f
     db "to show off to",$55
     db "girls.",$57
 
-_MtMoon1BattleText4: ; 8074b (20:474b)
+_MtMoon1BattleText4:
     db $0,"Wow! It's way",$4f
     db "bigger in here",$55
     db "than I thought!",$57
 
-_MtMoon1EndBattleText4: ; 80778 (20:4778)
+_MtMoon1EndBattleText4:
     db $0,"Oh!",$4f
     db "I lost it!",$58
 
-_MtMoon1AfterBattleText4: ; 80788 (20:4788)
+_MtMoon1AfterBattleText4:
     db $0,"How do you get",$4f
     db "out of here?",$57
 
-_MtMoon1BattleText5: ; 807a5 (20:47a5)
+_MtMoon1BattleText5:
     db $0,"What! Don't sneak",$4f
     db "up on me!",$57
 
-_MtMoon1EndBattleText5: ; 807c1 (20:47c1)
+_MtMoon1EndBattleText5:
     db $0,"My",$4f
     db "#MON won't do!",$58
 
-_MtMoon1AfterBattleText5: ; 807d3 (20:47d3)
+_MtMoon1AfterBattleText5:
     db $0,"I have to find",$4f
     db "stronger #MON.",$57
 
-_MtMoon1BattleText6: ; 807f2 (20:47f2)
+_MtMoon1BattleText6:
     db $0,"What? I'm waiting",$4f
     db "for my friends to",$55
     db "find me here.",$57
 
-_MtMoon1EndBattleText6: ; 80824 (20:4824)
+_MtMoon1EndBattleText6:
     db $0,"I lost?",$58
 
-_MtMoon1AfterBattleText6: ; 8082d (20:482d)
+_MtMoon1AfterBattleText6:
     db $0,"I heard there are",$4f
     db "some very rare",$55
     db "fossils here.",$57
 
-_MtMoon1BattleText7: ; 8085d (20:485d)
+_MtMoon1BattleText7:
     db $0,"Suspicious men",$4f
     db "are in the cave.",$55
     db "What about you?",$57
 
-_MtMoon1EndBattleText7: ; 8088e (20:488e)
+_MtMoon1EndBattleText7:
     db $0,"You",$4f
     db "got me!",$58
 
-_MtMoon1AfterBattleText7: ; 8089b (20:489b)
+_MtMoon1AfterBattleText7:
     db $0,"I saw them! I'm",$4f
     db "sure they're from",$55
     db "TEAM ROCKET!",$57
 
-_MtMoon1BattleText8: ; 808c9 (20:48c9)
+_MtMoon1BattleText8:
     db $0,"Go through this",$4f
     db "cave to get to",$55
     db "CERULEAN CITY!",$57
 
-_MtMoon1EndBattleText8: ; 808f8 (20:48f8)
+_MtMoon1EndBattleText8:
     db $0,"I",$4f
     db "lost.",$58
 
-_MtMoon1AfterBattleText8: ; 80901 (20:4901)
+_MtMoon1AfterBattleText8:
     db $0,"ZUBAT is tough!",$4f
     db "But,it can be",$55
     db "useful if you",$55
     db "catch one.",$57
 
-_MtMoon1Text14: ; 8093a (20:493a)
+_MtMoon1Text14:
     db $0,"Beware! ZUBAT is",$4f
     db "a blood sucker!",$57
 
-_UnnamedText_51a48: ; 8095c (20:495c)
+_UnnamedText_51a48:
     db $0,$57
 
-_UnnamedText_49f24: ; 8095e (20:495e)
+_UnnamedText_49f24:
     db $0,"You want the",$4f
     db "DOME FOSSIL?",$57
 
-_UnnamedText_49f64: ; 80979 (20:4979)
+_UnnamedText_49f64:
     db $0,"You want the",$4f
     db "HELIX FOSSIL?",$57
 
-_UnnamedText_49f6f: ; 80995 (20:4995)
+_UnnamedText_49f6f:
     db $0,$52," got the",$4f
     db "@"
     TX_RAM $cf4b
     db $0,"!@@"
 
-_UnnamedText_49f7f: ; 809a8 (20:49a8)
+_UnnamedText_49f7f:
     db $0,"Look,you've got",$4f
     db "no room for this.@@"
 
-_UnnamedText_49f85: ; 809cc (20:49cc)
+_UnnamedText_49f85:
     db $0,"Hey,stop!",$51
     db "I found these",$4f
     db "fossils! They're",$55
     db "both mine!",$57
 
-_UnnamedText_49f8a: ; 80a01 (20:4a01)
+_UnnamedText_49f8a:
     db $0,"OK!",$4f
     db "I'll share!",$58
 
-_UnnamedText_49f8f: ; 80a11 (20:4a11)
+_UnnamedText_49f8f:
     db $0,"We'll each take",$4f
     db "one!",$55
     db "No being greedy!",$57
 
-_UnnamedText_49f94: ; 80a37 (20:4a37)
+_UnnamedText_49f94:
     db $0,"Far away,on",$4f
     db "CINNABAR ISLAND,",$55
     db "there's a #MON",$55
@@ -117669,68 +117669,68 @@ _UnnamedText_49f94: ; 80a37 (20:4a37)
     db "on regenerating",$55
     db "fossils.",$57
 
-_UnnamedText_49f99: ; 80a93 (20:4a93)
+_UnnamedText_49f99:
     db $0,"All right. Then",$4f
     db "this is mine!@@"
 
-_MtMoon3BattleText2: ; 80ab3 (20:4ab3)
+_MtMoon3BattleText2:
     db $0,"TEAM ROCKET will",$4f
     db "find the fossils,",$55
     db "revive and sell",$55
     db "them for cash!",$57
 
-_MtMoon3EndBattleText2: ; 80af6 (20:4af6)
+_MtMoon3EndBattleText2:
     db $0,"Urgh!",$4f
     db "Now I'm mad!",$58
 
-_MtMoon3AfterBattleText2: ; 80b09 (20:4b09)
+_MtMoon3AfterBattleText2:
     db $0,"You made me mad!",$4f
     db "TEAM ROCKET will",$55
     db "blacklist you!",$57
 
-_MtMoon3BattleText3: ; 80b3b (20:4b3b)
+_MtMoon3BattleText3:
     db $0,"We,TEAM ROCKET,",$4f
     db "are #MON",$55
     db "gangsters!",$57
 
-_MtMoon3EndBattleText3: ; 80b61 (20:4b61)
+_MtMoon3EndBattleText3:
     db $0,"I blew",$4f
     db "it!",$58
 
-_MtMoon3AfterBattleText3: ; 80b6d (20:4b6d)
+_MtMoon3AfterBattleText3:
     db $0,"Darn it all! My",$4f
     db "associates won't",$55
     db "stand for this!",$57
 
-_MtMoon3BattleText4: ; 80b9e (20:4b9e)
+_MtMoon3BattleText4:
     db $0,"We're pulling a",$4f
     db "big job here!",$55
     db "Get lost,kid!",$57
 
-_MtMoon3EndBattleText4: ; 80bcb (20:4bcb)
+_MtMoon3EndBattleText4:
     db $0,"So,you",$4f
     db "are good.",$58
 
-_MtMoon3AfterBattleText4: ; 80bde (20:4bde)
+_MtMoon3AfterBattleText4:
     db $0,"If you find a",$4f
     db "fossil,give it",$55
     db "to me and scram!",$57
 
-_MtMoon3BattleText5: ; 80c0e (20:4c0e)
+_MtMoon3BattleText5:
     db $0,"Little kids",$4f
     db "should leave",$55
     db "grown-ups alone!",$57
 
-_MtMoon3EndBattleText5: ; 80c39 (20:4c39)
+_MtMoon3EndBattleText5:
     db $0,"I'm",$4f
     db "steamed!",$58
 
-_MtMoon3AfterBattleText5: ; 80c46 (20:4c46)
+_MtMoon3AfterBattleText5:
     db $0,"#MON lived",$4f
     db "here long before",$55
     db "people came.",$57
 
-_SSAnne1Text1: ; 80c70 (20:4c70)
+_SSAnne1Text1:
     db $0,"Bonjour!",$4f
     db "I am le waiter on",$55
     db "this ship!",$51
@@ -117740,14 +117740,14 @@ _SSAnne1Text1: ; 80c70 (20:4c70)
     db "Ah! Le strong",$4f
     db "silent type!",$57
 
-_SSAnne1Text2: ; 80ce6 (20:4ce6)
+_SSAnne1Text2:
     db $0,"The passengers",$4f
     db "are restless!",$51
     db "You might be",$4f
     db "challenged by the",$55
     db "more bored ones!",$57
 
-_SSAnne2Text1: ; 80d34 (20:4d34)
+_SSAnne2Text1:
     db $0,"This ship,she is",$4f
     db "a luxury liner",$55
     db "for trainers!",$51
@@ -117755,7 +117755,7 @@ _SSAnne2Text1: ; 80d34 (20:4d34)
     db "hold parties with",$55
     db "invited trainers!",$57
 
-_SSAnneRivalBeforeBattleText: ; 80d9a (20:4d9a)
+_SSAnneRivalBeforeBattleText:
     db $0,$53,": Bonjour!",$4f
     db $52,"!",$51
     db "Imagine seeing",$4f
@@ -117771,19 +117771,19 @@ _SSAnneRivalBeforeBattleText: ; 80d9a (20:4d9a)
     db "Crawl around in",$4f
     db "grassy areas!",$57
 
-_SSAnneRivalDefeatedText: ; 80e57 (20:4e57)
+_SSAnneRivalDefeatedText:
     db $0,"Humph!",$51
     db "At least you're",$4f
     db "raising your",$55
     db "#MON!",$58
 
-_SSAnneRivalWonText: ; 80e81 (20:4e81)
+_SSAnneRivalWonText:
     db $0,$52,"! What are",$4f
     db "you,seasick?",$51
     db "You should shape",$4f
     db "up,pal!",$58
 
-_SSAnneRivalCaptainText: ; 80eb6 (20:4eb6)
+_SSAnneRivalCaptainText:
     db $0,$53,": I heard",$4f
     db "there was a CUT",$55
     db "master on board.",$51
@@ -117794,108 +117794,108 @@ _SSAnneRivalCaptainText: ; 80eb6 (20:4eb6)
     db "You should go see",$4f
     db "him! Smell ya!",$57
 
-_SSAnne3Text1: ; 80f4b (20:4f4b)
+_SSAnne3Text1:
     db $0,"Our CAPTAIN is a",$4f
     db "sword master!",$51
     db "He even teaches",$4f
     db "CUT to #MON!",$57
 
-_SSAnne5Text1: ; 80f88 (20:4f88)
+_SSAnne5Text1:
     db $0,"The party's over.",$4f
     db "The ship will be",$55
     db "departing soon.",$57
 
-_SSAnne5Text2: ; 80fbb (20:4fbb)
+_SSAnne5Text2:
     db $0,"Scrubbing decks",$4f
     db "is hard work!",$57
 
-_SSAnne5Text3: ; 80fda (20:4fda)
+_SSAnne5Text3:
     db $0,"Urf. I feel ill.",$51
     db "I stepped out to",$4f
     db "get some air.",$57
 
-_SSAnneBattleText1: ; 8100b (20:500b)
+_SSAnneBattleText1:
     db $0,"Hey matey!",$51
     db "Let's do a little",$4f
     db "jig!",$57
 
-_SSAnneEndBattleText1: ; 8102d (20:502d)
+_SSAnneEndBattleText1:
     db $0,"You're",$4f
     db "impressive!",$58
 
-_SSAnneAfterBattleText1: ; 81040 (20:5040)
+_SSAnneAfterBattleText1:
     db $0,"How many kinds of",$4f
     db "#MON do you",$55
     db "think there are?",$57
 
-_SSAnneBattleText2: ; 81070 (20:5070)
+_SSAnneBattleText2:
     db $0,"Ahoy there!",$4f
     db "Are you seasick?",$57
 
-_SSAnneEndBattleText2: ; 8108e (20:508e)
+_SSAnneEndBattleText2:
     db $0,"I was",$4f
     db "just careless!",$58
 
-_SSAnneAfterBattleText2: ; 810a4 (20:50a4)
+_SSAnneAfterBattleText2:
     db $0,"My Pa said there",$4f
     db "are 100 kinds of",$55
     db "#MON. I think",$55
     db "there are more.",$57
 
-_SSAnne6Text1: ; 810e5 (20:50e5)
+_SSAnne6Text1:
     db $0,"You,mon petit!",$4f
     db "We're busy here!",$55
     db "Out of the way!",$57
 
-_SSAnne6Text2: ; 81116 (20:5116)
+_SSAnne6Text2:
     db $0,"I saw an odd ball",$4f
     db "in the trash.",$57
 
-_SSAnne6Text3: ; 81137 (20:5137)
+_SSAnne6Text3:
     db $0,"I'm so busy I'm",$4f
     db "getting dizzy!",$57
 
-_SSAnne6Text4: ; 81155 (20:5155)
+_SSAnne6Text4:
     db $0,"Hum-de-hum-de-",$4f
     db "ho...",$51
     db "I peel spuds",$4f
     db "every day!",$55
     db "Hum-hum...",$57
 
-_SSAnne6Text5: ; 8118e (20:518e)
+_SSAnne6Text5:
     db $0,"Did you hear about",$4f
     db "SNORLAX?",$51
     db "All it does is",$4f
     db "eat and sleep!",$57
 
-_SSAnne6Text6: ; 811c9 (20:51c9)
+_SSAnne6Text6:
     db $0,"Snivel...Sniff...",$51
     db "I only get to",$4f
     db "peel onions...",$55
     db "Snivel...",$57
 
-_UnnamedText_61807: ; 81203 (20:5203)
+_UnnamedText_61807:
     db $0,"Er-hem! Indeed I",$4f
     db "am le CHEF!",$51
     db "Le main course is",$58
 
-_UnnamedText_6180c: ; 81233 (20:5233)
+_UnnamedText_6180c:
     db $0,"Salmon du Salad!",$51
     db "Les guests may",$4f
     db "gripe it's fish",$55
     db "again,however!",$57
 
-_UnnamedText_61811: ; 81273 (20:5273)
+_UnnamedText_61811:
     db $0,"Eels au Barbecue!",$51
     db "Les guests will",$4f
     db "mutiny,I fear.",$57
 
-_UnnamedText_61816: ; 812a6 (20:52a6)
+_UnnamedText_61816:
     db $0,"Prime Beef Steak!",$51
     db "But,have I enough",$4f
     db "fillets du beef?",$57
 
-_SSAnne7RubText: ; 812dd (20:52dd)
+_SSAnne7RubText:
     db $0,"CAPTAIN: Ooargh...",$4f
     db "I feel hideous...",$55
     db "Urrp! Seasick...",$51
@@ -117905,7 +117905,7 @@ _SSAnne7RubText: ; 812dd (20:52dd)
     db "Rub-rub...",$4f
     db "Rub-rub...@@"
 
-_PreHM01Text: ; 81347 (20:5347)
+_PreHM01Text:
     db $0,"CAPTAIN: Whew!",$4f
     db "Thank you! I",$55
     db "feel much better!",$51
@@ -117920,103 +117920,101 @@ _HM01AfterText:
     db "sick any more,I",$55
     db "guess it's time.",$57
 
-SECTION "_SSAnne7Text2",ROMX[$5480],BANK[$20]
-
-_SSAnne7Text2: ; 81480 (20:5480)
+_SSAnne7Text2:
     db $0,"Yuck! Shouldn't",$4f
     db "have looked!",$57
 
-_SSAnne7Text3: ; 8149d (20:549d)
+_SSAnne7Text3:
     db $0,"How to Conquer",$4f
     db "Seasickness...",$55
     db "The CAPTAIN's",$55
     db "reading this!",$57
 
-_SSAnne8Text8: ; 814d7 (20:54d7)
+_SSAnne8Text8:
     db $0,"WIGGLYTUFF: Puup",$4f
     db "pupuu!@@"
 
-_SSAnne8BattleText1: ; 814f1 (20:54f1)
+_SSAnne8BattleText1:
     db $0,"I travel alone",$4f
     db "on my journeys!",$51
     db "My #MON are my",$4f
     db "only friends!",$57
 
-_SSAnne8EndBattleText1: ; 8152e (20:552e)
+_SSAnne8EndBattleText1:
     db $0,"My,my",$4f
     db "friends...",$58
 
-_SSAnne8AfterBattleText1: ; 81541 (20:5541)
+_SSAnne8AfterBattleText1:
     db $0,"You should be",$4f
     db "nice to friends!",$57
 
-_SSAnne8BattleText2: ; 81561 (20:5561)
+_SSAnne8BattleText2:
     db $0,"You pup! How dare",$4f
     db "you barge in!",$57
 
-_SSAnne8EndBattleText2: ; 81582 (20:5582)
+_SSAnne8EndBattleText2:
     db $0,"Humph!",$4f
     db "You rude child!",$58
 
-_UnnamedText_61a24: ; 8159a (20:559a)
+_UnnamedText_61a24:
     db $0,"I wish to be left",$4f
     db "alone! Get out!",$57
 
-_SSAnne8BattleText3: ; 815bd (20:55bd)
+_SSAnne8BattleText3:
     db $0,"I love #MON!",$4f
     db "Do you?",$57
 
-_SSAnne8EndBattleText3: ; 815d3 (20:55d3)
+_SSAnne8EndBattleText3:
     db $0,"Wow! ",$4f
     db "You're great!",$58
 
-_SSAnne8AfterBattleText3: ; 815e7 (20:55e7)
+_SSAnne8AfterBattleText3:
     db $0,"Let me be your",$4f
     db "friend,OK?",$51
     db "Then we can trade",$4f
     db "#MON!",$57
 
-_SSAnne8BattleText4: ; 8161b (20:561b)
+_SSAnne8BattleText4:
     db $0,"I collected these",$4f
     db "#MON from all",$55
     db "around the world!",$57
 
-_SSAnne8EndBattleText4: ; 8164e (20:564e)
+_SSAnne8EndBattleText4:
     db $0,"Oh no!",$4f
     db "I went around the",$55
     db "world for these!",$58
 
-_SSAnne8AfterBattleText4: ; 81679 (20:5679)
+_SSAnne8AfterBattleText4:
     db $0,"You hurt my poor",$4f
     db "worldly #MON!",$51
     db "I demand that you",$4f
     db "heal them at a",$55
     db "#MON CENTER!",$57
 
-_SSAnne8Text5: ; 816c7 (20:56c7)
+_SSAnne8Text5:
     db $0,"Waiter,I would",$4f
     db "like a cherry pie",$55
     db "please!",$57
 
-_SSAnne8Text6: ; 816f2 (20:56f2)
+_SSAnne8Text6:
     db $0,"A cruise is so",$4f
     db "elegant yet cozy!",$57
 
-_SSAnne8Text7: ; 81714 (20:5714)
+_SSAnne8Text7:
     db $0,"I always travel",$4f
     db "with WIGGLYTUFF!",$57
 
-_SSAnne8Text9: ; 81736 (20:5736)
+_SSAnne8Text9:
     db $0,"We are cruising",$4f
     db "around the world.",$57
 
-_SSAnne8Text11: ; 81759 (20:5759)
+_SSAnne8Text11:
     db $0,"Ssh! I'm a GLOBAL",$4f
     db "POLICE agent!",$51
     db "I'm on the trail",$4f
     db "of TEAM ROCKET!",$57
 
-_UnnamedText_61bf2: ; 81799 (20:5799)
+_UnnamedText_61bf2:
     db $0,"In all my travels",$4f
     db "I've never seen",$55
     db "any #MON sleep",$55
@@ -118024,350 +118022,350 @@ _UnnamedText_61bf2: ; 81799 (20:5799)
     db "It was something",$4f
     db "like this!",$57
 
-_UnnamedText_61c01: ; 817f5 (20:57f5)
+_UnnamedText_61c01:
     db $0,"Ah yes,I have",$4f
     db "seen some #MON",$55
     db "ferry people",$55
     db "across the water!",$57
 
-_UnnamedText_61c10: ; 81833 (20:5833)
+_UnnamedText_61c10:
     db $0,"#MON can CUT",$4f
     db "down small bushes.",$57
 
-_UnnamedText_61c1f: ; 81854 (20:5854)
+_UnnamedText_61c1f:
     db $0,"Have you gone to",$4f
     db "the SAFARI ZONE",$55
     db "in FUCHSIA CITY?",$51
     db "It had many rare",$4f
     db "kinds of #MON!!",$57
 
-_UnnamedText_61c2e: ; 818a8 (20:58a8)
+_UnnamedText_61c2e:
     db $0,"Me and my Daddy",$4f
     db "think the SAFARI",$55
     db "ZONE is awesome!",$57
 
-_UnnamedText_61c3d: ; 818db (20:58db)
+_UnnamedText_61c3d:
     db $0,"The CAPTAIN looked",$4f
     db "really sick and",$55
     db "pale!",$57
 
-_UnnamedText_61c4c: ; 81905 (20:5905)
+_UnnamedText_61c4c:
     db $0,"I hear many people",$4f
     db "get seasick!",$57
 
-_SSAnne9BattleText1: ; 81926 (20:5926)
+_SSAnne9BattleText1:
     db $0,"Competing against",$4f
     db "the young keeps",$55
     db "me youthful.",$57
 
-_SSAnne9EndBattleText1: ; 81956 (20:5956)
+_SSAnne9EndBattleText1:
     db $0,"Good",$4f
     db "fight! Ah,I feel",$55
     db "young again!",$58
 
-_SSAnne9AfterBattleText1: ; 8197b (20:597b)
+_SSAnne9AfterBattleText1:
     db $0,"15 years ago,I",$4f
     db "would have won!",$57
 
-_SSAnne9BattleText2: ; 8199c (20:599c)
+_SSAnne9BattleText2:
     db $0,"Check out what I",$4f
     db "fished up!",$57
 
-_SSAnne9EndBattleText2: ; 819b9 (20:59b9)
+_SSAnne9EndBattleText2:
     db $0,"I'm",$4f
     db "all out!",$58
 
-_SSAnne9AfterBattleText2: ; 819c6 (20:59c6)
+_SSAnne9AfterBattleText2:
     db $0,"Party?",$51
     db "The cruise ship's",$4f
     db "party should be",$55
     db "over by now.",$57
 
-_SSAnne9BattleText3: ; 819fc (20:59fc)
+_SSAnne9BattleText3:
     db $0,"Which do you like,",$4f
     db "a strong or a",$55
     db "rare #MON?",$57
 
-_SSAnne9EndBattleText3: ; 81a29 (20:5a29)
+_SSAnne9EndBattleText3:
     db $0,"I must",$4f
     db "salute you!",$58
 
-_SSAnne9AfterBattleText3: ; 81a3d (20:5a3d)
+_SSAnne9AfterBattleText3:
     db $0,"I prefer strong",$4f
     db "and rare #MON.",$57
 
-_SSAnne9BattleText4: ; 81a5d (20:5a5d)
+_SSAnne9BattleText4:
     db $0,"I never saw you",$4f
     db "at the party.",$57
 
-_SSAnne9EndBattleText4: ; 81a7c (20:5a7c)
+_SSAnne9EndBattleText4:
     db $0,"Take",$4f
     db "it easy!",$58
 
-_SSAnne9AfterBattleText4: ; 81a8b (20:5a8b)
+_SSAnne9AfterBattleText4:
     db $0,"Oh,I adore your",$4f
     db "strong #MON!",$57
 
-_SSAnne10Text8: ; 81aaa (20:5aaa)
+_SSAnne10Text8:
     db $0,"MACHOKE: Gwoh!",$4f
     db "Goggoh!@@"
 
-_SSAnne10BattleText1: ; 81ac3 (20:5ac3)
+_SSAnne10BattleText1:
     db $0,"You know what they",$4f
     db "say about sailors",$55
     db "and fighting!",$57
 
-_SSAnne10EndBattleText1: ; 81af7 (20:5af7)
+_SSAnne10EndBattleText1:
     db $0,"Right!",$4f
     db "Good fight,mate!",$58
 
-_SSAnne10AfterBattleText1: ; 81b11 (20:5b11)
+_SSAnne10AfterBattleText1:
     db $0,"Haha! Want to be",$4f
     db "a sailor,mate?",$57
 
-_SSAnne10BattleText2: ; 81b33 (20:5b33)
+_SSAnne10BattleText2:
     db $0,"My sailor's pride",$4f
     db "is at stake!",$57
 
-_SSAnne10EndBattleText2: ; 81b52 (20:5b52)
+_SSAnne10EndBattleText2:
     db $0,"Your",$4f
     db "spirit sank me!",$58
 
-_SSAnne10AfterBattleText2: ; 81b68 (20:5b68)
+_SSAnne10AfterBattleText2:
     db $0,"Did you see the",$4f
     db "FISHING GURU in",$55
     db "VERMILION CITY?",$57
 
-_SSAnne10BattleText3: ; 81b99 (20:5b99)
+_SSAnne10BattleText3:
     db $0,"Us sailors have",$4f
     db "#MON too!",$57
 
-_SSAnne10EndBattleText3: ; 81bb4 (20:5bb4)
+_SSAnne10EndBattleText3:
     db $0,"OK,",$4f
     db "you're not bad.",$58
 
-_SSAnne10AfterBattleText3: ; 81bc9 (20:5bc9)
+_SSAnne10AfterBattleText3:
     db $0,"We caught all our",$4f
     db "#MON while",$55
     db "out at sea!",$57
 
-_SSAnne10BattleText4: ; 81bf3 (20:5bf3)
+_SSAnne10BattleText4:
     db $0,"I like feisty",$4f
     db "kids like you!@@"
 
-_SSAnne10EndBattleText4: ; 81c12 (20:5c12)
+_SSAnne10EndBattleText4:
     db $0,"Argh!",$4f
     db "Lost it!",$58
 
-_SSAnne10AfterBattleText4: ; 81c22 (20:5c22)
+_SSAnne10AfterBattleText4:
     db $0,"Sea #MON live",$4f
     db "in deep water.",$55
     db "You'll need a ROD!",$57
 
-_SSAnne10BattleText5: ; 81c52 (20:5c52)
+_SSAnne10BattleText5:
     db $0,"Matey,you're",$4f
     db "walking the plank",$55
     db "if you lose!",$57
 
-_SSAnne10EndBattleText5: ; 81c7f (20:5c7f)
+_SSAnne10EndBattleText5:
     db $0,"Argh!",$4f
     db "Beaten by a kid!",$58
 
-_SSAnne10AfterBattleText5: ; 81c97 (20:5c97)
+_SSAnne10AfterBattleText5:
     db $0,"Jellyfish some-",$4f
     db "times drift into",$55
     db "the ship.",$57
 
-_SSAnne10BattleText6: ; 81cc3 (20:5cc3)
+_SSAnne10BattleText6:
     db $0,"Hello stranger!",$4f
     db "Stop and chat!",$51
     db "All my #MON",$4f
     db "are from the sea!",$57
 
-_SSAnne10EndBattleText6: ; 81d01 (20:5d01)
+_SSAnne10EndBattleText6:
     db $0,"Darn!",$4f
     db "I let that one",$55
     db "get away!",$58
 
-_SSAnne10AfterBattleText6: ; 81d21 (20:5d21)
+_SSAnne10AfterBattleText6:
     db $0,"I was going to",$4f
     db "make you my",$55
     db "assistant too!",$57
 
-_SSAnne10Text7: ; 81d4c (20:5d4c)
+_SSAnne10Text7:
     db $0,"My buddy,MACHOKE,",$4f
     db "is super strong!",$51
     db "He has enough",$4f
     db "STRENGTH to move",$55
     db "big rocks!",$57
 
-_VictoryRoad3BattleText2: ; 81d9b (20:5d9b)
+_VictoryRoad3BattleText2:
     db $0,"I heard rumors of",$4f
     db "a child prodigy!",$57
 
-_VictoryRoad3EndBattleText2: ; 81dbf (20:5dbf)
+_VictoryRoad3EndBattleText2:
     db $0,"The",$4f
     db "rumors were true!",$58
 
-_VictoryRoad3AfterBattleText2: ; 81dd6 (20:5dd6)
+_VictoryRoad3AfterBattleText2:
     db $0,"You beat GIOVANNI",$4f
     db "of TEAM ROCKET?",$57
 
-_VictoryRoad3BattleText3: ; 81df9 (20:5df9)
+_VictoryRoad3BattleText3:
     db $0,"I'll show you just",$4f
     db "how good you are!",$57
 
-_VictoryRoad3EndBattleText3: ; 81e1e (20:5e1e)
+_VictoryRoad3EndBattleText3:
     db $0,"I'm",$4f
     db "furious!",$58
 
-_VictoryRoad3AfterBattleText3: ; 81e2b (20:5e2b)
+_VictoryRoad3AfterBattleText3:
     db $0,"You showed me just",$4f
     db "how good I was!",$57
 
-_VictoryRoad3BattleText4: ; 81e4f (20:5e4f)
+_VictoryRoad3BattleText4:
     db $0,"Only the chosen",$4f
     db "can pass here!",$57
 
-_VictoryRoad3EndBattleText4: ; 81e6f (20:5e6f)
+_VictoryRoad3EndBattleText4:
     db $0,"I",$4f
     db "don't believe it!",$58
 
-_VictoryRoad3AfterBattleText4: ; 81e83 (20:5e83)
+_VictoryRoad3AfterBattleText4:
     db $0,"All trainers here",$4f
     db "are headed to the",$55
     db "#MON LEAGUE!",$55
     db "Be careful!",$57
 
-_VictoryRoad3BattleText5: ; 81ec1 (20:5ec1)
+_VictoryRoad3BattleText5:
     db $0,"Trainers live to",$4f
     db "seek stronger",$55
     db "opponents!",$57
 
-_VictoryRoad3EndBattleText5: ; 81eec (20:5eec)
+_VictoryRoad3EndBattleText5:
     db $0,"Oh!",$4f
     db "So strong!",$58
 
-_VictoryRoad3AfterBattleText5: ; 81efc (20:5efc)
+_VictoryRoad3AfterBattleText5:
     db $0,"By fighting tough",$4f
     db "battles,you get",$55
     db "stronger!",$57
 
-_RocketHideout1EndBattleText6: ; 81f2a (20:5f2a)
+_RocketHideout1EndBattleText6:
     db $0,"Why...?@@"
 
-_RocketHideout1BattleText2: ; 81f34 (20:5f34)
+_RocketHideout1BattleText2:
     db $0,"Who are you? How",$4f
     db "did you get here?",$57
 
-_RocketHideout1EndBattleText2: ; 81f58 (20:5f58)
+_RocketHideout1EndBattleText2:
     db $0,"Oww!",$4f
     db "Beaten!",$58
 
-_RocketHideout1AfterBattleTxt2: ; 81f66 (20:5f66)
+_RocketHideout1AfterBattleTxt2:
     db $0,"Are you dissing",$4f
     db "TEAM ROCKET?",$57
 
-_RocketHideout1BattleText3: ; 81f84 (20:5f84)
+_RocketHideout1BattleText3:
     db $0,"You broke into",$4f
     db "our operation?",$57
 
-_RocketHideout1EndBattleText3: ; 81fa3 (20:5fa3)
+_RocketHideout1EndBattleText3:
     db $0,"Burnt!",$58
 
-_RocketHideout1AfterBattleTxt3: ; 81fab (20:5fab)
+_RocketHideout1AfterBattleTxt3:
     db $0,"You're not going",$4f
     db "to get away with",$55
     db "this,brat!",$57
 
-_RocketHideout1BattleText4: ; 81fd9 (20:5fd9)
+_RocketHideout1BattleText4:
     db $0,"Intruder alert!",$57
 
-_RocketHideout1EndBattleText4: ; 81fea (20:5fea)
+_RocketHideout1EndBattleText4:
     db $0,"I",$4f
     db "can't do it!",$58
 
-_RocketHideout1AfterBattleTxt4: ; 81ff9 (20:5ff9)
+_RocketHideout1AfterBattleTxt4:
     db $0,"SILPH SCOPE?",$4f
     db "I don't know",$55
     db "where it is!",$57
 
-_RocketHideout1BattleText5: ; 82020 (20:6020)
+_RocketHideout1BattleText5:
     db $0,"Why did you come",$4f
     db "here?",$57
 
-_RocketHideout1EndBattleText5: ; 82038 (20:6038)
+_RocketHideout1EndBattleText5:
     db $0,"This",$4f
     db "won't do!",$58
 
-_RocketHideout1AfterBattleTxt5: ; 82047 (20:6047)
+_RocketHideout1AfterBattleTxt5:
     db $0,"OK,I'll talk!",$4f
     db "Take the elevator",$55
     db "to see my BOSS!",$57
 
-_RocketHideout1BattleText6: ; 82078 (20:6078)
+_RocketHideout1BattleText6:
     db $0,"Are you lost,you",$4f
     db "little rat?",$57
 
-_RocketHideout1AfterBattleTxt6: ; 82097 (20:6097)
+_RocketHideout1AfterBattleTxt6:
     db $0,"Uh-oh,that fight",$4f
     db "opened the door!",$57
 
-_RocketHideout2BattleText2: ; 820bb (20:60bb)
+_RocketHideout2BattleText2:
     db $0,"BOSS said you can",$4f
     db "see GHOSTs with",$55
     db "the SILPH SCOPE!",$57
 
-_RocketHideout2EndBattleText2: ; 820ef (20:60ef)
+_RocketHideout2EndBattleText2:
     db $0,"I",$4f
     db "surrender!",$58
 
-_RocketHideout2AfterBattleTxt2: ; 820fd (20:60fd)
+_RocketHideout2AfterBattleTxt2:
     db $0,"The TEAM ROCKET",$4f
     db "HQ has 4 basement",$55
     db "floors. Can you",$55
     db "reach the BOSS?",$57
 
-_RocketHideout3BattleText2: ; 82140 (20:6140)
+_RocketHideout3BattleText2:
     db $0,"Stop meddling in",$4f
     db "TEAM ROCKET's",$55
     db "affairs!",$57
 
-_RocketHideout3EndBattleText2: ; 82168 (20:6168)
+_RocketHideout3EndBattleText2:
     db $0,"Oof!",$4f
     db "Taken down!",$58
 
-_RocketHideout3AfterBattleTxt2: ; 8217a (20:617a)
+_RocketHideout3AfterBattleTxt2:
     db $0,"SILPH SCOPE?",$4f
     db "The machine the",$55
     db "BOSS stole. It's",$55
     db "here somewhere.",$57
 
-_RocketHideout3BattleTxt: ; 821b8 (20:61b8)
+_RocketHideout3BattleTxt:
     db $0,"We got word from",$4f
     db "upstairs that you",$55
     db "were coming!",$57
 
-_RocketHideout3EndBattleText3: ; 821e9 (20:61e9)
+_RocketHideout3EndBattleText3:
     db $0,"What?",$4f
     db "I lost? No!",$58
 
-_RocketHide3AfterBattleText3: ; 821fc (20:61fc)
+_RocketHide3AfterBattleText3:
     db $0,"Go ahead and go!",$4f
     db "But,you need the",$55
     db "LIFT KEY to run",$55
     db "the elevator!",$57
 
-_UnnamedText_4557a: ; 8223e (20:623e)
+_UnnamedText_4557a:
     db $0,"So! I must say,I",$4f
     db "am impressed you",$55
     db "got here!",$57
 
-_UnnamedText_4557f: ; 8226c (20:626c)
+_UnnamedText_4557f:
     db $0,"WHAT!",$4f
     db "This cannot be!",$58
 
-_UnnamedText_45584: ; 82283 (20:6283)
+_UnnamedText_45584:
     db $0,"I see that you",$4f
     db "raise #MON",$55
     db "with utmost care.",$51
@@ -118380,49 +118378,49 @@ _UnnamedText_45584: ; 82283 (20:6283)
     db "I hope we meet",$4f
     db "again...",$57
 
-_RocketHideout4BattleText2: ; 82326 (20:6326)
+_RocketHideout4BattleText2:
     db $0,"I know you! You",$4f
     db "ruined our plans",$55
     db "at MT.MOON!",$57
 
-_RocketHideout4EndBattleText2: ; 82354 (20:6354)
+_RocketHideout4EndBattleText2:
     db $0,"Burned",$4f
     db "again!",$58
 
-_RocketHide4AfterBattleText2: ; 82363 (20:6363)
+_RocketHide4AfterBattleText2:
     db $0,"Do you have",$4f
     db "something against",$55
     db "TEAM ROCKET?",$57
 
-_RocketHideout4BattleText3: ; 8238f (20:638f)
+_RocketHideout4BattleText3:
     db $0,"How can you not",$4f
     db "see the beauty of",$55
     db "our evil?",$57
 
-_RocketHideout4EndBattleText3: ; 823bc (20:63bc)
+_RocketHideout4EndBattleText3:
     db $0,"Ayaya!",$58
 
-_RocketHide4AfterBattleText3: ; 823c4 (20:63c4)
+_RocketHide4AfterBattleText3:
     db $0,"BOSS! I'm sorry I",$4f
     db "failed you!",$57
 
-_RocketHideout4BattleText4: ; 823e2 (20:63e2)
+_RocketHideout4BattleText4:
     db $0,"The elevator",$4f
     db "doesn't work? Who",$55
     db "has the LIFT KEY?",$57
 
-_RocketHideout4EndBattleText4: ; 82413 (20:6413)
+_RocketHideout4EndBattleText4:
     db $0,"No!",$58
 
-_UnnamedText_455ec: ; 82418 (20:6418)
+_UnnamedText_455ec:
     db $0,"Oh no! I dropped",$4f
     db "the LIFT KEY!",$57
 
-_UnnamedText_4578b: ; 82438 (20:6438)
+_UnnamedText_4578b:
     db $0,"It appears to",$4f
     db "need a key.@@"
 
-_UnnamedText_59ded: ; 82454 (20:6454)
+_UnnamedText_59ded:
     db $0,"Eeek!",$4f
     db "No! Stop! Help!",$51
     db "Oh,you're not",$4f
@@ -118431,9 +118429,7 @@ _UnnamedText_59ded: ; 82454 (20:6454)
     db "I'm sorry. Here,",$55
     db "please take this!",$58
 
-SECTION "_TM36ExplanationText",ROMX[$64c9],BANK[$20]
-
-_TM36ExplanationText: ; 824c9 (20:64c9)
+_TM36ExplanationText:
     db $0,"TM36 is",$4f
     db "SELFDESTRUCT!",$51
     db "It's powerful,but",$4f
@@ -118441,185 +118437,185 @@ _TM36ExplanationText: ; 824c9 (20:64c9)
     db "uses it faints!",$55
     db "Be careful.",$57
 
-_TM36NoRoomText: ; 8251c (20:651c)
+_TM36NoRoomText:
     db $0,"You don't have any",$4f
     db "room for this.",$57
 
-_SilphCo2BattleText1: ; 8253e (20:653e)
+_SilphCo2BattleText1:
     db $0,"Help! I'm a SILPH",$4f
     db "employee.",$57
 
-_SilphCo2EndBattleText1: ; 8255a (20:655a)
+_SilphCo2EndBattleText1:
     db $0,"How",$4f
     db "did you know I",$55
     db "was a ROCKET?",$58
 
-_SilphCo2AfterBattleText1: ; 8257c (20:657c)
+_SilphCo2AfterBattleText1:
     db $0,"I work for both",$4f
     db "SILPH and TEAM",$55
     db "ROCKET!",$57
 
-_SilphCo2BattleText2: ; 825a4 (20:65a4)
+_SilphCo2BattleText2:
     db $0,"It's off limits",$4f
     db "here! Go home!",$57
 
-_SilphCo2EndBattleText2: ; 825c3 (20:65c3)
+_SilphCo2EndBattleText2:
     db $0,"You're",$4f
     db "good.",$58
 
-_SilphCo2AfterBattleText2: ; 825d0 (20:65d0)
+_SilphCo2AfterBattleText2:
     db $0,"Can you solve the",$4f
     db "maze in here?",$57
 
-_SilphCo2BattleText3: ; 825f1 (20:65f1)
+_SilphCo2BattleText3:
     db $0,"No kids are",$4f
     db "allowed in here!",$57
 
-_SilphCo2EndBattleText3: ; 8260f (20:660f)
+_SilphCo2EndBattleText3:
     db $0,"Tough!",$58
 
-_SilphCo2AfterBattleText3: ; 82617 (20:6617)
+_SilphCo2AfterBattleText3:
     db $0,"Diamond shaped",$4f
     db "tiles are",$55
     db "teleport blocks!",$51
     db "They're hi-tech",$4f
     db "transporters!",$57
 
-_SilphCo2BattleText4: ; 8265f (20:665f)
+_SilphCo2BattleText4:
     db $0,"Hey kid! What are",$4f
     db "you doing here?",$57
 
-_SilphCo2EndBattleText4: ; 82682 (20:6682)
+_SilphCo2EndBattleText4:
     db $0,"I goofed!",$58
 
-_SilphCo2AfterBattleText4: ; 8268d (20:668d)
+_SilphCo2AfterBattleText4:
     db $0,"SILPH CO. will",$4f
     db "be merged with",$55
     db "TEAM ROCKET!",$57
 
-_UnnamedText_59ff9: ; 826b9 (20:66b9)
+_UnnamedText_59ff9:
     db $0,"I work for SILPH.",$4f
     db "What should I do?",$57
 
-_UnnamedText_59ffe: ; 826de (20:66de)
+_UnnamedText_59ffe:
     db $0,$52,"! You and",$4f
     db "your #MON",$55
     db "saved us!",$57
 
-_SilphCo3BattleText1: ; 826fe (20:66fe)
+_SilphCo3BattleText1:
     db $0,"Quit messing with",$4f
     db "us,kid!",$57
 
-_SilphCo3EndBattleText1: ; 8271a (20:671a)
+_SilphCo3EndBattleText1:
     db $0,"I give",$4f
     db "up!",$58
 
-_SilphCo3AfterBattleText1: ; 82726 (20:6726)
+_SilphCo3AfterBattleText1:
     db $0,"A hint? You can",$4f
     db "open doors with a",$55
     db "CARD KEY!",$57
 
-_SilphCo3BattleText2: ; 82753 (20:6753)
+_SilphCo3BattleText2:
     db $0,"I support TEAM",$4f
     db "ROCKET more than",$55
     db "I support SILPH!",$57
 
-_SilphCo3EndBattleText2: ; 82785 (20:6785)
+_SilphCo3EndBattleText2:
     db $0,"You",$4f
     db "really got me!",$58
 
-_SilphCo3AfterBattleText2: ; 82799 (20:6799)
+_SilphCo3AfterBattleText2:
     db $0,"Humph...",$51
     db "TEAM ROCKET said",$4f
     db "that if I helped",$55
     db "them,they'd let",$55
     db "me study #MON!",$57
 
-_UnnamedText_19de0: ; 827e4 (20:67e4)
+_UnnamedText_19de0:
     db $0,"Sssh! Can't you",$4f
     db "see I'm hiding?",$57
 
-_UnnamedText_19de5: ; 82803 (20:6803)
+_UnnamedText_19de5:
     db $0,"Huh? TEAM ROCKET",$4f
     db "is gone?",$57
 
-_SilphCo4BattleText2: ; 8281e (20:681e)
+_SilphCo4BattleText2:
     db $0,"TEAM ROCKET has",$4f
     db "taken command of",$55
     db "SILPH CO.!",$57
 
-_SilphCo4EndBattleText2: ; 8284b (20:684b)
+_SilphCo4EndBattleText2:
     db $0,"Arrgh!",$58
 
-_SilphCo4AfterBattleText2: ; 82853 (20:6853)
+_SilphCo4AfterBattleText2:
     db $0,"Fwahahaha!",$4f
     db "My BOSS has been",$55
     db "after this place!",$57
 
-_SilphCo4BattleText3: ; 82882 (20:6882)
+_SilphCo4BattleText3:
     db $0,"My #MON are my",$4f
     db "loyal soldiers!",$57
 
-_SilphCo4EndBattleText3: ; 828a2 (20:68a2)
+_SilphCo4EndBattleText3:
     db $0,"Darn!",$4f
     db "You weak #MON!",$58
 
-_SilphCo4AfterBattleText3: ; 828b8 (20:68b8)
+_SilphCo4AfterBattleText3:
     db $0,"The doors are",$4f
     db "electronically",$55
     db "locked! A CARD",$55
     db "KEY opens them!",$57
 
-_SilphCo4BattleText4: ; 828f5 (20:68f5)
+_SilphCo4BattleText4:
     db $0,"Intruder spotted!",$57
 
-_SilphCo4EndBattleText4: ; 82908 (20:6908)
+_SilphCo4EndBattleText4:
     db $0,"Who",$4f
     db "are you?",$58
 
-_SilphCo4AfterBattleText4: ; 82916 (20:6916)
+_SilphCo4AfterBattleText4:
     db $0,"I better tell the",$4f
     db "BOSS on 11F!",$57
 
-_UnnamedText_1a010: ; 82936 (20:6936)
+_UnnamedText_1a010:
     db $0,"TEAM ROCKET is",$4f
     db "in an uproar over",$55
     db "some intruder.",$55
     db "That's you right?",$57
 
-_UnnamedText_1a015: ; 82978 (20:6978)
+_UnnamedText_1a015:
     db $0,"TEAM ROCKET took",$4f
     db "off! You're our",$55
     db "hero! Thank you!",$57
 
-_SilphCo5BattleText2: ; 829aa (20:69aa)
+_SilphCo5BattleText2:
     db $0,"I heard a kid was",$4f
     db "wandering around.",$57
 
-_SilphCo5EndBattleText2: ; 829cf (20:69cf)
+_SilphCo5EndBattleText2:
     db $0,"Boom!",$58
 
-_SilphCo5AfterBattleText2: ; 829d6 (20:69d6)
+_SilphCo5AfterBattleText2:
     db $0,"It's not smart",$4f
     db "to pick a fight",$55
     db "with TEAM ROCKET!",$57
 
-_SilphCo5BattleText3: ; 82a07 (20:6a07)
+_SilphCo5BattleText3:
     db $0,"We study #",$4f
     db "BALL technology",$55
     db "on this floor!",$57
 
-_SilphCo5EndBattleText3: ; 82a32 (20:6a32)
+_SilphCo5EndBattleText3:
     db $0,"Dang!",$4f
     db "Blast it!",$58
 
-_SilphCo5AfterBattleText3: ; 82a43 (20:6a43)
+_SilphCo5AfterBattleText3:
     db $0,"We worked on the",$4f
     db "ultimate #",$55
     db "BALL which would",$55
     db "catch anything!",$57
 
-_SilphCo5BattleText4: ; 82a81 (20:6a81)
+_SilphCo5BattleText4:
     db $0,"Whaaat? There",$4f
     db "shouldn't be any",$55
     db "children here?",$57
@@ -118677,29 +118673,29 @@ _PreHM07Text:
 
 SECTION "bank21",ROMX,BANK[$21]
 
-_SilphCo5EndBattleText4: ; 84000 (21:4000)
+_SilphCo5EndBattleText4:
     db $0,"Oh",$4f
     db "goodness!",$58
 
-_SilphCo5AfterBattleText4: ; 8400e (21:400e)
+_SilphCo5AfterBattleText4:
     db $0,"You're only on 5F.",$4f
     db "It's a long way",$55
     db "to my BOSS!",$57
 
-_SilphCo5BattleText5: ; 8403c (21:403c)
+_SilphCo5BattleText5:
     db $0,"Show TEAM ROCKET",$4f
     db "a little respect!",$57
 
-_SilphCo5EndBattleText5: ; 84060 (21:4060)
+_SilphCo5EndBattleText5:
     db $0,"Cough...",$4f
     db "Cough...",$58
 
-_SilphCo5AfterBattleText5: ; 84073 (21:4073)
+_SilphCo5AfterBattleText5:
     db $0,"Which reminds me.",$51
     db "KOFFING evolves",$4f
     db "into WEEZING!",$57
 
-_SilphCo5Text9: ; 840a4 (21:40a4)
+_SilphCo5Text9:
     db $0,"It's a #MON",$4f
     db "REPORT!",$51
     db "#MON LAB",$4f
@@ -118707,109 +118703,109 @@ _SilphCo5Text9: ; 840a4 (21:40a4)
     db "the first virtual",$55
     db "reality #MON.",$57
 
-_SilphCo5Text10: ; 840f2 (21:40f2)
+_SilphCo5Text10:
     db $0,"It's a #MON",$4f
     db "REPORT!",$51
     db "Over 160 #MON",$4f
     db "techniques have",$55
     db "been confirmed.",$57
 
-_SilphCo5Text11: ; 84134 (21:4134)
+_SilphCo5Text11:
     db $0,"It's a #MON",$4f
     db "REPORT!",$51
     db "4 #MON evolve",$4f
     db "only when traded",$55
     db "by link-cable.",$57
 
-_UnnamedText_1a24a: ; 84176 (21:4176)
+_UnnamedText_1a24a:
     db $0,"The ROCKETs came",$4f
     db "and took over the",$55
     db "building!",$57
 
-_UnnamedText_1a24f: ; 841a4 (21:41a4)
+_UnnamedText_1a24f:
     db $0,"Well,better get",$4f
     db "back to work!",$57
 
-_UnnamedText_1a261: ; 841c4 (21:41c4)
+_UnnamedText_1a261:
     db $0,"Oh dear,oh dear.",$4f
     db "Help me please!",$57
 
-_UnnamedText_1a266: ; 841e7 (21:41e7)
+_UnnamedText_1a266:
     db $0,"We got engaged!",$4f
     db "Heheh!",$57
 
-_UnnamedText_1a278: ; 841ff (21:41ff)
+_UnnamedText_1a278:
     db $0,"Look at him! He's",$4f
     db "such a coward!",$57
 
-_UnnamedText_1a27d: ; 84220 (21:4220)
+_UnnamedText_1a27d:
     db $0,"I feel so sorry",$4f
     db "for him,I have",$55
     db "to marry him!",$57
 
-_UnnamedText_1a28f: ; 8424f (21:424f)
+_UnnamedText_1a28f:
     db $0,"TEAM ROCKET is",$4f
     db "trying to conquer",$55
     db "the world with",$55
     db "#MON!",$57
 
-_UnnamedText_1a294: ; 84286 (21:4286)
+_UnnamedText_1a294:
     db $0,"TEAM ROCKET ran",$4f
     db "because of you!",$57
 
-_UnnamedText_1a2a6: ; 842a7 (21:42a7)
+_UnnamedText_1a2a6:
     db $0,"They must have",$4f
     db "targeted SILPH",$55
     db "for our #MON",$55
     db "products.",$57
 
-_UnnamedText_1a2ab: ; 842dd (21:42dd)
+_UnnamedText_1a2ab:
     db $0,"Come work for",$4f
     db "SILPH when you",$55
     db "get older!",$57
 
-_SilphCo6BattleText2: ; 84306 (21:4306)
+_SilphCo6BattleText2:
     db $0,"I am one of the 4",$4f
     db "ROCKET BROTHERS!",$57
 
-_SilphCo6EndBattleText2: ; 8432a (21:432a)
+_SilphCo6EndBattleText2:
     db $0,"Flame",$4f
     db "out!",$58
 
-_SilphCo6AfterBattleText2: ; 84336 (21:4336)
+_SilphCo6AfterBattleText2:
     db $0,"No matter!",$4f
     db "My brothers will",$55
     db "avenge me!",$57
 
-_SilphCo6BattleText3: ; 8435e (21:435e)
+_SilphCo6BattleText3:
     db $0,"That rotten",$4f
     db "PRESIDENT!",$51
     db "He shouldn't have",$4f
     db "sent me to the",$55
     db "TIKSI BRANCH!",$57
 
-_SilphCo6EndBattleText3: ; 843a4 (21:43a4)
+_SilphCo6EndBattleText3:
     db $0,"Shoot!",$58
 
-_SilphCo6AfterBattleText3: ; 843ac (21:43ac)
+_SilphCo6AfterBattleText3:
     db $0,"TIKSI BRANCH?",$4f
     db "It's in Russian",$55
     db "no man's land!",$57
 
-_SilphCo6BattleText4: ; 843d8 (21:43d8)
+_SilphCo6BattleText4:
     db $0,"You dare betray",$4f
     db "TEAM ROCKET?",$57
 
-_SilphCo6EndBattleText4: ; 843f6 (21:43f6)
+_SilphCo6EndBattleText4:
     db $0,"You",$4f
     db "traitor!",$58
 
-_SilphCo6AfterBattleText4: ; 84404 (21:4404)
+_SilphCo6AfterBattleText4:
     db $0,"If you stand for",$4f
     db "justice,you",$55
     db "betray evil!",$57
 
-_UnnamedText_51dd3: ; 84430 (21:4430)
+_UnnamedText_51dd3:
     db $0,"Oh! Hi! You're",$4f
     db "not a ROCKET! You",$55
     db "came to save us?",$55
@@ -118818,7 +118814,7 @@ _UnnamedText_51dd3: ; 84430 (21:4430)
     db "have this #MON",$55
     db "for saving us.",$58
 
-_UnnamedText_51dd8: ; 8449e (21:449e)
+_UnnamedText_51dd8:
     db $0,"It's PORYGON. It's",$4f
     db "very intelligent.",$51
     db "We create it in",$4f
@@ -118831,109 +118827,107 @@ _UnnamedText_51dd8: ; 8449e (21:449e)
     db "It can also Hack",$4f
     db "Computers!",$57
 
-SECTION "_UnnamedText_51ddd",ROMX[$455a],BANK[$21]
-
-_UnnamedText_51ddd: ; 8455a (21:455a)
+_UnnamedText_51ddd:
     db $0,"TEAM ROCKET's",$4f
     db "BOSS went to the",$55
     db "boardroom! Is our",$55
     db "PRESIDENT OK?",$57
 
-_UnnamedText_51de2: ; 84599 (21:4599)
+_UnnamedText_51de2:
     db $0,"Saved at last!",$4f
     db "Thank you!",$57
 
-_UnnamedText_51e00: ; 845b4 (21:45b4)
+_UnnamedText_51e00:
     db $0,"TEAM ROCKET was",$4f
     db "after the MASTER",$55
     db "BALL which will",$55
     db "catch any #MON!",$57
 
-_UnnamedText_51e05: ; 845f6 (21:45f6)
+_UnnamedText_51e05:
     db $0,"We canceled the",$4f
     db "MASTER BALL",$55
     db "project because",$55
     db "of TEAM ROCKET.",$57
 
-_UnnamedText_51e23: ; 84633 (21:4633)
+_UnnamedText_51e23:
     db $0,"It would be bad",$4f
     db "if TEAM ROCKET",$55
     db "took over SILPH",$55
     db "or our #MON!",$57
 
-_UnnamedText_51e28: ; 84670 (21:4670)
+_UnnamedText_51e28:
     db $0,"Wow! You chased",$4f
     db "off TEAM ROCKET",$55
     db "all by yourself?",$57
 
-_UnnamedText_51e46: ; 846a2 (21:46a2)
+_UnnamedText_51e46:
     db $0,"You! It's really",$4f
     db "dangerous here!",$55
     db "You came to save",$55
     db "me? You can't!",$57
 
-_UnnamedText_51e4b: ; 846e2 (21:46e2)
+_UnnamedText_51e4b:
     db $0,"Safe at last!",$4f
     db "Oh thank you!",$57
 
-_SilphCo7BattleText1: ; 846ff (21:46ff)
+_SilphCo7BattleText1:
     db $0,"Oh ho! I smell a",$4f
     db "little rat!",$57
 
-_SilphCo7EndBattleText1: ; 8471d (21:471d)
+_SilphCo7EndBattleText1:
     db $0,"Lights",$4f
     db "out!",$58
 
-_SilphCo7AfterBattleText1: ; 8472a (21:472a)
+_SilphCo7AfterBattleText1:
     db $0,"You won't find my",$4f
     db "BOSS by just",$55
     db "scurrying around!",$57
 
-_SilphCo7BattleText2: ; 8475b (21:475b)
+_SilphCo7BattleText2:
     db $0,"Heheh!",$51
     db "You mistook me for",$4f
     db "a SILPH worker?",$57
 
-_SilphCo7EndBattleText2: ; 84786 (21:4786)
+_SilphCo7EndBattleText2:
     db $0,"I'm",$4f
     db "done!",$58
 
-_SilphCo7AfterBattleText2: ; 84790 (21:4790)
+_SilphCo7AfterBattleText2:
     db $0,"Despite your age,",$4f
     db "you are a skilled",$55
     db "trainer!",$57
 
-_SilphCo7BattleText3: ; 847be (21:47be)
+_SilphCo7BattleText3:
     db $0,"I am one of the 4",$4f
     db "ROCKET BROTHERS!",$57
 
-_SilphCo7EndBattleText3: ; 847e2 (21:47e2)
+_SilphCo7EndBattleText3:
     db $0,"Aack!",$4f
     db "Brothers,I lost!",$58
 
-_SilphCo7AfterBattleText3: ; 847fb (21:47fb)
+_SilphCo7AfterBattleText3:
     db $0,"Doesn't matter.",$4f
     db "My brothers will",$55
     db "repay the favor!",$57
 
-_SilphCo7BattleText4: ; 8482d (21:482d)
+_SilphCo7BattleText4:
     db $0,"A child intruder?",$4f
     db "That must be you!",$57
 
-_SilphCo7EndBattleText4: ; 84852 (21:4852)
+_SilphCo7EndBattleText4:
     db $0,"Fine!",$4f
     db "I lost!",$58
 
-_SilphCo7AfterBattleText4: ; 84861 (21:4861)
+_SilphCo7AfterBattleText4:
     db $0,"Go on home",$4f
     db "before my BOSS",$55
     db "gets ticked off!",$57
 
-_UnnamedText_51ebe: ; 8488d (21:488d)
+_UnnamedText_51ebe:
     db $0,$53,": What",$4f
     db "kept you ",$52,"?",$57
 
-_UnnamedText_51ec3: ; 848a2 (21:48a2)
+_UnnamedText_51ec3:
     db $0,$53,": Hahaha!",$4f
     db "I thought you'd",$55
     db "turn up if I",$55
@@ -118947,19 +118941,19 @@ _UnnamedText_51ec3: ; 848a2 (21:48a2)
     db "decided to see if",$55
     db "you got better!",$57
 
-_UnnamedText_51ec8: ; 8494a (21:494a)
+_UnnamedText_51ec8:
     db $0,"Oh ho!",$4f
     db "So,you are ready",$55
     db "for BOSS ROCKET!",$58
 
-_UnnamedText_51ecd: ; 84975 (21:4975)
+_UnnamedText_51ecd:
     db $0,$53,": How can",$4f
     db "I put this?",$51
     db "You're not good",$4f
     db "enough to play",$55
     db "with us big boys!",$58
 
-_UnnamedText_51ed2: ; 849bd (21:49bd)
+_UnnamedText_51ed2:
     db $0,"Well,",$52,"!",$51
     db "I'm moving on up",$4f
     db "and ahead!",$51
@@ -118980,139 +118974,139 @@ _UnnamedText_51ed2: ; 849bd (21:49bd)
     db "Don't sweat it!",$55
     db "Smell ya!",$57
 
-_UnnamedText_565be: ; 84ac4 (21:4ac4)
+_UnnamedText_565be:
     db $0,"I wonder if SILPH",$4f
     db "is finished...",$57
 
-_UnnamedText_565c3: ; 84ae6 (21:4ae6)
+_UnnamedText_565c3:
     db $0,"Thanks for saving",$4f
     db "us!",$57
 
-_SilphCo8BattleText1: ; 84afd (21:4afd)
+_SilphCo8BattleText1:
     db $0,"That's as far as",$4f
     db "you'll go!",$57
 
-_SilphCo8EndBattleText1: ; 84b18 (21:4b18)
+_SilphCo8EndBattleText1:
     db $0,"Not",$4f
     db "enough grit!",$58
 
-_SilphCo8AfterBattleText1: ; 84b2a (21:4b2a)
+_SilphCo8AfterBattleText1:
     db $0,"If you don't turn",$4f
     db "back,I'll call",$55
     db "for backup!",$57
 
-_SilphCo8BattleText2: ; 84b57 (21:4b57)
+_SilphCo8BattleText2:
     db $0,"You're causing us",$4f
     db "problems!",$57
 
-_SilphCo8EndBattleText2: ; 84b73 (21:4b73)
+_SilphCo8EndBattleText2:
     db $0,"Huh?",$4f
     db "I lost?",$58
 
-_SilphCo8AfterBattleText2: ; 84b81 (21:4b81)
+_SilphCo8AfterBattleText2:
     db $0,"So,what do you",$4f
     db "think of SILPH",$55
     db "BUILDING's maze?",$57
 
-_SilphCo8BattleText3: ; 84bb1 (21:4bb1)
+_SilphCo8BattleText3:
     db $0,"I am one of the 4",$4f
     db "ROCKET BROTHERS!",$57
 
-_SilphCo8EndBattleText3: ; 84bd5 (21:4bd5)
+_SilphCo8EndBattleText3:
     db $0,"Whoo!",$4f
     db "Oh brothers!",$58
 
-_SilphCo8AfterBattleText3: ; 84be9 (21:4be9)
+_SilphCo8AfterBattleText3:
     db $0,"I'll leave you up",$4f
     db "to my brothers!",$57
 
-_UnnamedText_5d8e5: ; 84c0b (21:4c0b)
+_UnnamedText_5d8e5:
     db $0,"You look tired!",$4f
     db "You should take a",$55
     db "quick nap!",$58
 
-_UnnamedText_5d8ea: ; 84c39 (21:4c39)
+_UnnamedText_5d8ea:
     db $0,"Don't give up!",$57
 
-_UnnamedText_5d8ef: ; 84c48 (21:4c48)
+_UnnamedText_5d8ef:
     db $0,"Thank you so",$4f
     db "much!",$57
 
-_SilphCo9BattleText1: ; 84c5c (21:4c5c)
+_SilphCo9BattleText1:
     db $0,"Your #MON seem",$4f
     db "to adore you,kid!",$57
 
-_SilphCo9EndBattleText1: ; 84c7f (21:4c7f)
+_SilphCo9EndBattleText1:
     db $0,"Ghaaah!",$58
 
-_SilphCo9AfterBattleText1: ; 84c88 (21:4c88)
+_SilphCo9AfterBattleText1:
     db $0,"If I had started",$4f
     db "as a trainer at",$55
     db "your age...",$57
 
-_SilphCo9BattleText2: ; 84cb6 (21:4cb6)
+_SilphCo9BattleText2:
     db $0,"Your #MON have",$4f
     db "weak points! I",$55
     db "can nail them!",$57
 
-_SilphCo9EndBattleText2: ; 84ce4 (21:4ce4)
+_SilphCo9EndBattleText2:
     db $0,"You",$4f
     db "hammered me!",$58
 
-_SilphCo9AfterBattleText2: ; 84cf6 (21:4cf6)
+_SilphCo9AfterBattleText2:
     db $0,"Exploiting weak",$4f
     db "spots does work!",$55
     db "Think about",$55
     db "element types!",$57
 
-_SilphCo9BattleText3: ; 84d33 (21:4d33)
+_SilphCo9BattleText3:
     db $0,"I am one of the 4",$4f
     db "ROCKET BROTHERS!",$57
 
-_SilphCo9EndBattleText3: ; 84d57 (21:4d57)
+_SilphCo9EndBattleText3:
     db $0,"Warg!",$4f
     db "Brothers,I lost!",$58
 
-_SilphCo9AfterBattleText3: ; 84d70 (21:4d70)
+_SilphCo9AfterBattleText3:
     db $0,"My brothers will",$4f
     db "avenge me!",$57
 
-_UnnamedText_5a1d3: ; 84d8d (21:4d8d)
+_UnnamedText_5a1d3:
     db $0,"Waaaaa!",$55
     db "I'm scared!",$57
 
-_UnnamedText_5a1d8: ; 84da1 (21:4da1)
+_UnnamedText_5a1d8:
     db $0,"Please keep quiet",$4f
     db "about my crying!",$57
 
-_SilphCo10BattleText1: ; 84dc5 (21:4dc5)
+_SilphCo10BattleText1:
     db $0,"Welcome to the",$4f
     db "10F! So good of",$55
     db "you to join me!",$57
 
-_SilphCo10EndBattleText1: ; 84df5 (21:4df5)
+_SilphCo10EndBattleText1:
     db $0,"I'm",$4f
     db "stunned!",$58
 
-_SilphCo10AfterBattleText1: ; 84e02 (21:4e02)
+_SilphCo10AfterBattleText1:
     db $0,"Nice try,but the",$4f
     db "boardroom is up",$55
     db "one more floor!",$57
 
-_SilphCo10BattleText2: ; 84e35 (21:4e35)
+_SilphCo10BattleText2:
     db $0,"Enough of your",$4f
     db "silly games!",$57
 
-_SilphCo10EndBattleText2: ; 84e52 (21:4e52)
+_SilphCo10EndBattleText2:
     db $0,"No",$4f
     db "continues left!",$58
 
-_SilphCo10AfterBattleText2: ; 84e66 (21:4e66)
+_SilphCo10AfterBattleText2:
     db $0,"Are you satisfied",$4f
     db "with beating me?",$55
     db "Then go on home!",$57
 
-_SilphCoPresidentText: ; 84e9b (21:4e9b)
+_SilphCoPresidentText:
     db $0,"PRESIDENT: Thank",$4f
     db "you for saving",$55
     db "SILPH!",$51
@@ -119128,13 +119122,13 @@ _SilphCoPresidentText: ; 84e9b (21:4e9b)
     db "Here,maybe this",$4f
     db "will do!",$58
 
-_ReceivedSilphCoMasterBallText: ; 84f63 (21:4f63)
+_ReceivedSilphCoMasterBallText:
     db $0,$52," got a",$4f
     db "@"
     TX_RAM $cf4b
     db $0,"!@@"
 
-_UnnamedText_6231c: ; 84f74 (21:4f74)
+_UnnamedText_6231c:
     db $0,"PRESIDENT: You",$4f
     db "can't buy that",$55
     db "anywhere!",$51
@@ -119148,18 +119142,18 @@ _UnnamedText_6231c: ; 84f74 (21:4f74)
     db "quiet about using",$55
     db "it,though.",$57
 
-_SilphCoMasterBallNoRoomText: ; 85013 (21:5013)
+_SilphCoMasterBallNoRoomText:
     db $0,"You have no",$4f
     db "room for this.",$57
 
-_SilphCo11Text2: ; 8502f (21:502f)
+_SilphCo11Text2:
     db $0,"SECRETARY: Thank",$4f
     db "you for rescuing",$55
     db "all of us!",$51
     db "We admire your",$4f
     db "courage.",$57
 
-_SilphCo11Text3: ; 85075 (21:5075)
+_SilphCo11Text3:
     db $0,"Ah ",$52,"!",$4f
     db "So we meet again!",$51
     db "The PRESIDENT and",$4f
@@ -119172,11 +119166,11 @@ _SilphCo11Text3: ; 85075 (21:5075)
     db "Or,experience a",$4f
     db "world of pain!",$57
 
-_UnnamedText_62330: ; 85119 (21:5119)
+_UnnamedText_62330:
     db $0,"Arrgh!!",$4f
     db "I lost again!?",$58
 
-_UnnamedText_62335: ; 85131 (21:5131)
+_UnnamedText_62335:
     db $0,"Blast it all!",$4f
     db "You ruined our",$55
     db "plans for SILPH!",$51
@@ -119189,51 +119183,51 @@ _UnnamedText_62335: ; 85131 (21:5131)
     db "I must go,but I",$4f
     db "shall return!",$57
 
-_SilphCo11BattleText1: ; 851d6 (21:51d6)
+_SilphCo11BattleText1:
     db $0,"Stop right there!",$4f
     db "Don't you move!",$57
 
-_SilphCo11EndBattleText1: ; 851f8 (21:51f8)
+_SilphCo11EndBattleText1:
     db $0,"Don't...",$4f
     db "Please!",$58
 
-_SilphCo11AfterBattleText1: ; 85209 (21:5209)
+_SilphCo11AfterBattleText1:
     db $0,"So,you want to",$4f
     db "see my BOSS?",$57
 
-_SilphCo11BattleText2: ; 85227 (21:5227)
+_SilphCo11BattleText2:
     db $0,"Halt! Do you have",$4f
     db "an appointment",$55
     db "with my BOSS?",$57
 
-_SilphCo11EndBattleText2: ; 85257 (21:5257)
+_SilphCo11EndBattleText2:
     db $0,"Gaah!",$4f
     db "Demolished!",$58
 
-_SilphCo11AfterBattleText2: ; 8526a (21:526a)
+_SilphCo11AfterBattleText2:
     db $0,"Watch your step,",$4f
     db "my BOSS likes his",$55
     db "#MON tough!",$57
 
-_UnnamedText_6237b: ; 8529a (21:529a)
+_UnnamedText_6237b:
     db $0,"The monitor has",$4f
     db "#MON on it!",$57
 
-_Mansion2BattleText1: ; 852b7 (21:52b7)
+_Mansion2BattleText1:
     db $0,"I can't get out!",$4f
     db "This old place is",$55
     db "one big puzzle!",$57
 
-_Mansion2EndBattleText1: ; 852ea (21:52ea)
+_Mansion2EndBattleText1:
     db $0,"Oh no!",$4f
     db "My bag of loot!",$58
 
-_Mansion2AfterBattleText1: ; 85302 (21:5302)
+_Mansion2AfterBattleText1:
     db $0,"Switches open and",$4f
     db "close alternating",$55
     db "sets of doors!",$57
 
-_Mansion2Text3: ; 85336 (21:5336)
+_Mansion2Text3:
     db $0,"Diary: July 5",$4f
     db "Guyana,",$55
     db "South America",$51
@@ -119241,77 +119235,77 @@ _Mansion2Text3: ; 85336 (21:5336)
     db "discovered deep",$55
     db "in the jungle.",$57
 
-_Mansion2Text4: ; 85389 (21:5389)
+_Mansion2Text4:
     db $0,"Diary: July 10",$4f
     db "We christened the",$55
     db "newly discovered",$55
     db "#MON,MEW.",$57
 
-_UnnamedText_520c2: ; 853c7 (21:53c7)
+_UnnamedText_520c2:
     db $0,"A secret switch!",$51
     db "Press it?",$57
 
-_UnnamedText_520c7: ; 853e3 (21:53e3)
+_UnnamedText_520c7:
     db $0,"Who wouldn't?",$58
 
-_UnnamedText_520cc: ; 853f1 (21:53f1)
+_UnnamedText_520cc:
     db $0,"Not quite yet!",$57
 
-_Mansion3BattleText1: ; 85401 (21:5401)
+_Mansion3BattleText1:
     db $0,"This place is",$4f
     db "like,huge!",$57
 
-_Mansion3EndBattleText1: ; 8541c (21:541c)
+_Mansion3EndBattleText1:
     db $0,"Ayah!",$58
 
-_Mansion3AfterBattleText1: ; 85423 (21:5423)
+_Mansion3AfterBattleText1:
     db $0,"I wonder where",$4f
     db "my partner went.",$57
 
-_Mansion3BattleText2: ; 85444 (21:5444)
+_Mansion3BattleText2:
     db $0,"My mentor once",$4f
     db "lived here.",$57
 
-_Mansion3EndBattleText2: ; 85460 (21:5460)
+_Mansion3EndBattleText2:
     db $0,"Whew!",$4f
     db "Overwhelming!",$58
 
-_Mansion3AfterBattleText2: ; 85475 (21:5475)
+_Mansion3AfterBattleText2:
     db $0,"So,you're stuck?",$4f
     db "Try jumping off",$55
     db "over there!",$57
 
-_Mansion3Text5: ; 854a3 (21:54a3)
+_Mansion3Text5:
     db $0,"Diary: Feb. 6",$4f
     db "MEW gave birth.",$51
     db "We named the",$4f
     db "newborn MEWTWO.",$57
 
-_Mansion4BattleText1: ; 854df (21:54df)
+_Mansion4BattleText1:
     db $0,"Uh-oh. Where am",$4f
     db "I now?",$57
 
-_Mansion4EndBattleText1: ; 854f7 (21:54f7)
+_Mansion4EndBattleText1:
     db $0,"Awooh!",$58
 
-_Mansion4AfterBattleText1: ; 854ff (21:54ff)
+_Mansion4AfterBattleText1:
     db $0,"You can find stuff",$4f
     db "lying around.",$57
 
-_Mansion4BattleText2: ; 85521 (21:5521)
+_Mansion4BattleText2:
     db $0,"This place is",$4f
     db "ideal for a lab.",$57
 
-_Mansion4EndBattleText2: ; 85541 (21:5541)
+_Mansion4EndBattleText2:
     db $0,"What",$4f
     db "was that for?",$58
 
-_Mansion4AfterBattleText2: ; 85555 (21:5555)
+_Mansion4AfterBattleText2:
     db $0,"I like it here!",$4f
     db "It's conducive to",$55
     db "my studies!",$57
 
-_Mansion4Text7: ; 85583 (21:5583)
+_Mansion4Text7:
     db $0,"Diary; Sept. 1",$4f
     db "MEWTWO is far too",$55
     db "powerful.",$51
@@ -119319,31 +119313,31 @@ _Mansion4Text7: ; 85583 (21:5583)
     db "curb its vicious",$55
     db "tendencies...",$57
 
-_SafariZoneEastText5: ; 855e0 (21:55e0)
+_SafariZoneEastText5:
     db $0,"REST HOUSE",$57
 
-_SafariZoneEastText6: ; 855ec (21:55ec)
+_SafariZoneEastText6:
     db $0,"TRAINER TIPS",$51
     db "The remaining time",$4f
     db "declines only",$55
     db "while you walk!",$57
 
-_SafariZoneEastText7: ; 8562b (21:562b)
+_SafariZoneEastText7:
     db $0,"CENTER AREA",$4f
     db "NORTH: AREA 2",$57
 
-_SafariZoneNorthText3: ; 85646 (21:5646)
+_SafariZoneNorthText3:
     db $0,"REST HOUSE",$57
 
-_SafariZoneNorthText4: ; 85652 (21:5652)
+_SafariZoneNorthText4:
     db $0,"TRAINER TIPS",$51
     db "The SECRET HOUSE",$4f
     db "is still ahead!",$57
 
-_SafariZoneNorthText5: ; 85681 (21:5681)
+_SafariZoneNorthText5:
     db $0,"AREA 2",$57
 
-_SafariZoneNorthText6: ; 85689 (21:5689)
+_SafariZoneNorthText6:
     db $0,"TRAINER TIPS",$51
     db "#MON hide in",$4f
     db "tall grass!",$51
@@ -119351,12 +119345,10 @@ _SafariZoneNorthText6: ; 85689 (21:5689)
     db "grassy areas to",$55
     db "flush them out.",$57
 
-SECTION "_SafariZoneWestText5",ROMX[$5719],BANK[$21]
-
-_SafariZoneWestText5: ; 85719 (21:5719)
+_SafariZoneWestText5:
     db $0,"REST HOUSE",$57
 
-_SafariZoneWestText6: ; 85725 (21:5725)
+_SafariZoneWestText6:
     db $0,"REQUEST NOTICE",$51
     db "Please find the",$4f
     db "SAFARI WARDEN's",$55
@@ -119366,37 +119358,37 @@ _SafariZoneWestText6: ; 85725 (21:5725)
     db "Reward offered!",$4f
     db "Contact: WARDEN",$57
 
-_SafariZoneWestText7: ; 857a3 (21:57a3)
+_SafariZoneWestText7:
     db $0,"TRAINER TIPS",$51
     db "Zone Exploration",$4f
     db "Campaign!",$51
     db "The Search for",$4f
     db "the SECRET HOUSE!",$57
 
-_SafariZoneWestText8: ; 857ed (21:57ed)
+_SafariZoneWestText8:
     db $0,"AREA 3",$4f
     db "EAST: CENTER AREA",$57
 
-_SafariZoneCenterText2: ; 85807 (21:5807)
+_SafariZoneCenterText2:
     db $0,"REST HOUSE",$57
 
-_SafariZoneCenterText3: ; 85813 (21:5813)
+_SafariZoneCenterText3:
     db $0,"TRAINER TIPS",$51
     db "Press the START",$4f
     db "Button to check",$55
     db "remaining time!",$57
 
-_SafariZoneRestHouse1Text1: ; 85851 (21:5851)
+_SafariZoneRestHouse1Text1:
     db $0,"SARA: Where did",$4f
     db "my boy friend,",$55
     db "ERIK,go?",$57
 
-_SafariZoneRestHouse1Text2: ; 8587b (21:587b)
+_SafariZoneRestHouse1Text2:
     db $0,"I'm catching",$4f
     db "#MON to take",$55
     db "home as gifts!",$57
 
-_PreHM03Text: ; 858a4 (21:58a4)
+_PreHM03Text:
     db $0,"Ah! Finally!",$51
     db "You're the first",$4f
     db "person to reach",$55
@@ -119408,7 +119400,7 @@ _PreHM03Text: ; 858a4 (21:58a4)
     db "Congratulations!",$4f
     db "You have won!",$58
 
-_HM03AfterText: ; 85957 (21:5957)
+_HM03AfterText:
     db $0,"This is FLOAT!",$51
     db "#MON will be",$4f
     db "able to support",$55
@@ -119421,41 +119413,39 @@ _HM03AfterText: ; 85957 (21:5957)
     db "for winning this",$55
     db "fabulous prize!",$57
 
-SECTION "_SafariZoneRestHouse2Text1",ROMX[$5a2f],BANK[$21]
-
-_SafariZoneRestHouse2Text1: ; 85a2f (21:5a2f)
+_SafariZoneRestHouse2Text1:
     db $0,"Tossing ROCKs at",$4f
     db "#MON might",$55
     db "make them run,",$55
     db "but they'll be",$55
     db "easier to catch.",$57
 
-_SafariZoneRestHouse2Text2: ; 85a7a (21:5a7a)
+_SafariZoneRestHouse2Text2:
     db $0,"Using BAIT will",$4f
     db "make #MON",$55
     db "easier to catch.",$57
 
-_SafariZoneRestHouse2Text3: ; 85aa6 (21:5aa6)
+_SafariZoneRestHouse2Text3:
     db $0,"I hiked a lot,but",$4f
     db "I didn't see any",$55
     db "#MON I wanted.",$57
 
-_SafariZoneRestHouse3Text1: ; 85ad9 (21:5ad9)
+_SafariZoneRestHouse3Text1:
     db $0,"How many did you",$4f
     db "catch? I'm bushed",$55
     db "from the work!",$57
 
-_SafariZoneRestHouse3Text2: ; 85b0b (21:5b0b)
+_SafariZoneRestHouse3Text2:
     db $0,"I caught a",$4f
     db "CHANSEY!",$51
     db "That makes this",$4f
     db "all worthwhile!",$57
 
-_SafariZoneRestHouse3Text3: ; 85b40 (21:5b40)
+_SafariZoneRestHouse3Text3:
     db $0,"Whew! I'm tired",$4f
     db "from all the fun!",$57
 
-_SafariZoneRestHouse4Text1: ; 85b62 (21:5b62)
+_SafariZoneRestHouse4Text1:
     db $0,"You can keep any",$4f
     db "item you find on",$55
     db "the ground here.",$51
@@ -119464,13 +119454,13 @@ _SafariZoneRestHouse4Text1: ; 85b62 (21:5b62)
     db "you try for all",$55
     db "of them at once!",$57
 
-_SafariZoneRestHouse4Text2: ; 85bd5 (21:5bd5)
+_SafariZoneRestHouse4Text2:
     db $0,"Go to the deepest",$4f
     db "part of the",$55
     db "SAFARI ZONE. You",$55
     db "will win a prize!",$57
 
-_SafariZoneRestHouse4Text3: ; 85c17 (21:5c17)
+_SafariZoneRestHouse4Text3:
     db $0,"My EEVEE evolved",$4f
     db "into FLAREON!",$51
     db "But,a friend's",$4f
@@ -119478,36 +119468,36 @@ _SafariZoneRestHouse4Text3: ; 85c17 (21:5c17)
     db "a VAPOREON!",$55
     db "I wonder why?",$57
 
-_UnknownDungeon4MewtwoText: ; 85c72 (21:5c72)
+_UnknownDungeon4MewtwoText:
     db $0,"Mew!@@"
 
-_VictoryRoad1BattleText1: ; 85c79 (21:5c79)
+_VictoryRoad1BattleText1:
     db $0,"I wonder if you",$4f
     db "are good enough",$55
     db "for me!",$57
 
-_VictoryRoad1EndBattleText1: ; 85ca2 (21:5ca2)
+_VictoryRoad1EndBattleText1:
     db $0,"I",$4f
     db "lost out!",$58
 
-_VictoryRoad1AfterBattleText1: ; 85caf (21:5caf)
+_VictoryRoad1AfterBattleText1:
     db $0,"I never wanted to",$4f
     db "lose to anybody!",$57
 
-_VictoryRoad1BattleText2: ; 85cd3 (21:5cd3)
+_VictoryRoad1BattleText2:
     db $0,"I can see you're",$4f
     db "good! Let me see",$55
     db "exactly how good!",$57
 
-_VictoryRoad1EndBattleText2: ; 85d07 (21:5d07)
+_VictoryRoad1EndBattleText2:
     db $0,"I",$4f
     db "had a chance...",$58
 
-_VictoryRoad1AfterBattleText2: ; 85d1a (21:5d1a)
+_VictoryRoad1AfterBattleText2:
     db $0,"I concede,you're",$4f
     db "better than me!",$57
 
-_LanceBeforeBattleText: ; 85d3c (21:5d3c)
+_LanceBeforeBattleText:
     db $0,"Ah! I heard about",$4f
     db "you ",$52,"!",$51
     db "I lead the ELITE",$4f
@@ -119529,13 +119519,13 @@ _LanceBeforeBattleText: ; 85d3c (21:5d3c)
     db "challenge ends",$55
     db "with me,",$52,"!",$57
 
-_LanceEndBattleText: ; 85e64 (21:5e64)
+_LanceEndBattleText:
     db $0,"That's it!",$51
     db "I hate to admit",$4f
     db "it,but you are a",$55
     db "#MON master!",$58
 
-_LanceAfterBattleText: ; 85e9e (21:5e9e)
+_LanceAfterBattleText:
     db $0,"I still can't",$4f
     db "believe my",$55
     db "dragons lost to",$55
@@ -119557,7 +119547,7 @@ _LanceAfterBattleText: ; 85e9e (21:5e9e)
     db "#MON LEAGUE",$55
     db "champion!@@"
 
-_HallofFameRoomText1: ; 85fb5 (21:5fb5)
+_HallofFameRoomText1:
     db $0,"OAK: Er-hem!",$4f
     db "Congratulations",$55
     db $52,"!",$51
@@ -119580,7 +119570,7 @@ _HallofFameRoomText1: ; 85fb5 (21:5fb5)
     db "your #MON are",$55
     db "HALL OF FAMERs!",$57
 
-_UnnamedText_760f4: ; 860e1 (21:60e1)
+_UnnamedText_760f4:
     db $0,$53,": Hey!",$51
     db "I was looking",$4f
     db "forward to seeing",$55
@@ -119607,7 +119597,7 @@ _UnnamedText_760f4: ; 860e1 (21:60e1)
     db "powerful trainer",$55
     db "in the world!",$57
 
-_UnnamedText_760f9: ; 8623b (21:623b)
+_UnnamedText_760f9:
     db $0,"NO!",$4f
     db "That can't be!",$55
     db "You beat my best!",$51
@@ -119618,7 +119608,7 @@ _UnnamedText_760f9: ; 8623b (21:623b)
     db "already?",$55
     db "It's not fair!",$58
 
-_UnnamedText_760fe: ; 862b4 (21:62b4)
+_UnnamedText_760fe:
     db $0,"Hahaha!",$4f
     db "I won,I won!",$51
     db "I'm too good for",$4f
@@ -119630,7 +119620,7 @@ _UnnamedText_760fe: ; 862b4 (21:62b4)
     db "Nice try,loser!",$4f
     db "Hahaha!",$58
 
-_UnnamedText_76103: ; 8632f (21:632f)
+_UnnamedText_76103:
     db $0,"Why?",$4f
     db "Why did I lose?",$51
     db "I never made any",$4f
@@ -119642,10 +119632,10 @@ _UnnamedText_76103: ; 8632f (21:632f)
     db "Although I don't",$4f
     db "like to admit it.",$57
 
-_GaryText2: ; 863c1 (21:63c1)
+_GaryText2:
     db $0,"OAK: ",$52,"!",$57
 
-_UnnamedText_76120: ; 863ca (21:63ca)
+_UnnamedText_76120:
     db $0,"OAK: So,you won!",$4f
     db "Congratulations!",$55
     db "You're the new",$55
@@ -119660,7 +119650,7 @@ _UnnamedText_76120: ; 863ca (21:63ca)
     db $52,",you have",$4f
     db "come of age!",$57
 
-_UnnamedText_76125: ; 86463 (21:6463)
+_UnnamedText_76125:
     db $0,"OAK: ",$53,"! I'm",$4f
     db "disappointed!",$51
     db "I came when I",$4f
@@ -119680,7 +119670,7 @@ _UnnamedText_76125: ; 86463 (21:6463)
     db "will never become",$55
     db "a champ again!",$57
 
-_UnnamedText_7612a: ; 86567 (21:6567)
+_UnnamedText_7612a:
     db $0,"OAK: ",$52,"!",$51
     db "You understand",$4f
     db "that your victory",$55
@@ -119692,7 +119682,7 @@ _UnnamedText_7612a: ; 86567 (21:6567)
     db $52,"!",$4f
     db "Come with me!",$57
 
-_LoreleiBeforeBattleText: ; 865ef (21:65ef)
+_LoreleiBeforeBattleText:
     db $0,"I am LORELEI of",$4f
     db "the ELITE FOUR!",$51
     db "No one can best",$4f
@@ -119707,11 +119697,11 @@ _LoreleiBeforeBattleText: ; 865ef (21:65ef)
     db "Hahaha!",$4f
     db "Are you ready?",$57
 
-_LoreleiEndBattleText: ; 866c4 (21:66c4)
+_LoreleiEndBattleText:
     db $0,"How",$4f
     db "dare you!",$58
 
-_LoreleiAfterBattleText: ; 866d3 (21:66d3)
+_LoreleiAfterBattleText:
     db $0,"You're better",$4f
     db "than I thought!",$55
     db "Go on ahead!",$51
@@ -119719,11 +119709,11 @@ _LoreleiAfterBattleText: ; 866d3 (21:66d3)
     db "taste of #MON",$55
     db "LEAGUE power!",$57
 
-_UnnamedText_7627b: ; 86729 (21:6729)
+_UnnamedText_7627b:
     db $0,"Someone's voice:",$4f
     db "Don't run away!",$57
 
-_BrunoBeforeBattleText: ; 86749 (21:6749)
+_BrunoBeforeBattleText:
     db $0,"Welcome to",$4f
     db "#MON LEAGUE!",$51
     db "I am BRUNO of",$4f
@@ -119741,20 +119731,20 @@ _BrunoBeforeBattleText: ; 86749 (21:6749)
     db "superior power!",$51
     db "Hoo hah!",$57
 
-_BrunoEndBattleText: ; 86805 (21:6805)
+_BrunoEndBattleText:
     db $0,"Why?",$4f
     db "How could I lose?",$58
 
-_BrunoAfterBattleText: ; 8681d (21:681d)
+_BrunoAfterBattleText:
     db $0,"My job is done!",$4f
     db "Go face your next",$55
     db "challenge!",$57
 
-_UnnamedText_763d2: ; 8684b (21:684b)
+_UnnamedText_763d2:
     db $0,"Someone's voice:",$4f
     db "Don't run away!",$57
 
-_AgathaBeforeBattleText: ; 8686b (21:686b)
+_AgathaBeforeBattleText:
     db $0,"I am AGATHA of",$4f
     db "the ELITE FOUR!",$51
     db "OAK's taken a lot",$4f
@@ -119773,12 +119763,12 @@ _AgathaBeforeBattleText: ; 8686b (21:686b)
     db "you how a real",$55
     db "trainer fights!",$57
 
-_AgathaEndBattleText: ; 86970 (21:6970)
+_AgathaEndBattleText:
     db $0,"Oh ho!",$4f
     db "You're something",$55
     db "special,child!",$58
 
-_AgathaAfterBattleText: ; 86998 (21:6998)
+_AgathaAfterBattleText:
     db $0,"You win! I see",$4f
     db "what the old duff",$55
     db "sees in you now!",$51
@@ -119786,96 +119776,96 @@ _AgathaAfterBattleText: ; 86998 (21:6998)
     db "else to say! Run",$55
     db "along now,child!",$57
 
-_AgathaText2: ; 869fd (21:69fd)
+_AgathaText2:
     db $0,"Someone's voice:",$4f
     db "Don't run away!",$57
 
-_RockTunnel2BattleText2: ; 86a1d (21:6a1d)
+_RockTunnel2BattleText2:
     db $0,"Hikers leave twigs",$4f
     db "as trail markers.",$57
 
-_RockTunnel2EndBattleText2: ; 86a43 (21:6a43)
+_RockTunnel2EndBattleText2:
     db $0,"Ohhh!",$4f
     db "I did my best!",$58
 
-_RockTunnel2AfterBattleText2: ; 86a59 (21:6a59)
+_RockTunnel2AfterBattleText2:
     db $0,"I want to go ",$4f
     db "home!",$57
 
-_RockTunnel2BattleText3: ; 86a6e (21:6a6e)
+_RockTunnel2BattleText3:
     db $0,"Hahaha! Can you",$4f
     db "beat my power?",$57
 
-_RockTunnel2EndBattleText3: ; 86a8e (21:6a8e)
+_RockTunnel2EndBattleText3:
     db $0,"Oops!",$4f
     db "Out-muscled!",$58
 
-_RockTunnel2AfterBattleText3: ; 86aa2 (21:6aa2)
+_RockTunnel2AfterBattleText3:
     db $0,"I go for power",$4f
     db "because I hate",$55
     db "thinking!",$57
 
-_RockTunnel2BattleText4: ; 86acb (21:6acb)
+_RockTunnel2BattleText4:
     db $0,"You have a",$4f
     db "#DEX?",$55
     db "I want one too!",$57
 
-_RockTunnel2EndBattleText4: ; 86aed (21:6aed)
+_RockTunnel2EndBattleText4:
     db $0,"Shoot!",$4f
     db "I'm so jealous!",$58
 
-_RockTunnel2AfterBattleText4: ; 86b04 (21:6b04)
+_RockTunnel2AfterBattleText4:
     db $0,"When you finish",$4f
     db "your #DEX,can",$55
     db "I have it?",$57
 
-_RockTunnel2BattleText5: ; 86b2f (21:6b2f)
+_RockTunnel2BattleText5:
     db $0,"Do you know about",$4f
     db "costume players?",$57
 
-_RockTunnel2EndBattleText5: ; 86b53 (21:6b53)
+_RockTunnel2EndBattleText5:
     db $0,"Well,",$4f
     db "that's that.",$58
 
-_RockTunnel2AfterBattleText5: ; 86b66 (21:6b66)
+_RockTunnel2AfterBattleText5:
     db $0,"Costume players",$4f
     db "dress up as",$55
     db "#MON for fun.",$57
 
-_RockTunnel2BattleText6: ; 86b91 (21:6b91)
+_RockTunnel2BattleText6:
     db $0,"My #MON",$4f
     db "techniques will",$55
     db "leave you crying!",$57
 
-_RockTunnel2EndBattleText6: ; 86bbc (21:6bbc)
+_RockTunnel2EndBattleText6:
     db $0,"I give!",$4f
     db "You're a better",$55
     db "technician!",$58
 
-_RockTunnel2AfterBattleText6: ; 86be0 (21:6be0)
+_RockTunnel2AfterBattleText6:
     db $0,"In mountains,",$4f
     db "you'll often find",$55
     db "rock-type #MON.",$57
 
-_RockTunnel2BattleText7: ; 86c10 (21:6c10)
+_RockTunnel2BattleText7:
     db $0,"I don't often",$4f
     db "come here,but I",$55
     db "will fight you.",$57
 
-_RockTunnel2EndBattleText7: ; 86c3f (21:6c3f)
+_RockTunnel2EndBattleText7:
     db $0,"Oh!",$4f
     db "I lost!",$58
 
-_RockTunnel2AfterBattleText7: ; 86c4c (21:6c4c)
+_RockTunnel2AfterBattleText7:
     db $0,"I like tiny",$4f
     db "#MON,big ones",$55
     db "are too scary!",$57
 
-_RockTunnel2BattleText8: ; 86c77 (21:6c77)
+_RockTunnel2BattleText8:
     db $0,"Hit me with your",$4f
     db "best shot!",$57
 
-_RockTunnel2EndBattleText8: ; 86c94 (21:6c94)
+_RockTunnel2EndBattleText8:
     db $0,"Fired",$4f
     db "away!",$58
 
@@ -119925,38 +119915,36 @@ _SafariZoneNorthText7:
 
 SECTION "bank22",ROMX,BANK[$22]
 
-_RockTunnel2AfterBattleText8: ; 88000 (22:4000)
+_RockTunnel2AfterBattleText8:
     db $0,"I'll raise my",$4f
     db "#MON to beat",$55
     db "yours,kid!",$57
 
-_RockTunnel2BattleText9: ; 88027 (22:4027)
+_RockTunnel2BattleText9:
     db $0,"I draw #MON",$4f
     db "when I'm home.",$57
 
-_RockTunnel2EndBattleText9: ; 88042 (22:4042)
+_RockTunnel2EndBattleText9:
     db $0,"Whew!",$4f
     db "I'm exhausted!",$58
 
-_RockTunnel2AfterBattleText9: ; 88057 (22:4057)
+_RockTunnel2AfterBattleText9:
     db $0,"I'm an artist,",$4f
     db "not a fighter.",$57
 
-_SeafoamIslands5BattleText2: ; 88075 (22:4075)
+_SeafoamIslands5BattleText2:
     db $0,"Gyaoo!@@"
 
-_SeafoamIslands5Text4: ; 8807e (22:407e)
+_SeafoamIslands5Text4:
     db $0,"Boulders might",$4f
     db "change the flow",$55
     db "of water!",$57
 
-_SeafoamIslands5Text5: ; 880a8 (22:40a8)
+_SeafoamIslands5Text5:
     db $0,"DANGER",$4f
     db "Fast current!",$57
 
-SECTION "_AIBattleUseItemText",ROMX[$40d5],BANK[$22]
-
-_AIBattleUseItemText: ; 880d5 (22:40d5)
+_AIBattleUseItemText:
     db 1
     dw W_TRAINERNAME
     db 0,$4F,"used @",1
@@ -119965,97 +119953,97 @@ _AIBattleUseItemText: ; 880d5 (22:40d5)
     dw W_ENEMYMONNAME
     db 0,"!",$58
 
-_UnnamedText_4160c: ; 880ef (22:40ef)
+_UnnamedText_4160c:
     TX_RAM $cf4b
     db $0," went",$4f
     db "to @"
     TX_RAM $d887
     db $0,".",$57
 
-_UnnamedText_41623: ; 88103 (22:4103)
+_UnnamedText_41623:
     db $0,"For ",$52,"'s",$4f
     db "@"
     TX_RAM $cf4b
     db $0,",",$57
 
-_UnnamedText_41628: ; 88112 (22:4112)
+_UnnamedText_41628:
     TX_RAM $d887
     db $0," sends",$4f
     db "@"
     TX_RAM $cd6d
     db $0,".",$57
 
-_UnnamedText_41642: ; 88124 (22:4124)
+_UnnamedText_41642:
     TX_RAM $d887
     db $0," waves",$4f
     db "farewell as",$57
 
-_UnnamedText_41647: ; 8813b (22:413b)
+_UnnamedText_41647:
     TX_RAM $cd6d
     db $0," is",$4f
     db "transferred.",$57
 
-_UnnamedText_41655: ; 88150 (22:4150)
+_UnnamedText_41655:
     db $0,"Take good care of",$4f
     db "@"
 
-UnnamedText_88164: ; 88164 (22:4164)
+UnnamedText_88164:
     TX_RAM $cd6d
     db $0,".",$57
 
-_UnnamedText_4166c: ; 8816a (22:416a)
+_UnnamedText_4166c:
     TX_RAM $d887
     db $0," will",$4f
     db "trade @"
 
-UnnamedText_8817b: ; 8817b (22:417b)
+UnnamedText_8817b:
     TX_RAM $cd6d
     db $0,$57
 
-_UnnamedText_41671: ; 88180 (22:4180)
+_UnnamedText_41671:
     db $0,"for ",$52,"'s",$4f
     db "@"
     TX_RAM $cf4b
     db $0,".",$57
 
-_UnnamedText_37390: ; 8818f (22:418f)
+_UnnamedText_37390:
     db $0,"A slot machine!",$4f
     db "Want to play?",$57
 
-_UnnamedText_37467: ; 881ae (22:41ae)
+_UnnamedText_37467:
     db $0,"Darn!",$4f
     db "Ran out of coins!",$57
 
-_UnnamedText_3746c: ; 881c7 (22:41c7)
+_UnnamedText_3746c:
     db $0,"Bet how many",$4f
     db "coins?",$57
 
-_UnnamedText_37471: ; 881dc (22:41dc)
+_UnnamedText_37471:
     db $0,"Start!",$57
 
-_UnnamedText_37476: ; 881e4 (22:41e4)
+_UnnamedText_37476:
     db $0,"Not enough",$4f
     db "coins!",$58
 
-_UnnamedText_3747b: ; 881f7 (22:41f7)
+_UnnamedText_3747b:
     db $0,"One more ",$4f
     db "go?",$57
 
-_UnnamedText_37673: ; 88206 (22:4206)
+_UnnamedText_37673:
     db $0," lined up!",$4f
     db "Scored @"
 
-UnnamedText_8821a: ; 8821a (22:421a)
+UnnamedText_8821a:
     TX_RAM $cf4b
     db $0," coins!",$57
 
-_UnnamedText_3769d: ; 88226 (22:4226)
+_UnnamedText_3769d:
     db $0,"Not this time!",$58
 
-_UnnamedText_37722: ; 88236 (22:4236)
+_UnnamedText_37722:
     db $0,"Yeah!@@"
 
-_UnnamedText_703fa: ; 8823e (22:423e)
+_UnnamedText_703fa:
     db $0,"#DEX   Seen:@"
     TX_NUM $cc5b,1,3
     db $0,$4f
@@ -120063,9 +120051,7 @@ _UnnamedText_703fa: ; 8823e (22:423e)
     TX_NUM $cc5c,1,3
     db "@"
 
-SECTION "_GymStatueText1",ROMX[$4275],BANK[$22]
-
-_GymStatueText1: ; 88275 (22:4275)
+_GymStatueText1:
     TX_RAM wGymCityName
     db $0,$4f
     db "#MON GYM",$55
@@ -120075,7 +120061,7 @@ _GymStatueText1: ; 88275 (22:4275)
     db "WINNING TRAINERS:",$4f
     db $53,$57
 
-_GymStatueText2: ; 882a5 (22:42a5)
+_GymStatueText2:
     TX_RAM wGymCityName
     db $0,$4f
     db "#MON GYM",$55
@@ -120086,13 +120072,13 @@ _GymStatueText2: ; 882a5 (22:42a5)
     db $53,$55
     db $52,$57
 
-_ViridianCityPokecenterGuyText: ; 882d7 (22:42d7)
+_ViridianCityPokecenterGuyText:
     db $0,"#MON CENTERs",$4f
     db "heal your tired,",$55
     db "hurt or fainted",$55
     db "#MON!",$57
 
-_PewterCityPokecenterGuyText: ; 8830c (22:430c)
+_PewterCityPokecenterGuyText:
     db $0,"Yawn!",$51
     db "When JIGGLYPUFF",$4f
     db "sings,#MON",$55
@@ -120100,32 +120086,30 @@ _PewterCityPokecenterGuyText: ; 8830c (22:430c)
     db "...Me too...",$4f
     db "Snore ",$CA,$CA,$57
 
-_CeruleanPokecenterGuyText: ; 88353 (22:4353)
+_CeruleanPokecenterGuyText:
     db $0,"BILL has lots of",$4f
     db "#MON!",$51
     db "He collects rare",$4f
     db "ones too!",$57
 
-_LavenderPokecenterGuyText: ; 88386 (22:4386)
+_LavenderPokecenterGuyText:
     db $0,"CUBONEs wear",$4f
     db "skulls,right?",$51
     db "People will pay a",$4f
     db "lot for one!",$57
 
-_MtMoonPokecenterBenchGuyText: ; 883c2 (22:43c2)
+_MtMoonPokecenterBenchGuyText:
     db $0,"If you have too",$4f
     db "many #MON,you",$55
     db "should store them",$55
     db "via PC!",$57
 
-_RockTunnelPokecenterGuyText: ; 883fc (22:43fc)
+_RockTunnelPokecenterGuyText:
     db $0,"I heard that",$4f
     db "GHOSTs haunt",$55
     db "LAVENDER TOWN!",$57
 
-SECTION "_VermilionPokecenterGuyText",ROMX[$448e],BANK[$22]
-
-_VermilionPokecenterGuyText: ; 8848e (22:448e)
+_VermilionPokecenterGuyText:
     db $0,"It is true that a",$4f
     db "higher level",$55
     db "#MON will be",$55
@@ -120138,19 +120122,19 @@ _VermilionPokecenterGuyText: ; 8848e (22:448e)
     db "universally",$55
     db "strong #MON.",$57
 
-_CeladonCityPokecenterGuyText: ; 88531 (22:4531)
+_CeladonCityPokecenterGuyText:
     db $0,"If I had a BIKE,",$4f
     db "I would go to",$55
     db "CYCLING ROAD!",$57
 
-_FuchsiaCityPokecenterGuyText: ; 8855f (22:455f)
+_FuchsiaCityPokecenterGuyText:
     db $0,"If you're studying ",$4f
     db "#MON,visit",$55
     db "the SAFARI ZONE.",$51
     db "It has all sorts",$4f
     db "of rare #MON.",$57
 
-_CinnabarPokecenterGuyText: ; 885af (22:45af)
+_CinnabarPokecenterGuyText:
     db $0,"#MON can still",$4f
     db "learn techniques",$55
     db "after canceling",$55
@@ -120159,54 +120143,54 @@ _CinnabarPokecenterGuyText: ; 885af (22:45af)
     db "until new moves",$55
     db "have been learned.",$57
 
-_SaffronCityPokecenterGuyText1: ; 88621 (22:4621)
+_SaffronCityPokecenterGuyText1:
     db $0,"It would be great",$4f
     db "if the ELITE FOUR",$55
     db "came and stomped",$55
     db "TEAM ROCKET!",$57
 
-_SaffronCityPokecenterGuyText2: ; 88664 (22:4664)
+_SaffronCityPokecenterGuyText2:
     db $0,"TEAM ROCKET took",$4f
     db "off! We can go",$55
     db "out safely again!",$55
     db "That's great!",$57
 
-_CeladonCityHotelText: ; 886a4 (22:46a4)
+_CeladonCityHotelText:
     db $0,"My sis brought me",$4f
     db "on this vacation!",$57
 
-_BookcaseText: ; 886c9 (22:46c9)
+_BookcaseText:
     db $0,"Crammed full of",$4f
     db "#MON books!",$57
 
-_NewBicycleText: ; 886e6 (22:46e6)
+_NewBicycleText:
     db $0,"A shiny new",$4f
     db "BICYCLE!",$57
 
-_UnnamedText_1e960: ; 886fc (22:46fc)
+_UnnamedText_1e960:
     db $0,"Push START to",$4f
     db "open the MENU!",$57
 
-_UnnamedText_1e97e: ; 8871a (22:471a)
+_UnnamedText_1e97e:
     db $0,"The SAVE option is",$4f
     db "on the MENU",$55
     db "screen.",$57
 
-_UnnamedText_1e983: ; 88742 (22:4742)
+_UnnamedText_1e983:
     db $0,"All #MON types",$4f
     db "have strong and",$55
     db "weak points",$55
     db "against others.",$57
 
-_UnnamedText_1ea0d: ; 8877e (22:477e)
+_UnnamedText_1ea0d:
     db $0,"PA: Ding-dong!",$51
     db "Time's up!",$58
 
-_UnnamedText_1ea12: ; 88798 (22:4798)
+_UnnamedText_1ea12:
     db $0,"PA: Your SAFARI",$4f
     db "GAME is over!",$57
 
-_CinnabarGymQuizIntroText: ; 887b7 (22:47b7)
+_CinnabarGymQuizIntroText:
     db $0,"#MON Quiz!",$51
     db "Get it right and",$4f
     db "the door opens to",$55
@@ -120220,67 +120204,67 @@ _CinnabarGymQuizIntroText: ; 887b7 (22:47b7)
     db "Then get it right!",$4f
     db "Here we go!",$58
 
-_CinnabarQuizQuestionsText1: ; 8886d (22:486d)
+_CinnabarQuizQuestionsText1:
     db $0,"CATERPIE evolves",$4f
     db "into BUTTERFREE?",$57
 
-_CinnabarQuizQuestionsText2: ; 88890 (22:4890)
+_CinnabarQuizQuestionsText2:
     db $0,"There are 9",$4f
     db "certified #MON",$55
     db "LEAGUE BADGEs?",$57
 
-_CinnabarQuizQuestionsText3: ; 888bb (22:48bb)
+_CinnabarQuizQuestionsText3:
     db $0,"POLIWAG evolves 3",$4f
     db "times?",$57
 
-_CinnabarQuizQuestionsText4: ; 888d5 (22:48d5)
+_CinnabarQuizQuestionsText4:
     db $0,"Are thunder moves",$4f
     db "effective against",$55
     db "ground element-",$55
     db "type #MON?",$57
 
-_CinnabarQuizQuestionsText5: ; 88915 (22:4915)
+_CinnabarQuizQuestionsText5:
     db $0,"#MON of the",$4f
     db "same kind and",$55
     db "level are not",$55
     db "identical?",$57
 
-_CinnabarQuizQuestionsText6: ; 88949 (22:4949)
+_CinnabarQuizQuestionsText6:
     db $0,"TM28 contains",$4f
     db "TOMBSTONER?",$57
 
-_CinnabarGymQuizCorrectText: ; 88964 (22:4964)
+_CinnabarGymQuizCorrectText:
     db $0,"You're absolutely",$4f
     db "correct!",$51
     db "Go on through!@@"
 
-_CinnabarGymQuizIncorrectText: ; 8898f (22:498f)
+_CinnabarGymQuizIncorrectText:
     db $0,"Sorry! Bad call!",$58
 
-_UnnamedText_1eb69: ; 889a1 (22:49a1)
+_UnnamedText_1eb69:
     db $0,"#MON magazines!",$51
     db "#MON notebooks!",$51
     db "#MON graphs!",$57
 
-_BillsHouseMonitorText: ; 889cf (22:49cf)
+_BillsHouseMonitorText:
     db $0,"TELEPORTER is",$4f
     db "displayed on the",$55
     db "PC monitor.",$57
 
-_BillsHouseInitiatedText: ; 889fb (22:49fb)
+_BillsHouseInitiatedText:
     db $0,$52," initiated",$4f
     db "TELEPORTER's Cell",$55
     db "Separator!@@"
 
-_BillsHousePokemonListText1: ; 88a25 (22:4a25)
+_BillsHousePokemonListText1:
     db $0,"BILL's favorite",$4f
     db "#MON list!",$58
 
-_BillsHousePokemonListText2: ; 88a40 (22:4a40)
+_BillsHousePokemonListText2:
     db $0,"Which #MON do",$4f
     db "you want to see?",$57
 
-_OakLabEmailText: ; 88a60 (22:4a60)
+_OakLabEmailText:
     db $0,"There's an e-mail",$4f
     db "message here!",$51
     db "...",$51
@@ -120300,30 +120284,30 @@ _OakLabEmailText: ; 88a60 (22:4a60)
     db "please visit us!",$55
     db "...",$57
 
-_GameCornerCoinCaseText: ; 88b5b (22:4b5b)
+_GameCornerCoinCaseText:
     db $0,"A COIN CASE is",$4f
     db "required!",$57
 
-_GameCornerNoCoinsText: ; 88b75 (22:4b75)
+_GameCornerNoCoinsText:
     db $0,"You don't have",$4f
     db "any coins!",$57
 
-_GameCornerOutOfOrderText: ; 88b8f (22:4b8f)
+_GameCornerOutOfOrderText:
     db $0,"OUT OF ORDER",$4f
     db "This is broken.",$57
 
-_GameCornerOutToLunchText: ; 88bad (22:4bad)
+_GameCornerOutToLunchText:
     db $0,"OUT TO LUNCH",$4f
     db "This is reserved.",$57
 
-_GameCornerSomeonesKeysText: ; 88bcd (22:4bcd)
+_GameCornerSomeonesKeysText:
     db $0,"Someone's keys!",$4f
     db "They'll be back.",$57
 
-_UnnamedText_21865: ; 88bed (22:4bed)
+_UnnamedText_21865:
     db $0,"Just a moment.",$57
 
-TMNotebookText: ; 88bfd (22:4bfd)
+TMNotebookText:
     db $0,"It's a pamphlet",$4f
     db "on TMs.",$51
     db "...",$51
@@ -120331,16 +120315,14 @@ TMNotebookText: ; 88bfd (22:4bfd)
     db "in all.",$51
     db "SILPH CO.@@"
 
-SECTION "_TurnPageText",ROMX[$4c6f],BANK[$22]
-
-_TurnPageText: ; 88c6f (22:4c6f)
+_TurnPageText:
     db $0,"Turn the page?",$57
 
-_ViridianSchoolNotebookText5: ; 88c7f (22:4c7f)
+_ViridianSchoolNotebookText5:
     db $0,"GIRL: Hey! Don't",$4f
     db "look at my notes!@@"
 
-_ViridianSchoolNotebookText1: ; 88ca3 (22:4ca3)
+_ViridianSchoolNotebookText1:
     db $0,"Looked at the",$4f
     db "notebook!",$51
     db "First page...",$51
@@ -120354,7 +120336,7 @@ _ViridianSchoolNotebookText1: ; 88ca3 (22:4ca3)
     db "fight are called",$55
     db "#MON trainers.",$58
 
-_ViridianSchoolNotebookText2: ; 88d46 (22:4d46)
+_ViridianSchoolNotebookText2:
     db $0,"Second page...",$51
     db "A healthy #MON",$4f
     db "may be hard to",$55
@@ -120364,7 +120346,7 @@ _ViridianSchoolNotebookText2: ; 88d46 (22:4d46)
     db "other damage are",$55
     db "effective!",$58
 
-_ViridianSchoolNotebookText3: ; 88dbd (22:4dbd)
+_ViridianSchoolNotebookText3:
     db $0,"Third page...",$51
     db "#MON trainers",$4f
     db "seek others to",$55
@@ -120374,7 +120356,7 @@ _ViridianSchoolNotebookText3: ; 88dbd (22:4dbd)
     db "constantly fought",$55
     db "at #MON GYMs.",$58
 
-_ViridianSchoolNotebookText4: ; 88e2c (22:4e2c)
+_ViridianSchoolNotebookText4:
     db $0,"Fourth page...",$51
     db "The goal for",$4f
     db "#MON trainers",$55
@@ -120386,54 +120368,54 @@ _ViridianSchoolNotebookText4: ; 88e2c (22:4e2c)
     db "The ELITE FOUR of",$4f
     db "#MON LEAGUE!",$58
 
-_EnemiesOnEverySideText: ; 88ec1 (22:4ec1)
+_EnemiesOnEverySideText:
     db $0,"Enemies on every",$4f
     db "side!",$57
 
-_WhatGoesAroundComesAroundText: ; 88ed9 (22:4ed9)
+_WhatGoesAroundComesAroundText:
     db $0,"What goes around",$4f
     db "comes around!",$57
 
-_FightingDojoText: ; 88ef9 (22:4ef9)
+_FightingDojoText:
     db $0,"FIGHTING DOJO",$57
 
-_IndigoPlateauHQText: ; 88f08 (22:4f08)
+_IndigoPlateauHQText:
     db $0,"INDIGO PLATEAU",$4f
     db "#MON LEAGUE HQ",$57
 
-_RedBedroomSNESText: ; 88f27 (22:4f27)
+_RedBedroomSNESText:
     db $0,$52," is",$4f
     db "playing the SNES!",$55
     db "...Okay!",$55
     db "It's time to go!",$57
 
-_Route15UpstairsBinocularsText: ; 88f58 (22:4f58)
+_Route15UpstairsBinocularsText:
     db $0,"Looked into the",$4f
     db "binoculars...",$51
     db "A large,shining",$4f
     db "bird is flying",$55
     db "toward the sea.",$57
 
-_AerodactylFossilText: ; 88fa7 (22:4fa7)
+_AerodactylFossilText:
     db $0,"AERODACTYL Fossil",$4f
     db "A primitive and",$55
     db "rare #MON.",$57
 
-_KabutopsFossilText: ; 88fd5 (22:4fd5)
+_KabutopsFossilText:
     db $0,"KABUTOPS Fossil",$4f
     db "A primitive and",$55
     db "rare #MON.",$57
 
-_LinkCableHelpText1: ; 89001 (22:5001)
+_LinkCableHelpText1:
     db $0,"TRAINER TIPS",$51
     db "Using a Game Link",$4f
     db "Cable",$58
 
-_LinkCableHelpText2: ; 89027 (22:5027)
+_LinkCableHelpText2:
     db $0,"Which heading do",$4f
     db "you want to read?",$57
 
-_LinkCableInfoText1: ; 8904b (22:504b)
+_LinkCableInfoText1:
     db $0,"When you have",$4f
     db "linked your GAME",$55
     db "BOY with another",$55
@@ -120442,23 +120424,23 @@ _LinkCableInfoText1: ; 8904b (22:504b)
     db "the right in any",$55
     db "#MON CENTER.",$58
 
-_LinkCableInfoText2: ; 890bd (22:50bd)
+_LinkCableInfoText2:
     db $0,"COLOSSEUM lets",$4f
     db "you play against",$55
     db "a friend.",$58
 
-_LinkCableInfoText3: ; 890e8 (22:50e8)
+_LinkCableInfoText3:
     db $0,"TRADE CENTER is",$4f
     db "used for trading",$55
     db "#MON.",$58
 
-_ViridianSchoolBlackboardText1: ; 89110 (22:5110)
+_ViridianSchoolBlackboardText1:
     db $0,"The blackboard",$4f
     db "describes #MON",$55
     db "STATUS changes",$55
     db "during battles.",$58
 
-_ViridianSchoolBlackboardText2: ; 8914e (22:514e)
+_ViridianSchoolBlackboardText2:
     db $0,"Which heading do",$4f
     db "you want to read?",$57
 
@@ -120468,13 +120450,11 @@ _ViridianSchoolBlackboardText2: ; 8914e (22:514e)
 
 ; ───────────────────────────────────
 
-SECTION "_ViridianBlackboardFrozenText",ROMX[$532f],BANK[$22]
-
-_VermilionGymTrashText: ; 893a7 (22:53a7)
+_VermilionGymTrashText:
     db $0,"Nope,there's",$4f
     db "only trash here.",$57
 
-_VermilionGymTrashSuccesText1: ; 893c6 (22:53c6)
+_VermilionGymTrashSuccesText1:
     db $0,"Hey! There's a",$4f
     db "switch under the",$55
     db "trash!",$55
@@ -120482,156 +120462,154 @@ _VermilionGymTrashSuccesText1: ; 893c6 (22:53c6)
     db "The 1st electric",$4f
     db "lock opened!@@"
 
-_VermilionGymTrashSuccesText2: ; 89418 (22:5418)
+_VermilionGymTrashSuccesText2:
     db $0,"Hey! There's",$4f
     db "another switch",$55
     db "under the trash!",$55
     db "Turn it on!",$58
 
-_VermilionGymTrashSuccesText3: ; 89451 (22:5451)
+_VermilionGymTrashSuccesText3:
     db $0,"The 2nd electric",$4f
     db "lock opened!",$51
     db "The motorized door",$4f
     db "opened!@@"
 
-_VermilionGymTrashFailText: ; 8948c (22:548c)
+_VermilionGymTrashFailText:
     db $0,"Nope! There's",$4f
     db "only trash here.",$55
     db "Hey! The electric",$55
     db "locks were reset!@@"
 
-UnnamedText_894d0: ; 894d0 (22:54d0)
+UnnamedText_894d0:
     db $0,$52," found",$4f
     db "@"
     TX_RAM $cd6d
     db $0,"!@@"
 
-_UnnamedText_76794: ; 894e1 (22:54e1)
+_UnnamedText_76794:
     db $0,"But,",$52," has",$4f
     db "no more room for",$55
     db "other items!",$57
 
-_FoundHiddenCoinsText: ; 8950b (22:550b)
+_FoundHiddenCoinsText:
     db $0,$52," found",$4f
     db "@"
     db $2,$a0,$ff,$c2 ; XXX $2
     db $0," coins!@@"
 
-_FoundHiddenCoins2Text: ; 89523 (22:5523)
+_FoundHiddenCoins2Text:
     db $0,$52," found",$4f
     db "@"
     db $2,$a0,$ff,$c2 ; XXX $2 probably coins
     db $0," coins!@@"
 
-_DroppedHiddenCoinsText: ; 8953b (22:553b)
+_DroppedHiddenCoinsText:
     db $0,$51
     db "Oops! Dropped",$4f
     db "some coins!",$57
 
-_IndigoPlateauStatuesText1: ; 89557 (22:5557)
+_IndigoPlateauStatuesText1:
     db $0,"INDIGO PLATEAU",$58
 
-_IndigoPlateauStatuesText2: ; 89567 (22:5567)
+_IndigoPlateauStatuesText2:
     db $0,"The ultimate goal",$4f
     db "of trainers!",$55
     db "#MON LEAGUE HQ",$57
 
-_IndigoPlateauStatuesText3: ; 89596 (22:5596)
+_IndigoPlateauStatuesText3:
     db $0,"The highest",$4f
     db "#MON authority",$55
     db "#MON LEAGUE HQ",$57
 
-_PokemonBooksText: ; 895c1 (22:55c1)
+_PokemonBooksText:
     db $0,"Crammed full of",$4f
     db "#MON books!",$57
 
-_DiglettSculptureText: ; 895de (22:55de)
+_DiglettSculptureText:
     db $0,"It's a sculpture",$4f
     db "of DIGLETT.",$57
 
-_ElevatorText: ; 895fb (22:55fb)
+_ElevatorText:
     db $0,"This is an",$4f
     db "elevator.",$57
 
-_TownMapText: ; 89611 (22:5611)
+_TownMapText:
     db $0,"A TOWN MAP.@@"
 
-_PokemonStuffText: ; 8961f (22:561f)
+_PokemonStuffText:
     db $0,"Wow! Tons of",$4f
     db "#MON stuff!",$57
 
-_UnnamedText_3c1a8: ; 89639 (22:5639)
+_UnnamedText_3c1a8:
     db $0,"PA: Ding-dong!",$51
     db "You are out of",$4f
     db "SAFARI BALLs!",$58
 
-_UnnamedText_3c229: ; 89666 (22:5666)
+_UnnamedText_3c229:
     db $0,"Wild @"
     TX_RAM W_ENEMYMONNAME
     db $0,$4f
     db "ran!",$58
 
-_UnnamedText_3c22e: ; 89677 (22:5677)
+_UnnamedText_3c22e:
     db $0,"Enemy @"
     TX_RAM W_ENEMYMONNAME
     db $0,$4f
     db "ran!",$58
 
-_HurtByPoisonText: ; 89689 (22:5689)
+_HurtByPoisonText:
     db $0,$5a,"'s",$4f
     db "hurt by poison!",$57
 
-_HurtByBurnText: ; 8969d (22:569d)
+_HurtByBurnText:
     db $0,$5a,"'s",$4f
     db "hurt by the burn!",$57
 
-_HurtByLeechSeedText: ; 896b3 (22:56b3)
+_HurtByLeechSeedText:
     db $0,"LEECH SEED saps",$4f
     db $5a,"!",$57
 
-_EnemyMonFainted: ; 0x896c7
+_EnemyMonFainted:
     db $0,"Enemy @"
     TX_RAM W_ENEMYMONNAME
     db $0,$4f
     db "fainted!",$58
 
-_MoneyForWinningText: ; 896dd (22:56dd)
+_MoneyForWinningText:
     db $0,$52," got ¥@"
     ;XXX $2
     db $2,$79,$d0,$c3
     db $0,$4f
     db "for winning!",$58
 
-_TrainerDefeatedText: ; 896f9 (22:56f9)
+_TrainerDefeatedText:
     db $0,$52," defeated",$4f
     db "@"
-    TX_RAM W_TRAINERNAME ; 0x89706
+    TX_RAM W_TRAINERNAME
     db $0,"!",$58
 
-_PlayerMonFaintedText: ; 8970c (22:570c)
+_PlayerMonFaintedText:
     TX_RAM W_PLAYERMONNAME
     db $0,$4f
     db "fainted!",$58
 
-SECTION "_Sony1WinText",ROMX[$572a],BANK[$22]
-
-_Sony1WinText: ; 8972a (22:572a)
+_Sony1WinText:
     db $0,$53,": Yeah! Am",$4f
     db "I great or what?",$58
 
-_PlayerBlackedOutText2: ; 89748 (22:5748)
+_PlayerBlackedOutText2:
     db $0,$52," is out of",$4f
     db "useable #MON!",$51
     db $52," blacked",$4f
     db "out!",$58
 
-_LinkBattleLostText: ; 89772 (22:5772)
+_LinkBattleLostText:
     db $0,$52," lost to",$4f
     db "@"
-    TX_RAM W_TRAINERNAME ; 0x8977e
+    TX_RAM W_TRAINERNAME
     db $0,"!",$58
 
-_TrainerAboutToUseText: ; 89784 (22:5784)
+_TrainerAboutToUseText:
     db 1
     dw W_TRAINERNAME
     db 0," is",$4F
@@ -120641,7 +120619,7 @@ _TrainerAboutToUseText: ; 89784 (22:5784)
     db "Will ",$52,$4F
     db "change #MON?",$57
 
-_TrainerSentOutText: ; 897b4 (22:57b4)
+_TrainerSentOutText:
     db 1
     dw W_TRAINERNAME
     db 0," sent",$4F
@@ -120649,26 +120627,26 @@ _TrainerSentOutText: ; 897b4 (22:57b4)
     dw W_ENEMYMONNAME
     db 0,"!",$57
 
-_UnnamedText_3cab4: ; 897c9 (22:57c9)
+_UnnamedText_3cab4:
     db $0,"There's no will",$4f
     db "to fight!",$58
 
-_UnnamedText_3cb97: ; 897e3 (22:57e3)
+_UnnamedText_3cb97:
     db $0,"Can't escape!",$58
 
-_UnnamedText_3cb9c: ; 897f1 (22:57f1)
+_UnnamedText_3cb9c:
     db $0,"No! There's no",$4f
     db "running from a",$55
     db "trainer battle!",$58
 
-_UnnamedText_3cba1: ; 8981f (22:581f)
+_UnnamedText_3cba1:
     db $0,"Got away safely!",$58
 
-ItemsCantBeUsedHere_: ; 89831 (22:5831)
+ItemsCantBeUsedHere_:
     db $0,"Items can't be",$4f
     db "used here.",$58
 
-_UnnamedText_3d1f5: ; 8984b (22:584b)
+_UnnamedText_3d1f5:
     TX_RAM W_PLAYERMONNAME
     db $0," is",$4f
     db "already out!",$58
@@ -120677,241 +120655,237 @@ _MoveDisabledText:
     db $0,"The move is",$4f
     db "disabled!",$58
 
-SECTION "_MoveDisabledText",ROMX[$587b],BANK[$22]
-
-_MultiHitText: ; 898aa (22:58aa)
+_MultiHitText:
     db 0,"Hit the enemy",$4F,"@"
     TX_NUM W_NUMHITS,1,1
     db 0," times!",$58
 
-_ScaredText: ; 898c7 (22:58c7)
+_ScaredText:
     db 1
     dw W_PLAYERMONNAME
     db 0," is too",$4F
     db "scared to move!",$58
 
-_GetOutText: ; 898e3 (22:58e3)
+_GetOutText:
     db 0,"GHOST: Get out...",$4F
     db "Get out...",$58
 
-_FastAsleepText: ; 89901 (22:5901)
+_FastAsleepText:
     db 0,$5A,$4F
     db "is fast asleep!",$58
 
-_WokeUpText: ; 89914 (22:5914)
+_WokeUpText:
     db 0,$5A,$4F
     db "woke up!",$58
 
-_FrozenText: ; 89920 (22:5920)
+_FrozenText:
     db 0,$5A,$4F
     db "is frozen solid!",$58
 
-_FullyParalyzedText: ; 89934 (22:5934)
+_FullyParalyzedText:
     db 0,$5A,"'s",$4F
     db "fully paralyzed!",$58
 
-_FlinchedText: ; 89949 (22:5949)
+_FlinchedText:
     db 0,$5A,$4F
     db "flinched!",$58
 
-_MustRechargeText: ; 89956 (22:5956)
+_MustRechargeText:
     db 0,$5A,$4F
     db "must recharge!",$58
 
-_DisabledNoMoreText: ; 89968 (22:5968)
+_DisabledNoMoreText:
     db 0,$5A,"'s",$4F
     db "disabled no more!",$58
 
-_IsConfusedText: ; 8997e (22:597e)
+_IsConfusedText:
     db 0,$5A,$4F
     db "is confused!",$58
 
-_HurtItselfText: ; 8998e (22:598e)
+_HurtItselfText:
     db 0,"It hurt itself in",$4F
     db "its confusion!",$58
 
-_ConfusedNoMoreText: ; 899b0 (22:59b0)
+_ConfusedNoMoreText:
     db 0,$5A,"'s",$4F
     db "confused no more!",$58
 
-_SavingEnergyText: ; 899c6 (22:59c6)
+_SavingEnergyText:
     db 0,$5A,$4F
     db "is saving energy!",$58
 
-_UnleashedEnergyText: ; 899db (22:59db)
+_UnleashedEnergyText:
     db 0,$5A,$4F
     db "unleashed energy!",$58
 
-_ThrashingAboutText: ; 899f0 (22:59f0)
+_ThrashingAboutText:
     db 0,$5A,"'s",$4F
     db "thrashing about!",$57
 
-_AttackContinuesText: ; 89a05 (22:5a05)
+_AttackContinuesText:
     db 0,$5A,"'s",$4F
     db "attack continues!",$57
 
-_CantMoveText: ; 89a1b (22:5a1b)
+_CantMoveText:
     db 0,$5A,$4F
     db "can't move!",$58
 
-_UnnamedText_3daa8: ; 89a29 (22:5a29)
+_UnnamedText_3daa8:
     db $0,$5a,"'s",$4f
     db "@"
 
-UnnamedText_89a2e: ; 89a2e (22:5a2e)
+UnnamedText_89a2e:
     TX_RAM $cd6d
     db $0," is",$55
     db "disabled!",$58
 
-_UnnamedText_3dafb: ; 89a40 (22:5a40)
+_UnnamedText_3dafb:
     db $0,$5a,"@@"
 
-_UnnamedText_3db2d: ; 89a44 (22:5a44)
+_UnnamedText_3db2d:
     db $0,$4f
     db "used @@"
 
-_UnnamedText_3db34: ; 89a4d (22:5a4d)
+_UnnamedText_3db34:
     db $0,$4f
     db "used @@"
 
-_UnnamedText_3db43: ; 89a56 (22:5a56)
+_UnnamedText_3db43:
     db $0,"instead,",$55
     db "@@"
 
-_UnnamedText_3db4c: ; 89a62 (22:5a62)
+_UnnamedText_3db4c:
     TX_RAM $cf4b
     db $0,"@"
 
-_UnnamedText_3db6c: ; 89a67 (22:5a67)
+_UnnamedText_3db6c:
     db $0,"!",$57
 
-_UnnamedText_3db71: ; 89a6a (22:5a6a)
+_UnnamedText_3db71:
     db $0,"!",$57
 
-_UnnamedText_3db76: ; 89a6d (22:5a6d)
+_UnnamedText_3db76:
     db $0,"!",$57
 
-_UnnamedText_3db7b: ; 89a70 (22:5a70)
+_UnnamedText_3db7b:
     db $0,"!",$57
 
-_UnnamedText_3db80: ; 89a73 (22:5a73)
+_UnnamedText_3db80:
     db $0,"!",$57
 
-_AttackMissedText: ; 89a76 (22:5a76)
+_AttackMissedText:
     db $0,$5a,"'s",$4f
     db "attack missed!",$58
 
-_KeptGoingAndCrashedText: ; 89a89 (22:5a89)
+_KeptGoingAndCrashedText:
     db $0,$5a,$4f
     db "kept going and",$55
     db "crashed!",$58
 
-_UnaffectedText: ; 89aa4 (22:5aa4)
+_UnaffectedText:
     db $0,$59,"'s",$4f
     db "unaffected!",$58
 
-_DoesntAffectMonText: ; 89ab4 (22:5ab4)
+_DoesntAffectMonText:
     db $0,"It doesn't affect",$4f
     db $59,"!",$58
 
-_UnnamedText_3dc7e: ; 89ac9 (22:5ac9)
+_UnnamedText_3dc7e:
     db $0,"Critical hit!",$58
 
-_UnnamedText_3dc83: ; 89ad8 (22:5ad8)
+_UnnamedText_3dc83:
     db $0,"One-hit KO!",$58
 
-_UnnamedText_3ddb6: ; 89ae5 (22:5ae5)
+_UnnamedText_3ddb6:
     TX_RAM W_PLAYERMONNAME
     db $0," is",$4f
     db "loafing around.",$58
 
-_UnnamedText_3ddbb: ; 89afd (22:5afd)
+_UnnamedText_3ddbb:
     TX_RAM W_PLAYERMONNAME
     db $0," began",$4f
     db "to nap!",$58
 
-_UnnamedText_3ddc0: ; 89b10 (22:5b10)
+_UnnamedText_3ddc0:
     TX_RAM W_PLAYERMONNAME
     db $0," won't",$4f
     db "obey!",$58
 
-_UnnamedText_3ddc5: ; 89b20 (22:5b20)
+_UnnamedText_3ddc5:
     TX_RAM W_PLAYERMONNAME
     db $0," turned",$4f
     db "away!",$58
 
-_UnnamedText_3ddca: ; 89b32 (22:5b32)
+_UnnamedText_3ddca:
     TX_RAM W_PLAYERMONNAME
     db $0,$4f
     db "ignored orders!",$58
 
-_SubstituteTookDamageText: ; 89b47 (22:5b47)
+_SubstituteTookDamageText:
     db $0,"The SUBSTITUTE",$4f
     db "took damage for",$55
     db $59,"!",$58
 
-_SubstituteBrokeText: ; 89b6a (22:5b6a)
+_SubstituteBrokeText:
     db $0,$59,"'s",$4f
     db "SUBSTITUTE broke!",$58
 
-_BuildingRageText: ; 89b80 (22:5b80)
+_BuildingRageText:
     db $0,$5a,"'s",$4f
     db "RAGE is building!",$58
 
-_MirrorMoveFailedText: ; 89b96 (22:5b96)
+_MirrorMoveFailedText:
     db $0,"The MIRROR MOVE",$4e,"failed!",$58
 
-_HitXTimesText: ; 89baf (22:5baf)
+_HitXTimesText:
     db $0,"Hit @"
 
-UnnamedText_89bb5: ; 89bb5 (22:5bb5)
+UnnamedText_89bb5:
     TX_NUM $cd05,1,1
     db $0," times!",$58
 
-_UnnamedText_554b2: ; 89bc2 (22:5bc2)
+_UnnamedText_554b2:
     TX_RAM $cd6d
     db $0," gained",$4f
     db "@@"
 
-;_UnnamedText_554cb: ; 89bd0 (22:5bd0)
+;_UnnamedText_554cb:
 ;    db $0,"with EXP.ALL,",$55
 ;    db "@@"
 
-SECTION "_UnnamedText_554d4",ROMX[$5be1],BANK[$22]
-
-_UnnamedText_554d4: ; 89be1 (22:5be1)
+_UnnamedText_554d4:
     db $0,"a boosted",$55
     db "@@"
-_UnnamedText_554d8: ; 89bee (22:5bee)
+_UnnamedText_554d8:
     TX_NUM $cf4b,2,4
     db $0," EXP. Points!",$58
 
-UnnamedText_89c01: ; 89c01 (22:5c01)
+UnnamedText_89c01:
     TX_RAM $cd6d
     db $0," grew",$4f
     db "to level @"
     TX_NUM $d127,1,3
     db $0,"!@@"
 
-_UnnamedText_58e3b: ; 89c1d (22:5c1d)
+_UnnamedText_58e3b:
     db $0,"Wild @"
     TX_RAM W_ENEMYMONNAME
     db $0,$4f
     db "appeared!",$58
 
-_UnnamedText_58e40: ; 89c33 (22:5c33)
+_UnnamedText_58e40:
     db $0,"The hooked",$4f
     db "@"
     TX_RAM W_ENEMYMONNAME
     db $0,$55
     db "attacked!",$58
 
-_UnnamedText_58e45: ; 89c4f (22:5c4f)
+_UnnamedText_58e45:
     TX_RAM W_ENEMYMONNAME
     db $0,$4f
     db "appeared!",$58
 
-_UnnamedText_58e4a: ; 89c5e (22:5c5e)
+_UnnamedText_58e4a:
     TX_RAM W_TRAINERNAME
     db $0," wants",$4f
     db "to fight!",$58
@@ -120924,51 +120898,47 @@ _UnnamedText_58e54:
     db $0,"Darn! The GHOST",$4f
     db "can't be ID'd!",$58
 
-SECTION "_UnnamedText_58eae",ROMX[$5cbc],BANK[$22]
-
-_UnnamedText_58eae: ; 89cbc (22:5cbc)
+_UnnamedText_58eae:
     db $0,"Go! @@"
 
-_UnnamedText_58eb5: ; 89cc3 (22:5cc3)
+_UnnamedText_58eb5:
     db $0,"Do it! @@"
 
-_UnnamedText_58ebc: ; 89ccd (22:5ccd)
+_UnnamedText_58ebc:
     db $0,"Get'm! @@"
 
-_UnnamedText_58ec3: ; 89cd6 (22:5cd6)
+_UnnamedText_58ec3:
     db $0,"The enemy's weak!",$4f
     db "Get'm! @@"
 
-_UnnamedText_58ecc: ; 89cf0 (22:5cf0)
+_UnnamedText_58ecc:
     TX_RAM W_PLAYERMONNAME
     db $0,"!",$57
 
-_UnnamedText_58ed7: ; 89cf6 (22:5cf6)
+_UnnamedText_58ed7:
     TX_RAM W_PLAYERMONNAME
     db $0," @@"
 
-_UnnamedText_58f25: ; 89cfd (22:5cfd)
+_UnnamedText_58f25:
     db $0,"enough!@@"
 
-_UnnamedText_58f2c: ; 89d07 (22:5d07)
+_UnnamedText_58f2c:
     db $0,"OK!@@"
 
-_UnnamedText_58f33: ; 89d0d (22:5d0d)
+_UnnamedText_58f33:
     db $0,"good!@@"
 
-_UnnamedText_58f3e: ; 89d15 (22:5d15)
+_UnnamedText_58f3e:
     db $0,$4f
     db "Come back!",$57
 
-SECTION "SafariZoneEatingText",ROMX[$5d53],BANK[$22]
-
-SafariZoneEatingText: ; 89d53 (22:5d53)
+SafariZoneEatingText:
     db $0,"Wild @"
     TX_RAM W_ENEMYMONNAME
     db $0,$4f
     db "is eating!",$58
 
-SafariZoneAngryText: ; 89d6a (22:5d6a)
+SafariZoneAngryText:
     db $0,"Wild @"
     TX_RAM W_ENEMYMONNAME
     db $0,$4f
@@ -120977,336 +120947,334 @@ SafariZoneAngryText: ; 89d6a (22:5d6a)
 ; money related
 ; XXX $2 BCD macro
 ; $2,pointer,byte
-_UnnamedText_1386b: ; 89d80 (22:5d80)
+_UnnamedText_1386b:
     db $0,$52," picked up",$4f
     db "¥@"
     db $2,$e5,$cc,$c3
     db $0,"!",$58
 
-_UnnamedText_1c9c1: ; 89d96 (22:5d96)
+_UnnamedText_1c9c1:
     db $0,"Clear all saved",$4f
     db "data?",$57
 
-_UnnamedText_1ca14: ; 89dad (22:5dad)
+_UnnamedText_1ca14:
     db $0,"Which floor do",$4f
     db "you want? ",$57
 
-_PartyMenuNormalText: ; 89dc8 (22:5dc8)
+_PartyMenuNormalText:
     db $0,"Choose a #MON.",$57
 
-_PartyMenuItemUseText: ; 89dd8 (22:5dd8)
+_PartyMenuItemUseText:
     db $0,"Use item on which",$4f
     db "#MON?",$57
 
-_PartyMenuBattleText: ; 89df1 (22:5df1)
+_PartyMenuBattleText:
     db $0,"Bring out which",$4f
     db "#MON?",$57
 
-_PartyMenuUseTMText: ; 89e08 (22:5e08)
+_PartyMenuUseTMText:
     db $0,"Use TM on which",$4f
     db "#MON?",$57
 
-_PartyMenuSwapMonText: ; 89e1f (22:5e1f)
+_PartyMenuSwapMonText:
     db $0,"Move #MON",$4f
     db "where?",$57
 
-_PotionText: ; 89e31 (22:5e31)
+_PotionText:
     TX_RAM $cd6d
     db $0,$4f
     db "recovered by @"
     TX_NUM wHPBarHPDifference,2,3
     db $0,"!",$57
 
-_AntidoteText: ; 89e4b (22:5e4b)
+_AntidoteText:
     TX_RAM $cd6d
     db $0," was",$4f
     db "cured of poison!",$57
 
-_ParlyzHealText: ; 89e65 (22:5e65)
+_ParlyzHealText:
     TX_RAM $cd6d
     db $0,"'s",$4f
     db "rid of paralysis!",$57
 
-_BurnHealText: ; 89e7d (22:5e7d)
+_BurnHealText:
     TX_RAM $cd6d
     db $0,"'s",$4f
     db "burn was healed!",$57
 
-_IceHealText: ; 89e94 (22:5e94)
+_IceHealText:
     TX_RAM $cd6d
     db $0," was",$4f
     db "defrosted!",$57
 
-_AwakeningText: ; 89ea8 (22:5ea8)
+_AwakeningText:
     TX_RAM $cd6d
     db $0,$4f
     db "woke up!",$57
 
-_FullHealText: ; 89eb6 (22:5eb6)
+_FullHealText:
     TX_RAM $cd6d
     db $0,"'s",$4f
     db "health returned!",$57
 
-_ReviveText: ; 89ecd (22:5ecd)
+_ReviveText:
     TX_RAM $cd6d
     db $0,$4f
     db "is revitalized!",$57
 
-_RareCandyText: ; 89ee2 (22:5ee2)
+_RareCandyText:
     TX_RAM $cd6d
     db $0," grew",$4f
     db "to level @"
     TX_NUM $d127,$1,$3
     db $0,"!@@"
 
-_UnnamedText_17f23: ; 89efe (22:5efe)
+_UnnamedText_17f23:
     db $0,$52," turned on",$4f
     db "the PC.",$58
 
-_UnnamedText_17f28: ; 89f13 (22:5f13)
+_UnnamedText_17f28:
     db $0,"Accessed BILL's",$4f
     db "PC.",$51
     db "Accessed #MON",$4f
     db "Storage System.",$58
 
-_UnnamedText_17f2d: ; 89f45 (22:5f45)
+_UnnamedText_17f2d:
     db $0,"Accessed someone's",$4f
     db "PC.",$51
     db "Accessed #MON",$4f
     db "Storage System.",$58
 
-_UnnamedText_17f32: ; 89f7a (22:5f7a)
+_UnnamedText_17f32:
     db $0,"Accessed my PC.",$51
     db "Accessed Item",$4f
     db "Storage System.",$58
 
-_UnnamedText_7b22: ; 89fa9 (22:5fa9)
+_UnnamedText_7b22:
     db $0,$52," turned on",$4f
     db "the PC.",$58
 
-_UnnamedText_7b27: ; 89fbe (22:5fbe)
+_UnnamedText_7b27:
     db $0,"What do you want",$4f
     db "to do?",$57
 
-_UnnamedText_7b2c: ; 89fd7 (22:5fd7)
+_UnnamedText_7b2c:
     db $0,"What do you want",$4f
     db "to deposit?",$57
 
-_UnnamedText_7b31: ; 89ff5 (22:5ff5)
+_UnnamedText_7b31:
     db $0,"How many?",$57
 
-_UnnamedText_7b36: ; 8a000 (22:6000)
+_UnnamedText_7b36:
     TX_RAM $cd6d
     db $0," was",$4f
     db "stored via PC.",$58
 
-_UnnamedText_7b3b: ; 8a018 (22:6018)
+_UnnamedText_7b3b:
     db $0,"You have nothing",$4f
     db "to deposit.",$58
 
-_UnnamedText_7b40: ; 8a036 (22:6036)
+_UnnamedText_7b40:
     db $0,"No room left to",$4f
     db "store items.",$58
 
-_UnnamedText_7b45: ; 8a054 (22:6054)
+_UnnamedText_7b45:
     db $0,"What do you want",$4f
     db "to withdraw?",$57
 
-_UnnamedText_7b4a: ; 8a073 (22:6073)
+_UnnamedText_7b4a:
     db $0,"How many?",$57
 
-_UnnamedText_7b4f: ; 8a07e (22:607e)
+_UnnamedText_7b4f:
     db $0,"Withdrew",$4f
     db "@"
     TX_RAM $cd6d
     db $0,".",$58
 
-_NothingStoredText: ; 8a08f (22:608f)
+_NothingStoredText:
     db $0,"There is nothing",$4f
     db "stored.",$58
 
-_UnnamedText_7b59: ; 8a0a9 (22:60a9)
+_UnnamedText_7b59:
     db $0,"You can't carry",$4f
     db "any more items.",$58
 
-_UnnamedText_7b5e: ; 8a0c9 (22:60c9)
+_UnnamedText_7b5e:
     db $0,"What do you want",$4f
     db "to toss away?",$57
 
-_UnnamedText_7b63: ; 8a0e9 (22:60e9)
+_UnnamedText_7b63:
     db $0,"How many?",$57
 
-_UnnamedText_76683: ; 8a0f4 (22:60f4)
+_UnnamedText_76683:
     db $0,"Accessed #MON",$4f
     db "LEAGUE's site.",$51
     db "Accessed the HALL",$4f
     db "OF FAME List.",$58
 
-_SwitchOnText: ; 0x8a131
+_SwitchOnText:
     db $0,"Switch on!",$58
 
-_WhatText: ; 0x8a13d
+_WhatText:
     db $0,"What?",$57
 
-_DepositWhichMonText: ; 0x8a144
+_DepositWhichMonText:
     db $0,"Deposit which",$4f
     db "#MON?",$57
 
-_MonWasStoredText: ; 0x8a159
+_MonWasStoredText:
     TX_RAM $cf4b
     db $0," was",$4f
     db "stored in Box @"
     TX_RAM $cd3d
     db $0,".",$58
 
-_CantDepositLastMonText: ; 0x8a177
+_CantDepositLastMonText:
     db $0,"You can't deposit",$4f
     db "the last #MON!",$58
 
-_BoxFullText: ; 0x8a198
+_BoxFullText:
     db $0,"Oops! This Box is",$4f
     db "full of #MON.",$58
 
-_MonIsTakenOutText: ; 0x8a1b9
+_MonIsTakenOutText:
     TX_RAM $cf4b
     db $0," is",$4f
     db "taken out.",$55
     db "Got @"
-UnnamedText_8a1d1: ; 8a1d1 (22:61d1)
+UnnamedText_8a1d1:
     TX_RAM $cf4b
     db $0,".",$58
 
-_NoMonText: ; 0x8a1d7
+_NoMonText:
     db $0,"What? There are",$4f
     db "no #MON here!",$58
 
-_CantTakeMonText: ; 0x8a1f6
+_CantTakeMonText:
     db $0,"You can't take",$4f
     db "any more #MON.",$51
     db "Deposit #MON",$4f
     db "first.",$58
 
-_ReleaseWhichMonText: ; 0x8a228
+_ReleaseWhichMonText:
     db $0,"Release which",$4f
     db "#MON?",$57
 
-_OnceReleasedText: ; 0x8a23d
+_OnceReleasedText:
     db $0,"Once released,",$4f
     db "@"
 
-MonIsGoneForeverText: ; 0x8a24e
+MonIsGoneForeverText:
     TX_RAM $cf4b
     db $0," is",$55
     db "gone forever. OK?",$57
 
-_MonWasReleasedText: ; 0x8a268
+_MonWasReleasedText:
     TX_RAM $cf4b
     db $0," was",$4f
     db "released outside.",$55
     db "Bye @"
 
-_UnnamedText_8a288: ; 8a288 (22:6288)
+_UnnamedText_8a288:
     TX_RAM $cf4b
     db $0,"!",$58
 
-_RequireCoinCaseText: ; 8a28e (22:628e)
+_RequireCoinCaseText:
     db 0,"A COIN CASE is",$4F
     db "required!@@"
 
-_ExchangeCoinsForPrizesText: ; 8a2a9 (22:62a9)
+_ExchangeCoinsForPrizesText:
     db 0,"We exchange your",$4F
     db "coins for prizes.",$58
 
-_WhichPrizeText: ; 8a2cd (22:62cd)
+_WhichPrizeText:
     db 0,"Which prize do",$4F
     db "you want?",$57
 
-_HereYouGoText: ; 8a2e7 (22:62e7)
+_HereYouGoText:
     db 0,"Here you go!@@"
 
-_SoYouWantPrizeText: ; 8a2f6 (22:62f6)
+_SoYouWantPrizeText:
     db 0,"So,you want",$4F
     db "@"
     db 1
     dw $CD6D
     db 0,"?",$57
 
-_SorryNeedMoreCoins: ; 8a30b (22:630b)
+_SorryNeedMoreCoins:
     db 0,"Sorry,you need",$4F
     db "more coins.@@"
 
-_OopsYouDontHaveEnoughRoomText: ; 8a329 (22:6329)
+_OopsYouDontHaveEnoughRoomText:
     db 0,"Oops! You don't",$4F
     db "have enough room.@@"
 
-_OhFineThenText: ; 8a34c (22:634c)
+_OhFineThenText:
     db 0,"Oh,fine then.@@"
 
-_GetDexRatedText: ; 8a35d (22:635d)
+_GetDexRatedText:
     db $0,"Want to get your",$4f
     db "#DEX rated?",$57
 
-_ClosedOaksPCText: ; 8a37b (22:637b)
+_ClosedOaksPCText:
     db $0,"Closed link to",$4f
     db "PROF.OAK's PC.@@"
 
-_AccessedOaksPCText: ; 8a39a (22:639a)
+_AccessedOaksPCText:
     db $0,"Accessed PROF.",$4f
     db "OAK's PC.",$51
     db "Accessed #DEX",$4f
     db "Rating System.",$58
 
-_UnnamedText_5d43: ; 8a3d0 (22:63d0)
+_UnnamedText_5d43:
     db $0,"Where would you",$4f
     db "like to go?",$57
 
-_UnnamedText_5d48: ; 8a3ed (22:63ed)
+_UnnamedText_5d48:
     db $0,"OK,please wait",$4f
     db "just a moment.",$57
 
-_UnnamedText_5d4d: ; 8a40d (22:640d)
+_UnnamedText_5d4d:
     db $0,"The link was",$4f
     db "canceled.",$57
 
 INCLUDE "text/oakspeech.asm"
 
-_DoYouWantToNicknameText: ; 0x8a605
+_DoYouWantToNicknameText:
     db $0,"Give a nickname",$4f
     db "to @"
 
-UnnamedText_8a629: ; 8a629 (22:6629)
+UnnamedText_8a629:
     TX_RAM $cd6d
     db $0,"?",$57
 
-SECTION "_UnnamedText_699f",ROMX[$662f],BANK[$22]
-
-_UnnamedText_699f: ; 8a62f (22:662f)
+_UnnamedText_699f:
     db $0,"Right! So your",$4f
     db "name is ",$52,"!",$58
 
-_UnnamedText_69e7: ; 8a64a (22:664a)
+_UnnamedText_69e7:
     db $0,"That's right! I",$4f
     db "remember now! His",$55
     db "name is ",$53,"!",$58
 
-_SSAnne8AfterBattleText2: ; 8a677 (22:6677)
+_SSAnne8AfterBattleText2:
     TX_RAM $cd3f
     db $0," and",$4f
     db "@"
 
-UnnamedText_8a681: ; 8a681 (22:6681)
+UnnamedText_8a681:
     TX_RAM $cd6d
     db $0," will",$55
     db "be traded.",$57
 
-_Char00Text: ; 8a696 (22:6696)
+_Char00Text:
     TX_NUM $FF8C,1,2
     db 0," ERROR.",$57
 
-_Char55Text: ; 8a6a3 (22:66a3)
+_Char55Text:
     db 0,$4B,"@@"
 
-_DiglettsCaveRoute2Text1: ; 8a6a7 (22:66a7)
+_DiglettsCaveRoute2Text1:
     db $0,"I went to ROCK",$4f
     db "TUNNEL,but it's",$55
     db "dark and scary.",$51
@@ -121314,7 +121282,7 @@ _DiglettsCaveRoute2Text1: ; 8a6a7 (22:66a7)
     db "SKILL could light",$55
     db "it up...",$57
 
-_ViridianForestexitText1: ; 8a6fd (22:66fd)
+_ViridianForestexitText1:
     db $0,"Many #MON live",$4f
     db "only in forests ",$55
     db "and caves.",$51
@@ -121322,7 +121290,7 @@ _ViridianForestexitText1: ; 8a6fd (22:66fd)
     db "everywhere to get",$55
     db "different kinds!",$57
 
-_ViridianForestexitText2: ; 8a75d (22:675d)
+_ViridianForestexitText2:
     db $0,"Have you noticed",$4f
     db "the bushes on the",$55
     db "roadside?",$51
@@ -121330,44 +121298,42 @@ _ViridianForestexitText2: ; 8a75d (22:675d)
     db "down by a special",$55
     db "#MON move.",$57
 
-_Route2HouseText1: ; 8a7b8 (22:67b8)
+_Route2HouseText1:
     db $0,"A fainted #MON",$4f
     db "can't fight. But,",$55
     db "it can still use ",$55
     db "moves like CUT!",$57
 
-_HM05AfterText: ; 8a7fc (22:67fc)
+_HM05AfterText:
     db $0,"This SKILL",$4f
     db "lights even the",$55
     db "darkest dungeons.",$57
 
-SECTION "_Route2GateText2",ROMX[$682c],BANK[$22]
-
-_Route2GateText2: ; 8a82c (22:682c)
+_Route2GateText2:
     db $0,"Once a #MON",$4f
     db "can Light UP,you",$55
     db "can get through",$55
     db "ROCK TUNNEL.",$57
 
-_ViridianForestEntranceText1: ; 8a868 (22:6868)
+_ViridianForestEntranceText1:
     db $0,"Are you going to",$4f
     db "VIRIDIAN FOREST?",$55
     db "Be careful,it's",$55
     db "a natural maze!",$57
 
-_ViridianForestEntranceText2: ; 8a8ab (22:68ab)
+_ViridianForestEntranceText2:
     db $0,"RATTATA may be",$4f
     db "small,but its",$55
     db "bite is wicked!",$55
     db "Did you get one?",$57
 
-_MtMoonPokecenterText1: ; 8a8eb (22:68eb)
+_MtMoonPokecenterText1:
     db $0,"I've 6 # BALLs",$4f
     db "set in my belt.",$51
     db "At most,you can",$4f
     db "carry 6 #MON.",$57
 
-_MtMoonPokecenterText3: ; 8a929 (22:6929)
+_MtMoonPokecenterText3:
     db $0,"TEAM ROCKET",$4f
     db "attacks CERULEAN",$55
     db "citizens...",$51
@@ -121375,7 +121341,7 @@ _MtMoonPokecenterText3: ; 8a929 (22:6929)
     db "always in the",$55
     db "news!",$57
 
-_UnnamedText_4935c: ; 8a976 (22:6976)
+_UnnamedText_4935c:
     db $0,"MAN: Hello,there!",$4f
     db "Have I got a deal",$55
     db "just for you!",$51
@@ -121384,30 +121350,30 @@ _UnnamedText_4935c: ; 8a976 (22:6976)
     db "for just ¥500!",$55
     db "What do you say?",$57
 
-_UnnamedText_49361: ; 8a9ec (22:69ec)
+_UnnamedText_49361:
     db $0,"No? I'm only",$4f
     db "doing this as a",$55
     db "favor to you!",$57
 
-_UnnamedText_49366: ; 8aa17 (22:6a17)
+_UnnamedText_49366:
     db $0,"You'll need more",$4f
     db "money than that!",$57
 
-_UnnamedText_4936b: ; 8aa39 (22:6a39)
+_UnnamedText_4936b:
     db $0,"MAN: Well,I don't",$4f
     db "give refunds!",$57
 
-_MtMoonPokecenterText5: ; 8aa5a (22:6a5a)
+_MtMoonPokecenterText5:
     db $0,$57
 
-_UnnamedText_1dfe7: ; 8aa5c (22:6a5c)
+_UnnamedText_1dfe7:
     db $0,"I'm on guard duty.",$4f
     db "Gee,I'm thirsty,",$55
     db "though!",$51
     db "Oh wait there,",$4f
     db "the road's closed.",$57
 
-_UnnamedText_8aaa9: ; 8aaa9 (22:6aa9)
+_UnnamedText_8aaa9:
     db $0,"Whoa,boy!",$4f
     db "I'm parched!",$55
     db "...",$55
@@ -121415,7 +121381,7 @@ _UnnamedText_8aaa9: ; 8aaa9 (22:6aa9)
     db "this drink?",$55
     db "Gee,thanks!@@"
 
-_UnnamedText_1dff1: ; 8aaef (22:6aef)
+_UnnamedText_1dff1:
     db $0,$51
     db "...",$4f
     db "Glug glug...",$55
@@ -121429,70 +121395,70 @@ _UnnamedText_1dff1: ; 8aaef (22:6aef)
     db "share this with",$55
     db "the other guards!",$57
 
-_UnnamedText_1dff6: ; 8ab74 (22:6b74)
+_UnnamedText_1dff6:
     db $0,"Hi,thanks for",$4f
     db "the cool drinks!",$57
 
-_UnnamedText_5640f: ; 8ab95 (22:6b95)
+_UnnamedText_5640f:
     db $0,"I run a DAYCARE.",$4f
     db "Would you like me",$55
     db "to raise one of",$55
     db "your #MON?",$57
 
-_UnnamedText_56414: ; 8abd4 (22:6bd4)
+_UnnamedText_56414:
     db $0,"Which #MON",$4f
     db "should I raise?",$58
 
-_UnnamedText_56419: ; 8abf0 (22:6bf0)
+_UnnamedText_56419:
     db $0,"Fine,I'll look",$4f
     db "after @"
 
-UnnamedText_8ac07: ; 8ac07 (22:6c07)
+UnnamedText_8ac07:
     TX_RAM $cd6d
     db $0,$55
     db "for a while.",$58
 
-_UnnamedText_5641e: ; 8ac19 (22:6c19)
+_UnnamedText_5641e:
     db $0,"Come see me in",$4f
     db "a while.",$57
 
-_UnnamedText_56423: ; 8ac32 (22:6c32)
+_UnnamedText_56423:
     db $0,"Your @"
 
-UnnamedText_8ac39: ; 8ac39 (22:6c39)
+UnnamedText_8ac39:
     TX_RAM $cd6d
     db $0,$4f
     db "has grown a lot!",$51
     db "By level,it's",$4f
     db "grown by @"
 
-UnnamedText_8ac67: ; 8ac67 (22:6c67)
+UnnamedText_8ac67:
     TX_NUM $cd3e,$1,$3
     db $0,"!",$51
     db "Aren't I great?",$58
 
-_UnnamedText_56428: ; 8ac7d (22:6c7d)
+_UnnamedText_56428:
     db $0,"You owe me ¥@"
 
 ;XXX
     db $2,$3f,$cd,$c2
 
-UnnamedText_8ac8f: ; 8ac8f (22:6c8f)
+UnnamedText_8ac8f:
     db $0,$4f
     db "for the return",$55
     db "of this #MON.",$57
 
-_UnnamedText_5642d: ; 8acae (22:6cae)
+_UnnamedText_5642d:
     db $0,$52," got",$4f
     db "@"
     TX_RAM $da49
     db $0," back!",$57
 
-_UnnamedText_56432: ; 8acc1 (22:6cc1)
+_UnnamedText_56432:
     db $0,"Back already?",$4f
     db "Your @"
 
-UnnamedText_8acd6: ; 8acd6 (22:6cd6)
+UnnamedText_8acd6:
     TX_RAM $cd6d
     db $0,$55
     db "needs some more",$55
@@ -121783,49 +121749,45 @@ _EscapeRopeNoRoomText:
 
 SECTION "bank23",ROMX,BANK[$23]
 
-_UnnamedText_56437: ; 8c000 (23:4000)
+_UnnamedText_56437:
     db $0,"All right then,",$4f
     db "@@"
 
-_UnnamedText_5643b: ; 8c013 (23:4013)
+_UnnamedText_5643b:
     db $0,"come again.",$57
 
-_UnnamedText_56440: ; 8c020 (23:4020)
+_UnnamedText_56440:
     db $0,"You have no room",$4f
     db "for this #MON!",$57
 
-_UnnamedText_56445: ; 8c041 (23:4041)
+_UnnamedText_56445:
     db $0,"You only have one",$4f
     db "#MON with you.",$57
 
-SECTION "_UnnamedText_5644f",ROMX[$4090],BANK[$23]
-
-_UnnamedText_5644f: ; 8c090 (23:4090)
+_UnnamedText_5644f:
     db $0,"Thank you! Here's",$4f
     db "your #MON!",$58
 
-_UnnamedText_56454: ; 8c0ad (23:40ad)
+_UnnamedText_56454:
     db $0,"Hey,you don't",$4f
     db "have enough ¥!",$57
 
-_UndergrdTunnelEntRoute6Text1: ; 8c0cb (23:40cb)
+_UndergrdTunnelEntRoute6Text1:
     db $0,"People often lose",$4f
     db "things in that",$55
     db "UNDERGROUND PATH.",$57
 
-_UndergroundPathEntRoute7Text1: ; 8c0ff (23:40ff)
+_UndergroundPathEntRoute7Text1:
     db $0,"I heard a sleepy",$4f
     db "#MON appeared",$55
     db "near CELADON CITY.",$57
 
-SECTION "_UndergroundPathEntRoute8Text1",ROMX[$428d],BANK[$23]
-
-_UndergroundPathEntRoute8Text1: ; 8c28d (23:428d)
+_UndergroundPathEntRoute8Text1:
     db $0,"The dept. store",$4f
     db "in CELADON has a",$55
     db "great selection!",$57
 
-_RockTunnelPokecenterText1: ; 8c2c0 (23:42c0)
+_RockTunnelPokecenterText1:
     db $0,"The element types",$4f
     db "of #MON make",$55
     db "them stronger",$55
@@ -121833,111 +121795,111 @@ _RockTunnelPokecenterText1: ; 8c2c0 (23:42c0)
     db "and weaker than",$55
     db "others!",$57
 
-_RockTunnelPokecenterText3: ; 8c316 (23:4316)
+_RockTunnelPokecenterText3:
     db $0,"I sold a useless",$4f
     db "NUGGET for ¥5000!",$57
 
-_RockTunnel1BattleText1: ; 8c33a (23:433a)
+_RockTunnel1BattleText1:
     db $0,"This tunnel goes",$4f
     db "a long way,kid!",$57
 
-_RockTunnel1EndBattleText1: ; 8c35d (23:435d)
+_RockTunnel1EndBattleText1:
     db $0,"Doh!",$4f
     db "You win!",$58
 
-_RockTunnel1AfterBattleText1: ; 8c36c (23:436c)
+_RockTunnel1AfterBattleText1:
     db $0,"Watch for ONIX!",$4f
     db "It can put the",$55
     db "squeeze on you!",$57
 
-_RockTunnel1BattleText2: ; 8c39c (23:439c)
+_RockTunnel1BattleText2:
     db $0,"Hmm. Maybe I'm",$4f
     db "lost in here...",$57
 
-_RockTunnel1EndBattleText2: ; 8c3bb (23:43bb)
+_RockTunnel1EndBattleText2:
     db $0,"Ease up!",$4f
     db "What am I doing?",$55
     db "Which way is out?",$58
 
-_RockTunnel1AfterBattleText2: ; 8c3e8 (23:43e8)
+_RockTunnel1AfterBattleText2:
     db $0,"That sleeping",$4f
     db "#MON on ROUTE",$55
     db "12 forced me to",$55
     db "take this detour.",$57
 
-_RockTunnel1BattleText3: ; 8c427 (23:4427)
+_RockTunnel1BattleText3:
     db $0,"Outsiders like",$4f
     db "you need to show",$55
     db "me some respect!",$57
 
-_RockTunnel1EndBattleText3: ; 8c459 (23:4459)
+_RockTunnel1EndBattleText3:
     db $0,"I give!",$58
 
-_RockTunnel1AfterBattleText3: ; 8c462 (23:4462)
+_RockTunnel1AfterBattleText3:
     db $0,"You're talented",$4f
     db "enough to hike!",$57
 
-_RockTunnel1BattleText4: ; 8c482 (23:4482)
+_RockTunnel1BattleText4:
     db $0,"#MON fight!",$4f
     db "Ready,go!",$57
 
-_RockTunnel1EndBattleText4: ; 8c49a (23:449a)
+_RockTunnel1EndBattleText4:
     db $0,"Game",$4f
     db "over!",$58
 
-_RockTunnel1AfterBattleText4: ; 8c4a6 (23:44a6)
+_RockTunnel1AfterBattleText4:
     db $0,"Oh well,I'll get",$4f
     db "a ZUBAT as I go!",$57
 
-_RockTunnel1BattleText5: ; 8c4c9 (23:44c9)
+_RockTunnel1BattleText5:
     db $0,"Eek! Don't try",$4f
     db "anything funny in",$55
     db "the dark!",$57
 
-_RockTunnel1EndBattleText5: ; 8c4f4 (23:44f4)
+_RockTunnel1EndBattleText5:
     db $0,"It",$4f
     db "was too dark!",$58
 
-_RockTunnel1AfterBattleText5: ; 8c506 (23:4506)
+_RockTunnel1AfterBattleText5:
     db $0,"I saw a MACHOP",$4f
     db "in this tunnel!",$57
 
-_RockTunnel1BattleText6: ; 8c526 (23:4526)
+_RockTunnel1BattleText6:
     db $0,"I came this far",$4f
     db "for #MON!",$57
 
-_RockTunnel1EndBattleText6: ; 8c541 (23:4541)
+_RockTunnel1EndBattleText6:
     db $0,"I'm",$4f
     db "out of #MON!",$58
 
-_RockTunnel1AfterBattleText6: ; 8c552 (23:4552)
+_RockTunnel1AfterBattleText6:
     db $0,"You looked cute",$4f
     db "and harmless!",$57
 
-_RockTunnel1BattleText7: ; 8c571 (23:4571)
+_RockTunnel1BattleText7:
     db $0,"You have #MON!",$4f
     db "Let's start!",$57
 
-_RockTunnel1EndBattleText7: ; 8c58d (23:458d)
+_RockTunnel1EndBattleText7:
     db $0,"You",$4f
     db "play hard!",$58
 
-_RockTunnel1AfterBattleText7: ; 8c59d (23:459d)
+_RockTunnel1AfterBattleText7:
     db $0,"Whew! I'm all",$4f
     db "sweaty now!",$57
 
-_RockTunnel1Text8: ; 8c5b7 (23:45b7)
+_RockTunnel1Text8:
     db $0,"ROCK TUNNEL",$4f
     db "CERULEAN CITY -",$55
     db "LAVENDER TOWN",$57
 
-_VoltorbBattleText: ; 8c5e2 (23:45e2)
+_VoltorbBattleText:
     db $0,"Bzzzt!",$57
 
-_ZapdosBattleText: ; 8c5ea (23:45ea)
+_ZapdosBattleText:
     db $0,"Gyaoo!@@"
 
-_Route11GateText1: ; 8c5f3 (23:45f3)
+_Route11GateText1:
     db $0,"When you catch",$4f
     db "lots of #MON,",$55
     db "isn't it hard to",$55
@@ -121949,7 +121911,7 @@ _Route11GateText1: ; 8c5f3 (23:45f3)
     db "He'll help you",$4f
     db "rename them too!",$57
 
-_UnnamedText_494a3: ; 8c689 (23:4689)
+_UnnamedText_494a3:
     db $0,"There are items on",$4f
     db "the ground that",$55
     db "can't be seen.",$51
@@ -121960,19 +121922,19 @@ _UnnamedText_494a3: ; 8c689 (23:4689)
     db "it,so you have",$55
     db "to look yourself!",$57
 
-_UnnamedText_494c4: ; 8c71b (23:471b)
+_UnnamedText_494c4:
     db $0,"Looked into the",$4f
     db "binoculars.",$51
     db "A big #MON is",$4f
     db "asleep on a road!",$57
 
-_UnnamedText_494c9: ; 8c758 (23:4758)
+_UnnamedText_494c9:
     db $0,"Looked into the",$4f
     db "binoculars.",$51
     db "It's a beautiful",$4f
     db "view!",$57
 
-_UnnamedText_494d5: ; 8c78b (23:478b)
+_UnnamedText_494d5:
     db $0,"Looked into the",$4f
     db "binoculars.",$51
     db "The only way to",$4f
@@ -121981,18 +121943,18 @@ _UnnamedText_494d5: ; 8c78b (23:478b)
     db "is by way of the",$55
     db "ROCK TUNNEL.",$57
 
-_DiglettsCaveEntRoute11Text1: ; 8c7f9 (23:47f9)
+_DiglettsCaveEntRoute11Text1:
     db $0,"What a surprise!",$4f
     db "DIGLETTs dug this",$55
     db "long tunnel!",$51
     db "It goes right to",$4f
     db "VIRIDIAN CITY!",$57
 
-_Route12GateText1: ; 8c84a (23:484a)
+_Route12GateText1:
     db $0,"There's a lookout",$4f
     db "spot upstairs.",$57
 
-_TM39PreReceiveText: ; 8c86b (23:486b)
+_TM39PreReceiveText:
     db $0,"My #MON's",$4f
     db "ashes are stored",$55
     db "in #MON TOWER.",$51
@@ -122000,9 +121962,7 @@ _TM39PreReceiveText: ; 8c86b (23:486b)
     db "TM. I don't need",$55
     db "it any more...",$58
 
-SECTION "_TM39ExplanationText",ROMX[$48d9],BANK[$23]
-
-_TM39ExplanationText: ; 8c8d9 (23:48d9)
+_TM39ExplanationText:
     db $0,"TM39 is a move",$4f
     db "called SWIFT.",$51
     db "It's very accurate,",$4f
@@ -122010,21 +121970,21 @@ _TM39ExplanationText: ; 8c8d9 (23:48d9)
     db "battles you can't",$55
     db "afford to lose.",$57
 
-_TM39NoRoomText: ; 8c93c (23:493c)
+_TM39NoRoomText:
     db $0,"You don't have",$4f
     db "room for this.",$57
 
-_UnnamedText_495b8: ; 8c95a (23:495a)
+_UnnamedText_495b8:
     db $0,"Looked into the",$4f
     db "binoculars.",$51
     db "A man fishing!",$57
 
-_UnnamedText_495c4: ; 8c986 (23:4986)
+_UnnamedText_495c4:
     db $0,"Looked into the",$4f
     db "binoculars.",$51
     db "It's #MON TOWER!",$57
 
-_UnnamedText_564c0: ; 8c9b3 (23:49b3)
+_UnnamedText_564c0:
     db $0,"I'm the FISHING",$4f
     db "GURU's brother!",$51
     db "I simply Looove",$4f
@@ -122032,7 +121992,7 @@ _UnnamedText_564c0: ; 8c9b3 (23:49b3)
     db "Do you like to",$4f
     db "fish?",$57
 
-_UnnamedText_564c5: ; 8ca00 (23:4a00)
+_UnnamedText_564c5:
     db $0,"Grand! I like",$4f
     db "your style!",$51
     db "Take this and",$4f
@@ -122040,11 +122000,11 @@ _UnnamedText_564c5: ; 8ca00 (23:4a00)
     db $52," received",$4f
     db "a @"
 
-UnnamedText_8ca48: ; 8ca48 (23:4a48)
+UnnamedText_8ca48:
     TX_RAM $cf4b
     db $0,"!@@"
 
-_UnnamedText_564ca: ; 8ca4f (23:4a4f)
+_UnnamedText_564ca:
     db $0,$51
     db "Fishing is a way",$4f
     db "of life!",$51
@@ -122053,11 +122013,11 @@ _UnnamedText_564ca: ; 8ca4f (23:4a4f)
     db "and land the big",$55
     db "one!",$57
 
-_UnnamedText_564cf: ; 8caa1 (23:4aa1)
+_UnnamedText_564cf:
     db $0,"Oh... That's so",$4f
     db "disappointing...",$57
 
-_UnnamedText_564d4: ; 8cac2 (23:4ac2)
+_UnnamedText_564d4:
     db $0,"Hello there,",$4f
     db $52,"!",$51
     db "Use the SUPER ROD",$4f
@@ -122068,19 +122028,19 @@ _UnnamedText_564d4: ; 8cac2 (23:4ac2)
     db "Try fishing",$4f
     db "wherever you can!",$57
 
-_UnnamedText_564d9: ; 8cb38 (23:4b38)
+_UnnamedText_564d9:
     db $0,"Oh no!",$51
     db "I had a gift for",$4f
     db "you,but you have",$55
     db "no room for it!",$57
 
-_Route15GateText1: ; 8cb73 (23:4b73)
+_Route15GateText1:
     db $0,"Are you working",$4f
     db "on a #DEX?",$51
     db "PROF.OAK's AIDE",$4f
     db "came by here.",$57
 
-;_UnnamedText_4968c: ; 8cbac (23:4bac)
+;_UnnamedText_4968c:
 ;    db $0,"EXP.ALL gives",$4f
 ;    db "EXP points to all",$55
 ;    db "the #MON with",$55
@@ -122094,7 +122054,7 @@ _Route15GateText1: ; 8cb73 (23:4b73)
 ;    db "it,you should ",$55
 ;    db "store it via PC.",$57
 
-_UnnamedText_4968c: ; 8cbac (23:4bac)
+_UnnamedText_4968c:
     db $0,"FOCUS gives EXP",$4f
     db "points only to",$55
     db "#MON that",$55
@@ -122107,55 +122067,53 @@ _UnnamedText_4968c: ; 8cbac (23:4bac)
     db "it,you should ",$55
     db "store it via PC.",$57
 
-SECTION "_UnnamedText_49698",ROMX[$4c65],BANK[$23]
-
-_UnnamedText_49698: ; 8cc65 (23:4c65)
+_UnnamedText_49698:
     db $0,"Looked into the",$4f
     db "binoculars.",$51
     db "It looks like a",$4f
     db "small island!",$57
 
-_UnnamedText_49777: ; 8cca0 (23:4ca0)
+_UnnamedText_49777:
     db $0,"No pedestrians",$4f
     db "are allowed on",$55
     db "CYCLING ROAD!",$57
 
-_UnnamedText_4977c: ; 8cccd (23:4ccd)
+_UnnamedText_4977c:
     db $0,"CYCLING ROAD is a",$4f
     db "downhill course",$55
     db "by the sea. It's",$55
     db "a great ride.",$57
 
-_UnnamedText_49781: ; 8cd0e (23:4d0e)
+_UnnamedText_49781:
     db $0,"Excuse me! Wait",$4f
     db "up please!",$57
 
-_Route16GateMapText2: ; 8cd2a (23:4d2a)
+_Route16GateMapText2:
     db $0,"How'd you get in?",$4f
     db "Good effort!",$57
 
-_UnnamedText_49820: ; 8cd49 (23:4d49)
+_UnnamedText_49820:
     db $0,"I'm going for a",$4f
     db "ride with my girl",$55
     db "friend!",$57
 
-_UnnamedText_4982f: ; 8cd73 (23:4d73)
+_UnnamedText_4982f:
     db $0,"We're going",$4f
     db "riding together!",$57
 
-_UnnamedText_4983b: ; 8cd90 (23:4d90)
+_UnnamedText_4983b:
     db $0,"Looked into the",$4f
     db "binoculars.",$51
     db "It's CELADON DEPT.",$4f
     db "STORE!",$57
 
-_UnnamedText_49847: ; 8cdc6 (23:4dc6)
+_UnnamedText_49847:
     db $0,"Looked into the",$4f
     db "binoculars.",$51
     db "There's a long",$4f
     db "path over water!",$57
 
-_PreHM02Text: ; 8ce02 (23:4e02)
+_PreHM02Text:
     db $0,"Oh,you found my",$4f
     db "secret retreat!",$51
     db "Please don't tell",$4f
@@ -122163,125 +122121,123 @@ _PreHM02Text: ; 8ce02 (23:4e02)
     db "I'll make it up",$55
     db "to you with this!",$58
 
-SECTION "_UnnamedText_1e652",ROMX[$4ee0],BANK[$23]
-
-_UnnamedText_1e652: ; 8cee0 (23:4ee0)
+_UnnamedText_1e652:
     db $0,"FEAROW: Kyueen!",$57
 
-_UnnamedText_49928: ; 8cef1 (23:4ef1)
+_UnnamedText_49928:
     db $0,"You need a BICYCLE",$4f
     db "for CYCLING ROAD!",$57
 
-_UnnamedText_4992d: ; 8cf17 (23:4f17)
+_UnnamedText_4992d:
     db $0,"CYCLING ROAD is",$4f
     db "all uphill from",$55
     db "here.",$57
 
-_UnnamedText_49932: ; 8cf3e (23:4f3e)
+_UnnamedText_49932:
     db $0,"Excuse me!",$57
 
-_UnnamedText_49993: ; 8cf4a (23:4f4a)
+_UnnamedText_49993:
     db $0,"Looked into the",$4f
     db "binoculars.",$51
     db "PALLET TOWN is in",$4f
     db "the west!",$57
 
-_UnnamedText_4999f: ; 8cf83 (23:4f83)
+_UnnamedText_4999f:
     db $0,"Looked into the",$4f
     db "binoculars.",$51
     db "There are people",$4f
     db "swimming!",$57
 
-_UnnamedText_1e704: ; 8cfbb (23:4fbb)
+_UnnamedText_1e704:
     db $0,"Only truly skilled",$4f
     db "trainers are",$55
     db "allowed through.",$51
     db "You don't have the",$4f
     db "BOULDERBADGE yet!@@"
 
-_UnnamedText_1e715: ; 8d012 (23:5012)
+_UnnamedText_1e715:
     db $0,$51
     db "The rules are",$4f
     db "rules. I can't",$55
     db "let you pass.",$57
 
-_UnnamedText_1e71a: ; 8d03e (23:503e)
+_UnnamedText_1e71a:
     db $0,"Oh! That is the",$4f
     db "BOULDERBADGE!",$55
     db "Go right ahead!@@"
 
-_OnixText: ; 8d06e (23:506e)
+_OnixText:
     db $0,"Hurou!@@"
 
-_VictoryRoad2BattleText1: ; 8d077 (23:5077)
+_VictoryRoad2BattleText1:
     db $0,"VICTORY ROAD is",$4f
     db "the final test",$55
     db "for trainers!",$57
 
-_VictoryRoad2EndBattleText1: ; 8d0a5 (23:50a5)
+_VictoryRoad2EndBattleText1:
     db $0,"Aiyah!",$58
 
-_VictoryRoad2AfterBattleText1: ; 8d0ad (23:50ad)
+_VictoryRoad2AfterBattleText1:
     db $0,"If you get stuck,",$4f
     db "try moving some",$55
     db "boulders around!",$57
 
-_VictoryRoad2BattleText2: ; 8d0e1 (23:50e1)
+_VictoryRoad2BattleText2:
     db $0,"Ah,so you wish",$4f
     db "to challenge the",$55
     db "ELITE FOUR?",$57
 
-_VictoryRoad2EndBattleText2: ; 8d10f (23:510f)
+_VictoryRoad2EndBattleText2:
     db $0,"You",$4f
     db "got me!",$58
 
-_VictoryRoad2AfterBattleText2: ; 8d11c (23:511c)
+_VictoryRoad2AfterBattleText2:
     db $0,$53," also came",$4f
     db "through here!",$57
 
-_VictoryRoad2BattleText3: ; 8d137 (23:5137)
+_VictoryRoad2BattleText3:
     db $0,"Come on!",$4f
     db "I'll whip you!",$57
 
-_VictoryRoad2EndBattleText3: ; 8d14f (23:514f)
+_VictoryRoad2EndBattleText3:
     db $0,"I got",$4f
     db "whipped!",$58
 
-_VictoryRoad2AfterBattleText3: ; 8d15f (23:515f)
+_VictoryRoad2AfterBattleText3:
     db $0,"You earned the",$4f
     db "right to be on",$55
     db "VICTORY ROAD!",$57
 
-_VictoryRoad2BattleText4: ; 8d18c (23:518c)
+_VictoryRoad2BattleText4:
     db $0,"If you can get",$4f
     db "through here,you",$55
     db "can go meet the",$55
     db "ELITE FOUR!",$57
 
-_VictoryRoad2EndBattleText4: ; 8d1ca (23:51ca)
+_VictoryRoad2EndBattleText4:
     db $0,"No!",$4f
     db "Unbelievable!",$58
 
-_VictoryRoad2AfterBattleText4: ; 8d1dd (23:51dd)
+_VictoryRoad2AfterBattleText4:
     db $0,"I can beat you",$4f
     db "when it comes to",$55
     db "knowledge about",$55
     db "#MON!",$57
 
-_VictoryRoad2BattleText5: ; 8d214 (23:5214)
+_VictoryRoad2BattleText5:
     db $0,"Is VICTORY ROAD",$4f
     db "too tough?",$57
 
-_VictoryRoad2EndBattleText5: ; 8d230 (23:5230)
+_VictoryRoad2EndBattleText5:
     db $0,"Well",$4f
     db "done!",$58
 
-_VictoryRoad2AfterBattleText5: ; 8d23c (23:523c)
+_VictoryRoad2AfterBattleText5:
     db $0,"Many trainers give",$4f
     db "up the challenge",$55
     db "here.",$57
 
-_UnnamedText_1e865: ; 8d267 (23:5267)
+_UnnamedText_1e865:
     db $0,"Hiya! I'm a",$4f
     db "#MON...",$55
     db "...No I'm not!",$51
@@ -122298,14 +122254,14 @@ _UnnamedText_1e865: ; 8d267 (23:5267)
     db "So,how about it?",$4f
     db "Help me out here!",$57
 
-_UnnamedText_1e86a: ; 8d345 (23:5345)
+_UnnamedText_1e86a:
     db $0,"When I'm in the",$4f
     db "TELEPORTER,go to",$55
     db "my PC and run the",$55
     db "Cell Separation",$55
     db "System!",$57
 
-_UnnamedText_1e86f: ; 8d391 (23:5391)
+_UnnamedText_1e86f:
     db $0,"No!? Come on,you",$4f
     db "gotta help a guy",$55
     db "in deep trouble!",$51
@@ -122313,7 +122269,7 @@ _UnnamedText_1e86f: ; 8d391 (23:5391)
     db "chief? Please?",$55
     db "OK? All right!",$58
 
-_BillThankYouText: ; 8d3f5 (23:53f5)
+_BillThankYouText:
     db $0,"BILL: Yeehah!",$4f
     db "Thanks,bud! I",$55
     db "owe you one!",$51
@@ -122326,17 +122282,17 @@ _BillThankYouText: ; 8d3f5 (23:53f5)
     db "you... Oh here,",$55
     db "maybe this'll do.",$58
 
-_SSTicketReceivedText: ; 8d499 (23:5499)
+_SSTicketReceivedText:
     db $0,$52," received",$4f
     db "an @"
     TX_RAM $cf4b
     db $0,"!@@"
 
-_SSTicketNoRoomText: ; 8d4b0 (23:54b0)
+_SSTicketNoRoomText:
     db $0,"You've got too",$4f
     db "much stuff,bud!",$57
 
-_UnnamedText_1e8cb: ; 8d4d0 (23:54d0)
+_UnnamedText_1e8cb:
     db $0,"That cruise ship,",$4f
     db "S.S.ANNE,is in",$55
     db "VERMILION CITY.",$55
@@ -122349,13 +122305,13 @@ _UnnamedText_1e8cb: ; 8d4d0 (23:54d0)
     db "don't you go",$55
     db "instead of me?",$57
 
-_UnnamedText_1e8da: ; 8d57f (23:557f)
+_UnnamedText_1e8da:
     db $0,"BILL: Look,bud,",$4f
     db "just check out",$55
     db "some of my rare",$55
     db "#MON on my PC!",$57
 
-_Route1ViridianMartSampleText: ; 8d5bf (23:55bf)
+_Route1ViridianMartSampleText:
     db $0,"Hi! I work at a",$4f
     db "#MON MART.",$51
     db "It's a convenient",$4f
@@ -122366,18 +122322,16 @@ _Route1ViridianMartSampleText: ; 8d5bf (23:55bf)
     db "you a sample!",$55
     db "Here you go!",$58
 
-SECTION "_UnnamedText_1caee",ROMX[$5652],BANK[$23]
-
-_UnnamedText_1caee: ; 8d652 (23:5652)
+_UnnamedText_1caee:
     db $0,"We also carry",$4f
     db "# BALLs for",$55
     db "catching #MON!",$57
 
-_UnnamedText_1caf3: ; 8d67c (23:567c)
+_UnnamedText_1caf3:
     db $0,"You have too much",$4f
     db "stuff with you!",$57
 
-_Route1Text2: ; 8d69f (23:569f)
+_Route1Text2:
     db $0,"See those ledges",$4f
     db "along the road?",$51
     db "It's a bit scary,",$4f
@@ -122387,20 +122341,20 @@ _Route1Text2: ; 8d69f (23:569f)
     db "to PALLET TOWN",$55
     db "quicker that way.",$57
 
-_Route1Text3: ; 8d720 (23:5720)
+_Route1Text3:
     db $0,"ROUTE 1",$4f
     db "PALLET TOWN -",$55
     db "VIRIDIAN CITY",$57
 
-_Route2Text3: ; 8d745 (23:5745)
+_Route2Text3:
     db $0,"ROUTE 2",$4f
     db "VIRIDIAN CITY -",$55
     db "PEWTER CITY",$57
 
-_Route2Text4: ; 8d76a (23:576a)
+_Route2Text4:
     db $0,"DIGLETT's CAVE",$57
 
-_Route3Text1: ; 8d779 (23:5779)
+_Route3Text1:
     db $0,"Whew... I better",$4f
     db "take a rest...",$55
     db "Groan...",$51
@@ -122408,677 +122362,677 @@ _Route3Text1: ; 8d779 (23:5779)
     db "CERULEAN takes a",$55
     db "lot out of you!",$57
 
-_Route3BattleText1: ; 8d7d5 (23:57d5)
+_Route3BattleText1:
     db $0,"Hey! I met you in",$4f
     db "VIRIDIAN FOREST!",$57
 
-_Route3EndBattleText1: ; 8d7f9 (23:57f9)
+_Route3EndBattleText1:
     db $0,"You",$4f
     db "beat me again!",$58
 
-_Route3AfterBattleText1: ; 8d80d (23:580d)
+_Route3AfterBattleText1:
     db $0,"There are other",$4f
     db "kinds of #MON",$55
     db "than those found",$55
     db "in the forest!",$57
 
-_Route3BattleText2: ; 8d84c (23:584c)
+_Route3BattleText2:
     db $0,"Hi! I like shorts!",$4f
     db "They're comfy and",$55
     db "easy to wear!",$57
 
-_Route3EndBattleText2: ; 8d87f (23:587f)
+_Route3EndBattleText2:
     db $0,"I don't",$4f
     db "believe it!",$58
 
-_Route3AfterBattleText2: ; 8d893 (23:5893)
+_Route3AfterBattleText2:
     db $0,"Are you storing",$4f
     db "your #MON on",$55
     db "PC? Each BOX can",$55
     db "hold 20 #MON!",$57
 
-_Route3BattleText3: ; 8d8d0 (23:58d0)
+_Route3BattleText3:
     db $0,"You looked at me,",$4f
     db "didn't you?",$57
 
-_Route3EndBattleText3: ; 8d8ee (23:58ee)
+_Route3EndBattleText3:
     db $0,"You're",$4f
     db "mean!",$58
 
-_Route3AfterBattleText3: ; 8d8fb (23:58fb)
+_Route3AfterBattleText3:
     db $0,"Quit staring if",$4f
     db "you don't want to",$55
     db "fight!",$57
 
-_Route3BattleText4: ; 8d924 (23:5924)
+_Route3BattleText4:
     db $0,"Are you a trainer?",$4f
     db "Let's fight!",$57
 
-_Route3EndBattleText4: ; 8d944 (23:5944)
+_Route3EndBattleText4:
     db $0,"If I",$4f
     db "had new #MON I",$55
     db "would've won!",$58
 
-_Route3AfterBattleText4: ; 8d966 (23:5966)
+_Route3AfterBattleText4:
     db $0,"If a #MON BOX",$4f
     db "on the PC gets",$55
     db "full,just switch",$55
     db "to another BOX!",$57
 
-_Route3BattleText5: ; 8d9a6 (23:59a6)
+_Route3BattleText5:
     db $0,"That look you",$4f
     db "gave me,it's so",$55
     db "intriguing!",$57
 
-_Route3EndBattleText5: ; 8d9d1 (23:59d1)
+_Route3EndBattleText5:
     db $0,"Be nice!",$58
 
-_Route3AfterBattleText5: ; 8d9db (23:59db)
+_Route3AfterBattleText5:
     db $0,"Avoid fights by",$4f
     db "not letting",$55
     db "people see you!",$57
 
-_Route3BattleText6: ; 8da08 (23:5a08)
+_Route3BattleText6:
     db $0,"Hey! You're not",$4f
     db "wearing shorts!",$57
 
-_Route3EndBattleText6: ; 8da28 (23:5a28)
+_Route3EndBattleText6:
     db $0,"Lost!",$4f
     db "Lost! Lost!",$58
 
-_Route3AfterBattleText6: ; 8da3b (23:5a3b)
+_Route3AfterBattleText6:
     db $0,"I always wear",$4f
     db "shorts,even in",$55
     db "winter!",$57
 
-_Route3BattleText7: ; 8da62 (23:5a62)
+_Route3BattleText7:
     db $0,"You can fight my",$4f
     db "new #MON!",$57
 
-_Route3EndBattleText7: ; 8da7e (23:5a7e)
+_Route3EndBattleText7:
     db $0,"Done",$4f
     db "like dinner!",$58
 
-_Route3AfterBattleText7: ; 8da91 (23:5a91)
+_Route3AfterBattleText7:
     db $0,"Trained #MON",$4f
     db "are stronger than",$55
     db "the wild ones!",$57
 
-_Route3BattleText8: ; 8dac0 (23:5ac0)
+_Route3BattleText8:
     db $0,"Eek! Did you",$4f
     db "touch me?",$57
 
-_Route3EndBattleText8: ; 8dad8 (23:5ad8)
+_Route3EndBattleText8:
     db $0,"That's it?",$58
 
-_Route3AfterBattleText8: ; 8dae3 (23:5ae3)
+_Route3AfterBattleText8:
     db $0,"ROUTE 4 is at the",$4f
     db "foot of MT.MOON.",$57
 
-_Route3Text10: ; 8db07 (23:5b07)
+_Route3Text10:
     db $0,"ROUTE 3",$4f
     db "MT.MOON AHEAD",$57
 
-_Route4Text1: ; 8db1e (23:5b1e)
+_Route4Text1:
     db $0,"Ouch! I tripped",$4f
     db "over a rocky",$55
     db "#MON,GEODUDE!",$57
 
-_Route4BattleText1: ; 8db4b (23:5b4b)
+_Route4BattleText1:
     db $0,"I came to get my",$4f
     db "mushroom #MON!",$57
 
-_Route4EndBattleText1: ; 8db6c (23:5b6c)
+_Route4EndBattleText1:
     db $0,"Oh! My cute",$4f
     db "mushroom #MON!",$58
 
-_Route4AfterBattleText1: ; 8db88 (23:5b88)
+_Route4AfterBattleText1:
     db $0,"There might not",$4f
     db "be any more",$55
     db "mushrooms here.",$51
     db "I think I got",$4f
     db "them all.",$57
 
-_Route4Text5: ; 8dbcd (23:5bcd)
+_Route4Text5:
     db $0,"MT.MOON",$4f
     db "Tunnel Entrance",$57
 
-_Route4Text6: ; 8dbe6 (23:5be6)
+_Route4Text6:
     db $0,"ROUTE 4",$4f
     db "MT.MOON -",$55
     db "CERULEAN CITY",$57
 
-_Route5Text1: ; 8dc07 (23:5c07)
+_Route5Text1:
     db $0,"UNDERGROUND PATH",$4f
     db "CERULEAN CITY -",$55
     db "VERMILION CITY",$57
 
-_Route6BattleText1: ; 8dc38 (23:5c38)
+_Route6BattleText1:
     db $0,"Who's there?",$4f
     db "Quit listening in",$55
     db "on us!",$57
 
-_Route6EndBattleText1: ; 8dc5e (23:5c5e)
+_Route6EndBattleText1:
     db $0,"I",$4f
     db "just can't win!",$58
 
-_Route6AfterBattleText1: ; 8dc70 (23:5c70)
+_Route6AfterBattleText1:
     db $0,"Whisper...",$4f
     db "whisper...",$57
 
-_Route6BattleText2: ; 8dc87 (23:5c87)
+_Route6BattleText2:
     db $0,"Excuse me! This",$4f
     db "is a private",$55
     db "conversation!",$57
 
-_Route6EndBattleText2: ; 8dcb3 (23:5cb3)
+_Route6EndBattleText2:
     db $0,"Ugh!",$4f
     db "I hate losing!",$58
 
-_Route6BattleText3: ; 8dcc8 (23:5cc8)
+_Route6BattleText3:
     db $0,"There aren't many",$4f
     db "bugs out here.",$57
 
-_Route6EndBattleText3: ; 8dce9 (23:5ce9)
+_Route6EndBattleText3:
     db $0,"No!",$4f
     db "You're kidding!",$58
 
-_Route6AfterBattleText3: ; 8dcfd (23:5cfd)
+_Route6AfterBattleText3:
     db $0,"I like bugs,so",$4f
     db "I'm going back to",$55
     db "VIRIDIAN FOREST.",$57
 
-_Route6BattleText4: ; 8dd30 (23:5d30)
+_Route6BattleText4:
     db $0,"Huh? You want",$4f
     db "to talk to me?",$57
 
-_Route6EndBattleText4: ; 8dd4e (23:5d4e)
+_Route6EndBattleText4:
     db $0,"I",$4f
     db "didn't start it!",$58
 
-_Route6AfterBattleText4: ; 8dd61 (23:5d61)
+_Route6AfterBattleText4:
     db $0,"I should carry",$4f
     db "more #MON with",$55
     db "me for safety.",$57
 
-_Route6BattleText5: ; 8dd8f (23:5d8f)
+_Route6BattleText5:
     db $0,"Me? Well,OK.",$4f
     db "I'll play!",$57
 
-_Route6EndBattleText5: ; 8dda8 (23:5da8)
+_Route6EndBattleText5:
     db $0,"Just",$4f
     db "didn't work!",$58
 
-_Route6AfterBattleText5: ; 8ddba (23:5dba)
+_Route6AfterBattleText5:
     db $0,"I want to get",$4f
     db "stronger! What's",$55
     db "your secret?",$57
 
-_Route6BattleText6: ; 8dde6 (23:5de6)
+_Route6BattleText6:
     db $0,"I've never seen",$4f
     db "you around!",$55
     db "Are you good?",$57
 
-_Route6EndBattleText6: ; 8de10 (23:5e10)
+_Route6EndBattleText6:
     db $0,"You",$4f
     db "are too good!",$58
 
-_Route6AfterBattleText6: ; 8de23 (23:5e23)
+_Route6AfterBattleText6:
     db $0,"Are my #MON",$4f
     db "weak? Or,am I",$55
     db "just bad?",$57
 
-_Route6Text7: ; 8de49 (23:5e49)
+_Route6Text7:
     db $0,"UNDERGROUND PATH",$4f
     db "CERULEAN CITY -",$55
     db "VERMILION CITY",$57
 
-_Route7Text1: ; 8de7a (23:5e7a)
+_Route7Text1:
     db $0,"UNDERGROUND PATH",$4f
     db "CELADON CITY -",$55
     db "LAVENDER TOWN",$57
 
-_Route8BattleText1: ; 8dea9 (23:5ea9)
+_Route8BattleText1:
     db $0,"You look good at",$4f
     db "#MON,but",$55
     db "how's your chem?",$57
 
-_Route8EndBattleText1: ; 8ded5 (23:5ed5)
+_Route8EndBattleText1:
     db $0,"Ow!",$4f
     db "Meltdown!",$58
 
-_Route8AfterBattleText1: ; 8dee4 (23:5ee4)
+_Route8AfterBattleText1:
     db $0,"I am better at",$4f
     db "school than this!",$57
 
-_Route8BattleText2: ; 8df06 (23:5f06)
+_Route8BattleText2:
     db $0,"All right! Let's",$4f
     db "roll the dice!",$57
 
-_Route8EndBattleText2: ; 8df26 (23:5f26)
+_Route8EndBattleText2:
     db $0,"Drat!",$4f
     db "Came up short!",$58
 
-_Route8AfterBattleText2: ; 8df3c (23:5f3c)
+_Route8AfterBattleText2:
     db $0,"Lady Luck's not",$4f
     db "with me today!",$57
 
-_Route8BattleText3: ; 8df5b (23:5f5b)
+_Route8BattleText3:
     db $0,"You need strategy",$4f
     db "to win at this!",$57
 
-_Route8EndBattleText3: ; 8df7e (23:5f7e)
+_Route8EndBattleText3:
     db $0,"It's",$4f
     db "not logical!",$58
 
-_Route8AfterBattleText3: ; 8df90 (23:5f90)
+_Route8AfterBattleText3:
     db $0,"Go with GRIMER",$4f
     db "first...and...",$55
     db "...and...then...",$57
 
-_Route8BattleText4: ; 8dfc0 (23:5fc0)
+_Route8BattleText4:
     db $0,"I like NIDORAN,so",$4f
     db "I collect them!",$57
 
-_Route8EndBattleText4: ; 8dfe4 (23:5fe4)
+_Route8EndBattleText4:
     db $0,"Why? Why??",$58
 
-_Route8AfterBattleText4: ; 8dff0 (23:5ff0)
+_Route8AfterBattleText4:
     db $0,"When #MON grow",$4f
     db "up they get ugly!",$55
     db "They shouldn't",$55
     db "evolve!",$57
 
-_Route8BattleText5: ; 8e028 (23:6028)
+_Route8BattleText5:
     db $0,"School is fun,but",$4f
     db "so are #MON.",$57
 
-_Route8EndBattleText5: ; 8e049 (23:6049)
+_Route8EndBattleText5:
     db $0,"I'll",$4f
     db "stay with school.",$58
 
-_Route8AfterBattleText5: ; 8e060 (23:6060)
+_Route8AfterBattleText5:
     db $0,"We're stuck here",$4f
     db "because of the",$55
     db "gates at SAFFRON.",$57
 
-_Route8BattleText6: ; 8e092 (23:6092)
+_Route8BattleText6:
     db $0,"MEOWTH is so cute,",$4f
     db "meow,meow,meow!",$57
 
-_Route8EndBattleText6: ; 8e0b8 (23:60b8)
+_Route8EndBattleText6:
     db $0,"Meow!",$58
 
-_Route8AfterBattleText6: ; 8e0bf (23:60bf)
+_Route8AfterBattleText6:
     db $0,"I think PIDGEY",$4f
     db "and RATTATA",$55
     db "are cute too!",$57
 
-_Route8BattleText7: ; 8e0e9 (23:60e9)
+_Route8BattleText7:
     db $0,"We must look",$4f
     db "silly standing",$55
     db "here like this!",$57
 
-_Route8EndBattleText7: ; 8e116 (23:6116)
+_Route8EndBattleText7:
     db $0,"Look what",$4f
     db "you did!",$58
 
-_Route8AfterBattleText7: ; 8e12a (23:612a)
+_Route8AfterBattleText7:
     db $0,"SAFFRON's gate",$4f
     db "keeper won't let",$55
     db "us through.",$55
     db "He's so mean!",$57
 
-_Route8BattleText8: ; 8e162 (23:6162)
+_Route8BattleText8:
     db $0,"I'm a rambling,",$4f
     db "gambling dude!",$57
 
-_Route8EndBattleText8: ; 8e181 (23:6181)
+_Route8EndBattleText8:
     db $0,"Missed",$4f
     db "the big score!",$58
 
-_Route8AfterBattleText8: ; 8e198 (23:6198)
+_Route8AfterBattleText8:
     db $0,"Gambling and",$4f
     db "#MON are like",$55
     db "eating peanuts!",$55
     db "Just can't stop!",$57
 
-_Route8BattleText9: ; 8e1d4 (23:61d4)
+_Route8BattleText9:
     db $0,"What's a cute,",$4f
     db "round and fluffy",$55
     db "#MON?",$57
 
-_Route8EndBattleText9: ; 8e1fa (23:61fa)
+_Route8EndBattleText9:
     db $0,"Stop!",$51
     db "Don't be so mean",$4f
     db "to my CLEFAIRY!",$58
 
-_Route8AfterBattleText9: ; 8e221 (23:6221)
+_Route8AfterBattleText9:
     db $0,"I heard that",$4f
     db "CLEFAIRY evolves",$55
     db "when it's exposed",$55
     db "to a MOON STONE.",$57
 
-_Route8Text10: ; 8e262 (23:6262)
+_Route8Text10:
     db $0,"UNDERGROUND PATH",$4f
     db "CELADON CITY -",$55
     db "LAVENDER TOWN",$57
 
-_Route9BattleText1: ; 8e291 (23:6291)
+_Route9BattleText1:
     db $0,"You have #MON",$4f
     db "with you!",$55
     db "You're mine!",$57
 
-_Route9EndBattleText1: ; 8e2b6 (23:62b6)
+_Route9EndBattleText1:
     db $0,"You",$4f
     db "deceived me!",$58
 
-_Route9AfterBattleText1: ; 8e2c8 (23:62c8)
+_Route9AfterBattleText1:
     db $0,"You need light to",$4f
     db "get through that",$55
     db "dark tunnel ahead.",$57
 
-_Route9BattleText2: ; 8e2ff (23:62ff)
+_Route9BattleText2:
     db $0,"Who's that walking",$4f
     db "with those good",$55
     db "looking #MON?",$57
 
-_Route9EndBattleText2: ; 8e330 (23:6330)
+_Route9EndBattleText2:
     db $0,"Out",$4f
     db "like a light!",$58
 
-_Route9AfterBattleText2: ; 8e343 (23:6343)
+_Route9AfterBattleText2:
     db $0,"Keep walking!",$57
 
-_Route9BattleText3: ; 8e352 (23:6352)
+_Route9BattleText3:
     db $0,"I'm taking ROCK",$4f
     db "TUNNEL to go to",$55
     db "LAVENDER...",$57
 
-_Route9EndBattleText3: ; 8e37e (23:637e)
+_Route9EndBattleText3:
     db $0,"Can't",$4f
     db "measure up!",$58
 
-_Route9AfterBattleText3: ; 8e390 (23:6390)
+_Route9AfterBattleText3:
     db $0,"Are you off to",$4f
     db "ROCK TUNNEL too?",$57
 
-_Route9BattleText4: ; 8e3b1 (23:63b1)
+_Route9BattleText4:
     db $0,"Don't you dare",$4f
     db "condescend me!",$57
 
-_Route9EndBattleText4: ; 8e3cf (23:63cf)
+_Route9EndBattleText4:
     db $0,"No!",$4f
     db "You're too much!",$58
 
-_Route9AfterBattleText4: ; 8e3e4 (23:63e4)
+_Route9AfterBattleText4:
     db $0,"You're obviously",$4f
     db "talented! Good",$55
     db "luck to you!",$57
 
-_Route9BattleText5: ; 8e411 (23:6411)
+_Route9BattleText5:
     db $0,"Bwahaha!",$4f
     db "Great! I was",$55
     db "bored,eh!",$57
 
-_Route9EndBattleText5: ; 8e433 (23:6433)
+_Route9EndBattleText5:
     db $0,"Keep it",$4f
     db "coming,eh!",$51
     db "Oh wait. I'm out",$4f
     db "of #MON!",$58
 
-_Route9AfterBattleText5: ; 8e461 (23:6461)
+_Route9AfterBattleText5:
     db $0,"You sure had guts",$4f
     db "standing up to me",$55
     db "there,eh?",$57
 
-_Route9BattleText6: ; 8e491 (23:6491)
+_Route9BattleText6:
     db $0,"Hahaha!",$4f
     db "Aren't you a",$55
     db "little toughie!",$57
 
-_Route9EndBattleText6: ; 8e4b6 (23:64b6)
+_Route9EndBattleText6:
     db $0,"What's",$4f
     db "that?",$58
 
-_Route9AfterBattleText6: ; 8e4c3 (23:64c3)
+_Route9AfterBattleText6:
     db $0,"Hahaha! Kids",$4f
     db "should be tough!",$57
 
-_Route9BattleText7: ; 8e4e2 (23:64e2)
+_Route9BattleText7:
     db $0,"I got up early",$4f
     db "every day to",$55
     db "raise my #MON",$55
     db "from cocoons!",$57
 
-_Route9EndBattleText7: ; 8e51b (23:651b)
+_Route9EndBattleText7:
     db $0,"WHAT?",$51
     db "What a total",$4f
     db "waste of time!",$58
 
-_Route9AfterBattleText7: ; 8e53e (23:653e)
+_Route9AfterBattleText7:
     db $0,"I have to collect",$4f
     db "more than bugs to",$55
     db "get stronger...",$57
 
-_Route9BattleText8: ; 8e573 (23:6573)
+_Route9BattleText8:
     db $0,"Hahahaha!",$4f
     db "Come on,dude!",$57
 
-_Route9EndBattleText8: ; 8e58d (23:658d)
+_Route9EndBattleText8:
     db $0,"Hahahaha!",$4f
     db "You beat me fair!",$58
 
-_Route9AfterBattleText8: ; 8e5aa (23:65aa)
+_Route9AfterBattleText8:
     db $0,"Hahahaha!",$4f
     db "Us hearty guys",$55
     db "always laugh!",$57
 
-_Route9BattleText9: ; 8e5d2 (23:65d2)
+_Route9BattleText9:
     db $0,"Go,my super bug",$4f
     db "#MON!",$57
 
-_Route9EndBattleText9: ; 8e5ea (23:65ea)
+_Route9EndBattleText9:
     db $0,"My",$4f
     db "bugs...",$58
 
-_Route9AfterBattleText9: ; 8e5f6 (23:65f6)
+_Route9AfterBattleText9:
     db $0,"If you don't like",$4f
     db "bug #MON,you",$55
     db "bug me!",$57
 
-_Route9Text11: ; 8e61e (23:661e)
+_Route9Text11:
     db $0,"ROUTE 9",$4f
     db "CERULEAN CITY-",$55
     db "ROCK TUNNEL",$57
 
-_Route10BattleText1: ; 8e642 (23:6642)
+_Route10BattleText1:
     db $0,"Wow,are you a",$4f
     db "#MANIAC too?",$55
     db "Want to see my",$55
     db "collection?",$57
 
-_Route10EndBattleText1: ; 8e67a (23:667a)
+_Route10EndBattleText1:
     db $0,"Humph.",$4f
     db "I'm not angry!",$58
 
-_Route10AfterBattleText1: ; 8e690 (23:6690)
+_Route10AfterBattleText1:
     db $0,"I have more rare",$4f
     db "#MON at home!",$57
 
-_Route10BattleText2: ; 8e6b0 (23:66b0)
+_Route10BattleText2:
     db $0,"Ha-hahah-ah-ha!",$57
 
-_Route10EndBattleText2: ; 8e6c1 (23:66c1)
+_Route10EndBattleText2:
     db $0,"Ha-haha!",$4f
     db "Not laughing!",$55
     db "Ha-hay fever!",$55
     db "Haha-ha-choo!",$58
 
-_Route10AfterBattleText2: ; 8e6f5 (23:66f5)
+_Route10AfterBattleText2:
     db $0,"Haha-ha-choo!",$4f
     db "Ha-choo!",$55
     db "Snort! Snivel!",$57
 
-_Route10BattleText3: ; 8e71c (23:671c)
+_Route10BattleText3:
     db $0,"Hi kid,want to",$4f
     db "see my #MON?",$57
 
-_Route10EndBattleText3: ; 8e73a (23:673a)
+_Route10EndBattleText3:
     db $0,"Oh no!",$4f
     db "My #MON!",$58
 
-_Route10AfterBattleText3: ; 8e74b (23:674b)
+_Route10AfterBattleText3:
     db $0,"I don't like you",$4f
     db "for beating me!",$57
 
-_Route10BattleText4: ; 8e76c (23:676c)
+_Route10BattleText4:
     db $0,"I've been to a",$4f
     db "#MON GYM a few",$55
     db "times. But,I",$55
     db "lost each time.",$57
 
-_Route10EndBattleText4: ; 8e7a8 (23:67a8)
+_Route10EndBattleText4:
     db $0,"Ohh!",$4f
     db "Blew it again!",$58
 
-_Route10AfterBattleText4: ; 8e7bd (23:67bd)
+_Route10AfterBattleText4:
     db $0,"I noticed some",$4f
     db "#MANIACs",$55
     db "prowling around.",$57
 
-_Route10BattleText5: ; 8e7e7 (23:67e7)
+_Route10BattleText5:
     db $0,"Ah! This mountain",$4f
     db "air is delicious!",$57
 
-_Route10EndBattleText5: ; 8e80c (23:680c)
+_Route10EndBattleText5:
     db $0,"That",$4f
     db "cleared my head!",$58
 
-_Route10AfterBattleText5: ; 8e823 (23:6823)
+_Route10AfterBattleText5:
     db $0,"I feel bloated on",$4f
     db "mountain air!",$57
 
-_Route10BattleText6: ; 8e844 (23:6844)
+_Route10BattleText6:
     db $0,"I'm feeling a bit",$4f
     db "faint from this",$55
     db "tough hike.",$57
 
-_Route10EndBattleText6: ; 8e872 (23:6872)
+_Route10EndBattleText6:
     db $0,"I'm",$4f
     db "not up to it!",$58
 
-_Route10AfterBattleText6: ; 8e884 (23:6884)
+_Route10AfterBattleText6:
     db $0,"The #MON here",$4f
     db "are so chunky!",$55
     db "There should be a",$55
     db "pink one with a",$55
     db "floral pattern!",$57
 
-_Route10Text9: ; 8e8d4 (23:68d4)
-_Route10Text7: ; 8e8d4 (23:68d4)
+_Route10Text9:
+_Route10Text7:
     db $0,"ROCK TUNNEL",$57
 
-_Route10Text10: ; 8e8e1 (23:68e1)
+_Route10Text10:
     db $0,"POWER PLANT",$57
 
-_Route11BattleText1: ; 8e8ee (23:68ee)
+_Route11BattleText1:
     db $0,"Win,lose or draw!",$57
 
-_Route11EndBattleText1: ; 8e902 (23:6902)
+_Route11EndBattleText1:
     db $0,"Atcha!",$4f
     db "Didn't go my way!",$58
 
-_Route11AfterBattleText1: ; 8e91b (23:691b)
+_Route11AfterBattleText1:
     db $0,"#MON is life!",$4f
     db "And to live is to",$55
     db "gamble!",$57
 
-_Route11BattleText2: ; 8e944 (23:6944)
+_Route11BattleText2:
     db $0,"Competition! I",$4f
     db "can't get enough!",$57
 
-_Route11EndBattleText2: ; 8e965 (23:6965)
+_Route11EndBattleText2:
     db $0,"I had",$4f
     db "a chance!",$58
 
-_Route11AfterBattleText2: ; 8e976 (23:6976)
+_Route11AfterBattleText2:
     db $0,"You can't be a",$4f
     db "coward in the",$55
     db "world of #MON!",$57
 
-_Route11BattleText3: ; 8e9a2 (23:69a2)
+_Route11BattleText3:
     db $0,"Let's go,but",$4f
     db "don't cheat!",$57
 
-_Route11EndBattleText3: ; 8e9bc (23:69bc)
+_Route11EndBattleText3:
     db $0,"Huh?",$4f
     db "That's not right!",$58
 
-_Route11AfterBattleText3: ; 8e9d3 (23:69d3)
+_Route11AfterBattleText3:
     db $0,"I did my best! I",$4f
     db "have no regrets!",$57
 
-_Route11BattleText4: ; 8e9f6 (23:69f6)
+_Route11BattleText4:
     db $0,"Careful!",$4f
     db "I'm laying down",$55
     db "some cables!",$57
 
-_Route11EndBattleText4: ; 8ea1c (23:6a1c)
+_Route11EndBattleText4:
     db $0,"That",$4f
     db "was electric!",$58
 
-_Route11AfterBattleText4: ; 8ea30 (23:6a30)
+_Route11AfterBattleText4:
     db $0,"Spread the word",$4f
     db "to save energy!",$57
 
-_Route11BattleText5: ; 8ea51 (23:6a51)
+_Route11BattleText5:
     db $0,"I just became a",$4f
     db "trainer! But,I",$55
     db "think I can win!",$57
 
-_Route11EndBattleText5: ; 8ea83 (23:6a83)
+_Route11EndBattleText5:
     db $0,"My",$4f
     db "#MON couldn't!",$58
 
-_Route11AfterBattleText5: ; 8ea95 (23:6a95)
+_Route11AfterBattleText5:
     db $0,"What do you want?",$4f
     db "Leave me alone!",$57
 
-_Route11BattleText6: ; 8eab8 (23:6ab8)
+_Route11BattleText6:
     db $0,"Fwahaha! I have",$4f
     db "never lost!",$57
 
-_Route11EndBattleText6: ; 8ead5 (23:6ad5)
+_Route11EndBattleText6:
     db $0,"My",$4f
     db "first loss!",$58
 
-_Route11AfterBattleText6: ; 8eae5 (23:6ae5)
+_Route11AfterBattleText6:
     db $0,"Luck of the draw!",$4f
     db "Just luck!",$57
 
-_Route11BattleText7: ; 8eb03 (23:6b03)
+_Route11BattleText7:
     db $0,"I have never won",$4f
     db "before...",$57
 
-_Route11EndBattleText7: ; 8eb1f (23:6b1f)
+_Route11EndBattleText7:
     db $0,"I saw",$4f
     db "this coming...",$58
 
-_Route11AfterBattleText7: ; 8eb35 (23:6b35)
+_Route11AfterBattleText7:
     db $0,"It's just luck.",$4f
     db "Luck of the draw.",$57
 
-_Route11BattleText8: ; 8eb57 (23:6b57)
+_Route11BattleText8:
     db $0,"I'm the best in",$4f
     db "my class!",$57
 
-_Route11EndBattleText8: ; 8eb71 (23:6b71)
+_Route11EndBattleText8:
     db $0,"Darn!",$4f
     db "I need to make my",$55
     db "#MON stronger!",$58
 
-_Route11AfterBattleText8: ; 8eb99 (23:6b99)
+_Route11AfterBattleText8:
     db $0,"There's a fat",$4f
     db "#MON that",$55
     db "comes down from",$55
@@ -123086,7 +123040,7 @@ _Route11AfterBattleText8: ; 8eb99 (23:6b99)
     db "It's strong if",$4f
     db "you can get it.",$57
 
-_Route11BattleText9: ; 8ebee (23:6bee)
+_Route11BattleText9:
     db $0,"Watch out for",$4f
     db "live wires!",$57
 
@@ -123112,778 +123066,772 @@ _Route3Text1_TM30:
 
 SECTION "bank24",ROMX,BANK[$24]
 
-_Route11EndBattleText9: ; 90000 (24:4000)
+_Route11EndBattleText9:
     db $0,"Whoa!",$4f
     db "You spark plug!",$58
 
-_Route11AfterBattleText9: ; 90017 (24:4017)
+_Route11AfterBattleText9:
     db $0,"Well,better get",$4f
     db "back to work.",$57
 
-_Route11BattleText10: ; 90037 (24:4037)
+_Route11BattleText10:
     db $0,"My #MON should",$4f
     db "be ready by now!",$57
 
-_Route11EndBattleText10: ; 90058 (24:4058)
+_Route11EndBattleText10:
     db $0,"Too",$4f
     db "much,too young!",$58
 
-_Route11AfterBattleText10: ; 9006e (24:406e)
+_Route11AfterBattleText10:
     db $0,"I better go find",$4f
     db "stronger ones!",$57
 
-_Route11Text11: ; 9008f (24:408f)
+_Route11Text11:
     db $0,"DIGLETT's CAVE",$57
 
-_Route12Text1: ; 9009e (24:409e)
+_Route12Text1:
     db $0,"A sleeping #MON",$4f
     db "blocks the way!",$57
 
-_Route12SnorlaxText: ; 900bf (24:40bf)
+_Route12SnorlaxText:
     db $0,"SNORLAX woke up!",$51
     db "It attacked in a",$4f
     db "grumpy rage!",$57
 
-_UnnamedText_596f0: ; 900ef (24:40ef)
+_UnnamedText_596f0:
     db $0,"SNORLAX calmed",$4f
     db "down! With a big",$55
     db "yawn,it returned",$55
     db "to the mountains!",$57
 
-_Route12BattleText1: ; 90134 (24:4134)
+_Route12BattleText1:
     db $0,"Yeah! I got a",$4f
     db "bite,here!",$57
 
-_Route12EndBattleText1: ; 9014f (24:414f)
+_Route12EndBattleText1:
     db $0,"Tch!",$4f
     db "Just a small fry!",$58
 
-_Route12AfterBattleText1: ; 90167 (24:4167)
+_Route12AfterBattleText1:
     db $0,"Hang on! My line's",$4f
     db "snagged!",$57
 
-_Route12BattleText2: ; 90183 (24:4183)
+_Route12BattleText2:
     db $0,"Be patient!",$4f
     db "Fishing is a",$55
     db "waiting game!",$57
 
-_Route12EndBattleText2: ; 901ab (24:41ab)
+_Route12EndBattleText2:
     db $0,"That",$4f
     db "one got away!",$58
 
-_Route12AfterBattleText2: ; 901bf (24:41bf)
+_Route12AfterBattleText2:
     db $0,"With a better ROD,",$4f
     db "I could catch",$55
     db "better #MON!",$57
 
-_Route12BattleText3: ; 901ee (24:41ee)
+_Route12BattleText3:
     db $0,"Have you found a",$4f
     db "MOON STONE?",$57
 
-_Route12EndBattleText3: ; 9020c (24:420c)
+_Route12EndBattleText3:
     db $0,"Oww!",$58
 
-_Route12AfterBattleText3: ; 90212 (24:4212)
+_Route12AfterBattleText3:
     db $0,"I could have made",$4f
     db "my #MON evolve",$55
     db "with MOON STONE!",$57
 
-_Route12BattleText4: ; 90245 (24:4245)
+_Route12BattleText4:
     db $0,"Electricity is my",$4f
     db "specialty!",$57
 
-_Route12EndBattleText4: ; 90263 (24:4263)
+_Route12EndBattleText4:
     db $0,"Unplugged!",$58
 
-_Route12AfterBattleText4: ; 9026f (24:426f)
+_Route12AfterBattleText4:
     db $0,"Water conducts",$4f
     db "electricity,so",$55
     db "you should zap",$55
     db "sea #MON!",$57
 
-_Route12BattleText5: ; 902a8 (24:42a8)
+_Route12BattleText5:
     db $0,"The FISHING FOOL",$4f
     db "vs. #MON KID!",$57
 
-_Route12EndBattleText5: ; 902c8 (24:42c8)
+_Route12EndBattleText5:
     db $0,"Too",$4f
     db "much!",$58
 
-_Route12AfterBattleText5: ; 902d3 (24:42d3)
+_Route12AfterBattleText5:
     db $0,"You beat me at",$4f
     db "#MON,but I'm",$55
     db "good at fishing!",$57
 
-_Route12BattleText6: ; 90301 (24:4301)
+_Route12BattleText6:
     db $0,"I'd rather be",$4f
     db "working!",$57
 
-_Route12EndBattleText6: ; 90318 (24:4318)
+_Route12EndBattleText6:
     db $0,"It's",$4f
     db "not easy...",$58
 
-_Route12AfterBattleText6: ; 90329 (24:4329)
+_Route12AfterBattleText6:
     db $0,"It's all right.",$4f
     db "Losing doesn't",$55
     db "bug me any more.",$57
 
-_Route12BattleText7: ; 90358 (24:4358)
+_Route12BattleText7:
     db $0,"You never know",$4f
     db "what you could",$55
     db "catch!",$57
 
-_Route12EndBattleText7: ; 9037e (24:437e)
+_Route12EndBattleText7:
     db $0,"Lost",$4f
     db "it!",$58
 
-_Route12AfterBattleText7: ; 90388 (24:4388)
+_Route12AfterBattleText7:
     db $0,"I catch MAGIKARP",$4f
     db "all the time,but",$55
     db "they're so weak!",$57
 
-_Route12Text11: ; 903bc (24:43bc)
+_Route12Text11:
     db $0,"ROUTE 12 ",$4f
     db "North to LAVENDER",$57
 
-_Route12Text12: ; 903d9 (24:43d9)
+_Route12Text12:
     db $0,"SPORT FISHING AREA",$57
 
-_Route13BattleText2: ; 903ed (24:43ed)
+_Route13BattleText2:
     db $0,"My bird #MON",$4f
     db "want to scrap!",$57
 
-_Route13EndBattleText2: ; 9040a (24:440a)
+_Route13EndBattleText2:
     db $0,"My",$4f
     db "bird combo lost?",$58
 
-_Route13AfterBattleText2: ; 9041f (24:441f)
+_Route13AfterBattleText2:
     db $0,"My #MON look",$4f
     db "happy even though",$55
     db "they lost.",$57
 
-_Route13BattleText3: ; 9044a (24:444a)
+_Route13BattleText3:
     db $0,"I'm told I'm good",$4f
     db "for a kid!",$57
 
-_Route13EndBattleText3: ; 90466 (24:4466)
+_Route13EndBattleText3:
     db $0,"Ohh!",$4f
     db "I lost!",$58
 
-_Route13AfterBattleText3: ; 90474 (24:4474)
+_Route13AfterBattleText3:
     db $0,"I want to become",$4f
     db "a good trainer.",$55
     db "I'll train hard.",$57
 
-_Route13BattleText4: ; 904a6 (24:44a6)
+_Route13BattleText4:
     db $0,"Wow! Your BADGEs",$4f
     db "are too cool!",$57
 
-_Route13EndBattleText4: ; 904c6 (24:44c6)
+_Route13EndBattleText4:
     db $0,"Not",$4f
     db "enough!",$58
 
-_Route13AfterBattleText4: ; 904d3 (24:44d3)
+_Route13AfterBattleText4:
     db $0,"You got those",$4f
     db "BADGEs from GYM",$55
     db "LEADERs. I know!",$57
 
-_Route13BattleText5: ; 90503 (24:4503)
+_Route13BattleText5:
     db $0,"My cute #MON",$4f
     db "wish to make your",$55
     db "acquaintance.",$57
 
-_Route13EndBattleText5: ; 90531 (24:4531)
+_Route13EndBattleText5:
     db $0,"Wow!",$4f
     db "You totally won!",$58
 
-_Route13AfterBattleText5: ; 90548 (24:4548)
+_Route13AfterBattleText5:
     db $0,"You have to make",$4f
     db "#MON fight to",$55
     db "toughen them up!",$57
 
-_Route13BattleText6: ; 90579 (24:4579)
+_Route13BattleText6:
     db $0,"I found CARBOS in",$4f
     db "a cave once.",$57
 
-_Route13EndBattleText6: ; 90599 (24:4599)
+_Route13EndBattleText6:
     db $0,"Just",$4f
     db "messed up!",$58
 
-_Route13AfterBattleText6: ; 905aa (24:45aa)
+_Route13AfterBattleText6:
     db $0,"CARBOS boosted",$4f
     db "the SPEED of my",$55
     db "#MON.",$57
 
-_Route13BattleText7: ; 905d0 (24:45d0)
+_Route13BattleText7:
     db $0,"The wind's blowing",$4f
     db "my way!",$57
 
-_Route13EndBattleText7: ; 905eb (24:45eb)
+_Route13EndBattleText7:
     db $0,"The",$4f
     db "wind turned!",$58
 
-_Route13AfterBattleText7: ; 905fd (24:45fd)
+_Route13AfterBattleText7:
     db $0,"I'm beat. I guess",$4f
     db "I'll FLY home.",$57
 
-_Route13BattleText8: ; 9061d (24:461d)
+_Route13BattleText8:
     db $0,"Sure,I'll play",$4f
     db "with you!",$57
 
-_Route13EndBattleText8: ; 90637 (24:4637)
+_Route13EndBattleText8:
     db $0,"Oh!",$4f
     db "You little brute!",$58
 
-_Route13AfterBattleText8: ; 9064e (24:464e)
+_Route13AfterBattleText8:
     db $0,"I wonder which is",$4f
     db "stronger,male or",$55
     db "female #MON?",$57
 
-_Route13BattleText9: ; 90680 (24:4680)
+_Route13BattleText9:
     db $0,"Do you want to",$4f
     db "#MON with me?",$57
 
-_Route13EndBattleText9: ; 9069e (24:469e)
+_Route13EndBattleText9:
     db $0,"It's over",$4f
     db "already?",$58
 
-_Route13AfterBattleText9: ; 906b1 (24:46b1)
+_Route13AfterBattleText9:
     db $0,"I don't know",$4f
     db "anything about",$55
     db "#MON. I just",$55
     db "like cool ones!",$57
 
-_Route13BattleText10: ; 906ea (24:46ea)
+_Route13BattleText10:
     db $0,"What're you",$4f
     db "lookin' at?",$57
 
-_Route13EndBattleText10: ; 90702 (24:4702)
+_Route13EndBattleText10:
     db $0,"Dang!",$4f
     db "Stripped gears!",$58
 
-_Route13AfterBattleText10: ; 90719 (24:4719)
+_Route13AfterBattleText10:
     db $0,"Get lost!",$57
 
-_Route13BattleText11: ; 90724 (24:4724)
+_Route13BattleText11:
     db $0,"I always go with",$4f
     db "bird #MON!",$57
 
-_Route13EndBattleText11: ; 90741 (24:4741)
+_Route13EndBattleText11:
     db $0,"Out",$4f
     db "of power!",$58
 
-_Route13AfterBattleText11: ; 90750 (24:4750)
+_Route13AfterBattleText11:
     db $0,"I wish I could",$4f
     db "fly like PIDGEY",$55
     db "and PIDGEOTTO...",$57
 
-_Route13Text11: ; 90781 (24:4781)
+_Route13Text11:
     db $0,"TRAINER TIPS",$51
     db "Look to the left",$4f
     db "of that post!",$57
 
-_Route13Text12: ; 907ae (24:47ae)
+_Route13Text12:
     db $0,"TRAINER TIPS",$51
     db "Use SELECT to",$4f
     db "switch items in",$55
     db "the ITEM window!",$57
 
-_Route13Text13: ; 907eb (24:47eb)
+_Route13Text13:
     db $0,"ROUTE 13",$4f
     db "North to SILENCE",$55
     db "BRIDGE",$57
 
-_Route14BattleText1: ; 9080d (24:480d)
+_Route14BattleText1:
     db $0,"You need to use",$4f
     db "TMs to teach good",$55
     db "moves to #MON!",$57
 
-_Route14EndBattleText1: ; 9083f (24:483f)
+_Route14EndBattleText1:
     db $0,"Not",$4f
     db "good enough!",$58
 
-SECTION "_Route14BattleText2",ROMX[$488e],BANK[$24]
-
-_Route14BattleText2: ; 9088e (24:488e)
+_Route14BattleText2:
     db $0,"My bird #MON",$4f
     db "should be ready",$55
     db "for battle.",$57
 
-_Route14EndBattleText2: ; 908b8 (24:48b8)
+_Route14EndBattleText2:
     db $0,"Not",$4f
     db "ready yet!",$58
 
-_Route14AfterBattleText2: ; 908c8 (24:48c8)
+_Route14AfterBattleText2:
     db $0,"They need to learn",$4f
     db "better moves.",$57
 
-SECTION "_Route14EndBattleText3",ROMX[$4928],BANK[$24]
-
-_Route14EndBattleText3: ; 90928 (24:4928)
+_Route14EndBattleText3:
     db $0,"Aww,",$4f
     db "bummer!",$58
 
-_Route14AfterBattleText3: ; 90936 (24:4936)
+_Route14AfterBattleText3:
     db $0,"Teach #MON",$4f
     db "moves of the same",$55
     db "element type for",$55
     db "more power.",$57
 
-_Route14BattleText4: ; 90971 (24:4971)
+_Route14BattleText4:
     db $0,"Have you taught",$4f
     db "your bird #MON",$55
     db "how to FLY?",$57
 
-_Route14EndBattleText4: ; 9099d (24:499d)
+_Route14EndBattleText4:
     db $0,"Shot",$4f
     db "down in flames!",$58
 
-_Route14AfterBattleText4: ; 909b3 (24:49b3)
+_Route14AfterBattleText4:
     db $0,"Bird #MON are",$4f
     db "my true love!",$57
 
-_Route14BattleText5: ; 909d0 (24:49d0)
+_Route14BattleText5:
     db $0,"Have you heard of",$4f
     db "the legendary",$55
     db "#MON?",$57
 
-_Route14EndBattleText5: ; 909f7 (24:49f7)
+_Route14EndBattleText5:
     db $0,"Why?",$4f
     db "Why'd I lose?",$58
 
-_Route14AfterBattleText5: ; 90a0a (24:4a0a)
+_Route14AfterBattleText5:
     db $0,"The 3 legendary",$4f
     db "#MON are all",$55
     db "birds of prey.",$57
 
-_Route14BattleText6: ; 90a37 (24:4a37)
+_Route14BattleText6:
     db $0,"I'm not into it,",$4f
     db "but OK! Let's go!",$57
 
-_Route14EndBattleText6: ; 90a59 (24:4a59)
+_Route14EndBattleText6:
     db $0,"I",$4f
     db "knew it!",$58
 
-_Route14AfterBattleText6: ; 90a65 (24:4a65)
+_Route14AfterBattleText6:
     db $0,"Winning,losing,",$4f
     db "it doesn't matter",$55
     db "in the long run!",$57
 
-_Route14BattleText7: ; 90a99 (24:4a99)
+_Route14BattleText7:
     db $0,"C'mon,c'mon.",$4f
     db "Let's go,let's",$55
     db "go,let's go!",$57
 
-_Route14EndBattleText7: ; 90ac1 (24:4ac1)
+_Route14EndBattleText7:
     db $0,"Arrg!",$4f
     db "Lost! Get lost!",$58
 
-_Route14AfterBattleText7: ; 90ad8 (24:4ad8)
+_Route14AfterBattleText7:
     db $0,"What,what,what?",$4f
     db "What do you want?",$57
 
-_Route14BattleText8: ; 90afd (24:4afd)
+_Route14BattleText8:
     db $0,"Perfect! I need to",$4f
     db "burn some time!",$57
 
-_Route14EndBattleText8: ; 90b21 (24:4b21)
+_Route14EndBattleText8:
     db $0,"What?",$4f
     db "You!?",$58
 
-_Route14AfterBattleText8: ; 90b2e (24:4b2e)
+_Route14AfterBattleText8:
     db $0,"Raising #MON",$4f
     db "is a drag,man.",$57
 
-_Route14BattleText9: ; 90b4c (24:4b4c)
+_Route14BattleText9:
     db $0,"We ride out here",$4f
     db "because there's",$55
     db "more room!",$57
 
-_Route14EndBattleText9: ; 90b78 (24:4b78)
+_Route14EndBattleText9:
     db $0,"Wipe out!",$58
 
-_Route14AfterBattleText9: ; 90b83 (24:4b83)
+_Route14AfterBattleText9:
     db $0,"It's cool you",$4f
     db "made your #MON",$55
     db "so strong!",$51
     db "Might is right!",$4f
     db "And you know it!",$57
 
-_Route14BattleText10: ; 90bcc (24:4bcc)
+_Route14BattleText10:
     db $0,"#MON fight?",$4f
     db "Cool! Rumble!",$57
 
-_Route14EndBattleText10: ; 90be7 (24:4be7)
+_Route14EndBattleText10:
     db $0,"Blown",$4f
     db "away!",$58
 
-_Route14AfterBattleText10: ; 90bf4 (24:4bf4)
+_Route14AfterBattleText10:
     db $0,"You know who'd",$4f
     db "win,you and me",$55
     db "one on one!",$57
 
-_Route14Text11: ; 90c1f (24:4c1f)
+_Route14Text11:
     db $0,"ROUTE 14",$4f
     db "West to FUCHSIA",$55
     db "CITY",$57
 
-_Route15BattleText1: ; 90c3e (24:4c3e)
+_Route15BattleText1:
     db $0,"Let me try out the",$4f
     db "#MON I just",$55
     db "got in a trade!",$57
 
-_Route15EndBattleText1: ; 90c6e (24:4c6e)
+_Route15EndBattleText1:
     db $0,"Not",$4f
     db "good enough!",$58
 
-SECTION "_Route15BattleText2",ROMX[$4cdd],BANK[$24]
-
-_Route15BattleText2: ; 90cdd (24:4cdd)
+_Route15BattleText2:
     db $0,"You look gentle,",$4f
     db "so I think I can",$55
     db "beat you!",$57
 
-_Route15EndBattleText2: ; 90d0a (24:4d0a)
+_Route15EndBattleText2:
     db $0,"No,",$4f
     db "wrong!",$58
 
-_Route15AfterBattleText2: ; 90d16 (24:4d16)
+_Route15AfterBattleText2:
     db $0,"I'm afraid of",$4f
     db "BIKERs,they look",$55
     db "so ugly and mean!",$57
 
-_Route15BattleText3: ; 90d48 (24:4d48)
+_Route15BattleText3:
     db $0,"When I whistle,I",$4f
     db "can summon bird",$55
     db "#MON!",$57
 
-_Route15EndBattleText3: ; 90d71 (24:4d71)
+_Route15EndBattleText3:
     db $0,"Ow!",$4f
     db "That's tragic!",$58
 
-_Route15AfterBattleText3: ; 90d84 (24:4d84)
+_Route15AfterBattleText3:
     db $0,"Maybe I'm not cut",$4f
     db "out for battles.",$57
 
-_Route15BattleText4: ; 90da7 (24:4da7)
+_Route15BattleText4:
     db $0,"Hmm? My birds are",$4f
     db "shivering! You're",$55
     db "good,aren't you?",$57
 
-_Route15EndBattleText4: ; 90ddc (24:4ddc)
+_Route15EndBattleText4:
     db $0,"Just",$4f
     db "as I thought!",$58
 
-_Route15AfterBattleText4: ; 90df0 (24:4df0)
+_Route15AfterBattleText4:
     db $0,"Did you know moves",$4f
     db "like EARTHQUAKE",$55
     db "don't have any",$55
     db "effect on birds?",$57
 
-_Route15BattleText5: ; 90e33 (24:4e33)
+_Route15BattleText5:
     db $0,"Oh,you're a",$4f
     db "little cutie!",$57
 
-_Route15EndBattleText5: ; 90e4e (24:4e4e)
+_Route15EndBattleText5:
     db $0,"You looked",$4f
     db "so cute too!",$58
 
-_Route15AfterBattleText5: ; 90e67 (24:4e67)
+_Route15AfterBattleText5:
     db $0,"I forgive you!",$4f
     db "I can take it!",$57
 
-_Route15BattleText6: ; 90e86 (24:4e86)
+_Route15BattleText6:
     db $0,"I raise #MON",$4f
     db "because I live",$55
     db "alone!",$57
 
-_Route15EndBattleText6: ; 90eaa (24:4eaa)
+_Route15EndBattleText6:
     db $0,"I didn't",$4f
     db "ask for this!",$58
 
-_Route15AfterBattleText6: ; 90ec1 (24:4ec1)
+_Route15AfterBattleText6:
     db $0,"I just like going",$4f
     db "home to be with",$55
     db "my #MON!",$57
 
-_Route15BattleText7: ; 90eed (24:4eed)
+_Route15BattleText7:
     db $0,"Hey kid! C'mon!",$4f
     db "I just got these!",$57
 
-_Route15EndBattleText7: ; 90f0f (24:4f0f)
+_Route15EndBattleText7:
     db $0,"Why",$4f
     db "not?",$58
 
-_Route15AfterBattleText7: ; 90f19 (24:4f19)
+_Route15AfterBattleText7:
     db $0,"You only live",$4f
     db "once,so I live",$55
     db "as an outlaw!",$55
     db "TEAM ROCKET RULES!",$57
 
-_Route15BattleText8: ; 90f59 (24:4f59)
+_Route15BattleText8:
     db $0,"Fork over all your",$4f
     db "cash when you",$55
     db "lose to me,kid!",$57
 
-_Route15EndBattleText8: ; 90f8c (24:4f8c)
+_Route15EndBattleText8:
     db $0,"That",$4f
     db "can't be true!",$58
 
-_Route15AfterBattleText8: ; 90fa0 (24:4fa0)
+_Route15AfterBattleText8:
     db $0,"I was just joking",$4f
     db "about the money!",$57
 
-_Route15BattleText9: ; 90fc4 (24:4fc4)
+_Route15BattleText9:
     db $0,"What's cool?",$4f
     db "Trading #MON!",$57
 
-_Route15EndBattleText9: ; 90fdf (24:4fdf)
+_Route15EndBattleText9:
     db $0,"I",$4f
     db "said trade!",$58
 
-_Route15AfterBattleText9: ; 90fee (24:4fee)
+_Route15AfterBattleText9:
     db $0,"I trade #MON",$4f
     db "with my friends!",$57
 
-_Route15BattleText10: ; 9100d (24:500d)
+_Route15BattleText10:
     db $0,"Want to play with",$4f
     db "my #MON?",$57
 
-_Route15EndBattleText10: ; 91029 (24:5029)
+_Route15EndBattleText10:
     db $0,"I was",$4f
     db "too impatient!",$58
 
-_Route15AfterBattleText10: ; 9103f (24:503f)
+_Route15AfterBattleText10:
     db $0,"I'll go train with",$4f
     db "weaker people.@@"
 
-_Route15Text12: ; 91062 (24:5062)
+_Route15Text12:
     db $0,"ROUTE 15",$4f
     db "West to FUCHSIA",$55
     db "CITY",$57
 
-_Route16BattleText1: ; 91081 (24:5081)
+_Route16BattleText1:
     db $0,"What do you want?",$57
 
-_Route16EndBattleText1: ; 91094 (24:5094)
+_Route16EndBattleText1:
     db $0,"Don't you",$4f
     db "dare laugh!",$58
 
-_Route16AfterBattleText1: ; 910aa (24:50aa)
+_Route16AfterBattleText1:
     db $0,"We like just",$4f
     db "hanging here,",$55
     db "what's it to you?",$57
 
-_Route16BattleText2: ; 910d7 (24:50d7)
+_Route16BattleText2:
     db $0,"Nice BIKE!",$4f
     db "Hand it over!",$57
 
-_Route16EndBattleText2: ; 910f1 (24:50f1)
+_Route16EndBattleText2:
     db $0,"Knock",$4f
     db "out!",$58
 
-_Route16AfterBattleText2: ; 910fd (24:50fd)
+_Route16AfterBattleText2:
     db $0,"Forget it,who",$4f
     db "needs your BIKE!",$57
 
-_Route16BattleText3: ; 9111e (24:511e)
+_Route16BattleText3:
     db $0,"Come out and play,",$4f
     db "little mouse!",$57
 
-_Route16EndBattleText3: ; 91140 (24:5140)
+_Route16EndBattleText3:
     db $0,"You",$4f
     db "little rat!",$58
 
-_Route16AfterBattleText3: ; 91151 (24:5151)
+_Route16AfterBattleText3:
     db $0,"I hate losing!",$4f
     db "Get away from me!",$57
 
-_Route16BattleText4: ; 91173 (24:5173)
+_Route16BattleText4:
     db $0,"Hey,you just",$4f
     db "bumped me!",$57
 
-_Route16EndBattleText4: ; 9118d (24:518d)
+_Route16EndBattleText4:
     db $0,"Kaboom!",$58
 
-_Route16AfterBattleText4: ; 91196 (24:5196)
+_Route16AfterBattleText4:
     db $0,"You can also get",$4f
     db "to FUCHSIA from",$55
     db "VERMILION using a",$55
     db "coastal road.",$57
 
-_Route16BattleText5: ; 911d8 (24:51d8)
+_Route16BattleText5:
     db $0,"I'm feeling",$4f
     db "hungry and mean!",$57
 
-_Route16EndBattleText5: ; 911f5 (24:51f5)
+_Route16EndBattleText5:
     db $0,"Bad,",$4f
     db "bad,bad!",$58
 
-_Route16AfterBattleText5: ; 91205 (24:5205)
+_Route16AfterBattleText5:
     db $0,"I like my #MON",$4f
     db "ferocious! They",$55
     db "tear up enemies!",$57
 
-_Route16BattleText6: ; 91236 (24:5236)
+_Route16BattleText6:
     db $0,"Sure,I'll go!",$57
 
-_Route16EndBattleText6: ; 91245 (24:5245)
+_Route16EndBattleText6:
     db $0,"Don't make",$4f
     db "me mad!",$58
 
-_Route16AfterBattleText6: ; 91258 (24:5258)
+_Route16AfterBattleText6:
     db $0,"I like harassing",$4f
     db "people with my",$55
     db "vicious #MON!",$57
 
-_Route16Text7: ; 91287 (24:5287)
+_Route16Text7:
     db $0,"A sleeping #MON",$4f
     db "blocks the way!",$57
 
-_Route16SnorlaxText: ; 912a8 (24:52a8)
+_Route16SnorlaxText:
     db $0,"SNORLAX woke up!",$51
     db "It attacked in a",$4f
     db "grumpy rage!",$57
 
-_UnnamedText_59ab8: ; 912d8 (24:52d8)
+_UnnamedText_59ab8:
     db $0,"With a big yawn,",$4f
     db "SNORLAX returned",$55
     db "to the mountains!",$57
 
-_Route16Text8: ; 9130d (24:530d)
+_Route16Text8:
     db $0,"Enjoy the slope!",$4f
     db "CYCLING ROAD",$57
 
-_Route16Text9: ; 9132c (24:532c)
+_Route16Text9:
     db $0,"ROUTE 16",$4f
     db "CELADON CITY -",$55
     db "FUCHSIA CITY",$57
 
-_Route17BattleText1: ; 91352 (24:5352)
+_Route17BattleText1:
     db $0,"There's no money",$4f
     db "in fighting kids!",$57
 
-_Route17EndBattleText1: ; 91375 (24:5375)
+_Route17EndBattleText1:
     db $0,"Burned",$4f
     db "out!",$58
 
-_Route17AfterBattleText1: ; 91382 (24:5382)
+_Route17AfterBattleText1:
     db $0,"Good stuff is",$4f
     db "lying around on",$55
     db "CYCLING ROAD!",$57
 
-_Route17BattleText2: ; 913af (24:53af)
+_Route17BattleText2:
     db $0,"What do you want,",$4f
     db "kiddo?",$57
 
-_Route17EndBattleText2: ; 913c9 (24:53c9)
+_Route17EndBattleText2:
     db $0,"Whoo!",$58
 
-_Route17AfterBattleText2: ; 913d0 (24:53d0)
+_Route17AfterBattleText2:
     db $0,"I could belly-",$4f
     db "bump you outta",$55
     db "here!",$57
 
-_Route17BattleText3: ; 913f5 (24:53f5)
+_Route17BattleText3:
     db $0,"You heading to",$4f
     db "FUCHSIA?",$57
 
-_Route17EndBattleText3: ; 9140e (24:540e)
+_Route17EndBattleText3:
     db $0,"Crash and",$4f
     db "burn!",$58
 
-_Route17AfterBattleText3: ; 9141f (24:541f)
+_Route17AfterBattleText3:
     db $0,"I love racing",$4f
     db "downhill!",$57
 
-_Route17BattleText4: ; 91438 (24:5438)
+_Route17BattleText4:
     db $0,"We're BIKERs!",$4f
     db "Highway stars!",$57
 
-_Route17EndBattleText4: ; 91455 (24:5455)
+_Route17EndBattleText4:
     db $0,"Smoked!",$58
 
-_Route17AfterBattleText4: ; 9145e (24:545e)
+_Route17AfterBattleText4:
     db $0,"Are you looking",$4f
     db "for adventure?",$57
 
-_Route17BattleText5: ; 9147e (24:547e)
+_Route17BattleText5:
     db $0,"Let VOLTORB",$4f
     db "electrify you!",$57
 
-_Route17EndBattleText5: ; 9149a (24:549a)
+_Route17EndBattleText5:
     db $0,"Grounded",$4f
     db "out!",$58
 
-_Route17AfterBattleText5: ; 914a9 (24:54a9)
+_Route17AfterBattleText5:
     db $0,"I got my VOLTORB",$4f
     db "at the abandoned",$55
     db "POWER PLANT.",$57
 
-_Route17BattleText6: ; 914d9 (24:54d9)
+_Route17BattleText6:
     db $0,"My #MON won't",$4f
     db "evolve! Why?",$57
 
-_Route17EndBattleText6: ; 914f4 (24:54f4)
+_Route17EndBattleText6:
     db $0,"Why,",$4f
     db "you!",$58
 
-_Route17AfterBattleText6: ; 914ff (24:54ff)
+_Route17AfterBattleText6:
     db $0,"Maybe some #MON",$4f
     db "need element",$55
     db "STONEs to evolve.",$57
 
-_Route17BattleText7: ; 9152f (24:552f)
+_Route17BattleText7:
     db $0,"I need a little",$4f
     db "exercise!",$57
 
-_Route17EndBattleText7: ; 9154a (24:554a)
+_Route17EndBattleText7:
     db $0,"Whew!",$4f
     db "Good workout!",$58
 
-_Route17AfterBattleText7: ; 9155f (24:555f)
+_Route17AfterBattleText7:
     db $0,"I'm sure I lost",$4f
     db "weight there!",$57
 
-_Route17BattleText8: ; 9157d (24:557d)
+_Route17BattleText8:
     db $0,"Be a rebel!",$57
 
-_Route17EndBattleText8: ; 9158a (24:558a)
+_Route17EndBattleText8:
     db $0,"Aaaargh!",$58
 
-_Route17AfterBattleText8: ; 91594 (24:5594)
+_Route17AfterBattleText8:
     db $0,"Be ready to fight",$4f
     db "for your beliefs!",$57
 
-_Route17BattleText9: ; 915b9 (24:55b9)
+_Route17BattleText9:
     db $0,"Nice BIKE!",$4f
     db "How's it handle?",$57
 
-_Route17EndBattleText9: ; 915d5 (24:55d5)
+_Route17EndBattleText9:
     db $0,"Shoot!",$58
 
-_Route17AfterBattleText9: ; 915dd (24:55dd)
+_Route17AfterBattleText9:
     db $0,"The slope makes",$4f
     db "it hard to steer!",$57
 
-_Route17BattleText10: ; 91600 (24:5600)
+_Route17BattleText10:
     db $0,"Get lost kid!",$4f
     db "I'm bushed!",$57
 
-_Route17EndBattleText10: ; 9161a (24:561a)
+_Route17EndBattleText10:
     db $0,"Are you",$4f
     db "satisfied?",$58
 
-_Route17AfterBattleText10: ; 9162e (24:562e)
+_Route17AfterBattleText10:
     db $0,"I need to catch",$4f
     db "a few Zs!",$57
 
-_Route17Text11: ; 91649 (24:5649)
+_Route17Text11:
     db $0,"It's a notice!",$51
     db "Watch out for",$4f
     db "discarded items!",$57
 
-_Route17Text12: ; 91677 (24:5677)
+_Route17Text12:
     db $0,"TRAINER TIPS",$51
     db "All #MON are",$4f
     db "unique.",$51
@@ -123892,438 +123840,436 @@ _Route17Text12: ; 91677 (24:5677)
     db "level grow at",$55
     db "different rates.",$57
 
-_Route17Text13: ; 916d8 (24:56d8)
+_Route17Text13:
     db $0,"TRAINER TIPS",$51
     db "Press the A or B",$4f
     db "Button to stay in",$55
     db "place while on a",$55
     db "slope.",$57
 
-_Route17Text14: ; 91721 (24:5721)
+_Route17Text14:
     db $0,"ROUTE 17",$4f
     db "CELADON CITY -",$55
     db "FUCHSIA CITY",$57
 
-_Route17Text15: ; 91747 (24:5747)
+_Route17Text15:
     db $0,"It's a notice!",$51
     db "Don't throw the",$4f
     db "game,throw #",$55
     db "BALLs instead!",$57
 
-_Route17Text16: ; 91782 (24:5782)
+_Route17Text16:
     db $0,"CYCLING ROAD",$4f
     db "Slope ends here!",$57
 
-_Route18BattleText1: ; 917a1 (24:57a1)
+_Route18BattleText1:
     db $0,"I always check",$4f
     db "every grassy area",$55
     db "for new #MON.",$57
 
-_Route18EndBattleText1: ; 917d1 (24:57d1)
+_Route18EndBattleText1:
     db $0,"Tch!",$58
 
-_Route18AfterBattleText1: ; 917d7 (24:57d7)
+_Route18AfterBattleText1:
     db $0,"I wish I had a",$4f
     db "BIKE!",$57
 
-_Route18BattleText2: ; 917ed (24:57ed)
+_Route18BattleText2:
     db $0,"Kurukkoo!",$4f
     db "How do you like",$55
     db "my bird call?",$57
 
-_Route18EndBattleText2: ; 91816 (24:5816)
+_Route18EndBattleText2:
     db $0,"I",$4f
     db "had to bug you!",$58
 
-_Route18AfterBattleText2: ; 91829 (24:5829)
+_Route18AfterBattleText2:
     db $0,"I also collect sea",$4f
     db "#MON on",$55
     db "weekends!",$57
 
-_Route18BattleText3: ; 9184f (24:584f)
+_Route18BattleText3:
     db $0,"This is my turf!",$4f
     db "Get out of here!",$57
 
-_Route18EndBattleText3: ; 91872 (24:5872)
+_Route18EndBattleText3:
     db $0,"Darn!",$58
 
-_Route18AfterBattleText3: ; 91879 (24:5879)
+_Route18AfterBattleText3:
     db $0,"This is my fave",$4f
     db "#MON hunting",$55
     db "area!",$57
 
-_Route18Text4: ; 9189d (24:589d)
+_Route18Text4:
     db $0,"ROUTE 18",$4f
     db "CELADON CITY -",$55
     db "FUCHSIA CITY",$57
 
-_Route18Text5: ; 918c3 (24:58c3)
+_Route18Text5:
     db $0,"CYCLING ROAD",$4f
     db "No pedestrians",$55
     db "permitted!",$57
 
-_Route19BattleText1: ; 918eb (24:58eb)
+_Route19BattleText1:
     db $0,"Have to warm up",$4f
     db "before my swim!",$57
 
-_Route19EndBattleText1: ; 9190c (24:590c)
+_Route19EndBattleText1:
     db $0,"All",$4f
     db "warmed up!",$58
 
-_Route19AfterBattleText1: ; 9191c (24:591c)
+_Route19AfterBattleText1:
     db $0,"Thanks,kid! I'm",$4f
     db "ready for a swim!",$57
 
-_Route19BattleText2: ; 9193f (24:593f)
+_Route19BattleText2:
     db $0,"Wait! You'll have",$4f
     db "a heart attack!",$57
 
-_Route19EndBattleText2: ; 91961 (24:5961)
+_Route19EndBattleText2:
     db $0,"Ooh!",$4f
     db "That's chilly!",$58
 
-_Route19AfterBattleText2: ; 91975 (24:5975)
+_Route19AfterBattleText2:
     db $0,"Watch out for",$4f
     db "TENTACOOL!",$57
 
-_Route19BattleText3: ; 9198f (24:598f)
+_Route19BattleText3:
     db $0,"I love swimming!",$4f
     db "What about you?",$57
 
-_Route19EndBattleText3: ; 919b1 (24:59b1)
+_Route19EndBattleText3:
     db $0,"Belly",$4f
     db "flop!",$58
 
-_Route19AfterBattleText3: ; 919be (24:59be)
+_Route19AfterBattleText3:
     db $0,"I can beat #MON",$4f
     db "at swimming!",$57
 
-_Route19BattleText4: ; 919dc (24:59dc)
+_Route19BattleText4:
     db $0,"What's beyond the",$4f
     db "horizon?",$57
 
-_Route19EndBattleText4: ; 919f7 (24:59f7)
+_Route19EndBattleText4:
     db $0,"Glub!",$58
 
-_Route19AfterBattleText4: ; 919fe (24:59fe)
+_Route19AfterBattleText4:
     db $0,"I see a couple of",$4f
     db "islands!",$57
 
-_Route19BattleText5: ; 91a1a (24:5a1a)
+_Route19BattleText5:
     db $0,"I tried diving",$4f
     db "for #MON,but",$55
     db "it was a no go!",$57
 
-_Route19EndBattleText5: ; 91a48 (24:5a48)
+_Route19EndBattleText5:
     db $0,"Help!",$58
 
-_Route19AfterBattleText5: ; 91a4f (24:5a4f)
+_Route19AfterBattleText5:
     db $0,"You have to fish",$4f
     db "for sea #MON!",$57
 
-_Route19BattleText6: ; 91a6f (24:5a6f)
+_Route19BattleText6:
     db $0,"I look at the",$4f
     db "sea to forget!",$57
 
-_Route19EndBattleText6: ; 91a8d (24:5a8d)
+_Route19EndBattleText6:
     db $0,"Ooh!",$4f
     db "Traumatic!",$58
 
-_Route19AfterBattleText6: ; 91a9e (24:5a9e)
+_Route19AfterBattleText6:
     db $0,"I'm looking at the",$4f
     db "sea to forget!",$57
 
-SECTION "_Route19EndBattleText7",ROMX[$5af4],BANK[$24]
-
-_Route19EndBattleText7: ; 91af4 (24:5af4)
+_Route19EndBattleText7:
     db $0,"Oh!",$4f
     db "I lost!",$58
 
-_Route19AfterBattleText7: ; 91b01 (24:5b01)
+_Route19AfterBattleText7:
     db $0,"It's still a long",$4f
     db "way to go to",$55
     db "SEAFOAM ISLANDS.",$57
 
-_Route19BattleText8: ; 91b31 (24:5b31)
+_Route19BattleText8:
     db $0,"Swimming's great!",$4f
     db "Sunburns aren't!",$57
 
-_Route19EndBattleText8: ; 91b53 (24:5b53)
+_Route19EndBattleText8:
     db $0,"Shocker!",$58
 
-_Route19AfterBattleText8: ; 91b5d (24:5b5d)
+_Route19AfterBattleText8:
     db $0,"My boy friend",$4f
     db "wanted to swim to",$55
     db "SEAFOAM ISLANDS.",$57
 
-_Route19BattleText9: ; 91b8f (24:5b8f)
+_Route19BattleText9:
     db $0,"These waters are",$4f
     db "treacherous!",$57
 
-_Route19EndBattleText9: ; 91bae (24:5bae)
+_Route19EndBattleText9:
     db $0,"Ooh!",$4f
     db "Dangerous!",$58
 
-_Route19AfterBattleText9: ; 91bbf (24:5bbf)
+_Route19AfterBattleText9:
     db $0,"I got a cramp!",$4f
     db "Glub,glub...",$57
 
-_Route19BattleText10: ; 91bdd (24:5bdd)
+_Route19BattleText10:
     db $0,"I swam here,but",$4f
     db "I'm tired.",$57
 
-_Route19EndBattleText10: ; 91bf9 (24:5bf9)
+_Route19EndBattleText10:
     db $0,"I'm",$4f
     db "exhausted...",$58
 
-_Route19AfterBattleText10: ; 91c0a (24:5c0a)
+_Route19AfterBattleText10:
     db $0,"LAPRAS is so big,",$4f
     db "it must keep you",$55
     db "dry on water.",$57
 
-_Route19Text11: ; 91c3c (24:5c3c)
+_Route19Text11:
     db $0,"SEA ROUTE 19",$4f
     db "FUCHSIA CITY -",$55
     db "SEAFOAM ISLANDS",$57
 
-_Route20BattleText1: ; 91c69 (24:5c69)
+_Route20BattleText1:
     db $0,"The water is",$4f
     db "shallow here.",$57
 
-_Route20EndBattleText1: ; 91c85 (24:5c85)
+_Route20EndBattleText1:
     db $0,"Splash!",$58
 
-_Route20AfterBattleText1: ; 91c8e (24:5c8e)
+_Route20AfterBattleText1:
     db $0,"I wish I could",$4f
     db "ride my #MON.",$57
 
-_Route20BattleText2: ; 91cac (24:5cac)
+_Route20BattleText2:
     db $0,"SEAFOAM is a",$4f
     db "quiet getaway!",$57
 
-_Route20EndBattleText2: ; 91cc9 (24:5cc9)
+_Route20EndBattleText2:
     db $0,"Quit it!",$58
 
-_Route20AfterBattleText2: ; 91cd3 (24:5cd3)
+_Route20AfterBattleText2:
     db $0,"There's a huge",$4f
     db "cavern underneath",$55
     db "this island.",$57
 
-_Route20BattleText3: ; 91d01 (24:5d01)
+_Route20BattleText3:
     db $0,"I love floating",$4f
     db "with the fishes!",$57
 
-_Route20EndBattleText3: ; 91d23 (24:5d23)
+_Route20EndBattleText3:
     db $0,"Yowch!",$58
 
-_Route20AfterBattleText3: ; 91d2b (24:5d2b)
+_Route20AfterBattleText3:
     db $0,"Want to float",$4f
     db "with me?",$57
 
-_Route20BattleText4: ; 91d43 (24:5d43)
+_Route20BattleText4:
     db $0,"Are you on",$4f
     db "vacation too?",$57
 
-_Route20EndBattleText4: ; 91d5d (24:5d5d)
+_Route20EndBattleText4:
     db $0,"No",$4f
     db "mercy at all!",$58
 
-_Route20AfterBattleText4: ; 91d6f (24:5d6f)
+_Route20AfterBattleText4:
     db $0,"SEAFOAM used to",$4f
     db "be one island!",$57
 
-_Route20BattleText5: ; 91d8f (24:5d8f)
+_Route20BattleText5:
     db $0,"Check out my buff",$4f
     db "physique!",$57
 
-_Route20EndBattleText5: ; 91dac (24:5dac)
+_Route20EndBattleText5:
     db $0,"Wimpy!",$58
 
-_Route20AfterBattleText5: ; 91db4 (24:5db4)
+_Route20AfterBattleText5:
     db $0,"I should've been",$4f
     db "buffing up my",$55
     db "#MON,not me!",$57
 
-_Route20BattleText6: ; 91de1 (24:5de1)
+_Route20BattleText6:
     db $0,"Why are you",$4f
     db "riding a #MON?",$55
     db "Can't you swim?",$57
 
-_Route20EndBattleText6: ; 91e0c (24:5e0c)
+_Route20EndBattleText6:
     db $0,"Ouch!",$4f
     db "Torpedoed!",$58
 
-_Route20AfterBattleText6: ; 91e1e (24:5e1e)
+_Route20AfterBattleText6:
     db $0,"Riding a #MON",$4f
     db "sure looks fun!",$57
 
-_Route20BattleText7: ; 91e3d (24:5e3d)
+_Route20BattleText7:
     db $0,"I rode my bird",$4f
     db "#MON here!",$57
 
-_Route20EndBattleText7: ; 91e58 (24:5e58)
+_Route20EndBattleText7:
     db $0,"Oh",$4f
     db "no!",$58
 
-_Route20AfterBattleText7: ; 91e60 (24:5e60)
+_Route20AfterBattleText7:
     db $0,"My birds can't",$4f
     db "FLY me back!",$57
 
-_Route20BattleText8: ; 91e7c (24:5e7c)
+_Route20BattleText8:
     db $0,"My boy friend gave",$4f
     db "me big pearls!",$57
 
-_Route20EndBattleText8: ; 91e9f (24:5e9f)
+_Route20EndBattleText8:
     db $0,"Don't",$4f
     db "touch my pearls!",$58
 
-_Route20AfterBattleText8: ; 91eb6 (24:5eb6)
+_Route20AfterBattleText8:
     db $0,"Will my pearls",$4f
     db "grow bigger",$55
     db "inside CLOYSTER?",$57
 
-_Route20BattleText9: ; 91ee3 (24:5ee3)
+_Route20BattleText9:
     db $0,"I swam here from",$4f
     db "CINNABAR ISLAND!",$57
 
-_Route20EndBattleText9: ; 91f06 (24:5f06)
+_Route20EndBattleText9:
     db $0,"I'm",$4f
     db "so disappointed!",$58
 
-_Route20AfterBattleText9: ; 91f1b (24:5f1b)
+_Route20AfterBattleText9:
     db $0,"#MON have",$4f
     db "taken over an",$55
     db "abandoned mansion",$55
     db "on CINNABAR!",$57
 
-_Route20BattleText10: ; 91f53 (24:5f53)
+_Route20BattleText10:
     db $0,"CINNABAR,in the",$4f
     db "west,has a LAB",$55
     db "for #MON.",$57
 
-_Route20EndBattleText10: ; 91f7f (24:5f7f)
+_Route20EndBattleText10:
     db $0,"Wait!",$58
 
-_Route20AfterBattleText10: ; 91f86 (24:5f86)
+_Route20AfterBattleText10:
     db $0,"CINNABAR is a ",$4f
     db "volcanic island!",$57
 
-_Route20Text12: ; 91fa7 (24:5fa7)
-_Route20Text11: ; 91fa7 (24:5fa7)
+_Route20Text12:
+_Route20Text11:
     db $0,"SEAFOAM ISLANDS",$57
 
-_Route21BattleText1: ; 91fb8 (24:5fb8)
+_Route21BattleText1:
     db $0,"You want to know",$4f
     db "if the fish are",$55
     db "biting?",$57
 
-_Route21EndBattleText1: ; 91fe2 (24:5fe2)
+_Route21EndBattleText1:
     db $0,"Dang!",$58
 
-_Route21AfterBattleText1: ; 91fe9 (24:5fe9)
+_Route21AfterBattleText1:
     db $0,"I can't catch",$4f
     db "anything good!",$57
 
-_Route21BattleText2: ; 92006 (24:6006)
+_Route21BattleText2:
     db $0,"I got a big haul!",$4f
     db "Wanna go for it?",$57
 
-_Route21EndBattleText2: ; 9202a (24:602a)
+_Route21EndBattleText2:
     db $0,"Darn",$4f
     db "MAGIKARP!",$58
 
-_Route21AfterBattleText2: ; 9203a (24:603a)
+_Route21AfterBattleText2:
     db $0,"I seem to only",$4f
     db "catch MAGIKARP!",$57
 
-_Route21BattleText3: ; 9205a (24:605a)
+_Route21BattleText3:
     db $0,"The sea cleanses",$4f
     db "my body and soul!",$57
 
-_Route21EndBattleText3: ; 9207e (24:607e)
+_Route21EndBattleText3:
     db $0,"Ayah!",$58
 
-_Route21AfterBattleText3: ; 92085 (24:6085)
+_Route21AfterBattleText3:
     db $0,"I like the",$4f
     db "mountains too!",$57
 
-_Route21BattleText4: ; 920a0 (24:60a0)
+_Route21BattleText4:
     db $0,"What's wrong with",$4f
     db "me swimming?",$57
 
-_Route21EndBattleText4: ; 920bf (24:60bf)
+_Route21EndBattleText4:
     db $0,"Cheap",$4f
     db "shot!",$58
 
-_Route21AfterBattleText4: ; 920cc (24:60cc)
+_Route21AfterBattleText4:
     db $0,"I look like what?",$4f
     db "A studded inner",$55
     db "tube? Get lost!",$57
 
-_Route21BattleText5: ; 920ff (24:60ff)
+_Route21BattleText5:
     db $0,"I caught all my",$4f
     db "#MON at sea!",$57
 
-_Route21EndBattleText5: ; 9211d (24:611d)
+_Route21EndBattleText5:
     db $0,"Diver!!",$4f
     db "Down!!",$58
 
-_Route21AfterBattleText5: ; 9212d (24:612d)
+_Route21AfterBattleText5:
     db $0,"Where'd you catch",$4f
     db "your #MON?",$57
 
-_Route21BattleText6: ; 9214a (24:614a)
+_Route21BattleText6:
     db $0,"Right now,I'm in",$4f
     db "a triathlon meet!",$57
 
-_Route21EndBattleText6: ; 9216e (24:616e)
+_Route21EndBattleText6:
     db $0,"Pant...",$4f
     db "pant...pant...",$58
 
-_Route21AfterBattleText6: ; 92186 (24:6186)
+_Route21AfterBattleText6:
     db $0,"I'm beat!",$4f
     db "But,I still have",$55
     db "the bike race and",$55
     db "marathon left!",$57
 
-_Route21BattleText7: ; 921c3 (24:61c3)
+_Route21BattleText7:
     db $0,"Ahh! Feel the sun",$4f
     db "and the wind!",$57
 
-_Route21EndBattleText7: ; 921e4 (24:61e4)
+_Route21EndBattleText7:
     db $0,"Yow!",$4f
     db "I lost!",$58
 
-_Route21AfterBattleText7: ; 921f2 (24:61f2)
+_Route21AfterBattleText7:
     db $0,"I'm sunburnt to a",$4f
     db "crisp!",$57
 
-_Route21BattleText8: ; 9220b (24:620b)
+_Route21BattleText8:
     db $0,"Hey,don't scare",$4f
     db "away the fish!",$57
 
-_Route21EndBattleText8: ; 9222b (24:622b)
+_Route21EndBattleText8:
     db $0,"Sorry!",$4f
     db "I didn't mean it!",$58
 
-_Route21AfterBattleText8: ; 92244 (24:6244)
+_Route21AfterBattleText8:
     db $0,"I was just angry",$4f
     db "that I couldn't",$55
     db "catch anything.",$57
 
-_Route21BattleText9: ; 92275 (24:6275)
+_Route21BattleText9:
     db $0,"Keep me company",$4f
     db "'til I get a hit!",$57
 
-_Route21EndBattleText9: ; 92297 (24:6297)
+_Route21EndBattleText9:
     db $0,"That",$4f
     db "burned some time.",$58
 
-_Route21AfterBattleText9: ; 922af (24:62af)
+_Route21AfterBattleText9:
     db $0,"Oh wait! I got a",$4f
     db "bite! Yeah!",$57
 
-_UnnamedText_511ad: ; 922cd (24:62cd)
+_UnnamedText_511ad:
     db $0,$53,": Hey!",$4f
     db $52,"!",$51
     db "You're going to",$4f
@@ -124337,7 +124283,7 @@ _UnnamedText_511ad: ; 922cd (24:62cd)
     db "your #MON",$55
     db "get any stronger?",$57
 
-_UnnamedText_511b2: ; 9236f (24:636f)
+_UnnamedText_511b2:
     db $0,"I heard #MON",$4f
     db "LEAGUE has many",$55
     db "tough trainers!",$51
@@ -124348,19 +124294,19 @@ _UnnamedText_511b2: ; 9236f (24:636f)
     db "dawdling and get",$55
     db "a move on!",$57
 
-_UnnamedText_511b7: ; 923f4 (24:63f4)
+_UnnamedText_511b7:
     db $0,"Awww!",$4f
     db "You just lucked",$55
     db "out!",$58
 
-_UnnamedText_511bc: ; 92410 (24:6410)
+_UnnamedText_511bc:
     db $0,$53,": What?",$4f
     db "Why do I have 2",$55
     db "#MON?",$51
     db "You should catch",$55
     db "some more too!",$58
 
-_UnnamedText_511c1: ; 92450 (24:6450)
+_UnnamedText_511c1:
     db $0,$53,": What?",$4f
     db $52,"! What a",$55
     db "surprise to see",$55
@@ -124376,7 +124322,7 @@ _UnnamedText_511c1: ; 92450 (24:6450)
     db "#MON LEAGUE!",$51
     db "Come on!",$57
 
-_UnnamedText_511c6: ; 92506 (24:6506)
+_UnnamedText_511c6:
     db $0,"That loosened me",$4f
     db "up! I'm ready for",$55
     db "#MON LEAGUE!",$51
@@ -124386,12 +124332,12 @@ _UnnamedText_511c6: ; 92506 (24:6506)
     db "that! I'm out of",$55
     db "here. Smell ya!",$57
 
-_UnnamedText_511cb: ; 92583 (24:6583)
+_UnnamedText_511cb:
     db $0,"What!?",$51
     db "I was just",$4f
     db "careless!",$58
 
-_UnnamedText_511d0: ; 925a0 (24:65a0)
+_UnnamedText_511d0:
     db $0,$53,": Hahaha!",$4f
     db $52,"! That's",$55
     db "your best? You're",$55
@@ -124400,75 +124346,75 @@ _UnnamedText_511d0: ; 925a0 (24:65a0)
     db "Go train some",$4f
     db "more! You loser!",$58
 
-_Route22Text3: ; 92606 (24:6606)
+_Route22Text3:
     db $0,"#MON LEAGUE",$4f
     db "Front Gate",$57
 
-_VictoryRoadGuardText1: ; 9261e (24:661e)
+_VictoryRoadGuardText1:
     db $0,"You can pass here",$4f
     db "only if you have",$55
     db "the @"
 
-UnnamedText_92647: ; 92647 (24:6647)
+UnnamedText_92647:
     TX_RAM $cd6d
     db $0,"!",$51
     db "You don't have the",$4f
     db "@"
 
-UnnamedText_92660: ; 92660 (24:6660)
+UnnamedText_92660:
     TX_RAM $cd6d
     db $0," yet!",$51
     db "You have to have",$4f
     db "it to get to",$55
     db "#MON LEAGUE!@@"
 
-_VictoryRoadGuardText2: ; 92696 (24:6696)
+_VictoryRoadGuardText2:
     db $0,"You can pass here",$4f
     db "only if you have",$55
     db "the @"
 
-UnnamedText_926bf: ; 926bf (24:66bf)
+UnnamedText_926bf:
     TX_RAM $cd6d
     db $0,"!",$51
     db "Oh! That is the",$4f
     db "@"
 
-UnnamedText_926d6: ; 926d6 (24:66d6)
+UnnamedText_926d6:
     TX_RAM $cd6d
     db $0,"!@@"
 
-_UnnamedText_513a3: ; 926dd (24:66dd)
+_UnnamedText_513a3:
     db $0,$51
     db "OK then! Please,",$4f
     db "go right ahead!",$57
 
-_Route23Text8: ; 92700 (24:6700)
+_Route23Text8:
     db $0,"VICTORY ROAD GATE",$4f
     db "- #MON LEAGUE",$57
 
-_UnnamedText_51510: ; 92721 (24:6721)
+_UnnamedText_51510:
     db $0,"Congratulations!",$4f
     db "You beat our 5",$55
     db "contest trainers!@@"
 
-_UnnamedText_51515: ; 92755 (24:6755)
+_UnnamedText_51515:
     db $0,$51
     db "You just earned a",$4f
     db "fabulous prize!",$58
 
-_UnnamedText_5151a: ; 92779 (24:6779)
+_UnnamedText_5151a:
     db $0,$52," received",$4f
     db "a @"
 
-UnnamedText_92788: ; 92788 (24:6788)
+UnnamedText_92788:
     TX_RAM $cf4b
     db $0,"!@@"
 
-_UnnamedText_51521: ; 9278f (24:678f)
+_UnnamedText_51521:
     db $0,"You don't have",$4f
     db "any room!",$57
 
-_UnnamedText_51526: ; 927a8 (24:67a8)
+_UnnamedText_51526:
     db $0,"By the way,would",$4f
     db "you like to join",$55
     db "TEAM ROCKET?",$51
@@ -124486,17 +124432,17 @@ _UnnamedText_51526: ; 927a8 (24:67a8)
     db "offer you can't",$55
     db "refuse!",$57
 
-_UnnamedText_5152b: ; 9288a (24:688a)
+_UnnamedText_5152b:
     db $0,"Arrgh!",$4f
     db "You are good!",$58
 
-_UnnamedText_51530: ; 928a0 (24:68a0)
+_UnnamedText_51530:
     db $0,"With your ability,",$4f
     db "you could become",$55
     db "a top leader in",$55
     db "TEAM ROCKET!",$57
 
-_Route24BattleText1: ; 928e2 (24:68e2)
+_Route24BattleText1:
     db $0,"I saw your feat",$4f
     db "from the grass!",$57
 
@@ -124576,64 +124522,64 @@ _Route19BattleText7:
 
 SECTION "bank25",ROMX,BANK[$25]
 
-_Route24EndBattleText1: ; 94000 (25:4000)
+_Route24EndBattleText1:
     db $0,"I",$4f
     db "thought not!",$58
 
-_Route24AfterBattleText1: ; 94010 (25:4010)
+_Route24AfterBattleText1:
     db $0,"I hid because the",$4f
     db "people on the",$55
     db "bridge scared me!",$57
 
-_Route24BattleText2: ; 94043 (25:4043)
+_Route24BattleText2:
     db $0,"OK! I'm No. 5!",$4f
     db "I'll stomp you!",$57
 
-_Route24EndBattleText2: ; 94061 (25:4061)
+_Route24EndBattleText2:
     db $0,"Whoa!",$4f
     db "Too much!",$58
 
-_Route24AfterBattleText2: ; 94072 (25:4072)
+_Route24AfterBattleText2:
     db $0,"I did my best,I",$4f
     db "have no regrets!",$57
 
-_Route24BattleText3: ; 94095 (25:4095)
+_Route24BattleText3:
     db $0,"I'm No. 4!",$4f
     db "Getting tired?",$57
 
-_Route24EndBattleText3: ; 940af (25:40af)
+_Route24EndBattleText3:
     db $0,"I lost",$4f
     db "too!",$58
 
-_Route24AfterBattleText3: ; 940bc (25:40bc)
+_Route24AfterBattleText3:
     db $0,"I did my best,so",$4f
     db "I've no regrets!",$57
 
-_Route24BattleText4: ; 940df (25:40df)
+_Route24BattleText4:
     db $0,"Here's No. 3!",$4f
     db "I won't be easy!",$57
 
-_Route24EndBattleText4: ; 940fd (25:40fd)
+_Route24EndBattleText4:
     db $0,"Ow!",$4f
     db "Stomped flat!",$58
 
-_Route24AfterBattleText4: ; 94110 (25:4110)
+_Route24AfterBattleText4:
     db $0,"I did my best,I",$4f
     db "have no regrets!",$57
 
-_Route24BattleText5: ; 94133 (25:4133)
+_Route24BattleText5:
     db $0,"I'm second!",$4f
     db "Now it's serious!",$57
 
-_Route24EndBattleText5: ; 94150 (25:4150)
+_Route24EndBattleText5:
     db $0,"How could I",$4f
     db "lose?",$58
 
-_Route24AfterBattleText5: ; 94163 (25:4163)
+_Route24AfterBattleText5:
     db $0,"I did my best,I",$4f
     db "have no regrets!",$57
 
-_Route24BattleText6: ; 94186 (25:4186)
+_Route24BattleText6:
     db $0,"This is NUGGET",$4f
     db "BRIDGE! Beat us 5",$55
     db "trainers and win",$55
@@ -124641,328 +124587,317 @@ _Route24BattleText6: ; 94186 (25:4186)
     db "Think you got",$4f
     db "what it takes?",$57
 
-_Route24EndBattleText6: ; 941e8 (25:41e8)
+_Route24EndBattleText6:
     db $0,"Whoo!",$4f
     db "Good stuff!",$58
 
-_Route24AfterBattleText6: ; 941fb (25:41fb)
+_Route24AfterBattleText6:
     db $0,"I did my best,I",$4f
     db "have no regrets!",$57
 
-_Route25BattleText1: ; 9421e (25:421e)
+_Route25BattleText1:
     db $0,"Local trainers",$4f
     db "come here to",$55
     db "practice!",$57
 
-_Route25EndBattleText1: ; 94245 (25:4245)
+_Route25EndBattleText1:
     db $0,"You're",$4f
     db "decent.",$58
 
-_Route25AfterBattleText1: ; 94254 (25:4254)
+_Route25AfterBattleText1:
     db $0,"All #MON have",$4f
     db "weaknesses. It's",$55
     db "best to raise",$55
     db "different kinds.",$57
 
-_Route25BattleText2: ; 94292 (25:4292)
+_Route25BattleText2:
     db $0,"Dad took me to a",$4f
     db "great party on",$55
     db "S.S.ANNE at",$55
     db "VERMILION CITY!",$57
 
-_Route25EndBattleText2: ; 942cf (25:42cf)
+_Route25EndBattleText2:
     db $0,"I'm",$4f
     db "not mad!",$58
 
-_Route25AfterBattleText2: ; 942dc (25:42dc)
+_Route25AfterBattleText2:
     db $0,"On S.S.ANNE,I",$4f
     db "saw trainers from",$55
     db "around the world.",$57
 
-_Route25BattleText3: ; 94310 (25:4310)
+_Route25BattleText3:
     db $0,"I'm a cool guy.",$4f
     db "I've got a girl",$55
     db "friend!",$57
 
-_Route25EndBattleText3: ; 94337 (25:4337)
+_Route25EndBattleText3:
     db $0,"Aww,",$4f
     db "darn...",$58
 
-_Route25AfterBattleText3: ; 94345 (25:4345)
+_Route25AfterBattleText3:
     db $0,"Oh well. My girl",$4f
     db "will cheer me up.",$57
 
-_Route25BattleText4: ; 94369 (25:4369)
+_Route25BattleText4:
     db $0,"Hi! My boy",$4f
     db "friend is cool!",$57
 
-_Route25EndBattleText4: ; 94385 (25:4385)
+_Route25EndBattleText4:
     db $0,"I was in",$4f
     db "bad condition!",$58
 
-_Route25AfterBattleText4: ; 9439e (25:439e)
+_Route25AfterBattleText4:
     db $0,"I wish my guy was",$4f
     db "as good as you!",$57
 
-_Route25BattleText5: ; 943c1 (25:43c1)
+_Route25BattleText5:
     db $0,"I knew I had to",$4f
     db "fight you!",$57
 
-_Route25EndBattleText5: ; 943dd (25:43dd)
+_Route25EndBattleText5:
     db $0,"I knew",$4f
     db "I'd lose too!",$58
 
-_Route25AfterBattleText5: ; 943f2 (25:43f2)
+_Route25AfterBattleText5:
     db $0,"If your #MON",$4f
     db "gets confused or",$55
     db "falls asleep,",$55
     db "switch it!",$57
 
-_Route25BattleText6: ; 9442a (25:442a)
+_Route25BattleText6:
     db $0,"My friend has a",$4f
     db "cute #MON.",$55
     db "I'm so jealous!",$57
 
-_Route25EndBattleText6: ; 94455 (25:4455)
+_Route25EndBattleText6:
     db $0,"I'm",$4f
     db "not so jealous!",$58
 
-_Route25AfterBattleText6: ; 94469 (25:4469)
+_Route25AfterBattleText6:
     db $0,"You came from MT.",$4f
     db "MOON? May I have",$55
     db "a CLEFAIRY?",$57
 
-_Route25BattleText7: ; 94499 (25:4499)
+_Route25BattleText7:
     db $0,"I just got down",$4f
     db "from MT.MOON,",$55
     db "but I'm ready!",$57
 
-_Route25EndBattleText7: ; 944c6 (25:44c6)
+_Route25EndBattleText7:
     db $0,"You",$4f
     db "worked hard!",$58
 
-_Route25AfterBattleText7: ; 944d8 (25:44d8)
+_Route25AfterBattleText7:
     db $0,"Drat!",$4f
     db "A ZUBAT bit me",$55
     db "back in there.",$57
 
-_Route25BattleText8: ; 944fd (25:44fd)
+_Route25BattleText8:
     db $0,"I'm off to see a",$4f
     db "#MON collector",$55
     db "at the cape!",$57
 
-_Route25EndBattleText8: ; 9452a (25:452a)
+_Route25EndBattleText8:
     db $0,"You",$4f
     db "got me.",$58
 
-_Route25AfterBattleText8: ; 94537 (25:4537)
+_Route25AfterBattleText8:
     db $0,"The collector has",$4f
     db "many rare kinds",$55
     db "of #MON.",$57
 
-_Route25BattleText9: ; 94563 (25:4563)
+_Route25BattleText9:
     db $0,"You're going to",$4f
     db "see BILL? First,",$55
     db "let's fight!",$57
 
-_Route25EndBattleText9: ; 94590 (25:4590)
+_Route25EndBattleText9:
     db $0,"You're",$4f
     db "something.",$58
 
-_Route25AfterBattleText9: ; 945a2 (25:45a2)
+_Route25AfterBattleText9:
     db $0,"The trail below",$4f
     db "is a shortcut to",$55
     db "CERULEAN CITY.",$57
 
-_Route25Text11: ; 945d3 (25:45d3)
+_Route25Text11:
     db $0,"SEA COTTAGE",$4f
     db "BILL lives here!",$57
 
-_FileDataDestroyedText: ; 945f1 (25:45f1)
+_FileDataDestroyedText:
     db $0,"The file data is",$4f
     db "destroyed!",$58
 
-_WouldYouLikeToSaveText: ; 9460e (25:460e)
+_WouldYouLikeToSaveText:
     db $0,"Would you like to",$4f
     db "SAVE the game?",$57
 
-_GameSavedText: ; 94630 (25:4630)
+_GameSavedText:
     db $0,$52," saved",$4f
     db "the game!",$57
 
-_OlderFileWillBeErasedText: ; 94643 (25:4643)
+_OlderFileWillBeErasedText:
     db $0,"The older file",$4f
     db "will be erased to",$55
     db "save. Okay?",$57
 
-;_UnnamedText_73909: ; 94671 (25:4671)
-;    db $0,"When you change a",$4f
-;    db "#MON BOX,data",$55
-;    db "will be saved.",$51
-;    db "Is that okay?",$57
-; 0x94671 + 63 bytes
-
-_UnnamedText_73909: ; 94671 (25:4671)
+_UnnamedText_73909:
     db $0,"Change #MON BOX",$4f
     db "and save data?",$57
 
-SECTION "_UnnamedText_739d4",ROMX[$46b0],BANK[$25]
-
-_UnnamedText_739d4: ; 946b0 (25:46b0)
+_UnnamedText_739d4:
     db $0,"Choose a",$4f
     db $4a," BOX.@@"
 
-_UnnamedText_3af3e: ; 946c2 (25:46c2)
+_UnnamedText_3af3e:
     TX_RAM $cf4b
     db $0," evolved",$57
 
-_UnnamedText_3af43: ; 946cf (25:46cf)
+_UnnamedText_3af43:
     db $0,$4f
     db "into @"
 
-UnnamedText_946d7: ; 946d7 (25:46d7)
+UnnamedText_946d7:
     TX_RAM $cd6d
     db $0,"!",$57
 
-_UnnamedText_3af48: ; 946dd (25:46dd)
+_UnnamedText_3af48:
     db $0,"Huh? @"
 
-UnnamedText_946e4: ; 946e4 (25:46e4)
+UnnamedText_946e4:
     TX_RAM $cf4b
     db $0,$4f
     db "stopped evolving!",$58
 
-_UnnamedText_3af4d: ; 946fb (25:46fb)
+_UnnamedText_3af4d:
     db $0,"What? @"
 
-UnnamedText_94703: ; 94703 (25:4703)
+UnnamedText_94703:
     TX_RAM $cf4b
     db $0,$4f
     db "is evolving!",$57
 
-_FellAsleepText: ; 94715 (25:4715)
+_FellAsleepText:
     db $0,$59,$4f
     db "fell asleep!",$58
 
-;_AlreadyAsleepText: ; 94725 (25:4725)
+;_AlreadyAsleepText:
 ;    db $0,$59,"'s",$4f
 ;    db "already asleep!",$58
 
-SECTION "_PoisonedText",ROMX[$4739],BANK[$25]
-
-_PoisonedText: ; 94739 (25:4739)
+_PoisonedText:
     db $0,$59,$4f
     db "was poisoned!",$58
 
-_BadlyPoisonedText: ; 9474a (25:474a)
+_BadlyPoisonedText:
     db $0,$59,"'s",$4f
     db "badly poisoned!",$58
 
-_UnnamedText_3f3d8: ; 9475e (25:475e)
+_UnnamedText_3f3d8:
     db $0,$59,$4f
     db "was burned!",$58
 
-_UnnamedText_3f3dd: ; 9476d (25:476d)
+_UnnamedText_3f3dd:
     db $0,$59,$4f
     db "was frozen solid!",$58
 
-_UnnamedText_3f423: ; 94782 (25:4782)
+_UnnamedText_3f423:
     db $0,"Fire defrosted",$4f
     db $59,"!",$58
 
-_MonsStatsRoseText: ; 94795 (25:4795)
+_MonsStatsRoseText:
     db $0,$5a,"'s",$4f
     db "@"
 
-UnnamedText_9479a: ; 9479a (25:479a)
+UnnamedText_9479a:
     TX_RAM $cf4b
     db $0,"@@"
 
-_GreatlyText: ; 947a0 (25:47a0)
+_GreatlyText:
     db $0,$4c,"greatly@@"
 
-_RoseText: ; 947ab (25:47ab)
+_RoseText:
     db $0," rose!",$58
 
-_MonsStatsFellText: ; 947b3 (25:47b3)
+_MonsStatsFellText:
     db $0,$59,"'s",$4f
     db "@"
 
-UnnamedText_947b8: ; 947b8 (25:47b8)
+UnnamedText_947b8:
     TX_RAM $cf4b
     db $0,"@@"
 
-_GreatlyFellText: ; 947be (25:47be)
+_GreatlyFellText:
     db $0,$4c,"greatly@@"
 
-_FellText: ; 947c9 (25:47c9)
+_FellText:
     db $0," fell!",$58
 
-_RanFromBattleText: ; 947d1 (25:47d1)
+_RanFromBattleText:
     db $0,$5a,$4f
     db "ran from battle!",$58
 
-_RanAwayScaredText: ; 947e5 (25:47e5)
+_RanAwayScaredText:
     db $0,$59,$4f
     db "ran away scared!",$58
 
-_WasBlownAwayText: ; 947f9 (25:47f9)
+_WasBlownAwayText:
     db $0,$59,$4f
     db "was blown away!",$58
 
-_UnnamedText_3f8c8: ; 9480c (25:480c)
+_UnnamedText_3f8c8:
     db $0,$5a,"@@"
 
-_UnnamedText_3f8f9: ; 94810 (25:4810)
+_UnnamedText_3f8f9:
     db $0,$4f
     db "made a whirlwind!",$58
 
-_UnnamedText_3f8fe: ; 94824 (25:4824)
+_UnnamedText_3f8fe:
     db $0,$4f
     db "took in sunlight!",$58
 
-_UnnamedText_3f903: ; 94838 (25:4838)
+_UnnamedText_3f903:
     db $0,$4f
     db "lowered its head!",$58
 
-_UnnamedText_3f908: ; 9484c (25:484c)
+_UnnamedText_3f908:
     db $0,$4f
     db "is glowing!",$58
 
-_UnnamedText_3f90d: ; 9485a (25:485a)
+_UnnamedText_3f90d:
     db $0,$4f
     db "flew up high!",$58
 
-_UnnamedText_3f912: ; 9486a (25:486a)
+_UnnamedText_3f912:
     db $0,$4f
     db "dug a hole!",$58
 
-_BecameConfusedText: ; 94878 (25:4878)
+_BecameConfusedText:
     db $0,$59,$4f
     db "became confused!",$58
 
-_MimicLearnedMoveText: ; 9488c (25:488c)
+_MimicLearnedMoveText:
     db $0,$5a,$4f
     db "learned",$55
     db "@"
 
-UnnamedText_94898: ; 94898 (25:4898)
+UnnamedText_94898:
     TX_RAM $cd6d
     db $0,"!",$58
 
-_MoveWasDisabledText: ; 9489e (25:489e)
+_MoveWasDisabledText:
     db $0,$59,"'s",$4f
     db "@"
 
-UnnamedText_948a3: ; 948a3 (25:48a3)
+UnnamedText_948a3:
     TX_RAM $cd6d
     db $0," was",$55
     db "disabled!",$58
 
-_NothingHappenedText: ; 948b6 (25:48b6)
+_NothingHappenedText:
     db $0,"Nothing happened!",$58
 
-_NoEffectText: ; 948c9 (25:48c9)
+_NoEffectText:
     db $0,"No effect!",$58
 
 _DidntAffectText:
@@ -124973,177 +124908,173 @@ _IsUnaffectedText:
     db $0,$59,$4f
     db "is unaffected!",$58
 
-SECTION "_UnnamedText_3fb74",ROMX[$490d],BANK[$25]
-
-_UnnamedText_3fb74: ; 9490d (25:490d)
+_UnnamedText_3fb74:
     db $0,$59,"'s",$4f
     db "paralyzed! It may",$55
     db "not attack!",$58
 
-_UnnamedText_17e1d: ; 9492f (25:492f)
+_UnnamedText_17e1d:
     db $0,"It created a",$4f
     db "SUBSTITUTE!",$58
 
-_UnnamedText_17e22: ; 94949 (25:4949)
+_UnnamedText_17e22:
     db $0,$5a,$4f
     db "has a SUBSTITUTE!",$58
 
-_UnnamedText_17e27: ; 9495e (25:495e)
+_UnnamedText_17e27:
     db $0,"Too weak to make",$4f
     db "a SUBSTITUTE!",$58
 
-_UnnamedText_2ff04: ; 9497e (25:497e)
+_UnnamedText_2ff04:
     db $0,"Coins scattered",$4f
     db "everywhere!",$58
 
-_GettingPumpedText: ; 9499b (25:499b)
+_GettingPumpedText:
     db $0,$5a,"'s",$4f
     db "getting pumped!",$58
 
-_WasSeededText: ; 949af (25:49af)
+_WasSeededText:
     db $0,$59,$4f
     db "was seeded!",$58
 
-;_EvadedAttackText: ; 949be (25:49be)
+;_EvadedAttackText:
 ;    db $0,$59,$4f
 ;    db "evaded attack!",$58
 
-SECTION "_UnnamedText_1399e",ROMX[$49d0],BANK[$25]
-
-_UnnamedText_1399e: ; 949d0 (25:49d0)
+_UnnamedText_1399e:
     db $0,$5a,"'s",$4f
     db "hit with recoil!",$58
 
-_ConvertedTypeToText: ; 949e5 (25:49e5)
+_ConvertedTypeToText:
     db $0,"Converted type to",$4f
     db $59,"'s!",$58
 
-_StatusChangesEliminatedText: ; 949fc (25:49fc)
+_StatusChangesEliminatedText:
     db $0,"All STATUS changes",$4f
     db "are eliminated!",$58
 
-_StartedSleepingEffect: ; 94a20 (25:4a20)
+_StartedSleepingEffect:
     db $0,$5a,$4f
     db "started sleeping!",$57
 
-_FellAsleepBecameHealthyText: ; 94a35 (25:4a35)
+_FellAsleepBecameHealthyText:
     db $0,$5a,$4f
     db "fell asleep and",$55
     db "became healthy!",$57
 
-_RegainedHealthText: ; 94a58 (25:4a58)
+_RegainedHealthText:
     db $0,$5a,$4f
     db "regained health!",$58
 
-_UnnamedText_3bb92: ; 94a6c (25:4a6c)
+_UnnamedText_3bb92:
     db $0,$5a,$4f
     db "transformed into",$55
     db "@"
 
-UnnamedText_94a81: ; 94a81 (25:4a81)
+UnnamedText_94a81:
     TX_RAM $cd6d
     db $0,"!",$58
 
-_LightScreenProtectedText: ; 94a87 (25:4a87)
+_LightScreenProtectedText:
     db $0,$5a,"'s",$4f
     db "protected against",$55
     db "special attacks!",$58
 
-_ReflectGainedArmorText: ; 94aae (25:4aae)
+_ReflectGainedArmorText:
     db $0,$5a,$4f
     db "gained armor!",$58
 
-_ShroudedInMistText: ; 94abf (25:4abf)
+_ShroudedInMistText:
     db $0,$5a,"'s",$4f
     db "shrouded in mist!",$58
 
-_SuckedHealthText: ; 94ad5 (25:4ad5)
+_SuckedHealthText:
     db $0,"Sucked health from",$4f
     db $59,"!",$58
 
-_DreamWasEatenText: ; 94aec (25:4aec)
+_DreamWasEatenText:
     db $0,$59,"'s",$4f
     db "dream was eaten!",$58
 
-_BattleCenterMText1: ; 94b01 (25:4b01)
+_BattleCenterMText1:
     db $0,"!",$57
 
-_TradeCenterMText1: ; 94b04 (25:4b04)
+_TradeCenterMText1:
     db $0,"!",$57
 
 INCLUDE "text/mapRedsHouse1F.asm"
 INCLUDE "text/mapBluesHouse.asm"
 
-_OaksLabGaryText1: ; 94d5b (25:4d5b)
+_OaksLabGaryText1:
     db $0,$53,": Yo",$4f
     db $52,"! Gramps",$55
     db "isn't around!",$57
 
-_OaksLabText40: ; 94d79 (25:4d79)
+_OaksLabText40:
     db $0,$53,": Heh,I",$4f
     db "don't need to be",$55
     db "greedy like you!",$51
     db "Go ahead and",$4f
     db "choose,",$52,"!",$57
 
-_OaksLabText41: ; 94dbd (25:4dbd)
+_OaksLabText41:
     db $0,$53,": My",$4f
     db "#MON looks a",$55
     db "lot stronger.",$57
 
-_OaksLabText39: ; 94ddf (25:4ddf)
+_OaksLabText39:
     db $0
     db "Those are #",$4f
     db "BALLs. They",$55
     db "contain #MON!",$57
 
-_OaksLabCharmanderText: ; 94e06 (25:4e06)
+_OaksLabCharmanderText:
     db $0,"So! You want the",$4f
     db "fire #MON,",$55
     db "CHARMANDER?",$57
 
-_OaksLabSquirtleText: ; 94e2f (25:4e2f)
+_OaksLabSquirtleText:
     db $0,"So! You want the",$4f
     db "water #MON,",$55
     db "SQUIRTLE?",$57
 
-_OaksLabBulbasaurText: ; 94e57 (25:4e57)
+_OaksLabBulbasaurText:
     db $0,"So! You want the",$4f
     db "plant #MON,",$55
     db "BULBASAUR?",$57
 
-_OaksLabMonEnergeticText: ; 94e80 (25:4e80)
+_OaksLabMonEnergeticText:
     db $0,"This #MON is",$4f
     db "really energetic!",$58
 
-_OaksLabReceivedMonText: ; 94ea0 (25:4ea0)
+_OaksLabReceivedMonText:
     db $0,$52," received",$4f
     db "a @"
     TX_RAM $cd6d
     db $0,"!@@"
 
-_OaksLabLastMonText: ; 94eb6 (25:4eb6)
+_OaksLabLastMonText:
     db $0,"That's PROF.OAK's",$4f
     db "last #MON!",$57
 
-_UnnamedText_1d2f0: ; 94ed2 (25:4ed2)
+_UnnamedText_1d2f0:
     db $0,"OAK: Now,",$52,",",$4f
     db "which #MON do",$55
     db "you want?",$57
 
-_UnnamedText_1d2f5: ; 94ef8 (25:4ef8)
+_UnnamedText_1d2f5:
     db $0,"OAK: If a wild",$4f
     db "#MON appears,",$55
     db "your #MON can",$55
     db "fight against it!",$57
 
-_UnnamedText_1d2fa: ; 94f36 (25:4f36)
+_UnnamedText_1d2fa:
     db $0,"OAK: ",$52,",",$4f
     db "raise your young",$55
     db "#MON by making",$55
     db "it fight!",$57
 
-_OaksLabDeliverParcelText1: ; 94f69 (25:4f69)
+_OaksLabDeliverParcelText1:
     db $0,"OAK: Oh,",$52,"!",$51
     db "How is my old",$4f
     db "#MON?",$51
@@ -125157,19 +125088,19 @@ _OaksLabDeliverParcelText1: ; 94f69 (25:4f69)
     db $52," delivered",$4f
     db "OAK's PARCEL.@@"
 
-_OaksLabDeliverParcelText2: ; 9500f (25:500f)
+_OaksLabDeliverParcelText2:
     db $0,$51
     db "Ah! This is the",$4f
     db "custom # BALL",$55
     db "I ordered!",$55
     db "Thank you!",$57
 
-_OaksLabAroundWorldText: ; 95045 (25:5045)
+_OaksLabAroundWorldText:
     db $0,"#MON around the",$4f
     db "world wait for",$55
     db "you,",$52,"!",$57
 
-_OaksLabGivePokeballsText1: ; 9506d (25:506d)
+_OaksLabGivePokeballsText1:
     db $0,"OAK: You can't get",$4f
     db "detailed data on",$55
     db "#MON by just",$55
@@ -125181,7 +125112,7 @@ _OaksLabGivePokeballsText1: ; 9506d (25:506d)
     db $52," got 5",$4f
     db "# BALLs!@@"
 
-_OaksLabGivePokeballsText2: ; 950f2 (25:50f2)
+_OaksLabGivePokeballsText2:
     db $0,$51
     db "When a wild",$4f
     db "#MON appears,",$55
@@ -125195,29 +125126,29 @@ _OaksLabGivePokeballsText2: ; 950f2 (25:50f2)
     db "could escape. You",$55
     db "have to be lucky!",$57
 
-_OaksLabPleaseVisitText: ; 9519e (25:519e)
+_OaksLabPleaseVisitText:
     db $0,"OAK: Come see me",$4f
     db "sometimes.",$51
     db "I want to know how",$4f
     db "your #DEX is",$55
     db "coming along.",$57
 
-_UnnamedText_1d31d: ; 951e9 (25:51e9)
+_UnnamedText_1d31d:
     db $0,"OAK: Good to see ",$4f
     db "you! How is your ",$55
     db "#DEX coming? ",$55
     db "Here,let me take",$55
     db "a look!",$58
 
-_UnnamedText_1d32c: ; 95236 (25:5236)
+_UnnamedText_1d32c:
     db $0,"It's encyclopedia-",$4f
     db "like,but the",$55
     db "pages are blank!",$57
 
-_OaksLabText8: ; 95268 (25:5268)
+_OaksLabText8:
     db $0,"?",$57
 
-_UnnamedText_1d340: ; 9526b (25:526b)
+_UnnamedText_1d340:
     db $0,"PROF.OAK is the",$4f
     db "authority on",$55
     db "#MON!",$51
@@ -125225,12 +125156,12 @@ _UnnamedText_1d340: ; 9526b (25:526b)
     db "trainers hold him",$55
     db "in high regard!",$57
 
-_OaksLabRivalWaitingText: ; 952bb (25:52bb)
+_OaksLabRivalWaitingText:
     db $0,$53,": Gramps!",$4f
     db "I'm fed up with",$55
     db "waiting!",$57
 
-_OaksLabChooseMonText: ; 952df (25:52df)
+_OaksLabChooseMonText:
     db $0,"OAK: ",$53,"?",$4f
     db "Let me think...",$51
     db "Oh,that's right,",$4f
@@ -125250,33 +125181,33 @@ _OaksLabChooseMonText: ; 952df (25:52df)
     db "but you can have",$55
     db "one! Choose!",$57
 
-_OaksLabRivalInterjectionText: ; 953dc (25:53dc)
+_OaksLabRivalInterjectionText:
     db $0,$53,": Hey!",$4f
     db "Gramps! What",$55
     db "about me?",$57
 
-_OaksLabBePatientText: ; 953fc (25:53fc)
+_OaksLabBePatientText:
     db $0,"OAK: Be patient!",$4f
     db $53,",you can",$55
     db "have one too!",$57
 
-_OaksLabLeavingText: ; 95427 (25:5427)
+_OaksLabLeavingText:
     db $0,"OAK: Hey! Don't go",$4f
     db "away yet!",$57
 
-_OaksLabRivalPickingMonText: ; 95444 (25:5444)
+_OaksLabRivalPickingMonText:
     db $0,$53,": I'll take",$4f
     db "this one,then!",$57
 
-_OaksLabRivalReceivedMonText: ; 95461 (25:5461)
+_OaksLabRivalReceivedMonText:
     db $0,$53," received",$4f
     db "a @"
 
-UnnamedText_95470: ; 95470 (25:5470)
+UnnamedText_95470:
     TX_RAM $cd6d
     db $0,"!@@"
 
-_OaksLabRivalChallengeText: ; 95477 (25:5477)
+_OaksLabRivalChallengeText:
     db $0,$53,": Wait",$4f
     db $52,"!",$55
     db "Let's check out",$55
@@ -125284,17 +125215,17 @@ _OaksLabRivalChallengeText: ; 95477 (25:5477)
     db "Come on,I'll take",$4f
     db "you on!",$57
 
-_UnnamedText_1d3be: ; 954b6 (25:54b6)
+_UnnamedText_1d3be:
     db $0,"WHAT?",$4f
     db "Unbelievable!",$55
     db "I picked the",$55
     db "wrong #MON!",$58
 
-_UnnamedText_1d3c3: ; 954e4 (25:54e4)
+_UnnamedText_1d3c3:
     db $0,$53,": Yeah! Am",$4f
     db "I great or what?",$58
 
-_OaksLabRivalToughenUpText: ; 95502 (25:5502)
+_OaksLabRivalToughenUpText:
     db $0,$53,": Okay!",$4f
     db "I'll make my",$55
     db "#MON fight to",$55
@@ -125302,19 +125233,19 @@ _OaksLabRivalToughenUpText: ; 95502 (25:5502)
     db $52,"! Gramps!",$4f
     db "Smell you later!",$57
 
-_OaksLabText21: ; 95551 (25:5551)
+_OaksLabText21:
     db $0,$53,": Gramps!",$57
 
-_OaksLabText22: ; 9555d (25:555d)
+_OaksLabText22:
     db $0,$53,": What did",$4f
     db "you call me for?",$57
 
-_OaksLabText23: ; 9557b (25:557b)
+_OaksLabText23:
     db $0,"OAK: Oh right! I",$4f
     db "have a request",$55
     db "of you two.",$57
 
-_OaksLabText24: ; 955a8 (25:55a8)
+_OaksLabText24:
     db $0,"On the desk there",$4f
     db "is my invention,",$55
     db "#DEX!",$51
@@ -125325,14 +125256,14 @@ _OaksLabText24: ; 955a8 (25:55a8)
     db "It's a hi-tech",$4f
     db "encyclopedia!",$57
 
-_OaksLabText25: ; 9562a (25:562a)
+_OaksLabText25:
     db $0,"OAK: ",$52," and",$4f
     db $53,"! Take",$55
     db "these with you!",$51
     db $52," got",$4f
     db "#DEX from OAK!@@"
 
-_OaksLabText26: ; 95664 (25:5664)
+_OaksLabText26:
     db $0,"To make a complete",$4f
     db "guide on all the",$55
     db "#MON in the",$55
@@ -125349,7 +125280,7 @@ _OaksLabText26: ; 95664 (25:5664)
     db "undertaking in",$55
     db "#MON history!",$58
 
-_OaksLabText27: ; 95741 (25:5741)
+_OaksLabText27:
     db $0,$53,": Alright",$4f
     db "Gramps! Leave it",$55
     db "all to me!",$51
@@ -125363,136 +125294,134 @@ _OaksLabText27: ; 95741 (25:5741)
     db "to lend you one,",$55
     db $52,"! Hahaha!",$57
 
-_UnnamedText_1d405: ; 957eb (25:57eb)
+_UnnamedText_1d405:
     db $0,"I study #MON as",$4f
     db "PROF.OAK's AIDE.",$57
 
-_UnnamedText_441cc: ; 9580c (25:580c)
+_UnnamedText_441cc:
     db $0,"#DEX comp-",$4f
     db "letion is:",$51
     db "@"
 
-UnnamedText_95824: ; 95824 (25:5824)
+UnnamedText_95824:
     TX_NUM $ffdb,1,3
     db $0," #MON seen",$4f
     db "@"
 
-UnnamedText_95835: ; 95835 (25:5835)
+UnnamedText_95835:
     TX_NUM $ffdc,1,3
     db $0," #MON owned",$51
     db "PROF.OAK's",$4f
     db "Rating:",$58
 
-_UnnamedText_44201: ; 95858 (25:5858)
+_UnnamedText_44201:
     db $0,"You still have",$4f
     db "lots to do.",$55
     db "Look for #MON",$55
     db "in grassy areas!",$57
 
-_UnnamedText_44206: ; 95893 (25:5893)
+_UnnamedText_44206:
     db $0,"You're on the",$4f
     db "right track!",$57
 
-SECTION "_UnnamedText_4420b",ROMX[$58cc],BANK[$25]
-
-_UnnamedText_4420b: ; 958cc (25:58cc)
+_UnnamedText_4420b:
     db $0,"You still need",$4f
     db "more #MON!",$55
     db "Try to catch",$55
     db "other species!",$57
 
-_UnnamedText_44210: ; 95903 (25:5903)
+_UnnamedText_44210:
     db $0,"Good,you're",$4f
     db "trying hard!",$55
     db "Get an ITEMFINDER",$55
     db "from my AIDE!",$57
 
-_UnnamedText_44215: ; 9593d (25:593d)
+_UnnamedText_44215:
     db $0,"Looking good!",$4f
     db "Go find my AIDE",$55
     db "when you get 50!",$57
 
-_UnnamedText_4421a: ; 9596d (25:596d)
+_UnnamedText_4421a:
     db $0,"You finally got at",$4f
     db "least 50 species!",$55
     db "Be sure to get",$55
     db "FOCUS from my",$55
     db "AIDE!  ",$57
 
-_UnnamedText_4421f: ; 959b8 (25:59b8)
+_UnnamedText_4421f:
     db $0,"Ho! This is geting",$4f
     db "even better!",$57
 
-_UnnamedText_44224: ; 959d9 (25:59d9)
+_UnnamedText_44224:
     db $0,"Very good!",$4f
     db "Go fish for some",$55
     db "marine #MON!",$57
 
-_UnnamedText_44229: ; 95a03 (25:5a03)
+_UnnamedText_44229:
     db $0,"Wonderful!",$4f
     db "Do you like to",$55
     db "collect things?",$57
 
-_UnnamedText_4422e: ; 95a2e (25:5a2e)
+_UnnamedText_4422e:
     db $0,"I'm impressed!",$4f
     db "It must have been",$55
     db "difficult to do!",$57
 
-_UnnamedText_44233: ; 95a60 (25:5a60)
+_UnnamedText_44233:
     db $0,"You finally got at",$4f
     db "least 100 species!",$55
     db "I can't believe",$55
     db "how good you are!",$57
 
-_UnnamedText_44238: ; 95aa8 (25:5aa8)
+_UnnamedText_44238:
     db $0,"You even have the",$4f
     db "evolved forms of",$55
     db "#MON! Super!",$57
 
-_UnnamedText_4423d: ; 95ad9 (25:5ad9)
+_UnnamedText_4423d:
     db $0,"Excellent! Trade",$4f
     db "with friends to",$55
     db "get some more!",$57
 
-_UnnamedText_44242: ; 95b0a (25:5b0a)
+_UnnamedText_44242:
     db $0,"Outstanding!",$4f
     db "You've become a",$55
     db "real pro at this!",$57
 
-_UnnamedText_44247: ; 95b39 (25:5b39)
+_UnnamedText_44247:
     db $0,"I have nothing",$4f
     db "left to say!",$55
     db "You're the",$55
     db "authority now!",$57
 
-_UnnamedText_4424c: ; 95b6f (25:5b6f)
+_UnnamedText_4424c:
     db $0,"Your #DEX is",$4f
     db "entirely complete!",$55
     db "Congratulations!",$57
 
-_ViridianPokeCenterText2: ; 95ba1 (25:5ba1)
-_ViridianPokeCenterText1: ; 95ba1 (25:5ba1)
+_ViridianPokeCenterText2:
+_ViridianPokeCenterText1:
     db $0,"You can use that",$4f
     db "PC in the corner.",$51
     db "The receptionist",$4f
     db "told me. So kind!",$57
 
-_ViridianPokeCenterText3: ; 95be8 (25:5be8)
+_ViridianPokeCenterText3:
     db $0,"There's a #MON",$4f
     db "CENTER in every",$55
     db "town ahead.",$51
     db "They don't charge",$4f
     db "any money either!",$57
 
-_ViridianMartText1: ; 95c36 (25:5c36)
+_ViridianMartText1:
     db $0,"Okay! Say hi to",$4f
     db "PROF.OAK for me!",$57
 
-_ViridianMartText4: ; 95c58 (25:5c58)
+_ViridianMartText4:
     db $0,"Hey! You came from",$4f
     db "PALLET TOWN?",$57
 
-ViridianMartParcelQuestText: ; 95c79 (25:5c79)
+ViridianMartParcelQuestText:
     db $0,"You know PROF.",$4f
     db "OAK,right?",$51
     db "His order came in.",$4f
@@ -125501,26 +125430,26 @@ ViridianMartParcelQuestText: ; 95c79 (25:5c79)
     db $52," got",$4f
     db "OAK's PARCEL!@@"
 
-_ViridianMartText2: ; 95cd5 (25:5cd5)
+_ViridianMartText2:
     db $0,"This shop sells",$4f
     db "many ANTIDOTEs.",$57
 
-_ViridianMartText3: ; 95cf6 (25:5cf6)
+_ViridianMartText3:
     db $0,"No! POTIONs are",$4f
     db "all sold out.",$57
 
-_SchoolText1: ; 95d15 (25:5d15)
+_SchoolText1:
     db $0,"Whew! I'm trying",$4f
     db "to memorize all",$55
     db "my notes.",$57
 
-_SchoolText2: ; 95d40 (25:5d40)
+_SchoolText2:
     db $0,"Okay!",$51
     db "Be sure to read",$4f
     db "the blackboard",$55
     db "carefully!",$57
 
-_ViridianHouseText1: ; 95d71 (25:5d71)
+_ViridianHouseText1:
     db $0,"Coming up with",$4f
     db "nicknames is fun,",$55
     db "but hard.",$51
@@ -125528,18 +125457,18 @@ _ViridianHouseText1: ; 95d71 (25:5d71)
     db "the easiest to",$55
     db "remember.",$57
 
-_ViridianHouseText2: ; 95dc7 (25:5dc7)
+_ViridianHouseText2:
     db $0,"My Daddy loves",$4f
     db "#MON too.",$57
 
-_UnnamedText_1d5b1: ; 95de1 (25:5de1)
+_UnnamedText_1d5b1:
     db $0,"SPEARY: Tetweet!",$57
 
-_ViridianHouseText4: ; 95df3 (25:5df3)
+_ViridianHouseText4:
     db $0,"SPEAROW",$4f
     db "Name: SPEARY",$57
 
-_UnnamedText_74ace: ; 95e09 (25:5e09)
+_UnnamedText_74ace:
     db $0,"Fwahahaha! This is",$4f
     db "my hideout!",$51
     db "I planned to",$4f
@@ -125555,7 +125484,7 @@ _UnnamedText_74ace: ; 95e09 (25:5e09)
     db "GIOVANNI,the",$55
     db "greatest trainer!",$57
 
-_UnnamedText_74ad3: ; 95ed5 (25:5ed5)
+_UnnamedText_74ad3:
     db $0,"Ha!",$4f
     db "That was a truly",$55
     db "intense fight!",$55
@@ -125563,7 +125492,7 @@ _UnnamedText_74ad3: ; 95ed5 (25:5ed5)
     db "As proof,here is",$55
     db "the EARTHBADGE!@@"
 
-_UnnamedText_74ad9: ; 95f2b (25:5f2b)
+_UnnamedText_74ad9:
     db $0,"Having lost,I",$4f
     db "cannot face my",$55
     db "underlings!",$55
@@ -125588,9 +125517,7 @@ _ViridianGymText12:
     db "your #MON",$55
     db "LEAGUE challenge!",$57
 
-SECTION "_TM27ExplanationText",ROMX[$6095],BANK[$25]
-
-_TM27ExplanationText: ; 96095 (25:6095)
+_TM27ExplanationText:
     db $0,$51
     db "TM27 is FISSURE!",$4f
     db "It will take out",$55
@@ -125600,118 +125527,118 @@ _TM27ExplanationText: ; 96095 (25:6095)
     db "ran the GYM here,",$55
     db "too long ago...",$57
 
-_TM27NoRoomText: ; 96104 (25:6104)
+_TM27NoRoomText:
     db $0,"You do not have",$4f
     db "space for this!",$57
 
-_ViridianGymBattleText1: ; 96125 (25:6125)
+_ViridianGymBattleText1:
     db $0,"Heh! You must be",$4f
     db "running out of",$55
     db "steam by now!",$57
 
-_ViridianGymEndBattleText1: ; 96154 (25:6154)
+_ViridianGymEndBattleText1:
     db $0,"I",$4f
     db "ran out of gas!",$58
 
-_ViridianGymAfterBattleText1: ; 96167 (25:6167)
+_ViridianGymAfterBattleText1:
     db $0,"You need power to",$4f
     db "keep up with our",$55
     db "GYM LEADER!",$57
 
-_ViridianGymBattleText2: ; 96197 (25:6197)
+_ViridianGymBattleText2:
     db $0,"Rrrroar! I'm",$4f
     db "working myself",$55
     db "into a rage!",$57
 
-_ViridianGymEndBattleText2: ; 961c0 (25:61c0)
+_ViridianGymEndBattleText2:
     db $0,"Wargh!",$58
 
-_ViridianGymAfterBattleText2: ; 961c8 (25:61c8)
+_ViridianGymAfterBattleText2:
     db $0,"I'm still not",$4f
     db "worthy!",$57
 
-_ViridianGymBattleText3: ; 961de (25:61de)
+_ViridianGymBattleText3:
     db $0,"#MON and I,we",$4f
     db "make wonderful",$55
     db "music together!",$57
 
-_ViridianGymEndBattleText3: ; 9620d (25:620d)
+_ViridianGymEndBattleText3:
     db $0,"You are in",$4f
     db "perfect harmony!",$58
 
-_ViridianGymAfterBattleText3: ; 9622a (25:622a)
+_ViridianGymAfterBattleText3:
     db $0,"Do you know the",$4f
     db "identity of our",$55
     db "GYM LEADER?",$57
 
-_ViridianGymBattleText4: ; 96257 (25:6257)
+_ViridianGymBattleText4:
     db $0,"Karate is the",$4f
     db "ultimate form of",$55
     db "martial arts!",$57
 
-_ViridianGymEndBattleText4: ; 96285 (25:6285)
+_ViridianGymEndBattleText4:
     db $0,"Atcho!",$58
 
-_ViridianGymAfterBattleText4: ; 9628d (25:628d)
+_ViridianGymAfterBattleText4:
     db $0,"If my #MON",$4f
     db "were as good at",$55
     db "Karate as I...",$57
 
-_ViridianGymBattleText5: ; 962b8 (25:62b8)
+_ViridianGymBattleText5:
     db $0,"The truly talented",$4f
     db "win with style!",$57
 
-_ViridianGymEndBattleText5: ; 962dc (25:62dc)
+_ViridianGymEndBattleText5:
     db $0,"I",$4f
     db "lost my grip!",$58
 
-_ViridianGymAfterBattleText5: ; 962ed (25:62ed)
+_ViridianGymAfterBattleText5:
     db $0,"The LEADER will",$4f
     db "scold me!",$57
 
-_ViridianGymBattleText6: ; 96308 (25:6308)
+_ViridianGymBattleText6:
     db $0,"I'm the KARATE",$4f
     db "KING! Your fate",$55
     db "rests with me!",$57
 
-_ViridianGymEndBattleText6: ; 96336 (25:6336)
+_ViridianGymEndBattleText6:
     db $0,"Ayah!",$58
 
-_ViridianGymAfterBattleText6: ; 9633d (25:633d)
+_ViridianGymAfterBattleText6:
     db $0,"#MON LEAGUE?",$4f
     db "You? Don't get",$55
     db "cocky!",$57
 
-_ViridianGymBattleText7: ; 96360 (25:6360)
+_ViridianGymBattleText7:
     db $0,"Your #MON will",$4f
     db "cower at the",$55
     db "crack of my whip!",$57
 
-_ViridianGymEndBattleText7: ; 9638f (25:638f)
+_ViridianGymEndBattleText7:
     db $0,"Yowch!",$4f
     db "Whiplash!",$58
 
-_ViridianGymAfterBattleText7: ; 963a1 (25:63a1)
+_ViridianGymAfterBattleText7:
     db $0,"Wait! I was just",$4f
     db "careless!",$57
 
-_ViridianGymBattleText8: ; 963bd (25:63bd)
+_ViridianGymBattleText8:
     db $0,"VIRIDIAN GYM was",$4f
     db "closed for a long",$55
     db "time,but now our",$55
     db "LEADER is back!",$57
 
-_ViridianGymEndBattleText8: ; 96403 (25:6403)
+_ViridianGymEndBattleText8:
     db $0,"I",$4f
     db "was beaten?",$58
 
-_ViridianGymAfterBattleText8: ; 96412 (25:6412)
+_ViridianGymAfterBattleText8:
     db $0,"You can go onto",$4f
     db "#MON LEAGUE",$55
     db "only by defeating",$55
     db "our GYM LEADER!",$57
 
-_UnnamedText_74bd4: ; 96451 (25:6451)
+_UnnamedText_74bd4:
     db $0,"Yo! Champ in",$4f
     db "making!",$51
     db "Even I don't know",$4f
@@ -125725,60 +125652,60 @@ _UnnamedText_74bd4: ; 96451 (25:6451)
     db "like ground-type",$55
     db "#MON!",$57
 
-_UnnamedText_74bd9: ; 964fb (25:64fb)
+_UnnamedText_74bd9:
     db $0,"Blow me away!",$4f
     db "GIOVANNI was the",$55
     db "GYM LEADER here?",$57
 
-_UnnamedText_5c21a: ; 9652c (25:652c)
+_UnnamedText_5c21a:
     db $0,"Come again!",$57
 
-_UnnamedText_5c21f: ; 96539 (25:6539)
+_UnnamedText_5c21f:
     db $0,"It's ¥50 for a",$4f
     db "child's ticket.",$51
     db "Would you like to",$4f
     db "come in?",$57
 
-_UnnamedText_5c224: ; 96572 (25:6572)
+_UnnamedText_5c224:
     db $0,"Right,¥50!",$4f
     db "Thank you!",$57
 
-_UnnamedText_5c229: ; 9658a (25:658a)
+_UnnamedText_5c229:
     db $0,"You don't have",$4f
     db "enough money.",$58
 
-_UnnamedText_5c22e: ; 965a7 (25:65a7)
+_UnnamedText_5c22e:
     db $0,"You can't sneak",$4f
     db "in the back way!",$51
     db "Oh,whatever!",$4f
     db "Do you know what",$55
     db "AMBER is?",$57
 
-_UnnamedText_5c233: ; 965f1 (25:65f1)
+_UnnamedText_5c233:
     db $0,"There's a lab",$4f
     db "somewhere trying",$55
     db "to resurrect",$55
     db "ancient #MON",$55
     db "from AMBER.",$57
 
-_UnnamedText_5c238: ; 96636 (25:6636)
+_UnnamedText_5c238:
     db $0,"AMBER is fossil-",$4f
     db "ized tree sap.",$57
 
-_UnnamedText_5c23d: ; 96657 (25:6657)
+_UnnamedText_5c23d:
     db $0,"Please go to the",$4f
     db "other side!",$57
 
-_UnnamedText_5c242: ; 96675 (25:6675)
+_UnnamedText_5c242:
     db $0,"Take plenty of",$4f
     db "time to look!",$57
 
-_UnnamedText_5c251: ; 96693 (25:6693)
+_UnnamedText_5c251:
     db $0,"That is one",$4f
     db "magnificent",$55
     db "fossil!",$57
 
-_UnnamedText_5c28e: ; 966b4 (25:66b4)
+_UnnamedText_5c28e:
     db $0,"Ssh! I think that",$4f
     db "this chunk of",$55
     db "AMBER contains",$55
@@ -125795,64 +125722,64 @@ _UnnamedText_5c28e: ; 966b4 (25:66b4)
     db "#MON LAB and",$55
     db "get it examined!",$58
 
-_ReceivedOldAmberText: ; 96790 (25:6790)
+_ReceivedOldAmberText:
     db $0,$52," received",$4f
     db "OLD AMBER!@@"
 
-_UnnamedText_5c299: ; 967a8 (25:67a8)
+_UnnamedText_5c299:
     db $0,"Ssh! Get the OLD",$4f
     db "AMBER checked!",$57
 
-_UnnamedText_5c29e: ; 967c9 (25:67c9)
+_UnnamedText_5c29e:
     db $0,"You don't have",$4f
     db "space for this!",$57
 
-_UnnamedText_5c2ad: ; 967e8 (25:67e8)
+_UnnamedText_5c2ad:
     db $0,"We are proud of 2",$4f
     db "fossils of very",$55
     db "rare,prehistoric",$55
     db "#MON!",$57
 
-_UnnamedText_5c2bc: ; 96823 (25:6823)
+_UnnamedText_5c2bc:
     db $0,"The AMBER is",$4f
     db "clear and gold!",$57
 
-_MuseumF2Text1: ; 96841 (25:6841)
+_MuseumF2Text1:
     db $0,"MOON STONE?",$51
     db "What's so special",$4f
     db "about it?",$57
 
-_MuseumF2Text2: ; 96869 (25:6869)
+_MuseumF2Text2:
     db $0,"July 20,1969!",$51
     db "The 1st lunar",$4f
     db "landing!",$51
     db "I bought a color",$4f
     db "TV to watch it!",$57
 
-_MuseumF2Text3: ; 968b1 (25:68b1)
+_MuseumF2Text3:
     db $0,"We have a space",$4f
     db "exhibit now.",$57
 
-_MuseumF2Text4: ; 968cf (25:68cf)
+_MuseumF2Text4:
     db $0,"I want a PIKACHU!",$4f
     db "It's so cute!",$51
     db "I asked my Daddy",$4f
     db "to catch me one!",$57
 
-_MuseumF2Text5: ; 96911 (25:6911)
+_MuseumF2Text5:
     db $0,"Yeah,a PIKACHU",$4f
     db "soon,I promise!",$57
 
-_MuseumF2Text6: ; 96933 (25:6933)
+_MuseumF2Text6:
     db $0,"SPACE SHUTTLE",$4f
     db "COLUMBIA",$57
 
-_MuseumF2Text7: ; 9694b (25:694b)
+_MuseumF2Text7:
     db $0,"Meteorite that",$4f
     db "fell on MT.MOON.",$55
     db "(MOON STONE?)",$57
 
-_UnnamedText_5c49e: ; 9697a (25:697a)
+_UnnamedText_5c49e:
     db $0,"I'm BROCK!",$4f
     db "I'm PEWTER's GYM",$55
     db "LEADER!",$51
@@ -125944,7 +125871,7 @@ _PreHM06Text:
 
 SECTION "bank26",ROMX,BANK[$26]
 
-_UnnamedText_5c4a3: ; 98000 (26:4000)
+_UnnamedText_5c4a3:
     db $0,"There are all",$4f
     db "kinds of trainers",$55
     db "in the world!",$51
@@ -125955,7 +125882,7 @@ _UnnamedText_5c4a3: ; 98000 (26:4000)
     db "CERULEAN and test",$55
     db "your abilities!",$57
 
-_TM34PreReceiveText: ; 98092 (26:4092)
+_TM34PreReceiveText:
     db $0,"Wait! Take this",$4f
     db "with you!",$57
 
@@ -125971,13 +125898,11 @@ _TM34ExplanationText:
     db "battle then pay",$55
     db "it back double!",$57
 
-SECTION "_TM34NoRoomText",ROMX[$41ab],BANK[$26]
-
-_TM34NoRoomText: ; 981ab (26:41ab)
+_TM34NoRoomText:
     db $0,"You don't have",$4f
     db "room for this!",$57
 
-_UnnamedText_5c4bc: ; 981c9 (26:41c9)
+_UnnamedText_5c4bc:
     db $0,"I took",$4f
     db "you for granted.",$51
     db "As proof of your",$4f
@@ -125995,27 +125920,25 @@ _UnnamedText_5c4c1:
     db "#MON become",$55
     db "more powerful!",$58
 
-SECTION "_PewterGymBattleText1",ROMX[$42ae],BANK[$26]
-
-_PewterGymBattleText1: ; 982ae (26:42ae)
+_PewterGymBattleText1:
     db $0,"Stop right there,",$4f
     db "kid!",$51
     db "You're still light",$4f
     db "years from facing",$55
     db "BROCK!",$57
 
-_PewterGymEndBattleText1: ; 982f1 (26:42f1)
+_PewterGymEndBattleText1:
     db $0,"Darn!",$51
     db "Light years isn't",$4f
     db "time! It measures",$55
     db "distance!",$58
 
-_PewterGymAfterBattleText1: ; 98325 (26:4325)
+_PewterGymAfterBattleText1:
     db $0,"You're pretty hot,",$4f
     db "but not as hot",$55
     db "as BROCK!",$57
 
-_UnnamedText_5c515: ; 98351 (26:4351)
+_UnnamedText_5c515:
     db $0,"Hiya! I can tell",$4f
     db "you have what it",$55
     db "takes to become a",$55
@@ -126026,11 +125949,11 @@ _UnnamedText_5c515: ; 98351 (26:4351)
     db "Let me take you",$4f
     db "to the top!",$57
 
-_UnnamedText_5c51a: ; 983dc (26:43dc)
+_UnnamedText_5c51a:
     db $0,"All right! Let's",$4f
     db "get happening!",$58
 
-_UnnamedText_5c51f: ; 983fc (26:43fc)
+_UnnamedText_5c51f:
     db $0,"The 1st #MON",$4f
     db "out in a match is",$55
     db "at the top of the",$55
@@ -126040,23 +125963,23 @@ _UnnamedText_5c51f: ; 983fc (26:43fc)
     db "matches could be",$55
     db "made easier!",$57
 
-_UnnamedText_5c524: ; 98476 (26:4476)
+_UnnamedText_5c524:
     db $0,"It's a free",$4f
     db "service! Let's",$55
     db "get happening!",$58
 
-_UnnamedText_5c529: ; 9849f (26:449f)
+_UnnamedText_5c529:
     db $0,"Just as I thought!",$4f
     db "You're #MON",$55
     db "champ material!",$57
 
-_PewterHouse1Text1: ; 984ce (26:44ce)
+_PewterHouse1Text1:
     db $0,"NIDORAN: Bowbow!@@"
 
-_PewterHouse1Text2: ; 984e1 (26:44e1)
+_PewterHouse1Text2:
     db $0,"NIDORAN sit!",$57
 
-_PewterHouse1Text3: ; 984ef (26:44ef)
+_PewterHouse1Text3:
     db $0,"Our #MON's an",$4f
     db "outsider,so it's",$55
     db "hard to handle.",$51
@@ -126070,7 +125993,7 @@ _PewterHouse1Text3: ; 984ef (26:44ef)
     db "If only we had",$4f
     db "some BADGEs...",$57
 
-_UnnamedText_74cc6: ; 985ac (26:45ac)
+_UnnamedText_74cc6:
     db $0,"A shady,old man",$4f
     db "got me to buy",$55
     db "this really weird",$55
@@ -126078,14 +126001,14 @@ _UnnamedText_74cc6: ; 985ac (26:45ac)
     db "It's totally weak",$4f
     db "and it cost ¥500!",$57
 
-_UnnamedText_74cd5: ; 9860c (26:460c)
+_UnnamedText_74cd5:
     db $0,"Good things can",$4f
     db "happen if you",$55
     db "raise #MON",$55
     db "diligently,even",$55
     db "the weak ones!",$57
 
-_PewterHouse2Text1: ; 98656 (26:4656)
+_PewterHouse2Text1:
     db $0,"#MON learn new",$4f
     db "techniques as",$55
     db "they grow!",$51
@@ -126093,7 +126016,7 @@ _PewterHouse2Text1: ; 98656 (26:4656)
     db "must be taught by",$55
     db "the trainer!",$57
 
-_PewterHouse2Text2: ; 986ae (26:46ae)
+_PewterHouse2Text2:
     db $0,"#MON become",$4f
     db "easier to catch",$55
     db "when they are",$55
@@ -126101,18 +126024,18 @@ _PewterHouse2Text2: ; 986ae (26:46ae)
     db "But,it's not a",$4f
     db "sure thing!",$57
 
-_PewterPokecenterText1: ; 98704 (26:4704)
+_PewterPokecenterText1:
     db $0,"What!?",$51
     db "TEAM ROCKET is",$4f
     db "at MT.MOON? Huh?",$55
     db "I'm on the phone!",$51
     db "Scram!",$57
 
-_PewterPokecenterText5: ; 98744 (26:4744)
+_PewterPokecenterText5:
     db $0,"JIGGLYPUFF: Puu",$4f
     db "pupuu!",$57
 
-_UnnamedText_1d6ab: ; 9875c (26:475c)
+_UnnamedText_1d6ab:
     db $0,"Those miserable",$4f
     db "ROCKETs!",$51
     db "Look what they",$4f
@@ -126124,24 +126047,24 @@ _UnnamedText_1d6ab: ; 9875c (26:475c)
     db "That cost me a",$4f
     db "bundle,it did!",$57
 
-_UnnamedText_1d6b0: ; 987e2 (26:47e2)
+_UnnamedText_1d6b0:
     db $0,"I figure what's",$4f
     db "lost is lost!",$51
     db "I decided to teach",$4f
     db "DIGLETT how to",$55
     db "DIG without a TM!",$57
 
-_CeruleanHouseTrashedText2: ; 98834 (26:4834)
+_CeruleanHouseTrashedText2:
     db $0,"TEAM ROCKET must",$4f
     db "be trying to DIG",$55
     db "their way into no",$55
     db "good!",$57
 
-_CeruleanHouseTrashedText3: ; 9886f (26:486f)
+_CeruleanHouseTrashedText3:
     db $0,"TEAM ROCKET left",$4f
     db "a way out!",$57
 
-_CeruleanHouseText1: ; 9888c (26:488c)
+_CeruleanHouseText1:
     db $0,"My husband likes",$4f
     db "trading #MON.",$51
     db "If you are a",$4f
@@ -126149,14 +126072,14 @@ _CeruleanHouseText1: ; 9888c (26:488c)
     db "you please trade",$55
     db "with him?",$57
 
-_CeruleanPokecenterText1: ; 988e5 (26:48e5)
+_CeruleanPokecenterText1:
     db $0,"That BILL!",$51
     db "I heard that",$4f
     db "he'll do whatever",$55
     db "it takes to get",$55
     db "rare #MON!",$57
 
-_CeruleanPokecenterText3: ; 9892a (26:492a)
+_CeruleanPokecenterText3:
     db $0,"Have you heard",$4f
     db "about BILL?",$51
     db "Everyone calls",$4f
@@ -126168,7 +126091,7 @@ _CeruleanPokecenterText3: ; 9892a (26:492a)
     db "to boast about",$55
     db "their #MON?",$57
 
-_UnnamedText_5c7be: ; 989c1 (26:49c1)
+_UnnamedText_5c7be:
     db $0,"Hi,you're a new",$4f
     db "face!",$51
     db "Trainers who want",$4f
@@ -126183,7 +126106,7 @@ _UnnamedText_5c7be: ; 989c1 (26:49c1)
     db "with water-type",$55
     db "#MON!",$57
 
-_UnnamedText_5c7c3: ; 98a7b (26:4a7b)
+_UnnamedText_5c7c3:
     db $0,"TM11 teaches",$4f
     db "BUBBLEBEAM!",$51
     db "Use it on an",$4f
@@ -126193,13 +126116,11 @@ _UnnamedText_5c7c8:
     db $0,"You can also have",$4f
     db "my favorite TM!",$57
 
-SECTION "_UnnamedText_5c7d3",ROMX[$4b90],BANK[$26]
-
-_UnnamedText_5c7d3: ; 98b90 (26:4b90)
+_UnnamedText_5c7d3:
     db $0,"You better make",$4f
     db "room for this!",$57
 
-_UnnamedText_5c7d8: ; 98bb0 (26:4bb0)
+_UnnamedText_5c7d8:
     db $0,"Wow!",$4f
     db "You're too much!",$51
     db "All right!",$51
@@ -126207,37 +126128,37 @@ _UnnamedText_5c7d8: ; 98bb0 (26:4bb0)
     db "CASCADEBADGE to",$55
     db "show you beat me!@@"
 
-_CeruleanGymBattleText1: ; 98c05 (26:4c05)
+_CeruleanGymBattleText1:
     db $0,"I'm more than good",$4f
     db "enough for you!",$51
     db "MISTY can wait!",$57
 
-_CeruleanGymEndBattleText1: ; 98c38 (26:4c38)
+_CeruleanGymEndBattleText1:
     db $0,"You",$4f
     db "overwhelmed me!",$58
 
-_CeruleanGymAfterBattleText1: ; 98c4d (26:4c4d)
+_CeruleanGymAfterBattleText1:
     db $0,"You have to face",$4f
     db "other trainers to",$55
     db "find out how good",$55
     db "you really are.",$57
 
-_CeruleanGymBattleText2: ; 98c93 (26:4c93)
+_CeruleanGymBattleText2:
     db $0,"Splash!",$51
     db "I'm first up!",$4f
     db "Let's do it!",$57
 
-_CeruleanGymEndBattleText2: ; 98cb5 (26:4cb5)
+_CeruleanGymEndBattleText2:
     db $0,"That",$4f
     db "can't be!",$58
 
-_CeruleanGymAfterBattleText2: ; 98cc4 (26:4cc4)
+_CeruleanGymAfterBattleText2:
     db $0,"MISTY is going to",$4f
     db "keep improving!",$51
     db "She won't lose to",$4f
     db "someone like you!",$57
 
-_UnnamedText_5c82a: ; 98d0a (26:4d0a)
+_UnnamedText_5c82a:
     db $0,"Yo! Champ in",$4f
     db "making!",$51
     db "Here's my advice!",$51
@@ -126250,53 +126171,53 @@ _UnnamedText_5c82a: ; 98d0a (26:4d0a)
     db "Or,zap them with",$4f
     db "electricity!",$57
 
-_UnnamedText_5c82f: ; 98db0 (26:4db0)
+_UnnamedText_5c82f:
     db $0,"You beat MISTY!",$4f
     db "What'd I tell ya?",$51
     db "You and me kid,",$4f
     db "we make a pretty",$55
     db "darn good team!",$57
 
-_UnnamedText_1d810: ; 98e03 (26:4e03)
+_UnnamedText_1d810:
     db $0,"Hi! Welcome to",$4f
     db "our BIKE SHOP.",$51
     db "Have we got just",$4f
     db "the BIKE for you!",$58
 
-_UnnamedText_1d815: ; 98e45 (26:4e45)
+_UnnamedText_1d815:
     db $0,"It's a cool BIKE!",$4f
     db "Do you want it?",$57
 
-_UnnamedText_1d81a: ; 98e67 (26:4e67)
+_UnnamedText_1d81a:
     db $0,"Sorry! You can't",$4f
     db "afford it!",$58
 
-_UnnamedText_1d81f: ; 98e83 (26:4e83)
+_UnnamedText_1d81f:
     db $0,"Oh,that's...",$51
     db "A BIKE VOUCHER!",$51
     db "OK! Here you go!",$58
 
-_UnnamedText_1d824: ; 98eb2 (26:4eb2)
+_UnnamedText_1d824:
     db $0,$52," exchanged",$4f
     db "the BIKE VOUCHER",$55
     db "for a BICYCLE.@@"
 
-_UnnamedText_1d82a: ; 98ee0 (26:4ee0)
+_UnnamedText_1d82a:
     db $0,"Come back again",$4f
     db "some time!",$57
 
-_UnnamedText_1d82f: ; 98efc (26:4efc)
+_UnnamedText_1d82f:
     db $0,"How do you like",$4f
     db "your new BICYCLE?",$51
     db "You can take it",$4f
     db "on CYCLING ROAD",$55
     db "and in caves!",$57
 
-_UnnamedText_1d834: ; 98f4d (26:4f4d)
+_UnnamedText_1d834:
     db $0,"You better make",$4f
     db "room for this!",$57
 
-_UnnamedText_1d843: ; 98f6d (26:4f6d)
+_UnnamedText_1d843:
     db $0,"A plain city BIKE",$4f
     db "is good enough",$55
     db "for me!",$51
@@ -126304,16 +126225,16 @@ _UnnamedText_1d843: ; 98f6d (26:4f6d)
     db "shopping basket",$55
     db "on an MTB!",$57
 
-_UnnamedText_1d85c: ; 98fc1 (26:4fc1)
+_UnnamedText_1d85c:
     db $0,"These BIKEs are",$4f
     db "cool,but they're",$55
     db "way expensive!",$57
 
-_UnnamedText_1d861: ; 98ff2 (26:4ff2)
+_UnnamedText_1d861:
     db $0,"Wow. Your BIKE is",$4f
     db "really cool!",$57
 
-_CeruleanMartText2: ; 99012 (26:5012)
+_CeruleanMartText2:
     db $0,"Use REPEL to keep",$4f
     db "bugs and weak",$55
     db "#MON away.",$51
@@ -126322,14 +126243,14 @@ _CeruleanMartText2: ; 99012 (26:5012)
     db "top of the list",$55
     db "for best results!",$57
 
-_CeruleanMartText3: ; 9907f (26:507f)
+_CeruleanMartText3:
     db $0,"Have you seen any",$4f
     db "RARE CANDY?",$51
     db "It's supposed to",$4f
     db "make #MON go",$55
     db "up one level!",$57
 
-_UnnamedText_74e77: ; 990c9 (26:50c9)
+_UnnamedText_74e77:
     db $0,"#MON BADGEs",$4f
     db "are owned only by",$55
     db "skilled trainers.",$51
@@ -126338,7 +126259,7 @@ _UnnamedText_74e77: ; 990c9 (26:50c9)
     db "Those BADGEs have",$4f
     db "amazing secrets!",$58
 
-_UnnamedText_74e7c: ; 9913a (26:513a)
+_UnnamedText_74e7c:
     db $0,"Now then...",$51
     db "Which of the 8",$4f
     db "BADGEs should I",$55
@@ -126380,48 +126301,46 @@ _UnnamedText_74eb4:
 _UnnamedText_74eb9:
     db $0,"No Effects...",$51,$57
 
-SECTION "_LavenderPokecenterText4",ROMX[$540e],BANK[$26]
-
-_LavenderPokecenterText4: ; 9940e (26:540e)
-_LavenderPokecenterText2: ; 9940e (26:540e)
-_LavenderPokecenterText1: ; 9940e (26:540e)
+_LavenderPokecenterText4:
+_LavenderPokecenterText2:
+_LavenderPokecenterText1:
     db $0,"TEAM ROCKET will",$4f
     db "do anything for",$55
     db "the sake of gold!",$57
 
-_LavenderPokecenterText3: ; 99442 (26:5442)
+_LavenderPokecenterText3:
     db $0,"I saw CUBONE's",$4f
     db "mother die trying",$55
     db "to escape from",$55
     db "TEAM ROCKET!",$57
 
-_PokemonTower1Text1: ; 9947f (26:547f)
+_PokemonTower1Text1:
     db $0,"#MON TOWER was",$4f
     db "erected in the",$55
     db "memory of #MON",$55
     db "that had died.",$57
 
-_PokemonTower1Text2: ; 994bc (26:54bc)
+_PokemonTower1Text2:
     db $0,"Did you come to",$4f
     db "pay respects?",$55
     db "Bless you!",$57
 
-_PokemonTower1Text3: ; 994e6 (26:54e6)
+_PokemonTower1Text3:
     db $0,"I came to pray",$4f
     db "for my CLEFAIRY.",$51
     db "Sniff! I can't",$4f
     db "stop crying...",$57
 
-_PokemonTower1Text4: ; 99524 (26:5524)
+_PokemonTower1Text4:
     db $0,"My GROWLITHE...",$4f
     db "Why did you die?",$57
 
-_PokemonTower1Text5: ; 99546 (26:5546)
+_PokemonTower1Text5:
     db $0,"I am a CHANNELER!",$4f
     db "There are spirits",$55
     db "up to mischief!",$57
 
-_UnnamedText_6062d: ; 9957b (26:557b)
+_UnnamedText_6062d:
     db $0,$53,": Hey,",$4f
     db $52,"! What",$55
     db "brings you here?",$55
@@ -126431,20 +126350,20 @@ _UnnamedText_6062d: ; 9957b (26:557b)
     db "make them faint!",$55
     db "Let's go,pal!",$57
 
-_UnnamedText_60632: ; 995e5 (26:55e5)
+_UnnamedText_60632:
     db $0,"What?",$4f
     db "You stinker!",$51
     db "I took it easy on",$4f
     db "you too!",$58
 
-_UnnamedText_60637: ; 99614 (26:5614)
+_UnnamedText_60637:
     db $0,$53,": Well,",$4f
     db "look at all your",$55
     db "wimpy #MON!",$51
     db "Toughen them up a",$4f
     db "bit more!",$58
 
-_UnnamedText_6063c: ; 99657 (26:5657)
+_UnnamedText_6063c:
     db $0,"How's your #DEX",$4f
     db "coming,pal?",$55
     db "I just caught a",$55
@@ -126459,7 +126378,7 @@ _UnnamedText_6063c: ; 99657 (26:5657)
     db "accomplish,pal!",$51
     db "Smell ya later!",$57
 
-_PokemonTower2Text2: ; 9971a (26:571a)
+_PokemonTower2Text2:
     db $0,"Even we could not",$4f
     db "identify the",$55
     db "wayward GHOSTs!",$51
@@ -126467,186 +126386,186 @@ _PokemonTower2Text2: ; 9971a (26:571a)
     db "might be able to",$55
     db "unmask them.",$57
 
-_PokemonTower3BattleText1: ; 99776 (26:5776)
+_PokemonTower3BattleText1:
     db $0,"Urrg...Awaa...",$4f
     db "Huhu...graa..",$57
 
-_PokemonTower3EndBattleText1: ; 99794 (26:5794)
+_PokemonTower3EndBattleText1:
     db $0,"Hwa!",$4f
     db "I'm saved!",$58
 
-_PokemonTower3AfterBattleText1: ; 997a4 (26:57a4)
+_PokemonTower3AfterBattleText1:
     db $0,"The GHOSTs can be",$4f
     db "identified by the",$55
     db "SILPH SCOPE.",$57
 
-_PokemonTower3BattleText2: ; 997d6 (26:57d6)
+_PokemonTower3BattleText2:
     db $0,"Kekeke....",$4f
     db "Kwaaah!",$57
 
-_PokemonTower3EndBattleText2: ; 997ea (26:57ea)
+_PokemonTower3EndBattleText2:
     db $0,"Hmm?",$4f
     db "What am I doing?",$58
 
-_PokemonTower3AfterBattleText2: ; 99801 (26:5801)
+_PokemonTower3AfterBattleText2:
     db $0,"Sorry! I was",$4f
     db "possessed!",$57
 
-_PokemonTower3BattleText3: ; 9981a (26:581a)
+_PokemonTower3BattleText3:
     db $0,"Be gone!",$4f
     db "Evil spirit!",$57
 
-_PokemonTower3EndBattleText3: ; 99831 (26:5831)
+_PokemonTower3EndBattleText3:
     db $0,"Whew!",$4f
     db "The spirit left!",$58
 
-_PokemonTower3AfterBattleText3: ; 99849 (26:5849)
+_PokemonTower3AfterBattleText3:
     db $0,"My friends were",$4f
     db "possessed too!",$57
 
-_PokemonTower4BattleText1: ; 99869 (26:5869)
+_PokemonTower4BattleText1:
     db $0,"GHOST! No!",$4f
     db "Kwaaah!",$57
 
-_PokemonTower4EndBattleText1: ; 9987d (26:587d)
+_PokemonTower4EndBattleText1:
     db $0,"Where",$4f
     db "is the GHOST?",$58
 
-_PokemonTower4AfterBattleText1: ; 99892 (26:5892)
+_PokemonTower4AfterBattleText1:
     db $0,"I must have been",$4f
     db "dreaming...",$57
 
-_PokemonTower4BattleText2: ; 998b0 (26:58b0)
+_PokemonTower4BattleText2:
     db $0,"Be cursed with",$4f
     db "me! Kwaaah!",$57
 
-_PokemonTower4EndBattleText2: ; 998cc (26:58cc)
+_PokemonTower4EndBattleText2:
     db $0,"What!",$58
 
-_PokemonTower4AfterBattleText2: ; 998d3 (26:58d3)
+_PokemonTower4AfterBattleText2:
     db $0,"We can't crack",$4f
     db "the identity of",$55
     db "the GHOSTs.",$57
 
-_PokemonTower4BattleText3: ; 998fe (26:58fe)
+_PokemonTower4BattleText3:
     db $0,"Huhuhu...",$4f
     db "Beat me not!",$57
 
-_PokemonTower4EndBattleText3: ; 99916 (26:5916)
+_PokemonTower4EndBattleText3:
     db $0,"Huh?",$4f
     db "Who? What?",$58
 
-_PokemonTower4AfterBattleText3: ; 99927 (26:5927)
+_PokemonTower4AfterBattleText3:
     db $0,"May the departed",$4f
     db "souls of #MON",$55
     db "rest in peace...",$57
 
-_PokemonTower5Text1: ; 99958 (26:5958)
+_PokemonTower5Text1:
     db $0,"Come,child! I",$4f
     db "sealed this space",$55
     db "with white magic!",$51
     db "You can rest here!",$57
 
-_PokemonTower5BattleText1: ; 9999f (26:599f)
+_PokemonTower5BattleText1:
     db $0,"Give...me...",$4f
     db "your...soul...",$57
 
-_PokemonTower5EndBattleText1: ; 999bc (26:59bc)
+_PokemonTower5EndBattleText1:
     db $0,"Gasp!",$58
 
-_PokemonTower5AfterBattleText1: ; 999c3 (26:59c3)
+_PokemonTower5AfterBattleText1:
     db $0,"I was under",$4f
     db "possession!",$57
 
-_PokemonTower5BattleText2: ; 999dc (26:59dc)
+_PokemonTower5BattleText2:
     db $0,"You...shall...",$4f
     db "join...us...",$57
 
-_PokemonTower5EndBattleText2: ; 999f9 (26:59f9)
+_PokemonTower5EndBattleText2:
     db $0,"What",$4f
     db "a nightmare!",$58
 
-_PokemonTower5AfterBattleText2: ; 99a0c (26:5a0c)
+_PokemonTower5AfterBattleText2:
     db $0,"I was possessed!",$57
 
-_PokemonTower5BattleText3: ; 99a1e (26:5a1e)
+_PokemonTower5BattleText3:
     db $0,"Zombies!",$57
 
-_PokemonTower5EndBattleText3: ; 99a28 (26:5a28)
+_PokemonTower5EndBattleText3:
     db $0,"Ha?",$58
 
-_PokemonTower5AfterBattleText3: ; 99a2d (26:5a2d)
+_PokemonTower5AfterBattleText3:
     db $0,"I regained my",$4f
     db "senses!",$57
 
-_PokemonTower5BattleText4: ; 99a44 (26:5a44)
+_PokemonTower5BattleText4:
     db $0,"Urgah...",$4f
     db "Urff....",$57
 
-_PokemonTower5EndBattleText4: ; 99a57 (26:5a57)
+_PokemonTower5EndBattleText4:
     db $0,"Whoo!",$58
 
-_PokemonTower5AfterBattleText4: ; 99a5e (26:5a5e)
+_PokemonTower5AfterBattleText4:
     db $0,"I fell to evil",$4f
     db "spirits despite",$55
     db "my training!",$57
 
-_UnnamedText_60a43: ; 99a8b (26:5a8b)
+_UnnamedText_60a43:
     db $0,"Entered purified,",$4f
     db "protected zone!",$51
     db $52,"'s #MON",$4f
     db "are fully healed!",$57
 
-_UnnamedText_60c1f: ; 99ac8 (26:5ac8)
+_UnnamedText_60c1f:
     db $0,"The GHOST was the",$4f
     db "restless soul of",$55
     db "CUBONE's mother!",$57
 
-_UnnamedText_60c24: ; 99afc (26:5afc)
+_UnnamedText_60c24:
     db $0,"The mother's soul",$4f
     db "was calmed.",$51
     db "It departed to",$4f
     db "the afterlife!",$57
 
-_PokemonTower6BattleText1: ; 99b38 (26:5b38)
+_PokemonTower6BattleText1:
     db $0,"Give...me...",$4f
     db "blood...",$57
 
-_PokemonTower6EndBattleText1: ; 99b4f (26:5b4f)
+_PokemonTower6EndBattleText1:
     db $0,"Groan!",$58
 
-_PokemonTower6AfterBattleText1: ; 99b57 (26:5b57)
+_PokemonTower6AfterBattleText1:
     db $0,"I feel anemic and",$4f
     db "weak...",$57
 
-_PokemonTower6BattleText2: ; 99b72 (26:5b72)
+_PokemonTower6BattleText2:
     db $0,"Urff... Kwaah!",$57
 
-_PokemonTower6EndBattleText2: ; 99b82 (26:5b82)
+_PokemonTower6EndBattleText2:
     db $0,"Some-",$4f
     db "thing fell out!",$58
 
-_PokemonTower6AfterBattleText2: ; 99b99 (26:5b99)
+_PokemonTower6AfterBattleText2:
     db $0,"Hair didn't fall",$4f
     db "out! It was an",$55
     db "evil spirit!",$57
 
-_PokemonTower6BattleText3: ; 99bc6 (26:5bc6)
+_PokemonTower6BattleText3:
     db $0,"Ke..ke...ke...",$4f
     db "ke..ke...ke!!",$57
 
-_PokemonTower6EndBattleText3: ; 99be4 (26:5be4)
+_PokemonTower6EndBattleText3:
     db $0,"Keee!",$58
 
-_PokemonTower6AfterBattleText3: ; 99beb (26:5beb)
+_PokemonTower6AfterBattleText3:
     db $0,"What's going on",$4f
     db "here?",$57
 
-_UnnamedText_60c56: ; 99c01 (26:5c01)
+_UnnamedText_60c56:
     db $0,"Be gone...",$4f
     db "Intruders...",$57
 
-_UnnamedText_60ec4: ; 99c1a (26:5c1a)
+_UnnamedText_60ec4:
     db $0,"MR.FUJI: Heh? You",$4f
     db "came to save me?",$51
     db "Thank you. But,I",$4f
@@ -126666,18 +126585,18 @@ _UnnamedText_60ec4: ; 99c1a (26:5c1a)
     db "HOUSE at the foot",$55
     db "of this tower.",$57
 
-_PokemonTower7BattleText1: ; 99d31 (26:5d31)
+_PokemonTower7BattleText1:
     db $0,"What do you want?",$4f
     db "Why are you here?",$57
 
-_PokemonTower7EndBattleText1: ; 99d56 (26:5d56)
+_PokemonTower7EndBattleText1:
     db $0,"I give up!",$58
 
-_PokemonTower7AfterBattleText1: ; 99d62 (26:5d62)
+_PokemonTower7AfterBattleText1:
     db $0,"I'm not going to",$4f
     db "forget this!",$57
 
-_PokemonTower7BattleText2: ; 99d80 (26:5d80)
+_PokemonTower7BattleText2:
     db $0,"This old guy came",$4f
     db "and complained",$55
     db "about us harming",$55
@@ -126685,40 +126604,40 @@ _PokemonTower7BattleText2: ; 99d80 (26:5d80)
     db "We're talking it",$4f
     db "over as adults!",$57
 
-_PokemonTower7EndBattleText2: ; 99de1 (26:5de1)
+_PokemonTower7EndBattleText2:
     db $0,"Please!",$4f
     db "No more!",$58
 
-_PokemonTower7AfterBattleText2: ; 99df3 (26:5df3)
+_PokemonTower7AfterBattleText2:
     db $0,"#MON are only",$4f
     db "good for making",$55
     db "money!",$51
     db "Stay out of our",$4f
     db "business!",$57
 
-_PokemonTower7BattleText3: ; 99e33 (26:5e33)
+_PokemonTower7BattleText3:
     db $0,"You're not saving",$4f
     db "anyone,kid!",$57
 
-_PokemonTower7EndBattleText3: ; 99e52 (26:5e52)
+_PokemonTower7EndBattleText3:
     db $0,"Don't",$4f
     db "fight us ROCKETs!",$58
 
-_PokemonTower7AfterBattleText3: ; 99e6a (26:5e6a)
+_PokemonTower7AfterBattleText3:
     db $0,"You're not getting",$4f
     db "away with this!",$57
 
-_UnnamedText_1d8d1: ; 99e8d (26:5e8d)
+_UnnamedText_1d8d1:
     db $0,"That's odd,MR.FUJI",$4f
     db "isn't here.",$55
     db "Where'd he go?",$57
 
-_UnnamedText_1d8d6: ; 99eba (26:5eba)
+_UnnamedText_1d8d6:
     db $0,"MR.FUJI had been",$4f
     db "praying alone for",$55
     db "CUBONE's mother.",$57
 
-_UnnamedText_1d8f4: ; 99eee (26:5eee)
+_UnnamedText_1d8f4:
     db $0,"This is really",$4f
     db "MR.FUJI's house.",$51
     db "He's really kind!",$51
@@ -126726,18 +126645,18 @@ _UnnamedText_1d8f4: ; 99eee (26:5eee)
     db "abandoned and",$55
     db "orphaned #MON!",$57
 
-_UnnamedText_1d8f9: ; 99f4b (26:5f4b)
+_UnnamedText_1d8f9:
     db $0,"It's so warm!",$4f
     db "#MON are so",$55
     db "nice to hug!",$57
 
-_LavenderHouse1Text3: ; 99f72 (26:5f72)
+_LavenderHouse1Text3:
     db $0,"GROWLITHE: Woof!@@"
 
-_LavenderHouse1Text4: ; 99f85 (26:5f85)
+_LavenderHouse1Text4:
     db $0,"NIDORINO: Gaoo!@@"
 
-_UnnamedText_1d94c: ; 99f97 (26:5f97)
+_UnnamedText_1d94c:
     db $0,"MR.FUJI: ",$52,".",$51
     db "Your #DEX quest",$4f
     db "may fail without",$55
@@ -126746,13 +126665,13 @@ _UnnamedText_1d94c: ; 99f97 (26:5f97)
     db "I think this may",$4f
     db "help your quest.",$58
 
-_ReceivedFluteText: ; 99ffb (26:5ffb)
+_ReceivedFluteText:
     db $0,$52," received",$4f
     db "a @"
     TX_RAM $cf4b
     db $0,"!@@"
 
-_FluteExplanationText: ; 9a011 (26:6011)
+_FluteExplanationText:
     db $0,$51
     db "Upon hearing #",$4f
     db "FLUTE,sleeping",$55
@@ -126761,15 +126680,15 @@ _FluteExplanationText: ; 9a011 (26:6011)
     db "It works on all",$4f
     db "sleeping #MON.",$57
 
-_FluteNoRoomText: ; 9a069 (26:6069)
+_FluteNoRoomText:
     db $0,"You must make",$4f
     db "room for this!",$57
 
-_MrFujiAfterFluteText: ; 9a087 (26:6087)
+_MrFujiAfterFluteText:
     db $0,"MR.FUJI: Has my",$4f
     db "FLUTE helped you?",$57
 
-_LavenderHouse1Text6: ; 9a0aa (26:60aa)
+_LavenderHouse1Text6:
     db $0,"#MON Monthly",$4f
     db "Grand Prize",$55
     db "Drawing!",$51
@@ -126778,7 +126697,7 @@ _LavenderHouse1Text6: ; 9a0aa (26:60aa)
     db "Gone! It's been",$4f
     db "clipped out!",$57
 
-_LavenderMartText2: ; 9a104 (26:6104)
+_LavenderMartText2:
     db $0,"I'm searching for",$4f
     db "items that raise",$55
     db "the abilities of",$55
@@ -126791,22 +126710,22 @@ _LavenderMartText2: ; 9a104 (26:6104)
     db "Do you know where",$4f
     db "I can get them?",$57
 
-_UnnamedText_5c953: ; 9a1b4 (26:61b4)
+_UnnamedText_5c953:
     db $0,"You know REVIVE?",$4f
     db "It revives any",$55
     db "fainted #MON!",$57
 
-_UnnamedText_5c958: ; 9a1e3 (26:61e3)
+_UnnamedText_5c958:
     db $0,"I found a NUGGET",$4f
     db "in the mountains.",$51
     db "I thought it was",$4f
     db "useless,but it",$55
     db "sold for ¥5000!",$57
 
-_LavenderHouse2Text1: ; 9a238 (26:6238)
+_LavenderHouse2Text1:
     db $0,"CUBONE: Kyarugoo!@@"
 
-_UnnamedText_1d9dc: ; 9a24c (26:624c)
+_UnnamedText_1d9dc:
     db $0,"I hate those",$4f
     db "horrible ROCKETs!",$51
     db "That poor CUBONE's",$4f
@@ -126815,7 +126734,7 @@ _UnnamedText_1d9dc: ; 9a24c (26:624c)
     db "trying to escape",$55
     db "from TEAM ROCKET!",$57
 
-_UnnamedText_1d9e1: ; 9a2b9 (26:62b9)
+_UnnamedText_1d9e1:
     db $0,"The GHOST of",$4f
     db "#MON TOWER is",$55
     db "gone!",$51
@@ -126823,10 +126742,8 @@ _UnnamedText_1d9e1: ; 9a2b9 (26:62b9)
     db "soothed its",$55
     db "restless soul!",$57
 
-SECTION "_VermilionPokecenterText2",ROMX[$64b2],BANK[$26]
-
-_VermilionPokecenterText2: ; 9a4b2 (26:64b2)
-_VermilionPokecenterText1: ; 9a4b2 (26:64b2)
+_VermilionPokecenterText2:
+_VermilionPokecenterText1:
     db $0,"Even if they are",$4f
     db "the same level,",$55
     db "#MON can have",$55
@@ -126837,41 +126754,41 @@ _VermilionPokecenterText1: ; 9a4b2 (26:64b2)
     db "stronger than one",$55
     db "in the wild.",$57
 
-_VermilionPokecenterText3: ; 9a539 (26:6539)
+_VermilionPokecenterText3:
     db $0,"My #MON was",$4f
     db "poisoned! It",$55
     db "fainted while we",$55
     db "were walking!",$57
 
-_UnnamedText_59bb7: ; 9a572 (26:6572)
+_UnnamedText_59bb7:
     db $0,"Won't you admire",$4f
     db "my PIKACHU's",$55
     db "adorable tail?",$57
 
-_UnnamedText_59bbc: ; 9a59e (26:659e)
+_UnnamedText_59bbc:
     db $0,"Humph! My PIKACHU",$4f
     db "is twice as cute",$55
     db "as that one!",$57
 
-_UnnamedText_59be4: ; 9a5cf (26:65cf)
+_UnnamedText_59be4:
     db $0,"I just love my",$4f
     db "SEEL!",$51
     db "It squeals when I",$4f
     db "hug it!",$57
 
-_UnnamedText_59be9: ; 9a5ff (26:65ff)
+_UnnamedText_59be9:
     db $0,"Oh dear!",$51
     db "My SEEL is far",$4f
     db "more attractive!",$57
 
-_UnnamedText_59c00: ; 9a629 (26:6629)
+_UnnamedText_59c00:
     db $0,"PIKACHU: Chu!",$4f
     db "Pikachu!",$57
 
-_UnnamedText_59c17: ; 9a641 (26:6641)
+_UnnamedText_59c17:
     db $0,"SEEL: Kyuoo!",$57
 
-_UnnamedText_59c65: ; 9a64f (26:664f)
+_UnnamedText_59c65:
     db $0,"I chair the",$4f
     db "#MON Fan Club!",$51
     db "I have collected",$4f
@@ -126884,7 +126801,7 @@ _UnnamedText_59c65: ; 9a64f (26:664f)
     db "visit to hear",$55
     db "about my #MON?",$57
 
-_UnnamedText_59c6a: ; 9a6e0 (26:66e0)
+_UnnamedText_59c6a:
     db $0,"Good!",$4f
     db "Then listen up!",$51
     db "My favorite",$4f
@@ -126909,13 +126826,13 @@ _UnnamedText_59c6a: ; 9a6e0 (26:66e0)
     db "me out! I want",$55
     db "you to have this!",$58
 
-_ReceivedBikeVoucherText: ; 9a82e (26:682e)
+_ReceivedBikeVoucherText:
     db $0,$52," received",$4f
     db "a @"
     TX_RAM $cf4b
     db $0,"!@@"
 
-_UnnamedText_59c74: ; 9a844 (26:6844)
+_UnnamedText_59c74:
     db $0,$51
     db "Exchange that for",$4f
     db "a BICYCLE!",$51
@@ -126927,37 +126844,37 @@ _UnnamedText_59c74: ; 9a844 (26:6844)
     db "I hope you like",$4f
     db "cycling!",$57
 
-_UnnamedText_59c79: ; 9a8c3 (26:68c3)
+_UnnamedText_59c79:
     db $0,"Oh. Come back",$4f
     db "when you want to",$55
     db "hear my story!",$57
 
-_UnnamedText_59c7e: ; 9a8f2 (26:68f2)
+_UnnamedText_59c7e:
     db $0,"Hello,",$52,"!",$51
     db "Did you come see",$4f
     db "me about my",$55
     db "#MON again?",$51
     db "No? Too bad!",$57
 
-_UnnamedText_59c83: ; 9a933 (26:6933)
+_UnnamedText_59c83:
     db $0,"Make room for",$4f
     db "this!",$57
 
-_FanClubText6: ; 9a948 (26:6948)
+_FanClubText6:
     db $0,"Our Chairman is",$4f
     db "very vocal about",$55
     db "#MON.",$57
 
-_FanClubText7: ; 9a970 (26:6970)
+_FanClubText7:
     db $0,"Let's all listen",$4f
     db "politely to other",$55
     db "trainers!",$57
 
-_FanClubText8: ; 9a99d (26:699d)
+_FanClubText8:
     db $0,"If someone brags,",$4f
     db "brag right back!",$57
 
-_VermilionMartText2: ; 9a9c1 (26:69c1)
+_VermilionMartText2:
     db $0,"There are evil",$4f
     db "people who will",$55
     db "use #MON for",$55
@@ -126971,13 +126888,13 @@ _VermilionMartText2: ; 9a9c1 (26:69c1)
     db "be popular or",$55
     db "useful.",$57
 
-_VermilionMartText3: ; 9aa67 (26:6a67)
+_VermilionMartText3:
     db $0,"I think #MON",$4f
     db "can be good or",$55
     db "evil. It depends",$55
     db "on the trainer.",$57
 
-_UnnamedText_5cb6d: ; 9aaa5 (26:6aa5)
+_UnnamedText_5cb6d:
     db $0,"Hey,kid! What do",$4f
     db "you think you're",$55
     db "doing here?",$51
@@ -127013,7 +126930,7 @@ _BengalNoRoomText:
 
 SECTION "bank27",ROMX,BANK[$27]
 
-_UnnamedText_5cb72: ; 9c000 (27:4000)
+_UnnamedText_5cb72:
     db $0,"A little word of",$4f
     db "advice,kid!",$51
     db "Electricity is",$4f
@@ -127022,7 +126939,7 @@ _UnnamedText_5cb72: ; 9c000 (27:4000)
     db "against ground-",$55
     db "type #MON!",$57
 
-;_UnnamedText_5cb77: ; 9c069 (27:4069)
+;_UnnamedText_5cb77:
 ;    db $0,"The THUNDERBADGE",$4f
 ;    db "cranks up your",$55
 ;    db "#MON's SPEED!",$51
@@ -127039,64 +126956,62 @@ _UnnamedText_5cb77:
     db "You're special,",$4f
     db "kid! Take this!",$57
 
-SECTION "_TM24ExplanationText",ROMX[$40f5],BANK[$27]
-
-_TM24ExplanationText: ; 9c0f5 (27:40f5)
+_TM24ExplanationText:
     db $0,$51
     db "TM24 contains",$4f
     db "THUNDERBOLT!",$51
     db "Teach it to an",$4f
     db "electric #MON!",$57
 
-_TM24NoRoomText: ; 9c130 (27:4130)
+_TM24NoRoomText:
     db $0,"Yo kid,make room",$4f
     db "in your pack!",$57
 
-_ReceivedThunderbadgeText: ; 9c151 (27:4151)
+_ReceivedThunderbadgeText:
     db $0,"Whoa!",$51
     db "You're the real",$4f
     db "deal,kid!",$51
     db "Fine then,take",$4f
     db "the THUNDERBADGE!",$58
 
-_VermilionGymBattleText1: ; 9c194 (27:4194)
+_VermilionGymBattleText1:
     db $0,"When I was in the",$4f
     db "Army,LT.SURGE",$55
     db "was my strict CO!",$57
 
-_VermilionGymEndBattleText1: ; 9c1c8 (27:41c8)
+_VermilionGymEndBattleText1:
     db $0,"Stop!",$4f
     db "You're very good!",$58
 
-_VermilionGymAfterBattleText1: ; 9c1e0 (27:41e0)
+_VermilionGymAfterBattleText1:
     db $0,"The door won't",$4f
     db "open?",$51
     db "LT.SURGE always",$4f
     db "was cautious!",$57
 
-_VermilionGymBattleText2: ; 9c213 (27:4213)
+_VermilionGymBattleText2:
     db $0,"I'm a lightweight,",$4f
     db "but I'm good with",$55
     db "electricity!",$57
 
-_VermilionGymEndBattleText2: ; 9c244 (27:4244)
+_VermilionGymEndBattleText2:
     db $0,"Fried!",$58
 
-_VermilionGymAfterBattleText2: ; 9c24c (27:424c)
+_VermilionGymAfterBattleText2:
     db $0,"OK,I'll talk!",$51
     db "LT.SURGE said he",$4f
     db "hid door switches",$55
     db "inside something!",$57
 
-_VermilionGymBattleText3: ; 9c290 (27:4290)
+_VermilionGymBattleText3:
     db $0,"This is no place",$4f
     db "for kids!",$57
 
-_VermilionGymEndBattleText3: ; 9c2ac (27:42ac)
+_VermilionGymEndBattleText3:
     db $0,"Wow!",$4f
     db "Surprised me!",$58
 
-_VermilionGymAfterBattleText3: ; 9c2c0 (27:42c0)
+_VermilionGymAfterBattleText3:
     db $0,"LT.SURGE set up",$4f
     db "double locks!",$55
     db "Here's a hint!",$51
@@ -127105,7 +127020,7 @@ _VermilionGymAfterBattleText3: ; 9c2c0 (27:42c0)
     db "lock is right",$55
     db "next to it!",$57
 
-_UnnamedText_5cbf4: ; 9c32b (27:432b)
+_UnnamedText_5cbf4:
     db $0,"Yo! Champ in",$4f
     db "making!",$51
     db "LT.SURGE has a",$4f
@@ -127125,20 +127040,20 @@ _UnnamedText_5cbf4: ; 9c32b (27:432b)
     db "break a code to",$55
     db "get to him!",$57
 
-_UnnamedText_5cbf9: ; 9c429 (27:4429)
+_UnnamedText_5cbf9:
     db $0,"Whew! That match",$4f
     db "was electric!",$57
 
-_VermilionHouse1Text1: ; 9c449 (27:4449)
+_VermilionHouse1Text1:
     db $0,"I'm getting my",$4f
     db "PIDGEY to fly a",$55
     db "letter to SAFFRON",$55
     db "in the north!",$57
 
-_VermilionHouse1Text2: ; 9c488 (27:4488)
+_VermilionHouse1Text2:
     db $0,"PIDGEY: Kurukkoo!@@"
 
-_VermilionHouse1Text3: ; 9c49c (27:449c)
+_VermilionHouse1Text3:
     db $0,"Dear PIPPI,I hope",$4f
     db "to see you soon.",$51
     db "I heard SAFFRON",$4f
@@ -127147,10 +127062,10 @@ _VermilionHouse1Text3: ; 9c49c (27:449c)
     db "VERMILION appears",$4f
     db "to be safe.",$57
 
-_VermilionDockText1: ; 9c50e (27:450e)
+_VermilionDockText1:
     db $0,$57
 
-_UnnamedText_560b1: ; 9c510 (27:4510)
+_UnnamedText_560b1:
     db $0,"I'm the FISHING",$4f
     db "GURU!",$51
     db "I simply Looove",$4f
@@ -127158,7 +127073,7 @@ _UnnamedText_560b1: ; 9c510 (27:4510)
     db "Do you like to",$4f
     db "fish?",$57
 
-_UnnamedText_560b6: ; 9c554 (27:4554)
+_UnnamedText_560b6:
     db $0,"Grand! I like",$4f
     db "your style!",$51
     db "Take this and",$4f
@@ -127168,7 +127083,7 @@ _UnnamedText_560b6: ; 9c554 (27:4554)
     TX_RAM $cf4b
     db $0,"!@@"
 
-_UnnamedText_560bb: ; 9c5a4 (27:45a4)
+_UnnamedText_560bb:
     db $0,$51
     db "Fishing is a way",$4f
     db "of life!",$51
@@ -127177,22 +127092,22 @@ _UnnamedText_560bb: ; 9c5a4 (27:45a4)
     db "and land the big",$55
     db "one,young one!",$57
 
-_UnnamedText_560c0: ; 9c601 (27:4601)
+_UnnamedText_560c0:
     db $0,"Oh... That's so",$4f
     db "disappointing...",$57
 
-_UnnamedText_560c5: ; 9c622 (27:4622)
+_UnnamedText_560c5:
     db $0,"Hello there,",$4f
     db $52,"!",$51
     db "How are the fish",$4f
     db "biting?",$57
 
-_UnnamedText_560ca: ; 9c64c (27:464c)
+_UnnamedText_560ca:
     db $0,"Oh no!",$51
     db "You have no room",$4f
     db "for my gift!",$57
 
-_CeladonMart1Text1: ; 9c672 (27:4672)
+_CeladonMart1Text1:
     db $0,"Hello! Welcome to",$4f
     db "CELADON DEPT.",$55
     db "STORE.",$51
@@ -127200,7 +127115,7 @@ _CeladonMart1Text1: ; 9c672 (27:4672)
     db "right describes",$55
     db "the store layout.",$57
 
-_CeladonMart1Text2: ; 9c6cd (27:46cd)
+_CeladonMart1Text2:
     db $0,"1F: SERVICE",$4f
     db "    COUNTER",$51
     db "2F: TRAINER'S",$4f
@@ -127211,48 +127126,46 @@ _CeladonMart1Text2: ; 9c6cd (27:46cd)
     db "ROOFTOP SQUARE:",$4f
     db "VENDING MACHINES",$57
 
-_CeladonMart1Text3: ; 9c752 (27:4752)
+_CeladonMart1Text3:
     db $0,"1F: SERVICE",$4f
     db "    COUNTER",$57
 
-_CeladonMart2Text3: ; 9c76b (27:476b)
+_CeladonMart2Text3:
     db $0,"SUPER REPEL keeps",$4f
     db "weak #MON at",$55
     db "bay...",$51
     db "Hmm,it's a more",$4f
     db "powerful REPEL!",$57
 
-_CeladonMart2Text4: ; 9c7b2 (27:47b2)
+_CeladonMart2Text4:
     db $0,"For long outings,",$4f
     db "you should buy",$55
     db "REVIVE.",$57
 
-_CeladonMart2Text5: ; 9c7dc (27:47dc)
+_CeladonMart2Text5:
     db $0,"Top Grade Items",$4f
     db "for Trainers!",$51
     db "2F: TRAINER'S",$4f
     db "    MARKET",$57
 
-_TM18PreReceiveText: ; 9c814 (27:4814)
+_TM18PreReceiveText:
     db $0,"Oh,hi! I finally",$4f
     db "finished #MON!",$51
     db "Not done yet?",$4f
     db "This might be",$55
     db "useful!",$58
 
-SECTION "_TM18ExplanationText",ROMX[$486e],BANK[$27]
-
-_TM18ExplanationText: ; 9c86e (27:486e)
+_TM18ExplanationText:
     db $0,"TM18 is COUNTER!",$4f
     db "Not like the one",$55
     db "I'm leaning on,",$55
     db "mind you!",$57
 
-_TM18NoRoomText: ; 9c8aa (27:48aa)
+_TM18NoRoomText:
     db $0,"Your pack is full",$4f
     db "of items!",$57
 
-_CeladonMart3Text2: ; 9c8c7 (27:48c7)
+_CeladonMart3Text2:
     db $0,"Captured #MON",$4f
     db "are registered",$55
     db "with an ID No.",$55
@@ -127261,14 +127174,14 @@ _CeladonMart3Text2: ; 9c8c7 (27:48c7)
     db "Trainer that",$55
     db "caught it!",$57
 
-_CeladonMart3Text3: ; 9c92d (27:492d)
+_CeladonMart3Text3:
     db $0,"All right!",$51
     db "My buddy's going",$4f
     db "to trade me his",$55
     db "KANGASKHAN for my",$55
     db "GRAVELER!",$57
 
-_CeladonMart3Text4: ; 9c975 (27:4975)
+_CeladonMart3Text4:
     db $0,"Come on GRAVELER!",$51
     db "I love GRAVELER!",$4f
     db "I collect them!",$51
@@ -127277,44 +127190,44 @@ _CeladonMart3Text4: ; 9c975 (27:4975)
     db "into a different",$55
     db "#MON!",$57
 
-_CeladonMart3Text5: ; 9c9d5 (27:49d5)
+_CeladonMart3Text5:
     db $0,"You can identify",$4f
     db "#MON you got",$55
     db "in trades by",$55
     db "their ID Numbers!",$57
 
-_CeladonMart3Text6: ; 9ca13 (27:4a13)
+_CeladonMart3Text6:
     db $0,"It's an SNES!",$57
 
-_CeladonMart3Text7: ; 9ca21 (27:4a21)
+_CeladonMart3Text7:
     db $0,"An RPG! There's",$4f
     db "no time for that!",$57
 
-_CeladonMart3Text9: ; 9ca43 (27:4a43)
+_CeladonMart3Text9:
     db $0,"A sports game!",$4f
     db "Dad'll like that!",$57
 
-_CeladonMart3Text11: ; 9ca64 (27:4a64)
+_CeladonMart3Text11:
     db $0,"A puzzle game!",$4f
     db "Looks addictive!",$57
 
-_CeladonMart3Text13: ; 9ca85 (27:4a85)
+_CeladonMart3Text13:
     db $0,"A fighting game!",$4f
     db "Looks tough!",$57
 
-_CeladonMart3Text14: ; 9caa4 (27:4aa4)
+_CeladonMart3Text14:
     db $0,"3F: TV GAME SHOP",$57
 
-_CeladonMart3Text15: ; 9cab6 (27:4ab6)
+_CeladonMart3Text15:
     db $0,"Red and Blue!",$4f
     db "Both are #MON!",$57
 
-_CeladonMart4Text2: ; 9cad4 (27:4ad4)
+_CeladonMart4Text2:
     db $0,"I'm getting a",$4f
     db "# DOLL for my",$55
     db "girl friend!",$57
 
-_CeladonMart4Text3: ; 9cafd (27:4afd)
+_CeladonMart4Text3:
     db $0,"I heard something",$4f
     db "useful.",$51
     db "You can run from",$4f
@@ -127322,7 +127235,7 @@ _CeladonMart4Text3: ; 9cafd (27:4afd)
     db "distracting them",$55
     db "with a # DOLL!",$57
 
-_CeladonMart4Text4: ; 9cb56 (27:4b56)
+_CeladonMart4Text4:
     db $0,"Express yourself",$4f
     db "with gifts!",$51
     db "4F: WISEMAN GIFTS",$51
@@ -127330,7 +127243,7 @@ _CeladonMart4Text4: ; 9cb56 (27:4b56)
     db "Element STONEs on",$55
     db "sale now!",$57
 
-_UnnamedText_484ee: ; 9cbb5 (27:4bb5)
+_UnnamedText_484ee:
     db $0,"Give her which",$4f
     db "drink?",$57
 
@@ -127374,18 +127287,16 @@ _UnnamedText_48520:
     db "TM49 contains",$4f
     db "TRI ATTACK!@@"
 
-SECTION "_UnnamedText_48526",ROMX[$4d4d],BANK[$27]
-
-_UnnamedText_48526: ; 9cd4d (27:4d4d)
+_UnnamedText_48526:
     db $0,"You don't have",$4f
     db "space for this!@@"
 
-_UnnamedText_4852c: ; 9cd6d (27:4d6d)
+_UnnamedText_4852c:
     db $0,"No thank you!",$4f
     db "I'm not thirsty",$55
     db "after all!@@"
 
-_CeladonMartRoofText1: ; 9cd97 (27:4d97)
+_CeladonMartRoofText1:
     db $0,"My sister is a",$4f
     db "trainer,believe",$55
     db "it or not.",$51
@@ -127393,76 +127304,76 @@ _CeladonMartRoofText1: ; 9cd97 (27:4d97)
     db "immature,she",$55
     db "drives me nuts!",$57
 
-_UnnamedText_48598: ; 9cdee (27:4dee)
+_UnnamedText_48598:
     db $0,"I'm thirsty!",$4f
     db "I want something",$55
     db "to drink!",$57
 
-_CeladonMartRoofText4: ; 9ce16 (27:4e16)
+_CeladonMartRoofText4:
     db $0,"I'm thirsty!",$4f
     db "I want something",$55
     db "to drink!",$51
     db "Give her a drink?",$57
 
-_CeladonMartRoofText6: ; 9ce50 (27:4e50)
+_CeladonMartRoofText6:
     db $0,"ROOFTOP SQUARE:",$4f
     db "VENDING MACHINES",$57
 
-_VendingMachineText1: ; 9ce72 (27:4e72)
+_VendingMachineText1:
     db $0,"A vending machine!",$4f
     db "Here's the menu!",$58
 
-_VendingMachineText4: ; 9ce96 (27:4e96)
+_VendingMachineText4:
     db $0,"Oops,not enough",$4f
     db "money!",$57
 
-_VendingMachineText5: ; 9ceaf (27:4eaf)
+_VendingMachineText5:
     TX_RAM $cf4b
     db $0,$4f
     db "popped out!",$57
 
-_VendingMachineText6: ; 9cec0 (27:4ec0)
+_VendingMachineText6:
     db $0,"There's no more",$4f
     db "room for stuff!",$57
 
-_VendingMachineText7: ; 9cee0 (27:4ee0)
+_VendingMachineText7:
     db $0,"Not thirsty!",$57
 
-_CeladonMansion1Text1: ; 9ceee (27:4eee)
+_CeladonMansion1Text1:
     db $0,"MEOWTH: Meow!@@"
 
-_CeladonMansion1Text2: ; 9cefe (27:4efe)
+_CeladonMansion1Text2:
     db $0,"My dear #MON",$4f
     db "keep me company.",$51
     db "MEOWTH even brings",$4f
     db "money home!",$57
 
-_CeladonMansion1Text3: ; 9cf3c (27:4f3c)
+_CeladonMansion1Text3:
     db $0,"CLEFAIRY: Pi",$4f
     db "pippippi!@@"
 
-_CeladonMansion1Text4: ; 9cf55 (27:4f55)
+_CeladonMansion1Text4:
     db $0,"NIDORAN: Kya",$4f
     db "kyaoo!@@"
 
-_CeladonMansion1Text5: ; 9cf6b (27:4f6b)
+_CeladonMansion1Text5:
     db $0,"CELADON MANSION",$4f
     db "Manager's Suite",$57
 
-_CeladonMansion2Text1: ; 9cf8b (27:4f8b)
+_CeladonMansion2Text1:
     db $0,"GAME FREAK",$4f
     db "Meeting Room",$57
 
-_ProgrammerText: ; 9cfa4 (27:4fa4)
+_ProgrammerText:
     db $0,"Me? I'm the",$4f
     db "programmer!",$57
 
-_GraphicArtistText: ; 9cfbc (27:4fbc)
+_GraphicArtistText:
     db $0,"I'm the graphic",$4f
     db "artist!",$55
     db "I drew you!",$57
 
-_WriterText: ; 9cfe0 (27:4fe0)
+_WriterText:
     db $0,"I wrote the story!",$4f
     db "Isn't ERIKA cute?",$51
     db "I like MISTY a",$4f
@@ -127470,7 +127381,7 @@ _WriterText: ; 9cfe0 (27:4fe0)
     db "Oh,and SABRINA,",$4f
     db "I like her!",$57
 
-_GameDesignerText: ; 9d03a (27:503a)
+_GameDesignerText:
     db $0,"Is that right?",$51
     db "I'm the game",$4f
     db "designer!",$51
@@ -127480,37 +127391,37 @@ _GameDesignerText: ; 9d03a (27:503a)
     db "When you finish,",$4f
     db "come tell me!",$57
 
-_CompletedDexText: ; 9d0ad (27:50ad)
+_CompletedDexText:
     db $0,"Wow! Excellent!",$4f
     db "You completed",$55
     db "your #DEX!",$55
     db "Congratulations!",$55
     db "...@@"
 
-_CeladonMansion3Text5: ; 9d0ed (27:50ed)
+_CeladonMansion3Text5:
     db $0,"It's the game",$4f
     db "program! Messing",$55
     db "with it could bug",$55
     db "out the game!",$57
 
-_CeladonMansion3Text6: ; 9d12c (27:512c)
+_CeladonMansion3Text6:
     db $0,"Someone's playing",$4f
     db "a game instead of",$55
     db "working!",$57
 
-_CeladonMansion3Text7: ; 9d159 (27:5159)
+_CeladonMansion3Text7:
     db $0,"It's the script!",$4f
     db "Better not look",$55
     db "at the ending!",$57
 
-_CeladonMansion3Text8: ; 9d189 (27:5189)
+_CeladonMansion3Text8:
     db $0,"GAME FREAK",$4f
     db "Development Room",$57
 
-_CeladonMansion4Text1: ; 9d1a6 (27:51a6)
+_CeladonMansion4Text1:
     db $0,"I KNOW EVERYTHING!",$57
 
-_CeladonMansion5Text1: ; 9d1ba (27:51ba)
+_CeladonMansion5Text1:
     db $0,"I know everything",$4f
     db "about the world",$55
     db "of #MON in",$55
@@ -127519,18 +127430,18 @@ _CeladonMansion5Text1: ; 9d1ba (27:51ba)
     db "your friends and",$55
     db "trade #MON!",$57
 
-_CeladonPokecenterText2: ; 9d226 (27:5226)
+_CeladonPokecenterText2:
     db $0,"# FLUTE awakens",$4f
     db "#MON with a",$55
     db "sound that only",$55
     db "they can hear!",$57
 
-_CeladonPokecenterText3: ; 9d262 (27:5262)
+_CeladonPokecenterText3:
     db $0,"I rode uphill on",$4f
     db "CYCLING ROAD from",$55
     db "FUCHSIA!",$57
 
-_UnnamedText_48a5e: ; 9d28f (27:528f)
+_UnnamedText_48a5e:
     db $0,"Hello. Lovely",$4f
     db "weather isn't it?",$55
     db "It's so pleasant.",$51
@@ -127551,7 +127462,7 @@ _UnnamedText_48a5e: ; 9d28f (27:528f)
     db "Very well,but I",$4f
     db "shall not lose.",$57
 
-_UnnamedText_48a63: ; 9d3c2 (27:53c2)
+_UnnamedText_48a63:
     db $0,"Oh!",$4f
     db "I concede defeat.",$51
     db "You are remarkably",$4f
@@ -127559,7 +127470,7 @@ _UnnamedText_48a63: ; 9d3c2 (27:53c2)
     db "I must confer you",$4f
     db "the RAINBOWBADGE.",$58
 
-_UnnamedText_48a68: ; 9d418 (27:5418)
+_UnnamedText_48a68:
     db $0,"You are cataloging",$4f
     db "#MON? I must",$55
     db "say I'm impressed.",$51
@@ -127572,9 +127483,7 @@ _UnnamedText_48a6d:
     db $0,"Please also take",$4f
     db "this with you.",$57
 
-SECTION "_TM21ExplanationText",ROMX[$5520],BANK[$27]
-
-_TM21ExplanationText: ; 9d520 (27:5520)
+_TM21ExplanationText:
     db $0,$51
     db "TM21 contains",$4f
     db "MEGA DRAIN.",$51
@@ -127583,33 +127492,33 @@ _TM21ExplanationText: ; 9d520 (27:5520)
     db "drained to heal",$55
     db "your #MON!",$57
 
-_TM21NoRoomText: ; 9d576 (27:5576)
+_TM21NoRoomText:
     db $0,"You should make",$4f
     db "room for this.",$57
 
-_CeladonGymBattleText2: ; 9d596 (27:5596)
+_CeladonGymBattleText2:
     db $0,"Hey!",$51
     db "You are not",$4f
     db "allowed in here!",$57
 
-_CeladonGymEndBattleText2: ; 9d5b9 (27:55b9)
+_CeladonGymEndBattleText2:
     db $0,"You're",$4f
     db "too rough!",$58
 
-_CeladonGymAfterBattleText2: ; 9d5cb (27:55cb)
+_CeladonGymAfterBattleText2:
     db $0,"Bleaah!",$4f
     db "I hope ERIKA",$55
     db "wipes you out!",$57
 
-_CeladonGymBattleText3: ; 9d5f0 (27:55f0)
+_CeladonGymBattleText3:
     db $0,"I was getting",$4f
     db "bored.",$57
 
-_CeladonGymEndBattleText3: ; 9d606 (27:5606)
+_CeladonGymEndBattleText3:
     db $0,"My",$4f
     db "makeup!",$58
 
-_CeladonGymAfterBattleText3: ; 9d612 (27:5612)
+_CeladonGymAfterBattleText3:
     db $0,"Grass-type #MON",$4f
     db "are tough against",$55
     db "the water-type!",$51
@@ -127617,29 +127526,29 @@ _CeladonGymAfterBattleText3: ; 9d612 (27:5612)
     db "edge on rock and",$55
     db "ground #MON!",$57
 
-_CeladonGymBattleText4: ; 9d675 (27:5675)
+_CeladonGymBattleText4:
     db $0,"Aren't you the",$4f
     db "peeping Tom?",$57
 
-_CeladonGymEndBattleText4: ; 9d691 (27:5691)
+_CeladonGymEndBattleText4:
     db $0,"I'm",$4f
     db "in shock!",$58
 
-_CeladonGymAfterBattleText4: ; 9d69f (27:569f)
+_CeladonGymAfterBattleText4:
     db $0,"Oh,you weren't",$4f
     db "peeping? We get a",$55
     db "lot of gawkers!",$57
 
-_CeladonGymBattleText5: ; 9d6d1 (27:56d1)
+_CeladonGymBattleText5:
     db $0,"Look at my grass",$4f
     db "#MON!",$51
     db "They're so easy",$4f
     db "to raise!",$57
 
-_CeladonGymEndBattleText5: ; 9d702 (27:5702)
+_CeladonGymEndBattleText5:
     db $0,"No!",$58
 
-_CeladonGymAfterBattleText5: ; 9d707 (27:5707)
+_CeladonGymAfterBattleText5:
     db $0,"We only use grass-",$4f
     db "type #MON at",$55
     db "our GYM!",$51
@@ -127647,120 +127556,118 @@ _CeladonGymAfterBattleText5: ; 9d707 (27:5707)
     db "for making flower",$55
     db "arrangements!",$57
 
-_CeladonGymBattleText6: ; 9d762 (27:5762)
+_CeladonGymBattleText6:
     db $0,"Don't bring any",$4f
     db "bugs or fire",$55
     db "#MON in here!",$57
 
-_CeladonGymEndBattleText6: ; 9d78d (27:578d)
+_CeladonGymEndBattleText6:
     db $0,"Oh!",$4f
     db "You!",$58
 
-_CeladonGymAfterBattleText6: ; 9d797 (27:5797)
+_CeladonGymAfterBattleText6:
     db $0,"Our LEADER,ERIKA,",$4f
     db "might be quiet,",$55
     db "but she's also",$55
     db "very skilled!",$57
 
-_CeladonGymBattleText7: ; 9d7d7 (27:57d7)
+_CeladonGymBattleText7:
     db $0,"Pleased to meet",$4f
     db "you. My hobby is",$55
     db "#MON training.",$57
 
-_CeladonGymEndBattleText7: ; 9d808 (27:5808)
+_CeladonGymEndBattleText7:
     db $0,"Oh!",$4f
     db "Splendid!",$58
 
-_CeladonGymAfterBattleText7: ; 9d817 (27:5817)
+_CeladonGymAfterBattleText7:
     db $0,"I have a blind",$4f
     db "date coming up.",$55
     db "I have to learn",$55
     db "to be polite.",$57
 
-_CeladonGymBattleText8: ; 9d855 (27:5855)
+_CeladonGymBattleText8:
     db $0,"Welcome to",$4f
     db "CELADON GYM!",$51
     db "You better not",$4f
     db "underestimate",$55
     db "girl power!",$57
 
-_CeladonGymEndBattleText8: ; 9d897 (27:5897)
+_CeladonGymEndBattleText8:
     db $0,"Oh!",$4f
     db "Beaten!",$58
 
-_CeladonGymAfterBattleText8: ; 9d8a4 (27:58a4)
+_CeladonGymAfterBattleText8:
     db $0,"I didn't bring my",$4f
     db "best #MON!",$51
     db "Wait 'til next",$4f
     db "time!",$57
 
-_CeladonGameCornerText1: ; 9d8d5 (27:58d5)
+_CeladonGameCornerText1:
     db $0,"Welcome!",$51
     db "You can exchange",$4f
     db "your coins for",$55
     db "fabulous prizes",$55
     db "next door.",$57
 
-_UnnamedText_48d22: ; 9d91a (27:591a)
+_UnnamedText_48d22:
     db $0,"Welcome to ROCKET",$4f
     db "GAME CORNER!",$51
     db "It's ¥10000 for",$4f
     db "500 coins. Ok?",$57
 
-_UnnamedText_48d27: ; 9d984 (27:5984)
+_UnnamedText_48d27:
     db $0,"Thanks! Here are",$4f
     db "your 500 coins!",$57
 
-SECTION "_UnnamedText_48d2c",ROMX[$59a5],BANK[$27]
-
-_UnnamedText_48d2c: ; 9d9a5 (27:59a5)
+_UnnamedText_48d2c:
     db $0,"No? Please come",$4f
     db "play sometime!",$57
 
-_UnnamedText_48d31: ; 9d9c5 (27:59c5)
+_UnnamedText_48d31:
     db $0,"You can't afford",$4f
     db "the coins!",$57
 
-_UnnamedText_48d36: ; 9d9e1 (27:59e1)
+_UnnamedText_48d36:
     db $0,"Oops! Your COIN",$4f
     db "CASE is full.",$57
 
-_UnnamedText_48d3b: ; 9da00 (27:5a00)
+_UnnamedText_48d3b:
     db $0,"You don't have a",$4f
     db "COIN CASE!",$57
 
-_CeladonGameCornerText3: ; 9da1c (27:5a1c)
+_CeladonGameCornerText3:
     db $0,"Keep this quiet.",$51
     db "It's rumored that",$4f
     db "this place is run",$55
     db "by TEAM ROCKET.",$57
 
-_CeladonGameCornerText4: ; 9da61 (27:5a61)
+_CeladonGameCornerText4:
     db $0,"I think these",$4f
     db "machines have",$55
     db "different odds.",$57
 
-_UnnamedText_48d9c: ; 9da8e (27:5a8e)
+_UnnamedText_48d9c:
     db $0,"Kid,do you want",$4f
     db "to play?",$58
 
-_Received10CoinsText: ; 9daa9 (27:5aa9)
+_Received10CoinsText:
     db $0,$52," received",$4f
     db "10 coins!@@"
 
-_UnnamedText_48da7: ; 9dac0 (27:5ac0)
+_UnnamedText_48da7:
     db $0,"You don't need my",$4f
     db "coins!",$57
 
-_UnnamedText_48dac: ; 9dad9 (27:5ad9)
+_UnnamedText_48dac:
     db $0,"Wins seem to come",$4f
     db "and go.",$57
 
-_CeladonGameCornerText6: ; 9daf4 (27:5af4)
+_CeladonGameCornerText6:
     db $0,"I'm having a",$4f
     db "wonderful time!",$57
 
-_UnnamedText_48dca: ; 9db11 (27:5b11)
+_UnnamedText_48dca:
     db $0,"Hey!",$51
     db "You have better",$4f
     db "things to do,",$55
@@ -127773,7 +127680,7 @@ _UnnamedText_48dca: ; 9db11 (27:5b11)
     db "docile,but don't",$55
     db "be fooled!",$57
 
-_UnnamedText_48dcf: ; 9dbac (27:5bac)
+_UnnamedText_48dcf:
     db $0,"They offer rare",$4f
     db "#MON that can",$55
     db "be exchanged for",$55
@@ -127781,71 +127688,71 @@ _UnnamedText_48dcf: ; 9dbac (27:5bac)
     db "But,I just can't",$4f
     db "seem to win!",$57
 
-_CeladonGameCornerText8: ; 9dc06 (27:5c06)
+_CeladonGameCornerText8:
     db $0,"Games are scary!",$4f
     db "It's so easy to",$55
     db "get hooked!",$57
 
-_UnnamedText_48e26: ; 9dc33 (27:5c33)
+_UnnamedText_48e26:
     db $0,"What's up? Want",$4f
     db "some coins?",$58
 
-_Received20CoinsText: ; 9dc4f (27:5c4f)
+_Received20CoinsText:
     db $0,$52," received",$4f
     db "20 coins!@@"
 
-_UnnamedText_48e31: ; 9dc66 (27:5c66)
+_UnnamedText_48e31:
     db $0,"You have lots of",$4f
     db "coins!",$57
 
-_UnnamedText_48e36: ; 9dc7f (27:5c7f)
+_UnnamedText_48e36:
     db $0,"Darn! I need more",$4f
     db "coins for the",$55
     db "#MON I want!",$57
 
-_UnnamedText_48e88: ; 9dcad (27:5cad)
+_UnnamedText_48e88:
     db $0,"Hey,what? You're",$4f
     db "throwing me off!",$55
     db "Here are some",$55
     db "coins,shoo!",$58
 
-_UnnamedText_48e8d: ; 9dceb (27:5ceb)
+_UnnamedText_48e8d:
     db $0,$52," received",$4f
     db "20 coins!@@"
 
-_UnnamedText_48e93: ; 9dd02 (27:5d02)
+_UnnamedText_48e93:
     db $0,"You've got your",$4f
     db "own coins!",$57
 
-_UnnamedText_48e98: ; 9dd1d (27:5d1d)
+_UnnamedText_48e98:
     db $0,"The trick is to",$4f
     db "watch the reels",$55
     db "closely!",$57
 
-_UnnamedText_48ece: ; 9dd47 (27:5d47)
+_UnnamedText_48ece:
     db $0,"I'm guarding this",$4f
     db "poster!",$55
     db "Go away,or else!",$57
 
-_UnnamedText_48ed3: ; 9dd73 (27:5d73)
+_UnnamedText_48ed3:
     db $0,"Dang!",$58
 
-_UnnamedText_48ed8: ; 9dd7a (27:5d7a)
+_UnnamedText_48ed8:
     db $0,"Our hideout might",$4f
     db "be discovered! I",$55
     db "better tell BOSS!",$57
 
-_UnnamedText_48f09: ; 9ddb0 (27:5db0)
+_UnnamedText_48f09:
     db $0,"Hey!",$51
     db "A switch behind",$4f
     db "the poster!?",$55
     db "Let's push it!@@"
 
-_UnnamedText_48f19: ; 9dde2 (27:5de2)
+_UnnamedText_48f19:
     db $0,"Oops! Forgot the",$4f
     db "COIN CASE!",$57
 
-_CeladonMart5Text1: ; 9ddff (27:5dff)
+_CeladonMart5Text1:
     db $0,"#MON ability",$4f
     db "enhancers can be",$55
     db "bought only here.",$51
@@ -127855,7 +127762,7 @@ _CeladonMart5Text1: ; 9ddff (27:5dff)
     db "Use CARBOS to",$4f
     db "increase SPEED.",$57
 
-_CeladonMart5Text2: ; 9de79 (27:5e79)
+_CeladonMart5Text2:
     db $0,"I'm here for",$4f
     db "#MON ability",$55
     db "enhancers.",$51
@@ -127864,42 +127771,42 @@ _CeladonMart5Text2: ; 9de79 (27:5e79)
     db "IRON increases",$4f
     db "DEFENSE!",$57
 
-_CeladonMart5Text5: ; 9ded6 (27:5ed6)
+_CeladonMart5Text5:
     db $0,"5F: DRUG STORE",$57
 
-_CeladonPrizeRoomText1: ; 9dee6 (27:5ee6)
+_CeladonPrizeRoomText1:
     db $0,"I sure do fancy",$4f
     db "that PORYGON!",$51 ; ~TODO
     db "But,it's hard to",$4f
     db "win at slots!",$57
 
-_CeladonPrizeRoomText2: ; 9df24 (27:5f24)
+_CeladonPrizeRoomText2:
     db $0,"I had a major",$4f
     db "haul today!",$57
 
-_CeladonDinerText1: ; 9df3f (27:5f3f)
+_CeladonDinerText1:
     db $0,"Hi!",$51
     db "We're taking a",$4f
     db "break now.",$57
 
-_CeladonDinerText2: ; 9df5d (27:5f5d)
+_CeladonDinerText2:
     db $0,"My #MON are",$4f
     db "weak,so I often",$55
     db "have to go to the",$55
     db "DRUG STORE.",$57
 
-_CeladonDinerText3: ; 9df99 (27:5f99)
+_CeladonDinerText3:
     db $0,"Psst! There's a",$4f
     db "basement under",$55
     db "the GAME CORNER.",$57
 
-_CeladonDinerText4: ; 9dfc9 (27:5fc9)
+_CeladonDinerText4:
     db $0,"Munch...",$51
     db "The man at that",$4f
     db "table lost it all",$55
     db "at the slots.",$57
 
-_UnnamedText_491a7: ; 9e003 (27:6003)
+_UnnamedText_491a7:
     db $0,"Go ahead! Laugh!",$51
     db "I'm flat out",$4f
     db "busted!",$51
@@ -127910,76 +127817,76 @@ _UnnamedText_491a7: ; 9e003 (27:6003)
     db "needing this any-",$55
     db "more!",$58
 
-_ReceivedCoinCaseText: ; 9e07a (27:607a)
+_ReceivedCoinCaseText:
     db $0,$52," received",$4f
     db "a @"
     TX_RAM $cf4b
     db $0,"!@@"
 
-_CoinCaseNoRoomText: ; 9e090 (27:6090)
+_CoinCaseNoRoomText:
     db $0,"Make room for",$4f
     db "this!",$57
 
-_UnnamedText_491b7: ; 9e0a5 (27:60a5)
+_UnnamedText_491b7:
     db $0,"I always thought",$4f
     db "I was going to",$55
     db "win it back...",$57
 
-_CeladonHouseText1: ; 9e0d5 (27:60d5)
+_CeladonHouseText1:
     db $0,"Hehehe! The slots",$4f
     db "just reel in the",$55
     db "dough,big time!",$57
 
-_CeladonHouseText2: ; 9e10a (27:610a)
+_CeladonHouseText2:
     db $0,"CHIEF!",$51
     db "We just shipped",$4f
     db "2000 #MON as",$55
     db "slot prizes!",$57
 
-_CeladonHouseText3: ; 9e13c (27:613c)
+_CeladonHouseText3:
     db $0,"Don't touch the",$4f
     db "poster at the",$55
     db "GAME CORNER!",$51
     db "There's no secret",$4f
     db "switch behind it!",$57
 
-_CeladonHotelText1: ; 9e18a (27:618a)
+_CeladonHotelText1:
     db $0,"#MON? No,this",$4f
     db "is a hotel for",$55
     db "people.",$51
     db "We're full up.",$57
 
-_CeladonHotelText2: ; 9e1bf (27:61bf)
+_CeladonHotelText2:
     db $0,"I'm on vacation",$4f
     db "with my brother",$55
     db "and boy friend.",$51
     db "CELADON is such a",$4f
     db "pretty city!",$57
 
-_CeladonHotelText3: ; 9e20e (27:620e)
+_CeladonHotelText3:
     db $0,"Why did she bring",$4f
     db "her brother?",$57
 
-_FuchsiaMartText2: ; 9e22e (27:622e)
+_FuchsiaMartText2:
     db $0,"Do you have a",$4f
     db "SAFARI ZONE flag?",$51
     db "What about cards",$4f
     db "or calendars?",$57
 
-_FuchsiaMartText3: ; 9e26e (27:626e)
+_FuchsiaMartText3:
     db $0,"Did you try X",$4f
     db "SPEED? It speeds",$55
     db "up a #MON in",$55
     db "battle!",$57
 
-_FuchsiaHouse1Text1: ; 9e2a3 (27:62a3)
+_FuchsiaHouse1Text1:
     db $0,"SAFARI ZONE's",$4f
     db "WARDEN is old,",$55
     db "but still active!",$51
     db "All his teeth are",$4f
     db "false,though.",$57
 
-_FuchsiaHouse1Text2: ; 9e2f3 (27:62f3)
+_FuchsiaHouse1Text2:
     db $0,"Hmm? You've met",$4f
     db "BILL?",$51
     db "He's my grandson!",$51
@@ -127987,13 +127894,13 @@ _FuchsiaHouse1Text2: ; 9e2f3 (27:62f3)
     db "collecting things",$55
     db "even as a child!",$57
 
-_FuchsiaHouse1Text3: ; 9e34d (27:634d)
+_FuchsiaHouse1Text3:
     db $0,"BILL files his",$4f
     db "own #MON data",$55
     db "on his PC!",$51
     db "Did he show you?",$57
 
-_FuchsiaPokecenterText1: ; 9e387 (27:6387)
+_FuchsiaPokecenterText1:
     db $0,"You can't win",$4f
     db "with just one",$55
     db "strong #MON.",$51
@@ -128001,7 +127908,7 @@ _FuchsiaPokecenterText1: ; 9e387 (27:6387)
     db "you have to raise",$55
     db "them evenly.",$57
 
-_FuchsiaPokecenterText3: ; 9e3de (27:63de)
+_FuchsiaPokecenterText3:
     db $0,"There's a narrow",$4f
     db "trail west of",$55
     db "VIRIDIAN CITY.",$51
@@ -128059,21 +127966,19 @@ _HM04AfterText:
     db "If you do,you win",$4f
     db "a special Gift!",$57
 
-SECTION "_UnnamedText_75176",ROMX[$6696],BANK[$27]
-
-_UnnamedText_75176: ; 9e696 (27:6696)
+_UnnamedText_75176:
     db $0,"#MON photos",$4f
     db "and fossils.",$57
 
-_UnnamedText_7517b: ; 9e6b0 (27:66b0)
+_UnnamedText_7517b:
     db $0,"Old #MON",$4f
     db "merchandise.",$57
 
-_SafariZoneEntranceText1: ; 9e6c7 (27:66c7)
+_SafariZoneEntranceText1:
     db $0,"Welcome to the",$4f
     db "SAFARI ZONE!",$57
 
-UnnamedText_9e6e4: ; 9e6e4 (27:66e4)
+UnnamedText_9e6e4:
     db $0,"For just ¥500,",$4f
     db "you can catch all",$55
     db "the #MON you",$55
@@ -128081,7 +127986,7 @@ UnnamedText_9e6e4: ; 9e6e4 (27:66e4)
     db "Would you like to",$4f
     db "join the hunt?@@"
 
-UnnamedText_9e747: ; 9e747 (27:6747)
+UnnamedText_9e747:
     db $0,"That'll be ¥500",$4f
     db "please!",$51
     db "We only use a",$4f
@@ -128090,42 +127995,42 @@ UnnamedText_9e747: ; 9e747 (27:6747)
     db $52," received",$4f
     db "30 SAFARI BALLs!@@"
 
-_UnnamedText_75360: ; 9e79f (27:679f)
+_UnnamedText_75360:
     db $0,$51
     db "We'll call you on",$4f
     db "the PA when you",$55
     db "run out of time",$55
     db "or SAFARI BALLs!",$57
 
-_UnnamedText_75365: ; 9e7e3 (27:67e3)
+_UnnamedText_75365:
     db $0,"OK! Please come",$4f
     db "again!",$57
 
-_UnnamedText_7536a: ; 9e7fb (27:67fb)
+_UnnamedText_7536a:
     db $0,"Oops! Not enough",$4f
     db "money!",$57
 
-UnnamedText_9e814: ; 9e814 (27:6814)
+UnnamedText_9e814:
     db $0,"Leaving early?@@"
 
-_UnnamedText_753bb: ; 9e825 (27:6825)
+_UnnamedText_753bb:
     db $0,"Please return any",$4f
     db "SAFARI BALLs you",$55
     db "have left.",$57
 
-_UnnamedText_753c0: ; 9e854 (27:6854)
+_UnnamedText_753c0:
     db $0,"Good Luck!",$57
 
-_UnnamedText_753c5: ; 9e860 (27:6860)
+_UnnamedText_753c5:
     db $0,"Did you get a",$4f
     db "good haul?",$55
     db "Come again!",$57
 
-_UnnamedText_753e6: ; 9e886 (27:6886)
+_UnnamedText_753e6:
     db $0,"Hi! Is it your",$4f
     db "first time here?",$57
 
-_UnnamedText_753eb: ; 9e8a7 (27:68a7)
+_UnnamedText_753eb:
     db $0,"SAFARI ZONE has 4",$4f
     db "zones in it.",$51
     db "Each zone has",$4f
@@ -128143,11 +128048,11 @@ _UnnamedText_753eb: ; 9e8a7 (27:68a7)
     db "there's room for",$55
     db "new #MON!",$57
 
-_UnnamedText_753f0: ; 9e993 (27:6993)
+_UnnamedText_753f0:
     db $0,"Sorry,you're a",$4f
     db "regular here!",$57
 
-_UnnamedText_75581: ; 9e9b1 (27:69b1)
+_UnnamedText_75581:
     db $0,"KOGA: Fwahahaha!",$51
     db "A mere child like",$4f
     db "you dares to",$55
@@ -128161,7 +128066,7 @@ _UnnamedText_75581: ; 9e9b1 (27:69b1)
     db "poison and sleep",$55
     db "techniques!",$57
 
-_UnnamedText_75586: ; 9ea66 (27:6a66)
+_UnnamedText_75586:
     db $0,"Humph!",$4f
     db "You have proven",$55
     db "your worth!",$51
@@ -128170,7 +128075,7 @@ _UnnamedText_75586: ; 9ea66 (27:6a66)
 
 SECTION "bank28",ROMX,BANK[$28]
 
-_UnnamedText_7558b: ; a0000 (28:4000)
+_UnnamedText_7558b:
     db $0,"When afflicted by",$4f
     db "TOXIC,#MON",$55
     db "suffer more and",$55
@@ -128188,9 +128093,7 @@ _UnnamedText_75590:
     db "Ah! Take this",$4f
     db "too!",$57
 
-SECTION "_TM06ExplanationText",ROMX[$40ff],BANK[$28]
-
-_TM06ExplanationText: ; a00ff (28:40ff)
+_TM06ExplanationText:
     db $0,$51
     db "TM06 contains",$4f
     db "TOXIC!",$51
@@ -128198,11 +128101,11 @@ _TM06ExplanationText: ; a00ff (28:40ff)
     db "technique over",$55
     db "400 years old!",$57
 
-_TM06NoRoomText: ; a0143 (28:4143)
+_TM06NoRoomText:
     db $0,"Make space for",$4f
     db "this,child!",$57
 
-_FuchsiaGymBattleText1: ; a0160 (28:4160)
+_FuchsiaGymBattleText1:
     db $0,"Strength isn't",$4f
     db "the key for",$55
     db "#MON!",$51
@@ -128211,63 +128114,63 @@ _FuchsiaGymBattleText1: ; a0160 (28:4160)
     db "strategy can beat",$55
     db "brute strength!",$57
 
-_FuchsiaGymEndBattleText1: ; a01c2 (28:41c2)
+_FuchsiaGymEndBattleText1:
     db $0,"What?",$4f
     db "Extraordinary!",$58
 
-_FuchsiaGymAfterBattleText1: ; a01d8 (28:41d8)
+_FuchsiaGymAfterBattleText1:
     db $0,"So,you mix brawn",$4f
     db "with brains?",$55
     db "Good strategy!",$57
 
-_FuchsiaGymBattleText2: ; a0207 (28:4207)
+_FuchsiaGymBattleText2:
     db $0,"I wanted to become",$4f
     db "a ninja,so I",$55
     db "joined this GYM!",$57
 
-_FuchsiaGymEndBattleText2: ; a023a (28:423a)
+_FuchsiaGymEndBattleText2:
     db $0,"I'm done",$4f
     db "for!",$58
 
-_FuchsiaGymAfterBattleText2: ; a0248 (28:4248)
+_FuchsiaGymAfterBattleText2:
     db $0,"I will keep on",$4f
     db "training under",$55
     db "KOGA,my ninja",$55
     db "master!",$57
 
-_FuchsiaGymBattleText3: ; a027e (28:427e)
+_FuchsiaGymBattleText3:
     db $0,"Let's see you",$4f
     db "beat my special",$55
     db "techniques!",$57
 
-_FuchsiaGymEndBattleText3: ; a02a8 (28:42a8)
+_FuchsiaGymEndBattleText3:
     db $0,"You",$4f
     db "had me fooled!",$58
 
-_FuchsiaGymAfterBattleText3: ; a02bc (28:42bc)
+_FuchsiaGymAfterBattleText3:
     db $0,"I like poison and",$4f
     db "sleep techniques,",$55
     db "as they linger",$55
     db "after battle!",$57
 
-_FuchsiaGymBattleText4: ; a02fe (28:42fe)
+_FuchsiaGymBattleText4:
     db $0,"Stop right there!",$51
     db "Our invisible",$4f
     db "walls have you",$55
     db "frustrated?",$57
 
-_FuchsiaGymEndBattleText4: ; a033a (28:433a)
+_FuchsiaGymEndBattleText4:
     db $0,"Whoa!",$4f
     db "He's got it!",$58
 
-_FuchsiaGymAfterBattleText4: ; a034d (28:434d)
+_FuchsiaGymAfterBattleText4:
     db $0,"You impressed me!",$4f
     db "Here's a hint!",$51
     db "Look very closely",$4f
     db "for gaps in the",$55
     db "invisible walls!",$57
 
-_FuchsiaGymBattleText5: ; a03a1 (28:43a1)
+_FuchsiaGymBattleText5:
     db $0,"I also study the",$4f
     db "way of the ninja",$55
     db "with master KOGA!",$51
@@ -128275,25 +128178,25 @@ _FuchsiaGymBattleText5: ; a03a1 (28:43a1)
     db "history of using",$55
     db "animals!",$57
 
-_FuchsiaGymEndBattleText5: ; a0402 (28:4402)
+_FuchsiaGymEndBattleText5:
     db $0,"Awoo!",$58
 
-_FuchsiaGymAfterBattleText5: ; a0409 (28:4409)
+_FuchsiaGymAfterBattleText5:
     db $0,"I still have much",$4f
     db "to learn!",$57
 
-_FuchsiaGymBattleText6: ; a0426 (28:4426)
+_FuchsiaGymBattleText6:
     db $0,"Master KOGA comes",$4f
     db "from a long line",$55
     db "of ninjas!",$51
     db "What did you",$4f
     db "descend from?",$57
 
-_FuchsiaGymEndBattleText6: ; a0470 (28:4470)
+_FuchsiaGymEndBattleText6:
     db $0,"Dropped",$4f
     db "my balls!",$58
 
-_FuchsiaGymAfterBattleText6: ; a0483 (28:4483)
+_FuchsiaGymAfterBattleText6:
     db $0,"Where there is",$4f
     db "light,there is",$55
     db "shadow!",$51
@@ -128301,7 +128204,7 @@ _FuchsiaGymAfterBattleText6: ; a0483 (28:4483)
     db "Which do you",$55
     db "choose?",$57
 
-_UnnamedText_7564e: ; a04d2 (28:44d2)
+_UnnamedText_7564e:
     db $0,"Yo! Champ in",$4f
     db "making!",$51
     db "FUCHSIA GYM is",$4f
@@ -128314,18 +128217,18 @@ _UnnamedText_7564e: ; a04d2 (28:44d2)
     db "gaps in the walls",$55
     db "to reach him!",$57
 
-_UnnamedText_75653: ; a0574 (28:4574)
+_UnnamedText_75653:
     db $0,"It's amazing how",$4f
     db "ninja can terrify",$55
     db "even now!",$57
 
-_FuchsiaMeetingRoomText1: ; a05a1 (28:45a1)
+_FuchsiaMeetingRoomText1:
     db $0,"We nicknamed the",$4f
     db "WARDEN SLOWPOKE.",$51
     db "He and SLOWPOKE",$4f
     db "both look vacant!",$57
 
-_FuchsiaMeetingRoomText2: ; a05e6 (28:45e6)
+_FuchsiaMeetingRoomText2:
     db $0,"SLOWPOKE is very",$4f
     db "knowledgeable",$55
     db "about #MON!",$51
@@ -128333,14 +128236,14 @@ _FuchsiaMeetingRoomText2: ; a05e6 (28:45e6)
     db "fossils of rare,",$55
     db "extinct #MON!",$57
 
-_FuchsiaMeetingRoomText3: ; a0642 (28:4642)
+_FuchsiaMeetingRoomText3:
     db $0,"SLOWPOKE came in,",$4f
     db "but I couldn't",$55
     db "understand him.",$51
     db "I think he's got",$4f
     db "a speech problem!",$57
 
-_UnnamedText_561bd: ; a0695 (28:4695)
+_UnnamedText_561bd:
     db $0,"I'm the FISHING",$4f
     db "GURU's older",$55
     db "brother!",$51
@@ -128349,7 +128252,7 @@ _UnnamedText_561bd: ; a0695 (28:4695)
     db "Do you like to",$4f
     db "fish?",$57
 
-_UnnamedText_561c2: ; a06e8 (28:46e8)
+_UnnamedText_561c2:
     db $0,"Grand! I like",$4f
     db "your style!",$51
     db "Take this and",$4f
@@ -128359,45 +128262,45 @@ _UnnamedText_561c2: ; a06e8 (28:46e8)
     TX_RAM $cf4b
     db $0,"!@@"
 
-_UnnamedText_56212: ; a0737 (28:4737)
+_UnnamedText_56212:
     db $0,"Oh... That's so",$4f
     db "disappointing...",$57
 
-_UnnamedText_56217: ; a0758 (28:4758)
+_UnnamedText_56217:
     db $0,"Hello there,",$4f
     db $52,"!",$51
     db "How are the fish",$4f
     db "biting?",$57
 
-_UnnamedText_5621c: ; a0782 (28:4782)
+_UnnamedText_5621c:
     db $0,"Oh no!",$51
     db "You have no room",$4f
     db "for my gift!",$57
 
-_Mansion1BattleText2: ; a07a8 (28:47a8)
+_Mansion1BattleText2:
     db $0,"Who are you? There",$4f
     db "shouldn't be",$55
     db "anyone here.",$57
 
-_Mansion1EndBattleText2: ; a07d5 (28:47d5)
+_Mansion1EndBattleText2:
     db $0,"Ouch!",$58
 
-_Mansion1AfterBattleText2: ; a07dc (28:47dc)
+_Mansion1AfterBattleText2:
     db $0,"A key? I don't",$4f
     db "know what you're",$55
     db "talking about.",$57
 
-_UnnamedText_44395: ; a080a (28:480a)
+_UnnamedText_44395:
     db $0,"A secret switch!",$51
     db "Press it?",$57
 
-_UnnamedText_4439a: ; a0826 (28:4826)
+_UnnamedText_4439a:
     db $0,"Who wouldn't?",$58
 
-_UnnamedText_4439f: ; a0834 (28:4834)
+_UnnamedText_4439f:
     db $0,"Not quite yet!",$57
 
-_UnnamedText_75914: ; a0844 (28:4844)
+_UnnamedText_75914:
     db $0,"Hah!",$51
     db "I am BLAINE! I",$4f
     db "am the LEADER of",$55
@@ -128408,13 +128311,13 @@ _UnnamedText_75914: ; a0844 (28:4844)
     db "Hah! You better",$4f
     db "have BURN HEAL!",$57
 
-UnnamedText_a08c7: ; a08c7 (28:48c7)
+UnnamedText_a08c7:
     db $0,"I have",$4f
     db "burnt out!",$51
     db "You have earned",$4f
     db "the VOLCANOBADGE!@@"
 
-_UnnamedText_75920: ; a08fd (28:48fd)
+_UnnamedText_75920:
     db $0,"FIRE BLAST is the",$4f
     db "ultimate fire",$55
     db "technique!",$51
@@ -128430,9 +128333,7 @@ _UnnamedText_75925:
     db "Here,you can",$4f
     db "have this too!",$57
 
-SECTION "_TM38ExplanationText",ROMX[$49bc],BANK[$28]
-
-_TM38ExplanationText: ; a09bc (28:49bc)
+_TM38ExplanationText:
     db $0,$51
     db "TM38 contains",$4f
     db "FIRE BLAST!",$51
@@ -128442,75 +128343,75 @@ _TM38ExplanationText: ; a09bc (28:49bc)
     db "PONYTA would be",$55
     db "good bets!",$57
 
-_TM38NoRoomText: ; a0a1e (28:4a1e)
+_TM38NoRoomText:
     db $0,"Make room for my",$4f
     db "gift!",$57
 
-_UnnamedText_7595f: ; a0a36 (28:4a36)
+_UnnamedText_7595f:
     db $0,"Do you know how",$4f
     db "hot #MON fire",$55
     db "breath can get?",$57
 
-_UnnamedText_75964: ; a0a65 (28:4a65)
+_UnnamedText_75964:
     db $0,"Yow!",$4f
     db "Hot,hot,hot!",$58
 
-_UnnamedText_75969: ; a0a7a (28:4a7a)
+_UnnamedText_75969:
     db $0,"Fire,or to be",$4f
     db "more precise,",$55
     db "combustion...",$51
     db "Blah,blah,blah,",$4f
     db "blah...",$57
 
-_UnnamedText_75994: ; a0ac0 (28:4ac0)
+_UnnamedText_75994:
     db $0,"I was a thief,but",$4f
     db "I became straight",$55
     db "as a trainer!",$57
 
-_UnnamedText_75999: ; a0af4 (28:4af4)
+_UnnamedText_75999:
     db $0,"I",$4f
     db "surrender!",$58
 
-_UnnamedText_7599e: ; a0b02 (28:4b02)
+_UnnamedText_7599e:
     db $0,"I can't help",$4f
     db "stealing other",$55
     db "people's #MON!",$57
 
-_UnnamedText_759c9: ; a0b2c (28:4b2c)
+_UnnamedText_759c9:
     db $0,"You can't win!",$4f
     db "I have studied",$55
     db "#MON totally!",$57
 
-_UnnamedText_759ce: ; a0b58 (28:4b58)
+_UnnamedText_759ce:
     db $0,"Waah!",$4f
     db "My studies!",$58
 
-_UnnamedText_759d3: ; a0b6b (28:4b6b)
+_UnnamedText_759d3:
     db $0,"My theories are",$4f
     db "too complicated",$55
     db "for you!",$57
 
-_UnnamedText_759fe: ; a0b95 (28:4b95)
+_UnnamedText_759fe:
     db $0,"I just like using",$4f
     db "fire #MON!",$57
 
-_UnnamedText_75a03: ; a0bb3 (28:4bb3)
+_UnnamedText_75a03:
     db $0,"Too hot",$4f
     db "to handle!",$58
 
-_UnnamedText_75a08: ; a0bc7 (28:4bc7)
+_UnnamedText_75a08:
     db $0,"I wish there was",$4f
     db "a thief #MON!",$55
     db "I'd use that!",$57
 
-_UnnamedText_75a33: ; a0bf4 (28:4bf4)
+_UnnamedText_75a33:
     db $0,"I know why BLAINE",$4f
     db "became a trainer!",$57
 
-_UnnamedText_75a38: ; a0c19 (28:4c19)
+_UnnamedText_75a38:
     db $0,"Ow!",$58
 
-_UnnamedText_75a3d: ; a0c1e (28:4c1e)
+_UnnamedText_75a3d:
     db $0,"BLAINE was lost",$4f
     db "in the mountains",$55
     db "when a fiery bird",$55
@@ -128519,34 +128420,34 @@ _UnnamedText_75a3d: ; a0c1e (28:4c1e)
     db "BLAINE to find",$55
     db "his way down!",$57
 
-_UnnamedText_75a68: ; a0c90 (28:4c90)
+_UnnamedText_75a68:
     db $0,"I've been to many",$4f
     db "GYMs,but this is",$55
     db "my favorite!",$57
 
-_UnnamedText_75a6d: ; a0cc1 (28:4cc1)
+_UnnamedText_75a6d:
     db $0,"Yowza!",$4f
     db "Too hot!",$58
 
-_UnnamedText_75a72: ; a0cd2 (28:4cd2)
+_UnnamedText_75a72:
     db $0,"Us fire #MON",$4f
     db "fans like PONYTA",$55
     db "and NINETALES!",$57
 
-_UnnamedText_75a9d: ; a0d00 (28:4d00)
+_UnnamedText_75a9d:
     db $0,"Fire is weak",$4f
     db "against H2O!",$57
 
-_UnnamedText_75aa2: ; a0d1b (28:4d1b)
+_UnnamedText_75aa2:
     db $0,"Oh!",$4f
     db "Snuffed out!",$58
 
-_UnnamedText_75aa7: ; a0d2d (28:4d2d)
+_UnnamedText_75aa7:
     db $0,"Water beats fire!",$4f
     db "But,fire melts",$55
     db "ice #MON!",$57
 
-_UnnamedText_75ac2: ; a0d5a (28:4d5a)
+_UnnamedText_75ac2:
     db $0,"Yo! Champ in",$4f
     db "making!",$51
     db "The hot-headed",$4f
@@ -128557,35 +128458,35 @@ _UnnamedText_75ac2: ; a0d5a (28:4d5a)
     db "You better take",$4f
     db "some BURN HEALs!",$57
 
-_UnnamedText_75ac7: ; a0dd9 (28:4dd9)
+_UnnamedText_75ac7:
     db $0,$52,"! You beat",$4f
     db "that fire brand!",$57
 
-_Lab1Text1: ; a0df7 (28:4df7)
+_Lab1Text1:
     db $0,"We study #MON",$4f
     db "extensively here.",$51
     db "People often bring",$4f
     db "us rare #MON",$55
     db "for examination.",$57
 
-_Lab1Text2: ; a0e49 (28:4e49)
+_Lab1Text2:
     db $0,"A photo of the",$4f
     db "LAB's founder,",$55
     db "DR.FUJI!",$57
 
-_Lab1Text3: ; a0e70 (28:4e70)
+_Lab1Text3:
     db $0,"#MON LAB",$4f
     db "Meeting Room",$57
 
-_Lab1Text4: ; a0e87 (28:4e87)
+_Lab1Text4:
     db $0,"#MON LAB",$4f
     db "R-and-D Room",$57
 
-_Lab1Text5: ; a0e9e (28:4e9e)
+_Lab1Text5:
     db $0,"#MON LAB",$4f
     db "Testing Room",$57
 
-_Lab2Text1: ; a0eb5 (28:4eb5)
+_Lab2Text1:
     db $0,"I found this very",$4f
     db "strange fossil in",$55
     db "MT.MOON!",$51
@@ -128593,15 +128494,13 @@ _Lab2Text1: ; a0eb5 (28:4eb5)
     db "rare,prehistoric",$55
     db "#MON!",$57
 
-_TM35PreReceiveText: ; a0f09 (28:4f09)
+_TM35PreReceiveText:
     db $0,"Tch-tch-tch!",$4f
     db "I made a cool TM!",$51
     db "It can cause all",$4f
     db "kinds of fun!",$58
 
-SECTION "_TM35ExplanationText",ROMX[$4f5d],BANK[$28]
-
-_TM35ExplanationText: ; a0f5d (28:4f5d)
+_TM35ExplanationText:
     db $0,"Tch-tch-tch!",$4f
     db "That's the sound",$55
     db "of a METRONOME!",$51
@@ -128610,16 +128509,16 @@ _TM35ExplanationText: ; a0f5d (28:4f5d)
     db "into using moves",$55
     db "it doesn't know!",$57
 
-_TM35NoRoomText: ; a0fc7 (28:4fc7)
+_TM35NoRoomText:
     db $0,"Your pack is",$4f
     db "crammed full!",$57
 
-_Lab3Text2: ; a0fe3 (28:4fe3)
+_Lab3Text2:
     db $0,"EEVEE can evolve",$4f
     db "into 1 of 3 kinds",$55
     db "of #MON.",$57
 
-_Lab3Text3: ; a1010 (28:5010)
+_Lab3Text3:
     db $0,"There's an e-mail",$4f
     db "message!",$51
     db "...",$51
@@ -128636,10 +128535,10 @@ _Lab3Text3: ; a1010 (28:5010)
     db "RESEARCH TEAM",$51
     db "...",$57
 
-_Lab3Text5: ; a10d8 (28:50d8)
+_Lab3Text5:
     db $0,"An amber pipe!",$57
 
-_UnnamedText_75dc6: ; a10e8 (28:50e8)
+_UnnamedText_75dc6:
     db $0,"Hiya!",$51
     db "I am important",$4f
     db "doctor!",$51
@@ -128648,31 +128547,31 @@ _UnnamedText_75dc6: ; a10e8 (28:50e8)
     db "You! Have you a",$4f
     db "fossil for me?",$58
 
-_UnnamedText_75dcb: ; a1145 (28:5145)
+_UnnamedText_75dcb:
     db $0,"No! Is too bad!",$57
 
-_UnnamedText_75dd0: ; a1156 (28:5156)
+_UnnamedText_75dd0:
     db $0,"I take a little",$4f
     db "time!",$51
     db "You go for walk a",$4f
     db "little while!",$57
 
-_UnnamedText_75dd5: ; a118d (28:518d)
+_UnnamedText_75dd5:
     db $0,"Where were you?",$51
     db "Your fossil is",$4f
     db "back to life!",$51
     db "It was @"
 
-UnnamedText_a11c3: ; a11c3 (28:51c3)
+UnnamedText_a11c3:
     TX_RAM $cf4b
     db $0,$4f
     db "like I think!",$58
 
-_UnnamedText_610ae: ; a11d6 (28:51d6)
+_UnnamedText_610ae:
     db $0,"Oh! That is",$4f
     db "@"
 
-UnnamedText_a11e4: ; a11e4 (28:51e4)
+UnnamedText_a11e4:
     TX_RAM $cd6d
     db $0,"!",$51
     db "It is fossil of",$4f
@@ -128686,7 +128585,7 @@ UnnamedText_a11e4: ; a11e4 (28:51e4)
     db "that #MON live",$55
     db "again!",$57
 
-_UnnamedText_610b3: ; a1259 (28:5259)
+_UnnamedText_610b3:
     db $0,"So! You hurry and",$4f
     db "give me that!",$51
     db $52," handed",$4f
@@ -128694,18 +128593,18 @@ _UnnamedText_610b3: ; a1259 (28:5259)
     TX_RAM $cd6d
     db $0,"!",$58
 
-_UnnamedText_610b8: ; a128f (28:528f)
+_UnnamedText_610b8:
     db $0,"I take a little",$4f
     db "time!",$51
     db "You go for walk a",$4f
     db "little while!",$57
 
-_UnnamedText_610bd: ; a12c6 (28:52c6)
+_UnnamedText_610bd:
     db $0,"Aiyah! You come",$4f
     db "again!",$57
 
-_CinnabarPokecenterText2: ; a12de (28:52de)
-_CinnabarPokecenterText1: ; a12de (28:52de)
+_CinnabarPokecenterText2:
+_CinnabarPokecenterText1:
     db $0,"You can cancel",$4f
     db "evolution.",$51
     db "When a #MON is",$4f
@@ -128713,7 +128612,7 @@ _CinnabarPokecenterText1: ; a12de (28:52de)
     db "stop it and leave",$55
     db "it the way it is.",$57
 
-_CinnabarPokecenterText3: ; a133e (28:533e)
+_CinnabarPokecenterText3:
     db $0,"Do you have any",$4f
     db "friends?",$51
     db "#MON you get",$4f
@@ -128722,16 +128621,16 @@ _CinnabarPokecenterText3: ; a133e (28:533e)
     db "I think it's",$4f
     db "worth a try!",$57
 
-_CinnabarMartText2: ; a139b (28:539b)
+_CinnabarMartText2:
     db $0,"Don't they have X",$4f
     db "ATTACK? It's good",$55
     db "for battles!",$57
 
-_CinnabarMartText3: ; a13cb (28:53cb)
+_CinnabarMartText3:
     db $0,"It never hurts to",$4f
     db "have extra items!",$57
 
-_IndigoPlateauLobbyText1: ; a13f0 (28:53f0)
+_IndigoPlateauLobbyText1:
     db $0,"Yo! Champ in",$4f
     db "making!",$51
     db "At #MON LEAGUE,",$4f
@@ -128743,7 +128642,7 @@ _IndigoPlateauLobbyText1: ; a13f0 (28:53f0)
     db "over again! This",$55
     db "is it! Go for it!",$57
 
-_IndigoPlateauLobbyText3: ; a148b (28:548b)
+_IndigoPlateauLobbyText3:
     db $0,"From here on,you",$4f
     db "face the ELITE",$55
     db "FOUR one by one!",$51
@@ -128752,13 +128651,13 @@ _IndigoPlateauLobbyText3: ; a148b (28:548b)
     db "next trainer!",$55
     db "Good luck!",$57
 
-_CopycatsHouseF1Text1: ; a14f7 (28:54f7)
+_CopycatsHouseF1Text1:
     db $0,"My daughter is so",$4f
     db "self-centered.",$55
     db "She only has a",$55
     db "few friends.",$57
 
-_CopycatsHouseF1Text2: ; a1535 (28:5535)
+_CopycatsHouseF1Text2:
     db $0,"My daughter likes",$4f
     db "to mimic people.",$51
     db "Her mimicry has",$4f
@@ -128766,11 +128665,11 @@ _CopycatsHouseF1Text2: ; a1535 (28:5535)
     db "nickname COPYCAT",$55
     db "around here!",$57
 
-_CopycatsHouseF1Text3: ; a1596 (28:5596)
+_CopycatsHouseF1Text3:
     db $0,"CHANSEY: Chaan!",$4f
     db "Sii!@@"
 
-_UnnamedText_5ccd4: ; a15ad (28:55ad)
+_UnnamedText_5ccd4:
     db $0,$52,": Hi! Do",$4f
     db "you like #MON?",$51
     db $52,": Uh no,I",$4f
@@ -128782,7 +128681,7 @@ _UnnamedText_5ccd4: ; a15ad (28:55ad)
     db "But,that's my",$4f
     db "favorite hobby!",$58
 
-_TM31PreReceiveText: ; a1636 (28:5636)
+_TM31PreReceiveText:
     db $0,"Oh wow!",$4f
     db "A # DOLL!",$51
     db "For me?",$4f
@@ -128790,16 +128689,14 @@ _TM31PreReceiveText: ; a1636 (28:5636)
     db "You can have",$4f
     db "this,then!",$58
 
-SECTION "_TM31ExplanationText1",ROMX[$5689],BANK[$28]
-
-_TM31ExplanationText1: ; a1689 (28:5689)
+_TM31ExplanationText1:
     db $0,$51
     db "TM31 contains my",$4f
     db "favorite,MIMIC!",$51
     db "Use it on a good",$4f
     db "#MON!@@"
 
-_TM31ExplanationText2: ; a16c5 (28:56c5)
+_TM31ExplanationText2:
     db $0,$52,": Hi!",$4f
     db "Thanks for TM31!",$51
     db $52,": Pardon?",$51
@@ -128809,26 +128706,24 @@ _TM31ExplanationText2: ; a16c5 (28:56c5)
     db "COPYCAT: You bet!",$4f
     db "It's a scream!",$57
 
-_TM31NoRoomText: ; a1733 (28:5733)
+_TM31NoRoomText:
     db $0,"Don't you want",$4f
     db "this?@@"
 
-_CopycatsHouseF2Text2: ; a1749 (28:5749)
+_CopycatsHouseF2Text2:
     db $0,"DODUO: Giiih!@@"
 
-SECTION "_CopycatsHouseOnlyDollText",ROMX[$5792],BANK[$28]
-
-_CopycatsHouseOnlyDollText: ; a1792 (28:5792)
+_CopycatsHouseOnlyDollText:
     db $0,"This is a rare",$4f
     db "#MON! Huh?",$55
     db "It's only a doll!",$57
 
-_CopycatsHouseF2Text6: ; a17be (28:57be)
+_CopycatsHouseF2Text6:
     db $0,"A game with MARIO",$4f
     db "wearing a bucket",$55
     db "on his head!",$57
 
-_UnnamedText_5cd17: ; a17ef (28:57ef)
+_UnnamedText_5cd17:
     db $0,"...",$51
     db "My Secrets!",$51
     db "Skill: Mimicry!",$4f
@@ -128837,10 +128732,10 @@ _UnnamedText_5cd17: ; a17ef (28:57ef)
     db "Favorite #MON:",$55
     db "CLEFAIRY!",$57
 
-_UnnamedText_5cd1c: ; a1842 (28:5842)
+_UnnamedText_5cd1c:
     db $0,"Huh? Can't see!",$57
 
-_UnnamedText_5ce8e: ; a1852 (28:5852)
+_UnnamedText_5ce8e:
     db $0,"Grunt!",$51
     db "I am the KARATE",$4f
     db "MASTER! I am the",$55
@@ -128850,11 +128745,11 @@ _UnnamedText_5ce8e: ; a1852 (28:5852)
     db "Expect no mercy!",$51
     db "Fwaaa!",$57
 
-_UnnamedText_5ce93: ; a18ba (28:58ba)
+_UnnamedText_5ce93:
     db $0,"Hwa!",$4f
     db "Arrgh! Beaten!",$58
 
-_UnnamedText_5ce98: ; a18cf (28:58cf)
+_UnnamedText_5ce98:
     db $0,"Indeed,I have",$4f
     db "lost!",$51
     db "But,I beseech",$4f
@@ -128867,82 +128762,82 @@ _UnnamedText_5ce98: ; a18cf (28:58cf)
     db "Choose whichever",$4f
     db "one you like!",$57
 
-_UnnamedText_5ce9d: ; a1972 (28:5972)
+_UnnamedText_5ce9d:
     db $0,"Ho!",$51
     db "Stay and train at",$4f
     db "Karate with us!",$57
 
-_FightingDojoBattleText1: ; a1999 (28:5999)
+_FightingDojoBattleText1:
     db $0,"Hoargh! Take your",$4f
     db "shoes off!",$57
 
-_FightingDojoEndBattleText1: ; a19b7 (28:59b7)
+_FightingDojoEndBattleText1:
     db $0,"I give",$4f
     db "up!",$58
 
-_FightingDojoAfterBattleText1: ; a19c3 (28:59c3)
+_FightingDojoAfterBattleText1:
     db $0,"You wait 'til you",$4f
     db "see our Master!",$51
     db "I'm a small fry",$4f
     db "compared to him!",$57
 
-_FightingDojoBattleText2: ; a1a05 (28:5a05)
+_FightingDojoBattleText2:
     db $0,"I hear you're",$4f
     db "good! Show me!",$57
 
-_FightingDojoEndBattleText2: ; a1a22 (28:5a22)
+_FightingDojoEndBattleText2:
     db $0,"Judge!",$4f
     db "1 point!",$58
 
-_FightingDojoAfterBattleText2: ; a1a33 (28:5a33)
+_FightingDojoAfterBattleText2:
     db $0,"Our Master is a",$4f
     db "pro fighter!",$57
 
-_FightingDojoBattleText3: ; a1a51 (28:5a51)
+_FightingDojoBattleText3:
     db $0,"Nothing tough",$4f
     db "frightens me!",$51
     db "I break boulders",$4f
     db "for training!",$57
 
-_FightingDojoEndBattleText3: ; a1a8d (28:5a8d)
+_FightingDojoEndBattleText3:
     db $0,"Yow!",$4f
     db "Stubbed fingers!",$58
 
-_FightingDojoAfterBattleText3: ; a1aa4 (28:5aa4)
+_FightingDojoAfterBattleText3:
     db $0,"The only thing",$4f
     db "that frightens us",$55
     db "is psychic power!",$57
 
-_FightingDojoBattleText4: ; a1ad8 (28:5ad8)
+_FightingDojoBattleText4:
     db $0,"Hoohah!",$51
     db "You're trespassing",$4f
     db "in our FIGHTING",$55
     db "DOJO!",$57
 
-_FightingDojoEndBattleText4: ; a1b09 (28:5b09)
+_FightingDojoEndBattleText4:
     db $0,"Oof!",$4f
     db "I give up!",$58
 
-_FightingDojoAfterBattleText4: ; a1b1a (28:5b1a)
+_FightingDojoAfterBattleText4:
     db $0,"The prime fighters",$4f
     db "across the land",$55
     db "train here.",$57
 
-_WantHitmonleeText: ; a1b4a (28:5b4a)
+_WantHitmonleeText:
     db $0,"You want the",$4f
     db "hard kicking",$55
     db "HITMONLEE?",$57
 
-_WantHitmonchanText: ; a1b70 (28:5b70)
+_WantHitmonchanText:
     db $0,"You want the",$4f
     db "piston punching",$55
     db "HITMONCHAN?",$57
 
-_OtherHitmonText: ; a1b9a (28:5b9a)
+_OtherHitmonText:
     db $0,"Better not get",$4f
     db "greedy...",$57
 
-_UnnamedText_5d162: ; a1bb4 (28:5bb4)
+_UnnamedText_5d162:
     db $0,"I had a vision of",$4f
     db "your arrival!",$51
     db "I have had psychic",$4f
@@ -128956,7 +128851,7 @@ _UnnamedText_5d162: ; a1bb4 (28:5bb4)
     db "wish,I will show",$55
     db "you my powers!",$57
 
-_UnnamedText_5d167: ; a1c73 (28:5c73)
+_UnnamedText_5d167:
     db $0,"I'm",$4f
     db "shocked!",$55
     db "But,a loss is a",$55
@@ -128967,7 +128862,7 @@ _UnnamedText_5d167: ; a1c73 (28:5c73)
     db "You earned the",$4f
     db "MARSHBADGE!@@"
 
-_UnnamedText_5d16e: ; a1cdc (28:5cdc)
+_UnnamedText_5d16e:
     db $0,"Everyone has",$4f
     db "psychic power!",$55
     db "People just don't",$55
@@ -128984,13 +128879,11 @@ _TM46ExplanationText:
     db "target's SPECIAL",$55
     db "abilities.",$57
 
-SECTION "_TM46NoRoomText",ROMX[$5e25],BANK[$28]
-
-_TM46NoRoomText: ; a1e25 (28:5e25)
+_TM46NoRoomText:
     db $0,"Your pack is full",$4f
     db "of other items!",$57
 
-_UnnamedText_5d1e6: ; a1e48 (28:5e48)
+_UnnamedText_5d1e6:
     db $0,"Yo! Champ in",$4f
     db "making!",$51
     db "SABRINA's #MON",$4f
@@ -129003,23 +128896,23 @@ _UnnamedText_5d1e6: ; a1e48 (28:5e48)
     db "before they can",$55
     db "even aim a punch!",$57
 
-_UnnamedText_5d1eb: ; a1ef0 (28:5ef0)
+_UnnamedText_5d1eb:
     db $0,"Psychic power,",$4f
     db "huh?",$51
     db "If I had that,",$4f
     db "I'd make a bundle",$55
     db "at the slots!",$57
 
-_SaffronGymBattleText1: ; a1f33 (28:5f33)
+_SaffronGymBattleText1:
     db $0,"SABRINA is younger",$4f
     db "than I,but I",$55
     db "respect her!",$57
 
-_SaffronGymEndBattleText1: ; a1f62 (28:5f62)
+_SaffronGymEndBattleText1:
     db $0,"Not",$4f
     db "good enough!",$58
 
-_SaffronGymAfterBattleText1: ; a1f74 (28:5f74)
+_SaffronGymAfterBattleText1:
     db $0,"In a battle of",$4f
     db "equals,the one",$55
     db "with the stronger",$55
@@ -129028,75 +128921,75 @@ _SaffronGymAfterBattleText1: ; a1f74 (28:5f74)
     db "to beat SABRINA,",$55
     db "focus on winning!",$57
 
-_SaffronGymBattleText2: ; a1fe0 (28:5fe0)
+_SaffronGymBattleText2:
     db $0,"Does our unseen",$4f
     db "power scare you?",$57
 
-_SaffronGymEndBattleText2: ; a2002 (28:6002)
+_SaffronGymEndBattleText2:
     db $0,"I never",$4f
     db "foresaw this!",$58
 
-_SaffronGymAfterBattleText2: ; a2019 (28:6019)
+_SaffronGymAfterBattleText2:
     db $0,"Psychic #MON",$4f
     db "fear only ghosts",$55
     db "and bugs!",$57
 
-_SaffronGymBattleText3: ; a2042 (28:6042)
+_SaffronGymBattleText3:
     db $0,"#MON take on",$4f
     db "the appearance of",$55
     db "their trainers.",$51
     db "Your #MON must",$4f
     db "be tough,then!",$57
 
-_SaffronGymEndBattleText3: ; a2091 (28:6091)
+_SaffronGymEndBattleText3:
     db $0,"I knew",$4f
     db "it!",$58
 
-_SaffronGymAfterBattleText3: ; a209d (28:609d)
+_SaffronGymAfterBattleText3:
     db $0,"I must teach",$4f
     db "better techniques",$55
     db "to my #MON!",$57
 
-_SaffronGymBattleText4: ; a20c9 (28:60c9)
+_SaffronGymBattleText4:
     db $0,"You know that",$4f
     db "power alone isn't",$55
     db "enough!",$57
 
-_SaffronGymEndBattleText4: ; a20f1 (28:60f1)
+_SaffronGymEndBattleText4:
     db $0,"I don't",$4f
     db "believe this!",$58
 
-_SaffronGymAfterBattleText4: ; a2107 (28:6107)
+_SaffronGymAfterBattleText4:
     db $0,"SABRINA just wiped",$4f
     db "out the KARATE",$55
     db "MASTER next door!",$57
 
-_SaffronGymBattleText5: ; a213c (28:613c)
+_SaffronGymBattleText5:
     db $0,"You and I,our",$4f
     db "#MON shall",$55
     db "fight!",$57
 
-_SaffronGymEndBattleText5: ; a215e (28:615e)
+_SaffronGymEndBattleText5:
     db $0,"I lost",$4f
     db "after all!",$58
 
-_SaffronGymAfterBattleText5: ; a2171 (28:6171)
+_SaffronGymAfterBattleText5:
     db $0,"I knew that this",$4f
     db "was going to take",$55
     db "place.",$57
 
-_SaffronGymBattleText6: ; a219c (28:619c)
+_SaffronGymBattleText6:
     db $0,"SABRINA is young,",$4f
     db "but she's also",$55
     db "our LEADER!",$51
     db "You won't reach",$4f
     db "her easily!",$57
 
-_SaffronGymEndBattleText6: ; a21e4 (28:61e4)
+_SaffronGymEndBattleText6:
     db $0,"I lost",$4f
     db "my concentration!",$58
 
-_SaffronGymAfterBattleText6: ; a21fe (28:61fe)
+_SaffronGymAfterBattleText6:
     db $0,"There used to be",$4f
     db "2 #MON GYMs in",$55
     db "SAFFRON.",$51
@@ -129106,7 +128999,7 @@ _SaffronGymAfterBattleText6: ; a21fe (28:61fe)
     db "when we went and",$55
     db "creamed them!",$57
 
-_SaffronGymBattleText7: ; a2277 (28:6277)
+_SaffronGymBattleText7:
     db $0,"SAFFRON #MON",$4f
     db "GYM is famous for",$55
     db "its psychics!",$51
@@ -129114,66 +129007,66 @@ _SaffronGymBattleText7: ; a2277 (28:6277)
     db "SABRINA!",$55
     db "I can tell!",$57
 
-_SaffronGymEndBattleText7: ; a22ca (28:62ca)
+_SaffronGymEndBattleText7:
     db $0,"Arrrgh!",$58
 
-_SaffronGymAfterBattleText7: ; a22d3 (28:62d3)
+_SaffronGymAfterBattleText7:
     db $0,"That's right! I",$4f
     db "used telepathy to",$55
     db "read your mind!",$57
 
-_SaffronHouse1Text1: ; a2305 (28:6305)
+_SaffronHouse1Text1:
     db $0,"Thank you for",$4f
     db "writing. I hope",$55
     db "to see you soon!",$51
     db "Hey! Don't look",$4f
     db "at my letter!",$57
 
-_SaffronHouse1Text2: ; a2352 (28:6352)
+_SaffronHouse1Text2:
     db $0,"PIDGEY: Kurukkoo!@@"
 
-_SaffronHouse1Text3: ; a2366 (28:6366)
+_SaffronHouse1Text3:
     db $0,"The COPYCAT is",$4f
     db "cute! I'm getting",$55
     db "her a # DOLL!",$57
 
-_SaffronHouse1Text4: ; a2395 (28:6395)
+_SaffronHouse1Text4:
     db $0,"I was given a PP",$4f
     db "UP as a gift.",$51
     db "It's used for",$4f
     db "increasing the PP",$55
     db "of techniques!",$57
 
-_SaffronMartText2: ; a23e3 (28:63e3)
+_SaffronMartText2:
     db $0,"MAX REPEL lasts",$4f
     db "longer than SUPER",$55
     db "REPEL for keeping",$55
     db "weaker #MON",$55
     db "away!",$57
 
-_SaffronMartText3: ; a242a (28:642a)
+_SaffronMartText3:
     db $0,"REVIVE is costly,",$4f
     db "but it revives",$55
     db "fainted #MON!",$57
 
-_SilphCo1Text1: ; a245a (28:645a)
+_SilphCo1Text1:
     db $0,"Welcome!",$51
     db "The PRESIDENT is",$4f
     db "in the boardroom",$55
     db "on 11F!",$57
 
-_SaffronPokecenterText1: ; a248e (28:648e)
+_SaffronPokecenterText1:
     db $0,"#MON growth",$4f
     db "rates differ from",$55
     db "specie to specie.",$57
 
-_SaffronPokecenterText3: ; a24bf (28:64bf)
+_SaffronPokecenterText3:
     db $0,"SILPH CO. is very",$4f
     db "famous. That's",$55
     db "why it attracted",$55
     db "TEAM ROCKET!",$57
 
-_TM29PreReceiveText: ; a24fe (28:64fe)
+_TM29PreReceiveText:
     db $0,"...Wait! Don't",$4f
     db "say a word!",$51
     db "You wanted this!",$58
@@ -129184,32 +129077,28 @@ _TM29ExplanationText:
     db "psychic waves to",$55
     db "inflict damage!",$57
 
-SECTION "_TM29NoRoomText",ROMX[$657c],BANK[$28]
-
-_TM29NoRoomText: ; a257c (28:657c)
+_TM29NoRoomText:
     db $0,"Where do you plan",$4f
     db "to put this?",$57
 
-_PokemartGreetingText: ; a259c (28:659c)
+_PokemartGreetingText:
     db $0,"Hi there!",$4e,"May I help you?",$57
 
-_PokemonFaintedText: ; a25b7 (28:65b7)
+_PokemonFaintedText:
     TX_RAM $cd6d
     db $0,$4f
     db "fainted!",$57
 
-_PlayerBlackedOutText: ; a25c5 (28:65c5)
+_PlayerBlackedOutText:
     db $0,$52," is out of",$4f
     db "useable #MON!",$51
     db $52," blacked",$4f
     db "out!",$58
 
-SECTION "_PokemartBuyingGreetingText",ROMX[$6608],BANK[$28]
-
-_PokemartBuyingGreetingText: ; a2608 (28:6608)
+_PokemartBuyingGreetingText:
     db $0,"Take your time.",$57
 
-_PokemartTellBuyPrice: ; a2619 (28:6619)
+_PokemartTellBuyPrice:
     TX_RAM $cf4b
     db $0,"?",$4f
     db "That will be",$55
@@ -129217,40 +129106,40 @@ _PokemartTellBuyPrice: ; a2619 (28:6619)
     db $2,$9f,$ff,$c3
     db $0,". OK?",$57
 
-_PokemartBoughtItemText: ; a2639 (28:6639)
+_PokemartBoughtItemText:
     db $0,"Here you are!",$4f
     db "Thank you!",$58
 
-_PokemartNotEnoughMoneyText: ; a2653 (28:6653)
+_PokemartNotEnoughMoneyText:
     db $0,"You don't have",$4f
     db "enough money.",$58
 
-_PokemartItemBagFullText: ; a2670 (28:6670)
+_PokemartItemBagFullText:
     db $0,"You can't carry",$4f
     db "any more items.",$58
 
-_PokemonSellingGreetingText: ; a2690 (28:6690)
+_PokemonSellingGreetingText:
     db $0,"What would you",$4f
     db "like to sell?",$57
 
-_PokemartTellSellPrice: ; a26ae (28:66ae)
+_PokemartTellSellPrice:
     db $0,"I can pay you",$4f
     db "¥@"
     db $2,$9f,$ff,$c3 ; XXX
     db $0," for that.",$57
 
-_PokemartItemBagEmptyText: ; a26cf (28:66cf)
+_PokemartItemBagEmptyText:
     db $0,"You don't have",$4f
     db "anything to sell.",$58
 
-_PokemartUnsellableItemText: ; a26f0 (28:66f0)
+_PokemartUnsellableItemText:
     db $0,"I can't put a",$4f
     db "price on that.",$58
 
-_PokemartThankYouText: ; a270d (28:670d)
+_PokemartThankYouText:
     db $0,"Thank you!",$57
 
-_PokemartAnythingElseText: ; a2719 (28:6719)
+_PokemartAnythingElseText:
     db $0,"Is there anything",$4f
     db "else I can do?",$57
 
@@ -129274,52 +129163,50 @@ _ReplaceAMoveForText:
     TX_RAM $cf4b
     db $0,"?",$57
 
-SECTION "_PokemonCenterWelcomeText",ROMX[$686d],BANK[$28]
-
-_PokemonCenterWelcomeText: ; a286d (28:686d)
+_PokemonCenterWelcomeText:
     db $0,"Welcome to our",$4f
     db "#MON CENTER!",$57
     db "We heal your",$4f
     db "#MON back to",$55
     db "perfect health!",$58
 
-_ShallWeHealYourPokemonText: ; a28b4 (28:68b4)
+_ShallWeHealYourPokemonText:
     db $0,"Shall we heal your",$4f
     db "#MON?",$57
 
-_NeedYourPokemonText: ; a28ce (28:68ce)
+_NeedYourPokemonText:
     db $0,"OK. We'll need",$4f
     db "your #MON.",$57
 
-_PokemonFightingFitText: ; a28e8 (28:68e8)
+_PokemonFightingFitText:
     db $0,"Thank you!",$4f
     db "Your #MON are",$55
     db "fighting fit!",$58
 
-_PokemonCenterFarewellText: ; a2910 (28:6910)
+_PokemonCenterFarewellText:
     db $0,"We hope to see",$4f
     db "you again!",$57
 
-_CableClubNPCText7: ; a292b (28:692b)
+_CableClubNPCText7:
     db $0,"This area is",$4f
     db "reserved for 2",$55
     db "friends who are",$55
     db "linked by cable.",$57
 
-_CableClubNPCText1: ; a2969 (28:6969)
+_CableClubNPCText1:
     db $0,"Welcome to the",$4f
     db "Cable Club!",$57
 
-_CableClubNPCText2: ; a2985 (28:6985)
+_CableClubNPCText2:
     db $0,"Please apply here.",$51
     db "Before opening",$4f
     db "the link,we have",$55
     db "to save the game.",$57
 
-_CableClubNPCText3: ; a29cc (28:69cc)
+_CableClubNPCText3:
     db $0,"Please wait.@@"
 
-_CableClubNPCText4: ; a29db (28:69db)
+_CableClubNPCText4:
     db $0,"The link has been",$4f
     db "closed because of",$55
     db "inactivity.",$51
@@ -129437,68 +129324,64 @@ _PreHM08Text:
 
 SECTION "bank29",ROMX,BANK[$29]
 
-_CableClubNPCText5: ; a4000 (29:4000)
+_CableClubNPCText5:
     db $0,"Please come again!",$57
 
-_CableClubNPCText6: ; a4014 (29:4014)
+_CableClubNPCText6:
     db $0,"We're making",$4f
     db "preparations.",$55
     db "Please wait.",$57
 
-SECTION "_UnnamedText_cdbb",ROMX[$4051],BANK[$29]
-
-_UnnamedText_cdbb: ; a4051 (29:4051)
+_UnnamedText_cdbb:
     TX_RAM $cd6d
     db $0," can",$4f
     db "move boulders.",$57
 
-_UnnamedText_cdfa: ; a4069 (29:4069)
+_UnnamedText_cdfa:
     db $0,"The current is",$4f
     db "much too fast!",$58
 
-_UnnamedText_cdff: ; a4088 (29:4088)
+_UnnamedText_cdff:
     db $0,"Cycling is fun!",$4f
     db "Forget SWIM!   ",$58
 
-_FlashLightsAreaText: ; a40a9 (29:40a9)
+_FlashLightsAreaText:
     db $0,"A blinding LIGHT",$4f
     db "lights the area!",$57
 
-_WarpToLastPokemonCenterText: ; a40cc (29:40cc)
+_WarpToLastPokemonCenterText:
     db $0,"Warp to the last",$4f
     db "#MON CENTER.",$57
 
-_CannotUseTeleportNowText: ; a40eb (29:40eb)
+_CannotUseTeleportNowText:
     TX_RAM $cd6d
     db $0," can't",$4f
     db "use TELEPORT now.",$58
 
-_CannotFlyHereText: ; a4107 (29:4107)
+_CannotFlyHereText:
     TX_RAM $cd6d
     db $0," can't",$4f
     db "FLY here.",$58
 
-_NotHealthyEnoughText: ; a411b (29:411b)
+_NotHealthyEnoughText:
     db $0,"Not healthy",$4f
     db "enough.",$58
 
-SECTION "_CannotUseItemsHereText",ROMX[$414e],BANK[$29]
-
-_CannotUseItemsHereText: ; a414e (29:414e)
+_CannotUseItemsHereText:
     db $0,"You can't use items",$4f
     db "here.",$58
 
-_CannotGetOffHereText: ; a4168 (29:4168)
+_CannotGetOffHereText:
     db $0,"You can't get off",$4f
     db "here.",$58
 
-_UnnamedText_4fe39: ; a4180 (29:4180)
+_UnnamedText_4fe39:
     db $0,$52," got",$4f
     db "@"
     TX_RAM $cd6d
     db $0,"!@@"
 
-_UnnamedText_4fe3f: ; a418f (29:418f)
+_UnnamedText_4fe3f:
     db $0,"There's no more",$4f
     db "room for #MON!",$55
     db "@"
@@ -129509,7 +129392,7 @@ _UnnamedText_4fe3f: ; a418f (29:418f)
     TX_RAM $cf4b
     db $0," on PC!",$57
 
-_UnnamedText_4fe44: ; a41d6 (29:41d6)
+_UnnamedText_4fe44:
     db $0,"There's no more",$4f
     db "room for #MON!",$51
     db "The #MON BOX",$4f
@@ -129520,7 +129403,7 @@ _UnnamedText_4fe44: ; a41d6 (29:41d6)
 
 INCLUDE "text/mapPalletTown.asm"
 
-_ViridianCityText1: ; a43cc (29:43cc)
+_ViridianCityText1:
     db $0,"Those # BALLs",$4f
     db "at your waist!",$55
     db "You have #MON!",$51
@@ -129529,52 +129412,52 @@ _ViridianCityText1: ; a43cc (29:43cc)
     db "use #MON any",$55
     db "time,anywhere!",$57
 
-_UnnamedText_19122: ; a4437 (29:4437)
+_UnnamedText_19122:
     db $0,"This #MON GYM",$4f
     db "is always closed.",$51
     db "I wonder who the",$4f
     db "LEADER is?",$57
 
-_UnnamedText_19127: ; a4474 (29:4474)
+_UnnamedText_19127:
     db $0,"VIRIDIAN GYM's",$4f
     db "LEADER returned!",$57
 
-_UnnamedText_1914d: ; a4494 (29:4494)
+_UnnamedText_1914d:
     db $0,"You want to know",$4f
     db "about the 2 kinds",$55
     db "of caterpillar",$55
     db "#MON?",$57
 
-_UnnamedText_19152: ; a44cd (29:44cd)
+_UnnamedText_19152:
     db $0,"Oh,OK then!",$57
 
-_UnnamedText_19157: ; a44db (29:44db)
+_UnnamedText_19157:
     db $0,"CATERPIE has no",$4f
     db "poison,but",$55
     db "WEEDLE does.",$51
     db "Watch out for its",$4f
     db "POISON STING!",$57
 
-_UnnamedText_19175: ; a4525 (29:4525)
+_UnnamedText_19175:
     db $0,"Oh Grandpa! Don't",$4f
     db "be so mean!",$55
     db "He hasn't had his",$55
     db "coffee yet.",$57
 
-_UnnamedText_1917a: ; a4560 (29:4560)
+_UnnamedText_1917a:
     db $0,"When I go shop in",$4f
     db "PEWTER CITY,I",$55
     db "have to take the",$55
     db "winding trail in",$55
     db "VIRIDIAN FOREST.",$57
 
-_UnnamedText_19191: ; a45b5 (29:45b5)
+_UnnamedText_19191:
     db $0,"You can't go",$4f
     db "through here!",$51
     db "This is private",$4f
     db "property!",$57
 
-_UnnamedText_191ca: ; a45ea (29:45ea)
+_UnnamedText_191ca:
     db $0,"Yawn!",$4f
     db "I must have dozed",$55
     db "off in the sun.",$51
@@ -129588,18 +129471,16 @@ _UnnamedText_191ca: ; a45ea (29:45ea)
     db "Here,you can",$55
     db "have this TM.",$58
 
-SECTION "_TM42Explanation",ROMX[$46ad],BANK[$29]
-
-_TM42Explanation: ; a46ad (29:46ad)
+_TM42Explanation:
     db $0,"TM42 contains",$4f
     db "DREAM EATER...",$55
     db "..Snore..",$CA,$CA,$57
 
-_TM42NoRoomText: ; a46d7 (29:46d7)
+_TM42NoRoomText:
     db $0,"You have too much",$4f
     db "stuff already.",$57
 
-_UnnamedText_1920a: ; a46f9 (29:46f9)
+_UnnamedText_1920a:
     db $0,"Ahh,I've had my",$4f
     db "coffee now and I",$55
     db "feel great!",$51
@@ -129608,7 +129489,7 @@ _UnnamedText_1920a: ; a46f9 (29:46f9)
     db "Are you in a",$4f
     db "hurry?",$57
 
-_UnnamedText_1920f: ; a4754 (29:4754)
+_UnnamedText_1920f:
     db $0,"I see you're using",$4f
     db "a #DEX.",$51
     db "When you catch a",$4f
@@ -129621,21 +129502,21 @@ _UnnamedText_1920f: ; a4754 (29:4754)
     db "I'll show you",$4f
     db "how to then.",$57
 
-_UnnamedText_19214: ; a47e6 (29:47e6)
+_UnnamedText_19214:
     db $0,"Time is money...",$4f
     db "Go along then.",$57
 
-_UnnamedText_19219: ; a4807 (29:4807)
+_UnnamedText_19219:
     db $0,"First,you need",$4f
     db "to weaken the",$55
     db "target #MON.",$57
 
-_ViridianCityText8: ; a4833 (29:4833)
+_ViridianCityText8:
     db $0,"VIRIDIAN CITY ",$4f
     db "The Eternally",$55
     db "Green Paradise",$57
 
-_ViridianCityText9: ; a4860 (29:4860)
+_ViridianCityText9:
     db $0,"TRAINER TIPS",$51
     db "Catch #MON",$4f
     db "and expand your",$55
@@ -129644,7 +129525,7 @@ _ViridianCityText9: ; a4860 (29:4860)
     db "the easier it is",$55
     db "to fight!",$57
 
-_ViridianCityText10: ; a48c3 (29:48c3)
+_ViridianCityText10:
     db $0,"TRAINER TIPS",$51
     db "The battle moves",$4f
     db "of #MON are",$55
@@ -129655,15 +129536,15 @@ _ViridianCityText10: ; a48c3 (29:48c3)
     db "#MON at a",$55
     db "#MON CENTER!",$57
 
-_ViridianCityText13: ; a4949 (29:4949)
+_ViridianCityText13:
     db $0,"VIRIDIAN CITY",$4f
     db "#MON GYM",$57
 
-_ViridianCityText14: ; a4961 (29:4961)
+_ViridianCityText14:
     db $0,"The GYM's doors",$4f
     db "are locked...",$57
 
-_PewterCityText1: ; a497f (29:497f)
+_PewterCityText1:
     db $0,"It's rumored that",$4f
     db "CLEFAIRYs came",$55
     db "from the moon!",$51
@@ -129671,7 +129552,7 @@ _PewterCityText1: ; a497f (29:497f)
     db "after MOON STONE",$55
     db "fell on MT.MOON.",$57
 
-_PewterCityText2: ; a49e0 (29:49e0)
+_PewterCityText2:
     db $0,"There aren't many",$4f
     db "serious #MON",$55
     db "trainers here!",$51
@@ -129681,61 +129562,61 @@ _PewterCityText2: ; a49e0 (29:49e0)
     db "BROCK is totally",$55
     db "into it!",$57
 
-_UnnamedText_193f1: ; a4a56 (29:4a56)
+_UnnamedText_193f1:
     db $0,"Did you check out",$4f
     db "the MUSEUM?",$57
 
-_UnnamedText_193f6: ; a4a75 (29:4a75)
+_UnnamedText_193f6:
     db $0,"Weren't those",$4f
     db "fossils from MT.",$55
     db "MOON amazing?",$57
 
-_UnnamedText_193fb: ; a4aa2 (29:4aa2)
+_UnnamedText_193fb:
     db $0,"Really?",$4f
     db "You absolutely",$55
     db "have to go!",$57
 
-_PewterCityText13: ; a4ac6 (29:4ac6)
+_PewterCityText13:
     db $0,"It's right here!",$4f
     db "You have to pay",$55
     db "to get in,but",$55
     db "it's worth it!",$55
     db "See you around!",$57
 
-_UnnamedText_19427: ; a4b14 (29:4b14)
+_UnnamedText_19427:
     db $0,"Psssst!",$4f
     db "Do you know what",$55
     db "I'm doing?",$57
 
-_UnnamedText_1942c: ; a4b38 (29:4b38)
+_UnnamedText_1942c:
     db $0,"That's right!",$4f
     db "It's hard work!",$57
 
-_UnnamedText_19431: ; a4b55 (29:4b55)
+_UnnamedText_19431:
     db $0,"I'm spraying REPEL",$4f
     db "to keep #MON",$55
     db "out of my garden!",$57
 
-_UnnamedText_1945d: ; a4b87 (29:4b87)
+_UnnamedText_1945d:
     db $0,"You're a trainer",$4f
     db "right? BROCK's",$55
     db "looking for new",$55
     db "challengers!",$55
     db "Follow me!",$57
 
-_UnnamedText_19462: ; a4bce (29:4bce)
+_UnnamedText_19462:
     db $0,"If you have the",$4f
     db "right stuff,go",$55
     db "take on BROCK!",$57
 
-_PewterCityText6: ; a4bfe (29:4bfe)
+_PewterCityText6:
     db $0,"TRAINER TIPS",$51
     db "Any #MON that",$4f
     db "takes part in",$55
     db "battle,however",$55
     db "short,earns EXP!",$57
 
-_PewterCityText7: ; a4c4a (29:4c4a)
+_PewterCityText7:
     db $0,"NOTICE!",$51
     db "Thieves have been",$4f
     db "stealing #MON",$55
@@ -129744,23 +129625,23 @@ _PewterCityText7: ; a4c4a (29:4c4a)
     db "PEWTER POLICE",$55
     db "with any info!",$57
 
-_PewterCityText10: ; a4cb1 (29:4cb1)
+_PewterCityText10:
     db $0,"PEWTER MUSEUM",$4f
     db "OF SCIENCE",$57
 
-_PewterCityText11: ; a4ccb (29:4ccb)
+_PewterCityText11:
     db $0,"PEWTER CITY",$4f
     db "#MON GYM",$55
     db "LEADER: BROCK",$51
     db "The Rock Solid",$4f
     db "#MON Trainer!",$57
 
-_PewterCityText12: ; a4d0c (29:4d0c)
+_PewterCityText12:
     db $0,"PEWTER CITY",$4f
     db "A Stone Gray",$55
     db "City",$57
 
-_UnnamedText_19668: ; a4d2b (29:4d2b)
+_UnnamedText_19668:
     db $0,$53,": Yo!",$4f
     db $52,"!",$51
     db "You're still",$4f
@@ -129774,17 +129655,17 @@ _UnnamedText_19668: ; a4d2b (29:4d2b)
     db "what you caught,",$55
     db $52,"!",$57
 
-_UnnamedText_1966d: ; a4dbe (29:4dbe)
+_UnnamedText_1966d:
     db $0,"Hey!",$4f
     db "Take it easy!",$55
     db "You won already!",$58
 
-_UnnamedText_19672: ; a4de3 (29:4de3)
+_UnnamedText_19672:
     db $0,"Heh!",$4f
     db "You're no match",$55
     db "for my genius!",$58
 
-_UnnamedText_19677: ; a4e07 (29:4e07)
+_UnnamedText_19677:
     db $0,$53,": Hey,",$4f
     db "guess what?",$51
     db "I went to BILL's",$4f
@@ -129807,7 +129688,7 @@ _UnnamedText_19677: ; a4e07 (29:4e07)
     db "get rolling!",$55
     db "Smell ya later!",$57
 
-_UnnamedText_196d9: ; a4f27 (29:4f27)
+_UnnamedText_196d9:
     db $0,"Hey! Stay out!",$4f
     db "It's not your",$55
     db "yard! Huh? Me?",$51
@@ -129815,48 +129696,46 @@ _UnnamedText_196d9: ; a4f27 (29:4f27)
     db "bystander! Don't",$55
     db "you believe me?",$57
 
-SECTION "_ReceivedTM28Text2",ROMX[$4f96],BANK[$29]
-
-_ReceivedTM28Text2: ; a4f96 (29:4f96)
+_ReceivedTM28Text2:
     db $0,$51
     db "I better get",$4f
     db "moving! Bye!@@"
 
-_TM28NoRoomText: ; a4fb3 (29:4fb3)
+_TM28NoRoomText:
     db $0,"Make room for",$4f
     db "this!",$51
     db "I can't run until",$4f
     db "I give it to you!",$57
 
-_UnnamedText_196ee: ; a4feb (29:4feb)
+_UnnamedText_196ee:
     db $0,"Stop!",$4f
     db "I give up! I'll",$55
     db "leave quietly!",$58
 
-_UnnamedText_196f3: ; a5010 (29:5010)
+_UnnamedText_196f3:
     db $0,"OK! I'll return",$4f
     db "the TM I stole!",$58
 
-_CeruleanCityText3: ; a5030 (29:5030)
+_CeruleanCityText3:
     db $0,"You're a trainer",$4f
     db "too? Collecting,",$55
     db "fighting,it's a",$55
     db "tough life.",$57
 
-_CeruleanCityText4: ; a506e (29:506e)
+_CeruleanCityText4:
     db $0,"That bush in",$4f
     db "front of the shop",$55
     db "is in the way.",$51
     db "There might be a",$4f
     db "way around.",$57
 
-_CeruleanCityText5: ; a50ba (29:50ba)
+_CeruleanCityText5:
     db $0,"You're making an",$4f
     db "encyclopedia on",$55
     db "#MON? That",$55
     db "sounds amusing.",$57
 
-_CeruleanCityText6: ; a50f6 (29:50f6)
+_CeruleanCityText6:
     db $0,"The people here",$4f
     db "were robbed.",$51
     db "It's obvious that",$4f
@@ -129867,18 +129746,18 @@ _CeruleanCityText6: ; a50f6 (29:50f6)
     db "force has trouble",$55
     db "with the ROCKETs!",$57
 
-_UnnamedText_19730: ; a5188 (29:5188)
+_UnnamedText_19730:
     db $0,"OK! SLOWBRO!",$4f
     db "Use SONICBOOM!",$55
     db "Come on,SLOWBRO",$55
     db "pay attention!",$57
 
-_UnnamedText_19735: ; a51c5 (29:51c5)
+_UnnamedText_19735:
     db $0,"SLOWBRO punch!",$4f
     db "No! You blew it",$55
     db "again!",$57
 
-_UnnamedText_1973a: ; a51ec (29:51ec)
+_UnnamedText_1973a:
     db $0,"SLOWBRO,WITHDRAW!",$4f
     db "No! That's wrong!",$51
     db "It's so hard to",$4f
@@ -129888,30 +129767,30 @@ _UnnamedText_1973a: ; a51ec (29:51ec)
     db "on your abilities",$55
     db "as a trainer!",$57
 
-_UnnamedText_1976f: ; a526b (29:526b)
+_UnnamedText_1976f:
     db $0,"SLOWBRO took a",$4f
     db "snooze ",$CA,$CA,$57
 
-_UnnamedText_19774: ; a5285 (29:5285)
+_UnnamedText_19774:
     db $0,"SLOWBRO is",$4f
     db "loafing around...",$57
 
-_UnnamedText_19779: ; a52a3 (29:52a3)
+_UnnamedText_19779:
     db $0,"SLOWBRO turned",$4f
     db "away...",$57
 
-_UnnamedText_1977e: ; a52bb (29:52bb)
+_UnnamedText_1977e:
     db $0,"SLOWBRO",$4f
     db "ignored orders...",$57
 
-_CeruleanCityText9: ; a52d6 (29:52d6)
+_CeruleanCityText9:
     db $0,"I want a bright",$4f
     db "red BICYCLE!",$51
     db "I'll keep it at",$4f
     db "home,so it won't",$55
     db "get dirty!",$57
 
-_CeruleanCityText10: ; a531f (29:531f)
+_CeruleanCityText10:
     db $0,"This is CERULEAN",$4f
     db "CAVE! Horribly",$55
     db "strong #MON",$55
@@ -129921,47 +129800,47 @@ _CeruleanCityText10: ; a531f (29:531f)
     db "only person who",$55
     db "is allowed in!",$57
 
-_CeruleanCityText12: ; a539a (29:539a)
+_CeruleanCityText12:
     db $0,"CERULEAN CITY",$4f
     db "A Mysterious,",$55
     db "Blue Aura",$55
     db "Surrounds It",$57
 
-_CeruleanCityText13: ; a53ce (29:53ce)
+_CeruleanCityText13:
     db $0,"TRAINER TIPS",$51
     db "Pressing B Button",$4f
     db "during evolution",$55
     db "cancels the whole",$55
     db "process.",$57
 
-_CeruleanCityText16: ; a541a (29:541a)
+_CeruleanCityText16:
     db $0,"Grass and caves",$4f
     db "handled easily!",$55
     db "BIKE SHOP",$57
 
-_CeruleanCityText17: ; a5445 (29:5445)
+_CeruleanCityText17:
     db $0,"CERULEAN CITY",$4f
     db "#MON GYM",$55
     db "LEADER: MISTY",$51
     db "The Tomboyish",$4f
     db "Mermaid!",$57
 
-_UnnamedText_4413c: ; a5482 (29:5482)
+_UnnamedText_4413c:
     db $0,"Do you believe in",$4f
     db "GHOSTs?",$57
 
-_UnnamedText_44141: ; a549d (29:549d)
+_UnnamedText_44141:
     db $0,"Really? So there",$4f
     db "are believers...",$57
 
-_UnnamedText_44146: ; a54c0 (29:54c0)
+_UnnamedText_44146:
     db $0,"Hahaha,I guess",$4f
     db "not.",$51
     db "That white hand",$4f
     db "on your shoulder,",$55
     db "it's not real.",$57
 
-_LavenderTownText2: ; a5506 (29:5506)
+_LavenderTownText2:
     db $0,"This town is known",$4f
     db "as the grave site",$55
     db "of #MON.",$51
@@ -129969,7 +129848,7 @@ _LavenderTownText2: ; a5506 (29:5506)
     db "are held in",$55
     db "#MON TOWER.",$57
 
-_LavenderTownText3: ; a555f (29:555f)
+_LavenderTownText3:
     db $0,"GHOSTs appeared",$4f
     db "in #MON TOWER.",$51
     db "I think they're",$4f
@@ -129977,61 +129856,61 @@ _LavenderTownText3: ; a555f (29:555f)
     db "#MON that the",$55
     db "ROCKETs killed.",$57
 
-_LavenderTownText4: ; a55bb (29:55bb)
+_LavenderTownText4:
     db $0,"LAVENDER TOWN",$4f
     db "The Noble Purple",$55
     db "Town",$57
 
-_LavenderTownText5: ; a55e0 (29:55e0)
+_LavenderTownText5:
     db $0,"New SILPH SCOPE!",$51
     db "Make the Invisible",$4f
     db "Plain to See!",$51
     db "SILPH CO.",$57
 
-_LavenderTownText8: ; a561d (29:561d)
+_LavenderTownText8:
     db $0,"LAVENDER VOLUNTEER",$4f
     db "#MON HOUSE",$57
 
-_LavenderTownText9: ; a563c (29:563c)
+_LavenderTownText9:
     db $0,"May the Souls of",$4f
     db "#MON Rest Easy",$55
     db "#MON TOWER",$57
 
-_VermilionCityText1: ; a5668 (29:5668)
+_VermilionCityText1:
     db $0,"We're careful",$4f
     db "about pollution!",$51
     db "We've heard GRIMER",$4f
     db "multiplies in",$55
     db "toxic sludge!",$57
 
-_UnnamedText_198a7: ; a56b5 (29:56b5)
+_UnnamedText_198a7:
     db $0,"Did you see S.S.",$4f
     db "ANNE moored in",$55
     db "the harbor?",$57
 
-_UnnamedText_198ac: ; a56e2 (29:56e2)
+_UnnamedText_198ac:
     db $0,"So,S.S.ANNE has",$4f
     db "departed!",$51
     db "She'll be back in",$4f
     db "about a year.",$57
 
-_SSAnneWelcomeText4: ; a571d (29:571d)
+_SSAnneWelcomeText4:
     db $0,"Welcome to S.S.",$4f
     db "ANNE!",$57
 
-_SSAnneWelcomeText9: ; a5734 (29:5734)
+_SSAnneWelcomeText9:
     db $0,"Welcome to S.S.",$4f
     db "ANNE!",$51
     db "Excuse me,do you",$4f
     db "have a ticket?",$58
 
-_SSAnneFlashedTicketText: ; a576c (29:576c)
+_SSAnneFlashedTicketText:
     db $0,$52," flashed",$4f
     db "the S.S.TICKET!",$51
     db "Great! Welcome to",$4f
     db "S.S.ANNE!",$57
 
-_SSAnneNoTicketText: ; a57a3 (29:57a3)
+_SSAnneNoTicketText:
     db $0,$52," doesn't",$4f
     db "have the needed",$55
     db "S.S.TICKET.",$51
@@ -130039,39 +129918,39 @@ _SSAnneNoTicketText: ; a57a3 (29:57a3)
     db "You need a ticket",$4f
     db "to get aboard.",$57
 
-_SSAnneNotHereText: ; a57f1 (29:57f1)
+_SSAnneNotHereText:
     db $0,"The ship set sail.",$57
 
-_VermilionCityText4: ; a5805 (29:5805)
+_VermilionCityText4:
     db $0,"I'm putting up a",$4f
     db "building on this",$55
     db "plot of land.",$51
     db "My #MON is",$4f
     db "tamping the land.",$57
 
-_VermilionCityText5: ; a5852 (29:5852)
+_VermilionCityText5:
     db $0,"MACHOP: Guoh!",$4f
     db "Gogogoh!@@"
 
-_VermilionCityText14: ; a586b (29:586b)
+_VermilionCityText14:
     db $0,$51
     db "A MACHOP is",$4f
     db "stomping the land",$55
     db "flat.",$57
 
-_VermilionCityText6: ; a5891 (29:5891)
+_VermilionCityText6:
     db $0,"S.S.ANNE is a",$4f
     db "famous luxury",$55
     db "cruise ship.",$51
     db "We visit VERMILION",$4f
     db "once a year.",$57
 
-_VermilionCityText7: ; a58db (29:58db)
+_VermilionCityText7:
     db $0,"VERMILION CITY",$4f
     db "The Port of",$55
     db "Exquisite Sunsets",$57
 
-_VermilionCityText8: ; a5909 (29:5909)
+_VermilionCityText8:
     db $0,"NOTICE!",$51
     db "ROUTE 12 may be",$4f
     db "blocked off by a",$55
@@ -130081,46 +129960,46 @@ _VermilionCityText8: ; a5909 (29:5909)
     db "LAVENDER TOWN.",$51
     db "VERMILION POLICE",$57
 
-_VermilionCityText11: ; a5980 (29:5980)
+_VermilionCityText11:
     db $0,"#MON FAN CLUB",$4f
     db "All #MON fans",$55
     db "welcome!",$57
 
-_VermilionCityText12: ; a59a6 (29:59a6)
+_VermilionCityText12:
     db $0,"VERMILION CITY",$4f
     db "#MON GYM",$55
     db "LEADER: LT.SURGE",$51
     db "The Lightning ",$4f
     db "American!",$57
 
-_VermilionCityText13: ; a59e9 (29:59e9)
+_VermilionCityText13:
     db $0,"VERMILION HARBOR",$57
 
-_CeladonCityText1: ; a59fb (29:59fb)
+_CeladonCityText1:
     db $0,"I got my KOFFING",$4f
     db "in CINNABAR!",$51
     db "It's nice,but it",$4f
     db "breathes poison",$55
     db "when it's angry!",$57
 
-_CeladonCityText2: ; a5a4b (29:5a4b)
+_CeladonCityText2:
     db $0,"Heheh! This GYM",$4f
     db "is great! It's",$55
     db "full of women!",$57
 
-_CeladonCityText3: ; a5a79 (29:5a79)
+_CeladonCityText3:
     db $0,"The GAME CORNER",$4f
     db "is bad for our",$55
     db "city's image!",$57
 
-_CeladonCityText4: ; a5aa6 (29:5aa6)
+_CeladonCityText4:
     db $0,"Moan! I blew it",$4f
     db "all at the slots!",$51
     db "I knew I should",$4f
     db "have cashed in my",$55
     db "coins for prizes!",$57
 
-_TM41PreText: ; a5afd (29:5afd)
+_TM41PreText:
     db $0,"Hello,there!",$51
     db "I've seen you,",$4f
     db "but I never had a",$55
@@ -130137,32 +130016,30 @@ _TM41ExplanationText:
     db "Especially Big",$4f
     db "WATER #MON!",$57
 
-SECTION "_TM41NoRoomText",ROMX[$5bb8],BANK[$29]
-
-_TM41NoRoomText: ; a5bb8 (29:5bb8)
+_TM41NoRoomText:
     db $0,"Oh,your pack is",$4f
     db "full of items!",$57
 
-_CeladonCityText6: ; a5bd9 (29:5bd9)
+_CeladonCityText6:
     db $0,"This is my trusted",$4f
     db "pal,POLIWRATH!",$51
     db "It evolved from",$4f
     db "POLIWHIRL when I",$55
     db "used WATER STONE!",$57
 
-_CeladonCityText7: ; a5c30 (29:5c30)
+_CeladonCityText7:
     db $0,"POLIWRATH: Ribi",$4f
     db "ribit!@@"
 
-_CeladonCityText8: ; a5c49 (29:5c49)
+_CeladonCityText8:
     db $0,"What are you",$4f
     db "staring at?",$57
 
-_CeladonCityText9: ; a5c63 (29:5c63)
+_CeladonCityText9:
     db $0,"Keep out of TEAM",$4f
     db "ROCKET's way!",$57
 
-_CeladonCityText10: ; a5c82 (29:5c82)
+_CeladonCityText10:
     db $0,"TRAINER TIPS",$51
     db "X ACCURACY boosts",$4f
     db "the accuracy of",$55
@@ -130174,27 +130051,27 @@ _CeladonCityText10: ; a5c82 (29:5c82)
     db "CELADON DEPT.",$55
     db "STORE!",$57
 
-_CeladonCityText11: ; a5d18 (29:5d18)
+_CeladonCityText11:
     db $0,"CELADON CITY",$4f
     db "The City of",$55
     db "Rainbow Dreams",$57
 
-_CeladonCityText13: ; a5d41 (29:5d41)
+_CeladonCityText13:
     db $0,"CELADON CITY",$4f
     db "#MON GYM",$55
     db "LEADER: ERIKA",$51
     db "The Nature Loving",$4f
     db "Princess!",$57
 
-_CeladonCityText14: ; a5d82 (29:5d82)
+_CeladonCityText14:
     db $0,"CELADON MANSION",$57
 
-_CeladonCityText15: ; a5d93 (29:5d93)
+_CeladonCityText15:
     db $0,"Find what you",$4f
     db "need at CELADON",$55
     db "DEPT. STORE!",$57
 
-_CeladonCityText16: ; a5dbf (29:5dbf)
+_CeladonCityText16:
     db $0,"TRAINER TIPS",$51
     db "GUARD SPEC.",$4f
     db "protects #MON",$55
@@ -130205,23 +130082,23 @@ _CeladonCityText16: ; a5dbf (29:5dbf)
     db "CELADON DEPT.",$55
     db "STORE!",$57
 
-_CeladonCityText17: ; a5e3e (29:5e3e)
+_CeladonCityText17:
     db $0,"Coins exchanged",$4f
     db "for prizes!",$55
     db "PRIZE EXCHANGE",$57
 
-_CeladonCityText18: ; a5e6a (29:5e6a)
+_CeladonCityText18:
     db $0,"ROCKET GAME CORNER",$4f
     db "The playground",$55
     db "for grown-ups!",$57
 
-_FuchsiaCityText1: ; a5e9c (29:5e9c)
+_FuchsiaCityText1:
     db $0,"Did you try the",$4f
     db "SAFARI GAME? Some",$55
     db "#MON can only",$55
     db "be caught there.",$57
 
-_FuchsiaCityText2: ; a5ede (29:5ede)
+_FuchsiaCityText2:
     db $0,"SAFARI ZONE has a",$4f
     db "zoo in front of",$55
     db "the entrance.",$51
@@ -130229,160 +130106,158 @@ _FuchsiaCityText2: ; a5ede (29:5ede)
     db "SAFARI GAME for",$55
     db "catching #MON.",$57
 
-_FuchsiaCityText3: ; a5f3e (29:5f3e)
+_FuchsiaCityText3:
     db $0,"ERIK: Where's",$4f
     db "SARA? I said I'd",$55
     db "meet her here.",$57
 
-_FuchsiaCityText4: ; a5f6b (29:5f6b)
+_FuchsiaCityText4:
     db $0,"That item ball in",$4f
     db "there is really a",$55
     db "#MON.",$57
 
-_FuchsiaCityText5: ; a5f96 (29:5f96)
+_FuchsiaCityText5:
     db $0,"!",$57
 
- SECTION "_FuchsiaCityText13",ROMX[$5fc1],BANK[$29]
-
-_FuchsiaCityText13: ; a5fc1 (29:5fc1)
+_FuchsiaCityText13:
     db $0,"SAFARI GAME",$4f
     db "#MON-U-CATCH!",$57
 
-_FuchsiaCityText16: ; a5fdc (29:5fdc)
+_FuchsiaCityText16:
     db $0,"SAFARI ZONE",$4f
     db "WARDEN's HOME",$57
 
-_FuchsiaCityText17: ; a5ff6 (29:5ff6)
+_FuchsiaCityText17:
     db $0,"#MON PARADISE",$4f
     db "SAFARI ZONE",$57
 
-_FuchsiaCityText18: ; a6011 (29:6011)
+_FuchsiaCityText18:
     db $0,"FUCHSIA CITY",$4f
     db "#MON GYM",$55
     db "LEADER: KOGA",$51
     db "The Poisonous",$4f
     db "Ninja Master",$57
 
-_FuchsiaCityChanseyText: ; a6050 (29:6050)
+_FuchsiaCityChanseyText:
     db $0,"Name: CHANSEY",$51
     db "Catching one is",$4f
     db "all up to chance.",$57
 
-_FuchsiaCityVoltorbText: ; a6081 (29:6081)
+_FuchsiaCityVoltorbText:
     db $0,"Name: VOLTORB",$51
     db "The very image of",$4f
     db "a # BALL.",$57
 
-_FuchsiaCityKangaskhanText: ; a60ac (29:60ac)
+_FuchsiaCityKangaskhanText:
     db $0,"Name: KANGASKHAN",$51
     db "A maternal #MON",$4f
     db "that raises its",$55
     db "young in a pouch",$55
     db "on its belly.",$57
 
-_FuchsiaCitySlowpokeText: ; a60fd (29:60fd)
+_FuchsiaCitySlowpokeText:
     db $0,"Name: SLOWPOKE",$51
     db "Friendly and very",$4f
     db "slow moving.",$57
 
-_FuchsiaCityLaprasText: ; a612c (29:612c)
+_FuchsiaCityLaprasText:
     db $0,"Name: LAPRAS",$51
     db "A.K.A. the king",$4f
     db "of the seas.",$57
 
-_FuchsiaCityOmanyteText: ; a6157 (29:6157)
+_FuchsiaCityOmanyteText:
     db $0,"Name: OMANYTE",$51
     db "A #MON that",$4f
     db "was resurrected",$55
     db "from a fossil.",$57
 
-_FuchsiaCityKabutoText: ; a6191 (29:6191)
+_FuchsiaCityKabutoText:
     db $0,"Name: KABUTO",$51
     db "A #MON that",$4f
     db "was resurrected",$55
     db "from a fossil.",$57
 
-_UnnamedText_19b2a: ; a61ca (29:61ca)
+_UnnamedText_19b2a:
     db $0,"...",$57
 
-_CinnabarIslandText8: ; a61cf (29:61cf)
+_CinnabarIslandText8:
     db $0,"The door is",$4f
     db "locked...",$57
 
-_CinnabarIslandText1: ; a61e6 (29:61e6)
+_CinnabarIslandText1:
     db $0,"CINNABAR GYM's",$4f
     db "BLAINE is an odd",$55
     db "man who has lived",$55
     db "here for decades.",$57
 
-_CinnabarIslandText2: ; a622a (29:622a)
+_CinnabarIslandText2:
     db $0,"Scientists conduct",$4f
     db "experiments in",$55
     db "the burned out",$55
     db "building.",$57
 
-_CinnabarIslandText3: ; a6266 (29:6266)
+_CinnabarIslandText3:
     db $0,"CINNABAR ISLAND",$4f
     db "The Fiery Town of",$55
     db "Burning Desire",$57
 
-_CinnabarIslandText6: ; a6298 (29:6298)
+_CinnabarIslandText6:
     db $0,"#MON LAB",$57
 
-_CinnabarIslandText7: ; a62a2 (29:62a2)
+_CinnabarIslandText7:
     db $0,"CINNABAR ISLAND",$4f
     db "#MON GYM",$55
     db "LEADER: BLAINE",$51
     db "The Hot-Headed",$4f
     db "Quiz Master!",$57
 
-_SaffronCityText1: ; a62e7 (29:62e7)
+_SaffronCityText1:
     db $0,"What do you want?",$4f
     db "Get lost!",$57
 
-_SaffronCityText2: ; a6304 (29:6304)
+_SaffronCityText2:
     db $0,"BOSS said he'll",$4f
     db "take this town!",$57
 
-_SaffronCityText3: ; a6324 (29:6324)
+_SaffronCityText3:
     db $0,"Get out of the",$4f
     db "way!",$57
 
-_SaffronCityText4: ; a6339 (29:6339)
+_SaffronCityText4:
     db $0,"SAFFRON belongs",$4f
     db "to TEAM ROCKET!",$57
 
-_SaffronCityText5: ; a635a (29:635a)
+_SaffronCityText5:
     db $0,"Being evil makes",$4f
     db "me feel so alive!",$57
 
-_SaffronCityText6: ; a637e (29:637e)
+_SaffronCityText6:
     db $0,"Ow! Watch where",$4f
     db "you're walking!",$57
 
-_SaffronCityText7: ; a639e (29:639e)
+_SaffronCityText7:
     db $0,"With SILPH under",$4f
     db "control,we can",$55
     db "exploit #MON",$55
     db "around the world!",$57
 
-_SaffronCityText8: ; a63df (29:63df)
+_SaffronCityText8:
     db $0,"You beat TEAM",$4f
     db "ROCKET all alone?",$55
     db "That's amazing!",$57
 
-_SaffronCityText9: ; a640f (29:640f)
+_SaffronCityText9:
     db $0,"Yeah! TEAM ROCKET",$4f
     db "is gone!",$55
     db "It's safe to go",$55
     db "out again!",$57
 
-_SaffronCityText10: ; a6445 (29:6445)
+_SaffronCityText10:
     db $0,"People should be",$4f
     db "flocking back to",$55
     db "SAFFRON now.",$57
 
-_SaffronCityText11: ; a6475 (29:6475)
+_SaffronCityText11:
     db $0,"I flew here on my",$4f
     db "PIDGEOT when I",$55
     db "read about SILPH.",$51
@@ -130390,42 +130265,42 @@ _SaffronCityText11: ; a6475 (29:6475)
     db "I missed the",$55
     db "media action.",$57
 
-_SaffronCityText12: ; a64d6 (29:64d6)
+_SaffronCityText12:
     db $0,"PIDGEOT: Bi bibii!@@"
 
-_SaffronCityText13: ; a64eb (29:64eb)
+_SaffronCityText13:
     db $0,"I saw ROCKET",$4f
     db "BOSS escaping",$55
     db "SILPH's building.",$57
 
-_SaffronCityText14: ; a6518 (29:6518)
+_SaffronCityText14:
     db $0,"I'm a security",$4f
     db "guard.",$51
     db "Suspicious kids I",$4f
     db "don't allow in!",$57
 
-_SaffronCityText15: ; a654f (29:654f)
+_SaffronCityText15:
     db $0,"...",$4f
     db "Snore ",$CA,$CA,$51
     db "Hah! He's taking",$4f
     db "a snooze!",$57
 
-_SaffronCityText16: ; a6577 (29:6577)
+_SaffronCityText16:
     db $0,"SAFFRON CITY",$4f
     db "Shining,Golden",$55
     db "Land of Commerce",$57
 
-_SaffronCityText17: ; a65a6 (29:65a6)
+_SaffronCityText17:
     db $0,"FIGHTING DOJO",$57
 
-_SaffronCityText18: ; a65b5 (29:65b5)
+_SaffronCityText18:
     db $0,"SAFFRON CITY",$4f
     db "#MON GYM",$55
     db "LEADER: SABRINA",$51
     db "The Master of",$4f
     db "Psychic #MON!",$57
 
-_SaffronCityText20: ; a65f8 (29:65f8)
+_SaffronCityText20:
     db $0,"TRAINER TIPS",$51
     db "FULL HEAL cures",$4f
     db "all ailments like",$55
@@ -130434,7 +130309,7 @@ _SaffronCityText20: ; a65f8 (29:65f8)
     db "more,but it's",$55
     db "more convenient.",$57
 
-_SaffronCityText21: ; a6667 (29:6667)
+_SaffronCityText21:
     db $0,"TRAINER TIPS",$51
     db "New GREAT BALL",$4f
     db "offers improved",$55
@@ -130443,50 +130318,48 @@ _SaffronCityText21: ; a6667 (29:6667)
     db "hard-to-catch",$55
     db "#MON.",$57
 
-_SaffronCityText22: ; a66c7 (29:66c7)
+_SaffronCityText22:
     db $0,"SILPH CO.",$4f
     db "OFFICE BUILDING",$57
 
-_SaffronCityText24: ; a66e2 (29:66e2)
+_SaffronCityText24:
     db $0,"MR.PSYCHIC's",$4f
     db "HOUSE",$57
 
-_SaffronCityText25: ; a66f5 (29:66f5)
+_SaffronCityText25:
     db $0,"SILPH's latest",$4f
     db "product!",$51
     db "Release to be",$4f
     db "determined...",$57
 
-_ItemUseBallText00: ; a6729 (29:6729)
+_ItemUseBallText00:
     db 0,"It dodged the",$4F
     db "thrown BALL!",$51
     db "This #MON",$4F
     db "can't be caught!",$58
 
-_ItemUseBallText01: ; a675f (29:675f)
+_ItemUseBallText01:
     db 0,"You missed the",$4F
     db "#MON!",$58
 
-_ItemUseBallText02: ; a6775 (29:6775)
+_ItemUseBallText02:
     db 0,"Darn! The #MON",$4F
     db "broke free!",$58
 
-_ItemUseBallText03: ; a6791 (29:6791)
+_ItemUseBallText03:
     db 0,"Aww! It appeared",$4F
     db "to be caught! ",$58
 
-_ItemUseBallText04: ; a67b2 (29:67b2)
+_ItemUseBallText04:
     db 0,"Shoot! It was so",$4F
     db "close too!",$58
 
-_ItemUseBallText05: ; a67cf (29:67cf)
+_ItemUseBallText05:
     db 0,"Yeah! @",1
     dw W_ENEMYMONNAME
     db 0,$4f,"was caught!@@"
 
-SECTION "_ItemUseBallText08",ROMX[$6810],BANK[$29]
-
-_ItemUseBallText08: ; a6810 (29:6810)
+_ItemUseBallText08:
     db 1
     dw $DE06
     db 0," sent to",$4F
@@ -130502,28 +130375,26 @@ _ItemUseBallText06:
     db 0,"New #DEX data",$4F
     db "will be added!@@"
 
-SECTION "_SurfingNoPlaceToGetOffText",ROMX[$686f],BANK[$29]
-
-_SurfingNoPlaceToGetOffText: ; a686f (29:686f)
+_SurfingNoPlaceToGetOffText:
     db $0,"There's no place",$4f
     db "to get off!",$58
 
-_VitaminStatRoseText: ; a688c (29:688c)
+_VitaminStatRoseText:
     TX_RAM $cd6d
     db $0,"'s",$4f
     db "@"
     TX_RAM $cf4b
     db $0," rose.",$58
 
-_VitaminNoEffectText: ; a689e (29:689e)
+_VitaminNoEffectText:
     db $0,"It won't have any",$4f
     db "effect.",$58
 
-_ThrewBaitText: ; a68b8 (29:68b8)
+_ThrewBaitText:
     db $0,$52," threw",$4f
     db "some BAIT.",$57
 
-_ThrewRockText: ; a68cc (29:68cc)
+_ThrewRockText:
     db $0,$52," threw a",$4f
     db "ROCK.",$57
 
@@ -130535,24 +130406,22 @@ _PlayedFluteHadEffectText:
     db $0,$52," played the",$4f
     db "# FLUTE.",$57
 
-SECTION "_CoinCaseNumCoinsText",ROMX[$6940],BANK[$29]
-
-_CoinCaseNumCoinsText: ; a6940 (29:6940)
+_CoinCaseNumCoinsText:
     db $0,"Coins",$4f
     db "@"
     db $2,$a4,$d5,$c2 ; print BCD number
     db $0," ",$58
 
-_ItemfinderFoundItemText: ; a694f (29:694f)
+_ItemfinderFoundItemText:
     db $0,"Yes! ITEMFINDER",$4f
     db "indicates there's",$55
     db "an item nearby.",$58
 
-_ItemfinderFoundNothingText: ; a6981 (29:6981)
+_ItemfinderFoundNothingText:
     db $0,"Nope! ITEMFINDER",$4f
     db "isn't responding.",$58
 
-_PPRestoredText: ; a6a0d (29:6a0d)
+_PPRestoredText:
     TX_NUM $d11e,1,3
     db $0,$DA," ENERGY",$4f
     db "Restored!",$58
@@ -130571,38 +130440,36 @@ _MonCannotLearnMachineMoveText:
     TX_RAM $cf4b
     db $0,".",$58
 
-SECTION "_ItemUseNotTimeText",ROMX[$6aa6],BANK[$29]
-
-_ItemUseNotTimeText: ; a6aa6 (29:6aa6)
+_ItemUseNotTimeText:
     db $0,"OAK: ",$52,"!",$4f
     db "This isn't the",$55
     db "time to use that! ",$58
 
-_ItemUseNotYoursToUseText: ; a6ad0 (29:6ad0)
+_ItemUseNotYoursToUseText:
     db $0,"This isn't yours",$4f
     db "to use!",$58
 
-_ItemUseNoEffectText: ; a6ae9 (29:6ae9)
+_ItemUseNoEffectText:
     db $0,"It won't have any",$4f
     db "effect.",$58
 
-_ThrowBallAtTrainerMonText1: ; a6b03 (29:6b03)
+_ThrowBallAtTrainerMonText1:
     db $0,"The trainer",$4f
     db "blocked the BALL!",$58
 
-_ThrowBallAtTrainerMonText2: ; a6b22 (29:6b22)
+_ThrowBallAtTrainerMonText2:
     db $0,"Don't be a thief!",$58
 
-_NoCyclingAllowedHereText: ; a6b34 (29:6b34)
+_NoCyclingAllowedHereText:
     db $0,"No cycling",$4e,"allowed here.",$58
 
-_NoSurfingHereText: ; a6b4e (29:6b4e)
+_NoSurfingHereText:
     db $0,"No FLOAT on  ",$4f
     db "@"
     TX_RAM $cd6d
     db $0," here!",$58
 
-_BoxFullCannotThrowBallText: ; a6b69 (29:6b69)
+_BoxFullCannotThrowBallText:
     db $0,"The #MON BOX",$4f
     db "is full! Can't",$55
     db "use that item!",$58
@@ -130708,53 +130575,51 @@ _SurfingText:
 
 SECTION "bank2A",ROMX,BANK[$2A]
 
-_ItemUseText001: ; a8000 (2a:4000)
+_ItemUseText001:
     db 0,$52," used@@"
 
-_ItemUseText002: ; a8009 (2a:4009)
+_ItemUseText002:
     TX_RAM $cf4b
     db $0,"!",$57
 
-_GotOnBicycleText1: ; a800f (2a:400f)
+_GotOnBicycleText1:
     db $0,$52," got on the@@"
 
-_GotOnBicycleText2: ; a801e (2a:401e)
+_GotOnBicycleText2:
     TX_RAM $cf4b
     db $0,"!",$58
 
-_GotOffBicycleText1: ; a8024 (2a:4024)
+_GotOffBicycleText1:
     db $0,$52," got off@@"
 
-_GotOffBicycleText2: ; a8030 (2a:4030)
+_GotOffBicycleText2:
     db $0,"the @"
     TX_RAM $cf4b
     db $0,".",$58
 
-_ThrewAwayItemText: ; a803c (2a:403c)
+_ThrewAwayItemText:
     db $0,"Threw away",$4f
     db "@"
 
-UnnamedText_a8049: ; a8049 (2a:4049)
+UnnamedText_a8049:
     TX_RAM $cd6d
     db $0,".",$58
 
-_IsItOKToTossItemText: ; a804f (2a:404f)
+_IsItOKToTossItemText:
     db $0,"Is it OK to toss",$4f
     db "@"
     TX_RAM $cf4b
     db $0,"?",$58
 
-_TooImportantToTossText: ; a8068 (2a:4068)
+_TooImportantToTossText:
     db $0,"That's too impor-",$4f
     db "tant to toss!",$58
 
-SECTION "_UnnamedText_71d88",ROMX[$409a],BANK[$2a]
-
-_UnnamedText_71d88: ; a809a (2a:409a)
+_UnnamedText_71d88:
     db $0,"Okay,connect the",$4f
     db "cable like so!",$58
 
-_UnnamedText_71d8d: ; a80bc (2a:40bc)
+_UnnamedText_71d8d:
     db $0,$52," traded",$4f
     db "@"
     TX_RAM $cd13
@@ -130763,7 +130628,7 @@ _UnnamedText_71d8d: ; a80bc (2a:40bc)
     TX_RAM $cd1e
     db $0,"!@@"
 
-_UnnamedText_71d94: ; a80d8 (2a:40d8)
+_UnnamedText_71d94:
     db $0,"I'm looking for",$4f
     db "@"
     TX_RAM $cd13
@@ -130773,30 +130638,30 @@ _UnnamedText_71d94: ; a80d8 (2a:40d8)
     TX_RAM $cd1e
     db $0,"? ",$57
 
-_UnnamedText_71d99: ; a810b (2a:410b)
+_UnnamedText_71d99:
     db $0,"Awww!",$4f
     db "Oh well...",$57
 
-_UnnamedText_71d9e: ; a811d (2a:411d)
+_UnnamedText_71d9e:
     db $0,"What? That's not",$4f
     db "@"
 
-UnnamedText_a812f: ; a812f (2a:412f)
+UnnamedText_a812f:
     TX_RAM $cd13
     db $0,"!",$51
     db "If you get one,",$4f
     db "come back here!",$57
 
-_UnnamedText_71da3: ; a8155 (2a:4155)
+_UnnamedText_71da3:
     db $0,"Hey thanks!",$57
 
-_UnnamedText_71da8: ; a8162 (2a:4162)
+_UnnamedText_71da8:
     db $0,"Isn't my old",$4f
     db "@"
     TX_RAM $cd1e
     db $0," great?",$57
 
-_UnnamedText_71dad: ; a817c (2a:417c)
+_UnnamedText_71dad:
     db $0,"Hello there! Do",$4f
     db "you want to trade",$51
     db "your @"
@@ -130806,11 +130671,11 @@ _UnnamedText_71dad: ; a817c (2a:417c)
     TX_RAM $cd1e
     db $0,"?",$57
 
-_UnnamedText_71db2: ; a81b5 (2a:41b5)
+_UnnamedText_71db2:
     db $0,"Well,if you",$4f
     db "don't want to...",$57
 
-_UnnamedText_71db7: ; a81d3 (2a:41d3)
+_UnnamedText_71db7:
     db $0,"Hmmm? This isn't",$4f
     db "@"
     TX_RAM $cd13
@@ -130818,17 +130683,17 @@ _UnnamedText_71db7: ; a81d3 (2a:41d3)
     db "Think of me when",$4f
     db "you get one.",$57
 
-_UnnamedText_71dbc: ; a8209 (2a:4209)
+_UnnamedText_71dbc:
     db $0,"Thanks!",$57
 
-_UnnamedText_71dc1: ; a8212 (2a:4212)
+_UnnamedText_71dc1:
     db $0,"The @"
     TX_RAM $cd13
     db $0," you",$4f
     db "traded to me",$51
     db "went and evolved!",$57
 
-_UnnamedText_71dc6: ; a8240 (2a:4240)
+_UnnamedText_71dc6:
     db $0,"Hi! Do you have",$4f
     db "@"
     TX_RAM $cd13
@@ -130838,10 +130703,10 @@ _UnnamedText_71dc6: ; a8240 (2a:4240)
     TX_RAM $cd1e
     db $0,"?",$57
 
-_UnnamedText_71dcb: ; a8274 (2a:4274)
+_UnnamedText_71dcb:
     db $0,"That's too bad.",$57
 
-_UnnamedText_71dd0: ; a8284 (2a:4284)
+_UnnamedText_71dd0:
     db $0,"...This is no",$4f
     db "@"
     TX_RAM $cd13
@@ -130849,10 +130714,10 @@ _UnnamedText_71dd0: ; a8284 (2a:4284)
     db "If you get one,",$4f
     db "trade it with me!",$57
 
-_UnnamedText_71dd5: ; a82bc (2a:42bc)
+_UnnamedText_71dd5:
     db $0,"Thanks pal!",$57
 
-_UnnamedText_71dda: ; a82c9 (2a:42c9)
+_UnnamedText_71dda:
     db $0,"How is my old",$4f
     db "@"
     TX_RAM $cd1e
