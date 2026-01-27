@@ -22834,11 +22834,6 @@ UseItem_:
     dw UnusableItem      ; ItemUsePPRestore ; MAX_ETHER
     dw ItemUsePPRestore  ; ELIXER
     dw UnusableItem      ; ItemUsePPRestore ; MAX_ELIXER
-    dw UnusableItem      ; CUT      ; Ex HM_01 ; Ex NATURE POWER
-    dw UnusableItem      ; FLY      ; Ex HM_02 ; Ex AIR POWER
-    dw UnusableItem      ; FLOAT    ; Ex HM_03 ; Ex WATER POWER
-    dw UnusableItem      ; STRENGTH ; Ex HM_04 ; Ex EARTH POWER
-    dw UnusableItem      ; LIGHT    ; Ex HM_05 ; Ex FIRE POWER
 
 IsSurfingAllowed:
     ld hl,$d728
