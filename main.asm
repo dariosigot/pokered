@@ -117282,13391 +117282,15930 @@ INCLUDE "music/jigglypuffsong.asm"
 INCLUDE "music/halloffame.asm"
 INCLUDE "music/credits.asm"
 
+text_init EQUS "db $00"     ; init
+text_line EQUS "db $4F"     ; \n (new line) after an "init"
+text_cont EQUS "db $55"     ; continue with scroll text
+text_para EQUS "db $51"     ; new paragraph (Clear all previous Text)
+text_done EQUS "db $57"     ; text end
+text_wait EQUS "db $58"     ; text end wait button press
+text_paus EQUS "db $50"     ; text pause, follow by another function
+text_stop EQUS "db $50"     ; text single end
+text_past EQUS "db $50,$50" ; text double end
+
 SECTION "bank20",ROMX,BANK[$20]
 
 _CardKeySuccessText1:
-    db $0,"Bingo!@@"
+    text_init , "Bingo!"
+    text_past
 
 _CardKeySuccessText2:
-    db $0,$4f
-    db "The CARD KEY",$55
-    db "opened the door!",$57
+    text_init
+    text_line , "The CARD KEY"
+    text_cont , "opened the door!"
+    text_done
 
 _CardKeyFailText:
-    db $0,"Darn! It needs a",$4f
-    db "CARD KEY!",$57
+    text_init , "Darn! It needs a"
+    text_line , "CARD KEY!"
+    text_done
 
 _UnnamedText_33cf:
     TX_RAM $cd6d
-    db $0,": @@"
+    text_init , ": "
+    text_past
 
 _UnnamedText_70847:
-    db $0,"Not even a nibble!",$58
+    text_init , "Not even a nibble!"
+    text_wait
 
 _UnnamedText_7084c:
-    db $0,"Looks like there's",$4f
-    db "nothing here.",$58
+    text_init , "Looks like there's"
+    text_line , "nothing here."
+    text_wait
 
 _UnnamedText_70851:
-    db $0,"Oh!",$4f
-    db "It's a bite!",$58
+    text_init , "Oh!"
+    text_line , "It's a bite!"
+    text_wait
 
 _UnnamedText_24db:
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _UnnamedText_24e0:
-    db $0,"Ground rose up",$4f
-    db "somewhere!",$57
+    text_init , "Ground rose up"
+    text_line , "somewhere!"
+    text_done
 
 _BoulderText:
-    db $0,"This requires",$4f
-    db "STRENGTH to move!",$57
+    text_init , "This requires"
+    text_line , "STRENGTH to move!"
+    text_done
 
 _MartSignText:
-    db $0,"All your item",$4f
-    db "needs fulfilled!",$55
-    db "#MON MART",$57
+    text_init , "All your item"
+    text_line , "needs fulfilled!"
+    text_cont , "#MON MART"
+    text_done
 
 _PokeCenterSignText:
-    db $0,"Heal Your #MON!",$4f
-    db "#MON CENTER",$57
+    text_init , "Heal Your #MON!"
+    text_line , "#MON CENTER"
+    text_done
 
 _FoundItemText:
-    db $0,$52," found",$4f
-    db "@"
+    text_init , $52," found"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _NoMoreRoomForItemText:
-    db $0,"No more room for",$4f
-    db "items!",$57
+    text_init , "No more room for"
+    text_line , "items!"
+    text_done
 
 _UnnamedText_59091:
-    db $0,"Hi! Remember me?",$4f
-    db "I'm PROF.OAK's",$55
-    db "AIDE!",$51
-    db "If you caught @"
-
-UnnamedText_80177:
+    text_init , "Hi! Remember me?"
+    text_line , "I'm PROF.OAK's"
+    text_cont , "AIDE!"
+    text_para , "If you caught "
+    text_paus
     TX_NUM $ffdb,1,3
-    db $0,$4f
-    db "kinds of #MON,",$55
-    db "I'm supposed to",$55
-    db "give you a ",$55
-    db "@"
+    text_init
+    text_line , "kinds of #MON,"
+    text_cont , "I'm supposed to"
+    text_cont , "give you a "
+    text_cont
+    text_paus
     TX_RAM $cc5b
-    db $0,"!",$51
-    db "So,",$52,"! Have",$4f
-    db "you caught at",$55
-    db "least @"
+    text_init , "!"
+    text_para , "So,",$52,"! Have"
+    text_line , "you caught at"
+    text_cont , "least "
+    text_paus
     TX_NUM $ffdb,1,3
-    db $0," kinds of",$55
-    db "#MON?",$57
+    text_init , " kinds of"
+    text_cont , "#MON?"
+    text_done
 
 _UnnamedText_59096:
-    db $0,"Let's see...",$4f
-    db "Uh-oh! You have",$55
-    db "caught only @"
-
-UnnamedText_8020e:
+    text_init , "Let's see..."
+    text_line , "Uh-oh! You have"
+    text_cont , "caught only "
+    text_paus
     TX_NUM $ffdd,1,3
-    db $0,$55
-    db "kinds of #MON!",$51
-    db "You need @"
+    text_init
+    text_cont , "kinds of #MON!"
+    text_para , "You need "
+    text_paus
     TX_NUM $ffdb,1,3
-    db $0," kinds",$4f
-    db "if you want the",$55
-    db "@"
+    text_init , " kinds"
+    text_line , "if you want the"
+    text_cont
+    text_paus
     TX_RAM $cc5b
-    db $0,".",$57
+    text_init , "."
+    text_done
 
 _UnnamedText_5909b:
-    db $0,"Oh. I see.",$51
-    db "When you get @"
+    text_init , "Oh. I see."
+    text_para , "When you get "
+    text_paus
     TX_NUM $ffdb,1,3
-    db $0,$4f
-    db "kinds,come back",$55
-    db "for @"
+    text_init
+    text_line , "kinds,come back"
+    text_cont , "for "
+    text_paus
     TX_RAM $cc5b
-    db $0,".",$57
+    text_init , "."
+    text_done
 
 _UnnamedText_590a0:
-    db $0,"Great! You have",$4f
-    db "caught @"
-
-UnnamedText_802a5:
+    text_init , "Great! You have"
+    text_line , "caught "
+    text_paus
     TX_NUM $ffdd,1,3
-    db $0," kinds ",$55
-    db "of #MON!",$55
-    db "Congratulations!",$51
-    db "Here you go!",$58
+    text_init , " kinds "
+    text_cont , "of #MON!"
+    text_cont , "Congratulations!"
+    text_para , "Here you go!"
+    text_wait
 
 _UnnamedText_590a5:
-    db $0,$52," got the",$4f
-    db "@"
+    text_init , $52," got the"
+    text_line
+    text_paus
     TX_RAM $cc5b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_590ab:
-    db $0,"Oh! I see you",$4f
-    db "don't have any",$55
-    db "room for the",$55
-    db "@"
-
-UnnamedText_80317:
+    text_init , "Oh! I see you"
+    text_line , "don't have any"
+    text_cont , "room for the"
+    text_cont
+    text_paus
     TX_RAM $cc5b
-    db $0,".",$57
+    text_init , "."
+    text_done
 
 _ViridianForestText1:
-    db $0,"I came here with",$4f
-    db "some friends!",$51
-    db "They're out for",$4f
-    db "#MON fights!",$57
+    text_init , "I came here with"
+    text_line , "some friends!"
+    text_para , "They're out for"
+    text_line , "#MON fights!"
+    text_done
 
 _ViridianForestBattleText1:
-    db $0,"Hey! You have",$4f
-    db "#MON! Come on!",$55
-    db "Let's battle'em!",$57
+    text_init , "Hey! You have"
+    text_line , "#MON! Come on!"
+    text_cont , "Let's battle'em!"
+    text_done
 
 _ViridianForestEndBattleText1:
-    db $0,"No!",$4f
-    db "CATERPIE can't",$55
-    db "cut it!",$58
+    text_init , "No!"
+    text_line , "CATERPIE can't"
+    text_cont , "cut it!"
+    text_wait
 
 _ViridianFrstAfterBattleText1:
-    db $0,"Ssh! You'll scare",$4f
-    db "the bugs away!",$57
+    text_init , "Ssh! You'll scare"
+    text_line , "the bugs away!"
+    text_done
 
 _ViridianForestBattleText2:
-    db $0,"Yo! You can't jam",$4f
-    db "out if you're a",$55
-    db "#MON trainer!",$57
+    text_init , "Yo! You can't jam"
+    text_line , "out if you're a"
+    text_cont , "#MON trainer!"
+    text_done
 
 _ViridianForestEndBattleText2:
-    db $0,"Huh?",$4f
-    db "I ran out of",$55
-    db "#MON!",$58
+    text_init , "Huh?"
+    text_line , "I ran out of"
+    text_cont , "#MON!"
+    text_wait
 
 _ViridianFrstAfterBattleText2:
-    db $0,"Darn! I'm going",$4f
-    db "to catch some",$55
-    db "stronger ones!",$57
+    text_init , "Darn! I'm going"
+    text_line , "to catch some"
+    text_cont , "stronger ones!"
+    text_done
 
 _ViridianForestBattleText3:
-    db $0,"Hey,wait up!",$4f
-    db "What's the hurry?",$57
+    text_init , "Hey,wait up!"
+    text_line , "What's the hurry?"
+    text_done
 
 _ViridianForestEndBattleText3:
-    db $0,"I",$4f
-    db "give! You're good",$55
-    db "at this!",$58
+    text_init , "I"
+    text_line , "give! You're good"
+    text_cont , "at this!"
+    text_wait
 
 _ViridianFrstAfterBattleText3:
-    db $0,"Sometimes,you",$4f
-    db "can find stuff on",$55
-    db "the ground!",$51
-    db "I'm looking for",$4f
-    db "the stuff I",$55
-    db "dropped!",$57
+    text_init , "Sometimes,you"
+    text_line , "can find stuff on"
+    text_cont , "the ground!"
+    text_para , "I'm looking for"
+    text_line , "the stuff I"
+    text_cont , "dropped!"
+    text_done
 
 _ViridianForestText8:
-    db $0,"I ran out of #",$4f
-    db "BALLs to catch",$55
-    db "#MON with!",$51
-    db "You should carry",$4f
-    db "extras!",$57
+    text_init , "I ran out of #"
+    text_line , "BALLs to catch"
+    text_cont , "#MON with!"
+    text_para , "You should carry"
+    text_line , "extras!"
+    text_done
 
 _ViridianForestText9:
-    db $0,"TRAINER TIPS",$51
-    db "If you want to",$4f
-    db "avoid battles,",$55
-    db "stay away from",$55
-    db "grassy areas!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "If you want to"
+    text_line , "avoid battles,"
+    text_cont , "stay away from"
+    text_cont , "grassy areas!"
+    text_done
 
 _ViridianForestText10:
-    db $0,"For poison,use",$4f
-    db "ANTIDOTE! Get it",$55
-    db "at #MON MARTs!",$57
+    text_init , "For poison,use"
+    text_line , "ANTIDOTE! Get it"
+    text_cont , "at #MON MARTs!"
+    text_done
 
 _ViridianForestText11:
-    db $0,"TRAINER TIPS",$51
-    db "Contact PROF.OAK",$4f
-    db "via PC to get",$55
-    db "your #DEX",$55
-    db "evaluated!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "Contact PROF.OAK"
+    text_line , "via PC to get"
+    text_cont , "your #DEX"
+    text_cont , "evaluated!"
+    text_done
 
 _ViridianForestText12:
-    db $0,"TRAINER TIPS",$51
-    db "No stealing of",$4f
-    db "#MON from",$55
-    db "other trainers!",$55
-    db "Catch only wild",$55
-    db "#MON!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "No stealing of"
+    text_line , "#MON from"
+    text_cont , "other trainers!"
+    text_cont , "Catch only wild"
+    text_cont , "#MON!"
+    text_done
 
 _ViridianForestText13:
-    db $0,"TRAINER TIPS",$51
-    db "Weaken #MON",$4f
-    db "before attempting",$55
-    db "capture!",$51
-    db "When healthy,",$4f
-    db "they may escape!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "Weaken #MON"
+    text_line , "before attempting"
+    text_cont , "capture!"
+    text_para , "When healthy,"
+    text_line , "they may escape!"
+    text_done
 
 _ViridianForestText14:
-    db $0,"LEAVING",$4f
-    db "VIRIDIAN FOREST",$55
-    db "PEWTER CITY AHEAD",$57
+    text_init , "LEAVING"
+    text_line , "VIRIDIAN FOREST"
+    text_cont , "PEWTER CITY AHEAD"
+    text_done
 
 _MtMoon1BattleText2:
-    db $0,"WHOA! You shocked",$4f
-    db "me! Oh,you're",$55
-    db "just a kid!",$57
+    text_init , "WHOA! You shocked"
+    text_line , "me! Oh,you're"
+    text_cont , "just a kid!"
+    text_done
 
 _MtMoon1EndBattleText2:
-    db $0,"Wow!",$4f
-    db "Shocked again!",$58
+    text_init , "Wow!"
+    text_line , "Shocked again!"
+    text_wait
 
 _HM07AfterText:
-    db $0,"Kids like you",$4f
-    db "shouldn't be",$55
-    db "here!",$57
+    text_init , "Kids like you"
+    text_line , "shouldn't be"
+    text_cont , "here!"
+    text_done
 
 _MtMoon1BattleText3:
-    db $0,"Did you come to",$4f
-    db "explore too?",$57
+    text_init , "Did you come to"
+    text_line , "explore too?"
+    text_done
 
 _MtMoon1EndBattleText3:
-    db $0,"Losing",$4f
-    db "stinks!",$58
+    text_init , "Losing"
+    text_line , "stinks!"
+    text_wait
 
 _MtMoon1AfterBattleText3:
-    db $0,"I came down here",$4f
-    db "to show off to",$55
-    db "girls.",$57
+    text_init , "I came down here"
+    text_line , "to show off to"
+    text_cont , "girls."
+    text_done
 
 _MtMoon1BattleText4:
-    db $0,"Wow! It's way",$4f
-    db "bigger in here",$55
-    db "than I thought!",$57
+    text_init , "Wow! It's way"
+    text_line , "bigger in here"
+    text_cont , "than I thought!"
+    text_done
 
 _MtMoon1EndBattleText4:
-    db $0,"Oh!",$4f
-    db "I lost it!",$58
+    text_init , "Oh!"
+    text_line , "I lost it!"
+    text_wait
 
 _MtMoon1AfterBattleText4:
-    db $0,"How do you get",$4f
-    db "out of here?",$57
+    text_init , "How do you get"
+    text_line , "out of here?"
+    text_done
 
 _MtMoon1BattleText5:
-    db $0,"What! Don't sneak",$4f
-    db "up on me!",$57
+    text_init , "What! Don't sneak"
+    text_line , "up on me!"
+    text_done
 
 _MtMoon1EndBattleText5:
-    db $0,"My",$4f
-    db "#MON won't do!",$58
+    text_init , "My"
+    text_line , "#MON won't do!"
+    text_wait
 
 _MtMoon1AfterBattleText5:
-    db $0,"I have to find",$4f
-    db "stronger #MON.",$57
+    text_init , "I have to find"
+    text_line , "stronger #MON."
+    text_done
 
 _MtMoon1BattleText6:
-    db $0,"What? I'm waiting",$4f
-    db "for my friends to",$55
-    db "find me here.",$57
+    text_init , "What? I'm waiting"
+    text_line , "for my friends to"
+    text_cont , "find me here."
+    text_done
 
 _MtMoon1EndBattleText6:
-    db $0,"I lost?",$58
+    text_init , "I lost?"
+    text_wait
 
 _MtMoon1AfterBattleText6:
-    db $0,"I heard there are",$4f
-    db "some very rare",$55
-    db "fossils here.",$57
+    text_init , "I heard there are"
+    text_line , "some very rare"
+    text_cont , "fossils here."
+    text_done
 
 _MtMoon1BattleText7:
-    db $0,"Suspicious men",$4f
-    db "are in the cave.",$55
-    db "What about you?",$57
+    text_init , "Suspicious men"
+    text_line , "are in the cave."
+    text_cont , "What about you?"
+    text_done
 
 _MtMoon1EndBattleText7:
-    db $0,"You",$4f
-    db "got me!",$58
+    text_init , "You"
+    text_line , "got me!"
+    text_wait
 
 _MtMoon1AfterBattleText7:
-    db $0,"I saw them! I'm",$4f
-    db "sure they're from",$55
-    db "TEAM ROCKET!",$57
+    text_init , "I saw them! I'm"
+    text_line , "sure they're from"
+    text_cont , "TEAM ROCKET!"
+    text_done
 
 _MtMoon1BattleText8:
-    db $0,"Go through this",$4f
-    db "cave to get to",$55
-    db "CERULEAN CITY!",$57
+    text_init , "Go through this"
+    text_line , "cave to get to"
+    text_cont , "CERULEAN CITY!"
+    text_done
 
 _MtMoon1EndBattleText8:
-    db $0,"I",$4f
-    db "lost.",$58
+    text_init , "I"
+    text_line , "lost."
+    text_wait
 
 _MtMoon1AfterBattleText8:
-    db $0,"ZUBAT is tough!",$4f
-    db "But,it can be",$55
-    db "useful if you",$55
-    db "catch one.",$57
+    text_init , "ZUBAT is tough!"
+    text_line , "But,it can be"
+    text_cont , "useful if you"
+    text_cont , "catch one."
+    text_done
 
 _MtMoon1Text14:
-    db $0,"Beware! ZUBAT is",$4f
-    db "a blood sucker!",$57
+    text_init , "Beware! ZUBAT is"
+    text_line , "a blood sucker!"
+    text_done
 
 _UnnamedText_51a48:
-    db $0,$57
+    text_init
+    text_done
 
 _UnnamedText_49f24:
-    db $0,"You want the",$4f
-    db "DOME FOSSIL?",$57
+    text_init , "You want the"
+    text_line , "DOME FOSSIL?"
+    text_done
 
 _UnnamedText_49f64:
-    db $0,"You want the",$4f
-    db "HELIX FOSSIL?",$57
+    text_init , "You want the"
+    text_line , "HELIX FOSSIL?"
+    text_done
 
 _UnnamedText_49f6f:
-    db $0,$52," got the",$4f
-    db "@"
+    text_init , $52," got the"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_49f7f:
-    db $0,"Look,you've got",$4f
-    db "no room for this.@@"
+    text_init , "Look,you've got"
+    text_line , "no room for this."
+    text_past
 
 _UnnamedText_49f85:
-    db $0,"Hey,stop!",$51
-    db "I found these",$4f
-    db "fossils! They're",$55
-    db "both mine!",$57
+    text_init , "Hey,stop!"
+    text_para , "I found these"
+    text_line , "fossils! They're"
+    text_cont , "both mine!"
+    text_done
 
 _UnnamedText_49f8a:
-    db $0,"OK!",$4f
-    db "I'll share!",$58
+    text_init , "OK!"
+    text_line , "I'll share!"
+    text_wait
 
 _UnnamedText_49f8f:
-    db $0,"We'll each take",$4f
-    db "one!",$55
-    db "No being greedy!",$57
+    text_init , "We'll each take"
+    text_line , "one!"
+    text_cont , "No being greedy!"
+    text_done
 
 _UnnamedText_49f94:
-    db $0,"Far away,on",$4f
-    db "CINNABAR ISLAND,",$55
-    db "there's a #MON",$55
-    db "LAB.",$51
-    db "They do research",$4f
-    db "on regenerating",$55
-    db "fossils.",$57
+    text_init , "Far away,on"
+    text_line , "CINNABAR ISLAND,"
+    text_cont , "there's a #MON"
+    text_cont , "LAB."
+    text_para , "They do research"
+    text_line , "on regenerating"
+    text_cont , "fossils."
+    text_done
 
 _UnnamedText_49f99:
-    db $0,"All right. Then",$4f
-    db "this is mine!@@"
+    text_init , "All right. Then"
+    text_line , "this is mine!"
+    text_past
 
 _MtMoon3BattleText2:
-    db $0,"TEAM ROCKET will",$4f
-    db "find the fossils,",$55
-    db "revive and sell",$55
-    db "them for cash!",$57
+    text_init , "TEAM ROCKET will"
+    text_line , "find the fossils,"
+    text_cont , "revive and sell"
+    text_cont , "them for cash!"
+    text_done
 
 _MtMoon3EndBattleText2:
-    db $0,"Urgh!",$4f
-    db "Now I'm mad!",$58
+    text_init , "Urgh!"
+    text_line , "Now I'm mad!"
+    text_wait
 
 _MtMoon3AfterBattleText2:
-    db $0,"You made me mad!",$4f
-    db "TEAM ROCKET will",$55
-    db "blacklist you!",$57
+    text_init , "You made me mad!"
+    text_line , "TEAM ROCKET will"
+    text_cont , "blacklist you!"
+    text_done
 
 _MtMoon3BattleText3:
-    db $0,"We,TEAM ROCKET,",$4f
-    db "are #MON",$55
-    db "gangsters!",$57
+    text_init , "We,TEAM ROCKET,"
+    text_line , "are #MON"
+    text_cont , "gangsters!"
+    text_done
 
 _MtMoon3EndBattleText3:
-    db $0,"I blew",$4f
-    db "it!",$58
+    text_init , "I blew"
+    text_line , "it!"
+    text_wait
 
 _MtMoon3AfterBattleText3:
-    db $0,"Darn it all! My",$4f
-    db "associates won't",$55
-    db "stand for this!",$57
+    text_init , "Darn it all! My"
+    text_line , "associates won't"
+    text_cont , "stand for this!"
+    text_done
 
 _MtMoon3BattleText4:
-    db $0,"We're pulling a",$4f
-    db "big job here!",$55
-    db "Get lost,kid!",$57
+    text_init , "We're pulling a"
+    text_line , "big job here!"
+    text_cont , "Get lost,kid!"
+    text_done
 
 _MtMoon3EndBattleText4:
-    db $0,"So,you",$4f
-    db "are good.",$58
+    text_init , "So,you"
+    text_line , "are good."
+    text_wait
 
 _MtMoon3AfterBattleText4:
-    db $0,"If you find a",$4f
-    db "fossil,give it",$55
-    db "to me and scram!",$57
+    text_init , "If you find a"
+    text_line , "fossil,give it"
+    text_cont , "to me and scram!"
+    text_done
 
 _MtMoon3BattleText5:
-    db $0,"Little kids",$4f
-    db "should leave",$55
-    db "grown-ups alone!",$57
+    text_init , "Little kids"
+    text_line , "should leave"
+    text_cont , "grown-ups alone!"
+    text_done
 
 _MtMoon3EndBattleText5:
-    db $0,"I'm",$4f
-    db "steamed!",$58
+    text_init , "I'm"
+    text_line , "steamed!"
+    text_wait
 
 _MtMoon3AfterBattleText5:
-    db $0,"#MON lived",$4f
-    db "here long before",$55
-    db "people came.",$57
+    text_init , "#MON lived"
+    text_line , "here long before"
+    text_cont , "people came."
+    text_done
 
 _SSAnne1Text1:
-    db $0,"Bonjour!",$4f
-    db "I am le waiter on",$55
-    db "this ship!",$51
-    db "I will be happy",$4f
-    db "to serve you any-",$55
-    db "thing you please!",$51
-    db "Ah! Le strong",$4f
-    db "silent type!",$57
+    text_init , "Bonjour!"
+    text_line , "I am le waiter on"
+    text_cont , "this ship!"
+    text_para , "I will be happy"
+    text_line , "to serve you any-"
+    text_cont , "thing you please!"
+    text_para , "Ah! Le strong"
+    text_line , "silent type!"
+    text_done
 
 _SSAnne1Text2:
-    db $0,"The passengers",$4f
-    db "are restless!",$51
-    db "You might be",$4f
-    db "challenged by the",$55
-    db "more bored ones!",$57
+    text_init , "The passengers"
+    text_line , "are restless!"
+    text_para , "You might be"
+    text_line , "challenged by the"
+    text_cont , "more bored ones!"
+    text_done
 
 _SSAnne2Text1:
-    db $0,"This ship,she is",$4f
-    db "a luxury liner",$55
-    db "for trainers!",$51
-    db "At every port,we",$4f
-    db "hold parties with",$55
-    db "invited trainers!",$57
+    text_init , "This ship,she is"
+    text_line , "a luxury liner"
+    text_cont , "for trainers!"
+    text_para , "At every port,we"
+    text_line , "hold parties with"
+    text_cont , "invited trainers!"
+    text_done
 
 _SSAnneRivalBeforeBattleText:
-    db $0,$53,": Bonjour!",$4f
-    db $52,"!",$51
-    db "Imagine seeing",$4f
-    db "you here!",$51
-    db $52,",were you",$4f
-    db "really invited?",$51
-    db "So how's your",$4f
-    db "#DEX coming?",$51
-    db "I already caught",$4f
-    db "40 kinds,pal!",$51
-    db "Different kinds",$4f
-    db "are everywhere!",$51
-    db "Crawl around in",$4f
-    db "grassy areas!",$57
+    text_init , $53,": Bonjour!"
+    text_line , $52,"!"
+    text_para , "Imagine seeing"
+    text_line , "you here!"
+    text_para,$52,",were you"
+    text_line , "really invited?"
+    text_para , "So how's your"
+    text_line , "#DEX coming?"
+    text_para , "I already caught"
+    text_line , "40 kinds,pal!"
+    text_para , "Different kinds"
+    text_line , "are everywhere!"
+    text_para , "Crawl around in"
+    text_line , "grassy areas!"
+    text_done
 
 _SSAnneRivalDefeatedText:
-    db $0,"Humph!",$51
-    db "At least you're",$4f
-    db "raising your",$55
-    db "#MON!",$58
+    text_init , "Humph!"
+    text_para , "At least you're"
+    text_line , "raising your"
+    text_cont , "#MON!"
+    text_wait
 
 _SSAnneRivalWonText:
-    db $0,$52,"! What are",$4f
-    db "you,seasick?",$51
-    db "You should shape",$4f
-    db "up,pal!",$58
+    text_init , $52,"! What are"
+    text_line , "you,seasick?"
+    text_para , "You should shape"
+    text_line , "up,pal!"
+    text_wait
 
 _SSAnneRivalCaptainText:
-    db $0,$53,": I heard",$4f
-    db "there was a CUT",$55
-    db "master on board.",$51
-    db "But,he was just a",$4f
-    db "seasick,old man!",$51
-    db "But,CUT itself is",$4f
-    db "really useful!",$51
-    db "You should go see",$4f
-    db "him! Smell ya!",$57
+    text_init , $53,": I heard"
+    text_line , "there was a CUT"
+    text_cont , "master on board."
+    text_para , "But,he was just a"
+    text_line , "seasick,old man!"
+    text_para , "But,CUT itself is"
+    text_line , "really useful!"
+    text_para , "You should go see"
+    text_line , "him! Smell ya!"
+    text_done
 
 _SSAnne3Text1:
-    db $0,"Our CAPTAIN is a",$4f
-    db "sword master!",$51
-    db "He even teaches",$4f
-    db "CUT to #MON!",$57
+    text_init , "Our CAPTAIN is a"
+    text_line , "sword master!"
+    text_para , "He even teaches"
+    text_line , "CUT to #MON!"
+    text_done
 
 _SSAnne5Text1:
-    db $0,"The party's over.",$4f
-    db "The ship will be",$55
-    db "departing soon.",$57
+    text_init , "The party's over."
+    text_line , "The ship will be"
+    text_cont , "departing soon."
+    text_done
 
 _SSAnne5Text2:
-    db $0,"Scrubbing decks",$4f
-    db "is hard work!",$57
+    text_init , "Scrubbing decks"
+    text_line , "is hard work!"
+    text_done
 
 _SSAnne5Text3:
-    db $0,"Urf. I feel ill.",$51
-    db "I stepped out to",$4f
-    db "get some air.",$57
+    text_init , "Urf. I feel ill."
+    text_para , "I stepped out to"
+    text_line , "get some air."
+    text_done
 
 _SSAnneBattleText1:
-    db $0,"Hey matey!",$51
-    db "Let's do a little",$4f
-    db "jig!",$57
+    text_init , "Hey matey!"
+    text_para , "Let's do a little"
+    text_line , "jig!"
+    text_done
 
 _SSAnneEndBattleText1:
-    db $0,"You're",$4f
-    db "impressive!",$58
+    text_init , "You're"
+    text_line , "impressive!"
+    text_wait
 
 _SSAnneAfterBattleText1:
-    db $0,"How many kinds of",$4f
-    db "#MON do you",$55
-    db "think there are?",$57
+    text_init , "How many kinds of"
+    text_line , "#MON do you"
+    text_cont , "think there are?"
+    text_done
 
 _SSAnneBattleText2:
-    db $0,"Ahoy there!",$4f
-    db "Are you seasick?",$57
+    text_init , "Ahoy there!"
+    text_line , "Are you seasick?"
+    text_done
 
 _SSAnneEndBattleText2:
-    db $0,"I was",$4f
-    db "just careless!",$58
+    text_init , "I was"
+    text_line , "just careless!"
+    text_wait
 
 _SSAnneAfterBattleText2:
-    db $0,"My Pa said there",$4f
-    db "are 100 kinds of",$55
-    db "#MON. I think",$55
-    db "there are more.",$57
+    text_init , "My Pa said there"
+    text_line , "are 100 kinds of"
+    text_cont , "#MON. I think"
+    text_cont , "there are more."
+    text_done
 
 _SSAnne6Text1:
-    db $0,"You,mon petit!",$4f
-    db "We're busy here!",$55
-    db "Out of the way!",$57
+    text_init , "You,mon petit!"
+    text_line , "We're busy here!"
+    text_cont , "Out of the way!"
+    text_done
 
 _SSAnne6Text2:
-    db $0,"I saw an odd ball",$4f
-    db "in the trash.",$57
+    text_init , "I saw an odd ball"
+    text_line , "in the trash."
+    text_done
 
 _SSAnne6Text3:
-    db $0,"I'm so busy I'm",$4f
-    db "getting dizzy!",$57
+    text_init , "I'm so busy I'm"
+    text_line , "getting dizzy!"
+    text_done
 
 _SSAnne6Text4:
-    db $0,"Hum-de-hum-de-",$4f
-    db "ho...",$51
-    db "I peel spuds",$4f
-    db "every day!",$55
-    db "Hum-hum...",$57
+    text_init , "Hum-de-hum-de-"
+    text_line , "ho..."
+    text_para , "I peel spuds"
+    text_line , "every day!"
+    text_cont , "Hum-hum..."
+    text_done
 
 _SSAnne6Text5:
-    db $0,"Did you hear about",$4f
-    db "SNORLAX?",$51
-    db "All it does is",$4f
-    db "eat and sleep!",$57
+    text_init , "Did you hear about"
+    text_line , "SNORLAX?"
+    text_para , "All it does is"
+    text_line , "eat and sleep!"
+    text_done
 
 _SSAnne6Text6:
-    db $0,"Snivel...Sniff...",$51
-    db "I only get to",$4f
-    db "peel onions...",$55
-    db "Snivel...",$57
+    text_init , "Snivel...Sniff..."
+    text_para , "I only get to"
+    text_line , "peel onions..."
+    text_cont , "Snivel..."
+    text_done
 
 _UnnamedText_61807:
-    db $0,"Er-hem! Indeed I",$4f
-    db "am le CHEF!",$51
-    db "Le main course is",$58
+    text_init , "Er-hem! Indeed I"
+    text_line , "am le CHEF!"
+    text_para , "Le main course is"
+    text_wait
 
 _UnnamedText_6180c:
-    db $0,"Salmon du Salad!",$51
-    db "Les guests may",$4f
-    db "gripe it's fish",$55
-    db "again,however!",$57
+    text_init , "Salmon du Salad!"
+    text_para , "Les guests may"
+    text_line , "gripe it's fish"
+    text_cont , "again,however!"
+    text_done
 
 _UnnamedText_61811:
-    db $0,"Eels au Barbecue!",$51
-    db "Les guests will",$4f
-    db "mutiny,I fear.",$57
+    text_init , "Eels au Barbecue!"
+    text_para , "Les guests will"
+    text_line , "mutiny,I fear."
+    text_done
 
 _UnnamedText_61816:
-    db $0,"Prime Beef Steak!",$51
-    db "But,have I enough",$4f
-    db "fillets du beef?",$57
+    text_init , "Prime Beef Steak!"
+    text_para , "But,have I enough"
+    text_line , "fillets du beef?"
+    text_done
 
 _SSAnne7RubText:
-    db $0,"CAPTAIN: Ooargh...",$4f
-    db "I feel hideous...",$55
-    db "Urrp! Seasick...",$51
-    db $52," rubbed",$4f
-    db "the CAPTAIN's",$55
-    db "back!",$51
-    db "Rub-rub...",$4f
-    db "Rub-rub...@@"
+    text_init , "CAPTAIN: Ooargh..."
+    text_line , "I feel hideous..."
+    text_cont , "Urrp! Seasick..."
+    text_para,$52," rubbed"
+    text_line , "the CAPTAIN's"
+    text_cont , "back!"
+    text_para , "Rub-rub..."
+    text_line , "Rub-rub..."
+    text_past
 
 _PreHM01Text:
-    db $0,"CAPTAIN: Whew!",$4f
-    db "Thank you! I",$55
-    db "feel much better!",$51
-    db "To thank you I",$4f
-    db "want to teach you",$55
-    db "and your #MON",$55
-    db "my CUT SKILL!",$58
+    text_init , "CAPTAIN: Whew!"
+    text_line , "Thank you! I"
+    text_cont , "feel much better!"
+    text_para , "To thank you I"
+    text_line , "want to teach you"
+    text_cont , "and your #MON"
+    text_cont , "my CUT SKILL!"
+    text_wait
 
 _HM01AfterText:
-    db $0,"CAPTAIN: Whew!",$51
-    db "Now that I'm not",$4f
-    db "sick any more,I",$55
-    db "guess it's time.",$57
+    text_init , "CAPTAIN: Whew!"
+    text_para , "Now that I'm not"
+    text_line , "sick any more,I"
+    text_cont , "guess it's time."
+    text_done
 
 _SSAnne7Text2:
-    db $0,"Yuck! Shouldn't",$4f
-    db "have looked!",$57
+    text_init , "Yuck! Shouldn't"
+    text_line , "have looked!"
+    text_done
 
 _SSAnne7Text3:
-    db $0,"How to Conquer",$4f
-    db "Seasickness...",$55
-    db "The CAPTAIN's",$55
-    db "reading this!",$57
+    text_init , "How to Conquer"
+    text_line , "Seasickness..."
+    text_cont , "The CAPTAIN's"
+    text_cont , "reading this!"
+    text_done
 
 _SSAnne8Text8:
-    db $0,"WIGGLYTUFF: Puup",$4f
-    db "pupuu!@@"
+    text_init , "WIGGLYTUFF: Puup"
+    text_line , "pupuu!"
+    text_past
 
 _SSAnne8BattleText1:
-    db $0,"I travel alone",$4f
-    db "on my journeys!",$51
-    db "My #MON are my",$4f
-    db "only friends!",$57
+    text_init , "I travel alone"
+    text_line , "on my journeys!"
+    text_para , "My #MON are my"
+    text_line , "only friends!"
+    text_done
 
 _SSAnne8EndBattleText1:
-    db $0,"My,my",$4f
-    db "friends...",$58
+    text_init , "My,my"
+    text_line , "friends..."
+    text_wait
 
 _SSAnne8AfterBattleText1:
-    db $0,"You should be",$4f
-    db "nice to friends!",$57
+    text_init , "You should be"
+    text_line , "nice to friends!"
+    text_done
 
 _SSAnne8BattleText2:
-    db $0,"You pup! How dare",$4f
-    db "you barge in!",$57
+    text_init , "You pup! How dare"
+    text_line , "you barge in!"
+    text_done
 
 _SSAnne8EndBattleText2:
-    db $0,"Humph!",$4f
-    db "You rude child!",$58
+    text_init , "Humph!"
+    text_line , "You rude child!"
+    text_wait
 
 _UnnamedText_61a24:
-    db $0,"I wish to be left",$4f
-    db "alone! Get out!",$57
+    text_init , "I wish to be left"
+    text_line , "alone! Get out!"
+    text_done
 
 _SSAnne8BattleText3:
-    db $0,"I love #MON!",$4f
-    db "Do you?",$57
+    text_init , "I love #MON!"
+    text_line , "Do you?"
+    text_done
 
 _SSAnne8EndBattleText3:
-    db $0,"Wow! ",$4f
-    db "You're great!",$58
+    text_init , "Wow! "
+    text_line , "You're great!"
+    text_wait
 
 _SSAnne8AfterBattleText3:
-    db $0,"Let me be your",$4f
-    db "friend,OK?",$51
-    db "Then we can trade",$4f
-    db "#MON!",$57
+    text_init , "Let me be your"
+    text_line , "friend,OK?"
+    text_para , "Then we can trade"
+    text_line , "#MON!"
+    text_done
 
 _SSAnne8BattleText4:
-    db $0,"I collected these",$4f
-    db "#MON from all",$55
-    db "around the world!",$57
+    text_init , "I collected these"
+    text_line , "#MON from all"
+    text_cont , "around the world!"
+    text_done
 
 _SSAnne8EndBattleText4:
-    db $0,"Oh no!",$4f
-    db "I went around the",$55
-    db "world for these!",$58
+    text_init , "Oh no!"
+    text_line , "I went around the"
+    text_cont , "world for these!"
+    text_wait
 
 _SSAnne8AfterBattleText4:
-    db $0,"You hurt my poor",$4f
-    db "worldly #MON!",$51
-    db "I demand that you",$4f
-    db "heal them at a",$55
-    db "#MON CENTER!",$57
+    text_init , "You hurt my poor"
+    text_line , "worldly #MON!"
+    text_para , "I demand that you"
+    text_line , "heal them at a"
+    text_cont , "#MON CENTER!"
+    text_done
 
 _SSAnne8Text5:
-    db $0,"Waiter,I would",$4f
-    db "like a cherry pie",$55
-    db "please!",$57
+    text_init , "Waiter,I would"
+    text_line , "like a cherry pie"
+    text_cont , "please!"
+    text_done
 
 _SSAnne8Text6:
-    db $0,"A cruise is so",$4f
-    db "elegant yet cozy!",$57
+    text_init , "A cruise is so"
+    text_line , "elegant yet cozy!"
+    text_done
 
 _SSAnne8Text7:
-    db $0,"I always travel",$4f
-    db "with WIGGLYTUFF!",$57
+    text_init , "I always travel"
+    text_line , "with WIGGLYTUFF!"
+    text_done
 
 _SSAnne8Text9:
-    db $0,"We are cruising",$4f
-    db "around the world.",$57
+    text_init , "We are cruising"
+    text_line , "around the world."
+    text_done
 
 _SSAnne8Text11:
-    db $0,"Ssh! I'm a GLOBAL",$4f
-    db "POLICE agent!",$51
-    db "I'm on the trail",$4f
-    db "of TEAM ROCKET!",$57
+    text_init , "Ssh! I'm a GLOBAL"
+    text_line , "POLICE agent!"
+    text_para , "I'm on the trail"
+    text_line , "of TEAM ROCKET!"
+    text_done
 
 _UnnamedText_61bf2:
-    db $0,"In all my travels",$4f
-    db "I've never seen",$55
-    db "any #MON sleep",$55
-    db "like this one!",$51
-    db "It was something",$4f
-    db "like this!",$57
+    text_init , "In all my travels"
+    text_line , "I've never seen"
+    text_cont , "any #MON sleep"
+    text_cont , "like this one!"
+    text_para , "It was something"
+    text_line , "like this!"
+    text_done
 
 _UnnamedText_61c01:
-    db $0,"Ah yes,I have",$4f
-    db "seen some #MON",$55
-    db "ferry people",$55
-    db "across the water!",$57
+    text_init , "Ah yes,I have"
+    text_line , "seen some #MON"
+    text_cont , "ferry people"
+    text_cont , "across the water!"
+    text_done
 
 _UnnamedText_61c10:
-    db $0,"#MON can CUT",$4f
-    db "down small bushes.",$57
+    text_init , "#MON can CUT"
+    text_line , "down small bushes."
+    text_done
 
 _UnnamedText_61c1f:
-    db $0,"Have you gone to",$4f
-    db "the SAFARI ZONE",$55
-    db "in FUCHSIA CITY?",$51
-    db "It had many rare",$4f
-    db "kinds of #MON!!",$57
+    text_init , "Have you gone to"
+    text_line , "the SAFARI ZONE"
+    text_cont , "in FUCHSIA CITY?"
+    text_para , "It had many rare"
+    text_line , "kinds of #MON!!"
+    text_done
 
 _UnnamedText_61c2e:
-    db $0,"Me and my Daddy",$4f
-    db "think the SAFARI",$55
-    db "ZONE is awesome!",$57
+    text_init , "Me and my Daddy"
+    text_line , "think the SAFARI"
+    text_cont , "ZONE is awesome!"
+    text_done
 
 _UnnamedText_61c3d:
-    db $0,"The CAPTAIN looked",$4f
-    db "really sick and",$55
-    db "pale!",$57
+    text_init , "The CAPTAIN looked"
+    text_line , "really sick and"
+    text_cont , "pale!"
+    text_done
 
 _UnnamedText_61c4c:
-    db $0,"I hear many people",$4f
-    db "get seasick!",$57
+    text_init , "I hear many people"
+    text_line , "get seasick!"
+    text_done
 
 _SSAnne9BattleText1:
-    db $0,"Competing against",$4f
-    db "the young keeps",$55
-    db "me youthful.",$57
+    text_init , "Competing against"
+    text_line , "the young keeps"
+    text_cont , "me youthful."
+    text_done
 
 _SSAnne9EndBattleText1:
-    db $0,"Good",$4f
-    db "fight! Ah,I feel",$55
-    db "young again!",$58
+    text_init , "Good"
+    text_line , "fight! Ah,I feel"
+    text_cont , "young again!"
+    text_wait
 
 _SSAnne9AfterBattleText1:
-    db $0,"15 years ago,I",$4f
-    db "would have won!",$57
+    text_init , "15 years ago,I"
+    text_line , "would have won!"
+    text_done
 
 _SSAnne9BattleText2:
-    db $0,"Check out what I",$4f
-    db "fished up!",$57
+    text_init , "Check out what I"
+    text_line , "fished up!"
+    text_done
 
 _SSAnne9EndBattleText2:
-    db $0,"I'm",$4f
-    db "all out!",$58
+    text_init , "I'm"
+    text_line , "all out!"
+    text_wait
 
 _SSAnne9AfterBattleText2:
-    db $0,"Party?",$51
-    db "The cruise ship's",$4f
-    db "party should be",$55
-    db "over by now.",$57
+    text_init , "Party?"
+    text_para , "The cruise ship's"
+    text_line , "party should be"
+    text_cont , "over by now."
+    text_done
 
 _SSAnne9BattleText3:
-    db $0,"Which do you like,",$4f
-    db "a strong or a",$55
-    db "rare #MON?",$57
+    text_init , "Which do you like,"
+    text_line , "a strong or a"
+    text_cont , "rare #MON?"
+    text_done
 
 _SSAnne9EndBattleText3:
-    db $0,"I must",$4f
-    db "salute you!",$58
+    text_init , "I must"
+    text_line , "salute you!"
+    text_wait
 
 _SSAnne9AfterBattleText3:
-    db $0,"I prefer strong",$4f
-    db "and rare #MON.",$57
+    text_init , "I prefer strong"
+    text_line , "and rare #MON."
+    text_done
 
 _SSAnne9BattleText4:
-    db $0,"I never saw you",$4f
-    db "at the party.",$57
+    text_init , "I never saw you"
+    text_line , "at the party."
+    text_done
 
 _SSAnne9EndBattleText4:
-    db $0,"Take",$4f
-    db "it easy!",$58
+    text_init , "Take"
+    text_line , "it easy!"
+    text_wait
 
 _SSAnne9AfterBattleText4:
-    db $0,"Oh,I adore your",$4f
-    db "strong #MON!",$57
+    text_init , "Oh,I adore your"
+    text_line , "strong #MON!"
+    text_done
 
 _SSAnne10Text8:
-    db $0,"MACHOKE: Gwoh!",$4f
-    db "Goggoh!@@"
+    text_init , "MACHOKE: Gwoh!"
+    text_line , "Goggoh!"
+    text_past
 
 _SSAnne10BattleText1:
-    db $0,"You know what they",$4f
-    db "say about sailors",$55
-    db "and fighting!",$57
+    text_init , "You know what they"
+    text_line , "say about sailors"
+    text_cont , "and fighting!"
+    text_done
 
 _SSAnne10EndBattleText1:
-    db $0,"Right!",$4f
-    db "Good fight,mate!",$58
+    text_init , "Right!"
+    text_line , "Good fight,mate!"
+    text_wait
 
 _SSAnne10AfterBattleText1:
-    db $0,"Haha! Want to be",$4f
-    db "a sailor,mate?",$57
+    text_init , "Haha! Want to be"
+    text_line , "a sailor,mate?"
+    text_done
 
 _SSAnne10BattleText2:
-    db $0,"My sailor's pride",$4f
-    db "is at stake!",$57
+    text_init , "My sailor's pride"
+    text_line , "is at stake!"
+    text_done
 
 _SSAnne10EndBattleText2:
-    db $0,"Your",$4f
-    db "spirit sank me!",$58
+    text_init , "Your"
+    text_line , "spirit sank me!"
+    text_wait
 
 _SSAnne10AfterBattleText2:
-    db $0,"Did you see the",$4f
-    db "FISHING GURU in",$55
-    db "VERMILION CITY?",$57
+    text_init , "Did you see the"
+    text_line , "FISHING GURU in"
+    text_cont , "VERMILION CITY?"
+    text_done
 
 _SSAnne10BattleText3:
-    db $0,"Us sailors have",$4f
-    db "#MON too!",$57
+    text_init , "Us sailors have"
+    text_line , "#MON too!"
+    text_done
 
 _SSAnne10EndBattleText3:
-    db $0,"OK,",$4f
-    db "you're not bad.",$58
+    text_init , "OK,"
+    text_line , "you're not bad."
+    text_wait
 
 _SSAnne10AfterBattleText3:
-    db $0,"We caught all our",$4f
-    db "#MON while",$55
-    db "out at sea!",$57
+    text_init , "We caught all our"
+    text_line , "#MON while"
+    text_cont , "out at sea!"
+    text_done
 
 _SSAnne10BattleText4:
-    db $0,"I like feisty",$4f
-    db "kids like you!@@"
+    text_init , "I like feisty"
+    text_line , "kids like you!"
+    text_past
 
 _SSAnne10EndBattleText4:
-    db $0,"Argh!",$4f
-    db "Lost it!",$58
+    text_init , "Argh!"
+    text_line , "Lost it!"
+    text_wait
 
 _SSAnne10AfterBattleText4:
-    db $0,"Sea #MON live",$4f
-    db "in deep water.",$55
-    db "You'll need a ROD!",$57
+    text_init , "Sea #MON live"
+    text_line , "in deep water."
+    text_cont , "You'll need a ROD!"
+    text_done
 
 _SSAnne10BattleText5:
-    db $0,"Matey,you're",$4f
-    db "walking the plank",$55
-    db "if you lose!",$57
+    text_init , "Matey,you're"
+    text_line , "walking the plank"
+    text_cont , "if you lose!"
+    text_done
 
 _SSAnne10EndBattleText5:
-    db $0,"Argh!",$4f
-    db "Beaten by a kid!",$58
+    text_init , "Argh!"
+    text_line , "Beaten by a kid!"
+    text_wait
 
 _SSAnne10AfterBattleText5:
-    db $0,"Jellyfish some-",$4f
-    db "times drift into",$55
-    db "the ship.",$57
+    text_init , "Jellyfish some-"
+    text_line , "times drift into"
+    text_cont , "the ship."
+    text_done
 
 _SSAnne10BattleText6:
-    db $0,"Hello stranger!",$4f
-    db "Stop and chat!",$51
-    db "All my #MON",$4f
-    db "are from the sea!",$57
+    text_init , "Hello stranger!"
+    text_line , "Stop and chat!"
+    text_para , "All my #MON"
+    text_line , "are from the sea!"
+    text_done
 
 _SSAnne10EndBattleText6:
-    db $0,"Darn!",$4f
-    db "I let that one",$55
-    db "get away!",$58
+    text_init , "Darn!"
+    text_line , "I let that one"
+    text_cont , "get away!"
+    text_wait
 
 _SSAnne10AfterBattleText6:
-    db $0,"I was going to",$4f
-    db "make you my",$55
-    db "assistant too!",$57
+    text_init , "I was going to"
+    text_line , "make you my"
+    text_cont , "assistant too!"
+    text_done
 
 _SSAnne10Text7:
-    db $0,"My buddy,MACHOKE,",$4f
-    db "is super strong!",$51
-    db "He has enough",$4f
-    db "STRENGTH to move",$55
-    db "big rocks!",$57
+    text_init , "My buddy,MACHOKE,"
+    text_line , "is super strong!"
+    text_para , "He has enough"
+    text_line , "STRENGTH to move"
+    text_cont , "big rocks!"
+    text_done
 
 _VictoryRoad3BattleText2:
-    db $0,"I heard rumors of",$4f
-    db "a child prodigy!",$57
+    text_init , "I heard rumors of"
+    text_line , "a child prodigy!"
+    text_done
 
 _VictoryRoad3EndBattleText2:
-    db $0,"The",$4f
-    db "rumors were true!",$58
+    text_init , "The"
+    text_line , "rumors were true!"
+    text_wait
 
 _VictoryRoad3AfterBattleText2:
-    db $0,"You beat GIOVANNI",$4f
-    db "of TEAM ROCKET?",$57
+    text_init , "You beat GIOVANNI"
+    text_line , "of TEAM ROCKET?"
+    text_done
 
 _VictoryRoad3BattleText3:
-    db $0,"I'll show you just",$4f
-    db "how good you are!",$57
+    text_init , "I'll show you just"
+    text_line , "how good you are!"
+    text_done
 
 _VictoryRoad3EndBattleText3:
-    db $0,"I'm",$4f
-    db "furious!",$58
+    text_init , "I'm"
+    text_line , "furious!"
+    text_wait
 
 _VictoryRoad3AfterBattleText3:
-    db $0,"You showed me just",$4f
-    db "how good I was!",$57
+    text_init , "You showed me just"
+    text_line , "how good I was!"
+    text_done
 
 _VictoryRoad3BattleText4:
-    db $0,"Only the chosen",$4f
-    db "can pass here!",$57
+    text_init , "Only the chosen"
+    text_line , "can pass here!"
+    text_done
 
 _VictoryRoad3EndBattleText4:
-    db $0,"I",$4f
-    db "don't believe it!",$58
+    text_init , "I"
+    text_line , "don't believe it!"
+    text_wait
 
 _VictoryRoad3AfterBattleText4:
-    db $0,"All trainers here",$4f
-    db "are headed to the",$55
-    db "#MON LEAGUE!",$55
-    db "Be careful!",$57
+    text_init , "All trainers here"
+    text_line , "are headed to the"
+    text_cont , "#MON LEAGUE!"
+    text_cont , "Be careful!"
+    text_done
 
 _VictoryRoad3BattleText5:
-    db $0,"Trainers live to",$4f
-    db "seek stronger",$55
-    db "opponents!",$57
+    text_init , "Trainers live to"
+    text_line , "seek stronger"
+    text_cont , "opponents!"
+    text_done
 
 _VictoryRoad3EndBattleText5:
-    db $0,"Oh!",$4f
-    db "So strong!",$58
+    text_init , "Oh!"
+    text_line , "So strong!"
+    text_wait
 
 _VictoryRoad3AfterBattleText5:
-    db $0,"By fighting tough",$4f
-    db "battles,you get",$55
-    db "stronger!",$57
+    text_init , "By fighting tough"
+    text_line , "battles,you get"
+    text_cont , "stronger!"
+    text_done
 
 _RocketHideout1EndBattleText6:
-    db $0,"Why...?@@"
+    text_init , "Why...?"
+    text_past
 
 _RocketHideout1BattleText2:
-    db $0,"Who are you? How",$4f
-    db "did you get here?",$57
+    text_init , "Who are you? How"
+    text_line , "did you get here?"
+    text_done
 
 _RocketHideout1EndBattleText2:
-    db $0,"Oww!",$4f
-    db "Beaten!",$58
+    text_init , "Oww!"
+    text_line , "Beaten!"
+    text_wait
 
 _RocketHideout1AfterBattleTxt2:
-    db $0,"Are you dissing",$4f
-    db "TEAM ROCKET?",$57
+    text_init , "Are you dissing"
+    text_line , "TEAM ROCKET?"
+    text_done
 
 _RocketHideout1BattleText3:
-    db $0,"You broke into",$4f
-    db "our operation?",$57
+    text_init , "You broke into"
+    text_line , "our operation?"
+    text_done
 
 _RocketHideout1EndBattleText3:
-    db $0,"Burnt!",$58
+    text_init , "Burnt!"
+    text_wait
 
 _RocketHideout1AfterBattleTxt3:
-    db $0,"You're not going",$4f
-    db "to get away with",$55
-    db "this,brat!",$57
+    text_init , "You're not going"
+    text_line , "to get away with"
+    text_cont , "this,brat!"
+    text_done
 
 _RocketHideout1BattleText4:
-    db $0,"Intruder alert!",$57
+    text_init , "Intruder alert!"
+    text_done
 
 _RocketHideout1EndBattleText4:
-    db $0,"I",$4f
-    db "can't do it!",$58
+    text_init , "I"
+    text_line , "can't do it!"
+    text_wait
 
 _RocketHideout1AfterBattleTxt4:
-    db $0,"SILPH SCOPE?",$4f
-    db "I don't know",$55
-    db "where it is!",$57
+    text_init , "SILPH SCOPE?"
+    text_line , "I don't know"
+    text_cont , "where it is!"
+    text_done
 
 _RocketHideout1BattleText5:
-    db $0,"Why did you come",$4f
-    db "here?",$57
+    text_init , "Why did you come"
+    text_line , "here?"
+    text_done
 
 _RocketHideout1EndBattleText5:
-    db $0,"This",$4f
-    db "won't do!",$58
+    text_init , "This"
+    text_line , "won't do!"
+    text_wait
 
 _RocketHideout1AfterBattleTxt5:
-    db $0,"OK,I'll talk!",$4f
-    db "Take the elevator",$55
-    db "to see my BOSS!",$57
+    text_init , "OK,I'll talk!"
+    text_line , "Take the elevator"
+    text_cont , "to see my BOSS!"
+    text_done
 
 _RocketHideout1BattleText6:
-    db $0,"Are you lost,you",$4f
-    db "little rat?",$57
+    text_init , "Are you lost,you"
+    text_line , "little rat?"
+    text_done
 
 _RocketHideout1AfterBattleTxt6:
-    db $0,"Uh-oh,that fight",$4f
-    db "opened the door!",$57
+    text_init , "Uh-oh,that fight"
+    text_line , "opened the door!"
+    text_done
 
 _RocketHideout2BattleText2:
-    db $0,"BOSS said you can",$4f
-    db "see GHOSTs with",$55
-    db "the SILPH SCOPE!",$57
+    text_init , "BOSS said you can"
+    text_line , "see GHOSTs with"
+    text_cont , "the SILPH SCOPE!"
+    text_done
 
 _RocketHideout2EndBattleText2:
-    db $0,"I",$4f
-    db "surrender!",$58
+    text_init , "I"
+    text_line , "surrender!"
+    text_wait
 
 _RocketHideout2AfterBattleTxt2:
-    db $0,"The TEAM ROCKET",$4f
-    db "HQ has 4 basement",$55
-    db "floors. Can you",$55
-    db "reach the BOSS?",$57
+    text_init , "The TEAM ROCKET"
+    text_line , "HQ has 4 basement"
+    text_cont , "floors. Can you"
+    text_cont , "reach the BOSS?"
+    text_done
 
 _RocketHideout3BattleText2:
-    db $0,"Stop meddling in",$4f
-    db "TEAM ROCKET's",$55
-    db "affairs!",$57
+    text_init , "Stop meddling in"
+    text_line , "TEAM ROCKET's"
+    text_cont , "affairs!"
+    text_done
 
 _RocketHideout3EndBattleText2:
-    db $0,"Oof!",$4f
-    db "Taken down!",$58
+    text_init , "Oof!"
+    text_line , "Taken down!"
+    text_wait
 
 _RocketHideout3AfterBattleTxt2:
-    db $0,"SILPH SCOPE?",$4f
-    db "The machine the",$55
-    db "BOSS stole. It's",$55
-    db "here somewhere.",$57
+    text_init , "SILPH SCOPE?"
+    text_line , "The machine the"
+    text_cont , "BOSS stole. It's"
+    text_cont , "here somewhere."
+    text_done
 
 _RocketHideout3BattleTxt:
-    db $0,"We got word from",$4f
-    db "upstairs that you",$55
-    db "were coming!",$57
+    text_init , "We got word from"
+    text_line , "upstairs that you"
+    text_cont , "were coming!"
+    text_done
 
 _RocketHideout3EndBattleText3:
-    db $0,"What?",$4f
-    db "I lost? No!",$58
+    text_init , "What?"
+    text_line , "I lost? No!"
+    text_wait
 
 _RocketHide3AfterBattleText3:
-    db $0,"Go ahead and go!",$4f
-    db "But,you need the",$55
-    db "LIFT KEY to run",$55
-    db "the elevator!",$57
+    text_init , "Go ahead and go!"
+    text_line , "But,you need the"
+    text_cont , "LIFT KEY to run"
+    text_cont , "the elevator!"
+    text_done
 
 _UnnamedText_4557a:
-    db $0,"So! I must say,I",$4f
-    db "am impressed you",$55
-    db "got here!",$57
+    text_init , "So! I must say,I"
+    text_line , "am impressed you"
+    text_cont , "got here!"
+    text_done
 
 _UnnamedText_4557f:
-    db $0,"WHAT!",$4f
-    db "This cannot be!",$58
+    text_init , "WHAT!"
+    text_line , "This cannot be!"
+    text_wait
 
 _UnnamedText_45584:
-    db $0,"I see that you",$4f
-    db "raise #MON",$55
-    db "with utmost care.",$51
-    db "A child like you",$4f
-    db "would never",$55
-    db "understand what I",$55
-    db "hope to achieve.",$51
-    db "I shall step",$4f
-    db "aside this time!",$51
-    db "I hope we meet",$4f
-    db "again...",$57
+    text_init , "I see that you"
+    text_line , "raise #MON"
+    text_cont , "with utmost care."
+    text_para , "A child like you"
+    text_line , "would never"
+    text_cont , "understand what I"
+    text_cont , "hope to achieve."
+    text_para , "I shall step"
+    text_line , "aside this time!"
+    text_para , "I hope we meet"
+    text_line , "again..."
+    text_done
 
 _RocketHideout4BattleText2:
-    db $0,"I know you! You",$4f
-    db "ruined our plans",$55
-    db "at MT.MOON!",$57
+    text_init , "I know you! You"
+    text_line , "ruined our plans"
+    text_cont , "at MT.MOON!"
+    text_done
 
 _RocketHideout4EndBattleText2:
-    db $0,"Burned",$4f
-    db "again!",$58
+    text_init , "Burned"
+    text_line , "again!"
+    text_wait
 
 _RocketHide4AfterBattleText2:
-    db $0,"Do you have",$4f
-    db "something against",$55
-    db "TEAM ROCKET?",$57
+    text_init , "Do you have"
+    text_line , "something against"
+    text_cont , "TEAM ROCKET?"
+    text_done
 
 _RocketHideout4BattleText3:
-    db $0,"How can you not",$4f
-    db "see the beauty of",$55
-    db "our evil?",$57
+    text_init , "How can you not"
+    text_line , "see the beauty of"
+    text_cont , "our evil?"
+    text_done
 
 _RocketHideout4EndBattleText3:
-    db $0,"Ayaya!",$58
+    text_init , "Ayaya!"
+    text_wait
 
 _RocketHide4AfterBattleText3:
-    db $0,"BOSS! I'm sorry I",$4f
-    db "failed you!",$57
+    text_init , "BOSS! I'm sorry I"
+    text_line , "failed you!"
+    text_done
 
 _RocketHideout4BattleText4:
-    db $0,"The elevator",$4f
-    db "doesn't work? Who",$55
-    db "has the LIFT KEY?",$57
+    text_init , "The elevator"
+    text_line , "doesn't work? Who"
+    text_cont , "has the LIFT KEY?"
+    text_done
 
 _RocketHideout4EndBattleText4:
-    db $0,"No!",$58
+    text_init , "No!"
+    text_wait
 
 _UnnamedText_455ec:
-    db $0,"Oh no! I dropped",$4f
-    db "the LIFT KEY!",$57
+    text_init , "Oh no! I dropped"
+    text_line , "the LIFT KEY!"
+    text_done
 
 _UnnamedText_4578b:
-    db $0,"It appears to",$4f
-    db "need a key.@@"
+    text_init , "It appears to"
+    text_line , "need a key."
+    text_past
 
 _UnnamedText_59ded:
-    db $0,"Eeek!",$4f
-    db "No! Stop! Help!",$51
-    db "Oh,you're not",$4f
-    db "with TEAM ROCKET.",$55
-    db "I thought...",$55
-    db "I'm sorry. Here,",$55
-    db "please take this!",$58
+    text_init , "Eeek!"
+    text_line , "No! Stop! Help!"
+    text_para , "Oh,you're not"
+    text_line , "with TEAM ROCKET."
+    text_cont , "I thought..."
+    text_cont , "I'm sorry. Here,"
+    text_cont , "please take this!"
+    text_wait
 
 _TM36ExplanationText:
-    db $0,"TM36 is",$4f
-    db "SELFDESTRUCT!",$51
-    db "It's powerful,but",$4f
-    db "the #MON that",$55
-    db "uses it faints!",$55
-    db "Be careful.",$57
+    text_init , "TM36 is"
+    text_line , "SELFDESTRUCT!"
+    text_para , "It's powerful,but"
+    text_line , "the #MON that"
+    text_cont , "uses it faints!"
+    text_cont , "Be careful."
+    text_done
 
 _TM36NoRoomText:
-    db $0,"You don't have any",$4f
-    db "room for this.",$57
+    text_init , "You don't have any"
+    text_line , "room for this."
+    text_done
 
 _SilphCo2BattleText1:
-    db $0,"Help! I'm a SILPH",$4f
-    db "employee.",$57
+    text_init , "Help! I'm a SILPH"
+    text_line , "employee."
+    text_done
 
 _SilphCo2EndBattleText1:
-    db $0,"How",$4f
-    db "did you know I",$55
-    db "was a ROCKET?",$58
+    text_init , "How"
+    text_line , "did you know I"
+    text_cont , "was a ROCKET?"
+    text_wait
 
 _SilphCo2AfterBattleText1:
-    db $0,"I work for both",$4f
-    db "SILPH and TEAM",$55
-    db "ROCKET!",$57
+    text_init , "I work for both"
+    text_line , "SILPH and TEAM"
+    text_cont , "ROCKET!"
+    text_done
 
 _SilphCo2BattleText2:
-    db $0,"It's off limits",$4f
-    db "here! Go home!",$57
+    text_init , "It's off limits"
+    text_line , "here! Go home!"
+    text_done
 
 _SilphCo2EndBattleText2:
-    db $0,"You're",$4f
-    db "good.",$58
+    text_init , "You're"
+    text_line , "good."
+    text_wait
 
 _SilphCo2AfterBattleText2:
-    db $0,"Can you solve the",$4f
-    db "maze in here?",$57
+    text_init , "Can you solve the"
+    text_line , "maze in here?"
+    text_done
 
 _SilphCo2BattleText3:
-    db $0,"No kids are",$4f
-    db "allowed in here!",$57
+    text_init , "No kids are"
+    text_line , "allowed in here!"
+    text_done
 
 _SilphCo2EndBattleText3:
-    db $0,"Tough!",$58
+    text_init , "Tough!"
+    text_wait
 
 _SilphCo2AfterBattleText3:
-    db $0,"Diamond shaped",$4f
-    db "tiles are",$55
-    db "teleport blocks!",$51
-    db "They're hi-tech",$4f
-    db "transporters!",$57
+    text_init , "Diamond shaped"
+    text_line , "tiles are"
+    text_cont , "teleport blocks!"
+    text_para , "They're hi-tech"
+    text_line , "transporters!"
+    text_done
 
 _SilphCo2BattleText4:
-    db $0,"Hey kid! What are",$4f
-    db "you doing here?",$57
+    text_init , "Hey kid! What are"
+    text_line , "you doing here?"
+    text_done
 
 _SilphCo2EndBattleText4:
-    db $0,"I goofed!",$58
+    text_init , "I goofed!"
+    text_wait
 
 _SilphCo2AfterBattleText4:
-    db $0,"SILPH CO. will",$4f
-    db "be merged with",$55
-    db "TEAM ROCKET!",$57
+    text_init , "SILPH CO. will"
+    text_line , "be merged with"
+    text_cont , "TEAM ROCKET!"
+    text_done
 
 _UnnamedText_59ff9:
-    db $0,"I work for SILPH.",$4f
-    db "What should I do?",$57
+    text_init , "I work for SILPH."
+    text_line , "What should I do?"
+    text_done
 
 _UnnamedText_59ffe:
-    db $0,$52,"! You and",$4f
-    db "your #MON",$55
-    db "saved us!",$57
+    text_init , $52,"! You and"
+    text_line , "your #MON"
+    text_cont , "saved us!"
+    text_done
 
 _SilphCo3BattleText1:
-    db $0,"Quit messing with",$4f
-    db "us,kid!",$57
+    text_init , "Quit messing with"
+    text_line , "us,kid!"
+    text_done
 
 _SilphCo3EndBattleText1:
-    db $0,"I give",$4f
-    db "up!",$58
+    text_init , "I give"
+    text_line , "up!"
+    text_wait
 
 _SilphCo3AfterBattleText1:
-    db $0,"A hint? You can",$4f
-    db "open doors with a",$55
-    db "CARD KEY!",$57
+    text_init , "A hint? You can"
+    text_line , "open doors with a"
+    text_cont , "CARD KEY!"
+    text_done
 
 _SilphCo3BattleText2:
-    db $0,"I support TEAM",$4f
-    db "ROCKET more than",$55
-    db "I support SILPH!",$57
+    text_init , "I support TEAM"
+    text_line , "ROCKET more than"
+    text_cont , "I support SILPH!"
+    text_done
 
 _SilphCo3EndBattleText2:
-    db $0,"You",$4f
-    db "really got me!",$58
+    text_init , "You"
+    text_line , "really got me!"
+    text_wait
 
 _SilphCo3AfterBattleText2:
-    db $0,"Humph...",$51
-    db "TEAM ROCKET said",$4f
-    db "that if I helped",$55
-    db "them,they'd let",$55
-    db "me study #MON!",$57
+    text_init , "Humph..."
+    text_para , "TEAM ROCKET said"
+    text_line , "that if I helped"
+    text_cont , "them,they'd let"
+    text_cont , "me study #MON!"
+    text_done
 
 _UnnamedText_19de0:
-    db $0,"Sssh! Can't you",$4f
-    db "see I'm hiding?",$57
+    text_init , "Sssh! Can't you"
+    text_line , "see I'm hiding?"
+    text_done
 
 _UnnamedText_19de5:
-    db $0,"Huh? TEAM ROCKET",$4f
-    db "is gone?",$57
+    text_init , "Huh? TEAM ROCKET"
+    text_line , "is gone?"
+    text_done
 
 _SilphCo4BattleText2:
-    db $0,"TEAM ROCKET has",$4f
-    db "taken command of",$55
-    db "SILPH CO.!",$57
+    text_init , "TEAM ROCKET has"
+    text_line , "taken command of"
+    text_cont , "SILPH CO.!"
+    text_done
 
 _SilphCo4EndBattleText2:
-    db $0,"Arrgh!",$58
+    text_init , "Arrgh!"
+    text_wait
 
 _SilphCo4AfterBattleText2:
-    db $0,"Fwahahaha!",$4f
-    db "My BOSS has been",$55
-    db "after this place!",$57
+    text_init , "Fwahahaha!"
+    text_line , "My BOSS has been"
+    text_cont , "after this place!"
+    text_done
 
 _SilphCo4BattleText3:
-    db $0,"My #MON are my",$4f
-    db "loyal soldiers!",$57
+    text_init , "My #MON are my"
+    text_line , "loyal soldiers!"
+    text_done
 
 _SilphCo4EndBattleText3:
-    db $0,"Darn!",$4f
-    db "You weak #MON!",$58
+    text_init , "Darn!"
+    text_line , "You weak #MON!"
+    text_wait
 
 _SilphCo4AfterBattleText3:
-    db $0,"The doors are",$4f
-    db "electronically",$55
-    db "locked! A CARD",$55
-    db "KEY opens them!",$57
+    text_init , "The doors are"
+    text_line , "electronically"
+    text_cont , "locked! A CARD"
+    text_cont , "KEY opens them!"
+    text_done
 
 _SilphCo4BattleText4:
-    db $0,"Intruder spotted!",$57
+    text_init , "Intruder spotted!"
+    text_done
 
 _SilphCo4EndBattleText4:
-    db $0,"Who",$4f
-    db "are you?",$58
+    text_init , "Who"
+    text_line , "are you?"
+    text_wait
 
 _SilphCo4AfterBattleText4:
-    db $0,"I better tell the",$4f
-    db "BOSS on 11F!",$57
+    text_init , "I better tell the"
+    text_line , "BOSS on 11F!"
+    text_done
 
 _UnnamedText_1a010:
-    db $0,"TEAM ROCKET is",$4f
-    db "in an uproar over",$55
-    db "some intruder.",$55
-    db "That's you right?",$57
+    text_init , "TEAM ROCKET is"
+    text_line , "in an uproar over"
+    text_cont , "some intruder."
+    text_cont , "That's you right?"
+    text_done
 
 _UnnamedText_1a015:
-    db $0,"TEAM ROCKET took",$4f
-    db "off! You're our",$55
-    db "hero! Thank you!",$57
+    text_init , "TEAM ROCKET took"
+    text_line , "off! You're our"
+    text_cont , "hero! Thank you!"
+    text_done
 
 _SilphCo5BattleText2:
-    db $0,"I heard a kid was",$4f
-    db "wandering around.",$57
+    text_init , "I heard a kid was"
+    text_line , "wandering around."
+    text_done
 
 _SilphCo5EndBattleText2:
-    db $0,"Boom!",$58
+    text_init , "Boom!"
+    text_wait
 
 _SilphCo5AfterBattleText2:
-    db $0,"It's not smart",$4f
-    db "to pick a fight",$55
-    db "with TEAM ROCKET!",$57
+    text_init , "It's not smart"
+    text_line , "to pick a fight"
+    text_cont , "with TEAM ROCKET!"
+    text_done
 
 _SilphCo5BattleText3:
-    db $0,"We study #",$4f
-    db "BALL technology",$55
-    db "on this floor!",$57
+    text_init , "We study #"
+    text_line , "BALL technology"
+    text_cont , "on this floor!"
+    text_done
 
 _SilphCo5EndBattleText3:
-    db $0,"Dang!",$4f
-    db "Blast it!",$58
+    text_init , "Dang!"
+    text_line , "Blast it!"
+    text_wait
 
 _SilphCo5AfterBattleText3:
-    db $0,"We worked on the",$4f
-    db "ultimate #",$55
-    db "BALL which would",$55
-    db "catch anything!",$57
+    text_init , "We worked on the"
+    text_line , "ultimate #"
+    text_cont , "BALL which would"
+    text_cont , "catch anything!"
+    text_done
 
 _SilphCo5BattleText4:
-    db $0,"Whaaat? There",$4f
-    db "shouldn't be any",$55
-    db "children here?",$57
+    text_init , "Whaaat? There"
+    text_line , "shouldn't be any"
+    text_cont , "children here?"
+    text_done
 
 _ViridianForestBattleText4:
-    db $0,"Hi! I'm a",$4f
-    db "Trainer, Fight!",$57
+    text_init , "Hi! I'm a"
+    text_line , "Trainer, Fight!"
+    text_done
 
 _ViridianForestEndBattleText4:
-    db $0,"I",$4f
-    db "Lost! Damn!",$58
+    text_init , "I"
+    text_line , "Lost! Damn!"
+    text_wait
 
 _ViridianFrstAfterBattleText4:
-    db $0,"My #MON",$4f
-    db "can TELEPORT",$55
-    db "to return to",$55
-    db "#MON CENTER!",$57
+    text_init , "My #MON"
+    text_line , "can TELEPORT"
+    text_cont , "to return to"
+    text_cont , "#MON CENTER!"
+    text_done
 
 _ViridianForestBattleText5:
-    db $0,"Hi! I'm a",$4f
-    db "Trainer, Fight!",$57
+    text_init , "Hi! I'm a"
+    text_line , "Trainer, Fight!"
+    text_done
 
 _ViridianForestEndBattleText5:
-    db $0,"I",$4f
-    db "Lost! Damn!",$58
+    text_init , "I"
+    text_line , "Lost! Damn!"
+    text_wait
 
 _ViridianFrstAfterBattleText5:
-    db $0,"You must",$4f
-    db "train a lot",$55
-    db "every your",$55
-    db "#MON!",$57
+    text_init , "You must"
+    text_line , "train a lot"
+    text_cont , "every your"
+    text_cont , "#MON!"
+    text_done
 
 _ViridianForestBattleText6:
-    db $0,"Hi! I'm a",$4f
-    db "Trainer, Fight!",$57
+    text_init , "Hi! I'm a"
+    text_line , "Trainer, Fight!"
+    text_done
 
 _ViridianForestEndBattleText6:
-    db $0,"I",$4f
-    db "Lost! Damn!",$58
+    text_init , "I"
+    text_line , "Lost! Damn!"
+    text_wait
 
 _ViridianFrstAfterBattleText6:
-    db $0,"CATERPIE Seems",$4f
-    db "so weak...",$51
-    db "I hope to ",$4f
-    db "Evolve it!",$57
+    text_init , "CATERPIE Seems"
+    text_line , "so weak..."
+    text_para , "I hope to "
+    text_line , "Evolve it!"
+    text_done
 
 _PreHM07Text:
-    db $0,"Kids like you",$4f
-    db "shouldn't be",$55
-    db "here!",$51
-    db "This intensive",$4f
-    db "course could be",$55
-    db "very useful",$55
-    db "to you!",$58
+    text_init , "Kids like you"
+    text_line , "shouldn't be"
+    text_cont , "here!"
+    text_para , "This intensive"
+    text_line , "course could be"
+    text_cont , "very useful"
+    text_cont , "to you!"
+    text_wait
 
 SECTION "bank21",ROMX,BANK[$21]
 
 _SilphCo5EndBattleText4:
-    db $0,"Oh",$4f
-    db "goodness!",$58
+    text_init , "Oh"
+    text_line , "goodness!"
+    text_wait
 
 _SilphCo5AfterBattleText4:
-    db $0,"You're only on 5F.",$4f
-    db "It's a long way",$55
-    db "to my BOSS!",$57
+    text_init , "You're only on 5F."
+    text_line , "It's a long way"
+    text_cont , "to my BOSS!"
+    text_done
 
 _SilphCo5BattleText5:
-    db $0,"Show TEAM ROCKET",$4f
-    db "a little respect!",$57
+    text_init , "Show TEAM ROCKET"
+    text_line , "a little respect!"
+    text_done
 
 _SilphCo5EndBattleText5:
-    db $0,"Cough...",$4f
-    db "Cough...",$58
+    text_init , "Cough..."
+    text_line , "Cough..."
+    text_wait
 
 _SilphCo5AfterBattleText5:
-    db $0,"Which reminds me.",$51
-    db "KOFFING evolves",$4f
-    db "into WEEZING!",$57
+    text_init , "Which reminds me."
+    text_para , "KOFFING evolves"
+    text_line , "into WEEZING!"
+    text_done
 
 _SilphCo5Text9:
-    db $0,"It's a #MON",$4f
-    db "REPORT!",$51
-    db "#MON LAB",$4f
-    db "created PORYGON,",$55
-    db "the first virtual",$55
-    db "reality #MON.",$57
+    text_init , "It's a #MON"
+    text_line , "REPORT!"
+    text_para , "#MON LAB"
+    text_line , "created PORYGON,"
+    text_cont , "the first virtual"
+    text_cont , "reality #MON."
+    text_done
 
 _SilphCo5Text10:
-    db $0,"It's a #MON",$4f
-    db "REPORT!",$51
-    db "Over 160 #MON",$4f
-    db "techniques have",$55
-    db "been confirmed.",$57
+    text_init , "It's a #MON"
+    text_line , "REPORT!"
+    text_para , "Over 160 #MON"
+    text_line , "techniques have"
+    text_cont , "been confirmed."
+    text_done
 
 _SilphCo5Text11:
-    db $0,"It's a #MON",$4f
-    db "REPORT!",$51
-    db "4 #MON evolve",$4f
-    db "only when traded",$55
-    db "by link-cable.",$57
+    text_init , "It's a #MON"
+    text_line , "REPORT!"
+    text_para , "4 #MON evolve"
+    text_line , "only when traded"
+    text_cont , "by link-cable."
+    text_done
 
 _UnnamedText_1a24a:
-    db $0,"The ROCKETs came",$4f
-    db "and took over the",$55
-    db "building!",$57
+    text_init , "The ROCKETs came"
+    text_line , "and took over the"
+    text_cont , "building!"
+    text_done
 
 _UnnamedText_1a24f:
-    db $0,"Well,better get",$4f
-    db "back to work!",$57
+    text_init , "Well,better get"
+    text_line , "back to work!"
+    text_done
 
 _UnnamedText_1a261:
-    db $0,"Oh dear,oh dear.",$4f
-    db "Help me please!",$57
+    text_init , "Oh dear,oh dear."
+    text_line , "Help me please!"
+    text_done
 
 _UnnamedText_1a266:
-    db $0,"We got engaged!",$4f
-    db "Heheh!",$57
+    text_init , "We got engaged!"
+    text_line , "Heheh!"
+    text_done
 
 _UnnamedText_1a278:
-    db $0,"Look at him! He's",$4f
-    db "such a coward!",$57
+    text_init , "Look at him! He's"
+    text_line , "such a coward!"
+    text_done
 
 _UnnamedText_1a27d:
-    db $0,"I feel so sorry",$4f
-    db "for him,I have",$55
-    db "to marry him!",$57
+    text_init , "I feel so sorry"
+    text_line , "for him,I have"
+    text_cont , "to marry him!"
+    text_done
 
 _UnnamedText_1a28f:
-    db $0,"TEAM ROCKET is",$4f
-    db "trying to conquer",$55
-    db "the world with",$55
-    db "#MON!",$57
+    text_init , "TEAM ROCKET is"
+    text_line , "trying to conquer"
+    text_cont , "the world with"
+    text_cont , "#MON!"
+    text_done
 
 _UnnamedText_1a294:
-    db $0,"TEAM ROCKET ran",$4f
-    db "because of you!",$57
+    text_init , "TEAM ROCKET ran"
+    text_line , "because of you!"
+    text_done
 
 _UnnamedText_1a2a6:
-    db $0,"They must have",$4f
-    db "targeted SILPH",$55
-    db "for our #MON",$55
-    db "products.",$57
+    text_init , "They must have"
+    text_line , "targeted SILPH"
+    text_cont , "for our #MON"
+    text_cont , "products."
+    text_done
 
 _UnnamedText_1a2ab:
-    db $0,"Come work for",$4f
-    db "SILPH when you",$55
-    db "get older!",$57
+    text_init , "Come work for"
+    text_line , "SILPH when you"
+    text_cont , "get older!"
+    text_done
 
 _SilphCo6BattleText2:
-    db $0,"I am one of the 4",$4f
-    db "ROCKET BROTHERS!",$57
+    text_init , "I am one of the 4"
+    text_line , "ROCKET BROTHERS!"
+    text_done
 
 _SilphCo6EndBattleText2:
-    db $0,"Flame",$4f
-    db "out!",$58
+    text_init , "Flame"
+    text_line , "out!"
+    text_wait
 
 _SilphCo6AfterBattleText2:
-    db $0,"No matter!",$4f
-    db "My brothers will",$55
-    db "avenge me!",$57
+    text_init , "No matter!"
+    text_line , "My brothers will"
+    text_cont , "avenge me!"
+    text_done
 
 _SilphCo6BattleText3:
-    db $0,"That rotten",$4f
-    db "PRESIDENT!",$51
-    db "He shouldn't have",$4f
-    db "sent me to the",$55
-    db "TIKSI BRANCH!",$57
+    text_init , "That rotten"
+    text_line , "PRESIDENT!"
+    text_para , "He shouldn't have"
+    text_line , "sent me to the"
+    text_cont , "TIKSI BRANCH!"
+    text_done
 
 _SilphCo6EndBattleText3:
-    db $0,"Shoot!",$58
+    text_init , "Shoot!"
+    text_wait
 
 _SilphCo6AfterBattleText3:
-    db $0,"TIKSI BRANCH?",$4f
-    db "It's in Russian",$55
-    db "no man's land!",$57
+    text_init , "TIKSI BRANCH?"
+    text_line , "It's in Russian"
+    text_cont , "no man's land!"
+    text_done
 
 _SilphCo6BattleText4:
-    db $0,"You dare betray",$4f
-    db "TEAM ROCKET?",$57
+    text_init , "You dare betray"
+    text_line , "TEAM ROCKET?"
+    text_done
 
 _SilphCo6EndBattleText4:
-    db $0,"You",$4f
-    db "traitor!",$58
+    text_init , "You"
+    text_line , "traitor!"
+    text_wait
 
 _SilphCo6AfterBattleText4:
-    db $0,"If you stand for",$4f
-    db "justice,you",$55
-    db "betray evil!",$57
+    text_init , "If you stand for"
+    text_line , "justice,you"
+    text_cont , "betray evil!"
+    text_done
 
 _UnnamedText_51dd3:
-    db $0,"Oh! Hi! You're",$4f
-    db "not a ROCKET! You",$55
-    db "came to save us?",$55
-    db "Why,thank you!",$51
-    db "I want you to",$4f
-    db "have this #MON",$55
-    db "for saving us.",$58
+    text_init , "Oh! Hi! You're"
+    text_line , "not a ROCKET! You"
+    text_cont , "came to save us?"
+    text_cont , "Why,thank you!"
+    text_para , "I want you to"
+    text_line , "have this #MON"
+    text_cont , "for saving us."
+    text_wait
 
 _UnnamedText_51dd8:
-    db $0,"It's PORYGON. It's",$4f
-    db "very intelligent.",$51
-    db "We create it in",$4f
-    db "lab,but it will",$55
-    db "be much better",$55
-    db "off with you!",$51
-    db "I think you will",$4f
-    db "be a good friend",$55
-    db "for PORYGON!",$51
-    db "It can also Hack",$4f
-    db "Computers!",$57
+    text_init , "It's PORYGON. It's"
+    text_line , "very intelligent."
+    text_para , "We create it in"
+    text_line , "lab,but it will"
+    text_cont , "be much better"
+    text_cont , "off with you!"
+    text_para , "I think you will"
+    text_line , "be a good friend"
+    text_cont , "for PORYGON!"
+    text_para , "It can also Hack"
+    text_line , "Computers!"
+    text_done
 
 _UnnamedText_51ddd:
-    db $0,"TEAM ROCKET's",$4f
-    db "BOSS went to the",$55
-    db "boardroom! Is our",$55
-    db "PRESIDENT OK?",$57
+    text_init , "TEAM ROCKET's"
+    text_line , "BOSS went to the"
+    text_cont , "boardroom! Is our"
+    text_cont , "PRESIDENT OK?"
+    text_done
 
 _UnnamedText_51de2:
-    db $0,"Saved at last!",$4f
-    db "Thank you!",$57
+    text_init , "Saved at last!"
+    text_line , "Thank you!"
+    text_done
 
 _UnnamedText_51e00:
-    db $0,"TEAM ROCKET was",$4f
-    db "after the MASTER",$55
-    db "BALL which will",$55
-    db "catch any #MON!",$57
+    text_init , "TEAM ROCKET was"
+    text_line , "after the MASTER"
+    text_cont , "BALL which will"
+    text_cont , "catch any #MON!"
+    text_done
 
 _UnnamedText_51e05:
-    db $0,"We canceled the",$4f
-    db "MASTER BALL",$55
-    db "project because",$55
-    db "of TEAM ROCKET.",$57
+    text_init , "We canceled the"
+    text_line , "MASTER BALL"
+    text_cont , "project because"
+    text_cont , "of TEAM ROCKET."
+    text_done
 
 _UnnamedText_51e23:
-    db $0,"It would be bad",$4f
-    db "if TEAM ROCKET",$55
-    db "took over SILPH",$55
-    db "or our #MON!",$57
+    text_init , "It would be bad"
+    text_line , "if TEAM ROCKET"
+    text_cont , "took over SILPH"
+    text_cont , "or our #MON!"
+    text_done
 
 _UnnamedText_51e28:
-    db $0,"Wow! You chased",$4f
-    db "off TEAM ROCKET",$55
-    db "all by yourself?",$57
+    text_init , "Wow! You chased"
+    text_line , "off TEAM ROCKET"
+    text_cont , "all by yourself?"
+    text_done
 
 _UnnamedText_51e46:
-    db $0,"You! It's really",$4f
-    db "dangerous here!",$55
-    db "You came to save",$55
-    db "me? You can't!",$57
+    text_init , "You! It's really"
+    text_line , "dangerous here!"
+    text_cont , "You came to save"
+    text_cont , "me? You can't!"
+    text_done
 
 _UnnamedText_51e4b:
-    db $0,"Safe at last!",$4f
-    db "Oh thank you!",$57
+    text_init , "Safe at last!"
+    text_line , "Oh thank you!"
+    text_done
 
 _SilphCo7BattleText1:
-    db $0,"Oh ho! I smell a",$4f
-    db "little rat!",$57
+    text_init , "Oh ho! I smell a"
+    text_line , "little rat!"
+    text_done
 
 _SilphCo7EndBattleText1:
-    db $0,"Lights",$4f
-    db "out!",$58
+    text_init , "Lights"
+    text_line , "out!"
+    text_wait
 
 _SilphCo7AfterBattleText1:
-    db $0,"You won't find my",$4f
-    db "BOSS by just",$55
-    db "scurrying around!",$57
+    text_init , "You won't find my"
+    text_line , "BOSS by just"
+    text_cont , "scurrying around!"
+    text_done
 
 _SilphCo7BattleText2:
-    db $0,"Heheh!",$51
-    db "You mistook me for",$4f
-    db "a SILPH worker?",$57
+    text_init , "Heheh!"
+    text_para , "You mistook me for"
+    text_line , "a SILPH worker?"
+    text_done
 
 _SilphCo7EndBattleText2:
-    db $0,"I'm",$4f
-    db "done!",$58
+    text_init , "I'm"
+    text_line , "done!"
+    text_wait
 
 _SilphCo7AfterBattleText2:
-    db $0,"Despite your age,",$4f
-    db "you are a skilled",$55
-    db "trainer!",$57
+    text_init , "Despite your age,"
+    text_line , "you are a skilled"
+    text_cont , "trainer!"
+    text_done
 
 _SilphCo7BattleText3:
-    db $0,"I am one of the 4",$4f
-    db "ROCKET BROTHERS!",$57
+    text_init , "I am one of the 4"
+    text_line , "ROCKET BROTHERS!"
+    text_done
 
 _SilphCo7EndBattleText3:
-    db $0,"Aack!",$4f
-    db "Brothers,I lost!",$58
+    text_init , "Aack!"
+    text_line , "Brothers,I lost!"
+    text_wait
 
 _SilphCo7AfterBattleText3:
-    db $0,"Doesn't matter.",$4f
-    db "My brothers will",$55
-    db "repay the favor!",$57
+    text_init , "Doesn't matter."
+    text_line , "My brothers will"
+    text_cont , "repay the favor!"
+    text_done
 
 _SilphCo7BattleText4:
-    db $0,"A child intruder?",$4f
-    db "That must be you!",$57
+    text_init , "A child intruder?"
+    text_line , "That must be you!"
+    text_done
 
 _SilphCo7EndBattleText4:
-    db $0,"Fine!",$4f
-    db "I lost!",$58
+    text_init , "Fine!"
+    text_line , "I lost!"
+    text_wait
 
 _SilphCo7AfterBattleText4:
-    db $0,"Go on home",$4f
-    db "before my BOSS",$55
-    db "gets ticked off!",$57
+    text_init , "Go on home"
+    text_line , "before my BOSS"
+    text_cont , "gets ticked off!"
+    text_done
 
 _UnnamedText_51ebe:
-    db $0,$53,": What",$4f
-    db "kept you ",$52,"?",$57
+    text_init , $53,": What"
+    text_line , "kept you ",$52,"?"
+    text_done
 
 _UnnamedText_51ec3:
-    db $0,$53,": Hahaha!",$4f
-    db "I thought you'd",$55
-    db "turn up if I",$55
-    db "waited here!",$51
-    db "I guess TEAM",$4f
-    db "ROCKET slowed you",$55
-    db "down! Not that I",$55
-    db "care!",$51
-    db "I saw you in",$4f
-    db "SAFFRON,so I",$55
-    db "decided to see if",$55
-    db "you got better!",$57
+    text_init , $53,": Hahaha!"
+    text_line , "I thought you'd"
+    text_cont , "turn up if I"
+    text_cont , "waited here!"
+    text_para , "I guess TEAM"
+    text_line , "ROCKET slowed you"
+    text_cont , "down! Not that I"
+    text_cont , "care!"
+    text_para , "I saw you in"
+    text_line , "SAFFRON,so I"
+    text_cont , "decided to see if"
+    text_cont , "you got better!"
+    text_done
 
 _UnnamedText_51ec8:
-    db $0,"Oh ho!",$4f
-    db "So,you are ready",$55
-    db "for BOSS ROCKET!",$58
+    text_init , "Oh ho!"
+    text_line , "So,you are ready"
+    text_cont , "for BOSS ROCKET!"
+    text_wait
 
 _UnnamedText_51ecd:
-    db $0,$53,": How can",$4f
-    db "I put this?",$51
-    db "You're not good",$4f
-    db "enough to play",$55
-    db "with us big boys!",$58
+    text_init , $53,": How can"
+    text_line , "I put this?"
+    text_para , "You're not good"
+    text_line , "enough to play"
+    text_cont , "with us big boys!"
+    text_wait
 
 _UnnamedText_51ed2:
-    db $0,"Well,",$52,"!",$51
-    db "I'm moving on up",$4f
-    db "and ahead!",$51
-    db "By checking my",$4f
-    db "#DEX,I'm",$55
-    db "starting to see",$55
-    db "what's strong and",$55
-    db "how they evolve!",$51
-    db "I'm going to the",$4f
-    db "#MON LEAGUE",$55
-    db "to boot out the",$55
-    db "ELITE FOUR!",$51
-    db "I'll become the",$4f
-    db "world's most",$55
-    db "powerful trainer!",$51
-    db $52,",well",$4f
-    db "good luck to you!",$55
-    db "Don't sweat it!",$55
-    db "Smell ya!",$57
+    text_init , "Well,",$52,"!"
+    text_para , "I'm moving on up"
+    text_line , "and ahead!"
+    text_para , "By checking my"
+    text_line , "#DEX,I'm"
+    text_cont , "starting to see"
+    text_cont , "what's strong and"
+    text_cont , "how they evolve!"
+    text_para , "I'm going to the"
+    text_line , "#MON LEAGUE"
+    text_cont , "to boot out the"
+    text_cont , "ELITE FOUR!"
+    text_para , "I'll become the"
+    text_line , "world's most"
+    text_cont , "powerful trainer!"
+    text_para,$52,",well"
+    text_line , "good luck to you!"
+    text_cont , "Don't sweat it!"
+    text_cont , "Smell ya!"
+    text_done
 
 _UnnamedText_565be:
-    db $0,"I wonder if SILPH",$4f
-    db "is finished...",$57
+    text_init , "I wonder if SILPH"
+    text_line , "is finished..."
+    text_done
 
 _UnnamedText_565c3:
-    db $0,"Thanks for saving",$4f
-    db "us!",$57
+    text_init , "Thanks for saving"
+    text_line , "us!"
+    text_done
 
 _SilphCo8BattleText1:
-    db $0,"That's as far as",$4f
-    db "you'll go!",$57
+    text_init , "That's as far as"
+    text_line , "you'll go!"
+    text_done
 
 _SilphCo8EndBattleText1:
-    db $0,"Not",$4f
-    db "enough grit!",$58
+    text_init , "Not"
+    text_line , "enough grit!"
+    text_wait
 
 _SilphCo8AfterBattleText1:
-    db $0,"If you don't turn",$4f
-    db "back,I'll call",$55
-    db "for backup!",$57
+    text_init , "If you don't turn"
+    text_line , "back,I'll call"
+    text_cont , "for backup!"
+    text_done
 
 _SilphCo8BattleText2:
-    db $0,"You're causing us",$4f
-    db "problems!",$57
+    text_init , "You're causing us"
+    text_line , "problems!"
+    text_done
 
 _SilphCo8EndBattleText2:
-    db $0,"Huh?",$4f
-    db "I lost?",$58
+    text_init , "Huh?"
+    text_line , "I lost?"
+    text_wait
 
 _SilphCo8AfterBattleText2:
-    db $0,"So,what do you",$4f
-    db "think of SILPH",$55
-    db "BUILDING's maze?",$57
+    text_init , "So,what do you"
+    text_line , "think of SILPH"
+    text_cont , "BUILDING's maze?"
+    text_done
 
 _SilphCo8BattleText3:
-    db $0,"I am one of the 4",$4f
-    db "ROCKET BROTHERS!",$57
+    text_init , "I am one of the 4"
+    text_line , "ROCKET BROTHERS!"
+    text_done
 
 _SilphCo8EndBattleText3:
-    db $0,"Whoo!",$4f
-    db "Oh brothers!",$58
+    text_init , "Whoo!"
+    text_line , "Oh brothers!"
+    text_wait
 
 _SilphCo8AfterBattleText3:
-    db $0,"I'll leave you up",$4f
-    db "to my brothers!",$57
+    text_init , "I'll leave you up"
+    text_line , "to my brothers!"
+    text_done
 
 _UnnamedText_5d8e5:
-    db $0,"You look tired!",$4f
-    db "You should take a",$55
-    db "quick nap!",$58
+    text_init , "You look tired!"
+    text_line , "You should take a"
+    text_cont , "quick nap!"
+    text_wait
 
 _UnnamedText_5d8ea:
-    db $0,"Don't give up!",$57
+    text_init , "Don't give up!"
+    text_done
 
 _UnnamedText_5d8ef:
-    db $0,"Thank you so",$4f
-    db "much!",$57
+    text_init , "Thank you so"
+    text_line , "much!"
+    text_done
 
 _SilphCo9BattleText1:
-    db $0,"Your #MON seem",$4f
-    db "to adore you,kid!",$57
+    text_init , "Your #MON seem"
+    text_line , "to adore you,kid!"
+    text_done
 
 _SilphCo9EndBattleText1:
-    db $0,"Ghaaah!",$58
+    text_init , "Ghaaah!"
+    text_wait
 
 _SilphCo9AfterBattleText1:
-    db $0,"If I had started",$4f
-    db "as a trainer at",$55
-    db "your age...",$57
+    text_init , "If I had started"
+    text_line , "as a trainer at"
+    text_cont , "your age..."
+    text_done
 
 _SilphCo9BattleText2:
-    db $0,"Your #MON have",$4f
-    db "weak points! I",$55
-    db "can nail them!",$57
+    text_init , "Your #MON have"
+    text_line , "weak points! I"
+    text_cont , "can nail them!"
+    text_done
 
 _SilphCo9EndBattleText2:
-    db $0,"You",$4f
-    db "hammered me!",$58
+    text_init , "You"
+    text_line , "hammered me!"
+    text_wait
 
 _SilphCo9AfterBattleText2:
-    db $0,"Exploiting weak",$4f
-    db "spots does work!",$55
-    db "Think about",$55
-    db "element types!",$57
+    text_init , "Exploiting weak"
+    text_line , "spots does work!"
+    text_cont , "Think about"
+    text_cont , "element types!"
+    text_done
 
 _SilphCo9BattleText3:
-    db $0,"I am one of the 4",$4f
-    db "ROCKET BROTHERS!",$57
+    text_init , "I am one of the 4"
+    text_line , "ROCKET BROTHERS!"
+    text_done
 
 _SilphCo9EndBattleText3:
-    db $0,"Warg!",$4f
-    db "Brothers,I lost!",$58
+    text_init , "Warg!"
+    text_line , "Brothers,I lost!"
+    text_wait
 
 _SilphCo9AfterBattleText3:
-    db $0,"My brothers will",$4f
-    db "avenge me!",$57
+    text_init , "My brothers will"
+    text_line , "avenge me!"
+    text_done
 
 _UnnamedText_5a1d3:
-    db $0,"Waaaaa!",$55
-    db "I'm scared!",$57
+    text_init , "Waaaaa!"
+    text_cont , "I'm scared!"
+    text_done
 
 _UnnamedText_5a1d8:
-    db $0,"Please keep quiet",$4f
-    db "about my crying!",$57
+    text_init , "Please keep quiet"
+    text_line , "about my crying!"
+    text_done
 
 _SilphCo10BattleText1:
-    db $0,"Welcome to the",$4f
-    db "10F! So good of",$55
-    db "you to join me!",$57
+    text_init , "Welcome to the"
+    text_line , "10F! So good of"
+    text_cont , "you to join me!"
+    text_done
 
 _SilphCo10EndBattleText1:
-    db $0,"I'm",$4f
-    db "stunned!",$58
+    text_init , "I'm"
+    text_line , "stunned!"
+    text_wait
 
 _SilphCo10AfterBattleText1:
-    db $0,"Nice try,but the",$4f
-    db "boardroom is up",$55
-    db "one more floor!",$57
+    text_init , "Nice try,but the"
+    text_line , "boardroom is up"
+    text_cont , "one more floor!"
+    text_done
 
 _SilphCo10BattleText2:
-    db $0,"Enough of your",$4f
-    db "silly games!",$57
+    text_init , "Enough of your"
+    text_line , "silly games!"
+    text_done
 
 _SilphCo10EndBattleText2:
-    db $0,"No",$4f
-    db "continues left!",$58
+    text_init , "No"
+    text_line , "continues left!"
+    text_wait
 
 _SilphCo10AfterBattleText2:
-    db $0,"Are you satisfied",$4f
-    db "with beating me?",$55
-    db "Then go on home!",$57
+    text_init , "Are you satisfied"
+    text_line , "with beating me?"
+    text_cont , "Then go on home!"
+    text_done
 
 _SilphCoPresidentText:
-    db $0,"PRESIDENT: Thank",$4f
-    db "you for saving",$55
-    db "SILPH!",$51
-    db "I will never",$4f
-    db "forget you saved",$55
-    db "us in our moment",$55
-    db "of peril!",$51
-    db "I have to thank",$4f
-    db "you in some way!",$51
-    db "Because I am rich,",$4f
-    db "I can give you",$55
-    db "anything!",$51
-    db "Here,maybe this",$4f
-    db "will do!",$58
+    text_init , "PRESIDENT: Thank"
+    text_line , "you for saving"
+    text_cont , "SILPH!"
+    text_para , "I will never"
+    text_line , "forget you saved"
+    text_cont , "us in our moment"
+    text_cont , "of peril!"
+    text_para , "I have to thank"
+    text_line , "you in some way!"
+    text_para , "Because I am rich,"
+    text_line , "I can give you"
+    text_cont , "anything!"
+    text_para , "Here,maybe this"
+    text_line , "will do!"
+    text_wait
 
 _ReceivedSilphCoMasterBallText:
-    db $0,$52," got a",$4f
-    db "@"
+    text_init , $52," got a"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_6231c:
-    db $0,"PRESIDENT: You",$4f
-    db "can't buy that",$55
-    db "anywhere!",$51
-    db "It's our secret",$4f
-    db "prototype MASTER",$55
-    db "BALL!",$51
-    db "It will catch any",$4f
-    db "#MON without",$55
-    db "fail!",$51
-    db "You should be",$4f
-    db "quiet about using",$55
-    db "it,though.",$57
+    text_init , "PRESIDENT: You"
+    text_line , "can't buy that"
+    text_cont , "anywhere!"
+    text_para , "It's our secret"
+    text_line , "prototype MASTER"
+    text_cont , "BALL!"
+    text_para , "It will catch any"
+    text_line , "#MON without"
+    text_cont , "fail!"
+    text_para , "You should be"
+    text_line , "quiet about using"
+    text_cont , "it,though."
+    text_done
 
 _SilphCoMasterBallNoRoomText:
-    db $0,"You have no",$4f
-    db "room for this.",$57
+    text_init , "You have no"
+    text_line , "room for this."
+    text_done
 
 _SilphCo11Text2:
-    db $0,"SECRETARY: Thank",$4f
-    db "you for rescuing",$55
-    db "all of us!",$51
-    db "We admire your",$4f
-    db "courage.",$57
+    text_init , "SECRETARY: Thank"
+    text_line , "you for rescuing"
+    text_cont , "all of us!"
+    text_para , "We admire your"
+    text_line , "courage."
+    text_done
 
 _SilphCo11Text3:
-    db $0,"Ah ",$52,"!",$4f
-    db "So we meet again!",$51
-    db "The PRESIDENT and",$4f
-    db "I are discussing",$55
-    db "a vital business",$55
-    db "proposition.",$51
-    db "Keep your nose",$4f
-    db "out of grown-up",$55
-    db "matters...",$51
-    db "Or,experience a",$4f
-    db "world of pain!",$57
+    text_init , "Ah ",$52,"!"
+    text_line , "So we meet again!"
+    text_para , "The PRESIDENT and"
+    text_line , "I are discussing"
+    text_cont , "a vital business"
+    text_cont , "proposition."
+    text_para , "Keep your nose"
+    text_line , "out of grown-up"
+    text_cont , "matters..."
+    text_para , "Or,experience a"
+    text_line , "world of pain!"
+    text_done
 
 _UnnamedText_62330:
-    db $0,"Arrgh!!",$4f
-    db "I lost again!?",$58
+    text_init , "Arrgh!!"
+    text_line , "I lost again!?"
+    text_wait
 
 _UnnamedText_62335:
-    db $0,"Blast it all!",$4f
-    db "You ruined our",$55
-    db "plans for SILPH!",$51
-    db "But,TEAM ROCKET",$4f
-    db "will never fall!",$51
-    db $52,"! Never",$4f
-    db "forget that all",$55
-    db "#MON exist",$55
-    db "for TEAM ROCKET!",$51
-    db "I must go,but I",$4f
-    db "shall return!",$57
+    text_init , "Blast it all!"
+    text_line , "You ruined our"
+    text_cont , "plans for SILPH!"
+    text_para , "But,TEAM ROCKET"
+    text_line , "will never fall!"
+    text_para,$52,"! Never"
+    text_line , "forget that all"
+    text_cont , "#MON exist"
+    text_cont , "for TEAM ROCKET!"
+    text_para , "I must go,but I"
+    text_line , "shall return!"
+    text_done
 
 _SilphCo11BattleText1:
-    db $0,"Stop right there!",$4f
-    db "Don't you move!",$57
+    text_init , "Stop right there!"
+    text_line , "Don't you move!"
+    text_done
 
 _SilphCo11EndBattleText1:
-    db $0,"Don't...",$4f
-    db "Please!",$58
+    text_init , "Don't..."
+    text_line , "Please!"
+    text_wait
 
 _SilphCo11AfterBattleText1:
-    db $0,"So,you want to",$4f
-    db "see my BOSS?",$57
+    text_init , "So,you want to"
+    text_line , "see my BOSS?"
+    text_done
 
 _SilphCo11BattleText2:
-    db $0,"Halt! Do you have",$4f
-    db "an appointment",$55
-    db "with my BOSS?",$57
+    text_init , "Halt! Do you have"
+    text_line , "an appointment"
+    text_cont , "with my BOSS?"
+    text_done
 
 _SilphCo11EndBattleText2:
-    db $0,"Gaah!",$4f
-    db "Demolished!",$58
+    text_init , "Gaah!"
+    text_line , "Demolished!"
+    text_wait
 
 _SilphCo11AfterBattleText2:
-    db $0,"Watch your step,",$4f
-    db "my BOSS likes his",$55
-    db "#MON tough!",$57
+    text_init , "Watch your step,"
+    text_line , "my BOSS likes his"
+    text_cont , "#MON tough!"
+    text_done
 
 _UnnamedText_6237b:
-    db $0,"The monitor has",$4f
-    db "#MON on it!",$57
+    text_init , "The monitor has"
+    text_line , "#MON on it!"
+    text_done
 
 _Mansion2BattleText1:
-    db $0,"I can't get out!",$4f
-    db "This old place is",$55
-    db "one big puzzle!",$57
+    text_init , "I can't get out!"
+    text_line , "This old place is"
+    text_cont , "one big puzzle!"
+    text_done
 
 _Mansion2EndBattleText1:
-    db $0,"Oh no!",$4f
-    db "My bag of loot!",$58
+    text_init , "Oh no!"
+    text_line , "My bag of loot!"
+    text_wait
 
 _Mansion2AfterBattleText1:
-    db $0,"Switches open and",$4f
-    db "close alternating",$55
-    db "sets of doors!",$57
+    text_init , "Switches open and"
+    text_line , "close alternating"
+    text_cont , "sets of doors!"
+    text_done
 
 _Mansion2Text3:
-    db $0,"Diary: July 5",$4f
-    db "Guyana,",$55
-    db "South America",$51
-    db "A new #MON was",$4f
-    db "discovered deep",$55
-    db "in the jungle.",$57
+    text_init , "Diary: July 5"
+    text_line , "Guyana,"
+    text_cont , "South America"
+    text_para , "A new #MON was"
+    text_line , "discovered deep"
+    text_cont , "in the jungle."
+    text_done
 
 _Mansion2Text4:
-    db $0,"Diary: July 10",$4f
-    db "We christened the",$55
-    db "newly discovered",$55
-    db "#MON,MEW.",$57
+    text_init , "Diary: July 10"
+    text_line , "We christened the"
+    text_cont , "newly discovered"
+    text_cont , "#MON,MEW."
+    text_done
 
 _UnnamedText_520c2:
-    db $0,"A secret switch!",$51
-    db "Press it?",$57
+    text_init , "A secret switch!"
+    text_para , "Press it?"
+    text_done
 
 _UnnamedText_520c7:
-    db $0,"Who wouldn't?",$58
+    text_init , "Who wouldn't?"
+    text_wait
 
 _UnnamedText_520cc:
-    db $0,"Not quite yet!",$57
+    text_init , "Not quite yet!"
+    text_done
 
 _Mansion3BattleText1:
-    db $0,"This place is",$4f
-    db "like,huge!",$57
+    text_init , "This place is"
+    text_line , "like,huge!"
+    text_done
 
 _Mansion3EndBattleText1:
-    db $0,"Ayah!",$58
+    text_init , "Ayah!"
+    text_wait
 
 _Mansion3AfterBattleText1:
-    db $0,"I wonder where",$4f
-    db "my partner went.",$57
+    text_init , "I wonder where"
+    text_line , "my partner went."
+    text_done
 
 _Mansion3BattleText2:
-    db $0,"My mentor once",$4f
-    db "lived here.",$57
+    text_init , "My mentor once"
+    text_line , "lived here."
+    text_done
 
 _Mansion3EndBattleText2:
-    db $0,"Whew!",$4f
-    db "Overwhelming!",$58
+    text_init , "Whew!"
+    text_line , "Overwhelming!"
+    text_wait
 
 _Mansion3AfterBattleText2:
-    db $0,"So,you're stuck?",$4f
-    db "Try jumping off",$55
-    db "over there!",$57
+    text_init , "So,you're stuck?"
+    text_line , "Try jumping off"
+    text_cont , "over there!"
+    text_done
 
 _Mansion3Text5:
-    db $0,"Diary: Feb. 6",$4f
-    db "MEW gave birth.",$51
-    db "We named the",$4f
-    db "newborn MEWTWO.",$57
+    text_init , "Diary: Feb. 6"
+    text_line , "MEW gave birth."
+    text_para , "We named the"
+    text_line , "newborn MEWTWO."
+    text_done
 
 _Mansion4BattleText1:
-    db $0,"Uh-oh. Where am",$4f
-    db "I now?",$57
+    text_init , "Uh-oh. Where am"
+    text_line , "I now?"
+    text_done
 
 _Mansion4EndBattleText1:
-    db $0,"Awooh!",$58
+    text_init , "Awooh!"
+    text_wait
 
 _Mansion4AfterBattleText1:
-    db $0,"You can find stuff",$4f
-    db "lying around.",$57
+    text_init , "You can find stuff"
+    text_line , "lying around."
+    text_done
 
 _Mansion4BattleText2:
-    db $0,"This place is",$4f
-    db "ideal for a lab.",$57
+    text_init , "This place is"
+    text_line , "ideal for a lab."
+    text_done
 
 _Mansion4EndBattleText2:
-    db $0,"What",$4f
-    db "was that for?",$58
+    text_init , "What"
+    text_line , "was that for?"
+    text_wait
 
 _Mansion4AfterBattleText2:
-    db $0,"I like it here!",$4f
-    db "It's conducive to",$55
-    db "my studies!",$57
+    text_init , "I like it here!"
+    text_line , "It's conducive to"
+    text_cont , "my studies!"
+    text_done
 
 _Mansion4Text7:
-    db $0,"Diary; Sept. 1",$4f
-    db "MEWTWO is far too",$55
-    db "powerful.",$51
-    db "We have failed to",$4f
-    db "curb its vicious",$55
-    db "tendencies...",$57
+    text_init , "Diary; Sept. 1"
+    text_line , "MEWTWO is far too"
+    text_cont , "powerful."
+    text_para , "We have failed to"
+    text_line , "curb its vicious"
+    text_cont , "tendencies..."
+    text_done
 
 _SafariZoneEastText5:
-    db $0,"REST HOUSE",$57
+    text_init , "REST HOUSE"
+    text_done
 
 _SafariZoneEastText6:
-    db $0,"TRAINER TIPS",$51
-    db "The remaining time",$4f
-    db "declines only",$55
-    db "while you walk!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "The remaining time"
+    text_line , "declines only"
+    text_cont , "while you walk!"
+    text_done
 
 _SafariZoneEastText7:
-    db $0,"CENTER AREA",$4f
-    db "NORTH: AREA 2",$57
+    text_init , "CENTER AREA"
+    text_line , "NORTH: AREA 2"
+    text_done
 
 _SafariZoneNorthText3:
-    db $0,"REST HOUSE",$57
+    text_init , "REST HOUSE"
+    text_done
 
 _SafariZoneNorthText4:
-    db $0,"TRAINER TIPS",$51
-    db "The SECRET HOUSE",$4f
-    db "is still ahead!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "The SECRET HOUSE"
+    text_line , "is still ahead!"
+    text_done
 
 _SafariZoneNorthText5:
-    db $0,"AREA 2",$57
+    text_init , "AREA 2"
+    text_done
 
 _SafariZoneNorthText6:
-    db $0,"TRAINER TIPS",$51
-    db "#MON hide in",$4f
-    db "tall grass!",$51
-    db "Zigzag through",$4f
-    db "grassy areas to",$55
-    db "flush them out.",$57
+    text_init , "TRAINER TIPS"
+    text_para , "#MON hide in"
+    text_line , "tall grass!"
+    text_para , "Zigzag through"
+    text_line , "grassy areas to"
+    text_cont , "flush them out."
+    text_done
 
 _SafariZoneWestText5:
-    db $0,"REST HOUSE",$57
+    text_init , "REST HOUSE"
+    text_done
 
 _SafariZoneWestText6:
-    db $0,"REQUEST NOTICE",$51
-    db "Please find the",$4f
-    db "SAFARI WARDEN's",$55
-    db "lost GOLD TEETH.",$55
-    db "They're around",$55
-    db "here somewhere.",$51
-    db "Reward offered!",$4f
-    db "Contact: WARDEN",$57
+    text_init , "REQUEST NOTICE"
+    text_para , "Please find the"
+    text_line , "SAFARI WARDEN's"
+    text_cont , "lost GOLD TEETH."
+    text_cont , "They're around"
+    text_cont , "here somewhere."
+    text_para , "Reward offered!"
+    text_line , "Contact: WARDEN"
+    text_done
 
 _SafariZoneWestText7:
-    db $0,"TRAINER TIPS",$51
-    db "Zone Exploration",$4f
-    db "Campaign!",$51
-    db "The Search for",$4f
-    db "the SECRET HOUSE!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "Zone Exploration"
+    text_line , "Campaign!"
+    text_para , "The Search for"
+    text_line , "the SECRET HOUSE!"
+    text_done
 
 _SafariZoneWestText8:
-    db $0,"AREA 3",$4f
-    db "EAST: CENTER AREA",$57
+    text_init , "AREA 3"
+    text_line , "EAST: CENTER AREA"
+    text_done
 
 _SafariZoneCenterText2:
-    db $0,"REST HOUSE",$57
+    text_init , "REST HOUSE"
+    text_done
 
 _SafariZoneCenterText3:
-    db $0,"TRAINER TIPS",$51
-    db "Press the START",$4f
-    db "Button to check",$55
-    db "remaining time!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "Press the START"
+    text_line , "Button to check"
+    text_cont , "remaining time!"
+    text_done
 
 _SafariZoneRestHouse1Text1:
-    db $0,"SARA: Where did",$4f
-    db "my boy friend,",$55
-    db "ERIK,go?",$57
+    text_init , "SARA: Where did"
+    text_line , "my boy friend,"
+    text_cont , "ERIK,go?"
+    text_done
 
 _SafariZoneRestHouse1Text2:
-    db $0,"I'm catching",$4f
-    db "#MON to take",$55
-    db "home as gifts!",$57
+    text_init , "I'm catching"
+    text_line , "#MON to take"
+    text_cont , "home as gifts!"
+    text_done
 
 _PreHM03Text:
-    db $0,"Ah! Finally!",$51
-    db "You're the first",$4f
-    db "person to reach",$55
-    db "the SECRET HOUSE!",$51
-    db "I was getting",$4f
-    db "worried that no",$55
-    db "one would win our",$55
-    db "campaign prize.",$51
-    db "Congratulations!",$4f
-    db "You have won!",$58
+    text_init , "Ah! Finally!"
+    text_para , "You're the first"
+    text_line , "person to reach"
+    text_cont , "the SECRET HOUSE!"
+    text_para , "I was getting"
+    text_line , "worried that no"
+    text_cont , "one would win our"
+    text_cont , "campaign prize."
+    text_para , "Congratulations!"
+    text_line , "You have won!"
+    text_wait
 
 _HM03AfterText:
-    db $0,"This is FLOAT!",$51
-    db "#MON will be",$4f
-    db "able to support",$55
-    db "you across water!",$51
-    db "And,Skill isn't ",$4f
-    db "disposable! You",$55
-    db "can use it over",$55
-    db "and over!",$51
-    db "You're super lucky",$4f
-    db "for winning this",$55
-    db "fabulous prize!",$57
+    text_init , "This is FLOAT!"
+    text_para , "#MON will be"
+    text_line , "able to support"
+    text_cont , "you across water!"
+    text_para , "And,Skill isn't "
+    text_line , "disposable! You"
+    text_cont , "can use it over"
+    text_cont , "and over!"
+    text_para , "You're super lucky"
+    text_line , "for winning this"
+    text_cont , "fabulous prize!"
+    text_done
 
 _SafariZoneRestHouse2Text1:
-    db $0,"Tossing ROCKs at",$4f
-    db "#MON might",$55
-    db "make them run,",$55
-    db "but they'll be",$55
-    db "easier to catch.",$57
+    text_init , "Tossing ROCKs at"
+    text_line , "#MON might"
+    text_cont , "make them run,"
+    text_cont , "but they'll be"
+    text_cont , "easier to catch."
+    text_done
 
 _SafariZoneRestHouse2Text2:
-    db $0,"Using BAIT will",$4f
-    db "make #MON",$55
-    db "easier to catch.",$57
+    text_init , "Using BAIT will"
+    text_line , "make #MON"
+    text_cont , "easier to catch."
+    text_done
 
 _SafariZoneRestHouse2Text3:
-    db $0,"I hiked a lot,but",$4f
-    db "I didn't see any",$55
-    db "#MON I wanted.",$57
+    text_init , "I hiked a lot,but"
+    text_line , "I didn't see any"
+    text_cont , "#MON I wanted."
+    text_done
 
 _SafariZoneRestHouse3Text1:
-    db $0,"How many did you",$4f
-    db "catch? I'm bushed",$55
-    db "from the work!",$57
+    text_init , "How many did you"
+    text_line , "catch? I'm bushed"
+    text_cont , "from the work!"
+    text_done
 
 _SafariZoneRestHouse3Text2:
-    db $0,"I caught a",$4f
-    db "CHANSEY!",$51
-    db "That makes this",$4f
-    db "all worthwhile!",$57
+    text_init , "I caught a"
+    text_line , "CHANSEY!"
+    text_para , "That makes this"
+    text_line , "all worthwhile!"
+    text_done
 
 _SafariZoneRestHouse3Text3:
-    db $0,"Whew! I'm tired",$4f
-    db "from all the fun!",$57
+    text_init , "Whew! I'm tired"
+    text_line , "from all the fun!"
+    text_done
 
 _SafariZoneRestHouse4Text1:
-    db $0,"You can keep any",$4f
-    db "item you find on",$55
-    db "the ground here.",$51
-    db "But,you'll run",$4f
-    db "out of time if",$55
-    db "you try for all",$55
-    db "of them at once!",$57
+    text_init , "You can keep any"
+    text_line , "item you find on"
+    text_cont , "the ground here."
+    text_para , "But,you'll run"
+    text_line , "out of time if"
+    text_cont , "you try for all"
+    text_cont , "of them at once!"
+    text_done
 
 _SafariZoneRestHouse4Text2:
-    db $0,"Go to the deepest",$4f
-    db "part of the",$55
-    db "SAFARI ZONE. You",$55
-    db "will win a prize!",$57
+    text_init , "Go to the deepest"
+    text_line , "part of the"
+    text_cont , "SAFARI ZONE. You"
+    text_cont , "will win a prize!"
+    text_done
 
 _SafariZoneRestHouse4Text3:
-    db $0,"My EEVEE evolved",$4f
-    db "into FLAREON!",$51
-    db "But,a friend's",$4f
-    db "EEVEE turned into",$55
-    db "a VAPOREON!",$55
-    db "I wonder why?",$57
+    text_init , "My EEVEE evolved"
+    text_line , "into FLAREON!"
+    text_para , "But,a friend's"
+    text_line , "EEVEE turned into"
+    text_cont , "a VAPOREON!"
+    text_cont , "I wonder why?"
+    text_done
 
 _UnknownDungeon4MewtwoText:
-    db $0,"Mew!@@"
+    text_init , "Mew!"
+    text_past
 
 _VictoryRoad1BattleText1:
-    db $0,"I wonder if you",$4f
-    db "are good enough",$55
-    db "for me!",$57
+    text_init , "I wonder if you"
+    text_line , "are good enough"
+    text_cont , "for me!"
+    text_done
 
 _VictoryRoad1EndBattleText1:
-    db $0,"I",$4f
-    db "lost out!",$58
+    text_init , "I"
+    text_line , "lost out!"
+    text_wait
 
 _VictoryRoad1AfterBattleText1:
-    db $0,"I never wanted to",$4f
-    db "lose to anybody!",$57
+    text_init , "I never wanted to"
+    text_line , "lose to anybody!"
+    text_done
 
 _VictoryRoad1BattleText2:
-    db $0,"I can see you're",$4f
-    db "good! Let me see",$55
-    db "exactly how good!",$57
+    text_init , "I can see you're"
+    text_line , "good! Let me see"
+    text_cont , "exactly how good!"
+    text_done
 
 _VictoryRoad1EndBattleText2:
-    db $0,"I",$4f
-    db "had a chance...",$58
+    text_init , "I"
+    text_line , "had a chance..."
+    text_wait
 
 _VictoryRoad1AfterBattleText2:
-    db $0,"I concede,you're",$4f
-    db "better than me!",$57
+    text_init , "I concede,you're"
+    text_line , "better than me!"
+    text_done
 
 _LanceBeforeBattleText:
-    db $0,"Ah! I heard about",$4f
-    db "you ",$52,"!",$51
-    db "I lead the ELITE",$4f
-    db "FOUR! You can",$55
-    db "call me LANCE the",$55
-    db "dragon trainer!",$51
-    db "You know that",$4f
-    db "dragons are",$55
-    db "mythical #MON!",$51
-    db "They're hard to",$4f
-    db "catch and raise,",$55
-    db "but their powers",$55
-    db "are superior!",$51
-    db "They're virtually",$4f
-    db "indestructible!",$51
-    db "Well,are you",$4f
-    db "ready to lose?",$51
-    db "Your LEAGUE",$4f
-    db "challenge ends",$55
-    db "with me,",$52,"!",$57
+    text_init , "Ah! I heard about"
+    text_line , "you ",$52,"!"
+    text_para , "I lead the ELITE"
+    text_line , "FOUR! You can"
+    text_cont , "call me LANCE the"
+    text_cont , "dragon trainer!"
+    text_para , "You know that"
+    text_line , "dragons are"
+    text_cont , "mythical #MON!"
+    text_para , "They're hard to"
+    text_line , "catch and raise,"
+    text_cont , "but their powers"
+    text_cont , "are superior!"
+    text_para , "They're virtually"
+    text_line , "indestructible!"
+    text_para , "Well,are you"
+    text_line , "ready to lose?"
+    text_para , "Your LEAGUE"
+    text_line , "challenge ends"
+    text_cont , "with me,",$52,"!"
+    text_done
 
 _LanceEndBattleText:
-    db $0,"That's it!",$51
-    db "I hate to admit",$4f
-    db "it,but you are a",$55
-    db "#MON master!",$58
+    text_init , "That's it!"
+    text_para , "I hate to admit"
+    text_line , "it,but you are a"
+    text_cont , "#MON master!"
+    text_wait
 
 _LanceAfterBattleText:
-    db $0,"I still can't",$4f
-    db "believe my",$55
-    db "dragons lost to",$55
-    db "you,",$52,"!",$51
-    db "You are now the",$4f
-    db "#MON LEAGUE",$55
-    db "champion!",$51
-    db "...Or,you would",$4f
-    db "have been,but",$55
-    db "you have one more",$55
-    db "challenge ahead.",$51
-    db "You have to face",$4f
-    db "another trainer!",$55
-    db "His name is...",$51
-    db $53,"!",$4f
-    db "He beat the ELITE",$55
-    db "FOUR before you!",$51
-    db "He is the real",$4f
-    db "#MON LEAGUE",$55
-    db "champion!@@"
+    text_init , "I still can't"
+    text_line , "believe my"
+    text_cont , "dragons lost to"
+    text_cont , "you,",$52,"!"
+    text_para , "You are now the"
+    text_line , "#MON LEAGUE"
+    text_cont , "champion!"
+    text_para , "...Or,you would"
+    text_line , "have been,but"
+    text_cont , "you have one more"
+    text_cont , "challenge ahead."
+    text_para , "You have to face"
+    text_line , "another trainer!"
+    text_cont , "His name is..."
+    text_para,$53,"!"
+    text_line , "He beat the ELITE"
+    text_cont , "FOUR before you!"
+    text_para , "He is the real"
+    text_line , "#MON LEAGUE"
+    text_cont , "champion!"
+    text_past
 
 _HallofFameRoomText1:
-    db $0,"OAK: Er-hem!",$4f
-    db "Congratulations",$55
-    db $52,"!",$51
-    db "This floor is the",$4f
-    db "#MON HALL OF",$55
-    db "FAME!",$51
-    db "#MON LEAGUE",$4f
-    db "champions are",$55
-    db "honored for their",$55
-    db "exploits here!",$51
-    db "Their #MON are",$4f
-    db "also recorded in",$55
-    db "the HALL OF FAME!",$51
-    db $52,"! You have",$4f
-    db "endeavored hard",$55
-    db "to become the new",$55
-    db "LEAGUE champion!",$51
-    db "Congratulations,",$4f
-    db $52,",you and",$55
-    db "your #MON are",$55
-    db "HALL OF FAMERs!",$57
+    text_init , "OAK: Er-hem!"
+    text_line , "Congratulations"
+    text_cont , $52,"!"
+    text_para , "This floor is the"
+    text_line , "#MON HALL OF"
+    text_cont , "FAME!"
+    text_para , "#MON LEAGUE"
+    text_line , "champions are"
+    text_cont , "honored for their"
+    text_cont , "exploits here!"
+    text_para , "Their #MON are"
+    text_line , "also recorded in"
+    text_cont , "the HALL OF FAME!"
+    text_para,$52,"! You have"
+    text_line , "endeavored hard"
+    text_cont , "to become the new"
+    text_cont , "LEAGUE champion!"
+    text_para , "Congratulations,"
+    text_line , $52,",you and"
+    text_cont , "your #MON are"
+    text_cont , "HALL OF FAMERs!"
+    text_done
 
 _UnnamedText_760f4:
-    db $0,$53,": Hey!",$51
-    db "I was looking",$4f
-    db "forward to seeing",$55
-    db "you,",$52,"!",$51
-    db "My rival should",$4f
-    db "be strong to keep",$55
-    db "me sharp!",$51
-    db "While working on",$4f
-    db "#DEX,I looked",$55
-    db "all over for",$55
-    db "powerful #MON!",$51
-    db "Not only that,I",$4f
-    db "assembled teams",$55
-    db "that would beat",$55
-    db "any #MON type!",$51
-    db "And now!",$51
-    db "I'm the #MON",$4f
-    db "LEAGUE champion!",$51
-    db $52,"! Do you",$4f
-    db "know what that",$55
-    db "means?",$51
-    db "I'll tell you!",$51
-    db "I am the most",$4f
-    db "powerful trainer",$55
-    db "in the world!",$57
+    text_init , $53,": Hey!"
+    text_para , "I was looking"
+    text_line , "forward to seeing"
+    text_cont , "you,",$52,"!"
+    text_para , "My rival should"
+    text_line , "be strong to keep"
+    text_cont , "me sharp!"
+    text_para , "While working on"
+    text_line , "#DEX,I looked"
+    text_cont , "all over for"
+    text_cont , "powerful #MON!"
+    text_para , "Not only that,I"
+    text_line , "assembled teams"
+    text_cont , "that would beat"
+    text_cont , "any #MON type!"
+    text_para , "And now!"
+    text_para , "I'm the #MON"
+    text_line , "LEAGUE champion!"
+    text_para,$52,"! Do you"
+    text_line , "know what that"
+    text_cont , "means?"
+    text_para , "I'll tell you!"
+    text_para , "I am the most"
+    text_line , "powerful trainer"
+    text_cont , "in the world!"
+    text_done
 
 _UnnamedText_760f9:
-    db $0,"NO!",$4f
-    db "That can't be!",$55
-    db "You beat my best!",$51
-    db "After all that",$4f
-    db "work to become",$55
-    db "LEAGUE champ?",$51
-    db "My reign is over",$4f
-    db "already?",$55
-    db "It's not fair!",$58
+    text_init , "NO!"
+    text_line , "That can't be!"
+    text_cont , "You beat my best!"
+    text_para , "After all that"
+    text_line , "work to become"
+    text_cont , "LEAGUE champ?"
+    text_para , "My reign is over"
+    text_line , "already?"
+    text_cont , "It's not fair!"
+    text_wait
 
 _UnnamedText_760fe:
-    db $0,"Hahaha!",$4f
-    db "I won,I won!",$51
-    db "I'm too good for",$4f
-    db "you,",$52,"!",$51
-    db "You did well to",$4f
-    db "even reach me,",$55
-    db $53,",the",$55
-    db "#MON genius!",$51
-    db "Nice try,loser!",$4f
-    db "Hahaha!",$58
+    text_init , "Hahaha!"
+    text_line , "I won,I won!"
+    text_para , "I'm too good for"
+    text_line , "you,",$52,"!"
+    text_para , "You did well to"
+    text_line , "even reach me,"
+    text_cont , $53,",the"
+    text_cont , "#MON genius!"
+    text_para , "Nice try,loser!"
+    text_line , "Hahaha!"
+    text_wait
 
 _UnnamedText_76103:
-    db $0,"Why?",$4f
-    db "Why did I lose?",$51
-    db "I never made any",$4f
-    db "mistakes raising",$55
-    db "my #MON...",$51
-    db "Darn it! You're",$4f
-    db "the new #MON",$55
-    db "LEAGUE champion!",$51
-    db "Although I don't",$4f
-    db "like to admit it.",$57
+    text_init , "Why?"
+    text_line , "Why did I lose?"
+    text_para , "I never made any"
+    text_line , "mistakes raising"
+    text_cont , "my #MON..."
+    text_para , "Darn it! You're"
+    text_line , "the new #MON"
+    text_cont , "LEAGUE champion!"
+    text_para , "Although I don't"
+    text_line , "like to admit it."
+    text_done
 
 _GaryText2:
-    db $0,"OAK: ",$52,"!",$57
+    text_init , "OAK: ",$52,"!"
+    text_done
 
 _UnnamedText_76120:
-    db $0,"OAK: So,you won!",$4f
-    db "Congratulations!",$55
-    db "You're the new",$55
-    db "#MON LEAGUE",$55
-    db "champion!",$51
-    db "You've grown up so",$4f
-    db "much since you",$55
-    db "first left with",$55
-    db "@"
+    text_init , "OAK: So,you won!"
+    text_line , "Congratulations!"
+    text_cont , "You're the new"
+    text_cont , "#MON LEAGUE"
+    text_cont , "champion!"
+    text_para , "You've grown up so"
+    text_line , "much since you"
+    text_cont , "first left with"
+    text_cont
+    text_paus
     TX_RAM $cd6d
-    db $0,"!",$51
-    db $52,",you have",$4f
-    db "come of age!",$57
+    text_init , "!"
+    text_para,$52,",you have"
+    text_line , "come of age!"
+    text_done
 
 _UnnamedText_76125:
-    db $0,"OAK: ",$53,"! I'm",$4f
-    db "disappointed!",$51
-    db "I came when I",$4f
-    db "heard you beat",$55
-    db "the ELITE FOUR!",$51
-    db "But,when I got",$4f
-    db "here,you had",$55
-    db "already lost!",$51
-    db $53,"! Do you",$4f
-    db "understand why",$55
-    db "you lost?",$51
-    db "You have forgotten",$4f
-    db "to treat your",$55
-    db "#MON with",$55
-    db "trust and love!",$51
-    db "Without them,you",$4f
-    db "will never become",$55
-    db "a champ again!",$57
+    text_init , "OAK: ",$53,"! I'm"
+    text_line , "disappointed!"
+    text_para , "I came when I"
+    text_line , "heard you beat"
+    text_cont , "the ELITE FOUR!"
+    text_para , "But,when I got"
+    text_line , "here,you had"
+    text_cont , "already lost!"
+    text_para,$53,"! Do you"
+    text_line , "understand why"
+    text_cont , "you lost?"
+    text_para , "You have forgotten"
+    text_line , "to treat your"
+    text_cont , "#MON with"
+    text_cont , "trust and love!"
+    text_para , "Without them,you"
+    text_line , "will never become"
+    text_cont , "a champ again!"
+    text_done
 
 _UnnamedText_7612a:
-    db $0,"OAK: ",$52,"!",$51
-    db "You understand",$4f
-    db "that your victory",$55
-    db "was not just your",$55
-    db "own doing!",$51
-    db "The bond you share",$4f
-    db "with your #MON",$55
-    db "is marvelous!",$51
-    db $52,"!",$4f
-    db "Come with me!",$57
+    text_init , "OAK: ",$52,"!"
+    text_para , "You understand"
+    text_line , "that your victory"
+    text_cont , "was not just your"
+    text_cont , "own doing!"
+    text_para , "The bond you share"
+    text_line , "with your #MON"
+    text_cont , "is marvelous!"
+    text_para,$52,"!"
+    text_line , "Come with me!"
+    text_done
 
 _LoreleiBeforeBattleText:
-    db $0,"I am LORELEI of",$4f
-    db "the ELITE FOUR!",$51
-    db "No one can best",$4f
-    db "me when it comes",$55
-    db "to icy #MON!",$51
-    db "Freezing moves",$4f
-    db "are powerful!",$51
-    db "Your #MON will",$4f
-    db "be at my mercy",$55
-    db "when they are",$55
-    db "frozen solid!",$51
-    db "Hahaha!",$4f
-    db "Are you ready?",$57
+    text_init , "I am LORELEI of"
+    text_line , "the ELITE FOUR!"
+    text_para , "No one can best"
+    text_line , "me when it comes"
+    text_cont , "to icy #MON!"
+    text_para , "Freezing moves"
+    text_line , "are powerful!"
+    text_para , "Your #MON will"
+    text_line , "be at my mercy"
+    text_cont , "when they are"
+    text_cont , "frozen solid!"
+    text_para , "Hahaha!"
+    text_line , "Are you ready?"
+    text_done
 
 _LoreleiEndBattleText:
-    db $0,"How",$4f
-    db "dare you!",$58
+    text_init , "How"
+    text_line , "dare you!"
+    text_wait
 
 _LoreleiAfterBattleText:
-    db $0,"You're better",$4f
-    db "than I thought!",$55
-    db "Go on ahead!",$51
-    db "You only got a",$4f
-    db "taste of #MON",$55
-    db "LEAGUE power!",$57
+    text_init , "You're better"
+    text_line , "than I thought!"
+    text_cont , "Go on ahead!"
+    text_para , "You only got a"
+    text_line , "taste of #MON"
+    text_cont , "LEAGUE power!"
+    text_done
 
 _UnnamedText_7627b:
-    db $0,"Someone's voice:",$4f
-    db "Don't run away!",$57
+    text_init , "Someone's voice:"
+    text_line , "Don't run away!"
+    text_done
 
 _BrunoBeforeBattleText:
-    db $0,"Welcome to",$4f
-    db "#MON LEAGUE!",$51
-    db "I am BRUNO of",$4f
-    db "the ELITE FOUR!",$51
-    db "Through rigorous",$4f
-    db "training,people",$55
-    db "and #MON can",$55
-    db "become stronger!",$51
-    db "I've weight",$4f
-    db "trained with",$55
-    db "my #MON!",$51
-    db $52,"!",$51
-    db "We will grind you",$4f
-    db "down with our",$55
-    db "superior power!",$51
-    db "Hoo hah!",$57
+    text_init , "Welcome to"
+    text_line , "#MON LEAGUE!"
+    text_para , "I am BRUNO of"
+    text_line , "the ELITE FOUR!"
+    text_para , "Through rigorous"
+    text_line , "training,people"
+    text_cont , "and #MON can"
+    text_cont , "become stronger!"
+    text_para , "I've weight"
+    text_line , "trained with"
+    text_cont , "my #MON!"
+    text_para,$52,"!"
+    text_para , "We will grind you"
+    text_line , "down with our"
+    text_cont , "superior power!"
+    text_para , "Hoo hah!"
+    text_done
 
 _BrunoEndBattleText:
-    db $0,"Why?",$4f
-    db "How could I lose?",$58
+    text_init , "Why?"
+    text_line , "How could I lose?"
+    text_wait
 
 _BrunoAfterBattleText:
-    db $0,"My job is done!",$4f
-    db "Go face your next",$55
-    db "challenge!",$57
+    text_init , "My job is done!"
+    text_line , "Go face your next"
+    text_cont , "challenge!"
+    text_done
 
 _UnnamedText_763d2:
-    db $0,"Someone's voice:",$4f
-    db "Don't run away!",$57
+    text_init , "Someone's voice:"
+    text_line , "Don't run away!"
+    text_done
 
 _AgathaBeforeBattleText:
-    db $0,"I am AGATHA of",$4f
-    db "the ELITE FOUR!",$51
-    db "OAK's taken a lot",$4f
-    db "of interest in",$55
-    db "you,child!",$51
-    db "That old duff was",$4f
-    db "once tough and",$55
-    db "handsome! That",$55
-    db "was decades ago!",$51
-    db "Now he just wants",$4f
-    db "to fiddle with",$55
-    db "his #DEX! He's",$55
-    db "wrong! #MON",$55
-    db "are for fighting!",$51
-    db $52,"! I'll show",$4f
-    db "you how a real",$55
-    db "trainer fights!",$57
+    text_init , "I am AGATHA of"
+    text_line , "the ELITE FOUR!"
+    text_para , "OAK's taken a lot"
+    text_line , "of interest in"
+    text_cont , "you,child!"
+    text_para , "That old duff was"
+    text_line , "once tough and"
+    text_cont , "handsome! That"
+    text_cont , "was decades ago!"
+    text_para , "Now he just wants"
+    text_line , "to fiddle with"
+    text_cont , "his #DEX! He's"
+    text_cont , "wrong! #MON"
+    text_cont , "are for fighting!"
+    text_para,$52,"! I'll show"
+    text_line , "you how a real"
+    text_cont , "trainer fights!"
+    text_done
 
 _AgathaEndBattleText:
-    db $0,"Oh ho!",$4f
-    db "You're something",$55
-    db "special,child!",$58
+    text_init , "Oh ho!"
+    text_line , "You're something"
+    text_cont , "special,child!"
+    text_wait
 
 _AgathaAfterBattleText:
-    db $0,"You win! I see",$4f
-    db "what the old duff",$55
-    db "sees in you now!",$51
-    db "I have nothing",$4f
-    db "else to say! Run",$55
-    db "along now,child!",$57
+    text_init , "You win! I see"
+    text_line , "what the old duff"
+    text_cont , "sees in you now!"
+    text_para , "I have nothing"
+    text_line , "else to say! Run"
+    text_cont , "along now,child!"
+    text_done
 
 _AgathaText2:
-    db $0,"Someone's voice:",$4f
-    db "Don't run away!",$57
+    text_init , "Someone's voice:"
+    text_line , "Don't run away!"
+    text_done
 
 _RockTunnel2BattleText2:
-    db $0,"Hikers leave twigs",$4f
-    db "as trail markers.",$57
+    text_init , "Hikers leave twigs"
+    text_line , "as trail markers."
+    text_done
 
 _RockTunnel2EndBattleText2:
-    db $0,"Ohhh!",$4f
-    db "I did my best!",$58
+    text_init , "Ohhh!"
+    text_line , "I did my best!"
+    text_wait
 
 _RockTunnel2AfterBattleText2:
-    db $0,"I want to go ",$4f
-    db "home!",$57
+    text_init , "I want to go "
+    text_line , "home!"
+    text_done
 
 _RockTunnel2BattleText3:
-    db $0,"Hahaha! Can you",$4f
-    db "beat my power?",$57
+    text_init , "Hahaha! Can you"
+    text_line , "beat my power?"
+    text_done
 
 _RockTunnel2EndBattleText3:
-    db $0,"Oops!",$4f
-    db "Out-muscled!",$58
+    text_init , "Oops!"
+    text_line , "Out-muscled!"
+    text_wait
 
 _RockTunnel2AfterBattleText3:
-    db $0,"I go for power",$4f
-    db "because I hate",$55
-    db "thinking!",$57
+    text_init , "I go for power"
+    text_line , "because I hate"
+    text_cont , "thinking!"
+    text_done
 
 _RockTunnel2BattleText4:
-    db $0,"You have a",$4f
-    db "#DEX?",$55
-    db "I want one too!",$57
+    text_init , "You have a"
+    text_line , "#DEX?"
+    text_cont , "I want one too!"
+    text_done
 
 _RockTunnel2EndBattleText4:
-    db $0,"Shoot!",$4f
-    db "I'm so jealous!",$58
+    text_init , "Shoot!"
+    text_line , "I'm so jealous!"
+    text_wait
 
 _RockTunnel2AfterBattleText4:
-    db $0,"When you finish",$4f
-    db "your #DEX,can",$55
-    db "I have it?",$57
+    text_init , "When you finish"
+    text_line , "your #DEX,can"
+    text_cont , "I have it?"
+    text_done
 
 _RockTunnel2BattleText5:
-    db $0,"Do you know about",$4f
-    db "costume players?",$57
+    text_init , "Do you know about"
+    text_line , "costume players?"
+    text_done
 
 _RockTunnel2EndBattleText5:
-    db $0,"Well,",$4f
-    db "that's that.",$58
+    text_init , "Well,"
+    text_line , "that's that."
+    text_wait
 
 _RockTunnel2AfterBattleText5:
-    db $0,"Costume players",$4f
-    db "dress up as",$55
-    db "#MON for fun.",$57
+    text_init , "Costume players"
+    text_line , "dress up as"
+    text_cont , "#MON for fun."
+    text_done
 
 _RockTunnel2BattleText6:
-    db $0,"My #MON",$4f
-    db "techniques will",$55
-    db "leave you crying!",$57
+    text_init , "My #MON"
+    text_line , "techniques will"
+    text_cont , "leave you crying!"
+    text_done
 
 _RockTunnel2EndBattleText6:
-    db $0,"I give!",$4f
-    db "You're a better",$55
-    db "technician!",$58
+    text_init , "I give!"
+    text_line , "You're a better"
+    text_cont , "technician!"
+    text_wait
 
 _RockTunnel2AfterBattleText6:
-    db $0,"In mountains,",$4f
-    db "you'll often find",$55
-    db "rock-type #MON.",$57
+    text_init , "In mountains,"
+    text_line , "you'll often find"
+    text_cont , "rock-type #MON."
+    text_done
 
 _RockTunnel2BattleText7:
-    db $0,"I don't often",$4f
-    db "come here,but I",$55
-    db "will fight you.",$57
+    text_init , "I don't often"
+    text_line , "come here,but I"
+    text_cont , "will fight you."
+    text_done
 
 _RockTunnel2EndBattleText7:
-    db $0,"Oh!",$4f
-    db "I lost!",$58
+    text_init , "Oh!"
+    text_line , "I lost!"
+    text_wait
 
 _RockTunnel2AfterBattleText7:
-    db $0,"I like tiny",$4f
-    db "#MON,big ones",$55
-    db "are too scary!",$57
+    text_init , "I like tiny"
+    text_line , "#MON,big ones"
+    text_cont , "are too scary!"
+    text_done
 
 _RockTunnel2BattleText8:
-    db $0,"Hit me with your",$4f
-    db "best shot!",$57
+    text_init , "Hit me with your"
+    text_line , "best shot!"
+    text_done
 
 _RockTunnel2EndBattleText8:
-    db $0,"Fired",$4f
-    db "away!",$58
+    text_init , "Fired"
+    text_line , "away!"
+    text_wait
 
 _UnknownDungeon4AlakazamText:
-    db $0,"Kazam!@@"
+    text_init , "Kazam!"
+    text_past
 
 _UnknownDungeon4MachampText:
-    db $0,"Champ!@@"
+    text_init , "Champ!"
+    text_past
 
 _UnknownDungeon4GolemText:
-    db $0,"Gooooo!@@"
+    text_init , "Gooooo!"
+    text_past
 
 _UnknownDungeon4GengarText:
-    db $0,"Geeeeeeeeeee!@@"
+    text_init , "Geeeeeeeeeee!"
+    text_past
 
 _ErikWhatText:
-    db 0,"What? SARA is",$4f
-    db "in SAFARI ZONE?@@"
+    text_init , "What? SARA is"
+    text_line , "in SAFARI ZONE?"
+    text_past
 
 _TM60PreText:
-    db $0,"ERIK: Thanks",$4f
-    db "Man!! I want to",$55
-    db "give you this as",$55
-    db "a thank you!",$58
+    text_init , "ERIK: Thanks"
+    text_line , "Man!! I want to"
+    text_cont , "give you this as"
+    text_cont , "a thank you!"
+    text_wait
 
 _TM60ExplanationText:
-    db $0,"TM60 is",$4f
-    db "DIZZY PUNCH!",$51
-    db "Very Strong!",$4f
-    db "It can also",$55
-    db "confuse targeted",$55
-    db "#MON!",$57
+    text_init , "TM60 is"
+    text_line , "DIZZY PUNCH!"
+    text_para , "Very Strong!"
+    text_line , "It can also"
+    text_cont , "confuse targeted"
+    text_cont , "#MON!"
+    text_done
 
 _SaraAndErikText
-    db 0,"SARA: ERIK!! "
-    db $DB,$DB,$DB,"@@" ; ❤️
+    text_init , "SARA: ERIK!! "
+    db $DB,$DB,$DB ; ❤️
+    text_past
 
 _ErikAndSaraText
-    db 0,"ERIK: SARA!! "
-    db $DB,$DB,$DB,"@@" ; ❤️
+    text_init , "ERIK: SARA!! "
+    db $DB,$DB,$DB ; ❤️
+    text_past
 
 _SafariZoneNorthText7:
-    db $0,"TRAINER TIPS",$51
-    db "Win a New SKILL",$4f
-    db "for finding the",$55
-    db "SECRET HOUSE!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "Win a New SKILL"
+    text_line , "for finding the"
+    text_cont , "SECRET HOUSE!"
+    text_done
 
 SECTION "bank22",ROMX,BANK[$22]
 
 _RockTunnel2AfterBattleText8:
-    db $0,"I'll raise my",$4f
-    db "#MON to beat",$55
-    db "yours,kid!",$57
+    text_init , "I'll raise my"
+    text_line , "#MON to beat"
+    text_cont , "yours,kid!"
+    text_done
 
 _RockTunnel2BattleText9:
-    db $0,"I draw #MON",$4f
-    db "when I'm home.",$57
+    text_init , "I draw #MON"
+    text_line , "when I'm home."
+    text_done
 
 _RockTunnel2EndBattleText9:
-    db $0,"Whew!",$4f
-    db "I'm exhausted!",$58
+    text_init , "Whew!"
+    text_line , "I'm exhausted!"
+    text_wait
 
 _RockTunnel2AfterBattleText9:
-    db $0,"I'm an artist,",$4f
-    db "not a fighter.",$57
+    text_init , "I'm an artist,"
+    text_line , "not a fighter."
+    text_done
 
 _SeafoamIslands5BattleText2:
-    db $0,"Gyaoo!@@"
+    text_init , "Gyaoo!"
+    text_past
 
 _SeafoamIslands5Text4:
-    db $0,"Boulders might",$4f
-    db "change the flow",$55
-    db "of water!",$57
+    text_init , "Boulders might"
+    text_line , "change the flow"
+    text_cont , "of water!"
+    text_done
 
 _SeafoamIslands5Text5:
-    db $0,"DANGER",$4f
-    db "Fast current!",$57
+    text_init , "DANGER"
+    text_line , "Fast current!"
+    text_done
 
 _AIBattleUseItemText:
     db 1
     dw W_TRAINERNAME
-    db 0,$4F,"used @",1
+    text_init
+    text_line , "used "
+    text_paus
+    db 1
     dw $CD6D
-    db 0,$55,"on @",1
+    text_init
+    text_cont , "on "
+    text_paus
+    db 1
     dw W_ENEMYMONNAME
-    db 0,"!",$58
+    text_init , "!"
+    text_wait
 
 _UnnamedText_4160c:
     TX_RAM $cf4b
-    db $0," went",$4f
-    db "to @"
+    text_init , " went"
+    text_line , "to "
+    text_paus
     TX_RAM $d887
-    db $0,".",$57
+    text_init , "."
+    text_done
 
 _UnnamedText_41623:
-    db $0,"For ",$52,"'s",$4f
-    db "@"
+    text_init , "For ",$52,"'s"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,",",$57
+    text_init , ","
+    text_done
 
 _UnnamedText_41628:
     TX_RAM $d887
-    db $0," sends",$4f
-    db "@"
+    text_init , " sends"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0,".",$57
+    text_init , "."
+    text_done
 
 _UnnamedText_41642:
     TX_RAM $d887
-    db $0," waves",$4f
-    db "farewell as",$57
+    text_init , " waves"
+    text_line , "farewell as"
+    text_done
 
 _UnnamedText_41647:
     TX_RAM $cd6d
-    db $0," is",$4f
-    db "transferred.",$57
+    text_init , " is"
+    text_line , "transferred."
+    text_done
 
 _UnnamedText_41655:
-    db $0,"Take good care of",$4f
-    db "@"
-
-UnnamedText_88164:
+    text_init , "Take good care of"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0,".",$57
+    text_init , "."
+    text_done
 
 _UnnamedText_4166c:
     TX_RAM $d887
-    db $0," will",$4f
-    db "trade @"
-
-UnnamedText_8817b:
+    text_init , " will"
+    text_line , "trade "
+    text_paus
     TX_RAM $cd6d
-    db $0,$57
+    text_init
+    text_done
 
 _UnnamedText_41671:
-    db $0,"for ",$52,"'s",$4f
-    db "@"
+    text_init , "for ",$52,"'s"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,".",$57
+    text_init , "."
+    text_done
 
 _UnnamedText_37390:
-    db $0,"A slot machine!",$4f
-    db "Want to play?",$57
+    text_init , "A slot machine!"
+    text_line , "Want to play?"
+    text_done
 
 _UnnamedText_37467:
-    db $0,"Darn!",$4f
-    db "Ran out of coins!",$57
+    text_init , "Darn!"
+    text_line , "Ran out of coins!"
+    text_done
 
 _UnnamedText_3746c:
-    db $0,"Bet how many",$4f
-    db "coins?",$57
+    text_init , "Bet how many"
+    text_line , "coins?"
+    text_done
 
 _UnnamedText_37471:
-    db $0,"Start!",$57
+    text_init , "Start!"
+    text_done
 
 _UnnamedText_37476:
-    db $0,"Not enough",$4f
-    db "coins!",$58
+    text_init , "Not enough"
+    text_line , "coins!"
+    text_wait
 
 _UnnamedText_3747b:
-    db $0,"One more ",$4f
-    db "go?",$57
+    text_init , "One more "
+    text_line , "go?"
+    text_done
 
 _UnnamedText_37673:
-    db $0," lined up!",$4f
-    db "Scored @"
-
-UnnamedText_8821a:
+    text_init , " lined up!"
+    text_line , "Scored "
+    text_paus
     TX_RAM $cf4b
-    db $0," coins!",$57
+    text_init , " coins!"
+    text_done
 
 _UnnamedText_3769d:
-    db $0,"Not this time!",$58
+    text_init , "Not this time!"
+    text_wait
 
 _UnnamedText_37722:
-    db $0,"Yeah!@@"
+    text_init , "Yeah!"
+    text_past
 
 _UnnamedText_703fa:
-    db $0,"#DEX   Seen:@"
+    text_init , "#DEX   Seen:"
+    text_paus
     TX_NUM $cc5b,1,3
-    db $0,$4f
-    db "         Owned:@"
+    text_init
+    text_line , "         Owned:"
+    text_paus
     TX_NUM $cc5c,1,3
-    db "@"
+    text_stop
 
 _GymStatueText1:
     TX_RAM wGymCityName
-    db $0,$4f
-    db "#MON GYM",$55
-    db "LEADER: @"
+    text_init
+    text_line , "#MON GYM"
+    text_cont , "LEADER: "
+    text_paus
     TX_RAM wGymLeaderName
-    db $0,$51
-    db "WINNING TRAINERS:",$4f
-    db $53,$57
+    text_init
+    text_para , "WINNING TRAINERS:"
+    text_line , $53
+    text_done
 
 _GymStatueText2:
     TX_RAM wGymCityName
-    db $0,$4f
-    db "#MON GYM",$55
-    db "LEADER: @"
+    text_init
+    text_line , "#MON GYM"
+    text_cont , "LEADER: "
+    text_paus
     TX_RAM wGymLeaderName
-    db $0,$51
-    db "WINNING TRAINERS:",$4f
-    db $53,$55
-    db $52,$57
+    text_init
+    text_para , "WINNING TRAINERS:"
+    text_line , $53
+    text_cont , $52
+    text_done
 
 _ViridianCityPokecenterGuyText:
-    db $0,"#MON CENTERs",$4f
-    db "heal your tired,",$55
-    db "hurt or fainted",$55
-    db "#MON!",$57
+    text_init , "#MON CENTERs"
+    text_line , "heal your tired,"
+    text_cont , "hurt or fainted"
+    text_cont , "#MON!"
+    text_done
 
 _PewterCityPokecenterGuyText:
-    db $0,"Yawn!",$51
-    db "When JIGGLYPUFF",$4f
-    db "sings,#MON",$55
-    db "get drowsy ",$CA,$CA,$51
-    db "...Me too...",$4f
-    db "Snore ",$CA,$CA,$57
+    text_init , "Yawn!"
+    text_para , "When JIGGLYPUFF"
+    text_line , "sings,#MON"
+    text_cont , "get drowsy ",$CA,$CA
+    text_para , "...Me too..."
+    text_line , "Snore ",$CA,$CA
+    text_done
 
 _CeruleanPokecenterGuyText:
-    db $0,"BILL has lots of",$4f
-    db "#MON!",$51
-    db "He collects rare",$4f
-    db "ones too!",$57
+    text_init , "BILL has lots of"
+    text_line , "#MON!"
+    text_para , "He collects rare"
+    text_line , "ones too!"
+    text_done
 
 _LavenderPokecenterGuyText:
-    db $0,"CUBONEs wear",$4f
-    db "skulls,right?",$51
-    db "People will pay a",$4f
-    db "lot for one!",$57
+    text_init , "CUBONEs wear"
+    text_line , "skulls,right?"
+    text_para , "People will pay a"
+    text_line , "lot for one!"
+    text_done
 
 _MtMoonPokecenterBenchGuyText:
-    db $0,"If you have too",$4f
-    db "many #MON,you",$55
-    db "should store them",$55
-    db "via PC!",$57
+    text_init , "If you have too"
+    text_line , "many #MON,you"
+    text_cont , "should store them"
+    text_cont , "via PC!"
+    text_done
 
 _RockTunnelPokecenterGuyText:
-    db $0,"I heard that",$4f
-    db "GHOSTs haunt",$55
-    db "LAVENDER TOWN!",$57
+    text_init , "I heard that"
+    text_line , "GHOSTs haunt"
+    text_cont , "LAVENDER TOWN!"
+    text_done
 
 _VermilionPokecenterGuyText:
-    db $0,"It is true that a",$4f
-    db "higher level",$55
-    db "#MON will be",$55
-    db "more powerful...",$51
-    db "But,all #MON",$4f
-    db "will have weak",$55
-    db "points against",$55
-    db "specific types.",$51
-    db "So,there is no",$4f
-    db "universally",$55
-    db "strong #MON.",$57
+    text_init , "It is true that a"
+    text_line , "higher level"
+    text_cont , "#MON will be"
+    text_cont , "more powerful..."
+    text_para , "But,all #MON"
+    text_line , "will have weak"
+    text_cont , "points against"
+    text_cont , "specific types."
+    text_para , "So,there is no"
+    text_line , "universally"
+    text_cont , "strong #MON."
+    text_done
 
 _CeladonCityPokecenterGuyText:
-    db $0,"If I had a BIKE,",$4f
-    db "I would go to",$55
-    db "CYCLING ROAD!",$57
+    text_init , "If I had a BIKE,"
+    text_line , "I would go to"
+    text_cont , "CYCLING ROAD!"
+    text_done
 
 _FuchsiaCityPokecenterGuyText:
-    db $0,"If you're studying ",$4f
-    db "#MON,visit",$55
-    db "the SAFARI ZONE.",$51
-    db "It has all sorts",$4f
-    db "of rare #MON.",$57
+    text_init , "If you're studying "
+    text_line , "#MON,visit"
+    text_cont , "the SAFARI ZONE."
+    text_para , "It has all sorts"
+    text_line , "of rare #MON."
+    text_done
 
 _CinnabarPokecenterGuyText:
-    db $0,"#MON can still",$4f
-    db "learn techniques",$55
-    db "after canceling",$55
-    db "evolution.",$51
-    db "Evolution can wait",$4f
-    db "until new moves",$55
-    db "have been learned.",$57
+    text_init , "#MON can still"
+    text_line , "learn techniques"
+    text_cont , "after canceling"
+    text_cont , "evolution."
+    text_para , "Evolution can wait"
+    text_line , "until new moves"
+    text_cont , "have been learned."
+    text_done
 
 _SaffronCityPokecenterGuyText1:
-    db $0,"It would be great",$4f
-    db "if the ELITE FOUR",$55
-    db "came and stomped",$55
-    db "TEAM ROCKET!",$57
+    text_init , "It would be great"
+    text_line , "if the ELITE FOUR"
+    text_cont , "came and stomped"
+    text_cont , "TEAM ROCKET!"
+    text_done
 
 _SaffronCityPokecenterGuyText2:
-    db $0,"TEAM ROCKET took",$4f
-    db "off! We can go",$55
-    db "out safely again!",$55
-    db "That's great!",$57
+    text_init , "TEAM ROCKET took"
+    text_line , "off! We can go"
+    text_cont , "out safely again!"
+    text_cont , "That's great!"
+    text_done
 
 _CeladonCityHotelText:
-    db $0,"My sis brought me",$4f
-    db "on this vacation!",$57
+    text_init , "My sis brought me"
+    text_line , "on this vacation!"
+    text_done
 
 _BookcaseText:
-    db $0,"Crammed full of",$4f
-    db "#MON books!",$57
+    text_init , "Crammed full of"
+    text_line , "#MON books!"
+    text_done
 
 _NewBicycleText:
-    db $0,"A shiny new",$4f
-    db "BICYCLE!",$57
+    text_init , "A shiny new"
+    text_line , "BICYCLE!"
+    text_done
 
 _UnnamedText_1e960:
-    db $0,"Push START to",$4f
-    db "open the MENU!",$57
+    text_init , "Push START to"
+    text_line , "open the MENU!"
+    text_done
 
 _UnnamedText_1e97e:
-    db $0,"The SAVE option is",$4f
-    db "on the MENU",$55
-    db "screen.",$57
+    text_init , "The SAVE option is"
+    text_line , "on the MENU"
+    text_cont , "screen."
+    text_done
 
 _UnnamedText_1e983:
-    db $0,"All #MON types",$4f
-    db "have strong and",$55
-    db "weak points",$55
-    db "against others.",$57
+    text_init , "All #MON types"
+    text_line , "have strong and"
+    text_cont , "weak points"
+    text_cont , "against others."
+    text_done
 
 _UnnamedText_1ea0d:
-    db $0,"PA: Ding-dong!",$51
-    db "Time's up!",$58
+    text_init , "PA: Ding-dong!"
+    text_para , "Time's up!"
+    text_wait
 
 _UnnamedText_1ea12:
-    db $0,"PA: Your SAFARI",$4f
-    db "GAME is over!",$57
+    text_init , "PA: Your SAFARI"
+    text_line , "GAME is over!"
+    text_done
 
 _CinnabarGymQuizIntroText:
-    db $0,"#MON Quiz!",$51
-    db "Get it right and",$4f
-    db "the door opens to",$55
-    db "the next room!",$51
-    db "Get it wrong and",$4f
-    db "face a trainer!",$51
-    db "If you want to",$4f
-    db "conserve your",$55
-    db "#MON for the",$55
-    db "GYM LEADER...",$51
-    db "Then get it right!",$4f
-    db "Here we go!",$58
+    text_init , "#MON Quiz!"
+    text_para , "Get it right and"
+    text_line , "the door opens to"
+    text_cont , "the next room!"
+    text_para , "Get it wrong and"
+    text_line , "face a trainer!"
+    text_para , "If you want to"
+    text_line , "conserve your"
+    text_cont , "#MON for the"
+    text_cont , "GYM LEADER..."
+    text_para , "Then get it right!"
+    text_line , "Here we go!"
+    text_wait
 
 _CinnabarQuizQuestionsText1:
-    db $0,"CATERPIE evolves",$4f
-    db "into BUTTERFREE?",$57
+    text_init , "CATERPIE evolves"
+    text_line , "into BUTTERFREE?"
+    text_done
 
 _CinnabarQuizQuestionsText2:
-    db $0,"There are 9",$4f
-    db "certified #MON",$55
-    db "LEAGUE BADGEs?",$57
+    text_init , "There are 9"
+    text_line , "certified #MON"
+    text_cont , "LEAGUE BADGEs?"
+    text_done
 
 _CinnabarQuizQuestionsText3:
-    db $0,"POLIWAG evolves 3",$4f
-    db "times?",$57
+    text_init , "POLIWAG evolves 3"
+    text_line , "times?"
+    text_done
 
 _CinnabarQuizQuestionsText4:
-    db $0,"Are thunder moves",$4f
-    db "effective against",$55
-    db "ground element-",$55
-    db "type #MON?",$57
+    text_init , "Are thunder moves"
+    text_line , "effective against"
+    text_cont , "ground element-"
+    text_cont , "type #MON?"
+    text_done
 
 _CinnabarQuizQuestionsText5:
-    db $0,"#MON of the",$4f
-    db "same kind and",$55
-    db "level are not",$55
-    db "identical?",$57
+    text_init , "#MON of the"
+    text_line , "same kind and"
+    text_cont , "level are not"
+    text_cont , "identical?"
+    text_done
 
 _CinnabarQuizQuestionsText6:
-    db $0,"TM28 contains",$4f
-    db "TOMBSTONER?",$57
+    text_init , "TM28 contains"
+    text_line , "TOMBSTONER?"
+    text_done
 
 _CinnabarGymQuizCorrectText:
-    db $0,"You're absolutely",$4f
-    db "correct!",$51
-    db "Go on through!@@"
+    text_init , "You're absolutely"
+    text_line , "correct!"
+    text_para , "Go on through!"
+    text_past
 
 _CinnabarGymQuizIncorrectText:
-    db $0,"Sorry! Bad call!",$58
+    text_init , "Sorry! Bad call!"
+    text_wait
 
 _UnnamedText_1eb69:
-    db $0,"#MON magazines!",$51
-    db "#MON notebooks!",$51
-    db "#MON graphs!",$57
+    text_init , "#MON magazines!"
+    text_para , "#MON notebooks!"
+    text_para , "#MON graphs!"
+    text_done
 
 _BillsHouseMonitorText:
-    db $0,"TELEPORTER is",$4f
-    db "displayed on the",$55
-    db "PC monitor.",$57
+    text_init , "TELEPORTER is"
+    text_line , "displayed on the"
+    text_cont , "PC monitor."
+    text_done
 
 _BillsHouseInitiatedText:
-    db $0,$52," initiated",$4f
-    db "TELEPORTER's Cell",$55
-    db "Separator!@@"
+    text_init , $52," initiated"
+    text_line , "TELEPORTER's Cell"
+    text_cont , "Separator!"
+    text_past
 
 _BillsHousePokemonListText1:
-    db $0,"BILL's favorite",$4f
-    db "#MON list!",$58
+    text_init , "BILL's favorite"
+    text_line , "#MON list!"
+    text_wait
 
 _BillsHousePokemonListText2:
-    db $0,"Which #MON do",$4f
-    db "you want to see?",$57
+    text_init , "Which #MON do"
+    text_line , "you want to see?"
+    text_done
 
 _OakLabEmailText:
-    db $0,"There's an e-mail",$4f
-    db "message here!",$51
-    db "...",$51
-    db "Calling all",$4f
-    db "#MON trainers!",$51
-    db "The elite trainers",$4f
-    db "of #MON LEAGUE",$55
-    db "are ready to take",$55
-    db "on all comers!",$51
-    db "Bring your best",$4f
-    db "#MON and see",$55
-    db "how you rate as a",$55
-    db "trainer!",$51
-    db "#MON LEAGUE HQ",$4f
-    db "INDIGO PLATEAU",$51
-    db "PS: PROF.OAK,",$4f
-    db "please visit us!",$55
-    db "...",$57
+    text_init , "There's an e-mail"
+    text_line , "message here!"
+    text_para , "..."
+    text_para , "Calling all"
+    text_line , "#MON trainers!"
+    text_para , "The elite trainers"
+    text_line , "of #MON LEAGUE"
+    text_cont , "are ready to take"
+    text_cont , "on all comers!"
+    text_para , "Bring your best"
+    text_line , "#MON and see"
+    text_cont , "how you rate as a"
+    text_cont , "trainer!"
+    text_para , "#MON LEAGUE HQ"
+    text_line , "INDIGO PLATEAU"
+    text_para , "PS: PROF.OAK,"
+    text_line , "please visit us!"
+    text_cont , "..."
+    text_done
 
 _GameCornerCoinCaseText:
-    db $0,"A COIN CASE is",$4f
-    db "required!",$57
+    text_init , "A COIN CASE is"
+    text_line , "required!"
+    text_done
 
 _GameCornerNoCoinsText:
-    db $0,"You don't have",$4f
-    db "any coins!",$57
+    text_init , "You don't have"
+    text_line , "any coins!"
+    text_done
 
 _GameCornerOutOfOrderText:
-    db $0,"OUT OF ORDER",$4f
-    db "This is broken.",$57
+    text_init , "OUT OF ORDER"
+    text_line , "This is broken."
+    text_done
 
 _GameCornerOutToLunchText:
-    db $0,"OUT TO LUNCH",$4f
-    db "This is reserved.",$57
+    text_init , "OUT TO LUNCH"
+    text_line , "This is reserved."
+    text_done
 
 _GameCornerSomeonesKeysText:
-    db $0,"Someone's keys!",$4f
-    db "They'll be back.",$57
+    text_init , "Someone's keys!"
+    text_line , "They'll be back."
+    text_done
 
 _UnnamedText_21865:
-    db $0,"Just a moment.",$57
+    text_init , "Just a moment."
+    text_done
 
 TMNotebookText:
-    db $0,"It's a pamphlet",$4f
-    db "on TMs.",$51
-    db "...",$51
-    db "There are 56 TMs",$4f
-    db "in all.",$51
-    db "SILPH CO.@@"
+    text_init , "It's a pamphlet"
+    text_line , "on TMs."
+    text_para , "..."
+    text_para , "There are 56 TMs"
+    text_line , "in all."
+    text_para , "SILPH CO."
+    text_past
 
 _TurnPageText:
-    db $0,"Turn the page?",$57
+    text_init , "Turn the page?"
+    text_done
 
 _ViridianSchoolNotebookText5:
-    db $0,"GIRL: Hey! Don't",$4f
-    db "look at my notes!@@"
+    text_init , "GIRL: Hey! Don't"
+    text_line , "look at my notes!"
+    text_past
 
 _ViridianSchoolNotebookText1:
-    db $0,"Looked at the",$4f
-    db "notebook!",$51
-    db "First page...",$51
-    db "# BALLs are",$4f
-    db "used to catch",$55
-    db "#MON.",$51
-    db "Up to 6 #MON",$4f
-    db "can be carried.",$51
-    db "People who raise",$4f
-    db "and make #MON",$55
-    db "fight are called",$55
-    db "#MON trainers.",$58
+    text_init , "Looked at the"
+    text_line , "notebook!"
+    text_para , "First page..."
+    text_para , "# BALLs are"
+    text_line , "used to catch"
+    text_cont , "#MON."
+    text_para , "Up to 6 #MON"
+    text_line , "can be carried."
+    text_para , "People who raise"
+    text_line , "and make #MON"
+    text_cont , "fight are called"
+    text_cont , "#MON trainers."
+    text_wait
 
 _ViridianSchoolNotebookText2:
-    db $0,"Second page...",$51
-    db "A healthy #MON",$4f
-    db "may be hard to",$55
-    db "catch,so weaken",$55
-    db "it first!",$51
-    db "Poison,burns and",$4f
-    db "other damage are",$55
-    db "effective!",$58
+    text_init , "Second page..."
+    text_para , "A healthy #MON"
+    text_line , "may be hard to"
+    text_cont , "catch,so weaken"
+    text_cont , "it first!"
+    text_para , "Poison,burns and"
+    text_line , "other damage are"
+    text_cont , "effective!"
+    text_wait
 
 _ViridianSchoolNotebookText3:
-    db $0,"Third page...",$51
-    db "#MON trainers",$4f
-    db "seek others to",$55
-    db "engage in #MON",$55
-    db "fights.",$51
-    db "Battles are",$4f
-    db "constantly fought",$55
-    db "at #MON GYMs.",$58
+    text_init , "Third page..."
+    text_para , "#MON trainers"
+    text_line , "seek others to"
+    text_cont , "engage in #MON"
+    text_cont , "fights."
+    text_para , "Battles are"
+    text_line , "constantly fought"
+    text_cont , "at #MON GYMs."
+    text_wait
 
 _ViridianSchoolNotebookText4:
-    db $0,"Fourth page...",$51
-    db "The goal for",$4f
-    db "#MON trainers",$55
-    db "is to beat the ",$55
-    db "top 8 #MON",$55
-    db "GYM LEADERs.",$51
-    db "Do so to earn the",$4f
-    db "right to face...",$51
-    db "The ELITE FOUR of",$4f
-    db "#MON LEAGUE!",$58
+    text_init , "Fourth page..."
+    text_para , "The goal for"
+    text_line , "#MON trainers"
+    text_cont , "is to beat the "
+    text_cont , "top 8 #MON"
+    text_cont , "GYM LEADERs."
+    text_para , "Do so to earn the"
+    text_line , "right to face..."
+    text_para , "The ELITE FOUR of"
+    text_line , "#MON LEAGUE!"
+    text_wait
 
 _EnemiesOnEverySideText:
-    db $0,"Enemies on every",$4f
-    db "side!",$57
+    text_init , "Enemies on every"
+    text_line , "side!"
+    text_done
 
 _WhatGoesAroundComesAroundText:
-    db $0,"What goes around",$4f
-    db "comes around!",$57
+    text_init , "What goes around"
+    text_line , "comes around!"
+    text_done
 
 _FightingDojoText:
-    db $0,"FIGHTING DOJO",$57
+    text_init , "FIGHTING DOJO"
+    text_done
 
 _IndigoPlateauHQText:
-    db $0,"INDIGO PLATEAU",$4f
-    db "#MON LEAGUE HQ",$57
+    text_init , "INDIGO PLATEAU"
+    text_line , "#MON LEAGUE HQ"
+    text_done
 
 _RedBedroomSNESText:
-    db $0,$52," is",$4f
-    db "playing the SNES!",$55
-    db "...Okay!",$55
-    db "It's time to go!",$57
+    text_init , $52," is"
+    text_line , "playing the SNES!"
+    text_cont , "...Okay!"
+    text_cont , "It's time to go!"
+    text_done
 
 _Route15UpstairsBinocularsText:
-    db $0,"Looked into the",$4f
-    db "binoculars...",$51
-    db "A large,shining",$4f
-    db "bird is flying",$55
-    db "toward the sea.",$57
+    text_init , "Looked into the"
+    text_line , "binoculars..."
+    text_para , "A large,shining"
+    text_line , "bird is flying"
+    text_cont , "toward the sea."
+    text_done
 
 _AerodactylFossilText:
-    db $0,"AERODACTYL Fossil",$4f
-    db "A primitive and",$55
-    db "rare #MON.",$57
+    text_init , "AERODACTYL Fossil"
+    text_line , "A primitive and"
+    text_cont , "rare #MON."
+    text_done
 
 _KabutopsFossilText:
-    db $0,"KABUTOPS Fossil",$4f
-    db "A primitive and",$55
-    db "rare #MON.",$57
+    text_init , "KABUTOPS Fossil"
+    text_line , "A primitive and"
+    text_cont , "rare #MON."
+    text_done
 
 _LinkCableHelpText1:
-    db $0,"TRAINER TIPS",$51
-    db "Using a Game Link",$4f
-    db "Cable",$58
+    text_init , "TRAINER TIPS"
+    text_para , "Using a Game Link"
+    text_line , "Cable"
+    text_wait
 
 _LinkCableHelpText2:
-    db $0,"Which heading do",$4f
-    db "you want to read?",$57
+    text_init , "Which heading do"
+    text_line , "you want to read?"
+    text_done
 
 _LinkCableInfoText1:
-    db $0,"When you have",$4f
-    db "linked your GAME",$55
-    db "BOY with another",$55
-    db "GAME BOY,talk to",$55
-    db "the attendant on",$55
-    db "the right in any",$55
-    db "#MON CENTER.",$58
+    text_init , "When you have"
+    text_line , "linked your GAME"
+    text_cont , "BOY with another"
+    text_cont , "GAME BOY,talk to"
+    text_cont , "the attendant on"
+    text_cont , "the right in any"
+    text_cont , "#MON CENTER."
+    text_wait
 
 _LinkCableInfoText2:
-    db $0,"COLOSSEUM lets",$4f
-    db "you play against",$55
-    db "a friend.",$58
+    text_init , "COLOSSEUM lets"
+    text_line , "you play against"
+    text_cont , "a friend."
+    text_wait
 
 _LinkCableInfoText3:
-    db $0,"TRADE CENTER is",$4f
-    db "used for trading",$55
-    db "#MON.",$58
+    text_init , "TRADE CENTER is"
+    text_line , "used for trading"
+    text_cont , "#MON."
+    text_wait
 
 _ViridianSchoolBlackboardText1:
-    db $0,"The blackboard",$4f
-    db "describes #MON",$55
-    db "STATUS changes",$55
-    db "during battles.",$58
+    text_init , "The blackboard"
+    text_line , "describes #MON"
+    text_cont , "STATUS changes"
+    text_cont , "during battles."
+    text_wait
 
 _ViridianSchoolBlackboardText2:
-    db $0,"Which heading do",$4f
-    db "you want to read?",$57
+    text_init , "Which heading do"
+    text_line , "you want to read?"
+    text_done
 
 _VermilionGymTrashText:
-    db $0,"Nope,there's",$4f
-    db "only trash here.",$57
+    text_init , "Nope,there's"
+    text_line , "only trash here."
+    text_done
 
 _VermilionGymTrashSuccesText1:
-    db $0,"Hey! There's a",$4f
-    db "switch under the",$55
-    db "trash!",$55
-    db "Turn it on!",$51
-    db "The 1st electric",$4f
-    db "lock opened!@@"
+    text_init , "Hey! There's a"
+    text_line , "switch under the"
+    text_cont , "trash!"
+    text_cont , "Turn it on!"
+    text_para , "The 1st electric"
+    text_line , "lock opened!"
+    text_past
 
 _VermilionGymTrashSuccesText2:
-    db $0,"Hey! There's",$4f
-    db "another switch",$55
-    db "under the trash!",$55
-    db "Turn it on!",$58
+    text_init , "Hey! There's"
+    text_line , "another switch"
+    text_cont , "under the trash!"
+    text_cont , "Turn it on!"
+    text_wait
 
 _VermilionGymTrashSuccesText3:
-    db $0,"The 2nd electric",$4f
-    db "lock opened!",$51
-    db "The motorized door",$4f
-    db "opened!@@"
+    text_init , "The 2nd electric"
+    text_line , "lock opened!"
+    text_para , "The motorized door"
+    text_line , "opened!"
+    text_past
 
 _VermilionGymTrashFailText:
-    db $0,"Nope! There's",$4f
-    db "only trash here.",$55
-    db "Hey! The electric",$55
-    db "locks were reset!@@"
+    text_init , "Nope! There's"
+    text_line , "only trash here."
+    text_cont , "Hey! The electric"
+    text_cont , "locks were reset!"
+    text_past
 
 UnnamedText_894d0:
-    db $0,$52," found",$4f
-    db "@"
+    text_init , $52," found"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_76794:
-    db $0,"But,",$52," has",$4f
-    db "no more room for",$55
-    db "other items!",$57
+    text_init , "But,",$52," has"
+    text_line , "no more room for"
+    text_cont , "other items!"
+    text_done
 
 _FoundHiddenCoinsText:
-    db $0,$52," found",$4f
-    db "@"
-    db $2,$a0,$ff,$c2 ; XXX $2
-    db $0," coins!@@"
+    text_init , $52," found"
+    text_line
+    text_paus
+    db $2,$a0,$ff,$c2 ; print BCD number
+    text_init , " coins!"
+    text_past
 
 _FoundHiddenCoins2Text:
-    db $0,$52," found",$4f
-    db "@"
-    db $2,$a0,$ff,$c2 ; XXX $2
-    db $0," coins!@@"
+    text_init , $52," found"
+    text_line
+    text_paus
+    db $2,$a0,$ff,$c2 ; print BCD number
+    text_init , " coins!"
+    text_past
 
 _DroppedHiddenCoinsText:
-    db $0,$51
-    db "Oops! Dropped",$4f
-    db "some coins!",$57
+    text_init
+    text_para , "Oops! Dropped"
+    text_line , "some coins!"
+    text_done
 
 _IndigoPlateauStatuesText1:
-    db $0,"INDIGO PLATEAU",$58
+    text_init , "INDIGO PLATEAU"
+    text_wait
 
 _IndigoPlateauStatuesText2:
-    db $0,"The ultimate goal",$4f
-    db "of trainers!",$55
-    db "#MON LEAGUE HQ",$57
+    text_init , "The ultimate goal"
+    text_line , "of trainers!"
+    text_cont , "#MON LEAGUE HQ"
+    text_done
 
 _IndigoPlateauStatuesText3:
-    db $0,"The highest",$4f
-    db "#MON authority",$55
-    db "#MON LEAGUE HQ",$57
+    text_init , "The highest"
+    text_line , "#MON authority"
+    text_cont , "#MON LEAGUE HQ"
+    text_done
 
 _PokemonBooksText:
-    db $0,"Crammed full of",$4f
-    db "#MON books!",$57
+    text_init , "Crammed full of"
+    text_line , "#MON books!"
+    text_done
 
 _DiglettSculptureText:
-    db $0,"It's a sculpture",$4f
-    db "of DIGLETT.",$57
+    text_init , "It's a sculpture"
+    text_line , "of DIGLETT."
+    text_done
 
 _ElevatorText:
-    db $0,"This is an",$4f
-    db "elevator.",$57
+    text_init , "This is an"
+    text_line , "elevator."
+    text_done
 
 _TownMapText:
-    db $0,"A TOWN MAP.@@"
+    text_init , "A TOWN MAP."
+    text_past
 
 _PokemonStuffText:
-    db $0,"Wow! Tons of",$4f
-    db "#MON stuff!",$57
+    text_init , "Wow! Tons of"
+    text_line , "#MON stuff!"
+    text_done
 
 _UnnamedText_3c1a8:
-    db $0,"PA: Ding-dong!",$51
-    db "You are out of",$4f
-    db "SAFARI BALLs!",$58
+    text_init , "PA: Ding-dong!"
+    text_para , "You are out of"
+    text_line , "SAFARI BALLs!"
+    text_wait
 
 _UnnamedText_3c229:
-    db $0,"Wild @"
+    text_init , "Wild "
+    text_paus
     TX_RAM W_ENEMYMONNAME
-    db $0,$4f
-    db "ran!",$58
+    text_init
+    text_line , "ran!"
+    text_wait
 
 _UnnamedText_3c22e:
-    db $0,"Enemy @"
+    text_init , "Enemy "
+    text_paus
     TX_RAM W_ENEMYMONNAME
-    db $0,$4f
-    db "ran!",$58
+    text_init
+    text_line , "ran!"
+    text_wait
 
 _HurtByPoisonText:
-    db $0,$5a,"'s",$4f
-    db "hurt by poison!",$57
+    text_init , $5a,"'s"
+    text_line , "hurt by poison!"
+    text_done
 
 _HurtByBurnText:
-    db $0,$5a,"'s",$4f
-    db "hurt by the burn!",$57
+    text_init , $5a,"'s"
+    text_line , "hurt by the burn!"
+    text_done
 
 _HurtByLeechSeedText:
-    db $0,"LEECH SEED saps",$4f
-    db $5a,"!",$57
+    text_init , "LEECH SEED saps"
+    text_line , $5a,"!"
+    text_done
 
 _EnemyMonFainted:
-    db $0,"Enemy @"
+    text_init , "Enemy "
+    text_paus
     TX_RAM W_ENEMYMONNAME
-    db $0,$4f
-    db "fainted!",$58
+    text_init
+    text_line , "fainted!"
+    text_wait
 
 _MoneyForWinningText:
-    db $0,$52," got ¥@"
-    db $2,$79,$d0,$c3 ; XXX $2
-    db $0,$4f
-    db "for winning!",$58
+    text_init , $52," got ¥"
+    text_paus
+    db $2,$79,$d0,$c3 ; print BCD number
+    text_init
+    text_line , "for winning!"
+    text_wait
 
 _TrainerDefeatedText:
-    db $0,$52," defeated",$4f
-    db "@"
+    text_init , $52," defeated"
+    text_line
+    text_paus
     TX_RAM W_TRAINERNAME
-    db $0,"!",$58
+    text_init , "!"
+    text_wait
 
 _PlayerMonFaintedText:
     TX_RAM W_PLAYERMONNAME
-    db $0,$4f
-    db "fainted!",$58
+    text_init
+    text_line , "fainted!"
+    text_wait
 
 _Sony1WinText:
-    db $0,$53,": Yeah! Am",$4f
-    db "I great or what?",$58
+    text_init , $53,": Yeah! Am"
+    text_line , "I great or what?"
+    text_wait
 
 _PlayerBlackedOutText2:
-    db $0,$52," is out of",$4f
-    db "useable #MON!",$51
-    db $52," blacked",$4f
-    db "out!",$58
+    text_init , $52," is out of"
+    text_line , "useable #MON!"
+    text_para,$52," blacked"
+    text_line , "out!"
+    text_wait
 
 _LinkBattleLostText:
-    db $0,$52," lost to",$4f
-    db "@"
+    text_init , $52," lost to"
+    text_line
+    text_paus
     TX_RAM W_TRAINERNAME
-    db $0,"!",$58
+    text_init , "!"
+    text_wait
 
 _TrainerAboutToUseText:
     db 1
     dw W_TRAINERNAME
-    db 0," is",$4F
-    db "about to use",$55,"@",1
+    text_init , " is"
+    text_line , "about to use"
+    text_cont
+    text_paus
+    db 1
     dw W_ENEMYMONNAME
-    db 0,"!",$51
-    db "Will ",$52,$4F
-    db "change #MON?",$57
+    text_init , "!"
+    text_para , "Will ",$52
+    text_line , "change #MON?"
+    text_done
 
 _TrainerSentOutText:
     db 1
     dw W_TRAINERNAME
-    db 0," sent",$4F
-    db "out @",1
+    text_init , " sent"
+    text_line , "out "
+    text_paus
+    db 1
     dw W_ENEMYMONNAME
-    db 0,"!",$57
+    text_init , "!"
+    text_done
 
 _UnnamedText_3cab4:
-    db $0,"There's no will",$4f
-    db "to fight!",$58
+    text_init , "There's no will"
+    text_line , "to fight!"
+    text_wait
 
 _UnnamedText_3cb97:
-    db $0,"Can't escape!",$58
+    text_init , "Can't escape!"
+    text_wait
 
 _UnnamedText_3cb9c:
-    db $0,"No! There's no",$4f
-    db "running from a",$55
-    db "trainer battle!",$58
+    text_init , "No! There's no"
+    text_line , "running from a"
+    text_cont , "trainer battle!"
+    text_wait
 
 _UnnamedText_3cba1:
-    db $0,"Got away safely!",$58
+    text_init , "Got away safely!"
+    text_wait
 
 ItemsCantBeUsedHere_:
-    db $0,"Items can't be",$4f
-    db "used here.",$58
+    text_init , "Items can't be"
+    text_line , "used here."
+    text_wait
 
 _UnnamedText_3d1f5:
     TX_RAM W_PLAYERMONNAME
-    db $0," is",$4f
-    db "already out!",$58
+    text_init , " is"
+    text_line , "already out!"
+    text_wait
 
 _MoveDisabledText:
-    db $0,"The move is",$4f
-    db "disabled!",$58
+    text_init , "The move is"
+    text_line , "disabled!"
+    text_wait
 
 _MultiHitText:
-    db 0,"Hit the enemy",$4F,"@"
+    text_init , "Hit the enemy"
+    text_line
+    text_paus
     TX_NUM W_NUMHITS,1,1
-    db 0," times!",$58
+    text_init , " times!"
+    text_wait
 
 _ScaredText:
     db 1
     dw W_PLAYERMONNAME
-    db 0," is too",$4F
-    db "scared to move!",$58
+    text_init , " is too"
+    text_line , "scared to move!"
+    text_wait
 
 _GetOutText:
-    db 0,"GHOST: Get out...",$4F
-    db "Get out...",$58
+    text_init , "GHOST: Get out..."
+    text_line , "Get out..."
+    text_wait
 
 _FastAsleepText:
-    db 0,$5A,$4F
-    db "is fast asleep!",$58
+    text_init , $5a
+    text_line , "is fast asleep!"
+    text_wait
 
 _WokeUpText:
-    db 0,$5A,$4F
-    db "woke up!",$58
+    text_init , $5a
+    text_line , "woke up!"
+    text_wait
 
 _FrozenText:
-    db 0,$5A,$4F
-    db "is frozen solid!",$58
+    text_init , $5a
+    text_line , "is frozen solid!"
+    text_wait
 
 _FullyParalyzedText:
-    db 0,$5A,"'s",$4F
-    db "fully paralyzed!",$58
+    text_init , $5a,"'s"
+    text_line , "fully paralyzed!"
+    text_wait
 
 _FlinchedText:
-    db 0,$5A,$4F
-    db "flinched!",$58
+    text_init , $5a
+    text_line , "flinched!"
+    text_wait
 
 _MustRechargeText:
-    db 0,$5A,$4F
-    db "must recharge!",$58
+    text_init , $5a
+    text_line , "must recharge!"
+    text_wait
 
 _DisabledNoMoreText:
-    db 0,$5A,"'s",$4F
-    db "disabled no more!",$58
+    text_init , $5a,"'s"
+    text_line , "disabled no more!"
+    text_wait
 
 _IsConfusedText:
-    db 0,$5A,$4F
-    db "is confused!",$58
+    text_init , $5a
+    text_line , "is confused!"
+    text_wait
 
 _HurtItselfText:
-    db 0,"It hurt itself in",$4F
-    db "its confusion!",$58
+    text_init , "It hurt itself in"
+    text_line , "its confusion!"
+    text_wait
 
 _ConfusedNoMoreText:
-    db 0,$5A,"'s",$4F
-    db "confused no more!",$58
+    text_init , $5a,"'s"
+    text_line , "confused no more!"
+    text_wait
 
 _SavingEnergyText:
-    db 0,$5A,$4F
-    db "is saving energy!",$58
+    text_init , $5a
+    text_line , "is saving energy!"
+    text_wait
 
 _UnleashedEnergyText:
-    db 0,$5A,$4F
-    db "unleashed energy!",$58
+    text_init , $5a
+    text_line , "unleashed energy!"
+    text_wait
 
 _ThrashingAboutText:
-    db 0,$5A,"'s",$4F
-    db "thrashing about!",$57
+    text_init , $5a,"'s"
+    text_line , "thrashing about!"
+    text_done
 
 _AttackContinuesText:
-    db 0,$5A,"'s",$4F
-    db "attack continues!",$57
+    text_init , $5a,"'s"
+    text_line , "attack continues!"
+    text_done
 
 _CantMoveText:
-    db 0,$5A,$4F
-    db "can't move!",$58
+    text_init , $5a
+    text_line , "can't move!"
+    text_wait
 
 _UnnamedText_3daa8:
-    db $0,$5a,"'s",$4f
-    db "@"
-
-UnnamedText_89a2e:
+    text_init , $5a,"'s"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0," is",$55
-    db "disabled!",$58
+    text_init , " is"
+    text_cont , "disabled!"
+    text_wait
 
 _UnnamedText_3dafb:
-    db $0,$5a,"@@"
+    text_init , $5a
+    text_past
 
 _UnnamedText_3db2d:
-    db $0,$4f
-    db "used @@"
+    text_init
+    text_line , "used "
+    text_past
 
 _UnnamedText_3db34:
-    db $0,$4f
-    db "used @@"
+    text_init
+    text_line , "used "
+    text_past
 
 _UnnamedText_3db43:
-    db $0,"instead,",$55
-    db "@@"
+    text_init , "instead,"
+    text_cont
+    text_past
 
 _UnnamedText_3db4c:
     TX_RAM $cf4b
-    db $0,"@"
+    text_init
+    text_stop
 
 _UnnamedText_3db6c:
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _UnnamedText_3db71:
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _UnnamedText_3db76:
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _UnnamedText_3db7b:
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _UnnamedText_3db80:
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _AttackMissedText:
-    db $0,$5a,"'s",$4f
-    db "attack missed!",$58
+    text_init , $5a,"'s"
+    text_line , "attack missed!"
+    text_wait
 
 _KeptGoingAndCrashedText:
-    db $0,$5a,$4f
-    db "kept going and",$55
-    db "crashed!",$58
+    text_init , $5a
+    text_line , "kept going and"
+    text_cont , "crashed!"
+    text_wait
 
 _UnaffectedText:
-    db $0,$59,"'s",$4f
-    db "unaffected!",$58
+    text_init , $59,"'s"
+    text_line , "unaffected!"
+    text_wait
 
 _DoesntAffectMonText:
-    db $0,"It doesn't affect",$4f
-    db $59,"!",$58
+    text_init , "It doesn't affect"
+    text_line , $59,"!"
+    text_wait
 
 _UnnamedText_3dc7e:
-    db $0,"Critical hit!",$58
+    text_init , "Critical hit!"
+    text_wait
 
 _UnnamedText_3dc83:
-    db $0,"One-hit KO!",$58
+    text_init , "One-hit KO!"
+    text_wait
 
 _UnnamedText_3ddb6:
     TX_RAM W_PLAYERMONNAME
-    db $0," is",$4f
-    db "loafing around.",$58
+    text_init , " is"
+    text_line , "loafing around."
+    text_wait
 
 _UnnamedText_3ddbb:
     TX_RAM W_PLAYERMONNAME
-    db $0," began",$4f
-    db "to nap!",$58
+    text_init , " began"
+    text_line , "to nap!"
+    text_wait
 
 _UnnamedText_3ddc0:
     TX_RAM W_PLAYERMONNAME
-    db $0," won't",$4f
-    db "obey!",$58
+    text_init , " won't"
+    text_line , "obey!"
+    text_wait
 
 _UnnamedText_3ddc5:
     TX_RAM W_PLAYERMONNAME
-    db $0," turned",$4f
-    db "away!",$58
+    text_init , " turned"
+    text_line , "away!"
+    text_wait
 
 _UnnamedText_3ddca:
     TX_RAM W_PLAYERMONNAME
-    db $0,$4f
-    db "ignored orders!",$58
+    text_init
+    text_line , "ignored orders!"
+    text_wait
 
 _SubstituteTookDamageText:
-    db $0,"The SUBSTITUTE",$4f
-    db "took damage for",$55
-    db $59,"!",$58
+    text_init , "The SUBSTITUTE"
+    text_line , "took damage for"
+    text_cont , $59,"!"
+    text_wait
 
 _SubstituteBrokeText:
-    db $0,$59,"'s",$4f
-    db "SUBSTITUTE broke!",$58
+    text_init , $59,"'s"
+    text_line , "SUBSTITUTE broke!"
+    text_wait
 
 _BuildingRageText:
-    db $0,$5a,"'s",$4f
-    db "RAGE is building!",$58
+    text_init , $5a,"'s"
+    text_line , "RAGE is building!"
+    text_wait
 
 _MirrorMoveFailedText:
-    db $0,"The MIRROR MOVE",$4e,"failed!",$58
+    text_init , "The MIRROR MOVE",$4e,"failed!"
+    text_wait
 
 _HitXTimesText:
-    db $0,"Hit @"
-
-UnnamedText_89bb5:
+    text_init , "Hit "
+    text_paus
     TX_NUM $cd05,1,1
-    db $0," times!",$58
+    text_init , " times!"
+    text_wait
 
 _UnnamedText_554b2:
     TX_RAM $cd6d
-    db $0," gained",$4f
-    db "@@"
+    text_init , " gained"
+    text_line
+    text_past
 
 _UnnamedText_554d4:
-    db $0,"a boosted",$55
-    db "@@"
+    text_init , "a boosted"
+    text_cont
+    text_past
 _UnnamedText_554d8:
     TX_NUM $cf4b,2,4
-    db $0," EXP. Points!",$58
+    text_init , " EXP. Points!"
+    text_wait
 
 UnnamedText_89c01:
     TX_RAM $cd6d
-    db $0," grew",$4f
-    db "to level @"
+    text_init , " grew"
+    text_line , "to level "
+    text_paus
     TX_NUM $d127,1,3
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_58e3b:
-    db $0,"Wild @"
+    text_init , "Wild "
+    text_paus
     TX_RAM W_ENEMYMONNAME
-    db $0,$4f
-    db "appeared!",$58
+    text_init
+    text_line , "appeared!"
+    text_wait
 
 _UnnamedText_58e40:
-    db $0,"The hooked",$4f
-    db "@"
+    text_init , "The hooked"
+    text_line
+    text_paus
     TX_RAM W_ENEMYMONNAME
-    db $0,$55
-    db "attacked!",$58
+    text_init
+    text_cont , "attacked!"
+    text_wait
 
 _UnnamedText_58e45:
     TX_RAM W_ENEMYMONNAME
-    db $0,$4f
-    db "appeared!",$58
+    text_init
+    text_line , "appeared!"
+    text_wait
 
 _UnnamedText_58e4a:
     TX_RAM W_TRAINERNAME
-    db $0," wants",$4f
-    db "to fight!",$58
+    text_init , " wants"
+    text_line , "to fight!"
+    text_wait
 
 _UnnamedText_58e4f:
-    db $0,"SILPH SCOPE",$4f
-    db "unveiled GHOST!",$58
+    text_init , "SILPH SCOPE"
+    text_line , "unveiled GHOST!"
+    text_wait
 
 _UnnamedText_58e54:
-    db $0,"Darn! The GHOST",$4f
-    db "can't be ID'd!",$58
+    text_init , "Darn! The GHOST"
+    text_line , "can't be ID'd!"
+    text_wait
 
 _UnnamedText_58eae:
-    db $0,"Go! @@"
+    text_init , "Go! "
+    text_past
 
 _UnnamedText_58eb5:
-    db $0,"Do it! @@"
+    text_init , "Do it! "
+    text_past
 
 _UnnamedText_58ebc:
-    db $0,"Get'm! @@"
+    text_init , "Get'm! "
+    text_past
 
 _UnnamedText_58ec3:
-    db $0,"The enemy's weak!",$4f
-    db "Get'm! @@"
+    text_init , "The enemy's weak!"
+    text_line , "Get'm! "
+    text_past
 
 _UnnamedText_58ecc:
     TX_RAM W_PLAYERMONNAME
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _UnnamedText_58ed7:
     TX_RAM W_PLAYERMONNAME
-    db $0," @@"
+    text_init , " "
+    text_past
 
 _UnnamedText_58f25:
-    db $0,"enough!@@"
+    text_init , "enough!"
+    text_past
 
 _UnnamedText_58f2c:
-    db $0,"OK!@@"
+    text_init , "OK!"
+    text_past
 
 _UnnamedText_58f33:
-    db $0,"good!@@"
+    text_init , "good!"
+    text_past
 
 _UnnamedText_58f3e:
-    db $0,$4f
-    db "Come back!",$57
+    text_init
+    text_line , "Come back!"
+    text_done
 
 SafariZoneEatingText:
-    db $0,"Wild @"
+    text_init , "Wild "
+    text_paus
     TX_RAM W_ENEMYMONNAME
-    db $0,$4f
-    db "is eating!",$58
+    text_init
+    text_line , "is eating!"
+    text_wait
 
 SafariZoneAngryText:
-    db $0,"Wild @"
+    text_init , "Wild "
+    text_paus
     TX_RAM W_ENEMYMONNAME
-    db $0,$4f
-    db "is angry!",$58
+    text_init
+    text_line , "is angry!"
+    text_wait
 
 _UnnamedText_1386b:
-    db $0,$52," picked up",$4f
-    db "¥@"
-    db $2,$e5,$cc,$c3 ; XXX $2
-    db $0,"!",$58
+    text_init , $52," picked up"
+    text_line , "¥"
+    text_paus
+    db $2,$e5,$cc,$c3 ; print BCD number
+    text_init , "!"
+    text_wait
 
 _UnnamedText_1c9c1:
-    db $0,"Clear all saved",$4f
-    db "data?",$57
+    text_init , "Clear all saved"
+    text_line , "data?"
+    text_done
 
 _UnnamedText_1ca14:
-    db $0,"Which floor do",$4f
-    db "you want? ",$57
+    text_init , "Which floor do"
+    text_line , "you want? "
+    text_done
 
 _PartyMenuNormalText:
-    db $0,"Choose a #MON.",$57
+    text_init , "Choose a #MON."
+    text_done
 
 _PartyMenuItemUseText:
-    db $0,"Use item on which",$4f
-    db "#MON?",$57
+    text_init , "Use item on which"
+    text_line , "#MON?"
+    text_done
 
 _PartyMenuBattleText:
-    db $0,"Bring out which",$4f
-    db "#MON?",$57
+    text_init , "Bring out which"
+    text_line , "#MON?"
+    text_done
 
 _PartyMenuUseTMText:
-    db $0,"Use TM on which",$4f
-    db "#MON?",$57
+    text_init , "Use TM on which"
+    text_line , "#MON?"
+    text_done
 
 _PartyMenuSwapMonText:
-    db $0,"Move #MON",$4f
-    db "where?",$57
+    text_init , "Move #MON"
+    text_line , "where?"
+    text_done
 
 _PotionText:
     TX_RAM $cd6d
-    db $0,$4f
-    db "recovered by @"
+    text_init
+    text_line , "recovered by "
+    text_paus
     TX_NUM wHPBarHPDifference,2,3
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _AntidoteText:
     TX_RAM $cd6d
-    db $0," was",$4f
-    db "cured of poison!",$57
+    text_init , " was"
+    text_line , "cured of poison!"
+    text_done
 
 _ParlyzHealText:
     TX_RAM $cd6d
-    db $0,"'s",$4f
-    db "rid of paralysis!",$57
+    text_init , "'s"
+    text_line , "rid of paralysis!"
+    text_done
 
 _BurnHealText:
     TX_RAM $cd6d
-    db $0,"'s",$4f
-    db "burn was healed!",$57
+    text_init , "'s"
+    text_line , "burn was healed!"
+    text_done
 
 _IceHealText:
     TX_RAM $cd6d
-    db $0," was",$4f
-    db "defrosted!",$57
+    text_init , " was"
+    text_line , "defrosted!"
+    text_done
 
 _AwakeningText:
     TX_RAM $cd6d
-    db $0,$4f
-    db "woke up!",$57
+    text_init
+    text_line , "woke up!"
+    text_done
 
 _FullHealText:
     TX_RAM $cd6d
-    db $0,"'s",$4f
-    db "health returned!",$57
+    text_init , "'s"
+    text_line , "health returned!"
+    text_done
 
 _ReviveText:
     TX_RAM $cd6d
-    db $0,$4f
-    db "is revitalized!",$57
+    text_init
+    text_line , "is revitalized!"
+    text_done
 
 _RareCandyText:
     TX_RAM $cd6d
-    db $0," grew",$4f
-    db "to level @"
+    text_init , " grew"
+    text_line , "to level "
+    text_paus
     TX_NUM $d127,$1,$3
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_17f23:
-    db $0,$52," turned on",$4f
-    db "the PC.",$58
+    text_init , $52," turned on"
+    text_line , "the PC."
+    text_wait
 
 _UnnamedText_17f28:
-    db $0,"Accessed BILL's",$4f
-    db "PC.",$51
-    db "Accessed #MON",$4f
-    db "Storage System.",$58
+    text_init , "Accessed BILL's"
+    text_line , "PC."
+    text_para , "Accessed #MON"
+    text_line , "Storage System."
+    text_wait
 
 _UnnamedText_17f2d:
-    db $0,"Accessed someone's",$4f
-    db "PC.",$51
-    db "Accessed #MON",$4f
-    db "Storage System.",$58
+    text_init , "Accessed someone's"
+    text_line , "PC."
+    text_para , "Accessed #MON"
+    text_line , "Storage System."
+    text_wait
 
 _UnnamedText_17f32:
-    db $0,"Accessed my PC.",$51
-    db "Accessed Item",$4f
-    db "Storage System.",$58
+    text_init , "Accessed my PC."
+    text_para , "Accessed Item"
+    text_line , "Storage System."
+    text_wait
 
 _UnnamedText_7b22:
-    db $0,$52," turned on",$4f
-    db "the PC.",$58
+    text_init , $52," turned on"
+    text_line , "the PC."
+    text_wait
 
 _UnnamedText_7b27:
-    db $0,"What do you want",$4f
-    db "to do?",$57
+    text_init , "What do you want"
+    text_line , "to do?"
+    text_done
 
 _UnnamedText_7b2c:
-    db $0,"What do you want",$4f
-    db "to deposit?",$57
+    text_init , "What do you want"
+    text_line , "to deposit?"
+    text_done
 
 _UnnamedText_7b31:
-    db $0,"How many?",$57
+    text_init , "How many?"
+    text_done
 
 _UnnamedText_7b36:
     TX_RAM $cd6d
-    db $0," was",$4f
-    db "stored via PC.",$58
+    text_init , " was"
+    text_line , "stored via PC."
+    text_wait
 
 _UnnamedText_7b3b:
-    db $0,"You have nothing",$4f
-    db "to deposit.",$58
+    text_init , "You have nothing"
+    text_line , "to deposit."
+    text_wait
 
 _UnnamedText_7b40:
-    db $0,"No room left to",$4f
-    db "store items.",$58
+    text_init , "No room left to"
+    text_line , "store items."
+    text_wait
 
 _UnnamedText_7b45:
-    db $0,"What do you want",$4f
-    db "to withdraw?",$57
+    text_init , "What do you want"
+    text_line , "to withdraw?"
+    text_done
 
 _UnnamedText_7b4a:
-    db $0,"How many?",$57
+    text_init , "How many?"
+    text_done
 
 _UnnamedText_7b4f:
-    db $0,"Withdrew",$4f
-    db "@"
+    text_init , "Withdrew"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0,".",$58
+    text_init , "."
+    text_wait
 
 _NothingStoredText:
-    db $0,"There is nothing",$4f
-    db "stored.",$58
+    text_init , "There is nothing"
+    text_line , "stored."
+    text_wait
 
 _UnnamedText_7b59:
-    db $0,"You can't carry",$4f
-    db "any more items.",$58
+    text_init , "You can't carry"
+    text_line , "any more items."
+    text_wait
 
 _UnnamedText_7b5e:
-    db $0,"What do you want",$4f
-    db "to toss away?",$57
+    text_init , "What do you want"
+    text_line , "to toss away?"
+    text_done
 
 _UnnamedText_7b63:
-    db $0,"How many?",$57
+    text_init , "How many?"
+    text_done
 
 _UnnamedText_76683:
-    db $0,"Accessed #MON",$4f
-    db "LEAGUE's site.",$51
-    db "Accessed the HALL",$4f
-    db "OF FAME List.",$58
+    text_init , "Accessed #MON"
+    text_line , "LEAGUE's site."
+    text_para , "Accessed the HALL"
+    text_line , "OF FAME List."
+    text_wait
 
 _SwitchOnText:
-    db $0,"Switch on!",$58
+    text_init , "Switch on!"
+    text_wait
 
 _WhatText:
-    db $0,"What?",$57
+    text_init , "What?"
+    text_done
 
 _DepositWhichMonText:
-    db $0,"Deposit which",$4f
-    db "#MON?",$57
+    text_init , "Deposit which"
+    text_line , "#MON?"
+    text_done
 
 _MonWasStoredText:
     TX_RAM $cf4b
-    db $0," was",$4f
-    db "stored in Box @"
+    text_init , " was"
+    text_line , "stored in Box "
+    text_paus
     TX_RAM $cd3d
-    db $0,".",$58
+    text_init , "."
+    text_wait
 
 _CantDepositLastMonText:
-    db $0,"You can't deposit",$4f
-    db "the last #MON!",$58
+    text_init , "You can't deposit"
+    text_line , "the last #MON!"
+    text_wait
 
 _BoxFullText:
-    db $0,"Oops! This Box is",$4f
-    db "full of #MON.",$58
+    text_init , "Oops! This Box is"
+    text_line , "full of #MON."
+    text_wait
 
 _MonIsTakenOutText:
     TX_RAM $cf4b
-    db $0," is",$4f
-    db "taken out.",$55
-    db "Got @"
+    text_init , " is"
+    text_line , "taken out."
+    text_cont , "Got "
+    text_paus
 UnnamedText_8a1d1:
     TX_RAM $cf4b
-    db $0,".",$58
+    text_init , "."
+    text_wait
 
 _NoMonText:
-    db $0,"What? There are",$4f
-    db "no #MON here!",$58
+    text_init , "What? There are"
+    text_line , "no #MON here!"
+    text_wait
 
 _CantTakeMonText:
-    db $0,"You can't take",$4f
-    db "any more #MON.",$51
-    db "Deposit #MON",$4f
-    db "first.",$58
+    text_init , "You can't take"
+    text_line , "any more #MON."
+    text_para , "Deposit #MON"
+    text_line , "first."
+    text_wait
 
 _ReleaseWhichMonText:
-    db $0,"Release which",$4f
-    db "#MON?",$57
+    text_init , "Release which"
+    text_line , "#MON?"
+    text_done
 
 _OnceReleasedText:
-    db $0,"Once released,",$4f
-    db "@"
-
-MonIsGoneForeverText:
+    text_init , "Once released,"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0," is",$55
-    db "gone forever. OK?",$57
+    text_init , " is"
+    text_cont , "gone forever. OK?"
+    text_done
 
 _MonWasReleasedText:
     TX_RAM $cf4b
-    db $0," was",$4f
-    db "released outside.",$55
-    db "Bye @"
-
-_UnnamedText_8a288:
+    text_init , " was"
+    text_line , "released outside."
+    text_cont , "Bye "
+    text_paus
     TX_RAM $cf4b
-    db $0,"!",$58
+    text_init , "!"
+    text_wait
 
 _RequireCoinCaseText:
-    db 0,"A COIN CASE is",$4F
-    db "required!@@"
+    text_init , "A COIN CASE is"
+    text_line , "required!"
+    text_past
 
 _ExchangeCoinsForPrizesText:
-    db 0,"We exchange your",$4F
-    db "coins for prizes.",$58
+    text_init , "We exchange your"
+    text_line , "coins for prizes."
+    text_wait
 
 _WhichPrizeText:
-    db 0,"Which prize do",$4F
-    db "you want?",$57
+    text_init , "Which prize do"
+    text_line , "you want?"
+    text_done
 
 _HereYouGoText:
-    db 0,"Here you go!@@"
+    text_init , "Here you go!"
+    text_past
 
 _SoYouWantPrizeText:
-    db 0,"So,you want",$4F
-    db "@"
+    text_init , "So,you want"
+    text_line
+    text_paus
     db 1
     dw $CD6D
-    db 0,"?",$57
+    text_init , "?"
+    text_done
 
 _SorryNeedMoreCoins:
-    db 0,"Sorry,you need",$4F
-    db "more coins.@@"
+    text_init , "Sorry,you need"
+    text_line , "more coins."
+    text_past
 
 _OopsYouDontHaveEnoughRoomText:
-    db 0,"Oops! You don't",$4F
-    db "have enough room.@@"
+    text_init , "Oops! You don't"
+    text_line , "have enough room."
+    text_past
 
 _OhFineThenText:
-    db 0,"Oh,fine then.@@"
+    text_init , "Oh,fine then."
+    text_past
 
 _GetDexRatedText:
-    db $0,"Want to get your",$4f
-    db "#DEX rated?",$57
+    text_init , "Want to get your"
+    text_line , "#DEX rated?"
+    text_done
 
 _ClosedOaksPCText:
-    db $0,"Closed link to",$4f
-    db "PROF.OAK's PC.@@"
+    text_init , "Closed link to"
+    text_line , "PROF.OAK's PC."
+    text_past
 
 _AccessedOaksPCText:
-    db $0,"Accessed PROF.",$4f
-    db "OAK's PC.",$51
-    db "Accessed #DEX",$4f
-    db "Rating System.",$58
+    text_init , "Accessed PROF."
+    text_line , "OAK's PC."
+    text_para , "Accessed #DEX"
+    text_line , "Rating System."
+    text_wait
 
 _UnnamedText_5d43:
-    db $0,"Where would you",$4f
-    db "like to go?",$57
+    text_init , "Where would you"
+    text_line , "like to go?"
+    text_done
 
 _UnnamedText_5d48:
-    db $0,"OK,please wait",$4f
-    db "just a moment.",$57
+    text_init , "OK,please wait"
+    text_line , "just a moment."
+    text_done
 
 _UnnamedText_5d4d:
-    db $0,"The link was",$4f
-    db "canceled.",$57
+    text_init , "The link was"
+    text_line , "canceled."
+    text_done
 
 INCLUDE "text/oakspeech.asm"
 
 _DoYouWantToNicknameText:
-    db $0,"Give a nickname",$4f
-    db "to @"
-
-UnnamedText_8a629:
+    text_init , "Give a nickname"
+    text_line , "to "
+    text_paus
     TX_RAM $cd6d
-    db $0,"?",$57
+    text_init , "?"
+    text_done
 
 _UnnamedText_699f:
-    db $0,"Right! So your",$4f
-    db "name is ",$52,"!",$58
+    text_init , "Right! So your"
+    text_line , "name is ",$52,"!"
+    text_wait
 
 _UnnamedText_69e7:
-    db $0,"That's right! I",$4f
-    db "remember now! His",$55
-    db "name is ",$53,"!",$58
+    text_init , "That's right! I"
+    text_line , "remember now! His"
+    text_cont , "name is ",$53,"!"
+    text_wait
 
 _SSAnne8AfterBattleText2:
     TX_RAM $cd3f
-    db $0," and",$4f
-    db "@"
-
-UnnamedText_8a681:
+    text_init , " and"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0," will",$55
-    db "be traded.",$57
+    text_init , " will"
+    text_cont , "be traded."
+    text_done
 
 _Char00Text:
     TX_NUM $FF8C,1,2
-    db 0," ERROR.",$57
+    text_init , " ERROR."
+    text_done
 
 _Char55Text:
-    db 0,$4B,"@@"
+    text_init , $4B
+    text_past
 
 _DiglettsCaveRoute2Text1:
-    db $0,"I went to ROCK",$4f
-    db "TUNNEL,but it's",$55
-    db "dark and scary.",$51
-    db "If a #MON's",$4f
-    db "SKILL could light",$55
-    db "it up...",$57
+    text_init , "I went to ROCK"
+    text_line , "TUNNEL,but it's"
+    text_cont , "dark and scary."
+    text_para , "If a #MON's"
+    text_line , "SKILL could light"
+    text_cont , "it up..."
+    text_done
 
 _ViridianForestexitText1:
-    db $0,"Many #MON live",$4f
-    db "only in forests ",$55
-    db "and caves.",$51
-    db "You need to look",$4f
-    db "everywhere to get",$55
-    db "different kinds!",$57
+    text_init , "Many #MON live"
+    text_line , "only in forests "
+    text_cont , "and caves."
+    text_para , "You need to look"
+    text_line , "everywhere to get"
+    text_cont , "different kinds!"
+    text_done
 
 _ViridianForestexitText2:
-    db $0,"Have you noticed",$4f
-    db "the bushes on the",$55
-    db "roadside?",$51
-    db "They can be cut",$4f
-    db "down by a special",$55
-    db "#MON move.",$57
+    text_init , "Have you noticed"
+    text_line , "the bushes on the"
+    text_cont , "roadside?"
+    text_para , "They can be cut"
+    text_line , "down by a special"
+    text_cont , "#MON move."
+    text_done
 
 _Route2HouseText1:
-    db $0,"A fainted #MON",$4f
-    db "can't fight. But,",$55
-    db "it can still use ",$55
-    db "moves like CUT!",$57
+    text_init , "A fainted #MON"
+    text_line , "can't fight. But,"
+    text_cont , "it can still use "
+    text_cont , "moves like CUT!"
+    text_done
 
 _HM05AfterText:
-    db $0,"This SKILL",$4f
-    db "lights even the",$55
-    db "darkest dungeons.",$57
+    text_init , "This SKILL"
+    text_line , "lights even the"
+    text_cont , "darkest dungeons."
+    text_done
 
 _Route2GateText2:
-    db $0,"Once a #MON",$4f
-    db "can Light UP,you",$55
-    db "can get through",$55
-    db "ROCK TUNNEL.",$57
+    text_init , "Once a #MON"
+    text_line , "can Light UP,you"
+    text_cont , "can get through"
+    text_cont , "ROCK TUNNEL."
+    text_done
 
 _ViridianForestEntranceText1:
-    db $0,"Are you going to",$4f
-    db "VIRIDIAN FOREST?",$55
-    db "Be careful,it's",$55
-    db "a natural maze!",$57
+    text_init , "Are you going to"
+    text_line , "VIRIDIAN FOREST?"
+    text_cont , "Be careful,it's"
+    text_cont , "a natural maze!"
+    text_done
 
 _ViridianForestEntranceText2:
-    db $0,"RATTATA may be",$4f
-    db "small,but its",$55
-    db "bite is wicked!",$55
-    db "Did you get one?",$57
+    text_init , "RATTATA may be"
+    text_line , "small,but its"
+    text_cont , "bite is wicked!"
+    text_cont , "Did you get one?"
+    text_done
 
 _MtMoonPokecenterText1:
-    db $0,"I've 6 # BALLs",$4f
-    db "set in my belt.",$51
-    db "At most,you can",$4f
-    db "carry 6 #MON.",$57
+    text_init , "I've 6 # BALLs"
+    text_line , "set in my belt."
+    text_para , "At most,you can"
+    text_line , "carry 6 #MON."
+    text_done
 
 _MtMoonPokecenterText3:
-    db $0,"TEAM ROCKET",$4f
-    db "attacks CERULEAN",$55
-    db "citizens...",$51
-    db "TEAM ROCKET is",$4f
-    db "always in the",$55
-    db "news!",$57
+    text_init , "TEAM ROCKET"
+    text_line , "attacks CERULEAN"
+    text_cont , "citizens..."
+    text_para , "TEAM ROCKET is"
+    text_line , "always in the"
+    text_cont , "news!"
+    text_done
 
 _UnnamedText_4935c:
-    db $0,"MAN: Hello,there!",$4f
-    db "Have I got a deal",$55
-    db "just for you!",$51
-    db "I'll let you have",$4f
-    db "a swell MAGIKARP",$55
-    db "for just ¥500!",$55
-    db "What do you say?",$57
+    text_init , "MAN: Hello,there!"
+    text_line , "Have I got a deal"
+    text_cont , "just for you!"
+    text_para , "I'll let you have"
+    text_line , "a swell MAGIKARP"
+    text_cont , "for just ¥500!"
+    text_cont , "What do you say?"
+    text_done
 
 _UnnamedText_49361:
-    db $0,"No? I'm only",$4f
-    db "doing this as a",$55
-    db "favor to you!",$57
+    text_init , "No? I'm only"
+    text_line , "doing this as a"
+    text_cont , "favor to you!"
+    text_done
 
 _UnnamedText_49366:
-    db $0,"You'll need more",$4f
-    db "money than that!",$57
+    text_init , "You'll need more"
+    text_line , "money than that!"
+    text_done
 
 _UnnamedText_4936b:
-    db $0,"MAN: Well,I don't",$4f
-    db "give refunds!",$57
+    text_init , "MAN: Well,I don't"
+    text_line , "give refunds!"
+    text_done
 
 _MtMoonPokecenterText5:
-    db $0,$57
+    text_init
+    text_done
 
 _UnnamedText_1dfe7:
-    db $0,"I'm on guard duty.",$4f
-    db "Gee,I'm thirsty,",$55
-    db "though!",$51
-    db "Oh wait there,",$4f
-    db "the road's closed.",$57
+    text_init , "I'm on guard duty."
+    text_line , "Gee,I'm thirsty,"
+    text_cont , "though!"
+    text_para , "Oh wait there,"
+    text_line , "the road's closed."
+    text_done
 
 _UnnamedText_8aaa9:
-    db $0,"Whoa,boy!",$4f
-    db "I'm parched!",$55
-    db "...",$55
-    db "Huh? I can have",$55
-    db "this drink?",$55
-    db "Gee,thanks!@@"
+    text_init , "Whoa,boy!"
+    text_line , "I'm parched!"
+    text_cont , "..."
+    text_cont , "Huh? I can have"
+    text_cont , "this drink?"
+    text_cont , "Gee,thanks!"
+    text_past
 
 _UnnamedText_1dff1:
-    db $0,$51
-    db "...",$4f
-    db "Glug glug...",$55
-    db "...",$55
-    db "Gulp...",$55
-    db "If you want to go",$55
-    db "to SAFFRON CITY...",$55
-    db "...",$55
-    db "You can go on",$55
-    db "through. I'll",$55
-    db "share this with",$55
-    db "the other guards!",$57
+    text_init
+    text_para , "..."
+    text_line , "Glug glug..."
+    text_cont , "..."
+    text_cont , "Gulp..."
+    text_cont , "If you want to go"
+    text_cont , "to SAFFRON CITY..."
+    text_cont , "..."
+    text_cont , "You can go on"
+    text_cont , "through. I'll"
+    text_cont , "share this with"
+    text_cont , "the other guards!"
+    text_done
 
 _UnnamedText_1dff6:
-    db $0,"Hi,thanks for",$4f
-    db "the cool drinks!",$57
+    text_init , "Hi,thanks for"
+    text_line , "the cool drinks!"
+    text_done
 
 _UnnamedText_5640f:
-    db $0,"I run a DAYCARE.",$4f
-    db "Would you like me",$55
-    db "to raise one of",$55
-    db "your #MON?",$57
+    text_init , "I run a DAYCARE."
+    text_line , "Would you like me"
+    text_cont , "to raise one of"
+    text_cont , "your #MON?"
+    text_done
 
 _UnnamedText_56414:
-    db $0,"Which #MON",$4f
-    db "should I raise?",$58
+    text_init , "Which #MON"
+    text_line , "should I raise?"
+    text_wait
 
 _UnnamedText_56419:
-    db $0,"Fine,I'll look",$4f
-    db "after @"
-
-UnnamedText_8ac07:
+    text_init , "Fine,I'll look"
+    text_line , "after "
+    text_paus
     TX_RAM $cd6d
-    db $0,$55
-    db "for a while.",$58
+    text_init
+    text_cont , "for a while."
+    text_wait
 
 _UnnamedText_5641e:
-    db $0,"Come see me in",$4f
-    db "a while.",$57
+    text_init , "Come see me in"
+    text_line , "a while."
+    text_done
 
 _UnnamedText_56423:
-    db $0,"Your @"
-
-UnnamedText_8ac39:
+    text_init , "Your "
+    text_paus
     TX_RAM $cd6d
-    db $0,$4f
-    db "has grown a lot!",$51
-    db "By level,it's",$4f
-    db "grown by @"
-
-UnnamedText_8ac67:
+    text_init
+    text_line , "has grown a lot!"
+    text_para , "By level,it's"
+    text_line , "grown by "
+    text_paus
     TX_NUM $cd3e,$1,$3
-    db $0,"!",$51
-    db "Aren't I great?",$58
+    text_init , "!"
+    text_para , "Aren't I great?"
+    text_wait
 
 _UnnamedText_56428:
-    db $0,"You owe me ¥@"
-    db $2,$3f,$cd,$c2 ; XXX $2
-    db $0,$4f
-    db "for the return",$55
-    db "of this #MON.",$57
+    text_init , "You owe me ¥"
+    text_paus
+    db $2,$3f,$cd,$c2 ; print BCD number
+    text_init
+    text_line , "for the return"
+    text_cont , "of this #MON."
+    text_done
 
 _UnnamedText_5642d:
-    db $0,$52," got",$4f
-    db "@"
+    text_init , $52," got"
+    text_line
+    text_paus
     TX_RAM $da49
-    db $0," back!",$57
+    text_init , " back!"
+    text_done
 
 _UnnamedText_56432:
-    db $0,"Back already?",$4f
-    db "Your @"
-
-UnnamedText_8acd6:
+    text_init , "Back already?"
+    text_line , "Your "
+    text_paus
     TX_RAM $cd6d
-    db $0,$55
-    db "needs some more",$55
-    db "time with me.",$58
+    text_init
+    text_cont , "needs some more"
+    text_cont , "time with me."
+    text_wait
 
 _WithExpAllText
-    db $0,"Other #MON gain",$4F
-    db "some EXP. Points!",$58
+    text_init , "Other #MON gain"
+    text_line , "some EXP. Points!"
+    text_wait
 
 _PartyMenuItemUseInBattleText:
-    db $0,"Use item on",$4f
-    db "ACTIVE #MON!",$57
+    text_init , "Use item on"
+    text_line , "ACTIVE #MON!"
+    text_done
 
 _PartyMenuSoftboiledUseText:
-    db $0,"Heal which",$4f
-    db "#MON?",$57
+    text_init , "Heal which"
+    text_line , "#MON?"
+    text_done
 
 _MustChoiceActiveText:
-    db $0,"You must choice",$4F
-    db "ACTIVE #MON!",$58
+    text_init , "You must choice"
+    text_line , "ACTIVE #MON!"
+    text_wait
 
 _MoveNoPPText:
-    db $0,"Not Enough Energy",$4f
-    db "for this move!",$58
+    text_init , "Not Enough Energy"
+    text_line , "for this move!"
+    text_wait
 
 _UnnamedText_3d430:
     TX_RAM W_PLAYERMONNAME
-    db $0," has not",$4f
-    db "Enough Energy!",$57
+    text_init , " has not"
+    text_line , "Enough Energy!"
+    text_done
 
 _EmptyPartyText:
-    db $0,"You don't have",$4F
-    db "any #MON!",$58
+    text_init , "You don't have"
+    text_line , "any #MON!"
+    text_wait
 
 ; ───────────────────────────────────
 ; Display Effectiveness
 ; ───────────────────────────────────
 
 DEBUG_DAMAGE_MULTIPLIER: MACRO
-    db " (@"
+    db " ("
+    text_paus
     TX_NUM wTmpDmgMultiplier,2,3
-    db 0,$D9,")"
+    text_init , $D9,")"
     ENDM
 
 _ExtremelyEffectiveText:
-    db 0,"It's extremely",$4f
-    db "effective!"
+    text_init , "It's extremely"
+    text_line , "effective!"
     DEBUG_DAMAGE_MULTIPLIER
-    db $58
+    text_wait
 
 _UltraEffectiveText:
-    db 0,"It's ultra",$4f
-    db "effective!"
+    text_init , "It's ultra"
+    text_line , "effective!"
     DEBUG_DAMAGE_MULTIPLIER
-    db $58
+    text_wait
 
 _SuperEffectiveText:
-    db 0,"It's super",$4f
-    db "effective!"
+    text_init , "It's super"
+    text_line , "effective!"
     DEBUG_DAMAGE_MULTIPLIER
-    db $58
+    text_wait
 
 _VeryEffectiveText:
-    db 0,"It's very",$4f
-    db "effective!"
+    text_init , "It's very"
+    text_line , "effective!"
     DEBUG_DAMAGE_MULTIPLIER
-    db $58
+    text_wait
 
 _QuiteEffectiveText:
-    db 0,"It's quite",$4f
-    db "effective!"
+    text_init , "It's quite"
+    text_line , "effective!"
     DEBUG_DAMAGE_MULTIPLIER
-    db $58
+    text_wait
 
 _AlmostEffectiveText:
-    db 0,"It's almost",$4f
-    db "effective!"
+    text_init , "It's almost"
+    text_line , "effective!"
     DEBUG_DAMAGE_MULTIPLIER
-    db $58
+    text_wait
 
 _NotVeryEffectiveText:
-    db 0,"It's not very"
+    text_init , "It's not very"
     DEBUG_DAMAGE_MULTIPLIER
-    db $4f
-    db "effective...",$58
+    text_line , "effective..."
+    text_wait
 
 _AlmostIneffectiveText:
-    db 0,"It's not"
+    text_init , "It's not"
     DEBUG_DAMAGE_MULTIPLIER
-    db $4f
-    db "effective at all!",$58
+    text_line , "effective at all!"
+    text_wait
 
 _IneffectiveText:
-    db 0,"It's totally"
+    text_init , "It's totally"
     DEBUG_DAMAGE_MULTIPLIER
-    db $4f
-    db "ineffective!",$58
+    text_line , "ineffective!"
+    text_wait
 
 _Route2HouseText2:
-    db $0,"I found this",$4f
-    db "strange VOLTORB",$55
-    db "in my bag after",$55
-    db "the holidays!",$57
+    text_init , "I found this"
+    text_line , "strange VOLTORB"
+    text_cont , "in my bag after"
+    text_cont , "the holidays!"
+    text_done
 
 _ViridianBlackboardSleepText:
-    db $0,"A #MON can't",$4f
-    db "attack if it's",$55
-    db "asleep!",$51
-    db "#MON will stay",$4f
-    db "asleep even after",$55
-    db "battles.",$51
-    db "Use AWAKENING to",$4f
-    db "wake them up!",$58
+    text_init , "A #MON can't"
+    text_line , "attack if it's"
+    text_cont , "asleep!"
+    text_para , "#MON will stay"
+    text_line , "asleep even after"
+    text_cont , "battles."
+    text_para , "Use AWAKENING to"
+    text_line , "wake them up!"
+    text_wait
 
 _ViridianBlackboardPoisonText:
-    db $0,"When poisoned,a",$4f
-    db "#MON's health",$55
-    db "steadily drops.",$51
-    db "Poison lingers",$4f
-    db "after battles.",$51
-    db "Use an ANTIDOTE",$4f
-    db "to cure poison!",$58
+    text_init , "When poisoned,a"
+    text_line , "#MON's health"
+    text_cont , "steadily drops."
+    text_para , "Poison lingers"
+    text_line , "after battles."
+    text_para , "Use an ANTIDOTE"
+    text_line , "to cure poison!"
+    text_wait
 
 _ViridianBlackboardPrlzText:
-    db $0,"Paralysis",$4f
-    db "reduces speed.",$55
-    db "It could",$55
-    db "make #MON",$55
-    db "moves misfire!",$51
-    db "Paralysis remains",$4f
-    db "after battles.",$51
-    db "Use PARLYZ HEAL",$4f
-    db "for treatment!",$58
+    text_init , "Paralysis"
+    text_line , "reduces speed."
+    text_cont , "It could"
+    text_cont , "make #MON"
+    text_cont , "moves misfire!"
+    text_para , "Paralysis remains"
+    text_line , "after battles."
+    text_para , "Use PARLYZ HEAL"
+    text_line , "for treatment!"
+    text_wait
 
 _ViridianBlackboardBurnText:
-    db $0,"A burn reduces",$4f
-    db "attack.",$55
-    db "It also causes",$55
-    db "ongoing damage.",$51
-    db "Burns remain",$4f
-    db "after battles.",$51
-    db "Use BURN HEAL to",$4f
-    db "cure a burn!",$58
+    text_init , "A burn reduces"
+    text_line , "attack."
+    text_cont , "It also causes"
+    text_cont , "ongoing damage."
+    text_para , "Burns remain"
+    text_line , "after battles."
+    text_para , "Use BURN HEAL to"
+    text_line , "cure a burn!"
+    text_wait
 
 _ViridianBlackboardFrozenText:
-    db $0,"If frozen,a",$4f
-    db "#MON becomes",$55
-    db "totally immobile!",$51
-    db "It stays frozen",$4f
-    db "even after the",$55
-    db "battle ends.",$51
-    db "Use ICE HEAL to",$4f
-    db "thaw out #MON!",$58
+    text_init , "If frozen,a"
+    text_line , "#MON becomes"
+    text_cont , "totally immobile!"
+    text_para , "It stays frozen"
+    text_line , "even after the"
+    text_cont , "battle ends."
+    text_para , "Use ICE HEAL to"
+    text_line , "thaw out #MON!"
+    text_wait
 
 _ReceivedText:
-    db $0,$52," received",$4f
-    db "@"
+    text_init , $52," received"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _GotText:
-    db $0,$52," got",$4f
-    db "@"
+    text_init , $52," got"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _ShipReturned:
-    db $0,"The ship has",$4f
-    db "returned!",$57
+    text_init , "The ship has"
+    text_line , "returned!"
+    text_done
 
 _LikeShipText:
-    db $0,"I would like",$4f
-    db "to go on a ship!",$57
+    text_init , "I would like"
+    text_line , "to go on a ship!"
+    text_done
 
 _AIBattleWithdrawText:
     db 1
     dw W_TRAINERNAME
-    db 0," with- (@"
+    text_init , " with- ("
+    text_paus
     TX_RAM wTrainerAISwitchDebugReason ; TODO
-    db 0,")",$4F
-    db "drew @"
+    text_init , ")"
+    text_line , "drew "
+    text_paus
     db 1
     dw W_ENEMYMONNAME
-    db 0,"!",$58
+    text_init , "!"
+    text_wait
 
 _SilphScopeDoesntWorkInTheDark
-    db $0,"Darn!",$51
-    db "SILPH SCOPE doesn't",$4f
-    db "work in the dark!",$58
+    text_init , "Darn!"
+    text_para , "SILPH SCOPE doesn't"
+    text_line , "work in the dark!"
+    text_wait
 
 ; ───────────────────────────────────
 
 _PreHM05Text:
-    db $0,"I give you this!",$58
+    text_init , "I give you this!"
+    text_wait
 
 _LearnSkillText:
-    db $0,$52," learns all",$4f
-    db "secrets about",$55
-    db "@"
+    text_init , $52," learns all"
+    text_line , "secrets about"
+    text_cont
+    text_paus
     TX_RAM $cf4b
-    db $0," SKILL!@@"
+    text_init , " SKILL!"
+    text_past
 
 _HM01SkillFoundText:
-    db $0,"Now #MON and",$4f
-    db "you can see it",$55
-    db "CUT any time!",$51
-    db "You're Ready!@@"
+    text_init , "Now #MON and"
+    text_line , "you can see it"
+    text_cont , "CUT any time!"
+    text_para , "You're Ready!"
+    text_past
 
 _HM01SkillNotFoundText:
-    db $0,"Hmmm... I think",$4f
-    db "your team is",$55
-    db "missing a #MON",$55
-    db "with this SKILL!",$51
-    db "..But I'm sure",$4f
-    db "you'll be able to",$55
-    db "figure out who",$55
-    db "can learn it.",$51
-    db "Make good use!@@"
+    text_init , "Hmmm... I think"
+    text_line , "your team is"
+    text_cont , "missing a #MON"
+    text_cont , "with this SKILL!"
+    text_para , "..But I'm sure"
+    text_line , "you'll be able to"
+    text_cont , "figure out who"
+    text_cont , "can learn it."
+    text_para , "Make good use!"
+    text_past
 
 _HM02SkillFoundText:
-    db $0,"Found!@@"
+    text_init , "Found!"
+    text_past
 
 _HM02SkillNotFoundText:
-    db $0,"NOT Found!@@"
+    text_init , "NOT Found!"
+    text_past
 
 _HM03SkillFoundText:
-    db $0,"Found!@@"
+    text_init , "Found!"
+    text_past
 
 _HM03SkillNotFoundText:
-    db $0,"NOT Found!@@"
+    text_init , "NOT Found!"
+    text_past
 
 _HM04SkillFoundText:
-    db $0,"Found!@@"
+    text_init , "Found!"
+    text_past
 
 _HM04SkillNotFoundText:
-    db $0,"NOT Found!@@"
+    text_init , "NOT Found!"
+    text_past
 
 _HM05SkillFoundText:
-    db $0,"Found!@@"
+    text_init , "Found!"
+    text_past
 
 _HM05SkillNotFoundText:
-    db $0,"NOT Found!@@"
+    text_init , "NOT Found!"
+    text_past
 
 _HM06SkillFoundText:
-    db $0,"Found!@@"
+    text_init , "Found!"
+    text_past
 
 _HM06SkillNotFoundText:
-    db $0,"NOT Found!@@"
+    text_init , "NOT Found!"
+    text_past
 
 _HM07SkillFoundText:
-    db $0,"Found!@@"
+    text_init , "Found!"
+    text_past
 
 _HM07SkillNotFoundText:
-    db $0,"NOT Found!@@"
+    text_init , "NOT Found!"
+    text_past
 
 _HM08SkillFoundText:
-    db $0,"Found!@@"
+    text_init , "Found!"
+    text_past
 
 _HM08SkillNotFoundText:
-    db $0,"NOT Found!@@"
+    text_init , "NOT Found!"
+    text_past
 
 ; ───────────────────────────────────
 
 _EscapeRopeReceiveText1:
-    db $0,"I went to ROCK",$4f
-    db "TUNNEL,but it's",$55
-    db "dark and scary.",$51
-    db "If a #MON's",$4f
-    db "SKILL could light",$55
-    db "it up...",$51
-    db "I don't need this",$4f
-    db "tool at the",$55
-    db "moment, take it!",$58
+    text_init , "I went to ROCK"
+    text_line , "TUNNEL,but it's"
+    text_cont , "dark and scary."
+    text_para , "If a #MON's"
+    text_line , "SKILL could light"
+    text_cont , "it up..."
+    text_para , "I don't need this"
+    text_line , "tool at the"
+    text_cont , "moment, take it!"
+    text_wait
 
 _EscapeRopeNoRoomText:
-    db $0,"You do not have",$4f
-    db "space for this!",$57
+    text_init , "You do not have"
+    text_line , "space for this!"
+    text_done
 
 SECTION "bank23",ROMX,BANK[$23]
 
 _UnnamedText_56437:
-    db $0,"All right then,",$4f
-    db "@@"
+    text_init , "All right then,"
+    text_line
+    text_past
 
 _UnnamedText_5643b:
-    db $0,"come again.",$57
+    text_init , "come again."
+    text_done
 
 _UnnamedText_56440:
-    db $0,"You have no room",$4f
-    db "for this #MON!",$57
+    text_init , "You have no room"
+    text_line , "for this #MON!"
+    text_done
 
 _UnnamedText_56445:
-    db $0,"You only have one",$4f
-    db "#MON with you.",$57
+    text_init , "You only have one"
+    text_line , "#MON with you."
+    text_done
 
 _UnnamedText_5644f:
-    db $0,"Thank you! Here's",$4f
-    db "your #MON!",$58
+    text_init , "Thank you! Here's"
+    text_line , "your #MON!"
+    text_wait
 
 _UnnamedText_56454:
-    db $0,"Hey,you don't",$4f
-    db "have enough ¥!",$57
+    text_init , "Hey,you don't"
+    text_line , "have enough ¥!"
+    text_done
 
 _UndergrdTunnelEntRoute6Text1:
-    db $0,"People often lose",$4f
-    db "things in that",$55
-    db "UNDERGROUND PATH.",$57
+    text_init , "People often lose"
+    text_line , "things in that"
+    text_cont , "UNDERGROUND PATH."
+    text_done
 
 _UndergroundPathEntRoute7Text1:
-    db $0,"I heard a sleepy",$4f
-    db "#MON appeared",$55
-    db "near CELADON CITY.",$57
+    text_init , "I heard a sleepy"
+    text_line , "#MON appeared"
+    text_cont , "near CELADON CITY."
+    text_done
 
 _UndergroundPathEntRoute8Text1:
-    db $0,"The dept. store",$4f
-    db "in CELADON has a",$55
-    db "great selection!",$57
+    text_init , "The dept. store"
+    text_line , "in CELADON has a"
+    text_cont , "great selection!"
+    text_done
 
 _RockTunnelPokecenterText1:
-    db $0,"The element types",$4f
-    db "of #MON make",$55
-    db "them stronger",$55
-    db "than some types",$55
-    db "and weaker than",$55
-    db "others!",$57
+    text_init , "The element types"
+    text_line , "of #MON make"
+    text_cont , "them stronger"
+    text_cont , "than some types"
+    text_cont , "and weaker than"
+    text_cont , "others!"
+    text_done
 
 _RockTunnelPokecenterText3:
-    db $0,"I sold a useless",$4f
-    db "NUGGET for ¥5000!",$57
+    text_init , "I sold a useless"
+    text_line , "NUGGET for ¥5000!"
+    text_done
 
 _RockTunnel1BattleText1:
-    db $0,"This tunnel goes",$4f
-    db "a long way,kid!",$57
+    text_init , "This tunnel goes"
+    text_line , "a long way,kid!"
+    text_done
 
 _RockTunnel1EndBattleText1:
-    db $0,"Doh!",$4f
-    db "You win!",$58
+    text_init , "Doh!"
+    text_line , "You win!"
+    text_wait
 
 _RockTunnel1AfterBattleText1:
-    db $0,"Watch for ONIX!",$4f
-    db "It can put the",$55
-    db "squeeze on you!",$57
+    text_init , "Watch for ONIX!"
+    text_line , "It can put the"
+    text_cont , "squeeze on you!"
+    text_done
 
 _RockTunnel1BattleText2:
-    db $0,"Hmm. Maybe I'm",$4f
-    db "lost in here...",$57
+    text_init , "Hmm. Maybe I'm"
+    text_line , "lost in here..."
+    text_done
 
 _RockTunnel1EndBattleText2:
-    db $0,"Ease up!",$4f
-    db "What am I doing?",$55
-    db "Which way is out?",$58
+    text_init , "Ease up!"
+    text_line , "What am I doing?"
+    text_cont , "Which way is out?"
+    text_wait
 
 _RockTunnel1AfterBattleText2:
-    db $0,"That sleeping",$4f
-    db "#MON on ROUTE",$55
-    db "12 forced me to",$55
-    db "take this detour.",$57
+    text_init , "That sleeping"
+    text_line , "#MON on ROUTE"
+    text_cont , "12 forced me to"
+    text_cont , "take this detour."
+    text_done
 
 _RockTunnel1BattleText3:
-    db $0,"Outsiders like",$4f
-    db "you need to show",$55
-    db "me some respect!",$57
+    text_init , "Outsiders like"
+    text_line , "you need to show"
+    text_cont , "me some respect!"
+    text_done
 
 _RockTunnel1EndBattleText3:
-    db $0,"I give!",$58
+    text_init , "I give!"
+    text_wait
 
 _RockTunnel1AfterBattleText3:
-    db $0,"You're talented",$4f
-    db "enough to hike!",$57
+    text_init , "You're talented"
+    text_line , "enough to hike!"
+    text_done
 
 _RockTunnel1BattleText4:
-    db $0,"#MON fight!",$4f
-    db "Ready,go!",$57
+    text_init , "#MON fight!"
+    text_line , "Ready,go!"
+    text_done
 
 _RockTunnel1EndBattleText4:
-    db $0,"Game",$4f
-    db "over!",$58
+    text_init , "Game"
+    text_line , "over!"
+    text_wait
 
 _RockTunnel1AfterBattleText4:
-    db $0,"Oh well,I'll get",$4f
-    db "a ZUBAT as I go!",$57
+    text_init , "Oh well,I'll get"
+    text_line , "a ZUBAT as I go!"
+    text_done
 
 _RockTunnel1BattleText5:
-    db $0,"Eek! Don't try",$4f
-    db "anything funny in",$55
-    db "the dark!",$57
+    text_init , "Eek! Don't try"
+    text_line , "anything funny in"
+    text_cont , "the dark!"
+    text_done
 
 _RockTunnel1EndBattleText5:
-    db $0,"It",$4f
-    db "was too dark!",$58
+    text_init , "It"
+    text_line , "was too dark!"
+    text_wait
 
 _RockTunnel1AfterBattleText5:
-    db $0,"I saw a MACHOP",$4f
-    db "in this tunnel!",$57
+    text_init , "I saw a MACHOP"
+    text_line , "in this tunnel!"
+    text_done
 
 _RockTunnel1BattleText6:
-    db $0,"I came this far",$4f
-    db "for #MON!",$57
+    text_init , "I came this far"
+    text_line , "for #MON!"
+    text_done
 
 _RockTunnel1EndBattleText6:
-    db $0,"I'm",$4f
-    db "out of #MON!",$58
+    text_init , "I'm"
+    text_line , "out of #MON!"
+    text_wait
 
 _RockTunnel1AfterBattleText6:
-    db $0,"You looked cute",$4f
-    db "and harmless!",$57
+    text_init , "You looked cute"
+    text_line , "and harmless!"
+    text_done
 
 _RockTunnel1BattleText7:
-    db $0,"You have #MON!",$4f
-    db "Let's start!",$57
+    text_init , "You have #MON!"
+    text_line , "Let's start!"
+    text_done
 
 _RockTunnel1EndBattleText7:
-    db $0,"You",$4f
-    db "play hard!",$58
+    text_init , "You"
+    text_line , "play hard!"
+    text_wait
 
 _RockTunnel1AfterBattleText7:
-    db $0,"Whew! I'm all",$4f
-    db "sweaty now!",$57
+    text_init , "Whew! I'm all"
+    text_line , "sweaty now!"
+    text_done
 
 _RockTunnel1Text8:
-    db $0,"ROCK TUNNEL",$4f
-    db "CERULEAN CITY -",$55
-    db "LAVENDER TOWN",$57
+    text_init , "ROCK TUNNEL"
+    text_line , "CERULEAN CITY -"
+    text_cont , "LAVENDER TOWN"
+    text_done
 
 _VoltorbBattleText:
-    db $0,"Bzzzt!",$57
+    text_init , "Bzzzt!"
+    text_done
 
 _ZapdosBattleText:
-    db $0,"Gyaoo!@@"
+    text_init , "Gyaoo!"
+    text_past
 
 _Route11GateText1:
-    db $0,"When you catch",$4f
-    db "lots of #MON,",$55
-    db "isn't it hard to",$55
-    db "think up names?",$51
-    db "In LAVENDER TOWN,",$4f
-    db "there's a man who",$55
-    db "rates #MON",$55
-    db "nicknames.",$51
-    db "He'll help you",$4f
-    db "rename them too!",$57
+    text_init , "When you catch"
+    text_line , "lots of #MON,"
+    text_cont , "isn't it hard to"
+    text_cont , "think up names?"
+    text_para , "In LAVENDER TOWN,"
+    text_line , "there's a man who"
+    text_cont , "rates #MON"
+    text_cont , "nicknames."
+    text_para , "He'll help you"
+    text_line , "rename them too!"
+    text_done
 
 _UnnamedText_494a3:
-    db $0,"There are items on",$4f
-    db "the ground that",$55
-    db "can't be seen.",$51
-    db "ITEMFINDER will",$4f
-    db "detect an item",$55
-    db "close to you.",$51
-    db "It can't pinpoint",$4f
-    db "it,so you have",$55
-    db "to look yourself!",$57
+    text_init , "There are items on"
+    text_line , "the ground that"
+    text_cont , "can't be seen."
+    text_para , "ITEMFINDER will"
+    text_line , "detect an item"
+    text_cont , "close to you."
+    text_para , "It can't pinpoint"
+    text_line , "it,so you have"
+    text_cont , "to look yourself!"
+    text_done
 
 _UnnamedText_494c4:
-    db $0,"Looked into the",$4f
-    db "binoculars.",$51
-    db "A big #MON is",$4f
-    db "asleep on a road!",$57
+    text_init , "Looked into the"
+    text_line , "binoculars."
+    text_para , "A big #MON is"
+    text_line , "asleep on a road!"
+    text_done
 
 _UnnamedText_494c9:
-    db $0,"Looked into the",$4f
-    db "binoculars.",$51
-    db "It's a beautiful",$4f
-    db "view!",$57
+    text_init , "Looked into the"
+    text_line , "binoculars."
+    text_para , "It's a beautiful"
+    text_line , "view!"
+    text_done
 
 _UnnamedText_494d5:
-    db $0,"Looked into the",$4f
-    db "binoculars.",$51
-    db "The only way to",$4f
-    db "get from CERULEAN",$55
-    db "CITY to LAVENDER",$55
-    db "is by way of the",$55
-    db "ROCK TUNNEL.",$57
+    text_init , "Looked into the"
+    text_line , "binoculars."
+    text_para , "The only way to"
+    text_line , "get from CERULEAN"
+    text_cont , "CITY to LAVENDER"
+    text_cont , "is by way of the"
+    text_cont , "ROCK TUNNEL."
+    text_done
 
 _DiglettsCaveEntRoute11Text1:
-    db $0,"What a surprise!",$4f
-    db "DIGLETTs dug this",$55
-    db "long tunnel!",$51
-    db "It goes right to",$4f
-    db "VIRIDIAN CITY!",$57
+    text_init , "What a surprise!"
+    text_line , "DIGLETTs dug this"
+    text_cont , "long tunnel!"
+    text_para , "It goes right to"
+    text_line , "VIRIDIAN CITY!"
+    text_done
 
 _Route12GateText1:
-    db $0,"There's a lookout",$4f
-    db "spot upstairs.",$57
+    text_init , "There's a lookout"
+    text_line , "spot upstairs."
+    text_done
 
 _TM39PreReceiveText:
-    db $0,"My #MON's",$4f
-    db "ashes are stored",$55
-    db "in #MON TOWER.",$51
-    db "You can have this",$4f
-    db "TM. I don't need",$55
-    db "it any more...",$58
+    text_init , "My #MON's"
+    text_line , "ashes are stored"
+    text_cont , "in #MON TOWER."
+    text_para , "You can have this"
+    text_line , "TM. I don't need"
+    text_cont , "it any more..."
+    text_wait
 
 _TM39ExplanationText:
-    db $0,"TM39 is a move",$4f
-    db "called SWIFT.",$51
-    db "It's very accurate,",$4f
-    db "so use it during",$55
-    db "battles you can't",$55
-    db "afford to lose.",$57
+    text_init , "TM39 is a move"
+    text_line , "called SWIFT."
+    text_para , "It's very accurate,"
+    text_line , "so use it during"
+    text_cont , "battles you can't"
+    text_cont , "afford to lose."
+    text_done
 
 _TM39NoRoomText:
-    db $0,"You don't have",$4f
-    db "room for this.",$57
+    text_init , "You don't have"
+    text_line , "room for this."
+    text_done
 
 _UnnamedText_495b8:
-    db $0,"Looked into the",$4f
-    db "binoculars.",$51
-    db "A man fishing!",$57
+    text_init , "Looked into the"
+    text_line , "binoculars."
+    text_para , "A man fishing!"
+    text_done
 
 _UnnamedText_495c4:
-    db $0,"Looked into the",$4f
-    db "binoculars.",$51
-    db "It's #MON TOWER!",$57
+    text_init , "Looked into the"
+    text_line , "binoculars."
+    text_para , "It's #MON TOWER!"
+    text_done
 
 _UnnamedText_564c0:
-    db $0,"I'm the FISHING",$4f
-    db "GURU's brother!",$51
-    db "I simply Looove",$4f
-    db "fishing!",$51
-    db "Do you like to",$4f
-    db "fish?",$57
+    text_init , "I'm the FISHING"
+    text_line , "GURU's brother!"
+    text_para , "I simply Looove"
+    text_line , "fishing!"
+    text_para , "Do you like to"
+    text_line , "fish?"
+    text_done
 
 _UnnamedText_564c5:
-    db $0,"Grand! I like",$4f
-    db "your style!",$51
-    db "Take this and",$4f
-    db "fish,young one!",$51
-    db $52," received",$4f
-    db "a @"
-
-UnnamedText_8ca48:
+    text_init , "Grand! I like"
+    text_line , "your style!"
+    text_para , "Take this and"
+    text_line , "fish,young one!"
+    text_para,$52," received"
+    text_line , "a "
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_564ca:
-    db $0,$51
-    db "Fishing is a way",$4f
-    db "of life!",$51
-    db "From the seas to",$4f
-    db "rivers,go out",$55
-    db "and land the big",$55
-    db "one!",$57
+    text_init
+    text_para , "Fishing is a way"
+    text_line , "of life!"
+    text_para , "From the seas to"
+    text_line , "rivers,go out"
+    text_cont , "and land the big"
+    text_cont , "one!"
+    text_done
 
 _UnnamedText_564cf:
-    db $0,"Oh... That's so",$4f
-    db "disappointing...",$57
+    text_init , "Oh... That's so"
+    text_line , "disappointing..."
+    text_done
 
 _UnnamedText_564d4:
-    db $0,"Hello there,",$4f
-    db $52,"!",$51
-    db "Use the SUPER ROD",$4f
-    db "in any water!",$55
-    db "You can catch",$55
-    db "different kinds",$55
-    db "of #MON.",$51
-    db "Try fishing",$4f
-    db "wherever you can!",$57
+    text_init , "Hello there,"
+    text_line , $52,"!"
+    text_para , "Use the SUPER ROD"
+    text_line , "in any water!"
+    text_cont , "You can catch"
+    text_cont , "different kinds"
+    text_cont , "of #MON."
+    text_para , "Try fishing"
+    text_line , "wherever you can!"
+    text_done
 
 _UnnamedText_564d9:
-    db $0,"Oh no!",$51
-    db "I had a gift for",$4f
-    db "you,but you have",$55
-    db "no room for it!",$57
+    text_init , "Oh no!"
+    text_para , "I had a gift for"
+    text_line , "you,but you have"
+    text_cont , "no room for it!"
+    text_done
 
 _Route15GateText1:
-    db $0,"Are you working",$4f
-    db "on a #DEX?",$51
-    db "PROF.OAK's AIDE",$4f
-    db "came by here.",$57
+    text_init , "Are you working"
+    text_line , "on a #DEX?"
+    text_para , "PROF.OAK's AIDE"
+    text_line , "came by here."
+    text_done
 
 _UnnamedText_4968c:
-    db $0,"FOCUS gives EXP",$4f
-    db "points only to",$55
-    db "#MON that",$55
-    db "has fought!",$51
-    db "It does,therefore,",$4f
-    db "raises the amount",$55
-    db "of EXP for those",$55
-    db "#MON.",$51
-    db "If you don't need",$4f
-    db "it,you should ",$55
-    db "store it via PC.",$57
+    text_init , "FOCUS gives EXP"
+    text_line , "points only to"
+    text_cont , "#MON that"
+    text_cont , "has fought!"
+    text_para , "It does,therefore,"
+    text_line , "raises the amount"
+    text_cont , "of EXP for those"
+    text_cont , "#MON."
+    text_para , "If you don't need"
+    text_line , "it,you should "
+    text_cont , "store it via PC."
+    text_done
 
 _UnnamedText_49698:
-    db $0,"Looked into the",$4f
-    db "binoculars.",$51
-    db "It looks like a",$4f
-    db "small island!",$57
+    text_init , "Looked into the"
+    text_line , "binoculars."
+    text_para , "It looks like a"
+    text_line , "small island!"
+    text_done
 
 _UnnamedText_49777:
-    db $0,"No pedestrians",$4f
-    db "are allowed on",$55
-    db "CYCLING ROAD!",$57
+    text_init , "No pedestrians"
+    text_line , "are allowed on"
+    text_cont , "CYCLING ROAD!"
+    text_done
 
 _UnnamedText_4977c:
-    db $0,"CYCLING ROAD is a",$4f
-    db "downhill course",$55
-    db "by the sea. It's",$55
-    db "a great ride.",$57
+    text_init , "CYCLING ROAD is a"
+    text_line , "downhill course"
+    text_cont , "by the sea. It's"
+    text_cont , "a great ride."
+    text_done
 
 _UnnamedText_49781:
-    db $0,"Excuse me! Wait",$4f
-    db "up please!",$57
+    text_init , "Excuse me! Wait"
+    text_line , "up please!"
+    text_done
 
 _Route16GateMapText2:
-    db $0,"How'd you get in?",$4f
-    db "Good effort!",$57
+    text_init , "How'd you get in?"
+    text_line , "Good effort!"
+    text_done
 
 _UnnamedText_49820:
-    db $0,"I'm going for a",$4f
-    db "ride with my girl",$55
-    db "friend!",$57
+    text_init , "I'm going for a"
+    text_line , "ride with my girl"
+    text_cont , "friend!"
+    text_done
 
 _UnnamedText_4982f:
-    db $0,"We're going",$4f
-    db "riding together!",$57
+    text_init , "We're going"
+    text_line , "riding together!"
+    text_done
 
 _UnnamedText_4983b:
-    db $0,"Looked into the",$4f
-    db "binoculars.",$51
-    db "It's CELADON DEPT.",$4f
-    db "STORE!",$57
+    text_init , "Looked into the"
+    text_line , "binoculars."
+    text_para , "It's CELADON DEPT."
+    text_line , "STORE!"
+    text_done
 
 _UnnamedText_49847:
-    db $0,"Looked into the",$4f
-    db "binoculars.",$51
-    db "There's a long",$4f
-    db "path over water!",$57
+    text_init , "Looked into the"
+    text_line , "binoculars."
+    text_para , "There's a long"
+    text_line , "path over water!"
+    text_done
 
 _PreHM02Text:
-    db $0,"Oh,you found my",$4f
-    db "secret retreat!",$51
-    db "Please don't tell",$4f
-    db "anyone I'm here.",$55
-    db "I'll make it up",$55
-    db "to you with this!",$58
+    text_init , "Oh,you found my"
+    text_line , "secret retreat!"
+    text_para , "Please don't tell"
+    text_line , "anyone I'm here."
+    text_cont , "I'll make it up"
+    text_cont , "to you with this!"
+    text_wait
 
 _UnnamedText_1e652:
-    db $0,"FEAROW: Kyueen!",$57
+    text_init , "FEAROW: Kyueen!"
+    text_done
 
 _UnnamedText_49928:
-    db $0,"You need a BICYCLE",$4f
-    db "for CYCLING ROAD!",$57
+    text_init , "You need a BICYCLE"
+    text_line , "for CYCLING ROAD!"
+    text_done
 
 _UnnamedText_4992d:
-    db $0,"CYCLING ROAD is",$4f
-    db "all uphill from",$55
-    db "here.",$57
+    text_init , "CYCLING ROAD is"
+    text_line , "all uphill from"
+    text_cont , "here."
+    text_done
 
 _UnnamedText_49932:
-    db $0,"Excuse me!",$57
+    text_init , "Excuse me!"
+    text_done
 
 _UnnamedText_49993:
-    db $0,"Looked into the",$4f
-    db "binoculars.",$51
-    db "PALLET TOWN is in",$4f
-    db "the west!",$57
+    text_init , "Looked into the"
+    text_line , "binoculars."
+    text_para , "PALLET TOWN is in"
+    text_line , "the west!"
+    text_done
 
 _UnnamedText_4999f:
-    db $0,"Looked into the",$4f
-    db "binoculars.",$51
-    db "There are people",$4f
-    db "swimming!",$57
+    text_init , "Looked into the"
+    text_line , "binoculars."
+    text_para , "There are people"
+    text_line , "swimming!"
+    text_done
 
 _UnnamedText_1e704:
-    db $0,"Only truly skilled",$4f
-    db "trainers are",$55
-    db "allowed through.",$51
-    db "You don't have the",$4f
-    db "BOULDERBADGE yet!@@"
+    text_init , "Only truly skilled"
+    text_line , "trainers are"
+    text_cont , "allowed through."
+    text_para , "You don't have the"
+    text_line , "BOULDERBADGE yet!"
+    text_past
 
 _UnnamedText_1e715:
-    db $0,$51
-    db "The rules are",$4f
-    db "rules. I can't",$55
-    db "let you pass.",$57
+    text_init
+    text_para , "The rules are"
+    text_line , "rules. I can't"
+    text_cont , "let you pass."
+    text_done
 
 _UnnamedText_1e71a:
-    db $0,"Oh! That is the",$4f
-    db "BOULDERBADGE!",$55
-    db "Go right ahead!@@"
+    text_init , "Oh! That is the"
+    text_line , "BOULDERBADGE!"
+    text_cont , "Go right ahead!"
+    text_past
 
 _OnixText:
-    db $0,"Hurou!@@"
+    text_init , "Hurou!"
+    text_past
 
 _VictoryRoad2BattleText1:
-    db $0,"VICTORY ROAD is",$4f
-    db "the final test",$55
-    db "for trainers!",$57
+    text_init , "VICTORY ROAD is"
+    text_line , "the final test"
+    text_cont , "for trainers!"
+    text_done
 
 _VictoryRoad2EndBattleText1:
-    db $0,"Aiyah!",$58
+    text_init , "Aiyah!"
+    text_wait
 
 _VictoryRoad2AfterBattleText1:
-    db $0,"If you get stuck,",$4f
-    db "try moving some",$55
-    db "boulders around!",$57
+    text_init , "If you get stuck,"
+    text_line , "try moving some"
+    text_cont , "boulders around!"
+    text_done
 
 _VictoryRoad2BattleText2:
-    db $0,"Ah,so you wish",$4f
-    db "to challenge the",$55
-    db "ELITE FOUR?",$57
+    text_init , "Ah,so you wish"
+    text_line , "to challenge the"
+    text_cont , "ELITE FOUR?"
+    text_done
 
 _VictoryRoad2EndBattleText2:
-    db $0,"You",$4f
-    db "got me!",$58
+    text_init , "You"
+    text_line , "got me!"
+    text_wait
 
 _VictoryRoad2AfterBattleText2:
-    db $0,$53," also came",$4f
-    db "through here!",$57
+    text_init , $53," also came"
+    text_line , "through here!"
+    text_done
 
 _VictoryRoad2BattleText3:
-    db $0,"Come on!",$4f
-    db "I'll whip you!",$57
+    text_init , "Come on!"
+    text_line , "I'll whip you!"
+    text_done
 
 _VictoryRoad2EndBattleText3:
-    db $0,"I got",$4f
-    db "whipped!",$58
+    text_init , "I got"
+    text_line , "whipped!"
+    text_wait
 
 _VictoryRoad2AfterBattleText3:
-    db $0,"You earned the",$4f
-    db "right to be on",$55
-    db "VICTORY ROAD!",$57
+    text_init , "You earned the"
+    text_line , "right to be on"
+    text_cont , "VICTORY ROAD!"
+    text_done
 
 _VictoryRoad2BattleText4:
-    db $0,"If you can get",$4f
-    db "through here,you",$55
-    db "can go meet the",$55
-    db "ELITE FOUR!",$57
+    text_init , "If you can get"
+    text_line , "through here,you"
+    text_cont , "can go meet the"
+    text_cont , "ELITE FOUR!"
+    text_done
 
 _VictoryRoad2EndBattleText4:
-    db $0,"No!",$4f
-    db "Unbelievable!",$58
+    text_init , "No!"
+    text_line , "Unbelievable!"
+    text_wait
 
 _VictoryRoad2AfterBattleText4:
-    db $0,"I can beat you",$4f
-    db "when it comes to",$55
-    db "knowledge about",$55
-    db "#MON!",$57
+    text_init , "I can beat you"
+    text_line , "when it comes to"
+    text_cont , "knowledge about"
+    text_cont , "#MON!"
+    text_done
 
 _VictoryRoad2BattleText5:
-    db $0,"Is VICTORY ROAD",$4f
-    db "too tough?",$57
+    text_init , "Is VICTORY ROAD"
+    text_line , "too tough?"
+    text_done
 
 _VictoryRoad2EndBattleText5:
-    db $0,"Well",$4f
-    db "done!",$58
+    text_init , "Well"
+    text_line , "done!"
+    text_wait
 
 _VictoryRoad2AfterBattleText5:
-    db $0,"Many trainers give",$4f
-    db "up the challenge",$55
-    db "here.",$57
+    text_init , "Many trainers give"
+    text_line , "up the challenge"
+    text_cont , "here."
+    text_done
 
 _UnnamedText_1e865:
-    db $0,"Hiya! I'm a",$4f
-    db "#MON...",$55
-    db "...No I'm not!",$51
-    db "Call me BILL!",$4f
-    db "I'm a true blue",$55
-    db "#MANIAC! Hey!",$55
-    db "What's with that",$55
-    db "skeptical look?",$51
-    db "I'm not joshing",$4f
-    db "you,I screwed up",$55
-    db "an experiment and",$55
-    db "got combined with",$55
-    db "a #MON!",$51
-    db "So,how about it?",$4f
-    db "Help me out here!",$57
+    text_init , "Hiya! I'm a"
+    text_line , "#MON..."
+    text_cont , "...No I'm not!"
+    text_para , "Call me BILL!"
+    text_line , "I'm a true blue"
+    text_cont , "#MANIAC! Hey!"
+    text_cont , "What's with that"
+    text_cont , "skeptical look?"
+    text_para , "I'm not joshing"
+    text_line , "you,I screwed up"
+    text_cont , "an experiment and"
+    text_cont , "got combined with"
+    text_cont , "a #MON!"
+    text_para , "So,how about it?"
+    text_line , "Help me out here!"
+    text_done
 
 _UnnamedText_1e86a:
-    db $0,"When I'm in the",$4f
-    db "TELEPORTER,go to",$55
-    db "my PC and run the",$55
-    db "Cell Separation",$55
-    db "System!",$57
+    text_init , "When I'm in the"
+    text_line , "TELEPORTER,go to"
+    text_cont , "my PC and run the"
+    text_cont , "Cell Separation"
+    text_cont , "System!"
+    text_done
 
 _UnnamedText_1e86f:
-    db $0,"No!? Come on,you",$4f
-    db "gotta help a guy",$55
-    db "in deep trouble!",$51
-    db "What do you say,",$4f
-    db "chief? Please?",$55
-    db "OK? All right!",$58
+    text_init , "No!? Come on,you"
+    text_line , "gotta help a guy"
+    text_cont , "in deep trouble!"
+    text_para , "What do you say,"
+    text_line , "chief? Please?"
+    text_cont , "OK? All right!"
+    text_wait
 
 _BillThankYouText:
-    db $0,"BILL: Yeehah!",$4f
-    db "Thanks,bud! I",$55
-    db "owe you one!",$51
-    db "So,did you come",$4f
-    db "to see my #MON",$55
-    db "collection?",$55
-    db "You didn't?",$55
-    db "That's a bummer.",$51
-    db "I've got to thank",$4f
-    db "you... Oh here,",$55
-    db "maybe this'll do.",$58
+    text_init , "BILL: Yeehah!"
+    text_line , "Thanks,bud! I"
+    text_cont , "owe you one!"
+    text_para , "So,did you come"
+    text_line , "to see my #MON"
+    text_cont , "collection?"
+    text_cont , "You didn't?"
+    text_cont , "That's a bummer."
+    text_para , "I've got to thank"
+    text_line , "you... Oh here,"
+    text_cont , "maybe this'll do."
+    text_wait
 
 _SSTicketReceivedText:
-    db $0,$52," received",$4f
-    db "an @"
+    text_init , $52," received"
+    text_line , "an "
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _SSTicketNoRoomText:
-    db $0,"You've got too",$4f
-    db "much stuff,bud!",$57
+    text_init , "You've got too"
+    text_line , "much stuff,bud!"
+    text_done
 
 _UnnamedText_1e8cb:
-    db $0,"That cruise ship,",$4f
-    db "S.S.ANNE,is in",$55
-    db "VERMILION CITY.",$55
-    db "Its passengers",$55
-    db "are all trainers!",$51
-    db "They invited me",$4f
-    db "to their party,",$55
-    db "but I can't stand",$55
-    db "fancy do's. Why",$55
-    db "don't you go",$55
-    db "instead of me?",$57
+    text_init , "That cruise ship,"
+    text_line , "S.S.ANNE,is in"
+    text_cont , "VERMILION CITY."
+    text_cont , "Its passengers"
+    text_cont , "are all trainers!"
+    text_para , "They invited me"
+    text_line , "to their party,"
+    text_cont , "but I can't stand"
+    text_cont , "fancy do's. Why"
+    text_cont , "don't you go"
+    text_cont , "instead of me?"
+    text_done
 
 _UnnamedText_1e8da:
-    db $0,"BILL: Look,bud,",$4f
-    db "just check out",$55
-    db "some of my rare",$55
-    db "#MON on my PC!",$57
+    text_init , "BILL: Look,bud,"
+    text_line , "just check out"
+    text_cont , "some of my rare"
+    text_cont , "#MON on my PC!"
+    text_done
 
 _Route1ViridianMartSampleText:
-    db $0,"Hi! I work at a",$4f
-    db "#MON MART.",$51
-    db "It's a convenient",$4f
-    db "shop,so please",$55
-    db "visit us in",$55
-    db "VIRIDIAN CITY.",$51
-    db "I know,I'll give",$4f
-    db "you a sample!",$55
-    db "Here you go!",$58
+    text_init , "Hi! I work at a"
+    text_line , "#MON MART."
+    text_para , "It's a convenient"
+    text_line , "shop,so please"
+    text_cont , "visit us in"
+    text_cont , "VIRIDIAN CITY."
+    text_para , "I know,I'll give"
+    text_line , "you a sample!"
+    text_cont , "Here you go!"
+    text_wait
 
 _UnnamedText_1caee:
-    db $0,"We also carry",$4f
-    db "# BALLs for",$55
-    db "catching #MON!",$57
+    text_init , "We also carry"
+    text_line , "# BALLs for"
+    text_cont , "catching #MON!"
+    text_done
 
 _UnnamedText_1caf3:
-    db $0,"You have too much",$4f
-    db "stuff with you!",$57
+    text_init , "You have too much"
+    text_line , "stuff with you!"
+    text_done
 
 _Route1Text2:
-    db $0,"See those ledges",$4f
-    db "along the road?",$51
-    db "It's a bit scary,",$4f
-    db "but you can jump",$55
-    db "from them.",$51
-    db "You can get back",$4f
-    db "to PALLET TOWN",$55
-    db "quicker that way.",$57
+    text_init , "See those ledges"
+    text_line , "along the road?"
+    text_para , "It's a bit scary,"
+    text_line , "but you can jump"
+    text_cont , "from them."
+    text_para , "You can get back"
+    text_line , "to PALLET TOWN"
+    text_cont , "quicker that way."
+    text_done
 
 _Route1Text3:
-    db $0,"ROUTE 1",$4f
-    db "PALLET TOWN -",$55
-    db "VIRIDIAN CITY",$57
+    text_init , "ROUTE 1"
+    text_line , "PALLET TOWN -"
+    text_cont , "VIRIDIAN CITY"
+    text_done
 
 _Route2Text3:
-    db $0,"ROUTE 2",$4f
-    db "VIRIDIAN CITY -",$55
-    db "PEWTER CITY",$57
+    text_init , "ROUTE 2"
+    text_line , "VIRIDIAN CITY -"
+    text_cont , "PEWTER CITY"
+    text_done
 
 _Route2Text4:
-    db $0,"DIGLETT's CAVE",$57
+    text_init , "DIGLETT's CAVE"
+    text_done
 
 _Route3Text1:
-    db $0,"Whew... I better",$4f
-    db "take a rest...",$55
-    db "Groan...",$51
-    db "That tunnel from",$4f
-    db "CERULEAN takes a",$55
-    db "lot out of you!",$57
+    text_init , "Whew... I better"
+    text_line , "take a rest..."
+    text_cont , "Groan..."
+    text_para , "That tunnel from"
+    text_line , "CERULEAN takes a"
+    text_cont , "lot out of you!"
+    text_done
 
 _Route3BattleText1:
-    db $0,"Hey! I met you in",$4f
-    db "VIRIDIAN FOREST!",$57
+    text_init , "Hey! I met you in"
+    text_line , "VIRIDIAN FOREST!"
+    text_done
 
 _Route3EndBattleText1:
-    db $0,"You",$4f
-    db "beat me again!",$58
+    text_init , "You"
+    text_line , "beat me again!"
+    text_wait
 
 _Route3AfterBattleText1:
-    db $0,"There are other",$4f
-    db "kinds of #MON",$55
-    db "than those found",$55
-    db "in the forest!",$57
+    text_init , "There are other"
+    text_line , "kinds of #MON"
+    text_cont , "than those found"
+    text_cont , "in the forest!"
+    text_done
 
 _Route3BattleText2:
-    db $0,"Hi! I like shorts!",$4f
-    db "They're comfy and",$55
-    db "easy to wear!",$57
+    text_init , "Hi! I like shorts!"
+    text_line , "They're comfy and"
+    text_cont , "easy to wear!"
+    text_done
 
 _Route3EndBattleText2:
-    db $0,"I don't",$4f
-    db "believe it!",$58
+    text_init , "I don't"
+    text_line , "believe it!"
+    text_wait
 
 _Route3AfterBattleText2:
-    db $0,"Are you storing",$4f
-    db "your #MON on",$55
-    db "PC? Each BOX can",$55
-    db "hold 20 #MON!",$57
+    text_init , "Are you storing"
+    text_line , "your #MON on"
+    text_cont , "PC? Each BOX can"
+    text_cont , "hold 20 #MON!"
+    text_done
 
 _Route3BattleText3:
-    db $0,"You looked at me,",$4f
-    db "didn't you?",$57
+    text_init , "You looked at me,"
+    text_line , "didn't you?"
+    text_done
 
 _Route3EndBattleText3:
-    db $0,"You're",$4f
-    db "mean!",$58
+    text_init , "You're"
+    text_line , "mean!"
+    text_wait
 
 _Route3AfterBattleText3:
-    db $0,"Quit staring if",$4f
-    db "you don't want to",$55
-    db "fight!",$57
+    text_init , "Quit staring if"
+    text_line , "you don't want to"
+    text_cont , "fight!"
+    text_done
 
 _Route3BattleText4:
-    db $0,"Are you a trainer?",$4f
-    db "Let's fight!",$57
+    text_init , "Are you a trainer?"
+    text_line , "Let's fight!"
+    text_done
 
 _Route3EndBattleText4:
-    db $0,"If I",$4f
-    db "had new #MON I",$55
-    db "would've won!",$58
+    text_init , "If I"
+    text_line , "had new #MON I"
+    text_cont , "would've won!"
+    text_wait
 
 _Route3AfterBattleText4:
-    db $0,"If a #MON BOX",$4f
-    db "on the PC gets",$55
-    db "full,just switch",$55
-    db "to another BOX!",$57
+    text_init , "If a #MON BOX"
+    text_line , "on the PC gets"
+    text_cont , "full,just switch"
+    text_cont , "to another BOX!"
+    text_done
 
 _Route3BattleText5:
-    db $0,"That look you",$4f
-    db "gave me,it's so",$55
-    db "intriguing!",$57
+    text_init , "That look you"
+    text_line , "gave me,it's so"
+    text_cont , "intriguing!"
+    text_done
 
 _Route3EndBattleText5:
-    db $0,"Be nice!",$58
+    text_init , "Be nice!"
+    text_wait
 
 _Route3AfterBattleText5:
-    db $0,"Avoid fights by",$4f
-    db "not letting",$55
-    db "people see you!",$57
+    text_init , "Avoid fights by"
+    text_line , "not letting"
+    text_cont , "people see you!"
+    text_done
 
 _Route3BattleText6:
-    db $0,"Hey! You're not",$4f
-    db "wearing shorts!",$57
+    text_init , "Hey! You're not"
+    text_line , "wearing shorts!"
+    text_done
 
 _Route3EndBattleText6:
-    db $0,"Lost!",$4f
-    db "Lost! Lost!",$58
+    text_init , "Lost!"
+    text_line , "Lost! Lost!"
+    text_wait
 
 _Route3AfterBattleText6:
-    db $0,"I always wear",$4f
-    db "shorts,even in",$55
-    db "winter!",$57
+    text_init , "I always wear"
+    text_line , "shorts,even in"
+    text_cont , "winter!"
+    text_done
 
 _Route3BattleText7:
-    db $0,"You can fight my",$4f
-    db "new #MON!",$57
+    text_init , "You can fight my"
+    text_line , "new #MON!"
+    text_done
 
 _Route3EndBattleText7:
-    db $0,"Done",$4f
-    db "like dinner!",$58
+    text_init , "Done"
+    text_line , "like dinner!"
+    text_wait
 
 _Route3AfterBattleText7:
-    db $0,"Trained #MON",$4f
-    db "are stronger than",$55
-    db "the wild ones!",$57
+    text_init , "Trained #MON"
+    text_line , "are stronger than"
+    text_cont , "the wild ones!"
+    text_done
 
 _Route3BattleText8:
-    db $0,"Eek! Did you",$4f
-    db "touch me?",$57
+    text_init , "Eek! Did you"
+    text_line , "touch me?"
+    text_done
 
 _Route3EndBattleText8:
-    db $0,"That's it?",$58
+    text_init , "That's it?"
+    text_wait
 
 _Route3AfterBattleText8:
-    db $0,"ROUTE 4 is at the",$4f
-    db "foot of MT.MOON.",$57
+    text_init , "ROUTE 4 is at the"
+    text_line , "foot of MT.MOON."
+    text_done
 
 _Route3Text10:
-    db $0,"ROUTE 3",$4f
-    db "MT.MOON AHEAD",$57
+    text_init , "ROUTE 3"
+    text_line , "MT.MOON AHEAD"
+    text_done
 
 _Route4Text1:
-    db $0,"Ouch! I tripped",$4f
-    db "over a rocky",$55
-    db "#MON,GEODUDE!",$57
+    text_init , "Ouch! I tripped"
+    text_line , "over a rocky"
+    text_cont , "#MON,GEODUDE!"
+    text_done
 
 _Route4BattleText1:
-    db $0,"I came to get my",$4f
-    db "mushroom #MON!",$57
+    text_init , "I came to get my"
+    text_line , "mushroom #MON!"
+    text_done
 
 _Route4EndBattleText1:
-    db $0,"Oh! My cute",$4f
-    db "mushroom #MON!",$58
+    text_init , "Oh! My cute"
+    text_line , "mushroom #MON!"
+    text_wait
 
 _Route4AfterBattleText1:
-    db $0,"There might not",$4f
-    db "be any more",$55
-    db "mushrooms here.",$51
-    db "I think I got",$4f
-    db "them all.",$57
+    text_init , "There might not"
+    text_line , "be any more"
+    text_cont , "mushrooms here."
+    text_para , "I think I got"
+    text_line , "them all."
+    text_done
 
 _Route4Text5:
-    db $0,"MT.MOON",$4f
-    db "Tunnel Entrance",$57
+    text_init , "MT.MOON"
+    text_line , "Tunnel Entrance"
+    text_done
 
 _Route4Text6:
-    db $0,"ROUTE 4",$4f
-    db "MT.MOON -",$55
-    db "CERULEAN CITY",$57
+    text_init , "ROUTE 4"
+    text_line , "MT.MOON -"
+    text_cont , "CERULEAN CITY"
+    text_done
 
 _Route5Text1:
-    db $0,"UNDERGROUND PATH",$4f
-    db "CERULEAN CITY -",$55
-    db "VERMILION CITY",$57
+    text_init , "UNDERGROUND PATH"
+    text_line , "CERULEAN CITY -"
+    text_cont , "VERMILION CITY"
+    text_done
 
 _Route6BattleText1:
-    db $0,"Who's there?",$4f
-    db "Quit listening in",$55
-    db "on us!",$57
+    text_init , "Who's there?"
+    text_line , "Quit listening in"
+    text_cont , "on us!"
+    text_done
 
 _Route6EndBattleText1:
-    db $0,"I",$4f
-    db "just can't win!",$58
+    text_init , "I"
+    text_line , "just can't win!"
+    text_wait
 
 _Route6AfterBattleText1:
-    db $0,"Whisper...",$4f
-    db "whisper...",$57
+    text_init , "Whisper..."
+    text_line , "whisper..."
+    text_done
 
 _Route6BattleText2:
-    db $0,"Excuse me! This",$4f
-    db "is a private",$55
-    db "conversation!",$57
+    text_init , "Excuse me! This"
+    text_line , "is a private"
+    text_cont , "conversation!"
+    text_done
 
 _Route6EndBattleText2:
-    db $0,"Ugh!",$4f
-    db "I hate losing!",$58
+    text_init , "Ugh!"
+    text_line , "I hate losing!"
+    text_wait
 
 _Route6BattleText3:
-    db $0,"There aren't many",$4f
-    db "bugs out here.",$57
+    text_init , "There aren't many"
+    text_line , "bugs out here."
+    text_done
 
 _Route6EndBattleText3:
-    db $0,"No!",$4f
-    db "You're kidding!",$58
+    text_init , "No!"
+    text_line , "You're kidding!"
+    text_wait
 
 _Route6AfterBattleText3:
-    db $0,"I like bugs,so",$4f
-    db "I'm going back to",$55
-    db "VIRIDIAN FOREST.",$57
+    text_init , "I like bugs,so"
+    text_line , "I'm going back to"
+    text_cont , "VIRIDIAN FOREST."
+    text_done
 
 _Route6BattleText4:
-    db $0,"Huh? You want",$4f
-    db "to talk to me?",$57
+    text_init , "Huh? You want"
+    text_line , "to talk to me?"
+    text_done
 
 _Route6EndBattleText4:
-    db $0,"I",$4f
-    db "didn't start it!",$58
+    text_init , "I"
+    text_line , "didn't start it!"
+    text_wait
 
 _Route6AfterBattleText4:
-    db $0,"I should carry",$4f
-    db "more #MON with",$55
-    db "me for safety.",$57
+    text_init , "I should carry"
+    text_line , "more #MON with"
+    text_cont , "me for safety."
+    text_done
 
 _Route6BattleText5:
-    db $0,"Me? Well,OK.",$4f
-    db "I'll play!",$57
+    text_init , "Me? Well,OK."
+    text_line , "I'll play!"
+    text_done
 
 _Route6EndBattleText5:
-    db $0,"Just",$4f
-    db "didn't work!",$58
+    text_init , "Just"
+    text_line , "didn't work!"
+    text_wait
 
 _Route6AfterBattleText5:
-    db $0,"I want to get",$4f
-    db "stronger! What's",$55
-    db "your secret?",$57
+    text_init , "I want to get"
+    text_line , "stronger! What's"
+    text_cont , "your secret?"
+    text_done
 
 _Route6BattleText6:
-    db $0,"I've never seen",$4f
-    db "you around!",$55
-    db "Are you good?",$57
+    text_init , "I've never seen"
+    text_line , "you around!"
+    text_cont , "Are you good?"
+    text_done
 
 _Route6EndBattleText6:
-    db $0,"You",$4f
-    db "are too good!",$58
+    text_init , "You"
+    text_line , "are too good!"
+    text_wait
 
 _Route6AfterBattleText6:
-    db $0,"Are my #MON",$4f
-    db "weak? Or,am I",$55
-    db "just bad?",$57
+    text_init , "Are my #MON"
+    text_line , "weak? Or,am I"
+    text_cont , "just bad?"
+    text_done
 
 _Route6Text7:
-    db $0,"UNDERGROUND PATH",$4f
-    db "CERULEAN CITY -",$55
-    db "VERMILION CITY",$57
+    text_init , "UNDERGROUND PATH"
+    text_line , "CERULEAN CITY -"
+    text_cont , "VERMILION CITY"
+    text_done
 
 _Route7Text1:
-    db $0,"UNDERGROUND PATH",$4f
-    db "CELADON CITY -",$55
-    db "LAVENDER TOWN",$57
+    text_init , "UNDERGROUND PATH"
+    text_line , "CELADON CITY -"
+    text_cont , "LAVENDER TOWN"
+    text_done
 
 _Route8BattleText1:
-    db $0,"You look good at",$4f
-    db "#MON,but",$55
-    db "how's your chem?",$57
+    text_init , "You look good at"
+    text_line , "#MON,but"
+    text_cont , "how's your chem?"
+    text_done
 
 _Route8EndBattleText1:
-    db $0,"Ow!",$4f
-    db "Meltdown!",$58
+    text_init , "Ow!"
+    text_line , "Meltdown!"
+    text_wait
 
 _Route8AfterBattleText1:
-    db $0,"I am better at",$4f
-    db "school than this!",$57
+    text_init , "I am better at"
+    text_line , "school than this!"
+    text_done
 
 _Route8BattleText2:
-    db $0,"All right! Let's",$4f
-    db "roll the dice!",$57
+    text_init , "All right! Let's"
+    text_line , "roll the dice!"
+    text_done
 
 _Route8EndBattleText2:
-    db $0,"Drat!",$4f
-    db "Came up short!",$58
+    text_init , "Drat!"
+    text_line , "Came up short!"
+    text_wait
 
 _Route8AfterBattleText2:
-    db $0,"Lady Luck's not",$4f
-    db "with me today!",$57
+    text_init , "Lady Luck's not"
+    text_line , "with me today!"
+    text_done
 
 _Route8BattleText3:
-    db $0,"You need strategy",$4f
-    db "to win at this!",$57
+    text_init , "You need strategy"
+    text_line , "to win at this!"
+    text_done
 
 _Route8EndBattleText3:
-    db $0,"It's",$4f
-    db "not logical!",$58
+    text_init , "It's"
+    text_line , "not logical!"
+    text_wait
 
 _Route8AfterBattleText3:
-    db $0,"Go with GRIMER",$4f
-    db "first...and...",$55
-    db "...and...then...",$57
+    text_init , "Go with GRIMER"
+    text_line , "first...and..."
+    text_cont , "...and...then..."
+    text_done
 
 _Route8BattleText4:
-    db $0,"I like NIDORAN,so",$4f
-    db "I collect them!",$57
+    text_init , "I like NIDORAN,so"
+    text_line , "I collect them!"
+    text_done
 
 _Route8EndBattleText4:
-    db $0,"Why? Why??",$58
+    text_init , "Why? Why??"
+    text_wait
 
 _Route8AfterBattleText4:
-    db $0,"When #MON grow",$4f
-    db "up they get ugly!",$55
-    db "They shouldn't",$55
-    db "evolve!",$57
+    text_init , "When #MON grow"
+    text_line , "up they get ugly!"
+    text_cont , "They shouldn't"
+    text_cont , "evolve!"
+    text_done
 
 _Route8BattleText5:
-    db $0,"School is fun,but",$4f
-    db "so are #MON.",$57
+    text_init , "School is fun,but"
+    text_line , "so are #MON."
+    text_done
 
 _Route8EndBattleText5:
-    db $0,"I'll",$4f
-    db "stay with school.",$58
+    text_init , "I'll"
+    text_line , "stay with school."
+    text_wait
 
 _Route8AfterBattleText5:
-    db $0,"We're stuck here",$4f
-    db "because of the",$55
-    db "gates at SAFFRON.",$57
+    text_init , "We're stuck here"
+    text_line , "because of the"
+    text_cont , "gates at SAFFRON."
+    text_done
 
 _Route8BattleText6:
-    db $0,"MEOWTH is so cute,",$4f
-    db "meow,meow,meow!",$57
+    text_init , "MEOWTH is so cute,"
+    text_line , "meow,meow,meow!"
+    text_done
 
 _Route8EndBattleText6:
-    db $0,"Meow!",$58
+    text_init , "Meow!"
+    text_wait
 
 _Route8AfterBattleText6:
-    db $0,"I think PIDGEY",$4f
-    db "and RATTATA",$55
-    db "are cute too!",$57
+    text_init , "I think PIDGEY"
+    text_line , "and RATTATA"
+    text_cont , "are cute too!"
+    text_done
 
 _Route8BattleText7:
-    db $0,"We must look",$4f
-    db "silly standing",$55
-    db "here like this!",$57
+    text_init , "We must look"
+    text_line , "silly standing"
+    text_cont , "here like this!"
+    text_done
 
 _Route8EndBattleText7:
-    db $0,"Look what",$4f
-    db "you did!",$58
+    text_init , "Look what"
+    text_line , "you did!"
+    text_wait
 
 _Route8AfterBattleText7:
-    db $0,"SAFFRON's gate",$4f
-    db "keeper won't let",$55
-    db "us through.",$55
-    db "He's so mean!",$57
+    text_init , "SAFFRON's gate"
+    text_line , "keeper won't let"
+    text_cont , "us through."
+    text_cont , "He's so mean!"
+    text_done
 
 _Route8BattleText8:
-    db $0,"I'm a rambling,",$4f
-    db "gambling dude!",$57
+    text_init , "I'm a rambling,"
+    text_line , "gambling dude!"
+    text_done
 
 _Route8EndBattleText8:
-    db $0,"Missed",$4f
-    db "the big score!",$58
+    text_init , "Missed"
+    text_line , "the big score!"
+    text_wait
 
 _Route8AfterBattleText8:
-    db $0,"Gambling and",$4f
-    db "#MON are like",$55
-    db "eating peanuts!",$55
-    db "Just can't stop!",$57
+    text_init , "Gambling and"
+    text_line , "#MON are like"
+    text_cont , "eating peanuts!"
+    text_cont , "Just can't stop!"
+    text_done
 
 _Route8BattleText9:
-    db $0,"What's a cute,",$4f
-    db "round and fluffy",$55
-    db "#MON?",$57
+    text_init , "What's a cute,"
+    text_line , "round and fluffy"
+    text_cont , "#MON?"
+    text_done
 
 _Route8EndBattleText9:
-    db $0,"Stop!",$51
-    db "Don't be so mean",$4f
-    db "to my CLEFAIRY!",$58
+    text_init , "Stop!"
+    text_para , "Don't be so mean"
+    text_line , "to my CLEFAIRY!"
+    text_wait
 
 _Route8AfterBattleText9:
-    db $0,"I heard that",$4f
-    db "CLEFAIRY evolves",$55
-    db "when it's exposed",$55
-    db "to a MOON STONE.",$57
+    text_init , "I heard that"
+    text_line , "CLEFAIRY evolves"
+    text_cont , "when it's exposed"
+    text_cont , "to a MOON STONE."
+    text_done
 
 _Route8Text10:
-    db $0,"UNDERGROUND PATH",$4f
-    db "CELADON CITY -",$55
-    db "LAVENDER TOWN",$57
+    text_init , "UNDERGROUND PATH"
+    text_line , "CELADON CITY -"
+    text_cont , "LAVENDER TOWN"
+    text_done
 
 _Route9BattleText1:
-    db $0,"You have #MON",$4f
-    db "with you!",$55
-    db "You're mine!",$57
+    text_init , "You have #MON"
+    text_line , "with you!"
+    text_cont , "You're mine!"
+    text_done
 
 _Route9EndBattleText1:
-    db $0,"You",$4f
-    db "deceived me!",$58
+    text_init , "You"
+    text_line , "deceived me!"
+    text_wait
 
 _Route9AfterBattleText1:
-    db $0,"You need light to",$4f
-    db "get through that",$55
-    db "dark tunnel ahead.",$57
+    text_init , "You need light to"
+    text_line , "get through that"
+    text_cont , "dark tunnel ahead."
+    text_done
 
 _Route9BattleText2:
-    db $0,"Who's that walking",$4f
-    db "with those good",$55
-    db "looking #MON?",$57
+    text_init , "Who's that walking"
+    text_line , "with those good"
+    text_cont , "looking #MON?"
+    text_done
 
 _Route9EndBattleText2:
-    db $0,"Out",$4f
-    db "like a light!",$58
+    text_init , "Out"
+    text_line , "like a light!"
+    text_wait
 
 _Route9AfterBattleText2:
-    db $0,"Keep walking!",$57
+    text_init , "Keep walking!"
+    text_done
 
 _Route9BattleText3:
-    db $0,"I'm taking ROCK",$4f
-    db "TUNNEL to go to",$55
-    db "LAVENDER...",$57
+    text_init , "I'm taking ROCK"
+    text_line , "TUNNEL to go to"
+    text_cont , "LAVENDER..."
+    text_done
 
 _Route9EndBattleText3:
-    db $0,"Can't",$4f
-    db "measure up!",$58
+    text_init , "Can't"
+    text_line , "measure up!"
+    text_wait
 
 _Route9AfterBattleText3:
-    db $0,"Are you off to",$4f
-    db "ROCK TUNNEL too?",$57
+    text_init , "Are you off to"
+    text_line , "ROCK TUNNEL too?"
+    text_done
 
 _Route9BattleText4:
-    db $0,"Don't you dare",$4f
-    db "condescend me!",$57
+    text_init , "Don't you dare"
+    text_line , "condescend me!"
+    text_done
 
 _Route9EndBattleText4:
-    db $0,"No!",$4f
-    db "You're too much!",$58
+    text_init , "No!"
+    text_line , "You're too much!"
+    text_wait
 
 _Route9AfterBattleText4:
-    db $0,"You're obviously",$4f
-    db "talented! Good",$55
-    db "luck to you!",$57
+    text_init , "You're obviously"
+    text_line , "talented! Good"
+    text_cont , "luck to you!"
+    text_done
 
 _Route9BattleText5:
-    db $0,"Bwahaha!",$4f
-    db "Great! I was",$55
-    db "bored,eh!",$57
+    text_init , "Bwahaha!"
+    text_line , "Great! I was"
+    text_cont , "bored,eh!"
+    text_done
 
 _Route9EndBattleText5:
-    db $0,"Keep it",$4f
-    db "coming,eh!",$51
-    db "Oh wait. I'm out",$4f
-    db "of #MON!",$58
+    text_init , "Keep it"
+    text_line , "coming,eh!"
+    text_para , "Oh wait. I'm out"
+    text_line , "of #MON!"
+    text_wait
 
 _Route9AfterBattleText5:
-    db $0,"You sure had guts",$4f
-    db "standing up to me",$55
-    db "there,eh?",$57
+    text_init , "You sure had guts"
+    text_line , "standing up to me"
+    text_cont , "there,eh?"
+    text_done
 
 _Route9BattleText6:
-    db $0,"Hahaha!",$4f
-    db "Aren't you a",$55
-    db "little toughie!",$57
+    text_init , "Hahaha!"
+    text_line , "Aren't you a"
+    text_cont , "little toughie!"
+    text_done
 
 _Route9EndBattleText6:
-    db $0,"What's",$4f
-    db "that?",$58
+    text_init , "What's"
+    text_line , "that?"
+    text_wait
 
 _Route9AfterBattleText6:
-    db $0,"Hahaha! Kids",$4f
-    db "should be tough!",$57
+    text_init , "Hahaha! Kids"
+    text_line , "should be tough!"
+    text_done
 
 _Route9BattleText7:
-    db $0,"I got up early",$4f
-    db "every day to",$55
-    db "raise my #MON",$55
-    db "from cocoons!",$57
+    text_init , "I got up early"
+    text_line , "every day to"
+    text_cont , "raise my #MON"
+    text_cont , "from cocoons!"
+    text_done
 
 _Route9EndBattleText7:
-    db $0,"WHAT?",$51
-    db "What a total",$4f
-    db "waste of time!",$58
+    text_init , "WHAT?"
+    text_para , "What a total"
+    text_line , "waste of time!"
+    text_wait
 
 _Route9AfterBattleText7:
-    db $0,"I have to collect",$4f
-    db "more than bugs to",$55
-    db "get stronger...",$57
+    text_init , "I have to collect"
+    text_line , "more than bugs to"
+    text_cont , "get stronger..."
+    text_done
 
 _Route9BattleText8:
-    db $0,"Hahahaha!",$4f
-    db "Come on,dude!",$57
+    text_init , "Hahahaha!"
+    text_line , "Come on,dude!"
+    text_done
 
 _Route9EndBattleText8:
-    db $0,"Hahahaha!",$4f
-    db "You beat me fair!",$58
+    text_init , "Hahahaha!"
+    text_line , "You beat me fair!"
+    text_wait
 
 _Route9AfterBattleText8:
-    db $0,"Hahahaha!",$4f
-    db "Us hearty guys",$55
-    db "always laugh!",$57
+    text_init , "Hahahaha!"
+    text_line , "Us hearty guys"
+    text_cont , "always laugh!"
+    text_done
 
 _Route9BattleText9:
-    db $0,"Go,my super bug",$4f
-    db "#MON!",$57
+    text_init , "Go,my super bug"
+    text_line , "#MON!"
+    text_done
 
 _Route9EndBattleText9:
-    db $0,"My",$4f
-    db "bugs...",$58
+    text_init , "My"
+    text_line , "bugs..."
+    text_wait
 
 _Route9AfterBattleText9:
-    db $0,"If you don't like",$4f
-    db "bug #MON,you",$55
-    db "bug me!",$57
+    text_init , "If you don't like"
+    text_line , "bug #MON,you"
+    text_cont , "bug me!"
+    text_done
 
 _Route9Text11:
-    db $0,"ROUTE 9",$4f
-    db "CERULEAN CITY-",$55
-    db "ROCK TUNNEL",$57
+    text_init , "ROUTE 9"
+    text_line , "CERULEAN CITY-"
+    text_cont , "ROCK TUNNEL"
+    text_done
 
 _Route10BattleText1:
-    db $0,"Wow,are you a",$4f
-    db "#MANIAC too?",$55
-    db "Want to see my",$55
-    db "collection?",$57
+    text_init , "Wow,are you a"
+    text_line , "#MANIAC too?"
+    text_cont , "Want to see my"
+    text_cont , "collection?"
+    text_done
 
 _Route10EndBattleText1:
-    db $0,"Humph.",$4f
-    db "I'm not angry!",$58
+    text_init , "Humph."
+    text_line , "I'm not angry!"
+    text_wait
 
 _Route10AfterBattleText1:
-    db $0,"I have more rare",$4f
-    db "#MON at home!",$57
+    text_init , "I have more rare"
+    text_line , "#MON at home!"
+    text_done
 
 _Route10BattleText2:
-    db $0,"Ha-hahah-ah-ha!",$57
+    text_init , "Ha-hahah-ah-ha!"
+    text_done
 
 _Route10EndBattleText2:
-    db $0,"Ha-haha!",$4f
-    db "Not laughing!",$55
-    db "Ha-hay fever!",$55
-    db "Haha-ha-choo!",$58
+    text_init , "Ha-haha!"
+    text_line , "Not laughing!"
+    text_cont , "Ha-hay fever!"
+    text_cont , "Haha-ha-choo!"
+    text_wait
 
 _Route10AfterBattleText2:
-    db $0,"Haha-ha-choo!",$4f
-    db "Ha-choo!",$55
-    db "Snort! Snivel!",$57
+    text_init , "Haha-ha-choo!"
+    text_line , "Ha-choo!"
+    text_cont , "Snort! Snivel!"
+    text_done
 
 _Route10BattleText3:
-    db $0,"Hi kid,want to",$4f
-    db "see my #MON?",$57
+    text_init , "Hi kid,want to"
+    text_line , "see my #MON?"
+    text_done
 
 _Route10EndBattleText3:
-    db $0,"Oh no!",$4f
-    db "My #MON!",$58
+    text_init , "Oh no!"
+    text_line , "My #MON!"
+    text_wait
 
 _Route10AfterBattleText3:
-    db $0,"I don't like you",$4f
-    db "for beating me!",$57
+    text_init , "I don't like you"
+    text_line , "for beating me!"
+    text_done
 
 _Route10BattleText4:
-    db $0,"I've been to a",$4f
-    db "#MON GYM a few",$55
-    db "times. But,I",$55
-    db "lost each time.",$57
+    text_init , "I've been to a"
+    text_line , "#MON GYM a few"
+    text_cont , "times. But,I"
+    text_cont , "lost each time."
+    text_done
 
 _Route10EndBattleText4:
-    db $0,"Ohh!",$4f
-    db "Blew it again!",$58
+    text_init , "Ohh!"
+    text_line , "Blew it again!"
+    text_wait
 
 _Route10AfterBattleText4:
-    db $0,"I noticed some",$4f
-    db "#MANIACs",$55
-    db "prowling around.",$57
+    text_init , "I noticed some"
+    text_line , "#MANIACs"
+    text_cont , "prowling around."
+    text_done
 
 _Route10BattleText5:
-    db $0,"Ah! This mountain",$4f
-    db "air is delicious!",$57
+    text_init , "Ah! This mountain"
+    text_line , "air is delicious!"
+    text_done
 
 _Route10EndBattleText5:
-    db $0,"That",$4f
-    db "cleared my head!",$58
+    text_init , "That"
+    text_line , "cleared my head!"
+    text_wait
 
 _Route10AfterBattleText5:
-    db $0,"I feel bloated on",$4f
-    db "mountain air!",$57
+    text_init , "I feel bloated on"
+    text_line , "mountain air!"
+    text_done
 
 _Route10BattleText6:
-    db $0,"I'm feeling a bit",$4f
-    db "faint from this",$55
-    db "tough hike.",$57
+    text_init , "I'm feeling a bit"
+    text_line , "faint from this"
+    text_cont , "tough hike."
+    text_done
 
 _Route10EndBattleText6:
-    db $0,"I'm",$4f
-    db "not up to it!",$58
+    text_init , "I'm"
+    text_line , "not up to it!"
+    text_wait
 
 _Route10AfterBattleText6:
-    db $0,"The #MON here",$4f
-    db "are so chunky!",$55
-    db "There should be a",$55
-    db "pink one with a",$55
-    db "floral pattern!",$57
+    text_init , "The #MON here"
+    text_line , "are so chunky!"
+    text_cont , "There should be a"
+    text_cont , "pink one with a"
+    text_cont , "floral pattern!"
+    text_done
 
 _Route10Text9:
 _Route10Text7:
-    db $0,"ROCK TUNNEL",$57
+    text_init , "ROCK TUNNEL"
+    text_done
 
 _Route10Text10:
-    db $0,"POWER PLANT",$57
+    text_init , "POWER PLANT"
+    text_done
 
 _Route11BattleText1:
-    db $0,"Win,lose or draw!",$57
+    text_init , "Win,lose or draw!"
+    text_done
 
 _Route11EndBattleText1:
-    db $0,"Atcha!",$4f
-    db "Didn't go my way!",$58
+    text_init , "Atcha!"
+    text_line , "Didn't go my way!"
+    text_wait
 
 _Route11AfterBattleText1:
-    db $0,"#MON is life!",$4f
-    db "And to live is to",$55
-    db "gamble!",$57
+    text_init , "#MON is life!"
+    text_line , "And to live is to"
+    text_cont , "gamble!"
+    text_done
 
 _Route11BattleText2:
-    db $0,"Competition! I",$4f
-    db "can't get enough!",$57
+    text_init , "Competition! I"
+    text_line , "can't get enough!"
+    text_done
 
 _Route11EndBattleText2:
-    db $0,"I had",$4f
-    db "a chance!",$58
+    text_init , "I had"
+    text_line , "a chance!"
+    text_wait
 
 _Route11AfterBattleText2:
-    db $0,"You can't be a",$4f
-    db "coward in the",$55
-    db "world of #MON!",$57
+    text_init , "You can't be a"
+    text_line , "coward in the"
+    text_cont , "world of #MON!"
+    text_done
 
 _Route11BattleText3:
-    db $0,"Let's go,but",$4f
-    db "don't cheat!",$57
+    text_init , "Let's go,but"
+    text_line , "don't cheat!"
+    text_done
 
 _Route11EndBattleText3:
-    db $0,"Huh?",$4f
-    db "That's not right!",$58
+    text_init , "Huh?"
+    text_line , "That's not right!"
+    text_wait
 
 _Route11AfterBattleText3:
-    db $0,"I did my best! I",$4f
-    db "have no regrets!",$57
+    text_init , "I did my best! I"
+    text_line , "have no regrets!"
+    text_done
 
 _Route11BattleText4:
-    db $0,"Careful!",$4f
-    db "I'm laying down",$55
-    db "some cables!",$57
+    text_init , "Careful!"
+    text_line , "I'm laying down"
+    text_cont , "some cables!"
+    text_done
 
 _Route11EndBattleText4:
-    db $0,"That",$4f
-    db "was electric!",$58
+    text_init , "That"
+    text_line , "was electric!"
+    text_wait
 
 _Route11AfterBattleText4:
-    db $0,"Spread the word",$4f
-    db "to save energy!",$57
+    text_init , "Spread the word"
+    text_line , "to save energy!"
+    text_done
 
 _Route11BattleText5:
-    db $0,"I just became a",$4f
-    db "trainer! But,I",$55
-    db "think I can win!",$57
+    text_init , "I just became a"
+    text_line , "trainer! But,I"
+    text_cont , "think I can win!"
+    text_done
 
 _Route11EndBattleText5:
-    db $0,"My",$4f
-    db "#MON couldn't!",$58
+    text_init , "My"
+    text_line , "#MON couldn't!"
+    text_wait
 
 _Route11AfterBattleText5:
-    db $0,"What do you want?",$4f
-    db "Leave me alone!",$57
+    text_init , "What do you want?"
+    text_line , "Leave me alone!"
+    text_done
 
 _Route11BattleText6:
-    db $0,"Fwahaha! I have",$4f
-    db "never lost!",$57
+    text_init , "Fwahaha! I have"
+    text_line , "never lost!"
+    text_done
 
 _Route11EndBattleText6:
-    db $0,"My",$4f
-    db "first loss!",$58
+    text_init , "My"
+    text_line , "first loss!"
+    text_wait
 
 _Route11AfterBattleText6:
-    db $0,"Luck of the draw!",$4f
-    db "Just luck!",$57
+    text_init , "Luck of the draw!"
+    text_line , "Just luck!"
+    text_done
 
 _Route11BattleText7:
-    db $0,"I have never won",$4f
-    db "before...",$57
+    text_init , "I have never won"
+    text_line , "before..."
+    text_done
 
 _Route11EndBattleText7:
-    db $0,"I saw",$4f
-    db "this coming...",$58
+    text_init , "I saw"
+    text_line , "this coming..."
+    text_wait
 
 _Route11AfterBattleText7:
-    db $0,"It's just luck.",$4f
-    db "Luck of the draw.",$57
+    text_init , "It's just luck."
+    text_line , "Luck of the draw."
+    text_done
 
 _Route11BattleText8:
-    db $0,"I'm the best in",$4f
-    db "my class!",$57
+    text_init , "I'm the best in"
+    text_line , "my class!"
+    text_done
 
 _Route11EndBattleText8:
-    db $0,"Darn!",$4f
-    db "I need to make my",$55
-    db "#MON stronger!",$58
+    text_init , "Darn!"
+    text_line , "I need to make my"
+    text_cont , "#MON stronger!"
+    text_wait
 
 _Route11AfterBattleText8:
-    db $0,"There's a fat",$4f
-    db "#MON that",$55
-    db "comes down from",$55
-    db "the mountains.",$51
-    db "It's strong if",$4f
-    db "you can get it.",$57
+    text_init , "There's a fat"
+    text_line , "#MON that"
+    text_cont , "comes down from"
+    text_cont , "the mountains."
+    text_para , "It's strong if"
+    text_line , "you can get it."
+    text_done
 
 _Route11BattleText9:
-    db $0,"Watch out for",$4f
-    db "live wires!",$57
+    text_init , "Watch out for"
+    text_line , "live wires!"
+    text_done
 
 _HM02AfterText:
-    db $0,"This is FLY!",$51
-    db "It will take you",$4f
-    db "back to any town.",$51
-    db "Put it to good",$4f
-    db "use!",$57
+    text_init , "This is FLY!"
+    text_para , "It will take you"
+    text_line , "back to any town."
+    text_para , "Put it to good"
+    text_line , "use!"
+    text_done
 
 _Mansion2BattleText2:
-    db $0,"Gyaoo!@@"
+    text_init , "Gyaoo!"
+    text_past
 
 _Route3Text1_TM30:
-    db $0,"Whew... I better",$4f
-    db "take a rest...",$55
-    db "Groan...",$51
-    db "That tunnel from",$4f
-    db "CERULEAN takes a",$55
-    db "lot out of you!",$51
-    db "I recommend you",$4f
-    db "to use this TM!",$58
+    text_init , "Whew... I better"
+    text_line , "take a rest..."
+    text_cont , "Groan..."
+    text_para , "That tunnel from"
+    text_line , "CERULEAN takes a"
+    text_cont , "lot out of you!"
+    text_para , "I recommend you"
+    text_line , "to use this TM!"
+    text_wait
 
 SECTION "bank24",ROMX,BANK[$24]
 
 _Route11EndBattleText9:
-    db $0,"Whoa!",$4f
-    db "You spark plug!",$58
+    text_init , "Whoa!"
+    text_line , "You spark plug!"
+    text_wait
 
 _Route11AfterBattleText9:
-    db $0,"Well,better get",$4f
-    db "back to work.",$57
+    text_init , "Well,better get"
+    text_line , "back to work."
+    text_done
 
 _Route11BattleText10:
-    db $0,"My #MON should",$4f
-    db "be ready by now!",$57
+    text_init , "My #MON should"
+    text_line , "be ready by now!"
+    text_done
 
 _Route11EndBattleText10:
-    db $0,"Too",$4f
-    db "much,too young!",$58
+    text_init , "Too"
+    text_line , "much,too young!"
+    text_wait
 
 _Route11AfterBattleText10:
-    db $0,"I better go find",$4f
-    db "stronger ones!",$57
+    text_init , "I better go find"
+    text_line , "stronger ones!"
+    text_done
 
 _Route11Text11:
-    db $0,"DIGLETT's CAVE",$57
+    text_init , "DIGLETT's CAVE"
+    text_done
 
 _Route12Text1:
-    db $0,"A sleeping #MON",$4f
-    db "blocks the way!",$57
+    text_init , "A sleeping #MON"
+    text_line , "blocks the way!"
+    text_done
 
 _Route12SnorlaxText:
-    db $0,"SNORLAX woke up!",$51
-    db "It attacked in a",$4f
-    db "grumpy rage!",$57
+    text_init , "SNORLAX woke up!"
+    text_para , "It attacked in a"
+    text_line , "grumpy rage!"
+    text_done
 
 _UnnamedText_596f0:
-    db $0,"SNORLAX calmed",$4f
-    db "down! With a big",$55
-    db "yawn,it returned",$55
-    db "to the mountains!",$57
+    text_init , "SNORLAX calmed"
+    text_line , "down! With a big"
+    text_cont , "yawn,it returned"
+    text_cont , "to the mountains!"
+    text_done
 
 _Route12BattleText1:
-    db $0,"Yeah! I got a",$4f
-    db "bite,here!",$57
+    text_init , "Yeah! I got a"
+    text_line , "bite,here!"
+    text_done
 
 _Route12EndBattleText1:
-    db $0,"Tch!",$4f
-    db "Just a small fry!",$58
+    text_init , "Tch!"
+    text_line , "Just a small fry!"
+    text_wait
 
 _Route12AfterBattleText1:
-    db $0,"Hang on! My line's",$4f
-    db "snagged!",$57
+    text_init , "Hang on! My line's"
+    text_line , "snagged!"
+    text_done
 
 _Route12BattleText2:
-    db $0,"Be patient!",$4f
-    db "Fishing is a",$55
-    db "waiting game!",$57
+    text_init , "Be patient!"
+    text_line , "Fishing is a"
+    text_cont , "waiting game!"
+    text_done
 
 _Route12EndBattleText2:
-    db $0,"That",$4f
-    db "one got away!",$58
+    text_init , "That"
+    text_line , "one got away!"
+    text_wait
 
 _Route12AfterBattleText2:
-    db $0,"With a better ROD,",$4f
-    db "I could catch",$55
-    db "better #MON!",$57
+    text_init , "With a better ROD,"
+    text_line , "I could catch"
+    text_cont , "better #MON!"
+    text_done
 
 _Route12BattleText3:
-    db $0,"Have you found a",$4f
-    db "MOON STONE?",$57
+    text_init , "Have you found a"
+    text_line , "MOON STONE?"
+    text_done
 
 _Route12EndBattleText3:
-    db $0,"Oww!",$58
+    text_init , "Oww!"
+    text_wait
 
 _Route12AfterBattleText3:
-    db $0,"I could have made",$4f
-    db "my #MON evolve",$55
-    db "with MOON STONE!",$57
+    text_init , "I could have made"
+    text_line , "my #MON evolve"
+    text_cont , "with MOON STONE!"
+    text_done
 
 _Route12BattleText4:
-    db $0,"Electricity is my",$4f
-    db "specialty!",$57
+    text_init , "Electricity is my"
+    text_line , "specialty!"
+    text_done
 
 _Route12EndBattleText4:
-    db $0,"Unplugged!",$58
+    text_init , "Unplugged!"
+    text_wait
 
 _Route12AfterBattleText4:
-    db $0,"Water conducts",$4f
-    db "electricity,so",$55
-    db "you should zap",$55
-    db "sea #MON!",$57
+    text_init , "Water conducts"
+    text_line , "electricity,so"
+    text_cont , "you should zap"
+    text_cont , "sea #MON!"
+    text_done
 
 _Route12BattleText5:
-    db $0,"The FISHING FOOL",$4f
-    db "vs. #MON KID!",$57
+    text_init , "The FISHING FOOL"
+    text_line , "vs. #MON KID!"
+    text_done
 
 _Route12EndBattleText5:
-    db $0,"Too",$4f
-    db "much!",$58
+    text_init , "Too"
+    text_line , "much!"
+    text_wait
 
 _Route12AfterBattleText5:
-    db $0,"You beat me at",$4f
-    db "#MON,but I'm",$55
-    db "good at fishing!",$57
+    text_init , "You beat me at"
+    text_line , "#MON,but I'm"
+    text_cont , "good at fishing!"
+    text_done
 
 _Route12BattleText6:
-    db $0,"I'd rather be",$4f
-    db "working!",$57
+    text_init , "I'd rather be"
+    text_line , "working!"
+    text_done
 
 _Route12EndBattleText6:
-    db $0,"It's",$4f
-    db "not easy...",$58
+    text_init , "It's"
+    text_line , "not easy..."
+    text_wait
 
 _Route12AfterBattleText6:
-    db $0,"It's all right.",$4f
-    db "Losing doesn't",$55
-    db "bug me any more.",$57
+    text_init , "It's all right."
+    text_line , "Losing doesn't"
+    text_cont , "bug me any more."
+    text_done
 
 _Route12BattleText7:
-    db $0,"You never know",$4f
-    db "what you could",$55
-    db "catch!",$57
+    text_init , "You never know"
+    text_line , "what you could"
+    text_cont , "catch!"
+    text_done
 
 _Route12EndBattleText7:
-    db $0,"Lost",$4f
-    db "it!",$58
+    text_init , "Lost"
+    text_line , "it!"
+    text_wait
 
 _Route12AfterBattleText7:
-    db $0,"I catch MAGIKARP",$4f
-    db "all the time,but",$55
-    db "they're so weak!",$57
+    text_init , "I catch MAGIKARP"
+    text_line , "all the time,but"
+    text_cont , "they're so weak!"
+    text_done
 
 _Route12Text11:
-    db $0,"ROUTE 12 ",$4f
-    db "North to LAVENDER",$57
+    text_init , "ROUTE 12 "
+    text_line , "North to LAVENDER"
+    text_done
 
 _Route12Text12:
-    db $0,"SPORT FISHING AREA",$57
+    text_init , "SPORT FISHING AREA"
+    text_done
 
 _Route13BattleText2:
-    db $0,"My bird #MON",$4f
-    db "want to scrap!",$57
+    text_init , "My bird #MON"
+    text_line , "want to scrap!"
+    text_done
 
 _Route13EndBattleText2:
-    db $0,"My",$4f
-    db "bird combo lost?",$58
+    text_init , "My"
+    text_line , "bird combo lost?"
+    text_wait
 
 _Route13AfterBattleText2:
-    db $0,"My #MON look",$4f
-    db "happy even though",$55
-    db "they lost.",$57
+    text_init , "My #MON look"
+    text_line , "happy even though"
+    text_cont , "they lost."
+    text_done
 
 _Route13BattleText3:
-    db $0,"I'm told I'm good",$4f
-    db "for a kid!",$57
+    text_init , "I'm told I'm good"
+    text_line , "for a kid!"
+    text_done
 
 _Route13EndBattleText3:
-    db $0,"Ohh!",$4f
-    db "I lost!",$58
+    text_init , "Ohh!"
+    text_line , "I lost!"
+    text_wait
 
 _Route13AfterBattleText3:
-    db $0,"I want to become",$4f
-    db "a good trainer.",$55
-    db "I'll train hard.",$57
+    text_init , "I want to become"
+    text_line , "a good trainer."
+    text_cont , "I'll train hard."
+    text_done
 
 _Route13BattleText4:
-    db $0,"Wow! Your BADGEs",$4f
-    db "are too cool!",$57
+    text_init , "Wow! Your BADGEs"
+    text_line , "are too cool!"
+    text_done
 
 _Route13EndBattleText4:
-    db $0,"Not",$4f
-    db "enough!",$58
+    text_init , "Not"
+    text_line , "enough!"
+    text_wait
 
 _Route13AfterBattleText4:
-    db $0,"You got those",$4f
-    db "BADGEs from GYM",$55
-    db "LEADERs. I know!",$57
+    text_init , "You got those"
+    text_line , "BADGEs from GYM"
+    text_cont , "LEADERs. I know!"
+    text_done
 
 _Route13BattleText5:
-    db $0,"My cute #MON",$4f
-    db "wish to make your",$55
-    db "acquaintance.",$57
+    text_init , "My cute #MON"
+    text_line , "wish to make your"
+    text_cont , "acquaintance."
+    text_done
 
 _Route13EndBattleText5:
-    db $0,"Wow!",$4f
-    db "You totally won!",$58
+    text_init , "Wow!"
+    text_line , "You totally won!"
+    text_wait
 
 _Route13AfterBattleText5:
-    db $0,"You have to make",$4f
-    db "#MON fight to",$55
-    db "toughen them up!",$57
+    text_init , "You have to make"
+    text_line , "#MON fight to"
+    text_cont , "toughen them up!"
+    text_done
 
 _Route13BattleText6:
-    db $0,"I found CARBOS in",$4f
-    db "a cave once.",$57
+    text_init , "I found CARBOS in"
+    text_line , "a cave once."
+    text_done
 
 _Route13EndBattleText6:
-    db $0,"Just",$4f
-    db "messed up!",$58
+    text_init , "Just"
+    text_line , "messed up!"
+    text_wait
 
 _Route13AfterBattleText6:
-    db $0,"CARBOS boosted",$4f
-    db "the SPEED of my",$55
-    db "#MON.",$57
+    text_init , "CARBOS boosted"
+    text_line , "the SPEED of my"
+    text_cont , "#MON."
+    text_done
 
 _Route13BattleText7:
-    db $0,"The wind's blowing",$4f
-    db "my way!",$57
+    text_init , "The wind's blowing"
+    text_line , "my way!"
+    text_done
 
 _Route13EndBattleText7:
-    db $0,"The",$4f
-    db "wind turned!",$58
+    text_init , "The"
+    text_line , "wind turned!"
+    text_wait
 
 _Route13AfterBattleText7:
-    db $0,"I'm beat. I guess",$4f
-    db "I'll FLY home.",$57
+    text_init , "I'm beat. I guess"
+    text_line , "I'll FLY home."
+    text_done
 
 _Route13BattleText8:
-    db $0,"Sure,I'll play",$4f
-    db "with you!",$57
+    text_init , "Sure,I'll play"
+    text_line , "with you!"
+    text_done
 
 _Route13EndBattleText8:
-    db $0,"Oh!",$4f
-    db "You little brute!",$58
+    text_init , "Oh!"
+    text_line , "You little brute!"
+    text_wait
 
 _Route13AfterBattleText8:
-    db $0,"I wonder which is",$4f
-    db "stronger,male or",$55
-    db "female #MON?",$57
+    text_init , "I wonder which is"
+    text_line , "stronger,male or"
+    text_cont , "female #MON?"
+    text_done
 
 _Route13BattleText9:
-    db $0,"Do you want to",$4f
-    db "#MON with me?",$57
+    text_init , "Do you want to"
+    text_line , "#MON with me?"
+    text_done
 
 _Route13EndBattleText9:
-    db $0,"It's over",$4f
-    db "already?",$58
+    text_init , "It's over"
+    text_line , "already?"
+    text_wait
 
 _Route13AfterBattleText9:
-    db $0,"I don't know",$4f
-    db "anything about",$55
-    db "#MON. I just",$55
-    db "like cool ones!",$57
+    text_init , "I don't know"
+    text_line , "anything about"
+    text_cont , "#MON. I just"
+    text_cont , "like cool ones!"
+    text_done
 
 _Route13BattleText10:
-    db $0,"What're you",$4f
-    db "lookin' at?",$57
+    text_init , "What're you"
+    text_line , "lookin' at?"
+    text_done
 
 _Route13EndBattleText10:
-    db $0,"Dang!",$4f
-    db "Stripped gears!",$58
+    text_init , "Dang!"
+    text_line , "Stripped gears!"
+    text_wait
 
 _Route13AfterBattleText10:
-    db $0,"Get lost!",$57
+    text_init , "Get lost!"
+    text_done
 
 _Route13BattleText11:
-    db $0,"I always go with",$4f
-    db "bird #MON!",$57
+    text_init , "I always go with"
+    text_line , "bird #MON!"
+    text_done
 
 _Route13EndBattleText11:
-    db $0,"Out",$4f
-    db "of power!",$58
+    text_init , "Out"
+    text_line , "of power!"
+    text_wait
 
 _Route13AfterBattleText11:
-    db $0,"I wish I could",$4f
-    db "fly like PIDGEY",$55
-    db "and PIDGEOTTO...",$57
+    text_init , "I wish I could"
+    text_line , "fly like PIDGEY"
+    text_cont , "and PIDGEOTTO..."
+    text_done
 
 _Route13Text11:
-    db $0,"TRAINER TIPS",$51
-    db "Look to the left",$4f
-    db "of that post!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "Look to the left"
+    text_line , "of that post!"
+    text_done
 
 _Route13Text12:
-    db $0,"TRAINER TIPS",$51
-    db "Use SELECT to",$4f
-    db "switch items in",$55
-    db "the ITEM window!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "Use SELECT to"
+    text_line , "switch items in"
+    text_cont , "the ITEM window!"
+    text_done
 
 _Route13Text13:
-    db $0,"ROUTE 13",$4f
-    db "North to SILENCE",$55
-    db "BRIDGE",$57
+    text_init , "ROUTE 13"
+    text_line , "North to SILENCE"
+    text_cont , "BRIDGE"
+    text_done
 
 _Route14BattleText1:
-    db $0,"You need to use",$4f
-    db "TMs to teach good",$55
-    db "moves to #MON!",$57
+    text_init , "You need to use"
+    text_line , "TMs to teach good"
+    text_cont , "moves to #MON!"
+    text_done
 
 _Route14EndBattleText1:
-    db $0,"Not",$4f
-    db "good enough!",$58
+    text_init , "Not"
+    text_line , "good enough!"
+    text_wait
 
 _Route14BattleText2:
-    db $0,"My bird #MON",$4f
-    db "should be ready",$55
-    db "for battle.",$57
+    text_init , "My bird #MON"
+    text_line , "should be ready"
+    text_cont , "for battle."
+    text_done
 
 _Route14EndBattleText2:
-    db $0,"Not",$4f
-    db "ready yet!",$58
+    text_init , "Not"
+    text_line , "ready yet!"
+    text_wait
 
 _Route14AfterBattleText2:
-    db $0,"They need to learn",$4f
-    db "better moves.",$57
+    text_init , "They need to learn"
+    text_line , "better moves."
+    text_done
 
 _Route14EndBattleText3:
-    db $0,"Aww,",$4f
-    db "bummer!",$58
+    text_init , "Aww,"
+    text_line , "bummer!"
+    text_wait
 
 _Route14AfterBattleText3:
-    db $0,"Teach #MON",$4f
-    db "moves of the same",$55
-    db "element type for",$55
-    db "more power.",$57
+    text_init , "Teach #MON"
+    text_line , "moves of the same"
+    text_cont , "element type for"
+    text_cont , "more power."
+    text_done
 
 _Route14BattleText4:
-    db $0,"Have you taught",$4f
-    db "your bird #MON",$55
-    db "how to FLY?",$57
+    text_init , "Have you taught"
+    text_line , "your bird #MON"
+    text_cont , "how to FLY?"
+    text_done
 
 _Route14EndBattleText4:
-    db $0,"Shot",$4f
-    db "down in flames!",$58
+    text_init , "Shot"
+    text_line , "down in flames!"
+    text_wait
 
 _Route14AfterBattleText4:
-    db $0,"Bird #MON are",$4f
-    db "my true love!",$57
+    text_init , "Bird #MON are"
+    text_line , "my true love!"
+    text_done
 
 _Route14BattleText5:
-    db $0,"Have you heard of",$4f
-    db "the legendary",$55
-    db "#MON?",$57
+    text_init , "Have you heard of"
+    text_line , "the legendary"
+    text_cont , "#MON?"
+    text_done
 
 _Route14EndBattleText5:
-    db $0,"Why?",$4f
-    db "Why'd I lose?",$58
+    text_init , "Why?"
+    text_line , "Why'd I lose?"
+    text_wait
 
 _Route14AfterBattleText5:
-    db $0,"The 3 legendary",$4f
-    db "#MON are all",$55
-    db "birds of prey.",$57
+    text_init , "The 3 legendary"
+    text_line , "#MON are all"
+    text_cont , "birds of prey."
+    text_done
 
 _Route14BattleText6:
-    db $0,"I'm not into it,",$4f
-    db "but OK! Let's go!",$57
+    text_init , "I'm not into it,"
+    text_line , "but OK! Let's go!"
+    text_done
 
 _Route14EndBattleText6:
-    db $0,"I",$4f
-    db "knew it!",$58
+    text_init , "I"
+    text_line , "knew it!"
+    text_wait
 
 _Route14AfterBattleText6:
-    db $0,"Winning,losing,",$4f
-    db "it doesn't matter",$55
-    db "in the long run!",$57
+    text_init , "Winning,losing,"
+    text_line , "it doesn't matter"
+    text_cont , "in the long run!"
+    text_done
 
 _Route14BattleText7:
-    db $0,"C'mon,c'mon.",$4f
-    db "Let's go,let's",$55
-    db "go,let's go!",$57
+    text_init , "C'mon,c'mon."
+    text_line , "Let's go,let's"
+    text_cont , "go,let's go!"
+    text_done
 
 _Route14EndBattleText7:
-    db $0,"Arrg!",$4f
-    db "Lost! Get lost!",$58
+    text_init , "Arrg!"
+    text_line , "Lost! Get lost!"
+    text_wait
 
 _Route14AfterBattleText7:
-    db $0,"What,what,what?",$4f
-    db "What do you want?",$57
+    text_init , "What,what,what?"
+    text_line , "What do you want?"
+    text_done
 
 _Route14BattleText8:
-    db $0,"Perfect! I need to",$4f
-    db "burn some time!",$57
+    text_init , "Perfect! I need to"
+    text_line , "burn some time!"
+    text_done
 
 _Route14EndBattleText8:
-    db $0,"What?",$4f
-    db "You!?",$58
+    text_init , "What?"
+    text_line , "You!?"
+    text_wait
 
 _Route14AfterBattleText8:
-    db $0,"Raising #MON",$4f
-    db "is a drag,man.",$57
+    text_init , "Raising #MON"
+    text_line , "is a drag,man."
+    text_done
 
 _Route14BattleText9:
-    db $0,"We ride out here",$4f
-    db "because there's",$55
-    db "more room!",$57
+    text_init , "We ride out here"
+    text_line , "because there's"
+    text_cont , "more room!"
+    text_done
 
 _Route14EndBattleText9:
-    db $0,"Wipe out!",$58
+    text_init , "Wipe out!"
+    text_wait
 
 _Route14AfterBattleText9:
-    db $0,"It's cool you",$4f
-    db "made your #MON",$55
-    db "so strong!",$51
-    db "Might is right!",$4f
-    db "And you know it!",$57
+    text_init , "It's cool you"
+    text_line , "made your #MON"
+    text_cont , "so strong!"
+    text_para , "Might is right!"
+    text_line , "And you know it!"
+    text_done
 
 _Route14BattleText10:
-    db $0,"#MON fight?",$4f
-    db "Cool! Rumble!",$57
+    text_init , "#MON fight?"
+    text_line , "Cool! Rumble!"
+    text_done
 
 _Route14EndBattleText10:
-    db $0,"Blown",$4f
-    db "away!",$58
+    text_init , "Blown"
+    text_line , "away!"
+    text_wait
 
 _Route14AfterBattleText10:
-    db $0,"You know who'd",$4f
-    db "win,you and me",$55
-    db "one on one!",$57
+    text_init , "You know who'd"
+    text_line , "win,you and me"
+    text_cont , "one on one!"
+    text_done
 
 _Route14Text11:
-    db $0,"ROUTE 14",$4f
-    db "West to FUCHSIA",$55
-    db "CITY",$57
+    text_init , "ROUTE 14"
+    text_line , "West to FUCHSIA"
+    text_cont , "CITY"
+    text_done
 
 _Route15BattleText1:
-    db $0,"Let me try out the",$4f
-    db "#MON I just",$55
-    db "got in a trade!",$57
+    text_init , "Let me try out the"
+    text_line , "#MON I just"
+    text_cont , "got in a trade!"
+    text_done
 
 _Route15EndBattleText1:
-    db $0,"Not",$4f
-    db "good enough!",$58
+    text_init , "Not"
+    text_line , "good enough!"
+    text_wait
 
 _Route15BattleText2:
-    db $0,"You look gentle,",$4f
-    db "so I think I can",$55
-    db "beat you!",$57
+    text_init , "You look gentle,"
+    text_line , "so I think I can"
+    text_cont , "beat you!"
+    text_done
 
 _Route15EndBattleText2:
-    db $0,"No,",$4f
-    db "wrong!",$58
+    text_init , "No,"
+    text_line , "wrong!"
+    text_wait
 
 _Route15AfterBattleText2:
-    db $0,"I'm afraid of",$4f
-    db "BIKERs,they look",$55
-    db "so ugly and mean!",$57
+    text_init , "I'm afraid of"
+    text_line , "BIKERs,they look"
+    text_cont , "so ugly and mean!"
+    text_done
 
 _Route15BattleText3:
-    db $0,"When I whistle,I",$4f
-    db "can summon bird",$55
-    db "#MON!",$57
+    text_init , "When I whistle,I"
+    text_line , "can summon bird"
+    text_cont , "#MON!"
+    text_done
 
 _Route15EndBattleText3:
-    db $0,"Ow!",$4f
-    db "That's tragic!",$58
+    text_init , "Ow!"
+    text_line , "That's tragic!"
+    text_wait
 
 _Route15AfterBattleText3:
-    db $0,"Maybe I'm not cut",$4f
-    db "out for battles.",$57
+    text_init , "Maybe I'm not cut"
+    text_line , "out for battles."
+    text_done
 
 _Route15BattleText4:
-    db $0,"Hmm? My birds are",$4f
-    db "shivering! You're",$55
-    db "good,aren't you?",$57
+    text_init , "Hmm? My birds are"
+    text_line , "shivering! You're"
+    text_cont , "good,aren't you?"
+    text_done
 
 _Route15EndBattleText4:
-    db $0,"Just",$4f
-    db "as I thought!",$58
+    text_init , "Just"
+    text_line , "as I thought!"
+    text_wait
 
 _Route15AfterBattleText4:
-    db $0,"Did you know moves",$4f
-    db "like EARTHQUAKE",$55
-    db "don't have any",$55
-    db "effect on birds?",$57
+    text_init , "Did you know moves"
+    text_line , "like EARTHQUAKE"
+    text_cont , "don't have any"
+    text_cont , "effect on birds?"
+    text_done
 
 _Route15BattleText5:
-    db $0,"Oh,you're a",$4f
-    db "little cutie!",$57
+    text_init , "Oh,you're a"
+    text_line , "little cutie!"
+    text_done
 
 _Route15EndBattleText5:
-    db $0,"You looked",$4f
-    db "so cute too!",$58
+    text_init , "You looked"
+    text_line , "so cute too!"
+    text_wait
 
 _Route15AfterBattleText5:
-    db $0,"I forgive you!",$4f
-    db "I can take it!",$57
+    text_init , "I forgive you!"
+    text_line , "I can take it!"
+    text_done
 
 _Route15BattleText6:
-    db $0,"I raise #MON",$4f
-    db "because I live",$55
-    db "alone!",$57
+    text_init , "I raise #MON"
+    text_line , "because I live"
+    text_cont , "alone!"
+    text_done
 
 _Route15EndBattleText6:
-    db $0,"I didn't",$4f
-    db "ask for this!",$58
+    text_init , "I didn't"
+    text_line , "ask for this!"
+    text_wait
 
 _Route15AfterBattleText6:
-    db $0,"I just like going",$4f
-    db "home to be with",$55
-    db "my #MON!",$57
+    text_init , "I just like going"
+    text_line , "home to be with"
+    text_cont , "my #MON!"
+    text_done
 
 _Route15BattleText7:
-    db $0,"Hey kid! C'mon!",$4f
-    db "I just got these!",$57
+    text_init , "Hey kid! C'mon!"
+    text_line , "I just got these!"
+    text_done
 
 _Route15EndBattleText7:
-    db $0,"Why",$4f
-    db "not?",$58
+    text_init , "Why"
+    text_line , "not?"
+    text_wait
 
 _Route15AfterBattleText7:
-    db $0,"You only live",$4f
-    db "once,so I live",$55
-    db "as an outlaw!",$55
-    db "TEAM ROCKET RULES!",$57
+    text_init , "You only live"
+    text_line , "once,so I live"
+    text_cont , "as an outlaw!"
+    text_cont , "TEAM ROCKET RULES!"
+    text_done
 
 _Route15BattleText8:
-    db $0,"Fork over all your",$4f
-    db "cash when you",$55
-    db "lose to me,kid!",$57
+    text_init , "Fork over all your"
+    text_line , "cash when you"
+    text_cont , "lose to me,kid!"
+    text_done
 
 _Route15EndBattleText8:
-    db $0,"That",$4f
-    db "can't be true!",$58
+    text_init , "That"
+    text_line , "can't be true!"
+    text_wait
 
 _Route15AfterBattleText8:
-    db $0,"I was just joking",$4f
-    db "about the money!",$57
+    text_init , "I was just joking"
+    text_line , "about the money!"
+    text_done
 
 _Route15BattleText9:
-    db $0,"What's cool?",$4f
-    db "Trading #MON!",$57
+    text_init , "What's cool?"
+    text_line , "Trading #MON!"
+    text_done
 
 _Route15EndBattleText9:
-    db $0,"I",$4f
-    db "said trade!",$58
+    text_init , "I"
+    text_line , "said trade!"
+    text_wait
 
 _Route15AfterBattleText9:
-    db $0,"I trade #MON",$4f
-    db "with my friends!",$57
+    text_init , "I trade #MON"
+    text_line , "with my friends!"
+    text_done
 
 _Route15BattleText10:
-    db $0,"Want to play with",$4f
-    db "my #MON?",$57
+    text_init , "Want to play with"
+    text_line , "my #MON?"
+    text_done
 
 _Route15EndBattleText10:
-    db $0,"I was",$4f
-    db "too impatient!",$58
+    text_init , "I was"
+    text_line , "too impatient!"
+    text_wait
 
 _Route15AfterBattleText10:
-    db $0,"I'll go train with",$4f
-    db "weaker people.@@"
+    text_init , "I'll go train with"
+    text_line , "weaker people."
+    text_past
 
 _Route15Text12:
-    db $0,"ROUTE 15",$4f
-    db "West to FUCHSIA",$55
-    db "CITY",$57
+    text_init , "ROUTE 15"
+    text_line , "West to FUCHSIA"
+    text_cont , "CITY"
+    text_done
 
 _Route16BattleText1:
-    db $0,"What do you want?",$57
+    text_init , "What do you want?"
+    text_done
 
 _Route16EndBattleText1:
-    db $0,"Don't you",$4f
-    db "dare laugh!",$58
+    text_init , "Don't you"
+    text_line , "dare laugh!"
+    text_wait
 
 _Route16AfterBattleText1:
-    db $0,"We like just",$4f
-    db "hanging here,",$55
-    db "what's it to you?",$57
+    text_init , "We like just"
+    text_line , "hanging here,"
+    text_cont , "what's it to you?"
+    text_done
 
 _Route16BattleText2:
-    db $0,"Nice BIKE!",$4f
-    db "Hand it over!",$57
+    text_init , "Nice BIKE!"
+    text_line , "Hand it over!"
+    text_done
 
 _Route16EndBattleText2:
-    db $0,"Knock",$4f
-    db "out!",$58
+    text_init , "Knock"
+    text_line , "out!"
+    text_wait
 
 _Route16AfterBattleText2:
-    db $0,"Forget it,who",$4f
-    db "needs your BIKE!",$57
+    text_init , "Forget it,who"
+    text_line , "needs your BIKE!"
+    text_done
 
 _Route16BattleText3:
-    db $0,"Come out and play,",$4f
-    db "little mouse!",$57
+    text_init , "Come out and play,"
+    text_line , "little mouse!"
+    text_done
 
 _Route16EndBattleText3:
-    db $0,"You",$4f
-    db "little rat!",$58
+    text_init , "You"
+    text_line , "little rat!"
+    text_wait
 
 _Route16AfterBattleText3:
-    db $0,"I hate losing!",$4f
-    db "Get away from me!",$57
+    text_init , "I hate losing!"
+    text_line , "Get away from me!"
+    text_done
 
 _Route16BattleText4:
-    db $0,"Hey,you just",$4f
-    db "bumped me!",$57
+    text_init , "Hey,you just"
+    text_line , "bumped me!"
+    text_done
 
 _Route16EndBattleText4:
-    db $0,"Kaboom!",$58
+    text_init , "Kaboom!"
+    text_wait
 
 _Route16AfterBattleText4:
-    db $0,"You can also get",$4f
-    db "to FUCHSIA from",$55
-    db "VERMILION using a",$55
-    db "coastal road.",$57
+    text_init , "You can also get"
+    text_line , "to FUCHSIA from"
+    text_cont , "VERMILION using a"
+    text_cont , "coastal road."
+    text_done
 
 _Route16BattleText5:
-    db $0,"I'm feeling",$4f
-    db "hungry and mean!",$57
+    text_init , "I'm feeling"
+    text_line , "hungry and mean!"
+    text_done
 
 _Route16EndBattleText5:
-    db $0,"Bad,",$4f
-    db "bad,bad!",$58
+    text_init , "Bad,"
+    text_line , "bad,bad!"
+    text_wait
 
 _Route16AfterBattleText5:
-    db $0,"I like my #MON",$4f
-    db "ferocious! They",$55
-    db "tear up enemies!",$57
+    text_init , "I like my #MON"
+    text_line , "ferocious! They"
+    text_cont , "tear up enemies!"
+    text_done
 
 _Route16BattleText6:
-    db $0,"Sure,I'll go!",$57
+    text_init , "Sure,I'll go!"
+    text_done
 
 _Route16EndBattleText6:
-    db $0,"Don't make",$4f
-    db "me mad!",$58
+    text_init , "Don't make"
+    text_line , "me mad!"
+    text_wait
 
 _Route16AfterBattleText6:
-    db $0,"I like harassing",$4f
-    db "people with my",$55
-    db "vicious #MON!",$57
+    text_init , "I like harassing"
+    text_line , "people with my"
+    text_cont , "vicious #MON!"
+    text_done
 
 _Route16Text7:
-    db $0,"A sleeping #MON",$4f
-    db "blocks the way!",$57
+    text_init , "A sleeping #MON"
+    text_line , "blocks the way!"
+    text_done
 
 _Route16SnorlaxText:
-    db $0,"SNORLAX woke up!",$51
-    db "It attacked in a",$4f
-    db "grumpy rage!",$57
+    text_init , "SNORLAX woke up!"
+    text_para , "It attacked in a"
+    text_line , "grumpy rage!"
+    text_done
 
 _UnnamedText_59ab8:
-    db $0,"With a big yawn,",$4f
-    db "SNORLAX returned",$55
-    db "to the mountains!",$57
+    text_init , "With a big yawn,"
+    text_line , "SNORLAX returned"
+    text_cont , "to the mountains!"
+    text_done
 
 _Route16Text8:
-    db $0,"Enjoy the slope!",$4f
-    db "CYCLING ROAD",$57
+    text_init , "Enjoy the slope!"
+    text_line , "CYCLING ROAD"
+    text_done
 
 _Route16Text9:
-    db $0,"ROUTE 16",$4f
-    db "CELADON CITY -",$55
-    db "FUCHSIA CITY",$57
+    text_init , "ROUTE 16"
+    text_line , "CELADON CITY -"
+    text_cont , "FUCHSIA CITY"
+    text_done
 
 _Route17BattleText1:
-    db $0,"There's no money",$4f
-    db "in fighting kids!",$57
+    text_init , "There's no money"
+    text_line , "in fighting kids!"
+    text_done
 
 _Route17EndBattleText1:
-    db $0,"Burned",$4f
-    db "out!",$58
+    text_init , "Burned"
+    text_line , "out!"
+    text_wait
 
 _Route17AfterBattleText1:
-    db $0,"Good stuff is",$4f
-    db "lying around on",$55
-    db "CYCLING ROAD!",$57
+    text_init , "Good stuff is"
+    text_line , "lying around on"
+    text_cont , "CYCLING ROAD!"
+    text_done
 
 _Route17BattleText2:
-    db $0,"What do you want,",$4f
-    db "kiddo?",$57
+    text_init , "What do you want,"
+    text_line , "kiddo?"
+    text_done
 
 _Route17EndBattleText2:
-    db $0,"Whoo!",$58
+    text_init , "Whoo!"
+    text_wait
 
 _Route17AfterBattleText2:
-    db $0,"I could belly-",$4f
-    db "bump you outta",$55
-    db "here!",$57
+    text_init , "I could belly-"
+    text_line , "bump you outta"
+    text_cont , "here!"
+    text_done
 
 _Route17BattleText3:
-    db $0,"You heading to",$4f
-    db "FUCHSIA?",$57
+    text_init , "You heading to"
+    text_line , "FUCHSIA?"
+    text_done
 
 _Route17EndBattleText3:
-    db $0,"Crash and",$4f
-    db "burn!",$58
+    text_init , "Crash and"
+    text_line , "burn!"
+    text_wait
 
 _Route17AfterBattleText3:
-    db $0,"I love racing",$4f
-    db "downhill!",$57
+    text_init , "I love racing"
+    text_line , "downhill!"
+    text_done
 
 _Route17BattleText4:
-    db $0,"We're BIKERs!",$4f
-    db "Highway stars!",$57
+    text_init , "We're BIKERs!"
+    text_line , "Highway stars!"
+    text_done
 
 _Route17EndBattleText4:
-    db $0,"Smoked!",$58
+    text_init , "Smoked!"
+    text_wait
 
 _Route17AfterBattleText4:
-    db $0,"Are you looking",$4f
-    db "for adventure?",$57
+    text_init , "Are you looking"
+    text_line , "for adventure?"
+    text_done
 
 _Route17BattleText5:
-    db $0,"Let VOLTORB",$4f
-    db "electrify you!",$57
+    text_init , "Let VOLTORB"
+    text_line , "electrify you!"
+    text_done
 
 _Route17EndBattleText5:
-    db $0,"Grounded",$4f
-    db "out!",$58
+    text_init , "Grounded"
+    text_line , "out!"
+    text_wait
 
 _Route17AfterBattleText5:
-    db $0,"I got my VOLTORB",$4f
-    db "at the abandoned",$55
-    db "POWER PLANT.",$57
+    text_init , "I got my VOLTORB"
+    text_line , "at the abandoned"
+    text_cont , "POWER PLANT."
+    text_done
 
 _Route17BattleText6:
-    db $0,"My #MON won't",$4f
-    db "evolve! Why?",$57
+    text_init , "My #MON won't"
+    text_line , "evolve! Why?"
+    text_done
 
 _Route17EndBattleText6:
-    db $0,"Why,",$4f
-    db "you!",$58
+    text_init , "Why,"
+    text_line , "you!"
+    text_wait
 
 _Route17AfterBattleText6:
-    db $0,"Maybe some #MON",$4f
-    db "need element",$55
-    db "STONEs to evolve.",$57
+    text_init , "Maybe some #MON"
+    text_line , "need element"
+    text_cont , "STONEs to evolve."
+    text_done
 
 _Route17BattleText7:
-    db $0,"I need a little",$4f
-    db "exercise!",$57
+    text_init , "I need a little"
+    text_line , "exercise!"
+    text_done
 
 _Route17EndBattleText7:
-    db $0,"Whew!",$4f
-    db "Good workout!",$58
+    text_init , "Whew!"
+    text_line , "Good workout!"
+    text_wait
 
 _Route17AfterBattleText7:
-    db $0,"I'm sure I lost",$4f
-    db "weight there!",$57
+    text_init , "I'm sure I lost"
+    text_line , "weight there!"
+    text_done
 
 _Route17BattleText8:
-    db $0,"Be a rebel!",$57
+    text_init , "Be a rebel!"
+    text_done
 
 _Route17EndBattleText8:
-    db $0,"Aaaargh!",$58
+    text_init , "Aaaargh!"
+    text_wait
 
 _Route17AfterBattleText8:
-    db $0,"Be ready to fight",$4f
-    db "for your beliefs!",$57
+    text_init , "Be ready to fight"
+    text_line , "for your beliefs!"
+    text_done
 
 _Route17BattleText9:
-    db $0,"Nice BIKE!",$4f
-    db "How's it handle?",$57
+    text_init , "Nice BIKE!"
+    text_line , "How's it handle?"
+    text_done
 
 _Route17EndBattleText9:
-    db $0,"Shoot!",$58
+    text_init , "Shoot!"
+    text_wait
 
 _Route17AfterBattleText9:
-    db $0,"The slope makes",$4f
-    db "it hard to steer!",$57
+    text_init , "The slope makes"
+    text_line , "it hard to steer!"
+    text_done
 
 _Route17BattleText10:
-    db $0,"Get lost kid!",$4f
-    db "I'm bushed!",$57
+    text_init , "Get lost kid!"
+    text_line , "I'm bushed!"
+    text_done
 
 _Route17EndBattleText10:
-    db $0,"Are you",$4f
-    db "satisfied?",$58
+    text_init , "Are you"
+    text_line , "satisfied?"
+    text_wait
 
 _Route17AfterBattleText10:
-    db $0,"I need to catch",$4f
-    db "a few Zs!",$57
+    text_init , "I need to catch"
+    text_line , "a few Zs!"
+    text_done
 
 _Route17Text11:
-    db $0,"It's a notice!",$51
-    db "Watch out for",$4f
-    db "discarded items!",$57
+    text_init , "It's a notice!"
+    text_para , "Watch out for"
+    text_line , "discarded items!"
+    text_done
 
 _Route17Text12:
-    db $0,"TRAINER TIPS",$51
-    db "All #MON are",$4f
-    db "unique.",$51
-    db "Even #MON of",$4f
-    db "the same type and",$55
-    db "level grow at",$55
-    db "different rates.",$57
+    text_init , "TRAINER TIPS"
+    text_para , "All #MON are"
+    text_line , "unique."
+    text_para , "Even #MON of"
+    text_line , "the same type and"
+    text_cont , "level grow at"
+    text_cont , "different rates."
+    text_done
 
 _Route17Text13:
-    db $0,"TRAINER TIPS",$51
-    db "Press the A or B",$4f
-    db "Button to stay in",$55
-    db "place while on a",$55
-    db "slope.",$57
+    text_init , "TRAINER TIPS"
+    text_para , "Press the A or B"
+    text_line , "Button to stay in"
+    text_cont , "place while on a"
+    text_cont , "slope."
+    text_done
 
 _Route17Text14:
-    db $0,"ROUTE 17",$4f
-    db "CELADON CITY -",$55
-    db "FUCHSIA CITY",$57
+    text_init , "ROUTE 17"
+    text_line , "CELADON CITY -"
+    text_cont , "FUCHSIA CITY"
+    text_done
 
 _Route17Text15:
-    db $0,"It's a notice!",$51
-    db "Don't throw the",$4f
-    db "game,throw #",$55
-    db "BALLs instead!",$57
+    text_init , "It's a notice!"
+    text_para , "Don't throw the"
+    text_line , "game,throw #"
+    text_cont , "BALLs instead!"
+    text_done
 
 _Route17Text16:
-    db $0,"CYCLING ROAD",$4f
-    db "Slope ends here!",$57
+    text_init , "CYCLING ROAD"
+    text_line , "Slope ends here!"
+    text_done
 
 _Route18BattleText1:
-    db $0,"I always check",$4f
-    db "every grassy area",$55
-    db "for new #MON.",$57
+    text_init , "I always check"
+    text_line , "every grassy area"
+    text_cont , "for new #MON."
+    text_done
 
 _Route18EndBattleText1:
-    db $0,"Tch!",$58
+    text_init , "Tch!"
+    text_wait
 
 _Route18AfterBattleText1:
-    db $0,"I wish I had a",$4f
-    db "BIKE!",$57
+    text_init , "I wish I had a"
+    text_line , "BIKE!"
+    text_done
 
 _Route18BattleText2:
-    db $0,"Kurukkoo!",$4f
-    db "How do you like",$55
-    db "my bird call?",$57
+    text_init , "Kurukkoo!"
+    text_line , "How do you like"
+    text_cont , "my bird call?"
+    text_done
 
 _Route18EndBattleText2:
-    db $0,"I",$4f
-    db "had to bug you!",$58
+    text_init , "I"
+    text_line , "had to bug you!"
+    text_wait
 
 _Route18AfterBattleText2:
-    db $0,"I also collect sea",$4f
-    db "#MON on",$55
-    db "weekends!",$57
+    text_init , "I also collect sea"
+    text_line , "#MON on"
+    text_cont , "weekends!"
+    text_done
 
 _Route18BattleText3:
-    db $0,"This is my turf!",$4f
-    db "Get out of here!",$57
+    text_init , "This is my turf!"
+    text_line , "Get out of here!"
+    text_done
 
 _Route18EndBattleText3:
-    db $0,"Darn!",$58
+    text_init , "Darn!"
+    text_wait
 
 _Route18AfterBattleText3:
-    db $0,"This is my fave",$4f
-    db "#MON hunting",$55
-    db "area!",$57
+    text_init , "This is my fave"
+    text_line , "#MON hunting"
+    text_cont , "area!"
+    text_done
 
 _Route18Text4:
-    db $0,"ROUTE 18",$4f
-    db "CELADON CITY -",$55
-    db "FUCHSIA CITY",$57
+    text_init , "ROUTE 18"
+    text_line , "CELADON CITY -"
+    text_cont , "FUCHSIA CITY"
+    text_done
 
 _Route18Text5:
-    db $0,"CYCLING ROAD",$4f
-    db "No pedestrians",$55
-    db "permitted!",$57
+    text_init , "CYCLING ROAD"
+    text_line , "No pedestrians"
+    text_cont , "permitted!"
+    text_done
 
 _Route19BattleText1:
-    db $0,"Have to warm up",$4f
-    db "before my swim!",$57
+    text_init , "Have to warm up"
+    text_line , "before my swim!"
+    text_done
 
 _Route19EndBattleText1:
-    db $0,"All",$4f
-    db "warmed up!",$58
+    text_init , "All"
+    text_line , "warmed up!"
+    text_wait
 
 _Route19AfterBattleText1:
-    db $0,"Thanks,kid! I'm",$4f
-    db "ready for a swim!",$57
+    text_init , "Thanks,kid! I'm"
+    text_line , "ready for a swim!"
+    text_done
 
 _Route19BattleText2:
-    db $0,"Wait! You'll have",$4f
-    db "a heart attack!",$57
+    text_init , "Wait! You'll have"
+    text_line , "a heart attack!"
+    text_done
 
 _Route19EndBattleText2:
-    db $0,"Ooh!",$4f
-    db "That's chilly!",$58
+    text_init , "Ooh!"
+    text_line , "That's chilly!"
+    text_wait
 
 _Route19AfterBattleText2:
-    db $0,"Watch out for",$4f
-    db "TENTACOOL!",$57
+    text_init , "Watch out for"
+    text_line , "TENTACOOL!"
+    text_done
 
 _Route19BattleText3:
-    db $0,"I love swimming!",$4f
-    db "What about you?",$57
+    text_init , "I love swimming!"
+    text_line , "What about you?"
+    text_done
 
 _Route19EndBattleText3:
-    db $0,"Belly",$4f
-    db "flop!",$58
+    text_init , "Belly"
+    text_line , "flop!"
+    text_wait
 
 _Route19AfterBattleText3:
-    db $0,"I can beat #MON",$4f
-    db "at swimming!",$57
+    text_init , "I can beat #MON"
+    text_line , "at swimming!"
+    text_done
 
 _Route19BattleText4:
-    db $0,"What's beyond the",$4f
-    db "horizon?",$57
+    text_init , "What's beyond the"
+    text_line , "horizon?"
+    text_done
 
 _Route19EndBattleText4:
-    db $0,"Glub!",$58
+    text_init , "Glub!"
+    text_wait
 
 _Route19AfterBattleText4:
-    db $0,"I see a couple of",$4f
-    db "islands!",$57
+    text_init , "I see a couple of"
+    text_line , "islands!"
+    text_done
 
 _Route19BattleText5:
-    db $0,"I tried diving",$4f
-    db "for #MON,but",$55
-    db "it was a no go!",$57
+    text_init , "I tried diving"
+    text_line , "for #MON,but"
+    text_cont , "it was a no go!"
+    text_done
 
 _Route19EndBattleText5:
-    db $0,"Help!",$58
+    text_init , "Help!"
+    text_wait
 
 _Route19AfterBattleText5:
-    db $0,"You have to fish",$4f
-    db "for sea #MON!",$57
+    text_init , "You have to fish"
+    text_line , "for sea #MON!"
+    text_done
 
 _Route19BattleText6:
-    db $0,"I look at the",$4f
-    db "sea to forget!",$57
+    text_init , "I look at the"
+    text_line , "sea to forget!"
+    text_done
 
 _Route19EndBattleText6:
-    db $0,"Ooh!",$4f
-    db "Traumatic!",$58
+    text_init , "Ooh!"
+    text_line , "Traumatic!"
+    text_wait
 
 _Route19AfterBattleText6:
-    db $0,"I'm looking at the",$4f
-    db "sea to forget!",$57
+    text_init , "I'm looking at the"
+    text_line , "sea to forget!"
+    text_done
 
 _Route19EndBattleText7:
-    db $0,"Oh!",$4f
-    db "I lost!",$58
+    text_init , "Oh!"
+    text_line , "I lost!"
+    text_wait
 
 _Route19AfterBattleText7:
-    db $0,"It's still a long",$4f
-    db "way to go to",$55
-    db "SEAFOAM ISLANDS.",$57
+    text_init , "It's still a long"
+    text_line , "way to go to"
+    text_cont , "SEAFOAM ISLANDS."
+    text_done
 
 _Route19BattleText8:
-    db $0,"Swimming's great!",$4f
-    db "Sunburns aren't!",$57
+    text_init , "Swimming's great!"
+    text_line , "Sunburns aren't!"
+    text_done
 
 _Route19EndBattleText8:
-    db $0,"Shocker!",$58
+    text_init , "Shocker!"
+    text_wait
 
 _Route19AfterBattleText8:
-    db $0,"My boy friend",$4f
-    db "wanted to swim to",$55
-    db "SEAFOAM ISLANDS.",$57
+    text_init , "My boy friend"
+    text_line , "wanted to swim to"
+    text_cont , "SEAFOAM ISLANDS."
+    text_done
 
 _Route19BattleText9:
-    db $0,"These waters are",$4f
-    db "treacherous!",$57
+    text_init , "These waters are"
+    text_line , "treacherous!"
+    text_done
 
 _Route19EndBattleText9:
-    db $0,"Ooh!",$4f
-    db "Dangerous!",$58
+    text_init , "Ooh!"
+    text_line , "Dangerous!"
+    text_wait
 
 _Route19AfterBattleText9:
-    db $0,"I got a cramp!",$4f
-    db "Glub,glub...",$57
+    text_init , "I got a cramp!"
+    text_line , "Glub,glub..."
+    text_done
 
 _Route19BattleText10:
-    db $0,"I swam here,but",$4f
-    db "I'm tired.",$57
+    text_init , "I swam here,but"
+    text_line , "I'm tired."
+    text_done
 
 _Route19EndBattleText10:
-    db $0,"I'm",$4f
-    db "exhausted...",$58
+    text_init , "I'm"
+    text_line , "exhausted..."
+    text_wait
 
 _Route19AfterBattleText10:
-    db $0,"LAPRAS is so big,",$4f
-    db "it must keep you",$55
-    db "dry on water.",$57
+    text_init , "LAPRAS is so big,"
+    text_line , "it must keep you"
+    text_cont , "dry on water."
+    text_done
 
 _Route19Text11:
-    db $0,"SEA ROUTE 19",$4f
-    db "FUCHSIA CITY -",$55
-    db "SEAFOAM ISLANDS",$57
+    text_init , "SEA ROUTE 19"
+    text_line , "FUCHSIA CITY -"
+    text_cont , "SEAFOAM ISLANDS"
+    text_done
 
 _Route20BattleText1:
-    db $0,"The water is",$4f
-    db "shallow here.",$57
+    text_init , "The water is"
+    text_line , "shallow here."
+    text_done
 
 _Route20EndBattleText1:
-    db $0,"Splash!",$58
+    text_init , "Splash!"
+    text_wait
 
 _Route20AfterBattleText1:
-    db $0,"I wish I could",$4f
-    db "ride my #MON.",$57
+    text_init , "I wish I could"
+    text_line , "ride my #MON."
+    text_done
 
 _Route20BattleText2:
-    db $0,"SEAFOAM is a",$4f
-    db "quiet getaway!",$57
+    text_init , "SEAFOAM is a"
+    text_line , "quiet getaway!"
+    text_done
 
 _Route20EndBattleText2:
-    db $0,"Quit it!",$58
+    text_init , "Quit it!"
+    text_wait
 
 _Route20AfterBattleText2:
-    db $0,"There's a huge",$4f
-    db "cavern underneath",$55
-    db "this island.",$57
+    text_init , "There's a huge"
+    text_line , "cavern underneath"
+    text_cont , "this island."
+    text_done
 
 _Route20BattleText3:
-    db $0,"I love floating",$4f
-    db "with the fishes!",$57
+    text_init , "I love floating"
+    text_line , "with the fishes!"
+    text_done
 
 _Route20EndBattleText3:
-    db $0,"Yowch!",$58
+    text_init , "Yowch!"
+    text_wait
 
 _Route20AfterBattleText3:
-    db $0,"Want to float",$4f
-    db "with me?",$57
+    text_init , "Want to float"
+    text_line , "with me?"
+    text_done
 
 _Route20BattleText4:
-    db $0,"Are you on",$4f
-    db "vacation too?",$57
+    text_init , "Are you on"
+    text_line , "vacation too?"
+    text_done
 
 _Route20EndBattleText4:
-    db $0,"No",$4f
-    db "mercy at all!",$58
+    text_init , "No"
+    text_line , "mercy at all!"
+    text_wait
 
 _Route20AfterBattleText4:
-    db $0,"SEAFOAM used to",$4f
-    db "be one island!",$57
+    text_init , "SEAFOAM used to"
+    text_line , "be one island!"
+    text_done
 
 _Route20BattleText5:
-    db $0,"Check out my buff",$4f
-    db "physique!",$57
+    text_init , "Check out my buff"
+    text_line , "physique!"
+    text_done
 
 _Route20EndBattleText5:
-    db $0,"Wimpy!",$58
+    text_init , "Wimpy!"
+    text_wait
 
 _Route20AfterBattleText5:
-    db $0,"I should've been",$4f
-    db "buffing up my",$55
-    db "#MON,not me!",$57
+    text_init , "I should've been"
+    text_line , "buffing up my"
+    text_cont , "#MON,not me!"
+    text_done
 
 _Route20BattleText6:
-    db $0,"Why are you",$4f
-    db "riding a #MON?",$55
-    db "Can't you swim?",$57
+    text_init , "Why are you"
+    text_line , "riding a #MON?"
+    text_cont , "Can't you swim?"
+    text_done
 
 _Route20EndBattleText6:
-    db $0,"Ouch!",$4f
-    db "Torpedoed!",$58
+    text_init , "Ouch!"
+    text_line , "Torpedoed!"
+    text_wait
 
 _Route20AfterBattleText6:
-    db $0,"Riding a #MON",$4f
-    db "sure looks fun!",$57
+    text_init , "Riding a #MON"
+    text_line , "sure looks fun!"
+    text_done
 
 _Route20BattleText7:
-    db $0,"I rode my bird",$4f
-    db "#MON here!",$57
+    text_init , "I rode my bird"
+    text_line , "#MON here!"
+    text_done
 
 _Route20EndBattleText7:
-    db $0,"Oh",$4f
-    db "no!",$58
+    text_init , "Oh"
+    text_line , "no!"
+    text_wait
 
 _Route20AfterBattleText7:
-    db $0,"My birds can't",$4f
-    db "FLY me back!",$57
+    text_init , "My birds can't"
+    text_line , "FLY me back!"
+    text_done
 
 _Route20BattleText8:
-    db $0,"My boy friend gave",$4f
-    db "me big pearls!",$57
+    text_init , "My boy friend gave"
+    text_line , "me big pearls!"
+    text_done
 
 _Route20EndBattleText8:
-    db $0,"Don't",$4f
-    db "touch my pearls!",$58
+    text_init , "Don't"
+    text_line , "touch my pearls!"
+    text_wait
 
 _Route20AfterBattleText8:
-    db $0,"Will my pearls",$4f
-    db "grow bigger",$55
-    db "inside CLOYSTER?",$57
+    text_init , "Will my pearls"
+    text_line , "grow bigger"
+    text_cont , "inside CLOYSTER?"
+    text_done
 
 _Route20BattleText9:
-    db $0,"I swam here from",$4f
-    db "CINNABAR ISLAND!",$57
+    text_init , "I swam here from"
+    text_line , "CINNABAR ISLAND!"
+    text_done
 
 _Route20EndBattleText9:
-    db $0,"I'm",$4f
-    db "so disappointed!",$58
+    text_init , "I'm"
+    text_line , "so disappointed!"
+    text_wait
 
 _Route20AfterBattleText9:
-    db $0,"#MON have",$4f
-    db "taken over an",$55
-    db "abandoned mansion",$55
-    db "on CINNABAR!",$57
+    text_init , "#MON have"
+    text_line , "taken over an"
+    text_cont , "abandoned mansion"
+    text_cont , "on CINNABAR!"
+    text_done
 
 _Route20BattleText10:
-    db $0,"CINNABAR,in the",$4f
-    db "west,has a LAB",$55
-    db "for #MON.",$57
+    text_init , "CINNABAR,in the"
+    text_line , "west,has a LAB"
+    text_cont , "for #MON."
+    text_done
 
 _Route20EndBattleText10:
-    db $0,"Wait!",$58
+    text_init , "Wait!"
+    text_wait
 
 _Route20AfterBattleText10:
-    db $0,"CINNABAR is a ",$4f
-    db "volcanic island!",$57
+    text_init , "CINNABAR is a "
+    text_line , "volcanic island!"
+    text_done
 
 _Route20Text12:
 _Route20Text11:
-    db $0,"SEAFOAM ISLANDS",$57
+    text_init , "SEAFOAM ISLANDS"
+    text_done
 
 _Route21BattleText1:
-    db $0,"You want to know",$4f
-    db "if the fish are",$55
-    db "biting?",$57
+    text_init , "You want to know"
+    text_line , "if the fish are"
+    text_cont , "biting?"
+    text_done
 
 _Route21EndBattleText1:
-    db $0,"Dang!",$58
+    text_init , "Dang!"
+    text_wait
 
 _Route21AfterBattleText1:
-    db $0,"I can't catch",$4f
-    db "anything good!",$57
+    text_init , "I can't catch"
+    text_line , "anything good!"
+    text_done
 
 _Route21BattleText2:
-    db $0,"I got a big haul!",$4f
-    db "Wanna go for it?",$57
+    text_init , "I got a big haul!"
+    text_line , "Wanna go for it?"
+    text_done
 
 _Route21EndBattleText2:
-    db $0,"Darn",$4f
-    db "MAGIKARP!",$58
+    text_init , "Darn"
+    text_line , "MAGIKARP!"
+    text_wait
 
 _Route21AfterBattleText2:
-    db $0,"I seem to only",$4f
-    db "catch MAGIKARP!",$57
+    text_init , "I seem to only"
+    text_line , "catch MAGIKARP!"
+    text_done
 
 _Route21BattleText3:
-    db $0,"The sea cleanses",$4f
-    db "my body and soul!",$57
+    text_init , "The sea cleanses"
+    text_line , "my body and soul!"
+    text_done
 
 _Route21EndBattleText3:
-    db $0,"Ayah!",$58
+    text_init , "Ayah!"
+    text_wait
 
 _Route21AfterBattleText3:
-    db $0,"I like the",$4f
-    db "mountains too!",$57
+    text_init , "I like the"
+    text_line , "mountains too!"
+    text_done
 
 _Route21BattleText4:
-    db $0,"What's wrong with",$4f
-    db "me swimming?",$57
+    text_init , "What's wrong with"
+    text_line , "me swimming?"
+    text_done
 
 _Route21EndBattleText4:
-    db $0,"Cheap",$4f
-    db "shot!",$58
+    text_init , "Cheap"
+    text_line , "shot!"
+    text_wait
 
 _Route21AfterBattleText4:
-    db $0,"I look like what?",$4f
-    db "A studded inner",$55
-    db "tube? Get lost!",$57
+    text_init , "I look like what?"
+    text_line , "A studded inner"
+    text_cont , "tube? Get lost!"
+    text_done
 
 _Route21BattleText5:
-    db $0,"I caught all my",$4f
-    db "#MON at sea!",$57
+    text_init , "I caught all my"
+    text_line , "#MON at sea!"
+    text_done
 
 _Route21EndBattleText5:
-    db $0,"Diver!!",$4f
-    db "Down!!",$58
+    text_init , "Diver!!"
+    text_line , "Down!!"
+    text_wait
 
 _Route21AfterBattleText5:
-    db $0,"Where'd you catch",$4f
-    db "your #MON?",$57
+    text_init , "Where'd you catch"
+    text_line , "your #MON?"
+    text_done
 
 _Route21BattleText6:
-    db $0,"Right now,I'm in",$4f
-    db "a triathlon meet!",$57
+    text_init , "Right now,I'm in"
+    text_line , "a triathlon meet!"
+    text_done
 
 _Route21EndBattleText6:
-    db $0,"Pant...",$4f
-    db "pant...pant...",$58
+    text_init , "Pant..."
+    text_line , "pant...pant..."
+    text_wait
 
 _Route21AfterBattleText6:
-    db $0,"I'm beat!",$4f
-    db "But,I still have",$55
-    db "the bike race and",$55
-    db "marathon left!",$57
+    text_init , "I'm beat!"
+    text_line , "But,I still have"
+    text_cont , "the bike race and"
+    text_cont , "marathon left!"
+    text_done
 
 _Route21BattleText7:
-    db $0,"Ahh! Feel the sun",$4f
-    db "and the wind!",$57
+    text_init , "Ahh! Feel the sun"
+    text_line , "and the wind!"
+    text_done
 
 _Route21EndBattleText7:
-    db $0,"Yow!",$4f
-    db "I lost!",$58
+    text_init , "Yow!"
+    text_line , "I lost!"
+    text_wait
 
 _Route21AfterBattleText7:
-    db $0,"I'm sunburnt to a",$4f
-    db "crisp!",$57
+    text_init , "I'm sunburnt to a"
+    text_line , "crisp!"
+    text_done
 
 _Route21BattleText8:
-    db $0,"Hey,don't scare",$4f
-    db "away the fish!",$57
+    text_init , "Hey,don't scare"
+    text_line , "away the fish!"
+    text_done
 
 _Route21EndBattleText8:
-    db $0,"Sorry!",$4f
-    db "I didn't mean it!",$58
+    text_init , "Sorry!"
+    text_line , "I didn't mean it!"
+    text_wait
 
 _Route21AfterBattleText8:
-    db $0,"I was just angry",$4f
-    db "that I couldn't",$55
-    db "catch anything.",$57
+    text_init , "I was just angry"
+    text_line , "that I couldn't"
+    text_cont , "catch anything."
+    text_done
 
 _Route21BattleText9:
-    db $0,"Keep me company",$4f
-    db "'til I get a hit!",$57
+    text_init , "Keep me company"
+    text_line , "'til I get a hit!"
+    text_done
 
 _Route21EndBattleText9:
-    db $0,"That",$4f
-    db "burned some time.",$58
+    text_init , "That"
+    text_line , "burned some time."
+    text_wait
 
 _Route21AfterBattleText9:
-    db $0,"Oh wait! I got a",$4f
-    db "bite! Yeah!",$57
+    text_init , "Oh wait! I got a"
+    text_line , "bite! Yeah!"
+    text_done
 
 _UnnamedText_511ad:
-    db $0,$53,": Hey!",$4f
-    db $52,"!",$51
-    db "You're going to",$4f
-    db "#MON LEAGUE?",$51
-    db "Forget it! You",$4f
-    db "probably don't",$55
-    db "have any BADGEs!",$51
-    db "The guard won't",$4f
-    db "let you through!",$51
-    db "By the way,did",$4f
-    db "your #MON",$55
-    db "get any stronger?",$57
+    text_init , $53,": Hey!"
+    text_line , $52,"!"
+    text_para , "You're going to"
+    text_line , "#MON LEAGUE?"
+    text_para , "Forget it! You"
+    text_line , "probably don't"
+    text_cont , "have any BADGEs!"
+    text_para , "The guard won't"
+    text_line , "let you through!"
+    text_para , "By the way,did"
+    text_line , "your #MON"
+    text_cont , "get any stronger?"
+    text_done
 
 _UnnamedText_511b2:
-    db $0,"I heard #MON",$4f
-    db "LEAGUE has many",$55
-    db "tough trainers!",$51
-    db "I have to figure",$4f
-    db "out how to get",$55
-    db "past them!",$51
-    db "You should quit",$4f
-    db "dawdling and get",$55
-    db "a move on!",$57
+    text_init , "I heard #MON"
+    text_line , "LEAGUE has many"
+    text_cont , "tough trainers!"
+    text_para , "I have to figure"
+    text_line , "out how to get"
+    text_cont , "past them!"
+    text_para , "You should quit"
+    text_line , "dawdling and get"
+    text_cont , "a move on!"
+    text_done
 
 _UnnamedText_511b7:
-    db $0,"Awww!",$4f
-    db "You just lucked",$55
-    db "out!",$58
+    text_init , "Awww!"
+    text_line , "You just lucked"
+    text_cont , "out!"
+    text_wait
 
 _UnnamedText_511bc:
-    db $0,$53,": What?",$4f
-    db "Why do I have 2",$55
-    db "#MON?",$51
-    db "You should catch",$55
-    db "some more too!",$58
+    text_init , $53,": What?"
+    text_line , "Why do I have 2"
+    text_cont , "#MON?"
+    text_para , "You should catch"
+    text_cont , "some more too!"
+    text_wait
 
 _UnnamedText_511c1:
-    db $0,$53,": What?",$4f
-    db $52,"! What a",$55
-    db "surprise to see",$55
-    db "you here!",$51
-    db "So you're going to",$4f
-    db "#MON LEAGUE?",$51
-    db "You collected all",$4f
-    db "the BADGEs too?",$55
-    db "That's cool!",$51
-    db "Then I'll whip you",$4f
-    db $52," as a",$55
-    db "warm up for",$55
-    db "#MON LEAGUE!",$51
-    db "Come on!",$57
+    text_init , $53,": What?"
+    text_line , $52,"! What a"
+    text_cont , "surprise to see"
+    text_cont , "you here!"
+    text_para , "So you're going to"
+    text_line , "#MON LEAGUE?"
+    text_para , "You collected all"
+    text_line , "the BADGEs too?"
+    text_cont , "That's cool!"
+    text_para , "Then I'll whip you"
+    text_line , $52," as a"
+    text_cont , "warm up for"
+    text_cont , "#MON LEAGUE!"
+    text_para , "Come on!"
+    text_done
 
 _UnnamedText_511c6:
-    db $0,"That loosened me",$4f
-    db "up! I'm ready for",$55
-    db "#MON LEAGUE!",$51
-    db $52,",you need",$4f
-    db "more practice!",$51
-    db "But hey,you know",$4f
-    db "that! I'm out of",$55
-    db "here. Smell ya!",$57
+    text_init , "That loosened me"
+    text_line , "up! I'm ready for"
+    text_cont , "#MON LEAGUE!"
+    text_para,$52,",you need"
+    text_line , "more practice!"
+    text_para , "But hey,you know"
+    text_line , "that! I'm out of"
+    text_cont , "here. Smell ya!"
+    text_done
 
 _UnnamedText_511cb:
-    db $0,"What!?",$51
-    db "I was just",$4f
-    db "careless!",$58
+    text_init , "What!?"
+    text_para , "I was just"
+    text_line , "careless!"
+    text_wait
 
 _UnnamedText_511d0:
-    db $0,$53,": Hahaha!",$4f
-    db $52,"! That's",$55
-    db "your best? You're",$55
-    db "nowhere near as",$55
-    db "good as me,pal!",$51
-    db "Go train some",$4f
-    db "more! You loser!",$58
+    text_init , $53,": Hahaha!"
+    text_line , $52,"! That's"
+    text_cont , "your best? You're"
+    text_cont , "nowhere near as"
+    text_cont , "good as me,pal!"
+    text_para , "Go train some"
+    text_line , "more! You loser!"
+    text_wait
 
 _Route22Text3:
-    db $0,"#MON LEAGUE",$4f
-    db "Front Gate",$57
+    text_init , "#MON LEAGUE"
+    text_line , "Front Gate"
+    text_done
 
 _VictoryRoadGuardText1:
-    db $0,"You can pass here",$4f
-    db "only if you have",$55
-    db "the @"
-
-UnnamedText_92647:
+    text_init , "You can pass here"
+    text_line , "only if you have"
+    text_cont , "the "
+    text_paus
     TX_RAM $cd6d
-    db $0,"!",$51
-    db "You don't have the",$4f
-    db "@"
-
-UnnamedText_92660:
+    text_init , "!"
+    text_para , "You don't have the"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0," yet!",$51
-    db "You have to have",$4f
-    db "it to get to",$55
-    db "#MON LEAGUE!@@"
+    text_init , " yet!"
+    text_para , "You have to have"
+    text_line , "it to get to"
+    text_cont , "#MON LEAGUE!"
+    text_past
 
 _VictoryRoadGuardText2:
-    db $0,"You can pass here",$4f
-    db "only if you have",$55
-    db "the @"
-
-UnnamedText_926bf:
+    text_init , "You can pass here"
+    text_line , "only if you have"
+    text_cont , "the "
+    text_paus
     TX_RAM $cd6d
-    db $0,"!",$51
-    db "Oh! That is the",$4f
-    db "@"
-
-UnnamedText_926d6:
+    text_init , "!"
+    text_para , "Oh! That is the"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_513a3:
-    db $0,$51
-    db "OK then! Please,",$4f
-    db "go right ahead!",$57
+    text_init
+    text_para , "OK then! Please,"
+    text_line , "go right ahead!"
+    text_done
 
 _Route23Text8:
-    db $0,"VICTORY ROAD GATE",$4f
-    db "- #MON LEAGUE",$57
+    text_init , "VICTORY ROAD GATE"
+    text_line , "- #MON LEAGUE"
+    text_done
 
 _UnnamedText_51510:
-    db $0,"Congratulations!",$4f
-    db "You beat our 5",$55
-    db "contest trainers!@@"
+    text_init , "Congratulations!"
+    text_line , "You beat our 5"
+    text_cont , "contest trainers!"
+    text_past
 
 _UnnamedText_51515:
-    db $0,$51
-    db "You just earned a",$4f
-    db "fabulous prize!",$58
+    text_init
+    text_para , "You just earned a"
+    text_line , "fabulous prize!"
+    text_wait
 
 _UnnamedText_5151a:
-    db $0,$52," received",$4f
-    db "a @"
-
-UnnamedText_92788:
+    text_init , $52," received"
+    text_line , "a "
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_51521:
-    db $0,"You don't have",$4f
-    db "any room!",$57
+    text_init , "You don't have"
+    text_line , "any room!"
+    text_done
 
 _UnnamedText_51526:
-    db $0,"By the way,would",$4f
-    db "you like to join",$55
-    db "TEAM ROCKET?",$51
-    db "We're a group",$4f
-    db "dedicated to evil",$55
-    db "using #MON!",$51
-    db "Want to join?",$51
-    db "Are you sure?",$51
-    db "Come on,join us!",$51
-    db "I'm telling you",$4f
-    db "to join!",$51
-    db "OK,you need",$4f
-    db "convincing!",$51
-    db "I'll make you an",$4f
-    db "offer you can't",$55
-    db "refuse!",$57
+    text_init , "By the way,would"
+    text_line , "you like to join"
+    text_cont , "TEAM ROCKET?"
+    text_para , "We're a group"
+    text_line , "dedicated to evil"
+    text_cont , "using #MON!"
+    text_para , "Want to join?"
+    text_para , "Are you sure?"
+    text_para , "Come on,join us!"
+    text_para , "I'm telling you"
+    text_line , "to join!"
+    text_para , "OK,you need"
+    text_line , "convincing!"
+    text_para , "I'll make you an"
+    text_line , "offer you can't"
+    text_cont , "refuse!"
+    text_done
 
 _UnnamedText_5152b:
-    db $0,"Arrgh!",$4f
-    db "You are good!",$58
+    text_init , "Arrgh!"
+    text_line , "You are good!"
+    text_wait
 
 _UnnamedText_51530:
-    db $0,"With your ability,",$4f
-    db "you could become",$55
-    db "a top leader in",$55
-    db "TEAM ROCKET!",$57
+    text_init , "With your ability,"
+    text_line , "you could become"
+    text_cont , "a top leader in"
+    text_cont , "TEAM ROCKET!"
+    text_done
 
 _Route24BattleText1:
-    db $0,"I saw your feat",$4f
-    db "from the grass!",$57
+    text_init , "I saw your feat"
+    text_line , "from the grass!"
+    text_done
 
 _DiglettsCave1:
-    db $0,"It looks like a",$4f
-    db "huge ROCK stone",$55
-    db "Statue!",$57
+    text_init , "It looks like a"
+    text_line , "huge ROCK stone"
+    text_cont , "Statue!"
+    text_done
 
 _DiglettsCaveHiker:
-    db $0,"It seems that",$4f
-    db "all DIGLETTs",$55
-    db "often DIG in the",$55
-    db "same corner of",$55
-    db "the tunnel!",$51
-    db "What strange",$4f
-    db "behavior!",$57
+    text_init , "It seems that"
+    text_line , "all DIGLETTs"
+    text_cont , "often DIG in the"
+    text_cont , "same corner of"
+    text_cont , "the tunnel!"
+    text_para , "What strange"
+    text_line , "behavior!"
+    text_done
 
 _DiglettsCaveAerodactylText:
-    db $0,"Oops...",$51
-    db "It wasn't a Statue!",$57
+    text_init , "Oops..."
+    text_para , "It wasn't a Statue!"
+    text_done
 
 _DiglettsCaveAerodactylRunAway:
-    db $0,"The gigantic",$4f
-    db "Aerodatyl flies",$55
-    db "through the hole.",$51
-    db "Good bye!",$57
+    text_init , "The gigantic"
+    text_line , "Aerodatyl flies"
+    text_cont , "through the hole."
+    text_para , "Good bye!"
+    text_done
 
 _SafariZoneLaprasText:
-    db $0,"Weeeeh!",$57
+    text_init , "Weeeeh!"
+    text_done
 
 _SafariZoneLaprasRunAway:
-    db $0,"Lapras has",$4f
-    db "disappeared into",$55
-    db "the lake.",$51
-    db "He won't have",$4f
-    db "gone far!",$57
+    text_init , "Lapras has"
+    text_line , "disappeared into"
+    text_cont , "the lake."
+    text_para , "He won't have"
+    text_line , "gone far!"
+    text_done
 
 _Route15AfterBattleText1:
-    db $0,"You can change",$4f
-    db "the nickname of",$55
-    db "any #MON you",$55
-    db "get in a trade.",$51
-    db "Even if you aren't",$4f
-    db "the Original",$55
-    db "Trainer.",$57
+    text_init , "You can change"
+    text_line , "the nickname of"
+    text_cont , "any #MON you"
+    text_cont , "get in a trade."
+    text_para , "Even if you aren't"
+    text_line , "the Original"
+    text_cont , "Trainer."
+    text_done
 
 _SurfBoardReceiveText1:
-    db $0,"I seem to only",$4f
-    db "catch MAGIKARP!",$51
-    db "But NO PROBLEM!",$51
-    db "My grandfather",$4f
-    db "makes these,",$55
-    db "get one!!",$58
+    text_init , "I seem to only"
+    text_line , "catch MAGIKARP!"
+    text_para , "But NO PROBLEM!"
+    text_para , "My grandfather"
+    text_line , "makes these,"
+    text_cont , "get one!!"
+    text_wait
 
 _SurfBoardNoRoomText:
-    db $0,"You do not have",$4f
-    db "space for this!",$57
+    text_init , "You do not have"
+    text_line , "space for this!"
+    text_done
 
 _Route14AfterBattleText1
-    db $0,"You have some",$4f
-    db "SKILL right?",$51
-    db "#MON can use",$4f
-    db "it with 10",$DA,$55
-    db "every time!",$57
+    text_init , "You have some"
+    text_line , "SKILL right?"
+    text_para , "#MON can use"
+    text_line , "it with 10",$DA
+    text_cont , "every time!"
+    text_done
 
 _Route14BattleText3:
-    db $0,"TMs are on sale",$4f
-    db "in CELADON!",$55
-    db "But,only a few",$55
-    db "people know",$55
-    db "SKILL!",$57
+    text_init , "TMs are on sale"
+    text_line , "in CELADON!"
+    text_cont , "But,only a few"
+    text_cont , "people know"
+    text_cont , "SKILL!"
+    text_done
 
 _Route19BattleText7:
-    db $0,"Oh,I just love",$4f
-    db "your SKILL! Can I",$55
-    db "have it if I win?",$57
+    text_init , "Oh,I just love"
+    text_line , "your SKILL! Can I"
+    text_cont , "have it if I win?"
+    text_done
 
 SECTION "bank25",ROMX,BANK[$25]
 
 _Route24EndBattleText1:
-    db $0,"I",$4f
-    db "thought not!",$58
+    text_init , "I"
+    text_line , "thought not!"
+    text_wait
 
 _Route24AfterBattleText1:
-    db $0,"I hid because the",$4f
-    db "people on the",$55
-    db "bridge scared me!",$57
+    text_init , "I hid because the"
+    text_line , "people on the"
+    text_cont , "bridge scared me!"
+    text_done
 
 _Route24BattleText2:
-    db $0,"OK! I'm No. 5!",$4f
-    db "I'll stomp you!",$57
+    text_init , "OK! I'm No. 5!"
+    text_line , "I'll stomp you!"
+    text_done
 
 _Route24EndBattleText2:
-    db $0,"Whoa!",$4f
-    db "Too much!",$58
+    text_init , "Whoa!"
+    text_line , "Too much!"
+    text_wait
 
 _Route24AfterBattleText2:
-    db $0,"I did my best,I",$4f
-    db "have no regrets!",$57
+    text_init , "I did my best,I"
+    text_line , "have no regrets!"
+    text_done
 
 _Route24BattleText3:
-    db $0,"I'm No. 4!",$4f
-    db "Getting tired?",$57
+    text_init , "I'm No. 4!"
+    text_line , "Getting tired?"
+    text_done
 
 _Route24EndBattleText3:
-    db $0,"I lost",$4f
-    db "too!",$58
+    text_init , "I lost"
+    text_line , "too!"
+    text_wait
 
 _Route24AfterBattleText3:
-    db $0,"I did my best,so",$4f
-    db "I've no regrets!",$57
+    text_init , "I did my best,so"
+    text_line , "I've no regrets!"
+    text_done
 
 _Route24BattleText4:
-    db $0,"Here's No. 3!",$4f
-    db "I won't be easy!",$57
+    text_init , "Here's No. 3!"
+    text_line , "I won't be easy!"
+    text_done
 
 _Route24EndBattleText4:
-    db $0,"Ow!",$4f
-    db "Stomped flat!",$58
+    text_init , "Ow!"
+    text_line , "Stomped flat!"
+    text_wait
 
 _Route24AfterBattleText4:
-    db $0,"I did my best,I",$4f
-    db "have no regrets!",$57
+    text_init , "I did my best,I"
+    text_line , "have no regrets!"
+    text_done
 
 _Route24BattleText5:
-    db $0,"I'm second!",$4f
-    db "Now it's serious!",$57
+    text_init , "I'm second!"
+    text_line , "Now it's serious!"
+    text_done
 
 _Route24EndBattleText5:
-    db $0,"How could I",$4f
-    db "lose?",$58
+    text_init , "How could I"
+    text_line , "lose?"
+    text_wait
 
 _Route24AfterBattleText5:
-    db $0,"I did my best,I",$4f
-    db "have no regrets!",$57
+    text_init , "I did my best,I"
+    text_line , "have no regrets!"
+    text_done
 
 _Route24BattleText6:
-    db $0,"This is NUGGET",$4f
-    db "BRIDGE! Beat us 5",$55
-    db "trainers and win",$55
-    db "a fabulous prize!",$51
-    db "Think you got",$4f
-    db "what it takes?",$57
+    text_init , "This is NUGGET"
+    text_line , "BRIDGE! Beat us 5"
+    text_cont , "trainers and win"
+    text_cont , "a fabulous prize!"
+    text_para , "Think you got"
+    text_line , "what it takes?"
+    text_done
 
 _Route24EndBattleText6:
-    db $0,"Whoo!",$4f
-    db "Good stuff!",$58
+    text_init , "Whoo!"
+    text_line , "Good stuff!"
+    text_wait
 
 _Route24AfterBattleText6:
-    db $0,"I did my best,I",$4f
-    db "have no regrets!",$57
+    text_init , "I did my best,I"
+    text_line , "have no regrets!"
+    text_done
 
 _Route25BattleText1:
-    db $0,"Local trainers",$4f
-    db "come here to",$55
-    db "practice!",$57
+    text_init , "Local trainers"
+    text_line , "come here to"
+    text_cont , "practice!"
+    text_done
 
 _Route25EndBattleText1:
-    db $0,"You're",$4f
-    db "decent.",$58
+    text_init , "You're"
+    text_line , "decent."
+    text_wait
 
 _Route25AfterBattleText1:
-    db $0,"All #MON have",$4f
-    db "weaknesses. It's",$55
-    db "best to raise",$55
-    db "different kinds.",$57
+    text_init , "All #MON have"
+    text_line , "weaknesses. It's"
+    text_cont , "best to raise"
+    text_cont , "different kinds."
+    text_done
 
 _Route25BattleText2:
-    db $0,"Dad took me to a",$4f
-    db "great party on",$55
-    db "S.S.ANNE at",$55
-    db "VERMILION CITY!",$57
+    text_init , "Dad took me to a"
+    text_line , "great party on"
+    text_cont , "S.S.ANNE at"
+    text_cont , "VERMILION CITY!"
+    text_done
 
 _Route25EndBattleText2:
-    db $0,"I'm",$4f
-    db "not mad!",$58
+    text_init , "I'm"
+    text_line , "not mad!"
+    text_wait
 
 _Route25AfterBattleText2:
-    db $0,"On S.S.ANNE,I",$4f
-    db "saw trainers from",$55
-    db "around the world.",$57
+    text_init , "On S.S.ANNE,I"
+    text_line , "saw trainers from"
+    text_cont , "around the world."
+    text_done
 
 _Route25BattleText3:
-    db $0,"I'm a cool guy.",$4f
-    db "I've got a girl",$55
-    db "friend!",$57
+    text_init , "I'm a cool guy."
+    text_line , "I've got a girl"
+    text_cont , "friend!"
+    text_done
 
 _Route25EndBattleText3:
-    db $0,"Aww,",$4f
-    db "darn...",$58
+    text_init , "Aww,"
+    text_line , "darn..."
+    text_wait
 
 _Route25AfterBattleText3:
-    db $0,"Oh well. My girl",$4f
-    db "will cheer me up.",$57
+    text_init , "Oh well. My girl"
+    text_line , "will cheer me up."
+    text_done
 
 _Route25BattleText4:
-    db $0,"Hi! My boy",$4f
-    db "friend is cool!",$57
+    text_init , "Hi! My boy"
+    text_line , "friend is cool!"
+    text_done
 
 _Route25EndBattleText4:
-    db $0,"I was in",$4f
-    db "bad condition!",$58
+    text_init , "I was in"
+    text_line , "bad condition!"
+    text_wait
 
 _Route25AfterBattleText4:
-    db $0,"I wish my guy was",$4f
-    db "as good as you!",$57
+    text_init , "I wish my guy was"
+    text_line , "as good as you!"
+    text_done
 
 _Route25BattleText5:
-    db $0,"I knew I had to",$4f
-    db "fight you!",$57
+    text_init , "I knew I had to"
+    text_line , "fight you!"
+    text_done
 
 _Route25EndBattleText5:
-    db $0,"I knew",$4f
-    db "I'd lose too!",$58
+    text_init , "I knew"
+    text_line , "I'd lose too!"
+    text_wait
 
 _Route25AfterBattleText5:
-    db $0,"If your #MON",$4f
-    db "gets confused or",$55
-    db "falls asleep,",$55
-    db "switch it!",$57
+    text_init , "If your #MON"
+    text_line , "gets confused or"
+    text_cont , "falls asleep,"
+    text_cont , "switch it!"
+    text_done
 
 _Route25BattleText6:
-    db $0,"My friend has a",$4f
-    db "cute #MON.",$55
-    db "I'm so jealous!",$57
+    text_init , "My friend has a"
+    text_line , "cute #MON."
+    text_cont , "I'm so jealous!"
+    text_done
 
 _Route25EndBattleText6:
-    db $0,"I'm",$4f
-    db "not so jealous!",$58
+    text_init , "I'm"
+    text_line , "not so jealous!"
+    text_wait
 
 _Route25AfterBattleText6:
-    db $0,"You came from MT.",$4f
-    db "MOON? May I have",$55
-    db "a CLEFAIRY?",$57
+    text_init , "You came from MT."
+    text_line , "MOON? May I have"
+    text_cont , "a CLEFAIRY?"
+    text_done
 
 _Route25BattleText7:
-    db $0,"I just got down",$4f
-    db "from MT.MOON,",$55
-    db "but I'm ready!",$57
+    text_init , "I just got down"
+    text_line , "from MT.MOON,"
+    text_cont , "but I'm ready!"
+    text_done
 
 _Route25EndBattleText7:
-    db $0,"You",$4f
-    db "worked hard!",$58
+    text_init , "You"
+    text_line , "worked hard!"
+    text_wait
 
 _Route25AfterBattleText7:
-    db $0,"Drat!",$4f
-    db "A ZUBAT bit me",$55
-    db "back in there.",$57
+    text_init , "Drat!"
+    text_line , "A ZUBAT bit me"
+    text_cont , "back in there."
+    text_done
 
 _Route25BattleText8:
-    db $0,"I'm off to see a",$4f
-    db "#MON collector",$55
-    db "at the cape!",$57
+    text_init , "I'm off to see a"
+    text_line , "#MON collector"
+    text_cont , "at the cape!"
+    text_done
 
 _Route25EndBattleText8:
-    db $0,"You",$4f
-    db "got me.",$58
+    text_init , "You"
+    text_line , "got me."
+    text_wait
 
 _Route25AfterBattleText8:
-    db $0,"The collector has",$4f
-    db "many rare kinds",$55
-    db "of #MON.",$57
+    text_init , "The collector has"
+    text_line , "many rare kinds"
+    text_cont , "of #MON."
+    text_done
 
 _Route25BattleText9:
-    db $0,"You're going to",$4f
-    db "see BILL? First,",$55
-    db "let's fight!",$57
+    text_init , "You're going to"
+    text_line , "see BILL? First,"
+    text_cont , "let's fight!"
+    text_done
 
 _Route25EndBattleText9:
-    db $0,"You're",$4f
-    db "something.",$58
+    text_init , "You're"
+    text_line , "something."
+    text_wait
 
 _Route25AfterBattleText9:
-    db $0,"The trail below",$4f
-    db "is a shortcut to",$55
-    db "CERULEAN CITY.",$57
+    text_init , "The trail below"
+    text_line , "is a shortcut to"
+    text_cont , "CERULEAN CITY."
+    text_done
 
 _Route25Text11:
-    db $0,"SEA COTTAGE",$4f
-    db "BILL lives here!",$57
+    text_init , "SEA COTTAGE"
+    text_line , "BILL lives here!"
+    text_done
 
 _FileDataDestroyedText:
-    db $0,"The file data is",$4f
-    db "destroyed!",$58
+    text_init , "The file data is"
+    text_line , "destroyed!"
+    text_wait
 
 _WouldYouLikeToSaveText:
-    db $0,"Would you like to",$4f
-    db "SAVE the game?",$57
+    text_init , "Would you like to"
+    text_line , "SAVE the game?"
+    text_done
 
 _GameSavedText:
-    db $0,$52," saved",$4f
-    db "the game!",$57
+    text_init , $52," saved"
+    text_line , "the game!"
+    text_done
 
 _OlderFileWillBeErasedText:
-    db $0,"The older file",$4f
-    db "will be erased to",$55
-    db "save. Okay?",$57
+    text_init , "The older file"
+    text_line , "will be erased to"
+    text_cont , "save. Okay?"
+    text_done
 
 _UnnamedText_73909:
-    db $0,"Change #MON BOX",$4f
-    db "and save data?",$57
+    text_init , "Change #MON BOX"
+    text_line , "and save data?"
+    text_done
 
 _UnnamedText_739d4:
-    db $0,"Choose a",$4f
-    db $4a," BOX.@@"
+    text_init , "Choose a"
+    text_line , $4a," BOX."
+    text_past
 
 _UnnamedText_3af3e:
     TX_RAM $cf4b
-    db $0," evolved",$57
+    text_init , " evolved"
+    text_done
 
 _UnnamedText_3af43:
-    db $0,$4f
-    db "into @"
-
-UnnamedText_946d7:
+    text_init
+    text_line , "into "
+    text_paus
     TX_RAM $cd6d
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _UnnamedText_3af48:
-    db $0,"Huh? @"
-
-UnnamedText_946e4:
+    text_init , "Huh? "
+    text_paus
     TX_RAM $cf4b
-    db $0,$4f
-    db "stopped evolving!",$58
+    text_init
+    text_line , "stopped evolving!"
+    text_wait
 
 _UnnamedText_3af4d:
-    db $0,"What? @"
-
-UnnamedText_94703:
+    text_init , "What? "
+    text_paus
     TX_RAM $cf4b
-    db $0,$4f
-    db "is evolving!",$57
+    text_init
+    text_line , "is evolving!"
+    text_done
 
 _FellAsleepText:
-    db $0,$59,$4f
-    db "fell asleep!",$58
+    text_init , $59
+    text_line , "fell asleep!"
+    text_wait
 
 _PoisonedText:
-    db $0,$59,$4f
-    db "was poisoned!",$58
+    text_init , $59
+    text_line , "was poisoned!"
+    text_wait
 
 _BadlyPoisonedText:
-    db $0,$59,"'s",$4f
-    db "badly poisoned!",$58
+    text_init , $59,"'s"
+    text_line , "badly poisoned!"
+    text_wait
 
 _UnnamedText_3f3d8:
-    db $0,$59,$4f
-    db "was burned!",$58
+    text_init , $59
+    text_line , "was burned!"
+    text_wait
 
 _UnnamedText_3f3dd:
-    db $0,$59,$4f
-    db "was frozen solid!",$58
+    text_init , $59
+    text_line , "was frozen solid!"
+    text_wait
 
 _UnnamedText_3f423:
-    db $0,"Fire defrosted",$4f
-    db $59,"!",$58
+    text_init , "Fire defrosted"
+    text_line , $59,"!"
+    text_wait
 
 _MonsStatsRoseText:
-    db $0,$5a,"'s",$4f
-    db "@"
-
-UnnamedText_9479a:
+    text_init , $5a,"'s"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,"@@"
+    text_init
+    text_past
 
 _GreatlyText:
-    db $0,$4c,"greatly@@"
+    text_init , $4c,"greatly"
+    text_past
 
 _RoseText:
-    db $0," rose!",$58
+    text_init , " rose!"
+    text_wait
 
 _MonsStatsFellText:
-    db $0,$59,"'s",$4f
-    db "@"
-
-UnnamedText_947b8:
+    text_init , $59,"'s"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,"@@"
+    text_init
+    text_past
 
 _GreatlyFellText:
-    db $0,$4c,"greatly@@"
+    text_init , $4c,"greatly"
+    text_past
 
 _FellText:
-    db $0," fell!",$58
+    text_init , " fell!"
+    text_wait
 
 _RanFromBattleText:
-    db $0,$5a,$4f
-    db "ran from battle!",$58
+    text_init , $5a
+    text_line , "ran from battle!"
+    text_wait
 
 _RanAwayScaredText:
-    db $0,$59,$4f
-    db "ran away scared!",$58
+    text_init , $59
+    text_line , "ran away scared!"
+    text_wait
 
 _WasBlownAwayText:
-    db $0,$59,$4f
-    db "was blown away!",$58
+    text_init , $59
+    text_line , "was blown away!"
+    text_wait
 
 _UnnamedText_3f8c8:
-    db $0,$5a,"@@"
+    text_init , $5a
+    text_past
 
 _UnnamedText_3f8f9:
-    db $0,$4f
-    db "made a whirlwind!",$58
+    text_init
+    text_line , "made a whirlwind!"
+    text_wait
 
 _UnnamedText_3f8fe:
-    db $0,$4f
-    db "took in sunlight!",$58
+    text_init
+    text_line , "took in sunlight!"
+    text_wait
 
 _UnnamedText_3f903:
-    db $0,$4f
-    db "lowered its head!",$58
+    text_init
+    text_line , "lowered its head!"
+    text_wait
 
 _UnnamedText_3f908:
-    db $0,$4f
-    db "is glowing!",$58
+    text_init
+    text_line , "is glowing!"
+    text_wait
 
 _UnnamedText_3f90d:
-    db $0,$4f
-    db "flew up high!",$58
+    text_init
+    text_line , "flew up high!"
+    text_wait
 
 _UnnamedText_3f912:
-    db $0,$4f
-    db "dug a hole!",$58
+    text_init
+    text_line , "dug a hole!"
+    text_wait
 
 _BecameConfusedText:
-    db $0,$59,$4f
-    db "became confused!",$58
+    text_init , $59
+    text_line , "became confused!"
+    text_wait
 
 _MimicLearnedMoveText:
-    db $0,$5a,$4f
-    db "learned",$55
-    db "@"
-
-UnnamedText_94898:
+    text_init , $5a
+    text_line , "learned"
+    text_cont
+    text_paus
     TX_RAM $cd6d
-    db $0,"!",$58
+    text_init , "!"
+    text_wait
 
 _MoveWasDisabledText:
-    db $0,$59,"'s",$4f
-    db "@"
-
-UnnamedText_948a3:
+    text_init , $59,"'s"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0," was",$55
-    db "disabled!",$58
+    text_init , " was"
+    text_cont , "disabled!"
+    text_wait
 
 _NothingHappenedText:
-    db $0,"Nothing happened!",$58
+    text_init , "Nothing happened!"
+    text_wait
 
 _NoEffectText:
-    db $0,"No effect!",$58
+    text_init , "No effect!"
+    text_wait
 
 _DidntAffectText:
-    db $0,"It didn't affect",$4f
-    db $59,"!",$58
+    text_init , "It didn't affect"
+    text_line , $59,"!"
+    text_wait
 
 _IsUnaffectedText:
-    db $0,$59,$4f
-    db "is unaffected!",$58
+    text_init , $59
+    text_line , "is unaffected!"
+    text_wait
 
 _UnnamedText_3fb74:
-    db $0,$59,"'s",$4f
-    db "paralyzed! It may",$55
-    db "not attack!",$58
+    text_init , $59,"'s"
+    text_line , "paralyzed! It may"
+    text_cont , "not attack!"
+    text_wait
 
 _UnnamedText_17e1d:
-    db $0,"It created a",$4f
-    db "SUBSTITUTE!",$58
+    text_init , "It created a"
+    text_line , "SUBSTITUTE!"
+    text_wait
 
 _UnnamedText_17e22:
-    db $0,$5a,$4f
-    db "has a SUBSTITUTE!",$58
+    text_init , $5a
+    text_line , "has a SUBSTITUTE!"
+    text_wait
 
 _UnnamedText_17e27:
-    db $0,"Too weak to make",$4f
-    db "a SUBSTITUTE!",$58
+    text_init , "Too weak to make"
+    text_line , "a SUBSTITUTE!"
+    text_wait
 
 _UnnamedText_2ff04:
-    db $0,"Coins scattered",$4f
-    db "everywhere!",$58
+    text_init , "Coins scattered"
+    text_line , "everywhere!"
+    text_wait
 
 _GettingPumpedText:
-    db $0,$5a,"'s",$4f
-    db "getting pumped!",$58
+    text_init , $5a,"'s"
+    text_line , "getting pumped!"
+    text_wait
 
 _WasSeededText:
-    db $0,$59,$4f
-    db "was seeded!",$58
+    text_init , $59
+    text_line , "was seeded!"
+    text_wait
 
 _UnnamedText_1399e:
-    db $0,$5a,"'s",$4f
-    db "hit with recoil!",$58
+    text_init , $5a,"'s"
+    text_line , "hit with recoil!"
+    text_wait
 
 _ConvertedTypeToText:
-    db $0,"Converted type to",$4f
-    db $59,"'s!",$58
+    text_init , "Converted type to"
+    text_line , $59,"'s!"
+    text_wait
 
 _StatusChangesEliminatedText:
-    db $0,"All STATUS changes",$4f
-    db "are eliminated!",$58
+    text_init , "All STATUS changes"
+    text_line , "are eliminated!"
+    text_wait
 
 _StartedSleepingEffect:
-    db $0,$5a,$4f
-    db "started sleeping!",$57
+    text_init , $5a
+    text_line , "started sleeping!"
+    text_done
 
 _FellAsleepBecameHealthyText:
-    db $0,$5a,$4f
-    db "fell asleep and",$55
-    db "became healthy!",$57
+    text_init , $5a
+    text_line , "fell asleep and"
+    text_cont , "became healthy!"
+    text_done
 
 _RegainedHealthText:
-    db $0,$5a,$4f
-    db "regained health!",$58
+    text_init , $5a
+    text_line , "regained health!"
+    text_wait
 
 _UnnamedText_3bb92:
-    db $0,$5a,$4f
-    db "transformed into",$55
-    db "@"
-
-UnnamedText_94a81:
+    text_init , $5a
+    text_line , "transformed into"
+    text_cont
+    text_paus
     TX_RAM $cd6d
-    db $0,"!",$58
+    text_init , "!"
+    text_wait
 
 _LightScreenProtectedText:
-    db $0,$5a,"'s",$4f
-    db "protected against",$55
-    db "special attacks!",$58
+    text_init , $5a,"'s"
+    text_line , "protected against"
+    text_cont , "special attacks!"
+    text_wait
 
 _ReflectGainedArmorText:
-    db $0,$5a,$4f
-    db "gained armor!",$58
+    text_init , $5a
+    text_line , "gained armor!"
+    text_wait
 
 _ShroudedInMistText:
-    db $0,$5a,"'s",$4f
-    db "shrouded in mist!",$58
+    text_init , $5a,"'s"
+    text_line , "shrouded in mist!"
+    text_wait
 
 _SuckedHealthText:
-    db $0,"Sucked health from",$4f
-    db $59,"!",$58
+    text_init , "Sucked health from"
+    text_line , $59,"!"
+    text_wait
 
 _DreamWasEatenText:
-    db $0,$59,"'s",$4f
-    db "dream was eaten!",$58
+    text_init , $59,"'s"
+    text_line , "dream was eaten!"
+    text_wait
 
 _BattleCenterMText1:
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _TradeCenterMText1:
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 INCLUDE "text/mapRedsHouse1F.asm"
 INCLUDE "text/mapBluesHouse.asm"
 
 _OaksLabGaryText1:
-    db $0,$53,": Yo",$4f
-    db $52,"! Gramps",$55
-    db "isn't around!",$57
+    text_init , $53,": Yo"
+    text_line , $52,"! Gramps"
+    text_cont , "isn't around!"
+    text_done
 
 _OaksLabText40:
-    db $0,$53,": Heh,I",$4f
-    db "don't need to be",$55
-    db "greedy like you!",$51
-    db "Go ahead and",$4f
-    db "choose,",$52,"!",$57
+    text_init , $53,": Heh,I"
+    text_line , "don't need to be"
+    text_cont , "greedy like you!"
+    text_para , "Go ahead and"
+    text_line , "choose,",$52,"!"
+    text_done
 
 _OaksLabText41:
-    db $0,$53,": My",$4f
-    db "#MON looks a",$55
-    db "lot stronger.",$57
+    text_init , $53,": My"
+    text_line , "#MON looks a"
+    text_cont , "lot stronger."
+    text_done
 
 _OaksLabText39:
-    db $0
-    db "Those are #",$4f
-    db "BALLs. They",$55
-    db "contain #MON!",$57
+    text_init , "Those are #"
+    text_line , "BALLs. They"
+    text_cont , "contain #MON!"
+    text_done
 
 _OaksLabCharmanderText:
-    db $0,"So! You want the",$4f
-    db "fire #MON,",$55
-    db "CHARMANDER?",$57
+    text_init , "So! You want the"
+    text_line , "fire #MON,"
+    text_cont , "CHARMANDER?"
+    text_done
 
 _OaksLabSquirtleText:
-    db $0,"So! You want the",$4f
-    db "water #MON,",$55
-    db "SQUIRTLE?",$57
+    text_init , "So! You want the"
+    text_line , "water #MON,"
+    text_cont , "SQUIRTLE?"
+    text_done
 
 _OaksLabBulbasaurText:
-    db $0,"So! You want the",$4f
-    db "plant #MON,",$55
-    db "BULBASAUR?",$57
+    text_init , "So! You want the"
+    text_line , "plant #MON,"
+    text_cont , "BULBASAUR?"
+    text_done
 
 _OaksLabMonEnergeticText:
-    db $0,"This #MON is",$4f
-    db "really energetic!",$58
+    text_init , "This #MON is"
+    text_line , "really energetic!"
+    text_wait
 
 _OaksLabReceivedMonText:
-    db $0,$52," received",$4f
-    db "a @"
+    text_init , $52," received"
+    text_line , "a "
+    text_paus
     TX_RAM $cd6d
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _OaksLabLastMonText:
-    db $0,"That's PROF.OAK's",$4f
-    db "last #MON!",$57
+    text_init , "That's PROF.OAK's"
+    text_line , "last #MON!"
+    text_done
 
 _UnnamedText_1d2f0:
-    db $0,"OAK: Now,",$52,",",$4f
-    db "which #MON do",$55
-    db "you want?",$57
+    text_init , "OAK: Now,",$52,","
+    text_line , "which #MON do"
+    text_cont , "you want?"
+    text_done
 
 _UnnamedText_1d2f5:
-    db $0,"OAK: If a wild",$4f
-    db "#MON appears,",$55
-    db "your #MON can",$55
-    db "fight against it!",$57
+    text_init , "OAK: If a wild"
+    text_line , "#MON appears,"
+    text_cont , "your #MON can"
+    text_cont , "fight against it!"
+    text_done
 
 _UnnamedText_1d2fa:
-    db $0,"OAK: ",$52,",",$4f
-    db "raise your young",$55
-    db "#MON by making",$55
-    db "it fight!",$57
+    text_init , "OAK: ",$52,","
+    text_line , "raise your young"
+    text_cont , "#MON by making"
+    text_cont , "it fight!"
+    text_done
 
 _OaksLabDeliverParcelText1:
-    db $0,"OAK: Oh,",$52,"!",$51
-    db "How is my old",$4f
-    db "#MON?",$51
-    db "Well,it seems to",$4f
-    db "like you a lot.",$51
-    db "You must be",$4f
-    db "talented as a",$55
-    db "#MON trainer!",$51
-    db "What? You have",$4f
-    db "something for me?",$51
-    db $52," delivered",$4f
-    db "OAK's PARCEL.@@"
+    text_init , "OAK: Oh,",$52,"!"
+    text_para , "How is my old"
+    text_line , "#MON?"
+    text_para , "Well,it seems to"
+    text_line , "like you a lot."
+    text_para , "You must be"
+    text_line , "talented as a"
+    text_cont , "#MON trainer!"
+    text_para , "What? You have"
+    text_line , "something for me?"
+    text_para,$52," delivered"
+    text_line , "OAK's PARCEL."
+    text_past
 
 _OaksLabDeliverParcelText2:
-    db $0,$51
-    db "Ah! This is the",$4f
-    db "custom # BALL",$55
-    db "I ordered!",$55
-    db "Thank you!",$57
+    text_init
+    text_para , "Ah! This is the"
+    text_line , "custom # BALL"
+    text_cont , "I ordered!"
+    text_cont , "Thank you!"
+    text_done
 
 _OaksLabAroundWorldText:
-    db $0,"#MON around the",$4f
-    db "world wait for",$55
-    db "you,",$52,"!",$57
+    text_init , "#MON around the"
+    text_line , "world wait for"
+    text_cont , "you,",$52,"!"
+    text_done
 
 _OaksLabGivePokeballsText1:
-    db $0,"OAK: You can't get",$4f
-    db "detailed data on",$55
-    db "#MON by just",$55
-    db "seeing them.",$51
-    db "You must catch",$4f
-    db "them! Use these",$55
-    db "to capture wild",$55
-    db "#MON.",$51
-    db $52," got 5",$4f
-    db "# BALLs!@@"
+    text_init , "OAK: You can't get"
+    text_line , "detailed data on"
+    text_cont , "#MON by just"
+    text_cont , "seeing them."
+    text_para , "You must catch"
+    text_line , "them! Use these"
+    text_cont , "to capture wild"
+    text_cont , "#MON."
+    text_para,$52," got 5"
+    text_line , "# BALLs!"
+    text_past
 
 _OaksLabGivePokeballsText2:
-    db $0,$51
-    db "When a wild",$4f
-    db "#MON appears,",$55
-    db "it's fair game.",$51
-    db "Just throw a #",$4f
-    db "BALL at it and try",$4f
-    db "to catch it!",$51
-    db "This won't always",$4f
-    db "work,though.",$51
-    db "A healthy #MON",$4f
-    db "could escape. You",$55
-    db "have to be lucky!",$57
+    text_init
+    text_para , "When a wild"
+    text_line , "#MON appears,"
+    text_cont , "it's fair game."
+    text_para , "Just throw a #"
+    text_line , "BALL at it and try"
+    text_line , "to catch it!"
+    text_para , "This won't always"
+    text_line , "work,though."
+    text_para , "A healthy #MON"
+    text_line , "could escape. You"
+    text_cont , "have to be lucky!"
+    text_done
 
 _OaksLabPleaseVisitText:
-    db $0,"OAK: Come see me",$4f
-    db "sometimes.",$51
-    db "I want to know how",$4f
-    db "your #DEX is",$55
-    db "coming along.",$57
+    text_init , "OAK: Come see me"
+    text_line , "sometimes."
+    text_para , "I want to know how"
+    text_line , "your #DEX is"
+    text_cont , "coming along."
+    text_done
 
 _UnnamedText_1d31d:
-    db $0,"OAK: Good to see ",$4f
-    db "you! How is your ",$55
-    db "#DEX coming? ",$55
-    db "Here,let me take",$55
-    db "a look!",$58
+    text_init , "OAK: Good to see "
+    text_line , "you! How is your "
+    text_cont , "#DEX coming? "
+    text_cont , "Here,let me take"
+    text_cont , "a look!"
+    text_wait
 
 _UnnamedText_1d32c:
-    db $0,"It's encyclopedia-",$4f
-    db "like,but the",$55
-    db "pages are blank!",$57
+    text_init , "It's encyclopedia-"
+    text_line , "like,but the"
+    text_cont , "pages are blank!"
+    text_done
 
 _OaksLabText8:
-    db $0,"?",$57
+    text_init , "?"
+    text_done
 
 _UnnamedText_1d340:
-    db $0,"PROF.OAK is the",$4f
-    db "authority on",$55
-    db "#MON!",$51
-    db "Many #MON",$4f
-    db "trainers hold him",$55
-    db "in high regard!",$57
+    text_init , "PROF.OAK is the"
+    text_line , "authority on"
+    text_cont , "#MON!"
+    text_para , "Many #MON"
+    text_line , "trainers hold him"
+    text_cont , "in high regard!"
+    text_done
 
 _OaksLabRivalWaitingText:
-    db $0,$53,": Gramps!",$4f
-    db "I'm fed up with",$55
-    db "waiting!",$57
+    text_init , $53,": Gramps!"
+    text_line , "I'm fed up with"
+    text_cont , "waiting!"
+    text_done
 
 _OaksLabChooseMonText:
-    db $0,"OAK: ",$53,"?",$4f
-    db "Let me think...",$51
-    db "Oh,that's right,",$4f
-    db "I told you to",$55
-    db "come! Just wait!",$51
-    db "Here,",$52,"!",$51
-    db "There are 3",$4f
-    db "#MON here!",$51
-    db "Haha!",$51
-    db "They are inside",$4f
-    db "the # BALLs.",$51
-    db "When I was young,",$4f
-    db "I was a serious",$55
-    db "#MON trainer!",$51
-    db "In my old age,I",$4f
-    db "have only 3 left,",$55
-    db "but you can have",$55
-    db "one! Choose!",$57
+    text_init , "OAK: ",$53,"?"
+    text_line , "Let me think..."
+    text_para , "Oh,that's right,"
+    text_line , "I told you to"
+    text_cont , "come! Just wait!"
+    text_para , "Here,",$52,"!"
+    text_para , "There are 3"
+    text_line , "#MON here!"
+    text_para , "Haha!"
+    text_para , "They are inside"
+    text_line , "the # BALLs."
+    text_para , "When I was young,"
+    text_line , "I was a serious"
+    text_cont , "#MON trainer!"
+    text_para , "In my old age,I"
+    text_line , "have only 3 left,"
+    text_cont , "but you can have"
+    text_cont , "one! Choose!"
+    text_done
 
 _OaksLabRivalInterjectionText:
-    db $0,$53,": Hey!",$4f
-    db "Gramps! What",$55
-    db "about me?",$57
+    text_init , $53,": Hey!"
+    text_line , "Gramps! What"
+    text_cont , "about me?"
+    text_done
 
 _OaksLabBePatientText:
-    db $0,"OAK: Be patient!",$4f
-    db $53,",you can",$55
-    db "have one too!",$57
+    text_init , "OAK: Be patient!"
+    text_line , $53,",you can"
+    text_cont , "have one too!"
+    text_done
 
 _OaksLabLeavingText:
-    db $0,"OAK: Hey! Don't go",$4f
-    db "away yet!",$57
+    text_init , "OAK: Hey! Don't go"
+    text_line , "away yet!"
+    text_done
 
 _OaksLabRivalPickingMonText:
-    db $0,$53,": I'll take",$4f
-    db "this one,then!",$57
+    text_init , $53,": I'll take"
+    text_line , "this one,then!"
+    text_done
 
 _OaksLabRivalReceivedMonText:
-    db $0,$53," received",$4f
-    db "a @"
-
-UnnamedText_95470:
+    text_init , $53," received"
+    text_line , "a "
+    text_paus
     TX_RAM $cd6d
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _OaksLabRivalChallengeText:
-    db $0,$53,": Wait",$4f
-    db $52,"!",$55
-    db "Let's check out",$55
-    db "our #MON!",$51
-    db "Come on,I'll take",$4f
-    db "you on!",$57
+    text_init , $53,": Wait"
+    text_line , $52,"!"
+    text_cont , "Let's check out"
+    text_cont , "our #MON!"
+    text_para , "Come on,I'll take"
+    text_line , "you on!"
+    text_done
 
 _UnnamedText_1d3be:
-    db $0,"WHAT?",$4f
-    db "Unbelievable!",$55
-    db "I picked the",$55
-    db "wrong #MON!",$58
+    text_init , "WHAT?"
+    text_line , "Unbelievable!"
+    text_cont , "I picked the"
+    text_cont , "wrong #MON!"
+    text_wait
 
 _UnnamedText_1d3c3:
-    db $0,$53,": Yeah! Am",$4f
-    db "I great or what?",$58
+    text_init , $53,": Yeah! Am"
+    text_line , "I great or what?"
+    text_wait
 
 _OaksLabRivalToughenUpText:
-    db $0,$53,": Okay!",$4f
-    db "I'll make my",$55
-    db "#MON fight to",$55
-    db "toughen it up!",$51
-    db $52,"! Gramps!",$4f
-    db "Smell you later!",$57
+    text_init , $53,": Okay!"
+    text_line , "I'll make my"
+    text_cont , "#MON fight to"
+    text_cont , "toughen it up!"
+    text_para,$52,"! Gramps!"
+    text_line , "Smell you later!"
+    text_done
 
 _OaksLabText21:
-    db $0,$53,": Gramps!",$57
+    text_init , $53,": Gramps!"
+    text_done
 
 _OaksLabText22:
-    db $0,$53,": What did",$4f
-    db "you call me for?",$57
+    text_init , $53,": What did"
+    text_line , "you call me for?"
+    text_done
 
 _OaksLabText23:
-    db $0,"OAK: Oh right! I",$4f
-    db "have a request",$55
-    db "of you two.",$57
+    text_init , "OAK: Oh right! I"
+    text_line , "have a request"
+    text_cont , "of you two."
+    text_done
 
 _OaksLabText24:
-    db $0,"On the desk there",$4f
-    db "is my invention,",$55
-    db "#DEX!",$51
-    db "It automatically",$4f
-    db "records data on",$55
-    db "#MON you've",$55
-    db "seen or caught!",$51
-    db "It's a hi-tech",$4f
-    db "encyclopedia!",$57
+    text_init , "On the desk there"
+    text_line , "is my invention,"
+    text_cont , "#DEX!"
+    text_para , "It automatically"
+    text_line , "records data on"
+    text_cont , "#MON you've"
+    text_cont , "seen or caught!"
+    text_para , "It's a hi-tech"
+    text_line , "encyclopedia!"
+    text_done
 
 _OaksLabText25:
-    db $0,"OAK: ",$52," and",$4f
-    db $53,"! Take",$55
-    db "these with you!",$51
-    db $52," got",$4f
-    db "#DEX from OAK!@@"
+    text_init , "OAK: ",$52," and"
+    text_line , $53,"! Take"
+    text_cont , "these with you!"
+    text_para,$52," got"
+    text_line , "#DEX from OAK!"
+    text_past
 
 _OaksLabText26:
-    db $0,"To make a complete",$4f
-    db "guide on all the",$55
-    db "#MON in the",$55
-    db "world...",$51
-    db "That was my dream!",$51
-    db "But,I'm too old!",$4f
-    db "I can't do it!",$51
-    db "So,I want you two",$4f
-    db "to fulfill my",$55
-    db "dream for me!",$51
-    db "Get moving,you",$4f
-    db "two!",$51
-    db "This is a great",$4f
-    db "undertaking in",$55
-    db "#MON history!",$58
+    text_init , "To make a complete"
+    text_line , "guide on all the"
+    text_cont , "#MON in the"
+    text_cont , "world..."
+    text_para , "That was my dream!"
+    text_para , "But,I'm too old!"
+    text_line , "I can't do it!"
+    text_para , "So,I want you two"
+    text_line , "to fulfill my"
+    text_cont , "dream for me!"
+    text_para , "Get moving,you"
+    text_line , "two!"
+    text_para , "This is a great"
+    text_line , "undertaking in"
+    text_cont , "#MON history!"
+    text_wait
 
 _OaksLabText27:
-    db $0,$53,": Alright",$4f
-    db "Gramps! Leave it",$55
-    db "all to me!",$51
-    db $52,",I hate to",$4f
-    db "say it,but I",$55
-    db "don't need you!",$51
-    db "I know! I'll",$4f
-    db "borrow a TOWN MAP",$55
-    db "from my sis!",$51
-    db "I'll tell her not",$4f
-    db "to lend you one,",$55
-    db $52,"! Hahaha!",$57
+    text_init , $53,": Alright"
+    text_line , "Gramps! Leave it"
+    text_cont , "all to me!"
+    text_para,$52,",I hate to"
+    text_line , "say it,but I"
+    text_cont , "don't need you!"
+    text_para , "I know! I'll"
+    text_line , "borrow a TOWN MAP"
+    text_cont , "from my sis!"
+    text_para , "I'll tell her not"
+    text_line , "to lend you one,"
+    text_cont , $52,"! Hahaha!"
+    text_done
 
 _UnnamedText_1d405:
-    db $0,"I study #MON as",$4f
-    db "PROF.OAK's AIDE.",$57
+    text_init , "I study #MON as"
+    text_line , "PROF.OAK's AIDE."
+    text_done
 
 _UnnamedText_441cc:
-    db $0,"#DEX comp-",$4f
-    db "letion is:",$51
-    db "@"
-
-UnnamedText_95824:
+    text_init , "#DEX comp-"
+    text_line , "letion is:"
+    text_para
+    text_paus
     TX_NUM $ffdb,1,3
-    db $0," #MON seen",$4f
-    db "@"
-
-UnnamedText_95835:
+    text_init , " #MON seen"
+    text_line
+    text_paus
     TX_NUM $ffdc,1,3
-    db $0," #MON owned",$51
-    db "PROF.OAK's",$4f
-    db "Rating:",$58
+    text_init , " #MON owned"
+    text_para , "PROF.OAK's"
+    text_line , "Rating:"
+    text_wait
 
 _UnnamedText_44201:
-    db $0,"You still have",$4f
-    db "lots to do.",$55
-    db "Look for #MON",$55
-    db "in grassy areas!",$57
+    text_init , "You still have"
+    text_line , "lots to do."
+    text_cont , "Look for #MON"
+    text_cont , "in grassy areas!"
+    text_done
 
 _UnnamedText_44206:
-    db $0,"You're on the",$4f
-    db "right track!",$57
+    text_init , "You're on the"
+    text_line , "right track!"
+    text_done
 
 _UnnamedText_4420b:
-    db $0,"You still need",$4f
-    db "more #MON!",$55
-    db "Try to catch",$55
-    db "other species!",$57
+    text_init , "You still need"
+    text_line , "more #MON!"
+    text_cont , "Try to catch"
+    text_cont , "other species!"
+    text_done
 
 _UnnamedText_44210:
-    db $0,"Good,you're",$4f
-    db "trying hard!",$55
-    db "Get an ITEMFINDER",$55
-    db "from my AIDE!",$57
+    text_init , "Good,you're"
+    text_line , "trying hard!"
+    text_cont , "Get an ITEMFINDER"
+    text_cont , "from my AIDE!"
+    text_done
 
 _UnnamedText_44215:
-    db $0,"Looking good!",$4f
-    db "Go find my AIDE",$55
-    db "when you get 50!",$57
+    text_init , "Looking good!"
+    text_line , "Go find my AIDE"
+    text_cont , "when you get 50!"
+    text_done
 
 _UnnamedText_4421a:
-    db $0,"You finally got at",$4f
-    db "least 50 species!",$55
-    db "Be sure to get",$55
-    db "FOCUS from my",$55
-    db "AIDE!  ",$57
+    text_init , "You finally got at"
+    text_line , "least 50 species!"
+    text_cont , "Be sure to get"
+    text_cont , "FOCUS from my"
+    text_cont , "AIDE!  "
+    text_done
 
 _UnnamedText_4421f:
-    db $0,"Ho! This is geting",$4f
-    db "even better!",$57
+    text_init , "Ho! This is geting"
+    text_line , "even better!"
+    text_done
 
 _UnnamedText_44224:
-    db $0,"Very good!",$4f
-    db "Go fish for some",$55
-    db "marine #MON!",$57
+    text_init , "Very good!"
+    text_line , "Go fish for some"
+    text_cont , "marine #MON!"
+    text_done
 
 _UnnamedText_44229:
-    db $0,"Wonderful!",$4f
-    db "Do you like to",$55
-    db "collect things?",$57
+    text_init , "Wonderful!"
+    text_line , "Do you like to"
+    text_cont , "collect things?"
+    text_done
 
 _UnnamedText_4422e:
-    db $0,"I'm impressed!",$4f
-    db "It must have been",$55
-    db "difficult to do!",$57
+    text_init , "I'm impressed!"
+    text_line , "It must have been"
+    text_cont , "difficult to do!"
+    text_done
 
 _UnnamedText_44233:
-    db $0,"You finally got at",$4f
-    db "least 100 species!",$55
-    db "I can't believe",$55
-    db "how good you are!",$57
+    text_init , "You finally got at"
+    text_line , "least 100 species!"
+    text_cont , "I can't believe"
+    text_cont , "how good you are!"
+    text_done
 
 _UnnamedText_44238:
-    db $0,"You even have the",$4f
-    db "evolved forms of",$55
-    db "#MON! Super!",$57
+    text_init , "You even have the"
+    text_line , "evolved forms of"
+    text_cont , "#MON! Super!"
+    text_done
 
 _UnnamedText_4423d:
-    db $0,"Excellent! Trade",$4f
-    db "with friends to",$55
-    db "get some more!",$57
+    text_init , "Excellent! Trade"
+    text_line , "with friends to"
+    text_cont , "get some more!"
+    text_done
 
 _UnnamedText_44242:
-    db $0,"Outstanding!",$4f
-    db "You've become a",$55
-    db "real pro at this!",$57
+    text_init , "Outstanding!"
+    text_line , "You've become a"
+    text_cont , "real pro at this!"
+    text_done
 
 _UnnamedText_44247:
-    db $0,"I have nothing",$4f
-    db "left to say!",$55
-    db "You're the",$55
-    db "authority now!",$57
+    text_init , "I have nothing"
+    text_line , "left to say!"
+    text_cont , "You're the"
+    text_cont , "authority now!"
+    text_done
 
 _UnnamedText_4424c:
-    db $0,"Your #DEX is",$4f
-    db "entirely complete!",$55
-    db "Congratulations!",$57
+    text_init , "Your #DEX is"
+    text_line , "entirely complete!"
+    text_cont , "Congratulations!"
+    text_done
 
 _ViridianPokeCenterText2:
 _ViridianPokeCenterText1:
-    db $0,"You can use that",$4f
-    db "PC in the corner.",$51
-    db "The receptionist",$4f
-    db "told me. So kind!",$57
+    text_init , "You can use that"
+    text_line , "PC in the corner."
+    text_para , "The receptionist"
+    text_line , "told me. So kind!"
+    text_done
 
 _ViridianPokeCenterText3:
-    db $0,"There's a #MON",$4f
-    db "CENTER in every",$55
-    db "town ahead.",$51
-    db "They don't charge",$4f
-    db "any money either!",$57
+    text_init , "There's a #MON"
+    text_line , "CENTER in every"
+    text_cont , "town ahead."
+    text_para , "They don't charge"
+    text_line , "any money either!"
+    text_done
 
 _ViridianMartText1:
-    db $0,"Okay! Say hi to",$4f
-    db "PROF.OAK for me!",$57
+    text_init , "Okay! Say hi to"
+    text_line , "PROF.OAK for me!"
+    text_done
 
 _ViridianMartText4:
-    db $0,"Hey! You came from",$4f
-    db "PALLET TOWN?",$57
+    text_init , "Hey! You came from"
+    text_line , "PALLET TOWN?"
+    text_done
 
 ViridianMartParcelQuestText:
-    db $0,"You know PROF.",$4f
-    db "OAK,right?",$51
-    db "His order came in.",$4f
-    db "Will you take it",$55
-    db "to him?",$51
-    db $52," got",$4f
-    db "OAK's PARCEL!@@"
+    text_init , "You know PROF."
+    text_line , "OAK,right?"
+    text_para , "His order came in."
+    text_line , "Will you take it"
+    text_cont , "to him?"
+    text_para,$52," got"
+    text_line , "OAK's PARCEL!"
+    text_past
 
 _ViridianMartText2:
-    db $0,"This shop sells",$4f
-    db "many ANTIDOTEs.",$57
+    text_init , "This shop sells"
+    text_line , "many ANTIDOTEs."
+    text_done
 
 _ViridianMartText3:
-    db $0,"No! POTIONs are",$4f
-    db "all sold out.",$57
+    text_init , "No! POTIONs are"
+    text_line , "all sold out."
+    text_done
 
 _SchoolText1:
-    db $0,"Whew! I'm trying",$4f
-    db "to memorize all",$55
-    db "my notes.",$57
+    text_init , "Whew! I'm trying"
+    text_line , "to memorize all"
+    text_cont , "my notes."
+    text_done
 
 _SchoolText2:
-    db $0,"Okay!",$51
-    db "Be sure to read",$4f
-    db "the blackboard",$55
-    db "carefully!",$57
+    text_init , "Okay!"
+    text_para , "Be sure to read"
+    text_line , "the blackboard"
+    text_cont , "carefully!"
+    text_done
 
 _ViridianHouseText1:
-    db $0,"Coming up with",$4f
-    db "nicknames is fun,",$55
-    db "but hard.",$51
-    db "Simple names are",$4f
-    db "the easiest to",$55
-    db "remember.",$57
+    text_init , "Coming up with"
+    text_line , "nicknames is fun,"
+    text_cont , "but hard."
+    text_para , "Simple names are"
+    text_line , "the easiest to"
+    text_cont , "remember."
+    text_done
 
 _ViridianHouseText2:
-    db $0,"My Daddy loves",$4f
-    db "#MON too.",$57
+    text_init , "My Daddy loves"
+    text_line , "#MON too."
+    text_done
 
 _UnnamedText_1d5b1:
-    db $0,"SPEARY: Tetweet!",$57
+    text_init , "SPEARY: Tetweet!"
+    text_done
 
 _ViridianHouseText4:
-    db $0,"SPEAROW",$4f
-    db "Name: SPEARY",$57
+    text_init , "SPEAROW"
+    text_line , "Name: SPEARY"
+    text_done
 
 _UnnamedText_74ace:
-    db $0,"Fwahahaha! This is",$4f
-    db "my hideout!",$51
-    db "I planned to",$4f
-    db "resurrect TEAM",$55
-    db "ROCKET here!",$51
-    db "But,you have",$4f
-    db "caught me again!",$55
-    db "So be it! This",$55
-    db "time,I'm not",$55
-    db "holding back!",$51
-    db "Once more,you",$4f
-    db "shall face",$55
-    db "GIOVANNI,the",$55
-    db "greatest trainer!",$57
+    text_init , "Fwahahaha! This is"
+    text_line , "my hideout!"
+    text_para , "I planned to"
+    text_line , "resurrect TEAM"
+    text_cont , "ROCKET here!"
+    text_para , "But,you have"
+    text_line , "caught me again!"
+    text_cont , "So be it! This"
+    text_cont , "time,I'm not"
+    text_cont , "holding back!"
+    text_para , "Once more,you"
+    text_line , "shall face"
+    text_cont , "GIOVANNI,the"
+    text_cont , "greatest trainer!"
+    text_done
 
 _UnnamedText_74ad3:
-    db $0,"Ha!",$4f
-    db "That was a truly",$55
-    db "intense fight!",$55
-    db "You have won!",$55
-    db "As proof,here is",$55
-    db "the EARTHBADGE!@@"
+    text_init , "Ha!"
+    text_line , "That was a truly"
+    text_cont , "intense fight!"
+    text_cont , "You have won!"
+    text_cont , "As proof,here is"
+    text_cont , "the EARTHBADGE!"
+    text_past
 
 _UnnamedText_74ad9:
-    db $0,"Having lost,I",$4f
-    db "cannot face my",$55
-    db "underlings!",$55
-    db "TEAM ROCKET is",$55
-    db "finished forever!",$51
-    db "I will dedicate my",$4f
-    db "life to the study",$55
-    db "of #MON!",$51
-    db "Let us meet again",$4f
-    db "some day!",$55
-    db "Farewell!@@"
+    text_init , "Having lost,I"
+    text_line , "cannot face my"
+    text_cont , "underlings!"
+    text_cont , "TEAM ROCKET is"
+    text_cont , "finished forever!"
+    text_para , "I will dedicate my"
+    text_line , "life to the study"
+    text_cont , "of #MON!"
+    text_para , "Let us meet again"
+    text_line , "some day!"
+    text_cont , "Farewell!"
+    text_past
 
 _ViridianGymText12:
-    db $0,"The EARTHBADGE",$4f
-    db "is evidence of",$55
-    db "your mastery as a",$55
-    db "#MON trainer!",$51
-    db "With it,you can",$4f
-    db "enter the #MON",$55
-    db "LEAGUE!",$51
-    db "It is my gift for",$4f
-    db "your #MON",$55
-    db "LEAGUE challenge!",$57
+    text_init , "The EARTHBADGE"
+    text_line , "is evidence of"
+    text_cont , "your mastery as a"
+    text_cont , "#MON trainer!"
+    text_para , "With it,you can"
+    text_line , "enter the #MON"
+    text_cont , "LEAGUE!"
+    text_para , "It is my gift for"
+    text_line , "your #MON"
+    text_cont , "LEAGUE challenge!"
+    text_done
 
 _TM27ExplanationText:
-    db $0,$51
-    db "TM27 is FISSURE!",$4f
-    db "It will take out",$55
-    db "#MON with just",$55
-    db "one hit!",$51
-    db "I made it when I",$4f
-    db "ran the GYM here,",$55
-    db "too long ago...",$57
+    text_init
+    text_para , "TM27 is FISSURE!"
+    text_line , "It will take out"
+    text_cont , "#MON with just"
+    text_cont , "one hit!"
+    text_para , "I made it when I"
+    text_line , "ran the GYM here,"
+    text_cont , "too long ago..."
+    text_done
 
 _TM27NoRoomText:
-    db $0,"You do not have",$4f
-    db "space for this!",$57
+    text_init , "You do not have"
+    text_line , "space for this!"
+    text_done
 
 _ViridianGymBattleText1:
-    db $0,"Heh! You must be",$4f
-    db "running out of",$55
-    db "steam by now!",$57
+    text_init , "Heh! You must be"
+    text_line , "running out of"
+    text_cont , "steam by now!"
+    text_done
 
 _ViridianGymEndBattleText1:
-    db $0,"I",$4f
-    db "ran out of gas!",$58
+    text_init , "I"
+    text_line , "ran out of gas!"
+    text_wait
 
 _ViridianGymAfterBattleText1:
-    db $0,"You need power to",$4f
-    db "keep up with our",$55
-    db "GYM LEADER!",$57
+    text_init , "You need power to"
+    text_line , "keep up with our"
+    text_cont , "GYM LEADER!"
+    text_done
 
 _ViridianGymBattleText2:
-    db $0,"Rrrroar! I'm",$4f
-    db "working myself",$55
-    db "into a rage!",$57
+    text_init , "Rrrroar! I'm"
+    text_line , "working myself"
+    text_cont , "into a rage!"
+    text_done
 
 _ViridianGymEndBattleText2:
-    db $0,"Wargh!",$58
+    text_init , "Wargh!"
+    text_wait
 
 _ViridianGymAfterBattleText2:
-    db $0,"I'm still not",$4f
-    db "worthy!",$57
+    text_init , "I'm still not"
+    text_line , "worthy!"
+    text_done
 
 _ViridianGymBattleText3:
-    db $0,"#MON and I,we",$4f
-    db "make wonderful",$55
-    db "music together!",$57
+    text_init , "#MON and I,we"
+    text_line , "make wonderful"
+    text_cont , "music together!"
+    text_done
 
 _ViridianGymEndBattleText3:
-    db $0,"You are in",$4f
-    db "perfect harmony!",$58
+    text_init , "You are in"
+    text_line , "perfect harmony!"
+    text_wait
 
 _ViridianGymAfterBattleText3:
-    db $0,"Do you know the",$4f
-    db "identity of our",$55
-    db "GYM LEADER?",$57
+    text_init , "Do you know the"
+    text_line , "identity of our"
+    text_cont , "GYM LEADER?"
+    text_done
 
 _ViridianGymBattleText4:
-    db $0,"Karate is the",$4f
-    db "ultimate form of",$55
-    db "martial arts!",$57
+    text_init , "Karate is the"
+    text_line , "ultimate form of"
+    text_cont , "martial arts!"
+    text_done
 
 _ViridianGymEndBattleText4:
-    db $0,"Atcho!",$58
+    text_init , "Atcho!"
+    text_wait
 
 _ViridianGymAfterBattleText4:
-    db $0,"If my #MON",$4f
-    db "were as good at",$55
-    db "Karate as I...",$57
+    text_init , "If my #MON"
+    text_line , "were as good at"
+    text_cont , "Karate as I..."
+    text_done
 
 _ViridianGymBattleText5:
-    db $0,"The truly talented",$4f
-    db "win with style!",$57
+    text_init , "The truly talented"
+    text_line , "win with style!"
+    text_done
 
 _ViridianGymEndBattleText5:
-    db $0,"I",$4f
-    db "lost my grip!",$58
+    text_init , "I"
+    text_line , "lost my grip!"
+    text_wait
 
 _ViridianGymAfterBattleText5:
-    db $0,"The LEADER will",$4f
-    db "scold me!",$57
+    text_init , "The LEADER will"
+    text_line , "scold me!"
+    text_done
 
 _ViridianGymBattleText6:
-    db $0,"I'm the KARATE",$4f
-    db "KING! Your fate",$55
-    db "rests with me!",$57
+    text_init , "I'm the KARATE"
+    text_line , "KING! Your fate"
+    text_cont , "rests with me!"
+    text_done
 
 _ViridianGymEndBattleText6:
-    db $0,"Ayah!",$58
+    text_init , "Ayah!"
+    text_wait
 
 _ViridianGymAfterBattleText6:
-    db $0,"#MON LEAGUE?",$4f
-    db "You? Don't get",$55
-    db "cocky!",$57
+    text_init , "#MON LEAGUE?"
+    text_line , "You? Don't get"
+    text_cont , "cocky!"
+    text_done
 
 _ViridianGymBattleText7:
-    db $0,"Your #MON will",$4f
-    db "cower at the",$55
-    db "crack of my whip!",$57
+    text_init , "Your #MON will"
+    text_line , "cower at the"
+    text_cont , "crack of my whip!"
+    text_done
 
 _ViridianGymEndBattleText7:
-    db $0,"Yowch!",$4f
-    db "Whiplash!",$58
+    text_init , "Yowch!"
+    text_line , "Whiplash!"
+    text_wait
 
 _ViridianGymAfterBattleText7:
-    db $0,"Wait! I was just",$4f
-    db "careless!",$57
+    text_init , "Wait! I was just"
+    text_line , "careless!"
+    text_done
 
 _ViridianGymBattleText8:
-    db $0,"VIRIDIAN GYM was",$4f
-    db "closed for a long",$55
-    db "time,but now our",$55
-    db "LEADER is back!",$57
+    text_init , "VIRIDIAN GYM was"
+    text_line , "closed for a long"
+    text_cont , "time,but now our"
+    text_cont , "LEADER is back!"
+    text_done
 
 _ViridianGymEndBattleText8:
-    db $0,"I",$4f
-    db "was beaten?",$58
+    text_init , "I"
+    text_line , "was beaten?"
+    text_wait
 
 _ViridianGymAfterBattleText8:
-    db $0,"You can go onto",$4f
-    db "#MON LEAGUE",$55
-    db "only by defeating",$55
-    db "our GYM LEADER!",$57
+    text_init , "You can go onto"
+    text_line , "#MON LEAGUE"
+    text_cont , "only by defeating"
+    text_cont , "our GYM LEADER!"
+    text_done
 
 _UnnamedText_74bd4:
-    db $0,"Yo! Champ in",$4f
-    db "making!",$51
-    db "Even I don't know",$4f
-    db "VIRIDIAN LEADER's",$55
-    db "identity!",$51
-    db "This will be the",$4f
-    db "toughest of all",$55
-    db "the GYM LEADERs!",$51
-    db "I heard that the",$4f
-    db "trainers here",$55
-    db "like ground-type",$55
-    db "#MON!",$57
+    text_init , "Yo! Champ in"
+    text_line , "making!"
+    text_para , "Even I don't know"
+    text_line , "VIRIDIAN LEADER's"
+    text_cont , "identity!"
+    text_para , "This will be the"
+    text_line , "toughest of all"
+    text_cont , "the GYM LEADERs!"
+    text_para , "I heard that the"
+    text_line , "trainers here"
+    text_cont , "like ground-type"
+    text_cont , "#MON!"
+    text_done
 
 _UnnamedText_74bd9:
-    db $0,"Blow me away!",$4f
-    db "GIOVANNI was the",$55
-    db "GYM LEADER here?",$57
+    text_init , "Blow me away!"
+    text_line , "GIOVANNI was the"
+    text_cont , "GYM LEADER here?"
+    text_done
 
 _UnnamedText_5c21a:
-    db $0,"Come again!",$57
+    text_init , "Come again!"
+    text_done
 
 _UnnamedText_5c21f:
-    db $0,"It's ¥50 for a",$4f
-    db "child's ticket.",$51
-    db "Would you like to",$4f
-    db "come in?",$57
+    text_init , "It's ¥50 for a"
+    text_line , "child's ticket."
+    text_para , "Would you like to"
+    text_line , "come in?"
+    text_done
 
 _UnnamedText_5c224:
-    db $0,"Right,¥50!",$4f
-    db "Thank you!",$57
+    text_init , "Right,¥50!"
+    text_line , "Thank you!"
+    text_done
 
 _UnnamedText_5c229:
-    db $0,"You don't have",$4f
-    db "enough money.",$58
+    text_init , "You don't have"
+    text_line , "enough money."
+    text_wait
 
 _UnnamedText_5c22e:
-    db $0,"You can't sneak",$4f
-    db "in the back way!",$51
-    db "Oh,whatever!",$4f
-    db "Do you know what",$55
-    db "AMBER is?",$57
+    text_init , "You can't sneak"
+    text_line , "in the back way!"
+    text_para , "Oh,whatever!"
+    text_line , "Do you know what"
+    text_cont , "AMBER is?"
+    text_done
 
 _UnnamedText_5c233:
-    db $0,"There's a lab",$4f
-    db "somewhere trying",$55
-    db "to resurrect",$55
-    db "ancient #MON",$55
-    db "from AMBER.",$57
+    text_init , "There's a lab"
+    text_line , "somewhere trying"
+    text_cont , "to resurrect"
+    text_cont , "ancient #MON"
+    text_cont , "from AMBER."
+    text_done
 
 _UnnamedText_5c238:
-    db $0,"AMBER is fossil-",$4f
-    db "ized tree sap.",$57
+    text_init , "AMBER is fossil-"
+    text_line , "ized tree sap."
+    text_done
 
 _UnnamedText_5c23d:
-    db $0,"Please go to the",$4f
-    db "other side!",$57
+    text_init , "Please go to the"
+    text_line , "other side!"
+    text_done
 
 _UnnamedText_5c242:
-    db $0,"Take plenty of",$4f
-    db "time to look!",$57
+    text_init , "Take plenty of"
+    text_line , "time to look!"
+    text_done
 
 _UnnamedText_5c251:
-    db $0,"That is one",$4f
-    db "magnificent",$55
-    db "fossil!",$57
+    text_init , "That is one"
+    text_line , "magnificent"
+    text_cont , "fossil!"
+    text_done
 
 _UnnamedText_5c28e:
-    db $0,"Ssh! I think that",$4f
-    db "this chunk of",$55
-    db "AMBER contains",$55
-    db "#MON DNA!",$51
-    db "It would be great",$4f
-    db "if #MON could",$55
-    db "be resurrected",$55
-    db "from it!",$51
-    db "But,my colleagues",$4f
-    db "just ignore me!",$51
-    db "So I have a favor",$4f
-    db "to ask!",$51
-    db "Take this to a",$4f
-    db "#MON LAB and",$55
-    db "get it examined!",$58
+    text_init , "Ssh! I think that"
+    text_line , "this chunk of"
+    text_cont , "AMBER contains"
+    text_cont , "#MON DNA!"
+    text_para , "It would be great"
+    text_line , "if #MON could"
+    text_cont , "be resurrected"
+    text_cont , "from it!"
+    text_para , "But,my colleagues"
+    text_line , "just ignore me!"
+    text_para , "So I have a favor"
+    text_line , "to ask!"
+    text_para , "Take this to a"
+    text_line , "#MON LAB and"
+    text_cont , "get it examined!"
+    text_wait
 
 _ReceivedOldAmberText:
-    db $0,$52," received",$4f
-    db "OLD AMBER!@@"
+    text_init , $52," received"
+    text_line , "OLD AMBER!"
+    text_past
 
 _UnnamedText_5c299:
-    db $0,"Ssh! Get the OLD",$4f
-    db "AMBER checked!",$57
+    text_init , "Ssh! Get the OLD"
+    text_line , "AMBER checked!"
+    text_done
 
 _UnnamedText_5c29e:
-    db $0,"You don't have",$4f
-    db "space for this!",$57
+    text_init , "You don't have"
+    text_line , "space for this!"
+    text_done
 
 _UnnamedText_5c2ad:
-    db $0,"We are proud of 2",$4f
-    db "fossils of very",$55
-    db "rare,prehistoric",$55
-    db "#MON!",$57
+    text_init , "We are proud of 2"
+    text_line , "fossils of very"
+    text_cont , "rare,prehistoric"
+    text_cont , "#MON!"
+    text_done
 
 _UnnamedText_5c2bc:
-    db $0,"The AMBER is",$4f
-    db "clear and gold!",$57
+    text_init , "The AMBER is"
+    text_line , "clear and gold!"
+    text_done
 
 _MuseumF2Text1:
-    db $0,"MOON STONE?",$51
-    db "What's so special",$4f
-    db "about it?",$57
+    text_init , "MOON STONE?"
+    text_para , "What's so special"
+    text_line , "about it?"
+    text_done
 
 _MuseumF2Text2:
-    db $0,"July 20,1969!",$51
-    db "The 1st lunar",$4f
-    db "landing!",$51
-    db "I bought a color",$4f
-    db "TV to watch it!",$57
+    text_init , "July 20,1969!"
+    text_para , "The 1st lunar"
+    text_line , "landing!"
+    text_para , "I bought a color"
+    text_line , "TV to watch it!"
+    text_done
 
 _MuseumF2Text3:
-    db $0,"We have a space",$4f
-    db "exhibit now.",$57
+    text_init , "We have a space"
+    text_line , "exhibit now."
+    text_done
 
 _MuseumF2Text4:
-    db $0,"I want a PIKACHU!",$4f
-    db "It's so cute!",$51
-    db "I asked my Daddy",$4f
-    db "to catch me one!",$57
+    text_init , "I want a PIKACHU!"
+    text_line , "It's so cute!"
+    text_para , "I asked my Daddy"
+    text_line , "to catch me one!"
+    text_done
 
 _MuseumF2Text5:
-    db $0,"Yeah,a PIKACHU",$4f
-    db "soon,I promise!",$57
+    text_init , "Yeah,a PIKACHU"
+    text_line , "soon,I promise!"
+    text_done
 
 _MuseumF2Text6:
-    db $0,"SPACE SHUTTLE",$4f
-    db "COLUMBIA",$57
+    text_init , "SPACE SHUTTLE"
+    text_line , "COLUMBIA"
+    text_done
 
 _MuseumF2Text7:
-    db $0,"Meteorite that",$4f
-    db "fell on MT.MOON.",$55
-    db "(MOON STONE?)",$57
+    text_init , "Meteorite that"
+    text_line , "fell on MT.MOON."
+    text_cont , "(MOON STONE?)"
+    text_done
 
 _UnnamedText_5c49e:
-    db $0,"I'm BROCK!",$4f
-    db "I'm PEWTER's GYM",$55
-    db "LEADER!",$51
-    db "I believe in rock",$4f
-    db "hard defense and",$55
-    db "determination!",$51
-    db "That's why my",$4f
-    db "#MON are all",$55
-    db "the rock-type!",$51
-    db "Do you still want",$4f
-    db "to challenge me?",$55
-    db "Fine then! Show",$55
-    db "me your best!",$57
+    text_init , "I'm BROCK!"
+    text_line , "I'm PEWTER's GYM"
+    text_cont , "LEADER!"
+    text_para , "I believe in rock"
+    text_line , "hard defense and"
+    text_cont , "determination!"
+    text_para , "That's why my"
+    text_line , "#MON are all"
+    text_cont , "the rock-type!"
+    text_para , "Do you still want"
+    text_line , "to challenge me?"
+    text_cont , "Fine then! Show"
+    text_cont , "me your best!"
+    text_done
 
 _EnormouslyText:
-    db $0,$4c,"enormously@@"
+    text_init , $4c,"enormously"
+    text_past
 
 _WasJustSeededText:
-    db $0,$59,$4f
-    db "was just seeded!",$58
+    text_init , $59
+    text_line , "was just seeded!"
+    text_wait
 
 _AlreadyAsleepText:
-    db $0,$59,$4f
-    db "already asleep!",$58
+    text_init , $59
+    text_line , "already asleep!"
+    text_wait
 
 _AlreadyPoisonedText:
-    db $0,$59,$4f
-    db "already poisoned!",$58
+    text_init , $59
+    text_line , "already poisoned!"
+    text_wait
 
 _AlreadyParalyzedText:
-    db $0,$59,$4f
-    db "already",$55
-    db "paralyzed!",$58
+    text_init , $59
+    text_line , "already"
+    text_cont , "paralyzed!"
+    text_wait
 
 _AlreadyConfusedText:
-    db $0,$59,$4f
-    db "already confused!",$58
+    text_init , $59
+    text_line , "already confused!"
+    text_wait
 
 _MistAlreadyInUseText:
-    db $0,$5a,"'s",$4f
-    db "already in mist!",$58
+    text_init , $5a,"'s"
+    text_line , "already in mist!"
+    text_wait
 
 _FocusEnergyAlreadyInUseText:
-    db $0,$5a,"'s",$4f
-    db "already pumped!",$58
+    text_init , $5a,"'s"
+    text_line , "already pumped!"
+    text_wait
 
 _AlreadyProtectedText:
-    db $0,$5a,"'s",$4f
-    db "already",$55
-    db "protected!",$58
+    text_init , $5a,"'s"
+    text_line , "already"
+    text_cont , "protected!"
+    text_wait
 
 _NoEnergyText:
-    db $0,$59,$4f
-    db "has run out",$55
-    db "of energy!",$58
+    text_init , $59
+    text_line , "has run out"
+    text_cont , "of energy!"
+    text_wait
 
 _AlreadyDisabledText:
-    db $0,$59,"'s",$4f
-    db "already",$55
-    db "disabled!",$58
+    text_init , $59,"'s"
+    text_line , "already"
+    text_cont , "disabled!"
+    text_wait
 
 _OaksLabTextTM1:
-    db $0
-    db "Finally, take",$4f
-    db "this with you!",$51
-    db $52," received",$4f
-    db "TECH.MACHINE!@@"
+    text_init , "Finally, take"
+    text_line , "this with you!"
+    text_para,$52," received"
+    text_line , "TECH.MACHINE!"
+    text_past
 
 _OaksLabTextTM2:
-    db $0,$51
-    db "T.M. contains",$4f
-    db "techniques that",$55
-    db "can be added to",$55
-    db "#MON!",$51
-    db "When you",$4f
-    db "use one to add",$55
-    db "a new technique,",$55
-    db "pick the #MON",$55
-    db "carefully!",$58
+    text_init
+    text_para , "T.M. contains"
+    text_line , "techniques that"
+    text_cont , "can be added to"
+    text_cont , "#MON!"
+    text_para , "When you"
+    text_line , "use one to add"
+    text_cont , "a new technique,"
+    text_cont , "pick the #MON"
+    text_cont , "carefully!"
+    text_wait
 
 _PreHM06Text:
-    db $0,"I hid because the",$4f
-    db "people on the",$55
-    db "bridge scared me!",$51
-    db "My special ability",$4f
-    db "is fast retreat!",$55
-    db "I can teach it to",$55
-    db "you if you want!",$58
+    text_init , "I hid because the"
+    text_line , "people on the"
+    text_cont , "bridge scared me!"
+    text_para , "My special ability"
+    text_line , "is fast retreat!"
+    text_cont , "I can teach it to"
+    text_cont , "you if you want!"
+    text_wait
 
 SECTION "bank26",ROMX,BANK[$26]
 
 _UnnamedText_5c4a3:
-    db $0,"There are all",$4f
-    db "kinds of trainers",$55
-    db "in the world!",$51
-    db "You appear to be",$4f
-    db "very gifted as a",$55
-    db "#MON trainer!",$51
-    db "Go to the GYM in",$4f
-    db "CERULEAN and test",$55
-    db "your abilities!",$57
+    text_init , "There are all"
+    text_line , "kinds of trainers"
+    text_cont , "in the world!"
+    text_para , "You appear to be"
+    text_line , "very gifted as a"
+    text_cont , "#MON trainer!"
+    text_para , "Go to the GYM in"
+    text_line , "CERULEAN and test"
+    text_cont , "your abilities!"
+    text_done
 
 _TM34PreReceiveText:
-    db $0,"Wait! Take this",$4f
-    db "with you!",$57
+    text_init , "Wait! Take this"
+    text_line , "with you!"
+    text_done
 
 _TM34ExplanationText:
-    db $0,$51
-    db "My Gift is",$4f
-    db "3x BIDE!",$51
-    db "You can use",$4f
-    db "it with",$55
-    db "TECH.MACHINE!",$51
-    db "Your #MON will",$4f
-    db "absorb damage in",$55
-    db "battle then pay",$55
-    db "it back double!",$57
+    text_init
+    text_para , "My Gift is"
+    text_line , "3x BIDE!"
+    text_para , "You can use"
+    text_line , "it with"
+    text_cont , "TECH.MACHINE!"
+    text_para , "Your #MON will"
+    text_line , "absorb damage in"
+    text_cont , "battle then pay"
+    text_cont , "it back double!"
+    text_done
 
 _TM34NoRoomText:
-    db $0,"You don't have",$4f
-    db "room for this!",$57
+    text_init , "You don't have"
+    text_line , "room for this!"
+    text_done
 
 _UnnamedText_5c4bc:
-    db $0,"I took",$4f
-    db "you for granted.",$51
-    db "As proof of your",$4f
-    db "victory,here's",$55
-    db "the BOULDERBADGE!",$51
-    db $52," received",$4f
-    db "the BOULDERBADGE!@@"
+    text_init , "I took"
+    text_line , "you for granted."
+    text_para , "As proof of your"
+    text_line , "victory,here's"
+    text_cont , "the BOULDERBADGE!"
+    text_para,$52," received"
+    text_line , "the BOULDERBADGE!"
+    text_past
 
 _UnnamedText_5c4c1:
-    db $0,$51
-    db "That's an official",$4f
-    db "#MON LEAGUE",$55
-    db "BADGE!",$51
-    db "Its bearer's",$4f
-    db "#MON become",$55
-    db "more powerful!",$58
+    text_init
+    text_para , "That's an official"
+    text_line , "#MON LEAGUE"
+    text_cont , "BADGE!"
+    text_para , "Its bearer's"
+    text_line , "#MON become"
+    text_cont , "more powerful!"
+    text_wait
 
 _PewterGymBattleText1:
-    db $0,"Stop right there,",$4f
-    db "kid!",$51
-    db "You're still light",$4f
-    db "years from facing",$55
-    db "BROCK!",$57
+    text_init , "Stop right there,"
+    text_line , "kid!"
+    text_para , "You're still light"
+    text_line , "years from facing"
+    text_cont , "BROCK!"
+    text_done
 
 _PewterGymEndBattleText1:
-    db $0,"Darn!",$51
-    db "Light years isn't",$4f
-    db "time! It measures",$55
-    db "distance!",$58
+    text_init , "Darn!"
+    text_para , "Light years isn't"
+    text_line , "time! It measures"
+    text_cont , "distance!"
+    text_wait
 
 _PewterGymAfterBattleText1:
-    db $0,"You're pretty hot,",$4f
-    db "but not as hot",$55
-    db "as BROCK!",$57
+    text_init , "You're pretty hot,"
+    text_line , "but not as hot"
+    text_cont , "as BROCK!"
+    text_done
 
 _UnnamedText_5c515:
-    db $0,"Hiya! I can tell",$4f
-    db "you have what it",$55
-    db "takes to become a",$55
-    db "#MON champ!",$51
-    db "I'm no trainer,",$4f
-    db "but I can tell",$55
-    db "you how to win!",$51
-    db "Let me take you",$4f
-    db "to the top!",$57
+    text_init , "Hiya! I can tell"
+    text_line , "you have what it"
+    text_cont , "takes to become a"
+    text_cont , "#MON champ!"
+    text_para , "I'm no trainer,"
+    text_line , "but I can tell"
+    text_cont , "you how to win!"
+    text_para , "Let me take you"
+    text_line , "to the top!"
+    text_done
 
 _UnnamedText_5c51a:
-    db $0,"All right! Let's",$4f
-    db "get happening!",$58
+    text_init , "All right! Let's"
+    text_line , "get happening!"
+    text_wait
 
 _UnnamedText_5c51f:
-    db $0,"The 1st #MON",$4f
-    db "out in a match is",$55
-    db "at the top of the",$55
-    db "#MON LIST!",$51
-    db "By changing the",$4f
-    db "order of #MON,",$55
-    db "matches could be",$55
-    db "made easier!",$57
+    text_init , "The 1st #MON"
+    text_line , "out in a match is"
+    text_cont , "at the top of the"
+    text_cont , "#MON LIST!"
+    text_para , "By changing the"
+    text_line , "order of #MON,"
+    text_cont , "matches could be"
+    text_cont , "made easier!"
+    text_done
 
 _UnnamedText_5c524:
-    db $0,"It's a free",$4f
-    db "service! Let's",$55
-    db "get happening!",$58
+    text_init , "It's a free"
+    text_line , "service! Let's"
+    text_cont , "get happening!"
+    text_wait
 
 _UnnamedText_5c529:
-    db $0,"Just as I thought!",$4f
-    db "You're #MON",$55
-    db "champ material!",$57
+    text_init , "Just as I thought!"
+    text_line , "You're #MON"
+    text_cont , "champ material!"
+    text_done
 
 _PewterHouse1Text1:
-    db $0,"NIDORAN: Bowbow!@@"
+    text_init , "NIDORAN: Bowbow!"
+    text_past
 
 _PewterHouse1Text2:
-    db $0,"NIDORAN sit!",$57
+    text_init , "NIDORAN sit!"
+    text_done
 
 _PewterHouse1Text3:
-    db $0,"Our #MON's an",$4f
-    db "outsider,so it's",$55
-    db "hard to handle.",$51
-    db "An outsider is a",$4f
-    db "#MON that you",$55
-    db "get in a trade.",$51
-    db "It grows fast,but",$4f
-    db "it may ignore an",$55
-    db "unskilled trainer",$55
-    db "in battle!",$51
-    db "If only we had",$4f
-    db "some BADGEs...",$57
+    text_init , "Our #MON's an"
+    text_line , "outsider,so it's"
+    text_cont , "hard to handle."
+    text_para , "An outsider is a"
+    text_line , "#MON that you"
+    text_cont , "get in a trade."
+    text_para , "It grows fast,but"
+    text_line , "it may ignore an"
+    text_cont , "unskilled trainer"
+    text_cont , "in battle!"
+    text_para , "If only we had"
+    text_line , "some BADGEs..."
+    text_done
 
 _UnnamedText_74cc6:
-    db $0,"A shady,old man",$4f
-    db "got me to buy",$55
-    db "this really weird",$55
-    db "fish #MON!",$51
-    db "It's totally weak",$4f
-    db "and it cost ¥500!",$57
+    text_init , "A shady,old man"
+    text_line , "got me to buy"
+    text_cont , "this really weird"
+    text_cont , "fish #MON!"
+    text_para , "It's totally weak"
+    text_line , "and it cost ¥500!"
+    text_done
 
 _UnnamedText_74cd5:
-    db $0,"Good things can",$4f
-    db "happen if you",$55
-    db "raise #MON",$55
-    db "diligently,even",$55
-    db "the weak ones!",$57
+    text_init , "Good things can"
+    text_line , "happen if you"
+    text_cont , "raise #MON"
+    text_cont , "diligently,even"
+    text_cont , "the weak ones!"
+    text_done
 
 _PewterHouse2Text1:
-    db $0,"#MON learn new",$4f
-    db "techniques as",$55
-    db "they grow!",$51
-    db "But,some moves",$4f
-    db "must be taught by",$55
-    db "the trainer!",$57
+    text_init , "#MON learn new"
+    text_line , "techniques as"
+    text_cont , "they grow!"
+    text_para , "But,some moves"
+    text_line , "must be taught by"
+    text_cont , "the trainer!"
+    text_done
 
 _PewterHouse2Text2:
-    db $0,"#MON become",$4f
-    db "easier to catch",$55
-    db "when they are",$55
-    db "hurt or asleep!",$51
-    db "But,it's not a",$4f
-    db "sure thing!",$57
+    text_init , "#MON become"
+    text_line , "easier to catch"
+    text_cont , "when they are"
+    text_cont , "hurt or asleep!"
+    text_para , "But,it's not a"
+    text_line , "sure thing!"
+    text_done
 
 _PewterPokecenterText1:
-    db $0,"What!?",$51
-    db "TEAM ROCKET is",$4f
-    db "at MT.MOON? Huh?",$55
-    db "I'm on the phone!",$51
-    db "Scram!",$57
+    text_init , "What!?"
+    text_para , "TEAM ROCKET is"
+    text_line , "at MT.MOON? Huh?"
+    text_cont , "I'm on the phone!"
+    text_para , "Scram!"
+    text_done
 
 _PewterPokecenterText5:
-    db $0,"JIGGLYPUFF: Puu",$4f
-    db "pupuu!",$57
+    text_init , "JIGGLYPUFF: Puu"
+    text_line , "pupuu!"
+    text_done
 
 _UnnamedText_1d6ab:
-    db $0,"Those miserable",$4f
-    db "ROCKETs!",$51
-    db "Look what they",$4f
-    db "did here!",$51
-    db "They stole a TM",$4f
-    db "for teaching",$55
-    db "#MON how to",$55
-    db "DIG holes!",$51
-    db "That cost me a",$4f
-    db "bundle,it did!",$57
+    text_init , "Those miserable"
+    text_line , "ROCKETs!"
+    text_para , "Look what they"
+    text_line , "did here!"
+    text_para , "They stole a TM"
+    text_line , "for teaching"
+    text_cont , "#MON how to"
+    text_cont , "DIG holes!"
+    text_para , "That cost me a"
+    text_line , "bundle,it did!"
+    text_done
 
 _UnnamedText_1d6b0:
-    db $0,"I figure what's",$4f
-    db "lost is lost!",$51
-    db "I decided to teach",$4f
-    db "DIGLETT how to",$55
-    db "DIG without a TM!",$57
+    text_init , "I figure what's"
+    text_line , "lost is lost!"
+    text_para , "I decided to teach"
+    text_line , "DIGLETT how to"
+    text_cont , "DIG without a TM!"
+    text_done
 
 _CeruleanHouseTrashedText2:
-    db $0,"TEAM ROCKET must",$4f
-    db "be trying to DIG",$55
-    db "their way into no",$55
-    db "good!",$57
+    text_init , "TEAM ROCKET must"
+    text_line , "be trying to DIG"
+    text_cont , "their way into no"
+    text_cont , "good!"
+    text_done
 
 _CeruleanHouseTrashedText3:
-    db $0,"TEAM ROCKET left",$4f
-    db "a way out!",$57
+    text_init , "TEAM ROCKET left"
+    text_line , "a way out!"
+    text_done
 
 _CeruleanHouseText1:
-    db $0,"My husband likes",$4f
-    db "trading #MON.",$51
-    db "If you are a",$4f
-    db "collector,would",$55
-    db "you please trade",$55
-    db "with him?",$57
+    text_init , "My husband likes"
+    text_line , "trading #MON."
+    text_para , "If you are a"
+    text_line , "collector,would"
+    text_cont , "you please trade"
+    text_cont , "with him?"
+    text_done
 
 _CeruleanPokecenterText1:
-    db $0,"That BILL!",$51
-    db "I heard that",$4f
-    db "he'll do whatever",$55
-    db "it takes to get",$55
-    db "rare #MON!",$57
+    text_init , "That BILL!"
+    text_para , "I heard that"
+    text_line , "he'll do whatever"
+    text_cont , "it takes to get"
+    text_cont , "rare #MON!"
+    text_done
 
 _CeruleanPokecenterText3:
-    db $0,"Have you heard",$4f
-    db "about BILL?",$51
-    db "Everyone calls",$4f
-    db "him a #MANIAC!",$51
-    db "I think people",$4f
-    db "are just jealous",$55
-    db "of BILL,though.",$51
-    db "Who wouldn't want",$4f
-    db "to boast about",$55
-    db "their #MON?",$57
+    text_init , "Have you heard"
+    text_line , "about BILL?"
+    text_para , "Everyone calls"
+    text_line , "him a #MANIAC!"
+    text_para , "I think people"
+    text_line , "are just jealous"
+    text_cont , "of BILL,though."
+    text_para , "Who wouldn't want"
+    text_line , "to boast about"
+    text_cont , "their #MON?"
+    text_done
 
 _UnnamedText_5c7be:
-    db $0,"Hi,you're a new",$4f
-    db "face!",$51
-    db "Trainers who want",$4f
-    db "to turn pro have",$55
-    db "to have a policy",$55
-    db "about #MON!",$51
-    db "What is your",$4f
-    db "approach when you",$55
-    db "catch #MON?",$51
-    db "My policy is an",$4f
-    db "all-out offensive",$55
-    db "with water-type",$55
-    db "#MON!",$57
+    text_init , "Hi,you're a new"
+    text_line , "face!"
+    text_para , "Trainers who want"
+    text_line , "to turn pro have"
+    text_cont , "to have a policy"
+    text_cont , "about #MON!"
+    text_para , "What is your"
+    text_line , "approach when you"
+    text_cont , "catch #MON?"
+    text_para , "My policy is an"
+    text_line , "all-out offensive"
+    text_cont , "with water-type"
+    text_cont , "#MON!"
+    text_done
 
 _UnnamedText_5c7c3:
-    db $0,"TM11 teaches",$4f
-    db "BUBBLEBEAM!",$51
-    db "Use it on an",$4f
-    db "aquatic #MON!",$57
+    text_init , "TM11 teaches"
+    text_line , "BUBBLEBEAM!"
+    text_para , "Use it on an"
+    text_line , "aquatic #MON!"
+    text_done
 
 _UnnamedText_5c7c8:
-    db $0,"You can also have",$4f
-    db "my favorite TM!",$57
+    text_init , "You can also have"
+    text_line , "my favorite TM!"
+    text_done
 
 _UnnamedText_5c7d3:
-    db $0,"You better make",$4f
-    db "room for this!",$57
+    text_init , "You better make"
+    text_line , "room for this!"
+    text_done
 
 _UnnamedText_5c7d8:
-    db $0,"Wow!",$4f
-    db "You're too much!",$51
-    db "All right!",$51
-    db "You can have the",$4f
-    db "CASCADEBADGE to",$55
-    db "show you beat me!@@"
+    text_init , "Wow!"
+    text_line , "You're too much!"
+    text_para , "All right!"
+    text_para , "You can have the"
+    text_line , "CASCADEBADGE to"
+    text_cont , "show you beat me!"
+    text_past
 
 _CeruleanGymBattleText1:
-    db $0,"I'm more than good",$4f
-    db "enough for you!",$51
-    db "MISTY can wait!",$57
+    text_init , "I'm more than good"
+    text_line , "enough for you!"
+    text_para , "MISTY can wait!"
+    text_done
 
 _CeruleanGymEndBattleText1:
-    db $0,"You",$4f
-    db "overwhelmed me!",$58
+    text_init , "You"
+    text_line , "overwhelmed me!"
+    text_wait
 
 _CeruleanGymAfterBattleText1:
-    db $0,"You have to face",$4f
-    db "other trainers to",$55
-    db "find out how good",$55
-    db "you really are.",$57
+    text_init , "You have to face"
+    text_line , "other trainers to"
+    text_cont , "find out how good"
+    text_cont , "you really are."
+    text_done
 
 _CeruleanGymBattleText2:
-    db $0,"Splash!",$51
-    db "I'm first up!",$4f
-    db "Let's do it!",$57
+    text_init , "Splash!"
+    text_para , "I'm first up!"
+    text_line , "Let's do it!"
+    text_done
 
 _CeruleanGymEndBattleText2:
-    db $0,"That",$4f
-    db "can't be!",$58
+    text_init , "That"
+    text_line , "can't be!"
+    text_wait
 
 _CeruleanGymAfterBattleText2:
-    db $0,"MISTY is going to",$4f
-    db "keep improving!",$51
-    db "She won't lose to",$4f
-    db "someone like you!",$57
+    text_init , "MISTY is going to"
+    text_line , "keep improving!"
+    text_para , "She won't lose to"
+    text_line , "someone like you!"
+    text_done
 
 _UnnamedText_5c82a:
-    db $0,"Yo! Champ in",$4f
-    db "making!",$51
-    db "Here's my advice!",$51
-    db "The LEADER,MISTY,",$4f
-    db "is a pro who uses",$55
-    db "water #MON!",$51
-    db "You can drain all",$4f
-    db "their water with",$55
-    db "plant #MON!",$51
-    db "Or,zap them with",$4f
-    db "electricity!",$57
+    text_init , "Yo! Champ in"
+    text_line , "making!"
+    text_para , "Here's my advice!"
+    text_para , "The LEADER,MISTY,"
+    text_line , "is a pro who uses"
+    text_cont , "water #MON!"
+    text_para , "You can drain all"
+    text_line , "their water with"
+    text_cont , "plant #MON!"
+    text_para , "Or,zap them with"
+    text_line , "electricity!"
+    text_done
 
 _UnnamedText_5c82f:
-    db $0,"You beat MISTY!",$4f
-    db "What'd I tell ya?",$51
-    db "You and me kid,",$4f
-    db "we make a pretty",$55
-    db "darn good team!",$57
+    text_init , "You beat MISTY!"
+    text_line , "What'd I tell ya?"
+    text_para , "You and me kid,"
+    text_line , "we make a pretty"
+    text_cont , "darn good team!"
+    text_done
 
 _UnnamedText_1d810:
-    db $0,"Hi! Welcome to",$4f
-    db "our BIKE SHOP.",$51
-    db "Have we got just",$4f
-    db "the BIKE for you!",$58
+    text_init , "Hi! Welcome to"
+    text_line , "our BIKE SHOP."
+    text_para , "Have we got just"
+    text_line , "the BIKE for you!"
+    text_wait
 
 _UnnamedText_1d815:
-    db $0,"It's a cool BIKE!",$4f
-    db "Do you want it?",$57
+    text_init , "It's a cool BIKE!"
+    text_line , "Do you want it?"
+    text_done
 
 _UnnamedText_1d81a:
-    db $0,"Sorry! You can't",$4f
-    db "afford it!",$58
+    text_init , "Sorry! You can't"
+    text_line , "afford it!"
+    text_wait
 
 _UnnamedText_1d81f:
-    db $0,"Oh,that's...",$51
-    db "A BIKE VOUCHER!",$51
-    db "OK! Here you go!",$58
+    text_init , "Oh,that's..."
+    text_para , "A BIKE VOUCHER!"
+    text_para , "OK! Here you go!"
+    text_wait
 
 _UnnamedText_1d824:
-    db $0,$52," exchanged",$4f
-    db "the BIKE VOUCHER",$55
-    db "for a BICYCLE.@@"
+    text_init , $52," exchanged"
+    text_line , "the BIKE VOUCHER"
+    text_cont , "for a BICYCLE."
+    text_past
 
 _UnnamedText_1d82a:
-    db $0,"Come back again",$4f
-    db "some time!",$57
+    text_init , "Come back again"
+    text_line , "some time!"
+    text_done
 
 _UnnamedText_1d82f:
-    db $0,"How do you like",$4f
-    db "your new BICYCLE?",$51
-    db "You can take it",$4f
-    db "on CYCLING ROAD",$55
-    db "and in caves!",$57
+    text_init , "How do you like"
+    text_line , "your new BICYCLE?"
+    text_para , "You can take it"
+    text_line , "on CYCLING ROAD"
+    text_cont , "and in caves!"
+    text_done
 
 _UnnamedText_1d834:
-    db $0,"You better make",$4f
-    db "room for this!",$57
+    text_init , "You better make"
+    text_line , "room for this!"
+    text_done
 
 _UnnamedText_1d843:
-    db $0,"A plain city BIKE",$4f
-    db "is good enough",$55
-    db "for me!",$51
-    db "You can't put a",$4f
-    db "shopping basket",$55
-    db "on an MTB!",$57
+    text_init , "A plain city BIKE"
+    text_line , "is good enough"
+    text_cont , "for me!"
+    text_para , "You can't put a"
+    text_line , "shopping basket"
+    text_cont , "on an MTB!"
+    text_done
 
 _UnnamedText_1d85c:
-    db $0,"These BIKEs are",$4f
-    db "cool,but they're",$55
-    db "way expensive!",$57
+    text_init , "These BIKEs are"
+    text_line , "cool,but they're"
+    text_cont , "way expensive!"
+    text_done
 
 _UnnamedText_1d861:
-    db $0,"Wow. Your BIKE is",$4f
-    db "really cool!",$57
+    text_init , "Wow. Your BIKE is"
+    text_line , "really cool!"
+    text_done
 
 _CeruleanMartText2:
-    db $0,"Use REPEL to keep",$4f
-    db "bugs and weak",$55
-    db "#MON away.",$51
-    db "Put your strongest",$4f
-    db "#MON at the",$55
-    db "top of the list",$55
-    db "for best results!",$57
+    text_init , "Use REPEL to keep"
+    text_line , "bugs and weak"
+    text_cont , "#MON away."
+    text_para , "Put your strongest"
+    text_line , "#MON at the"
+    text_cont , "top of the list"
+    text_cont , "for best results!"
+    text_done
 
 _CeruleanMartText3:
-    db $0,"Have you seen any",$4f
-    db "RARE CANDY?",$51
-    db "It's supposed to",$4f
-    db "make #MON go",$55
-    db "up one level!",$57
+    text_init , "Have you seen any"
+    text_line , "RARE CANDY?"
+    text_para , "It's supposed to"
+    text_line , "make #MON go"
+    text_cont , "up one level!"
+    text_done
 
 _UnnamedText_74e77:
-    db $0,"#MON BADGEs",$4f
-    db "are owned only by",$55
-    db "skilled trainers.",$51
-    db "I see you have",$4f
-    db "at least one.",$51
-    db "Those BADGEs have",$4f
-    db "amazing secrets!",$58
+    text_init , "#MON BADGEs"
+    text_line , "are owned only by"
+    text_cont , "skilled trainers."
+    text_para , "I see you have"
+    text_line , "at least one."
+    text_para , "Those BADGEs have"
+    text_line , "amazing secrets!"
+    text_wait
 
 _UnnamedText_74e7c:
-    db $0,"Now then...",$51
-    db "Which of the 8",$4f
-    db "BADGEs should I",$55
-    db "describe?",$51,$57
+    text_init , "Now then..."
+    text_para , "Which of the 8"
+    text_line , "BADGEs should I"
+    text_cont , "describe?"
+    text_para
+    text_done
 
 _UnnamedText_74e81:
-    db $0,"Come visit me any",$4f
-    db "time you wish.",$57
+    text_init , "Come visit me any"
+    text_line , "time you wish."
+    text_done
 
 _UnnamedText_74e96:
-    db $0,"The ATTACK of all",$4f
-    db "#MON increases",$55
-    db "a little bit.",$51,$57
+    text_init , "The ATTACK of all"
+    text_line , "#MON increases"
+    text_cont , "a little bit."
+    text_para
+    text_done
 
 _UnnamedText_74e9b:
-    db $0,"No Effects...",$51,$57
+    text_init , "No Effects..."
+    text_para
+    text_done
 
 _UnnamedText_74ea0:
-    db $0,"The SPEED of all",$4f
-    db "#MON increases",$55
-    db "a little bit.",$51,$57
+    text_init , "The SPEED of all"
+    text_line , "#MON increases"
+    text_cont , "a little bit."
+    text_para
+    text_done
 
 _UnnamedText_74ea5:
-    db $0,"No Effects...",$51,$57
+    text_init , "No Effects..."
+    text_para
+    text_done
 
 _UnnamedText_74eaa:
-    db $0,"The DEFENSE of all",$4f
-    db "#MON increases",$55
-    db "a little bit.",$51,$57
+    text_init , "The DEFENSE of all"
+    text_line , "#MON increases"
+    text_cont , "a little bit."
+    text_para
+    text_done
 
 _UnnamedText_74eaf:
-    db $0,"No Effects...",$51,$57
+    text_init , "No Effects..."
+    text_para
+    text_done
 
 _UnnamedText_74eb4:
-    db $0,"Your #MON's",$4f
-    db "SPECIAL abilities",$55
-    db "increase a bit.",$51,$57
+    text_init , "Your #MON's"
+    text_line , "SPECIAL abilities"
+    text_cont , "increase a bit."
+    text_para
+    text_done
 
 _UnnamedText_74eb9:
-    db $0,"No Effects...",$51,$57
+    text_init , "No Effects..."
+    text_para
+    text_done
 
 _LavenderPokecenterText4:
 _LavenderPokecenterText2:
 _LavenderPokecenterText1:
-    db $0,"TEAM ROCKET will",$4f
-    db "do anything for",$55
-    db "the sake of gold!",$57
+    text_init , "TEAM ROCKET will"
+    text_line , "do anything for"
+    text_cont , "the sake of gold!"
+    text_done
 
 _LavenderPokecenterText3:
-    db $0,"I saw CUBONE's",$4f
-    db "mother die trying",$55
-    db "to escape from",$55
-    db "TEAM ROCKET!",$57
+    text_init , "I saw CUBONE's"
+    text_line , "mother die trying"
+    text_cont , "to escape from"
+    text_cont , "TEAM ROCKET!"
+    text_done
 
 _PokemonTower1Text1:
-    db $0,"#MON TOWER was",$4f
-    db "erected in the",$55
-    db "memory of #MON",$55
-    db "that had died.",$57
+    text_init , "#MON TOWER was"
+    text_line , "erected in the"
+    text_cont , "memory of #MON"
+    text_cont , "that had died."
+    text_done
 
 _PokemonTower1Text2:
-    db $0,"Did you come to",$4f
-    db "pay respects?",$55
-    db "Bless you!",$57
+    text_init , "Did you come to"
+    text_line , "pay respects?"
+    text_cont , "Bless you!"
+    text_done
 
 _PokemonTower1Text3:
-    db $0,"I came to pray",$4f
-    db "for my CLEFAIRY.",$51
-    db "Sniff! I can't",$4f
-    db "stop crying...",$57
+    text_init , "I came to pray"
+    text_line , "for my CLEFAIRY."
+    text_para , "Sniff! I can't"
+    text_line , "stop crying..."
+    text_done
 
 _PokemonTower1Text4:
-    db $0,"My GROWLITHE...",$4f
-    db "Why did you die?",$57
+    text_init , "My GROWLITHE..."
+    text_line , "Why did you die?"
+    text_done
 
 _PokemonTower1Text5:
-    db $0,"I am a CHANNELER!",$4f
-    db "There are spirits",$55
-    db "up to mischief!",$57
+    text_init , "I am a CHANNELER!"
+    text_line , "There are spirits"
+    text_cont , "up to mischief!"
+    text_done
 
 _UnnamedText_6062d:
-    db $0,$53,": Hey,",$4f
-    db $52,"! What",$55
-    db "brings you here?",$55
-    db "Your #MON",$55
-    db "don't look dead!",$51
-    db "I can at least",$4f
-    db "make them faint!",$55
-    db "Let's go,pal!",$57
+    text_init , $53,": Hey,"
+    text_line , $52,"! What"
+    text_cont , "brings you here?"
+    text_cont , "Your #MON"
+    text_cont , "don't look dead!"
+    text_para , "I can at least"
+    text_line , "make them faint!"
+    text_cont , "Let's go,pal!"
+    text_done
 
 _UnnamedText_60632:
-    db $0,"What?",$4f
-    db "You stinker!",$51
-    db "I took it easy on",$4f
-    db "you too!",$58
+    text_init , "What?"
+    text_line , "You stinker!"
+    text_para , "I took it easy on"
+    text_line , "you too!"
+    text_wait
 
 _UnnamedText_60637:
-    db $0,$53,": Well,",$4f
-    db "look at all your",$55
-    db "wimpy #MON!",$51
-    db "Toughen them up a",$4f
-    db "bit more!",$58
+    text_init , $53,": Well,"
+    text_line , "look at all your"
+    text_cont , "wimpy #MON!"
+    text_para , "Toughen them up a"
+    text_line , "bit more!"
+    text_wait
 
 _UnnamedText_6063c:
-    db $0,"How's your #DEX",$4f
-    db "coming,pal?",$55
-    db "I just caught a",$55
-    db "CUBONE!",$51
-    db "I can't find the",$4f
-    db "grown-up MAROWAK",$55
-    db "yet!",$51
-    db "I doubt there are",$4f
-    db "any left! Well,I",$55
-    db "better get going!",$55
-    db "I've got a lot to",$55
-    db "accomplish,pal!",$51
-    db "Smell ya later!",$57
+    text_init , "How's your #DEX"
+    text_line , "coming,pal?"
+    text_cont , "I just caught a"
+    text_cont , "CUBONE!"
+    text_para , "I can't find the"
+    text_line , "grown-up MAROWAK"
+    text_cont , "yet!"
+    text_para , "I doubt there are"
+    text_line , "any left! Well,I"
+    text_cont , "better get going!"
+    text_cont , "I've got a lot to"
+    text_cont , "accomplish,pal!"
+    text_para , "Smell ya later!"
+    text_done
 
 _PokemonTower2Text2:
-    db $0,"Even we could not",$4f
-    db "identify the",$55
-    db "wayward GHOSTs!",$51
-    db "A SILPH SCOPE",$4f
-    db "might be able to",$55
-    db "unmask them.",$57
+    text_init , "Even we could not"
+    text_line , "identify the"
+    text_cont , "wayward GHOSTs!"
+    text_para , "A SILPH SCOPE"
+    text_line , "might be able to"
+    text_cont , "unmask them."
+    text_done
 
 _PokemonTower3BattleText1:
-    db $0,"Urrg...Awaa...",$4f
-    db "Huhu...graa..",$57
+    text_init , "Urrg...Awaa..."
+    text_line , "Huhu...graa.."
+    text_done
 
 _PokemonTower3EndBattleText1:
-    db $0,"Hwa!",$4f
-    db "I'm saved!",$58
+    text_init , "Hwa!"
+    text_line , "I'm saved!"
+    text_wait
 
 _PokemonTower3AfterBattleText1:
-    db $0,"The GHOSTs can be",$4f
-    db "identified by the",$55
-    db "SILPH SCOPE.",$57
+    text_init , "The GHOSTs can be"
+    text_line , "identified by the"
+    text_cont , "SILPH SCOPE."
+    text_done
 
 _PokemonTower3BattleText2:
-    db $0,"Kekeke....",$4f
-    db "Kwaaah!",$57
+    text_init , "Kekeke...."
+    text_line , "Kwaaah!"
+    text_done
 
 _PokemonTower3EndBattleText2:
-    db $0,"Hmm?",$4f
-    db "What am I doing?",$58
+    text_init , "Hmm?"
+    text_line , "What am I doing?"
+    text_wait
 
 _PokemonTower3AfterBattleText2:
-    db $0,"Sorry! I was",$4f
-    db "possessed!",$57
+    text_init , "Sorry! I was"
+    text_line , "possessed!"
+    text_done
 
 _PokemonTower3BattleText3:
-    db $0,"Be gone!",$4f
-    db "Evil spirit!",$57
+    text_init , "Be gone!"
+    text_line , "Evil spirit!"
+    text_done
 
 _PokemonTower3EndBattleText3:
-    db $0,"Whew!",$4f
-    db "The spirit left!",$58
+    text_init , "Whew!"
+    text_line , "The spirit left!"
+    text_wait
 
 _PokemonTower3AfterBattleText3:
-    db $0,"My friends were",$4f
-    db "possessed too!",$57
+    text_init , "My friends were"
+    text_line , "possessed too!"
+    text_done
 
 _PokemonTower4BattleText1:
-    db $0,"GHOST! No!",$4f
-    db "Kwaaah!",$57
+    text_init , "GHOST! No!"
+    text_line , "Kwaaah!"
+    text_done
 
 _PokemonTower4EndBattleText1:
-    db $0,"Where",$4f
-    db "is the GHOST?",$58
+    text_init , "Where"
+    text_line , "is the GHOST?"
+    text_wait
 
 _PokemonTower4AfterBattleText1:
-    db $0,"I must have been",$4f
-    db "dreaming...",$57
+    text_init , "I must have been"
+    text_line , "dreaming..."
+    text_done
 
 _PokemonTower4BattleText2:
-    db $0,"Be cursed with",$4f
-    db "me! Kwaaah!",$57
+    text_init , "Be cursed with"
+    text_line , "me! Kwaaah!"
+    text_done
 
 _PokemonTower4EndBattleText2:
-    db $0,"What!",$58
+    text_init , "What!"
+    text_wait
 
 _PokemonTower4AfterBattleText2:
-    db $0,"We can't crack",$4f
-    db "the identity of",$55
-    db "the GHOSTs.",$57
+    text_init , "We can't crack"
+    text_line , "the identity of"
+    text_cont , "the GHOSTs."
+    text_done
 
 _PokemonTower4BattleText3:
-    db $0,"Huhuhu...",$4f
-    db "Beat me not!",$57
+    text_init , "Huhuhu..."
+    text_line , "Beat me not!"
+    text_done
 
 _PokemonTower4EndBattleText3:
-    db $0,"Huh?",$4f
-    db "Who? What?",$58
+    text_init , "Huh?"
+    text_line , "Who? What?"
+    text_wait
 
 _PokemonTower4AfterBattleText3:
-    db $0,"May the departed",$4f
-    db "souls of #MON",$55
-    db "rest in peace...",$57
+    text_init , "May the departed"
+    text_line , "souls of #MON"
+    text_cont , "rest in peace..."
+    text_done
 
 _PokemonTower5Text1:
-    db $0,"Come,child! I",$4f
-    db "sealed this space",$55
-    db "with white magic!",$51
-    db "You can rest here!",$57
+    text_init , "Come,child! I"
+    text_line , "sealed this space"
+    text_cont , "with white magic!"
+    text_para , "You can rest here!"
+    text_done
 
 _PokemonTower5BattleText1:
-    db $0,"Give...me...",$4f
-    db "your...soul...",$57
+    text_init , "Give...me..."
+    text_line , "your...soul..."
+    text_done
 
 _PokemonTower5EndBattleText1:
-    db $0,"Gasp!",$58
+    text_init , "Gasp!"
+    text_wait
 
 _PokemonTower5AfterBattleText1:
-    db $0,"I was under",$4f
-    db "possession!",$57
+    text_init , "I was under"
+    text_line , "possession!"
+    text_done
 
 _PokemonTower5BattleText2:
-    db $0,"You...shall...",$4f
-    db "join...us...",$57
+    text_init , "You...shall..."
+    text_line , "join...us..."
+    text_done
 
 _PokemonTower5EndBattleText2:
-    db $0,"What",$4f
-    db "a nightmare!",$58
+    text_init , "What"
+    text_line , "a nightmare!"
+    text_wait
 
 _PokemonTower5AfterBattleText2:
-    db $0,"I was possessed!",$57
+    text_init , "I was possessed!"
+    text_done
 
 _PokemonTower5BattleText3:
-    db $0,"Zombies!",$57
+    text_init , "Zombies!"
+    text_done
 
 _PokemonTower5EndBattleText3:
-    db $0,"Ha?",$58
+    text_init , "Ha?"
+    text_wait
 
 _PokemonTower5AfterBattleText3:
-    db $0,"I regained my",$4f
-    db "senses!",$57
+    text_init , "I regained my"
+    text_line , "senses!"
+    text_done
 
 _PokemonTower5BattleText4:
-    db $0,"Urgah...",$4f
-    db "Urff....",$57
+    text_init , "Urgah..."
+    text_line , "Urff...."
+    text_done
 
 _PokemonTower5EndBattleText4:
-    db $0,"Whoo!",$58
+    text_init , "Whoo!"
+    text_wait
 
 _PokemonTower5AfterBattleText4:
-    db $0,"I fell to evil",$4f
-    db "spirits despite",$55
-    db "my training!",$57
+    text_init , "I fell to evil"
+    text_line , "spirits despite"
+    text_cont , "my training!"
+    text_done
 
 _UnnamedText_60a43:
-    db $0,"Entered purified,",$4f
-    db "protected zone!",$51
-    db $52,"'s #MON",$4f
-    db "are fully healed!",$57
+    text_init , "Entered purified,"
+    text_line , "protected zone!"
+    text_para,$52,"'s #MON"
+    text_line , "are fully healed!"
+    text_done
 
 _UnnamedText_60c1f:
-    db $0,"The GHOST was the",$4f
-    db "restless soul of",$55
-    db "CUBONE's mother!",$57
+    text_init , "The GHOST was the"
+    text_line , "restless soul of"
+    text_cont , "CUBONE's mother!"
+    text_done
 
 _UnnamedText_60c24:
-    db $0,"The mother's soul",$4f
-    db "was calmed.",$51
-    db "It departed to",$4f
-    db "the afterlife!",$57
+    text_init , "The mother's soul"
+    text_line , "was calmed."
+    text_para , "It departed to"
+    text_line , "the afterlife!"
+    text_done
 
 _PokemonTower6BattleText1:
-    db $0,"Give...me...",$4f
-    db "blood...",$57
+    text_init , "Give...me..."
+    text_line , "blood..."
+    text_done
 
 _PokemonTower6EndBattleText1:
-    db $0,"Groan!",$58
+    text_init , "Groan!"
+    text_wait
 
 _PokemonTower6AfterBattleText1:
-    db $0,"I feel anemic and",$4f
-    db "weak...",$57
+    text_init , "I feel anemic and"
+    text_line , "weak..."
+    text_done
 
 _PokemonTower6BattleText2:
-    db $0,"Urff... Kwaah!",$57
+    text_init , "Urff... Kwaah!"
+    text_done
 
 _PokemonTower6EndBattleText2:
-    db $0,"Some-",$4f
-    db "thing fell out!",$58
+    text_init , "Some-"
+    text_line , "thing fell out!"
+    text_wait
 
 _PokemonTower6AfterBattleText2:
-    db $0,"Hair didn't fall",$4f
-    db "out! It was an",$55
-    db "evil spirit!",$57
+    text_init , "Hair didn't fall"
+    text_line , "out! It was an"
+    text_cont , "evil spirit!"
+    text_done
 
 _PokemonTower6BattleText3:
-    db $0,"Ke..ke...ke...",$4f
-    db "ke..ke...ke!!",$57
+    text_init , "Ke..ke...ke..."
+    text_line , "ke..ke...ke!!"
+    text_done
 
 _PokemonTower6EndBattleText3:
-    db $0,"Keee!",$58
+    text_init , "Keee!"
+    text_wait
 
 _PokemonTower6AfterBattleText3:
-    db $0,"What's going on",$4f
-    db "here?",$57
+    text_init , "What's going on"
+    text_line , "here?"
+    text_done
 
 _UnnamedText_60c56:
-    db $0,"Be gone...",$4f
-    db "Intruders...",$57
+    text_init , "Be gone..."
+    text_line , "Intruders..."
+    text_done
 
 _UnnamedText_60ec4:
-    db $0,"MR.FUJI: Heh? You",$4f
-    db "came to save me?",$51
-    db "Thank you. But,I",$4f
-    db "came here of my",$55
-    db "own free will.",$51
-    db "I came to calm",$4f
-    db "the soul of",$55
-    db "CUBONE's mother.",$51
-    db "I think MAROWAK's",$4f
-    db "spirit has gone",$55
-    db "to the afterlife.",$51
-    db "I must thank you",$4f
-    db "for your kind",$55
-    db "concern!",$51
-    db "Follow me to my",$4f
-    db "home,#MON",$55
-    db "HOUSE at the foot",$55
-    db "of this tower.",$57
+    text_init , "MR.FUJI: Heh? You"
+    text_line , "came to save me?"
+    text_para , "Thank you. But,I"
+    text_line , "came here of my"
+    text_cont , "own free will."
+    text_para , "I came to calm"
+    text_line , "the soul of"
+    text_cont , "CUBONE's mother."
+    text_para , "I think MAROWAK's"
+    text_line , "spirit has gone"
+    text_cont , "to the afterlife."
+    text_para , "I must thank you"
+    text_line , "for your kind"
+    text_cont , "concern!"
+    text_para , "Follow me to my"
+    text_line , "home,#MON"
+    text_cont , "HOUSE at the foot"
+    text_cont , "of this tower."
+    text_done
 
 _PokemonTower7BattleText1:
-    db $0,"What do you want?",$4f
-    db "Why are you here?",$57
+    text_init , "What do you want?"
+    text_line , "Why are you here?"
+    text_done
 
 _PokemonTower7EndBattleText1:
-    db $0,"I give up!",$58
+    text_init , "I give up!"
+    text_wait
 
 _PokemonTower7AfterBattleText1:
-    db $0,"I'm not going to",$4f
-    db "forget this!",$57
+    text_init , "I'm not going to"
+    text_line , "forget this!"
+    text_done
 
 _PokemonTower7BattleText2:
-    db $0,"This old guy came",$4f
-    db "and complained",$55
-    db "about us harming",$55
-    db "useless #MON!",$51
-    db "We're talking it",$4f
-    db "over as adults!",$57
+    text_init , "This old guy came"
+    text_line , "and complained"
+    text_cont , "about us harming"
+    text_cont , "useless #MON!"
+    text_para , "We're talking it"
+    text_line , "over as adults!"
+    text_done
 
 _PokemonTower7EndBattleText2:
-    db $0,"Please!",$4f
-    db "No more!",$58
+    text_init , "Please!"
+    text_line , "No more!"
+    text_wait
 
 _PokemonTower7AfterBattleText2:
-    db $0,"#MON are only",$4f
-    db "good for making",$55
-    db "money!",$51
-    db "Stay out of our",$4f
-    db "business!",$57
+    text_init , "#MON are only"
+    text_line , "good for making"
+    text_cont , "money!"
+    text_para , "Stay out of our"
+    text_line , "business!"
+    text_done
 
 _PokemonTower7BattleText3:
-    db $0,"You're not saving",$4f
-    db "anyone,kid!",$57
+    text_init , "You're not saving"
+    text_line , "anyone,kid!"
+    text_done
 
 _PokemonTower7EndBattleText3:
-    db $0,"Don't",$4f
-    db "fight us ROCKETs!",$58
+    text_init , "Don't"
+    text_line , "fight us ROCKETs!"
+    text_wait
 
 _PokemonTower7AfterBattleText3:
-    db $0,"You're not getting",$4f
-    db "away with this!",$57
+    text_init , "You're not getting"
+    text_line , "away with this!"
+    text_done
 
 _UnnamedText_1d8d1:
-    db $0,"That's odd,MR.FUJI",$4f
-    db "isn't here.",$55
-    db "Where'd he go?",$57
+    text_init , "That's odd,MR.FUJI"
+    text_line , "isn't here."
+    text_cont , "Where'd he go?"
+    text_done
 
 _UnnamedText_1d8d6:
-    db $0,"MR.FUJI had been",$4f
-    db "praying alone for",$55
-    db "CUBONE's mother.",$57
+    text_init , "MR.FUJI had been"
+    text_line , "praying alone for"
+    text_cont , "CUBONE's mother."
+    text_done
 
 _UnnamedText_1d8f4:
-    db $0,"This is really",$4f
-    db "MR.FUJI's house.",$51
-    db "He's really kind!",$51
-    db "He looks after",$4f
-    db "abandoned and",$55
-    db "orphaned #MON!",$57
+    text_init , "This is really"
+    text_line , "MR.FUJI's house."
+    text_para , "He's really kind!"
+    text_para , "He looks after"
+    text_line , "abandoned and"
+    text_cont , "orphaned #MON!"
+    text_done
 
 _UnnamedText_1d8f9:
-    db $0,"It's so warm!",$4f
-    db "#MON are so",$55
-    db "nice to hug!",$57
+    text_init , "It's so warm!"
+    text_line , "#MON are so"
+    text_cont , "nice to hug!"
+    text_done
 
 _LavenderHouse1Text3:
-    db $0,"GROWLITHE: Woof!@@"
+    text_init , "GROWLITHE: Woof!"
+    text_past
 
 _LavenderHouse1Text4:
-    db $0,"NIDORINO: Gaoo!@@"
+    text_init , "NIDORINO: Gaoo!"
+    text_past
 
 _UnnamedText_1d94c:
-    db $0,"MR.FUJI: ",$52,".",$51
-    db "Your #DEX quest",$4f
-    db "may fail without",$55
-    db "love for your",$55
-    db "#MON.",$51
-    db "I think this may",$4f
-    db "help your quest.",$58
+    text_init , "MR.FUJI: ",$52,"."
+    text_para , "Your #DEX quest"
+    text_line , "may fail without"
+    text_cont , "love for your"
+    text_cont , "#MON."
+    text_para , "I think this may"
+    text_line , "help your quest."
+    text_wait
 
 _ReceivedFluteText:
-    db $0,$52," received",$4f
-    db "a @"
+    text_init , $52," received"
+    text_line , "a "
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _FluteExplanationText:
-    db $0,$51
-    db "Upon hearing #",$4f
-    db "FLUTE,sleeping",$55
-    db "#MON will",$55
-    db "spring awake.",$51
-    db "It works on all",$4f
-    db "sleeping #MON.",$57
+    text_init
+    text_para , "Upon hearing #"
+    text_line , "FLUTE,sleeping"
+    text_cont , "#MON will"
+    text_cont , "spring awake."
+    text_para , "It works on all"
+    text_line , "sleeping #MON."
+    text_done
 
 _FluteNoRoomText:
-    db $0,"You must make",$4f
-    db "room for this!",$57
+    text_init , "You must make"
+    text_line , "room for this!"
+    text_done
 
 _MrFujiAfterFluteText:
-    db $0,"MR.FUJI: Has my",$4f
-    db "FLUTE helped you?",$57
+    text_init , "MR.FUJI: Has my"
+    text_line , "FLUTE helped you?"
+    text_done
 
 _LavenderHouse1Text6:
-    db $0,"#MON Monthly",$4f
-    db "Grand Prize",$55
-    db "Drawing!",$51
-    db "The application",$4f
-    db "form is...",$51
-    db "Gone! It's been",$4f
-    db "clipped out!",$57
+    text_init , "#MON Monthly"
+    text_line , "Grand Prize"
+    text_cont , "Drawing!"
+    text_para , "The application"
+    text_line , "form is..."
+    text_para , "Gone! It's been"
+    text_line , "clipped out!"
+    text_done
 
 _LavenderMartText2:
-    db $0,"I'm searching for",$4f
-    db "items that raise",$55
-    db "the abilities of",$55
-    db "#MON during a",$55
-    db "single battle.",$51
-    db "X ATTACK,X",$4f
-    db "DEFEND,X SPEED",$55
-    db "and X SPECIAL are",$55
-    db "what I'm after.",$51
-    db "Do you know where",$4f
-    db "I can get them?",$57
+    text_init , "I'm searching for"
+    text_line , "items that raise"
+    text_cont , "the abilities of"
+    text_cont , "#MON during a"
+    text_cont , "single battle."
+    text_para , "X ATTACK,X"
+    text_line , "DEFEND,X SPEED"
+    text_cont , "and X SPECIAL are"
+    text_cont , "what I'm after."
+    text_para , "Do you know where"
+    text_line , "I can get them?"
+    text_done
 
 _UnnamedText_5c953:
-    db $0,"You know REVIVE?",$4f
-    db "It revives any",$55
-    db "fainted #MON!",$57
+    text_init , "You know REVIVE?"
+    text_line , "It revives any"
+    text_cont , "fainted #MON!"
+    text_done
 
 _UnnamedText_5c958:
-    db $0,"I found a NUGGET",$4f
-    db "in the mountains.",$51
-    db "I thought it was",$4f
-    db "useless,but it",$55
-    db "sold for ¥5000!",$57
+    text_init , "I found a NUGGET"
+    text_line , "in the mountains."
+    text_para , "I thought it was"
+    text_line , "useless,but it"
+    text_cont , "sold for ¥5000!"
+    text_done
 
 _LavenderHouse2Text1:
-    db $0,"CUBONE: Kyarugoo!@@"
+    text_init , "CUBONE: Kyarugoo!"
+    text_past
 
 _UnnamedText_1d9dc:
-    db $0,"I hate those",$4f
-    db "horrible ROCKETs!",$51
-    db "That poor CUBONE's",$4f
-    db "mother...",$51
-    db "It was killed",$4f
-    db "trying to escape",$55
-    db "from TEAM ROCKET!",$57
+    text_init , "I hate those"
+    text_line , "horrible ROCKETs!"
+    text_para , "That poor CUBONE's"
+    text_line , "mother..."
+    text_para , "It was killed"
+    text_line , "trying to escape"
+    text_cont , "from TEAM ROCKET!"
+    text_done
 
 _UnnamedText_1d9e1:
-    db $0,"The GHOST of",$4f
-    db "#MON TOWER is",$55
-    db "gone!",$51
-    db "Someone must have",$4f
-    db "soothed its",$55
-    db "restless soul!",$57
+    text_init , "The GHOST of"
+    text_line , "#MON TOWER is"
+    text_cont , "gone!"
+    text_para , "Someone must have"
+    text_line , "soothed its"
+    text_cont , "restless soul!"
+    text_done
 
 _VermilionPokecenterText2:
 _VermilionPokecenterText1:
-    db $0,"Even if they are",$4f
-    db "the same level,",$55
-    db "#MON can have",$55
-    db "very different",$55
-    db "abilities.",$51
-    db "A #MON raised",$4f
-    db "by a trainer is",$55
-    db "stronger than one",$55
-    db "in the wild.",$57
+    text_init , "Even if they are"
+    text_line , "the same level,"
+    text_cont , "#MON can have"
+    text_cont , "very different"
+    text_cont , "abilities."
+    text_para , "A #MON raised"
+    text_line , "by a trainer is"
+    text_cont , "stronger than one"
+    text_cont , "in the wild."
+    text_done
 
 _VermilionPokecenterText3:
-    db $0,"My #MON was",$4f
-    db "poisoned! It",$55
-    db "fainted while we",$55
-    db "were walking!",$57
+    text_init , "My #MON was"
+    text_line , "poisoned! It"
+    text_cont , "fainted while we"
+    text_cont , "were walking!"
+    text_done
 
 _UnnamedText_59bb7:
-    db $0,"Won't you admire",$4f
-    db "my PIKACHU's",$55
-    db "adorable tail?",$57
+    text_init , "Won't you admire"
+    text_line , "my PIKACHU's"
+    text_cont , "adorable tail?"
+    text_done
 
 _UnnamedText_59bbc:
-    db $0,"Humph! My PIKACHU",$4f
-    db "is twice as cute",$55
-    db "as that one!",$57
+    text_init , "Humph! My PIKACHU"
+    text_line , "is twice as cute"
+    text_cont , "as that one!"
+    text_done
 
 _UnnamedText_59be4:
-    db $0,"I just love my",$4f
-    db "SEEL!",$51
-    db "It squeals when I",$4f
-    db "hug it!",$57
+    text_init , "I just love my"
+    text_line , "SEEL!"
+    text_para , "It squeals when I"
+    text_line , "hug it!"
+    text_done
 
 _UnnamedText_59be9:
-    db $0,"Oh dear!",$51
-    db "My SEEL is far",$4f
-    db "more attractive!",$57
+    text_init , "Oh dear!"
+    text_para , "My SEEL is far"
+    text_line , "more attractive!"
+    text_done
 
 _UnnamedText_59c00:
-    db $0,"PIKACHU: Chu!",$4f
-    db "Pikachu!",$57
+    text_init , "PIKACHU: Chu!"
+    text_line , "Pikachu!"
+    text_done
 
 _UnnamedText_59c17:
-    db $0,"SEEL: Kyuoo!",$57
+    text_init , "SEEL: Kyuoo!"
+    text_done
 
 _UnnamedText_59c65:
-    db $0,"I chair the",$4f
-    db "#MON Fan Club!",$51
-    db "I have collected",$4f
-    db "over 100 #MON!",$51
-    db "I'm very fussy",$4f
-    db "when it comes to",$55
-    db "#MON!",$51
-    db "So...",$51
-    db "Did you come",$4f
-    db "visit to hear",$55
-    db "about my #MON?",$57
+    text_init , "I chair the"
+    text_line , "#MON Fan Club!"
+    text_para , "I have collected"
+    text_line , "over 100 #MON!"
+    text_para , "I'm very fussy"
+    text_line , "when it comes to"
+    text_cont , "#MON!"
+    text_para , "So..."
+    text_para , "Did you come"
+    text_line , "visit to hear"
+    text_cont , "about my #MON?"
+    text_done
 
 _UnnamedText_59c6a:
-    db $0,"Good!",$4f
-    db "Then listen up!",$51
-    db "My favorite",$4f
-    db "RAPIDASH...",$51
-    db "It...cute...",$4f
-    db "lovely...smart...",$55
-    db "plus...amazing...",$55
-    db "you think so?...",$55
-    db "oh yes...it...",$55
-    db "stunning...",$55
-    db "kindly...",$55
-    db "love it!",$51
-    db "Hug it...when...",$55
-    db "sleeping...warm",$55
-    db "and cuddly...",$55
-    db "spectacular...",$55
-    db "ravishing...",$55
-    db "...Oops! Look at",$55
-    db "the time! I kept",$55
-    db "you too long!",$51
-    db "Thanks for hearing",$4f
-    db "me out! I want",$55
-    db "you to have this!",$58
+    text_init , "Good!"
+    text_line , "Then listen up!"
+    text_para , "My favorite"
+    text_line , "RAPIDASH..."
+    text_para , "It...cute..."
+    text_line , "lovely...smart..."
+    text_cont , "plus...amazing..."
+    text_cont , "you think so?..."
+    text_cont , "oh yes...it..."
+    text_cont , "stunning..."
+    text_cont , "kindly..."
+    text_cont , "love it!"
+    text_para , "Hug it...when..."
+    text_cont , "sleeping...warm"
+    text_cont , "and cuddly..."
+    text_cont , "spectacular..."
+    text_cont , "ravishing..."
+    text_cont , "...Oops! Look at"
+    text_cont , "the time! I kept"
+    text_cont , "you too long!"
+    text_para , "Thanks for hearing"
+    text_line , "me out! I want"
+    text_cont , "you to have this!"
+    text_wait
 
 _ReceivedBikeVoucherText:
-    db $0,$52," received",$4f
-    db "a @"
+    text_init , $52," received"
+    text_line , "a "
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_59c74:
-    db $0,$51
-    db "Exchange that for",$4f
-    db "a BICYCLE!",$51
-    db "Don't worry,my",$4f
-    db "FEAROW will FLY",$55
-    db "me anywhere!",$51
-    db "So,I don't need a",$4f
-    db "BICYCLE!",$51
-    db "I hope you like",$4f
-    db "cycling!",$57
+    text_init
+    text_para , "Exchange that for"
+    text_line , "a BICYCLE!"
+    text_para , "Don't worry,my"
+    text_line , "FEAROW will FLY"
+    text_cont , "me anywhere!"
+    text_para , "So,I don't need a"
+    text_line , "BICYCLE!"
+    text_para , "I hope you like"
+    text_line , "cycling!"
+    text_done
 
 _UnnamedText_59c79:
-    db $0,"Oh. Come back",$4f
-    db "when you want to",$55
-    db "hear my story!",$57
+    text_init , "Oh. Come back"
+    text_line , "when you want to"
+    text_cont , "hear my story!"
+    text_done
 
 _UnnamedText_59c7e:
-    db $0,"Hello,",$52,"!",$51
-    db "Did you come see",$4f
-    db "me about my",$55
-    db "#MON again?",$51
-    db "No? Too bad!",$57
+    text_init , "Hello,",$52,"!"
+    text_para , "Did you come see"
+    text_line , "me about my"
+    text_cont , "#MON again?"
+    text_para , "No? Too bad!"
+    text_done
 
 _UnnamedText_59c83:
-    db $0,"Make room for",$4f
-    db "this!",$57
+    text_init , "Make room for"
+    text_line , "this!"
+    text_done
 
 _FanClubText6:
-    db $0,"Our Chairman is",$4f
-    db "very vocal about",$55
-    db "#MON.",$57
+    text_init , "Our Chairman is"
+    text_line , "very vocal about"
+    text_cont , "#MON."
+    text_done
 
 _FanClubText7:
-    db $0,"Let's all listen",$4f
-    db "politely to other",$55
-    db "trainers!",$57
+    text_init , "Let's all listen"
+    text_line , "politely to other"
+    text_cont , "trainers!"
+    text_done
 
 _FanClubText8:
-    db $0,"If someone brags,",$4f
-    db "brag right back!",$57
+    text_init , "If someone brags,"
+    text_line , "brag right back!"
+    text_done
 
 _VermilionMartText2:
-    db $0,"There are evil",$4f
-    db "people who will",$55
-    db "use #MON for",$55
-    db "criminal acts.",$51
-    db "TEAM ROCKET",$4f
-    db "traffics in rare",$55
-    db "#MON.",$51
-    db "They also abandon",$4f
-    db "#MON that they",$55
-    db "consider not to",$55
-    db "be popular or",$55
-    db "useful.",$57
+    text_init , "There are evil"
+    text_line , "people who will"
+    text_cont , "use #MON for"
+    text_cont , "criminal acts."
+    text_para , "TEAM ROCKET"
+    text_line , "traffics in rare"
+    text_cont , "#MON."
+    text_para , "They also abandon"
+    text_line , "#MON that they"
+    text_cont , "consider not to"
+    text_cont , "be popular or"
+    text_cont , "useful."
+    text_done
 
 _VermilionMartText3:
-    db $0,"I think #MON",$4f
-    db "can be good or",$55
-    db "evil. It depends",$55
-    db "on the trainer.",$57
+    text_init , "I think #MON"
+    text_line , "can be good or"
+    text_cont , "evil. It depends"
+    text_cont , "on the trainer."
+    text_done
 
 _UnnamedText_5cb6d:
-    db $0,"Hey,kid! What do",$4f
-    db "you think you're",$55
-    db "doing here?",$51
-    db "You won't live",$4f
-    db "long in combat!",$55
-    db "That's for sure!",$51
-    db "I tell you kid,",$4f
-    db "electric #MON",$55
-    db "saved me during",$55
-    db "the war!",$51
-    db "They zapped my",$4f
-    db "enemies into",$55
-    db "paralysis!",$51
-    db "The same as I'll",$4f
-    db "do to you!",$57
+    text_init , "Hey,kid! What do"
+    text_line , "you think you're"
+    text_cont , "doing here?"
+    text_para , "You won't live"
+    text_line , "long in combat!"
+    text_cont , "That's for sure!"
+    text_para , "I tell you kid,"
+    text_line , "electric #MON"
+    text_cont , "saved me during"
+    text_cont , "the war!"
+    text_para , "They zapped my"
+    text_line , "enemies into"
+    text_cont , "paralysis!"
+    text_para , "The same as I'll"
+    text_line , "do to you!"
+    text_done
 
 _GymLeaderRematchText1:
-    db $0,"Rematch?",$57
+    text_init , "Rematch?"
+    text_done
 
 _GymLeaderRematchText2:
-    db $0,"Go!",$57
+    text_init , "Go!"
+    text_done
 
 _BengalReceiveText1:
-    db $0,"What's going on",$4f
-    db "here?",$51
-    db "And Why do I have",$4f
-    db "this tool in my",$55
-    db "pocket?",$58
+    text_init , "What's going on"
+    text_line , "here?"
+    text_para , "And Why do I have"
+    text_line , "this tool in my"
+    text_cont , "pocket?"
+    text_wait
 
 _BengalNoRoomText:
-    db $0,"You do not have",$4f
-    db "space for this!",$57
+    text_init , "You do not have"
+    text_line , "space for this!"
+    text_done
 
 SECTION "bank27",ROMX,BANK[$27]
 
 _UnnamedText_5cb72:
-    db $0,"A little word of",$4f
-    db "advice,kid!",$51
-    db "Electricity is",$4f
-    db "sure powerful!",$51
-    db "But,it's useless",$4f
-    db "against ground-",$55
-    db "type #MON!",$57
+    text_init , "A little word of"
+    text_line , "advice,kid!"
+    text_para , "Electricity is"
+    text_line , "sure powerful!"
+    text_para , "But,it's useless"
+    text_line , "against ground-"
+    text_cont , "type #MON!"
+    text_done
 
 _UnnamedText_5cb77:
-    db $0,"The THUNDERBADGE",$4f
-    db "cranks up your",$55
-    db "#MON's SPEED!",$51
-    db "You're special,",$4f
-    db "kid! Take this!",$57
+    text_init , "The THUNDERBADGE"
+    text_line , "cranks up your"
+    text_cont , "#MON's SPEED!"
+    text_para , "You're special,"
+    text_line , "kid! Take this!"
+    text_done
 
 _TM24ExplanationText:
-    db $0,$51
-    db "TM24 contains",$4f
-    db "THUNDERBOLT!",$51
-    db "Teach it to an",$4f
-    db "electric #MON!",$57
+    text_init
+    text_para , "TM24 contains"
+    text_line , "THUNDERBOLT!"
+    text_para , "Teach it to an"
+    text_line , "electric #MON!"
+    text_done
 
 _TM24NoRoomText:
-    db $0,"Yo kid,make room",$4f
-    db "in your pack!",$57
+    text_init , "Yo kid,make room"
+    text_line , "in your pack!"
+    text_done
 
 _ReceivedThunderbadgeText:
-    db $0,"Whoa!",$51
-    db "You're the real",$4f
-    db "deal,kid!",$51
-    db "Fine then,take",$4f
-    db "the THUNDERBADGE!",$58
+    text_init , "Whoa!"
+    text_para , "You're the real"
+    text_line , "deal,kid!"
+    text_para , "Fine then,take"
+    text_line , "the THUNDERBADGE!"
+    text_wait
 
 _VermilionGymBattleText1:
-    db $0,"When I was in the",$4f
-    db "Army,LT.SURGE",$55
-    db "was my strict CO!",$57
+    text_init , "When I was in the"
+    text_line , "Army,LT.SURGE"
+    text_cont , "was my strict CO!"
+    text_done
 
 _VermilionGymEndBattleText1:
-    db $0,"Stop!",$4f
-    db "You're very good!",$58
+    text_init , "Stop!"
+    text_line , "You're very good!"
+    text_wait
 
 _VermilionGymAfterBattleText1:
-    db $0,"The door won't",$4f
-    db "open?",$51
-    db "LT.SURGE always",$4f
-    db "was cautious!",$57
+    text_init , "The door won't"
+    text_line , "open?"
+    text_para , "LT.SURGE always"
+    text_line , "was cautious!"
+    text_done
 
 _VermilionGymBattleText2:
-    db $0,"I'm a lightweight,",$4f
-    db "but I'm good with",$55
-    db "electricity!",$57
+    text_init , "I'm a lightweight,"
+    text_line , "but I'm good with"
+    text_cont , "electricity!"
+    text_done
 
 _VermilionGymEndBattleText2:
-    db $0,"Fried!",$58
+    text_init , "Fried!"
+    text_wait
 
 _VermilionGymAfterBattleText2:
-    db $0,"OK,I'll talk!",$51
-    db "LT.SURGE said he",$4f
-    db "hid door switches",$55
-    db "inside something!",$57
+    text_init , "OK,I'll talk!"
+    text_para , "LT.SURGE said he"
+    text_line , "hid door switches"
+    text_cont , "inside something!"
+    text_done
 
 _VermilionGymBattleText3:
-    db $0,"This is no place",$4f
-    db "for kids!",$57
+    text_init , "This is no place"
+    text_line , "for kids!"
+    text_done
 
 _VermilionGymEndBattleText3:
-    db $0,"Wow!",$4f
-    db "Surprised me!",$58
+    text_init , "Wow!"
+    text_line , "Surprised me!"
+    text_wait
 
 _VermilionGymAfterBattleText3:
-    db $0,"LT.SURGE set up",$4f
-    db "double locks!",$55
-    db "Here's a hint!",$51
-    db "When you open the",$4f
-    db "1st lock,the 2nd",$55
-    db "lock is right",$55
-    db "next to it!",$57
+    text_init , "LT.SURGE set up"
+    text_line , "double locks!"
+    text_cont , "Here's a hint!"
+    text_para , "When you open the"
+    text_line , "1st lock,the 2nd"
+    text_cont , "lock is right"
+    text_cont , "next to it!"
+    text_done
 
 _UnnamedText_5cbf4:
-    db $0,"Yo! Champ in",$4f
-    db "making!",$51
-    db "LT.SURGE has a",$4f
-    db "nickname. People",$55
-    db "refer to him as",$55
-    db "the Lightning",$55
-    db "American!",$51
-    db "He's an expert on",$4f
-    db "electric #MON!",$51
-    db "Birds and water",$4f
-    db "#MON are at",$55
-    db "risk! Beware of",$55
-    db "paralysis too!",$51
-    db "LT.SURGE is very",$4f
-    db "cautious!",$51
-    db "You'll have to",$4f
-    db "break a code to",$55
-    db "get to him!",$57
+    text_init , "Yo! Champ in"
+    text_line , "making!"
+    text_para , "LT.SURGE has a"
+    text_line , "nickname. People"
+    text_cont , "refer to him as"
+    text_cont , "the Lightning"
+    text_cont , "American!"
+    text_para , "He's an expert on"
+    text_line , "electric #MON!"
+    text_para , "Birds and water"
+    text_line , "#MON are at"
+    text_cont , "risk! Beware of"
+    text_cont , "paralysis too!"
+    text_para , "LT.SURGE is very"
+    text_line , "cautious!"
+    text_para , "You'll have to"
+    text_line , "break a code to"
+    text_cont , "get to him!"
+    text_done
 
 _UnnamedText_5cbf9:
-    db $0,"Whew! That match",$4f
-    db "was electric!",$57
+    text_init , "Whew! That match"
+    text_line , "was electric!"
+    text_done
 
 _VermilionHouse1Text1:
-    db $0,"I'm getting my",$4f
-    db "PIDGEY to fly a",$55
-    db "letter to SAFFRON",$55
-    db "in the north!",$57
+    text_init , "I'm getting my"
+    text_line , "PIDGEY to fly a"
+    text_cont , "letter to SAFFRON"
+    text_cont , "in the north!"
+    text_done
 
 _VermilionHouse1Text2:
-    db $0,"PIDGEY: Kurukkoo!@@"
+    text_init , "PIDGEY: Kurukkoo!"
+    text_past
 
 _VermilionHouse1Text3:
-    db $0,"Dear PIPPI,I hope",$4f
-    db "to see you soon.",$51
-    db "I heard SAFFRON",$4f
-    db "has problems with",$55
-    db "TEAM ROCKET.",$51
-    db "VERMILION appears",$4f
-    db "to be safe.",$57
+    text_init , "Dear PIPPI,I hope"
+    text_line , "to see you soon."
+    text_para , "I heard SAFFRON"
+    text_line , "has problems with"
+    text_cont , "TEAM ROCKET."
+    text_para , "VERMILION appears"
+    text_line , "to be safe."
+    text_done
 
 _VermilionDockText1:
-    db $0,$57
+    text_init
+    text_done
 
 _UnnamedText_560b1:
-    db $0,"I'm the FISHING",$4f
-    db "GURU!",$51
-    db "I simply Looove",$4f
-    db "fishing!",$51
-    db "Do you like to",$4f
-    db "fish?",$57
+    text_init , "I'm the FISHING"
+    text_line , "GURU!"
+    text_para , "I simply Looove"
+    text_line , "fishing!"
+    text_para , "Do you like to"
+    text_line , "fish?"
+    text_done
 
 _UnnamedText_560b6:
-    db $0,"Grand! I like",$4f
-    db "your style!",$51
-    db "Take this and",$4f
-    db "fish,young one!",$51
-    db $52," received",$4f
-    db "an @"
+    text_init , "Grand! I like"
+    text_line , "your style!"
+    text_para , "Take this and"
+    text_line , "fish,young one!"
+    text_para,$52," received"
+    text_line , "an "
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_560bb:
-    db $0,$51
-    db "Fishing is a way",$4f
-    db "of life!",$51
-    db "From the seas to",$4f
-    db "rivers,go out",$55
-    db "and land the big",$55
-    db "one,young one!",$57
+    text_init
+    text_para , "Fishing is a way"
+    text_line , "of life!"
+    text_para , "From the seas to"
+    text_line , "rivers,go out"
+    text_cont , "and land the big"
+    text_cont , "one,young one!"
+    text_done
 
 _UnnamedText_560c0:
-    db $0,"Oh... That's so",$4f
-    db "disappointing...",$57
+    text_init , "Oh... That's so"
+    text_line , "disappointing..."
+    text_done
 
 _UnnamedText_560c5:
-    db $0,"Hello there,",$4f
-    db $52,"!",$51
-    db "How are the fish",$4f
-    db "biting?",$57
+    text_init , "Hello there,"
+    text_line , $52,"!"
+    text_para , "How are the fish"
+    text_line , "biting?"
+    text_done
 
 _UnnamedText_560ca:
-    db $0,"Oh no!",$51
-    db "You have no room",$4f
-    db "for my gift!",$57
+    text_init , "Oh no!"
+    text_para , "You have no room"
+    text_line , "for my gift!"
+    text_done
 
 _CeladonMart1Text1:
-    db $0,"Hello! Welcome to",$4f
-    db "CELADON DEPT.",$55
-    db "STORE.",$51
-    db "The board on the",$4f
-    db "right describes",$55
-    db "the store layout.",$57
+    text_init , "Hello! Welcome to"
+    text_line , "CELADON DEPT."
+    text_cont , "STORE."
+    text_para , "The board on the"
+    text_line , "right describes"
+    text_cont , "the store layout."
+    text_done
 
 _CeladonMart1Text2:
-    db $0,"1F: SERVICE",$4f
-    db "    COUNTER",$51
-    db "2F: TRAINER'S",$4f
-    db "    MARKET",$51
-    db "3F: TV GAME SHOP",$51
-    db "4F: WISEMAN GIFTS",$51
-    db "5F: DRUG STORE",$51
-    db "ROOFTOP SQUARE:",$4f
-    db "VENDING MACHINES",$57
+    text_init , "1F: SERVICE"
+    text_line , "    COUNTER"
+    text_para , "2F: TRAINER'S"
+    text_line , "    MARKET"
+    text_para , "3F: TV GAME SHOP"
+    text_para , "4F: WISEMAN GIFTS"
+    text_para , "5F: DRUG STORE"
+    text_para , "ROOFTOP SQUARE:"
+    text_line , "VENDING MACHINES"
+    text_done
 
 _CeladonMart1Text3:
-    db $0,"1F: SERVICE",$4f
-    db "    COUNTER",$57
+    text_init , "1F: SERVICE"
+    text_line , "    COUNTER"
+    text_done
 
 _CeladonMart2Text3:
-    db $0,"SUPER REPEL keeps",$4f
-    db "weak #MON at",$55
-    db "bay...",$51
-    db "Hmm,it's a more",$4f
-    db "powerful REPEL!",$57
+    text_init , "SUPER REPEL keeps"
+    text_line , "weak #MON at"
+    text_cont , "bay..."
+    text_para , "Hmm,it's a more"
+    text_line , "powerful REPEL!"
+    text_done
 
 _CeladonMart2Text4:
-    db $0,"For long outings,",$4f
-    db "you should buy",$55
-    db "REVIVE.",$57
+    text_init , "For long outings,"
+    text_line , "you should buy"
+    text_cont , "REVIVE."
+    text_done
 
 _CeladonMart2Text5:
-    db $0,"Top Grade Items",$4f
-    db "for Trainers!",$51
-    db "2F: TRAINER'S",$4f
-    db "    MARKET",$57
+    text_init , "Top Grade Items"
+    text_line , "for Trainers!"
+    text_para , "2F: TRAINER'S"
+    text_line , "    MARKET"
+    text_done
 
 _TM18PreReceiveText:
-    db $0,"Oh,hi! I finally",$4f
-    db "finished #MON!",$51
-    db "Not done yet?",$4f
-    db "This might be",$55
-    db "useful!",$58
+    text_init , "Oh,hi! I finally"
+    text_line , "finished #MON!"
+    text_para , "Not done yet?"
+    text_line , "This might be"
+    text_cont , "useful!"
+    text_wait
 
 _TM18ExplanationText:
-    db $0,"TM18 is COUNTER!",$4f
-    db "Not like the one",$55
-    db "I'm leaning on,",$55
-    db "mind you!",$57
+    text_init , "TM18 is COUNTER!"
+    text_line , "Not like the one"
+    text_cont , "I'm leaning on,"
+    text_cont , "mind you!"
+    text_done
 
 _TM18NoRoomText:
-    db $0,"Your pack is full",$4f
-    db "of items!",$57
+    text_init , "Your pack is full"
+    text_line , "of items!"
+    text_done
 
 _CeladonMart3Text2:
-    db $0,"Captured #MON",$4f
-    db "are registered",$55
-    db "with an ID No.",$55
-    db "and OT,the name",$55
-    db "of the Original",$55
-    db "Trainer that",$55
-    db "caught it!",$57
+    text_init , "Captured #MON"
+    text_line , "are registered"
+    text_cont , "with an ID No."
+    text_cont , "and OT,the name"
+    text_cont , "of the Original"
+    text_cont , "Trainer that"
+    text_cont , "caught it!"
+    text_done
 
 _CeladonMart3Text3:
-    db $0,"All right!",$51
-    db "My buddy's going",$4f
-    db "to trade me his",$55
-    db "KANGASKHAN for my",$55
-    db "GRAVELER!",$57
+    text_init , "All right!"
+    text_para , "My buddy's going"
+    text_line , "to trade me his"
+    text_cont , "KANGASKHAN for my"
+    text_cont , "GRAVELER!"
+    text_done
 
 _CeladonMart3Text4:
-    db $0,"Come on GRAVELER!",$51
-    db "I love GRAVELER!",$4f
-    db "I collect them!",$51
-    db "Huh?",$51
-    db "GRAVELER turned",$4f
-    db "into a different",$55
-    db "#MON!",$57
+    text_init , "Come on GRAVELER!"
+    text_para , "I love GRAVELER!"
+    text_line , "I collect them!"
+    text_para , "Huh?"
+    text_para , "GRAVELER turned"
+    text_line , "into a different"
+    text_cont , "#MON!"
+    text_done
 
 _CeladonMart3Text5:
-    db $0,"You can identify",$4f
-    db "#MON you got",$55
-    db "in trades by",$55
-    db "their ID Numbers!",$57
+    text_init , "You can identify"
+    text_line , "#MON you got"
+    text_cont , "in trades by"
+    text_cont , "their ID Numbers!"
+    text_done
 
 _CeladonMart3Text6:
-    db $0,"It's an SNES!",$57
+    text_init , "It's an SNES!"
+    text_done
 
 _CeladonMart3Text7:
-    db $0,"An RPG! There's",$4f
-    db "no time for that!",$57
+    text_init , "An RPG! There's"
+    text_line , "no time for that!"
+    text_done
 
 _CeladonMart3Text9:
-    db $0,"A sports game!",$4f
-    db "Dad'll like that!",$57
+    text_init , "A sports game!"
+    text_line , "Dad'll like that!"
+    text_done
 
 _CeladonMart3Text11:
-    db $0,"A puzzle game!",$4f
-    db "Looks addictive!",$57
+    text_init , "A puzzle game!"
+    text_line , "Looks addictive!"
+    text_done
 
 _CeladonMart3Text13:
-    db $0,"A fighting game!",$4f
-    db "Looks tough!",$57
+    text_init , "A fighting game!"
+    text_line , "Looks tough!"
+    text_done
 
 _CeladonMart3Text14:
-    db $0,"3F: TV GAME SHOP",$57
+    text_init , "3F: TV GAME SHOP"
+    text_done
 
 _CeladonMart3Text15:
-    db $0,"Red and Blue!",$4f
-    db "Both are #MON!",$57
+    text_init , "Red and Blue!"
+    text_line , "Both are #MON!"
+    text_done
 
 _CeladonMart4Text2:
-    db $0,"I'm getting a",$4f
-    db "# DOLL for my",$55
-    db "girl friend!",$57
+    text_init , "I'm getting a"
+    text_line , "# DOLL for my"
+    text_cont , "girl friend!"
+    text_done
 
 _CeladonMart4Text3:
-    db $0,"I heard something",$4f
-    db "useful.",$51
-    db "You can run from",$4f
-    db "wild #MON by",$55
-    db "distracting them",$55
-    db "with a # DOLL!",$57
+    text_init , "I heard something"
+    text_line , "useful."
+    text_para , "You can run from"
+    text_line , "wild #MON by"
+    text_cont , "distracting them"
+    text_cont , "with a # DOLL!"
+    text_done
 
 _CeladonMart4Text4:
-    db $0,"Express yourself",$4f
-    db "with gifts!",$51
-    db "4F: WISEMAN GIFTS",$51
-    db "Evolution Special!",$4f
-    db "Element STONEs on",$55
-    db "sale now!",$57
+    text_init , "Express yourself"
+    text_line , "with gifts!"
+    text_para , "4F: WISEMAN GIFTS"
+    text_para , "Evolution Special!"
+    text_line , "Element STONEs on"
+    text_cont , "sale now!"
+    text_done
 
 _UnnamedText_484ee:
-    db $0,"Give her which",$4f
-    db "drink?",$57
+    text_init , "Give her which"
+    text_line , "drink?"
+    text_done
 
 _UnnamedText_484f3:
-    db $0,"Yay!",$51
-    db "FRESH WATER!",$51
-    db "Thank you!",$51
-    db "You can have this",$4f
-    db "from me!@@"
+    text_init , "Yay!"
+    text_para , "FRESH WATER!"
+    text_para , "Thank you!"
+    text_para , "You can have this"
+    text_line , "from me!"
+    text_past
 
 _UnnamedText_484fe:
-    db $0,$51
-    db "TM13 is",$4f
-    db "ICE BEAM!",$51
-    db "It can freeze the",$4f
-    db "target sometimes!@@"
+    text_init
+    text_para , "TM13 is"
+    text_line , "ICE BEAM!"
+    text_para , "It can freeze the"
+    text_line , "target sometimes!"
+    text_past
 
 _UnnamedText_48504:
-    db $0,"Yay!",$51
-    db "SODA POP!",$51
-    db "Thank you!",$51
-    db "You can have this",$4f
-    db "from me!@@"
+    text_init , "Yay!"
+    text_para , "SODA POP!"
+    text_para , "Thank you!"
+    text_para , "You can have this"
+    text_line , "from me!"
+    text_past
 
 _UnnamedText_4850f:
-    db $0,$51
-    db "TM48 is",$4f
-    db "ROCK SLIDE!",$51
-    db "It can spook the",$4f
-    db "target sometimes!@@"
+    text_init
+    text_para , "TM48 is"
+    text_line , "ROCK SLIDE!"
+    text_para , "It can spook the"
+    text_line , "target sometimes!"
+    text_past
 
 _UnnamedText_48515:
-    db $0,"Yay!",$51
-    db "LEMONADE!",$51
-    db "Thank you!",$51
-    db "You can have this",$4f
-    db "from me!@@"
+    text_init , "Yay!"
+    text_para , "LEMONADE!"
+    text_para , "Thank you!"
+    text_para , "You can have this"
+    text_line , "from me!"
+    text_past
 
 _UnnamedText_48520:
-    db $0,$51
-    db "TM49 contains",$4f
-    db "TRI ATTACK!@@"
+    text_init
+    text_para , "TM49 contains"
+    text_line , "TRI ATTACK!"
+    text_past
 
 _UnnamedText_48526:
-    db $0,"You don't have",$4f
-    db "space for this!@@"
+    text_init , "You don't have"
+    text_line , "space for this!"
+    text_past
 
 _UnnamedText_4852c:
-    db $0,"No thank you!",$4f
-    db "I'm not thirsty",$55
-    db "after all!@@"
+    text_init , "No thank you!"
+    text_line , "I'm not thirsty"
+    text_cont , "after all!"
+    text_past
 
 _CeladonMartRoofText1:
-    db $0,"My sister is a",$4f
-    db "trainer,believe",$55
-    db "it or not.",$51
-    db "But,she's so",$4f
-    db "immature,she",$55
-    db "drives me nuts!",$57
+    text_init , "My sister is a"
+    text_line , "trainer,believe"
+    text_cont , "it or not."
+    text_para , "But,she's so"
+    text_line , "immature,she"
+    text_cont , "drives me nuts!"
+    text_done
 
 _UnnamedText_48598:
-    db $0,"I'm thirsty!",$4f
-    db "I want something",$55
-    db "to drink!",$57
+    text_init , "I'm thirsty!"
+    text_line , "I want something"
+    text_cont , "to drink!"
+    text_done
 
 _CeladonMartRoofText4:
-    db $0,"I'm thirsty!",$4f
-    db "I want something",$55
-    db "to drink!",$51
-    db "Give her a drink?",$57
+    text_init , "I'm thirsty!"
+    text_line , "I want something"
+    text_cont , "to drink!"
+    text_para , "Give her a drink?"
+    text_done
 
 _CeladonMartRoofText6:
-    db $0,"ROOFTOP SQUARE:",$4f
-    db "VENDING MACHINES",$57
+    text_init , "ROOFTOP SQUARE:"
+    text_line , "VENDING MACHINES"
+    text_done
 
 _VendingMachineText1:
-    db $0,"A vending machine!",$4f
-    db "Here's the menu!",$58
+    text_init , "A vending machine!"
+    text_line , "Here's the menu!"
+    text_wait
 
 _VendingMachineText4:
-    db $0,"Oops,not enough",$4f
-    db "money!",$57
+    text_init , "Oops,not enough"
+    text_line , "money!"
+    text_done
 
 _VendingMachineText5:
     TX_RAM $cf4b
-    db $0,$4f
-    db "popped out!",$57
+    text_init
+    text_line , "popped out!"
+    text_done
 
 _VendingMachineText6:
-    db $0,"There's no more",$4f
-    db "room for stuff!",$57
+    text_init , "There's no more"
+    text_line , "room for stuff!"
+    text_done
 
 _VendingMachineText7:
-    db $0,"Not thirsty!",$57
+    text_init , "Not thirsty!"
+    text_done
 
 _CeladonMansion1Text1:
-    db $0,"MEOWTH: Meow!@@"
+    text_init , "MEOWTH: Meow!"
+    text_past
 
 _CeladonMansion1Text2:
-    db $0,"My dear #MON",$4f
-    db "keep me company.",$51
-    db "MEOWTH even brings",$4f
-    db "money home!",$57
+    text_init , "My dear #MON"
+    text_line , "keep me company."
+    text_para , "MEOWTH even brings"
+    text_line , "money home!"
+    text_done
 
 _CeladonMansion1Text3:
-    db $0,"CLEFAIRY: Pi",$4f
-    db "pippippi!@@"
+    text_init , "CLEFAIRY: Pi"
+    text_line , "pippippi!"
+    text_past
 
 _CeladonMansion1Text4:
-    db $0,"NIDORAN: Kya",$4f
-    db "kyaoo!@@"
+    text_init , "NIDORAN: Kya"
+    text_line , "kyaoo!"
+    text_past
 
 _CeladonMansion1Text5:
-    db $0,"CELADON MANSION",$4f
-    db "Manager's Suite",$57
+    text_init , "CELADON MANSION"
+    text_line , "Manager's Suite"
+    text_done
 
 _CeladonMansion2Text1:
-    db $0,"GAME FREAK",$4f
-    db "Meeting Room",$57
+    text_init , "GAME FREAK"
+    text_line , "Meeting Room"
+    text_done
 
 _ProgrammerText:
-    db $0,"Me? I'm the",$4f
-    db "programmer!",$57
+    text_init , "Me? I'm the"
+    text_line , "programmer!"
+    text_done
 
 _GraphicArtistText:
-    db $0,"I'm the graphic",$4f
-    db "artist!",$55
-    db "I drew you!",$57
+    text_init , "I'm the graphic"
+    text_line , "artist!"
+    text_cont , "I drew you!"
+    text_done
 
 _WriterText:
-    db $0,"I wrote the story!",$4f
-    db "Isn't ERIKA cute?",$51
-    db "I like MISTY a",$4f
-    db "lot too!",$51
-    db "Oh,and SABRINA,",$4f
-    db "I like her!",$57
+    text_init , "I wrote the story!"
+    text_line , "Isn't ERIKA cute?"
+    text_para , "I like MISTY a"
+    text_line , "lot too!"
+    text_para , "Oh,and SABRINA,"
+    text_line , "I like her!"
+    text_done
 
 _GameDesignerText:
-    db $0,"Is that right?",$51
-    db "I'm the game",$4f
-    db "designer!",$51
-    db "Filling up your",$4f
-    db "#DEX is tough,",$55
-    db "but don't quit!",$51
-    db "When you finish,",$4f
-    db "come tell me!",$57
+    text_init , "Is that right?"
+    text_para , "I'm the game"
+    text_line , "designer!"
+    text_para , "Filling up your"
+    text_line , "#DEX is tough,"
+    text_cont , "but don't quit!"
+    text_para , "When you finish,"
+    text_line , "come tell me!"
+    text_done
 
 _CompletedDexText:
-    db $0,"Wow! Excellent!",$4f
-    db "You completed",$55
-    db "your #DEX!",$55
-    db "Congratulations!",$55
-    db "...@@"
+    text_init , "Wow! Excellent!"
+    text_line , "You completed"
+    text_cont , "your #DEX!"
+    text_cont , "Congratulations!"
+    text_cont , "..."
+    text_past
 
 _CeladonMansion3Text5:
-    db $0,"It's the game",$4f
-    db "program! Messing",$55
-    db "with it could bug",$55
-    db "out the game!",$57
+    text_init , "It's the game"
+    text_line , "program! Messing"
+    text_cont , "with it could bug"
+    text_cont , "out the game!"
+    text_done
 
 _CeladonMansion3Text6:
-    db $0,"Someone's playing",$4f
-    db "a game instead of",$55
-    db "working!",$57
+    text_init , "Someone's playing"
+    text_line , "a game instead of"
+    text_cont , "working!"
+    text_done
 
 _CeladonMansion3Text7:
-    db $0,"It's the script!",$4f
-    db "Better not look",$55
-    db "at the ending!",$57
+    text_init , "It's the script!"
+    text_line , "Better not look"
+    text_cont , "at the ending!"
+    text_done
 
 _CeladonMansion3Text8:
-    db $0,"GAME FREAK",$4f
-    db "Development Room",$57
+    text_init , "GAME FREAK"
+    text_line , "Development Room"
+    text_done
 
 _CeladonMansion4Text1:
-    db $0,"I KNOW EVERYTHING!",$57
+    text_init , "I KNOW EVERYTHING!"
+    text_done
 
 _CeladonMansion5Text1:
-    db $0,"I know everything",$4f
-    db "about the world",$55
-    db "of #MON in",$55
-    db "your GAME BOY!",$51
-    db "Get together with",$4f
-    db "your friends and",$55
-    db "trade #MON!",$57
+    text_init , "I know everything"
+    text_line , "about the world"
+    text_cont , "of #MON in"
+    text_cont , "your GAME BOY!"
+    text_para , "Get together with"
+    text_line , "your friends and"
+    text_cont , "trade #MON!"
+    text_done
 
 _CeladonPokecenterText2:
-    db $0,"# FLUTE awakens",$4f
-    db "#MON with a",$55
-    db "sound that only",$55
-    db "they can hear!",$57
+    text_init , "# FLUTE awakens"
+    text_line , "#MON with a"
+    text_cont , "sound that only"
+    text_cont , "they can hear!"
+    text_done
 
 _CeladonPokecenterText3:
-    db $0,"I rode uphill on",$4f
-    db "CYCLING ROAD from",$55
-    db "FUCHSIA!",$57
+    text_init , "I rode uphill on"
+    text_line , "CYCLING ROAD from"
+    text_cont , "FUCHSIA!"
+    text_done
 
 _UnnamedText_48a5e:
-    db $0,"Hello. Lovely",$4f
-    db "weather isn't it?",$55
-    db "It's so pleasant.",$51
-    db "...Oh dear...",$4f
-    db "I must have dozed",$55
-    db "off. Welcome.",$51
-    db "My name is ERIKA.",$4f
-    db "I am the LEADER",$55
-    db "of CELADON GYM.",$51
-    db "I teach the art of",$4f
-    db "flower arranging.",$55
-    db "My #MON are of",$55
-    db "the grass-type.",$51
-    db "Oh,I'm sorry,I",$4f
-    db "had no idea that",$55
-    db "you wished to",$55
-    db "challenge me.",$51
-    db "Very well,but I",$4f
-    db "shall not lose.",$57
+    text_init , "Hello. Lovely"
+    text_line , "weather isn't it?"
+    text_cont , "It's so pleasant."
+    text_para , "...Oh dear..."
+    text_line , "I must have dozed"
+    text_cont , "off. Welcome."
+    text_para , "My name is ERIKA."
+    text_line , "I am the LEADER"
+    text_cont , "of CELADON GYM."
+    text_para , "I teach the art of"
+    text_line , "flower arranging."
+    text_cont , "My #MON are of"
+    text_cont , "the grass-type."
+    text_para , "Oh,I'm sorry,I"
+    text_line , "had no idea that"
+    text_cont , "you wished to"
+    text_cont , "challenge me."
+    text_para , "Very well,but I"
+    text_line , "shall not lose."
+    text_done
 
 _UnnamedText_48a63:
-    db $0,"Oh!",$4f
-    db "I concede defeat.",$51
-    db "You are remarkably",$4f
-    db "strong.",$51
-    db "I must confer you",$4f
-    db "the RAINBOWBADGE.",$58
+    text_init , "Oh!"
+    text_line , "I concede defeat."
+    text_para , "You are remarkably"
+    text_line , "strong."
+    text_para , "I must confer you"
+    text_line , "the RAINBOWBADGE."
+    text_wait
 
 _UnnamedText_48a68:
-    db $0,"You are cataloging",$4f
-    db "#MON? I must",$55
-    db "say I'm impressed.",$51
-    db "I would never",$4f
-    db "collect #MON",$55
-    db "if they were",$55
-    db "unattractive.",$57
+    text_init , "You are cataloging"
+    text_line , "#MON? I must"
+    text_cont , "say I'm impressed."
+    text_para , "I would never"
+    text_line , "collect #MON"
+    text_cont , "if they were"
+    text_cont , "unattractive."
+    text_done
 
 _UnnamedText_48a6d:
-    db $0,"Please also take",$4f
-    db "this with you.",$57
+    text_init , "Please also take"
+    text_line , "this with you."
+    text_done
 
 _TM21ExplanationText:
-    db $0,$51
-    db "TM21 contains",$4f
-    db "MEGA DRAIN.",$51
-    db "Half the damage",$4f
-    db "it inflicts is",$55
-    db "drained to heal",$55
-    db "your #MON!",$57
+    text_init
+    text_para , "TM21 contains"
+    text_line , "MEGA DRAIN."
+    text_para , "Half the damage"
+    text_line , "it inflicts is"
+    text_cont , "drained to heal"
+    text_cont , "your #MON!"
+    text_done
 
 _TM21NoRoomText:
-    db $0,"You should make",$4f
-    db "room for this.",$57
+    text_init , "You should make"
+    text_line , "room for this."
+    text_done
 
 _CeladonGymBattleText2:
-    db $0,"Hey!",$51
-    db "You are not",$4f
-    db "allowed in here!",$57
+    text_init , "Hey!"
+    text_para , "You are not"
+    text_line , "allowed in here!"
+    text_done
 
 _CeladonGymEndBattleText2:
-    db $0,"You're",$4f
-    db "too rough!",$58
+    text_init , "You're"
+    text_line , "too rough!"
+    text_wait
 
 _CeladonGymAfterBattleText2:
-    db $0,"Bleaah!",$4f
-    db "I hope ERIKA",$55
-    db "wipes you out!",$57
+    text_init , "Bleaah!"
+    text_line , "I hope ERIKA"
+    text_cont , "wipes you out!"
+    text_done
 
 _CeladonGymBattleText3:
-    db $0,"I was getting",$4f
-    db "bored.",$57
+    text_init , "I was getting"
+    text_line , "bored."
+    text_done
 
 _CeladonGymEndBattleText3:
-    db $0,"My",$4f
-    db "makeup!",$58
+    text_init , "My"
+    text_line , "makeup!"
+    text_wait
 
 _CeladonGymAfterBattleText3:
-    db $0,"Grass-type #MON",$4f
-    db "are tough against",$55
-    db "the water-type!",$51
-    db "They also have an",$4f
-    db "edge on rock and",$55
-    db "ground #MON!",$57
+    text_init , "Grass-type #MON"
+    text_line , "are tough against"
+    text_cont , "the water-type!"
+    text_para , "They also have an"
+    text_line , "edge on rock and"
+    text_cont , "ground #MON!"
+    text_done
 
 _CeladonGymBattleText4:
-    db $0,"Aren't you the",$4f
-    db "peeping Tom?",$57
+    text_init , "Aren't you the"
+    text_line , "peeping Tom?"
+    text_done
 
 _CeladonGymEndBattleText4:
-    db $0,"I'm",$4f
-    db "in shock!",$58
+    text_init , "I'm"
+    text_line , "in shock!"
+    text_wait
 
 _CeladonGymAfterBattleText4:
-    db $0,"Oh,you weren't",$4f
-    db "peeping? We get a",$55
-    db "lot of gawkers!",$57
+    text_init , "Oh,you weren't"
+    text_line , "peeping? We get a"
+    text_cont , "lot of gawkers!"
+    text_done
 
 _CeladonGymBattleText5:
-    db $0,"Look at my grass",$4f
-    db "#MON!",$51
-    db "They're so easy",$4f
-    db "to raise!",$57
+    text_init , "Look at my grass"
+    text_line , "#MON!"
+    text_para , "They're so easy"
+    text_line , "to raise!"
+    text_done
 
 _CeladonGymEndBattleText5:
-    db $0,"No!",$58
+    text_init , "No!"
+    text_wait
 
 _CeladonGymAfterBattleText5:
-    db $0,"We only use grass-",$4f
-    db "type #MON at",$55
-    db "our GYM!",$51
-    db "We also use them",$4f
-    db "for making flower",$55
-    db "arrangements!",$57
+    text_init , "We only use grass-"
+    text_line , "type #MON at"
+    text_cont , "our GYM!"
+    text_para , "We also use them"
+    text_line , "for making flower"
+    text_cont , "arrangements!"
+    text_done
 
 _CeladonGymBattleText6:
-    db $0,"Don't bring any",$4f
-    db "bugs or fire",$55
-    db "#MON in here!",$57
+    text_init , "Don't bring any"
+    text_line , "bugs or fire"
+    text_cont , "#MON in here!"
+    text_done
 
 _CeladonGymEndBattleText6:
-    db $0,"Oh!",$4f
-    db "You!",$58
+    text_init , "Oh!"
+    text_line , "You!"
+    text_wait
 
 _CeladonGymAfterBattleText6:
-    db $0,"Our LEADER,ERIKA,",$4f
-    db "might be quiet,",$55
-    db "but she's also",$55
-    db "very skilled!",$57
+    text_init , "Our LEADER,ERIKA,"
+    text_line , "might be quiet,"
+    text_cont , "but she's also"
+    text_cont , "very skilled!"
+    text_done
 
 _CeladonGymBattleText7:
-    db $0,"Pleased to meet",$4f
-    db "you. My hobby is",$55
-    db "#MON training.",$57
+    text_init , "Pleased to meet"
+    text_line , "you. My hobby is"
+    text_cont , "#MON training."
+    text_done
 
 _CeladonGymEndBattleText7:
-    db $0,"Oh!",$4f
-    db "Splendid!",$58
+    text_init , "Oh!"
+    text_line , "Splendid!"
+    text_wait
 
 _CeladonGymAfterBattleText7:
-    db $0,"I have a blind",$4f
-    db "date coming up.",$55
-    db "I have to learn",$55
-    db "to be polite.",$57
+    text_init , "I have a blind"
+    text_line , "date coming up."
+    text_cont , "I have to learn"
+    text_cont , "to be polite."
+    text_done
 
 _CeladonGymBattleText8:
-    db $0,"Welcome to",$4f
-    db "CELADON GYM!",$51
-    db "You better not",$4f
-    db "underestimate",$55
-    db "girl power!",$57
+    text_init , "Welcome to"
+    text_line , "CELADON GYM!"
+    text_para , "You better not"
+    text_line , "underestimate"
+    text_cont , "girl power!"
+    text_done
 
 _CeladonGymEndBattleText8:
-    db $0,"Oh!",$4f
-    db "Beaten!",$58
+    text_init , "Oh!"
+    text_line , "Beaten!"
+    text_wait
 
 _CeladonGymAfterBattleText8:
-    db $0,"I didn't bring my",$4f
-    db "best #MON!",$51
-    db "Wait 'til next",$4f
-    db "time!",$57
+    text_init , "I didn't bring my"
+    text_line , "best #MON!"
+    text_para , "Wait 'til next"
+    text_line , "time!"
+    text_done
 
 _CeladonGameCornerText1:
-    db $0,"Welcome!",$51
-    db "You can exchange",$4f
-    db "your coins for",$55
-    db "fabulous prizes",$55
-    db "next door.",$57
+    text_init , "Welcome!"
+    text_para , "You can exchange"
+    text_line , "your coins for"
+    text_cont , "fabulous prizes"
+    text_cont , "next door."
+    text_done
 
 _UnnamedText_48d22:
-    db $0,"Welcome to ROCKET",$4f
-    db "GAME CORNER!",$51
-    db "It's ¥10000 for",$4f
-    db "500 coins. Ok?",$57
+    text_init , "Welcome to ROCKET"
+    text_line , "GAME CORNER!"
+    text_para , "It's ¥10000 for"
+    text_line , "500 coins. Ok?"
+    text_done
 
 _UnnamedText_48d27:
-    db $0,"Thanks! Here are",$4f
-    db "your 500 coins!",$57
+    text_init , "Thanks! Here are"
+    text_line , "your 500 coins!"
+    text_done
 
 _UnnamedText_48d2c:
-    db $0,"No? Please come",$4f
-    db "play sometime!",$57
+    text_init , "No? Please come"
+    text_line , "play sometime!"
+    text_done
 
 _UnnamedText_48d31:
-    db $0,"You can't afford",$4f
-    db "the coins!",$57
+    text_init , "You can't afford"
+    text_line , "the coins!"
+    text_done
 
 _UnnamedText_48d36:
-    db $0,"Oops! Your COIN",$4f
-    db "CASE is full.",$57
+    text_init , "Oops! Your COIN"
+    text_line , "CASE is full."
+    text_done
 
 _UnnamedText_48d3b:
-    db $0,"You don't have a",$4f
-    db "COIN CASE!",$57
+    text_init , "You don't have a"
+    text_line , "COIN CASE!"
+    text_done
 
 _CeladonGameCornerText3:
-    db $0,"Keep this quiet.",$51
-    db "It's rumored that",$4f
-    db "this place is run",$55
-    db "by TEAM ROCKET.",$57
+    text_init , "Keep this quiet."
+    text_para , "It's rumored that"
+    text_line , "this place is run"
+    text_cont , "by TEAM ROCKET."
+    text_done
 
 _CeladonGameCornerText4:
-    db $0,"I think these",$4f
-    db "machines have",$55
-    db "different odds.",$57
+    text_init , "I think these"
+    text_line , "machines have"
+    text_cont , "different odds."
+    text_done
 
 _UnnamedText_48d9c:
-    db $0,"Kid,do you want",$4f
-    db "to play?",$58
+    text_init , "Kid,do you want"
+    text_line , "to play?"
+    text_wait
 
 _Received10CoinsText:
-    db $0,$52," received",$4f
-    db "10 coins!@@"
+    text_init , $52," received"
+    text_line , "10 coins!"
+    text_past
 
 _UnnamedText_48da7:
-    db $0,"You don't need my",$4f
-    db "coins!",$57
+    text_init , "You don't need my"
+    text_line , "coins!"
+    text_done
 
 _UnnamedText_48dac:
-    db $0,"Wins seem to come",$4f
-    db "and go.",$57
+    text_init , "Wins seem to come"
+    text_line , "and go."
+    text_done
 
 _CeladonGameCornerText6:
-    db $0,"I'm having a",$4f
-    db "wonderful time!",$57
+    text_init , "I'm having a"
+    text_line , "wonderful time!"
+    text_done
 
 _UnnamedText_48dca:
-    db $0,"Hey!",$51
-    db "You have better",$4f
-    db "things to do,",$55
-    db "champ in making!",$51
-    db "CELADON GYM's",$4f
-    db "LEADER is ERIKA!",$55
-    db "She uses grass-",$55
-    db "type #MON!",$51
-    db "She might appear",$4f
-    db "docile,but don't",$55
-    db "be fooled!",$57
+    text_init , "Hey!"
+    text_para , "You have better"
+    text_line , "things to do,"
+    text_cont , "champ in making!"
+    text_para , "CELADON GYM's"
+    text_line , "LEADER is ERIKA!"
+    text_cont , "She uses grass-"
+    text_cont , "type #MON!"
+    text_para , "She might appear"
+    text_line , "docile,but don't"
+    text_cont , "be fooled!"
+    text_done
 
 _UnnamedText_48dcf:
-    db $0,"They offer rare",$4f
-    db "#MON that can",$55
-    db "be exchanged for",$55
-    db "your coins.",$51
-    db "But,I just can't",$4f
-    db "seem to win!",$57
+    text_init , "They offer rare"
+    text_line , "#MON that can"
+    text_cont , "be exchanged for"
+    text_cont , "your coins."
+    text_para , "But,I just can't"
+    text_line , "seem to win!"
+    text_done
 
 _CeladonGameCornerText8:
-    db $0,"Games are scary!",$4f
-    db "It's so easy to",$55
-    db "get hooked!",$57
+    text_init , "Games are scary!"
+    text_line , "It's so easy to"
+    text_cont , "get hooked!"
+    text_done
 
 _UnnamedText_48e26:
-    db $0,"What's up? Want",$4f
-    db "some coins?",$58
+    text_init , "What's up? Want"
+    text_line , "some coins?"
+    text_wait
 
 _Received20CoinsText:
-    db $0,$52," received",$4f
-    db "20 coins!@@"
+    text_init , $52," received"
+    text_line , "20 coins!"
+    text_past
 
 _UnnamedText_48e31:
-    db $0,"You have lots of",$4f
-    db "coins!",$57
+    text_init , "You have lots of"
+    text_line , "coins!"
+    text_done
 
 _UnnamedText_48e36:
-    db $0,"Darn! I need more",$4f
-    db "coins for the",$55
-    db "#MON I want!",$57
+    text_init , "Darn! I need more"
+    text_line , "coins for the"
+    text_cont , "#MON I want!"
+    text_done
 
 _UnnamedText_48e88:
-    db $0,"Hey,what? You're",$4f
-    db "throwing me off!",$55
-    db "Here are some",$55
-    db "coins,shoo!",$58
+    text_init , "Hey,what? You're"
+    text_line , "throwing me off!"
+    text_cont , "Here are some"
+    text_cont , "coins,shoo!"
+    text_wait
 
 _UnnamedText_48e8d:
-    db $0,$52," received",$4f
-    db "20 coins!@@"
+    text_init , $52," received"
+    text_line , "20 coins!"
+    text_past
 
 _UnnamedText_48e93:
-    db $0,"You've got your",$4f
-    db "own coins!",$57
+    text_init , "You've got your"
+    text_line , "own coins!"
+    text_done
 
 _UnnamedText_48e98:
-    db $0,"The trick is to",$4f
-    db "watch the reels",$55
-    db "closely!",$57
+    text_init , "The trick is to"
+    text_line , "watch the reels"
+    text_cont , "closely!"
+    text_done
 
 _UnnamedText_48ece:
-    db $0,"I'm guarding this",$4f
-    db "poster!",$55
-    db "Go away,or else!",$57
+    text_init , "I'm guarding this"
+    text_line , "poster!"
+    text_cont , "Go away,or else!"
+    text_done
 
 _UnnamedText_48ed3:
-    db $0,"Dang!",$58
+    text_init , "Dang!"
+    text_wait
 
 _UnnamedText_48ed8:
-    db $0,"Our hideout might",$4f
-    db "be discovered! I",$55
-    db "better tell BOSS!",$57
+    text_init , "Our hideout might"
+    text_line , "be discovered! I"
+    text_cont , "better tell BOSS!"
+    text_done
 
 _UnnamedText_48f09:
-    db $0,"Hey!",$51
-    db "A switch behind",$4f
-    db "the poster!?",$55
-    db "Let's push it!@@"
+    text_init , "Hey!"
+    text_para , "A switch behind"
+    text_line , "the poster!?"
+    text_cont , "Let's push it!"
+    text_past
 
 _UnnamedText_48f19:
-    db $0,"Oops! Forgot the",$4f
-    db "COIN CASE!",$57
+    text_init , "Oops! Forgot the"
+    text_line , "COIN CASE!"
+    text_done
 
 _CeladonMart5Text1:
-    db $0,"#MON ability",$4f
-    db "enhancers can be",$55
-    db "bought only here.",$51
-    db "Use CALCIUM to",$4f
-    db "increase SPECIAL",$55
-    db "abilities.",$51
-    db "Use CARBOS to",$4f
-    db "increase SPEED.",$57
+    text_init , "#MON ability"
+    text_line , "enhancers can be"
+    text_cont , "bought only here."
+    text_para , "Use CALCIUM to"
+    text_line , "increase SPECIAL"
+    text_cont , "abilities."
+    text_para , "Use CARBOS to"
+    text_line , "increase SPEED."
+    text_done
 
 _CeladonMart5Text2:
-    db $0,"I'm here for",$4f
-    db "#MON ability",$55
-    db "enhancers.",$51
-    db "PROTEIN increases",$4f
-    db "ATTACK power.",$51
-    db "IRON increases",$4f
-    db "DEFENSE!",$57
+    text_init , "I'm here for"
+    text_line , "#MON ability"
+    text_cont , "enhancers."
+    text_para , "PROTEIN increases"
+    text_line , "ATTACK power."
+    text_para , "IRON increases"
+    text_line , "DEFENSE!"
+    text_done
 
 _CeladonMart5Text5:
-    db $0,"5F: DRUG STORE",$57
+    text_init , "5F: DRUG STORE"
+    text_done
 
 _CeladonPrizeRoomText1:
-    db $0,"I sure do fancy",$4f
-    db "that PORYGON!",$51 ; ~TODO
-    db "But,it's hard to",$4f
-    db "win at slots!",$57
+    text_init , "I sure do fancy"
+    text_line , "that PORYGON!"
+    text_para , "But,it's hard to"
+    text_line , "win at slots!"
+    text_done
 
 _CeladonPrizeRoomText2:
-    db $0,"I had a major",$4f
-    db "haul today!",$57
+    text_init , "I had a major"
+    text_line , "haul today!"
+    text_done
 
 _CeladonDinerText1:
-    db $0,"Hi!",$51
-    db "We're taking a",$4f
-    db "break now.",$57
+    text_init , "Hi!"
+    text_para , "We're taking a"
+    text_line , "break now."
+    text_done
 
 _CeladonDinerText2:
-    db $0,"My #MON are",$4f
-    db "weak,so I often",$55
-    db "have to go to the",$55
-    db "DRUG STORE.",$57
+    text_init , "My #MON are"
+    text_line , "weak,so I often"
+    text_cont , "have to go to the"
+    text_cont , "DRUG STORE."
+    text_done
 
 _CeladonDinerText3:
-    db $0,"Psst! There's a",$4f
-    db "basement under",$55
-    db "the GAME CORNER.",$57
+    text_init , "Psst! There's a"
+    text_line , "basement under"
+    text_cont , "the GAME CORNER."
+    text_done
 
 _CeladonDinerText4:
-    db $0,"Munch...",$51
-    db "The man at that",$4f
-    db "table lost it all",$55
-    db "at the slots.",$57
+    text_init , "Munch..."
+    text_para , "The man at that"
+    text_line , "table lost it all"
+    text_cont , "at the slots."
+    text_done
 
 _UnnamedText_491a7:
-    db $0,"Go ahead! Laugh!",$51
-    db "I'm flat out",$4f
-    db "busted!",$51
-    db "No more slots for",$4f
-    db "me! I'm going",$55
-    db "straight!",$51
-    db "Here! I won't be",$4f
-    db "needing this any-",$55
-    db "more!",$58
+    text_init , "Go ahead! Laugh!"
+    text_para , "I'm flat out"
+    text_line , "busted!"
+    text_para , "No more slots for"
+    text_line , "me! I'm going"
+    text_cont , "straight!"
+    text_para , "Here! I won't be"
+    text_line , "needing this any-"
+    text_cont , "more!"
+    text_wait
 
 _ReceivedCoinCaseText:
-    db $0,$52," received",$4f
-    db "a @"
+    text_init , $52," received"
+    text_line , "a "
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _CoinCaseNoRoomText:
-    db $0,"Make room for",$4f
-    db "this!",$57
+    text_init , "Make room for"
+    text_line , "this!"
+    text_done
 
 _UnnamedText_491b7:
-    db $0,"I always thought",$4f
-    db "I was going to",$55
-    db "win it back...",$57
+    text_init , "I always thought"
+    text_line , "I was going to"
+    text_cont , "win it back..."
+    text_done
 
 _CeladonHouseText1:
-    db $0,"Hehehe! The slots",$4f
-    db "just reel in the",$55
-    db "dough,big time!",$57
+    text_init , "Hehehe! The slots"
+    text_line , "just reel in the"
+    text_cont , "dough,big time!"
+    text_done
 
 _CeladonHouseText2:
-    db $0,"CHIEF!",$51
-    db "We just shipped",$4f
-    db "2000 #MON as",$55
-    db "slot prizes!",$57
+    text_init , "CHIEF!"
+    text_para , "We just shipped"
+    text_line , "2000 #MON as"
+    text_cont , "slot prizes!"
+    text_done
 
 _CeladonHouseText3:
-    db $0,"Don't touch the",$4f
-    db "poster at the",$55
-    db "GAME CORNER!",$51
-    db "There's no secret",$4f
-    db "switch behind it!",$57
+    text_init , "Don't touch the"
+    text_line , "poster at the"
+    text_cont , "GAME CORNER!"
+    text_para , "There's no secret"
+    text_line , "switch behind it!"
+    text_done
 
 _CeladonHotelText1:
-    db $0,"#MON? No,this",$4f
-    db "is a hotel for",$55
-    db "people.",$51
-    db "We're full up.",$57
+    text_init , "#MON? No,this"
+    text_line , "is a hotel for"
+    text_cont , "people."
+    text_para , "We're full up."
+    text_done
 
 _CeladonHotelText2:
-    db $0,"I'm on vacation",$4f
-    db "with my brother",$55
-    db "and boy friend.",$51
-    db "CELADON is such a",$4f
-    db "pretty city!",$57
+    text_init , "I'm on vacation"
+    text_line , "with my brother"
+    text_cont , "and boy friend."
+    text_para , "CELADON is such a"
+    text_line , "pretty city!"
+    text_done
 
 _CeladonHotelText3:
-    db $0,"Why did she bring",$4f
-    db "her brother?",$57
+    text_init , "Why did she bring"
+    text_line , "her brother?"
+    text_done
 
 _FuchsiaMartText2:
-    db $0,"Do you have a",$4f
-    db "SAFARI ZONE flag?",$51
-    db "What about cards",$4f
-    db "or calendars?",$57
+    text_init , "Do you have a"
+    text_line , "SAFARI ZONE flag?"
+    text_para , "What about cards"
+    text_line , "or calendars?"
+    text_done
 
 _FuchsiaMartText3:
-    db $0,"Did you try X",$4f
-    db "SPEED? It speeds",$55
-    db "up a #MON in",$55
-    db "battle!",$57
+    text_init , "Did you try X"
+    text_line , "SPEED? It speeds"
+    text_cont , "up a #MON in"
+    text_cont , "battle!"
+    text_done
 
 _FuchsiaHouse1Text1:
-    db $0,"SAFARI ZONE's",$4f
-    db "WARDEN is old,",$55
-    db "but still active!",$51
-    db "All his teeth are",$4f
-    db "false,though.",$57
+    text_init , "SAFARI ZONE's"
+    text_line , "WARDEN is old,"
+    text_cont , "but still active!"
+    text_para , "All his teeth are"
+    text_line , "false,though."
+    text_done
 
 _FuchsiaHouse1Text2:
-    db $0,"Hmm? You've met",$4f
-    db "BILL?",$51
-    db "He's my grandson!",$51
-    db "He always liked",$4f
-    db "collecting things",$55
-    db "even as a child!",$57
+    text_init , "Hmm? You've met"
+    text_line , "BILL?"
+    text_para , "He's my grandson!"
+    text_para , "He always liked"
+    text_line , "collecting things"
+    text_cont , "even as a child!"
+    text_done
 
 _FuchsiaHouse1Text3:
-    db $0,"BILL files his",$4f
-    db "own #MON data",$55
-    db "on his PC!",$51
-    db "Did he show you?",$57
+    text_init , "BILL files his"
+    text_line , "own #MON data"
+    text_cont , "on his PC!"
+    text_para , "Did he show you?"
+    text_done
 
 _FuchsiaPokecenterText1:
-    db $0,"You can't win",$4f
-    db "with just one",$55
-    db "strong #MON.",$51
-    db "It's tough,but",$4f
-    db "you have to raise",$55
-    db "them evenly.",$57
+    text_init , "You can't win"
+    text_line , "with just one"
+    text_cont , "strong #MON."
+    text_para , "It's tough,but"
+    text_line , "you have to raise"
+    text_cont , "them evenly."
+    text_done
 
 _FuchsiaPokecenterText3:
-    db $0,"There's a narrow",$4f
-    db "trail west of",$55
-    db "VIRIDIAN CITY.",$51
-    db "It goes to #MON",$4f
-    db "LEAGUE HQ.",$55
-    db "The HQ governs",$55
-    db "all trainers.",$57
+    text_init , "There's a narrow"
+    text_line , "trail west of"
+    text_cont , "VIRIDIAN CITY."
+    text_para , "It goes to #MON"
+    text_line , "LEAGUE HQ."
+    text_cont , "The HQ governs"
+    text_cont , "all trainers."
+    text_done
 
 _WardenGibberishText1:
-    db $0,"WARDEN: Hif fuff",$4f
-    db "hefifoo!",$51
-    db "Ha lof ha feef ee",$4f
-    db "hafahi ho. Heff",$55
-    db "hee fwee!",$57
+    text_init , "WARDEN: Hif fuff"
+    text_line , "hefifoo!"
+    text_para , "Ha lof ha feef ee"
+    text_line , "hafahi ho. Heff"
+    text_cont , "hee fwee!"
+    text_done
 
 _WardenGibberishText2:
-    db $0,"Ah howhee ho hoo!",$4f
-    db "Eef ee hafahi ho!",$57
+    text_init , "Ah howhee ho hoo!"
+    text_line , "Eef ee hafahi ho!"
+    text_done
 
 _WardenGibberishText3:
-    db $0,"Ha? He ohay heh",$4f
-    db "ha hoo ee haheh!",$57
+    text_init , "Ha? He ohay heh"
+    text_line , "ha hoo ee haheh!"
+    text_done
 
 _WardenTeethText1:
-    db $0,$52," gave the",$4f
-    db "GOLD TEETH to the",$55
-    db "WARDEN!@@"
+    text_init , $52," gave the"
+    text_line , "GOLD TEETH to the"
+    text_cont , "WARDEN!"
+    text_past
 
 _WardenTeethText2:
-    db $0,$51
-    db "The WARDEN popped",$4f
-    db "in his teeth!",$58
+    text_init
+    text_para , "The WARDEN popped"
+    text_line , "in his teeth!"
+    text_wait
 
 _PreHM04Text:
-    db $0,"WARDEN: Thanks,",$4f
-    db "kid! No one could",$55
-    db "understand a word",$55
-    db "that I said.",$51
-    db "I couldn't work",$4f
-    db "that way.",$55
-    db "Let me give you",$55
-    db "something for",$55
-    db "your trouble.",$58
+    text_init , "WARDEN: Thanks,"
+    text_line , "kid! No one could"
+    text_cont , "understand a word"
+    text_cont , "that I said."
+    text_para , "I couldn't work"
+    text_line , "that way."
+    text_cont , "Let me give you"
+    text_cont , "something for"
+    text_cont , "your trouble."
+    text_wait
 
 _HM04AfterText:
-    db $0,"WARDEN: Now you",$4f
-    db "know STRENGTH!",$51
-    db "It lets #MON",$4f
-    db "move boulders",$55
-    db "when you're out-",$55
-    db "side of battle.",$51
-    db "Oh yes,did you",$4f
-    db "find SECRET HOUSE",$55
-    db "in SAFARI ZONE?",$51
-    db "If you do,you win",$4f
-    db "a special Gift!",$57
+    text_init , "WARDEN: Now you"
+    text_line , "know STRENGTH!"
+    text_para , "It lets #MON"
+    text_line , "move boulders"
+    text_cont , "when you're out-"
+    text_cont , "side of battle."
+    text_para , "Oh yes,did you"
+    text_line , "find SECRET HOUSE"
+    text_cont , "in SAFARI ZONE?"
+    text_para , "If you do,you win"
+    text_line , "a special Gift!"
+    text_done
 
 _UnnamedText_75176:
-    db $0,"#MON photos",$4f
-    db "and fossils.",$57
+    text_init , "#MON photos"
+    text_line , "and fossils."
+    text_done
 
 _UnnamedText_7517b:
-    db $0,"Old #MON",$4f
-    db "merchandise.",$57
+    text_init , "Old #MON"
+    text_line , "merchandise."
+    text_done
 
 _SafariZoneEntranceText1:
-    db $0,"Welcome to the",$4f
-    db "SAFARI ZONE!",$57
+    text_init , "Welcome to the"
+    text_line , "SAFARI ZONE!"
+    text_done
 
 UnnamedText_9e6e4:
-    db $0,"For just ¥500,",$4f
-    db "you can catch all",$55
-    db "the #MON you",$55
-    db "want in the park!",$51
-    db "Would you like to",$4f
-    db "join the hunt?@@"
+    text_init , "For just ¥500,"
+    text_line , "you can catch all"
+    text_cont , "the #MON you"
+    text_cont , "want in the park!"
+    text_para , "Would you like to"
+    text_line , "join the hunt?"
+    text_past
 
 UnnamedText_9e747:
-    db $0,"That'll be ¥500",$4f
-    db "please!",$51
-    db "We only use a",$4f
-    db "special # BALL",$55
-    db "here.",$51
-    db $52," received",$4f
-    db "30 SAFARI BALLs!@@"
+    text_init , "That'll be ¥500"
+    text_line , "please!"
+    text_para , "We only use a"
+    text_line , "special # BALL"
+    text_cont , "here."
+    text_para,$52," received"
+    text_line , "30 SAFARI BALLs!"
+    text_past
 
 _UnnamedText_75360:
-    db $0,$51
-    db "We'll call you on",$4f
-    db "the PA when you",$55
-    db "run out of time",$55
-    db "or SAFARI BALLs!",$57
+    text_init
+    text_para , "We'll call you on"
+    text_line , "the PA when you"
+    text_cont , "run out of time"
+    text_cont , "or SAFARI BALLs!"
+    text_done
 
 _UnnamedText_75365:
-    db $0,"OK! Please come",$4f
-    db "again!",$57
+    text_init , "OK! Please come"
+    text_line , "again!"
+    text_done
 
 _UnnamedText_7536a:
-    db $0,"Oops! Not enough",$4f
-    db "money!",$57
+    text_init , "Oops! Not enough"
+    text_line , "money!"
+    text_done
 
 UnnamedText_9e814:
-    db $0,"Leaving early?@@"
+    text_init , "Leaving early?"
+    text_past
 
 _UnnamedText_753bb:
-    db $0,"Please return any",$4f
-    db "SAFARI BALLs you",$55
-    db "have left.",$57
+    text_init , "Please return any"
+    text_line , "SAFARI BALLs you"
+    text_cont , "have left."
+    text_done
 
 _UnnamedText_753c0:
-    db $0,"Good Luck!",$57
+    text_init , "Good Luck!"
+    text_done
 
 _UnnamedText_753c5:
-    db $0,"Did you get a",$4f
-    db "good haul?",$55
-    db "Come again!",$57
+    text_init , "Did you get a"
+    text_line , "good haul?"
+    text_cont , "Come again!"
+    text_done
 
 _UnnamedText_753e6:
-    db $0,"Hi! Is it your",$4f
-    db "first time here?",$57
+    text_init , "Hi! Is it your"
+    text_line , "first time here?"
+    text_done
 
 _UnnamedText_753eb:
-    db $0,"SAFARI ZONE has 4",$4f
-    db "zones in it.",$51
-    db "Each zone has",$4f
-    db "different kinds",$55
-    db "of #MON. Use",$55
-    db "SAFARI BALLs to",$55
-    db "catch them!",$51
-    db "When you run out",$4f
-    db "of time or SAFARI",$55
-    db "BALLs,it's game",$55
-    db "over for you!",$51
-    db "Before you go,",$4f
-    db "open an unused",$55
-    db "#MON BOX so",$55
-    db "there's room for",$55
-    db "new #MON!",$57
+    text_init , "SAFARI ZONE has 4"
+    text_line , "zones in it."
+    text_para , "Each zone has"
+    text_line , "different kinds"
+    text_cont , "of #MON. Use"
+    text_cont , "SAFARI BALLs to"
+    text_cont , "catch them!"
+    text_para , "When you run out"
+    text_line , "of time or SAFARI"
+    text_cont , "BALLs,it's game"
+    text_cont , "over for you!"
+    text_para , "Before you go,"
+    text_line , "open an unused"
+    text_cont , "#MON BOX so"
+    text_cont , "there's room for"
+    text_cont , "new #MON!"
+    text_done
 
 _UnnamedText_753f0:
-    db $0,"Sorry,you're a",$4f
-    db "regular here!",$57
+    text_init , "Sorry,you're a"
+    text_line , "regular here!"
+    text_done
 
 _UnnamedText_75581:
-    db $0,"KOGA: Fwahahaha!",$51
-    db "A mere child like",$4f
-    db "you dares to",$55
-    db "challenge me?",$51
-    db "Very well,I",$4f
-    db "shall show you",$55
-    db "true terror as a",$55
-    db "ninja master!",$51
-    db "You shall feel",$4f
-    db "the despair of",$55
-    db "poison and sleep",$55
-    db "techniques!",$57
+    text_init , "KOGA: Fwahahaha!"
+    text_para , "A mere child like"
+    text_line , "you dares to"
+    text_cont , "challenge me?"
+    text_para , "Very well,I"
+    text_line , "shall show you"
+    text_cont , "true terror as a"
+    text_cont , "ninja master!"
+    text_para , "You shall feel"
+    text_line , "the despair of"
+    text_cont , "poison and sleep"
+    text_cont , "techniques!"
+    text_done
 
 _UnnamedText_75586:
-    db $0,"Humph!",$4f
-    db "You have proven",$55
-    db "your worth!",$51
-    db "Here! Take the",$4f
-    db "SOULBADGE!",$58
+    text_init , "Humph!"
+    text_line , "You have proven"
+    text_cont , "your worth!"
+    text_para , "Here! Take the"
+    text_line , "SOULBADGE!"
+    text_wait
 
 SECTION "bank28",ROMX,BANK[$28]
 
 _UnnamedText_7558b:
-    db $0,"When afflicted by",$4f
-    db "TOXIC,#MON",$55
-    db "suffer more and",$55
-    db "more as battle",$55
-    db "progresses!",$51
-    db "It will surely",$4f
-    db "terrorize foes!",$57
+    text_init , "When afflicted by"
+    text_line , "TOXIC,#MON"
+    text_cont , "suffer more and"
+    text_cont , "more as battle"
+    text_cont , "progresses!"
+    text_para , "It will surely"
+    text_line , "terrorize foes!"
+    text_done
 
 _UnnamedText_75590:
-    db $0,"Now that you have",$4f
-    db "the SOULBADGE,",$55
-    db "the DEFENSE of",$55
-    db "your #MON",$55
-    db "increases!",$51
-    db "Ah! Take this",$4f
-    db "too!",$57
+    text_init , "Now that you have"
+    text_line , "the SOULBADGE,"
+    text_cont , "the DEFENSE of"
+    text_cont , "your #MON"
+    text_cont , "increases!"
+    text_para , "Ah! Take this"
+    text_line , "too!"
+    text_done
 
 _TM06ExplanationText:
-    db $0,$51
-    db "TM06 contains",$4f
-    db "TOXIC!",$51
-    db "It is a secret",$4f
-    db "technique over",$55
-    db "400 years old!",$57
+    text_init
+    text_para , "TM06 contains"
+    text_line , "TOXIC!"
+    text_para , "It is a secret"
+    text_line , "technique over"
+    text_cont , "400 years old!"
+    text_done
 
 _TM06NoRoomText:
-    db $0,"Make space for",$4f
-    db "this,child!",$57
+    text_init , "Make space for"
+    text_line , "this,child!"
+    text_done
 
 _FuchsiaGymBattleText1:
-    db $0,"Strength isn't",$4f
-    db "the key for",$55
-    db "#MON!",$51
-    db "It's strategy!",$51
-    db "I'll show you how",$4f
-    db "strategy can beat",$55
-    db "brute strength!",$57
+    text_init , "Strength isn't"
+    text_line , "the key for"
+    text_cont , "#MON!"
+    text_para , "It's strategy!"
+    text_para , "I'll show you how"
+    text_line , "strategy can beat"
+    text_cont , "brute strength!"
+    text_done
 
 _FuchsiaGymEndBattleText1:
-    db $0,"What?",$4f
-    db "Extraordinary!",$58
+    text_init , "What?"
+    text_line , "Extraordinary!"
+    text_wait
 
 _FuchsiaGymAfterBattleText1:
-    db $0,"So,you mix brawn",$4f
-    db "with brains?",$55
-    db "Good strategy!",$57
+    text_init , "So,you mix brawn"
+    text_line , "with brains?"
+    text_cont , "Good strategy!"
+    text_done
 
 _FuchsiaGymBattleText2:
-    db $0,"I wanted to become",$4f
-    db "a ninja,so I",$55
-    db "joined this GYM!",$57
+    text_init , "I wanted to become"
+    text_line , "a ninja,so I"
+    text_cont , "joined this GYM!"
+    text_done
 
 _FuchsiaGymEndBattleText2:
-    db $0,"I'm done",$4f
-    db "for!",$58
+    text_init , "I'm done"
+    text_line , "for!"
+    text_wait
 
 _FuchsiaGymAfterBattleText2:
-    db $0,"I will keep on",$4f
-    db "training under",$55
-    db "KOGA,my ninja",$55
-    db "master!",$57
+    text_init , "I will keep on"
+    text_line , "training under"
+    text_cont , "KOGA,my ninja"
+    text_cont , "master!"
+    text_done
 
 _FuchsiaGymBattleText3:
-    db $0,"Let's see you",$4f
-    db "beat my special",$55
-    db "techniques!",$57
+    text_init , "Let's see you"
+    text_line , "beat my special"
+    text_cont , "techniques!"
+    text_done
 
 _FuchsiaGymEndBattleText3:
-    db $0,"You",$4f
-    db "had me fooled!",$58
+    text_init , "You"
+    text_line , "had me fooled!"
+    text_wait
 
 _FuchsiaGymAfterBattleText3:
-    db $0,"I like poison and",$4f
-    db "sleep techniques,",$55
-    db "as they linger",$55
-    db "after battle!",$57
+    text_init , "I like poison and"
+    text_line , "sleep techniques,"
+    text_cont , "as they linger"
+    text_cont , "after battle!"
+    text_done
 
 _FuchsiaGymBattleText4:
-    db $0,"Stop right there!",$51
-    db "Our invisible",$4f
-    db "walls have you",$55
-    db "frustrated?",$57
+    text_init , "Stop right there!"
+    text_para , "Our invisible"
+    text_line , "walls have you"
+    text_cont , "frustrated?"
+    text_done
 
 _FuchsiaGymEndBattleText4:
-    db $0,"Whoa!",$4f
-    db "He's got it!",$58
+    text_init , "Whoa!"
+    text_line , "He's got it!"
+    text_wait
 
 _FuchsiaGymAfterBattleText4:
-    db $0,"You impressed me!",$4f
-    db "Here's a hint!",$51
-    db "Look very closely",$4f
-    db "for gaps in the",$55
-    db "invisible walls!",$57
+    text_init , "You impressed me!"
+    text_line , "Here's a hint!"
+    text_para , "Look very closely"
+    text_line , "for gaps in the"
+    text_cont , "invisible walls!"
+    text_done
 
 _FuchsiaGymBattleText5:
-    db $0,"I also study the",$4f
-    db "way of the ninja",$55
-    db "with master KOGA!",$51
-    db "Ninja have a long",$4f
-    db "history of using",$55
-    db "animals!",$57
+    text_init , "I also study the"
+    text_line , "way of the ninja"
+    text_cont , "with master KOGA!"
+    text_para , "Ninja have a long"
+    text_line , "history of using"
+    text_cont , "animals!"
+    text_done
 
 _FuchsiaGymEndBattleText5:
-    db $0,"Awoo!",$58
+    text_init , "Awoo!"
+    text_wait
 
 _FuchsiaGymAfterBattleText5:
-    db $0,"I still have much",$4f
-    db "to learn!",$57
+    text_init , "I still have much"
+    text_line , "to learn!"
+    text_done
 
 _FuchsiaGymBattleText6:
-    db $0,"Master KOGA comes",$4f
-    db "from a long line",$55
-    db "of ninjas!",$51
-    db "What did you",$4f
-    db "descend from?",$57
+    text_init , "Master KOGA comes"
+    text_line , "from a long line"
+    text_cont , "of ninjas!"
+    text_para , "What did you"
+    text_line , "descend from?"
+    text_done
 
 _FuchsiaGymEndBattleText6:
-    db $0,"Dropped",$4f
-    db "my balls!",$58
+    text_init , "Dropped"
+    text_line , "my balls!"
+    text_wait
 
 _FuchsiaGymAfterBattleText6:
-    db $0,"Where there is",$4f
-    db "light,there is",$55
-    db "shadow!",$51
-    db "Light and shadow!",$4f
-    db "Which do you",$55
-    db "choose?",$57
+    text_init , "Where there is"
+    text_line , "light,there is"
+    text_cont , "shadow!"
+    text_para , "Light and shadow!"
+    text_line , "Which do you"
+    text_cont , "choose?"
+    text_done
 
 _UnnamedText_7564e:
-    db $0,"Yo! Champ in",$4f
-    db "making!",$51
-    db "FUCHSIA GYM is",$4f
-    db "riddled with",$55
-    db "invisible walls!",$51
-    db "KOGA might appear",$4f
-    db "close,but he's",$55
-    db "blocked off!",$51
-    db "You have to find",$4f
-    db "gaps in the walls",$55
-    db "to reach him!",$57
+    text_init , "Yo! Champ in"
+    text_line , "making!"
+    text_para , "FUCHSIA GYM is"
+    text_line , "riddled with"
+    text_cont , "invisible walls!"
+    text_para , "KOGA might appear"
+    text_line , "close,but he's"
+    text_cont , "blocked off!"
+    text_para , "You have to find"
+    text_line , "gaps in the walls"
+    text_cont , "to reach him!"
+    text_done
 
 _UnnamedText_75653:
-    db $0,"It's amazing how",$4f
-    db "ninja can terrify",$55
-    db "even now!",$57
+    text_init , "It's amazing how"
+    text_line , "ninja can terrify"
+    text_cont , "even now!"
+    text_done
 
 _FuchsiaMeetingRoomText1:
-    db $0,"We nicknamed the",$4f
-    db "WARDEN SLOWPOKE.",$51
-    db "He and SLOWPOKE",$4f
-    db "both look vacant!",$57
+    text_init , "We nicknamed the"
+    text_line , "WARDEN SLOWPOKE."
+    text_para , "He and SLOWPOKE"
+    text_line , "both look vacant!"
+    text_done
 
 _FuchsiaMeetingRoomText2:
-    db $0,"SLOWPOKE is very",$4f
-    db "knowledgeable",$55
-    db "about #MON!",$51
-    db "He even has some",$4f
-    db "fossils of rare,",$55
-    db "extinct #MON!",$57
+    text_init , "SLOWPOKE is very"
+    text_line , "knowledgeable"
+    text_cont , "about #MON!"
+    text_para , "He even has some"
+    text_line , "fossils of rare,"
+    text_cont , "extinct #MON!"
+    text_done
 
 _FuchsiaMeetingRoomText3:
-    db $0,"SLOWPOKE came in,",$4f
-    db "but I couldn't",$55
-    db "understand him.",$51
-    db "I think he's got",$4f
-    db "a speech problem!",$57
+    text_init , "SLOWPOKE came in,"
+    text_line , "but I couldn't"
+    text_cont , "understand him."
+    text_para , "I think he's got"
+    text_line , "a speech problem!"
+    text_done
 
 _UnnamedText_561bd:
-    db $0,"I'm the FISHING",$4f
-    db "GURU's older",$55
-    db "brother!",$51
-    db "I simply Looove",$4f
-    db "fishing!",$51
-    db "Do you like to",$4f
-    db "fish?",$57
+    text_init , "I'm the FISHING"
+    text_line , "GURU's older"
+    text_cont , "brother!"
+    text_para , "I simply Looove"
+    text_line , "fishing!"
+    text_para , "Do you like to"
+    text_line , "fish?"
+    text_done
 
 _UnnamedText_561c2:
-    db $0,"Grand! I like",$4f
-    db "your style!",$51
-    db "Take this and",$4f
-    db "fish,young one!",$51
-    db $52," received",$4f
-    db "a @"
+    text_init , "Grand! I like"
+    text_line , "your style!"
+    text_para , "Take this and"
+    text_line , "fish,young one!"
+    text_para,$52," received"
+    text_line , "a "
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_56212:
-    db $0,"Oh... That's so",$4f
-    db "disappointing...",$57
+    text_init , "Oh... That's so"
+    text_line , "disappointing..."
+    text_done
 
 _UnnamedText_56217:
-    db $0,"Hello there,",$4f
-    db $52,"!",$51
-    db "How are the fish",$4f
-    db "biting?",$57
+    text_init , "Hello there,"
+    text_line , $52,"!"
+    text_para , "How are the fish"
+    text_line , "biting?"
+    text_done
 
 _UnnamedText_5621c:
-    db $0,"Oh no!",$51
-    db "You have no room",$4f
-    db "for my gift!",$57
+    text_init , "Oh no!"
+    text_para , "You have no room"
+    text_line , "for my gift!"
+    text_done
 
 _Mansion1BattleText2:
-    db $0,"Who are you? There",$4f
-    db "shouldn't be",$55
-    db "anyone here.",$57
+    text_init , "Who are you? There"
+    text_line , "shouldn't be"
+    text_cont , "anyone here."
+    text_done
 
 _Mansion1EndBattleText2:
-    db $0,"Ouch!",$58
+    text_init , "Ouch!"
+    text_wait
 
 _Mansion1AfterBattleText2:
-    db $0,"A key? I don't",$4f
-    db "know what you're",$55
-    db "talking about.",$57
+    text_init , "A key? I don't"
+    text_line , "know what you're"
+    text_cont , "talking about."
+    text_done
 
 _UnnamedText_44395:
-    db $0,"A secret switch!",$51
-    db "Press it?",$57
+    text_init , "A secret switch!"
+    text_para , "Press it?"
+    text_done
 
 _UnnamedText_4439a:
-    db $0,"Who wouldn't?",$58
+    text_init , "Who wouldn't?"
+    text_wait
 
 _UnnamedText_4439f:
-    db $0,"Not quite yet!",$57
+    text_init , "Not quite yet!"
+    text_done
 
 _UnnamedText_75914:
-    db $0,"Hah!",$51
-    db "I am BLAINE! I",$4f
-    db "am the LEADER of",$55
-    db "CINNABAR GYM!",$51
-    db "My fiery #MON",$4f
-    db "will incinerate",$55
-    db "all challengers!",$51
-    db "Hah! You better",$4f
-    db "have BURN HEAL!",$57
+    text_init , "Hah!"
+    text_para , "I am BLAINE! I"
+    text_line , "am the LEADER of"
+    text_cont , "CINNABAR GYM!"
+    text_para , "My fiery #MON"
+    text_line , "will incinerate"
+    text_cont , "all challengers!"
+    text_para , "Hah! You better"
+    text_line , "have BURN HEAL!"
+    text_done
 
 UnnamedText_a08c7:
-    db $0,"I have",$4f
-    db "burnt out!",$51
-    db "You have earned",$4f
-    db "the VOLCANOBADGE!@@"
+    text_init , "I have"
+    text_line , "burnt out!"
+    text_para , "You have earned"
+    text_line , "the VOLCANOBADGE!"
+    text_past
 
 _UnnamedText_75920:
-    db $0,"FIRE BLAST is the",$4f
-    db "ultimate fire",$55
-    db "technique!",$51
-    db "Don't waste it on",$4f
-    db "water #MON!",$57
+    text_init , "FIRE BLAST is the"
+    text_line , "ultimate fire"
+    text_cont , "technique!"
+    text_para , "Don't waste it on"
+    text_line , "water #MON!"
+    text_done
 
 _UnnamedText_75925:
-    db $0,"Hah!",$51
-    db "The VOLCANOBADGE",$4f
-    db "heightens the",$55
-    db "SPECIAL abilities",$55
-    db "of your #MON!",$51
-    db "Here,you can",$4f
-    db "have this too!",$57
+    text_init , "Hah!"
+    text_para , "The VOLCANOBADGE"
+    text_line , "heightens the"
+    text_cont , "SPECIAL abilities"
+    text_cont , "of your #MON!"
+    text_para , "Here,you can"
+    text_line , "have this too!"
+    text_done
 
 _TM38ExplanationText:
-    db $0,$51
-    db "TM38 contains",$4f
-    db "FIRE BLAST!",$51
-    db "Teach it to fire-",$4f
-    db "type #MON!",$51
-    db "CHARMELEON or",$4f
-    db "PONYTA would be",$55
-    db "good bets!",$57
+    text_init
+    text_para , "TM38 contains"
+    text_line , "FIRE BLAST!"
+    text_para , "Teach it to fire-"
+    text_line , "type #MON!"
+    text_para , "CHARMELEON or"
+    text_line , "PONYTA would be"
+    text_cont , "good bets!"
+    text_done
 
 _TM38NoRoomText:
-    db $0,"Make room for my",$4f
-    db "gift!",$57
+    text_init , "Make room for my"
+    text_line , "gift!"
+    text_done
 
 _UnnamedText_7595f:
-    db $0,"Do you know how",$4f
-    db "hot #MON fire",$55
-    db "breath can get?",$57
+    text_init , "Do you know how"
+    text_line , "hot #MON fire"
+    text_cont , "breath can get?"
+    text_done
 
 _UnnamedText_75964:
-    db $0,"Yow!",$4f
-    db "Hot,hot,hot!",$58
+    text_init , "Yow!"
+    text_line , "Hot,hot,hot!"
+    text_wait
 
 _UnnamedText_75969:
-    db $0,"Fire,or to be",$4f
-    db "more precise,",$55
-    db "combustion...",$51
-    db "Blah,blah,blah,",$4f
-    db "blah...",$57
+    text_init , "Fire,or to be"
+    text_line , "more precise,"
+    text_cont , "combustion..."
+    text_para , "Blah,blah,blah,"
+    text_line , "blah..."
+    text_done
 
 _UnnamedText_75994:
-    db $0,"I was a thief,but",$4f
-    db "I became straight",$55
-    db "as a trainer!",$57
+    text_init , "I was a thief,but"
+    text_line , "I became straight"
+    text_cont , "as a trainer!"
+    text_done
 
 _UnnamedText_75999:
-    db $0,"I",$4f
-    db "surrender!",$58
+    text_init , "I"
+    text_line , "surrender!"
+    text_wait
 
 _UnnamedText_7599e:
-    db $0,"I can't help",$4f
-    db "stealing other",$55
-    db "people's #MON!",$57
+    text_init , "I can't help"
+    text_line , "stealing other"
+    text_cont , "people's #MON!"
+    text_done
 
 _UnnamedText_759c9:
-    db $0,"You can't win!",$4f
-    db "I have studied",$55
-    db "#MON totally!",$57
+    text_init , "You can't win!"
+    text_line , "I have studied"
+    text_cont , "#MON totally!"
+    text_done
 
 _UnnamedText_759ce:
-    db $0,"Waah!",$4f
-    db "My studies!",$58
+    text_init , "Waah!"
+    text_line , "My studies!"
+    text_wait
 
 _UnnamedText_759d3:
-    db $0,"My theories are",$4f
-    db "too complicated",$55
-    db "for you!",$57
+    text_init , "My theories are"
+    text_line , "too complicated"
+    text_cont , "for you!"
+    text_done
 
 _UnnamedText_759fe:
-    db $0,"I just like using",$4f
-    db "fire #MON!",$57
+    text_init , "I just like using"
+    text_line , "fire #MON!"
+    text_done
 
 _UnnamedText_75a03:
-    db $0,"Too hot",$4f
-    db "to handle!",$58
+    text_init , "Too hot"
+    text_line , "to handle!"
+    text_wait
 
 _UnnamedText_75a08:
-    db $0,"I wish there was",$4f
-    db "a thief #MON!",$55
-    db "I'd use that!",$57
+    text_init , "I wish there was"
+    text_line , "a thief #MON!"
+    text_cont , "I'd use that!"
+    text_done
 
 _UnnamedText_75a33:
-    db $0,"I know why BLAINE",$4f
-    db "became a trainer!",$57
+    text_init , "I know why BLAINE"
+    text_line , "became a trainer!"
+    text_done
 
 _UnnamedText_75a38:
-    db $0,"Ow!",$58
+    text_init , "Ow!"
+    text_wait
 
 _UnnamedText_75a3d:
-    db $0,"BLAINE was lost",$4f
-    db "in the mountains",$55
-    db "when a fiery bird",$55
-    db "#MON appeared.",$51
-    db "Its light enabled",$4f
-    db "BLAINE to find",$55
-    db "his way down!",$57
+    text_init , "BLAINE was lost"
+    text_line , "in the mountains"
+    text_cont , "when a fiery bird"
+    text_cont , "#MON appeared."
+    text_para , "Its light enabled"
+    text_line , "BLAINE to find"
+    text_cont , "his way down!"
+    text_done
 
 _UnnamedText_75a68:
-    db $0,"I've been to many",$4f
-    db "GYMs,but this is",$55
-    db "my favorite!",$57
+    text_init , "I've been to many"
+    text_line , "GYMs,but this is"
+    text_cont , "my favorite!"
+    text_done
 
 _UnnamedText_75a6d:
-    db $0,"Yowza!",$4f
-    db "Too hot!",$58
+    text_init , "Yowza!"
+    text_line , "Too hot!"
+    text_wait
 
 _UnnamedText_75a72:
-    db $0,"Us fire #MON",$4f
-    db "fans like PONYTA",$55
-    db "and NINETALES!",$57
+    text_init , "Us fire #MON"
+    text_line , "fans like PONYTA"
+    text_cont , "and NINETALES!"
+    text_done
 
 _UnnamedText_75a9d:
-    db $0,"Fire is weak",$4f
-    db "against H2O!",$57
+    text_init , "Fire is weak"
+    text_line , "against H2O!"
+    text_done
 
 _UnnamedText_75aa2:
-    db $0,"Oh!",$4f
-    db "Snuffed out!",$58
+    text_init , "Oh!"
+    text_line , "Snuffed out!"
+    text_wait
 
 _UnnamedText_75aa7:
-    db $0,"Water beats fire!",$4f
-    db "But,fire melts",$55
-    db "ice #MON!",$57
+    text_init , "Water beats fire!"
+    text_line , "But,fire melts"
+    text_cont , "ice #MON!"
+    text_done
 
 _UnnamedText_75ac2:
-    db $0,"Yo! Champ in",$4f
-    db "making!",$51
-    db "The hot-headed",$4f
-    db "BLAINE is a fire",$55
-    db "#MON pro!",$51
-    db "Douse his spirits",$4f
-    db "with water!",$51
-    db "You better take",$4f
-    db "some BURN HEALs!",$57
+    text_init , "Yo! Champ in"
+    text_line , "making!"
+    text_para , "The hot-headed"
+    text_line , "BLAINE is a fire"
+    text_cont , "#MON pro!"
+    text_para , "Douse his spirits"
+    text_line , "with water!"
+    text_para , "You better take"
+    text_line , "some BURN HEALs!"
+    text_done
 
 _UnnamedText_75ac7:
-    db $0,$52,"! You beat",$4f
-    db "that fire brand!",$57
+    text_init , $52,"! You beat"
+    text_line , "that fire brand!"
+    text_done
 
 _Lab1Text1:
-    db $0,"We study #MON",$4f
-    db "extensively here.",$51
-    db "People often bring",$4f
-    db "us rare #MON",$55
-    db "for examination.",$57
+    text_init , "We study #MON"
+    text_line , "extensively here."
+    text_para , "People often bring"
+    text_line , "us rare #MON"
+    text_cont , "for examination."
+    text_done
 
 _Lab1Text2:
-    db $0,"A photo of the",$4f
-    db "LAB's founder,",$55
-    db "DR.FUJI!",$57
+    text_init , "A photo of the"
+    text_line , "LAB's founder,"
+    text_cont , "DR.FUJI!"
+    text_done
 
 _Lab1Text3:
-    db $0,"#MON LAB",$4f
-    db "Meeting Room",$57
+    text_init , "#MON LAB"
+    text_line , "Meeting Room"
+    text_done
 
 _Lab1Text4:
-    db $0,"#MON LAB",$4f
-    db "R-and-D Room",$57
+    text_init , "#MON LAB"
+    text_line , "R-and-D Room"
+    text_done
 
 _Lab1Text5:
-    db $0,"#MON LAB",$4f
-    db "Testing Room",$57
+    text_init , "#MON LAB"
+    text_line , "Testing Room"
+    text_done
 
 _Lab2Text1:
-    db $0,"I found this very",$4f
-    db "strange fossil in",$55
-    db "MT.MOON!",$51
-    db "I think it's a",$4f
-    db "rare,prehistoric",$55
-    db "#MON!",$57
+    text_init , "I found this very"
+    text_line , "strange fossil in"
+    text_cont , "MT.MOON!"
+    text_para , "I think it's a"
+    text_line , "rare,prehistoric"
+    text_cont , "#MON!"
+    text_done
 
 _TM35PreReceiveText:
-    db $0,"Tch-tch-tch!",$4f
-    db "I made a cool TM!",$51
-    db "It can cause all",$4f
-    db "kinds of fun!",$58
+    text_init , "Tch-tch-tch!"
+    text_line , "I made a cool TM!"
+    text_para , "It can cause all"
+    text_line , "kinds of fun!"
+    text_wait
 
 _TM35ExplanationText:
-    db $0,"Tch-tch-tch!",$4f
-    db "That's the sound",$55
-    db "of a METRONOME!",$51
-    db "It tweaks your",$4f
-    db "#MON's brain",$55
-    db "into using moves",$55
-    db "it doesn't know!",$57
+    text_init , "Tch-tch-tch!"
+    text_line , "That's the sound"
+    text_cont , "of a METRONOME!"
+    text_para , "It tweaks your"
+    text_line , "#MON's brain"
+    text_cont , "into using moves"
+    text_cont , "it doesn't know!"
+    text_done
 
 _TM35NoRoomText:
-    db $0,"Your pack is",$4f
-    db "crammed full!",$57
+    text_init , "Your pack is"
+    text_line , "crammed full!"
+    text_done
 
 _Lab3Text2:
-    db $0,"EEVEE can evolve",$4f
-    db "into 1 of 3 kinds",$55
-    db "of #MON.",$57
+    text_init , "EEVEE can evolve"
+    text_line , "into 1 of 3 kinds"
+    text_cont , "of #MON."
+    text_done
 
 _Lab3Text3:
-    db $0,"There's an e-mail",$4f
-    db "message!",$51
-    db "...",$51
-    db "The 3 legendary",$4f
-    db "bird #MON are",$55
-    db "ARTICUNO,ZAPDOS",$55
-    db "and MOLTRES.",$51
-    db "Their whereabouts",$4f
-    db "are unknown.",$51
-    db "We plan to explore",$4f
-    db "the cavern close",$55
-    db "to CERULEAN.",$51
-    db "From: #MON",$4f
-    db "RESEARCH TEAM",$51
-    db "...",$57
+    text_init , "There's an e-mail"
+    text_line , "message!"
+    text_para , "..."
+    text_para , "The 3 legendary"
+    text_line , "bird #MON are"
+    text_cont , "ARTICUNO,ZAPDOS"
+    text_cont , "and MOLTRES."
+    text_para , "Their whereabouts"
+    text_line , "are unknown."
+    text_para , "We plan to explore"
+    text_line , "the cavern close"
+    text_cont , "to CERULEAN."
+    text_para , "From: #MON"
+    text_line , "RESEARCH TEAM"
+    text_para , "..."
+    text_done
 
 _Lab3Text5:
-    db $0,"An amber pipe!",$57
+    text_init , "An amber pipe!"
+    text_done
 
 _UnnamedText_75dc6:
-    db $0,"Hiya!",$51
-    db "I am important",$4f
-    db "doctor!",$51
-    db "I study here rare",$4f
-    db "#MON fossils!",$51
-    db "You! Have you a",$4f
-    db "fossil for me?",$58
+    text_init , "Hiya!"
+    text_para , "I am important"
+    text_line , "doctor!"
+    text_para , "I study here rare"
+    text_line , "#MON fossils!"
+    text_para , "You! Have you a"
+    text_line , "fossil for me?"
+    text_wait
 
 _UnnamedText_75dcb:
-    db $0,"No! Is too bad!",$57
+    text_init , "No! Is too bad!"
+    text_done
 
 _UnnamedText_75dd0:
-    db $0,"I take a little",$4f
-    db "time!",$51
-    db "You go for walk a",$4f
-    db "little while!",$57
+    text_init , "I take a little"
+    text_line , "time!"
+    text_para , "You go for walk a"
+    text_line , "little while!"
+    text_done
 
 _UnnamedText_75dd5:
-    db $0,"Where were you?",$51
-    db "Your fossil is",$4f
-    db "back to life!",$51
-    db "It was @"
-
-UnnamedText_a11c3:
+    text_init , "Where were you?"
+    text_para , "Your fossil is"
+    text_line , "back to life!"
+    text_para , "It was "
+    text_paus
     TX_RAM $cf4b
-    db $0,$4f
-    db "like I think!",$58
+    text_init
+    text_line , "like I think!"
+    text_wait
 
 _UnnamedText_610ae:
-    db $0,"Oh! That is",$4f
-    db "@"
-
-UnnamedText_a11e4:
+    text_init , "Oh! That is"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0,"!",$51
-    db "It is fossil of",$4f
-    db "@"
+    text_init , "!"
+    text_para , "It is fossil of"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,",a",$55
-    db "#MON that is",$55
-    db "already extinct!",$51
-    db "My Resurrection",$4f
-    db "Machine will make",$55
-    db "that #MON live",$55
-    db "again!",$57
+    text_init , ",a"
+    text_cont , "#MON that is"
+    text_cont , "already extinct!"
+    text_para , "My Resurrection"
+    text_line , "Machine will make"
+    text_cont , "that #MON live"
+    text_cont , "again!"
+    text_done
 
 _UnnamedText_610b3:
-    db $0,"So! You hurry and",$4f
-    db "give me that!",$51
-    db $52," handed",$4f
-    db "over @"
+    text_init , "So! You hurry and"
+    text_line , "give me that!"
+    text_para,$52," handed"
+    text_line , "over "
+    text_paus
     TX_RAM $cd6d
-    db $0,"!",$58
+    text_init , "!"
+    text_wait
 
 _UnnamedText_610b8:
-    db $0,"I take a little",$4f
-    db "time!",$51
-    db "You go for walk a",$4f
-    db "little while!",$57
+    text_init , "I take a little"
+    text_line , "time!"
+    text_para , "You go for walk a"
+    text_line , "little while!"
+    text_done
 
 _UnnamedText_610bd:
-    db $0,"Aiyah! You come",$4f
-    db "again!",$57
+    text_init , "Aiyah! You come"
+    text_line , "again!"
+    text_done
 
 _CinnabarPokecenterText2:
 _CinnabarPokecenterText1:
-    db $0,"You can cancel",$4f
-    db "evolution.",$51
-    db "When a #MON is",$4f
-    db "evolving,you can",$55
-    db "stop it and leave",$55
-    db "it the way it is.",$57
+    text_init , "You can cancel"
+    text_line , "evolution."
+    text_para , "When a #MON is"
+    text_line , "evolving,you can"
+    text_cont , "stop it and leave"
+    text_cont , "it the way it is."
+    text_done
 
 _CinnabarPokecenterText3:
-    db $0,"Do you have any",$4f
-    db "friends?",$51
-    db "#MON you get",$4f
-    db "in trades grow",$55
-    db "very quickly.",$51
-    db "I think it's",$4f
-    db "worth a try!",$57
+    text_init , "Do you have any"
+    text_line , "friends?"
+    text_para , "#MON you get"
+    text_line , "in trades grow"
+    text_cont , "very quickly."
+    text_para , "I think it's"
+    text_line , "worth a try!"
+    text_done
 
 _CinnabarMartText2:
-    db $0,"Don't they have X",$4f
-    db "ATTACK? It's good",$55
-    db "for battles!",$57
+    text_init , "Don't they have X"
+    text_line , "ATTACK? It's good"
+    text_cont , "for battles!"
+    text_done
 
 _CinnabarMartText3:
-    db $0,"It never hurts to",$4f
-    db "have extra items!",$57
+    text_init , "It never hurts to"
+    text_line , "have extra items!"
+    text_done
 
 _IndigoPlateauLobbyText1:
-    db $0,"Yo! Champ in",$4f
-    db "making!",$51
-    db "At #MON LEAGUE,",$4f
-    db "you have to face",$55
-    db "the ELITE FOUR in",$55
-    db "succession.",$51
-    db "If you lose,you",$4f
-    db "have to start all",$55
-    db "over again! This",$55
-    db "is it! Go for it!",$57
+    text_init , "Yo! Champ in"
+    text_line , "making!"
+    text_para , "At #MON LEAGUE,"
+    text_line , "you have to face"
+    text_cont , "the ELITE FOUR in"
+    text_cont , "succession."
+    text_para , "If you lose,you"
+    text_line , "have to start all"
+    text_cont , "over again! This"
+    text_cont , "is it! Go for it!"
+    text_done
 
 _IndigoPlateauLobbyText3:
-    db $0,"From here on,you",$4f
-    db "face the ELITE",$55
-    db "FOUR one by one!",$51
-    db "If you win,a",$4f
-    db "door opens to the",$55
-    db "next trainer!",$55
-    db "Good luck!",$57
+    text_init , "From here on,you"
+    text_line , "face the ELITE"
+    text_cont , "FOUR one by one!"
+    text_para , "If you win,a"
+    text_line , "door opens to the"
+    text_cont , "next trainer!"
+    text_cont , "Good luck!"
+    text_done
 
 _CopycatsHouseF1Text1:
-    db $0,"My daughter is so",$4f
-    db "self-centered.",$55
-    db "She only has a",$55
-    db "few friends.",$57
+    text_init , "My daughter is so"
+    text_line , "self-centered."
+    text_cont , "She only has a"
+    text_cont , "few friends."
+    text_done
 
 _CopycatsHouseF1Text2:
-    db $0,"My daughter likes",$4f
-    db "to mimic people.",$51
-    db "Her mimicry has",$4f
-    db "earned her the",$55
-    db "nickname COPYCAT",$55
-    db "around here!",$57
+    text_init , "My daughter likes"
+    text_line , "to mimic people."
+    text_para , "Her mimicry has"
+    text_line , "earned her the"
+    text_cont , "nickname COPYCAT"
+    text_cont , "around here!"
+    text_done
 
 _CopycatsHouseF1Text3:
-    db $0,"CHANSEY: Chaan!",$4f
-    db "Sii!@@"
+    text_init , "CHANSEY: Chaan!"
+    text_line , "Sii!"
+    text_past
 
 _UnnamedText_5ccd4:
-    db $0,$52,": Hi! Do",$4f
-    db "you like #MON?",$51
-    db $52,": Uh no,I",$4f
-    db "just asked you.",$51
-    db $52,": Huh?",$4f
-    db "You're strange!",$51
-    db "COPYCAT: Hmm?",$4f
-    db "Quit mimicking?",$51
-    db "But,that's my",$4f
-    db "favorite hobby!",$58
+    text_init , $52,": Hi! Do"
+    text_line , "you like #MON?"
+    text_para,$52,": Uh no,I"
+    text_line , "just asked you."
+    text_para,$52,": Huh?"
+    text_line , "You're strange!"
+    text_para , "COPYCAT: Hmm?"
+    text_line , "Quit mimicking?"
+    text_para , "But,that's my"
+    text_line , "favorite hobby!"
+    text_wait
 
 _TM31PreReceiveText:
-    db $0,"Oh wow!",$4f
-    db "A # DOLL!",$51
-    db "For me?",$4f
-    db "Thank you!",$51
-    db "You can have",$4f
-    db "this,then!",$58
+    text_init , "Oh wow!"
+    text_line , "A # DOLL!"
+    text_para , "For me?"
+    text_line , "Thank you!"
+    text_para , "You can have"
+    text_line , "this,then!"
+    text_wait
 
 _TM31ExplanationText1:
-    db $0,$51
-    db "TM31 contains my",$4f
-    db "favorite,MIMIC!",$51
-    db "Use it on a good",$4f
-    db "#MON!@@"
+    text_init
+    text_para , "TM31 contains my"
+    text_line , "favorite,MIMIC!"
+    text_para , "Use it on a good"
+    text_line , "#MON!"
+    text_past
 
 _TM31ExplanationText2:
-    db $0,$52,": Hi!",$4f
-    db "Thanks for TM31!",$51
-    db $52,": Pardon?",$51
-    db $52,": Is it",$4f
-    db "that fun to mimic",$55
-    db "my every move?",$51
-    db "COPYCAT: You bet!",$4f
-    db "It's a scream!",$57
+    text_init , $52,": Hi!"
+    text_line , "Thanks for TM31!"
+    text_para,$52,": Pardon?"
+    text_para,$52,": Is it"
+    text_line , "that fun to mimic"
+    text_cont , "my every move?"
+    text_para , "COPYCAT: You bet!"
+    text_line , "It's a scream!"
+    text_done
 
 _TM31NoRoomText:
-    db $0,"Don't you want",$4f
-    db "this?@@"
+    text_init , "Don't you want"
+    text_line , "this?"
+    text_past
 
 _CopycatsHouseF2Text2:
-    db $0,"DODUO: Giiih!@@"
+    text_init , "DODUO: Giiih!"
+    text_past
 
 _CopycatsHouseOnlyDollText:
-    db $0,"This is a rare",$4f
-    db "#MON! Huh?",$55
-    db "It's only a doll!",$57
+    text_init , "This is a rare"
+    text_line , "#MON! Huh?"
+    text_cont , "It's only a doll!"
+    text_done
 
 _CopycatsHouseF2Text6:
-    db $0,"A game with MARIO",$4f
-    db "wearing a bucket",$55
-    db "on his head!",$57
+    text_init , "A game with MARIO"
+    text_line , "wearing a bucket"
+    text_cont , "on his head!"
+    text_done
 
 _UnnamedText_5cd17:
-    db $0,"...",$51
-    db "My Secrets!",$51
-    db "Skill: Mimicry!",$4f
-    db "Hobby: Collecting",$55
-    db "dolls!",$55
-    db "Favorite #MON:",$55
-    db "CLEFAIRY!",$57
+    text_init , "..."
+    text_para , "My Secrets!"
+    text_para , "Skill: Mimicry!"
+    text_line , "Hobby: Collecting"
+    text_cont , "dolls!"
+    text_cont , "Favorite #MON:"
+    text_cont , "CLEFAIRY!"
+    text_done
 
 _UnnamedText_5cd1c:
-    db $0,"Huh? Can't see!",$57
+    text_init , "Huh? Can't see!"
+    text_done
 
 _UnnamedText_5ce8e:
-    db $0,"Grunt!",$51
-    db "I am the KARATE",$4f
-    db "MASTER! I am the",$55
-    db "LEADER here!",$51
-    db "You wish to",$4f
-    db "challenge us?",$55
-    db "Expect no mercy!",$51
-    db "Fwaaa!",$57
+    text_init , "Grunt!"
+    text_para , "I am the KARATE"
+    text_line , "MASTER! I am the"
+    text_cont , "LEADER here!"
+    text_para , "You wish to"
+    text_line , "challenge us?"
+    text_cont , "Expect no mercy!"
+    text_para , "Fwaaa!"
+    text_done
 
 _UnnamedText_5ce93:
-    db $0,"Hwa!",$4f
-    db "Arrgh! Beaten!",$58
+    text_init , "Hwa!"
+    text_line , "Arrgh! Beaten!"
+    text_wait
 
 _UnnamedText_5ce98:
-    db $0,"Indeed,I have",$4f
-    db "lost!",$51
-    db "But,I beseech",$4f
-    db "you,do not take",$55
-    db "our emblem as",$55
-    db "your trophy!",$51
-    db "In return,I will",$4f
-    db "give you a prized",$55
-    db "fighting #MON!",$51
-    db "Choose whichever",$4f
-    db "one you like!",$57
+    text_init , "Indeed,I have"
+    text_line , "lost!"
+    text_para , "But,I beseech"
+    text_line , "you,do not take"
+    text_cont , "our emblem as"
+    text_cont , "your trophy!"
+    text_para , "In return,I will"
+    text_line , "give you a prized"
+    text_cont , "fighting #MON!"
+    text_para , "Choose whichever"
+    text_line , "one you like!"
+    text_done
 
 _UnnamedText_5ce9d:
-    db $0,"Ho!",$51
-    db "Stay and train at",$4f
-    db "Karate with us!",$57
+    text_init , "Ho!"
+    text_para , "Stay and train at"
+    text_line , "Karate with us!"
+    text_done
 
 _FightingDojoBattleText1:
-    db $0,"Hoargh! Take your",$4f
-    db "shoes off!",$57
+    text_init , "Hoargh! Take your"
+    text_line , "shoes off!"
+    text_done
 
 _FightingDojoEndBattleText1:
-    db $0,"I give",$4f
-    db "up!",$58
+    text_init , "I give"
+    text_line , "up!"
+    text_wait
 
 _FightingDojoAfterBattleText1:
-    db $0,"You wait 'til you",$4f
-    db "see our Master!",$51
-    db "I'm a small fry",$4f
-    db "compared to him!",$57
+    text_init , "You wait 'til you"
+    text_line , "see our Master!"
+    text_para , "I'm a small fry"
+    text_line , "compared to him!"
+    text_done
 
 _FightingDojoBattleText2:
-    db $0,"I hear you're",$4f
-    db "good! Show me!",$57
+    text_init , "I hear you're"
+    text_line , "good! Show me!"
+    text_done
 
 _FightingDojoEndBattleText2:
-    db $0,"Judge!",$4f
-    db "1 point!",$58
+    text_init , "Judge!"
+    text_line , "1 point!"
+    text_wait
 
 _FightingDojoAfterBattleText2:
-    db $0,"Our Master is a",$4f
-    db "pro fighter!",$57
+    text_init , "Our Master is a"
+    text_line , "pro fighter!"
+    text_done
 
 _FightingDojoBattleText3:
-    db $0,"Nothing tough",$4f
-    db "frightens me!",$51
-    db "I break boulders",$4f
-    db "for training!",$57
+    text_init , "Nothing tough"
+    text_line , "frightens me!"
+    text_para , "I break boulders"
+    text_line , "for training!"
+    text_done
 
 _FightingDojoEndBattleText3:
-    db $0,"Yow!",$4f
-    db "Stubbed fingers!",$58
+    text_init , "Yow!"
+    text_line , "Stubbed fingers!"
+    text_wait
 
 _FightingDojoAfterBattleText3:
-    db $0,"The only thing",$4f
-    db "that frightens us",$55
-    db "is psychic power!",$57
+    text_init , "The only thing"
+    text_line , "that frightens us"
+    text_cont , "is psychic power!"
+    text_done
 
 _FightingDojoBattleText4:
-    db $0,"Hoohah!",$51
-    db "You're trespassing",$4f
-    db "in our FIGHTING",$55
-    db "DOJO!",$57
+    text_init , "Hoohah!"
+    text_para , "You're trespassing"
+    text_line , "in our FIGHTING"
+    text_cont , "DOJO!"
+    text_done
 
 _FightingDojoEndBattleText4:
-    db $0,"Oof!",$4f
-    db "I give up!",$58
+    text_init , "Oof!"
+    text_line , "I give up!"
+    text_wait
 
 _FightingDojoAfterBattleText4:
-    db $0,"The prime fighters",$4f
-    db "across the land",$55
-    db "train here.",$57
+    text_init , "The prime fighters"
+    text_line , "across the land"
+    text_cont , "train here."
+    text_done
 
 _WantHitmonleeText:
-    db $0,"You want the",$4f
-    db "hard kicking",$55
-    db "HITMONLEE?",$57
+    text_init , "You want the"
+    text_line , "hard kicking"
+    text_cont , "HITMONLEE?"
+    text_done
 
 _WantHitmonchanText:
-    db $0,"You want the",$4f
-    db "piston punching",$55
-    db "HITMONCHAN?",$57
+    text_init , "You want the"
+    text_line , "piston punching"
+    text_cont , "HITMONCHAN?"
+    text_done
 
 _OtherHitmonText:
-    db $0,"Better not get",$4f
-    db "greedy...",$57
+    text_init , "Better not get"
+    text_line , "greedy..."
+    text_done
 
 _UnnamedText_5d162:
-    db $0,"I had a vision of",$4f
-    db "your arrival!",$51
-    db "I have had psychic",$4f
-    db "powers since I",$55
-    db "was a child.",$51
-    db "I first learned",$4f
-    db "to bend spoons",$55
-    db "with my mind.",$51
-    db "I dislike fight-",$4f
-    db "ing,but if you",$55
-    db "wish,I will show",$55
-    db "you my powers!",$57
+    text_init , "I had a vision of"
+    text_line , "your arrival!"
+    text_para , "I have had psychic"
+    text_line , "powers since I"
+    text_cont , "was a child."
+    text_para , "I first learned"
+    text_line , "to bend spoons"
+    text_cont , "with my mind."
+    text_para , "I dislike fight-"
+    text_line , "ing,but if you"
+    text_cont , "wish,I will show"
+    text_cont , "you my powers!"
+    text_done
 
 _UnnamedText_5d167:
-    db $0,"I'm",$4f
-    db "shocked!",$55
-    db "But,a loss is a",$55
-    db "loss.",$51
-    db "I admit I didn't",$4f
-    db "work hard enough",$55
-    db "to win!",$51
-    db "You earned the",$4f
-    db "MARSHBADGE!@@"
+    text_init , "I'm"
+    text_line , "shocked!"
+    text_cont , "But,a loss is a"
+    text_cont , "loss."
+    text_para , "I admit I didn't"
+    text_line , "work hard enough"
+    text_cont , "to win!"
+    text_para , "You earned the"
+    text_line , "MARSHBADGE!"
+    text_past
 
 _UnnamedText_5d16e:
-    db $0,"Everyone has",$4f
-    db "psychic power!",$55
-    db "People just don't",$55
-    db "realize it!",$57
+    text_init , "Everyone has"
+    text_line , "psychic power!"
+    text_cont , "People just don't"
+    text_cont , "realize it!"
+    text_done
 
 _UnnamedText_5d173:
-    db $0,"Wait,please take",$4f
-    db "this TM with you!",$57
+    text_init , "Wait,please take"
+    text_line , "this TM with you!"
+    text_done
 
 _TM46ExplanationText:
-    db $0,$51
-    db "TM29 is PSYCHIC!",$51
-    db "It can lower the",$4f
-    db "target's SPECIAL",$55
-    db "abilities.",$57
+    text_init
+    text_para , "TM29 is PSYCHIC!"
+    text_para , "It can lower the"
+    text_line , "target's SPECIAL"
+    text_cont , "abilities."
+    text_done
 
 _TM46NoRoomText:
-    db $0,"Your pack is full",$4f
-    db "of other items!",$57
+    text_init , "Your pack is full"
+    text_line , "of other items!"
+    text_done
 
 _UnnamedText_5d1e6:
-    db $0,"Yo! Champ in",$4f
-    db "making!",$51
-    db "SABRINA's #MON",$4f
-    db "use psychic power",$55
-    db "instead of force!",$51
-    db "Fighting #MON",$4f
-    db "are weak against",$55
-    db "psychic #MON!",$51
-    db "They get creamed",$4f
-    db "before they can",$55
-    db "even aim a punch!",$57
+    text_init , "Yo! Champ in"
+    text_line , "making!"
+    text_para , "SABRINA's #MON"
+    text_line , "use psychic power"
+    text_cont , "instead of force!"
+    text_para , "Fighting #MON"
+    text_line , "are weak against"
+    text_cont , "psychic #MON!"
+    text_para , "They get creamed"
+    text_line , "before they can"
+    text_cont , "even aim a punch!"
+    text_done
 
 _UnnamedText_5d1eb:
-    db $0,"Psychic power,",$4f
-    db "huh?",$51
-    db "If I had that,",$4f
-    db "I'd make a bundle",$55
-    db "at the slots!",$57
+    text_init , "Psychic power,"
+    text_line , "huh?"
+    text_para , "If I had that,"
+    text_line , "I'd make a bundle"
+    text_cont , "at the slots!"
+    text_done
 
 _SaffronGymBattleText1:
-    db $0,"SABRINA is younger",$4f
-    db "than I,but I",$55
-    db "respect her!",$57
+    text_init , "SABRINA is younger"
+    text_line , "than I,but I"
+    text_cont , "respect her!"
+    text_done
 
 _SaffronGymEndBattleText1:
-    db $0,"Not",$4f
-    db "good enough!",$58
+    text_init , "Not"
+    text_line , "good enough!"
+    text_wait
 
 _SaffronGymAfterBattleText1:
-    db $0,"In a battle of",$4f
-    db "equals,the one",$55
-    db "with the stronger",$55
-    db "will wins!",$51
-    db "If you wish",$4f
-    db "to beat SABRINA,",$55
-    db "focus on winning!",$57
+    text_init , "In a battle of"
+    text_line , "equals,the one"
+    text_cont , "with the stronger"
+    text_cont , "will wins!"
+    text_para , "If you wish"
+    text_line , "to beat SABRINA,"
+    text_cont , "focus on winning!"
+    text_done
 
 _SaffronGymBattleText2:
-    db $0,"Does our unseen",$4f
-    db "power scare you?",$57
+    text_init , "Does our unseen"
+    text_line , "power scare you?"
+    text_done
 
 _SaffronGymEndBattleText2:
-    db $0,"I never",$4f
-    db "foresaw this!",$58
+    text_init , "I never"
+    text_line , "foresaw this!"
+    text_wait
 
 _SaffronGymAfterBattleText2:
-    db $0,"Psychic #MON",$4f
-    db "fear only ghosts",$55
-    db "and bugs!",$57
+    text_init , "Psychic #MON"
+    text_line , "fear only ghosts"
+    text_cont , "and bugs!"
+    text_done
 
 _SaffronGymBattleText3:
-    db $0,"#MON take on",$4f
-    db "the appearance of",$55
-    db "their trainers.",$51
-    db "Your #MON must",$4f
-    db "be tough,then!",$57
+    text_init , "#MON take on"
+    text_line , "the appearance of"
+    text_cont , "their trainers."
+    text_para , "Your #MON must"
+    text_line , "be tough,then!"
+    text_done
 
 _SaffronGymEndBattleText3:
-    db $0,"I knew",$4f
-    db "it!",$58
+    text_init , "I knew"
+    text_line , "it!"
+    text_wait
 
 _SaffronGymAfterBattleText3:
-    db $0,"I must teach",$4f
-    db "better techniques",$55
-    db "to my #MON!",$57
+    text_init , "I must teach"
+    text_line , "better techniques"
+    text_cont , "to my #MON!"
+    text_done
 
 _SaffronGymBattleText4:
-    db $0,"You know that",$4f
-    db "power alone isn't",$55
-    db "enough!",$57
+    text_init , "You know that"
+    text_line , "power alone isn't"
+    text_cont , "enough!"
+    text_done
 
 _SaffronGymEndBattleText4:
-    db $0,"I don't",$4f
-    db "believe this!",$58
+    text_init , "I don't"
+    text_line , "believe this!"
+    text_wait
 
 _SaffronGymAfterBattleText4:
-    db $0,"SABRINA just wiped",$4f
-    db "out the KARATE",$55
-    db "MASTER next door!",$57
+    text_init , "SABRINA just wiped"
+    text_line , "out the KARATE"
+    text_cont , "MASTER next door!"
+    text_done
 
 _SaffronGymBattleText5:
-    db $0,"You and I,our",$4f
-    db "#MON shall",$55
-    db "fight!",$57
+    text_init , "You and I,our"
+    text_line , "#MON shall"
+    text_cont , "fight!"
+    text_done
 
 _SaffronGymEndBattleText5:
-    db $0,"I lost",$4f
-    db "after all!",$58
+    text_init , "I lost"
+    text_line , "after all!"
+    text_wait
 
 _SaffronGymAfterBattleText5:
-    db $0,"I knew that this",$4f
-    db "was going to take",$55
-    db "place.",$57
+    text_init , "I knew that this"
+    text_line , "was going to take"
+    text_cont , "place."
+    text_done
 
 _SaffronGymBattleText6:
-    db $0,"SABRINA is young,",$4f
-    db "but she's also",$55
-    db "our LEADER!",$51
-    db "You won't reach",$4f
-    db "her easily!",$57
+    text_init , "SABRINA is young,"
+    text_line , "but she's also"
+    text_cont , "our LEADER!"
+    text_para , "You won't reach"
+    text_line , "her easily!"
+    text_done
 
 _SaffronGymEndBattleText6:
-    db $0,"I lost",$4f
-    db "my concentration!",$58
+    text_init , "I lost"
+    text_line , "my concentration!"
+    text_wait
 
 _SaffronGymAfterBattleText6:
-    db $0,"There used to be",$4f
-    db "2 #MON GYMs in",$55
-    db "SAFFRON.",$51
-    db "The FIGHTING DOJO",$4f
-    db "next door lost",$55
-    db "its GYM status",$55
-    db "when we went and",$55
-    db "creamed them!",$57
+    text_init , "There used to be"
+    text_line , "2 #MON GYMs in"
+    text_cont , "SAFFRON."
+    text_para , "The FIGHTING DOJO"
+    text_line , "next door lost"
+    text_cont , "its GYM status"
+    text_cont , "when we went and"
+    text_cont , "creamed them!"
+    text_done
 
 _SaffronGymBattleText7:
-    db $0,"SAFFRON #MON",$4f
-    db "GYM is famous for",$55
-    db "its psychics!",$51
-    db "You want to see",$4f
-    db "SABRINA!",$55
-    db "I can tell!",$57
+    text_init , "SAFFRON #MON"
+    text_line , "GYM is famous for"
+    text_cont , "its psychics!"
+    text_para , "You want to see"
+    text_line , "SABRINA!"
+    text_cont , "I can tell!"
+    text_done
 
 _SaffronGymEndBattleText7:
-    db $0,"Arrrgh!",$58
+    text_init , "Arrrgh!"
+    text_wait
 
 _SaffronGymAfterBattleText7:
-    db $0,"That's right! I",$4f
-    db "used telepathy to",$55
-    db "read your mind!",$57
+    text_init , "That's right! I"
+    text_line , "used telepathy to"
+    text_cont , "read your mind!"
+    text_done
 
 _SaffronHouse1Text1:
-    db $0,"Thank you for",$4f
-    db "writing. I hope",$55
-    db "to see you soon!",$51
-    db "Hey! Don't look",$4f
-    db "at my letter!",$57
+    text_init , "Thank you for"
+    text_line , "writing. I hope"
+    text_cont , "to see you soon!"
+    text_para , "Hey! Don't look"
+    text_line , "at my letter!"
+    text_done
 
 _SaffronHouse1Text2:
-    db $0,"PIDGEY: Kurukkoo!@@"
+    text_init , "PIDGEY: Kurukkoo!"
+    text_past
 
 _SaffronHouse1Text3:
-    db $0,"The COPYCAT is",$4f
-    db "cute! I'm getting",$55
-    db "her a # DOLL!",$57
+    text_init , "The COPYCAT is"
+    text_line , "cute! I'm getting"
+    text_cont , "her a # DOLL!"
+    text_done
 
 _SaffronHouse1Text4:
-    db $0,"I was given a PP",$4f
-    db "UP as a gift.",$51
-    db "It's used for",$4f
-    db "increasing the PP",$55
-    db "of techniques!",$57
+    text_init , "I was given a PP"
+    text_line , "UP as a gift."
+    text_para , "It's used for"
+    text_line , "increasing the PP"
+    text_cont , "of techniques!"
+    text_done
 
 _SaffronMartText2:
-    db $0,"MAX REPEL lasts",$4f
-    db "longer than SUPER",$55
-    db "REPEL for keeping",$55
-    db "weaker #MON",$55
-    db "away!",$57
+    text_init , "MAX REPEL lasts"
+    text_line , "longer than SUPER"
+    text_cont , "REPEL for keeping"
+    text_cont , "weaker #MON"
+    text_cont , "away!"
+    text_done
 
 _SaffronMartText3:
-    db $0,"REVIVE is costly,",$4f
-    db "but it revives",$55
-    db "fainted #MON!",$57
+    text_init , "REVIVE is costly,"
+    text_line , "but it revives"
+    text_cont , "fainted #MON!"
+    text_done
 
 _SilphCo1Text1:
-    db $0,"Welcome!",$51
-    db "The PRESIDENT is",$4f
-    db "in the boardroom",$55
-    db "on 11F!",$57
+    text_init , "Welcome!"
+    text_para , "The PRESIDENT is"
+    text_line , "in the boardroom"
+    text_cont , "on 11F!"
+    text_done
 
 _SaffronPokecenterText1:
-    db $0,"#MON growth",$4f
-    db "rates differ from",$55
-    db "specie to specie.",$57
+    text_init , "#MON growth"
+    text_line , "rates differ from"
+    text_cont , "specie to specie."
+    text_done
 
 _SaffronPokecenterText3:
-    db $0,"SILPH CO. is very",$4f
-    db "famous. That's",$55
-    db "why it attracted",$55
-    db "TEAM ROCKET!",$57
+    text_init , "SILPH CO. is very"
+    text_line , "famous. That's"
+    text_cont , "why it attracted"
+    text_cont , "TEAM ROCKET!"
+    text_done
 
 _TM29PreReceiveText:
-    db $0,"...Wait! Don't",$4f
-    db "say a word!",$51
-    db "You wanted this!",$58
+    text_init , "...Wait! Don't"
+    text_line , "say a word!"
+    text_para , "You wanted this!"
+    text_wait
 
 _TM29ExplanationText:
-    db $0,"TM46 is PSYWAVE!",$51
-    db "It uses random",$4f
-    db "psychic waves to",$55
-    db "inflict damage!",$57
+    text_init , "TM46 is PSYWAVE!"
+    text_para , "It uses random"
+    text_line , "psychic waves to"
+    text_cont , "inflict damage!"
+    text_done
 
 _TM29NoRoomText:
-    db $0,"Where do you plan",$4f
-    db "to put this?",$57
+    text_init , "Where do you plan"
+    text_line , "to put this?"
+    text_done
 
 _PokemartGreetingText:
-    db $0,"Hi there!",$4e,"May I help you?",$57
+    text_init , "Hi there!",$4e,"May I help you?"
+    text_done
 
 _PokemonFaintedText:
     TX_RAM $cd6d
-    db $0,$4f
-    db "fainted!",$57
+    text_init
+    text_line , "fainted!"
+    text_done
 
 _PlayerBlackedOutText:
-    db $0,$52," is out of",$4f
-    db "useable #MON!",$51
-    db $52," blacked",$4f
-    db "out!",$58
+    text_init , $52," is out of"
+    text_line , "useable #MON!"
+    text_para,$52," blacked"
+    text_line , "out!"
+    text_wait
 
 _PokemartBuyingGreetingText:
-    db $0,"Take your time.",$57
+    text_init , "Take your time."
+    text_done
 
 _PokemartTellBuyPrice:
     TX_RAM $cf4b
-    db $0,"?",$4f
-    db "That will be",$55
-    db "¥@"
-    db $2,$9f,$ff,$c3
-    db $0,". OK?",$57
+    text_init , "?"
+    text_line , "That will be"
+    text_cont , "¥"
+    text_paus
+    db $2,$9f,$ff,$c3 ; print BCD number
+    text_init , ". OK?"
+    text_done
 
 _PokemartBoughtItemText:
-    db $0,"Here you are!",$4f
-    db "Thank you!",$58
+    text_init , "Here you are!"
+    text_line , "Thank you!"
+    text_wait
 
 _PokemartNotEnoughMoneyText:
-    db $0,"You don't have",$4f
-    db "enough money.",$58
+    text_init , "You don't have"
+    text_line , "enough money."
+    text_wait
 
 _PokemartItemBagFullText:
-    db $0,"You can't carry",$4f
-    db "any more items.",$58
+    text_init , "You can't carry"
+    text_line , "any more items."
+    text_wait
 
 _PokemonSellingGreetingText:
-    db $0,"What would you",$4f
-    db "like to sell?",$57
+    text_init , "What would you"
+    text_line , "like to sell?"
+    text_done
 
 _PokemartTellSellPrice:
-    db $0,"I can pay you",$4f
-    db "¥@"
-    db $2,$9f,$ff,$c3 ; XXX $2
-    db $0," for that.",$57
+    text_init , "I can pay you"
+    text_line , "¥"
+    text_paus
+    db $2,$9f,$ff,$c3 ; print BCD number
+    text_init , " for that."
+    text_done
 
 _PokemartItemBagEmptyText:
-    db $0,"You don't have",$4f
-    db "anything to sell.",$58
+    text_init , "You don't have"
+    text_line , "anything to sell."
+    text_wait
 
 _PokemartUnsellableItemText:
-    db $0,"I can't put a",$4f
-    db "price on that.",$58
+    text_init , "I can't put a"
+    text_line , "price on that."
+    text_wait
 
 _PokemartThankYouText:
-    db $0,"Thank you!",$57
+    text_init , "Thank you!"
+    text_done
 
 _PokemartAnythingElseText:
-    db $0,"Is there anything",$4f
-    db "else I can do?",$57
+    text_init , "Is there anything"
+    text_line , "else I can do?"
+    text_done
 
 _LearnedText:
     TX_RAM $d036
-    db $0," learned",$4f
-    db "@"
+    text_init , " learned"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _LearnedSkillText1:
     TX_RAM $d036
-    db $0," learned",$4f
-    db "@"
+    text_init , " learned"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0," SKILL!@@"
+    text_init , " SKILL!"
+    text_past
 
 _ReplaceAMoveForText:
-    db 0,"Replace a move for",$4f
-    db "@"
+    text_init , "Replace a move for"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,"?",$57
+    text_init , "?"
+    text_done
 
 _PokemonCenterWelcomeText:
-    db $0,"Welcome to our",$4f
-    db "#MON CENTER!",$57
-    db "We heal your",$4f
-    db "#MON back to",$55
-    db "perfect health!",$58
+    text_init , "Welcome to our"
+    text_line , "#MON CENTER!"
+    text_done
 
 _ShallWeHealYourPokemonText:
-    db $0,"Shall we heal your",$4f
-    db "#MON?",$57
+    text_init , "Shall we heal your"
+    text_line , "#MON?"
+    text_done
 
 _NeedYourPokemonText:
-    db $0,"OK. We'll need",$4f
-    db "your #MON.",$57
+    text_init , "OK. We'll need"
+    text_line , "your #MON."
+    text_done
 
 _PokemonFightingFitText:
-    db $0,"Thank you!",$4f
-    db "Your #MON are",$55
-    db "fighting fit!",$58
+    text_init , "Thank you!"
+    text_line , "Your #MON are"
+    text_cont , "fighting fit!"
+    text_wait
 
 _PokemonCenterFarewellText:
-    db $0,"We hope to see",$4f
-    db "you again!",$57
+    text_init , "We hope to see"
+    text_line , "you again!"
+    text_done
 
 _CableClubNPCText7:
-    db $0,"This area is",$4f
-    db "reserved for 2",$55
-    db "friends who are",$55
-    db "linked by cable.",$57
+    text_init , "This area is"
+    text_line , "reserved for 2"
+    text_cont , "friends who are"
+    text_cont , "linked by cable."
+    text_done
 
 _CableClubNPCText1:
-    db $0,"Welcome to the",$4f
-    db "Cable Club!",$57
+    text_init , "Welcome to the"
+    text_line , "Cable Club!"
+    text_done
 
 _CableClubNPCText2:
-    db $0,"Please apply here.",$51
-    db "Before opening",$4f
-    db "the link,we have",$55
-    db "to save the game.",$57
+    text_init , "Please apply here."
+    text_para , "Before opening"
+    text_line , "the link,we have"
+    text_cont , "to save the game."
+    text_done
 
 _CableClubNPCText3:
-    db $0,"Please wait.@@"
+    text_init , "Please wait."
+    text_past
 
 _CableClubNPCText4:
-    db $0,"The link has been",$4f
-    db "closed because of",$55
-    db "inactivity.",$51
-    db "Please contact",$4f
-    db "your friend and",$55
-    db "come again!",$57
+    text_init , "The link has been"
+    text_line , "closed because of"
+    text_cont , "inactivity."
+    text_para , "Please contact"
+    text_line , "your friend and"
+    text_cont , "come again!"
+    text_done
 
 _ChoiceTMText:
-    db $0,"Which Technical",$4f
-    db "Machines Move?",$57
+    text_init , "Which Technical"
+    text_line , "Machines Move?"
+    text_done
 
 _TMEmpy:
-    db $0,"Technical",$4f
-    db "Machines Empty!",$58
+    text_init , "Technical"
+    text_line , "Machines Empty!"
+    text_wait
 
 ; ───────────────────────────────
 ; Move Deleter
 ; ───────────────────────────────
 
 _AnswerNoText:
-    db $0,"Bye!",$4f
-    db "Come Again.",$57
+    text_init , "Bye!"
+    text_line , "Come Again."
+    text_done
 
 _MoveDeleterIntroText:
-    db $0
-    db "I'm MOVEDELETER."  ,$4f
-    db "Would you like to" ,$55
-    db "delete one move"   ,$55
-    db "of your #MON?"     ,$57
+    text_init , "I'm MOVEDELETER."  
+    text_line , "Would you like to" 
+    text_cont , "delete one move"   
+    text_cont , "of your #MON?"     
+    text_done
 
 _WhichPkmnForgotText:
-    db $0,"Which #MON" ,$4f
-    db "must forgot a"  ,$55
-    db "move?"          ,$58
+    text_init , "Which #MON" 
+    text_line , "must forgot a"  
+    text_cont , "move?"          
+    text_wait
 
 _ForgetCompleteText:
-    db $0
-    db "@"
     TX_RAM $cd6d
-    db 0
-    db " forgot" ,$4f
-    db "@"
+    text_init , " forgot" 
+    text_line
+    text_paus
     TX_RAM $CF4B
-    db 0
-    db "!@@"
+    text_init , "!"
+    text_past
 
 _DeleteWhichTechniqueText:
-    db $0,"Delete which",$4f
-    db "technique?",$57
+    text_init , "Delete which"
+    text_line , "technique?"
+    text_done
 
 _OnlyOneMoveText:
-    db $0,"the #MON knows",$4f
-    db "only one move!",$58
+    text_init , "the #MON knows"
+    text_line , "only one move!"
+    text_wait
 
 _NoPartyText:
-    db $0
-    db "Your party is" ,$4f
-    db "Empty!"        ,$57
+    text_init , "Your party is" 
+    text_line , "Empty!"        
+    text_done
 
 _CopycatsHouseF2Text2_Part2:
-    db $0,$51
-    db "MIRROR MIRROR ON",$4f
-    db "THE WALL,WHO IS",$55
-    db "THE FAIREST ONE",$55
-    db "OF ALL?",$57
+    text_init
+    text_para , "MIRROR MIRROR ON"
+    text_line , "THE WALL,WHO IS"
+    text_cont , "THE FAIREST ONE"
+    text_cont , "OF ALL?"
+    text_done
 
 _CopycatsHouseF2Text2_Part2_Dex:
-    db $0
-    db "MIRROR MIRROR ON",$4f
-    db "THE WALL,WHO IS",$55
-    db "THE FAIREST ONE",$55
-    db "OF ALL?",$58
+    text_init , "MIRROR MIRROR ON"
+    text_line , "THE WALL,WHO IS"
+    text_cont , "THE FAIREST ONE"
+    text_cont , "OF ALL?"
+    text_wait
 
 _RepelWoreOffText:
-    db $0,"REPEL's effect",$4f
-    db "wore off.",$58
+    text_init , "REPEL's effect"
+    text_line , "wore off."
+    text_wait
 
 _TryUseAnotherRepelText:
-    db $0,"REPEL's effect",$4f
-    db "wore off.",$51
-    db "Use another",$4f,"@"
+    text_init , "REPEL's effect"
+    text_line , "wore off."
+    text_para , "Use another"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0," (",$F1,"@"
+    text_init , " (",$F1
+    text_paus
     TX_NUM wTmpRepelQty,1,2
-    db $0,")?",$57
+    text_init , ")?"
+    text_done
 
 _TryUseAnotherRepelText_LessThan10:
-    db $0,"REPEL's effect",$4f
-    db "wore off.",$51
-    db "Use another",$4f,"@"
+    text_init , "REPEL's effect"
+    text_line , "wore off."
+    text_para , "Use another"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0," (",$F1," @"
+    text_init , " (",$F1," "
+    text_paus
     TX_NUM wTmpRepelQty,1,2
-    db $0,")?",$57
+    text_init , ")?"
+    text_done
 
 _PreHM08Text:
-    db $0
-    db "Thank you so much",$4f
-    db "for your help!",$51
-    db "My dream was to",$4f
-    db "work in a #MON",$55
-    db "CENTER!",$51
-    db "I'm good at",$4f
-    db "healing #MON.",$51
-    db "But...",$51
-    db "C'est la vie... ",$51
-    db "You are a",$4f
-    db "special trainer!",$51
-    db "If I taught you",$4f
-    db "my SKILL you",$55
-    db "wouldn't need any",$55
-    db "support anymore!",$58
+    text_init , "Thank you so much"
+    text_line , "for your help!"
+    text_para , "My dream was to"
+    text_line , "work in a #MON"
+    text_cont , "CENTER!"
+    text_para , "I'm good at"
+    text_line , "healing #MON."
+    text_para , "But..."
+    text_para , "C'est la vie... "
+    text_para , "You are a"
+    text_line , "special trainer!"
+    text_para , "If I taught you"
+    text_line , "my SKILL you"
+    text_cont , "wouldn't need any"
+    text_cont , "support anymore!"
+    text_wait
 
 SECTION "bank29",ROMX,BANK[$29]
 
 _CableClubNPCText5:
-    db $0,"Please come again!",$57
+    text_init , "Please come again!"
+    text_done
 
 _CableClubNPCText6:
-    db $0,"We're making",$4f
-    db "preparations.",$55
-    db "Please wait.",$57
+    text_init , "We're making"
+    text_line , "preparations."
+    text_cont , "Please wait."
+    text_done
 
 _UnnamedText_cdbb:
     TX_RAM $cd6d
-    db $0," can",$4f
-    db "move boulders.",$57
+    text_init , " can"
+    text_line , "move boulders."
+    text_done
 
 _UnnamedText_cdfa:
-    db $0,"The current is",$4f
-    db "much too fast!",$58
+    text_init , "The current is"
+    text_line , "much too fast!"
+    text_wait
 
 _UnnamedText_cdff:
-    db $0,"Cycling is fun!",$4f
-    db "Forget SWIM!   ",$58
+    text_init , "Cycling is fun!"
+    text_line , "Forget SWIM!   "
+    text_wait
 
 _FlashLightsAreaText:
-    db $0,"A blinding LIGHT",$4f
-    db "lights the area!",$57
+    text_init , "A blinding LIGHT"
+    text_line , "lights the area!"
+    text_done
 
 _WarpToLastPokemonCenterText:
-    db $0,"Warp to the last",$4f
-    db "#MON CENTER.",$57
+    text_init , "Warp to the last"
+    text_line , "#MON CENTER."
+    text_done
 
 _CannotUseTeleportNowText:
     TX_RAM $cd6d
-    db $0," can't",$4f
-    db "use TELEPORT now.",$58
+    text_init , " can't"
+    text_line , "use TELEPORT now."
+    text_wait
 
 _CannotFlyHereText:
     TX_RAM $cd6d
-    db $0," can't",$4f
-    db "FLY here.",$58
+    text_init , " can't"
+    text_line , "FLY here."
+    text_wait
 
 _NotHealthyEnoughText:
-    db $0,"Not healthy",$4f
-    db "enough.",$58
+    text_init , "Not healthy"
+    text_line , "enough."
+    text_wait
 
 _CannotUseItemsHereText:
-    db $0,"You can't use items",$4f
-    db "here.",$58
+    text_init , "You can't use items"
+    text_line , "here."
+    text_wait
 
 _CannotGetOffHereText:
-    db $0,"You can't get off",$4f
-    db "here.",$58
+    text_init , "You can't get off"
+    text_line , "here."
+    text_wait
 
 _UnnamedText_4fe39:
-    db $0,$52," got",$4f
-    db "@"
+    text_init , $52," got"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_4fe3f:
-    db $0,"There's no more",$4f
-    db "room for #MON!",$55
-    db "@"
+    text_init , "There's no more"
+    text_line , "room for #MON!"
+    text_cont
+    text_paus
     TX_RAM $de06
-    db $0," was",$55
-    db "sent to #MON",$55
-    db "BOX @"
+    text_init , " was"
+    text_cont , "sent to #MON"
+    text_cont , "BOX "
+    text_paus
     TX_RAM $cf4b
-    db $0," on PC!",$57
+    text_init , " on PC!"
+    text_done
 
 _UnnamedText_4fe44:
-    db $0,"There's no more",$4f
-    db "room for #MON!",$51
-    db "The #MON BOX",$4f
-    db "is full and can't",$55
-    db "accept any more!",$51
-    db "Change the BOX at",$4f
-    db "a #MON CENTER!",$57
+    text_init , "There's no more"
+    text_line , "room for #MON!"
+    text_para , "The #MON BOX"
+    text_line , "is full and can't"
+    text_cont , "accept any more!"
+    text_para , "Change the BOX at"
+    text_line , "a #MON CENTER!"
+    text_done
 
 INCLUDE "text/mapPalletTown.asm"
 
 _ViridianCityText1:
-    db $0,"Those # BALLs",$4f
-    db "at your waist!",$55
-    db "You have #MON!",$51
-    db "It's great that",$4f
-    db "you can carry and",$55
-    db "use #MON any",$55
-    db "time,anywhere!",$57
+    text_init , "Those # BALLs"
+    text_line , "at your waist!"
+    text_cont , "You have #MON!"
+    text_para , "It's great that"
+    text_line , "you can carry and"
+    text_cont , "use #MON any"
+    text_cont , "time,anywhere!"
+    text_done
 
 _UnnamedText_19122:
-    db $0,"This #MON GYM",$4f
-    db "is always closed.",$51
-    db "I wonder who the",$4f
-    db "LEADER is?",$57
+    text_init , "This #MON GYM"
+    text_line , "is always closed."
+    text_para , "I wonder who the"
+    text_line , "LEADER is?"
+    text_done
 
 _UnnamedText_19127:
-    db $0,"VIRIDIAN GYM's",$4f
-    db "LEADER returned!",$57
+    text_init , "VIRIDIAN GYM's"
+    text_line , "LEADER returned!"
+    text_done
 
 _UnnamedText_1914d:
-    db $0,"You want to know",$4f
-    db "about the 2 kinds",$55
-    db "of caterpillar",$55
-    db "#MON?",$57
+    text_init , "You want to know"
+    text_line , "about the 2 kinds"
+    text_cont , "of caterpillar"
+    text_cont , "#MON?"
+    text_done
 
 _UnnamedText_19152:
-    db $0,"Oh,OK then!",$57
+    text_init , "Oh,OK then!"
+    text_done
 
 _UnnamedText_19157:
-    db $0,"CATERPIE has no",$4f
-    db "poison,but",$55
-    db "WEEDLE does.",$51
-    db "Watch out for its",$4f
-    db "POISON STING!",$57
+    text_init , "CATERPIE has no"
+    text_line , "poison,but"
+    text_cont , "WEEDLE does."
+    text_para , "Watch out for its"
+    text_line , "POISON STING!"
+    text_done
 
 _UnnamedText_19175:
-    db $0,"Oh Grandpa! Don't",$4f
-    db "be so mean!",$55
-    db "He hasn't had his",$55
-    db "coffee yet.",$57
+    text_init , "Oh Grandpa! Don't"
+    text_line , "be so mean!"
+    text_cont , "He hasn't had his"
+    text_cont , "coffee yet."
+    text_done
 
 _UnnamedText_1917a:
-    db $0,"When I go shop in",$4f
-    db "PEWTER CITY,I",$55
-    db "have to take the",$55
-    db "winding trail in",$55
-    db "VIRIDIAN FOREST.",$57
+    text_init , "When I go shop in"
+    text_line , "PEWTER CITY,I"
+    text_cont , "have to take the"
+    text_cont , "winding trail in"
+    text_cont , "VIRIDIAN FOREST."
+    text_done
 
 _UnnamedText_19191:
-    db $0,"You can't go",$4f
-    db "through here!",$51
-    db "This is private",$4f
-    db "property!",$57
+    text_init , "You can't go"
+    text_line , "through here!"
+    text_para , "This is private"
+    text_line , "property!"
+    text_done
 
 _UnnamedText_191ca:
-    db $0,"Yawn!",$4f
-    db "I must have dozed",$55
-    db "off in the sun.",$51
-    db "I had this dream",$4f
-    db "about a DROWZEE",$55
-    db "eating my dream.",$55
-    db "What's this?",$55
-    db "Where did this TM",$55
-    db "come from?",$51
-    db "This is spooky!",$4f
-    db "Here,you can",$55
-    db "have this TM.",$58
+    text_init , "Yawn!"
+    text_line , "I must have dozed"
+    text_cont , "off in the sun."
+    text_para , "I had this dream"
+    text_line , "about a DROWZEE"
+    text_cont , "eating my dream."
+    text_cont , "What's this?"
+    text_cont , "Where did this TM"
+    text_cont , "come from?"
+    text_para , "This is spooky!"
+    text_line , "Here,you can"
+    text_cont , "have this TM."
+    text_wait
 
 _TM42Explanation:
-    db $0,"TM42 contains",$4f
-    db "DREAM EATER...",$55
-    db "..Snore..",$CA,$CA,$57
+    text_init , "TM42 contains"
+    text_line , "DREAM EATER..."
+    text_cont , "..Snore..",$CA,$CA
+    text_done
 
 _TM42NoRoomText:
-    db $0,"You have too much",$4f
-    db "stuff already.",$57
+    text_init , "You have too much"
+    text_line , "stuff already."
+    text_done
 
 _UnnamedText_1920a:
-    db $0,"Ahh,I've had my",$4f
-    db "coffee now and I",$55
-    db "feel great!",$51
-    db "Sure you can go",$4f
-    db "through!",$51
-    db "Are you in a",$4f
-    db "hurry?",$57
+    text_init , "Ahh,I've had my"
+    text_line , "coffee now and I"
+    text_cont , "feel great!"
+    text_para , "Sure you can go"
+    text_line , "through!"
+    text_para , "Are you in a"
+    text_line , "hurry?"
+    text_done
 
 _UnnamedText_1920f:
-    db $0,"I see you're using",$4f
-    db "a #DEX.",$51
-    db "When you catch a",$4f
-    db "#MON,#DEX",$55
-    db "is automatically",$55
-    db "updated.",$51
-    db "What? Don't you",$4f
-    db "know how to catch",$55
-    db "#MON?",$51
-    db "I'll show you",$4f
-    db "how to then.",$57
+    text_init , "I see you're using"
+    text_line , "a #DEX."
+    text_para , "When you catch a"
+    text_line , "#MON,#DEX"
+    text_cont , "is automatically"
+    text_cont , "updated."
+    text_para , "What? Don't you"
+    text_line , "know how to catch"
+    text_cont , "#MON?"
+    text_para , "I'll show you"
+    text_line , "how to then."
+    text_done
 
 _UnnamedText_19214:
-    db $0,"Time is money...",$4f
-    db "Go along then.",$57
+    text_init , "Time is money..."
+    text_line , "Go along then."
+    text_done
 
 _UnnamedText_19219:
-    db $0,"First,you need",$4f
-    db "to weaken the",$55
-    db "target #MON.",$57
+    text_init , "First,you need"
+    text_line , "to weaken the"
+    text_cont , "target #MON."
+    text_done
 
 _ViridianCityText8:
-    db $0,"VIRIDIAN CITY ",$4f
-    db "The Eternally",$55
-    db "Green Paradise",$57
+    text_init , "VIRIDIAN CITY "
+    text_line , "The Eternally"
+    text_cont , "Green Paradise"
+    text_done
 
 _ViridianCityText9:
-    db $0,"TRAINER TIPS",$51
-    db "Catch #MON",$4f
-    db "and expand your",$55
-    db "collection!",$51
-    db "The more you have,",$4f
-    db "the easier it is",$55
-    db "to fight!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "Catch #MON"
+    text_line , "and expand your"
+    text_cont , "collection!"
+    text_para , "The more you have,"
+    text_line , "the easier it is"
+    text_cont , "to fight!"
+    text_done
 
 _ViridianCityText10:
-    db $0,"TRAINER TIPS",$51
-    db "The battle moves",$4f
-    db "of #MON are",$55
-    db "limited by their",$55
-    db "POWER POINTs,PP.",$51
-    db "To replenish PP,",$4f
-    db "rest your tired",$55
-    db "#MON at a",$55
-    db "#MON CENTER!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "The battle moves"
+    text_line , "of #MON are"
+    text_cont , "limited by their"
+    text_cont , "POWER POINTs,PP."
+    text_para , "To replenish PP,"
+    text_line , "rest your tired"
+    text_cont , "#MON at a"
+    text_cont , "#MON CENTER!"
+    text_done
 
 _ViridianCityText13:
-    db $0,"VIRIDIAN CITY",$4f
-    db "#MON GYM",$57
+    text_init , "VIRIDIAN CITY"
+    text_line , "#MON GYM"
+    text_done
 
 _ViridianCityText14:
-    db $0,"The GYM's doors",$4f
-    db "are locked...",$57
+    text_init , "The GYM's doors"
+    text_line , "are locked..."
+    text_done
 
 _PewterCityText1:
-    db $0,"It's rumored that",$4f
-    db "CLEFAIRYs came",$55
-    db "from the moon!",$51
-    db "They appeared ",$4f
-    db "after MOON STONE",$55
-    db "fell on MT.MOON.",$57
+    text_init , "It's rumored that"
+    text_line , "CLEFAIRYs came"
+    text_cont , "from the moon!"
+    text_para , "They appeared "
+    text_line , "after MOON STONE"
+    text_cont , "fell on MT.MOON."
+    text_done
 
 _PewterCityText2:
-    db $0,"There aren't many",$4f
-    db "serious #MON",$55
-    db "trainers here!",$51
-    db "They're all like",$4f
-    db "BUG CATCHERs,",$55
-    db "but PEWTER GYM's",$55
-    db "BROCK is totally",$55
-    db "into it!",$57
+    text_init , "There aren't many"
+    text_line , "serious #MON"
+    text_cont , "trainers here!"
+    text_para , "They're all like"
+    text_line , "BUG CATCHERs,"
+    text_cont , "but PEWTER GYM's"
+    text_cont , "BROCK is totally"
+    text_cont , "into it!"
+    text_done
 
 _UnnamedText_193f1:
-    db $0,"Did you check out",$4f
-    db "the MUSEUM?",$57
+    text_init , "Did you check out"
+    text_line , "the MUSEUM?"
+    text_done
 
 _UnnamedText_193f6:
-    db $0,"Weren't those",$4f
-    db "fossils from MT.",$55
-    db "MOON amazing?",$57
+    text_init , "Weren't those"
+    text_line , "fossils from MT."
+    text_cont , "MOON amazing?"
+    text_done
 
 _UnnamedText_193fb:
-    db $0,"Really?",$4f
-    db "You absolutely",$55
-    db "have to go!",$57
+    text_init , "Really?"
+    text_line , "You absolutely"
+    text_cont , "have to go!"
+    text_done
 
 _PewterCityText13:
-    db $0,"It's right here!",$4f
-    db "You have to pay",$55
-    db "to get in,but",$55
-    db "it's worth it!",$55
-    db "See you around!",$57
+    text_init , "It's right here!"
+    text_line , "You have to pay"
+    text_cont , "to get in,but"
+    text_cont , "it's worth it!"
+    text_cont , "See you around!"
+    text_done
 
 _UnnamedText_19427:
-    db $0,"Psssst!",$4f
-    db "Do you know what",$55
-    db "I'm doing?",$57
+    text_init , "Psssst!"
+    text_line , "Do you know what"
+    text_cont , "I'm doing?"
+    text_done
 
 _UnnamedText_1942c:
-    db $0,"That's right!",$4f
-    db "It's hard work!",$57
+    text_init , "That's right!"
+    text_line , "It's hard work!"
+    text_done
 
 _UnnamedText_19431:
-    db $0,"I'm spraying REPEL",$4f
-    db "to keep #MON",$55
-    db "out of my garden!",$57
+    text_init , "I'm spraying REPEL"
+    text_line , "to keep #MON"
+    text_cont , "out of my garden!"
+    text_done
 
 _UnnamedText_1945d:
-    db $0,"You're a trainer",$4f
-    db "right? BROCK's",$55
-    db "looking for new",$55
-    db "challengers!",$55
-    db "Follow me!",$57
+    text_init , "You're a trainer"
+    text_line , "right? BROCK's"
+    text_cont , "looking for new"
+    text_cont , "challengers!"
+    text_cont , "Follow me!"
+    text_done
 
 _UnnamedText_19462:
-    db $0,"If you have the",$4f
-    db "right stuff,go",$55
-    db "take on BROCK!",$57
+    text_init , "If you have the"
+    text_line , "right stuff,go"
+    text_cont , "take on BROCK!"
+    text_done
 
 _PewterCityText6:
-    db $0,"TRAINER TIPS",$51
-    db "Any #MON that",$4f
-    db "takes part in",$55
-    db "battle,however",$55
-    db "short,earns EXP!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "Any #MON that"
+    text_line , "takes part in"
+    text_cont , "battle,however"
+    text_cont , "short,earns EXP!"
+    text_done
 
 _PewterCityText7:
-    db $0,"NOTICE!",$51
-    db "Thieves have been",$4f
-    db "stealing #MON",$55
-    db "fossils at MT.",$55
-    db "MOON! Please call",$55
-    db "PEWTER POLICE",$55
-    db "with any info!",$57
+    text_init , "NOTICE!"
+    text_para , "Thieves have been"
+    text_line , "stealing #MON"
+    text_cont , "fossils at MT."
+    text_cont , "MOON! Please call"
+    text_cont , "PEWTER POLICE"
+    text_cont , "with any info!"
+    text_done
 
 _PewterCityText10:
-    db $0,"PEWTER MUSEUM",$4f
-    db "OF SCIENCE",$57
+    text_init , "PEWTER MUSEUM"
+    text_line , "OF SCIENCE"
+    text_done
 
 _PewterCityText11:
-    db $0,"PEWTER CITY",$4f
-    db "#MON GYM",$55
-    db "LEADER: BROCK",$51
-    db "The Rock Solid",$4f
-    db "#MON Trainer!",$57
+    text_init , "PEWTER CITY"
+    text_line , "#MON GYM"
+    text_cont , "LEADER: BROCK"
+    text_para , "The Rock Solid"
+    text_line , "#MON Trainer!"
+    text_done
 
 _PewterCityText12:
-    db $0,"PEWTER CITY",$4f
-    db "A Stone Gray",$55
-    db "City",$57
+    text_init , "PEWTER CITY"
+    text_line , "A Stone Gray"
+    text_cont , "City"
+    text_done
 
 _UnnamedText_19668:
-    db $0,$53,": Yo!",$4f
-    db $52,"!",$51
-    db "You're still",$4f
-    db "struggling along",$55
-    db "back here?",$51
-    db "I'm doing great!",$4f
-    db "I caught a bunch",$55
-    db "of strong and",$55
-    db "smart #MON!",$51
-    db "Here,let me see",$4f
-    db "what you caught,",$55
-    db $52,"!",$57
+    text_init , $53,": Yo!"
+    text_line , $52,"!"
+    text_para , "You're still"
+    text_line , "struggling along"
+    text_cont , "back here?"
+    text_para , "I'm doing great!"
+    text_line , "I caught a bunch"
+    text_cont , "of strong and"
+    text_cont , "smart #MON!"
+    text_para , "Here,let me see"
+    text_line , "what you caught,"
+    text_cont , $52,"!"
+    text_done
 
 _UnnamedText_1966d:
-    db $0,"Hey!",$4f
-    db "Take it easy!",$55
-    db "You won already!",$58
+    text_init , "Hey!"
+    text_line , "Take it easy!"
+    text_cont , "You won already!"
+    text_wait
 
 _UnnamedText_19672:
-    db $0,"Heh!",$4f
-    db "You're no match",$55
-    db "for my genius!",$58
+    text_init , "Heh!"
+    text_line , "You're no match"
+    text_cont , "for my genius!"
+    text_wait
 
 _UnnamedText_19677:
-    db $0,$53,": Hey,",$4f
-    db "guess what?",$51
-    db "I went to BILL's",$4f
-    db "and got him to",$55
-    db "show me his rare",$55
-    db "#MON!",$51
-    db "That added a lot",$4f
-    db "of pages to my",$55
-    db "#DEX!",$51
-    db "After all,BILL's",$4f
-    db "world famous as a",$55
-    db "#MANIAC!",$51
-    db "He invented the",$4f
-    db "#MON Storage",$55
-    db "System on PC!",$51
-    db "Since you're using",$4f
-    db "his system,go",$55
-    db "thank him!",$51
-    db "Well,I better",$4f
-    db "get rolling!",$55
-    db "Smell ya later!",$57
+    text_init , $53,": Hey,"
+    text_line , "guess what?"
+    text_para , "I went to BILL's"
+    text_line , "and got him to"
+    text_cont , "show me his rare"
+    text_cont , "#MON!"
+    text_para , "That added a lot"
+    text_line , "of pages to my"
+    text_cont , "#DEX!"
+    text_para , "After all,BILL's"
+    text_line , "world famous as a"
+    text_cont , "#MANIAC!"
+    text_para , "He invented the"
+    text_line , "#MON Storage"
+    text_cont , "System on PC!"
+    text_para , "Since you're using"
+    text_line , "his system,go"
+    text_cont , "thank him!"
+    text_para , "Well,I better"
+    text_line , "get rolling!"
+    text_cont , "Smell ya later!"
+    text_done
 
 _UnnamedText_196d9:
-    db $0,"Hey! Stay out!",$4f
-    db "It's not your",$55
-    db "yard! Huh? Me?",$51
-    db "I'm an innocent",$4f
-    db "bystander! Don't",$55
-    db "you believe me?",$57
+    text_init , "Hey! Stay out!"
+    text_line , "It's not your"
+    text_cont , "yard! Huh? Me?"
+    text_para , "I'm an innocent"
+    text_line , "bystander! Don't"
+    text_cont , "you believe me?"
+    text_done
 
 _ReceivedTM28Text2:
-    db $0,$51
-    db "I better get",$4f
-    db "moving! Bye!@@"
+    text_init
+    text_para , "I better get"
+    text_line , "moving! Bye!"
+    text_past
 
 _TM28NoRoomText:
-    db $0,"Make room for",$4f
-    db "this!",$51
-    db "I can't run until",$4f
-    db "I give it to you!",$57
+    text_init , "Make room for"
+    text_line , "this!"
+    text_para , "I can't run until"
+    text_line , "I give it to you!"
+    text_done
 
 _UnnamedText_196ee:
-    db $0,"Stop!",$4f
-    db "I give up! I'll",$55
-    db "leave quietly!",$58
+    text_init , "Stop!"
+    text_line , "I give up! I'll"
+    text_cont , "leave quietly!"
+    text_wait
 
 _UnnamedText_196f3:
-    db $0,"OK! I'll return",$4f
-    db "the TM I stole!",$58
+    text_init , "OK! I'll return"
+    text_line , "the TM I stole!"
+    text_wait
 
 _CeruleanCityText3:
-    db $0,"You're a trainer",$4f
-    db "too? Collecting,",$55
-    db "fighting,it's a",$55
-    db "tough life.",$57
+    text_init , "You're a trainer"
+    text_line , "too? Collecting,"
+    text_cont , "fighting,it's a"
+    text_cont , "tough life."
+    text_done
 
 _CeruleanCityText4:
-    db $0,"That bush in",$4f
-    db "front of the shop",$55
-    db "is in the way.",$51
-    db "There might be a",$4f
-    db "way around.",$57
+    text_init , "That bush in"
+    text_line , "front of the shop"
+    text_cont , "is in the way."
+    text_para , "There might be a"
+    text_line , "way around."
+    text_done
 
 _CeruleanCityText5:
-    db $0,"You're making an",$4f
-    db "encyclopedia on",$55
-    db "#MON? That",$55
-    db "sounds amusing.",$57
+    text_init , "You're making an"
+    text_line , "encyclopedia on"
+    text_cont , "#MON? That"
+    text_cont , "sounds amusing."
+    text_done
 
 _CeruleanCityText6:
-    db $0,"The people here",$4f
-    db "were robbed.",$51
-    db "It's obvious that",$4f
-    db "TEAM ROCKET is",$55
-    db "behind this most",$55
-    db "heinous crime!",$51
-    db "Even our POLICE",$4f
-    db "force has trouble",$55
-    db "with the ROCKETs!",$57
+    text_init , "The people here"
+    text_line , "were robbed."
+    text_para , "It's obvious that"
+    text_line , "TEAM ROCKET is"
+    text_cont , "behind this most"
+    text_cont , "heinous crime!"
+    text_para , "Even our POLICE"
+    text_line , "force has trouble"
+    text_cont , "with the ROCKETs!"
+    text_done
 
 _UnnamedText_19730:
-    db $0,"OK! SLOWBRO!",$4f
-    db "Use SONICBOOM!",$55
-    db "Come on,SLOWBRO",$55
-    db "pay attention!",$57
+    text_init , "OK! SLOWBRO!"
+    text_line , "Use SONICBOOM!"
+    text_cont , "Come on,SLOWBRO"
+    text_cont , "pay attention!"
+    text_done
 
 _UnnamedText_19735:
-    db $0,"SLOWBRO punch!",$4f
-    db "No! You blew it",$55
-    db "again!",$57
+    text_init , "SLOWBRO punch!"
+    text_line , "No! You blew it"
+    text_cont , "again!"
+    text_done
 
 _UnnamedText_1973a:
-    db $0,"SLOWBRO,WITHDRAW!",$4f
-    db "No! That's wrong!",$51
-    db "It's so hard to",$4f
-    db "control #MON!",$51
-    db "Your #MON's",$4f
-    db "obedience depends",$55
-    db "on your abilities",$55
-    db "as a trainer!",$57
+    text_init , "SLOWBRO,WITHDRAW!"
+    text_line , "No! That's wrong!"
+    text_para , "It's so hard to"
+    text_line , "control #MON!"
+    text_para , "Your #MON's"
+    text_line , "obedience depends"
+    text_cont , "on your abilities"
+    text_cont , "as a trainer!"
+    text_done
 
 _UnnamedText_1976f:
-    db $0,"SLOWBRO took a",$4f
-    db "snooze ",$CA,$CA,$57
+    text_init , "SLOWBRO took a"
+    text_line , "snooze ",$CA,$CA
+    text_done
 
 _UnnamedText_19774:
-    db $0,"SLOWBRO is",$4f
-    db "loafing around...",$57
+    text_init , "SLOWBRO is"
+    text_line , "loafing around..."
+    text_done
 
 _UnnamedText_19779:
-    db $0,"SLOWBRO turned",$4f
-    db "away...",$57
+    text_init , "SLOWBRO turned"
+    text_line , "away..."
+    text_done
 
 _UnnamedText_1977e:
-    db $0,"SLOWBRO",$4f
-    db "ignored orders...",$57
+    text_init , "SLOWBRO"
+    text_line , "ignored orders..."
+    text_done
 
 _CeruleanCityText9:
-    db $0,"I want a bright",$4f
-    db "red BICYCLE!",$51
-    db "I'll keep it at",$4f
-    db "home,so it won't",$55
-    db "get dirty!",$57
+    text_init , "I want a bright"
+    text_line , "red BICYCLE!"
+    text_para , "I'll keep it at"
+    text_line , "home,so it won't"
+    text_cont , "get dirty!"
+    text_done
 
 _CeruleanCityText10:
-    db $0,"This is CERULEAN",$4f
-    db "CAVE! Horribly",$55
-    db "strong #MON",$55
-    db "live in there!",$51
-    db "The #MON LEAGUE",$4f
-    db "champion is the",$55
-    db "only person who",$55
-    db "is allowed in!",$57
+    text_init , "This is CERULEAN"
+    text_line , "CAVE! Horribly"
+    text_cont , "strong #MON"
+    text_cont , "live in there!"
+    text_para , "The #MON LEAGUE"
+    text_line , "champion is the"
+    text_cont , "only person who"
+    text_cont , "is allowed in!"
+    text_done
 
 _CeruleanCityText12:
-    db $0,"CERULEAN CITY",$4f
-    db "A Mysterious,",$55
-    db "Blue Aura",$55
-    db "Surrounds It",$57
+    text_init , "CERULEAN CITY"
+    text_line , "A Mysterious,"
+    text_cont , "Blue Aura"
+    text_cont , "Surrounds It"
+    text_done
 
 _CeruleanCityText13:
-    db $0,"TRAINER TIPS",$51
-    db "Pressing B Button",$4f
-    db "during evolution",$55
-    db "cancels the whole",$55
-    db "process.",$57
+    text_init , "TRAINER TIPS"
+    text_para , "Pressing B Button"
+    text_line , "during evolution"
+    text_cont , "cancels the whole"
+    text_cont , "process."
+    text_done
 
 _CeruleanCityText16:
-    db $0,"Grass and caves",$4f
-    db "handled easily!",$55
-    db "BIKE SHOP",$57
+    text_init , "Grass and caves"
+    text_line , "handled easily!"
+    text_cont , "BIKE SHOP"
+    text_done
 
 _CeruleanCityText17:
-    db $0,"CERULEAN CITY",$4f
-    db "#MON GYM",$55
-    db "LEADER: MISTY",$51
-    db "The Tomboyish",$4f
-    db "Mermaid!",$57
+    text_init , "CERULEAN CITY"
+    text_line , "#MON GYM"
+    text_cont , "LEADER: MISTY"
+    text_para , "The Tomboyish"
+    text_line , "Mermaid!"
+    text_done
 
 _UnnamedText_4413c:
-    db $0,"Do you believe in",$4f
-    db "GHOSTs?",$57
+    text_init , "Do you believe in"
+    text_line , "GHOSTs?"
+    text_done
 
 _UnnamedText_44141:
-    db $0,"Really? So there",$4f
-    db "are believers...",$57
+    text_init , "Really? So there"
+    text_line , "are believers..."
+    text_done
 
 _UnnamedText_44146:
-    db $0,"Hahaha,I guess",$4f
-    db "not.",$51
-    db "That white hand",$4f
-    db "on your shoulder,",$55
-    db "it's not real.",$57
+    text_init , "Hahaha,I guess"
+    text_line , "not."
+    text_para , "That white hand"
+    text_line , "on your shoulder,"
+    text_cont , "it's not real."
+    text_done
 
 _LavenderTownText2:
-    db $0,"This town is known",$4f
-    db "as the grave site",$55
-    db "of #MON.",$51
-    db "Memorial services",$4f
-    db "are held in",$55
-    db "#MON TOWER.",$57
+    text_init , "This town is known"
+    text_line , "as the grave site"
+    text_cont , "of #MON."
+    text_para , "Memorial services"
+    text_line , "are held in"
+    text_cont , "#MON TOWER."
+    text_done
 
 _LavenderTownText3:
-    db $0,"GHOSTs appeared",$4f
-    db "in #MON TOWER.",$51
-    db "I think they're",$4f
-    db "the spirits of",$55
-    db "#MON that the",$55
-    db "ROCKETs killed.",$57
+    text_init , "GHOSTs appeared"
+    text_line , "in #MON TOWER."
+    text_para , "I think they're"
+    text_line , "the spirits of"
+    text_cont , "#MON that the"
+    text_cont , "ROCKETs killed."
+    text_done
 
 _LavenderTownText4:
-    db $0,"LAVENDER TOWN",$4f
-    db "The Noble Purple",$55
-    db "Town",$57
+    text_init , "LAVENDER TOWN"
+    text_line , "The Noble Purple"
+    text_cont , "Town"
+    text_done
 
 _LavenderTownText5:
-    db $0,"New SILPH SCOPE!",$51
-    db "Make the Invisible",$4f
-    db "Plain to See!",$51
-    db "SILPH CO.",$57
+    text_init , "New SILPH SCOPE!"
+    text_para , "Make the Invisible"
+    text_line , "Plain to See!"
+    text_para , "SILPH CO."
+    text_done
 
 _LavenderTownText8:
-    db $0,"LAVENDER VOLUNTEER",$4f
-    db "#MON HOUSE",$57
+    text_init , "LAVENDER VOLUNTEER"
+    text_line , "#MON HOUSE"
+    text_done
 
 _LavenderTownText9:
-    db $0,"May the Souls of",$4f
-    db "#MON Rest Easy",$55
-    db "#MON TOWER",$57
+    text_init , "May the Souls of"
+    text_line , "#MON Rest Easy"
+    text_cont , "#MON TOWER"
+    text_done
 
 _VermilionCityText1:
-    db $0,"We're careful",$4f
-    db "about pollution!",$51
-    db "We've heard GRIMER",$4f
-    db "multiplies in",$55
-    db "toxic sludge!",$57
+    text_init , "We're careful"
+    text_line , "about pollution!"
+    text_para , "We've heard GRIMER"
+    text_line , "multiplies in"
+    text_cont , "toxic sludge!"
+    text_done
 
 _UnnamedText_198a7:
-    db $0,"Did you see S.S.",$4f
-    db "ANNE moored in",$55
-    db "the harbor?",$57
+    text_init , "Did you see S.S."
+    text_line , "ANNE moored in"
+    text_cont , "the harbor?"
+    text_done
 
 _UnnamedText_198ac:
-    db $0,"So,S.S.ANNE has",$4f
-    db "departed!",$51
-    db "She'll be back in",$4f
-    db "about a year.",$57
+    text_init , "So,S.S.ANNE has"
+    text_line , "departed!"
+    text_para , "She'll be back in"
+    text_line , "about a year."
+    text_done
 
 _SSAnneWelcomeText4:
-    db $0,"Welcome to S.S.",$4f
-    db "ANNE!",$57
+    text_init , "Welcome to S.S."
+    text_line , "ANNE!"
+    text_done
 
 _SSAnneWelcomeText9:
-    db $0,"Welcome to S.S.",$4f
-    db "ANNE!",$51
-    db "Excuse me,do you",$4f
-    db "have a ticket?",$58
+    text_init , "Welcome to S.S."
+    text_line , "ANNE!"
+    text_para , "Excuse me,do you"
+    text_line , "have a ticket?"
+    text_wait
 
 _SSAnneFlashedTicketText:
-    db $0,$52," flashed",$4f
-    db "the S.S.TICKET!",$51
-    db "Great! Welcome to",$4f
-    db "S.S.ANNE!",$57
+    text_init , $52," flashed"
+    text_line , "the S.S.TICKET!"
+    text_para , "Great! Welcome to"
+    text_line , "S.S.ANNE!"
+    text_done
 
 _SSAnneNoTicketText:
-    db $0,$52," doesn't",$4f
-    db "have the needed",$55
-    db "S.S.TICKET.",$51
-    db "Sorry!",$51
-    db "You need a ticket",$4f
-    db "to get aboard.",$57
+    text_init , $52," doesn't"
+    text_line , "have the needed"
+    text_cont , "S.S.TICKET."
+    text_para , "Sorry!"
+    text_para , "You need a ticket"
+    text_line , "to get aboard."
+    text_done
 
 _SSAnneNotHereText:
-    db $0,"The ship set sail.",$57
+    text_init , "The ship set sail."
+    text_done
 
 _VermilionCityText4:
-    db $0,"I'm putting up a",$4f
-    db "building on this",$55
-    db "plot of land.",$51
-    db "My #MON is",$4f
-    db "tamping the land.",$57
+    text_init , "I'm putting up a"
+    text_line , "building on this"
+    text_cont , "plot of land."
+    text_para , "My #MON is"
+    text_line , "tamping the land."
+    text_done
 
 _VermilionCityText5:
-    db $0,"MACHOP: Guoh!",$4f
-    db "Gogogoh!@@"
+    text_init , "MACHOP: Guoh!"
+    text_line , "Gogogoh!"
+    text_past
 
 _VermilionCityText14:
-    db $0,$51
-    db "A MACHOP is",$4f
-    db "stomping the land",$55
-    db "flat.",$57
+    text_init
+    text_para , "A MACHOP is"
+    text_line , "stomping the land"
+    text_cont , "flat."
+    text_done
 
 _VermilionCityText6:
-    db $0,"S.S.ANNE is a",$4f
-    db "famous luxury",$55
-    db "cruise ship.",$51
-    db "We visit VERMILION",$4f
-    db "once a year.",$57
+    text_init , "S.S.ANNE is a"
+    text_line , "famous luxury"
+    text_cont , "cruise ship."
+    text_para , "We visit VERMILION"
+    text_line , "once a year."
+    text_done
 
 _VermilionCityText7:
-    db $0,"VERMILION CITY",$4f
-    db "The Port of",$55
-    db "Exquisite Sunsets",$57
+    text_init , "VERMILION CITY"
+    text_line , "The Port of"
+    text_cont , "Exquisite Sunsets"
+    text_done
 
 _VermilionCityText8:
-    db $0,"NOTICE!",$51
-    db "ROUTE 12 may be",$4f
-    db "blocked off by a",$55
-    db "sleeping #MON.",$51
-    db "Detour through",$4f
-    db "ROCK TUNNEL to",$55
-    db "LAVENDER TOWN.",$51
-    db "VERMILION POLICE",$57
+    text_init , "NOTICE!"
+    text_para , "ROUTE 12 may be"
+    text_line , "blocked off by a"
+    text_cont , "sleeping #MON."
+    text_para , "Detour through"
+    text_line , "ROCK TUNNEL to"
+    text_cont , "LAVENDER TOWN."
+    text_para , "VERMILION POLICE"
+    text_done
 
 _VermilionCityText11:
-    db $0,"#MON FAN CLUB",$4f
-    db "All #MON fans",$55
-    db "welcome!",$57
+    text_init , "#MON FAN CLUB"
+    text_line , "All #MON fans"
+    text_cont , "welcome!"
+    text_done
 
 _VermilionCityText12:
-    db $0,"VERMILION CITY",$4f
-    db "#MON GYM",$55
-    db "LEADER: LT.SURGE",$51
-    db "The Lightning ",$4f
-    db "American!",$57
+    text_init , "VERMILION CITY"
+    text_line , "#MON GYM"
+    text_cont , "LEADER: LT.SURGE"
+    text_para , "The Lightning "
+    text_line , "American!"
+    text_done
 
 _VermilionCityText13:
-    db $0,"VERMILION HARBOR",$57
+    text_init , "VERMILION HARBOR"
+    text_done
 
 _CeladonCityText1:
-    db $0,"I got my KOFFING",$4f
-    db "in CINNABAR!",$51
-    db "It's nice,but it",$4f
-    db "breathes poison",$55
-    db "when it's angry!",$57
+    text_init , "I got my KOFFING"
+    text_line , "in CINNABAR!"
+    text_para , "It's nice,but it"
+    text_line , "breathes poison"
+    text_cont , "when it's angry!"
+    text_done
 
 _CeladonCityText2:
-    db $0,"Heheh! This GYM",$4f
-    db "is great! It's",$55
-    db "full of women!",$57
+    text_init , "Heheh! This GYM"
+    text_line , "is great! It's"
+    text_cont , "full of women!"
+    text_done
 
 _CeladonCityText3:
-    db $0,"The GAME CORNER",$4f
-    db "is bad for our",$55
-    db "city's image!",$57
+    text_init , "The GAME CORNER"
+    text_line , "is bad for our"
+    text_cont , "city's image!"
+    text_done
 
 _CeladonCityText4:
-    db $0,"Moan! I blew it",$4f
-    db "all at the slots!",$51
-    db "I knew I should",$4f
-    db "have cashed in my",$55
-    db "coins for prizes!",$57
+    text_init , "Moan! I blew it"
+    text_line , "all at the slots!"
+    text_para , "I knew I should"
+    text_line , "have cashed in my"
+    text_cont , "coins for prizes!"
+    text_done
 
 _TM41PreText:
-    db $0,"Hello,there!",$51
-    db "I've seen you,",$4f
-    db "but I never had a",$55
-    db "chance to talk!",$51
-    db "Here's a gift for",$4f
-    db "dropping by!",$58
+    text_init , "Hello,there!"
+    text_para , "I've seen you,"
+    text_line , "but I never had a"
+    text_cont , "chance to talk!"
+    text_para , "Here's a gift for"
+    text_line , "dropping by!"
+    text_wait
 
 _TM41ExplanationText:
-    db $0,"TM53 teaches",$4f
-    db "TSUNAMI!",$51
-    db "Only strong",$4f
-    db "#MON can use",$55
-    db "it!",$51
-    db "Especially Big",$4f
-    db "WATER #MON!",$57
+    text_init , "TM53 teaches"
+    text_line , "TSUNAMI!"
+    text_para , "Only strong"
+    text_line , "#MON can use"
+    text_cont , "it!"
+    text_para , "Especially Big"
+    text_line , "WATER #MON!"
+    text_done
 
 _TM41NoRoomText:
-    db $0,"Oh,your pack is",$4f
-    db "full of items!",$57
+    text_init , "Oh,your pack is"
+    text_line , "full of items!"
+    text_done
 
 _CeladonCityText6:
-    db $0,"This is my trusted",$4f
-    db "pal,POLIWRATH!",$51
-    db "It evolved from",$4f
-    db "POLIWHIRL when I",$55
-    db "used WATER STONE!",$57
+    text_init , "This is my trusted"
+    text_line , "pal,POLIWRATH!"
+    text_para , "It evolved from"
+    text_line , "POLIWHIRL when I"
+    text_cont , "used WATER STONE!"
+    text_done
 
 _CeladonCityText7:
-    db $0,"POLIWRATH: Ribi",$4f
-    db "ribit!@@"
+    text_init , "POLIWRATH: Ribi"
+    text_line , "ribit!"
+    text_past
 
 _CeladonCityText8:
-    db $0,"What are you",$4f
-    db "staring at?",$57
+    text_init , "What are you"
+    text_line , "staring at?"
+    text_done
 
 _CeladonCityText9:
-    db $0,"Keep out of TEAM",$4f
-    db "ROCKET's way!",$57
+    text_init , "Keep out of TEAM"
+    text_line , "ROCKET's way!"
+    text_done
 
 _CeladonCityText10:
-    db $0,"TRAINER TIPS",$51
-    db "X ACCURACY boosts",$4f
-    db "the accuracy of",$55
-    db "techniques!",$51
-    db "DIRE HIT jacks up",$4f
-    db "the likelihood of",$55
-    db "critical hits!",$51
-    db "Get your items at",$4f
-    db "CELADON DEPT.",$55
-    db "STORE!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "X ACCURACY boosts"
+    text_line , "the accuracy of"
+    text_cont , "techniques!"
+    text_para , "DIRE HIT jacks up"
+    text_line , "the likelihood of"
+    text_cont , "critical hits!"
+    text_para , "Get your items at"
+    text_line , "CELADON DEPT."
+    text_cont , "STORE!"
+    text_done
 
 _CeladonCityText11:
-    db $0,"CELADON CITY",$4f
-    db "The City of",$55
-    db "Rainbow Dreams",$57
+    text_init , "CELADON CITY"
+    text_line , "The City of"
+    text_cont , "Rainbow Dreams"
+    text_done
 
 _CeladonCityText13:
-    db $0,"CELADON CITY",$4f
-    db "#MON GYM",$55
-    db "LEADER: ERIKA",$51
-    db "The Nature Loving",$4f
-    db "Princess!",$57
+    text_init , "CELADON CITY"
+    text_line , "#MON GYM"
+    text_cont , "LEADER: ERIKA"
+    text_para , "The Nature Loving"
+    text_line , "Princess!"
+    text_done
 
 _CeladonCityText14:
-    db $0,"CELADON MANSION",$57
+    text_init , "CELADON MANSION"
+    text_done
 
 _CeladonCityText15:
-    db $0,"Find what you",$4f
-    db "need at CELADON",$55
-    db "DEPT. STORE!",$57
+    text_init , "Find what you"
+    text_line , "need at CELADON"
+    text_cont , "DEPT. STORE!"
+    text_done
 
 _CeladonCityText16:
-    db $0,"TRAINER TIPS",$51
-    db "GUARD SPEC.",$4f
-    db "protects #MON",$55
-    db "against SPECIAL",$55
-    db "attacks such as",$55
-    db "fire and water!",$51
-    db "Get your items at",$4f
-    db "CELADON DEPT.",$55
-    db "STORE!",$57
+    text_init , "TRAINER TIPS"
+    text_para , "GUARD SPEC."
+    text_line , "protects #MON"
+    text_cont , "against SPECIAL"
+    text_cont , "attacks such as"
+    text_cont , "fire and water!"
+    text_para , "Get your items at"
+    text_line , "CELADON DEPT."
+    text_cont , "STORE!"
+    text_done
 
 _CeladonCityText17:
-    db $0,"Coins exchanged",$4f
-    db "for prizes!",$55
-    db "PRIZE EXCHANGE",$57
+    text_init , "Coins exchanged"
+    text_line , "for prizes!"
+    text_cont , "PRIZE EXCHANGE"
+    text_done
 
 _CeladonCityText18:
-    db $0,"ROCKET GAME CORNER",$4f
-    db "The playground",$55
-    db "for grown-ups!",$57
+    text_init , "ROCKET GAME CORNER"
+    text_line , "The playground"
+    text_cont , "for grown-ups!"
+    text_done
 
 _FuchsiaCityText1:
-    db $0,"Did you try the",$4f
-    db "SAFARI GAME? Some",$55
-    db "#MON can only",$55
-    db "be caught there.",$57
+    text_init , "Did you try the"
+    text_line , "SAFARI GAME? Some"
+    text_cont , "#MON can only"
+    text_cont , "be caught there."
+    text_done
 
 _FuchsiaCityText2:
-    db $0,"SAFARI ZONE has a",$4f
-    db "zoo in front of",$55
-    db "the entrance.",$51
-    db "Out back is the",$4f
-    db "SAFARI GAME for",$55
-    db "catching #MON.",$57
+    text_init , "SAFARI ZONE has a"
+    text_line , "zoo in front of"
+    text_cont , "the entrance."
+    text_para , "Out back is the"
+    text_line , "SAFARI GAME for"
+    text_cont , "catching #MON."
+    text_done
 
 _FuchsiaCityText3:
-    db $0,"ERIK: Where's",$4f
-    db "SARA? I said I'd",$55
-    db "meet her here.",$57
+    text_init , "ERIK: Where's"
+    text_line , "SARA? I said I'd"
+    text_cont , "meet her here."
+    text_done
 
 _FuchsiaCityText4:
-    db $0,"That item ball in",$4f
-    db "there is really a",$55
-    db "#MON.",$57
+    text_init , "That item ball in"
+    text_line , "there is really a"
+    text_cont , "#MON."
+    text_done
 
 _FuchsiaCityText5:
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _FuchsiaCityText13:
-    db $0,"SAFARI GAME",$4f
-    db "#MON-U-CATCH!",$57
+    text_init , "SAFARI GAME"
+    text_line , "#MON-U-CATCH!"
+    text_done
 
 _FuchsiaCityText16:
-    db $0,"SAFARI ZONE",$4f
-    db "WARDEN's HOME",$57
+    text_init , "SAFARI ZONE"
+    text_line , "WARDEN's HOME"
+    text_done
 
 _FuchsiaCityText17:
-    db $0,"#MON PARADISE",$4f
-    db "SAFARI ZONE",$57
+    text_init , "#MON PARADISE"
+    text_line , "SAFARI ZONE"
+    text_done
 
 _FuchsiaCityText18:
-    db $0,"FUCHSIA CITY",$4f
-    db "#MON GYM",$55
-    db "LEADER: KOGA",$51
-    db "The Poisonous",$4f
-    db "Ninja Master",$57
+    text_init , "FUCHSIA CITY"
+    text_line , "#MON GYM"
+    text_cont , "LEADER: KOGA"
+    text_para , "The Poisonous"
+    text_line , "Ninja Master"
+    text_done
 
 _FuchsiaCityChanseyText:
-    db $0,"Name: CHANSEY",$51
-    db "Catching one is",$4f
-    db "all up to chance.",$57
+    text_init , "Name: CHANSEY"
+    text_para , "Catching one is"
+    text_line , "all up to chance."
+    text_done
 
 _FuchsiaCityVoltorbText:
-    db $0,"Name: VOLTORB",$51
-    db "The very image of",$4f
-    db "a # BALL.",$57
+    text_init , "Name: VOLTORB"
+    text_para , "The very image of"
+    text_line , "a # BALL."
+    text_done
 
 _FuchsiaCityKangaskhanText:
-    db $0,"Name: KANGASKHAN",$51
-    db "A maternal #MON",$4f
-    db "that raises its",$55
-    db "young in a pouch",$55
-    db "on its belly.",$57
+    text_init , "Name: KANGASKHAN"
+    text_para , "A maternal #MON"
+    text_line , "that raises its"
+    text_cont , "young in a pouch"
+    text_cont , "on its belly."
+    text_done
 
 _FuchsiaCitySlowpokeText:
-    db $0,"Name: SLOWPOKE",$51
-    db "Friendly and very",$4f
-    db "slow moving.",$57
+    text_init , "Name: SLOWPOKE"
+    text_para , "Friendly and very"
+    text_line , "slow moving."
+    text_done
 
 _FuchsiaCityLaprasText:
-    db $0,"Name: LAPRAS",$51
-    db "A.K.A. the king",$4f
-    db "of the seas.",$57
+    text_init , "Name: LAPRAS"
+    text_para , "A.K.A. the king"
+    text_line , "of the seas."
+    text_done
 
 _FuchsiaCityOmanyteText:
-    db $0,"Name: OMANYTE",$51
-    db "A #MON that",$4f
-    db "was resurrected",$55
-    db "from a fossil.",$57
+    text_init , "Name: OMANYTE"
+    text_para , "A #MON that"
+    text_line , "was resurrected"
+    text_cont , "from a fossil."
+    text_done
 
 _FuchsiaCityKabutoText:
-    db $0,"Name: KABUTO",$51
-    db "A #MON that",$4f
-    db "was resurrected",$55
-    db "from a fossil.",$57
+    text_init , "Name: KABUTO"
+    text_para , "A #MON that"
+    text_line , "was resurrected"
+    text_cont , "from a fossil."
+    text_done
 
 _UnnamedText_19b2a:
-    db $0,"...",$57
+    text_init , "..."
+    text_done
 
 _CinnabarIslandText8:
-    db $0,"The door is",$4f
-    db "locked...",$57
+    text_init , "The door is"
+    text_line , "locked..."
+    text_done
 
 _CinnabarIslandText1:
-    db $0,"CINNABAR GYM's",$4f
-    db "BLAINE is an odd",$55
-    db "man who has lived",$55
-    db "here for decades.",$57
+    text_init , "CINNABAR GYM's"
+    text_line , "BLAINE is an odd"
+    text_cont , "man who has lived"
+    text_cont , "here for decades."
+    text_done
 
 _CinnabarIslandText2:
-    db $0,"Scientists conduct",$4f
-    db "experiments in",$55
-    db "the burned out",$55
-    db "building.",$57
+    text_init , "Scientists conduct"
+    text_line , "experiments in"
+    text_cont , "the burned out"
+    text_cont , "building."
+    text_done
 
 _CinnabarIslandText3:
-    db $0,"CINNABAR ISLAND",$4f
-    db "The Fiery Town of",$55
-    db "Burning Desire",$57
+    text_init , "CINNABAR ISLAND"
+    text_line , "The Fiery Town of"
+    text_cont , "Burning Desire"
+    text_done
 
 _CinnabarIslandText6:
-    db $0,"#MON LAB",$57
+    text_init , "#MON LAB"
+    text_done
 
 _CinnabarIslandText7:
-    db $0,"CINNABAR ISLAND",$4f
-    db "#MON GYM",$55
-    db "LEADER: BLAINE",$51
-    db "The Hot-Headed",$4f
-    db "Quiz Master!",$57
+    text_init , "CINNABAR ISLAND"
+    text_line , "#MON GYM"
+    text_cont , "LEADER: BLAINE"
+    text_para , "The Hot-Headed"
+    text_line , "Quiz Master!"
+    text_done
 
 _SaffronCityText1:
-    db $0,"What do you want?",$4f
-    db "Get lost!",$57
+    text_init , "What do you want?"
+    text_line , "Get lost!"
+    text_done
 
 _SaffronCityText2:
-    db $0,"BOSS said he'll",$4f
-    db "take this town!",$57
+    text_init , "BOSS said he'll"
+    text_line , "take this town!"
+    text_done
 
 _SaffronCityText3:
-    db $0,"Get out of the",$4f
-    db "way!",$57
+    text_init , "Get out of the"
+    text_line , "way!"
+    text_done
 
 _SaffronCityText4:
-    db $0,"SAFFRON belongs",$4f
-    db "to TEAM ROCKET!",$57
+    text_init , "SAFFRON belongs"
+    text_line , "to TEAM ROCKET!"
+    text_done
 
 _SaffronCityText5:
-    db $0,"Being evil makes",$4f
-    db "me feel so alive!",$57
+    text_init , "Being evil makes"
+    text_line , "me feel so alive!"
+    text_done
 
 _SaffronCityText6:
-    db $0,"Ow! Watch where",$4f
-    db "you're walking!",$57
+    text_init , "Ow! Watch where"
+    text_line , "you're walking!"
+    text_done
 
 _SaffronCityText7:
-    db $0,"With SILPH under",$4f
-    db "control,we can",$55
-    db "exploit #MON",$55
-    db "around the world!",$57
+    text_init , "With SILPH under"
+    text_line , "control,we can"
+    text_cont , "exploit #MON"
+    text_cont , "around the world!"
+    text_done
 
 _SaffronCityText8:
-    db $0,"You beat TEAM",$4f
-    db "ROCKET all alone?",$55
-    db "That's amazing!",$57
+    text_init , "You beat TEAM"
+    text_line , "ROCKET all alone?"
+    text_cont , "That's amazing!"
+    text_done
 
 _SaffronCityText9:
-    db $0,"Yeah! TEAM ROCKET",$4f
-    db "is gone!",$55
-    db "It's safe to go",$55
-    db "out again!",$57
+    text_init , "Yeah! TEAM ROCKET"
+    text_line , "is gone!"
+    text_cont , "It's safe to go"
+    text_cont , "out again!"
+    text_done
 
 _SaffronCityText10:
-    db $0,"People should be",$4f
-    db "flocking back to",$55
-    db "SAFFRON now.",$57
+    text_init , "People should be"
+    text_line , "flocking back to"
+    text_cont , "SAFFRON now."
+    text_done
 
 _SaffronCityText11:
-    db $0,"I flew here on my",$4f
-    db "PIDGEOT when I",$55
-    db "read about SILPH.",$51
-    db "It's already over?",$4f
-    db "I missed the",$55
-    db "media action.",$57
+    text_init , "I flew here on my"
+    text_line , "PIDGEOT when I"
+    text_cont , "read about SILPH."
+    text_para , "It's already over?"
+    text_line , "I missed the"
+    text_cont , "media action."
+    text_done
 
 _SaffronCityText12:
-    db $0,"PIDGEOT: Bi bibii!@@"
+    text_init , "PIDGEOT: Bi bibii!"
+    text_past
 
 _SaffronCityText13:
-    db $0,"I saw ROCKET",$4f
-    db "BOSS escaping",$55
-    db "SILPH's building.",$57
+    text_init , "I saw ROCKET"
+    text_line , "BOSS escaping"
+    text_cont , "SILPH's building."
+    text_done
 
 _SaffronCityText14:
-    db $0,"I'm a security",$4f
-    db "guard.",$51
-    db "Suspicious kids I",$4f
-    db "don't allow in!",$57
+    text_init , "I'm a security"
+    text_line , "guard."
+    text_para , "Suspicious kids I"
+    text_line , "don't allow in!"
+    text_done
 
 _SaffronCityText15:
-    db $0,"...",$4f
-    db "Snore ",$CA,$CA,$51
-    db "Hah! He's taking",$4f
-    db "a snooze!",$57
+    text_init , "..."
+    text_line , "Snore ",$CA,$CA
+    text_para , "Hah! He's taking"
+    text_line , "a snooze!"
+    text_done
 
 _SaffronCityText16:
-    db $0,"SAFFRON CITY",$4f
-    db "Shining,Golden",$55
-    db "Land of Commerce",$57
+    text_init , "SAFFRON CITY"
+    text_line , "Shining,Golden"
+    text_cont , "Land of Commerce"
+    text_done
 
 _SaffronCityText17:
-    db $0,"FIGHTING DOJO",$57
+    text_init , "FIGHTING DOJO"
+    text_done
 
 _SaffronCityText18:
-    db $0,"SAFFRON CITY",$4f
-    db "#MON GYM",$55
-    db "LEADER: SABRINA",$51
-    db "The Master of",$4f
-    db "Psychic #MON!",$57
+    text_init , "SAFFRON CITY"
+    text_line , "#MON GYM"
+    text_cont , "LEADER: SABRINA"
+    text_para , "The Master of"
+    text_line , "Psychic #MON!"
+    text_done
 
 _SaffronCityText20:
-    db $0,"TRAINER TIPS",$51
-    db "FULL HEAL cures",$4f
-    db "all ailments like",$55
-    db "sleep and burns.",$51
-    db "It costs a bit",$4f
-    db "more,but it's",$55
-    db "more convenient.",$57
+    text_init , "TRAINER TIPS"
+    text_para , "FULL HEAL cures"
+    text_line , "all ailments like"
+    text_cont , "sleep and burns."
+    text_para , "It costs a bit"
+    text_line , "more,but it's"
+    text_cont , "more convenient."
+    text_done
 
 _SaffronCityText21:
-    db $0,"TRAINER TIPS",$51
-    db "New GREAT BALL",$4f
-    db "offers improved",$55
-    db "capture rates.",$51
-    db "Try it on those",$4f
-    db "hard-to-catch",$55
-    db "#MON.",$57
+    text_init , "TRAINER TIPS"
+    text_para , "New GREAT BALL"
+    text_line , "offers improved"
+    text_cont , "capture rates."
+    text_para , "Try it on those"
+    text_line , "hard-to-catch"
+    text_cont , "#MON."
+    text_done
 
 _SaffronCityText22:
-    db $0,"SILPH CO.",$4f
-    db "OFFICE BUILDING",$57
+    text_init , "SILPH CO."
+    text_line , "OFFICE BUILDING"
+    text_done
 
 _SaffronCityText24:
-    db $0,"MR.PSYCHIC's",$4f
-    db "HOUSE",$57
+    text_init , "MR.PSYCHIC's"
+    text_line , "HOUSE"
+    text_done
 
 _SaffronCityText25:
-    db $0,"SILPH's latest",$4f
-    db "product!",$51
-    db "Release to be",$4f
-    db "determined...",$57
+    text_init , "SILPH's latest"
+    text_line , "product!"
+    text_para , "Release to be"
+    text_line , "determined..."
+    text_done
 
 _ItemUseBallText00:
-    db 0,"It dodged the",$4F
-    db "thrown BALL!",$51
-    db "This #MON",$4F
-    db "can't be caught!",$58
+    text_init , "It dodged the"
+    text_line , "thrown BALL!"
+    text_para , "This #MON"
+    text_line , "can't be caught!"
+    text_wait
 
 _ItemUseBallText01:
-    db 0,"You missed the",$4F
-    db "#MON!",$58
+    text_init , "You missed the"
+    text_line , "#MON!"
+    text_wait
 
 _ItemUseBallText02:
-    db 0,"Darn! The #MON",$4F
-    db "broke free!",$58
+    text_init , "Darn! The #MON"
+    text_line , "broke free!"
+    text_wait
 
 _ItemUseBallText03:
-    db 0,"Aww! It appeared",$4F
-    db "to be caught! ",$58
+    text_init , "Aww! It appeared"
+    text_line , "to be caught! "
+    text_wait
 
 _ItemUseBallText04:
-    db 0,"Shoot! It was so",$4F
-    db "close too!",$58
+    text_init , "Shoot! It was so"
+    text_line , "close too!"
+    text_wait
 
 _ItemUseBallText05:
-    db 0,"Yeah! @",1
+    text_init , "Yeah! "
+    text_paus
+    db 1
     dw W_ENEMYMONNAME
-    db 0,$4f,"was caught!@@"
+    text_init
+    text_line , "was caught!"
+    text_past
 
 _ItemUseBallText08:
     db 1
     dw $DE06
-    db 0," sent to",$4F
-    db "someone's PC!",$58
+    text_init , " sent to"
+    text_line , "someone's PC!"
+    text_wait
 
 _ItemUseBallText06:
-    db 0,"New #DEX data",$4F
-    db "will be added!@@"
+    text_init , "New #DEX data"
+    text_line , "will be added!"
+    text_past
 
 _SurfingNoPlaceToGetOffText:
-    db $0,"There's no place",$4f
-    db "to get off!",$58
+    text_init , "There's no place"
+    text_line , "to get off!"
+    text_wait
 
 _VitaminStatRoseText:
     TX_RAM $cd6d
-    db $0,"'s",$4f
-    db "@"
+    text_init , "'s"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0," rose.",$58
+    text_init , " rose."
+    text_wait
 
 _VitaminNoEffectText:
-    db $0,"It won't have any",$4f
-    db "effect.",$58
+    text_init , "It won't have any"
+    text_line , "effect."
+    text_wait
 
 _ThrewBaitText:
-    db $0,$52," threw",$4f
-    db "some BAIT.",$57
+    text_init , $52," threw"
+    text_line , "some BAIT."
+    text_done
 
 _ThrewRockText:
-    db $0,$52," threw a",$4f
-    db "ROCK.",$57
+    text_init , $52," threw a"
+    text_line , "ROCK."
+    text_done
 
 _FluteWokeUpText:
-    db $0,"All sleeping",$4f
-    db "#MON woke up!",$58
+    text_init , "All sleeping"
+    text_line , "#MON woke up!"
+    text_wait
 
 _PlayedFluteHadEffectText:
-    db $0,$52," played the",$4f
-    db "# FLUTE.",$57
+    text_init , $52," played the"
+    text_line , "# FLUTE."
+    text_done
 
 _CoinCaseNumCoinsText:
-    db $0,"Coins",$4f
-    db "@"
+    text_init , "Coins"
+    text_line
+    text_paus
     db $2,$a4,$d5,$c2 ; print BCD number
-    db $0," ",$58
+    text_init , " "
+    text_wait
 
 _ItemfinderFoundItemText:
-    db $0,"Yes! ITEMFINDER",$4f
-    db "indicates there's",$55
-    db "an item nearby.",$58
+    text_init , "Yes! ITEMFINDER"
+    text_line , "indicates there's"
+    text_cont , "an item nearby."
+    text_wait
 
 _ItemfinderFoundNothingText:
-    db $0,"Nope! ITEMFINDER",$4f
-    db "isn't responding.",$58
+    text_init , "Nope! ITEMFINDER"
+    text_line , "isn't responding."
+    text_wait
 
 _PPRestoredText:
     TX_NUM $d11e,1,3
-    db $0,$DA," ENERGY",$4f
-    db "Restored!",$58
+    text_init , $DA," ENERGY"
+    text_line , "Restored!"
+    text_wait
 
 _TeachMachineMoveText:
-    db $0,"Teach @"
+    text_init , "Teach "
+    text_paus
     TX_RAM $cf4b
-    db $0,$4f
-    db "to a #MON?",$57
+    text_init
+    text_line , "to a #MON?"
+    text_done
 
 _MonCannotLearnMachineMoveText:
     TX_RAM $cd6d
-    db $0," is not",$4f
-    db "compatible with",$55
-    db "@"
+    text_init , " is not"
+    text_line , "compatible with"
+    text_cont
+    text_paus
     TX_RAM $cf4b
-    db $0,".",$58
+    text_init , "."
+    text_wait
 
 _ItemUseNotTimeText:
-    db $0,"OAK: ",$52,"!",$4f
-    db "This isn't the",$55
-    db "time to use that! ",$58
+    text_init , "OAK: ",$52,"!"
+    text_line , "This isn't the"
+    text_cont , "time to use that! "
+    text_wait
 
 _ItemUseNotYoursToUseText:
-    db $0,"This isn't yours",$4f
-    db "to use!",$58
+    text_init , "This isn't yours"
+    text_line , "to use!"
+    text_wait
 
 _ItemUseNoEffectText:
-    db $0,"It won't have any",$4f
-    db "effect.",$58
+    text_init , "It won't have any"
+    text_line , "effect."
+    text_wait
 
 _ThrowBallAtTrainerMonText1:
-    db $0,"The trainer",$4f
-    db "blocked the BALL!",$58
+    text_init , "The trainer"
+    text_line , "blocked the BALL!"
+    text_wait
 
 _ThrowBallAtTrainerMonText2:
-    db $0,"Don't be a thief!",$58
+    text_init , "Don't be a thief!"
+    text_wait
 
 _NoCyclingAllowedHereText:
-    db $0,"No cycling",$4e,"allowed here.",$58
+    text_init , "No cycling",$4e,"allowed here."
+    text_wait
 
 _NoSurfingHereText:
-    db $0,"No FLOAT on  ",$4f
-    db "@"
+    text_init , "No FLOAT on  "
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0," here!",$58
+    text_init , " here!"
+    text_wait
 
 _BoxFullCannotThrowBallText:
-    db $0,"The #MON BOX",$4f
-    db "is full! Can't",$55
-    db "use that item!",$58
+    text_init , "The #MON BOX"
+    text_line , "is full! Can't"
+    text_cont , "use that item!"
+    text_wait
 
 _FuchsiaCityText11:
-    db $0,"To access it",$4f
-    db "is necessary",$55
-    db "to overcome Fear!",$57
+    text_init , "To access it"
+    text_line , "is necessary"
+    text_cont , "to overcome Fear!"
+    text_done
 
 _FuchsiaCityText12:
-    db $0,"FUCHSIA CITY",$4f
-    db "Behold! It's",$55
-    db "Passion Pink!",$57
+    text_init , "FUCHSIA CITY"
+    text_line , "Behold! It's"
+    text_cont , "Passion Pink!"
+    text_done
 
 _SurfingGotOnText:
-    db $0,$52," puts bag",$4f
-    db "on "
-    db "@"
+    text_init , $52," puts bag"
+    text_line , "on "
+    text_paus
     TX_RAM $cd6d
-    db $0,"!",$58
+    text_init , "!"
+    text_wait
 
 _ItemUseBallText07:
     db 1
     dw $DE06
-    db 0," sent to",$4F
-    db "BILL's PC! (@"
+    text_init , " sent to"
+    text_line , "BILL's PC! ("
+    text_paus
     TX_NUM W_NUMINBOX,1,2
-    db 0,"/20)",$58
+    text_init , "/20)"
+    text_wait
 
 _CannotDigHereText:
     TX_RAM $cd6d
-    db $0," can't",$4f
-    db "DIG here.",$58
+    text_init , " can't"
+    text_line , "DIG here."
+    text_wait
 
 _VermilionCityText14_Dex:
-    db $0
-    db "A MACHOP is",$4f
-    db "stomping the land",$55
-    db "flat.",$58
+    text_init , "A MACHOP is"
+    text_line , "stomping the land"
+    text_cont , "flat."
+    text_wait
 
 _VoltorbText:
-    db $0,"Wow!",$4f
-    db "A VOLTORB...",$58
+    text_init , "Wow!"
+    text_line , "A VOLTORB..."
+    text_wait
 
 _VoltorbHisuiText:
-    db $0,"Wow! Is it",$4f
-    db "a VOLTORB?",$51
-    db "I must check",$4f
-    db "the #DEX!",$58
+    text_init , "Wow! Is it"
+    text_line , "a VOLTORB?"
+    text_para , "I must check"
+    text_line , "the #DEX!"
+    text_wait
 
 _VoltorbHisui2Text:
-    db $0,"It's different",$4f
-    db "from the #DEX!",$58
+    text_init , "It's different"
+    text_line , "from the #DEX!"
+    text_wait
 
 _EnableLastPkmnText:
-    db $0,"OAK: WOW! ",$51
-    db "Have you already",$4f
-    db "won @"
+    text_init , "OAK: WOW! "
+    text_para , "Have you already"
+    text_line , "won "
+    text_paus
     TX_NUM $d11e,1,3
-    db $0," badges",$55
-    db "yet?",$51
-    db "Wonderfull!",$51
-    db "I knew that the",$4f
-    db "energy of a real",$55
-    db "trainer flows",$55
-    db "through you!",$51
-    db "Why don't you take",$4f
-    db "care of my last",$55
-    db "#MON?",$57
+    text_init , " badges"
+    text_cont , "yet?"
+    text_para , "Wonderfull!"
+    text_para , "I knew that the"
+    text_line , "energy of a real"
+    text_cont , "trainer flows"
+    text_cont , "through you!"
+    text_para , "Why don't you take"
+    text_line , "care of my last"
+    text_cont , "#MON?"
+    text_done
 
 _ReceivedTM28Text:
-    db $0,$52," recovered",$4f
-    db "@"
+    text_init , $52," recovered"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _EndSurfText:
-    db $0,$52," retrieves",$4f
-    db "bag!",$58
+    text_init , $52," retrieves"
+    text_line , "bag!"
+    text_wait
 
 _SurfingOnLaprasText:
-    db $0,$52," got on",$4f
-    db "@"
+    text_init , $52," got on"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0,"!",$58
+    text_init , "!"
+    text_wait
 
 _NoSurfingOnLaprasHereText:
-    db $0,"No SURFing on",$4f
-    db "@"
+    text_init , "No SURFing on"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0," here!",$58
+    text_init , " here!"
+    text_wait
 
 _AlreadyStrengthText:
-    db $0,"STRENGTH Already",$4f
-    db "in use!",$58
+    text_init , "STRENGTH Already"
+    text_line , "in use!"
+    text_wait
 
 _SurfingText:
     TX_RAM $cd6d
-    db $0," can't",$4f
-    db "apply STRENGTH",$55
-    db "in water!",$58
+    text_init , " can't"
+    text_line , "apply STRENGTH"
+    text_cont , "in water!"
+    text_wait
 
 SECTION "bank2A",ROMX,BANK[$2A]
 
 _ItemUseText001:
-    db 0,$52," used@@"
+    text_init , $52," used"
+    text_past
 
 _ItemUseText002:
     TX_RAM $cf4b
-    db $0,"!",$57
+    text_init , "!"
+    text_done
 
 _GotOnBicycleText1:
-    db $0,$52," got on the@@"
+    text_init , $52," got on the"
+    text_past
 
 _GotOnBicycleText2:
     TX_RAM $cf4b
-    db $0,"!",$58
+    text_init , "!"
+    text_wait
 
 _GotOffBicycleText1:
-    db $0,$52," got off@@"
+    text_init , $52," got off"
+    text_past
 
 _GotOffBicycleText2:
-    db $0,"the @"
+    text_init , "the "
+    text_paus
     TX_RAM $cf4b
-    db $0,".",$58
+    text_init , "."
+    text_wait
 
 _ThrewAwayItemText:
-    db $0,"Threw away",$4f
-    db "@"
-
-UnnamedText_a8049:
+    text_init , "Threw away"
+    text_line
+    text_paus
     TX_RAM $cd6d
-    db $0,".",$58
+    text_init , "."
+    text_wait
 
 _IsItOKToTossItemText:
-    db $0,"Is it OK to toss",$4f
-    db "@"
+    text_init , "Is it OK to toss"
+    text_line
+    text_paus
     TX_RAM $cf4b
-    db $0,"?",$58
+    text_init , "?"
+    text_wait
 
 _TooImportantToTossText:
-    db $0,"That's too impor-",$4f
-    db "tant to toss!",$58
+    text_init , "That's too impor-"
+    text_line , "tant to toss!"
+    text_wait
 
 _UnnamedText_71d88:
-    db $0,"Okay,connect the",$4f
-    db "cable like so!",$58
+    text_init , "Okay,connect the"
+    text_line , "cable like so!"
+    text_wait
 
 _UnnamedText_71d8d:
-    db $0,$52," traded",$4f
-    db "@"
+    text_init , $52," traded"
+    text_line
+    text_paus
     TX_RAM $cd13
-    db $0," for",$55
-    db "@"
+    text_init , " for"
+    text_cont
+    text_paus
     TX_RAM $cd1e
-    db $0,"!@@"
+    text_init , "!"
+    text_past
 
 _UnnamedText_71d94:
-    db $0,"I'm looking for",$4f
-    db "@"
+    text_init , "I'm looking for"
+    text_line
+    text_paus
     TX_RAM $cd13
-    db $0,"! Wanna",$51
-    db "trade one for",$4f
-    db "@"
+    text_init , "! Wanna"
+    text_para , "trade one for"
+    text_line
+    text_paus
     TX_RAM $cd1e
-    db $0,"? ",$57
+    text_init , "? "
+    text_done
 
 _UnnamedText_71d99:
-    db $0,"Awww!",$4f
-    db "Oh well...",$57
+    text_init , "Awww!"
+    text_line , "Oh well..."
+    text_done
 
 _UnnamedText_71d9e:
-    db $0,"What? That's not",$4f
-    db "@"
-
-UnnamedText_a812f:
+    text_init , "What? That's not"
+    text_line
+    text_paus
     TX_RAM $cd13
-    db $0,"!",$51
-    db "If you get one,",$4f
-    db "come back here!",$57
+    text_init , "!"
+    text_para , "If you get one,"
+    text_line , "come back here!"
+    text_done
 
 _UnnamedText_71da3:
-    db $0,"Hey thanks!",$57
+    text_init , "Hey thanks!"
+    text_done
 
 _UnnamedText_71da8:
-    db $0,"Isn't my old",$4f
-    db "@"
+    text_init , "Isn't my old"
+    text_line
+    text_paus
     TX_RAM $cd1e
-    db $0," great?",$57
+    text_init , " great?"
+    text_done
 
 _UnnamedText_71dad:
-    db $0,"Hello there! Do",$4f
-    db "you want to trade",$51
-    db "your @"
+    text_init , "Hello there! Do"
+    text_line , "you want to trade"
+    text_para , "your "
+    text_paus
     TX_RAM $cd13
-    db $0,$4f
-    db "for @"
+    text_init
+    text_line , "for "
+    text_paus
     TX_RAM $cd1e
-    db $0,"?",$57
+    text_init , "?"
+    text_done
 
 _UnnamedText_71db2:
-    db $0,"Well,if you",$4f
-    db "don't want to...",$57
+    text_init , "Well,if you"
+    text_line , "don't want to..."
+    text_done
 
 _UnnamedText_71db7:
-    db $0,"Hmmm? This isn't",$4f
-    db "@"
+    text_init , "Hmmm? This isn't"
+    text_line
+    text_paus
     TX_RAM $cd13
-    db $0,".",$51
-    db "Think of me when",$4f
-    db "you get one.",$57
+    text_init , "."
+    text_para , "Think of me when"
+    text_line , "you get one."
+    text_done
 
 _UnnamedText_71dbc:
-    db $0,"Thanks!",$57
+    text_init , "Thanks!"
+    text_done
 
 _UnnamedText_71dc1:
-    db $0,"The @"
+    text_init , "The "
+    text_paus
     TX_RAM $cd13
-    db $0," you",$4f
-    db "traded to me",$51
-    db "went and evolved!",$57
+    text_init , " you"
+    text_line , "traded to me"
+    text_para , "went and evolved!"
+    text_done
 
 _UnnamedText_71dc6:
-    db $0,"Hi! Do you have",$4f
-    db "@"
+    text_init , "Hi! Do you have"
+    text_line
+    text_paus
     TX_RAM $cd13
-    db $0,"?",$51
-    db "Want to trade it",$4f
-    db "for @"
+    text_init , "?"
+    text_para , "Want to trade it"
+    text_line , "for "
+    text_paus
     TX_RAM $cd1e
-    db $0,"?",$57
+    text_init , "?"
+    text_done
 
 _UnnamedText_71dcb:
-    db $0,"That's too bad.",$57
+    text_init , "That's too bad."
+    text_done
 
 _UnnamedText_71dd0:
-    db $0,"...This is no",$4f
-    db "@"
+    text_init , "...This is no"
+    text_line
+    text_paus
     TX_RAM $cd13
-    db $0,".",$51
-    db "If you get one,",$4f
-    db "trade it with me!",$57
+    text_init , "."
+    text_para , "If you get one,"
+    text_line , "trade it with me!"
+    text_done
 
 _UnnamedText_71dd5:
-    db $0,"Thanks pal!",$57
+    text_init , "Thanks pal!"
+    text_done
 
 _UnnamedText_71dda:
-    db $0,"How is my old",$4f
-    db "@"
+    text_init , "How is my old"
+    text_line
+    text_paus
     TX_RAM $cd1e
-    db $0,"?",$51
-    db "My @"
+    text_init , "?"
+    text_para , "My "
+    text_paus
     TX_RAM $cd13
-    db $0," is",$4f
-    db "doing great!",$57
+    text_init , " is"
+    text_line , "doing great!"
+    text_done
 
 _NothingToCutText:
-    db $0,"There isn't",$4f
-    db "anything to CUT!",$58
+    text_init , "There isn't"
+    text_line , "anything to CUT!"
+    text_wait
 
 _UsedCutText:
     TX_RAM $cd6d
-    db $0," hacked",$4f
-    db "away with CUT!",$58
+    text_init , " hacked"
+    text_line , "away with CUT!"
+    text_wait
 
 _PlateauGrassText:
-    db $0,"The grass is",$4f
-    db "too thick to CUT!",$58
+    text_init , "The grass is"
+    text_line , "too thick to CUT!"
+    text_wait
 
 _UnnamedText_2fe3b:
     TX_RAM $cd6d
-    db $0,$4f
-    db "already knows",$55,"@"
+    text_init
+    text_line , "already knows"
+    text_cont
+    text_paus
     TX_RAM $cf4b
-    db $0,"!",$58
+    text_init , "!"
+    text_wait
 
 SECTION "bank2B",ROMX,BANK[$2B]
 
