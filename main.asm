@@ -134069,6 +134069,8 @@ SelectInOverWorld:
     ld hl,FLOAT_FLAG_BYTE
     bit FLOAT_FLAG_BIT,[hl]
     jr z,.noFloat
+    call CheckLaprasInPartyWithEnergy
+    jr c,.canFloat
     ld b,FLOAT_SKILL_SORT
     call SearchSkillInParty
     jr nc,.noFloat
@@ -134288,10 +134290,47 @@ SelectInOverWorld:
     ld [$FF8C],a
     jp DisplayTextID
 
+CheckLaprasInPartyWithEnergy:
+    ld hl,W_NUMINPARTY
+    ld a,[hli]
+    and a
+    jr z,.NotFound
+    ld b,a
+    ld c,0
+.Loop
+    ld a,[hli]
+    cp $FF
+    jr z,.NotFound
+    cp LAPRAS
+    jr z,.Found
+.Next
+    inc c
+    dec b
+    jr nz,.Loop
+.NotFound
+    xor a ; rcf
+    ret
+.Found ; LAPRAS Learn SKILL_FLOAT at Level 1
+    ld a,c
+    ld [wWhichPokemon],a
+    call .CheckAndDecreaseSkillEnergy
+    jr c,.Next
+    scf
+    ret
+.CheckAndDecreaseSkillEnergy
+    push hl
+    push bc
+    BANKSWITCH CheckAndDecreaseSkillEnergy
+    pop bc
+    pop hl
+    ret
+
 ; INPUT  : b = Skill
 ; OUTPUT : carry flag -> set found | reset not found
 SearchSkillInParty:
     ld a,[W_NUMINPARTY]
+    and a
+    jr z,.notfound
     ld d,a
     ld c,0
 .LoopMon

@@ -3277,7 +3277,7 @@ MAGIKARP_NoEvo_Learnset:
 LAPRAS_Learnset:
     db  1,BUBBLE
     db  1,GROWL
-    db  3,Skill__FLOAT
+    db  1,Skill__FLOAT
     db  7,BIDE
     db  9,WATER_GUN
     db 11,SING
