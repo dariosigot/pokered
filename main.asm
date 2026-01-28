@@ -5355,6 +5355,7 @@ VBlankHandler:
     push bc
     push de
     push hl
+    call SynchronizeParty
     ld a,[H_LOADEDROMBANK] ; current ROM bank
     ld [$d122],a
     ld a,[$ffae]
@@ -8056,6 +8057,30 @@ Func_310e:
 Func_314e:
     BANKSWITCH_JUMP Func_1a41d
 
+; ──────────────────────────────────
+
+SynchronizeParty:
+    ld a,[H_LOADEDROMBANK]
+    push af
+    ld a,BANK(_SynchronizeParty)
+    call RoutineForRealGB
+    call _SynchronizeParty
+    jr SynchronizeCommon
+
+SynchronizeBox:
+    ld a,[H_LOADEDROMBANK]
+    push af
+    ld a,BANK(_SynchronizeBox)
+    call RoutineForRealGB
+    call _SynchronizeBox
+    ; fall through
+
+SynchronizeCommon:
+    pop af
+    jp RoutineForRealGB
+
+; ──────────────────────────────────
+
 ; Free
 
 SECTION "StoreTrainerHeaderPointer",ROM0[$3157]
@@ -8532,8 +8557,8 @@ FuncTX_ItemStoragePC: ; 3460 (0:3460)
 
 FuncTX_BillsPC: ; 346a (0:346a)
     call SaveScreenTilesToBuffer2
-    ld b,BANK(Func_214c2)
-    ld hl,Func_214c2
+    ld b,BANK(BillsPC_)
+    ld hl,BillsPC_
     jr bankswitchAndContinue
 
 FuncTX_SlotMachine: ; 3474 (0:3474)
@@ -44053,10 +44078,11 @@ Func_213c8: ; 213c8 (8:53c8)
 ;.LogOffPCText
 ;    db "LOG OFF@"
 
-SECTION "Func_214c2",ROMX[$54c2],BANK[$8]
+; ──────────────────────────────────────────────────────────────
 
-Func_214c2: ; 214c2 (8:54c2)
-BillsPC_: ; 0x214c2
+SECTION "BillsPC_",ROMX[$54c2],BANK[$8]
+
+BillsPC_: ; 214c2 (8:54c2)
     ld hl,$d730
     set 6,[hl]
     xor a
@@ -44068,13 +44094,14 @@ BillsPC_: ; 0x214c2
     push af
     ld a,[wFlags_0xcd60]
     bit 3,a
-    jr nz,BillsPCMenu
+    jr nz,.BillsPCMenu
     ld a,$99
     call PlaySound
-    ld hl,SwitchOnText
+    ld hl,.SwitchOnText
     call PrintText
 
-BillsPCMenu: ; 214e8 (8:54e8)
+.BillsPCMenu
+    call SynchronizeBox
     ld a,[$ccd3]
     ld [wCurrentMenuItem],a ; $cc26
     ld hl,$9780
@@ -44088,7 +44115,7 @@ BillsPCMenu: ; 214e8 (8:54e8)
     call TextBoxBorder
     FuncCoord 2,2 ; $c3ca
     ld hl,Coord
-    ld de,BillsPCMenuText ; $56e1
+    ld de,.BillsPCMenuText ; $56e1
     call PlaceString
     ld hl,wTopMenuItemY ; $cc24
     ld a,$2
@@ -44108,7 +44135,7 @@ BillsPCMenu: ; 214e8 (8:54e8)
     ld [hli],a
     ld [hl],a
     ld [wPlayerMonNumber],a ; $cc2f
-    ld hl,WhatText
+    ld hl,.WhatText
     call PrintText
     FuncCoord 9,13 ; $c4c1
     ld hl,Coord
@@ -44132,27 +44159,28 @@ BillsPCMenu: ; 214e8 (8:54e8)
     ld [Coord],a
     FuncCoord 10,14 ; $c4ea
     ld hl,Coord
-    ld de,BoxNoPCText ; $5713
-    call PlaceStringAndBoxPkmnNumber ; call PlaceString
+    ld de,.BoxNoPCText ; $5713
+    call PlaceString
+    call .PlaceBoxPkmnNumber
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     call Delay3
     call HandleMenuInputWithWrap
     bit 1,a
-    jp nz,Func_21588 ; b button
+    jp nz,.Func_21588 ; b button
     call PlaceUnfilledArrowMenuCursor
     ld a,[wCurrentMenuItem] ; $cc26
     ld [$ccd3],a
     and a
-    jp z,BillsPCWithdraw ; withdraw
+    jp z,.BillsPCWithdraw ; withdraw
     cp $1
-    jp z,BillsPCDeposit ; deposit
+    jp z,.BillsPCDeposit ; deposit
     cp $2
-    jp z,BillsPCRelease ; release
+    jp z,.BillsPCRelease ; release
     cp $3
-    jp z,BillsPCChangeBox ; change box
+    jp z,.BillsPCChangeBox ; change box
 
-Func_21588: ; 21588 (8:5588)
+.Func_21588
     ld a,[wFlags_0xcd60]
     bit 3,a
     jr nz,.asm_2159a
@@ -44163,42 +44191,29 @@ Func_21588: ; 21588 (8:5588)
 .asm_2159a
     ld hl,wFlags_0xcd60
     res 5,[hl]
-    call RestoreScreenAndTilesAfterBillsPC ; call LoadScreenTilesFromBuffer2
+    call GBPalWhiteOutWithDelay3
+    call ReloadMapSpriteTilePatterns
+    call LoadScreenTilesFromBuffer2
+    call Delay3
+    call GBPalNormal
     pop af
     ld [wListScrollOffset],a ; $cc36
     ld hl,$d730
     res 6,[hl]
     ret
 
-BillsPCDeposit: ; 215ac (8:55ac)
+.BillsPCDeposit
     ld hl,W_NUMINPARTY ; $d163
-    call DisplayMonListMenu
-    jp c,BillsPCMenu
-    call DisplayDepositWithdrawMenu
-    jp nc,BillsPCMenu
-;    ld a,[W_NUMINPARTY] ; $d163
-;    dec a
-;    jr nz,.partyLargeEnough
-;    ld hl,CantDepositLastMonText
-;    call PrintText
-;    jp BillsPCMenu
-;.partyLargeEnough
-;    ld a,[W_NUMINBOX] ; $da80
-;    cp $14
-;    jr nz,.boxNotFull
-;    ld hl,BoxFullText ; $5802
-;    call PrintText
-;    jp BillsPCMenu
-;.boxNotFull
-;    ld a,[$cf91]
-;    call GetCryData
-;    call PlaySoundWaitForCurrent
+    call .DisplayMonListMenu
+    jp c,.BillsPCMenu
+    call .DisplayDepositWithdrawMenu
+    jp nc,.BillsPCMenu
     ld a,$1
     ld [$cf95],a
     call MoveMon
     xor a
     ld [$cf95],a
-    call RemovePokemonWithHack
+    call .RemovePokemonWithHack
     call WaitForSoundToFinish
     ld hl,wWhichTrade ; $cd3d
     ld a,[$d5a0]
@@ -44215,36 +44230,23 @@ BillsPCDeposit: ; 215ac (8:55ac)
 .asm_2160c
     ld [hli],a
     ld [hl],$50
-    ld hl,MonWasStoredText ; $57f8
+    ld hl,.MonWasStoredText ; $57f8
     call PrintText
-    jp BillsPCMenu
+    jp .BillsPCMenu
 
-BillsPCWithdraw: ; 21618 (8:5618)
+.BillsPCWithdraw
     ld a,[W_NUMINBOX] ; $da80
     and a
     jr nz,.boxNotEmpty
-    ld hl,NoMonText ; $580c
+    ld hl,.NoMonText ; $580c
     call PrintText
-    jp BillsPCMenu
+    jp .BillsPCMenu
 .boxNotEmpty
     ld hl,W_NUMINBOX ; $da80
-    call DisplayMonListMenu
-    jp c,BillsPCMenu
-    call DisplayDepositWithdrawMenu
-    jp nc,BillsPCMenu
-;    ld a,[W_NUMINPARTY] ; $d163
-;    cp $6
-;    jr nz,.Continue
-;    ld hl,CantTakeMonText ; $5811
-;    call PrintText
-;    jp BillsPCMenu
-;.Continue
-;    ld a,[wWhichPokemon] ; $cf92
-;    ld hl,$de06
-;    call GetPartyMonName
-;    ld a,[$cf91]
-;    call GetCryData
-;    call PlaySoundWaitForCurrent
+    call .DisplayMonListMenu
+    jp c,.BillsPCMenu
+    call .DisplayDepositWithdrawMenu
+    jp nc,.BillsPCMenu
     xor a
     ld [$cf95],a
     call MoveMon
@@ -44252,22 +44254,22 @@ BillsPCWithdraw: ; 21618 (8:5618)
     ld [$cf95],a
     call RemovePokemon
     call WaitForSoundToFinish
-    ld hl,MonIsTakenOutText ; $5807
+    ld hl,.MonIsTakenOutText ; $5807
     call PrintText
-    jp BillsPCMenu
+    jp .BillsPCMenu
 
-BillsPCRelease: ; 21673 (8:5673)
+.BillsPCRelease
     ld a,[W_NUMINBOX] ; $da80
     and a
     jr nz,.asm_21682
-    ld hl,NoMonText ; $580c
+    ld hl,.NoMonText ; $580c
     call PrintText
-    jp BillsPCMenu
+    jp .BillsPCMenu
 .asm_21682
     ld hl,W_NUMINBOX ; $da80
-    call DisplayMonListMenu
-    jp c,BillsPCMenu
-    ld hl,OnceReleasedText ; $581b
+    call .DisplayMonListMenu
+    jp c,.BillsPCMenu
+    ld hl,.OnceReleasedText ; $581b
     call PrintText
     call YesNoChoice
     ld a,[wCurrentMenuItem] ; $cc26
@@ -44279,15 +44281,15 @@ BillsPCRelease: ; 21673 (8:5673)
     call WaitForSoundToFinish
     ld a,[$cf91]
     call PlayCry
-    ld hl,MonWasReleasedText ; $5820
+    ld hl,.MonWasReleasedText ; $5820
     call PrintText
-    jp BillsPCMenu
+    jp .BillsPCMenu
 
-BillsPCChangeBox: ; 216b3 (8:56b3)
+.BillsPCChangeBox
     BANKSWITCH Func_738a1
-    jp BillsPCMenu
+    jp .BillsPCMenu
 
-DisplayMonListMenu: ; 216be (8:56be)
+.DisplayMonListMenu
     ld a,l
     ld [$cf8b],a
     ld a,h
@@ -44304,54 +44306,71 @@ DisplayMonListMenu: ; 216be (8:56be)
     ld [$cc2b],a
     ret
 
-BillsPCMenuText: ; 216e1 (8:56e1)
-    db "WITHDRAW ",$4a,$4e,"DEPOSIT ",$4a,$4e,"RELEASE ",$4a,$4e,"CHANGE BOX","@";$4e,"SEE YA!@"
+.PlaceBoxPkmnNumber
+    FuncCoord 10,16
+    ld hl,Coord
+    ld de,.BoxNoPkmnNumber
+    call PlaceString
+    FuncCoord 14,16
+    ld hl,Coord
+    ld de,W_NUMINBOX
+    ld bc,$102
+    jp PrintNumber
+.BoxNoPkmnNumber:
+    db $E1,$E2,"    /20@"
 
-SECTION "BoxNoPCText",ROMX[$5713],BANK[$8]
+.RemovePokemonWithHack
+    call GetCurrentOldAdventureMap
+    cp a,CELADON_HOTEL
+    jr nz,.RemovePokemon
+    ld a,PORYGON
+    ld hl,W_PARTYMON1
+    cp [hl]
+    ret z ; If Porygon is the first pkmn in Party Don't Remove = Duplicate
+.RemovePokemon
+    jp RemovePokemon
 
-BoxNoPCText: ; 21713 (8:5713)
-    db "BOX No.@"
-
-DisplayDepositWithdrawMenu:
+.DisplayDepositWithdrawMenu
     BANKSWITCH_JUMP DisplayDepositWithdrawMenu_
 
-SwitchOnText: ; 0x217e9
+.BillsPCMenuText
+    db "WITHDRAW ",$4a,$4e
+    db "DEPOSIT ",$4a,$4e
+    db "RELEASE ",$4a,$4e
+    db "CHANGE BOX"
+    db "@"
+.BoxNoPCText
+    db "BOX No."
+    db "@"
+.SwitchOnText
     TX_FAR _SwitchOnText
     db "@"
-
-WhatText: ; 0x217ee
+.WhatText
     TX_FAR _WhatText
     db "@"
-
-DepositWhichMonText: ; 0x217f3
+.DepositWhichMonText
     TX_FAR _DepositWhichMonText
     db "@"
-
-MonWasStoredText: ; 0x217f8
+.MonWasStoredText
     TX_FAR _MonWasStoredText
     db "@"
-
-MonIsTakenOutText: ; 0x21807
+.MonIsTakenOutText
     TX_FAR _MonIsTakenOutText
     db "@"
-
-NoMonText: ; 0x2180c
+.NoMonText:
     TX_FAR _NoMonText
     db "@"
-
-ReleaseWhichMonText: ; 0x21816
+.ReleaseWhichMonText
     TX_FAR _ReleaseWhichMonText
     db "@"
-
-OnceReleasedText: ; 0x2181b
+.OnceReleasedText
     TX_FAR _OnceReleasedText
     db "@"
-
-MonWasReleasedText: ; 0x21820
+.MonWasReleasedText
     TX_FAR _MonWasReleasedText
     db "@"
 
-SECTION "CableClubLeftGameboy",ROMX[$5825],BANK[$8]
+; ──────────────────────────────────────────────────────────────
 
 CableClubLeftGameboy:
     ld a,[$ff00+$aa]
@@ -44389,7 +44408,7 @@ CableClubRightGameboy:
     ld a,$22
     jp PrintPredefTextID
 
-UnnamedText_21865: ; 21865 (8:5865)
+UnnamedText_21865:
     TX_FAR _UnnamedText_21865
     db "@"
 
@@ -46165,39 +46184,6 @@ INCLUDE "music/sfx/sfx_08_46.asm"
 INCLUDE "music/defeatedtrainer.asm"
 INCLUDE "music/defeatedwildmon.asm"
 INCLUDE "music/defeatedgymleader.asm"
-
-RemovePokemonWithHack:
-    call GetCurrentOldAdventureMap
-    cp a,CELADON_HOTEL
-    jr nz,.RemovePokemon
-    ld a,PORYGON
-    ld hl,W_PARTYMON1
-    cp [hl]
-    ret z ; If Porygon is the first pkmn in Party Don't Remove = Duplicate
-.RemovePokemon
-    jp RemovePokemon
-
-PlaceStringAndBoxPkmnNumber:
-    call PlaceString
-    FuncCoord 10,16
-    ld hl,Coord
-    ld de,BoxNoPkmnNumber
-    call PlaceString
-    FuncCoord 14,16
-    ld hl,Coord
-    ld de,W_NUMINBOX
-    ld bc,$102
-    jp PrintNumber
-
-BoxNoPkmnNumber:
-    db $E1,$E2,"    /20@"
-
-RestoreScreenAndTilesAfterBillsPC:
-    call GBPalWhiteOutWithDelay3
-    call ReloadMapSpriteTilePatterns
-    call LoadScreenTilesFromBuffer2
-    call Delay3
-    jp GBPalNormal
 
 SECTION "bank9",ROMX,BANK[$9]
 
@@ -75275,195 +75261,6 @@ _GivePokemon: ; 4fda5 (13:7da5)
     TX_FAR _UnnamedText_4fe44
     db "@"
 
-GetPredefPointer:
-; stores hl in $CC4F,$CC50
-; stores de in $CC51,$CC52
-; stores bc in $CC53,$CC54
-; grabs a byte "n" from $CC4E,
-;    and gets the nth (3-byte) pointer in PredefPointers
-; stores the bank of said pointer in [$D0B7]
-; stores the pointer in hl and returns
-    ; ld $CC4F,hl
-    ld a,h
-    ld [$CC4F],a
-    ld a,l
-    ld [$CC50],a
-
-    ; ld $CC51,de
-    ld hl,$CC51
-    ld a,d
-    ld [hli],a
-    ld a,e
-    ld [hli],a
-
-    ; ld $CC53,bc
-    ld a,b
-    ld [hli],a
-    ld [hl],c
-
-    ld hl,PredefPointers
-    ld de,0
-
-    push af ; Backup F Flags
-    ; de = 3 * [$CC4E]
-    ld a,[$CC4E]
-    ld e,a
-    add a,a
-    add a,e
-    ld e,a
-    jr nc,.next
-    inc d
-
-.next
-    add hl,de
-    ld d,h
-    ld e,l
-    pop af ; Restore F Flags
-
-    ; get bank of predef routine
-    ld a,[de]
-    ld [$D0B7],a
-    push af
-
-    ; get pointer
-    inc de
-    ld a,[de]
-    ld l,a
-    inc de
-    ld a,[de]
-    ld h,a
-
-    pop af
-    ret
-
-PredefPointers:
-
-DrawPlayerHUDAndHPBarPredef:               NEW_PREDEF DrawPlayerHUDAndHPBar               ; $00
-CopyUncompressedPicToTilemapPredef:        NEW_PREDEF CopyUncompressedPicToTilemap        ; $01
-Func_3f073Predef:                          NEW_PREDEF Func_3f073                          ; $02
-ScaleSpriteByTwoPredef:                    NEW_PREDEF ScaleSpriteByTwo                    ; $03
-LoadMonBackSpritePredef:                   NEW_PREDEF LoadMonBackSprite                   ; $04
-Func_79abaPredef:                          NEW_PREDEF Func_79aba                          ; $05
-GetMovesPredef:                            NEW_PREDEF GetMoves                            ; $06
-HealPartyPredef:                           NEW_PREDEF HealParty                           ; $07
-MoveAnimationPredef:                       NEW_PREDEF MoveAnimation                       ; $08
-Func_f71ePredef:                           NEW_PREDEF Func_f71e                           ; $09
-Func_f71e_2Predef:                         NEW_PREDEF Func_f71e                           ; $0A
-Func_f81dPredef:                           NEW_PREDEF Func_f81d                           ; $0B
-Func_f836Predef:                           NEW_PREDEF Func_f836                           ; $0C
-Func_f71e_3Predef:                         NEW_PREDEF Func_f71e                           ; $0D
-Func_f71e_4Predef:                         NEW_PREDEF Func_f71e                           ; $0E
-InitializePlayerDataPredef:                NEW_PREDEF InitializePlayerData                ; $0F
-HandleBitArrayPredef:                      NEW_PREDEF HandleBitArray                      ; $10
-RemoveMissableObjectPredef:                NEW_PREDEF RemoveMissableObject                ; $11
-IsMissableObjectHiddenPredef:              NEW_PREDEF IsMissableObjectHidden              ; $12
-Func_c69cPredef:                           NEW_PREDEF Func_c69c                           ; $13
-AnyPokemonAliveCheckPredef:                NEW_PREDEF AnyPokemonAliveCheck                ; $14
-AddMissableObjectPredef:                   NEW_PREDEF AddMissableObject                   ; $15
-AddMissableObject_2Predef:                 NEW_PREDEF AddMissableObject                   ; $16
-ReplaceTileBlockPredef:                    NEW_PREDEF ReplaceTileBlock                    ; $17
-InitializePlayerData_2Predef:              NEW_PREDEF InitializePlayerData                ; $18
-Func_c754Predef:                           NEW_PREDEF Func_c754                           ; $19
-LearnMoveFromLevelUpPredef:                NEW_PREDEF LearnMoveFromLevelUp                ; $1A
-LearnMovePredef:                           NEW_PREDEF LearnMove                           ; $1B
-_IsItemInBagPredef:                        NEW_PREDEF _IsItemInBag                        ; $1C
-ds 3                                                                                      ; $1D
-GiveItemPredef:                            NEW_PREDEF GiveItem                            ; $1E
-Func_480ebPredef:                          NEW_PREDEF Func_480eb                          ; $1F
-Func_f8baPredef:                           NEW_PREDEF Func_f8ba                           ; $20
-Func_480ffPredef:                          NEW_PREDEF Func_480ff                          ; $21
-Func_f929Predef:                           NEW_PREDEF Func_f929                           ; $22
-Func_f9a0Predef:                           NEW_PREDEF Func_f9a0                           ; $23
-ShakeScreenHorizontallyPredef:             NEW_PREDEF ShakeScreenHorizontally             ; $24
-UpdateHPBarPredef:                         NEW_PREDEF UpdateHPBar                         ; $25
-Func_f9dcPredef:                           NEW_PREDEF Func_f9dc                           ; $26
-Func_5ab0Predef:                           NEW_PREDEF Func_5ab0                           ; $27
-UnusedPredef:                              NEW_PREDEF Unused                              ; $28
-DisplayPokedexMenu_Predef:                 NEW_PREDEF DisplayPokedexMenu_                 ; $29
-EvolutionAfterBattlePredef:                NEW_PREDEF EvolutionAfterBattle                ; $2A
-SaveSAVtoSRAM0Predef:                      NEW_PREDEF SaveSAVtoSRAM0                      ; $2B
-InitOpponentPredef:                        NEW_PREDEF InitOpponent                        ; $2C
-Func_5a5fPredef:                           NEW_PREDEF Func_5a5f                           ; $2D
-DrawBadgesPredef:                          NEW_PREDEF DrawBadges                          ; $2E
-Func_410f3Predef:                          NEW_PREDEF Func_410f3                          ; $2F
-Func_7096dPredef:                          NEW_PREDEF Func_7096d                          ; $30
-Func_79ddaPredef:                          NEW_PREDEF Func_79dda                          ; $31
-PlayIntroPredef:                           NEW_PREDEF PlayIntro                           ; $32
-Func_79869Predef:                          NEW_PREDEF Func_79869                          ; $33
-Func_70b5dPredef:                          NEW_PREDEF Func_70b5d                          ; $34
-Func_c586Predef:                           NEW_PREDEF Func_c586                           ; $35
-StatusScreenPredef:                        NEW_PREDEF StatusScreen                        ; $36
-_ReadRodDataPredef:                        NEW_PREDEF _ReadRodData                        ; $37
-Func_410e2Predef:                          NEW_PREDEF Func_410e2                          ; $38
-CheckEngagePlayerPredef:                   NEW_PREDEF CheckEngagePlayer                   ; $39
-IndexToPokedexPredef:                      NEW_PREDEF IndexToPokedex                      ; $3A
-Predef3BPredef:                            NEW_PREDEF Predef3B                            ; $3B
-UsedCutPredef:                             NEW_PREDEF UsedCut                             ; $3C
-ShowPokedexDataPredef:                     NEW_PREDEF ShowPokedexData                     ; $3D
-WriteMonMovesPredef:                       NEW_PREDEF WriteMonMoves                       ; $3E
-SaveSAVPredef:                             NEW_PREDEF SaveSAV                             ; $3F
-Func_7202bPredef:                          NEW_PREDEF Func_7202b                          ; $40
-SetVisitedAndLoadMissableObjPredef:        NEW_PREDEF SetVisitedAndLoadMissableObj        ; $41
-Unused_2Predef:                            NEW_PREDEF Unused                              ; $42
-TestMonMoveCompatibilityPredef:            NEW_PREDEF TestMonMoveCompatibility            ; $43
-TMToMovePredef:                            NEW_PREDEF TMToMove                            ; $44
-ProcessSGBPacketPredef:                    NEW_PREDEF ProcessSGBPacket                    ; $45
-Func_5c0dcPredef:                          NEW_PREDEF Func_5c0dc                          ; $46
-_AddPokemonToPartyPredef:                  NEW_PREDEF _AddPokemonToParty                  ; $47
-UpdateHPBar_2Predef:                       NEW_PREDEF UpdateHPBar                         ; $48
-DrawEnemyHUDAndHPBarPredef:                NEW_PREDEF DrawEnemyHUDAndHPBar                ; $49
-Func_70f60Predef:                          NEW_PREDEF Func_70f60                          ; $4A
-PrintTypesPredef:                          NEW_PREDEF PrintTypes                          ; $4B
-EmotionBubblePredef:                       NEW_PREDEF EmotionBubble                       ; $4C
-_GetEvosPredef:                            NEW_PREDEF _GetEvos                            ; $4D
-AskForMonNicknamePredef:                   NEW_PREDEF AskForMonNickname                   ; $4E
-Func_37ca1Predef:                          NEW_PREDEF Func_37ca1                          ; $4F
-SaveSAVtoSRAM2Predef:                      NEW_PREDEF SaveSAVtoSRAM2                      ; $50
-LoadSAVCheckSum2Predef:                    NEW_PREDEF LoadSAVCheckSum2                    ; $51
-LoadSAVPredef:                             NEW_PREDEF LoadSAV                             ; $52
-SaveSAVtoSRAM1Predef:                      NEW_PREDEF SaveSAVtoSRAM1                      ; $53
-Predef54Predef:                            NEW_PREDEF Predef54                            ; $54
-HallOfFamePCPredef:                        NEW_PREDEF HallOfFamePC                        ; $55
-DisplayDexRatingPredef:                    NEW_PREDEF DisplayDexRating                    ; $56
-_DoFlyOrTeleportAwayGraphicsPredef:        NEW_PREDEF _DoFlyOrTeleportAwayGraphics        ; $57
-Func_70510Predef:                          NEW_PREDEF Func_70510                          ; $58
-GetTileTwoStepsInFrontOfPlayerPredef:      NEW_PREDEF GetTileTwoStepsInFrontOfPlayer      ; $59
-CheckForCollisionWhenPushingBoulderPredef: NEW_PREDEF CheckForCollisionWhenPushingBoulder ; $5A
-UseStrengthPredef:                         NEW_PREDEF UseStrength                         ; $5B
-PickupItemPredef:                          NEW_PREDEF PickupItem                          ; $5C
-PrintMoveTypePredef:                       NEW_PREDEF PrintMoveType                       ; $5D
-ResetMovePPsPredef:                        NEW_PREDEF ResetMovePPs                        ; $5E
-DrawPlayerHPBarStatusBattlePredef:         NEW_PREDEF DrawPlayerHPBarStatusBattle         ; $5F
-DrawPlayerHPBarPartyPredef:                NEW_PREDEF DrawPlayerHPBarParty                ; $60
-Func_1c9c6Predef:                          NEW_PREDEF Func_1c9c6                          ; $61
-OakAideNDexToGiftItemPredef:               NEW_PREDEF OakAideNDexToGiftItem               ; $62
-TestPhysicalSpecial_Predef:                NEW_PREDEF TestPhysicalSpecial_                ; $63
-InsertRealTypes_Predef:                    NEW_PREDEF InsertRealTypes_                    ; $64
-MovesMenuPredef:                           NEW_PREDEF MovesMenu                           ; $65
-PrintMoveDetailsBoxPredef:                 NEW_PREDEF PrintMoveDetailsBox                 ; $66
-BC999capPredef:                            NEW_PREDEF BC999cap                            ; $67
-CritHitStatsPlayerPhysicalPredef:          NEW_PREDEF CritHitStatsPlayerPhysical          ; $68
-CritHitStatsPlayerSpecialPredef:           NEW_PREDEF CritHitStatsPlayerSpecial           ; $69
-CritHitStatsEnemyPhysicalPredef:           NEW_PREDEF CritHitStatsEnemyPhysical           ; $6A
-CritHitStatsEnemySpecialPredef:            NEW_PREDEF CritHitStatsEnemySpecial            ; $6B
-CheckWildSubGroupPredef:                   NEW_PREDEF CheckWildSubGroup                   ; $6C
-GetAttackerType_Predef:                    NEW_PREDEF GetAttackerType_                    ; $6D
-AdjustDamageForMoveType_GetInputPredef:    NEW_PREDEF AdjustDamageForMoveType_GetInput    ; $6E
-UpgradeTrainerSet_Predef:                  NEW_PREDEF UpgradeTrainerSet_                  ; $6F
-IsMonInCurrentMapPredef:                   NEW_PREDEF IsMonInCurrentMap                   ; $70
-UndoBurnParStatsPredef:                    NEW_PREDEF UndoBurnParStats                    ; $71
-DrawHUDsAndHPBarsPredef:                   NEW_PREDEF DrawHUDsAndHPBars                   ; $72
-GetAttackAnimationPointers_Predef:         NEW_PREDEF GetAttackAnimationPointers_         ; $73
-_IsItemInBagOrBoxPredef:                   NEW_PREDEF _IsItemInBagOrBox                   ; $74
-TryHallOfFameRematchPredef:                NEW_PREDEF TryHallOfFameRematch                ; $75
-HoF_SetVariablesPredef:                    NEW_PREDEF HoF_SetVariables                    ; $76
-_InitBattleEnemyParametersPredef:          NEW_PREDEF _InitBattleEnemyParameters          ; $77
-_CheckDarkMapPredef:                       NEW_PREDEF _CheckDarkMap                       ; $78
-PrintMoveTypeShortPredef:                  NEW_PREDEF PrintMoveTypeShort                  ; $79
-PrintTypesFullPredef:                      NEW_PREDEF PrintTypesFull                      ; $7A
-LearnSkillPredef:                          NEW_PREDEF LearnSkill                          ; $7B
-GetMonPotentialMoveListPredef:             NEW_PREDEF GetMonPotentialMoveList             ; $7C
-
 GivePokemon_LoadEnemyMonData:
     ld hl,wTempAlternateFormIndex
     ld a,[hl]
@@ -75474,10 +75271,6 @@ GivePokemon_LoadEnemyMonData:
     pop af
     ld [hl],a
     ret
-
-; Free
-
-Unused:
 
 SECTION "bank14",ROMX,BANK[$14]
 
@@ -142012,6 +141805,275 @@ DebugNPC:
     pop af
     ld [$cf92],a
     jp TextScriptEnd
+
+; ──────────────────────────────────────────────────────────────────────
+
+GetPredefPointer:
+; stores hl in $CC4F,$CC50
+; stores de in $CC51,$CC52
+; stores bc in $CC53,$CC54
+; grabs a byte "n" from $CC4E,
+;    and gets the nth (3-byte) pointer in PredefPointers
+; stores the bank of said pointer in [$D0B7]
+; stores the pointer in hl and returns
+    ; ld $CC4F,hl
+    ld a,h
+    ld [$CC4F],a
+    ld a,l
+    ld [$CC50],a
+
+    ; ld $CC51,de
+    ld hl,$CC51
+    ld a,d
+    ld [hli],a
+    ld a,e
+    ld [hli],a
+
+    ; ld $CC53,bc
+    ld a,b
+    ld [hli],a
+    ld [hl],c
+
+    ld hl,PredefPointers
+    ld de,0
+
+    push af ; Backup F Flags
+    ; de = 3 * [$CC4E]
+    ld a,[$CC4E]
+    ld e,a
+    add a,a
+    add a,e
+    ld e,a
+    jr nc,.next
+    inc d
+
+.next
+    add hl,de
+    ld d,h
+    ld e,l
+    pop af ; Restore F Flags
+
+    ; get bank of predef routine
+    ld a,[de]
+    ld [$D0B7],a
+    push af
+
+    ; get pointer
+    inc de
+    ld a,[de]
+    ld l,a
+    inc de
+    ld a,[de]
+    ld h,a
+
+    pop af
+    ret
+
+PredefPointers:
+
+DrawPlayerHUDAndHPBarPredef:               NEW_PREDEF DrawPlayerHUDAndHPBar               ; $00
+CopyUncompressedPicToTilemapPredef:        NEW_PREDEF CopyUncompressedPicToTilemap        ; $01
+Func_3f073Predef:                          NEW_PREDEF Func_3f073                          ; $02
+ScaleSpriteByTwoPredef:                    NEW_PREDEF ScaleSpriteByTwo                    ; $03
+LoadMonBackSpritePredef:                   NEW_PREDEF LoadMonBackSprite                   ; $04
+Func_79abaPredef:                          NEW_PREDEF Func_79aba                          ; $05
+GetMovesPredef:                            NEW_PREDEF GetMoves                            ; $06
+HealPartyPredef:                           NEW_PREDEF HealParty                           ; $07
+MoveAnimationPredef:                       NEW_PREDEF MoveAnimation                       ; $08
+Func_f71ePredef:                           NEW_PREDEF Func_f71e                           ; $09
+Func_f71e_2Predef:                         NEW_PREDEF Func_f71e                           ; $0A
+Func_f81dPredef:                           NEW_PREDEF Func_f81d                           ; $0B
+Func_f836Predef:                           NEW_PREDEF Func_f836                           ; $0C
+Func_f71e_3Predef:                         NEW_PREDEF Func_f71e                           ; $0D
+Func_f71e_4Predef:                         NEW_PREDEF Func_f71e                           ; $0E
+InitializePlayerDataPredef:                NEW_PREDEF InitializePlayerData                ; $0F
+HandleBitArrayPredef:                      NEW_PREDEF HandleBitArray                      ; $10
+RemoveMissableObjectPredef:                NEW_PREDEF RemoveMissableObject                ; $11
+IsMissableObjectHiddenPredef:              NEW_PREDEF IsMissableObjectHidden              ; $12
+Func_c69cPredef:                           NEW_PREDEF Func_c69c                           ; $13
+AnyPokemonAliveCheckPredef:                NEW_PREDEF AnyPokemonAliveCheck                ; $14
+AddMissableObjectPredef:                   NEW_PREDEF AddMissableObject                   ; $15
+AddMissableObject_2Predef:                 NEW_PREDEF AddMissableObject                   ; $16
+ReplaceTileBlockPredef:                    NEW_PREDEF ReplaceTileBlock                    ; $17
+InitializePlayerData_2Predef:              NEW_PREDEF InitializePlayerData                ; $18
+Func_c754Predef:                           NEW_PREDEF Func_c754                           ; $19
+LearnMoveFromLevelUpPredef:                NEW_PREDEF LearnMoveFromLevelUp                ; $1A
+LearnMovePredef:                           NEW_PREDEF LearnMove                           ; $1B
+_IsItemInBagPredef:                        NEW_PREDEF _IsItemInBag                        ; $1C
+ds 3                                                                                      ; $1D
+GiveItemPredef:                            NEW_PREDEF GiveItem                            ; $1E
+Func_480ebPredef:                          NEW_PREDEF Func_480eb                          ; $1F
+Func_f8baPredef:                           NEW_PREDEF Func_f8ba                           ; $20
+Func_480ffPredef:                          NEW_PREDEF Func_480ff                          ; $21
+Func_f929Predef:                           NEW_PREDEF Func_f929                           ; $22
+Func_f9a0Predef:                           NEW_PREDEF Func_f9a0                           ; $23
+ShakeScreenHorizontallyPredef:             NEW_PREDEF ShakeScreenHorizontally             ; $24
+UpdateHPBarPredef:                         NEW_PREDEF UpdateHPBar                         ; $25
+Func_f9dcPredef:                           NEW_PREDEF Func_f9dc                           ; $26
+Func_5ab0Predef:                           NEW_PREDEF Func_5ab0                           ; $27
+ds 3                                                                                      ; $28
+DisplayPokedexMenu_Predef:                 NEW_PREDEF DisplayPokedexMenu_                 ; $29
+EvolutionAfterBattlePredef:                NEW_PREDEF EvolutionAfterBattle                ; $2A
+SaveSAVtoSRAM0Predef:                      NEW_PREDEF SaveSAVtoSRAM0                      ; $2B
+InitOpponentPredef:                        NEW_PREDEF InitOpponent                        ; $2C
+Func_5a5fPredef:                           NEW_PREDEF Func_5a5f                           ; $2D
+DrawBadgesPredef:                          NEW_PREDEF DrawBadges                          ; $2E
+Func_410f3Predef:                          NEW_PREDEF Func_410f3                          ; $2F
+Func_7096dPredef:                          NEW_PREDEF Func_7096d                          ; $30
+Func_79ddaPredef:                          NEW_PREDEF Func_79dda                          ; $31
+PlayIntroPredef:                           NEW_PREDEF PlayIntro                           ; $32
+Func_79869Predef:                          NEW_PREDEF Func_79869                          ; $33
+Func_70b5dPredef:                          NEW_PREDEF Func_70b5d                          ; $34
+Func_c586Predef:                           NEW_PREDEF Func_c586                           ; $35
+StatusScreenPredef:                        NEW_PREDEF StatusScreen                        ; $36
+_ReadRodDataPredef:                        NEW_PREDEF _ReadRodData                        ; $37
+Func_410e2Predef:                          NEW_PREDEF Func_410e2                          ; $38
+CheckEngagePlayerPredef:                   NEW_PREDEF CheckEngagePlayer                   ; $39
+IndexToPokedexPredef:                      NEW_PREDEF IndexToPokedex                      ; $3A
+Predef3BPredef:                            NEW_PREDEF Predef3B                            ; $3B
+UsedCutPredef:                             NEW_PREDEF UsedCut                             ; $3C
+ShowPokedexDataPredef:                     NEW_PREDEF ShowPokedexData                     ; $3D
+WriteMonMovesPredef:                       NEW_PREDEF WriteMonMoves                       ; $3E
+SaveSAVPredef:                             NEW_PREDEF SaveSAV                             ; $3F
+Func_7202bPredef:                          NEW_PREDEF Func_7202b                          ; $40
+SetVisitedAndLoadMissableObjPredef:        NEW_PREDEF SetVisitedAndLoadMissableObj        ; $41
+ds 3                                                                                      ; $42
+TestMonMoveCompatibilityPredef:            NEW_PREDEF TestMonMoveCompatibility            ; $43
+TMToMovePredef:                            NEW_PREDEF TMToMove                            ; $44
+ProcessSGBPacketPredef:                    NEW_PREDEF ProcessSGBPacket                    ; $45
+Func_5c0dcPredef:                          NEW_PREDEF Func_5c0dc                          ; $46
+_AddPokemonToPartyPredef:                  NEW_PREDEF _AddPokemonToParty                  ; $47
+UpdateHPBar_2Predef:                       NEW_PREDEF UpdateHPBar                         ; $48
+DrawEnemyHUDAndHPBarPredef:                NEW_PREDEF DrawEnemyHUDAndHPBar                ; $49
+Func_70f60Predef:                          NEW_PREDEF Func_70f60                          ; $4A
+PrintTypesPredef:                          NEW_PREDEF PrintTypes                          ; $4B
+EmotionBubblePredef:                       NEW_PREDEF EmotionBubble                       ; $4C
+_GetEvosPredef:                            NEW_PREDEF _GetEvos                            ; $4D
+AskForMonNicknamePredef:                   NEW_PREDEF AskForMonNickname                   ; $4E
+Func_37ca1Predef:                          NEW_PREDEF Func_37ca1                          ; $4F
+SaveSAVtoSRAM2Predef:                      NEW_PREDEF SaveSAVtoSRAM2                      ; $50
+LoadSAVCheckSum2Predef:                    NEW_PREDEF LoadSAVCheckSum2                    ; $51
+LoadSAVPredef:                             NEW_PREDEF LoadSAV                             ; $52
+SaveSAVtoSRAM1Predef:                      NEW_PREDEF SaveSAVtoSRAM1                      ; $53
+Predef54Predef:                            NEW_PREDEF Predef54                            ; $54
+HallOfFamePCPredef:                        NEW_PREDEF HallOfFamePC                        ; $55
+DisplayDexRatingPredef:                    NEW_PREDEF DisplayDexRating                    ; $56
+_DoFlyOrTeleportAwayGraphicsPredef:        NEW_PREDEF _DoFlyOrTeleportAwayGraphics        ; $57
+Func_70510Predef:                          NEW_PREDEF Func_70510                          ; $58
+GetTileTwoStepsInFrontOfPlayerPredef:      NEW_PREDEF GetTileTwoStepsInFrontOfPlayer      ; $59
+CheckForCollisionWhenPushingBoulderPredef: NEW_PREDEF CheckForCollisionWhenPushingBoulder ; $5A
+UseStrengthPredef:                         NEW_PREDEF UseStrength                         ; $5B
+PickupItemPredef:                          NEW_PREDEF PickupItem                          ; $5C
+PrintMoveTypePredef:                       NEW_PREDEF PrintMoveType                       ; $5D
+ResetMovePPsPredef:                        NEW_PREDEF ResetMovePPs                        ; $5E
+DrawPlayerHPBarStatusBattlePredef:         NEW_PREDEF DrawPlayerHPBarStatusBattle         ; $5F
+DrawPlayerHPBarPartyPredef:                NEW_PREDEF DrawPlayerHPBarParty                ; $60
+Func_1c9c6Predef:                          NEW_PREDEF Func_1c9c6                          ; $61
+OakAideNDexToGiftItemPredef:               NEW_PREDEF OakAideNDexToGiftItem               ; $62
+TestPhysicalSpecial_Predef:                NEW_PREDEF TestPhysicalSpecial_                ; $63
+InsertRealTypes_Predef:                    NEW_PREDEF InsertRealTypes_                    ; $64
+MovesMenuPredef:                           NEW_PREDEF MovesMenu                           ; $65
+PrintMoveDetailsBoxPredef:                 NEW_PREDEF PrintMoveDetailsBox                 ; $66
+BC999capPredef:                            NEW_PREDEF BC999cap                            ; $67
+CritHitStatsPlayerPhysicalPredef:          NEW_PREDEF CritHitStatsPlayerPhysical          ; $68
+CritHitStatsPlayerSpecialPredef:           NEW_PREDEF CritHitStatsPlayerSpecial           ; $69
+CritHitStatsEnemyPhysicalPredef:           NEW_PREDEF CritHitStatsEnemyPhysical           ; $6A
+CritHitStatsEnemySpecialPredef:            NEW_PREDEF CritHitStatsEnemySpecial            ; $6B
+CheckWildSubGroupPredef:                   NEW_PREDEF CheckWildSubGroup                   ; $6C
+GetAttackerType_Predef:                    NEW_PREDEF GetAttackerType_                    ; $6D
+AdjustDamageForMoveType_GetInputPredef:    NEW_PREDEF AdjustDamageForMoveType_GetInput    ; $6E
+UpgradeTrainerSet_Predef:                  NEW_PREDEF UpgradeTrainerSet_                  ; $6F
+IsMonInCurrentMapPredef:                   NEW_PREDEF IsMonInCurrentMap                   ; $70
+UndoBurnParStatsPredef:                    NEW_PREDEF UndoBurnParStats                    ; $71
+DrawHUDsAndHPBarsPredef:                   NEW_PREDEF DrawHUDsAndHPBars                   ; $72
+GetAttackAnimationPointers_Predef:         NEW_PREDEF GetAttackAnimationPointers_         ; $73
+_IsItemInBagOrBoxPredef:                   NEW_PREDEF _IsItemInBagOrBox                   ; $74
+TryHallOfFameRematchPredef:                NEW_PREDEF TryHallOfFameRematch                ; $75
+HoF_SetVariablesPredef:                    NEW_PREDEF HoF_SetVariables                    ; $76
+_InitBattleEnemyParametersPredef:          NEW_PREDEF _InitBattleEnemyParameters          ; $77
+_CheckDarkMapPredef:                       NEW_PREDEF _CheckDarkMap                       ; $78
+PrintMoveTypeShortPredef:                  NEW_PREDEF PrintMoveTypeShort                  ; $79
+PrintTypesFullPredef:                      NEW_PREDEF PrintTypesFull                      ; $7A
+LearnSkillPredef:                          NEW_PREDEF LearnSkill                          ; $7B
+GetMonPotentialMoveListPredef:             NEW_PREDEF GetMonPotentialMoveList             ; $7C
+
+; ──────────────────────────────────────────────────────────────────────
+
+_SynchronizeParty:
+    ld hl,W_NUMINPARTY
+    ld a,[hl]
+    and a
+    ld d,h
+    ld e,l
+    inc de
+    ld c,0
+    jr z,.loop2
+    cp 6 + 1
+    jr c,.continue
+    ld a,6
+    ld [hl],a
+.continue
+    ld hl,W_PARTYMON1DATA
+    ld b,a
+.loop
+    ld a,[hl]
+    ld [de],a
+    push de
+    ld de,W_PARTYMON2DATA-W_PARTYMON1DATA
+    add hl,de
+    pop de
+    inc de
+    inc c
+    dec b
+    jr nz,.loop
+.loop2
+    ld a,$FF
+    ld [de],a
+    inc de
+    inc c
+    ld a,c
+    cp 6 + 1
+    ret z
+    jr .loop2
+
+; ──────────────────────────────────────────────────────────────────────
+
+_SynchronizeBox:
+    ld hl,W_NUMINBOX
+    ld a,[hl]
+    and a
+    ld d,h
+    ld e,l
+    inc de
+    ld c,0
+    jr z,.loop2
+    cp 20 + 1
+    jr c,.continue
+    ld a,20
+    ld [hl],a
+.continue
+    ld hl,W_BOXMON1DATA
+    ld b,a
+.loop
+    ld a,[hl]
+    ld [de],a
+    push de
+    ld de,W_BOXMON2DATA-W_BOXMON1DATA
+    add hl,de
+    pop de
+    inc de
+    inc c
+    dec b
+    jr nz,.loop
+.loop2
+    ld a,$FF
+    ld [de],a
+    inc de
+    inc c
+    ld a,c
+    cp 20 + 1
+    ret z
+    jr .loop2
 
 ; ──────────────────────────────────────────────────────────────────────
 
