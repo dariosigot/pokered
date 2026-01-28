@@ -193,7 +193,7 @@ AerodactylFossilBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 25 ; catch rate
     db 202 ; base exp yield
 
     db BANK(FossilAerodactylPicFront)
@@ -233,7 +233,7 @@ BulbasaurStarterBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 65 ; catch rate
     db 64 ; base exp yield
 
     db BANK(BulbasaurPicFront)
@@ -313,7 +313,7 @@ VenusaurStarterBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 25 ; catch rate
     db 208 ; base exp yield
 
     db BANK(VenusaurPicFront)
@@ -353,7 +353,7 @@ CharmanderStarterBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 65 ; catch rate
     db 65 ; base exp yield
 
     db BANK(CharmanderPicFront)
@@ -433,7 +433,7 @@ CharizardStarterBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 25 ; catch rate
     db 209 ; base exp yield
 
     db BANK(CharizardPicFront)
@@ -473,7 +473,7 @@ SquirtleStarterBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 65 ; catch rate
     db 66 ; base exp yield
 
     db BANK(SquirtlePicFront)
@@ -553,7 +553,7 @@ BlastoiseStarterBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 25 ; catch rate
     db 210 ; base exp yield
 
     db BANK(BlastoisePicFront)
@@ -713,7 +713,7 @@ EeveeStarterBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 65 ; catch rate
     db 92 ; base exp yield
 
     db BANK(EeveePicFront)

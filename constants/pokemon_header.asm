@@ -73,7 +73,7 @@ BulbasaurBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 65 ; catch rate
     db 64 ; base exp yield
 
     db BANK(BulbasaurPicFront)
@@ -153,7 +153,7 @@ VenusaurBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 25 ; catch rate
     db 208 ; base exp yield
 
     db BANK(VenusaurPicFront)
@@ -193,7 +193,7 @@ CharmanderBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 65 ; catch rate
     db 65 ; base exp yield
 
     db BANK(CharmanderPicFront)
@@ -273,7 +273,7 @@ CharizardBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 25 ; catch rate
     db 209 ; base exp yield
 
     db BANK(CharizardPicFront)
@@ -313,7 +313,7 @@ SquirtleBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 65 ; catch rate
     db 66 ; base exp yield
 
     db BANK(SquirtlePicFront)
@@ -393,7 +393,7 @@ BlastoiseBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 25 ; catch rate
     db 210 ; base exp yield
 
     db BANK(BlastoisePicFront)
@@ -753,7 +753,7 @@ PidgeotBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 40 ; catch rate
     db 172 ; base exp yield
 
     db BANK(PidgeotPicFront)
@@ -913,7 +913,7 @@ FearowBaseStats:
     ; not used
     db 0
 
-    db 90 ; catch rate
+    db 50 ; catch rate
     db 162 ; base exp yield
 
     db BANK(FearowPicFront)
@@ -1273,7 +1273,7 @@ NidoqueenBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 35 ; catch rate
     db 194 ; base exp yield
 
     db BANK(NidoqueenPicFront)
@@ -1393,7 +1393,7 @@ NidokingBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 35 ; catch rate
     db 195 ; base exp yield
 
     db BANK(NidokingPicFront)
@@ -1553,7 +1553,7 @@ NinetalesBaseStats:
     ; not used
     db 0
 
-    db 75 ; catch rate
+    db 50 ; catch rate
     db 178 ; base exp yield
 
     db BANK(NinetalesPicFront)
@@ -1633,7 +1633,7 @@ WigglytuffBaseStats:
     ; not used
     db 0
 
-    db 50 ; catch rate
+    db 35 ; catch rate
     db 109 ; base exp yield
 
     db BANK(WigglytuffPicFront)
@@ -1713,7 +1713,7 @@ GolbatBaseStats:
     ; not used
     db 0
 
-    db 90 ; catch rate
+    db 50 ; catch rate
     db 171 ; base exp yield
 
     db BANK(GolbatPicFront)
@@ -2153,7 +2153,7 @@ PersianBaseStats:
     ; not used
     db 0
 
-    db 90 ; catch rate
+    db 50 ; catch rate
     db 148 ; base exp yield
 
     db BANK(PersianPicFront)
@@ -2233,7 +2233,7 @@ GolduckBaseStats:
     ; not used
     db 0
 
-    db 75 ; catch rate
+    db 50 ; catch rate
     db 174 ; base exp yield
 
     db BANK(GolduckPicFront)
@@ -2393,7 +2393,7 @@ ArcanineBaseStats:
     ; not used
     db 0
 
-    db 75 ; catch rate
+    db 25 ; catch rate
     db 213 ; base exp yield
 
     db BANK(ArcaninePicFront)
@@ -2593,7 +2593,7 @@ KadabraBaseStats:
     ; not used
     db 0
 
-    db 100 ; catch rate
+    db 90 ; catch rate
     db 145 ; base exp yield
 
     db BANK(KadabraPicFront)
@@ -2633,7 +2633,7 @@ AlakazamBaseStats:
     ; not used
     db 0
 
-    db 50 ; catch rate
+    db 10 ; catch rate
     db 186 ; base exp yield
 
     db BANK(AlakazamPicFront)
@@ -2753,7 +2753,7 @@ MachampBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 10 ; catch rate
     db 193 ; base exp yield
 
     db BANK(MachampPicFront)
@@ -2953,7 +2953,7 @@ TentacruelBaseStats:
     ; not used
     db 0
 
-    db 60 ; catch rate
+    db 50 ; catch rate
     db 205 ; base exp yield
 
     db BANK(TentacruelPicFront)
@@ -2993,7 +2993,7 @@ GeodudeBaseStats:
     ; not used
     db 0
 
-    db 255 ; catch rate
+    db 200 ; catch rate
     db 86 ; base exp yield
 
     db BANK(GeodudePicFront)
@@ -3033,7 +3033,7 @@ GravelerBaseStats:
     ; not used
     db 0
 
-    db 120 ; catch rate
+    db 90 ; catch rate
     db 134 ; base exp yield
 
     db BANK(GravelerPicFront)
@@ -3073,7 +3073,7 @@ GolemBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 10 ; catch rate
     db 177 ; base exp yield
 
     db BANK(GolemPicFront)
@@ -3153,7 +3153,7 @@ RapidashBaseStats:
     ; not used
     db 0
 
-    db 60 ; catch rate
+    db 40 ; catch rate
     db 192 ; base exp yield
 
     db BANK(RapidashPicFront)
@@ -3313,7 +3313,7 @@ MagnetonBaseStats:
     ; not used
     db 0
 
-    db 60 ; catch rate
+    db 50 ; catch rate
     db 161 ; base exp yield
 
     db BANK(MagnetonPicFront)
@@ -3673,7 +3673,7 @@ CloysterBaseStats:
     ; not used
     db 0
 
-    db 60 ; catch rate
+    db 25 ; catch rate
     db 203 ; base exp yield
 
     db BANK(CloysterPicFront)
@@ -3793,7 +3793,7 @@ GengarBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 10 ; catch rate
     db 190 ; base exp yield
 
     db BANK(GengarPicFront)
@@ -3993,7 +3993,7 @@ KinglerBaseStats:
     ; not used
     db 0
 
-    db 60 ; catch rate
+    db 50 ; catch rate
     db 206 ; base exp yield
 
     db BANK(KinglerPicFront)
@@ -4073,7 +4073,7 @@ ElectrodeBaseStats:
     ; not used
     db 0
 
-    db 60 ; catch rate
+    db 40 ; catch rate
     db 150 ; base exp yield
 
     db BANK(ElectrodePicFront)
@@ -4153,7 +4153,7 @@ ExeggutorBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 25 ; catch rate
     db 212 ; base exp yield
 
     db BANK(ExeggutorPicFront)
@@ -4353,7 +4353,7 @@ LickitungBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 35 ; catch rate
     db 127 ; base exp yield
 
     db BANK(LickitungPicFront)
@@ -4473,7 +4473,7 @@ RhyhornBaseStats:
     ; not used
     db 0
 
-    db 120 ; catch rate
+    db 60 ; catch rate
     db 135 ; base exp yield
 
     db BANK(RhyhornPicFront)
@@ -4513,7 +4513,7 @@ RhydonBaseStats:
     ; not used
     db 0
 
-    db 60 ; catch rate
+    db 25 ; catch rate
     db 204 ; base exp yield
 
     db BANK(RhydonPicFront)
@@ -4713,7 +4713,7 @@ SeadraBaseStats:
     ; not used
     db 0
 
-    db 75 ; catch rate
+    db 45 ; catch rate
     db 155 ; base exp yield
 
     db BANK(SeadraPicFront)
@@ -4873,7 +4873,7 @@ StarmieBaseStats:
     ; not used
     db 0
 
-    db 60 ; catch rate
+    db 45 ; catch rate
     db 207 ; base exp yield
 
     db BANK(StarmiePicFront)
@@ -5233,7 +5233,7 @@ GyaradosBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 25 ; catch rate
     db 214 ; base exp yield
 
     db BANK(GyaradosPicFront)
@@ -5353,7 +5353,7 @@ EeveeBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 65 ; catch rate
     db 92 ; base exp yield
 
     db BANK(EeveePicFront)
@@ -5713,7 +5713,7 @@ AerodactylBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 25 ; catch rate
     db 202 ; base exp yield
 
     db BANK(AerodactylPicFront)
@@ -5753,7 +5753,7 @@ SnorlaxBaseStats:
     ; not used
     db 0
 
-    db 25 ; catch rate
+    db 20 ; catch rate
     db 154 ; base exp yield
 
     db BANK(SnorlaxPicFront)
@@ -5953,7 +5953,7 @@ DragonairBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 35 ; catch rate
     db 144 ; base exp yield
 
     db BANK(DragonairPicFront)
@@ -5993,7 +5993,7 @@ DragoniteBaseStats:
     ; not used
     db 0
 
-    db 45 ; catch rate
+    db 10 ; catch rate
     db 218 ; base exp yield
 
     db BANK(DragonitePicFront)

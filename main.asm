@@ -124120,8 +124120,8 @@ _Route11BattleText9:
     text_done
 
 _HM02AfterText:
-    text_init , "Put it to good"
-    text_line , "use!"
+    text_init , "Remember to keep"
+    text_line , "the secret!"
     text_done
 
 _Mansion2BattleText2:
