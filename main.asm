@@ -22182,21 +22182,37 @@ CheckItemOnActive:
     cp b
     ret ; z if active mon is choice in battle
 
-SurfingCry:
+SurfingCryAndGetSurfingGotOnText:
     ld a,[$d152]
     and a ; using surfboard?
     jr z,.skip
     ld a,[wSkillMonID]
     ld [wSurfingMonID],a
     call PlayCryAndDecreaseSkillEnergy
-.skip
     call IsSurfingOnLapras
-    ld hl,SurfingGotOnText
-    ret nz
     ld hl,.SurfingOnLaprasText
+    ret z
+.skip
+    ld hl,.SurfingGotOnText
     ret
 .SurfingOnLaprasText:
     TX_FAR _SurfingOnLaprasText
+    db "@"
+.SurfingGotOnText
+    TX_FAR _SurfingGotOnText
+    db "@"
+
+GetEndSurfText:
+    call IsSurfingOnLapras
+    ld hl,.EndSurfOnLaprasText
+    ret z
+    ld hl,.EndSurfText
+    ret
+.EndSurfOnLaprasText:
+    TX_FAR _EndSurfOnLaprasText
+    db "@"
+.EndSurfText
+    TX_FAR _EndSurfText
     db "@"
 
 SurfingAttemptFailed:
@@ -22210,6 +22226,45 @@ SurfingAttemptFailed:
     ret
 .NoSurfingOnLaprasHereText
     TX_FAR _NoSurfingOnLaprasHereText
+    db "@"
+
+ItemUseBengal:
+    ld a,[W_ISINBATTLE]
+    and a
+    jp nz,ItemUseNotTime
+    ; Check Surfing
+    ld a,[$d700]
+    cp a,2 ; Surfing?
+    jr nz,.SurfingCheckOK
+    call IsSurfingOnLapras
+    jr z,.SurfingCheckOK
+    ld hl,.PrintNoLightInWater
+    call RunOnlyIfNotSelectInOverworld
+    xor a
+    ld [$cd6a],a ; item use failed
+    ret
+.SurfingCheckOK
+    ld a,[$d152]
+    and a ; is using mon's light
+    jr nz,.skip
+    call ItemUseReloadOverworldData
+    ld hl,wOverworlLightSoundBit4
+    set 4,[hl]
+    jr .end
+.skip
+    ld hl,PlayCryAndDecreaseSkillEnergy
+    call RunOnlyIfNotSelectInOverworld
+.end
+    ld hl,wOverworlLightAnimBit0
+    set 0,[hl]
+    ld a,1
+    ld [$cd6a],a ; item use success
+    ret
+.PrintNoLightInWater
+    ld hl,.NoLightInWaterText
+    jp PrintText
+.NoLightInWaterText
+    TX_FAR _NoLightInWaterText
     db "@"
 
 ; Free
@@ -23355,6 +23410,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld [$d700],a ; change player state to surfing
     ld hl,$d728 ; Disable Strength
     res 0,[hl]  ; ...
+    call CheckDisableLightDuringFloat
     call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play surfing music
     ld hl,.HandleSurfboardTextMessage
     jp RunOnlyIfNotSelectInOverworld
@@ -23394,9 +23450,8 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
 ;    dec a
 ;    ld [wJoypadForbiddenButtonsMask],a
     call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play walking music
-    ld hl,.EndSurfText
-    call PrintText
-    ret ; jp ClearScreenAndLoadWalkingPlayerSpriteGraphics ; jp LoadWalkingPlayerSpriteGraphics
+    call GetEndSurfText
+    jr .PrintText
 ; uses a simulated button press to make the player move forward
 .makePlayerMoveForward
     ld a,[$d52a] ; direction the player is going
@@ -23441,12 +23496,9 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     scf
     ret
 .HandleSurfboardTextMessage
-    call SurfingCry ; ld hl,SurfingGotOnText
+    call SurfingCryAndGetSurfingGotOnText
 .PrintText
     jp PrintText
-.EndSurfText
-    TX_FAR _EndSurfText
-    db "@"
 
 ItemUseEvoStone:
     ld a,[W_ISINBATTLE]
@@ -27858,7 +27910,7 @@ UseStrength:
     ld hl,.AlreadyStrengthText
     jr .fail
 .Surfing
-    ld hl,.SurfingText
+    ld hl,.NoStrengthDuringFloat
     ; fall through
 .fail
     call PrintText
@@ -27867,8 +27919,8 @@ UseStrength:
 .AlreadyStrengthText
     TX_FAR _AlreadyStrengthText
     db "@"
-.SurfingText
-    TX_FAR _SurfingText
+.NoStrengthDuringFloat
+    TX_FAR _NoStrengthDuringFloat
     db "@"
 
 ReDrawBattleHudAfterItemUse:
@@ -28036,15 +28088,6 @@ GetBiteLevel:
     ld [W_CURENEMYLVL],a
     pop bc
     ret
-
-;ClearScreenAndLoadWalkingPlayerSpriteGraphics:
-;    ld a,[$d152]
-;    and a ; using surfboard?
-;    jr z,.skip
-;    call GBPalWhiteOutWithDelay3
-;    call ClearScreen
-;.skip
-;    jp LoadWalkingPlayerSpriteGraphics
 
 PoisonedOnlyIfNotFaintened:
     ld a,[hl]
@@ -28360,10 +28403,6 @@ UnknownOAM_f060:
     db $FC,$10,$FD,$10
     db $FE,$10,$FF,$10
 
-SurfingGotOnText:
-    TX_FAR _SurfingGotOnText
-    db "@"
-
 SurfingNoPlaceToGetOffText:
     TX_FAR _SurfingNoPlaceToGetOffText
     db "@"
@@ -28469,21 +28508,6 @@ UpdateHPBar_AnimateHPBar:
     pop hl
     ret
 
-ItemUseBengal:
-    ld a,[W_ISINBATTLE]
-    and a
-    jp nz,ItemUseNotTime
-    ld a,[$d152]
-    and a ; is using mon's light
-    jr nz,.skip
-    call ItemUseReloadOverworldData
-    ld hl,wOverworlLightSoundBit4
-    set 4,[hl]
-.skip
-    ld hl,wOverworlLightAnimBit0
-    set 0,[hl]
-    ret
-
 ArePlayerNearAerodactyl:
     ld a,[$c11a] ; Aerodactyl Delta Y from Player?
     ld b,a
@@ -28496,6 +28520,14 @@ ArePlayerNearAerodactyl:
     db $40,$50 ; one space West of Aerodactyl
     db $30,$40 ; one space Sud of Aerodactyl
     db $ff ; terminator
+
+CheckDisableLightDuringFloat:
+    ld a,[wSkillMonID]
+    cp LAPRAS
+    ret z
+    ld hl,wOverworldGoToDarkBit4
+    set 4,[hl]
+    ret
 
 SECTION "bank4",ROMX,BANK[$4]
 
@@ -29639,15 +29671,14 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     jr .WhiteScreenAndGotoMap
 
 .flash
-    call PlayCryAndDecreaseSkillEnergy
     ld a,BENGAL
-    ld [$cf91],a
-    ld [$d152],a
-    call UseItem
-    jr .WhiteScreenAndGotoMap
+    jr .common
 
 .dig
     ld a,ESCAPE_ROPE
+    ; fall through
+
+.common
     ld [$cf91],a
     ld [$d152],a
     call UseItem
@@ -132878,7 +132909,7 @@ _FuchsiaCityText12:
     text_done
 
 _SurfingGotOnText:
-    text_init , $52," puts bag"
+    text_init , $52," puts backpack"
     text_line , "on "
     text_paus
     TX_RAM $cd6d
@@ -132952,7 +132983,7 @@ _ReceivedTM28Text:
 
 _EndSurfText:
     text_init , $52," retrieves"
-    text_line , "bag!"
+    text_line , "backpack!"
     text_wait
 
 _SurfingOnLaprasText:
@@ -132961,6 +132992,11 @@ _SurfingOnLaprasText:
     text_paus
     TX_RAM $cd6d
     text_init , "!"
+    text_wait
+
+_EndSurfOnLaprasText:
+    text_init , $52," stops"
+    text_line , "SURFing!"
     text_wait
 
 _NoSurfingOnLaprasHereText:
@@ -132976,10 +133012,17 @@ _AlreadyStrengthText:
     text_line , "in use!"
     text_wait
 
-_SurfingText:
+_NoStrengthDuringFloat:
     TX_RAM $cd6d
     text_init , " can't"
     text_line , "apply STRENGTH"
+    text_cont , "in water!"
+    text_wait
+
+_NoLightInWaterText:
+    TX_RAM $cd6d
+    text_init , " can't"
+    text_line , "apply LIGHT"
     text_cont , "in water!"
     text_wait
 
@@ -133995,6 +134038,8 @@ SuperPalettes:
 SelectInOverWorld:
     ld hl,wSelectInOverworldOnBit6
     set 6,[hl]
+    xor a
+    ld [wSkillMonID],a
     PREDEF Func_c586 ; Update Next Tile
     scf ; set carry flag
     ld a,[H_CURRENTPRESSEDBUTTONS] ; ▼▲◄►StSeBA
@@ -134011,12 +134056,14 @@ SelectInOverWorld:
     call c,.TryItemFinder
     jr .end
 .SelectPlusB
+    call c,.TryLight
     call c,.TryCut
     call c,.TryFloat
-    call c,.TryLight
     call c,.TryStrength
     ; fall through
 .end
+    xor a
+    ld [wSkillMonID],a
     ld hl,wSelectInOverworldOnBit6
     res 6,[hl]
     ret
@@ -134099,6 +134146,13 @@ SelectInOverWorld:
     ld a,[$d35d]
     and a
     jr z,.noLight
+    ; Check Surfing
+    ld a,[$d700]
+    cp a,2 ; Surfing?
+    jr nz,.SurfingCheckOK
+    call IsSurfingOnLapras
+    jr nz,.noLight
+.SurfingCheckOK
     ld b,BENGAL
     call .IsItemInBag
     jr nz,.canLightNoCry
@@ -134315,6 +134369,7 @@ CheckLaprasInPartyWithEnergy:
     ld [wWhichPokemon],a
     call .CheckAndDecreaseSkillEnergy
     jr c,.Next
+    call SetSkillMonID
     scf
     ret
 .CheckAndDecreaseSkillEnergy
@@ -134362,6 +134417,9 @@ SearchSkillInParty:
     call .CheckAndDecreaseSkillEnergy
     jr c,.NextMon
 .SkipCheckEnergy
+    ld hl,wDontCheckEnergySkillBit0
+    bit 0,[hl]
+    call z,SetSkillMonID
     scf
     ret
 .GetMonSkill
@@ -134375,6 +134433,16 @@ SearchSkillInParty:
     push bc
     BANKSWITCH CheckAndDecreaseSkillEnergy
     pop bc
+    ret
+
+SetSkillMonID:
+    ld a,[wWhichPokemon]
+    ld hl,W_PARTYMON1
+    ld b,0
+    ld c,a
+    add hl,bc
+    ld a,[hl]
+    ld [wSkillMonID],a
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -135476,6 +135544,9 @@ _CheckDarkMap:
 .TryGBFadeIn1
     ld a,[$d732] ; fall in hole
     bit 4,a      ; ...
+    ret nz
+    ld a,[wOverworldGoToDarkBit4] ; Force Go To Dark
+    bit 4,a                       ; ...
     ret nz
     jp GBFadeIn1
 .DarkMapList
@@ -140382,6 +140453,7 @@ _OverworldHackRoutine:
     call BackupDarkMapState
     call HandleLightAnimation
     call HandleStrengthAnimation
+    call HandleGoToDark
     ; fall through
 
 BugFixLongRangeTrainer:
@@ -140527,6 +140599,15 @@ HandleStrengthAnimation:
     call AdvancePlayerSprite
     call AdvancePlayerSprite
     jp DelayFrame
+
+HandleGoToDark:
+    ld hl,wOverworldGoToDarkBit4
+    bit 4,[hl]
+    ret z
+    call CheckDarkMap
+    ld hl,wOverworldGoToDarkBit4
+    res 4,[hl]
+    ret
 
 _BugFixWarpDuringJump:
     ld hl,_BugFixWarpDuringJump
