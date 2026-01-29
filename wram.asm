@@ -1886,13 +1886,13 @@ wSpriteOAMBySpeciesBit7    ; dee2 ; bit 7 = Flag Single Mon ID Sprite
 wFlagBattleCureBit7        ; dee2 ; bit 7 = Print "Cure" intead of damage
     ds 1
 
-wFlagPlaceTitleScreen ; dee3 ; counter for title screen
+wFlagPlaceTitleScreen ; dee3 = counter for title screen
 wTempStatHI           ; dee3
 wSpriteOAMBySpeciesId ; dee3
-wTempMoveEnergy       ; dee3 ; Temp Buffer for Move Energy
-wTempMovePowerHI      ; dee3 ; Temp Move Power 1st Byte
-wTempInitialPalette   ; dee3 ; Initial Background Palette (rBGP) during Power Plant Explosion
-wBufferPointerByte1   ; dee3 ; Buffer Pointer Byte 01
+wTempMoveEnergy       ; dee3 = Temp Buffer for Move Energy
+wTempMovePowerHI      ; dee3 = Temp Move Power 1st Byte
+wTempInitialPalette   ; dee3 = Initial Background Palette (rBGP) during Power Plant Explosion
+wBufferPointerByte1   ; dee3 = Buffer Pointer Byte 01
     ds 1
 
 wMaxLevel              ; dee4
@@ -1903,8 +1903,9 @@ wTempStatLO            ; dee4
 wSkillMonID            ; dee4 = Mon ID used for Cry
 wMonIdCryAndDex        ; dee4 = Mon ID used for PlayCryAndDisplayPokedex
 wTempEnemyMinMaxIV     ; dee4 = Temp Min Enemy IV Value
-wTempMovePowerLO       ; dee4 ; Temp Move Power 2nd Byte
-wBufferPointerByte2    ; dee4 ; Buffer Pointer Byte 02
+wTempMovePowerLO       ; dee4 = Temp Move Power 2nd Byte
+wBufferPointerByte2    ; dee4 = Buffer Pointer Byte 02
+wTempBoxSlot           ; dee4 = Temp Buffer for Printing Box Slot
     ds 1
 
 wStatusScreen2OAMBit0       ; dee5 ; bit 0 = Write OAM in Status Screen 2

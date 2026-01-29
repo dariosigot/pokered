@@ -44205,9 +44205,9 @@ BillsPC_: ; 214c2 (8:54c2)
 .BillsPCDeposit
     ld hl,W_NUMINPARTY ; $d163
     call .DisplayMonListMenu
-    jp c,.BillsPCMenu
+    jr c,.JumpPCMenu1
     call .DisplayDepositWithdrawMenu
-    jp nc,.BillsPCMenu
+    jr nc,.JumpPCMenu1
     ld a,$1
     ld [$cf95],a
     call MoveMon
@@ -44232,6 +44232,7 @@ BillsPC_: ; 214c2 (8:54c2)
     ld [hl],$50
     ld hl,.MonWasStoredText ; $57f8
     call PrintText
+.JumpPCMenu1
     jp .BillsPCMenu
 
 .BillsPCWithdraw
@@ -44240,13 +44241,13 @@ BillsPC_: ; 214c2 (8:54c2)
     jr nz,.boxNotEmpty
     ld hl,.NoMonText ; $580c
     call PrintText
-    jp .BillsPCMenu
+    jr .JumpPCMenu2
 .boxNotEmpty
     ld hl,W_NUMINBOX ; $da80
     call .DisplayMonListMenu
-    jp c,.BillsPCMenu
+    jr c,.JumpPCMenu2
     call .DisplayDepositWithdrawMenu
-    jp nc,.BillsPCMenu
+    jr nc,.JumpPCMenu2
     xor a
     ld [$cf95],a
     call MoveMon
@@ -44256,6 +44257,7 @@ BillsPC_: ; 214c2 (8:54c2)
     call WaitForSoundToFinish
     ld hl,.MonIsTakenOutText ; $5807
     call PrintText
+.JumpPCMenu2
     jp .BillsPCMenu
 
 .BillsPCRelease
@@ -44264,17 +44266,17 @@ BillsPC_: ; 214c2 (8:54c2)
     jr nz,.asm_21682
     ld hl,.NoMonText ; $580c
     call PrintText
-    jp .BillsPCMenu
+    jr .JumpPCMenu3
 .asm_21682
     ld hl,W_NUMINBOX ; $da80
     call .DisplayMonListMenu
-    jp c,.BillsPCMenu
+    jr c,.JumpPCMenu3
     ld hl,.OnceReleasedText ; $581b
     call PrintText
     call YesNoChoice
     ld a,[wCurrentMenuItem] ; $cc26
     and a
-    jr nz,.asm_21682
+    jr nz,.JumpPCMenu3
     inc a
     ld [$cf95],a
     call RemovePokemon
@@ -44283,6 +44285,7 @@ BillsPC_: ; 214c2 (8:54c2)
     call PlayCry
     ld hl,.MonWasReleasedText ; $5820
     call PrintText
+.JumpPCMenu3
     jp .BillsPCMenu
 
 .BillsPCChangeBox
@@ -44316,7 +44319,7 @@ BillsPC_: ; 214c2 (8:54c2)
     ld de,W_NUMINBOX
     ld bc,$102
     jp PrintNumber
-.BoxNoPkmnNumber:
+.BoxNoPkmnNumber
     db $E1,$E2,"    /20@"
 
 .RemovePokemonWithHack
@@ -144131,12 +144134,11 @@ DisplayDepositWithdrawMenu_:
     xor a
     ld [hli],a ; wCurrentMenuItem
     inc hl
-    ld a,1
+    inc a ; a = 1
     ld [hli],a ; wMaxMenuItem
-    ld a,%00110011 ; ▼▲◄►StSeBA
-    ld [hli],a ; wMenuWatchedKeys
+    inc hl
     xor a
-    ld [hl],a
+    ld [hl],a ; wLastMenuItem
     ld hl,wListScrollOffset ; $cc36
     ld [hli],a
     ld [hl],a
@@ -144144,33 +144146,89 @@ DisplayDepositWithdrawMenu_:
     ld [$cc2b],a
 .StartOrShiftMon
     call .DepositWithdrawMonTitle
-.ReturnFromStatusScreenOrShiftNull
-    ld a,$40
-    ld [$d09b],a
-    ld a,1
-    ld [wMenuWrappingEnabled],a ; $cc4a
-    call HandleMenuInputPokemonSelection
+    xor a        ; counter for pokemon shaking animation
+    ld [$d08b],a ; ...
+.LoopMenu2
+    call PlaceMenuCursor
+    call Delay3
+.LoopMenu
+    BANKSWITCH ShakeMiniSprite ; shake mini sprite of selected pokemon
+    call GetJoypadStateLowSensitivity
+    ld a,[$ffb5] ; ▼▲◄►StSeBA
     ld b,a
-    xor a
-    ld [$d09b],a
-    ld a,[$cf92]
+    ld a,[wWhichPokemon]
     bit 1,b
-    jr nz,.exit
+    jr nz,.BPressed
+    bit 0,b
+    jr nz,.APressed
+    bit 6,b
+    jr nz,.UpPressed
+    bit 7,b
+    jr nz,.DownPressed
     bit 4,b
-    jr nz,.right
+    jr nz,.RightPressed
     bit 5,b
-    jr nz,.left
+    jr nz,.LeftPressed
+    jr .LoopMenu
+.UpPressed
+    ld a,[wCurrentMenuItem]
+    and a
+    jr z,.LoopMenu ; already at the top?
+    dec a
+    ld [wCurrentMenuItem],a
+    jr .LoopMenu2
+.DownPressed
+    ld a,[wCurrentMenuItem]
+    inc a
+    ld c,a
+    ld a,[wMaxMenuItem]
+    cp c
+    jr c,.LoopMenu ; already at the bottom?
+    ld a,c
+    ld [wCurrentMenuItem],a
+    jr .LoopMenu2
+.APressed
     ld a,[wCurrentMenuItem]
     and a
     jr z,.choseDepositWithdraw
     dec a
     jr z,.viewStats
-.exit
+.BPressed
     ; Restore Update Sprites Flag
     pop bc
     call .ResetConditions
     and a ; rcf
     ret
+.RightPressed
+    FuncCoord 18,04
+    ld hl,Coord
+    inc a
+    jr .RightLeftCommon
+.LeftPressed
+    FuncCoord 05,04
+    ld hl,Coord
+    dec a
+.RightLeftCommon
+    call .GetNumberOfMon
+    cp b
+    jp nc,.WrapRightLeftCommon
+    ld [hl]," "
+.GoToDifferentPage
+    ld [wWhichPokemon],a
+    call Delay3
+    jr .StartOrShiftMon
+.WrapRightLeftCommon
+    ld b,a
+    ld a,[H_NEWLYPRESSEDBUTTONS]
+    and a
+    jr z,.LoopMenu
+    inc b
+    ld a,0
+    jr nz,.GoToDifferentPage
+    call .GetNumberOfMon
+    ld a,b
+    dec a
+    jr .GoToDifferentPage
 .choseDepositWithdraw
     call PlaceUnfilledArrowMenuCursor
     ld a,[$ccd3] ; 0 = withdraw | 1 = Deposit
@@ -144202,7 +144260,7 @@ DisplayDepositWithdrawMenu_:
     call ReloadTilesetTilePatterns
     call GoPAL_SET_CF1C
     call LoadGBPal
-    jr .ReturnFromStatusScreenOrShiftNull
+    jp .LoopMenu
 .ResetConditions ; carry flag contains function result, don't override it!
     ; Restore Update Sprites Flag
     ld a,b
@@ -144214,23 +144272,6 @@ DisplayDepositWithdrawMenu_:
     ld a,0
     ld [$ffb7],a
     ret
-.right
-    FuncCoord 18,04
-    ld hl,Coord
-    inc a
-    jr .RightLeftCommon
-.left
-    FuncCoord 05,04
-    ld hl,Coord
-    dec a
-.RightLeftCommon
-    call .GetNumberOfMon
-    cp b
-    jp nc,.ReturnFromStatusScreenOrShiftNull
-    ld [hl]," "
-    ld [$cf92],a
-    call Delay3
-    jp .StartOrShiftMon
 .GetNumberOfMon
     push af
     ld a,[$ccd3]
@@ -144269,11 +144310,11 @@ DisplayDepositWithdrawMenu_:
 .DepositWithdrawMonTitle
     ; Clear Title Area
     FuncCoord 05,03
-    ld bc,$030e ; 03,14
+    ld bc,(04<<8|14)
     ld hl,Coord
     call ClearScreenArea
     FuncCoord 05,06
-    ld bc,$0604 ; 06,04
+    ld bc,(06<<8|04)
     ld hl,Coord
     call ClearScreenArea
     ; Arrow
@@ -144294,6 +144335,26 @@ DisplayDepositWithdrawMenu_:
     ld a,$ED ; Right Arrow
     ld [Coord],a
 .skipRightArrow
+    ; Box Slot
+    FuncCoord 15,06
+    ld hl,Coord
+    ld [hl],"/"
+    call .GetNumberOfMon
+    ld a,b
+    ld [wTempBoxSlot],a
+    FuncCoord 16,06
+    ld hl,Coord
+    ld de,wTempBoxSlot
+    ld bc,$102
+    call PrintNumber
+    ld a,[wWhichPokemon]
+    inc a
+    ld [wTempBoxSlot],a
+    FuncCoord 13,06
+    ld hl,Coord
+    ld de,wTempBoxSlot
+    ld bc,$102
+    call PrintNumber
     ; Level
     call LoadMonData
     ld a,[$cc49]
