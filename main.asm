@@ -25,10 +25,6 @@ ResetTempIV:
     pop hl
     ret
 
-HandleLessThan2MenuElements:
-    add 2
-    jp GoToBottomLessThan2MenuElements
-
 StoreGymLeaderRematch:
     push bc
     ld hl,W_OBTAINEDBADGES
@@ -514,6 +510,7 @@ GoToTop:
     ld a,[H_NEWLYPRESSEDBUTTONS] ; ▼▲◄►StSeBA
     bit 7,a
     ret z
+GoToTop2:
     xor a
     ld [hl],a
     ld [wCurrentMenuItem],a
@@ -523,12 +520,16 @@ GoToBottom:
     ld a,[H_NEWLYPRESSEDBUTTONS] ; ▼▲◄►StSeBA
     bit 6,a
     ret z
+GoToBottom2:
     ld a,[$d12a]
     sub 3
-    jp c,HandleLessThan2MenuElements
+    jr nc,.done
+    add 2
+    jr .end
+.done
     ld [hl],a
     ld a,2
-GoToBottomLessThan2MenuElements:
+.end
     ld [wCurrentMenuItem],a
     ret
 
@@ -3177,8 +3178,6 @@ DelayFramesAndSetWaitReleaseJoyFlag:
     ld hl,wWaitReleaseJoyBit5
     set 5,[hl]
     jp DelayFrames
-
-; Free
 
 SECTION "DisplayPartyMenu",ROM0[$13fc]
 
@@ -7315,13 +7314,13 @@ DisplayListMenuID: ; 2be6 (0:2be6)
     call HackItemInBattle ; ld [wTopMenuItemY],a ; $2c41
     ld a,5
     ld [wTopMenuItemX],a
-    ld a,%00000111 ; A button,B button,Select button
+    ld a,%00110111 ; ▼▲◄►StSeBA
     ld [wMenuWatchedKeys],a
     ld c,10
     call DelayFramesAndSetWaitReleaseJoyFlag ; call DelayFrames
     ; fall through
 
-DisplayListMenuIDLoop: ; 2c53 (0:2c53)
+DisplayListMenuIDLoop:
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; disable transfer
     call PrintListMenuEntries
@@ -7352,7 +7351,8 @@ DisplayListMenuIDLoop: ; 2c53 (0:2c53)
     call PlaceMenuCursor
     pop af
     bit 0,a ; was the A button pressed?
-    jp z,.checkOtherKeys
+    jp z,ListMenu_CheckOtherKeys
+
 .buttonAPressed
     ld a,[wCurrentMenuItem]
     call PlaceUnfilledArrowMenuCursor
@@ -7424,6 +7424,9 @@ DisplayListMenuIDLoop: ; 2c53 (0:2c53)
     call CopyStringToCF4B ; copy name to $cf4b
     ld a,$01
     ld [$d12e],a
+    ; fall through
+
+ResetListMenuEnv:
     ld a,[wCurrentMenuItem]
     ld [$d12d],a
     xor a
@@ -7431,36 +7434,67 @@ DisplayListMenuIDLoop: ; 2c53 (0:2c53)
     ld hl,$d730
     res 6,[hl] ; turn on letter printing delay
     jp BankswitchBack
-.checkOtherKeys ; check B,SELECT,Up,and Down keys
+
+ExitListMenu:
+    ld a,$02
+    ld [$d12e],a
+    ld [$cc37],a
+    call ResetListMenuEnv
+    xor a
+    ld [$cc35],a ; 0 means no item is currently being swapped
+    scf
+    ret
+
+ListMenu_CheckOtherKeys: ; check B,SELECT,Up,and Down keys
     bit 1,a ; was the B button pressed?
-    jp nz,ExitListMenu ; if so,exit the menu
+    jr nz,ExitListMenu ; if so,exit the menu
     bit 2,a ; was the select button pressed?
     jp nz,HandleItemListSwapping ; if so,allow the player to swap menu entries
-    ld b,a
-    bit 7,b ; was Down pressed?
+
+    ; ▼▲◄►
     ld hl,wListScrollOffset
     ld de,DisplayListMenuIDLoop
     push de ; Return Pointer
-    jr z,.upPressed
-.downPressed
+    bit 5,a
+    jr nz,.LeftPressed
+    bit 4,a
+    jr nz,.RightPressed
+    bit 6,a ; was Down pressed?
+    jr nz,.UpPressed
+.DownPressed
     ld a,[hl]
-    add a,4 ; 3
+    add 3 + 1
     ld b,a
     ld a,[$d12a] ; number of list entries
     cp b ; will going down scroll past the Cancel button?
     jp c,GoToTop
     inc [hl] ; if not,go down
     ret
-.upPressed
+.UpPressed
     ld a,[hl]
     and a
     jp z,GoToBottom
     dec [hl]
     ret
+.LeftPressed
+    ld a,[hl]
+    sub 3
+    jp c,GoToTop2
+    ld [hl],a
+    ret
+.RightPressed
+    ld a,[hl]
+    add 3 + 3
+    ld b,a
+    ld a,[$d12a] ; number of list entries
+    cp b ; will going down scroll past the Cancel button?
+    jp c,GoToBottom2
+    inc [hl]
+    inc [hl]
+    inc [hl]
+    ret
 
-SECTION "DisplayChooseQuantityMenu",ROM0[$2d57]
-
-DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
+DisplayChooseQuantityMenu:
 ; text box dimensions/coordinates for just quantity
 
     ld a,1
@@ -7582,37 +7616,6 @@ DisplayChooseQuantityMenu: ; 2d57 (0:2d57)
     ret
 .SpacesBetweenQuantityAndPriceText
     db "      @"
-
-; ───────────────────────────────────────
-; Handle New Adventure Pointer Conversion (BANK $00)
-; ───────────────────────────────────────
-
-GetMapHeaderBanks:
-    ld hl,MapHeaderBanks
-    call CheckNewAdventureFlag
-    ret z
-    ld hl,MapHeaderBanksNew
-    ret
-
-; ───────────────────────────────────────
-
-SECTION "ExitListMenu",ROM0[$2e3b]
-
-ExitListMenu: ; 2e3b (0:2e3b)
-    ld a,[wCurrentMenuItem]
-    ld [$d12d],a
-    ld a,$02
-    ld [$d12e],a
-    ld [$cc37],a
-    xor a
-    ld [$ffb7],a
-    ld hl,$d730
-    res 6,[hl]
-    call BankswitchBack
-    xor a
-    ld [$cc35],a ; 0 means no item is currently being swapped
-    scf
-    ret
 
 SECTION "PrintListMenuEntries",ROM0[$2e5a] ; cannot be moved cause "HackItemInBattle"
 
@@ -8541,6 +8544,19 @@ ArePlayerCoordsInArrayBeforeHOFWin:
 
 Nope:
     ret
+
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $00)
+; ───────────────────────────────────────
+
+GetMapHeaderBanks:
+    ld hl,MapHeaderBanks
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,MapHeaderBanksNew
+    ret
+
+; ───────────────────────────────────────
 
 ; Free
 
