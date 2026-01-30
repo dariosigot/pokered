@@ -7314,7 +7314,7 @@ DisplayListMenuID: ; 2be6 (0:2be6)
     call HackItemInBattle ; ld [wTopMenuItemY],a ; $2c41
     ld a,5
     ld [wTopMenuItemX],a
-    ld a,%00110111 ; ▼▲◄►StSeBA
+    ld a,%11110111 ; ▼▲◄►StSeBA
     ld [wMenuWatchedKeys],a
     ld c,10
     call DelayFramesAndSetWaitReleaseJoyFlag ; call DelayFrames
@@ -7345,6 +7345,8 @@ DisplayListMenuIDLoop:
     ld [wMenuCursorLocation + 1],a
     jr .buttonAPressed
 .notOldManBattle
+    ld hl,wTestWrapInMenuInputBit6
+    set 6,[hl]
     call LoadGBPal
     call HandleMenuInput
     push af
@@ -7427,6 +7429,8 @@ DisplayListMenuIDLoop:
     ; fall through
 
 ResetListMenuEnv:
+    ld hl,wTestWrapInMenuInputBit6
+    res 6,[hl]
     ld a,[wCurrentMenuItem]
     ld [$d12d],a
     xor a
@@ -7435,19 +7439,9 @@ ResetListMenuEnv:
     res 6,[hl] ; turn on letter printing delay
     jp BankswitchBack
 
-ExitListMenu:
-    ld a,$02
-    ld [$d12e],a
-    ld [$cc37],a
-    call ResetListMenuEnv
-    xor a
-    ld [$cc35],a ; 0 means no item is currently being swapped
-    scf
-    ret
-
 ListMenu_CheckOtherKeys: ; check B,SELECT,Up,and Down keys
     bit 1,a ; was the B button pressed?
-    jr nz,ExitListMenu ; if so,exit the menu
+    jp nz,ExitListMenu ; if so,exit the menu
     bit 2,a ; was the select button pressed?
     jp nz,HandleItemListSwapping ; if so,allow the player to swap menu entries
 
@@ -7459,6 +7453,8 @@ ListMenu_CheckOtherKeys: ; check B,SELECT,Up,and Down keys
     jr nz,.LeftPressed
     bit 4,a
     jr nz,.RightPressed
+    call TestWrapInMenuInput ; Run Up/Down Code Only if MenuInput Try
+    ret nz                    ; to Wrap (like in original Code)
     bit 6,a ; was Down pressed?
     jr nz,.UpPressed
 .DownPressed
@@ -7806,10 +7802,7 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     ld a,$ee ; down arrow
     ld [hl],a
 .end
-    ld a,[wListMenuID]
-    cp a,ITEMLISTMENU
-    ret nz
-    BANKSWITCH PrintMenuItemQty
+    BANKSWITCH PrintMenuQty
     ; fall through
 
 GetMonName:
@@ -8558,8 +8551,6 @@ GetMapHeaderBanks:
 
 ; ───────────────────────────────────────
 
-; Free
-
 SECTION "Func_3442",ROM0[$3442]
 
 Func_3442: ; 3442 (0:3442)
@@ -9001,6 +8992,13 @@ SpeedUpByke:
 .TrySpeedUpWithB
     jp TrySpeedUpWithB       ; Speed 4X
 
+TestWrapInMenuInput:
+    push hl
+    ld hl,wTestWrapInMenuInputBit6
+    bit 6,[hl]
+    pop hl
+    ret
+
 ; Free
 
 SECTION "LoadTextBoxTilePatterns",ROM0[$36a0]
@@ -9424,6 +9422,17 @@ Divide:
     pop hl
     ret
 
+; TODO : Riavvicinare alla giusta sezione
+ExitListMenu:
+    ld a,$02
+    ld [$d12e],a
+    ld [$cc37],a
+    call ResetListMenuEnv
+    xor a
+    ld [$cc35],a ; 0 means no item is currently being swapped
+    scf
+    ret
+
 ; Free
 
 SECTION "PrintLetterDelay",ROM0[$38d3]
@@ -9763,14 +9772,12 @@ StringCmp:
     jr nz,StringCmp
     ret
 
-SECTION "WriteOAMBlock",ROM0[$3a97]
-
 ; INPUT:
 ; a = oam block index (each block is 4 oam entries)
 ; b = Y coordinate of upper left corner of sprite
 ; c = X coordinate of upper left corner of sprite
 ; de = base address of 4 tile number and attribute pairs
-WriteOAMBlock: ; 3a97 (0:3a97)
+WriteOAMBlock:
     ld h,$c3
     swap a ; multiply by 16
     ld l,a
@@ -9802,11 +9809,11 @@ WriteOAMBlock: ; 3a97 (0:3a97)
     ld [hli],a
     ret
 
-HandleMenuInput: ; 3abe (0:3abe)
+HandleMenuInput:
     xor a
     ld [$d09b],a
 
-HandleMenuInputPokemonSelection: ; 3ac2 (0:3ac2)
+HandleMenuInputPokemonSelection:
     ld a,[H_DOWNARROWBLINKCNT1]
     push af
     ld a,[H_DOWNARROWBLINKCNT2]
@@ -9916,12 +9923,14 @@ HandleMenuInputPokemonSelection: ; 3ac2 (0:3ac2)
     ld a,[$ffb5]
     ret
 .noWrappingAround
+    ld hl,wTestWrapInMenuInputBit6
+    res 6,[hl]
     ld a,[$cc37]
     and a ; should we return if the user tried to go past the top or bottom?
     jr z,.checkOtherKeys
     jr .checkIfAButtonOrBButtonPressed
 
-PlaceMenuCursor: ; 3b7c (0:3b7c)
+PlaceMenuCursor:
     ld a,[wTopMenuItemY]
     and a ; is the y coordinate 0?
     jr z,.adjustForXCoord
@@ -10000,7 +10009,7 @@ PlaceMenuCursor: ; 3b7c (0:3b7c)
 ; manipulated. In the case of submenus,this is used to show the location of
 ; the menu cursor in the parent menu. In the case of swapping items in list,
 ; this is used to mark the item that was first chosen to be swapped.
-PlaceUnfilledArrowMenuCursor: ; 3bec (0:3bec)
+PlaceUnfilledArrowMenuCursor:
     ld b,a
     ld a,[wMenuCursorLocation]
     ld l,a
@@ -10011,7 +10020,7 @@ PlaceUnfilledArrowMenuCursor: ; 3bec (0:3bec)
     ret
 
 ; Replaces the menu cursor with a blank space.
-EraseMenuCursor: ; 3bf9 (0:3bf9)
+EraseMenuCursor:
     ld a,[wMenuCursorLocation]
     ld l,a
     ld a,[wMenuCursorLocation + 1]
@@ -10027,7 +10036,7 @@ EraseMenuCursor: ; 3bf9 (0:3bf9)
 ; initliazed with a down arrow,this function does nothing.
 ; That allows this to be called without worrying about if a down arrow should
 ; be blinking.
-HandleDownArrowBlinkTiming: ; 3c04 (0:3c04)
+HandleDownArrowBlinkTiming:
     ld a,[hl]
     ld b,a
     ld a,$ee ; down arrow
@@ -10067,6 +10076,8 @@ HandleDownArrowBlinkTiming: ; 3c04 (0:3c04)
     ld a,$ee ; down arrow
     ld [hl],a
     ret
+
+SECTION "EnableAutoTextBoxDrawing",ROM0[$3c3c]
 
 ; The following code either enables or disables the automatic drawing of
 ; text boxes by DisplayTextID. Both functions cause DisplayTextID to wait
@@ -135903,31 +135914,13 @@ _InitBattleEnemyParameters:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-PrintMenuItemQty:
-    ld hl,$cf8b
-    ld a,[hli]
-    cp wNumBagItems & $FF
-    jr nz,.NotBag
-    ld a,[hld]
-    cp wNumBagItems >> 8
-    jr nz,.NotBag
-    ld a,[wNumBagItems]
-    ld b,20 ; bag can hold 20 items
-    jr .found
-.NotBag
-    ld hl,$cf8b
-    ld a,[hli]
-    cp wNumBoxItems & $FF
-    jr nz,.NotBox
-    ld a,[hld]
-    cp wNumBoxItems >> 8
-    jr nz,.NotBox
-    ld a,[wNumBoxItems]
-    ld b,40 ; bag can hold 20 items
-    jr .found
-.NotBox
-    ret
-.found
+PrintMenuQty:
+    ; PrintCurrentItem
+    ld a,[wCurrentMenuItem]
+    ld c,a
+    ld a,[wListScrollOffset]
+    add c
+    inc a
     ld de,$d11e
     ld [de],a
     ld a,[W_ISINBATTLE]
@@ -135945,7 +135938,7 @@ PrintMenuItemQty:
     pop bc
     ld [hl],"/"
     inc hl
-    ld a,b
+    ld a,[$d12a]
     ld [de],a
     ; fall through
 .PrintNumber

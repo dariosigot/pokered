@@ -1919,6 +1919,7 @@ wFlagForceGhostPalBit4      ; dee5 ; bit 4 = Force Ghost Palette during Ghost Ma
 wOverworlLightSoundBit4     ; dee5 ; bit 4 = Force Overworld Light Sound
 wForceShowPokedexBit5       ; dee5 ; bit 5 = Show Pokedex during first Seen in Battle
 wWaitReleaseJoyBit5         ; dee5 ; bit 5 = Enable Waiting Joy Release in "menuloop"
+wTestWrapInMenuInputBit6    ; dee5 ; bit 6 = Enable to Test if Cursor try to "wrap" during MenuInput, if positive reset it
 wFirstExpAllMessageBit6     ; dee5 ; bit 6
 wSelectInOverworldOnBit6    ; dee5 ; bit 6
 wStatusScreenJustLoadBit6   ; dee5 ; bit 6 = Status Screen Picture Just Load
