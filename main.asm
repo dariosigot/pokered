@@ -42346,11 +42346,8 @@ MovesMenu:
     ld [hli],a ; wCurrentMenuItem
     inc hl
     inc hl
-    ld a,%11111111 ; ▼▲◄►StSeBA
-    ld [hli],a ; wMenuWatchedKeys
-    xor a
+    inc hl
     ld [hl],a ; wLastMenuItem
-    xor a
     ld [wListScrollOffset],a
 
     ; Choice Move
@@ -42394,6 +42391,7 @@ MovesMenu:
     jr .Retry
 
 .MoveJustKnown
+    call Delay3 ; Show "UnfilledArrow"
     ld a,$a5 ; Error
     call PlaySoundWaitForCurrent ; play sound
     jr .Retry
@@ -42541,14 +42539,21 @@ WriteEnergyAllMovesDuringMoveRelearn:
 ; output a = Flag Result,[wCurrentMenuItem] = Index of Choice
 ChoiceRelearnMove:
 
-    jr .start
+.Restart
+    call .ResetScreen
 
 .MenuLoop
-    call .HandleMenuInput
-    bit 0,a ; was the A button pressed? 
-    jr nz,.APressed
+    BANKSWITCH ShakeMiniSprite ; shake mini sprite of selected pokemon
+    call GetJoypadStateLowSensitivity
+    ld a,[$ffb5] ; ▼▲◄►StSeBA
     bit 1,a ; was the B button pressed?
     ret nz
+    bit 0,a ; was the A button pressed? 
+    jr nz,.APressed
+    bit 6,a ; was up button pressed?
+    jr nz,.UpPressed
+    bit 7,a ; was down button pressed?
+    jr nz,.DownPressed
     bit 5,a ; was left button pressed?
     jr nz,.LeftPressed
     bit 4,a ; was right button pressed?
@@ -42556,7 +42561,38 @@ ChoiceRelearnMove:
     bit 2,a ; was select button pressed?
     jp nz,.SelectPressed
     bit 3,a ; was start button pressed?
-    jr nz,.start
+    jr nz,.StartPressed
+    jr .MenuLoop
+
+.StartPressed
+    ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
+    and a                        ; ...
+    jr z,.MenuLoop               ; ...
+    jr .Restart
+
+.UpPressed
+    ld a,[wCurrentMenuItem]
+    dec a
+    jr .UpDownCommon
+.DownPressed
+    ld a,[wCurrentMenuItem]
+    inc a
+.UpDownCommon
+    ld hl,wMaxMenuItem
+    ld b,[hl]
+    inc b ; Max Menu Id + 1 = Number of Slot
+    cp b
+    jr c,.UpDownEnd
+    ld b,a
+    ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
+    and a                        ; ...
+    jr z,.MenuLoop               ; ...
+    inc b
+    ld a,0 ; Start
+    jr nz,.UpDownEnd
+    ld a,[wMaxMenuItem] ; End
+.UpDownEnd
+    ld [wCurrentMenuItem],a
     jr .UpOrDownPressedOrSelectUsed
 
 .APressed
@@ -42566,6 +42602,7 @@ ChoiceRelearnMove:
     call PlaceUnfilledArrowMenuCursor
     xor a ; szf
     ret
+
 .LeftPressed
     FuncCoord 04,01
     ld hl,Coord
@@ -42592,35 +42629,45 @@ ChoiceRelearnMove:
     ld b,a
     ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
     and a                        ; ...
-    jr z,.MenuLoop               ; ...
+    jp z,.MenuLoop               ; ...
     ld a,b
 .MenuContinue
     ld [hl]," "
     ld [wListScrollOffset],a
-    call Delay3
+    call Delay3 ; Disappear Left/Right Arrow 
     ld a,[wCurrentMenuItem]
     ld b,a
     call .GetMaxCurrentScreenMenuLenght
     cp b
-    jr nc,.start
+    jr nc,.DontResetItemId
     ld [wCurrentMenuItem],a
-.start
-    call .ResetScreen
-    jr .MenuLoop
+.DontResetItemId
+    jp .Restart
 
 .ResetScreen
     call .ClearScreenArea
     call .PrintMovesAndArrows
+    call .PlaceMenuCursor
     call .GetCurrentMove
     call .GetMaxCurrentScreenMenuLenght
     ld [wMaxMenuItem],a
-    ret
+    jp Delay3 ; Wait Screen Reset
 
 .UpOrDownPressedOrSelectUsed
     call .ClearScreenArea
     call .PrintMoves
+    call .PlaceMenuCursor
     call .GetCurrentMove
+    call Delay3 ; Wait Screen Update
     jp .MenuLoop
+
+.PlaceMenuCursor
+    ld hl,$fff6
+    set 1,[hl]
+    call PlaceMenuCursor
+    ld hl,$fff6
+    res 1,[hl]
+    ret
 
 .GetCurrentMove
     call .ListLenghtAndPointerToFirst
@@ -42896,18 +42943,6 @@ ChoiceRelearnMove:
     ld hl,Coord
     ld bc,$020b
     jp ClearScreenArea
-
-.HandleMenuInput
-    ld a,1
-    ld [wMenuWrappingEnabled],a
-    ld hl,$fff6
-    set 1,[hl]
-    ld a,$40
-    ld [$d09b],a
-    call HandleMenuInputPokemonSelection
-    ld hl,$fff6
-    res 1,[hl]
-    ret
 
 .SelectPressed
     call .ResetScreen
@@ -144211,7 +144246,7 @@ DisplayDepositWithdrawMenu_:
 .RightLeftCommon
     call .GetNumberOfMon
     cp b
-    jp nc,.WrapRightLeftCommon
+    jr nc,.WrapRightLeftCommon
     ld [hl]," "
 .GoToDifferentPage
     ld [wWhichPokemon],a
