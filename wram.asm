@@ -1918,6 +1918,7 @@ wDisableEncounterBit3       ; dee5 ; bit 3 = Disable Pewter's Eevee Encounter
 wFlagForceGhostPalBit4      ; dee5 ; bit 4 = Force Ghost Palette during Ghost Marowak Encounter
 wOverworlLightSoundBit4     ; dee5 ; bit 4 = Force Overworld Light Sound
 wForceShowPokedexBit5       ; dee5 ; bit 5 = Show Pokedex during first Seen in Battle
+wWaitReleaseJoyBit5         ; dee5 ; bit 5 = Enable Waiting Joy Release in "menuloop"
 wFirstExpAllMessageBit6     ; dee5 ; bit 6
 wSelectInOverworldOnBit6    ; dee5 ; bit 6
 wStatusScreenJustLoadBit6   ; dee5 ; bit 6 = Status Screen Picture Just Load

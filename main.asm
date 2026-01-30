@@ -3173,6 +3173,11 @@ GetCryData:
     add c ; a = $14 + cryID * 3
     ret
 
+DelayFramesAndSetWaitReleaseJoyFlag:
+    ld hl,wWaitReleaseJoyBit5
+    set 5,[hl]
+    jp DelayFrames
+
 ; Free
 
 SECTION "DisplayPartyMenu",ROM0[$13fc]
@@ -7237,9 +7242,23 @@ AddItemToInventory:
     pop bc
     ret
 
-; Free
+; Output : a = [$ffb5]
+;      z set = Can Continue
+;    z reset = Must Wait
+GetJoypadStateLowSensitivityWaitReleaseJoy:
+    call GetJoypadStateLowSensitivity
+    ld hl,wWaitReleaseJoyBit5
+    bit 5,[hl]
+    jr z,.end
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    and a
+    jr nz,.end
+    res 5,[hl]
+.end
+    ld a,[$ffb5]
+    ret
 
-SECTION "DisplayListMenuID",ROM0[$2be6]
+SECTION "DisplayListMenuID",ROM0[$2be6] ; cannot be moved cause "HackItemInBattle"
 
 ; INPUT:
 ; [wListMenuID] = list menu ID
@@ -7299,7 +7318,7 @@ DisplayListMenuID: ; 2be6 (0:2be6)
     ld a,%00000111 ; A button,B button,Select button
     ld [wMenuWatchedKeys],a
     ld c,10
-    call DelayFrames
+    call DelayFramesAndSetWaitReleaseJoyFlag ; call DelayFrames
     ; fall through
 
 DisplayListMenuIDLoop: ; 2c53 (0:2c53)
@@ -7594,6 +7613,8 @@ ExitListMenu: ; 2e3b (0:2e3b)
     ld [$cc35],a ; 0 means no item is currently being swapped
     scf
     ret
+
+SECTION "PrintListMenuEntries",ROM0[$2e5a] ; cannot be moved cause "HackItemInBattle"
 
 PrintListMenuEntries: ; 2e5a (0:2e5a)
     FuncCoord 5,3 ; $c3e1
@@ -9784,15 +9805,15 @@ HandleMenuInputPokemonSelection: ; 3ac2 (0:3ac2)
     call PlaceMenuCursor
     call Delay3
 .loop2
-    push hl
     ld a,[$d09b]
     and a ; is it a pokemon selection menu?
     jr z,.getJoypadState
+    push hl
     BANKSWITCH ShakeMiniSprite ; shake mini sprite of selected pokemon
-.getJoypadState
     pop hl
-    call GetJoypadStateLowSensitivity
-    ld a,[$ffb5]
+.getJoypadState
+    call GetJoypadStateLowSensitivityWaitReleaseJoy
+    jr nz,.loop2
     and a ; was a key pressed?
     jr nz,.keyPressed
     push hl
@@ -25676,6 +25697,8 @@ ItemUseTechMach:
     ld [$ffb7],a
     ld a,[wLastTechMachIdUsed] ; restore last choice
     ld [$cf91],a
+    ld hl,wWaitReleaseJoyBit5
+    set 5,[hl]
     call GetTMChoiceItemID ; put item_ID in $cf91
     ld a,[$cf91]
     ld [wLastTechMachIdUsed],a ; overwrite last choice
@@ -25735,8 +25758,8 @@ GetTMChoiceItemID:
     call .ClearScreenArea
     call .GetAndPlaceTMStats
 .getJoypadStateLoop
-    call GetJoypadStateLowSensitivity
-    ld a,[$ffb5]
+    call GetJoypadStateLowSensitivityWaitReleaseJoy
+    jr nz,.getJoypadStateLoop
     and %00110011 ; ▼▲◄►StSeBA
     jr z,.getJoypadStateLoop
     bit 4,a ; pressed Right key?
@@ -42539,13 +42562,14 @@ WriteEnergyAllMovesDuringMoveRelearn:
 ; output a = Flag Result,[wCurrentMenuItem] = Index of Choice
 ChoiceRelearnMove:
 
-.Restart
+    ld hl,wWaitReleaseJoyBit5
+    set 5,[hl]
     call .ResetScreen
 
 .MenuLoop
     BANKSWITCH ShakeMiniSprite ; shake mini sprite of selected pokemon
-    call GetJoypadStateLowSensitivity
-    ld a,[$ffb5] ; ▼▲◄►StSeBA
+    call GetJoypadStateLowSensitivityWaitReleaseJoy ; ▼▲◄►StSeBA
+    jr nz,.MenuLoop
     bit 1,a ; was the B button pressed?
     ret nz
     bit 0,a ; was the A button pressed? 
@@ -42567,8 +42591,8 @@ ChoiceRelearnMove:
 .StartPressed
     ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
     and a                        ; ...
-    jr z,.MenuLoop               ; ...
-    jr .Restart
+    call nz,.ResetScreen         ; ...
+    jr .MenuLoop
 
 .UpPressed
     ld a,[wCurrentMenuItem]
@@ -42593,7 +42617,7 @@ ChoiceRelearnMove:
     ld a,[wMaxMenuItem] ; End
 .UpDownEnd
     ld [wCurrentMenuItem],a
-    jr .UpOrDownPressedOrSelectUsed
+    jr .UpOrDownPressed
 
 .APressed
     ld hl,H_CURRENTPRESSEDBUTTONS ; ▼▲◄►StSeBA
@@ -42642,7 +42666,8 @@ ChoiceRelearnMove:
     jr nc,.DontResetItemId
     ld [wCurrentMenuItem],a
 .DontResetItemId
-    jp .Restart
+    call .ResetScreen
+    jp .MenuLoop
 
 .ResetScreen
     call .ClearScreenArea
@@ -42653,7 +42678,7 @@ ChoiceRelearnMove:
     ld [wMaxMenuItem],a
     jp Delay3 ; Wait Screen Reset
 
-.UpOrDownPressedOrSelectUsed
+.UpOrDownPressed
     call .ClearScreenArea
     call .PrintMoves
     call .PlaceMenuCursor
@@ -42968,7 +42993,7 @@ ChoiceRelearnMove:
     ld [hld],a
     dec c
     jr nz,.LoopRestoreMenu
-    jp .UpOrDownPressedOrSelectUsed
+    jp ChoiceRelearnMove
 
 SortMoves:
     ; Initialize Menù Config
@@ -61550,7 +61575,9 @@ HandlePokedexListMenu: ; 40111 (10:4111)
 .storeMaxSeenPokemon
     ld a,b
     ld [$cd3d],a ; max seen pokemon
-.loop
+    ld hl,wWaitReleaseJoyBit5
+    set 5,[hl]
+.loop2
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a
     FuncCoord 4,2
@@ -61634,43 +61661,43 @@ HandlePokedexListMenu: ; 40111 (10:4111)
 .upPressed ; scroll up one row
     ld a,[wListScrollOffset]
     and a
-    jp z,.loop
+    jr z,.loop
     dec a
     ld [wListScrollOffset],a
-    jp .loop
+    jr .loop
 .checkIfDownPressed
     bit 7,a ; was Down pressed?
     jr z,.checkIfRightPressed
 .downPressed ; scroll down one row
     ld a,[$cd3d]
     cp a,8
-    jp c,.loop
+    jr c,.loop
     sub a,8
     ld b,a
     ld a,[wListScrollOffset]
     cp b
-    jp z,.loop
+    jr z,.loop
     inc a
     ld [wListScrollOffset],a
-    jp .loop
+    jr .loop
 .checkIfRightPressed
     bit 4,a ; was Right pressed?
     jr z,.checkIfLeftPressed
 .rightPressed ; scroll down 8 rows
     ld a,[$cd3d]
     cp a,8
-    jp c,.loop
+    jr c,.loop
     sub a,7
     ld b,a
     ld a,[wListScrollOffset]
     add a,8
     ld [wListScrollOffset],a
     cp b
-    jp c,.loop
+    jr c,.loop
     dec b
     ld a,b
     ld [wListScrollOffset],a
-    jp .loop
+    jr .loop
 .checkIfLeftPressed ; scroll up 8 rows
     bit 5,a ; was Left pressed?
     jr z,.buttonAPressed
@@ -61678,10 +61705,11 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld a,[wListScrollOffset]
     sub a,8
     ld [wListScrollOffset],a
-    jp nc,.loop
+    jr nc,.loop
     xor a
     ld [wListScrollOffset],a
-    jp .loop
+.loop
+    jp .loop2
 .buttonAPressed
     scf
     ret
@@ -99096,6 +99124,8 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     ; Quick Joypad
     ld a,1
     ld [$ffb7],a
+    ld hl,wWaitReleaseJoyBit5
+    set 5,[hl]
     call BuildFlyLocationsList
     ld hl,$cfcb
     ld a,[hl]
@@ -99141,8 +99171,9 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
 .asm_71004
     push hl
     call Delay3;call DelayFrames
-    call GetJoypadStateLowSensitivity
-    ld a,[$FF00+$b5]
+.Wait
+    call GetJoypadStateLowSensitivityWaitReleaseJoy
+    jr nz,.Wait
     ld b,a
     pop hl
     and $c3
@@ -99374,16 +99405,6 @@ Func_711ef:
     ld de,wTileMapBackup
     ld bc,$a0
     jp CopyData
-
-ShakeMiniSprite:
-    call CheckMoveRelearn
-    jp z,Func_716ff
-    ld a,[wCurrentMenuItem]
-    push af
-    call Func_716f7
-    pop af
-    ld [wCurrentMenuItem],a
-    ret
 
 SECTION "TownMapCoordsToOAMCoords",ROMX[$5258],BANK[$1c]
 
@@ -99921,6 +99942,16 @@ Func_71791: ; 71791 (1c:5791)
     dec a
     jr nz,.asm_7179c
     jp EnableLCD
+
+ShakeMiniSprite:
+    call CheckMoveRelearn
+    jp z,Func_716ff
+    ld a,[wCurrentMenuItem]
+    push af
+    call Func_716f7
+    pop af
+    ld [wCurrentMenuItem],a
+    ret
 
 ; Free
 
@@ -144179,6 +144210,9 @@ DisplayDepositWithdrawMenu_:
     ld [hl],a
     ld [wPlayerMonNumber],a ; $cc2f
     ld [$cc2b],a
+.LoopMenu3
+    ld hl,wWaitReleaseJoyBit5
+    set 5,[hl]
 .StartOrShiftMon
     call .DepositWithdrawMonTitle
     xor a        ; counter for pokemon shaking animation
@@ -144188,9 +144222,9 @@ DisplayDepositWithdrawMenu_:
     call Delay3
 .LoopMenu
     BANKSWITCH ShakeMiniSprite ; shake mini sprite of selected pokemon
-    call GetJoypadStateLowSensitivity
-    ld a,[$ffb5] ; ▼▲◄►StSeBA
-    ld b,a
+    call GetJoypadStateLowSensitivityWaitReleaseJoy
+    jr nz,.LoopMenu
+    ld b,a ; ▼▲◄►StSeBA
     ld a,[wWhichPokemon]
     bit 1,b
     jr nz,.BPressed
@@ -144251,12 +144285,12 @@ DisplayDepositWithdrawMenu_:
 .GoToDifferentPage
     ld [wWhichPokemon],a
     call Delay3
-    jr .StartOrShiftMon
+    jp .StartOrShiftMon
 .WrapRightLeftCommon
     ld b,a
     ld a,[H_NEWLYPRESSEDBUTTONS]
     and a
-    jr z,.LoopMenu
+    jp z,.LoopMenu
     inc b
     ld a,0
     jr nz,.GoToDifferentPage
@@ -144291,11 +144325,10 @@ DisplayDepositWithdrawMenu_:
     ld [$cc49],a
     PREDEF StatusScreen
     call LoadScreenTilesFromBuffer1
-    call .DepositWithdrawMonTitle
     call ReloadTilesetTilePatterns
     call GoPAL_SET_CF1C
     call LoadGBPal
-    jp .LoopMenu
+    jp .LoopMenu3
 .ResetConditions ; carry flag contains function result, don't override it!
     ; Restore Update Sprites Flag
     ld a,b
