@@ -143210,6 +143210,8 @@ StatusScreen:
 ; STATUSSCREEN 1
     jr .skipOnlyFirstTime
 .Status1
+    call WaitForSoundToFinish
+.Status1NoWaitSound
     call GBPalWhiteOutWithDelay3
 .skipOnlyFirstTime
     call ClearScreen
@@ -143245,7 +143247,7 @@ StatusScreen:
     and %11100011 ; ▼▲◄►StSeBA
     jr z,.getJoypadStateLoop2
     bit 5,a ; left pressed?
-    jr nz,.Status1
+    jr nz,.Status1NoWaitSound
     bit 7,a ; down pressed?
     jr nz,.downFromStatus2
     bit 6,a ; up pressed?
@@ -143266,8 +143268,9 @@ StatusScreen:
     res 1,[hl]
     ld a,$77
     ld [$ff00+$24],a
-    ; Restore Tile
+    ; Restore Tile & Remove Mini Sprite
     call GBPalWhiteOut
+    call CleanLCD_OAM
     call LoadFontTilePatterns
     ld de,FontGraphics+(6*16*16)+(9*16) ; EmptyTile
     ld hl,$97F0
@@ -143281,7 +143284,7 @@ StatusScreen:
     ld hl,$ffb7
     ld [hl],a
     ; END
-    ret
+    jp Delay3
 
 .ResetFlagStatusScreenJustLoad
     ld hl,wStatusScreenJustLoadBit6
@@ -143448,7 +143451,8 @@ HandleStatusScreen1:
     jp nz,HackLoadUncompressedPicToHLFromStatusScreen
     call LoadFlippedFrontSpriteByMonIndex ; draw Pokémon picture
     ld a,[$cf91]
-    jp PlayCry ; play Pokémon cry
+    call GetCryData ; get cry data
+    jp PlaySound ; play sound
 ;.Paging1:
 ;    db $d6,$ec,"@"
 
