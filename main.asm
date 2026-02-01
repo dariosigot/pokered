@@ -3229,7 +3229,7 @@ PartyMenuInit:
     ld [hli],a ; max menu item ID
     ld a,[$d11f]
     and a
-    ld a,%00000011 ; A button and B button
+    ld a,%00000111 ; ▼▲◄►StSeBA
     jr z,.next
     xor a
     ld [$d11f],a
@@ -3241,6 +3241,12 @@ PartyMenuInit:
     ret
 
 HandlePartyMenuInput:
+    ld hl,wForceSortPartyWSelectBit4
+    bit 4,[hl]
+    jr nz,.continue
+    ld hl,wMenuWatchedKeys
+    res 2,[hl]
+.continue
     ld a,1
     ld [wMenuWrappingEnabled],a ; $cc4a
     ld a,$40
@@ -3264,6 +3270,14 @@ HandlePartyMenuInput:
     ld a,[W_NUMINPARTY]
     and a
     jr z,.noPokemonChosen
+    bit 2,b
+    jr z,.NoSelect
+    ld a,[W_NUMINPARTY]
+    cp a,2 ; is there more than one pokemon in the party?
+    jr c,.NoSelect
+    ld hl,wForceSortPartyWSelectBit4
+    res 4,[hl]
+.NoSelect
     ld a,[wCurrentMenuItem]
     ld [$cf92],a
     ld hl,W_PARTYMON1
@@ -3289,12 +3303,13 @@ HandlePartyMenuInput:
     ld [$cc35],a
     ld [$d07d],a
     call RedrawPartyMenu
-    jr HandlePartyMenuInput
+.hpmi_midjump
+    jp HandlePartyMenuInput
 .handleSwap
     ld a,[wCurrentMenuItem]
     ld [$cf92],a
     BANKSWITCH Func_13613
-    jr HandlePartyMenuInput
+    jr .hpmi_midjump
 
 DrawPartyMenu:
     ld hl,DrawPartyMenu_
@@ -3430,26 +3445,6 @@ GetMonHeader:
     pop bc
     pop af
     jp RoutineForRealGB
-
-; ───────────────────────────────────────
-; Handle New Adventure Pointer Conversion (BANK $00)
-; ───────────────────────────────────────
-
-GetTownVisitedFlag:
-    ld hl,W_TOWNVISITEDFLAG
-    call CheckNewAdventureFlag
-    ret z
-    ld hl,W_TOWNVISITEDFLAG_NEW
-    ret
-
-GetCurrentOldAdventureMap:
-    ld a,[W_CURMAP]
-    call CheckNewAdventureFlag
-    ret z
-    ld a,$FF
-    ret
-
-; ───────────────────────────────────────
 
 Tset11_Coll:
     INCBIN "gfx/tilesets/11.tilecoll"
@@ -8096,7 +8091,25 @@ SynchronizeCommon:
     pop af
     jp RoutineForRealGB
 
-; ──────────────────────────────────
+; ───────────────────────────────────────
+; Handle New Adventure Pointer Conversion (BANK $00)
+; ───────────────────────────────────────
+
+GetTownVisitedFlag:
+    ld hl,W_TOWNVISITEDFLAG
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,W_TOWNVISITEDFLAG_NEW
+    ret
+
+GetCurrentOldAdventureMap:
+    ld a,[W_CURMAP]
+    call CheckNewAdventureFlag
+    ret z
+    ld a,$FF
+    ret
+
+; ───────────────────────────────────────
 
 ; Free
 
@@ -29555,9 +29568,7 @@ StartMenu_Pokedex: ; 13095 (4:7095)
     call UpdateSprites
     jp RedisplayStartMenu
 
-SECTION "StartMenu_Pokemon",ROMX[$70a9],BANK[$4]
-
-StartMenu_Pokemon: ; 130a9 (4:70a9)
+StartMenu_Pokemon:
     ld a,[W_NUMINPARTY]
     and a
     jp z,RedisplayStartMenu
@@ -29565,6 +29576,8 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld [$cc35],a
     ld [$d07d],a
     ld [$cfcb],a
+    ld hl,wForceSortPartyWSelectBit4
+    set 4,[hl]
     call DisplayPartyMenu
     jr .checkIfPokemonChosen
 .loop
@@ -29572,18 +29585,25 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld [$cc35],a
     ld [$d07d],a
 .checkIfPokemonChosen2
+    ld hl,wForceSortPartyWSelectBit4
+    set 4,[hl]
     call GoBackToPartyMenu
 .checkIfPokemonChosen
     ld a,0
     ld [wSkillMonID],a
     jr nc,.chosePokemon
 .exitMenu
+    ld hl,wForceSortPartyWSelectBit4
+    res 4,[hl]
     call GBPalWhiteOutWithDelay3
     call RestoreScreenTilesAndReloadTilePatterns
     call LoadGBPal
     jp RedisplayStartMenu
 .chosePokemon
     call SaveScreenTilesToBuffer1 ; save screen
+    ld hl,wForceSortPartyWSelectBit4
+    bit 4,[hl]
+    jr z,.choseSwitch
 .RedrawMenu
     ld a,3 ; ChoiceMonSimpleMenu
     ld [$d125],a
@@ -29616,6 +29636,11 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     ld [$d07d],a
     jr .checkIfPokemonChosen2
 
+.ReloadScreenAndLoop
+    call LoadScreenTilesFromBuffer1 ; restore saved screen
+.MiddleJumpToLoop
+    jr .loop
+
 .choseStats
     call CleanLCD_OAM
     xor a
@@ -29623,7 +29648,7 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
     PREDEF StatusScreen
 .ReturnToPartyMenu
     call ReloadMapData
-    jr StartMenu_Pokemon
+    jp StartMenu_Pokemon
 
 .choseMoves
     PREDEF MovesMenu
@@ -29632,11 +29657,6 @@ StartMenu_Pokemon: ; 130a9 (4:70a9)
 .choseRename
     call DisplayPartyRenameScreen
     jr .ReturnToPartyMenu
-
-.ReloadScreenAndLoop
-    call LoadScreenTilesFromBuffer1 ; restore saved screen
-.MiddleJumpToLoop
-    jr .loop
 
 .NoSkill
     ld a,$a5 ; Error

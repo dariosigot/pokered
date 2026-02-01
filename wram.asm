@@ -1879,6 +1879,7 @@ wOverworldPressABit2       ; dee2 ; bit 2 = Press A in Overworld (talk with invi
 wFlagBaloonSpriteBit3      ; dee2 ; bit 3 = Enable Baloon Sprite durint Trade
 wOverworldGoToDarkBit4     ; dee2 ; bit 4 = Force Overworld "CheckDarkMap"
 wFlagBackSpritePlayerBit4  ; dee2 ; bit 4
+wForceSortPartyWSelectBit4 ; dee2 ; bit 4 = Select Pressed Force Sort Party
 wFlagBackFrontSpriteBit56  ; dee2 ; bit 5
                            ; dee2 ; bit 6
 wFlagFlashingHealBallBit7  ; dee2 ; bit 7
