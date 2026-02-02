@@ -514,7 +514,9 @@ W_ENEMYMONTYPE3: ; d000
 W_ENEMYMONTYPE4: ; d001
     ds 1
 
-    ds 7
+wEnemyMonBaseStats:: ds 5
+wEnemyMonActualCatchRate:: db
+wEnemyMonBaseExp:: db
 
 W_PLAYERMONNAME: ; d009
     ds 11

@@ -30358,6 +30358,7 @@ EndOfBattle:
     xor a
     ld [$ccd4],a
     call EvolutionAfterBattlePlus
+    BANKSWITCH UpdatePartyStats
 .Lose
     xor a
     ld [$d083],a
@@ -80254,135 +80255,115 @@ DayCareMBlocks: ; 5522f (15:522f)
 FuchsiaHouse3Blocks: ; 5523f (15:523f)
     INCBIN "maps/fuchsiahouse3.blk"
 
-GainExperience: ; 5524f (15:524f)
-    ld a,[W_ISLINKBATTLE] ; $d12b
+GainExperience:
+    ld a,[W_ISLINKBATTLE]
     cp $4
     ret z
     call DivideExpDataByNumMonsGainingExp
-    ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
+    ld hl,W_PARTYMON1_NUM
     xor a
-    ld [wWhichPokemon],a ; $cf92
+    ld [wWhichPokemon],a
 .partyMonLoop ; loop over each mon and add gained exp
     inc hl
     ld a,[hli]
-    or [hl]
-    jp z,.nextMon
+    or [hl] ; is mon's HP 0?
+    jp z,.nextMon ; if so, go to next mon
     push hl
     ld hl,W_PLAYERMONSALIVEFLAGS
-    ld a,[wWhichPokemon] ; $cf92
+    ld a,[wWhichPokemon]
     ld c,a
     ld b,$2
     PREDEF HandleBitArray
     ld a,c
-    and a
+    and a ; is mon's gain exp flag set?
     pop hl
-    jp z,.nextMon
-    ld de,$10
+    jp z,.nextMon ; if mon's gain exp flag not set, go to next mon
+    ld de,(W_PARTYMON1_EVHP+1)-(W_PARTYMON1_HP+1)
     add hl,de
     ld d,h
     ld e,l
-    ld hl,$d002
-    ld c,$5
-.asm_55285
+    ld hl,wEnemyMonBaseStats
+    ld c,5
+.gainStatExpLoop
     ld a,[hli]
-    ld b,a
-    ld a,[de]
-    add b
+    ld b,a ; enemy mon base stat
+    ld a,[de] ; stat exp
+    add b ; add enemy mon base state to stat exp
     ld [de],a
-    jr nc,.asm_5529a
+    jr nc,.nextBaseStat
+; if there was a carry, increment the upper byte
     dec de
     ld a,[de]
     inc a
-    jr z,.asm_55295
+    jr z,.maxStatExp ; jump if the value overflowed
     ld [de],a
     inc de
-    jr .asm_5529a
-.asm_55295
+    jr .nextBaseStat
+.maxStatExp
     ld a,$ff
     ld [de],a
     inc de
     ld [de],a
-.asm_5529a
+.nextBaseStat
     dec c
     jr z,.statExpDone
     inc de
     inc de
-    jr .asm_55285
+    jr .gainStatExpLoop
 .statExpDone
     call CheckReachLevelLimit
     jp nc,.nextMon
-    ; xor a
-    ; ld [H_NUMTOPRINT],a ; $FF00+$96 (aliases: H_MULTIPLICAND)
-    ; ld [$FF00+$97],a
-    ; ld a,[$d008]
-    ld [$FF00+$98],a
-    ld a,[W_ENEMYMONLEVEL] ; $cff3
-    ld [H_REMAINDER],a ; $FF00+$99 (aliases: H_DIVISOR,H_MULTIPLIER,H_POWEROFTEN)
+    ld [H_MULTIPLICAND+2],a
+    ld a,[W_ENEMYMONLEVEL]
+    ld [H_MULTIPLIER],a
     call Multiply
-    ld a,$7
-    ld [H_REMAINDER],a ; $FF00+$99 (aliases: H_DIVISOR,H_MULTIPLIER,H_POWEROFTEN)
-    ld b,$4
+    ld a,7
+    ld [H_DIVISOR],a
+    ld b,4
     call Divide
-    ld hl,$fff2
-    add hl,de
-    ;ld b,[hl]
-    inc hl
-    ;ld a,[wPlayerID] ; $d359
-    ;cp b
-    ;jr nz,.tradedMon
-    ;ld b,[hl]
-    ;ld a,[wPlayerID + 1] ; $d35a
-    ;cp b
     ld a,$0
-    ;jr z,.asm_552d6
-.tradedMon
-    ;call BoostExp ; Denim : Delete boost exp if traded
-    ;ld a,$1
-.asm_552d6
     ld [$cf4d],a
-    ld a,[W_ISINBATTLE] ; $d057
+    ld a,[W_ISINBATTLE]
     dec a ; is it a trainer battle?
     call nz,BoostExp ; if so, boost exp
-    inc hl
-    inc hl
-    inc hl
     call IsCurrentMonBattleMon ; Boost if Current Active Mon
     call z,BoostExpCurrentMon
 ; add the gained exp to the party mon's exp
+    ld hl,(W_PARTYMON1_EXP+2)-(W_PARTYMON1_EVSECIAL+1)
+    add hl,de
     ld b,[hl]
-    ld a,[$FF00+$98]
-    ld [$cf4c],a
+    ld a,[H_QUOTIENT+3]
+    ld [$cf4c],a ; ExpAmountGained+1
     add b
     ld [hld],a
     ld b,[hl]
-    ld a,[$FF00+$97]
-    ld [$cf4b],a
+    ld a,[H_QUOTIENT+2]
+    ld [$cf4b],a ; ExpAmountGained
     adc b
     ld [hl],a
-    jr nc,.asm_552f8
+    jr nc,.noCarry
     dec hl
     inc [hl]
     inc hl
-.asm_552f8
+.noCarry
 ; calculate exp for the mon at max level, and cap the exp at that value
     inc hl
     push hl
-    ld a,[wWhichPokemon] ; $cf92
+    ld a,[wWhichPokemon]
     ld c,a
     ld b,$0
-    ld hl,W_PARTYMON1 ; $d164
+    ld hl,W_PARTYMON1
     add hl,bc
     ld a,[hl]
     ld [$d0b5],a
-    call GetMonHeaderAndMaxLevel ; call GetMonHeader
-    ; ds 2 ; ld d,100
+    call GetMonHeaderAndMaxLevel
     BANKSWITCH CalcExperience
 ; compare max exp with current exp
-    ld a,[H_NUMTOPRINT] ; $FF00+$96 (aliases: H_MULTIPLICAND)
+    ld a,[H_MULTIPLICAND]
     ld b,a
-    ld a,[$FF00+$97]
+    ld a,[H_MULTIPLICAND+1]
     ld c,a
-    ld a,[$FF00+$98]
+    ld a,[H_MULTIPLICAND+2]
     ld d,a
     pop hl
     ld a,[hld]
@@ -80402,16 +80383,16 @@ GainExperience: ; 5524f (15:524f)
     dec hl
 .next2
     push hl
-    ld a,[wWhichPokemon] ; $cf92
-    ld hl,W_PARTYMON1NAME ; $d2b5
+    ld a,[wWhichPokemon]
+    ld hl,W_PARTYMON1NAME
     call GetPartyMonName
-    call GetExperienceTextPointerAndPrintText ; ld hl,UnnamedText_554b2 ; $54b2
-    ; call PrintText
+    call GetExperienceTextPointerAndPrintText
     xor a
     ld [$cc49],a
-    call AnimateEXPBar ; Denim,ExpBar ; call LoadMonData
+    call LoadMonData
+    call AnimateEXPBar
     pop hl
-    ld bc,$13
+    ld bc,W_PARTYMON1_LEVEL-W_PARTYMON1_EXP
     add hl,bc
     push hl
     BANKSWITCH CalcLevelFromExperience
@@ -80420,14 +80401,15 @@ GainExperience: ; 5524f (15:524f)
     ld [$cd46],a ; ($cd46 = wTempCoins1) - fixing skip move-learn glitch: need to store the current level in wram
     ;wTempCoins1 was chosen because it's used only for slot machine and gets defaulted to 1 during the mini-game
     cp d
-    jp z,.nextMon
-    call KeepEXPBarFull ; Denim,ExpBar ; ld a,[W_CURENEMYLVL] ; $d127
+    jp z,.nextMon ; if level didn't change, go to next mon
+    call KeepEXPBarFull
+    ld a,[W_CURENEMYLVL]
     push af
     push hl
     ld a,d
-    ld [W_CURENEMYLVL],a ; $d127
+    ld [W_CURENEMYLVL],a
     ld [hl],a
-    ld bc,$ffdf
+    ld bc,W_PARTYMON1_NUM-W_PARTYMON1_LEVEL
     add hl,bc
     ld a,[hl]
     ld [$d0b5],a
@@ -80439,60 +80421,65 @@ GainExperience: ; 5524f (15:524f)
     ld [wAlternateFormIndex],a
     pop hl
     call GetMonHeader
-    ld bc,$23
+    ld bc,(W_PARTYMON1_MAXHP+1)-W_PARTYMON1_NUM
     add hl,bc
     push hl
     ld a,[hld]
     ld c,a
     ld b,[hl]
-    push bc
+    push bc ; push max HP (from before levelling up)
     ld d,h
     ld e,l
-    ld bc,$ffee
+    ld bc,(W_PARTYMON1_EVHP-1)-W_PARTYMON1_MAXHP
     add hl,bc
-    ld b,$1
+    ld b,1 ; consider stat exp when calculating stats
     call CalcStats
-    pop bc
+    pop bc ; pop max HP (from before levelling up)
     pop hl
     ld a,[hld]
     sub c
     ld c,a
     ld a,[hl]
     sbc b
-    ld b,a
-    ld de,$ffe0
+    ld b,a ; bc = difference between old max HP and new max HP after levelling
+    ld de,(W_PARTYMON1_HP+1)-W_PARTYMON1_MAXHP
     add hl,de
-    ld a,[hl]
+; add to the current HP the amount of max HP gained when levelling
+    ld a,[hl] ; W_PARTYMON1_HP + 1
     add c
-    ld [hld],a
-    ld a,[hl]
+    ld [hld],a ; W_PARTYMON1_HP + 1
+    ld a,[hl] ; W_PARTYMON1_HP
     adc b
-    ld [hl],a
-    ld a,[wPlayerMonNumber] ; $cc2f
+    ld [hl],a ; W_PARTYMON1_HP
+    ld a,[wPlayerMonNumber]
     ld b,a
-    ld a,[wWhichPokemon] ; $cf92
-    cp b
-    jr nz,.asm_553f7
-    ld de,W_PLAYERMONCURHP ; $d015
+    ld a,[wWhichPokemon]
+    cp b ; is the current mon in battle?
+    jr nz,.printGrewLevelText
+; current mon is in battle
+    ld de,W_PLAYERMONCURHP
+; copy party mon HP to battle mon HP
     ld a,[hli]
     ld [de],a
     inc de
     ld a,[hl]
     ld [de],a
-    ld bc,$1f
+; copy other stats from party mon to battle mon
+    ld bc,W_PARTYMON1_LEVEL-(W_PARTYMON1_HP+1)
     add hl,bc
     push hl
-    ld de,W_PLAYERMONLEVEL ; $d022
-    ld bc,$b
+    ld de,W_PLAYERMONLEVEL
+    ld bc,1+(5*2) ; size of stats
     call CopyData
     pop hl
-    ld a,[W_PLAYERBATTSTATUS3] ; $d064
-    bit 3,a
-    jr nz,.asm_553c8
-    ld de,$cd0f
-    ld bc,$b
+    ld a,[W_PLAYERBATTSTATUS3]
+    bit 3,a ; is the mon transformed?
+    jr nz,.recalcStatChanges
+; the mon is not transformed, so update the unmodified stats
+    ld de,$cd0f ; PlayerMonUnmodifiedLevel
+    ld bc,1+(5*2) ; size of stats
     call CopyData
-.asm_553c8
+.recalcStatChanges
     xor a
     ld [$d11e],a
     BANKSWITCH CalculateModifiedStats
@@ -80501,57 +80488,59 @@ GainExperience: ; 5524f (15:524f)
     BANKSWITCH DrawPlayerHUDAndHPBar
     BANKSWITCH PrintEmptyString
     call SaveScreenTilesToBuffer1
-.asm_553f7
-    ld hl,UnnamedText_554dd ; $54dd
+.printGrewLevelText
+    ld hl,GrewLevelText
     call PrintText
-    xor a
+    xor a ; PLAYER_PARTY_DATA
     ld [$cc49],a
-    call AnimateEXPBarAgain ; call LoadMonData ; Denim,ExpBar ;
+    call LoadMonData
+    call AnimateEXPBarAgain
     ld d,$1
     BANKSWITCH PrintStatsBox
     call WaitForTextScrollButtonPress
     call LoadScreenTilesFromBuffer1
-    xor a
+    xor a ; PLAYER_PARTY_DATA
     ld [$cc49],a
     ld a,[$d0b5]
     ld [$d11e],a
     PREDEF LearnMoveFromLevelUp
-    ld hl,$ccd3
-    ld a,[wWhichPokemon] ; $cf92
+    ld hl,$ccd3 ; wCanEvolveFlags
+    ld a,[wWhichPokemon]
     ld c,a
     ld b,$1
     PREDEF HandleBitArray
     pop hl
     pop af
-    ld [W_CURENEMYLVL],a ; $d127
+    ld [W_CURENEMYLVL],a
+
 .nextMon
-    ld a,[W_NUMINPARTY] ; $d163
+    ld a,[W_NUMINPARTY]
     ld b,a
-    ld a,[wWhichPokemon] ; $cf92
+    ld a,[wWhichPokemon]
     inc a
     cp b
-    jr z,.asm_55450
-    ld [wWhichPokemon],a ; $cf92
-    ld bc,$2c
-    ld hl,W_PARTYMON1_NUM ; $d16b (aliases: W_PARTYMON1DATA)
+    jr z,.done
+    ld [wWhichPokemon],a
+    ld bc,W_PARTYMON2DATA-W_PARTYMON1DATA
+    ld hl,W_PARTYMON1_NUM
     call AddNTimes
     jp .partyMonLoop
-.asm_55450
+.done
     ld hl,wFirstExpAllMessageBit6
     res 6,[hl]
     ld hl,W_PLAYERMONSALIVEFLAGS
     xor a
     ld [hl],a
-    ld a,[wPlayerMonNumber] ; $cc2f
+    ld a,[wPlayerMonNumber]
     ld c,a
     ld b,$1
     push bc
-    PREDEF HandleBitArray
-    ld hl,$ccf5
+    PREDEF HandleBitArray ; set the gain exp flag for the mon that is currently out
+    ld hl,$ccf5 ; PartyFoughtCurrentEnemyFlags
     xor a
     ld [hl],a
     pop bc
-    PREDEF_JUMP HandleBitArray
+    PREDEF_JUMP HandleBitArray ; set the fought current enemy flag for the mon that is currently out
 
 BoostExpCurrentMon:
     call TryToBoostUnderLevelled
@@ -80602,29 +80591,25 @@ BoostCommon:
     ld [$FF00+$98],a
     ret
 
-SECTION "UnnamedText_554b2",ROMX[$54b2],BANK[$15]
-
-UnnamedText_554b2: ; 554b2 (15:54b2)
+UnnamedText_554b2:
     TX_FAR _UnnamedText_554b2
     db $08 ; asm
-    ld hl,UnnamedText_554d8
+    ld hl,.UnnamedText_554d8
     ld a,[$cf4d]
     and a
     ret z
-    ld hl,UnnamedText_554d4
+    ld hl,.UnnamedText_554d4
     ret
-
-SECTION "UnnamedText_554d4",ROMX[$54d4],BANK[$15]
-
-UnnamedText_554d4: ; 554d4 (15:54d4)
+.UnnamedText_554d4
     TX_FAR _UnnamedText_554d4
-
-UnnamedText_554d8: ; 554d8 (15:54d8)
+.UnnamedText_554d8
     TX_FAR _UnnamedText_554d8
     db "@"
 
-UnnamedText_554dd: ; 554dd (15:54dd)
-    TX_FAR UnnamedText_89c01
+SECTION "GrewLevelText",ROMX[$54dd],BANK[$15]
+
+GrewLevelText: ; 554dd (15:54dd)
+    TX_FAR _GrewLevelText
     db $0b
     db "@"
 
@@ -84004,8 +83989,7 @@ CheckPlayerIsInFrontOfSprite: ; 569e3 (15:69e3)
     ld [wTrainerSpriteOffset],a ; $cd3d
     ret
 
-AnimateEXPBarAgain: ; Denim,ExpBar
-    call LoadMonData
+AnimateEXPBarAgain:
     call IsCurrentMonBattleMon
     ret nz
     xor a
@@ -84019,7 +84003,6 @@ AnimateEXPBarAgain: ; Denim,ExpBar
     dec c
     jr nz,.loop
 AnimateEXPBar:
-    call LoadMonData
     call IsCurrentMonBattleMon
     ret nz
     ld a,(SFX_08_3d - $4000) / 3
@@ -84064,7 +84047,6 @@ KeepEXPBarFull:
     ld a,[wEXPBarKeepFullFlag]
     set 0,a
     ld [wEXPBarKeepFullFlag],a
-    ld a,[W_CURENEMYLVL] ; $d127
     ret
 
 IsCurrentMonBattleMon:
@@ -84161,21 +84143,21 @@ CheckReachLevelLimit:
     add hl,de
 ; calculate exp for the mon at max level
     push hl
-    ld a,[wWhichPokemon] ; $cf92
+    ld a,[wWhichPokemon]
     ld c,a
     ld b,0
-    ld hl,W_PARTYMON1 ; $d164
+    ld hl,W_PARTYMON1
     add hl,bc
     ld a,[hl]
     ld [$d0b5],a
     call GetMonHeaderAndMaxLevel
     BANKSWITCH CalcExperience
 ; compare max exp with current exp
-    ld a,[H_NUMTOPRINT] ; $FF00+$96 (aliases: H_MULTIPLICAND)
+    ld a,[H_MULTIPLICAND]
     ld b,a
-    ld a,[$FF00+$97]
+    ld a,[H_MULTIPLICAND+1]
     ld c,a
-    ld a,[$FF00+$98]
+    ld a,[H_MULTIPLICAND+2]
     ld d,a
     pop hl
     ld a,[hld]
@@ -84188,9 +84170,9 @@ CheckReachLevelLimit:
     ret nc
 ; Original Code
     xor a ; Reset Carry Flag
-    ld [H_NUMTOPRINT],a ; $FF00+$96 (aliases: H_MULTIPLICAND)
-    ld [$FF00+$97],a
-    ld a,[$d008]
+    ld [H_MULTIPLICAND],a
+    ld [H_MULTIPLICAND+1],a
+    ld a,[wEnemyMonBaseExp]
     scf ; Set Carry Flag
     ret
 
@@ -121471,7 +121453,7 @@ _UnnamedText_554d8:
     text_init , " EXP. Points!"
     text_wait
 
-UnnamedText_89c01:
+_GrewLevelText:
     TX_RAM $cd6d
     text_init , " grew"
     text_line , "to level "
@@ -142172,6 +142154,44 @@ _SynchronizeBox:
     cp 20 + 1
     ret z
     jr .loop2
+
+; ──────────────────────────────────────────────────────────────────────
+
+UpdatePartyStats:
+    ld a,[W_CURENEMYLVL]
+    push af
+    ld a,[W_NUMINPARTY]
+    ld b,a
+    ld hl,W_PARTYMON1_NUM
+.loop
+    push bc
+    push hl
+    ld a,[hl]
+    ld [$D0B5],a
+    ld bc,W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
+    add hl,bc
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    call GetMonHeader
+    ld bc,W_PARTYMON1_LEVEL-W_PARTYMON1_MOVE2PP
+    add hl,bc
+    ld a,[hli] ; hl = W_PARTYMON1_MAXHP
+    ld [W_CURENEMYLVL],a
+    ld d,h
+    ld e,l
+    ld bc,(W_PARTYMON1_EVHP-1)-W_PARTYMON1_MAXHP
+    add hl,bc
+    ld b,1
+    call CalcStats
+    pop hl
+    ld bc,W_PARTYMON2DATA-W_PARTYMON1DATA
+    add hl,bc
+    pop bc
+    dec b
+    jr nz,.loop
+    pop af
+    ld [W_CURENEMYLVL],a
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
