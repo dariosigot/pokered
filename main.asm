@@ -30047,9 +30047,19 @@ StartMenu_Option:
     bit 3,a ; was the start button pressed?
     jr z,.skip
     bit 4,a ; was the right button pressed?
+    jr nz,.wtw
+    bit 5,a ; was the left button pressed?
     jr z,.skip
-    ld a,$89       ; FoundHiddenItem
-    call PlaySound ; ...
+.UpdatePartyStats
+    ld a,CHANSEY
+    call GetCryData
+    call PlaySound
+    BANKSWITCH UpdatePartyStats
+    jr .restore
+.wtw
+    ld a,HAUNTER
+    call GetCryData
+    call PlaySound
     ld hl,$cd38
     set 0,[hl]
     jr .restore
@@ -30373,7 +30383,6 @@ EndOfBattle:
     xor a
     ld [$ccd4],a
     call EvolutionAfterBattlePlus
-    BANKSWITCH UpdatePartyStats
 .Lose
     xor a
     ld [$d083],a
@@ -30405,7 +30414,7 @@ EndOfBattle:
     call GBPalWhiteOut
     ld a,$ff
     ld [$d42f],a
-    ret
+    BANKSWITCH_JUMP UpdatePartyStats
 YouWinText:
     db "YOU WIN@"
 YouLoseText:
@@ -142262,6 +142271,34 @@ UpdatePartyStats:
     add hl,bc
     ld b,1
     call CalcStats
+    pop hl
+    push hl
+    inc hl ; hl = W_PARTYMON1_MAXHP
+    ld a,[hli]
+    ld d,a
+    ld e,[hl] ; hl = W_PARTYMON1_MAXHP+1
+    ld bc,(W_PARTYMON1_HP)-(W_PARTYMON1_MAXHP+1)
+    add hl,bc
+    ld a,[hli]
+    ld b,a
+    ld c,[hl]
+    ; de = MaxHP
+    ; bc = HP
+    ld a,d
+    cp b
+    jr z,.CompareHpLSB ; jump if d = b
+    jr nc,.done ; jump if d > b
+    ; d < b
+.SetHpToMax
+    ld [hl],e
+    dec hl
+    ld [hl],d
+    jr .done
+.CompareHpLSB
+    ld a,e
+    cp c
+    jr c,.SetHpToMax ; jump if e < c
+.done
     pop hl
     ld bc,W_PARTYMON2DATA-W_PARTYMON1DATA
     add hl,bc
