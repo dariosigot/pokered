@@ -14,6 +14,12 @@ IfGBCDelay3:
     ret nz ; NotGBC
     jp Delay3
 
+IfGBCDelay:
+    ld a,[wFlagGameBoyColor]
+    cp a,$11
+    ret nz ; NotGBC
+    jp DelayFrame
+
 ResetTempIV:
     push hl
     push af
@@ -53920,7 +53926,7 @@ GetBattleHealthBarColor:
     ret z
     ld b,$1
     call GoPAL_SET
-    jp IfGBCDelay3
+    jp IfGBCDelay
 
 GetSelectedMovePointer:
     ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
