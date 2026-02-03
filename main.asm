@@ -30042,7 +30042,7 @@ StartMenu_Option:
     ld a,CHANSEY
     call GetCryData
     call PlaySound
-    BANKSWITCH UpdatePartyStats
+    BANKSWITCH UpdatePartyStats_DEBUG
     jr .restore
 .wtw
     ld a,HAUNTER
@@ -30326,7 +30326,7 @@ TechnicalMachines: ; 13773 (4:7773)
 EndOfBattle:
     ld a,[W_ISLINKBATTLE] ; $d12b
     cp $4
-    jr nz,.asm_137eb
+    jr nz,.notLinkBattle
     ld a,[W_ENEMYMONNUMBER] ; $cfe8
     ld hl,$d8a8
     ld bc,$2c
@@ -30338,38 +30338,36 @@ EndOfBattle:
     ld a,[wBattleResult]
     cp $1
     ld de,YouWinText ; $7853
-    jr c,.asm_137de
+    jr c,.placeWinOrLoseString
     ld de,YouLoseText ; $785b
-    jr z,.asm_137de
+    jr z,.placeWinOrLoseString
     ld de,DrawText ; $7864
-.asm_137de
+.placeWinOrLoseString
     FuncCoord 6,8 ; $c446
     ld hl,Coord
     call PlaceString
     ld c,$c8
     call DelayFrames
-    jr .asm_1380a
-.asm_137eb
+    jr .evolution
+.notLinkBattle
     ld a,[wBattleResult]
-    cp 2
-    jr z,.WinOrDraw
-    and a
-    jr nz,.Lose
+    dec a
+    jr z,.Lose
 .WinOrDraw
     ld hl,$cce5
     ld a,[hli]
     or [hl]
     inc hl
     or [hl]
-    jr z,.asm_1380a
+    jr z,.evolution ; if pay day money is 0, jump
     ld de,wPlayerMoney + 2 ; $d349
     ld c,$3
     PREDEF Func_f81d
     ld hl,UnnamedText_1386b ; $786b
     call PrintText
-.asm_1380a
+.evolution
     xor a
-    ld [$ccd4],a
+    ld [$ccd4],a ; ForceEvolution???
     call EvolutionAfterBattlePlus
 .Lose
     xor a
@@ -30392,17 +30390,20 @@ EndOfBattle:
     res 4,[hl]
     ld hl,$d060
     ld b,$18
-.asm_1383e
+.loop
     ld [hli],a
     dec b
-    jr nz,.asm_1383e
+    jr nz,.loop
     ld hl,$d72c
     set 0,[hl]
     call WaitForSoundToFinish
     call GBPalWhiteOut
     ld a,$ff
     ld [$d42f],a
-    BANKSWITCH_JUMP UpdatePartyStats
+    ld a,[wBattleResult]
+    and a
+    BANKSWITCH_Z UpdatePartyStats
+    ret
 YouWinText:
     db "YOU WIN@"
 YouLoseText:
@@ -142175,6 +142176,44 @@ _SynchronizeBox:
 ; ──────────────────────────────────────────────────────────────────────
 
 UpdatePartyStats:
+    ld a,[W_CURENEMYLVL]
+    push af
+    ld a,[W_NUMINPARTY]
+    ld b,a
+    ld hl,W_PARTYMON1_NUM
+.loop
+    push bc
+    push hl
+    ld a,[hl]
+    ld [$D0B5],a
+    ld bc,W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
+    add hl,bc
+    ld a,[hl]
+    ld [wAlternateFormIndex],a
+    call GetMonHeader
+    ld bc,W_PARTYMON1_LEVEL-W_PARTYMON1_MOVE2PP
+    add hl,bc
+    ld a,[hli] ; hl = W_PARTYMON1_MAXHP
+    ld [W_CURENEMYLVL],a
+    ld d,h
+    ld e,l
+    ld bc,(W_PARTYMON1_EVHP-1)-W_PARTYMON1_MAXHP
+    add hl,bc
+    ld b,1
+    call CalcStats
+    pop hl
+    ld bc,W_PARTYMON2DATA-W_PARTYMON1DATA
+    add hl,bc
+    pop bc
+    dec b
+    jr nz,.loop
+    pop af
+    ld [W_CURENEMYLVL],a
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+UpdatePartyStats_DEBUG:
     ld a,[W_CURENEMYLVL]
     push af
     ld a,[W_NUMINPARTY]
