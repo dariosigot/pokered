@@ -49073,7 +49073,7 @@ ShiftMoveData:
     jr nz,.asm_3b050
     ret
 
-Func_3b057:
+HandleBitArray_BankE:
     PREDEF_JUMP HandleBitArray
 
 RedBallColorDuringEnemySwitch:
@@ -50377,13 +50377,13 @@ ReflectLightScreenEffect_:
     db "@"
 
 TryEvolvingMon:
-    ld hl,$ccd3
+    ld hl,$ccd3 ; wCanEvolveFlags
     xor a
     ld [hl],a
     ld a,[wWhichPokemon] ; $cf92
     ld c,a
     ld b,$1
-    call Func_3b057
+    call HandleBitArray_BankE
 
 EvolutionAfterBattle:
     ld a,[$FF00+$d7]
@@ -50410,9 +50410,9 @@ Evolution_PartyMonLoop:
     push hl
     ld a,[wWhichPokemon] ; $cf92
     ld c,a
-    ld hl,$ccd3
+    ld hl,$ccd3 ; wCanEvolveFlags
     ld b,$2
-    call Func_3b057
+    call HandleBitArray_BankE
     ld a,c
     and a
     jp z,Evolution_PartyMonLoop
@@ -50503,6 +50503,13 @@ TryEvolution: ; loop over evolution entries
     ld a,$ff
     ld [$cfcb],a
     call CleanLCD_OAM
+    ld a,[wWhichPokemon]
+    ld c,a
+    ld hl,$ccd3 ; wCanEvolveFlags
+    ld b,$0
+    call HandleBitArray_BankE
+    ld hl,wTestEvoDuringBattleBit3
+    res 3,[hl]
     BANKSWITCH EvolveMon
     jp c,Func_3af2e
     ld hl,UnnamedText_3af3e ; $6f3e
@@ -50527,26 +50534,7 @@ TryEvolution: ; loop over evolution entries
     call DelayFrames
     call ClearScreen
     call RenameEvolvedMon
-;    ld a,[$d11e]
-;    push af
-;    ld a,[$d0b5]
-;    ld [$d11e],a
-;    PREDEF IndexToPokedex
-;    ld a,[$d11e]
-;;   dec a ; MissingNo First
-;    ld hl,PokemonBaseStats ; $43de
-;    ld bc,$1c
-;    call AddNTimes
-;    ld de,W_MONHEADER
-;    ld a,BANK(PokemonBaseStats)
-;    call FarCopyData
-;    ld a,[$d0b5]
-;    ld [$d0b8],a
-;    pop af
-;    ld [$d11e],a
-
     call DoEvolution_HandleAlternative ; call GetMonHeader
-
     ld hl,$cfa8
     ld de,$cfba
     ld b,$1
@@ -50585,7 +50573,7 @@ TryEvolution: ; loop over evolution entries
     ld [$d11e],a
     xor a
     ld [$cc49],a
-    call AfterEvolution_TryToAddExclusiveMove
+    call .AfterEvolution_TryToAddExclusiveMove
     call .ShowPokedex
     pop hl
     ld a,[W_ISINBATTLE] ; $d057
@@ -50597,10 +50585,10 @@ TryEvolution: ; loop over evolution entries
     ld b,$1
     ld hl,wPokedexOwned ; $d2f7
     push bc
-    call Func_3b057
+    call HandleBitArray_BankE
     pop bc
     ld hl,wPokedexSeen
-    call Func_3b057
+    call HandleBitArray_BankE
     pop de
     pop hl
     ld a,[$cf98]
@@ -50609,6 +50597,15 @@ TryEvolution: ; loop over evolution entries
     ld l,e
     ld h,d
     jp Evolution_PartyMonLoop ; jr nextEvoEntry2
+
+.AfterEvolution_TryToAddExclusiveMove
+    ld a,[$d0b5]
+    push af
+    call AfterEvolution_TryToAddExclusiveMove
+    pop af
+    ld [$d0b5],a
+    ret
+
 .ShowPokedex
     ld a,[$d0b5]
     call IsPokemonSeen
@@ -52720,10 +52717,12 @@ HackGainExpAfterCatch:
     xor a
     call GainExperience_
     pop af
-    ret c ; end if focus
+    jr c,.end ; end if focus
     BANKSWITCH ModulateExpForMonsThatNotFought
     ld a,$1
-    jp GainExperience_
+    call GainExperience_
+.end
+    BANKSWITCH_JUMP HandleEvolutionDuringBattle
 
 ; Set Carry Flag if Focus in Bag or All Pkmn Fought
 IsFocusInBagOrAllFought:
@@ -53354,7 +53353,7 @@ Func_3c92a: ; 3c92a (f:492a)
     ld [$FFE1],a
     FuncCoord 15,6 ; $c427
     ld hl,Coord
-    PREDEF Func_3f073
+    PREDEF AnimateSendingOutMon
     ld a,[W_ENEMYMONID]
     call PlayCry
     call DrawEnemyHUDAndHPBar
@@ -53671,7 +53670,7 @@ Func_3cca4: ; 3cca4 (f:4ca4)
     call PlayMoveAnimation
     FuncCoord 4,11 ; $c480
     ld hl,Coord
-    PREDEF Func_3f073
+    PREDEF AnimateSendingOutMon
     ld a,[$cf91]
     call PlayCry
     call PrintEmptyString
@@ -53725,8 +53724,7 @@ ReadPlayerMonCurHPAndStatus: ; 3cd43 (f:4d43)
     jp CopyData
 
 DrawPlayerHUDAndHPBar:
-    xor a
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
+    call DisableAutoBgTransfer
     FuncCoord 09,07 ; Player Battle Hud Reset Screen
     ld hl,Coord
     ld bc,$50b ; 05 | 11
@@ -53763,10 +53761,9 @@ DrawPlayerHUDAndHPBar:
     FuncCoord 10,09 ; Player Bar in Battle
     ld hl,Coord
     PREDEF DrawPlayerHPBarStatusBattle
-    ld a,$1
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld hl,$cf1d
     call GetBattleHealthBarColor_PlusFlag ; Denim,funzione per deflaggare questo istante di chiamata ; call GetBattleHealthBarColor
+    call EnableAutoBgTransfer
     ld hl,W_PLAYERMONCURHP ; $d015
     ld a,[hli]
     or [hl]
@@ -53794,8 +53791,7 @@ DrawHUDsAndHPBars:
     ; fall through
 
 DrawEnemyHUDAndHPBar:
-    xor a
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
+    call DisableAutoBgTransfer
     ld hl,wTileMap
     ld bc,$40c
     call ClearScreenAreaAndGoPalSet ; Reset Battle Standard Palette after red ball
@@ -53877,9 +53873,8 @@ Func_3ce7f: ; 3ce7f (f:4e7f)
     FuncCoord 02,02 ; Enemy Bar in Battle
     ld hl,Coord
     call nc,DrawHPBar
-    ld a,$1
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ; fall through
+    call GetEnemyBattleHealthBarColor
+    jp EnableAutoBgTransfer
 
 GetEnemyBattleHealthBarColor:
     ld hl,$cf1e
@@ -53894,7 +53889,8 @@ GetBattleHealthBarColor:
     cp b
     ret z
     ld b,$1
-    jp GoPAL_SET
+    call GoPAL_SET
+    jp IfGBCDelay3
 
 GetSelectedMovePointer:
     ld hl,wPlayerSelectedMove ; ipotizzo che il turno sia del giocatore
@@ -58977,7 +58973,7 @@ Func_3f069: ; 3f069 (f:7069)
     ld [$c0f2],a
     jp PlaySound
 
-Func_3f073: ; 3f073 (f:7073)
+AnimateSendingOutMon: ; 3f073 (f:7073)
     ld a,[$cc4f]
     ld h,a
     ld a,[$cc50]
@@ -80244,17 +80240,6 @@ Route21Object: ; 0x55021 (size=76)
     db SPRITE_FISHER2,$38 + 4,$e + 4,$ff,$d2,$48,FISHER,$8 ; trainer
     db SPRITE_FISHER2,$39 + 4,$11 + 4,$ff,$d3,$49,FISHER,$a ; trainer
 
-Route21Blocks: ; 5506d (15:506d)
-    INCBIN "maps/route21.blk"
-
-VermilionHouse2Blocks: ; 5522f (15:522f)
-Route12HouseBlocks: ; 5522f (15:522f)
-DayCareMBlocks: ; 5522f (15:522f)
-    INCBIN "maps/daycarem.blk"
-
-FuchsiaHouse3Blocks: ; 5523f (15:523f)
-    INCBIN "maps/fuchsiahouse3.blk"
-
 GainExperience:
     ld a,[W_ISLINKBATTLE]
     cp $4
@@ -80451,44 +80436,8 @@ GainExperience:
     ld a,[hl] ; W_PARTYMON1_HP
     adc b
     ld [hl],a ; W_PARTYMON1_HP
-    ld a,[wPlayerMonNumber]
-    ld b,a
-    ld a,[wWhichPokemon]
-    cp b ; is the current mon in battle?
-    jr nz,.printGrewLevelText
-; current mon is in battle
-    ld de,W_PLAYERMONCURHP
-; copy party mon HP to battle mon HP
-    ld a,[hli]
-    ld [de],a
-    inc de
-    ld a,[hl]
-    ld [de],a
-; copy other stats from party mon to battle mon
-    ld bc,W_PARTYMON1_LEVEL-(W_PARTYMON1_HP+1)
-    add hl,bc
-    push hl
-    ld de,W_PLAYERMONLEVEL
-    ld bc,1+(5*2) ; size of stats
-    call CopyData
-    pop hl
-    ld a,[W_PLAYERBATTSTATUS3]
-    bit 3,a ; is the mon transformed?
-    jr nz,.recalcStatChanges
-; the mon is not transformed, so update the unmodified stats
-    ld de,$cd0f ; PlayerMonUnmodifiedLevel
-    ld bc,1+(5*2) ; size of stats
-    call CopyData
-.recalcStatChanges
-    xor a
-    ld [$d11e],a
-    BANKSWITCH CalculateModifiedStats
-    BANKSWITCH ApplyBadgeStatBoostsFull
-    BANKSWITCH ApplyBurnAndParalysisPenaltiesToPlayer
-    BANKSWITCH DrawPlayerHUDAndHPBar
-    BANKSWITCH PrintEmptyString
-    call SaveScreenTilesToBuffer1
-.printGrewLevelText
+    call IsCurrentMonBattleMon
+    call z,CopyInfoFromMonPartyToBattle
     ld hl,GrewLevelText
     call PrintText
     xor a ; PLAYER_PARTY_DATA
@@ -80541,6 +80490,84 @@ GainExperience:
     ld [hl],a
     pop bc
     PREDEF_JUMP HandleBitArray ; set the fought current enemy flag for the mon that is currently out
+
+HandleEvolutionDuringBattle:
+    ld a,[W_ISINBATTLE]
+    cp 2 ; Trainer Battle
+    ret nz
+    ld hl,wTestEvoDuringBattleBit3
+    set 3,[hl]
+    BANKSWITCH EvolutionAfterBattlePlus
+    ld hl,wTestEvoDuringBattleBit3
+    bit 3,[hl]
+    res 3,[hl]
+    ret nz
+.ResetCurrentMonGraphics
+    call ClearScreen
+    call DisableAutoBgTransfer
+    ld a,[wPlayerMonNumber]
+    ld [wWhichPokemon],a
+    BANKSWITCH LoadBattleMonFromParty
+    ld a,[W_PLAYERMONID]
+    ld [$d0b5],a
+    ld a,[W_PLAYERMONALTFORM]
+    ld [wAlternateFormIndex],a
+    call GetMonHeader
+    ld a,[$cfd9]
+    push af
+    ld a,[W_MONHEADER]
+    ld [$cfd9],a
+    PREDEF LoadMonBackSprite
+    pop af
+    ld [$cfd9],a
+    call LoadFontTilePatterns
+    BANKSWITCH LoadHudAndHpBarAndStatusTilePatterns
+    ld hl,.EmptyText
+    call PrintText
+    FuncCoord 01,05
+    ld hl,Coord
+    ld a,$31         ; BackSprite Uncompressed
+    ld [$FF00+$e1],a ; offset
+    PREDEF CopyUncompressedPicToTilemap
+    PREDEF DrawPlayerHUDAndHPBar
+    call SaveScreenTilesToBuffer1
+    ld c,60
+    jp DelayFrames
+.EmptyText
+    db "@"
+
+CopyInfoFromMonPartyToBattle:
+    ld de,W_PLAYERMONCURHP
+; copy party mon HP to battle mon HP
+    ld a,[hli]
+    ld [de],a
+    inc de
+    ld a,[hl]
+    ld [de],a
+; copy other stats from party mon to battle mon
+    ld bc,W_PARTYMON1_LEVEL-(W_PARTYMON1_HP+1)
+    add hl,bc
+    push hl
+    ld de,W_PLAYERMONLEVEL
+    ld bc,1+(5*2) ; size of stats
+    call CopyData
+    pop hl
+    ld a,[W_PLAYERBATTSTATUS3]
+    bit 3,a ; is the mon transformed?
+    jr nz,.recalcStatChanges
+; the mon is not transformed, so update the unmodified stats
+    ld de,$cd0f ; PlayerMonUnmodifiedLevel
+    ld bc,1+(5*2) ; size of stats
+    call CopyData
+.recalcStatChanges
+    xor a
+    ld [$d11e],a
+    BANKSWITCH CalculateModifiedStats
+    BANKSWITCH ApplyBadgeStatBoostsFull
+    BANKSWITCH ApplyBurnAndParalysisPenaltiesToPlayer
+    BANKSWITCH DrawPlayerHUDAndHPBar
+    BANKSWITCH PrintEmptyString
+    jp SaveScreenTilesToBuffer1
 
 BoostExpCurrentMon:
     call TryToBoostUnderLevelled
@@ -80606,12 +80633,12 @@ UnnamedText_554b2:
     TX_FAR _UnnamedText_554d8
     db "@"
 
-SECTION "GrewLevelText",ROMX[$54dd],BANK[$15]
-
-GrewLevelText: ; 554dd (15:54dd)
+GrewLevelText:
     TX_FAR _GrewLevelText
     db $0b
     db "@"
+
+SECTION "Route2Script",ROMX[$54e3],BANK[$15]
 
 Route2Script: ; 554e3 (15:54e3)
     jp EnableAutoTextBoxDrawing
@@ -84375,6 +84402,17 @@ HandleMovesAfterDayCare:
     pop af
     ld [$FF00+$e4],a
     ret
+
+Route21Blocks:
+    INCBIN "maps/route21.blk"
+
+VermilionHouse2Blocks:
+Route12HouseBlocks:
+DayCareMBlocks:
+    INCBIN "maps/daycarem.blk"
+
+FuchsiaHouse3Blocks:
+    INCBIN "maps/fuchsiahouse3.blk"
 
 SECTION "bank16",ROMX,BANK[$16]
 
@@ -92476,7 +92514,7 @@ DisplayMonFrontSpriteInBox:
     ld [$FF00+$e1],a
     FuncCoord 10,11 ; $c486
     ld hl,Coord
-    PREDEF Func_3f073
+    PREDEF AnimateSendingOutMon
     call WaitForTextScrollButtonPress
     call LoadScreenTilesFromBuffer1
     call Delay3
@@ -115029,10 +115067,10 @@ EvolveMon: ; 7bde9 (1e:7de9)
     push af
     xor a
     ld [$d083],a ; LowHealthAlarm
-    ld [$c02a],a ; ChannelSoundIDs + CHAN5
-    dec a ; SFX_STOP_ALL_MUSIC
-    ld [$c0ee],a ; NewSoundID
-    call PlaySound
+    ;ld [$c02a],a ; ChannelSoundIDs + CHAN5
+    ;dec a ; SFX_STOP_ALL_MUSIC
+    ;ld [$c0ee],a ; NewSoundID
+    ;call PlaySound
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld a,$8c ; SFX_TINK
@@ -115062,9 +115100,9 @@ EvolveMon: ; 7bde9 (1e:7de9)
     ld a,[$cee9] ; EvoOldSpecies
     call PlayCry
     call WaitForSoundToFinish
-    ld c,BANK(Music_SafariZone)
-    ld a,(Music_SafariZone - $4000) / 3
-    call PlayMusic
+    ;ld c,BANK(Music_SafariZone)
+    ;ld a,(Music_SafariZone - $4000) / 3
+    ;call PlayMusic
     ld c,$50
     call DelayFrames
     ld c,$1 ; set PAL_BLACK instead of mon palette
@@ -115088,9 +115126,9 @@ EvolveMon: ; 7bde9 (1e:7de9)
     ld a,[$ceea] ; EvoNewSpecies
 .done
     ld [$cf1d],a ; WholeScreenPaletteMonSpecies
-    ld a,$ff ; SFX_STOP_ALL_MUSIC
-    ld [$c0ee],a ; NewSoundID
-    call PlaySound
+    ;ld a,$ff ; SFX_STOP_ALL_MUSIC
+    ;ld [$c0ee],a ; NewSoundID
+    ;call PlaySound
     ld a,[$cf1d] ; WholeScreenPaletteMonSpecies
     call PlayCry
     ld c,$0
@@ -115115,11 +115153,11 @@ EvolveMon: ; 7bde9 (1e:7de9)
     ld a,[$cee9] ; EvoOldSpecies
     jr .done
 
-EvolutionSetWholeScreenPalette: ; 7beb4 (1e:7eb4)
+EvolutionSetWholeScreenPalette:
     ld b,$b
     jp GoPAL_SET
 
-Evolution_LoadPic: ; 7beb9 (1e:7eb9)
+Evolution_LoadPic:
     FuncCoord 7,2 ; $c3cf
     ld hl,Coord
     jp LoadFlippedFrontSpriteByMonIndex
@@ -141953,7 +141991,7 @@ PredefPointers:
 
 DrawPlayerHUDAndHPBarPredef:               NEW_PREDEF DrawPlayerHUDAndHPBar               ; $00
 CopyUncompressedPicToTilemapPredef:        NEW_PREDEF CopyUncompressedPicToTilemap        ; $01
-Func_3f073Predef:                          NEW_PREDEF Func_3f073                          ; $02
+AnimateSendingOutMonPredef:                NEW_PREDEF AnimateSendingOutMon                          ; $02
 ScaleSpriteByTwoPredef:                    NEW_PREDEF ScaleSpriteByTwo                    ; $03
 LoadMonBackSpritePredef:                   NEW_PREDEF LoadMonBackSprite                   ; $04
 Func_79abaPredef:                          NEW_PREDEF Func_79aba                          ; $05
