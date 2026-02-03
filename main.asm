@@ -142236,22 +142236,26 @@ UpdatePartyStats:
     ld a,[W_CURENEMYLVL]
     push af
     ld a,[W_NUMINPARTY]
+    and a
+    jr z,.end
     ld b,a
-    ld hl,W_PARTYMON1_NUM
+    ld c,0
+    ld hl,W_PARTYMON1_LEVEL
 .loop
     push bc
     push hl
-    ld a,[hl]
-    ld [$D0B5],a
-    ld bc,W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
-    add hl,bc
-    ld a,[hl]
-    ld [wAlternateFormIndex],a
-    call GetMonHeader
-    ld bc,W_PARTYMON1_LEVEL-W_PARTYMON1_MOVE2PP
-    add hl,bc
-    ld a,[hli] ; hl = W_PARTYMON1_MAXHP
+    ld a,c
+    ld [wWhichPokemon],a
+    xor a
+    ld [$cc49],a
+    call LoadMonData
+    BANKSWITCH CalcLevelFromExperience
+    pop hl
+    push hl
+    ld a,d
+    ld [hli],a ; Store Level from EXP
     ld [W_CURENEMYLVL],a
+    ; hl = W_PARTYMON1_MAXHP
     ld d,h
     ld e,l
     ld bc,(W_PARTYMON1_EVHP-1)-W_PARTYMON1_MAXHP
@@ -142262,8 +142266,10 @@ UpdatePartyStats:
     ld bc,W_PARTYMON2DATA-W_PARTYMON1DATA
     add hl,bc
     pop bc
+    inc c
     dec b
     jr nz,.loop
+.end
     pop af
     ld [W_CURENEMYLVL],a
     ret
