@@ -50322,6 +50322,7 @@ LearnMoveCommon:
     call GetMoveName
     call CopyStringToCF4B
     PREDEF LearnMove
+    call .GetPotentialNewMoves
 .LearnEndOrJustKnow
     pop hl ; Restore Pointer to Current Learn Move's Level
     jr .learnSetLoop
