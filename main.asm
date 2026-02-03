@@ -16293,7 +16293,7 @@ LearnMove:
     jr nz,.skip
     ; XX learned YY! ♫♪
     call .IsSkill
-    ld hl,.LearnedSkillTextPlusSound
+    ld hl,LearnedSkillTextPlusSound
     jr c,.PrintLearned
     cp TELEPORT
     ld hl,.LearnedTextPlusSound
@@ -16304,7 +16304,7 @@ LearnMove:
     ld hl,.LearnedTextPlusSound
     jr .PrintLearned
 .TeleportFullMessage
-    ld hl,.LearnedSkillTextPlusSound
+    ld hl,LearnedSkillTextPlusSound
     call PrintText
     ld hl,.LearnedTextPlusSound
 .PrintLearned
@@ -16493,10 +16493,10 @@ LearnMove:
     TX_FAR _LearnedText
     db $b,6,"@"
 
-.LearnedSkillTextPlusSound
-    TX_FAR _LearnedSkillText1
-    db $11
-    db $0,$58
+;.LearnedSkillTextPlusSound
+;    TX_FAR _LearnedSkillText1
+;    db $11
+;    db $0,$58
 
 .ReplaceAMoveForText
     TX_FAR _ReplaceAMoveForText
@@ -17712,6 +17712,23 @@ LearnMove_SkillConfigTable:
     SCT Skill__LIGHT    , LIGHT_FLAG_BYTE    , LIGHT_FLAG_BIT
     SCT Skill__HEAL     , HEAL_FLAG_BYTE     , HEAL_FLAG_BIT
     db $FF
+
+LearnedSkillTextPlusSound:
+    TX_FAR _LearnedSkillText1
+    db $08 ; asm
+    ld a,[$C0EF] ; Actual Music Bank
+    cp $08
+    ld a,$86 ; LevelUP Sound in battle
+    jr z,.done
+    ld a,$94 ; KeyItem Sound out of battle
+.done
+    ld [$C0EE],a
+    call PlaySound
+    call WaitForSoundToFinish
+    ld hl,.wait
+    ret
+.wait
+    db $0,$58
 
 ; Free
 
