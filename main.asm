@@ -11027,15 +11027,8 @@ Func_42dd: ; 42dd (1:42dd)
     ld a,BANK(PokemonLogoGraphics)
     call FarCopyData2          ; second chunk
     ld hl,Version_GFX ; $402f
-IF _RED
     ld de,$9600 ; where to put redgreenversion.2bpp in the VRAM
     ld bc,$50 ; how big that file is
-ENDC
-IF _BLUE
-    ld de,$9610 ; where to put blueversion.2bpp in the VRAM
-    ld bc,$40 ; how big that file is
-ENDC
-
     ld a,BANK(Version_GFX)
     call FarCopyDataDouble
     call Func_4519
@@ -11360,13 +11353,8 @@ PrintGameVersionOnTitleScreen: ; 4598 (1:4598)
 
 ; these point to special tiles specifically loaded for that purpose ad are no usual text
 VersionOnTitleScreenText: ; 45a1 (1:45a1)
-IF _RED
     db $60,$61,$62,$63,$64,$65,$66,$67,"@" ; "Denim Version"
 ;    db $60,$61,$7F,$65,$66,$67,$68,$69,"@" ; "Red Version"
-ENDC
-IF _BLUE
-    db $61,$62,$63,$64,$65,$66,$67,$68,"@" ; "Blue Version"
-ENDC
 
 NintenText: ; 45aa (1:45aa)
     db "NINTEN@"
@@ -48585,12 +48573,7 @@ SlotMachineWheel3: ; 37a2d (d:7a2d)
     dw SLOTSFISH
 
 SlotMachineTiles1: ; 37a51 (d:7a51)
-IF _RED
     INCBIN "gfx/red/slotmachine1.2bpp"
-ENDC
-IF _BLUE
-    INCBIN "gfx/blue/slotmachine1.2bpp"
-ENDC
 
 Func_37ca1: ; 37ca1 (d:7ca1)
     ld hl,$ccd3
@@ -64673,13 +64656,7 @@ FightIntroBackMon: ; 41a99 (10:5a99)
     INCBIN "gfx/intro_fight.2bpp"
 
 FightIntroFrontMon: ; 42099 (10:6099)
-
-IF _RED
     INCBIN "gfx/red/introfight.2bpp"
-ENDC
-IF _BLUE
-    INCBIN "gfx/blue/introfight.2bpp"
-ENDC
 
 ; XXX what do these do
 Func_42769: ; 42769 (10:6769)
@@ -97489,8 +97466,8 @@ HoFMonInfoText: ; 70329 (1c:4329)
     ds 8
 
 Func_7033e: ; 7033e (1c:433e)
-    ld de,Unknown_72ede ; $6ede
-    ld a,$4
+    ld de,RedPicFront
+    ld a,BANK(RedPicFront)
     call UncompressSpriteFromDE
     ld hl,S_SPRITEBUFFER1
     ld de,$a000
@@ -101926,14 +101903,6 @@ IfNotDarkGBFadeIn2:
     ld b,2
     jp GBFadeOutCommon
 
-BorderPalettes:
-IF _RED
-    INCBIN "gfx/red/sgbborder.map"
-ENDC
-IF _BLUE
-    INCBIN "gfx/blue/sgbborder.map"
-ENDC
-
 ; format: db tileset id,tile id,value to be put in $cd5b
 DataTable_707a9:
     db $16,$20,$01
@@ -101943,63 +101912,12 @@ DataTable_707a9:
     db $10,$00,$01 ; Bills Teleport Fake Tileset
     db $FF
 
-SECTION "Unknown_72ede",ROMX[$6ede],BANK[$1C]
-
-Unknown_72ede: ; 72ede (1c:6ede)
-    ds $AA
-
-IF _RED
-    RGB 30,29,29 ; PAL_SGB1
-    RGB 25,22,25
-    RGB 25,17,21
-    RGB 24,14,12
-ENDC
-IF _BLUE
-    RGB 0,0,0 ; PAL_SGB1 (the first color is not defined,but if used,turns up as 30,29,29... o_O)
-    RGB 10,17,26
-    RGB 5,9,20
-    RGB 16,20,27
-ENDC
-
-    ds $18
-
-IF _RED
-    RGB 30,29,29 ; PAL_SGB2
-    RGB 22,31,16
-    RGB 27,20,6
-    RGB 15,15,15
-ENDC
-IF _BLUE
-    RGB 30,29,29 ; PAL_SGB2
-    RGB 27,11,6
-    RGB 5,9,20
-    RGB 28,25,15
-ENDC
-
-    ds $18
-
-IF _RED
-    RGB 30,29,29 ; PAL_SGB3
-    RGB 31,31,17
-    RGB 18,21,29
-    RGB 15,15,15
-ENDC
-IF _BLUE
-    RGB 30,29,29 ; PAL_SGB3
-    RGB 12,15,11
-    RGB 5,9,20
-    RGB 14,22,17
-ENDC
-
-    ds $18
-
-SGBBorderGraphics: ; 72fe8 (1c:6fe8)
-IF _RED
+SGBBorderGraphics:
     INCBIN "gfx/red/sgbborder.2bpp"
-ENDC
-IF _BLUE
-    INCBIN "gfx/blue/sgbborder.2bpp"
-ENDC
+
+; Free
+
+SECTION "LoadSAV",ROMX[$75e8],BANK[$1C]
 
 LoadSAV: ; 735e8 (1c:75e8)
 ;(if carry -> write
@@ -103882,12 +103800,7 @@ CreditsTextPointers: ; 742c3 (1d:42c3)
     dw CredPAAD
 
 CredVersion: ; 74343 (1d:4343) ; this 1 byte difference makes all bank addresses offset by 1 in the blue version
-IF _RED
     db "2RED VERSION STAFF@"
-ENDC
-IF _BLUE
-    db "2BLUE VERSION STAFF@"
-ENDC
 CredTajiri: ; 74356 (1d:4356)
     db "4SATOSHI TAJIRI@"
 CredTaOota: ; 74366 (1d:4366)
@@ -108955,12 +108868,7 @@ AnimationTileset2: ; 786ee (1e:46ee)
     INCBIN "gfx/attack_anim_2.2bpp"
 
 SlotMachineTiles2: ; 78bde (1e:4bde)
-IF _RED
     INCBIN "gfx/red/slotmachine2.2bpp"
-ENDC
-IF _BLUE
-    INCBIN "gfx/blue/slotmachine2.2bpp"
-ENDC
 
 MoveAnimation: ; 78d5e (1e:4d5e)
     push hl
@@ -115460,12 +115368,7 @@ INCLUDE "music/sfx/sfx_1f_5a.asm"
 INCLUDE "music/sfx/sfx_1f_5b.asm"
 INCLUDE "music/sfx/sfx_1f_5c.asm"
 INCLUDE "music/sfx/sfx_1f_40.asm"
-IF _RED
-    INCLUDE "music/sfx/sfx_1f_5d.asm"
-ENDC
-IF _BLUE
-    INCLUDE "music/blue/sfx_1f_5d.asm"
-ENDC
+INCLUDE "music/sfx/sfx_1f_5d.asm"
 INCLUDE "music/sfx/sfx_1f_3d.asm"
 INCLUDE "music/sfx/sfx_1f_43.asm"
 INCLUDE "music/sfx/sfx_1f_3e.asm"
@@ -134009,6 +133912,36 @@ SECTION "bank31",ROMX,BANK[$31]
 
 SuperPalettes:
     INCLUDE "constants/SuperPalettes.asm"
+
+; ─────────────────────────────────────────
+
+BorderPalettes:
+    INCBIN "gfx/red/sgbborder.map"
+
+    ds $AA+$56
+
+    RGB 30,29,29 ; PAL_SGB1
+    RGB 25,22,25
+    RGB 25,17,21
+    RGB 24,14,12
+
+    ds $18
+
+    RGB 30,29,29 ; PAL_SGB2
+    RGB 22,31,16
+    RGB 27,20,6
+    RGB 15,15,15
+
+    ds $18
+
+    RGB 30,29,29 ; PAL_SGB3
+    RGB 31,31,17
+    RGB 18,21,29
+    RGB 15,15,15
+
+    ds $18
+
+; ─────────────────────────────────────────
 
 SelectInOverWorld:
     ld hl,wSelectInOverworldOnBit6
