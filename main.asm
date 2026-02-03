@@ -8072,6 +8072,9 @@ Func_314e:
 ; ──────────────────────────────────
 
 SynchronizeParty:
+    ld hl,wFlagDisableSynchronizeBit0
+    bit 0,[hl]
+    ret nz
     ld a,[H_LOADEDROMBANK]
     push af
     ld a,BANK(_SynchronizeParty)
@@ -16493,11 +16496,6 @@ LearnMove:
     TX_FAR _LearnedText
     db $b,6,"@"
 
-;.LearnedSkillTextPlusSound
-;    TX_FAR _LearnedSkillText1
-;    db $11
-;    db $0,$58
-
 .ReplaceAMoveForText
     TX_FAR _ReplaceAMoveForText
     db "@"
@@ -17718,7 +17716,7 @@ LearnedSkillTextPlusSound:
     db $08 ; asm
     ld a,[$C0EF] ; Actual Music Bank
     cp $08
-    ld a,$86 ; LevelUP Sound in battle
+    ld a,$89 ; Evolution Sound in battle
     jr z,.done
     ld a,$94 ; KeyItem Sound out of battle
 .done
@@ -50528,6 +50526,8 @@ TryEvolution: ; loop over evolution entries
     call HandleBitArray_BankE
     ld hl,wTestEvoDuringBattleBit3
     res 3,[hl]
+    ld hl,wFlagDisableSynchronizeBit0
+    set 0,[hl]
     BANKSWITCH EvolveMon
     jp c,Func_3af2e
     ld hl,UnnamedText_3af3e ; $6f3e
@@ -50548,9 +50548,6 @@ TryEvolution: ; loop over evolution entries
     ld a,$89
     call PlaySoundWaitForCurrent
     call WaitForSoundToFinish
-    ld c,$28
-    call DelayFrames
-    call ClearScreen
     call RenameEvolvedMon
     call DoEvolution_HandleAlternative ; call GetMonHeader
     ld hl,$cfa8
@@ -50591,8 +50588,14 @@ TryEvolution: ; loop over evolution entries
     ld [$d11e],a
     xor a
     ld [$cc49],a
+    call .PrintStatsBox
     call .AfterEvolution_TryToAddExclusiveMove
+    ld hl,wFlagDisableSynchronizeBit0
+    res 0,[hl]
+    ld c,60
+    call DelayFrames
     call .ShowPokedex
+    call ClearScreen
     pop hl
     ld a,[W_ISINBATTLE] ; $d057
     and a
@@ -50623,6 +50626,22 @@ TryEvolution: ; loop over evolution entries
     pop af
     ld [$d0b5],a
     ret
+
+.PrintStatsBox
+    call SaveScreenTilesToBuffer1
+    ld hl,W_ISINBATTLE
+    ld a,[hl]
+    push af
+    push hl
+    xor a
+    ld [hl],a
+    ld d,$01
+    BANKSWITCH PrintStatsBox ; display new stats text box
+    pop hl
+    pop af
+    ld [hl],a
+    call WaitForTextScrollButtonPress
+    jp LoadScreenTilesFromBuffer1
 
 .ShowPokedex
     ld a,[$d0b5]
