@@ -17726,11 +17726,7 @@ LearnedSkillTextPlusSound:
 .wait
     db $0,$58
 
-; Free
-
-SECTION "PlayerPC",ROMX[$78e6],BANK[$1]
-
-PlayerPC: ; 78e6 (1:78e6)
+PlayerPC:
     ld hl,$d730
     set 6,[hl]
     ld a,ITEM_NAME
@@ -17840,6 +17836,9 @@ PlayerPCDeposit:
     ld [wListMenuID],a ; $cf94
     call DisplayListMenuID
     jr c,.PlayerPCMenu
+    ld a,[$cf91]
+    cp POKEDEX
+    jr z,.pokedex
     call IsKeyItem
     ld a,$1
     ld [$cf96],a
@@ -17871,6 +17870,13 @@ PlayerPCDeposit:
     and a
     jr z,.PlayerPCMenu
     jr .loop
+.pokedex
+    ld hl,.TryDepositPokedexText
+    call PrintText
+    jr .loop
+.TryDepositPokedexText
+    TX_FAR _TryDepositPokedexText
+    db "@"
 
 PlayerPCWithdraw:
     xor a
@@ -18026,6 +18032,8 @@ UnnamedText_7b5e
 UnnamedText_7b63
     TX_FAR _UnnamedText_7b63
     db "@"
+
+; Free
 
 SECTION "_RemovePokemon",ROMX[$7b68],BANK[$1]
 
@@ -22372,6 +22380,20 @@ ItemUseBengal:
     TX_FAR _NoLightInWaterText
     db "@"
 
+ItemUsePokedex:
+    ld a,[W_ISINBATTLE]
+    and a
+    jr nz,.battle
+    PREDEF DisplayPokedexMenu_
+    ret
+.battle
+    PREDEF ShowBattlePokedex
+    xor a        ; Force item use failed
+    ld [$cd6a],a ; to do not consume turn during battle
+    ld hl,wBattlePokedexUsedBit5
+    set 5,[hl] ; Don't consume turn
+    ret
+
 ; Free
 
 SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
@@ -26711,9 +26733,6 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     scf
     ret
 
-ItemUsePokedex:
-    PREDEF_JUMP DisplayPokedexMenu_
-
 ResetMovePPs:
     call Load16BitRegisters
     ; fallthrough
@@ -29929,9 +29948,11 @@ StartMenu_Item: ; 13302 (4:7302)
     xor a
     ld [$cc35],a
     ld a,[$cf91]
-    cp a,BICYCLE
+    cp BICYCLE
     jp z,.useOrTossItem
-    cp a,TECH_MACHINE
+    cp TECH_MACHINE
+    jp z,.useOrTossItem
+    cp POKEDEX
     jp z,.useOrTossItem
 .notBicycle1
     ld a,$06 ; use/toss menu
@@ -37268,6 +37289,12 @@ OakLabHealParty:
     jp GBFadeIn2
 
 DisplayStarterPokedexAndResetSeenOwn:
+    ld hl,wJoypadForbiddenButtonsMask
+    ld a,[hl]
+    push af
+    push hl
+    xor %00110000 ; ▼▲◄►StSeBA
+    ld [hl],a
     call .GetStarter
     ld hl,wPokedexSeen
     call .FillMemory
@@ -37275,7 +37302,11 @@ DisplayStarterPokedexAndResetSeenOwn:
     call .FillMemory
     call .SetStarter
     ld a,[W_PLAYERSTARTER]
-    jp UpdatePokedex
+    call UpdatePokedex
+    pop hl
+    pop af
+    ld [hl],a
+    ret
 .GetStarter
     ld a,[W_PLAYERSTARTER]
     ld [$d11e],a
@@ -37557,6 +37588,11 @@ Route16HouseText1:
 .HM02AfterText
     TX_FAR _HM02AfterText
     db "@"
+
+RealGivePokedexAndOaksLabScript_1cefd:
+    ld bc,(POKEDEX << 8) | 1
+    call GiveItem
+    jp OaksLabScript_1cefd
 
 ; Free
 
@@ -38342,7 +38378,7 @@ OaksLabScript16: ; 1cf12 (7:4f12)
     ld a,$30
     ld [$cc4d],a
     PREDEF RemoveMissableObject
-    call OaksLabScript_1cefd
+    call RealGivePokedexAndOaksLabScript_1cefd ; call OaksLabScript_1cefd
     ld a,$1a
     ld [$ff00+$8c],a
     call DisplayTextID
@@ -52285,7 +52321,6 @@ MainInBattleLoop: ; 3c233 (f:4233)
     jr nz,.InitBattleMenu
 
 .selectEnemyMove
-;    call BackupCurMenuItemAndSelectEnemyMove
     ld a,[W_ISLINKBATTLE]
     cp $4
     jr nz,.noLinkBattle
@@ -53108,7 +53143,7 @@ TrainerBattleNotB:
     ld a,b
     pop bc
     ret nz
-    sub %00000010 ; ▼▲◄►StSeBA
+    res 1,a ; ▼▲◄►StSeBA
     ret
 
 RageEffect:
@@ -53403,7 +53438,7 @@ Func_3c92a: ; 3c92a (f:492a)
     ld a,[W_ENEMYMONID]
     call PlayCry
     call DrawEnemyHUDAndHPBar
-    call LoadBattlePokedex
+    call SaveScreenAndLoadBattlePokedex
     ld a,[$CC26]
     and a
     ret nz
@@ -53948,11 +53983,7 @@ GetSelectedMovePointer:
     ld de,W_ENEMYMONATTACK
     ret
 
-; Free
-
-SECTION "InitBattleMenu",ROMX[$4eb1],BANK[$f]
-
-InitBattleMenu: ; 3ceb1 (f:4eb1)
+InitBattleMenu:
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     ld a,[W_BATTLETYPE] ; $d05a
     and a
@@ -54146,7 +54177,7 @@ InitBattleMenu: ; 3ceb1 (f:4eb1)
     ld [$cf91],a
     jr asm_3d05f
 
-asm_3d00e: ; 3d00e (f:500e)
+asm_3d00e:
     call LoadScreenTilesFromBuffer1
     ld a,[W_BATTLETYPE] ; $d05a
     and a
@@ -54201,6 +54232,11 @@ asm_3d05f:
     xor a
     ld [$d152],a
     call UseItem
+    ld hl,wBattlePokedexUsedBit5
+    bit 5,[hl] 
+    res 5,[hl]
+    jp nz,InitBattleMenu ; Don't consume turn
+
     call LoadHudTilePatterns
     call CleanLCD_OAM
     ld a,[W_BATTLETYPE] ; $d05a
@@ -54227,17 +54263,7 @@ asm_3d05f:
 .FinalCheck2
     BANKSWITCH_JUMP ItemInBattleFinalCheck
 
-;BackupCurMenuItemAndSelectEnemyMove:
-;    ld a,[wCurrentMenuItem] ; Backup Current Menu Item
-;    push af                 ; ...
-;    call SelectEnemyMove
-;    pop af                  ; Restore Current Menu Item
-;    ld [wCurrentMenuItem],a ; ...
-;    ret
-
-SECTION "Func_3d0ca",ROMX[$50ca],BANK[$f]
-
-Func_3d0ca: ; 3d0ca (f:50ca)
+Func_3d0ca:
     dec a
     jp nz,Func_3d1fa
     call SaveScreenTilesToBuffer2
@@ -54248,15 +54274,15 @@ Func_3d0ca: ; 3d0ca (f:50ca)
     ld [$cf91],a
     jp asm_3d05f
 
-Func_3d0e0: ; 3d0e0 (f:50e0)
+Func_3d0e0:
     call LoadScreenTilesFromBuffer1
     xor a
     ld [$d07d],a
     ld [$cc35],a
     call DisplayPartyMenu
-asm_3d0ed: ; 3d0ed (f:50ed)
+asm_3d0ed:
     jp nc,Func_3d119
-asm_3d0f0: ; 3d0f0 (f:50f0)
+asm_3d0f0:
     call CleanLCD_OAM
     call GBPalWhiteOut
     call LoadHudTilePatterns
@@ -54265,7 +54291,7 @@ asm_3d0f0: ; 3d0f0 (f:50f0)
     call GBPalNormal
     jp InitBattleMenu
 
-Func_3d105: ; 3d105 (f:5105)
+Func_3d105:
     FuncCoord 0,12 ; Denim,occorre cancellare solo il Box,Eliminato "CANCEL" ; FuncCoord 11,11 ; $c487
     ld hl,Coord
     ld bc,20*6 ; 6 righe
@@ -54276,7 +54302,7 @@ Func_3d105: ; 3d105 (f:5105)
     call GoBackToPartyMenu
     jr asm_3d0ed
 
-Func_3d119: ; 3d119 (f:5119)
+Func_3d119:
     ld a,$c
     ld [$d125],a
     call DisplayTextBoxID
@@ -54373,9 +54399,6 @@ SwitchPlayerMon: ; joedebug - this is where the player switches
 UnnamedText_3d1f5:
     TX_FAR _UnnamedText_3d1f5
     db "@"
-
-LoadBattlePokedex:
-    BANKSWITCH_JUMP _LoadBattlePokedex
 
 SECTION "Func_3d1fa",ROMX[$51fa],BANK[$f]
 
@@ -54725,7 +54748,7 @@ SwapMovesInMenu:
     ld [$cc35],a
     jp AlignIndexMenu ; jp MoveSelectionMenu
 
-Func_3d493: ; 3d493 (f:5493)
+Func_3d493:
     push hl
     ld a,[$cc35]
     dec a
@@ -54746,12 +54769,13 @@ Func_3d493: ; 3d493 (f:5493)
     ld a,b
     ld [de],a
     ret
-asm_3d4ad: ; 3d4ad (f:54ad)
+
+asm_3d4ad:
     ld a,[wCurrentMenuItem] ; $cc26
     ld [$cc35],a
     jp AlignIndexMenu ; jp MoveSelectionMenu
 
-PrintMenuItem: ; 3d4b6 (f:54b6)
+PrintMenuItem:
     ld a,[wDebugEnemyMoveBit7]
     bit 7,a
     ret nz
@@ -55541,8 +55565,12 @@ GetSideEffectType_Common:
     ret
 
 SaveScreenAndLoadBattlePokedex:
+    ld hl,.EmptyText
+    call PrintText
     call SaveScreenTilesToBuffer1
-    jp LoadBattlePokedex
+    PREDEF_JUMP _LoadBattlePokedex
+.EmptyText
+    db "@"
 
 ; Free
 
@@ -122526,6 +122554,11 @@ _EscapeRopeNoRoomText:
     text_line , "space for this!"
     text_done
 
+_TryDepositPokedexText:
+    text_init , "It's better not to"
+    text_line , "deposit #DEX!"
+    text_wait
+
 SECTION "bank23",ROMX,BANK[$23]
 
 _UnnamedText_56437:
@@ -142038,7 +142071,7 @@ Func_c754Predef:                           NEW_PREDEF Func_c754                 
 LearnMoveFromLevelUpPredef:                NEW_PREDEF LearnMoveFromLevelUp                ; $1A
 LearnMovePredef:                           NEW_PREDEF LearnMove                           ; $1B
 _IsItemInBagPredef:                        NEW_PREDEF _IsItemInBag                        ; $1C
-ds 3                                                                                      ; $1D
+_LoadBattlePokedexPredef:                  NEW_PREDEF _LoadBattlePokedex                  ; $1D
 GiveItemPredef:                            NEW_PREDEF GiveItem                            ; $1E
 Func_480ebPredef:                          NEW_PREDEF Func_480eb                          ; $1F
 Func_f8baPredef:                           NEW_PREDEF Func_f8ba                           ; $20
@@ -142049,7 +142082,7 @@ ShakeScreenHorizontallyPredef:             NEW_PREDEF ShakeScreenHorizontally   
 UpdateHPBarPredef:                         NEW_PREDEF UpdateHPBar                         ; $25
 Func_f9dcPredef:                           NEW_PREDEF Func_f9dc                           ; $26
 Func_5ab0Predef:                           NEW_PREDEF Func_5ab0                           ; $27
-ds 3                                                                                      ; $28
+ShowBattlePokedexPredef:                   NEW_PREDEF ShowBattlePokedex                   ; $28
 DisplayPokedexMenu_Predef:                 NEW_PREDEF DisplayPokedexMenu_                 ; $29
 EvolutionAfterBattlePredef:                NEW_PREDEF EvolutionAfterBattle                ; $2A
 SaveSAVtoSRAM0Predef:                      NEW_PREDEF SaveSAVtoSRAM0                      ; $2B
@@ -146170,8 +146203,14 @@ SubstituteEffectHandler:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+ShowBattlePokedex:
+    ld hl,wForceShowPokedexBit5 ; wSkipTextInPokedexBit7
+    set 5,[hl]
+    set 7,[hl]
+    ; fall through
+
 _LoadBattlePokedex:
-    ld hl,wForceShowPokedexBit5
+    ld hl,wForceShowPokedexBit5 ; wSkipTextInPokedexBit7
     bit 5,[hl]
     jr z,.end
     ld a,[$d74b]
@@ -146179,11 +146218,9 @@ _LoadBattlePokedex:
     jr z,.end
     call IsGhostBattle
     jr z,.end
+    bit 7,[hl]
     ld hl,.LoadPokedexText
-    call PrintText
-    ld hl,.EmptyText
-    call PrintText
-    call SaveScreenTilesToBuffer1
+    call z,PrintText
     ld a,[W_ENEMYMONID]
     ld [$d11e],a
     PREDEF ShowPokedexData
@@ -146197,8 +146234,9 @@ _LoadBattlePokedex:
     ld c,25
     call DelayFrames
 .end
-    ld hl,wForceShowPokedexBit5
+    ld hl,wForceShowPokedexBit5 ; wSkipTextInPokedexBit7
     res 5,[hl]
+    res 7,[hl]
     ret
 .LoadMonFrontSprite
     ld a,[W_ENEMYBATTSTATUS2]
@@ -146211,8 +146249,6 @@ _LoadBattlePokedex:
     call GetMonHeader
     ld de,$9000
     jp LoadMonFrontSprite
-.EmptyText
-    db "@"
 .LoadPokedexText
     TX_FAR _ItemUseBallText06
     db $13,$06

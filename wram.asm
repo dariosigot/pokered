@@ -1922,6 +1922,7 @@ wDisableEncounterBit3       ; dee5 ; bit 3 = Disable Pewter's Eevee Encounter
 wFlagForceGhostPalBit4      ; dee5 ; bit 4 = Force Ghost Palette during Ghost Marowak Encounter
 wOverworlLightSoundBit4     ; dee5 ; bit 4 = Force Overworld Light Sound
 wForceShowPokedexBit5       ; dee5 ; bit 5 = Show Pokedex during first Seen in Battle
+wBattlePokedexUsedBit5      ; dee5 ; bit 5 = Set Pokedex used in battle
 wWaitReleaseJoyBit5         ; dee5 ; bit 5 = Enable Waiting Joy Release in "menuloop"
 wTestWrapInMenuInputBit6    ; dee5 ; bit 6 = Enable to Test if Cursor try to "wrap" during MenuInput, if positive reset it
 wFirstExpAllMessageBit6     ; dee5 ; bit 6
@@ -1931,6 +1932,7 @@ wPokedexScreenJustLoadBit6  ; dee5 ; bit 6 = Pokedex Screen Picture Just Load
 wDebugEnemyMoveBit7         ; dee5 ; bit 7
 wFlagMoveRelearnEngagedBit7 ; dee5 ; bit 7
 wFlagFollowBoulderBit7      ; dee5 ; bit 7 = Force player to follow Boulder
+wSkipTextInPokedexBit7      ; dee5 ; bit 7 = Skip Text during Show Pokedex in Battle
     ds 1
 
 wFlagListMenuSpc:           ; dee6 ; bit 0 = BadgeName
