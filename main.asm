@@ -16430,9 +16430,24 @@ LearnMove:
     ld bc,$4
     call CopyData
     BANKSWITCH FormatMovesString
-    pop hl
-.ChoiceAnotherMoveToDelete
-    push hl
+    ld hl,wTopMenuItemY ; $cc24
+    ld a,13
+    ld [hli],a
+    ld a,01
+    ld [hli],a
+    xor a
+    ld [hli],a
+    inc hl
+    ld a,[$cd6c]
+    ld [hli],a
+    call CheckMoveRelearn
+    ld a,%11000011 ; ▼▲◄►StSeBA
+    jr nz,.DoneMask
+    ld a,%11001011 ; ▼▲◄►StSeBA
+.DoneMask
+    ld [hli],a
+    ld [hl],$0
+.RestartMenu
     FuncCoord 00,12
     ld hl,Coord
     ld bc,$0412
@@ -16447,24 +16462,13 @@ LearnMove:
     ld a,[$FF00+$f6]
     res 2,a
     ld [$FF00+$f6],a
-    ld hl,wTopMenuItemY ; $cc24
-    ld a,13
-    ld [hli],a
-    ld a,01
-    ld [hli],a
-    xor a
-    ld [hli],a
-    inc hl
-    ld a,[$cd6c]
-    ld [hli],a
-    ld a,%11000011 ; ▼▲◄►StSeBA
-    ld [hli],a
-    ld [hl],$0
     ld hl,$fff6
     set 1,[hl]
     pop hl
     push hl
     call HandleMenuInput_PrintMoveBox ; call HandleMenuInput
+    bit 3,a
+    jr nz,.RestartMenu
     ld hl,$fff6
     res 1,[hl]
     push af
@@ -18534,24 +18538,30 @@ HandleMenuInput_PrintMoveBox:
     add hl,bc
     ld a,[hl]
     ld [wPlayerSelectedMove],a
+    ; Energy
+    BANKSWITCH WriteEnergyAllMovesDuringMoveRelearn
     ; Print Move Details Box
     FuncCoord 10,12
     ld de,Coord
     call CheckMoveRelearn
-    jr z,.skip
-    ; Energy
-    BANKSWITCH WriteEnergyAllMovesDuringMoveRelearn
+    jr z,.skip1
     ; Print Move Details Box (Move Relearner)
     FuncCoord 09,05
     ld de,Coord
     FuncCoord 19,02
     ld a,[Coord]
     cp $7B ; Upper Right Corner
-    jr nz,.skip
+    jr nz,.skip2
     FuncCoord 09,01
     ld de,Coord
-.skip
+    jr .skip2
+.skip1
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    bit 3,a ; ▼▲◄►StSeBA
+    jr nz,.skip3
+.skip2
     PREDEF PrintMoveDetailsBox
+.skip3
 
     ; Menu
     ld hl,wMenuWrappingEnabled
