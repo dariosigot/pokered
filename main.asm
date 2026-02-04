@@ -87047,10 +87047,7 @@ Route18Script: ; 59ac7 (16:5ac7)
     ld [W_ROUTE18CURSCRIPT],a
     ret
 
-Route18ScriptPointers: ; 59ada (16:5ada)
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
+SECTION "Route18TextPointers",ROMX[$5ae0],BANK[$16]
 
 Route18TextPointers: ; 59ae0 (16:5ae0)
     dw Route18Text1
@@ -87103,9 +87100,7 @@ Route18EndBattleText1: ; 59b1e (16:5b1e)
     TX_FAR _Route18EndBattleText1
     db "@"
 
-Route18AfterBattleText1: ; 59b23 (16:5b23)
-    TX_FAR _Route18AfterBattleText1
-    db "@"
+SECTION "Route18Text2",ROMX[$5b28],BANK[$16]
 
 Route18Text2: ; 59b28 (16:5b28)
     db $08 ; asm
@@ -88570,6 +88565,35 @@ HallofFameRoomScript2:
     call DelayFramesCredits
     dec b
     jr nz,.loop
+    ret
+
+; ───────────────────────────────────────────
+
+Route18ScriptPointers:
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
+    dw ShowMoltres
+
+Route18AfterBattleText1:
+    db $08 ; asm
+    ld hl,.Route18AfterBattleText1
+    call PrintText
+    ld a,MOLTRES
+    ld [$cf91],a
+    ld a,3 ; ShowMoltres
+    ld [W_ROUTE18CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
+    jp TextScriptEnd
+.Route18AfterBattleText1
+    TX_FAR _Route18AfterBattleText1
+    db "@"
+
+ShowMoltres:
+    BANKSWITCH DisplayMonFrontSpriteInBox
+    xor a
+    ld [W_ROUTE18CURSCRIPT],a
+    ld [W_CURMAPSCRIPT],a
     ret
 
 ; ───────────────────────────────────────────
@@ -91987,7 +92011,7 @@ SECTION "ItemStoragePCInRedHouse",ROMX[$5b8e],BANK[$17]
 ItemStoragePCInRedHouse: ; 5db8e (17:5b8e)
     db $fc ; Item Storage PC in DisplayTextID
 
-Route15UpstairsLeftBinoculars: ; 5db8f (17:5b8f)
+Route15UpstairsLeftBinoculars:
     ld a,[$c109]
     cp $4 ; i
     ret nz
@@ -91996,10 +92020,9 @@ Route15UpstairsLeftBinoculars: ; 5db8f (17:5b8f)
     call PrintPredefTextID
     ld a,ARTICUNO
     ld [$cf91],a
-    call PlayCry
     jp DisplayMonFrontSpriteInBox
 
-Route15UpstairsBinocularsText: ; 5dba8 (17:5ba8)
+Route15UpstairsBinocularsText:
     TX_FAR _Route15UpstairsBinocularsText
     db "@"
 
@@ -125057,8 +125080,9 @@ _Route18EndBattleText1:
     text_wait
 
 _Route18AfterBattleText1:
-    text_init , "I wish I had a"
-    text_line , "BIKE!"
+    text_init , "I hope to find"
+    text_line , "a #MON like"
+    text_cont , "this one..."
     text_done
 
 _Route18BattleText2:
