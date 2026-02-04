@@ -109768,7 +109768,7 @@ AnimationWaterDropletsEverywhere: ; 79215 (1e:5215)
     xor a
     ld [$d09f],a
     call LoadAnimationTileset
-    ld d,$20
+    ld d,20
     ld a,$f0
     ld [W_BASECOORDX],a ; $d081
     ld a,$71
@@ -122366,15 +122366,15 @@ _LikeShipText:
 _AIBattleWithdrawText:
     db 1
     dw W_TRAINERNAME
-    text_init , " with- ("
-    text_paus
-    TX_RAM wTrainerAISwitchDebugReason ; TODO
-    text_init , ")"
+    text_init , " with-"
     text_line , "drew "
     text_paus
     db 1
     dw W_ENEMYMONNAME
     text_init , "!"
+    text_paus
+    TX_RAM wTrainerAISwitchDebugReason ; TODO
+    text_init
     text_wait
 
 _SilphScopeDoesntWorkInTheDark
