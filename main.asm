@@ -32609,28 +32609,34 @@ UnnamedText_17f32: ; 17f32 (5:7f32)
     db "@"
 
 ; removes one of the specified item ID [$FFdb] from bag (if existent)
-RemoveItemByID: ; 17f37 (5:7f37)
-    ld hl,wBagItems ; $d31e
+RemoveItemByID:
+    ld hl,wNumBagItems
+    ld a,[hli]
+    and a
+    ret z
+    ld e,a
     ld a,[$FF00+$db]
     ld b,a
     xor a
     ld [$FF00+$dc],a
-.asm_17f40
+.loop
     ld a,[hli]
     cp $ff
     ret z
     cp b
-    jr z,.asm_17f4f
+    jr z,.found
     inc hl
     ld a,[$FF00+$dc]
     inc a
     ld [$FF00+$dc],a
-    jr .asm_17f40
-.asm_17f4f
-    ld a,$1
+    dec e
+    ret z
+    jr .loop
+.found
+    ld a,1
     ld [$cf96],a
     ld a,[$FF00+$dc]
-    ld [wWhichPokemon],a ; $cf92
+    ld [$cf92],a
     ld hl,wNumBagItems
     jp RemoveItemFromInventory
 
@@ -37600,6 +37606,32 @@ RealGivePokedexAndOaksLabScript_1cefd:
     call GiveItem
     jp OaksLabScript_1cefd
 
+OaksLabScript_1d00a:
+    ld hl,wNumBagItems
+    ld a,[hli]
+    and a
+    ret z
+    ld e,a
+    ld c,0
+.loop
+    ld a,[hli]
+    cp $ff
+    ret z
+    cp OAKS_PARCEL
+    jr z,.GotParcel
+    inc hl
+    inc c
+    dec e
+    ret z
+    jr .loop
+.GotParcel
+    ld a,1
+    ld [$cf96],a
+    ld a,c
+    ld [$cf92],a
+    ld hl,wNumBagItems
+    jp RemoveItemFromInventory
+
 ; Free
 
 SECTION "Func_1c98a",ROMX[$498a],BANK[$7]
@@ -38451,27 +38483,7 @@ OaksLabScript17: ; 1cfd4 (7:4fd4)
     ld [W_OAKSLABCURSCRIPT],a
     ret
 
-SECTION "OaksLabScript_1d00a",ROMX[$500a],BANK[$7]
-
-OaksLabScript_1d00a: ; 1d00a (7:500a)
-    ld hl,wBagItems
-    ld bc,$0000
-.asm_1d010
-    ld a,[hli]
-    cp $ff
-    ret z
-    cp OAKS_PARCEL
-    jr z,.GotParcel ; 0x1d016 $4
-    inc hl
-    inc c
-    jr .asm_1d010 ; 0x1d01a $f4
-.GotParcel
-    ld hl,wNumBagItems
-    ld a,c
-    ld [$cf92],a
-    ld a,$1
-    ld [$cf96],a
-    jp RemoveItemFromInventory
+SECTION "OaksLabScript_1d02b",ROMX[$502b],BANK[$7]
 
 OaksLabScript_1d02b: ; 1d02b (7:502b)
     ld a,$7c
