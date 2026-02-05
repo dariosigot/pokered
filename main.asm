@@ -30001,6 +30001,8 @@ StartMenu_Item: ; 13302 (4:7302)
     ld a,[$cf91]
     cp TECH_MACHINE
     jr z,.useItem_partyMenu
+    cp POKEDEX
+    jr z,.useItem_Standard
     ld a,[wCurrentMenuItem]
     and a
     jr nz,.tossItem
@@ -132812,9 +132814,7 @@ _MonCannotLearnMachineMoveText:
     text_wait
 
 _ItemUseNotTimeText:
-    text_init , "OAK: ",$52,"!"
-    text_line , "This isn't the"
-    text_cont , "time to use that! "
+    text_init , "Not Now!"
     text_wait
 
 _ItemUseNotYoursToUseText:
