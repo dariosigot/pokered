@@ -99136,24 +99136,22 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
     ld bc,$10
     call CopyData
     ld hl,$8040
-    ld de,TownMapCursor ; $4f40
-    ld bc,(BANK(TownMapCursor) << 8) + $04
+    ld de,.TownMapCursor ; $4f40
+    ld bc,(BANK(.TownMapCursor) << 8) + $04
     call CopyVideoDataDouble
     xor a
     ld [wWhichTrade],a ; $cd3d
     pop af
 .RestartCurrentMap
-    call SetTownMapBeforeJoypad
+    call .SetTownMapBeforeJoypad
     jr .enterLoop
-.townMapLoop:
-    call TestAndResetTownMapBeforeJoypad
+.townMapLoop
+    call .TestAndResetTownMapBeforeJoypad
     jr z,.skip
     xor a
     ld [wWhichTrade],a ; $cd3d
 .skip
-    ld hl,wTileMap
-    ld bc,$114
-    call ClearScreenArea
+    call .ClearTitle
     call ChoiceTownMapOrder ; ld hl,TownMapOrder ; $4f11
     ld a,[wWhichTrade] ; $cd3d
     ld c,a
@@ -99201,7 +99199,7 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
     jr nz,.pressedUp
     bit 7,b
     jr nz,.pressedDown
-    call TestAndResetTownMapBeforeJoypad
+    call .TestAndResetTownMapBeforeJoypad
     xor a
     ld [$d09b],a
     ld [$FF00+$b7],a
@@ -99230,24 +99228,31 @@ DisplayTownMap: ; 70e3e (1c:4e3e)
     ld [wWhichTrade],a ; $cd3d
     jp .townMapLoop
 .selectPressed
+    call .ClearTitle
     ld a,[W_CURMAP]
     jp .RestartCurrentMap
 
-SetTownMapBeforeJoypad:
+.SetTownMapBeforeJoypad
     ld hl,wTownMapBeforeJoypadBit0
     set 0,[hl]
     ret
 
-TestAndResetTownMapBeforeJoypad:
+.TestAndResetTownMapBeforeJoypad
     ld hl,wTownMapBeforeJoypadBit0
     bit 0,[hl]
     res 0,[hl]
     ret
 
-SECTION "TownMapCursor",ROMX[$4f40],BANK[$1c]
+.ClearTitle
+    FuncCoord 00,00
+    ld hl,Coord
+    ld bc,(01<<8|20)
+    jp ClearScreenArea
 
-TownMapCursor: ; 70f40 (1c:4f40)
+.TownMapCursor
     INCBIN "gfx/town_map_cursor.1bpp"
+
+SECTION "Func_70f60",ROMX[$4f60],BANK[$1c]
 
 Func_70f60: ; 70f60 (1c:4f60)
     call _LoadTownMap
