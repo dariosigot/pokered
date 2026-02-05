@@ -7103,12 +7103,13 @@ RedisplayStartMenu:
     and a
     jr nz,.loop
 ; if the player pressed tried to go past the top item,wrap around to the bottom
-    ld a,[$d74b]
-    bit 5,a ; does the player have the pokedex?
-    ld a,6-1 ; there are 7 menu items with the pokedex,so the max index is 6
-    jr nz,.wrapMenuItemId
-    dec a ; there are only 6 menu items without the pokedex
-.wrapMenuItemId
+;    ld a,[$d74b]
+;    bit 5,a ; does the player have the pokedex?
+;    ld a,6-1 ; there are 7 menu items with the pokedex,so the max index is 6
+;    jr nz,.wrapMenuItemId
+;    dec a ; there are only 6 menu items without the pokedex
+;.wrapMenuItemId
+    ld a,4
     ld [wCurrentMenuItem],a
     call EraseMenuCursor
     jr .loop
@@ -7116,14 +7117,16 @@ RedisplayStartMenu:
     bit 7,a
     jr z,.buttonPressed
 ; if the player pressed tried to go past the bottom item,wrap around to the top
-    ld a,[$d74b]
-    bit 5,a ; does the player have the pokedex?
+;    ld a,[$d74b]
+;    bit 5,a ; does the player have the pokedex?
+;    ld a,[wCurrentMenuItem]
+;    ld c,7-1 ; there are 7 menu items with the pokedex
+;    jr nz,.checkIfPastBottom
+;    dec c ; there are only 6 menu items without the pokedex
+;.checkIfPastBottom
+;    cp c
     ld a,[wCurrentMenuItem]
-    ld c,7-1 ; there are 7 menu items with the pokedex
-    jr nz,.checkIfPastBottom
-    dec c ; there are only 6 menu items without the pokedex
-.checkIfPastBottom
-    cp c
+    cp 5
     jr nz,.loop
 ; the player went past the bottom,so wrap to the top
     xor a
@@ -7138,26 +7141,35 @@ RedisplayStartMenu:
     and a,%00001010 ; was the Start button or B button pressed?
     jp nz,CloseStartMenu
     call SaveScreenTilesToBuffer2 ; copy background from wTileMap to wTileMapBackup2
-    ld a,[$d74b]
-    bit 5,a ; does the player have the pokedex?
+;    ld a,[$d74b]
+;    bit 5,a ; does the player have the pokedex?
+;    ld a,[wCurrentMenuItem]
+;    jr nz,.displayMenuItem
+;    inc a ; adjust position to account for missing pokedex menu item
+;.displayMenuItem
+;    cp a,0
+;    jp z,StartMenu_Pokedex
+;    cp a,1
+;    jp z,StartMenu_Pokemon
+;    cp a,2
+;    jp z,StartMenu_Item
+;    cp a,3
+;    jp z,StartMenu_TrainerInfo
+;    cp a,4
+;    jp z,StartMenu_SaveReset
+;    cp a,5
+;    jp z,StartMenu_Option
     ld a,[wCurrentMenuItem]
-    jr nz,.displayMenuItem
-    inc a ; adjust position to account for missing pokedex menu item
-.displayMenuItem
-    cp a,0
-    jp z,StartMenu_Pokedex
-    cp a,1
+    and a
     jp z,StartMenu_Pokemon
-    cp a,2
+    dec a
     jp z,StartMenu_Item
-    cp a,3
+    dec a
     jp z,StartMenu_TrainerInfo
-    cp a,4
+    dec a
     jp z,StartMenu_SaveReset
-    cp a,5
-    jp z,StartMenu_Option
+    jp StartMenu_Option
 
-; EXIT falls through to here
 CloseStartMenu:
     call GetJoypadState
     ld a,[H_NEWLYPRESSEDBUTTONS]
@@ -16609,14 +16621,14 @@ DisplayTextIDInit: ; 7096 (1:7096)
 ; if text ID is 0 (i.e. the start menu)
 ; Note that the start menu text border is also drawn in the function directly
 ; below this,so this seems unnecessary.
-    ld a,[$d74b]
-    bit 5,a ; does the player have the pokedex?
+;    ld a,[$d74b]
+;    bit 5,a ; does the player have the pokedex?
 ; start menu with pokedex
-    FuncCoord 10,0 ; $c3aa
-    ld hl,Coord
-    ld b,$0e-2
-    ld c,$08
-    jr nz,.drawTextBoxBorder
+;    FuncCoord 10,0 ; $c3aa
+;    ld hl,Coord
+;    ld b,$0e-2
+;    ld c,$08
+;    jr nz,.drawTextBoxBorder
 ; start menu without pokedex
     FuncCoord 10,0 ; $c3aa
     ld hl,Coord
@@ -16680,15 +16692,15 @@ DisplayTextIDInit: ; 7096 (1:7096)
     ret
 
 ; function that displays the start menu
-DrawStartMenu: ; 710b (1:710b)
-    ld a,[$d74b]
-    bit 5,a ; does the player have the pokedex?
+DrawStartMenu:
+;    ld a,[$d74b]
+;    bit 5,a ; does the player have the pokedex?
 ; menu with pokedex
-    FuncCoord 10,0 ; $c3aa
-    ld hl,Coord
-    ld b,$0e-2
-    ld c,$08
-    jr nz,.drawTextBoxBorder
+;    FuncCoord 10,0 ; $c3aa
+;    ld hl,Coord
+;    ld b,$0e-2
+;    ld c,$08
+;    jr nz,.drawTextBoxBorder
 ; shorter menu if the player doesn't have the pokedex
     FuncCoord 10,0 ; $c3aa
     ld hl,Coord
@@ -16711,72 +16723,66 @@ DrawStartMenu: ; 710b (1:710b)
     set 6,[hl] ; no pauses between printing each letter
     FuncCoord 12,2 ; $c3d4
     ld hl,Coord
-    ld a,[$d74b]
-    bit 5,a ; does the player have the pokedex?
+;    ld a,[$d74b]
+;    bit 5,a ; does the player have the pokedex?
 ; case for not having pokdex
-    ld a,$06-1
-    jr z,.storeMenuItemCount
+;    ld a,$06-1
+;    jr z,.storeMenuItemCount
 ; case for having pokedex
-    ld de,StartMenuPokedexText
-    call PrintStartMenuItem
-    ld a,$07-1
-.storeMenuItemCount
+;    ld de,.StartMenuPokedexText
+;    call .PrintStartMenuItem
+;    ld a,$07-1
+;.storeMenuItemCount
+    ld a,5
     ld [$cc28],a ; number of menu items
-    ld de,StartMenuPokemonText
-    call PrintStartMenuItem
-    ld de,StartMenuItemText
-    call PrintStartMenuItem
+    ld de,.StartMenuPokemonText
+    call .PrintStartMenuItem
+    ld de,.StartMenuItemText
+    call .PrintStartMenuItem
     ld de,$d158 ; player's name
-    call PrintStartMenuItem
+    call .PrintStartMenuItem
     ld a,[$d72e]
     bit 6,a ; is the player using the link feature?
 ; case for not using link feature
-    ld de,StartMenuSaveText
+    ld de,.StartMenuSaveText
     jr z,.printSaveOrResetText
 ; case for using link feature
-    ld de,StartMenuResetText
+    ld de,.StartMenuResetText
 .printSaveOrResetText
-    call PrintStartMenuItem
-    ld de,StartMenuOptionText
-    call PrintStartMenuItem
-    ;ld de,StartMenuExitText
-    ;call PlaceString
+    call .PrintStartMenuItem
+    ld de,.StartMenuOptionText
+    call .PrintStartMenuItem
     ld hl,$d730
     res 6,[hl] ; turn pauses between printing letters back on
     ret
 
-SECTION "StartMenuPokedexText",ROMX[$718f],BANK[$1]
+;.StartMenuPokedexText
+;    db "POKéDEX@"
 
-StartMenuPokedexText: ; 718f (1:718f)
-    db "POKéDEX@"
-
-StartMenuPokemonText: ; 7197 (1:7197)
+.StartMenuPokemonText
     db "POKéMON@"
 
-StartMenuItemText: ; 719f (1:719f)
+.StartMenuItemText
     db "ITEM@"
 
-StartMenuSaveText: ; 71a4 (1:71a4)
+.StartMenuSaveText
     db "SAVE@"
 
-StartMenuResetText: ; 71a9 (1:71a9)
+.StartMenuResetText
     db "RESET@"
 
-;StartMenuExitText: ; 71af (1:71af)
-;    db "EXIT@"
-
-SECTION "StartMenuOptionText",ROMX[$71b4],BANK[$1]
-
-StartMenuOptionText: ; 71b4 (1:71b4)
+.StartMenuOptionText
     db "OPTION@"
 
-PrintStartMenuItem: ; 71bb (1:71bb)
+.PrintStartMenuItem
     push hl
     call PlaceString
     pop hl
     ld de,$28
     add hl,de
     ret
+
+SECTION "CableClubNPC",ROMX[$71c5],BANK[$1]
 
 CableClubNPC: ; 71c5 (1:71c5)
     ld hl,CableClubNPCText1 ; $72b8
