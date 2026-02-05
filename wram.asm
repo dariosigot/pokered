@@ -1076,7 +1076,6 @@ W_PARTYMON5NAME: ; d2e1
 W_PARTYMON6NAME: ; d2ec
     ds 11
 
-
 SECTION "Pokedex", WRAMX[$d2f7], BANK[1]
 
 DEX_NUM_MON EQU 160
@@ -1085,18 +1084,13 @@ wPokedexOwned: ; d2f7
     ds (DEX_NUM_MON / 8)
 wPokedexOwnedEnd:
 
-SECTION "wArrayMiniSpriteLoaded", WRAMX[$d317], BANK[1]
+SECTION "wNumBagItems", WRAMX[$d317], BANK[1]
 
-wArrayMiniSpriteLoaded: ; d317
-    ds 6
-
-SECTION "wNumBagItems", WRAMX[$d31d], BANK[1]
-
-wNumBagItems: ; d31d
+wNumBagItems: ; d317
     ds 1
-wBagItems: ; d31e
+wBagItems: ; d318
 ; item, quantity
-    ds 20 * 2
+    ds 23 * 2
     ds 1 ; end
 
 ; money is in decimal
@@ -1227,13 +1221,10 @@ ENDU
 
 wChangedBlocksEnd::
 
-wUselessD45F:
-    ds 1
-
-wBackupNearPlayerTiles: ; d460
+wBackupNearPlayerTiles: ; d45f
     ds 20
 
-wEXPBarPixelLength: ; d474
+wEXPBarPixelLength: ; d473
     ds 1
 wEXPBarBaseEXP:
     ds 3
@@ -1244,61 +1235,57 @@ wEXPBarNeededEXP:
 wEXPBarKeepFullFlag:
     ds 1
 
-wDVForShinyAtkDef ; d47f
+wDVForShinyAtkDef ; d47e
     db
-wDVForShinySpdSpc ; d480
+wDVForShinySpdSpc ; d47f
     db
 
 UNION ; 8 Bytes
 
-wTmpMonLearnset: ; d481
+wTmpMonLearnset: ; d480
     ds 8
 
 NEXTU
 
-wTradedPlayerMonIV: ; d481
+wTradedPlayerMonIV: ; d480
     ds 2
-wTradePlayerMonAltForm: ; d483
+wTradePlayerMonAltForm: ; d482
     ds 1
-wTradedEnemyMonIV: ; d484
+wTradedEnemyMonIV: ; d483
     ds 2
-wTradeEnemyMonAltForm: ; d486
+wTradeEnemyMonAltForm: ; d485
     ds 1
 
 NEXTU
 
-wTmpLevel:: db ; d481
+wTmpLevel:: db ; d480
 
 NEXTU
 
-wBackupTypes: ; d481
+wBackupTypes: ; d480
     ds 4
 
-wBackupAIMoveChoice: ; d485
-    ds 4
-
-NEXTU
-
-wTmpAttackerTypes: ; d481
-    ds 4
-wTmpDefenderTypes: ; d485
+wBackupAIMoveChoice: ; d484
     ds 4
 
 NEXTU
 
-wTmpDmgMultiplier: ; d481
+wTmpAttackerTypes: ; d480
+    ds 4
+wTmpDefenderTypes: ; d484
+    ds 4
+
+NEXTU
+
+wTmpDmgMultiplier: ; d480
     ds 2
 
 ENDU
 
-; Free
-
-SECTION "wFlagsGymLeaderAfterHoFWin",WRAMX[$d48e],BANK[1]
+wArrayMiniSpriteLoaded: ; d487
+    ds 6
 
 wFlagsGymLeaderAfterHoFWin:: ds 1 ; d48e
-
-SECTION "GymLeaderRematch",WRAMX[$d48f],BANK[1]
-
 wGymLeaderRematch:: ds 1 ; d48f
 
 SECTION "Pokedex Seen",WRAMX[$d490],BANK[1]
@@ -1307,7 +1294,20 @@ wPokedexSeen: ; d490
     ds (DEX_NUM_MON / 8)
 wPokedexSeenEnd:
 
-SECTION "W_NUMSPRITES", WRAMX[$d4e1], BANK[1]
+; ─────────────────────────────────────
+; TODO in main code
+; ─────────────────────────────────────
+SECTION "Sign",WRAMX[$d4b0],BANK[1]
+wNumSigns:: ; d4b0
+; number of signs in the current map (up to 16)
+	ds 1
+wSignCoords:: ; d4b1
+; 2 bytes each
+; Y, X
+	ds 32
+wSignTextIDs:: ; d4d1
+	ds 16
+; ─────────────────────────────────────
 
 W_NUMSPRITES: ; d4e1
 ; number of sprites on the current map

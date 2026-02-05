@@ -17821,7 +17821,7 @@ PlayerPCDeposit:
     xor a
     ld [wCurrentMenuItem],a ; $cc26
     ld [wListScrollOffset],a ; $cc36
-    ld a,[wNumBagItems] ; $d31d
+    ld a,[wNumBagItems]
     and a
     jr nz,.loop
     ld hl,UnnamedText_7b3b ; $7b3b
@@ -17831,7 +17831,7 @@ PlayerPCDeposit:
 .loop
     ld hl,UnnamedText_7b2c ; $7b2c
     call PrintText
-    ld hl,wNumBagItems ; $d31d
+    ld hl,wNumBagItems
     ld a,l
     ld [$cf8b],a
     ld a,h
@@ -17864,7 +17864,7 @@ PlayerPCDeposit:
     call PrintText
     jr .loop
 .asm_79f8
-    ld hl,wNumBagItems ; $d31d
+    ld hl,wNumBagItems
     call RemoveItemFromInventory
     call WaitForSoundToFinish
     ld a,$ab
@@ -17921,7 +17921,7 @@ PlayerPCWithdraw:
     cp $ff
     jr z,.loop
 .asm_7a64
-    ld hl,wNumBagItems ; $d31d
+    ld hl,wNumBagItems
     call AddItemToInventory
     jr c,.asm_7a75
     ld hl,UnnamedText_7b59 ; $7b59
@@ -22433,7 +22433,7 @@ AddItemToInventory_: ; ce04 (3:4e04)
     cp h
     jr nz,.checkIfInventoryFull
 ; if the destination is the bag
-    ld d,20 ; bag can hold 20 items
+    ld d,23 ; bag can hold 23 items
 .checkIfInventoryFull
     ld a,[hl]
     sub d
@@ -23404,7 +23404,7 @@ ItemUseBall: ; d687 (3:5687)
     ld a,[W_BATTLETYPE]
     and a
     ret nz
-    ld hl,$d31d
+    ld hl,wNumBagItems
     inc a
     ld [$cf96],a
     jp RemoveItemFromInventory    ;remove ITEM (XXX)
@@ -27396,13 +27396,13 @@ InitializePlayerData: ; f850 (3:7850)
     ;ld a,$ff
     ;ld [$d71b],a                 ; XXX what's this?
     ld hl,W_NUMINPARTY ; $d163
-    call InitializeEmptyList      ; no party mons
+    call .InitializeEmptyList      ; no party mons
     ld hl,W_NUMINBOX ; $da80
-    call InitializeEmptyList      ; no boxed mons
-    ld hl,wNumBagItems ; $d31d
-    call InitializeEmptyList      ; no items
+    call .InitializeEmptyList      ; no boxed mons
+    ld hl,wNumBagItems
+    call .InitializeEmptyList      ; no items
     ld hl,wNumBoxItems ; $d53a
-    call InitializeEmptyList      ; no boxed items
+    call .InitializeEmptyList      ; no boxed items
     ld hl,wPlayerMoney + 1 ; $d348
     ld a,$30
     ld [hld],a                   ; set money to 00 30 00 (3000)
@@ -27422,10 +27422,8 @@ InitializePlayerData: ; f850 (3:7850)
     call FillMemory               ; clear all game progress flags
     jp InitializeMissableObjectsFlags_OldAndNew
 
-SECTION "InitializeEmptyList",ROMX[$78a0],BANK[$3]
-
 ; writes two bytes $00 $ff to hl
-InitializeEmptyList: ; f8a0 (3:78a0)
+.InitializeEmptyList
     xor a
     ld [hli],a
     dec a
@@ -32633,7 +32631,7 @@ RemoveItemByID: ; 17f37 (5:7f37)
     ld [$cf96],a
     ld a,[$FF00+$dc]
     ld [wWhichPokemon],a ; $cf92
-    ld hl,wNumBagItems ; $d31d
+    ld hl,wNumBagItems
     jp RemoveItemFromInventory
 
 EmotionBubblesPointerTable:
@@ -38468,7 +38466,7 @@ OaksLabScript_1d00a: ; 1d00a (7:500a)
     inc c
     jr .asm_1d010 ; 0x1d01a $f4
 .GotParcel
-    ld hl,$d31d
+    ld hl,wNumBagItems
     ld a,c
     ld [$cf92],a
     ld a,$1
@@ -49448,7 +49446,7 @@ Func_39bd5: ; 39bd5 (e:5bd5)
 .asm_39c02
     cp $2
     jr nz,.asm_39c10
-    ld hl,wNumBagItems ; $d31d
+    ld hl,wNumBagItems
     ld de,ItemNames ; $472b
     ld a,$4
     jr .asm_39c18
@@ -54209,7 +54207,7 @@ asm_3d00e:
     ld a,[wNumBagItems]
     and a
     jp z,InitBattleMenu
-    ld hl,wNumBagItems ; $d31d
+    ld hl,wNumBagItems
     ld a,l
     ld [$cf8b],a
     ld a,h
@@ -100119,11 +100117,7 @@ ShakeMiniSprite:
     ld [wCurrentMenuItem],a
     ret
 
-; Free
-
-SECTION "PlaceAppropriatePokemonIcon",ROMX[$5868],BANK[$1C]
-
-PlaceAppropriatePokemonIcon: ; 71868 (1c:5868)
+PlaceAppropriatePokemonIcon:
     push hl
     push de
     push bc
@@ -100141,47 +100135,13 @@ PlaceAppropriatePokemonIcon: ; 71868 (1c:5868)
     pop hl
     ret
 
-WriteMonPartySpriteOAMBySpecies: ; 71882 (1c:5882)
+WriteMonPartySpriteOAMBySpecies:
     xor a
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     ld a,[$cd5d]
     call IndexToMiniSpritePointer
     ld [$cd5b],a
-    jr WriteMonPartySpriteOAM
-
-UnusedPartyMonSpriteFunction: ; 71890 (1c:5890)
-    ld a,[$cf91]
-    call IndexToMiniSpritePointer
-    push af
-    ld hl,$8000
-    call Func_718ac
-    pop af
-    add $54
-    ld hl,$8040
-    call Func_718ac
-    xor a
-    ld [$cd5d],a
-    jr WriteMonPartySpriteOAMBySpecies
-
-Func_718ac: ; 718ac (1c:58ac)
-    push hl
-    add a
-    ld c,a
-    ld b,$0
-    call CreateMonOvWorldSprInstruction
-    add hl,bc
-    add hl,bc
-    add hl,bc
-    ld a,[hli]
-    ld e,a
-    ld a,[hli]
-    ld d,a
-    ld a,[hli]
-    ld c,a
-    ld a,[hli]
-    ld b,a
-    pop hl
-    jp CopyVideoData
+    ; fall through
 
 WriteMonPartySpriteOAM:
     push af
@@ -134210,6 +134170,8 @@ SelectInOverWorld:
     ;are rods in the bag?
     ld hl,wNumBagItems
     ld a,[hli]
+    and a
+    jr z,.noFishing
     ld c,a
 .SearchFishingLoop
     ld a,[hli]
