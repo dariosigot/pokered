@@ -119767,20 +119767,21 @@ _PreHM03Text:
     text_cont , "campaign prize."
     text_para , "Congratulations!"
     text_line , "You have won!"
+    text_para , "Now I will teach"
+    text_line , "you how to use"
+    text_cont , "FLOAT SKILL!"
     text_wait
 
 _HM03AfterText:
-    text_init , "This is FLOAT!"
-    text_para , "#MON will be"
-    text_line , "able to support"
-    text_cont , "you across water!"
-    text_para , "And,Skill isn't "
-    text_line , "disposable! You"
-    text_cont , "can use it over"
-    text_cont , "and over!"
-    text_para , "You're super lucky"
-    text_line , "for winning this"
-    text_cont , "fabulous prize!"
+    text_init , "I'll tell you"
+    text_line , "another secret..."
+    text_para , "I know there's a"
+    text_line , "#MON that can"
+    text_cont , "even ferry you"
+    text_cont , "across water!"
+    text_para , "I've been told"
+    text_line , "it's been spotted"
+    text_cont , "around here!"
     text_done
 
 _SafariZoneRestHouse2Text1:
@@ -122473,11 +122474,27 @@ _HM02SkillNotFoundText:
     text_past
 
 _HM03SkillFoundText:
-    text_init , "Found!"
+    text_init , "#MON will be"
+    text_line , "able to support"
+    text_cont , "you across water!"
+    text_para , "This is FLOAT!"
+    text_para , "You're super lucky"
+    text_line , "for winning this"
+    text_cont , "fabulous SKILL!"
     text_past
 
 _HM03SkillNotFoundText:
-    text_init , "NOT Found!"
+    text_init , "Even if you don't"
+    text_line , "have any #MON"
+    text_cont , "that can do it"
+    text_cont , "now, #MON will"
+    text_cont , "be able to"
+    text_cont , "support you"
+    text_cont , "across water!"
+    text_para , "This is FLOAT!"
+    text_para , "You're super lucky"
+    text_line , "for winning this"
+    text_cont , "fabulous SKILL!"
     text_past
 
 _HM04SkillFoundText:
