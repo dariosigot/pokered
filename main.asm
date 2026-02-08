@@ -69290,6 +69290,7 @@ HiddenObjectMaps:
     db ROUTE_4
     db ROUTE_15_GATE_2F
     db HALL_OF_FAME
+    db DAYCAREM
     db $FF
 
 HiddenObjectPointers:
@@ -69374,6 +69375,7 @@ HiddenObjectPointers:
     dw Route4HiddenObjects
     dw Route15GateUpstairsHiddenObjects
     dw HallOfFameRoomHiddenObjects
+    dw DayCareMHiddenObjects
 
 ; Some hidden objects use SPRITE_FACING_* values,
 ; but these do not actually prevent the player
@@ -70058,6 +70060,11 @@ Route15GateUpstairsHiddenObjects:
 HallOfFameRoomHiddenObjects:
     db 01,04,SPRITE_FACING_UP
     dbw BANK(UseHallOfFamePC),UseHallOfFamePC
+    db $FF
+
+DayCareMHiddenObjects:
+    db 01,00,SPRITE_FACING_UP
+    dbw BANK(BillPC),BillPC
     db $FF
 
 ; ────────────────────────────────────────────────────────
@@ -84494,11 +84501,13 @@ Route21Blocks:
 
 VermilionHouse2Blocks:
 Route12HouseBlocks:
-DayCareMBlocks:
-    INCBIN "maps/daycarem.blk"
+    INCBIN "maps/rodhouse.blk"
 
 FuchsiaHouse3Blocks:
     INCBIN "maps/fuchsiahouse3.blk"
+
+DayCareMBlocks:
+    INCBIN "maps/daycarem.blk"
 
 SECTION "bank16",ROMX,BANK[$16]
 
