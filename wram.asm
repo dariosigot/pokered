@@ -1391,6 +1391,7 @@ W_BLUESHOUSECURSCRIPT: ; d5f3
 W_VIRIDIANCITYCURSCRIPT: ; d5f4
     ds 1
 W_MUSEUM2FCURSCRIPT: ; d5f5
+W_GENERICMAPCURSCRIPT ; d5f5
     ds 1
     ds 1
 W_PEWTERCITYCURSCRIPT: ; d5f7
@@ -1972,14 +1973,18 @@ wBackupHealthBarWidth: ; deeb
 
 SECTION "DenimBuffer",WRAMX[$def0],BANK[$1]
 
-DENIM_BUFFER_LENGHT EQU 80 ; Number of Byte
-
-BUFFER_TYPE_EFFECTS_LENGHT EQU 68 ; DENIM_BUFFER_LENGHT - 12
+DENIM_BUFFER_LENGHT EQUS "80" ; Number of Byte
 
 UNION 
 
 wMoveRelearnerMoveList: ; def0
     ds DENIM_BUFFER_LENGHT
+
+NEXTU
+
+wBufferList: ; def0
+    ds DENIM_BUFFER_LENGHT - 1
+    db ; end list
 
 NEXTU
 
@@ -2041,7 +2046,7 @@ wBattleValueCounter: ; def2
 NEXTU
 
 wBufferTypeEffects: ; def0
-    ds BUFFER_TYPE_EFFECTS_LENGHT
+    ds DENIM_BUFFER_LENGHT - 12
 wBufferTypeEffectsEnd:
     db
 

@@ -7020,7 +7020,7 @@ LoadItemList:
     ld [$d128],a
     ld a,l
     ld [$d129],a
-    ld de,$cf7b
+    ld de,wBufferList
 .loop
     ld a,[hli]
     ld [de],a
@@ -7855,17 +7855,6 @@ GetItemName:
     pop bc
     pop hl
     ret
-
-; sets carry if item is HM,clears carry if item is not HM
-; Input: a = item ID
-;IsItemHM:
-;    cp a,HM_01
-;    jr c,.notHM
-;    cp a,TM_01
-;    ret
-;.notHM
-;    and a
-;    ret
 
 GetMoveName:
     push hl
@@ -16160,7 +16149,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld a,$13
     ld [$d125],a
     call DisplayTextBoxID ; draw money text box
-    ld hl,$cf7b
+    ld hl,wBufferList
     ld a,l
     ld [$cf8b],a
     ld a,h
@@ -37758,7 +37747,7 @@ UnnamedText_1c9c1: ; 1c9c1 (7:49c1)
 Func_1c9c6: ; 1c9c6 (7:49c6)
     ld hl,UnnamedText_1ca14 ; $4a14
     call PrintText
-    ld hl,$cf7b
+    ld hl,wBufferList
     ld a,l
     ld [$cf8b],a
     ld a,h
@@ -83083,27 +83072,7 @@ CeladonMart2_h: ; 0x560e9 to 0x560f5 (12 bytes) (id=123)
     db $00 ; connections
     dw CeladonMart2Object ; objects
 
-CeladonMart2Script: ; 560f5 (15:60f5)
-    jp EnableAutoTextBoxDrawing
-
-CeladonMart2TextPointers: ; 560f8 (15:60f8)
-    dw CeladonMart2Text1
-    dw CeladonMart2Text2
-    dw CeladonMart2Text3
-    dw CeladonMart2Text4
-    dw CeladonMart2Text5
-
-CeladonMart2Text3: ; 56102 (15:6102)
-    TX_FAR _CeladonMart2Text3
-    db "@"
-
-CeladonMart2Text4: ; 56107 (15:6107)
-    TX_FAR _CeladonMart2Text4
-    db "@"
-
-CeladonMart2Text5: ; 5610c (15:610c)
-    TX_FAR _CeladonMart2Text5
-    db "@"
+SECTION "CeladonMart2Object",ROMX[$6111],BANK[$15]
 
 CeladonMart2Object: ; 0x56111 (size=55)
     db $f ; border tile
@@ -84446,22 +84415,127 @@ CheckReachLevelLimit:
 
 ; ────────────────────────
 
+CeladonMart2Script:
+    jp EnableAutoTextBoxDrawing
+
+CeladonMart2TextPointers:
+    dw CeladonMart2Text1
+    dw CeladonMart2Text2
+    dw CeladonMart2Text3
+    dw CeladonMart2Text4
+    dw CeladonMart2Text5
+    dw CeladonMart2Text2_BeforeWinHoF
+    dw CeladonMart2Text2_AfterWinHoF
+
+CeladonMart2Text3:
+    TX_FAR _CeladonMart2Text3
+    db "@"
+
+CeladonMart2Text4:
+    TX_FAR _CeladonMart2Text4
+    db "@"
+
+CeladonMart2Text5:
+    TX_FAR _CeladonMart2Text5
+    db "@"
+
 ; Celadon Dept. Store 2F (2)
 CeladonMart2Text2:
-    db $FE,13
+    db $08 ; asm
+    ld hl,$cf0c ; skipDrawingTextBoxBorder
+    set 0,[hl]    ; ...
+    ld a,6 ; CeladonMart2Text2_BeforeWinHoF
+    call CheckHallOfFameWin
+    jr z,.done
+    ld a,7 ; CeladonMart2Text2_AfterWinHoF
+.done
+    ld [$ff00+$8c],a
+    call DisplayTextID
+    call DisableWaitingAfterTextDisplay
+    jp TextScriptEnd
+
+CeladonMart2Text2_BeforeWinHoF:
+    db $FE,16
     db TM_01 ; MEGA_PUNCH
     db TM_02 ; RAZOR_WIND
     db TM_04 ; WHIRLWIND
-    db TM_05 ; MEGA_KICK
-    db TM_07 ; HORN_DRILL
     db TM_09 ; TAKE_DOWN
     db TM_10 ; DOUBLE_EDGE
     db TM_12 ; WATER_GUN
-    db TM_17 ; SUBMISSION
     db TM_30 ; TELEPORT
     db TM_32 ; DOUBLE_TEAM
     db TM_33 ; REFLECT
+    db TM_40 ; SKULL_BASH
     db TM_41 ; LIGHT_SCREEN
+    db TM_44 ; REST
+    db TM_45 ; THUNDER_WAVE
+    db TM_51 ; BLADE
+    db TM_52 ; SWOOP
+    db TM_54 ; STRIKE
+    db $FF
+
+CeladonMart2Text2_AfterWinHoF:
+    db $FE,60
+    db TM_01 ; MEGA_PUNCH
+    db TM_02 ; RAZOR_WIND
+    db TM_03 ; SWORDS_DANCE
+    db TM_04 ; WHIRLWIND
+    db TM_05 ; MEGA_KICK
+    db TM_06 ; TOXIC
+    db TM_07 ; HORN_DRILL
+    db TM_08 ; BODY_SLAM
+    db TM_09 ; TAKE_DOWN
+    db TM_10 ; DOUBLE_EDGE
+    db TM_11 ; BUBBLEBEAM
+    db TM_12 ; WATER_GUN
+    db TM_13 ; ICE_BEAM
+    db TM_14 ; BLIZZARD
+    db TM_15 ; HYPER_BEAM
+    db TM_16 ; PAY_DAY
+    db TM_17 ; SUBMISSION
+    db TM_18 ; COUNTER
+    db TM_19 ; SEISMIC_TOSS
+    db TM_20 ; RAGE
+    db TM_21 ; MEGA_DRAIN
+    db TM_22 ; SOLARBEAM
+    db TM_23 ; DRAGON_RAGE
+    db TM_24 ; THUNDERBOLT
+    db TM_25 ; THUNDER_M
+    db TM_26 ; EARTHQUAKE
+    db TM_27 ; FISSURE
+    db TM_28 ; TRAPHOLE
+    db TM_29 ; PSYCHIC_M
+    db TM_30 ; TELEPORT
+    db TM_31 ; MIMIC
+    db TM_32 ; DOUBLE_TEAM
+    db TM_33 ; REFLECT
+    db TM_34 ; BIDE
+    db TM_35 ; METRONOME
+    db TM_36 ; SELFDESTRUCT
+    db TM_37 ; FLAMETHROWER
+    db TM_38 ; FIRE_BLAST
+    db TM_39 ; SWIFT
+    db TM_40 ; SKULL_BASH
+    db TM_41 ; LIGHT_SCREEN
+    db TM_42 ; DREAM_EATER
+    db TM_43 ; SKY_ATTACK
+    db TM_44 ; REST
+    db TM_45 ; THUNDER_WAVE
+    db TM_46 ; PSYWAVE
+    db TM_47 ; EXPLOSION
+    db TM_48 ; ROCK_SLIDE
+    db TM_49 ; TRI_ATTACK
+    db TM_50 ; SUBSTITUTE
+    db TM_51 ; BLADE
+    db TM_52 ; SWOOP
+    db TM_53 ; TSUNAMI
+    db TM_54 ; STRIKE
+    db TM_55 ; FLASH
+    db TM_56 ; SLUDGE
+    db TM_57 ; FIRE_PUNCH
+    db TM_58 ; ICE_PUNCH
+    db TM_59 ; THUNDERPUNCH
+    db TM_60 ; DIZZY_PUNCH
     db $FF
 
 ; ────────────────────────
@@ -104851,7 +104925,7 @@ CeruleanHouse2Text1: ; 74e15 (1d:4e15)
 .asm_74e23
     ld hl,BadgeIdList
     call LoadItemList
-    ld hl,$cf7b
+    ld hl,wBufferList
     ld a,l
     ld [$cf8b],a
     ld a,h
@@ -111771,6 +111845,86 @@ RoarAnim:
 GetAttackAnimationPointers:
     PREDEF_JUMP GetAttackAnimationPointers_
 
+GetMachinePrice:
+    ld a,[$cf91]
+    sub TM_01 - 1
+    ld hl,.TechnicalMachinePrices
+    ld bc,3
+.loop
+    add hl,bc
+    dec a
+    jr nz,.loop
+    dec hl
+    ld a,[hld]
+    ld [$FF00+$8d],a
+    ld a,[hld]
+    ld [$FF00+$8c],a
+    ld a,[hl]
+    ld [$FF00+$8b],a
+    ret
+
+.TechnicalMachinePrices
+    bcd3   3000 ; TM_01 ; MEGA_PUNCH
+    bcd3   2000 ; TM_02 ; RAZOR_WIND
+    bcd3  15000 ; TM_03 ; SWORDS_DANCE
+    bcd3   1000 ; TM_04 ; WHIRLWIND
+    bcd3   6000 ; TM_05 ; MEGA_KICK
+    bcd3  20000 ; TM_06 ; TOXIC
+    bcd3  10000 ; TM_07 ; HORN_DRILL
+    bcd3  15000 ; TM_08 ; BODY_SLAM
+    bcd3   3000 ; TM_09 ; TAKE_DOWN
+    bcd3   4000 ; TM_10 ; DOUBLE_EDGE
+    bcd3  20000 ; TM_11 ; BUBBLEBEAM
+    bcd3   1000 ; TM_12 ; WATER_GUN
+    bcd3  20000 ; TM_13 ; ICE_BEAM
+    bcd3  30000 ; TM_14 ; BLIZZARD
+    bcd3  50000 ; TM_15 ; HYPER_BEAM
+    bcd3  20000 ; TM_16 ; PAY_DAY
+    bcd3   5000 ; TM_17 ; SUBMISSION
+    bcd3   4000 ; TM_18 ; COUNTER
+    bcd3   3000 ; TM_19 ; SEISMIC_TOSS
+    bcd3   2000 ; TM_20 ; RAGE
+    bcd3  20000 ; TM_21 ; MEGA_DRAIN
+    bcd3  30000 ; TM_22 ; SOLARBEAM
+    bcd3   5000 ; TM_23 ; DRAGON_RAGE
+    bcd3  20000 ; TM_24 ; THUNDERBOLT
+    bcd3  30000 ; TM_25 ; THUNDER_M
+    bcd3  30000 ; TM_26 ; EARTHQUAKE
+    bcd3  20000 ; TM_27 ; FISSURE
+    bcd3   5000 ; TM_28 ; TRAPHOLE
+    bcd3  20000 ; TM_29 ; PSYCHIC_M
+    bcd3   1000 ; TM_30 ; TELEPORT
+    bcd3   5000 ; TM_31 ; MIMIC
+    bcd3   1000 ; TM_32 ; DOUBLE_TEAM
+    bcd3   1000 ; TM_33 ; REFLECT
+    bcd3  20000 ; TM_34 ; BIDE
+    bcd3   6000 ; TM_35 ; METRONOME
+    bcd3   8000 ; TM_36 ; SELFDESTRUCT
+    bcd3  20000 ; TM_37 ; FLAMETHROWER
+    bcd3  30000 ; TM_38 ; FIRE_BLAST
+    bcd3   4000 ; TM_39 ; SWIFT
+    bcd3   2000 ; TM_40 ; SKULL_BASH
+    bcd3   1000 ; TM_41 ; LIGHT_SCREEN
+    bcd3   4000 ; TM_42 ; DREAM_EATER
+    bcd3  30000 ; TM_43 ; SKY_ATTACK
+    bcd3  20000 ; TM_44 ; REST
+    bcd3   8000 ; TM_45 ; THUNDER_WAVE
+    bcd3   1000 ; TM_46 ; PSYWAVE
+    bcd3  30000 ; TM_47 ; EXPLOSION
+    bcd3  30000 ; TM_48 ; ROCK_SLIDE
+    bcd3  20000 ; TM_49 ; TRI_ATTACK
+    bcd3  65000 ; TM_50 ; SUBSTITUTE
+    bcd3   3000 ; TM_51 ; BLADE
+    bcd3  10000 ; TM_52 ; SWOOP
+    bcd3  20000 ; TM_53 ; TSUNAMI
+    bcd3   4000 ; TM_54 ; STRIKE
+    bcd3   2000 ; TM_55 ; FLASH
+    bcd3  30000 ; TM_56 ; SLUDGE
+    bcd3  20000 ; TM_57 ; FIRE_PUNCH
+    bcd3  20000 ; TM_58 ; ICE_PUNCH
+    bcd3  20000 ; TM_59 ; THUNDERPUNCH
+    bcd3  20000 ; TM_60 ; DIZZY_PUNCH
+
 ; Free
 
 ; each animation is a list of subanimations and special effects
@@ -115413,37 +115567,6 @@ Func_7bf64: ; 7bf64 (1e:7f64)
     pop af
     ld [hl],a
     jp Delay3
-
-GetMachinePrice: ; 7bf86 (1e:7f86)
-    ld a,[$cf91]
-    sub TM_01
-    ret c
-    ld d,a
-    ld hl,TechnicalMachinePrices ; $7fa7
-    srl a
-    ld c,a
-    ld b,0
-    add hl,bc
-    ld a,[hl]
-    srl d
-    jr nc,.asm_7bf9d
-    swap a
-.asm_7bf9d
-    and $f0
-    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    xor a
-    ld [H_DOWNARROWBLINKCNT1],a ; $FF00+$8b
-    ld [$FF00+$8d],a
-    ret
-
-TechnicalMachinePrices: ; 7bfa7 (1e:7fa7)
-; In thousands (nybbles).
-    db $32,$21,$34,$24,$34
-    db $21,$45,$55,$32,$32
-    db $55,$52,$54,$52,$41
-    db $21,$12,$42,$45,$24
-    db $22,$52,$24,$34,$42
-    db $24,$43
 
 CheckShinyDuringEvolution: ; DONE:Palette
     push af
