@@ -10475,9 +10475,8 @@ GoPAL_SET_CF1C: ; 3ded (0:3ded)
 GoPAL_SET: ; 3def (0:3def)
     ld a,[wRunningOnSGB]
     and a
-    ret z
-    call DelayAndProcessSGBPacket
-    ret ; (only for Debug)
+    jp z,Delay3
+    jp DelayAndProcessSGBPacket
 
 SECTION "GetHealthBarColor",ROM0[$3df9]
 
