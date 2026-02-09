@@ -1883,8 +1883,10 @@ wTestEvoDuringBattleBit3   ; dee2 ; bit 3 = Enable to Test at least one evolutio
 wOverworldGoToDarkBit4     ; dee2 ; bit 4 = Force Overworld "CheckDarkMap"
 wFlagBackSpritePlayerBit4  ; dee2 ; bit 4
 wForceSortPartyWSelectBit4 ; dee2 ; bit 4 = Select Pressed Force Sort Party
+wDisableAutoRedrawMapBit5  ; dee2 ; bit 5 = Disable Auto call of "RedrawMapView" after run "ReplaceTileBlock"
 wFlagBackFrontSpriteBit56  ; dee2 ; bit 5
                            ; dee2 ; bit 6
+wMustRedrawMapBlockBit6    ; dee2 ; bit 6 = Indicate that must "RedrawMapView" after run "ReplaceTileBlock"
 wFlagFlashingHealBallBit7  ; dee2 ; bit 7
 wSpriteOAMBySpeciesBit7    ; dee2 ; bit 7 = Flag Single Mon ID Sprite
 wFlagBattleCureBit7        ; dee2 ; bit 7 = Print "Cure" intead of damage

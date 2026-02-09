@@ -25986,6 +25986,11 @@ DrawBadges:
 GymLeaderFaceAndBadgeTileGraphics:
     INCBIN "gfx/badges.2bpp"
 
+ReplaceTileBlockNoRedraw:
+    ld hl,wDisableAutoRedrawMapBit5
+    set 5,[hl]
+    ; fall through
+
 ; replaces a tile block with the one specified in [$d09f] ; NewTileBlockID
 ; and redraws the map view if necessary
 ; b = Y
@@ -26035,6 +26040,19 @@ ReplaceTileBlock:
     pop bc
     call CompareHLWithBC
     ret c ; return if the replaced tile block is above the map view in memory
+    ld hl,wDisableAutoRedrawMapBit5 ; wMustRedrawMapBlockBit6
+    bit 5,[hl]
+    res 5,[hl]
+    jr z,RedrawMapView
+    set 6,[hl]
+    ret
+
+TryToRedrawMapView:
+    ld hl,wMustRedrawMapBlockBit6
+    bit 6,[hl]
+    res 6,[hl]
+    ret z
+    ; fall through
 
 RedrawMapView:
     ld a,[W_ISINBATTLE] ; $d057
@@ -35255,7 +35273,7 @@ SilphCo4_h: ; 0x19cff to 0x19d0b (12 bytes) (bank=6) (id=209)
     dw SilphCo4Object ; objects
 
 SilphCo4Script: ; 19d0b (6:5d0b)
-    call SilphCo4Script_19d21
+    call SilphCo4Script_19d21_OneDraw
     call EnableAutoTextBoxDrawing
     ld hl,SilphCo4TrainerHeaders
     ld de,SilphCo4ScriptPointers
@@ -35264,12 +35282,14 @@ SilphCo4Script: ; 19d0b (6:5d0b)
     ld [W_SILPHCO4CURSCRIPT],a
     ret
 
+    ds 2
+
 SilphCo4Script_19d21: ; 19d21 (6:5d21)
-    ld hl,$d126
-    bit 5,[hl]
-    res 5,[hl]
-    ret z
-    ld hl,SilphCo4Data19d58
+;    ld hl,$d126
+;    bit 5,[hl]
+;    res 5,[hl]
+;    ret z
+    ld hl,.SilphCo4Data19d58
     call SilphCo4Script_19d5d
     call SilphCo4Script_19d89
     ld a,[$d82a]
@@ -35279,17 +35299,19 @@ SilphCo4Script_19d21: ; 19d21 (6:5d21)
     ld a,$54
     ld [$d09f],a
     ld bc,$0602
-    PREDEF ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
     pop af
 .asm_19d48
     bit 1,a
-    ret nz
+    jr nz,.end
     ld a,$54
     ld [$d09f],a
     ld bc,$0406
-    PREDEF_JUMP ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
+.end
+    PREDEF_JUMP TryToRedrawMapView
 
-SilphCo4Data19d58: ; 19d58 (6:5d58)
+.SilphCo4Data19d58
     db $06,$02,$04,$06,$ff
 
 SilphCo4Script_19d5d: ; 19d5d (6:5d5d)
@@ -35497,7 +35519,7 @@ SilphCo5_h: ; 0x19f2b to 0x19f37 (12 bytes) (bank=6) (id=210)
     dw SilphCo5Object ; objects
 
 SilphCo5Script: ; 19f37 (6:5f37)
-    call SilphCo5Script_19f4d
+    call SilphCo5Script_19f4d_OneDraw
     call EnableAutoTextBoxDrawing
     ld hl,SilphCo5TrainerHeaders
     ld de,SilphCo5ScriptPointers
@@ -35506,12 +35528,14 @@ SilphCo5Script: ; 19f37 (6:5f37)
     ld [W_SILPHCO5CURSCRIPT],a
     ret
 
-SilphCo5Script_19f4d: ; 19f4d (6:5f4d)
-    ld hl,$d126
-    bit 5,[hl]
-    res 5,[hl]
-    ret z
-    ld hl,SilphCo5Coords
+    ds 2
+
+SilphCo5Script_19f4d:
+;    ld hl,$d126
+;    bit 5,[hl]
+;    res 5,[hl]
+;    ret z
+    ld hl,.SilphCo5Coords
     call SilphCo4Script_19d5d
     call SilphCo5Script_19f9e
     ld a,[$d82c]
@@ -35521,7 +35545,7 @@ SilphCo5Script_19f4d: ; 19f4d (6:5f4d)
     ld a,$5f
     ld [$d09f],a
     ld bc,$0203
-    PREDEF ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
     pop af
 .asm_19f74
     bit 1,a
@@ -35530,17 +35554,19 @@ SilphCo5Script_19f4d: ; 19f4d (6:5f4d)
     ld a,$5f
     ld [$d09f],a
     ld bc,$0603
-    PREDEF ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
     pop af
 .asm_19f87
     bit 2,a
-    ret nz
+    jr nz,.end
     ld a,$5f
     ld [$d09f],a
     ld bc,$0507
-    PREDEF_JUMP ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
+.end
+    PREDEF_JUMP TryToRedrawMapView
 
-SilphCo5Coords: ; 19f97 (6:5f97) ; coords?
+.SilphCo5Coords ; coords?
     db $02,$03,$06,$03,$05,$07,$ff
 
 SilphCo5Script_19f9e: ; 19f9e (6:5f9e)
@@ -37094,6 +37120,20 @@ FuchsiaCityText3:
     ld c,20
     jp DelayFrames
 
+SilphCo4Script_19d21_OneDraw:
+    ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    ret z
+    jp SilphCo4Script_19d21
+
+SilphCo5Script_19f4d_OneDraw:
+    ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    ret z
+    jp SilphCo5Script_19f4d
+
 SECTION "bank7",ROMX,BANK[$7]
 
 CinnabarIsland_h: ; 0x1c000 to 0x1c022 (34 bytes) (bank=7) (id=8)
@@ -37333,7 +37373,7 @@ CinnabarGymProcessAllGate:
     pop de
     ret
 
-.RedrawMapView:
+.RedrawMapView
     call RestoreChangedBlocks
     PREDEF_JUMP RedrawMapView
 
@@ -65623,7 +65663,7 @@ Mansion1_h: ; 0x442a3 to 0x442af (12 bytes) (bank=11) (id=165)
     dw Mansion1Object ; objects
 
 Mansion1Script: ; 442af (11:42af)
-    call Mansion1Subscript1
+    call Mansion1Subscript1_OneDraw
     call EnableAutoTextBoxDrawing
     ld hl,Mansion1TrainerHeaders
     ld de,Mansion1ScriptPointers
@@ -65632,43 +65672,47 @@ Mansion1Script: ; 442af (11:42af)
     ld [W_MANSION1CURSCRIPT],a
     ret
 
+    ds 2
+
 Mansion1Subscript1: ; 442c5 (11:42c5)
-    ld hl,$d126
-    bit 5,[hl]
-    res 5,[hl]
-    ret z
+;    ld hl,$d126
+;    bit 5,[hl]
+;    res 5,[hl]
+;    ret z
     ld a,[$d796]
     bit 0,a
     jr nz,.asm_442ec ; 0x442d2 $18
     ld bc,$060c
-    call Func_4430b
+    call .Func_4430b
     ld bc,$0308
-    call Func_44304
+    call .Func_44304
     ld bc,$080a
-    call Func_44304
+    call .Func_44304
     ld bc,$0d0d
-    jp Func_44304
+    call .Func_44304
+    jr .end
 .asm_442ec
     ld bc,$060c
-    call Func_44304
+    call .Func_44304
     ld bc,$0308
-    call Func_4430b
+    call .Func_4430b
     ld bc,$080a
-    call Func_4430b
+    call .Func_4430b
     ld bc,$0d0d
-    jp Func_4430b
+    call .Func_4430b
+.end
+    PREDEF_JUMP TryToRedrawMapView
 
-Func_44304: ; 44304 (11:4304)
+.Func_44304
     ld a,$2d
     ld [$d09f],a
-    jr asm_44310
+    jr .asm_44310
 
-Func_4430b: ; 4430b (11:430b)
+.Func_4430b
     ld a,$e
     ld [$d09f],a
-asm_44310: ; 44310 (11:4310)
-    PREDEF ReplaceTileBlock
-    ret
+.asm_44310
+    PREDEF_JUMP ReplaceTileBlockNoRedraw
 
 Mansion1Script_Switches: ; 44316 (11:4316)
     ld a,[$c109]
@@ -70779,6 +70823,15 @@ SafariZoneRestHouse1Script:
 .done
     jp EnableAutoTextBoxDrawing
     db $80,$FF
+
+; ───────────────────────────────────────
+
+Mansion1Subscript1_OneDraw:
+    ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    ret z
+    jp Mansion1Subscript1
 
 ; ───────────────────────────────────────
 
@@ -77867,7 +77920,7 @@ SilphCo7_h: ; 0x51b55 to 0x51b61 (12 bytes) (id=212)
     dw SilphCo7Object ; objects
 
 SilphCo7Script: ; 51b61 (14:5b61)
-    call SilphCo7Script_51b77
+    call SilphCo7Script_51b77_OneDraw
     call EnableAutoTextBoxDrawing
     ld hl,SilphCo7TrainerHeaders
     ld de,SilphCo7ScriptPointers
@@ -77876,12 +77929,14 @@ SilphCo7Script: ; 51b61 (14:5b61)
     ld [W_SILPHCO7CURSCRIPT],a
     ret
 
+    ds 2
+
 SilphCo7Script_51b77: ; 51b77 (14:5b77)
-    ld hl,$d126
-    bit 5,[hl]
-    res 5,[hl]
-    ret z
-    ld hl,DataTable_51bc1 ; $5bc1
+;    ld hl,$d126
+;    bit 5,[hl]
+;    res 5,[hl]
+;    ret z
+    ld hl,.DataTable_51bc1
     call Func_51bc8
     call Func_51bf4
     ld a,[$d830]
@@ -77891,7 +77946,7 @@ SilphCo7Script_51b77: ; 51b77 (14:5b77)
     ld a,$54
     ld [$d09f],a
     ld bc,$305
-    PREDEF ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
     pop af
 .asm_51b9e
     bit 5,a
@@ -77900,17 +77955,19 @@ SilphCo7Script_51b77: ; 51b77 (14:5b77)
     ld a,$54
     ld [$d09f],a
     ld bc,$20a
-    PREDEF ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
     pop af
 .asm_51bb1
     bit 6,a
-    ret nz
+    jr nz,.end
     ld a,$54
     ld [$d09f],a
     ld bc,$60a
-    PREDEF_JUMP ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
+.end
+    PREDEF_JUMP TryToRedrawMapView
 
-DataTable_51bc1: ; 51bc1 (14:5bc1)
+.DataTable_51bc1
     db $03,$05,$02,$0A,$06,$0A,$FF
 
 Func_51bc8: ; 51bc8 (14:5bc8)
@@ -78386,7 +78443,7 @@ Mansion2_h: ; 0x51fcc to 0x51fd8 (12 bytes) (id=214)
     dw Mansion2Object ; objects
 
 Mansion2Script: ; 51fd8 (14:5fd8)
-    call Mansion2Script_51fee
+    call Mansion2Script_51fee_OneDraw
     call EnableAutoTextBoxDrawing
     ld hl,Mansion2TrainerHeaders
     ld de,Mansion2ScriptPointers
@@ -78395,39 +78452,42 @@ Mansion2Script: ; 51fd8 (14:5fd8)
     ld [W_MANSION2CURSCRIPT],a
     ret
 
+    ds 3
+
 Mansion2Script_51fee: ; 51fee (14:5fee)
-    ld hl,$d126
-    bit 5,[hl]
-    res 5,[hl]
-    ret z
+;    ld hl,$d126
+;    bit 5,[hl]
+;    res 5,[hl]
+;    ret z
     ld a,[$d796]
     bit 0,a
     jr nz,.asm_52016
     ld a,$e
     ld bc,$204
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$54
     ld bc,$409
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$5f
     ld bc,$b03
-    call Func_5202f
-    ret
+    call ReplaceBlock_Bank14
+    jr .end
 .asm_52016
     ld a,$5f
     ld bc,$204
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$e
     ld bc,$409
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$e
     ld bc,$b03
-    call Func_5202f
-    ret
+    call ReplaceBlock_Bank14
+.end
+    PREDEF_JUMP TryToRedrawMapView
 
-Func_5202f: ; 5202f (14:602f)
+ReplaceBlock_Bank14: ; 5202f (14:602f)
     ld [$d09f],a
-    PREDEF_JUMP ReplaceTileBlock
+    PREDEF_JUMP ReplaceTileBlockNoRedraw
 
 Mansion2Script_Switches: ; 52037 (14:6037)
     ld a,[$c109]
@@ -78546,7 +78606,7 @@ Mansion3_h: ; 0x521e2 to 0x521ee (12 bytes) (id=215)
     dw Mansion3Object ; objects
 
 Mansion3Script: ; 521ee (14:61ee)
-    call Mansion3Script_52204
+    call Mansion3Script_52204_OneDraw
     call EnableAutoTextBoxDrawing
     ld hl,Mansion3TrainerHeader0
     ld de,Mansion3ScriptPointers
@@ -78555,29 +78615,32 @@ Mansion3Script: ; 521ee (14:61ee)
     ld [W_MANSION3CURSCRIPT],a
     ret
 
+    ds 3
+
 Mansion3Script_52204: ; 52204 (14:6204)
-    ld hl,$d126
-    bit 5,[hl]
-    res 5,[hl]
-    ret z
+;    ld hl,$d126
+;    bit 5,[hl]
+;    res 5,[hl]
+;    ret z
     ld a,[$d796]
     bit 0,a
     jr nz,.asm_52224
     ld a,$e
     ld bc,$207
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$5f
     ld bc,$507
-    call Func_5202f
-    ret
+    call ReplaceBlock_Bank14
+    jr .end
 .asm_52224
     ld a,$5f
     ld bc,$207
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$e
     ld bc,$507
-    call Func_5202f
-    ret
+    call ReplaceBlock_Bank14
+.end
+    PREDEF_JUMP TryToRedrawMapView
 
 Mansion3ScriptPointers: ; 52235 (14:6235)
     dw Mansion3Script0
@@ -78732,7 +78795,7 @@ Mansion4_h: ; 0x523ad to 0x523b9 (12 bytes) (id=216)
     dw Mansion4Object ; objects
 
 Mansion4Script: ; 523b9 (14:63b9)
-    call Mansion4Script_523cf
+    call Mansion4Script_523cf_OneDraw
     call EnableAutoTextBoxDrawing
     ld hl,Mansion4TrainerHeader0
     ld de,Mansion4ScriptPointers
@@ -78741,41 +78804,44 @@ Mansion4Script: ; 523b9 (14:63b9)
     ld [W_MANSION4CURSCRIPT],a
     ret
 
+    ds 3
+
 Mansion4Script_523cf: ; 523cf (14:63cf)
-    ld hl,$d126
-    bit 5,[hl]
-    res 5,[hl]
-    ret z
+;    ld hl,$d126
+;    bit 5,[hl]
+;    res 5,[hl]
+;    ret z
     ld a,[$d796]
     bit 0,a
     jr nz,.asm_523ff
     ld a,$e
     ld bc,$80d
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$e
     ld bc,$b06
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$5f
     ld bc,$304
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$54
     ld bc,$808
-    call Func_5202f
-    ret
+    call ReplaceBlock_Bank14
+    jr .end
 .asm_523ff
     ld a,$2d
     ld bc,$80d
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$5f
     ld bc,$b06
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$e
     ld bc,$304
-    call Func_5202f
+    call ReplaceBlock_Bank14
     ld a,$e
     ld bc,$808
-    call Func_5202f
-    ret
+    call ReplaceBlock_Bank14
+.end
+    PREDEF_JUMP TryToRedrawMapView
 
 Mansion4Script_Switches: ; 52420 (14:6420)
     ld a,[$c109]
@@ -79002,7 +79068,7 @@ PrintCardKeyText: ; 52673 (14:6673)
     cp $5e
     ret nz
 .asm_5269c
-    ld b,$30
+    ld b,CARD_KEY
     call IsItemInBag
     jr z,.asm_526dc
     call Func_526fd
@@ -80048,6 +80114,34 @@ Route24AfterBattleText1:
 .HM06AfterText
     TX_FAR _Route24AfterBattleText1
     db "@"
+
+SilphCo7Script_51b77_OneDraw:
+    ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    ret z
+    jp SilphCo7Script_51b77
+
+Mansion2Script_51fee_OneDraw:
+    ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    ret z
+    jp Mansion2Script_51fee
+
+Mansion3Script_52204_OneDraw:
+    ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    ret z
+    jp Mansion3Script_52204
+
+Mansion4Script_523cf_OneDraw:
+    ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    ret z
+    jp Mansion4Script_523cf
 
 SECTION "bank15",ROMX,BANK[$15]
 
@@ -83506,7 +83600,7 @@ SilphCo8Script_5651a: ; 5651a (15:651a)
     bit 5,[hl]
     res 5,[hl]
     ret z
-    ld hl,DataTable_5653e ; $653e
+    ld hl,.DataTable_5653e
     call Func_56541
     call Func_5656d
     ld a,[$d832]
@@ -83517,7 +83611,7 @@ SilphCo8Script_5651a: ; 5651a (15:651a)
     ld bc,$403
     PREDEF_JUMP ReplaceTileBlock
 
-DataTable_5653e: ; 5653e (15:653e)
+.DataTable_5653e ; 5653e (15:653e)
     db $04,$03,$FF
 
 Func_56541: ; 56541 (15:6541)
@@ -87469,7 +87563,7 @@ SilphCo2_h: ; 0x59ce5 to 0x59cf1 (12 bytes) (id=207)
     dw SilphCo2Object ; objects
 
 SilphCo2Script: ; 59cf1 (16:5cf1)
-    call SilphCo2Script_59d07
+    call SilphCo2Script_59d07_OneDraw
     call EnableAutoTextBoxDrawing
     ld hl,SilphCo2TrainerHeaders
     ld de,SilphCo2ScriptPointers
@@ -87478,12 +87572,14 @@ SilphCo2Script: ; 59cf1 (16:5cf1)
     ld [W_SILPHCO2CURSCRIPT],a
     ret
 
+    ds 2
+
 SilphCo2Script_59d07: ; 59d07 (16:5d07)
-    ld hl,$d126
-    bit 5,[hl]
-    res 5,[hl]
-    ret z
-    ld hl,DataTable_59d3e
+;    ld hl,$d126
+;    bit 5,[hl]
+;    res 5,[hl]
+;    ret z
+    ld hl,.DataTable_59d3e
     call Func_59d43
     call Func_59d6f
     ld a,[$d826]
@@ -87493,17 +87589,19 @@ SilphCo2Script_59d07: ; 59d07 (16:5d07)
     ld a,$54
     ld [$d09f],a
     ld bc,$0202
-    PREDEF ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
     pop af
 .asm_59d2e
     bit 6,a
-    ret nz
+    jr nz,.end
     ld a,$54
     ld [$d09f],a
     ld bc,$0502
-    PREDEF_JUMP ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
+.end
+    PREDEF_JUMP TryToRedrawMapView
 
-DataTable_59d3e: ; 59d3e (16:5d3e)
+.DataTable_59d3e
     db $02,$02,$05,$02,$FF
 
 Func_59d43: ; 59d43 (16:5d43)
@@ -87756,7 +87854,7 @@ SilphCo3_h: ; 0x59f4f to 0x59f5b (12 bytes) (id=208)
     dw SilphCo3Object ; objects
 
 SilphCo3Script: ; 59f5b (16:5f5b)
-    call SilphCo3Script_59f71
+    call SilphCo3Script_59f71_OneDraw
     call EnableAutoTextBoxDrawing
     ld hl,SilphCo3TrainerHeaders
     ld de,SilphCo3ScriptPointers
@@ -87765,12 +87863,14 @@ SilphCo3Script: ; 59f5b (16:5f5b)
     ld [W_SILPHCO3CURSCRIPT],a
     ret
 
+    ds 2
+
 SilphCo3Script_59f71: ; 59f71 (16:5f71)
-    ld hl,$d126
-    bit 5,[hl]
-    res 5,[hl]
-    ret z
-    ld hl,DataTable_59fa8 ; $5fa8
+;    ld hl,$d126
+;    bit 5,[hl]
+;    res 5,[hl]
+;    ret z
+    ld hl,.DataTable_59fa8
     call Func_59d43
     call Func_59fad
     ld a,[$d828]
@@ -87780,17 +87880,19 @@ SilphCo3Script_59f71: ; 59f71 (16:5f71)
     ld a,$5f
     ld [$d09f],a
     ld bc,$404
-    PREDEF ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
     pop af
 .asm_59f98
     bit 1,a
-    ret nz
+    jr nz,.end
     ld a,$5f
     ld [$d09f],a
     ld bc,$408
-    PREDEF_JUMP ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
+.end
+    PREDEF_JUMP TryToRedrawMapView
 
-DataTable_59fa8: ; 59fa8 (16:5fa8)
+.DataTable_59fa8
     db $04,$04,$04,$08,$FF
 
 Func_59fad: ; 59fad (16:5fad)
@@ -88126,34 +88228,6 @@ LanceScript_5a2c4:
 .skip
     jp HallOfFame_ReplaceTileBlock_Bank16
 
-;LanceScript_5a2c4: ; 5a2c4 (16:62c4)
-;    ld hl,$d126
-;    bit 5,[hl]
-;    res 5,[hl]
-;    ret z
-;    ld a,[$d866]
-;    bit 7,a
-;    jr nz,.asm_5a2da
-;    ld a,$31
-;    ld b,$32
-;    jp Func_5a2de
-;.asm_5a2da
-;    ld a,$72
-;    ld b,$73
-
-;Func_5a2de: ; 5a2de (16:62de)
-;    push bc
-;    ld [$d09f],a
-;    ld bc,$602
-;    call Func_5a2f0
-;    pop bc
-;    ld a,b
-;    ld [$d09f],a
-;    ld bc,$603
-
-;Func_5a2f0: ; 5a2f0 (16:62f0)
-;    PREDEF_JUMP ReplaceTileBlock
-
 SECTION "Func_5a2f5",ROMX[$62f5],BANK[$16]
 
 Func_5a2f5:
@@ -88168,42 +88242,6 @@ LanceScriptPointers:
     dw LanceScript3
     dw Nope
 
-;LanceScript0: ; 5a305 (16:6305)
-;    ld a,[$d866]
-;    bit 1,a
-;    ret nz
-;    ld hl,CoordsData_5a33e
-;    call ArePlayerCoordsInArray
-;    jp nc,CheckFightingMapTrainers
-;    xor a
-;    ld [H_CURRENTPRESSEDBUTTONS],a
-;    ld a,[wWhichTrade] ; $cd3d
-;    cp $3
-;    jr nc,.asm_5a325
-;    ld a,$1
-;    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-;    jp DisplayTextID
-;.asm_5a325
-;    cp $5
-;    jr z,Func_5a35b
-;    ld hl,$d866
-;    bit 7,[hl]
-;    set 7,[hl]
-;    ret nz
-;    ld hl,$d126
-;    set 5,[hl]
-;    ld a,$ad
-;    call PlaySound
-;    jp LanceScript_5a2c4
-;
-;CoordsData_5a33e: ; 5a33e (16:633e)
-;    db $01,$05
-;    db $02,$06
-;    db $0B,$05
-;    db $0B,$06
-;    db $15,$05
-;    db $FF
-
 LanceScript2:
     call EndTrainerBattle
     ld a,[W_ISINBATTLE] ; $d057
@@ -88213,20 +88251,6 @@ LanceScript2:
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
     jp HallOfFame_HealParty_Bank16
-
-;Func_5a35b: ; 5a35b (16:635b)
-;    ld a,$ff
-;    ld [wJoypadForbiddenButtonsMask],a
-;    ld hl,$ccd3
-;    ld de,RLEList_5a379
-;    call DecodeRLEList
-;    dec a
-;    ld [$cd38],a
-;    call StartSimulatingJoypadStates
-;    ld a,$3
-;    ld [W_LANCECURSCRIPT],a
-;    ld [W_CURMAPSCRIPT],a
-;    ret
 
 RLEList_5a379: ; 5a379 (16:6379)
     db $40,$0A
@@ -88704,6 +88728,22 @@ ShowMoltres:
     ld [W_ROUTE18CURSCRIPT],a
     ld [W_CURMAPSCRIPT],a
     ret
+
+; ───────────────────────────────────────────
+
+SilphCo2Script_59d07_OneDraw:
+    ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    ret z
+    jp SilphCo2Script_59d07
+
+SilphCo3Script_59f71_OneDraw:
+    ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    ret z
+    jp SilphCo3Script_59f71
 
 ; ───────────────────────────────────────────
 
@@ -91688,7 +91728,7 @@ SilphCo9_h: ; 0x5d7af to 0x5d7bb (12 bytes) (id=233)
     dw SilphCo9Object ; objects
 
 SilphCo9Script: ; 5d7bb (17:57bb)
-    call SilphCo9Script_5d7d1
+    call SilphCo9Script_5d7d1_OneDraw
     call EnableAutoTextBoxDrawing
     ld hl,SilphCo9TrainerHeaders
     ld de,SilphCo9ScriptPointers
@@ -91697,12 +91737,14 @@ SilphCo9Script: ; 5d7bb (17:57bb)
     ld [W_SILPHCO9CURSCRIPT],a
     ret
 
+    ds 2
+
 SilphCo9Script_5d7d1: ; 5d7d1 (17:57d1)
-    ld hl,$d126
-    bit 5,[hl]
-    res 5,[hl]
-    ret z
-    ld hl,DataTable_5d82e ; $582e
+;    ld hl,$d126
+;    bit 5,[hl]
+;    res 5,[hl]
+;    ret z
+    ld hl,.DataTable_5d82e
     call Func_5d837
     call Func_5d863
     ld a,[$d834]
@@ -91712,7 +91754,7 @@ SilphCo9Script_5d7d1: ; 5d7d1 (17:57d1)
     ld a,$5f
     ld [$d09f],a
     ld bc,$401
-    PREDEF ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
     pop af
 .asm_5d7f8
     bit 1,a
@@ -91721,7 +91763,7 @@ SilphCo9Script_5d7d1: ; 5d7d1 (17:57d1)
     ld a,$54
     ld [$d09f],a
     ld bc,$209
-    PREDEF ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
     pop af
 .asm_5d80b
     bit 2,a
@@ -91730,17 +91772,19 @@ SilphCo9Script_5d7d1: ; 5d7d1 (17:57d1)
     ld a,$54
     ld [$d09f],a
     ld bc,$509
-    PREDEF ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
     pop af
 .asm_5d81e
     bit 3,a
-    ret nz
+    jr nz,.end
     ld a,$5f
     ld [$d09f],a
     ld bc,$605
-    PREDEF_JUMP ReplaceTileBlock
+    PREDEF ReplaceTileBlockNoRedraw
+.end
+    PREDEF_JUMP TryToRedrawMapView
 
-DataTable_5d82e: ; 5d82e (17:582e)
+.DataTable_5d82e
     db $04,$01,$02,$09,$05,$09,$06,$05,$FF
 
 Func_5d837: ; 5d837 (17:5837)
@@ -92934,6 +92978,15 @@ SilphCo1Text1:
 .HM08AfterText
     TX_FAR _SilphCo1Text1
     db "@"
+
+; ───────────────────────────────────────────
+
+SilphCo9Script_5d7d1_OneDraw:
+    ld hl,$d126
+    bit 5,[hl]
+    res 5,[hl]
+    ret z
+    jp SilphCo9Script_5d7d1
 
 ; ───────────────────────────────────────────
 
@@ -142232,6 +142285,8 @@ PrintMoveTypeShortPredef:                  NEW_PREDEF PrintMoveTypeShort        
 PrintTypesFullPredef:                      NEW_PREDEF PrintTypesFull                      ; $7A
 LearnSkillPredef:                          NEW_PREDEF LearnSkill                          ; $7B
 GetMonPotentialMoveListPredef:             NEW_PREDEF GetMonPotentialMoveList             ; $7C
+ReplaceTileBlockNoRedrawPredef:            NEW_PREDEF ReplaceTileBlockNoRedraw            ; $7D
+TryToRedrawMapViewPredef:                  NEW_PREDEF TryToRedrawMapView                  ; $7E
 
 ; ──────────────────────────────────────────────────────────────────────
 
