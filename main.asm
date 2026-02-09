@@ -5358,7 +5358,6 @@ VBlankHandler:
     push bc
     push de
     push hl
-    call SynchronizeParty
     ld a,[H_LOADEDROMBANK] ; current ROM bank
     ld [$d122],a
     ld a,[$ffae]
@@ -5417,6 +5416,7 @@ VBlankHandler:
     and a
     call z,ReadJoypadRegister
     call PostVBlankHandler
+    call SynchronizeParty
     ld a,[$d122]
     call RoutineForRealGB
     pop hl
