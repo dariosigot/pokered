@@ -243,29 +243,15 @@ GetJoypadState:
     pop af
     jp RoutineForRealGB
 
-ChangeCurMap:
-    push hl
+RestoreChangedBlocks:
+    ld a,[W_CURMAP]
     ld hl,wChangedBlocksMapId
     cp [hl]
-    jr z,.same
-    push af
-    push bc
-    ld [hli],a ; Id
-    xor a
-    ld bc,3 * 15 + 1
-    call FillMemory
-    pop bc
-    pop af
-.same
-    pop hl
-    ld [W_CURMAP],a
-    ret
-
-RestoreChangedBlocks:
-    ld hl,wChangedBlocksNum
-    ld a,[hli]
+    ld [hli],a
+    jr nz,.MapChange
+    ld a,[hli] ; wChangedBlocksNum
     and a
-    jr z,.done
+    ret z
     ld b,a
 .loop
     ld a,[hli] ; H
@@ -276,9 +262,21 @@ RestoreChangedBlocks:
     ld [de],a
     dec b
     jr nz,.loop
-.done
-    ld a,[$d371]
     ret
+.MapChange
+    ld a,[hl] ; wChangedBlocksNum
+    and a
+    push af
+    xor a
+    ld bc,3 * 15 + 1
+    call FillMemory
+    pop af
+    ret
+
+LoadTileBlockMapAndRedrawMapView:
+    call LoadTileBlockMap
+    ret z ; If No Tile to Restore
+    PREDEF_JUMP RedrawMapView
 
 BackupNearPlayerTiles:
     ld bc,Tile_A_OFFSET
@@ -1243,7 +1241,7 @@ CheckMapConnections: ; 07ba (0:07ba)
 ; Since the sprite set shouldn't change,this will just update VRAM slots at
 ; $C2XE without loading any tile patterns.
     BANKSWITCH InitMapSprites
-    call LoadTileBlockMap
+    call LoadTileBlockMapAndRedrawMapView
     jp OverworldLoop+3
 .didNotEnterConnectedMap
     jp OverworldLoop
@@ -1416,10 +1414,8 @@ IsBikeRidingAllowed:
 .BikeRidingTilesets
     db $00,$03,$0B,$11,$FF
 
-SECTION "LoadTilesetTilePatternData",ROM0[$09e8]
-
 ; load the tile pattern data of the current tileset into VRAM
-LoadTilesetTilePatternData: ; 09e8 (0:09e8)
+LoadTilesetTilePatternData:
     ld a,[$d52e]
     ld l,a
     ld a,[$d52f]
@@ -1431,7 +1427,7 @@ LoadTilesetTilePatternData: ; 09e8 (0:09e8)
 
 ; this loads the current maps complete tile map (which references blocks,not individual tiles) to C6E8
 ; it can also load partial tile maps of connected maps into a border of length 3 around the current map
-LoadTileBlockMap: ; 09fc (0:09fc)
+LoadTileBlockMap:
 ; fill C6E8-CBFB with the background tile
     ld hl,$c6e8
     ld a,[$d3ad] ; background tile number
@@ -1486,7 +1482,7 @@ LoadTileBlockMap: ; 09fc (0:09fc)
     dec b
     jr nz,.rowLoop
 .northConnection
-    call RestoreChangedBlocks ; ld a,[$d371]
+    ld a,[$d371]
     cp a,$ff
     jr z,.southConnection
     call SwitchToMapRomBank
@@ -1558,9 +1554,9 @@ LoadTileBlockMap: ; 09fc (0:09fc)
     ld [$ff8b],a
     call LoadEastWestConnectionsTileMap
 .done
-    ret
+    jp RestoreChangedBlocks
 
-LoadNorthSouthConnectionsTileMap: ; 0ade (0:0ade)
+LoadNorthSouthConnectionsTileMap:
     ld c,$03
 .loop
     push de
@@ -1592,7 +1588,7 @@ LoadNorthSouthConnectionsTileMap: ; 0ade (0:0ade)
     jr nz,.loop
     ret
 
-LoadEastWestConnectionsTileMap: ; 0b02 (0:0b02)
+LoadEastWestConnectionsTileMap:
     push hl
     push de
     ld c,$03
@@ -1620,6 +1616,8 @@ LoadEastWestConnectionsTileMap: ; 0b02 (0:0b02)
     dec b
     jr nz,LoadEastWestConnectionsTileMap
     ret
+
+SECTION "IsSpriteOrSignInFrontOfPlayer",ROM0[$0b23]
 
 ; function to check if there is a sign or sprite in front of the player
 ; if so,it is stored in [$FF8C]
@@ -9031,6 +9029,10 @@ TestWrapInMenuInput:
     ld hl,wTestWrapInMenuInputBit6
     bit 6,[hl]
     pop hl
+    ret
+
+ChangeCurMap:
+    ld [W_CURMAP],a
     ret
 
 ; Free
@@ -22400,6 +22402,84 @@ ItemUsePokedex:
     set 5,[hl] ; Don't consume turn
     ret
 
+NUM_OF_STORED_BLOCKS EQU 15
+
+BackupChangedBlocks:
+    push hl
+    ld d,h
+    ld e,l
+    ld hl,wChangedBlocksNum
+    ld a,[hli]
+    and a
+    jr z,.insert
+    ld b,a
+    ld c,0
+.loop
+    ld a,[hli] ; H
+    cp d
+    jr nz,.next1
+    ld a,[hli] ; L
+    cp e
+    jr nz,.next2
+.found
+    ld a,[hl]
+    ld b,a
+    ld a,[$d09f]
+    cp b
+    ld [hl],a ; ID
+    jr .done
+.next1
+    inc hl
+.next2
+    inc hl
+    inc c
+    dec b
+    jr nz,.loop
+    ld a,c
+    cp NUM_OF_STORED_BLOCKS
+    call nc,.overflow
+.insert
+    ld a,d
+    ld [hli],a ; H
+    ld a,e
+    ld [hli],a ; L
+    ld a,[$d09f]
+    ld [hl],a ; ID
+    ld hl,wChangedBlocksNum
+    inc [hl]
+    ld a,1 ; reset all flag
+    or a   ; ...
+.done
+    ld a,[$d09f]
+    pop hl
+    ret
+
+.overflow
+    push de
+    ld hl,wChangedBlocksNum
+    dec [hl]
+    inc hl
+    ld d,h
+    ld e,l
+    inc de
+    inc de
+    inc de
+    ld b,NUM_OF_STORED_BLOCKS - 1
+.LoopOverflow
+    ld a,[de]
+    ld [hli],a
+    inc de
+    ld a,[de]
+    ld [hli],a
+    inc de
+    ld a,[de]
+    ld [hli],a
+    inc de
+    dec b
+    jr nz,.LoopOverflow
+    pop de
+    ret
+
 ; Free
 
 SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
@@ -24440,53 +24520,6 @@ SimpleBattleItemEnd:
     call ReDrawBattleHudAfterItemUse
     jp PrintItemUseTextAndRemoveItem
 
-BackupChangedBlocks:
-    push hl
-    ld d,h
-    ld e,l
-    ld hl,wChangedBlocksNum
-    ld a,[hli]
-    cp 15
-    jr nc,.done
-    and a
-    jr z,.insert
-    ld b,a
-.loop
-    ld a,[hli] ; H
-    cp d
-    jr nz,.next1
-    ld a,[hli] ; L
-    cp e
-    jr nz,.next2
-.found
-    ld a,[hl]
-    ld b,a
-    ld a,[$d09f]
-    cp b
-    ld [hl],a ; ID
-    jr .done
-.next1
-    inc hl
-.next2
-    inc hl
-    dec b
-    jr nz,.loop
-.insert
-    ld a,d
-    ld [hli],a ; H
-    ld a,e
-    ld [hli],a ; L
-    ld a,[$d09f]
-    ld [hl],a ; ID
-    ld hl,wChangedBlocksNum
-    inc [hl]
-    ld a,1 ; reset all flag
-    or a   ; ...
-.done
-    ld a,[$d09f]
-    pop hl
-    ret
-
 ItemUseCoinCase:
     ld a,[W_ISINBATTLE]
     and a
@@ -24591,6 +24624,8 @@ ItemUseXStat:
     pop af
     ld [hl],a ; restore [W_PLAYERMOVENUM]
     ret
+
+; Free
 
 SECTION "ItemUsePokeflute",ROMX[$6140],BANK[$3]
 
@@ -26100,9 +26135,9 @@ CanCut:
     jr z,.plateau
     ld a,$ff
     ld [$cfcb],a
-    call Func_eff7
+    call InitCutAnimOAM
     ld de,CutTreeBlockSwaps ; $7100
-    call Func_f09f
+    call ReplaceTreeTileBlock
     call RedrawMapView
     BANKSWITCH Func_79e96
     ld a,$1
@@ -26146,7 +26181,7 @@ CanCut:
     res 6,[hl]
     ret
 
-Func_eff7:
+InitCutAnimOAM:
     xor a
     ld [$cd50],a
     ld a,$e4
@@ -26247,77 +26282,82 @@ BoulderDustAnimationOffsets: ; f097 (3:7097)
     db -8,20 ; player is facing left
     db 24,20 ; player is facing right
 
-Func_f09f: ; f09f (3:709f)
+ReplaceTreeTileBlock: ; f09f (3:709f)
+; Determine the address of the tile block that contains the tile in front of the
+; player (i.e. where the tree is) and replace it with the corresponding tile
+; block that doesn't have the tree.
     push de
     ld a,[W_CURMAPWIDTH] ; $d369
     add $6
     ld c,a
     ld b,$0
     ld d,$0
-    ld hl,$d35f
+    ld hl,$d35f ; CurrentTileBlockMapViewPointer
     ld a,[hli]
     ld h,[hl]
     ld l,a
     add hl,bc
-    ld a,[$c109]
+    ld a,[$c109] ; SpritePlayerStateData1FacingDirection
     and a
-    jr z,.asm_f0c7
-    cp $4
-    jr z,.asm_f0cf
-    cp $8
-    jr z,.asm_f0d7
+    jr z,.down
+    cp $4 ; SPRITE_FACING_UP
+    jr z,.up
+    cp $8 ; SPRITE_FACING_LEFT
+    jr z,.left
+; right
     ld a,[W_XBLOCKCOORD] ; $d364
     and a
-    jr z,.asm_f0e0
-    jr .asm_f0ec
-.asm_f0c7
+    jr z,.centerTileBlock
+    jr .rightOfCenter
+.down
     ld a,[W_YBLOCKCOORD] ; $d363
     and a
-    jr z,.asm_f0e0
-    jr .asm_f0df
-.asm_f0cf
+    jr z,.centerTileBlock
+    jr .belowCenter
+.up
     ld a,[W_YBLOCKCOORD] ; $d363
     and a
-    jr z,.asm_f0e1
-    jr .asm_f0e0
-.asm_f0d7
+    jr z,.aboveCenter
+    jr .centerTileBlock
+.left
     ld a,[W_XBLOCKCOORD] ; $d364
     and a
-    jr z,.asm_f0e6
-    jr .asm_f0e0
-.asm_f0df
+    jr z,.leftOfCenter
+    jr .centerTileBlock
+.belowCenter
     add hl,bc
-.asm_f0e0
+.centerTileBlock
     add hl,bc
-.asm_f0e1
+.aboveCenter
     ld e,$2
     add hl,de
-    jr .asm_f0f0
-.asm_f0e6
+    jr .next
+.leftOfCenter
     ld e,$1
     add hl,bc
     add hl,de
-    jr .asm_f0f0
-.asm_f0ec
+    jr .next
+.rightOfCenter
     ld e,$3
     add hl,bc
     add hl,de
-.asm_f0f0
+.next
     pop de
     ld a,[hl]
     ld c,a
-.asm_f0f3
+.loop ; find the matching tile block in the array
     ld a,[de]
     inc de
     inc de
     cp $ff
     ret z
     cp c
-    jr nz,.asm_f0f3
+    jr nz,.loop
     dec de
-    ld a,[de]
-    ld [hl],a
-    ret
+;    ld a,[de] ; replacement tile block from matching array entry
+;    ld [hl],a
+;    ret
+    jp BackupChangedBlocks_Cut
 
 CutTreeBlockSwaps: ; f100 (3:7100)
 ; first byte = tileset block containing the cut tree
@@ -28657,6 +28697,23 @@ CheckDisableLightDuringFloat:
     ret z
     ld hl,wOverworldGoToDarkBit4
     set 4,[hl]
+    ret
+
+BackupChangedBlocks_Cut:
+    ; Original Code
+    ld a,[de] ; replacement tile block from matching array entry
+    ld [hl],a
+    ; New Code
+    ld bc,$d09f ; Backup
+    ld a,[bc]   ; ...
+    push af     ; ...
+    push bc     ; ...
+    ld a,[de]
+    ld [bc],a
+    call BackupChangedBlocks
+    pop bc      ; Restore
+    pop af      ; ...
+    ld [bc],a   ; ...
     ret
 
 SECTION "bank4",ROMX,BANK[$4]
@@ -37281,7 +37338,7 @@ CinnabarGymProcessAllGate:
 
 .RedrawMapView:
     call RestoreChangedBlocks
-    BANKSWITCH_JUMP RedrawMapView
+    PREDEF_JUMP RedrawMapView
 
 .CinnabarGymGateCoords
     ; format: LSB Changed Block Address,direction
@@ -84340,7 +84397,7 @@ Route21ScriptBarrier:
     ld bc,.ChangedBlocksEnd-.ChangedBlocks
     call CopyData
     call RestoreChangedBlocks
-    BANKSWITCH_JUMP RedrawMapView
+    PREDEF_JUMP RedrawMapView
 .CheckCinnabarVisited
     call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG
     ld c,CINNABAR_ISLAND ; bit n
@@ -100601,7 +100658,7 @@ Func_71c07: ; 71c07 (1c:5c07)
     BANKSWITCH Func_17d7d
     call ClearScreen
     call Func_71ca2
-    BANKSWITCH RedrawMapView
+    PREDEF RedrawMapView
     and a
     ld a,$3
     jr .asm_ee803 ; 0x71c9b $1
@@ -108322,7 +108379,7 @@ TryToRemoveUnknownDungeonWaterBlocks:
     ld bc,.ChangedBlocksEnd-.ChangedBlocks
     call CopyData
     call RestoreChangedBlocks
-    BANKSWITCH_JUMP RedrawMapView
+    PREDEF_JUMP RedrawMapView
 .ChangedBlocks
     db 2
     dw $60C7
@@ -142119,7 +142176,7 @@ WriteMonMovesPredef:                       NEW_PREDEF WriteMonMoves             
 SaveSAVPredef:                             NEW_PREDEF SaveSAV                             ; $3F
 Func_7202bPredef:                          NEW_PREDEF Func_7202b                          ; $40
 SetVisitedAndLoadMissableObjPredef:        NEW_PREDEF SetVisitedAndLoadMissableObj        ; $41
-ds 3                                                                                      ; $42
+RedrawMapViewPredef:                       NEW_PREDEF RedrawMapView                       ; $42
 TestMonMoveCompatibilityPredef:            NEW_PREDEF TestMonMoveCompatibility            ; $43
 TMToMovePredef:                            NEW_PREDEF TMToMove                            ; $44
 ProcessSGBPacketPredef:                    NEW_PREDEF ProcessSGBPacket                    ; $45
