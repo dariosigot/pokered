@@ -22443,14 +22443,13 @@ BackupChangedBlocks:
     ld [hli],a ; H
     ld a,e
     ld [hli],a ; L
-    ld a,[$d09f]
+    ld a,[$d09f] ; NewTileBlockID
     ld [hl],a ; ID
     ld hl,wChangedBlocksNum
     inc [hl]
     ld a,1 ; reset all flag
     or a   ; ...
 .done
-    ld a,[$d09f]
     pop hl
     ret
 
@@ -25988,13 +25987,13 @@ DrawBadges:
 GymLeaderFaceAndBadgeTileGraphics:
     INCBIN "gfx/badges.2bpp"
 
-; Free
-
-SECTION "ReplaceTileBlock",ROMX[$6e9e],BANK[$3]
-
-ReplaceTileBlock: ; ee9e (3:6e9e)
+; replaces a tile block with the one specified in [$d09f] ; NewTileBlockID
+; and redraws the map view if necessary
+; b = Y
+; c = X
+ReplaceTileBlock:
     call Load16BitRegisters
-    ld hl,$c6e8
+    ld hl,$c6e8 ; OverworldMap
     ld a,[W_CURMAPWIDTH] ; $d369
     add $6
     ld e,a
@@ -26007,22 +26006,24 @@ ReplaceTileBlock: ; ee9e (3:6e9e)
     ld e,a
     ld a,b
     and a
-    jr z,.asm_eebb
-.asm_eeb7
+    jr z,.addX
+; add width * Y
+.addWidthYTimesLoop
     add hl,de
     dec b
-    jr nz,.asm_eeb7
-.asm_eebb
+    jr nz,.addWidthYTimesLoop
+.addX
     add hl,bc
-    call BackupChangedBlocks ; ld a,[$d09f]
+    call BackupChangedBlocks
     ret z ; kickout if same block ID
+    ld a,[$d09f] ; NewTileBlockID
     ld [hl],a
-    ld a,[$d35f]
+    ld a,[$d35f] ; CurrentTileBlockMapViewPointer
     ld c,a
-    ld a,[$d360]
+    ld a,[$d360] ; CurrentTileBlockMapViewPointer + 1
     ld b,a
-    call Func_ef4e
-    ret c
+    call CompareHLWithBC
+    ret c ; return if the replaced tile block is below the map view in memory
     push hl
     ld l,e
     ld h,$0
@@ -26033,8 +26034,8 @@ ReplaceTileBlock: ; ee9e (3:6e9e)
     add hl,de
     add hl,bc
     pop bc
-    call Func_ef4e
-    ret c
+    call CompareHLWithBC
+    ret c ; return if the replaced tile block is above the map view in memory
 
 RedrawMapView:
     ld a,[W_ISINBATTLE] ; $d057
@@ -26042,72 +26043,72 @@ RedrawMapView:
     ret z
     ld a,[H_AUTOBGTRANSFERENABLED] ; $FF00+$ba
     push af
-    ld a,[$FF00+$d7]
+    ld a,[$FF00+$d7] ; TileAnimations
     push af
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ld [$FF00+$d7],a
+    ld [$FF00+$d7],a ; TileAnimations
     call LoadCurrentMapView
     call GoPAL_SET_CF1C
-    ld hl,$d526
+    ld hl,$d526 ; MapViewVRAMPointer
     ld a,[hli]
     ld h,[hl]
     ld l,a
-    ld de,$ffc0
+    ld de,$ffc0 ; -2 * BG_MAP_WIDTH
     add hl,de
     ld a,h
     and $3
     or $98
     ld a,l
-    ld [$cee9],a
+    ld [$cee9],a ; wBuffer
     ld a,h
-    ld [$ceea],a
+    ld [$ceea],a ; wBuffer + 1
     ld a,$2
-    ld [$FF00+$be],a
-    ld c,$9
-.asm_ef0f
+    ld [$FF00+$be],a ; RedrawMapViewRowOffset
+    ld c,$9 ; SCREEN_HEIGHT / 2 ; number of rows of 2x2 tiles (this covers the whole screen)
+.redrawRowLoop
     push bc
     push hl
     push hl
-    ld hl,$c378
-    ld de,$14
-    ld a,[$FF00+$be]
-.asm_ef1a
+    ld hl,$c378 ; wTileMap - 2 * SCREEN_WIDTH
+    ld de,$14 ; SCREEN_WIDTH
+    ld a,[$FF00+$be] ; RedrawMapViewRowOffset
+.calcWRAMAddrLoop
     add hl,de
     dec a
-    jr nz,.asm_ef1a
+    jr nz,.calcWRAMAddrLoop
     call ScheduleRowRedrawHelper
     pop hl
-    ld de,$20
-    ld a,[$FF00+$be]
+    ld de,$20 ; BG_MAP_WIDTH
+    ld a,[$FF00+$be] ; RedrawMapViewRowOffset
     ld c,a
-.asm_ef28
+.calcVRAMAddrLoop
     add hl,de
     ld a,h
     and $3
     or $98
     dec c
-    jr nz,.asm_ef28
-    ld [$FF00+$d2],a
+    jr nz,.calcVRAMAddrLoop
+    ld [$FF00+$d2],a ; RedrawRowOrColumnDest + 1
     ld a,l
-    ld [H_SCREENEDGEREDRAWADDR],a ; $FF00+$d1
-    ld a,$2
-    ld [H_SCREENEDGEREDRAW],a ; $FF00+$d0
+    ld [H_SCREENEDGEREDRAWADDR],a ; RedrawRowOrColumnDest
+    ld a,$2 ; REDRAW_ROW
+    ld [H_SCREENEDGEREDRAW],a ; RedrawRowOrColumnMode
     call DelayFrame
-    ld hl,$ffbe
+    ld hl,$ffbe ; RedrawMapViewRowOffset
     inc [hl]
     inc [hl]
     pop hl
     pop bc
     dec c
-    jr nz,.asm_ef0f
+    jr nz,.redrawRowLoop
     pop af
-    ld [$FF00+$d7],a
+    ld [$FF00+$d7],a ; TileAnimations
     pop af
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ret
 
-Func_ef4e:
+CompareHLWithBC:
     ld a,h
     sub b
     ret nz
@@ -26233,6 +26234,8 @@ asm_f055:
 DungeonTilesetIDs:
     db $03,$0A,$0D,$10,$11,$12,$13,$0C,$14,$16,$0F,$07
     db $FF
+
+; Free
 
 SECTION "Func_f068",ROMX[$7068],BANK[$3]
 
