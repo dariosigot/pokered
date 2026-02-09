@@ -26146,8 +26146,7 @@ CanCut:
     call PlaySound
     ld a,$90
     ld [$FF00+$b0],a
-    call UpdateSprites
-    jp RedrawMapView
+    jp UpdateSprites
 .plateau
     call WaitForSoundToFinish
     ld a,$a5
@@ -26189,24 +26188,20 @@ InitCutAnimOAM:
     ld a,[$cd4d]
     cp $52
     jr z,.asm_f020
-    ld de,Tset00_GFX + $2d0 ; $42d0 ; cuttable tree sprite top row
+    ld de,TreeOAM ; $42d0 ; cuttable tree sprite
     ld hl,$8fc0
-    ld bc,(BANK(Tset00_GFX) << 8) + $02
-    call CopyVideoData
-    ld de,Tset00_GFX + $3d0 ; $43d0 ; cuttable tree sprite bottom row
-    ld hl,$8fe0
-    ld bc,(BANK(Tset00_GFX) << 8) + $02
+    ld bc,(BANK(TreeOAM) << 8) | 04
     call CopyVideoData
     jr asm_f055
 .asm_f020
     ld hl,$8fc0
-    call Func_f04c
+    call .Func_f04c
     ld hl,$8fd0
-    call Func_f04c
+    call .Func_f04c
     ld hl,$8fe0
-    call Func_f04c
+    call .Func_f04c
     ld hl,$8ff0
-    call Func_f04c
+    call .Func_f04c
     call asm_f055
     ld hl,$c393
     ld de,$4
@@ -26219,11 +26214,11 @@ InitCutAnimOAM:
     dec c
     jr nz,.asm_f044
     ret
-
-Func_f04c:
+.Func_f04c
     ld de,AnimationTileset2 + $60 ; $474e ; tile depicting a leaf
     ld bc,(BANK(AnimationTileset2) << 8) + $01
     jp CopyVideoData
+
 asm_f055:
     call Func_f068
     ld a,$9
@@ -148024,6 +148019,9 @@ SECTION "Bank3d",ROMX,BANK[$3D]
 
 EmotionBubbles:
     INCBIN "gfx/emotion_bubbles.2bpp"
+
+TreeOAM:
+    INCBIN "gfx/denim/tree.2bpp"
 
 ; ──────────────────────────────────────────────────────────────────────
 
