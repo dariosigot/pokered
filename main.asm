@@ -25847,7 +25847,9 @@ GetTMChoiceItemID:
     push af
     call .PrintBasicLayoutTMChoice
     pop af
+    ld hl,$cf91
     jr .start
+
 .Init
     ld hl,wTM
     ld b,((TM_64-TM_01+1) >> 2)+1
@@ -25858,87 +25860,150 @@ GetTMChoiceItemID:
     dec b
     jr nz,.LoopSearchAtLeastOne
     call PrintTMEmpty
-    jr .BPressed
-.AtLeastOne
-    call .PrintBasicLayoutTMChoice
-    ld a,TM_01-1
-.TryNext
-    inc a
-    cp TM_64+1
-    jr nz,.continue1
-    ld a,TM_01
-.continue1
-    call GetTMQty ; input a = TM ID | output c = Qty | z if Qty=0
-    jr z,.TryNext
-    jr .start
-.TryPrev
-    dec a
-    cp TM_01-1
-    jr nz,.continue2
-    ld a,TM_64
-.continue2
-    call GetTMQty ; input a = TM ID | output c = Qty | z if Qty=0
-    jr z,.TryPrev
-.start
-    ld [$cf91],a
-    call .ClearScreenArea
-    call .GetAndPlaceTMStats
-.getJoypadStateLoop
-    call GetJoypadStateLowSensitivityWaitReleaseJoy
-    jr nz,.getJoypadStateLoop
-    and %00110011 ; ▼▲◄►StSeBA
-    jr z,.getJoypadStateLoop
-    bit 4,a ; pressed Right key?
-    jr z,.checkIfLeftPressed
-;Right
-    FuncCoord 18,11
-    ld hl,Coord
-    ld [hl]," "
-    call Delay3
-    ld a,[$cf91]
-    jr .TryNext
-.checkIfLeftPressed
-    bit 5,a ; pressed Left key?
-    jr z,.checkIfAPressed
-;Left
-    FuncCoord 05,11
-    ld hl,Coord
-    ld [hl]," "
-    call Delay3
-    ld a,[$cf91]
-    jr .TryPrev
-.checkIfAPressed
-    bit 0,a
-    jr z,.BPressed
-    scf ; APressed
-    ret
+    ; ft
+
 .BPressed
     ld a,2
     ld [$cd6a],a ; item not used
     xor a ; rcf
     ret
 
+.APressed
+    scf ; APressed
+    ret
+
+.AtLeastOne
+    call .PrintBasicLayoutTMChoice
+    ld a,TM_01-1
+    ld hl,$cf91
+    ; ft
+
+.TryNext
+    inc a
+    cp [hl]
+    jr z,.NoChange
+    cp TM_64+1
+    jr c,.continue1
+    ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
+    and a                        ; ...
+    jr z,.NoChange               ; ...
+    ld a,TM_01
+.continue1
+    call GetTMQty ; input a = TM ID | output c = Qty | z if Qty=0
+    jr z,.TryNext
+    jr .start
+
+.TryPrev
+    dec a
+    cp [hl]
+    jr z,.NoChange
+    cp TM_01
+    jr nc,.continue2
+    ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
+    and a                        ; ...
+    jr z,.NoChange               ; ...
+    ld a,TM_64
+.continue2
+    call GetTMQty ; input a = TM ID | output c = Qty | z if Qty=0
+    jr z,.TryPrev
+    ; ft
+
+.start
+    ld [hl],a
+    call .ClearScreenArea
+    call .GetAndPlaceTMStats
+    ; ft
+
+.NoChange
+    call .DrawArrows
+    ; ft
+
+.getJoypadStateLoop
+    call GetJoypadStateLowSensitivityWaitReleaseJoy
+    jr nz,.getJoypadStateLoop
+    and %11110011 ; ▼▲◄►StSeBA
+    jr z,.getJoypadStateLoop
+    bit 0,a ; pressed A?
+    jr nz,.APressed
+    bit 1,a ; pressed B?
+    jr nz,.BPressed
+    bit 4,a ; pressed Right?
+    jr nz,.RightPressed
+    bit 5,a ; pressed Left?
+    jr nz,.LeftPressed
+    bit 6,a ; pressed Up?
+    jr nz,.UpPressed
+    bit 7,a ; pressed Down?
+    jr nz,.DownPressed
+    jr .getJoypadStateLoop
+
+.RightPressed
+    call .BlinkRightArrow
+    ld hl,$cf91
+    ld a,[hl]
+    jr .TryNext
+
+.LeftPressed
+    call .BlinkLeftArrow
+    ld hl,$cf91
+    ld a,[hl]
+    jr .TryPrev
+
+.UpPressed
+    call .BlinkRightArrow
+    ld hl,$cf91
+    ld a,[hl]
+    add 6
+    cp TM_01
+    jr nc,.TryPrev
+    ld a,TM_64+1
+    jr .TryPrev
+
+.DownPressed
+    call .BlinkLeftArrow
+    ld hl,$cf91
+    ld a,[hl]
+    sub 6
+    jp .TryNext
+
+.BlinkLeftArrow
+    FuncCoord 05,11
+    ld hl,Coord
+    jp .BlinkArrow
+
+.BlinkRightArrow
+    FuncCoord 18,11
+    ld hl,Coord
+    ; ft
+
+.BlinkArrow
+    ld [hl]," "
+    jp Delay3
+
 .PrintBasicLayoutTMChoice
     ld hl,.ChoiceTMText
     call PrintText
-    FuncCoord 4,10
+    FuncCoord 04,10
     ld hl,Coord
-    ld bc,$020e ; 2,14
+    ld bc,$020e ; 02,14
     jp TextBoxBorder
 
 .ClearScreenArea
-    FuncCoord 6,11
+    FuncCoord 06,11
     ld hl,Coord
-    ld bc,$020c ; 2,12
+    ld bc,$020c ; 02,12
     jp ClearScreenArea
 
-.GetAndPlaceTMStats
+.DrawArrows
     FuncCoord 05,11
     ld hl,Coord
     ld [hl],$D6 ; Arrow Left
     FuncCoord 18,11
     ld hl,Coord
     ld [hl],$ED ; Arrow Right
+    ret
+
+.GetAndPlaceTMStats
     FuncCoord 14,12
     ld hl,Coord
     ld de,.X
@@ -25959,7 +26024,7 @@ GetTMChoiceItemID:
     inc a
     ld [$d11e],a
     ld de,$d11e
-    FuncCoord 6,12
+    FuncCoord 06,12
     ld hl,Coord
     ld bc,$8102 ; b=%10000001 Leading Zeroes | c=2
     call PrintNumber
@@ -25970,7 +26035,7 @@ GetTMChoiceItemID:
     call GetMoveName
     call CopyStringToCF4B ; copy name to $cf4b
     ld de,$cf4b
-    FuncCoord 6,11
+    FuncCoord 06,11
     ld hl,Coord
     call PlaceString
     ; Print Move Details Box
@@ -28383,6 +28448,7 @@ ItemUseReloadOverworldData:
 
 GetTMQty:
     ; a = TM ID
+    push hl
     push af
     call FindRightByteAndNibbleID ; hl=pointerToRightByte | e=nibbleID
     ld a,[hl]
@@ -28402,6 +28468,7 @@ GetTMQty:
     pop bc
     ld c,a
     ld a,b
+    pop hl
     ; a = TM ID
     ; c = Qty
     ret
