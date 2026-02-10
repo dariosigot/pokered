@@ -7513,7 +7513,8 @@ DisplayChooseQuantityMenu:
     jr .incrementQuantity
 
 .waitForKeyPressLoop
-    call GetJoypadStateLowSensitivity
+    call GetJoypadStateLowSensitivityWaitReleaseJoy
+    jr nz,.waitForKeyPressLoop
     ld a,[$ffb5] ; ▼▲◄►StSeBA
     bit 0,a ; was the A button pressed?
     jp nz,QtyMenu_buttonAPressed
@@ -7552,74 +7553,40 @@ DisplayChooseQuantityMenu:
     ld hl,$cf96 ; current quantity
     ld a,[hl]
     add c
-    ld [hl],a
     cp b
     jr c,.handleNewQuantity
-; wrap to 1 if the player goes above the max quantity
-    ld a,1
-    ld [hl],a
-    jr .handleNewQuantity
+    jr .wrapToMax
 
 .decrementQuantity
     ld hl,$cf96 ; current quantity
     ld a,[hl]
     sub c
-    ld [hl],a
-    jr c,.wrapToMax
+    jr c,.wrapTo1
     jr nz,.handleNewQuantity
+
+.wrapTo1
+    ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
+    and a                        ; ...
+    jr nz,.wrapToMaxSkip         ; ...
+.wrapTo1Skip
+    ld a,1
+    jr .handleNewQuantity
+
 .wrapToMax
-; wrap to the max quantity if the player goes below 1
+    ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
+    and a                        ; ...
+    jr nz,.wrapTo1Skip           ; ...
+.wrapToMaxSkip
     ld a,[$cf97] ; max quantity
-    ld [hl],a
 
 .handleNewQuantity
+    ld [hl],a
     FuncCoord 17,10
     ld hl,Coord
     ld a,[wListMenuID]
     cp a,PRICEDITEMLISTMENU
     jr nz,.printQuantity
-.printPrice
-    ld c,$03
-    ld a,[$cf96]
-    ld b,a
-    ld hl,$ff9f ; total price
-; initialize total price to 0
-    xor a
-    ld [hli],a
-    ld [hli],a
-    ld [hl],a
-.addLoop ; loop to multiply the individual price by the quantity to get the total price
-    ld de,$ffa1
-    ld hl,$ff8d
-    push bc
-    PREDEF Func_f81d ; add the individual price to the current sum
-    pop bc
-    dec b
-    jr nz,.addLoop
-    ld a,[$ff8e]
-    and a ; should the price be halved (for selling items)?
-    jr z,.skipHalvingPrice
-    xor a
-    ld [$ffa2],a
-    ld [$ffa3],a
-    ld a,$02
-    ld [$ffa4],a
-    PREDEF Func_f71e ; halves the price
-; store the halved price
-    ld a,[$ffa2]
-    ld [$ff9f],a
-    ld a,[$ffa3]
-    ld [$ffa0],a
-    ld a,[$ffa4]
-    ld [$ffa1],a
-.skipHalvingPrice
-    FuncCoord 12,10
-    ld hl,Coord
-    ld de,SpacesBetweenQuantityAndPriceText
-    call PlaceString
-    ld de,$ff9f ; total price
-    ld c,$a3
-    call PrintBCDNumber
+    BANKSWITCH PrintPrice
     FuncCoord 9,10
     ld hl,Coord
 .printQuantity
@@ -7627,6 +7594,8 @@ DisplayChooseQuantityMenu:
     ld bc,$8102 ; print leading zeroes,1 byte,2 digits
     call PrintNumber
     jp .waitForKeyPressLoop
+
+; Free
 
 SECTION "PrintListMenuEntries",ROM0[$2e5a] ; cannot be moved cause "HackItemInBattle"
 
@@ -141081,7 +141050,11 @@ CheckIfAllFought:
     cp d
     ret
 
+; ──────────────────────────────────────────────────────────────────────
+
 InitializeChooseQuantityMenu:
+    ld hl,wWaitReleaseJoyBit5
+    set 5,[hl]
 ; text box dimensions/coordinates for just quantity
     FuncCoord 15,9
     ld hl,Coord
@@ -141142,6 +141115,51 @@ InitializeChooseQuantityMenu:
     db "BAG ×@"
 .InitialQuantityText
     db "×01@"
+
+PrintPrice:
+    ld c,$03
+    ld a,[$cf96]
+    ld b,a
+    ld hl,$ff9f ; total price
+; initialize total price to 0
+    xor a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+.addLoop ; loop to multiply the individual price by the quantity to get the total price
+    ld de,$ffa1
+    ld hl,$ff8d
+    push bc
+    PREDEF Func_f81d ; add the individual price to the current sum
+    pop bc
+    dec b
+    jr nz,.addLoop
+    ld a,[$ff8e]
+    and a ; should the price be halved (for selling items)?
+    jr z,.skipHalvingPrice
+    xor a
+    ld [$ffa2],a
+    ld [$ffa3],a
+    ld a,$02
+    ld [$ffa4],a
+    PREDEF Func_f71e ; halves the price
+; store the halved price
+    ld a,[$ffa2]
+    ld [$ff9f],a
+    ld a,[$ffa3]
+    ld [$ffa0],a
+    ld a,[$ffa4]
+    ld [$ffa1],a
+.skipHalvingPrice
+    FuncCoord 12,10
+    ld hl,Coord
+    ld de,SpacesBetweenQuantityAndPriceText
+    call PlaceString
+    ld de,$ff9f ; total price
+    ld c,$a3
+    jp PrintBCDNumber
+
+; ──────────────────────────────────────────────────────────────────────
 
 _CheckNotEscapeWildPokemon:
     ld a,[W_BATTLETYPE]
