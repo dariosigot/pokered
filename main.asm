@@ -22467,6 +22467,36 @@ BackupChangedBlocks:
     pop de
     ret
 
+CheckCutTile: ;joenote - consolidate this into its own function
+    ld a,[W_CURMAPTILESET]
+    and a
+    jr z,.overworld
+    cp 7
+    jr z,.gym
+    cp 23 ;added plateau
+    jr z,.plateau
+    ret ;nz if not one of the listed tilesets
+.gym
+    ld a,[$cfc6]
+    cp $50 ; gym cut tree
+    jr z,.loadCutTile
+    ret ;nz if not a cuttable tile
+.plateau
+    ld a,[$cfc6]
+    cp $45 ; grass
+    jr z,.loadCutTile
+    ret ;nz if not a cuttable tile
+.overworld
+    ld a,[$cfc6]
+    cp $3d ; cut tree
+    jr z,.loadCutTile
+    cp $52 ; grass
+    jr z,.loadCutTile
+    ret ;nz if not a cuttable tile
+.loadCutTile
+    ld [$cd4d],a ; CutTile
+    ret ;z already set at this return
+
 ; Free
 
 SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
@@ -28390,7 +28420,7 @@ GetTMQty:
     ret
 
 ResetTMQty:
-    ld a,[$cf91] ; TM ID
+    ; a = TM ID
     call FindRightByteAndNibbleID ; hl=pointerToRightByte | e=nibbleID
     ld b,%00000011 ; Mask
 .LoopForMask
@@ -28405,6 +28435,7 @@ ResetTMQty:
     ld a,[hl] ; Read Original
     or b ; Apply Mask (Qty = 3)
     ld [hl],a ; Overwrite
+    scf
     ret
 
 RemoveTMQty:
@@ -28447,6 +28478,49 @@ RemoveTMQty:
     ld [hl],a ; Overwrite
     ret
 
+AddTMQty:
+    ; a = TM ID
+    call FindRightByteAndNibbleID ; hl=pointerToRightByte | e=nibbleID
+    ld a,[hl]
+    ld b,a
+    ld d,e ; Backup Nibble
+    ld c,%00000011 ; Mask
+.LoopForMaskAndRightNibble
+    ld a,e
+    and a
+    jr z,.RightMaskAndNibble
+    srl b ; shift right byte read
+    srl b ; ...
+    sla c ; shift left mask
+    sla c ; ...
+    dec e
+    jr .LoopForMaskAndRightNibble
+.RightMaskAndNibble
+    ld a,b
+    and %00000011 ; Mask to Only Actual TM Qty
+    cp 3
+    ret z ; rcf ; 3 = Max Quantity than EXIT
+    ld b,a
+    inc b ; Add 1 Unit to TM Qty
+.LoopToRevertSlide
+    ld a,d
+    and a
+    jr z,.RevertSlideDone
+    sla b ; shift left byte read
+    sla b ; ...
+    dec d
+    jr .LoopToRevertSlide
+.RevertSlideDone
+    ld a,%11111111  ; Reverse Mask
+    sub c           ; ...
+    ld c,a          ; ...
+    ld a,[hl] ; Read Original
+    and c ; Apply Mask
+    add b ; Insert New TM Qty
+    ld [hl],a ; Overwrite
+    scf
+    ret
+
 FindRightByteAndNibbleID:
     sub TM_01 ; TM01 ID = 0
     ld c,a
@@ -28481,10 +28555,13 @@ HackCheckTMToBag:
     ld a,wNumBagItems >> 8
     cp h
     jr nz,.Standard
-    call ResetTMQty
+.Custom
     pop hl ; Hack Remove Return Pointer
-    scf
-    ret
+    call GetCurrentOldAdventureMap
+    cp CELADON_MART_2
+    ld a,[$cf91] ; a = item ID
+    jp nz,ResetTMQty
+    jp AddTMQty ; Only in CeladonMart2
 .Standard
     ld a,[$cf96] ; a = item quantity
     ret
@@ -28520,36 +28597,6 @@ StopAlarmAndLoadCaughtText:
     ld [$d083],a ; ...
     ld hl,ItemUseBallText05
     ret
-
-CheckCutTile: ;joenote - consolidate this into its own function
-    ld a,[W_CURMAPTILESET]
-    and a
-    jr z,.overworld
-    cp 7
-    jr z,.gym
-    cp 23 ;added plateau
-    jr z,.plateau
-    ret ;nz if not one of the listed tilesets
-.gym
-    ld a,[$cfc6]
-    cp $50 ; gym cut tree
-    jr z,.loadCutTile
-    ret ;nz if not a cuttable tile
-.plateau
-    ld a,[$cfc6]
-    cp $45 ; grass
-    jr z,.loadCutTile
-    ret ;nz if not a cuttable tile
-.overworld
-    ld a,[$cfc6]
-    cp $3d ; cut tree
-    jr z,.loadCutTile
-    cp $52 ; grass
-    jr z,.loadCutTile
-    ret ;nz if not a cuttable tile
-.loadCutTile
-    ld [$cd4d],a ; CutTile
-    ret ;z already set at this return
 
 RunOnlyIfNotSelectInOverworld:
     ld a,[wSelectInOverworldOnBit6]
@@ -30362,23 +30409,23 @@ TMToMove: ; 13763 (4:7763)
     ret
 
 TechnicalMachines: ; 13773 (4:7773)
-    db MEGA_PUNCH   ; TM_01 ; Market
-    db RAZOR_WIND   ; TM_02 ; Market
+    db MEGA_PUNCH   ; TM_01
+    db RAZOR_WIND   ; TM_02
     db SWORDS_DANCE ; TM_03
     db WHIRLWIND    ; TM_04
-    db MEGA_KICK    ; TM_05 ; Market
+    db MEGA_KICK    ; TM_05
     db TOXIC        ; TM_06
-    db HORN_DRILL   ; TM_07 ; Market
+    db HORN_DRILL   ; TM_07
     db BODY_SLAM    ; TM_08
-    db TAKE_DOWN    ; TM_09 ; Market
+    db TAKE_DOWN    ; TM_09
     db DOUBLE_EDGE  ; TM_10
     db BUBBLEBEAM   ; TM_11
     db WATER_GUN    ; TM_12
     db ICE_BEAM     ; TM_13
     db BLIZZARD     ; TM_14
-    db HYPER_BEAM   ; TM_15 ; Game Corner
-    db PAY_DAY      ; TM_16 ; Game Corner
-    db SUBMISSION   ; TM_17 ; Market
+    db HYPER_BEAM   ; TM_15
+    db PAY_DAY      ; TM_16
+    db SUBMISSION   ; TM_17
     db COUNTER      ; TM_18
     db SEISMIC_TOSS ; TM_19
     db RAGE         ; TM_20
@@ -30393,8 +30440,8 @@ TechnicalMachines: ; 13773 (4:7773)
     db PSYCHIC_M    ; TM_29
     db TELEPORT     ; TM_30
     db MIMIC        ; TM_31
-    db DOUBLE_TEAM  ; TM_32 ; Market
-    db REFLECT      ; TM_33 ; Market
+    db DOUBLE_TEAM  ; TM_32
+    db REFLECT      ; TM_33
     db BIDE         ; TM_34
     db METRONOME    ; TM_35
     db SELFDESTRUCT ; TM_36
@@ -30411,7 +30458,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db EXPLOSION    ; TM_47
     db ROCK_SLIDE   ; TM_48
     db TRI_ATTACK   ; TM_49
-    db SUBSTITUTE   ; TM_50 ; Game Corner
+    db SUBSTITUTE   ; TM_50
     db BLADE        ; TM_51
     db SWOOP        ; TM_52
     db TSUNAMI      ; TM_53
@@ -84444,8 +84491,8 @@ CeladonMart2Text2:
     db $08 ; asm
     ld hl,$cf0c ; skipDrawingTextBoxBorder
     set 0,[hl]    ; ...
-    ld a,6 ; CeladonMart2Text2_BeforeWinHoF
     call CheckHallOfFameWin
+    ld a,6 ; CeladonMart2Text2_BeforeWinHoF
     jr z,.done
     ld a,7 ; CeladonMart2Text2_AfterWinHoF
 .done
@@ -135657,23 +135704,23 @@ ItemNames:
     db "?@"            ; $BC
     db "?@"            ; $BD
     db "?@"            ; $BE
-    db "TM01:M.PNCH@"  ; $BF ; TM_01 ; Market
-    db "TM02:RAZ.WND@" ; $C0 ; TM_02 ; Market
+    db "TM01:M.PNCH@"  ; $BF ; TM_01
+    db "TM02:RAZ.WND@" ; $C0 ; TM_02
     db "TM03:SW.DNCE@" ; $C1 ; TM_03
-    db "TM04:WHRLWND@" ; $C2 ; TM_04 ; Market
-    db "TM05:MEG.KCK@" ; $C3 ; TM_05 ; Market
+    db "TM04:WHRLWND@" ; $C2 ; TM_04
+    db "TM05:MEG.KCK@" ; $C3 ; TM_05
     db "TM06:TOXIC@"   ; $C4 ; TM_06
-    db "TM07:HRN DR.@" ; $C5 ; TM_07 ; Market
+    db "TM07:HRN DR.@" ; $C5 ; TM_07
     db "TM08:BDY SLM@" ; $C6 ; TM_08
-    db "TM09:TAK.DWN@" ; $C7 ; TM_09 ; Market
-    db "TM10:DB.EDG@"  ; $C8 ; TM_10 ; Market
+    db "TM09:TAK.DWN@" ; $C7 ; TM_09
+    db "TM10:DB.EDG@"  ; $C8 ; TM_10
     db "TM11:BUB.B.@"  ; $C9 ; TM_11
-    db "TM12:WTR GUN@" ; $CA ; TM_12 ; Market
+    db "TM12:WTR GUN@" ; $CA ; TM_12
     db "TM13:ICE BM.@" ; $CB ; TM_13
     db "TM14:BLZZARD@" ; $CC ; TM_14
     db "TM15:HYPR.B.@" ; $CD ; TM_15
     db "TM16:PAY DAY@" ; $CE ; TM_16
-    db "TM17:SUBMIS.@" ; $CF ; TM_17 ; Market
+    db "TM17:SUBMIS.@" ; $CF ; TM_17
     db "TM18:COUNTER@" ; $D0 ; TM_18
     db "TM19:SSM TOS@" ; $D1 ; TM_19
     db "TM20:RAGE@"    ; $D2 ; TM_20
@@ -135684,12 +135731,12 @@ ItemNames:
     db "TM25:THUNDER@" ; $D7 ; TM_25
     db "TM26:EARTHQ.@" ; $D8 ; TM_26
     db "TM27:FISSURE@" ; $D9 ; TM_27
-    db "TM28:DIG@"     ; $DA ; TM_28
+    db "TM28:TRPHOLE@" ; $DA ; TM_28
     db "TM29:PSYCHIC@" ; $DB ; TM_29
-    db "TM30:TELEPRT@" ; $DC ; TM_30 ; Market
+    db "TM30:TELEPRT@" ; $DC ; TM_30
     db "TM31:MIMIC@"   ; $DD ; TM_31
-    db "TM32:DB.TEAM@" ; $DE ; TM_32 ; Market
-    db "TM33:REFLECT@" ; $DF ; TM_33 ; Market
+    db "TM32:DB.TEAM@" ; $DE ; TM_32
+    db "TM33:REFLECT@" ; $DF ; TM_33
     db "TM34:BIDE@"    ; $E0 ; TM_34
     db "TM35:METRONM@" ; $E1 ; TM_35
     db "TM36:SELFDST@" ; $E2 ; TM_36
@@ -135697,7 +135744,7 @@ ItemNames:
     db "TM38:FIR.BLS@" ; $E4 ; TM_38
     db "TM39:SWIFT@"   ; $E5 ; TM_39
     db "TM40:SKUL B.@" ; $E6 ; TM_40
-    db "TM41:LGT SCR@" ; $E7 ; TM_41 ; Market
+    db "TM41:LGT SCR@" ; $E7 ; TM_41
     db "TM42:DRM EAT@" ; $E8 ; TM_42
     db "TM43:SKY ATK@" ; $E9 ; TM_43
     db "TM44:REST@"    ; $EA ; TM_44
@@ -141070,19 +141117,7 @@ InitializeChooseQuantityMenu:
 .printInitialQuantity
     ld de,.InitialQuantityText
     call PlaceString
-    ld a,[$ff8e]
-    and a ; should the price be halved (for selling items)?
-    jr nz,.QtyStandard
-    ld a,[wListMenuID]
-    cp a,PRICEDITEMLISTMENU
-    jr nz,.QtyStandard
-    ld a,[$cf91] ; selected item ID
-    cp TM_01
-    ld a,2 ; Initialize TM Qty to 2 (then increase)
-    jr nc,.QtyDone
-.QtyStandard
     xor a
-.QtyDone
     ld [$cf96],a ; initialize current quantity to 0 (then increase)
     ret
 .PackText
