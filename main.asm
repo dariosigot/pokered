@@ -7509,53 +7509,69 @@ DisplayChooseQuantityMenu:
 
     BANKSWITCH InitializeChooseQuantityMenu
 
+    ld c,1
     jr .incrementQuantity
 
 .waitForKeyPressLoop
     call GetJoypadStateLowSensitivity
-    ld a,[$ffb5]
+    ld a,[$ffb5] ; ▼▲◄►StSeBA
     bit 0,a ; was the A button pressed?
-    jp nz,.buttonAPressed
+    jp nz,QtyMenu_buttonAPressed
     bit 1,a ; was the B button pressed?
-    jp nz,.buttonBPressed
+    jp nz,QtyMenu_buttonBPressed
     ld b,a
     ld a,[$ff8e]
     and a ; should the price be halved (for selling items)?
-    jr nz,.CheckUpDown
+    jr nz,.CheckUpDownLeftRight
     ld a,[wListMenuID]
     cp a,PRICEDITEMLISTMENU
-    jr nz,.CheckUpDown
+    jr nz,.CheckUpDownLeftRight
     ld a,[$cf91] ; selected item ID
     cp TM_01
-    jr c,.CheckUpDown
+    jr c,.CheckUpDownLeftRight
     jr .waitForKeyPressLoop
-.CheckUpDown
+
+.CheckUpDownLeftRight
     ld a,b
+    ld c,1
     bit 6,a ; was Up pressed?
     jr nz,.incrementQuantity
     bit 7,a ; was Down pressed?
     jr nz,.decrementQuantity
+    ld c,10
+    bit 4,a ; was Right pressed?
+    jr nz,.incrementQuantity
+    bit 5,a ; was Left pressed?
+    jr nz,.decrementQuantity
     jr .waitForKeyPressLoop
+
 .incrementQuantity
     ld a,[$cf97] ; max quantity
     inc a
     ld b,a
     ld hl,$cf96 ; current quantity
-    inc [hl]
     ld a,[hl]
+    add c
+    ld [hl],a
     cp b
-    jr nz,.handleNewQuantity
+    jr c,.handleNewQuantity
 ; wrap to 1 if the player goes above the max quantity
     ld a,1
     ld [hl],a
     jr .handleNewQuantity
+
 .decrementQuantity
     ld hl,$cf96 ; current quantity
-    dec [hl]
+    ld a,[hl]
+    sub c
+    ld [hl],a
+    jr c,.wrapToMax
     jr nz,.handleNewQuantity
+.wrapToMax
 ; wrap to the max quantity if the player goes below 1
     ld a,[$cf97] ; max quantity
     ld [hl],a
+
 .handleNewQuantity
     FuncCoord 17,10
     ld hl,Coord
@@ -7599,7 +7615,7 @@ DisplayChooseQuantityMenu:
 .skipHalvingPrice
     FuncCoord 12,10
     ld hl,Coord
-    ld de,.SpacesBetweenQuantityAndPriceText
+    ld de,SpacesBetweenQuantityAndPriceText
     call PlaceString
     ld de,$ff9f ; total price
     ld c,$a3
@@ -7611,18 +7627,6 @@ DisplayChooseQuantityMenu:
     ld bc,$8102 ; print leading zeroes,1 byte,2 digits
     call PrintNumber
     jp .waitForKeyPressLoop
-.buttonAPressed ; the player chose to make the transaction
-.buttonCommonPressed
-    xor a
-    ld [$cc35],a ; 0 means no item is currently being swapped
-    ld [$ffb7],a ; Reset Quick Menu
-    ret
-.buttonBPressed ; the player chose to cancel the transaction
-    call .buttonCommonPressed
-    ld a,$ff
-    ret
-.SpacesBetweenQuantityAndPriceText
-    db "      @"
 
 SECTION "PrintListMenuEntries",ROM0[$2e5a] ; cannot be moved cause "HackItemInBattle"
 
@@ -9023,6 +9027,20 @@ TestWrapInMenuInput:
 ChangeCurMap:
     ld [W_CURMAP],a
     ret
+
+QtyMenu_buttonAPressed: ; the player chose to make the transaction
+buttonCommonPressed:
+    xor a
+    ld [$cc35],a ; 0 means no item is currently being swapped
+    ld [$ffb7],a ; Reset Quick Menu
+    ret
+QtyMenu_buttonBPressed: ; the player chose to cancel the transaction
+    call buttonCommonPressed
+    ld a,$ff
+    ret
+
+SpacesBetweenQuantityAndPriceText:
+    db "      @"
 
 ; Free
 
