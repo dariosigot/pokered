@@ -115,9 +115,13 @@ wLastMenuItem: ; cc2a
 ; id of previously selected menu item
     ds 1
 
-; cc2b
+wcc2b:: db
 
-    ds 3
+; It is used by the bag list to remember the cursor position while the menu
+; isn't active.
+wBagSavedMenuItem:: db ; cc2c
+
+wcc2d:: db
 
 wPlayerMoveListIndex: ; cc2e
     ds 1
