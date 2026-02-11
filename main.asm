@@ -7552,6 +7552,7 @@ DisplayChooseQuantityMenu:
     ld hl,$cf96 ; current quantity
     ld a,[hl]
     add c
+    jr c,.wrapToMax
     cp b
     jr c,.handleNewQuantity
     jr .wrapToMax
@@ -7562,8 +7563,12 @@ DisplayChooseQuantityMenu:
     sub c
     jr c,.wrapTo1
     jr nz,.handleNewQuantity
+    ; ft
 
 .wrapTo1
+    ld a,[hl] ; current quantity
+    dec a
+    jr nz,.wrapTo1Skip
     ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
     and a                        ; ...
     jr nz,.wrapToMaxSkip         ; ...
@@ -7572,25 +7577,30 @@ DisplayChooseQuantityMenu:
     jr .handleNewQuantity
 
 .wrapToMax
+    ld a,[hl] ; current quantity
+    dec b
+    cp b
+    jr nz,.wrapToMaxSkip
     ld a,[H_NEWLYPRESSEDBUTTONS] ; No Infinite Loop
     and a                        ; ...
     jr nz,.wrapTo1Skip           ; ...
 .wrapToMaxSkip
     ld a,[$cf97] ; max quantity
+    ; ft
 
 .handleNewQuantity
     ld [hl],a
-    FuncCoord 17,10
+    FuncCoord 16,10
     ld hl,Coord
     ld a,[wListMenuID]
     cp a,PRICEDITEMLISTMENU
     jr nz,.printQuantity
     BANKSWITCH PrintPrice
-    FuncCoord 9,10
+    FuncCoord 08,10
     ld hl,Coord
 .printQuantity
     ld de,$cf96 ; current quantity
-    ld bc,$8102 ; print leading zeroes,1 byte,2 digits
+    ld bc,((%10000000|01)<<8|03) ; print leading zeroes,1 byte,3 digits
     call PrintNumber
     jp .waitForKeyPressLoop
 
@@ -7741,7 +7751,7 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     and a ; is the item unsellable?
     jr nz,.skipPrintingItemQuantity ; if so,don't print the quantity
     push hl
-    ld bc,20 + 8 ; 1 row down and 8 columns right
+    ld bc,20 + 7 ; 1 row down and 7 columns right
     add hl,bc
     ld a,"×"
     ldi [hl],a
@@ -7752,7 +7762,7 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     push de
     ld de,$d11e
     ld [de],a
-    ld bc,$0102
+    ld bc,(01<<8|03)
     call PrintNumber
     pop de
     pop af
@@ -15946,19 +15956,6 @@ HandleItemListSwapping: ; 6b44 (1:6b44)
     jr z,.swapSameItemType
 .swapDifferentItems
     call SwapItemNew
-    ;ld [$ff95],a ; [$ff95] = second item ID
-    ;ld a,[hld]
-    ;ld [$ff96],a ; [$ff96] = second item quantity
-    ;ld a,[de]
-    ;ld [hli],a ; put first item ID in second item slot
-    ;inc de
-    ;ld a,[de]
-    ;ld [hl],a ; put first item quantity in second item slot
-    ;ld a,[$ff96]
-    ;ld [de],a ; put second item quantity in first item slot
-    ;dec de
-    ;ld a,[$ff95]
-    ;ld [de],a ; put second item ID in first item slot
     xor a
     ld [$cc35],a ; 0 means no item is currently being swapped
     pop de
@@ -15970,12 +15967,14 @@ HandleItemListSwapping: ; 6b44 (1:6b44)
     ld b,a
     ld a,[de]
     add b ; a = sum of both item quantities
-    cp a,100 ; is the sum too big for one item slot?
+    jr c,.MoveQuantity
+    cp a,255 ; is the sum too big for one item slot?
     jr c,.combineItemSlots
 ; swap enough items from the first slot to max out the second slot if they can't be combined
-    sub a,99
+.MoveQuantity
+    sub a,254
     ld [de],a
-    ld a,99
+    ld a,254
     ld [hl],a
     jr .done
 .combineItemSlots
@@ -16089,7 +16088,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld a,[$cf91]
     ld a,PRICEDITEMLISTMENU
     ld [wListMenuID],a
-    ld [$ff8e],a ; halve prices when selling
+    BANKSWITCH HalvePrice
     call DisplayChooseQuantityMenu
     inc a
     jr z,.sellMenuLoop ; if the player closed the choose quantity menu with the B button
@@ -16158,7 +16157,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld [wListMenuID],a
     call DisplayListMenuIDSaveCursor
     jr c,.returnToMainPokemartMenu ; if the player closed the menu
-    ld a,$63
+    ld a,254
     ld [$cf97],a
     xor a
     ld [$ff8e],a
@@ -22493,15 +22492,11 @@ CheckCutTile: ;joenote - consolidate this into its own function
     ld [$cd4d],a ; CutTile
     ret ;z already set at this return
 
-; Free
-
-SECTION "UnnamedText_cdfa",ROMX[$4dfa],BANK[$3]
-
-UnnamedText_cdfa: ; cdfa (3:4dfa)
+UnnamedText_cdfa:
     TX_FAR _UnnamedText_cdfa
     db "@"
 
-UnnamedText_cdff: ; cdff (3:4dff)
+UnnamedText_cdff:
     TX_FAR _UnnamedText_cdff
     db "@"
 
@@ -22511,7 +22506,7 @@ UnnamedText_cdff: ; cdff (3:4dff)
 ; [$CF91] = item ID
 ; [$CF96] = item quantity
 ; sets carry flag if successful,unsets carry flag if unsuccessful
-AddItemToInventory_: ; ce04 (3:4e04)
+AddItemToInventory_:
     call HackCheckTMToBag ; ld a,[$cf96] ; a = item quantity
     push af
     push bc
@@ -22568,17 +22563,19 @@ AddItemToInventory_: ; ce04 (3:4e04)
     ld b,a ; b = quantity to add
     ld a,[hl] ; a = existing item quantity
     add b ; a = new item quantity
-    cp a,100
-    jp c,.storeNewQuantity ; if the new quantity is less than 100,store it
-; if the new quantity is greater than or equal to 100,
+    jr c,.DivideIntoTwoItem
+    cp a,255
+    jp c,.storeNewQuantity ; if the new quantity is less than 255,store it
+; if the new quantity is greater than or equal to 255,
 ; try to max out the current slot and add the rest in a new slot
-    sub a,99
+.DivideIntoTwoItem
+    sub a,254
     ld [$cf96],a ; a = amount left over (to put in the new slot)
     ld a,d
     and a ; is there room for a new item slot?
     jr z,.increaseItemQuantityFailed
-; if so,store 99 in the current slot and store the rest in a new slot
-    ld a,99
+; if so,store 254 in the current slot and store the rest in a new slot
+    ld a,254
     ld [hli],a
     jp .loop
 .increaseItemQuantityFailed
@@ -22604,7 +22601,7 @@ AddItemToInventory_: ; ce04 (3:4e04)
 ; hl = address of inventory (either wNumBagItems or wNumBoxItems)
 ; [$CF92] = index (within the inventory) of the item to remove
 ; [$CF96] = quantity to remove
-RemoveItemFromInventory_: ; ce74 (3:4e74)
+RemoveItemFromInventory_:
     push hl
     inc hl
     ld a,[$cf92] ; index (within the inventory) of the item being removed
@@ -55712,7 +55709,7 @@ CheckPlayerStatusConditions:
     ld a,[W_PLAYERBATTSTATUS2] ; $d063
     bit 6,a
     jr z,.Func_3da39
-    ld a,$63
+    ld a,RAGE
     ld [$d11e],a
     call GetMoveName
     call CopyStringToCF4B
@@ -58323,7 +58320,7 @@ CheckEnemyStatusConditions:
     ld a,[W_ENEMYBATTSTATUS2] ; $d068
     bit 6,a
     jr z,.Func_3eaba
-    ld a,$63
+    ld a,RAGE
     ld [$d11e],a
     call GetMoveName
     call CopyStringToCF4B
@@ -141133,29 +141130,29 @@ InitializeChooseQuantityMenu:
     ld hl,wWaitReleaseJoyBit5
     set 5,[hl]
 ; text box dimensions/coordinates for just quantity
-    FuncCoord 15,9
+    FuncCoord 14,09
     ld hl,Coord
-    ld b,1 ; height
-    ld c,3 ; width
+    ld b,01 ; height
+    ld c,04 ; width
     ld a,[wListMenuID]
     cp a,PRICEDITEMLISTMENU
     jr nz,.drawTextBox
 ; text box dimensions/coordinates for quantity and price
-    FuncCoord 7,9
+    FuncCoord 06,09
     ld hl,Coord
     ld a,[$ff8e]
     and a ; should the price be halved (for selling items)?
-    ld b,1  ; height
+    ld b,01  ; height
     jr nz,.SellOnly1Row
     ld a,[$cf91] ; selected item ID
     cp TM_01
     jr nc,.SellOnly1Row
-    ld b,3  ; height
+    ld b,03  ; height
 .SellOnly1Row
-    ld c,11 ; width
+    ld c,12 ; width
 .drawTextBox
     call TextBoxBorder
-    FuncCoord 16,10
+    FuncCoord 15,10
     ld hl,Coord
     ld a,[wListMenuID]
     cp a,PRICEDITEMLISTMENU
@@ -141165,24 +141162,23 @@ InitializeChooseQuantityMenu:
     jr nz,.SkipShowBagInfo
     ld a,[$cf91] ; selected item ID
     cp TM_01
-    jr nc,.SkipShowBagInfo
-    ld b,a
-    call IsItemInBag
-    ld a,b
-    ld [wBackupItemCurrentQty],a
-    FuncCoord 17,12
-    ld hl,Coord
-    ld de,wBackupItemCurrentQty ; quantity
-    ld bc,$8102 ; print leading zeroes,1 byte,2 digits
-    call PrintNumber
-    FuncCoord 12,12
-    ld hl,Coord
-    ld de,.PackText
-    call PlaceString
+    call c,.PrintBagInfo
 .SkipShowBagInfo
     ld a,[$cf91] ; selected item ID
     sub TM_01
-    jr c,.SkipMoveDetails
+    call nc,.PrintMoveDetails
+    FuncCoord 07,10
+    ld hl,Coord
+.printInitialQuantity
+    ld de,.InitialQuantityText
+    call PlaceString
+    xor a
+    ld [$cf96],a ; initialize current quantity to 0 (then increase)
+    ret
+.InitialQuantityText
+    db "×001@"
+
+.PrintMoveDetails
     inc a
     ld [$d11e],a
     PREDEF TMToMove
@@ -141192,20 +141188,76 @@ InitializeChooseQuantityMenu:
     ld de,Coord
     ld hl,wHyperBeamUnknownTypeBit4
     set 4,[hl]
-    PREDEF PrintMoveDetailsBox
-.SkipMoveDetails
-    FuncCoord 8,10
+    PREDEF_JUMP PrintMoveDetailsBox
+
+.PrintBagInfo
+    ld b,a
+    ld hl,0
+    ld de,wNumBagItems
+    ld a,[de]
+    and a
+    jr z,.BagItemCountDone
+    inc de
+    ld c,a
+.BagItemCountLoop
+    ld a,[de]
+    cp $FF
+    jr z,.BagItemCountDone
+    inc de
+    cp b
+    jr nz,.BagItemCountSkip
+    ld a,[de]
+    push bc
+    ld b,0
+    ld c,a
+    add hl,bc ; add found item qty to hl
+    pop bc
+.BagItemCountSkip
+    inc de
+    dec c
+    jr nz,.BagItemCountLoop
+.BagItemCountDone
+    ld a,h
+    ld [wBufferPointerByte1],a
+    ld a,l
+    ld [wBufferPointerByte2],a
+    FuncCoord 15,12
     ld hl,Coord
-.printInitialQuantity
-    ld de,.InitialQuantityText
-    call PlaceString
-    xor a
-    ld [$cf96],a ; initialize current quantity to 0 (then increase)
-    ret
+    ld de,wBufferPointerByte1 ; quantity
+    ld bc,((%10000000|02)<<8|04) ; print leading zeroes,2 byte,4 digits
+    call PrintNumber
+    FuncCoord 10,12
+    ld hl,Coord
+    ld de,.PackText
+    jp PlaceString
 .PackText
     db "BAG ×@"
-.InitialQuantityText
-    db "×01@"
+
+; ──────────────────────────────────────────────────────────────────────
+
+HalvePrice:
+    ld a,2
+    ld [$ff8e],a ; halve unit prices when selling
+    ld a,[$ff8b]
+    ld [$ff9f],a
+    ld a,[$ff8c]
+    ld [$ffa0],a
+    ld a,[$ff8d]
+    ld [$ffa1],a
+    xor a
+    ld [$ffa2],a
+    ld [$ffa3],a
+    ld a,$02
+    ld [$ffa4],a
+    PREDEF Func_f71e ; halves the unit price
+; store the halved unit price
+    ld a,[$ffa2]
+    ld [$ff8b],a
+    ld a,[$ffa3]
+    ld [$ff8c],a
+    ld a,[$ffa4]
+    ld [$ff8d],a
+    ret
 
 PrintPrice:
     ld c,$03
@@ -141225,23 +141277,6 @@ PrintPrice:
     pop bc
     dec b
     jr nz,.addLoop
-    ld a,[$ff8e]
-    and a ; should the price be halved (for selling items)?
-    jr z,.skipHalvingPrice
-    xor a
-    ld [$ffa2],a
-    ld [$ffa3],a
-    ld a,$02
-    ld [$ffa4],a
-    PREDEF Func_f71e ; halves the price
-; store the halved price
-    ld a,[$ffa2]
-    ld [$ff9f],a
-    ld a,[$ffa3]
-    ld [$ffa0],a
-    ld a,[$ffa4]
-    ld [$ffa1],a
-.skipHalvingPrice
     FuncCoord 12,10
     ld hl,Coord
     ld de,.SpacesBetweenQuantityAndPriceText

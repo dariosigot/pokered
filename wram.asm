@@ -1974,7 +1974,6 @@ wFlagDisableSynchronizeBit0: ; dee9 ; bit 0 = Disable Synchronize Party
     ds 1
 
 wExplodeFlag:          ; deea
-wBackupItemCurrentQty: ; deea
 wMaxNotExclMoveSlotId: ; deea
     ds 1
 
