@@ -27,7 +27,7 @@ BENGAL        EQU $19
 ; XXX ????? EQU $1A
 ; XXX ????? EQU $1B
 ; XXX ????? EQU $1C
-ESCAPE_ROPE   EQU $1D
+AUGER         EQU $1D
 REPEL         EQU $1E
 OLD_AMBER     EQU $1F
 FIRE_STONE    EQU $20

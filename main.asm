@@ -11485,7 +11485,7 @@ ItemPrices:
     bcd3      0 ; ?
     bcd3      0 ; ?
     bcd3      0 ; ?
-    bcd3      0 ; ESCAPE_ROPE
+    bcd3      0 ; AUGER
     bcd3    350 ; REPEL
     bcd3      0 ; OLD_AMBER
     bcd3  40000 ; FIRE_STONE
@@ -22361,6 +22361,8 @@ ItemUseBengal:
 .end
     ld hl,wOverworlLightAnimBit0
     set 0,[hl]
+    ld hl,wOverworldGoToDarkBit4
+    res 4,[hl]
     ld a,1
     ld [$cd6a],a ; item use success
     ret
@@ -23057,7 +23059,7 @@ UseItem_:
     dw UnusableItem      ;
     dw UnusableItem      ;
     dw UnusableItem      ;
-    dw ItemUseEscapeRope ; ESCAPE_ROPE
+    dw ItemUseAuger      ; AUGER
     dw ItemUseRepel      ; REPEL
     dw UnusableItem      ; OLD_AMBER
     dw ItemUseEvoStone   ; FIRE_STONE
@@ -24452,33 +24454,9 @@ ThrewRockText:
     db "@"
 
 ; also used for Dig out-of-battle effect
-ItemUseEscapeRope:
-    ld a,[W_ISINBATTLE]
-    and a
-    jr nz,.notUsable
-    ; Check Surfing
-    ld a,[$d700]
-    cp a,2 ; Surfing?
-    jr z,.notUsable
-    call CheckDiglettsCaveHole
-    jr z,.SkipCheckDark
-    ; Check Dark
-    ld a,[$d35d]
-    and a
-    jr nz,.notUsable
-.SkipCheckDark
-    call GetCurrentOldAdventureMap
-    cp AGATHAS_ROOM
-    jr z,.notUsable
-    ld a,[W_CURMAPTILESET]
-    ld b,a
-    ld hl,.EscapeRopeTilesets
-.loop
-    ld a,[hli]
-    cp a,$ff
-    jr z,.notUsable
-    cp b
-    jr nz,.loop
+ItemUseAuger:
+    call CanDig
+    jp nc,ItemUseFailed
     ld hl,$d732
     set 3,[hl]
     set 6,[hl]
@@ -24498,11 +24476,38 @@ ItemUseEscapeRope:
     call ItemUseReloadOverworldData
     ld c,30
     jp DelayFrames
-.notUsable
-    jp DigNotUsable
-.EscapeRopeTilesets
-    db $03,$0f,$11,$16,$10
-    db $ff ; terminator
+
+CanDig:
+    ld a,[W_ISINBATTLE]
+    and a
+    ld hl,ItemUseNotTimeText
+    jr nz,.Cant
+    ; Check Surfing
+    ld a,[$d700]
+    cp a,2 ; Surfing?
+    ld hl,.CantDigDuringFloatText
+    jr z,.Cant
+    ld a,[W_CURMAPTILESET]
+    cp $11 ; Cave
+    jr z,.Can
+    call GetCurrentOldAdventureMap
+    cp VIRIDIAN_FOREST
+    ld hl,.cannotDigHereText
+    jr nz,.Cant
+    ; ft
+.Can
+    scf
+    ret
+.Cant
+    and a ; rcf
+    ret
+
+.CantDigDuringFloatText
+    TX_FAR _CantDigDuringFloatText
+    db "@"
+.cannotDigHereText
+    TX_FAR _CannotDigHereText
+    db "@"
 
 SECTION "ItemUseRepel",ROMX[$6003],BANK[$3]
 
@@ -25068,16 +25073,6 @@ ItemUsePPRestore:
     ret
 .PPRestoredText
     TX_FAR _PPRestoredText
-    db "@"
-
-DigNotUsable:
-    ld a,[$d152]
-    and a
-    jp z,ItemUseNotTime
-    ld hl,.cannotDigHereText
-    jp ItemUseFailed
-.cannotDigHereText
-    TX_FAR _CannotDigHereText
     db "@"
 
 PrintBattleValueNearMon:
@@ -29654,7 +29649,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
 
 ; items which close the item menu when used
 UsableItems_CloseMenu:
-    db ESCAPE_ROPE
+    db AUGER
     db ITEMFINDER
     db POKE_FLUTE
     db OLD_ROD
@@ -29920,12 +29915,11 @@ StartMenu_Pokemon:
     dw .softboiled
 
 .fly
-    call CheckIfInOutsideMapAndAtLeastOneFlyingMap
-    jr z,.canFly
-    ld a,[$cf92]
-    ld hl,W_PARTYMON1NAME
-    call GetPartyMonName
-    ld hl,.cannotFlyHereText
+    call CanFly
+    jr c,.canFly
+    push hl
+    call GetPartyMonName2
+    pop hl
     call PrintText
     jp .loop
 .canFly
@@ -29933,6 +29927,7 @@ StartMenu_Pokemon:
     ld a,[$d732]
     bit 3,a ; did the player decide to fly?
     jr z,.undoFly
+    call .ResetSafari
     call PlayCryAndDecreaseSkillEnergy
     jp .goBackToMap
 .undoFly
@@ -29940,9 +29935,6 @@ StartMenu_Pokemon:
     ld hl,$d72e
     set 1,[hl]
     jp StartMenu_Pokemon
-.cannotFlyHereText
-    TX_FAR _CannotFlyHereText
-    db "@"
 
 .cut
     BANKSWITCH CheckCutTile
@@ -29951,6 +29943,8 @@ StartMenu_Pokemon:
     ld a,[$cd6a]
     and a
     jp z,.loop
+    ld hl,wForceSortPartyWSelectBit4
+    res 4,[hl]
     jp CloseTextDisplay
 
 .surf
@@ -29980,7 +29974,7 @@ StartMenu_Pokemon:
     jr .common
 
 .dig
-    ld a,ESCAPE_ROPE
+    ld a,AUGER
     ; fall through
 
 .common
@@ -29993,12 +29987,11 @@ StartMenu_Pokemon:
     jr .WhiteScreenAndGotoMap
 
 .teleport
-    call CheckIfTeleportNotAllowed
-    jr nz,.canTeleport
-    ld a,[$cf92]
-    ld hl,W_PARTYMON1NAME
-    call GetPartyMonName
-    ld hl,.cannotUseTeleportNowText
+    call CanTeleport
+    jr c,.canTeleport
+    push hl
+    call GetPartyMonName2
+    pop hl
     call PrintText
     jp .loop
 .canTeleport
@@ -30011,6 +30004,7 @@ StartMenu_Pokemon:
     ld hl,$d72e
     set 1,[hl]
     res 4,[hl]
+    call .ResetSafari
     ld c,60
     call DelayFrames
     call GBPalWhiteOutWithDelay3 ; zero all three palettes and wait 3 V-blanks
@@ -30018,9 +30012,14 @@ StartMenu_Pokemon:
 .warpToLastPokemonCenterText
     TX_FAR _WarpToLastPokemonCenterText
     db "@"
-.cannotUseTeleportNowText
-    TX_FAR _CannotUseTeleportNowText
-    db "@"
+
+.ResetSafari
+    ld hl,$d790
+    res 7,[hl] ; unset Safari Zone bit
+    xor a
+    ld [$da47],a
+    ld [W_SAFARIZONEENTRANCECURSCRIPT],a
+    ret
 
 .softboiled
     ld hl,W_PARTYMON1_MAXHP
@@ -30063,6 +30062,8 @@ StartMenu_Pokemon:
     db "@"
 
 .goBackToMap
+    ld hl,wForceSortPartyWSelectBit4
+    res 4,[hl]
     call RestoreScreenTilesAndReloadTilePatterns
     jp CloseTextDisplay
 
@@ -30960,49 +30961,87 @@ FixTMPalette:
     jp PlaceString
 
 ; If Not Allowed Set z
-CheckIfTeleportNotAllowed:
+CanTeleport:
+    ; Check Dark
+    ld a,[$d35d]
+    and a
+    ld hl,.CantTeleportInTheDarkText
+    jr nz,.Cant
+    ; Check Surfing
+    ld a,[$d700]
+    cp a,2 ; Surfing?
+    jr nz,.SurfingCheckOK
+    call IsSurfingOnLapras
+    ld hl,.CantTeleportDuringFloatText
+    jr nz,.Cant
+.SurfingCheckOK
     call CheckHallOfFameWin
     jr z,.skip
     call GetCurrentOldAdventureMap
     ld b,a
-    ld c,4
+    ld c,6
     ld hl,.EliteFourMapAllowed
 .LoopEliteFour
     ld a,[hli]
     cp b
-    jr z,.Allowed
+    jr z,.Can
     dec c
     jr nz,.LoopEliteFour
 .skip
     ld a,[W_CURMAPTILESET]
-    ld hl,.TilesetNotAllowed
-    call .CheckList
+    cp $11 ; Cave
+    ld hl,.CantTeleportInACaveText
+    jr z,.Cant
     call GetCurrentOldAdventureMap
+    ld de,1
     ld hl,.MapNotAllowed
-    call .CheckList
-.Allowed
-    dec a ; Reset z ; Allowed
+    call IsInArray
+    ld hl,.CantTeleportHereText
+    jr c,.Cant
+    ; ft
+.Can
+    scf
     ret
-.CheckList
-    ld b,a
-.Loop
-    ld a,[hli]
-    cp a,$ff
-    ret z
-    cp b
-    jr nz,.Loop
-    pop hl ; Delete Return Pointer
-    ret ; Set z ; Not Allowed
-.EliteFourMapAllowed ; only first 4 maps
+.Cant
+    and a ; rcf
+    ret
+
+.EliteFourMapAllowed ; only first 6 maps
 .MapNotAllowed
-    db LORELEIS_ROOM,BRUNOS_ROOM,AGATHAS_ROOM,LANCES_ROOM
-    db BATTLE_CENTER,TRADE_CENTER
-    db SS_ANNE_1,SS_ANNE_2,SS_ANNE_3,SS_ANNE_4,SS_ANNE_5,SS_ANNE_6,SS_ANNE_7,SS_ANNE_8,SS_ANNE_9,SS_ANNE_10,DRATINI_CAVE
-    db SAFARI_ZONE_REST_HOUSE_1,SAFARI_ZONE_REST_HOUSE_2,SAFARI_ZONE_REST_HOUSE_3,SAFARI_ZONE_REST_HOUSE_4,SAFARI_ZONE_SECRET_HOUSE
+    db BRUNOS_ROOM
+    db LORELEIS_ROOM
+    db AGATHAS_ROOM
+    db LANCES_ROOM
+    db CHAMPIONS_ROOM
+    db HALL_OF_FAME ; End of "EliteFourMapAllowed"
+    db BATTLE_CENTER
+    db TRADE_CENTER
+    db SS_ANNE_1
+    db SS_ANNE_2
+    db SS_ANNE_3
+    db SS_ANNE_4
+    db SS_ANNE_5
+    db SS_ANNE_6
+    db SS_ANNE_7
+    db SS_ANNE_8
+    db SS_ANNE_9
+    db SS_ANNE_10
+    db DRATINI_CAVE
+    db VIRIDIAN_FOREST
     db $ff ; terminator
-.TilesetNotAllowed ; same as escape rope
-    db $03,$0f,$11,$16,$10
-    db $ff ; terminator
+
+.CantTeleportInTheDarkText
+    TX_FAR _CantTeleportInTheDarkText
+    db "@"
+.CantTeleportDuringFloatText
+    TX_FAR _CantTeleportDuringFloatText
+    db "@"
+.CantTeleportInACaveText
+    TX_FAR _CantTeleportInACaveText
+    db "@"
+.CantTeleportHereText
+    TX_FAR _CantTeleportHereText
+    db "@"
 
 HackDockTilesetLikeSafari:
     call GetCurrentOldAdventureMap
@@ -31233,14 +31272,45 @@ PartyMenuMessagePointers:
     dw PartyMenuItemUseText
     dw PartyMenuNormalText
 
-CheckIfInOutsideMapAndAtLeastOneFlyingMap:
-    call CheckIfInOutsideMap
-    ret nz
+CanFly:
     call GetTownVisitedFlag
-    ld a,[hl]
-    and %00000001 ; check only first bit
-    dec a
+    ld a,[hli]
+    ld b,[hl]
+    or b
+    ld hl,.CantFlyNoTownVisited
+    jr z,.Cant
+    call GetCurrentOldAdventureMap
+    ld de,1
+    ld hl,.ExceptionMap
+    call IsInArray
+    jr c,.Can
+    call CheckIfInOutsideMap
+    ld hl,.CantFlyHereText
+    jr nz,.Cant
+    ; ft
+.Can
+    scf
     ret
+.Cant
+    and a ; rcf
+    ret
+
+.ExceptionMap
+    db SAFARI_ZONE_EAST
+    db SAFARI_ZONE_NORTH
+    db SAFARI_ZONE_WEST
+    db SAFARI_ZONE_CENTER
+    db VERMILION_DOCK
+    db CELADON_MART_ROOF
+    db SS_ANNE_5
+    db $FF
+
+.CantFlyNoTownVisited
+    TX_FAR _CantFlyNoTownVisited
+    db "@"
+.CantFlyHereText
+    TX_FAR _CantFlyHereText
+    db "@"
 
 HandlePkmnSubMenuSkill:
     ld hl,wSkill
@@ -44107,29 +44177,29 @@ DiglettsCaveRoute2Text1:
     db $08 ; asm
     ld hl,.end
     push hl
-    ld b,ESCAPE_ROPE
+    ld b,AUGER
     PREDEF _IsItemInBagOrBox
     ld hl,.DiglettsCaveRoute2Text1
     ret nz
-    ld hl,.EscapeRopeReceiveText1
+    ld hl,.AugerReceiveText1
     call PrintText
-    ld bc,(ESCAPE_ROPE << 8) | 1
+    ld bc,(AUGER << 8) | 1
     call GiveItem
-    ld hl,.EscapeRopeNoRoomText
+    ld hl,.AugerNoRoomText
     ret nc
-    ld hl,.EscapeRopeReceiveText2
+    ld hl,.AugerReceiveText2
     ret
 .end
     call PrintText
     jp TextScriptEnd
-.EscapeRopeReceiveText1
-    TX_FAR _EscapeRopeReceiveText1
+.AugerReceiveText1
+    TX_FAR _AugerReceiveText1
     db "@"
-.EscapeRopeReceiveText2
+.AugerReceiveText2
     TX_FAR _ReceivedText
     db $11,"@"
-.EscapeRopeNoRoomText
-    TX_FAR _EscapeRopeNoRoomText
+.AugerNoRoomText
+    TX_FAR _AugerNoRoomText
     db $0F,"@"
 .DiglettsCaveRoute2Text1
     TX_FAR _DiglettsCaveRoute2Text1
@@ -122887,7 +122957,7 @@ _HM08SkillNotFoundText:
 
 ; ───────────────────────────────────
 
-_EscapeRopeReceiveText1:
+_AugerReceiveText1:
     text_init , "I went to ROCK"
     text_line , "TUNNEL,but it's"
     text_cont , "dark and scary."
@@ -122899,7 +122969,7 @@ _EscapeRopeReceiveText1:
     text_cont , "moment, take it!"
     text_wait
 
-_EscapeRopeNoRoomText:
+_AugerNoRoomText:
     text_init , "You do not have"
     text_line , "space for this!"
     text_done
@@ -131880,16 +131950,44 @@ _WarpToLastPokemonCenterText:
     text_line , "#MON CENTER."
     text_done
 
-_CannotUseTeleportNowText:
+_CantTeleportInTheDarkText:
     TX_RAM $cd6d
     text_init , " can't"
-    text_line , "use TELEPORT now."
+    text_line , "TELEPORT"
+    text_cont , "in the dark!"
     text_wait
 
-_CannotFlyHereText:
+_CantTeleportDuringFloatText:
     TX_RAM $cd6d
     text_init , " can't"
-    text_line , "FLY here."
+    text_line , "TELEPORT"
+    text_cont , "in water!"
+    text_wait
+
+_CantTeleportInACaveText:
+    TX_RAM $cd6d
+    text_init , " can't"
+    text_line , "TELEPORT"
+    text_cont , "in a cave!"
+    text_wait
+
+_CantTeleportHereText:
+    TX_RAM $cd6d
+    text_init , " can't"
+    text_line , "TELEPORT here!"
+    text_wait
+
+_CantFlyNoTownVisited:
+    TX_RAM $cd6d
+    text_init , " can't"
+    text_line , "FLY without knows"
+    text_cont , "this new MAP!"
+    text_wait
+
+_CantFlyHereText:
+    TX_RAM $cd6d
+    text_init , " can't"
+    text_line , "FLY here!"
     text_wait
 
 _NotHealthyEnoughText:
@@ -133178,7 +133276,7 @@ _ThrowBallAtTrainerMonText2:
     text_wait
 
 _NoCyclingAllowedHereText:
-    text_init , "No cycling",$4e,"allowed here."
+    text_init , "No cycling",$4e,"allowed here!"
     text_wait
 
 _NoSurfingHereText:
@@ -133228,7 +133326,13 @@ _ItemUseBallText07:
 _CannotDigHereText:
     TX_RAM $cd6d
     text_init , " can't"
-    text_line , "DIG here."
+    text_line , "DIG here!"
+    text_wait
+
+_CantDigDuringFloatText:
+    TX_RAM $cd6d
+    text_init , " can't"
+    text_line , "DIG in water!"
     text_wait
 
 _VermilionCityText14_Dex:
@@ -135603,7 +135707,7 @@ ItemNames:
     db "?@"            ; $1A
     db "?@"            ; $1B
     db "?@"            ; $1C
-    db "ESCAPE ROPE@"  ; $1D
+    db "AUGER@"        ; $1D
     db "REPEL@"        ; $1E
     db "OLD AMBER@"    ; $1F
     db "FIRE STONE@"   ; $20
