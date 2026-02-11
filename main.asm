@@ -7513,9 +7513,8 @@ DisplayChooseQuantityMenu:
     jr .incrementQuantity
 
 .waitForKeyPressLoop
-    call GetJoypadStateLowSensitivityWaitReleaseJoy
+    call GetJoypadStateLowSensitivityWaitReleaseJoy ; ▼▲◄►StSeBA
     jr nz,.waitForKeyPressLoop
-    ld a,[$ffb5] ; ▼▲◄►StSeBA
     bit 0,a ; was the A button pressed?
     jp nz,QtyMenu_buttonAPressed
     bit 1,a ; was the B button pressed?
@@ -9007,9 +9006,6 @@ QtyMenu_buttonBPressed: ; the player chose to cancel the transaction
     call buttonCommonPressed
     ld a,$ff
     ret
-
-SpacesBetweenQuantityAndPriceText:
-    db "      @"
 
 ; Free
 
@@ -84544,7 +84540,9 @@ CeladonMart2Text5:
 CeladonMart2Text2:
     db $08 ; asm
     ld hl,$cf0c ; skipDrawingTextBoxBorder
-    set 0,[hl]    ; ...
+    set 0,[hl]  ; ...
+    ld hl,$d358 ; Previously Set in "TextCommandProcessor"
+    res 1,[hl]  ; ...
     call CheckHallOfFameWin
     ld a,6 ; CeladonMart2Text2_BeforeWinHoF
     jr z,.done
@@ -141220,11 +141218,13 @@ PrintPrice:
 .skipHalvingPrice
     FuncCoord 12,10
     ld hl,Coord
-    ld de,SpacesBetweenQuantityAndPriceText
+    ld de,.SpacesBetweenQuantityAndPriceText
     call PlaceString
     ld de,$ff9f ; total price
     ld c,$a3
     jp PrintBCDNumber
+.SpacesBetweenQuantityAndPriceText
+    db "      @"
 
 ; ──────────────────────────────────────────────────────────────────────
 
