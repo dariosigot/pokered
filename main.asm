@@ -37716,6 +37716,7 @@ FuchsiaMartText1:
     db MAX_REPEL
     db SUPER_REPEL
     db REPEL
+    db IRON
     db $FF
 
 ; ────────────────────────
@@ -92890,6 +92891,7 @@ VermilionMartText1:
     db BURN_HEAL
     db AWAKENING
     db REPEL
+    db CARBOS
     db $FF
 
 ; Lavender
@@ -108576,6 +108578,7 @@ PewterMartText1:
     db BURN_HEAL
     db AWAKENING
     db REPEL
+    db PROTEIN
     db $FF
 
 ; Cinnabar
@@ -108596,6 +108599,7 @@ CinnabarMartText1:
     db FULL_HEAL
     db SUPER_REPEL
     db REPEL
+    db CALCIUM
     db $FF
 
 ; ────────────────────────
