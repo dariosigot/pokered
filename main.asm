@@ -141168,6 +141168,20 @@ InitializeChooseQuantityMenu:
     ld de,.PackText
     call PlaceString
 .SkipShowBagInfo
+    ld a,[$cf91] ; selected item ID
+    sub TM_01
+    jr c,.SkipMoveDetails
+    inc a
+    ld [$d11e],a
+    PREDEF TMToMove
+    ld a,[$d11e]
+    ld [wPlayerSelectedMove],a
+    FuncCoord 10,12
+    ld de,Coord
+    ld hl,wHyperBeamUnknownTypeBit4
+    set 4,[hl]
+    PREDEF PrintMoveDetailsBox
+.SkipMoveDetails
     FuncCoord 8,10
     ld hl,Coord
 .printInitialQuantity
