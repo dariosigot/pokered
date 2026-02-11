@@ -115,13 +115,23 @@ wLastMenuItem: ; cc2a
 ; id of previously selected menu item
     ds 1
 
-wcc2b:: db
+; It is mainly used by the party menu to remember the cursor position while the
+; menu isn't active.
+; It is also used to remember the cursor position of mon lists (for the
+; withdraw/deposit/release actions) in Bill's PC so that it doesn't get lost
+; when you choose a mon from the list and a sub-menu is shown. It's reset when
+; you return to the main Bill's PC menu.
+wPartyAndBillsPCSavedMenuItem:: db ; cc2b
 
 ; It is used by the bag list to remember the cursor position while the menu
 ; isn't active.
 wBagSavedMenuItem:: db ; cc2c
 
-wcc2d:: db
+; It is used by the start menu to remember the cursor position while the menu
+; isn't active.
+; The battle menu uses it so that the cursor position doesn't get lost when
+; a sub-menu is shown. It's reset at the start of each battle.
+wBattleAndStartSavedMenuItem:: db ; cc2d
 
 wPlayerMoveListIndex: ; cc2e
     ds 1

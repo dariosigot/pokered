@@ -3219,7 +3219,7 @@ PartyMenuInit:
     ld [hli],a ; top menu item Y
     xor a
     ld [hli],a ; top menu item X
-    ld a,[$cc2b]
+    ld a,[wPartyAndBillsPCSavedMenuItem]
     push af
     ld [hli],a ; current menu item ID
     inc hl
@@ -3261,7 +3261,7 @@ HandlePartyMenuInput:
     xor a
     ld [$d09b],a
     ld a,[wCurrentMenuItem]
-    ld [$cc2b],a
+    ld [wPartyAndBillsPCSavedMenuItem],a
     ld hl,$d730
     res 6,[hl] ; turn on letter printing delay
     ld a,[$cc35]
@@ -7134,7 +7134,7 @@ RedisplayStartMenu:
 .buttonPressed ; A,B,or Start button pressed
     call PlaceUnfilledArrowMenuCursor
     ld a,[wCurrentMenuItem]
-    ld [$cc2d],a ; save current menu item ID
+    ld [wBattleAndStartSavedMenuItem],a ; save current menu item ID
     ld a,b
     and a,%00001010 ; was the Start button or B button pressed?
     jp nz,CloseStartMenu
@@ -13902,7 +13902,7 @@ MainMenu: ; 5af2 (1:5af2)
     call DelayFrames
     xor a
     ld [$D12B],a
-    ld hl,$CC2B
+    ld hl,wPartyAndBillsPCSavedMenuItem
     ld [hli],a
     ld [hli],a
     ld [hli],a
@@ -16700,7 +16700,7 @@ DrawStartMenu:
     ld [$cc24],a ; Y position of first menu choice
     ld a,$0b
     ld [$cc25],a ; X position of first menu choice
-    ld a,[$cc2d] ; remembered menu selection from last time
+    ld a,[wBattleAndStartSavedMenuItem] ; remembered menu selection from last time
     ld [$cc26],a
     ld [$cc2a],a
     xor a
@@ -30048,14 +30048,14 @@ StartMenu_Pokemon:
     ld a,[H_QUOTIENT + 2]
     sbc b
     jp nc,.notHealthyEnough
-    ld a,[$cc2b]
+    ld a,[wPartyAndBillsPCSavedMenuItem]
     push af
     ld a,POTION
     ld [$cf91],a
     ld [$d152],a
     call UseItem
     pop af
-    ld [$cc2b],a
+    ld [wPartyAndBillsPCSavedMenuItem],a
     jp .loop
 .notHealthyEnough ; if current HP is less than 1/5 of max HP
     ld hl,.notHealthyEnoughText
@@ -30594,7 +30594,7 @@ EndOfBattle:
     ld [$d11f],a
     ld [$d120],a
     ld [$d078],a
-    ld hl,$cc2b
+    ld hl,wPartyAndBillsPCSavedMenuItem
     ld [hli],a
     ld [hli],a
     ld [hli],a
@@ -42311,7 +42311,7 @@ MoveDeleterText:
     ld [$cfcb],a  ; ?
     ld [$d07d],a  ; Item Menu Id
     ld [$cc35],a  ; ?
-    ld [$cc2b],a  ; Index of Choice Pkmn
+    ld [wPartyAndBillsPCSavedMenuItem],a  ; Index of Choice Pkmn
     call DisplayPartyMenu
     jr .CheckIfPokemonChosen
 .PrintAndLoopParty
@@ -42335,7 +42335,7 @@ MoveDeleterText:
 .ChosePokemon
     call SaveScreenTilesToBuffer1 ; save screen
     ld a,[wWhichPokemon] ; $cf92 ; Index of Choice Pkmn
-    ld [$cc2b],a  ; Backup Index of Choice Pkmn
+    ld [wPartyAndBillsPCSavedMenuItem],a  ; Backup Index of Choice Pkmn
     ld [wChoicePkmnMoveDeleter],a
     call GoToFirstMove ; Hl point to first move
     ld a,[hli]
@@ -44686,11 +44686,11 @@ BillsPC_: ; 214c2 (8:54c2)
     ld [wListMenuID],a ; $cf94
     inc a                ; MONSTER_NAME
     ld [W_LISTTYPE],a
-    ld a,[$cc2b]
+    ld a,[wPartyAndBillsPCSavedMenuItem]
     ld [wCurrentMenuItem],a ; $cc26
     call DisplayListMenuID
     ld a,[wCurrentMenuItem] ; $cc26
-    ld [$cc2b],a
+    ld [wPartyAndBillsPCSavedMenuItem],a
     ret
 
 .PlaceBoxPkmnNumber
@@ -53932,7 +53932,7 @@ Func_3cc91: ; 3cc91 (f:4c91)
 Func_3cca4: ; 3cca4 (f:4ca4)
     xor a
     ld [$FF00+$e1],a
-    ld hl,$cc2d
+    ld hl,wBattleAndStartSavedMenuItem
     ld [hli],a
     ld [hl],a
     ld [$cc5b],a
@@ -54247,7 +54247,7 @@ InitBattleMenu:
     db "OLD MAN@"
 
 .RegularBattleMenu:
-    ld a,[$cc2d]
+    ld a,[wBattleAndStartSavedMenuItem]
     ld [wCurrentMenuItem],a ; $cc26
     ld [wLastMenuItem],a ; $cc2a
     sub $2
@@ -54345,7 +54345,7 @@ InitBattleMenu:
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
     ld a,[wCurrentMenuItem] ; $cc26
-    ld [$cc2d],a
+    ld [wBattleAndStartSavedMenuItem],a
     jr z,.asm_3cfd0
     cp $1
     jr nz,.asm_3cfcb
@@ -79059,7 +79059,7 @@ InitBattleVariables: ; 525af (14:65af)
     xor a
     ld [$cd6a],a
     ld [wBattleResult],a
-    ld hl,$cc2b
+    ld hl,wPartyAndBillsPCSavedMenuItem
     ld [hli],a
     ld [hli],a
     ld [hli],a
@@ -83337,7 +83337,7 @@ DayCareMText1:
     ld hl,.UnnamedText_56437
     jp c,.Func_56409
     xor a
-    ld [$cc2b],a
+    ld [wPartyAndBillsPCSavedMenuItem],a
     ld a,[$cf92]
     ld hl,$d2b5
     call GetPartyMonName
@@ -143868,7 +143868,7 @@ StatusScreen:
 .end
     ; Update Selected Pokemon Menù ID
     ld a,[$cf92]
-    ld [$cc2b],a
+    ld [wPartyAndBillsPCSavedMenuItem],a
     call .ResetFlagStatusScreenJustLoad
     ; water/flower tile animation
     pop af
@@ -144832,7 +144832,7 @@ DisplayDepositWithdrawMenu_:
     ld [hli],a
     ld [hl],a
     ld [wPlayerMonNumber],a ; $cc2f
-    ld [$cc2b],a
+    ld [wPartyAndBillsPCSavedMenuItem],a
 .LoopMenu3
     ld hl,wWaitReleaseJoyBit5
     set 5,[hl]
