@@ -936,7 +936,10 @@ W_DAMAGE: ; d0d7
 W_CURENEMYLVL: ; d127
     ds 1
 
-    ds 3
+wNotUsedD128: ; d128
+    ds 2
+
+    db ; d12a
 
 W_ISLINKBATTLE: ; d12b
     ds 1

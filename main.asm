@@ -7016,17 +7016,17 @@ DisplayPokemartDialogue:
 LoadItemList:
     ld a,$01
     ld [$cfcb],a
-    ld a,h
-    ld [$d128],a
-    ld a,l
-    ld [$d129],a
-    ld de,wBufferList
+    ld de,wBufferList + 1
+    ld b,-1
 .loop
     ld a,[hli]
     ld [de],a
     inc de
-    cp a,$ff
+    inc b
+    inc a
     jr nz,.loop
+    ld a,b
+    ld [wBufferList],a
     ret
 
 DisplayPokemonCenterDialogue:
@@ -7267,6 +7267,8 @@ GetJoypadStateLowSensitivityWaitReleaseJoy:
 .end
     ld a,[$ffb5]
     ret
+
+; Free
 
 SECTION "DisplayListMenuID",ROM0[$2be6] ; cannot be moved cause "HackItemInBattle"
 
@@ -16037,10 +16039,6 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld a,$15
     ld [$d125],a
     call DisplayTextBoxID ; do buy/sell/quit menu
-    ld hl,$d128 ; pointer to this pokemart's inventory
-    ld a,[hli]
-    ld l,[hl]
-    ld h,a ; hl = address of inventory
     ld a,[$d12e]
     cp a,$02
     jp z,.done
@@ -36934,13 +36932,20 @@ FuchsiaCityText12:
 
 ; Indigo
 IndigoPlateauLobbyText4:
-    db $FE,13
+    db $FE
+    db ETHER
+    db ELIXER
     db FULL_RESTORE
     db MAX_POTION
     db HYPER_POTION
     db SUPER_POTION
     db POTION
     db FULL_HEAL
+    db ANTIDOTE
+    db PARLYZ_HEAL
+    db BURN_HEAL
+    db AWAKENING
+    db ICE_HEAL
     db X_ATTACK
     db X_DEFEND
     db X_SPEED
@@ -37683,7 +37688,7 @@ DecreaseFossilStep:
 
 ; Viridian
 ViridianMartText6:
-    db $FE,5
+    db $FE
     db POKE_BALL
     db ANTIDOTE
     db PARLYZ_HEAL
@@ -37693,10 +37698,14 @@ ViridianMartText6:
 
 ; Fuchsia
 FuchsiaMartText1:
-    db $FE,12
+    db $FE
     db ULTRA_BALL
     db GREAT_BALL
     db POKE_BALL
+    db TM_28 ; TRAPHOLE
+    db TM_32 ; DOUBLE_TEAM
+    db TM_33 ; REFLECT
+    db TM_41 ; LIGHT_SCREEN
     db SUPER_POTION
     db POTION
     db ANTIDOTE
@@ -37704,6 +37713,7 @@ FuchsiaMartText1:
     db BURN_HEAL
     db AWAKENING
     db ICE_HEAL
+    db MAX_REPEL
     db SUPER_REPEL
     db REPEL
     db $FF
@@ -67942,19 +67952,17 @@ RocketHideoutElevatorScript_4573a: ; 4573a (11:573a)
     ret
 
 RocketHideoutElevatorScript_45741: ; 45741 (11:5741)
-    ld hl,RocketHideoutElavatorFloors ; $5754
+    ld hl,.RocketHideoutElavatorFloors
     call LoadItemList
     ld hl,RocketHideoutElevatorWarpMaps ; $5759
     ld de,$cc5b
     ld bc,$0006
     call CopyData
     ret
-
-RocketHideoutElavatorFloors: ; 45754 (11:5754)
-    db $03 ; num elements in list
-    ;db $55,$54,$61 ; "B1F","B2F","B4F"
-    db 1,2,3 ; Denim
+.RocketHideoutElavatorFloors
+    db 1,2,3
     db $FF ; terminator
+    db
 
 RocketHideoutElevatorWarpMaps: ; 45759 (11:5759)
 ; first byte is warp number
@@ -68052,19 +68060,17 @@ SilphCoElevatorScript_457ea: ; 457ea (11:57ea)
     ret
 
 SilphCoElevatorScript_457f1: ; 457f1 (11:57f1)
-    ld hl,SilphCoElavatorFloors ; $5804
+    ld hl,.SilphCoElavatorFloors
     call LoadItemList
     ld hl,SilphCoElevatorWarpMaps ; $5811
     ld de,$cc5b
     ld bc,$16
     call CopyData
     ret
-
-SilphCoElavatorFloors: ; 45804 (11:5804)
-    db $0B ; num elements in list
-    ;db $56,$57,$58,$59,$5A,$5B,$5C,$5D,$5E,$5F,$60 ; "1F","2F","3F","4F",... ,"11F"
+.SilphCoElavatorFloors
     db 1,2,3,4,5,6,7,8,9,10,11
     db $FF ; terminator
+    db
 
 SilphCoElevatorWarpMaps: ; 45811 (11:5811)
 ; first byte is warp number
@@ -71765,18 +71771,16 @@ CeladonMartElevatorScript_4862a: ; 4862a (12:462a)
     ret
 
 CeladonMartElevatorScript_48631: ; 48631 (12:4631)
-    ld hl,CeladonMartElavatorFloors ; $4643
+    ld hl,.CeladonMartElavatorFloors
     call LoadItemList
     ld hl,CeldaonMartElevatorWarpMaps ; $464a
     ld de,$cc5b
     ld bc,$000a
     jp CopyData
-
-CeladonMartElavatorFloors: ; 48643 (12:4643)
-    db $05 ; num elements in list
-    ; db $56,$57,$58,$59,$5A ; "1F","2F","3F","4F,"5F"
-    db 1,2,3,4,5 ; Denim
+.CeladonMartElavatorFloors
+    db 1,2,3,4,5
     db $FF ; terminator
+    db
 
 CeldaonMartElevatorWarpMaps: ; 4864a (12:464a)
 ; first byte is warp number
@@ -75304,7 +75308,7 @@ VictoryPokecenterBlocks: ; 480ab (12:40ab)
 
 ; Celadon Dept. Store 4F
 CeladonMart4Text1:
-    db $FE,5
+    db $FE
     db POKE_DOLL
     db FIRE_STONE
     db THUNDER_STONE
@@ -75314,7 +75318,7 @@ CeladonMart4Text1:
 
 ; Celadon Dept. Store 5F (1)
 CeladonMart5Text3:
-    db $FE,7
+    db $FE
     db X_ATTACK
     db X_DEFEND
     db X_SPEED
@@ -75326,7 +75330,7 @@ CeladonMart5Text3:
 
 ; Celadon Dept. Store 5F (2)
 CeladonMart5Text4:
-    db $FE,5
+    db $FE
     db HP_UP
     db PROTEIN
     db IRON
@@ -84634,7 +84638,7 @@ CeladonMart2Text2:
     jp TextScriptEnd
 
 CeladonMart2Text2_BeforeWinHoF:
-    db $FE,16
+    db $FE
     db TM_01 ; MEGA_PUNCH
     db TM_02 ; RAZOR_WIND
     db TM_04 ; WHIRLWIND
@@ -84643,18 +84647,16 @@ CeladonMart2Text2_BeforeWinHoF:
     db TM_12 ; WATER_GUN
     db TM_30 ; TELEPORT
     db TM_32 ; DOUBLE_TEAM
-    db TM_33 ; REFLECT
+    db TM_39 ; SWIFT
     db TM_40 ; SKULL_BASH
-    db TM_41 ; LIGHT_SCREEN
     db TM_44 ; REST
     db TM_45 ; THUNDER_WAVE
     db TM_51 ; BLADE
-    db TM_52 ; SWOOP
-    db TM_54 ; STRIKE
+    db TM_55 ; FLASH
     db $FF
 
 CeladonMart2Text2_AfterWinHoF:
-    db $FE,60
+    db $FE
     db TM_01 ; MEGA_PUNCH
     db TM_02 ; RAZOR_WIND
     db TM_03 ; SWORDS_DANCE
@@ -84770,7 +84772,7 @@ Route21ScriptBarrier:
 
 ; Celadon Dept. Store 2F (1)
 CeladonMart2Text1:
-    db $FE,13
+    db $FE
     db GREAT_BALL
     db POKE_BALL
     db MAX_REVIVE
@@ -92864,8 +92866,9 @@ GetLastFighter:
 
 ; Cerulean
 CeruleanMartText1:
-    db $FE,7
+    db $FE
     db POKE_BALL
+    db TM_09 ; TAKE_DOWN
     db POTION
     db ANTIDOTE
     db PARLYZ_HEAL
@@ -92876,8 +92879,10 @@ CeruleanMartText1:
 
 ; Vermilion
 VermilionMartText1:
-    db $FE,8
+    db $FE
     db POKE_BALL
+    db TM_12 ; WATER_GUN
+    db TM_40 ; SKULL_BASH
     db SUPER_POTION
     db POTION
     db ANTIDOTE
@@ -92889,9 +92894,11 @@ VermilionMartText1:
 
 ; Lavender
 LavenderMartText1:
-    db $FE,12
+    db $FE
     db GREAT_BALL
     db POKE_BALL
+    db TM_02 ; RAZOR_WIND
+    db TM_30 ; TELEPORT
     db ETHER
     db ELIXER
     db SUPER_POTION
@@ -92906,9 +92913,12 @@ LavenderMartText1:
 
 ; Saffron
 SaffronMartText1:
-    db $FE,9
+    db $FE
     db GREAT_BALL
     db POKE_BALL
+    db TM_19 ; SEISMIC_TOSS
+    db TM_20 ; RAGE
+    db TM_42 ; DREAM_EATER
     db HYPER_POTION
     db SUPER_POTION
     db POTION
@@ -105102,7 +105112,7 @@ CeruleanHouse2Text1: ; 74e15 (1d:4e15)
     ld hl,UnnamedText_74e7c
     call PrintText
 .asm_74e23
-    ld hl,BadgeIdList
+    ld hl,.BadgeIdList
     call LoadItemList
     ld hl,wBufferList
     ld a,l
@@ -105134,18 +105144,10 @@ CeruleanHouse2Text1: ; 74e15 (1d:4e15)
     ld hl,UnnamedText_74e81
     call PrintText
     jp TextScriptEnd
-
-BOULDERBADGE  EQU 0 + 1
-CASCADEBADGE  EQU 1 + 1
-THUNDERBADGE  EQU 2 + 1
-RAINBOWBADGE  EQU 3 + 1
-SOULBADGE     EQU 4 + 1
-MARSHBADGE    EQU 5 + 1
-VOLCANOBADGE  EQU 6 + 1
-EARTHBADGE    EQU 7 + 1
-
-BadgeIdList: ; 74e6d (1d:4e6d)
-    db $8,BOULDERBADGE,CASCADEBADGE,THUNDERBADGE,RAINBOWBADGE,SOULBADGE,MARSHBADGE,VOLCANOBADGE,EARTHBADGE,$FF
+.BadgeIdList
+    db 1,2,3,4,5,6,7,8
+    db $FF ; terminator
+    db
 
 UnnamedText_74e77: ; 74e77 (1d:4e77)
     TX_FAR _UnnamedText_74e77
@@ -108565,8 +108567,9 @@ CheckSafariStatusAndDelay3:
 
 ; Pewter
 PewterMartText1:
-    db $FE,7
+    db $FE
     db POKE_BALL
+    db TM_04 ; WHIRLWIND
     db POTION
     db ANTIDOTE
     db PARLYZ_HEAL
@@ -108577,17 +108580,20 @@ PewterMartText1:
 
 ; Cinnabar
 CinnabarMartText1:
-    db $FE,12
+    db $FE
     db ULTRA_BALL
     db GREAT_BALL
     db POKE_BALL
+    db TM_07 ; HORN_DRILL
+    db TM_08 ; BODY_SLAM
+    db TM_52 ; SWOOP
+    db TM_54 ; STRIKE
     db ETHER
     db ELIXER
     db HYPER_POTION
     db SUPER_POTION
     db POTION
     db FULL_HEAL
-    db MAX_REPEL
     db SUPER_REPEL
     db REPEL
     db $FF
@@ -148175,7 +148181,7 @@ PortRoyalMartBlocks:
 ; ────────────────────────
 
 PortRoyalMartText1:
-    db $FE,7
+    db $FE
     db POKE_BALL
     db POTION
     db ANTIDOTE
