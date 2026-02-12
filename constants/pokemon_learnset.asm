@@ -1718,6 +1718,7 @@ GEODUDE_Learnset:
     db 11,SAND_ATTACK
     db 12,Skill__DIG
     db 13,ROCK_THROW
+    db 13,BIDE
     db 14,HEADBUTT
     db 15,HARDEN
     db 17,TRAPHOLE
@@ -1735,7 +1736,6 @@ GOLEM_Learnset:
     db 25,BODY_SLAM
     db 0
 GRAVELER_GOLEM_Learnset:
-    db 29,BIDE
     db 30,ROCK_SLIDE
     db 33,SKULL_BASH
     db 36,EARTHQUAKE
@@ -2176,9 +2176,10 @@ ONIX_Learnset:
     db 31,STRIKE
     db 34,BODY_SLAM
     db 36,SELFDESTRUCT
-    db 39,THRASH
+    db 38,THRASH
+    db 40,EARTHQUAKE
     db 42,DRAGON_RAGE
-    db 46,EARTHQUAKE
+    db 46,SKULL_BASH
     db 50,EXPLOSION
     db 55,SUBSTITUTE
     db 58,SWORDS_DANCE
@@ -2207,9 +2208,10 @@ ONIX_Crystal_Learnset:
     db 33,Skill__FLOAT
     db 34,BODY_SLAM
     db 36,SELFDESTRUCT
-    db 39,THRASH
+    db 38,THRASH
+    db 40,EARTHQUAKE
     db 42,DRAGON_RAGE
-    db 46,EARTHQUAKE
+    db 46,SKULL_BASH
     db 50,EXPLOSION
     db 55,SUBSTITUTE
     db 58,SWORDS_DANCE
