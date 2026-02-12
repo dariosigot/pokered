@@ -137280,14 +137280,14 @@ CeruleanMons:
 Route24Mons:
     db $19
     db 13,PIDGEY     ; 20%
-    db  9,VENONAT    ; 20%
+    WILDSUB          ; 20% ; Route24Mons1
     db 12,PIDGEY     ; 15%
     db 11,ODDISH     ; 10% ; Entry Point
     db 11,BELLSPROUT ; 10% ; Entry Point
     db  8,ABRA       ; 10% ; Entry Point
     db 14,ODDISH     ;  5%
     db 14,BELLSPROUT ;  5%
-    db 12,VENONAT    ;  4%
+    WILDSUB          ;  4% ; Route24Mons8
     db 11,ABRA       ;  1%
     db $05
     db 15,GOLDEEN   ; 20%
@@ -137300,6 +137300,12 @@ Route24Mons:
     db 24,GOLDEEN   ;  5%
     db 33,SEAKING   ;  4%
     db 33,SEAKING   ;  1%
+Route24Mons1:
+    db $7F, 9,VENONAT ; 50%
+    db $FF, 9,MR_MIME ; 50% ; Entry Point
+Route24Mons8:
+    db $7F,12,VENONAT ; 50%
+    db $FF,15,MR_MIME ; 50%
 
 Route25Mons:
     db $0F
@@ -138210,11 +138216,11 @@ Route21Mons:
     db 25,KADABRA    ; 15% ; Entry Point
     db 25,ABRA       ; 10%
     db 21,DROWZEE    ; 10%
-    db 28,KADABRA    ; 10%
+    db 35,KADABRA    ; 10%
     db 27,HYPNO      ;  5% ; Entry Point
-    db 25,MR_MIME    ;  5% ; Entry Point
-    db 32,HYPNO      ;  4%
-    db 10,MR_MIME    ;  1%
+    db 25,MR_MIME    ;  5%
+    db 40,HYPNO      ;  4%
+    db 40,MR_MIME    ;  1%
     db $05
     db 11,TENTACOOL  ; 20%
     db 15,TENTACOOL  ; 20%
@@ -139602,6 +139608,8 @@ WILDSUBGROUP: MACRO
 WildSubGroupTable:
     WILDSUBGROUP VIRIDIAN_FOREST,LAND,6,ForestMons6
     WILDSUBGROUP VIRIDIAN_FOREST,LAND,9,ForestMons9
+    WILDSUBGROUP ROUTE_24,LAND,1,Route24Mons1
+    WILDSUBGROUP ROUTE_24,LAND,8,Route24Mons8
     WILDSUBGROUP ROUTE_5,LAND,0,Route5Mons0
     WILDSUBGROUP ROUTE_5,LAND,4,Route5Mons4
     WILDSUBGROUP ROUTE_5,LAND,6,Route5Mons6

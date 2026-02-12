@@ -4882,7 +4882,7 @@ MrMimeBaseStats:
     db MR_MIME ; mon id
     db 40 ; base hp
     db 45 ; base attack
-    db 65 ; base defense
+    db 90 ; base defense (+25)
     db 90 ; base speed
     db 100 ; base special
 
