@@ -30501,7 +30501,7 @@ TechnicalMachines: ; 13773 (4:7773)
     db MIMIC        ; TM_31
     db DOUBLE_TEAM  ; TM_32
     db REFLECT      ; TM_33
-    db BIDE         ; TM_34
+    db ROCK_THROW   ; TM_34
     db METRONOME    ; TM_35
     db SELFDESTRUCT ; TM_36
     db FLAMETHROWER ; TM_37
@@ -52268,9 +52268,12 @@ GetDamageVarsScaleStats:
 DontMissDigMoves:
     db EARTHQUAKE
     db FISSURE
+    db STOMP
     db $FF
 
 DontMissFlyMoves:
+    db ROCK_THROW
+    db ROCK_SLIDE
     db THUNDER_M
     db BLIZZARD
     db TOXIC
@@ -84691,7 +84694,7 @@ CeladonMart2Text2_AfterWinHoF:
     db TM_31 ; MIMIC
     db TM_32 ; DOUBLE_TEAM
     db TM_33 ; REFLECT
-    db TM_34 ; BIDE
+    db TM_34 ; ROCK_THROW
     db TM_35 ; METRONOME
     db TM_36 ; SELFDESTRUCT
     db TM_37 ; FLAMETHROWER
@@ -112086,7 +112089,7 @@ GetMachinePrice:
     bcd3   5000 ; TM_31 ; MIMIC
     bcd3   1000 ; TM_32 ; DOUBLE_TEAM
     bcd3   1000 ; TM_33 ; REFLECT
-    bcd3  20000 ; TM_34 ; BIDE
+    bcd3  20000 ; TM_34 ; ROCK_THROW
     bcd3   6000 ; TM_35 ; METRONOME
     bcd3   8000 ; TM_36 ; SELFDESTRUCT
     bcd3  20000 ; TM_37 ; FLAMETHROWER
@@ -127916,14 +127919,13 @@ _TM34PreReceiveText:
 _TM34ExplanationText:
     text_init
     text_para , "My Gift is"
-    text_line , "3x BIDE!"
+    text_line , "3x ROCK THROW!"
     text_para , "You can use"
     text_line , "it with"
     text_cont , "TECH.MACHINE!"
-    text_para , "Your #MON will"
-    text_line , "absorb damage in"
-    text_cont , "battle then pay"
-    text_cont , "it back double!"
+    text_para , "Will your #MON"
+    text_line , "be able to hit"
+    text_cont , "the target?"
     text_done
 
 _TM34NoRoomText:
@@ -135912,7 +135914,7 @@ ItemNames:
     db "TM31:MIMIC@"   ; $DD ; TM_31
     db "TM32:DB.TEAM@" ; $DE ; TM_32
     db "TM33:REFLECT@" ; $DF ; TM_33
-    db "TM34:BIDE@"    ; $E0 ; TM_34
+    db "TM34:RCK TRW@" ; $E0 ; TM_34
     db "TM35:METRONM@" ; $E1 ; TM_35
     db "TM36:SELFDST@" ; $E2 ; TM_36
     db "TM37:FLMTRWR@" ; $E3 ; TM_37
@@ -147149,6 +147151,10 @@ GetAttackerType:
     db PRIMEAPE
     db DODUO
     db DODRIO
+    db RHYHORN
+    db RHYDON
+    db TAUROS
+    db GYARADOS
     db MEWTWO
     db $FF
 

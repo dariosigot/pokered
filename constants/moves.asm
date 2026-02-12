@@ -88,7 +88,7 @@
     db THUNDERBOLT  , PARALYZE_SIDE_EFFECT1      ,  90 , THUNDER  , 255 , 14 ; pp 15 ; 1 ; Pwr 95 -> 90
     db THUNDER_WAVE , PARALYZE_EFFECT            ,   0 , THUNDER  , 255 , 14 ; pp 15 ; - ; PP 20 -> 15
     db THUNDER_M    , PARALYZE_SIDE_EFFECT2      , 120 , THUNDER  , 178 , 20 ; pp 10 ; 1
-    db ROCK_THROW   , NO_ADDITIONAL_EFFECT       ,  50 , ROCK     , 229 , 09 ; pp 15 ; 0 ; Acr 165 -> 229 ; PP 15 -> 25 ; Ene 08 -> 09 
+    db ROCK_THROW   , FLINCH_SIDE_EFFECT1        ,  50 , ROCK     , 216 , 09 ; pp 15 ; 0 ; Acr 165 -> 216 ; PP 15 -> 25 ; Ene 08 -> 09 
     db EARTHQUAKE   , NO_ADDITIONAL_EFFECT       , 100 , EARTH    , 255 , 20 ; pp 10 ; 0
     db FISSURE      , OHKO_EFFECT                ,   1 , EARTH    ,  76 , 45 ; pp  5 ; - ; Ene 40 -> 45
     db TRAPHOLE     , CHARGE_EFFECT              ,  80 , EARTH    , 255 , 14 ; pp 15 ; 0 ; Pwr 100 -> 80 ; PP 10 -> 15
@@ -157,7 +157,7 @@
     db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , NORMAL   , 204 , 12 ; pp 15 ; 0 ; Pwr 18 -> 21 ; Ene 14 -> 12
     db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  55 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Earth -> Ivory ; Pwr 50 -> 55
     db REST         , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 28 ; pp 10 ; - ; Type Psychic -> Normal ; Ene 20 -> 28
-    db ROCK_SLIDE   , NO_ADDITIONAL_EFFECT       ,  85 , ROCK     , 229 , 14 ; pp 10 ; 0 ; Pwr 75 -> 85 ; PP 10 -> 15
+    db ROCK_SLIDE   , FLINCH_SIDE_EFFECT1        , 100 , ROCK     , 216 , 18 ; pp 10 ; 0 ; Acr 229 -> 216 ; Pwr 75 -> 100 ; PP 10 -> 15 ; Ene 14 -> 18
     db HYPER_FANG   , FLINCH_SIDE_EFFECT1        ,  80 , NORMAL   , 229 , 14 ; pp 15 ; 0
     db SHARPEN      , ATTACK_UP1_EFFECT          ,   0 , METAL    , 255 , 07 ; pp 30 ; - ; Type Normal -> Metal
     db CONVERSION   , CONVERSION_EFFECT          ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -

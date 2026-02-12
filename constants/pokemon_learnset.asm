@@ -261,10 +261,10 @@ BUTTERFREE_Learnset:
     db 0
 CATERPIE_NoEvo_Learnset:
     db 10,LEECH_LIFE ; Exclusive
-    db 15,DISABLE
+    db 15,DISABLE ; Exclusive
     db 20,CONFUSION ; Exclusive
-    db 25,SUPERSONIC
-    db 30,SCREECH
+    db 25,SUPERSONIC ; Exclusive
+    db 30,SCREECH ; Exclusive
     db 0
 METAPOD_NoEvo_Learnset:
     db 18,SELFDESTRUCT ; Exclusive*
@@ -313,10 +313,10 @@ BEEDRILL_Learnset:
     db 0
 WEEDLE_NoEvo_Learnset:
     db 10,LEECH_LIFE ; Exclusive
-    db 15,LEER
+    db 15,LEER ; Exclusive
     db 20,TWINEEDLE ; Exclusive
-    db 25,SCREECH
-    db 30,DOUBLE_TEAM
+    db 25,SCREECH ; Exclusive
+    db 30,DOUBLE_TEAM ; Exclusive
     db 0
 KAKUNA_NoEvo_Learnset:
     db 18,SELFDESTRUCT ; Exclusive*
@@ -801,7 +801,7 @@ CLEFABLE_Learnset:
 VULPIX_Learnset:
     db  1,TACKLE
     db  1,TAIL_WHIP
-    db  8,EMBER ; Exclusive
+    db  8,EMBER
     db  9,Skill__LIGHT
     db 13,ROAR
     db 17,BITE
@@ -858,7 +858,7 @@ NINETALES_Learnset:
 VULPIX_Alola_Learnset:
     db  1,TACKLE
     db  1,TAIL_WHIP
-    db  8,AURORA_BEAM ; Exclusive
+    db  8,AURORA_BEAM
     db 13,ROAR
     db 17,BITE
     db 19,MIST
@@ -883,10 +883,10 @@ NINETALES_Alola_Learnset:
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  1,BITE
-    db  8,ROAR
-    db 13,MIST
+    db  5,AURORA_BEAM
+    db 10,ROAR
+    db 15,MIST
     db 16,Skill__FLOAT
-    db 17,AURORA_BEAM
     db 18,Skill__DIG
     db 20,HYPER_FANG
     db 22,DOUBLE_KICK
@@ -1372,7 +1372,7 @@ MANKEY_NoEvo_Learnset:
 GROWLITHE_Learnset:
     db  1,BITE
     db  1,ROAR
-    db  8,EMBER ; Exclusive
+    db  8,EMBER
     db  9,Skill__LIGHT
     db 13,LEER
     db 17,HYPER_FANG

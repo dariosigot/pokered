@@ -11,23 +11,23 @@ VenusaurExclusiveMove:
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db MEGA_DRAIN ; TM21
     db SOLARBEAM ; TM22
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
+    db SLUDGE ; TM56
     db LEECH_LIFE
     db BARRAGE
     db BIND
-    db RAGE ; TM20
-    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CharmanderExclusiveMove:
@@ -36,6 +36,7 @@ CharizardExclusiveMove:
     db MEGA_PUNCH ; TM01
     db RAZOR_WIND ; TM02
     db SWORDS_DANCE ; TM03
+    db WHIRLWIND ; TM04
     db MEGA_KICK ; TM05
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
@@ -44,6 +45,7 @@ CharizardExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db SOLARBEAM ; TM22
     db DRAGON_RAGE ; TM23
     db EARTHQUAKE ; TM26
@@ -52,7 +54,7 @@ CharizardExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
@@ -65,15 +67,13 @@ CharizardExclusiveMove:
     db BLADE ; TM51
     db SWOOP ; TM52
     db STRIKE ; TM54
+    db SLUDGE ; TM56
+    db FIRE_PUNCH ; TM57
+    db THUNDERPUNCH ; TM59
+    db DIZZY_PUNCH ; TM60
     db QUICK_ATTACK
     db AGILITY
     db SLAM
-    db RAGE ; TM20
-    db WHIRLWIND ; TM04
-    db FIRE_PUNCH ; TM57
-    db THUNDERPUNCH ; TM59
-    db SLUDGE ; TM56
-    db DIZZY_PUNCH ; TM60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SquirtleExclusiveMove:
@@ -92,12 +92,13 @@ BlastoiseExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
     db REST ; TM44
@@ -105,12 +106,11 @@ BlastoiseExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db STRIKE ; TM54
+    db ICE_PUNCH ; TM58
+    db DIZZY_PUNCH ; TM60
     db SONICBOOM
     db SUPERSONIC
     db HEADBUTT
-    db RAGE ; TM20
-    db ICE_PUNCH ; TM58
-    db DIZZY_PUNCH ; TM60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CaterpieExclusiveMove:
@@ -139,10 +139,10 @@ ButterfreeExclusiveMove:
     db SUBSTITUTE ; TM50
     db SWOOP ; TM52
     db FLASH ; TM55
-    db LEECH_LIFE
-    db CONFUSION
     db SLUDGE ; TM56
+    db LEECH_LIFE
     db DISABLE
+    db CONFUSION
     db SUPERSONIC
     db SCREECH
     db 0
@@ -152,10 +152,12 @@ KakunaExclusiveMove:
 BeedrillExclusiveMove:
     db RAZOR_WIND ; TM02
     db SWORDS_DANCE ; TM03
+    db WHIRLWIND ; TM04
     db TOXIC ; TM06
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db MEGA_DRAIN ; TM21
     db SOLARBEAM ; TM22
     db MIMIC ; TM31
@@ -170,13 +172,11 @@ BeedrillExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
-    db LEECH_LIFE
-    db TWINEEDLE
-    db RAGE ; TM20
     db SLUDGE ; TM56
+    db LEECH_LIFE
     db LEER
+    db TWINEEDLE
     db SCREECH
-    db WHIRLWIND ; TM04
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PidgeyExclusiveMove:
@@ -190,14 +190,13 @@ PidgeotExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db SWIFT ; TM39
     db SKY_ATTACK ; TM43
     db REST ; TM44
+    db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
-    db TRI_ATTACK ; TM49
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RattataExclusiveMove:
@@ -218,15 +217,14 @@ RaticateExclusiveMove:
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db REST ; TM44
     db THUNDER_WAVE ; TM45
     db SUBSTITUTE ; TM50
-    db AGILITY
     db SLUDGE ; TM56
     db DIZZY_PUNCH ; TM60
+    db AGILITY
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SpearowExclusiveMove:
@@ -238,7 +236,6 @@ FearowExclusiveMove:
     db HYPER_BEAM ; TM15
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
     db SWIFT ; TM39
     db SKY_ATTACK ; TM43
     db REST ; TM44
@@ -262,15 +259,15 @@ ArbokExclusiveMove:
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
-    db ABSORB
     db SLUDGE ; TM56
+    db ABSORB
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PikachuExclusiveMove:
@@ -290,18 +287,17 @@ RaichuExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
-    db FLASH ; TM55
     db REST ; TM44
     db THUNDER_WAVE ; TM45
     db SUBSTITUTE ; TM50
-    db QUICK_ATTACK
-    db AGILITY
+    db FLASH ; TM55
     db THUNDERPUNCH ; TM59
     db DIZZY_PUNCH ; TM60
+    db QUICK_ATTACK
+    db AGILITY
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SandshrewExclusiveMove:
@@ -319,7 +315,7 @@ SandslashExclusiveMove:
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
-    db $FF
+    db ROCK_THROW ; TM34
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db REST ; TM44
@@ -327,8 +323,8 @@ SandslashExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db STRIKE ; TM54
-    db FIRE_PUNCH ; TM57
     db SLUDGE ; TM56
+    db FIRE_PUNCH ; TM57
     db DIZZY_PUNCH ; TM60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -354,6 +350,7 @@ NidokingExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
@@ -362,7 +359,7 @@ NidokingExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SKULL_BASH ; TM40
@@ -372,14 +369,13 @@ NidokingExclusiveMove:
     db BLADE ; TM51
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db AGILITY
-    db RAGE ; TM20
-    db QUICK_ATTACK
+    db SLUDGE ; TM56
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
-    db SLUDGE ; TM56
     db DIZZY_PUNCH ; TM60
+    db QUICK_ATTACK
+    db AGILITY
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ClefairyExclusiveMove:
@@ -403,9 +399,10 @@ WigglytuffExclusiveMove:
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
     db PSYCHIC_M ; TM29
+    db TELEPORT ; TM30
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db METRONOME ; TM35
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
@@ -420,11 +417,10 @@ WigglytuffExclusiveMove:
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
     db FLASH ; TM55
-    db DEFENSE_CURL
-    db TELEPORT ; TM30
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
+    db DEFENSE_CURL
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VulpixExclusiveMove:
@@ -433,13 +429,18 @@ NinetalesExclusiveMove:
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
+    db BUBBLEBEAM ; TM11
+    db WATER_GUN ; TM12
+    db ICE_BEAM ; TM13
+    db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db SOLARBEAM ; TM22
     db TRAPHOLE ; TM28
+    db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
@@ -447,16 +448,12 @@ NinetalesExclusiveMove:
     db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
+    db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
-    db $FF
+    db TSUNAMI ; TM53
+    db FIRE_PUNCH ; TM57
     db QUICK_ATTACK
     db AGILITY
-    db RAGE ; TM20
-    db FIRE_PUNCH ; TM57
-    db PSYCHIC_M ; TM29
-    db AURORA_BEAM
-    db PSYWAVE ; TM46
-    db TSUNAMI ; TM53
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ZubatExclusiveMove:
@@ -469,16 +466,15 @@ GolbatExclusiveMove:
     db MEGA_DRAIN ; TM21
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
     db SWIFT ; TM39
     db SKY_ATTACK ; TM43
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
+    db SLUDGE ; TM56
     db ABSORB
     db LICK
-    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OddishExclusiveMove:
@@ -497,17 +493,16 @@ VictreebelExclusiveMove:
     db SOLARBEAM ; TM22
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
     db SWIFT ; TM39
     db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
+    db SLUDGE ; TM56
     db ABSORB
     db LEECH_LIFE
     db LEECH_SEED
     db RAZOR_LEAF
-    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ParasExclusiveMove:
@@ -522,16 +517,15 @@ ParasectExclusiveMove:
     db MEGA_DRAIN ; TM21
     db SOLARBEAM ; TM22
     db TRAPHOLE ; TM28
+    db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
     db LIGHT_SCREEN ; TM41
     db REST ; TM44
+    db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SLUDGE ; TM56
-    db PSYCHIC_M ; TM29
-    db PSYWAVE ; TM46
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 VenonatExclusiveMove:
@@ -548,7 +542,6 @@ VenomothExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db SWIFT ; TM39
     db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
@@ -571,7 +564,7 @@ DugtrioExclusiveMove:
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db REST ; TM44
     db ROCK_SLIDE ; TM48
     db TRI_ATTACK ; TM49
@@ -594,7 +587,6 @@ PersianExclusiveMove:
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
@@ -603,8 +595,8 @@ PersianExclusiveMove:
     db THUNDER_WAVE ; TM45
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
-    db KINESIS
     db DIZZY_PUNCH ; TM60
+    db KINESIS
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PsyduckExclusiveMove:
@@ -627,7 +619,7 @@ GolduckExclusiveMove:
     db TELEPORT ; TM30
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db REFLECT ; TM33
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
@@ -638,11 +630,10 @@ GolduckExclusiveMove:
     db BLADE ; TM51
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db FLARE
     db ICE_PUNCH ; TM58
     db DIZZY_PUNCH ; TM60
-    db REFLECT ; TM33
     db BARRIER
+    db FLARE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MankeyExclusiveMove:
@@ -657,13 +648,14 @@ PrimeapeExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db METRONOME ; TM35
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
@@ -673,12 +665,11 @@ PrimeapeExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db STRIKE ; TM54
-    db BARRAGE
-    db RAGE ; TM20
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
     db DIZZY_PUNCH ; TM60
+    db BARRAGE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GrowlitheExclusiveMove:
@@ -688,6 +679,7 @@ ArcanineExclusiveMove:
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db SOLARBEAM ; TM22
     db DRAGON_RAGE ; TM23
     db EARTHQUAKE ; TM26
@@ -696,18 +688,15 @@ ArcanineExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db REST ; TM44
     db SUBSTITUTE ; TM50
-    db $FF
+    db FIRE_PUNCH ; TM57
     db AGILITY
     db QUICK_ATTACK
-    db RAGE ; TM20
-    db FIRE_PUNCH ; TM57
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PoliwagExclusiveMove:
@@ -732,7 +721,7 @@ PoliwrathExclusiveMove:
     db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db METRONOME ; TM35
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
@@ -742,13 +731,13 @@ PoliwrathExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db AMNESIA
-    db CONFUSION
+    db SLUDGE ; TM56
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
-    db SLUDGE ; TM56
     db DIZZY_PUNCH ; TM60
+    db AMNESIA
+    db CONFUSION
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 AbraExclusiveMove:
@@ -761,11 +750,9 @@ AlakazamExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db METRONOME ; TM35
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
-    db FLASH ; TM55
     db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
@@ -773,6 +760,7 @@ AlakazamExclusiveMove:
     db PSYWAVE ; TM46
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
+    db FLASH ; TM55
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
@@ -790,14 +778,14 @@ MachampExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
-    db FLAMETHROWER ; TM37
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db METRONOME ; TM35
+    db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SKULL_BASH ; TM40
     db REST ; TM44
@@ -805,11 +793,11 @@ MachampExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db AGILITY
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
     db DIZZY_PUNCH ; TM60
+    db AGILITY
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 TentacoolExclusiveMove:
@@ -827,7 +815,6 @@ TentacruelExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
@@ -835,8 +822,8 @@ TentacruelExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db TSUNAMI ; TM53
-    db VINE_WHIP
     db SLUDGE ; TM56
+    db VINE_WHIP
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GeodudeExclusiveMove:
@@ -855,7 +842,7 @@ GolemExclusiveMove:
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
-    db $FF
+    db ROCK_THROW ; TM34
     db METRONOME ; TM35
     db SELFDESTRUCT ; TM36
     db FLAMETHROWER ; TM37
@@ -865,10 +852,10 @@ GolemExclusiveMove:
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
-    db LEER
     db FIRE_PUNCH ; TM57
     db THUNDERPUNCH ; TM59
     db DIZZY_PUNCH ; TM60
+    db LEER
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PonytaExclusiveMove:
@@ -880,19 +867,18 @@ RapidashExclusiveMove:
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
     db PAY_DAY ; TM16
+    db RAGE ; TM20
     db SOLARBEAM ; TM22
-    db FLAMETHROWER ; TM37
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
+    db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db SUBSTITUTE ; TM50
-    db RAGE ; TM20
     db FIRE_PUNCH ; TM57
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -918,7 +904,6 @@ SlowbroExclusiveMove:
     db TELEPORT ; TM30
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
@@ -949,34 +934,35 @@ ElectrodeExclusiveMove:
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
+    db PSYCHIC_M ; TM29
     db TELEPORT ; TM30
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db SELFDESTRUCT ; TM36
     db SWIFT ; TM39
     db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db THUNDER_WAVE ; TM45
+    db PSYWAVE ; TM46
     db EXPLOSION ; TM47
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
     db FLASH ; TM55
     db DISABLE
-    db PSYCHIC_M ; TM29
-    db PSYWAVE ; TM46
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 FarfetchdExclusiveMove:
     db RAZOR_WIND ; TM02
     db SWORDS_DANCE ; TM03
     db WHIRLWIND ; TM04
+    db TAKE_DOWN ; TM09
+    db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db SKY_ATTACK ; TM43
@@ -984,9 +970,6 @@ FarfetchdExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
-    db TAKE_DOWN ; TM09
-    db DOUBLE_EDGE ; TM10
-    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DoduoExclusiveMove:
@@ -996,17 +979,16 @@ DodrioExclusiveMove:
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db REST ; TM44
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
-    db RAGE ; TM20
     db DIZZY_PUNCH ; TM60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -1023,14 +1005,13 @@ DewgongExclusiveMove:
     db HYPER_BEAM ; TM15
     db PAY_DAY ; TM16
     db MIMIC ; TM31
-    db $FF
     db SKULL_BASH ; TM40
     db REST ; TM44
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db SCREECH
     db ICE_PUNCH ; TM58
+    db SCREECH
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GrimerExclusiveMove:
@@ -1042,7 +1023,7 @@ MukExclusiveMove:
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
     db MIMIC ; TM31
-    db $FF
+    db ROCK_THROW ; TM34
     db SELFDESTRUCT ; TM36
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
@@ -1052,11 +1033,11 @@ MukExclusiveMove:
     db EXPLOSION ; TM47
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
-    db LEECH_LIFE
+    db SLUDGE ; TM56
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
-    db SLUDGE ; TM56
+    db LEECH_LIFE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ShellderExclusiveMove:
@@ -1070,7 +1051,6 @@ CloysterExclusiveMove:
     db HYPER_BEAM ; TM15
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
     db SELFDESTRUCT ; TM36
     db SWIFT ; TM39
     db LIGHT_SCREEN ; TM41
@@ -1095,7 +1075,6 @@ GengarExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db METRONOME ; TM35
     db SELFDESTRUCT ; TM36
     db DREAM_EATER ; TM42
@@ -1104,24 +1083,26 @@ GengarExclusiveMove:
     db PSYWAVE ; TM46
     db EXPLOSION ; TM47
     db SUBSTITUTE ; TM50
-    db ABSORB
-    db AMNESIA
     db SLUDGE ; TM56
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
+    db ABSORB
+    db AMNESIA
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OnixExclusiveMove:
+    db SWORDS_DANCE ; TM03
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
-    db $FF
+    db ROCK_THROW ; TM34
     db SELFDESTRUCT ; TM36
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
@@ -1131,9 +1112,7 @@ OnixExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db STRIKE ; TM54
-    db RAGE ; TM20
     db SLUDGE ; TM56
-    db SWORDS_DANCE ; TM03
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DrowzeeExclusiveMove:
@@ -1152,7 +1131,6 @@ HypnoExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db METRONOME ; TM35
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
@@ -1179,17 +1157,17 @@ KinglerExclusiveMove:
     db ICE_BEAM ; TM13
     db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db REST ; TM44
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db RAGE ; TM20
     db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -1208,7 +1186,6 @@ ExeggutorExclusiveMove:
     db TELEPORT ; TM30
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
     db SELFDESTRUCT ; TM36
     db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
@@ -1217,10 +1194,10 @@ ExeggutorExclusiveMove:
     db EXPLOSION ; TM47
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
+    db SLUDGE ; TM56
     db STUN_SPORE
     db POISONPOWDER
     db SLEEP_POWDER
-    db SLUDGE ; TM56
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CuboneExclusiveMove:
@@ -1228,6 +1205,7 @@ MarowakExclusiveMove:
     db MEGA_PUNCH ; TM01
     db SWORDS_DANCE ; TM03
     db MEGA_KICK ; TM05
+    db TOXIC ; TM06
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1239,33 +1217,31 @@ MarowakExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
+    db TELEPORT ; TM30
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db REST ; TM44
+    db PSYWAVE ; TM46
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
-    db MEDITATE
-    db ROCK_THROW
-    db SPIKE_CANNON
-    db RAGE ; TM20
-    db TOXIC ; TM06
-    db TELEPORT ; TM30
-    db PSYWAVE ; TM46
     db FLASH ; TM55
+    db SLUDGE ; TM56
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
-    db SLUDGE ; TM56
     db DIZZY_PUNCH ; TM60
+    db MEDITATE
+    db SPIKE_CANNON
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HitmonleeExclusiveMove:
@@ -1285,7 +1261,7 @@ HitmonchanExclusiveMove:
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db METRONOME ; TM35
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
@@ -1321,7 +1297,7 @@ LickitungExclusiveMove:
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db MIMIC ; TM31
-    db $FF
+    db ROCK_THROW ; TM34
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SKULL_BASH ; TM40
@@ -1342,11 +1318,12 @@ KoffingExclusiveMove:
 WeezingExclusiveMove:
     db TOXIC ; TM06
     db HYPER_BEAM ; TM15
+    db MEGA_DRAIN ; TM21
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
+    db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
     db SELFDESTRUCT ; TM36
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
@@ -1356,10 +1333,8 @@ WeezingExclusiveMove:
     db EXPLOSION ; TM47
     db SUBSTITUTE ; TM50
     db FLASH ; TM55
-    db ABSORB
-    db MEGA_DRAIN ; TM21
     db SLUDGE ; TM56
-    db PSYCHIC_M ; TM29
+    db ABSORB
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RhyhornExclusiveMove:
@@ -1380,13 +1355,14 @@ RhydonExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
-    db $FF
+    db ROCK_THROW ; TM34
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SKULL_BASH ; TM40
@@ -1395,12 +1371,11 @@ RhydonExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db DOUBLE_KICK
-    db RAGE ; TM20
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
     db DIZZY_PUNCH ; TM60
+    db DOUBLE_KICK
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ChanseyExclusiveMove:
@@ -1422,7 +1397,7 @@ ChanseyExclusiveMove:
     db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db METRONOME ; TM35
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
@@ -1453,14 +1428,13 @@ TangelaExclusiveMove:
     db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
     db REST ; TM44
+    db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SLUDGE ; TM56
-    db PSYWAVE ; TM46
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KangaskhanExclusiveMove:
@@ -1477,6 +1451,7 @@ KangaskhanExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
@@ -1485,7 +1460,7 @@ KangaskhanExclusiveMove:
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SKULL_BASH ; TM40
@@ -1494,7 +1469,6 @@ KangaskhanExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db RAGE ; TM20
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
@@ -1510,19 +1484,18 @@ SeadraExclusiveMove:
     db ICE_BEAM ; TM13
     db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db DRAGON_RAGE ; TM23
+    db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db REST ; TM44
+    db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
-    db RAGE ; TM20
     db SLUDGE ; TM56
-    db PSYCHIC_M ; TM29
-    db PSYWAVE ; TM46
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GoldeenExclusiveMove:
@@ -1538,17 +1511,16 @@ SeakingExclusiveMove:
     db ICE_BEAM ; TM13
     db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
+    db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db REST ; TM44
+    db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db LOVELY_KISS
-    db PSYCHIC_M ; TM29
-    db PSYWAVE ; TM46
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 StaryuExclusiveMove:
@@ -1565,7 +1537,6 @@ StarmieExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db SWIFT ; TM39
     db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
@@ -1593,7 +1564,6 @@ MrMimeExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db METRONOME ; TM35
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
@@ -1611,13 +1581,14 @@ MrMimeExclusiveMove:
 ScytherExclusiveMove:
     db RAZOR_WIND ; TM02
     db SWORDS_DANCE ; TM03
+    db WHIRLWIND ; TM04
     db TOXIC ; TM06
     db TAKE_DOWN ; TM09
     db HYPER_BEAM ; TM15
     db COUNTER ; TM18
+    db RAGE ; TM20
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
@@ -1626,8 +1597,6 @@ ScytherExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SWOOP ; TM52
-    db RAGE ; TM20
-    db WHIRLWIND ; TM04
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 JynxExclusiveMove:
@@ -1644,23 +1613,22 @@ JynxExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db PSYCHIC_M ; TM29
     db TELEPORT ; TM30
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db METRONOME ; TM35
+    db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
     db REST ; TM44
     db PSYWAVE ; TM46
     db SUBSTITUTE ; TM50
-    db RAGE ; TM20
     db ICE_PUNCH ; TM58
     db DIZZY_PUNCH ; TM60
-    db SWIFT ; TM39
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ElectabuzzExclusiveMove:
@@ -1673,13 +1641,14 @@ ElectabuzzExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
     db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db METRONOME ; TM35
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
@@ -1687,10 +1656,10 @@ ElectabuzzExclusiveMove:
     db REST ; TM44
     db THUNDER_WAVE ; TM45
     db PSYWAVE ; TM46
+    db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
     db FLASH ; TM55
-    db RAGE ; TM20
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
@@ -1708,25 +1677,26 @@ MagmarExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db METRONOME ; TM35
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
+    db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
     db REST ; TM44
     db PSYWAVE ; TM46
+    db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
-    db RAGE ; TM20
+    db SLUDGE ; TM56
     db FIRE_PUNCH ; TM57
     db THUNDERPUNCH ; TM59
-    db SLUDGE ; TM56
     db DIZZY_PUNCH ; TM60
-    db SWIFT ; TM39
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PinsirExclusiveMove:
@@ -1739,18 +1709,18 @@ PinsirExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db REST ; TM44
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db STRIKE ; TM54
-    db RAGE ; TM20
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
@@ -1765,6 +1735,7 @@ TaurosExclusiveMove:
     db ICE_BEAM ; TM13
     db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
@@ -1772,7 +1743,7 @@ TaurosExclusiveMove:
     db FISSURE ; TM27
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
-    db $FF
+    db ROCK_THROW ; TM34
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SKULL_BASH ; TM40
@@ -1780,7 +1751,6 @@ TaurosExclusiveMove:
     db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db STRIKE ; TM54
-    db RAGE ; TM20
     db DIZZY_PUNCH ; TM60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -1794,23 +1764,24 @@ GyaradosExclusiveMove:
     db ICE_BEAM ; TM13
     db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db DRAGON_RAGE ; TM23
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
     db EARTHQUAKE ; TM26
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SKULL_BASH ; TM40
     db REST ; TM44
     db THUNDER_WAVE ; TM45
+    db ROCK_SLIDE ; TM48
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db STRIKE ; TM54
     db AMNESIA
-    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LaprasExclusiveMove:
@@ -1832,7 +1803,6 @@ LaprasExclusiveMove:
     db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
     db DREAM_EATER ; TM42
@@ -1863,12 +1833,12 @@ FlareonExclusiveMove:
     db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
     db PAY_DAY ; TM16
+    db RAGE ; TM20
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
@@ -1879,7 +1849,6 @@ FlareonExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db FLASH ; TM55
-    db RAGE ; TM20
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
@@ -1889,7 +1858,6 @@ PorygonExclusiveMove:
     db ICE_BEAM ; TM13
     db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
-    db BLADE ; TM51
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
@@ -1897,7 +1865,6 @@ PorygonExclusiveMove:
     db TELEPORT ; TM30
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
     db SWIFT ; TM39
     db SKULL_BASH ; TM40
     db LIGHT_SCREEN ; TM41
@@ -1907,6 +1874,7 @@ PorygonExclusiveMove:
     db PSYWAVE ; TM46
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
+    db BLADE ; TM51
     db FLASH ; TM55
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -1927,7 +1895,7 @@ OmastarExclusiveMove:
     db TRAPHOLE ; TM28
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db SELFDESTRUCT ; TM36
     db SKULL_BASH ; TM40
     db REST ; TM44
@@ -1953,6 +1921,7 @@ KabutopsExclusiveMove:
     db HYPER_BEAM ; TM15
     db SUBMISSION ; TM17
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db MEGA_DRAIN ; TM21
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
@@ -1960,7 +1929,7 @@ KabutopsExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db SKULL_BASH ; TM40
     db REST ; TM44
     db ROCK_SLIDE ; TM48
@@ -1976,13 +1945,14 @@ AerodactylExclusiveMove:
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
     db HYPER_BEAM ; TM15
+    db RAGE ; TM20
     db DRAGON_RAGE ; TM23
     db EARTHQUAKE ; TM26
     db FISSURE ; TM27
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
@@ -1993,7 +1963,6 @@ AerodactylExclusiveMove:
     db BLADE ; TM51
     db SWOOP ; TM52
     db STRIKE ; TM54
-    db RAGE ; TM20
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SnorlaxExclusiveMove:
@@ -2011,6 +1980,7 @@ SnorlaxExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
@@ -2019,7 +1989,7 @@ SnorlaxExclusiveMove:
     db PSYCHIC_M ; TM29
     db MIMIC ; TM31
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db METRONOME ; TM35
     db SELFDESTRUCT ; TM36
     db FLAMETHROWER ; TM37
@@ -2031,7 +2001,6 @@ SnorlaxExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db RAGE ; TM20
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
@@ -2051,15 +2020,14 @@ ArticunoExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db SWIFT ; TM39
     db LIGHT_SCREEN ; TM41
     db SKY_ATTACK ; TM43
     db REST ; TM44
+    db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
     db SWOOP ; TM52
     db TSUNAMI ; TM53
-    db TRI_ATTACK ; TM49
     db ICE_PUNCH ; TM58
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -2074,16 +2042,15 @@ ZapdosExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db SWIFT ; TM39
     db LIGHT_SCREEN ; TM41
     db SKY_ATTACK ; TM43
     db REST ; TM44
     db THUNDER_WAVE ; TM45
+    db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
     db SWOOP ; TM52
     db FLASH ; TM55
-    db TRI_ATTACK ; TM49
     db THUNDERPUNCH ; TM59
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -2097,16 +2064,15 @@ MoltresExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
     db LIGHT_SCREEN ; TM41
     db SKY_ATTACK ; TM43
     db REST ; TM44
+    db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
     db SWOOP ; TM52
-    db TRI_ATTACK ; TM49
     db FIRE_PUNCH ; TM57
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -2127,6 +2093,7 @@ DragoniteExclusiveMove:
     db BLIZZARD ; TM14
     db HYPER_BEAM ; TM15
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db DRAGON_RAGE ; TM23
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
@@ -2136,7 +2103,7 @@ DragoniteExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
+    db ROCK_THROW ; TM34
     db FLAMETHROWER ; TM37
     db FIRE_BLAST ; TM38
     db SWIFT ; TM39
@@ -2151,11 +2118,10 @@ DragoniteExclusiveMove:
     db SWOOP ; TM52
     db TSUNAMI ; TM53
     db STRIKE ; TM54
-    db RAGE ; TM20
+    db SLUDGE ; TM56
     db FIRE_PUNCH ; TM57
     db ICE_PUNCH ; TM58
     db THUNDERPUNCH ; TM59
-    db SLUDGE ; TM56
     db DIZZY_PUNCH ; TM60
     db 0
 ; ──────────────────────────────────────────────────────────────────────
@@ -2174,6 +2140,7 @@ MewtwoExclusiveMove:
     db SUBMISSION ; TM17
     db COUNTER ; TM18
     db SEISMIC_TOSS ; TM19
+    db RAGE ; TM20
     db SOLARBEAM ; TM22
     db THUNDERBOLT ; TM24
     db THUNDER_M ; TM25
@@ -2183,7 +2150,7 @@ MewtwoExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db RAGE ; TM20
+    db ROCK_THROW ; TM34
     db METRONOME ; TM35
     db SELFDESTRUCT ; TM36
     db FLAMETHROWER ; TM37
@@ -2219,7 +2186,6 @@ ChandelureExclusiveMove:
     db MIMIC ; TM31
     db DOUBLE_TEAM ; TM32
     db REFLECT ; TM33
-    db $FF
     db METRONOME ; TM35
     db SELFDESTRUCT ; TM36
     db FLAMETHROWER ; TM37
@@ -2231,7 +2197,7 @@ ChandelureExclusiveMove:
     db EXPLOSION ; TM47
     db SUBSTITUTE ; TM50
     db FLASH ; TM55
-    db ACID_ARMOR
     db FIRE_PUNCH ; TM57
+    db ACID_ARMOR
     db 0
 ; ──────────────────────────────────────────────────────────────────────
