@@ -3594,6 +3594,7 @@ AERODACTYL_Learnset:
     db  1,AGILITY
     db  3,Skill__FLY
     db  6,WING_ATTACK
+    db  7,BIDE
     db  8,WHIRLWIND
     db 10,QUICK_ATTACK
     db 11,BITE
