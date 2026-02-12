@@ -570,6 +570,7 @@ SANDSHREW_Learnset:
     db 0
 SANDSLASH_Learnset:
     db 22,PIN_MISSILE
+    db 24,BIDE
     db 26,ROCK_THROW
     db 28,Skill__STRENGTH
     db 29,BLADE
@@ -585,6 +586,7 @@ SANDSLASH_Learnset:
     db 0
 SANDSHREW_NoEvo_Learnset:
     db 25,PIN_MISSILE
+    db 27,BIDE
     db 29,ROCK_THROW
     db 33,BLADE
     db 37,FOCUS_ENERGY
@@ -1733,6 +1735,7 @@ GOLEM_Learnset:
     db 25,BODY_SLAM
     db 0
 GRAVELER_GOLEM_Learnset:
+    db 29,BIDE
     db 30,ROCK_SLIDE
     db 33,SKULL_BASH
     db 36,EARTHQUAKE
@@ -2278,6 +2281,7 @@ KINGLER_Learnset:
     db 28,HAMMER
     db 28,Skill__DIG
     db 30,FOCUS_ENERGY
+    db 31,BIDE
     db 32,WATERFALL
     db 32,Skill__FLOAT
     db 34,SPIKE_CANNON
@@ -2295,6 +2299,7 @@ KINGLER_Learnset:
 KRABBY_NoEvo_Learnset:
     db 32,HAMMER
     db 32,Skill__DIG
+    db 34,BIDE
     db 35,WATERFALL
     db 35,Skill__FLOAT
     db 38,SPIKE_CANNON
@@ -2691,6 +2696,7 @@ RHYHORN_Learnset:
     db 17,RAGE
     db 18,STOMP
     db 18,Skill__DIG
+    db 19,BIDE
     db 20,LEER
     db 22,TRAPHOLE
     db 24,SLAM
@@ -3472,6 +3478,7 @@ PORYGON_Learnset:
 OMANYTE_Learnset:
     db  1,CONSTRICT
     db  1,WITHDRAW
+    db  6,BIDE
     db  8,BUBBLE
     db 11,BITE
     db 13,ROCK_THROW
@@ -3527,6 +3534,7 @@ OMANYTE_NoEvo_Learnset:
 KABUTO_Learnset:
     db  1,SCRATCH
     db  1,HARDEN
+    db  6,BIDE
     db  8,BUBBLE
     db 11,LEECH_LIFE
     db 13,ROCK_THROW
@@ -3620,6 +3628,7 @@ SNORLAX_Learnset:
     db  8,BITE
     db 11,STOMP
     db 13,DOUBLESLAP
+    db 15,BIDE
     db 16,REST
     db 18,SLAM
     db 20,ROCK_THROW
