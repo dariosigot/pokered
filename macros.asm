@@ -141,6 +141,42 @@ PREDEF_NZ: MACRO
 	call nz,Predef
 	ENDM
 
+BANKSWITCH: MACRO
+    ld b,BANK(\1)
+    ld hl,\1
+    call Bankswitch
+    ENDM
+
+BANKSWITCH_JUMP: MACRO
+    ld b,BANK(\1)
+    ld hl,\1
+    jp Bankswitch
+    ENDM
+
+BANKSWITCH_Z: MACRO
+    ld b,BANK(\1)
+    ld hl,\1
+    call z,Bankswitch
+    ENDM
+
+BANKSWITCH_NZ: MACRO
+    ld b,BANK(\1)
+    ld hl,\1
+    call nz,Bankswitch
+    ENDM
+
+BANKSWITCH_NC: MACRO
+    ld b,BANK(\1)
+    ld hl,\1
+    call nc,Bankswitch
+    ENDM
+
+BANKSWITCH_JUMP_NZ: MACRO
+    ld b,BANK(\1)
+    ld hl,\1
+    jp nz,Bankswitch
+    ENDM
+
 ;1_channel	EQU $00
 ;2_channels	EQU $40
 ;3_channels	EQU $80

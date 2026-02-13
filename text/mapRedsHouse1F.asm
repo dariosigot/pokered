@@ -1,30 +1,35 @@
 _MomWakeUpText:
-    db 0,"MOM: Right.",$4F
-    db "All boys leave",$55
-    db "home some day.",$55
-    db "It said so on TV.",$51
-    db "PROF.OAK, next",$4F
-    db "door, is looking",$55
-    db "for you.",$57
+    text_init , "MOM: Right."
+    text_line , "All boys leave"
+    text_cont , "home some day."
+    text_cont , "It said so on TV."
+    text_para , "PROF.OAK, next"
+    text_line , "door, is looking"
+    text_cont , "for you."
+    text_done
 
 _MomHealText1:
-    db 0,"MOM: ",$52,"!",$4F
-    db "You should take a",$55
-    db "quick rest.",$58
+    text_init , "MOM: ",$52,"!"
+    text_line , "You should take a"
+    text_cont , "quick rest."
+    text_wait
 
 _MomHealText2:
-    db 0,"MOM: Oh good!",$4F
-    db "You and your",$55
-    db "#MON are",$55
-    db "looking great!",$55
-    db "Take care now!",$57
+    text_init , "MOM: Oh good!"
+    text_line , "You and your"
+    text_cont , "#MON are"
+    text_cont , "looking great!"
+    text_cont , "Take care now!"
+    text_done
 
 _StandByMeText:
-    db 0,"There's a movie",$4F
-    db "on TV. Four boys",$55
-    db "are walking on",$55
-    db "railroad tracks.",$51
-    db "I better go too.",$57
+    text_init , "There's a movie"
+    text_line , "on TV. Four boys"
+    text_cont , "are walking on"
+    text_cont , "railroad tracks."
+    text_para , "I better go too."
+    text_done
 
 _TVWrongSideText:
-    db 0,"Oops, wrong side.",$57
+    text_init , "Oops, wrong side."
+    text_done

@@ -1,34 +1,44 @@
 _DaisyInitialText:
-    db 0,"Hi ",$52,"!",$4F
-    db $53," is out at",$55
-    db "Grandpa's lab.",$57
+    text_init , "Hi ",$52,"!"
+    text_line , $53," is out at"
+    text_cont , "Grandpa's lab."
+    text_done
 
 _DaisyOfferMapText:
-    db 0,"Grandpa asked you",$4F
-    db "to run an errand?",$55
-    db "Here, this will",$55
-    db "help you!",$58
+    text_init , "Grandpa asked you"
+    text_line , "to run an errand?"
+    text_cont , "Here, this will"
+    text_cont , "help you!"
+    text_wait
 
 _GotMapText:
-    db 0,$52," got a",$4F,"@",1
+    text_init , $52," got a"
+    text_line
+    text_paus
+    db 1
     dw $CF4B
-    db 0,"!@@"
+    text_init , "!"
+    text_past
 
 _DaisyBagFullText:
-    db 0,"You have too much",$4F
-    db "stuff with you.",$57
+    text_init , "You have too much"
+    text_line , "stuff with you."
+    text_done
 
 _DaisyUseMapText:
-    db 0,"Use the TOWN MAP",$4F
-    db "to find out where",$55
-    db "you are.",$57
+    text_init , "Use the TOWN MAP"
+    text_line , "to find out where"
+    text_cont , "you are."
+    text_done
 
 _BluesHouseText2:
-    db 0,"#MON are living",$4F
-    db "things! If they",$55
-    db "get tired, give",$55
-    db "them a rest!",$57
+    text_init , "#MON are living"
+    text_line , "things! If they"
+    text_cont , "get tired, give"
+    text_cont , "them a rest!"
+    text_done
 
 _BluesHouseText3:
-    db 0,"It's a big map!",$4F
-    db "This is useful!",$57
+    text_init , "It's a big map!"
+    text_line , "This is useful!"
+    text_done

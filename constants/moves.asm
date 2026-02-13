@@ -88,7 +88,7 @@
     db THUNDERBOLT  , PARALYZE_SIDE_EFFECT1      ,  90 , THUNDER  , 255 , 14 ; pp 15 ; 1 ; Pwr 95 -> 90
     db THUNDER_WAVE , PARALYZE_EFFECT            ,   0 , THUNDER  , 255 , 14 ; pp 15 ; - ; PP 20 -> 15
     db THUNDER_M    , PARALYZE_SIDE_EFFECT2      , 120 , THUNDER  , 178 , 20 ; pp 10 ; 1
-    db ROCK_THROW   , NO_ADDITIONAL_EFFECT       ,  50 , ROCK     , 229 , 09 ; pp 15 ; 0 ; Acr 165 -> 229 ; PP 15 -> 25 ; Ene 08 -> 09 
+    db ROCK_THROW   , FLINCH_SIDE_EFFECT1        ,  50 , ROCK     , 216 , 09 ; pp 15 ; 0 ; Acr 165 -> 216 ; PP 15 -> 25 ; Ene 08 -> 09 
     db EARTHQUAKE   , NO_ADDITIONAL_EFFECT       , 100 , EARTH    , 255 , 20 ; pp 10 ; 0
     db FISSURE      , OHKO_EFFECT                ,   1 , EARTH    ,  76 , 45 ; pp  5 ; - ; Ene 40 -> 45
     db TRAPHOLE     , CHARGE_EFFECT              ,  80 , EARTH    , 255 , 14 ; pp 15 ; 0 ; Pwr 100 -> 80 ; PP 10 -> 15
@@ -152,12 +152,12 @@
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; Acr 204 -> 255 ; PP 15 -> 30
     db SPLASH       , SPLASH_EFFECT              ,   0 , WATER    , 255 , 00 ; pp 40 ; - ; Type Normal -> Water
     db ACID_ARMOR   , DEFENSE_UP3_EFFECT         ,   0 , POISON   , 255 , 10 ; pp 20 ; - ; PP 40 -> 20 ; Defense 3x
-    db HAMMER   , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 191 , 20 ; pp 10 ; 0 ; Acr 216 -> 191
+    db HAMMER       , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 191 , 20 ; pp 10 ; 0 ; Acr 216 -> 191
     db EXPLOSION    , EXPLODE_EFFECT             , 255 , NORMAL   , 255 , 60 ; pp  5 ; 0 ; Pwr 170 -> 255 ; Ene 40 -> 60
     db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , NORMAL   , 204 , 12 ; pp 15 ; 0 ; Pwr 18 -> 21 ; Ene 14 -> 12
     db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  55 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Earth -> Ivory ; Pwr 50 -> 55
     db REST         , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 28 ; pp 10 ; - ; Type Psychic -> Normal ; Ene 20 -> 28
-    db ROCK_SLIDE   , NO_ADDITIONAL_EFFECT       ,  85 , ROCK     , 229 , 14 ; pp 10 ; 0 ; Pwr 75 -> 85 ; PP 10 -> 15
+    db ROCK_SLIDE   , FLINCH_SIDE_EFFECT1        , 100 , ROCK     , 216 , 18 ; pp 10 ; 0 ; Acr 229 -> 216 ; Pwr 75 -> 100 ; PP 10 -> 15 ; Ene 14 -> 18
     db HYPER_FANG   , FLINCH_SIDE_EFFECT1        ,  80 , NORMAL   , 229 , 14 ; pp 15 ; 0
     db SHARPEN      , ATTACK_UP1_EFFECT          ,   0 , METAL    , 255 , 07 ; pp 30 ; - ; Type Normal -> Metal
     db CONVERSION   , CONVERSION_EFFECT          ,   0 , NORMAL   , 255 , 07 ; pp 30 ; -
@@ -166,3 +166,11 @@
     db SLASH        , NO_ADDITIONAL_EFFECT       ,  70 , NORMAL   , 255 , 11 ; pp 20 ; 0 ; Ene 10 -> 11
     db SUBSTITUTE   , SUBSTITUTE_EFFECT          ,   0 , NORMAL   , 255 , 20 ; pp 10 ; -
     db STRUGGLE     , RECOIL_EFFECT              ,  60 , TYPE_NA  , 255 , 00 ; pp 99 ; ? ; Type Normal -> N.A. ; Pwr 50 -> 60 ; PP 10 -> inf ; Phi/Spc Split depends by Mon
+
+    db SHOWPIC_ANIM , NO_ADDITIONAL_EFFECT       ,  00 , TYPE_NA  ,   0 , 00 ; FLY
+    db SHOWPIC_ANIM , NO_ADDITIONAL_EFFECT       ,  00 , TYPE_NA  ,   0 , 00 ; DIG
+    db SHOWPIC_ANIM , NO_ADDITIONAL_EFFECT       ,  00 , TYPE_NA  ,   0 , 00 ; CUT
+    db SHOWPIC_ANIM , NO_ADDITIONAL_EFFECT       ,  00 , TYPE_NA  ,   0 , 00 ; FLOAT
+    db SHOWPIC_ANIM , NO_ADDITIONAL_EFFECT       ,  00 , TYPE_NA  ,   0 , 00 ; STRENGTH
+    db SHOWPIC_ANIM , NO_ADDITIONAL_EFFECT       ,  00 , TYPE_NA  ,   0 , 00 ; LIGHT
+    db SHOWPIC_ANIM , NO_ADDITIONAL_EFFECT       ,  00 , TYPE_NA  ,   0 , 00 ; HEAL

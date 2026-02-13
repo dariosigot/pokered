@@ -149,7 +149,7 @@ FLASH        EQU $94
 PSYWAVE      EQU $95
 SPLASH       EQU $96
 ACID_ARMOR   EQU $97
-HAMMER   EQU $98
+HAMMER       EQU $98
 EXPLOSION    EQU $99
 FURY_SWIPES  EQU $9A
 BONEMERANG   EQU $9B
@@ -163,6 +163,18 @@ SUPER_FANG   EQU $A2
 SLASH        EQU $A3
 SUBSTITUTE   EQU $A4
 STRUGGLE     EQU $A5
+
+; ─────────────────────────────
+; Skill
+; ─────────────────────────────
+Skill__FLY      EQU $A6
+Skill__DIG      EQU $A7
+Skill__CUT      EQU $A8
+Skill__FLOAT    EQU $A9
+Skill__STRENGTH EQU $AA
+Skill__LIGHT    EQU $AB
+Skill__HEAL     EQU $AC
+
 ; these do double duty as animation identifiers
 SHOWPIC_ANIM EQU $A6 ; redraw monster pic
 XSTATITEM_ANIM EQU $AE ; use X Attack/Defense/Speed/Special

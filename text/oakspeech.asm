@@ -1,44 +1,51 @@
 _OakSpeechText1:
-    db 0,"Hello there!",$4F
-    db "Welcome to the",$55
-    db "world of #MON!",$51
-    db "My name is OAK!",$4F
-    db "People call me",$55
-    db "the #MON PROF!",$58
+    text_init , "Hello there!"
+    text_line , "Welcome to the"
+    text_cont , "world of #MON!"
+    text_para , "My name is OAK!"
+    text_line , "People call me"
+    text_cont , "the #MON PROF!"
+    text_wait
 
 _OakSpeechText2A:
-    db 0,"This world is",$4F
-    db "inhabited by",$55
-    db "creatures called",$55
-    db "#MON!@@"
+    text_init , "This world is"
+    text_line , "inhabited by"
+    text_cont , "creatures called"
+    text_cont , "#MON!"
+    text_past
 
 _OakSpeechText2B:
-    db 0,$51,"For some people,",$4F
-    db "#MON are",$55
-    db "pets. Others use",$55
-    db "them for fights.",$51
-    db "Myself...",$51
-    db "I study #MON",$4F
-    db "as a profession.",$58
+    text_init
+    text_para , "For some people,"
+    text_line , "#MON are"
+    text_cont , "pets. Others use"
+    text_cont , "them for fights."
+    text_para , "Myself..."
+    text_para , "I study #MON"
+    text_line , "as a profession."
+    text_wait
 
 _IntroducePlayerText:
-    db 0,"First, what is",$4F
-    db "your name?",$58
+    text_init , "First, what is"
+    text_line , "your name?"
+    text_wait
 
 _IntroduceRivalText:
-    db 0,"This is my grand-",$4F
-    db "son. He's been",$55
-    db "your rival since",$55
-    db "you were a baby.",$51
-    db "...Erm, what is",$4F
-    db "his name again?",$58
+    text_init , "This is my grand-"
+    text_line , "son. He's been"
+    text_cont , "your rival since"
+    text_cont , "you were a baby."
+    text_para , "...Erm, what is"
+    text_line , "his name again?"
+    text_wait
 
 _OakSpeechText3:
-    db 0,$52,"!",$51
-    db "Your very own",$4F
-    db "#MON legend is",$55
-    db "about to unfold!",$51
-    db "A world of dreams",$4F
-    db "and adventures",$55
-    db "with #MON",$55
-    db "awaits! Let's go!",$57
+    text_init , $52,"!"
+    text_para , "Your very own"
+    text_line , "#MON legend is"
+    text_cont , "about to unfold!"
+    text_para , "A world of dreams"
+    text_line , "and adventures"
+    text_cont , "with #MON"
+    text_cont , "awaits! Let's go!"
+    text_done

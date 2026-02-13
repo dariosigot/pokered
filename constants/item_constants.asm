@@ -5,7 +5,7 @@ GREAT_BALL    EQU $03
 POKE_BALL     EQU $04
 TOWN_MAP      EQU $05
 BICYCLE       EQU $06
-SURFBOARD     EQU $07 ; buggy?
+SURFBOARD     EQU $07
 SAFARI_BALL   EQU $08
 POKEDEX       EQU $09
 MOON_STONE    EQU $0A
@@ -23,11 +23,11 @@ BAIT_ITEM     EQU $15
 ROCK_ITEM     EQU $16
 DUSK_STONE    EQU $17
 ICE_STONE     EQU $18
-; XXX ????? EQU $19
+BENGAL        EQU $19
 ; XXX ????? EQU $1A
 ; XXX ????? EQU $1B
 ; XXX ????? EQU $1C
-ESCAPE_ROPE   EQU $1D
+AUGER         EQU $1D
 REPEL         EQU $1E
 OLD_AMBER     EQU $1F
 FIRE_STONE    EQU $20
@@ -83,13 +83,16 @@ ETHER         EQU $50
 ELIXER        EQU $52
 ;MAX_ELIXER   EQU $53
 
-HM_01         EQU $54 ; NATURE POWER
-HM_02         EQU $55 ; AIR POWER
-HM_03         EQU $56 ; WATER POWER
-HM_04         EQU $57 ; EARTH POWER
-HM_05         EQU $58 ; FIRE POWER
+ITEM_END_LIST EQU $54 ; End of List
 
-ITEM_END_LIST EQU $59 ; End of List
+HM_01         EQU $54 ; CUT      ; Ex NATURE POWER
+HM_02         EQU $55 ; FLY      ; Ex AIR POWER
+HM_03         EQU $56 ; FLOAT    ; Ex WATER POWER
+HM_04         EQU $57 ; STRENGTH ; Ex EARTH POWER
+HM_05         EQU $58 ; LIGHT    ; Ex FIRE POWER
+HM_06         EQU $59 ; TELEPORT
+HM_07         EQU $5A ; DIG
+HM_08         EQU $5B ; HEAL
 
 TM_01         EQU $BF
 TM_02         EQU $C0
