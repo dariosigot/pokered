@@ -122929,43 +122929,63 @@ _HM03SkillNotFoundText:
     text_past
 
 _HM04SkillFoundText:
-    text_init , "Found!"
+    text_init , "You're Team is"
+    text_line , "Ready for this"
+    text_cont , "SKILL!"
     text_past
 
 _HM04SkillNotFoundText:
-    text_init , "NOT Found!"
+    text_init , "It seems that you"
+    text_line , "miss a #MON"
+    text_cont , "for this SKILL."
     text_past
 
 _HM05SkillFoundText:
-    text_init , "Found!"
+    text_init , "You're Team is"
+    text_line , "Ready for this"
+    text_cont , "SKILL!"
     text_past
 
 _HM05SkillNotFoundText:
-    text_init , "NOT Found!"
+    text_init , "It seems that you"
+    text_line , "miss a #MON"
+    text_cont , "for this SKILL."
     text_past
 
 _HM06SkillFoundText:
-    text_init , "Found!"
+    text_init , "You're Team is"
+    text_line , "Ready for this"
+    text_cont , "SKILL!"
     text_past
 
 _HM06SkillNotFoundText:
-    text_init , "NOT Found!"
+    text_init , "It seems that you"
+    text_line , "miss a #MON"
+    text_cont , "for this SKILL."
     text_past
 
 _HM07SkillFoundText:
-    text_init , "Found!"
+    text_init , "You're Team is"
+    text_line , "Ready for this"
+    text_cont , "SKILL!"
     text_past
 
 _HM07SkillNotFoundText:
-    text_init , "NOT Found!"
+    text_init , "It seems that you"
+    text_line , "miss a #MON"
+    text_cont , "for this SKILL."
     text_past
 
 _HM08SkillFoundText:
-    text_init , "Found!"
+    text_init , "You're Team is"
+    text_line , "Ready for this"
+    text_cont , "SKILL!"
     text_past
 
 _HM08SkillNotFoundText:
-    text_init , "NOT Found!"
+    text_init , "It seems that you"
+    text_line , "miss a #MON"
+    text_cont , "for this SKILL."
     text_past
 
 ; ───────────────────────────────────
