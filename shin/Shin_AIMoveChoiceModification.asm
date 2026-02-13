@@ -506,7 +506,7 @@ AIMoveChoiceModification1:
     ld a,[W_PLAYERMONSTATUS]
     bit PAR_Bit,a
     jr nz,.heavydiscourage
-    ; fall through
+    ; ft
 .nostatusconflict
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

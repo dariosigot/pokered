@@ -1673,7 +1673,7 @@ IsSpriteOrSignInFrontOfPlayer: ; 0b23 (0:0b23)
     jr z,IsSpriteInFrontOfPlayer2 ; jumps if the tile in front of the player is a counter tile
     dec b
     jr nz,.counterTilesLoop
-    ; fall through
+    ; ft
 
 ; part of the above function,but sometimes its called on its own,when signs are irrelevant
 ; the caller must zero [$FF8C]
@@ -1859,7 +1859,7 @@ IsGhostBattle:
     call CheckWildGhost
     jr nz,.end
     call IsSilphScopeInBagNotDark
-    ; fall through
+    ; ft
 .end
     pop bc
     ld a,b
@@ -1903,7 +1903,7 @@ IsGhostBattlePlus:
 .marowak
     call GetCurrentOldAdventureMap
     cp POKEMONTOWER_6
-    ; fall through
+    ; ft
 .end
     pop bc
     ld a,b
@@ -2562,7 +2562,7 @@ LoadSurfingPlayerSpriteGraphics:
 LoadBikePlayerSpriteGraphics:
     ld de,RedCyclingSprite
     ld bc,(BANK(RedCyclingSprite) << 8) + $0c
-    ; fall through
+    ; ft
 
 LoadPlayerSpriteGraphicsCommon:
     ld hl,$8000
@@ -3321,7 +3321,7 @@ DrawPartyMenu:
 
 RedrawPartyMenu:
     ld hl,RedrawPartyMenu_
-    ; fall through
+    ; ft
 
 DrawPartyMenuCommon:
     ld b,BANK(RedrawPartyMenu_)
@@ -3384,7 +3384,7 @@ PrintLevelFull:
     ld [hli],a
     ld c,3 ; number of digits
     ld a,[$cfb9] ; level
-    ; fall through
+    ; ft
 
 PrintLevelCommon:
     ld [$d11e],a
@@ -3432,7 +3432,7 @@ GetMonHeader:
     ld l,a
     or h
     jr nz,.retry
-    ; fall through
+    ; ft
 .done
     pop af
     ld [$d11e],a
@@ -3605,7 +3605,7 @@ LoadMonFrontSprite: ; 1665 (0:1665)
 HackBackSprite: ; Denim,Pointer utilizzato per caricare i backsprite come i frontsprite
     ld c,a
     pop de
-    ; fall through
+    ; ft
 
 ; postprocesses uncompressed sprite chunks to a 2bpp sprite and loads it into video ram
 ; calculates alignment parameters to place both sprite chunks in the center of the 7*7 tile sprite buffers
@@ -5866,7 +5866,7 @@ PlayDefaultMusicFadeOutCurrent: ; 2312 (0:2312)
     ld [$cfca],a
     ld c,$8
     ld d,c
-    ; fall through
+    ; ft
 
 PlayDefaultMusicCommon: ; 2324 (0:2324)
     ld a,[$d700] ; WalkBikeSurfState
@@ -6235,7 +6235,7 @@ _UncompressSpriteData: ; 251a (0:251a)
     ld [W_SPRITELOADFLAGS],a ; initialite bit1 to 0 and bit0 to the first input bit
                               ; this will load two chunks of data to S_SPRITEBUFFER1 and S_SPRITEBUFFER2
                               ; bit 0 decides in which one the first chunk is placed
-    ; fall through
+    ; ft
 
 ; uncompresses a chunk from the sprite input data stream (pointed to at $d0da) into S_SPRITEBUFFER1 or S_SPRITEBUFFER2
 ; each chunk is a 1bpp sprite. A 2bpp sprite consist of two chunks which are merged afterwards
@@ -6478,7 +6478,7 @@ UnpackSprite: ; 26bf (0:26bf)
     ld hl,S_SPRITEBUFFER1
     call SpriteDifferentialDecode
     ld hl,S_SPRITEBUFFER2
-    ; fall through
+    ; ft
 
 ; decodes differential encoded sprite data
 ; input bit value 0 preserves the current bit value and input bit value 1 toggles it (starting from initial value 0).
@@ -7082,7 +7082,7 @@ DisplayStartMenu:
     ld [$d11a],a
     ld a,(SFX_02_3f - $4000) / 3 ; Start menu sound
     call PlaySound
-    ; fall through
+    ; ft
 
 RedisplayStartMenu:
     BANKSWITCH DrawStartMenu
@@ -7331,7 +7331,7 @@ DisplayListMenuID: ; 2be6 (0:2be6)
     ld [wMenuWatchedKeys],a
     ld c,10
     call DelayFramesAndSetWaitReleaseJoyFlag ; call DelayFrames
-    ; fall through
+    ; ft
 
 DisplayListMenuIDLoop:
     xor a
@@ -7439,7 +7439,7 @@ DisplayListMenuIDLoop:
     call CopyStringToCF4B ; copy name to $cf4b
     ld a,$01
     ld [$d12e],a
-    ; fall through
+    ; ft
 
 ResetListMenuEnv:
     ld hl,wTestWrapInMenuInputBit6
@@ -7798,7 +7798,7 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     ld [hl],a
 .end
     BANKSWITCH PrintMenuQty
-    ; fall through
+    ; ft
 
 GetMonName:
     push hl
@@ -7859,7 +7859,7 @@ IsSpriteInFrontOfPlayer3:
     ld a,[$c10c] ; the player sprite's collision data (bit field) (set in the sprite movement code)
     and d ; check if a sprite is in the direction the player is trying to go
     ret nz ; nz = collison
-    ; fall through
+    ; ft
 
 IsSpriteInFrontOfPlayer4:
     xor a
@@ -8077,7 +8077,7 @@ SynchronizeBox:
     ld a,BANK(_SynchronizeBox)
     call RoutineForRealGB
     call _SynchronizeBox
-    ; fall through
+    ; ft
 
 SynchronizeCommon:
     pop af
@@ -8332,7 +8332,7 @@ SpeedUp:
     call TrySpeedUpWithB
     ret z
     call TrySpeedUpWithA
-    ; fall through
+    ; ft
 
 TrySpeedUpWithA:
     ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
@@ -8660,7 +8660,7 @@ ArePlayerCoordsInArray: ; 34bf (0:34bf)
     ld b,a
     ld a,[W_XCOORD]
     ld c,a
-    ; fallthrough
+    ; ft
 
 CheckCoords: ; 34c7 (0:34c7)
     xor a
@@ -8908,7 +8908,7 @@ YesNoChoicePokeCenter:
     FuncCoord 11,6 ; $c423
     ld hl,Coord
     ld bc,$80c
-    ; fall through
+    ; ft
 
 DisplayYesNoChoice:
     ld a,$14
@@ -8929,7 +8929,7 @@ MoveSprite:
 ; move the sprite [$FF8C] with the movement pointed to by de
 ; actually only copies the movement data to $CC5B for later
     call SetSpriteMovementBytesToFF
-    ; fall through
+    ; ft
 
 MoveSprite_:
     push hl
@@ -9104,7 +9104,7 @@ LoadScreenTilesFromBuffer1:
 
 LoadScreenTilesFromBuffer2:
     call LoadScreenTilesFromBuffer2DisableBGTransfer
-    ; fall through
+    ; ft
 
 EnableAutoBgTransfer:
     ld a,1
@@ -9294,7 +9294,7 @@ GetItemPrice:
 ; copies a string from [de] to [$cf4b]
 CopyStringToCF4B:
     ld hl,$cf4b
-    ; fall through
+    ; ft
 
 ; copies a string from [de] to [hl]
 CopyString:
@@ -10398,7 +10398,7 @@ CallFunctionInTable: ; 3d97 (0:3d97)
 ; if found,returns count in b and sets carry.
 IsInArray: ; 3dab (0:3dab)
     ld b,0
-    ; fall through
+    ; ft
 
 IsInArrayCummulativeCount: ; 3dad (0:3dad)
     ld c,a
@@ -10945,7 +10945,7 @@ PrintSafariZoneBattleText:
     dec [hl]
     jr z,.resetCatchRate
     ld hl,.AngryText
-    ; fall through
+    ; ft
 .PrintText
     push hl
     call LoadScreenTilesFromBuffer1
@@ -12324,7 +12324,7 @@ Func_4ed1: ; 4ed1 (1:4ed1)
 ; changes facing direction by zeroing the movement delta and calling TryWalking
 ChangeFacingDirection: ; 4fc8 (1:4fc8)
     ld de,$0
-    ; fall through
+    ; ft
 
 ; b: direction (1,2,4 or 8)
 ; c: new facing direction (0,4,8 or $c)
@@ -14437,7 +14437,7 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     jr z,.updateMenuVariables
     ld b,+8
     inc hl
-    ; fall through
+    ; ft
 .updateMenuVariables
     add b
     ld [wTopMenuItemY],a
@@ -16863,7 +16863,7 @@ Func_71e1: ; 71e1 (1:71e1)
     call Func_72d7
     ld hl,CableClubNPCText5 ; $72cd
     call PrintText
-    ; fall through
+    ; ft
 
 Func_7298: ; 7298 (1:7298)
     xor a
@@ -19190,7 +19190,7 @@ Music2_loopchannel: ; 0x92a9
 .loopAgain ; inc loop count
     inc a
     ld [hl],a
-    ; fall through
+    ; ft
 .infiniteLoop ; overwrite current address with pointer
     call Music2_GetNextMusicByte
     push af
@@ -19239,7 +19239,7 @@ Music2_notetype: ; 0x92e4
     and $30
     sla a
     ld d,a
-    ; fall through
+    ; ft
 
     ; if channel 3,store high nibble as volume
     ; else,store volume (high nibble) and fade (low nibble)
@@ -19608,7 +19608,7 @@ Music2_notepitch: ; 0x9568
     ld a,[hl]
     and a
     jr nz,.done
-    ; fall through
+    ; ft
 .sfxChannel
     ld a,c
     cp CH2
@@ -19752,7 +19752,7 @@ Func_964b: ; 0x964b
     jr z,.channel3
     cp CH6
     jr nz,.notSfxChannel3
-    ; fall through
+    ; ft
 .channel3
     push de
     ld de,$c0e6
@@ -22888,7 +22888,7 @@ GetMissableObjectFlag:
 
 InitializeMissableObjectsFlags_OldAndNew:
     call InitializeMissableObjectsFlags
-    ; fall through
+    ; ft
 
 InitializeMissableObjectsFlagsNew:
     ld hl,W_MISSABLEOBJECTFLAGS_NEW
@@ -23733,7 +23733,7 @@ ItemUseVitamin:
     ld a,[W_ISINBATTLE]
     and a
     jp nz,ItemUseNotTime
-    ; fall through
+    ; ft
 
 ItemUseMedicine:
     ld a,[W_NUMINPARTY]
@@ -23810,7 +23810,7 @@ ItemUseMedicine:
     jp nc,.useVitamin ; if it's a vitamin or Rare Candy
     cp FULL_RESTORE
     jp nc,.healHP ; if it's a Full Restore or one of the potions
-; fall through if it's one of the status-specifc healing items
+; ft if it's one of the status-specifc healing items
 .cureStatusAilment
     ld bc,4
     add hl,bc ; hl now points to status
@@ -24527,7 +24527,7 @@ ItemUseXAccuracy: ; e013 (3:6013)
     jp z,ItemUseNotTime
     ld hl,W_PLAYERBATTSTATUS2
     set 0,[hl] ; X Accuracy bit
-    ; fall through
+    ; ft
 
 SimpleBattleItemEnd:
     call ReDrawBattleHudAfterItemUse
@@ -25238,7 +25238,7 @@ NoCyclingAllowedHere: ; e5ac (3:65ac)
 
 BoxFullCannotThrowBall: ; e5b1 (3:65b1)
     ld hl,BoxFullCannotThrowBallText
-    ; fall through
+    ; ft
 
 ItemUseFailed:
     xor a
@@ -26059,7 +26059,7 @@ GymLeaderFaceAndBadgeTileGraphics:
 ReplaceTileBlockNoRedraw:
     ld hl,wDisableAutoRedrawMapBit5
     set 5,[hl]
-    ; fall through
+    ; ft
 
 ; replaces a tile block with the one specified in [$d09f] ; NewTileBlockID
 ; and redraws the map view if necessary
@@ -26122,7 +26122,7 @@ TryToRedrawMapView:
     bit 6,[hl]
     res 6,[hl]
     ret z
-    ; fall through
+    ; ft
 
 RedrawMapView:
     ld a,[W_ISINBATTLE] ; $d057
@@ -26866,7 +26866,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
 
 ResetMovePPs:
     call Load16BitRegisters
-    ; fallthrough
+    ; ft
 ResetMovePPs_:
     inc de
     ld a,255
@@ -28166,7 +28166,7 @@ UseStrength:
     jr .fail
 .Surfing
     ld hl,.NoStrengthDuringFloat
-    ; fall through
+    ; ft
 .fail
     call PrintText
     and a ; rcf
@@ -28260,7 +28260,7 @@ AddPokemonToParty_SetStatExp:
     dec a
     jr z,WriteMaxStatExpByLevel
     ; error
-    ; fall through
+    ; ft
 
 WriteStatExpPreLoaded:
     ld b,10
@@ -28349,7 +28349,7 @@ PoisonedOnlyIfNotFaintened:
     and $8
     ret z ; Set z if NOT Poisoned
 .Poison
-    ; fall through
+    ; ft
 
 CheckFaintenedFromStatusPointer:
     dec hl
@@ -28704,7 +28704,7 @@ GetAlternateForm:
     ld a,[wBackupEnemyAltForm] ; if transformed copy from backup
     jr nz,.end
     ld a,[W_ENEMYMONALTFORM]
-    ; fall through
+    ; ft
 .end
     ld [wAlternateFormIndex],a ; Save AlternateFormIndex
     ld [wTempAlternateFormIndex],a
@@ -28743,7 +28743,7 @@ InsertIVDuringAddMonToParty:
 CopyDataAndInsertIVDuringSendNewMonToBox:
     call CopyData
     ld hl,wDVForShinyAtkDef
-    ; fall through
+    ; ft
 
 InsertIVFromEnemyMonData:
     ld a,[W_ENEMYMONATKDEFIV]
@@ -29828,7 +29828,7 @@ StartMenu_Pokemon:
     jr z,.choseMoves
     dec a
     jr z,.choseRename
-    ; fall through
+    ; ft
 
 .choseSwitch
     ld a,[W_NUMINPARTY]
@@ -29973,7 +29973,7 @@ StartMenu_Pokemon:
 
 .dig
     ld a,AUGER
-    ; fall through
+    ; ft
 
 .common
     ld [$cf91],a
@@ -31324,7 +31324,7 @@ HandlePkmnSubMenuSkill:
     dec c
     jr .adjustMenuVariablesLoop
 .storeMenuVariables
-    ; fall through
+    ; ft
 
 HandlePkmnSubMenu:
     ld hl,wTopMenuItemY
@@ -36709,7 +36709,7 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     ld a,[$d700]
     cp $2
     jr z,CheckWaterTilePassable
-    ; fall through
+    ; ft
 
 CheckTilePassable:
     push hl
@@ -36751,7 +36751,7 @@ CheckWaterTilePassable:
     cp $0e ; Vermilion Dock tileset
     jr nz,.noCollision ; keep surfing if it's not the boarding platform tile
     ; if it is the boarding platform tile,stop surfing
-    ; fall through
+    ; ft
 .stopSurfing
     ; Check Try Stop Surfing
     ld a,[wCollisionFlag]
@@ -36761,7 +36761,7 @@ CheckWaterTilePassable:
     ld [$d700],a
     call LoadPlayerSpriteGraphics
     call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic
-    ; fall through
+    ; ft
 .noCollision
     jr ResetFlags
 .collision
@@ -37807,7 +37807,7 @@ PowerPlantExplosion:
     jr .SlideScreen
 .SlideRight
     ld a,+01
-    ; fall through
+    ; ft
 .SlideScreen
     ld [$c105],a ; delta X
     ld a,8
@@ -44077,7 +44077,7 @@ CheckMonAlreadyKnowMove:
     ld a,[$cfb9] ; Level
     ld b,a       ; ...
     call GetMonPotentialMoveList
-    ; fall through
+    ; ft
 
 CheckMonAlreadyKnowMoveQuick:
     ld a,[W_MONHEADER]
@@ -45205,7 +45205,7 @@ Music8_loopchannel: ; 21a2a (8:5a2a)
 .loopAgain ; inc loop count
     inc a
     ld [hl],a
-    ; fall through
+    ; ft
 .infiniteLoop ; overwrite current address with pointer
     call Music8_GetNextMusicByte
     push af
@@ -45254,7 +45254,7 @@ Music8_notetype: ; 21a65 (8:5a65)
     and $30
     sla a
     ld d,a
-    ; fall through
+    ; ft
 
     ; if channel 3,store high nibble as volume
     ; else,store volume (high nibble) and fade (low nibble)
@@ -45623,7 +45623,7 @@ Music8_notepitch: ; 21ce9 (8:5ce9)
     ld a,[hl]
     and a
     jr nz,.done
-    ; fall through
+    ; ft
 .sfxChannel
     ld a,c
     cp CH2
@@ -45767,7 +45767,7 @@ Func_21dcc: ; 21dcc (8:5dcc)
     jr z,.channel3
     cp CH6
     jr nz,.notSfxChannel3
-    ; fall through
+    ; ft
 .channel3
     push de
     ld de,$c0e6
@@ -46750,7 +46750,7 @@ PrintTypesFull:
     ld a,[W_MONHTYPE3]
     call .PrintSingleType
     ld a,[W_MONHTYPE4]
-    ; fall through
+    ; ft
 .PrintSingleType
     push hl
     call PrintMoveType_
@@ -46767,7 +46767,7 @@ PrintTypes:
     ld a,[W_MONHTYPE1]
     call .PrintSingleType
     ld a,[W_MONHTYPE2]
-    ; fall through
+    ; ft
 .PrintSingleType
     push hl
     call PrintMoveType_
@@ -46784,7 +46784,7 @@ PrintTypes:
     ld a,[W_MONHTYPE3]
     call .PrintSingleTypeShort1
     ld a,[W_MONHTYPE4]
-    ; fall through
+    ; ft
 .PrintSingleTypeShort2
     push hl
     call PrintMoveTypeShort_
@@ -50111,7 +50111,7 @@ AIUseHyperPotion: ; 3a6d6 (e:66d6)
 ; enemy trainer heals his monster with a hyper potion
     ld a,HYPER_POTION
     ld b,200
-    ; fallthrough
+    ; ft
 
 AIRecoverHP: ; 3a6da (e:66da)
 ; heal b HP and print "trainer used $(a) on pokemon!"
@@ -50152,7 +50152,7 @@ AIRecoverHP: ; 3a6da (e:66da)
     ld a,[de]
     ld [hl],a
     ld [wHPBarNewHP+1],a
-    ; fallthrough
+    ; ft
 
 Func_3a718: ; 3a718 (e:6718)
     call AIPrintItemUse_
@@ -50302,7 +50302,7 @@ AIUseXSpeed: ; 3a7fe (e:67fe)
 AIUseXSpecial: ; 3a804 (e:6804)
     ld b,$D
     ld a,X_SPECIAL
-    ; fallthrough
+    ; ft
 
 AIIncreaseStat: ; 3a808 (e:6808)
     ld [$CF05],a
@@ -51480,7 +51480,7 @@ HealEffect_:
     pop af
     pop de
     pop hl
-    ; fall through
+    ; ft
 
 .healHP
     ld a,[hld]
@@ -53281,7 +53281,7 @@ HandlePlayerMonFainted:
 RemoveFaintedPlayerMon2:
     ld a,$1
     ld [$ccf0],a
-    ; fall through
+    ; ft
 
 RemoveFaintedPlayerMon:
     ld a,[wPlayerMonNumber] ; $cc2f
@@ -53473,7 +53473,7 @@ EffectsArray5:
     db ATTACK_TWICE_EFFECT
     db JUMP_KICK_EFFECT
     db RECOIL_EFFECT
-    ; fallthru
+    ; ft
 
 ; SpecialEffectsCont
 EffectsArray5B:
@@ -54161,7 +54161,7 @@ DrawPlayerHUDAndHPBar:
 
 DrawHUDsAndHPBars:
     call DrawPlayerHUDAndHPBar
-    ; fall through
+    ; ft
 
 DrawEnemyHUDAndHPBar:
     call DisableAutoBgTransfer
@@ -54237,7 +54237,7 @@ DrawEnemyHUDAndHPBar:
     ld a,$6
     ld d,a
     ld c,a
-    ; fall through
+    ; ft
 
 Func_3ce7f: ; 3ce7f (f:4e7f)
     xor a
@@ -54251,7 +54251,7 @@ Func_3ce7f: ; 3ce7f (f:4e7f)
 
 GetEnemyBattleHealthBarColor:
     ld hl,$cf1e
-    ; fall through
+    ; ft
 
 GetBattleHealthBarColor:
     ld b,[hl]
@@ -54663,7 +54663,7 @@ Func_3d119:
     call LoadScreenTilesFromBuffer1
     call GoPAL_SET_CF1C
     call GBPalNormal
-    ; fall through
+    ; ft
 
 SwitchPlayerMon: ; joedebug - this is where the player switches
     call CheckTrappingMoveAndSetEnemyActedBitAndLoadHl ; ld hl,RetreatMon
@@ -55410,7 +55410,7 @@ handleIfPlayerMoveMissed:
     xor a
     jr playPlayerMoveAnimation
 .moveDidNotMiss
-    ; fall through
+    ; ft
 
 getPlayerAnimationType:
     ld a,[W_PLAYERMOVEEFFECT]
@@ -55515,7 +55515,7 @@ MirrorMoveCheck:
     jr z,ExecutePlayerMoveDone
     ld hl,EffectsArray5
     call RunMoveEffectNotInList
-    ; fall through
+    ; ft
 
 ExecutePlayerMoveDone:
     xor a
@@ -55600,7 +55600,7 @@ CheckPlayerStatusConditions:
     call .DrawHudAndPrintText ; call PrintText
     call IsGhostBattle
     jr z,.ExecutePlayerMoveDone
-    ; fall through
+    ; ft
 
 .HeldInPlaceCheck
     ld a,[W_ENEMYBATTSTATUS1]
@@ -55608,7 +55608,7 @@ CheckPlayerStatusConditions:
     jr z,.FlinchedCheck
     ld hl,CantMoveText
     call PrintText
-    ; fall through
+    ; ft
 
 .ExecutePlayerMoveDone
     ld hl,ExecutePlayerMoveDone
@@ -55800,7 +55800,7 @@ CheckPlayerStatusConditions:
     xor a
     ld [W_PLAYERMOVEEFFECT],a ; $cfd3
     ld hl,PlayerCanExecuteMove ; $56b0
-    ; fall through
+    ; ft
 
 .Func_3da37
     xor a
@@ -55824,7 +55824,7 @@ EnemyMoveDidntMissAndPlayerBideAccum:
     jr BideAccumCommon
 PlayerMoveDidntMissAndEnemyBideAccum:
     ld hl,EnemyBideAccum_
-    ; fall through
+    ; ft
 BideAccumCommon:
     ld b,bank(EnemyBideAccum_) ; same PlayerBideAccum_
     call Bankswitch
@@ -55844,7 +55844,7 @@ GetSideEffectType_Player:
 
 GetSideEffectType_Enemy:
     ld a,[W_ENEMYMOVETYPE]
-    ; fall through
+    ; ft
 
 GetSideEffectType_Common:
     cp THUNDER
@@ -57584,7 +57584,7 @@ CheckTrappingToResetDamage:
     ld a,[W_PLAYERBATTSTATUS1]
     bit USING_TRAPPING_MOVE,a
     ret nz
-    ; fall through ; joenote - prevent counter shenanigans of all sorts
+    ; ft ; joenote - prevent counter shenanigans of all sorts
 
 ;joenote - this sets the last damage dealt to zero
 ;meant for fixing counter glitches
@@ -58047,7 +58047,7 @@ handleIfEnemyMoveMissed:
     jr handleExplosionMiss
 .moveDidNotMiss
     call SwapPlayerAndEnemyLevels
-    ; fall through
+    ; ft
 
 GetEnemyAnimationType:
     ld a,[W_ENEMYMOVEEFFECT] ; $cfcd
@@ -58154,7 +58154,7 @@ EnemyCheckIfMirrorMoveEffect:
     jr z,ExecuteEnemyMoveDone
     ld hl,EffectsArray5
     call RunMoveEffectNotInList
-    ; fall through
+    ; ft
 
 ExecuteEnemyMoveDone:
     ld b,$1
@@ -58211,7 +58211,7 @@ CheckEnemyStatusConditions:
 .WakeUp
     ld hl,WokeUpText
     call .DrawHudAndPrintText ; call PrintText
-    ; fall through
+    ; ft
 
 .HeldInPlaceCheck
     ld a,[W_PLAYERBATTSTATUS1] ; $d062
@@ -58219,7 +58219,7 @@ CheckEnemyStatusConditions:
     jp z,.FlinchedCheck
     ld hl,CantMoveText ; $5a83
     call PrintText
-    ; fall through
+    ; ft
 
 .ExecuteEnemyMoveDone
     ld hl,ExecuteEnemyMoveDone
@@ -58411,7 +58411,7 @@ CheckEnemyStatusConditions:
     xor a
     ld [W_ENEMYMOVEEFFECT],a ; $cfcd
     ld hl,EnemyCanExecuteMove ; $672b
-    ; fall through
+    ; ft
 
 .Func_3eab8
     xor a
@@ -58814,7 +58814,7 @@ ApplyBurnAndParalysisPenaltiesToEnemy:
     ld a,[hl]
     push af
     xor a
-    ; fall through
+    ; ft
 
 ApplyBurnAndParalysisPenalties:
     push hl
@@ -58998,7 +58998,7 @@ Func_3ee0c: ; 3ee0c (f:6e0c)
 ApplyBadgeStatBoostsFull:
     xor a
     ld [wBackupStatRaisedLoweredType],a
-    ; fall through
+    ; ft
 
 ApplyBadgeStatBoosts:
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -59136,7 +59136,7 @@ HandleExplodingAnimation: ; 3eed3 (f:6ed3)
 .explodeMove
     ld a,$5 ; MegaPunchAnim
     ld [$cc5b],a
-    ; fall through
+    ; ft
 
 PlayMoveAnimation:
     ld [$D07C],a
@@ -59711,7 +59711,7 @@ PoisonEffect:
     jp z,.retry
 .alreadyPoisoned2
     ld hl,PrintAlreadyPoisonedText
-    ; fall through
+    ; ft
 .checkEnd
     ld a,[de]
     cp POISON_EFFECT
@@ -59849,7 +59849,7 @@ FreezeBurnParalyzeEffect:
     cp THUNDER
     ret nz
     ld a,ROCK
-    ; fall through
+    ; ft
 .Loop4MovesInHLAndCompareWithA
     ld b,4
 .loop
@@ -60068,7 +60068,7 @@ RestoreOriginalStatModifier:
     pop hl
     dec [hl]
     call PlayCurrentMoveAnimation_WithException
-    ; fall through
+    ; ft
 
 PrintNothingHappenedText:
     ld hl,NothingHappenedText ; $7b3e
@@ -60121,7 +60121,7 @@ StatModifierDownEffect:
     jr .checkEnd
 .didntAffect
     ld hl,PrintDidntAffectText
-    ; fall through
+    ; ft
 .checkEnd
     ld a,[de]
     cp ATTACK_DOWN_SIDE1_EFFECT
@@ -60702,7 +60702,7 @@ ConfusionEffect:
     jr .checkEnd
 .alreadyConfused
     ld hl,PrintAlreadyConfusedText
-    ; fall through
+    ; ft
 .checkEnd
     ld a,[de]
     cp CONFUSION_SIDE_EFFECT
@@ -61504,7 +61504,7 @@ Copy4Bytes:
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
     call AddNTimes
-    ; fall through
+    ; ft
 Copy4BytesDirect:
     ld bc,4
     jp CopyData
@@ -61513,7 +61513,7 @@ Copy2Bytes:
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
     call AddNTimes
-    ; fall through
+    ; ft
 Copy2BytesDirect:
     ld bc,2
     jp CopyData
@@ -61660,7 +61660,7 @@ LoadBattleMonFromParty_HandleAlternative:
 
 LoadEnemyMonFromParty_HandleAlternative:
     ld hl,wEnemyMon1+(W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM) ; move2pp
-    ; fall through
+    ; ft
 
 LoadMonFromParty_HandleAlternative_Common:
     ld a,[wWhichPokemon]
@@ -61875,7 +61875,7 @@ HandlePokedexSideMenu: ; 4006d (10:406d)
     jr z,.choseData
     dec a
     jr z,.choseCry
-    ; fall through
+    ; ft
 .choseArea
     PREDEF Func_70f60 ; display pokemon areas
     ld b,0
@@ -61883,7 +61883,7 @@ HandlePokedexSideMenu: ; 4006d (10:406d)
 .choseData
     call ShowPokedexDataInternal
     ld b,0
-    ; fall through
+    ; ft
 .exitSideMenu
     pop af
     ld [$cd3d],a
@@ -62188,7 +62188,7 @@ ShowPokedexData: ; 402d1 (10:42d1)
     call ClearScreen
     call UpdateSprites
     BANKSWITCH LoadPokedexTilePatterns ; load pokedex tiles
-    ; fall through
+    ; ft
 
 ; function to display pokedex data from inside the pokedex
 ShowPokedexDataInternal: ; 402e2 (10:42e2)
@@ -62221,7 +62221,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
 .SkipFirstTime
     call .ShowPokedexFirstPage
     ld b,%00010011 ; ▼▲◄►StSeBA
-    ; fall through
+    ; ft
 
 .waitForButtonPress
     call GetJoypadStateLowSensitivity
@@ -62230,7 +62230,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     jr z,.waitForButtonPress
     bit 1,a
     jr nz,.end
-    ; fall through
+    ; ft
 
 .SecondPage
     call .ClearCommonScreenArea
@@ -62243,7 +62243,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     jr z,.waitForButtonPress2
     bit 5,a
     jr nz,.FirstPage
-    ; fall through
+    ; ft
 
 .end
     ; Restore Screen
@@ -65064,7 +65064,7 @@ CheckShinyDuringTradeInSend:
 CheckShinyDuringTradeInReceive:
     push af
     ld hl,wTradedEnemyMonIV
-    ; fall through
+    ; ft
 
 CheckShinyDuringTradeInCommon:
     call IsShiny
@@ -70724,7 +70724,7 @@ UnknownDungeon4GengarText:
     TX_FAR _UnknownDungeon4GengarText
     db $8
     ld a,GENGAR
-    ; fall through
+    ; ft
 
 UnknownDungeon4TextCommon:
     call PlayCry
@@ -70976,7 +70976,7 @@ SafariZoneRestHouse1Text3:
     db "@"
 .EmotionBubble
     ld a,3
-    ; fall through
+    ; ft
 
 ErikAndSaraEmotionBubbleCommon:
     ld [$CD4F],a ; EmotionBubbleSpriteIndex
@@ -75411,7 +75411,7 @@ SafariZoneWestPostGhost:
 .SetBitRevealSafariGhost
     ld hl,wEventRevealSafariGhostBit0
     set 0,[hl]
-    ; fall through
+    ; ft
 .reset
     jr SafariZoneWestResetScript
 
@@ -79203,7 +79203,7 @@ ParalyzeEffect_:
     jr .PlayAnimationAndTextFail
 .doesntAffect
     ld hl,PrintDoesntAffectMonText
-    ; fall through
+    ; ft
 .PlayAnimationAndTextFail
     push hl
     call .PlayCurrentMoveAnimation
@@ -79211,7 +79211,7 @@ ParalyzeEffect_:
     jr .BankswitchToF
 .PlayCurrentMoveAnimation
     ld hl,PlayCurrentMoveAnimation
-    ; fall through
+    ; ft
 .BankswitchToF
     ld b,BANK(PlayCurrentMoveAnimation) ; same PrintAlreadyParalyzedText,PrintDidntAffectText
     jp Bankswitch
@@ -80051,7 +80051,7 @@ CheckGoundOrRock:
     call .CheckGoundOrRock
     ret z
     inc bc
-    ; fall through
+    ; ft
 .CheckGoundOrRock
     ld a,[bc]
     cp EARTH
@@ -92949,7 +92949,7 @@ PewterJigglypuff:
 JigglypuffDanceHack:
     call DelayFrames
     ld de,$40+MonOverworldDataNew_emimonserrate+($80*((DEX_JIGGLYPUFF)%(128)))
-    ; fall through
+    ; ft
 
 JigglypuffDanceHackCommon:
     ld hl,$8280
@@ -93047,7 +93047,7 @@ _CopycatsHouseF2Text4:
 CopycatsHouseF2Text5:
     db $08 ; asm
     ld a,CLEFABLE
-    ; fall through
+    ; ft
 
 CopycatsHouseOnlyDollCommon:
     ld [$cf91],a
@@ -97155,7 +97155,7 @@ DiglettsCavePostAerodactyl:
     ld hl,wEventBeatAerodactylBit5
     set 5,[hl]
     call Delay3
-    ; fallthrough
+    ; ft
 
 DiglettsCaveResetDefaultScript:
     xor a
@@ -100542,7 +100542,7 @@ WriteMonPartySpriteOAMBySpecies:
     ld a,[$cd5d]
     call IndexToMiniSpritePointer
     ld [$cd5b],a
-    ; fall through
+    ; ft
 
 WriteMonPartySpriteOAM:
     push af
@@ -103019,7 +103019,7 @@ LoadHallOfFameTeams: ; 73b3f (1c:7b3f)
     call AddNTimes
     ld de,$cc5b
     ld bc,$60
-    ; fallthrough
+    ; ft
 
 HallOfFame_Copy: ; 73b51 (1c:7b51)
     ld a,$a
@@ -103326,14 +103326,14 @@ CheckShinyAndGetPAL:
     ld [$d0b5],a
     BANKSWITCH GetLoadedMonHeader
     ld hl,$cfb3
-    ; fall through
+    ; ft
 
 GetPalCommon:
     pop af
     call IsShiny
 SkipShinyAndGetPAL:
     pop hl
-    ; fall through
+    ; ft
 
 DeterminePaletteID: ; DONE:Palette
     push bc
@@ -108301,7 +108301,7 @@ HiddenItems: ; 76688 (1d:6688)
     ld a,c
     and a
     ret nz
-    ; fall through
+    ; ft
 
 GiveHiddenItems:
     call EnableAutoTextBoxDrawing
@@ -108654,7 +108654,7 @@ GetObtainedHiddenCoinsFlags:
 
 HallOfFame_DisplayTextID_HealParty:
     call DisplayTextID
-    ; fall through
+    ; ft
 
 HallOfFame_HealParty:
     PREDEF HealParty
@@ -110749,7 +110749,7 @@ INCBIN "baserom.gbc",$79598,$7959f - $79598
 RestoreOldMonHeader:
     ld a,[$cee9] ; EvoOldSpecies
     ld [$d0b5],a
-    ; fall through
+    ; ft
 
 Evolution_GetMonHeader_HandleAlternateForm:
     ld hl,W_PARTYMON1_MOVE2PP
@@ -116276,7 +116276,7 @@ Music1f_loopchannel: ; 7d31d (1f:531d)
 .loopAgain ; inc loop count
     inc a
     ld [hl],a
-    ; fall through
+    ; ft
 .infiniteLoop ; overwrite current address with pointer
     call Music1f_GetNextMusicByte
     push af
@@ -116325,7 +116325,7 @@ Music1f_notetype: ; 7d358 (1f:5358)
     and $30
     sla a
     ld d,a
-    ; fall through
+    ; ft
 
     ; if channel 3,store high nibble as volume
     ; else,store volume (high nibble) and fade (low nibble)
@@ -116694,7 +116694,7 @@ Music1f_notepitch: ; 7d5dc (1f:55dc)
     ld a,[hl]
     and a
     jr nz,.quit
-    ; fall through
+    ; ft
 .sfxChannel
     ld a,c
     cp CH2
@@ -116838,7 +116838,7 @@ Func_7d6bf: ; 7d6bf (1f:56bf)
     jr z,.channel3
     cp CH6
     jr nz,.notSfxChannel3
-    ; fall through
+    ; ft
 .channel3
     push de
     ld de,$c0e6
@@ -134492,7 +134492,7 @@ SelectInOverWorld:
     jr nz,.SelectPlusA
     bit 1,a ; B button (carry flag not affected)
     jr nz,.SelectPlusB
-    ; fall through
+    ; ft
 .Select
     call c,.TryFishing
     call c,.TryBike
@@ -134505,7 +134505,7 @@ SelectInOverWorld:
     call c,.TryCut
     call c,.TryFloat
     call c,.TryStrength
-    ; fall through
+    ; ft
 .end
     xor a
     ld [wSkillMonID],a
@@ -136028,7 +136028,7 @@ DecAttackPlayer:
 DecAttackEnemy:
     push hl
     ld hl,$d06f ; EnemyNumAttacksLeft
-    ; fall through
+    ; ft
 DecAttack:
     dec [hl]
     pop hl
@@ -136389,7 +136389,7 @@ SECTION "bank35",ROMX,BANK[$35]
 HoF_SetVariables:
     call CheckHallOfFameWin
     jr nz,.HoF_AfterFirstWin
-    ; fall through
+    ; ft
 
 .HoF_BeforeFirstWin
     xor a
@@ -136415,7 +136415,7 @@ HoF_SetVariables:
     call .HoF_Hide
     ld a,$FC ; Oak in Hall of Fame Room
     call .HoF_Hide
-    ; fall through
+    ; ft
 
 .HoF_ResetRoomsScriptAndFlags
     xor a
@@ -136498,7 +136498,7 @@ PrintMenuQty:
     inc hl
     ld a,[$d12a]
     ld [de],a
-    ; fall through
+    ; ft
 .PrintNumber
     ld bc,((%10000000 + 1) << 8) + 2
     jp PrintNumber
@@ -140891,7 +140891,7 @@ _OverworldHackRoutine:
     call HandleLightAnimation
     call HandleStrengthAnimation
     call HandleGoToDark
-    ; fall through
+    ; ft
 
 BugFixLongRangeTrainer:
     ld hl,W_FLAGS_D733 ; check if trainer is wanting to battle
@@ -141083,7 +141083,7 @@ ForceShinyOrRandom_:
     jp z,.PalletTown
     cp MUSEUM_2F
     jp z,.PewterCity
-    ; fall through
+    ; ft
 .Random
     call .GenRandomInBattle
     jr .End
@@ -141889,7 +141889,7 @@ GymLeaderAfterRematch_:
     call .Read
     ret z ; return if just reset
     res 7,a
-    ; fall through
+    ; ft
 .Store
     ld b,c
     call .loop2
@@ -141945,7 +141945,7 @@ TryHallOfFameRematch:
     ld a,2
     ld [W_CURMAPSCRIPT],a
     ld [hl],a
-    ; fall through
+    ; ft
 
 .End_Nope
     ld de,Nope
@@ -142132,7 +142132,7 @@ _LoadEnemyMonData_CalcStats:
     dec a
     jr z,.FromEnemyTeam
     ; error
-    ; fall through
+    ; ft
 
 .NoBattle
     push de
@@ -142163,7 +142163,7 @@ _LoadEnemyMonData_CalcStats:
     ld a,[wWhichPokemon] ; $cf92
     ld bc,$2c
     call AddNTimes
-    ; fall through
+    ; ft
 
 .Done
     ld b,$1
@@ -143998,7 +143998,7 @@ StatusScreen:
     jr nz,.downFromStatus1
     bit 6,a ; up pressed?
     jr nz,.upFromStatus1
-    ; fall through (a/right)
+    ; ft (a/right)
 
 ; STATUSSCREEN 2
     jr .skipIfDirectlyFromStatus1
@@ -144022,7 +144022,7 @@ StatusScreen:
     bit 6,a ; up pressed?
     jr nz,.upFromStatus2
 
-    ; fall through (a/b)
+    ; ft (a/b)
 
 .end
     ; Update Selected Pokemon Menù ID
@@ -146291,7 +146291,7 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     jr z,.AltForm1
     call .CheckPewterEevee
     jr z,.AltForm1
-    ; fall through
+    ; ft
 .WildStandard
     xor a ; ~TODO
     jr .end
@@ -146773,7 +146773,7 @@ ShowBattlePokedex:
     ld hl,wForceShowPokedexBit5 ; wSkipTextInPokedexBit7
     set 5,[hl]
     set 7,[hl]
-    ; fall through
+    ; ft
 
 _LoadBattlePokedex:
     ld hl,wForceShowPokedexBit5 ; wSkipTextInPokedexBit7
@@ -146920,7 +146920,7 @@ GetDefenderType:
 ;    ld a,[$d11e]
 ;    cp EARTH
 ;    jr z,.TryToLevitate
-    ; fall through
+    ; ft
 
 .Standard
     ld de,wTmpDefenderTypes
@@ -146997,7 +146997,7 @@ GetAttackerType:
     call .IsInArray
     pop hl
     jr nc,.next2
-    ; fall through
+    ; ft
 .Custom
     pop hl ; Restore Attacker Mon Types
     ld a,[$d11e]
@@ -147013,7 +147013,7 @@ GetAttackerType:
 .next2
     jr .loop
 .done
-    ; fall through
+    ; ft
 .Standard
     pop hl ; Restore Attacker Mon Types
     ld de,wTmpAttackerTypes
