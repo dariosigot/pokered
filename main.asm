@@ -47,6 +47,10 @@ CheckSkillInList:
     pop hl
     ret
 
+Delay2:
+    ld c,2
+    jp DelayFrames
+
 ; interrupts
 SECTION "vblank",ROM0[$40]
     jp VBlankHandler
@@ -600,8 +604,8 @@ EnterMap: ; 03a6 (0:03a6)
 SECTION "OverworldLoop",ROM0[$03ff]
 
 OverworldLoop: ; 03ff (0:03ff)
-    call DelayFrame
-    call DelayFrame
+    call Delay2
+    call SynchronizeParty
     call LoadGBPal
     ld a,[$d736]
     bit 6,a ; jumping down a ledge?
@@ -5419,7 +5423,6 @@ VBlankHandler:
     and a
     call z,ReadJoypadRegister
     call PostVBlankHandler
-    call SynchronizeParty
     ld a,[$d122]
     call RoutineForRealGB
     pop hl

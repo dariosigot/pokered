@@ -1973,6 +1973,9 @@ wNewMonIdDuringLearnMove: ; dee8
 wBackupDarkMap            ; dee8
     ds 1
 
+; TODO : Check it! maybe can be dismiss
+; because "Synchronize" was been moved
+; to OverworldLoop (Not yet in VBlank) 
 wFlagDisableSynchronizeBit0: ; dee9 ; bit 0 = Disable Synchronize Party
     ds 1
 
