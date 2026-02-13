@@ -3238,7 +3238,6 @@ TAUROS_Learnset:
 ; ──────────────────────────────────────────────────────────────────────
 MAGIKARP_Learnset:
     db  1,SPLASH
-    db 10,Skill__FLOAT
     db 15,TACKLE
     db 20,TAIL_WHIP
     ;  20,GYARADOS
@@ -3250,6 +3249,7 @@ GYARADOS_Learnset:
     db 20,WATER_GUN
     db 20,ROAR
     db 20,HYPER_FANG
+    db 20,Skill__FLOAT
     db 21,FOCUS_ENERGY
     db 21,RAGE
     db 21,Skill__STRENGTH
@@ -3277,8 +3277,11 @@ GYARADOS_Learnset:
     db 0
 MAGIKARP_NoEvo_Learnset:
     db 30,SLAM
+    db 35,BITE
     db 40,AMNESIA ; Exclusive
+    db 45,WATERFALL
     db 50,BODY_SLAM
+    db 55,Skill__FLOAT
     db 60,TSUNAMI
     db 0
 ; ──────────────────────────────────────────────────────────────────────
