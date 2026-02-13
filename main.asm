@@ -1912,6 +1912,8 @@ IsGhostBattlePlus:
 
 ; ──────────────────────
 
+; Free
+
 SECTION "LoadCurrentMapView",ROM0[$0ca2]
 
 ; this builds a tile map from the tile block map based on the current X/Y coordinates of the player's character
@@ -2900,6 +2902,7 @@ LoadMapData:
     call LoadTextBoxTilePatterns
     call LoadMapHeader
     BANKSWITCH InitMapSprites ; load tile pattern data for sprites
+    BANKSWITCH RunMapGraphicalScript
     call LoadTileBlockMap
     call LoadTilesetTilePatternData
     call LoadCurrentMapView
@@ -8103,8 +8106,6 @@ GetCurrentOldAdventureMap:
 
 ; ───────────────────────────────────────
 
-; Free
-
 SECTION "StoreTrainerHeaderPointer",ROM0[$3157]
 
 ; stores hl in [W_TRAINERHEADERPTR]
@@ -9452,8 +9453,6 @@ ExitListMenu:
     ld [$cc35],a ; 0 means no item is currently being swapped
     scf
     ret
-
-; Free
 
 SECTION "PrintLetterDelay",ROM0[$38d3]
 
@@ -95272,6 +95271,22 @@ SSAnne4Script0:
     ld [$cc4d],a                     ; ...
     PREDEF_JUMP RemoveMissableObject ; ...
 
+SSAnne4GraphicalScript:
+    ld a,[W_SSANNE4CURSCRIPT]
+    cp $01
+    ret nz
+    ; Replace Invisible Door with "Shadow Door"
+    ld hl,.ChangedBlocks
+    ld de,wChangedBlocksMapId
+    ld bc,.ChangedBlocksEnd-.ChangedBlocks
+    jp CopyData
+.ChangedBlocks
+    db SS_ANNE_4
+    db 1
+    dw $55C7
+    db $3F
+.ChangedBlocksEnd
+
 SSAnne4TextPointers:
     dw SSAnne4BasketText
     dw SSAnne4BasketText
@@ -135012,7 +135027,7 @@ DratiniCave_h:
 DratiniCaveScript:
     call EnableAutoTextBoxDrawing
     ld a,[W_SSANNE4CURSCRIPT]
-    cp 1
+    cp $01
     jr z,.Skip
     ld a,$C6 ; old $e7
     ld [$cc4d],a
@@ -135020,7 +135035,7 @@ DratiniCaveScript:
     ld a,$C7 ; old $e8
     ld [$cc4d],a
     PREDEF AddMissableObject ; Show Basket 2
-    ld a,1
+    ld a,$01 ; SSAnne4Script1
     ld [W_SSANNE4CURSCRIPT],a
 .Skip
     ld hl,DratiniCaveTrainerHeaders
@@ -135059,7 +135074,7 @@ DratiniCaveText1:
 
 DratiniCaveDratiniText:
     TX_FAR _DratiniCaveDratiniText
-    db $8
+    db $08 ; asm
     ld a,DRATINI
     call PlayCry
     call WaitForSoundToFinish
@@ -142941,6 +142956,50 @@ UpdatePartyStats_DEBUG:
     pop af
     ld [W_CURENEMYLVL],a
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+KANTO    EQU 0
+NEWWORLD EQU 1
+
+GRAPHICAL_SCRIPT: MACRO
+    db \1
+    db \2
+    db BANK(\3)
+    dw \3
+    ENDM
+
+RunMapGraphicalScript:
+    ld a,[wAdventureMap]
+    ld b,a
+    ld a,[W_CURMAP]
+    ld c,a
+    ld hl,.Table
+.next
+    ld a,[hli]
+    cp $FF
+    ret z
+    cp b
+    jr nz,.next1
+    ld a,[hli]
+    cp c
+    jr nz,.next2
+    ld a,[hli]
+    ld b,a ; BANK
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    jp Bankswitch
+.next1
+    inc hl
+.next2
+    inc hl
+    inc hl
+    inc hl
+    jr .next
+.Table
+    GRAPHICAL_SCRIPT KANTO,SS_ANNE_4,SSAnne4GraphicalScript
+    db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
 
