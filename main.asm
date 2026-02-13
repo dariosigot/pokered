@@ -10,13 +10,13 @@ DelayAndProcessSGBPacket:
 
 IfGBCDelay3:
     ld a,[wFlagGameBoyColor]
-    cp a,$11
+    cp $11
     ret nz ; NotGBC
     jp Delay3
 
 IfGBCDelay:
     ld a,[wFlagGameBoyColor]
-    cp a,$11
+    cp $11
     ret nz ; NotGBC
     jp DelayFrame
 
@@ -78,7 +78,7 @@ DisableLCD:
     ld [$ffff],a
 .waitVBlank
     ld a,[$ff44]
-    cp a,$91
+    cp $91
     jr nz,.waitVBlank
     ld a,[$ff40]
     and a,$7f    ; res 7,a
@@ -139,7 +139,7 @@ CopyData:
 
 CheckIfThisIsInAGBC:
     ld [wFlagGameBoyColor],a
-    cp a,$11
+    cp $11
     jr nz,.NotGBC
     ld a,BANK(InizializzaParametriGBC)
     call RoutineForRealGB
@@ -151,7 +151,7 @@ CheckIfThisIsInAGBC:
 
 PostVBlankHandler:
     ld a,[wFlagGameBoyColor]
-    cp a,$11
+    cp $11
     ret nz ; NotGBC
     ld a,BANK(FF47toColor)
     call RoutineForRealGB
@@ -770,25 +770,25 @@ OverworldLoop: ; 03ff (0:03ff)
 ; also,it does a seemingly pointless loop afterwards
 ;    swap a ; put old direction in upper half
 ;    or b ; put new direction in lower half
-;    cp a,$48 ; change dir from down to up
+;    cp $48 ; change dir from down to up
 ;    jr nz,.notDownToUp
 ;    ld a,$02
 ;    ld [$d528],a
 ;    jr .oddLoop
 ;.notDownToUp
-;    cp a,$84 ; change dir from up to down
+;    cp $84 ; change dir from up to down
 ;    jr nz,.notUpToDown
 ;    ld a,$01
 ;    ld [$d528],a
 ;    jr .oddLoop
 ;.notUpToDown
-;    cp a,$12 ; change dir from right to left
+;    cp $12 ; change dir from right to left
 ;    jr nz,.notRightToLeft
 ;    ld a,$04
 ;    ld [$d528],a
 ;    jr .oddLoop
 ;.notRightToLeft
-;    cp a,$21 ; change dir from left to right
+;    cp $21 ; change dir from left to right
 ;    jr nz,.oddLoop
 ;    ld a,$08
 ;    ld [$d528],a
@@ -809,7 +809,7 @@ OverworldLoop: ; 03ff (0:03ff)
     ld [$d528],a ; save direction
     call UpdateSprites ; move sprites
     ld a,[$d700]
-    cp a,$02 ; surfing
+    cp $02 ; surfing
     jr z,.surfing
 ; not surfing
     call CollisionCheckOnLand
@@ -893,7 +893,7 @@ OverworldLoop: ; 03ff (0:03ff)
     xor a
     ld [H_CURRENTPRESSEDBUTTONS],a ; clear joypad state
     call GetCurrentOldAdventureMap
-    cp a,CINNABAR_GYM
+    cp CINNABAR_GYM
     jr nz,.notCinnabarGym
     ld hl,$d79b
     set 7,[hl]
@@ -901,7 +901,7 @@ OverworldLoop: ; 03ff (0:03ff)
     ld hl,$d72e
     set 5,[hl]
     call GetCurrentOldAdventureMap
-    cp a,OAKS_LAB
+    cp OAKS_LAB
     jp z,.noFaintCheck
     BANKSWITCH AnyPokemonAliveCheck ; check if all the player's pokemon fainted
     call RestoreFaintenedWith1HP
@@ -1061,7 +1061,7 @@ WarpFound2: ; 073c (0:073c)
 ; for maps that can have the 0xFF destination map,which means to return to the outside map; not all these maps are necessarily indoors,though
 .indoorMaps
     ld a,[$ff8b] ; destination map
-    cp a,$ff
+    cp $ff
     jr z,.goBackOutside
 ; if not going back to the previous map
     call ChangeCurMap ; current map number
@@ -1112,7 +1112,7 @@ ContinueCheckWarpsNoCollisionLoop: ; 07b5 (0:07b5)
 CheckMapConnections: ; 07ba (0:07ba)
 .checkWestMap
     ld a,[W_XCOORD]
-    cp a,$ff
+    cp $ff
     jr nz,.checkEastMap
     ld a,[$d387]
     call ChangeCurMap
@@ -1183,7 +1183,7 @@ CheckMapConnections: ; 07ba (0:07ba)
     jp .loadNewMap
 .checkNorthMap
     ld a,[W_YCOORD]
-    cp a,$ff
+    cp $ff
     jr nz,.checkSouthMap
     ld a,[$d371]
     call ChangeCurMap
@@ -1250,7 +1250,7 @@ CheckMapConnections: ; 07ba (0:07ba)
 PlayMapChangeSound: ; 08c9 (0:08c9)
     FuncCoord 8,8 ; $c448
     ld a,[Coord] ; upper left tile of the 4x4 square the player's sprite is standing on
-    cp a,$0b ; door tile in tileset 0
+    cp $0b ; door tile in tileset 0
     jr nz,.didNotGoThroughDoor
     ld a,$ad
     jr .playSound
@@ -1270,7 +1270,7 @@ CheckIfInOutsideMap: ; 08e1 (0:08e1)
     ld a,[W_CURMAPTILESET]
     and a ; most towns/routes have tileset 0
     ret z
-    cp a,$17 ; Route 23 / Indigo Plateau
+    cp $17 ; Route 23 / Indigo Plateau
     ret
 
 ; this function is an extra check that sometimes has to pass in order to warp,beyond just standing on a warp
@@ -1281,24 +1281,24 @@ CheckIfInOutsideMap: ; 08e1 (0:08e1)
 ; sets carry if the check passes,otherwise clears carry
 ExtraWarpCheck:
     call GetCurrentOldAdventureMap
-    cp a,SS_ANNE_3
+    cp SS_ANNE_3
     jr z,.useFunction1
-    cp a,ROCKET_HIDEOUT_1
+    cp ROCKET_HIDEOUT_1
     jr z,.useFunction2
-    cp a,ROCKET_HIDEOUT_2
+    cp ROCKET_HIDEOUT_2
     jr z,.useFunction2
-    cp a,ROCKET_HIDEOUT_4
+    cp ROCKET_HIDEOUT_4
     jr z,.useFunction2
-    cp a,ROCK_TUNNEL_1
+    cp ROCK_TUNNEL_1
     jr z,.useFunction2
     ld a,[W_CURMAPTILESET]
     and a ; outside tileset
     jr z,.useFunction2
-    cp a,$0d ; S.S. Anne tileset
+    cp $0d ; S.S. Anne tileset
     jr z,.useFunction2
-    cp a,$0e ; Vermilion Port tileset
+    cp $0e ; Vermilion Port tileset
     jr z,.useFunction2
-    cp a,$17 ; Indigo Plateau tileset
+    cp $17 ; Indigo Plateau tileset
     jr z,.useFunction2
 .useFunction1
     ld hl,Func_c3ff
@@ -1393,9 +1393,9 @@ LoadPlayerSpriteGraphics:
 ; sets carry if bike is allowed,clears carry otherwise
 IsBikeRidingAllowed:
     call GetCurrentOldAdventureMap
-    cp a,ROUTE_23
+    cp ROUTE_23
     jr z,.allowed
-    cp a,INDIGO_PLATEAU
+    cp INDIGO_PLATEAU
     jr z,.allowed
     ld a,[W_CURMAPTILESET]
     ld b,a
@@ -1483,7 +1483,7 @@ LoadTileBlockMap:
     jr nz,.rowLoop
 .northConnection
     ld a,[$d371]
-    cp a,$ff
+    cp $ff
     jr z,.southConnection
     call SwitchToMapRomBank
     ld a,[$d372]
@@ -1501,7 +1501,7 @@ LoadTileBlockMap:
     call LoadNorthSouthConnectionsTileMap
 .southConnection
     ld a,[$d37c]
-    cp a,$ff
+    cp $ff
     jr z,.westConnection
     call SwitchToMapRomBank
     ld a,[$d37d]
@@ -1519,7 +1519,7 @@ LoadTileBlockMap:
     call LoadNorthSouthConnectionsTileMap
 .westConnection
     ld a,[$d387]
-    cp a,$ff
+    cp $ff
     jr z,.eastConnection
     call SwitchToMapRomBank
     ld a,[$d388]
@@ -1537,7 +1537,7 @@ LoadTileBlockMap:
     call LoadEastWestConnectionsTileMap
 .eastConnection
     ld a,[$d392]
-    cp a,$ff
+    cp $ff
     jr z,.done
     call SwitchToMapRomBank
     ld a,[$d393]
@@ -1683,7 +1683,7 @@ IsSpriteInFrontOfPlayer2: ; 0b6d (0:0b6d)
     ld bc,$3c40 ; Y and X position of player sprite
     ld a,[$c109] ; direction the player is facing
 .checkIfPlayerFacingUp
-    cp a,$04
+    cp $04
     jr nz,.checkIfPlayerFacingDown
 ; facing up
     ld a,b
@@ -1692,7 +1692,7 @@ IsSpriteInFrontOfPlayer2: ; 0b6d (0:0b6d)
     ld a,$08
     jr .doneCheckingDirection
 .checkIfPlayerFacingDown
-    cp a,$00
+    cp $00
     jr nz,.checkIfPlayerFacingRight
 ; facing down
     ld a,b
@@ -1701,7 +1701,7 @@ IsSpriteInFrontOfPlayer2: ; 0b6d (0:0b6d)
     ld a,$04
     jr .doneCheckingDirection
 .checkIfPlayerFacingRight
-    cp a,$0c
+    cp $0c
     jr nz,.playerFacingLeft
 ; facing right
     ld a,c
@@ -1794,7 +1794,7 @@ CollisionCheckOnLand:
 
 Collision::
     ld a,[$c02a]
-    cp a,$b4 ; check if collision sound is already playing
+    cp $b4 ; check if collision sound is already playing
     jr z,.setCarry
     ld a,$b4
     call PlaySound ; play collision sound (if it's not already playing)
@@ -2026,11 +2026,11 @@ AdvancePlayerSprite: ; 0d27 (0:0d27)
     ld [W_XCOORD],a
 .afterUpdateMapCoords
     ld a,[wWalkCounter] ; walking animation counter
-    cp a,$07
+    cp $07
     jp nz,.scrollBackgroundAndSprites
 ; if this is the first iteration of the animation
     ld a,c
-    cp a,$01
+    cp $01
     jr nz,.checkIfMovingWest
 ; moving east
     ld a,[$d526]
@@ -2044,7 +2044,7 @@ AdvancePlayerSprite: ; 0d27 (0:0d27)
     ld [$d526],a
     jr .adjustXCoordWithinBlock
 .checkIfMovingWest
-    cp a,$ff
+    cp $ff
     jr nz,.checkIfMovingSouth
 ; moving west
     ld a,[$d526]
@@ -2059,7 +2059,7 @@ AdvancePlayerSprite: ; 0d27 (0:0d27)
     jr .adjustXCoordWithinBlock
 .checkIfMovingSouth
     ld a,b
-    cp a,$01
+    cp $01
     jr nz,.checkIfMovingNorth
 ; moving south
     ld a,[$d526]
@@ -2073,7 +2073,7 @@ AdvancePlayerSprite: ; 0d27 (0:0d27)
     ld [$d527],a
     jr .adjustXCoordWithinBlock
 .checkIfMovingNorth
-    cp a,$ff
+    cp $ff
     jr nz,.adjustXCoordWithinBlock
 ; moving north
     ld a,[$d526]
@@ -2094,7 +2094,7 @@ AdvancePlayerSprite: ; 0d27 (0:0d27)
     ld a,[hl]
     add c
     ld [hl],a
-    cp a,$02
+    cp $02
     jr nz,.checkForMoveToWestBlock
 ; moved into the tile block to the east
     xor a
@@ -2105,7 +2105,7 @@ AdvancePlayerSprite: ; 0d27 (0:0d27)
     call MoveTileBlockMapPointerEast
     jr .updateMapView
 .checkForMoveToWestBlock
-    cp a,$ff
+    cp $ff
     jr nz,.adjustYCoordWithinBlock
 ; moved into the tile block to the west
     ld a,$01
@@ -2120,7 +2120,7 @@ AdvancePlayerSprite: ; 0d27 (0:0d27)
     ld a,[hl]
     add b
     ld [hl],a
-    cp a,$02
+    cp $02
     jr nz,.checkForMoveToNorthBlock
 ; moved into the tile block to the south
     xor a
@@ -2132,7 +2132,7 @@ AdvancePlayerSprite: ; 0d27 (0:0d27)
     call MoveTileBlockMapPointerSouth
     jr .updateMapView
 .checkForMoveToNorthBlock
-    cp a,$ff
+    cp $ff
     jr nz,.updateMapView
 ; moved into the tile block to the north
     ld a,$01
@@ -2145,26 +2145,26 @@ AdvancePlayerSprite: ; 0d27 (0:0d27)
 .updateMapView
     call LoadCurrentMapView
     ld a,[$c103] ; delta Y
-    cp a,$01
+    cp $01
     jr nz,.checkIfMovingNorth2
 ; if moving south
     call ScheduleSouthRowRedraw
     jr .scrollBackgroundAndSprites
 .checkIfMovingNorth2
-    cp a,$ff
+    cp $ff
     jr nz,.checkIfMovingEast2
 ; if moving north
     call ScheduleNorthRowRedraw
     jr .scrollBackgroundAndSprites
 .checkIfMovingEast2
     ld a,[$c105] ; delta X
-    cp a,$01
+    cp $01
     jr nz,.checkIfMovingWest2
 ; if moving east
     call ScheduleEastColumnRedraw
     jr .scrollBackgroundAndSprites
 .checkIfMovingWest2
-    cp a,$ff
+    cp $ff
     jr nz,.scrollBackgroundAndSprites
 ; if moving west
     call ScheduleWestColumnRedraw
@@ -2405,7 +2405,7 @@ GetJoypadStateOverworld: ; 0f4d (0:0f4d)
     bit 3,a ; check if a trainer wants a challenge
     jr nz,.notForcedDownwards
     call GetCurrentOldAdventureMap
-    cp a,ROUTE_17 ; Cycling Road
+    cp ROUTE_17 ; Cycling Road
     jr nz,.notForcedDownwards
     ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
     and a,%11110011 ; bit mask for all directions and A/B
@@ -2425,7 +2425,7 @@ GetJoypadStateOverworld: ; 0f4d (0:0f4d)
     ld hl,$cd38 ; index of current simulated button press
     dec [hl]
     ld a,[hl]
-    cp a,$ff
+    cp $ff
     jr z,.doneSimulating ; if the end of the simulated button presses has been reached
     ld hl,$ccd3 ; base address of simulated button presses
 ; add offset to base address
@@ -2991,7 +2991,7 @@ CheckForUserInterruption: ; 12f8 (0:12f8)
     call GetJoypadStateLowSensitivity
     pop bc
     ld a,[H_CURRENTPRESSEDBUTTONS] ; currently pressed buttons
-    cp a,%01000110 ; Up,Select button,B button
+    cp %01000110 ; Up,Select button,B button
     jr z,.setCarry ; if all three keys are pressed
     ld a,[$ffb5] ; either newly pressed buttons or currently pressed buttons at low sampling rate
     and a,%00001001 ; Start button,A button
@@ -3277,7 +3277,7 @@ HandlePartyMenuInput:
     bit 2,b
     jr z,.NoSelect
     ld a,[W_NUMINPARTY]
-    cp a,2 ; is there more than one pokemon in the party?
+    cp 2 ; is there more than one pokemon in the party?
     jr c,.NoSelect
     ld hl,wForceSortPartyWSelectBit4
     res 4,[hl]
@@ -3368,7 +3368,7 @@ PrintLevel:
     ld [hli],a
     ld c,2 ; number of digits
     ld a,[$cfb9] ; level
-    cp a,100
+    cp 100
     jr c,PrintLevelCommon
 ; if level at least 100,write over the ":L" tile
     dec hl
@@ -3860,7 +3860,7 @@ CopyVideoData: ; 1848 (0:1848)
     ld [H_VBCOPYDEST + 1],a
 .loop
     ld a,c
-    cp a,8 ; are there more than 128 bytes left to copy?
+    cp 8 ; are there more than 128 bytes left to copy?
     jr nc,.copyMaxSize ; only copy up to 128 bytes at a time
 .copyRemainder
     ld [H_VBCOPYSIZE],a
@@ -3901,7 +3901,7 @@ CopyVideoDataDouble: ; 1886 (0:1886)
     ld [H_VBCOPYDOUBLEDEST + 1],a
 .loop
     ld a,c
-    cp a,8 ; are there more than 64 source bytes left to copy?
+    cp 8 ; are there more than 64 source bytes left to copy?
     jr nc,.copyMaxSize ; only copy up to 64 source bytes at a time
 .copyRemainder
     ld [H_VBCOPYDOUBLESIZE],a
@@ -4396,16 +4396,16 @@ TextCommandProcessor:
 
 NextTextCommand:
     ld a,[hli]
-    cp a,"@" ; terminator
+    cp "@" ; terminator
     jr nz,.doTextCommand
     pop af
     ld [$d358],a
     ret
 .doTextCommand
     push hl
-    cp a,$17
+    cp $17
     jp z,TextCommand17
-    cp a,$0e
+    cp $0e
     jp nc,TextCommand0B ; if a != 0x17 and a >= 0xE,go to command 0xB
 ; if a < 0xE,use a jump table
     ld hl,TextCommandJumpTable
@@ -4522,7 +4522,7 @@ TextCommand05:
 ; (no arguments)
 TextCommand06:
     ld a,[W_ISLINKBATTLE]
-    cp a,$04
+    cp $04
     jp z,TextCommand0D
     ld a,$ee ; down arrow
     FuncCoord 18,16 ; $c4f2
@@ -4622,11 +4622,11 @@ TextCommand0B:
     inc hl
     jr .loop
 .matchFound
-    cp a,$14
+    cp $14
     jr z,.pokemonCry
-    cp a,$15
+    cp $15
     jr z,.pokemonCry
-    cp a,$16
+    cp $16
     jr z,.pokemonCry
     ld a,[hl]
     call PlaySoundWaitForCurrent ; call PlaySound ; Denim : modifica per riprodurre i suoni anche con velocità massima dei testi
@@ -5170,9 +5170,9 @@ UpdateMovingBgTiles: ; 1ebe (0:1ebe)
     ld a,[$ffd8]
     inc a
     ld [$ffd8],a
-    cp a,20
+    cp 20
     ret c
-    cp a,21
+    cp 21
     jr z,.updateFlowerTile
     ld hl,$9140 ; water tile pattern VRAM location
     ld c,16 ; number of bytes in a tile pattern
@@ -5207,7 +5207,7 @@ UpdateMovingBgTiles: ; 1ebe (0:1ebe)
     ld [$ffd8],a
     ld a,[$d085]
     and a,$03
-    cp a,2
+    cp 2
     ld hl,FlowerTilePattern1
     jr c,.writeTilePatternToVram
     ld hl,FlowerTilePattern2
@@ -5396,13 +5396,13 @@ VBlankHandler:
     call Func_28cb
     ld a,[$c0ef] ; music ROM bank
     call RoutineForRealGB
-    cp a,$02
+    cp $02
     jr nz,.checkIfBank08
 .bank02
     call Func_9103
     jr .afterMusic
 .checkIfBank08
-    cp a,$08
+    cp $08
     jr nz,.bank1F
 .bank08
     call Func_2136e
@@ -6869,13 +6869,13 @@ DisplayTextID: ; 2920 (0:2920)
     ld [$cf13],a
     and a
     jp z,DisplayStartMenu
-    cp a,$d3 ; safari game over
+    cp $d3 ; safari game over
     jp z,DisplaySafariGameOverText
-    cp a,$d0 ; fainted
+    cp $d0 ; fainted
     jp z,DisplayPokemonFaintedText
-    cp a,$d1 ; blacked out
+    cp $d1 ; blacked out
     jp z,DisplayPlayerBlackedOutText
-    cp a,$d2 ; repel wore off
+    cp $d2 ; repel wore off
     jp z,DisplayRepelWoreOffText
     jp HackForOtherText ; ld a,[$d4e1] ; number of sprites
 ReturnInDisplayTextIDHack:
@@ -6915,24 +6915,24 @@ ReturnInDisplayTextIDHack:
     ld l,a ; hl = address of the text
     ld a,[hl] ; a = first byte of text
 ; check first byte of text for special cases
-    cp a,$fe   ; Pokemart NPC
+    cp $fe   ; Pokemart NPC
     jp z,DisplayPokemartDialogue
-    cp a,$ff   ; Pokemon Center NPC
+    cp $ff   ; Pokemon Center NPC
     jp z,DisplayPokemonCenterDialogue
-    cp a,$fc   ; Item Storage PC
+    cp $fc   ; Item Storage PC
     jp z,FuncTX_ItemStoragePC
-    cp a,$fd   ; Bill's PC
+    cp $fd   ; Bill's PC
     jp z,FuncTX_BillsPC
-    cp a,$f9   ; Pokemon Center PC
+    cp $f9   ; Pokemon Center PC
     jp z,FuncTX_PokemonCenterPC
-    cp a,$f5   ; Vending Machine
+    cp $f5   ; Vending Machine
     jr nz,.notVendingMachine
     BANKSWITCH VendingMachineMenu ; jump banks to vending machine routine
     jr AfterDisplayingTextID
 .notVendingMachine
-    cp a,$f7   ; slot machine
+    cp $f7   ; slot machine
     jp z,FuncTX_SlotMachine
-    cp a,$f6   ; cable connection NPC in Pokemon Center
+    cp $f6   ; cable connection NPC in Pokemon Center
     jr nz,.notSpecialCase
     BANKSWITCH DebugNPC ; BANKSWITCH CableClubNPC
     jr AfterDisplayingTextID
@@ -7145,17 +7145,17 @@ RedisplayStartMenu:
 ;    jr nz,.displayMenuItem
 ;    inc a ; adjust position to account for missing pokedex menu item
 ;.displayMenuItem
-;    cp a,0
+;    cp 0
 ;    jp z,StartMenu_Pokedex
-;    cp a,1
+;    cp 1
 ;    jp z,StartMenu_Pokemon
-;    cp a,2
+;    cp 2
 ;    jp z,StartMenu_Item
-;    cp a,3
+;    cp 3
 ;    jp z,StartMenu_TrainerInfo
-;    cp a,4
+;    cp 4
 ;    jp z,StartMenu_SaveReset
-;    cp a,5
+;    cp 5
 ;    jp z,StartMenu_Option
     ld a,[wCurrentMenuItem]
     and a
@@ -7318,7 +7318,7 @@ DisplayListMenuID: ; 2be6 (0:2be6)
     ld [$cc37],a
     pop af ; Restore number of list entries
     dec a
-    cp a,2 ; does the list have less than 2 entries?
+    cp 2 ; does the list have less than 2 entries?
     jr c,.setMenuVariables
     ld a,2 ; max menu item ID is 2 if the list has at least 2 entries
 .setMenuVariables
@@ -7390,7 +7390,7 @@ DisplayListMenuIDLoop:
     ld a,c
     ld [$cf92],a
     ld a,[wListMenuID]
-    cp a,ITEMLISTMENU
+    cp ITEMLISTMENU
     jr nz,.skipMultiplying
 ; if it's an item menu
     sla c ; item entries are 2 bytes long,so multiply by 2
@@ -7411,7 +7411,7 @@ DisplayListMenuIDLoop:
     call GetItemPrice
     pop hl
     ld a,[wListMenuID]
-    cp a,ITEMLISTMENU
+    cp ITEMLISTMENU
     jr nz,.skipGettingQuantity
 ; if it's an item menu
     inc hl
@@ -7526,7 +7526,7 @@ DisplayChooseQuantityMenu:
     and a ; should the price be halved (for selling items)?
     jr nz,.CheckUpDownLeftRight
     ld a,[wListMenuID]
-    cp a,PRICEDITEMLISTMENU
+    cp PRICEDITEMLISTMENU
     jr nz,.CheckUpDownLeftRight
     ld a,[$cf91] ; selected item ID
     cp TM_01
@@ -7595,7 +7595,7 @@ DisplayChooseQuantityMenu:
     FuncCoord 16,10
     ld hl,Coord
     ld a,[wListMenuID]
-    cp a,PRICEDITEMLISTMENU
+    cp PRICEDITEMLISTMENU
     jr nz,.printQuantity
     BANKSWITCH PrintPrice
     FuncCoord 08,10
@@ -7624,7 +7624,7 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     ld a,[wListScrollOffset]
     ld c,a
     ld a,[wListMenuID]
-    cp a,ITEMLISTMENU
+    cp ITEMLISTMENU
     ld a,c
     jr nz,.skipMultiplying
 ; if it's an item menu
@@ -7645,7 +7645,7 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     ld [$cf92],a
     ld a,[de]
     ld [$d11e],a
-    cp a,$ff
+    cp $ff
     jp z,.end
     push bc
     push de
@@ -7655,7 +7655,7 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     ld a,[wListMenuID]
     and a
     jr z,.pokemonPCMenu
-    cp a,$01
+    cp $01
     jr z,.movesMenu
 .itemMenu
     call BackupHlAndGetSpecialListNameOrGetItemName ; Denim ; call GetItemName
@@ -7743,7 +7743,7 @@ PrintListMenuEntries: ; 2e5a (0:2e5a)
     pop de
     inc de
     ld a,[wListMenuID]
-    cp a,ITEMLISTMENU
+    cp ITEMLISTMENU
     jr nz,.nextListEntry
 .printItemQuantity
     ld a,[$d11e]
@@ -8667,7 +8667,7 @@ CheckCoords: ; 34c7 (0:34c7)
     ld [$cd3d],a
 .loop
     ld a,[hli]
-    cp a,$ff ; reached terminator?
+    cp $ff ; reached terminator?
     jr z,.notInArray
     push hl
     ld hl,$cd3d
@@ -8945,7 +8945,7 @@ MoveSprite_:
     ld [hli],a
     inc de
     inc c
-    cp a,$FF ; have we reached the end of the movement data?
+    cp $FF ; have we reached the end of the movement data?
     jr nz,.loop
 
     ld a,c
@@ -8986,7 +8986,7 @@ DivideBytes:
 
 SpeedUpByke:
     call GetCurrentOldAdventureMap
-    cp a,ROUTE_17 ; Cycling Road
+    cp ROUTE_17 ; Cycling Road
     jr nz,.normalByke
     ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
     and a,%01110000 ; bit mask for up,left,right buttons
@@ -9230,7 +9230,7 @@ GetName: ; 376b (0:376b)
     ld e,l
 .nextChar
     ld a,[hli]
-    cp a,"@"
+    cp "@"
     jr nz,.nextChar
     inc c           ;entry counter
     ld a,b          ;wanted entry
@@ -9985,7 +9985,7 @@ PlaceMenuCursor:
     jr nz,.oldMenuItemLoop
 .checkForArrow1
     ld a,[hl]
-    cp a,"▶" ; was an arrow next to the previously selected menu item?
+    cp "▶" ; was an arrow next to the previously selected menu item?
     jr nz,.skipClearingArrow
 .clearArrow
     ld a,[wTileBehindCursor]
@@ -10011,7 +10011,7 @@ PlaceMenuCursor:
     jr nz,.currentMenuItemLoop
 .checkForArrow2
     ld a,[hl]
-    cp a,"▶" ; has the right arrow already been placed?
+    cp "▶" ; has the right arrow already been placed?
     jr z,.skipSavingTile ; if so,don't lose the saved tile
     ld [wTileBehindCursor],a ; save tile before overwriting with right arrow
 .skipSavingTile
@@ -10149,9 +10149,9 @@ PrintNumber: ; 3c5f (0:3c5f)
     ld [H_NUMTOPRINT + 1],a
     ld a,b
     and a,%00001111
-    cp a,1
+    cp 1
     jr z,.oneByte
-    cp a,2
+    cp 2
     jr z,.twoBytes
 .threeBytes
     ld a,[de]
@@ -10181,17 +10181,17 @@ PrintNumber: ; 3c5f (0:3c5f)
     xor a
     ld c,a
     ld a,b ; a = number of decimal digits
-    cp a,2
+    cp 2
     jr z,.tensPlace
-    cp a,3
+    cp 3
     jr z,.hundredsPlace
-    cp a,4
+    cp 4
     jr z,.thousandsPlace
-    cp a,5
+    cp 5
     jr z,.tenThousandsPlace
-    cp a,6
+    cp 6
     jr z,.hundredThousandsPlace
-    cp a,7
+    cp 7
     jr z,.millionsPlace
 .tenMillionsPlace
     ld a,10000000 >> 16
@@ -10239,7 +10239,7 @@ PrintNumber: ; 3c5f (0:3c5f)
     ld c,00
     ld a,[H_NUMTOPRINT + 2]
 .loop
-    cp a,10
+    cp 10
     jr c,.underflow
     sub a,10
     inc c
@@ -10404,7 +10404,7 @@ IsInArrayCummulativeCount: ; 3dad (0:3dad)
     ld c,a
 .loop
     ld a,[hl]
-    cp a,$FF
+    cp $FF
     jr z,.NotInArray
     cp c
     jr z,.InArray
@@ -10736,10 +10736,10 @@ IsShiny:
 CheckShiny:
     ld a,[hli] ; Controllo IV Atk/Def ; Controllo IV Atk,Shiny se IV Atk = 2,3,6,7,10,11,14 o 15
     and %00101111 ; Shiny se bit 5 di a settato,gli altri bit dell'atk non contano,applico maschera
-    cp a,%00101010
+    cp %00101010
     ld a,[hld] ; Controllo IV Spd/Spc
     ret nz
-    cp a,%10101010
+    cp %10101010
     ret
 
 GoodCopyVideoData: ; Denim,ExpBar
@@ -11382,7 +11382,7 @@ LoadMonData_: ; 45b6 (1:45b6)
     ld a,[$da5f] ; daycare pokemon ID
     ld [$cf91],a
     ld a,[$cc49]
-    cp a,$03
+    cp $03
     jr z,.done
     ld a,[$cf92]
     ld e,a
@@ -11407,11 +11407,11 @@ LoadMonData_: ; 45b6 (1:45b6)
     ld hl,W_PARTYMON1DATA
     ld bc,44
     ld a,[$cc49]
-    cp a,$01
+    cp $01
     jr c,.getMonEntry
     ld hl,wEnemyMons ; enemy pokemon 1 data
     jr z,.getMonEntry
-    cp a,$02
+    cp $02
     ld hl,W_BOXMON1DATA ; box pokemon 1 data
     ld bc,33
     jr z,.getMonEntry
@@ -13929,7 +13929,7 @@ MainMenu: ; 5af2 (1:5af2)
     ld hl,$D730
     set 6,[hl]
     ld a,[$D088]
-    cp a,1
+    cp 1
     jr z,.next1
     FuncCoord 0,0
     ld hl,Coord
@@ -13975,14 +13975,14 @@ MainMenu: ; 5af2 (1:5af2)
     ld a,[$CC26]
     ld b,a
     ld a,[$D088]
-    cp a,2
+    cp 2
     jp z,.next3
     inc b ; adjust MenuArrow_Counter
 .next3
     ld a,b
     and a
     jr z,.next4 ; if press_A on Continue
-    cp a,1
+    cp 1
     jp z,Func_5d52 ; if press_A on NewGame
     call DisplayOptionMenu ; if press_a on Options
     ld a,1
@@ -14015,7 +14015,7 @@ MainMenu: ; 5af2 (1:5af2)
 ;    and a
 ;    jp z,SpecialEnterMap
 ;    call GetCurrentOldAdventureMap
-;    cp a,HALL_OF_FAME
+;    cp HALL_OF_FAME
 ;    jp nz,SpecialEnterMap
 ;    xor a
 ;    ld [$D71A],a
@@ -14387,7 +14387,7 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
 ;    jr z,.checkDirectionKeys
     jr .checkDirectionKeys
 ;    ld a,[wTopMenuItemY]
-;    cp a,16 ; is the cursor on Cancel?
+;    cp 16 ; is the cursor on Cancel?
 ;    jr nz,.loop
 .exitMenu
     ld a,$90
@@ -14406,33 +14406,33 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     jr nz,.downPressed
     bit 6,b ; Up pressed?
     jr nz,.upPressed
-    cp a,7 ; cursor in Battle Animation section?
+    cp 7 ; cursor in Battle Animation section?
     jr z,.cursorInBattleAnimation
-    cp a,11 ; cursor in Battle Style section?
+    cp 11 ; cursor in Battle Style section?
     jr z,.cursorInBattleStyle
-    cp a,16 ; cursor on Cancel?
+    cp 16 ; cursor on Cancel?
     jr z,.loop
 .cursorInTextSpeed
     bit 5,b ; Left pressed?
     jp nz,.pressedLeftInTextSpeed
     jp .pressedRightInTextSpeed
 .downPressed
-    cp a,11
+    cp 11
     ld b,-8
     ld hl,$cd3d
     jr z,.updateMenuVariables
     ld b,4
-    cp a,3
+    cp 3
     inc hl
     jr z,.updateMenuVariables
     inc hl
     jr .updateMenuVariables
 .upPressed
-    cp a,7
+    cp 7
     ld b,-4
     ld hl,$cd3d
     jr z,.updateMenuVariables
-    cp a,11
+    cp 11
     inc hl
     jr z,.updateMenuVariables
     ld b,+8
@@ -14457,9 +14457,9 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     jp .eraseOldMenuCursor
 .pressedLeftInTextSpeed
     ld a,[$cd3d] ; text speed cursor X coordinate
-    cp a,2
+    cp 2
     jr z,.updateTextSpeedXCoord
-    cp a,7
+    cp 7
     jr nz,.fromSlowToMedium
     sub a,5
     jr .updateTextSpeedXCoord
@@ -14468,9 +14468,9 @@ DisplayOptionMenu: ; 5e8a (1:5e8a)
     jr .updateTextSpeedXCoord
 .pressedRightInTextSpeed
     ld a,[$cd3d] ; text speed cursor X coordinate
-    cp a,14
+    cp 14
     jr z,.updateTextSpeedXCoord
-    cp a,7
+    cp 7
     jr nz,.fromFastToMedium
     add a,7
     jr .updateTextSpeedXCoord
@@ -15880,7 +15880,7 @@ SubtractAmountPaidFromMoney_: ; 6b21 (1:6b21)
 
 HandleItemListSwapping: ; 6b44 (1:6b44)
     ld a,[wListMenuID]
-    cp a,ITEMLISTMENU
+    cp ITEMLISTMENU
     jp nz,DisplayListMenuIDLoop ; only rearrange item list menus
     push hl
     ld hl,$cf8b
@@ -15970,7 +15970,7 @@ HandleItemListSwapping: ; 6b44 (1:6b44)
     ld a,[de]
     add b ; a = sum of both item quantities
     jr c,.MoveQuantity
-    cp a,255 ; is the sum too big for one item slot?
+    cp 255 ; is the sum too big for one item slot?
     jr c,.combineItemSlots
 ; swap enough items from the first slot to max out the second slot if they can't be combined
 .MoveQuantity
@@ -15988,7 +15988,7 @@ HandleItemListSwapping: ; 6b44 (1:6b44)
     dec [hl] ; decrease the number of items
     ld a,[hl]
     ld [$d12a],a ; update number of items variable
-    cp a,1
+    cp 1
     jr nz,.skipSettingMaxMenuItemID
     ld [wMaxMenuItem],a ; if the number of items is only one now,update the max menu item ID
 .skipSettingMaxMenuItemID
@@ -16040,7 +16040,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld [$d125],a
     call DisplayTextBoxID ; do buy/sell/quit menu
     ld a,[$d12e]
-    cp a,$02
+    cp $02
     jp z,.done
     ld a,[$d12d] ; ID of the chosen menu item
     and a ; buying?
@@ -16100,7 +16100,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld [$d125],a
     call DisplayTextBoxID ; yes/no menu
     ld a,[$d12e]
-    cp a,$02
+    cp $02
     jr z,.sellMenuLoop ; if the player pressed the B button
     ld a,[$d12d] ; ID of the chosen menu item
     dec a
@@ -16175,7 +16175,7 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     ld [$d125],a
     call DisplayTextBoxID ; yes/no menu
     ld a,[$d12e]
-    cp a,$02
+    cp $02
     jr z,.buyMenuLoop ; if the player pressed the B button
     ld a,[$d12d] ; ID of the chosen menu item
     dec a
@@ -16656,7 +16656,7 @@ DisplayTextIDInit: ; 7096 (1:7096)
     ld c,e
 .spriteStandStillLoop
     ld a,[hl]
-    cp a,$ff ; is the sprite visible?
+    cp $ff ; is the sprite visible?
     jr z,.nextSprite
 ; if it is visible
     and a,$fc
@@ -16927,7 +16927,7 @@ Func_72d7: ; 72d7 (1:72d7)
 ; [$D125] = text box ID
 DisplayTextBoxID_: ; 72ea (1:72ea)
     ld a,[$d125] ; a = text box ID
-    cp a,$14
+    cp $14
     jp z,DisplayYesNoTextBox
     ld c,a
     ld hl,TextBoxFunctionTable
@@ -16978,7 +16978,7 @@ SearchTextBoxTable: ; 734c (1:734c)
     dec de
 .loop
     ld a,[hli]
-    cp a,$ff
+    cp $ff
     jr z,.notFound
     cp c
     jr z,.found
@@ -18155,9 +18155,9 @@ setExceptionPaletteGbcAndGoPAL_SET:
 ForceVRAM2WritingAndPrintGameVersionOnTitleScreen:
     ld hl,wFlagPlaceTitleScreen
     ld a,[hl]
-    cp a,3
+    cp 3
     jr z,.Write
-    cp a,7
+    cp 7
     jr z,.End
     inc a
     ld [wFlagPlaceTitleScreen],a
@@ -18331,7 +18331,7 @@ TextBoxCoordTable:
 
 PrintDenimVersionAndSaveScreenTilesToBuffer2:
     ld a,[wFlagGameBoyColor]
-    cp a,$11
+    cp $11
     jr nz,.done
     ld de,.GBC
     FuncCoord 0,0
@@ -22336,7 +22336,7 @@ ItemUseBengal:
     jp nz,ItemUseNotTime
     ; Check Surfing
     ld a,[$d700]
-    cp a,2 ; Surfing?
+    cp 2 ; Surfing?
     jr nz,.SurfingCheckOK
     call IsSurfingOnLapras
     jr z,.SurfingCheckOK
@@ -22537,7 +22537,7 @@ AddItemToInventory_:
     jp z,.increaseItemQuantity ; if so,increase the item's quantity
     inc hl
     ld a,[hl]
-    cp a,$ff ; is it the end of the table?
+    cp $ff ; is it the end of the table?
     jr nz,.loop
 .addNewItem ; add an item not yet in the inventory
     pop hl
@@ -22564,7 +22564,7 @@ AddItemToInventory_:
     ld a,[hl] ; a = existing item quantity
     add b ; a = new item quantity
     jr c,.DivideIntoTwoItem
-    cp a,255
+    cp 255
     jp c,.storeNewQuantity ; if the new quantity is less than 255,store it
 ; if the new quantity is greater than or equal to 255,
 ; try to max out the current slot and add the rest in a new slot
@@ -22631,7 +22631,7 @@ RemoveItemFromInventory_:
     ld a,[de]
     inc de
     ld [hli],a
-    cp a,$ff
+    cp $ff
     jr nz,.loop
 ; update menu info
     xor a
@@ -22644,7 +22644,7 @@ RemoveItemFromInventory_:
     dec a ; decrement the number of items
     ld [hl],a ; store new number of items
     ld [$d12a],a
-    cp a,2
+    cp 2
     jr c,.done
     ld [wMaxMenuItem],a
     jr .done
@@ -23174,17 +23174,17 @@ ItemUseBall: ; d687 (3:5687)
     dec a
     jr z,.UseBall
     ld a,[W_NUMINPARTY]    ;is Party full?
-    cp a,6
+    cp 6
     jr nz,.UseBall
     ld a,[W_NUMINBOX]    ;is Box full?
-    cp a,20
+    cp 20
     jp z,BoxFullCannotThrowBall
 .UseBall    ;$56a7
 ;ok,you can use a ball
     xor a
     ld [$d11c],a
     ld a,[W_BATTLETYPE]
-    cp a,2        ;SafariBattle
+    cp 2        ;SafariBattle
     jr nz,.skipSafariZoneCode
 .safariZone
     push af
@@ -23221,10 +23221,10 @@ ItemUseBall: ; d687 (3:5687)
     jp .BallSuccess    ;$578b
 .notOldManBattle    ;$56e9
     call GetCurrentOldAdventureMap
-    cp a,POKEMONTOWER_6
+    cp POKEMONTOWER_6
     jr nz,.loop
     ld a,[W_ENEMYMONID]
-    cp a,MAROWAK
+    cp MAROWAK
     ld b,$10
     jp z,.next12
 ; if not fighting ghost Marowak,loop until a random number in the current
@@ -23234,15 +23234,15 @@ ItemUseBall: ; d687 (3:5687)
     ld b,a
     ld hl,$cf91
     ld a,[hl]
-    cp a,MASTER_BALL
+    cp MASTER_BALL
     jp z,.BallSuccess    ;$578b
-    cp a,POKE_BALL
+    cp POKE_BALL
     jr z,.checkForAilments
     ld a,200
     cp b
     jr c,.loop    ;get only numbers <= 200 for Great Ball
     ld a,[hl]
-    cp a,GREAT_BALL
+    cp GREAT_BALL
     jr z,.checkForAilments
     ld a,150    ;get only numbers <= 150 for Ultra Ball
     cp b
@@ -23270,7 +23270,7 @@ ItemUseBall: ; d687 (3:5687)
     ld [H_MULTIPLIER],a
     call Multiply    ; MaxHP * 255
     ld a,[$cf91]
-    cp a,GREAT_BALL
+    cp GREAT_BALL
     ld a,12        ;any other BallFactor
     jr nz,.next7
     ld a,8
@@ -23330,13 +23330,13 @@ ItemUseBall: ; d687 (3:5687)
     call Multiply    ; CatchRate * 100
     ld a,[$cf91]
     ld b,255
-    cp a,POKE_BALL
+    cp POKE_BALL
     jr z,.next11
     ld b,200
-    cp a,GREAT_BALL
+    cp GREAT_BALL
     jr z,.next11
     ld b,150
-    cp a,ULTRA_BALL
+    cp ULTRA_BALL
     jr z,.next11
 .next11    ;$57b8
     ld a,b
@@ -23358,13 +23358,13 @@ ItemUseBall: ; d687 (3:5687)
     ld a,[H_QUOTIENT + 3]
     add e
     ld [H_QUOTIENT + 3],a
-    cp a,10
+    cp 10
     ld b,$20
     jr c,.next12
-    cp a,30
+    cp 30
     ld b,$61
     jr c,.next12
-    cp a,70
+    cp 70
     ld b,$62
     jr c,.next12
     ld b,$63
@@ -23390,19 +23390,19 @@ ItemUseBall: ; d687 (3:5687)
     pop af
     ld [$cf92],a
     ld a,[$d11e]
-    cp a,$10
+    cp $10
     ld hl,ItemUseBallText00
     jp z,.printText0
-    cp a,$20
+    cp $20
     ld hl,ItemUseBallText01
     jp z,.printText0
-    cp a,$61
+    cp $61
     ld hl,ItemUseBallText02
     jp z,.printText0
-    cp a,$62
+    cp $62
     ld hl,ItemUseBallText03
     jp z,.printText0
-    cp a,$63
+    cp $63
     ld hl,ItemUseBallText04
     jp z,.printText0
     ld hl,$cfe6    ;current HP
@@ -23465,7 +23465,7 @@ ItemUseBall: ; d687 (3:5687)
 ;    PREDEF ShowPokedexData
 ;.checkParty    ;$58f4
     ld a,[W_NUMINPARTY]
-    cp a,6        ;is party full?
+    cp 6        ;is party full?
     jr z,.sendToBox
     xor a
     ld [$cc49],a
@@ -23592,7 +23592,7 @@ ItemUseBicycle: ; d977 (3:5977)
     jp nz,ItemUseNotTime
     ld a,[$d700]
     ld [$d11a],a
-    cp a,2 ; is the player surfing?
+    cp 2 ; is the player surfing?
     jp z,ItemUseNotTime
     dec a ; is player already bicycling?
     jr nz,.tryToGetOnBike
@@ -23659,7 +23659,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld a,[hli]
     cp b
     jr z,.stopSurfing
-    cp a,$ff
+    cp $ff
     jr nz,.passableTileLoop
 .cannotStopSurfing
     ld hl,SurfingNoPlaceToGetOffText
@@ -23699,7 +23699,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
 .HandleSurfboardCheck
     ld a,[$d700]
     ld [$d11a],a
-    cp a,2 ; is the player already surfing?
+    cp 2 ; is the player already surfing?
     ret z; jr z,.tryToStopSurfing
 .tryToSurf
     call IsNextTileShoreOrWater
@@ -23802,13 +23802,13 @@ ItemUseMedicine:
     jr z,.forceAnotherChoice ; if so,force another choice
 .checkItemType
     ld a,[$cf91]
-    cp a,REVIVE
+    cp REVIVE
     jp nc,.healHP ; if it's a Revive or Max Revive
-    cp a,FULL_HEAL
+    cp FULL_HEAL
     jr z,.cureStatusAilment ; if it's a Full Heal
-    cp a,HP_UP
+    cp HP_UP
     jp nc,.useVitamin ; if it's a vitamin or Rare Candy
-    cp a,FULL_RESTORE
+    cp FULL_RESTORE
     jp nc,.healHP ; if it's a Full Restore or one of the potions
 ; fall through if it's one of the status-specifc healing items
 .cureStatusAilment
@@ -23818,19 +23818,19 @@ ItemUseMedicine:
     ld a,[$cf91]
     jp z,.healingItemNoEffect
     ld bc,$f008
-    cp a,ANTIDOTE
+    cp ANTIDOTE
     jr z,.checkMonStatus
     ld bc,$f110
-    cp a,BURN_HEAL
+    cp BURN_HEAL
     jr z,.checkMonStatus
     ld bc,$f220
-    cp a,ICE_HEAL
+    cp ICE_HEAL
     jr z,.checkMonStatus
     ld bc,$f307
-    cp a,AWAKENING
+    cp AWAKENING
     jr z,.checkMonStatus
     ld bc,$f440
-    cp a,PARLYZ_HEAL
+    cp PARLYZ_HEAL
     jr z,.checkMonStatus
     ld bc,$f6ff ; Full Heal
 .checkMonStatus
@@ -23895,9 +23895,9 @@ ItemUseMedicine:
     jr nz,.notFainted
 .fainted
     ld a,[$cf91]
-    cp a,REVIVE
+    cp REVIVE
     jr z,.updateInBattleFaintedData
-    cp a,MAX_REVIVE
+    cp MAX_REVIVE
     jr z,.updateInBattleFaintedData
     jp .healingItemNoEffect
 .updateInBattleFaintedData
@@ -23907,9 +23907,9 @@ ItemUseMedicine:
     jp .healingItemNoEffect
 .notFainted
     ld a,[$cf91]
-    cp a,REVIVE
+    cp REVIVE
     jp z,.healingItemNoEffect
-    cp a,MAX_REVIVE
+    cp MAX_REVIVE
     jp z,.healingItemNoEffect
 .compareCurrentHPToMaxHP
     push hl
@@ -23927,7 +23927,7 @@ ItemUseMedicine:
     jr nz,.notFullHP
 .fullHP ; if the pokemon's current HP equals its max HP
     ld a,[$cf91]
-    cp a,FULL_RESTORE
+    cp FULL_RESTORE
     jp nz,.healingItemNoEffect
     inc hl
     inc hl
@@ -24028,15 +24028,15 @@ ItemUseMedicine:
     jr .addHealAmount
 .notUsingSoftboiled2
     ld a,[$cf91]
-    cp a,SODA_POP
+    cp SODA_POP
     ld b,60 ; Soda Pop heal amount
     jr z,.addHealAmount
     ld b,80 ; Lemonade heal amount
     jr nc,.addHealAmount
-    cp a,FRESH_WATER
+    cp FRESH_WATER
     ld b,50 ; Fresh Water heal amount
     jr z,.addHealAmount
-    cp a,SUPER_POTION
+    cp SUPER_POTION
     ld b,200 ; Hyper Potion heal amount
     jr c,.addHealAmount
     ld b,50 ; Super Potion heal amount
@@ -24063,7 +24063,7 @@ ItemUseMedicine:
     ld hl,33
     add hl,de ; hl now points to max HP
     ld a,[$cf91]
-    cp a,REVIVE
+    cp REVIVE
     jr z,.setCurrentHPToHalfMaxHP
     ld a,[hld]
     ld b,a
@@ -24075,9 +24075,9 @@ ItemUseMedicine:
     sbc b
     jr nc,.setCurrentHPToMaxHp ; if current HP exceeds max HP after healing
     ld a,[$cf91]
-    cp a,HYPER_POTION
+    cp HYPER_POTION
     jr c,.setCurrentHPToMaxHp ; if using a Full Restore or Max Potion
-    cp a,MAX_REVIVE
+    cp MAX_REVIVE
     jr z,.setCurrentHPToMaxHp ; if using a Max Revive
     jr .updateInBattleData
 .setCurrentHPToHalfMaxHP
@@ -24105,7 +24105,7 @@ ItemUseMedicine:
     dec de
 .doneHealingPartyHP ; done updating the pokemon's current HP in the party data structure
     ld a,[$cf91]
-    cp a,FULL_RESTORE
+    cp FULL_RESTORE
     jr nz,.updateInBattleData
     ld bc,-31
     add hl,bc
@@ -24127,7 +24127,7 @@ ItemUseMedicine:
     ld a,[hld]
     ld [W_PLAYERMONCURHP + 1],a
     ld a,[$cf91]
-    cp a,FULL_RESTORE
+    cp FULL_RESTORE
     jr nz,.calculateHPBarCoords
     xor a
     ld [W_PLAYERMONSTATUS],a ; remove the status ailment in the in-battle pokemon data
@@ -24152,9 +24152,9 @@ ItemUseMedicine:
     pop hl
 .skipRemovingItem
     ld a,[$cf91]
-    cp a,FULL_RESTORE
+    cp FULL_RESTORE
     jr c,.playStatusAilmentCuringSound
-    cp a,FULL_HEAL
+    cp FULL_HEAL
     jr z,.playStatusAilmentCuringSound
     ld a,$8d ; HP healing sound
     call PlaySoundWaitForCurrent ; play sound
@@ -24170,9 +24170,9 @@ ItemUseMedicine:
     ld a,$f7 ; revived message
     ld [$d07d],a
     ld a,[$cf91]
-    cp a,REVIVE
+    cp REVIVE
     jr z,.showHealingItemMessage
-    cp a,MAX_REVIVE
+    cp MAX_REVIVE
     jr z,.showHealingItemMessage
     ld a,$f5 ; standard HP healed message
     ld [$d07d],a
@@ -24229,7 +24229,7 @@ ItemUseMedicine:
     pop de
     pop hl
     ld a,[$cf91]
-    cp a,RARE_CANDY
+    cp RARE_CANDY
     jp z,.useRareCandy
     push hl
     sub a,HP_UP
@@ -24244,7 +24244,7 @@ ItemUseMedicine:
     ld a,30
     ld b,a
     ld a,[hl] ; a = MSB of stat experience of the appropriate stat
-    cp a,247 ; is there already at least 63232 (256 * 253) stat experience?
+    cp 247 ; is there already at least 63232 (256 * 253) stat experience?
     jr nc,.vitaminNoEffect ; if so,vitamins can't add any more
     add b ; add 7680 (256 * 30) stat experience
     jr nc,.noCarry3 ; a carry should be impossible here,so this will always jump
@@ -24295,7 +24295,7 @@ ItemUseMedicine:
     ld bc,33
     add hl,bc ; hl now points to level
     ld a,[hl] ; a = level
-    cp a,100
+    cp 100
     jr z,.vitaminNoEffect ; can't raise level above 100
     ld [$cd46],a ; ($cd46 = wTempCoins1) - fixing skip move-learn glitch: need to store the current level in wram
                  ; wTempCoins1 was chosen because it's used only for slot machine and gets defaulted to 1 during the mini-game
@@ -24425,7 +24425,7 @@ BaitRockCommon:
 .randomLoop ; loop until a random number less than 5 is generated
     call GenRandom
     and a,7
-    cp a,5
+    cp 5
     jr nc,.randomLoop
     inc a ; increment the random number,giving a range from 1 to 5 inclusive
 ;joenote - There is a bug here.
@@ -24482,7 +24482,7 @@ CanDig:
     jr nz,.Cant
     ; Check Surfing
     ld a,[$d700]
-    cp a,2 ; Surfing?
+    cp 2 ; Surfing?
     ld hl,.CantDigDuringFloatText
     jr z,.Cant
     ld a,[W_CURMAPTILESET]
@@ -24654,7 +24654,7 @@ ItemUsePokeflute: ; e140 (3:6140)
 
     ; Check Surfing
     ld a,[$d700]
-    cp a,2 ; Surfing?
+    cp 2 ; Surfing?
     jr z,.ItemUseNotTime
 
     call ItemUseReloadOverworldData
@@ -24700,7 +24700,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     call .PrintFluteResult
     call ItemUseReloadOverworldData
     call GetCurrentOldAdventureMap
-    cp a,ROUTE_12
+    cp ROUTE_12
     jr nz,.notRoute12
     ld a,[$d7d8]
     bit 7,a ; has the player beaten Route 12 Snorlax yet?
@@ -24713,7 +24713,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     set 6,[hl] ; trigger Snorlax fight (handled by map script)
     ret
 .notRoute12
-    cp a,ROUTE_16
+    cp ROUTE_16
     jr nz,.notRoute16
     ld a,[$d7e0]
     bit 1,a ; has the player beaten Route 16 Snorlax yet?
@@ -24726,7 +24726,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     set 0,[hl] ; trigger Snorlax fight (handled by map script)
     ret
 .notRoute16
-    cp a,DIGLETTS_CAVE
+    cp DIGLETTS_CAVE
     ret nz
     ld a,[wEventBeatAerodactylBit5]
     bit 5,a ; has the player beaten Diglett's Cave Aerodactyl yet?
@@ -24767,7 +24767,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     call PlayMusic ; play music
 .musicWaitLoop1 ; wait for music to finish playing
     ld a,[$c028]
-    cp a,$b8
+    cp $b8
     jr z,.musicWaitLoop1
     call PlayDefaultMusic ; start playing normal music again
     jr .done
@@ -24860,7 +24860,7 @@ FishingInit:
     call CheckExceptionTilePassable
     ret c
     ld a,[$d700]
-    cp a,2 ; Surfing?
+    cp 2 ; Surfing?
     jr z,.surfing
     call ItemUseReloadOverworldData
     ld hl,.PrintText
@@ -25323,7 +25323,7 @@ GotOffBicycleText: ; e5fc (3:65fc)
 ;.loop
 ;    inc b
 ;    ld a,b
-;    cp a,5 ; reached the end of the pokemon's moves?
+;    cp 5 ; reached the end of the pokemon's moves?
 ;    ret z ; if so,return
 ;    ld a,[$d11e]
 ;    dec a ; using a PP Up?
@@ -25370,7 +25370,7 @@ GotOffBicycleText: ; e5fc (3:65fc)
 ;    ld c,a ; c = number of PP Ups used
 ;.loop
 ;    ld a,[H_QUOTIENT + 3]
-;    cp a,8 ; is the amount greater than or equal to 8?
+;    cp 8 ; is the amount greater than or equal to 8?
 ;    jr c,.addAmount
 ;    ld a,7 ; cap the amount at 7
 ;.addAmount
@@ -25437,7 +25437,7 @@ GotOffBicycleText: ; e5fc (3:65fc)
 ;    push bc
 ;    ld bc,21 ; PP offset if not player's in-battle pokemon data
 ;    ld a,[$cc49]
-;    cp a,4 ; player's in-battle pokemon?
+;    cp 4 ; player's in-battle pokemon?
 ;    jr nz,.addPPOffset
 ;    ld bc,17 ; PP offset if player's in-battle pokemon data
 ;.addPPOffset
@@ -25567,7 +25567,7 @@ TossItem_: ; e6f1 (3:66f1)
     ld [$d125],a
     call DisplayTextBoxID ; yes/no menu
     ld a,[$d12e]
-    cp a,2
+    cp 2
     pop hl
     scf
     ret z
@@ -28152,7 +28152,7 @@ UseStrength:
     bit 0,[hl]
     jr nz,.AlreadyStrength
     ld a,[$d700]
-    cp a,2 ; is the player surfing?
+    cp 2 ; is the player surfing?
     jp z,.Surfing
     ld hl,$d728
     set 0,[hl]
@@ -29454,7 +29454,7 @@ DrawPartyMenu_: ; 12cd2 (4:6cd2)
 
 RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     ld a,[$D07D]
-    cp a,$04
+    cp $04
     jp z,.printMessage
     call ErasePartyMenuCursors
     BANKSWITCH Func_71fb6 ; loads some data to $cf2e
@@ -29467,7 +29467,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     ld [$CF2D],a
 .loop
     ld a,[de]
-    cp a,$FF ; reached the terminator?
+    cp $FF ; reached the terminator?
     jp z,.afterDrawingMonEntries
     push bc
     push de
@@ -29505,9 +29505,9 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     inc hl
 .skipUnfilledRightArrow
     ld a,[$D07D] ; menu type
-    cp a,$03
+    cp $03
     jr z,.teachMoveMenu
-    cp a,$05
+    cp $05
     jr z,.evolutionStoneMenu
     push hl
     ld bc,20 ; Party Menu Status
@@ -29572,7 +29572,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     jr z,.placeEvolutionStoneString ; if so,place the "NOT ABLE" string
     inc hl
     inc hl
-    cp a,EV_ITEM
+    cp EV_ITEM
     jr nz,.checkEvolutionsLoop
 ; if it's a stone evolution entry
     dec hl
@@ -29608,7 +29608,7 @@ RedrawPartyMenu_: ; 12ce3 (4:6ce3)
     push hl
     set 6,[hl] ; turn off letter printing delay
     ld a,[$D07D] ; message ID
-    cp a,$F0
+    cp $F0
     jr nc,.printItemUseMessage
     add a
     call CheckIfInBattleItem ; ld hl,PartyMenuMessagePointers
@@ -29832,7 +29832,7 @@ StartMenu_Pokemon:
 
 .choseSwitch
     ld a,[W_NUMINPARTY]
-    cp a,2 ; is there more than one pokemon in the party?
+    cp 2 ; is there more than one pokemon in the party?
     jr c,StartMenu_Pokemon ; if not,no switching
     call Func_13653
     ld a,$04 ; swap pokemon positions menu
@@ -30154,7 +30154,7 @@ StartMenu_Item: ; 13302 (4:7302)
     call GetItemName
     call CopyStringToCF4B ; copy name to $cf4b
     ld a,[$cf91]
-    cp a,BICYCLE
+    cp BICYCLE
     jr nz,.notBicycle2
     ld a,[$d732]
     bit 5,a
@@ -30176,7 +30176,7 @@ StartMenu_Item: ; 13302 (4:7302)
     ld a,[$cf91]
     cp $FF
     jr z,.useItem_Standard
-    cp a,TM_01
+    cp TM_01
     jr nc,.useItem_partyMenu
     ld hl,UsableItems_CloseMenu
     ld de,1
@@ -30203,7 +30203,7 @@ StartMenu_Item: ; 13302 (4:7302)
     push af
     call UseItem
     ld a,[$cd6a]
-    cp a,$02
+    cp $02
     jp z,.partyMenuNotDisplayed
     call GBPalWhiteOutWithDelay3
     call RestoreScreenTilesAndReloadTilePatterns
@@ -30967,7 +30967,7 @@ CanTeleport:
     jr nz,.Cant
     ; Check Surfing
     ld a,[$d700]
-    cp a,2 ; Surfing?
+    cp 2 ; Surfing?
     jr nz,.SurfingCheckOK
     call IsSurfingOnLapras
     ld hl,.CantTeleportDuringFloatText
@@ -31726,7 +31726,7 @@ LoadMapSpriteTilePatterns: ; 17871 (5:7871)
     cp e ; reached current slot?
     jr z,.foundNextVRAMSlot
     ld a,[de] ; $C2YE (VRAM slot)
-    cp a,11 ; is it one of the first 10 slots?
+    cp 11 ; is it one of the first 10 slots?
     jr nc,.findNextVRAMSlotLoop
     cp b ; compare the slot being checked to the current max
     jr c,.findNextVRAMSlotLoop ; if the slot being checked is less than the current max
@@ -31803,7 +31803,7 @@ LoadMapSpriteTilePatterns: ; 17871 (5:7871)
     pop de
     pop hl
     ld a,[$ff8d]
-    cp a,11 ; is it a 4-tile sprite?
+    cp 11 ; is it a 4-tile sprite?
     jr nc,.skipSecondLoad ; if so,there is no second block
     push de
     call .ReadSpriteSheetData
@@ -31897,7 +31897,7 @@ SECTION "InitOutsideMapSprites",ROMX[$797b],BANK[$5]
 ; sets carry if the map is a city or route,unsets carry if not
 InitOutsideMapSprites: ; 1797b (5:797b)
     call IsCurrentMapTownOrRoute
-    ds 2 ; cp a,REDS_HOUSE_1F ; is the map a city or a route (map ID less than $25)?
+    ds 2 ; cp REDS_HOUSE_1F ; is the map a city or a route (map ID less than $25)?
     ret nc ; if not,return
     call GetMapSpriteSets ; ld hl,MapSpriteSets
     add l
@@ -31906,7 +31906,7 @@ InitOutsideMapSprites: ; 1797b (5:797b)
     inc h
 .noCarry
     ld a,[hl] ; a = spriteSetID
-    cp a,$f0 ; does the map have 2 sprite sets?
+    cp $f0 ; does the map have 2 sprite sets?
     call nc,GetSplitMapSpriteSetID ; if so,choose the appropriate one
     ld b,a ; b = spriteSetID
     ld a,[$cfc4]
@@ -31951,7 +31951,7 @@ InitOutsideMapSprites: ; 1797b (5:797b)
     inc de
     inc bc
     ld a,l
-    cp a,$bd ; reached 11th sprite slot?
+    cp $bd ; reached 11th sprite slot?
     jr nz,.loadSpriteSetLoop
     ld b,4 ; 4 remaining sprite slots
 .zeroRemainingSlotsLoop ; loop to zero the picture ID's of the remaining sprite slots
@@ -32026,7 +32026,7 @@ InitOutsideMapSprites: ; 1797b (5:797b)
 ; Chooses the correct sprite set ID depending on the player's position within
 ; the map for maps with two sprite sets.
 GetSplitMapSpriteSetID: ; 17a1a (5:7a1a)
-    cp a,$f8
+    cp $f8
     jr z,.route20
     ld hl,SplitMapSpriteSets
     and a,$0f
@@ -32039,7 +32039,7 @@ GetSplitMapSpriteSetID: ; 17a1a (5:7a1a)
     inc h
 .noCarry
     ld a,[hli] ; determines whether the map is split East/West or North/South
-    cp a,$01
+    cp $01
     ld a,[hli] ; position of dividing line
     ld b,a
     jr z,.eastWestDivide
@@ -32062,15 +32062,15 @@ GetSplitMapSpriteSetID: ; 17a1a (5:7a1a)
 .route20
     ld hl,W_XCOORD
     ld a,[hl]
-    cp a,$2b
+    cp $2b
     ld a,$01
     ret c
     ld a,[hl]
-    cp a,$3e
+    cp $3e
     ld a,$0a
     ret nc
     ld a,[hl]
-    cp a,$37
+    cp $37
     ld b,$08
     jr nc,.next
     ld b,$0d
@@ -32746,34 +32746,34 @@ PCMainMenu: ; 17e48 (5:7e48)
     bit 1,a              ;if player pressed B
     jp nz,LogOff
     ld a,[wMaxMenuItem]
-    cp a,2-1
+    cp 2-1
     jr nz,.next ;if not 2 menu items (not counting log off) (2 occurs before you get the pokedex)
     ld a,[wCurrentMenuItem]
     and a
     jp z,BillsPC    ;if current menu item id is 0,it's bills pc
-    cp a,1
+    cp 1
     jr z,.playersPC ;if current menu item id is 1,it's players pc
     jp LogOff        ;otherwise,it's 2,and you're logging off
 .next
-    cp a,3-1
+    cp 3-1
     jr nz,.next2 ;if not 3 menu items (not counting log off) (3 occurs after you get the pokedex,before you beat the pokemon league)
     ld a,[wCurrentMenuItem]
     and a
     jp z,BillsPC    ;if current menu item id is 0,it's bills pc
-    cp a,1
+    cp 1
     jr z,.playersPC ;if current menu item id is 1,it's players pc
-    cp a,2
+    cp 2
     jp z,OaksPC     ;if current menu item id is 2,it's oaks pc
     jp LogOff        ;otherwise,it's 3,and you're logging off
 .next2
     ld a,[wCurrentMenuItem]
     and a
     jp z,BillsPC    ;if current menu item id is 0,it's bills pc
-    cp a,1
+    cp 1
     jr z,.playersPC ;if current menu item id is 1,it's players pc
-    cp a,2
+    cp 2
     jp z,OaksPC     ;if current menu item id is 2,it's oaks pc
-    cp a,3
+    cp 3
     jp z,PKMNLeague ;if current menu item id is 3,it's pkmnleague
     jp LogOff        ;otherwise,it's 4,and you're logging off
 .playersPC
@@ -36719,7 +36719,7 @@ CheckTilePassable:
     ld l,a ; hl now points to passable tiles
 .loop
     ld a,[hli]
-    cp a,$ff
+    cp $ff
     jr z,.tileNotPassable
     cp d
     jr z,.tilePassable
@@ -36736,11 +36736,11 @@ CheckTilePassable:
 
 CheckWaterTilePassable:
     ld a,d
-    cp a,$14 ; water tile
+    cp $14 ; water tile
     jr z,.noCollision ; keep surfing if it's a water tile
-    cp a,$32 ; either the left tile of the S.S. Anne boarding platform or the tile on eastern coastlines (depending on the current tileset)
+    cp $32 ; either the left tile of the S.S. Anne boarding platform or the tile on eastern coastlines (depending on the current tileset)
     jr z,.checkIfVermilionDockTileset
-    cp a,$48 ; tile on right on coast lines in Safari Zone
+    cp $48 ; tile on right on coast lines in Safari Zone
     jr z,.noCollision ; keep surfing
 ; check if the [land] tile in front of the player is passable
     call CheckTilePassable
@@ -36748,7 +36748,7 @@ CheckWaterTilePassable:
     jr .collision
 .checkIfVermilionDockTileset
     ld a,[W_CURMAPTILESET] ; tileset
-    cp a,$0e ; Vermilion Dock tileset
+    cp $0e ; Vermilion Dock tileset
     jr nz,.noCollision ; keep surfing if it's not the boarding platform tile
     ; if it is the boarding platform tile,stop surfing
     ; fall through
@@ -44786,7 +44786,7 @@ BillsPC_: ; 214c2 (8:54c2)
 
 .RemovePokemonWithHack
     call GetCurrentOldAdventureMap
-    cp a,CELADON_HOTEL
+    cp CELADON_HOTEL
     jr nz,.RemovePokemon
     ld a,PORYGON
     ld hl,W_PARTYMON1
@@ -47422,7 +47422,7 @@ DisplayEffectiveness:
     ld a,[H_PRODUCT+3]
     ld [wTmpDmgMultiplier+1],a
     pop af
-    cp a,10
+    cp 10
     ret z
     cp 35
     ld hl,.ExtremelyEffectiveText
@@ -50617,7 +50617,7 @@ GetUpdatedActualMoveList:
 LearnMoveFromLevelUp:
     ld a,[$d11e]
     ld [$cf91],a
-    cp a,MEW
+    cp MEW
     ret z ; Mew just know every Move!
     ld [wNewMonIdDuringLearnMove],a
     ld hl,W_PARTYMON1_LEVEL
@@ -52762,7 +52762,7 @@ HandlePoisonBurnLeechSeed2:
     BANKSWITCH_JUMP HandlePoisonBurnLeechSeed_
 
 MoveEffectToPercentage:
-    cp a,7    ; 10% status effects are 04,05,06 so 07 will set carry for those
+    cp 7    ; 10% status effects are 04,05,06 so 07 will set carry for those
     ld b,$1a  ; [1A-1]/100 or [26-1]/256 = 9.8%~ chance
     ret c     ; branch ahead if this is a 10% chance effect..
     ld b,$4d  ; ..or use [4D-1]/100 or [76-1]/256 = 29.7%~ chance
@@ -55439,9 +55439,9 @@ playerCheckIfFlyOrChargeEffect:
     ld c,$1E
     call DelayFrames
     ld a,[W_PLAYERMOVEEFFECT]
-    cp a,FLY_EFFECT
+    cp FLY_EFFECT
     jr z,.playAnim
-    cp a,CHARGE_EFFECT
+    cp CHARGE_EFFECT
     jr z,.playAnim
     jr MirrorMoveCheck
 .playAnim
@@ -55460,7 +55460,7 @@ MirrorMoveCheck:
     ld [$CCED],a
     jp CheckIfPlayerNeedsToChargeUp
 .metronomeCheck
-    cp a,METRONOME_EFFECT
+    cp METRONOME_EFFECT
     jr nz,.next
     call MetronomePickMove
     jp CheckIfPlayerNeedsToChargeUp ; if Mirror Move was successful go back to damage calculation for copied move
@@ -55664,7 +55664,7 @@ CheckPlayerStatusConditions:
     ld a,CONF_ANIM - 1
     call PlayMoveAnimation
     call GenRandomInBattle
-    cp a,$80
+    cp $80
     jr c,.next3
     ld hl,W_PLAYERBATTSTATUS1
     ld a,[hl]
@@ -55686,7 +55686,7 @@ CheckPlayerStatusConditions:
     bit 6,[hl]
     jr z,.next7 ; 5975
     call GenRandomInBattle ; random number
-    cp a,$3F
+    cp $3F
     jr nc,.next7
     ld hl,FullyParalyzedText
     call PrintText
@@ -56429,7 +56429,7 @@ CalculateDamage: ; 3ddcf (f:5dcf)
     ld d,a         ;*D = attack base,used later
     ret z           ;return if attack is zero
     ;ld a,[hl]      ;*test attacking type
-    ;cp a,$14       ;types >= $14 are all special
+    ;cp $14       ;types >= $14 are all special
     call TestPhysicalSpecialBattle
     jr nz,.specialAttack
 .physicalAttack
@@ -56662,7 +56662,7 @@ MoreCalculateDamage:
 .effect
 
 ; EXPLODE_EFFECT halves defense.
-    cp a,EXPLODE_EFFECT
+    cp EXPLODE_EFFECT
     jr nz,.ok
     srl c
     jr nz,.ok
@@ -56670,13 +56670,13 @@ MoreCalculateDamage:
 .ok
 
 ; Multi-hit attacks may or may not have 0 bp.
-    cp a,TWO_TO_FIVE_ATTACKS_EFFECT
+    cp TWO_TO_FIVE_ATTACKS_EFFECT
     jr z,.skipbp
-    cp a,$1e
+    cp $1e
     jr z,.skipbp
 
 ; Calculate OHKO damage based on remaining HP.
-    cp a,OHKO_EFFECT
+    cp OHKO_EFFECT
     jp z,.Func_3e016
 
 ; Don't calculate damage for moves that don't do any.
@@ -56882,12 +56882,12 @@ HandleCounterMove:
     ld de,W_PLAYERMOVEPOWER
     ld a,[wEnemySelectedMove]
 .next
-    cp a,COUNTER
+    cp COUNTER
     ret nz ; return if not using Counter
     ld a,$01
     ld [W_MOVEMISSED],a ; initialize the move missed variable to true (it is set to false below if the move hits)
     ld a,[hl]
-    cp a,COUNTER
+    cp COUNTER
     ret z ; if the target also used Counter,miss
     ld a,[de]
     and a
@@ -56957,11 +56957,11 @@ SECTION "ApplyAttackToEnemyPokemon",ROMX[$60df],BANK[$f]
 
 ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
     ld a,[W_PLAYERMOVEEFFECT]
-    cp a,OHKO_EFFECT
+    cp OHKO_EFFECT
     jr z,ApplyDamageToEnemyPokemon
-    cp a,SUPER_FANG_EFFECT
+    cp SUPER_FANG_EFFECT
     jr z,.superFangEffect
-    cp a,SPECIAL_DAMAGE_EFFECT
+    cp SPECIAL_DAMAGE_EFFECT
     jr z,.specialDamage
     call CheckTrappingToResetPlayerHyperBeam ; ld a,[W_PLAYERMOVEPOWER]
     and a
@@ -56990,15 +56990,15 @@ ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
     ld a,[hl]
     ld b,a
     ld a,[W_PLAYERMOVENUM]
-    cp a,SEISMIC_TOSS
+    cp SEISMIC_TOSS
     jr z,.storeDamage
-    cp a,NIGHT_SHADE
+    cp NIGHT_SHADE
     jr z,.storeDamage
     ld b,SONICBOOM_DAMAGE
-    cp a,SONICBOOM
+    cp SONICBOOM
     jr z,.storeDamage
     ld b,DRAGON_RAGE_DAMAGE
-    cp a,DRAGON_RAGE
+    cp DRAGON_RAGE
     jr z,.storeDamage
 ; Psywave
     ld a,[hl]
@@ -57079,11 +57079,11 @@ SECTION "ApplyAttackToPlayerPokemon",ROMX[$61a0],BANK[$f]
 
 ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
     ld a,[W_ENEMYMOVEEFFECT]
-    cp a,OHKO_EFFECT
+    cp OHKO_EFFECT
     jr z,ApplyDamageToPlayerPokemon
-    cp a,SUPER_FANG_EFFECT
+    cp SUPER_FANG_EFFECT
     jr z,.superFangEffect
-    cp a,SPECIAL_DAMAGE_EFFECT
+    cp SPECIAL_DAMAGE_EFFECT
     jr z,.specialDamage
     call CheckTrappingToResetEnemyHyperBeam ; ld a,[W_ENEMYMOVEPOWER]
     and a
@@ -57112,15 +57112,15 @@ ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
     ld a,[hl]
     ld b,a
     ld a,[W_ENEMYMOVENUM]
-    cp a,SEISMIC_TOSS
+    cp SEISMIC_TOSS
     jr z,.storeDamage
-    cp a,NIGHT_SHADE
+    cp NIGHT_SHADE
     jr z,.storeDamage
     ld b,SONICBOOM_DAMAGE
-    cp a,SONICBOOM
+    cp SONICBOOM
     jr z,.storeDamage
     ld b,DRAGON_RAGE_DAMAGE
-    cp a,DRAGON_RAGE
+    cp DRAGON_RAGE
     jr z,.storeDamage
 ; Psywave
     ld a,[hl]
@@ -57263,7 +57263,7 @@ HandleBuildingRage: ; 3e2b6 (f:62b6)
     bit 6,[hl] ; is the pokemon being attacked under the effect of Rage?
     ret z ; return if not
     ld a,[de]
-    cp a,$0d ; maximum stat modifier value
+    cp $0d ; maximum stat modifier value
     ret z ; return if attack modifier is already maxed
     ld a,[H_WHOSETURN]
     xor a,$01 ; flip turn for the stat modifier raising function
@@ -57309,7 +57309,7 @@ MirrorMoveCopyMove: ; 3e2fd (f:62fd)
     ld hl,wEnemySelectedMove
 .next
     ld [hl],a
-    cp a,MIRROR_MOVE ; did the target pokemon also use Mirror Move?
+    cp MIRROR_MOVE ; did the target pokemon also use Mirror Move?
     jr z,.mirrorMoveFailed
     and a ; null move?
     jr nz,ReloadMoveData
@@ -57361,9 +57361,9 @@ MetronomePickMove: ; 3e348 (f:6348)
     call GenRandomInBattle ; random number
     and a
     jr z,.pickMoveLoop
-    cp a,$a5 ; max normal move number + 1 (this is Struggle's move number)
+    cp $a5 ; max normal move number + 1 (this is Struggle's move number)
     jr nc,.pickMoveLoop
-    cp a,METRONOME
+    cp METRONOME
     jr z,.pickMoveLoop
     ld [hl],a
     jr ReloadMoveData
@@ -57447,7 +57447,7 @@ AdjustDamageForMoveType:
     call GetTypeEffects
 .loop
     ld a,[hli] ; a = "attacking type" of the current type pair
-    cp a,$ff
+    cp $ff
     jr z,.done
     cp b ; does move type match "attacking type"?
     jr nz,.nextTypePair
@@ -57689,14 +57689,14 @@ MoveHitTest:
     jr z,.moveMissed2
 .dreamEaterCheck
     ld a,[de]
-    cp a,DREAM_EATER_EFFECT
+    cp DREAM_EATER_EFFECT
     jr nz,.swiftCheck
     ld a,[bc]
     and a,$07 ; is the target pokemon sleeping?
     jr z,.moveMissed2
 .swiftCheck
     ld a,[de]
-    cp a,SWIFT_EFFECT
+    cp SWIFT_EFFECT
     ret z ; Swift never misses (interestingly,Azure Heights lists this is a myth,but it appears to be true)
     call CheckTargetSubstitute ; substitute check (note that this overwrites a)
     jr z,.checkForDigOrFlyStatus
@@ -59753,9 +59753,9 @@ FreezeBurnParalyzeEffect:
     ret nc      ;do nothing if random value is >= 1A or 4D [no status applied]
     ld hl,W_ENEMYMONSTATUS
     ld a,b     ;what type of effect is this?
-    cp a,BURN_SIDE_EFFECT1
+    cp BURN_SIDE_EFFECT1
     jr z,.burn1
-    cp a,FREEZE_SIDE_EFFECT
+    cp FREEZE_SIDE_EFFECT
     jr z,.freeze1
 .par1
     bit PAR_Bit,[hl]
@@ -59800,9 +59800,9 @@ FreezeBurnParalyzeEffect:
     ret nc
     ld hl,W_PLAYERMONSTATUS
     ld a,b
-    cp a,BURN_SIDE_EFFECT1
+    cp BURN_SIDE_EFFECT1
     jr z,.burn2
-    cp a,FREEZE_SIDE_EFFECT
+    cp FREEZE_SIDE_EFFECT
     jr z,.freeze2
 .par2
     bit PAR_Bit,[hl]
@@ -61385,7 +61385,7 @@ AIGetTypeEffectiveness:
 ; ──────────────────────────────────────────────────
 .loop
     ld a,[hli]                   ; Read Attacker Type from "TypeEffects"
-    cp a,$ff
+    cp $ff
     ret z
     cp b                         ; match the type of the attacker move
     jr nz,.nextTypePair1
@@ -62001,7 +62001,7 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     ld [$d11e],a
     ld d,8
     ld a,[$cd3d]
-    cp a,8
+    cp 8
     jr nc,.printPokemonLoop
     ld d,a
     dec a
@@ -62080,7 +62080,7 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     jr z,.checkIfRightPressed
 .downPressed ; scroll down one row
     ld a,[$cd3d]
-    cp a,8
+    cp 8
     jr c,.loop
     sub a,8
     ld b,a
@@ -62095,7 +62095,7 @@ HandlePokedexListMenu: ; 40111 (10:4111)
     jr z,.checkIfLeftPressed
 .rightPressed ; scroll down 8 rows
     ld a,[$cd3d]
-    cp a,8
+    cp 8
     jr c,.loop
     sub a,7
     ld b,a
@@ -79413,7 +79413,7 @@ GetPrizeMenuId: ; 5278e (14:678e)
     ld bc,$0008
     call CopyData
     ld a,[$D12F]
-    cp a,$02        ;is TM_menu?
+    cp $02        ;is TM_menu?
     jr nz,.putMonName
     ld a,[W_PRIZE1]
     ld [$D11E],a
@@ -79570,7 +79570,7 @@ HandlePrizeChoice: ; 528c6 (14:68c6)
     ld a,[hl]
     ld [$D11E],a
     ld a,[$D12F]
-    cp a,$02 ; is prize a TM?
+    cp $02 ; is prize a TM?
     jr nz,.GetMonName
     call GetItemName
     jr .GivePrize
@@ -79587,7 +79587,7 @@ HandlePrizeChoice: ; 528c6 (14:68c6)
     call HasEnoughCoins
     jr c,.NotEnoughCoins
     ld a,[$D12F]
-    cp a,$02
+    cp $02
     jr nz,.GiveMon
     ld a,[$D11E]
     ld b,a
@@ -101511,7 +101511,7 @@ Func_7202b: ; 7202b (1c:602b)
     ld a,$1
     ld [wRunningOnSGB],a
     ld a,[wFlagGameBoyColor] ; 3 ; Denim,se gameBoyColor NO BORDI
-    cp a,$11                 ; 2
+    cp $11                 ; 2
     ret z                    ; 1
     nop                      ; 1
 ;    ld a,[$cf1a]
@@ -102153,11 +102153,11 @@ _IsNextTileShoreOrWater:
     jr nc,.notShoreOrWater
     ld hl,WaterTile
     ld a,[W_CURMAPTILESET]
-    cp a,$0e ; Vermilion Dock tileset
+    cp $0e ; Vermilion Dock tileset
     jr z,.skipShoreTiles
-    cp a,$07 ; Gym tileset
+    cp $07 ; Gym tileset
     jr z,.skipShoreTiles
-    cp a,$05 ; Dojo/Lance/OakLab tileset
+    cp $05 ; Dojo/Lance/OakLab tileset
     jr z,.skipShoreTiles
     ld hl,ShoreTiles
 .skipShoreTiles
@@ -103061,7 +103061,7 @@ PadSRAM_FF: ; 73b8f (1c:7b8f)
 
 TryToSendSGBPackets_Plus: ; Denim ; gameboycolor
     ld a,[wFlagGameBoyColor]
-    cp a,$11
+    cp $11
     jr z,.GameBoyColor
     jp Func_7209b
 .GameBoyColor
@@ -103074,14 +103074,14 @@ TryToSendSGBPackets_Plus: ; Denim ; gameboycolor
 CheckIfGameBoyColorModeAndSetPalette:
     di
     ld a,[wFlagGameBoyColor]
-    cp a,$11
+    cp $11
     ld a,[hl]
     push af ; Backup First Byte Packet
     jr nz,.Done
     and a,%11111000 ; Apply Mask to SGB Packet Type
-    cp a,%01010000 ; PAL_SET : $A
+    cp %01010000 ; PAL_SET : $A
     jr z,.SetGBCPalette
-    cp a,%00100000 ; ATTR_BLK ; $4
+    cp %00100000 ; ATTR_BLK ; $4
     jr z,.SetGBCAttrBlk
     jr .Done
 
@@ -108168,7 +108168,7 @@ PKMNLeaguePC:
     ld [$CD42],a
     ld a,[$D5A2]
     ld b,a
-    cp a,$33
+    cp $33
     jr c,.loop1
 ; If the total number of hall of fame teams is greater than the storage
 ; capacity, then calculate the number of the first team that is still recorded.
@@ -108228,7 +108228,7 @@ PKMNLeaguePC:
     call CopyData
     pop bc
     ld a,[$CC5B]
-    cp a,$FF
+    cp $FF
     jr z,.done
     dec c
     jr nz,.loop2
@@ -109017,10 +109017,10 @@ DrawFrameBlock: ; 78000 (1e:4000)
     and a
     ld b,OAM_VFLIP | OAM_HFLIP
     jr z,.storeFlags1
-    cp a,OAM_HFLIP
+    cp OAM_HFLIP
     ld b,OAM_VFLIP
     jr z,.storeFlags1
-    cp a,OAM_VFLIP
+    cp OAM_VFLIP
     ld b,OAM_HFLIP
     jr z,.storeFlags1
     ld b,0
@@ -109067,18 +109067,18 @@ DrawFrameBlock: ; 78000 (1e:4000)
     jp nz,.loop ; go back up if there are more tiles to draw
 .afterDrawingTiles
     ld a,[W_FBMODE]
-    cp a,2
+    cp 2
     jr z,.advanceFrameBlockDestAddr; skip delay and don't clean OAM buffer
     ld a,[W_SUBANIMFRAMEDELAY]
     ld c,a
     call DelayFrames
     ld a,[W_FBMODE]
-    cp a,3
+    cp 3
     jr z,.advanceFrameBlockDestAddr ; skip cleaning OAM buffer
-    cp a,4
+    cp 4
     jr z,.done ; skip cleaning OAM buffer and don't advance the frame block destination address
     ld a,[W_ANIMATIONID]
-    cp a,GROWL
+    cp GROWL
     jr z,.resetFrameBlockDestAddr
     call AnimationCleanOAM
 .resetFrameBlockDestAddr
@@ -109113,9 +109113,9 @@ PlayAnimation: ; 780f1 (1e:40f1)
     ;ld l,a
 .animationLoop
     ld a,[hli]
-    cp a,$FF
+    cp $FF
     jr z,.AnimationOver
-    cp a,$C0 ; is this subanimation or a special effect?
+    cp $C0 ; is this subanimation or a special effect?
     jr c,.playSubanimation
 .doSpecialEffect
     ld c,a
@@ -109130,7 +109130,7 @@ PlayAnimation: ; 780f1 (1e:40f1)
     jr .searchSpecialEffectTableLoop
 .foundMatch
     ld a,[hli]
-    cp a,$FF ; is there a sound to play?
+    cp $FF ; is there a sound to play?
     jr z,.skipPlayingSound
     ld [wAnimSoundID],a ; store sound
     push hl
@@ -109207,7 +109207,7 @@ LoadSubanimation: ; 7817c (1e:417c)
     ld [W_SUBANIMCOUNTER],a ; number of frame blocks
     ld a,b
     and a,%11100000
-    cp a,5 << 5 ; is subanimation type 5?
+    cp 5 << 5 ; is subanimation type 5?
     jr nz,.isNotType5
 .isType5
     call GetSubanimationTransform2
@@ -109219,7 +109219,7 @@ LoadSubanimation: ; 7817c (1e:417c)
     srl a
     swap a
     ld [W_SUBANIMTRANSFORM],a
-    cp a,4 ; is the animation reversed?
+    cp 4 ; is the animation reversed?
     ld hl,0
     jr nz,.storeSubentryAddr
 ; if the animation is reversed,then place the initial subentry address at the end of the list of subentries
@@ -109317,7 +109317,7 @@ MoveAnimation: ; 78d5e (1e:4d5e)
     jr z,.AnimationFinished
 
     ; if throwing a Poké Ball,skip the regular animation code
-    cp a,TOSS_ANIM
+    cp TOSS_ANIM
     jr nz,.MoveAnimation
     ld de,.AnimationFinished
     push de
@@ -109360,11 +109360,11 @@ ShareMoveAnimations: ; 78da6 (1e:4da6)
 
     ld a,[W_ANIMATIONID]
 
-    cp a,AMNESIA
+    cp AMNESIA
     ld b,CONF_ANIM
     jr z,.Replace
 
-    cp a,REST
+    cp REST
     ld b,SLP_ANIM
     ret nz
 
@@ -109491,7 +109491,7 @@ SECTION "PlaySubanimation",ROMX[$4e53],BANK[$1e] ; Denim
 
 PlaySubanimation: ; 78e53 (1e:4e53)
     ld a,[wAnimSoundID]
-    cp a,$FF
+    cp $FF
     jr z,.skipPlayingSound
     call Func_7986f
     call PlaySound ; play sound effect
@@ -109543,7 +109543,7 @@ PlaySubanimation: ; 78e53 (1e:4e53)
     ld a,[W_SUBANIMSUBENTRYADDR]
     ld l,a
     ld a,[W_SUBANIMTRANSFORM]
-    cp a,4 ; is the animation reversed?
+    cp 4 ; is the animation reversed?
     ld bc,3
     jr nz,.nextSubanimationSubentry
     ld bc,-3
@@ -109670,7 +109670,7 @@ AnimationIdSpecialEffects: ; 78ef5 (1e:4ef5)
 
 DoBallTossSpecialEffects: ; 78f3e (1e:4f3e)
     ld a,[$CF91]
-    cp a,3 ; is it a Master Ball or Ultra Ball?
+    cp 3 ; is it a Master Ball or Ultra Ball?
     jr nc,.skipFlashingEffect
 .flashingEffect ; do a flashing effect if it's Master Ball or Ultra Ball
     ld a,[rOBP0]
@@ -109678,25 +109678,25 @@ DoBallTossSpecialEffects: ; 78f3e (1e:4f3e)
     ld [rOBP0],a
 .skipFlashingEffect
     ld a,[W_SUBANIMCOUNTER]
-    cp a,11 ; is it the beginning of the subanimation?
+    cp 11 ; is it the beginning of the subanimation?
     jr nz,.skipPlayingSound
 ; if it is the beginning of the subanimation,play a sound
     ld a,$91
     call PlaySound ; play sound
 .skipPlayingSound
     ld a,[W_ISINBATTLE]
-    cp a,02 ; is it a trainer battle?
+    cp 02 ; is it a trainer battle?
     jr z,.isTrainerBattle
     ld a,[$d11e]
-    cp a,$10 ; is the enemy pokemon the Ghost Marowak?
+    cp $10 ; is the enemy pokemon the Ghost Marowak?
     ret nz
 ; if the enemy pokemon is the Ghost Marowak,make it dodge during the last 3 frames
     ld a,[W_SUBANIMCOUNTER]
-    cp a,3
+    cp 3
     jr z,.moveGhostMarowakLeft
-    cp a,2
+    cp 2
     jr z,.moveGhostMarowakLeft
-    cp a,1
+    cp 1
     ret nz
 .moveGhostMarowakLeft
     FuncCoord 17,0
@@ -109717,7 +109717,7 @@ DoBallTossSpecialEffects: ; 78f3e (1e:4f3e)
     ret
 .isTrainerBattle ; if it's a trainer battle,shorten the animation by one frame
     ld a,[W_SUBANIMCOUNTER]
-    cp a,3
+    cp 3
     ret nz
     dec a
     ld [W_SUBANIMCOUNTER],a
@@ -109725,7 +109725,7 @@ DoBallTossSpecialEffects: ; 78f3e (1e:4f3e)
 
 DoBallShakeSpecialEffects: ; 78f96 (1e:4f96)
     ld a,[W_SUBANIMCOUNTER]
-    cp a,4 ; is it the beginning of a shake?
+    cp 4 ; is it the beginning of a shake?
     jr nz,.skipPlayingSound
 ; if it is the beginning of a shake,play a sound and wait 2/3 of a second
     ld a,$8c
@@ -109759,18 +109759,18 @@ DoBallShakeSpecialEffects: ; 78f96 (1e:4f96)
 ; plays a sound after the second frame of the poof animation
 DoPoofSpecialEffects: ; 78fce (1e:4fce)
     ld a,[W_SUBANIMCOUNTER]
-    cp a,5
+    cp 5
     ret nz
     ld a,$93
     jp PlaySound
 
 DoRockSlideSpecialEffects: ; 78fd9 (1e:4fd9)
     ld a,[W_SUBANIMCOUNTER]
-    cp a,12
+    cp 12
     ret nc
-    cp a,8
+    cp 8
     jr nc,.shakeScreen
-    cp a,1
+    cp 1
     jp z,AnimationFlashScreen ; if it's the end of the subanimation,flash the screen
     ret
 ; if the subaninmation counter is between 8 and 11,shake the screen horizontally and vertically
@@ -109796,7 +109796,7 @@ FlashScreenEveryFourFrameBlocks: ; 79000 (1e:5000)
 ; used for Explosion and Selfdestruct
 DoExplodeSpecialEffects: ; 79009 (1e:5009)
     ld a,[W_SUBANIMCOUNTER]
-    cp a,1 ; is it the end of the subanimation?
+    cp 1 ; is it the end of the subanimation?
     jr nz,FlashScreenEveryFourFrameBlocks
 ; if it's the end of the subanimation,make the attacking pokemon disappear
     FuncCoord 1,5 ; $c405
@@ -109806,13 +109806,13 @@ DoExplodeSpecialEffects: ; 79009 (1e:5009)
 ; flashes the screen when subanimation counter is 1 modulo 4
 DoBlizzardSpecialEffects: ; 79016 (1e:5016)
     ld a,[W_SUBANIMCOUNTER]
-    cp a,13
+    cp 13
     jp z,AnimationFlashScreen
-    cp a,9
+    cp 9
     jp z,AnimationFlashScreen
-    cp a,5
+    cp 5
     jp z,AnimationFlashScreen
-    cp a,1
+    cp 1
     jp z,AnimationFlashScreen
     ret
 
@@ -109820,11 +109820,11 @@ DoBlizzardSpecialEffects: ; 79016 (1e:5016)
 ; XXX is this unused?
 Func_7902e: ; 7902e (1e:502e)
     ld a,[W_SUBANIMCOUNTER]
-    cp a,14
+    cp 14
     jp z,AnimationFlashScreen
-    cp a,9
+    cp 9
     jp z,AnimationFlashScreen
-    cp a,2
+    cp 2
     jp z,AnimationFlashScreen
     ret
 
@@ -109832,7 +109832,7 @@ Func_7902e: ; 7902e (1e:502e)
 ; XXX probably a trade-related animation
 Func_79041: ; 79041 (1e:5041)
     ld a,[W_SUBANIMCOUNTER]
-    cp a,6
+    cp 6
     ret nz
     ld a,$2F
     jp Func_7980c ; make pokemon disappear
@@ -109841,7 +109841,7 @@ Func_79041: ; 79041 (1e:5041)
 ; XXX probably a trade-related animation
 Func_7904c: ; 7904c (1e:504c)
     ld a,[W_SUBANIMCOUNTER]
-    cp a,1
+    cp 1
     ret nz
 ; if it's the end of the animation,make the ball jump up
     ld de,BallMoveDistances1
@@ -109850,13 +109850,13 @@ Func_7904c: ; 7904c (1e:504c)
     ld bc,4
 .innerLoop
     ld a,[de]
-    cp a,$ff
+    cp $ff
     jr z,.done
     add [hl] ; add to Y value of OAM entry
     ld [hl],a
     add hl,bc
     ld a,l
-    cp a,4 * 4 ; there are 4 entries,each 4 bytes
+    cp 4 * 4 ; there are 4 entries,each 4 bytes
     jr nz,.innerLoop
     inc de
     push bc
@@ -109881,20 +109881,20 @@ Func_7907c ; 507C
     ld bc,4
 .innerLoop
     ld a,[de]
-    cp a,$ff
+    cp $ff
     jp z,ClearScreen
     add [hl]
     ld [hl],a
     add hl,bc
     ld a,l
-    cp a,4 * 4 ; there are 4 entries,each 4 bytes
+    cp 4 * 4 ; there are 4 entries,each 4 bytes
     jr nz,.innerLoop
     inc de
     push de
     ld a,[de]
-    cp a,12
+    cp 12
     jr z,.playSound
-    cp a,$ff
+    cp $ff
     jr nz,.skipPlayingSound
 .playSound ; play sound if next move distance is 12 or this is the last one
     ld a,$ae
@@ -110047,7 +110047,7 @@ AnimationFlashScreenLong: ; 79165 (1e:5165)
     push hl
 .innerLoop
     ld a,[hli]
-    cp a,$01 ; is it the end of the palettes?
+    cp $01 ; is it the end of the palettes?
     jr z,.endOfPalettes
     ld [rBGP],a
     call FlashScreenLongDelay
@@ -110096,13 +110096,13 @@ FlashScreenLongSGB: ; 7919b (1e:519b)
 ; causes a delay of 1 frame for the second and third cycles
 FlashScreenLongDelay: ; 791a8 (1e:51a8)
     ld a,[$D08A]
-    cp a,4 ; never true since [$D08A] starts at 3
+    cp 4 ; never true since [$D08A] starts at 3
     ld c,4
     jr z,.delayFrames
-    cp a,3
+    cp 3
     ld c,2
     jr z,.delayFrames
-    cp a,2 ; nothing is done with this
+    cp 2 ; nothing is done with this
     ld c,1
 .delayFrames
     jp DelayFrames
@@ -111228,9 +111228,9 @@ Func_7986f: ; 7986f (1e:586f)
 IsCryMove: ; 798ad (1e:58ad)
 ; set carry if the move animation involves playing a monster cry
     ld a,[W_ANIMATIONID]
-    cp a,GROWL
+    cp GROWL
     jr z,.CryMove
-    cp a,ROAR
+    cp ROAR
     jr z,.CryMove
     and a ; clear carry
     ret
@@ -111735,7 +111735,7 @@ Func_79e0d: ; 79e0d (1e:5e0d)
 
 TossBallAnimation: ; 79e16 (1e:5e16)
     ld a,[W_ISINBATTLE]
-    cp a,2
+    cp 2
     jr z,.BlockBall ; if in trainer battle,play different animation
     ld a,[$D11E]
     ld b,a
@@ -111755,10 +111755,10 @@ TossBallAnimation: ; 79e16 (1e:5e16)
     ld hl,.PokeBallAnimations
     ; choose which toss animation to use
     ld a,[$CF91]
-    cp a,POKE_BALL
+    cp POKE_BALL
     ld b,TOSS_ANIM
     jr z,.done
-    cp a,GREAT_BALL
+    cp GREAT_BALL
     ld b,GREATTOSS_ANIM
     jr z,.done
     ld b,ULTRATOSS_ANIM
@@ -134136,7 +134136,7 @@ FF47toColor:
     call FF47BlackOrWhite
     jr .Done
 .notWhite
-    cp a,$ff
+    cp $ff
     jr nz,.notBlack
     call FF47BlackOrWhite
     jr .Done
@@ -134150,11 +134150,11 @@ FF47toColor:
     pop bc ; Restore counter
     inc c
     ld a,c
-    cp a,$04
+    cp $04
     jr nz,.LoopAll4Color
     inc b
     ld a,b
-    cp a,$04
+    cp $04
     jr nz,.LoopAll8LeftPalette
     ld a,[rBGP] ; $FF00+$47
     ld [wLastrBGPUsed],a
@@ -134178,7 +134178,7 @@ FF47toColor:
     call FF47BlackOrWhite
     jr .DoneRight
 .notRightWhite
-    cp a,$ff
+    cp $ff
     jr nz,.notRightBlack
     call FF47BlackOrWhite
     jr .DoneRight
@@ -134192,11 +134192,11 @@ FF47toColor:
     pop bc
     inc c
     ld a,c
-    cp a,$04
+    cp $04
     jr nz,.LoopAll4RightColor
     inc b
     ld a,b
-    cp a,$4
+    cp $4
     jr nz,.LoopAll8RightPalette
     ld a,[rOBP0] ; $FF00+$48
     ld [wLastrOBP0Used],a
@@ -134539,7 +134539,7 @@ SelectInOverWorld:
     ; ──────────────────────────────────── Float
     ld a,[$d700]
     ld [$d11a],a
-    cp a,2 ; is the player surfing?
+    cp 2 ; is the player surfing?
     jp z,.noFloat
     BANKSWITCH IsSurfingAllowed
     ld hl,$d728
@@ -134593,7 +134593,7 @@ SelectInOverWorld:
     jr z,.noLight
     ; Check Surfing
     ld a,[$d700]
-    cp a,2 ; Surfing?
+    cp 2 ; Surfing?
     jr nz,.SurfingCheckOK
     call IsSurfingOnLapras
     jr nz,.noLight
@@ -134632,7 +134632,7 @@ SelectInOverWorld:
     bit 0,[hl]
     jr nz,.noStrength
     ld a,[$d700]
-    cp a,2 ; is the player surfing?
+    cp 2 ; is the player surfing?
     jp z,.noStrength
     ld hl,STRENGTH_FLAG_BYTE
     bit STRENGTH_FLAG_BIT,[hl]
@@ -134657,7 +134657,7 @@ SelectInOverWorld:
 .TryFishing
     ; ──────────────────────────────────── Fishing
     ld a,[$d700]
-    cp a,2 ; is the player surfing?
+    cp 2 ; is the player surfing?
     jp z,.noFishing
     call IsNextTileShoreOrWater ; unsets carry if player is facing water or shore
     jr c,.noFishing
@@ -134709,7 +134709,7 @@ SelectInOverWorld:
     call IsBikeRidingAllowed
     jp nc,.noBike
     ld a,[$d700]
-    cp a,2 ; is the player surfing?
+    cp 2 ; is the player surfing?
     jp z,.noBike
 .BikeOrWalk
     push af
@@ -141259,7 +141259,7 @@ InitializeChooseQuantityMenu:
     ld b,01 ; height
     ld c,04 ; width
     ld a,[wListMenuID]
-    cp a,PRICEDITEMLISTMENU
+    cp PRICEDITEMLISTMENU
     jr nz,.drawTextBox
 ; text box dimensions/coordinates for quantity and price
     FuncCoord 06,09
@@ -141279,7 +141279,7 @@ InitializeChooseQuantityMenu:
     FuncCoord 15,10
     ld hl,Coord
     ld a,[wListMenuID]
-    cp a,PRICEDITEMLISTMENU
+    cp PRICEDITEMLISTMENU
     jr nz,.printInitialQuantity
     ld a,[$ff8e]
     and a ; should the price be halved (for selling items)?
@@ -143785,7 +143785,7 @@ EnableBillsTeleport2:
 DecrementPP: ; 68000 (1a:4000)
 ; after using a move,decrement pp in battle and (if not transformed?) in party
     ld a,[de]
-    cp a,STRUGGLE
+    cp STRUGGLE
     ret z                ; if the pokemon is using "struggle",there's nothing to do
                          ; we don't decrement PP for "struggle"
     ld hl,W_PLAYERBATTSTATUS1
@@ -143813,7 +143813,7 @@ DecrementPP: ; 68000 (1a:4000)
 DecrementEnemyPP_:
 ; after using a move,decrement pp in battle and (if not transformed?) in party
     ld a,[de]
-    cp a,STRUGGLE
+    cp STRUGGLE
     ret z                ; if the pokemon is using "struggle",there's nothing to do
                          ; we don't decrement PP for "struggle"
     ld hl,W_ENEMYBATTSTATUS1
