@@ -1980,13 +1980,15 @@ wFlagDisableSynchronizeBit0: ; dee9 ; bit 0 = Disable Synchronize Party
     ds 1
 
 wExplodeFlag:          ; deea
-wMaxNotExclMoveSlotId: ; deea
     ds 1
 
 wBackupHealthBarWidth: ; deeb
     ds 1
 
-    ds 4 ; Free
+wMaxNotExclMoveSlotId: ; deec
+    ds 1
+
+    ds 3 ; Free
 
 ; ────────────────────────────────────────────────────
 
