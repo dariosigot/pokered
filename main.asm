@@ -31532,11 +31532,7 @@ TryUseAnotherRepel:
     call GetItemName ; get the item name into de register
     call CopyStringToCF4B ; copy name from de to wcf4b so it shows up in text
     pop af
-    cp 10
     ld hl,.TryUseAnotherRepelText
-    jr nc,.done
-    ld hl,.TryUseAnotherRepelText_LessThan10
-.done
     call PrintText
     call YesNoChoice ; yes/no textbox
     ld a,[$CC26] ; yes/no answer (Y=0,N=1)
@@ -31552,9 +31548,6 @@ TryUseAnotherRepel:
     db "@"
 .TryUseAnotherRepelText
     TX_FAR _TryUseAnotherRepelText
-    db "@"
-.TryUseAnotherRepelText_LessThan10
-    TX_FAR _TryUseAnotherRepelText_LessThan10
     db "@"
 
 SECTION "bank5",ROMX,BANK[$5]
@@ -131927,20 +131920,7 @@ _TryUseAnotherRepelText:
     TX_RAM $cf4b
     text_init , " (",$F1
     text_paus
-    TX_NUM wTmpRepelQty,1,2
-    text_init , ")?"
-    text_done
-
-_TryUseAnotherRepelText_LessThan10:
-    text_init , "REPEL's effect"
-    text_line , "wore off."
-    text_para , "Use another"
-    text_line
-    text_paus
-    TX_RAM $cf4b
-    text_init , " (",$F1," "
-    text_paus
-    TX_NUM wTmpRepelQty,1,2
+    TX_NUM wTmpRepelQty,1,3
     text_init , ")?"
     text_done
 
