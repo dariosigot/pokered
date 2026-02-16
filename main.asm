@@ -10972,6 +10972,40 @@ PrintSafariZoneBattleText:
     TX_FAR SafariZoneAngryText
     db "@"
 
+CheckWalkingSpriteTilePassable:
+    push bc
+    push de
+    ld a,[$c109] ; Backup
+    push af      ; ...
+    call getTileSpriteStandsOn
+    ld de,wBackupNearPlayerTiles
+    call BackupNearPlayerTiles
+    call .SwapPlayerSpriteFacingDirection
+    ld d,%00010000 ; Try Walking Sprite
+    call CheckExceptionTilePassable
+    push af
+    ld de,wBackupNearPlayerTiles
+    FuncCoord 8,9 ; tile the player is on
+    ld hl,Coord
+    call BackupNearPlayerTiles
+    pop af
+    pop bc       ; Restore
+    ld a,b       ; ...
+    ld [$c109],a ; ...
+    pop de
+    pop bc
+    ret
+.SwapPlayerSpriteFacingDirection
+    ld h,$c1
+    ld a,[H_CURRENTSPRITEOFFSET]
+    add $9
+    ld l,a
+    ld a,[hl] ; c1x9 (update facing direction)
+    ld [$c109],a
+    ret
+
+; Free
+
 SECTION "CopyFixedLengthText",ROMX[$42b1],BANK[$1]
 
 ; copy text of fixed length $b (like player name,rival name,mon names,...)
@@ -12657,16 +12691,20 @@ CanWalkOntoTile: ; 516e (1:516e)
     and a
     ret
 .canMove
-    ld a,[W_TILESETCOLLISIONPTR]
-    ld l,a
-    ld a,[W_TILESETCOLLISIONPTR+1]
-    ld h,a
-.tilePassableLoop
-    ld a,[hli]
-    cp $ff
-    jr z,.impassable
-    cp c
-    jr nz,.tilePassableLoop
+;    ld a,[W_TILESETCOLLISIONPTR]
+;    ld l,a
+;    ld a,[W_TILESETCOLLISIONPTR+1]
+;    ld h,a
+;.tilePassableLoop
+;    ld a,[hli]
+;    cp $ff
+;    jr z,.impassable
+;    cp c
+;    jr nz,.tilePassableLoop
+
+    call CheckWalkingSpriteTilePassable
+    jr c,.impassable
+
     ld h,$c2
     ld a,[H_CURRENTSPRITEOFFSET]
     add $6
@@ -12752,6 +12790,8 @@ CanWalkOntoTile: ; 516e (1:516e)
     ld [hl],a         ; c2x8: set next movement delay to a random value in [0,$7f] (again with delay $100 if value is 0)
     scf                ; set carry (marking failure to walk)
     ret
+
+SECTION "getTileSpriteStandsOn",ROMX[$5207],BANK[1]
 
 ; calculates the tile pointer pointing to the tile the current sprite stancs on
 ; this is always the lower left tile of the 2x2 tile blocks all sprites are snapped to
@@ -13832,11 +13872,11 @@ Func_5a5f: ; 5a5f (1:5a5f)
     ld [$d52e],a
     ld a,$1b
     ld [$d52b],a
-    ld hl,$17d1
+    ld hl,Tset15_Coll
     ld a,h
-    ld [$d531],a
+    ld [W_TILESETCOLLISIONPTR+1],a
     ld a,l
-    ld [$d530],a
+    ld [W_TILESETCOLLISIONPTR],a
     xor a
     ld [W_GRASSRATE],a ; $d887
     inc a
@@ -23651,7 +23691,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     jr c,.cannotStopSurfing
-    ld hl,$d530 ; pointer to list of passable tiles
+    ld hl,W_TILESETCOLLISIONPTR ; pointer to list of passable tiles
     ld a,[hli]
     ld h,[hl]
     ld l,a ; hl now points to passable tiles
@@ -36572,15 +36612,19 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     ld a,$FF
     ld [wCollisionRule],a
 
-; get the tile in front of the player (or boulder)
+; get the tile in front of the player (or boulder/walking sprite)
     call GetDirectionOffset
     call GetTileOffset
     ld [$cfc6],a
 
     ; Check just Jumping
+    ld a,[wCollisionFlag]
+    bit 4,a ; Try Walking Sprite
+    jr nz,.SkipCheckJump
     ld a,[$d736]
     bit 6,a
     jp nz,.end
+.SkipCheckJump
 
     ; Collision Rule
     ld hl,CollissionRule
@@ -36601,7 +36645,7 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     cp $FF
     jr nz,.continue
     pop af ; delete useless stack
-    jr .end
+    jp .end
 .continue
     cp d
     jr nz,.loop
@@ -36641,6 +36685,19 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     ld [$cfc6],a ; Next Tile Simulation
     jr .end
 .noBoulder
+
+    ; Check Try Walking Sprite
+    ld a,[wCollisionFlag]
+    bit 4,a ; Try Walking Sprite
+    jr z,.noWalkingSprite
+    inc hl
+    ld a,[hld]
+    bit 5,a ; EX_WALING_SPRITE
+    jr z,.noWalkingSprite
+    ld a,$FF
+    ld [$cfc6],a ; Next Tile Simulation
+    jr .end
+.noWalkingSprite
 
     ; Check Float
     ld a,[$d700]
@@ -36708,7 +36765,7 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
 
 CheckTilePassable:
     push hl
-    ld hl,$d530 ; pointer to list of passable tiles
+    ld hl,W_TILESETCOLLISIONPTR ; pointer to list of passable tiles
     ld a,[hli]
     ld h,[hl]
     ld l,a ; hl now points to passable tiles
@@ -36834,6 +36891,8 @@ GetTilesetTile:
     db $03,TILE_WALKING  , TILE_03_WALKING
     db $04,TILE_STRS_DW  , TILE_04_STRS_DW
     db $FF
+
+
 
 DoorTileIDPointers: ; Move to Bank's End
     db $00
@@ -36999,14 +37058,14 @@ CollissionRule:
     db D_DOWN  , Tile_T , TILE_UPP_RGT   , $FF            , 0          , EX_B | EX_NOBIKE     , 0 , 0 ; $1A
 
 ; GO OUT
-    db D_DOWN  , Tile_A , TILE_J_DOWN    , 0              , COLL_DOWN  , 0                    , 0 , 0 ; $1B
-    db D_DOWN  , Tile_A , TILE_BTM_LFT   , 0              , COLL_DOWN  , 0                    , 0 , 0 ; $1C
-    db D_LEFT  , Tile_A , TILE_J_LEFT    , 0              , COLL_LEFT  , 0                    , 0 , 0 ; $1D
-    db D_LEFT  , Tile_A , TILE_BTM_LFT   , 0              , COLL_LEFT  , 0                    , 0 , 0 ; $1E
-    db D_RIGHT , Tile_D , TILE_J_RIGHT   , 0              , COLL_RIGHT , 0                    , 0 , 0 ; $1F
-    db D_RIGHT , Tile_D , TILE_UPP_RGT   , 0              , COLL_RIGHT , 0                    , 0 , 0 ; $20
-    db D_UP    , Tile_D , TILE_J_UP      , 0              , COLL_UP    , 0                    , 0 , 0 ; $21
-    db D_UP    , Tile_D , TILE_UPP_RGT   , 0              , COLL_UP    , 0                    , 0 , 0 ; $22
+    db D_DOWN  , Tile_A , TILE_J_DOWN    , 0              , COLL_DOWN  , EX_WALING_SPRITE     , 0 , 0 ; $1B
+    db D_DOWN  , Tile_A , TILE_BTM_LFT   , 0              , COLL_DOWN  , EX_WALING_SPRITE     , 0 , 0 ; $1C
+    db D_LEFT  , Tile_A , TILE_J_LEFT    , 0              , COLL_LEFT  , EX_WALING_SPRITE     , 0 , 0 ; $1D
+    db D_LEFT  , Tile_A , TILE_BTM_LFT   , 0              , COLL_LEFT  , EX_WALING_SPRITE     , 0 , 0 ; $1E
+    db D_RIGHT , Tile_D , TILE_J_RIGHT   , 0              , COLL_RIGHT , EX_WALING_SPRITE     , 0 , 0 ; $1F
+    db D_RIGHT , Tile_D , TILE_UPP_RGT   , 0              , COLL_RIGHT , EX_WALING_SPRITE     , 0 , 0 ; $20
+    db D_UP    , Tile_D , TILE_J_UP      , 0              , COLL_UP    , EX_WALING_SPRITE     , 0 , 0 ; $21
+    db D_UP    , Tile_D , TILE_UPP_RGT   , 0              , COLL_UP    , EX_WALING_SPRITE     , 0 , 0 ; $22
 
 ; WALK NEAR JUMP BORDER
     db D_LEFT  , Tile_E , TILE_J_LEFT    , TILE_WALKING   , 0          , EX_FAIL              , 0 , 0 ; $23
