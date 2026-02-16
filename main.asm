@@ -20733,7 +20733,7 @@ HandleJoypadResetButtons: ; c03c (3:403c)
     jp z,SoftReset
     jp GetJoypadState
 
-MapSongBanks: ; c04d (3:404d)
+MapSongBanks:
     db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; PALLET_TOWN
     db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; VIRIDIAN_CITY
     db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; PEWTER_CITY
@@ -20982,9 +20982,17 @@ MapSongBanks: ; c04d (3:404d)
     db (Music_Gym             -$4000)/3 , BANK(Music_Gym)             ; Lorelei
     db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; Bruno
     db (Music_PokemonTower    -$4000)/3 , BANK(Music_PokemonTower)    ; Agatha
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
 
 ; see also MapHeaderPointers
-MapHeaderBanks: ; c23d (3:423d)
+MapHeaderBanks:
     db BANK(PalletTown_h) ; PALLET_TOWN
     db BANK(ViridianCity_h) ; VIRIDIAN_CITY
     db BANK(PewterCity_h) ; PEWTER_CITY
@@ -21233,59 +21241,18 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(Lorelei_h)
     db BANK(Bruno_h)
     db BANK(Agatha_h)
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
 
-Func_c335: ; c335 (3:4335)
-    ld a,$90
-    ld [$FF00+$b0],a
-    ld [rWY],a ; $FF00+$4a
-    xor a
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ld [$d13b],a
-    ld [W_LONEATTACKNO],a ; $d05c
-    ld [H_NEWLYPRESSEDBUTTONS],a
-    ld [H_NEWLYRELEASEDBUTTONS],a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld [$cd6a],a
-    ld [$d5a3],a
-    ld hl,$d73f
-    ld [hli],a
-    ld [hl],a
-    ld hl,wWhichTrade ; $cd3d
-    ld bc,$1e
-    call FillMemory
-    ret
+; Free
 
-Func_c35f: ; c35f (3:435f)
-    ld a,[$d3ae]
-    and a
-    ret z
-    ld c,a
-    ld hl,$d3af
-.asm_c368
-    ld a,[W_YCOORD] ; $d361
-    cp [hl]
-    jr nz,.asm_c383
-    inc hl
-    ld a,[W_XCOORD] ; $d362
-    cp [hl]
-    jr nz,.asm_c384
-    inc hl
-    ld a,[hli]
-    ld [$d42f],a
-    ld a,[hl]
-    ld [H_DOWNARROWBLINKCNT1],a ; $FF00+$8b
-    ld hl,$d736
-    set 2,[hl]
-    ret
-.asm_c383
-    inc hl
-.asm_c384
-    inc hl
-    inc hl
-    inc hl
-    dec c
-    jr nz,.asm_c368
-    ret
+SECTION "CheckForceBikeOrSurf",ROMX[$438b],BANK[$3]
 
 CheckForceBikeOrSurf: ; c38b (3:438b)
     ld hl,$D732
@@ -136459,6 +136426,33 @@ _BaitHealth:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+SECTION "bank34",ROMX,BANK[$34]
+
+_RouteD1BeforeBattleText1:
+    text_init , "Before"
+    text_line , "Battle Text 1."
+    text_done
+
+_RouteD1AfterBattleText1:
+    text_init , "After"
+    text_line , "Battle Text 1."
+    text_done
+
+_RouteD1EndBattleText1:
+    text_init , "End"
+    text_line , "Battle Text 1."
+    text_wait
+
+_RouteD1Text2:
+    text_init , "Text 2."
+    text_done
+
+_RouteD1Text3:
+    text_init , "Text 3."
+    text_done
+
+; ──────────────────────────────────────────────────────────────────────
+
 SECTION "bank35",ROMX,BANK[$35]
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -143044,6 +143038,68 @@ RunMapGraphicalScript:
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
+; Moved from BANK 3 because only "BANKSWITCH"
+; ──────────────────────────────────────────────────────────────────────
+
+; initialize some variables
+Func_c335:
+    ld a,$90
+    ld [$FF00+$b0],a
+    ld [rWY],a ; $FF00+$4a
+    xor a
+    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
+    ld [$d13b],a
+    ld [W_LONEATTACKNO],a ; $d05c
+    ld [H_NEWLYPRESSEDBUTTONS],a
+    ld [H_NEWLYRELEASEDBUTTONS],a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld [$cd6a],a
+    ld [$d5a3],a
+    ld hl,$d73f
+    ld [hli],a
+    ld [hl],a
+    ld hl,wWhichTrade ; $cd3d
+    ld bc,$1e
+    jp FillMemory
+
+; ──────────────────────────────────────────────────────────────────────
+; Moved from BANK 3 because only "BANKSWITCH"
+; ──────────────────────────────────────────────────────────────────────
+
+; function that appears to disable warp testing after collisions if the player is standing on a warp
+Func_c35f:
+    ld a,[$d3ae]
+    and a
+    ret z
+    ld c,a
+    ld hl,$d3af
+.asm_c368
+    ld a,[W_YCOORD] ; $d361
+    cp [hl]
+    jr nz,.asm_c383
+    inc hl
+    ld a,[W_XCOORD] ; $d362
+    cp [hl]
+    jr nz,.asm_c384
+    inc hl
+    ld a,[hli]
+    ld [$d42f],a
+    ld a,[hl]
+    ld [H_DOWNARROWBLINKCNT1],a ; $FF00+$8b
+    ld hl,$d736
+    set 2,[hl]
+    ret
+.asm_c383
+    inc hl
+.asm_c384
+    inc hl
+    inc hl
+    inc hl
+    dec c
+    jr nz,.asm_c368
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
 
 SECTION "Bank38",ROMX,BANK[$38]
 
@@ -147959,6 +148015,14 @@ MapHeaderPointers:
     dw Lorelei_h
     dw Bruno_h
     dw Agatha_h ;247
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $3C)
@@ -148156,15 +148220,22 @@ PortRoyalScript:
 ; ROUTE_D1
 ; ──────────────────────────────────────────────────────────────────────
 
+RouteD1Blocks:
+    INCBIN "maps/routed1.blk"
+
+; ──────────────────────
+
 RouteD1_h:
     db $00 ; tileset
     db ROUTE_D1_HEIGHT,ROUTE_D1_WIDTH ; dimensions (y,x)
-    dw RouteD1Blocks,RouteD1TextPointers,RouteD1Script ; blocks,texts,scripts
+    dw RouteD1Blocks,.RouteD1TextPointers,.RouteD1Script ; blocks,texts,scripts
     db WEST ; connections
     WEST_MAP_CONNECTION PORT_ROYAL,PORT_ROYAL_WIDTH,0,0,PORT_ROYAL_HEIGHT,PortRoyalBlocks,ROUTE_D1_WIDTH
-    dw RouteD1Object ; objects
+    dw .RouteD1Object ; objects
 
-RouteD1Object:
+; ──────────────────────
+
+.RouteD1Object
     db $f ; border tile
 
     db 3 ; warps
@@ -148173,68 +148244,75 @@ RouteD1Object:
     db 11,07,0,SWAP_MAP
 
     db 1 ; signs
-    db 05,01,2 ; CeladonCityText10
+    db 05,01,3
 
-    db 1 ; people
+    db 2 ; people
     db SPRITE_BLACK_HAIR_BOY_2,10 + 4,17 + 4,$ff,$d2,$41,POKEMANIAC,8 ; trainer
+    db SPRITE_SLOWBRO,05 + 4,13 + 4,$fe,$0,$2 ; person
 
     ; warp-to
     EVENT_DISP ROUTE_D1_WIDTH,15,34 ; TEST_MAP_1
     EVENT_DISP ROUTE_D1_WIDTH,11,06 ; SWAP_MAP
     EVENT_DISP ROUTE_D1_WIDTH,11,07 ; SWAP_MAP
 
-RouteD1Blocks:
-    INCBIN "maps/routed1.blk"
+; ──────────────────────
 
-RouteD1TextPointers:
-    dw RouteD1Text1
-    dw RouteD1Text2
+.RouteD1TextPointers
+    dw .RouteD1Text1
+    dw .RouteD1Text2
+    dw .RouteD1Text3
 
-RouteD1Text2:
+.RouteD1Text1
+    db $8 ; asm
+    ld hl,.RouteD1TrainerHeader1
+    call TalkToTrainer
+    jp TextScriptEnd
+
+.RouteD1Text2
     TX_FAR _RouteD1Text2
     db "@"
 
-_RouteD1Text2:
-    db $0,"A!",$57
-
-RouteD1Text2End:
-    TX_FAR _RouteD1Text2End
+.RouteD1Text3
+    TX_FAR _RouteD1Text3
     db "@"
 
-_RouteD1Text2End:
-    db $0,"A!",$58
-
-RouteD1Script:
-    call EnableAutoTextBoxDrawing
-    ld hl,RouteD1TrainerHeaders
-    ld de,RouteD1ScriptPointers
-    ld a,[W_ROUTED1CURSCRIPT]
-    call ExecuteCurMapScriptInTable
-    ld [W_ROUTED1CURSCRIPT],a
-    ret
-
-RouteD1ScriptPointers:
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
-
-RouteD1TrainerHeaders:
-RouteD1TrainerHeader0:
+.RouteD1TrainerHeaders
+.RouteD1TrainerHeader1
     db 1 ; flag's bit
-    db ($3 << 4) ; trainer's view range
+    db (3 << 4) ; trainer's view range
     dw wEventRouteD1Trainer0Bit1 ; flag's byte
-    dw RouteD1Text2 ; TextBeforeBattle
-    dw RouteD1Text2 ; TextAfterBattle
-    dw RouteD1Text2End ; TextEndBattle
-    dw RouteD1Text2End ; TextEndBattle
+    dw .RouteD1BeforeBattleText1 ; TextBeforeBattle
+    dw .RouteD1AfterBattleText1 ; TextAfterBattle
+    dw .RouteD1EndBattleText1 ; TextEndBattle
+    dw .RouteD1EndBattleText1 ; TextEndBattle
 
     db $ff
 
-RouteD1Text1:
-    db $8 ; asm
-    ld hl,RouteD1TrainerHeader0
-    call TalkToTrainer
-    jp TextScriptEnd
+.RouteD1BeforeBattleText1
+    TX_FAR _RouteD1BeforeBattleText1
+    db "@"
+.RouteD1AfterBattleText1
+    TX_FAR _RouteD1AfterBattleText1
+    db "@"
+.RouteD1EndBattleText1
+    TX_FAR _RouteD1EndBattleText1
+    db "@"
+
+; ──────────────────────
+
+.RouteD1Script
+    call EnableAutoTextBoxDrawing
+    ld hl,.RouteD1TrainerHeaders
+    ld de,.RouteD1ScriptPointers
+    ld a,[W_GENERICMAPCURSCRIPT]
+    call ExecuteCurMapScriptInTable
+    ld [W_GENERICMAPCURSCRIPT],a
+    ret
+
+.RouteD1ScriptPointers
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
 
 ; ──────────────────────────────────────────────────────────────────────
 ; PORT_ROYAL_POKECENTER
