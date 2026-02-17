@@ -278,6 +278,7 @@ RestoreChangedBlocks:
     ret
 
 LoadTileBlockMapAndRedrawMapView:
+    BANKSWITCH RunMapGraphicalScript
     call LoadTileBlockMap
     ret z ; If No Tile to Restore
     PREDEF_JUMP RedrawMapView
@@ -492,12 +493,12 @@ UpdatePokedex:
 BackupHeader:
     ld hl,W_MONHEADER
     ld de,GenericBuffer+1
-    ld bc,28
-    jp CopyData
+    jr HeaderCommon
 
 RestoreHeader:
     ld hl,GenericBuffer+1
     ld de,W_MONHEADER
+HeaderCommon:
     ld bc,28
     jp CopyData
 
@@ -26134,14 +26135,6 @@ TryToRedrawMapView:
     ; ft
 
 RedrawMapView:
-    ld hl,wDisableGoPalSetBit3
-    set 3,[hl]
-    call .RedrawMapView
-    ld hl,wDisableGoPalSetBit3
-    res 3,[hl]
-    ret
-
-.RedrawMapView
     ld a,[W_ISINBATTLE] ; $d057
     inc a
     ret z
@@ -26153,9 +26146,6 @@ RedrawMapView:
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld [$FF00+$d7],a ; TileAnimations
     call LoadCurrentMapView
-    ld hl,wDisableGoPalSetBit3
-    bit 3,[hl]
-    call z,GoPAL_SET_CF1C
     ld hl,$d526 ; MapViewVRAMPointer
     ld a,[hli]
     ld h,[hl]
@@ -82934,7 +82924,6 @@ Route19Text11: ; 55ee6 (15:5ee6)
     db "@"
 
 Route21Script: ; 55eeb (15:5eeb)
-    call Route21ScriptBarrier
     call EnableAutoTextBoxDrawing
     ld hl,Route21TrainerHeaders
     ld de,Route21ScriptPointers
@@ -82943,7 +82932,10 @@ Route21Script: ; 55eeb (15:5eeb)
     ld [W_ROUTE21CURSCRIPT],a
     ret
 
-SECTION "Route21TextPointers",ROMX[$5f04],BANK[$15]
+Route21ScriptPointers: ; 55efe (15:5efe)
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw Route21Script2
 
 Route21TextPointers: ; 55f04 (15:5f04)
     dw Route21Text1
@@ -84756,31 +84748,20 @@ CeladonMart2Text2_AfterWinHoF:
 
 ; ────────────────────────
 
-Route21ScriptPointers:
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw Route21Script2
-
 ROUTE21_BARRIER_BLOCK EQU $6B
 
-Route21ScriptBarrier:
-    ld hl,$d126
-    bit 6,[hl]
-    res 6,[hl]
+Route21GraphicalScript:
+    ld a,[wChangedBlocksMapId]
+    cp ROUTE_21
     ret z
-    ld a,[$c78c]
-    cp ROUTE21_BARRIER_BLOCK
-    ret z ; Don't block if just blocked
     call .CheckCinnabarVisited
     ret nz ; Don't block if visited
     ld hl,.ChangedBlocks
-    ld de,wChangedBlocksNum
+    ld de,wChangedBlocksMapId
     ld bc,.ChangedBlocksEnd-.ChangedBlocks
-    call CopyData
-    call RestoreChangedBlocks
-    PREDEF_JUMP RedrawMapView
+    jp CopyData
 .CheckCinnabarVisited
-    call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG
+    ld hl,W_TOWNVISITEDFLAG
     ld c,CINNABAR_ISLAND ; bit n
     ld b,2 ; read bit
     PREDEF HandleBitArray
@@ -84788,6 +84769,7 @@ Route21ScriptBarrier:
     and a
     ret
 .ChangedBlocks
+    db ROUTE_21
     db 6
     dw $8CC7
     db ROUTE21_BARRIER_BLOCK
@@ -105097,10 +105079,12 @@ UnknownDungeon1_h: ; 0x74d00 to 0x74d0c (12 bytes) (id=228)
     dw UnknownDungeon1Object ; objects
 
 UnknownDungeon1Script: ; 74d0c (1d:4d0c)
-    call TryToRemoveUnknownDungeonWaterBlocks
     jp EnableAutoTextBoxDrawing
 
-SECTION "UnknownDungeon1Object",ROMX[$4d15],BANK[$1d]
+UnknownDungeon1TextPointers: ; 74d0f (1d:4d0f)
+    dw PickupItemText
+    dw PickupItemText
+    dw PickupItemText
 
 UnknownDungeon1Object: ; 0x74d15 (size=97)
     db $7d ; border tile
@@ -108721,29 +108705,19 @@ CreditsMons_HandleAlternative:
 
 ; ───────────────────────────────────────
 
-UnknownDungeon1TextPointers:
-    dw PickupItemText
-    dw PickupItemText
-    dw PickupItemText
-
-TryToRemoveUnknownDungeonWaterBlocks:
-    ld hl,$d126
-    bit 6,[hl]
-    res 6,[hl]
+UnknownDungeon1GraphicalScript:
+    ld a,[wChangedBlocksMapId]
+    cp UNKNOWN_DUNGEON_1
     ret z
-    ld a,[$C760]
-    cp $76
-    ret z ; Don't Remove block if just removed
     ld hl,$d85f ; Check Mewtwo
     bit 1,[hl]  ; ...
     ret z
     ld hl,.ChangedBlocks
-    ld de,wChangedBlocksNum
+    ld de,wChangedBlocksMapId
     ld bc,.ChangedBlocksEnd-.ChangedBlocks
-    call CopyData
-    call RestoreChangedBlocks
-    PREDEF_JUMP RedrawMapView
+    jp CopyData
 .ChangedBlocks
+    db UNKNOWN_DUNGEON_1
     db 2
     dw $60C7
     db $76
@@ -143045,6 +143019,8 @@ RunMapGraphicalScript:
     jr .next
 .Table
     GRAPHICAL_SCRIPT KANTO,SS_ANNE_4,SSAnne4GraphicalScript
+    GRAPHICAL_SCRIPT KANTO,UNKNOWN_DUNGEON_1,UnknownDungeon1GraphicalScript
+    GRAPHICAL_SCRIPT KANTO,ROUTE_21,Route21GraphicalScript
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
