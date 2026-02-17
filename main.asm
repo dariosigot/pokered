@@ -26134,6 +26134,14 @@ TryToRedrawMapView:
     ; ft
 
 RedrawMapView:
+    ld hl,wDisableGoPalSetBit3
+    set 3,[hl]
+    call .RedrawMapView
+    ld hl,wDisableGoPalSetBit3
+    res 3,[hl]
+    ret
+
+.RedrawMapView
     ld a,[W_ISINBATTLE] ; $d057
     inc a
     ret z
@@ -26145,7 +26153,9 @@ RedrawMapView:
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld [$FF00+$d7],a ; TileAnimations
     call LoadCurrentMapView
-    call GoPAL_SET_CF1C
+    ld hl,wDisableGoPalSetBit3
+    bit 3,[hl]
+    call z,GoPAL_SET_CF1C
     ld hl,$d526 ; MapViewVRAMPointer
     ld a,[hli]
     ld h,[hl]
@@ -26160,7 +26170,7 @@ RedrawMapView:
     ld a,h
     ld [$ceea],a ; wBuffer + 1
     ld a,$2
-    ld [$FF00+$be],a ; RedrawMapViewRowOffset
+    ld [$FF00+$be],a ; RowOffset
     ld c,$9 ; SCREEN_HEIGHT / 2 ; number of rows of 2x2 tiles (this covers the whole screen)
 .redrawRowLoop
     push bc
@@ -26168,7 +26178,7 @@ RedrawMapView:
     push hl
     ld hl,$c378 ; wTileMap - 2 * SCREEN_WIDTH
     ld de,$14 ; SCREEN_WIDTH
-    ld a,[$FF00+$be] ; RedrawMapViewRowOffset
+    ld a,[$FF00+$be] ; RowOffset
 .calcWRAMAddrLoop
     add hl,de
     dec a
@@ -26176,7 +26186,7 @@ RedrawMapView:
     call ScheduleRowRedrawHelper
     pop hl
     ld de,$20 ; BG_MAP_WIDTH
-    ld a,[$FF00+$be] ; RedrawMapViewRowOffset
+    ld a,[$FF00+$be] ; RowOffset
     ld c,a
 .calcVRAMAddrLoop
     add hl,de
@@ -26191,7 +26201,7 @@ RedrawMapView:
     ld a,$2 ; REDRAW_ROW
     ld [H_SCREENEDGEREDRAW],a ; RedrawRowOrColumnMode
     call DelayFrame
-    ld hl,$ffbe ; RedrawMapViewRowOffset
+    ld hl,$ffbe ; RowOffset
     inc [hl]
     inc [hl]
     pop hl

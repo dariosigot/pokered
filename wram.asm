@@ -1895,6 +1895,7 @@ wFlagShinyBit2             ; dee2 ; bit 2
 wFlagFlyingMonSpriteBit2   ; dee2 ; bit 2 = Force to Load Mon Sprite with $0880 offset
 wOverworldPressABit2       ; dee2 ; bit 2 = Press A in Overworld (talk with invisible sprite in Unknown Dungeon Gengar)
 wFlagBaloonSpriteBit3      ; dee2 ; bit 3 = Enable Baloon Sprite durint Trade
+wDisableGoPalSetBit3       ; dee2 ; bit 3 = Disable "GoPAL_SET_CF1C" during "RedrawMapView"
 wTestEvoDuringBattleBit3   ; dee2 ; bit 3 = Enable to Test at least one evolution during battle
 wOverworldGoToDarkBit4     ; dee2 ; bit 4 = Force Overworld "CheckDarkMap"
 wFlagBackSpritePlayerBit4  ; dee2 ; bit 4
