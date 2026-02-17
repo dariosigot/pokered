@@ -278,6 +278,7 @@ RestoreChangedBlocks:
     ret
 
 LoadTileBlockMapAndRedrawMapView:
+    BANKSWITCH RunMapGraphicalScript
     call LoadTileBlockMap
     ret z ; If No Tile to Restore
     PREDEF_JUMP RedrawMapView
@@ -492,12 +493,12 @@ UpdatePokedex:
 BackupHeader:
     ld hl,W_MONHEADER
     ld de,GenericBuffer+1
-    ld bc,28
-    jp CopyData
+    jr HeaderCommon
 
 RestoreHeader:
     ld hl,GenericBuffer+1
     ld de,W_MONHEADER
+HeaderCommon:
     ld bc,28
     jp CopyData
 
@@ -10972,6 +10973,40 @@ PrintSafariZoneBattleText:
     TX_FAR SafariZoneAngryText
     db "@"
 
+CheckWalkingSpriteTilePassable:
+    push bc
+    push de
+    ld a,[$c109] ; Backup
+    push af      ; ...
+    call getTileSpriteStandsOn
+    ld de,wBackupNearPlayerTiles
+    call BackupNearPlayerTiles
+    call .SwapPlayerSpriteFacingDirection
+    ld d,%00010000 ; Try Walking Sprite
+    call CheckExceptionTilePassable
+    push af
+    ld de,wBackupNearPlayerTiles
+    FuncCoord 8,9 ; tile the player is on
+    ld hl,Coord
+    call BackupNearPlayerTiles
+    pop af
+    pop bc       ; Restore
+    ld a,b       ; ...
+    ld [$c109],a ; ...
+    pop de
+    pop bc
+    ret
+.SwapPlayerSpriteFacingDirection
+    ld h,$c1
+    ld a,[H_CURRENTSPRITEOFFSET]
+    add $9
+    ld l,a
+    ld a,[hl] ; c1x9 (update facing direction)
+    ld [$c109],a
+    ret
+
+; Free
+
 SECTION "CopyFixedLengthText",ROMX[$42b1],BANK[$1]
 
 ; copy text of fixed length $b (like player name,rival name,mon names,...)
@@ -12657,16 +12692,20 @@ CanWalkOntoTile: ; 516e (1:516e)
     and a
     ret
 .canMove
-    ld a,[W_TILESETCOLLISIONPTR]
-    ld l,a
-    ld a,[W_TILESETCOLLISIONPTR+1]
-    ld h,a
-.tilePassableLoop
-    ld a,[hli]
-    cp $ff
-    jr z,.impassable
-    cp c
-    jr nz,.tilePassableLoop
+;    ld a,[W_TILESETCOLLISIONPTR]
+;    ld l,a
+;    ld a,[W_TILESETCOLLISIONPTR+1]
+;    ld h,a
+;.tilePassableLoop
+;    ld a,[hli]
+;    cp $ff
+;    jr z,.impassable
+;    cp c
+;    jr nz,.tilePassableLoop
+
+    call CheckWalkingSpriteTilePassable
+    jr c,.impassable
+
     ld h,$c2
     ld a,[H_CURRENTSPRITEOFFSET]
     add $6
@@ -12752,6 +12791,8 @@ CanWalkOntoTile: ; 516e (1:516e)
     ld [hl],a         ; c2x8: set next movement delay to a random value in [0,$7f] (again with delay $100 if value is 0)
     scf                ; set carry (marking failure to walk)
     ret
+
+SECTION "getTileSpriteStandsOn",ROMX[$5207],BANK[1]
 
 ; calculates the tile pointer pointing to the tile the current sprite stancs on
 ; this is always the lower left tile of the 2x2 tile blocks all sprites are snapped to
@@ -13832,11 +13873,11 @@ Func_5a5f: ; 5a5f (1:5a5f)
     ld [$d52e],a
     ld a,$1b
     ld [$d52b],a
-    ld hl,$17d1
+    ld hl,Tset15_Coll
     ld a,h
-    ld [$d531],a
+    ld [W_TILESETCOLLISIONPTR+1],a
     ld a,l
-    ld [$d530],a
+    ld [W_TILESETCOLLISIONPTR],a
     xor a
     ld [W_GRASSRATE],a ; $d887
     inc a
@@ -20693,7 +20734,7 @@ HandleJoypadResetButtons: ; c03c (3:403c)
     jp z,SoftReset
     jp GetJoypadState
 
-MapSongBanks: ; c04d (3:404d)
+MapSongBanks:
     db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; PALLET_TOWN
     db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; VIRIDIAN_CITY
     db (Music_Cities1         -$4000)/3 , BANK(Music_Cities1)         ; PEWTER_CITY
@@ -20942,9 +20983,17 @@ MapSongBanks: ; c04d (3:404d)
     db (Music_Gym             -$4000)/3 , BANK(Music_Gym)             ; Lorelei
     db (Music_Dungeon1        -$4000)/3 , BANK(Music_Dungeon1)        ; Bruno
     db (Music_PokemonTower    -$4000)/3 , BANK(Music_PokemonTower)    ; Agatha
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
+    db (Music_PalletTown      -$4000)/3 , BANK(Music_PalletTown)      ; unused
 
 ; see also MapHeaderPointers
-MapHeaderBanks: ; c23d (3:423d)
+MapHeaderBanks:
     db BANK(PalletTown_h) ; PALLET_TOWN
     db BANK(ViridianCity_h) ; VIRIDIAN_CITY
     db BANK(PewterCity_h) ; PEWTER_CITY
@@ -21193,59 +21242,18 @@ MapHeaderBanks: ; c23d (3:423d)
     db BANK(Lorelei_h)
     db BANK(Bruno_h)
     db BANK(Agatha_h)
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
+    db BANK(PortRoyal_h) ; devmap
 
-Func_c335: ; c335 (3:4335)
-    ld a,$90
-    ld [$FF00+$b0],a
-    ld [rWY],a ; $FF00+$4a
-    xor a
-    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
-    ld [$d13b],a
-    ld [W_LONEATTACKNO],a ; $d05c
-    ld [H_NEWLYPRESSEDBUTTONS],a
-    ld [H_NEWLYRELEASEDBUTTONS],a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld [$cd6a],a
-    ld [$d5a3],a
-    ld hl,$d73f
-    ld [hli],a
-    ld [hl],a
-    ld hl,wWhichTrade ; $cd3d
-    ld bc,$1e
-    call FillMemory
-    ret
+; Free
 
-Func_c35f: ; c35f (3:435f)
-    ld a,[$d3ae]
-    and a
-    ret z
-    ld c,a
-    ld hl,$d3af
-.asm_c368
-    ld a,[W_YCOORD] ; $d361
-    cp [hl]
-    jr nz,.asm_c383
-    inc hl
-    ld a,[W_XCOORD] ; $d362
-    cp [hl]
-    jr nz,.asm_c384
-    inc hl
-    ld a,[hli]
-    ld [$d42f],a
-    ld a,[hl]
-    ld [H_DOWNARROWBLINKCNT1],a ; $FF00+$8b
-    ld hl,$d736
-    set 2,[hl]
-    ret
-.asm_c383
-    inc hl
-.asm_c384
-    inc hl
-    inc hl
-    inc hl
-    dec c
-    jr nz,.asm_c368
-    ret
+SECTION "CheckForceBikeOrSurf",ROMX[$438b],BANK[$3]
 
 CheckForceBikeOrSurf: ; c38b (3:438b)
     ld hl,$D732
@@ -23651,7 +23659,7 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld d,%00000100 ; CanSurfing
     call CheckExceptionTilePassable
     jr c,.cannotStopSurfing
-    ld hl,$d530 ; pointer to list of passable tiles
+    ld hl,W_TILESETCOLLISIONPTR ; pointer to list of passable tiles
     ld a,[hli]
     ld h,[hl]
     ld l,a ; hl now points to passable tiles
@@ -24457,6 +24465,8 @@ ThrewRockText:
 ItemUseAuger:
     call CanDig
     jp nc,ItemUseFailed
+    call CheckDiglettsCaveHole
+    ret c
     ld hl,$d732
     set 3,[hl]
     set 6,[hl]
@@ -24739,8 +24749,8 @@ ItemUsePokeflute: ; e140 (3:6140)
     ret nz
     call ArePlayerNearAerodactyl
     ret nc
-    ld hl,wDigCaveAerodactylTrigBit0
-    set 0,[hl] ; trigger Aerodactyl fight (handled by map script)
+    ld a,4 ; DiglettsCaveBeforeAerodactyl
+    ld [W_GENERICMAPCURSCRIPT],a ; trigger Aerodactyl fight
     ret
 
 .PrintFluteResult
@@ -26138,7 +26148,6 @@ RedrawMapView:
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld [$FF00+$d7],a ; TileAnimations
     call LoadCurrentMapView
-    call GoPAL_SET_CF1C
     ld hl,$d526 ; MapViewVRAMPointer
     ld a,[hli]
     ld h,[hl]
@@ -26153,7 +26162,7 @@ RedrawMapView:
     ld a,h
     ld [$ceea],a ; wBuffer + 1
     ld a,$2
-    ld [$FF00+$be],a ; RedrawMapViewRowOffset
+    ld [$FF00+$be],a ; RowOffset
     ld c,$9 ; SCREEN_HEIGHT / 2 ; number of rows of 2x2 tiles (this covers the whole screen)
 .redrawRowLoop
     push bc
@@ -26161,7 +26170,7 @@ RedrawMapView:
     push hl
     ld hl,$c378 ; wTileMap - 2 * SCREEN_WIDTH
     ld de,$14 ; SCREEN_WIDTH
-    ld a,[$FF00+$be] ; RedrawMapViewRowOffset
+    ld a,[$FF00+$be] ; RowOffset
 .calcWRAMAddrLoop
     add hl,de
     dec a
@@ -26169,7 +26178,7 @@ RedrawMapView:
     call ScheduleRowRedrawHelper
     pop hl
     ld de,$20 ; BG_MAP_WIDTH
-    ld a,[$FF00+$be] ; RedrawMapViewRowOffset
+    ld a,[$FF00+$be] ; RowOffset
     ld c,a
 .calcVRAMAddrLoop
     add hl,de
@@ -26184,7 +26193,7 @@ RedrawMapView:
     ld a,$2 ; REDRAW_ROW
     ld [H_SCREENEDGEREDRAW],a ; RedrawRowOrColumnMode
     call DelayFrame
-    ld hl,$ffbe ; RedrawMapViewRowOffset
+    ld hl,$ffbe ; RowOffset
     inc [hl]
     inc [hl]
     pop hl
@@ -28427,15 +28436,14 @@ CheckDiglettsCaveHole:
     ld hl,.coordsData
     call ArePlayerCoordsInArray
     jr nc,.NotEvent
-.Event
-    pop hl ; remove return pointer
-    ld a,1
-    ld [W_DIGLETTSCAVECURSCRIPT],a
+;Event
+    ld a,1 ; DiglettsCaveHole
+    ld [W_GENERICMAPCURSCRIPT],a
     ld [$cd6a],a ; item used
+    scf
     ret
 .NotEvent
-    call GetCurrentOldAdventureMap
-    cp DIGLETTS_CAVE
+    and a ; rcf
     ret
 .coordsData
     db 18,13
@@ -31532,11 +31540,7 @@ TryUseAnotherRepel:
     call GetItemName ; get the item name into de register
     call CopyStringToCF4B ; copy name from de to wcf4b so it shows up in text
     pop af
-    cp 10
     ld hl,.TryUseAnotherRepelText
-    jr nc,.done
-    ld hl,.TryUseAnotherRepelText_LessThan10
-.done
     call PrintText
     call YesNoChoice ; yes/no textbox
     ld a,[$CC26] ; yes/no answer (Y=0,N=1)
@@ -31552,9 +31556,6 @@ TryUseAnotherRepel:
     db "@"
 .TryUseAnotherRepelText
     TX_FAR _TryUseAnotherRepelText
-    db "@"
-.TryUseAnotherRepelText_LessThan10
-    TX_FAR _TryUseAnotherRepelText_LessThan10
     db "@"
 
 SECTION "bank5",ROMX,BANK[$5]
@@ -33352,8 +33353,6 @@ PalletTownScript: ; 18e5b (6:4e5b)
     ld hl,$D747
     set 6,[hl]
 .next
-    ld hl,$d126
-    set 6,[hl] ; Set Temp Script Flag to potentially Lock Cinnabar from Pallet
     call EnableAutoTextBoxDrawing
     ld hl,PalletTownScriptPointers
     ld a,[W_PALLETTOWNCURSCRIPT]
@@ -36579,15 +36578,19 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     ld a,$FF
     ld [wCollisionRule],a
 
-; get the tile in front of the player (or boulder)
+; get the tile in front of the player (or boulder/walking sprite)
     call GetDirectionOffset
     call GetTileOffset
     ld [$cfc6],a
 
     ; Check just Jumping
+    ld a,[wCollisionFlag]
+    bit 4,a ; Try Walking Sprite
+    jr nz,.SkipCheckJump
     ld a,[$d736]
     bit 6,a
     jp nz,.end
+.SkipCheckJump
 
     ; Collision Rule
     ld hl,CollissionRule
@@ -36608,7 +36611,7 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     cp $FF
     jr nz,.continue
     pop af ; delete useless stack
-    jr .end
+    jp .end
 .continue
     cp d
     jr nz,.loop
@@ -36648,6 +36651,19 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
     ld [$cfc6],a ; Next Tile Simulation
     jr .end
 .noBoulder
+
+    ; Check Try Walking Sprite
+    ld a,[wCollisionFlag]
+    bit 4,a ; Try Walking Sprite
+    jr z,.noWalkingSprite
+    inc hl
+    ld a,[hld]
+    bit 5,a ; EX_WALING_SPRITE
+    jr z,.noWalkingSprite
+    ld a,$FF
+    ld [$cfc6],a ; Next Tile Simulation
+    jr .end
+.noWalkingSprite
 
     ; Check Float
     ld a,[$d700]
@@ -36715,7 +36731,7 @@ _CheckExceptionTilePassable: ; 1a672 (6:6672)
 
 CheckTilePassable:
     push hl
-    ld hl,$d530 ; pointer to list of passable tiles
+    ld hl,W_TILESETCOLLISIONPTR ; pointer to list of passable tiles
     ld a,[hli]
     ld h,[hl]
     ld l,a ; hl now points to passable tiles
@@ -36841,6 +36857,8 @@ GetTilesetTile:
     db $03,TILE_WALKING  , TILE_03_WALKING
     db $04,TILE_STRS_DW  , TILE_04_STRS_DW
     db $FF
+
+
 
 DoorTileIDPointers: ; Move to Bank's End
     db $00
@@ -37006,14 +37024,14 @@ CollissionRule:
     db D_DOWN  , Tile_T , TILE_UPP_RGT   , $FF            , 0          , EX_B | EX_NOBIKE     , 0 , 0 ; $1A
 
 ; GO OUT
-    db D_DOWN  , Tile_A , TILE_J_DOWN    , 0              , COLL_DOWN  , 0                    , 0 , 0 ; $1B
-    db D_DOWN  , Tile_A , TILE_BTM_LFT   , 0              , COLL_DOWN  , 0                    , 0 , 0 ; $1C
-    db D_LEFT  , Tile_A , TILE_J_LEFT    , 0              , COLL_LEFT  , 0                    , 0 , 0 ; $1D
-    db D_LEFT  , Tile_A , TILE_BTM_LFT   , 0              , COLL_LEFT  , 0                    , 0 , 0 ; $1E
-    db D_RIGHT , Tile_D , TILE_J_RIGHT   , 0              , COLL_RIGHT , 0                    , 0 , 0 ; $1F
-    db D_RIGHT , Tile_D , TILE_UPP_RGT   , 0              , COLL_RIGHT , 0                    , 0 , 0 ; $20
-    db D_UP    , Tile_D , TILE_J_UP      , 0              , COLL_UP    , 0                    , 0 , 0 ; $21
-    db D_UP    , Tile_D , TILE_UPP_RGT   , 0              , COLL_UP    , 0                    , 0 , 0 ; $22
+    db D_DOWN  , Tile_A , TILE_J_DOWN    , 0              , COLL_DOWN  , EX_WALING_SPRITE     , 0 , 0 ; $1B
+    db D_DOWN  , Tile_A , TILE_BTM_LFT   , 0              , COLL_DOWN  , EX_WALING_SPRITE     , 0 , 0 ; $1C
+    db D_LEFT  , Tile_A , TILE_J_LEFT    , 0              , COLL_LEFT  , EX_WALING_SPRITE     , 0 , 0 ; $1D
+    db D_LEFT  , Tile_A , TILE_BTM_LFT   , 0              , COLL_LEFT  , EX_WALING_SPRITE     , 0 , 0 ; $1E
+    db D_RIGHT , Tile_D , TILE_J_RIGHT   , 0              , COLL_RIGHT , EX_WALING_SPRITE     , 0 , 0 ; $1F
+    db D_RIGHT , Tile_D , TILE_UPP_RGT   , 0              , COLL_RIGHT , EX_WALING_SPRITE     , 0 , 0 ; $20
+    db D_UP    , Tile_D , TILE_J_UP      , 0              , COLL_UP    , EX_WALING_SPRITE     , 0 , 0 ; $21
+    db D_UP    , Tile_D , TILE_UPP_RGT   , 0              , COLL_UP    , EX_WALING_SPRITE     , 0 , 0 ; $22
 
 ; WALK NEAR JUMP BORDER
     db D_LEFT  , Tile_E , TILE_J_LEFT    , TILE_WALKING   , 0          , EX_FAIL              , 0 , 0 ; $23
@@ -55120,9 +55138,13 @@ PrintMenuItem:
     ld [$cd6d],a
 
     ; Print Move Details Box
+    ld hl,wMoveDetBoxActualMonBit5
+    set 5,[hl]
     FuncCoord 00,07
     ld de,Coord
     PREDEF PrintMoveDetailsBox
+    ld hl,wMoveDetBoxActualMonBit5
+    res 5,[hl]
 
 .asm_3d54e
     ld a,$1
@@ -82905,7 +82927,6 @@ Route19Text11: ; 55ee6 (15:5ee6)
     db "@"
 
 Route21Script: ; 55eeb (15:5eeb)
-    call Route21ScriptBarrier
     call EnableAutoTextBoxDrawing
     ld hl,Route21TrainerHeaders
     ld de,Route21ScriptPointers
@@ -82914,7 +82935,10 @@ Route21Script: ; 55eeb (15:5eeb)
     ld [W_ROUTE21CURSCRIPT],a
     ret
 
-SECTION "Route21TextPointers",ROMX[$5f04],BANK[$15]
+Route21ScriptPointers: ; 55efe (15:5efe)
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw Route21Script2
 
 Route21TextPointers: ; 55f04 (15:5f04)
     dw Route21Text1
@@ -84727,31 +84751,20 @@ CeladonMart2Text2_AfterWinHoF:
 
 ; ────────────────────────
 
-Route21ScriptPointers:
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw Route21Script2
-
 ROUTE21_BARRIER_BLOCK EQU $6B
 
-Route21ScriptBarrier:
-    ld hl,$d126
-    bit 6,[hl]
-    res 6,[hl]
+Route21GraphicalScript:
+    ld a,[wChangedBlocksMapId]
+    cp ROUTE_21
     ret z
-    ld a,[$c78c]
-    cp ROUTE21_BARRIER_BLOCK
-    ret z ; Don't block if just blocked
     call .CheckCinnabarVisited
     ret nz ; Don't block if visited
     ld hl,.ChangedBlocks
-    ld de,wChangedBlocksNum
+    ld de,wChangedBlocksMapId
     ld bc,.ChangedBlocksEnd-.ChangedBlocks
-    call CopyData
-    call RestoreChangedBlocks
-    PREDEF_JUMP RedrawMapView
+    jp CopyData
 .CheckCinnabarVisited
-    call GetTownVisitedFlag ; ld hl,W_TOWNVISITEDFLAG
+    ld hl,W_TOWNVISITEDFLAG
     ld c,CINNABAR_ISLAND ; bit n
     ld b,2 ; read bit
     PREDEF HandleBitArray
@@ -84759,6 +84772,7 @@ Route21ScriptBarrier:
     and a
     ret
 .ChangedBlocks
+    db ROUTE_21
     db 6
     dw $8CC7
     db ROUTE21_BARRIER_BLOCK
@@ -96352,17 +96366,9 @@ UndergroundPathWEObject: ; 0x61f4e (size=20)
     EVENT_DISP $19,$5,$2 ; PATH_ENTRANCE_ROUTE_7
     EVENT_DISP $19,$2,$2f ; PATH_ENTRANCE_ROUTE_8
 
-DiglettsCave_h: ; 0x61f62 to 0x61f6e (12 bytes) (id=197)
-    db $11 ; tileset
-    db DIGLETTS_CAVE_HEIGHT,DIGLETTS_CAVE_WIDTH ; dimensions (y,x)
-    dw DiglettsCaveBlocks,DiglettsCaveTextPointers,DiglettsCaveScript ; blocks,texts,scripts
-    db $00 ; connections
-    dw DiglettsCaveObject ; objects
+; Free
 
-SECTION "DiglettsCaveBlocks",ROMX[$5f86],BANK[$18]
-
-DiglettsCaveBlocks: ; 61f86 (18:5f86)
-    INCBIN "maps/diglettscave.blk"
+SECTION "SilphCo11_h",ROMX[$60ee],BANK[$18]
 
 SilphCo11_h: ; 0x620ee to 0x620fa (12 bytes) (id=235)
     db $10 ; tileset
@@ -97025,83 +97031,80 @@ MissableObjectIDs_6219b:
     db $AE,$AF,$B0,$B1,$B2,$B7,$B8,$B9
     db $C9,$CA,$FF
 
-DiglettsCaveObject: ; 0x61f72 (size=20)
+; ──────────────────────────────────────────────────────────────────────
+; DIGLETTS_CAVE
+; ──────────────────────────────────────────────────────────────────────
+
+DiglettsCave_h:
+    db $11 ; tileset
+    db DIGLETTS_CAVE_HEIGHT,DIGLETTS_CAVE_WIDTH ; dimensions (y,x)
+    dw .DiglettsCaveBlocks,.DiglettsCaveTextPointers,.DiglettsCaveScript ; blocks,texts,scripts
+    db $00 ; connections
+    dw .DiglettsCaveObject ; objects
+
+; ──────────────────────
+
+.DiglettsCaveBlocks
+    INCBIN "maps/diglettscave.blk"
+
+; ──────────────────────
+
+.DiglettsCaveObject
     db $19 ; border tile
 
-    db $2 ; warps
-    db $5,$5,$2,DIGLETTS_CAVE_EXIT
-    db $1f,$25,$2,DIGLETTS_CAVE_ENTRANCE
+    db 2 ; warps
+    db 05,05,2,DIGLETTS_CAVE_EXIT
+    db 31,37,2,DIGLETTS_CAVE_ENTRANCE
 
-    db $0 ; signs
+    db 0 ; signs
 
-    db $2 ; people
-    db SPRITE_AERODACTYL,$4 + 4,$20 + 4,$ff,$10,$1 ; person
-    db SPRITE_HIKER,$1c + 4,$d + 4,$ff,$d1,$2 ; person
+    db 2 ; people
+    db SPRITE_AERODACTYL,04 + 4,32 + 4,$ff,$10,$1 ; person
+    db SPRITE_HIKER,28 + 4,13 + 4,$ff,$d1,$2 ; person
 
     ; warp-to
-    EVENT_DISP $14,$5,$5 ; DIGLETTS_CAVE_EXIT
-    EVENT_DISP $14,$1f,$25 ; DIGLETTS_CAVE_ENTRANCE
+    EVENT_DISP DIGLETTS_CAVE_WIDTH,05,05 ; DIGLETTS_CAVE_EXIT
+    EVENT_DISP DIGLETTS_CAVE_WIDTH,31,37 ; DIGLETTS_CAVE_ENTRANCE
 
-DiglettsCaveTextPointers:
-    dw DiglettsCave1
-    dw DiglettsCaveHiker
-    dw DiglettsCaveAerodactyl
-    dw DiglettsCaveAerodactylRunAway
+; ──────────────────────
 
-DiglettsCave1:
+.DiglettsCaveTextPointers
+    dw .DiglettsCave1
+    dw .DiglettsCaveHiker
+    dw .DiglettsCaveAerodactyl
+    dw .DiglettsCaveAerodactylRunAway
+
+.DiglettsCave1
     TX_FAR _DiglettsCave1
     db "@"
-DiglettsCaveHiker:
+.DiglettsCaveHiker
     TX_FAR _DiglettsCaveHiker
     db "@"
+.DiglettsCaveAerodactylRunAway
+    TX_FAR _DiglettsCaveAerodactylRunAway
+    db "@"
 
-DiglettsCaveScript:
+; ──────────────────────
+
+.DiglettsCaveScript
     call EnableAutoTextBoxDrawing
-    ld hl,DiglettsCaveScriptPointers
-    ld a,[W_DIGLETTSCAVECURSCRIPT]
+    ld hl,.DiglettsCaveScriptPointers
+    ld a,[W_GENERICMAPCURSCRIPT]
     jp CallFunctionInTable
 
-DiglettsCaveScriptPointers:
-    dw DiglettsCaveScript0
-    dw DiglettsCaveHole
-    dw DiglettsCavePostAerodactyl
-    dw DiglettCaveWaitOne
+.DiglettsCaveScriptPointers
+    dw Nope
+    dw .DiglettsCaveHole
+    dw .DiglettsCaveWaitOne
+    dw .DiglettsCaveWarp
+    dw .DiglettsCaveBeforeAerodactyl
+    dw .DiglettsCaveAfterAerodactyl
 
-DiglettsCaveScript0:
-    ld hl,$d126
-    bit 6,[hl] ; Trigger Check Warp Script 0
-    set 6,[hl] ; ...
-    jr nz,.CheckAerodactyl
-    ; Start Warp
-    ld a,1 ; Warp ID
-    ld [$d71e],a
-    ld hl,$d72d
-    set 4,[hl]
-    ld hl,$d732
-    set 4,[hl]
-    ld a,DIGLETTS_CAVE
-    ld [$d71d],a
-    ld a,$06     ; Dark Map
-    ld [$d35d],a ; ...
-    xor a
-    ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
+.DiglettsCaveUpdateScriptPointer
+    ld [W_GENERICMAPCURSCRIPT],a
     ret
-.CheckAerodactyl
-    ld hl,wEventBeatAerodactylBit5
-    bit 5,[hl]
-    ret nz
-    ld hl,wDigCaveAerodactylTrigBit0
-    bit 0,[hl]
-    res 0,[hl]
-    ret z
-    ld a,AERODACTYL
-    call PlayCry
-    call WaitForSoundToFinish
-    ld a,3 ; DiglettsCaveAerodactyl
-    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    jp DisplayTextID
 
-DiglettsCaveHole:
+.DiglettsCaveHole
     ld a,$FF
     ld [wJoypadForbiddenButtonsMask],a ; Disable Joy
     call .Delay30
@@ -97119,12 +97122,8 @@ DiglettsCaveHole:
     ld [hl],a
     PREDEF EmotionBubble
     call .Delay5
-    ld hl,$d126 ; Trigger Check Warp Script 0
-    res 6,[hl]  ; ...
-    ld a,3
-    ld [W_DIGLETTSCAVECURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
-    ret
+    ld a,2 ; DiglettsCaveWaitOne
+    jr .DiglettsCaveUpdateScriptPointer
 .Delay5
     ld c,5
     jp DelayFrames
@@ -97132,9 +97131,37 @@ DiglettsCaveHole:
     ld c,30
     jp DelayFrames
 
-DiglettsCaveAerodactyl:
+.DiglettsCaveWaitOne
+    ld a,3 ; DiglettsCaveWarp
+    jr .DiglettsCaveUpdateScriptPointer
+
+.DiglettsCaveWarp
+    ; Start Warp
+    ld a,1 ; Warp ID
+    ld [$d71e],a
+    ld hl,$d72d
+    set 4,[hl]
+    ld hl,$d732
+    set 4,[hl]
+    ld a,DIGLETTS_CAVE
+    ld [$d71d],a
+    ld a,$06     ; Dark Map
+    ld [$d35d],a ; ...
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
+    jr .DiglettsCaveResetDefaultScript
+
+.DiglettsCaveBeforeAerodactyl
+    ld a,AERODACTYL
+    call PlayCry
+    call WaitForSoundToFinish
+    ld a,3 ; DiglettsCaveAerodactyl
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    jp DisplayTextID
+
+.DiglettsCaveAerodactyl
     db $8
-    ld hl,DiglettsCaveAerodactylText
+    ld hl,.DiglettsCaveAerodactylText
     call PrintText
     ld a,1           ; Aerodactyl OAM ID
     ld [$FF00+$8c],a ; ...
@@ -97146,19 +97173,17 @@ DiglettsCaveAerodactyl:
     ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
     call PlayTrainerMusic
-    ld a,2
-    ld [W_DIGLETTSCAVECURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
+    ld a,5 ; DiglettsCaveAfterAerodactyl
+    call .DiglettsCaveUpdateScriptPointer
     jp TextScriptEnd
-
-DiglettsCaveAerodactylText:
+.DiglettsCaveAerodactylText
     TX_FAR _DiglettsCaveAerodactylText
     db "@"
 
-DiglettsCavePostAerodactyl:
+.DiglettsCaveAfterAerodactyl
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
-    jr z,DiglettsCaveResetDefaultScript
+    jr z,.DiglettsCaveResetDefaultScript
     ld a,[wBattleResult]
     cp $2
     jr z,.skip
@@ -97175,20 +97200,11 @@ DiglettsCavePostAerodactyl:
     call Delay3
     ; ft
 
-DiglettsCaveResetDefaultScript:
-    xor a
-    ld [W_DIGLETTSCAVECURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
-    ret
+.DiglettsCaveResetDefaultScript
+    xor a ; Nope
+    jp .DiglettsCaveUpdateScriptPointer
 
-DiglettCaveWaitOne:
-    jp DiglettsCaveResetDefaultScript
-
-DiglettsCaveAerodactylRunAway:
-    TX_FAR _DiglettsCaveAerodactylRunAway
-    db "@"
-
-; ────────────────────────────────────────
+; ──────────────────────────────────────────────────────────────────────
 
 SSAnne9ScriptPointers:
     dw CheckFightingMapTrainers
@@ -105068,10 +105084,12 @@ UnknownDungeon1_h: ; 0x74d00 to 0x74d0c (12 bytes) (id=228)
     dw UnknownDungeon1Object ; objects
 
 UnknownDungeon1Script: ; 74d0c (1d:4d0c)
-    call TryToRemoveUnknownDungeonWaterBlocks
     jp EnableAutoTextBoxDrawing
 
-SECTION "UnknownDungeon1Object",ROMX[$4d15],BANK[$1d]
+UnknownDungeon1TextPointers: ; 74d0f (1d:4d0f)
+    dw PickupItemText
+    dw PickupItemText
+    dw PickupItemText
 
 UnknownDungeon1Object: ; 0x74d15 (size=97)
     db $7d ; border tile
@@ -108692,29 +108710,19 @@ CreditsMons_HandleAlternative:
 
 ; ───────────────────────────────────────
 
-UnknownDungeon1TextPointers:
-    dw PickupItemText
-    dw PickupItemText
-    dw PickupItemText
-
-TryToRemoveUnknownDungeonWaterBlocks:
-    ld hl,$d126
-    bit 6,[hl]
-    res 6,[hl]
+UnknownDungeon1GraphicalScript:
+    ld a,[wChangedBlocksMapId]
+    cp UNKNOWN_DUNGEON_1
     ret z
-    ld a,[$C760]
-    cp $76
-    ret z ; Don't Remove block if just removed
     ld hl,$d85f ; Check Mewtwo
     bit 1,[hl]  ; ...
     ret z
     ld hl,.ChangedBlocks
-    ld de,wChangedBlocksNum
+    ld de,wChangedBlocksMapId
     ld bc,.ChangedBlocksEnd-.ChangedBlocks
-    call CopyData
-    call RestoreChangedBlocks
-    PREDEF_JUMP RedrawMapView
+    jp CopyData
 .ChangedBlocks
+    db UNKNOWN_DUNGEON_1
     db 2
     dw $60C7
     db $76
@@ -126359,6 +126367,10 @@ _Route19BattleText7:
     text_cont , "have it if I win?"
     text_done
 
+_DratiniCaveDratiniText:
+    text_init , "Truiuo!"
+    text_past
+
 SECTION "bank25",ROMX,BANK[$25]
 
 _Route24EndBattleText1:
@@ -131927,20 +131939,7 @@ _TryUseAnotherRepelText:
     TX_RAM $cf4b
     text_init , " (",$F1
     text_paus
-    TX_NUM wTmpRepelQty,1,2
-    text_init , ")?"
-    text_done
-
-_TryUseAnotherRepelText_LessThan10:
-    text_init , "REPEL's effect"
-    text_line , "wore off."
-    text_para , "Use another"
-    text_line
-    text_paus
-    TX_RAM $cf4b
-    text_init , " (",$F1," "
-    text_paus
-    TX_NUM wTmpRepelQty,1,2
+    TX_NUM wTmpRepelQty,1,3
     text_init , ")?"
     text_done
 
@@ -135020,14 +135019,74 @@ NinetalesAlolaPicBack:
 
 SECTION "bank32",ROMX,BANK[$32]
 
+; ──────────────────────────────────────────────────────────────────────
+; DRATINI_CAVE
+; ──────────────────────────────────────────────────────────────────────
+
 DratiniCave_h:
     db $0d ; tileset
     db DRATINI_CAVE_HEIGHT,DRATINI_CAVE_WIDTH ; dimensions (y,x)
-    dw DratiniCaveBlocks,DratiniCaveTextPointers,DratiniCaveScript ; blocks,texts,scripts
+    dw .DratiniCaveBlocks,.DratiniCaveTextPointers,.DratiniCaveScript ; blocks,texts,scripts
     db $00 ; connections
-    dw DratiniCaveObject ; objects
+    dw .DratiniCaveObject ; objects
 
-DratiniCaveScript:
+; ──────────────────────
+
+.DratiniCaveBlocks
+    INCBIN "maps/dratinicave.blk"
+
+; ──────────────────────
+
+.DratiniCaveObject
+    db $0c ; border tile
+
+    db 1 ; warps
+    db 09,25,6,SS_ANNE_4
+
+    db 0 ; signs
+
+    db 2 ; people
+    db SPRITE_DRATINI,13 + 4,26 + 4,$ff,$d0,$41,DRATINI,OPP_LVL_OFFSET+12
+    db SPRITE_BALL,10 + 4,27 + 4,$ff,$ff,$82,DUSK_STONE ; item
+
+    ; warp-to
+    EVENT_DISP DRATINI_CAVE_WIDTH,09,25 ; SS_ANNE_4
+
+; ──────────────────────
+
+.DratiniCaveTextPointers
+    dw .DratiniCaveText1
+    dw PickupItemText
+
+.DratiniCaveText1
+    db $08 ; asm
+    ld hl,.DratiniCaveTrainerHeader0
+    call TalkToTrainer
+    jp TextScriptEnd
+
+.DratiniCaveTrainerHeaders
+.DratiniCaveTrainerHeader0
+    db 3 ; flag's bit
+    db ($0 << 4) ; trainer's view range
+    dw wEventBeatDratiniBit3 ; flag's byte
+    dw .DratiniCaveDratiniText ; TextBeforeBattle
+    dw .DratiniCaveDratiniText ; TextAfterBattle
+    dw .DratiniCaveDratiniText ; TextEndBattle
+    dw .DratiniCaveDratiniText ; TextEndBattle
+
+    db $ff
+
+.DratiniCaveDratiniText
+    TX_FAR _DratiniCaveDratiniText
+    db $08 ; asm
+    ld a,DRATINI
+    call PlayCry
+    call WaitForSoundToFinish
+    jp TextScriptEnd
+
+; ──────────────────────
+
+.DratiniCaveScript
     call EnableAutoTextBoxDrawing
     ld a,[W_SSANNE4CURSCRIPT]
     cp $01
@@ -135041,68 +135100,19 @@ DratiniCaveScript:
     ld a,$01 ; SSAnne4Script1
     ld [W_SSANNE4CURSCRIPT],a
 .Skip
-    ld hl,DratiniCaveTrainerHeaders
-    ld de,DratiniCaveScriptPointers
-    ld a,[W_DRATINICAVECURSCRIPT]
+    ld hl,.DratiniCaveTrainerHeaders
+    ld de,.DratiniCaveScriptPointers
+    ld a,[W_GENERICMAPCURSCRIPT]
     call ExecuteCurMapScriptInTable
-    ld [W_DRATINICAVECURSCRIPT],a
+    ld [W_GENERICMAPCURSCRIPT],a
     ret
 
-DratiniCaveScriptPointers:
+.DratiniCaveScriptPointers
     dw CheckFightingMapTrainers
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
-DratiniCaveTextPointers:
-    dw DratiniCaveText1
-    dw PickupItemText
-
-DratiniCaveTrainerHeaders:
-DratiniCaveTrainerHeader0:
-    db 3 ; flag's bit
-    db ($0 << 4) ; trainer's view range
-    dw wEventBeatDratiniBit3 ; flag's byte
-    dw DratiniCaveDratiniText ; TextBeforeBattle
-    dw DratiniCaveDratiniText ; TextAfterBattle
-    dw DratiniCaveDratiniText ; TextEndBattle
-    dw DratiniCaveDratiniText ; TextEndBattle
-
-    db $ff
-
-DratiniCaveText1:
-    db $08 ; asm
-    ld hl,DratiniCaveTrainerHeader0
-    call TalkToTrainer
-    jp TextScriptEnd
-
-DratiniCaveDratiniText:
-    TX_FAR _DratiniCaveDratiniText
-    db $08 ; asm
-    ld a,DRATINI
-    call PlayCry
-    call WaitForSoundToFinish
-    jp TextScriptEnd
-
-_DratiniCaveDratiniText:
-    db $0,"Truiuo!@@"
-
-DratiniCaveObject:
-    db $0c ; border tile
-
-    db $1 ; warps
-    db $09,$19,$6,SS_ANNE_4
-
-    db $0 ; signs
-
-    db $2 ; people
-    db SPRITE_DRATINI,$d + 4,$1a + 4,$ff,$d0,$41,DRATINI,OPP_LVL_OFFSET+12
-    db SPRITE_BALL,$a + 4,$1b + 4,$ff,$ff,$82,DUSK_STONE ; item
-
-    ; warp-to
-    EVENT_DISP $f,$09,$19 ; SS_ANNE_4
-
-DratiniCaveBlocks:
-    INCBIN "maps/dratinicave.blk"
+; ──────────────────────────────────────────────────────────────────────
 
 ; INPUT
 ; e = Low Bit Return Pointer
@@ -136417,6 +136427,33 @@ _BaitHealth:
     ld hl,W_ENEMYMONCURHP
     call LeechSeed_IncreaseEnemyHP
     PREDEF_JUMP DrawEnemyHUDAndHPBar
+
+; ──────────────────────────────────────────────────────────────────────
+
+SECTION "bank34",ROMX,BANK[$34]
+
+_RouteD1BeforeBattleText1:
+    text_init , "Before"
+    text_line , "Battle Text 1."
+    text_done
+
+_RouteD1AfterBattleText1:
+    text_init , "After"
+    text_line , "Battle Text 1."
+    text_done
+
+_RouteD1EndBattleText1:
+    text_init , "End"
+    text_line , "Battle Text 1."
+    text_wait
+
+_RouteD1Text2:
+    text_init , "Text 2."
+    text_done
+
+_RouteD1Text3:
+    text_init , "Text 3."
+    text_done
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -143002,7 +143039,71 @@ RunMapGraphicalScript:
     jr .next
 .Table
     GRAPHICAL_SCRIPT KANTO,SS_ANNE_4,SSAnne4GraphicalScript
+    GRAPHICAL_SCRIPT KANTO,UNKNOWN_DUNGEON_1,UnknownDungeon1GraphicalScript
+    GRAPHICAL_SCRIPT KANTO,ROUTE_21,Route21GraphicalScript
     db $FF
+
+; ──────────────────────────────────────────────────────────────────────
+; Moved from BANK 3 because only "BANKSWITCH"
+; ──────────────────────────────────────────────────────────────────────
+
+; initialize some variables
+Func_c335:
+    ld a,$90
+    ld [$FF00+$b0],a
+    ld [rWY],a ; $FF00+$4a
+    xor a
+    ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
+    ld [$d13b],a
+    ld [W_LONEATTACKNO],a ; $d05c
+    ld [H_NEWLYPRESSEDBUTTONS],a
+    ld [H_NEWLYRELEASEDBUTTONS],a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld [$cd6a],a
+    ld [$d5a3],a
+    ld hl,$d73f
+    ld [hli],a
+    ld [hl],a
+    ld hl,wWhichTrade ; $cd3d
+    ld bc,$1e
+    jp FillMemory
+
+; ──────────────────────────────────────────────────────────────────────
+; Moved from BANK 3 because only "BANKSWITCH"
+; ──────────────────────────────────────────────────────────────────────
+
+; function that appears to disable warp testing after collisions if the player is standing on a warp
+Func_c35f:
+    ld a,[$d3ae]
+    and a
+    ret z
+    ld c,a
+    ld hl,$d3af
+.asm_c368
+    ld a,[W_YCOORD] ; $d361
+    cp [hl]
+    jr nz,.asm_c383
+    inc hl
+    ld a,[W_XCOORD] ; $d362
+    cp [hl]
+    jr nz,.asm_c384
+    inc hl
+    ld a,[hli]
+    ld [$d42f],a
+    ld a,[hl]
+    ld [H_DOWNARROWBLINKCNT1],a ; $FF00+$8b
+    ld hl,$d736
+    set 2,[hl]
+    ret
+.asm_c383
+    inc hl
+.asm_c384
+    inc hl
+    inc hl
+    inc hl
+    dec c
+    jr nz,.asm_c368
+    ret
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -143578,7 +143679,12 @@ CheckSTAB:
     ld b,a
     ld a,[W_PLAYERMOVENUM]
     ld c,a
+    ld hl,wMoveDetBoxActualMonBit5
+    bit 5,[hl]
     ld hl,W_MONHTYPES
+    jr z,.done
+    ld hl,W_PLAYERMONTYPES
+.done
     PREDEF GetAttackerType_
     pop hl    ; Restore
     pop af    ; ...
@@ -147920,6 +148026,14 @@ MapHeaderPointers:
     dw Lorelei_h
     dw Bruno_h
     dw Agatha_h ;247
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
+    dw EmptyMap_h ; unused
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $3C)
@@ -148117,15 +148231,22 @@ PortRoyalScript:
 ; ROUTE_D1
 ; ──────────────────────────────────────────────────────────────────────
 
+RouteD1Blocks:
+    INCBIN "maps/routed1.blk"
+
+; ──────────────────────
+
 RouteD1_h:
     db $00 ; tileset
     db ROUTE_D1_HEIGHT,ROUTE_D1_WIDTH ; dimensions (y,x)
-    dw RouteD1Blocks,RouteD1TextPointers,RouteD1Script ; blocks,texts,scripts
+    dw RouteD1Blocks,.RouteD1TextPointers,.RouteD1Script ; blocks,texts,scripts
     db WEST ; connections
     WEST_MAP_CONNECTION PORT_ROYAL,PORT_ROYAL_WIDTH,0,0,PORT_ROYAL_HEIGHT,PortRoyalBlocks,ROUTE_D1_WIDTH
-    dw RouteD1Object ; objects
+    dw .RouteD1Object ; objects
 
-RouteD1Object:
+; ──────────────────────
+
+.RouteD1Object
     db $f ; border tile
 
     db 3 ; warps
@@ -148134,68 +148255,75 @@ RouteD1Object:
     db 11,07,0,SWAP_MAP
 
     db 1 ; signs
-    db 05,01,2 ; CeladonCityText10
+    db 05,01,3
 
-    db 1 ; people
+    db 2 ; people
     db SPRITE_BLACK_HAIR_BOY_2,10 + 4,17 + 4,$ff,$d2,$41,POKEMANIAC,8 ; trainer
+    db SPRITE_SLOWBRO,05 + 4,13 + 4,$fe,$0,$2 ; person
 
     ; warp-to
     EVENT_DISP ROUTE_D1_WIDTH,15,34 ; TEST_MAP_1
     EVENT_DISP ROUTE_D1_WIDTH,11,06 ; SWAP_MAP
     EVENT_DISP ROUTE_D1_WIDTH,11,07 ; SWAP_MAP
 
-RouteD1Blocks:
-    INCBIN "maps/routed1.blk"
+; ──────────────────────
 
-RouteD1TextPointers:
-    dw RouteD1Text1
-    dw RouteD1Text2
+.RouteD1TextPointers
+    dw .RouteD1Text1
+    dw .RouteD1Text2
+    dw .RouteD1Text3
 
-RouteD1Text2:
+.RouteD1Text1
+    db $8 ; asm
+    ld hl,.RouteD1TrainerHeader1
+    call TalkToTrainer
+    jp TextScriptEnd
+
+.RouteD1Text2
     TX_FAR _RouteD1Text2
     db "@"
 
-_RouteD1Text2:
-    db $0,"A!",$57
-
-RouteD1Text2End:
-    TX_FAR _RouteD1Text2End
+.RouteD1Text3
+    TX_FAR _RouteD1Text3
     db "@"
 
-_RouteD1Text2End:
-    db $0,"A!",$58
-
-RouteD1Script:
-    call EnableAutoTextBoxDrawing
-    ld hl,RouteD1TrainerHeaders
-    ld de,RouteD1ScriptPointers
-    ld a,[W_ROUTED1CURSCRIPT]
-    call ExecuteCurMapScriptInTable
-    ld [W_ROUTED1CURSCRIPT],a
-    ret
-
-RouteD1ScriptPointers:
-    dw CheckFightingMapTrainers
-    dw DisplayEnemyTrainerTextAndStartBattle
-    dw EndTrainerBattle
-
-RouteD1TrainerHeaders:
-RouteD1TrainerHeader0:
+.RouteD1TrainerHeaders
+.RouteD1TrainerHeader1
     db 1 ; flag's bit
-    db ($3 << 4) ; trainer's view range
+    db (3 << 4) ; trainer's view range
     dw wEventRouteD1Trainer0Bit1 ; flag's byte
-    dw RouteD1Text2 ; TextBeforeBattle
-    dw RouteD1Text2 ; TextAfterBattle
-    dw RouteD1Text2End ; TextEndBattle
-    dw RouteD1Text2End ; TextEndBattle
+    dw .RouteD1BeforeBattleText1 ; TextBeforeBattle
+    dw .RouteD1AfterBattleText1 ; TextAfterBattle
+    dw .RouteD1EndBattleText1 ; TextEndBattle
+    dw .RouteD1EndBattleText1 ; TextEndBattle
 
     db $ff
 
-RouteD1Text1:
-    db $8 ; asm
-    ld hl,RouteD1TrainerHeader0
-    call TalkToTrainer
-    jp TextScriptEnd
+.RouteD1BeforeBattleText1
+    TX_FAR _RouteD1BeforeBattleText1
+    db "@"
+.RouteD1AfterBattleText1
+    TX_FAR _RouteD1AfterBattleText1
+    db "@"
+.RouteD1EndBattleText1
+    TX_FAR _RouteD1EndBattleText1
+    db "@"
+
+; ──────────────────────
+
+.RouteD1Script
+    call EnableAutoTextBoxDrawing
+    ld hl,.RouteD1TrainerHeaders
+    ld de,.RouteD1ScriptPointers
+    ld a,[W_GENERICMAPCURSCRIPT]
+    call ExecuteCurMapScriptInTable
+    ld [W_GENERICMAPCURSCRIPT],a
+    ret
+
+.RouteD1ScriptPointers
+    dw CheckFightingMapTrainers
+    dw DisplayEnemyTrainerTextAndStartBattle
+    dw EndTrainerBattle
 
 ; ──────────────────────────────────────────────────────────────────────
 ; PORT_ROYAL_POKECENTER

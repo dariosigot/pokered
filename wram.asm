@@ -1613,16 +1613,14 @@ W_SEAFOAMISLANDS5CURSCRIPT: ; d668
 W_ROUTE18GATECURSCRIPT: ; d669
     ds 1
 
-W_DRATINICAVECURSCRIPT: ; d66a
+;Unused ; d66a
     ds 1
 W_SSANNE4CURSCRIPT: ; d66b
     ds 1
-W_DIGLETTSCAVECURSCRIPT: ; d66c
+;Unused ; d66c
     ds 1
 W_SAFARIZONECURSCRIPT: ; d66d
     ds 1
-
-W_ROUTED1CURSCRIPT:: db ; d66e
 
 wGameProgressFlagsEnd:
 
@@ -1882,7 +1880,6 @@ W_BOXMON2DATA: ; dab7
 
 SECTION "DenimFlags",WRAMX[$dee2],BANK[1]
 
-wDigCaveAerodactylTrigBit0 ; dee2 ; bit 0
 wPrintBattleValueBit0      ; dee2 ; bit 0 = Trigger Print Battle Value
 wTownMapBeforeJoypadBit0   ; dee2 ; bit 0 = Show Town Map Before Joypad Press
 wFlagFlyingMonSpriteBit0   ; dee2 ; bit 0 = Force to Load Mon Sprite with $0040 offset
@@ -1902,6 +1899,7 @@ wOverworldGoToDarkBit4     ; dee2 ; bit 4 = Force Overworld "CheckDarkMap"
 wFlagBackSpritePlayerBit4  ; dee2 ; bit 4
 wForceSortPartyWSelectBit4 ; dee2 ; bit 4 = Select Pressed Force Sort Party
 wDisableAutoRedrawMapBit5  ; dee2 ; bit 5 = Disable Auto call of "RedrawMapView" after run "ReplaceTileBlock"
+wMoveDetBoxActualMonBit5   ; dee2 ; bit 5 = Consider Actual Mon Type when "CheckSTAB" during "PrintMoveDetailsBox"
 wFlagBackFrontSpriteBit56  ; dee2 ; bit 5
                            ; dee2 ; bit 6
 wMustRedrawMapBlockBit6    ; dee2 ; bit 6 = Indicate that must "RedrawMapView" after run "ReplaceTileBlock"
