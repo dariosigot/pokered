@@ -55138,9 +55138,13 @@ PrintMenuItem:
     ld [$cd6d],a
 
     ; Print Move Details Box
+    ld hl,wMoveDetBoxActualMonBit5
+    set 5,[hl]
     FuncCoord 00,07
     ld de,Coord
     PREDEF PrintMoveDetailsBox
+    ld hl,wMoveDetBoxActualMonBit5
+    res 5,[hl]
 
 .asm_3d54e
     ld a,$1
@@ -143675,7 +143679,12 @@ CheckSTAB:
     ld b,a
     ld a,[W_PLAYERMOVENUM]
     ld c,a
+    ld hl,wMoveDetBoxActualMonBit5
+    bit 5,[hl]
     ld hl,W_MONHTYPES
+    jr z,.done
+    ld hl,W_PLAYERMONTYPES
+.done
     PREDEF GetAttackerType_
     pop hl    ; Restore
     pop af    ; ...

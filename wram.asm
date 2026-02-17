@@ -1899,6 +1899,7 @@ wOverworldGoToDarkBit4     ; dee2 ; bit 4 = Force Overworld "CheckDarkMap"
 wFlagBackSpritePlayerBit4  ; dee2 ; bit 4
 wForceSortPartyWSelectBit4 ; dee2 ; bit 4 = Select Pressed Force Sort Party
 wDisableAutoRedrawMapBit5  ; dee2 ; bit 5 = Disable Auto call of "RedrawMapView" after run "ReplaceTileBlock"
+wMoveDetBoxActualMonBit5   ; dee2 ; bit 5 = Consider Actual Mon Type when "CheckSTAB" during "PrintMoveDetailsBox"
 wFlagBackFrontSpriteBit56  ; dee2 ; bit 5
                            ; dee2 ; bit 6
 wMustRedrawMapBlockBit6    ; dee2 ; bit 6 = Indicate that must "RedrawMapView" after run "ReplaceTileBlock"
