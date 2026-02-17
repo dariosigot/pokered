@@ -24465,6 +24465,8 @@ ThrewRockText:
 ItemUseAuger:
     call CanDig
     jp nc,ItemUseFailed
+    call CheckDiglettsCaveHole
+    ret c
     ld hl,$d732
     set 3,[hl]
     set 6,[hl]
@@ -24747,8 +24749,8 @@ ItemUsePokeflute: ; e140 (3:6140)
     ret nz
     call ArePlayerNearAerodactyl
     ret nc
-    ld hl,wDigCaveAerodactylTrigBit0
-    set 0,[hl] ; trigger Aerodactyl fight (handled by map script)
+    ld a,4 ; DiglettsCaveBeforeAerodactyl
+    ld [W_GENERICMAPCURSCRIPT],a ; trigger Aerodactyl fight
     ret
 
 .PrintFluteResult
@@ -28434,15 +28436,14 @@ CheckDiglettsCaveHole:
     ld hl,.coordsData
     call ArePlayerCoordsInArray
     jr nc,.NotEvent
-.Event
-    pop hl ; remove return pointer
-    ld a,1
-    ld [W_DIGLETTSCAVECURSCRIPT],a
+;Event
+    ld a,1 ; DiglettsCaveHole
+    ld [W_GENERICMAPCURSCRIPT],a
     ld [$cd6a],a ; item used
+    scf
     ret
 .NotEvent
-    call GetCurrentOldAdventureMap
-    cp DIGLETTS_CAVE
+    and a ; rcf
     ret
 .coordsData
     db 18,13
@@ -33352,8 +33353,6 @@ PalletTownScript: ; 18e5b (6:4e5b)
     ld hl,$D747
     set 6,[hl]
 .next
-    ld hl,$d126
-    set 6,[hl] ; Set Temp Script Flag to potentially Lock Cinnabar from Pallet
     call EnableAutoTextBoxDrawing
     ld hl,PalletTownScriptPointers
     ld a,[W_PALLETTOWNCURSCRIPT]
@@ -96363,17 +96362,9 @@ UndergroundPathWEObject: ; 0x61f4e (size=20)
     EVENT_DISP $19,$5,$2 ; PATH_ENTRANCE_ROUTE_7
     EVENT_DISP $19,$2,$2f ; PATH_ENTRANCE_ROUTE_8
 
-DiglettsCave_h: ; 0x61f62 to 0x61f6e (12 bytes) (id=197)
-    db $11 ; tileset
-    db DIGLETTS_CAVE_HEIGHT,DIGLETTS_CAVE_WIDTH ; dimensions (y,x)
-    dw DiglettsCaveBlocks,DiglettsCaveTextPointers,DiglettsCaveScript ; blocks,texts,scripts
-    db $00 ; connections
-    dw DiglettsCaveObject ; objects
+; Free
 
-SECTION "DiglettsCaveBlocks",ROMX[$5f86],BANK[$18]
-
-DiglettsCaveBlocks: ; 61f86 (18:5f86)
-    INCBIN "maps/diglettscave.blk"
+SECTION "SilphCo11_h",ROMX[$60ee],BANK[$18]
 
 SilphCo11_h: ; 0x620ee to 0x620fa (12 bytes) (id=235)
     db $10 ; tileset
@@ -97036,83 +97027,80 @@ MissableObjectIDs_6219b:
     db $AE,$AF,$B0,$B1,$B2,$B7,$B8,$B9
     db $C9,$CA,$FF
 
-DiglettsCaveObject: ; 0x61f72 (size=20)
+; ──────────────────────────────────────────────────────────────────────
+; DIGLETTS_CAVE
+; ──────────────────────────────────────────────────────────────────────
+
+DiglettsCave_h:
+    db $11 ; tileset
+    db DIGLETTS_CAVE_HEIGHT,DIGLETTS_CAVE_WIDTH ; dimensions (y,x)
+    dw .DiglettsCaveBlocks,.DiglettsCaveTextPointers,.DiglettsCaveScript ; blocks,texts,scripts
+    db $00 ; connections
+    dw .DiglettsCaveObject ; objects
+
+; ──────────────────────
+
+.DiglettsCaveBlocks
+    INCBIN "maps/diglettscave.blk"
+
+; ──────────────────────
+
+.DiglettsCaveObject
     db $19 ; border tile
 
-    db $2 ; warps
-    db $5,$5,$2,DIGLETTS_CAVE_EXIT
-    db $1f,$25,$2,DIGLETTS_CAVE_ENTRANCE
+    db 2 ; warps
+    db 05,05,2,DIGLETTS_CAVE_EXIT
+    db 31,37,2,DIGLETTS_CAVE_ENTRANCE
 
-    db $0 ; signs
+    db 0 ; signs
 
-    db $2 ; people
-    db SPRITE_AERODACTYL,$4 + 4,$20 + 4,$ff,$10,$1 ; person
-    db SPRITE_HIKER,$1c + 4,$d + 4,$ff,$d1,$2 ; person
+    db 2 ; people
+    db SPRITE_AERODACTYL,04 + 4,32 + 4,$ff,$10,$1 ; person
+    db SPRITE_HIKER,28 + 4,13 + 4,$ff,$d1,$2 ; person
 
     ; warp-to
-    EVENT_DISP $14,$5,$5 ; DIGLETTS_CAVE_EXIT
-    EVENT_DISP $14,$1f,$25 ; DIGLETTS_CAVE_ENTRANCE
+    EVENT_DISP DIGLETTS_CAVE_WIDTH,05,05 ; DIGLETTS_CAVE_EXIT
+    EVENT_DISP DIGLETTS_CAVE_WIDTH,31,37 ; DIGLETTS_CAVE_ENTRANCE
 
-DiglettsCaveTextPointers:
-    dw DiglettsCave1
-    dw DiglettsCaveHiker
-    dw DiglettsCaveAerodactyl
-    dw DiglettsCaveAerodactylRunAway
+; ──────────────────────
 
-DiglettsCave1:
+.DiglettsCaveTextPointers
+    dw .DiglettsCave1
+    dw .DiglettsCaveHiker
+    dw .DiglettsCaveAerodactyl
+    dw .DiglettsCaveAerodactylRunAway
+
+.DiglettsCave1
     TX_FAR _DiglettsCave1
     db "@"
-DiglettsCaveHiker:
+.DiglettsCaveHiker
     TX_FAR _DiglettsCaveHiker
     db "@"
+.DiglettsCaveAerodactylRunAway
+    TX_FAR _DiglettsCaveAerodactylRunAway
+    db "@"
 
-DiglettsCaveScript:
+; ──────────────────────
+
+.DiglettsCaveScript
     call EnableAutoTextBoxDrawing
-    ld hl,DiglettsCaveScriptPointers
-    ld a,[W_DIGLETTSCAVECURSCRIPT]
+    ld hl,.DiglettsCaveScriptPointers
+    ld a,[W_GENERICMAPCURSCRIPT]
     jp CallFunctionInTable
 
-DiglettsCaveScriptPointers:
-    dw DiglettsCaveScript0
-    dw DiglettsCaveHole
-    dw DiglettsCavePostAerodactyl
-    dw DiglettCaveWaitOne
+.DiglettsCaveScriptPointers
+    dw Nope
+    dw .DiglettsCaveHole
+    dw .DiglettsCaveWaitOne
+    dw .DiglettsCaveWarp
+    dw .DiglettsCaveBeforeAerodactyl
+    dw .DiglettsCaveAfterAerodactyl
 
-DiglettsCaveScript0:
-    ld hl,$d126
-    bit 6,[hl] ; Trigger Check Warp Script 0
-    set 6,[hl] ; ...
-    jr nz,.CheckAerodactyl
-    ; Start Warp
-    ld a,1 ; Warp ID
-    ld [$d71e],a
-    ld hl,$d72d
-    set 4,[hl]
-    ld hl,$d732
-    set 4,[hl]
-    ld a,DIGLETTS_CAVE
-    ld [$d71d],a
-    ld a,$06     ; Dark Map
-    ld [$d35d],a ; ...
-    xor a
-    ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
+.DiglettsCaveUpdateScriptPointer
+    ld [W_GENERICMAPCURSCRIPT],a
     ret
-.CheckAerodactyl
-    ld hl,wEventBeatAerodactylBit5
-    bit 5,[hl]
-    ret nz
-    ld hl,wDigCaveAerodactylTrigBit0
-    bit 0,[hl]
-    res 0,[hl]
-    ret z
-    ld a,AERODACTYL
-    call PlayCry
-    call WaitForSoundToFinish
-    ld a,3 ; DiglettsCaveAerodactyl
-    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    jp DisplayTextID
 
-DiglettsCaveHole:
+.DiglettsCaveHole
     ld a,$FF
     ld [wJoypadForbiddenButtonsMask],a ; Disable Joy
     call .Delay30
@@ -97130,12 +97118,8 @@ DiglettsCaveHole:
     ld [hl],a
     PREDEF EmotionBubble
     call .Delay5
-    ld hl,$d126 ; Trigger Check Warp Script 0
-    res 6,[hl]  ; ...
-    ld a,3
-    ld [W_DIGLETTSCAVECURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
-    ret
+    ld a,2 ; DiglettsCaveWaitOne
+    jr .DiglettsCaveUpdateScriptPointer
 .Delay5
     ld c,5
     jp DelayFrames
@@ -97143,9 +97127,37 @@ DiglettsCaveHole:
     ld c,30
     jp DelayFrames
 
-DiglettsCaveAerodactyl:
+.DiglettsCaveWaitOne
+    ld a,3 ; DiglettsCaveWarp
+    jr .DiglettsCaveUpdateScriptPointer
+
+.DiglettsCaveWarp
+    ; Start Warp
+    ld a,1 ; Warp ID
+    ld [$d71e],a
+    ld hl,$d72d
+    set 4,[hl]
+    ld hl,$d732
+    set 4,[hl]
+    ld a,DIGLETTS_CAVE
+    ld [$d71d],a
+    ld a,$06     ; Dark Map
+    ld [$d35d],a ; ...
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a ; Enable Joy
+    jr .DiglettsCaveResetDefaultScript
+
+.DiglettsCaveBeforeAerodactyl
+    ld a,AERODACTYL
+    call PlayCry
+    call WaitForSoundToFinish
+    ld a,3 ; DiglettsCaveAerodactyl
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    jp DisplayTextID
+
+.DiglettsCaveAerodactyl
     db $8
-    ld hl,DiglettsCaveAerodactylText
+    ld hl,.DiglettsCaveAerodactylText
     call PrintText
     ld a,1           ; Aerodactyl OAM ID
     ld [$FF00+$8c],a ; ...
@@ -97157,19 +97169,17 @@ DiglettsCaveAerodactyl:
     ld [W_CUROPPONENT],a ; $d059
     ld [wEngagedTrainerClass],a
     call PlayTrainerMusic
-    ld a,2
-    ld [W_DIGLETTSCAVECURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
+    ld a,5 ; DiglettsCaveAfterAerodactyl
+    call .DiglettsCaveUpdateScriptPointer
     jp TextScriptEnd
-
-DiglettsCaveAerodactylText:
+.DiglettsCaveAerodactylText
     TX_FAR _DiglettsCaveAerodactylText
     db "@"
 
-DiglettsCavePostAerodactyl:
+.DiglettsCaveAfterAerodactyl
     ld a,[W_ISINBATTLE] ; $d057
     cp $ff
-    jr z,DiglettsCaveResetDefaultScript
+    jr z,.DiglettsCaveResetDefaultScript
     ld a,[wBattleResult]
     cp $2
     jr z,.skip
@@ -97186,20 +97196,11 @@ DiglettsCavePostAerodactyl:
     call Delay3
     ; ft
 
-DiglettsCaveResetDefaultScript:
-    xor a
-    ld [W_DIGLETTSCAVECURSCRIPT],a
-    ld [W_CURMAPSCRIPT],a
-    ret
+.DiglettsCaveResetDefaultScript
+    xor a ; Nope
+    jp .DiglettsCaveUpdateScriptPointer
 
-DiglettCaveWaitOne:
-    jp DiglettsCaveResetDefaultScript
-
-DiglettsCaveAerodactylRunAway:
-    TX_FAR _DiglettsCaveAerodactylRunAway
-    db "@"
-
-; ────────────────────────────────────────
+; ──────────────────────────────────────────────────────────────────────
 
 SSAnne9ScriptPointers:
     dw CheckFightingMapTrainers
@@ -126362,6 +126363,10 @@ _Route19BattleText7:
     text_cont , "have it if I win?"
     text_done
 
+_DratiniCaveDratiniText:
+    text_init , "Truiuo!"
+    text_past
+
 SECTION "bank25",ROMX,BANK[$25]
 
 _Route24EndBattleText1:
@@ -135010,14 +135015,74 @@ NinetalesAlolaPicBack:
 
 SECTION "bank32",ROMX,BANK[$32]
 
+; ──────────────────────────────────────────────────────────────────────
+; DRATINI_CAVE
+; ──────────────────────────────────────────────────────────────────────
+
 DratiniCave_h:
     db $0d ; tileset
     db DRATINI_CAVE_HEIGHT,DRATINI_CAVE_WIDTH ; dimensions (y,x)
-    dw DratiniCaveBlocks,DratiniCaveTextPointers,DratiniCaveScript ; blocks,texts,scripts
+    dw .DratiniCaveBlocks,.DratiniCaveTextPointers,.DratiniCaveScript ; blocks,texts,scripts
     db $00 ; connections
-    dw DratiniCaveObject ; objects
+    dw .DratiniCaveObject ; objects
 
-DratiniCaveScript:
+; ──────────────────────
+
+.DratiniCaveBlocks
+    INCBIN "maps/dratinicave.blk"
+
+; ──────────────────────
+
+.DratiniCaveObject
+    db $0c ; border tile
+
+    db 1 ; warps
+    db 09,25,6,SS_ANNE_4
+
+    db 0 ; signs
+
+    db 2 ; people
+    db SPRITE_DRATINI,13 + 4,26 + 4,$ff,$d0,$41,DRATINI,OPP_LVL_OFFSET+12
+    db SPRITE_BALL,10 + 4,27 + 4,$ff,$ff,$82,DUSK_STONE ; item
+
+    ; warp-to
+    EVENT_DISP DRATINI_CAVE_WIDTH,09,25 ; SS_ANNE_4
+
+; ──────────────────────
+
+.DratiniCaveTextPointers
+    dw .DratiniCaveText1
+    dw PickupItemText
+
+.DratiniCaveText1
+    db $08 ; asm
+    ld hl,.DratiniCaveTrainerHeader0
+    call TalkToTrainer
+    jp TextScriptEnd
+
+.DratiniCaveTrainerHeaders
+.DratiniCaveTrainerHeader0
+    db 3 ; flag's bit
+    db ($0 << 4) ; trainer's view range
+    dw wEventBeatDratiniBit3 ; flag's byte
+    dw .DratiniCaveDratiniText ; TextBeforeBattle
+    dw .DratiniCaveDratiniText ; TextAfterBattle
+    dw .DratiniCaveDratiniText ; TextEndBattle
+    dw .DratiniCaveDratiniText ; TextEndBattle
+
+    db $ff
+
+.DratiniCaveDratiniText
+    TX_FAR _DratiniCaveDratiniText
+    db $08 ; asm
+    ld a,DRATINI
+    call PlayCry
+    call WaitForSoundToFinish
+    jp TextScriptEnd
+
+; ──────────────────────
+
+.DratiniCaveScript
     call EnableAutoTextBoxDrawing
     ld a,[W_SSANNE4CURSCRIPT]
     cp $01
@@ -135031,68 +135096,19 @@ DratiniCaveScript:
     ld a,$01 ; SSAnne4Script1
     ld [W_SSANNE4CURSCRIPT],a
 .Skip
-    ld hl,DratiniCaveTrainerHeaders
-    ld de,DratiniCaveScriptPointers
-    ld a,[W_DRATINICAVECURSCRIPT]
+    ld hl,.DratiniCaveTrainerHeaders
+    ld de,.DratiniCaveScriptPointers
+    ld a,[W_GENERICMAPCURSCRIPT]
     call ExecuteCurMapScriptInTable
-    ld [W_DRATINICAVECURSCRIPT],a
+    ld [W_GENERICMAPCURSCRIPT],a
     ret
 
-DratiniCaveScriptPointers:
+.DratiniCaveScriptPointers
     dw CheckFightingMapTrainers
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
-DratiniCaveTextPointers:
-    dw DratiniCaveText1
-    dw PickupItemText
-
-DratiniCaveTrainerHeaders:
-DratiniCaveTrainerHeader0:
-    db 3 ; flag's bit
-    db ($0 << 4) ; trainer's view range
-    dw wEventBeatDratiniBit3 ; flag's byte
-    dw DratiniCaveDratiniText ; TextBeforeBattle
-    dw DratiniCaveDratiniText ; TextAfterBattle
-    dw DratiniCaveDratiniText ; TextEndBattle
-    dw DratiniCaveDratiniText ; TextEndBattle
-
-    db $ff
-
-DratiniCaveText1:
-    db $08 ; asm
-    ld hl,DratiniCaveTrainerHeader0
-    call TalkToTrainer
-    jp TextScriptEnd
-
-DratiniCaveDratiniText:
-    TX_FAR _DratiniCaveDratiniText
-    db $08 ; asm
-    ld a,DRATINI
-    call PlayCry
-    call WaitForSoundToFinish
-    jp TextScriptEnd
-
-_DratiniCaveDratiniText:
-    db $0,"Truiuo!@@"
-
-DratiniCaveObject:
-    db $0c ; border tile
-
-    db $1 ; warps
-    db $09,$19,$6,SS_ANNE_4
-
-    db $0 ; signs
-
-    db $2 ; people
-    db SPRITE_DRATINI,$d + 4,$1a + 4,$ff,$d0,$41,DRATINI,OPP_LVL_OFFSET+12
-    db SPRITE_BALL,$a + 4,$1b + 4,$ff,$ff,$82,DUSK_STONE ; item
-
-    ; warp-to
-    EVENT_DISP $f,$09,$19 ; SS_ANNE_4
-
-DratiniCaveBlocks:
-    INCBIN "maps/dratinicave.blk"
+; ──────────────────────────────────────────────────────────────────────
 
 ; INPUT
 ; e = Low Bit Return Pointer

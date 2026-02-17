@@ -1613,11 +1613,11 @@ W_SEAFOAMISLANDS5CURSCRIPT: ; d668
 W_ROUTE18GATECURSCRIPT: ; d669
     ds 1
 
-W_DRATINICAVECURSCRIPT: ; d66a
+;Unused ; d66a
     ds 1
 W_SSANNE4CURSCRIPT: ; d66b
     ds 1
-W_DIGLETTSCAVECURSCRIPT: ; d66c
+;Unused ; d66c
     ds 1
 W_SAFARIZONECURSCRIPT: ; d66d
     ds 1
@@ -1880,7 +1880,6 @@ W_BOXMON2DATA: ; dab7
 
 SECTION "DenimFlags",WRAMX[$dee2],BANK[1]
 
-wDigCaveAerodactylTrigBit0 ; dee2 ; bit 0
 wPrintBattleValueBit0      ; dee2 ; bit 0 = Trigger Print Battle Value
 wTownMapBeforeJoypadBit0   ; dee2 ; bit 0 = Show Town Map Before Joypad Press
 wFlagFlyingMonSpriteBit0   ; dee2 ; bit 0 = Force to Load Mon Sprite with $0040 offset
