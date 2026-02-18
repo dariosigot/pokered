@@ -384,8 +384,8 @@ RATTATA_Learnset:
     db  4,SCRATCH
     db  8,FURY_SWIPES
     db 10,QUICK_ATTACK
+    db 12,Skill__DIG
     db 13,BITE
-    db 14,Skill__DIG
     db 15,HYPER_FANG
     db 17,DEFENSE_CURL
     ;  20,RATICATE
@@ -604,8 +604,8 @@ NIDORAN_F_Learnset:
     db  7,TAIL_WHIP
     db  9,SAND_ATTACK
     db 11,POISON_STING
+    db 12,Skill__DIG
     db 13,FURY_SWIPES
-    db 14,Skill__DIG
     db 15,LEER
     db 16,DOUBLE_KICK
     db 16,POISONPOWDER
@@ -677,8 +677,8 @@ NIDORAN_M_Learnset:
     db  7,HORN_ATTACK
     db  9,SAND_ATTACK
     db 11,POISON_STING
+    db 12,Skill__DIG
     db 13,FURY_ATTACK
-    db 14,Skill__DIG
     db 15,LEER
     db 16,DOUBLE_KICK
     db 16,POISONPOWDER
@@ -1190,8 +1190,8 @@ VENONAT_NoEvo_Learnset:
 ; ──────────────────────────────────────────────────────────────────────
 DIGLETT_Learnset:
     db  1,SCRATCH
+    db  1,Skill__DIG
     db  1,GROWL
-    db  3,Skill__DIG
     db  5,SAND_ATTACK
     db  9,TRAPHOLE
     db 13,AGILITY
@@ -1716,7 +1716,7 @@ GEODUDE_Learnset:
     db  6,POUND
     db  9,DOUBLESLAP
     db 11,SAND_ATTACK
-    db 12,Skill__DIG
+    db 11,Skill__DIG
     db 13,ROCK_THROW
     db 13,BIDE
     db 14,HEADBUTT
@@ -2158,7 +2158,7 @@ GASTLY_NoEvo_Learnset:
 ONIX_Learnset:
     db  1,TACKLE
     db  1,SCREECH
-    db  4,Skill__DIG
+    db  1,Skill__DIG
     db  5,CONSTRICT
     db  8,BIDE
     db  8,RAGE
@@ -2189,7 +2189,7 @@ ONIX_Learnset:
 ONIX_Crystal_Learnset:
     db  1,TACKLE
     db  1,SCREECH
-    db  4,Skill__DIG
+    db  1,Skill__DIG
     db  5,CONSTRICT
     db  8,BIDE
     db  8,RAGE
