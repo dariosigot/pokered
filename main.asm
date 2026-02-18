@@ -84840,9 +84840,9 @@ Route3Text1:
     set 1,[hl]
     ld hl,.Route3Text1
     jr nz,.skip
-    ld hl,.Route3Text1_TM30
+    ld hl,.Route3Text1_TM44
     call PrintText
-    ld bc,(TM_30 << 8) | 3
+    ld bc,(TM_44 << 8) | 3
     call GiveItem
     ld hl,.GotText
 .skip
@@ -84851,8 +84851,8 @@ Route3Text1:
 .Route3Text1
     TX_FAR _Route3Text1
     db "@"
-.Route3Text1_TM30
-    TX_FAR _Route3Text1_TM30
+.Route3Text1_TM44
+    TX_FAR _Route3Text1_TM44
     db "@"
 .GotText
     TX_FAR _GotText
@@ -96330,7 +96330,7 @@ SSAnne10Object: ; 0x61e75 (size=165)
     db SPRITE_BLACK_HAIR_BOY_2,$d + 4,$a + 4,$ff,$d3,$7 ; person
     db SPRITE_MACHOKE,$c + 4,$b + 4,$ff,$ff,$8 ; person
     db SPRITE_BALL,$2 + 4,$14 + 4,$ff,$ff,$89,ETHER ; item
-    db SPRITE_BALL,$2 + 4,$a + 4,$ff,$ff,$8a,TM_44 ; item
+    db SPRITE_BALL,$2 + 4,$a + 4,$ff,$ff,$8a,TM_30 ; item
     db SPRITE_BALL,$b + 4,$c + 4,$ff,$ff,$8b,MAX_POTION ; item
 
     ; warp-to
@@ -123774,7 +123774,7 @@ _Route2Text4:
 
 _Route3Text1:
     text_init , "Whew... I better"
-    text_line , "take a rest..."
+    text_line , "take a REST..."
     text_cont , "Groan..."
     text_para , "That tunnel from"
     text_line , "CERULEAN takes a"
@@ -124624,9 +124624,9 @@ _Mansion2BattleText2:
     text_init , "Gyaoo!"
     text_past
 
-_Route3Text1_TM30:
+_Route3Text1_TM44:
     text_init , "Whew... I better"
-    text_line , "take a rest..."
+    text_line , "take a REST..."
     text_cont , "Groan..."
     text_para , "That tunnel from"
     text_line , "CERULEAN takes a"
