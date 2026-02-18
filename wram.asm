@@ -2032,6 +2032,7 @@ wCollisionFlag:: db ; def1
 ; bit 1 = Try Stop Surfing
 ; bit 2 = Can Surfing
 ; bit 3 = Try Pushing Boulder
+; bit 4 = Try Walking Sprite
 
 NEXTU
 

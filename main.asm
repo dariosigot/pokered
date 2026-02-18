@@ -51046,31 +51046,31 @@ SearchMoveToReplace:
 
     ; Shuffle Move
     push af
-    call ShuffleMoves
+    call .ShuffleMoves
     pop af
 
     ; Check New Move
     push de
-    call GetMoveDamageAndType
+    call .GetMoveDamageAndType
     ld a,d
     ld [wNewMoveDamage],a
     ld a,e
     ld [wNewMoveType],a
     pop de
     ld b,%00111111 ; 1/64 = 1.5625% not learn
-    ld hl,LearnDamageMove
+    ld hl,.LearnDamageNewMove
     jr nz,.done
     ld b,%00001111 ; 1/16 = 6.25% not learn
-    ld hl,LearnZeroDamageMove
+    ld hl,.LearnZeroDamageNewMove
 .done
-    call DefinePriorityMoveToReplace
+    call .DefinePriorityMoveToReplace
     jr nc,.fail
 
     ; Read Calculated Move Priority to Identify Worst
 .resetloop
     ld hl,wMoveForgotPriority
     ld c,-1
-.loop
+.loop1
     inc c
     ld a,c
     cp 4
@@ -51078,7 +51078,7 @@ SearchMoveToReplace:
     dec [hl]
     jr z,.endloop
     inc hl
-    jr .loop
+    jr .loop1
 .endloop
 
     ; Place Worst Move to first position
@@ -51087,9 +51087,9 @@ SearchMoveToReplace:
     ld e,l
     ld b,0
     add hl,bc
-    call SwapMoves
+    call .SwapMoves
 
-.end
+.end1
     pop hl
     pop de
     call ShiftMoveData ; shift all moves one up (deleting move 1)
@@ -51101,27 +51101,26 @@ SearchMoveToReplace:
     pop de
     xor a ; rcf
     ret
-.daycare
-    pop hl
-    jr .end
 
-DefinePriorityMoveToReplace:
+.DefinePriorityMoveToReplace
     call GenRandom
     and b
     ret z ; rcf
     ld bc,$00FF ; b = 0 | c = -1
-.loop
+.loop2
     inc c
     push hl
     push bc
     ld a,c
     cp 4
-    jr z,.end
+    jr z,.end2
     ld a,[de]
     ld b,20 ; Start Value
     push de
     ld de,.return
     push de
+    call .GetMoveDamageAndType
+    call .LearnDamageAndZeroDamageMoveCommon
     jp hl
 .return
     pop de
@@ -51132,18 +51131,94 @@ DefinePriorityMoveToReplace:
     ld [hl],a
     pop hl
     inc de
-    jr .loop
-.end
+    jr .loop2
+.end2
     pop bc
     pop hl
     scf
     ret
 
-LearnZeroDamageMove:
-    call LearnDamageAndZeroDamageMoveCommon
-    jp EncourageForgot3 ; ▲ zero damage
+.LearnZeroDamageNewMove
+    jr z,.Zero1
+    jr c,.One1
+    call .HandleOldStabMove
+    inc b ; ▼ old not zero damage
+.Zero1
+    dec b ; ▲ old zero damage
+    dec b ; ...
+.One1
+    dec b ; ▲ old special (1 damage)
+    ret
 
-LearnStabMove:
+.LearnDamageNewMove
+    jr z,.Zero2
+    jr c,.One2
+    call .HandleOldStabMove
+    ld a,[wNewMoveType]
+    cp e
+    jr nz,.DifferentType
+    dec b ; ▲ same type
+    ld a,[wNewMoveDamage]
+    cp d
+    jr c,.DifferentType ; c = damage old > damage new
+    call .EncourageForgot3 ; ▲ same type and new damage >= old damage
+.DifferentType
+    ld a,[wNewMoveDamage]
+    cp d
+    jr nc,.NewMoreDamageThanOld ; c = damage old > damage new
+    ; old > new
+    ld e,a ; a = delta
+    ld a,d ; ...
+    sub e  ; ...
+.LoopDeltaDamage1
+    inc b ; ▼ damage old > damage new
+    sub 20
+    jr nc,.LoopDeltaDamage1
+    ret
+.NewMoreDamageThanOld
+    ; new >= old
+    sub d ; a = delta
+.LoopDeltaDamage2
+    dec b ; ▲ damage new >= old
+    sub 20
+    jr nc,.LoopDeltaDamage2
+    ret
+.Zero2
+    inc b ; ▼ old zero damage
+    ret
+.One2
+    dec b ; ▲ old special (1 damage)
+    ret
+
+.LearnDamageAndZeroDamageMoveCommon
+    push af
+    push de
+    push hl
+    ld hl,W_ISINBATTLE
+    ld d,[hl]
+    dec d
+    jr nz,.notWildBattle
+    ld hl,.EscapeMoves
+    call .CheckList
+    jr nc,.notWildBattle
+    call .DiscourageForgot6 ; ▼ Escape
+.notWildBattle
+    ld hl,.DreamEaterMoves
+    call .CheckList
+    jr nc,.notDreamEater
+    call .DiscourageForgot6 ; ▼ DreamEater
+.notDreamEater
+    ld hl,.NotForgottableMoves
+    call .CheckList
+    jr nc,.notForgottable
+    call .DiscourageForgot3 ; ▼ Unforgottable
+.notForgottable
+    pop hl
+    pop de
+    pop af
+    ret
+
+.HandleOldStabMove
     push hl
     ld hl,W_MONHTYPES
     ld a,[hli]
@@ -51164,82 +51239,19 @@ LearnStabMove:
     pop hl
     ret
 
-LearnDamageAndZeroDamageMoveCommon:
-    ld hl,W_ISINBATTLE
-    ld d,[hl]
-    dec d
-    jr nz,.notWildBattle
-    ld hl,EscapeMoves
-    call CheckList
-    jr nc,.notWildBattle
-    call DiscourageForgot6 ; ▼ Escape
-.notWildBattle
-    ld hl,DreamEaterMoves
-    call CheckList
-    jr nc,.notDreamEater
-    call DiscourageForgot6 ; ▼ DreamEater
-.notDreamEater
-    ld hl,NotForgottableMoves
-    call CheckList
-    jr nc,.notForgottable
-    call DiscourageForgot3 ; ▼ Unforgottable
-.notForgottable
-    ret
-
-LearnDamageMove:
-    call LearnDamageAndZeroDamageMoveCommon
-    call GetMoveDamageAndType
-    ld a,d
-    dec a
-    jr z,.One
-    ld a,[wNewMoveType]
-    cp e
-    jr nz,.DifferentType
-    dec b ; ▲ same type
-    ld a,[wNewMoveDamage]
-    cp d
-    jr c,.DifferentType ; c = damage old > damage new
-    call EncourageForgot3 ; ▲ same type and new damage >= old damage
-.DifferentType
-    call LearnStabMove
-    ld a,[wNewMoveDamage]
-    cp d
-    jr nc,.NewLessDamageThanOld ; c = damage old > damage new
-    ; old > new
-    ld e,a ; a = delta
-    ld a,d ; ...
-    sub e  ; ...
-.LoopDeltaDamage1
-    inc b ; ▼ damage old > damage new
-    sub 20
-    jr nc,.LoopDeltaDamage1
-    jr .done
-.NewLessDamageThanOld
-    ; new >= old
-    sub d ; a = delta
-.LoopDeltaDamage2
-    dec b ; ▲ damage new >= old
-    sub 20
-    jr nc,.LoopDeltaDamage2
-.done
-    ret
-.One
-    dec b ; ▲ special (1 damage)
-    ret
-
-ShuffleMoves:
+.ShuffleMoves
     push de
     push hl
-    call .ShuffleMoves
+    call .Shuffle
     pop hl
     pop de
     ret
-.ShuffleMoves
+.Shuffle
     ld h,d
     ld l,e
     ld b,0
     push hl
-.loop
+.loop3
     inc b
     ld a,b
     cp 30 ; swap slot n times
@@ -51253,13 +51265,13 @@ ShuffleMoves:
     add hl,de
     ld a,[hl]
     and a
-    jr z,.loop
+    jr z,.loop3
     pop de
     push de
-    call SwapMoves
-    jr .loop
+    call .SwapMoves
+    jr .loop3
 
-SwapMoves:
+.SwapMoves
     push bc
     ld a,[hl]
     ld c,a
@@ -51275,40 +51287,51 @@ SwapMoves:
 ; OUTPUT
 ; d = damage
 ; e = type
-; set z if damage = 0
-GetMoveDamageAndType:
+; set z reset c if damage = 0
+; set c reset z if damage = 1
+; reset z reset c if damage > 1
+.GetMoveDamageAndType
     push hl
     push bc
+    push af
     dec a
     ld hl,Moves+2 ; damage
     ld bc,6
     call AddNTimes
     ld a,[hli] ; damage
     ld d,a
-    and a
+    and a ; rcf
+    jr z,.GetType ; szf
+    dec a
+    jr nz,.GetType
+    inc a ; rzf
+    scf ; scf
+.GetType
     ld a,[hl] ; type
     ld e,a
+    pop bc
+    ld a,b
     pop bc
     pop hl
     ret
 
-DiscourageForgot6:
-    call DiscourageForgot3
-DiscourageForgot3:
+.DiscourageForgot6
+    call .DiscourageForgot3
+.DiscourageForgot3
     inc b
     inc b
     inc b
     ret
 
-EncourageForgot6:
-    call EncourageForgot3
-EncourageForgot3:
+.EncourageForgot6
+    call .EncourageForgot3
+.EncourageForgot3
     dec b
     dec b
     dec b
     ret
 
-CheckList:
+.CheckList
     push bc
     push af
     push de
@@ -51320,13 +51343,13 @@ CheckList:
     pop bc
     ret
 
-EscapeMoves:
+.EscapeMoves
     db ROAR
     db TELEPORT
     db WHIRLWIND
     db $FF
 
-DreamEaterMoves:
+.DreamEaterMoves
     db SING
     db SLEEP_POWDER
     db HYPNOSIS
@@ -51335,7 +51358,7 @@ DreamEaterMoves:
     db DREAM_EATER
     db $FF
 
-NotForgottableMoves:
+.NotForgottableMoves
     db SWORDS_DANCE
     db BODY_SLAM
     db TWINEEDLE
@@ -84908,7 +84931,10 @@ Route21Script2:
     ld [W_ROUTE21CURSCRIPT],a
     ret
 
+; de = Mon Moves
+; hl = Mon Moves
 HandleMovesAfterDayCare:
+    call .ResetActualMoves
     PREDEF WriteMonMoves
     ld a,[$FF00+$e4]
     push af
@@ -84917,6 +84943,15 @@ HandleMovesAfterDayCare:
     BANKSWITCH AddPokemonToParty_TryToAddExclusiveMove_
     pop af
     ld [$FF00+$e4],a
+    ret
+.ResetActualMoves
+    xor a
+    ld [hli],a
+    ld [hli],a
+    ld [hli],a
+    ld [hl],a
+    ld h,d
+    ld l,e
     ret
 
 Route21Blocks:
