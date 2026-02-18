@@ -118190,7 +118190,7 @@ _UnnamedText_49f94:
 _UnnamedText_49f99:
     text_init , "All right. Then"
     text_line , "this is mine!"
-    text_past
+    text_wait
 
 _MtMoon3BattleText2:
     text_init , "TEAM ROCKET will"
