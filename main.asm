@@ -108402,7 +108402,7 @@ HiddenItemCoords: ; 766b8 (1d:66b8)
     db ROUTE_13            , 14,01
     db ROUTE_13            , 13,16
     db MANSION_4           , 09,01
-    db $FF                 , 00,00 ; Not Used
+    db $FE                 , 00,00 ; Not Used
     db SAFARI_ZONE_WEST    , 05,06
     db SILPH_CO_5F         , 03,12
     db SILPH_CO_9F         , 15,02
