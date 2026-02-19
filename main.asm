@@ -117728,6 +117728,8 @@ INCLUDE "music/jigglypuffsong.asm"
 INCLUDE "music/halloffame.asm"
 INCLUDE "music/credits.asm"
 
+SECTION "bank20",ROMX,BANK[$20]
+
 text_init EQUS "db $00"     ; init
 text_line EQUS "db $4F"     ; \n (new line) after an "init"
 text_cont EQUS "db $55"     ; continue with scroll text
@@ -117737,8 +117739,6 @@ text_wait EQUS "db $58"     ; text end wait button press
 text_paus EQUS "db $50"     ; text pause, follow by another function
 text_stop EQUS "db $50"     ; text single end
 text_past EQUS "db $50,$50" ; text double end
-
-SECTION "bank20",ROMX,BANK[$20]
 
 _CardKeySuccessText1:
     text_init , "Bingo!"
@@ -133730,9 +133730,196 @@ _UnnamedText_2fe3b:
     text_init , "!"
     text_wait
 
+; ──────────────────────────────────────────────────────────────────────
+
 SECTION "bank2B",ROMX,BANK[$2B]
 
 INCLUDE "text/pokedex.asm"
+
+; ──────────────────────────────────────────────────────────────────────
+
+MonsterNames:
+    db "MISSINGNO." ; 001 - MISSINGNO
+    db "BULBASAUR@" ; 001 - BULBASAUR
+    db "IVYSAUR@@@" ; 002 - IVYSAUR
+    db "VENUSAUR@@" ; 003 - VENUSAUR
+    db "CHARMANDER" ; 004 - CHARMANDER
+    db "CHARMELEON" ; 005 - CHARMELEON
+    db "CHARIZARD@" ; 006 - CHARIZARD
+    db "SQUIRTLE@@" ; 007 - SQUIRTLE
+    db "WARTORTLE@" ; 008 - WARTORTLE
+    db "BLASTOISE@" ; 009 - BLASTOISE
+    db "CATERPIE@@" ; 010 - CATERPIE
+    db "METAPOD@@@" ; 011 - METAPOD
+    db "BUTTERFREE" ; 012 - BUTTERFREE
+    db "WEEDLE@@@@" ; 013 - WEEDLE
+    db "KAKUNA@@@@" ; 014 - KAKUNA
+    db "BEEDRILL@@" ; 015 - BEEDRILL
+    db "PIDGEY@@@@" ; 016 - PIDGEY
+    db "PIDGEOTTO@" ; 017 - PIDGEOTTO
+    db "PIDGEOT@@@" ; 018 - PIDGEOT
+    db "RATTATA@@@" ; 019 - RATTATA
+    db "RATICATE@@" ; 020 - RATICATE
+    db "SPEAROW@@@" ; 021 - SPEAROW
+    db "FEAROW@@@@" ; 022 - FEAROW
+    db "EKANS@@@@@" ; 023 - EKANS
+    db "ARBOK@@@@@" ; 024 - ARBOK
+    db "PIKACHU@@@" ; 025 - PIKACHU
+    db "RAICHU@@@@" ; 026 - RAICHU
+    db "SANDSHREW@" ; 027 - SANDSHREW
+    db "SANDSLASH@" ; 028 - SANDSLASH
+    db "NIDORAN@@@" ; 029 - NIDORAN_F
+    db "NIDORINA@@" ; 030 - NIDORINA
+    db "NIDOQUEEN@" ; 031 - NIDOQUEEN
+    db "NIDORAN@@@" ; 032 - NIDORAN_M
+    db "NIDORINO@@" ; 033 - NIDORINO
+    db "NIDOKING@@" ; 034 - NIDOKING
+    db "CLEFAIRY@@" ; 035 - CLEFAIRY
+    db "CLEFABLE@@" ; 036 - CLEFABLE
+    db "VULPIX@@@@" ; 037 - VULPIX
+    db "NINETALES@" ; 038 - NINETALES
+    db "JIGGLYPUFF" ; 039 - JIGGLYPUFF
+    db "WIGGLYTUFF" ; 040 - WIGGLYTUFF
+    db "ZUBAT@@@@@" ; 041 - ZUBAT
+    db "GOLBAT@@@@" ; 042 - GOLBAT
+    db "ODDISH@@@@" ; 043 - ODDISH
+    db "GLOOM@@@@@" ; 044 - GLOOM
+    db "VILEPLUME@" ; 045 - VILEPLUME
+    db "PARAS@@@@@" ; 046 - PARAS
+    db "PARASECT@@" ; 047 - PARASECT
+    db "VENONAT@@@" ; 048 - VENONAT
+    db "VENOMOTH@@" ; 049 - VENOMOTH
+    db "DIGLETT@@@" ; 050 - DIGLETT
+    db "DUGTRIO@@@" ; 051 - DUGTRIO
+    db "MEOWTH@@@@" ; 052 - MEOWTH
+    db "PERSIAN@@@" ; 053 - PERSIAN
+    db "PSYDUCK@@@" ; 054 - PSYDUCK
+    db "GOLDUCK@@@" ; 055 - GOLDUCK
+    db "MANKEY@@@@" ; 056 - MANKEY
+    db "PRIMEAPE@@" ; 057 - PRIMEAPE
+    db "GROWLITHE@" ; 058 - GROWLITHE
+    db "ARCANINE@@" ; 059 - ARCANINE
+    db "POLIWAG@@@" ; 060 - POLIWAG
+    db "POLIWHIRL@" ; 061 - POLIWHIRL
+    db "POLIWRATH@" ; 062 - POLIWRATH
+    db "ABRA@@@@@@" ; 063 - ABRA
+    db "KADABRA@@@" ; 064 - KADABRA
+    db "ALAKAZAM@@" ; 065 - ALAKAZAM
+    db "MACHOP@@@@" ; 066 - MACHOP
+    db "MACHOKE@@@" ; 067 - MACHOKE
+    db "MACHAMP@@@" ; 068 - MACHAMP
+    db "BELLSPROUT" ; 069 - BELLSPROUT
+    db "WEEPINBELL" ; 070 - WEEPINBELL
+    db "VICTREEBEL" ; 071 - VICTREEBEL
+    db "TENTACOOL@" ; 072 - TENTACOOL
+    db "TENTACRUEL" ; 073 - TENTACRUEL
+    db "GEODUDE@@@" ; 074 - GEODUDE
+    db "GRAVELER@@" ; 075 - GRAVELER
+    db "GOLEM@@@@@" ; 076 - GOLEM
+    db "PONYTA@@@@" ; 077 - PONYTA
+    db "RAPIDASH@@" ; 078 - RAPIDASH
+    db "SLOWPOKE@@" ; 079 - SLOWPOKE
+    db "SLOWBRO@@@" ; 080 - SLOWBRO
+    db "MAGNEMITE@" ; 081 - MAGNEMITE
+    db "MAGNETON@@" ; 082 - MAGNETON
+    db "FARFETCH'D" ; 083 - FARFETCH_D
+    db "DODUO@@@@@" ; 084 - DODUO
+    db "DODRIO@@@@" ; 085 - DODRIO
+    db "SEEL@@@@@@" ; 086 - SEEL
+    db "DEWGONG@@@" ; 087 - DEWGONG
+    db "GRIMER@@@@" ; 088 - GRIMER
+    db "MUK@@@@@@@" ; 089 - MUK
+    db "SHELLDER@@" ; 090 - SHELLDER
+    db "CLOYSTER@@" ; 091 - CLOYSTER
+    db "GASTLY@@@@" ; 092 - GASTLY
+    db "HAUNTER@@@" ; 093 - HAUNTER
+    db "GENGAR@@@@" ; 094 - GENGAR
+    db "ONIX@@@@@@" ; 095 - ONIX
+    db "DROWZEE@@@" ; 096 - DROWZEE
+    db "HYPNO@@@@@" ; 097 - HYPNO
+    db "KRABBY@@@@" ; 098 - KRABBY
+    db "KINGLER@@@" ; 099 - KINGLER
+    db "VOLTORB@@@" ; 100 - VOLTORB
+    db "ELECTRODE@" ; 101 - ELECTRODE
+    db "EXEGGCUTE@" ; 102 - EXEGGCUTE
+    db "EXEGGUTOR@" ; 103 - EXEGGUTOR
+    db "CUBONE@@@@" ; 104 - CUBONE
+    db "MAROWAK@@@" ; 105 - MAROWAK
+    db "HITMONLEE@" ; 106 - HITMONLEE
+    db "HITMONCHAN" ; 107 - HITMONCHAN
+    db "LICKITUNG@" ; 108 - LICKITUNG
+    db "KOFFING@@@" ; 109 - KOFFING
+    db "WEEZING@@@" ; 110 - WEEZING
+    db "RHYHORN@@@" ; 111 - RHYHORN
+    db "RHYDON@@@@" ; 112 - RHYDON
+    db "CHANSEY@@@" ; 113 - CHANSEY
+    db "TANGELA@@@" ; 114 - TANGELA
+    db "KANGASKHAN" ; 115 - KANGASKHAN
+    db "HORSEA@@@@" ; 116 - HORSEA
+    db "SEADRA@@@@" ; 117 - SEADRA
+    db "GOLDEEN@@@" ; 118 - GOLDEEN
+    db "SEAKING@@@" ; 119 - SEAKING
+    db "STARYU@@@@" ; 120 - STARYU
+    db "STARMIE@@@" ; 121 - STARMIE
+    db "MR.MIME@@@" ; 122 - MR_MIME
+    db "SCYTHER@@@" ; 123 - SCYTHER
+    db "JYNX@@@@@@" ; 124 - JYNX
+    db "ELECTABUZZ" ; 125 - ELECTABUZZ
+    db "MAGMAR@@@@" ; 126 - MAGMAR
+    db "PINSIR@@@@" ; 127 - PINSIR
+    db "TAUROS@@@@" ; 128 - TAUROS
+    db "MAGIKARP@@" ; 129 - MAGIKARP
+    db "GYARADOS@@" ; 130 - GYARADOS
+    db "LAPRAS@@@@" ; 131 - LAPRAS
+    db "DITTO@@@@@" ; 132 - DITTO
+    db "EEVEE@@@@@" ; 133 - EEVEE
+    db "VAPOREON@@" ; 134 - VAPOREON
+    db "JOLTEON@@@" ; 135 - JOLTEON
+    db "FLAREON@@@" ; 136 - FLAREON
+    db "PORYGON@@@" ; 137 - PORYGON
+    db "OMANYTE@@@" ; 138 - OMANYTE
+    db "OMASTAR@@@" ; 139 - OMASTAR
+    db "KABUTO@@@@" ; 140 - KABUTO
+    db "KABUTOPS@@" ; 141 - KABUTOPS
+    db "AERODACTYL" ; 142 - AERODACTYL
+    db "SNORLAX@@@" ; 143 - SNORLAX
+    db "ARTICUNO@@" ; 144 - ARTICUNO
+    db "ZAPDOS@@@@" ; 145 - ZAPDOS
+    db "MOLTRES@@@" ; 146 - MOLTRES
+    db "DRATINI@@@" ; 147 - DRATINI
+    db "DRAGONAIR@" ; 148 - DRAGONAIR
+    db "DRAGONITE@" ; 149 - DRAGONITE
+    db "MEWTWO@@@@" ; 150 - MEWTWO
+    db "MEW@@@@@@@" ; 151 - MEW
+    db "LITWICK@@@" ; 152 - LITWICK
+    db "LAMPENT@@@" ; 153 - LAMPENT
+    db "CHANDELURE" ; 154 - CHANDELURE
+    db "MISSINGNO." ; 155 - MISSINGNO
+    db "MISSINGNO." ; 156 - MISSINGNO
+    db "MISSINGNO." ; 157 - MISSINGNO
+    db "MISSINGNO." ; 158 - MISSINGNO
+    db "MISSINGNO." ; 159 - MISSINGNO
+
+;CharizardMName: ; D73D3E12E08CCD2029CD
+;    db $D7,$3D
+;    ld a, $12
+;    ld [$ff00+$8c], a
+;    call DisplayTextID
+;    db $CD
+
+;ApostropheMName: ; D73D3E13E08CCD2029CD
+;    db $D7,$3D
+;    ld a,$13
+;    ld [$ff00+$8c],a
+;    call DisplayTextID
+;    db $CD
+
+_MissingNoDexEntry:
+    db 0 ;----------------|
+    db "What's that ???" ,$4E
+    db "It's a Glitch" ,$5f,"@"
+
+; ──────────────────────────────────────────────────────────────────────
 
 SECTION "bank2C",ROMX,BANK[$2C]
 
@@ -147654,189 +147841,6 @@ GetMonSkill:
     ld [de],a ; store skill id in wSkill vector
     inc de
     ret
-
-; ──────────────────────────────────────────────────────────────────────
-
-MonsterNames:
-    db "MISSINGNO." ; 001 - MISSINGNO
-    db "BULBASAUR@" ; 001 - BULBASAUR
-    db "IVYSAUR@@@" ; 002 - IVYSAUR
-    db "VENUSAUR@@" ; 003 - VENUSAUR
-    db "CHARMANDER" ; 004 - CHARMANDER
-    db "CHARMELEON" ; 005 - CHARMELEON
-    db "CHARIZARD@" ; 006 - CHARIZARD
-    db "SQUIRTLE@@" ; 007 - SQUIRTLE
-    db "WARTORTLE@" ; 008 - WARTORTLE
-    db "BLASTOISE@" ; 009 - BLASTOISE
-    db "CATERPIE@@" ; 010 - CATERPIE
-    db "METAPOD@@@" ; 011 - METAPOD
-    db "BUTTERFREE" ; 012 - BUTTERFREE
-    db "WEEDLE@@@@" ; 013 - WEEDLE
-    db "KAKUNA@@@@" ; 014 - KAKUNA
-    db "BEEDRILL@@" ; 015 - BEEDRILL
-    db "PIDGEY@@@@" ; 016 - PIDGEY
-    db "PIDGEOTTO@" ; 017 - PIDGEOTTO
-    db "PIDGEOT@@@" ; 018 - PIDGEOT
-    db "RATTATA@@@" ; 019 - RATTATA
-    db "RATICATE@@" ; 020 - RATICATE
-    db "SPEAROW@@@" ; 021 - SPEAROW
-    db "FEAROW@@@@" ; 022 - FEAROW
-    db "EKANS@@@@@" ; 023 - EKANS
-    db "ARBOK@@@@@" ; 024 - ARBOK
-    db "PIKACHU@@@" ; 025 - PIKACHU
-    db "RAICHU@@@@" ; 026 - RAICHU
-    db "SANDSHREW@" ; 027 - SANDSHREW
-    db "SANDSLASH@" ; 028 - SANDSLASH
-    db "NIDORAN@@@" ; 029 - NIDORAN_F
-    db "NIDORINA@@" ; 030 - NIDORINA
-    db "NIDOQUEEN@" ; 031 - NIDOQUEEN
-    db "NIDORAN@@@" ; 032 - NIDORAN_M
-    db "NIDORINO@@" ; 033 - NIDORINO
-    db "NIDOKING@@" ; 034 - NIDOKING
-    db "CLEFAIRY@@" ; 035 - CLEFAIRY
-    db "CLEFABLE@@" ; 036 - CLEFABLE
-    db "VULPIX@@@@" ; 037 - VULPIX
-    db "NINETALES@" ; 038 - NINETALES
-    db "JIGGLYPUFF" ; 039 - JIGGLYPUFF
-    db "WIGGLYTUFF" ; 040 - WIGGLYTUFF
-    db "ZUBAT@@@@@" ; 041 - ZUBAT
-    db "GOLBAT@@@@" ; 042 - GOLBAT
-    db "ODDISH@@@@" ; 043 - ODDISH
-    db "GLOOM@@@@@" ; 044 - GLOOM
-    db "VILEPLUME@" ; 045 - VILEPLUME
-    db "PARAS@@@@@" ; 046 - PARAS
-    db "PARASECT@@" ; 047 - PARASECT
-    db "VENONAT@@@" ; 048 - VENONAT
-    db "VENOMOTH@@" ; 049 - VENOMOTH
-    db "DIGLETT@@@" ; 050 - DIGLETT
-    db "DUGTRIO@@@" ; 051 - DUGTRIO
-    db "MEOWTH@@@@" ; 052 - MEOWTH
-    db "PERSIAN@@@" ; 053 - PERSIAN
-    db "PSYDUCK@@@" ; 054 - PSYDUCK
-    db "GOLDUCK@@@" ; 055 - GOLDUCK
-    db "MANKEY@@@@" ; 056 - MANKEY
-    db "PRIMEAPE@@" ; 057 - PRIMEAPE
-    db "GROWLITHE@" ; 058 - GROWLITHE
-    db "ARCANINE@@" ; 059 - ARCANINE
-    db "POLIWAG@@@" ; 060 - POLIWAG
-    db "POLIWHIRL@" ; 061 - POLIWHIRL
-    db "POLIWRATH@" ; 062 - POLIWRATH
-    db "ABRA@@@@@@" ; 063 - ABRA
-    db "KADABRA@@@" ; 064 - KADABRA
-    db "ALAKAZAM@@" ; 065 - ALAKAZAM
-    db "MACHOP@@@@" ; 066 - MACHOP
-    db "MACHOKE@@@" ; 067 - MACHOKE
-    db "MACHAMP@@@" ; 068 - MACHAMP
-    db "BELLSPROUT" ; 069 - BELLSPROUT
-    db "WEEPINBELL" ; 070 - WEEPINBELL
-    db "VICTREEBEL" ; 071 - VICTREEBEL
-    db "TENTACOOL@" ; 072 - TENTACOOL
-    db "TENTACRUEL" ; 073 - TENTACRUEL
-    db "GEODUDE@@@" ; 074 - GEODUDE
-    db "GRAVELER@@" ; 075 - GRAVELER
-    db "GOLEM@@@@@" ; 076 - GOLEM
-    db "PONYTA@@@@" ; 077 - PONYTA
-    db "RAPIDASH@@" ; 078 - RAPIDASH
-    db "SLOWPOKE@@" ; 079 - SLOWPOKE
-    db "SLOWBRO@@@" ; 080 - SLOWBRO
-    db "MAGNEMITE@" ; 081 - MAGNEMITE
-    db "MAGNETON@@" ; 082 - MAGNETON
-    db "FARFETCH'D" ; 083 - FARFETCH_D
-    db "DODUO@@@@@" ; 084 - DODUO
-    db "DODRIO@@@@" ; 085 - DODRIO
-    db "SEEL@@@@@@" ; 086 - SEEL
-    db "DEWGONG@@@" ; 087 - DEWGONG
-    db "GRIMER@@@@" ; 088 - GRIMER
-    db "MUK@@@@@@@" ; 089 - MUK
-    db "SHELLDER@@" ; 090 - SHELLDER
-    db "CLOYSTER@@" ; 091 - CLOYSTER
-    db "GASTLY@@@@" ; 092 - GASTLY
-    db "HAUNTER@@@" ; 093 - HAUNTER
-    db "GENGAR@@@@" ; 094 - GENGAR
-    db "ONIX@@@@@@" ; 095 - ONIX
-    db "DROWZEE@@@" ; 096 - DROWZEE
-    db "HYPNO@@@@@" ; 097 - HYPNO
-    db "KRABBY@@@@" ; 098 - KRABBY
-    db "KINGLER@@@" ; 099 - KINGLER
-    db "VOLTORB@@@" ; 100 - VOLTORB
-    db "ELECTRODE@" ; 101 - ELECTRODE
-    db "EXEGGCUTE@" ; 102 - EXEGGCUTE
-    db "EXEGGUTOR@" ; 103 - EXEGGUTOR
-    db "CUBONE@@@@" ; 104 - CUBONE
-    db "MAROWAK@@@" ; 105 - MAROWAK
-    db "HITMONLEE@" ; 106 - HITMONLEE
-    db "HITMONCHAN" ; 107 - HITMONCHAN
-    db "LICKITUNG@" ; 108 - LICKITUNG
-    db "KOFFING@@@" ; 109 - KOFFING
-    db "WEEZING@@@" ; 110 - WEEZING
-    db "RHYHORN@@@" ; 111 - RHYHORN
-    db "RHYDON@@@@" ; 112 - RHYDON
-    db "CHANSEY@@@" ; 113 - CHANSEY
-    db "TANGELA@@@" ; 114 - TANGELA
-    db "KANGASKHAN" ; 115 - KANGASKHAN
-    db "HORSEA@@@@" ; 116 - HORSEA
-    db "SEADRA@@@@" ; 117 - SEADRA
-    db "GOLDEEN@@@" ; 118 - GOLDEEN
-    db "SEAKING@@@" ; 119 - SEAKING
-    db "STARYU@@@@" ; 120 - STARYU
-    db "STARMIE@@@" ; 121 - STARMIE
-    db "MR.MIME@@@" ; 122 - MR_MIME
-    db "SCYTHER@@@" ; 123 - SCYTHER
-    db "JYNX@@@@@@" ; 124 - JYNX
-    db "ELECTABUZZ" ; 125 - ELECTABUZZ
-    db "MAGMAR@@@@" ; 126 - MAGMAR
-    db "PINSIR@@@@" ; 127 - PINSIR
-    db "TAUROS@@@@" ; 128 - TAUROS
-    db "MAGIKARP@@" ; 129 - MAGIKARP
-    db "GYARADOS@@" ; 130 - GYARADOS
-    db "LAPRAS@@@@" ; 131 - LAPRAS
-    db "DITTO@@@@@" ; 132 - DITTO
-    db "EEVEE@@@@@" ; 133 - EEVEE
-    db "VAPOREON@@" ; 134 - VAPOREON
-    db "JOLTEON@@@" ; 135 - JOLTEON
-    db "FLAREON@@@" ; 136 - FLAREON
-    db "PORYGON@@@" ; 137 - PORYGON
-    db "OMANYTE@@@" ; 138 - OMANYTE
-    db "OMASTAR@@@" ; 139 - OMASTAR
-    db "KABUTO@@@@" ; 140 - KABUTO
-    db "KABUTOPS@@" ; 141 - KABUTOPS
-    db "AERODACTYL" ; 142 - AERODACTYL
-    db "SNORLAX@@@" ; 143 - SNORLAX
-    db "ARTICUNO@@" ; 144 - ARTICUNO
-    db "ZAPDOS@@@@" ; 145 - ZAPDOS
-    db "MOLTRES@@@" ; 146 - MOLTRES
-    db "DRATINI@@@" ; 147 - DRATINI
-    db "DRAGONAIR@" ; 148 - DRAGONAIR
-    db "DRAGONITE@" ; 149 - DRAGONITE
-    db "MEWTWO@@@@" ; 150 - MEWTWO
-    db "MEW@@@@@@@" ; 151 - MEW
-    db "LITWICK@@@" ; 152 - LITWICK
-    db "LAMPENT@@@" ; 153 - LAMPENT
-    db "CHANDELURE" ; 154 - CHANDELURE
-    db "MISSINGNO." ; 155 - MISSINGNO
-    db "MISSINGNO." ; 156 - MISSINGNO
-    db "MISSINGNO." ; 157 - MISSINGNO
-    db "MISSINGNO." ; 158 - MISSINGNO
-    db "MISSINGNO." ; 159 - MISSINGNO
-
-;CharizardMName: ; D73D3E12E08CCD2029CD
-;    db $D7,$3D
-;    ld a, $12
-;    ld [$ff00+$8c], a
-;    call DisplayTextID
-;    db $CD
-
-;ApostropheMName: ; D73D3E13E08CCD2029CD
-;    db $D7,$3D
-;    ld a,$13
-;    ld [$ff00+$8c],a
-;    call DisplayTextID
-;    db $CD
-
-_MissingNoDexEntry:
-    db 0 ;----------------|
-    db "What's that ???" ,$4E
-    db "It's a Glitch" ,$5f,"@"
 
 ; ──────────────────────────────────────────────────────────────────────
 

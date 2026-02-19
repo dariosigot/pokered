@@ -152,10 +152,10 @@ PidgeyTMCompatibility:
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,39                   ; |REFLECT|SWIFT|
     tmlearn 43,44                   ; |SKY_ATTACK|REST|
-    tmlearn 50,52                   ; |SUBSTITUTE|SWOOP|
+    tmlearn 50,51,52                ; |SUBSTITUTE|BLADE|SWOOP|
     tmlearn 0
 PidgeottoTMCompatibility:
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
+    tmlearn 02,03,04                ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|
     tmlearn 09                      ; |TAKE_DOWN|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -164,7 +164,7 @@ PidgeottoTMCompatibility:
     tmlearn 50,51,52                ; |SUBSTITUTE|BLADE|SWOOP|
     tmlearn 0
 PidgeotTMCompatibility:
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
+    tmlearn 02,03,04                ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -199,10 +199,10 @@ SpearowTMCompatibility:
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 39                      ; |SWIFT|
     tmlearn 43,44                   ; |SKY_ATTACK|REST|
-    tmlearn 50,52                   ; |SUBSTITUTE|SWOOP|
+    tmlearn 50,51,52                ; |SUBSTITUTE|BLADE|SWOOP|
     tmlearn 0
 FearowTMCompatibility:
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
+    tmlearn 02,03,04                ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
@@ -1391,7 +1391,7 @@ KabutopsTMCompatibility:
     tmlearn 0
 ; ──────────────────────────────────────────────────────────────────────
 AerodactylTMCompatibility:
-    tmlearn 02,04,08                ; |RAZOR_WIND|WHIRLWIND|BODY_SLAM|
+    tmlearn 02,03,04,08             ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|BODY_SLAM|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 20,23                   ; |RAGE|DRAGON_RAGE|
     tmlearn 26,27,31,32             ; |EARTHQUAKE|FISSURE|MIMIC|DOUBLE_TEAM|
@@ -1411,33 +1411,33 @@ SnorlaxTMCompatibility:
     tmlearn 57,58,59,60             ; |FIRE_PUNCH|ICE_PUNCH|THUNDERPUNCH|DIZZY_PUNCH|
 ; ──────────────────────────────────────────────────────────────────────
 ArticunoTMCompatibility:
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
+    tmlearn 02,03,04                ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|
     tmlearn 09,10,11,12,13,14,15    ; |TAKE_DOWN|DOUBLE_EDGE|BUBBLEBEAM|WATER_GUN|ICE_BEAM|BLIZZARD|HYPER_BEAM|
     tmlearn 0
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,39                   ; |REFLECT|SWIFT|
     tmlearn 41,43,44                ; |LIGHT_SCREEN|SKY_ATTACK|REST|
-    tmlearn 49,50,52,53             ; |TRI_ATTACK|SUBSTITUTE|SWOOP|TSUNAMI|
+    tmlearn 49,50,51,52,53          ; |TRI_ATTACK|SUBSTITUTE|BLADE|SWOOP|TSUNAMI|
     tmlearn 58                      ; |ICE_PUNCH|
 ; ──────────────────────────────────────────────────────────────────────
 ZapdosTMCompatibility:
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
+    tmlearn 02,03,04                ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 24                      ; |THUNDERBOLT|
     tmlearn 25,31,32                ; |THUNDER_M|MIMIC|DOUBLE_TEAM|
     tmlearn 33,39                   ; |REFLECT|SWIFT|
     tmlearn 41,43,44,45             ; |LIGHT_SCREEN|SKY_ATTACK|REST|THUNDER_WAVE|
-    tmlearn 49,50,52,55             ; |TRI_ATTACK|SUBSTITUTE|SWOOP|FLASH|
+    tmlearn 49,50,51,52,55          ; |TRI_ATTACK|SUBSTITUTE|BLADE|SWOOP|FLASH|
     tmlearn 59                      ; |THUNDERPUNCH|
 ; ──────────────────────────────────────────────────────────────────────
 MoltresTMCompatibility:
-    tmlearn 02,04                   ; |RAZOR_WIND|WHIRLWIND|
+    tmlearn 02,03,04                ; |RAZOR_WIND|SWORDS_DANCE|WHIRLWIND|
     tmlearn 09,10,15                ; |TAKE_DOWN|DOUBLE_EDGE|HYPER_BEAM|
     tmlearn 22                      ; |SOLARBEAM|
     tmlearn 31,32                   ; |MIMIC|DOUBLE_TEAM|
     tmlearn 33,37,38,39             ; |REFLECT|FLAMETHROWER|FIRE_BLAST|SWIFT|
     tmlearn 41,43,44                ; |LIGHT_SCREEN|SKY_ATTACK|REST|
-    tmlearn 49,50,52                ; |TRI_ATTACK|SUBSTITUTE|SWOOP|
+    tmlearn 49,50,51,52             ; |TRI_ATTACK|SUBSTITUTE|BLADE|SWOOP|
     tmlearn 57                      ; |FIRE_PUNCH|
 ; ──────────────────────────────────────────────────────────────────────
 DratiniTMCompatibility:

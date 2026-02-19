@@ -25,7 +25,7 @@ VenusaurExclusiveMove:
     db SUBSTITUTE ; TM50
     db BLADE ; TM51
     db SLUDGE ; TM56
-    db LEECH_LIFE
+    db ABSORB
     db BARRAGE
     db BIND
     db 0
@@ -183,6 +183,7 @@ PidgeyExclusiveMove:
 PidgeottoExclusiveMove:
 PidgeotExclusiveMove:
     db RAZOR_WIND ; TM02
+    db SWORDS_DANCE ; TM03
     db WHIRLWIND ; TM04
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -230,6 +231,7 @@ RaticateExclusiveMove:
 SpearowExclusiveMove:
 FearowExclusiveMove:
     db RAZOR_WIND ; TM02
+    db SWORDS_DANCE ; TM03
     db WHIRLWIND ; TM04
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -1940,6 +1942,7 @@ KabutopsExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 AerodactylExclusiveMove:
     db RAZOR_WIND ; TM02
+    db SWORDS_DANCE ; TM03
     db WHIRLWIND ; TM04
     db BODY_SLAM ; TM08
     db TAKE_DOWN ; TM09
@@ -2009,6 +2012,7 @@ SnorlaxExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 ArticunoExclusiveMove:
     db RAZOR_WIND ; TM02
+    db SWORDS_DANCE ; TM03
     db WHIRLWIND ; TM04
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -2026,6 +2030,7 @@ ArticunoExclusiveMove:
     db REST ; TM44
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
+    db BLADE ; TM51
     db SWOOP ; TM52
     db TSUNAMI ; TM53
     db ICE_PUNCH ; TM58
@@ -2033,6 +2038,7 @@ ArticunoExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 ZapdosExclusiveMove:
     db RAZOR_WIND ; TM02
+    db SWORDS_DANCE ; TM03
     db WHIRLWIND ; TM04
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -2049,6 +2055,7 @@ ZapdosExclusiveMove:
     db THUNDER_WAVE ; TM45
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
+    db BLADE ; TM51
     db SWOOP ; TM52
     db FLASH ; TM55
     db THUNDERPUNCH ; TM59
@@ -2056,6 +2063,7 @@ ZapdosExclusiveMove:
 ; ──────────────────────────────────────────────────────────────────────
 MoltresExclusiveMove:
     db RAZOR_WIND ; TM02
+    db SWORDS_DANCE ; TM03
     db WHIRLWIND ; TM04
     db TAKE_DOWN ; TM09
     db DOUBLE_EDGE ; TM10
@@ -2072,6 +2080,7 @@ MoltresExclusiveMove:
     db REST ; TM44
     db TRI_ATTACK ; TM49
     db SUBSTITUTE ; TM50
+    db BLADE ; TM51
     db SWOOP ; TM52
     db FIRE_PUNCH ; TM57
     db 0
