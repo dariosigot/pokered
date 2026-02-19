@@ -1919,6 +1919,7 @@ wBufferPointerByte1   ; dee3 = Buffer Pointer Byte 01
 
 wMaxLevel              ; dee4
 wAvgLevel              ; dee4
+wTmpHPIV               ; dee4 = temporary slot for HP IV from other IV (for debug statusscreen1)
 wTmpRepelQty           ; dee4
 wChoicePkmnMoveDeleter ; dee4
 wTempStatLO            ; dee4

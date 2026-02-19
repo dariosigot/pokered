@@ -30263,6 +30263,7 @@ StartMenu_Option:
     call GetCryData
     call PlaySound
     BANKSWITCH UpdatePartyStats_DEBUG
+    PREDEF HealParty
     jr .restore
 .wtw
     ld a,HAUNTER
@@ -52931,9 +52932,7 @@ ReplaceFaintedEnemyMon_:
 HandlePoisonBurnAfterPlayerMonFainted:
     ld a,[H_WHOSETURN] ; 0 on player’s turn, 1 on enemy’s turn
     and a
-    jr z,.end
-    call HandlePoisonBurnLeechSeed2
-.end
+    call nz,HandlePoisonBurnLeechSeed2
     ld hl,W_ENEMYMONCURHP
     ld a,[hli]
     or [hl]
@@ -52942,9 +52941,7 @@ HandlePoisonBurnAfterPlayerMonFainted:
 HandlePoisonBurnAfterEnemyMonFainted:
     ld a,[H_WHOSETURN] ; 0 on player’s turn, 1 on enemy’s turn
     and a
-    jr nz,.end
     call z,HandlePoisonBurnLeechSeed2
-.end
     ld hl,W_PLAYERMONCURHP
     ld a,[hli]
     or [hl]
@@ -56998,11 +56995,7 @@ Func_3c643:
     ld [$ccf6],a
     ret
 
-; Free
-
-SECTION "ApplyAttackToEnemyPokemon",ROMX[$60df],BANK[$f]
-
-ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
+ApplyAttackToEnemyPokemon:
     ld a,[W_PLAYERMOVEEFFECT]
     cp OHKO_EFFECT
     jr z,ApplyDamageToEnemyPokemon
@@ -57067,8 +57060,9 @@ ApplyAttackToEnemyPokemon: ; 3e0df (f:60df)
     ld [hli],a
     ld a,b
     ld [hl],a
+    ; ft
 
-ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
+ApplyDamageToEnemyPokemon:
     call SetDamageDirectToEnemy ; Denim ; ld hl,W_DAMAGE
     ld a,[hli]
     ld b,a
@@ -57122,9 +57116,7 @@ ApplyDamageToEnemyPokemon: ; 3e142 (f:6142)
 ApplyAttackToEnemyPokemonDone: ; 3e19d (f:619d)
     jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
-SECTION "ApplyAttackToPlayerPokemon",ROMX[$61a0],BANK[$f]
-
-ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
+ApplyAttackToPlayerPokemon:
     ld a,[W_ENEMYMOVEEFFECT]
     cp OHKO_EFFECT
     jr z,ApplyDamageToPlayerPokemon
@@ -57180,6 +57172,8 @@ ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
 ; it's possible for the enemy to do 0 damage with Psywave,but the player always does at least 1 damage
 .loop
     call GenRandomInBattle ; random number
+    and a
+    jr z,.loop
     cp b
     jr nc,.loop
     ld b,a
@@ -57189,8 +57183,9 @@ ApplyAttackToPlayerPokemon: ; 3e1a0 (f:61a0)
     ld [hli],a
     ld a,b
     ld [hl],a
+    ; ft
 
-ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
+ApplyDamageToPlayerPokemon:
     call SetDamageDirectToPlayer ; Denim ; ld hl,W_DAMAGE
     ld a,[hli]
     ld b,a
@@ -57243,7 +57238,7 @@ ApplyDamageToPlayerPokemon: ; 3e200 (f:6200)
 ApplyAttackToPlayerPokemonDone
     jp DrawHUDsAndHPBars ; redraw pokemon names and HP bars
 
-AttackSubstitute: ; 3e25e (f:625e)
+AttackSubstitute:
     call GetPlayerOrEnemyTurnWithSubstitute
     push de
     push bc
@@ -57290,6 +57285,8 @@ AttackSubstitute: ; 3e25e (f:625e)
 .SubstituteTookDamageText
     TX_FAR _SubstituteTookDamageText
     db "@"
+
+; Free
 
 SECTION "HandleBuildingRage",ROMX[$62b6],BANK[$f]
 
@@ -135477,12 +135474,12 @@ DebugStats:
 
 _DebugPlayerStats:
     ; Remove Stat Text
-    FuncCoord 11,7
+    FuncCoord 11,07
     ld hl,Coord
     ld de,.DebugStatsText
     call PlaceString
     ; Print IV
-    FuncCoord 11,9
+    FuncCoord 11,09
     ld hl,Coord
     ld a,[wDVForShinyAtkDef]
     call .PrintIV
@@ -135492,6 +135489,40 @@ _DebugPlayerStats:
     call .PrintIV
     swap a
     call .PrintIV
+    ; Print HP IV
+    ld b,0
+    ld hl,wDVForShinyAtkDef ; wDVForShinySpdSpc
+    ld a,[hli]
+    ld c,a
+    swap a
+    and %00000001
+    sla a
+    sla a
+    sla a
+    add b
+    ld b,a
+    ld a,c
+    and %00000001
+    sla a
+    sla a
+    add b
+    ld b,a
+    ld a,[hl]
+    ld c,a
+    swap a
+    and %00000001
+    sla a
+    add b
+    ld b,a
+    ld a,c
+    and %00000001
+    add b
+    ld de,wTmpHPIV
+    ld [de],a
+    FuncCoord 11,07
+    ld hl,Coord
+    ld bc,(%10000001<<8|2) ; 1 Byte, 2 Digit (with left zero)
+    call PrintNumber
     ; Print exp point
     ld bc,$0205 ; five digits
     ; Print HP exp point
