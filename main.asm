@@ -52250,6 +52250,7 @@ EffectsArray1:
     db FOCUS_ENERGY_EFFECT
     db CONFUSION_EFFECT
     db HEAL_EFFECT
+    db REST_EFFECT
     db TRANSFORM_EFFECT
     db LIGHT_SCREEN_EFFECT
     db REFLECT_EFFECT
@@ -59517,7 +59518,7 @@ JumpMoveEffect_:
     ld l,a
     jp hl       ;jump to special effect handler
 .MoveEffectPointerTable
-     dw SleepEffect                  ; EFFECT_01
+     dw HealEffect                   ; REST_EFFECT
      dw PoisonEffect                 ; POISON_SIDE_EFFECT1
      dw DrainHPEffect                ; DRAIN_HP_EFFECT
      dw FreezeBurnParalyzeEffect     ; BURN_SIDE_EFFECT1

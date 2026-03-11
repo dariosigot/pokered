@@ -103,6 +103,8 @@ AIMoveChoiceModification1:
     ld a,[W_ENEMYMOVEEFFECT]    ;load the move effect
     cp HEAL_EFFECT    ;see if it is a healing move
     jr z,.heal_explode    ;skip out if move is not
+    cp REST_EFFECT    ;see if it is a healing move
+    jr z,.heal_explode    ;skip out if move is not
     cp EXPLODE_EFFECT    ;what about an explosion effect?
     jr nz,.not_heal_explode    ;skip out if move is not
     dec [hl]    ;otherwise give a slight edge to exploding
@@ -583,6 +585,7 @@ EffectsToNotDissuade:
     db LEECH_SEED_EFFECT
     db DISABLE_EFFECT
     db HEAL_EFFECT
+    db REST_EFFECT
     db FOCUS_ENERGY_EFFECT
     db SUBSTITUTE_EFFECT
     db CONVERSION_EFFECT
@@ -754,12 +757,12 @@ AIMoveChoiceModification2:
 
     cp ATTACK_UP1_EFFECT
     jr c,.nextMove
-    cp PAY_DAY_EFFECT
+    cp EVASION_UP1_EFFECT+1
     jr c,.preferMove
 
     cp ATTACK_DOWN1_EFFECT
     jr c,.nextMove
-    cp CONVERSION_EFFECT
+    cp EVASION_DOWN1_EFFECT+1
     jr c,.preferMove
 
     cp SLEEP_EFFECT
@@ -770,7 +773,7 @@ AIMoveChoiceModification2:
 
     cp ATTACK_UP2_EFFECT
     jr c,.nextMove
-    cp HEAL_EFFECT
+    cp EVASION_UP2_EFFECT+1
     jr c,.preferMove
 
     cp ATTACK_UP3_EFFECT
@@ -780,7 +783,7 @@ AIMoveChoiceModification2:
 
     cp ATTACK_DOWN2_EFFECT
     jr c,.nextMove
-    cp ATTACK_DOWN_SIDE1_EFFECT
+    cp PARALYZE_EFFECT+1
     jr c,.preferMove
 
     cp SUBSTITUTE_EFFECT

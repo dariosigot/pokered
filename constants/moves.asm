@@ -140,7 +140,7 @@
     db FLARE        , PARALYZE_EFFECT            ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Acr 191 -> 255 ; PP 30 -> 15
     db DREAM_EATER  , DREAM_EATER_EFFECT         , 100 , GHOST    , 255 , 17 ; pp 10 ; 1 ; Type Psychic -> Ghost ; PP 15 -> 10 ; Ene 20 -> 17
     db POISON_GAS   , POISON_EFFECT              ,   0 , POISON   , 229 , 07 ; pp 30 ; - ; Acr 140 -> 229 ; PP 40 -> 30
-    db BARRAGE      , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , GRASS    , 216 , 14 ; pp 15 ; 0 ; Type Normal -> Grass ; Pwr 15 -> 28 ; PP 20 -> 15
+    db BARRAGE      , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , GRASS    , 216 , 14 ; pp 15 ; 1 ; Type Normal -> Grass ; Pwr 15 -> 28 ; PP 20 -> 15 ; Special
     db LEECH_LIFE   , DRAIN_HP_EFFECT            ,  30 , BUG      , 255 , 08 ; pp 25 ; 0 ; Pwr 20 -> 30 ; PP 15 -> 25
     db LOVELY_KISS  , SLEEP_EFFECT               ,   0 , NORMAL   , 191 , 22 ; pp 10 ; - ; Ene 20 -> 24
     db SKY_ATTACK   , CHARGE_EFFECT              , 140 , WIND     , 229 , 36 ; pp  5 ; 0 ; Ene 40 -> 36
@@ -156,7 +156,7 @@
     db EXPLOSION    , EXPLODE_EFFECT             , 255 , NORMAL   , 255 , 60 ; pp  5 ; 0 ; Pwr 170 -> 255 ; Ene 40 -> 60
     db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , NORMAL   , 204 , 12 ; pp 15 ; 0 ; Pwr 18 -> 21 ; Ene 14 -> 12
     db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  55 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Earth -> Ivory ; Pwr 50 -> 55
-    db REST         , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 28 ; pp 10 ; - ; Type Psychic -> Normal ; Ene 20 -> 28
+    db REST         , REST_EFFECT                ,   0 , NORMAL   , 255 , 28 ; pp 10 ; - ; Type Psychic -> Normal ; Ene 20 -> 28
     db ROCK_SLIDE   , FLINCH_SIDE_EFFECT1        , 100 , ROCK     , 216 , 18 ; pp 10 ; 0 ; Acr 229 -> 216 ; Pwr 75 -> 100 ; PP 10 -> 15 ; Ene 14 -> 18
     db HYPER_FANG   , FLINCH_SIDE_EFFECT1        ,  80 , NORMAL   , 229 , 14 ; pp 15 ; 0
     db SHARPEN      , ATTACK_UP1_EFFECT          ,   0 , METAL    , 255 , 07 ; pp 30 ; - ; Type Normal -> Metal
