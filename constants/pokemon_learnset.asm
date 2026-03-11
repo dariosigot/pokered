@@ -2326,7 +2326,7 @@ KRABBY_Learnset:
     db 18,BUBBLEBEAM
     db 20,STOMP
     db 21,LEECH_LIFE
-    db 22,BONE_CLUB
+    db 22,BONE_SHOT
     db 24,HARDEN
     db 25,SHARPEN
     db 27,STRIKE
@@ -2521,7 +2521,7 @@ CUBONE_Learnset:
     db  1,TACKLE
     db  1,GROWL
     db  5,TAIL_WHIP
-    db  7,BONE_CLUB
+    db  7,BONE_SHOT
     db  7,Skill__DIG
     db  8,SAND_ATTACK
     db 10,TRAPHOLE
@@ -2746,7 +2746,7 @@ RHYHORN_Learnset:
     db 11,Skill__CUT
     db 13,ROCK_THROW
     db 13,Skill__STRENGTH
-    db 15,BONE_CLUB
+    db 15,BONE_SHOT
     db 17,FOCUS_ENERGY
     db 17,RAGE
     db 18,STOMP
@@ -2857,7 +2857,7 @@ KANGASKHAN_Learnset:
     db 17,LOW_KICK
     db 18,RAGE
     db 19,SAND_ATTACK
-    db 19,BONE_CLUB
+    db 19,BONE_SHOT
     db 21,REST
     db 23,BITE
     db 25,ROCK_THROW
@@ -3229,7 +3229,7 @@ PINSIR_Learnset:
     db 16,RAGE
     db 17,LEECH_LIFE
     db 18,KARATE_CHOP
-    db 19,BONE_CLUB
+    db 19,BONE_SHOT
     db 19,Skill__DIG
     db 20,COMET_PUNCH
     db 21,CLAMP
@@ -3268,7 +3268,7 @@ TAUROS_Learnset:
     db 11,STOMP
     db 13,FURY_ATTACK
     db 15,SAND_ATTACK
-    db 15,BONE_CLUB
+    db 15,BONE_SHOT
     db 17,DOUBLE_KICK
     db 19,FOCUS_ENERGY
     db 21,SLAM

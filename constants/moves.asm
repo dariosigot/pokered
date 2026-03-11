@@ -125,7 +125,7 @@
     db LICK         , PARALYZE_SIDE_EFFECT2      ,  35 , NORMAL   , 255 , 07 ; pp 30 ; 0 ; Pwr 20 -> 35
     db SMOG         , POISON_SIDE_EFFECT2        ,  45 , POISON   , 178 , 08 ; pp 20 ; 1 ; Pwr 20 -> 45 ; PP 20 -> 25
     db SLUDGE       , POISON_SIDE_EFFECT2        ,  75 , POISON   , 255 , 11 ; pp 20 ; 0 ; Pwr 65 -> 75 ; Phisical ; Ene 10 -> 11
-    db BONE_CLUB    , FLINCH_SIDE_EFFECT1        ,  70 , IVORY    , 216 , 08 ; pp 25 ; 0 ; Type Earth -> Ivory ; Pwr 65 -> 70 ; PP 20 -> 25
+    db BONE_SHOT    , FLINCH_SIDE_EFFECT1        ,  70 , IVORY    , 216 , 08 ; pp 25 ; 0 ; Type Earth -> Ivory ; Pwr 65 -> 70 ; PP 20 -> 25
     db FIRE_BLAST   , BURN_SIDE_EFFECT2          , 120 , FIRE     , 216 , 36 ; pp  5 ; 1 ; Ene 40 -> 36
     db WATERFALL    , NO_ADDITIONAL_EFFECT       ,  80 , WATER    , 255 , 14 ; pp 15 ; 0
     db CLAMP        , TRAPPING_EFFECT            ,  10 , IVORY    , 191 , 11 ; pp 20 ; 0 ; Pwr 35 -> 10 ; Type Water -> Ivory ; PP 10 -> 20 ; Ene 10 -> 11

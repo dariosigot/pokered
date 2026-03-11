@@ -112872,7 +112872,7 @@ SludgeAnim: ; 7a5ad (1e:65ad)
     db $46,$7B,$14
     db $FF
 
-BoneClubAnim: ; 7a5b4 (1e:65b4)
+BoneShotAnim: ; 7a5b4 (1e:65b4)
     db $08,$7C,$02
     db $FF
 
@@ -134048,7 +134048,7 @@ MoveNames: ; b0000 (2c:4000)
     db "LICK@"
     db "SMOG@"
     db "SLUDGE@"
-    db "BONE CLUB@"
+    db "BONE SHOT@"
     db "FIRE BLAST@"
     db "WATERFALL@"
     db "CLAMP@"
@@ -136965,7 +136965,7 @@ AttackAnimationPointers:
     dw LickAnim
     dw SmogAnim
     dw SludgeAnim
-    dw BoneClubAnim
+    dw BoneShotAnim
     dw FireBlastAnim
     dw WaterfallAnim
     dw ClampAnim
@@ -144374,7 +144374,7 @@ db %00000110    ; Rock Throw,Earthquake,Fissure,Dig,Toxic,Confusion,Psychic,Hypn
 db %00000100    ; Meditate,Agility,Quick Attack,Rage,Teleport,Night Shade,Mimic,Screech
 db %00000000    ; Double Team,Recover,Harden,Minimize,Smokescreen,Confuse Ray,Withdraw,Defense Curl
 db %00000000    ; Barrier,Light Screen,Haze,Reflect,Focus Energy,Bide,Metronome,Mirror Move
-db %00010010    ; Self-Destruct,Egg Bomb,Lick,Smog,Sludge,Bone Club,Fire Blast,Waterfall
+db %00010010    ; Self-Destruct,Egg Bomb,Lick,Smog,Sludge,Bone Shot,Fire Blast,Waterfall
 db %01000000    ; Clamp,Swift,Skull Bash,Spike Cannon,Constrict,Amnesia,Kinesis,Soft-Boiled
 db %00100000    ; High Jump Kick,Flare,Dream Eater,Poison Gas,Barrage,Leech Life,Lovely Kiss,Sky Attack
 db %01000100    ; Transform,Bubble,Dizzy Punch,Spore,Flash,Psywave,Splash,Acid Armor
