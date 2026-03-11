@@ -52310,23 +52310,7 @@ GetDamageVarsScaleStats:
     inc c
     ret
 
-DontMissDigMoves:
-    db EARTHQUAKE
-    db FISSURE
-    db STOMP
-    db $FF
-
-DontMissFlyMoves:
-    db ROCK_THROW
-    db ROCK_SLIDE
-    db THUNDER_M
-    db BLIZZARD
-    db TOXIC
-    db BONEMERANG
-    db RAZOR_WIND
-    db GUST
-    db WHIRLWIND
-    db $FF
+; Free
 
 SECTION "Func_3c04c",ROMX[$404c],BANK[$f]
 
@@ -57287,7 +57271,24 @@ AttackSubstitute:
     TX_FAR _SubstituteTookDamageText
     db "@"
 
-; Free
+DontMissDigMoves:
+    db EARTHQUAKE
+    db FISSURE
+    db STOMP
+    db $FF
+
+DontMissFlyMoves:
+    db ROCK_THROW
+    db ROCK_SLIDE
+    db THUNDER_M
+    db BLIZZARD
+    db TOXIC
+    db BONEMERANG
+    db RAZOR_WIND
+    db GUST
+    db WHIRLWIND
+    db HI_JUMP_KICK
+    db $FF
 
 SECTION "HandleBuildingRage",ROMX[$62b6],BANK[$f]
 
@@ -144377,7 +144378,7 @@ db %00000000    ; Double Team,Recover,Harden,Minimize,Smokescreen,Confuse Ray,Wi
 db %00000000    ; Barrier,Light Screen,Haze,Reflect,Focus Energy,Bide,Metronome,Mirror Move
 db %00010010    ; Self-Destruct,Egg Bomb,Lick,Smog,Sludge,Bone Shot,Fire Blast,Waterfall
 db %01000000    ; Clamp,Swift,Skull Bash,Spike Cannon,Constrict,Amnesia,Kinesis,Soft-Boiled
-db %00100000    ; High Jump Kick,Flare,Dream Eater,Poison Gas,Barrage,Leech Life,Lovely Kiss,Sky Attack
+db %00101000    ; High Jump Kick,Flare,Dream Eater,Poison Gas,Barrage,Leech Life,Lovely Kiss,Sky Attack
 db %01000100    ; Transform,Bubble,Dizzy Punch,Spore,Flash,Psywave,Splash,Acid Armor
 db %00000000    ; Hammer,Explosion,Fury Swipes,Bonemerang,Rest,Rock Slide,Hyper Fang,Sharpen
 db %01000000    ; Conversion,Tri Attack,Super Fang,Slash,Substitute,Struggle,???,???
