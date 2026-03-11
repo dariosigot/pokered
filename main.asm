@@ -140761,12 +140761,49 @@ TrainerClassMoveChoiceModifications:
     db 1,3,4,0    ; LANCE
 
 WildAI:
+    db VENUSAUR
+    db CHARIZARD
+    db BLASTOISE
+    db BUTTERFREE
+    db PIDGEOT
+    db CLEFABLE
+    db NINETALES
+    db VENONAT
+    db VENOMOTH
+    db PSYDUCK
+    db GOLDUCK
+    db ARCANINE
     db ABRA
     db KADABRA
     db ALAKAZAM
     db MACHAMP
+    db TENTACRUEL
     db GOLEM
+    db RAPIDASH
+    db SLOWPOKE
+    db SLOWBRO
+    db MAGNETON
+    db DEWGONG
+    db CLOYSTER
+    db HAUNTER
     db GENGAR
+    db DROWZEE
+    db HYPNO
+    db EXEGGCUTE
+    db EXEGGUTOR
+    db CHANSEY
+    db TANGELA
+    db SEADRA
+    db STARYU
+    db STARMIE
+    db MR_MIME
+    db SCYTHER
+    db JYNX
+    db LAPRAS
+    db VAPOREON
+    db JOLTEON
+    db FLAREON
+    db PORYGON
     db AERODACTYL
     db SNORLAX
     db ARTICUNO
@@ -140775,6 +140812,8 @@ WildAI:
     db DRAGONITE
     db MEWTWO
     db MEW
+    db LAMPENT
+    db CHANDELURE
     db $FF
 
 ; creates a set of moves that may be used and returns its address in hl
