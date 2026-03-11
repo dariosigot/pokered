@@ -2078,12 +2078,12 @@ ENDU
 
 ; ────────────────────────────────────────────────────
 
-SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
+SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1]
 
-wFlagGameBoyColor:    ; dfff ; Denim
+wFlagGameBoyColor: ; dfff
     ds 1
 
-SECTION "WRAM Bank 2", WRAMX, BANK[2] ; Denim
+SECTION "WRAM Bank 2", WRAMX, BANK[2]
 
     ds 135
 
@@ -2101,7 +2101,7 @@ wForceVRAM2Writing: ; d08a
 
     ds 116
 
-wExceptionPaletteGbc ; d0ff ; Denim
+wExceptionPaletteGbc ; d0ff
     ds 1
 
 wPreLoadOfVRAM2: ; d100

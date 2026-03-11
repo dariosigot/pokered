@@ -1346,21 +1346,25 @@ GOLDUCK_Learnset:
     db 46,REFLECT
     db 46,BARRIER
     db 48,ICE_PUNCH
+    db 50,MIRROR_MOVE
     db 52,HYDRO_PUMP
     db 55,PSYCHIC_M
+    db 55,MIMIC
     db 58,DRILL_PECK
     db 60,HYPER_BEAM
     db 0
 PSYDUCK_NoEvo_Learnset:
     db 34,LIGHT_SCREEN ; Exclusive
-    db 34,REFLECT ; Exclusive
-    db 34,BARRIER ; Exclusive
+    db 35,REFLECT ; Exclusive
     db 36,FLARE ; Exclusive
-    db 40,PAY_DAY
-    db 41,PSYCHIC_M ; Exclusive
+    db 37,BARRIER ; Exclusive
+    db 38,PSYCHIC_M ; Exclusive
+    db 41,PAY_DAY
     db 43,SLASH
     db 43,Skill__CUT
     db 48,SONICBOOM
+    db 53,MIRROR_MOVE
+    db 58,MIMIC
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MANKEY_Learnset:
@@ -1397,6 +1401,7 @@ PRIMEAPE_Learnset:
     db 49,COUNTER
     db 50,Skill__FLOAT
     db 51,MEGA_KICK
+    db 53,MIRROR_MOVE
     db 55,EARTHQUAKE
     db 58,HI_JUMP_KICK
     db 60,ROCK_SLIDE
@@ -1413,6 +1418,7 @@ MANKEY_NoEvo_Learnset:
     db 50,THRASH
     db 54,SCREECH
     db 58,MEGA_KICK
+    db 60,MIRROR_MOVE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GROWLITHE_Learnset:
@@ -3373,9 +3379,12 @@ LAPRAS_Learnset:
 ; ──────────────────────────────────────────────────────────────────────
 DITTO_Learnset:
     db  1,TRANSFORM
-    db 30,CONVERSION
-    db 40,MIMIC
-    db 50,MIRROR_MOVE
+    db 10,MINIMIZE
+    db 20,CONVERSION
+    db 30,MIMIC
+    db 40,MIRROR_MOVE
+    db 50,METRONOME
+    db 60,SUBSTITUTE
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 EEVEE_Learnset:
@@ -3955,6 +3964,7 @@ MEW_Learnset:
     db  1,METRONOME
     db  1,PSYCHIC_M
     db  1,SOFTBOILED
+    db  1,HYPER_BEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LITWICK_Learnset:
