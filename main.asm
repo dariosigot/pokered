@@ -143897,10 +143897,15 @@ PrintMoveDetailsBox:
     jp PrintNumber
 
 .GetMonAtk
+    ld hl,wMoveDetBoxActualMonBit5
+    bit 5,[hl]
+    ld hl,W_PLAYERMONATK
+    jr nz,.GetMonAtkDone
     ld a,[wWhichPokemon]
     ld hl,W_PARTYMON1_ATTACK ; monatk
     ld bc,44
     call AddNTimes
+.GetMonAtkDone
     ld d,h
     ld e,l
     ret
