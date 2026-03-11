@@ -147478,6 +147478,8 @@ GetAttackerType:
     dw .SwiftMoveTable     , .SwiftMonTable
     dw .PinMissMoveTable   , .PinMissMonTable
     dw .BladeMoveTable     , .BladeMonTable
+    dw .ElemPunchMoveTable , .ElemPunchMonTable
+    dw .TakeDownMoveTable  , .TakeDownMonTable
     db $FF
 
 .TryToForceIvory
@@ -147500,9 +147502,12 @@ GetAttackerType:
     db PIDGEOT
     db SPEAROW
     db FEAROW
+    db PSYDUCK
+    db GOLDUCK
     db RAPIDASH
     db FARFETCH_D
     db SEAKING
+    db MAGMAR
     db ARTICUNO
     db ZAPDOS
     db MOLTRES
@@ -147590,6 +147595,17 @@ GetAttackerType:
     db HYPER_BEAM
     db $FF
 .HyperBeamMonTable
+    db CHARIZARD
+    db GOLDUCK
+    db ONIX
+    db SEADRA
+    db GYARADOS
+    db AERODACTYL
+    db SNORLAX
+    db ARTICUNO
+    db ZAPDOS  
+    db MOLTRES 
+    db DRAGONITE
     db MEWTWO
     db MEW
     db $FF
@@ -147642,6 +147658,23 @@ GetAttackerType:
     db $FF
 .BladeMonTable
     db FARFETCH_D
+    db $FF
+
+.ElemPunchMoveTable
+    db FIRE_PUNCH
+    db ICE_PUNCH
+    db THUNDERPUNCH
+    db $FF
+.ElemPunchMonTable
+    db HITMONCHAN
+    db $FF
+
+.TakeDownMoveTable
+    db TAKE_DOWN
+    db $FF
+.TakeDownMonTable
+    db GROWLITHE
+    db ARCANINE
     db $FF
 
 ; ──────────────────────────────────────────────────────────────────────
