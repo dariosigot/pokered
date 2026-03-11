@@ -26820,17 +26820,6 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld [hli],a ; move 2
     ld [hli],a ; move 3
     ld [hli],a ; move 4
-    push hl
-    dec hl
-    dec hl
-    dec hl
-    dec hl ; go to move 1
-    xor a
-    ld [wLearningMovesFromDayCare],a
-    ld d,h
-    ld e,l
-    call WriteMonMoves2
-    pop hl
     ld a,[wPlayerID]  ; set trainer ID to player ID
     ld [hli],a
     ld a,[wPlayerID + 1]
@@ -26866,11 +26855,26 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     jr .done
 .calcFreshStats
     pop hl
+    push hl
     ld bc,$10
     add hl,bc
     ld b,$1 ; Consider also stat exp
     call CalcStatsAndSetCurrentHpToMax ; call CalcStats         ; calculate fresh set of stats
+    pop hl
 .done
+    ld de,W_PARTYMON1_ATTACK-W_PARTYMON1_NUM
+    add hl,de ; go to attack
+    ld a,l
+    ld [wStoreAttackPointer],a
+    ld a,h
+    ld [wStoreAttackPointer+1],a
+    ld de,W_PARTYMON1_MOVE1-W_PARTYMON1_ATTACK
+    add hl,de ; go to move 1
+    xor a
+    ld [wLearningMovesFromDayCare],a
+    ld d,h
+    ld e,l
+    call WriteMonMoves2
     call AddPokemonToParty_TryToAddExclusiveMove
     scf
     ret
@@ -49432,17 +49436,6 @@ Func_3bb7d:
     ld bc,$8
     jp CopyData
 
-; shifts all move data one up (freeing 4th move slot)
-ShiftMoveData:
-    ld c,$3
-.asm_3b050
-    inc de
-    ld a,[de]
-    ld [hli],a
-    dec c
-    jr nz,.asm_3b050
-    ret
-
 HandleBitArray_BankE:
     PREDEF_JUMP HandleBitArray
 
@@ -51040,370 +51033,17 @@ SetAttributeOamRedBall:
 
 ; ────────────────────────────────────────────────────────────
 
-SearchMoveToReplace:
-    push de
-    push hl
-    push hl
-
-    ; Shuffle Move
-    push af
-    call .ShuffleMoves
-    pop af
-
-    ; Check New Move
-    push de
-    call .GetMoveDamageAndType
-    ld a,d
-    ld [wNewMoveDamage],a
-    ld a,e
-    ld [wNewMoveType],a
-    pop de
-    ld b,%00111111 ; 1/64 = 1.5625% not learn
-    ld hl,.LearnDamageNewMove
-    jr nz,.done
-    ld b,%00001111 ; 1/16 = 6.25% not learn
-    ld hl,.LearnZeroDamageNewMove
-.done
-    call .DefinePriorityMoveToReplace
-    jr nc,.fail
-
-    ; Read Calculated Move Priority to Identify Worst
-.resetloop
-    ld hl,wMoveForgotPriority
-    ld c,-1
-.loop1
-    inc c
-    ld a,c
-    cp 4
-    jr z,.resetloop
-    dec [hl]
-    jr z,.endloop
-    inc hl
-    jr .loop1
-.endloop
-
-    ; Place Worst Move to first position
-    pop hl
-    ld d,h
-    ld e,l
-    ld b,0
-    add hl,bc
-    call .SwapMoves
-
-.end1
-    pop hl
-    pop de
-    call ShiftMoveData ; shift all moves one up (deleting move 1)
-    scf
-    ret
-.fail
-    pop hl
-    pop hl
-    pop de
-    xor a ; rcf
-    ret
-
-.DefinePriorityMoveToReplace
-    call GenRandom
-    and b
-    ret z ; rcf
-    ld bc,$00FF ; b = 0 | c = -1
-.loop2
-    inc c
-    push hl
-    push bc
-    ld a,c
-    cp 4
-    jr z,.end2
-    ld a,[de]
-    ld b,20 ; Start Value
-    push de
-    ld de,.return
-    push de
-    call .GetMoveDamageAndType
-    call .LearnDamageAndZeroDamageMoveCommon
-    jp hl
-.return
-    pop de
-    ld a,b
-    ld hl,wMoveForgotPriority
-    pop bc
-    add hl,bc
-    ld [hl],a
-    pop hl
-    inc de
-    jr .loop2
-.end2
-    pop bc
-    pop hl
-    scf
-    ret
-
-.LearnZeroDamageNewMove
-    jr z,.Zero1
-    jr c,.One1
-    call .HandleOldStabMove
-    inc b ; ▼ old not zero damage
-.Zero1
-    dec b ; ▲ old zero damage
-    dec b ; ...
-.One1
-    dec b ; ▲ old special (1 damage)
-    ret
-
-.LearnDamageNewMove
-    jr z,.Zero2
-    jr c,.One2
-    call .HandleOldStabMove
-    ld a,[wNewMoveType]
-    cp e
-    jr nz,.DifferentType
-    dec b ; ▲ same type
-    ld a,[wNewMoveDamage]
-    cp d
-    jr c,.DifferentType ; c = damage old > damage new
-    call .EncourageForgot3 ; ▲ same type and new damage >= old damage
-.DifferentType
-    ld a,[wNewMoveDamage]
-    cp d
-    jr nc,.NewMoreDamageThanOld ; c = damage old > damage new
-    ; old > new
-    ld e,a ; a = delta
-    ld a,d ; ...
-    sub e  ; ...
-.LoopDeltaDamage1
-    inc b ; ▼ damage old > damage new
-    sub 20
-    jr nc,.LoopDeltaDamage1
-    ret
-.NewMoreDamageThanOld
-    ; new >= old
-    sub d ; a = delta
-.LoopDeltaDamage2
-    dec b ; ▲ damage new >= old
-    sub 20
-    jr nc,.LoopDeltaDamage2
-    ret
-.Zero2
-    inc b ; ▼ old zero damage
-    ret
-.One2
-    dec b ; ▲ old special (1 damage)
-    ret
-
-.LearnDamageAndZeroDamageMoveCommon
-    push af
-    push de
-    push hl
-    ld hl,W_ISINBATTLE
-    ld d,[hl]
-    dec d
-    jr nz,.notWildBattle
-    ld hl,.EscapeMoves
-    call .CheckList
-    jr nc,.notWildBattle
-    call .DiscourageForgot6 ; ▼ Escape
-.notWildBattle
-    ld hl,.DreamEaterMoves
-    call .CheckList
-    jr nc,.notDreamEater
-    call .DiscourageForgot6 ; ▼ DreamEater
-.notDreamEater
-    ld hl,.NotForgottableMoves
-    call .CheckList
-    jr nc,.notForgottable
-    call .DiscourageForgot3 ; ▼ Unforgottable
-.notForgottable
-    pop hl
-    pop de
-    pop af
-    ret
-
-.HandleOldStabMove
-    push hl
-    ld hl,W_MONHTYPES
-    ld a,[hli]
-    cp e
-    jr z,.StabFound
-    ld a,[hli]
-    cp e
-    jr z,.StabFound
-    ld a,[hli]
-    cp e
-    jr z,.StabFound
-    ld a,[hl]
-    cp e
-    jr nz,.StabDone
-.StabFound
-    inc b ; ▼ stab
-.StabDone
-    pop hl
-    ret
-
-.ShuffleMoves
-    push de
-    push hl
-    call .Shuffle
-    pop hl
-    pop de
-    ret
-.Shuffle
-    ld h,d
-    ld l,e
-    ld b,0
-    push hl
-.loop3
-    inc b
-    ld a,b
-    cp 30 ; swap slot n times
-    pop hl
-    ret z
-    call GenRandom
-    and %00000011 ; from 0 to 3
-    ld e,a
-    ld d,0
-    push hl
-    add hl,de
-    ld a,[hl]
-    and a
-    jr z,.loop3
-    pop de
-    push de
-    call .SwapMoves
-    jr .loop3
-
-.SwapMoves
-    push bc
-    ld a,[hl]
-    ld c,a
-    ld a,[de]
-    ld [hl],a
-    ld a,c
-    ld [de],a
-    pop bc
-    ret
-
-; INPUT
-; a = Move ID
-; OUTPUT
-; d = damage
-; e = type
-; set z reset c if damage = 0
-; set c reset z if damage = 1
-; reset z reset c if damage > 1
-.GetMoveDamageAndType
-    push hl
-    push bc
-    push af
-    dec a
-    ld hl,Moves+2 ; damage
-    ld bc,6
-    call AddNTimes
-    ld a,[hli] ; damage
-    ld d,a
-    and a ; rcf
-    jr z,.GetType ; szf
-    dec a
-    jr nz,.GetType
-    inc a ; rzf
-    scf ; scf
-.GetType
-    ld a,[hl] ; type
-    ld e,a
-    pop bc
-    ld a,b
-    pop bc
-    pop hl
-    ret
-
-.DiscourageForgot6
-    call .DiscourageForgot3
-.DiscourageForgot3
-    inc b
-    inc b
-    inc b
-    ret
-
-.EncourageForgot6
-    call .EncourageForgot3
-.EncourageForgot3
-    dec b
-    dec b
-    dec b
-    ret
-
-.CheckList
-    push bc
-    push af
-    push de
-    ld de,1
-    call IsInArray
-    pop de
-    pop bc
-    ld a,b
-    pop bc
-    ret
-
-.EscapeMoves
-    db ROAR
-    db TELEPORT
-    db WHIRLWIND
-    db $FF
-
-.DreamEaterMoves
-    db SING
-    db SLEEP_POWDER
-    db HYPNOSIS
-    db LOVELY_KISS
-    db SPORE
-    db DREAM_EATER
-    db $FF
-
-.NotForgottableMoves
-    db SWORDS_DANCE
-    db BODY_SLAM
-    db TWINEEDLE
-    db FLAMETHROWER
-    db TSUNAMI
-    db ICE_BEAM
-    db DRILL_PECK
-    db SUBMISSION
-    db LOW_KICK
-    db RAZOR_LEAF
-    db THUNDERBOLT
-    db THUNDER_WAVE
-    db EARTHQUAKE
-    db PSYCHIC_M
-    db NIGHT_SHADE
-    db RECOVER
-    db SLUDGE
-    db BONE_CLUB
-    db AMNESIA
-    db SOFTBOILED
-    db FLARE
-    db TRANSFORM
-    db HAMMER
-    db EXPLOSION
-    db BONEMERANG
-    db REST
-    db ROCK_SLIDE
-    db HYPER_FANG
-    db SUPER_FANG
-    db SLASH
-    db SUBSTITUTE
-    db $FF
-
-; ────────────────────────────────────────────────────────────
-
 ; writes the moves a mon has at level [W_CURENEMYLVL] to [de]
-; move slots are being filled up sequentially and shifted if all slots are full
 ; [wLearningMovesFromDayCare]: Day Care
 WriteMonMoves:
     call Load16BitRegisters
     push hl
     push de
     push bc
-    push de
+    push de ; ActualMovesPointer
+    call .ResetWriteMonMovesFlags
+;DEBUG~
+    call .ResetNumOfTestCaseInsert
     ld hl,wWriteInGenericBufferBit4
     set 4,[hl] ; wWriteInGenericBufferBit4
     set 6,[hl] ; wNoSkillInListBit6
@@ -51421,52 +51061,1456 @@ WriteMonMoves:
     res 4,[hl] ; wWriteInGenericBufferBit4
     res 6,[hl] ; wNoSkillInListBit6
     res 7,[hl] ; wNoExclusiveInListBit7
+    call .GetFlagWildRandomMoveChoice
     pop hl
-    dec hl ; because "inc" in next instructions
+
 .nextMove
-    pop de
-.nextMove2
-    inc hl
-    ld a,[hl]        ; read next move in learnset
+    ld a,[hli] ; read next move in learnset
     and a
-    jp z,.done       ; end of list
-    push de
-    ld c,4
-.moveAlreadyLearnedCheckLoop
-    ld a,[de]
-    inc de
-    cp [hl]
-    jr z,.nextMove
-    dec c
-    jr nz,.moveAlreadyLearnedCheckLoop
-    pop de
-    push de
-    ld c,4
+    jp z,.done ; end of list
+    call .GetNewMoveDetails
+    pop de  ; ActualMovesPointer
+    push de ; ...
+
+    ld bc,$00FF ; b = 0 | c = -1
 .findEmptySlotLoop
+    inc c
+    ld a,c
+    cp 4
+    jr z,.NoEmptyMoveSlotsFound
     ld a,[de]
     and a
-    jr z,.writeMoveToSlot
     inc de
-    dec c
-    jr nz,.findEmptySlotLoop
-    pop de                        ; no empty move slots found
-    push de
+    jr z,.writeMoveToSlot
+    jr .findEmptySlotLoop
+
+.NoEmptyMoveSlotsFound
+    pop de  ; ActualMovesPointer
+    push de ; ...
     push hl
-    ld a,[hl] ; read new move
     ld h,d
     ld l,e
-    call SearchMoveToReplace
+    call .ReadActualMoves
+    call .SearchMoveToReplace
+    call .ResetSleepEffectAndDreamEaterFlags
     pop hl
     jr nc,.nextMove
+
 .writeMoveToSlot
-    ld a,[hl]
-    ld [de],a
+    pop de  ; ActualMovesPointer
+    push de ; ...
+    push hl
+    ld h,d
+    ld l,e
+    add hl,bc
+    ld a,[wNewMoveNum]
+    ld [hl],a
+    ld a,c
+    ld bc,6
+    ld hl,wActualMoves
+    call AddNTimes
+    ld d,h
+    ld e,l
+    ld hl,wNewMove
+    call CopyData
+    pop hl
     jr .nextMove
+
 .done
+    pop de  ; ActualMovesPointer
+;DEBUG~
+    call .PrintFinalTestCase
     pop bc
     pop de
     pop hl
     ret
+
+.ResetWriteMonMovesFlags
+    xor a
+    ld [wWriteMonMovesFlags],a
+    ret
+
+; ─────────────────────
+
+.SearchMoveToReplace
+    ld de,wNewMove
+    call .GetPowerAndFlags
+    ld hl,.continue ; Return Pointer
+    push hl         ; ...
+    ld hl,wRandomMoveChoiceBit7
+    jr z,.NewZeroDamage
+    jr c,.NewOneDamage
+;NewDamage
+    bit 7,[hl]
+    ld hl,.LearnDamageNewMove
+    ret z
+    ld hl,.LearnDamageAndOneDamageNewMove_WithoutAI
+    ret
+.NewZeroDamage
+    bit 7,[hl]
+    ld hl,.LearnZeroDamageNewMove
+    ret z
+    ld hl,.LearnZeroDamageNewMove_WithoutAI
+    ret
+.NewOneDamage
+    bit 7,[hl]
+    ld hl,.LearnOneDamageNewMove
+    ret z
+    ld hl,.LearnDamageAndOneDamageNewMove_WithoutAI
+    ret
+.continue
+    call .DefinePriorityMoveToReplace
+;DEBUG~
+    call .PrintTestCase
+    call .CanNewOverwriteActualMoves
+    jr nc,.fail
+    call .ReadCalculatedMovePriorityToIdentifyWorst
+    ld b,0
+    scf
+    ret
+.fail
+    xor a ; rcf
+    ret
+
+; ─────────────────────
+
+.DefinePriorityMoveToReplace
+    ld bc,$00FF ; b = 0 | c = -1
+    ld de,wActualMoves
+.loop2
+    inc c
+    ld a,c
+    cp 4
+    ret z
+    push hl
+    push bc
+    push de
+    ld bc,.return
+    push bc
+    call GenRandom
+    ld b,20 ; Start Value
+    call .GetPowerAndFlags
+    jp hl
+.return
+    pop de
+    ld a,b
+    ld hl,wMoveForgotPriority
+    pop bc
+    add hl,bc
+    ld [hl],a
+    pop hl
+    inc de
+    inc de
+    inc de
+    inc de
+    inc de
+    inc de
+    jr .loop2
+
+; ─────────────────────
+
+.LearnZeroDamageNewMove
+    call .LearnMoveCommon
+    jr c,.ZeroOnOne
+    jr z,.ZeroOnZero1
+;ZeroOnDamage
+    ld a,[wCountActualDamageMove]
+    dec a
+    jp z,.DiscourageForgot9 ; ▼x9 zero on damage with 1 damage
+    ld a,[H_RAND1]
+    and %00011111 ; 3.125%
+    ret z ; zero on damage no change
+    call .GetPower
+.LoopPower0
+    inc b ; ▼ zero on damage
+    sub 40
+    jr nc,.LoopPower0
+    ret
+.ZeroOnZero1
+    call .GetEffect
+    ld c,a
+    ld a,[wNewMoveEff]
+    cp c
+    jr z,.ZeroOnZeroSameEffect
+    call .HandleUpgradedDownUpEffect
+    ret c
+    ld a,[H_RAND1]
+    and %00000011 ; 25%
+    jp z,.DiscourageForgot2 ; ▼x2 zero on zero
+    ret ; zero on zero no change
+.ZeroOnOne
+    ld a,[H_RAND1]
+    and %00000001 ; 50%
+    jp z,.DiscourageForgot3 ; ▼x3 zero on one
+    inc b ; ▼ zero on one
+    ret
+
+.ZeroOnZeroSameEffect
+    call .GetAccuracy
+    ld c,a
+    ld a,[wNewMoveAcr]
+    cp c ; c = old > new ; nc = old <= new
+    jp nc,.EncourageForgot9 ; ▲x9 zero on zero same effect accuracy upgrade
+    jp .DiscourageForgot9 ; ▼x9 zero on zero same effect accuracy downgrade
+
+.HandleUpgradedDownUpEffect
+    ld hl,.DownEffectMoves
+    call .CheckUpgrade
+    jr c,.DownUpEncourage
+    ld hl,.UpEffectMoves
+    call .CheckUpgrade
+    ret nc
+.DownUpEncourage
+    call .EncourageForgot9 ; ▲x9 zero on zero upgrade down/up effect
+    scf
+    ret
+.CheckUpgrade
+    ld a,c ; old effect
+    call .CheckList
+    jr nc,.NotUpgrade
+    ld a,[wNewMoveEff]
+    ld e,a ; new effect
+    call .CheckList
+    jr nc,.NotUpgrade
+    cp c ; c = old > new ; nc = old <= new
+    jr c,.NotUpgrade
+    ld a,e ; new
+    call .NormalizeDownUp
+    ld e,a ; e = new normalized
+    ld a,c ; old
+    call .NormalizeDownUp ; a = old normalized
+    cp e
+    jr z,.Upgrade ; same normalized value
+.NotUpgrade
+    and a ; rcf
+    ret
+.Upgrade
+    scf
+    ret
+
+.NormalizeDownUp
+    ld d,EVASION_UP1_EFFECT+1
+    cp d
+    jr c,.FoundNormalization
+    ld d,EVASION_DOWN1_EFFECT+1
+    cp d
+    jr c,.FoundNormalization
+    ld d,EVASION_UP2_EFFECT+1
+    cp d
+    jr c,.FoundNormalization
+    ld d,EVASION_DOWN2_EFFECT+1
+    cp d
+    jr c,.FoundNormalization
+    ld d,EVASION_UP3_EFFECT+1
+    cp d
+    jr c,.FoundNormalization
+    ret
+.FoundNormalization
+    sub d
+    add 6
+    ret
+
+; ─────────────────────
+
+.LearnOneDamageNewMove
+    call .LearnMoveCommon
+    jr c,.OneOnOne
+    jr z,.OneOnZero
+;OneOnDamage
+    ld a,[wCountActualDamageMove]
+    dec a
+    jp z,.DiscourageForgot9 ; ▼x9 one on damage with 1 damage
+    ld a,[wNewMoveNum]
+    cp DREAM_EATER
+    ret z ; dreameater on damage no change
+    ld a,[H_RAND1]
+    and %00000011 ; 25%
+    call z,.EncourageForgot4 ; ▲x4 one on damage
+    call .GetPower
+.LoopPower1
+    inc b ; ▼ one on damage
+    sub 50
+    jr nc,.LoopPower1
+    ret
+.OneOnZero
+    ld a,[wCountActualZeroMove]
+    dec a
+    jp z,.DiscourageForgot6 ; ▼x6 one on zero with 1 zero
+    ld a,[wNewMoveNum]
+    cp DREAM_EATER
+    jr nz,.NotDreamEaterOnZero
+    call .GetEffect
+    cp SLEEP_EFFECT
+    jp z,.DiscourageForgot9 ; ▼x9 dreameater on sleep
+    ret ; dreameater on zero no change
+.NotDreamEaterOnZero
+    ld a,[H_RAND1]
+    and %00000111 ; 12.5%
+    jp z,.EncourageForgot2 ; ▲x2 one on zero
+    ret ; one on zero no change
+.OneOnOne
+    ld a,[wNewMoveNum]
+    cp EXPLOSION
+    jr nz,.NotExplosionOnZero
+    ld a,[de]
+    cp SELFDESTRUCT
+    jr nz,.NotExplosionOnZero
+    jp .EncourageForgot9 ; ▲x9 explosion on selfdestruction
+.NotExplosionOnZero
+    ld a,[H_RAND1]
+    and %00000001 ; 50%
+    jp z,.EncourageForgot3 ; ▲x3 one on one
+    ret ; one on one no change
+
+; ─────────────────────
+
+.LearnDamageNewMove
+    call .LearnMoveCommon
+    jr c,.DamageOnOne
+    jr z,.DamageOnZero1
+;DamageOnDamage
+    ld a,[wCountActualDamageMove]
+    dec a
+    call z,.DiscourageForgot6 ; ▼x6 damage on damage with 1 damage
+    call .GetPower
+    ld c,a
+    call .GetTypeAndPhiSpcFlag
+    ld d,c
+    ld e,a
+    ld a,[wNewMoveTyp] ; include PhiSpcFlag
+    cp e
+    jr z,.SameTypeAndPhiSpc
+    res 7,a ; remove phi/spc flag
+    res 7,e ; ...
+    cp e
+    jr nz,.CheckTypeDone
+    ld a,[wNewMovePwr]
+    cp d
+    call nc,.EncourageForgot1 ; ▲x4 damage on damage same type (different Phi/Spc)
+    jr .CheckTypeDone
+.SameTypeAndPhiSpc
+    ld a,[wNewMovePwr]
+    cp d
+    call nc,.EncourageForgot4 ; ▲x4 damage on damage same type (same Phi/Spc) and new >= old
+.CheckTypeDone
+    ld a,[wNewMovePwr]
+    cp d
+    jr nc,.NewMoreDamageThanOld
+    ; old > new
+    ld e,a ; a = delta
+    ld a,d ; ...
+    sub e  ; ...
+.LoopDeltaPower1
+    inc b ; ▼ damage on damage old > new
+    sub 15
+    jr nc,.LoopDeltaPower1
+    ret
+.NewMoreDamageThanOld
+    ; new >= old
+    sub d ; a = delta
+.LoopDeltaPower2
+    dec b ; ▲ damage on damage new >= old
+    sub 20
+    jr nc,.LoopDeltaPower2
+    ret
+.DamageOnZero1
+    ld a,[wCountActualZeroMove]
+    dec a
+    jp z,.DiscourageForgot6 ; ▼x6 damage on zero with 1 zero
+    ld a,[H_RAND1]
+    and %00001111 ; 6.25%
+    jp z,.EncourageForgot2 ; ▲x2 damage on zero
+    inc b ; ▼ damage on zero
+    ret
+.DamageOnOne
+    ld a,[H_RAND1]
+    and %00000011 ; 25%
+    jp z,.EncourageForgot2 ; ▲x2 damage on one
+    jp .DiscourageForgot2 ; ▼x2 damage on one
+
+; ─────────────────────
+
+.LearnMoveCommon
+    push af
+    push de
+    push bc
+    call .Run_LearnMoveCommon
+    pop de
+    ld c,e
+    pop de
+    pop af
+    ret
+.Run_LearnMoveCommon
+    cp TRANSFORM
+    jr nz,.NotTransform
+    ld a,[W_MONHEADER]
+    cp DITTO
+    jp z,.DiscourageForgot9 ; ▼x9 Ditto's Transform
+.NotTransform
+    ld a,[de]
+    cp SPLASH
+    jp z,.EncourageForgot6 ; ▲x6 Splash
+    cp DREAM_EATER
+    jr z,.HandleDreamEater
+    call .GetEffect
+    cp SLEEP_EFFECT
+    call z,.HandleSleepEffect
+    ld a,[de] ; old
+    ld hl,.NotForgottableMoves
+    call .CheckList
+    jp c,.DiscourageForgot2 ; ▼x2 Old Unforgottable
+    ld a,[wNewMoveNum]
+    call .CheckList
+    call c,.EncourageForgot2 ; ▲x2 New Unforgottable Old Forgottable
+    ld hl,W_ISINBATTLE
+    ld d,[hl]
+    dec d
+    ret nz ; notWildBattle
+    ld hl,.EscapeMoves
+    call .CheckList
+    jp c,.DiscourageForgot6 ; ▼x6 Escape
+    ret
+
+.HandleDreamEater
+    ld hl,wSleepEffectInMovesBit0
+    bit 0,[hl]
+    jp z,.EncourageForgot9 ; ▲x9 DreamEater without SleepEffect
+    inc b ; ▼ DreamEater with SleepEffect
+    ret
+
+.HandleSleepEffect
+    ld hl,wDreamEaterInMovesBit1
+    bit 1,[hl]
+    jp nz,.DiscourageForgot9 ; ▼x9 SleepEffect with DreamEater
+    ret
+
+; ─────────────────────
+
+.LearnZeroDamageNewMove_WithoutAI
+    call .LearnMoveCommon_WithoutAI
+    ret c ; zero on one no change
+    jr z,.ZeroOnZero2
+;ZeroOnDamage
+    ld a,[wCountActualDamageMove]
+    dec a
+    jp z,.DiscourageForgot3 ; ▼x3 zero on damage with only 1 damage
+    ld a,[H_RAND1]
+    and %00011111 ; 3.125%
+    ret z ; zero on damage no change
+    inc b ; ▼ zero on damage
+    ret
+.ZeroOnZero2
+    ld a,[H_RAND1]
+    and %00000011 ; 25%
+    jp z,.DiscourageForgot1 ; ▼ zero on zero
+    ret ; zero on zero no change
+
+; ─────────────────────
+
+.LearnDamageAndOneDamageNewMove_WithoutAI
+    call .LearnMoveCommon_WithoutAI
+    jr c,.DamageOneOnOne
+    jr z,.DamageOneOnZero
+;DamageOneOnDamage
+    ld a,[wCountActualDamageMove]
+    dec a
+    jp z,.DiscourageForgot2 ; ▼x2 damage/one on damage with only 1 damage
+    ; ft
+.DamageOneOnOne
+    ld a,[H_RAND1]
+    and %00000001 ; 50%
+    ret z ; damage/one on damage/one no change
+    dec b ; ▲ damage/one on damage/one
+    ret
+.DamageOneOnZero
+    ld a,[wCountActualZeroMove]
+    dec a
+    jp z,.DiscourageForgot3 ; ▼x3 damage/one on zero with 1 zero
+    ld a,[H_RAND1]
+    and %00000111 ; 12.5%
+    ret z ; damage/one on zero no change
+    inc b ; ▼ damage/one on zero
+    ret
+
+; ─────────────────────
+
+.LearnMoveCommon_WithoutAI
+    push af
+    cp TRANSFORM
+    jr nz,.NotTransform2
+    ld a,[W_MONHEADER]
+    cp DITTO
+    jp z,.DiscourageForgot9 ; ▼x9 Ditto's Transform
+.NotTransform2
+    ld a,[W_ISINBATTLE]
+    dec a
+    jr nz,.LearnMoveCommon_WithoutAI_End ; NotWildBattle
+    ld a,[de]
+    ld hl,.EscapeMoves
+    call .CheckList
+    call c,.DiscourageForgot6 ; ▼x6 Escape
+.LearnMoveCommon_WithoutAI_End
+    pop af
+    ret
+
+; ─────────────────────
+
+.GetFlagWildRandomMoveChoice
+    ld a,[W_ISINBATTLE]
+    dec a
+    jr nz,.NotWildBattle
+;WildBattle
+    ld a,[W_MONHEADER]
+    ld d,a
+    BANKSWITCH CheckWildAI
+    ret c
+    jr .SetRandomMoveChoice
+.NotWildBattle
+    ld a,[W_CUROPPONENT]
+    and a
+    ret z ; NotTrainer
+    ld hl,.TrainerWithoutMoveAI
+    call .CheckList
+    ret nc
+.SetRandomMoveChoice
+    ld hl,wRandomMoveChoiceBit7
+    set 7,[hl]
+    ret
+
+.TrainerWithoutMoveAI
+    db YOUNGSTER
+    db BUG_CATCHER
+    db LASS
+    db JR__TRAINER_M
+    db JR__TRAINER_F
+    db HIKER
+    db BIKER
+    db CUE_BALL
+    db BEAUTY
+    db ROCKET
+    db $FF
+
+; ─────────────────────
+
+; INPUT
+; a = Move ID
+; OUTPUT
+; Store 6 byte from "Moves" in "wNewMove"
+; Power normalized with Accuracy, Stab, Effect, Phi/Spc, ...
+.GetNewMoveDetails
+    push hl
+    ld de,wNewMove
+    call .ReadNewMoveDetails
+    call .HandleOutliersPower
+    call .GetPowerAndFlags
+    jr z,.DetailsEnd
+    jr c,.DetailsEnd
+    call .MultiplyDamageAndAccuracy
+    call .HandlePhisicalSpecial
+    call .CheckStabMove
+    call z,.SetPower150
+    call .CheckDamage2xEffects
+    call c,.SetPower200
+    call .CheckMultiDamageEffects
+    call c,.SetPower250
+    call .CheckHighProbCritHitMoves
+    call c,.SetPower175
+    call .CheckUsefullEffectMoves
+    call c,.SetPower1125
+    call .CheckChargeMoves
+    call c,.SetPower050
+    call .GetEffect
+    cp EXPLODE_EFFECT
+    call z,.SetPower050
+    call .CheckMalusEffectMoves
+    call c,.SetPower075
+    call .GetPower
+    cp 2 ; < 2 ?
+    ld a,2
+    call c,.SetPower
+.DetailsEnd
+    pop hl
+    ret
+
+.HandleOutliersPower
+    ld a,[de]
+    cp DREAM_EATER
+    ld a,1
+    jr z,.SetPower
+    ld a,[de]
+    ld hl,.SpecialZeroBPMoves
+    call .CheckList
+    ld a,1
+    jr c,.SetPower
+    call .GetEffect
+    ld hl,.SpecialZeroBPEffect
+    call .CheckList
+    ld a,1
+    jr c,.SetPower
+    ret
+.SpecialZeroBPMoves
+    db BIDE
+    db METRONOME
+    db MIRROR_MOVE
+    db LEECH_SEED
+    db $FF
+.SpecialZeroBPEffect
+    db TRAPPING_EFFECT
+    db EXPLODE_EFFECT
+    db $FF
+
+.ReadNewMoveDetails
+    dec a
+    ld hl,Moves
+    ld bc,6
+    push bc
+    call AddNTimes
+    pop bc
+    push de
+    call CopyData
+    pop de
+    ret
+
+.SetPower
+    inc de
+    inc de
+    ld [de],a
+    dec de
+    dec de
+    ret
+
+.SetPower250
+    inc de
+    inc de
+    ld a,[de]
+    ld b,a ; pwr * 2.5
+    add a  ; ...
+    call c,.SetATo255
+    srl b  ; ...
+    add b  ; ...
+    call c,.SetATo255
+    ld [de],a
+    dec de
+    dec de
+    ret
+
+.SetPower200
+    inc de
+    inc de
+    ld a,[de]
+    add a ; pwr * 2
+    call c,.SetATo255
+    ld [de],a
+    dec de
+    dec de
+    ret
+
+.SetPower175
+    inc de
+    inc de
+    ld a,[de]
+    ld b,a ; pwr * 1.75
+    srl b  ; ...
+    add b  ; ...
+    call c,.SetATo255
+    srl b  ; ...
+    add b  ; ...
+    call c,.SetATo255
+    ld [de],a
+    dec de
+    dec de
+    ret
+
+.SetPower150
+    inc de
+    inc de
+    ld a,[de]
+    ld b,a ; pwr * 1.5
+    srl b  ; ...
+    add b  ; ...
+    call c,.SetATo255
+    ld [de],a
+    dec de
+    dec de
+    ret
+
+.SetPower1125
+    inc de
+    inc de
+    ld a,[de]
+    ld b,a ; pwr * 1.125
+    srl b  ; ...
+    srl b  ; ...
+    srl b  ; ...
+    add b  ; ...
+    call c,.SetATo255
+    ld [de],a
+    dec de
+    dec de
+    ret
+
+.SetPower075
+    inc de
+    inc de
+    ld a,[de]
+    ld b,a ; pwr * 0.75
+    srl b  ; ...
+    srl b  ; ...
+    sub b  ; ...
+    ld [de],a
+    dec de
+    dec de
+    ret
+
+.SetPower050
+    inc de
+    inc de
+    ld a,[de]
+    srl a  ; pwr * 0.50
+    ld [de],a
+    dec de
+    dec de
+    ret
+
+.SetATo255
+    ld a,255
+    ret
+
+; INPUT
+; de = pointer to move details
+; a = move power
+; set z reset c if damage = 0
+; set c reset z if damage = 1
+; reset z reset c if damage > 1
+.GetPowerAndFlags
+    inc de
+    inc de
+    ld a,[de]
+    and a ; rcf
+    jr z,.GetPowerDone ; szf
+    dec a
+    jr nz,.GetPowerDone
+    inc a ; rzf
+    scf ; scf
+.GetPowerDone
+    ld a,[de]
+    dec de
+    dec de
+    ret
+
+.GetPower
+    inc de
+    inc de
+    ld a,[de]
+    dec de
+    dec de
+    ret
+
+.GetEffect
+    inc de
+    ld a,[de]
+    dec de
+    ret
+
+.GetType
+    call .GetTypeAndPhiSpcFlag
+    res 7,a ; Remove Phi/Spc Flag
+    ret
+
+.GetTypeAndPhiSpcFlag
+    inc de
+    inc de
+    inc de
+    ld a,[de]
+    dec de
+    dec de
+    dec de
+    ret
+
+.GetAccuracy
+    inc de
+    inc de
+    inc de
+    inc de
+    ld a,[de]
+    dec de
+    dec de
+    dec de
+    dec de
+    ret
+
+; de = pointer to move details
+.CheckStabMove
+    push hl
+    ld a,[$d11e]
+    push af
+    push de
+    call .GetType
+    ld [$d11e],a
+    ld hl,W_MONHTYPES
+    ld a,[de]
+    ld c,a
+    ld a,[W_MONHEADER]
+    ld b,a
+    PREDEF GetAttackerType_
+    pop de
+    call .GetType
+    ld hl,wTmpAttackerTypes
+    cp [hl]
+    jr z,.StabEnd
+    inc hl
+    cp [hl]
+    jr z,.StabEnd
+    inc hl
+    cp [hl]
+    jr z,.StabEnd
+    inc hl
+    cp [hl]
+.StabEnd
+    pop hl
+    ld a,h
+    ld [$d11e],a
+    pop hl
+    ret
+
+.CheckDamage2xEffects
+    call .GetEffect
+    ld hl,.Damage2xEffects
+    jp .CheckList
+.Damage2xEffects
+    db TWINEEDLE_EFFECT
+    db ATTACK_TWICE_EFFECT
+    db $FF
+
+.CheckMultiDamageEffects
+    call .GetEffect
+    ld hl,.MultiDamageEffects
+    jp .CheckList
+.MultiDamageEffects
+    db TWO_TO_FIVE_ATTACKS_EFFECT
+    db $FF
+
+.CheckHighProbCritHitMoves
+    push de
+    ld a,[de] ; moveid
+    ld d,a    ; ...
+    BANKSWITCH CheckHighCriticalMoves
+    pop de
+    ret
+
+.CheckUsefullEffectMoves
+    call .GetEffect
+    ld hl,.UsefullEffectMoves
+    jp .CheckList
+.UsefullEffectMoves
+    db DRAIN_HP_EFFECT
+    db ACCURACY_DOWN_SIDE2_EFFECT
+    db ATTACK_DOWN_SIDE1_EFFECT
+    db BURN_SIDE_EFFECT2
+    db CONFUSION_SIDE_EFFECT
+    db DEFENSE_DOWN_SIDE1_EFFECT
+    db FLINCH_SIDE_EFFECT1
+    db FLINCH_SIDE_EFFECT2
+    db FREEZE_SIDE_EFFECT
+    db PARALYZE_SIDE_EFFECT1
+    db PARALYZE_SIDE_EFFECT2
+    db POISON_SIDE_EFFECT1
+    db POISON_SIDE_EFFECT2
+    db SPECIAL_DOWN_SIDE1_EFFECT
+    db SPEED_DOWN_SIDE1_EFFECT
+    db SPEED_DOWN_SIDE2_EFFECT
+    db $FF
+
+.CheckChargeMoves
+    ld a,[de] ; moveid
+    cp TRAPHOLE ; rcf
+    ret z
+    call .GetEffect
+    ld hl,.ChargeMoves
+    jp .CheckList
+.ChargeMoves
+    db CHARGE_EFFECT
+    db $FF
+
+.CheckMalusEffectMoves
+    ld a,[de] ; moveid
+    ld hl,.MalusMoves
+    call .CheckList
+    ret c
+    call .GetEffect
+    ld hl,.MalusEffectMoves
+    jp .CheckList
+.MalusMoves
+    db SWOOP
+    db TRAPHOLE
+    db $FF
+.MalusEffectMoves
+    db RECOIL_EFFECT
+    db THRASH_PETAL_DANCE_EFFECT
+    db HYPER_BEAM_EFFECT
+    db $FF
+
+; de = pointer to move details
+.MultiplyDamageAndAccuracy
+    call .GetAccuracy
+    cp 255
+    ret z
+    ld [H_MULTIPLIER],a ; acr
+    call .GetPower
+    ld [H_MULTIPLICAND+2],a ; pwr
+    xor a
+    ld [H_DIVIDEND],a
+    ld [H_MULTIPLICAND],a
+    ld [H_MULTIPLICAND+1],a
+    call Multiply
+    ld a,255 ; Divide 255
+    ld [H_DIVISOR],a
+    ld b,4 ; 4 bytes
+    call Divide
+    ld a,[$FF00+$98]
+    jp .SetPower
+
+.HandlePhisicalSpecial
+    call .GetPower
+    ld [H_MULTIPLICAND+2],a ; pwr
+    push de
+    ld b,d ; bc = Pointer to Move ID
+    ld c,e ; ...
+    call .GetPointerToAtk
+    ld d,h ; de = Pointer to Mon ATK
+    ld e,l ; ...
+    ld h,b ; hl = Pointer to Move ID
+    ld l,c ; ...
+    call TestPhysicalSpecial
+    pop de
+    push de
+    call nz,.SetTypeSpecial
+    call .GetPointerToAtkOrSpc
+    call .ReadValueAndDividedBy4
+    ld [H_MULTIPLIER],a ; atk or spc
+    xor a
+    ld [H_DIVIDEND],a
+    ld [H_MULTIPLICAND],a
+    ld [H_MULTIPLICAND+1],a
+    call Multiply
+    call .GetPointerToAtk
+    call .ReadValueAndDividedBy4
+    ld d,a ; d = Atk
+    call .MovePointerToSpc
+    call .ReadValueAndDividedBy4 ; a = Spc
+    cp d
+    jr nc,.DivisorDone
+    ld a,d
+.DivisorDone
+    ld [H_DIVISOR],a
+    ld b,4 ; 4 bytes
+    call Divide
+    ld a,[$FF00+$98]
+    pop de
+    jp .SetPower
+
+.GetPointerToAtk
+    ld hl,wStoreAttackPointer
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ret
+
+.MovePointerToSpc
+    ld bc,W_PARTYMON1_SPECIAL-W_PARTYMON1_ATTACK
+    add hl,bc
+    ret
+
+.GetPointerToAtkOrSpc
+    call .GetPointerToAtk
+    ld bc,0
+    jr z,.MultiplierDone
+    ld bc,W_PARTYMON1_SPECIAL-W_PARTYMON1_ATTACK
+.MultiplierDone
+    add hl,bc
+    ret
+
+.ReadValueAndDividedBy4
+    ld a,[hli]
+    ld b,a
+    ld a,[hld]
+    srl b ; Atk/Spc Divided by 4
+    rr a  ; ...
+    srl b ; ...
+    rr a  ; ...
+    ret
+
+.SetTypeSpecial
+    inc de
+    inc de
+    inc de
+    ld a,[de]
+    set 7,a
+    ld [de],a
+    dec de
+    dec de
+    dec de
+    ret
+
+; ─────────────────────
+
+.DiscourageForgot9
+    inc b
+    inc b
+    inc b
+.DiscourageForgot6
+    inc b
+    inc b
+.DiscourageForgot4
+    inc b
+.DiscourageForgot3
+    inc b
+.DiscourageForgot2
+    inc b
+.DiscourageForgot1
+    inc b
+    ret
+
+; ─────────────────────
+
+.EncourageForgot9
+    dec b
+    dec b
+    dec b
+.EncourageForgot6
+    dec b
+    dec b
+.EncourageForgot4
+    dec b
+.EncourageForgot3
+    dec b
+.EncourageForgot2
+    dec b
+.EncourageForgot1
+    dec b
+    ret
+
+; ─────────────────────
+
+.ReadActualMoves
+    xor a
+    ld hl,wCountActualDamageMove
+    ld [hli],a ; wCountActualDamageMove
+    ld [hli],a ; wCountActualZeroMove
+    ld de,wActualMoves
+    ld c,4
+.ReadActualLoop
+    ld hl,.ReadActualMoves_continue ; Return Pointer
+    push hl                         ; ...
+    ld a,[de]
+    ld hl,.ExceptionOneDamageMovesToConsiderDamage
+    call .CheckList
+    jr c,.IncreseCountActualDamageMove
+    call .GetPowerAndFlags
+    ret c
+    jr z,.IncreseCountActualZeroMove
+.IncreseCountActualDamageMove
+    ld hl,wCountActualDamageMove
+    inc [hl]
+    ret
+.IncreseCountActualZeroMove
+    ld hl,wCountActualZeroMove
+    inc [hl]
+    ret
+.ReadActualMoves_continue
+    ld a,[de]
+    cp DREAM_EATER
+    call z,.SetDreamEaterFlag
+    call .GetEffect
+    cp SLEEP_EFFECT
+    call z,.SetSleepEffectFlag
+    inc de
+    inc de
+    inc de
+    inc de
+    inc de
+    inc de
+    dec c
+    jr nz,.ReadActualLoop
+    ret
+
+.SetDreamEaterFlag
+    ld hl,wDreamEaterInMovesBit1
+    set 1,[hl]
+    ret
+
+.SetSleepEffectFlag
+    ld hl,wSleepEffectInMovesBit0
+    set 0,[hl]
+    ret
+
+.ResetSleepEffectAndDreamEaterFlags
+    ld hl,wSleepEffectInMovesBit0
+    res 0,[hl] ; wSleepEffectInMovesBit0
+    res 1,[hl] ; wDreamEaterInMovesBit1
+    ret
+
+; ─────────────────────
+
+.CanNewOverwriteActualMoves
+    call GenRandom
+    call .CheckForceEncourage
+    jr c,.ForceEncourage
+    call .CheckAtLeast1Encouraged ; <=20
+    jr nc,.cant
+    ; ft
+.ForceEncourage
+    scf
+    ret
+.cant ; No Moved to Forgot "Encouraged"
+    and a ; rcf
+    ret
+
+.CheckAtLeast1Encouraged ; <=20
+    ld a,[wNewMoveNum]
+    cp DREAM_EATER
+    jr nz,.NotFailDreamEater
+    ld hl,wSleepEffectInMovesBit0
+    bit 0,[hl]
+    jr z,.FailEncouraged
+.NotFailDreamEater
+    ld hl,wMoveForgotPriority
+    ld bc,(0<<8|4)
+.LoopAtLeast1Encouraged
+    ld a,[hli]
+    cp 20+1
+    jr c,.AtLeast1Encouraged
+    dec c
+    jr nz,.LoopAtLeast1Encouraged
+    ld a,[wNewMoveNum]
+    ld hl,.EncourageLearnMoves
+    call .CheckList
+    ld b,%00000001 ; 50%
+    jr c,.TryToForceEncourage
+    ld b,%00011111 ; 12.5%
+.TryToForceEncourage
+    ld a,[H_RAND2]
+    and b
+    jr z,.AtLeast1Encouraged
+.FailEncouraged
+    and a ; rcf
+    ret
+.AtLeast1Encouraged
+    scf
+    ret
+
+.CheckForceEncourage
+    ; Check actual 4 moves vs new move (zero/damage)
+    ld a,[wNewMoveNum]
+    cp DREAM_EATER
+    jr z,.NotForceEnc
+    ld a,[wNewMovePwr]
+    and a
+    jr z,.NewMoveNoDamage
+    ld a,[wCountActualDamageMove]
+    cp 2
+    jr c,.ForceEnc ; new damage but 0/1 damage actual
+    jr .NotForceEnc
+.NewMoveNoDamage
+    ld a,[wCountActualDamageMove]
+    cp 4
+    jr nz,.NotForceEnc
+    ld a,[H_RAND1]
+    and %00000001 ; 50%
+    jr z,.ForceEnc ; new zero but 4 damage actual
+    ; ft
+.NotForceEnc
+    and a ; rcf
+    ret
+.ForceEnc
+    scf
+    ret
+
+; ─────────────────────
+
+.ReadCalculatedMovePriorityToIdentifyWorst
+    ld b,0
+.resetloop
+    ld hl,wMoveForgotPriority
+    ld c,4
+.loop1
+    dec [hl]
+    jr nz,.notzero
+    inc b
+.notzero
+    inc hl
+    dec c
+    jr nz,.loop1
+    ld a,b
+    and a
+    jr z,.resetloop
+    call GenRandom
+    and %00000011 ; 0...3
+    ld b,0
+    ld c,a
+.looptofindzero
+    ld hl,wMoveForgotPriority
+    add hl,bc
+    ld a,[hl]
+    and a
+    ret z
+    inc c
+    ld a,c
+    and %00000011 ; 0...3
+    ld c,a
+    jr .looptofindzero
+
+; ─────────────────────
+
+.CheckList
+    push hl
+    push bc
+    push af
+    push de
+    ld de,1
+    call IsInArray
+    pop de
+    pop bc
+    ld a,b
+    pop bc
+    pop hl
+    ret
+
+; ─────────────────────
+
+.ExceptionOneDamageMovesToConsiderDamage
+    db DREAM_EATER
+    db SEISMIC_TOSS
+    db NIGHT_SHADE
+    db $FF
+
+.EscapeMoves
+    db ROAR
+    db TELEPORT
+    db WHIRLWIND
+    db $FF
+
+.EncourageLearnMoves
+    db DREAM_EATER
+    ; ft
+
+.NotForgottableMoves
+    db SING
+    db SLEEP_POWDER
+    db HYPNOSIS
+    db LOVELY_KISS
+    db SPORE
+    db SWORDS_DANCE
+    db BODY_SLAM
+    db TWINEEDLE
+    db PIN_MISSILE
+    db FLAMETHROWER
+    db FIRE_BLAST
+    db TSUNAMI
+    db HYDRO_PUMP
+    db ICE_BEAM
+    db BLIZZARD
+    db DRILL_PECK
+    db KARATE_CHOP
+    db JUMP_KICK
+    db HI_JUMP_KICK
+    db RAZOR_LEAF
+    db MEGA_DRAIN
+    db THUNDERBOLT
+    db THUNDER_M
+    db THUNDER_WAVE
+    db STUN_SPORE
+    db EARTHQUAKE
+    db PSYCHIC_M
+    db NIGHT_SHADE
+    db SEISMIC_TOSS
+    db RECOVER
+    db SLUDGE
+    db AMNESIA
+    db SOFTBOILED
+    db FLARE
+    db DIZZY_PUNCH
+    db HAMMER
+    db EXPLOSION
+    db BONEMERANG
+    db REST
+    db ROCK_SLIDE
+    db SUPER_FANG
+    db SLASH
+    db SUBSTITUTE
+    db WATERFALL
+    db FIRE_PUNCH
+    db ICE_PUNCH
+    db THUNDERPUNCH
+    db TRI_ATTACK
+    db HYPER_BEAM
+    db HAZE
+    db $FF
+
+.DownEffectMoves:
+    db ATTACK_DOWN1_EFFECT
+    db DEFENSE_DOWN1_EFFECT
+    db SPEED_DOWN1_EFFECT
+    db SPECIAL_DOWN1_EFFECT
+    db ACCURACY_DOWN1_EFFECT
+    db EVASION_DOWN1_EFFECT
+    db ATTACK_DOWN2_EFFECT
+    db DEFENSE_DOWN2_EFFECT
+    db SPEED_DOWN2_EFFECT
+    db SPECIAL_DOWN2_EFFECT
+    db ACCURACY_DOWN2_EFFECT
+    db EVASION_DOWN2_EFFECT
+    db $FF
+
+.UpEffectMoves:
+    db ATTACK_UP1_EFFECT
+    db DEFENSE_UP1_EFFECT
+    db SPEED_UP1_EFFECT
+    db SPECIAL_UP1_EFFECT
+    db ACCURACY_UP1_EFFECT
+    db EVASION_UP1_EFFECT
+    db ATTACK_UP2_EFFECT
+    db DEFENSE_UP2_EFFECT
+    db SPEED_UP2_EFFECT
+    db SPECIAL_UP2_EFFECT
+    db ACCURACY_UP2_EFFECT
+    db EVASION_UP2_EFFECT
+    db ATTACK_UP3_EFFECT
+    db DEFENSE_UP3_EFFECT
+    db SPEED_UP3_EFFECT
+    db SPECIAL_UP3_EFFECT
+    db ACCURACY_UP3_EFFECT
+    db EVASION_UP3_EFFECT
+    db $FF
+
+; ─────────────────────
+
+.ResetNumOfTestCaseInsert
+    ld a,[wFlagGameBoyColor]
+    cp $11
+    ret nz ; NotGBC
+    ld a,$02
+    ld [H_LOADEDWRAMBANK],a
+    ld hl,wPointerToNextTestCase
+    ld a,wDebugActualMoveList_Bank2 & $FF
+    ld [hli],a
+    ld a,wDebugActualMoveList_Bank2 >> 8
+    ld [hl],a
+    xor a
+    ld [H_LOADEDWRAMBANK],a
+    ret
+
+.PrintTestCase
+    ld a,[wFlagGameBoyColor]
+    cp $11
+    ret nz ; NotGBC
+    ld hl,wActualMoves
+    call .read1
+    ld a,$02
+    ld [H_LOADEDWRAMBANK],a
+    ld hl,wPointerToNextTestCase
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    call .write
+    xor a
+    ld [H_LOADEDWRAMBANK],a
+    push hl
+    ld hl,wMoveForgotPriority
+    call .read2
+    pop hl
+    ld a,$02
+    ld [H_LOADEDWRAMBANK],a
+    call .write
+    xor a
+    ld [H_LOADEDWRAMBANK],a
+    push hl
+    ld a,[wNewMoveNum]
+    ld b,a
+    ld a,[wNewMovePwr]
+    ld c,a
+    pop hl
+    ld a,$02
+    ld [H_LOADEDWRAMBANK],a
+    ld a,b
+    ld [hli],a
+    ld a,c
+    ld [hli],a
+    ld a,l
+    ld [wPointerToNextTestCase],a
+    ld a,h
+    ld [wPointerToNextTestCase+1],a
+    xor a
+    ld [H_LOADEDWRAMBANK],a
+    ret
+
+.PrintFinalTestCase
+    ld a,[wFlagGameBoyColor]
+    cp $11
+    ret nz ; NotGBC
+    ld h,d
+    ld l,e
+    call .read2
+    ld a,$02
+    ld [H_LOADEDWRAMBANK],a
+    ld hl,wPointerToNextTestCase
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    call .write
+    xor a
+    ld [H_LOADEDWRAMBANK],a
+    ret
+
+.read1
+    ld a,[hli]
+    inc hl
+    inc hl
+    inc hl
+    inc hl
+    inc hl
+    ld b,a
+    ld a,[hli]
+    inc hl
+    inc hl
+    inc hl
+    inc hl
+    inc hl
+    ld c,a
+    ld a,[hli]
+    inc hl
+    inc hl
+    inc hl
+    inc hl
+    inc hl
+    ld d,a
+    ld a,[hl]
+    ld e,a
+    ret
+
+.read2
+    ld a,[hli]
+    ld b,a
+    ld a,[hli]
+    ld c,a
+    ld a,[hli]
+    ld d,a
+    ld a,[hl]
+    ld e,a
+    ret
+
+.write
+    ld a,b
+    ld [hli],a
+    ld a,c
+    ld [hli],a
+    ld a,d
+    ld [hli],a
+    ld a,e
+    ld [hli],a
+    ret
+
+; ────────────────────────────────────────────────────────────
 
 HealEffect_:
     ld a,[H_WHOSETURN] ; $FF00+$f3
@@ -56922,10 +57966,12 @@ HandleCounterMove:
     and a
     ret z ; if the move the target used has 0 power,miss
     push bc ; Backup Target ID
+    push hl ; Backup Enemy Selected Move
     ld hl,(W_PLAYERMONATK)-W_PLAYERMONID
     add hl,bc
     ld d,h
     ld e,l ; de point to mon attack
+    pop hl ; Restore Enemy Selected Move
     call TestPhysicalSpecial
     pop de ; Restore Target ID
     jr nz,.specialAttackFail
@@ -58694,6 +59740,11 @@ LoadEnemyMonData:
     call Copy2BytesDirect
     jr .continue
 .FreshMoves
+    ld hl,W_ENEMYMONATTACK
+    ld a,l
+    ld [wStoreAttackPointer],a
+    ld a,h
+    ld [wStoreAttackPointer+1],a
     xor a
     ld [wLearningMovesFromDayCare],a
     ld h,d
@@ -83598,8 +84649,16 @@ DayCareMText1:
     call AddNTimes
     ld d,h
     ld e,l
+    push hl
+    ld bc,W_PARTYMON1_ATTACK-W_PARTYMON1_MOVE1
+    add hl,bc
+    ld a,l
+    ld [wStoreAttackPointer],a
+    ld a,h
+    ld [wStoreAttackPointer+1],a
     ld a,$1
     ld [wLearningMovesFromDayCare],a
+    pop hl
     call HandleMovesAfterDayCare
     pop bc
     pop af
@@ -140760,6 +141819,12 @@ TrainerClassMoveChoiceModifications:
     db 1,2,3,4,0  ; AGATHA
     db 1,3,4,0    ; LANCE
 
+CheckWildAI:
+    ld a,d
+    ld hl,WildAI
+    ld de,1
+    jp IsInArray
+
 WildAI:
     db VENUSAUR
     db CHARIZARD
@@ -143561,6 +144626,12 @@ GenRandomInBattle_CH:
     ld a,d
     pop bc
     ret
+
+CheckHighCriticalMoves:
+    ld a,d ; moveid
+    ld hl,HighCriticalMoves
+    ld de,1
+    jp IsInArray
 
 ; high critical hit moves
 HighCriticalMoves:

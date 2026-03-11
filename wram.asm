@@ -2037,12 +2037,65 @@ wCollisionFlag:: db ; def1
 
 NEXTU
 
-wMoveForgotPriority:: ; def0
+; ─────────────────────────────────
+; Memory used in "WriteMonMoves"
+; ─────────────────────────────────
+
+wStoreAttackPointer::
+    ds 2
+
+wWriteMonMovesFlags::
+wSleepEffectInMovesBit0 ; bit 0 = Sleep Effect in Actual Moves
+wDreamEaterInMovesBit1  ; bit 1 = Dream Eater in Actual Moves
+wRandomMoveChoiceBit7   ; bit 7 = Enable with Wild (no AI) Mon or "stupid" trainer when "choice moveset"
+    ds 1
+
+wCountActualDamageMove:: db
+wCountActualZeroMove:: db
+
+wMoveForgotPriority::
     ds 4
-wNewMoveDamage:: ; $def4
-    db
-wNewMoveType:: ; $def5
-    db
+
+wNewMove::
+
+wNewMoveNum:: db
+wNewMoveEff:: db
+wNewMovePwr:: db
+wNewMoveTyp:: db
+wNewMoveAcr:: db
+wNewMoveEne:: db
+
+wActualMoves::
+
+wActualMove01Num:: db
+wActualMove01Eff:: db
+wActualMove01Pwr:: db
+wActualMove01Typ:: db
+wActualMove01Acr:: db
+wActualMove01Ene:: db
+
+wActualMove02Num:: db
+wActualMove02Eff:: db
+wActualMove02Pwr:: db
+wActualMove02Typ:: db
+wActualMove02Acr:: db
+wActualMove02Ene:: db
+
+wActualMove03Num:: db
+wActualMove03Eff:: db
+wActualMove03Pwr:: db
+wActualMove03Typ:: db
+wActualMove03Acr:: db
+wActualMove03Ene:: db
+
+wActualMove04Num:: db
+wActualMove04Eff:: db
+wActualMove04Pwr:: db
+wActualMove04Typ:: db
+wActualMove04Acr:: db
+wActualMove04Ene:: db
+
+; ─────────────────────────────────
 
 NEXTU
 
@@ -2106,3 +2159,17 @@ wExceptionPaletteGbc ; d0ff
 
 wPreLoadOfVRAM2: ; d100
     ds 1024
+
+SECTION "SearchMoveToReplaceTestCase", WRAMX[$d500], BANK[2]
+
+UNION
+
+wPointerToNextTestCase:: dw
+
+wDebugActualMoveList_Bank2:: ds 4
+wMoveForgotPriority_Bank2:: ds 4
+wNewMoveID_Bank2:: db
+
+ds 9 * 100
+
+ENDU
