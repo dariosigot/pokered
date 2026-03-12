@@ -51041,7 +51041,9 @@ WriteMonMoves:
     push de
     push bc
     push de ; ActualMovesPointer
-    call .ResetWriteMonMovesFlags
+    xor a
+    ld [wWriteMonMovesFlags],a
+    call .GetFlagWildRandomMoveChoice
 ;DEBUG~
     call .ResetNumOfTestCaseInsert
     ld hl,wWriteInGenericBufferBit4
@@ -51061,7 +51063,6 @@ WriteMonMoves:
     res 4,[hl] ; wWriteInGenericBufferBit4
     res 6,[hl] ; wNoSkillInListBit6
     res 7,[hl] ; wNoExclusiveInListBit7
-    call .GetFlagWildRandomMoveChoice
     pop hl
 
 .nextMove
@@ -51085,14 +51086,9 @@ WriteMonMoves:
     jr .findEmptySlotLoop
 
 .NoEmptyMoveSlotsFound
-    pop de  ; ActualMovesPointer
-    push de ; ...
     push hl
-    ld h,d
-    ld l,e
     call .ReadActualMoves
     call .SearchMoveToReplace
-    call .ResetSleepEffectAndDreamEaterFlags
     pop hl
     jr nc,.nextMove
 
@@ -51123,11 +51119,6 @@ WriteMonMoves:
     pop bc
     pop de
     pop hl
-    ret
-
-.ResetWriteMonMovesFlags
-    xor a
-    ld [wWriteMonMovesFlags],a
     ret
 
 ; ─────────────────────
@@ -51354,8 +51345,7 @@ WriteMonMoves:
     jr nz,.NotExplosionOnZero
     ld a,[de]
     cp SELFDESTRUCT
-    jr nz,.NotExplosionOnZero
-    jp .EncourageForgot9 ; ▲x9 explosion on selfdestruction
+    jp z,.EncourageForgot9 ; ▲x9 explosion on selfdestruction
 .NotExplosionOnZero
     ld a,[H_RAND1]
     and %00000001 ; 50%
@@ -51386,7 +51376,7 @@ WriteMonMoves:
     jr nz,.CheckTypeDone
     ld a,[wNewMovePwr]
     cp d
-    call nc,.EncourageForgot1 ; ▲x4 damage on damage same type (different Phi/Spc)
+    call nc,.EncourageForgot1 ; ▲x1 damage on damage same type (different Phi/Spc) and new >= old
     jr .CheckTypeDone
 .SameTypeAndPhiSpc
     ld a,[wNewMovePwr]
@@ -51462,10 +51452,10 @@ WriteMonMoves:
     ld a,[wNewMoveNum]
     call .CheckList
     call c,.EncourageForgot2 ; ▲x2 New Unforgottable Old Forgottable
-    ld hl,W_ISINBATTLE
-    ld d,[hl]
-    dec d
+    ld a,[W_ISINBATTLE]
+    dec a
     ret nz ; notWildBattle
+    ld a,[de] ; old
     ld hl,.EscapeMoves
     call .CheckList
     jp c,.DiscourageForgot6 ; ▼x6 Escape
@@ -51610,18 +51600,15 @@ WriteMonMoves:
     call .CheckStabMove
     call z,.SetPower150
     call .CheckDamage2xEffects
-    call c,.SetPower200
+    call z,.SetPower200
     call .CheckMultiDamageEffects
-    call c,.SetPower250
+    call z,.SetPower250
     call .CheckHighProbCritHitMoves
     call c,.SetPower175
     call .CheckUsefullEffectMoves
     call c,.SetPower1125
     call .CheckChargeMoves
     call c,.SetPower050
-    call .GetEffect
-    cp EXPLODE_EFFECT
-    call z,.SetPower050
     call .CheckMalusEffectMoves
     call c,.SetPower075
     call .GetPower
@@ -51634,21 +51621,18 @@ WriteMonMoves:
 
 .HandleOutliersPower
     ld a,[de]
-    cp DREAM_EATER
-    ld a,1
-    jr z,.SetPower
-    ld a,[de]
     ld hl,.SpecialZeroBPMoves
     call .CheckList
-    ld a,1
-    jr c,.SetPower
+    jr c,.Set1Power
     call .GetEffect
     ld hl,.SpecialZeroBPEffect
     call .CheckList
+    ret nc
+.Set1Power
     ld a,1
-    jr c,.SetPower
-    ret
+    jr .SetPower
 .SpecialZeroBPMoves
+    db DREAM_EATER
     db BIDE
     db METRONOME
     db MIRROR_MOVE
@@ -51875,28 +51859,26 @@ WriteMonMoves:
 
 .CheckDamage2xEffects
     call .GetEffect
-    ld hl,.Damage2xEffects
-    jp .CheckList
-.Damage2xEffects
-    db TWINEEDLE_EFFECT
-    db ATTACK_TWICE_EFFECT
-    db $FF
+    cp TWINEEDLE_EFFECT
+    ret z
+    cp ATTACK_TWICE_EFFECT
+    ret
 
 .CheckMultiDamageEffects
     call .GetEffect
-    ld hl,.MultiDamageEffects
-    jp .CheckList
-.MultiDamageEffects
-    db TWO_TO_FIVE_ATTACKS_EFFECT
-    db $FF
+    cp TWO_TO_FIVE_ATTACKS_EFFECT
+    ret
 
 .CheckHighProbCritHitMoves
-    push de
     ld a,[de] ; moveid
-    ld d,a    ; ...
-    BANKSWITCH CheckHighCriticalMoves
-    pop de
-    ret
+    ld hl,.HighCriticalMoves
+    jp .CheckList
+.HighCriticalMoves
+    db KARATE_CHOP
+    db RAZOR_LEAF
+    db HAMMER
+    db SLASH
+    db $FF
 
 .CheckUsefullEffectMoves
     call .GetEffect
@@ -51919,6 +51901,7 @@ WriteMonMoves:
     db SPECIAL_DOWN_SIDE1_EFFECT
     db SPEED_DOWN_SIDE1_EFFECT
     db SPEED_DOWN_SIDE2_EFFECT
+    db TWINEEDLE_EFFECT
     db $FF
 
 .CheckChargeMoves
@@ -52093,37 +52076,46 @@ WriteMonMoves:
 ; ─────────────────────
 
 .ReadActualMoves
+    ld hl,wSleepEffectInMovesBit0
+    res 0,[hl] ; wSleepEffectInMovesBit0
+    res 1,[hl] ; wDreamEaterInMovesBit1
     xor a
-    ld hl,wCountActualDamageMove
+    inc hl
     ld [hli],a ; wCountActualDamageMove
     ld [hli],a ; wCountActualZeroMove
     ld de,wActualMoves
     ld c,4
 .ReadActualLoop
-    ld hl,.ReadActualMoves_continue ; Return Pointer
-    push hl                         ; ...
+    ld a,[de]
+    cp DREAM_EATER
+    jr nz,.ReadActualMoves_NotDreamEater
+    ld hl,wDreamEaterInMovesBit1
+    set 1,[hl]
+    jr .IncreseCountActualDamageMove
+.ReadActualMoves_NotDreamEater
+    call .GetEffect
+    cp SLEEP_EFFECT
+    jr nz,.ReadActualMoves_NotSleepEffect
+    ld hl,wSleepEffectInMovesBit0
+    set 0,[hl]
+    jr .IncreseCountActualZeroMove
+.ReadActualMoves_NotSleepEffect
     ld a,[de]
     ld hl,.ExceptionOneDamageMovesToConsiderDamage
     call .CheckList
     jr c,.IncreseCountActualDamageMove
     call .GetPowerAndFlags
-    ret c
+    jr c,.ReadActualMoves_Next
     jr z,.IncreseCountActualZeroMove
 .IncreseCountActualDamageMove
     ld hl,wCountActualDamageMove
     inc [hl]
-    ret
+    jr .ReadActualMoves_Next
 .IncreseCountActualZeroMove
     ld hl,wCountActualZeroMove
     inc [hl]
-    ret
-.ReadActualMoves_continue
-    ld a,[de]
-    cp DREAM_EATER
-    call z,.SetDreamEaterFlag
-    call .GetEffect
-    cp SLEEP_EFFECT
-    call z,.SetSleepEffectFlag
+    ; ft
+.ReadActualMoves_Next
     inc de
     inc de
     inc de
@@ -52132,22 +52124,6 @@ WriteMonMoves:
     inc de
     dec c
     jr nz,.ReadActualLoop
-    ret
-
-.SetDreamEaterFlag
-    ld hl,wDreamEaterInMovesBit1
-    set 1,[hl]
-    ret
-
-.SetSleepEffectFlag
-    ld hl,wSleepEffectInMovesBit0
-    set 0,[hl]
-    ret
-
-.ResetSleepEffectAndDreamEaterFlags
-    ld hl,wSleepEffectInMovesBit0
-    res 0,[hl] ; wSleepEffectInMovesBit0
-    res 1,[hl] ; wDreamEaterInMovesBit1
     ret
 
 ; ─────────────────────
@@ -52265,13 +52241,19 @@ WriteMonMoves:
 .CheckList
     push hl
     push bc
-    push af
-    push de
-    ld de,1
-    call IsInArray
-    pop de
-    pop bc
-    ld a,b
+    ld c,a
+.CheckList_Loop
+    ld a,[hli]
+    cp $FF
+    jr z,.CheckList_NotInArray
+    cp c
+    jr nz,.CheckList_Loop
+    scf
+    jr .CheckList_InArray
+.CheckList_NotInArray
+    and a
+.CheckList_InArray
+    ld a,c
     pop bc
     pop hl
     ret
@@ -52279,7 +52261,6 @@ WriteMonMoves:
 ; ─────────────────────
 
 .ExceptionOneDamageMovesToConsiderDamage
-    db DREAM_EATER
     db SEISMIC_TOSS
     db NIGHT_SHADE
     db $FF
@@ -144626,12 +144607,6 @@ GenRandomInBattle_CH:
     ld a,d
     pop bc
     ret
-
-CheckHighCriticalMoves:
-    ld a,d ; moveid
-    ld hl,HighCriticalMoves
-    ld de,1
-    jp IsInArray
 
 ; high critical hit moves
 HighCriticalMoves:
