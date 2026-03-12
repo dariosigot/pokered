@@ -51452,6 +51452,13 @@ WriteMonMoves:
     ld a,[wNewMoveNum]
     call .CheckList
     call c,.EncourageForgot2 ; ▲x2 New Unforgottable Old Forgottable
+    ld a,[de] ; old
+    ld hl,.MediumUsefullMoves
+    call .CheckList
+    jp c,.DiscourageForgot1 ; ▼x1 Old Medium Usefull
+    ld a,[wNewMoveNum]
+    call .CheckList
+    call c,.EncourageForgot1 ; ▲x1 New Medium Usefull Old Not Medium Usefull
     ld a,[W_ISINBATTLE]
     dec a
     ret nz ; notWildBattle
@@ -52163,6 +52170,10 @@ WriteMonMoves:
     call .CheckList
     ld b,%00000001 ; 50%
     jr c,.TryToForceEncourage
+    ld hl,.MediumUsefullMoves
+    call .CheckList
+    ld b,%00000011 ; 25%
+    jr c,.TryToForceEncourage
     ld b,%00011111 ; 12.5%
 .TryToForceEncourage
     ld a,[H_RAND2]
@@ -52326,6 +52337,29 @@ WriteMonMoves:
     db TRI_ATTACK
     db HYPER_BEAM
     db HAZE
+    db $FF
+
+.MediumUsefullMoves
+    db CONFUSE_RAY
+    db SUPERSONIC
+    db ABSORB
+    db LEECH_LIFE
+    db LEECH_SEED
+    db POISON_GAS
+    db POISONPOWDER
+    db TOXIC
+    db AGILITY
+    db SCREECH
+    db HARDEN
+    db WITHDRAW
+    db ACID_ARMOR
+    db BARRIER
+    db LIGHT_SCREEN
+    db REFLECT
+    db BIND
+    db CLAMP
+    db FIRE_SPIN
+    db WRAP
     db $FF
 
 .DownEffectMoves:
