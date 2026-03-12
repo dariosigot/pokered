@@ -22944,15 +22944,13 @@ BackupPP:
     ld bc,2
     jp CopyData
 
-WriteMonMoves2:
+AddPokemonToParty_WriteMonMoves:
     ld a,[W_ISINBATTLE]
     dec a
-    jr nz,.WriteMonMoves
+    PREDEF_JUMP_NZ WriteMonMoves
     ld hl,wBackupEnemyMoves
     ld bc,$4
     jp CopyData
-.WriteMonMoves
-    PREDEF_JUMP WriteMonMoves
 
 WriteMovePP:
     ld a,[W_ISINBATTLE]
@@ -26874,7 +26872,7 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld [wLearningMovesFromDayCare],a
     ld d,h
     ld e,l
-    call WriteMonMoves2
+    call AddPokemonToParty_WriteMonMoves
     call AddPokemonToParty_TryToAddExclusiveMove
     scf
     ret
@@ -59766,7 +59764,7 @@ LoadEnemyMonData:
     ld l,e
     ld bc,4
     call FillMemory
-    call WriteMonMovesPlus
+    call LoadEnemyMonData_WriteMonMoves
     ld de,W_ENEMYMONENERGY-1 ; W_ENEMYMONALTFORM
     PREDEF ResetMovePPs
 .continue
@@ -62596,7 +62594,7 @@ LoadMonFrontSpriteOrGhost:
     jp nz,LoadMonFrontSprite
     jp LoadGhostPic
 
-WriteMonMovesPlus:
+LoadEnemyMonData_WriteMonMoves:
     ld a,[W_ISINBATTLE]
     dec a
     jr z,.CheckSpecialWild
