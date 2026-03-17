@@ -81,10 +81,6 @@ SpecialTrainerMoves:
     SpecialTrainer JUGGLER,5,JugglerMove5
     SpecialTrainer TAMER,5,TamerMove5
     SpecialTrainer POKEMANIAC,6,PokemaniacMove6
-    SpecialTrainer CHANNELER,14,ChannelerMove14
-    SpecialTrainer CHANNELER,15,ChannelerMove15
-    SpecialTrainer CHANNELER,16,ChannelerMove16
-    SpecialTrainer POKEMANIAC,8,PokemaniacMove8
     db $ff
 
 ; ────────────────────────────────────────────────
@@ -1104,34 +1100,6 @@ PokemaniacMove6:
     db HYPNOSIS,NIGHT_SHADE,PSYCHIC_M,THUNDERBOLT
     ; 44,FARFETCH'D
     db BLADE,SWORDS_DANCE,SLASH,SWOOP
-    db 0
-
-PokemaniacMove8:
-    ; 26,DITTO
-    db TRANSFORM,0,0,0
-    db 0
-
-; ────────────────────────────────────────────────
-
-ChannelerMove14:
-    ; 35,GASTLY
-    db ABSORB,LICK,POISON_GAS,NIGHT_SHADE
-    ; 35,HAUNTER
-    db MEGA_DRAIN,SMOG,CONFUSION,NIGHT_SHADE
-    db 0
-
-ChannelerMove15:
-    ; 38,HAUNTER
-    db HYPNOSIS,DREAM_EATER,THUNDERPUNCH,CONFUSION
-    db 0
-
-ChannelerMove16:
-    ; 33,GASTLY
-    db HYPNOSIS,DREAM_EATER,CONFUSE_RAY,SMOG
-    ; 33,GASTLY
-    db POISON_GAS,NIGHT_SHADE,LEECH_LIFE,LICK
-    ; 33,HAUNTER
-    db PSYWAVE,HYPNOSIS,NIGHT_SHADE,CONFUSION
     db 0
 
 ; ────────────────────────────────────────────────
