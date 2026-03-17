@@ -22945,6 +22945,9 @@ BackupPP:
     jp CopyData
 
 AddPokemonToParty_WriteMonMoves:
+    ld hl,wSpecialTrainerMovesBit5
+    bit 5,[hl]
+    ret nz
     ld a,[W_ISINBATTLE]
     dec a
     PREDEF_JUMP_NZ WriteMonMoves
@@ -149974,6 +149977,9 @@ ReadTrainer:
     and a
     ret nz
 
+    call .CheckSpecialTrainer
+    push de ; Backup potentially pointer to SpecialTrainer moveset
+
 ; set [wEnemyPartyCount] to 0,[$D89D] to FF
 ; XXX first is total enemy pokemon?
 ; XXX second is species of first pokemon?
@@ -150049,32 +150055,12 @@ ReadTrainer:
     jr .SpecialTrainer
 .AddAdditionalMoveData
 ; does the trainer have additional move data?
-    ld a,[W_TRAINERCLASS]
-    ld b,a
-    ld a,[W_TRAINERNO]
-    ld c,a
-    ld hl,SpecialTrainerMoves
-.loopAdditionalMoveData
-    ld a,[hli]
-    cp $ff
-    jr z,.FinishUp
-    cp b
-    jr nz,.NextSpecialTrainer1
-    ld a,[hli]
-    cp c
-    jr nz,.NextSpecialTrainer2
-    ld a,[hli]
-    ld d,[hl]
-    ld e,a
-    call LoadSpecialTrainerMoves
-    jr .FinishUp
-.NextSpecialTrainer1
-    inc hl
-.NextSpecialTrainer2
-    inc hl
-    inc hl
-    jr .loopAdditionalMoveData
-.FinishUp ; XXX this needs documenting
+    ld hl,wSpecialTrainerMovesBit5
+    bit 5,[hl]
+    res 5,[hl]
+    pop hl ; Restore potentially pointer to SpecialTrainer moveset
+    call nz,.LoadSpecialTrainerMoves
+; XXX this needs documenting
     xor a       ; clear D079-D07B
     ld de,$D079
     ld [de],a
@@ -150098,14 +150084,45 @@ ReadTrainer:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-LoadSpecialTrainerMoves:
-    ld h,d
-    ld l,e
+; does the trainer have additional move data?
+.CheckSpecialTrainer
+    ld hl,wSpecialTrainerMovesBit5
+    res 5,[hl]
+    ld a,[W_TRAINERCLASS]
+    ld b,a
+    ld a,[W_TRAINERNO]
+    ld c,a
+    ld hl,SpecialTrainerMoves
+.loopAdditionalMoveData_1
+    ld a,[hli]
+    cp $ff
+    ret z
+    cp b
+    jr nz,.NextSpecialTrainer1_1
+    ld a,[hli]
+    cp c
+    jr nz,.NextSpecialTrainer2_1
+    ld a,[hli]
+    ld d,[hl]
+    ld e,a
+    ld hl,wSpecialTrainerMovesBit5
+    set 5,[hl]
+    ret
+.NextSpecialTrainer1_1
+    inc hl
+.NextSpecialTrainer2_1
+    inc hl
+    inc hl
+    jr .loopAdditionalMoveData_1
+
+; ──────────────────────────────────────────────────────────────────────
+
+.LoadSpecialTrainerMoves
     ld b,0
 .writeAdditionalMoveDataLoop
     ld a,[hl]
     and a
-    jr z,.FinishUp
+    jr z,.FinishUp3
     ld a,b
     push bc
     push hl
@@ -150117,35 +150134,13 @@ LoadSpecialTrainerMoves:
     pop hl
     ld bc,4
     call CopyData ; copy bc bytes of data from hl to de
-;    call .WritePP
     pop bc
     inc b
     jr .writeAdditionalMoveDataLoop
-.FinishUp
+.FinishUp3
     ret
-;.WritePP
-;    push hl
-;    call .HLToMove
-;    call .DEToPP
-;    PREDEF ResetMovePPs
-;    pop hl
-;    ret
-;.HLToMove
-;    ld h,d
-;    ld l,e
-;    ld bc,-4
-;    add hl,bc
-;    ret
-;.DEToPP
-;    push hl
-;    ld h,d
-;    ld l,e
-;    ld de,16
-;    add hl,de
-;    ld d,h
-;    ld e,l
-;    pop hl
-;    ret
+
+; ──────────────────────────────────────────────────────────────────────
 
 INCLUDE "constants/TrainerData.asm"
 INCLUDE "constants/special_trainer.asm"

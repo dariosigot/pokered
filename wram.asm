@@ -1961,6 +1961,7 @@ wFlagListMenuSpc:           ; dee6 ; bit 0 = BadgeName
 wHyperBeamUnknownTypeBit4   ; dee6 ; bit 4 = Set Hyper Beam to Unknown Type
 wWriteInGenericBufferBit4   ; dee6 ; bit 4 = Force to Save Moves List in GenericBuffer+1
 wCollisionWithSpriteBit5    ; dee6 ; bit 5 = Set during start menu if there is a sprite in front of player
+wSpecialTrainerMovesBit5    ; dee6 ; bit 5 = Set before "AddPokemonToParty" to Skip "WriteMonMoves" cause SpecialTrainer
 wNoSkillInListBit6          ; dee6 ; bit 6 = Don't Load Skill in List
 wNoExclusiveInListBit7      ; dee6 ; bit 7 = Don't Load Exclusive in List
     ds 1
