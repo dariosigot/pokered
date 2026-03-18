@@ -150102,15 +150102,32 @@ ReadTrainer:
     ld a,[hli]
     cp c
     jr nz,.NextSpecialTrainer2_1
-    ld a,[hli]
-    ld d,[hl]
-    ld e,a
+.SpecialTrainerFound
+    ld a,[hli] ; Get Pointer to SpecialTrainer Moveset
+    ld e,a     ; ...
+    ld a,[hli] ; ...
+    ld d,a     ; ...
+    ld a,[hl] ; Get "SpecialTrainer Moveset MaxLevel" (0 = No Max Level)
+    and a
+    jr z,.SpecialTrainerMovesConfirmed
+    push de
+    push af
+    BANKSWITCH GetMaxLevel ; b = Max Level
+    ld a,d                 ; ...
+    pop bc
+    pop de
+    ; a = Actual Max Level
+    ; b = Required Max Level
+    cp b
+    ret nc ; Return if Actual >= Required
+.SpecialTrainerMovesConfirmed
     ld hl,wSpecialTrainerMovesBit5
     set 5,[hl]
     ret
 .NextSpecialTrainer1_1
     inc hl
 .NextSpecialTrainer2_1
+    inc hl
     inc hl
     inc hl
     jr .loopAdditionalMoveData_1
