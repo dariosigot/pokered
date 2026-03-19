@@ -362,8 +362,6 @@ wTileMapBackup2: ; cd81
 wBuffer: ; cee9
 ; used for temporary things
 
-wLearningMovesFromDayCare: ; cee9
-
 wHPBarMaxHP: ; cee9
     ds 2
 wHPBarOldHP: ; ceeb

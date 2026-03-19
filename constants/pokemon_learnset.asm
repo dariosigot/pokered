@@ -1892,6 +1892,7 @@ SLOWBRO_Learnset:
     db 52,ICE_PUNCH
     db 56,HAMMER
     db 59,HYDRO_PUMP
+    db 60,SUBSTITUTE
     db 0
 SLOWPOKE_NoEvo_Learnset:
     db 42,TSUNAMI

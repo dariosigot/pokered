@@ -454,6 +454,7 @@ NinetalesExclusiveMove:
     db SUBSTITUTE ; TM50
     db TSUNAMI ; TM53
     db FIRE_PUNCH ; TM57
+    db ICE_PUNCH ; TM58
     db QUICK_ATTACK
     db AGILITY
     db 0

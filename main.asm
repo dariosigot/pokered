@@ -11464,10 +11464,11 @@ LoadMonData_: ; 45b6 (1:45b6)
     ; Copy Exclusive
     ld a,[$cc49]
     and a
-    ld hl,W_PARTYMON1OT+8
+    ld hl,W_PARTYMON1OT+8 ; PLAYER
     jr z,.getExclusive
     dec a
-    jr z,.resetExclusive ; Enemy Exclusive doesn't exists
+    ld hl,W_ENEMYMON1OT+8 ; ENEMY
+    jr z,.getExclusive
     dec a
     ld hl,$dd2a+8 ; BOXMON1OT
     jr z,.getExclusive
@@ -22945,12 +22946,25 @@ BackupPP:
     jp CopyData
 
 AddPokemonToParty_WriteMonMoves:
+    ld a,[W_ISINBATTLE]
+    dec a
+    jr z,.CopyFromBackup
+    ld a,[$cc49]
+    and $f
+    jr z,.ToPlayer
+;ToEnemy
     ld hl,wSpecialTrainerMovesBit5
     bit 5,[hl]
     ret nz
-    ld a,[W_ISINBATTLE]
-    dec a
-    PREDEF_JUMP_NZ WriteMonMoves
+    ld hl,wNoExclusiveInListBit7
+    res 7,[hl]
+.WriteMonMoves
+    PREDEF_JUMP WriteMonMoves
+.ToPlayer
+    ld hl,wNoExclusiveInListBit7
+    set 7,[hl]
+    jr .WriteMonMoves
+.CopyFromBackup
     ld hl,wBackupEnemyMoves
     ld bc,$4
     jp CopyData
@@ -23170,6 +23184,18 @@ DrawHudAndPrintTextPokeFlute:
     pop hl
 .End
     jp PrintText
+
+AddPokemonToParty_HandleEnemyExclusive:
+    ld a,[$cc49]
+    and $f
+    ret z
+    ld hl,wSpecialTrainerMovesBit5
+    bit 5,[hl]
+    ret nz
+    push de
+    BANKSWITCH AddPokemonToParty_HandleEnemyExclusive_
+    pop de
+    ret
 
 ; Free
 
@@ -26871,10 +26897,9 @@ _AddPokemonToParty: ; f2e5 (3:72e5)
     ld [wStoreAttackPointer+1],a
     ld de,W_PARTYMON1_MOVE1-W_PARTYMON1_ATTACK
     add hl,de ; go to move 1
-    xor a
-    ld [wLearningMovesFromDayCare],a
     ld d,h
     ld e,l
+    call AddPokemonToParty_HandleEnemyExclusive
     call AddPokemonToParty_WriteMonMoves
     call AddPokemonToParty_TryToAddExclusiveMove
     scf
@@ -51035,7 +51060,7 @@ SetAttributeOamRedBall:
 ; ────────────────────────────────────────────────────────────
 
 ; writes the moves a mon has at level [W_CURENEMYLVL] to [de]
-; [wLearningMovesFromDayCare]: Day Care
+; input wNoExclusiveInListBit7
 WriteMonMoves:
     call Load16BitRegisters
     push hl
@@ -51050,12 +51075,6 @@ WriteMonMoves:
     ld hl,wWriteInGenericBufferBit4
     set 4,[hl] ; wWriteInGenericBufferBit4
     set 6,[hl] ; wNoSkillInListBit6
-    set 7,[hl] ; wNoExclusiveInListBit7
-    ld a,[wLearningMovesFromDayCare]
-    and a
-    jr z,.skip
-    res 7,[hl] ; wNoExclusiveInListBit7
-.skip
     ld a,[W_CURENEMYLVL] ; Level
     ld b,a               ; ...
     PREDEF GetMonPotentialMoveList
@@ -52408,6 +52427,25 @@ WriteMonMoves:
     ld a,$02
     ld [H_LOADEDWRAMBANK],a
     ld hl,wPointerToNextTestCase
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld a,h
+    cp wDebugActualMoveList_Bank2 >> 8
+    jr c,.SkipResetLoop
+.ResetLoop
+    xor a
+    ld [hld],a
+    ld a,h
+    cp wDebugActualMoveList_Bank2 >> 8
+    jr nz,.ResetLoop
+    ld a,l
+    cp wDebugActualMoveList_Bank2 & $FF
+    jr nz,.ResetLoop
+    xor a
+    ld [hl],a
+.SkipResetLoop
+    ld hl,wPointerToNextTestCase
     ld a,wDebugActualMoveList_Bank2 & $FF
     ld [hli],a
     ld a,wDebugActualMoveList_Bank2 >> 8
@@ -52474,6 +52512,10 @@ WriteMonMoves:
     ld h,[hl]
     ld l,a
     call .write
+    ld a,l
+    ld [wPointerToNextTestCase],a
+    ld a,h
+    ld [wPointerToNextTestCase+1],a
     xor a
     ld [H_LOADEDWRAMBANK],a
     ret
@@ -59762,7 +59804,6 @@ LoadEnemyMonData:
     ld a,h
     ld [wStoreAttackPointer+1],a
     xor a
-    ld [wLearningMovesFromDayCare],a
     ld h,d
     ld l,e
     ld bc,4
@@ -62602,6 +62643,8 @@ LoadEnemyMonData_WriteMonMoves:
     dec a
     jr z,.CheckSpecialWild
 .NormalWild
+    ld hl,wNoExclusiveInListBit7
+    set 7,[hl]
     PREDEF_JUMP WriteMonMoves
 .CheckSpecialWild
     BANKSWITCH CheckSpecialWild_
@@ -84672,8 +84715,6 @@ DayCareMText1:
     ld [wStoreAttackPointer],a
     ld a,h
     ld [wStoreAttackPointer+1],a
-    ld a,$1
-    ld [wLearningMovesFromDayCare],a
     pop hl
     call HandleMovesAfterDayCare
     pop bc
@@ -86009,6 +86050,8 @@ Route21Script2:
 ; hl = Mon Moves
 HandleMovesAfterDayCare:
     call .ResetActualMoves
+    ld hl,wNoExclusiveInListBit7
+    res 7,[hl]
     PREDEF WriteMonMoves
     ld a,[$FF00+$e4]
     push af
@@ -150139,7 +150182,7 @@ ReadTrainer:
 .writeAdditionalMoveDataLoop
     ld a,[hl]
     and a
-    jr z,.FinishUp3
+    ret z
     ld a,b
     push bc
     push hl
@@ -150154,7 +150197,94 @@ ReadTrainer:
     pop bc
     inc b
     jr .writeAdditionalMoveDataLoop
-.FinishUp3
+
+; ──────────────────────────────────────────────────────────────────────
+
+AddPokemonToParty_HandleEnemyExclusive_:
+    ; Backup
+    ld a,[wWhichPokemon]
+    push af
+    ld a,[$cc49]
+    push af
+    ld a,[$FF00+$e4] ; Mon Id +1
+    dec a
+    ld [wWhichPokemon],a
+    ld a,[W_TRAINERCLASS]
+    ld b,a
+    ld a,[W_TRAINERNO]
+    ld c,a
+    ld hl,EnemyExclusive
+.loop
+    ld a,[hli]
+    cp $ff
+    jr z,.end
+    cp b
+    jr nz,.Next1
+    ld a,[hli]
+    cp c
+    jr nz,.Next2
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld a,[wWhichPokemon]
+    ld bc,6
+    call AddNTimes
+    call .WriteExclusive
+.end
+    ld a,1 ; enemy party
+    ld [$cc49],a
+    call LoadMonData
+    ; Restore
+    pop af
+    ld [$cc49],a
+    pop af
+    ld [wWhichPokemon],a
+    ret
+.Next1
+    inc hl
+.Next2
+    inc hl
+    inc hl
+    jr .loop
+
+.WriteExclusive
+    ld d,h
+    ld e,l
+    ; Ex Type1
+    ld hl,W_ENEMYMON1MOVE3-05
+    ld a,[wWhichPokemon]
+    ld bc,44
+    call AddNTimes
+    ld a,[de]
+    ld [hli],a
+    inc de
+    ; Ex Type2
+    ld a,[de]
+    ld [hl],a
+    inc de
+    ; Ot+08
+    ld hl,W_ENEMYMON1OT+8
+    ld a,[wWhichPokemon]
+    ld bc,11
+    call AddNTimes
+    ld a,[de]
+    ld [hli],a
+    inc de
+    ; Ot+09
+    ld a,[de]
+    ld [hli],a
+    inc de
+    ; Ot+10
+    ld a,[de]
+    ld [hli],a
+    inc de
+    ; Ex Move 3 PP
+    ld hl,W_ENEMYMON1MOVE3+21
+    ld a,[wWhichPokemon]
+    ld bc,44
+    call AddNTimes
+    ld a,[de]
+    ld [hl],a
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
