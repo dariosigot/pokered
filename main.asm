@@ -51070,8 +51070,9 @@ WriteMonMoves:
     xor a
     ld [wWriteMonMovesFlags],a
     call .GetFlagWildRandomMoveChoice
-;DEBUG~
+IF _DEBUG
     call .ResetNumOfTestCaseInsert
+ENDC
     ld hl,wWriteInGenericBufferBit4
     set 4,[hl] ; wWriteInGenericBufferBit4
     set 6,[hl] ; wNoSkillInListBit6
@@ -51134,8 +51135,9 @@ WriteMonMoves:
 
 .done
     pop de  ; ActualMovesPointer
-;DEBUG~
+IF _DEBUG
     call .PrintFinalTestCase
+ENDC
     pop bc
     pop de
     pop hl
@@ -51171,8 +51173,9 @@ WriteMonMoves:
     ret
 .continue
     call .DefinePriorityMoveToReplace
-;DEBUG~
+IF _DEBUG
     call .PrintTestCase
+ENDC
     call .CanNewOverwriteActualMoves
     jr nc,.fail
     call .ReadCalculatedMovePriorityToIdentifyWorst
@@ -52420,6 +52423,8 @@ WriteMonMoves:
 
 ; ─────────────────────
 
+IF _DEBUG
+
 .ResetNumOfTestCaseInsert
     ld a,[wFlagGameBoyColor]
     cp $11
@@ -52567,6 +52572,8 @@ WriteMonMoves:
     ld a,e
     ld [hli],a
     ret
+
+ENDC
 
 ; ────────────────────────────────────────────────────────────
 
