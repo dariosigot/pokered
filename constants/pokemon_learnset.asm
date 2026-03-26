@@ -8,18 +8,21 @@ MissingNo_Learnset:
 BULBASAUR_Learnset:
     db  1,TACKLE
     db  1,GROWL
+    db  6,CONSTRICT
     db  8,LEECH_SEED
-    db 10,CONSTRICT
-    db 13,VINE_WHIP
+    db 10,VINE_WHIP
+    db 13,LEER
     db 15,Skill__CUT
     ;  16,IVYSAUR
     db 0
 IVYSAUR_Learnset:
     db 16,POISONPOWDER
     db 17,POISON_STING
+    db 18,LICK
     db 19,ABSORB
     db 20,DOUBLE_KICK
     db 21,SMOG
+    db 22,BITE
     db 23,RAZOR_LEAF
     db 25,SLAM
     db 26,DEFENSE_CURL
@@ -31,6 +34,7 @@ IVYSAUR_Learnset:
     db 0
 VENUSAUR_Learnset:
     db 32,LEECH_LIFE
+    db 32,SKULL_BASH
     db 32,PETAL_DANCE
     db 36,STOMP
     db 36,Skill__STRENGTH
@@ -50,7 +54,9 @@ VENUSAUR_Learnset:
     db 0
 BULBASAUR_NoEvo_Learnset:
     db 17,ABSORB ; Exclusive
+    db 20,LICK
     db 22,DOUBLE_KICK
+    db 24,BITE
     db 25,RAZOR_LEAF
     db 29,SLAM
     db 31,BARRAGE ; Exclusive
@@ -81,6 +87,7 @@ IVYSAUR_NoEvo_Learnset:
 CHARMANDER_Learnset:
     db  1,SCRATCH
     db  1,GROWL
+    db  6,TACKLE
     db  8,EMBER
     db  9,Skill__LIGHT
     db 10,LEER
@@ -91,6 +98,7 @@ CHARMELEON_Learnset:
     db 16,FOCUS_ENERGY
     db 18,RAGE
     db 19,SMOKESCREEN
+    db 20,BITE
     db 22,FIRE_PUNCH
     db 23,QUICK_ATTACK
     db 24,POISON_GAS
@@ -98,6 +106,7 @@ CHARMELEON_Learnset:
     db 25,Skill__DIG
     db 26,TRAPHOLE
     db 28,MEGA_PUNCH
+    db 29,SHARPEN
     db 30,SMOG
     db 32,SLASH
     db 32,Skill__CUT
@@ -106,6 +115,7 @@ CHARMELEON_Learnset:
     db 0
 CHARIZARD_Learnset:
     db 36,WING_ATTACK
+    db 36,GUST
     db 36,SWOOP
     db 36,Skill__FLY
     db 39,DRAGON_RAGE
@@ -128,9 +138,11 @@ CHARMANDER_NoEvo_Learnset:
     db 21,FOCUS_ENERGY
     db 24,SMOKESCREEN
     db 26,FIRE_PUNCH
+    db 28,BITE
     db 30,AGILITY ; Exclusive
     db 30,SAND_ATTACK
     db 30,Skill__DIG
+    db 32,SHARPEN
     db 35,SLASH
     db 38,Skill__CUT
     db 40,FLAMETHROWER
@@ -157,6 +169,7 @@ CHARMELEON_NoEvo_Learnset:
 SQUIRTLE_Learnset:
     db  1,TACKLE
     db  1,TAIL_WHIP
+    db  6,POUND
     db  8,BUBBLE
     db 10,PECK
     db 13,DOUBLESLAP
@@ -174,13 +187,16 @@ WARTORTLE_Learnset:
     db 26,Skill__DIG
     db 27,MEDITATE
     db 28,TRAPHOLE
+    db 30,BONE_SHOT
     db 31,BUBBLEBEAM
     db 33,HAZE
+    db 34,SLAM
     db 35,ROCK_THROW
     ;  36,BLASTOISE
     db 0
 BLASTOISE_Learnset:
     db 36,SPIKE_CANNON
+    db 36,THRASH
     db 36,TSUNAMI
     db 36,Skill__STRENGTH
     db 38,MIST
@@ -206,8 +222,10 @@ SQUIRTLE_NoEvo_Learnset:
     db 31,Skill__DIG
     db 33,MEDITATE
     db 34,TRAPHOLE
+    db 37,BONE_SHOT
     db 39,BUBBLEBEAM
     db 41,WATERFALL
+    db 42,SLAM
     db 44,HEADBUTT ; Exclusive
     db 49,SKULL_BASH
     db 52,REST
