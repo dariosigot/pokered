@@ -148683,6 +148683,7 @@ GetAttackerType:
     db FARFETCH_D
     db SEAKING
     db MAGMAR
+    db PORYGON
     db ARTICUNO
     db ZAPDOS
     db MOLTRES

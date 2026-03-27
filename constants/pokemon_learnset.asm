@@ -9,6 +9,7 @@ BULBASAUR_Learnset:
     db  1,TACKLE
     db  1,GROWL
     db  6,CONSTRICT
+    db  7,GROWTH
     db  8,LEECH_SEED
     db 10,VINE_WHIP
     db 13,LEER
@@ -39,7 +40,7 @@ VENUSAUR_Learnset:
     db 36,STOMP
     db 36,Skill__STRENGTH
     db 37,BARRAGE
-    db 38,GROWTH
+    db 38,MEGA_DRAIN
     db 39,HAZE
     db 39,Skill__HEAL
     db 40,SLEEP_POWDER
@@ -64,7 +65,7 @@ BULBASAUR_NoEvo_Learnset:
     db 35,STUN_SPORE
     db 39,BIND ; Exclusive
     db 42,LEECH_LIFE
-    db 44,GROWTH
+    db 44,MEGA_DRAIN
     db 49,SLEEP_POWDER
     db 52,HAZE
     db 52,Skill__HEAL
@@ -75,7 +76,7 @@ IVYSAUR_NoEvo_Learnset:
     db 34,BIND ; Exclusive
     db 38,LEECH_LIFE
     db 40,PETAL_DANCE
-    db 42,GROWTH
+    db 42,MEGA_DRAIN
     db 44,HAZE
     db 44,Skill__HEAL
     db 46,SLEEP_POWDER
@@ -88,6 +89,7 @@ CHARMANDER_Learnset:
     db  1,SCRATCH
     db  1,GROWL
     db  6,TACKLE
+    db  7,TAIL_WHIP
     db  8,EMBER
     db  9,Skill__LIGHT
     db 10,LEER
@@ -170,6 +172,7 @@ SQUIRTLE_Learnset:
     db  1,TACKLE
     db  1,TAIL_WHIP
     db  6,POUND
+    db  7,LEER
     db  8,BUBBLE
     db 10,PECK
     db 13,DOUBLESLAP
@@ -248,6 +251,7 @@ WARTORTLE_NoEvo_Learnset:
 CATERPIE_Learnset:
     db  1,TACKLE
     db  1,STRING_SHOT
+    db  4,CONSTRICT
     ;   7,METAPOD
     db 0
 METAPOD_Learnset:
@@ -301,8 +305,9 @@ METAPOD_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 WEEDLE_Learnset:
-    db  1,POISON_STING
+    db  1,TACKLE
     db  1,STRING_SHOT
+    db  4,POISON_STING
     ;   7,KAKUNA
     db 0
 KAKUNA_Learnset:
@@ -435,6 +440,7 @@ RATTATA_Learnset:
 RATICATE_Learnset:
     db 20,TRAPHOLE
     db 24,FOCUS_ENERGY
+    db 26,SLAM
     db 27,REST
     db 30,THRASH
     db 32,DOUBLE_TEAM
@@ -453,6 +459,7 @@ RATTATA_NoEvo_Learnset:
     db 23,TRAPHOLE
     db 25,AGILITY ; Exclusive
     db 27,FOCUS_ENERGY
+    db 29,SLAM
     db 31,REST
     db 35,THRASH
     db 39,DOUBLE_TEAM
@@ -513,8 +520,9 @@ SPEAROW_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 EKANS_Learnset:
-    db  1,CONSTRICT
+    db  1,TACKLE
     db  1,LEER
+    db  4,CONSTRICT
     db  5,WRAP
     db  7,POISON_STING
     db 11,LEECH_LIFE
@@ -560,11 +568,12 @@ EKANS_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PIKACHU_Learnset:
-    db  1,THUNDERSHOCK
+    db  1,TACKLE
     db  1,GROWL
+    db  3,THUNDERSHOCK
+    db  5,SCRATCH
     db  6,TAIL_WHIP
     db  8,THUNDER_WAVE
-    db 10,SCRATCH
     db 11,QUICK_ATTACK ; Exclusive*
     db 13,BITE
     db 15,DOUBLE_TEAM ; Exclusive*
@@ -583,12 +592,13 @@ PIKACHU_Learnset:
     db 55,LOVELY_KISS
     db 0
 RAICHU_Learnset:
-    db  1,THUNDERSHOCK
+    db  1,TACKLE
     db  1,GROWL
+    db  1,THUNDERSHOCK
     db  1,THUNDERBOLT
+    db  5,SCRATCH
     db  6,TAIL_WHIP
     db  8,THUNDER_WAVE
-    db 10,SCRATCH
     db 11,BITE
     db 13,FURY_SWIPES
     db 15,FLASH
@@ -609,13 +619,15 @@ RAICHU_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SANDSHREW_Learnset:
-    db  1,SCRATCH
+    db  1,TACKLE
     db  1,DEFENSE_CURL
+    db  3,SCRATCH
     db  5,SAND_ATTACK
     db  7,Skill__DIG
     db  9,TRAPHOLE
     db 12,FURY_SWIPES
     db 14,POISON_STING
+    db 16,TAIL_WHIP
     db 17,SLASH
     db 17,Skill__CUT
     db 20,HARDEN
@@ -692,11 +704,11 @@ NIDOQUEEN_Learnset:
     db 21,SLAM
     db 22,THRASH
     db 22,Skill__STRENGTH
+    db 25,ROCK_THROW
     db 25,SLASH
-    db 25,HYPER_FANG
     db 25,Skill__CUT
     db 27,BODY_SLAM
-    db 29,ROCK_THROW
+    db 29,HYPER_FANG
     db 31,SKULL_BASH
     db 33,STOMP
     db 35,SLUDGE
@@ -765,11 +777,11 @@ NIDOKING_Learnset:
     db 21,SLAM
     db 22,THRASH
     db 22,Skill__STRENGTH
+    db 25,ROCK_THROW
     db 25,HYPER_FANG
-    db 25,SLASH
     db 25,Skill__CUT
     db 27,BODY_SLAM
-    db 29,ROCK_THROW
+    db 29,SLASH
     db 31,SLUDGE
     db 33,STOMP
     db 35,SKULL_BASH
@@ -797,8 +809,9 @@ NIDORAN_M_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CLEFAIRY_Learnset:
-    db  1,POUND
+    db  1,TACKLE
     db  1,GROWL
+    db  3,POUND
     db  7,DEFENSE_CURL ; Exclusive
     db 10,DISABLE
     db 13,SING
@@ -822,8 +835,9 @@ CLEFAIRY_Learnset:
     db 57,DOUBLE_EDGE
     db 0
 CLEFABLE_Learnset:
-    db  1,POUND
+    db  1,TACKLE
     db  1,GROWL
+    db  1,POUND
     db  1,SWIFT
     db  8,DISABLE
     db 10,TELEPORT
@@ -854,6 +868,8 @@ CLEFABLE_Learnset:
 VULPIX_Learnset:
     db  1,TACKLE
     db  1,TAIL_WHIP
+    db  5,SCRATCH
+    db  7,LEER
     db  8,EMBER
     db  9,Skill__LIGHT
     db 11,SAND_ATTACK
@@ -879,6 +895,8 @@ VULPIX_Learnset:
 NINETALES_Learnset:
     db  1,TACKLE
     db  1,TAIL_WHIP
+    db  1,SCRATCH
+    db  1,LEER
     db  1,BITE
     db  5,EMBER
     db  6,Skill__LIGHT
@@ -913,6 +931,8 @@ NINETALES_Learnset:
 VULPIX_Alola_Learnset:
     db  1,TACKLE
     db  1,TAIL_WHIP
+    db  5,SCRATCH
+    db  7,LEER
     db  8,AURORA_BEAM
     db 11,SAND_ATTACK
     db 13,ROAR
@@ -938,6 +958,8 @@ VULPIX_Alola_Learnset:
 NINETALES_Alola_Learnset:
     db  1,TACKLE
     db  1,TAIL_WHIP
+    db  1,SCRATCH
+    db  1,LEER
     db  1,BITE
     db  5,AURORA_BEAM
     db  8,SAND_ATTACK
@@ -970,8 +992,9 @@ NINETALES_Alola_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 JIGGLYPUFF_Learnset:
-    db  1,POUND
+    db  1,TACKLE
     db  1,SING
+    db  3,POUND
     db  7,DEFENSE_CURL ; Exclusive
     db 10,GROWL
     db 13,DISABLE
@@ -995,8 +1018,9 @@ JIGGLYPUFF_Learnset:
     db 57,DOUBLE_EDGE
     db 0
 WIGGLYTUFF_Learnset:
-    db  1,POUND
+    db  1,TACKLE
     db  1,SING
+    db  1,POUND
     db  1,SWIFT
     db  8,GROWL
     db 10,TELEPORT
@@ -1082,8 +1106,9 @@ ZUBAT_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ODDISH_Learnset:
-    db  1,ABSORB
+    db  1,TACKLE
     db  1,GROWTH
+    db  4,ABSORB
     db  9,LEECH_SEED
     db 11,DEFENSE_CURL
     db 13,POISON_STING
@@ -1250,8 +1275,8 @@ VENONAT_NoEvo_Learnset:
 ; ──────────────────────────────────────────────────────────────────────
 DIGLETT_Learnset:
     db  1,SCRATCH
-    db  1,Skill__DIG
     db  1,GROWL
+    db  1,Skill__DIG
     db  5,SAND_ATTACK
     db  9,TRAPHOLE
     db 13,AGILITY
@@ -1286,8 +1311,9 @@ DIGLETT_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MEOWTH_Learnset:
-    db  1,SCRATCH
+    db  1,TACKLE
     db  1,GROWL
+    db  3,SCRATCH
     db  5,TAIL_WHIP
     db  7,SAND_ATTACK
     db  9,PAY_DAY
@@ -1330,8 +1356,9 @@ MEOWTH_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PSYDUCK_Learnset:
-    db  1,SCRATCH
+    db  1,TACKLE
     db  1,TAIL_WHIP
+    db  4,SCRATCH
     db  7,PSYWAVE
     db  9,KINESIS
     db 10,DISABLE
@@ -1386,8 +1413,9 @@ PSYDUCK_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MANKEY_Learnset:
-    db  1,SCRATCH
+    db  1,TACKLE
     db  1,LEER
+    db  5,SCRATCH
     db  8,KARATE_CHOP
     db 10,LOW_KICK
     db 12,FURY_SWIPES
@@ -1440,8 +1468,10 @@ MANKEY_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 GROWLITHE_Learnset:
-    db  1,BITE
-    db  1,ROAR
+    db  1,TACKLE
+    db  1,TAIL_WHIP
+    db  5,BITE
+    db  7,ROAR
     db  8,EMBER
     db  9,Skill__LIGHT
     db 11,SAND_ATTACK
@@ -1465,6 +1495,8 @@ GROWLITHE_Learnset:
     db 56,FIRE_BLAST
     db 0
 ARCANINE_Learnset:
+    db  1,TACKLE
+    db  1,TAIL_WHIP
     db  1,BITE
     db  1,ROAR
     db  1,HYPER_FANG
@@ -1619,8 +1651,9 @@ ABRA_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MACHOP_Learnset:
-    db  1,KARATE_CHOP
+    db  1,TACKLE
     db  1,LEER
+    db  5,KARATE_CHOP
     db  9,LOW_KICK
     db 11,COMET_PUNCH
     db 13,FOCUS_ENERGY
@@ -1669,8 +1702,9 @@ MACHOP_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 BELLSPROUT_Learnset:
-    db  1,VINE_WHIP
+    db  1,TACKLE
     db  1,GROWTH
+    db  4,VINE_WHIP
     db  9,LEECH_LIFE
     db 11,CONSTRICT
     db 13,POISON_STING
@@ -1733,6 +1767,7 @@ BELLSPROUT_NoEvo_Learnset:
 TENTACOOL_Learnset:
     db  1,CONSTRICT
     db  1,SUPERSONIC
+    db  4,TACKLE
     db  6,POISON_STING
     db  7,BUBBLE
     db  9,ACID
@@ -1753,6 +1788,7 @@ TENTACOOL_Learnset:
     db 0
 TENTACRUEL_Learnset:
     db 30,SLUDGE
+    db 31,SLAM
     db 32,WATERFALL
     db 34,BARRIER
     db 36,STRING_SHOT
@@ -1773,6 +1809,7 @@ TENTACRUEL_Learnset:
 TENTACOOL_NoEvo_Learnset:
     db 33,VINE_WHIP ; Exclusive
     db 37,SLUDGE
+    db 39,SLAM
     db 41,SCREECH
     db 44,STRING_SHOT
     db 47,TSUNAMI
@@ -1793,6 +1830,7 @@ GEODUDE_Learnset:
     db 13,BIDE
     db 14,HEADBUTT
     db 15,HARDEN
+    db 16,SLAM
     db 17,TRAPHOLE
     db 19,MEGA_PUNCH
     db 21,SELFDESTRUCT
@@ -1996,8 +2034,9 @@ FARFETCH_D_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 DODUO_Learnset:
-    db  1,PECK
+    db  1,TACKLE
     db  1,LEER
+    db  3,PECK
     db  5,GROWL
     db  7,FURY_ATTACK
     db  9,RAGE
@@ -2036,14 +2075,16 @@ DODUO_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 SEEL_Learnset:
-    db  1,HEADBUTT
+    db  1,TACKLE
     db  1,GROWL
+    db  4,HEADBUTT
     db  6,LICK
     db  9,BUBBLE
     db 11,TAIL_WHIP
     db 13,WATER_GUN
     db 13,Skill__FLOAT
     db 15,DISABLE
+    db 16,SLAM
     db 17,AURORA_BEAM
     db 19,TAKE_DOWN
     db 21,BUBBLEBEAM
@@ -2082,7 +2123,8 @@ SEEL_NoEvo_Learnset:
 GRIMER_Learnset:
     db  1,POUND
     db  1,POISON_GAS
-    db  7,DEFENSE_CURL
+    db  6,DEFENSE_CURL
+    db  7,TACKLE
     db  9,ACID
     db 11,DOUBLESLAP
     db 13,LICK
@@ -2235,11 +2277,12 @@ GASTLY_NoEvo_Learnset:
 ; ──────────────────────────────────────────────────────────────────────
 ONIX_Learnset:
     db  1,TACKLE
-    db  1,SCREECH
+    db  1,TAIL_WHIP
     db  1,Skill__DIG
     db  5,CONSTRICT
     db  8,BIDE
     db  8,RAGE
+    db 10,SCREECH
     db 12,ROCK_THROW
     db 12,Skill__STRENGTH
     db 14,WRAP
@@ -2248,6 +2291,7 @@ ONIX_Learnset:
     db 19,BLADE
     db 19,Skill__CUT
     db 21,SHARPEN
+    db 22,LEER
     db 23,TRAPHOLE
     db 26,HARDEN
     db 29,ROCK_SLIDE
@@ -2339,8 +2383,9 @@ DROWZEE_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KRABBY_Learnset:
-    db  1,BUBBLE
+    db  1,TACKLE
     db  1,LEER
+    db  3,BUBBLE
     db  6,VICEGRIP
     db  8,SPLASH
     db  9,BLADE
@@ -2369,6 +2414,7 @@ KINGLER_Learnset:
     db 36,Skill__STRENGTH
     db 38,TRAPHOLE
     db 40,GUILLOTINE
+    db 42,SLAM
     db 44,HAZE
     db 47,TSUNAMI
     db 49,BODY_SLAM
@@ -2484,8 +2530,9 @@ ELECTRODE_HISUI_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 EXEGGCUTE_Learnset:
-    db  1,BARRAGE
+    db  1,TACKLE
     db  1,HYPNOSIS
+    db  4,BARRAGE
     db  7,PSYWAVE
     db 10,REFLECT
     db 13,TELEPORT
@@ -2510,8 +2557,9 @@ EXEGGCUTE_Learnset:
     db 60,DREAM_EATER
     db 0
 EXEGGUTOR_Learnset:
-    db  1,BARRAGE
+    db  1,TACKLE
     db  1,HYPNOSIS
+    db  1,BARRAGE
     db  1,STOMP
     db  7,PSYWAVE
     db  9,REFLECT
@@ -2618,8 +2666,10 @@ CUBONE_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HITMONLEE_Learnset:
-    db  1,LOW_KICK
-    db  1,MEDITATE
+    db  1,TACKLE
+    db  1,LEER
+    db  4,LOW_KICK
+    db  5,MEDITATE
     db  6,DOUBLE_KICK
     db  9,FOCUS_ENERGY
     db 11,ROLLING_KICK
@@ -2652,8 +2702,10 @@ HITMONLEE_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HITMONCHAN_Learnset:
-    db  1,KARATE_CHOP
-    db  1,AGILITY
+    db  1,TACKLE
+    db  1,LEER
+    db  4,KARATE_CHOP
+    db  5,AGILITY
     db  6,COMET_PUNCH
     db  9,FOCUS_ENERGY
     db 11,BIDE
@@ -2687,9 +2739,11 @@ HITMONCHAN_Learnset:
 LICKITUNG_Learnset:
     db  1,LICK
     db  1,STRING_SHOT
+    db  4,POUND
     db  5,SUPERSONIC
+    db  6,TAIL_WHIP
     db  7,DEFENSE_CURL
-    db  9,POUND
+    db  9,TACKLE
     db 11,DISABLE
     db 13,DOUBLESLAP
     db 15,STOMP
@@ -2762,8 +2816,9 @@ KOFFING_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 RHYHORN_Learnset:
-    db  1,HORN_ATTACK
+    db  1,TACKLE
     db  1,TAIL_WHIP
+    db  5,HORN_ATTACK
     db  5,GROWL
     db  8,HARDEN
     db 10,SAND_ATTACK
@@ -2814,8 +2869,9 @@ RHYHORN_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 CHANSEY_Learnset:
-    db  1,POUND
+    db  1,TACKLE
     db  1,TAIL_WHIP
+    db  4,POUND
     db  5,GROWL
     db  8,SOFTBOILED
     db  8,Skill__HEAL
@@ -2843,6 +2899,8 @@ CHANSEY_Learnset:
 TANGELA_Learnset:
     db  1,CONSTRICT
     db  1,SLEEP_POWDER
+    db  5,TACKLE
+    db  7,GROWTH
     db  8,VINE_WHIP
     db 10,BIND
     db 12,LEECH_SEED
@@ -2852,8 +2910,7 @@ TANGELA_Learnset:
     db 17,STUN_SPORE
     db 17,Skill__HEAL
     db 19,BLADE
-    db 21,GROWTH
-    db 23,LEECH_LIFE
+    db 22,LEECH_LIFE
     db 25,MEGA_DRAIN
     db 27,SLAM
     db 29,STRING_SHOT
@@ -2872,8 +2929,9 @@ TANGELA_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KANGASKHAN_Learnset:
-    db  1,SCRATCH
+    db  1,TACKLE
     db  1,TAIL_WHIP
+    db  4,SCRATCH
     db  7,COMET_PUNCH
     db  9,SUBSTITUTE
     db 11,LEER
@@ -2907,8 +2965,9 @@ KANGASKHAN_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 HORSEA_Learnset:
-    db  1,BUBBLE
+    db  1,TACKLE
     db  1,SMOKESCREEN
+    db  4,BUBBLE
     db  8,LEER
     db 11,DISABLE
     db 13,SMOG
@@ -2958,6 +3017,7 @@ HORSEA_NoEvo_Learnset:
 GOLDEEN_Learnset:
     db  1,SPLASH
     db  1,TAIL_WHIP
+    db  4,TACKLE
     db  7,PECK
     db  9,BUBBLE
     db 11,SUPERSONIC
@@ -2967,6 +3027,7 @@ GOLDEEN_Learnset:
     db 18,Skill__FLOAT
     db 20,AGILITY
     db 23,WATER_GUN
+    db 25,SLAM
     db 26,FURY_ATTACK
     db 28,SONICBOOM
     db 29,BUBBLEBEAM
@@ -3061,8 +3122,9 @@ STARMIE_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MR_MIME_Learnset:
-    db  1,POUND
+    db  1,TACKLE
     db  1,BARRIER
+    db  4,POUND
     db  6,PSYWAVE
     db  9,SUBSTITUTE
     db 11,TELEPORT
@@ -3133,26 +3195,30 @@ SCYTHER_Learnset:
 JYNX_Learnset:
     db  1,POUND
     db  1,SING
+    db  4,TACKLE
     db  5,LICK
+    db  6,SCREECH
     db  8,DOUBLESLAP
     db 10,PSYWAVE
     db 12,AURORA_BEAM
     db 13,TELEPORT
     db 14,CONFUSION
     db 16,BARRIER
-    db 17,LOVELY_KISS
+    db 17,HYPNOSIS
     db 18,MIST
     db 20,ICE_PUNCH
     db 21,SLAM
+    db 21,LOVELY_KISS
     db 22,DISABLE
-    db 24,KARATE_CHOP
-    db 25,SWIFT
+    db 24,SWIFT
+    db 25,KARATE_CHOP
     db 26,KINESIS
     db 27,MEDITATE
     db 29,REFLECT
     db 31,LIGHT_SCREEN
     db 33,LEECH_LIFE
     db 34,ICE_BEAM
+    db 34,Skill__FLOAT
     db 36,PSYBEAM
     db 38,BODY_SLAM
     db 40,CONFUSE_RAY
@@ -3167,10 +3233,12 @@ JYNX_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 ELECTABUZZ_Learnset:
-    db  1,KARATE_CHOP
+    db  1,TACKLE
     db  1,LEER
+    db  4,KARATE_CHOP
     db  5,FLASH
     db  5,Skill__LIGHT
+    db  6,TAIL_WHIP
     db  8,THUNDERSHOCK
     db 10,QUICK_ATTACK
     db 12,THUNDER_WAVE
@@ -3180,6 +3248,7 @@ ELECTABUZZ_Learnset:
     db 17,DOUBLE_KICK
     db 18,DOUBLE_TEAM
     db 20,THUNDERPUNCH
+    db 21,SLAM
     db 21,FOCUS_ENERGY
     db 21,Skill__STRENGTH
     db 22,SCREECH
@@ -3205,9 +3274,11 @@ ELECTABUZZ_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 MAGMAR_Learnset:
-    db  1,SCRATCH
+    db  1,TACKLE
     db  1,LEER
+    db  4,SCRATCH
     db  5,SMOG
+    db  6,TAIL_WHIP
     db  8,EMBER
     db  8,Skill__LIGHT
     db 10,SMOKESCREEN
@@ -3219,13 +3290,14 @@ MAGMAR_Learnset:
     db 18,REFLECT
     db 20,FIRE_PUNCH
     db 21,SLAM
+    db 21,FIRE_SPIN
     db 22,KARATE_CHOP
-    db 24,FIRE_SPIN
+    db 24,SWIFT
     db 25,FOCUS_ENERGY
-    db 26,SWIFT
+    db 26,LIGHT_SCREEN
     db 27,MEDITATE
     db 29,MEGA_PUNCH
-    db 31,LIGHT_SCREEN
+    db 31,SLASH
     db 33,SCREECH
     db 34,FLAMETHROWER
     db 36,STRIKE
@@ -3243,8 +3315,9 @@ MAGMAR_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 PINSIR_Learnset:
-    db  1,BLADE
+    db  1,TACKLE
     db  1,FOCUS_ENERGY
+    db  5,BLADE
     db  7,VICEGRIP
     db  9,HARDEN
     db 11,STRING_SHOT
@@ -3366,10 +3439,12 @@ MAGIKARP_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LAPRAS_Learnset:
-    db  1,BUBBLE
+    db  1,TACKLE
     db  1,GROWL
     db  1,Skill__FLOAT
+    db  3,BUBBLE
     db  7,BIDE
+    db  8,TAIL_WHIP
     db  9,WATER_GUN
     db 11,SING
     db 13,MIST
@@ -3377,6 +3452,7 @@ LAPRAS_Learnset:
     db 17,WITHDRAW
     db 19,CONFUSE_RAY
     db 21,BUBBLEBEAM
+    db 23,SLAM
     db 23,TAKE_DOWN
     db 25,WATERFALL
     db 27,SCREECH
@@ -3529,6 +3605,7 @@ FLAREON_Learnset:
 PORYGON_Learnset:
     db  1,TACKLE
     db  1,CONVERSION
+    db  4,PECK
     db  6,AGILITY
     db  9,PSYWAVE
     db 11,TELEPORT
@@ -3560,12 +3637,14 @@ PORYGON_Learnset:
     db 47,PSYCHIC_M
     db 51,REFLECT
     db 55,THUNDER_M
+    db 58,DRILL_PECK
     db 60,HYPER_BEAM
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 OMANYTE_Learnset:
     db  1,CONSTRICT
     db  1,WITHDRAW
+    db  4,TACKLE
     db  6,BIDE
     db  8,BUBBLE
     db 11,BITE
@@ -3620,8 +3699,9 @@ OMANYTE_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 KABUTO_Learnset:
-    db  1,SCRATCH
+    db  1,TACKLE
     db  1,HARDEN
+    db  4,SCRATCH
     db  6,BIDE
     db  8,BUBBLE
     db 11,LEECH_LIFE
@@ -3676,10 +3756,12 @@ KABUTO_NoEvo_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 AERODACTYL_Learnset:
-    db  1,GUST
+    db  1,TACKLE
     db  1,AGILITY
+    db  3,GUST
     db  3,Skill__FLY
     db  4,WING_ATTACK
+    db  5,SCRATCH
     db  6,SAND_ATTACK
     db  7,BIDE
     db  8,WHIRLWIND
@@ -3687,6 +3769,7 @@ AERODACTYL_Learnset:
     db 11,BITE
     db 13,ROCK_THROW
     db 13,Skill__STRENGTH
+    db 14,SLAM
     db 15,SUPERSONIC
     db 17,HYPER_FANG
     db 17,Skill__CUT
@@ -3716,6 +3799,7 @@ AERODACTYL_Learnset:
 SNORLAX_Learnset:
     db  1,LICK
     db  1,DEFENSE_CURL
+    db  3,TACKLE
     db  6,POUND
     db  8,BITE
     db 11,STOMP
@@ -3750,6 +3834,7 @@ ARTICUNO_Learnset:
     db  3,Skill__FLY
     db  3,Skill__FLOAT
     db  5,PECK
+    db  7,TACKLE
     db  9,SAND_ATTACK
     db 11,BUBBLE
     db 13,WATER_GUN
@@ -3788,6 +3873,7 @@ ZAPDOS_Learnset:
     db  3,Skill__FLY
     db  3,Skill__LIGHT
     db  5,PECK
+    db  7,TACKLE
     db  9,SAND_ATTACK
     db 11,LEER
     db 13,THUNDERSHOCK
@@ -3826,6 +3912,7 @@ MOLTRES_Learnset:
     db  3,Skill__FLY
     db  3,Skill__LIGHT
     db  5,PECK
+    db  7,TACKLE
     db  9,SAND_ATTACK
     db 11,SMOKESCREEN
     db 13,EMBER
@@ -3860,8 +3947,10 @@ MOLTRES_Learnset:
 ; ──────────────────────────────────────────────────────────────────────
 DRATINI_Learnset:
     db  1,CONSTRICT
-    db  1,LEER
+    db  1,TAIL_WHIP
+    db  4,TACKLE
     db  6,WRAP
+    db  7,LEER
     db  8,SUPERSONIC
     db  9,WATER_GUN
     db  9,Skill__FLOAT
@@ -3902,6 +3991,9 @@ DRAGONAIR_Learnset:
     ;  55,DRAGONITE
     db 0
 DRAGONITE_Learnset:
+    db 55,SCRATCH
+    db 55,FURY_SWIPES
+    db 55,SLASH
     db 55,SWOOP
     db 55,Skill__STRENGTH
     db 56,HYDRO_PUMP
@@ -3931,8 +4023,10 @@ DRAGONAIR_NoEvo_Learnset:
 ; ──────────────────────────────────────────────────────────────────────
 MEWTWO_Learnset:
     db  1,CONFUSION
-    db  1,DISABLE
+    db  1,LEER
+    db  4,TACKLE
     db  4,RAGE
+    db  5,DISABLE
     db  7,REFLECT
     db  7,Skill__LIGHT
     db  8,PSYWAVE
@@ -3950,6 +4044,7 @@ MEWTWO_Learnset:
     db 33,RECOVER
     db 34,HYPNOSIS
     db 38,DREAM_EATER
+    db 39,SLAM
     db 40,MIST
     db 42,HAZE
     db 44,SUBSTITUTE
@@ -3987,10 +4082,12 @@ MEW_Learnset:
     db 0
 ; ──────────────────────────────────────────────────────────────────────
 LITWICK_Learnset:
-    db  1,SMOG
+    db  1,POUND
     db  1,MINIMIZE
+    db  4,SMOG
     db  5,TELEPORT
     db  7,DEFENSE_CURL
+    db  8,TACKLE
     db  9,EMBER
     db 11,FLASH
     db 11,Skill__LIGHT
