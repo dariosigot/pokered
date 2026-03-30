@@ -79,14 +79,15 @@ SpecialTrainerMoves:
     SpecialTrainer COOLTRAINER_F,2,CooltrainerFMove2,0
     SpecialTrainer COOLTRAINER_F,3,CooltrainerFMove3,0
     SpecialTrainer COOLTRAINER_F,4,CooltrainerFMove4,0
+    SpecialTrainer COOLTRAINER_F,5,CooltrainerFMove5,0
     SpecialTrainer COOLTRAINER_M,2,CooltrainerMMove2,0
     SpecialTrainer COOLTRAINER_M,3,CooltrainerMMove3,0
     SpecialTrainer COOLTRAINER_M,4,CooltrainerMMove4,0
-    SpecialTrainer BLACKBELT,9,BlackBeltMove9,0
-    SpecialTrainer JUGGLER,2,JugglerMove2,0
-    SpecialTrainer JUGGLER,5,JugglerMove5,0
-    SpecialTrainer TAMER,5,TamerMove5,0
-    SpecialTrainer POKEMANIAC,6,PokemaniacMove6,0
+    SpecialTrainer COOLTRAINER_M,7,CooltrainerMMove7,0
+    SpecialTrainer COOLTRAINER_M,8,CooltrainerMMove8,0
+    SpecialTrainer COOLTRAINER_M,9,CooltrainerMMove9,0
+    SpecialTrainer COOLTRAINER_M,10,CooltrainerMMove10,0
+
     db $ff
 
 ; ────────────────────────────────────────────────
@@ -1118,6 +1119,21 @@ CooltrainerFMove4:
     db DIZZY_PUNCH,BLIZZARD,SLUDGE,EARTHQUAKE
     db 0
 
+CooltrainerFMove5:
+    ; 45,DRAGONAIR
+    db LIGHT_SCREEN,THUNDER_WAVE,FLAMETHROWER,ICE_BEAM
+    ; 43,LAPRAS
+    db THUNDER_M,REST,THUNDER_WAVE,ICE_BEAM
+    ; 45,SLOWBRO
+    db WITHDRAW,TSUNAMI,AMNESIA,PSYBEAM
+    ; 45,LICKITUNG
+    db EARTHQUAKE,BODY_SLAM,SOFTBOILED,SWORDS_DANCE
+    ; 42,HAUNTER
+    db HYPNOSIS,NIGHT_SHADE,PSYCHIC_M,THUNDERBOLT
+    ; 44,FARFETCH'D
+    db BLADE,SWORDS_DANCE,SLASH,SWOOP
+    db 0
+
 ; ────────────────────────────────────────────────
 
 CooltrainerMMove2:
@@ -1165,26 +1181,7 @@ CooltrainerMMove4:
     db DIZZY_PUNCH,SLUDGE,EARTHQUAKE,THUNDER_M
     db 0
 
-; ────────────────────────────────────────────────
-
-BlackBeltMove9:
-    ; 43,MACHOKE
-    db TRAPHOLE,JUMP_KICK,SEISMIC_TOSS,BODY_SLAM
-    ; 45,GRAVELER
-    db ROCK_SLIDE,THUNDERPUNCH,EARTHQUAKE,EXPLOSION
-    ; 42,PARASECT
-    db SLASH,TWINEEDLE,BARRAGE,SPORE
-    ; 42,SNORLAX
-    db HYPER_BEAM,AMNESIA,EARTHQUAKE,BODY_SLAM
-    ; 44,GOLBAT
-    db SWOOP,SLUDGE,MEGA_DRAIN,HYPER_FANG
-    ; 43,POLIWRATH
-    db TSUNAMI,ICE_PUNCH,HYPNOSIS,SUBMISSION
-    db 0
-
-; ────────────────────────────────────────────────
-
-JugglerMove2:
+CooltrainerMMove7:
     ; 43,HYPNO
     db FLARE,REFLECT,REST,PSYCHIC_M
     ; 43,TENTACRUEL
@@ -1199,7 +1196,7 @@ JugglerMove2:
     db EXPLOSION,SLUDGE,THUNDERPUNCH,TOXIC
     db 0
 
-JugglerMove5:
+CooltrainerMMove8:
     ; 45,MR. MIME
     db FLARE,CONFUSE_RAY,MIRROR_MOVE,PSYCHIC_M
     ; 43,STARMIE
@@ -1214,9 +1211,7 @@ JugglerMove5:
     db LEECH_SEED,SLEEP_POWDER,STUN_SPORE,SOLARBEAM
     db 0
 
-; ────────────────────────────────────────────────
-
-TamerMove5:
+CooltrainerMMove9:
     ; 41,ELECTABUZZ
     db AGILITY,THUNDERBOLT,BODY_SLAM,THUNDER_WAVE
     ; 40,JYNX
@@ -1231,21 +1226,19 @@ TamerMove5:
     db SLASH,SWORDS_DANCE,EARTHQUAKE,TWINEEDLE
     db 0
 
-; ────────────────────────────────────────────────
-
-PokemaniacMove6:
-    ; 45,DRAGONAIR
-    db LIGHT_SCREEN,THUNDER_WAVE,FLAMETHROWER,ICE_BEAM
-    ; 43,LAPRAS
-    db THUNDER_M,REST,THUNDER_WAVE,ICE_BEAM
-    ; 45,SLOWBRO
-    db WITHDRAW,TSUNAMI,AMNESIA,PSYBEAM
-    ; 45,LICKITUNG
-    db EARTHQUAKE,BODY_SLAM,SOFTBOILED,SWORDS_DANCE
-    ; 42,HAUNTER
-    db HYPNOSIS,NIGHT_SHADE,PSYCHIC_M,THUNDERBOLT
-    ; 44,FARFETCH'D
-    db BLADE,SWORDS_DANCE,SLASH,SWOOP
+CooltrainerMMove10:
+    ; 43,MACHOKE
+    db TRAPHOLE,JUMP_KICK,SEISMIC_TOSS,BODY_SLAM
+    ; 45,GRAVELER
+    db ROCK_SLIDE,THUNDERPUNCH,EARTHQUAKE,EXPLOSION
+    ; 42,PARASECT
+    db SLASH,TWINEEDLE,BARRAGE,SPORE
+    ; 42,SNORLAX
+    db HYPER_BEAM,AMNESIA,EARTHQUAKE,BODY_SLAM
+    ; 44,GOLBAT
+    db SWOOP,SLUDGE,MEGA_DRAIN,HYPER_FANG
+    ; 43,POLIWRATH
+    db TSUNAMI,ICE_PUNCH,HYPNOSIS,SUBMISSION
     db 0
 
 ; ────────────────────────────────────────────────
