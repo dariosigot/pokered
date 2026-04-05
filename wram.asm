@@ -362,8 +362,6 @@ wTileMapBackup2: ; cd81
 wBuffer: ; cee9
 ; used for temporary things
 
-wLearningMovesFromDayCare: ; cee9
-
 wHPBarMaxHP: ; cee9
     ds 2
 wHPBarOldHP: ; ceeb
@@ -1919,6 +1917,7 @@ wBufferPointerByte1   ; dee3 = Buffer Pointer Byte 01
 
 wMaxLevel              ; dee4
 wAvgLevel              ; dee4
+wTmpHPIV               ; dee4 = temporary slot for HP IV from other IV (for debug statusscreen1)
 wTmpRepelQty           ; dee4
 wChoicePkmnMoveDeleter ; dee4
 wTempStatLO            ; dee4
@@ -1960,6 +1959,7 @@ wFlagListMenuSpc:           ; dee6 ; bit 0 = BadgeName
 wHyperBeamUnknownTypeBit4   ; dee6 ; bit 4 = Set Hyper Beam to Unknown Type
 wWriteInGenericBufferBit4   ; dee6 ; bit 4 = Force to Save Moves List in GenericBuffer+1
 wCollisionWithSpriteBit5    ; dee6 ; bit 5 = Set during start menu if there is a sprite in front of player
+wSpecialTrainerMovesBit5    ; dee6 ; bit 5 = Set before "AddPokemonToParty" to Skip "WriteMonMoves" cause SpecialTrainer
 wNoSkillInListBit6          ; dee6 ; bit 6 = Don't Load Skill in List
 wNoExclusiveInListBit7      ; dee6 ; bit 7 = Don't Load Exclusive in List
     ds 1
@@ -2036,12 +2036,65 @@ wCollisionFlag:: db ; def1
 
 NEXTU
 
-wMoveForgotPriority:: ; def0
+; ─────────────────────────────────
+; Memory used in "WriteMonMoves"
+; ─────────────────────────────────
+
+wStoreAttackPointer::
+    ds 2
+
+wWriteMonMovesFlags::
+wSleepEffectInMovesBit0 ; bit 0 = Sleep Effect in Actual Moves
+wDreamEaterInMovesBit1  ; bit 1 = Dream Eater in Actual Moves
+wRandomMoveChoiceBit7   ; bit 7 = Enable with Wild (no AI) Mon or "stupid" trainer when "choice moveset"
+    ds 1
+
+wCountActualDamageMove:: db
+wCountActualZeroMove:: db
+
+wMoveForgotPriority::
     ds 4
-wNewMoveDamage:: ; $def4
-    db
-wNewMoveType:: ; $def5
-    db
+
+wNewMove::
+
+wNewMoveNum:: db
+wNewMoveEff:: db
+wNewMovePwr:: db
+wNewMoveTyp:: db
+wNewMoveAcr:: db
+wNewMoveEne:: db
+
+wActualMoves::
+
+wActualMove01Num:: db
+wActualMove01Eff:: db
+wActualMove01Pwr:: db
+wActualMove01Typ:: db
+wActualMove01Acr:: db
+wActualMove01Ene:: db
+
+wActualMove02Num:: db
+wActualMove02Eff:: db
+wActualMove02Pwr:: db
+wActualMove02Typ:: db
+wActualMove02Acr:: db
+wActualMove02Ene:: db
+
+wActualMove03Num:: db
+wActualMove03Eff:: db
+wActualMove03Pwr:: db
+wActualMove03Typ:: db
+wActualMove03Acr:: db
+wActualMove03Ene:: db
+
+wActualMove04Num:: db
+wActualMove04Eff:: db
+wActualMove04Pwr:: db
+wActualMove04Typ:: db
+wActualMove04Acr:: db
+wActualMove04Ene:: db
+
+; ─────────────────────────────────
 
 NEXTU
 
@@ -2077,12 +2130,12 @@ ENDU
 
 ; ────────────────────────────────────────────────────
 
-SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1] ; Denim
+SECTION "wFlagGameBoyColor", WRAMX[$dfff], BANK[1]
 
-wFlagGameBoyColor:    ; dfff ; Denim
+wFlagGameBoyColor: ; dfff
     ds 1
 
-SECTION "WRAM Bank 2", WRAMX, BANK[2] ; Denim
+SECTION "WRAM Bank 2", WRAMX, BANK[2]
 
     ds 135
 
@@ -2100,8 +2153,22 @@ wForceVRAM2Writing: ; d08a
 
     ds 116
 
-wExceptionPaletteGbc ; d0ff ; Denim
+wExceptionPaletteGbc ; d0ff
     ds 1
 
 wPreLoadOfVRAM2: ; d100
     ds 1024
+
+SECTION "SearchMoveToReplaceTestCase", WRAMX[$d500], BANK[2]
+
+UNION
+
+wPointerToNextTestCase:: dw
+
+wDebugActualMoveList_Bank2:: ds 4
+wMoveForgotPriority_Bank2:: ds 4
+wNewMoveID_Bank2:: db
+
+ds 9 * 100
+
+ENDU

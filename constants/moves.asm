@@ -10,7 +10,7 @@
     db FIRE_PUNCH   , BURN_SIDE_EFFECT2          ,  75 , FIRE     , 255 , 14 ; pp 15 ; 0
     db ICE_PUNCH    , FREEZE_SIDE_EFFECT         ,  75 , ICE      , 255 , 14 ; pp 15 ; 0
     db THUNDERPUNCH , PARALYZE_SIDE_EFFECT1      ,  75 , THUNDER  , 255 , 14 ; pp 15 ; 0
-    db SCRATCH      , NO_ADDITIONAL_EFFECT       ,  40 , NORMAL   , 255 , 06 ; pp 35 ; 0
+    db SCRATCH      , NO_ADDITIONAL_EFFECT       ,  36 , NORMAL   , 255 , 06 ; pp 35 ; 0
     db VICEGRIP     , NO_ADDITIONAL_EFFECT       ,  60 , IVORY    , 255 , 07 ; pp 30 ; 0 ; Pwr 55 -> 60 ; Type Normal -> Ivory
     db GUILLOTINE   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 45 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 45
     db RAZOR_WIND   , CHARGE_EFFECT              , 120 , WIND     , 255 , 20 ; pp 10 ; 1 ; Type Normal -> Wind ; Acr 191 -> 255 ; Pwr 80 -> 120
@@ -125,7 +125,7 @@
     db LICK         , PARALYZE_SIDE_EFFECT2      ,  35 , NORMAL   , 255 , 07 ; pp 30 ; 0 ; Pwr 20 -> 35
     db SMOG         , POISON_SIDE_EFFECT2        ,  45 , POISON   , 178 , 08 ; pp 20 ; 1 ; Pwr 20 -> 45 ; PP 20 -> 25
     db SLUDGE       , POISON_SIDE_EFFECT2        ,  75 , POISON   , 255 , 11 ; pp 20 ; 0 ; Pwr 65 -> 75 ; Phisical ; Ene 10 -> 11
-    db BONE_CLUB    , FLINCH_SIDE_EFFECT1        ,  70 , IVORY    , 216 , 08 ; pp 25 ; 0 ; Type Earth -> Ivory ; Pwr 65 -> 70 ; PP 20 -> 25
+    db BONE_SHOT    , FLINCH_SIDE_EFFECT1        ,  70 , IVORY    , 216 , 08 ; pp 25 ; 0 ; Type Earth -> Ivory ; Pwr 65 -> 70 ; PP 20 -> 25
     db FIRE_BLAST   , BURN_SIDE_EFFECT2          , 120 , FIRE     , 216 , 36 ; pp  5 ; 1 ; Ene 40 -> 36
     db WATERFALL    , NO_ADDITIONAL_EFFECT       ,  80 , WATER    , 255 , 14 ; pp 15 ; 0
     db CLAMP        , TRAPPING_EFFECT            ,  10 , IVORY    , 191 , 11 ; pp 20 ; 0 ; Pwr 35 -> 10 ; Type Water -> Ivory ; PP 10 -> 20 ; Ene 10 -> 11
@@ -140,7 +140,7 @@
     db FLARE        , PARALYZE_EFFECT            ,   0 , NORMAL   , 255 , 14 ; pp 15 ; - ; Acr 191 -> 255 ; PP 30 -> 15
     db DREAM_EATER  , DREAM_EATER_EFFECT         , 100 , GHOST    , 255 , 17 ; pp 10 ; 1 ; Type Psychic -> Ghost ; PP 15 -> 10 ; Ene 20 -> 17
     db POISON_GAS   , POISON_EFFECT              ,   0 , POISON   , 229 , 07 ; pp 30 ; - ; Acr 140 -> 229 ; PP 40 -> 30
-    db BARRAGE      , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , GRASS    , 216 , 14 ; pp 15 ; 0 ; Type Normal -> Grass ; Pwr 15 -> 28 ; PP 20 -> 15
+    db BARRAGE      , TWO_TO_FIVE_ATTACKS_EFFECT ,  28 , GRASS    , 216 , 14 ; pp 15 ; 1 ; Type Normal -> Grass ; Pwr 15 -> 28 ; PP 20 -> 15 ; Special
     db LEECH_LIFE   , DRAIN_HP_EFFECT            ,  30 , BUG      , 255 , 08 ; pp 25 ; 0 ; Pwr 20 -> 30 ; PP 15 -> 25
     db LOVELY_KISS  , SLEEP_EFFECT               ,   0 , NORMAL   , 191 , 22 ; pp 10 ; - ; Ene 20 -> 24
     db SKY_ATTACK   , CHARGE_EFFECT              , 140 , WIND     , 229 , 36 ; pp  5 ; 0 ; Ene 40 -> 36
@@ -150,13 +150,13 @@
     db SPORE        , SLEEP_EFFECT               ,   0 , GRASS    , 216 , 24 ; pp 10 ; - ; PP 15 -> 10 ; Ene 20 -> 28 ; Acr 255 -> 216
     db FLASH        , ACCURACY_DOWN1_EFFECT      ,   0 , THUNDER  , 178 , 14 ; pp 15 ; - ; Type Normal -> THUNDER ; PP 20 -> 15
     db PSYWAVE      , SPECIAL_DAMAGE_EFFECT      ,   1 , PSYCHIC  , 255 , 07 ; pp 30 ; - ; Acr 204 -> 255 ; PP 15 -> 30
-    db SPLASH       , SPLASH_EFFECT              ,   0 , WATER    , 255 , 00 ; pp 40 ; - ; Type Normal -> Water
+    db SPLASH       , SPLASH_EFFECT              ,   0 , WATER    , 255 , 01 ; pp 40 ; - ; Type Normal -> Water
     db ACID_ARMOR   , DEFENSE_UP3_EFFECT         ,   0 , POISON   , 255 , 10 ; pp 20 ; - ; PP 40 -> 20 ; Defense 3x
     db HAMMER       , NO_ADDITIONAL_EFFECT       ,  80 , IVORY    , 191 , 20 ; pp 10 ; 0 ; Acr 216 -> 191
     db EXPLOSION    , EXPLODE_EFFECT             , 255 , NORMAL   , 255 , 60 ; pp  5 ; 0 ; Pwr 170 -> 255 ; Ene 40 -> 60
     db FURY_SWIPES  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , NORMAL   , 204 , 12 ; pp 15 ; 0 ; Pwr 18 -> 21 ; Ene 14 -> 12
     db BONEMERANG   , ATTACK_TWICE_EFFECT        ,  55 , IVORY    , 229 , 20 ; pp 10 ; 0 ; Type Earth -> Ivory ; Pwr 50 -> 55
-    db REST         , HEAL_EFFECT                ,   0 , NORMAL   , 255 , 28 ; pp 10 ; - ; Type Psychic -> Normal ; Ene 20 -> 28
+    db REST         , REST_EFFECT                ,   0 , NORMAL   , 255 , 28 ; pp 10 ; - ; Type Psychic -> Normal ; Ene 20 -> 28
     db ROCK_SLIDE   , FLINCH_SIDE_EFFECT1        , 100 , ROCK     , 216 , 18 ; pp 10 ; 0 ; Acr 229 -> 216 ; Pwr 75 -> 100 ; PP 10 -> 15 ; Ene 14 -> 18
     db HYPER_FANG   , FLINCH_SIDE_EFFECT1        ,  80 , NORMAL   , 229 , 14 ; pp 15 ; 0
     db SHARPEN      , ATTACK_UP1_EFFECT          ,   0 , METAL    , 255 , 07 ; pp 30 ; - ; Type Normal -> Metal

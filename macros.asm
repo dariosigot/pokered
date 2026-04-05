@@ -130,6 +130,11 @@ PREDEF_JUMP: MACRO
 	ld a, (\1Predef - PredefPointers) / 3
 	jp Predef
 	ENDM
+	
+PREDEF_JUMP_NZ: MACRO
+	ld a, (\1Predef - PredefPointers) / 3
+	jp nz,Predef
+	ENDM
 
 PREDEF_Z: MACRO
 	ld a, (\1Predef - PredefPointers) / 3

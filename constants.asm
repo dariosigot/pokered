@@ -1,11 +1,8 @@
-_JAPAN EQU 0
-_GREEN EQU 0
-_YELLOW EQU 0
-
-
 VERSION: MACRO
     db "0.89.015"
     ENDM
+
+_DEBUG EQU 0
 
 INCLUDE "macros.asm"
 
