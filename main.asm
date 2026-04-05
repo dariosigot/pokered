@@ -120515,8 +120515,8 @@ _PreHM07Text:
     text_line , "shouldn't be"
     text_cont , "here!"
     text_para , "This intensive"
-    text_line , "course could be"
-    text_cont , "very useful"
+    text_line , "training could"
+    text_cont , "be very useful"
     text_cont , "to you!"
     text_wait
 
@@ -124141,39 +124141,72 @@ _HM05SkillNotFoundText:
     text_past
 
 _HM06SkillFoundText:
-    text_init , "You're Team is"
-    text_line , "Ready for this"
-    text_cont , "SKILL!"
+    text_init , "Now you and your"
+    text_line , "#MON can"
+    text_cont , "quickly return"
+    text_cont , "to the last"
+    text_cont , "#MON CENTER"
+    text_cont , "you visited!"
+    text_para , "Remember, it"
+    text_line , "won't work in"
+    text_cont , "forests or caves!"
     text_past
 
 _HM06SkillNotFoundText:
-    text_init , "It seems that you"
-    text_line , "miss a #MON"
-    text_cont , "for this SKILL."
+    text_init , "It looks like none"
+    text_line , "of your party"
+    text_cont , "members have this"
+    text_cont , "SKILL..."
+    text_para , "But don't worry,"
+    text_line , "I'm sure you'll"
+    text_cont , "be able to teach"
+    text_cont , "it to them once"
+    text_cont , "they're with you!"
+    text_para , "Remember, it"
+    text_line , "won't work in"
+    text_cont , "forests or caves!"
     text_past
 
 _HM07SkillFoundText:
-    text_init , "You're Team is"
-    text_line , "Ready for this"
-    text_cont , "SKILL!"
+    text_init , "AH-AH!"
+    text_para , "Now get out of"
+    text_line , "here and get"
+    text_cont , "to safety!"
     text_past
 
 _HM07SkillNotFoundText:
-    text_init , "It seems that you"
-    text_line , "miss a #MON"
-    text_cont , "for this SKILL."
+    text_init , "AH-AH!"
+    text_para , "Now you can teach"
+    text_line , "your #MON to"
+    text_cont , "escape from a"
+    text_cont , "cave!"
+    text_para , "Find the right"
+    text_line , "#MON to do it"
+    text_cont , "before you find"
+    text_cont , "again yourself in"
+    text_cont , "a situation like"
+    text_cont , "this!"
     text_past
 
 _HM08SkillFoundText:
-    text_init , "You're Team is"
-    text_line , "Ready for this"
-    text_cont , "SKILL!"
+    text_init , "Now you have"
+    text_line , "nothing else to"
+    text_cont , "know!"
+    text_para , "I hope my"
+    text_line , "knowledge can"
+    text_cont , "help you and"
+    text_cont , "your #MON at"
+    text_cont , "any time!"
     text_past
 
 _HM08SkillNotFoundText:
-    text_init , "It seems that you"
-    text_line , "miss a #MON"
-    text_cont , "for this SKILL."
+    text_init , "Now you have"
+    text_line , "nothing else to"
+    text_cont , "know!"
+    text_para , "You will recognize"
+    text_line , "by yourself which"
+    text_cont , "#MON will be"
+    text_cont , "able to do this."
     text_past
 
 ; ───────────────────────────────────
