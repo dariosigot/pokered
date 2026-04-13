@@ -10889,15 +10889,17 @@ NewMoveDetails:
     push hl
     ld a,[H_WHOSETURN] ; $FF00+$f3
     push af
-
+    ld a,[wPlayerSelectedMove]
+    push af
     ; Print Move Details Box
     ld a,[$d0e0] ; New Move Learned
     ld [wPlayerSelectedMove],a
     FuncCoord 04,07
     ld de,Coord
     PREDEF PrintMoveDetailsBox
-
     ; Restore
+    pop af
+    ld [wPlayerSelectedMove],a
     pop af
     ld [H_WHOSETURN],a ; $FF00+$f3
     pop hl
@@ -18571,6 +18573,10 @@ CheckDiglettsCave:
     jp GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
 
 HandleMenuInput_PrintMoveBox:
+    ; Backup
+    ld a,[wPlayerSelectedMove]
+    push af
+.loop
     push hl
     ; Get Move to Delete
     ld a,[wCurrentMenuItem] ; $cc26
@@ -18603,7 +18609,6 @@ HandleMenuInput_PrintMoveBox:
 .skip2
     PREDEF PrintMoveDetailsBox
 .skip3
-
     ; Menu
     ld hl,wMenuWrappingEnabled
     set 1,[hl]
@@ -18612,8 +18617,12 @@ HandleMenuInput_PrintMoveBox:
     ld b,a
     and %11000000 ; ▼▲◄►StSeBA
     ld a,b
-    ret z
-    jr HandleMenuInput_PrintMoveBox
+    jr nz,.loop
+    ; Restore
+    pop bc
+    ld hl,wPlayerSelectedMove
+    ld [hl],b
+    ret
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $01)
@@ -24696,6 +24705,11 @@ ItemUsePokeflute: ; e140 (3:6140)
     cp 2 ; Surfing?
     jr z,.ItemUseNotTime
 
+    ; Check Cycling Road
+    ld a,[$d732]
+    bit 5,a ; Cycling Road?
+    jp nz,ItemUseNotTime
+
     call ItemUseReloadOverworldData
     jr .ContextDone
 .BattleContext
@@ -30165,6 +30179,8 @@ StartMenu_Item: ; 13302 (4:7302)
     jp z,.useOrTossItem
     cp POKEDEX
     jp z,.useOrTossItem
+    cp TOWN_MAP
+    jp z,.useOrTossItem
 .notBicycle1
     ld a,$06 ; use/toss menu
     ld [$d125],a
@@ -30207,6 +30223,8 @@ StartMenu_Item: ; 13302 (4:7302)
     cp TECH_MACHINE
     jr z,.useItem_partyMenu
     cp POKEDEX
+    jr z,.useItem_Standard
+    cp TOWN_MAP
     jr z,.useItem_Standard
     ld a,[wCurrentMenuItem]
     and a
@@ -56817,7 +56835,7 @@ CheckPlayerStatusConditions:
     ld a,[$CCEE]
     and a
     jr z,.ParalysisCheck ; 593E
-    ld hl,$CCDC
+    ld hl,wPlayerSelectedMove ; $CCDC
     cp [hl]
     jr nz,.ParalysisCheck
     call Func_3da88
@@ -122451,7 +122469,7 @@ TMNotebookText:
     text_init , "It's a pamphlet"
     text_line , "on TMs."
     text_para , "..."
-    text_para , "There are 56 TMs"
+    text_para , "There are 60 TMs"
     text_line , "in all."
     text_para , "SILPH CO."
     text_past
@@ -123643,7 +123661,7 @@ _ViridianForestexitText2:
     text_cont , "roadside?"
     text_para , "They can be cut"
     text_line , "down by a special"
-    text_cont , "#MON move."
+    text_cont , "#MON SKILL."
     text_done
 
 _Route2HouseText1:
