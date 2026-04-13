@@ -123661,7 +123661,7 @@ _ViridianForestexitText2:
     text_cont , "roadside?"
     text_para , "They can be cut"
     text_line , "down by a special"
-    text_cont , "#MON move."
+    text_cont , "#MON SKILL."
     text_done
 
 _Route2HouseText1:
