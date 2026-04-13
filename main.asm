@@ -10889,15 +10889,17 @@ NewMoveDetails:
     push hl
     ld a,[H_WHOSETURN] ; $FF00+$f3
     push af
-
+    ld a,[wPlayerSelectedMove]
+    push af
     ; Print Move Details Box
     ld a,[$d0e0] ; New Move Learned
     ld [wPlayerSelectedMove],a
     FuncCoord 04,07
     ld de,Coord
     PREDEF PrintMoveDetailsBox
-
     ; Restore
+    pop af
+    ld [wPlayerSelectedMove],a
     pop af
     ld [H_WHOSETURN],a ; $FF00+$f3
     pop hl
@@ -18571,6 +18573,10 @@ CheckDiglettsCave:
     jp GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
 
 HandleMenuInput_PrintMoveBox:
+    ; Backup
+    ld a,[wPlayerSelectedMove]
+    push af
+.loop
     push hl
     ; Get Move to Delete
     ld a,[wCurrentMenuItem] ; $cc26
@@ -18603,7 +18609,6 @@ HandleMenuInput_PrintMoveBox:
 .skip2
     PREDEF PrintMoveDetailsBox
 .skip3
-
     ; Menu
     ld hl,wMenuWrappingEnabled
     set 1,[hl]
@@ -18612,8 +18617,12 @@ HandleMenuInput_PrintMoveBox:
     ld b,a
     and %11000000 ; ▼▲◄►StSeBA
     ld a,b
-    ret z
-    jr HandleMenuInput_PrintMoveBox
+    jr nz,.loop
+    ; Restore
+    pop bc
+    ld hl,wPlayerSelectedMove
+    ld [hl],b
+    ret
 
 ; ───────────────────────────────────────
 ; Handle New Adventure Data (BANK $01)
@@ -56817,7 +56826,7 @@ CheckPlayerStatusConditions:
     ld a,[$CCEE]
     and a
     jr z,.ParalysisCheck ; 593E
-    ld hl,$CCDC
+    ld hl,wPlayerSelectedMove ; $CCDC
     cp [hl]
     jr nz,.ParalysisCheck
     call Func_3da88
