@@ -24705,6 +24705,11 @@ ItemUsePokeflute: ; e140 (3:6140)
     cp 2 ; Surfing?
     jr z,.ItemUseNotTime
 
+    ; Check Cycling Road
+    ld a,[$d732]
+    bit 5,a ; Cycling Road?
+    jp nz,ItemUseNotTime
+
     call ItemUseReloadOverworldData
     jr .ContextDone
 .BattleContext
