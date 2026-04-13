@@ -30174,6 +30174,8 @@ StartMenu_Item: ; 13302 (4:7302)
     jp z,.useOrTossItem
     cp POKEDEX
     jp z,.useOrTossItem
+    cp TOWN_MAP
+    jp z,.useOrTossItem
 .notBicycle1
     ld a,$06 ; use/toss menu
     ld [$d125],a
@@ -30216,6 +30218,8 @@ StartMenu_Item: ; 13302 (4:7302)
     cp TECH_MACHINE
     jr z,.useItem_partyMenu
     cp POKEDEX
+    jr z,.useItem_Standard
+    cp TOWN_MAP
     jr z,.useItem_Standard
     ld a,[wCurrentMenuItem]
     and a
