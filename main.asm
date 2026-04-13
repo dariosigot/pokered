@@ -122460,7 +122460,7 @@ TMNotebookText:
     text_init , "It's a pamphlet"
     text_line , "on TMs."
     text_para , "..."
-    text_para , "There are 56 TMs"
+    text_para , "There are 60 TMs"
     text_line , "in all."
     text_para , "SILPH CO."
     text_past
