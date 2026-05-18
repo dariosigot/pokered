@@ -403,10 +403,7 @@ PlayCryAndDecreaseSkillEnergy:
     call CheckAndDecreaseSkillEnergy
     ld a,[wSkillMonID]
     call GetCryData ; get cry data
-    call PlaySound ; play sound
-    xor a
-    ld [wSkillMonID],a
-    ret
+    jp PlaySound ; play sound
 
 CheckSkillEnergy:
     ld a,[wWhichPokemon]
@@ -21261,6 +21258,31 @@ MapHeaderBanks:
     db BANK(PortRoyal_h) ; devmap
     db BANK(PortRoyal_h) ; devmap
 
+PrintBattleValueNearMon:
+    BANKSWITCH PrintBattleValueNearMon_
+    ld hl,wHPBarOldHP
+    ret
+
+DecreaseValCounterAndPrintHPNumber:
+    push af
+    push de
+    call UpdateHPBar_PrintHPNumber
+    push hl
+    ld hl,wBattleValueCounter
+    ld a,[hl]
+    and a
+    jr z,.end
+    dec [hl]
+    call z,RemoveBattleValue
+.end
+    pop hl
+    pop de
+    pop af
+    ret
+
+RemoveBattleValue:
+    BANKSWITCH_JUMP RemoveBattleValue_
+
 ; Free
 
 SECTION "CheckForceBikeOrSurf",ROMX[$438b],BANK[$3]
@@ -23206,6 +23228,65 @@ AddPokemonToParty_HandleEnemyExclusive:
     pop de
     ret
 
+ItemUseBait:
+    ld hl,ThrewBaitText
+    call PrintText
+    ld hl,$d007 ; catch rate
+    srl [hl] ; halve catch rate
+    ld a,BAIT_ANIM
+    ld hl,$cce9 ; bait factor
+    ld de,$cce8 ; escape factor
+    jr BaitRockCommon
+
+ItemUseRock:
+    ld hl,ThrewRockText
+    call PrintText
+    ld hl,$d007 ; catch rate
+    ld a,[hl]
+    add a ; double catch rate
+    jr nc,.noCarry
+    ld a,$ff
+.noCarry
+    ld [hl],a
+    ld a,ROCK_ANIM
+    ld hl,$cce8 ; escape factor
+    ld de,$cce9 ; bait factor
+
+BaitRockCommon:
+    ld [W_ANIMATIONID],a
+    xor a
+    ld [$cc5b],a
+    ld [H_WHOSETURN],a
+    ld [de],a ; zero escape factor (for bait),zero bait factor (for rock)
+.randomLoop ; loop until a random number less than 5 is generated
+    call GenRandom
+    and a,7
+    cp 5
+    jr nc,.randomLoop
+    inc a ; increment the random number,giving a range from 1 to 5 inclusive
+;joenote - There is a bug here.
+; - The 1-to-5 number is always decremented when PrintSafariZoneBattleText runs.
+; - So getting a number of 1 will decrement immediately to zero and do nothing to the eating/angry state.
+; - To get an effective 1-to-5 turns, increment once more to bump the range to 2-to-6
+    inc a
+    ld b,a
+    ld a,[hl]
+    add b ; increase bait factor (for bait),increase escape factor (for rock)
+    jr nc,.noCarry
+    ld a,$ff
+.noCarry
+    ld [hl],a
+    PREDEF MoveAnimation
+    jp RockDamageOrBaitHealth
+
+ThrewBaitText:
+    TX_FAR _ThrewBaitText
+    db "@"
+
+ThrewRockText:
+    TX_FAR _ThrewRockText
+    db "@"
+
 ; Free
 
 SECTION "ItemUseBall",ROMX[$5687],BANK[$3]
@@ -23769,11 +23850,9 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
 .PrintText
     jp PrintText
 
-ItemUseEvoStone:
-    ld a,[W_ISINBATTLE]
-    and a
-    jp nz,ItemUseNotTime
-    BANKSWITCH_JUMP ItemUseEvoStone_
+; ─────────────────────────────────────
+; ItemUseMedicine & ItemUseVitamin
+; ─────────────────────────────────────
 
 ItemUseVitamin:
     ld a,[W_ISINBATTLE]
@@ -23784,46 +23863,30 @@ ItemUseVitamin:
 ItemUseMedicine:
     ld a,[W_NUMINPARTY]
     and a
-    jr z,.emptyParty
-    ld a,[$cf92]
-    push af
-    ld a,[$cf91]
-    push af
-    ld a,$01
-    ld [$d07d],a ; item use party menu
-    ld a,$ff
-    ld [$cfcb],a
-    ld a,[$d152]
-    and a ; using Softboiled?
-    jr z,.notUsingSoftboiled
-; if using softboiled
-    call GoBackToPartyMenu
-    jr .getPartyMonDataAddress
-.emptyParty
-    ld hl,.EmptyPartyText
-    xor a
-    ld [$cd6a],a ; item use failed
-    jp PrintText
-.EmptyPartyText
-    TX_FAR _EmptyPartyText
-    db "@"
-.MustChoiceActiveText
-    TX_FAR _MustChoiceActiveText
-    db "@"
-.notUsingSoftboiled
+    jp z,PrintEmptyPartyText
+    call .CheckSoftbolied
+    jr nz,.softboiled
+; if not using softboiled
+    call .Backup
+    call .InitializeMenu
     call DisplayPartyMenu
-.getPartyMonDataAddress
+    jr .skip
+
+.loop
+    call .RestoreItemID
+.softboiled
+    call .Backup
+    call .InitializeMenu
+    call GoBackToPartyMenu
+.skip
     jp c,.canceledItemUse
     call CheckItemOnActive
     jr z,.continue ; continue if not in battle or if active mon is choice in battle
-    pop af
-    ld [$cf91],a
-    pop af
-    ld [$cf92],a
     ld hl,.MustChoiceActiveText
     call PrintText
-.forceAnotherChoice
-    jr ItemUseMedicine ; force another choice
+    call .Restore
+    jr .loop ; force another choice
+
 .continue
     ld hl,W_PARTYMON1DATA
     ld bc,44
@@ -23835,17 +23898,14 @@ ItemUseMedicine:
     ld a,[$cf91]
     ld e,a
     ld [$d0b5],a
-    pop af
-    ld [$cf91],a
-    pop af
-    ld [$cf92],a
-    ld a,[$d152]
-    and a ; using Softboiled?
+    call .Restore
+    call .CheckSoftbolied
     jr z,.checkItemType
 ; if using softboiled
     ld a,[$cf92]
     cp d ; is the pokemon trying to use softboiled on itself?
-    jr z,.forceAnotherChoice ; if so,force another choice
+    jr z,.softboiled ; if so,force another choice
+
 .checkItemType
     ld a,[$cf91]
     cp REVIVE
@@ -23998,8 +24058,7 @@ ItemUseMedicine:
     ld [wHPBarMaxHP+1],a
     ld a,[hl]
     ld [wHPBarMaxHP],a ; max HP stored at $cee9 (2 bytes,big-endian)
-    ld a,[$d152]
-    and a ; using Softboiled?
+    call .CheckSoftbolied
     jp z,.notUsingSoftboiled2
 ; if using softboiled
     call PlayCryAndDecreaseSkillEnergy
@@ -24186,12 +24245,15 @@ ItemUseMedicine:
     dec d
     jr nz,.calculateHPBarCoordsLoop
     jr .doneHealing
+
 .healingItemNoEffect
     call ItemUseNoEffect
-    jp .done
+    call .CheckSoftbolied
+    jp nz,.softboiled
+    jp .loop
+
 .doneHealing
-    ld a,[$d152]
-    and a ; using Softboiled?
+    call .CheckSoftbolied
     jr nz,.skipRemovingItem ; no item to remove if using Softboiled
     push hl
     call RemoveUsedItem
@@ -24226,7 +24288,9 @@ ItemUseMedicine:
 .playStatusAilmentCuringSound
     ld a,$8e ; status ailment curing sound
     call PlaySoundWaitForCurrent ; play sound
+
 .showHealingItemMessage
+    call .Backup
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a
     call ClearScreen
@@ -24235,25 +24299,42 @@ ItemUseMedicine:
     call RedrawPartyMenu ; redraws the party menu and displays the message
     ld a,1
     ld [H_AUTOBGTRANSFERENABLED],a
-    ld c,50
+    ld c,10
     call DelayFrames
-    call WaitForTextScrollButtonPress ; wait for a button press
+    call .Restore
+    ld a,[W_ISINBATTLE]
+    and a
+    call nz,WaitForTextScrollButtonPress
+    jr nz,.done
+    call .CheckSoftbolied
+    jr z,.CheckItemInBag
+    call .CheckEnoughHealthy
+    ret nc
+    ld c,10
+    call DelayFrames
+    jp .softboiled
+.CheckItemInBag
+    ld a,[$cf97] ; new qty
+    and a
+    jp nz,.loop
+    call WaitForTextScrollButtonPress
     jr .done
+
 .canceledItemUse
     xor a
     ld [$cd6a],a ; item use failed
-    pop af
-    pop af
+    pop af ; Restore useless
+    pop af ; ...
 .done
-    ld a,[$d152]
-    and a ; using Softboiled?
+    call .CheckSoftbolied
     ret nz ; if so,return
     call GBPalWhiteOut
-    call z,GoPAL_SET_CF1C
+    call GoPAL_SET_CF1C
     ld a,[W_ISINBATTLE]
     and a
     ret nz
     jp ReloadMapData ; restore saved screen
+
 .useVitamin
     push hl
     ld a,[hl]
@@ -24364,10 +24445,7 @@ ItemUseMedicine:
     ld a,[$ff98]
     ld [hl],a
     pop hl
-    ld a,[$cf92]
-    push af
-    ld a,[$cf91]
-    push af
+    call .Backup
     push de
     push hl
     ld bc,34
@@ -24420,11 +24498,79 @@ ItemUseMedicine:
     BANKSWITCH TryEvolvingMon ; evolve pokemon,if appropriate
     ld a,$01
     ld [$cfcb],a
-    pop af
-    ld [$cf91],a
+    call .Restore
+    jp RemoveUsedItem
+
+.InitializeMenu
+    ld a,$01
+    ld [$d07d],a ; item use party menu
+    ld a,$ff
+    ld [$cfcb],a
+    ret
+
+.CheckSoftbolied
+    ld a,[$d152]
+    and a ; using Softboiled?
+    ret
+
+.Backup
+    pop bc
+    ld a,[$cf91]
+    push af
+    ld a,[$cf92]
+    push af
+    push bc
+    ret
+
+.Restore
+    pop bc
     pop af
     ld [$cf92],a
-    jp RemoveUsedItem
+    pop af
+    ld [$cf91],a
+    push bc
+    ret
+
+.RestoreItemID
+    call .CheckSoftbolied
+    ret nz
+    ld hl,wBagItems
+    ld a,[$cf92]
+    sla a
+    ld c,a
+    ld b,0
+    add hl,bc
+    ld a,[hl]
+    ld [$cf91],a
+    ret
+
+.CheckEnoughHealthy
+    ld hl,W_PARTYMON1_MAXHP
+    ld a,[$cf92]
+    ld bc,44
+    call AddNTimes
+    ld a,[hli]
+    ld [H_DIVIDEND],a
+    ld a,[hl]
+    ld [H_DIVIDEND + 1],a
+    ld a,5
+    ld [H_DIVISOR],a
+    ld b,2 ; number of bytes
+    call Divide
+    ld bc,-33
+    add hl,bc
+    ld a,[hld]
+    ld b,a
+    ld a,[H_QUOTIENT + 3]
+    sub b
+    ld b,[hl]
+    ld a,[H_QUOTIENT + 2]
+    sbc b
+    ret
+
+.MustChoiceActiveText
+    TX_FAR _MustChoiceActiveText
+    db "@"
 .VitaminStatRoseText
     TX_FAR _VitaminStatRoseText
     db "@"
@@ -24438,63 +24584,15 @@ ItemUseMedicine:
     db "SPEED@"
     db "SPECIAL@"
 
-ItemUseBait:
-    ld hl,ThrewBaitText
-    call PrintText
-    ld hl,$d007 ; catch rate
-    srl [hl] ; halve catch rate
-    ld a,BAIT_ANIM
-    ld hl,$cce9 ; bait factor
-    ld de,$cce8 ; escape factor
-    jr BaitRockCommon
+; ─────────────────────────────────────
 
-ItemUseRock:
-    ld hl,ThrewRockText
-    call PrintText
-    ld hl,$d007 ; catch rate
-    ld a,[hl]
-    add a ; double catch rate
-    jr nc,.noCarry
-    ld a,$ff
-.noCarry
-    ld [hl],a
-    ld a,ROCK_ANIM
-    ld hl,$cce8 ; escape factor
-    ld de,$cce9 ; bait factor
-
-BaitRockCommon:
-    ld [W_ANIMATIONID],a
+PrintEmptyPartyText:
     xor a
-    ld [$cc5b],a
-    ld [H_WHOSETURN],a
-    ld [de],a ; zero escape factor (for bait),zero bait factor (for rock)
-.randomLoop ; loop until a random number less than 5 is generated
-    call GenRandom
-    and a,7
-    cp 5
-    jr nc,.randomLoop
-    inc a ; increment the random number,giving a range from 1 to 5 inclusive
-;joenote - There is a bug here.
-; - The 1-to-5 number is always decremented when PrintSafariZoneBattleText runs.
-; - So getting a number of 1 will decrement immediately to zero and do nothing to the eating/angry state.
-; - To get an effective 1-to-5 turns, increment once more to bump the range to 2-to-6
-    inc a
-    ld b,a
-    ld a,[hl]
-    add b ; increase bait factor (for bait),increase escape factor (for rock)
-    jr nc,.noCarry
-    ld a,$ff
-.noCarry
-    ld [hl],a
-    PREDEF MoveAnimation
-    jp RockDamageOrBaitHealth
-
-ThrewBaitText:
-    TX_FAR _ThrewBaitText
-    db "@"
-
-ThrewRockText:
-    TX_FAR _ThrewRockText
+    ld [$cd6a],a ; item use failed
+    ld hl,.EmptyPartyText
+    jp PrintText
+.EmptyPartyText
+    TX_FAR _EmptyPartyText
     db "@"
 
 ; also used for Dig out-of-battle effect
@@ -24555,12 +24653,10 @@ CanDig:
     TX_FAR _CannotDigHereText
     db "@"
 
-SECTION "ItemUseRepel",ROMX[$6003],BANK[$3]
-
-ItemUseRepel: ; e003 (3:6003)
+ItemUseRepel:
     ld b,100
 
-ItemUseRepelCommon: ; e005 (3:6005)
+ItemUseRepelCommon:
     ld a,[W_ISINBATTLE]
     and a
     jp nz,ItemUseNotTime
@@ -24569,7 +24665,7 @@ ItemUseRepelCommon: ; e005 (3:6005)
     jp PrintItemUseTextAndRemoveItem
 
 ; handles X Accuracy item
-ItemUseXAccuracy: ; e013 (3:6013)
+ItemUseXAccuracy:
     ld a,[W_ISINBATTLE]
     and a
     jp z,ItemUseNotTime
@@ -24685,6 +24781,12 @@ ItemUseXStat:
     pop af
     ld [hl],a ; restore [W_PLAYERMOVENUM]
     ret
+
+ItemUseEvoStone:
+    ld a,[W_ISINBATTLE]
+    and a
+    jp nz,ItemUseNotTime
+    BANKSWITCH_JUMP ItemUseEvoStone_
 
 ; Free
 
@@ -24970,78 +25072,41 @@ ItemUseItemfinder:
     TX_FAR _ItemfinderFoundNothingText
     db "@"
 
+; ─────────────────────────────────────
+; ItemUsePPRestore
+; ─────────────────────────────────────
+
 ItemUsePPRestore:
     ld a,[W_NUMINPARTY]
     and a
-    jr z,.emptyParty
-    ld a,[$cf92]
-    push af
+    jp z,PrintEmptyPartyText
     ld a,[$cf91]
-    push af
     ld [$cd3d],a
-.chooseMon
-    xor a
-    ld [$cfcb],a
-    ld a,$01 ; item use party menu
-    ld [$d07d],a
+    call .Backup
+    call .InitializeMenu
     call DisplayPartyMenu
-    jr nc,.useEther
-    jp .itemNotUsed
-.emptyParty
-    ld hl,.EmptyPartyText
-    xor a
-    ld [$cd6a],a ; item use failed
-    jp PrintText
-.EmptyPartyText
-    TX_FAR _EmptyPartyText
-    db "@"
-.MustChoiceActiveText
-    TX_FAR _MustChoiceActiveText
-    db "@"
-.afterRestoringPP ; after using a (Max) Ether/Elixir
-    ld a,$8e
-    call PlaySound
-    ld a,[hl]
-    ld b,a
-    ld hl,$d11e
-    ld a,[hl]
-    push af
-    push hl
-    ld [hl],b
-    FuncCoord 08,01 ; Party Ether Update Energy
-    ld hl,Coord
-    ld a,[$cf92]
-    ld bc,40
-    call AddNTimes
-    ld de,$d11e
-    ld bc,$0103
-    call PrintNumber
-    pop hl
-    pop af
-    ld [hl],a
-    ld hl,.PPRestoredText
-    call PrintText
-    pop af
-    ld [$cf91],a
-    pop af
-    ld [$cf92],a
-    call GBPalWhiteOut
-    call GoPAL_SET_CF1C
-    jp RemoveUsedItem
-.useEther
+    jr .skip
+
+.loop
+    call .Backup
+    call .InitializeMenu
+    call GoBackToPartyMenu
+.skip
+    jp c,.canceledItemUse
     call CheckItemOnActive
     jr z,.continue ; continue if not in battle or if active mon is choice in battle
-    pop af
-    ld [$cf91],a
-    pop af
-    ld [$cf92],a
     ld hl,.MustChoiceActiveText
     call PrintText
-    jp ItemUsePPRestore ; force another choice
+    call .Restore
+    jr .loop ; force another choice
+
 .continue
     call .restorePP
     jr nz,.afterRestoringPP
-    jp .noEffect
+    call ItemUseNoEffect
+    call .Restore
+    jp .loop
+
 .restorePP
     ld a,[$cd3d]
     ld b,a
@@ -25112,44 +25177,90 @@ ItemUsePPRestore:
 .NoEffect
     xor a
     ret
-.noEffect
-    call ItemUseNoEffect
-.itemNotUsed
-    call GBPalWhiteOut
-    call GoPAL_SET_CF1C
+
+.afterRestoringPP ; after using a (Max) Ether/Elixir
+    ld a,$8e
+    call PlaySound
+    ld a,[hl]
+    ld b,a
+    ld hl,$d11e
+    ld a,[hl]
+    push af
+    push hl
+    ld [hl],b
+    FuncCoord 08,01 ; Party Ether Update Energy
+    ld hl,Coord
+    ld a,[$cf92]
+    ld bc,40
+    call AddNTimes
+    ld de,$d11e
+    ld bc,$0103
+    call PrintNumber
+    pop hl
     pop af
-    pop af
+    ld [hl],a
+    ld hl,.PPRestoredText
+    call PrintText
+    ld c,10
+    call DelayFrames
+    call .Restore
+    call RemoveUsedItem
+    ld a,[W_ISINBATTLE]
+    and a
+    call nz,WaitForTextScrollButtonPress
+    jr nz,.done
+    ld a,[$cf97] ; new qty
+    and a
+    jp nz,.loop
+    call WaitForTextScrollButtonPress
+    jr .done
+
+.canceledItemUse
     xor a
     ld [$cd6a],a ; item use failed
+    pop af ; Restore useless
+    pop af ; ...
+.done
+    call GBPalWhiteOut
+    call GoPAL_SET_CF1C
+    ld a,[W_ISINBATTLE]
+    and a
+    ret nz
+    jp ReloadMapData ; restore saved screen
+
+.InitializeMenu
+    ld a,$01
+    ld [$d07d],a ; item use party menu
+    ld a,$ff
+    ld [$cfcb],a
     ret
+
+.Backup
+    pop bc
+    ld a,[$cf91]
+    push af
+    ld a,[$cf92]
+    push af
+    push bc
+    ret
+
+.Restore
+    pop bc
+    pop af
+    ld [$cf92],a
+    pop af
+    ld [$cf91],a
+    push bc
+    ret
+
+.MustChoiceActiveText
+    TX_FAR _MustChoiceActiveText
+    db "@"
 .PPRestoredText
     TX_FAR _PPRestoredText
     db "@"
 
-PrintBattleValueNearMon:
-    BANKSWITCH PrintBattleValueNearMon_
-    ld hl,wHPBarOldHP
-    ret
-
-DecreaseValCounterAndPrintHPNumber:
-    push af
-    push de
-    call UpdateHPBar_PrintHPNumber
-    push hl
-    ld hl,wBattleValueCounter
-    ld a,[hl]
-    and a
-    jr z,.end
-    dec [hl]
-    call z,RemoveBattleValue
-.end
-    pop hl
-    pop de
-    pop af
-    ret
-
-RemoveBattleValue:
-    BANKSWITCH_JUMP RemoveBattleValue_
+; ─────────────────────────────────────
 
 ; Free
 
@@ -134494,7 +134605,7 @@ _PPRestoredText:
     TX_NUM $d11e,1,3
     text_init , $DA," ENERGY"
     text_line , "Restored!"
-    text_wait
+    text_done
 
 _TeachMachineMoveText:
     text_init , "Teach "
