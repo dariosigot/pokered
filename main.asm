@@ -24247,9 +24247,7 @@ ItemUseMedicine:
     jr .doneHealing
 
 .healingItemNoEffect
-    call ItemUseNoEffect
-    call .CheckSoftbolied
-    jp nz,.softboiled
+    call ItemUseNoEffectNoWaitButtonPressed
     jp .loop
 
 .doneHealing
@@ -25103,7 +25101,7 @@ ItemUsePPRestore:
 .continue
     call .restorePP
     jr nz,.afterRestoringPP
-    call ItemUseNoEffect
+    call ItemUseNoEffectNoWaitButtonPressed
     call .Restore
     jp .loop
 
@@ -25356,34 +25354,32 @@ ItemUseTMHM: ; e479 (3:6479)
     TX_FAR _UnnamedText_2fe3b
     db "@"
 
-SECTION "PrintItemUseTextAndRemoveItem",ROMX[$6563],BANK[$3]
-
-PrintItemUseTextAndRemoveItem: ; e563 (3:6563)
+PrintItemUseTextAndRemoveItem:
     ld hl,ItemUseText00
     call PrintText
     ld a,$8e
     call PlaySound ; play sound
     call WaitForTextScrollButtonPress ; wait for button press
 
-RemoveUsedItem: ; e571 (3:6571)
+RemoveUsedItem:
     ld hl,wNumBagItems
     ld a,1 ; one item
     ld [$cf96],a ; store quantity
     jp RemoveItemFromInventory
 
-ItemUseNoEffect: ; e57c (3:657c)
+ItemUseNoEffect:
     ld hl,ItemUseNoEffectText
     jr ItemUseFailed
 
-ItemUseNotTime: ; e581 (3:6581)
+ItemUseNotTime:
     ld hl,ItemUseNotTimeText
     jr ItemUseFailed
 
-ItemUseNotYoursToUse: ; e586 (3:6586)
+ItemUseNotYoursToUse:
     ld hl,ItemUseNotYoursToUseText
     jr ItemUseFailed
 
-ThrowBallAtTrainerMon: ; e58b (3:658b)
+ThrowBallAtTrainerMon:
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     call GoPAL_SET_CF1C
     call Delay3
@@ -25396,11 +25392,11 @@ ThrowBallAtTrainerMon: ; e58b (3:658b)
     call PrintText
     jr RemoveUsedItem
 
-NoCyclingAllowedHere: ; e5ac (3:65ac)
+NoCyclingAllowedHere:
     ld hl,NoCyclingAllowedHereText
     jr ItemUseFailed
 
-BoxFullCannotThrowBall: ; e5b1 (3:65b1)
+BoxFullCannotThrowBall:
     ld hl,BoxFullCannotThrowBallText
     ; ft
 
@@ -25409,53 +25405,60 @@ ItemUseFailed:
     ld [$cd6a],a ; item use failed
     jp PrintText
 
-SECTION "ItemUseNotTimeText",ROMX[$65c0],BANK[$3]
+ItemUseNoEffectNoWaitButtonPressed:
+    ld c,10
+    call DelayFrames
+    ld hl,.ItemUseNoEffectNoWaitButtonPressedText
+    jr ItemUseFailed
+.ItemUseNoEffectNoWaitButtonPressedText
+    TX_FAR _ItemUseNoEffectNoWaitButtonPressedText
+    db "@"
 
-ItemUseNotTimeText: ; e5c0 (3:65c0)
+ItemUseNotTimeText:
     TX_FAR _ItemUseNotTimeText
     db "@"
 
-ItemUseNotYoursToUseText: ; e5c5 (3:65c5)
+ItemUseNotYoursToUseText:
     TX_FAR _ItemUseNotYoursToUseText
     db "@"
 
-ItemUseNoEffectText: ; e5ca (3:65ca)
+ItemUseNoEffectText:
     TX_FAR _ItemUseNoEffectText
     db "@"
 
-ThrowBallAtTrainerMonText1: ; e5cf (3:65cf)
+ThrowBallAtTrainerMonText1:
     TX_FAR _ThrowBallAtTrainerMonText1
     db "@"
 
-ThrowBallAtTrainerMonText2: ; e5d4 (3:65d4)
+ThrowBallAtTrainerMonText2:
     TX_FAR _ThrowBallAtTrainerMonText2
     db "@"
 
-NoCyclingAllowedHereText: ; e5d9 (3:65d9)
+NoCyclingAllowedHereText:
     TX_FAR _NoCyclingAllowedHereText
     db "@"
 
-NoSurfingHereText: ; e5de (3:65de)
+NoSurfingHereText:
     TX_FAR _NoSurfingHereText
     db "@"
 
-BoxFullCannotThrowBallText: ; e5e3 (3:65e3)
+BoxFullCannotThrowBallText:
     TX_FAR _BoxFullCannotThrowBallText
     db "@"
 
-ItemUseText00: ; e5e8 (3:65e8)
+ItemUseText00:
     TX_FAR _ItemUseText001
     db $05
     TX_FAR _ItemUseText002
     db "@"
 
-GotOnBicycleText: ; e5f2 (3:65f2)
+GotOnBicycleText:
     TX_FAR _GotOnBicycleText1
     db $05
     TX_FAR _GotOnBicycleText2
     db "@"
 
-GotOffBicycleText: ; e5fc (3:65fc)
+GotOffBicycleText:
     TX_FAR _GotOffBicycleText1
     db $05
     TX_FAR _GotOffBicycleText2
@@ -134638,6 +134641,11 @@ _ItemUseNoEffectText:
     text_init , "It won't have any"
     text_line , "effect."
     text_wait
+
+_ItemUseNoEffectNoWaitButtonPressedText:
+    text_init , "It won't have any"
+    text_line , "effect."
+    text_done
 
 _ThrowBallAtTrainerMonText1:
     text_init , "The trainer"
