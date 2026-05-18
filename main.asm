@@ -25406,6 +25406,8 @@ ItemUseFailed:
     jp PrintText
 
 ItemUseNoEffectNoWaitButtonPressed:
+    ld a,$a5 ; Error
+    call PlaySoundWaitForCurrent ; play sound
     ld c,10
     call DelayFrames
     ld hl,.ItemUseNoEffectNoWaitButtonPressedText
@@ -30220,6 +30222,8 @@ StartMenu_Pokemon:
     ld [wPartyAndBillsPCSavedMenuItem],a
     jp .loop
 .notHealthyEnough ; if current HP is less than 1/5 of max HP
+    ld a,$a5 ; Error
+    call PlaySoundWaitForCurrent ; play sound
     ld hl,.notHealthyEnoughText
     call PrintText
     jp .loop
