@@ -4593,14 +4593,16 @@ TextCommand09:
     pop hl
     jp NextTextCommand
 
-; wait half a second if the user doesn't hold A or B
+WAIT_HALF_SECOND EQU $0A
+
+; wait half a second if the user doesn't hold B
 ; 0A
 ; (no arguments)
 TextCommand0A:
     push bc
     call GetJoypadState
     ld a,[H_CURRENTPRESSEDBUTTONS]
-    and a,%00000011 ; A and B buttons
+    and a,%00000010 ; ▼▲◄►StSeBA
     jr nz,.skipDelay
     ld c,30
     call DelayFrames
@@ -4608,6 +4610,9 @@ TextCommand0A:
     pop bc
     pop hl
     jp NextTextCommand
+
+ERROR_TEXT_SOUND EQU $0F
+ERROR_SOUND EQU $A5
 
 ; plays sounds
 ; this actually handles various command ID's,not just 0B
@@ -4633,9 +4638,12 @@ TextCommand0B:
     jr z,.pokemonCry
     cp $16
     jr z,.pokemonCry
+    cp ERROR_TEXT_SOUND
+    push af
     ld a,[hl]
     call PlaySoundWaitForCurrent ; call PlaySound ; Denim : modifica per riprodurre i suoni anche con velocità massima dei testi
-    call WaitForSoundToFinish
+    pop af
+    call nz,WaitForSoundToFinish
     pop hl
     pop bc
     jp NextTextCommand
@@ -4653,7 +4661,7 @@ TextCommand0B:
     db $0B,$86
     db $12,$9A
     db $0E,$91
-    db $0F,$A5 ; error
+    db ERROR_TEXT_SOUND,ERROR_SOUND
     db $10,$89
     db $11,$94
     db $13,$98
@@ -4739,25 +4747,9 @@ TextCommandJumpTable:
     dw TextCommand0C
     dw TextCommand0D
 
-SECTION "GetRowColAddressBgMap",ROM0[$1cdd]
+; Free
 
-; this function seems to be used only once
-; it store the address of a row and column of the VRAM background map in hl
-; INPUT: h - row,l - column,b - high byte of background tile map address in VRAM
-GetRowColAddressBgMap: ; 1cdd (0:1cdd)
-    xor a
-    srl h
-    rr a
-    srl h
-    rr a
-    srl h
-    rr a
-    or l
-    ld l,a
-    ld a,b
-    or h
-    ld h,a
-    ret
+SECTION "ClearBgMap",ROM0[$1cf0]
 
 ; clears a VRAM background map with blank space tiles
 ; INPUT: h - high byte of background tile map address in VRAM
@@ -7270,6 +7262,24 @@ GetJoypadStateLowSensitivityWaitReleaseJoy:
     res 5,[hl]
 .end
     ld a,[$ffb5]
+    ret
+
+; this function seems to be used only once
+; it store the address of a row and column of the VRAM background map in hl
+; INPUT: h - row,l - column,b - high byte of background tile map address in VRAM
+GetRowColAddressBgMap:
+    xor a
+    srl h
+    rr a
+    srl h
+    rr a
+    srl h
+    rr a
+    or l
+    ld l,a
+    ld a,b
+    or h
+    ld h,a
     ret
 
 ; Free
@@ -25041,7 +25051,7 @@ ItemUseItemfinder:
     call ItemUseReloadOverworldData
     BANKSWITCH Func_7481f ; check for hidden items
     jr c,.found
-    ld a,$a5 ; Error
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent ; play sound
     ld hl,.PrintItemfinderFoundNothing
     jr .printText ; if no hidden items
@@ -25324,7 +25334,7 @@ ItemUseTMHM: ; e479 (3:6479)
     and a ; can the pokemon learn the move?
     jr nz,.checkIfAlreadyLearnedMove
 ; if the pokemon can't learn the move
-    ld a,$a5
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent ; play sound
     ld hl,MonCannotLearnMachineMoveText
     call PrintText
@@ -25406,14 +25416,12 @@ ItemUseFailed:
     jp PrintText
 
 ItemUseNoEffectNoWaitButtonPressed:
-    ld a,$a5 ; Error
-    call PlaySoundWaitForCurrent ; play sound
-    ld c,10
-    call DelayFrames
     ld hl,.ItemUseNoEffectNoWaitButtonPressedText
     jr ItemUseFailed
 .ItemUseNoEffectNoWaitButtonPressedText
+    db ERROR_TEXT_SOUND
     TX_FAR _ItemUseNoEffectNoWaitButtonPressedText
+    db WAIT_HALF_SECOND
     db "@"
 
 ItemUseNotTimeText:
@@ -26404,12 +26412,14 @@ CanCut:
     ld [$FF00+$b0],a
     jp UpdateSprites
 .plateau
-    call WaitForSoundToFinish
-    ld a,$a5
-    call PlaySound
-    call WaitForSoundToFinish
-    ld hl,PlateauGrassText
+    ld c,60
+    call DelayFrames
+    ld hl,.PlateauGrassText
     jp PrintText
+.PlateauGrassText
+    db ERROR_TEXT_SOUND
+    TX_FAR _PlateauGrassText
+    db "@"
 
 .HandlePartyMenuToCut
     ld a,[wWhichPokemon] ; $cf92
@@ -28835,10 +28845,6 @@ NothingToCutText:
     TX_FAR _NothingToCutText
     db "@"
 
-PlateauGrassText:
-    TX_FAR _PlateauGrassText
-    db "@"
-
 UsedCutText:
     TX_FAR _UsedCutText
     db "@"
@@ -30032,7 +30038,7 @@ StartMenu_Pokemon:
     jr .ReturnToPartyMenu
 
 .NoSkill
-    ld a,$a5 ; Error
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent ; play sound
     jr .RedrawMenu
 
@@ -30222,13 +30228,13 @@ StartMenu_Pokemon:
     ld [wPartyAndBillsPCSavedMenuItem],a
     jp .loop
 .notHealthyEnough ; if current HP is less than 1/5 of max HP
-    ld a,$a5 ; Error
-    call PlaySoundWaitForCurrent ; play sound
     ld hl,.notHealthyEnoughText
     call PrintText
     jp .loop
 .notHealthyEnoughText
+    db ERROR_TEXT_SOUND
     TX_FAR _NotHealthyEnoughText
+    db WAIT_HALF_SECOND
     db "@"
 
 .goBackToMap
@@ -41815,7 +41821,7 @@ Route22GateText1: ; 1e6e1 (7:66e1)
 UnnamedText_1e704: ; 1e704 (7:6704)
     TX_FAR _UnnamedText_1e704 ; 0x8cfbb
     db $8
-    ld a,$a5
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent
     call WaitForSoundToFinish
     ld hl,UnnamedText_1e715 ; $6715
@@ -42312,7 +42318,7 @@ Func_1ea92: ; 1ea92 (7:6a92)
     jp CinnabarGymProcessAllGate
 .asm_1eab8
     call WaitForSoundToFinish
-    ld a,$a5
+    ld a,ERROR_SOUND
     call PlaySound
     call WaitForSoundToFinish
     ld hl,CinnabarGymQuizIncorrectText ; $6b05
@@ -43004,7 +43010,7 @@ MovesMenu:
 
 .MoveJustKnown
     call Delay3 ; Show "UnfilledArrow"
-    ld a,$a5 ; Error
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent ; play sound
     jr .Retry
 
@@ -44397,8 +44403,9 @@ DiglettsCaveRoute2Text1:
     TX_FAR _ReceivedText
     db $11,"@"
 .AugerNoRoomText
+    db ERROR_TEXT_SOUND
     TX_FAR _AugerNoRoomText
-    db $0F,"@"
+    db "@"
 .DiglettsCaveRoute2Text1
     TX_FAR _DiglettsCaveRoute2Text1
     db "@"
@@ -47279,7 +47286,7 @@ FocusEnergyEffect_: ; 27f86 (9:7f86)
 .Print
     jp PrintText
 .GettingPumpedText
-    db $0a
+    db WAIT_HALF_SECOND
     TX_FAR _GettingPumpedText
     db "@"
 .FocusEnergyAlreadyInUseText
@@ -48772,7 +48779,8 @@ SlotReward300Func: ; 37702 (d:7702)
 
 UnnamedText_37722: ; 37722 (d:7722)
     TX_FAR _UnnamedText_37722
-    db $0a,"@"
+    db WAIT_HALF_SECOND
+    db "@"
 
 Func_37728: ; 37728 (d:7728)
     ld hl,$c4ba
@@ -61351,13 +61359,13 @@ StatModifierUpEffect:
     ld hl,.EnormouslyText
     ret
 .GreatlyText
-    db $0a
+    db WAIT_HALF_SECOND
     TX_FAR _GreatlyText
 .RoseText
     TX_FAR _RoseText
     db "@"
 .EnormouslyText
-    db $0a
+    db WAIT_HALF_SECOND
     TX_FAR _EnormouslyText
     TX_FAR _RoseText
     db "@"
@@ -61557,7 +61565,7 @@ StatModifierDownEffect:
     ld hl,.GreatlyFellText
     ret
 .GreatlyFellText
-    db $0a
+    db WAIT_HALF_SECOND
     TX_FAR _GreatlyFellText
 .FellText
     TX_FAR _FellText
@@ -78418,7 +78426,7 @@ Func_51388: ; 51388 (14:5388)
 VictoryRoadGuardText1: ; 5138e (14:538e)
     TX_FAR _VictoryRoadGuardText1
     db $08 ; asm
-    ld a,$a5
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent
     call WaitForSoundToFinish
     jp TextScriptEnd
@@ -86171,8 +86179,9 @@ Route21AfterBattleText2:
     TX_FAR _ReceivedText
     db $11,"@"
 .SurfBoardNoRoomText
+    db ERROR_TEXT_SOUND
     TX_FAR _SurfBoardNoRoomText
-    db $0F,"@"
+    db "@"
 .Route21AfterBattleText2
     TX_FAR _Route21AfterBattleText2
     db "@"
@@ -94111,7 +94120,7 @@ VermilionGymTrashFailText: ; 5df02 (17:5f02)
     TX_FAR _VermilionGymTrashFailText
     db $08 ; asm
     call WaitForSoundToFinish
-    ld a,$a5
+    ld a,ERROR_SOUND
     call PlaySound
     call WaitForSoundToFinish
     jp TextScriptEnd
@@ -98685,8 +98694,9 @@ PokemonTower6AfterBattleText3:
     TX_FAR _ReceivedText
     db $11,"@"
 .BengalNoRoomText
+    db ERROR_TEXT_SOUND
     TX_FAR _BengalNoRoomText
-    db $0F,"@"
+    db "@"
 .PokemonTower6AfterBattleText3
     TX_FAR _PokemonTower6AfterBattleText3
     db "@"
@@ -133373,7 +133383,7 @@ _CantFlyHereText:
 _NotHealthyEnoughText:
     text_init , "Not healthy"
     text_line , "enough."
-    text_wait
+    text_done
 
 _CannotUseItemsHereText:
     text_init , "You can't use items"
@@ -147094,7 +147104,7 @@ DisplayDepositWithdrawMenu_:
 
 .Error
     push hl
-    ld a,$a5 ; Error
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent ; play sound
     pop hl
     call PrintText
