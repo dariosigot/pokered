@@ -25351,7 +25351,7 @@ ItemUseTMHM: ; e479 (3:6479)
 .checkIfAlreadyLearnedMove
     BANKSWITCH CheckMonAlreadyKnowMove ; check if the pokemon already knows the move
     jr nc,.continue
-    ld hl,.UnnamedText_2fe3b
+    ld hl,.AlreadyKnowsText
     call PrintText
     jr .chooseMon
 .continue
@@ -25369,8 +25369,9 @@ ItemUseTMHM: ; e479 (3:6479)
     jp RemoveUsedItem
 .TechMach
     jp RemoveTMQty ; but remove inside TM
-.UnnamedText_2fe3b
-    TX_FAR _UnnamedText_2fe3b
+.AlreadyKnowsText
+    db ERROR_TEXT_SOUND
+    TX_FAR _AlreadyKnowsText
     db "@"
 
 PrintItemUseTextAndRemoveItem:
@@ -135059,7 +135060,7 @@ _PlateauGrassText:
     text_line , "too thick to CUT!"
     text_wait
 
-_UnnamedText_2fe3b:
+_AlreadyKnowsText:
     TX_RAM $cd6d
     text_init
     text_line , "already knows"
