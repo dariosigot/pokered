@@ -25434,18 +25434,22 @@ ItemUseNoEffectNoWaitButtonPressed:
     db "@"
 
 ItemUseNotTimeText:
+    db ERROR_TEXT_SOUND
     TX_FAR _ItemUseNotTimeText
     db "@"
 
 ItemUseNotYoursToUseText:
+    db ERROR_TEXT_SOUND
     TX_FAR _ItemUseNotYoursToUseText
     db "@"
 
 ItemUseNoEffectText:
+    db ERROR_TEXT_SOUND
     TX_FAR _ItemUseNoEffectText
     db "@"
 
 ThrowBallAtTrainerMonText1:
+    db ERROR_TEXT_SOUND
     TX_FAR _ThrowBallAtTrainerMonText1
     db "@"
 
@@ -25454,14 +25458,17 @@ ThrowBallAtTrainerMonText2:
     db "@"
 
 NoCyclingAllowedHereText:
+    db ERROR_TEXT_SOUND
     TX_FAR _NoCyclingAllowedHereText
     db "@"
 
 NoSurfingHereText:
+    db ERROR_TEXT_SOUND
     TX_FAR _NoSurfingHereText
     db "@"
 
 BoxFullCannotThrowBallText:
+    db ERROR_TEXT_SOUND
     TX_FAR _BoxFullCannotThrowBallText
     db "@"
 
