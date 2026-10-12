@@ -403,10 +403,7 @@ PlayCryAndDecreaseSkillEnergy:
     call CheckAndDecreaseSkillEnergy
     ld a,[wSkillMonID]
     call GetCryData ; get cry data
-    call PlaySound ; play sound
-    xor a
-    ld [wSkillMonID],a
-    ret
+    jp PlaySound ; play sound
 
 CheckSkillEnergy:
     ld a,[wWhichPokemon]
@@ -4596,14 +4593,16 @@ TextCommand09:
     pop hl
     jp NextTextCommand
 
-; wait half a second if the user doesn't hold A or B
+WAIT_HALF_SECOND EQU $0A
+
+; wait half a second if the user doesn't hold B
 ; 0A
 ; (no arguments)
 TextCommand0A:
     push bc
     call GetJoypadState
     ld a,[H_CURRENTPRESSEDBUTTONS]
-    and a,%00000011 ; A and B buttons
+    and a,%00000010 ; ▼▲◄►StSeBA
     jr nz,.skipDelay
     ld c,30
     call DelayFrames
@@ -4611,6 +4610,9 @@ TextCommand0A:
     pop bc
     pop hl
     jp NextTextCommand
+
+ERROR_TEXT_SOUND EQU $0F
+ERROR_SOUND EQU $A5
 
 ; plays sounds
 ; this actually handles various command ID's,not just 0B
@@ -4636,9 +4638,12 @@ TextCommand0B:
     jr z,.pokemonCry
     cp $16
     jr z,.pokemonCry
+    cp ERROR_TEXT_SOUND
+    push af
     ld a,[hl]
     call PlaySoundWaitForCurrent ; call PlaySound ; Denim : modifica per riprodurre i suoni anche con velocità massima dei testi
-    call WaitForSoundToFinish
+    pop af
+    call nz,WaitForSoundToFinish
     pop hl
     pop bc
     jp NextTextCommand
@@ -4656,7 +4661,7 @@ TextCommand0B:
     db $0B,$86
     db $12,$9A
     db $0E,$91
-    db $0F,$A5 ; error
+    db ERROR_TEXT_SOUND,ERROR_SOUND
     db $10,$89
     db $11,$94
     db $13,$98
@@ -4742,25 +4747,9 @@ TextCommandJumpTable:
     dw TextCommand0C
     dw TextCommand0D
 
-SECTION "GetRowColAddressBgMap",ROM0[$1cdd]
+; Free
 
-; this function seems to be used only once
-; it store the address of a row and column of the VRAM background map in hl
-; INPUT: h - row,l - column,b - high byte of background tile map address in VRAM
-GetRowColAddressBgMap: ; 1cdd (0:1cdd)
-    xor a
-    srl h
-    rr a
-    srl h
-    rr a
-    srl h
-    rr a
-    or l
-    ld l,a
-    ld a,b
-    or h
-    ld h,a
-    ret
+SECTION "ClearBgMap",ROM0[$1cf0]
 
 ; clears a VRAM background map with blank space tiles
 ; INPUT: h - high byte of background tile map address in VRAM
@@ -7273,6 +7262,24 @@ GetJoypadStateLowSensitivityWaitReleaseJoy:
     res 5,[hl]
 .end
     ld a,[$ffb5]
+    ret
+
+; this function seems to be used only once
+; it store the address of a row and column of the VRAM background map in hl
+; INPUT: h - row,l - column,b - high byte of background tile map address in VRAM
+GetRowColAddressBgMap:
+    xor a
+    srl h
+    rr a
+    srl h
+    rr a
+    srl h
+    rr a
+    or l
+    ld l,a
+    ld a,b
+    or h
+    ld h,a
     ret
 
 ; Free
@@ -16285,9 +16292,11 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     TX_FAR _PokemartBoughtItemText
     db "@"
 .PokemartNotEnoughMoneyText
+    db ERROR_TEXT_SOUND
     TX_FAR _PokemartNotEnoughMoneyText
     db "@"
 .PokemartItemBagFullText
+    db ERROR_TEXT_SOUND
     TX_FAR _PokemartItemBagFullText
     db "@"
 .PokemonSellingGreetingText
@@ -16297,9 +16306,11 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     TX_FAR _PokemartTellSellPrice
     db "@"
 .PokemartItemBagEmptyText
+    db ERROR_TEXT_SOUND
     TX_FAR _PokemartItemBagEmptyText
     db "@"
 .PokemartUnsellableItemText
+    db ERROR_TEXT_SOUND
     TX_FAR _PokemartUnsellableItemText
     db "@"
 .PokemartThankYouText
@@ -18056,9 +18067,11 @@ UnnamedText_7b4f
     TX_FAR _UnnamedText_7b4f
     db "@"
 NothingStoredText
+    db ERROR_TEXT_SOUND
     TX_FAR _NothingStoredText
     db "@"
 UnnamedText_7b59
+    db ERROR_TEXT_SOUND
     TX_FAR _UnnamedText_7b59
     db "@"
 UnnamedText_7b5e
@@ -21261,6 +21274,31 @@ MapHeaderBanks:
     db BANK(PortRoyal_h) ; devmap
     db BANK(PortRoyal_h) ; devmap
 
+PrintBattleValueNearMon:
+    BANKSWITCH PrintBattleValueNearMon_
+    ld hl,wHPBarOldHP
+    ret
+
+DecreaseValCounterAndPrintHPNumber:
+    push af
+    push de
+    call UpdateHPBar_PrintHPNumber
+    push hl
+    ld hl,wBattleValueCounter
+    ld a,[hl]
+    and a
+    jr z,.end
+    dec [hl]
+    call z,RemoveBattleValue
+.end
+    pop hl
+    pop de
+    pop af
+    ret
+
+RemoveBattleValue:
+    BANKSWITCH_JUMP RemoveBattleValue_
+
 ; Free
 
 SECTION "CheckForceBikeOrSurf",ROMX[$438b],BANK[$3]
@@ -22388,6 +22426,7 @@ ItemUseBengal:
     ld hl,.NoLightInWaterText
     jp PrintText
 .NoLightInWaterText
+    db ERROR_TEXT_SOUND
     TX_FAR _NoLightInWaterText
     db "@"
 
@@ -23206,6 +23245,65 @@ AddPokemonToParty_HandleEnemyExclusive:
     pop de
     ret
 
+ItemUseBait:
+    ld hl,ThrewBaitText
+    call PrintText
+    ld hl,$d007 ; catch rate
+    srl [hl] ; halve catch rate
+    ld a,BAIT_ANIM
+    ld hl,$cce9 ; bait factor
+    ld de,$cce8 ; escape factor
+    jr BaitRockCommon
+
+ItemUseRock:
+    ld hl,ThrewRockText
+    call PrintText
+    ld hl,$d007 ; catch rate
+    ld a,[hl]
+    add a ; double catch rate
+    jr nc,.noCarry
+    ld a,$ff
+.noCarry
+    ld [hl],a
+    ld a,ROCK_ANIM
+    ld hl,$cce8 ; escape factor
+    ld de,$cce9 ; bait factor
+
+BaitRockCommon:
+    ld [W_ANIMATIONID],a
+    xor a
+    ld [$cc5b],a
+    ld [H_WHOSETURN],a
+    ld [de],a ; zero escape factor (for bait),zero bait factor (for rock)
+.randomLoop ; loop until a random number less than 5 is generated
+    call GenRandom
+    and a,7
+    cp 5
+    jr nc,.randomLoop
+    inc a ; increment the random number,giving a range from 1 to 5 inclusive
+;joenote - There is a bug here.
+; - The 1-to-5 number is always decremented when PrintSafariZoneBattleText runs.
+; - So getting a number of 1 will decrement immediately to zero and do nothing to the eating/angry state.
+; - To get an effective 1-to-5 turns, increment once more to bump the range to 2-to-6
+    inc a
+    ld b,a
+    ld a,[hl]
+    add b ; increase bait factor (for bait),increase escape factor (for rock)
+    jr nc,.noCarry
+    ld a,$ff
+.noCarry
+    ld [hl],a
+    PREDEF MoveAnimation
+    jp RockDamageOrBaitHealth
+
+ThrewBaitText:
+    TX_FAR _ThrewBaitText
+    db "@"
+
+ThrewRockText:
+    TX_FAR _ThrewRockText
+    db "@"
+
 ; Free
 
 SECTION "ItemUseBall",ROMX[$5687],BANK[$3]
@@ -23769,11 +23867,9 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
 .PrintText
     jp PrintText
 
-ItemUseEvoStone:
-    ld a,[W_ISINBATTLE]
-    and a
-    jp nz,ItemUseNotTime
-    BANKSWITCH_JUMP ItemUseEvoStone_
+; ─────────────────────────────────────
+; ItemUseMedicine & ItemUseVitamin
+; ─────────────────────────────────────
 
 ItemUseVitamin:
     ld a,[W_ISINBATTLE]
@@ -23784,46 +23880,30 @@ ItemUseVitamin:
 ItemUseMedicine:
     ld a,[W_NUMINPARTY]
     and a
-    jr z,.emptyParty
-    ld a,[$cf92]
-    push af
-    ld a,[$cf91]
-    push af
-    ld a,$01
-    ld [$d07d],a ; item use party menu
-    ld a,$ff
-    ld [$cfcb],a
-    ld a,[$d152]
-    and a ; using Softboiled?
-    jr z,.notUsingSoftboiled
-; if using softboiled
-    call GoBackToPartyMenu
-    jr .getPartyMonDataAddress
-.emptyParty
-    ld hl,.EmptyPartyText
-    xor a
-    ld [$cd6a],a ; item use failed
-    jp PrintText
-.EmptyPartyText
-    TX_FAR _EmptyPartyText
-    db "@"
-.MustChoiceActiveText
-    TX_FAR _MustChoiceActiveText
-    db "@"
-.notUsingSoftboiled
+    jp z,PrintEmptyPartyText
+    call .CheckSoftbolied
+    jr nz,.softboiled
+; if not using softboiled
+    call .Backup
+    call .InitializeMenu
     call DisplayPartyMenu
-.getPartyMonDataAddress
+    jr .skip
+
+.loop
+    call .RestoreItemID
+.softboiled
+    call .Backup
+    call .InitializeMenu
+    call GoBackToPartyMenu
+.skip
     jp c,.canceledItemUse
     call CheckItemOnActive
     jr z,.continue ; continue if not in battle or if active mon is choice in battle
-    pop af
-    ld [$cf91],a
-    pop af
-    ld [$cf92],a
     ld hl,.MustChoiceActiveText
     call PrintText
-.forceAnotherChoice
-    jr ItemUseMedicine ; force another choice
+    call .Restore
+    jr .loop ; force another choice
+
 .continue
     ld hl,W_PARTYMON1DATA
     ld bc,44
@@ -23835,17 +23915,14 @@ ItemUseMedicine:
     ld a,[$cf91]
     ld e,a
     ld [$d0b5],a
-    pop af
-    ld [$cf91],a
-    pop af
-    ld [$cf92],a
-    ld a,[$d152]
-    and a ; using Softboiled?
+    call .Restore
+    call .CheckSoftbolied
     jr z,.checkItemType
 ; if using softboiled
     ld a,[$cf92]
     cp d ; is the pokemon trying to use softboiled on itself?
-    jr z,.forceAnotherChoice ; if so,force another choice
+    jr z,.softboiled ; if so,force another choice
+
 .checkItemType
     ld a,[$cf91]
     cp REVIVE
@@ -23998,8 +24075,7 @@ ItemUseMedicine:
     ld [wHPBarMaxHP+1],a
     ld a,[hl]
     ld [wHPBarMaxHP],a ; max HP stored at $cee9 (2 bytes,big-endian)
-    ld a,[$d152]
-    and a ; using Softboiled?
+    call .CheckSoftbolied
     jp z,.notUsingSoftboiled2
 ; if using softboiled
     call PlayCryAndDecreaseSkillEnergy
@@ -24186,12 +24262,13 @@ ItemUseMedicine:
     dec d
     jr nz,.calculateHPBarCoordsLoop
     jr .doneHealing
+
 .healingItemNoEffect
-    call ItemUseNoEffect
-    jp .done
+    call ItemUseNoEffectNoWaitButtonPressed
+    jp .loop
+
 .doneHealing
-    ld a,[$d152]
-    and a ; using Softboiled?
+    call .CheckSoftbolied
     jr nz,.skipRemovingItem ; no item to remove if using Softboiled
     push hl
     call RemoveUsedItem
@@ -24226,7 +24303,9 @@ ItemUseMedicine:
 .playStatusAilmentCuringSound
     ld a,$8e ; status ailment curing sound
     call PlaySoundWaitForCurrent ; play sound
+
 .showHealingItemMessage
+    call .Backup
     xor a
     ld [H_AUTOBGTRANSFERENABLED],a
     call ClearScreen
@@ -24235,25 +24314,42 @@ ItemUseMedicine:
     call RedrawPartyMenu ; redraws the party menu and displays the message
     ld a,1
     ld [H_AUTOBGTRANSFERENABLED],a
-    ld c,50
+    ld c,10
     call DelayFrames
-    call WaitForTextScrollButtonPress ; wait for a button press
+    call .Restore
+    ld a,[W_ISINBATTLE]
+    and a
+    call nz,WaitForTextScrollButtonPress
+    jr nz,.done
+    call .CheckSoftbolied
+    jr z,.CheckItemInBag
+    call .CheckEnoughHealthy
+    ret nc
+    ld c,10
+    call DelayFrames
+    jp .softboiled
+.CheckItemInBag
+    ld a,[$cf97] ; new qty
+    and a
+    jp nz,.loop
+    call WaitForTextScrollButtonPress
     jr .done
+
 .canceledItemUse
     xor a
     ld [$cd6a],a ; item use failed
-    pop af
-    pop af
+    pop af ; Restore useless
+    pop af ; ...
 .done
-    ld a,[$d152]
-    and a ; using Softboiled?
+    call .CheckSoftbolied
     ret nz ; if so,return
     call GBPalWhiteOut
-    call z,GoPAL_SET_CF1C
+    call GoPAL_SET_CF1C
     ld a,[W_ISINBATTLE]
     and a
     ret nz
     jp ReloadMapData ; restore saved screen
+
 .useVitamin
     push hl
     ld a,[hl]
@@ -24364,10 +24460,7 @@ ItemUseMedicine:
     ld a,[$ff98]
     ld [hl],a
     pop hl
-    ld a,[$cf92]
-    push af
-    ld a,[$cf91]
-    push af
+    call .Backup
     push de
     push hl
     ld bc,34
@@ -24420,11 +24513,79 @@ ItemUseMedicine:
     BANKSWITCH TryEvolvingMon ; evolve pokemon,if appropriate
     ld a,$01
     ld [$cfcb],a
-    pop af
-    ld [$cf91],a
+    call .Restore
+    jp RemoveUsedItem
+
+.InitializeMenu
+    ld a,$01
+    ld [$d07d],a ; item use party menu
+    ld a,$ff
+    ld [$cfcb],a
+    ret
+
+.CheckSoftbolied
+    ld a,[$d152]
+    and a ; using Softboiled?
+    ret
+
+.Backup
+    pop bc
+    ld a,[$cf91]
+    push af
+    ld a,[$cf92]
+    push af
+    push bc
+    ret
+
+.Restore
+    pop bc
     pop af
     ld [$cf92],a
-    jp RemoveUsedItem
+    pop af
+    ld [$cf91],a
+    push bc
+    ret
+
+.RestoreItemID
+    call .CheckSoftbolied
+    ret nz
+    ld hl,wBagItems
+    ld a,[$cf92]
+    sla a
+    ld c,a
+    ld b,0
+    add hl,bc
+    ld a,[hl]
+    ld [$cf91],a
+    ret
+
+.CheckEnoughHealthy
+    ld hl,W_PARTYMON1_MAXHP
+    ld a,[$cf92]
+    ld bc,44
+    call AddNTimes
+    ld a,[hli]
+    ld [H_DIVIDEND],a
+    ld a,[hl]
+    ld [H_DIVIDEND + 1],a
+    ld a,5
+    ld [H_DIVISOR],a
+    ld b,2 ; number of bytes
+    call Divide
+    ld bc,-33
+    add hl,bc
+    ld a,[hld]
+    ld b,a
+    ld a,[H_QUOTIENT + 3]
+    sub b
+    ld b,[hl]
+    ld a,[H_QUOTIENT + 2]
+    sbc b
+    ret
+
+.MustChoiceActiveText
+    TX_FAR _MustChoiceActiveText
+    db "@"
 .VitaminStatRoseText
     TX_FAR _VitaminStatRoseText
     db "@"
@@ -24438,63 +24599,15 @@ ItemUseMedicine:
     db "SPEED@"
     db "SPECIAL@"
 
-ItemUseBait:
-    ld hl,ThrewBaitText
-    call PrintText
-    ld hl,$d007 ; catch rate
-    srl [hl] ; halve catch rate
-    ld a,BAIT_ANIM
-    ld hl,$cce9 ; bait factor
-    ld de,$cce8 ; escape factor
-    jr BaitRockCommon
+; ─────────────────────────────────────
 
-ItemUseRock:
-    ld hl,ThrewRockText
-    call PrintText
-    ld hl,$d007 ; catch rate
-    ld a,[hl]
-    add a ; double catch rate
-    jr nc,.noCarry
-    ld a,$ff
-.noCarry
-    ld [hl],a
-    ld a,ROCK_ANIM
-    ld hl,$cce8 ; escape factor
-    ld de,$cce9 ; bait factor
-
-BaitRockCommon:
-    ld [W_ANIMATIONID],a
+PrintEmptyPartyText:
     xor a
-    ld [$cc5b],a
-    ld [H_WHOSETURN],a
-    ld [de],a ; zero escape factor (for bait),zero bait factor (for rock)
-.randomLoop ; loop until a random number less than 5 is generated
-    call GenRandom
-    and a,7
-    cp 5
-    jr nc,.randomLoop
-    inc a ; increment the random number,giving a range from 1 to 5 inclusive
-;joenote - There is a bug here.
-; - The 1-to-5 number is always decremented when PrintSafariZoneBattleText runs.
-; - So getting a number of 1 will decrement immediately to zero and do nothing to the eating/angry state.
-; - To get an effective 1-to-5 turns, increment once more to bump the range to 2-to-6
-    inc a
-    ld b,a
-    ld a,[hl]
-    add b ; increase bait factor (for bait),increase escape factor (for rock)
-    jr nc,.noCarry
-    ld a,$ff
-.noCarry
-    ld [hl],a
-    PREDEF MoveAnimation
-    jp RockDamageOrBaitHealth
-
-ThrewBaitText:
-    TX_FAR _ThrewBaitText
-    db "@"
-
-ThrewRockText:
-    TX_FAR _ThrewRockText
+    ld [$cd6a],a ; item use failed
+    ld hl,.EmptyPartyText
+    jp PrintText
+.EmptyPartyText
+    TX_FAR _EmptyPartyText
     db "@"
 
 ; also used for Dig out-of-battle effect
@@ -24549,18 +24662,18 @@ CanDig:
     ret
 
 .CantDigDuringFloatText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantDigDuringFloatText
     db "@"
 .cannotDigHereText
+    db ERROR_TEXT_SOUND
     TX_FAR _CannotDigHereText
     db "@"
 
-SECTION "ItemUseRepel",ROMX[$6003],BANK[$3]
-
-ItemUseRepel: ; e003 (3:6003)
+ItemUseRepel:
     ld b,100
 
-ItemUseRepelCommon: ; e005 (3:6005)
+ItemUseRepelCommon:
     ld a,[W_ISINBATTLE]
     and a
     jp nz,ItemUseNotTime
@@ -24569,7 +24682,7 @@ ItemUseRepelCommon: ; e005 (3:6005)
     jp PrintItemUseTextAndRemoveItem
 
 ; handles X Accuracy item
-ItemUseXAccuracy: ; e013 (3:6013)
+ItemUseXAccuracy:
     ld a,[W_ISINBATTLE]
     and a
     jp z,ItemUseNotTime
@@ -24685,6 +24798,12 @@ ItemUseXStat:
     pop af
     ld [hl],a ; restore [W_PLAYERMOVENUM]
     ret
+
+ItemUseEvoStone:
+    ld a,[W_ISINBATTLE]
+    and a
+    jp nz,ItemUseNotTime
+    BANKSWITCH_JUMP ItemUseEvoStone_
 
 ; Free
 
@@ -24941,7 +25060,7 @@ ItemUseItemfinder:
     call ItemUseReloadOverworldData
     BANKSWITCH Func_7481f ; check for hidden items
     jr c,.found
-    ld a,$a5 ; Error
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent ; play sound
     ld hl,.PrintItemfinderFoundNothing
     jr .printText ; if no hidden items
@@ -24970,78 +25089,41 @@ ItemUseItemfinder:
     TX_FAR _ItemfinderFoundNothingText
     db "@"
 
+; ─────────────────────────────────────
+; ItemUsePPRestore
+; ─────────────────────────────────────
+
 ItemUsePPRestore:
     ld a,[W_NUMINPARTY]
     and a
-    jr z,.emptyParty
-    ld a,[$cf92]
-    push af
+    jp z,PrintEmptyPartyText
     ld a,[$cf91]
-    push af
     ld [$cd3d],a
-.chooseMon
-    xor a
-    ld [$cfcb],a
-    ld a,$01 ; item use party menu
-    ld [$d07d],a
+    call .Backup
+    call .InitializeMenu
     call DisplayPartyMenu
-    jr nc,.useEther
-    jp .itemNotUsed
-.emptyParty
-    ld hl,.EmptyPartyText
-    xor a
-    ld [$cd6a],a ; item use failed
-    jp PrintText
-.EmptyPartyText
-    TX_FAR _EmptyPartyText
-    db "@"
-.MustChoiceActiveText
-    TX_FAR _MustChoiceActiveText
-    db "@"
-.afterRestoringPP ; after using a (Max) Ether/Elixir
-    ld a,$8e
-    call PlaySound
-    ld a,[hl]
-    ld b,a
-    ld hl,$d11e
-    ld a,[hl]
-    push af
-    push hl
-    ld [hl],b
-    FuncCoord 08,01 ; Party Ether Update Energy
-    ld hl,Coord
-    ld a,[$cf92]
-    ld bc,40
-    call AddNTimes
-    ld de,$d11e
-    ld bc,$0103
-    call PrintNumber
-    pop hl
-    pop af
-    ld [hl],a
-    ld hl,.PPRestoredText
-    call PrintText
-    pop af
-    ld [$cf91],a
-    pop af
-    ld [$cf92],a
-    call GBPalWhiteOut
-    call GoPAL_SET_CF1C
-    jp RemoveUsedItem
-.useEther
+    jr .skip
+
+.loop
+    call .Backup
+    call .InitializeMenu
+    call GoBackToPartyMenu
+.skip
+    jp c,.canceledItemUse
     call CheckItemOnActive
     jr z,.continue ; continue if not in battle or if active mon is choice in battle
-    pop af
-    ld [$cf91],a
-    pop af
-    ld [$cf92],a
     ld hl,.MustChoiceActiveText
     call PrintText
-    jp ItemUsePPRestore ; force another choice
+    call .Restore
+    jr .loop ; force another choice
+
 .continue
     call .restorePP
     jr nz,.afterRestoringPP
-    jp .noEffect
+    call ItemUseNoEffectNoWaitButtonPressed
+    call .Restore
+    jp .loop
+
 .restorePP
     ld a,[$cd3d]
     ld b,a
@@ -25112,44 +25194,90 @@ ItemUsePPRestore:
 .NoEffect
     xor a
     ret
-.noEffect
-    call ItemUseNoEffect
-.itemNotUsed
-    call GBPalWhiteOut
-    call GoPAL_SET_CF1C
+
+.afterRestoringPP ; after using a (Max) Ether/Elixir
+    ld a,$8e
+    call PlaySound
+    ld a,[hl]
+    ld b,a
+    ld hl,$d11e
+    ld a,[hl]
+    push af
+    push hl
+    ld [hl],b
+    FuncCoord 08,01 ; Party Ether Update Energy
+    ld hl,Coord
+    ld a,[$cf92]
+    ld bc,40
+    call AddNTimes
+    ld de,$d11e
+    ld bc,$0103
+    call PrintNumber
+    pop hl
     pop af
-    pop af
+    ld [hl],a
+    ld hl,.PPRestoredText
+    call PrintText
+    ld c,10
+    call DelayFrames
+    call .Restore
+    call RemoveUsedItem
+    ld a,[W_ISINBATTLE]
+    and a
+    call nz,WaitForTextScrollButtonPress
+    jr nz,.done
+    ld a,[$cf97] ; new qty
+    and a
+    jp nz,.loop
+    call WaitForTextScrollButtonPress
+    jr .done
+
+.canceledItemUse
     xor a
     ld [$cd6a],a ; item use failed
+    pop af ; Restore useless
+    pop af ; ...
+.done
+    call GBPalWhiteOut
+    call GoPAL_SET_CF1C
+    ld a,[W_ISINBATTLE]
+    and a
+    ret nz
+    jp ReloadMapData ; restore saved screen
+
+.InitializeMenu
+    ld a,$01
+    ld [$d07d],a ; item use party menu
+    ld a,$ff
+    ld [$cfcb],a
     ret
+
+.Backup
+    pop bc
+    ld a,[$cf91]
+    push af
+    ld a,[$cf92]
+    push af
+    push bc
+    ret
+
+.Restore
+    pop bc
+    pop af
+    ld [$cf92],a
+    pop af
+    ld [$cf91],a
+    push bc
+    ret
+
+.MustChoiceActiveText
+    TX_FAR _MustChoiceActiveText
+    db "@"
 .PPRestoredText
     TX_FAR _PPRestoredText
     db "@"
 
-PrintBattleValueNearMon:
-    BANKSWITCH PrintBattleValueNearMon_
-    ld hl,wHPBarOldHP
-    ret
-
-DecreaseValCounterAndPrintHPNumber:
-    push af
-    push de
-    call UpdateHPBar_PrintHPNumber
-    push hl
-    ld hl,wBattleValueCounter
-    ld a,[hl]
-    and a
-    jr z,.end
-    dec [hl]
-    call z,RemoveBattleValue
-.end
-    pop hl
-    pop de
-    pop af
-    ret
-
-RemoveBattleValue:
-    BANKSWITCH_JUMP RemoveBattleValue_
+; ─────────────────────────────────────
 
 ; Free
 
@@ -25215,7 +25343,7 @@ ItemUseTMHM: ; e479 (3:6479)
     and a ; can the pokemon learn the move?
     jr nz,.checkIfAlreadyLearnedMove
 ; if the pokemon can't learn the move
-    ld a,$a5
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent ; play sound
     ld hl,MonCannotLearnMachineMoveText
     call PrintText
@@ -25245,34 +25373,32 @@ ItemUseTMHM: ; e479 (3:6479)
     TX_FAR _UnnamedText_2fe3b
     db "@"
 
-SECTION "PrintItemUseTextAndRemoveItem",ROMX[$6563],BANK[$3]
-
-PrintItemUseTextAndRemoveItem: ; e563 (3:6563)
+PrintItemUseTextAndRemoveItem:
     ld hl,ItemUseText00
     call PrintText
     ld a,$8e
     call PlaySound ; play sound
     call WaitForTextScrollButtonPress ; wait for button press
 
-RemoveUsedItem: ; e571 (3:6571)
+RemoveUsedItem:
     ld hl,wNumBagItems
     ld a,1 ; one item
     ld [$cf96],a ; store quantity
     jp RemoveItemFromInventory
 
-ItemUseNoEffect: ; e57c (3:657c)
+ItemUseNoEffect:
     ld hl,ItemUseNoEffectText
     jr ItemUseFailed
 
-ItemUseNotTime: ; e581 (3:6581)
+ItemUseNotTime:
     ld hl,ItemUseNotTimeText
     jr ItemUseFailed
 
-ItemUseNotYoursToUse: ; e586 (3:6586)
+ItemUseNotYoursToUse:
     ld hl,ItemUseNotYoursToUseText
     jr ItemUseFailed
 
-ThrowBallAtTrainerMon: ; e58b (3:658b)
+ThrowBallAtTrainerMon:
     call LoadScreenTilesFromBuffer1 ; restore saved screen
     call GoPAL_SET_CF1C
     call Delay3
@@ -25285,11 +25411,11 @@ ThrowBallAtTrainerMon: ; e58b (3:658b)
     call PrintText
     jr RemoveUsedItem
 
-NoCyclingAllowedHere: ; e5ac (3:65ac)
+NoCyclingAllowedHere:
     ld hl,NoCyclingAllowedHereText
     jr ItemUseFailed
 
-BoxFullCannotThrowBall: ; e5b1 (3:65b1)
+BoxFullCannotThrowBall:
     ld hl,BoxFullCannotThrowBallText
     ; ft
 
@@ -25298,53 +25424,60 @@ ItemUseFailed:
     ld [$cd6a],a ; item use failed
     jp PrintText
 
-SECTION "ItemUseNotTimeText",ROMX[$65c0],BANK[$3]
+ItemUseNoEffectNoWaitButtonPressed:
+    ld hl,.ItemUseNoEffectNoWaitButtonPressedText
+    jr ItemUseFailed
+.ItemUseNoEffectNoWaitButtonPressedText
+    db ERROR_TEXT_SOUND
+    TX_FAR _ItemUseNoEffectNoWaitButtonPressedText
+    db WAIT_HALF_SECOND
+    db "@"
 
-ItemUseNotTimeText: ; e5c0 (3:65c0)
+ItemUseNotTimeText:
     TX_FAR _ItemUseNotTimeText
     db "@"
 
-ItemUseNotYoursToUseText: ; e5c5 (3:65c5)
+ItemUseNotYoursToUseText:
     TX_FAR _ItemUseNotYoursToUseText
     db "@"
 
-ItemUseNoEffectText: ; e5ca (3:65ca)
+ItemUseNoEffectText:
     TX_FAR _ItemUseNoEffectText
     db "@"
 
-ThrowBallAtTrainerMonText1: ; e5cf (3:65cf)
+ThrowBallAtTrainerMonText1:
     TX_FAR _ThrowBallAtTrainerMonText1
     db "@"
 
-ThrowBallAtTrainerMonText2: ; e5d4 (3:65d4)
+ThrowBallAtTrainerMonText2:
     TX_FAR _ThrowBallAtTrainerMonText2
     db "@"
 
-NoCyclingAllowedHereText: ; e5d9 (3:65d9)
+NoCyclingAllowedHereText:
     TX_FAR _NoCyclingAllowedHereText
     db "@"
 
-NoSurfingHereText: ; e5de (3:65de)
+NoSurfingHereText:
     TX_FAR _NoSurfingHereText
     db "@"
 
-BoxFullCannotThrowBallText: ; e5e3 (3:65e3)
+BoxFullCannotThrowBallText:
     TX_FAR _BoxFullCannotThrowBallText
     db "@"
 
-ItemUseText00: ; e5e8 (3:65e8)
+ItemUseText00:
     TX_FAR _ItemUseText001
     db $05
     TX_FAR _ItemUseText002
     db "@"
 
-GotOnBicycleText: ; e5f2 (3:65f2)
+GotOnBicycleText:
     TX_FAR _GotOnBicycleText1
     db $05
     TX_FAR _GotOnBicycleText2
     db "@"
 
-GotOffBicycleText: ; e5fc (3:65fc)
+GotOffBicycleText:
     TX_FAR _GotOffBicycleText1
     db $05
     TX_FAR _GotOffBicycleText2
@@ -26288,12 +26421,14 @@ CanCut:
     ld [$FF00+$b0],a
     jp UpdateSprites
 .plateau
-    call WaitForSoundToFinish
-    ld a,$a5
-    call PlaySound
-    call WaitForSoundToFinish
-    ld hl,PlateauGrassText
+    ld c,60
+    call DelayFrames
+    ld hl,.PlateauGrassText
     jp PrintText
+.PlateauGrassText
+    db ERROR_TEXT_SOUND
+    TX_FAR _PlateauGrassText
+    db "@"
 
 .HandlePartyMenuToCut
     ld a,[wWhichPokemon] ; $cf92
@@ -28227,9 +28362,11 @@ UseStrength:
     and a ; rcf
     ret
 .AlreadyStrengthText
+    db ERROR_TEXT_SOUND
     TX_FAR _AlreadyStrengthText
     db "@"
 .NoStrengthDuringFloat
+    db ERROR_TEXT_SOUND
     TX_FAR _NoStrengthDuringFloat
     db "@"
 
@@ -28717,10 +28854,6 @@ RunOnlyIfNotSelectInOverworld:
 
 NothingToCutText:
     TX_FAR _NothingToCutText
-    db "@"
-
-PlateauGrassText:
-    TX_FAR _PlateauGrassText
     db "@"
 
 UsedCutText:
@@ -29916,7 +30049,7 @@ StartMenu_Pokemon:
     jr .ReturnToPartyMenu
 
 .NoSkill
-    ld a,$a5 ; Error
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent ; play sound
     jr .RedrawMenu
 
@@ -30110,7 +30243,9 @@ StartMenu_Pokemon:
     call PrintText
     jp .loop
 .notHealthyEnoughText
+    db ERROR_TEXT_SOUND
     TX_FAR _NotHealthyEnoughText
+    db WAIT_HALF_SECOND
     db "@"
 
 .goBackToMap
@@ -31088,15 +31223,19 @@ CanTeleport:
     db $ff ; terminator
 
 .CantTeleportInTheDarkText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantTeleportInTheDarkText
     db "@"
 .CantTeleportDuringFloatText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantTeleportDuringFloatText
     db "@"
 .CantTeleportInACaveText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantTeleportInACaveText
     db "@"
 .CantTeleportHereText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantTeleportHereText
     db "@"
 
@@ -31363,9 +31502,11 @@ CanFly:
     db $FF
 
 .CantFlyNoTownVisited
+    db ERROR_TEXT_SOUND
     TX_FAR _CantFlyNoTownVisited
     db "@"
 .CantFlyHereText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantFlyHereText
     db "@"
 
@@ -39867,14 +40008,14 @@ BikeShopText1: ; 1d745 (7:5745)
     ld a,[$d75f]
     bit 0,a
     jr z,.asm_260d4 ; 0x1d74b
-    ld hl,UnnamedText_1d82f
+    ld hl,.UnnamedText_1d82f
     call PrintText
     jp .Done
 .asm_260d4 ; 0x1d756
     ld b,BIKE_VOUCHER
     call IsItemInBag
     jr z,.asm_41190 ; 0x1d75b
-    ld hl,UnnamedText_1d81f
+    ld hl,.UnnamedText_1d81f
     call PrintText
     ld bc,(BICYCLE << 8) | 1
     call GiveItem
@@ -39884,15 +40025,15 @@ BikeShopText1: ; 1d745 (7:5745)
     BANKSWITCH RemoveItemByID
     ld hl,$d75f
     set 0,[hl]
-    ld hl,UnnamedText_1d824
+    ld hl,.UnnamedText_1d824
     call PrintText
     jr .Done
 .BagFull
-    ld hl,UnnamedText_1d834
+    ld hl,.UnnamedText_1d834
     call PrintText
     jr .Done
 .asm_41190 ; 0x1d78c
-    ld hl,UnnamedText_1d810
+    ld hl,.UnnamedText_1d810
     call PrintText
     xor a
     ld [$cc26],a
@@ -39914,13 +40055,13 @@ BikeShopText1: ; 1d745 (7:5745)
     call UpdateSprites
     FuncCoord 2,2 ; $c3ca
     ld hl,Coord
-    ld de,BikeShopMenuText
+    ld de,.BikeShopMenuText
     call PlaceString
     FuncCoord 8,3 ; $c3e4
     ld hl,Coord
-    ld de,BikeShopMenuPrice
+    ld de,.BikeShopMenuPrice
     call PlaceString
-    ld hl,UnnamedText_1d815
+    ld hl,.UnnamedText_1d815
     call PrintText
     call HandleMenuInput
     bit 1,a
@@ -39930,54 +40071,45 @@ BikeShopText1: ; 1d745 (7:5745)
     ld a,[$cc26]
     and a
     jr nz,.asm_b7579 ; 0x1d7e7
-    ld hl,UnnamedText_1d81a
+    ld hl,.UnnamedText_1d81a
     call PrintText
 .asm_b7579 ; 0x1d7ef
-    ld hl,UnnamedText_1d82a
+    ld hl,.UnnamedText_1d82a
     call PrintText
 .Done
     jp TextScriptEnd
 
-BikeShopMenuText: ; 1d7f8 (7:57f8)
-    db "BICYCLE","@";$4e
-;    db "CANCEL@"
-
-SECTION "BikeShopMenuPrice",ROMX[$5807],BANK[$7]
-
-BikeShopMenuPrice: ; 1d807 (7:5807)
+.BikeShopMenuText
+    db "BICYCLE","@"
+.BikeShopMenuPrice
     db "¥1000000@"
-
-UnnamedText_1d810: ; 1d810 (7:5810)
+.UnnamedText_1d810
     TX_FAR _UnnamedText_1d810
     db "@"
-
-UnnamedText_1d815: ; 1d815 (7:5815)
+.UnnamedText_1d815
     TX_FAR _UnnamedText_1d815
     db "@"
-
-UnnamedText_1d81a: ; 1d81a (7:581a)
+.UnnamedText_1d81a
+    db ERROR_TEXT_SOUND
     TX_FAR _UnnamedText_1d81a
     db "@"
-
-UnnamedText_1d81f: ; 1d81f (7:581f)
+.UnnamedText_1d81f
     TX_FAR _UnnamedText_1d81f
     db "@"
-
-UnnamedText_1d824: ; 1d824 (7:5824)
-    TX_FAR _UnnamedText_1d824 ; 0x98eb2
+.UnnamedText_1d824
+    TX_FAR _UnnamedText_1d824
     db $11,"@"
-
-UnnamedText_1d82a: ; 1d82a (7:582a)
+.UnnamedText_1d82a
     TX_FAR _UnnamedText_1d82a
     db "@"
-
-UnnamedText_1d82f: ; 1d82f (7:582f)
+.UnnamedText_1d82f
     TX_FAR _UnnamedText_1d82f
     db "@"
-
-UnnamedText_1d834: ; 1d834 (7:5834)
+.UnnamedText_1d834
     TX_FAR _UnnamedText_1d834
     db "@"
+
+SECTION "BikeShopText2",ROMX[$5839],BANK[$7]
 
 BikeShopText2: ; 1d839 (7:5839)
     db $08 ; asm
@@ -41697,7 +41829,7 @@ Route22GateText1: ; 1e6e1 (7:66e1)
 UnnamedText_1e704: ; 1e704 (7:6704)
     TX_FAR _UnnamedText_1e704 ; 0x8cfbb
     db $8
-    ld a,$a5
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent
     call WaitForSoundToFinish
     ld hl,UnnamedText_1e715 ; $6715
@@ -42194,7 +42326,7 @@ Func_1ea92: ; 1ea92 (7:6a92)
     jp CinnabarGymProcessAllGate
 .asm_1eab8
     call WaitForSoundToFinish
-    ld a,$a5
+    ld a,ERROR_SOUND
     call PlaySound
     call WaitForSoundToFinish
     ld hl,CinnabarGymQuizIncorrectText ; $6b05
@@ -42886,7 +43018,7 @@ MovesMenu:
 
 .MoveJustKnown
     call Delay3 ; Show "UnfilledArrow"
-    ld a,$a5 ; Error
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent ; play sound
     jr .Retry
 
@@ -44279,8 +44411,9 @@ DiglettsCaveRoute2Text1:
     TX_FAR _ReceivedText
     db $11,"@"
 .AugerNoRoomText
+    db ERROR_TEXT_SOUND
     TX_FAR _AugerNoRoomText
-    db $0F,"@"
+    db "@"
 .DiglettsCaveRoute2Text1
     TX_FAR _DiglettsCaveRoute2Text1
     db "@"
@@ -47161,7 +47294,7 @@ FocusEnergyEffect_: ; 27f86 (9:7f86)
 .Print
     jp PrintText
 .GettingPumpedText
-    db $0a
+    db WAIT_HALF_SECOND
     TX_FAR _GettingPumpedText
     db "@"
 .FocusEnergyAlreadyInUseText
@@ -48654,7 +48787,8 @@ SlotReward300Func: ; 37702 (d:7702)
 
 UnnamedText_37722: ; 37722 (d:7722)
     TX_FAR _UnnamedText_37722
-    db $0a,"@"
+    db WAIT_HALF_SECOND
+    db "@"
 
 Func_37728: ; 37728 (d:7728)
     ld hl,$c4ba
@@ -60468,6 +60602,7 @@ LoadGhostPic:
     BANKSWITCH_JUMP _LoadGhostPic
 
 ItemsCantBeUsedHere:
+    db ERROR_TEXT_SOUND
     TX_FAR ItemsCantBeUsedHere_
     db "@"
 
@@ -61233,13 +61368,13 @@ StatModifierUpEffect:
     ld hl,.EnormouslyText
     ret
 .GreatlyText
-    db $0a
+    db WAIT_HALF_SECOND
     TX_FAR _GreatlyText
 .RoseText
     TX_FAR _RoseText
     db "@"
 .EnormouslyText
-    db $0a
+    db WAIT_HALF_SECOND
     TX_FAR _EnormouslyText
     TX_FAR _RoseText
     db "@"
@@ -61439,7 +61574,7 @@ StatModifierDownEffect:
     ld hl,.GreatlyFellText
     ret
 .GreatlyFellText
-    db $0a
+    db WAIT_HALF_SECOND
     TX_FAR _GreatlyFellText
 .FellText
     TX_FAR _FellText
@@ -62092,16 +62227,20 @@ DisableEffect:
     ld hl,.AlreadyDisabledText
     jp Delay50AndPrintText
 .MoveWasDisabledText
+    db ERROR_TEXT_SOUND
     TX_FAR _MoveWasDisabledText
     db "@"
 .NoEnergyText
+    db ERROR_TEXT_SOUND
     TX_FAR _NoEnergyText
     db "@"
 .AlreadyDisabledText
+    db ERROR_TEXT_SOUND
     TX_FAR _AlreadyDisabledText
     db "@"
 
 NothingHappenedText:
+    db ERROR_TEXT_SOUND
     TX_FAR _NothingHappenedText
     db "@"
 
@@ -73835,7 +73974,7 @@ CeladonGameCornerText1: ; 48ca4 (12:4ca4)
 CeladonGameCornerText2: ; 48ca9 (12:4ca9)
     db $08 ; asm
     call Func_48f1e
-    ld hl,UnnamedText_48d22
+    ld hl,.UnnamedText_48d22
     call PrintText
     call YesNoChoice
     ld a,[$cc26]
@@ -73853,7 +73992,7 @@ CeladonGameCornerText2: ; 48ca9 (12:4ca9)
     ldh [$9f],a
     call HasEnoughMoney
     jr nc,.asm_b6ef0 ; 0x48cd4
-    ld hl,UnnamedText_48d31 ; $4d31
+    ld hl,.UnnamedText_48d31 ; $4d31
     jr .asm_e2afd ; 0x48cd9
 .asm_b6ef0 ; 0x48cdb
     xor a
@@ -73875,51 +74014,45 @@ CeladonGameCornerText2: ; 48ca9 (12:4ca9)
     ld c,$2
     PREDEF Func_f81d
     call Func_48f1e
-    call PlayCoinSoundAndLoadText ; ld hl,UnnamedText_48d27
-    jr .asm_e2afd ; 0x48d0d
-.asm_c650b ; 0x48d0f
-    ld hl,UnnamedText_48d2c
-    jr .asm_e2afd ; 0x48d12
-.asm_31338 ; 0x48d14
-    ld hl,UnnamedText_48d36
-    jr .asm_e2afd ; 0x48d17
-.asm_ed086 ; 0x48d19
-    ld hl,UnnamedText_48d3b
-.asm_e2afd ; 0x48d1c
+    call PlayCoinSound
+    ld hl,.UnnamedText_48d27
+    jr .asm_e2afd
+.asm_c650b
+    ld hl,.UnnamedText_48d2c
+    jr .asm_e2afd
+.asm_31338
+    ld hl,.UnnamedText_48d36
+    jr .asm_e2afd
+.asm_ed086
+    ld hl,.UnnamedText_48d3b
+.asm_e2afd
     call PrintText
     jp TextScriptEnd
-
-UnnamedText_48d22: ; 48d22 (12:4d22)
+.UnnamedText_48d22
     TX_FAR _UnnamedText_48d22
     db "@"
-
-UnnamedText_48d27: ; 48d27 (12:4d27)
+.UnnamedText_48d27
     TX_FAR _UnnamedText_48d27
     db "@"
-
-UnnamedText_48d2c: ; 48d2c (12:4d2c)
+.UnnamedText_48d2c
     TX_FAR _UnnamedText_48d2c
     db "@"
-
-UnnamedText_48d31: ; 48d31 (12:4d31)
+.UnnamedText_48d31
+    db ERROR_TEXT_SOUND
     TX_FAR _UnnamedText_48d31
     db "@"
-
-UnnamedText_48d36: ; 48d36 (12:4d36)
+.UnnamedText_48d36
+    db ERROR_TEXT_SOUND
     TX_FAR _UnnamedText_48d36
     db "@"
-
-UnnamedText_48d3b: ; 48d3b (12:4d3b)
+.UnnamedText_48d3b
+    db ERROR_TEXT_SOUND
     TX_FAR _UnnamedText_48d3b
     db "@"
 
-CeladonGameCornerText3: ; 48d40 (12:4d40)
-    TX_FAR _CeladonGameCornerText3
-    db "@"
+; Free
 
-CeladonGameCornerText4: ; 48d45 (12:4d45)
-    TX_FAR _CeladonGameCornerText4
-    db "@"
+SECTION "CeladonGameCornerText5",ROMX[$4d4a],BANK[$12]
 
 CeladonGameCornerText5: ; 48d4a (12:4d4a)
     db $08 ; asm
@@ -76599,12 +76732,10 @@ SafariZoneWestPostGhost:
 .reset
     jr SafariZoneWestResetScript
 
-PlayCoinSoundAndLoadText:
+PlayCoinSound:
     ld a,$b2
     call PlaySoundWaitForCurrent ; play sound
-    call WaitForSoundToFinish ; wait until sound is done playing
-    ld hl,UnnamedText_48d27
-    ret
+    jp WaitForSoundToFinish ; wait until sound is done playing
 
 MtMoonPokecenterScript:
     call Func_22fa
@@ -76666,6 +76797,18 @@ MtMoon1AfterBattleText2:
 .HM07AfterText
     TX_FAR _HM07AfterText
     db "@"
+
+; ──────────────────────
+
+CeladonGameCornerText3:
+    TX_FAR _CeladonGameCornerText3
+    db "@"
+
+CeladonGameCornerText4:
+    TX_FAR _CeladonGameCornerText4
+    db "@"
+
+; ──────────────────────
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -78300,7 +78443,7 @@ Func_51388: ; 51388 (14:5388)
 VictoryRoadGuardText1: ; 5138e (14:538e)
     TX_FAR _VictoryRoadGuardText1
     db $08 ; asm
-    ld a,$a5
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent
     call WaitForSoundToFinish
     jp TextScriptEnd
@@ -80552,14 +80695,15 @@ CeladonPrizeMenu: ; 5271b (14:671b)
     res 6,[hl]
     ret
 .RequireCoinCaseTextPtr
-    TX_FAR _RequireCoinCaseText ; 22:628E
+    db ERROR_TEXT_SOUND
+    TX_FAR _RequireCoinCaseText
     db $0D
     db "@"
 .ExchangeCoinsForPrizesTextPtr
-    TX_FAR _ExchangeCoinsForPrizesText ; 22:62A9
+    TX_FAR _ExchangeCoinsForPrizesText
     db "@"
 .WhichPrizeTextPtr
-    TX_FAR _WhichPrizeText ; 22:62CD
+    TX_FAR _WhichPrizeText
     db "@"
 
 SECTION "GetPrizeMenuId",ROMX[$678e],BANK[$14]
@@ -86053,8 +86197,9 @@ Route21AfterBattleText2:
     TX_FAR _ReceivedText
     db $11,"@"
 .SurfBoardNoRoomText
+    db ERROR_TEXT_SOUND
     TX_FAR _SurfBoardNoRoomText
-    db $0F,"@"
+    db "@"
 .Route21AfterBattleText2
     TX_FAR _Route21AfterBattleText2
     db "@"
@@ -93993,7 +94138,7 @@ VermilionGymTrashFailText: ; 5df02 (17:5f02)
     TX_FAR _VermilionGymTrashFailText
     db $08 ; asm
     call WaitForSoundToFinish
-    ld a,$a5
+    ld a,ERROR_SOUND
     call PlaySound
     call WaitForSoundToFinish
     jp TextScriptEnd
@@ -98567,8 +98712,9 @@ PokemonTower6AfterBattleText3:
     TX_FAR _ReceivedText
     db $11,"@"
 .BengalNoRoomText
+    db ERROR_TEXT_SOUND
     TX_FAR _BengalNoRoomText
-    db $0F,"@"
+    db "@"
 .PokemonTower6AfterBattleText3
     TX_FAR _PokemonTower6AfterBattleText3
     db "@"
@@ -133255,7 +133401,7 @@ _CantFlyHereText:
 _NotHealthyEnoughText:
     text_init , "Not healthy"
     text_line , "enough."
-    text_wait
+    text_done
 
 _CannotUseItemsHereText:
     text_init , "You can't use items"
@@ -134494,7 +134640,7 @@ _PPRestoredText:
     TX_NUM $d11e,1,3
     text_init , $DA," ENERGY"
     text_line , "Restored!"
-    text_wait
+    text_done
 
 _TeachMachineMoveText:
     text_init , "Teach "
@@ -134527,6 +134673,11 @@ _ItemUseNoEffectText:
     text_init , "It won't have any"
     text_line , "effect."
     text_wait
+
+_ItemUseNoEffectNoWaitButtonPressedText:
+    text_init , "It won't have any"
+    text_line , "effect."
+    text_done
 
 _ThrowBallAtTrainerMonText1:
     text_init , "The trainer"
@@ -146941,6 +147092,7 @@ DisplayDepositWithdrawMenu_:
     scf
     ret
 .CantTakeMonText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantTakeMonText
     db "@"
 
@@ -146963,15 +147115,17 @@ DisplayDepositWithdrawMenu_:
     scf
     ret
 .CantDepositLastMonText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantDepositLastMonText
     db "@"
 .BoxFullText
+    db ERROR_TEXT_SOUND
     TX_FAR _BoxFullText
     db "@"
 
 .Error
     push hl
-    ld a,$a5 ; Error
+    ld a,ERROR_SOUND
     call PlaySoundWaitForCurrent ; play sound
     pop hl
     call PrintText
