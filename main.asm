@@ -16292,9 +16292,11 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     TX_FAR _PokemartBoughtItemText
     db "@"
 .PokemartNotEnoughMoneyText
+    db ERROR_TEXT_SOUND
     TX_FAR _PokemartNotEnoughMoneyText
     db "@"
 .PokemartItemBagFullText
+    db ERROR_TEXT_SOUND
     TX_FAR _PokemartItemBagFullText
     db "@"
 .PokemonSellingGreetingText
@@ -16304,9 +16306,11 @@ DisplayPokemartDialogue_: ; 6c20 (1:6c20)
     TX_FAR _PokemartTellSellPrice
     db "@"
 .PokemartItemBagEmptyText
+    db ERROR_TEXT_SOUND
     TX_FAR _PokemartItemBagEmptyText
     db "@"
 .PokemartUnsellableItemText
+    db ERROR_TEXT_SOUND
     TX_FAR _PokemartUnsellableItemText
     db "@"
 .PokemartThankYouText
@@ -18063,9 +18067,11 @@ UnnamedText_7b4f
     TX_FAR _UnnamedText_7b4f
     db "@"
 NothingStoredText
+    db ERROR_TEXT_SOUND
     TX_FAR _NothingStoredText
     db "@"
 UnnamedText_7b59
+    db ERROR_TEXT_SOUND
     TX_FAR _UnnamedText_7b59
     db "@"
 UnnamedText_7b5e
@@ -22420,6 +22426,7 @@ ItemUseBengal:
     ld hl,.NoLightInWaterText
     jp PrintText
 .NoLightInWaterText
+    db ERROR_TEXT_SOUND
     TX_FAR _NoLightInWaterText
     db "@"
 
@@ -24655,9 +24662,11 @@ CanDig:
     ret
 
 .CantDigDuringFloatText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantDigDuringFloatText
     db "@"
 .cannotDigHereText
+    db ERROR_TEXT_SOUND
     TX_FAR _CannotDigHereText
     db "@"
 
@@ -28353,9 +28362,11 @@ UseStrength:
     and a ; rcf
     ret
 .AlreadyStrengthText
+    db ERROR_TEXT_SOUND
     TX_FAR _AlreadyStrengthText
     db "@"
 .NoStrengthDuringFloat
+    db ERROR_TEXT_SOUND
     TX_FAR _NoStrengthDuringFloat
     db "@"
 
@@ -31212,15 +31223,19 @@ CanTeleport:
     db $ff ; terminator
 
 .CantTeleportInTheDarkText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantTeleportInTheDarkText
     db "@"
 .CantTeleportDuringFloatText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantTeleportDuringFloatText
     db "@"
 .CantTeleportInACaveText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantTeleportInACaveText
     db "@"
 .CantTeleportHereText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantTeleportHereText
     db "@"
 
@@ -31487,9 +31502,11 @@ CanFly:
     db $FF
 
 .CantFlyNoTownVisited
+    db ERROR_TEXT_SOUND
     TX_FAR _CantFlyNoTownVisited
     db "@"
 .CantFlyHereText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantFlyHereText
     db "@"
 
@@ -39991,14 +40008,14 @@ BikeShopText1: ; 1d745 (7:5745)
     ld a,[$d75f]
     bit 0,a
     jr z,.asm_260d4 ; 0x1d74b
-    ld hl,UnnamedText_1d82f
+    ld hl,.UnnamedText_1d82f
     call PrintText
     jp .Done
 .asm_260d4 ; 0x1d756
     ld b,BIKE_VOUCHER
     call IsItemInBag
     jr z,.asm_41190 ; 0x1d75b
-    ld hl,UnnamedText_1d81f
+    ld hl,.UnnamedText_1d81f
     call PrintText
     ld bc,(BICYCLE << 8) | 1
     call GiveItem
@@ -40008,15 +40025,15 @@ BikeShopText1: ; 1d745 (7:5745)
     BANKSWITCH RemoveItemByID
     ld hl,$d75f
     set 0,[hl]
-    ld hl,UnnamedText_1d824
+    ld hl,.UnnamedText_1d824
     call PrintText
     jr .Done
 .BagFull
-    ld hl,UnnamedText_1d834
+    ld hl,.UnnamedText_1d834
     call PrintText
     jr .Done
 .asm_41190 ; 0x1d78c
-    ld hl,UnnamedText_1d810
+    ld hl,.UnnamedText_1d810
     call PrintText
     xor a
     ld [$cc26],a
@@ -40038,13 +40055,13 @@ BikeShopText1: ; 1d745 (7:5745)
     call UpdateSprites
     FuncCoord 2,2 ; $c3ca
     ld hl,Coord
-    ld de,BikeShopMenuText
+    ld de,.BikeShopMenuText
     call PlaceString
     FuncCoord 8,3 ; $c3e4
     ld hl,Coord
-    ld de,BikeShopMenuPrice
+    ld de,.BikeShopMenuPrice
     call PlaceString
-    ld hl,UnnamedText_1d815
+    ld hl,.UnnamedText_1d815
     call PrintText
     call HandleMenuInput
     bit 1,a
@@ -40054,54 +40071,45 @@ BikeShopText1: ; 1d745 (7:5745)
     ld a,[$cc26]
     and a
     jr nz,.asm_b7579 ; 0x1d7e7
-    ld hl,UnnamedText_1d81a
+    ld hl,.UnnamedText_1d81a
     call PrintText
 .asm_b7579 ; 0x1d7ef
-    ld hl,UnnamedText_1d82a
+    ld hl,.UnnamedText_1d82a
     call PrintText
 .Done
     jp TextScriptEnd
 
-BikeShopMenuText: ; 1d7f8 (7:57f8)
-    db "BICYCLE","@";$4e
-;    db "CANCEL@"
-
-SECTION "BikeShopMenuPrice",ROMX[$5807],BANK[$7]
-
-BikeShopMenuPrice: ; 1d807 (7:5807)
+.BikeShopMenuText
+    db "BICYCLE","@"
+.BikeShopMenuPrice
     db "¥1000000@"
-
-UnnamedText_1d810: ; 1d810 (7:5810)
+.UnnamedText_1d810
     TX_FAR _UnnamedText_1d810
     db "@"
-
-UnnamedText_1d815: ; 1d815 (7:5815)
+.UnnamedText_1d815
     TX_FAR _UnnamedText_1d815
     db "@"
-
-UnnamedText_1d81a: ; 1d81a (7:581a)
+.UnnamedText_1d81a
+    db ERROR_TEXT_SOUND
     TX_FAR _UnnamedText_1d81a
     db "@"
-
-UnnamedText_1d81f: ; 1d81f (7:581f)
+.UnnamedText_1d81f
     TX_FAR _UnnamedText_1d81f
     db "@"
-
-UnnamedText_1d824: ; 1d824 (7:5824)
-    TX_FAR _UnnamedText_1d824 ; 0x98eb2
+.UnnamedText_1d824
+    TX_FAR _UnnamedText_1d824
     db $11,"@"
-
-UnnamedText_1d82a: ; 1d82a (7:582a)
+.UnnamedText_1d82a
     TX_FAR _UnnamedText_1d82a
     db "@"
-
-UnnamedText_1d82f: ; 1d82f (7:582f)
+.UnnamedText_1d82f
     TX_FAR _UnnamedText_1d82f
     db "@"
-
-UnnamedText_1d834: ; 1d834 (7:5834)
+.UnnamedText_1d834
     TX_FAR _UnnamedText_1d834
     db "@"
+
+SECTION "BikeShopText2",ROMX[$5839],BANK[$7]
 
 BikeShopText2: ; 1d839 (7:5839)
     db $08 ; asm
@@ -60594,6 +60602,7 @@ LoadGhostPic:
     BANKSWITCH_JUMP _LoadGhostPic
 
 ItemsCantBeUsedHere:
+    db ERROR_TEXT_SOUND
     TX_FAR ItemsCantBeUsedHere_
     db "@"
 
@@ -62218,16 +62227,20 @@ DisableEffect:
     ld hl,.AlreadyDisabledText
     jp Delay50AndPrintText
 .MoveWasDisabledText
+    db ERROR_TEXT_SOUND
     TX_FAR _MoveWasDisabledText
     db "@"
 .NoEnergyText
+    db ERROR_TEXT_SOUND
     TX_FAR _NoEnergyText
     db "@"
 .AlreadyDisabledText
+    db ERROR_TEXT_SOUND
     TX_FAR _AlreadyDisabledText
     db "@"
 
 NothingHappenedText:
+    db ERROR_TEXT_SOUND
     TX_FAR _NothingHappenedText
     db "@"
 
@@ -73961,7 +73974,7 @@ CeladonGameCornerText1: ; 48ca4 (12:4ca4)
 CeladonGameCornerText2: ; 48ca9 (12:4ca9)
     db $08 ; asm
     call Func_48f1e
-    ld hl,UnnamedText_48d22
+    ld hl,.UnnamedText_48d22
     call PrintText
     call YesNoChoice
     ld a,[$cc26]
@@ -73979,7 +73992,7 @@ CeladonGameCornerText2: ; 48ca9 (12:4ca9)
     ldh [$9f],a
     call HasEnoughMoney
     jr nc,.asm_b6ef0 ; 0x48cd4
-    ld hl,UnnamedText_48d31 ; $4d31
+    ld hl,.UnnamedText_48d31 ; $4d31
     jr .asm_e2afd ; 0x48cd9
 .asm_b6ef0 ; 0x48cdb
     xor a
@@ -74001,51 +74014,45 @@ CeladonGameCornerText2: ; 48ca9 (12:4ca9)
     ld c,$2
     PREDEF Func_f81d
     call Func_48f1e
-    call PlayCoinSoundAndLoadText ; ld hl,UnnamedText_48d27
-    jr .asm_e2afd ; 0x48d0d
-.asm_c650b ; 0x48d0f
-    ld hl,UnnamedText_48d2c
-    jr .asm_e2afd ; 0x48d12
-.asm_31338 ; 0x48d14
-    ld hl,UnnamedText_48d36
-    jr .asm_e2afd ; 0x48d17
-.asm_ed086 ; 0x48d19
-    ld hl,UnnamedText_48d3b
-.asm_e2afd ; 0x48d1c
+    call PlayCoinSound
+    ld hl,.UnnamedText_48d27
+    jr .asm_e2afd
+.asm_c650b
+    ld hl,.UnnamedText_48d2c
+    jr .asm_e2afd
+.asm_31338
+    ld hl,.UnnamedText_48d36
+    jr .asm_e2afd
+.asm_ed086
+    ld hl,.UnnamedText_48d3b
+.asm_e2afd
     call PrintText
     jp TextScriptEnd
-
-UnnamedText_48d22: ; 48d22 (12:4d22)
+.UnnamedText_48d22
     TX_FAR _UnnamedText_48d22
     db "@"
-
-UnnamedText_48d27: ; 48d27 (12:4d27)
+.UnnamedText_48d27
     TX_FAR _UnnamedText_48d27
     db "@"
-
-UnnamedText_48d2c: ; 48d2c (12:4d2c)
+.UnnamedText_48d2c
     TX_FAR _UnnamedText_48d2c
     db "@"
-
-UnnamedText_48d31: ; 48d31 (12:4d31)
+.UnnamedText_48d31
+    db ERROR_TEXT_SOUND
     TX_FAR _UnnamedText_48d31
     db "@"
-
-UnnamedText_48d36: ; 48d36 (12:4d36)
+.UnnamedText_48d36
+    db ERROR_TEXT_SOUND
     TX_FAR _UnnamedText_48d36
     db "@"
-
-UnnamedText_48d3b: ; 48d3b (12:4d3b)
+.UnnamedText_48d3b
+    db ERROR_TEXT_SOUND
     TX_FAR _UnnamedText_48d3b
     db "@"
 
-CeladonGameCornerText3: ; 48d40 (12:4d40)
-    TX_FAR _CeladonGameCornerText3
-    db "@"
+; Free
 
-CeladonGameCornerText4: ; 48d45 (12:4d45)
-    TX_FAR _CeladonGameCornerText4
-    db "@"
+SECTION "CeladonGameCornerText5",ROMX[$4d4a],BANK[$12]
 
 CeladonGameCornerText5: ; 48d4a (12:4d4a)
     db $08 ; asm
@@ -76725,12 +76732,10 @@ SafariZoneWestPostGhost:
 .reset
     jr SafariZoneWestResetScript
 
-PlayCoinSoundAndLoadText:
+PlayCoinSound:
     ld a,$b2
     call PlaySoundWaitForCurrent ; play sound
-    call WaitForSoundToFinish ; wait until sound is done playing
-    ld hl,UnnamedText_48d27
-    ret
+    jp WaitForSoundToFinish ; wait until sound is done playing
 
 MtMoonPokecenterScript:
     call Func_22fa
@@ -76792,6 +76797,18 @@ MtMoon1AfterBattleText2:
 .HM07AfterText
     TX_FAR _HM07AfterText
     db "@"
+
+; ──────────────────────
+
+CeladonGameCornerText3:
+    TX_FAR _CeladonGameCornerText3
+    db "@"
+
+CeladonGameCornerText4:
+    TX_FAR _CeladonGameCornerText4
+    db "@"
+
+; ──────────────────────
 
 SECTION "bank13",ROMX,BANK[$13]
 
@@ -80678,14 +80695,15 @@ CeladonPrizeMenu: ; 5271b (14:671b)
     res 6,[hl]
     ret
 .RequireCoinCaseTextPtr
-    TX_FAR _RequireCoinCaseText ; 22:628E
+    db ERROR_TEXT_SOUND
+    TX_FAR _RequireCoinCaseText
     db $0D
     db "@"
 .ExchangeCoinsForPrizesTextPtr
-    TX_FAR _ExchangeCoinsForPrizesText ; 22:62A9
+    TX_FAR _ExchangeCoinsForPrizesText
     db "@"
 .WhichPrizeTextPtr
-    TX_FAR _WhichPrizeText ; 22:62CD
+    TX_FAR _WhichPrizeText
     db "@"
 
 SECTION "GetPrizeMenuId",ROMX[$678e],BANK[$14]
@@ -147074,6 +147092,7 @@ DisplayDepositWithdrawMenu_:
     scf
     ret
 .CantTakeMonText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantTakeMonText
     db "@"
 
@@ -147096,9 +147115,11 @@ DisplayDepositWithdrawMenu_:
     scf
     ret
 .CantDepositLastMonText
+    db ERROR_TEXT_SOUND
     TX_FAR _CantDepositLastMonText
     db "@"
 .BoxFullText
+    db ERROR_TEXT_SOUND
     TX_FAR _BoxFullText
     db "@"
 
