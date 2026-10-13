@@ -627,7 +627,7 @@ OverworldLoop: ; 03ff (0:03ff)
     ld a,[W_CUROPPONENT] ; $d059
     and a
     jp nz,.newBattle
-    call IsSpriteInFrontOfPlayer4
+    call IsSpriteInFrontOfPlayer5
     ld hl,wCollisionWithSpriteBit5
     res 5,[hl]
     jr z,.NoSpriteCollision
@@ -7882,6 +7882,19 @@ IsSpriteInFrontOfPlayer4:
     ld a,[$ff8c]
     and a ; was there a sprite collision?
     ret ; nz = collison
+
+IsSpriteInFrontOfPlayer5:
+    push bc
+    ld hl,$ff8c
+    ld b,[hl]
+    push hl
+    push bc
+    call IsSpriteInFrontOfPlayer4
+    pop bc
+    pop hl
+    ld [hl],b
+    pop bc
+    ret
 
 IsSkill:
     push bc
