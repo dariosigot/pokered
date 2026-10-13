@@ -65911,20 +65911,9 @@ Func_41676: ; 41676 (10:5676)
     ld [$cc5b],a
     PREDEF_JUMP MoveAnimation
 
-PlayIntro: ; 41682 (10:5682)
-    xor a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    inc a
-    ld [H_AUTOBGTRANSFERENABLED],a
-    call Func_4188a
-    call PlayIntroScene
-    call GBFadeOut2
-    xor a
-    ld [$FF00+$ae],a
-    ld [H_AUTOBGTRANSFERENABLED],a
-    call CleanLCD_OAM
-    call DelayFrame
-    ret
+; Free
+
+SECTION "PlayIntroScene",ROMX[$569d],BANK[$10]
 
 PlayIntroScene: ; 4169d (10:569d)
     ld b,$7
@@ -66207,8 +66196,8 @@ Func_41852: ; 41852 (10:5852)
     jp FarCopyData2
 
 Func_4188a: ; 4188a (10:588a)
-    ld b,$c
-    call GoPAL_SET
+    ds 2 ; ld b,$c
+    ds 3 ; call GoPAL_SET
     BANKSWITCH LoadCopyrightAndTextBoxTiles
     ld a,$e4
     ld [rBGP],a ; $FF00+$47
@@ -66877,6 +66866,46 @@ PokedexEntryPointers:
     dw MissingNoDexEntry  ; 157 - MON_157
     dw MissingNoDexEntry  ; 158 - MON_158
     dw MissingNoDexEntry  ; 159 - MON_159
+
+; ──────────────────────
+
+PlayIntro:
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    inc a
+    ld [H_AUTOBGTRANSFERENABLED],a
+    ld b,$c
+    call GoPAL_SET
+    ld c,10
+    call .CheckABInterruption
+    jr c,.skip
+    call Func_4188a
+    call PlayIntroScene
+.skip
+    call GBFadeOut2
+    xor a
+    ld [$FF00+$ae],a
+    ld [H_AUTOBGTRANSFERENABLED],a
+    call CleanLCD_OAM
+    jp DelayFrame
+
+.CheckABInterruption
+    call DelayFrame
+    push bc
+    call GetJoypadStateLowSensitivity
+    pop bc
+    ld a,[H_CURRENTPRESSEDBUTTONS]
+    cp %00000011 ; ▼▲◄►StSeBA
+    jr z,.setCarry
+    dec c
+    jr nz,.CheckABInterruption
+    and a ; rcf
+    ret
+.setCarry
+    scf
+    ret
+
+; ──────────────────────
 
 SECTION "bank11",ROMX,BANK[$11]
 
