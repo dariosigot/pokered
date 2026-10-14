@@ -66886,7 +66886,7 @@ PlayIntro:
     ld b,$c
     call GoPAL_SET
     ld c,10
-    call .CheckABInterruption
+    call .CheckInterruption
     jr c,.skip
     call Func_4188a
     call PlayIntroScene
@@ -66898,16 +66898,17 @@ PlayIntro:
     call CleanLCD_OAM
     jp DelayFrame
 
-.CheckABInterruption
+.CheckInterruption
     call DelayFrame
     push bc
     call GetJoypadStateLowSensitivity
     pop bc
     ld a,[H_CURRENTPRESSEDBUTTONS]
-    cp %00000011 ; ▼▲◄►StSeBA
+    and %00000101 ; ▼▲◄►StSeBA
+    cp %00000101 ; ▼▲◄►StSeBA
     jr z,.setCarry
     dec c
-    jr nz,.CheckABInterruption
+    jr nz,.CheckInterruption
     and a ; rcf
     ret
 .setCarry
