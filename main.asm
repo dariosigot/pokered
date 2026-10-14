@@ -136562,16 +136562,17 @@ FadeOutAnimationAndPlayHealSound:
 .skip
     ld a,$E8
     ld [$C0EE],a
-    call PlaySound ; play sound?
+    call PlaySound
 .WaitLoop
     ld a,[$C026]
     cp $E8
     jr z,.WaitLoop
-    ld a,[$C0F0]
-    ld [$C0EF],a
-    ld a,[$D35B]
-    ld [$C0EE],a
-    call PlaySound
+    ;ld a,[$C0F0]
+    ;ld [$C0EF],a
+    ;ld a,[$D35B]
+    ;ld [$C0EE],a
+    ;call PlaySound
+    call PlayDefaultMusic
     jp GBFadeIn2
 
 ; ──────────────────────────────────────────────────────────────────────
