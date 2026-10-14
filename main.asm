@@ -22375,12 +22375,13 @@ SurfingCryAndGetSurfingGotOnText:
     TX_FAR _SurfingGotOnText
     db "@"
 
-GetEndSurfText:
+PrintEndSurfText:
     call IsSurfingOnLapras
     ld hl,.EndSurfOnLaprasText
-    ret z
+    jr z,.end
     ld hl,.EndSurfText
-    ret
+.end
+    jp PrintText
 .EndSurfOnLaprasText:
     TX_FAR _EndSurfOnLaprasText
     db "@"
@@ -23791,9 +23792,11 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld hl,$d728 ; Disable Strength
     res 0,[hl]  ; ...
     call CheckDisableLightDuringFloat
-    call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play surfing music
     ld hl,.HandleSurfboardTextMessage
-    jp RunOnlyIfNotSelectInOverworld
+    call RunOnlyIfNotSelectInOverworld
+.PlayDefaultMusicFadeOutCurrent
+    call WaitForSoundToFinish
+    jp PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play surfing music
 .tryToStopSurfing
     xor a
     ld [$ff8c],a
@@ -23829,9 +23832,8 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld [$d700],a ; change player state to walking
 ;    dec a
 ;    ld [wJoypadForbiddenButtonsMask],a
-    call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play walking music
-    call GetEndSurfText
-    jr .PrintText
+    call PrintEndSurfText
+    jr .PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play walking music
 ; uses a simulated button press to make the player move forward
 .makePlayerMoveForward
     ld a,[$d52a] ; direction the player is going
