@@ -72554,31 +72554,20 @@ MomWakeUpText: ; 48185 (12:4185)
     db "@"
 
 MomHealPokemon: ; 4818a (12:418a)
-    ld hl,MomHealText1
+    ld hl,.MomHealText1
     call PrintText
-    call GBFadeOut2
-    call ReloadMapData
     PREDEF HealParty
-    ld a,$E8
-    ld [$C0EE],a
-    call PlaySound ; play sound?
-.next
-    ld a,[$C026]
-    cp $E8
-    jr z,.next
-    ld a,[$D35B]
-    ld [$C0EE],a
-    call PlaySound
-    call GBFadeIn2
-    ld hl,MomHealText2
+    PREDEF FadeOutAnimationAndPlayHealSound
+    ld hl,.MomHealText2
     jp PrintText
-
-MomHealText1: ; 481bc (12:41bc)
+.MomHealText1
     TX_FAR _MomHealText1
     db "@"
-MomHealText2: ; 481c1 (12:41c1)
+.MomHealText2
     TX_FAR _MomHealText2
     db "@"
+
+SECTION "RedsHouse1FText2",ROMX[$41c6],BANK[$12]
 
 RedsHouse1FText2: ; 0x481c6 TV
     db 8
@@ -93553,33 +93542,30 @@ SilphCo9Text1: ; 5d8b8 (17:58b8)
     db $08 ; asm
     ld a,[$d838]
     bit 7,a
-    jr nz,.asm_a14c3 ; 0x5d8be
-    ld hl,UnnamedText_5d8e5
+    jr nz,.asm_a14c3
+    ld hl,.UnnamedText_5d8e5
     call PrintText
     PREDEF HealParty
-    call GBFadeOut2
-    call Delay3
-    call GBFadeIn2
-    ld hl,UnnamedText_5d8ea
+    PREDEF FadeOutAnimationAndPlayHealSound
+    ld hl,.UnnamedText_5d8ea
     call PrintText
-    jr .asm_b6e28 ; 0x5d8da
-.asm_a14c3 ; 0x5d8dc
-    ld hl,UnnamedText_5d8ef
+    jr .asm_b6e28
+.asm_a14c3
+    ld hl,.UnnamedText_5d8ef
     call PrintText
-.asm_b6e28 ; 0x5d8e2
+.asm_b6e28
     jp TextScriptEnd
-
-UnnamedText_5d8e5: ; 5d8e5 (17:58e5)
+.UnnamedText_5d8e5
     TX_FAR _UnnamedText_5d8e5
     db "@"
-
-UnnamedText_5d8ea: ; 5d8ea (17:58ea)
+.UnnamedText_5d8ea
     TX_FAR _UnnamedText_5d8ea
     db "@"
-
-UnnamedText_5d8ef: ; 5d8ef (17:58ef)
+.UnnamedText_5d8ef
     TX_FAR _UnnamedText_5d8ef
     db "@"
+
+SECTION "SilphCo9Text2",ROMX[$58f4],BANK[$17]
 
 SilphCo9Text2: ; 5d8f4 (17:58f4)
     db $08 ; asm
@@ -95196,7 +95182,7 @@ PokemonTower5ScriptPointers: ; 60945 (18:4945)
     dw EndTrainerBattle
 
 PokemonTower5Script0: ; 6094b (18:494b)
-    ld hl,CoordsData_60992 ; $4992
+    ld hl,.CoordsData_60992
     call ArePlayerCoordsInArray
     jr c,.asm_60960
     ld hl,$d72e
@@ -95216,23 +95202,22 @@ PokemonTower5Script0: ; 6094b (18:494b)
     ld hl,$d72e
     set 4,[hl]
     PREDEF HealParty
-    call GBFadeOut2
-    call Delay3
-    call Delay3
-    call GBFadeIn2AndLoadGBPal ; call GBFadeIn2
+    PREDEF FadeOutAnimationAndPlayHealSound
+    call LoadGBPal
     ld a,$7
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     call DisplayTextID
     xor a
     ld [wJoypadForbiddenButtonsMask],a
     ret
-
-CoordsData_60992: ; 60992 (18:4992)
+.CoordsData_60992
     db $08,$0A
     db $08,$0B
     db $09,$0A
     db $09,$0B
     db $FF
+
+SECTION "PokemonTower5TextPointers",ROMX[$499b],BANK[$18]
 
 PokemonTower5TextPointers: ; 6099b (18:499b)
     dw PokemonTower5Text1
@@ -98654,12 +98639,6 @@ SSAnne4Object:
     EVENT_DISP $f,$3,$7 ; SS_ANNE_10
     EVENT_DISP $f,$5,$1b ; SS_ANNE_1
     EVENT_DISP $f,$5,$3 ; DRATINI_CAVE
-
-; ───────────────────────────────────────
-
-GBFadeIn2AndLoadGBPal:
-    call GBFadeIn2
-    jp LoadGBPal
 
 ; ───────────────────────────────────────
 
@@ -136547,7 +136526,7 @@ SetSkillMonID:
 LearnSkill:
     call Load16BitRegisters
     push bc
-    call .Animation
+    call FadeOutAnimationAndPlayHealSound
     ld hl,.LearnSkill
     call PrintText
     pop bc
@@ -136561,7 +136540,9 @@ LearnSkill:
     TX_FAR _LearnSkillText
     db $10,$0,$58,"@"
 
-.Animation
+; ──────────────────────────────────────────────────────────────────────
+
+FadeOutAnimationAndPlayHealSound:
     call GBFadeOut2
     call ReloadMapData
     ld a,[$C0EF]
@@ -144485,6 +144466,7 @@ LearnSkillPredef:                          NEW_PREDEF LearnSkill                
 GetMonPotentialMoveListPredef:             NEW_PREDEF GetMonPotentialMoveList             ; $7C
 ReplaceTileBlockNoRedrawPredef:            NEW_PREDEF ReplaceTileBlockNoRedraw            ; $7D
 TryToRedrawMapViewPredef:                  NEW_PREDEF TryToRedrawMapView                  ; $7E
+FadeOutAnimationAndPlayHealSoundPredef:    NEW_PREDEF FadeOutAnimationAndPlayHealSound    ; $7F
 
 ; ──────────────────────────────────────────────────────────────────────
 
