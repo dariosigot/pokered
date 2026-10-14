@@ -1893,7 +1893,6 @@ wFlagFlyingMonSpriteBit2   ; dee2 ; bit 2 = Force to Load Mon Sprite with $0880 
 wOverworldPressABit2       ; dee2 ; bit 2 = Press A in Overworld (talk with invisible sprite in Unknown Dungeon Gengar)
 wFlagBaloonSpriteBit3      ; dee2 ; bit 3 = Enable Baloon Sprite durint Trade
 wTestEvoDuringBattleBit3   ; dee2 ; bit 3 = Enable to Test at least one evolution during battle
-wOverworldGoToDarkBit4     ; dee2 ; bit 4 = Force Overworld "CheckDarkMap"
 wFlagBackSpritePlayerBit4  ; dee2 ; bit 4
 wForceSortPartyWSelectBit4 ; dee2 ; bit 4 = Select Pressed Force Sort Party
 wDisableAutoRedrawMapBit5  ; dee2 ; bit 5 = Disable Auto call of "RedrawMapView" after run "ReplaceTileBlock"
@@ -1952,6 +1951,7 @@ wFlagFollowBoulderBit7      ; dee5 ; bit 7 = Force player to follow Boulder
 wSkipTextInPokedexBit7      ; dee5 ; bit 7 = Skip Text during Show Pokedex in Battle
     ds 1
 
+wOverworldGoToDarkBit0      ; dee6 ; bit 0 = Force Overworld "CheckDarkMap"
 wFlagListMenuSpc:           ; dee6 ; bit 0 = BadgeName
                             ; dee6 ; bit 1 = Celadon Mart Elevator
                             ; dee6 ; bit 2 = Silph Co Elevator

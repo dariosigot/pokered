@@ -22375,12 +22375,13 @@ SurfingCryAndGetSurfingGotOnText:
     TX_FAR _SurfingGotOnText
     db "@"
 
-GetEndSurfText:
+PrintEndSurfText:
     call IsSurfingOnLapras
     ld hl,.EndSurfOnLaprasText
-    ret z
+    jr z,.end
     ld hl,.EndSurfText
-    ret
+.end
+    jp PrintText
 .EndSurfOnLaprasText:
     TX_FAR _EndSurfOnLaprasText
     db "@"
@@ -22430,8 +22431,8 @@ ItemUseBengal:
 .end
     ld hl,wOverworlLightAnimBit0
     set 0,[hl]
-    ld hl,wOverworldGoToDarkBit4
-    res 4,[hl]
+    ld hl,wOverworldGoToDarkBit0
+    res 0,[hl]
     ld a,1
     ld [$cd6a],a ; item use success
     ret
@@ -23791,9 +23792,11 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld hl,$d728 ; Disable Strength
     res 0,[hl]  ; ...
     call CheckDisableLightDuringFloat
-    call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play surfing music
     ld hl,.HandleSurfboardTextMessage
-    jp RunOnlyIfNotSelectInOverworld
+    call RunOnlyIfNotSelectInOverworld
+.PlayDefaultMusicFadeOutCurrent
+    call WaitForSoundToFinish
+    jp PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play surfing music
 .tryToStopSurfing
     xor a
     ld [$ff8c],a
@@ -23829,9 +23832,8 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     ld [$d700],a ; change player state to walking
 ;    dec a
 ;    ld [wJoypadForbiddenButtonsMask],a
-    call PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play walking music
-    call GetEndSurfText
-    jr .PrintText
+    call PrintEndSurfText
+    jr .PlayDefaultMusicFadeOutCurrent ; call PlayDefaultMusic ; play walking music
 ; uses a simulated button press to make the player move forward
 .makePlayerMoveForward
     ld a,[$d52a] ; direction the player is going
@@ -29007,8 +29009,8 @@ CheckDisableLightDuringFloat:
     ld a,[wSkillMonID]
     cp LAPRAS
     ret z
-    ld hl,wOverworldGoToDarkBit4
-    set 4,[hl]
+    ld hl,wOverworldGoToDarkBit0
+    set 0,[hl]
     ret
 
 BackupChangedBlocks_Cut:
@@ -30108,8 +30110,15 @@ StartMenu_Pokemon:
     ld a,[hli]
     ld h,[hl]
     ld l,a
+    push hl ; set return/jump pointer
+    call .UpdateNextTile
     ld a,[W_OBTAINEDBADGES] ; badges obtained
-    jp hl
+    ret
+.UpdateNextTile
+    call GetDirectionOffset
+    call GetTileOffset
+    ld [$cfc6],a
+    ret
 .outOfBattleMovePointers
     dw .fly
     dw .teleport
@@ -66877,7 +66886,7 @@ PlayIntro:
     ld b,$c
     call GoPAL_SET
     ld c,10
-    call .CheckABInterruption
+    call .CheckInterruption
     jr c,.skip
     call Func_4188a
     call PlayIntroScene
@@ -66889,16 +66898,17 @@ PlayIntro:
     call CleanLCD_OAM
     jp DelayFrame
 
-.CheckABInterruption
+.CheckInterruption
     call DelayFrame
     push bc
     call GetJoypadStateLowSensitivity
     pop bc
     ld a,[H_CURRENTPRESSEDBUTTONS]
-    cp %00000011 ; ▼▲◄►StSeBA
+    and %00000101 ; ▼▲◄►StSeBA
+    cp %00000101 ; ▼▲◄►StSeBA
     jr z,.setCarry
     dec c
-    jr nz,.CheckABInterruption
+    jr nz,.CheckInterruption
     and a ; rcf
     ret
 .setCarry
@@ -72544,31 +72554,20 @@ MomWakeUpText: ; 48185 (12:4185)
     db "@"
 
 MomHealPokemon: ; 4818a (12:418a)
-    ld hl,MomHealText1
+    ld hl,.MomHealText1
     call PrintText
-    call GBFadeOut2
-    call ReloadMapData
     PREDEF HealParty
-    ld a,$E8
-    ld [$C0EE],a
-    call PlaySound ; play sound?
-.next
-    ld a,[$C026]
-    cp $E8
-    jr z,.next
-    ld a,[$D35B]
-    ld [$C0EE],a
-    call PlaySound
-    call GBFadeIn2
-    ld hl,MomHealText2
+    PREDEF FadeOutAnimationAndPlayHealSound
+    ld hl,.MomHealText2
     jp PrintText
-
-MomHealText1: ; 481bc (12:41bc)
+.MomHealText1
     TX_FAR _MomHealText1
     db "@"
-MomHealText2: ; 481c1 (12:41c1)
+.MomHealText2
     TX_FAR _MomHealText2
     db "@"
+
+SECTION "RedsHouse1FText2",ROMX[$41c6],BANK[$12]
 
 RedsHouse1FText2: ; 0x481c6 TV
     db 8
@@ -93543,33 +93542,30 @@ SilphCo9Text1: ; 5d8b8 (17:58b8)
     db $08 ; asm
     ld a,[$d838]
     bit 7,a
-    jr nz,.asm_a14c3 ; 0x5d8be
-    ld hl,UnnamedText_5d8e5
+    jr nz,.asm_a14c3
+    ld hl,.UnnamedText_5d8e5
     call PrintText
     PREDEF HealParty
-    call GBFadeOut2
-    call Delay3
-    call GBFadeIn2
-    ld hl,UnnamedText_5d8ea
+    PREDEF FadeOutAnimationAndPlayHealSound
+    ld hl,.UnnamedText_5d8ea
     call PrintText
-    jr .asm_b6e28 ; 0x5d8da
-.asm_a14c3 ; 0x5d8dc
-    ld hl,UnnamedText_5d8ef
+    jr .asm_b6e28
+.asm_a14c3
+    ld hl,.UnnamedText_5d8ef
     call PrintText
-.asm_b6e28 ; 0x5d8e2
+.asm_b6e28
     jp TextScriptEnd
-
-UnnamedText_5d8e5: ; 5d8e5 (17:58e5)
+.UnnamedText_5d8e5
     TX_FAR _UnnamedText_5d8e5
     db "@"
-
-UnnamedText_5d8ea: ; 5d8ea (17:58ea)
+.UnnamedText_5d8ea
     TX_FAR _UnnamedText_5d8ea
     db "@"
-
-UnnamedText_5d8ef: ; 5d8ef (17:58ef)
+.UnnamedText_5d8ef
     TX_FAR _UnnamedText_5d8ef
     db "@"
+
+SECTION "SilphCo9Text2",ROMX[$58f4],BANK[$17]
 
 SilphCo9Text2: ; 5d8f4 (17:58f4)
     db $08 ; asm
@@ -95185,44 +95181,7 @@ PokemonTower5ScriptPointers: ; 60945 (18:4945)
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
-PokemonTower5Script0: ; 6094b (18:494b)
-    ld hl,CoordsData_60992 ; $4992
-    call ArePlayerCoordsInArray
-    jr c,.asm_60960
-    ld hl,$d72e
-    res 4,[hl]
-    ld hl,$d767
-    res 7,[hl]
-    jp CheckFightingMapTrainers
-.asm_60960
-    ld hl,$d767
-    bit 7,[hl]
-    set 7,[hl]
-    ret nz
-    xor a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,$f0
-    ld [wJoypadForbiddenButtonsMask],a
-    ld hl,$d72e
-    set 4,[hl]
-    PREDEF HealParty
-    call GBFadeOut2
-    call Delay3
-    call Delay3
-    call GBFadeIn2AndLoadGBPal ; call GBFadeIn2
-    ld a,$7
-    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call DisplayTextID
-    xor a
-    ld [wJoypadForbiddenButtonsMask],a
-    ret
-
-CoordsData_60992: ; 60992 (18:4992)
-    db $08,$0A
-    db $08,$0B
-    db $09,$0A
-    db $09,$0B
-    db $FF
+SECTION "PokemonTower5TextPointers",ROMX[$499b],BANK[$18]
 
 PokemonTower5TextPointers: ; 6099b (18:499b)
     dw PokemonTower5Text1
@@ -98647,12 +98606,6 @@ SSAnne4Object:
 
 ; ───────────────────────────────────────
 
-GBFadeIn2AndLoadGBPal:
-    call GBFadeIn2
-    jp LoadGBPal
-
-; ───────────────────────────────────────
-
 PokemonTower2Script0:
     ld a,[$d764]
     bit 7,a
@@ -98856,6 +98809,47 @@ SSAnne7Text1:
 .HM01AfterText
     TX_FAR _HM01AfterText
     db "@"
+
+; ───────────────────────────────────────
+
+PokemonTower5Script0:
+    ld hl,.CoordsData_60992
+    call ArePlayerCoordsInArray
+    ld hl,$d767
+    jr c,.InCoord
+    res 7,[hl]
+    ld hl,$d72e ; Enable Encounter
+    res 4,[hl]  ; ...
+    jp CheckFightingMapTrainers
+.InCoord
+    bit 7,[hl]
+    set 7,[hl]
+    ret nz
+    ld hl,$d72e ; Disable Encounter
+    set 4,[hl]  ; ...
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    ret z
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,$f0
+    ld [wJoypadForbiddenButtonsMask],a
+    PREDEF HealParty
+    PREDEF FadeOutAnimationAndPlayHealSound
+    call LoadGBPal
+    ld a,$7
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    call DisplayTextID
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a
+    ret
+.CoordsData_60992
+    db 08,10
+    db 08,11
+    db 09,10
+    db 09,11
+    db $FF
 
 ; ───────────────────────────────────────
 
@@ -136537,7 +136531,7 @@ SetSkillMonID:
 LearnSkill:
     call Load16BitRegisters
     push bc
-    call .Animation
+    call FadeOutAnimationAndPlayHealSound
     ld hl,.LearnSkill
     call PrintText
     pop bc
@@ -136551,7 +136545,9 @@ LearnSkill:
     TX_FAR _LearnSkillText
     db $10,$0,$58,"@"
 
-.Animation
+; ──────────────────────────────────────────────────────────────────────
+
+FadeOutAnimationAndPlayHealSound:
     call GBFadeOut2
     call ReloadMapData
     ld a,[$C0EF]
@@ -136566,16 +136562,17 @@ LearnSkill:
 .skip
     ld a,$E8
     ld [$C0EE],a
-    call PlaySound ; play sound?
+    call PlaySound
 .WaitLoop
     ld a,[$C026]
     cp $E8
     jr z,.WaitLoop
-    ld a,[$C0F0]
-    ld [$C0EF],a
-    ld a,[$D35B]
-    ld [$C0EE],a
-    call PlaySound
+    ;ld a,[$C0F0]
+    ;ld [$C0EF],a
+    ;ld a,[$D35B]
+    ;ld [$C0EE],a
+    ;call PlaySound
+    call PlayDefaultMusic
     jp GBFadeIn2
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -137675,8 +137672,8 @@ _CheckDarkMap:
     ld a,[$d732] ; fall in hole
     bit 4,a      ; ...
     ret nz
-    ld a,[wOverworldGoToDarkBit4] ; Force Go To Dark
-    bit 4,a                       ; ...
+    ld a,[wOverworldGoToDarkBit0] ; Force Go To Dark
+    bit 0,a                       ; ...
     ret nz
     jp GBFadeIn1
 .DarkMapList
@@ -142780,12 +142777,12 @@ HandleStrengthAnimation:
     jp DelayFrame
 
 HandleGoToDark:
-    ld hl,wOverworldGoToDarkBit4
-    bit 4,[hl]
+    ld hl,wOverworldGoToDarkBit0
+    bit 0,[hl]
     ret z
     call CheckDarkMap
-    ld hl,wOverworldGoToDarkBit4
-    res 4,[hl]
+    ld hl,wOverworldGoToDarkBit0
+    res 0,[hl]
     ret
 
 _BugFixWarpDuringJump:
@@ -144475,6 +144472,7 @@ LearnSkillPredef:                          NEW_PREDEF LearnSkill                
 GetMonPotentialMoveListPredef:             NEW_PREDEF GetMonPotentialMoveList             ; $7C
 ReplaceTileBlockNoRedrawPredef:            NEW_PREDEF ReplaceTileBlockNoRedraw            ; $7D
 TryToRedrawMapViewPredef:                  NEW_PREDEF TryToRedrawMapView                  ; $7E
+FadeOutAnimationAndPlayHealSoundPredef:    NEW_PREDEF FadeOutAnimationAndPlayHealSound    ; $7F
 
 ; ──────────────────────────────────────────────────────────────────────
 
