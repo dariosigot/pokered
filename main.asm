@@ -95181,42 +95181,6 @@ PokemonTower5ScriptPointers: ; 60945 (18:4945)
     dw DisplayEnemyTrainerTextAndStartBattle
     dw EndTrainerBattle
 
-PokemonTower5Script0: ; 6094b (18:494b)
-    ld hl,.CoordsData_60992
-    call ArePlayerCoordsInArray
-    jr c,.asm_60960
-    ld hl,$d72e
-    res 4,[hl]
-    ld hl,$d767
-    res 7,[hl]
-    jp CheckFightingMapTrainers
-.asm_60960
-    ld hl,$d767
-    bit 7,[hl]
-    set 7,[hl]
-    ret nz
-    xor a
-    ld [H_CURRENTPRESSEDBUTTONS],a
-    ld a,$f0
-    ld [wJoypadForbiddenButtonsMask],a
-    ld hl,$d72e
-    set 4,[hl]
-    PREDEF HealParty
-    PREDEF FadeOutAnimationAndPlayHealSound
-    call LoadGBPal
-    ld a,$7
-    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
-    call DisplayTextID
-    xor a
-    ld [wJoypadForbiddenButtonsMask],a
-    ret
-.CoordsData_60992
-    db $08,$0A
-    db $08,$0B
-    db $09,$0A
-    db $09,$0B
-    db $FF
-
 SECTION "PokemonTower5TextPointers",ROMX[$499b],BANK[$18]
 
 PokemonTower5TextPointers: ; 6099b (18:499b)
@@ -98845,6 +98809,47 @@ SSAnne7Text1:
 .HM01AfterText
     TX_FAR _HM01AfterText
     db "@"
+
+; ───────────────────────────────────────
+
+PokemonTower5Script0:
+    ld hl,.CoordsData_60992
+    call ArePlayerCoordsInArray
+    ld hl,$d767
+    jr c,.InCoord
+    res 7,[hl]
+    ld hl,$d72e ; Enable Encounter
+    res 4,[hl]  ; ...
+    jp CheckFightingMapTrainers
+.InCoord
+    bit 7,[hl]
+    set 7,[hl]
+    ret nz
+    ld hl,$d72e ; Disable Encounter
+    set 4,[hl]  ; ...
+    ld hl,$d126
+    bit 6,[hl]
+    res 6,[hl]
+    ret z
+    xor a
+    ld [H_CURRENTPRESSEDBUTTONS],a
+    ld a,$f0
+    ld [wJoypadForbiddenButtonsMask],a
+    PREDEF HealParty
+    PREDEF FadeOutAnimationAndPlayHealSound
+    call LoadGBPal
+    ld a,$7
+    ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
+    call DisplayTextID
+    xor a
+    ld [wJoypadForbiddenButtonsMask],a
+    ret
+.CoordsData_60992
+    db 08,10
+    db 08,11
+    db 09,10
+    db 09,11
+    db $FF
 
 ; ───────────────────────────────────────
 
