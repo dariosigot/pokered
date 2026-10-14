@@ -22430,8 +22430,8 @@ ItemUseBengal:
 .end
     ld hl,wOverworlLightAnimBit0
     set 0,[hl]
-    ld hl,wOverworldGoToDarkBit4
-    res 4,[hl]
+    ld hl,wOverworldGoToDarkBit0
+    res 0,[hl]
     ld a,1
     ld [$cd6a],a ; item use success
     ret
@@ -29007,8 +29007,8 @@ CheckDisableLightDuringFloat:
     ld a,[wSkillMonID]
     cp LAPRAS
     ret z
-    ld hl,wOverworldGoToDarkBit4
-    set 4,[hl]
+    ld hl,wOverworldGoToDarkBit0
+    set 0,[hl]
     ret
 
 BackupChangedBlocks_Cut:
@@ -137682,8 +137682,8 @@ _CheckDarkMap:
     ld a,[$d732] ; fall in hole
     bit 4,a      ; ...
     ret nz
-    ld a,[wOverworldGoToDarkBit4] ; Force Go To Dark
-    bit 4,a                       ; ...
+    ld a,[wOverworldGoToDarkBit0] ; Force Go To Dark
+    bit 0,a                       ; ...
     ret nz
     jp GBFadeIn1
 .DarkMapList
@@ -142787,12 +142787,12 @@ HandleStrengthAnimation:
     jp DelayFrame
 
 HandleGoToDark:
-    ld hl,wOverworldGoToDarkBit4
-    bit 4,[hl]
+    ld hl,wOverworldGoToDarkBit0
+    bit 0,[hl]
     ret z
     call CheckDarkMap
-    ld hl,wOverworldGoToDarkBit4
-    res 4,[hl]
+    ld hl,wOverworldGoToDarkBit0
+    res 0,[hl]
     ret
 
 _BugFixWarpDuringJump:
