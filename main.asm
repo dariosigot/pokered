@@ -30108,8 +30108,15 @@ StartMenu_Pokemon:
     ld a,[hli]
     ld h,[hl]
     ld l,a
+    push hl ; set return/jump pointer
+    call .UpdateNextTile
     ld a,[W_OBTAINEDBADGES] ; badges obtained
-    jp hl
+    ret
+.UpdateNextTile
+    call GetDirectionOffset
+    call GetTileOffset
+    ld [$cfc6],a
+    ret
 .outOfBattleMovePointers
     dw .fly
     dw .teleport
