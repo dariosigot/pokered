@@ -145804,6 +145804,14 @@ db %01000000    ; Conversion,Tri Attack,Super Fang,Slash,Substitute,Struggle,???
 
 ; Predef 0x37
 StatusScreen:
+    ; Backup Player Move (Trapping Effect in Battle)
+    ld hl,W_PLAYERMOVENUM
+    ld b,6
+.LoopBackupMoves
+    ld a,[hli]
+    push af
+    dec b
+    jr nz,.LoopBackupMoves
     ; Disable Quick Menu
     ld hl,$ffb7
     ld a,[hl]
@@ -145855,7 +145863,7 @@ StatusScreen:
     bit 7,a ; down pressed?
     jr nz,.downFromStatus1
     bit 6,a ; up pressed?
-    jr nz,.upFromStatus1
+    jp nz,.upFromStatus1
     ; ft (a/right)
 
 ; STATUSSCREEN 2
@@ -145910,6 +145918,14 @@ StatusScreen:
     pop af
     ld hl,$ffb7
     ld [hl],a
+    ; Restore Player Move (Trapping Effect in Battle)
+    ld hl,W_PLAYERMOVENUM+6-1
+    ld b,6
+.LoopRestoreMoves
+    pop af
+    ld [hld],a
+    dec b
+    jr nz,.LoopRestoreMoves
     ; END
     jp Delay3
 
@@ -145923,7 +145939,7 @@ StatusScreen:
     inc a
 .commonFromStatus1
     call .CompareWithCurrentPartyBoxNum ; cp 6
-    jr nc,.getJoypadStateLoop1 ; valid only between 0 and [W_NUMINPARTY]/[W_NUMINBOX]
+    jp nc,.getJoypadStateLoop1 ; valid only between 0 and [W_NUMINPARTY]/[W_NUMINBOX]
     ld [$cf92],a
     call .ResetFlagStatusScreenJustLoad
     jp .Status1
