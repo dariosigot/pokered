@@ -4640,10 +4640,19 @@ TextCommand0B:
     jr z,.pokemonCry
     cp ERROR_TEXT_SOUND
     push af
+    jr nz,.NoErrorSoundOrNoBattle
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.NoErrorSoundOrNoBattle
+;.ErrorSoundInBattle
+    pop af
+    jr .SkipSound
+.NoErrorSoundOrNoBattle
     ld a,[hl]
     call PlaySoundWaitForCurrent ; call PlaySound ; Denim : modifica per riprodurre i suoni anche con velocità massima dei testi
     pop af
     call nz,WaitForSoundToFinish
+.SkipSound
     pop hl
     pop bc
     jp NextTextCommand
