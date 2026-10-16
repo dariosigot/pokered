@@ -4640,10 +4640,19 @@ TextCommand0B:
     jr z,.pokemonCry
     cp ERROR_TEXT_SOUND
     push af
+    jr nz,.NoErrorSoundOrNoBattle
+    ld a,[W_ISINBATTLE]
+    and a
+    jr z,.NoErrorSoundOrNoBattle
+;.ErrorSoundInBattle
+    pop af
+    jr .SkipSound
+.NoErrorSoundOrNoBattle
     ld a,[hl]
     call PlaySoundWaitForCurrent ; call PlaySound ; Denim : modifica per riprodurre i suoni anche con velocità massima dei testi
     pop af
     call nz,WaitForSoundToFinish
+.SkipSound
     pop hl
     pop bc
     jp NextTextCommand
@@ -8391,10 +8400,10 @@ SpeedUp:
     dec a
     jp z,SpeedUpByke
 ;SpeedUpSurf
-    call IsSurfingOnLapras
-    ret nz
     call TrySpeedUpWithB
     ret z
+    call IsSurfingOnLapras
+    ret nz
     call TrySpeedUpWithA
     ; ft
 
@@ -23838,6 +23847,12 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     jr z,.tryToStopSurfing
     jp c,SurfingAttemptFailed
 .surf
+    ld a,[$d152]
+    and a
+    jr nz,.NotSurfBoard
+    ld [wSkillMonID],a
+    ld [wSurfingMonID],a
+.NotSurfBoard
     call .makePlayerMoveForward
     ld hl,$d730
     set 7,[hl]
