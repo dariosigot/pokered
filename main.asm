@@ -23838,6 +23838,12 @@ ItemUseSurfboard: ; d9b4 (3:59b4)
     jr z,.tryToStopSurfing
     jp c,SurfingAttemptFailed
 .surf
+    ld a,[$d152]
+    and a
+    jr nz,.NotSurfBoard
+    ld [wSkillMonID],a
+    ld [wSurfingMonID],a
+.NotSurfBoard
     call .makePlayerMoveForward
     ld hl,$d730
     set 7,[hl]
