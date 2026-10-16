@@ -2119,14 +2119,13 @@ wBattleValueCounter: ; def2
 NEXTU
 
 wBufferTypeEffects: ; def0
-    ds DENIM_BUFFER_LENGHT - 12
+    ds DENIM_BUFFER_LENGHT
 wBufferTypeEffectsEnd:
-    db
-
-wBackupBattleDataDuringDex2ndPage: ; def0
-    ds 12
 
 ENDU
+
+wDenimBufferEnd:
+    db
 
 ; ────────────────────────────────────────────────────
 
