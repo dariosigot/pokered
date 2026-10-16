@@ -8391,10 +8391,10 @@ SpeedUp:
     dec a
     jp z,SpeedUpByke
 ;SpeedUpSurf
-    call IsSurfingOnLapras
-    ret nz
     call TrySpeedUpWithB
     ret z
+    call IsSurfingOnLapras
+    ret nz
     call TrySpeedUpWithA
     ; ft
 
