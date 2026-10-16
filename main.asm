@@ -7620,6 +7620,45 @@ DisplayChooseQuantityMenu:
     call PrintNumber
     jp .waitForKeyPressLoop
 
+; ───────────────────────────────
+
+SpeedUpByke:
+    call GetCurrentOldAdventureMap
+    cp ROUTE_17 ; Cycling Road
+    jr nz,.normalByke
+    ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
+    and a,%01110000 ; bit mask for up,left,right buttons
+    jr nz,.TrySpeedUpWithB
+.normalByke
+    call AdvancePlayerSprite ; Speed 2X
+    call TrySpeedUpWithB     ; Speed 3X
+.TrySpeedUpWithB
+    jp TrySpeedUpWithB       ; Speed 4X
+
+TestWrapInMenuInput:
+    push hl
+    ld hl,wTestWrapInMenuInputBit6
+    bit 6,[hl]
+    pop hl
+    ret
+
+ChangeCurMap:
+    ld [W_CURMAP],a
+    ret
+
+QtyMenu_buttonAPressed: ; the player chose to make the transaction
+buttonCommonPressed:
+    xor a
+    ld [$cc35],a ; 0 means no item is currently being swapped
+    ld [$ffb7],a ; Reset Quick Menu
+    ret
+QtyMenu_buttonBPressed: ; the player chose to cancel the transaction
+    call buttonCommonPressed
+    ld a,$ff
+    ret
+
+; ───────────────────────────────
+
 ; Free
 
 SECTION "PrintListMenuEntries",ROM0[$2e5a] ; cannot be moved cause "HackItemInBattle"
@@ -9009,40 +9048,55 @@ DivideBytes:
     pop hl
     ret
 
-SpeedUpByke:
-    call GetCurrentOldAdventureMap
-    cp ROUTE_17 ; Cycling Road
-    jr nz,.normalByke
-    ld a,[H_CURRENTPRESSEDBUTTONS] ; current joypad state
-    and a,%01110000 ; bit mask for up,left,right buttons
-    jr nz,.TrySpeedUpWithB
-.normalByke
-    call AdvancePlayerSprite ; Speed 2X
-    call TrySpeedUpWithB     ; Speed 3X
-.TrySpeedUpWithB
-    jp TrySpeedUpWithB       ; Speed 4X
+; ───────────────────────────────
 
-TestWrapInMenuInput:
+BackupPlayerMove:
+    add sp,-12
+    push bc
+    push de
     push hl
-    ld hl,wTestWrapInMenuInputBit6
-    bit 6,[hl]
+    add sp,+18
+    pop hl ; hl=Return
+    add sp,-12
+    push hl
+    add sp,+14
+    ld hl,W_PLAYERMOVENUM
+    ld b,6
+.Loop
+    ld a,[hli]
+    push af
+    dec b
+    jr nz,.Loop
+    add sp,-08
     pop hl
+    pop de
+    pop bc
     ret
 
-ChangeCurMap:
-    ld [W_CURMAP],a
+RestorePlayerMove:
+    push bc
+    push de
+    push hl
+    add sp,+08
+    ld hl,W_PLAYERMOVENUM+6-1
+    ld b,6
+.Loop
+    pop af
+    ld [hld],a
+    dec b
+    jr nz,.Loop
+    add sp,-14
+    pop hl ; hl=Return
+    add sp,+12
+    push hl
+    add sp,-18
+    pop hl
+    pop de
+    pop bc
+    add sp,+12
     ret
 
-QtyMenu_buttonAPressed: ; the player chose to make the transaction
-buttonCommonPressed:
-    xor a
-    ld [$cc35],a ; 0 means no item is currently being swapped
-    ld [$ffb7],a ; Reset Quick Menu
-    ret
-QtyMenu_buttonBPressed: ; the player chose to cancel the transaction
-    call buttonCommonPressed
-    ld a,$ff
-    ret
+; ───────────────────────────────
 
 ; Free
 
@@ -24792,14 +24846,10 @@ ItemUseXStat:
     ld a,[W_ISINBATTLE]
     and a
     jp z,ItemUseNotTime
-    ld hl,W_PLAYERMOVENUM
-    ld a,[hli]
-    push af ; save [W_PLAYERMOVENUM]
-    ld a,[hl]
-    push af ; save [W_PLAYERMOVEEFFECT]
-    push hl
+    call BackupPlayerMove
     ld a,[$cf91]
     sub a,X_ATTACK - ATTACK_UP1_EFFECT
+    ld hl,W_PLAYERMOVEEFFECT
     ld [hl],a ; store player move effect
     call SimpleBattleItemEnd
     ld a,XSTATITEM_ANIM ; X stat item animation ID
@@ -24807,11 +24857,7 @@ ItemUseXStat:
     xor a
     ld [H_WHOSETURN],a ; set turn to player's turn
     BANKSWITCH StatModifierUpEffect ; do stat increase move
-    pop hl
-    pop af
-    ld [hld],a ; restore [W_PLAYERMOVEEFFECT]
-    pop af
-    ld [hl],a ; restore [W_PLAYERMOVENUM]
+    call RestorePlayerMove ; Do NOT use "Jump"
     ret
 
 ItemUseEvoStone:
@@ -57075,15 +57121,15 @@ CheckPlayerStatusConditions:
     xor a
     ld [hli],a
     ld [hl],a
-    ld a,$75
+    ld a,BIDE
     ld [W_PLAYERMOVENUM],a
     ld hl,handleIfPlayerMoveMissed ; $5705
     jr .Func_3da37
 .next10
     bit 1,[hl]
     jr z,.next13 ; 59FF
-    ld a,$25
-    ld [W_PLAYERMOVENUM],a
+    ds 2 ; ld a,THRASH
+    ds 3 ; ld [W_PLAYERMOVENUM],a
     ld hl,ThrashingAboutText
     call PrintText
     ld hl,$D06A
@@ -58703,7 +58749,7 @@ MetronomePickMove: ; 3e348 (f:6348)
     call GenRandomInBattle ; random number
     and a
     jr z,.pickMoveLoop
-    cp $a5 ; max normal move number + 1 (this is Struggle's move number)
+    cp STRUGGLE ; max normal move number + 1 (this is Struggle's move number)
     jr nc,.pickMoveLoop
     cp METRONOME
     jr z,.pickMoveLoop
@@ -60480,7 +60526,7 @@ HandleExplodingAnimation: ; 3eed3 (f:6ed3)
     cp EXPLOSION
     ret nz
 .explodeMove
-    ld a,$5 ; MegaPunchAnim
+    ld a,MEGA_PUNCH ; MegaPunchAnim
     ld [$cc5b],a
     ; ft
 
@@ -63833,29 +63879,67 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
 ; ───────────────────────────────────────
 
 .ShowPokedexSecondPage
-    ; Backup STACK
+    ; Backup
     ld a,[$d11e]
     push af
-
-    ; Backup
-    ld hl,wBackupBattleDataDuringDex2ndPage
     ld a,[H_WHOSETURN]
-    ld [hli],a
+    push af
     ld a,[W_PLAYERMONID]
-    ld [hli],a
-    ld a,[W_PLAYERMOVENUM]
-    ld [hli],a
+    push af
     ld a,[W_ENEMYMON_START]
-    ld [hli],a
-    ld d,h
-    ld e,l
+    push af
     ld hl,W_PLAYERMONTYPES
-    ld bc,4
-    call CopyData ; copy bc bytes of data from hl to de
+    ld a,[hli]
+    push af
+    ld a,[hli]
+    push af
+    ld a,[hli]
+    push af
+    ld a,[hl]
+    push af
     ld hl,W_ENEMYMONTYPES
-    ld bc,4
-    call CopyData ; copy bc bytes of data from hl to de
+    ld a,[hli]
+    push af
+    ld a,[hli]
+    push af
+    ld a,[hli]
+    push af
+    ld a,[hl]
+    push af
+    call BackupPlayerMove
+    ; Main
+    call .ShowPokedexSecondPage_Main
+    ; Restore
+    call RestorePlayerMove ; Do NOT use "Jump"
+    ld hl,W_ENEMYMONTYPES+4-1
+    pop af
+    ld [hli],a
+    pop af
+    ld [hli],a
+    pop af
+    ld [hli],a
+    pop af
+    ld [hl],a
+    ld hl,W_PLAYERMONTYPES+4-1
+    pop af
+    ld [hli],a
+    pop af
+    ld [hli],a
+    pop af
+    ld [hli],a
+    pop af
+    ld [hl],a
+    pop af
+    ld [W_ENEMYMON_START],a
+    pop af
+    ld [W_PLAYERMONID],a
+    pop af
+    ld [H_WHOSETURN],a
+    pop af
+    ld [$d11e],a
+    ret
 
+.ShowPokedexSecondPage_Main
     call .DisableAutoBG
     FuncCoord 00,10
     ld hl,Coord
@@ -63863,11 +63947,9 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     FuncCoord 19,10
     ld hl,Coord
     ld [hl],$67 ; Border Right
-
     FuncCoord 09,04
     ld hl,Coord
     PREDEF PrintTypesFull
-
     FuncCoord 02,09
     ld hl,Coord
     ld de,.TypesAttack1
@@ -63876,32 +63958,9 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld hl,Coord
     ld de,.TypesAttack2
     call .LoopTypesAttack
-
     call .EnableAutoBG
     call Delay3
-    call GBPalNormal
-
-    ; Restore
-    ld hl,wBackupBattleDataDuringDex2ndPage
-    ld a,[hli]
-    ld [H_WHOSETURN],a
-    ld a,[hli]
-    ld [W_PLAYERMONID],a
-    ld a,[hli]
-    ld [W_PLAYERMOVENUM],a
-    ld a,[hli]
-    ld [W_ENEMYMON_START],a
-    ld de,W_PLAYERMONTYPES
-    ld bc,4
-    call CopyData ; copy bc bytes of data from hl to de
-    ld de,W_ENEMYMONTYPES
-    ld bc,4
-    call CopyData ; copy bc bytes of data from hl to de
-
-    ; Restore STACK
-    pop af
-    ld [$d11e],a
-    ret
+    jp GBPalNormal
 
 .LoopTypesAttack
     ld a,[de]
@@ -145140,6 +145199,9 @@ _LoadGhostPic:
 PrintMoveDetailsBox:
     call Load16BitRegisters
 
+    ; Backup
+    call BackupPlayerMove
+
     ; Get Current Move
     push de
     ld a,[wPlayerSelectedMove]
@@ -145304,7 +145366,11 @@ PrintMoveDetailsBox:
     ld de,W_PLAYERMOVEMAXPP
     ld b,%00000001
     ld c,3
-    jp PrintNumber
+    call PrintNumber
+
+    ; Restore
+    call RestorePlayerMove ; Do NOT use "Jump"
+    ret
 
 .GetMonAtk
     ld hl,wMoveDetBoxActualMonBit5
@@ -145805,13 +145871,7 @@ db %01000000    ; Conversion,Tri Attack,Super Fang,Slash,Substitute,Struggle,???
 ; Predef 0x37
 StatusScreen:
     ; Backup Player Move (Trapping Effect in Battle)
-    ld hl,W_PLAYERMOVENUM
-    ld b,6
-.LoopBackupMoves
-    ld a,[hli]
-    push af
-    dec b
-    jr nz,.LoopBackupMoves
+    call BackupPlayerMove
     ; Disable Quick Menu
     ld hl,$ffb7
     ld a,[hl]
@@ -145863,7 +145923,7 @@ StatusScreen:
     bit 7,a ; down pressed?
     jr nz,.downFromStatus1
     bit 6,a ; up pressed?
-    jp nz,.upFromStatus1
+    jr nz,.upFromStatus1
     ; ft (a/right)
 
 ; STATUSSCREEN 2
@@ -145919,13 +145979,7 @@ StatusScreen:
     ld hl,$ffb7
     ld [hl],a
     ; Restore Player Move (Trapping Effect in Battle)
-    ld hl,W_PLAYERMOVENUM+6-1
-    ld b,6
-.LoopRestoreMoves
-    pop af
-    ld [hld],a
-    dec b
-    jr nz,.LoopRestoreMoves
+    call RestorePlayerMove ; Do NOT use "Jump"
     ; END
     jp Delay3
 
