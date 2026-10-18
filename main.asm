@@ -9060,6 +9060,7 @@ DivideBytes:
 ; ───────────────────────────────
 
 BackupPlayerMove:
+    di
     add sp,-12
     push bc
     push de
@@ -9080,9 +9081,11 @@ BackupPlayerMove:
     pop hl
     pop de
     pop bc
+    ei
     ret
 
 RestorePlayerMove:
+    di
     push bc
     push de
     push hl
@@ -9103,6 +9106,7 @@ RestorePlayerMove:
     pop de
     pop bc
     add sp,+12
+    ei
     ret
 
 ; ───────────────────────────────
