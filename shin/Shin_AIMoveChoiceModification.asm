@@ -50,8 +50,11 @@ AIMoveChoiceModification1:
     cp DREAM_EATER_EFFECT    ;see if it is dream eater
     jr nz,.notdreameater    ;skip out if move is not dream eater
     ld a,[W_PLAYERMONSTATUS]    ;load the player pkmn non-volatile status
-    and $7    ;check bits 0 to 2 for sleeping turns
+    and SLP    ;check bits 0 to 2 for sleeping turns
     jp z,.heavydiscourage    ;heavily discourage using dream eater on non-sleeping pkmn
+    ld a,[W_PLAYERBATTSTATUS2]
+    bit HAS_SUBSTITUTE_UP,a    ;check for substitute bit
+    jp nz,.heavydiscourage ;heavily discourage using dream eater against substitute 
     dec [hl]    ;else slightly encourage dream eater's use on a sleeping pkmn
     jp .nextMove
 .notdreameater
