@@ -9061,28 +9061,30 @@ DivideBytes:
 
 BackupPlayerMove:
     di
-    add sp,-12
+    add sp,-06
     push bc
     push de
     push hl
-    add sp,+18
+    add sp,+12
     pop hl ; hl=Return
-    add sp,-12
+    add sp,-06
     push hl
-    add sp,+14
+    add sp,+08
     ld hl,W_PLAYERMOVENUM
-    ld b,6
+    ld b,3
 .Loop
     ld a,[hli]
-    push af
+    ld d,a
+    ld a,[hli]
+    ld e,a
+    push de
     dec b
     jr nz,.Loop
     add sp,-08
     pop hl
     pop de
     pop bc
-    ei
-    ret
+    reti
 
 RestorePlayerMove:
     di
@@ -9091,27 +9093,27 @@ RestorePlayerMove:
     push hl
     add sp,+08
     ld hl,W_PLAYERMOVENUM+6-1
-    ld b,6
+    ld b,3
 .Loop
-    pop af
+    pop de
+    ld a,e
+    ld [hld],a
+    ld a,d
     ld [hld],a
     dec b
     jr nz,.Loop
-    add sp,-14
+    add sp,-08
     pop hl ; hl=Return
-    add sp,+12
+    add sp,+06
     push hl
-    add sp,-18
+    add sp,-12
     pop hl
     pop de
     pop bc
-    add sp,+12
-    ei
-    ret
+    add sp,+06
+    reti
 
 ; ───────────────────────────────
-
-; Free
 
 SECTION "LoadTextBoxTilePatterns",ROM0[$36a0]
 
@@ -63932,20 +63934,20 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     call RestorePlayerMove ; Do NOT use "Jump"
     ld hl,W_ENEMYMONTYPES+4-1
     pop af
-    ld [hli],a
+    ld [hld],a
     pop af
-    ld [hli],a
+    ld [hld],a
     pop af
-    ld [hli],a
+    ld [hld],a
     pop af
     ld [hl],a
     ld hl,W_PLAYERMONTYPES+4-1
     pop af
-    ld [hli],a
+    ld [hld],a
     pop af
-    ld [hli],a
+    ld [hld],a
     pop af
-    ld [hli],a
+    ld [hld],a
     pop af
     ld [hl],a
     pop af
