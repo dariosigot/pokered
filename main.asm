@@ -31,15 +31,6 @@ ResetTempIV:
     pop hl
     ret
 
-StoreGymLeaderRematch:
-    push bc
-    ld hl,W_OBTAINEDBADGES
-    ld b,[hl]
-    and b
-    ld [wGymLeaderRematch],a
-    pop bc
-    ret
-
 CheckSkillInList:
     push hl
     ld hl,wNoSkillInListBit6
@@ -50,6 +41,8 @@ CheckSkillInList:
 Delay2:
     ld c,2
     jp DelayFrames
+
+; Free
 
 ; interrupts
 SECTION "vblank",ROM0[$40]
@@ -10658,11 +10651,8 @@ Predef: ; 3e6d (0:3e6d)
 
     jp RoutineForRealGB
 
-SECTION "Load16BitRegisters",ROM0[$3e94]
-
 ;loads hl from cc4f,de from cc51,and bc from cc53
-
-Load16BitRegisters: ; 3e94 (0:3e94)
+Load16BitRegisters:
     ld a,[$cc4f]
     ld h,a
     ld a,[$cc50]
@@ -73660,10 +73650,7 @@ Func_48963: ; 48963 (12:4963)
 .asm_4898c
     ld hl,W_OBTAINEDBADGES ; $d356
     set 3,[hl]
-    ;ds 3 ; ld hl,$d72a
-    ;ds 2 ; set 3,[hl]
-    ld a,%01110111
-    call StoreGymLeaderRematch
+    PREDEF StoreGymLeaderRematch
     ld a,[$d77c]
     or $fc
     ld [$d77c],a
@@ -90407,8 +90394,7 @@ HallofFameRoomScript2:
     ld hl,wFlagsGymLeaderAfterHoFWin
     set 7,[hl]
 .skip2
-    ld a,%01111111
-    call StoreGymLeaderRematch
+    PREDEF StoreGymLeaderRematch
     call GBFadeOut2
     ld a,8
     call StopMusic
@@ -90972,10 +90958,7 @@ Func_5c3df: ; 5c3df (17:43df)
 .asm_5c408
     ld hl,W_OBTAINEDBADGES ; $d356
     set 0,[hl]
-    ;ds 3 ; ld hl,$d72a
-    ;ds 2 ; set 0,[hl]
-    ld a,%01111110
-    call StoreGymLeaderRematch
+    PREDEF StoreGymLeaderRematch
     ld a,$4
     ld [$cc4d],a
     PREDEF RemoveMissableObject
@@ -91383,10 +91366,7 @@ Func_5c70d: ; 5c70d (17:470d)
 .asm_5c736
     ld hl,W_OBTAINEDBADGES ; $d356
     set 1,[hl]
-    ;ds 3 ; ld hl,$d72a
-    ;ds 2 ; set 1,[hl]
-    ld a,%01111101
-    call StoreGymLeaderRematch
+    PREDEF StoreGymLeaderRematch
     ld hl,$d75e
     set 2,[hl]
     set 3,[hl]
@@ -91893,10 +91873,7 @@ Func_5caaa: ; 5caaa (17:4aaa)
 .asm_5cad3
     ld hl,W_OBTAINEDBADGES ; $d356
     set 2,[hl]
-    ;ds 3 ; ld hl,$d72a
-    ;ds 2 ; set 2,[hl]
-    ld a,%01111011
-    call StoreGymLeaderRematch
+    PREDEF StoreGymLeaderRematch
     ld a,[$d773]
     or $1c
     ld [$d773],a
@@ -92666,10 +92643,7 @@ Func_5d068: ; 5d068 (17:5068)
 .asm_5d091
     ld hl,W_OBTAINEDBADGES ; $d356
     set 5,[hl]
-    ;ds 3 ; ld hl,$d72a
-    ;ds 2 ; set 5,[hl]
-    ld a,%01011111
-    call StoreGymLeaderRematch
+    PREDEF StoreGymLeaderRematch
     ld a,[$d7b3]
     or $fc
     ld [$d7b3],a
@@ -106090,10 +106064,7 @@ ViridianGymScript3_74995: ; 74995 (1d:4995)
 .asm_749be
     ld hl,W_OBTAINEDBADGES ; $d356
     set 7,[hl]
-    ;ds 3 ; ld hl,$d72a
-    ;ds 2 ; set 7,[hl]
-    ld a,%01111111
-    call StoreGymLeaderRematch
+    PREDEF StoreGymLeaderRematch
     ld a,[$d751]
     or $fc
     ld [$d751],a
@@ -107466,10 +107437,7 @@ FuchsiaGymScript3_75497: ; 75497 (1d:5497)
 .asm_754c0
     ld hl,W_OBTAINEDBADGES ; $d356
     set 4,[hl]
-    ;ds 3 ; ld hl,$d72a
-    ;ds 2 ; set 4,[hl]
-    ld a,%01101111
-    call StoreGymLeaderRematch
+    PREDEF StoreGymLeaderRematch
     ld a,[$d792]
     or $fc
     ld [$d792],a
@@ -107972,10 +107940,7 @@ CinnabarGymScript3_75857: ; 75857 (1d:5857)
 .asm_75880
     ld hl,W_OBTAINEDBADGES ; $d356
     set 6,[hl]
-    ;ds 3 ; ld hl,$d72a
-    ;ds 2 ; set 6,[hl]
-    ld a,%00111111
-    call StoreGymLeaderRematch
+    PREDEF StoreGymLeaderRematch
     ld a,[$d79a]
     or $fc
     ld [$d79a],a
@@ -143728,6 +143693,67 @@ GymLeaderAfterRematch_:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+StoreGymLeaderRematch:
+    call Load16BitRegisters
+    push bc
+    push de
+    push hl
+    call GetCurrentOldAdventureMap
+    cp HALL_OF_FAME
+    jr z,.SetMax
+    ld hl,.Map
+    ld b,a
+    ld c,0 ; First Gym
+.loop
+    inc c
+    ld a,[hli]
+    cp $FF
+    ret z
+    cp b
+    jr nz,.loop
+    ld b,c
+    ld a,%01111111 ; Start with Last Gym
+.rotate
+    rlc a
+    dec b
+    jr nz,.rotate
+    ld d,a
+.retry
+    call GenRandom
+    and d
+    ld hl,wGymLeaderRematch
+    or [hl] ; Add Previous Rematch
+    jr .skip
+.SetMax
+    ld a,%01111111 ; Max Rematch
+.skip
+    ld hl,W_OBTAINEDBADGES
+    and [hl]
+    and %01111111 ; Last Gym Never Rematch
+    ld hl,wGymLeaderRematch
+    cp %01111111 ; Max Rematch
+    jr z,.end
+    cp [hl]
+    jr z,.retry
+.end
+    ld [hl],a
+    pop hl
+    pop de
+    pop bc
+    ret
+.Map
+    db PEWTER_GYM    ; 1
+    db CERULEAN_GYM  ; 2
+    db VERMILION_GYM ; 3 
+    db CELADON_GYM   ; 4 
+    db FUCHSIA_GYM   ; 5
+    db SAFFRON_GYM   ; 6
+    db CINNABAR_GYM  ; 7
+    db VIRIDIAN_GYM  ; 8
+    db $FF
+
+; ──────────────────────────────────────────────────────────────────────
+
 TryHallOfFameRematch:
     call Load16BitRegisters
     call .StoreInput
@@ -144365,56 +144391,35 @@ GetPredefPointer:
 ;    and gets the nth (3-byte) pointer in PredefPointers
 ; stores the bank of said pointer in [$D0B7]
 ; stores the pointer in hl and returns
-    ; ld $CC4F,hl
-    ld a,h
-    ld [$CC4F],a
-    ld a,l
-    ld [$CC50],a
-
-    ; ld $CC51,de
-    ld hl,$CC51
-    ld a,d
-    ld [hli],a
-    ld a,e
-    ld [hli],a
-
-    ; ld $CC53,bc
-    ld a,b
-    ld [hli],a
-    ld [hl],c
-
-    ld hl,PredefPointers
-    ld de,0
-
+    ld a,h       ; ld $CC4F,hl
+    ld [$CC4F],a ; ...
+    ld a,l       ; ...
+    ld [$CC50],a ; ...
+    ld hl,$CC51 ; ld $CC51,de
+    ld a,d      ; ...
+    ld [hli],a  ; ...
+    ld a,e      ; ...
+    ld [hli],a  ; ...
+    ld a,b     ; ld $CC53,bc
+    ld [hli],a ; ...
+    ld [hl],c  ; ...
     push af ; Backup F Flags
-    ; de = 3 * [$CC4E]
+    ld hl,PredefPointers
     ld a,[$CC4E]
+    ld d,0
     ld e,a
-    add a,a
-    add a,e
-    ld e,a
-    jr nc,.next
-    inc d
-
-.next
     add hl,de
-    ld d,h
-    ld e,l
+    add hl,de
+    add hl,de
     pop af ; Restore F Flags
-
     ; get bank of predef routine
-    ld a,[de]
+    ld a,[hli]
     ld [$D0B7],a
-    push af
-
     ; get pointer
-    inc de
-    ld a,[de]
+    push af
+    ld a,[hli]
+    ld h,[hl]
     ld l,a
-    inc de
-    ld a,[de]
-    ld h,a
-
     pop af
     ret
 
@@ -144548,6 +144553,7 @@ GetMonPotentialMoveListPredef:             NEW_PREDEF GetMonPotentialMoveList   
 ReplaceTileBlockNoRedrawPredef:            NEW_PREDEF ReplaceTileBlockNoRedraw            ; $7D
 TryToRedrawMapViewPredef:                  NEW_PREDEF TryToRedrawMapView                  ; $7E
 FadeOutAnimationAndPlayHealSoundPredef:    NEW_PREDEF FadeOutAnimationAndPlayHealSound    ; $7F
+StoreGymLeaderRematchPredef:               NEW_PREDEF StoreGymLeaderRematch               ; $80
 
 ; ──────────────────────────────────────────────────────────────────────
 
