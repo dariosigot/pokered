@@ -18296,24 +18296,19 @@ setExceptionPaletteGbcAndGoPAL_SET:
 ForceVRAM2WritingAndPrintGameVersionOnTitleScreen:
     ld hl,wFlagPlaceTitleScreen
     ld a,[hl]
-    cp 3
-    jr z,.Write
     cp 7
     jr z,.End
-    inc a
-    ld [wFlagPlaceTitleScreen],a
-    ret
-.End
-    ei
-    ret z
-.Write
+    inc [hl]
+    cp 3
+    ret nz
+;Write
     di
-    inc a
-    ld [wFlagPlaceTitleScreen],a
     push de
     call PrintGameVersionOnTitleScreen
     pop de
     ret
+.End
+    reti
 
 PlaySoundAndResetCounter ; Denim
     push af
