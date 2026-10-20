@@ -616,7 +616,7 @@ OverworldLoop: ; 03ff (0:03ff)
     call OverworldHackRoutine
     ld a,[$d732]
     and a,$18
-    jp nz,HandleFlyOrTeleportAway
+    jp nz,HandleFlyWarpOrDungeonWarp
     ld a,[W_CUROPPONENT] ; $d059
     and a
     jp nz,.newBattle
@@ -1060,14 +1060,14 @@ WarpFound2: ; 073c (0:073c)
     jr z,.goBackOutside
 ; if not going back to the previous map
     call ChangeCurMap ; current map number
-    BANKSWITCH Func_70787 ; check if the warp was a Silph Co. teleporter
+    BANKSWITCH IsPlayerStandingOnWarpPadOrHole ; check if the warp was a Silph Co. teleporter
     ld a,[$cd5b]
     dec a
     jr nz,.notTeleporter
 ; if it's a Silph Co. teleporter
     ld hl,$d732
     set 3,[hl]
-    call DoFlyOrTeleportAwayGraphics
+    call LeaveMapAnim
     jr .skipMapChangeSound
 .notTeleporter
     call PlayMapChangeSound
@@ -1337,7 +1337,7 @@ StopMusic:
     jr nz,.waitLoop
     jp StopAllSounds
 
-HandleFlyOrTeleportAway:
+HandleFlyWarpOrDungeonWarp:
     call UpdateSprites ; move sprites
     call Delay3
     xor a
@@ -1348,15 +1348,15 @@ HandleFlyOrTeleportAway:
     ld hl,$d732
     set 2,[hl]
     res 5,[hl]
-    call DoFlyOrTeleportAwayGraphics
+    call LeaveMapAnim
     ld a,$01
     call RoutineForRealGB
     call SpecialWarpIn
     jp SpecialEnterMap
 
 ; function that calls a function to do fly away or teleport away graphics
-DoFlyOrTeleportAwayGraphics:
-    BANKSWITCH_JUMP _DoFlyOrTeleportAwayGraphics
+LeaveMapAnim:
+    BANKSWITCH_JUMP _LeaveMapAnim
 
 ; load sprite graphics based on whether the player is standing,biking,or surfing
 LoadPlayerSpriteGraphics:
@@ -99608,7 +99608,7 @@ Func_70503: ; 70503 (1c:4503)
     ret
 
 Func_70510: ; 70510 (1c:4510)
-    call Func_706ef
+    call InitFacingDirectionList
     ld a,$ec
     ld [$c104],a
     call Delay3
@@ -99625,10 +99625,10 @@ Func_70510: ; 70510 (1c:4510)
     res 4,[hl]
     pop hl
     jr nz,.asm_7055e
-    call Func_705aa
+    call PlayerSpinWhileMovingDown
     ld a,$a3
     call PlaySound
-    call Func_70787
+    call IsPlayerStandingOnWarpPadOrHole
     ld a,b
     and a
     jr nz,.asm_7055b
@@ -99641,15 +99641,15 @@ Func_70510: ; 70510 (1c:4510)
     ld [hli],a
     ld [hl],$ff
     ld hl,$cd48
-    call Func_70730
+    call PlayerSpinInPlace
 .asm_70558
     call PlayDefaultMusic
 .asm_7055b
-    jp Func_70772
+    jp RestoreFacingDirectionAndYScreenPos
 .asm_7055e
     ld c,$32
     call DelayFrames
-    call Func_705aa
+    call PlayerSpinWhileMovingDown
     jr .asm_7055b
 .asm_70568
     pop hl
@@ -99663,7 +99663,7 @@ Func_70510: ; 70510 (1c:4510)
     ld [hli],a
     ld [hl],$8
     ld de,Unknown_70592 ; $4592
-    call Func_706ae
+    call DoFlyAnimation
     call LoadPlayerSpriteGraphics
     jr .asm_70558
 
@@ -99672,50 +99672,51 @@ SECTION "Unknown_70592",ROMX[$4592],BANK[$1c]
 Unknown_70592: ; 70592 (1c:4592)
 INCBIN "baserom.gbc",$70592,$705aa - $70592
 
-Func_705aa: ; 705aa (1c:45aa)
+PlayerSpinWhileMovingDown: ; 705aa (1c:45aa)
     ld hl,wWhichTrade ; $cd3d
     ld a,$10
     ld [hli],a
     ld a,$3c
     ld [hli],a
-    call Func_7077f
+    call GetPlayerTeleportAnimFrameDelay
     ld [hl],a
-    jp Func_70755
+    jp PlayerSpinWhileMovingUpOrDown
 
-_DoFlyOrTeleportAwayGraphics: ; 705ba (1c:45ba)
-    call Func_706ef
-    call Func_70787
+_LeaveMapAnim: ; 705ba (1c:45ba)
+    call InitFacingDirectionList
+    call IsPlayerStandingOnWarpPadOrHole
     ld a,b
     and a
-    jr z,.asm_705ef
+    jr z,.playerNotStandingOnWarpPadOrHole
     dec a
-    jp nz,Func_7067d
-.asm_705c8
-    ld a,$9f
+    jp nz,LeaveMapThroughHoleAnim
+.spinWhileMovingUp
+    ld a,$9f ; SFX_TELEPORT_EXIT_1
     call PlaySound
     ld hl,wWhichTrade ; $cd3d
     ld a,$f0
     ld [hli],a
     ld a,$ec
     ld [hli],a
-    call Func_7077f
+    call GetPlayerTeleportAnimFrameDelay
     ld [hl],a
-    call Func_70755
-    call Func_70787
+    call PlayerSpinWhileMovingUpOrDown
+    call IsPlayerStandingOnWarpPadOrHole
     ld a,b
     dec a
-    jr z,.asm_705e9
-    ld c,$a
+    jr z,.playerStandingOnWarpPad
+; if not standing on a warp pad, there is an extra delay
+    ld c,10
     call DelayFrames
-.asm_705e9
+.playerStandingOnWarpPad
     call IfNotDarkGBFadeOut2 ; call GBFadeOut2
-    jp Func_70772
-.asm_705ef
+    jp RestoreFacingDirectionAndYScreenPos
+.playerNotStandingOnWarpPadOrHole
     ld a,$4
     call StopMusic
     ld a,[$d732]
     bit 6,a
-    jr z,.asm_70610
+    jr z,.flyAnimation
     ld hl,wWhichTrade ; $cd3d
     ld a,$10
     ld [hli],a
@@ -99725,9 +99726,9 @@ _DoFlyOrTeleportAwayGraphics: ; 705ba (1c:45ba)
     ld [hli],a
     ld [hl],$a1
     ld hl,$cd48
-    call Func_70730
-    jr .asm_705c8
-.asm_70610
+    call PlayerSpinInPlace
+    jr .spinWhileMovingUp
+.flyAnimation
     call LoadFlyingMonSprite_Overworld
     ld hl,wWhichTrade ; $cd3d
     ld a,$ff
@@ -99735,7 +99736,7 @@ _DoFlyOrTeleportAwayGraphics: ; 705ba (1c:45ba)
     ld a,$8
     ld [hli],a
     ld [hl],$c
-    call Func_706ae
+    call DoFlyAnimation
     ld a,$a4
     call PlaySound
     ld hl,wWhichTrade ; $cd3d
@@ -99744,26 +99745,54 @@ _DoFlyOrTeleportAwayGraphics: ; 705ba (1c:45ba)
     ld a,$c
     ld [hli],a
     ld [hl],$c
-    ld de,Unknown_7064f ; $464f
-    call Func_706ae
+    ld de,FlyAnimationScreenCoords1
+    call DoFlyAnimation
     ld c,$28
     call DelayFrames
     ld hl,$cd3e
     ld a,$b
     ld [hli],a
     ld [hl],$8
-    ld de,Unknown_70667 ; $4667
-    call Func_706ae
+    ld de,FlyAnimationScreenCoords2
+    call DoFlyAnimation
     call GBFadeOut2
-    jp Func_70772
+    jp RestoreFacingDirectionAndYScreenPos
 
-Unknown_7064f: ; 7064f (1c:464f)
-INCBIN "baserom.gbc",$7064f,$70667 - $7064f
+FlyAnimationScreenCoords1:
+; y, x pairs
+; This is the sequence of screen coordinates used by the first part
+; of the Fly overworld animation.
+	db $3C, $48
+	db $3C, $50
+	db $3B, $58
+	db $3A, $60
+	db $39, $68
+	db $37, $70
+	db $37, $78
+	db $33, $80
+	db $30, $88
+	db $2D, $90
+	db $2A, $98
+	db $27, $A0
 
-Unknown_70667: ; 70667 (1c:4667)
-INCBIN "baserom.gbc",$70667,$7067d - $70667
+FlyAnimationScreenCoords2:
+; y, x pairs
+; This is the sequence of screen coordinates used by the second part
+; of the Fly overworld animation.
+	db $1A, $90
+	db $19, $80
+	db $17, $70
+	db $15, $60
+	db $12, $50
+	db $0F, $40
+	db $0C, $30
+	db $09, $20
+	db $05, $10
+	db $00, $00
 
-Func_7067d: ; 7067d (1c:467d)
+	db $F0, $00
+
+LeaveMapThroughHoleAnim: ; 7067d (1c:467d)
     ld a,$ff
     ld [$cfcb],a
     ld a,[$c302]
@@ -99781,9 +99810,9 @@ Func_7067d: ; 7067d (1c:467d)
     call IfNotDarkGBFadeOut2 ; call GBFadeOut2
     ld a,$1
     ld [$cfcb],a
-    jp Func_70772
+    jp RestoreFacingDirectionAndYScreenPos
 
-Func_706ae: ; 706ae (1c:46ae)
+DoFlyAnimation: ; 706ae (1c:46ae)
     ld a,[$cd3f]
     xor $1
     ld [$cd3f],a
@@ -99804,7 +99833,7 @@ Func_706ae: ; 706ae (1c:46ae)
     ld a,[$cd3e]
     dec a
     ld [$cd3e],a
-    jr nz,Func_706ae
+    jr nz,DoFlyAnimation
     ret
 
 LoadFlyingMonSprite_Overworld:
@@ -99816,9 +99845,9 @@ LoadFlyingMonSprite_Overworld:
     call LoadFlyingMonSprite
     jp LoadFlyingMonSprite
 
-SECTION "Func_706ef",ROMX[$46ef],BANK[$1c]
+SECTION "InitFacingDirectionList",ROMX[$46ef],BANK[$1c]
 
-Func_706ef: ; 706ef (1c:46ef)
+InitFacingDirectionList: ; 706ef (1c:46ef)
     ld a,[$c102]
     ld [$cd50],a
     ld a,[$c104]
@@ -99829,10 +99858,10 @@ Func_706ef: ; 706ef (1c:46ef)
     call CopyData
     ld a,[$c102]
     ld hl,$cd48
-.asm_7070d
+.loop
     cp [hl]
     inc hl
-    jr nz,.asm_7070d
+    jr nz,.loop
     dec hl
     ret
 
@@ -99852,7 +99881,7 @@ Func_70717: ; 70717 (1c:4717)
     pop hl
     ret
 
-Func_70730: ; 70730 (1c:4730)
+PlayerSpinInPlace: ; 70730 (1c:4730)
     call Func_70717
     ld a,[wWhichTrade] ; $cd3d
     ld c,a
@@ -99870,9 +99899,9 @@ Func_70730: ; 70730 (1c:4730)
     cp c
     ret z
     call DelayFrames
-    jr Func_70730
+    jr PlayerSpinInPlace
 
-Func_70755: ; 70755 (1c:4755)
+PlayerSpinWhileMovingUpOrDown: ; 70755 (1c:4755)
     call Func_70717
     ld a,[wWhichTrade] ; $cd3d
     ld c,a
@@ -99886,45 +99915,45 @@ Func_70755: ; 70755 (1c:4755)
     ld a,[$cd3f]
     ld c,a
     call DelayFrames
-    jr Func_70755
+    jr PlayerSpinWhileMovingUpOrDown
 
-Func_70772: ; 70772 (1c:4772)
+RestoreFacingDirectionAndYScreenPos: ; 70772 (1c:4772)
     ld a,[$cd4f]
     ld [$c104],a
     ld a,[$cd50]
     ld [$c102],a
     ret
 
-Func_7077f: ; 7077f (1c:477f)
+GetPlayerTeleportAnimFrameDelay: ; 7077f (1c:477f)
     ld a,[$cf1b]
     xor $1
     inc a
     inc a
     ret
 
-Func_70787: ; 70787 (1c:4787)
+IsPlayerStandingOnWarpPadOrHole: ; 70787 (1c:4787)
     ld b,$0
-    ld hl,DataTable_707a9 ; $47a9
+    ld hl,WarpPadAndHoleData
     ld a,[W_CURMAPTILESET] ; $d367
     ld c,a
-.asm_70790
+.loop
     ld a,[hli]
     cp $ff
-    jr z,.asm_707a4
+    jr z,.done
     cp c
-    jr nz,.asm_7079e
+    jr nz,.nextEntry
     FuncCoord 8,9 ; $c45c
     ld a,[Coord]
     cp [hl]
-    jr z,.asm_707a2
-.asm_7079e
+    jr z,.foundMatch
+.nextEntry
     inc hl
     inc hl
-    jr .asm_70790
-.asm_707a2
+    jr .loop
+.foundMatch
     inc hl
     ld b,[hl]
-.asm_707a4
+.done
     ld a,b
     ld [$cd5b],a
     ret
@@ -103793,13 +103822,16 @@ IfNotDarkGBFadeIn2:
     ld b,2
     jp GBFadeOutCommon
 
+WARP_PAD  EQU $01
+WARP_HOLE EQU $02
+
 ; format: db tileset id,tile id,value to be put in $cd5b
-DataTable_707a9:
-    db $16,$20,$01
-    db $16,$11,$02
-    db $11,$22,$02
-    db $10,$55,$01
-    db $10,$00,$01 ; Bills Teleport Fake Tileset
+WarpPadAndHoleData:
+    db $16,$20,WARP_PAD
+    db $16,$11,WARP_HOLE
+    db $11,$22,WARP_HOLE
+    db $10,$55,WARP_PAD
+    db $10,$00,WARP_PAD ; Bills Teleport Fake Tileset
     db $FF
 
 SGBBorderGraphics:
@@ -144512,7 +144544,7 @@ SaveSAVtoSRAM1Predef:                      NEW_PREDEF SaveSAVtoSRAM1            
 Predef54Predef:                            NEW_PREDEF Predef54                            ; $54
 HallOfFamePCPredef:                        NEW_PREDEF HallOfFamePC                        ; $55
 DisplayDexRatingPredef:                    NEW_PREDEF DisplayDexRating                    ; $56
-_DoFlyOrTeleportAwayGraphicsPredef:        NEW_PREDEF _DoFlyOrTeleportAwayGraphics        ; $57
+_LeaveMapAnimPredef:                       NEW_PREDEF _LeaveMapAnim                       ; $57
 Func_70510Predef:                          NEW_PREDEF Func_70510                          ; $58
 GetTileTwoStepsInFrontOfPlayerPredef:      NEW_PREDEF GetTileTwoStepsInFrontOfPlayer      ; $59
 CheckForCollisionWhenPushingBoulderPredef: NEW_PREDEF CheckForCollisionWhenPushingBoulder ; $5A
