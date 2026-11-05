@@ -1730,6 +1730,7 @@ ENDU
 wRivalStarterIV_AtkDef:: db ; $d726
 wRivalStarterIV_SpdSpc:: db ; $d727
 
+; Free
 ds 1 ; $d728
 
 wPalletPikachuIV_AtkDef:: db ; $d729
@@ -1737,10 +1738,70 @@ wPalletPikachuIV_SpdSpc:: db ; $d72a
 
 wSurfingMonID:: db ; $d72b
 
-SECTION "W_FLAGS_D733",WRAMX[$d733],BANK[$1]
+; bit 0: if not set, the 3 minimum steps between random battles have passed
+; bit 1: prevent audio fade out
+wd72c:: db
 
-W_FLAGS_D733: ; d733
+; This variable is used for temporary flags and as the destination map when
+; warping to the Trade Center or Colosseum.
+; bit 0: sprite facing directions have been initialised in the Trade Center
+; bit 3: do scripted warp (used to warp back to Lavender Town from the top of the pokemon tower)
+; bit 4: on a dungeon warp
+; bit 5: don't make NPCs face the player when spoken to
+; Bits 6 and 7 are set by scripts when starting major battles in the storyline,
+; but they do not appear to affect anything. Bit 6 is reset after all battles
+; and bit 7 is reset after trainer battles (but it's only set before trainer
+; battles anyway).
+wd72d:: db
+
+; bit 0: the player has received Lapras in the Silph Co. building
+; bit 1: set in various places, but doesn't appear to have an effect
+; bit 2: the player has healed pokemon at a pokemon center at least once
+; bit 3: the player has a received a pokemon from Prof. Oak
+; bit 4: disable battles
+; bit 5: set when a battle ends and when the player blacks out in the overworld due to poison
+; bit 6: using the link feature
+; bit 7: set if scripted NPC movement has been initialised
+wd72e:: db
+
+; Free
+wd72f:: db
+
+; bit 0: NPC sprite being moved by script
+; bit 5: ignore joypad input
+; bit 6: print text with no delay between each letter
+; bit 7: set if joypad states are being simulated in the overworld or an NPC's movement is being scripted
+wd730:: db
+
+; Free
+wd731:: db
+
+; bit 0: play time being counted
+; bit 1: remnant of debug mode; only set by the debug build.
+; if it is set:
+; 1. skips most of Prof. Oak's speech, and uses NINTEN as the player's name and SONY as the rival's name
+; 2. does not have the player start in floor two of the player's house (instead sending them to [wLastMap])
+; 3. allows wild battles to be avoided by holding down B
+; furthermore, in the debug build:
+; 4. allows trainers to be avoided by holding down B
+; 5. skips Safari Zone step counter by holding down B
+; 6. skips the NPC who blocks Route 3 before beating Brock by holding down B
+; 7. skips Cerulean City rival battle by holding down B
+; 8. skips Pokémon Tower rival battle by holding down B
+; bit 2: the target warp is a fly warp (bit 3 set or blacked out) or a dungeon warp (bit 4 set)
+; bit 3: used warp pad, escape rope, dig, teleport, or fly, so the target warp is a "fly warp"
+; bit 4: jumped into hole (Pokemon Mansion, Seafoam Islands, Victory Road) or went down waterfall (Seafoam Islands), so the target warp is a "dungeon warp"
+; bit 5: currently being forced to ride bike (cycling road)
+; bit 6: map destination is [wLastBlackoutMap] (usually the last used pokemon center, but could be the player's house)
+wd732:: db
+
+; bit 0: running a test battle
+; bit 1: prevent music from changing when entering new map
+; bit 2: skip the joypad check in CheckWarpsNoCollision (used for the forced warp down the waterfall in the Seafoam Islands)
+; bit 3: trainer wants to battle
 ; bit 4: use variable [W_CURMAPSCRIPT] instead of the provided index for next frame's map script (used to start battle when talking to trainers)
+; bit 7: used fly out of battle
+W_FLAGS_D733: ; d733
     ds 1
 
 SECTION "wEventFlags",WRAMX[$d747],BANK[$1]
