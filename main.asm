@@ -3386,7 +3386,7 @@ GetMonHeader:
     push de
     push hl
     ld hl,wAlternateFormIndex
-    ld a,[hl]
+    ld a,[hl] ; ~TODO:Shiny
     push af
     push hl
     ld a,[$d11e]
@@ -3402,7 +3402,7 @@ GetMonHeader:
     ld de,W_MONHEADER
     call CopyData
     ld hl,wAlternateFormIndex
-    ld a,[hl]
+    ld a,[hl] ; ~TODO:Shiny
     and a
     jr z,.done
     dec a
@@ -10784,10 +10784,10 @@ TextPredefs:
 ; W_ENEMYMONATKDEFIV ; .Front
 ; W_PLAYERMONIVS     ; .Back
 ; $cfb3              ; .OutOfBattle
-IsShiny:
+IsShiny: ; ~TODO:Shiny
     push hl
     push af
-    call CheckShiny
+    call CheckShiny ; ~TODO:Shiny
     jr nz,.End
     ld hl,wFlagShinyBit2
     set 2,[hl]
@@ -10798,7 +10798,7 @@ IsShiny:
 
 ; INPUT hl = giusto indirizzo degli IV del pokemon interessato
 ; OUTPUT z = set if Shiny
-CheckShiny:
+CheckShiny: ; ~TODO:Shiny
     ld a,[hli] ; Controllo IV Atk/Def ; Controllo IV Atk,Shiny se IV Atk = 2,3,6,7,10,11,14 o 15
     and %00101111 ; Shiny se bit 5 di a settato,gli altri bit dell'atk non contano,applico maschera
     cp %00101010
@@ -22430,7 +22430,7 @@ MapHS:
 
 SentNewMonToBox_ResetMovePPs:
     call ResetMovePPs_
-    xor a     ; Reset Move 2/3 PP
+    xor a     ; Reset Move 3/4 PP
     ld [de],a ; ...
     dec de    ; ...
     ld [de],a ; ...
@@ -23146,7 +23146,7 @@ WriteMovePP:
     call CopyData
     inc de
     xor a
-    ld [wTempAlternateFormIndex],a
+    ld [wTempAlternateFormIndex],a ; ~TODO:Shiny
     ret
 
 CheckForCollisionWhenPushingBoulder:
@@ -25610,167 +25610,6 @@ GotOffBicycleText:
     db $05
     TX_FAR _GotOffBicycleText2
     db "@"
-
-; restores bonus PP (from PP Ups) when healing at a pokemon center
-; also,when a PP Up is used,it increases the current PP by one PP Up bonus
-; INPUT:
-; [$cf92] = index of pokemon in party
-; [$d11e] = mode
-; 0: Pokemon Center healing
-; 1: using a PP Up
-; [wCurrentMenuItem] = index of move (when using a PP Up)
-;RestoreBonusPP: ; e606 (3:6606)
-;    ld hl,W_PARTYMON1_MOVE1
-;    ld bc,44
-;    ld a,[$cf92]
-;    call AddNTimes
-;    push hl
-;    ld de,$cd78 - 1
-;    PREDEF ResetMovePPs ; loads the normal max PP of each of the pokemon's moves to $cd78
-;    pop hl
-;    ld c,21
-;    ld b,0
-;    add hl,bc ; hl now points to move 1 PP
-;    ld de,$cd78
-;    ld b,0 ; initialize move counter to zero
-;; loop through the pokemon's moves
-;.loop
-;    inc b
-;    ld a,b
-;    cp 5 ; reached the end of the pokemon's moves?
-;    ret z ; if so,return
-;    ld a,[$d11e]
-;    dec a ; using a PP Up?
-;    jr nz,.skipMenuItemIDCheck
-;; if using a PP Up,check if this is the move it's being used on
-;    ld a,[wCurrentMenuItem]
-;    inc a
-;    cp b
-;    jr nz,.nextMove
-;.skipMenuItemIDCheck
-;    ld a,[hl]
-;    and a,%11000000 ; have any PP Ups been used?
-;    call nz,AddBonusPP ; if so,add bonus PP
-;.nextMove
-;    inc hl
-;    inc de
-;    jr .loop
-
-; adds bonus PP from PP Ups to current PP
-; 1/5 of normal max PP (capped at 7) is added for each PP Up
-; INPUT:
-; [de] = normal max PP
-; [hl] = move PP
-; [$d11e] = max number of times to add bonus
-; set to 1 when using a PP Up,set to 255 otherwise
-;AddBonusPP: ; e642 (3:6642)
-;    push bc
-;    ld a,[de] ; normal max PP of move
-;    ld [H_DIVIDEND + 3],a
-;    xor a
-;    ld [H_DIVIDEND],a
-;    ld [H_DIVIDEND + 1],a
-;    ld [H_DIVIDEND + 2],a
-;    ld a,5
-;    ld [H_DIVISOR],a
-;    ld b,4
-;    call Divide
-;    ld a,[hl] ; move PP
-;    ld b,a
-;    swap a
-;    and a,%00001111
-;    srl a
-;    srl a
-;    ld c,a ; c = number of PP Ups used
-;.loop
-;    ld a,[H_QUOTIENT + 3]
-;    cp 8 ; is the amount greater than or equal to 8?
-;    jr c,.addAmount
-;    ld a,7 ; cap the amount at 7
-;.addAmount
-;    add b
-;    ld b,a
-;    ld a,[$d11e]
-;    dec a
-;    jr z,.done
-;    dec c
-;    jr nz,.loop
-;.done
-;    ld [hl],b
-;    pop bc
-;    ret
-
-; gets max PP of a pokemon's move (including PP from PP Ups)
-; INPUT:
-; [$cf92] = index of pokemon within party/box
-; [$cc49] = pokemon source
-; 00: player's party
-; 01: enemy's party
-; 02: current box
-; 03: daycare
-; 04: player's in-battle pokemon
-; [wCurrentMenuItem] = move index
-; OUTPUT:
-; [$d11e] = max PP
-;GetMaxPP: ; e677 (3:6677)
-;    ld a,[$cc49]
-;    and a
-;    ld hl,W_PARTYMON1_MOVE1
-;    ld bc,44
-;    jr z,.sourceWithMultipleMon
-;    ld hl,$d8ac ; enemy party
-;    dec a
-;    jr z,.sourceWithMultipleMon
-;    ld hl,$da9e ; current box
-;    ld bc,33
-;    dec a
-;    jr z,.sourceWithMultipleMon
-;    ld hl,$da67 ; daycare
-;    dec a
-;    jr z,.sourceWithOneMon
-;    ld hl,W_PLAYERMONMOVES ; player's in-battle pokemon
-;.sourceWithOneMon
-;    call GetSelectedMoveOffset2
-;    jr .next
-;.sourceWithMultipleMon
-;    call GetSelectedMoveOffset
-;.next
-;    ld a,[hl]
-;    dec a
-;    push hl
-;    ld hl,Moves
-;    ld bc,6
-;    call AddNTimes
-;    ld de,$cd6d
-;    ld a,BANK(Moves)
-;    call FarCopyData
-;    ld de,$cd72
-;    ld a,[de]
-;    ld b,a ; b = normal max PP
-;    pop hl
-;    push bc
-;    ld bc,21 ; PP offset if not player's in-battle pokemon data
-;    ld a,[$cc49]
-;    cp 4 ; player's in-battle pokemon?
-;    jr nz,.addPPOffset
-;    ld bc,17 ; PP offset if player's in-battle pokemon data
-;.addPPOffset
-;    add hl,bc
-;    ld a,[hl] ; a = current PP
-;    and a,%11000000 ; get PP Up count
-;    pop bc
-;    or b ; place normal max PP in 6 lower bits of a
-;    ld h,d
-;    ld l,e
-;    inc hl ; hl = $cd73
-;    ld [hl],a
-;    xor a
-;    ld [$d11e],a ; no limit on PP Up amount
-;    call AddBonusPP ; add bonus PP from PP Ups
-;    ld a,[hl]
-;    and a,%00111111 ; mask out the PP Up count
-;    ld [$d11e],a ; store max PP
-;    ret
 
 ; ────────────────────────────────────
 
@@ -29034,7 +28873,7 @@ AddPokemonToParty_TryToAddExclusiveMove:
     ret nz
     BANKSWITCH_JUMP AddPokemonToParty_TryToAddExclusiveMove_
 
-GetAlternateForm:
+GetAlternateForm: ; ~TODO:Shiny
     ld a,[$cc49]
     and $f
     jr nz,.enemy
@@ -29066,7 +28905,7 @@ GetAlternateForm:
 ; Generate Random only if
 ; • Pkmn Is Added ToParty with Rename Screen (Out Of Battle)
 ; • Pkmn Is Added ToParty without Rename Screen
-InsertIVDuringAddMonToParty:
+InsertIVDuringAddMonToParty: ; ~TODO:Shiny
     ld hl,wDVForShinyAtkDef
     ld a,[$cc49]
     and a
@@ -29092,7 +28931,7 @@ CopyDataAndInsertIVDuringSendNewMonToBox:
     ld hl,wDVForShinyAtkDef
     ; ft
 
-InsertIVFromEnemyMonData:
+InsertIVFromEnemyMonData: ; ~TODO:Shiny
     ld a,[W_ENEMYMONATKDEFIV]
     ld [hli],a ; wDVForShinyAtkDef
     ld a,[W_ENEMYMONSPDSPCIV]
@@ -37843,7 +37682,7 @@ Route2HouseText3:
 Route2HouseText4:
     db $08 ; asm
     ld bc,(VOLTORB << 8) | 15
-    ld a,1
+    ld a,1 ; ~TODO:Shiny
     ld [wTempAlternateFormIndex],a
     call GivePokemon
     jr nc,.error
@@ -38119,7 +37958,7 @@ BillsHouseObject:
     EVENT_DISP BILLS_HOUSE_WIDTH,06,05
 
 AddStarterToParty:
-    ld a,1
+    ld a,1 ; ~TODO:Shiny
     ld [wTempAlternateFormIndex],a
     jp AddPokemonToParty
 
@@ -44525,7 +44364,7 @@ GetOakLastPkmn:
     pop af
     ld b,a
     ld c,5
-    ld a,1
+    ld a,1 ; ~TODO:Shiny
     ld [wTempAlternateFormIndex],a
     call GivePokemon
     pop de
@@ -60039,7 +59878,7 @@ LoadEnemyMonData:
     ld a,[W_ENEMYMONID]
     ld [$cfe5],a
     ld [$d0b5],a
-    call LoadEnemyMonData_GetAlternateMonHeader ; call GetMonHeader
+    call LoadEnemyMonData_GetAlternateMonHeader ; call GetMonHeader ; ~TODO:Shiny
     ld a,[W_ENEMYBATTSTATUS3] ; $d069
     bit 3,a
     ld hl,$cceb
@@ -60049,7 +59888,7 @@ LoadEnemyMonData:
     ld a,[W_ISINBATTLE] ; $d057
     cp $2
     call z,GetEnemyIV
-    call nz,ForceShinyOrRandom ; call GenRandomInBattle
+    call nz,ForceShinyOrRandom ; call GenRandomInBattle ; ~TODO:Shiny
 .storeDVs
     ld hl,W_ENEMYMONATKDEFIV
     ld [hli],a
@@ -65493,7 +65332,7 @@ Func_41245: ; 41245 (10:5245)
     call CopyScreenTileBufferToVRAM
     call ClearScreen
     ld a,[wWhichTrade] ; $cd3d
-    call CheckShinyDuringTradeInSend ; call Func_415a4 ; Invio
+    call CheckShinyDuringTradeInSend ; call Func_415a4 ; Invio ; ~TODO:Shiny
     ld a,$7e
 .asm_41273
     push af
@@ -65612,7 +65451,7 @@ Func_41336: ; 41336 (10:5336)
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld a,[$cd3e]
-    call CheckShinyDuringTradeInReceive ; call Func_415a4 ; Ricezione
+    call CheckShinyDuringTradeInReceive ; call Func_415a4 ; Ricezione ; ~TODO:Shiny
     ld a,$ad
     call Func_41676
     ld a,$1
@@ -66548,18 +66387,18 @@ OTString67E5: ; 427e5 (10:67e5)
     db "OT/",$4E
     db $73,"№",$F2,"@"
 
-CheckShinyDuringTradeInSend:
+CheckShinyDuringTradeInSend: ; ~TODO:Shiny
     push af
     ld hl,wTradedPlayerMonIV
     jr CheckShinyDuringTradeInCommon
 
-CheckShinyDuringTradeInReceive:
+CheckShinyDuringTradeInReceive: ; ~TODO:Shiny
     push af
     ld hl,wTradedEnemyMonIV
     ; ft
 
 CheckShinyDuringTradeInCommon:
-    call IsShiny
+    call IsShiny ; ~TODO:Shiny
     inc hl
     inc hl
     ld a,[hl] ; wTradePlayerMonAltForm / wTradeEnemyMonAltForm
@@ -102156,7 +101995,7 @@ HackForInsertDVInHallOfFameDataFirstStep:
     ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
-    call IsShiny
+    call IsShiny ; ~TODO:Shiny
     call SetTempIV
     push hl
     inc hl
@@ -102834,13 +102673,13 @@ GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
     ; Get Front Palette
     ld hl,W_ENEMYMONID
     ld a,[hl]
-    call CheckShinyFrontAndGetPAL ; DONE:Palette
+    call CheckShinyFrontAndGetPAL ; DONE:Palette ; ~TODO:Shiny
     push hl ; Backup frontsprite palette
 
     ; Get Back Palette
     ld hl,W_PLAYERMONID
     ld a,[hl]
-    call CheckShinyBackAndGetPAL ; DONE:Palette
+    call CheckShinyBackAndGetPAL ; DONE:Palette ; ~TODO:Shiny
     push hl ; Backup backsprite palette
 
     call RestoreHeader
@@ -102885,7 +102724,7 @@ GetPkmnStatPaletteID:
     ld bc,$10
     call CopyData
     ld a,[$cf91]
-    call CheckShinyAndGetPAL ; DONE:Palette
+    call CheckShinyAndGetPAL ; DONE:Palette ; ~TODO:Shiny
     push hl ; ...
     ld hl,$cf2e
     ld a,[$cf25]
@@ -104959,7 +104798,7 @@ ResetPreVRAM2:
     pop af
     ret
 
-CheckShinyFrontAndGetPAL:
+CheckShinyFrontAndGetPAL: ; ~TODO:Shiny
     push hl
     ld hl,wFlagForceGhostPalBit4
     bit 4,[hl]
@@ -104986,7 +104825,7 @@ CheckShinyFrontAndGetPAL:
     ld hl,W_ENEMYMONATKDEFIV
     jr GetPalCommon
 
-CheckShinyBackAndGetPAL:
+CheckShinyBackAndGetPAL: ; ~TODO:Shiny
     push hl
     push af
     ld [$d0b5],a
@@ -104996,7 +104835,7 @@ CheckShinyBackAndGetPAL:
     ld hl,W_PLAYERMONIVS
     jr GetPalCommon
 
-CheckShinyAndGetPAL:
+CheckShinyAndGetPAL: ; ~TODO:Shiny
     push hl
     push af
     ld [$d0b5],a
@@ -105006,7 +104845,7 @@ CheckShinyAndGetPAL:
 
 GetPalCommon:
     pop af
-    call IsShiny
+    call IsShiny ; ~TODO:Shiny
 SkipShinyAndGetPAL:
     pop hl
     ; ft
@@ -105052,7 +104891,7 @@ DeterminePaletteID: ; DONE:Palette
      ld a,[hli]
      ld h,[hl]
      ld l,a
-     call .CheckShiny
+     call .CheckShiny ; ~TODO:Shiny
      jr z,.End
      ld bc,1
      add hl,bc
@@ -105061,7 +104900,7 @@ DeterminePaletteID: ; DONE:Palette
     pop de
     pop bc
     ret
-.CheckShiny
+.CheckShiny ; ~TODO:Shiny
     push hl
     ld hl,wFlagShinyBit2
     bit 2,[hl]
@@ -105533,7 +105372,7 @@ InGameTrade_BackupPlayerIVandAltForm:
     ld de,wTradePlayerMonAltForm
     ld a,[hl]
     ld [de],a
-    ; ~TODO : Handle InGameTrade special mon
+    ; ~TODO : Handle InGameTrade special mon ; ~TODO:Shiny
     xor a
     ld hl,wTradedEnemyMonIV
     ld [hli],a
@@ -109927,7 +109766,7 @@ PKMNLeaguePC:
     ld [$CD3F],a
     ld de,$CD6D
     ld bc,$000B
-    call CheckShinyAndAlternativeFromHallOfFameData ; call CopyData
+    call CheckShinyAndAlternativeFromHallOfFameData ; call CopyData ; ~TODO:Shiny
     call GetMonHeader
     ld b,$0B
     ld c,0
@@ -109950,7 +109789,7 @@ PKMNLeaguePC:
     ld de,$CD42
     ld bc,$0103
     call PrintNumber
-    jp Func_702f0AndRemoveIVFromCheckShinyArea
+    jp Func_702f0AndRemoveIVFromCheckShinyArea ; ~TODO:Shiny
 .HallOfFameNoText
     db "HALL OF FAME No   @"
 
@@ -110192,9 +110031,9 @@ FindHiddenItemOrCoinsIndex: ; 76857 (1d:6857)
     inc hl
     jr .loop
 
-CheckShinyAndAlternativeFromHallOfFameData:
+CheckShinyAndAlternativeFromHallOfFameData: ; ~TODO:Shiny
     call CopyData
-    call IsShiny
+    call IsShiny ; ~TODO:Shiny
     call SetTempIV
     push hl
     inc hl
@@ -110204,7 +110043,7 @@ CheckShinyAndAlternativeFromHallOfFameData:
     pop hl
     ret
 
-Func_702f0AndRemoveIVFromCheckShinyArea:
+Func_702f0AndRemoveIVFromCheckShinyArea: ; ~TODO:Shiny
     BANKSWITCH Func_702f0
     jp ResetTempIV
 
@@ -117210,7 +117049,7 @@ EvolveMon: ; 7bde9 (1e:7de9)
     ld a,[$cee9] ; EvoOldSpecies
     ld [$cf1d],a ; WholeScreenPaletteMonSpecies
     ld c,$0
-    call CheckShinyDuringEvolution ; call EvolutionSetWholeScreenPalette
+    call CheckShinyDuringEvolution ; call EvolutionSetWholeScreenPalette ; ~TODO:Shiny
     ld a,[$ceea] ; EvoNewSpecies
     ld [$cf91],a
     ld [$d0b5],a
@@ -117260,7 +117099,7 @@ EvolveMon: ; 7bde9 (1e:7de9)
     ld a,[$cf1d] ; WholeScreenPaletteMonSpecies
     call PlayCry
     ld c,$0
-    call CheckShinyDuringEvolution ; call EvolutionSetWholeScreenPalette ; DONE:Palette
+    call CheckShinyDuringEvolution ; call EvolutionSetWholeScreenPalette ; DONE:Palette ; ~TODO:Shiny
     call RestoreOldMonHeader
     pop af
     ld [$d0b5],a
@@ -117419,14 +117258,14 @@ Func_7bf64: ; 7bf64 (1e:7f64)
     ld [hl],a
     jp Delay3
 
-CheckShinyDuringEvolution: ; DONE:Palette
+CheckShinyDuringEvolution: ; DONE:Palette ; ~TODO:Shiny
     push af
     push bc
     ld a,[wWhichPokemon] ; $cf92
     ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
-    call IsShiny
+    call IsShiny ; ~TODO:Shiny
     ld a,[$cf1d]
     ld [$d0b5],a
     call Evolution_GetMonHeader_HandleAlternateForm
@@ -137063,7 +136902,7 @@ _DrawCatchGender: ; Denim
     call .PlaceIcon
 .SkipCatchFlagIcon
     ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
-    call CheckShiny
+    call CheckShiny ; ~TODO:Shiny
     call SetTempIV
     jr nz,.NoShiny
     FuncCoord 1,1
@@ -143113,28 +142952,28 @@ ForceShinyOrRandom_:
     ld a,[$cf91]
     cp PIKACHU
     jr nz,.Random
-    ld a,[wPalletPikachuIV_AtkDef]
+    ld a,[wPalletPikachuIV_AtkDef] ; ~TODO:Shiny
     and a
     jr nz,.GetPikachuStoredIV
     ld a,e
     or $88 ; Speed > 7 ; Special > 7
     ld e,a
-    ld [wPalletPikachuIV_SpdSpc],a
+    ld [wPalletPikachuIV_SpdSpc],a ; ~TODO:Shiny
     call .GenRandomInBattle
     or $18 ; Attack ODD ; Defense > 7 ; HP > 7
     ld [wPalletPikachuIV_AtkDef],a
     jr .End
 .GetPikachuStoredIV
-    ld a,[wPalletPikachuIV_SpdSpc]
+    ld a,[wPalletPikachuIV_SpdSpc] ; ~TODO:Shiny
     ld e,a
-    ld a,[wPalletPikachuIV_AtkDef]
+    ld a,[wPalletPikachuIV_AtkDef] ; ~TODO:Shiny
     jr .End
 
 .PewterCity
     ld a,[$cf91]
     cp EEVEE
     jr nz,.Random
-    ld a,[wPewterEeveeIV_AtkDef]
+    ld a,[wPewterEeveeIV_AtkDef] ; ~TODO:Shiny
     and a
     jr nz,.GetEeveeStoredIV
     ld a,e
@@ -143143,12 +142982,12 @@ ForceShinyOrRandom_:
     ld [wPewterEeveeIV_SpdSpc],a
     call .GenRandomInBattle
     or $18 ; Attack ODD ; Defense > 7 ; HP > 7
-    ld [wPewterEeveeIV_AtkDef],a
+    ld [wPewterEeveeIV_AtkDef],a ; ~TODO:Shiny
     jr .End
 .GetEeveeStoredIV
-    ld a,[wPewterEeveeIV_SpdSpc]
+    ld a,[wPewterEeveeIV_SpdSpc] ; ~TODO:Shiny
     ld e,a
-    ld a,[wPewterEeveeIV_AtkDef]
+    ld a,[wPewterEeveeIV_AtkDef] ; ~TODO:Shiny
     jr .End
 
 .Lapras
@@ -143438,14 +143277,14 @@ _CheckNotEscapeWildPokemon:
     scf ; set carry flag
     ret
 .NotInList
-.CheckShiny
+.CheckShiny ; ~TODO:Shiny
     ld hl,W_ENEMYBATTSTATUS3
     bit TRANSFORMED,[hl]
     ld hl,W_ENEMYMONATKDEFIV
     jr z,.NotTransformed
     ld hl,$cceb
 .NotTransformed
-    call CheckShiny
+    call CheckShiny ; ~TODO:Shiny
     jr z,.NotEscape
 .End
     ld a,[W_BATTLETYPE] ; $d05a
@@ -143462,7 +143301,7 @@ _CheckNotEscapeWildPokemon:
     ld a,[W_ENEMYMONID]
     cp LAPRAS
     jr z,.NotEscape
-    jr .CheckShiny
+    jr .CheckShiny ; ~TODO:Shiny
 
 .NotEscapeWildPokemon
     db VOLTORB
@@ -146434,7 +146273,7 @@ HandleStatusScreen1:
     cp $FF
     jr z,.noShiny
     ld hl,$cfb3 ; .OutOfBattle
-    call CheckShiny
+    call CheckShiny ; ~TODO:Shiny
     jr nz,.noShiny
     FuncCoord 19,6
     ld hl,Coord
@@ -148472,10 +148311,10 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     jr z,.AltForm1
     ; ft
 .WildStandard
-    xor a ; ~TODO
+    xor a ; ~TODO ; ~TODO:Shiny
     jr .end
 .AltForm1
-    ld a,1
+    ld a,1 ; ~TODO:Shiny
     ld [wTempAlternateFormIndex],a
     jr .end
 .outOfBattle
