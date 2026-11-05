@@ -1952,6 +1952,8 @@ wSkipTextInPokedexBit7      ; dee5 ; bit 7 = Skip Text during Show Pokedex in Ba
     ds 1
 
 wOverworldGoToDarkBit0      ; dee6 ; bit 0 = Force Overworld "CheckDarkMap"
+wOverworldDigAnimationBit1  ; dee6 ; bit 1 = Force Overworld Dig/Auger Animation
+wVBlankDrawHoleBit2         ; dee6 ; bit 1 = Force to Draw Hole under Player during VBlank
 wFlagListMenuSpc:           ; dee6 ; bit 0 = BadgeName
                             ; dee6 ; bit 1 = Celadon Mart Elevator
                             ; dee6 ; bit 2 = Silph Co Elevator

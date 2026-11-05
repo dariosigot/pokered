@@ -579,7 +579,7 @@ EnterMap: ; 03a6 (0:03a6)
     and a,$18
     jr z,.didNotFlyOrTeleportIn
     res 3,[hl]
-    BANKSWITCH Func_70510 ; display fly/teleport in graphical effect
+    BANKSWITCH EnterMapAnim ; display fly/teleport in graphical effect
     call UpdateSprites ; move sprites
 .didNotFlyOrTeleportIn
     BANKSWITCH CheckForceBikeOrSurf ; handle currents in SF islands and forced bike riding in cycling road
@@ -615,7 +615,7 @@ OverworldLoop: ; 03ff (0:03ff)
     jp nz,WarpFound2
     call OverworldHackRoutine
     ld a,[$d732]
-    and a,$18
+    and a,%00011000 ; bit 3/4
     jp nz,HandleFlyWarpOrDungeonWarp
     ld a,[W_CUROPPONENT] ; $d059
     and a
@@ -688,11 +688,11 @@ OverworldLoop: ; 03ff (0:03ff)
     jr z,.changeMap
     PREDEF LoadSAV
     ld a,[W_CURMAP]
-    ld [$d71a],a
+    ld [wDestinationMap],a
     call SpecialWarpIn
     ld a,[W_CURMAP]
     call SwitchToMapRomBank ; switch to the ROM bank of the current map
-    ld hl,$d367
+    ld hl,W_CURMAPTILESET
     set 7,[hl]
 .changeMap
     jp EnterMap
@@ -1046,8 +1046,8 @@ WarpFound2: ; 073c (0:073c)
 ; this is for handling "outside" maps that can't have the 0xFF destination map
     ld a,[W_CURMAP]
     ld [wLastMap],a ; save current map as previous map
-    ld a,[W_CURMAPWIDTH]
-    ld [$d366],a
+    ds 3 ; ld a,[W_CURMAPWIDTH]
+    ds 3 ; ld [$d366],a ; Unused
     ld a,[$ff8b] ; destination map number
     call ChangeCurMap ; change current map to destination map
     call PlayMapChangeSound
@@ -2593,26 +2593,9 @@ LoadMapHeader: ; 107c (0:107c)
     ld [$ff8b],a
     bit 7,b
     ret nz
-
     BANKSWITCH GetPointerToBaseOfMapHeader ; hl = base of map header
-
-;    call GetMapHeaderPointers ; ld hl,MapHeaderPointers
-;    ld a,[W_CURMAP]
-;    sla a
-;    jr nc,.noCarry1
-;    inc h
-;.noCarry1
-;    add l
-;    ld l,a
-;    jr nc,.noCarry2
-;    inc h
-;.noCarry2
-;    ld a,[hli]
-;    ld h,[hl]
-;    ld l,a ; hl = base of map header
-
 ; copy the first 10 bytes (the fixed area) of the map data to D367-D370
-    ld de,$d367
+    ld de,W_CURMAPTILESET
     ld c,$0a
 .copyFixedHeaderLoop
     ld a,[hli]
@@ -2832,7 +2815,7 @@ LoadMapHeader: ; 107c (0:107c)
     dec b
     jp nz,.loadSpriteLoop
 .finishUp
-    PREDEF Func_c754 ; load tileset data
+    PREDEF LoadTilesetHeader ; load tileset data
     BANKSWITCH LoadWildData ; load wild pokemon data
     pop hl ; restore hl from before going to the warp/sign/sprite data (this value was saved for seemingly no purpose)
     ld a,[W_CURMAPHEIGHT] ; map height in 4x4 tile blocks
@@ -11086,6 +11069,66 @@ CheckWalkingSpriteTilePassable:
     ld [$c109],a
     ret
 
+; ────────────────────────────────
+
+AskForMonNickname:
+    call SaveScreenTilesToBuffer1
+    call Load16BitRegisters
+    push hl
+    ld a,[W_ISINBATTLE] ; $d057
+    dec a
+    ld hl,wTileMap
+    ld b,$4
+    ld c,$b
+    call z,ClearScreenArea ; only if in wild battle
+    ld a,[$cf91]
+    ld [$d11e],a
+    call GetMonName
+    call HidePlayerBattleHudAndStandarizePaletteBeforeRenameInBattle ; ld hl,DoYouWantToNicknameText ; $6557
+    call PrintText
+    FuncCoord 14,7 ; $c43a
+    ld hl,Coord
+    ld bc,$80f
+    ld a,$14
+    ld [$d125],a
+    call DisplayTextBoxID
+    pop hl
+    ld a,[wCurrentMenuItem] ; $cc26
+    and a
+    jr nz,.asm_654c
+    ld a,[$cfcb]
+    push af
+    xor a
+    ld [$cfcb],a
+    push hl
+    ld a,$2
+    ld [$d07d],a
+    call StoreCatchPkmnIdAndFlagBeforeRename
+    ld a,[W_ISINBATTLE] ; $d057
+    and a
+    jr nz,.asm_653e
+    call ReloadMapSpriteTilePatterns
+.asm_653e
+    call LoadScreenTilesFromBuffer1
+    pop hl
+    pop af
+    ld [$cfcb],a
+    ld a,[$cf4b]
+    cp $50
+    ret nz
+.asm_654c
+    ld d,h
+    ld e,l
+    ld hl,$cd6d
+    ld bc,$000b
+    jp CopyData
+
+DoYouWantToNicknameText: ; 0x6557
+    TX_FAR _DoYouWantToNicknameText
+    db "@"
+
+; ────────────────────────────────
+
 ; Free
 
 SECTION "CopyFixedLengthText",ROMX[$42b1],BANK[$1]
@@ -14136,17 +14179,6 @@ MainMenu: ; 5af2 (1:5af2)
     ld [$D52A],a
     ld c,10
     call DelayFrames
-;    ld a,[$D5A2]
-;    and a
-;    jp z,SpecialEnterMap
-;    call GetCurrentOldAdventureMap
-;    cp HALL_OF_FAME
-;    jp nz,SpecialEnterMap
-;    xor a
-;    ld [$D71A],a
-;    ld hl,$D732
-;    set 2,[hl]
-;    call SpecialWarpIn
     jp SpecialEnterMap
 
 Func_5bff: ; 5bff (1:5bff)
@@ -14297,7 +14329,7 @@ Func_5c0a: ; 5c0a (1:5c0a)
     ld hl,$d732
     res 1,[hl]
     ld a,[W_ANIMATIONID] ; $d07c
-    ld [$d71a],a
+    ld [wDestinationMap],a
     call SpecialWarpIn
     ld c,$14
     call DelayFrames
@@ -14817,7 +14849,7 @@ OakSpeech: ; 6115 (1:6115)
     ld [$CF96],a
     call AddItemToInventory  ; give one potion
     ld a,[$D07C]
-    ld [$D71A],a
+    ld [wDestinationMap],a
     call SpecialWarpIn
     xor a
     ld [$FFD7],a
@@ -14967,13 +14999,11 @@ OakSpeech: ; 6115 (1:6115)
     ld [$FF4B],a
     jr .next3
 
-; Free
-
-SECTION "Predef3B",ROMX[$62a1],BANK[$1]
-
-Predef3B: ; 62a1 (1:62a1)
+Predef3B:
     call Load16BitRegisters
-IntroPredef3B: ; 62a4 (1:62a4)
+    ; ft
+
+IntroPredef3B:
     push bc
     ld a,b
     call UncompressSpriteFromDE
@@ -14996,21 +15026,23 @@ IntroPredef3B: ; 62a4 (1:62a4)
     ld [$FFE1],a
     PREDEF_JUMP CopyUncompressedPicToTilemap
 
-SpecialWarpIn: ; 62ce (1:62ce)
-    call Func_62ff
-    PREDEF Func_c754
+; ────────────────────────────────
+
+SpecialWarpIn:
+    call .LoadSpecialWarpData
+    PREDEF LoadTilesetHeader
+    ld hl,wOverworldDigAnimationBit1
+    bit 1,[hl]
+    ret nz ; don't edit "wLastMap" because just set during ".LoadSpecialWarpData"
     ld hl,$D732
-    bit 2,[hl]
+    bit 2,[hl] ; dungeon warp or fly warp?
     res 2,[hl]
     jr z,.next
-    ld a,[$D71A]
+; if dungeon warp or fly warp
+    ld a,[wDestinationMap]
     jr .next2
 .next
-    bit 1,[hl]
-    jr z,.next3
-    ds 3 ; ex debug function?
-.next3
-    ld a,0
+    xor a
 .next2
     ld b,a
     ld a,[$D72D]
@@ -15019,128 +15051,214 @@ SpecialWarpIn: ; 62ce (1:62ce)
     ld a,b
 .next4
     ld hl,$D732
-    bit 4,[hl]
+    bit 4,[hl] ; dungeon warp?
     ret nz
-    ld [$D365],a
+    ld [wLastMap],a
     ret
 
-Func_62ff: ; 62ff (1:62ff)
-    ld a,[$d72d]
-    cp $ef
-    jr nz,.asm_6314
-    ld hl,BattleCenterSpec1 ; $6428
+.LoadSpecialWarpData
+    ld a,[$D72D]
+    cp BATTLE_CENTER
+    jr nz,.skip1
+    ld hl,BattleCenterSpec1
     ld a,[$FF00+$aa]
     cp $2
-    jr z,.asm_6334
-    ld hl,BattleCenterSpec2 ; $6430
-    jr .asm_6334
-.asm_6314
-    cp $f0
-    jr nz,.asm_6326
-    ld hl,TradeCenterSpec1 ; $6438
+    jr z,.done1
+    ld hl,BattleCenterSpec2
+    jr .done1
+.skip1
+    cp TRADE_CENTER
+    jr nz,.skip2
+    ld hl,TradeCenterSpec1
     ld a,[$FF00+$aa]
     cp $2
-    jr z,.asm_6334
-    ld hl,TradeCenterSpec2 ; $6440
-    jr .asm_6334
-.asm_6326
+    jr z,.done1
+    ld hl,TradeCenterSpec2
+    jr .done1
+.skip2
     ld a,[$d732]
     bit 1,a
-    jr nz,.asm_6346
+    jr nz,.notFirstMap
     bit 2,a
-    jr nz,.asm_6346
-    ld hl,FirstMapSpec ; $6420
-.asm_6334
-    ld de,W_CURMAP ; $d35e
-    ld c,$7
-.asm_6339
+    jr nz,.notFirstMap
+.firstmap
+    ld hl,FirstMapSpec
+.done1
+    ld de,W_CURMAP
+    ld c,7
+    call .CopyWarpData
     ld a,[hli]
-    ld [de],a
-    inc de
-    dec c
-    jr nz,.asm_6339
-    ld a,[hli]
-    ld [W_CURMAPTILESET],a ; $d367
+    ld [W_CURMAPTILESET],a
     xor a
-    jr .asm_63b3
-.asm_6346
-    ld a,[wLastMap]
+    jr .done2
+.notFirstMap
+    ld hl,wOverworldDigAnimationBit1
+    bit 1,[hl]
+    jp nz,.DigAugerWarp
     ld hl,$d732
-    bit 4,[hl]
-    jr nz,.asm_635b
-    bit 6,[hl]
+    bit 4,[hl] ; used dungeon warp (jumped down hole/waterfall)?
+    jr nz,.usedDunegonWarp
+    bit 6,[hl] ; return to last pokemon center (or player's house)?
     res 6,[hl]
-    jr z,.asm_638e
-    call GetLastBlackoutMap ; ld a,[wLastBlackoutMap]
-    jr .asm_6391
-.asm_635b
+    jr z,.otherDestination
+    call GetLastBlackoutMap
+    jr .usedFlyWarp
+.usedDunegonWarp
     ld hl,$d72d
     res 4,[hl]
-    ld a,[$d71d]
+    ld a,[$d71d] ; DungeonWarpDestinationMap
     ld b,a
     call ChangeCurMap
-    ld a,[$d71e]
+    ld a,[$d71e] ; WhichDungeonWarp
     ld c,a
-    call GetDungeonWarpList ; ld hl,DungeonWarpList ; $63bf
+    call GetDungeonWarpList
     ld de,$0
     ld a,$6
-    ld [$d12f],a
-.asm_6376
+    ld [$d12f],a ; DungeonWarpDataEntrySize
+.dungeonWarpListLoop
     ld a,[hli]
     cp b
-    jr z,.asm_637d
+    jr z,.matchedDungeonWarpDestinationMap
     inc hl
-    jr .asm_6381
-.asm_637d
+    jr .nextDungeonWarp
+.matchedDungeonWarpDestinationMap
     ld a,[hli]
     cp c
-    jr z,.asm_6388
-.asm_6381
-    ld a,[$d12f]
+    jr z,.matchedDungeonWarpID
+.nextDungeonWarp
+    ld a,[$d12f] ; DungeonWarpDataEntrySize
     add e
     ld e,a
-    jr .asm_6376
-.asm_6388
-    call CheckDiglettsCave ; call GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
+    jr .dungeonWarpListLoop
+.matchedDungeonWarpID
+    call .CheckDiglettsCave
+    call GetDungeonWarpData
     add hl,de
-    jr .asm_63a4
-.asm_638e
-    ld a,[$d71a]
-.asm_6391
+    jr .copyWarpData2
+.otherDestination
+    ld a,[wDestinationMap]
+.usedFlyWarp
     ld b,a
     call ChangeCurMap
-    call GetFlyWarpDataPtr ; ld hl,FlyWarpDataPtr ; $6448
-.asm_6398
+    call GetFlyWarpDataPtr
+.flyWarpDataPtrLoop
     ld a,[hli]
-    inc hl
     cp b
-    jr z,.asm_63a1
+    jr z,.foundFlyWarpMatch
     inc hl
     inc hl
-    jr .asm_6398
-.asm_63a1
+    jr .flyWarpDataPtrLoop
+.foundFlyWarpMatch
     ld a,[hli]
     ld h,[hl]
     ld l,a
-.asm_63a4
-    ld de,$d35f
-    ld c,$6
-.asm_63a9
-    ld a,[hli]
-    ld [de],a
-    inc de
-    dec c
-    jr nz,.asm_63a9
-    xor a
-    ld [W_CURMAPTILESET],a ; $d367
-.asm_63b3
+.copyWarpData2
+    ld de,$d35f ; CurrentTileBlockMapViewPointer
+    ld c,6
+    call .CopyWarpData
+    xor a ; OVERWORLD
+    ld [W_CURMAPTILESET],a
+.done2
     ld [$d4e2],a
     ld [$d4e3],a
     ld a,$ff
     ld [$d42f],a
     ret
 
-DungeonWarpList: ; 63bf (1:63bf)
+.CopyWarpData
+    ld a,[hli]
+    ld [de],a
+    inc de
+    dec c
+    jr nz,.CopyWarpData
+    ret
+
+.CheckDiglettsCave
+    call GetCurrentOldAdventureMap
+    cp DIGLETTS_CAVE
+    jp nz,CheckDarkMap
+    ld a,$06     ; Dark Map
+    ld [$d35d],a ; ...
+    ret
+
+.DigAugerWarp
+    ld a,[W_CURMAP]
+    ld b,a
+    call GetDigAugerWarpList
+.LoopDigAugerWarp
+    ld a,[hli]
+    cp b
+    jr z,.DigAugerWarpFound
+    inc hl
+    inc hl
+    jr .LoopDigAugerWarp
+.DigAugerWarpFound
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    ld de,W_CURMAP
+    ld c,8
+    call .CopyWarpData
+    xor a
+    ld [W_CURMAPTILESET],a
+    call CheckDarkMap
+    jr .done2
+
+; ────────────────────────────────
+
+DigAugerWarpList:
+    dbw VIRIDIAN_FOREST,.ViridianForest
+    dbw MT_MOON_1,.MtMoon
+    dbw MT_MOON_2,.MtMoon
+    dbw MT_MOON_3,.MtMoon
+    dbw DIGLETTS_CAVE_ENTRANCE,.DiglettsCave
+    dbw DIGLETTS_CAVE,.DiglettsCave
+    dbw DIGLETTS_CAVE_EXIT,.DiglettsCave
+    dbw ROCK_TUNNEL_1,.RockTunnel
+    dbw ROCK_TUNNEL_2,.RockTunnel
+    dbw SEAFOAM_ISLANDS_1,.SeafoamIslands
+    dbw SEAFOAM_ISLANDS_2,.SeafoamIslands
+    dbw SEAFOAM_ISLANDS_3,.SeafoamIslands
+    dbw SEAFOAM_ISLANDS_4,.SeafoamIslands
+    dbw SEAFOAM_ISLANDS_5,.SeafoamIslands
+    dbw VICTORY_ROAD_1,.VictoryRoad
+    dbw VICTORY_ROAD_2,.VictoryRoad
+    dbw VICTORY_ROAD_3,.VictoryRoad
+    dbw UNKNOWN_DUNGEON_1,.UnknownDungeon
+    dbw UNKNOWN_DUNGEON_2,.UnknownDungeon
+    dbw UNKNOWN_DUNGEON_3,.UnknownDungeon
+    dbw UNKNOWN_DUNGEON_4,.UnknownDungeon
+
+.ViridianForest
+    db VIRIDIAN_FOREST
+    FLYWARP_DATA VIRIDIAN_FOREST_WIDTH,47,17
+    db ROUTE_2
+.MtMoon
+    db MT_MOON_1
+    FLYWARP_DATA MT_MOON_1_WIDTH,35,14
+    db ROUTE_4
+.DiglettsCave
+    db DIGLETTS_CAVE_ENTRANCE
+    FLYWARP_DATA DIGLETTS_CAVE_ENTRANCE_WIDTH,07,02
+    db ROUTE_11
+.RockTunnel
+    db ROCK_TUNNEL_1
+    FLYWARP_DATA ROCK_TUNNEL_1_WIDTH,02,15
+    db ROUTE_10
+.SeafoamIslands
+    db SEAFOAM_ISLANDS_1
+    FLYWARP_DATA SEAFOAM_ISLANDS_1_WIDTH,17,04
+    db ROUTE_20
+.VictoryRoad
+    db VICTORY_ROAD_1
+    FLYWARP_DATA VICTORY_ROAD_1_WIDTH,17,08
+    db ROUTE_23
+.UnknownDungeon
+    db UNKNOWN_DUNGEON_1
+    FLYWARP_DATA UNKNOWN_DUNGEON_1_WIDTH,17,24
+    db CERULEAN_CITY
+
+DungeonWarpList:
     db SEAFOAM_ISLANDS_2,$01
     db SEAFOAM_ISLANDS_2,$02
     db SEAFOAM_ISLANDS_3,$01
@@ -15177,149 +15295,79 @@ DungeonWarpData:
 ;    db Tileset_id
 FirstMapSpec:
     db REDS_HOUSE_2F
-    FLYWARP_DATA REDS_HOUSE_2F_WIDTH,6,3
+    FLYWARP_DATA REDS_HOUSE_2F_WIDTH,06,03
     db $04
 
 BattleCenterSpec1:
     db BATTLE_CENTER
-    FLYWARP_DATA BATTLE_CENTER_WIDTH,4,3
+    FLYWARP_DATA BATTLE_CENTER_WIDTH,04,03
     db $15
 
 BattleCenterSpec2:
     db BATTLE_CENTER
-    FLYWARP_DATA BATTLE_CENTER_WIDTH,4,6
+    FLYWARP_DATA BATTLE_CENTER_WIDTH,04,06
     db $15
 
 TradeCenterSpec1:
     db TRADE_CENTER
-    FLYWARP_DATA TRADE_CENTER_WIDTH,4,3
+    FLYWARP_DATA TRADE_CENTER_WIDTH,04,03
     db $15
 
 TradeCenterSpec2:
     db TRADE_CENTER
-    FLYWARP_DATA TRADE_CENTER_WIDTH,4,6
+    FLYWARP_DATA TRADE_CENTER_WIDTH,04,06
     db $15
 
 FlyWarpDataPtr:
-    db $00,0
-    dw Map00FlyWarp
-    db $01,0
-    dw Map01FlyWarp
-    db $02,0
-    dw Map02FlyWarp
-    db $03,0
-    dw Map03FlyWarp
-    db $04,0
-    dw Map04FlyWarp
-    db $05,0
-    dw Map05FlyWarp
-    db $06,0
-    dw Map06FlyWarp
-    db $07,0
-    dw Map07FlyWarp
-    db $08,0
-    dw Map08FlyWarp
-    db $09,0
-    dw Map09FlyWarp
-    db $0A,0
-    dw Map0aFlyWarp
-    db $0F,0
-    dw Map0fFlyWarp
-    db $15,0
-    dw Map15FlyWarp
-    db $22,0
-    dw Map22FlyWarp
+    dbw PALLET_TOWN,.Map00FlyWarp
+    dbw VIRIDIAN_CITY,.Map01FlyWarp
+    dbw PEWTER_CITY,.Map02FlyWarp
+    dbw CERULEAN_CITY,.Map03FlyWarp
+    dbw LAVENDER_TOWN,.Map04FlyWarp
+    dbw VERMILION_CITY,.Map05FlyWarp
+    dbw CELADON_CITY,.Map06FlyWarp
+    dbw FUCHSIA_CITY,.Map07FlyWarp
+    dbw CINNABAR_ISLAND,.Map08FlyWarp
+    dbw INDIGO_PLATEAU,.Map09FlyWarp
+    dbw SAFFRON_CITY,.Map0aFlyWarp
+    dbw ROUTE_4,.Map0fFlyWarp
+    dbw ROUTE_10,.Map15FlyWarp
+    dbw ROUTE_23,.Map22FlyWarp
 
 ; Original Format:
 ;   [Event Displacement][Y-block][X-block][Y-sub_block][X-sub_block]
 ; Macro Format:
 ;   FLYWARP_DATA [Map Width][Y-pos][X-pos]
-Map00FlyWarp:
-    FLYWARP_DATA 10,6,5
-Map01FlyWarp:
-    FLYWARP_DATA 20,26,23
-Map02FlyWarp:
-    FLYWARP_DATA 20,26,13
-Map03FlyWarp:
-    FLYWARP_DATA 20,18,19
-Map04FlyWarp:
-    FLYWARP_DATA 10,6,3
-Map05FlyWarp:
-    FLYWARP_DATA 20,4,11
-Map06FlyWarp:
-    FLYWARP_DATA 25,10,41
-Map07FlyWarp:
-    FLYWARP_DATA 20,28,19
-Map08FlyWarp:
-    FLYWARP_DATA 10,12,11
-Map09FlyWarp:
-    FLYWARP_DATA 10,6,9
-Map0aFlyWarp:
-    FLYWARP_DATA 20,30,9
-Map0fFlyWarp:
-    FLYWARP_DATA 45,6,11
-Map15FlyWarp:
-    FLYWARP_DATA 10,20,11
-Map22FlyWarp:
-    FLYWARP_DATA 10,48,12
+.Map00FlyWarp
+    FLYWARP_DATA PALLET_TOWN_WIDTH,06,05
+.Map01FlyWarp
+    FLYWARP_DATA VIRIDIAN_CITY_WIDTH,26,23
+.Map02FlyWarp
+    FLYWARP_DATA PEWTER_CITY_WIDTH,26,13
+.Map03FlyWarp
+    FLYWARP_DATA CERULEAN_CITY_WIDTH,18,19
+.Map04FlyWarp
+    FLYWARP_DATA LAVENDER_TOWN_WIDTH,06,03
+.Map05FlyWarp
+    FLYWARP_DATA VERMILION_CITY_WIDTH,04,11
+.Map06FlyWarp
+    FLYWARP_DATA CELADON_CITY_WIDTH,10,41
+.Map07FlyWarp
+    FLYWARP_DATA FUCHSIA_CITY_WIDTH,28,19
+.Map08FlyWarp
+    FLYWARP_DATA CINNABAR_ISLAND_WIDTH,12,11
+.Map09FlyWarp
+    FLYWARP_DATA INDIGO_PLATEAU_WIDTH,06,09
+.Map0aFlyWarp
+    FLYWARP_DATA SAFFRON_CITY_WIDTH,30,09
+.Map0fFlyWarp
+    FLYWARP_DATA ROUTE_4_WIDTH,06,11
+.Map15FlyWarp
+    FLYWARP_DATA ROUTE_10_WIDTH,20,11
+.Map22FlyWarp
+    FLYWARP_DATA ROUTE_23_WIDTH,48,12
 
-SECTION "AskForMonNickname",ROMX[$64eb],BANK[$1]
-
-AskForMonNickname: ; 64eb (1:64eb)
-    call SaveScreenTilesToBuffer1
-    call Load16BitRegisters
-    push hl
-    ld a,[W_ISINBATTLE] ; $d057
-    dec a
-    ld hl,wTileMap
-    ld b,$4
-    ld c,$b
-    call z,ClearScreenArea ; only if in wild battle
-    ld a,[$cf91]
-    ld [$d11e],a
-    call GetMonName
-    call HidePlayerBattleHudAndStandarizePaletteBeforeRenameInBattle ; ld hl,DoYouWantToNicknameText ; $6557
-    call PrintText
-    FuncCoord 14,7 ; $c43a
-    ld hl,Coord
-    ld bc,$80f
-    ld a,$14
-    ld [$d125],a
-    call DisplayTextBoxID
-    pop hl
-    ld a,[wCurrentMenuItem] ; $cc26
-    and a
-    jr nz,.asm_654c
-    ld a,[$cfcb]
-    push af
-    xor a
-    ld [$cfcb],a
-    push hl
-    ld a,$2
-    ld [$d07d],a
-    call StoreCatchPkmnIdAndFlagBeforeRename
-    ld a,[W_ISINBATTLE] ; $d057
-    and a
-    jr nz,.asm_653e
-    call ReloadMapSpriteTilePatterns
-.asm_653e
-    call LoadScreenTilesFromBuffer1
-    pop hl
-    pop af
-    ld [$cfcb],a
-    ld a,[$cf4b]
-    cp $50
-    ret nz
-.asm_654c
-    ld d,h
-    ld e,l
-    ld hl,$cd6d
-    ld bc,$000b
-    jp CopyData
-
-DoYouWantToNicknameText: ; 0x6557
-    TX_FAR _DoYouWantToNicknameText
-    db "@"
+; ────────────────────────────────
 
 ; Free
 
@@ -18640,18 +18688,6 @@ DefaultNamesRivalList:
     db "GARY@"
     ds 6
 
-CheckDiglettsCave:
-    call GetCurrentOldAdventureMap
-    cp DIGLETTS_CAVE
-    jr nz,.done
-    ld a,$06     ; Dark Map
-    ld [$d35d],a ; ...
-    jr .end
-.done
-    call CheckDarkMap
-.end
-    jp GetDungeonWarpData ; ld hl,DungeonWarpData ; $63d8
-
 HandleMenuInput_PrintMoveBox:
     ; Backup
     ld a,[wPlayerSelectedMove]
@@ -18709,11 +18745,19 @@ HandleMenuInput_PrintMoveBox:
 ; ───────────────────────────────────────
 
 FlyWarpDataPtrNew:
-    db PORT_ROYAL,0
-    dw PortRoyalFlyWarp
+    dbw PORT_ROYAL,.PortRoyalFlyWarp
 
-PortRoyalFlyWarp:
+.PortRoyalFlyWarp
     FLYWARP_DATA PORT_ROYAL_WIDTH,6,5
+
+DigAugerWarpListNew:
+    dbw TEST_MAP_1,.TestMap
+    dbw TEST_MAP_2,.TestMap
+
+.TestMap
+    db TEST_MAP_1
+    FLYWARP_DATA TEST_MAP_1_WIDTH,28,06
+    db ROUTE_D1
 
 DungeonWarpListNew:
     db TEST_MAP_2,01
@@ -18743,6 +18787,13 @@ GetFlyWarpDataPtr:
     call CheckNewAdventureFlag
     ret z
     ld hl,FlyWarpDataPtrNew
+    ret
+
+GetDigAugerWarpList:
+    ld hl,DigAugerWarpList
+    call CheckNewAdventureFlag
+    ret z
+    ld hl,DigAugerWarpListNew
     ret
 
 GetDungeonWarpList:
@@ -21559,7 +21610,7 @@ Func_c49d: ; c49d (3:449d)
     push bc
     BANKSWITCH Func_1a609
     jr c,.asm_c4c8
-    ld a,[W_CURMAPTILESET] ; $d367
+    ld a,[W_CURMAPTILESET]
     add a
     ld c,a
     ld b,$0
@@ -22004,11 +22055,11 @@ Func_c69c: ; c69c (3:469c)
     ld [$d12d],a
     ret
 
-Func_c754: ; c754 (3:4754)
+LoadTilesetHeader: ; c754 (3:4754)
     call Load16BitRegisters
     push hl
     ld d,$0
-    ld a,[W_CURMAPTILESET] ; $d367
+    ld a,[W_CURMAPTILESET]
     add a
     add a
     ld b,a
@@ -22033,7 +22084,7 @@ Func_c754: ; c754 (3:4754)
     xor a
     ld [$FF00+$d8],a
     pop hl
-    ld a,[W_CURMAPTILESET] ; $d367
+    ld a,[W_CURMAPTILESET]
     push hl
     push de
     ld hl,DungeonTilesetIDs ; $47b2
@@ -22042,7 +22093,7 @@ Func_c754: ; c754 (3:4754)
     pop de
     pop hl
     jr c,.asm_c797
-    ld a,[W_CURMAPTILESET] ; $d367
+    ld a,[W_CURMAPTILESET]
     ld b,a
     ld a,[H_DOWNARROWBLINKCNT1] ; $FF00+$8b
     cp b
@@ -24691,9 +24742,11 @@ ItemUseAuger:
     jp nc,ItemUseFailed
     call CheckDiglettsCaveHole
     ret c
+    ld hl,wOverworldDigAnimationBit1
+    set 1,[hl]
     ld hl,$d732
     set 3,[hl]
-    set 6,[hl]
+    ;set 6,[hl]; Dont't Return to Last Pkmn Center
     ld hl,$d72e
     res 4,[hl]
     ld hl,$d790
@@ -26397,6 +26450,7 @@ RedrawMapView:
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld [$FF00+$d7],a ; TileAnimations
     call LoadCurrentMapView
+    call .HandleDigAugerHole
     ld hl,$d526 ; MapViewVRAMPointer
     ld a,[hli]
     ld h,[hl]
@@ -26454,6 +26508,40 @@ RedrawMapView:
     pop af
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ret
+
+.HandleDigAugerHole
+    ld hl,wVBlankDrawHoleBit2
+    bit 2,[hl]
+    res 2,[hl]
+    ret z
+    ld a,[W_CURMAPTILESET]
+    cp $03 ; Forest Tileset
+    FuncCoord 08,08
+    ld hl,Coord
+    call .GetBlackTileId
+    ld a,[bc]
+    ld [hli],a
+    inc bc
+    ld a,[bc]
+    ld [hli],a
+    ld de,20-2
+    add hl,de
+    inc bc
+    ld a,[bc]
+    ld [hli],a
+    inc bc
+    ld a,[bc]
+    ld [hl],a
+    ret
+.GetBlackTileId
+    ld bc,.Cave
+    ret nz
+    ld bc,.Forest
+    ret
+.Cave
+    db $2F,$2F,$22,$22
+.Forest
+    db $44,$45,$46,$47
 
 CompareHLWithBC:
     ld a,h
@@ -28276,7 +28364,7 @@ PrintBookshelfText: ; fb50 (3:7b50)
     ld a,[$c109]
     cp $4
     jr nz,.asm_fb7f
-    ld a,[W_CURMAPTILESET] ; $d367
+    ld a,[W_CURMAPTILESET]
     ld b,a
     FuncCoord 8,7 ; $c434
     ld a,[Coord]
@@ -28686,9 +28774,6 @@ CheckDiglettsCaveHole:
     call GetCurrentOldAdventureMap
     cp DIGLETTS_CAVE
     jr nz,.NotEvent
-    ld a,[$d152]
-    and a          ; using Dig?
-    jr z,.NotEvent ; if so,continue
     ld hl,.coordsData
     call ArePlayerCoordsInArray
     jr nc,.NotEvent
@@ -30938,7 +31023,7 @@ TryDoWildEncounter:
     jr z,.CanEncounter
     call IsCurrentMapTownOrRoute
     jr c,.CantEncounter2
-    call HackDockTilesetLikeSafari ; ld a,[W_CURMAPTILESET] ; $d367
+    call HackDockTilesetLikeSafari ; ld a,[W_CURMAPTILESET]
     cp $3 ; Viridian Forest/Safari Zone
     jr z,.CantEncounter2
 .CanEncounter2
@@ -31326,7 +31411,7 @@ HackDockTilesetLikeSafari:
     ld hl,.ExceptionList
     ld de,1
     call IsInArray
-    ld a,[W_CURMAPTILESET] ; $d367
+    ld a,[W_CURMAPTILESET]
     ret nc
     ld a,$3 ; Viridian Forest/Safari Zone
     ret
@@ -36776,7 +36861,7 @@ RivalIDs: ; 1a605 (6:6605)
 Func_1a609: ; 1a609 (6:6609)
     push de
     ld hl,DoorTileIDPointers ; $662c
-    ld a,[W_CURMAPTILESET] ; $d367
+    ld a,[W_CURMAPTILESET]
     ld de,$3
     call IsInArray
     pop de
@@ -68661,7 +68746,7 @@ Func_44fd7: ; 44fd7 (11:4fd7)
     add hl,bc
     ld a,[hl]
     ld [$c102],a
-    ld a,[W_CURMAPTILESET] ; $d367
+    ld a,[W_CURMAPTILESET]
     cp $16
     ld hl,SpinnerArrowTilePointers1 ; $5023
     jr z,.asm_44ff6
@@ -99577,10 +99662,7 @@ CheckBaloonRule:
     ld hl,wLocationMonOvSprInstruction
     ret
 
-SECTION "FlashingBallHealPokecenter",ROMX[$44f3],BANK[$1C]
-
-; known jump sources: 7049f (1c:449f),708f3 (1c:48f3)
-FlashingBallHealPokecenter: ; 704f3 (1c:44f3) ; Denim,modificata interamente per funzionare sul GameBoyColor
+FlashingBallHealPokecenter: ; Denim,modificata interamente per funzionare sul GameBoyColor
     ld b,$8
 .LoopFlash
     push bc
@@ -99592,7 +99674,7 @@ FlashingBallHealPokecenter: ; 704f3 (1c:44f3) ; Denim,modificata interamente per
     jr nz,.LoopFlash
     ret
 
-Func_70503: ; 70503 (1c:4503)
+Func_70503:
     ld a,[de]
     inc de
     ld [hli],a
@@ -99607,31 +99689,35 @@ Func_70503: ; 70503 (1c:4503)
     ld [hli],a
     ret
 
-Func_70510: ; 70510 (1c:4510)
+EnterMapAnim:
     call InitFacingDirectionList
     ld a,$ec
     ld [$c104],a
     call Delay3
     push hl
+    ld hl,wOverworldDigAnimationBit1
+    bit 1,[hl]
+    res 1,[hl]
+    jp nz,EnterMapThroughDigAuger
     call IfNotDarkGBFadeIn2 ; call GBFadeIn2
     ld hl,W_FLAGS_D733
-    bit 7,[hl]
+    bit 7,[hl] ; used fly out of battle?
     res 7,[hl]
-    jr nz,.asm_70568
-    ld a,$a0
+    jr nz,.flyAnimation
+    ld a,$a0 ; SFX_TELEPORT_ENTER_1
     call PlaySound
     ld hl,$d732
-    bit 4,[hl]
+    bit 4,[hl] ; used dungeon warp?
     res 4,[hl]
+    jr nz,.dungeonWarpAnimation
     pop hl
-    jr nz,.asm_7055e
     call PlayerSpinWhileMovingDown
-    ld a,$a3
+    ld a,$a3 ; SFX_TELEPORT_ENTER_2
     call PlaySound
     call IsPlayerStandingOnWarpPadOrHole
-    ld a,b
     and a
-    jr nz,.asm_7055b
+    jr nz,.done
+; if the player is not standing on a warp pad or hole
     ld hl,wWhichTrade ; $cd3d
     xor a
     ld [hli],a
@@ -99642,17 +99728,18 @@ Func_70510: ; 70510 (1c:4510)
     ld [hl],$ff
     ld hl,$cd48
     call PlayerSpinInPlace
-.asm_70558
+.restoreDefaultMusic
     call PlayDefaultMusic
-.asm_7055b
+.done
     jp RestoreFacingDirectionAndYScreenPos
-.asm_7055e
+.dungeonWarpAnimation
+    pop hl ; Restore Useless Pointer
     ld c,$32
     call DelayFrames
     call PlayerSpinWhileMovingDown
-    jr .asm_7055b
-.asm_70568
-    pop hl
+    jr .done
+.flyAnimation
+    pop hl ; Restore Useless Pointer
     call LoadFlyingMonSprite_Overworld
     ld a,$a4
     call PlaySound
@@ -99662,17 +99749,29 @@ Func_70510: ; 70510 (1c:4510)
     ld a,$c
     ld [hli],a
     ld [hl],$8
-    ld de,Unknown_70592 ; $4592
+    ld de,.FlyAnimationEnterScreenCoords
     call DoFlyAnimation
     call LoadPlayerSpriteGraphics
-    jr .asm_70558
+    jr .restoreDefaultMusic
 
-SECTION "Unknown_70592",ROMX[$4592],BANK[$1c]
+.FlyAnimationEnterScreenCoords
+; y, x pairs
+; This is the sequence of screen coordinates used by the overworld
+; Fly animation when the player is entering a map.
+	db $05, $98
+	db $0F, $90
+	db $18, $88
+	db $20, $80
+	db $27, $78
+	db $2D, $70
+	db $32, $68
+	db $36, $60
+	db $39, $58
+	db $3B, $50
+	db $3C, $48
+	db $3C, $40
 
-Unknown_70592: ; 70592 (1c:4592)
-INCBIN "baserom.gbc",$70592,$705aa - $70592
-
-PlayerSpinWhileMovingDown: ; 705aa (1c:45aa)
+PlayerSpinWhileMovingDown:
     ld hl,wWhichTrade ; $cd3d
     ld a,$10
     ld [hli],a
@@ -99682,14 +99781,17 @@ PlayerSpinWhileMovingDown: ; 705aa (1c:45aa)
     ld [hl],a
     jp PlayerSpinWhileMovingUpOrDown
 
-_LeaveMapAnim: ; 705ba (1c:45ba)
+_LeaveMapAnim:
     call InitFacingDirectionList
     call IsPlayerStandingOnWarpPadOrHole
-    ld a,b
     and a
     jr z,.playerNotStandingOnWarpPadOrHole
     dec a
-    jp nz,LeaveMapThroughHoleAnim
+    jr z,.spinWhileMovingUp
+    dec a
+    jp z,LeaveMapThroughHoleAnim
+    dec a
+    jp z,LeaveMapThroughDigAuger
 .spinWhileMovingUp
     ld a,$9f ; SFX_TELEPORT_EXIT_1
     call PlaySound
@@ -99702,7 +99804,6 @@ _LeaveMapAnim: ; 705ba (1c:45ba)
     ld [hl],a
     call PlayerSpinWhileMovingUpOrDown
     call IsPlayerStandingOnWarpPadOrHole
-    ld a,b
     dec a
     jr z,.playerStandingOnWarpPad
 ; if not standing on a warp pad, there is an extra delay
@@ -99745,7 +99846,7 @@ _LeaveMapAnim: ; 705ba (1c:45ba)
     ld a,$c
     ld [hli],a
     ld [hl],$c
-    ld de,FlyAnimationScreenCoords1
+    ld de,.FlyAnimationScreenCoords1
     call DoFlyAnimation
     ld c,$28
     call DelayFrames
@@ -99753,12 +99854,12 @@ _LeaveMapAnim: ; 705ba (1c:45ba)
     ld a,$b
     ld [hli],a
     ld [hl],$8
-    ld de,FlyAnimationScreenCoords2
+    ld de,.FlyAnimationScreenCoords2
     call DoFlyAnimation
     call GBFadeOut2
     jp RestoreFacingDirectionAndYScreenPos
 
-FlyAnimationScreenCoords1:
+.FlyAnimationScreenCoords1
 ; y, x pairs
 ; This is the sequence of screen coordinates used by the first part
 ; of the Fly overworld animation.
@@ -99775,7 +99876,7 @@ FlyAnimationScreenCoords1:
 	db $2A, $98
 	db $27, $A0
 
-FlyAnimationScreenCoords2:
+.FlyAnimationScreenCoords2
 ; y, x pairs
 ; This is the sequence of screen coordinates used by the second part
 ; of the Fly overworld animation.
@@ -99792,7 +99893,7 @@ FlyAnimationScreenCoords2:
 
 	db $F0, $00
 
-LeaveMapThroughHoleAnim: ; 7067d (1c:467d)
+LeaveMapThroughHoleAnim:
     ld a,$ff
     ld [$cfcb],a
     ld a,[$c302]
@@ -99807,12 +99908,12 @@ LeaveMapThroughHoleAnim: ; 7067d (1c:467d)
     ld a,$a0
     ld [$c308],a
     ld [$c30c],a
-    call IfNotDarkGBFadeOut2 ; call GBFadeOut2
+    call IfNotDarkGBFadeOut2
     ld a,$1
     ld [$cfcb],a
     jp RestoreFacingDirectionAndYScreenPos
 
-DoFlyAnimation: ; 706ae (1c:46ae)
+DoFlyAnimation:
     ld a,[$cd3f]
     xor $1
     ld [$cd3f],a
@@ -99929,33 +100030,6 @@ GetPlayerTeleportAnimFrameDelay: ; 7077f (1c:477f)
     xor $1
     inc a
     inc a
-    ret
-
-IsPlayerStandingOnWarpPadOrHole: ; 70787 (1c:4787)
-    ld b,$0
-    ld hl,WarpPadAndHoleData
-    ld a,[W_CURMAPTILESET] ; $d367
-    ld c,a
-.loop
-    ld a,[hli]
-    cp $ff
-    jr z,.done
-    cp c
-    jr nz,.nextEntry
-    FuncCoord 8,9 ; $c45c
-    ld a,[Coord]
-    cp [hl]
-    jr z,.foundMatch
-.nextEntry
-    inc hl
-    inc hl
-    jr .loop
-.foundMatch
-    inc hl
-    ld b,[hl]
-.done
-    ld a,b
-    ld [$cd5b],a
     ret
 
 CheckFlyingMonSprite2:
@@ -101238,7 +101312,7 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
     ld a,$8e
     call PlaySound
     ld a,[hl]
-    ld [$d71a],a
+    ld [wDestinationMap],a
     ld hl,$d732
     set 3,[hl]
     inc hl
@@ -102298,6 +102372,87 @@ LoadTrainerCardBadgePalettes:
     ld a,c
     cp 5
     ret
+
+; ─────────────────────────────────────────
+
+LeaveMapThroughDigAuger:
+    xor a
+    ld [$c207],a
+    call DrawHoleWithSound
+    call DisableUpdateSprites
+    call .DrawPlayerInHole
+    call .HidePlayerSprite
+    call IfNotDarkGBFadeOut2
+    jp EnableUpdateSpritesAndRestorePlayerSprite
+.DrawPlayerInHole
+    ld a,[$c302]
+    ld [$c30a],a
+    ld a,[$c306]
+    ld [$c30e],a
+    ld a,$a0
+    ld [wOAMBuffer],a
+    ld [$c304],a
+    ld c,$2
+    jp DelayFrames
+.HidePlayerSprite
+    ld a,$a0
+    ld [$c308],a
+    ld [$c30c],a
+    ret
+
+EnterMapThroughDigAuger:
+    pop hl ; Restore Useless Pointer
+    call DisableUpdateSprites
+    call IfNotDarkGBFadeIn2
+    call DrawHoleWithSound
+    call .DrawPlayerInHole
+    call .ResetPlayerSprite
+    call EnableUpdateSpritesAndRestorePlayerSprite
+    ld c,30
+    call DelayFrames
+    PREDEF RedrawMapView
+    ld hl,$d736 ; Stastanding on a warp
+    set 2,[hl]  ; ...
+    ret
+
+.DrawPlayerInHole
+    ld hl,.Config_Start1
+    ld de,wOAMBuffer
+    ld bc,.Config_End1-.Config_Start1
+    call CopyData
+    ld c,2
+    jp DelayFrames
+.Config_Start1
+    db $A0,$48,$00,$00,$A0,$50,$01,$00,$54,$48,$00,$00,$54,$50,$01,$00
+.Config_End1
+
+.ResetPlayerSprite
+    ld hl,.Config_Start2
+    ld de,wOAMBuffer
+    ld bc,.Config_End2-.Config_Start2
+    jp CopyData
+.Config_Start2
+    db $4C,$48,$00,$00,$4C,$50,$01,$00,$54,$48,$02,$00,$54,$50,$03,$00
+.Config_End2
+
+DrawHoleWithSound:
+    ld hl,wVBlankDrawHoleBit2
+    set 2,[hl]
+    PREDEF RedrawMapView
+    ld a,$AC
+    call PlaySound
+    ld c,30
+    jp DelayFrames
+
+DisableUpdateSprites:
+    ld a,$ff
+    ld [$cfcb],a
+    ret
+
+EnableUpdateSpritesAndRestorePlayerSprite:
+    ld a,$1
+    ld [$cfcb],a
+    jp RestoreFacingDirectionAndYScreenPos
 
 ; ─────────────────────────────────────────
 
@@ -103822,17 +103977,53 @@ IfNotDarkGBFadeIn2:
     ld b,2
     jp GBFadeOutCommon
 
-WARP_PAD  EQU $01
-WARP_HOLE EQU $02
+; ───────────────────────────────────────
 
+NO_WARP_PAD_HOLE EQU $00
+WARP_PAD EQU $01
+WARP_HOLE EQU $02
+DIG_AUGER EQU $03
+
+IsPlayerStandingOnWarpPadOrHole:
+    ld hl,wOverworldDigAnimationBit1
+    bit 1,[hl]
+    ld b,DIG_AUGER
+    jr nz,.done
+    ld b,NO_WARP_PAD_HOLE
+    ld hl,.WarpPadAndHoleData
+    ld a,[W_CURMAPTILESET]
+    ld c,a
+.loop
+    ld a,[hli]
+    cp $ff
+    jr z,.done
+    cp c
+    jr nz,.nextEntry
+    FuncCoord 8,9 ; $c45c
+    ld a,[Coord]
+    cp [hl]
+    jr z,.foundMatch
+.nextEntry
+    inc hl
+    inc hl
+    jr .loop
+.foundMatch
+    inc hl
+    ld b,[hl]
+.done
+    ld a,b
+    ld [$cd5b],a
+    ret
 ; format: db tileset id,tile id,value to be put in $cd5b
-WarpPadAndHoleData:
+.WarpPadAndHoleData
     db $16,$20,WARP_PAD
     db $16,$11,WARP_HOLE
     db $11,$22,WARP_HOLE
     db $10,$55,WARP_PAD
     db $10,$00,WARP_PAD ; Bills Teleport Fake Tileset
     db $FF
+
+; ───────────────────────────────────────
 
 SGBBorderGraphics:
     INCBIN "gfx/red/sgbborder.2bpp"
@@ -103904,7 +104095,7 @@ LoadSAVCheckSum: ; 73623 (1c:7623)
     ld de,wPokedexOwned ; $d2f7
     ld bc,$789
     call CopyData
-    ld hl,W_CURMAPTILESET ; $d367
+    ld hl,W_CURMAPTILESET
     set 7,[hl]
     ld hl,$ad2c
     ld de,wSpriteStateData1
@@ -137744,6 +137935,9 @@ _CheckDarkMap:
     ld a,[$d732] ; fall in hole
     bit 4,a      ; ...
     ret nz
+    ld hl,wOverworldDigAnimationBit1
+    bit 1,[hl]
+    ret nz
     ld a,[wOverworldGoToDarkBit0] ; Force Go To Dark
     bit 0,a                       ; ...
     ret nz
@@ -141023,16 +141217,16 @@ WildDataPointersNew:
 
 RouteD1Mons:
     db $19
-    db 26,DITTO  ; 20%
-    db 26,DITTO  ; 20%
-    db 26,DITTO  ; 15%
-    db 26,DITTO  ; 10%
-    db 26,DITTO  ; 10%
-    db 26,DITTO  ; 10%
-    db 26,DITTO  ;  5%
-    db 26,DITTO  ;  5%
-    db 26,DITTO  ;  4%
-    db 26,DITTO  ;  1%
+    db 10,DITTO  ; 20%
+    db 10,DITTO  ; 20%
+    db 10,DITTO  ; 15%
+    db 10,DITTO  ; 10%
+    db 10,DITTO  ; 10%
+    db 10,DITTO  ; 10%
+    db 10,DITTO  ;  5%
+    db 10,DITTO  ;  5%
+    db 10,DITTO  ;  4%
+    db 10,DITTO  ;  1%
     db $05
     db  2,MAGIKARP ; 20%
     db  2,MAGIKARP ; 20%
@@ -141047,16 +141241,16 @@ RouteD1Mons:
 
 TestMap1Mons:
     db $19
-    db   8,LITWICK    ; 20%
-    db   8,LITWICK    ; 20%
-    db   8,LITWICK    ; 15%
-    db  41,LAMPENT    ; 10%
-    db  41,LAMPENT    ; 10%
-    db  41,LAMPENT    ; 10%
-    db  50,CHANDELURE ;  5%
-    db  50,CHANDELURE ;  5%
-    db  50,CHANDELURE ;  4%
-    db  50,CHANDELURE ;  1%
+    db  9,ZUBAT   ; 20%
+    db  8,ZUBAT   ; 20%
+    db  8,GEODUDE ; 15%
+    db  9,GEODUDE ; 10%
+    db 10,ZUBAT   ; 10%
+    db  9,DIGLETT ; 10%
+    db  8,DIGLETT ;  5%
+    db 13,ZUBAT   ;  5%
+    db 10,DIGLETT ;  4%
+    db  7,LITWICK ;  1%
     db $05
     db  2,MAGIKARP ; 20%
     db  2,MAGIKARP ; 20%
@@ -144482,7 +144676,7 @@ AddMissableObjectPredef:                   NEW_PREDEF AddMissableObject         
 AddMissableObject_2Predef:                 NEW_PREDEF AddMissableObject                   ; $16
 ReplaceTileBlockPredef:                    NEW_PREDEF ReplaceTileBlock                    ; $17
 InitializePlayerData_2Predef:              NEW_PREDEF InitializePlayerData                ; $18
-Func_c754Predef:                           NEW_PREDEF Func_c754                           ; $19
+LoadTilesetHeaderPredef:                   NEW_PREDEF LoadTilesetHeader                   ; $19
 LearnMoveFromLevelUpPredef:                NEW_PREDEF LearnMoveFromLevelUp                ; $1A
 LearnMovePredef:                           NEW_PREDEF LearnMove                           ; $1B
 _IsItemInBagPredef:                        NEW_PREDEF _IsItemInBag                        ; $1C
@@ -144545,7 +144739,7 @@ Predef54Predef:                            NEW_PREDEF Predef54                  
 HallOfFamePCPredef:                        NEW_PREDEF HallOfFamePC                        ; $55
 DisplayDexRatingPredef:                    NEW_PREDEF DisplayDexRating                    ; $56
 _LeaveMapAnimPredef:                       NEW_PREDEF _LeaveMapAnim                       ; $57
-Func_70510Predef:                          NEW_PREDEF Func_70510                          ; $58
+EnterMapAnimPredef:                        NEW_PREDEF EnterMapAnim                        ; $58
 GetTileTwoStepsInFrontOfPlayerPredef:      NEW_PREDEF GetTileTwoStepsInFrontOfPlayer      ; $59
 CheckForCollisionWhenPushingBoulderPredef: NEW_PREDEF CheckForCollisionWhenPushingBoulder ; $5A
 UseStrengthPredef:                         NEW_PREDEF UseStrength                         ; $5B
