@@ -13944,10 +13944,10 @@ TradeCenter_Trade:
     ld a,[$ff00+$aa]
     cp $1
     jr z,.asm_59d9 ; 0x59d0 $7
-    PREDEF Func_410e2
+    PREDEF InternalClockTradeAnim
     jr .asm_59de ; 0x59d7 $5
 .asm_59d9
-    PREDEF Func_410f3
+    PREDEF ExternalClockTradeAnim
 .asm_59de
     BANKSWITCH TryEvolvingMon
     call ClearScreen
@@ -18433,7 +18433,9 @@ StoreCatchPkmnIdAndFlagBeforeRename: ; Denim
     set 7,[hl]
     inc hl
     ld a,[$cf91]
-    ld [hl],a ; wSpriteOAMBySpeciesId
+    ld [hli],a ; wSpriteOAMBySpeciesId
+    ld a,[wAltFormForShiny]
+    ld [hl],a ; wSpriteOAMBySpcAltForm
     pop hl
     jp LoadRenameScreen
 
@@ -31572,13 +31574,19 @@ HandlePkmnSubMenu:
 GetPartyMonIDAndName:
     push hl
     ld a,[$cf92]
-    ld hl,W_PARTYMON1
-    ld c,a
-    ld b,0
+    push af
+
+    ld hl,W_PARTYMON1_NUM
+    ld bc,44 ; Pokemon Data Lenght
+    call AddNTimes
+    ld a,[hl]
+    ld [wSkillMonID],a
+    ld bc,W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
     add hl,bc
-    ld b,[hl]
-    ld hl,wSkillMonID
-    ld [hl],b
+    ld a,[hl]
+    and %00001111 ; Max 15 Alternative Forms
+    ld [wSkillMonAltForm],a
+    pop af
     ld hl,W_PARTYMON1NAME
     call GetPartyMonName
     pop hl
@@ -65157,22 +65165,7 @@ MissingNoDexEntry:
     TX_FAR _MissingNoDexEntry
     db "@"
 
-SECTION "Func_410e2",ROMX[$50e2],BANK[$10]
-
-Func_410e2: ; 410e2 (10:50e2)
-    ld a,[wWhichTrade] ; $cd3d
-    ld [$cd5e],a
-    ld a,[wTrainerEngageDistance]
-    ld [$cd5f],a
-    ld de,PointerIDs_41138 ; $5138
-    jr Func_41102
-
-Func_410f3: ; 410f3 (10:50f3)
-    ld a,[wTrainerEngageDistance]
-    ld [$cd5e],a
-    ld a,[wTrainerSpriteOffset]
-    ld [$cd5f],a
-    ld de,PointerIDs_41149
+SECTION "InternalClockTradeAnim",ROMX[$50e2],BANK[$10]
 
 Func_41102: ; 41102 (10:5102)
     ld a,[W_OPTIONS] ; $d355
@@ -66431,7 +66424,9 @@ StoreTradeLeftToRightPkmnIdAndInitGameboyTransferGfx:
     set 3,[hl] ; wFlagBaloonSpriteBit3
     inc hl
     ld a,[$cd5e]
-    ld [hl],a ; wSpriteOAMBySpeciesId
+    ld [hli],a ; wSpriteOAMBySpeciesId
+    ld a,[wLeftGBMonAltForm] ; ~DONE:MiniAltForm
+    ld [hl],a ; wSpriteOAMBySpcAltForm
     pop hl
     jp Trade_InitGameboyTransferGfx
 
@@ -66442,7 +66437,9 @@ StoreTradeRightToLeftPkmnIdAndInitGameboyTransferGfx:
     set 3,[hl] ; wFlagBaloonSpriteBit3
     inc hl
     ld a,[$cd5f]
-    ld [hl],a ; wSpriteOAMBySpeciesId
+    ld [hli],a ; wSpriteOAMBySpeciesId
+    ld a,[wRightGBMonAltForm] ; ~DONE:MiniAltForm
+    ld [hl],a ; wSpriteOAMBySpcAltForm
     pop hl
     jp Trade_InitGameboyTransferGfx
 
@@ -66921,6 +66918,32 @@ PlayIntro:
 .setCarry
     scf
     ret
+
+; ──────────────────────
+
+InternalClockTradeAnim:
+    ld a,[wWhichTrade] ; $cd3d ; TradedPlayerMonSpecies
+    ld [$cd5e],a ; LeftGBMonSpecies
+    ld a,[wTradePlayerMonAltForm]
+    ld [wLeftGBMonAltForm],a
+    ld a,[wTrainerEngageDistance] ; TradedEnemyMonSpecies
+    ld [$cd5f],a ; RightGBMonSpecies
+    ld a,[wTradeEnemyMonAltForm]
+    ld [wRightGBMonAltForm],a
+    ld de,PointerIDs_41138 ; $5138
+    jp Func_41102
+
+ExternalClockTradeAnim:
+    ld a,[wTrainerEngageDistance] ; TradedEnemyMonSpecies
+    ld [$cd5e],a ; LeftGBMonSpecies
+    ld a,[wTradeEnemyMonAltForm]
+    ld [wLeftGBMonAltForm],a
+    ld a,[wTrainerSpriteOffset] ; TradedPlayerMonSpecies
+    ld [$cd5f],a ; RightGBMonSpecies
+    ld a,[wTradePlayerMonAltForm]
+    ld [wRightGBMonAltForm],a
+    ld de,PointerIDs_41149
+    jp Func_41102
 
 ; ──────────────────────
 
@@ -101222,7 +101245,7 @@ _ChooseFlyDestination: ; 70f90 (1c:4f90)
 .LoadFlyingMonSprite
     ld hl,wFlagFlyingMonSpriteBit0
     set 0,[hl]
-    jr LoadFlyingMonSprite
+    ; ft
 
 LoadFlyingMonSprite:
     ld hl,wSpriteOAMBySpeciesBit7
@@ -101230,7 +101253,9 @@ LoadFlyingMonSprite:
     inc hl
     ld a,[$cf91]
     ld [$cd5d],a
-    ld [hl],a ; wSpriteOAMBySpeciesId
+    ld [hli],a ; wSpriteOAMBySpeciesId
+    ld a,[wSkillMonAltForm] ; ~DONE:MiniAltForm
+    ld [hl],a ; wSpriteOAMBySpcAltForm
     jp LoadMonPartySpriteGfx
 
 BuildFlyLocationsList:
@@ -101861,6 +101886,7 @@ DataTable_71769: ; 71769 (1c:5769)
 LoadMonPartySpriteGfx: ; 7176c (1c:576c)
     call CreateMonOvWorldSprInstruction
     ds 2 ; ld a,$1c
+    ; ft
 
 Func_71771: ; 71771 (1c:5771)
     ld bc,$0
@@ -102450,7 +102476,7 @@ InGameTrade:
     push af
     call LoadHpBarAndStatusTilePatterns
     call InGameTrade_PrepareTradeData
-    PREDEF Func_410e2
+    PREDEF InternalClockTradeAnim
     pop af
     ld [$d127],a
     pop af
@@ -104899,7 +104925,6 @@ DeterminePaletteID:
 CreateMonOvWorldSprInstruction:
     ld hl,wSpriteOAMBySpeciesBit7
     bit 7,[hl]
-    res 7,[hl]
     jr z,.NoRename
     inc hl ; hl point to wSpriteOAMBySpeciesId
     ld a,1
@@ -104908,7 +104933,7 @@ CreateMonOvWorldSprInstruction:
     ld hl,W_NUMINPARTY
     ld a,[hli] ; numero di Pokemon nel party
     and a
-    jr z,.EmptyParty
+    jp z,.EmptyParty
 
 .StartCreation
     push af ; Backup numero di Pokemon nel party
@@ -104926,13 +104951,46 @@ CreateMonOvWorldSprInstruction:
     add hl,bc
     ld [hl],a ; Memorizzo l'elenco dei pokemon Id cosi come verranno caricati in VRAM
 
+    ; Handle Alternate Form
+    ld bc,6
+    add hl,bc
+    push hl ; Backup Alternate Form Mini Sprite Slot
+    ld hl,wSpriteOAMBySpeciesBit7
+    bit 7,[hl]
+    jr z,.NoRenameAltForm
+    ld a,[wSpriteOAMBySpcAltForm]
+    jr .ContinueAltForm
+.NoRenameAltForm
+    ld a,e
+    ld hl,W_PARTYMON1_MOVE2PP
+    ld bc,44 ; Pokemon Data Lenght
+    call AddNTimes
+    ld a,[hl]
+.ContinueAltForm
+    pop hl ; Restore Alternate Form Mini Sprite Slot
+    and %00001111 ; Max 15 Alternative Forms
+    ld [hl],a
+    push af ; Backup Flag Alternate Form
+
     ld a,e
     ld hl,wLocationMonOvSprInstruction
     ld bc,$06
-    call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
-    pop af ; Restore Id Pokemon
+    call AddNTimes
+
+    pop af ; Restore Flag Alternate Form
+    pop bc ; Restore Id Pokemon
+    ld a,b
     push hl ; Backup wLocationMonOvSprInstruction corretta
 
+    jr z,.NotAlternateForm
+
+    ld bc,$4000 ; ~TODO:MiniAltForm
+    
+    scf
+    push af ; Backup Fake flag C
+    jr .continue1
+
+.NotAlternateForm
     call IndexToMiniSpriteOrder
     ld b,128 ; TAUROS in original pokedex
     cp b
@@ -104942,11 +105000,12 @@ CreateMonOvWorldSprInstruction:
 .Before128
     ld hl,$4000 ; Entrambe le liste di immagini mini sprite iniziano a inizio BANK
     ld bc,$80
-    call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
+    call AddNTimes
     call CheckFlyingMonSprite2
     ld b,h
     ld c,l
 
+.continue1
     pop af ; Restore flag C
     pop hl ; Restore wLocationMonOvSprInstruction corretta
     ld a,c
@@ -104957,14 +105016,16 @@ CreateMonOvWorldSprInstruction:
     ld [hli],a
     ld a,BANK(MonOverworldDataNew_emimonserrate)
     jr c,.Before128_2
-    inc a
+    inc a ; BANK(MonOverworldDataNew2_emimonserrate)
 .Before128_2
+
+.continue2
     ld [hli],a
     push hl ; Backup wLocationMonOvSprInstruction
     ld a,e
     ld bc,$80
     ld hl,$8000
-    call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
+    call AddNTimes
     call CheckFlyingMonSprite
     ld b,h
     ld c,l
@@ -104977,7 +105038,7 @@ CreateMonOvWorldSprInstruction:
     pop hl ; Restore location id Pokemon n-esimo
     inc e
     dec d
-    jr nz,.NextPartyPokemon
+    jp nz,.NextPartyPokemon
     pop af ; Restore numero di Pokemon nel party
     and a
 .EmptyParty
@@ -104986,6 +105047,10 @@ CreateMonOvWorldSprInstruction:
 .Done
     call CheckBaloonRule ; ld hl,wLocationMonOvSprInstruction
     call nz,AddTradeBaloonRule
+    push hl
+    ld hl,wSpriteOAMBySpeciesBit7
+    res 7,[hl]
+    pop hl
     ret
 
 AddTradeBaloonRule:
@@ -104996,7 +105061,7 @@ AddTradeBaloonRule:
     ;db BANK(BaloonSprites)
     ;dw $8380
     ld bc,$06
-    call AddNTimes ; 3a87 (0:3a87) ; add bc to hl a times
+    call AddNTimes
     ld a,(BaloonSprites) % $100
     ld [hli],a
     ld a,(BaloonSprites) / $100
@@ -144528,7 +144593,7 @@ SaveSAVtoSRAM0Predef:                      NEW_PREDEF SaveSAVtoSRAM0            
 InitOpponentPredef:                        NEW_PREDEF InitOpponent                        ; $2C
 Func_5a5fPredef:                           NEW_PREDEF Func_5a5f                           ; $2D
 DrawBadgesPredef:                          NEW_PREDEF DrawBadges                          ; $2E
-Func_410f3Predef:                          NEW_PREDEF Func_410f3                          ; $2F
+ExternalClockTradeAnimPredef:              NEW_PREDEF ExternalClockTradeAnim              ; $2F
 Func_7096dPredef:                          NEW_PREDEF Func_7096d                          ; $30
 Func_79ddaPredef:                          NEW_PREDEF Func_79dda                          ; $31
 PlayIntroPredef:                           NEW_PREDEF PlayIntro                           ; $32
@@ -144537,7 +144602,7 @@ Func_70b5dPredef:                          NEW_PREDEF Func_70b5d                
 Func_c586Predef:                           NEW_PREDEF Func_c586                           ; $35
 StatusScreenPredef:                        NEW_PREDEF StatusScreen                        ; $36
 _ReadRodDataPredef:                        NEW_PREDEF _ReadRodData                        ; $37
-Func_410e2Predef:                          NEW_PREDEF Func_410e2                          ; $38
+InternalClockTradeAnimPredef:              NEW_PREDEF InternalClockTradeAnim              ; $38
 CheckEngagePlayerPredef:                   NEW_PREDEF CheckEngagePlayer                   ; $39
 IndexToPokedexPredef:                      NEW_PREDEF IndexToPokedex                      ; $3A
 Predef3BPredef:                            NEW_PREDEF Predef3B                            ; $3B
@@ -146385,7 +146450,9 @@ HandleStatusScreen2:
     inc hl
     ld a,[$cf91]
     ld [$cd5d],a
-    ld [hl],a ; wSpriteOAMBySpeciesId
+    ld [hli],a ; wSpriteOAMBySpeciesId
+    ld a,[$cfb6] ; ~DONE:MiniAltForm
+    ld [hl],a ; wSpriteOAMBySpcAltForm
     BANKSWITCH LoadMonPartySpriteGfx
     ld hl,wStatusScreen2OAMBit0
     set 0,[hl]
@@ -147230,7 +147297,6 @@ DisplayDepositWithdrawMenu_:
     ld bc,$cfb6-$cfb3
     call SetTempInfoForShinyAndGender ; 11
     BANKSWITCH GetGender
-    call ResetTempInfoForShinyAndGender ; 11
     pop hl
     jr c,.Genderless
     ld de,.MaleIcon
@@ -147259,7 +147325,9 @@ DisplayDepositWithdrawMenu_:
     inc hl
     ld a,[$cf91]
     ld [$cd5d],a
-    ld [hl],a ; wSpriteOAMBySpeciesId
+    ld [hli],a ; wSpriteOAMBySpeciesId
+    ld a,[wAltFormForShiny] ; ~DONE:MiniAltForm
+    ld [hl],a ; wSpriteOAMBySpcAltForm
     BANKSWITCH LoadMonPartySpriteGfx
     ld hl,wStatusScreen2OAMBit0
     set 0,[hl]
@@ -147267,7 +147335,7 @@ DisplayDepositWithdrawMenu_:
     BANKSWITCH WriteMonPartySpriteOAMBySpecies
     ld hl,wStatusScreen2OAMBit0
     res 0,[hl]
-    ret
+    jp ResetTempInfoForShinyAndGender ; 11
 .MaleIcon
     db $EF,$50
 .FemaleIcon

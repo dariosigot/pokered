@@ -345,6 +345,16 @@ wTrainerAISwitchDebugReason:
 
     ds 1
 
+NEXTU
+
+wLeftGBMonAltForm:: db ; $cd61
+wRightGBMonAltForm:: db ; $cd62
+
+NEXTU
+
+wSkillMonID:: db      ; $cd61 = Mon ID (used for Skill/Cry)
+wSkillMonAltForm:: db ; $cd62 = Mon Alt Form (used for Skill/Cry)
+
 ENDU
 
     ds 1
@@ -2003,12 +2013,12 @@ wTmpHPIV               ; dee4 = temporary slot for HP IV from other IV (for debu
 wTmpRepelQty           ; dee4
 wChoicePkmnMoveDeleter ; dee4
 wTempStatLO            ; dee4
-wSkillMonID            ; dee4 = Mon ID used for Cry
 wMonIdCryAndDex        ; dee4 = Mon ID used for PlayCryAndDisplayPokedex
 wTempEnemyMinMaxIV     ; dee4 = Temp Min Enemy IV Value
 wTempMovePowerLO       ; dee4 = Temp Move Power 2nd Byte
 wBufferPointerByte2    ; dee4 = Buffer Pointer Byte 02
 wTempBoxSlot           ; dee4 = Temp Buffer for Printing Box Slot
+wSpriteOAMBySpcAltForm ; dee4
     ds 1
 
 wStatusScreen2OAMBit0       ; dee5 ; bit 0 = Write OAM in Status Screen 2
