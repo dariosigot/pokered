@@ -20,13 +20,14 @@ IfGBCDelay:
     ret nz ; NotGBC
     jp DelayFrame
 
-ResetTempIV:
+ResetTempInfoForShinyAndGender:
     push hl
     push af
     xor a
-    ld hl,wDVForShinyAtkDef
-    ld [hli],a ; DV Atk/Def
-    ld [hl],a  ; DV Spd/Spc
+    ld hl,wInfoForShinyAndGender
+    ld [hli],a ; wDVForShinyAtkDef
+    ld [hli],a ; wDVForShinySpdSpc
+    ld [hl],a  ; wAltFormForShiny
     pop af
     pop hl
     ret
@@ -48,14 +49,7 @@ Delay2:
 SECTION "vblank",ROM0[$40]
     jp VBlankHandler
 
-SetTempIV:
-    push af
-    ld a,[hli]
-    ld [wDVForShinyAtkDef],a
-    ld a,[hld]
-    ld [wDVForShinySpdSpc],a
-    pop af
-    ret
+; Free
 
 SECTION "timer",ROM0[$50]
     jp TimerHandler
@@ -1907,6 +1901,28 @@ IsGhostBattlePlus:
 
 ; ──────────────────────
 
+; INPUT
+; • hl = Pointer to IV (2 Byte)
+; • bc = Delta to Shift IV Pointer to ALt Form
+; OUTPUT
+; • a = Alternative Form
+SetTempInfoForShinyAndGender:
+    push hl
+    push de
+    ld de,wInfoForShinyAndGender
+    ld a,[hli]
+    ld [de],a ; wDVForShinyAtkDef
+    inc de
+    ld a,[hld]
+    ld [de],a ; wDVForShinySpdSpc
+    inc de
+    add hl,bc
+    ld a,[hl]
+    ld [de],a ; wAltFormForShiny
+    pop de
+    pop hl
+    ret
+
 ; Free
 
 SECTION "LoadCurrentMapView",ROM0[$0ca2]
@@ -3386,7 +3402,7 @@ GetMonHeader:
     push de
     push hl
     ld hl,wAlternateFormIndex
-    ld a,[hl] ; ~TODO:Shiny
+    ld a,[hl] ; ~DONE:Shiny
     push af
     push hl
     ld a,[$d11e]
@@ -3402,8 +3418,8 @@ GetMonHeader:
     ld de,W_MONHEADER
     call CopyData
     ld hl,wAlternateFormIndex
-    ld a,[hl] ; ~TODO:Shiny
-    and a
+    ld a,[hl] ; ~DONE:Shiny
+    and %00001111 ; Max 15 Alternative Forms
     jr z,.done
     dec a
     ld [hl],a
@@ -10780,31 +10796,51 @@ TextPredefs:
     dw ElevatorText                         ; id = 41
     dw PokemonStuffText                     ; id = 42
 
-; INPUT hl = giusto indirizzo degli IV del pokemon interessato
-; W_ENEMYMONATKDEFIV ; .Front
-; W_PLAYERMONIVS     ; .Back
-; $cfb3              ; .OutOfBattle
-IsShiny: ; ~TODO:Shiny
+; INPUT [hl+0] = IV Atk/Def
+;       [hl+1] = IV Spd/Spc
+;       [hl+2] = Alternative Form
+; OUTPUT = set wFlagShinyBit2 if Shiny
+IsShiny: ; ~DONE:Shiny
     push hl
-    push af
-    call CheckShiny ; ~TODO:Shiny
-    jr nz,.End
+    call CheckShiny
     ld hl,wFlagShinyBit2
+    res 2,[hl]
+    jr nz,.End
     set 2,[hl]
 .End
-    pop af
     pop hl
     ret
 
-; INPUT hl = giusto indirizzo degli IV del pokemon interessato
-; OUTPUT z = set if Shiny
-CheckShiny: ; ~TODO:Shiny
+; INPUT [hl+0] = IV Atk/Def
+;       [hl+1] = IV Spd/Spc
+;       [hl+2] = Alternative Form
+; OUTPUT = set "z flag" if Shiny
+CheckShiny: ; ~DONE:Shiny
+    push hl
     ld a,[hli] ; Controllo IV Atk/Def ; Controllo IV Atk,Shiny se IV Atk = 2,3,6,7,10,11,14 o 15
     and %00101111 ; Shiny se bit 5 di a settato,gli altri bit dell'atk non contano,applico maschera
     cp %00101010
-    ld a,[hld] ; Controllo IV Spd/Spc
-    ret nz
+    jr nz,.CheckAltForm
+    ld a,[hl] ; Controllo IV Spd/Spc
     cp %10101010
+    jr z,.end
+.CheckAltForm
+    inc hl
+    ld a,[hl] ; Controllo Bit 7 Alternative Form
+    and %10000000
+    cp %10000000
+.end
+    pop hl
+    ret
+
+GenShinyRandom:
+    call GenRandom
+    and $00000001
+    ret z ; 50% No Shiny direct Return with a = $00
+    call GenRandom
+    cp %10000000 ; 1/256 (x 50% = 1/512)
+    ret z ; direct Return with a = $80 ► Shiny
+    xor a ; No Shiny a = $00
     ret
 
 GoodCopyVideoData: ; Denim,ExpBar
@@ -12164,34 +12200,9 @@ Func_4d72: ; 4d72 (1:4d72)
 .asm_4d84
     ret
 
-SECTION "Func_4da6",ROMX[$4da6],BANK[1]
+; Free
 
-Func_4da6: ; 4da6 (1:4da6)
-    call GBPalNormal
-    ld a,$80
-    ld [W_OBTAINEDBADGES],a
-    ld hl,W_FLAGS_D733
-    set 0,[hl]
-    ld hl,W_NUMINPARTY
-    xor a
-    ld [hli],a
-    dec a
-    ld [hl],a
-    ld a,$1
-    ld [$cf91],a
-    ld a,$14
-    ld [W_CURENEMYLVL],a
-    xor a
-    ld [$cc49],a
-    call ChangeCurMap
-    call AddPokemonToParty
-    ld a,$1
-    ld [W_CUROPPONENT],a ; $d059
-    PREDEF InitOpponent
-    ld a,$1
-    ld [$cfcb],a
-    ld [H_AUTOBGTRANSFERENABLED],a
-    jr Func_4da6
+SECTION "PickupItem",ROMX[$4de1],BANK[1]
 
 PickupItem: ; 4de1 (1:4de1)
     call EnableAutoTextBoxDrawing
@@ -13887,7 +13898,7 @@ TradeCenter_Trade:
     ld [$cd3d],a
     xor a
     ld [$cf95],a
-    call RemovePokemon ; call HackForBackupDVDuringTradeIn
+    call RemovePokemon
     ld a,[$cd3e]
     ld c,a
     ld [$cf92],a
@@ -18410,16 +18421,6 @@ Handle4TileSpriteOrMonSprite:
     inc e
     ret
 
-HackForBackupDVDuringTradeIn:
-;    push af
-;    ld a,[wWhichPokemon] ; $cf92
-;    ld hl,W_PARTYMON1_IV
-;    ld bc,44 ; Pokemon Data Lenght
-;    call AddNTimes
-;    call SetTempIV
-;    pop af
-;    jp RemovePokemon
-
 BattleMenuText: ; Denim,allargato menu battaglia
     db "FIGHT       ",$E1,$E2,$4E
     db "ITEM        RUN@"
@@ -18442,14 +18443,15 @@ HandleIVAndLevelAndLoadRenameScreenDuringPartyRenameScreen:
     ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
-    call SetTempIV
+    ld bc,W_PARTYMON1_MOVE2PP-W_PARTYMON1_IV
+    call SetTempInfoForShinyAndGender ; 01
     ld bc,W_PARTYMON1_LEVEL-W_PARTYMON1_IV
     add hl,bc
     ld a,[hl]
     ld [wTmpLevel],a
     pop hl
     call LoadRenameScreen
-    jp ResetTempIV
+    jp ResetTempInfoForShinyAndGender ; 01
 
 PrintGenderAndLevelInRenameScreen:
     add hl,bc
@@ -23146,7 +23148,7 @@ WriteMovePP:
     call CopyData
     inc de
     xor a
-    ld [wTempAlternateFormIndex],a ; ~TODO:Shiny
+    ld [wTempAlternateFormIndex],a ; ~DONE:Shiny
     ret
 
 CheckForCollisionWhenPushingBoulder:
@@ -23733,7 +23735,7 @@ ItemUseBall: ; d687 (3:5687)
     xor a
     ld [$cc49],a
     call CleanLCD_OAM
-    call AddPokemonToParty    ;add mon to Party
+    call AddPokemonToParty ; ~ADDPKMNTOPARTY
     ld hl,wNoExpToLastPartyMonBit1
     set 1,[hl]
     jr .End
@@ -25950,7 +25952,7 @@ SendNewMonToBox:
     inc de
     ld a,[hli]
     ld [de],a
-    call ResetTempIV
+    call ResetTempInfoForShinyAndGender ; (SendNewMonToBox)
     call SentNewMonToBox_ResetMovePPs
     BANKSWITCH_JUMP SentNewMonToBox_TryToAddExclusiveMove
 .GetMonHeader
@@ -27067,10 +27069,8 @@ ResetMovePPs_:
     ld a,[wTempAlternateFormIndex]
     ld [de],a
     inc de
-    xor a
-    ;ld [de],a
     inc de
-    ;ld [de],a
+    xor a
     ld [wTempAlternateFormIndex],a
     ret
 
@@ -28337,7 +28337,7 @@ PokemonStuffText: ; fc45 (3:7c45)
 
 ResetIVAndCheckIsInBattle:
     ld a,[W_ISINBATTLE] ; $d057
-    jp ResetTempIV
+    jp ResetTempInfoForShinyAndGender ; (AddPokemonToParty)
 
 UseStrength:
     ld hl,$d728
@@ -28873,7 +28873,7 @@ AddPokemonToParty_TryToAddExclusiveMove:
     ret nz
     BANKSWITCH_JUMP AddPokemonToParty_TryToAddExclusiveMove_
 
-GetAlternateForm: ; ~TODO:Shiny
+GetAlternateForm: ; ~DONE:Shiny
     ld a,[$cc49]
     and $f
     jr nz,.enemy
@@ -28902,18 +28902,28 @@ GetAlternateForm: ; ~TODO:Shiny
     pop de
     jr .end
 
+; ───────────────────────────────────────
+
 ; Generate Random only if
-; • Pkmn Is Added ToParty with Rename Screen (Out Of Battle)
-; • Pkmn Is Added ToParty without Rename Screen
-InsertIVDuringAddMonToParty: ; ~TODO:Shiny
-    ld hl,wDVForShinyAtkDef
+; Pkmn Is Added ToParty with
+; Rename Screen Out Of Battle
+
+; $cc49 = $00
+; • ItemUseBall
+; • AddStarterToParty
+; • GivePokemon
+
+; $cc49 = $01
+; • ReadTrainer
+
+; $cc49 = $80
+; • InGameTrade
+
+InsertIVDuringAddMonToParty: ; ~DONE:Shiny
+    ld hl,wInfoForShinyAndGender ; also wTmpLevel
     ld a,[$cc49]
     and a
-    jr z,.rename ; AddToPlayerPartyWithRename
-    and $0F
-    jr z,.random ; AddToPlayerPartyWithoutRename
-    ret
-.rename
+    ret nz ; ReadTrainer & InGameTrade
     ld a,[W_ISINBATTLE]
     and a
     jr nz,InsertIVFromEnemyMonData
@@ -28922,23 +28932,29 @@ InsertIVDuringAddMonToParty: ; ~TODO:Shiny
     ld [hli],a ; wDVForShinyAtkDef
     call GenRandom
     ld [hli],a ; wDVForShinySpdSpc
+    ld a,[wTempAlternateFormIndex]
+    ld [hli],a ; wAltFormForShiny
     ld a,[W_CURENEMYLVL]
     ld [hl],a ; wTmpLevel
     ret
 
 CopyDataAndInsertIVDuringSendNewMonToBox:
     call CopyData
-    ld hl,wDVForShinyAtkDef
+    ld hl,wInfoForShinyAndGender
     ; ft
 
-InsertIVFromEnemyMonData: ; ~TODO:Shiny
+InsertIVFromEnemyMonData: ; ~DONE:Shiny
     ld a,[W_ENEMYMONATKDEFIV]
     ld [hli],a ; wDVForShinyAtkDef
     ld a,[W_ENEMYMONSPDSPCIV]
     ld [hli],a ; wDVForShinySpdSpc
+    ld a,[W_ENEMYMONALTFORM]
+    ld [hli],a ; wAltFormForShiny
     ld a,[W_ENEMYMONLEVEL]
     ld [hl],a ; wTmpLevel
     ret
+
+; ───────────────────────────────────────
 
 ; animates the HP bar going up or down for (a) ticks (two waiting frames each)
 ; stops prematurely if bar is filled up
@@ -31426,9 +31442,10 @@ PrintLevelAndGender:
     push hl
     call PrintLevel
     ld hl,$cfb3 ; .OutOfBattle
-    call SetTempIV
+    ld bc,$cfb6-$cfb3
+    call SetTempInfoForShinyAndGender ; 02
     call GetGenderOutOfBattle
-    call ResetTempIV
+    call ResetTempInfoForShinyAndGender ; 02
     pop hl
     push af
     ld de,+10 ; Party Gender
@@ -37682,7 +37699,7 @@ Route2HouseText3:
 Route2HouseText4:
     db $08 ; asm
     ld bc,(VOLTORB << 8) | 15
-    ld a,1 ; ~TODO:Shiny
+    ld a,1
     ld [wTempAlternateFormIndex],a
     call GivePokemon
     jr nc,.error
@@ -37958,9 +37975,10 @@ BillsHouseObject:
     EVENT_DISP BILLS_HOUSE_WIDTH,06,05
 
 AddStarterToParty:
-    ld a,1 ; ~TODO:Shiny
+    call GenShinyRandom
+    inc a ; ~DONE:Shiny
     ld [wTempAlternateFormIndex],a
-    jp AddPokemonToParty
+    jp AddPokemonToParty ; ~ADDPKMNTOPARTY
 
 PrintMagazinesText:
     call EnableAutoTextBoxDrawing
@@ -39233,7 +39251,7 @@ asm_1d1e5: ; 1d1e5 (7:51e5)
     ld [$d127],a
     ld a,[$cf91]
     ld [$d11e],a
-    call AddStarterToParty ; call AddPokemonToParty
+    call AddStarterToParty
     ld hl,$d72e
     set 3,[hl]
     ld a,$fc
@@ -40697,7 +40715,7 @@ CeladonMansion5Text1: ; 1dd41 (7:5d41)
 CeladonMansion5Text2: ; 1dd46 (7:5d46)
     db $08 ; asm
     ld bc,(VOLTORB << 8) | 15
-    call GiveVoltorb ; call GivePokemon
+    call GiveVoltorb
     jr nc,.asm_24365 ; 0x1dd4d
     ld a,$45
     ld [$cc4d],a
@@ -44364,7 +44382,7 @@ GetOakLastPkmn:
     pop af
     ld b,a
     ld c,5
-    ld a,1 ; ~TODO:Shiny
+    ld a,1
     ld [wTempAlternateFormIndex],a
     call GivePokemon
     pop de
@@ -55537,7 +55555,7 @@ DrawEnemyHUDAndHPBar:
 Func_3ce7f: ; 3ce7f (f:4e7f)
     xor a
     ld [wListMenuID],a ; $cf94
-    call DrawCatchGenderAndLoadCoord ; Denim
+    call DrawCatchGender ; Denim
     FuncCoord 02,02 ; Enemy Bar in Battle
     ld hl,Coord
     call nc,DrawHPBar
@@ -59878,7 +59896,7 @@ LoadEnemyMonData:
     ld a,[W_ENEMYMONID]
     ld [$cfe5],a
     ld [$d0b5],a
-    call LoadEnemyMonData_GetAlternateMonHeader ; call GetMonHeader ; ~TODO:Shiny
+    call LoadEnemyMonData_GetAlternateMonHeader ; call GetMonHeader ; ~DONE:Shiny
     ld a,[W_ENEMYBATTSTATUS3] ; $d069
     bit 3,a
     ld hl,$cceb
@@ -59888,7 +59906,7 @@ LoadEnemyMonData:
     ld a,[W_ISINBATTLE] ; $d057
     cp $2
     call z,GetEnemyIV
-    call nz,ForceShinyOrRandom ; call GenRandomInBattle ; ~TODO:Shiny
+    call nz,ForceShinyOrRandom ; call GenRandomInBattle ; ~DONE:Shiny
 .storeDVs
     ld hl,W_ENEMYMONATKDEFIV
     ld [hli],a
@@ -62537,7 +62555,7 @@ CheckSpecialHybridSprite: ; Denim
     xor a ; Reset Carry Flag
     ret
 
-DrawCatchGenderAndLoadCoord: ; Denim
+DrawCatchGender: ; Denim
     push de
     push bc
     BANKSWITCH _DrawCatchGender
@@ -65332,7 +65350,7 @@ Func_41245: ; 41245 (10:5245)
     call CopyScreenTileBufferToVRAM
     call ClearScreen
     ld a,[wWhichTrade] ; $cd3d
-    call CheckShinyDuringTradeInSend ; call Func_415a4 ; Invio ; ~TODO:Shiny
+    call CheckShinyDuringTradeInSend ; call Func_415a4 ; Invio ; ~DONE:Shiny
     ld a,$7e
 .asm_41273
     push af
@@ -65451,7 +65469,7 @@ Func_41336: ; 41336 (10:5336)
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld a,[$cd3e]
-    call CheckShinyDuringTradeInReceive ; call Func_415a4 ; Ricezione ; ~TODO:Shiny
+    call CheckShinyDuringTradeInReceive ; call Func_415a4 ; Ricezione ; ~DONE:Shiny
     ld a,$ad
     call Func_41676
     ld a,$1
@@ -66387,18 +66405,18 @@ OTString67E5: ; 427e5 (10:67e5)
     db "OT/",$4E
     db $73,"№",$F2,"@"
 
-CheckShinyDuringTradeInSend: ; ~TODO:Shiny
+CheckShinyDuringTradeInSend: ; ~DONE:Shiny
     push af
     ld hl,wTradedPlayerMonIV
     jr CheckShinyDuringTradeInCommon
 
-CheckShinyDuringTradeInReceive: ; ~TODO:Shiny
+CheckShinyDuringTradeInReceive: ; ~DONE:Shiny
     push af
     ld hl,wTradedEnemyMonIV
     ; ft
 
 CheckShinyDuringTradeInCommon:
-    call IsShiny ; ~TODO:Shiny
+    call IsShiny ; ~DONE:Shiny
     inc hl
     inc hl
     ld a,[hl] ; wTradePlayerMonAltForm / wTradeEnemyMonAltForm
@@ -74788,7 +74806,7 @@ MtMoonPokecenterText4: ; 492ec (12:52ec)
     jr .asm_49356 ; 0x4931c
 .asm_faa09 ; 0x4931e
     ld bc,(MAGIKARP << 8) | 1
-    call GiveMagikarp ; call GivePokemon
+    call GiveMagikarp
     jr nc,.asm_49359 ; 0x49324
     xor a
     ld [wWhichTrade],a
@@ -77028,7 +77046,11 @@ TradeCenterMObject: ; 0x4fd87 (size=10)
 TradeCenterMBlocks: ; 4fd91 (13:7d91)
     INCBIN "maps/tradecenterm.blk"
 
-_GivePokemon: ; 4fda5 (13:7da5)
+_GivePokemon:
+    call GenShinyRandom
+    ld hl,wTempAlternateFormIndex
+    or [hl]
+    ld [hl],a
     call EnableAutoTextBoxDrawing
     xor a
     ld [$ccd3],a
@@ -77071,7 +77093,7 @@ _GivePokemon: ; 4fda5 (13:7da5)
     ret
 .asm_4fe01
     call .SetPokedexOwnedFlag
-    call AddPokemonToParty
+    call AddPokemonToParty ; ~ADDPKMNTOPARTY
     ld a,$1
     ld [$cc3c],a
     ld [$ccd3],a
@@ -79737,7 +79759,7 @@ SilphCo7Text1: ; 51d8e (14:5d8e)
     ld hl,UnnamedText_51dd3
     call PrintText
     ld bc,(PORYGON << 8) | 30 ; Entry Point
-    call GivePorygon ; call GivePokemon
+    call GivePorygon
     jr nc,.asm_b3069 ; 0x51db1
     ld a,[$ccd3]
     and a
@@ -101995,31 +102017,27 @@ HackForInsertDVInHallOfFameDataFirstStep:
     ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
-    call IsShiny ; ~TODO:Shiny
-    call SetTempIV
-    push hl
-    inc hl
-    inc hl
-    inc hl
-    ld a,[hl] ; Read move2pp
+    ld bc,W_PARTYMON1_MOVE2PP-W_PARTYMON1_IV
+    call SetTempInfoForShinyAndGender ; 03
     ld [wAlternateFormIndex],a
-    ld [wTempAlternateFormIndex],a
-    pop hl
+    ld hl,wInfoForShinyAndGender
+    call IsShiny ; ~DONE:Shiny
     jp HoFShowMonOrPlayer
 
 HackForInsertDVInHallOfFameDataSecondStep:
     call CopyData
     ld h,d
     ld l,e
-    ld a,[wDVForShinyAtkDef] ; DV Atk/Def
+    ld de,wInfoForShinyAndGender
+    ld a,[de] ; wDVForShinyAtkDef
     ld [hli],a
-    ld a,[wDVForShinySpdSpc] ; DV Spd/Spc
+    inc de
+    ld a,[de] ; wDVForShinySpdSpc
     ld [hli],a
-    ld a,[wTempAlternateFormIndex] ; Alternate Form ID
-    ld [hld],a
-    xor a
-    ld [wTempAlternateFormIndex],a ; Alternate Form ID
-    jp ResetTempIV
+    inc de
+    ld a,[de] ; wAltFormForShiny
+    ld [hl],a
+    jp ResetTempInfoForShinyAndGender ; 03
 
 BaloonSprites:
     INCBIN "gfx/baloon.2bpp"
@@ -102355,7 +102373,7 @@ Predef54: ; 71ad9 (1c:5ad9)
     ld a,[$cc26]
     and a
     jr nz,.asm_99bca ; 0x71b4b $b
-    call Func_71c07
+    call InGameTrade
     jr c,.asm_99bca ; 0x71b50 $6
     ld hl,UnnamedText_71d8d
     call PrintText
@@ -102396,9 +102414,7 @@ TradeMons: ; 71b7b (1c:5b7b)
     db VOLTORB,DITTO,2,"GUMMY@@@@@@"
     db VOLTORB,DITTO,2,"GUMMY@@@@@@"
 
-SECTION "Func_71c07",ROMX[$5c07],BANK[$1c]
-
-Func_71c07: ; 71c07 (1c:5c07)
+InGameTrade:
     xor a
     ld [$d07d],a
     dec a
@@ -102447,7 +102463,7 @@ Func_71c07: ; 71c07 (1c:5c07)
     call RemovePokemon
     ld a,$80
     ld [$cc49],a
-    call AddPokemonToParty
+    call AddPokemonToParty ; ~ADDPKMNTOPARTY
     call InGameTrade_CopyDataToReceivedMon
     BANKSWITCH Func_17d7d
     call ClearScreen
@@ -102461,6 +102477,8 @@ Func_71c07: ; 71c07 (1c:5c07)
 .asm_ee803 ; 0x71c9e
     ld [$cd12],a
     ret
+
+SECTION "Func_71ca2",ROMX[$5ca2],BANK[$1c]
 
 Func_71ca2: ; 71ca2 (1c:5ca2)
     call GBPalWhiteOutWithDelay3
@@ -102662,7 +102680,7 @@ Func_71dff: ; 71dff (1c:5dff)
     ld de,Unknown_721b5
     ret
 
-GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
+GetBattleScreenPaletteID:
     ld hl,PalPacket_72428
     ld de,$cf2d
     ld bc,$10
@@ -102671,15 +102689,11 @@ GetBattleScreenPaletteID: ; 71e06 (1c:5e06)
     call BackupHeader
 
     ; Get Front Palette
-    ld hl,W_ENEMYMONID
-    ld a,[hl]
-    call CheckShinyFrontAndGetPAL ; DONE:Palette ; ~TODO:Shiny
+    call CheckShinyFrontAndGetPAL ; DONE:Palette ; ~DONE:Shiny
     push hl ; Backup frontsprite palette
 
     ; Get Back Palette
-    ld hl,W_PLAYERMONID
-    ld a,[hl]
-    call CheckShinyBackAndGetPAL ; DONE:Palette ; ~TODO:Shiny
+    call CheckShinyBackAndGetPAL ; DONE:Palette ; ~DONE:Shiny
     push hl ; Backup backsprite palette
 
     call RestoreHeader
@@ -102723,8 +102737,7 @@ GetPkmnStatPaletteID:
     ld de,$cf2d
     ld bc,$10
     call CopyData
-    ld a,[$cf91]
-    call CheckShinyAndGetPAL ; DONE:Palette ; ~TODO:Shiny
+    call CheckShinyAndGetPAL ; DONE:Palette ; ~DONE:Shiny
     push hl ; ...
     ld hl,$cf2e
     ld a,[$cf25]
@@ -104798,59 +104811,26 @@ ResetPreVRAM2:
     pop af
     ret
 
-CheckShinyFrontAndGetPAL: ; ~TODO:Shiny
-    push hl
-    ld hl,wFlagForceGhostPalBit4
-    bit 4,[hl]
-    jr z,.NoGhost
-.Ghost
-    ld hl,W_MONH_PALETTE_ID
-    ld a,PAL_GASTLY ; Ghost Color is Gastly Color
-    ld [hli],a
-    xor a
-    ld [hl],a
-    ld a,GASTLY ; Ghost Color is Gastly Color
-    jp SkipShinyAndGetPAL
-.NoGhost
-    ld hl,wFlagBackFrontSpriteBit56
-    set 6,[hl]
-    ld hl,W_ENEMYBATTSTATUS3
-    bit 3,[hl] ; bit 3 of battle status 3,set if current Pokemon is transformed
-    jr z,.NoTransform
-    ld a,[$cfe5]
-.NoTransform
-    push af
-    ld [$d0b5],a
-    BANKSWITCH GetBattleFrontMonHeader
-    ld hl,W_ENEMYMONATKDEFIV
-    jr GetPalCommon
+; ────────────────────────────────────────────────────
 
-CheckShinyBackAndGetPAL: ; ~TODO:Shiny
-    push hl
-    push af
-    ld [$d0b5],a
-    BANKSWITCH GetBattleBackMonHeader
-    ld hl,wFlagBackFrontSpriteBit56
-    set 5,[hl]
-    ld hl,W_PLAYERMONIVS
-    jr GetPalCommon
+CheckShinyFrontAndGetPAL:
+    BANKSWITCH CheckShinyFrontAndGetPAL_
+    ld a,d
+    jr DeterminePaletteID
 
-CheckShinyAndGetPAL: ; ~TODO:Shiny
-    push hl
-    push af
-    ld [$d0b5],a
-    BANKSWITCH GetLoadedMonHeader
-    ld hl,$cfb3
+CheckShinyBackAndGetPAL:
+    BANKSWITCH CheckShinyBackAndGetPAL_
+    ld a,d
+    jr DeterminePaletteID
+
+CheckShinyAndGetPAL:
+    BANKSWITCH CheckShinyAndGetPAL_
+    ld a,d
     ; ft
 
-GetPalCommon:
-    pop af
-    call IsShiny ; ~TODO:Shiny
-SkipShinyAndGetPAL:
-    pop hl
-    ; ft
+; ────────────────────────────────────────────────────
 
-DeterminePaletteID: ; DONE:Palette
+DeterminePaletteID:
     push bc
     push de
     and a
@@ -104891,7 +104871,7 @@ DeterminePaletteID: ; DONE:Palette
      ld a,[hli]
      ld h,[hl]
      ld l,a
-     call .CheckShiny ; ~TODO:Shiny
+     call .CheckShiny
      jr z,.End
      ld bc,1
      add hl,bc
@@ -104900,7 +104880,7 @@ DeterminePaletteID: ; DONE:Palette
     pop de
     pop bc
     ret
-.CheckShiny ; ~TODO:Shiny
+.CheckShiny
     push hl
     ld hl,wFlagShinyBit2
     bit 2,[hl]
@@ -105372,12 +105352,18 @@ InGameTrade_BackupPlayerIVandAltForm:
     ld de,wTradePlayerMonAltForm
     ld a,[hl]
     ld [de],a
-    ; ~TODO : Handle InGameTrade special mon ; ~TODO:Shiny
-    xor a
+    ; ~TODO : Handle InGameTrade special mon ; ~DONE:Shiny
     ld hl,wTradedEnemyMonIV
+    call GenRandom
     ld [hli],a
+    ld [wDVForShinyAtkDef],a
+    call GenRandom
     ld [hli],a
+    ld [wDVForShinySpdSpc],a
+    call GenShinyRandom
     ld [hl],a ; wTradeEnemyMonAltForm
+    ld [wAltFormForShiny],a
+    ld [wTempAlternateFormIndex],a
     ; endhack
     jp GenRandom
 
@@ -108651,7 +108637,7 @@ Lab4Text1: ; 75d6c (1d:5d6c)
     ld a,[W_FOSSILMON]
     ld b,a
     ld c,40
-    call GiveFossil ; call GivePokemon
+    call GiveFossil
     jr nc,.asm_75d93 ; 0x75db9 $d8
     ld hl,$d7a3
     res 0,[hl]
@@ -109766,7 +109752,7 @@ PKMNLeaguePC:
     ld [$CD3F],a
     ld de,$CD6D
     ld bc,$000B
-    call CheckShinyAndAlternativeFromHallOfFameData ; call CopyData ; ~TODO:Shiny
+    call CheckShinyAndAlternativeFromHallOfFameData ; call CopyData ; ~DONE:Shiny
     call GetMonHeader
     ld b,$0B
     ld c,0
@@ -109789,7 +109775,7 @@ PKMNLeaguePC:
     ld de,$CD42
     ld bc,$0103
     call PrintNumber
-    jp Func_702f0AndRemoveIVFromCheckShinyArea ; ~TODO:Shiny
+    jp Func_702f0AndRemoveIVFromCheckShinyArea ; ~DONE:Shiny
 .HallOfFameNoText
     db "HALL OF FAME No   @"
 
@@ -110031,21 +110017,17 @@ FindHiddenItemOrCoinsIndex: ; 76857 (1d:6857)
     inc hl
     jr .loop
 
-CheckShinyAndAlternativeFromHallOfFameData: ; ~TODO:Shiny
+CheckShinyAndAlternativeFromHallOfFameData: ; ~DONE:Shiny
     call CopyData
-    call IsShiny ; ~TODO:Shiny
-    call SetTempIV
-    push hl
-    inc hl
-    inc hl
-    ld a,[hl]
+    ld bc,2
+    call SetTempInfoForShinyAndGender ; 04
     ld [wAlternateFormIndex],a
-    pop hl
-    ret
+    ld hl,wInfoForShinyAndGender
+    jp IsShiny ; ~DONE:Shiny
 
-Func_702f0AndRemoveIVFromCheckShinyArea: ; ~TODO:Shiny
+Func_702f0AndRemoveIVFromCheckShinyArea: ; ~DONE:Shiny
     BANKSWITCH Func_702f0
-    jp ResetTempIV
+    jp ResetTempInfoForShinyAndGender ; 04
 
 FlagInstantAndDisplayListMenuID:
     ld hl,wFlagListMenuSpc
@@ -117049,7 +117031,7 @@ EvolveMon: ; 7bde9 (1e:7de9)
     ld a,[$cee9] ; EvoOldSpecies
     ld [$cf1d],a ; WholeScreenPaletteMonSpecies
     ld c,$0
-    call CheckShinyDuringEvolution ; call EvolutionSetWholeScreenPalette ; ~TODO:Shiny
+    call CheckShinyDuringEvolution ; call EvolutionSetWholeScreenPalette ; ~DONE:Shiny
     ld a,[$ceea] ; EvoNewSpecies
     ld [$cf91],a
     ld [$d0b5],a
@@ -117096,10 +117078,10 @@ EvolveMon: ; 7bde9 (1e:7de9)
     ;ld a,$ff ; SFX_STOP_ALL_MUSIC
     ;ld [$c0ee],a ; NewSoundID
     ;call PlaySound
+    ld c,$0
+    call CheckShinyDuringEvolution ; call EvolutionSetWholeScreenPalette ; DONE:Palette ; ~DONE:Shiny
     ld a,[$cf1d] ; WholeScreenPaletteMonSpecies
     call PlayCry
-    ld c,$0
-    call CheckShinyDuringEvolution ; call EvolutionSetWholeScreenPalette ; DONE:Palette ; ~TODO:Shiny
     call RestoreOldMonHeader
     pop af
     ld [$d0b5],a
@@ -117258,17 +117240,22 @@ Func_7bf64: ; 7bf64 (1e:7f64)
     ld [hl],a
     jp Delay3
 
-CheckShinyDuringEvolution: ; DONE:Palette ; ~TODO:Shiny
+CheckShinyDuringEvolution: ; DONE:Palette ; ~DONE:Shiny
     push af
     push bc
     ld a,[wWhichPokemon] ; $cf92
     ld hl,W_PARTYMON1_IV
     ld bc,44 ; Pokemon Data Lenght
     call AddNTimes
-    call IsShiny ; ~TODO:Shiny
+    ld bc,W_PARTYMON1_MOVE2PP-W_PARTYMON1_IV
+    call SetTempInfoForShinyAndGender ; 05
+    ld [wAlternateFormIndex],a
+    ld hl,wInfoForShinyAndGender
+    call IsShiny ; ~DONE:Shiny
     ld a,[$cf1d]
     ld [$d0b5],a
-    call Evolution_GetMonHeader_HandleAlternateForm
+    call GetMonHeader
+    call ResetTempInfoForShinyAndGender ; 05
     pop bc
     pop af
     jp EvolutionSetWholeScreenPalette
@@ -136887,7 +136874,9 @@ _HackItemInBattle:
 SECTION "bank33",ROMX,BANK[$33] ; Denim,GENDER
 
 _DrawCatchGender: ; Denim
-; catch
+    ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
+    ld bc,W_ENEMYMONALTFORM-W_ENEMYMONATKDEFIV
+    call SetTempInfoForShinyAndGender ; 06
     call IsGhostBattle
     jp z,.Ghost ; No Gender,Pokedex or Debug If Ghost Battle
     call .CheckEnemyOwned
@@ -136901,9 +136890,8 @@ _DrawCatchGender: ; Denim
     ld de,.PokeBallCatchFlagIcon
     call .PlaceIcon
 .SkipCatchFlagIcon
-    ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
-    call CheckShiny ; ~TODO:Shiny
-    call SetTempIV
+    ld hl,wInfoForShinyAndGender
+    call CheckShiny ; ~DONE:Shiny
     jr nz,.NoShiny
     FuncCoord 1,1
     ld hl,Coord
@@ -136931,12 +136919,9 @@ _DrawCatchGender: ; Denim
 .PrintGender
     call .PlaceIcon
 .Genderless
-    call DebugStats
-    jp ResetTempIV
 .Ghost
-    ld hl,W_ENEMYMONATKDEFIV ; .FrontSpriteInBattle
-    call SetTempIV
-    jr .Genderless
+    call DebugStats
+    jp ResetTempInfoForShinyAndGender ; 06
 .CheckEnemyOwned
     ld a,[W_ENEMYMON_START]
     ld [$d11e],a
@@ -136964,7 +136949,8 @@ _DrawCatchGender: ; Denim
 
 _DrawCurrentMonGenderInBattle:
     ld hl,W_PLAYERMONIVS ; .BackSpriteInBattle
-    call SetTempIV
+    ld bc,W_PLAYERMONALTFORM-W_PLAYERMONIVS
+    call SetTempInfoForShinyAndGender ; 07
     ld a,[W_PLAYERMONID]
     ld [$d11e],a
     call GetGender
@@ -136984,8 +136970,7 @@ _DrawCurrentMonGenderInBattle:
 .Male
     call .PlaceIcon
 .Genderless
-    call ResetTempIV
-    ret
+    jp ResetTempInfoForShinyAndGender ; 07
 .PlaceIcon
     ld a,[de]
     ld [hl],a
@@ -137011,7 +136996,7 @@ DebugStats:
     ; Print IV
     FuncCoord 00,00
     ld hl,Coord
-    ld de,wDVForShinyAtkDef
+    ld de,wInfoForShinyAndGender
     call .Print4IV
     ; Print Stat Mod
     FuncCoord 06,00
@@ -137159,7 +137144,7 @@ _DebugPlayerStats:
     call .PrintIV
     ; Print HP IV
     ld b,0
-    ld hl,wDVForShinyAtkDef ; wDVForShinySpdSpc
+    ld hl,wInfoForShinyAndGender
     ld a,[hli]
     ld c,a
     swap a
@@ -137295,8 +137280,9 @@ _DebugPlayerStats:
 
 ; INPUT :
 ; $d11e = Pokemon ID
-; wDVForShinyAtkDef = ATK/DEF
-; wDVForShinySpdSpc = SPD/SPC
+; wInfoForShinyAndGender
+;  wDVForShinyAtkDef = ATK/DEF
+;  wDVForShinySpdSpc = SPD/SPC
 GetGender:
     ld a,[$d11e]
     and a
@@ -137348,11 +137334,11 @@ GetGender:
     add hl,de
     ld a,[hl]
     push af
-    ld hl,wDVForShinyAtkDef
-    ld a,[hli]
+    ld hl,wInfoForShinyAndGender
+    ld a,[hli] ; wDVForShinyAtkDef
     and a,$F0
     ld b,a
-    ld a,[hl]
+    ld a,[hl] ; wDVForShinySpdSpc
     and a,$F0
     swap a
     add b
@@ -138931,16 +138917,16 @@ Museum2FMons:
 
 Route1Mons:
     db $19
-    db  3,PIDGEY  ; 20% ; Entry Point
-    db  3,RATTATA ; 20% ; Entry Point
-    db  4,RATTATA ; 15%
-    db  2,RATTATA ; 10%
+    db  2,PIDGEY  ; 20% ; Entry Point
+    db  2,RATTATA ; 20% ; Entry Point
+    db  3,RATTATA ; 15%
+    db  1,RATTATA ; 10%
     db  2,PIDGEY  ; 10%
-    db  3,PIDGEY  ; 10%
-    db  4,PIDGEY  ;  5%
+    db  2,PIDGEY  ; 10%
+    db  3,PIDGEY  ;  5%
     db  1,RATTATA ;  5%
-    db  2,MEOWTH  ;  4% ; Entry Point
-    db  5,PIDGEY  ;  1%
+    db  1,MEOWTH  ;  4% ; Entry Point
+    db  4,PIDGEY  ;  1%
     db $00
 
 Route2Mons:
@@ -138959,16 +138945,16 @@ Route2Mons:
 
 Route22Mons:
     db $19
-    db  3,NIDORAN_M ; 20% ; Entry Point
-    db  3,NIDORAN_F ; 20% ; Entry Point
-    db  3,MANKEY    ; 15% ; Entry Point
-    db  4,NIDORAN_M ; 10%
-    db  4,NIDORAN_F ; 10%
-    db  3,SPEAROW   ; 10%
-    db  2,MANKEY    ;  5%
-    db  5,SPEAROW   ;  5%
-    db  4,MANKEY    ;  4%
-    db  6,POLIWAG   ;  1% ; Entry Point
+    db  2,NIDORAN_M ; 20% ; Entry Point
+    db  2,NIDORAN_F ; 20% ; Entry Point
+    db  2,MANKEY    ; 15% ; Entry Point
+    db  3,NIDORAN_M ; 10%
+    db  3,NIDORAN_F ; 10%
+    db  2,SPEAROW   ; 10%
+    db  1,MANKEY    ;  5%
+    db  4,SPEAROW   ;  5%
+    db  3,MANKEY    ;  4%
+    db  5,POLIWAG   ;  1% ; Entry Point
     db $00
 
 ForestMons:
@@ -142952,28 +142938,28 @@ ForceShinyOrRandom_:
     ld a,[$cf91]
     cp PIKACHU
     jr nz,.Random
-    ld a,[wPalletPikachuIV_AtkDef] ; ~TODO:Shiny
+    ld a,[wPalletPikachuIV_AtkDef] ; ~DONE:Shiny
     and a
     jr nz,.GetPikachuStoredIV
     ld a,e
     or $88 ; Speed > 7 ; Special > 7
     ld e,a
-    ld [wPalletPikachuIV_SpdSpc],a ; ~TODO:Shiny
+    ld [wPalletPikachuIV_SpdSpc],a ; ~DONE:Shiny
     call .GenRandomInBattle
     or $18 ; Attack ODD ; Defense > 7 ; HP > 7
     ld [wPalletPikachuIV_AtkDef],a
     jr .End
 .GetPikachuStoredIV
-    ld a,[wPalletPikachuIV_SpdSpc] ; ~TODO:Shiny
+    ld a,[wPalletPikachuIV_SpdSpc] ; ~DONE:Shiny
     ld e,a
-    ld a,[wPalletPikachuIV_AtkDef] ; ~TODO:Shiny
+    ld a,[wPalletPikachuIV_AtkDef] ; ~DONE:Shiny
     jr .End
 
 .PewterCity
     ld a,[$cf91]
     cp EEVEE
     jr nz,.Random
-    ld a,[wPewterEeveeIV_AtkDef] ; ~TODO:Shiny
+    ld a,[wPewterEeveeIV_AtkDef] ; ~DONE:Shiny
     and a
     jr nz,.GetEeveeStoredIV
     ld a,e
@@ -142982,12 +142968,12 @@ ForceShinyOrRandom_:
     ld [wPewterEeveeIV_SpdSpc],a
     call .GenRandomInBattle
     or $18 ; Attack ODD ; Defense > 7 ; HP > 7
-    ld [wPewterEeveeIV_AtkDef],a ; ~TODO:Shiny
+    ld [wPewterEeveeIV_AtkDef],a ; ~DONE:Shiny
     jr .End
 .GetEeveeStoredIV
-    ld a,[wPewterEeveeIV_SpdSpc] ; ~TODO:Shiny
+    ld a,[wPewterEeveeIV_SpdSpc] ; ~DONE:Shiny
     ld e,a
-    ld a,[wPewterEeveeIV_AtkDef] ; ~TODO:Shiny
+    ld a,[wPewterEeveeIV_AtkDef] ; ~DONE:Shiny
     jr .End
 
 .Lapras
@@ -143277,14 +143263,19 @@ _CheckNotEscapeWildPokemon:
     scf ; set carry flag
     ret
 .NotInList
-.CheckShiny ; ~TODO:Shiny
+.CheckShiny ; ~DONE:Shiny
     ld hl,W_ENEMYBATTSTATUS3
     bit TRANSFORMED,[hl]
     ld hl,W_ENEMYMONATKDEFIV
+    ld bc,W_ENEMYMONALTFORM-W_ENEMYMONATKDEFIV
     jr z,.NotTransformed
     ld hl,$cceb
+    ld bc,wBackupEnemyAltForm-$cceb
 .NotTransformed
-    call CheckShiny ; ~TODO:Shiny
+    call SetTempInfoForShinyAndGender ; 08
+    ld hl,wInfoForShinyAndGender
+    call CheckShiny ; ~DONE:Shiny
+    call ResetTempInfoForShinyAndGender ; 08
     jr z,.NotEscape
 .End
     ld a,[W_BATTLETYPE] ; $d05a
@@ -143301,7 +143292,7 @@ _CheckNotEscapeWildPokemon:
     ld a,[W_ENEMYMONID]
     cp LAPRAS
     jr z,.NotEscape
-    jr .CheckShiny ; ~TODO:Shiny
+    jr .CheckShiny ; ~DONE:Shiny
 
 .NotEscapeWildPokemon
     db VOLTORB
@@ -146244,7 +146235,8 @@ HandleStatusScreen1:
     BANKSWITCH PrintEXPBar_StatusScreen
     BANKSWITCH PrintStatsBox
     ld hl,$cfb3 ; .OutOfBattle
-    call SetTempIV
+    ld bc,$cfb6-$cfb3
+    call SetTempInfoForShinyAndGender ; 09
     ; ────────────────────────────────── Gender
     BANKSWITCH GetGenderOutOfBattle
     jr c,.Genderless
@@ -146266,21 +146258,20 @@ HandleStatusScreen1:
     ; ────────────────────────────────── Debug DV/StatExp
     call .DebugPlayerStats
     ; ──────────────────────────────────
-    call ResetTempIV
     ld a,[$cf98] ; Pokemon ID
     and a
     jr z,.noShiny
     cp $FF
     jr z,.noShiny
-    ld hl,$cfb3 ; .OutOfBattle
-    call CheckShiny ; ~TODO:Shiny
+    ld hl,wInfoForShinyAndGender
+    call CheckShiny ; ~DONE:Shiny
     jr nz,.noShiny
     FuncCoord 19,6
     ld hl,Coord
     ld de,.ShinyStarIcon
     call PlaceString
 .noShiny
-    ret
+    jp ResetTempInfoForShinyAndGender ; 09
 .ShinyStarIcon
     db $D1,$50
 .MaleIcon
@@ -146360,8 +146351,7 @@ HandleStatusScreen1:
 ; ──────────────────────────────────────────────────────────────────────
 
 HandleStatusScreen2:
-    xor a
-    ld [$ff00+$ba],a ; AutoBGTransferEnabled
+    call DisableAutoBgTransfer
     ld bc,$0005 ; Moves
     ld hl,$d0dc
     call FillMemory
@@ -146417,8 +146407,10 @@ HandleStatusScreen2:
     ; Gender
     push hl
     ld hl,$cfb3 ; .OutOfBattle
-    call SetTempIV
+    ld bc,$cfb6-$cfb3
+    call SetTempInfoForShinyAndGender ; 10
     BANKSWITCH GetGenderOutOfBattle
+    call ResetTempInfoForShinyAndGender ; 10
     pop hl
     jr c,.Genderless
     ld de,.MaleIcon
@@ -146461,8 +146453,7 @@ HandleStatusScreen2:
     cp $4
     jr nz,.LoopMove
     ; End
-    ld a,$1
-    ld [$ff00+$ba],a ; AutoBGTransferEnabled
+    call EnableAutoBgTransfer
     call Delay3
     jp GbPalComplete
 ;.Paging2:
@@ -147236,9 +147227,10 @@ DisplayDepositWithdrawMenu_:
     ld a,[$cf91]
     ld [$d11e],a
     ld hl,$cfb3 ; .OutOfBattle
-    call SetTempIV
+    ld bc,$cfb6-$cfb3
+    call SetTempInfoForShinyAndGender ; 11
     BANKSWITCH GetGender
-    call ResetTempIV
+    call ResetTempInfoForShinyAndGender ; 11
     pop hl
     jr c,.Genderless
     ld de,.MaleIcon
@@ -147839,8 +147831,33 @@ SpecialTrainerAlternateForm:
     inc hl
     jr .loop
 .NotFound
+    ld a,[W_CUROPPONENT]
+    ld hl,.BossTrainerWithoutShiny
+    ld de,1
+    call IsInArray ; carry flag set if true
     ld d,0
+    ret c
+    call GenShinyRandom
+    ld d,a
     ret
+
+.BossTrainerWithoutShiny
+    db SONY1
+    db SONY2
+    db SONY3
+    db BROCK
+    db MISTY
+    db LT_SURGE
+    db ERIKA
+    db KOGA
+    db SABRINA
+    db BLAINE
+    db GIOVANNI
+    db BRUNO
+    db AGATHA
+    db LORELEI
+    db LANCE
+    db $FF
 
 .CustomTrainer
 
@@ -148304,17 +148321,18 @@ LoadEnemyMonData_GetAlternateMonHeader_:
     jr z,.TrainerBattle
 .WildBattle
     call .CheckGhostMarowak
-    jr z,.AltForm1
+    jr z,.AltForm1NoShiny
     call .CheckPalletPikachu
-    jr z,.AltForm1
+    jr z,.AltForm1NoShiny
     call .CheckPewterEevee
-    jr z,.AltForm1
+    jr z,.AltForm1NoShiny
     ; ft
 .WildStandard
-    xor a ; ~TODO ; ~TODO:Shiny
+    call GenShinyRandom ; ~DONE:Shiny
+    ld [wTempAlternateFormIndex],a
     jr .end
-.AltForm1
-    ld a,1 ; ~TODO:Shiny
+.AltForm1NoShiny
+    ld a,1 ; ~DONE:Shiny
     ld [wTempAlternateFormIndex],a
     jr .end
 .outOfBattle
@@ -149455,6 +149473,66 @@ GetMonSkill:
 
 ; ──────────────────────────────────────────────────────────────────────
 
+CheckShinyFrontAndGetPAL_: ; ~DONE:Shiny
+    ld a,[W_ENEMYMONID]
+    ld hl,wFlagForceGhostPalBit4
+    bit 4,[hl]
+    jr z,.NoGhost
+.Ghost
+    ld hl,W_MONH_PALETTE_ID
+    ld a,PAL_GASTLY ; Ghost Color is Gastly Color
+    ld [hli],a
+    xor a
+    ld [hl],a
+    ld a,GASTLY ; Ghost Color is Gastly Color
+    jp SkipShinyAndGetPAL
+.NoGhost
+    ld hl,wFlagBackFrontSpriteBit56
+    set 6,[hl]
+    ld hl,W_ENEMYBATTSTATUS3
+    bit 3,[hl] ; bit 3 of battle status 3,set if current Pokemon is transformed
+    jr z,.NoTransform
+    ld a,[$cfe5]
+.NoTransform
+    push af
+    ld [$d0b5],a
+    BANKSWITCH GetBattleFrontMonHeader
+    ld hl,W_ENEMYMONATKDEFIV
+    ld bc,W_ENEMYMONALTFORM-W_ENEMYMONATKDEFIV
+    jr GetPalCommon
+
+CheckShinyBackAndGetPAL_: ; ~DONE:Shiny
+    ld a,[W_PLAYERMONID]
+    push af
+    ld [$d0b5],a
+    BANKSWITCH GetBattleBackMonHeader
+    ld hl,wFlagBackFrontSpriteBit56
+    set 5,[hl]
+    ld hl,W_PLAYERMONIVS
+    ld bc,W_PLAYERMONALTFORM-W_PLAYERMONIVS
+    jr GetPalCommon
+
+CheckShinyAndGetPAL_: ; ~DONE:Shiny
+    ld a,[$cf91]
+    push af
+    ld [$d0b5],a
+    BANKSWITCH GetLoadedMonHeader
+    ld hl,$cfb3
+    ld bc,$cfb6-$cfb3
+    ; ft
+
+GetPalCommon:
+    call SetTempInfoForShinyAndGender ; 12
+    ld hl,wInfoForShinyAndGender
+    call IsShiny ; ~DONE:Shiny
+    call ResetTempInfoForShinyAndGender ; 12
+    pop af
+SkipShinyAndGetPAL:
+    ld d,a
+    ret
+
+; ──────────────────────────────────────────────────────────────────────
+
 SECTION "Bank3c",ROMX,BANK[$3C]
 
 ; see also MapHeaderBanks
@@ -150484,7 +150562,7 @@ ReadTrainer:
     ld a,1
     ld [$CC49],a
     push hl
-    call AddPokemonToParty
+    call AddPokemonToParty ; ~ADDPKMNTOPARTY
     pop hl
     jr .LoopTrainerData
 .SpecialTrainer
@@ -150501,7 +150579,7 @@ ReadTrainer:
     ld a,1
     ld [$CC49],a
     push hl
-    call AddPokemonToParty
+    call AddPokemonToParty ; ~ADDPKMNTOPARTY
     pop hl
     jr .SpecialTrainer
 .AddAdditionalMoveData

@@ -1239,6 +1239,8 @@ wChangedBlocksEnd::
 wBackupNearPlayerTiles: ; d45f
     ds 20
 
+UNION ; 12 Bytes
+
 wEXPBarPixelLength: ; d473
     ds 1
 wEXPBarBaseEXP:
@@ -1250,55 +1252,75 @@ wEXPBarNeededEXP:
 wEXPBarKeepFullFlag:
     ds 1
 
-wDVForShinyAtkDef ; d47e
-    db
-wDVForShinySpdSpc ; d47f
-    db
+NEXTU
+
+wArrayMiniSpriteLoaded: ; d473
+    ds 6
+    ds 6 ; Free
+    ; TODO:Servono 6 spazi
+    ; per gestire le forme
+    ; alterate in caso di
+    ; mini sprite diversi
+
+ENDU
+
+UNION ; 3 Bytes
+
+wInfoForShinyAndGender: ; d47f
+    ds 3
+
+NEXTU
+
+wDVForShinyAtkDef:: db ; d47f
+wDVForShinySpdSpc:: db ; d480
+wAltFormForShiny:: db ; d481
+
+ENDU
 
 UNION ; 8 Bytes
 
-wTmpMonLearnset: ; d480
+wTmpMonLearnset: ; d482
     ds 8
 
 NEXTU
 
-wTradedPlayerMonIV: ; d480
+wTradedPlayerMonIV: ; d482
     ds 2
-wTradePlayerMonAltForm: ; d482
+wTradePlayerMonAltForm: ; d484
     ds 1
-wTradedEnemyMonIV: ; d483
+wTradedEnemyMonIV: ; d485
     ds 2
-wTradeEnemyMonAltForm: ; d485
+wTradeEnemyMonAltForm: ; d487
     ds 1
 
 NEXTU
 
-wTmpLevel:: db ; d480
+wTmpLevel:: db ; d482
 
 NEXTU
 
-wBackupTypes: ; d480
+wBackupTypes: ; d482
     ds 4
 
-wBackupAIMoveChoice: ; d484
-    ds 4
-
-NEXTU
-
-wTmpAttackerTypes: ; d480
-    ds 4
-wTmpDefenderTypes: ; d484
+wBackupAIMoveChoice: ; d486
     ds 4
 
 NEXTU
 
-wTmpDmgMultiplier: ; d480
+wTmpAttackerTypes: ; d482
+    ds 4
+wTmpDefenderTypes: ; d486
+    ds 4
+
+NEXTU
+
+wTmpDmgMultiplier: ; d482
     ds 2
 
 ENDU
 
-wArrayMiniSpriteLoaded: ; d487
-    ds 6
+; Free
+    ds 4
 
 wFlagsGymLeaderAfterHoFWin:: ds 1 ; d48e
 wGymLeaderRematch:: ds 1 ; d48f
