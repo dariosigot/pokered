@@ -1266,8 +1266,8 @@ NEXTU
 
 wArrayMiniSpriteLoaded: ; d473
     ds 6
-    ds 6 ; Free
-    ; TODO:Servono 6 spazi
+    ds 6
+    ; Servono 6 spazi
     ; per gestire le forme
     ; alterate in caso di
     ; mini sprite diversi

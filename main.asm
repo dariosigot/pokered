@@ -18452,6 +18452,8 @@ HandleIVAndLevelAndLoadRenameScreenDuringPartyRenameScreen:
     ld a,[hl]
     ld [wTmpLevel],a
     pop hl
+    ld a,[wAltFormForShiny]
+    ld [wSpriteOAMBySpcAltForm],a
     call LoadRenameScreen
     jp ResetTempInfoForShinyAndGender ; 01
 
@@ -42992,6 +42994,8 @@ MovesMenu:
     ; Mini Sprite
     ld a,[$cf98]
     ld [$cd5d],a
+    ld a,[$cfb6]
+    ld [wSpriteOAMBySpcAltForm],a
     BANKSWITCH WriteMonPartySpriteOAMBySpecies
 
     ; Initialize Menù Config
@@ -99525,27 +99529,6 @@ Func_70433: ; 70433 (1c:4433)
 PokeCenterHealBall:
     INCBIN "gfx/pokecenter_ball.2bpp"
 
-GetMonSpriteNumOfTiles:
-    push af
-    ld a,[wFlagFlyingMonSpriteBit0]
-    ; wFlagFlyingMonSpriteBit1
-    ; wFlagFlyingMonSpriteBit2
-    and %00000111 ; Check Bit 0,1,2
-    ld b,8
-    jr z,.end
-    ld b,4
-.end
-    pop af
-    ld a,b
-    ret
-
-CheckBaloonRule:
-    ld hl,wFlagBaloonSpriteBit3
-    bit 3,[hl]
-    res 3,[hl]
-    ld hl,wLocationMonOvSprInstruction
-    ret
-
 FlashingBallHealPokecenter: ; Denim,modificata interamente per funzionare sul GameBoyColor
     ld b,$8
 .LoopFlash
@@ -99914,17 +99897,6 @@ GetPlayerTeleportAnimFrameDelay: ; 7077f (1c:477f)
     xor $1
     inc a
     inc a
-    ret
-
-CheckFlyingMonSprite2:
-    ld a,[wFlagFlyingMonSpriteBit0]
-    ; wFlagFlyingMonSpriteBit1
-    ; wFlagFlyingMonSpriteBit2
-    and %00000111 ; Check Bit 0,1,2
-    cp %00000100 ; Only bit 2
-    ret nz
-    ld bc,$0040
-    add hl,bc
     ret
 
 SECTION "Func_707b6",ROMX[$47b6],BANK[$1c]
@@ -101966,12 +101938,17 @@ PlaceAppropriatePokemonIcon:
     push de
     push bc
     ld a,[H_DOWNARROWBLINKCNT2] ; $FF00+$8c
-    ld hl,W_PARTYMON1 ; $d164
-    ld e,a
-    ld d,$0
+    ld hl,W_PARTYMON1_NUM
+    ld bc,44 ; Pokemon Data Lenght
+    call AddNTimes
+    ld a,[hl]
+    ld b,a
+    ld de,W_PARTYMON1_MOVE2PP-W_PARTYMON1_NUM
     add hl,de
     ld a,[hl]
-    call IndexToMiniSpritePointer
+    and %00001111 ; Max 15 Alternative Forms
+    ld c,a
+    call IndexToMiniSpritePointer ; ~DONE:MiniAltForm
     ld [$cd5b],a
     call WriteMonPartySpriteOAM
     pop bc
@@ -101983,7 +101960,13 @@ WriteMonPartySpriteOAMBySpecies:
     xor a
     ld [H_DOWNARROWBLINKCNT2],a ; $FF00+$8c
     ld a,[$cd5d]
-    call IndexToMiniSpritePointer
+    ld b,a
+    ld a,[wSpriteOAMBySpcAltForm]
+    and %00001111 ; Max 15 Alternative Forms
+    ld c,a
+    push de
+    call IndexToMiniSpritePointer ; ~DONE:MiniAltForm
+    pop de
     ld [$cd5b],a
     ; ft
 
@@ -102020,17 +102003,30 @@ WriteMonPartySpriteOAM:
     pop hl
     ret
 
-IndexToMiniSpritePointer:
-    ld b,0
+; INPUT
+; b = Index
+; c = Alt. Form
+IndexToMiniSpritePointer: ; ~DONE:MiniAltForm
     ld hl,wArrayMiniSpriteLoaded
+    ld de,wArrayMiniSpriteLoaded+6-1
+    push de
 .Loop
-    cp [hl]
-    jr z,.Find
-    inc hl
-    inc b
-    jr .Loop
-.Find
-    ld a,b
+    inc de
+    ld a,[hli]
+    cp b
+    jr nz,.Loop
+    ld a,[de]
+    cp c
+    jr nz,.Loop
+;Find
+    ld a,e
+    pop de
+    inc e
+    cp e
+    jr nc,.NoCarry
+    add 6
+.NoCarry
+    sub e
     swap a
     srl a
     ret
@@ -102834,33 +102830,6 @@ Func_71ebb:
 
 GetMapPaletteID:
     BANKSWITCH_JUMP GetMapPaletteID_
-
-CheckFlyingMonSprite:
-    push hl
-    ld hl,wFlagFlyingMonSpriteBit0
-    bit 0,[hl]
-    res 0,[hl]
-    jr z,.CheckBit1
-    ld bc,$0040
-    jr .end
-.CheckBit1
-    bit 1,[hl] ; wFlagFlyingMonSpriteBit1
-    res 1,[hl]
-    jr z,.CheckBit2
-    ld bc,$0080
-    jr .end
-.CheckBit2
-    bit 2,[hl] ; wFlagFlyingMonSpriteBit2
-    res 2,[hl]
-    jr z,.skip
-    ld bc,$0880
-.end
-    pop hl
-    add hl,bc
-    ret
-.skip
-    pop hl
-    ret
 
 ; Free
 
@@ -104923,172 +104892,9 @@ DeterminePaletteID:
     ret
 
 CreateMonOvWorldSprInstruction:
-    ld hl,wSpriteOAMBySpeciesBit7
-    bit 7,[hl]
-    jr z,.NoRename
-    inc hl ; hl point to wSpriteOAMBySpeciesId
-    ld a,1
-    jr .StartCreation
-.NoRename
-    ld hl,W_NUMINPARTY
-    ld a,[hli] ; numero di Pokemon nel party
-    and a
-    jp z,.EmptyParty
-
-.StartCreation
-    push af ; Backup numero di Pokemon nel party
-    ld d,a ; contatore in discesa
-    xor a
-    ld e,a ; contatore in salita
-.NextPartyPokemon
-    xor a
-    ld b,a
-    ld c,e
-    ld a,[hli] ; leggo id Pokemon n-esimo
-    push hl ; Backup location id Pokemon n-esimo
-    push af ; Backup Id Pokemon
-    ld hl,wArrayMiniSpriteLoaded
-    add hl,bc
-    ld [hl],a ; Memorizzo l'elenco dei pokemon Id cosi come verranno caricati in VRAM
-
-    ; Handle Alternate Form
-    ld bc,6
-    add hl,bc
-    push hl ; Backup Alternate Form Mini Sprite Slot
-    ld hl,wSpriteOAMBySpeciesBit7
-    bit 7,[hl]
-    jr z,.NoRenameAltForm
-    ld a,[wSpriteOAMBySpcAltForm]
-    jr .ContinueAltForm
-.NoRenameAltForm
-    ld a,e
-    ld hl,W_PARTYMON1_MOVE2PP
-    ld bc,44 ; Pokemon Data Lenght
-    call AddNTimes
-    ld a,[hl]
-.ContinueAltForm
-    pop hl ; Restore Alternate Form Mini Sprite Slot
-    and %00001111 ; Max 15 Alternative Forms
-    ld [hl],a
-    push af ; Backup Flag Alternate Form
-
-    ld a,e
+    BANKSWITCH CreateMonOvWorldSprInstruction_
+    ld a,d
     ld hl,wLocationMonOvSprInstruction
-    ld bc,$06
-    call AddNTimes
-
-    pop af ; Restore Flag Alternate Form
-    pop bc ; Restore Id Pokemon
-    ld a,b
-    push hl ; Backup wLocationMonOvSprInstruction corretta
-
-    jr z,.NotAlternateForm
-
-    ld bc,$4000 ; ~TODO:MiniAltForm
-    
-    scf
-    push af ; Backup Fake flag C
-    jr .continue1
-
-.NotAlternateForm
-    call IndexToMiniSpriteOrder
-    ld b,128 ; TAUROS in original pokedex
-    cp b
-    push af ; Backup flag C
-    jr c,.Before128 ; < TAUROS in original pokedex
-    sub b
-.Before128
-    ld hl,$4000 ; Entrambe le liste di immagini mini sprite iniziano a inizio BANK
-    ld bc,$80
-    call AddNTimes
-    call CheckFlyingMonSprite2
-    ld b,h
-    ld c,l
-
-.continue1
-    pop af ; Restore flag C
-    pop hl ; Restore wLocationMonOvSprInstruction corretta
-    ld a,c
-    ld [hli],a
-    ld a,b
-    ld [hli],a
-    call GetMonSpriteNumOfTiles ; ld a,$08
-    ld [hli],a
-    ld a,BANK(MonOverworldDataNew_emimonserrate)
-    jr c,.Before128_2
-    inc a ; BANK(MonOverworldDataNew2_emimonserrate)
-.Before128_2
-
-.continue2
-    ld [hli],a
-    push hl ; Backup wLocationMonOvSprInstruction
-    ld a,e
-    ld bc,$80
-    ld hl,$8000
-    call AddNTimes
-    call CheckFlyingMonSprite
-    ld b,h
-    ld c,l
-    pop hl ; Restore wLocationMonOvSprInstruction
-    ld a,c
-    ld [hli],a
-    ld a,b
-    ld [hli],a
-
-    pop hl ; Restore location id Pokemon n-esimo
-    inc e
-    dec d
-    jp nz,.NextPartyPokemon
-    pop af ; Restore numero di Pokemon nel party
-    and a
-.EmptyParty
-    jr nz,.Done
-    inc a
-.Done
-    call CheckBaloonRule ; ld hl,wLocationMonOvSprInstruction
-    call nz,AddTradeBaloonRule
-    push hl
-    ld hl,wSpriteOAMBySpeciesBit7
-    res 7,[hl]
-    pop hl
-    ret
-
-AddTradeBaloonRule:
-    push af
-    push hl
-    ;dw BaloonSprites
-    ;db $80 / $10 ; $40 bytes
-    ;db BANK(BaloonSprites)
-    ;dw $8380
-    ld bc,$06
-    call AddNTimes
-    ld a,(BaloonSprites) % $100
-    ld [hli],a
-    ld a,(BaloonSprites) / $100
-    ld [hli],a
-    ld a,$80 / $10 ; $80 bytes
-    ld [hli],a
-    ld a,BANK(BaloonSprites)
-    ld [hli],a
-    ld a,$80
-    ld [hli],a
-    ld a,$83
-    ld [hli],a
-    pop hl
-    pop af
-    inc a
-    inc a
-    ret
-
-; Funzione che converte l'indice di un pokemon nel numero d'ordine del
-; mini sprite di MonOverworldDataNew
-; a = index
-IndexToMiniSpriteOrder:
-    ld [$d11e],a
-    push de
-    PREDEF IndexToPokedex
-    pop de
-    ld a,[$d11e]
     ret
 
 PalPacketStatMenu: ; Denim
@@ -149598,6 +149404,290 @@ GetPalCommon:
 SkipShinyAndGetPAL:
     ld d,a
     ret
+
+; ──────────────────────────────────────────────────────────────────────
+
+CreateMonOvWorldSprInstruction_:
+    call .CheckOAMBySpecies
+    jr z,.NoRename
+    inc hl ; hl point to wSpriteOAMBySpeciesId
+    ld a,1
+    jr .StartCreation
+.NoRename
+    ld hl,W_NUMINPARTY
+    ld a,[hli] ; numero di Pokemon nel party
+    and a
+    jp z,.EmptyParty
+.StartCreation
+    push af ; Backup numero di Pokemon nel party
+    ld d,a ; contatore in discesa
+    xor a
+    ld e,a ; contatore in salita
+.NextPartyPokemon
+    xor a
+    ld b,a
+    ld c,e
+    ld a,[hli] ; leggo id Pokemon n-esimo
+    push hl ; Backup location id Pokemon n-esimo
+    push af ; Backup Id Pokemon
+    ld hl,wArrayMiniSpriteLoaded
+    add hl,bc
+    ld [hl],a ; Memorizzo l'elenco dei pokemon Id cosi come verranno caricati in VRAM
+    ; Handle Alternate Form
+    ld bc,6
+    add hl,bc
+    push hl ; Backup Alternate Form Mini Sprite Slot
+    call .CheckOAMBySpecies
+    jr z,.NoRenameAltForm
+    ld a,[wSpriteOAMBySpcAltForm]
+    jr .ContinueAltForm
+.NoRenameAltForm
+    ld a,e
+    ld hl,W_PARTYMON1_MOVE2PP
+    ld bc,44 ; Pokemon Data Lenght
+    call AddNTimes
+    ld a,[hl]
+.ContinueAltForm
+    pop hl ; Restore Alternate Form Mini Sprite Slot
+    and %00001111 ; Max 15 Alternative Forms
+    ld [hl],a
+    push af ; Backup Flag Alternate Form
+    ld a,e
+    ld hl,wLocationMonOvSprInstruction
+    ld bc,$06
+    call AddNTimes
+    pop af ; Restore Flag Alternate Form
+    pop bc ; Restore Id Pokemon
+    ld c,a ; c = Alternate Form
+    ld a,b ; a/b = Id
+    push hl ; Backup wLocationMonOvSprInstruction corretta
+    jr z,.NotAlternateForm
+    call .GetPointerToAlternateForm
+    jr nc,.NotAlternateForm
+    call .CheckFlyingMonSprite2
+    ld b,h
+    ld c,l
+    pop hl ; Restore wLocationMonOvSprInstruction corretta
+    ld a,c
+    ld [hli],a
+    ld a,b
+    ld [hli],a
+    call .GetMonSpriteNumOfTiles ; ld a,$08
+    ld [hli],a
+    ld a,BANK(.AlternateTable)
+    jr .continue
+.NotAlternateForm
+    call .IndexToMiniSpriteOrder
+    ld b,128 ; TAUROS in original pokedex
+    cp b
+    push af ; Backup flag C
+    jr c,.Before128 ; < TAUROS in original pokedex
+    sub b
+.Before128
+    ld hl,$4000 ; Entrambe le liste di immagini mini sprite iniziano a inizio BANK
+    ld bc,$80
+    call AddNTimes
+    call .CheckFlyingMonSprite2
+    ld b,h
+    ld c,l
+    pop af ; Restore flag C
+    pop hl ; Restore wLocationMonOvSprInstruction corretta
+    ld a,c
+    ld [hli],a
+    ld a,b
+    ld [hli],a
+    call .GetMonSpriteNumOfTiles ; ld a,$08
+    ld [hli],a
+    ld a,BANK(MonOverworldDataNew_emimonserrate)
+    jr c,.Before128_2
+    inc a ; BANK(MonOverworldDataNew2_emimonserrate)
+.Before128_2
+.continue
+    ld [hli],a
+    push hl ; Backup wLocationMonOvSprInstruction
+    ld a,e
+    ld bc,$80
+    ld hl,$8000
+    call AddNTimes
+    call .CheckFlyingMonSprite
+    ld b,h
+    ld c,l
+    pop hl ; Restore wLocationMonOvSprInstruction
+    ld a,c
+    ld [hli],a
+    ld a,b
+    ld [hli],a
+    pop hl ; Restore location id Pokemon n-esimo
+    inc e
+    dec d
+    jp nz,.NextPartyPokemon
+    pop af ; Restore numero di Pokemon nel party
+    and a
+.EmptyParty
+    jr nz,.Done
+    inc a
+.Done
+    call .CheckBaloonRule
+    call .ResetOAMBySpecies
+    ld d,a
+    ret
+
+.IndexToMiniSpriteOrder
+    ld [$d11e],a
+    push de
+    PREDEF IndexToPokedex
+    pop de
+    ld a,[$d11e]
+    ret
+
+.CheckOAMBySpecies
+    ld hl,wSpriteOAMBySpeciesBit7
+    bit 7,[hl]
+    ret
+
+.ResetOAMBySpecies
+    ld hl,wSpriteOAMBySpeciesBit7
+    res 7,[hl]
+    ret
+
+.GetMonSpriteNumOfTiles
+    push af
+    ld a,[wFlagFlyingMonSpriteBit0]
+    ; wFlagFlyingMonSpriteBit1
+    ; wFlagFlyingMonSpriteBit2
+    and %00000111 ; Check Bit 0,1,2
+    ld b,8
+    jr z,.end0
+    ld b,4
+.end0
+    pop af
+    ld a,b
+    ret
+
+.CheckFlyingMonSprite
+    push hl
+    ld hl,wFlagFlyingMonSpriteBit0
+    bit 0,[hl]
+    res 0,[hl]
+    jr z,.CheckBit1
+    ld bc,$0040
+    jr .end1
+.CheckBit1
+    bit 1,[hl] ; wFlagFlyingMonSpriteBit1
+    res 1,[hl]
+    jr z,.CheckBit2
+    ld bc,$0080
+    jr .end1
+.CheckBit2
+    bit 2,[hl] ; wFlagFlyingMonSpriteBit2
+    res 2,[hl]
+    jr z,.skip1
+    ld bc,$0880
+.end1
+    pop hl
+    add hl,bc
+    ret
+.skip1
+    pop hl
+    ret
+
+.CheckFlyingMonSprite2
+    ld a,[wFlagFlyingMonSpriteBit0]
+    ; wFlagFlyingMonSpriteBit1
+    ; wFlagFlyingMonSpriteBit2
+    and %00000111 ; Check Bit 0,1,2
+    cp %00000100 ; Only bit 2
+    ret nz
+    ld bc,$0040
+    add hl,bc
+    ret
+
+.CheckBaloonRule
+    ld hl,wFlagBaloonSpriteBit3
+    bit 3,[hl]
+    res 3,[hl]
+    ret z
+    ld hl,wLocationMonOvSprInstruction
+    push af
+    ;dw BaloonSprites
+    ;db $80 / $10 ; $40 bytes
+    ;db BANK(BaloonSprites)
+    ;dw $8380
+    ld bc,$06
+    call AddNTimes
+    ld a,(BaloonSprites) % $100
+    ld [hli],a
+    ld a,(BaloonSprites) / $100
+    ld [hli],a
+    ld a,$80 / $10 ; $80 bytes
+    ld [hli],a
+    ld a,BANK(BaloonSprites)
+    ld [hli],a
+    ld a,$80
+    ld [hli],a
+    ld a,$83
+    ld [hli],a
+    pop af
+    inc a
+    inc a
+    ret
+
+; b = ID
+; c = Alt Form
+.GetPointerToAlternateForm
+    push bc
+    ld hl,.AlternateTable
+.LoopAltForm
+    ld a,[hli]
+    cp $FF
+    jr z,.fail
+    cp b
+    jr nz,.Next1AltForm
+    ld a,[hli]
+    cp c
+    jr nz,.Next2AltForm
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
+    scf
+.EndAltForm
+    pop bc
+    ld a,b
+    ret
+.Next1AltForm
+    inc hl
+.Next2AltForm
+    inc hl
+    inc hl
+    jr .LoopAltForm
+.fail
+    xor a ; rcf
+    jr .EndAltForm
+
+ALTERNATE_MINI_SPRITE: MACRO
+    db \1
+    db \2
+    dw \3
+ENDM
+
+.AlternateTable
+    ALTERNATE_MINI_SPRITE VOLTORB,$01,.VoltorbHisui
+    ALTERNATE_MINI_SPRITE ELECTRODE,$01,.ElectrodeHisui
+    ALTERNATE_MINI_SPRITE MAROWAK,$01,.MarowakAlola
+    ALTERNATE_MINI_SPRITE VULPIX,$01,.VulpixAlola
+    ALTERNATE_MINI_SPRITE NINETALES,$01,.NinetalesAlola
+    db $FF
+
+.VoltorbHisui
+    INCBIN "gfx/denim/AlternativeForms/VoltorbHisui.2bpp"
+.ElectrodeHisui
+    INCBIN "gfx/denim/AlternativeForms/ElectrodeHisui.2bpp"
+.MarowakAlola
+    INCBIN "gfx/denim/AlternativeForms/MarowakAlola.2bpp"
+.VulpixAlola
+    INCBIN "gfx/denim/AlternativeForms/VulpixAlola.2bpp"
+.NinetalesAlola
+    INCBIN "gfx/denim/AlternativeForms/NinetalesAlola.2bpp"
 
 ; ──────────────────────────────────────────────────────────────────────
 
