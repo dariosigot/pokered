@@ -297,6 +297,7 @@ wSkill: ; cd3e
 
 NEXTU
 
+wInGameTradeId: ; cd3d
 wFlyLocationList: ; cd3d
 wWhichTrade: ; cd3d
 ; which entry from TradeMons to select

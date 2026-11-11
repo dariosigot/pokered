@@ -35580,9 +35580,9 @@ VermilionHouse3TextPointers: ; 19c15 (6:5c15)
 
 VermilionHouse3Text1: ; 19c17 (6:5c17)
     db $08 ; asm
-    ld a,$4
-    ld [wWhichTrade],a
-    PREDEF Predef54
+    ld a,2
+    ld [wInGameTradeId],a
+    PREDEF DoInGameTradeDialogue
     jp TextScriptEnd
 
 VermilionHouse3Object: ; 0x19c25 (size=26)
@@ -40000,9 +40000,9 @@ CeruleanHouseText1: ; 1d6fd (7:56fd)
 
 CeruleanHouseText2: ; 1d702 (7:5702)
     db $08 ; asm
-    ld a,$6
-    ld [wWhichTrade],a
-    PREDEF Predef54
+    ld a,0
+    ld [wInGameTradeId],a
+    PREDEF DoInGameTradeDialogue
     jp TextScriptEnd
 
 CeruleanHouseObject: ; 0x1d710 (size=32)
@@ -74911,29 +74911,27 @@ RockTunnelPokecenter_h: ; 0x493ae to 0x493ba (12 bytes) (id=81)
     db $00 ; connections
     dw RockTunnelPokecenterObject ; objects
 
-SECTION "RockTunnelPokecenterTextPointers",ROMX[$53c0],BANK[$12]
-
-RockTunnelPokecenterTextPointers: ; 493c0 (12:53c0)
+RockTunnelPokecenterTextPointers:
     dw RockTunnelPokecenterText1
     dw RockTunnelPokecenterText2
     dw RockTunnelPokecenterText3
     dw RockTunnelPokecenterText4
 
-RockTunnelPokecenterText1: ; 493c8 (12:53c8)
+RockTunnelPokecenterText1:
     db $ff
 
-RockTunnelPokecenterText2: ; 493c9 (12:53c9)
+RockTunnelPokecenterText2:
     TX_FAR _RockTunnelPokecenterText1
     db "@"
 
-RockTunnelPokecenterText3: ; 493ce (12:53ce)
+RockTunnelPokecenterText3:
     TX_FAR _RockTunnelPokecenterText3
     db "@"
 
-RockTunnelPokecenterText4: ; 493d3 (12:53d3)
+RockTunnelPokecenterText4:
     db $f6
 
-RockTunnelPokecenterObject: ; 0x493d4 (size=44)
+RockTunnelPokecenterObject:
     db $0 ; border tile
 
     db $2 ; warps
@@ -74952,24 +74950,24 @@ RockTunnelPokecenterObject: ; 0x493d4 (size=44)
     EVENT_DISP $7,$7,$3
     EVENT_DISP $7,$7,$4
 
-Route11Gate_h: ; 0x49400 to 0x4940c (12 bytes) (id=84)
+Route11Gate_h: ; (id=84)
     db $0c ; tileset
     db ROUTE_11_GATE_1F_HEIGHT,ROUTE_11_GATE_1F_WIDTH ; dimensions (y,x)
     dw Route11GateBlocks,Route11GateTextPointers,Route11GateScript ; blocks,texts,scripts
     db $00 ; connections
     dw Route11GateObject ; objects
 
-Route11GateScript: ; 4940c (12:540c)
+Route11GateScript:
     jp EnableAutoTextBoxDrawing
 
-Route11GateTextPointers: ; 4940f (12:540f)
+Route11GateTextPointers:
     dw Route11GateText1
 
-Route11GateText1: ; 49411 (12:5411)
+Route11GateText1:
     TX_FAR _Route11GateText1
     db "@"
 
-Route11GateObject: ; 0x49416 (size=50)
+Route11GateObject:
     db $a ; border tile
 
     db $5 ; warps
@@ -74991,35 +74989,35 @@ Route11GateObject: ; 0x49416 (size=50)
     EVENT_DISP $4,$5,$7
     EVENT_DISP $4,$8,$6 ; ROUTE_11_GATE_2F
 
-Route11GateUpstairs_h: ; 0x49448 to 0x49454 (12 bytes) (id=86)
+Route11GateUpstairs_h: ; (id=86)
     db $0c ; tileset
     db ROUTE_11_GATE_2F_HEIGHT,ROUTE_11_GATE_2F_WIDTH ; dimensions (y,x)
     dw Route11GateUpstairsBlocks,Route11GateUpstairsTextPointers,Route11GateUpstairsScript ; blocks,texts,scripts
     db $00 ; connections
-    dw Route11GateUpstairsObject ; objects
+    dw Route11GateUpstairsObject
 
-Route11GateUpstairsScript: ; 49454 (12:5454)
+Route11GateUpstairsScript:
     jp DisableAutoTextBoxDrawing
 
-Route11GateUpstairsTextPointers: ; 49457 (12:5457)
+Route11GateUpstairsTextPointers:
     dw Route11GateUpstairsText1
     dw Route11GateUpstairsText2
     dw Route11GateUpstairsText3
     dw Route11GateUpstairsText4
 
-Route11GateUpstairsText1: ; 4945f (12:545f)
+Route11GateUpstairsText1:
     db $08 ; asm
-    xor a
-    ld [wWhichTrade],a
-    PREDEF Predef54
-asm_49469: ; 49469 (12:5469)
+    ld a,3
+    ld [wInGameTradeId],a
+    PREDEF DoInGameTradeDialogue
+asm_49469:
     jp TextScriptEnd
 
-Route11GateUpstairsText2: ; 4946c (12:546c)
+Route11GateUpstairsText2:
     db $8
     ld a,[$d7d6]
     add a
-    jr c,.asm_4949b ; 0x49471 $28
+    jr c,.asm_4949b
     ld a,30
     ld [$ff00+$db],a
     ld a,ITEMFINDER
@@ -75034,20 +75032,20 @@ Route11GateUpstairsText2: ; 4946c (12:546c)
     PREDEF OakAideNDexToGiftItem
     ld a,[$ff00+$db]
     dec a
-    jr nz,.asm_494a1 ; 0x49494 $b
+    jr nz,.asm_494a1
     ld hl,$d7d6
     set 7,[hl]
 .asm_4949b
     ld hl,UnnamedText_494a3
     call PrintText
 .asm_494a1
-    jr asm_49469 ; 0x494a1 $c6
+    jr asm_49469
 
-UnnamedText_494a3: ; 494a3 (12:54a3)
+UnnamedText_494a3:
     TX_FAR _UnnamedText_494a3
     db "@"
 
-Route11GateUpstairsText3: ; 494a8 (12:54a8)
+Route11GateUpstairsText3:
     db $08 ; asm
     ld a,[$c109]
     cp $4
@@ -75055,28 +75053,30 @@ Route11GateUpstairsText3: ; 494a8 (12:54a8)
     ld a,[$d7d8]
     bit 7,a
     ld hl,UnnamedText_494c4
-    jr z,.asm_5ac80 ; 0x494b9
+    jr z,.asm_5ac80
     ld hl,UnnamedText_494c9
-.asm_5ac80 ; 0x494be
+.asm_5ac80
     call PrintText
     jp TextScriptEnd
 
-UnnamedText_494c4: ; 494c4 (12:54c4)
+UnnamedText_494c4:
     TX_FAR _UnnamedText_494c4
     db "@"
 
-UnnamedText_494c9: ; 494c9 (12:54c9)
+UnnamedText_494c9:
     TX_FAR _UnnamedText_494c9
     db "@"
 
-Route11GateUpstairsText4: ; 494ce (12:54ce)
+Route11GateUpstairsText4:
     db $8
-    ld hl,UnnamedText_494d5 ; $54d5
+    ld hl,UnnamedText_494d5
     jp Func_55c9
 
-UnnamedText_494d5: ; 494d5 (12:54d5)
+UnnamedText_494d5:
     TX_FAR _UnnamedText_494d5
     db "@"
+
+SECTION "Route11GateUpstairsObject",ROMX[$54da],BANK[$12]
 
 Route11GateUpstairsObject: ; 0x494da (size=30)
     db $a ; border tile
@@ -75744,9 +75744,9 @@ Route18GateUpstairsTextPointers: ; 49978 (12:5978)
 
 Route18GateUpstairsText1: ; 4997e (12:597e)
     db $08 ; asm
-    ld a,$5
-    ld [wWhichTrade],a
-    PREDEF Predef54
+    ld a,4
+    ld [wInGameTradeId],a
+    PREDEF DoInGameTradeDialogue
     jp TextScriptEnd
 
 Route18GateUpstairsText2: ; 4998c (12:598c)
@@ -93291,9 +93291,9 @@ UndergroundTunnelEntranceRoute5TextPointers: ; 5d6b0 (17:56b0)
 
 UndergroundTunnelEntranceRoute5Text1: ; 5d6b2 (17:56b2)
     db $08 ; asm
-    ld a,$9
-    ld [wWhichTrade],a
-    PREDEF Predef54
+    ld a,1
+    ld [wInGameTradeId],a
+    PREDEF DoInGameTradeDialogue
     ld hl,UndergroundTunnelEntranceRoute5_5d6af
     ret
 
@@ -101747,9 +101747,7 @@ CeruleanCaveName:
 PowerPlantName:
     db "POWER PLANT@"
 
-SECTION "Func_716c6",ROMX[$56c6],BANK[$1c]
-
-Func_716c6: ; 716c6 (1c:56c6)
+Func_716c6:
     ld a,[W_SUBANIMTRANSFORM] ; $d08b
     inc a
     cp $19
@@ -101776,21 +101774,21 @@ Func_716c6: ; 716c6 (1c:56c6)
     ld [W_SUBANIMTRANSFORM],a ; $d08b
     jp DelayFrame
 
-Func_716f7: ; 716f7 (1c:56f7)
+Func_716f7:
     xor a
     ld [wCurrentMenuItem],a ; $cc26
     ld b,a
     inc a
     jr asm_7170a
 
-Func_716ff: ; 716ff (1c:56ff)
+Func_716ff:
     ld hl,$cf1f
     ld a,[wCurrentMenuItem] ; $cc26
     ld c,a
     ld b,$0
     add hl,bc
     ld a,[hl]
-asm_7170a: ; 7170a (1c:570a)
+asm_7170a:
     ld c,a
     ld hl,DataTable_71769 ; $5769
     add hl,bc
@@ -101829,16 +101827,6 @@ asm_7170a: ; 7170a (1c:570a)
     ld a,[wCurrentMenuItem] ; $cc26
     call AddNTimes
     ld c,$4 ; Denim ; $40
-    ds 1 ; ld a,[hl]
-    ds 2 ; cp $4
-    ds 2 ; jr z,.asm_71755
-    ds 2 ; cp $8
-    ds 2 ; jr nz,.asm_71759
-.asm_71755
-    ds 1 ; dec hl
-    ds 1 ; dec hl
-    ds 2 ; ld c,$1
-.asm_71759
     ld b,$4
     ld de,$4
 .asm_7175e
@@ -101852,15 +101840,14 @@ asm_7170a: ; 7170a (1c:570a)
     ld a,c
     jr .asm_71721
 
-DataTable_71769: ; 71769 (1c:5769)
+DataTable_71769:
     db $05,$10,$20
 
-LoadMonPartySpriteGfx: ; 7176c (1c:576c)
+LoadMonPartySpriteGfx:
     call CreateMonOvWorldSprInstruction
-    ds 2 ; ld a,$1c
     ; ft
 
-Func_71771: ; 71771 (1c:5771)
+Func_71771:
     ld bc,$0
 .asm_71774
     push af
@@ -101889,7 +101876,7 @@ Func_71771: ; 71771 (1c:5771)
     jr nz,.asm_71774
     ret
 
-Func_71791: ; 71791 (1c:5791)
+Func_71791:
     call DisableLCD
     call CreateMonOvWorldSprInstruction
     ld bc,$0
@@ -102335,35 +102322,28 @@ EnableUpdateSpritesAndRestorePlayerSprite:
 
 ; ─────────────────────────────────────────
 
-; Free
-
-SECTION "Predef54",ROMX[$5ad9],BANK[$1C]
-
-Predef54: ; 71ad9 (1c:5ad9)
-; trigger the trade offer/action specified by wWhichTrade
+DoInGameTradeDialogue:
+; trigger the trade offer/action specified by wInGameTradeId
     call SaveScreenTilesToBuffer2
-    ld hl,TradeMons
-    ld a,[wWhichTrade]
-    ld b,a
-    swap a
-    sub b
-    sub b
-    ld c,a
-    ld b,$0
-    add hl,bc
+    ld hl,.TradeMons
+    ld a,[wInGameTradeId]
+    ld bc,8
+    call AddNTimes
     ld a,[hli]
     ld [$cd0f],a
     ld a,[hli]
     ld [$cd34],a
     ld a,[hli]
+    ld [W_CURENEMYLVL],a
+    ld a,[hli]
     push af
-    ld de,$cd29
-    ld bc,$000b
+    ld de,$cd29 ; Pointer to Male/Female Name
+    ld bc,4
     call CopyData
     pop af
     ld l,a
     ld h,$0
-    ld de,InGameTradeTextPointers ; $5d64
+    ld de,.InGameTradeTextPointers
     add hl,hl
     add hl,de
     ld a,[hli]
@@ -102372,12 +102352,12 @@ Predef54: ; 71ad9 (1c:5ad9)
     ld [$cd11],a
     ld a,[$cd0f]
     ld de,$cd13
-    call Func_71b6a
+    call .GetMonName
     ld a,[$cd34]
     ld de,$cd1e
-    call Func_71b6a
+    call .GetMonName
     ld hl,$d737
-    ld a,[wWhichTrade]
+    ld a,[wInGameTradeId]
     ld c,a
     ld b,$2
     PREDEF HandleBitArray
@@ -102385,7 +102365,7 @@ Predef54: ; 71ad9 (1c:5ad9)
     and a
     ld a,$4
     ld [$cd12],a
-    jr nz,.asm_99bca ; 0x71b36 $20
+    jr nz,.asm_99bca
     xor a
     ld [$cd12],a
     call .asm_99bca
@@ -102394,12 +102374,12 @@ Predef54: ; 71ad9 (1c:5ad9)
     call YesNoChoice
     ld a,[$cc26]
     and a
-    jr nz,.asm_99bca ; 0x71b4b $b
-    call InGameTrade
-    jr c,.asm_99bca ; 0x71b50 $6
-    ld hl,UnnamedText_71d8d
+    jr nz,.asm_99bca
+    call .InGameTrade
+    jr c,.asm_99bca
+    ld hl,.UnnamedText_71d8d
     call PrintText
-.asm_99bca ; 0x71b58
+.asm_99bca
     ld hl,$cd12
     ld a,[hld]
     ld e,a
@@ -102414,7 +102394,7 @@ Predef54: ; 71ad9 (1c:5ad9)
     ld l,a
     jp PrintText
 
-Func_71b6a: ; 71b6a (1c:5b6a)
+.GetMonName
     push de
     ld [$d11e],a
     call GetMonName
@@ -102423,27 +102403,14 @@ Func_71b6a: ; 71b6a (1c:5b6a)
     ld bc,$b
     jp CopyData
 
-TradeMons: ; 71b7b (1c:5b7b)
-; givemonster,getmonster,textstring,nickname (11 bytes),14 bytes total
-    db VOLTORB,DITTO,0,"GUMMY@@@@@@"
-    db VOLTORB,DITTO,0,"GUMMY@@@@@@"
-    db VOLTORB,DITTO,2,"GUMMY@@@@@@"
-    db VOLTORB,DITTO,0,"GUMMY@@@@@@"
-    db VOLTORB,DITTO,2,"GUMMY@@@@@@"
-    db VOLTORB,DITTO,0,"GUMMY@@@@@@"
-    db VOLTORB,DITTO,1,"GUMMY@@@@@@"
-    db VOLTORB,DITTO,1,"GUMMY@@@@@@"
-    db VOLTORB,DITTO,2,"GUMMY@@@@@@"
-    db VOLTORB,DITTO,2,"GUMMY@@@@@@"
-
-InGameTrade:
+.InGameTrade
     xor a
     ld [$d07d],a
     dec a
     ld [$cfcb],a
     call DisplayPartyMenu
     push af
-    call Func_71ca2
+    call .Func_71ca2
     pop af
     ld a,$1
     jp c,.asm_c4bc2
@@ -102452,29 +102419,23 @@ InGameTrade:
     ld a,[$cf91]
     cp b
     ld a,$2
-    jr nz,.asm_c4bc2 ; 0x71c26 $75
-    ld a,[$cf92]
-    ld hl,$d18c
-    ld bc,$002c
-    call AddNTimes
-    ld a,[hl]
-    ld [$d127],a
+    jr nz,.asm_c4bc2
     ld hl,$d737
     ld a,[wWhichTrade]
     ld c,a
     ld b,$1
     PREDEF HandleBitArray
-    ld hl,UnnamedText_71d88
+    ld hl,.UnnamedText_71d88
     call PrintText
     ld a,[$cf92]
     push af
-    ld a,[$d127]
+    ld a,[W_CURENEMYLVL]
     push af
     call LoadHpBarAndStatusTilePatterns
-    call InGameTrade_PrepareTradeData
+    call .InGameTrade_PrepareTradeData
     PREDEF InternalClockTradeAnim
     pop af
-    ld [$d127],a
+    ld [W_CURENEMYLVL],a
     pop af
     ld [$cf92],a
     ld a,[$cd34]
@@ -102483,26 +102444,28 @@ InGameTrade:
     ld [$cc49],a
     ld [$cf95],a
     call RemovePokemon
+    ld hl,wInfoForShinyAndGender
+    BANKSWITCH GetGender
+    push af
     ld a,$80
     ld [$cc49],a
     call AddPokemonToParty ; ~ADDPKMNTOPARTY
-    call InGameTrade_CopyDataToReceivedMon
+    pop af
+    call .InGameTrade_CopyDataToReceivedMon
     BANKSWITCH Func_17d7d
     call ClearScreen
-    call Func_71ca2
+    call .Func_71ca2
     PREDEF RedrawMapView
     and a
     ld a,$3
-    jr .asm_ee803 ; 0x71c9b $1
-.asm_c4bc2 ; 0x71c9d
+    jr .asm_ee803
+.asm_c4bc2
     scf
-.asm_ee803 ; 0x71c9e
+.asm_ee803
     ld [$cd12],a
     ret
 
-SECTION "Func_71ca2",ROMX[$5ca2],BANK[$1c]
-
-Func_71ca2: ; 71ca2 (1c:5ca2)
+.Func_71ca2
     call GBPalWhiteOutWithDelay3
     call RestoreScreenTilesAndReloadTilePatterns
     call ReloadTilesetTilePatterns
@@ -102513,27 +102476,27 @@ Func_71ca2: ; 71ca2 (1c:5ca2)
     call DelayFrames
     BANKSWITCH_JUMP LoadWildData
 
-InGameTrade_PrepareTradeData: ; 71cc1 (1c:5cc1)
-    ld hl,wWhichTrade ; $cd3d
+.InGameTrade_PrepareTradeData
+    ld hl,wWhichTrade
     ld a,[$cd0f] ; InGameTradeGiveMonSpecies
     ld [hli],a
     ld a,[$cd34] ; InGameTradeReceiveMonSpecies
     ld [hl],a
-    ld hl,W_PARTYMON1OT ; $d273
+    ld hl,W_PARTYMON1OT
     ld bc,$b
-    ld a,[wWhichPokemon] ; $cf92
+    ld a,[wWhichPokemon]
     call AddNTimes
     ld de,$cd41 ; TradedPlayerMonOT
     ld bc,$b
     call .CopyData
-    ld hl,InGameTrade_TrainerString ; $5d59
+    ld hl,.InGameTrade_TrainerString
     ld de,$cd4e ; TradedEnemyMonOT
     call .CopyData
-    ld de,W_GRASSRATE ; $d887
+    ld de,W_GRASSRATE
     call .CopyData
-    ld hl,W_PARTYMON1_OTID ; $d177
+    ld hl,W_PARTYMON1_OTID
     ld bc,$2c
-    ld a,[wWhichPokemon] ; $cf92
+    ld a,[wWhichPokemon]
     call AddNTimes
     ld de,$cd4c ; TradedPlayerMonOTID
     ld bc,$2
@@ -102550,27 +102513,37 @@ InGameTrade_PrepareTradeData: ; 71cc1 (1c:5cc1)
     pop hl
     ret
 
-InGameTrade_CopyDataToReceivedMon: ; 71d19 (1c:5d19)
-    ld hl,W_PARTYMON1NAME ; $d2b5
+.InGameTrade_CopyDataToReceivedMon
+    push af
+    ld hl,W_PARTYMON1NAME
     ld bc,$b
-    call Func_71d4f
+    call .Func_71d4f
     ld hl,$cd29
+    pop af
+    jr c,.NoFemale
+    jr nz,.NoFemale
+    inc hl
+    inc hl
+.NoFemale
+    ld a,[hli]
+    ld h,[hl]
+    ld l,a
     ld bc,$b
     call CopyData
-    ld hl,W_PARTYMON1OT ; $d273
+    ld hl,W_PARTYMON1OT
     ld bc,$b
-    call Func_71d4f
-    ld hl,InGameTrade_TrainerString ; $5d59
-    ld bc,$b
+    call .Func_71d4f
+    ld hl,.InGameTrade_TrainerString
+    ld bc,2
     call CopyData
     ld hl,W_PARTYMON1_OTID ; $d177
-    ld bc,$2c
-    call Func_71d4f
+    ld bc,44
+    call .Func_71d4f
     ld hl,$cd59 ; TradedEnemyMonOTID
     ld bc,$2
     jp CopyData
 
-Func_71d4f: ; 71d4f (1c:5d4f)
+.Func_71d4f
     ld a,[W_NUMINPARTY] ; $d163
     dec a
     call AddNTimes
@@ -102578,103 +102551,139 @@ Func_71d4f: ; 71d4f (1c:5d4f)
     ld d,h
     ret
 
-InGameTrade_TrainerString: ; 71d59 (1c:5d59)
+.InGameTrade_TrainerString
     db $5D,$50
-    ds 9 ; "Trainer" Name
+    ds 9
 
-InGameTradeTextPointers: ; 71d64 (1c:5d64)
-    dw TradeTextPointers1
-    dw TradeTextPointers2
-    dw TradeTextPointers3
+.InGameTradeTextPointers
+    dw .TradeTextPointers1
+    dw .TradeTextPointers2
+    dw .TradeTextPointers3
 
-TradeTextPointers1: ; 71d6a (1c:5d6a)
-    dw UnnamedText_71d94
-    dw UnnamedText_71d99
-    dw UnnamedText_71d9e
-    dw UnnamedText_71da3
-    dw UnnamedText_71da8
+.TradeTextPointers1
+    dw .UnnamedText_71d94
+    dw .UnnamedText_71d99
+    dw .UnnamedText_71d9e
+    dw .UnnamedText_71da3
+    dw .UnnamedText_71da8
 
-TradeTextPointers2: ; 71d74 (1c:5d74)
-    dw UnnamedText_71dad
-    dw UnnamedText_71db2
-    dw UnnamedText_71db7
-    dw UnnamedText_71dbc
-    dw UnnamedText_71dc1
+.TradeTextPointers2
+    dw .UnnamedText_71dad
+    dw .UnnamedText_71db2
+    dw .UnnamedText_71db7
+    dw .UnnamedText_71dbc
+    dw .UnnamedText_71dc1
 
-TradeTextPointers3: ; 71d7e (1c:5d7e)
-    dw UnnamedText_71dc6
-    dw UnnamedText_71dcb
-    dw UnnamedText_71dd0
-    dw UnnamedText_71dd5
-    dw UnnamedText_71dda
+.TradeTextPointers3
+    dw .UnnamedText_71dc6
+    dw .UnnamedText_71dcb
+    dw .UnnamedText_71dd0
+    dw .UnnamedText_71dd5
+    dw .UnnamedText_71dda
 
-UnnamedText_71d88: ; 71d88 (1c:5d88)
+.UnnamedText_71d88
     TX_FAR _UnnamedText_71d88
     db "@"
-
-UnnamedText_71d8d: ; 71d8d (1c:5d8d)
-    TX_FAR _UnnamedText_71d8d ; 0xa80bc
+.UnnamedText_71d8d
+    TX_FAR _UnnamedText_71d8d
     db $11,$a,"@"
-
-UnnamedText_71d94: ; 71d94 (1c:5d94)
+.UnnamedText_71d94
     TX_FAR _UnnamedText_71d94
     db "@"
-
-UnnamedText_71d99: ; 71d99 (1c:5d99)
+.UnnamedText_71d99
     TX_FAR _UnnamedText_71d99
     db "@"
-
-UnnamedText_71d9e: ; 71d9e (1c:5d9e)
+.UnnamedText_71d9e
     TX_FAR _UnnamedText_71d9e
     db "@"
-
-UnnamedText_71da3: ; 71da3 (1c:5da3)
+.UnnamedText_71da3
     TX_FAR _UnnamedText_71da3
     db "@"
-
-UnnamedText_71da8: ; 71da8 (1c:5da8)
+.UnnamedText_71da8
     TX_FAR _UnnamedText_71da8
     db "@"
-
-UnnamedText_71dad: ; 71dad (1c:5dad)
+.UnnamedText_71dad
     TX_FAR _UnnamedText_71dad
     db "@"
-
-UnnamedText_71db2: ; 71db2 (1c:5db2)
+.UnnamedText_71db2
     TX_FAR _UnnamedText_71db2
     db "@"
-
-UnnamedText_71db7: ; 71db7 (1c:5db7)
+.UnnamedText_71db7
     TX_FAR _UnnamedText_71db7
     db "@"
-
-UnnamedText_71dbc: ; 71dbc (1c:5dbc)
+.UnnamedText_71dbc
     TX_FAR _UnnamedText_71dbc
     db "@"
-
-UnnamedText_71dc1: ; 71dc1 (1c:5dc1)
+.UnnamedText_71dc1
     TX_FAR _UnnamedText_71dc1
     db "@"
-
-UnnamedText_71dc6: ; 71dc6 (1c:5dc6)
+.UnnamedText_71dc6
     TX_FAR _UnnamedText_71dc6
     db "@"
-
-UnnamedText_71dcb: ; 71dcb (1c:5dcb)
+.UnnamedText_71dcb
     TX_FAR _UnnamedText_71dcb
     db "@"
-
-UnnamedText_71dd0: ; 71dd0 (1c:5dd0)
+.UnnamedText_71dd0
     TX_FAR _UnnamedText_71dd0
     db "@"
-
-UnnamedText_71dd5: ; 71dd5 (1c:5dd5)
+.UnnamedText_71dd5
     TX_FAR _UnnamedText_71dd5
     db "@"
-
-UnnamedText_71dda: ; 71dda (1c:5dda)
+.UnnamedText_71dda
     TX_FAR _UnnamedText_71dda
     db "@"
+
+
+
+TRADE_DIALOGSET_CASUAL EQU 0
+TRADE_DIALOGSET_EVOLUTION EQU 1
+TRADE_DIALOGSET_HAPPY EQU 2
+
+TRADE_MONS: MACRO
+    db \1,\2,\3,\4
+    dw \5,\6
+ENDM
+
+.TradeMons
+
+    TRADE_MONS DIGLETT,VOLTORB,12,TRADE_DIALOGSET_HAPPY,.Voltorb,.Voltorb ; CeruleanHouseText2
+
+    TRADE_MONS VENONAT,HORSEA,19,TRADE_DIALOGSET_CASUAL,.HorseaM,.HorseaF ; UndergroundTunnelEntranceRoute5Text1
+    TRADE_MONS CLEFAIRY,TANGELA,17,TRADE_DIALOGSET_EVOLUTION,.TangelaM,.TangelaF ; VermilionHouse3Text1
+    TRADE_MONS BUTTERFREE,VULPIX,23,TRADE_DIALOGSET_CASUAL,.VulpixM,.VulpixF ; Route11GateUpstairsText1
+
+    TRADE_MONS DODRIO,GOLDUCK,35,TRADE_DIALOGSET_HAPPY,.GolduckM,.GolduckF ; Route18GateUpstairsText1
+    
+    TRADE_MONS VOLTORB,DITTO,10,TRADE_DIALOGSET_EVOLUTION,.Ditto,.Ditto ; Lab2Text2
+    TRADE_MONS VOLTORB,DITTO,10,TRADE_DIALOGSET_HAPPY,.Ditto,.Ditto ; Lab2Text3
+    TRADE_MONS VOLTORB,DITTO,10,TRADE_DIALOGSET_CASUAL,.Ditto,.Ditto ; Lab4Text2    
+
+.Voltorb
+    db "DORIS@@@@@@"
+.HorseaM
+    db "TIAMAT@@@@@"
+.HorseaF
+    db "SIREN@@@@@@"
+.TangelaM
+    db "MORBOL@@@@@"
+.TangelaF
+    db "MORBOL@@@@@"
+.VulpixM
+    db "MOOMBA@@@@@"
+.VulpixF
+    db "MOOMBA@@@@@"
+.GolduckM
+    db "ODINE@@@@@@"
+.GolduckF
+    db "ELLIONE@@@@"
+.Ditto
+    db "GUMMY@@@@@@"
+
+; ─────────────────────────────────────────
+
+; Free
+
+SECTION "ProcessSGBPacket",ROMX[$5ddf],BANK[$1c]
 
 ProcessSGBPacket: ; 71ddf (1c:5ddf)
     call Load16BitRegisters
@@ -108296,16 +108305,16 @@ Lab2Text1: ; 75c2a (1d:5c2a)
 
 Lab2Text2: ; 75c2f (1d:5c2f)
     db $8
-    ld a,$7
-    ld [wWhichTrade],a
+    ld a,5
+    ld [wInGameTradeId],a
     jr asm_78552 ; 0x75c35 $6
 
 Lab2Text3: ; 75c37 (1d:5c37)
     db $8
-    ld a,$8
-    ld [wWhichTrade],a
+    ld a,6
+    ld [wInGameTradeId],a
 asm_78552: ; 75c3d (1d:5c3d)
-    PREDEF Predef54
+    PREDEF DoInGameTradeDialogue
     jp TextScriptEnd
 
 Lab2Object: ; 0x75c45 (size=38)
@@ -108534,9 +108543,9 @@ UnnamedText_75dd5: ; 75dd5 (1d:5dd5)
 
 Lab4Text2: ; 75dda (1d:5dda)
     db $08 ; asm
-    ld a,$3
-    ld [wWhichTrade],a
-    PREDEF Predef54
+    ld a,7
+    ld [wInGameTradeId],a
+    PREDEF DoInGameTradeDialogue
     jp TextScriptEnd
 
 LoadFossilItemAndMonNameBank1D: ; 75de8 (1d:5de8)
@@ -144436,7 +144445,7 @@ SaveSAVtoSRAM2Predef:                      NEW_PREDEF SaveSAVtoSRAM2            
 LoadSAVCheckSum2Predef:                    NEW_PREDEF LoadSAVCheckSum2                    ; $51
 LoadSAVPredef:                             NEW_PREDEF LoadSAV                             ; $52
 SaveSAVtoSRAM1Predef:                      NEW_PREDEF SaveSAVtoSRAM1                      ; $53
-Predef54Predef:                            NEW_PREDEF Predef54                            ; $54
+DoInGameTradeDialoguePredef:               NEW_PREDEF DoInGameTradeDialogue               ; $54
 HallOfFamePCPredef:                        NEW_PREDEF HallOfFamePC                        ; $55
 DisplayDexRatingPredef:                    NEW_PREDEF DisplayDexRating                    ; $56
 _LeaveMapAnimPredef:                       NEW_PREDEF _LeaveMapAnim                       ; $57

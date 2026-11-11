@@ -2873,8 +2873,8 @@ CHANSEY_Learnset:
     db  1,TAIL_WHIP
     db  4,POUND
     db  5,GROWL
-    db  8,SOFTBOILED
-    db  8,Skill__HEAL
+    db  7,SOFTBOILED
+    db  7,Skill__HEAL
     db 12,DEFENSE_CURL
     db 14,BIDE
     db 16,DOUBLESLAP
@@ -2902,13 +2902,13 @@ TANGELA_Learnset:
     db  5,TACKLE
     db  7,GROWTH
     db  8,VINE_WHIP
+    db  9,Skill__HEAL
     db 10,BIND
     db 12,LEECH_SEED
     db 13,Skill__CUT
     db 14,ABSORB
     db 16,POISONPOWDER
     db 17,STUN_SPORE
-    db 17,Skill__HEAL
     db 19,BLADE
     db 22,LEECH_LIFE
     db 25,MEGA_DRAIN
