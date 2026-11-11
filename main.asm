@@ -101305,6 +101305,9 @@ _LoadTownMap:
     ld [$d09b],a
     ret
 
+; Don't Move because "ClassicMap"
+SECTION "CompressedMap",ROMX[$5112],BANK[$1c]
+
 CompressedMap:
 ; you can decompress this file with the redrle program in the extras/ dir
     INCBIN "gfx/town_map.rle"
@@ -102327,8 +102330,12 @@ DoInGameTradeDialogue:
     call SaveScreenTilesToBuffer2
     ld hl,.TradeMons
     ld a,[wInGameTradeId]
-    ld bc,8
-    call AddNTimes
+    add a ; x2
+    add a ; x4
+    add a ; x8
+    ld b,0
+    ld c,a
+    add hl,bc
     ld a,[hli]
     ld [$cd0f],a
     ld a,[hli]
@@ -102633,8 +102640,6 @@ DoInGameTradeDialogue:
     TX_FAR _UnnamedText_71dda
     db "@"
 
-
-
 TRADE_DIALOGSET_CASUAL EQU 0
 TRADE_DIALOGSET_EVOLUTION EQU 1
 TRADE_DIALOGSET_HAPPY EQU 2
@@ -102646,46 +102651,46 @@ ENDM
 
 .TradeMons
 
-    TRADE_MONS DIGLETT,VOLTORB,12,TRADE_DIALOGSET_HAPPY,.Voltorb,.Voltorb ; CeruleanHouseText2
+    TRADE_MONS DIGLETT,VOLTORB,12,TRADE_DIALOGSET_HAPPY,.Voltorb,.Voltorb ; CeruleanHouseText2 ; Entry Point
 
-    TRADE_MONS VENONAT,HORSEA,19,TRADE_DIALOGSET_CASUAL,.HorseaM,.HorseaF ; UndergroundTunnelEntranceRoute5Text1
-    TRADE_MONS CLEFAIRY,TANGELA,17,TRADE_DIALOGSET_EVOLUTION,.TangelaM,.TangelaF ; VermilionHouse3Text1
-    TRADE_MONS BUTTERFREE,VULPIX,23,TRADE_DIALOGSET_CASUAL,.VulpixM,.VulpixF ; Route11GateUpstairsText1
+    TRADE_MONS VENONAT,HORSEA,19,TRADE_DIALOGSET_CASUAL,.HorseaM,.HorseaF ; UndergroundTunnelEntranceRoute5Text1 ; Entry Point
+    TRADE_MONS CLEFAIRY,TANGELA,17,TRADE_DIALOGSET_EVOLUTION,.Tangela,.Tangela ; VermilionHouse3Text1 ; Entry Point
+    TRADE_MONS BUTTERFREE,VULPIX,23,TRADE_DIALOGSET_CASUAL,.VulpixM,.VulpixF ; Route11GateUpstairsText1 ; Entry Point
 
-    TRADE_MONS DODRIO,GOLDUCK,35,TRADE_DIALOGSET_HAPPY,.GolduckM,.GolduckF ; Route18GateUpstairsText1
-    
-    TRADE_MONS VOLTORB,DITTO,10,TRADE_DIALOGSET_EVOLUTION,.Ditto,.Ditto ; Lab2Text2
-    TRADE_MONS VOLTORB,DITTO,10,TRADE_DIALOGSET_HAPPY,.Ditto,.Ditto ; Lab2Text3
-    TRADE_MONS VOLTORB,DITTO,10,TRADE_DIALOGSET_CASUAL,.Ditto,.Ditto ; Lab4Text2    
+    TRADE_MONS DODRIO,GOLDUCK,35,TRADE_DIALOGSET_HAPPY,.Golduck,.Golduck ; Route18GateUpstairsText1 ; Entry Point
+
+    TRADE_MONS MAROWAK,RHYHORN,41,TRADE_DIALOGSET_CASUAL,.RhyhornM,.RhyhornF ; Lab2Text2
+    TRADE_MONS LAPRAS,GYARADOS,46,TRADE_DIALOGSET_CASUAL,.GyaradosM,.GyaradosF ; Lab2Text3 ; Entry Point
+    TRADE_MONS ONIX,MAGNETON,43,TRADE_DIALOGSET_CASUAL,.Magneton,.Magneton ; Lab4Text2    
 
 .Voltorb
-    db "DORIS@@@@@@"
+    db "BLITZ@@@@@@"
 .HorseaM
-    db "TIAMAT@@@@@"
+    db "DIABLOS@@@@"
 .HorseaF
     db "SIREN@@@@@@"
-.TangelaM
-    db "MORBOL@@@@@"
-.TangelaF
-    db "MORBOL@@@@@"
+.Tangela
+    db "MALBORO@@@@"
 .VulpixM
     db "MOOMBA@@@@@"
 .VulpixF
-    db "MOOMBA@@@@@"
-.GolduckM
-    db "ODINE@@@@@@"
-.GolduckF
-    db "ELLIONE@@@@"
-.Ditto
-    db "GUMMY@@@@@@"
+    db "PHOENIX@@@@"
+.Golduck
+    db "CARBUNCLE@@"
+.RhyhornM
+    db "GRIEVER@@@@"
+.RhyhornF
+    db "KRYSTA@@@@@"
+.GyaradosM
+    db "BAHAMUT@@@@"
+.GyaradosF
+    db "TIAMAT@@@@@"
+.Magneton
+    db "X-ATMZNT@@@"
 
 ; ─────────────────────────────────────────
 
-; Free
-
-SECTION "ProcessSGBPacket",ROMX[$5ddf],BANK[$1c]
-
-ProcessSGBPacket: ; 71ddf (1c:5ddf)
+ProcessSGBPacket:
     call Load16BitRegisters
     ld a,b
     cp $ff
@@ -102706,7 +102711,7 @@ ProcessSGBPacket: ; 71ddf (1c:5ddf)
     push de
     jp hl
 
-Func_71dff: ; 71dff (1c:5dff)
+Func_71dff:
     ld hl,PalPacket_72448
     ld de,Unknown_721b5
     ret
@@ -102840,12 +102845,8 @@ Func_71ebb:
 GetMapPaletteID:
     BANKSWITCH_JUMP GetMapPaletteID_
 
-; Free
-
-SECTION "GetHallOfFameLinkCableEvolutionPaletteID",ROMX[$5f17],BANK[$1c]
-
 ; HallOfFame or LinkCable or Evolution
-GetHallOfFameLinkCableEvolutionPaletteID: ; 71f17 (1c:5f17)
+GetHallOfFameLinkCableEvolutionPaletteID:
     push bc
     ld hl,PalPacket_72428
     ld de,$cf2d
@@ -102865,11 +102866,7 @@ GetHallOfFameLinkCableEvolutionPaletteID: ; 71f17 (1c:5f17)
     ld de,Unknown_7219e
     ret
 
-; Free
-
-SECTION "PointerTable_71f73",ROMX[$5f73],BANK[$1c]
-
-PointerTable_71f73: ; 71f73 (1c:5f73)
+PointerTable_71f73:
     dw Func_71dff
     dw GetBattleScreenPaletteID ; Palette Battle Screen
     dw Func_71e48
@@ -102893,6 +102890,8 @@ CleanLCD_OAMAndResetForceGhostPal:
     res 4,[hl]
     ld b,$1
     jp GoPAL_SET
+
+; Free
 
 SECTION "Func_71fb6",ROMX[$5fb6],BANK[$1C]
 
@@ -134934,6 +134933,9 @@ _UnnamedText_71d94:
     text_line
     text_paus
     TX_RAM $cd1e
+    text_init , " ",$EA ; ":L" tile ID
+    text_paus
+    TX_NUM W_CURENEMYLVL,1,3
     text_init , "? "
     text_done
 
@@ -134974,6 +134976,9 @@ _UnnamedText_71dad:
     text_line , "for "
     text_paus
     TX_RAM $cd1e
+    text_init , " ",$EA ; ":L" tile ID
+    text_paus
+    TX_NUM W_CURENEMYLVL,1,3
     text_init , "?"
     text_done
 
@@ -135015,6 +135020,9 @@ _UnnamedText_71dc6:
     text_line , "for "
     text_paus
     TX_RAM $cd1e
+    text_init , " ",$EA ; ":L" tile ID
+    text_paus
+    TX_NUM W_CURENEMYLVL,1,3
     text_init , "?"
     text_done
 
@@ -139054,7 +139062,7 @@ Route6Mons:
     db 23,FARFETCH_D ;  5%
     db 22,PSYDUCK    ;  5%
     db 37,POLIWRATH  ;  4% ; Entry Point
-    db 33,GOLDUCK    ;  1% ; Entry Point
+    db 33,GOLDUCK    ;  1%
 
 VermilionMons:
     db $00
@@ -139158,7 +139166,7 @@ Route9Mons:
 
 Route10Mons:
     db $0F
-    db 12,VOLTORB   ; 20% ; Entry Point
+    db 12,VOLTORB   ; 20%
     db 16,VOLTORB   ; 20%
     db 13,VOLTORB   ; 15%
     db 11,GRIMER    ; 10% ; Entry Point
@@ -139255,7 +139263,7 @@ Route7Mons:
     db 21,VULPIX    ; 10%
     db 20,MANKEY    ; 10%
     db 17,GROWLITHE ;  5% ; Entry Point
-    db 17,VULPIX    ;  5% ; Entry Point
+    db 17,VULPIX    ;  5%
     db 23,MANKEY    ;  4%
     db 28,PRIMEAPE  ;  1% ; Entry Point
     db $00
@@ -139402,7 +139410,7 @@ Route13Mons:
     db 24,VENONAT    ; 10%
     db 22,GLOOM      ;  5%
     db 22,WEEPINBELL ;  5%
-    db 18,TANGELA    ;  4% ; Entry Point
+    db 18,TANGELA    ;  4%
     db 31,VENOMOTH   ;  1% ; Entry Point
     db $05
     db 21,MAGIKARP   ; 20%
@@ -140383,7 +140391,7 @@ GoodRodGroupEst:
     db  2,TENTACOOL ; Entry Point
     db  2,TENTACOOL
     db  3,TENTACOOL
-    db  2,HORSEA ; Entry Point
+    db  2,HORSEA
     db  3,HORSEA
 
 SuperRodGroupEst:
@@ -140669,7 +140677,7 @@ SuperRodGroupLake:
     db 30,MAGIKARP
     db 30,MAGIKARP
     db 33,MAGIKARP
-    db 43,GYARADOS ; Entry Point
+    db 43,GYARADOS
 
 ;SuperRodGroupUnknown:
 
