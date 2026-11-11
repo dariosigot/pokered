@@ -297,6 +297,7 @@ wSkill: ; cd3e
 
 NEXTU
 
+wInGameTradeId: ; cd3d
 wFlyLocationList: ; cd3d
 wWhichTrade: ; cd3d
 ; which entry from TradeMons to select
@@ -344,6 +345,16 @@ wTrainerAISwitchDebugReason:
     ds 2
 
     ds 1
+
+NEXTU
+
+wLeftGBMonAltForm:: db ; $cd61
+wRightGBMonAltForm:: db ; $cd62
+
+NEXTU
+
+wSkillMonID:: db      ; $cd61 = Mon ID (used for Skill/Cry)
+wSkillMonAltForm:: db ; $cd62 = Mon Alt Form (used for Skill/Cry)
 
 ENDU
 
@@ -1239,6 +1250,8 @@ wChangedBlocksEnd::
 wBackupNearPlayerTiles: ; d45f
     ds 20
 
+UNION ; 12 Bytes
+
 wEXPBarPixelLength: ; d473
     ds 1
 wEXPBarBaseEXP:
@@ -1250,55 +1263,75 @@ wEXPBarNeededEXP:
 wEXPBarKeepFullFlag:
     ds 1
 
-wDVForShinyAtkDef ; d47e
-    db
-wDVForShinySpdSpc ; d47f
-    db
+NEXTU
+
+wArrayMiniSpriteLoaded: ; d473
+    ds 6
+    ds 6
+    ; Servono 6 spazi
+    ; per gestire le forme
+    ; alterate in caso di
+    ; mini sprite diversi
+
+ENDU
+
+UNION ; 3 Bytes
+
+wInfoForShinyAndGender: ; d47f
+    ds 3
+
+NEXTU
+
+wDVForShinyAtkDef:: db ; d47f
+wDVForShinySpdSpc:: db ; d480
+wAltFormForShiny:: db ; d481
+
+ENDU
 
 UNION ; 8 Bytes
 
-wTmpMonLearnset: ; d480
+wTmpMonLearnset: ; d482
     ds 8
 
 NEXTU
 
-wTradedPlayerMonIV: ; d480
+wTradedPlayerMonIV: ; d482
     ds 2
-wTradePlayerMonAltForm: ; d482
+wTradePlayerMonAltForm: ; d484
     ds 1
-wTradedEnemyMonIV: ; d483
+wTradedEnemyMonIV: ; d485
     ds 2
-wTradeEnemyMonAltForm: ; d485
+wTradeEnemyMonAltForm: ; d487
     ds 1
 
 NEXTU
 
-wTmpLevel:: db ; d480
+wTmpLevel:: db ; d482
 
 NEXTU
 
-wBackupTypes: ; d480
+wBackupTypes: ; d482
     ds 4
 
-wBackupAIMoveChoice: ; d484
-    ds 4
-
-NEXTU
-
-wTmpAttackerTypes: ; d480
-    ds 4
-wTmpDefenderTypes: ; d484
+wBackupAIMoveChoice: ; d486
     ds 4
 
 NEXTU
 
-wTmpDmgMultiplier: ; d480
+wTmpAttackerTypes: ; d482
+    ds 4
+wTmpDefenderTypes: ; d486
+    ds 4
+
+NEXTU
+
+wTmpDmgMultiplier: ; d482
     ds 2
 
 ENDU
 
-wArrayMiniSpriteLoaded: ; d487
-    ds 6
+; Free
+    ds 4
 
 wFlagsGymLeaderAfterHoFWin:: ds 1 ; d48e
 wGymLeaderRematch:: ds 1 ; d48f
@@ -1730,6 +1763,7 @@ ENDU
 wRivalStarterIV_AtkDef:: db ; $d726
 wRivalStarterIV_SpdSpc:: db ; $d727
 
+; Free
 ds 1 ; $d728
 
 wPalletPikachuIV_AtkDef:: db ; $d729
@@ -1737,10 +1771,70 @@ wPalletPikachuIV_SpdSpc:: db ; $d72a
 
 wSurfingMonID:: db ; $d72b
 
-SECTION "W_FLAGS_D733",WRAMX[$d733],BANK[$1]
+; bit 0: if not set, the 3 minimum steps between random battles have passed
+; bit 1: prevent audio fade out
+wd72c:: db
 
-W_FLAGS_D733: ; d733
+; This variable is used for temporary flags and as the destination map when
+; warping to the Trade Center or Colosseum.
+; bit 0: sprite facing directions have been initialised in the Trade Center
+; bit 3: do scripted warp (used to warp back to Lavender Town from the top of the pokemon tower)
+; bit 4: on a dungeon warp
+; bit 5: don't make NPCs face the player when spoken to
+; Bits 6 and 7 are set by scripts when starting major battles in the storyline,
+; but they do not appear to affect anything. Bit 6 is reset after all battles
+; and bit 7 is reset after trainer battles (but it's only set before trainer
+; battles anyway).
+wd72d:: db
+
+; bit 0: the player has received Lapras in the Silph Co. building
+; bit 1: set in various places, but doesn't appear to have an effect
+; bit 2: the player has healed pokemon at a pokemon center at least once
+; bit 3: the player has a received a pokemon from Prof. Oak
+; bit 4: disable battles
+; bit 5: set when a battle ends and when the player blacks out in the overworld due to poison
+; bit 6: using the link feature
+; bit 7: set if scripted NPC movement has been initialised
+wd72e:: db
+
+; Free
+wd72f:: db
+
+; bit 0: NPC sprite being moved by script
+; bit 5: ignore joypad input
+; bit 6: print text with no delay between each letter
+; bit 7: set if joypad states are being simulated in the overworld or an NPC's movement is being scripted
+wd730:: db
+
+; Free
+wd731:: db
+
+; bit 0: play time being counted
+; bit 1: remnant of debug mode; only set by the debug build.
+; if it is set:
+; 1. skips most of Prof. Oak's speech, and uses NINTEN as the player's name and SONY as the rival's name
+; 2. does not have the player start in floor two of the player's house (instead sending them to [wLastMap])
+; 3. allows wild battles to be avoided by holding down B
+; furthermore, in the debug build:
+; 4. allows trainers to be avoided by holding down B
+; 5. skips Safari Zone step counter by holding down B
+; 6. skips the NPC who blocks Route 3 before beating Brock by holding down B
+; 7. skips Cerulean City rival battle by holding down B
+; 8. skips Pokémon Tower rival battle by holding down B
+; bit 2: the target warp is a fly warp (bit 3 set or blacked out) or a dungeon warp (bit 4 set)
+; bit 3: used warp pad, escape rope, dig, teleport, or fly, so the target warp is a "fly warp"
+; bit 4: jumped into hole (Pokemon Mansion, Seafoam Islands, Victory Road) or went down waterfall (Seafoam Islands), so the target warp is a "dungeon warp"
+; bit 5: currently being forced to ride bike (cycling road)
+; bit 6: map destination is [wLastBlackoutMap] (usually the last used pokemon center, but could be the player's house)
+wd732:: db
+
+; bit 0: running a test battle
+; bit 1: prevent music from changing when entering new map
+; bit 2: skip the joypad check in CheckWarpsNoCollision (used for the forced warp down the waterfall in the Seafoam Islands)
+; bit 3: trainer wants to battle
 ; bit 4: use variable [W_CURMAPSCRIPT] instead of the provided index for next frame's map script (used to start battle when talking to trainers)
+; bit 7: used fly out of battle
+W_FLAGS_D733: ; d733
     ds 1
 
 SECTION "wEventFlags",WRAMX[$d747],BANK[$1]
@@ -1920,12 +2014,12 @@ wTmpHPIV               ; dee4 = temporary slot for HP IV from other IV (for debu
 wTmpRepelQty           ; dee4
 wChoicePkmnMoveDeleter ; dee4
 wTempStatLO            ; dee4
-wSkillMonID            ; dee4 = Mon ID used for Cry
 wMonIdCryAndDex        ; dee4 = Mon ID used for PlayCryAndDisplayPokedex
 wTempEnemyMinMaxIV     ; dee4 = Temp Min Enemy IV Value
 wTempMovePowerLO       ; dee4 = Temp Move Power 2nd Byte
 wBufferPointerByte2    ; dee4 = Buffer Pointer Byte 02
 wTempBoxSlot           ; dee4 = Temp Buffer for Printing Box Slot
+wSpriteOAMBySpcAltForm ; dee4
     ds 1
 
 wStatusScreen2OAMBit0       ; dee5 ; bit 0 = Write OAM in Status Screen 2
@@ -1952,6 +2046,8 @@ wSkipTextInPokedexBit7      ; dee5 ; bit 7 = Skip Text during Show Pokedex in Ba
     ds 1
 
 wOverworldGoToDarkBit0      ; dee6 ; bit 0 = Force Overworld "CheckDarkMap"
+wOverworldDigAnimationBit1  ; dee6 ; bit 1 = Force Overworld Dig/Auger Animation
+wVBlankDrawHoleBit2         ; dee6 ; bit 1 = Force to Draw Hole under Player during VBlank
 wFlagListMenuSpc:           ; dee6 ; bit 0 = BadgeName
                             ; dee6 ; bit 1 = Celadon Mart Elevator
                             ; dee6 ; bit 2 = Silph Co Elevator
