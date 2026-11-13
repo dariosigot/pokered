@@ -2006,6 +2006,7 @@ wTempMoveEnergy       ; dee3 = Temp Buffer for Move Energy
 wTempMovePowerHI      ; dee3 = Temp Move Power 1st Byte
 wTempInitialPalette   ; dee3 = Initial Background Palette (rBGP) during Power Plant Explosion
 wBufferPointerByte1   ; dee3 = Buffer Pointer Byte 01
+wTempCountStatusCond  ; dee3 = Number of Status Cond Icon
     ds 1
 
 wMaxLevel              ; dee4
