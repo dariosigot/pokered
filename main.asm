@@ -379,7 +379,6 @@ GoodCopyVideoDataDouble:
     add hl,hl
     add hl,hl
     add hl,hl
-    add hl,hl
     ld b,h
     ld c,l
     pop hl
@@ -524,14 +523,6 @@ GoToBottom2:
     ld a,2
 .end
     ld [wCurrentMenuItem],a
-    ret
-
-GetLeftTileOfHPBar:
-    ld a,[wListMenuID] ; Is Party Menu?
-    cp 2               ; ...
-    ld a,$71 ; left of HP bar tile 1
-    ret nz ; NotParty
-    dec a ; $70 ; Energy Symbol in Party Menu
     ret
 
 HandleMenuInputWithWrap:
@@ -3031,8 +3022,7 @@ DrawHPBar:
     push hl
     push de
     push bc
-    call GetLeftTileOfHPBar ; ld a,$71 ; left of HP bar tile 1
-    ld [hli],a
+    inc hl ; Old First HP Bar Tile Deleted
     ld a,$62 ; left of HP bar tile 2
     ld [hli],a
     push hl
@@ -3041,12 +3031,7 @@ DrawHPBar:
     ld [hli],a
     dec d
     jr nz,.drawEmptyBarLoop
-    ld a,[$cf94]
-    dec a ; what should the right of HP bar tile be?
-    ld a,$6d ; right of HP bar tile,in status screen and battles
-    jr z,.writeTile
-    dec a ; right of HP bar tile,in pokemon menu
-.writeTile
+    ld a,$6C ; right of HP bar tile
     ld [hl],a
     pop hl
     ld a,e
@@ -3102,6 +3087,8 @@ CheckNewAdventureFlag:
     bit 0,[hl]
     pop hl
     ret
+
+; Free
 
 SECTION "LoadFlippedFrontSpriteByMonIndex",ROM0[$1384]
 
@@ -3361,7 +3348,7 @@ CheckSurfing:
 ; hl = destination address
 ; [$cfb9] = level
 PrintLevel:
-    ld a,$6e ; ":L" tile ID
+    ld a,$EA ; ":L" tile ID
     ld [hli],a
     ld c,2 ; number of digits
     ld a,[$cfb9] ; level
@@ -3370,22 +3357,11 @@ PrintLevel:
 ; if level at least 100,write over the ":L" tile
     dec hl
     inc c ; increment number of digits to 3
-    jr PrintLevelCommon
-
-; prints the level without leaving off ":L" regardless of level
-; INPUT:
-; hl = destination address
-; [$cfb9] = level
-PrintLevelFull:
-    ld a,$6e ; ":L" tile ID
-    ld [hli],a
-    ld c,3 ; number of digits
-    ld a,[$cfb9] ; level
     ; ft
 
 PrintLevelCommon:
-    ld [$d11e],a
     ld de,$d11e
+    ld [de],a
     ld b,$41 ; no leading zeroes,left-aligned,one byte
     jp PrintNumber
 
@@ -3449,6 +3425,8 @@ GetMonHeader:
 
 Tset11_Coll:
     INCBIN "gfx/tilesets/11.tilecoll"
+
+; Free
 
 SECTION "GetPartyMonName2",ROM0[$15b4]
 
@@ -9107,10 +9085,8 @@ RestorePlayerMove:
 
 ; ───────────────────────────────
 
-SECTION "LoadTextBoxTilePatterns",ROM0[$36a0]
-
 ; copies the text box tile patterns into VRAM
-LoadTextBoxTilePatterns: ; 36a0 (0:36a0)
+LoadTextBoxTilePatterns:
     ld a,[rLCDC]
     bit 7,a ; is the LCD enabled?
     jr nz,.lcdEnabled
@@ -9127,7 +9103,7 @@ LoadTextBoxTilePatterns: ; 36a0 (0:36a0)
     jp CopyVideoData ; if LCD is on,transfer during V-blank
 
 ; copies HP bar and status display tile patterns into VRAM
-LoadHpBarAndStatusTilePatterns: ; 36c0 (0:36c0)
+LoadHpBarAndStatusTilePatterns:
     BANKSWITCH_JUMP LoadHpBarAndStatusTilePatterns_
 
 ; Output -> a
@@ -10843,7 +10819,7 @@ GenShinyRandom:
     xor a ; No Shiny a = $00
     ret
 
-GoodCopyVideoData: ; Denim,ExpBar
+GoodCopyVideoData:
     ld a,[rLCDC]
     bit 7,a ; is the LCD enabled?
     jp nz,CopyVideoData ; if LCD is on,transfer during V-blank
@@ -15380,11 +15356,7 @@ FlyWarpDataPtr:
 
 ; ────────────────────────────────
 
-; Free
-
-SECTION "LoadRenameScreen",ROMX[$6596],BANK[$1]
-
-LoadRenameScreen: ; 6596 (1:6596)
+LoadRenameScreen:
     push hl
     ld hl,$d730
     set 6,[hl]
@@ -15475,7 +15447,7 @@ LoadRenameScreen: ; 6596 (1:6596)
     ld a,[W_ISINBATTLE] ; $d057
     and a
     jp z,LoadTextBoxTilePatterns
-    BANKSWITCH_JUMP LoadHudTilePatterns
+    ret
 
 .unknownPointerTable_665e: ; 665e (1:665e)
     dw .asm_65fc
@@ -15623,14 +15595,17 @@ LoadRenameScreen: ; 6596 (1:6596)
     ld [wTopMenuItemX],a ; $cc25
     jp EraseMenuCursor
 
-Func_675b: ; 675b (1:675b)
-    ld de,ED_Tile
+Func_675b:
+    ld de,.ED_Tile
     ld hl,$8f00
     ld bc,$1
     jp CopyVideoDataDouble
-
-ED_Tile: ; 6767 (1:6767)
+.ED_Tile
     INCBIN "gfx/ED_tile.1bpp"
+
+; Free
+
+SECTION "Func_676f",ROMX[$676f],BANK[$1]
 
 Func_676f: ; 676f (1:676f)
     xor a
@@ -29107,15 +29082,6 @@ ABTiles:
 HpBarAndStatusGraphics:
     INCBIN "gfx/hp_bar_and_status.2bpp"
 
-BattleHudTiles1:
-    INCBIN "gfx/battle_hud1.1bpp"
-
-BattleHudTiles2:
-    INCBIN "gfx/battle_hud2.1bpp"
-
-BattleHudTiles3:
-    INCBIN "gfx/battle_hud3.1bpp"
-
 NintendoCopyrightLogoGraphics:
     INCBIN "gfx/copyright.2bpp"
 
@@ -29200,14 +29166,7 @@ asm_128fb:
     ld de,$cfb5 ; Energy
     ld bc,$0103
     call PrintNumber
-    ld a,[wListMenuID] ; Is Party Menu?
-    cp 2               ; ...
-    jr nz,.NotParty
-    ld [hl],$70 ; Energy Symbol in Party Menu
-    jr .done3
-.NotParty
     ld [hl],$DA ; Energy Symbol
-.done3
     pop hl
     pop de
     ret
@@ -50694,7 +50653,7 @@ Func_3a8e1: ; 3a8e1 (e:68e1)
     ret
 
 Func_3a902: ; 3a902 (e:6902)
-    ld hl,PlayerBattleHUDGraphicsTiles ; $6916
+    ld hl,.PlayerBattleHUDGraphicsTiles
     ld de,$cd3f
     ld bc,$3
     call CopyData
@@ -50703,14 +50662,14 @@ Func_3a902: ; 3a902 (e:6902)
     ld de,rIE ; $ffff
     jr Func_3a930
 
-PlayerBattleHUDGraphicsTiles: ; 3a916 (e:6916)
+.PlayerBattleHUDGraphicsTiles
 ; The tile numbers for specific parts of the battle display for the player's pokemon
-    db $73 ; unused ($73 is hardcoded into the routine that uses these bytes)
-    db $77 ; lower-right corner tile of the HUD
-    db $6F ; lower-left triangle tile of the HUD
+    db $6D ; unused ($6D is hardcoded into the routine that uses these bytes)
+    db $6F ; lower-right corner tile of the HUD
+    db $70 ; lower-left triangle tile of the HUD
 
 Func_3a919: ; 3a919 (e:6919)
-    ld hl,EnemyBattleHUDGraphicsTiles ; $692d
+    ld hl,.EnemyBattleHUDGraphicsTiles
     ld de,$cd3f
     ld bc,$3
     call CopyData
@@ -50719,14 +50678,14 @@ Func_3a919: ; 3a919 (e:6919)
     ld de,$1
     jr Func_3a930
 
-EnemyBattleHUDGraphicsTiles: ; 3a92d (e:692d)
+.EnemyBattleHUDGraphicsTiles
 ; The tile numbers for specific parts of the battle display for the enemy
-    db $73 ; unused ($73 is hardcoded in the routine that uses these bytes)
-    db $74 ; lower-left corner tile of the HUD
-    db $78 ; lower-right triangle tile of the HUD
+    db $6D ; unused ($6D is hardcoded in the routine that uses these bytes)
+    db $6E ; lower-left corner tile of the HUD
+    db $70 ; lower-right triangle tile of the HUD
 
 Func_3a930: ; 3a930 (e:6930)
-    ld [hl],$73
+    ld [hl],$6D
     ld bc,$14
     add hl,bc
     ld a,[$cd40]
@@ -50734,7 +50693,7 @@ Func_3a930: ; 3a930 (e:6930)
     ld a,$7 ; Diminuita larghezza barra sottostante Hp in battle
 .asm_3a93c
     add hl,de
-    ld [hl],$76
+    ld [hl],$70
     dec a
     jr nz,.asm_3a93c
     add hl,de
@@ -53625,7 +53584,7 @@ Func_3c04c: ; 3c04c (f:404c)
     call ClearScreenArea
     call DisableLCD
     call LoadFontTilePatterns
-    call LoadHudAndHpBarAndStatusTilePatterns
+    call LoadHpBarAndStatusTilePatterns
     ld hl,$9800
     ld bc,$400
 .asm_3c06f
@@ -54685,11 +54644,7 @@ RunMoveEffectNotInList:
     pop af
     ret
 
-; Free
-
-SECTION "ChooseNextMon",ROMX[$47d8],BANK[$f]
-
-ChooseNextMon: ; 3c7d8 (f:47d8)
+ChooseNextMon:
     ld a,$2
     ld [$d07d],a
     call DisplayPartyMenu
@@ -54723,7 +54678,6 @@ ChooseNextMon: ; 3c7d8 (f:47d8)
     PREDEF HandleBitArray
     call LoadBattleMonFromParty
     call GBPalWhiteOut
-    call LoadHudTilePatterns
     call LoadScreenTilesFromBuffer1
     call GoPAL_SET_CF1C
     call GBPalNormal
@@ -54732,6 +54686,10 @@ ChooseNextMon: ; 3c7d8 (f:47d8)
     ld a,[hli]
     or [hl]
     ret
+
+; Free
+
+SECTION "HandlePlayerBlackOut",ROMX[$4837],BANK[$f]
 
 ; called when player is out of usable mons.
 ; prints approriate lose message,sets carry flag if player blacked out (special case for initial rival fight)
@@ -55027,7 +54985,6 @@ Func_3c92a: ; 3c92a (f:492a)
     ld [$CC26],a
 .next7
     call GBPalWhiteOut
-    call LoadHudTilePatterns
     call LoadScreenTilesFromBuffer1
 .next4
     call CleanLCD_OAM
@@ -55854,7 +55811,6 @@ asm_3d05f:
     res 5,[hl]
     jp nz,InitBattleMenu ; Don't consume turn
 
-    call LoadHudTilePatterns
     call CleanLCD_OAM
     ld a,[W_BATTLETYPE] ; $d05a
     cp $2
@@ -55902,7 +55858,6 @@ asm_3d0ed:
 asm_3d0f0:
     call CleanLCD_OAM
     call GBPalWhiteOut
-    call LoadHudTilePatterns
     call LoadScreenTilesFromBuffer2
     call GoPAL_SET_CF1C
     call GBPalNormal
@@ -55984,7 +55939,6 @@ Func_3d119:
     ld [$cd6a],a
     call GBPalWhiteOut
     call CleanLCD_OAM
-    call LoadHudTilePatterns
     call LoadScreenTilesFromBuffer1
     call GoPAL_SET_CF1C
     call GBPalNormal
@@ -60072,7 +60026,7 @@ DoBattleTransitionAndInitBatVar:
 .asm_3ec4d
     call DelayFrame
     PREDEF Func_7096d
-    BANKSWITCH LoadHudAndHpBarAndStatusTilePatterns
+    call LoadHpBarAndStatusTilePatterns
     ld a,$1
     ld [H_AUTOBGTRANSFERENABLED],a ; $FF00+$ba
     ld a,$ff
@@ -60396,41 +60350,9 @@ MoveHitTestPlus:
     and a
     ret
 
-SECTION "LoadHudAndHpBarAndStatusTilePatterns",ROMX[$6e58],BANK[$f]
+; Free
 
-LoadHudAndHpBarAndStatusTilePatterns: ; 3ee58 (f:6e58)
-    call LoadHpBarAndStatusTilePatterns
-
-LoadHudTilePatterns: ; 3ee5b (f:6e5b)
-    ld a,[rLCDC] ; $FF00+$40
-    add a
-    jr c,.asm_3ee7c
-    ld hl,BattleHudTiles1 ; $6080
-    ld de,$96d0
-    ld bc,$18
-    ld a,BANK(BattleHudTiles1)
-    call FarCopyDataDouble
-    ld hl,BattleHudTiles2 ; $6098
-    ld de,$9730
-    ld bc,$30
-    ld a,BANK(BattleHudTiles2)
-    jp FarCopyDataDouble
-.asm_3ee7c
-    ld de,BattleHudTiles1 ; $6080
-    ld hl,$96d0
-    ld bc,(BANK(BattleHudTiles1) << 8) + $03
-    call CopyVideoDataDouble
-    ld de,BattleHudTiles2 ; $6098
-    ld hl,$9730
-    ld bc,(BANK(BattleHudTiles2) << 8) + $06
-    jp CopyVideoDataDouble
-
-PrintEmptyString: ; 3ee94 (f:6e94)
-    ld hl,TerminatorText_3ee9a ; $6e9a
-    jp PrintText
-
-TerminatorText_3ee9a: ; 3ee9a (f:6e9a)
-    db "@"
+SECTION "GenRandomInBattle",ROMX[$6e9b],BANK[$f]
 
 ; generates a random number unless in link battle
 ; stores random number in A
@@ -62633,7 +62555,7 @@ PrintEXPBar: ; Denim,ExpBar
     jr .loop
 .skip
     ld b,a
-    ld a,$c0
+    ld a,$70
     add c
 .loop2
     ld [hld],a
@@ -62642,7 +62564,7 @@ PrintEXPBar: ; Denim,ExpBar
     ld a,b
     and a
     jr nz,.loop
-    ld a,$c0
+    ld a,$70
     jr .loop2
 
 CalcEXPBarPixelLength:
@@ -63128,6 +63050,12 @@ PlayCurrentMoveAnimation_WithException_Common:
     pop hl
     pop de
     ret
+
+PrintEmptyString:
+    ld hl,.text
+    jp PrintText
+.text
+    db "@"
 
 SECTION "bank10",ROMX,BANK[$10]
 
@@ -66397,7 +66325,7 @@ Func_427a7: ; 427a7 (10:67a7)
     jp PrintNumber
 
 OTString67E5: ; 427e5 (10:67e5)
-    db "──",$74,$F2,$4E
+    db "──","№",$F2,$4E
     db $4E
     db "OT/",$4E
     db $73,"№",$F2,"@"
@@ -82348,7 +82276,7 @@ HandleEvolutionDuringBattle:
     pop af
     ld [$cfd9],a
     call LoadFontTilePatterns
-    BANKSWITCH LoadHudAndHpBarAndStatusTilePatterns
+    call LoadHpBarAndStatusTilePatterns
     ld hl,.EmptyText
     call PrintText
     FuncCoord 01,05
@@ -85838,8 +85766,8 @@ AnimateEXPBarAgain:
     ld [wEXPBarPixelLength],a
     FuncCoord 17,11
     ld hl,Coord
-    ld a,$c0
-    ld c,$08
+    ld a,$70
+    ld c,8
 .loop
     ld [hld],a
     dec c
@@ -85856,12 +85784,12 @@ AnimateEXPBar:
     sub b
     jr z,.done
     ld b,a
-    ld c,$08
+    ld c,8
     FuncCoord 17,11
     ld hl,Coord
 .loop1
     ld a,[hl]
-    cp $c8
+    cp $78
     jr nz,.loop2
     dec hl
     dec c
@@ -85875,7 +85803,7 @@ AnimateEXPBar:
     jr z,.done
     jr .loop1
 .done
-    ld bc,$08
+    ld bc,8
     FuncCoord 10,11
     ld hl,Coord
     ld de,$c5ee
@@ -110083,20 +110011,31 @@ CinnabarGymScriptPointers:
 ; hl = destination address
 ; bc = battle status 1 address (if 0 Not Battle HUD)
 PrintStatusAilment:
+    ld a,[wTempCountStatusCond]
+    push af
+    xor a
+    ld [wTempCountStatusCond],a
+    call .Main
+    pop af
+    ld [wTempCountStatusCond],a
+    ret
+
+.Main
     ld a,[de]
     bit FRZ_Bit,a
     call nz,.Frz
     jr nz,.FrzThenSkipSlpBrn
-    and %00000111 ; slp
+    and SLP
     call nz,.Slp
     ld a,[de]
-    bit 4,a
+    bit BRN_Bit,a
     call nz,.Brn
 .FrzThenSkipSlpBrn
-    bit 3,a
+    ld a,[de]
+    bit PSN_Bit,a
     call nz,.Psn
     ld a,[de]
-    bit 6,a
+    bit PAR_Bit,a
     call nz,.Par
     call .CheckBattleHud
     ret z  ; End If Not Battle Hud
@@ -110108,10 +110047,10 @@ PrintStatusAilment:
     bit SEEDED,a
     call nz,.Seeded
     ret
+
 .Slp
     ld [hl],$CA
-    inc hl ; jr .NextVideoSlot
-    ret
+    jr .NextVideoSlot
 .Psn
     call .CheckBattleHud
     jr z,.NormalPoison
@@ -110124,32 +110063,47 @@ PrintStatusAilment:
     jr nz,.BadlyPoisoned
 .NormalPoison
     ld [hl],$CB
-    inc hl ; jr .NextVideoSlot
-    ret
+    jr .NextVideoSlot
 .Brn
     ld [hl],$CC
-    inc hl ; jr .NextVideoSlot
-    ret
+    jr .NextVideoSlot
 .Frz
     ld [hl],$CD
-    inc hl ; jr .NextVideoSlot
-    ret
+    jr .NextVideoSlot
 .Par
     ld [hl],$CE
-    inc hl ; jr .NextVideoSlot
-    ret
+    jr .NextVideoSlot
 .Confused
     ld [hl],$DE
-    inc hl ; jr .NextVideoSlot
-    ret
+    jr .NextVideoSlot
 .Seeded
     ld [hl],$DC
-    inc hl ; jr .NextVideoSlot
-    ret
+    jr .NextVideoSlot
 .BadlyPoisoned
     ld [hl],$DD
-    inc hl ; jr .NextVideoSlot
+    ; ft
+
+.NextVideoSlot
+    push hl
+    ld hl,wTempCountStatusCond
+    inc [hl]
+    ld a,5
+    cp [hl]
+    pop hl
+    jr z,.PreviousRow
+    jr c,.Reverse
+    inc hl
     ret
+.PreviousRow
+    push bc
+    ld bc,-20
+    add hl,bc
+    pop bc
+    ret
+.Reverse
+    dec hl
+    ret
+
 .CheckBattleHud
     push bc
     push af
@@ -110159,15 +110113,6 @@ PrintStatusAilment:
     ld a,b
     pop bc
     ret
-;.NextVideoSlot
-;    call .CheckBattleHud
-;    inc hl
-;    ret z
-;    ;push bc
-;    ;ld bc,-02
-;    ;add hl,bc
-;    ;pop bc
-;    ret
 
 BrunoText1:
     db $08 ; asm
@@ -124899,7 +124844,7 @@ _VictoryRoad2BattleText1:
     text_done
 
 _VictoryRoad2EndBattleText1:
-    text_init , "Aiyah!"
+    text_init , "Yah!"
     text_wait
 
 _VictoryRoad2AfterBattleText1:
@@ -124930,8 +124875,8 @@ _VictoryRoad2BattleText3:
     text_done
 
 _VictoryRoad2EndBattleText3:
-    text_init , "I got"
-    text_line , "whipped!"
+    text_init , "I"
+    text_line , "got whipped!"
     text_wait
 
 _VictoryRoad2AfterBattleText3:
@@ -142563,12 +142508,17 @@ WaitButtonPressed_:
     jr z,WaitButtonPressed_
     ret
 
+; ─────────────────
 ; copies HP bar and status display tile patterns into VRAM
+; ─────────────────
+
 LoadHpBarAndStatusTilePatterns_:
     ld de,HpBarAndStatusGraphics
+    ld bc,(BANK(HpBarAndStatusGraphics) << 8 | 30)
     ld hl,$9620
-    ld bc,(BANK(HpBarAndStatusGraphics) << 8 | $1e)
     jp GoodCopyVideoData
+
+; ─────────────────
 
 ; INPUT
 ; d = High Bit Return Pointer
@@ -143409,18 +143359,18 @@ CalcStatNoStatExp:
 DrawLineBox2:
     ld de,$0014 ; New line
 .PrintVerticalLine
-    ld [hl],$78 ; │
+    ld [hl],$6D ; │
     add hl,de
     dec b
     jr nz,.PrintVerticalLine ; 0x12ace $fa
-    ld [hl],$77 ; ┘
+    ld [hl],$6F ; ┘
     dec hl
 .PrintHorizLine
-    ld [hl],$76 ; ─
+    ld [hl],$70 ; ─
     dec hl
     dec c
     jr nz,.PrintHorizLine ; 0x12ad7 $fa
-    ld [hl],$6f ; ← (halfarrow ending)
+    ld [hl],$70 ; ← (halfarrow ending)
     ret
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -145055,8 +145005,8 @@ PrintEXPBar_StatusScreen:
     ld a,[H_QUOTIENT + 3] ; pixel length
     ld [wEXPBarPixelLength],a
     ld b,a
-    ld c,$08
-    ld d,$08
+    ld c,8
+    ld d,8
     FuncCoord 17,5
     ld hl,Coord
 .loop
@@ -145067,7 +145017,7 @@ PrintEXPBar_StatusScreen:
     jr .loop
 .skip
     ld b,a
-    ld a,$c0
+    ld a,$70
     add c
 .loop2
     ld [hld],a
@@ -145076,7 +145026,7 @@ PrintEXPBar_StatusScreen:
     ld a,b
     and a
     jr nz,.loop
-    ld a,$c0
+    ld a,$70
     jr .loop2
 
 CalcEXPBarPixelLength_StatusScreen:
@@ -145096,21 +145046,6 @@ FontGraphicsGrayWall2bpp:
     INCBIN "gfx/denim/font.2bpp"
 Wall2bpp:
     INCBIN "gfx/denim/wall.2bpp"
-
-LoadStatusScreenGenericTile:
-    call LoadHpBarAndStatusTilePatterns
-    ld de,BattleHudTiles1  ; $6080 ; source
-    ld hl,$96d0 ; dest
-    ld bc,(BANK(BattleHudTiles1) << 8) + $03 ; bank bytes/8
-    call CopyVideoDataDouble ; ·│ :L and halfarrow line end
-    ld de,BattleHudTiles2 ; $6098
-    ld hl,$9780
-    ld bc,(BANK(BattleHudTiles2) << 8) + $01
-    call CopyVideoDataDouble ; │
-    ld de,BattleHudTiles3 ; $60b0
-    ld hl,$9760
-    ld bc,(BANK(BattleHudTiles3) << 8) + $02
-    jp CopyVideoDataDouble ; ─┘
 
 LoadFontTilePatternsWithWall:
     ld de,FontGraphicsGrayWall2bpp
@@ -145863,7 +145798,7 @@ StatusScreen:
     push af
     xor a
     ld [$ff00+$d7],a
-    call LoadStatusScreenGenericTile ; Load Generic Tile
+    call LoadHpBarAndStatusTilePatterns ; Load Generic Tile
     ld a,[wRunningOnSGB]
     and a
     call nz,LoadFontTilePatternsWithWall ; Load Custom Tile
@@ -146597,18 +146532,18 @@ Unknown_12a9d:
 DrawLineBox:
     ld de,$0014 ; New line
 .PrintVerticalLine
-    ld [hl],$78 ; │
+    ld [hl],$6D ; │
     add hl,de
     dec b
     jr nz,.PrintVerticalLine ; 0x12ace $fa
-    ld [hl],$77 ; ┘
+    ld [hl],$6F ; ┘
     dec hl
 .PrintHorizLine
-    ld [hl],$76 ; ─
+    ld [hl],$70 ; ─
     dec hl
     dec c
     jr nz,.PrintHorizLine ; 0x12ad7 $fa
-    ld [hl],$6f ; ← (halfarrow ending)
+    ld [hl],$70 ; ← (halfarrow ending)
     ret
 
 unk_12a7e: ; I don't know what this does,iterates over pointers?
@@ -146703,7 +146638,7 @@ ItemInBattleFinalCheck:
     call GetMonHeader
     PREDEF LoadMonBackSprite
     call LoadFontTilePatterns
-    BANKSWITCH LoadHudAndHpBarAndStatusTilePatterns
+    call LoadHpBarAndStatusTilePatterns
     call LoadScreenTilesFromBuffer1DisableBGTransfer
     call RemovePlayerBattleStatsFrameDisableBGTransfer
     ld hl,.EmptyText
@@ -148720,7 +148655,7 @@ _LoadBattlePokedex:
     call .LoadMonFrontSprite
     call CleanLCD_OAM
     call GBPalWhiteOut
-    BANKSWITCH LoadHudAndHpBarAndStatusTilePatterns
+    call LoadHpBarAndStatusTilePatterns
     call LoadScreenTilesFromBuffer1
     call GoPAL_SET_CF1C
     call GBPalNormal
