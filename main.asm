@@ -367,24 +367,6 @@ IndexToPokedexAndRestoreD11E:
     pop de
     ret
 
-GoodCopyVideoDataDouble:
-    ld a,[rLCDC]
-    bit 7,a ; is the LCD enabled?
-    jp nz,CopyVideoDataDouble ; if LCD is on,transfer during V-blank
-    ld a,b
-    push hl
-    push de
-    ld h,0
-    ld l,c
-    add hl,hl
-    add hl,hl
-    add hl,hl
-    ld b,h
-    ld c,l
-    pop hl
-    pop de
-    jp FarCopyDataDouble ; if LCD is off,transfer all at once
-
 PlayCryAndDecreaseSkillEnergy:
     call CheckAndDecreaseSkillEnergy
     ld a,[wSkillMonID]
@@ -4081,8 +4063,6 @@ PlaceNextChar:
     jp z,Char5D
     cp $55
     jp z,Char55
-    cp $56
-    jp z,Char56
     cp $57
     jp z,Char57
     cp $58
@@ -4148,11 +4128,6 @@ Char54: ; POKé
     ld de,Char54Text
     jr FinishDTE
 
-Char56: ; ……
-    push de
-    ld de,Char56Text
-    jr FinishDTE
-
 Char4A: ; PKMN
     push de
     ld de,Char4AText
@@ -4208,8 +4183,6 @@ Char5EText:
     db "ROCKET@"
 Char54Text:
     db "POKé@"
-Char56Text:
-    db "……@"
 Char5AText:
     db "Enemy @"
 Char4AText:
@@ -15639,10 +15612,10 @@ Func_676f: ; 676f (1:676f)
     jp Delay3
 
 LowerCaseAlphabet: ; 679e (1:679e)
-    db "abcdefghijklmnopqrstuvwxyz ×():;[]",$e1,$e2,"-?!♂♀/",$f2,",¥UPPER CASE@"
+    db "abcdefghijklmnopqrstuvwxyz ×():;[]",$e1,$e2,"-?!♂♀/.,¥UPPER CASE@"
 
 UpperCaseAlphabet: ; 67d6 (1:67d6)
-    db "ABCDEFGHIJKLMNOPQRSTUVWXYZ ×():;[]",$e1,$e2,"-?!♂♀/",$f2,",¥lower case@"
+    db "ABCDEFGHIJKLMNOPQRSTUVWXYZ ×():;[]",$e1,$e2,"-?!♂♀/.,¥lower case@"
 
 Func_680e: ; 680e (1:680e)
     call Func_68eb
@@ -15666,7 +15639,7 @@ Func_680e: ; 680e (1:680e)
 .asm_6835
     ld b,$a
 .asm_6837
-    ld a,$76
+    ld a,"-"
 .asm_6839
     ld [hli],a
     dec b
@@ -15697,7 +15670,7 @@ Func_680e: ; 680e (1:680e)
     FuncCoord 10,3 ; $c3e6
     ld hl,Coord
     add hl,bc
-    ld [hl],$77
+    ld [hl],$D4 ; Upper Arrow
     ret
 
 Func_6871: ; 6871 (1:6871)
@@ -63660,7 +63633,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     ld hl,Coord
     ld a,"№"
     ld [hli],a
-    ld a,$f2
+    ld a,"."
     ld [hli],a
     ld de,$d11e
     ld bc,$8103
@@ -63719,7 +63692,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     inc hl
     ld a,[hli]
     ld [hld],a ; make space for the decimal point by moving the last digit forward one tile
-    ld [hl],$f2 ; decimal point tile
+    ld [hl],"." ; decimal point tile
     pop af
     ld [$ff8c],a ; restore original value of [$ff8c]
     pop af
@@ -66270,34 +66243,34 @@ FightIntroFrontMon: ; 42099 (10:6099)
     INCBIN "gfx/red/introfight.2bpp"
 
 ; XXX what do these do
-Func_42769: ; 42769 (10:6769)
-    FuncCoord 5,0
+Func_42769:
+    FuncCoord 05,00
     ld hl,Coord
     ld de,OTString67E5
     call PlaceString
     ld a,[$CD3D]
     ld [$D11E],a
     PREDEF IndexToPokedex
-    FuncCoord 9,0 ; $c3a9
+    FuncCoord 09,00
     ld hl,Coord
     ld de,$D11E
     ld bc,$8103
     call PrintNumber
-    FuncCoord 5,2
+    FuncCoord 05,02
     ld hl,Coord
     ld de,$CF4B
     call PlaceString
-    FuncCoord 8,4
+    FuncCoord 06,05
     ld hl,Coord
     ld de,$CD41
     call PlaceString
-    FuncCoord 8,6 ; $c420
+    FuncCoord 09,04
     ld hl,Coord
     ld de,$CD4C
     ld bc,$8205
     jp PrintNumber
 
-Func_427a7: ; 427a7 (10:67a7)
+Func_427a7:
     FuncCoord 5,10
     ld hl,Coord
     ld de,OTString67E5
@@ -66305,30 +66278,29 @@ Func_427a7: ; 427a7 (10:67a7)
     ld a,[$CD3E]
     ld [$D11E],a
     PREDEF IndexToPokedex
-    FuncCoord 9,10 ; $c471
+    FuncCoord 09,10
     ld hl,Coord
     ld de,$D11E
     ld bc,$8103
     call PrintNumber
-    FuncCoord 5,12
+    FuncCoord 05,12
     ld hl,Coord
     ld de,$CD6D
     call PlaceString
-    FuncCoord 8,14
+    FuncCoord 06,15
     ld hl,Coord
     ld de,$CD4E
     call PlaceString
-    FuncCoord 8,16 ; $c4e8
+    FuncCoord 09,14
     ld hl,Coord
     ld de,$CD59
     ld bc,$8205
     jp PrintNumber
 
-OTString67E5: ; 427e5 (10:67e5)
-    db "──","№",$F2,$4E
+OTString67E5:
+    db "──№.",$4E
     db $4E
-    db "OT/",$4E
-    db $73,"№",$F2,"@"
+    db "OT",$D3,$4E,"@"
 
 CheckShinyDuringTradeInSend: ; ~DONE:Shiny
     push af
@@ -110044,8 +110016,38 @@ PrintStatusAilment:
     call nz,.Confused
     inc bc
     ld a,[bc]
+    dec bc
     bit SEEDED,a
     call nz,.Seeded
+    ld a,[bc]
+    and (1<<STORING_ENERGY)|(1<<THRASHING_ABOUT)|(1<<FLINCHED)|(1<<CHARGING_UP)|(1<<INVULNERABLE)
+    call nz,.Waiting
+    jr nz,.SkipOtherWaiting
+    inc bc
+    ld a,[bc]
+    dec bc
+    and (1<<NEEDS_TO_RECHARGE)|(1<<USING_RAGE)
+    call nz,.Waiting
+.SkipOtherWaiting
+    ld a,[bc]
+    bit INVULNERABLE,a
+    call nz,.Shield
+    jr nz,.SkipOtherShield
+    inc bc
+    ld a,[bc]
+    dec bc
+    and (1<<PROTECTED_BY_MIST)|(1<<HAS_SUBSTITUTE_UP)
+    call nz,.Shield
+    jr nz,.SkipOtherShield
+    inc bc
+    inc bc
+    ld a,[bc]
+    dec bc
+    dec bc
+    and (1<<HAS_LIGHT_SCREEN_UP)|(1<<HAS_REFLECT_UP)
+    call nz,.Shield
+.SkipOtherShield
+    
     ret
 
 .Slp
@@ -110079,11 +110081,18 @@ PrintStatusAilment:
 .Seeded
     ld [hl],$DC
     jr .NextVideoSlot
+.Waiting
+    ld [hl],$EB
+    jr .NextVideoSlot
+.Shield
+    ld [hl],$CF
+    jr .NextVideoSlot
 .BadlyPoisoned
     ld [hl],$DD
     ; ft
 
 .NextVideoSlot
+    push af
     push hl
     ld hl,wTempCountStatusCond
     inc [hl]
@@ -110093,16 +110102,18 @@ PrintStatusAilment:
     jr z,.PreviousRow
     jr c,.Reverse
     inc hl
+.End
+    pop af
     ret
 .PreviousRow
     push bc
     ld bc,-20
     add hl,bc
     pop bc
-    ret
+    jr .End
 .Reverse
     dec hl
-    ret
+    jr .End
 
 .CheckBattleHud
     push bc
