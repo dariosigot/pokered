@@ -2147,7 +2147,7 @@ AIAbortMonSendOut:
     call nz,.dec5    ;-5 score if badly poisoned
 
     ld a,[W_PLAYERBATTSTATUS1]
-    bit 5,a    ;check a for trapping move bit
+    bit USING_TRAPPING_MOVE,a    ;check a for trapping move bit
     ld a,[hl]
     call nz,.dec5    ;-5 score if stuck in a trapping move
 

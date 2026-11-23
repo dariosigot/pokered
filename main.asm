@@ -1896,8 +1896,6 @@ SetTempInfoForShinyAndGender:
     pop hl
     ret
 
-; Free
-
 SECTION "LoadCurrentMapView",ROM0[$0ca2]
 
 ; this builds a tile map from the tile block map based on the current X/Y coordinates of the player's character
@@ -4699,7 +4697,25 @@ TextCommandJumpTable:
     dw TextCommand0C
     dw TextCommand0D
 
-; Free
+DrawHudAndPrintText:
+    push hl
+    PREDEF_A DrawHUDsAndHPBars
+    ; ft
+
+DHAPTCommon:
+    call Predef
+    pop hl
+    jp PrintText
+
+DrawPlayerHUDAndPrintText:
+    push hl
+    PREDEF_A DrawPlayerHUDAndHPBar
+    jr DHAPTCommon
+
+DrawEnemyHUDAndPrintText:
+    push hl
+    PREDEF_A DrawEnemyHUDAndHPBar
+    jr DHAPTCommon
 
 SECTION "ClearBgMap",ROM0[$1cf0]
 
@@ -7023,7 +7039,7 @@ DisplayRepelWoreOffText:
 
 DisplayStartMenu:
     ld a,BANK(StartMenu_Pokedex)
-    call RoutineForRealGB ; ROM bank 4 
+    call RoutineForRealGB ; ROM bank 4
     ld hl,$cd38 ; DisableDebugWtW_Hack
     res 0,[hl]  ; ...
     ld a,[$d700] ; walking/biking/surfing
@@ -23296,15 +23312,11 @@ IsSurfingAllowed:
 ItemUseCardKey:
     jp ItemUseNotTime
 
-DrawHudAndPrintTextPokeFlute:
+PrintTextPokeFlute:
     ld a,[W_ISINBATTLE]
     and a
-    jr z,.End
-    push hl
-    PREDEF DrawHUDsAndHPBars
-    pop hl
-.End
-    jp PrintText
+    jp z,PrintText
+    jp DrawHudAndPrintText
 
 AddPokemonToParty_HandleEnemyExclusive:
     ld a,[$cc49]
@@ -24992,7 +25004,7 @@ ItemUsePokeflute: ; e140 (3:6140)
     and a ; were any pokemon asleep before playing the flute?
     ret z
     ld hl,.FluteWokeUpText
-    jp DrawHudAndPrintTextPokeFlute
+    jp PrintTextPokeFlute
 
 .FluteWokeUpText
     TX_FAR _FluteWokeUpText
@@ -31016,7 +31028,7 @@ HazeEffect_:
     BANKSWITCH ApplyBadgeStatBoostsFull
     BANKSWITCH PlayCurrentMoveAnimation
     ld hl,.StatusChangesEliminatedText
-    jp DrawHudAndPrintTextBank4
+    jp DrawHudAndPrintText
 
 .CureVolatileStatuses
     res 7,[hl] ; confused
@@ -31052,12 +31064,6 @@ HazeEffect_:
 .StatusChangesEliminatedText
     TX_FAR _StatusChangesEliminatedText
     db "@"
-
-DrawHudAndPrintTextBank4:
-    push hl
-    PREDEF DrawHUDsAndHPBars
-    pop hl
-    jp PrintText
 
 ; Free
 
@@ -42803,7 +42809,7 @@ GetMonPotentialMoveList:
     ld a,[W_MONHEADER]
     cp MEW
     ret z
-    
+
     ; Get Moves
     PREDEF GetMoves
 
@@ -43143,7 +43149,7 @@ ChoiceRelearnMove:
     jr nz,.MenuLoop
     bit 1,a ; was the B button pressed?
     ret nz
-    bit 0,a ; was the A button pressed? 
+    bit 0,a ; was the A button pressed?
     jr nz,.APressed
     bit 6,a ; was up button pressed?
     jr nz,.UpPressed
@@ -43229,7 +43235,7 @@ ChoiceRelearnMove:
 .MenuContinue
     ld [hl]," "
     ld [wListScrollOffset],a
-    call Delay3 ; Disappear Left/Right Arrow 
+    call Delay3 ; Disappear Left/Right Arrow
     ld a,[wCurrentMenuItem]
     ld b,a
     call .GetMaxCurrentScreenMenuLenght
@@ -47254,13 +47260,13 @@ FocusEnergyEffect_: ; 27f86 (9:7f86)
     jr z,.done
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
 .done
-    bit 2,[hl]
-    set 2,[hl]
+    bit GETTING_PUMPED,[hl]
+    set GETTING_PUMPED,[hl]
+    set USING_X_ACCURACY,[hl]
     ld hl,.FocusEnergyAlreadyInUseText
-    jr nz,.Print
+    jp nz,PrintText
     ld hl,.GettingPumpedText
-.Print
-    jp PrintText
+    jp DrawHudAndPrintText
 .GettingPumpedText
     db WAIT_HALF_SECOND
     TX_FAR _GettingPumpedText
@@ -47434,7 +47440,7 @@ LeechSeedEffect_:
     set 7,[hl] ; SEEDED
     BANKSWITCH PlayCurrentMoveAnimation2
     ld hl,.WasSeededText ; $7ef2
-    jp .DrawHudAndPrintText
+    jp DrawHudAndPrintText
 .moveMissed
     call .PlayCurrentMoveAnimation
     BANKSWITCH_JUMP PrintMoveFailureText
@@ -47449,11 +47455,6 @@ LeechSeedEffect_:
     jp PrintText
 .PlayCurrentMoveAnimation
     BANKSWITCH_JUMP PlayCurrentMoveAnimation
-.DrawHudAndPrintText
-    push hl
-    PREDEF DrawHUDsAndHPBars
-    pop hl
-    jp PrintText
 .WasSeededText
     TX_FAR _WasSeededText
     db "@"
@@ -49936,7 +49937,7 @@ TrainerAI:
     ld a,[W_PLAYERBATTSTATUS1]
     bit USING_TRAPPING_MOVE,a ; caught in player's trapping move (e.g. wrap)
     jr z,.notbeingtrapped
-    call CheckandResetSwitchBit    
+    call CheckandResetSwitchBit
     jp nz,AISwitchIfEnoughMons ; switch if switch bit is set and stuck in the player's trapping move
 .notbeingtrapped
 ;    ...otherwise
@@ -50090,17 +50091,24 @@ BugfixEvolutionStoneInBattle:
     ret
 
 ;joenote - if player using trapping move, then end their move
-CheckTrappingMoveAndLoadEnemyMonNumber:
+SwitchEnemyCheckTrapping:
+    ld hl,W_ENEMYBATTSTATUS1
+    bit USING_TRAPPING_MOVE,[hl]
+    jr z,.skip
+    ld hl,wFlagForceSwapTrapFreeBit7
+    set 7,[hl]
+.skip
     ld hl,W_PLAYERBATTSTATUS1
     bit USING_TRAPPING_MOVE,[hl]
-    res USING_TRAPPING_MOVE,[hl]
-    jr z,.end
+;    res USING_TRAPPING_MOVE,[hl]
+    ret z
+    ;~DONE:Trap
+    ld hl,wFlagForceSwapTrapFreeBit7
+    set 7,[hl]
     xor a
     ld [$d06a],a ; wPlayerNumAttacksLeft
     ld a,$FF
     ld [wPlayerSelectedMove],a
-.end
-    ld a,[W_ENEMYMONNUMBER]
     ret
 
 ItemUseEvoStone_:
@@ -50177,12 +50185,6 @@ AICureStatus:
     BANKSWITCH DrawEnemyHUDAndHPBar
     pop af
     ret
-
-DrawHudAndPrintTextBankE:
-    push hl
-    PREDEF DrawHUDsAndHPBars
-    pop hl
-    jp PrintText
 
 AIUseLemonade:
 ; enemy trainer heals his monster with a lemonade
@@ -50357,11 +50359,12 @@ AISwitchIfEnoughMons: ; 3a72a (e:672a)
     and a
     ret
 
-SwitchEnemyMon: ; 3a74b (e:674b)
+SwitchEnemyMon:
 
 ; prepare to withdraw the active monster: copy hp,number,and status to roster
 
-    call CheckTrappingMoveAndLoadEnemyMonNumber ; ld a,[W_ENEMYMONNUMBER]
+    call SwitchEnemyCheckTrapping
+    ld a,[W_ENEMYMONNUMBER]
     ld hl,W_ENEMYMON1HP
     ld bc,$2C
     call AddNTimes
@@ -50371,7 +50374,7 @@ SwitchEnemyMon: ; 3a74b (e:674b)
     ld bc,4
     call CopyData
 
-    ld hl,AIBattleWithdrawText
+    ld hl,.AIBattleWithdrawText
     call PrintText
 
     ld a,1
@@ -50386,11 +50389,11 @@ SwitchEnemyMon: ; 3a74b (e:674b)
     scf
     ret
 
-AIBattleWithdrawText: ; 3a781 (e:6781)
+.AIBattleWithdrawText
     TX_FAR _AIBattleWithdrawText
     db "@"
 
-AIUseFullHeal: ; 3a786 (e:6786)
+AIUseFullHeal:
     call Func_3a69b
     call AICureStatus
     ld a,FULL_HEAL
@@ -50403,23 +50406,21 @@ AIUseXAccuracy:
     ld a,X_ACCURACY
     jp AIPrintItemUse
 
-SECTION "AIUseGuardSpec",ROMX[$67b5],BANK[$e]
-
-AIUseGuardSpec: ; 3a7b5 (e:67b5)
+AIUseGuardSpec:
     call Func_3a69b
     ld hl,$D068
     set 1,[hl]
     ld a,GUARD_SPEC_
     jp AIPrintItemUse
 
-AIUseDireHit: ; 0x3a7c2 unused
+AIUseDireHit:
     call Func_3a69b
     ld hl,$D068
     set 2,[hl]
     ld a,DIRE_HIT
     jp AIPrintItemUse
 
-AICheckIfHPBelowFraction: ; 3a7cf (e:67cf)
+AICheckIfHPBelowFraction:
     push hl
     push bc
     push de
@@ -52752,7 +52753,7 @@ HealEffect_:
     jr z,.printRestText
     ld hl,FellAsleepBecameHealthyText ; if mon had an status
 .printRestText
-    call DrawHudAndPrintTextBankE
+    call DrawHudAndPrintText
     pop af
     pop de
     pop hl
@@ -52824,7 +52825,7 @@ HealEffect_:
     ld [wListMenuID],a ; $cf94
     PREDEF UpdateHPBar ; UpdateHPBar
     ld hl,RegainedHealthText ; $7aac
-    jp DrawHudAndPrintTextBankE
+    jp DrawHudAndPrintText
 
 TransformEffect_:
     call .HideSubstitute
@@ -52986,7 +52987,7 @@ TransformEffect_:
     call Delay3
     call .RestoreSubstitute
     ld hl,UnnamedText_3bb92 ; $7b92
-    jp DrawHudAndPrintTextBankE
+    jp DrawHudAndPrintText
 .attackMissed
     ld a,1
     ld [W_MOVEMISSED],a
@@ -53851,7 +53852,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
     and %00100001 ; bide OR using multi-turn move (e.g. wrap) ; check player is using Bide or using a multi-turn attack like wrap
     jr nz,.selectEnemyMove
     ld a,[W_ENEMYBATTSTATUS1]
-    bit 5,a ; using multi-turn move (e.g. wrap)
+    bit USING_TRAPPING_MOVE,a ; using multi-turn move (e.g. wrap)
     jr z,.selectPlayerMove
     ld a,$ff
     ld [wPlayerSelectedMove],a
@@ -54009,7 +54010,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
 
 .end
     call DrawHUDsAndHPBars
-    call CheckNumAttacksLeft
+;    call CheckNumAttacksLeft
     jp MainInBattleLoop
 
 .HandleEnemyMonFainted
@@ -54184,19 +54185,19 @@ UpdateCurMonHPBar:
     pop bc
     ret
 
-CheckNumAttacksLeft:
-    ld a,[$d06a]
-    and a
-    jr nz,.asm_3c51a
-    ld hl,W_PLAYERBATTSTATUS1 ; $d062
-    res 5,[hl]
-.asm_3c51a
-    ld a,[$d06f]
-    and a
-    ret nz
-    ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    res 5,[hl]
-    ret
+;CheckNumAttacksLeft:
+;    ld a,[$d06a] ; PlayerNumAttacksLeft
+;    and a
+;    jr nz,.asm_3c51a
+;    ld hl,W_PLAYERBATTSTATUS1 ; $d062
+;    res USING_TRAPPING_MOVE,[hl]
+;.asm_3c51a
+;    ld a,[$d06f] ; EnemyNumAttacksLeft
+;    and a
+;    ret nz
+;    ld hl,W_ENEMYBATTSTATUS1 ; $d067
+;    res USING_TRAPPING_MOVE,[hl]
+;    ret
 
 HandlePlayerAliveAndApplyPoisonBurn:
 .AnyPokemonAliveCheck
@@ -54703,7 +54704,7 @@ RageEffect:
     ld hl,W_ENEMYBATTSTATUS2
     ld bc,$d06f ; EnemyNumAttacksLeft
 .player
-    set 6,[hl] ; mon is now in "rage" mode
+    set USING_RAGE,[hl] ; mon is now in "rage" mode
     call GenRandomInBattle
     and %00000001
     inc a
@@ -54735,7 +54736,7 @@ EffectsArray5:
 EffectsArray5B:
 ; damaging moves whose effect is executed prior to damage calculation
     db THRASH_PETAL_DANCE_EFFECT
-    db TRAPPING_EFFECT
+    ;db TRAPPING_EFFECT
     db SWITCH_AND_TELEPORT_EFFECT
     db $FF
 
@@ -54861,7 +54862,7 @@ Func_3c92a: ; 3c92a (f:492a)
     dec a
     ld [wAICount],a
     ld hl,W_PLAYERBATTSTATUS1
-    res 5,[hl]
+    res USING_TRAPPING_MOVE,[hl]
     FuncCoord 18,0 ; $c3b2
     ld hl,Coord
     ld a,8
@@ -54984,7 +54985,7 @@ Func_3c92a: ; 3c92a (f:492a)
     PREDEF AnimateSendingOutMon
     ld a,[W_ENEMYMONID]
     call PlayCry
-    call DrawEnemyHUDAndHPBar
+    call DrawHUDsAndHPBars
     call SaveScreenAndLoadBattlePokedex
     ld a,[$CC26]
     and a
@@ -55286,12 +55287,12 @@ Func_3cca4: ; 3cca4 (f:4ca4)
     ld [W_PLAYERDISABLEDMOVE],a ; $d06d
     ld [$ccee],a
     ld [$ccf7],a
-    call DrawPlayerHUDAndHPBar
+    ld hl,W_ENEMYBATTSTATUS1 ; $d067
+    res USING_TRAPPING_MOVE,[hl]
+    call DrawHUDsAndHPBars
     PREDEF LoadMonBackSprite
     ld b,$1
     call GoPAL_SET
-    ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    res 5,[hl]
     ld a,$1
     ld [H_WHOSETURN],a ; $FF00+$f3
     ld a,$c3
@@ -55780,7 +55781,7 @@ asm_3d05f:
     ld [$d152],a
     call UseItem
     ld hl,wBattlePokedexUsedBit5
-    bit 5,[hl] 
+    bit 5,[hl]
     res 5,[hl]
     jp nz,InitBattleMenu ; Don't consume turn
 
@@ -55796,13 +55797,14 @@ asm_3d05f:
     jr BattleItemRetry ; asm_3d00e
 .BattleItemOK
     ld a,[W_PLAYERBATTSTATUS1] ; $d062
-    bit 5,a
+    bit USING_TRAPPING_MOVE,a
     jr z,.FinalCheck
-    ld hl,$d06a
+    ld hl,$d06a ; PlayerNumAttacksLeft
     dec [hl]
-    jr nz,.FinalCheck
-    ld hl,W_PLAYERBATTSTATUS1 ; $d062
-    res 5,[hl]
+;    jr nz,.FinalCheck
+;    ld hl,W_PLAYERBATTSTATUS1 ; $d062
+;    res USING_TRAPPING_MOVE,[hl]
+    ;~DONE:Trap
 .FinalCheck
     xor a
     ld [wCurrentMenuItem],a ; $cc26
@@ -55918,7 +55920,8 @@ Func_3d119:
     ; ft
 
 SwitchPlayerMon: ; joedebug - this is where the player switches
-    call CheckTrappingMoveAndSetEnemyActedBitAndLoadHl ; ld hl,RetreatMon
+    call SwitchPlayerCheckTrapping
+    BANKSWITCH RetreatMon
     ld c,$32
     call DelayFrames
     call Func_3ccfa
@@ -56451,7 +56454,7 @@ SelectEnemyMove:
     and $21      ; using fly/dig or thrash/petal dance
     ret nz
     ld a,[W_PLAYERBATTSTATUS1]
-    bit 5,a    ; caught in player's multi-turn move (e.g. wrap)
+    bit USING_TRAPPING_MOVE,a    ; caught in player's multi-turn move (e.g. wrap)
     jr z,.notCaughtInWrap
 .unableToMove
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -56519,11 +56522,7 @@ HealEffect:
 TransformEffect:
     BANKSWITCH_JUMP TransformEffect_
 
-; Free
-
-SECTION "Func_3d605",ROMX[$5605],BANK[$F]
-
-Func_3d605: ; 3d605 (f:5605)
+Func_3d605:
     ld a,$ff
     ld [$cc3e],a
     ld a,[wPlayerMoveListIndex] ; $cc2e
@@ -56574,12 +56573,12 @@ Func_3d605: ; 3d605 (f:5605)
 ; ExecutePlayerMove
 ; ──────────────────────────────────────────
 
-ExecutePlayerMove: ; 3d65e (f:565e)
+ExecutePlayerMove:
     xor a
     ld [H_WHOSETURN],a ; set player's turn
     ld a,[wPlayerSelectedMove] ; $ccdc
     inc a
-    jp z,ExecutePlayerMoveDone ; for selected move = FF, skip most of player's turn
+    jp z,CheckPlayerTrappedAndDone ; for selected move = FF, skip most of player's turn
     xor a
     ld [W_MOVEMISSED],a ; $d05f
     ld [$cced],a ; MonIsDisobedient
@@ -56779,11 +56778,36 @@ ExecutePlayerMoveDone:
     ld b,1
     ret
 
+CheckPlayerTrappedAndDone:
+    ld hl,wFlagForceSwapTrapFreeBit7
+    bit 7,[hl]
+    res 7,[hl]
+    jr nz,.FreeMove
+    ld a,[W_ENEMYBATTSTATUS1]
+    bit USING_TRAPPING_MOVE,a
+    jr z,.done
+    ld a,[$d06f] ; EnemyNumAttacksLeft
+    and a
+    ld hl,CantMoveText
+    jr nz,.end
+    ld hl,W_ENEMYBATTSTATUS1
+    res USING_TRAPPING_MOVE,[hl]
+.FreeMove
+    ld hl,FreeMoveText
+.end
+    call DrawPlayerHUDAndPrintText
+.done
+    jr ExecutePlayerMoveDone
+
 ; ──────────────────────────────────────────
 
-SECTION "PrintGhostText",ROMX[$5811],BANK[$f]
+MultiHitText:
+    TX_FAR _MultiHitText
+    db "@"
 
-PrintGhostText: ; 3d811 (f:5811)
+; ──────────────────────────────────────────
+
+PrintGhostText:
 ; print the ghost battle messages
     call IsGhostBattle
     ret nz
@@ -56793,26 +56817,20 @@ PrintGhostText: ; 3d811 (f:5811)
     ld a,[W_PLAYERMONSTATUS] ; player’s turn
     and a,SLP | FRZ
     ret nz
-    ld hl,ScaredText
+    ld hl,.ScaredText
     call PrintText
     xor a
     ret
 .Ghost ; ghost’s turn
-    ld hl,GetOutText
+    ld hl,.GetOutText
     call PrintText
     xor a
     ret
-
-ScaredText: ; 3d830 (f:5830)
+.ScaredText
     TX_FAR _ScaredText
     db "@"
-
-GetOutText: ; 3d835 (f:5835)
+.GetOutText
     TX_FAR _GetOutText
-    db "@"
-
-MultiHitText:
-    TX_FAR _MultiHitText
     db "@"
 
 ; ──────────────────────────────────────────────────────────────────────
@@ -56853,21 +56871,18 @@ CheckPlayerStatusConditions:
 
 .WakeUp
     ld hl,WokeUpText
-    call .DrawHudAndPrintText ; call PrintText
+    call DrawPlayerHUDAndPrintText
     call IsGhostBattle
     jr z,.ExecutePlayerMoveDone
     ; ft
 
 .HeldInPlaceCheck
     ld a,[W_ENEMYBATTSTATUS1]
-    bit 5,a
+    bit USING_TRAPPING_MOVE,a
     jr z,.FlinchedCheck
-    ld hl,CantMoveText
-    call PrintText
-    ; ft
-
-.ExecutePlayerMoveDone
-    ld hl,ExecutePlayerMoveDone
+    ;ld hl,CantMoveText
+    ;call PrintText
+    ld hl,CheckPlayerTrappedAndDone
     jp .Func_3da37
 
 .FlinchedCheck
@@ -56877,7 +56892,11 @@ CheckPlayerStatusConditions:
     res 3,[hl]
     ld hl,FlinchedText
     call PrintText
-    jr .ExecutePlayerMoveDone
+    ; ft
+
+.ExecutePlayerMoveDone
+    ld hl,ExecutePlayerMoveDone
+    jp .Func_3da37
 
 .HyperBeamCheck
     ld hl,W_PLAYERBATTSTATUS2
@@ -56910,7 +56929,7 @@ CheckPlayerStatusConditions:
     ld hl,W_PLAYERBATTSTATUS1
     res 7,[hl]
     ld hl,ConfusedNoMoreText
-    call .DrawHudAndPrintText ; call PrintText
+    call DrawPlayerHUDAndPrintText
     jr .next3
 .next4
     ld hl,IsConfusedText
@@ -56983,7 +57002,7 @@ CheckPlayerStatusConditions:
 ;    ld a,[hl]
 ;    adc b
 ;    ld [hl],a
-    ld hl,$D06A
+    ld hl,$D06A ; PlayerNumAttacksLeft
     dec [hl]
     jp nz,.ExecutePlayerMoveDone
     ld hl,W_PLAYERBATTSTATUS1
@@ -57013,13 +57032,13 @@ CheckPlayerStatusConditions:
     ld hl,handleIfPlayerMoveMissed ; $5705
     jr .Func_3da37
 .next10
-    bit 1,[hl]
+    bit THRASHING_ABOUT,[hl]
     jr z,.next13 ; 59FF
-    ds 2 ; ld a,THRASH
-    ds 3 ; ld [W_PLAYERMOVENUM],a
+    ; ld a,THRASH
+    ; ld [W_PLAYERMOVENUM],a
     ld hl,ThrashingAboutText
     call PrintText
-    ld hl,$D06A
+    ld hl,$D06A ; PlayerNumAttacksLeft
     dec [hl]
     ld hl,PlayerCalcMoveDamage ; $56dc
     jr nz,.Func_3da37
@@ -57035,13 +57054,12 @@ CheckPlayerStatusConditions:
     pop hl
     jr .Func_3da37
 .next13
-    bit 5,[hl]
+    bit USING_TRAPPING_MOVE,[hl]
     jr z,.Func_3da1a
     ld hl,AttackContinuesText
     call PrintText
-    ld a,[$D06A]
-    dec a
-    ld [$D06A],a
+    ld hl,$D06A ; PlayerNumAttacksLeft
+    dec [hl]
     ld hl,getPlayerAnimationType ; $5714
     jr .Func_3da37
 
@@ -57067,12 +57085,6 @@ CheckPlayerStatusConditions:
     and a
     ret
 
-.DrawHudAndPrintText
-    push hl
-    call DrawPlayerHUDAndHPBar
-    pop hl
-    jp PrintText
-
 ; ──────────────────────────────────────────────────────────────────────
 
 EnemyMoveDidntMissAndPlayerBideAccum:
@@ -57087,12 +57099,6 @@ BideAccumCommon:
     ld a,1
     ld [$CCF4],a ; MoveDidntMiss
     ret
-
-DrawHudAndPrintText:
-    push hl
-    call DrawHUDsAndHPBars
-    pop hl
-    jp PrintText
 
 GetSideEffectType_Player:
     ld a,[W_PLAYERMOVETYPE]
@@ -57651,6 +57657,10 @@ SetCounterToMiss:
     set 7,[hl] ; setting this bit causes counter to miss
     ld hl,HurtItselfText ; $5a65
     ret
+
+FreeMoveText:
+    TX_FAR _FreeMoveText
+    db "@"
 
 SECTION "UnnamedText_3ddb6",ROMX[$5db6],BANK[$F]
 
@@ -58878,16 +58888,16 @@ TrappingEffect:
     ld hl,wUnusedC000
     set 3,[hl]
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
-    ld de,$d06a
+    ld de,$d06a ; PlayerNumAttacksLeft
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.done
     ld hl,wUnusedC000
     res 3,[hl]
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    ld de,$d06f
+    ld de,$d06f ; EnemyNumAttacksLeft
 .done
-    bit 5,[hl]
+    bit USING_TRAPPING_MOVE,[hl]
     ret nz
     push hl
     push bc
@@ -58902,7 +58912,7 @@ TrappingEffect:
     ;call ClearHyperBeam ; since this effect is called before testing whether the move will hit,
                          ; the target won't need to recharge even if the trapping move missed
                          ; joenote - will do this later under ApplyAttackToEnemy/Player functions
-    set 5,[hl]
+    set USING_TRAPPING_MOVE,[hl]
     call GenRandomInBattle
     and $3
     cp $2
@@ -58912,7 +58922,11 @@ TrappingEffect:
 .setTrappingCounter
     inc a
     ld [de],a
-    ret
+    ld hl,.TrappingEffectText
+    jp DrawHudAndPrintText
+.TrappingEffectText
+    TX_FAR _TrappingEffectText
+    db "@"
 
 LoadEnemyMonData_GetAlternateMonHeader:
     BANKSWITCH LoadEnemyMonData_GetAlternateMonHeader_
@@ -59221,7 +59235,7 @@ RandomizeDamage:
 ExecuteEnemyMove:
     ld a,[wEnemySelectedMove] ; $ccdd
     inc a
-    jp z,ExecuteEnemyMoveDone
+    jp z,CheckEnemyTrappedAndDone
     call PrintGhostText
     jp z,ExecuteEnemyMoveDone
     ld a,[W_ISLINKBATTLE] ; $d12b
@@ -59439,6 +59453,27 @@ HitXTimesText:
     TX_FAR _HitXTimesText
     db "@"
 
+CheckEnemyTrappedAndDone:
+    ld hl,wFlagForceSwapTrapFreeBit7
+    bit 7,[hl]
+    res 7,[hl]
+    jr nz,.FreeMove
+    ld a,[W_PLAYERBATTSTATUS1]
+    bit USING_TRAPPING_MOVE,a
+    jr z,.done
+    ld a,[$d06a] ; PlayerNumAttacksLeft
+    and a
+    ld hl,CantMoveText
+    jr nz,.end
+    ld hl,W_PLAYERBATTSTATUS1
+    res USING_TRAPPING_MOVE,[hl]
+.FreeMove
+    ld hl,FreeMoveText
+.end
+    call DrawEnemyHUDAndPrintText
+.done
+    jr ExecuteEnemyMoveDone
+
 ; ──────────────────────────────────────────
 
 QuarterSpeedDueToParalysisOrHalveAttackDueToBurn_Down:
@@ -59485,19 +59520,16 @@ CheckEnemyStatusConditions:
 
 .WakeUp
     ld hl,WokeUpText
-    call .DrawHudAndPrintText ; call PrintText
+    call DrawEnemyHUDAndPrintText
     ; ft
 
 .HeldInPlaceCheck
     ld a,[W_PLAYERBATTSTATUS1] ; $d062
-    bit 5,a
+    bit USING_TRAPPING_MOVE,a
     jp z,.FlinchedCheck
-    ld hl,CantMoveText ; $5a83
-    call PrintText
-    ; ft
-
-.ExecuteEnemyMoveDone
-    ld hl,ExecuteEnemyMoveDone
+    ;ld hl,CantMoveText ; $5a83
+    ;call PrintText
+    ld hl,CheckEnemyTrappedAndDone
     jp .Func_3eab8
 
 .FlinchedCheck
@@ -59507,7 +59539,11 @@ CheckEnemyStatusConditions:
     res 3,[hl]
     ld hl,FlinchedText ; $5a51
     call PrintText
-    jr .ExecuteEnemyMoveDone
+    ; ft
+
+.ExecuteEnemyMoveDone
+    ld hl,ExecuteEnemyMoveDone
+    jp .Func_3eab8
 
 .HyperBeamCheck
     ld hl,W_ENEMYBATTSTATUS2 ; $d068
@@ -59540,7 +59576,7 @@ CheckEnemyStatusConditions:
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     res 7,[hl]
     ld hl,ConfusedNoMoreText
-    call .DrawHudAndPrintText ; call PrintText
+    call DrawEnemyHUDAndPrintText
     jp .next3
 .next4
     ld hl,IsConfusedText ; $5a60
@@ -59613,7 +59649,7 @@ CheckEnemyStatusConditions:
 ;    ld a,[hl]
 ;    adc b
 ;    ld [hl],a
-    ld hl,$d06f
+    ld hl,$d06f ; EnemyNumAttacksLeft
     dec [hl]
     jp nz,.ExecuteEnemyMoveDone
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
@@ -59644,13 +59680,13 @@ CheckEnemyStatusConditions:
     ld hl,handleIfEnemyMoveMissed ; $6782
     jr .Func_3eab8
 .next10
-    bit 1,[hl]
+    bit THRASHING_ABOUT,[hl]
     jr z,.next13
-    ld a,$25
-    ld [W_ENEMYMOVENUM],a ; $cfcc
+    ; ld a,THRASH
+    ; ld [W_ENEMYMOVENUM],a
     ld hl,ThrashingAboutText ; $5a79
     call PrintText
-    ld hl,$d06f
+    ld hl,$d06f ; EnemyNumAttacksLeft
     dec [hl]
     ld hl,EnemyCalcMoveDamage ; $6750
     jr nz,.Func_3eab8
@@ -59666,11 +59702,11 @@ CheckEnemyStatusConditions:
     pop hl
     jr .Func_3eab8
 .next13
-    bit 5,[hl]
+    bit USING_TRAPPING_MOVE,[hl]
     jr z,.Func_3ea9b
     ld hl,AttackContinuesText ; $5a7e
     call PrintText
-    ld hl,$d06f
+    ld hl,$d06f ; EnemyNumAttacksLeft
     dec [hl]
     ld hl,GetEnemyAnimationType ; $6794
     jr .Func_3eab8
@@ -59696,12 +59732,6 @@ CheckEnemyStatusConditions:
     ld a,$1
     and a
     ret
-
-.DrawHudAndPrintText
-    push hl
-    call DrawEnemyHUDAndHPBar
-    pop hl
-    jp PrintText
 
 ; ──────────────────────────────────────────────────────────────────────
 
@@ -61560,13 +61590,13 @@ StatModifierRatios: ; 3f6cb (f:76cb)
 BideEffect: ; 3f6e5 (f:76e5)
     ld hl,W_PLAYERBATTSTATUS1
     ld de,W_NUMHITS
-    ld bc,$d06a
+    ld bc,$d06a ; PlayerNumAttacksLeft
     ld a,[H_WHOSETURN]
     and a
     jr z,.asm_3f6fc
     ld hl,W_ENEMYBATTSTATUS1
     ld de,$cd05
-    ld bc,$d06f
+    ld bc,$d06f ; EnemyNumAttacksLeft
 .asm_3f6fc
     set 0,[hl]
     xor a
@@ -61586,12 +61616,12 @@ BideEffect: ; 3f6e5 (f:76e5)
 
 ThrashPetalDanceEffect: ; 3f717 (f:7717)
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
-    ld de,$d06a
+    ld de,$d06a ; PlayerNumAttacksLeft
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.asm_3f728
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    ld de,$d06f
+    ld de,$d06f ; EnemyNumAttacksLeft
 .asm_3f728
     set 1,[hl]
     call GenRandomInBattle
@@ -61729,13 +61759,13 @@ SECTION "TwoToFiveAttacksEffect",ROMX[$7811],BANK[$f]
 
 TwoToFiveAttacksEffect: ; 3f811 (f:7811)
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
-    ld de,$d06a
+    ld de,$d06a ; PlayerNumAttacksLeft
     ld bc,W_NUMHITS ; $d074
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.asm_3f828
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
-    ld de,$d06f
+    ld de,$d06f ; EnemyNumAttacksLeft
     ld bc,$cd05
 .asm_3f828
     bit 2,[hl]
@@ -62710,18 +62740,23 @@ NoAttackAICall:
     ret
 
 ;joenote - if enemy using trapping move, then end their move
-CheckTrappingMoveAndSetEnemyActedBitAndLoadHl:
+SwitchPlayerCheckTrapping:
+    ld hl,W_PLAYERBATTSTATUS1
+    bit USING_TRAPPING_MOVE,[hl]
+    jr z,.skip
+    ld hl,wFlagForceSwapTrapFreeBit7
+    set 7,[hl]
+.skip
     ld hl,W_ENEMYBATTSTATUS1
     bit USING_TRAPPING_MOVE,[hl]
-    res USING_TRAPPING_MOVE,[hl]
-    jr z,.end
+;    res USING_TRAPPING_MOVE,[hl]
+    ret z
+    ;~DONE:Trap
     xor a
     ld [$d06f],a ; wEnemyNumAttacksLeft
     ld a,$FF
     ld [wEnemySelectedMove],a
-    call SetEnemyActedBit
-.end
-    BANKSWITCH_JUMP RetreatMon
+    ret
 
 SetExplodeFlag:
     BANKSWITCH SetExplodeFlag_
@@ -63466,7 +63501,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     push af
     xor a
     ld [$ffd7],a
-    ; reset mon picture "just load" flag 
+    ; reset mon picture "just load" flag
     ld hl,wPokedexScreenJustLoadBit6
     res 6,[hl]
 
@@ -63514,7 +63549,7 @@ ShowPokedexDataInternal: ; 402e2 (10:42e2)
     bit 5,[hl]
     call z,LoadTextBoxTilePatterns
     call GBPalNormal
-    ; reset mon picture "just load" flag 
+    ; reset mon picture "just load" flag
     ld hl,wPokedexScreenJustLoadBit6
     res 6,[hl]
     ; water/flower tile animation
@@ -72301,7 +72336,7 @@ ErikAndSaraEmotionBubbleCommon:
     ld [$CD50],a ; WhichEmotionBubble (3 = LOVE_BUBBLE)
     PREDEF EmotionBubble ; display emotion over head
     ld c,20
-    jp DelayFrames    
+    jp DelayFrames
 
 SafariZoneRestHouse1Script:
     ld hl,$d126
@@ -102561,7 +102596,7 @@ ENDM
 
     TRADE_MONS MAROWAK,RHYHORN,41,TRADE_DIALOGSET_CASUAL,.RhyhornM,.RhyhornF ; Lab2Text2
     TRADE_MONS LAPRAS,GYARADOS,46,TRADE_DIALOGSET_CASUAL,.GyaradosM,.GyaradosF ; Lab2Text3 ; Entry Point
-    TRADE_MONS ONIX,MAGNETON,43,TRADE_DIALOGSET_CASUAL,.Magneton,.Magneton ; Lab4Text2    
+    TRADE_MONS ONIX,MAGNETON,43,TRADE_DIALOGSET_CASUAL,.Magneton,.Magneton ; Lab4Text2
 
 .Voltorb
     db "BLITZ@@@@@@"
@@ -109977,6 +110012,8 @@ CinnabarGymScriptPointers:
     dw CinnabarGymScript3
     dw GymLeaderAfterRematch
 
+; ───────────────────────────────────────
+
 ; prints a pokemon's status condition
 ; INPUT:
 ; de = address of status condition
@@ -110011,43 +110048,51 @@ PrintStatusAilment:
     call nz,.Par
     call .CheckBattleHud
     ret z  ; End If Not Battle Hud
-    ld a,[bc]
+;Battle
+    ld a,[bc] ; ReadStatus1
     bit CONFUSED,a
     call nz,.Confused
-    inc bc
-    ld a,[bc]
-    dec bc
+    call .ReadStatus2
     bit SEEDED,a
     call nz,.Seeded
-    ld a,[bc]
+    call .HandleWaiting
+    call .HandleShield
+    call .HandleFocus
+    ret
+
+.HandleWaiting
+    ld a,[bc] ; ReadStatus1
     and (1<<STORING_ENERGY)|(1<<THRASHING_ABOUT)|(1<<FLINCHED)|(1<<CHARGING_UP)|(1<<INVULNERABLE)
-    call nz,.Waiting
-    jr nz,.SkipOtherWaiting
-    inc bc
-    ld a,[bc]
-    dec bc
+    jr nz,.Waiting
+    call .ReadStatus2
     and (1<<NEEDS_TO_RECHARGE)|(1<<USING_RAGE)
-    call nz,.Waiting
-.SkipOtherWaiting
-    ld a,[bc]
+    jr nz,.Waiting
+    ld a,c
+    cp (W_PLAYERBATTSTATUS1) % $100
+    ld a,[W_PLAYERBATTSTATUS1]
+    jr nz,.DoneIdentifyOtherStatus1
+    ld a,[W_ENEMYBATTSTATUS1]
+.DoneIdentifyOtherStatus1
+    bit USING_TRAPPING_MOVE,a
+    jr nz,.Waiting
+    ret
+
+.HandleShield
+    ld a,[bc] ; ReadStatus1
     bit INVULNERABLE,a
-    call nz,.Shield
-    jr nz,.SkipOtherShield
-    inc bc
-    ld a,[bc]
-    dec bc
+    jr nz,.Shield
+    call .ReadStatus2
     and (1<<PROTECTED_BY_MIST)|(1<<HAS_SUBSTITUTE_UP)
-    call nz,.Shield
-    jr nz,.SkipOtherShield
-    inc bc
-    inc bc
-    ld a,[bc]
-    dec bc
-    dec bc
+    jr nz,.Shield
+    call .ReadStatus3
     and (1<<HAS_LIGHT_SCREEN_UP)|(1<<HAS_REFLECT_UP)
-    call nz,.Shield
-.SkipOtherShield
-    
+    jr nz,.Shield
+    ret
+
+.HandleFocus
+    call .ReadStatus2
+    and (1<<USING_X_ACCURACY)|(1<<GETTING_PUMPED)
+    jr nz,.Focus
     ret
 
 .Slp
@@ -110056,11 +110101,7 @@ PrintStatusAilment:
 .Psn
     call .CheckBattleHud
     jr z,.NormalPoison
-    inc bc
-    inc bc
-    ld a,[bc]
-    dec bc
-    dec bc
+    call .ReadStatus3
     bit BADLY_POISONED,a
     jr nz,.BadlyPoisoned
 .NormalPoison
@@ -110086,6 +110127,9 @@ PrintStatusAilment:
     jr .NextVideoSlot
 .Shield
     ld [hl],$CF
+    jr .NextVideoSlot
+.Focus
+    ld [hl],$DF
     jr .NextVideoSlot
 .BadlyPoisoned
     ld [hl],$DD
@@ -110124,6 +110168,22 @@ PrintStatusAilment:
     ld a,b
     pop bc
     ret
+
+.ReadStatus2
+    inc bc
+    ld a,[bc]
+    dec bc
+    ret
+
+.ReadStatus3
+    inc bc
+    inc bc
+    ld a,[bc]
+    dec bc
+    dec bc
+    ret
+
+; ───────────────────────────────────────
 
 BrunoText1:
     db $08 ; asm
@@ -124365,6 +124425,11 @@ _TryDepositPokedexText:
     text_line , "deposit #DEX!"
     text_wait
 
+_FreeMoveText:
+    text_init , $5a
+    text_line , "is now free!"
+    text_wait
+
 SECTION "bank23",ROMX,BANK[$23]
 
 _UnnamedText_56437:
@@ -129274,6 +129339,11 @@ _PreHM06Text:
     text_cont , "you if you want!"
     text_wait
 
+_TrappingEffectText:
+    text_init , $59
+    text_line , "is trapped!"
+    text_wait
+
 SECTION "bank26",ROMX,BANK[$26]
 
 _UnnamedText_5c4a3:
@@ -133201,21 +133271,21 @@ _AnswerNoText:
     text_done
 
 _MoveDeleterIntroText:
-    text_init , "I'm MOVEDELETER."  
-    text_line , "Would you like to" 
-    text_cont , "delete one move"   
-    text_cont , "of your #MON?"     
+    text_init , "I'm MOVEDELETER."
+    text_line , "Would you like to"
+    text_cont , "delete one move"
+    text_cont , "of your #MON?"
     text_done
 
 _WhichPkmnForgotText:
-    text_init , "Which #MON" 
-    text_line , "must forgot a"  
-    text_cont , "move?"          
+    text_init , "Which #MON"
+    text_line , "must forgot a"
+    text_cont , "move?"
     text_wait
 
 _ForgetCompleteText:
     TX_RAM $cd6d
-    text_init , " forgot" 
+    text_init , " forgot"
     text_line
     text_paus
     TX_RAM $CF4B
@@ -133233,8 +133303,8 @@ _OnlyOneMoveText:
     text_wait
 
 _NoPartyText:
-    text_init , "Your party is" 
-    text_line , "Empty!"        
+    text_init , "Your party is"
+    text_line , "Empty!"
     text_done
 
 _CopycatsHouseF2Text2_Part2:
@@ -136459,7 +136529,7 @@ SetSkillMonID:
 
 ; ──────────────────────────────────────────────────────────────────────
 
-; Input 
+; Input
 ; b = XXX_SKILL_SORT
 LearnSkill:
     call Load16BitRegisters
@@ -137391,9 +137461,9 @@ ItemNames:
     db "FLOAT@"        ; $56 ; Ex WATER POWER
     db "STRENGTH@"     ; $57 ; Ex EARTH POWER
     db "LIGHT@"        ; $58 ; Ex FIRE POWER
-    db "TELEPORT@"     ; $59 ; 
-    db "DIG@"          ; $5A ; 
-    db "HEAL@"         ; $5B ; 
+    db "TELEPORT@"     ; $59 ;
+    db "DIG@"          ; $5A ;
+    db "HEAL@"         ; $5B ;
     db "?@"            ; $5C
     db "?@"            ; $5D
     db "?@"            ; $5E
@@ -138457,7 +138527,7 @@ WildDataPointers:
     dw VermilionMons ; VERMILION_CITY
     dw CeladonMons   ; CELADON_CITY
     dw NoMons        ; FUCHSIA_CITY
-    dw NoMons        ; CINNABAR_ISLAND
+    dw WaterMons     ; CINNABAR_ISLAND
     dw NoMons        ; INDIGO_PLATEAU
     dw NoMons        ; SAFFRON_CITY
     dw NoMons
@@ -143649,8 +143719,8 @@ StoreGymLeaderRematch:
 .Map
     db PEWTER_GYM    ; 1
     db CERULEAN_GYM  ; 2
-    db VERMILION_GYM ; 3 
-    db CELADON_GYM   ; 4 
+    db VERMILION_GYM ; 3
+    db CELADON_GYM   ; 4
     db FUCHSIA_GYM   ; 5
     db SAFFRON_GYM   ; 6
     db CINNABAR_GYM  ; 7
@@ -144023,7 +144093,7 @@ TryPushingBoulder:
     set 1,[hl]
     ret
 
-ResetBoulderPushFlags: 
+ResetBoulderPushFlags:
     ld hl,wFlagFollowBoulderBit7
     res 7,[hl]
     ld hl,wFlags_0xcd60
@@ -149034,8 +149104,8 @@ GetAttackerType:
     db AERODACTYL
     db SNORLAX
     db ARTICUNO
-    db ZAPDOS  
-    db MOLTRES 
+    db ZAPDOS
+    db MOLTRES
     db DRAGONITE
     db MEWTWO
     db MEW

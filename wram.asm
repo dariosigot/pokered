@@ -1997,6 +1997,7 @@ wMustRedrawMapBlockBit6    ; dee2 ; bit 6 = Indicate that must "RedrawMapView" a
 wFlagFlashingHealBallBit7  ; dee2 ; bit 7
 wSpriteOAMBySpeciesBit7    ; dee2 ; bit 7 = Flag Single Mon ID Sprite
 wFlagBattleCureBit7        ; dee2 ; bit 7 = Print "Cure" intead of damage
+wFlagForceSwapTrapFreeBit7 ; dee2 ; bit 7 = Flag to Force to Print Message "Free to Trap" during Swap
     ds 1
 
 wFlagPlaceTitleScreen ; dee3 = counter for title screen

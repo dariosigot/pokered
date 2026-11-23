@@ -121,28 +121,32 @@ NEW_PREDEF: MACRO
     ENDM
 
 ; Predef macro.
-PREDEF: MACRO
+PREDEF_A: MACRO
 	ld a, (\1Predef - PredefPointers) / 3
+	ENDM
+
+PREDEF: MACRO
+	PREDEF_A \1
 	call Predef
 	ENDM
 	
 PREDEF_JUMP: MACRO
-	ld a, (\1Predef - PredefPointers) / 3
+	PREDEF_A \1
 	jp Predef
 	ENDM
 	
 PREDEF_JUMP_NZ: MACRO
-	ld a, (\1Predef - PredefPointers) / 3
+	PREDEF_A \1
 	jp nz,Predef
 	ENDM
 
 PREDEF_Z: MACRO
-	ld a, (\1Predef - PredefPointers) / 3
+	PREDEF_A \1
 	call z,Predef
 	ENDM
 
 PREDEF_NZ: MACRO
-	ld a, (\1Predef - PredefPointers) / 3
+	PREDEF_A \1
 	call nz,Predef
 	ENDM
 
