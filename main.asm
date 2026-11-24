@@ -49916,12 +49916,12 @@ Func_39bd5: ; 39bd5 (e:5bd5)
     ret
 
 ;joenote - added these functions to check if the ai switching bit is set
-;need to have 'a' accumulator and flag register freed up to use this function
 CheckandResetSwitchBit:
-    ld a,[wUnusedC000]
-    bit 0,a    ;check a for switch pkmn bit (sets or clears zero flag)
-    res 0,a ; resets the switch pkmn bit (does not affect flags)
-    ld [wUnusedC000],a
+    push hl
+    ld hl,wUnusedC000
+    bit FLAG_AI_SHOULD_SWITCH,[hl]    ;check a for switch pkmn bit (sets or clears zero flag)
+    res FLAG_AI_SHOULD_SWITCH,[hl] ; resets the switch pkmn bit (does not affect flags)
+    pop hl
     ret
 
 TrainerAI:
@@ -49949,10 +49949,10 @@ TrainerAI:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - AI should not use actions if in a move that prevents such a thing
     ld a,[W_ENEMYBATTSTATUS2]
-    and %01100000
+    and (1<<NEEDS_TO_RECHARGE)|(1<<USING_RAGE)
     ret nz
     ld a,[W_ENEMYBATTSTATUS1]
-    and %01110011
+    and (1<<STORING_ENERGY)|(1<<THRASHING_ABOUT)|(1<<CHARGING_UP)|(1<<INVULNERABLE)
     ret nz
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld a,[W_TRAINERCLASS] ; what trainer class is this?
@@ -49982,9 +49982,8 @@ TrainerAI:
     jp hl
 .CheckItemUse
     jr nc,.handleSwitch
-    ld a,[wUnusedC000]
-    res 0,a ; resets the switch pkmn bit
-    ld [wUnusedC000],a
+    ld hl,wUnusedC000
+    res FLAG_AI_SHOULD_SWITCH,[hl] ; resets the switch pkmn bit
     push de
     ld de,W_ENEMYMONNUMBER
     BANKSWITCH ClearAISwitched
@@ -56390,8 +56389,8 @@ PrintMenuItem:
 CheckandResetEnemyActedBit:
     push hl
     ld hl,wUnusedC000
-    bit 1,[hl] ;check a for already-acted bit (sets or clears zero flag)
-    res 1,[hl] ; resets the already-acted bit (does not affect flags)
+    bit FLAG_AI_ACTED_SW_ITEM,[hl] ;check a for already-acted bit (sets or clears zero flag)
+    res FLAG_AI_ACTED_SW_ITEM,[hl] ; resets the already-acted bit (does not affect flags)
     pop hl
     ret
 
@@ -56399,7 +56398,7 @@ CheckandResetEnemyActedBit:
 SetEnemyActedBit:
     push hl
     ld hl,wUnusedC000
-    set 1,[hl] ; sets the already-acted bit
+    set FLAG_AI_ACTED_SW_ITEM,[hl] ; sets the already-acted bit
     pop hl
     ret
 
@@ -57405,7 +57404,7 @@ PrintMoveFailureText: ; 3dbe2 (f:5be2)
     ; if you get here, the mon used jump kick or hi jump kick and missed
 
     ld hl,wUnusedC000
-    set 7,[hl] ; setting this bit causes counter to miss
+    set FLAG_AI_FRC_CNTR_MISS,[hl] ; setting this bit causes counter to miss
 
     ld hl,wBackupDamage
     ld a,[hli]
@@ -57654,7 +57653,7 @@ SetDEAndLoadMonFrontSprite:
 
 SetCounterToMiss:
     ld hl,wUnusedC000
-    set 7,[hl] ; setting this bit causes counter to miss
+    set FLAG_AI_FRC_CNTR_MISS,[hl] ; setting this bit causes counter to miss
     ld hl,HurtItselfText ; $5a65
     ret
 
@@ -58105,10 +58104,11 @@ ResetLeechSeedFlagAndReadPlayerMonCurHPAndStatus:
     ;joenote - zero the damage from last round if not using a trapping move
     call CheckTrappingToResetDamage
     ;joenote - clear custom battle flags
-    ld a,[wUnusedC000]
-    res 7,a ;reset the bit that causes counter to miss
-    res 6,a ;reset the bit that specifies a leech seed effect
-    ld [wUnusedC000],a
+    push hl
+    ld hl,wUnusedC000
+    res FLAG_AI_FRC_CNTR_MISS,[hl] ;reset the bit that causes counter to miss
+    res FLAG_AI_PSN_TOXIC_ALG,[hl] ;reset the bit that specifies a leech seed effect
+    pop hl
     jp ReadPlayerMonCurHPAndStatus
 
 CheckNotEscapeWildPokemon:
@@ -58126,9 +58126,17 @@ DrawCurrentMonGenderInBattle:
     ret
 
 ResetBattleFlagAndLoadCurrentOpponent:
+    ; FLAG_AI_SHOULD_SWITCH
+    ; FLAG_AI_ACTED_SW_ITEM
+    ; FLAG_AI_CANT_USE_MOVE
+    ; FLAG_AI_PLYR_MOVE_EFF
+    ; FLAG_AI_CUR_MV_STATIC
+    ; FLAG_AI_TRAINR_SWITCH
+    ; FLAG_AI_PSN_TOXIC_ALG
+    ; FLAG_AI_FRC_CNTR_MISS
     xor a
-    ld [wUnusedC000],a;joenote - clear custom ai bits and battle flags at battle start
-    ld [wUnusedD366],a;joenote - clear ai switch tracker bits
+    ld [wUnusedC000],a ; joenote - clear custom ai bits and battle flags at battle start
+    ld [wUnusedD366],a ; joenote - clear ai switch tracker bits
     ld a,[W_CUROPPONENT] ; $d059
     ret
 
@@ -58886,14 +58894,14 @@ ZeroLastDamage:
 
 TrappingEffect:
     ld hl,wUnusedC000
-    set 3,[hl]
+    set FLAG_AI_PLYR_MOVE_EFF,[hl]
     ld hl,W_PLAYERBATTSTATUS1 ; $d062
     ld de,$d06a ; PlayerNumAttacksLeft
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.done
     ld hl,wUnusedC000
-    res 3,[hl]
+    res FLAG_AI_PLYR_MOVE_EFF,[hl]
     ld hl,W_ENEMYBATTSTATUS1 ; $d067
     ld de,$d06f ; EnemyNumAttacksLeft
 .done
@@ -62650,7 +62658,7 @@ AIGetTypeEffectiveness:
 ;        -also changed neutral value from $10 to $0A since it makes more sense
 ;        -and modifying this to take into account both types
     ld a,[wUnusedC000]
-    bit 3,a
+    bit FLAG_AI_PLYR_MOVE_EFF,a
     jr z,.EnemyMove
     ld a,[W_PLAYERMOVETYPE]
     ld de,W_ENEMYMONTYPES        ; [de] = types of enemy's pokemon
@@ -62722,20 +62730,20 @@ PlayBattleMusicAndDoBattleTransitionAndInitBatVar:
 ;used so only ai switching checks can run
 NoAttackAICall:
     push af ;preserve flags on stack
+    push hl
     ld a,[W_ISINBATTLE]
     dec a
-    jr z,.NoAttackAICall_exit ; exit if this is a wild encounter
+    jr z,.end ; exit if this is a wild encounter
     ;set the no-attack bit
-    ld a,[wUnusedC000]
-    set 2,a
-    ld [wUnusedC000],a
+    ld hl,wUnusedC000
+    set FLAG_AI_CANT_USE_MOVE,[hl]
     ;call ai routines
     BANKSWITCH AIEnemyTrainerChooseMoves
     ;joenote - reset the no-attack bit
-    ld a,[wUnusedC000]
-    res 2,a
-    ld [wUnusedC000],a
-.NoAttackAICall_exit
+    ld hl,wUnusedC000
+    res FLAG_AI_CANT_USE_MOVE,[hl]
+.end
+    pop hl
     pop af ;get flags from stack
     ret
 
@@ -137838,14 +137846,14 @@ HandlePoisonBurnLeechSeed_:
     ld [$cc5b],a
     ld a,$BA
     call .PlayMoveAnimation ; play poison animation
+    ld hl,wUnusedC000
+    set FLAG_AI_PSN_TOXIC_ALG,[hl] ; set the bit that indicates poison is being handled
     pop hl
-    ld a,[wUnusedC000]
-    set 6,a ; set the bit that indicates poison is being handled
-    ld [wUnusedC000],a
     call PoisonBurnLeechSeed_DecreaseOwnHP
-    ld a,[wUnusedC000]
-    res 6,a ; reset the bit that indicates poison is being handled
-    ld [wUnusedC000],a
+    push hl
+    ld hl,wUnusedC000
+    res FLAG_AI_PSN_TOXIC_ALG,[hl] ; reset the bit that indicates poison is being handled
+    pop hl
     call .WaitForTextScrollButtonPress
     pop bc
     call .IsFainted
@@ -137937,7 +137945,7 @@ PoisonBurnLeechSeed_DecreaseOwnHP:
     ld de,W_ENEMYTOXICCOUNTER ; $d071
 .playersTurn
     ld a,[wUnusedC000]
-    bit 6,a ; check if this is for leech seed
+    bit FLAG_AI_PSN_TOXIC_ALG,a ; check if this is for leech seed
     jr z,.noToxic
     bit BADLY_POISONED,[hl]
     jr z,.noToxic
@@ -148321,8 +148329,8 @@ EnemyBideAccum_:
 _CheckCounterFail:
     ; Check Force MISS
     ld hl,wUnusedC000
-    bit 7,[hl] ;check for Counter miss bit
-    res 7,[hl] ; resets the bit (does not affect flags)
+    bit FLAG_AI_FRC_CNTR_MISS,[hl] ;check for Counter miss bit
+    res FLAG_AI_FRC_CNTR_MISS,[hl] ; resets the bit (does not affect flags)
     jr nz,.Fail ; return if bit is set causing Counter to miss.
     ; Check Target Ghost
     ld h,d

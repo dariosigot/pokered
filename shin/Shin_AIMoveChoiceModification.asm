@@ -8,7 +8,7 @@ AIMoveChoiceModification1:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - kick out if no-attack bit is set
     ld a,[wUnusedC000]
-    bit 2,a
+    bit FLAG_AI_CANT_USE_MOVE,a
     ret nz
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld a,[W_PLAYERMONSTATUS]
@@ -738,7 +738,7 @@ AIMoveChoiceModification2:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - kick out if no-attack bit is set
     ld a,[wUnusedC000]
-    bit 2,a
+    bit FLAG_AI_CANT_USE_MOVE,a
     ret nz
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld a,[$ccd5]
@@ -813,7 +813,7 @@ AIMoveChoiceModification3:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - kick out if no-attack bit is set
     ld a,[wUnusedC000]
-    bit 2,a
+    bit FLAG_AI_CANT_USE_MOVE,a
     ret nz
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ld hl,wBuffer - 1 ; temp move selection array (-1 byte offset)
@@ -998,7 +998,7 @@ AIMoveChoiceModification3:
     push de
     ;reset type-effectiveness bit before calling function
     ld hl,wUnusedC000
-    res 3,[hl]
+    res FLAG_AI_PLYR_MOVE_EFF,[hl]
     BANKSWITCH AIGetTypeEffectiveness
     pop de
     pop bc
@@ -1124,11 +1124,10 @@ AIMoveChoiceModification3:
 ; ─────────────────────────────────────────────────────────────────────────
 
 AIMoveChoiceModification4:    ;this unused routine now handles intelligent trainer switching
-    ld a,[wUnusedC000]
-    set 5,a ; sets the bit that signifies trainer has intelligent switching
-    ld [wUnusedC000],a
     push hl
     push bc
+    ld hl,wUnusedC000
+    set FLAG_AI_TRAINR_SWITCH,[hl] ; sets the bit that signifies trainer has intelligent switching
     call ScoreAIParty ;carry is cleared if current mon score >= highest score of remaining roster; don't switch
     pop bc
     pop hl
@@ -1139,11 +1138,10 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     ld a,[W_ENEMYMONSTATUS]
     bit FRZ_Bit,a           ; check freeze
     jr z,.skipSwitchFreeze  ; no Freeze status if zero flag set
-    call GenRandom          ; put a random number in 'a' between 0 and 255
-    cp $E0                  ; set carry if rand num < $E0
+    scf                     ; set carry
     ld a,"A"
     call c,.SetReason
-    jp c,.setSwitch         ; 87.5% chance to switch
+    jp c,.setSwitch         ; 100% chance to switch
 .skipSwitchFreeze
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1161,7 +1159,7 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;chance to switch if stuck in a trapping move
     ld a,[W_PLAYERBATTSTATUS1]
-    bit 5,a    ;check a for trapping move bit (sets or clears zero flag)
+    bit USING_TRAPPING_MOVE,a    ;check a for trapping move bit (sets or clears zero flag)
     jr z,.skipSwitchTrapEnd    ;not trapped if zero flag set
     call GenRandom    ;put a random number in 'a' between 0 and 255
     cp $40    ;set carry if rand num < $40
@@ -1173,7 +1171,7 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;chance to switch if afflicted with confusion
     ld a,[W_ENEMYBATTSTATUS1]
-    bit 7,a    ;check a for the confusion bit (sets or clears zero flag)
+    bit CONFUSED,a    ;check a for the confusion bit (sets or clears zero flag)
     jr z,.skipSwitchConfuseEnd    ;not confused if zero flag set
     call GenRandom    ;put a random number in 'a' between 0 and 255
     cp $40    ;set carry if rand num < $40
@@ -1201,7 +1199,7 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;slight chance to switch if afflicted with leech seed
     ld a,[W_ENEMYBATTSTATUS2]
-    bit 7,a    ;check a for the leech seed bit (sets or clears zero flag)
+    bit SEEDED,a    ;check a for the leech seed bit (sets or clears zero flag)
     jr z,.skipSwitchSeedEnd    ;not seeded if zero flag set
     call GenRandom    ;put a random number in 'a' between 0 and 255
     cp $20    ;set carry if rand num < $20
@@ -1271,9 +1269,8 @@ AIMoveChoiceModification4:    ;this unused routine now handles intelligent train
     push bc
     push de
     ;set type-effectiveness bit before calling function
-    ld a,[wUnusedC000]
-    set 3,a
-    ld [wUnusedC000],a
+    ld hl,wUnusedC000
+    set FLAG_AI_PLYR_MOVE_EFF,[hl]
     BANKSWITCH AIGetTypeEffectiveness
     pop de
     pop bc
@@ -1652,9 +1649,10 @@ ScoreAIParty:
     ;adjust score based on having any regular damaging moves
     ld a,$00
     ld [wAIPartyMonScores + 6],a    ;set a default score tracker: (bits 0 to 6--> 0-5=-5,0A = 0,14 or more=+2)(bit 7 set for 60+ power)
-    ld a,[wUnusedC000]
-    res 3,a ;get effectiveness of enemy moves
-    ld [wUnusedC000],a
+    push hl
+    ld hl,wUnusedC000
+    res FLAG_AI_PLYR_MOVE_EFF,[hl] ;get effectiveness of enemy moves
+    pop hl
     ld bc,$08    ;set offest to point to first move of current mon
 .enemymoveloop
     ld a,$0C
@@ -1809,9 +1807,10 @@ ScoreAIParty:
     ld a,$00
     ret
 .get_effectiveness_to_enemy
-    ld a,[wUnusedC000]
-    set 3,a
-    ld [wUnusedC000],a
+    push hl
+    ld hl,wUnusedC000
+    set FLAG_AI_PLYR_MOVE_EFF,[hl]
+    pop hl
     ;preserve the current enemy mon typing
     push hl
     push de
@@ -1988,9 +1987,10 @@ SetAISwitched:
 ; ─────────────────────────────────────────────────────────────────────────
 
 SetSwitchBit:
-    ld a,[wUnusedC000]
-    set 0,a ; sets the switch pkmn bit
-    ld [wUnusedC000],a
+    push hl
+    ld hl,wUnusedC000
+    set FLAG_AI_SHOULD_SWITCH,[hl] ; sets the switch pkmn bit
+    pop hl
     ret
 
 ; ─────────────────────────────────────────────────────────────────────────
@@ -2250,7 +2250,7 @@ AISelectWhichMonSendOut:
     ld [wWhichPokemon],a    ;else save the new mon's position
 
     ld a,[wUnusedC000]
-    bit 5,a
+    bit FLAG_AI_TRAINR_SWITCH,a
     jp z,.sendOutNewMon    ;skip all this if AI routine 4 has not run and done all the scoring
     ld a,[wAIPartyMonScores + 6]    ;get the best score
     and a
