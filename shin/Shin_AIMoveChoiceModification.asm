@@ -54,7 +54,7 @@ AIMoveChoiceModification1:
     jp z,.heavydiscourage    ;heavily discourage using dream eater on non-sleeping pkmn
     ld a,[W_PLAYERBATTSTATUS2]
     bit HAS_SUBSTITUTE_UP,a    ;check for substitute bit
-    jp nz,.heavydiscourage ;heavily discourage using dream eater against substitute 
+    jp nz,.heavydiscourage ;heavily discourage using dream eater against substitute
     dec [hl]    ;else slightly encourage dream eater's use on a sleeping pkmn
     jp .nextMove
 .notdreameater

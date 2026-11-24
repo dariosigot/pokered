@@ -2,21 +2,21 @@
 ; animation,effect,power,type,accuracy,PP
 
     db POUND        , NO_ADDITIONAL_EFFECT       ,  40 , RUBBER   , 255 , 06 ; pp 35 ; 0 ; Type Normal -> Rubber
-    db KARATE_CHOP  , NO_ADDITIONAL_EFFECT       ,  50 , FIGHT    , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Fight   
+    db KARATE_CHOP  , NO_ADDITIONAL_EFFECT       ,  50 , FIGHT    , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Fight
     db DOUBLESLAP   , TWO_TO_FIVE_ATTACKS_EFFECT ,  19 , RUBBER   , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Rubber ; PP 10 -> 20 ; Pwr 15 -> 19
     db COMET_PUNCH  , TWO_TO_FIVE_ATTACKS_EFFECT ,  21 , FIGHT    , 216 , 12 ; pp 15 ; 0 ; Type Normal -> Fight    ; Pwr 18 -> 21 ; Ene 14 -> 12
-    db MEGA_PUNCH   , NO_ADDITIONAL_EFFECT       ,  80 , FIGHT    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Fight   
+    db MEGA_PUNCH   , NO_ADDITIONAL_EFFECT       ,  80 , FIGHT    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Fight
     db PAY_DAY      , PAY_DAY_EFFECT             ,  60 , NORMAL   , 255 , 10 ; pp 20 ; 0 ; Pwr 40 -> 60
     db FIRE_PUNCH   , BURN_SIDE_EFFECT2          ,  75 , FIRE     , 255 , 14 ; pp 15 ; 0
     db ICE_PUNCH    , FREEZE_SIDE_EFFECT         ,  75 , ICE      , 255 , 14 ; pp 15 ; 0
     db THUNDERPUNCH , PARALYZE_SIDE_EFFECT1      ,  75 , THUNDER  , 255 , 14 ; pp 15 ; 0
     db SCRATCH      , NO_ADDITIONAL_EFFECT       ,  36 , NORMAL   , 255 , 06 ; pp 35 ; 0
     db VICEGRIP     , NO_ADDITIONAL_EFFECT       ,  60 , IVORY    , 255 , 07 ; pp 30 ; 0 ; Pwr 55 -> 60 ; Type Normal -> Ivory
-    db GUILLOTINE   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 45 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 45
+    db GUILLOTINE   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 80 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 80
     db RAZOR_WIND   , CHARGE_EFFECT              , 120 , WIND     , 255 , 20 ; pp 10 ; 1 ; Type Normal -> Wind ; Acr 191 -> 255 ; Pwr 80 -> 120
     db SWORDS_DANCE , STAT_UP1_DOWN1_EFFECT      ,   0 , METAL    , 255 , 20 ; pp 10 ; - ; PP 30 -> 10 ; Type Normal -> Metal
     db BLADE        , NO_ADDITIONAL_EFFECT       ,  65 , METAL    , 242 , 08 ; pp 30 ; 0 ; Pwr 50 -> 65 ; Type Normal -> Metal ; Ene 07 -> 08
-    db GUST         , NO_ADDITIONAL_EFFECT       ,  40 , WIND     , 255 , 06 ; pp 35 ; 1 ; Type Normal -> Wind  
+    db GUST         , NO_ADDITIONAL_EFFECT       ,  40 , WIND     , 255 , 06 ; pp 35 ; 1 ; Type Normal -> Wind
     db WING_ATTACK  , NO_ADDITIONAL_EFFECT       ,  65 , WIND     , 255 , 08 ; pp 25 ; 0 ; Pwr 35 -> 65 ; PP 35 -> 25
     db WHIRLWIND    , SWITCH_AND_TELEPORT_EFFECT ,  65 , WIND     , 216 , 10 ; pp 35 ; 1 ; Type Normal -> Wind ; PP 20 -> 35 ; Ene 06 -> 10 ; Pwr 0 -> 65 ; Special ; EditEffect
     db SWOOP        , FLY_EFFECT                 ,  90 , WIND     , 242 , 14 ; pp 15 ; 0 ; Pwr 70 -> 90
@@ -32,7 +32,7 @@
     db HEADBUTT     , FLINCH_SIDE_EFFECT2        ,  70 , NORMAL   , 255 , 14 ; pp 15 ; 0
     db HORN_ATTACK  , NO_ADDITIONAL_EFFECT       ,  65 , IVORY    , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Ivory
     db FURY_ATTACK  , TWO_TO_FIVE_ATTACKS_EFFECT ,  19 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Ivory ; Pwr 15 -> 19
-    db HORN_DRILL   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 45 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 45
+    db HORN_DRILL   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 80 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 80
     db TACKLE       , NO_ADDITIONAL_EFFECT       ,  35 , NORMAL   , 255 , 05 ; pp 35 ; 0 ; Acr 242 -> 255 ; Ene 06 -> 05
     db BODY_SLAM    , PARALYZE_SIDE_EFFECT1      ,  85 , RUBBER   , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Rubber
     db WRAP         , TRAPPING_EFFECT            ,  10 , NORMAL   , 204 , 12 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Ene 10 -> 12 ; Acr 216 -> 204
@@ -88,9 +88,9 @@
     db THUNDERBOLT  , PARALYZE_SIDE_EFFECT1      ,  90 , THUNDER  , 255 , 14 ; pp 15 ; 1 ; Pwr 95 -> 90
     db THUNDER_WAVE , PARALYZE_EFFECT            ,   0 , THUNDER  , 255 , 14 ; pp 15 ; - ; PP 20 -> 15
     db THUNDER_M    , PARALYZE_SIDE_EFFECT2      , 120 , THUNDER  , 178 , 20 ; pp 10 ; 1
-    db ROCK_THROW   , FLINCH_SIDE_EFFECT1        ,  50 , ROCK     , 216 , 09 ; pp 15 ; 0 ; Acr 165 -> 216 ; PP 15 -> 25 ; Ene 08 -> 09 
+    db ROCK_THROW   , FLINCH_SIDE_EFFECT1        ,  50 , ROCK     , 216 , 09 ; pp 15 ; 0 ; Acr 165 -> 216 ; PP 15 -> 25 ; Ene 08 -> 09
     db EARTHQUAKE   , NO_ADDITIONAL_EFFECT       , 100 , EARTH    , 255 , 20 ; pp 10 ; 0
-    db FISSURE      , OHKO_EFFECT                ,   1 , EARTH    ,  76 , 45 ; pp  5 ; - ; Ene 40 -> 45
+    db FISSURE      , OHKO_EFFECT                ,   1 , EARTH    ,  76 , 80 ; pp  5 ; - ; Ene 40 -> 80
     db TRAPHOLE     , CHARGE_EFFECT              ,  80 , EARTH    , 255 , 14 ; pp 15 ; 0 ; Pwr 100 -> 80 ; PP 10 -> 15
     db TOXIC        , POISON_EFFECT              ,   0 , POISON   , 229 , 20 ; pp 10 ; - ; Acr 216 -> 229
     db CONFUSION    , CONFUSION_SIDE_EFFECT      ,  50 , PSYCHIC  , 255 , 08 ; pp 25 ; 1
@@ -116,10 +116,10 @@
     db LIGHT_SCREEN , LIGHT_SCREEN_EFFECT        ,   0 , THUNDER  , 255 , 10 ; pp 20 ; - ; PP 30 -> 20
     db HAZE         , HAZE_EFFECT                ,   0 , ICE      , 255 , 07 ; pp 30 ; -
     db REFLECT      , REFLECT_EFFECT             ,   0 , PSYCHIC  , 255 , 10 ; pp 20 ; -
-    db FOCUS_ENERGY , FOCUS_ENERGY_EFFECT        ,   0 , FIGHT    , 255 , 07 ; pp 30 ; - ; Type Normal -> Fight   
+    db FOCUS_ENERGY , FOCUS_ENERGY_EFFECT        ,   0 , FIGHT    , 255 , 25 ; pp 30 ; - ; Type Normal -> Fight ; Ene 07 -> 25
     db BIDE         , BIDE_EFFECT                ,   0 , TYPE_NA  , 255 , 20 ; pp 10 ; -
     db METRONOME    , METRONOME_EFFECT           ,   0 , TYPE_NA  , 255 , 20 ; pp 10 ; -
-    db MIRROR_MOVE  , MIRROR_MOVE_EFFECT         ,   0 , TYPE_NA  , 255 , 10 ; pp 20 ; - ; Typw Wind -> Normal
+    db MIRROR_MOVE  , MIRROR_MOVE_EFFECT         ,   0 , TYPE_NA  , 255 , 10 ; pp 20 ; - ; Type Wind -> Normal
     db SELFDESTRUCT , EXPLODE_EFFECT             , 200 , NORMAL   , 255 , 50 ; pp  5 ; 0 ; Pwr 130 -> 200 ; Ene 40 -> 50
     db EGG_BOMB     , NO_ADDITIONAL_EFFECT       , 100 , RUBBER   , 191 , 20 ; pp 10 ; 0 ; Type Normal -> Rubber
     db LICK         , PARALYZE_SIDE_EFFECT2      ,  35 , NORMAL   , 255 , 07 ; pp 30 ; 0 ; Pwr 20 -> 35

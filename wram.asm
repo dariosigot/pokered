@@ -15,7 +15,7 @@ wUnusedC000:: ; c000
 ;bit 1 - if set, ai already acted by switching or using an item this turn
 ;bit 2 - if set, ai can swith or use item but not use a move (only run ai routine 4)
 ;bit 3 - used for AIGetTypeEffectiveness (0 = enemy move effectiveness | 1 = player move effectiveness)
-;bit 4 - if set, current move being handled is a static damaging move 
+;bit 4 - if set, current move being handled is a static damaging move
 ;bit 5 - if set, current ai trainer has ai routine 4 assigned
 ;bit 6 - if set, poison damage algorithm is being called to handle toxic
 ;bit 7 - if set, force Counter to miss (for an opponent hurting itself or its jump kick missing)
@@ -326,7 +326,7 @@ ENDU
 SECTION "wAIPartyMonScores",WRAM0[$cd50]
 
 ;joenote - block of data that holds a score for the switch desireability of each AI trainer mon
-;gets overwritten with zeroes at the end of battle 
+;gets overwritten with zeroes at the end of battle
 wAIPartyMonScores:: ;cd50
     ;8 bytes
     ;-->6 bytes for roster scores
@@ -1867,7 +1867,7 @@ wEventRevealSafariGhostBit0  ; d883 ; bit 0
 wEventRouteD1Trainer0Bit1    ; d883 ; bit 1
     ds 1
 
-SECTION "W_GRASSRATE",WRAMX[$d887],BANK[$1] 
+SECTION "W_GRASSRATE",WRAMX[$d887],BANK[$1]
 
 W_GRASSRATE: ; d887
     ds 1
@@ -2004,7 +2004,6 @@ wMustRedrawMapBlockBit6    ; dee2 ; bit 6 = Indicate that must "RedrawMapView" a
 wFlagFlashingHealBallBit7  ; dee2 ; bit 7
 wSpriteOAMBySpeciesBit7    ; dee2 ; bit 7 = Flag Single Mon ID Sprite
 wFlagBattleCureBit7        ; dee2 ; bit 7 = Print "Cure" intead of damage
-wFlagForceSwapTrapFreeBit7 ; dee2 ; bit 7 = Flag to Force to Print Message "Free to Trap" during Swap
     ds 1
 
 wFlagPlaceTitleScreen ; dee3 = counter for title screen
@@ -2078,7 +2077,7 @@ wBackupDarkMap            ; dee8
 
 ; TODO : Check it! maybe can be dismiss
 ; because "Synchronize" was been moved
-; to OverworldLoop (Not yet in VBlank) 
+; to OverworldLoop (Not yet in VBlank)
 wFlagDisableSynchronizeBit0: ; dee9 ; bit 0 = Disable Synchronize Party
     ds 1
 
@@ -2099,7 +2098,7 @@ SECTION "DenimBuffer",WRAMX[$def0],BANK[$1]
 
 DENIM_BUFFER_LENGHT EQUS "80" ; Number of Byte
 
-UNION 
+UNION
 
 wMoveRelearnerMoveList: ; def0
     ds DENIM_BUFFER_LENGHT

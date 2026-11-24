@@ -64,7 +64,7 @@ MAIN EDIT
 • Handle Field Move (CUT, FLY, ...) by Pkmn Type (ex. Charizard can Cut,Fly,Strength,Light and Dig every time) and delete move dependence.
   Now a Pkmn can use its internal field move only with correct badge and after the player obtains a specific POWER.
   POWER location is the same of old HM (totally removed)
-• Custom TM Name with short Move Text 
+• Custom TM Name with short Move Text
 • Handle Party SubMenù with "Wrapping" and without CANCEL
 • Red Ball Icon in Battle
 • Dinamic Exp Bar in Battle and Status Screen (like Gen II)

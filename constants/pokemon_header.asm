@@ -6232,7 +6232,7 @@ Mon155BaseStats:
 
     ; not used
     db 0
-    
+
     db 255 ; catch rate
     db 0 ; base exp yield
 
@@ -6272,7 +6272,7 @@ Mon156BaseStats:
 
     ; not used
     db 0
-    
+
     db 255 ; catch rate
     db 0 ; base exp yield
 
@@ -6312,7 +6312,7 @@ Mon157BaseStats:
 
     ; not used
     db 0
-    
+
     db 255 ; catch rate
     db 0 ; base exp yield
 
@@ -6352,7 +6352,7 @@ Mon158BaseStats:
 
     ; not used
     db 0
-    
+
     db 255 ; catch rate
     db 0 ; base exp yield
 
@@ -6392,7 +6392,7 @@ Mon159BaseStats:
 
     ; not used
     db 0
-    
+
     db 255 ; catch rate
     db 0 ; base exp yield
 
