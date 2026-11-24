@@ -58894,7 +58894,7 @@ MoveHitTest:
     cp DREAM_EATER_EFFECT
     jr nz,.swiftCheck
     ld a,[bc]
-    and a,$07 ; is the target pokemon sleeping?
+    and a,SLP ; is the target pokemon sleeping?
     jr z,.moveMissed2
 .swiftCheck
     ld a,[de]
@@ -58934,6 +58934,7 @@ MoveHitTest:
     ld a,[H_WHOSETURN]
     and a
     jr nz,.enemyTurn
+
 .playerTurn
 ; this checks if the move effect is disallowed by mist
     ld a,[W_PLAYERMOVEEFFECT]
@@ -58954,21 +58955,23 @@ MoveHitTest:
 ; function is not called when those moves are used
 ; XXX are there are any others like those three?
     ld a,[W_ENEMYBATTSTATUS2]
-    bit 1,a ; PROTECTED_BY_MIST
+    bit PROTECTED_BY_MIST,a
     jr nz,.moveMissed
 .skipEnemyMistCheck
     ld a,[W_PLAYERBATTSTATUS2]
-    bit 0,a ; USING_X_ACCURACY ; is the player using X Accuracy?
+    bit USING_X_ACCURACY,a ; is the player using X Accuracy?
     jr z,.calcHitChance
     ; if so, always hit regardless of accuracy/evasion
-.player_ohko_xacc    ;joenote - player ohko moves now ignore x accuracy
-    ; this section is entered if the player is using x accuracy
-    ld a,[W_PLAYERMOVEEFFECT] ; load the move effect
-    cp OHKO_EFFECT            ; check if it's an ohko move
-    ret nz                    ; if not, the x accuracy skips hit chance
+
+    ld a,[W_PLAYERMOVEEFFECT]
+    call .CheckDontMissEffect
+    ret c
+
     jr .calcHitChance         ; else do normal accuracy checks
+
 .moveMissed2
     jr .moveMissed
+
 .enemyTurn
     ld a,[W_ENEMYMOVEEFFECT]
     cp ATTACK_DOWN1_EFFECT
@@ -58983,21 +58986,21 @@ MoveHitTest:
 .playerMistCheck
 ; similar to enemy mist check
     ld a,[W_PLAYERBATTSTATUS2]
-    bit 1,a ; PROTECTED_BY_MIST
+    bit PROTECTED_BY_MIST,a
     jr nz,.moveMissed
 .skipPlayerMistCheck
     ld a,[W_ENEMYBATTSTATUS2]
-    bit 0,a ; USING_X_ACCURACY ; is the enemy using X Accuracy?
+    bit USING_X_ACCURACY,a ; is the enemy using X Accuracy?
     jr z,.calcHitChance
     ; if so, always hit regardless of accuracy/evasion
-.enemy_ohko_xacc    ;joenote - enemy ohko moves now ignore x accuracy
-    ; this section is entered if the enemy is using x accuracy
-    ld a,[W_ENEMYMOVEEFFECT] ; load the move effect
-    cp OHKO_EFFECT           ; check if it's an ohko move
-    ret nz                   ; if not, the x accuracy skips hit chance
-    ;jr .calcHitChance       ; else do normal accuracy checks
+    
+    ld a,[W_ENEMYMOVEEFFECT]
+    call .CheckDontMissEffect
+    ret c
+    ; ft
+
 .calcHitChance
-    call CalcHitChance ; scale the move accuracy according to attacker's accuracy and target's evasion
+    call .CalcHitChance ; scale the move accuracy according to attacker's accuracy and target's evasion
     ld a,[W_PLAYERMOVEACCURACY]
     ld b,a
     ld a,[H_WHOSETURN]
@@ -59011,6 +59014,7 @@ MoveHitTest:
     call GenRandomInBattle ; random number
     cp b
     ret c
+
 .moveMissed
     ld hl,W_DAMAGE
     push de
@@ -59035,11 +59039,51 @@ MoveHitTest:
 .playerTurn2
     ld hl,W_PLAYERBATTSTATUS1
 .end
-    res 5,[hl] ; end multi-turn attack e.g. wrap
+    res USING_TRAPPING_MOVE,[hl] ; end multi-turn attack e.g. wrap
     ret
 
+.CheckDontMissEffect
+    ld hl,.DontMissEffectList
+    ld de,1
+    jp IsInArray
+
+.DontMissEffectList
+    db ACCURACY_DOWN_SIDE2_EFFECT
+    db ATTACK_DOWN_SIDE1_EFFECT
+    db ATTACK_TWICE_EFFECT
+    db BURN_SIDE_EFFECT2
+    db CHARGE_EFFECT
+    db CONFUSION_SIDE_EFFECT
+    db DEFENSE_DOWN_SIDE1_EFFECT
+    db DRAIN_HP_EFFECT
+    db DREAM_EATER_EFFECT
+    db EXPLODE_EFFECT
+    db FLINCH_SIDE_EFFECT1
+    db FLINCH_SIDE_EFFECT2
+    db FLY_EFFECT
+    db FREEZE_SIDE_EFFECT
+    db HYPER_BEAM_EFFECT
+    db JUMP_KICK_EFFECT
+    db NO_ADDITIONAL_EFFECT
+    db PARALYZE_SIDE_EFFECT1
+    db PARALYZE_SIDE_EFFECT2
+    db PAY_DAY_EFFECT
+    db POISON_SIDE_EFFECT1
+    db POISON_SIDE_EFFECT2
+    db RAGE_EFFECT
+    db RECOIL_EFFECT
+    db SPECIAL_DAMAGE_EFFECT
+    db SPECIAL_DOWN_SIDE1_EFFECT
+    db SPEED_DOWN_SIDE1_EFFECT
+    db SPEED_DOWN_SIDE2_EFFECT
+    db SUPER_FANG_EFFECT
+    db THRASH_PETAL_DANCE_EFFECT
+    db TWINEEDLE_EFFECT
+    db TWO_TO_FIVE_ATTACKS_EFFECT
+    db $FF
+
+.CalcHitChance
 ; values for player turn
-CalcHitChance:
     ld hl,W_PLAYERMOVEACCURACY
     ld a,[H_WHOSETURN]
     and a
@@ -60038,9 +60082,7 @@ ApplyBurnAndParalysisPenalties:
     ld [hl],a
     ret
 
-SECTION "QuarterSpeedDueToParalysis",ROMX[$6d27],BANK[$f]
-
-QuarterSpeedDueToParalysis: ; 3ed27 (f:6d27)
+QuarterSpeedDueToParalysis:
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.asm_3ed48
@@ -60082,7 +60124,7 @@ QuarterSpeedDueToParalysis: ; 3ed27 (f:6d27)
     ld [hl],b
     ret
 
-HalveAttackDueToBurn: ; 3ed64 (f:6d64)
+HalveAttackDueToBurn:
     ld a,[H_WHOSETURN] ; $FF00+$f3
     and a
     jr z,.asm_3ed81

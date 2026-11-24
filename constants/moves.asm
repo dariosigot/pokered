@@ -12,7 +12,7 @@
     db THUNDERPUNCH , PARALYZE_SIDE_EFFECT1      ,  75 , THUNDER  , 255 , 14 ; pp 15 ; 0
     db SCRATCH      , NO_ADDITIONAL_EFFECT       ,  36 , NORMAL   , 255 , 06 ; pp 35 ; 0
     db VICEGRIP     , NO_ADDITIONAL_EFFECT       ,  60 , IVORY    , 255 , 07 ; pp 30 ; 0 ; Pwr 55 -> 60 ; Type Normal -> Ivory
-    db GUILLOTINE   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 80 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 80
+    db GUILLOTINE   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 50 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 50
     db RAZOR_WIND   , CHARGE_EFFECT              , 120 , WIND     , 255 , 20 ; pp 10 ; 1 ; Type Normal -> Wind ; Acr 191 -> 255 ; Pwr 80 -> 120
     db SWORDS_DANCE , STAT_UP1_DOWN1_EFFECT      ,   0 , METAL    , 255 , 20 ; pp 10 ; - ; PP 30 -> 10 ; Type Normal -> Metal
     db BLADE        , NO_ADDITIONAL_EFFECT       ,  65 , METAL    , 242 , 08 ; pp 30 ; 0 ; Pwr 50 -> 65 ; Type Normal -> Metal ; Ene 07 -> 08
@@ -32,9 +32,9 @@
     db HEADBUTT     , FLINCH_SIDE_EFFECT2        ,  70 , NORMAL   , 255 , 14 ; pp 15 ; 0
     db HORN_ATTACK  , NO_ADDITIONAL_EFFECT       ,  65 , IVORY    , 255 , 08 ; pp 25 ; 0 ; Type Normal -> Ivory
     db FURY_ATTACK  , TWO_TO_FIVE_ATTACKS_EFFECT ,  19 , IVORY    , 216 , 10 ; pp 20 ; 0 ; Type Normal -> Ivory ; Pwr 15 -> 19
-    db HORN_DRILL   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 80 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 80
+    db HORN_DRILL   , OHKO_EFFECT                ,   1 , IVORY    ,  76 , 50 ; pp  5 ; - ; Type Normal -> Ivory ; Ene 40 -> 50
     db TACKLE       , NO_ADDITIONAL_EFFECT       ,  35 , NORMAL   , 255 , 05 ; pp 35 ; 0 ; Acr 242 -> 255 ; Ene 06 -> 05
-    db BODY_SLAM    , PARALYZE_SIDE_EFFECT1      ,  85 , RUBBER   , 255 , 14 ; pp 15 ; 0 ; Type Normal -> Rubber
+    db BODY_SLAM    , PARALYZE_SIDE_EFFECT2      ,  85 , RUBBER   , 229 , 14 ; pp 15 ; 0 ; Type Normal -> Rubber ; Acr 255 -> 229
     db WRAP         , TRAPPING_EFFECT            ,  10 , NORMAL   , 204 , 12 ; pp 20 ; 0 ; Pwr 15 -> 10 ; Ene 10 -> 12 ; Acr 216 -> 204
     db TAKE_DOWN    , RECOIL_EFFECT              , 100 , NORMAL   , 216 , 10 ; pp 20 ; 0 ; Pwr 90 -> 100
     db THRASH       , THRASH_PETAL_DANCE_EFFECT  , 120 , NORMAL   , 255 , 15 ; pp 15 ; 0 ; Pwr 90 -> 120 ; PP 20 -> 15 ; Ene 14 -> 15
@@ -90,7 +90,7 @@
     db THUNDER_M    , PARALYZE_SIDE_EFFECT2      , 120 , THUNDER  , 178 , 20 ; pp 10 ; 1
     db ROCK_THROW   , FLINCH_SIDE_EFFECT1        ,  50 , ROCK     , 216 , 09 ; pp 15 ; 0 ; Acr 165 -> 216 ; PP 15 -> 25 ; Ene 08 -> 09
     db EARTHQUAKE   , NO_ADDITIONAL_EFFECT       , 100 , EARTH    , 255 , 20 ; pp 10 ; 0
-    db FISSURE      , OHKO_EFFECT                ,   1 , EARTH    ,  76 , 80 ; pp  5 ; - ; Ene 40 -> 80
+    db FISSURE      , OHKO_EFFECT                ,   1 , EARTH    ,  76 , 50 ; pp  5 ; - ; Ene 40 -> 50
     db TRAPHOLE     , CHARGE_EFFECT              ,  80 , EARTH    , 255 , 14 ; pp 15 ; 0 ; Pwr 100 -> 80 ; PP 10 -> 15
     db TOXIC        , POISON_EFFECT              ,   0 , POISON   , 229 , 20 ; pp 10 ; - ; Acr 216 -> 229
     db CONFUSION    , CONFUSION_SIDE_EFFECT      ,  50 , PSYCHIC  , 255 , 08 ; pp 25 ; 1
